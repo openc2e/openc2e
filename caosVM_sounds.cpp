@@ -39,6 +39,10 @@ void caosVM::v_MMSC() {
  RMSC (command) x (integer) y (integer) track_name (string)
 */
 void caosVM::c_RMSC() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_STRING(track_name)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
 	cout << "unimplemented: RMSC\n";
 }
 
