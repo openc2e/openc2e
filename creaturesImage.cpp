@@ -26,18 +26,28 @@
 imageGallery gallery;
 
 creaturesImage *imageGallery::getImage(std::string name) {
+	// step one: see if the image is already in the gallery
 	std::map<std::string, creaturesImage *>::iterator i = gallery.find(name);
 	if (i != gallery.end()) {
 		creaturesImage *img = i->second;
 		img->addRef();
 		return img;
 	}
-	// todo: we need to check for c16 first, then s16, then spr(?)
+
+	// step two: try opening it in .c16 form first, then try .s16 form
 	std::string filename = "./data/Images/" + name + ".c16";
-	std::cout << "imageGallery: opening " << filename << "\n";
 	std::ifstream in(filename.c_str());
-	assert(in.is_open());
-	gallery[name] = new c16Image(in);
+	if (!in.is_open()) {
+		filename = "./data/Images/" + name + ".s16";
+		in.clear();
+		in.open(filename.c_str());
+		assert(in.is_open());
+		std::cout << "imageGallery: opening " << filename << "\n";
+		gallery[name] = new s16Image(in);
+	} else {
+		std::cout << "imageGallery: opening " << filename << "\n";
+		gallery[name] = new c16Image(in);
+	}
 	return gallery[name];
 }
 

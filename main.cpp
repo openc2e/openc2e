@@ -118,6 +118,8 @@ extern "C" int main(int argc, char *argv[]) {
 
 	assert(world.map.getMetaRoomCount() != 0);
 
+	world.init();
+
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		world.map.SetCurrentMetaRoom(j);
 		MetaRoom *m = world.map.getCurrentMetaRoom();
@@ -140,8 +142,8 @@ extern "C" int main(int argc, char *argv[]) {
 	assert(screen != 0);
 
 	SDL_WM_SetCaption("openc2e - Creatures 3", "openc2e");
-
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	SDL_ShowCursor(false);
 
 	adjustx = world.map.getCurrentMetaRoom()->x();
 	adjusty = world.map.getCurrentMetaRoom()->y();
@@ -149,8 +151,6 @@ extern "C" int main(int argc, char *argv[]) {
 
 	done = 0;
 	while ( !done ) {
-		SDL_Delay(50); // todo: use BUZZ value
-
 		world.tick();
 		drawWorld();
 
@@ -159,10 +159,10 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_VIDEORESIZE:
 					screen = SDL_SetVideoMode(event.resize.w, event.resize.h, video_bpp, videoflags);
 					assert(screen != 0);
-					drawWorld();
 					break;
-				case SDL_MOUSEBUTTONDOWN:
-					drawWorld();
+				case SDL_MOUSEMOTION:
+					world.hand()->moveTo(event.motion.x + adjustx, event.motion.y + adjusty);
+					// drawWorld();
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {

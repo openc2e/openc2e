@@ -73,3 +73,35 @@ c16Image::c16Image(std::istream &in) {
 	}
 	delete[] lineoffsets;
 }
+
+s16Image::s16Image(std::istream &in) {
+	uint32 flags; uint16 spritecount; bool is_565;
+	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
+	is_565 = (flags & 0x01);
+	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
+
+  widths = new unsigned short[m_numframes];
+	heights = new unsigned short[m_numframes];
+	buffers = new void *[m_numframes];
+	unsigned int *offsets = new unsigned int[m_numframes];
+
+	// first, read the headers.
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]);
+		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
+		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
+	}
+
+	// then, read the files. this involves seeking around, and is hence immensely ghey
+	// todo: we assume the file format is valid here. we shouldn't.
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		buffers[i] = new unsigned short[widths[i] * heights[i]];
+		in.seekg(offsets[i], std::ios::beg);
+		in.read((char *)buffers[i], (widths[i] * heights[i] * 2));
+		for (unsigned int k = 0; k < (widths[i] * heights[i]); k++) {
+			((unsigned short *)buffers[i])[k] = swapEndianShort(((unsigned short *)buffers[i])[k]);
+		}
+	}
+
+	delete[] offsets;
+}

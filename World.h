@@ -29,14 +29,19 @@ struct cainfo {
 };
 
 class World {
+protected:
+	Agent *theHand;
+
 public:
 	Map map;
 	std::multiset<Agent *, agentzorder> agents;
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 
 	void addAgent(Agent *a);
+	Agent *hand() { return theHand; }
 	
 	World();
+	void init();
 
 	void tick();
 };

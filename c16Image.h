@@ -24,3 +24,8 @@ class c16Image : public creaturesImage {
 public:
   c16Image(std::istream &);
 };
+
+class s16Image : public creaturesImage {
+public:
+  s16Image(std::istream &);
+};
