@@ -21,6 +21,7 @@
 #define _CAOSVM_H
 
 #include "caosScript.h"
+#include <map>
 
 #define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
@@ -34,6 +35,7 @@ public: // right now, Agent::fireEvent sets targ itself
 	std::vector<bool> truthstack;
 	std::vector<unsigned int> linestack;
 	std::vector<unsigned int> repstack;
+	std::map<unsigned int, unsigned int> enumdata;
 	bool locked, noschedule;
 	unsigned int blockingticks;
 
@@ -161,6 +163,8 @@ public:
 	void c_MESG_WRT();
 	void v_TOTL();
 	void c_SHOW();
+	void v_POSX();
+	void v_POSY();
 
 	// motion
 	void c_ELAS();

@@ -45,24 +45,22 @@ bool caosVar::operator == (caosVar &v) {
 }
 
 bool caosVar::operator > (caosVar &v) {
-	// todo: should be able to compare int and float, apparently
 	// todo: should be able to compare strings, apparently
-	if (this->hasInt() && v.hasInt()) {
-		return (this->intValue > v.intValue);
-	} else if (this->hasFloat() && v.hasFloat()) {
-		return (this->floatValue > v.floatValue);
+	if ((this->hasFloat() || this->hasInt()) && (v.hasFloat() || v.hasInt())) {
+		float one = (this->hasFloat() ? this->floatValue : this->intValue);
+		float two = (v.hasFloat() ? v.floatValue : v.intValue);
+		return (one > two);
 	}
 	std::cerr << "caosVar operator > couldn't compare " << this->dump() << " and " << v.dump() << "\n";
 	return false;
 }
 
 bool caosVar::operator < (caosVar &v) {
-	// todo: should be able to compare int and float, apparently
 	// todo: should be able to compare strings, apparently
-	if (this->hasInt() && v.hasInt()) {
-		return (this->intValue < v.intValue);
-	} else if (this->hasFloat() && v.hasFloat()) {
-		return (this->floatValue < v.floatValue);
+	if ((this->hasFloat() || this->hasInt()) && (v.hasFloat() || v.hasInt())) {
+		float one = (this->hasFloat() ? this->floatValue : this->intValue);
+		float two = (v.hasFloat() ? v.floatValue : v.intValue);
+		return (one < two);
 	}
 	std::cerr << "caosVar operator < couldn't compare " << this->dump() << " and " << v.dump() << "\n";
 	return false;
@@ -198,6 +196,7 @@ void caosVM::resetScriptState() {
 	truthstack.clear();
 	linestack.clear();
 	repstack.clear();
+	enumdata.clear();
 
 	currentscript = 0;
 	currentline = 0;

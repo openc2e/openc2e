@@ -50,8 +50,6 @@
 <p>create a new vehicle agent with given family/genus/species, given spritefile with image_count sprites</p>
 <p>available starting at first_image in the spritefile, with the first part at the screen depth given by plane</p>
 </td></tr></table><br>
-<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">NEXT </span>(command)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">NULL </span>(agent)</td></tr><tr><td class="description">
 <p>return null (zero) agent</p>
 </td></tr></table><br>
@@ -67,6 +65,10 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSE </span>(command) pose (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSE </span>(integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSX </span>(float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSY </span>(float)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RTAR </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
 <p>set targ to random agent with given family/genus/species</p>
@@ -176,6 +178,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ENDI </span>(command)</td></tr><tr><td class="description">
 <p>The end of a DOIF/ELIF/ELSE/ENDI block.</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ENUM </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">EVER </span>(command)</td></tr><tr><td class="description">
 <p>Jump back to the matching LOOP, no matter what.</p>
 </td></tr></table><br>
@@ -185,6 +189,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">LOOP </span>(command)</td></tr><tr><td class="description">
 <p>The start of a LOOP..EVER or LOOP..UNTL loop.</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">NEXT </span>(command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">REPE </span>(command)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">REPS </span>(command) reps (integer)</td></tr><tr><td class="description">
@@ -295,7 +301,7 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">LOCK </span>(command)</td></tr><tr><td class="description">
 <p>prevent agent script from being interrupted by another</p>
 </td></tr></table><br>
-<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRX </span>(command) event (integer) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRX </span>(command) family (integer) genus (integer) species (integer) event (integer)</td></tr><tr><td class="description">
 <p>delete the event script in question</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SLOW </span>(command)</td></tr><tr><td class="description">
@@ -396,4 +402,4 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VAxx </span>(variable)</td></tr><tr><td class="description">
 <p>script-local variables, 00 to 99</p>
 </td></tr></table><br>
-<p>130 documented commands: 18% of DS-era CEE, plus 6 openc2e-specific commands</p></body></html>
+<p>133 documented commands: 19% of DS-era CEE, plus 6 openc2e-specific commands</p></body></html>

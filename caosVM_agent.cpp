@@ -119,7 +119,7 @@ void caosVM::v_TARG() {
 */
 void caosVM::v_OWNR() {
 	VM_VERIFY_SIZE(0)
-	result.setAgent(0);
+	result.setAgent(owner);
 }
 
 /**
@@ -393,3 +393,20 @@ void caosVM::c_SHOW() {
 	targ->visible = visibility;
 }
 
+/**
+ POSX (float)
+*/
+void caosVM::v_POSX() {
+	VM_VERIFY_SIZE(0)
+	assert(targ);
+	result.setFloat(targ->x);
+}
+
+/**
+ POSY (float)
+*/
+void caosVM::v_POSY() {
+	VM_VERIFY_SIZE(0)
+	assert(targ);
+	result.setFloat(targ->y);
+}

@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include <iostream>
 #include "openc2e.h"
+#include "World.h" // enum
 
 void caosVM::jumpToAfterEquivalentNext() {
 	// todo: add non-ENUM things
@@ -237,12 +238,24 @@ void caosVM::c_ENUM() {
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
 
-	jumpToAfterEquivalentNext();
-	linestack.push_back(currentline);
-	repstack.push_back(0);
-	std::cerr << "unimplemented: ENUM\n";
+	// TODO: fix mess of 'r' initialisation
+	unsigned int r = (enumdata.count(currentline) == 0 ? 1 : enumdata[currentline]), x = 0;
 
-	// TODO: actual code here
+	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		if ((*i)->family == family)
+			if ((*i)->genus == genus)
+				if ((*i)->species == species)
+					x++;
+
+		if (x == r) {
+			enumdata[currentline] = x + 1;
+			targ = *i;
+			linestack.push_back(currentline);
+			return;
+		}
+	}
 	
+	enumdata[currentline] = 1; // TODO: erase it instead?
 	targ = owner;
+	jumpToAfterEquivalentNext();
 }
