@@ -74,3 +74,29 @@ unsigned int SimpleAgent::getAttributes() {
 	a += (rotatable ? 1024: 0);
 	return a + (presence ? 2048: 0);
 }
+
+void SimpleAgent::setFrameNo(unsigned int f) {
+	assert(f < animation.size());
+	frameno = f;
+}
+
+unsigned int SimpleAgent::getCurrentSprite() {
+	if (!animation.empty()) {
+		assert(frameno < animation.size());
+		return getFirstImage() + animation[frameno];
+	} else {
+		return getFirstImage() + 0; // TODO!!!
+	}
+}
+
+void SimpleAgent::tick() {
+	if (!animation.empty()) {
+		unsigned int f = frameno + 1;
+		if (f == animation.size()) return;
+		if (animation[f] == 255) {
+			if (f == (animation.size() - 1)) f = 0;
+			else f = animation[f + 1];
+		}
+		setFrameNo(f);
+	}
+}

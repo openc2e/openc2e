@@ -29,3 +29,10 @@ World::World() {
 void World::addAgent(Agent *a) {
 	agents.insert(a);
 }
+
+void World::tick() {
+	for (std::multiset<Agent *, agentzorder>::iterator i = agents.begin(); i != agents.end(); i++) {
+		(**i).tick();
+	}
+	// todo: tick rooms
+}

@@ -41,8 +41,8 @@ void drawWorld() {
 		SimpleAgent *agent = (SimpleAgent *)(*i);
 		creaturesImage *j = agent->getSprite();
 		SDL_Surface *surf;
-		// todo: we should get CURRENT FRAME
-		unsigned int img = agent->getFirstImage();
+
+		unsigned int img = agent->getCurrentSprite();
 		surf = SDL_CreateRGBSurfaceFrom(j->data(img),
 																		j->width(img),
 																		j->height(img),
@@ -136,6 +136,11 @@ extern "C" int main(int argc, char *argv[]) {
 
 	done = 0;
 	while ( !done ) {
+		SDL_Delay(50); // todo: use BUZZ value
+
+		world.tick();
+		drawWorld();
+
 		while ( SDL_PollEvent(&event) ) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:

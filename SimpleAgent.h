@@ -19,6 +19,7 @@
 
 #include "Agent.h"
 #include <string>
+#include <vector>
 
 #ifndef _C2E_SIMPLEAGENT_H
 #define _C2E_SIMPLEAGENT_H
@@ -26,10 +27,13 @@
 class SimpleAgent : public Agent {
 protected:
 	unsigned int first_image, image_count;
+	unsigned int frameno;
 
 public:
 	bool carryable, mouseable, activateable, invisible, floatable;
 	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
+
+	std::vector<unsigned int> animation;
 
 	SimpleAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
 							unsigned int firstimage, unsigned int imagecount);
@@ -39,6 +43,11 @@ public:
 	virtual bool isSimple() { return false; }
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
+
+	void setFrameNo(unsigned int);
+	unsigned int getCurrentSprite();
+
+	virtual void tick();
 };
 
 #endif

@@ -37,6 +37,8 @@ public:
 	void addAgent(Agent *a);
 	
 	World();
+
+	void tick();
 };
 
 extern World world;

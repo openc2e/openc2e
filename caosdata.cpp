@@ -63,6 +63,7 @@ void setupCommandPointers() {
 	CMDDEF(OUTV, 1)
 	CMDDEF(MMSC, 3)
 	CMDDEF(RMSC, 3)
+	CMDDEF(ANIM, 1)
 
 	NULLDEF(SCRP)
 	NULLDEF(ENDM)

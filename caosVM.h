@@ -96,6 +96,7 @@ public:
 	void c_KILL();
 	void c_NEXT();
 	void c_SCRX();
+	void c_ANIM();
 
 	// motion
 	void c_ELAS();
