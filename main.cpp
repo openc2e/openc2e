@@ -8,7 +8,33 @@
 #include "World.h"
 #include "caosVM.h"
 
-// testy!
+SDL_Surface *screen;
+blkImage *test;
+SDL_Surface **backsurfs;
+int adjustx, adjusty;
+
+void drawWorld() {
+	for (int i = 0; i < (test->totalheight / 128); i++) {
+		for (int j = 0; j < (test->totalwidth / 128); j++) {
+			int whereweare = j * (test->totalheight / 128) + i;
+			SDL_Rect destrect;
+			destrect.x = (j * 128) - adjustx; destrect.y = (i * 128) - adjusty;
+			SDL_BlitSurface(backsurfs[whereweare], 0, screen, &destrect);
+		}
+	}
+	for (std::vector<Room>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
+			 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
+		// ceiling
+		aalineColor(screen, i->x_left - adjustx, i->y_left_ceiling - adjusty, i->x_right - adjustx, i->y_right_ceiling - adjusty, 0xFF000077);
+		// floor
+		aalineColor(screen, i->x_left - adjustx, i->y_left_floor - adjusty, i->x_right - adjustx, i->y_right_floor - adjusty, 0xFF000077);
+		// left side
+		aalineColor(screen, i->x_left - adjustx, i->y_left_ceiling - adjusty, i->x_left - adjustx, i->y_left_floor - adjusty, 0xFF000077);
+		// right side
+		aalineColor(screen, i->x_right  - adjustx, i->y_right_ceiling - adjusty, i->x_right - adjustx, i->y_right_floor - adjusty, 0xFF000077);
+	}
+	SDL_UpdateRect(screen, 0, 0, 0, 0);
+}
 
 extern "C" int main(int argc, char *argv[]) {
 /*	if (argc != 2) {
@@ -26,23 +52,19 @@ extern "C" int main(int argc, char *argv[]) {
 	testvm.runEntirely();
 	
 	Uint32 initflags = SDL_INIT_VIDEO;
-	SDL_Surface *screen;
 	Uint8 video_bpp = 0;
 	Uint32 videoflags = SDL_SWSURFACE + SDL_RESIZABLE;
 	int done;
 	SDL_Event event;
-
-//	MetaRoom m(0, 0, 4112, 1300, "norn3.0");
 
 	if ( SDL_Init(initflags) < 0 ) {
 		std::cout << "SDL init failed: " << SDL_GetError();
 		return 1;
 	}
 
-	blkImage *test = world.map.getMetaRoom(0)->backImage();
+	test = world.map.getCurrentMetaRoom()->backImage();
 	assert(test != 0);
 
-	SDL_Surface **backsurfs;
 	backsurfs = new SDL_Surface *[test->numframes()];
 	for (int i = 0; i < test->numframes(); i++) {
 		backsurfs[i] = SDL_CreateRGBSurfaceFrom(test->data(i),
@@ -57,6 +79,13 @@ extern "C" int main(int argc, char *argv[]) {
 	screen = SDL_SetVideoMode(640, 480, video_bpp, videoflags);
 	assert(screen != 0);
 
+	SDL_WM_SetCaption("openc2e - Creatures 3", "openc2e");
+
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+
+	adjustx = 0; adjusty = 0;
+	drawWorld();
+
 	done = 0;
 	while ( !done ) {
 		while ( SDL_PollEvent(&event) ) {
@@ -64,30 +93,27 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_VIDEORESIZE:
 					screen = SDL_SetVideoMode(event.resize.w, event.resize.h, video_bpp, videoflags);
 					assert(screen != 0);
+					drawWorld();
+					break;
 				case SDL_MOUSEBUTTONDOWN:
-					for (int i = 0; i < (test->totalheight / 128); i++) {
-						for (int j = 0; j < (test->totalwidth / 128); j++) {
-							int whereweare = j * (test->totalheight / 128) + i;
-							SDL_Rect destrect;
-							destrect.x = (j * 128); destrect.y = (i * 128);
-							SDL_BlitSurface(backsurfs[whereweare], 0, screen, &destrect);
-						}
-					}
-					for (std::vector<Room>::iterator i = world.map.getMetaRoom(0)->rooms.begin();
-							 i != world.map.getMetaRoom(0)->rooms.end(); i++) {
-						// ceiling
-						lineColor(screen, i->x_left, i->y_left_ceiling, i->x_right, i->y_right_ceiling, 0xFF000000);
-						// floor
-						lineColor(screen, i->x_left, i->y_left_floor, i->x_right, i->y_right_floor, 0xFF000000);
-						// left side
-						lineColor(screen, i->x_left, i->y_left_ceiling, i->x_left, i->y_left_floor, 0xFF000000);
-						// right side
-						lineColor(screen, i->x_right, i->y_right_ceiling, i->x_right, i->y_right_floor, 0xFF000000);
-					}
-					SDL_UpdateRect(screen, 0, 0, 0, 0);
-					std::cout << "blit ok\n";
+					drawWorld();
 					break;
 				case SDL_KEYDOWN:
+					if (event.key.type == SDL_KEYDOWN) {
+						switch (event.key.keysym.sym) {
+							case SDLK_LEFT:
+								adjustx -= 20; break;
+							case SDLK_RIGHT:
+								adjustx += 20; break;
+							case SDLK_UP:
+								adjusty -= 20; break;
+							case SDLK_DOWN:
+								adjusty += 20; break;
+							default:
+								break;
+						}
+						drawWorld();
+					}
 					break;
 				case SDL_QUIT:
 					done = 1;

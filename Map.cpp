@@ -18,9 +18,16 @@
  */
 
 #include "Map.h"
+#include <assert.h>
+#include <iostream>
 
 void Map::Reset() {
-	// todo
+	currroom = 0;
+	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
+		delete *i;
+	}
+	metarooms.clear();
+	std::cout << "map reset\n";
 }
 
 void Map::SetMapDimensions(unsigned int w, unsigned int h) {
@@ -29,7 +36,8 @@ void Map::SetMapDimensions(unsigned int w, unsigned int h) {
 	height = h;
 }
 
-void Map::SetCurrentMetaRoom(unsigned int m) {
+void Map::SetCurrentMetaRoom(unsigned int room) {
+	assert(room < metarooms.size());
 	// todo
 }
 
@@ -39,5 +47,11 @@ int Map::addMetaRoom(MetaRoom *m) {
 }
 
 MetaRoom *Map::getMetaRoom(unsigned int room) {
+	assert(room < metarooms.size());
 	return metarooms[room];
+}
+
+MetaRoom *Map::getCurrentMetaRoom() {
+	assert(currroom < metarooms.size());
+	return metarooms[currroom];
 }

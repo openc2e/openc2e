@@ -24,6 +24,7 @@ class Map {
 protected:
 	unsigned int width, height;
 	std::vector<MetaRoom *> metarooms;
+	unsigned int currroom;
 
 public:
 	void Reset();
@@ -31,5 +32,6 @@ public:
 	void SetCurrentMetaRoom(unsigned int);
 	int addMetaRoom(MetaRoom *);
 	MetaRoom *getMetaRoom(unsigned int);
+	MetaRoom *getCurrentMetaRoom();
 };
 
