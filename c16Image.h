@@ -21,11 +21,18 @@
 #include <istream>
 
 class c16Image : public creaturesImage {
+private:
+	unsigned int **lineoffsets;
+
 public:
+	c16Image();
   c16Image(std::istream &);
+	void readHeader(std::istream &in);
 };
 
 class s16Image : public creaturesImage {
 public:
+	s16Image();
   s16Image(std::istream &);
+	void readHeader(std::istream &in);
 };

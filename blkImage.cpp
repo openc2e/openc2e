@@ -18,31 +18,35 @@
  */
 
 #include "blkImage.h"
-#include "endianlove.h"
 #include <assert.h>
 #include <iostream>
 
-blkImage::blkImage(std::istream &in) {
-	uint32 flags; uint16 width, height, spritecount; bool is_565;
+void blkImage::readHeader(std::istream &in) {
+	uint32 flags; uint16 width, height, spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	in.read((char *)&width, 2); width = swapEndianShort(width);
 	in.read((char *)&height, 2); height = swapEndianShort(height);
 	totalwidth = width * 128; totalheight = height * 128;
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
-
-	assert(m_numframes == (unsigned int) (width * height));
+	
+	assert(m_numframes == (unsigned int) (width * height));	
 
 	widths = new uint16[m_numframes];
 	heights = new uint16[m_numframes];
-	buffers = new void *[m_numframes];
-	uint32 *offsets = new uint32 [m_numframes];
+	offsets = new uint32[m_numframes];
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]) + 4;
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]); assert(widths[i] == 128);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]); assert(heights[i] == 128);
 	}
+}
+
+blkImage::blkImage(std::istream &in) {
+  readHeader(in);
+	
+	buffers = new void *[m_numframes];
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.seekg(offsets[i], std::ios::beg);

@@ -18,21 +18,19 @@
  */
 
 #include "c16Image.h"
-#include "endianlove.h"
 #include "openc2e.h"
 
-c16Image::c16Image(std::istream &in) {
-	uint32 flags; uint16 spritecount; bool is_565;
+void c16Image::readHeader(std::istream &in) {
+	uint32 flags; uint16 spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	// is_valid = (flags & 0x02);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
-	
+
   widths = new unsigned short[m_numframes];
 	heights = new unsigned short[m_numframes];
-	buffers = new void *[m_numframes];
-	unsigned int **lineoffsets = new unsigned int *[m_numframes];
-	
+	lineoffsets = new unsigned int *[m_numframes];
+
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		uint32 offset;
@@ -45,6 +43,12 @@ c16Image::c16Image(std::istream &in) {
 			in.read((char *)&lineoffsets[i][j], 4); lineoffsets[i][j] = swapEndianLong(lineoffsets[i][j]);
 		}
 	}
+}
+
+c16Image::c16Image(std::istream &in) {
+	readHeader(in);
+	
+	buffers = new void *[m_numframes];
 	
 	// then, read the files. this involves seeking around, and is hence immensely ghey
 	// todo: we assume the file format is valid here. we shouldn't.
@@ -74,16 +78,15 @@ c16Image::c16Image(std::istream &in) {
 	delete[] lineoffsets;
 }
 
-s16Image::s16Image(std::istream &in) {
-	uint32 flags; uint16 spritecount; bool is_565;
+void s16Image::readHeader(std::istream &in) {
+	uint32 flags; uint16 spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
-
+	
   widths = new unsigned short[m_numframes];
 	heights = new unsigned short[m_numframes];
-	buffers = new void *[m_numframes];
-	unsigned int *offsets = new unsigned int[m_numframes];
+	offsets = new unsigned int[m_numframes];
 
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
@@ -91,8 +94,14 @@ s16Image::s16Image(std::istream &in) {
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
 	}
+}
 
-	// then, read the files. this involves seeking around, and is hence immensely ghey
+s16Image::s16Image(std::istream &in) {
+	readHeader(in);
+	
+	buffers = new void *[m_numframes];
+
+	// read the files. this involves seeking around, and is hence immensely ghey
 	// todo: we assume the file format is valid here. we shouldn't.
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		buffers[i] = new unsigned short[widths[i] * heights[i]];

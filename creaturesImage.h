@@ -22,6 +22,7 @@
 
 #include <string>
 #include <map>
+#include "endianlove.h"
 
 class creaturesImage {
 private:
@@ -31,9 +32,12 @@ protected:
   unsigned int m_numframes;
   unsigned short *widths, *heights;
   void **buffers;
+	uint32 *offsets;
+	bool is_565;
   
 public:
   creaturesImage() { refcount = 0; }
+	bool is565() { return is_565; }
   unsigned int numframes() { return m_numframes; }
   virtual unsigned int width(unsigned int frame) { return widths[frame]; }
   virtual unsigned int height(unsigned int frame) { return heights[frame]; }

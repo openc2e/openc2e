@@ -222,6 +222,7 @@
 				HEADER_SEARCH_PATHS = "\"$(HOME)/Library/Frameworks/SDL.framework/Headers\"";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = "-framework SDL";
 				PRODUCT_NAME = openc2e;
 				SECTORDER_FLAGS = "";
@@ -283,6 +284,7 @@
 				E77716EA06AF0C9900507FAF,
 				E777176406AF0E8C00507FAF,
 				E77717D606AF0FF900507FAF,
+				E789D75E06B17D8900CCD159,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -331,6 +333,7 @@
 				E777172B06AF0CEF00507FAF,
 				E77717D406AF0FF900507FAF,
 				E77717D506AF0FF900507FAF,
+				E789D75F06B17D8900CCD159,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,6 +434,8 @@
 				E7004F05065F81B4000FB224,
 				E7E679630663419C004F1581,
 				E7E679640663419C004F1581,
+				E789D75C06B17D8900CCD159,
+				E789D75D06B17D8900CCD159,
 			);
 			isa = PBXGroup;
 			name = "image classes";
@@ -724,6 +729,34 @@
 		};
 		E77717D606AF0FF900507FAF = {
 			fileRef = E77717D306AF0FF900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E789D75C06B17D8900CCD159 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = fileSwapper.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E789D75D06B17D8900CCD159 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = fileSwapper.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E789D75E06B17D8900CCD159 = {
+			fileRef = E789D75C06B17D8900CCD159;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E789D75F06B17D8900CCD159 = {
+			fileRef = E789D75D06B17D8900CCD159;
 			isa = PBXBuildFile;
 			settings = {
 			};

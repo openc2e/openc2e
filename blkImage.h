@@ -24,5 +24,7 @@ class blkImage : public creaturesImage {
 public:
 	unsigned int totalwidth, totalheight;
 
+	blkImage() { }
   blkImage(std::istream &);
+	void readHeader(std::istream &in);
 };
