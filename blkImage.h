@@ -25,7 +25,7 @@ public:
 	unsigned int totalwidth, totalheight;
 
 	blkImage() { }
-  blkImage(std::istream *);
+  blkImage(std::ifstream *);
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &s);
 };

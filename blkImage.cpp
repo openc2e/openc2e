@@ -44,7 +44,8 @@ void blkImage::readHeader(std::istream &in) {
 }
 
 void blkImage::writeHeader(std::ostream &s) {
-  unsigned int dw; unsigned short w;
+	unsigned int dw; unsigned short w;
+	
 	dw = (is_565 ? 1 : 0);
 	dw = swapEndianLong(dw); s.write((char *)&dw, 4);
 	w = totalwidth / 128; assert(w * 128 == totalwidth);
@@ -64,7 +65,7 @@ void blkImage::writeHeader(std::ostream &s) {
 	}
 }
 
-blkImage::blkImage(std::istream *in) {
+blkImage::blkImage(std::ifstream *in) {
 	stream = in;
 
   readHeader(*in);

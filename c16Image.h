@@ -26,13 +26,13 @@ private:
 
 public:
 	c16Image();
-  c16Image(std::istream *);
+  c16Image(std::ifstream *);
 	void readHeader(std::istream &in);
 };
 
 class s16Image : public creaturesImage {
 public:
 	s16Image();
-  s16Image(std::istream *);
+  s16Image(std::ifstream *);
 	void readHeader(std::istream &in);
 };

@@ -45,7 +45,7 @@ void c16Image::readHeader(std::istream &in) {
 	}
 }
 
-c16Image::c16Image(std::istream *in) {
+c16Image::c16Image(std::ifstream *in) {
 	stream = in;
 
 	readHeader(*in);
@@ -98,7 +98,7 @@ void s16Image::readHeader(std::istream &in) {
 	}
 }
 
-s16Image::s16Image(std::istream *in) {
+s16Image::s16Image(std::ifstream *in) {
 	stream = in;
 
 	readHeader(*in);
