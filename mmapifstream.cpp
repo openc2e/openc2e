@@ -18,8 +18,13 @@
  */
 
 #include "mmapifstream.h"
+#include "openc2e.h"
+#ifdef _WIN32
+#include <windows.h>
+#else // assume POSIX
 #include <sys/types.h>
 #include <sys/mman.h>
+#endif
 #include <iostream> // debug needs only
 
 mmapifstream::mmapifstream(std::string filename) {
@@ -30,6 +35,14 @@ mmapifstream::mmapifstream(std::string filename) {
 void mmapifstream::mmapopen(std::string filename) {
 	open(filename.c_str());
 	if (!is_open()) return;
+
+#ifdef _WIN32
+	// todo: store the handle somewhere?
+	HANDLE hFile = CreateFile(filename.c_str(), GENERIC_READ, FILE_SHARE_READ,
+		NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE hMap = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+	void *mapr = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+#else
 	// todo: store the FILE* somewhere?
 	FILE *f = fopen(filename.c_str(), "r");
 	assert(f);
@@ -48,13 +61,18 @@ void mmapifstream::mmapopen(std::string filename) {
 	seekg(0, std::ios::beg);
 
 	void *mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, fno, 0);
+#endif
+
 	assert(mapr != (void *)-1);
 	map = (char *)mapr;
-	
 	live = true;
 }
 
 mmapifstream::~mmapifstream() {
 	if (live)
+#ifdef _WIN32
+		UnmapViewOfFile(map);
+#else
 		munmap(map, filesize);
+#endif
 }
