@@ -136,7 +136,7 @@ void prayBlock::write(ostream &s) const {
 		delete newbuf;
 		size = usize;
 		compressed = false;
-  } else if (size >= usize) {
+	} else if (size >= usize) {
 		// the compressed block is larger than the uncompressed block
 		// fallback to uncompressed data
 		delete newbuf;
@@ -203,19 +203,21 @@ void tagStringWrite(unsigned char *&ptr, string &s) {
 void tagPrayBlock::rawRead(unsigned int v, unsigned char *b) {
 	unsigned char *ptr = b;
 
-	unsigned int nointvalues = *(unsigned int *)ptr; ptr += 4;
+	unsigned int nointvalues = swapEndianLong(*(unsigned int *)ptr);
+	ptr += 4;
 
 	for (unsigned int i = 0; i < nointvalues; i++) {
 		pair<string, unsigned int> value;
 
 		value.first = tagStringRead(ptr);
-		value.second = *(unsigned int *)ptr;
+		value.second = swapEndianLong(*(unsigned int *)ptr);
 		ptr += 4;
 
 		intvalues.push_back(value);
 	}
 
-	unsigned int nostrvalues = *(unsigned int *)ptr; ptr += 4;
+	unsigned int nostrvalues = swapEndianLong(*(unsigned int *)ptr);
+	ptr += 4;
 
 	for (unsigned int i = 0; i < nostrvalues; i++) {
 		pair<string, string> value;
@@ -239,13 +241,13 @@ unsigned char *tagPrayBlock::rawWrite(unsigned int &l) const {
 	unsigned char *buf = new unsigned char[l];
 	unsigned char *ptr = buf;
 
-	*(unsigned int *)ptr = intvalues.size(); ptr += 4;
+	*(unsigned int *)ptr = swapEndianLong(intvalues.size()); ptr += 4;
 	for (vector<pair<string, unsigned int> >::iterator x = ((tagPrayBlock *)this)->intvalues.begin(); x != ((tagPrayBlock *)this)->intvalues.end(); x++) {
 		tagStringWrite(ptr, (*x).first);
-		*(unsigned int *)ptr = (*x).second; ptr += 4;
+		*(unsigned int *)ptr = swapEndianLong((*x).second); ptr += 4;
 	}
 
-	*(unsigned int *)ptr = strvalues.size(); ptr += 4;
+	*(unsigned int *)ptr = swapEndianLong(strvalues.size()); ptr += 4;
 	for (vector<pair<string, string> >::iterator x = ((tagPrayBlock *)this)->strvalues.begin(); x != ((tagPrayBlock *)this)->strvalues.end(); x++) {
 		tagStringWrite(ptr, (*x).first);
 		tagStringWrite(ptr, (*x).second);

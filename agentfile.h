@@ -39,6 +39,7 @@ protected:
 public:
 	unsigned char blockid[4];
 
+	virtual string blockname() { return string((char *)blockid, 4); }
 	virtual const string &name() const = 0;
 	virtual ~block() { }
 };
