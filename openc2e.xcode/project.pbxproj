@@ -285,6 +285,8 @@
 				E777176406AF0E8C00507FAF,
 				E77717D606AF0FF900507FAF,
 				E789D75E06B17D8900CCD159,
+				E765977006B1C47A00A0CA58,
+				E765977206B1C47A00A0CA58,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -334,6 +336,7 @@
 				E77717D406AF0FF900507FAF,
 				E77717D506AF0FF900507FAF,
 				E789D75F06B17D8900CCD159,
+				E765977106B1C47A00A0CA58,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -394,6 +397,9 @@
 //E74
 		E7004EDC065F8132000FB224 = {
 			children = (
+				E765976D06B1C47A00A0CA58,
+				E765976E06B1C47A00A0CA58,
+				E765976F06B1C47A00A0CA58,
 				F5A47A9D01A0482F01D3D55B,
 				F5A47A9E01A0483001D3D55B,
 			);
@@ -494,6 +500,48 @@
 		};
 		E748CFD3066538E000BF1F9A = {
 			fileRef = E748CFD2066538E000BF1F9A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E765976D06B1C47A00A0CA58 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = SDL_gfxPrimitives_font.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E765976E06B1C47A00A0CA58 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = SDL_gfxPrimitives.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E765976F06B1C47A00A0CA58 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = SDL_gfxPrimitives.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E765977006B1C47A00A0CA58 = {
+			fileRef = E765976D06B1C47A00A0CA58;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E765977106B1C47A00A0CA58 = {
+			fileRef = E765976E06B1C47A00A0CA58;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E765977206B1C47A00A0CA58 = {
+			fileRef = E765976F06B1C47A00A0CA58;
 			isa = PBXBuildFile;
 			settings = {
 			};

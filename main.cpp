@@ -1,5 +1,5 @@
 #include <SDL/SDL.h>
-//#include <SDL/SDL_gfxPrimitives.h>
+#include "SDL_gfxPrimitives.h"
 
 #include <fstream>
 #include "openc2e.h"
@@ -14,6 +14,7 @@
 SDL_Surface *screen;
 SDL_Surface **backsurfs[20]; // todo: grab metaroom count, don't arbitarily define 20
 int adjustx, adjusty;
+bool showrooms = false, paused = false;
 
 void drawWorld() {
 	MetaRoom *m = world.map.getCurrentMetaRoom();
@@ -26,16 +27,18 @@ void drawWorld() {
 			SDL_BlitSurface(backsurfs[m->id][whereweare], 0, screen, &destrect);
 		}
 	}
-	for (std::vector<Room *>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
-			 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
-		// ceiling
-//		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFF000077);
-		// floor
-//		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
-		// left side
-//		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFF000077);
-		// right side
-//		aalineColor(screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+	if (showrooms) {
+		for (std::vector<Room *>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
+				 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
+			// ceiling
+			aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFF000077);
+			// floor
+			aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+			// left side
+			aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFF000077);
+			// right side
+			aalineColor(screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+		}
 	}
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		// note: right now, we know we only have SimpleAgents in the world.
@@ -153,8 +156,10 @@ extern "C" int main(int argc, char *argv[]) {
 	drawWorld();
 
 	bool done = false;
+	unsigned int tickdata = 0;
 	while (!done) {
-		world.tick();
+		if (!paused && (SDL_GetTicks() > tickdata + 50)) world.tick(); // TODO: use BUZZ value
+		tickdata = SDL_GetTicks();
 		drawWorld();
 
 		while (SDL_PollEvent(&event)) {
@@ -177,14 +182,16 @@ extern "C" int main(int argc, char *argv[]) {
 								adjusty -= 20; break;
 							case SDLK_DOWN:
 								adjusty += 20; break;
-							case SDLK_1:
+							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
+								showrooms = !showrooms; break;
+							case SDLK_PAGEDOWN:
 								if (world.map.getCurrentMetaRoom()->id == 0)
 									break;
 								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id - 1);
 								adjustx = world.map.getCurrentMetaRoom()->x();
 								adjusty = world.map.getCurrentMetaRoom()->y();
 								break;
-							case SDLK_2:
+							case SDLK_PAGEUP:
 								if ((world.map.getMetaRoomCount() - 1) == world.map.getCurrentMetaRoom()->id)
 									break;
 								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id + 1);
