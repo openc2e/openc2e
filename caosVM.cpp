@@ -30,51 +30,6 @@ caosVM::caosVM(Agent *o) {
 	resetScriptState();
 }
 
-bool caosVar::operator == (caosVar &v) {
-	// todo: should be able to compare int and float, apparently
-	if (this->hasInt() && v.hasInt()) {
-		return (this->intValue == v.intValue);
-	} else if (this->hasFloat() || v.hasFloat()) {
-		if (!v.hasFloat())
-			return (this->floatValue == v.intValue);
-		else if (!this->hasFloat())
-			return (this->intValue == v.floatValue);
-		else
-			return (this->floatValue == v.floatValue);
-	} else if (this->hasString() && v.hasString()) {
-		return (this->stringValue == v.stringValue);
-	} else if (this->hasAgent() && v.hasAgent()) {
-		return (this->agentValue == v.agentValue);
-	}
-
-	std::cerr << "caosVar operator == couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-	return false;
-}
-
-bool caosVar::operator > (caosVar &v) {
-	// todo: should be able to compare strings, apparently
-	if ((this->hasFloat() || this->hasInt()) && (v.hasFloat() || v.hasInt())) {
-		float one = (this->hasFloat() ? this->floatValue : this->intValue);
-		float two = (v.hasFloat() ? v.floatValue : v.intValue);
-		return (one > two);
-	}
-
-	std::cerr << "caosVar operator > couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-	return false;
-}
-
-bool caosVar::operator < (caosVar &v) {
-	// todo: should be able to compare strings, apparently
-	if ((this->hasFloat() || this->hasInt()) && (v.hasFloat() || v.hasInt())) {
-		float one = (this->hasFloat() ? this->floatValue : this->intValue);
-		float two = (v.hasFloat() ? v.floatValue : v.intValue);
-		return (one < two);
-	}
-	
-	std::cerr << "caosVar operator < couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-	return false;
-}
-
 bool handleComparison(caosVar &one, caosVar &two, comparisonType compare) {
 	switch (compare) {
 		case EQ:

@@ -17,6 +17,7 @@ OPENC2E = \
 	caosdata.o \
 	caoshashes.o \
 	caosScript.o \
+	caosVar.o \
 	caosVM_agent.o \
 	caosVM_camera.o \
 	caosVM_cmdinfo.o \

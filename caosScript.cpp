@@ -50,24 +50,6 @@ std::string token::dump() {
 	return src;
 }
 
-inline std::string stringify(double x) {
-	std::ostringstream o;
-	if (!(o << x)) throw "stringify() failed";
-	return o.str();
-}
-
-std::string caosVar::dump() {
-	if (hasString()) {
-		return std::string("\"") + stringValue + "\" ";
-	} else if (hasInt()) {
-		return stringify(intValue) + " ";
-	} else if (hasFloat()) {
-		return stringify(floatValue) + " ";
-	} else {
-		return "[bad caosVar!] ";
-	}
-}
-
 std::string cmdinfo::dump() {
 	return std::string("[command: ") + name + "] ";
 }

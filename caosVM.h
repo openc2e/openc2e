@@ -358,24 +358,21 @@ class badParamException { };
 #define VM_VERIFY_SIZE(n) if (params.size() != n) { throw notEnoughParamsException(); }
 #define VM_PARAM_STRING(name) std::string name; { caosVar __x = params.back(); \
 	if (!__x.hasString()) { throw badParamException(); } \
-	name = __x.stringValue; } params.pop_back();
-// TODO: should try floats
+	name = __x.getString(); } params.pop_back();
 #define VM_PARAM_INTEGER(name) int name; { caosVar __x = params.back(); \
-	if (!__x.hasInt()) { throw badParamException(); } \
-	else name = __x.intValue; } params.pop_back();
+	if (!__x.hasDecimal()) { throw badParamException(); } \
+	else name = __x.getInt(); } params.pop_back();
 #define VM_PARAM_FLOAT(name) float name; { caosVar __x = params.back(); \
-	if (__x.hasFloat()) { name = __x.floatValue; } else { \
-	if (!__x.hasInt()) { throw badParamException(); } \
-	name = __x.intValue; } } params.pop_back();
+	if (!__x.hasDecimal()) { throw badParamException(); } \
+	name = __x.getFloat(); } params.pop_back();
 #define VM_PARAM_AGENT(name) Agent *name; { caosVar __x = params.back(); \
 	if (!__x.hasAgent()) { throw badParamException(); } \
-	name = __x.agentValue; } params.pop_back();
+	name = __x.getAgent(); } params.pop_back();
 #define VM_PARAM_VARIABLE(name) caosVar *name; { caosVar __x = params.back(); \
 	if (!__x.hasVariable()) { throw badParamException(); } \
-	name = __x.variableValue; } params.pop_back();
-// TODO: this isn't implemented
+	name = __x.getVariable(); } params.pop_back();
 #define VM_PARAM_DECIMAL(name) caosVar name = params.back(); \
-	if ((!name.hasFloat()) && (!name.hasInt())) { throw badParamException(); } \
+	if (!name.hasDecimal()) { throw badParamException(); } \
 	params.pop_back();
 
 #endif

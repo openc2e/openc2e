@@ -24,56 +24,9 @@
 #include <list>
 #include <string>
 #include <istream>
+#include "caosVar.h"
 
 class Agent;
-
-struct caosVar {
-	enum variableType {
-		NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING, VARREF
-	};
-
-	variableType type;
-
-	/* XXX: we need both the variable reference and value. this 
-	 * really ought not to exist.
-	 */
-	caosVar *variableValue;
-	
-	/* This is not in the union so its constructor and destructors get called
-	 * at the appropriate times.
-	 */
-	std::string stringValue;
-
-	union {
-		int intValue;
-		float floatValue;
-		Agent *agentValue;
-	};
-
-	void reset() { type = NULLTYPE; stringValue.clear(); variableValue = NULL; }
-	caosVar() { reset(); setInt(0); }
-	//virtual ~caosVar() { } // we don't truly need this.
-
-	//bool empty() { return (flags == 0); }
-	bool hasInt() { return type == INTEGER; }
-	void setInt(int i) { type = INTEGER; intValue = i; }
-	bool hasFloat() { return type == FLOAT; }
-	void setFloat(float i) { type = FLOAT; floatValue = i; }
-	bool hasString() { return type == STRING; }
-	void setString(const std::string &i) { type = STRING; stringValue = i; }
-	bool hasAgent() { return type == AGENT; }
-	void setAgent(Agent *i) { type = AGENT; agentValue = i; }
-	bool hasVariable() { return variableValue != NULL; }
-	void setVariable(caosVar *i) { variableValue = i; }
-	//virtual void notifyChanged() { }
-
-	bool operator == (caosVar &v);
-	bool operator != (caosVar &v) { return !(*this == v); }
-	bool operator > (caosVar &v);
-	bool operator < (caosVar &v);
-
-	std::string dump();
-};
 
 enum comparisonType {
 	NONE, EQ, NE, GT, GE, LT, LE, AND, OR
@@ -100,6 +53,18 @@ struct token {
 	std::string data;
 
 	std::string dump();
+
+	token() { }
+	token(const token &t) {
+		var = t.var;
+		func = t.func;
+		varnumber = t.varnumber;
+		len = t.len;
+		bytes = t.bytes;
+		comparison = t.comparison;
+		data = t.data;
+		type = t.type;
+	}
 };
 
 struct script {
