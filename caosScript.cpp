@@ -22,6 +22,7 @@
 #include "World.h"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 std::string token::dump() {
 	if (comparison == NONE) return (isvar ? var.dump() : ((cmd == 0) ? ((func == 0) ? "[bad command!] " : func->dump()) : cmd->dump()));
@@ -134,7 +135,7 @@ token makeToken(std::string &src, bool str, token &lasttok) {
 			throw tokeniseFailure();
 		}
 	} else { // presumably we have a comparison
-		transform(src.begin(), src.end(), src.begin(), toupper);
+		std::transform(src.begin(), src.end(), src.begin(), toupper);
 		// todo: make this a hash table?
 		if (src == "NE") r.comparison = NE;
 		else if (src == "EQ") r.comparison = EQ;

@@ -32,7 +32,7 @@ cmdinfo *getCmdInfo(std::string cmd, bool command) {
 	// std::cerr << "getCmdInfo called with '" << cmd << "' (wanting " << (command ? "command" : "function") << ")\n";
 	assert(cmd.size() == 4);
 	varnumber = -1;
-	transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
 	if (isdigit(cmd[2])) {// handle vaxx etc
 		varnumber = atoi(cmd.c_str() + 2);
 		cmd[2] = 'x';
@@ -56,7 +56,7 @@ cmdinfo *getCmdInfo(std::string cmd, bool command) {
 }
 
 cmdinfo *getSecondCmd(cmdinfo *first, std::string cmd, bool command) {
-	transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
 	std::string complete = first->name + " " + cmd;
 	assert(cmd.size() == 4);
 	assert(first->twotokens);

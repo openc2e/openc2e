@@ -21,6 +21,7 @@
 #include <fstream>
 #include "blkImage.h"
 #include "c16Image.h"
+#include "openc2e.h"
 
 void fileSwapper::convertc16(std::string directory, std::string name) {
 	assert(false); // unimplemented

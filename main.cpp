@@ -1,6 +1,7 @@
 #include <fstream>
 #include "openc2e.h"
 #include <iostream>
+#include <algorithm>
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "boost/filesystem/exception.hpp"
@@ -72,7 +73,7 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 	}
 
-	sort(scripts.begin(), scripts.end());
+	std::sort(scripts.begin(), scripts.end());
 	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
 		std::ifstream script(i->c_str());
 		assert(script.is_open());

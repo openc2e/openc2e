@@ -14,7 +14,7 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 	std::vector<std::string> *x = 0;
 
 	std::string i;
-	while (getline(s, i)) {
+	while (std::getline(s, i)) {
 		// std::cout << "Catalogue >> got " << i << std::endl;
 		bool wasparsingstring = false, parsingstring = false, parsingtag = false, parsingarray = false;
 		unsigned int stage = 0;
