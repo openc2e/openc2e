@@ -38,6 +38,7 @@ public:
 	Map map;
 	std::multiset<Agent *, agentzorder> agents;
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
+	std::map<std::string, caosVar> variables;
 
 	Scriptorium scriptorium;
 	Catalogue catalogue;
