@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "openc2e.h"
+#include "World.h"
 #include <iostream>
 
 using std::cout;
@@ -70,10 +71,10 @@ void caosVM::c_OUTV() {
 void caosVM::v_GAME() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(name)
-	// todo: ;-)
-	static caosVar gamehack;
-	result = gamehack;
-	result.setVariable(&gamehack);
+
+	caosVar &i = world.variables[name];
+	result = i;
+	result.setVariable(&i);
 }
 
 /**

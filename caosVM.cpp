@@ -35,18 +35,19 @@ bool caosVar::operator == (caosVar &v) {
 	if (this->hasInt() && v.hasInt()) {
 		return (this->intValue == v.intValue);
 	} else if (this->hasFloat() || v.hasFloat()) {
-		if (this->hasFloat())
+		if (!v.hasFloat())
 			return (this->floatValue == v.intValue);
-		else
+		else if (!this->hasFloat())
 			return (this->intValue == v.floatValue);
+		else
+			return (this->floatValue == v.floatValue);
 	} else if (this->hasString() && v.hasString()) {
 		return (this->stringValue == v.stringValue);
 	} else if (this->hasAgent() && v.hasAgent()) {
 		return (this->agentValue == v.agentValue);
 	}
-//#ifdef CAOSDEBUG
+
 	std::cerr << "caosVar operator == couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-//#endif
 	return false;
 }
 
@@ -57,9 +58,8 @@ bool caosVar::operator > (caosVar &v) {
 		float two = (v.hasFloat() ? v.floatValue : v.intValue);
 		return (one > two);
 	}
-#ifdef CAOSDEBUG
+
 	std::cerr << "caosVar operator > couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-#endif
 	return false;
 }
 
@@ -70,9 +70,8 @@ bool caosVar::operator < (caosVar &v) {
 		float two = (v.hasFloat() ? v.floatValue : v.intValue);
 		return (one < two);
 	}
-#ifdef CAOSDEBUG
+	
 	std::cerr << "caosVar operator < couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-#endif
 	return false;
 }
 
@@ -231,18 +230,15 @@ void caosVM::tick() {
 	}
 }
 
-// XXX TODO fuzzie commented out the error reporting lines below because rawlines no longer exists
 void caosVM::runCurrentLine() {
 	unsigned int i = currentline;
 	std::list<token> b = currentscript->lines[currentline];
 	try {
 		if (!b.empty()) internalRun(b, true);
 	} catch (badParamException e) {
-//#ifdef CAOSDEBUG
 		std::cerr << "caught badParamException while running '" << currentscript->dumpLine(currentline) << "' (line #" << i << ")" << std::endl;
-//#endif
 	} catch (notEnoughParamsException e) {
-		std::cerr << "caught notEnoughParamsException\n"; // while running '" << currentscript->rawlines[i]; << "' (line " << i << ")\n";
+		std::cerr << "caught notEnoughParamsException - this is an openc2e bug!\n";
 	} catch (assertFailure e) {
 		std::cerr.flush();
 		std::cerr << "caught assert failure '" << e.what() << "' while running '" << currentscript->dumpLine(currentline) << "' (line #" << i << ")" << std::endl;
