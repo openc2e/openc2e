@@ -113,14 +113,13 @@ void Agent::tick() {
 			if (r1 && r2) {
 				// quick hack to see if we can travel to the next room
 				bool hacked = false;
-				if (r1 != r2)
-					for (std::vector<std::pair<unsigned int, Room *> >::iterator i = r1->neighbours.begin(); i != r1->neighbours.end(); i++) {
-						if ((i->second == r2) && (i->first == 100)) { // check for PERM=100
-							moveTo(destx, desty + 2);
-							vely.setFloat(newvely);
-							hacked = true;
-						}
+				if (r1 != r2) {
+					if (r1->doors[r2] && r1->doors[r2]->perm == 100) {
+						moveTo(destx, desty + 2);
+						vely.setFloat(newvely);
+						hacked = true;
 					}
+				}
 				if (!hacked) {
 					// okay, we can't travel to the next room.
 					moveTo(destx, desty);

@@ -92,14 +92,13 @@ void caosVM::v_ADDR() {
 	VM_PARAM_INTEGER(x_left)
 	VM_PARAM_INTEGER(metaroomid)
 
-	Room *r = new Room();
-	r->x_left = x_left;
-	r->x_right = x_right;
-	r->y_left_ceiling = y_left_ceiling;
-	r->y_right_ceiling = y_right_ceiling;
-	r->y_left_floor = y_left_floor;
-	r->y_right_floor = y_right_floor;
-	result.setInt(world.map.getMetaRoom(metaroomid)->addRoom(r));
+	Room *r = new Room(x_left, x_right,
+			y_left_ceiling, y_right_ceiling,
+			y_left_floor, y_right_floor);
+	MetaRoom *m = world.map.getMetaRoom(metaroomid);
+	r->metaroom = m;
+	r->id = m->addRoom(r);
+	result.setInt(r->id);
 }
 
 /**
@@ -141,8 +140,19 @@ void caosVM::c_DOOR() {
 	// TODO: handle perm
 	Room *r1 = world.map.getRoom(room1);
 	Room *r2 = world.map.getRoom(room2);
-	r1->neighbours.push_back(std::pair<unsigned int, Room *>(perm, r2));
-	r2->neighbours.push_back(std::pair<unsigned int, Room *>(perm, r1));
+	RoomDoor *door = r1->doors[r2];
+	if (!door) {
+		door = new RoomDoor;
+		door->first = r1;
+		door->second = r2;
+		door->perm = perm;
+		r1->doors[r2] = door;
+		r2->doors[r1] = door;
+		r1->nearby.insert(r2);
+		r2->nearby.insert(r1);
+	} else {
+		door->perm = perm;
+	}
 }
 
 /**

@@ -84,26 +84,12 @@ MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 }
 
 Room *Map::roomAt(unsigned int _x, unsigned int _y) {
-	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+	MetaRoom *m = metaRoomAt(_x, _y);
+	if (!m) return 0;
+	for (std::vector<Room *>::iterator i = m->rooms.begin(); i != m->rooms.end(); i++) {
 		Room *r = *i;
-		if ((_x >= r->x_left) && (_x <= r->x_right)) {
-			// TODO: we should be able to catch most stuff by checking bounding box
-			unsigned int xdiff = r->x_right - r->x_left;
-			unsigned int xoffset = _x - r->x_left;
-		
-			// floors
-			int ydiff = (int)r->y_right_floor - (int)r->y_left_floor;
-			float m = (float)ydiff / (float)xdiff;
-			int ypoint = (xoffset * m) + r->y_left_floor;
-			if (ypoint >= _y) {
-				// ceiling
-				ydiff = (int)r->y_right_ceiling - (int)r->y_left_ceiling;
-				m = (float)ydiff / (float)xdiff;
-				ypoint = (xoffset * m) + r->y_left_ceiling;
-				if (ypoint <= _y)
-					return r;
-			}
-		}
+//		std::cerr << (void *)r << " -> contains " << _x << "," << _y << std::endl;
+		if (r->containsPoint(_x, _y)) return r;
 	}
 	return 0;
 }
