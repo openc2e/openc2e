@@ -27,12 +27,12 @@ protected:
 	
 	std::vector<caosVar> params;
 	caosVar result;
-	bool truth; // for comparisons
+	bool truth;
 	
 	Agent *owner, *_it_;
 
 	int currentline;
-	//	std::stack<int> stack;
+	std::vector<bool> truthstack;
 
 	script *currentscript;
 
@@ -75,6 +75,7 @@ public:
 	void c_REPS();
 	void c_REPE();
 	void c_ELSE();
+	void c_ELIF();
 	
 	// debug (currently in core)
 	void c_DBG_OUTS();
@@ -127,6 +128,7 @@ public:
 	void runCurrentLine();
 	void pushLineOntoStack(int);
 	int popStackLine();
+	void jumpToNextIfBlock();
 	caosVar internalRun(std::list<token> &tokens, bool first);
 	void runEntirely(script &s);
 

@@ -30,6 +30,9 @@ void setupCommandPointers() {
 	CMDDEF(CMRT, 1)
 	CMDDEF(DOIF, 0)
 	cmds[phash_cmd(*(int *)"DOIF")].needscondition = true;
+	CMDDEF(ELIF, 0)
+	cmds[phash_cmd(*(int *)"ELIF")].needscondition = true;
+	CMDDEF(ELSE, 0)
 	CMDDEF(ENDI, 0)
 	CMDDEF(REAF, 0)
 	CMDDEF(MODV, 2)
@@ -53,7 +56,6 @@ void setupCommandPointers() {
 	CMDDEF(TARG, 1)
 	CMDDEF(KILL, 1)
 	CMDDEF(SCRX, 4)
-	CMDDEF(ELSE, 0)
 	CMDDEF(ADDV, 2)
 	CMDDEF(NEXT, 0)
 	CMDDEF(RTYP, 2)

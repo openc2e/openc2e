@@ -19,20 +19,61 @@
 
 #include "caosVM.h"
 #include <iostream>
+#include "openc2e.h"
+
+/*
+ using sometruth is BROKEN, we need to have a stack
+
+ todo: if we encounter else in jumpToNextIfBlock, we can just skip to the line past it
+*/
+
+void caosVM::jumpToNextIfBlock() {
+	cmdinfo *doif = getCmdInfo("DOIF", true); assert(doif != 0);
+	cmdinfo *elif = getCmdInfo("ELIF", true); assert(elif != 0);
+	cmdinfo *els = getCmdInfo("ELSE", true); assert(els != 0);
+	cmdinfo *endi = getCmdInfo("ENDI", true); assert(endi != 0);
+	int stack = 0;
+	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
+		token front = currentscript->lines[i].front();
+		if (front.cmd == doif) {
+			stack++;
+		} else if (front.cmd == endi) {
+			if (stack) { stack--; continue; }
+			currentline = i; return;
+		} else if (stack) {
+			continue;
+		} else if ((front.cmd == elif) && !truthstack.back()) {
+			currentline = i; return;
+		} else if ((front.cmd == els) && !truthstack.back()) {
+			currentline = i + 1; return; // we don't NEED to actually run 'else'
+		}
+	}
+	currentline = currentscript->lines.size();
+	std::cout << "couldn't find matching block for IF blocks, stopping script\n";
+}
 
 void caosVM::c_DOIF() {
 	VM_VERIFY_SIZE(0)
-	// todo ;-) .. remember 'truth' holds the comparison result
-	std::cerr << "if we handled DOIF, we " << (truth ? "would" : "wouldn't") << " execute the code here\n";
+	truthstack.push_back(false);
+	if (!truth) jumpToNextIfBlock();
+	else { truthstack.pop_back(); truthstack.push_back(true); }
+}
+
+void caosVM::c_ELIF() {
+	VM_VERIFY_SIZE(0)
+	if (!truth || truthstack.back()) jumpToNextIfBlock();
+	else { truthstack.pop_back(); truthstack.push_back(true); }
 }
 
 void caosVM::c_ELSE() {
 	VM_VERIFY_SIZE(0)
+	assert(truthstack.back());
+	jumpToNextIfBlock();
 }
 
 void caosVM::c_ENDI() {
 	VM_VERIFY_SIZE(0)
-	std::cerr << "we hit endif\n";
+	truthstack.pop_back();
 }
 
 void caosVM::c_REPS() {

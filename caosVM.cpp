@@ -156,9 +156,11 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 }
 
 void caosVM::runEntirely(script &s) {
-  for (std::vector<std::list<token> >::iterator i = s.lines.begin();
-			 i != s.lines.end(); i++) {
-		std::list<token> b = *i;
+	currentscript = &s;
+	unsigned int i = 0;
+	while (i < s.lines.size()) {
+		currentline = i;
+		std::list<token> b = s.lines[i];
 		try {
 			if (!b.empty()) internalRun(b, true);
 		} catch (badParamException e) {
@@ -166,7 +168,13 @@ void caosVM::runEntirely(script &s) {
 		} catch (notEnoughParamsException e) {
 			std::cerr << "caught notEnoughParamsException\n";
 		}
+		if (currentline != i) {
+			i = currentline; // move to the line the flow wants us to
+		} else {
+			i++; // next line
+		}
 	}
+	currentscript = 0;
 }
 
 void caosVM::runCurrentLine() {
