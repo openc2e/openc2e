@@ -188,7 +188,7 @@ void caosVM::c_GSUB() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(label)
 	cmdinfo *subr = getCmdInfo("SUBR", true); assert(subr != 0);
-	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
+	for (unsigned int i = 0; i < currentscript->lines.size(); i++) {
 		std::list<token>::iterator j = currentscript->lines[i].begin();
 		// we're assuming that ++j is a label here, but the parser should force that issue
 		if (((*j).func == subr) && ((*++j).data == label)) {
