@@ -27,7 +27,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   vely.setFloat(0.0f);
 }
 
-void Agent::moveTo(unsigned int _x, unsigned int _y) {
+void Agent::moveTo(float _x, float _y) {
 	x = _x; y = _y;
 }
 

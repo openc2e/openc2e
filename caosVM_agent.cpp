@@ -138,6 +138,7 @@ void caosVM::v_NULL() {
 void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
+
 	// TODO
 }
 
@@ -208,7 +209,12 @@ void caosVM::v_FROM() {
 */
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
-	// TODO
+
+	// TODO: handle compound agents/parts
+
+	assert(targ);
+	SimpleAgent *n = (SimpleAgent *)targ;
+	result.setInt(n->getCurrentSprite());
 }
 
 /**
@@ -362,6 +368,8 @@ void caosVM::v_PNTR() {
 */
 void caosVM::c_MESG_WRIT() {
 	VM_VERIFY_SIZE(2)
+
+	std::cout << "MESG WRIT is unimplemented\n";
 }
 
 /**
@@ -369,6 +377,8 @@ void caosVM::c_MESG_WRIT() {
 */
 void caosVM::c_MESG_WRT() {
 	VM_VERIFY_SIZE(5)
+
+	std::cout << "MESG WRT+ is unimplemented\n";
 }
 
 /**

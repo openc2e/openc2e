@@ -33,12 +33,12 @@ void caosVM::c_ELAS() {
 }
 
 /**
- MVTO (command) x (integer) y (integer)
+ MVTO (command) x (float) y (float)
 */
 void caosVM::c_MVTO() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_INTEGER(y)
-	VM_PARAM_INTEGER(x)
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
 	assert(targ);
 	targ->moveTo(x, y);
 }

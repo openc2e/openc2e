@@ -28,7 +28,8 @@ void caosVM::jumpToAfterEquivalentNext() {
 	cmdinfo *enu = getCmdInfo("ENUM", true); assert(enu != 0);
 	cmdinfo *esee = getCmdInfo("ESEE", true); assert(esee != 0);
 
-	int stack = 0;
+// XXX PARSER XXX
+/*	int stack = 0;
 	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		token front = currentscript->lines[i].front();
 		if (front.cmd == enu) {
@@ -45,6 +46,7 @@ void caosVM::jumpToAfterEquivalentNext() {
 	}
 	currentline = currentscript->lines.size();
 	std::cerr << "caosVM: couldn't find matching NEXT, stopping script\n";
+*/
 }
 
 void caosVM::jumpToNextIfBlock() {
@@ -53,6 +55,8 @@ void caosVM::jumpToNextIfBlock() {
 	cmdinfo *els = getCmdInfo("ELSE", true); assert(els != 0);
 	cmdinfo *endi = getCmdInfo("ENDI", true); assert(endi != 0);
 	int stack = 0;
+	/// XXX PARSER XXX
+/*
 	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		token front = currentscript->lines[i].front();
 		if (front.cmd == doif) {
@@ -70,6 +74,7 @@ void caosVM::jumpToNextIfBlock() {
 	}
 	currentline = currentscript->lines.size();
 	std::cerr << "caosVM: couldn't find matching block for IF blocks, stopping script\n";
+*/
 }
 
 /**
@@ -187,14 +192,15 @@ void caosVM::c_GSUB() {
 	VM_PARAM_STRING(label)
 	assert(label.size());
 	cmdinfo *subr = getCmdInfo("SUBR", true); assert(subr != 0);
-	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
+	// XXX PARSER XXX
+	/* for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		std::list<token>::iterator j = currentscript->lines[i].begin();
 		if (((*j).cmd == subr) && ((*++j).var.stringValue == label)) {
 			linestack.push_back(currentline + 1);
 			currentline = i + 1;
 			return;
 		}
-	}
+	} */
 	std::cerr << "warning: GSUB didn't find matching SUBR for " << label << ", ignoring\n";
 }
 

@@ -98,7 +98,7 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout << "executing script " << *i << "...\n";
 		std::cout.flush();
 		std::cerr.flush();
-		testvm.runEntirely(testscript.installer);
+		//testvm.runEntirely(testscript.installer);
 		std::cout.flush();
 		std::cerr.flush();
 	}

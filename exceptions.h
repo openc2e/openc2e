@@ -12,6 +12,11 @@ public:
 	const char* what() const throw() { return r; }
 };
 
+class tokeniseFailure : public creaturesException {
+public:
+	tokeniseFailure(const char *s) throw() : creaturesException(s) { }
+};
+
 class genomeException : public creaturesException {
 public:
 	genomeException(const char *s) throw() : creaturesException(s) { }

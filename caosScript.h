@@ -65,15 +65,26 @@ enum comparisonType {
 };
 
 struct token {
+	enum { CAOSVAR, FUNCTION, BYTESTRING, COMPARISON, POSSIBLEFUNC, LABEL } type;
+
+	// CAOSVAR
 	caosVar var;
-	struct cmdinfo *cmd, *func;
-	bool isvar;
-	comparisonType comparison;
+
+	// FUNCTION
+	struct cmdinfo *func;
 	signed char varnumber;
 
-	std::string dump();
+	// BYTESTRING
+	unsigned int len;
+	unsigned char *bytes;
 
-	token() { isvar = true; cmd = 0; func = 0; comparison = NONE; }
+	// COMPARISON
+	comparisonType comparison;
+
+	// POSSIBLEFUNC/LABEL
+	std::string data;
+
+	std::string dump();
 };
 
 struct script {

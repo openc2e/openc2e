@@ -38,8 +38,8 @@ public:
 
 	void fireScript(unsigned char event);
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
-	unsigned int x, y;
-	void moveTo(unsigned int, unsigned int);
+	float x, y;
+	void moveTo(float, float);
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual bool isSimple() { return false; }
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }

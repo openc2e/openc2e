@@ -93,6 +93,8 @@ bool handleComparison(caosVar &one, caosVar &two, comparisonType compare) {
 }
 
 caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
+	// XXX PARSER XXX
+/*
 	// v- this is the command/function we're executing
 	std::vector<caosVar> ourparams;
 	token maintoken = tokens.front();
@@ -181,7 +183,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 		internalRun(tokens, true);
 	}
 	return result;
-}
+*/}
 
 void caosVM::runEntirely(script &s) {
 	resetScriptState();
@@ -237,9 +239,9 @@ void caosVM::runCurrentLine() {
 	try {
 		if (!b.empty()) internalRun(b, true);
 	} catch (badParamException e) {
-#ifdef CAOSDEBUG
+//#ifdef CAOSDEBUG
 		std::cerr << "caught badParamException while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
-#endif
+//#endif
 	} catch (notEnoughParamsException e) {
 		std::cerr << "caught notEnoughParamsException while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
 	} catch (assertFailure e) {

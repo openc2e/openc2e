@@ -25,8 +25,12 @@
 #include <algorithm>
 
 std::string token::dump() {
-	if (comparison == NONE) return (isvar ? var.dump() : ((cmd == 0) ? ((func == 0) ? "[bad command!] " : func->dump()) : cmd->dump()));
-	else {
+	if (type == CAOSVAR) return var.dump();
+	else if (type == BYTESTRING) return "(bytestring: TODO) "; // TODO
+	else if (type == POSSIBLEFUNC) return data + " ";
+	else if (type == LABEL) return data + " ";
+	else if (type == FUNCTION) return func->name + " "; // TODO
+	else if (type == COMPARISON) {
 		switch (comparison) {
 			case EQ: return "EQ ";
 			case NE: return "NE ";
@@ -39,6 +43,7 @@ std::string token::dump() {
 			default: return "[bad comparison!] ";
 		}
 	}
+	return "[bad token!] ";
 }
 
 inline std::string stringify(double x) {
@@ -48,21 +53,15 @@ inline std::string stringify(double x) {
 }
 
 std::string caosVar::dump() {
-	std::string out = "[caosVar: ";
 	if (hasString()) {
-		out += std::string("\"") + stringValue + "\"";
+		return std::string("\"") + stringValue + "\" ";
 	} else if (hasInt()) {
-		out += stringify(intValue);
-		out += "(i)";
+		return stringify(intValue);
 	} else if (hasFloat()) {
-		out += stringify(floatValue);
-		out += "(f)";
+		return stringify(floatValue);
 	} else {
-		out += "unknown flags: ";
-		out += flags;
+		return "[bad caosVar!] ";
 	}
-	out += "] ";
-	return out;
 }
 
 std::string cmdinfo::dump() {
@@ -100,42 +99,57 @@ std::string caosScript::dump() {
 // TODO: debug use only?
 std::map<std::string, bool> seenbadsymbols;
 
-token makeToken(std::string &src, bool str, token &lasttok) {
+token makeToken(std::string &src) {
+	static std::string t;
 	token r;
-	// todo: hrr. we shouldn't be doing this on every tokenisation pass
-	if ((lasttok.cmd) && ( (lasttok.cmd == getCmdInfo("GSUB", true)) || (lasttok.cmd == getCmdInfo("SUBR", true))) ) {
-		r.var.setString(src);
-		return r;
-	}
-	if (str) { // handle strings (and arrays, at present)
-		r.var.setString(src);
-	} else if ((isdigit(src[0])) || (src[0] == '.') || (src[0] == '-')) { // handle digits
-		if (src.find(".") == std::string::npos) r.var.setInt(atoi(src.c_str()));
-		else r.var.setFloat(atof(src.c_str()));
-//		if (errno == EINVAL) throw tokeniseFailure();
-		// TODO: check for zero return value from atoi (and atof?) and then check for EINVAL
-	} else if (src.size() == 4) { // handle commands
-		r.isvar = false;
-		cmdinfo *lastcmd = (lasttok.cmd ? lasttok.cmd : lasttok.func);
-		if ((!lasttok.isvar) && (lastcmd->twotokens)) {
-			if (lasttok.cmd) r.cmd = getSecondCmd(lastcmd, src, true);
-			else r.func = getSecondCmd(lastcmd, src, false);
-		} else {
-			r.cmd = getCmdInfo(src, true);
-			r.func = getCmdInfo(src, false);
-			// this is a global hack from caosVM_cmdinfo for VAxx/OVxx
-			if (varnumber != -1) r.varnumber = varnumber;
-		}
-		if (!r.cmd && !r.func) {
-			if (!seenbadsymbols[src]) {
-				std::cerr << "caosScript parser failed to find presumed function \"" << src << "\": each missing function is reported only once\n";
-				seenbadsymbols[src] = true;
-			}
 
-			throw tokeniseFailure();
+	// check for labels; easy enough, they only appear in certain places
+	if (!t.empty())
+		if ((t == "GSUB") || (t == "SUBR")) {
+			t.clear();
+			// first character *must* be a letter
+			if (!isalpha(src[0])) throw tokeniseFailure("wanted a label, but first character isn't alpha");
+			// handle a label
+			r.type = token::LABEL;
+			r.data = src;
+			return r;
 		}
-	} else { // presumably we have a comparison
+	t.clear();
+	
+	// handle strings
+	if (src[0] == '"') {
+		r.type = token::CAOSVAR;
+		src.erase(src.begin());
+		src.erase(src.end() - 1);
+		r.var.setString(src);
+	// handle bytestrings
+	} else if (src[0] == '[') {
+		r.type = token::BYTESTRING;
+		// TODO: handle this!
+		src.erase(src.begin());
+		src.erase(src.end() - 1);
+		r.var.setString(src);
+	// handle numeric types
+	} else if ((isdigit(src[0])) || (src[0] == '.') || (src[0] == '-')) {
+		r.type = token::CAOSVAR;
+		if (src.find(".") != std::string::npos) {
+			float f = atof(src.c_str());
+			r.var.setFloat(f);
+		} else {
+			int v = atoi(src.c_str());
+			r.var.setInt(v);
+		}
+		// TODO: check for zero return value from atoi (and atof?) and then check for EINVAL
+	// handle possible functions
+	} else if (src.size() == 4) {
+		r.type = token::POSSIBLEFUNC;
 		std::transform(src.begin(), src.end(), src.begin(), toupper);
+		r.data = src;
+		t = src;
+	// handle comparisons (our last possibility)
+	} else {
+		std::transform(src.begin(), src.end(), src.begin(), toupper);
+		r.type = token::COMPARISON;
 		// todo: make this a hash table?
 		if (src == "NE") r.comparison = NE;
 		else if (src == "EQ") r.comparison = EQ;
@@ -151,41 +165,43 @@ token makeToken(std::string &src, bool str, token &lasttok) {
 		else if (src == "<") r.comparison = LT;
 		else if (src == "AND") r.comparison = AND;
 		else if (src == "OR") r.comparison = OR;
-		else throw tokeniseFailure();
+		else throw tokeniseFailure("couldn't parse this token");
 	}
+			
 	return r;
 }
 
-void tokenise(std::string s, std::list<token> &t) {
+// TODO: "blah"blah shouldn't result in "blah" and blah as tokens, it should DIE
+void tokeniseLine(std::string s, std::vector<token> &t) {
 	std::string currtoken;
 	token lasttoken;
 	for (std::string::iterator i = s.begin(); i != s.end(); i++) {
 		if ((*i == ' ') || (*i == '\t') || (*i == '\r')) {
 			if (!currtoken.empty()) {
-				lasttoken = makeToken(currtoken, false, lasttoken);
-				if ((lasttoken.isvar) || (lasttoken.cmd ? !lasttoken.cmd->twotokens : !lasttoken.func->twotokens))
-					t.push_back(lasttoken);
+				t.push_back(makeToken(currtoken));
 				currtoken.clear();
 			}
 		} else if (*i == '"') {
-			if (!currtoken.empty()) throw tokeniseFailure();
-			i++; // skip the "
+			if (!currtoken.empty()) throw tokeniseFailure("can't have \" in the middle of a token");
+			currtoken += *i;
+			i++;
+			currtoken += *i;
 			while (*i != '"') {
-				currtoken += *i;
 				i++;
-				if (i == s.end()) throw tokeniseFailure();
+				currtoken += *i;
+				if (i == s.end()) throw tokeniseFailure("string parsing reached EOL");
 			}
-			t.push_back(makeToken(currtoken, true, lasttoken));
+			t.push_back(makeToken(currtoken));
 			currtoken.clear();
 		} else if (*i == '[') {
-			if (!currtoken.empty()) throw tokeniseFailure();
-			i++; // skip the [
+			if (!currtoken.empty()) throw tokeniseFailure("can't have [ in the middle of a token");
+			currtoken += *i;
 			while (*i != ']') {
-				currtoken += *i;
 				i++;
-				if (i == s.end()) throw tokeniseFailure();
+				currtoken += *i;
+				if (i == s.end()) throw tokeniseFailure("bytestring parsing reached EOL");
 			}
-			t.push_back(makeToken(currtoken, true, lasttoken));
+			t.push_back(makeToken(currtoken));
 			currtoken.clear();
 		} else if (*i == '*') {
 			// start of a comment. forget the rest of the line.
@@ -195,76 +211,132 @@ void tokenise(std::string s, std::list<token> &t) {
 		}
 	}
 	if (!currtoken.empty()) {
-		t.push_back(makeToken(currtoken, false, lasttoken));
+		t.push_back(makeToken(currtoken));
 	}
 }
 
+// TODO: we just blindly increase loc here, without checking if we have enough tokens to cope
+void slurpTokens(unsigned int &loc, std::vector<token> &tokens, std::list<token> &destline, bool func = false) {
+	if (tokens[loc].type != token::POSSIBLEFUNC) throw tokeniseFailure("Expected a command or function");
+	
+	cmdinfo *c = getCmdInfo(tokens[loc].data, !func);
+	if (!c) {
+		if (func) throw tokeniseFailure("Expected a function");
+		else throw tokeniseFailure("Expected a command");
+	}
+
+	if (c->twotokens) {
+		loc++;
+		if (tokens[loc].type != token::POSSIBLEFUNC) {
+			loc--;
+			throw tokeniseFailure("Expected a command or function");
+		}
+		c = getSecondCmd(c, tokens[loc].data, !func);
+	}
+
+	token us;
+	us.type = token::FUNCTION;
+	us.func = c;
+	us.varnumber = varnumber; // global hack for VAxx/OVxx etc (-1 if none)!
+	destline.push_back(us);
+
+	if (c->needscondition) {
+		bool looping = true;
+		while (looping) {
+			loc++;
+			if (tokens[loc].type == token::POSSIBLEFUNC)
+				slurpTokens(loc, tokens, destline, true);
+			else
+				destline.push_back(tokens[loc]);
+			loc++;
+			if (tokens[loc].type != token::COMPARISON)
+				throw tokeniseFailure("Expected a comparison operator");
+			destline.push_back(tokens[loc]);
+			loc++;
+			if (tokens[loc].type == token::POSSIBLEFUNC)
+				slurpTokens(loc, tokens, destline, true);
+			else
+				destline.push_back(tokens[loc]);
+			if (tokens[loc + 1].type == token::COMPARISON) {
+				loc++;
+				destline.push_back(tokens[loc]);
+			} else
+				looping = false;
+		}
+	}
+
+	for (int i = 0; i < c->notokens; i++) {
+		loc++;
+		// TODO: handle flow control
+		if (tokens[loc].type == token::POSSIBLEFUNC)
+			slurpTokens(loc, tokens, destline, true);
+		else
+			destline.push_back(tokens[loc]);
+	}
+}
+	
 caosScript::caosScript(std::istream &in) {
-	std::vector<std::list<token> > lines;
-	std::vector<std::string> rawlines;
+	std::vector<token> tokens;
 
 	int lineno = 0;
 	while (!in.fail()) {
 		lineno++;
-		std::list<token> t;
 		std::string s;
 		std::getline(in, s);
 		if (s[s.size() - 1] == '\r')
 			s.erase(s.end() - 1);
 		try {
-			tokenise(s, t);
-			if (!t.empty()) {
-				lines.push_back(t);
-				rawlines.push_back(s);
-			}
+			tokeniseLine(s, tokens);
 		} catch (tokeniseFailure f) {
-			// std::cerr << "failed to tokenise line #" << lineno << "(" << s << ")\n";
+			std::cerr << "failed to tokenise line #" << lineno << "(" << s << ") because: " << f.what() << "\n";
 		}
 	}
 
-	// we don't find scrp tokens which aren't on seperate lines here.
-	// the fix for this is probably to split things up between lines
-	// at tokenisation time..
-
-	/*
-	  okay, here we go through the scrip we've parsed, and strip out
-	  the individual script elements - ie, installation script, removal
-	  script, and agent scripts
-	*/
-	cmdinfo *scrp = getCmdInfo("SCRP", true); assert(scrp != 0);
-	cmdinfo *rscr = getCmdInfo("RSCR", true); assert(rscr != 0);
-	cmdinfo *endm = getCmdInfo("ENDM", true); assert(endm != 0);
+	unsigned int loc = 0;
 	script *currscrip = &installer;
-	
-	for (unsigned int i = 0; i < lines.size(); i++) {
-		std::list<token> &l = lines[i];
-		if (l.front().cmd != 0) {
-			if (l.front().cmd == scrp) {
-				assert(l.size() == 5);
+	for (unsigned int i = 0; loc != tokens.size(); i++) {
+		std::list<token> destline;
+		try {
+			slurpTokens(loc, tokens, destline);
+			if (destline.begin()->func->name == "SCRP") {
+				assert(destline.size() == 5);
 				int one, two, three, four;
-				std::list<token>::iterator i = l.begin();
+				std::list<token>::iterator i = destline.begin();
 				// TODO: shouldn't add scripts here, should store them for optional addition
-				i++; assert(i->isvar); assert(i->var.hasInt()); one = i->var.intValue;
-				i++; assert(i->isvar); assert(i->var.hasInt()); two = i->var.intValue;
-				i++; assert(i->isvar); assert(i->var.hasInt()); three = i->var.intValue;
-				i++; assert(i->isvar); assert(i->var.hasInt()); four = i->var.intValue;
+				i++; assert(i->type == token::CAOSVAR); assert(i->var.hasInt()); one = i->var.intValue;
+				i++; assert(i->type == token::CAOSVAR); assert(i->var.hasInt()); two = i->var.intValue;
+				i++; assert(i->type == token::CAOSVAR); assert(i->var.hasInt()); three = i->var.intValue;
+				i++; assert(i->type == token::CAOSVAR); assert(i->var.hasInt()); four = i->var.intValue;
 				std::cout << "caosScript: script " << one << " " << two << " " << three << " " << four
 					<< " being added to scriptorium.\n";
 				currscrip = &(world.scriptorium.getScript(one, two, three, four));
 				// todo: verify event script doesn't already exist, maybe? don't know
 				// what real engine does
-			} else if (l.front().cmd == rscr) {
+			} else if (destline.begin()->func->name == "RSCR") {
 				currscrip = &removal;
-			} else if (l.front().cmd == endm) {
-				currscrip->lines.push_back(l);
-				currscrip->rawlines.push_back(rawlines[i]);
+			} else if (destline.begin()->func->name == "ENDM") {
+				currscrip->lines.push_back(destline);
 				currscrip = &installer;
 			} else {
-				currscrip->lines.push_back(l);
-				currscrip->rawlines.push_back(rawlines[i]);
+				currscrip->lines.push_back(destline);
 			}
-		} else {
-			std::cerr << "skipping rawline '" << rawlines[i] << "' because first parsed token wasn't a command (this is likely to be a bug in openc2e)\n";
+		} catch (tokeniseFailure f) {
+			std::cerr << f.what() << ": ";
+			if (loc == 1)
+				std::cerr << tokens[0].dump();
+			else if (loc > 1)
+				std::cerr << tokens[loc - 2].dump() << tokens[loc - 1].dump();
+			std::cerr << "{@}" << tokens[loc].dump();
+			if (tokens.size() > (loc + 1))
+				std::cerr << tokens[loc + 1].dump();
+			std::cerr << "\n";
 		}
+		std::cout << "parsed line: ";
+		for (std::list<token>::iterator i = destline.begin(); i != destline.end(); i++) {
+			std::cout << (*i).dump();
+		}
+		std::cout << "\n";
+
+		loc++;
 	}
 }

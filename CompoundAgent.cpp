@@ -24,7 +24,7 @@
 
 void CompoundAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	for (std::vector<CompoundPart *>::iterator i = parts.begin(); i != parts.end(); i++) {
-		(*i)->render(renderer, xoffset + x, yoffset + y);
+		(*i)->render(renderer, xoffset + (int)x, yoffset + (int)y);
 	}
 }
 
