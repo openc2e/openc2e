@@ -50,9 +50,9 @@ void caosVM::c_NEW_SIMP() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
-	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, first_image, image_count);
 	a->setImage(sprite_file);
@@ -72,9 +72,9 @@ void caosVM::c_NEW_COMP() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
-	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	world.addAgent(a);
@@ -93,9 +93,9 @@ void caosVM::c_NEW_VHCL() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
-	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	Vehicle *a = new Vehicle(family, genus, species, plane, sprite_file, first_image, image_count);
 	world.addAgent(a);
@@ -390,13 +390,32 @@ void caosVM::v_PNTR() {
 	result.setAgent(world.hand());
 }
 
+unsigned int calculateScriptId(unsigned int message_id) {
+	switch (message_id) {
+		case 2: /* deactivate */
+			return 0;
+		case 0: /* activate 1 */
+		case 1: /* activate 2 */
+		case 3: /* hit */
+		case 4: /* pickup */
+		case 5: /* drop */
+			return message_id - 1;
+	}
+
+	return message_id;
+}
+
 /**
  MESG WRIT (command) agent (agent) message_id (integer)
 */
 void caosVM::c_MESG_WRIT() {
 	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(message_id)
+	VM_PARAM_AGENT(agent);
 
-	std::cout << "MESG WRIT is unimplemented\n";
+	caos_assert(agent);
+
+	agent->fireScript(calculateScriptId(message_id));
 }
 
 /**
@@ -404,8 +423,20 @@ void caosVM::c_MESG_WRIT() {
 */
 void caosVM::c_MESG_WRT() {
 	VM_VERIFY_SIZE(5)
+	VM_PARAM_INTEGER(delay)
+	// TODO: make into macros
+	caosVar param_2 = params.back(); params.pop_back();
+	caosVar param_1 = params.back(); params.pop_back();
+	VM_PARAM_INTEGER(message_id)
+	VM_PARAM_AGENT(agent)
 
-	std::cout << "MESG WRT+ is unimplemented\n";
+	caos_assert(agent);
+
+	// I'm not sure how to handle the 'delay'; is it a background delay, or do we actually block for delay ticks?
+	
+	agent->fireScript(calculateScriptId(message_id));
+	agent->vm.setVariables(param_1, param_2);
+	// TODO: set _p_ in agent's VM to param_1 and param_2
 }
 
 /**
@@ -413,9 +444,9 @@ void caosVM::c_MESG_WRT() {
 */
 void caosVM::v_TOTL() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
-	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	unsigned int x = 0;
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {

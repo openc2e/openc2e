@@ -114,10 +114,10 @@ void caosVM::v_ACCG() {
 */
 void caosVM::v_RELY() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_AGENT(first)
 	VM_PARAM_AGENT(second)
+	VM_PARAM_AGENT(first)
 
-	// XXX: not sure if this is right
+	// TODO: should we divide by 2.0 to get float answer? check it with the second lift in the norn terrarium..
 	float one = first->y + (first->getHeight() / 2);
 	float two = second->y + (second->getHeight() / 2);
 
@@ -133,8 +133,9 @@ void caosVM::c_VELO() {
 	VM_PARAM_FLOAT(velx)
 
 	assert(targ);
-	// TODO: reset first, maybe?
+	targ->velx.reset();
 	targ->velx.setFloat(velx);
+	targ->vely.reset();
 	targ->vely.setFloat(vely);
 }
 

@@ -115,5 +115,20 @@ unsigned int CompoundAgent::getAttributes() {
 void CompoundAgent::tick() {
 	Agent::tick();
 
-	// TODO: implement CompoundAgent ticks for animation
+	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
+		(*x)->tick();
+	}
 }
+
+void CompoundPart::tick() {
+	if (!animation.empty()) {
+		unsigned int f = frameno + 1;
+		if (f == animation.size()) return;
+		if (animation[f] == 255) {
+			if (f == (animation.size() - 1)) f = 0;
+			else f = animation[f + 1];
+		}
+		setFrameNo(f);
+	}
+}
+

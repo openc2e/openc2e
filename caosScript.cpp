@@ -27,7 +27,7 @@
 std::string token::dump() {
 	std::string src;
 	if (type == CAOSVAR) return var.dump();
-	else if (type == BYTESTRING) return "(bytestring: TODO) "; // TODO
+	else if (type == BYTESTRING) return "[" + var.stringValue + "] "; // TODO
 	else if (type == POSSIBLEFUNC) src = data + " ";
 	else if (type == LABEL) return data + " ";
 	else if (type == FUNCTION) src = func->name + " "; // TODO
@@ -72,13 +72,18 @@ std::string cmdinfo::dump() {
 	return std::string("[command: ") + name + "] ";
 }
 
+std::string script::dumpLine(unsigned int i) {
+	std::string out;
+	for (std::list<token>::iterator j = lines[i].begin(); j != lines[i].end(); j++) {
+		out += j->dump();
+	}
+	return out;
+}	
+
 std::string script::dump() {
 	std::string out;
 	for (unsigned int i = 0; i < lines.size(); i++) {
-		for (std::list<token>::iterator j = lines[i].begin(); j != lines[i].end(); j++) {
-			out += j->dump();
-		}
-		out += "\n";
+		out = out + dumpLine(i) + "\n";
 	}
 	return out;
 }

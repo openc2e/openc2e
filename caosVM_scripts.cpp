@@ -30,7 +30,8 @@ using std::cerr;
 void caosVM::c_INST() {
 	VM_VERIFY_SIZE(0)
 	noschedule = true;
-	locked = true;
+	// TODO: do we need a state similar to locked? i commented it out because it doesn't seem right - fuzzie
+	//locked = true;
 }
 
 /**
@@ -43,7 +44,7 @@ void caosVM::c_SLOW() {
 	if (!noschedule) cerr << "can't call SLOW on a script not in INST mode";
 	else {
 		noschedule = false;
-		locked = false;
+		//locked = false;
 	}
 }
 
@@ -64,8 +65,8 @@ void caosVM::c_LOCK() {
  */
 void caosVM::c_UNLK() {
 	VM_VERIFY_SIZE(0)
-	if (noschedule) cerr << "can't call UNLK on script in INST mode\n";
-	else if (!locked) cerr << "can't call UNLK on a script not in LOCK mode";
+	/*if (noschedule) cerr << "can't call UNLK on script in INST mode\n";
+	else */ if (!locked) cerr << "can't call UNLK on a script not in LOCK mode";
 	else locked = false;
 }
 
@@ -97,8 +98,8 @@ void caosVM::c_STOP() {
 void caosVM::c_SCRX() {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(event) assert(event >= 0); assert(event <= 255);
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 	world.scriptorium.delScript(family, genus, species, event);
 }

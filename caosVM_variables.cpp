@@ -121,11 +121,7 @@ void caosVM::c_ADDV() {
 		v->setFloat(v->floatValue + (add.hasFloat() ? add.floatValue : add.intValue));
 	else if (v->hasInt())
 		v->setInt((int)(v->intValue + (add.hasFloat() ? add.floatValue : add.intValue)));
-	else if (v->empty()) {
-		// c3's Robin2.cos does 'addv va66 1' at the top without initialising va66
-		if (add.hasFloat()) v->setFloat(add.floatValue);
-		else v->setInt(add.intValue);
-	} else
+	else
 		throw badParamException();
 }
 

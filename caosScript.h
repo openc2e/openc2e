@@ -36,10 +36,10 @@ struct caosVar {
 	caosVar *variableValue;
 
 	void reset() { flags = 0; }
-	caosVar() { reset(); }
+	caosVar() { reset(); setInt(0); }
 	//virtual ~caosVar() { } // we don't truly need this.
 
-	bool empty() { return (flags == 0); }
+	//bool empty() { return (flags == 0); }
 	bool hasInt() { return (flags & 1); }
 	void setInt(int i) { flags = flags | 1; intValue = i; }
 	bool hasFloat() { return (flags & 2); }
@@ -91,6 +91,7 @@ struct script {
 	std::vector<std::list<token> > lines;
 
 	std::string dump();
+	std::string dumpLine(unsigned int);
 };
 
 class caosScript {

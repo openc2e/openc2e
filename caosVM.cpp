@@ -34,16 +34,19 @@ bool caosVar::operator == (caosVar &v) {
 	// todo: should be able to compare int and float, apparently
 	if (this->hasInt() && v.hasInt()) {
 		return (this->intValue == v.intValue);
-	} else if (this->hasFloat() && v.hasFloat()) {
-		return (this->floatValue == v.floatValue);
+	} else if (this->hasFloat() || v.hasFloat()) {
+		if (this->hasFloat())
+			return (this->floatValue == v.intValue);
+		else
+			return (this->intValue == v.floatValue);
 	} else if (this->hasString() && v.hasString()) {
 		return (this->stringValue == v.stringValue);
 	} else if (this->hasAgent() && v.hasAgent()) {
 		return (this->agentValue == v.agentValue);
 	}
-#ifdef CAOSDEBUG
+//#ifdef CAOSDEBUG
 	std::cerr << "caosVar operator == couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-#endif
+//#endif
 	return false;
 }
 
@@ -207,8 +210,8 @@ void caosVM::resetScriptState() {
 	setTarg(0);
 	_it_ = 0;
 
-	_p_[0].reset(); _p_[1].reset();
-	for (unsigned int i = 0; i < 100; i++) { var[i].reset(); }
+	_p_[0].reset(); _p_[0].setInt(0); _p_[1].reset(); _p_[1].setInt(0);
+	for (unsigned int i = 0; i < 100; i++) { var[i].reset(); var[i].setInt(0); }
 }
 
 void caosVM::tick() {
@@ -220,8 +223,10 @@ void caosVM::tick() {
 		runCurrentLine();
 		n++;
 	}
-	if (currentline == currentscript->lines.size())
+	if (currentline == currentscript->lines.size()) {
 		currentscript = 0;
+		locked = false;
+	}
 }
 
 // XXX TODO fuzzie commented out the error reporting lines below because rawlines no longer exists
@@ -237,7 +242,8 @@ void caosVM::runCurrentLine() {
 	} catch (notEnoughParamsException e) {
 		std::cerr << "caught notEnoughParamsException\n"; // while running '" << currentscript->rawlines[i]; << "' (line " << i << ")\n";
 	} catch (assertFailure e) {
-		std::cerr << "caught assert failure '" << e.what() << "'\n"; // << "' while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		std::cerr.flush();
+		std::cerr << "caught assert failure '" << e.what() << "' while running '" << currentscript->dumpLine(currentline) << "' (line #" << i << ")" << std::endl;
 		currentline = currentscript->lines.size();
 	}
 	/* Generally, we want to proceed to the next line. Sometimes, opcodes will change the

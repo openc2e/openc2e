@@ -34,11 +34,11 @@ void Agent::moveTo(float _x, float _y) {
 	x = _x; y = _y;
 }
 
-void Agent::fireScript(unsigned char event) {
+void Agent::fireScript(unsigned short event) {
 	script &s = world.scriptorium.getScript(family, genus, species, event);
 	if (s.lines.empty()) return;
-	vm.setTarg(this);
 	vm.fireScript(s, (event == 9));
+	vm.setTarg(this);
 	
 	std::cout << "Agent::fireScript fired " << (unsigned int)family << " " << (unsigned int)genus << " " << species << " ";
 	const std::string n = world.catalogue.getAgentName(family, genus, species);
@@ -72,19 +72,24 @@ void Agent::tick() {
 					r1->x_left, r1->y_left_floor, r1->x_right, r1->y_right_floor);
 			
 			if (c) {
-				vely.setFloat(0);
 				destx = p.getCollisionX() - (getWidth() / 2);
 				desty = p.getCollisionY() - getHeight();
-			} else {
-				vely.setFloat(newvely);
 			}
 
 			r1 = world.map.roomAt(destx, desty);
 			r2 = world.map.roomAt(destx + getWidth(), desty + getHeight());
 
-			if ((r1 && r2) && (r1 == r2))
+			if ((r1 && r2)) {
 				moveTo(destx, desty);
+				vely.setFloat(newvely);
+			} else
+				vely.setFloat(0);
 		}
+	// TODO: check velx!
+	} else if (vely.hasFloat()) {
+		y = y + vely.floatValue;
+	} else if (vely.hasInt()) {
+		y = y + vely.intValue;
 	}
 
 	if (timerrate) {

@@ -238,9 +238,9 @@ void caosVM::c_NEXT() {
 */
 void caosVM::c_ENUM() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 
 	// TODO: fix mess of 'r' initialisation
 	unsigned int r = (enumdata.count(currentline) == 0 ? 1 : enumdata[currentline]), x = 0;
@@ -271,9 +271,9 @@ void caosVM::c_ENUM() {
 */
 void caosVM::c_ESEE() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 
 	// TODO: should probably implement this (ESEE)
 	
@@ -288,9 +288,9 @@ void caosVM::c_ESEE() {
 */
 void caosVM::c_ETCH() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 
 	// TODO: should probably implement this (ESEE)
 	
@@ -305,9 +305,9 @@ void caosVM::c_ETCH() {
 */
 void caosVM::c_EPAS() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 
 	// TODO: should probably implement this (ESEE)
 	

@@ -32,6 +32,7 @@ public:
 	creaturesImage *getSprite() { return sprite; }
 	unsigned int x, y, zorder, id;
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
+	virtual void tick();
 	unsigned int getWidth() { return sprite->width(firstimg); }
 	unsigned int getHeight() { return sprite->height(firstimg); }
 	unsigned int getPose() { return pose; }

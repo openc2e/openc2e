@@ -149,7 +149,7 @@ extern "C" int main(int argc, char *argv[]) {
 	bool done = false;
 	unsigned int tickdata = 0;
 	while (!done) {
-		if (!paused && (backend.ticks() > tickdata + 50)) {
+		if (!paused && (backend.ticks() > (tickdata + 50))) {
 			world.tick(); // TODO: use BUZZ value
 			tickdata = backend.ticks();
 		}

@@ -13,14 +13,14 @@
 class Scriptorium {
 protected:
 	// unsigned int = combined family/genus/species
-	// unsigned char = event id
-	std::map<unsigned int, std::map<unsigned char, script> > scripts;
+	// unsigned short = event id
+	std::map<unsigned int, std::map<unsigned short, script> > scripts;
 	
-	std::map<unsigned char, script> &getScripts(unsigned int value) { return scripts[value]; }
+	std::map<unsigned short, script> &getScripts(unsigned int value) { return scripts[value]; }
 	unsigned int calculateValue(unsigned char family, unsigned char genus, unsigned short species);
 
 public:
-	void addScript(unsigned char family, unsigned char genus, unsigned short species, unsigned char event, script &script);
-	void delScript(unsigned char family, unsigned char genus, unsigned short species, unsigned char event);
-	script &getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned char event);
+	void addScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event, script &script);
+	void delScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event);
+	script &getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event);
 };
