@@ -12,7 +12,7 @@ std::istream &operator >> (std::istream &, Catalogue &) {
 }
 
 void Catalogue::reset() {
-	data.empty();
+	data.clear();
 }
 
 void Catalogue::initFrom(boost::filesystem::path path) {
