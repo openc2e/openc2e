@@ -11,7 +11,7 @@ namespace fs = boost::filesystem;
 
 std::istream &operator >> (std::istream &s, Catalogue &c) {
 	unsigned int arraysize = 0;
-	std::vector<std::string> &x = c.data["dummyblah TODO fix this crap"];
+	std::vector<std::string> *x = 0;
 
 	std::string i;
 	while (getline(s, i)) {
@@ -73,7 +73,7 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 					t += " " + r;
 				}
 			} else if (stage == 2) {
-				// check for a number, store it in arraysize..
+				// check for a number, check it isn't zero, store it in arraysize..
 				stage = 3;
 			} else if (parsingstring) {
 				t += " " + y;
@@ -84,11 +84,14 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 			if (wasparsingstring && ((!parsingarray) && (!parsingtag))) {
 //				std::cout << "catalogue appending value: " << t << std::endl;
 				wasparsingstring = false;
-				x.push_back(t);
+				assert(x != 0);
+				x->push_back(t);
 				t.clear();
 			} else if (wasparsingstring) {
 				assert(stage == 1);
 				stage = 2;
+				// std::cout << "catalogue starting to parse tag/array: " << t << std::endl;
+				x = &(c.data[t]);
 				wasparsingstring = false;
 			}
 		}
@@ -96,16 +99,9 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 		if (parsingstring) {
 			std::cerr << "ERROR: incomplete string was found in: " << i << std::endl; 
 			// TODO: spit error message (incomplete string)
-		} else if (wasparsingstring) {
-			if (parsingarray || parsingtag) {
-				// TODO: once we fill in arraysize, uncomment following				
-				// if (parsingarray) assert(arraysize != 0);
-//				std::cout << "catalogue starting to parse tag/array: " << t << std::endl;
-				x = c.data[t];
-			}
 		}
 
-		// somewhere we need to check: if (arraysize != 0) assert(arraysize == x.size());
+		// somewhere we need to check: if (arraysize != 0) assert(arraysize == x->size());
 	}
 }
 
