@@ -215,6 +215,9 @@ public:
 	void v_PLNE();
 	void c_PLNE();
 	void v_WDTH();
+	void c_TINT();
+	void c_RNGE();
+	void v_RNGE();
 
 	// motion
 	void c_ELAS();
@@ -224,6 +227,7 @@ public:
 	void v_OBST();
 	void v_TMVT();
 	void v_TMVF();
+	void v_RELX();
 	void v_RELY();
 	void c_VELO();
 	void c_ACCG();
@@ -265,6 +269,7 @@ public:
 	void c_RMSC();
 	void v_RMSC();
 	void c_SNDL();
+	void c_FADE();
 
 	// time
 	void v_PACE();

@@ -145,6 +145,21 @@ void caosVM::v_AERO() {
 }
 
 /**
+ RELX (float) first (agent) second (agent)
+*/
+void caosVM::v_RELX() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_AGENT(second)
+	VM_PARAM_AGENT(first)
+
+	// TODO: should we divide by 2.0 to get float answer?
+	float one = first->x + (first->getWidth() / 2);
+	float two = second->x + (second->getWidth() / 2);
+
+	result.setFloat(two - one);
+}
+
+/**
  RELY (float) first (agent) second (agent)
 */
 void caosVM::v_RELY() {

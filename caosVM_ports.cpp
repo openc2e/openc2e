@@ -136,7 +136,7 @@ void caosVM::c_PRT_OZAP() {
 */
 void caosVM::c_PRT_SEND() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_INTEGER(id)
 	params.pop_back(); // TODO
+	VM_PARAM_INTEGER(id)
 }
 

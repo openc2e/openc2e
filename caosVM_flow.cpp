@@ -21,6 +21,7 @@
 #include <iostream>
 #include "openc2e.h"
 #include "World.h" // enum
+#include <cmath>   // sqrt
 
 void caosVM::jumpToAfterEquivalentNext() {
 	// todo: add non-ENUM things
@@ -275,8 +276,34 @@ void caosVM::c_ESEE() {
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 
-	// TODO: should probably implement this (ESEE)
+	caos_assert(owner);
+
+	// Copied from ENUM.
+	// TODO: fix mess of 'r' initialisation
+	unsigned int r = (enumdata.count(currentline) == 0 ? 1 : enumdata[currentline]), x = 0;
+
+	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		double deltax = (*i)->x - owner->x;
+		double deltay = (*i)->y - owner->y;
+		deltax *= deltax;
+		deltay *= deltay;
+
+		double distance = sqrt(deltax + deltay);
+		if (distance <= owner->range)
+			if ((*i)->family == family)
+				if ((*i)->genus == genus)
+					if ((*i)->species == species)
+						x++;
+
+		if (x == r) {
+			enumdata[currentline] = x + 1;
+			setTarg(*i);
+			linestack.push_back(currentline);
+			return;
+		}
+	}
 	
+	enumdata[currentline] = 1; // TODO: erase it instead?
 	setTarg(owner);
 	jumpToAfterEquivalentNext();
 }

@@ -59,7 +59,7 @@ OPENC2E = \
 	Vehicle.o \
 	World.o
 
-LDFLAGS=-lboost_filesystem $(shell sdl-config --static-libs) -lz
+LDFLAGS=-lboost_filesystem $(shell sdl-config --static-libs) -lz -lm
 CFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 CPPFLAGS=$(CFLAGS)
 
@@ -70,6 +70,11 @@ all: openc2e tools/filetests tools/praydumper
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
+
+caosdata.cpp caoshashes.cpp: $(wildcard caosVM_*.cpp)
+	cd caosdata; \
+	chmod u+x *.sh *.pl; \
+	./build.sh
 
 # shamelessly ripped from info make, with tweaks
 .deps/%.d: %.c
@@ -104,6 +109,5 @@ tools/praydumper: tools/praydumper.o pray.o
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
 	rm -rf .deps
-
 
 .PHONY: clean all dep

@@ -17,6 +17,7 @@
  *
  */
 
+#include "openc2e.h"
 #include "caosVM.h"
 #include <iostream>
 using std::cout;
@@ -91,4 +92,13 @@ void caosVM::v_RMSC() {
 	VM_PARAM_INTEGER(x)
 	// TODO
 	result.setString("");
+}
+
+/**
+ FADE (command)
+*/
+void caosVM::c_FADE() {
+	VM_VERIFY_SIZE(2)
+	caos_assert(targ);
+	//TODO
 }

@@ -27,6 +27,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   velx.setFloat(0.0f);
   vely.setFloat(0.0f);
   accg = 0.3f;
+  range = 0; // XXX: find out what CEE actually uses
   sufferphysics = false;
 }
 
@@ -40,11 +41,14 @@ void Agent::fireScript(unsigned short event) {
 	vm.fireScript(s, (event == 9));
 	vm.setTarg(this);
 	
+	// This slows us down too much :)
+#if 0
 	std::cout << "Agent::fireScript fired " << (unsigned int)family << " " << (unsigned int)genus << " " << species << " ";
 	const std::string n = world.catalogue.getAgentName(family, genus, species);
 	if (n.size())
 		std::cout << "(" << n << ") ";
 	std::cout << (unsigned int)event << std::endl;
+#endif
 }
 
 void Agent::tick() {

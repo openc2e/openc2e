@@ -603,3 +603,39 @@ void caosVM::c_PLNE() {
 	// TODO: resort the storage vector!
 }
 
+/**
+ TINT (command) red_tint (integer) green_tint (integer) blue_tint (integer) rotation (integer) swap (integer)
+*/
+void caosVM::c_TINT() {
+	VM_VERIFY_SIZE(5)
+	VM_PARAM_INTEGER(swap)
+	VM_PARAM_INTEGER(rotation)
+	VM_PARAM_INTEGER(blue_tint)
+	VM_PARAM_INTEGER(green_tint)
+	VM_PARAM_INTEGER(red_tint)
+
+	caos_assert(targ);
+
+	// TODO
+}
+
+/**
+ RNGE (command) distance (float)
+*/
+void caosVM::c_RNGE() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(distance)
+
+	caos_assert(targ)
+	targ->range = distance;
+}
+
+/**
+ RNGE (integer)
+*/
+void caosVM::v_RNGE() {
+	VM_VERIFY_SIZE(0)
+	caos_assert(targ);
+	result.setFloat(targ->range);
+}
+

@@ -45,6 +45,8 @@ public:
 	float accg, aero;
 	unsigned int friction;
 	float x, y;
+
+	float range;
 	
 	void fireScript(unsigned short event);
 	void moveTo(float, float);
