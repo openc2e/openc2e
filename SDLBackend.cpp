@@ -71,6 +71,10 @@ void SDLBackend::init() {
 	SDL_ShowCursor(false);
 }
 
+void SDLBackend::renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour) {
+	aalineColor(screen, x1, y1, x2, y2, colour);
+}
+
 void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y) {
 	SDL_Surface *surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
 												 image->width(frame),

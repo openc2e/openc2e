@@ -20,8 +20,11 @@
 #ifndef _C2E_ROOM_H
 #define _C2E_ROOM_H
 
+#include <vector>
+
 class Room {
 public:
+	std::vector<Room *> neighbours;
 	unsigned int x_left, x_right, y_left_ceiling, y_right_ceiling, y_left_floor, y_right_floor;
 	unsigned int type;
 	unsigned int id;

@@ -19,6 +19,14 @@
 
 #include "Agent.h"
 
-/*class Creature : public Agent {
-};*/
+class Creature : public Agent {
+protected:
+	// biochemistry
+	unsigned char chemicals[256];
+	unsigned char variant;
+	bool is_female;
+	class genomeFile *genome;
+
+	Creature(genomeFile *g, unsigned char _family, bool female, unsigned char _variant);
+};
 

@@ -197,6 +197,7 @@ public:
 	void v_POSY();
 	void c_FRAT();
 	void c_NOHH();
+	void c_OVER();
 
 	// motion
 	void c_ELAS();

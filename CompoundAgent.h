@@ -31,7 +31,9 @@ public:
 	creaturesImage *getSprite() { return sprite; }
 	unsigned int x, y, zorder, id;
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
-
+	unsigned int getWidth() { return sprite->width(firstimg); }
+	unsigned int getHeight() { return sprite->height(firstimg); }
+				
 	bool operator < (const CompoundPart *b) const {
 		return zorder < b->zorder;
 	}
@@ -99,6 +101,8 @@ public:
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
 	virtual void tick();
+	virtual unsigned int getWidth() { return parts[0]->getWidth(); }
+	virtual unsigned int getHeight() { return parts[0]->getHeight(); }
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 };

@@ -442,3 +442,15 @@ void caosVM::c_FRAT() {
 
 	// TODO
 }
+
+/**
+ OVER (command)
+*/
+void caosVM::c_OVER() {
+	VM_VERIFY_SIZE(0)
+
+	assert(targ);
+
+	// TODO: wait for completion of animation of current agent/part
+}
+

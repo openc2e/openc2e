@@ -138,9 +138,11 @@ void caosVM::c_DOOR() {
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
-	// TODO
+	// TODO: handle perm
 	Room *r1 = world.map.getRoom(room1);
 	Room *r2 = world.map.getRoom(room2);
+	r1->neighbours.push_back(r2);
+	r2->neighbours.push_back(r1);
 }
 
 /**

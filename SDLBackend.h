@@ -49,6 +49,7 @@ public:
 	void init();
 	void resizeNotify(int _w, int _h);
 	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y);
+	void renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour);
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
 };

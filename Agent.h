@@ -49,6 +49,9 @@ public:
 	virtual void setAttributes(unsigned int attr) = 0;
 	virtual unsigned int getAttributes() = 0;
 
+	virtual unsigned int getWidth() = 0;
+	virtual unsigned int getHeight() = 0;
+
 	virtual void tick();
 
 	friend struct agentzorder;

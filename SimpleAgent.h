@@ -46,6 +46,8 @@ public:
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
+	virtual unsigned int getWidth() { return sprite->width(first_image); }
+	virtual unsigned int getHeight() { return sprite->height(first_image); }
 
 	void setFrameNo(unsigned int);
 	unsigned int getCurrentSprite();

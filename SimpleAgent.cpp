@@ -100,5 +100,11 @@ void SimpleAgent::tick() {
 }
 
 void SimpleAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	renderer->render(getSprite(), getCurrentSprite(), xoffset + (int)x, yoffset + (int)y);
+	int xoff = xoffset + (int)x;
+	int yoff = yoffset + (int)y;
+	renderer->render(getSprite(), getCurrentSprite(), xoff, yoff);
+	renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF0000CC);
+	renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
+	renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
+	renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC);
 }

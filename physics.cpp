@@ -89,19 +89,19 @@ bool physicsHandler::collidePoints(float ax1, float ay1, float ax2, float ay2,
 	}
 
 	if (ax1 > ax2) {
-		if (x <= ax2) return false;
-		if (x >= ax1) return false;
+		if (x < ax2) return false;
+		if (x > ax1) return false;
 	} else {
-		if (x >= ax2) return false;
-		if (x <= ax1) return false;
+		if (x > ax2) return false;
+		if (x < ax1) return false;
 	}
 
 	if (bx1 > bx2) {
-		if (x <= bx2) return false;
-		if (x >= bx1) return false;
+		if (x < bx2) return false;
+		if (x > bx1) return false;
 	} else {
-		if (x >= bx2) return false;
-		if (x <= bx1) return false;
+		if (x > bx2) return false;
+		if (x < bx1) return false;
 	}
 
 	finalx = x;
