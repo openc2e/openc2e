@@ -54,6 +54,19 @@ void caosVM::c_SETV() {
 }
 
 /*
+ SETA (command) var (variable) value (agent)
+
+ sets given variable to given agent
+*/
+void caosVM::c_SETA() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_AGENT(value)
+	VM_PARAM_VARIABLE(var)
+	var->reset();
+	var->setAgent(value);
+}
+
+/*
  OVxx (variable)
 
  agent-local variables from TARG, 00 to 99

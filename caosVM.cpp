@@ -39,7 +39,7 @@ bool caosVar::operator == (caosVar &v) {
 	} else if (this->hasAgent() && v.hasAgent()) {
 		return (this->agentValue == v.agentValue);
 	}
-	std::cerr << "caosVar operator == couldn't compare\n";
+	std::cerr << "caosVar operator == couldn't compare " << this->dump() << " and " << v.dump() << "\n";
 	return false;
 }
 

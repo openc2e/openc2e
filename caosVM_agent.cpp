@@ -100,7 +100,15 @@ void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
 	assert(targ.hasAgent());
+	assert(targ.agentValue);
 	targ.agentValue->setAttributes(attr);
+}
+
+void caosVM::v_ATTR() {
+	VM_VERIFY_SIZE(0)
+	assert(targ.hasAgent());
+	assert(targ.agentValue);
+	result.setInt(targ.agentValue->getAttributes());
 }
 
 void caosVM::c_TICK() {

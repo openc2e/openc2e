@@ -1,0 +1,28 @@
+* unit tests for the simple agent stuff 
+* fuzzie, 06/06/04
+
+DBG: OUTS "TEST: simpleagent: 3 tests"
+
+* test NULL
+SETA VA00 NULL
+DOIF VA00 eq NULL
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test NEW: SIMP
+NEW: SIMP 1 1 1 "bluebell" 1 0 0
+DOIF TARG eq NULL
+ DBG: OUTS "FAIL"
+ELSE
+ DBG: OUTS "PASS"
+ENDI
+
+* test ATTR
+ATTR 3575 * all attributes relevant to agents
+DOIF ATTR eq 3575
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI

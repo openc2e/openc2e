@@ -55,12 +55,12 @@ public:
 	
 	// core
 	void v_GAME();
-	void c_SETV();
 	void null();
 	void c_OUTS();
 	void c_OUTV();
 
 	// variables
+	void c_SETV();
 	void v_RAND();
 	void c_REAF();
 	void v_VAxx();
@@ -70,6 +70,7 @@ public:
 	void c_NEGV();
 	void c_MULV();
 	void c_ADDV();
+	void c_SETA();
 
 	// flow
 	void c_DOIF();
@@ -100,6 +101,7 @@ public:
 	void c_NEXT();
 	void c_SCRX();
 	void c_ANIM();
+	void v_ATTR();
 
 	// motion
 	void c_ELAS();

@@ -3,6 +3,7 @@
 
 DBG: OUTS "TEST: variables: 5 tests"
 
+* test setv
 SETV VA00 1
 DOIF VA00 eq 1
  DBG: OUTS "PASS"
@@ -10,6 +11,7 @@ ELSE
  DBG: OUTS "FAIL"
 ENDI
 
+* test subv
 SETV VA00 4
 SUBV VA00 2
 DOIF VA00 eq 2
@@ -18,6 +20,7 @@ ELSE
  DBG: OUTS "FAIL"
 ENDI
 
+* test addv
 SETV VA00 4
 ADDV VA00 2
 DOIF VA00 eq 6
@@ -26,6 +29,7 @@ ELSE
  DBG: OUTS "FAIL"
 ENDI
 
+* test mulv
 SETV VA00 4
 MULV VA00 2
 DOIF VA00 eq 8
@@ -34,6 +38,16 @@ ELSE
  DBG: OUTS "FAIL"
 ENDI
 
+* test negv
+SETV VA00 4
+NEGV VA00
+DOIF VA00 eq -4
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test modv
 SETV VA00 7
 MODV VA00 2
 DOIF VA00 eq 1
@@ -42,6 +56,7 @@ ELSE
  DBG: OUTS "FAIL"
 ENDI
 
+* test that you can have independent va00/va01
 SETV VA01 8
 SETV VA00 7
 DOIF VA01 eq 8 AND VA00 eq 7
