@@ -17,8 +17,14 @@
  *
  */
 
+#ifndef _C2E_ROOM_H
+#define _C2E_ROOM_H
+
 class Room {
 public:
 	unsigned int x_left, x_right, y_left_ceiling, y_right_ceiling, y_left_floor, y_right_floor;
+	unsigned int type;
+	unsigned int id;
 };
 
+#endif

@@ -90,7 +90,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	if (maintoken.isvar) throw badParamException();
 	cmdinfo *us = (first ? maintoken.cmd : maintoken.func);
 	if (!us) throw badParamException();
-	std::cout << "internalRun called for " << us->dump() << "\n";
+	//std::cout << "internalRun called for " << us->dump() << "\n";
 	// if the command/function needs parameters, we suck them up
 	for (unsigned int i = 0; i < us->notokens; i++) {
 		if (tokens.empty()) throw notEnoughParamsException();
@@ -146,7 +146,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	}
 	params = ourparams;
 	result.reset();
-	std::cout << "internalRun executing " << us->dump() << "\n";
+	//std::cout << "internalRun executing " << us->dump() << "\n";
 	(this->*(us->method))();
 	if (first && !tokens.empty()) {
 		// assume there's another command on this line

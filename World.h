@@ -20,11 +20,19 @@
 #include "Map.h"
 #include "Agent.h"
 #include <list>
+#include <map>
+
+struct cainfo {
+	float gain;
+	float loss;
+	float diffusion;
+};
 
 class World {
 public:
 	Map map;
 	std::list<Agent *> agents;
+	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	
 	World();
 };

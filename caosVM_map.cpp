@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include <assert.h>
 #include <iostream>
 using std::cout;
 
@@ -34,7 +35,7 @@ void caosVM::v_ADDM() {
   VM_PARAM_INTEGER(width)
   VM_PARAM_INTEGER(y)
   VM_PARAM_INTEGER(x)
-	// todo: handle params
+
   MetaRoom *r = new MetaRoom(x, y, width, height, background);
 	caosVar v;
   v.setInt(world.map.addMetaRoom(r));
@@ -84,23 +85,23 @@ void caosVM::v_ADDR() {
 	VM_PARAM_INTEGER(x_right)
 	VM_PARAM_INTEGER(x_left)
 	VM_PARAM_INTEGER(metaroomid)
-	result.setInt(0);
-	Room r;
-	r.x_left = x_left;
-	r.x_right = x_right;
-	r.y_left_ceiling = y_left_ceiling;
-	r.y_right_ceiling = y_right_ceiling;
-	r.y_left_floor = y_left_floor;
-	r.y_right_floor = y_right_floor;
-	world.map.getMetaRoom(metaroomid)->rooms.push_back(r);
+
+	Room *r = new Room();
+	r->x_left = x_left;
+	r->x_right = x_right;
+	r->y_left_ceiling = y_left_ceiling;
+	r->y_right_ceiling = y_right_ceiling;
+	r->y_left_floor = y_left_floor;
+	r->y_right_floor = y_right_floor;
+	result.setInt(world.map.getMetaRoom(metaroomid)->addRoom(r));
 }
 
 void caosVM::c_RTYP() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(roomtype)
 	VM_PARAM_INTEGER(roomid)
-	// todo
-	cout << "unimplemented: RTYP\n";
+	Room *room = world.map.getRoom(roomid);
+	room->type = roomtype;
 }
 
 void caosVM::c_DOOR() {
@@ -108,6 +109,9 @@ void caosVM::c_DOOR() {
 	VM_PARAM_INTEGER(perm)
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
+
+	Room *r1 = world.map.getRoom(room1);
+	Room *r2 = world.map.getRoom(room2);
 	cout << "unimplemented: DOOR\n";
 }
 
@@ -118,5 +122,10 @@ void caosVM::c_RATE() {
 	VM_PARAM_FLOAT(gain)
 	VM_PARAM_INTEGER(caindex)
 	VM_PARAM_INTEGER(roomtype)
-	cout << "unimplemented: RATE\n";
+
+	cainfo info;
+	info.gain = gain;
+	info.loss = loss;
+	info.diffusion = diffusion;
+	world.carates[roomtype][caindex] = info;
 }

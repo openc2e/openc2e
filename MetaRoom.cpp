@@ -18,15 +18,23 @@
  */
 
 #include "MetaRoom.h"
+#include "World.h"
 #include <fstream>
 #include <assert.h>
 
 MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
 	xloc = _x; yloc = _y; wid = _width; hei = _height;
 	// todo: use gallery
-	if (back.compare("norn3.0")) return;
+	// if (back.compare("norn3.0")) return;
 	std::string filename = std::string("/mnt/creatures3/Backgrounds/") + back + std::string(".blk");
 	std::ifstream i(filename.c_str());
 	assert(i.is_open());
 	background = new blkImage(i);
+}
+
+unsigned int MetaRoom::addRoom(Room *r) {
+	rooms.push_back(r);
+	world.map.rooms.push_back(r);
+	r->id = world.map.rooms.size() - 1;
+	return r->id;
 }

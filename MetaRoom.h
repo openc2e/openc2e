@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef _C2E_METAROOM_H
+#define _C2E_METAROOM_H
+
 #include "Room.h"
 #include "blkImage.h"
 #include <string>
@@ -28,7 +31,7 @@ protected:
 	blkImage *background;
 	
 public:
-	std::vector<Room> rooms;
+	std::vector<Room *> rooms;
 
 	unsigned int x() { return xloc; }
 	unsigned int y() { return yloc; }
@@ -36,6 +39,11 @@ public:
 	unsigned int height() { return hei; }
 	blkImage *backImage() { return background; }
 
+	unsigned int addRoom(Room *);
+
+	unsigned int id;
+
 	MetaRoom(int _x, int _y, int width, int height, std::string back);
 };
 
+#endif

@@ -27,6 +27,7 @@ void Map::Reset() {
 		delete *i;
 	}
 	metarooms.clear();
+	rooms.clear(); // metaroom destructor handles
 	std::cout << "map reset\n";
 }
 
@@ -44,7 +45,8 @@ void Map::SetCurrentMetaRoom(unsigned int room) {
 int Map::addMetaRoom(MetaRoom *m) {
 	// todo: check if it's outlying
 	metarooms.push_back(m);
-	return (metarooms.size() - 1);
+	m->id = metarooms.size() - 1;
+	return m->id;
 }
 
 MetaRoom *Map::getMetaRoom(unsigned int room) {
@@ -55,4 +57,13 @@ MetaRoom *Map::getMetaRoom(unsigned int room) {
 MetaRoom *Map::getCurrentMetaRoom() {
 	assert(currroom < metarooms.size());
 	return metarooms[currroom];
+}
+
+Room *Map::getRoom(unsigned int r) {
+	assert(r < rooms.size());
+	return rooms[r];
+}
+
+unsigned int Map::getMetaRoomCount() {
+	return metarooms.size();
 }
