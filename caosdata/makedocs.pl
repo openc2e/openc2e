@@ -19,7 +19,7 @@ sub writedata {
 	my ($name, $docline, $type, $newname) = @_;
 
 	my @sp = split(/\(/, $docline);
-  my $count = int(@sp) - 2;
+	my $count = int(@sp) - 2;
 
 	die("unknown type $type passed to writedata") if ($type != 1) && ($type != 2);
 	
@@ -27,7 +27,7 @@ sub writedata {
 		$data = $data . "CMDDEF(" . $name if ($type == 1);
 		$data = $data . "FUNCDEF(" . $name if ($type == 2);
 		$count = 0 if $docline =~ /condition/;
-    $data = $data . ", " . $count . ")\n";
+		$data = $data . ", " . $count . ")\n";
 		if ($docline =~ /condition/) {
 			die("only commands can have conditions while processing " . $name) unless ($type == 1);
 			$data = $data . 'cmds[phash_cmd(*(int *)"' . $name . '")].needscondition = true;' . "\n";
@@ -68,7 +68,7 @@ sub writedocsanddata {
 		$newname = $one . " " . $two;
 	}
 	if ($doclines) {
-    my $firstline = (split(/\n/, $doclines))[0];
+		my $firstline = (split(/\n/, $doclines))[0];
 		$firstline =~ s/^\s*(.*)\s*$/$1/;
 		writedata($name, $firstline, $type, $newname);
 		
