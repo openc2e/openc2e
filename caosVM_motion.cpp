@@ -42,3 +42,32 @@ void caosVM::c_MVTO() {
 	assert(targ);
 	targ->moveTo(x, y);
 }
+
+/**
+ VELX (variable)
+*/
+void caosVM::v_VELX() {
+	VM_VERIFY_SIZE(0)
+	assert(targ);
+	result = targ->velx;
+	result.setVariable(&targ->velx);
+}
+
+/**
+ VELY (variable)
+*/
+void caosVM::v_VELY() {
+	VM_VERIFY_SIZE(0)
+	assert(targ);
+	result = targ->vely;
+	result.setVariable(&targ->vely);
+}
+
+/**
+ OBST (float) direction (integer)
+*/
+void caosVM::v_OBST() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(direction) assert(direction >= 0); assert(direction <= 3);
+	result.setFloat(0.0f);
+}

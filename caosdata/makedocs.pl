@@ -79,6 +79,10 @@ sub writedocsanddata {
 		}
 		$newname = $one . " " . $two;
 	}
+	if (length($name) == 2) {
+		$name = "_" . $name . "_";
+		$newname = $name;
+	}
 	if ($doclines) {
 	  my @lines = split(/\n/, $doclines);
 		my $firstline = $lines[0];
@@ -139,6 +143,9 @@ foreach my $fname (@files) {
 			$_ =~ s/(.*)(_.+)/$1/;
 			if (length($_) == 3) {
 				$_ = $_ . ":";
+			}
+			if (length($_) == 2) {
+				$_ = "_" . $_ . "_";
 			}
 			if ($type == 1) {
 				$voids{$_} = 1;

@@ -57,20 +57,20 @@ unsigned int phash_cmd(unsigned int val)
 
 /* small adjustments to _a_ to make values distinct */
 unsigned char tab_func[] = {
-0,9,19,10,19,0,9,16,0,0,10,0,0,0,59,28,
-0,28,0,11,9,9,9,24,34,0,0,0,36,5,0,0,
+12,50,7,0,0,28,0,49,0,22,41,9,46,0,0,0,
+9,9,38,0,34,1,19,51,0,0,41,0,35,0,19,9,
 };
 
 /* The hash function */
 unsigned int phash_func(unsigned int val)
 {
   unsigned int a, b, rsl;
-  val += 0xa2136dac;
+  val += 0xd90f5d4b;
   val ^= (val >> 16);
   val += (val << 8);
   val ^= (val >> 4);
-  b = (val >> 5) & 0x1f;
-  a = (val + (val << 1)) >> 27;
+  b = val & 0x1f;
+  a = (val + (val << 2)) >> 27;
   rsl = (a^tab_func[b]);
   return rsl;
 }
@@ -81,20 +81,20 @@ unsigned int phash_func(unsigned int val)
 
 /* small adjustments to _a_ to make values distinct */
 unsigned char tab_func[] = {
-19,0,7,0,19,26,0,0,9,7,9,6,7,28,2,0,
-28,6,0,0,11,60,32,20,12,34,4,15,36,22,0,12,
+0,0,0,49,19,36,0,16,49,7,0,51,51,9,34,7,
+61,28,0,49,59,0,50,7,0,25,9,19,16,49,0,0,
 };
 
 /* The hash function */
 unsigned int phash_func(unsigned int val)
 {
   unsigned int a, b, rsl;
-  val += 0x75fd85b3;
+  val += 0xd5b132b9;
   val ^= (val >> 16);
   val += (val << 8);
   val ^= (val >> 4);
-  b = (val >> 4) & 0x1f;
-  a = val >> 27;
+  b = (val >> 2) & 0x1f;
+  a = (val + (val << 2)) >> 27;
   rsl = (a^tab_func[b]);
   return rsl;
 }

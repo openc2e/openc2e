@@ -107,7 +107,21 @@ void caosVM::c_RTYP() {
 	VM_PARAM_INTEGER(roomtype)
 	VM_PARAM_INTEGER(roomid)
 	Room *room = world.map.getRoom(roomid);
+	assert(room);
 	room->type = roomtype;
+}
+
+/**
+ RTYP (integer) roomid (integer)
+*/
+void caosVM::v_RTYP() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(roomid)
+	Room *room = world.map.getRoom(roomid);
+	if (room)
+		result.setInt(room->type);
+	else
+		result.setInt(-1);
 }
 
 /**
@@ -155,3 +169,42 @@ void caosVM::v_ROOM() {
 	result.setInt(0);
 }
 
+/**
+ LEFT (integer)
+ 
+ returns the left constant (0)
+*/
+void caosVM::v_LEFT() {
+	VM_VERIFY_SIZE(0)
+	result.setInt(3);
+}
+
+/**
+ RGHT (integer)
+ 
+ returns the right constant (1)
+*/
+void caosVM::v_RGHT() {
+	VM_VERIFY_SIZE(0)
+	result.setInt(3);
+}
+
+/**
+ _UP_ (integer)
+ 
+ returns the up constant (2)
+*/
+void caosVM::v_UP() {
+	VM_VERIFY_SIZE(0)
+	result.setInt(3);
+}
+
+/**
+ DOWN (integer)
+ 
+ returns the down constant (3)
+*/
+void caosVM::v_DOWN() {
+	VM_VERIFY_SIZE(0)
+	result.setInt(3);
+}

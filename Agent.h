@@ -31,6 +31,8 @@ public:
 	unsigned short species;
 	unsigned int zorder;
 	caosVar var[100]; // OVxx
+	unsigned int tickssincelasttimer, timerrate;
+	caosVar velx, vely;
 	
 	caosVM vm;
 
@@ -40,6 +42,7 @@ public:
 	void moveTo(unsigned int, unsigned int);
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual bool isSimple() { return false; }
+	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	virtual ~Agent() { }
 
 	virtual void setAttributes(unsigned int attr) = 0;

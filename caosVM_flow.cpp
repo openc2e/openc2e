@@ -26,11 +26,14 @@ void caosVM::jumpToAfterEquivalentNext() {
 	// todo: add non-ENUM things
 	cmdinfo *next = getCmdInfo("NEXT", true); assert(next != 0);
 	cmdinfo *enu = getCmdInfo("ENUM", true); assert(enu != 0);
+	cmdinfo *esee = getCmdInfo("ESEE", true); assert(esee != 0);
 
 	int stack = 0;
 	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		token front = currentscript->lines[i].front();
 		if (front.cmd == enu) {
+			stack++;
+		} else if (front.cmd == esee) {
 			stack++;
 		} else if (front.cmd == next) {
 			if (stack) stack--;
@@ -256,6 +259,23 @@ void caosVM::c_ENUM() {
 	}
 	
 	enumdata[currentline] = 1; // TODO: erase it instead?
+	targ = owner;
+	jumpToAfterEquivalentNext();
+}
+
+/**
+ ESEE (command) family (integer) genus (integer) species (integer)
+ 
+ like ENUM, but iterate through agents OWNR can see (todo: document exact rules)
+*/
+void caosVM::c_ESEE() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+
+	// TODO: should probably implement this (ESEE)
+	
 	targ = owner;
 	jumpToAfterEquivalentNext();
 }

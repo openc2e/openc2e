@@ -22,7 +22,9 @@
 #include <iostream>
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  visible(true), family(f), genus(g), species(s), zorder(p), vm(this) {
+  visible(true), family(f), genus(g), species(s), zorder(p), vm(this), timerrate(0) {
+  velx.setFloat(0.0f);
+  vely.setFloat(0.0f);
 }
 
 void Agent::moveTo(unsigned int _x, unsigned int _y) {
@@ -38,5 +40,11 @@ void Agent::fireScript(unsigned char event) {
 }
 
 void Agent::tick() {
+	if (timerrate) {
+		tickssincelasttimer++;
+		if (tickssincelasttimer == timerrate)
+			fireScript(9);
+	}
+
 	vm.tick();
 }

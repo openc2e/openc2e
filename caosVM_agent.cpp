@@ -170,7 +170,8 @@ void caosVM::v_ATTR() {
 void caosVM::c_TICK() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(tickrate)
-	cerr << "unimplemented: TICK\n";
+	assert(targ);
+	targ->setTimerRate(tickrate);
 }
 
 /**
@@ -258,7 +259,6 @@ void caosVM::c_ANIM() {
 		a->animation.push_back(j);
 	}
 	if (!a->animation.empty()) { a->setFrameNo(0); }
-	if (a->animation.empty()) { std::cerr << "warning: ANIM produced an empty animation string\n"; }
 }
 
 /**
@@ -299,8 +299,8 @@ void caosVM::v_BHVR() {
 */
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
+	// TODO
 	result.setAgent(0);
-	cerr << "unimplemented: CARR\n";
 }
 
 /**
@@ -379,11 +379,21 @@ void caosVM::v_TOTL() {
 	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
-	result.setInt(0); // TODO
+
+	unsigned int x = 0;
+	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		if ((*i)->family == family)
+			if ((*i)->genus == genus)
+				if ((*i)->species == species)
+					x++;
+	}
+	result.setInt(x);
 }
 
 /**
  SHOW (command) visibility (integer)
+ 
+ set visibility of agent to cameras. 0 = invisible, 1 = visible.
 */
 void caosVM::c_SHOW() {
 	VM_VERIFY_SIZE(1)

@@ -63,9 +63,14 @@ public:
 	void c_MAPK();
 	void v_ADDR();
 	void c_RTYP();
+	void v_RTYP();
 	void c_DOOR();
 	void c_RATE();
 	void v_ROOM();
+	void v_LEFT();
+	void v_RGHT();
+	void v_UP();
+	void v_DOWN();
 	
 	// camera
 	void c_CMRT();
@@ -118,6 +123,7 @@ public:
 	void c_SUBR();
 	void c_RETN();
 	void c_ENUM();
+	voic c_ESEE();
 	void c_NEXT();
 	
 	// debug
@@ -169,6 +175,9 @@ public:
 	// motion
 	void c_ELAS();
 	void c_MVTO();
+	void v_VELX();
+	void v_VELY();
+	void v_OBST();
 
 	// scripts
 	void c_INST();
