@@ -1,7 +1,6 @@
 * implement ENUM/ESEE/ETCH/EPAS/NEXT
 * look at the room code
 * start implementing agent event script infrastructure
-* implement galleries (agents sharing images)
 * start implementing physics
 * look at starting the sound code (and integrating SDL_mixer)
 * look at using mmap() for backgrounds, to save memory. to do this, we might have to write an endian-swapper.

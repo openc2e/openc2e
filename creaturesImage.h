@@ -20,17 +20,38 @@
 #ifndef _CREATURESIMAGE_H
 #define _CREATURESIMAGE_H
 
+#include <string>
+#include <map>
+
 class creaturesImage {
+private:
+	unsigned int refcount;
+
 protected:
   unsigned int m_numframes;
   unsigned short *widths, *heights;
   void **buffers;
   
 public:
+  creaturesImage() { refcount = 0; }
   unsigned int numframes() { return m_numframes; }
   virtual unsigned int width(unsigned int frame) { return widths[frame]; }
   virtual unsigned int height(unsigned int frame) { return heights[frame]; }
   virtual void *data(unsigned int frame) { return buffers[frame]; }
+  void addRef() { refcount++; }
+  void delRef() { refcount--; }
+  unsigned int refCount() { return refcount; }
 };
+
+class imageGallery {
+protected:
+	std::map<std::string, creaturesImage *> gallery;
+
+public:
+	creaturesImage *getImage(std::string name);
+	void delImage(creaturesImage *i);
+};
+
+extern imageGallery gallery;
 
 #endif
