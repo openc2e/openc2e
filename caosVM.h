@@ -151,8 +151,6 @@ public:
 	void v_PACE();
 
 	void runCurrentLine();
-	void pushLineOntoStack(int);
-	int popStackLine();
 	void jumpToNextIfBlock();
 	caosVar internalRun(std::list<token> &tokens, bool first);
 	void runEntirely(script &s);

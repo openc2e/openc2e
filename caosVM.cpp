@@ -150,6 +150,9 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	//std::cout << "internalRun executing " << us->dump() << "\n";
 	varnumber = maintoken.varnumber; // VAxx/OVxx hack
 	(this->*(us->method))();
+	if (!params.empty()) {
+		std::cout << "warning: internal CAOS function " << maintoken.dump() << " didn't pop all parameters!\n";
+	}
 	if (first && !tokens.empty()) {
 		// assume there's another command on this line
 		internalRun(tokens, true);
@@ -184,9 +187,3 @@ void caosVM::runEntirely(script &s) {
 void caosVM::runCurrentLine() {
 }
 
-void caosVM::pushLineOntoStack(int line) {
-}
-
-int caosVM::popStackLine() {
-	return -1;
-}

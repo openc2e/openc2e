@@ -1,0 +1,70 @@
+body
+	{
+	background-color: #ffffff;
+	font-size: 100%;
+	}
+
+a:link
+	{
+	background: transparent;
+	color: #0000ff;
+	}
+
+a:visited
+	{
+	color: #000088;
+	}
+
+a:active
+	{
+	color: #ff0000;
+	}
+
+p
+	{
+	color: #000000;
+	}
+
+h1			{
+		font-size: 150%;
+		font-weight: bolder
+			}
+
+h2			{
+		font-size: 110%;
+		font-weight: bold
+			}
+
+td.command
+	{
+	background-color: #f8f8ff;
+	text-align: left;
+	}
+
+td.description
+	{
+	background-color: #ffffff;
+	text-align: left;
+	}
+
+span.vartype
+	{
+	vertical-align: sub;
+	font-size: smaller;
+	font-style: italic;
+	text-transform: lowercase;
+	}
+
+span.command
+	{
+	text-transform: uppercase;
+	font-family: monospace;
+	font-weight: 900;
+	font-size: larger;
+	color: navy;
+	}
+
+span.varname
+	{
+	text-transform: uppercase;
+	}

@@ -15,6 +15,10 @@ my %voids;
 
 my $data;
 
+my $table1 = '<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">';
+my $table2 = '</td></tr><tr><td class="description">';
+my $table3 = '</td></tr></table>';
+
 sub writedata {
 	my ($name, $docline, $type, $newname) = @_;
 
@@ -68,13 +72,26 @@ sub writedocsanddata {
 		$newname = $one . " " . $two;
 	}
 	if ($doclines) {
-		my $firstline = (split(/\n/, $doclines))[0];
+	  my @lines = split(/\n/, $doclines);
+		my $firstline = $lines[0];
 		$firstline =~ s/^\s*(.*)\s*$/$1/;
+		# todo: make sure the documentation command name is equivalent to $name
 		writedata($name, $firstline, $type, $newname);
 		
 		$doclines =~ s/\n/<br>/;
-		print docfile "<h2>", $newname, "</h2>";
-		print docfile "<p>", $doclines, "</p>\n";
+		print docfile $table1, $firstline, $table2, "\n";
+		my $i = 0;
+		my $j = 0;
+		foreach (@lines) {
+			$i++;
+			next if ($i == 1);
+			$_ =~ s/^\s*(.*)\s*$/$1/;
+			next unless $_;
+			$j++;
+			print docfile "<p>", $_, "</p>\n";
+		}
+		print docfile '<p><font color="#ff0000">undocumented</font></p>'if ($j == 0);
+		print docfile $table3 . "\n";
 	} else {
 	  print "command/function '", $newname, "' wasn't processed because it has no documentation. add at least a prototype.\n";
 	}
@@ -84,7 +101,12 @@ sub writedocsanddata {
 
 open(docfile, ">caosdocs.html");
 
+print docfile '<html><head><title>openc2e CAOS documentation</title><link rel=stylesheet href="caosdocs.css"></head><body>';
+
 foreach my $fname (@files) {
+  my $section = $fname;
+	$section =~ s/^\.\.\/caosVM_(.*).cpp$/$1/;
+  print docfile "<h1>" . $section . "</h1>"; 
 	open(filehandle, $fname);
 	while(<filehandle>) {
 		if (/^void caosVM::/) {

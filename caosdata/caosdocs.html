@@ -1,150 +1,205 @@
-<h2>RTAR</h2><p> RTAR (command) family (integer) genus (integer) species (integer)<br>
- set targ to random agent with given family/genus/species
-</p>
-<h2>NEW: SIMP</h2><p> NEW: SIMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)<br>
- create a new simple object with given family/genus/species, given spritefile with image_count sprites
- available starting at first_image in the spritefile, at the screen depth given by plane
-</p>
-<h2>NEW: COMP</h2><p> NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)<br></p>
-<h2>TARG</h2><p> TARG (agent)<br>
- return TARG
-</p>
-<h2>NULL</h2><p> NULL (agent)<br>
- return null (zero) agent
-</p>
-<h2>ATTR</h2><p> ATTR (command) attr (integer)<br>
- set attributes of TARG agent
-</p>
-<h2>ATTR</h2><p> ATTR (integer)<br>
- return attributes of TARG agent
-</p>
-<h2>TICK</h2><p> TICK (command) tickrate (integer)<br></p>
-<h2>BHVR</h2><p> BHVR (command) bhvr (integer)<br></p>
-<h2>TARG</h2><p> TARG (command) agent (agent)<br>
- set TARG to given agent
-</p>
-<h2>FROM</h2><p> FROM (agent)<br></p>
-<h2>KILL</h2><p> KILL (command) agent (agent)<br></p>
-<h2>NEXT</h2><p> NEXT (command)<br></p>
-<h2>SCRX</h2><p> SCRX (command) event (integer) species (integer) genus (integer) family (integer)<br></p>
-<h2>ANIM</h2><p> ANIM (command) poselist (byte-string)<br></p>
-<h2>BASE</h2><p> BASE (command) index (integer)<br></p>
-<h2>BASE</h2><p> BASE (integer)<br></p>
-<h2>BHVR</h2><p> BHVR (integer)<br></p>
-<h2>FMLY</h2><p> FMLY (integer)<br></p>
-<h2>GNUS</h2><p> GNUS (integer)<br></p>
-<h2>SPCS</h2><p> SPCS (integer)<br></p>
-<h2>PLNE</h2><p> PLNE (integer)<br></p>
-<h2>PNTR</h2><p> PNTR (agent)<br></p>
-<h2>META</h2><p> META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)<br> 
- set metaroom current camera is pointing at. coordinates point to top left of new
- camera position.
- 
- transition: 0 for none, 1 for flip horz, 2 for burst
-</p>
-<h2>CMRT</h2><p> CMRT (command) pan (integer)<br>
- centre current camera on TARG.
-
- pan: 0 for none (jump), 1 for smooth scroll if in same metaroom, 2 for smooth scroll if visible
-</p>
-<h2>PART</h2><p> PART (command) part_id (integer)<br></p>
-<h2>DBG: OUTS</h2><p> DBG: OUTS (command) val (string)<br> 
- output a string to the debug log
-</p>
-<h2>DBG: OUTV</h2><p> DBG: OUTV (command) val (decimal)<br> 
- output a decimal value to the debug log
-</p>
-<h2>OUTS</h2><p> OUTS (command) val (string)<br></p>
-<h2>OUTV</h2><p> OUTV (command) val (decimal)<br></p>
-<h2>GAME</h2><p>	GAME (variable) name (string)<br>
-	returns game variable with name given (unchecked)
-</p>
-<h2>SCRP</h2><p> SCRP (command)<br></p>
-<h2>RSCR</h2><p> RSCR (command)<br></p>
-<h2>ENDM</h2><p> ENDM (command)<br></p>
-<h2>STIM WRIT</h2><p> STIM WRIT (command) creature (agent) stimulus (integer) strength (float)<br>
- send stimulus to specific creature
-</p>
-<h2>DOIF</h2><p> DOIF (command) condition (condition)<br></p>
-<h2>ELIF</h2><p> ELIF (command) condition (condition)<br></p>
-<h2>ELSE</h2><p> ELSE (command)<br></p>
-<h2>ENDI</h2><p> ENDI (command)<br></p>
-<h2>REPS</h2><p> REPS (command) reps (integer)<br></p>
-<h2>REPE</h2><p> REPE (command)<br></p>
-<h2>LOOP</h2><p> LOOP (command)<br></p>
-<h2>EVER</h2><p> EVER (command)<br></p>
-<h2>UNTL</h2><p> UNTL (command) condition (condition)<br></p>
-<h2>GSUB</h2><p> GSUB (command) label (label)<br></p>
-<h2>SUBR</h2><p> SUBR (command) label (label)<br></p>
-<h2>RETN</h2><p> RETN (command)<br></p>
-<h2>ADDM</h2><p> ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)<br> 
- create metaroom. return id of created metaroom.
-</p>
-<h2>BRMI</h2><p> BRMI (command) metaroom_base (integer) room_base (integer)<br> 
- set metaroom/room bases, i have no idea why/if we need this
-</p>
-<h2>MAPD</h2><p> MAPD (command) width (integer) height (integer)<br> 
- set the map dimensions, inside which we place metarooms
-</p>
-<h2>MAPK</h2><p> MAPK (command)  <br> 
- reset the map (call map::reset)
-</p>
-<h2>ADDR</h2><p> ADDR (integer) metaroomid (integer) x_left (integer) x_right (integer) y_left_ceiling (integer) y_right_ceiling (integer) y_left_floor (integer) y_right_floor (integer)<br></p>
-<h2>RTYP</h2><p> RTYP (command) roomid (integer) roomtype (integer)<br></p>
-<h2>DOOR</h2><p> DOOR (command) room1 (integer) room2 (integer) perm (integer)<br></p>
-<h2>RATE</h2><p> RATE (command) roomtype (integer) caindex (integer) gain (float) loss (float) diffusion (float)<br></p>
-<h2>ELAS</h2><p> ELAS (command) elas (integer)<br></p>
-<h2>MVTO</h2><p> MVTO (command) x (integer) y (integer)<br></p>
-<h2>INST</h2><p> INST (command)<br>
- don't release control to the scheduler until end of script or SLOW
-</p>
-<h2>SLOW</h2><p> SLOW (command)<br>
- reverts effects of INST
-</p>
-<h2>LOCK</h2><p> LOCK (command)<br>
- prevent agent script from being interrupted by another
-</p>
-<h2>UNLK</h2><p> UNLK (command)<br>
- reverts effects of LOCK
-</p>
-<h2>WAIT</h2><p> WAIT (command) ticks (integer)<br>
- stop the script from running for a number of ticks
-</p>
-<h2>STOP</h2><p> STOP (command)<br></p>
-<h2>PACE</h2><p> PACE (float)<br>
- return speed factor of last ten ticks. < 1.0 = engine is ticking slower than BUZZ rating.
- > 1.0 = engine is ticking faster.
-</p>
-<h2>VAxx</h2><p> VAxx (variable)<br>
- script-local variables, 00 to 99 (todo: is this right?)
-</p>
-<h2>SETV</h2><p> SETV (command) var (variable) value (decimal)<br>
- sets given variable to given number [int/float]
-</p>
-<h2>SETA</h2><p> SETA (command) var (variable) value (agent)<br>
- sets given variable to given agent
-</p>
-<h2>OVxx</h2><p> OVxx (variable)<br>
- agent-local variables from TARG, 00 to 99
-</p>
-<h2>MODV</h2><p> MODV (command) var (variable) mod (integer)<br>
- returns var % mod
-</p>
-<h2>ADDV</h2><p> ADDV (command) var (variable) add (integer)<br>
- returns var + add
-</p>
-<h2>SUBV</h2><p> SUBV (command) var (variable) sub (integer)<br>
- returns var - sub
-</p>
-<h2>NEGV</h2><p> NEGV (command) var (variable)<br>
- returns a negated variable (eg 1 to -1, -3 to 3)
-</p>
-<h2>MULV</h2><p>  MULV (command) var (variable) mul (decimal)<br>
-  returns var * mul
-</p>
-<h2>RAND</h2><p> RAND (integer) value1 (integer) value2 (integer)<br>
- return a random integer between value1 and value2 inclusive
-</p>
-<h2>REAF</h2><p> REAF (command)<br>
- reread catalogue files
-</p>
+<html><head><title>openc2e CAOS documentation</title><link rel=stylesheet href="caosdocs.css"></head><body><h1>agent</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">RTAR (command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p>set targ to random agent with given family/genus/species</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">NEW: SIMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)</td></tr><tr><td class="description">
+<p>create a new simple object with given family/genus/species, given spritefile with image_count sprites</p>
+<p>available starting at first_image in the spritefile, at the screen depth given by plane</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">TARG (agent)</td></tr><tr><td class="description">
+<p>return TARG</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">NULL (agent)</td></tr><tr><td class="description">
+<p>return null (zero) agent</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">POSE (command) pose (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ATTR (command) attr (integer)</td></tr><tr><td class="description">
+<p>set attributes of TARG agent</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ATTR (integer)</td></tr><tr><td class="description">
+<p>return attributes of TARG agent</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">TICK (command) tickrate (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">BHVR (command) bhvr (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">TARG (command) agent (agent)</td></tr><tr><td class="description">
+<p>set TARG to given agent</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">FROM (agent)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">POSE (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">KILL (command) agent (agent)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">NEXT (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SCRX (command) event (integer) species (integer) genus (integer) family (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ANIM (command) poselist (byte-string)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ABBA (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">BASE (command) index (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">BASE (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">BHVR (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">CARR (agent)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">FMLY (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">GNUS (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SPCS (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PLNE (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PNTR (agent)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>camera</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)</td></tr><tr><td class="description">
+<p>set metaroom current camera is pointing at. coordinates point to top left of new</p>
+<p>camera position.</p>
+<p>transition: 0 for none, 1 for flip horz, 2 for burst</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">CMRT (command) pan (integer)</td></tr><tr><td class="description">
+<p>centre current camera on TARG.</p>
+<p>pan: 0 for none (jump), 1 for smooth scroll if in same metaroom, 2 for smooth scroll if visible</p>
+</td></tr></table>
+<h1>cmdinfo</h1><h1>compound</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PART (command) part_id (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>core</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">DBG: OUTS (command) val (string)</td></tr><tr><td class="description">
+<p>output a string to the debug log</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">DBG: OUTV (command) val (decimal)</td></tr><tr><td class="description">
+<p>output a decimal value to the debug log</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">OUTS (command) val (string)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">OUTV (command) val (decimal)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">GAME (variable) name (string)</td></tr><tr><td class="description">
+<p>returns game variable with name given (unchecked)</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SCRP (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">RSCR (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ENDM (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>creatures</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">STIM WRIT (command) creature (agent) stimulus (integer) strength (float)</td></tr><tr><td class="description">
+<p>send stimulus to specific creature</p>
+</td></tr></table>
+<h1>flow</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">DOIF (command) condition (condition)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ELIF (command) condition (condition)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ELSE (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ENDI (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">REPS (command) reps (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">REPE (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">LOOP (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">EVER (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">UNTL (command) condition (condition)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">GSUB (command) label (label)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SUBR (command) label (label)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">RETN (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>map</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)</td></tr><tr><td class="description">
+<p>create metaroom. return id of created metaroom.</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">BRMI (command) metaroom_base (integer) room_base (integer)</td></tr><tr><td class="description">
+<p>set metaroom/room bases, i have no idea why/if we need this</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MAPD (command) width (integer) height (integer)</td></tr><tr><td class="description">
+<p>set the map dimensions, inside which we place metarooms</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MAPK (command)  </td></tr><tr><td class="description">
+<p>reset the map (call map::reset)</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ADDR (integer) metaroomid (integer) x_left (integer) x_right (integer) y_left_ceiling (integer) y_right_ceiling (integer) y_left_floor (integer) y_right_floor (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">RTYP (command) roomid (integer) roomtype (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">DOOR (command) room1 (integer) room2 (integer) perm (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">RATE (command) roomtype (integer) caindex (integer) gain (float) loss (float) diffusion (float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>motion</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ELAS (command) elas (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MVTO (command) x (integer) y (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>scripts</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">INST (command)</td></tr><tr><td class="description">
+<p>don't release control to the scheduler until end of script or SLOW</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SLOW (command)</td></tr><tr><td class="description">
+<p>reverts effects of INST</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">LOCK (command)</td></tr><tr><td class="description">
+<p>prevent agent script from being interrupted by another</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">UNLK (command)</td></tr><tr><td class="description">
+<p>reverts effects of LOCK</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">WAIT (command) ticks (integer)</td></tr><tr><td class="description">
+<p>stop the script from running for a number of ticks</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">STOP (command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>sounds</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MMSC (command) x (integer) y (integer) track_name (string)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MMSC (string) x (integer) y (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">RMSC (command) x (integer) y (integer) track_name (string)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MMSC (string) x (integer) y (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table>
+<h1>time</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PACE (float)</td></tr><tr><td class="description">
+<p>return speed factor of last ten ticks. < 1.0 = engine is ticking slower than BUZZ rating.</p>
+<p>> 1.0 = engine is ticking faster.</p>
+</td></tr></table>
+<h1>variables</h1><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">VAxx (variable)</td></tr><tr><td class="description">
+<p>script-local variables, 00 to 99 (todo: is this right?)</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SETV (command) var (variable) value (decimal)</td></tr><tr><td class="description">
+<p>sets given variable to given number [int/float]</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SETA (command) var (variable) value (agent)</td></tr><tr><td class="description">
+<p>sets given variable to given agent</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">OVxx (variable)</td></tr><tr><td class="description">
+<p>agent-local variables from TARG, 00 to 99</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MODV (command) var (variable) mod (integer)</td></tr><tr><td class="description">
+<p>returns var % mod</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ADDV (command) var (variable) add (integer)</td></tr><tr><td class="description">
+<p>returns var + add</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SUBV (command) var (variable) sub (integer)</td></tr><tr><td class="description">
+<p>returns var - sub</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">NEGV (command) var (variable)</td></tr><tr><td class="description">
+<p>returns a negated variable (eg 1 to -1, -3 to 3)</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MULV (command) var (variable) mul (decimal)</td></tr><tr><td class="description">
+<p>returns var * mul</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">RAND (integer) value1 (integer) value2 (integer)</td></tr><tr><td class="description">
+<p>return a random integer between value1 and value2 inclusive</p>
+</td></tr></table>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">REAF (command)</td></tr><tr><td class="description">
+<p>reread catalogue files</p>
+</td></tr></table>

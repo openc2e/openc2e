@@ -21,18 +21,30 @@
 #include <iostream>
 using std::cout;
 
+/**
+ MMSC (command) x (integer) y (integer) track_name (string)
+*/
 void caosVM::c_MMSC() {
 	cout << "unimplemented: MMSC\n";
 }
 
+/**
+ MMSC (string) x (integer) y (integer)
+*/
 void caosVM::v_MMSC() {
 	cout << "unimplemented: MMSC\n";
 }
 
+/**
+ RMSC (command) x (integer) y (integer) track_name (string)
+*/
 void caosVM::c_RMSC() {
 	cout << "unimplemented: RMSC\n";
 }
 
+/**
+ MMSC (string) x (integer) y (integer)
+*/
 void caosVM::v_RMSC() {
 	cout << "unimplemented: RMSC\n";
 }

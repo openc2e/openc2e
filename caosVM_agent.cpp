@@ -102,6 +102,9 @@ void caosVM::v_NULL() {
 	result.setAgent(0);
 }
 
+/**
+ POSE (command) pose (integer)
+*/
 void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
@@ -170,6 +173,9 @@ void caosVM::v_FROM() {
 	cerr << "unimplemented: FROM\n";
 }
 
+/**
+ POSE (integer)
+*/
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
 	cerr << "unimplemented: POSE\n";
@@ -237,6 +243,9 @@ void caosVM::c_ANIM() {
 	if (a->animation.empty()) { std::cout << "warning: ANIM produced an empty animation string\n"; }
 }
 
+/**
+ ABBA (integer)
+*/
 void caosVM::v_ABBA() {
 	VM_VERIFY_SIZE(0)
 	cerr << "unimplemented: ABBA\n";
@@ -267,8 +276,12 @@ void caosVM::v_BHVR() {
 	cerr << "unimplemented: BHVR\n";
 }
 
+/**
+ CARR (agent)
+*/
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
+	result.setAgent(0);
 	cerr << "unimplemented: CARR\n";
 }
 
