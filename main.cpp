@@ -2,8 +2,9 @@
 #include <SDL/SDL_gfxPrimitives.h>
 
 #include <fstream>
-#include <assert.h>
+#include "openc2e.h"
 #include <iostream>
+#include <dirent.h>
 
 #include "World.h"
 #include "caosVM.h"
@@ -38,20 +39,35 @@ void drawWorld() {
 }
 
 extern "C" int main(int argc, char *argv[]) {
-/*	if (argc != 2) {
-		std::cout << "syntax: openc2e filename";
-		return 1;
-	} */
-	std::ifstream sc("/home/fuzzie/openc2e/data/Bootstrap/001 World/!map.cos");
-	caosScript testscript(sc);
-	caosVM testvm(0);
-	
-/*	std::cout << "dump of script:\n";
-	std::cout << testscript.dump(); */
-	std::cout << "executing script...\n";
-	testvm.script = &testscript;
-	testvm.runEntirely();
-	
+	std::vector<std::string> scripts;
+
+	DIR *dirh;
+	dirh = opendir("data/Bootstrap/001 World/");
+	assert(dirh);
+	for (dirent *dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
+		// we assume everything except . and .. is a cos file
+		if (strcmp(dirp->d_name, ".") && strcmp(dirp->d_name, ".."))
+			scripts.push_back(std::string("data/Bootstrap/001 World/") + dirp->d_name);
+	}
+	closedir(dirh);
+
+	sort(scripts.begin(), scripts.end());
+	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
+		std::ifstream script(i->c_str());
+		assert(script.is_open());
+		caosScript testscript(script);
+		caosVM testvm(0);
+		/* std::cout << "dump of script:\n";
+		std::cout << testscript.dump(); */
+		std::cout << "executing script " << *i << "...\n";
+		std::cout.flush();
+		std::cerr.flush();
+		testvm.script = &testscript;
+		testvm.runEntirely();
+		std::cout.flush();
+		std::cerr.flush();
+	}
+
 	Uint32 initflags = SDL_INIT_VIDEO;
 	Uint8 video_bpp = 0;
 	Uint32 videoflags = SDL_SWSURFACE + SDL_RESIZABLE;

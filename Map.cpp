@@ -18,7 +18,7 @@
  */
 
 #include "Map.h"
-#include <assert.h>
+#include "openc2e.h"
 #include <iostream>
 
 void Map::Reset() {
