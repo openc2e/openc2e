@@ -97,3 +97,7 @@ void SimpleAgent::tick() {
 		setFrameNo(f);
 	}
 }
+
+void SimpleAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
+	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y);
+}

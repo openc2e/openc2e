@@ -25,13 +25,18 @@
 class CompoundPart {
 protected:
 	creaturesImage *sprite;
-	unsigned int firstimg;
+	unsigned int firstimg, imagecount;
 
 public:
 	creaturesImage *getSprite() { return sprite; }
-	unsigned int x, y, zorder;
+	unsigned int x, y, zorder, id;
+	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
+
+	bool operator < (const CompoundPart *b) const {
+		return zorder < b->zorder;
+	}
 	
-	CompoundPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int imgcnt, unsigned int _x, unsigned int _y,
 				 unsigned int _z);
 };
 
@@ -40,52 +45,60 @@ protected:
 	bool hittransparentpixelsonly;
 
 public:
-	ButtonPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+	ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 			   unsigned int _z, std::string animhover, int msgid, int option);
 };
 
 class CameraPart : public CompoundPart {
 public:
-	CameraPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+	CameraPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
 			   unsigned int camerawidth, unsigned int cameraheight);
 };
 
 class DullPart : public CompoundPart {
 public:
-	DullPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+	DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int imgcnt, unsigned int _x, unsigned int _y,
 			 unsigned int _z);
 };
 
 class FixedTextPart : public CompoundPart {
 public:
-	FixedTextPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+	FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 				  unsigned int _z, std::string fontsprite);
 };
 
 class GraphPart : public CompoundPart {
 public:
-	GraphPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+	GraphPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 			  unsigned int _z, unsigned int novalues);
 };
 
 class TextEntryPart : public CompoundPart {
 public:
-	TextEntryPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+	TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 				  unsigned int _z, unsigned int msgid, std::string fontsprite);
 };
 
-class CompoundAgent : public SimpleAgent {
+class CompoundAgent : public Agent {
 protected:
-	std::map<unsigned int, CompoundPart *> parts;
+    std::vector<CompoundPart *> parts;
 
 public:
+	// TODO: we share all these with SimpleAgent
+	bool carryable, mouseable, activateable, invisible, floatable;
+	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
+	
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-								unsigned int firstimage, unsigned int imagecount) :
-		SimpleAgent(family, genus, species, plane, firstimage, imagecount) { }
+								std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 		
 	unsigned int partCount() { return parts.size(); }
-	CompoundPart &part(int id) { return *(parts[id]); }
-	void addPart(int, CompoundPart *);
+	CompoundPart *part(unsigned int id);
+	void addPart(CompoundPart *);
 	void delPart(int);
+	virtual void setAttributes(unsigned int attr);
+	virtual unsigned int getAttributes();
+	virtual void tick();
+
+	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 };

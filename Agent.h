@@ -21,17 +21,15 @@
 #define __AGENT_H
 
 #include "creaturesImage.h"
+#include "SDLBackend.h"
 
 class Agent {
-protected:
-	creaturesImage *sprite;
-
 public:
 	unsigned char family, genus;
 	unsigned short species;
 	unsigned int zorder;
 
-	creaturesImage *getSprite() { return sprite; }
+	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	unsigned int x, y;
 	void moveTo(unsigned int, unsigned int);
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);

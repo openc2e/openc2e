@@ -42,9 +42,7 @@ void drawWorld() {
 		}
 	}
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		// note: right now, we know we only have SimpleAgents in the world.
-		SimpleAgent *agent = (SimpleAgent *)(*i);
-		backend.render(agent->getSprite(), agent->getCurrentSprite(), agent->x - adjustx, agent->y - adjusty);
+		(*i)->render(&backend, -adjustx, -adjusty);
 	}
 	SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
 }
@@ -127,8 +125,10 @@ extern "C" int main(int argc, char *argv[]) {
 	bool done = false;
 	unsigned int tickdata = 0;
 	while (!done) {
-		if (!paused && (backend.ticks() > tickdata + 50)) world.tick(); // TODO: use BUZZ value
-		tickdata = backend.ticks();
+		if (!paused && (backend.ticks() > tickdata + 50)) {
+			world.tick(); // TODO: use BUZZ value
+			tickdata = backend.ticks();
+		}
 		drawWorld();
 
 		SDL_Event event;

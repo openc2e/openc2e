@@ -26,6 +26,7 @@
 
 class SimpleAgent : public Agent {
 protected:
+	creaturesImage *sprite;
 	unsigned int first_image, image_count;
 	unsigned int frameno;
 
@@ -39,10 +40,12 @@ public:
 							unsigned int firstimage, unsigned int imagecount);
 	unsigned int getFirstImage();
 	unsigned int getImageCount();
+	creaturesImage *getSprite() { return sprite; }
 	void setImage(std::string img);
 	virtual bool isSimple() { return false; }
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
+	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 
 	void setFrameNo(unsigned int);
 	unsigned int getCurrentSprite();

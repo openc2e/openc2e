@@ -77,8 +77,7 @@ void caosVM::c_NEW_COMP() {
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
 
-	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, first_image, image_count);
-	a->setImage(sprite_file);
+	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	world.addAgent(a);
 	targ.reset();
 	targ.setAgent(a);
@@ -100,8 +99,7 @@ void caosVM::c_NEW_VHCL() {
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
 
-	Vehicle *a = new Vehicle(family, genus, species, plane, first_image, image_count);
-	a->setImage(sprite_file);
+	Vehicle *a = new Vehicle(family, genus, species, plane, sprite_file, first_image, image_count);
 	world.addAgent(a);
 	targ.reset();
 	targ.setAgent(a);
@@ -255,6 +253,7 @@ void caosVM::c_ANIM() {
 	assert(targ.hasAgent());
 
 	// todo: !!
+	if (typeid(*(targ.agentValue)) != typeid(SimpleAgent)) return;
 	SimpleAgent *a = (SimpleAgent *)targ.agentValue;
 	a->animation.clear();
 
