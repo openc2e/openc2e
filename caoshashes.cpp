@@ -5,8 +5,8 @@
 
 /* small adjustments to _a_ to make values distinct */
 unsigned char tab_cmd[] = {
-0,0,50,0,7,51,19,60,49,63,28,0,9,19,61,46,
-12,51,51,28,0,33,0,10,0,51,2,19,32,54,4,0,
+0,0,34,0,36,56,10,22,37,46,51,0,57,19,10,19,
+12,51,10,28,0,33,0,61,0,36,49,19,51,61,0,0,
 };
 
 /* The hash function */
@@ -29,8 +29,8 @@ unsigned int phash_cmd(unsigned int val)
 
 /* small adjustments to _a_ to make values distinct */
 unsigned char tab_cmd[] = {
-12,19,0,0,0,0,16,7,0,0,19,26,19,38,61,51,
-9,0,51,36,49,36,49,28,60,36,38,36,33,0,32,6,
+6,19,0,0,0,0,58,7,0,59,19,26,19,36,51,51,
+9,0,34,60,49,36,30,53,36,49,38,51,0,0,4,12,
 };
 
 /* The hash function */
@@ -53,7 +53,7 @@ unsigned int phash_cmd(unsigned int val)
 
 /* small adjustments to _a_ to make values distinct */
 unsigned char tab_func[] = {
-0,0,0,7,13,26,30,0,14,31,9,3,7,23,30,0,
+0,0,1,18,13,16,24,0,14,31,9,3,7,23,30,0,
 };
 
 /* The hash function */
@@ -76,7 +76,7 @@ unsigned int phash_func(unsigned int val)
 
 /* small adjustments to _a_ to make values distinct */
 unsigned char tab_func[] = {
-21,0,0,13,9,21,0,9,16,0,6,0,15,31,26,7,
+21,7,0,13,1,7,0,22,16,0,6,11,28,31,26,7,
 };
 
 /* The hash function */

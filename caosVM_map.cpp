@@ -21,7 +21,7 @@
 #include "World.h"
 #include <assert.h>
 #include <iostream>
-using std::cout;
+using std::cerr;
 
 /**
  ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)
@@ -121,7 +121,7 @@ void caosVM::c_DOOR() {
 
 /*	Room *r1 = world.map.getRoom(room1);
 	Room *r2 = world.map.getRoom(room2); */
-	cout << "unimplemented: DOOR\n";
+//	cerr << "unimplemented: DOOR\n";
 }
 
 /**
@@ -141,3 +141,17 @@ void caosVM::c_RATE() {
 	info.diffusion = diffusion;
 	world.carates[roomtype][caindex] = info;
 }
+
+/**
+ ROOM (integer) agent (agent)
+ 
+ returns the room the midpoint of the agent is inside
+*/
+void caosVM::v_ROOM() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_AGENT(agent)
+	
+//	cerr << "unimplemented: ROOM\n";
+	result.setInt(0);
+}
+

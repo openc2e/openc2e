@@ -20,6 +20,16 @@
 #include "caosVM.h"
 #include <iostream>
 using std::cout;
+using std::cerr;
+
+/**
+ SNDE (command) filename (string)
+*/
+void caosVM::c_SNDE() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(filename)
+	cout << "snde tried to play " << filename << std::endl;
+}
 
 /**
  MMSC (command) x (integer) y (integer) track_name (string)
@@ -29,7 +39,7 @@ void caosVM::c_MMSC() {
 	VM_PARAM_STRING(track_name)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	cout << "unimplemented: MMSC\n";
+//	cerr << "unimplemented: MMSC\n";
 }
 
 /**
@@ -39,7 +49,7 @@ void caosVM::v_MMSC() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	cout << "unimplemented: MMSC\n";
+//	cerr << "unimplemented: MMSC\n";
 	result.setString("");
 }
 
@@ -51,7 +61,7 @@ void caosVM::c_RMSC() {
 	VM_PARAM_STRING(track_name)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	cout << "unimplemented: RMSC\n";
+//	cerr << "unimplemented: RMSC\n";
 }
 
 /**
@@ -61,6 +71,6 @@ void caosVM::v_RMSC() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	cout << "unimplemented: RMSC\n";
+//	cerr << "unimplemented: RMSC\n";
 	result.setString("");
 }

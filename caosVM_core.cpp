@@ -91,19 +91,19 @@ void caosVM::v_GAME() {
  SCRP (command)
 */
 void caosVM::c_SCRP() {
-	std::cout << "hit SCRP. shouldn't ever happen.\n";
+	cerr << "hit SCRP. shouldn't ever happen.\n";
 }
 
 /**
  RSCR (command)
 */
 void caosVM::c_RSCR() {
-	std::cout << "hit RSCR. shouldn't ever happen.\n";
+	cerr << "hit RSCR. shouldn't ever happen.\n";
 }
 
 /**
  ENDM (command)
 */
 void caosVM::c_ENDM() {
-	std::cout << "hit ENDM. shouldn't ever happen.\n";
+	cerr << "hit ENDM. shouldn't ever happen.\n";
 }

@@ -79,6 +79,7 @@ sub writedocsanddata {
 		writedata($name, $firstline, $type, $newname);
 		
 		$doclines =~ s/\n/<br>/;
+		$firstline =~ s/^([^(]*)/<span class="command">$1<\/span>/;
 		print docfile $table1, $firstline, $table2, "\n";
 		my $i = 0;
 		my $j = 0;

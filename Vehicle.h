@@ -17,7 +17,12 @@
  *
  */
 
-#include "Agent.h"
+#include "CompoundAgent.h"
 
-/*class Vehicle : public Agent {
-};*/
+// hey is Vehicle really a CompoundAgent?
+class Vehicle : public CompoundAgent {
+public:
+	Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
+								unsigned int firstimage, unsigned int imagecount) :
+		CompoundAgent(family, genus, species, plane, firstimage, imagecount) { }
+};

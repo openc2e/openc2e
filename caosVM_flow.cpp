@@ -49,7 +49,7 @@ void caosVM::jumpToNextIfBlock() {
 		}
 	}
 	currentline = currentscript->lines.size();
-	std::cout << "couldn't find matching block for IF blocks, stopping script\n";
+	std::cerr << "couldn't find matching block for IF blocks, stopping script\n";
 }
 
 /**
@@ -160,7 +160,7 @@ void caosVM::c_GSUB() {
 			return;
 		}
 	}
-	std::cout << "warning: GSUB didn't find matching SUBR for " << label << ", ignoring\n";
+	std::cerr << "warning: GSUB didn't find matching SUBR for " << label << ", ignoring\n";
 }
 
 /**

@@ -97,7 +97,7 @@ void imageGallery::delImage(creaturesImage *in) {
 		for (std::map<std::string, creaturesImage *>::iterator i = gallery.begin(); i != gallery.end(); i++) {
 			if (i->second == in) { gallery.erase(i); return; }
 		}
-		std::cout << "imageGallery warning: delImage got a newly unreferenced image but it isn't in the gallery\n";
+		std::cerr << "imageGallery warning: delImage got a newly unreferenced image but it isn't in the gallery\n";
 	}
 }
 

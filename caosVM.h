@@ -50,6 +50,7 @@ public:
 	void c_RTYP();
 	void c_DOOR();
 	void c_RATE();
+	void v_ROOM();
 	
 	// camera
 	void c_CMRT();
@@ -75,6 +76,7 @@ public:
 	void c_MULV();
 	void c_ADDV();
 	void c_SETA();
+	void c_DIVV();
 
 	// flow
 	void c_DOIF();
@@ -97,6 +99,7 @@ public:
 	// agent
 	void c_NEW_COMP();
 	void c_NEW_SIMP();
+	void c_NEW_VHCL();
 	void v_NULL();
 	void c_POSE();
 	void c_RTAR();
@@ -122,6 +125,7 @@ public:
 	void v_SPCS();
 	void v_PLNE();
 	void v_PNTR();
+	void v_OWNR();
 
 	// motion
 	void c_ELAS();
@@ -137,11 +141,15 @@ public:
 
 	// compound
 	void c_PART();
+	void c_PAT_DULL();
+	void c_PAT_BUTT();
+	void c_PAT_KILL();
 
 	// creatures
 	void c_STIM_WRIT();
 
 	// sounds
+	void c_SNDE();
 	void c_MMSC();
 	void v_MMSC();
 	void c_RMSC();
@@ -168,6 +176,9 @@ public:
 	void v_PRAY_PREV();
 	void c_PRAY_REFR();
 	void v_PRAY_TEST();
+	
+	// input
+	void c_CLAC();
 
 	void runCurrentLine();
 	void jumpToNextIfBlock();

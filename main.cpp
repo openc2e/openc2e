@@ -106,7 +106,7 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 
 	if (world.map.getMetaRoomCount() == 0) {
-		std::cout << "\nNo metarooms found in given directory (" << dir << "), exiting.\n";
+		std::cerr << "\nNo metarooms found in given directory (" << dir << "), exiting.\n";
 		return 0;
 	}
 
@@ -116,7 +116,7 @@ extern "C" int main(int argc, char *argv[]) {
 	SDL_Event event;
 
 	if ( SDL_Init(initflags) < 0 ) {
-		std::cout << "SDL init failed: " << SDL_GetError();
+		std::cerr << "SDL init failed: " << SDL_GetError();
 		return 1;
 	}
 

@@ -18,11 +18,75 @@
  */
 
 #include "SimpleAgent.h"
+#include "creaturesImage.h"
+#include <map>
+#include <string>
+
+class CompoundPart {
+protected:
+	creaturesImage *sprite;
+	unsigned int firstimg;
+
+public:
+	creaturesImage *getSprite() { return sprite; }
+	unsigned int x, y, zorder;
+	
+	CompoundPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+				 unsigned int _z);
+};
+
+class ButtonPart : public CompoundPart {
+protected:
+	bool hittransparentpixelsonly;
+
+public:
+	ButtonPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+			   unsigned int _z, std::string animhover, int msgid, int option);
+};
+
+class CameraPart : public CompoundPart {
+public:
+	CameraPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
+			   unsigned int camerawidth, unsigned int cameraheight);
+};
+
+class DullPart : public CompoundPart {
+public:
+	DullPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+			 unsigned int _z);
+};
+
+class FixedTextPart : public CompoundPart {
+public:
+	FixedTextPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+				  unsigned int _z, std::string fontsprite);
+};
+
+class GraphPart : public CompoundPart {
+public:
+	GraphPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+			  unsigned int _z, unsigned int novalues);
+};
+
+class TextEntryPart : public CompoundPart {
+public:
+	TextEntryPart(std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+				  unsigned int _z, unsigned int msgid, std::string fontsprite);
+};
 
 class CompoundAgent : public SimpleAgent {
+protected:
+	std::map<unsigned int, CompoundPart *> parts;
+
 public:
 	CompoundAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
 								unsigned int firstimage, unsigned int imagecount) :
 		SimpleAgent(family, genus, species, plane, firstimage, imagecount) { }
+		
+	unsigned int partCount() { return parts.size(); }
+	CompoundPart &part(int id) { return *(parts[id]); }
+	void addPart(int, CompoundPart *);
+	void delPart(int);
 };
 

@@ -144,6 +144,26 @@ void caosVM::c_NEGV() {
 }
 
 /**
+ DIVV (command) var (variable) div (decimal)
+ 
+ returns var / mul
+*/
+void caosVM::c_DIVV() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_DECIMAL(div)
+	VM_PARAM_VARIABLE(v)
+	if (v->hasInt() && div.hasInt()) {
+		// integer division
+		v->setInt(v->intValue / div.intValue);
+	} else if (v->hasInt() || v->hasFloat()) {
+		// floating point division
+		v->setFloat((v->hasFloat() ? v->floatValue : v->intValue) /
+					(div.hasFloat() ? div.floatValue : v->intValue));
+	} else
+		throw badParamException();
+}
+
+/**
   MULV (command) var (variable) mul (decimal)
 
   returns var * mul
@@ -155,7 +175,7 @@ void caosVM::c_MULV() {
 	if (v->hasFloat())
 		v->setFloat(v->floatValue * (mul.hasFloat() ? mul.floatValue : mul.intValue));
 	else if (v->hasInt())
-	  v->setInt((int)(v->intValue * (mul.hasFloat() ? mul.floatValue : mul.intValue)));
+		v->setInt((int)(v->intValue * (mul.hasFloat() ? mul.floatValue : mul.intValue)));
 	else
 		throw badParamException();
 }
@@ -187,3 +207,4 @@ void caosVM::c_REAF() {
 	VM_VERIFY_SIZE(0)
 	// todo
 }
+

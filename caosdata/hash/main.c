@@ -43,7 +43,8 @@ int main(int argc, char ** argv) {
 		perror("fopen");
 		exit(1);
 	}
-	while(getline(&buf, &len, fptr) != -1) {
+	do {
+		if(! fgets(buf, 1024, fptr)) break;
 		if(strlen(buf) != 4) {
 			if(! (strlen(buf) == 5 && buf[4] == '\n')) {
 				fprintf(stderr, "Length of line %i is %i, not 4!\n", line, strlen(buf));
@@ -54,6 +55,6 @@ int main(int argc, char ** argv) {
 		little = swapEndianLong(big);
 		printf("%lx\n", (endianness == 'b' ? big : little));
 		line++;
-	}
+	} while(! feof(fptr));
 	return 0;
 }

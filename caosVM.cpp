@@ -20,6 +20,9 @@
 #include "caosVM.h"
 #include <iostream>
 
+#define CAOSDEBUG
+//#define CAOSDEBUGDETAIL
+
 caosVM::caosVM(Agent *o) {
 	owner = o;
 	// if owner is Creature, set _it_
@@ -49,7 +52,7 @@ bool caosVar::operator > (caosVar &v) {
 	} else if (this->hasFloat() && v.hasFloat()) {
 		return (this->floatValue > v.floatValue);
 	}
-	std::cerr << "caosVar operator > couldn't compare\n";
+	std::cerr << "caosVar operator > couldn't compare " << this->dump() << " and " << v.dump() << "\n";
 	return false;
 }
 
@@ -59,7 +62,7 @@ bool caosVar::operator < (caosVar &v) {
 	} else if (this->hasFloat() && v.hasFloat()) {
 		return (this->floatValue < v.floatValue);
 	}
-	std::cerr << "caosVar operator < couldn't compare\n";
+	std::cerr << "caosVar operator < couldn't compare " << this->dump() << " and " << v.dump() << "\n";
 	return false;
 }
 
@@ -86,12 +89,23 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	// v- this is the command/function we're executing
 	std::vector<caosVar> ourparams;
 	token maintoken = tokens.front();
-	// std::cout << "internalRun called for " << maintoken.dump() << "\n";
 	tokens.pop_front();
-	if (maintoken.isvar) throw badParamException();
+	if (maintoken.isvar) {
+#ifdef CAOSDEBUG
+		std::cerr << "internalRun got a var as the first token (" << maintoken.dump() << ")\n";
+#endif
+		throw badParamException();
+	}
 	cmdinfo *us = (first ? maintoken.cmd : maintoken.func);
-	if (!us) throw badParamException();
-	// std::cout << "internalRun called for " << us->dump() << "\n";
+	if (!us) {
+#ifdef CAOSDEBUG
+		std::cerr << "internalRun couldn't find cmdinfo for the first token (" << maintoken.dump() << ")\n";
+#endif
+		throw badParamException();
+	}
+#ifdef CAOSDEBUGDETAIL
+	std::cerr << "internalRun called for " << us->dump() << "\n";
+#endif
 	// if the command/function needs parameters, we suck them up
 	for (unsigned int i = 0; i < us->notokens; i++) {
 		if (tokens.empty()) throw notEnoughParamsException();
@@ -147,11 +161,13 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	}
 	params = ourparams;
 	result.reset();
-	//std::cout << "internalRun executing " << us->dump() << "\n";
+#ifdef CAOSDEBUGDETAIL
+	std::cerr << "internalRun executing " << us->dump() << "\n";
+#endif
 	varnumber = maintoken.varnumber; // VAxx/OVxx hack
 	(this->*(us->method))();
 	if (!params.empty()) {
-		std::cout << "warning: internal CAOS function " << maintoken.dump() << " didn't pop all parameters!\n";
+		std::cerr << "warning: CAOS function " << maintoken.dump() << " didn't pop all parameters!\n";
 	}
 	if (first && !tokens.empty()) {
 		// assume there's another command on this line
@@ -170,9 +186,9 @@ void caosVM::runEntirely(script &s) {
 		try {
 			if (!b.empty()) internalRun(b, true);
 		} catch (badParamException e) {
-			std::cerr << "caught badParamException\n";
+			std::cerr << "caught badParamException running " << s.rawlines[i] << "\n";
 		} catch (notEnoughParamsException e) {
-			std::cerr << "caught notEnoughParamsException\n";
+			std::cerr << "caught notEnoughParamsException running " << s.rawlines[i] << "\n";
 		}
 		if (currentline != i) {
 			i = currentline; // move to the line the flow wants us to
@@ -180,7 +196,7 @@ void caosVM::runEntirely(script &s) {
 			i++; // next line
 		}
 	}
-	if (!linestack.empty()) std::cout << "warning: linestack wasn't empty at the end of runEntirely\n";
+	if (!linestack.empty()) std::cerr << "warning: linestack wasn't empty at the end of runEntirely\n";
 	currentscript = 0;
 }
 

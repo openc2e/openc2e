@@ -19,8 +19,7 @@
 
 #include "caosVM.h"
 #include "openc2e.h"
-#include "CompoundAgent.h"
-#include "SimpleAgent.h"
+#include "Vehicle.h"
 #include "World.h"
 #include <iostream>
 using std::cerr;
@@ -86,6 +85,29 @@ void caosVM::c_NEW_COMP() {
 }
 
 /**
+ NEW: VHCL (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
+
+ create a new vehicle agent with given family/genus/species, given spritefile with image_count sprites
+ available starting at first_image in the spritefile, with the first part at the screen depth given by plane
+*/
+void caosVM::c_NEW_VHCL() {
+	VM_VERIFY_SIZE(7)
+	VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+
+	Vehicle *a = new Vehicle(family, genus, species, plane, first_image, image_count);
+	a->setImage(sprite_file);
+	world.addAgent(a);
+	targ.reset();
+	targ.setAgent(a);
+}
+
+/**
  TARG (agent)
 
  return TARG
@@ -93,7 +115,19 @@ void caosVM::c_NEW_COMP() {
 void caosVM::v_TARG() {
 	VM_VERIFY_SIZE(0)
 	result = targ;
+	if (!targ.hasAgent()) targ.setAgent(0); // todo: we shouldn't need to do this
 	result.setVariable(&targ);
+}
+
+/**
+ OWNR (agent)
+ 
+ return OWNR
+*/
+void caosVM::v_OWNR() {
+	VM_VERIFY_SIZE(0)
+	result.setAgent(0);
+	cerr << "unimplemented: OWNR\n";
 }
 
 /**
@@ -254,7 +288,7 @@ void caosVM::c_ANIM() {
 		a->animation.push_back(j);
 	}
 	if (!a->animation.empty()) { a->setFrameNo(0); }
-	if (a->animation.empty()) { std::cout << "warning: ANIM produced an empty animation string\n"; }
+	if (a->animation.empty()) { std::cerr << "warning: ANIM produced an empty animation string\n"; }
 }
 
 /**

@@ -1,3 +1,4 @@
+* do mulv/divv/etc set the correct type bitmap on the variable?
 * implement ENUM/ESEE/ETCH/EPAS/NEXT
 * look at the room code
 * make the images detect 555/565 themselves

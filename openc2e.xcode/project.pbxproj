@@ -15,24 +15,6 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
-		089C165CFE840E0CC02AAC07 = {
-			children = (
-				089C165DFE840E0CC02AAC07,
-			);
-			isa = PBXVariantGroup;
-			name = InfoPlist.strings;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		089C165DFE840E0CC02AAC07 = {
-			fileEncoding = 10;
-			isa = PBXFileReference;
-			lastKnownFileType = text.plist.strings;
-			name = English;
-			path = English.lproj/InfoPlist.strings;
-			refType = 4;
-			sourceTree = "<group>";
-		};
 //080
 //081
 //082
@@ -143,7 +125,6 @@
 		};
 		29B97317FDCFA39411CA2CEA = {
 			children = (
-				089C165CFE840E0CC02AAC07,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -196,7 +177,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OPTIMIZATION_CFLAGS = "-O0";
-				ZERO_LINK = YES;
+				ZERO_LINK = NO;
 			};
 			isa = PBXBuildStyle;
 			name = Development;
@@ -303,7 +284,6 @@
 		E74DB79F06B460B300004BD4 = {
 			buildPhases = (
 				E74DB7A006B460B300004BD4,
-				E74DB7B806B460B300004BD4,
 				E74DB7BA06B460B300004BD4,
 				E74DB7DF06B460B300004BD4,
 			);
@@ -312,7 +292,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "$(HOME)/Library/Frameworks";
 				HEADER_SEARCH_PATHS = "$(HOME)/Library/Frameworks/SDL.framework/Headers";
-				INFOPLIST_FILE = "Info-openc2e__Upgraded_.plist";
+				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-Wall";
@@ -499,20 +479,6 @@
 			settings = {
 			};
 		};
-		E74DB7B806B460B300004BD4 = {
-			buildActionMask = 2147483647;
-			files = (
-				E74DB7B906B460B300004BD4,
-			);
-			isa = PBXResourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E74DB7B906B460B300004BD4 = {
-			fileRef = 089C165CFE840E0CC02AAC07;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		E74DB7BA06B460B300004BD4 = {
 			buildActionMask = 2147483647;
 			files = (
@@ -552,6 +518,7 @@
 				E74DB7DC06B460B300004BD4,
 				E74DB7DD06B460B300004BD4,
 				E74DB7DE06B460B300004BD4,
+				E7EAD59806B7E16A0040B1C9,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1193,6 +1160,7 @@
 				E7E67CD30663A05B004F1581,
 				E77716DE06AF0C9900507FAF,
 				E77716DF06AF0C9900507FAF,
+				E7EAD59706B7E16A0040B1C9,
 				E7E67CFC0663A111004F1581,
 				E77716E106AF0C9900507FAF,
 				E77716E206AF0C9900507FAF,
@@ -1286,6 +1254,20 @@
 			path = caosScript.cpp;
 			refType = 4;
 			sourceTree = "<group>";
+		};
+		E7EAD59706B7E16A0040B1C9 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_input.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7EAD59806B7E16A0040B1C9 = {
+			fileRef = E7EAD59706B7E16A0040B1C9;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 //E70
 //E71

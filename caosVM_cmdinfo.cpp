@@ -46,7 +46,7 @@ cmdinfo *getCmdInfo(std::string cmd, bool command) {
 	cmdinfo *x = (command ? &cmds[i] : &funcs[i]);
 	if ((!x->twotokens) && (!x->method)) return 0;
 	if (x->name.compare(cmd)) {
-		// std::cout << "getCmdInfo wanted " << cmd << " but got " << x->name << " out of the hash table!\n";
+		//std::cerr << "getCmdInfo wanted " << cmd << " but got " << x->name << " out of the hash table!\n";
 		return 0;
 	}
 	// todo: set varnumber
