@@ -24,11 +24,12 @@
 
 class Agent {
 protected:
-	unsigned int family, genus, species;
-	unsigned int zorder;
 	creaturesImage *sprite;
 
 public:
+	unsigned int family, genus, species;
+	unsigned int zorder;
+
 	creaturesImage *getSprite() { return sprite; }
 	unsigned int x, y;
 	void moveTo(unsigned int, unsigned int);

@@ -110,6 +110,16 @@ public:
 	void c_SCRX();
 	void c_ANIM();
 	void v_ATTR();
+	void v_ABBA();
+	void c_BASE();
+	void v_BASE();
+	void v_BHVR();
+	void v_CARR();
+	void v_FMLY();
+	void v_GNUS();
+	void v_SPCS();
+	void v_PLNE();
+	void v_PNTR();
 
 	// motion
 	void c_ELAS();

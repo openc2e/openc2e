@@ -100,14 +100,12 @@ void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
 	assert(targ.hasAgent());
-	assert(targ.agentValue);
 	targ.agentValue->setAttributes(attr);
 }
 
 void caosVM::v_ATTR() {
 	VM_VERIFY_SIZE(0)
 	assert(targ.hasAgent());
-	assert(targ.agentValue);
 	result.setInt(targ.agentValue->getAttributes());
 }
 
@@ -132,6 +130,7 @@ void caosVM::c_TARG() {
 
 void caosVM::v_FROM() {
 	VM_VERIFY_SIZE(0)
+	result.setAgent(0);
 	cerr << "unimplemented: FROM\n";
 }
 
@@ -188,4 +187,59 @@ void caosVM::c_ANIM() {
 	}
 	if (!a->animation.empty()) { a->setFrameNo(0); }
 	if (a->animation.empty()) { std::cout << "warning: ANIM produced an empty animation string\n"; }
+}
+
+void caosVM::v_ABBA() {
+	VM_VERIFY_SIZE(0)
+	cerr << "unimplemented: ABBA\n";
+}
+
+void caosVM::c_BASE() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(index)
+	cerr << "unimplemented: BASE\n";
+}
+
+void caosVM::v_BASE() {
+	VM_VERIFY_SIZE(0)
+	cerr << "unimplemented: BASE\n";
+}
+
+void caosVM::v_BHVR() {
+	VM_VERIFY_SIZE(0)
+	cerr << "unimplemented: BHVR\n";
+}
+
+void caosVM::v_CARR() {
+	VM_VERIFY_SIZE(0)
+	cerr << "unimplemented: CARR\n";
+}
+
+void caosVM::v_FMLY() {
+	VM_VERIFY_SIZE(0)
+	assert(targ.hasAgent());
+	result.setInt(targ.agentValue->family);
+}
+
+void caosVM::v_GNUS() {
+	VM_VERIFY_SIZE(0)
+	assert(targ.hasAgent());
+	result.setInt(targ.agentValue->genus);
+}
+
+void caosVM::v_SPCS() {
+	VM_VERIFY_SIZE(0)
+	assert(targ.hasAgent());
+	result.setInt(targ.agentValue->species);
+}
+
+void caosVM::v_PLNE() {
+	VM_VERIFY_SIZE(0)
+	assert(targ.hasAgent());
+	result.setInt(targ.agentValue->zorder);
+}
+
+void caosVM::v_PNTR() {
+	VM_VERIFY_SIZE(0)
+	result.setAgent(world.hand());
 }

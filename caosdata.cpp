@@ -75,6 +75,7 @@ void setupCommandPointers() {
 	CMDDEF(SUBR, 1)
 	CMDDEF(RETN, 0)
 	CMDDEF(STOP, 0)
+	CMDDEF(BASE, 1)
 
 	NULLDEF(SCRP)
 	NULLDEF(ENDM)
@@ -99,6 +100,15 @@ void setupCommandPointers() {
 	FUNCDEF(RMSC, 2)
 	FUNCDEF(PACE, 0)
 	FUNCDEF(ATTR, 0)
+	FUNCDEF(ABBA, 0)
+	FUNCDEF(BASE, 0)
+	FUNCDEF(BHVR, 0)
+	FUNCDEF(CARR, 0)
+	FUNCDEF(FMLY, 0)
+	FUNCDEF(SPCS, 0)
+	FUNCDEF(GNUS, 0)
+	FUNCDEF(PLNE, 0)
+	FUNCDEF(PNTR, 0)
 
 	cmdinfo n1(std::string("DBG: OUTS"), 1, false, &caosVM::c_DBG_OUTS);
 	doublecmds.push_back(n1);
