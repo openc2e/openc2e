@@ -125,6 +125,7 @@ void Agent::tick() {
 }
 
 void Agent::kill() {
+	assert(!dying);
 	if (immortal)
 		return;
 	dying = true; // what a world, what a world...

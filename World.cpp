@@ -62,8 +62,11 @@ void World::tick() {
 		Agent *rip = killqueue.back();
 		killqueue.pop_back();
 		assert(rip->dying);
-		agents.erase(rip);
 		delete rip;
+		// agents.erase(rip) doesn't work for some annoying reason, it zaps everything at that zorder - fuzzie
+		for (std::multiset<Agent *, agentzorder>::iterator i = agents.begin(); i != agents.end(); i++)
+			if (*i == rip)
+				agents.erase(i);
 	}
 	// todo: tick rooms
 }
