@@ -18,14 +18,9 @@
  */
 
 #include "creaturesImage.h"
-#include <istream>
+#include "mmapifstream.h"
 
 class blkImage : public creaturesImage {
-protected:
-	// following two for mmap()
-	char *map;
-	unsigned int filesize;
-
 public:
 	unsigned int totalwidth, totalheight;
 

@@ -65,9 +65,6 @@ void blkImage::writeHeader(std::ostream &s) {
 	}
 }
 
-#include <sys/types.h>
-#include <sys/mman.h>
-
 blkImage::blkImage(mmapifstream *in) {
 	stream = in;
 
@@ -75,21 +72,11 @@ blkImage::blkImage(mmapifstream *in) {
 	
 	buffers = new void *[m_numframes];
 	
-	in->seekg(0, std::ios::end);
-	filesize = in->tellg();
-	
-	void *mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, in->fno, 0);
-	assert(mapr != (void *)-1);
-	map = (char *)mapr;
-
 	for (unsigned int i = 0; i < m_numframes; i++)
-		buffers[i] = map + offsets[i];
+		buffers[i] = in->map + offsets[i];
 }
 
 blkImage::~blkImage() {
-	if (stream) {
-		munmap(map, filesize);
-	}
 	delete[] buffers;
 	delete[] offsets;
 }

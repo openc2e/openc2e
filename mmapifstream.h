@@ -23,7 +23,9 @@
 // todo: write destructor
 class mmapifstream : public std::ifstream {
 public:
-	int fno;
+	unsigned int filesize;
+	char *map;
 	mmapifstream(std::string filename);
+	~mmapifstream();
 	void mmapopen(std::string filename);
 };

@@ -24,7 +24,6 @@
 #include <map>
 #include <fstream>
 #include "endianlove.h"
-#include "mmapifstream.h"
 
 class creaturesImage {
 private:
