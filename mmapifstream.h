@@ -1,8 +1,8 @@
 /*
- *  blkImage.h
+ *  mmapifstream.h
  *  openc2e
  *
- *  Created by Alyssa Milburn on Tue May 25 2004.
+ *  Created by Alyssa Milburn on Sat Jul 24 2004.
  *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -17,21 +17,13 @@
  *
  */
 
-#include "creaturesImage.h"
-#include <istream>
+#include <string>
+#include <fstream>
 
-class blkImage : public creaturesImage {
-protected:
-	// following two for mmap()
-	char *map;
-	unsigned int filesize;
-
+// todo: write destructor
+class mmapifstream : public std::ifstream {
 public:
-	unsigned int totalwidth, totalheight;
-
-	blkImage() { }
-  blkImage(mmapifstream *);
-	~blkImage();
-	void readHeader(std::istream &in);
-	void writeHeader(std::ostream &s);
+	int fno;
+	mmapifstream(std::string filename);
+	void mmapopen(std::string filename);
 };

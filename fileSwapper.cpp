@@ -62,6 +62,4 @@ void fileSwapper::convertblk(std::string directory, std::string name) {
 	for (unsigned int i = 0; i < img.m_numframes; i++) {
 		delete (uint16 *)img.buffers[i];
 	}
-	delete[] img.buffers;
-	delete[] img.offsets;
 }

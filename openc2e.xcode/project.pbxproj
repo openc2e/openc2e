@@ -162,6 +162,7 @@
 		};
 		29B97315FDCFA39411CA2CEA = {
 			children = (
+				E7004F61065F8FBE000FB224,
 				E777176306AF0E8C00507FAF,
 				F5A47A9F01A0483001D3D55B,
 			);
@@ -287,6 +288,7 @@
 				E789D75E06B17D8900CCD159,
 				E765977006B1C47A00A0CA58,
 				E765977206B1C47A00A0CA58,
+				E7659A9606B2DEC700A0CA58,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -337,6 +339,7 @@
 				E77717D506AF0FF900507FAF,
 				E789D75F06B17D8900CCD159,
 				E765977106B1C47A00A0CA58,
+				E7659A9706B2DEC700A0CA58,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -411,7 +414,8 @@
 		E7004EE7065F8143000FB224 = {
 			children = (
 				E7004EF9065F8199000FB224,
-				E7004F61065F8FBE000FB224,
+				E7659A9406B2DEC700A0CA58,
+				E7659A9506B2DEC700A0CA58,
 			);
 			isa = PBXGroup;
 			name = "file classes";
@@ -542,6 +546,34 @@
 		};
 		E765977206B1C47A00A0CA58 = {
 			fileRef = E765976F06B1C47A00A0CA58;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E7659A9406B2DEC700A0CA58 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = mmapifstream.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7659A9506B2DEC700A0CA58 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = mmapifstream.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7659A9606B2DEC700A0CA58 = {
+			fileRef = E7659A9406B2DEC700A0CA58;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E7659A9706B2DEC700A0CA58 = {
+			fileRef = E7659A9506B2DEC700A0CA58;
 			isa = PBXBuildFile;
 			settings = {
 			};
