@@ -22,8 +22,6 @@
 #include <iostream>
 using std::cout;
 
-int roomid = -1; // debug!
-
 /*
  ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)
  
@@ -41,13 +39,12 @@ void caosVM::v_ADDM() {
 	caosVar v;
   v.setInt(world.map.addMetaRoom(r));
   result = v;
-  roomid++; // debug!
 }
 
 /*
  BRMI (command) metaroom_base (integer) room_base (integer)
  
- set metaroom/room bases, i have no idea why we need this
+ set metaroom/room bases, i have no idea why/if we need this
  */
 void caosVM::c_BRMI() {
 	VM_VERIFY_SIZE(2)
@@ -88,24 +85,21 @@ void caosVM::v_ADDR() {
 	VM_PARAM_INTEGER(x_left)
 	VM_PARAM_INTEGER(metaroomid)
 	result.setInt(0);
-	if (roomid != 0) {
-		cout << "unimplemented: ADDR\n";
-	} else {
-		Room r;
-		r.x_left = x_left;
-		r.x_right = x_right;
-		r.y_left_ceiling = y_left_ceiling;
-		r.y_right_ceiling = y_right_ceiling;
-		r.y_left_floor = y_left_floor;
-		r.y_right_floor = y_right_floor;
-		world.map.getMetaRoom(0)->rooms.push_back(r);
-	}
+	Room r;
+	r.x_left = x_left;
+	r.x_right = x_right;
+	r.y_left_ceiling = y_left_ceiling;
+	r.y_right_ceiling = y_right_ceiling;
+	r.y_left_floor = y_left_floor;
+	r.y_right_floor = y_right_floor;
+	world.map.getMetaRoom(metaroomid)->rooms.push_back(r);
 }
 
 void caosVM::c_RTYP() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(roomtype)
 	VM_PARAM_INTEGER(roomid)
+	// todo
 	cout << "unimplemented: RTYP\n";
 }
 

@@ -38,10 +38,11 @@ void Map::SetMapDimensions(unsigned int w, unsigned int h) {
 
 void Map::SetCurrentMetaRoom(unsigned int room) {
 	assert(room < metarooms.size());
-	// todo
+	currroom = room;
 }
 
 int Map::addMetaRoom(MetaRoom *m) {
+	// todo: check if it's outlying
 	metarooms.push_back(m);
 	return (metarooms.size() - 1);
 }
