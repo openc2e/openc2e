@@ -8,6 +8,7 @@ my %doublecmds;
 my %doublefuncs;
 
 my $parsingdoc = 0;
+my $count = 0;
 
 my $doclines;
 my $docs;
@@ -64,7 +65,7 @@ sub writedocsanddata {
 	my ($name, $type) = @_;
 
 	my $newname = $name;
-	if ($name =~ /_/) {
+	if ($name =~ /_.+/) {
 		my $one = $name;
 		$one =~ s/(.*)_(.*)/$1/;
 		my $two = $name;
@@ -101,6 +102,7 @@ sub writedocsanddata {
 		}
 		$thisdoc .= '<p><font color="#ff0000">undocumented</font></p>'if ($j == 0);
 		$thisdoc .= $table3 . "\n";
+		$count++;
 		$$docs{$section}{$newname} .= $thisdoc;
 	} else {
 	  print "command/function '", $newname, "' wasn't processed because it has no documentation. add at least a prototype.\n";
@@ -134,7 +136,7 @@ foreach my $fname (@files) {
 				next;
 			}
 			writedocsanddata($_, $type);
-			$_ =~ s/(.*)(_.*)/$1/;
+			$_ =~ s/(.*)(_.+)/$1/;
 			if (length($_) == 3) {
 				$_ = $_ . ":";
 			}
@@ -161,6 +163,9 @@ foreach my $sect (sort keys(%$docs)) {
 		print docfile $$docs{$sect}{$data};
 	}
 }
+# 6 below = number of openc2e-specific commands
+my $p = int(($count - 6) * 100 / 666);
+print docfile "<p>" . $count . " documented commands: " . $p . "% of DS-era CEE, plus 6 openc2e-specific commands</p>";
 print docfile "</body></html>";
 close(docfile);
 
