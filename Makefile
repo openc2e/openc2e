@@ -252,7 +252,7 @@ bin_PROGRAMS = openc2e
 openc2e_SOURCES = creaturesImage.cpp caosVM_time.cpp caosVM_sounds.cpp caosVM_creatures.cpp caosVM_motion.cpp caosVM_scripts.cpp caoshashes.cpp caosVM_compound.cpp caosVM_variables.cpp caosVM_flow.cpp caosdata.cpp caosVM_agent.cpp World.cpp Vehicle.cpp SimpleAgent.cpp Room.cpp MetaRoom.cpp Map.cpp main.cpp Creature.cpp CompoundAgent.cpp caosVM_map.cpp caosVM_core.cpp caosVM_cmdinfo.cpp caosVM_camera.cpp caosVM.cpp caosScript.cpp Camera.cpp c16Image.cpp blkImage.cpp Agent.cpp 
 openc2e_LDADD = /usr/lib/libSDL.la /usr/lib/libSDL_gfx.la
 
-EXTRA_DIST = Agent.cpp Agent.h blkImage.cpp blkImage.h c16Image.cpp c16Image.h Camera.cpp Camera.h caosScript.cpp caosVM.cpp caosVM.h caosVM_camera.cpp caosVM_cmdinfo.cpp caosVM_core.cpp caosVM_map.cpp CompoundAgent.cpp CompoundAgent.h Creature.cpp Creature.h creaturesImage.h endianlove.h main.cpp Map.cpp Map.h MetaRoom.cpp MetaRoom.h Room.cpp Room.h SimpleAgent.cpp SimpleAgent.h Vehicle.cpp Vehicle.h World.cpp World.h caosVM_agent.cpp caosVM_cmdinfo.h caosdata.cpp caosVM_flow.cpp caosVM_variables.cpp caosVM_compound.cpp caoshashes.cpp caosVM_scripts.cpp caosVM_motion.cpp caosVM_creatures.cpp caosVM_sounds.cpp openc2e.h caosScript.h TODO caosVM_time.cpp creaturesImage.cpp 
+EXTRA_DIST = Agent.cpp Agent.h blkImage.cpp blkImage.h c16Image.cpp c16Image.h Camera.cpp Camera.h caosScript.cpp caosVM.cpp caosVM.h caosVM_camera.cpp caosVM_cmdinfo.cpp caosVM_core.cpp caosVM_map.cpp CompoundAgent.cpp CompoundAgent.h Creature.cpp Creature.h creaturesImage.h endianlove.h main.cpp Map.cpp Map.h MetaRoom.cpp MetaRoom.h Room.cpp Room.h SimpleAgent.cpp SimpleAgent.h Vehicle.cpp Vehicle.h World.cpp World.h caosVM_agent.cpp caosVM_cmdinfo.h caosdata.cpp caosVM_flow.cpp caosVM_variables.cpp caosVM_compound.cpp caoshashes.cpp caosVM_scripts.cpp caosVM_motion.cpp caosVM_creatures.cpp caosVM_sounds.cpp openc2e.h caosScript.h TODO caosVM_time.cpp creaturesImage.cpp caoshashes.h 
 
 ####### kdevelop will overwrite this part!!! (end)############
 # set the include path found by configure
@@ -553,7 +553,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH
 #>- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 #>+ 4
-KDE_DIST=SDLMain.m openc2e SDLMain.h 
+KDE_DIST=SDLMain.m unittest.pl openc2e SDLMain.h 
 
 DISTFILES= $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) $(KDE_DIST)
 

@@ -50,8 +50,8 @@ int main(int argc, char ** argv) {
 				exit(1);
 			}
 		}
-		little = htonl(*((unsigned int *)buf));
-		big = swapEndianLong(little);
+		big = htonl(*((unsigned int *)buf));
+		little = swapEndianLong(big);
 		printf("%lx\n", (endianness == 'b' ? big : little));
 		line++;
 	}

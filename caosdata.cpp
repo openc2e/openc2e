@@ -22,10 +22,11 @@
 */
 
 #include "caosVM_cmdinfo.h"
+#include "caoshashes.h"
 
 void setupCommandPointers() {
-	cmds = new cmdinfo[247];
-	funcs = new cmdinfo[512];
+	cmds = new cmdinfo[cmd_RANGE];
+	funcs = new cmdinfo[func_RANGE];
 
 	CMDDEF(RTAR, 3)
 DBLCMDDEF("NEW:")
@@ -65,6 +66,7 @@ CMDDEF(OUTS, 1)
 CMDDEF(OUTV, 1)
 FUNCDEF(GAME, 1)
 CMDDEF(SCRP, 0)
+CMDDEF(RSCR, 0)
 CMDDEF(ENDM, 0)
 DBLCMDDEF("STIM")
 DBLCMD("STIM WRIT", STIM_WRIT, 3)
@@ -115,6 +117,5 @@ CMDDEF(NEGV, 1)
 CMDDEF(MULV, 2)
 FUNCDEF(RAND, 2)
 CMDDEF(REAF, 0)
-CMDDEF(RSCR, 0)
 
 }

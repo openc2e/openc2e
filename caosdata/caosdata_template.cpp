@@ -22,10 +22,11 @@
 */
 
 #include "caosVM_cmdinfo.h"
+#include "caoshashes.h"
 
 void setupCommandPointers() {
-	cmds = new cmdinfo[247];
-	funcs = new cmdinfo[512];
+	cmds = new cmdinfo[cmd_RANGE];
+	funcs = new cmdinfo[func_RANGE];
 
 	__CAOSMACROS__
 }

@@ -43,7 +43,6 @@ cmdinfo *getCmdInfo(std::string cmd, bool command) {
 	unsigned int i = (command ?
 										phash_cmd(*((int *)cmd.c_str())) :
 										phash_func(*((int *)cmd.c_str())) );
-	if (i > (command ? 246 : 511)) return 0; // todo: do we need this?
 	cmdinfo *x = (command ? &cmds[i] : &funcs[i]);
 	if ((!x->twotokens) && (!x->method)) return 0;
 	if (x->name.compare(cmd)) {
