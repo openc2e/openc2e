@@ -46,6 +46,8 @@ void c16Image::readHeader(std::istream &in) {
 }
 
 void c16Image::writeHeader(std::ostream &s) {
+	assert(false); // unimplemented
+
 	unsigned int dw; unsigned short w;
 	
 	assert(false);

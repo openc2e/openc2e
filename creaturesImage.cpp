@@ -32,7 +32,7 @@ enum filetype { blk, s16, c16 };
 bool tryOpen(mmapifstream *in, std::string dir, std::string filename, filetype ft) {
 	std::string fname = dir + filename;
 #ifdef __C2E_BIGENDIAN
-  fname = fname + ".big";
+  if (ft != c16) fname = fname + ".big";
 #endif
 	in->clear();
 	in->mmapopen(fname.c_str());
@@ -49,7 +49,7 @@ bool tryOpen(mmapifstream *in, std::string dir, std::string filename, filetype f
 				f.converts16(dir, filename);
 				break;
 			case c16:
-				f.convertc16(dir, filename);
+				// f.convertc16(dir, filename);
 				break;
 		}
 		in->clear();
@@ -84,6 +84,8 @@ creaturesImage *imageGallery::getImage(std::string name) {
 	} else {
 		gallery[name] = new s16Image(in);
 	}
+	
+	in->close(); // doesn't close the mmap, which we still need :)
 
 	return gallery[name];
 }

@@ -23,6 +23,8 @@
 #include "c16Image.h"
 
 void fileSwapper::convertc16(std::string directory, std::string name) {
+	assert(false); // unimplemented
+
 	std::ifstream in((directory + name).c_str());
 	if (!in.is_open()) return;
 	std::ofstream out((directory + name + ".big").c_str());
