@@ -4,6 +4,7 @@
 // for enum lifestage (0 to 6)
 #include "genome.h"
 
+#include "openc2e.h"
 #include "Agent.h"
 
 class SkeletalCreature {
