@@ -4,11 +4,11 @@
 #include <unistd.h>
 
 int main(int argc, char **argv) {
-	bool outputfiles = false, notags = false, usageerror = false;
+	bool outputfiles = true, notags = false, usageerror = false;
 	int ch;
 	while ((ch = getopt(argc, argv, "on")) != -1) {
 		switch (ch) {
-			case 'o': outputfiles = true; break;
+			case 'o': outputfiles = false; break;
 			case 'n': notags = true; break;
 			default: usageerror = true; break;
 		}
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 	argc -= optind;
 	argv += optind;
 	if ((argc != 1) || usageerror) {
-		cerr << "syntax: praydumper -o -n filename\n-o output uninterpreted blocks as files (currently unimplemented)\n-n do not interpret tag blocks" << endl;
+		cerr << "syntax: praydumper -o -n filename\n-o don't output non-tag blocks as files\n-n do not interpret tag blocks" << endl;
 		return 1;
 	}
 	ifstream input(argv[0]);
@@ -25,7 +25,6 @@ int main(int argc, char **argv) {
 	cout << endl << "\"en-GB\"" << endl;
 	prayFile file;
 	input >> file;
-	cerr << "read PRAY file okay" << endl;
 
 	for (vector<block *>::iterator x = file.blocks.begin(); x != file.blocks.end(); x++) {
 		tagPrayBlock *b = dynamic_cast<tagPrayBlock *>(*x);
@@ -40,7 +39,12 @@ int main(int argc, char **argv) {
 				cout << "\"" << y->first << "\" \"" << y->second << "\"" << endl;
 			}
 		} else {
-			cout << endl << "inline " << (*x)->blockname() << " \"" << (*x)->name() << "\" \"" << (*x)->name() << "\"" << endl;	
+			unknownPrayBlock *b = dynamic_cast<unknownPrayBlock *>(*x);
+			cout << endl << "inline " << (*x)->blockname() << " \"" << (*x)->name() << "\" \"" << (*x)->name() << "\"" << endl;
+			if (outputfiles) {
+				ofstream output((*x)->name().c_str());
+				output.write((char *)b->buf, b->len);
+			}
 		}
 	}
 }
