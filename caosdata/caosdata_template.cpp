@@ -17,8 +17,15 @@
  *
  */
 
+/*
+ __CAOSGENERATED__
+*/
+
 #include "caosVM_cmdinfo.h"
 
 void setupCommandPointers() {
 	cmds = new cmdinfo[247];
 	funcs = new cmdinfo[512];
+
+	__CAOSMACROS__
+}
