@@ -12,6 +12,7 @@
 #include "SDLBackend.h"
 
 #include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
+#include "SDL_net.h"
 
 SDLBackend backend;
 
@@ -98,18 +99,11 @@ extern "C" int main(int argc, char *argv[]) {
 	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
 		std::ifstream script(i->c_str());
 		assert(script.is_open());
-		std::cout << "loading script " << *i << "...\n";
+		std::cout << "executing script " << *i << "...\n";
 		std::cout.flush();
 		std::cerr.flush();
 		caosScript testscript(script);
 		caosVM testvm(0);
-		/* std::cout << "dump of script:\n";
-		std::cout << testscript.dump(); */
-		std::cout.flush();
-		std::cerr.flush();
-		std::cout << "executing script " << *i << "...\n";
-		std::cout.flush();
-		std::cerr.flush();
 		testvm.runEntirely(testscript.installer);
 		std::cout.flush();
 		std::cerr.flush();
@@ -121,6 +115,19 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 
 	backend.init();
+
+	SDLNet_Init();
+	TCPsocket listensocket = 0;
+	int listenport = 20000;
+	while ((!listensocket) && (listenport < 20050)) {
+		listenport++;
+		IPaddress ip;
+
+		SDLNet_ResolveHost(&ip, 0, listenport);
+		listensocket = SDLNet_TCP_Open(&ip); 
+	}
+	assert(listensocket);
+	std::cout << "listening on port " << listenport << std::endl;
 
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		world.map.SetCurrentMetaRoom(j);
@@ -154,6 +161,13 @@ extern "C" int main(int argc, char *argv[]) {
 			tickdata = backend.ticks();
 		}
 		drawWorld();
+		
+		TCPsocket connection;
+
+		while (connection = SDLNet_TCP_Accept(listensocket)) {
+			std::cerr << "ignoring TCP connection!\n";
+			SDLNet_TCP_Close(connection);
+		}
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -263,7 +277,8 @@ extern "C" int main(int argc, char *argv[]) {
 			adjusty += adjustbyy;
 		}
 	}
-	
+
+	SDLNet_Quit();
 	SDL_Quit();
 
 	} catch (creaturesException &e) {

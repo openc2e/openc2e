@@ -61,7 +61,7 @@ OPENC2E = \
 	Vehicle.o \
 	World.o
 
-LDFLAGS=-lboost_filesystem $(shell sdl-config --static-libs) -lz -lm
+LDFLAGS=-lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net
 CFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 CPPFLAGS=$(CFLAGS)
 

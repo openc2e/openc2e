@@ -297,8 +297,8 @@ caosScript::caosScript(std::istream &in) {
 				i++; assert(i->type == token::CAOSVAR); assert(i->var.hasInt()); two = i->var.intValue;
 				i++; assert(i->type == token::CAOSVAR); assert(i->var.hasInt()); three = i->var.intValue;
 				i++; assert(i->type == token::CAOSVAR); assert(i->var.hasInt()); four = i->var.intValue;
-				std::cout << "caosScript: script " << one << " " << two << " " << three << " " << four
-					<< " being added to scriptorium.\n";
+				//std::cout << "caosScript: script " << one << " " << two << " " << three << " " << four
+				//	<< " being added to scriptorium.\n";
 				currscrip = &(world.scriptorium.getScript(one, two, three, four));
 				// todo: verify event script doesn't already exist, maybe? don't know
 				// what real engine does

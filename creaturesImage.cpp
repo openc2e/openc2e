@@ -71,7 +71,7 @@ creaturesImage *imageGallery::getImage(std::string name) {
 	// step two: try opening it in .c16 form first, then try .s16 form
 	mmapifstream *in = new mmapifstream();
 
-	std::cout << "imageGallery is trying to open '" << name << "'" << std::endl;
+	// std::cout << "imageGallery is trying to open '" << name << "'" << std::endl;
 
 	if (!tryOpen(in, "./data/Images/", name + ".s16", s16)) {
 		if (!tryOpen(in, "./data/Images/", name + ".c16", c16)) {
