@@ -19,6 +19,7 @@
 
 #include "agentfile.h"
 #include "zlib.h"
+#include "endianlove.h"
 
 #include <exception>
 
@@ -84,9 +85,9 @@ void prayBlock::read(istream &s) {
 	blockname = (char *)x;
 
 	unsigned int size, usize, flags;
-	s.read((char *)&size, 4);
-	s.read((char *)&usize, 4);
-	s.read((char *)&flags, 4);
+	s.read((char *)&size, 4); size = swapEndianLong(size);
+	s.read((char *)&usize, 4); usize = swapEndianLong(usize);
+	s.read((char *)&flags, 4); flags = swapEndianLong(flags);
 
 	unsigned char *buf;
 	buf = new unsigned char[size];
@@ -147,10 +148,10 @@ void prayBlock::write(ostream &s) const {
 	}
 #endif
 
-	s.write((char *)&size, 4);
-	s.write((char *)&usize, 4);
+	unsigned int esize = swapEndianLong(size); s.write((char *)&esize, 4);
+	unsigned int eusize = swapEndianLong(usize); s.write((char *)&eusize, 4);
 
-	unsigned char flags = compressed ? 1 : 0;
+	unsigned int flags = swapEndianLong(compressed ? 1 : 0);
 	s.write((char *)&flags, 4);
 
 	s.write((char *)b, size);
@@ -183,6 +184,7 @@ unsigned char *unknownPrayBlock::rawWrite(unsigned int &l) const {
 
 char *tagStringRead(unsigned char *&ptr) {
 	unsigned int len = *(unsigned int *)ptr;
+	len = swapEndianLong(len);
 	ptr += 4;
 
 	// TODO: fixme: rewrite this code properly
@@ -194,7 +196,7 @@ char *tagStringRead(unsigned char *&ptr) {
 }
 
 void tagStringWrite(unsigned char *&ptr, string &s) {
-	*(unsigned int *)ptr = s.size(); ptr += 4;
+	*(unsigned int *)ptr = swapEndianLong(s.size()); ptr += 4;
 	memcpy(ptr, s.c_str(), s.size()); ptr += s.size();
 }
 
