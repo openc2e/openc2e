@@ -92,7 +92,13 @@ public:
 	void c_SUBR();
 	void c_RETN();
 	
-	// debug (currently in core)
+	// debug
+	void c_TEST_PASS();
+	void c_TEST_FAIL();
+	void c_TEST_INIT();
+	void c_TEST_CHEK();
+	void c_TEST_STRT();
+	void c_TEST_FINI();
 	void c_DBG_OUTS();
 	void c_DBG_OUTV();
 

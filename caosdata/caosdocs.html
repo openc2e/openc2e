@@ -110,13 +110,7 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PAT: KILL </span>(command) part (integer)</td></tr><tr><td class="description">
 <p>kill the specified part of the TARGed compound agent/vehicle</p>
 </td></tr></table><br>
-<h1>core</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DBG: OUTS </span>(command) val (string)</td></tr><tr><td class="description">
-<p>output a string to the debug log</p>
-</td></tr></table><br>
-<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DBG: OUTV </span>(command) val (decimal)</td></tr><tr><td class="description">
-<p>output a decimal value to the debug log</p>
-</td></tr></table><br>
-<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OUTS </span>(command) val (string)</td></tr><tr><td class="description">
+<h1>core</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OUTS </span>(command) val (string)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OUTV </span>(command) val (decimal)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
@@ -131,6 +125,36 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>creatures</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">STIM WRIT </span>(command) creature (agent) stimulus (integer) strength (float)</td></tr><tr><td class="description">
 <p>send stimulus to specific creature</p>
+</td></tr></table><br>
+<h1>debug</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DBG: OUTS </span>(command) val (string)</td></tr><tr><td class="description">
+<p>output a string to the debug log</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DBG: OUTV </span>(command) val (decimal)</td></tr><tr><td class="description">
+<p>output a decimal value to the debug log</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TEST PASS </span>(command)</td></tr><tr><td class="description">
+<p>openc2e-only</p>
+<p>signal a single test pass</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TEST FAIL </span>(command)</td></tr><tr><td class="description">
+<p>openc2e-only</p>
+<p>signal a single test fail</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TEST INIT </span>(command) notests (integer)</td></tr><tr><td class="description">
+<p>openc2e-only</p>
+<p>initialise the testing system, there will be notests tests</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TEST CHEK </span>(command) comparison (comparison)</td></tr><tr><td class="description">
+<p>openc2e-only</p>
+<p>signal a test pass if comparison is true, or a fail otherwise</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TEST STRT </span>(command)</td></tr><tr><td class="description">
+<p>openc2e-only</p>
+<p>start a single test, continuing until TEST PASS/FAIL/FINI</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TEST FINI </span>(command)</td></tr><tr><td class="description">
+<p>openc2e-only</p>
+<p>signal a single test fail if there has been no TEST/FAIL since last TEST STRT</p>
 </td></tr></table><br>
 <h1>flow</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DOIF </span>(command) condition (condition)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>

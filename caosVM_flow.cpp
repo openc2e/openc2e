@@ -21,12 +21,6 @@
 #include <iostream>
 #include "openc2e.h"
 
-/*
- using sometruth is BROKEN, we need to have a stack
-
- todo: if we encounter else in jumpToNextIfBlock, we can just skip to the line past it
-*/
-
 void caosVM::jumpToNextIfBlock() {
 	cmdinfo *doif = getCmdInfo("DOIF", true); assert(doif != 0);
 	cmdinfo *elif = getCmdInfo("ELIF", true); assert(elif != 0);

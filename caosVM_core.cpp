@@ -24,34 +24,6 @@ using std::cout;
 using std::cerr;
 
 /**
- DBG: OUTS (command) val (string)
- 
- output a string to the debug log
-*/
-void caosVM::c_DBG_OUTS() {
-	VM_VERIFY_SIZE(1)
-	VM_PARAM_STRING(val)
-
-	cout << val << "\n";
-}
-
-/**
- DBG: OUTV (command) val (decimal)
- 
- output a decimal value to the debug log
-*/
-void caosVM::c_DBG_OUTV() {
-  VM_VERIFY_SIZE(1)
-	VM_PARAM_DECIMAL(val)
-	
-	if (val.hasFloat()) {
-		cout << val.floatValue;
-	} else {
-		cout << val.intValue;
-	}
-}	
-
-/**
  OUTS (command) val (string)
 */
 void caosVM::c_OUTS() {
