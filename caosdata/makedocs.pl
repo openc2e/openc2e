@@ -17,7 +17,7 @@ my $data;
 
 my $table1 = '<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">';
 my $table2 = '</td></tr><tr><td class="description">';
-my $table3 = '</td></tr></table>';
+my $table3 = '</td></tr></table><br>';
 
 sub writedata {
 	my ($name, $docline, $type, $newname) = @_;
@@ -106,7 +106,7 @@ print docfile '<html><head><title>openc2e CAOS documentation</title><link rel=st
 foreach my $fname (@files) {
   my $section = $fname;
 	$section =~ s/^\.\.\/caosVM_(.*).cpp$/$1/;
-  print docfile "<h1>" . $section . "</h1>"; 
+  print docfile "<h1>" . $section . "</h1><br>"; 
 	open(filehandle, $fname);
 	while(<filehandle>) {
 		if (/^void caosVM::/) {
