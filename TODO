@@ -1,4 +1,4 @@
-* do the stack stuff (make doif work)
+* do the stack stuff (make enum/etc work)
 * look at the room code
 * start implementing agent event script infrastructure
 * implement galleries (agents sharing images)

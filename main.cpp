@@ -59,15 +59,18 @@ void drawWorld() {
 }
 
 extern "C" int main(int argc, char *argv[]) {
+	char *dir = "data/Bootstrap/001 World/";
+	if (argc > 1) dir = argv[1];
+
 	std::vector<std::string> scripts;
 
 	DIR *dirh;
-	dirh = opendir("data/Bootstrap/001 World/");
+	dirh = opendir(dir);
 	assert(dirh);
 	for (dirent *dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
 		// we assume everything except . and .. is a cos file
 		if (strcmp(dirp->d_name, ".") && strcmp(dirp->d_name, ".."))
-			scripts.push_back(std::string("data/Bootstrap/001 World/") + dirp->d_name);
+			scripts.push_back(std::string(dir) + dirp->d_name);
 	}
 	closedir(dirh);
 

@@ -1,0 +1,41 @@
+* unit tests for DOIF/ELIF/ELSE/ENDI blocks
+* fuzzie, 06/06/04
+
+DBG: OUTS "TEST: ifblocks: 5 tests"
+
+DOIF 1 eq 1
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+DOIF 1 > 2
+ DBG: OUTS "FAIL"
+ELSE
+ DBG: OUTS "PASS"
+ENDI
+
+DOIF 1 < 2
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+DOIF 1 eq 2
+ DBG: OUTS "FAIL"
+ELSE
+ DBG: OUTS "PASS"
+ENDI
+
+DOIF 1 eq 2
+ DOIF 1 eq 1
+  DBG: OUTS "FAIL"
+ ELSE
+  DBG: OUTS "FAIL"
+ ENDI
+ELSE
+ DOIF 1 eq 1
+  DBG: OUTS "PASS"
+ ELSE
+  DBG: OUTS "FAIL"
+ENDI
