@@ -30,7 +30,7 @@ void caosVM::c_PART() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part_id)
 
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	assert(a);
 	// TODO: this isn't entirely right, we should check it exists instead (maybe part should be a pointer?)
 	assert(part_id < a->partCount());
@@ -54,7 +54,7 @@ void caosVM::c_PAT_DULL() {
 	
 	assert(part > 0);
 	assert(targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	assert(a);
 
 	CompoundPart *p = new DullPart(part, sprite, first_image, x, y, plane);
@@ -86,7 +86,7 @@ void caosVM::c_PAT_BUTT() {
 	assert(part > 0);
 	assert((option == 0) || (option == 1));
 	assert(targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	assert(a);
 
 	// TODO TODO TODO we don't take image_count!!
@@ -105,7 +105,7 @@ void caosVM::c_PAT_KILL() {
 	
 	assert(part > 0);
 	assert(targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	assert(a);
 	
 	a->delPart(part);
@@ -123,7 +123,7 @@ void caosVM::c_FCUS() {
 	if (!targ) {
 		// TODO
 	} else {
-		CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+		CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 		caos_assert(c);
 		TextEntryPart *p = dynamic_cast<TextEntryPart *>(c->part(part));
 		caos_assert(p);

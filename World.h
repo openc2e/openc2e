@@ -40,6 +40,7 @@ public:
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
 	std::vector<caosVM *> vmpool;
+	std::vector<Agent *> killqueue;
 	
 	Scriptorium scriptorium;
 	Catalogue catalogue;

@@ -10,6 +10,7 @@ SOURCEDEPS = $(patsubst %.cpp,.deps/%.dpp,$(CXXFILES)) \
 
 OPENC2E = \
 	Agent.o \
+	AgentRef.o \
 	attFile.o \
 	blkImage.o \
 	c16Image.o \

@@ -23,6 +23,7 @@
 #include "openc2e.h"
 #include <string>
 #include <cassert>
+#include "AgentRef.h"
 
 class Agent;
 
@@ -37,8 +38,8 @@ class caosVar {
 		union {
 			int intValue;
 			float floatValue;
-			Agent *agent;
 		} values;
+		AgentRef agent;
 
 		std::string string;
 		// XXX: GET RID OF THIS
@@ -57,11 +58,19 @@ class caosVar {
 			values.intValue = 0;
 		}
 
-		caosVar(const caosVar &copyFrom) {
+		caosVar(const caosVar &copyFrom) : agent(copyFrom.agent) {
 			string = copyFrom.string;
 			type = copyFrom.type;
 			values = copyFrom.values;
 			vptr = copyFrom.vptr;
+		}
+
+		caosVar &operator=(const caosVar &copyFrom) {
+			string = copyFrom.string;
+			type = copyFrom.type;
+			values = copyFrom.values;
+			vptr = copyFrom.vptr;
+			agent = copyFrom.agent;
 		}
 
 		bool isEmpty() const { return type == NULLTYPE; }
@@ -73,7 +82,12 @@ class caosVar {
 		
 		void setInt(int i) { reset(); type = INTEGER; values.intValue = i; }
 		void setFloat(float i) { reset(); type = FLOAT; values.floatValue = i; }
-		void setAgent(Agent *i) { reset(); type = AGENT; values.agent = i; }
+		void setAgent(Agent *i) {
+			reset(); type = AGENT; agent = i;
+		}
+		void setAgent(const AgentRef &r) {
+			reset(); type = AGENT; agent = r;
+		}
 		void setString(const std::string &i) {
 			type = STRING;
 			string = i;
@@ -109,7 +123,12 @@ class caosVar {
 
 		Agent *getAgent() const {
 			caos_assert(hasAgent());
-			return values.agent;
+			return agent.get();
+		}
+
+		const AgentRef &getAgentRef() const {
+			caos_assert(hasAgent());
+			return agent;
 		}
 
 		// XXX: GET RID OF THIS

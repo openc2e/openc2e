@@ -128,8 +128,9 @@ void caosVM::v_OWNR() {
  return null (zero) agent
 */
 void caosVM::v_NULL() {
+	const static AgentRef nullref;
 	VM_VERIFY_SIZE(0)
-	result.setAgent(0);
+	result.setAgent(nullref);
 }
 
 /**
@@ -140,12 +141,12 @@ void caosVM::c_POSE() {
 	VM_PARAM_INTEGER(pose)
 
 	caos_assert(targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	if (c) {
 		CompoundPart *p = c->part(part);
 		p->setPose(pose);
 	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ);
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
 		caos_assert(a);
 		a->setPose(pose);
 	}
@@ -221,13 +222,13 @@ void caosVM::v_POSE() {
 
 	caos_assert(targ);
 
-	CompoundAgent *n = dynamic_cast<CompoundAgent *>(targ);
+	CompoundAgent *n = dynamic_cast<CompoundAgent *>(targ.get());
 	if (n) {
 		CompoundPart *p = n->part(part);
 		result.setInt(p->getPose());
 		// TODO
 	} else {
-		SimpleAgent *n = dynamic_cast<SimpleAgent *>(targ);
+		SimpleAgent *n = dynamic_cast<SimpleAgent *>(targ.get());
 		caos_assert(n);
 		result.setInt(n->getPose());
 	}
@@ -242,7 +243,7 @@ void caosVM::v_POSE() {
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
-	// TODO: KILL
+	a->kill();
 }
 
 /**
@@ -262,11 +263,11 @@ void caosVM::c_ANIM() {
 	caos_assert(targ);
 
 	SimpleAgent *a;
- 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+ 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	if (c) {
 		animation = &c->part(part)->animation;
 	} else {
-		a = dynamic_cast<SimpleAgent *>(targ);
+		a = dynamic_cast<SimpleAgent *>(targ.get());
 		caos_assert(a);
 		animation = &a->animation;
 	}
@@ -508,13 +509,13 @@ void caosVM::c_OVER() {
 
 	int fno, animsize;
 	
- 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+ 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	if (c) {
 		CompoundPart *p = c->part(part);
 		fno = p->getFrameNo();
 		animsize = p->animation.size();
 	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ);
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
 		caos_assert(a);
 		fno = a->getFrameNo();
 		animsize = a->animation.size();

@@ -23,14 +23,19 @@
 #include "creaturesImage.h"
 #include "SDLBackend.h"
 #include "caosVM.h" // caosVar and caosVM below
+#include "AgentRef.h"
 
 class Agent {
 	friend struct agentzorder;
 	friend class caosVM;
+	friend class AgentRef;
 
 protected:
 	caosVar var[100]; // OVxx
+	AgentRef self;
 	caosVM *vm;
+
+	void zotrefs();
 
 public:
 	bool carryable, mouseable, activateable, invisible, floatable;
@@ -47,13 +52,15 @@ public:
 	float x, y;
 
 	float range;
+
+	bool immortal, dying;
 	
 	void fireScript(unsigned short event);
 	void moveTo(float, float);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
-	virtual ~Agent() { }
+	virtual ~Agent();
 
 	virtual void setAttributes(unsigned int attr) = 0;
 	virtual unsigned int getAttributes() = 0;
@@ -62,6 +69,7 @@ public:
 
 	virtual void tick();
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
+	virtual void kill();
 };
 
 struct agentzorder {

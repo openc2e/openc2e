@@ -41,11 +41,13 @@ caosVM *World::getVM(Agent *a) {
 		caosVM *x = vmpool.back();
 		vmpool.pop_back();
 		x->setOwner(a);
+		x->freed = false;
 		return x;
 	}
 }
 
 void World::freeVM(caosVM *v) {
+	if (v->freed) return;
 	v->setOwner(0);
 	vmpool.push_back(v);
 }
@@ -57,6 +59,12 @@ void World::addAgent(Agent *a) {
 void World::tick() {
 	for (std::multiset<Agent *, agentzorder>::iterator i = agents.begin(); i != agents.end(); i++) {
 		(**i).tick();
+	}
+	while (killqueue.size()) {
+		Agent *rip = killqueue.back();
+		killqueue.pop_back();
+		agents.erase(rip);
+		delete rip;
 	}
 	// todo: tick rooms
 }

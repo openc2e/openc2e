@@ -32,8 +32,8 @@ void caosVM::c_CABN() {
 	VM_PARAM_INTEGER(top)
 	VM_PARAM_INTEGER(left)
 
-	assert(targ); // TODO: check it's a Vehicle
-	((Vehicle *)targ)->setCabinRect(left, top, right, bottom);
+	caos_assert(targ); // TODO: check it's a Vehicle
+	((Vehicle *)targ.get())->setCabinRect(left, top, right, bottom);
 }
 
 /**
@@ -43,8 +43,8 @@ void caosVM::c_CABW() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(cap)
 
-	assert(targ); // TODO: check it's a Vehicle
-	((Vehicle *)targ)->setCapacity(cap);
+	caos_assert(targ); // TODO: check it's a Vehicle
+	((Vehicle *)targ.get())->setCapacity(cap);
 }
 
 /**

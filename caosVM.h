@@ -22,6 +22,7 @@
 
 #include "caosScript.h"
 #include <map>
+#include "AgentRef.h"
 
 //#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
@@ -36,13 +37,13 @@ protected:
 	std::vector<unsigned int> linestack;
 	std::vector<unsigned int> repstack;
 	std::map<unsigned int, unsigned int> enumdata;
-	bool locked, noschedule;
+	bool locked, noschedule, stopping;
 	unsigned int blockingticks;
 
 	// ...which includes variables accessible to script
 	caosVar var[100]; // might want to make this a map, for memory efficiency
 	caosVar _p_[2]; // might want to add this onto the end of above map, if done
-	Agent *targ, *owner, *_it_;
+	AgentRef targ, owner, _it_;
 	unsigned int part;
 	
 	void resetScriptState(); // resets everything except OWNR
@@ -57,7 +58,8 @@ protected:
 	void jumpToAfterEquivalentNext();
 
 public:
-	void setTarg(Agent *a) { targ = a; part = 0; }
+	bool freed; // XXX: accessors?
+	void setTarg(const AgentRef &a) { targ = a; part = 0; }
 	void setVariables(caosVar &one, caosVar &two) { _p_[0] = one; _p_[1] = two; }
 	void setOwner(Agent *a) { owner = a; }
 
@@ -323,9 +325,11 @@ public:
 	caosVar internalRun(std::list<token> &tokens, bool first); // run a command, as represented by tokens
 	void runEntirely(script &s);
 	void tick();
+	void stop();
+	void halt();
 	void fireScript(script &s, bool nointerrupt);
 
-	caosVM(Agent *o);
+	caosVM(const AgentRef &o);
 
 	friend void setupCommandPointers();
 };

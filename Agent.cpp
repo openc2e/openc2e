@@ -29,6 +29,18 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   accg = 0.3f;
   range = 0; // XXX: find out what CEE actually uses
   sufferphysics = false;
+  self.ref = this;
+  self.next = self.prev = &self;
+  immortal = dying = false;
+}
+
+Agent::~Agent() {
+	assert(!immortal);
+	if (vm) {
+		world.freeVM(vm);
+		vm = NULL;
+	}
+	zotrefs();
 }
 
 void Agent::moveTo(float _x, float _y) {
@@ -36,6 +48,8 @@ void Agent::moveTo(float _x, float _y) {
 }
 
 void Agent::fireScript(unsigned short event) {
+	if (dying) return;
+
 	script &s = world.scriptorium.getScript(family, genus, species, event);
 	if (s.lines.empty()) return;
 	if (!vm) vm = world.getVM(this);
@@ -53,6 +67,8 @@ void Agent::fireScript(unsigned short event) {
 }
 
 void Agent::tick() {
+	if (dying) return;
+
 	if (sufferphysics && accg) {
 		float newvely = vely.floatValue + accg;
 		float destx = x + velx.floatValue;
@@ -105,6 +121,21 @@ void Agent::tick() {
 		}
 	}
 
-	if (vm) vm->tick();
+	if (vm)
+		vm->tick();
 }
 
+void Agent::kill() {
+	if (immortal)
+		return;
+	dying = true; // what a world, what a world...
+	if (vm)
+		vm->halt();
+	zotrefs();
+	world.killqueue.push_back(this);
+}
+
+void Agent::zotrefs() {
+	while (self.next != &self)
+		self.next->clear();
+}

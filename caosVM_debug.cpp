@@ -119,7 +119,7 @@ void caosVM::c_TEST_FINI() {
 void caosVM::v_UNID() {
 	VM_VERIFY_SIZE(0)
 	assert(targ);
-	result.setInt((int)targ); // TODO: pointers are no good, AGNT needs to be able to detect deletion!
+	result.setInt((int)targ.get()); // TODO: pointers are no good, AGNT needs to be able to detect deletion!
 }
 
 /**

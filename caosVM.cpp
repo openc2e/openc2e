@@ -22,10 +22,12 @@
 #include "World.h"
 #include <iostream>
 
-caosVM::caosVM(Agent *o) {
+caosVM::caosVM(const AgentRef &o) {
 	setOwner(o);
 	setTarg(owner);
 	resetScriptState();
+	freed = false;
+	stopping = false;
 }
 
 bool handleComparison(caosVar &one, caosVar &two, comparisonType compare) {
@@ -172,16 +174,13 @@ void caosVM::tick() {
 	if (blockingticks) { blockingticks--; return; }
 	unsigned int n = 0;
 	// run 5 lines per tick
-	while ((currentline < currentscript->lines.size()) && (noschedule || n < 5)) {
+	while (!stopping && (currentline < currentscript->lines.size()) && (noschedule || n < 5)) {
 		runCurrentLine();
 		if (blocking) return; // todo: should we check for noschedule/etc?
 		n++;
 	}
 	if (currentline == currentscript->lines.size()) {
-		currentscript = 0;
-		owner->vm = 0;
-		world.freeVM(this);
-		locked = false;
+		stop();
 	}
 }
 
@@ -202,4 +201,17 @@ void caosVM::runCurrentLine() {
 	/* Generally, we want to proceed to the next line. Sometimes, opcodes will change the
 		current line from under us, and in those instances, we should leave it alone. */
 	if ((currentline == i) && (!blocking)) currentline++;
+}
+
+void caosVM::stop() {
+	currentscript = NULL;
+	currentscript = 0;
+	if (owner)
+		owner->vm = 0;
+	world.freeVM(this);
+	locked = false;
+}
+
+void caosVM::halt() {
+	stopping = true;
 }
