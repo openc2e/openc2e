@@ -42,7 +42,7 @@ creaturesImage *imageGallery::getImage(std::string name) {
 		filename = "./data/Images/" + name + ".s16";
 		in.clear();
 		in.open(filename.c_str());
-		if (!in.is_open()) {
+		if (!in.is_open()) { // final try: this might be in the format 'name.blk'
 			in.clear();
 			filename = "./data/Backgrounds/" + name;
 			in.open(filename.c_str());
