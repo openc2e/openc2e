@@ -94,31 +94,44 @@ void Agent::tick() {
 
 			bool c = p.collidePoints(x + (getWidth() / 2), y + getHeight(), destx + (getWidth() / 2), desty + getHeight(),
 					r1->x_left, r1->y_left_floor, r1->x_right, r1->y_right_floor);
-			
+		
+			bool hitfloor = false;
 			if (c) {
 				destx = p.getCollisionX() - (getWidth() / 2);
 				desty = p.getCollisionY() - getHeight();
+				if (desty != y) hitfloor = true;
 			}
 
 			r1 = world.map.roomAt(destx, desty);
-			r2 = world.map.roomAt(destx + getWidth(), desty + getHeight());
+			r2 = world.map.roomAt(destx + getWidth() - 1, desty + getHeight() - 1);
 
-			if ((r1 && r2)) {
+			if (r1 && r2) {
+				// quick hack to see if we can travel to the next room
 				bool hacked = false;
-				if (r1 != r2) // quick hack
+				if (r1 != r2)
 					for (std::vector<std::pair<unsigned int, Room *> >::iterator i = r1->neighbours.begin(); i != r1->neighbours.end(); i++) {
 						if ((i->second == r2) && (i->first == 100)) { // check for PERM=100
-							moveTo(destx, desty + 1);
+							moveTo(destx, desty + 2);
 							vely.setFloat(newvely);
 							hacked = true;
 						}
 					}
 				if (!hacked) {
+					// okay, we can't travel to the next room.
 					moveTo(destx, desty);
+					// this is supposed to only fire if we hit the floor, but it's sort of iffy
 					vely.setFloat(newvely);
+					if (hitfloor) {
+						fireScript(6); // script Collision
+						if (vm) vm->setVariables(velx, vely);
+					}
+					// then set vely to 0 so we don't do stupid things
+					vely.setFloat(0);
 				}
-			} else
+			} else {
+				// we're not in the room system..
 				vely.setFloat(0);
+			}
 		}
 	} else {
 		if (vely.hasDecimal())
