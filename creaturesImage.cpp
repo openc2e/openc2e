@@ -21,6 +21,7 @@
 #include "c16Image.h"
 #include "blkImage.h"
 #include "openc2e.h"
+#include "fileSwapper.h"
 #include <iostream>
 #include <fstream>
 
@@ -44,8 +45,20 @@ creaturesImage *imageGallery::getImage(std::string name) {
 		in.open(filename.c_str());
 		if (!in.is_open()) { // final try: this might be in the format 'name.blk'
 			in.clear();
+#ifdef __C2E_LITTLEENDIAN
 			filename = "./data/Backgrounds/" + name;
+#else
+			filename = "./data/Backgrounds/" + name + ".big";
+#endif
 			in.open(filename.c_str());
+#ifdef __C2E_BIGENDIAN
+			if (!in.is_open()) {
+				fileSwapper f;
+				f.convertblk("./data/Backgrounds/", name);
+				in.clear();
+				in.open(filename.c_str());
+			}
+#endif
 			assert(in.is_open());
 			std::cout << "imageGallery: opened " << filename << "\n";
 			gallery[name] = new blkImage(in);

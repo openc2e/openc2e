@@ -17,8 +17,8 @@
  *
  */
 
+#include "openc2e.h"
 #include "blkImage.h"
-#include <assert.h>
 #include <iostream>
 
 void blkImage::readHeader(std::istream &in) {
@@ -51,15 +51,15 @@ void blkImage::writeHeader(std::ostream &s) {
 	w = swapEndianShort(w); s.write((char *)&w, 2);
 	w = totalheight / 128; assert(w * 128 == totalheight);
 	w = swapEndianShort(w); s.write((char *)&w, 2);
-	w = m_numframes;
+	w = m_numframes; assert(m_numframes == (unsigned int) ((totalwidth / 128) * (totalheight / 128)));
 	w = swapEndianShort(w); s.write((char *)&w, 2);
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		dw = offsets[i] - 4;
 		dw = swapEndianLong(dw); s.write((char *)&dw, 4);
-		w = widths[i];
+		w = widths[i]; assert(w == 128);
 		w = swapEndianShort(w); s.write((char *)&w, 2);
-		w = heights[i];
+		w = heights[i]; assert(w == 128);
 		w = swapEndianShort(w); s.write((char *)&w, 2);
 	}
 }
@@ -73,9 +73,6 @@ blkImage::blkImage(std::istream &in) {
 		in.seekg(offsets[i], std::ios::beg);
 		buffers[i] = new uint16[128 * 128];
 		in.read((char *)buffers[i], 128 * 128 * 2);
-		for (unsigned int k = 0; k < 128 * 128; k++) {
-			((unsigned short *)buffers[i])[k] = swapEndianShort(((unsigned short *)buffers[i])[k]);
-		}
 	}
 
   delete[] offsets;
