@@ -26,7 +26,6 @@ caosVM::caosVM(const AgentRef &o) {
 	setOwner(o);
 	setTarg(owner);
 	resetScriptState();
-	stopping = false;
 }
 
 bool handleComparison(caosVar &one, caosVar &two, comparisonType compare) {
@@ -173,10 +172,11 @@ void caosVM::tick() {
 	if (blockingticks) { blockingticks--; return; }
 	unsigned int n = 0;
 	// run 5 lines per tick
-	while (!stopping && (currentline < currentscript->lines.size()) && (noschedule || n < 5)) {
+	while ((currentline < currentscript->lines.size()) && (noschedule || n < 5)) {
 		runCurrentLine();
 		if (blocking) return; // todo: should we check for noschedule/etc?
 		n++;
+		if (!currentscript) return;
 	}
 	if (currentline == currentscript->lines.size()) {
 		stop();
@@ -203,7 +203,6 @@ void caosVM::runCurrentLine() {
 }
 
 void caosVM::stop() {
-	currentscript = NULL;
 	currentscript = 0;
 	if (owner)
 		owner->vm = 0;
@@ -211,6 +210,3 @@ void caosVM::stop() {
 	locked = false;
 }
 
-void caosVM::halt() {
-	stopping = true;
-}

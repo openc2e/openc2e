@@ -37,7 +37,7 @@ protected:
 	std::vector<unsigned int> linestack;
 	std::vector<unsigned int> repstack;
 	std::map<unsigned int, unsigned int> enumdata;
-	bool locked, noschedule, stopping;
+	bool locked, noschedule;
 	unsigned int blockingticks;
 
 	// ...which includes variables accessible to script
@@ -325,7 +325,6 @@ public:
 	void runEntirely(script &s);
 	void tick();
 	void stop();
-	void halt();
 	void fireScript(script &s, bool nointerrupt);
 
 	caosVM(const AgentRef &o);

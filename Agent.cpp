@@ -131,7 +131,7 @@ void Agent::kill() {
 		return;
 	dying = true; // what a world, what a world...
 	if (vm)
-		vm->halt();
+		vm->stop();
 	zotrefs();
 	world.killqueue.push_back(this);
 }
