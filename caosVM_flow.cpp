@@ -30,7 +30,7 @@ void caosVM::jumpToAfterEquivalentNext() {
 	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		token front = currentscript->lines[i].front();
 		if (front.cmd == enu) {
-			stack++
+			stack++;
 		} else if (front.cmd == next) {
 			if (stack) stack--;
 			else {

@@ -113,7 +113,9 @@
 		};
 		29B97315FDCFA39411CA2CEA = {
 			children = (
+				E711E00807481ADC00EDF13D,
 				E7F12847072C47750023ADBD,
+				E711E00507481ADC00EDF13D,
 				E7F12848072C47750023ADBD,
 				E7004F61065F8FBE000FB224,
 				E777176306AF0E8C00507FAF,
@@ -186,6 +188,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "/usr/local/include/boost-1_31/";
 				OPTIMIZATION_CFLAGS = "-O0";
 				ZERO_LINK = NO;
 			};
@@ -226,6 +229,8 @@
 		};
 		E7004EE7065F8143000FB224 = {
 			children = (
+				E711E01007481AF700EDF13D,
+				E711E00F07481AEB00EDF13D,
 				E7004EF9065F8199000FB224,
 				E7659A9406B2DEC700A0CA58,
 				E7659A9506B2DEC700A0CA58,
@@ -283,6 +288,110 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
+		E711E00307481ADC00EDF13D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = Catalogue.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E711E00407481ADC00EDF13D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = Catalogue.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E711E00507481ADC00EDF13D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = exceptions.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E711E00607481ADC00EDF13D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = genome.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E711E00707481ADC00EDF13D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = genomeFile.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E711E00807481ADC00EDF13D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = streamutils.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E711E00907481ADC00EDF13D = {
+			fileRef = E711E00307481ADC00EDF13D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E711E00A07481ADC00EDF13D = {
+			fileRef = E711E00407481ADC00EDF13D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E711E00B07481ADC00EDF13D = {
+			fileRef = E711E00507481ADC00EDF13D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E711E00C07481ADC00EDF13D = {
+			fileRef = E711E00607481ADC00EDF13D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E711E00D07481ADC00EDF13D = {
+			fileRef = E711E00707481ADC00EDF13D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E711E00E07481ADC00EDF13D = {
+			fileRef = E711E00807481ADC00EDF13D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E711E00F07481AEB00EDF13D = {
+			children = (
+				E711E00307481ADC00EDF13D,
+				E711E00407481ADC00EDF13D,
+			);
+			isa = PBXGroup;
+			name = "catalogue classes";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E711E01007481AF700EDF13D = {
+			children = (
+				E711E00607481ADC00EDF13D,
+				E711E00707481ADC00EDF13D,
+			);
+			isa = PBXGroup;
+			name = "genome classes";
+			refType = 4;
+			sourceTree = "<group>";
+		};
 		E748CFD2066538E000BF1F9A = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
@@ -306,7 +415,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-Wall";
-				OTHER_LDFLAGS = "-framework SDL";
+				OTHER_LDFLAGS = "-lboost_filesystem -framework SDL";
 				PRODUCT_NAME = openc2e;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
@@ -350,6 +459,9 @@
 				E7F127FF072C2C200023ADBD,
 				E7F12849072C47750023ADBD,
 				E7B0D7E7073BD6F6005B376D,
+				E711E00A07481ADC00EDF13D,
+				E711E00B07481ADC00EDF13D,
+				E711E00C07481ADC00EDF13D,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -535,6 +647,9 @@
 				E7F127FD072C2C090023ADBD,
 				E7F1284A072C47750023ADBD,
 				E7B0D7E8073BD6F6005B376D,
+				E711E00907481ADC00EDF13D,
+				E711E00D07481ADC00EDF13D,
+				E711E00E07481ADC00EDF13D,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

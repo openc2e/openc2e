@@ -3,7 +3,7 @@
 #include <iostream>
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
-#include "boost/filesystem/fstream.hpp"
+#include "boost/filesystem/exception.hpp"
 #include "boost/filesystem/convenience.hpp"
 
 #include "World.h"
@@ -55,16 +55,21 @@ extern "C" int main(int argc, char *argv[]) {
 
 	setupCommandPointers();
 	world.init();
-
-	std::string dir = "data/Bootstrap/001 World/";
-	if (argc > 1) dir = argv[1];
+	world.catalogue.initFrom("data/Catalogue/");
 
 	std::vector<std::string> scripts;
+	fs::path scriptdir((argc > 1 ? argv[1] : "data/Bootstrap/001 World/"), fs::native);
 
+	assert(fs::exists(scriptdir));
+	assert(fs::is_directory(scriptdir));
 	fs::directory_iterator fsend;
-	for (fs::directory_iterator i(dir); i != fsend; ++i) {
-		if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
-			scripts.push_back(i->native_file_string());
+	for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
+		try {
+			if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
+				scripts.push_back(i->native_file_string());
+		} catch (fs::filesystem_error &ex) {
+			std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+		}
 	}
 
 	sort(scripts.begin(), scripts.end());
@@ -89,7 +94,7 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 
 	if (world.map.getMetaRoomCount() == 0) {
-		std::cerr << "\nNo metarooms found in given directory (" << dir << "), exiting.\n";
+		std::cerr << "\nNo metarooms found in given directory (" << scriptdir.native_directory_string() << "), exiting.\n";
 		return 0;
 	}
 

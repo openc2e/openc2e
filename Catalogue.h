@@ -6,7 +6,8 @@
 #include "boost/filesystem/path.hpp"
 
 class Catalogue {
-protected:
+//protected:
+public:
 	std::map<std::string, std::vector<std::string> > data;
 
 public:

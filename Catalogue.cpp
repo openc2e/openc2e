@@ -103,6 +103,8 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 
 		// somewhere we need to check: if (arraysize != 0) assert(arraysize == x->size());
 	}
+	
+	return s;
 }
 
 void Catalogue::reset() {
@@ -117,16 +119,20 @@ void Catalogue::initFrom(boost::filesystem::path path) {
 
 	fs::directory_iterator end;
 	for (fs::directory_iterator i(path); i != end; ++i) {
-		if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".catalogue")) {
-			std::string x = fs::basename(*i);
-			// TODO: '-en-GB' exists too, this doesn't work for that
-			if ((x.size() > 3) && (x[x.size() - 3] == '-')) {
-				// TODO: this is NOT how we should do it
-				continue; // skip all localised files
+		try {
+			if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".catalogue")) {
+				std::string x = fs::basename(*i);
+				// TODO: '-en-GB' exists too, this doesn't work for that
+				if ((x.size() > 3) && (x[x.size() - 3] == '-')) {
+					// TODO: this is NOT how we should do it
+					continue; // skip all localised files
+				}
+				std::cout << "Catalogue file '" << x << "' being read" << std::endl;
+				fs::ifstream f(*i);
+				f >> *this;
 			}
-			std::cout << "Catalogue file '" << x << "' being read" << std::endl;
-			fs::ifstream f(*i);
-			f >> *this;
+		} catch (const std::exception &ex) {
+			std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
 		}
 	}	
 }

@@ -20,6 +20,7 @@
 #include "Map.h"
 #include "Agent.h"
 #include "Scriptorium.h"
+#include "Catalogue.h"
 #include <set>
 #include <map>
 
@@ -39,6 +40,7 @@ public:
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 
 	Scriptorium scriptorium;
+	Catalogue catalogue;
 
 	void addAgent(Agent *a);
 	Agent *agentAt(unsigned int x, unsigned int y);
