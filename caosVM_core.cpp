@@ -51,6 +51,9 @@ void caosVM::c_DBG_OUTV() {
 	}
 }	
 
+/**
+ OUTS (command) val (string)
+*/
 void caosVM::c_OUTS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(val)
@@ -58,6 +61,9 @@ void caosVM::c_OUTS() {
 	cout << val;
 }
 
+/**
+ OUTV (command) val (decimal)
+*/
 void caosVM::c_OUTV() {
   VM_VERIFY_SIZE(1)
 	VM_PARAM_DECIMAL(val)

@@ -72,6 +72,9 @@ void caosVM::c_WAIT() {
 	cerr << "unimplemented: WAIT\n";
 }
 
+/**
+ STOP (command)
+*/
 void caosVM::c_STOP() {
 	VM_VERIFY_SIZE(0)
 	currentline = currentscript->lines.size();

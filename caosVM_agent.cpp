@@ -61,7 +61,9 @@ void caosVM::c_NEW_SIMP() {
 	targ.reset();
 	targ.setAgent(a);
 }
-
+/**
+ NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
+*/
 void caosVM::c_NEW_COMP() {
 	VM_VERIFY_SIZE(7)
 	VM_PARAM_INTEGER(plane)
@@ -129,12 +131,18 @@ void caosVM::v_ATTR() {
 	result.setInt(targ.agentValue->getAttributes());
 }
 
+/**
+ TICK (command) tickrate (integer)
+*/
 void caosVM::c_TICK() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(tickrate)
 	cerr << "unimplemented: TICK\n";
 }
 
+/**
+ BHVR (command) bhvr (integer)
+*/
 void caosVM::c_BHVR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(bhvr)
@@ -153,6 +161,9 @@ void caosVM::c_TARG() {
 	targ.setAgent(a);
 }
 
+/**
+ FROM (agent)
+*/
 void caosVM::v_FROM() {
 	VM_VERIFY_SIZE(0)
 	result.setAgent(0);
@@ -174,7 +185,7 @@ void caosVM::c_KILL() {
 }
 
 /**
- NEXT (command
+ NEXT (command)
 */
 void caosVM::c_NEXT() {
 	VM_VERIFY_SIZE(0)
@@ -193,6 +204,9 @@ void caosVM::c_SCRX() {
 	cerr << "unimplemented: SCRX\n";
 }
 
+/**
+ ANIM (command) poselist (byte-string)
+*/
 void caosVM::c_ANIM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(poselist)
@@ -237,11 +251,17 @@ void caosVM::c_BASE() {
 	cerr << "unimplemented: BASE\n";
 }
 
+/**
+ BASE (integer)
+*/
 void caosVM::v_BASE() {
 	VM_VERIFY_SIZE(0)
 	cerr << "unimplemented: BASE\n";
 }
 
+/**
+ BHVR (integer)
+*/
 void caosVM::v_BHVR() {
 	VM_VERIFY_SIZE(0)
 	cerr << "unimplemented: BHVR\n";

@@ -19,6 +19,9 @@
 
 #include "caosVM.h"
 
+/**
+ PART (command) part_id (integer)
+*/
 void caosVM::c_PART() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part_id)

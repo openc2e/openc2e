@@ -178,7 +178,7 @@ void caosVM::v_RAND() {
 	// todo: we should call srand at the start of our code somewhere
 }
 
-/*
+/**
  REAF (command)
 
  reread catalogue files

@@ -76,6 +76,9 @@ void caosVM::c_MAPK() {
 	world.map.Reset();
 }
 
+/**
+ ADDR (integer) metaroomid (integer) x_left (integer) x_right (integer) y_left_ceiling (integer) y_right_ceiling (integer) y_left_floor (integer) y_right_floor (integer)
+*/
 void caosVM::v_ADDR() {
 	VM_VERIFY_SIZE(7)
 	VM_PARAM_INTEGER(y_right_floor)
@@ -96,6 +99,9 @@ void caosVM::v_ADDR() {
 	result.setInt(world.map.getMetaRoom(metaroomid)->addRoom(r));
 }
 
+/**
+ RTYP (command) roomid (integer) roomtype (integer)
+*/
 void caosVM::c_RTYP() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(roomtype)
@@ -104,6 +110,9 @@ void caosVM::c_RTYP() {
 	room->type = roomtype;
 }
 
+/**
+ DOOR (command) room1 (integer) room2 (integer) perm (integer)
+*/
 void caosVM::c_DOOR() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(perm)
@@ -115,6 +124,9 @@ void caosVM::c_DOOR() {
 	cout << "unimplemented: DOOR\n";
 }
 
+/**
+ RATE (command) roomtype (integer) caindex (integer) gain (float) loss (float) diffusion (float)
+*/
 void caosVM::c_RATE() {
 	VM_VERIFY_SIZE(5)
 	VM_PARAM_FLOAT(diffusion)

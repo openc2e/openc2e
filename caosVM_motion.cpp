@@ -23,12 +23,18 @@
 #include <iostream>
 using std::cerr;
 
+/**
+ ELAS (command) elas (integer)
+*/
 void caosVM::c_ELAS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(elas)
 	cerr << "unimplemented: ELAS\n";
 }
 
+/**
+ MVTO (command) x (integer) y (integer)
+*/
 void caosVM::c_MVTO() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
