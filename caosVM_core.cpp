@@ -54,6 +54,7 @@ void caosVM::c_OUTV() {
 	VM_PARAM_DECIMAL(val)
 
 	if (val.hasFloat()) {
+		// TODO: DS spits things like '4.000000' and '-5.000000', we don't
 		cout << val.floatValue;
 	} else {
 		cout << val.intValue;
