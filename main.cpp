@@ -1,8 +1,10 @@
 #include <fstream>
 #include "openc2e.h"
 #include <iostream>
-#include <dirent.h>
-#include <sys/stat.h>
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/path.hpp"
+#include "boost/filesystem/fstream.hpp"
+#include "boost/filesystem/convenience.hpp"
 
 #include "World.h"
 #include "SimpleAgent.h"
@@ -46,28 +48,24 @@ void drawWorld() {
 	SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
 }
 
+namespace fs = boost::filesystem;
+
 extern "C" int main(int argc, char *argv[]) {
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004 Alyssa Milburn\n\n";
 
 	setupCommandPointers();
 	world.init();
 
-	char *dir = "data/Bootstrap/001 World/";
+	std::string dir = "data/Bootstrap/001 World/";
 	if (argc > 1) dir = argv[1];
 
 	std::vector<std::string> scripts;
 
-	DIR *dirh;
-	dirh = opendir(dir);
-	assert(dirh);
-	for (dirent *dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
-		std::string fname = std::string(dir) + dirp->d_name;
-		struct stat buf;
-		stat(fname.c_str(), &buf);
-		if (S_ISREG(buf.st_mode))
-			scripts.push_back(fname);
+	fs::directory_iterator fsend;
+	for (fs::directory_iterator i(dir); i != fsend; ++i) {
+		if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
+			scripts.push_back(i->native_file_string());
 	}
-	closedir(dirh);
 
 	sort(scripts.begin(), scripts.end());
 	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
