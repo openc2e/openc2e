@@ -25,6 +25,10 @@ using std::cout;
  MMSC (command) x (integer) y (integer) track_name (string)
 */
 void caosVM::c_MMSC() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_STRING(track_name)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
 	cout << "unimplemented: MMSC\n";
 }
 
@@ -32,7 +36,11 @@ void caosVM::c_MMSC() {
  MMSC (string) x (integer) y (integer)
 */
 void caosVM::v_MMSC() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
 	cout << "unimplemented: MMSC\n";
+	result.setString("");
 }
 
 /**
@@ -50,5 +58,9 @@ void caosVM::c_RMSC() {
  MMSC (string) x (integer) y (integer)
 */
 void caosVM::v_RMSC() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
 	cout << "unimplemented: RMSC\n";
+	result.setString("");
 }
