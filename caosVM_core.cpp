@@ -30,7 +30,20 @@ void caosVM::c_OUTS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(val)
 
-	cout << val;
+	// TODO
+	for (unsigned int i = 0; i < val.size(); i++) {
+		if (val[i] == '\\') {
+			assert((i + 1) < val.size());
+			i++;
+			if (val[i] == 'n') {
+				cout << '\n';
+			} else {
+				cout << val[i];
+			}
+		} else {
+			cout << val[i];
+		}
+	}
 }
 
 /**

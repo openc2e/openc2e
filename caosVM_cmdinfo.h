@@ -30,6 +30,8 @@
 	tmp->notokens = y; tmp->name = cmdname; tmp->method = &caosVM::c_ ## x; } */
 #define FUNCDEF(x, y) { cmdinfo *tmp = &funcs[phash_func(*((int *)#x))]; \
 	tmp->notokens = y; tmp->name = #x; tmp->method = &caosVM::v_ ## x; }
+#define FUNCDEFHACK(x, y, n) { cmdinfo *tmp = &funcs[phash_func(*((int *)#x))]; \
+	tmp->notokens = y; tmp->name = #x; tmp->method = &caosVM::v_ ## n; }
 #define DBLCMD(x, y, z) { cmdinfo n(std::string(x), z, false, &caosVM::c_ ## y); \
 	doublecmds.push_back(n); }
 #define DBLFUNC(x, y, z) { cmdinfo n(std::string(x), z, false, &caosVM::v_ ## y); \

@@ -32,6 +32,10 @@ sub writedata {
 	die("unknown type $type passed to writedata") if ($type != 1) && ($type != 2);
 	
 	if ($newname eq $name) {
+		if ($name eq "_UP_") {
+			$data = $data . "FUNCDEFHACK(_UP_, 0, UP)\n";
+			return;
+		}
 		$data = $data . "CMDDEF(" . $name if ($type == 1);
 		$data = $data . "FUNCDEF(" . $name if ($type == 2);
 		$count = 0 if $docline =~ /condition/;

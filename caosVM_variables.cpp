@@ -344,3 +344,15 @@ void caosVM::v_TAN_() {
 	
 	result.setFloat(tan(x));
 }
+
+/**
+ SQRT (float) v (float)
+ 
+ returns square root of v
+*/
+void caosVM::v_SQRT() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(x)
+	
+	result.setFloat(sqrt(x));
+}

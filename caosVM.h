@@ -110,6 +110,7 @@ public:
 	void v_COS_();
 	void v_SIN_();
 	void v_TAN_();
+	void v_SQRT();
 
 	// flow
 	void c_DOIF();
