@@ -5,7 +5,6 @@
 
 int main(int argc, char **argv) {
 	bool outputfiles = false, notags = false, usageerror = false;
-	cerr << "praydumper, part of openc2e, copyright (c) 2004 Alyssa Milburn" << endl << endl;
 	int ch;
 	while ((ch = getopt(argc, argv, "on")) != -1) {
 		switch (ch) {
