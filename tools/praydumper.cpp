@@ -10,17 +10,17 @@ int main(int argc, char **argv) {
 	}
 	ifstream input(argv[1]);
 	// todo: check input is valid
-	cout << "(!- praydumper-generated PRAY file from '" << argv[1] << "' -)" << endl;
+	cout << "(- praydumper-generated PRAY file from '" << argv[1] << "' -)" << endl;
 	cout << endl << "\"en-GB\"" << endl;
 	prayFile file;
 	input >> file;
 	cerr << "read PRAY file okay" << endl;
 
 	for (vector<block *>::iterator x = file.blocks.begin(); x != file.blocks.end(); x++) {
-		cout << endl << "group " << (*x)->blockname() << " \"" << (*x)->name() << "\"" << endl;
-
 		tagPrayBlock *b = dynamic_cast<tagPrayBlock *>(*x);
+
 		if (b) {
+			cout << endl << "group " << (*x)->blockname() << " \"" << (*x)->name() << "\"" << endl;
 			for (vector<pair<string, unsigned int> >::iterator y = b->intvalues.begin(); y != b->intvalues.end(); y++) {
 				cout << "\"" << y->first << "\" " << y->second << endl;
 			}
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 				cout << "\"" << y->first << "\" \"" << y->second << "\"" << endl;
 			}
 		} else {
-			cout << "inline " << (*x)->blockname() << " \"" << (*x)->name() << "\" \"" << (*x)->name() << "\"" << endl;	
+			cout << endl << "inline " << (*x)->blockname() << " \"" << (*x)->name() << "\" \"" << (*x)->name() << "\"" << endl;	
 		}
 	}
 }
