@@ -38,9 +38,12 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	
 	dying = false;
 	unid = -1;
+
+	world.agents.insert(this);
 }
 
 Agent::~Agent() {
+	world.agents.erase(zorder_iter);
 	if (vm)
 		world.freeVM(vm);
 	zotrefs();
@@ -168,6 +171,12 @@ void Agent::zotrefs() {
 		self.next->clear();
 }
 
+void Agent::setZOrder(unsigned int z) {
+	zorder = z;
+	world.agents.erase(zorder_iter);
+	world.agents.insert(this);
+}
+
 int Agent::getUNID() {
       if (unid != -1)
               return unid;
@@ -185,5 +194,9 @@ std::string Agent::identify() const {
 	else
 		o << " (no unid assigned)";
 	return o.str();
+}
+
+bool agentzorder::operator ()(const Agent *s1, const Agent *s2) const {
+	return s1->zorder < s2->zorder;
 }
 

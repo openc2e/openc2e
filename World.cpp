@@ -32,7 +32,6 @@ World::World() {
 void World::init() {
 	theHand = new SimpleAgent(2, 1, 1, UINT_MAX, 0, 0);
 	((SimpleAgent *)theHand)->setImage("hand");
-	addAgent(theHand);
 }
 
 caosVM *World::getVM(Agent *a) {
@@ -51,10 +50,6 @@ void World::freeVM(caosVM *v) {
 	vmpool.push_back(v);
 }
 
-void World::addAgent(Agent *a) {
-	agents.insert(a);
-}
-
 void World::tick() {
 	for (std::multiset<Agent *, agentzorder>::iterator i = agents.begin(); i != agents.end(); i++) {
 		(**i).tick();
@@ -64,10 +59,6 @@ void World::tick() {
 		killqueue.pop_back();
 		assert(rip->dying);
 		delete rip;
-		// agents.erase(rip) doesn't work for some annoying reason, it zaps everything at that zorder - fuzzie
-		for (std::multiset<Agent *, agentzorder>::iterator i = agents.begin(); i != agents.end(); i++)
-			if (*i == rip)
-				agents.erase(i);
 	}
 	// todo: tick rooms
 }

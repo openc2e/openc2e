@@ -24,11 +24,17 @@
 #include "SDLBackend.h"
 #include "caosVM.h" // caosVar and caosVM below
 #include "AgentRef.h"
+#include <set>
+
+struct agentzorder {
+	bool operator()(const class Agent *s1, const class Agent *s2) const;
+};
 
 class Agent {
 	friend struct agentzorder;
 	friend class caosVM;
 	friend class AgentRef;
+	friend class World;
 
 protected:
 	caosVar var[100]; // OVxx
@@ -37,7 +43,12 @@ protected:
 
 	void zotrefs();
 
+	bool dying;
 	int unid;
+	unsigned int zorder;
+	unsigned int tickssincelasttimer, timerrate;
+
+	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
 
 public:
 	bool carryable, mouseable, activateable, invisible, floatable;
@@ -46,8 +57,6 @@ public:
 	bool visible;
 	unsigned char family, genus;
 	unsigned short species;
-	unsigned int zorder;
-	unsigned int tickssincelasttimer, timerrate;
 	caosVar velx, vely; // XXX: should these be basic floats?
 	float accg, aero;
 	unsigned int friction;
@@ -55,8 +64,9 @@ public:
 
 	float range;
 
-	bool dying;
-	
+	float floatingx, floatinyy;
+	AgentRef floatingrelative;
+
 	void fireScript(unsigned short event);
 	void moveTo(float, float);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
@@ -73,14 +83,11 @@ public:
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	virtual void kill();
 
+	virtual void setZOrder(unsigned int plane);
+	virtual unsigned int getZOrder() const { return zorder; }
+
 	int getUNID();
 	std::string identify() const;
-};
-
-struct agentzorder {
-  bool operator()(const Agent *s1, const Agent *s2) const {
-    return s1->zorder < s2->zorder;
-  }
 };
 
 #endif

@@ -263,6 +263,9 @@ public:
 	void c_FCUS();
 
 	// creatures
+	void c_STIM_SHOU();
+	void c_STIM_SIGN();
+	void c_STIM_TACT();
 	void c_STIM_WRIT();
 	void c_SWAY_SHOU();
 	void c_ASLP();
@@ -272,6 +275,7 @@ public:
 	void v_HHLD();
 	void c_MVFT();
 	void c_CHEM();
+	void v_CREA();
 
 	// sounds
 	void c_SNDE();

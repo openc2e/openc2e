@@ -20,7 +20,47 @@
 #include "caosVM.h"
 #include <iostream>
 #include "openc2e.h"
+#include "Creature.h"
 using std::cerr;
+
+/**
+ STIM SHOU (command) stimulus (integer) strength (float)
+
+ send stimulus to all creatures who can hear OWNR
+*/
+void caosVM::c_STIM_SHOU() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_FLOAT(strength)
+	VM_PARAM_INTEGER(stimulus)
+	
+	// TODO
+}
+
+/**
+ STIM SIGN (command) stimulus (integer) strength (float)
+
+ send stimulus to all creatures who can see OWNR
+*/
+void caosVM::c_STIM_SIGN() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_FLOAT(strength)
+	VM_PARAM_INTEGER(stimulus)
+	
+	// TODO
+}
+
+/**
+ STIM TACT (command) stimulus (integer) strength (float)
+
+ send stimulus to all creatures who are touching OWNR
+*/
+void caosVM::c_STIM_TACT() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_FLOAT(strength)
+	VM_PARAM_INTEGER(stimulus)
+	
+	// TODO
+}
 
 /**
  STIM WRIT (command) creature (agent) stimulus (integer) strength (float)
@@ -143,3 +183,18 @@ void caosVM::c_CHEM() {
 
 	// TODO
 }
+
+/**
+ CREA (integer) agent (agent)
+
+ return 1 if agent is a creature, or 0 otherwise
+*/
+void caosVM::v_CREA() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_AGENT(agent)
+
+	Creature *c = dynamic_cast<Creature *>(agent);
+	if (c) result.setInt(1);
+	else result.setInt(0);
+}
+
