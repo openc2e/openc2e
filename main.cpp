@@ -108,7 +108,6 @@ extern "C" int main(int argc, char *argv[]) {
 	Uint32 initflags = SDL_INIT_VIDEO;
 	Uint8 video_bpp = 0;
 	Uint32 videoflags = SDL_SWSURFACE + SDL_RESIZABLE;
-	int done;
 	SDL_Event event;
 
 	if ( SDL_Init(initflags) < 0 ) {
@@ -149,12 +148,12 @@ extern "C" int main(int argc, char *argv[]) {
 	adjusty = world.map.getCurrentMetaRoom()->y();
 	drawWorld();
 
-	done = 0;
-	while ( !done ) {
+	bool done = false;
+	while (!done) {
 		world.tick();
 		drawWorld();
 
-		while ( SDL_PollEvent(&event) ) {
+		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:
 					screen = SDL_SetVideoMode(event.resize.w, event.resize.h, video_bpp, videoflags);
@@ -162,7 +161,6 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + adjustx, event.motion.y + adjusty);
-					// drawWorld();
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
@@ -188,7 +186,6 @@ extern "C" int main(int argc, char *argv[]) {
 							default:
 								break;
 						}
-						drawWorld();
 					}
 					break;
 				case SDL_QUIT:
