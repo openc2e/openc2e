@@ -20,7 +20,7 @@
 #include "World.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "SimpleAgent.h"
-#include <values.h> // for MAXINT
+#include <limits.h> // for MAXINT
 
 World world;
 
@@ -30,7 +30,7 @@ World::World() {
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
 void World::init() {
-	theHand = new SimpleAgent(2, 1, 1, MAXINT, 0, 0);
+	theHand = new SimpleAgent(2, 1, 1, UINT_MAX, 0, 0);
 	((SimpleAgent *)theHand)->setImage("hand");
 	addAgent(theHand);
 }

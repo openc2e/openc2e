@@ -162,6 +162,7 @@
 		};
 		29B97315FDCFA39411CA2CEA = {
 			children = (
+				E777176306AF0E8C00507FAF,
 				F5A47A9F01A0483001D3D55B,
 			);
 			isa = PBXGroup;
@@ -279,6 +280,9 @@
 				E7E67ACA066368D8004F1581,
 				E7E67B3906638B28004F1581,
 				E7E67B7A06638C7C004F1581,
+				E77716EA06AF0C9900507FAF,
+				E777176406AF0E8C00507FAF,
+				E77717D606AF0FF900507FAF,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -314,6 +318,19 @@
 				E7E67D2E0663A1CA004F1581,
 				E7E67D670664A76F004F1581,
 				E748CFD3066538E000BF1F9A,
+				E77716E706AF0C9900507FAF,
+				E77716EB06AF0C9900507FAF,
+				E77716ED06AF0C9900507FAF,
+				E77716EE06AF0C9900507FAF,
+				E77716F006AF0C9900507FAF,
+				E77716F106AF0C9900507FAF,
+				E77716F206AF0C9900507FAF,
+				E77716F306AF0C9900507FAF,
+				E77716F406AF0C9900507FAF,
+				E77716F506AF0C9900507FAF,
+				E777172B06AF0CEF00507FAF,
+				E77717D406AF0FF900507FAF,
+				E77717D506AF0FF900507FAF,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -408,6 +425,7 @@
 		};
 		E7004EF9065F8199000FB224 = {
 			children = (
+				E777172A06AF0CEF00507FAF,
 				E7004EEB065F8186000FB224,
 				E7004F04065F81B4000FB224,
 				E7004F05065F81B4000FB224,
@@ -471,6 +489,241 @@
 		};
 		E748CFD3066538E000BF1F9A = {
 			fileRef = E748CFD2066538E000BF1F9A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716D806AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_agent.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716DB06AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = caosVM_cmdinfo.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716DC06AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_compound.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716DE06AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_creatures.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716DF06AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_flow.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716E106AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_motion.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716E206AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_resources.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716E306AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_scripts.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716E406AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_sounds.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716E506AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_time.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716E606AF0C9900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_variables.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77716E706AF0C9900507FAF = {
+			fileRef = E77716D806AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716EA06AF0C9900507FAF = {
+			fileRef = E77716DB06AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716EB06AF0C9900507FAF = {
+			fileRef = E77716DC06AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716ED06AF0C9900507FAF = {
+			fileRef = E77716DE06AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716EE06AF0C9900507FAF = {
+			fileRef = E77716DF06AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716F006AF0C9900507FAF = {
+			fileRef = E77716E106AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716F106AF0C9900507FAF = {
+			fileRef = E77716E206AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716F206AF0C9900507FAF = {
+			fileRef = E77716E306AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716F306AF0C9900507FAF = {
+			fileRef = E77716E406AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716F406AF0C9900507FAF = {
+			fileRef = E77716E506AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77716F506AF0C9900507FAF = {
+			fileRef = E77716E606AF0C9900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E777172A06AF0CEF00507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = creaturesImage.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E777172B06AF0CEF00507FAF = {
+			fileRef = E777172A06AF0CEF00507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E777176306AF0E8C00507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = openc2e.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E777176406AF0E8C00507FAF = {
+			fileRef = E777176306AF0E8C00507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77717C506AF0FDA00507FAF = {
+			children = (
+				E77717D106AF0FF900507FAF,
+				E77717D206AF0FF900507FAF,
+				E77717D306AF0FF900507FAF,
+			);
+			isa = PBXGroup;
+			name = "cmdinfo-generated";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77717D106AF0FF900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosdata.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77717D206AF0FF900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caoshashes.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77717D306AF0FF900507FAF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = caoshashes.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E77717D406AF0FF900507FAF = {
+			fileRef = E77717D106AF0FF900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77717D506AF0FF900507FAF = {
+			fileRef = E77717D206AF0FF900507FAF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E77717D606AF0FF900507FAF = {
+			fileRef = E77717D306AF0FF900507FAF;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -776,13 +1029,25 @@
 		};
 		E7E67AC4066368CA004F1581 = {
 			children = (
-				E7E67AC8066368D8004F1581,
-				E7E67D660664A76F004F1581,
+				E77717C506AF0FDA00507FAF,
 				E7E67AC9066368D8004F1581,
-				E748CFD2066538E000BF1F9A,
+				E7E67AC8066368D8004F1581,
+				E77716D806AF0C9900507FAF,
 				E7E67D2D0663A1CA004F1581,
-				E7E67CFC0663A111004F1581,
+				E748CFD2066538E000BF1F9A,
+				E77716DB06AF0C9900507FAF,
+				E77716DC06AF0C9900507FAF,
 				E7E67CD30663A05B004F1581,
+				E77716DE06AF0C9900507FAF,
+				E77716DF06AF0C9900507FAF,
+				E7E67CFC0663A111004F1581,
+				E77716E106AF0C9900507FAF,
+				E77716E206AF0C9900507FAF,
+				E77716E306AF0C9900507FAF,
+				E77716E406AF0C9900507FAF,
+				E77716E506AF0C9900507FAF,
+				E77716E606AF0C9900507FAF,
+				E7E67D660664A76F004F1581,
 			);
 			isa = PBXGroup;
 			name = "caos classes";

@@ -38,13 +38,13 @@ blkImage::blkImage(std::istream &in) {
 	buffers = new void *[m_numframes];
 	uint32 *offsets = new uint32 [m_numframes];
 
-	for (int i = 0; i < m_numframes; i++) {
+	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]) + 4;
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]); assert(widths[i] == 128);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]); assert(heights[i] == 128);
 	}
 
-	for (int i = 0; i < m_numframes; i++) {
+	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.seekg(offsets[i], std::ios::beg);
 		buffers[i] = new uint16[128 * 128];
 		in.read((char *)buffers[i], 128 * 128 * 2);

@@ -1,5 +1,5 @@
 #include <SDL/SDL.h>
-#include <SDL/SDL_gfxPrimitives.h>
+//#include <SDL/SDL_gfxPrimitives.h>
 
 #include <fstream>
 #include "openc2e.h"
@@ -29,13 +29,13 @@ void drawWorld() {
 	for (std::vector<Room *>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
 			 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
 		// ceiling
-		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFF000077);
+//		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFF000077);
 		// floor
-		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+//		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
 		// left side
-		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFF000077);
+//		aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFF000077);
 		// right side
-		aalineColor(screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+//		aalineColor(screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
 	}
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		// note: right now, we know we only have SimpleAgents in the world.
