@@ -76,8 +76,8 @@ unsigned int Map::getRoomCount() {
 MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
 		MetaRoom *r = *i;
-		if ((_x > r->x()) && (_y > r->y()))
-			if ((_x < (r->x() + r->width())) && (_y < (r->y() + r->height())))
+		if ((_x >= r->x()) && (_y >= r->y()))
+			if ((_x <= (r->x() + r->width())) && (_y <= (r->y() + r->height())))
 				return r;
 	}
 	return 0;
@@ -86,9 +86,25 @@ MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 Room *Map::roomAt(unsigned int _x, unsigned int _y) {
 	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		Room *r = *i;
-		if ((_x > r->x_left) && (_x < r->x_right))
-			// todo: we should check y position somehow
-				return r;
+		if ((_x >= r->x_left) && (_x <= r->x_right)) {
+			// TODO: we should be able to catch most stuff by checking bounding box
+			unsigned int xdiff = r->x_left - r->x_right;
+			unsigned int xoffset = _x - r->x_left;
+		
+			// floors
+			unsigned int ydiff = r->y_right_floor - r->y_left_floor;
+			float m = ydiff / xdiff;
+			unsigned int ypoint = (xoffset * m) + r->y_left_floor;
+			//if (ypoint > _y) {
+				// ceiling
+				ydiff = r->y_left_ceiling - r->y_right_ceiling;
+				m = ydiff / xdiff;
+				ypoint = (xoffset * m) + r->y_left_ceiling;
+				if (ypoint < _y)
+					return r;
+			//}
+		}
 	}
 	return 0;
 }
+

@@ -33,6 +33,7 @@ public:
 	caosVar var[100]; // OVxx
 	unsigned int tickssincelasttimer, timerrate;
 	caosVar velx, vely;
+	float accg;
 	
 	caosVM vm;
 

@@ -87,3 +87,25 @@ void caosVM::v_TMVT() {
 	assert(targ);
 	result.setInt(0); // TODO: don't hardcode
 }
+
+/**
+ ACCG (command) accel (float)
+*/
+void caosVM::c_ACCG() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(accel)
+
+	assert(targ);
+	targ->accg = accel;
+}
+
+/**
+ ACCG (float)
+*/
+void caosVM::v_ACCG() {
+	VM_VERIFY_SIZE(0)
+
+	assert(targ);
+	result.setFloat(targ->accg);
+}
+

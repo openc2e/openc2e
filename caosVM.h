@@ -207,6 +207,8 @@ public:
 	void v_TMVT();
 	void v_RELY();
 	void c_VELO();
+	void c_ACCG();
+	void v_ACCG();
 	
 	// scripts
 	void c_INST();

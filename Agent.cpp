@@ -19,6 +19,7 @@
 
 #include "Agent.h"
 #include "World.h"
+#include "physics.h"
 #include <iostream>
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
@@ -44,6 +45,21 @@ void Agent::fireScript(unsigned char event) {
 }
 
 void Agent::tick() {
+	if (accg) {
+		/*vely = velx + accg;
+		float destx = x + velx;
+		float desty = y + vely;
+
+		Room *r1 = world.map.roomAt((unsigned int)x, (unsigned int)y);
+		Room *r2 = world.map.roomAt((unsigned int)destx, (unsigned int)desty);
+
+		if (r1 == r2) {
+			moveTo(destx, desty);
+		} else {
+			physicsHandler p;
+		}*/
+	}
+
 	if (timerrate) {
 		tickssincelasttimer++;
 		if (tickssincelasttimer == timerrate) {
@@ -54,3 +70,4 @@ void Agent::tick() {
 
 	vm.tick();
 }
+

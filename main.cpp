@@ -34,16 +34,19 @@ void drawWorld() {
 		(*i)->render(&backend, -adjustx, -adjusty);
 	}
 	if (showrooms) {
+		Room *r = world.map.roomAt(world.hand()->x, world.hand()->y);
 		for (std::vector<Room *>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
 				 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
+			unsigned int col = 0xFFFF00CC;
+			if (*i == r) col = 0xFF00FFCC;
 			// ceiling
-			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFFFF00CC);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, col);
 			// floor
-			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFFFF00CC);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, col);
 			// left side
-			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFFFF00CC);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, col);
 			// right side
-			aalineColor(backend.screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFFFF00CC);
+			aalineColor(backend.screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, col);
 		}
 	}
 	SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
