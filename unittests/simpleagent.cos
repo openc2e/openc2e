@@ -1,7 +1,7 @@
 * unit tests for the simple agent stuff 
 * fuzzie, 06/06/04
 
-DBG: OUTS "TEST: simpleagent: 4 tests"
+DBG: OUTS "TEST: simpleagent: 6 tests"
 
 * test NULL
 SETA VA00 NULL
