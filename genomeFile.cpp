@@ -28,10 +28,10 @@ geneNote *genomeFile::findNote(uint8 type, uint8 subtype, uint8 which) {
 }
 
 void genomeFile::readNotes(istream &s) {
-	uint16 gnover = read16(s);
-
 	if (cversion == 3) {
+		uint16 gnover = read16(s);
 		uint16 nosvnotes = read16(s);
+		cout << "we have " << nosvnotes << " notes" << endl;
 
 		for (int i = 0; i < nosvnotes; i++) {
 			uint16 type = read16(s);
@@ -39,19 +39,19 @@ void genomeFile::readNotes(istream &s) {
 			uint16 which = read16(s);
 			uint16 rule = read16(s);
 
-			// TODO: we currently skip all the notes
+			// TODO: we currently skip all the notes (note that there are 18 and then 1!)
 			for (int i = 0; i < 19; i++) {
 				uint16 skip = read16(s);
 				uint8 *dummy = new uint8[skip]; s.read((char *)dummy, skip); delete[] dummy;
 			}
     		}
 
-		uint8 ver = 0;
+		uint16 ver = 0;
 
-		while ((ver != 0x02) && (!(s.fail() || s.eof())))
-			s >> ver;
-
-		if (ver != 0x02) throw genomeException("c3 gno loading broke ... second majic isn't 0x02");
+		while (ver != 0x02) {
+			if (s.fail() || s.eof()) throw genomeException("c3 gno loading broke ... second magic not present");
+			ver = read16(s);
+		}
 	}
 
 	uint16 noentries = read16(s);
@@ -63,18 +63,14 @@ void genomeFile::readNotes(istream &s) {
 
 		geneNote *n = findNote(type, subtype, which);
 
-		if (n == 0) {
-			cout << "warning: couldn't find type/subtype/which matching gno file (wrong GNO file?)\n";
-			continue;
-		}
-
 		uint16 buflen = read16(s);
-		char *buffer = new char[buflen];
-		s.read(buffer, buflen);
-		n->description = buffer;
+		char *buffer = new char[buflen + 1];
+		s.read(buffer, buflen); buffer[buflen] = 0;
+		if (n != 0) n->description = buffer;
 		buflen = read16(s);
-		delete[] buffer; buffer = new char[buflen];
-		n->comments = buffer;
+		delete[] buffer; buffer = new char[buflen + 1];
+		s.read(buffer, buflen); buffer[buflen] = 0;
+		if (n != 0) n->comments = buffer;
 		delete[] buffer;		
 	}
 }
