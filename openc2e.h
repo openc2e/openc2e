@@ -30,6 +30,7 @@ public:
 };
 
 #undef assert
-#define assert(x) if (!(x)) { throw assertFailure(#x); }
+#define caos_assert(x) if (!(x)) { throw assertFailure(#x); }
+#define assert(x) caos_assert(x)
 
 #endif

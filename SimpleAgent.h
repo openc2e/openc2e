@@ -28,21 +28,17 @@ class SimpleAgent : public Agent {
 protected:
 	creaturesImage *sprite;
 	unsigned int first_image, image_count;
-	unsigned int frameno;
+	unsigned int pose, frameno;
 
 public:
-	bool carryable, mouseable, activateable, invisible, floatable;
-	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
-
 	std::vector<unsigned int> animation;
 
 	SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 							unsigned int firstimage, unsigned int imagecount);
-	unsigned int getFirstImage();
-	unsigned int getImageCount();
+	unsigned int getFirstImage() { return first_image; }
+	unsigned int getImageCount() { return image_count; }
 	creaturesImage *getSprite() { return sprite; }
 	void setImage(std::string img);
-	virtual bool isSimple() { return false; }
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
@@ -50,7 +46,9 @@ public:
 	virtual unsigned int getHeight() { return sprite->height(first_image); }
 
 	void setFrameNo(unsigned int);
-	unsigned int getCurrentSprite();
+	void setPose(unsigned int p) { pose = p; }
+	unsigned int getPose() { return pose; }
+	unsigned int getCurrentSprite() { return first_image + pose; }
 
 	virtual void tick();
 };

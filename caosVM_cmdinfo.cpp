@@ -33,7 +33,7 @@ cmdinfo *getCmdInfo(std::string cmd, bool command) {
 	assert(cmd.size() == 4);
 	varnumber = -1;
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
-	if (isdigit(cmd[2])) {// handle vaxx etc
+	if (isdigit(cmd[3])) {// handle vaxx etc
 		varnumber = atoi(cmd.c_str() + 2);
 		cmd[2] = 'x';
 		cmd[3] = 'x';

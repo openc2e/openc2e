@@ -109,3 +109,32 @@ void caosVM::v_ACCG() {
 	result.setFloat(targ->accg);
 }
 
+/**
+ RELY (float) first (agent) second (agent)
+*/
+void caosVM::v_RELY() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_AGENT(first)
+	VM_PARAM_AGENT(second)
+
+	// XXX: not sure if this is right
+	float one = first->y + (first->getHeight() / 2);
+	float two = second->y + (second->getHeight() / 2);
+
+	result.setFloat(two - one);
+}
+
+/**
+ VELO (command) xvel (float) yvel (float)
+*/
+void caosVM::c_VELO() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_FLOAT(vely)
+	VM_PARAM_FLOAT(velx)
+
+	assert(targ);
+	// TODO: reset first, maybe?
+	targ->velx.setFloat(velx);
+	targ->vely.setFloat(vely);
+}
+

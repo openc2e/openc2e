@@ -47,3 +47,48 @@ void caosVM::c_CABW() {
 	((Vehicle *)targ)->setCapacity(cap);
 }
 
+/**
+ SPAS (command) vehicle (agent) passenger (agent)
+
+ make specified vehicle agent pick up specified passenger
+*/
+void caosVM::c_SPAS() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_AGENT(passenger)
+	VM_PARAM_AGENT(vehicle)
+
+	// TODO
+}
+
+/**
+ GPAS (command) family (integer) genus (integer) species (integer) options (integer)
+
+ pick up all nearby agents matching classifier, as passengers to target vehicle
+ options = 0 to pick up based on agent bounding rect, or 1 to pick up based on cabin rect
+*/
+void caosVM::c_GPAS() {
+	VM_VERIFY_SIZE(4)
+	VM_PARAM_INTEGER(options)
+	// TODO: assert ranges for these
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+
+	// TODO
+}
+
+/**
+ DPAS (command) family (integer) genus (integer) species (integer)
+
+ drop all agents matching classifier from target vehicle
+*/
+void caosVM::c_DPAS() {
+	VM_VERIFY_SIZE(3)
+	// TODO: assert ranges for these
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+
+	// TODO
+}
+

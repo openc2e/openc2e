@@ -55,6 +55,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">NULL </span>(agent)</td></tr><tr><td class="description">
 <p>return null (zero) agent</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OVER </span>(command)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OWNR </span>(agent)</td></tr><tr><td class="description">
 <p>return OWNR</p>
 </td></tr></table><br>
@@ -156,8 +158,17 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRP </span>(command) family (integer) genus (integer) species (integer) event (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>creatures</h1>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DIRN </span>(command) direction (integer)</td></tr><tr><td class="description">
+<p>change target creatures to face a different direction</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">NOHH </span>(command)</td></tr><tr><td class="description">
+<p>tell target creature to stop holding hands with the pointer</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">STIM WRIT </span>(command) creature (agent) stimulus (integer) strength (float)</td></tr><tr><td class="description">
 <p>send stimulus to specific creature</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ZOMB </span>(command) zombie (integer)</td></tr><tr><td class="description">
+<p>pass 1 to disconnect brain and motor of target creature, and 0 to undo</p>
 </td></tr></table><br>
 <h1>debug</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">AGNT </span>(agent) id (integer)</td></tr><tr><td class="description">
@@ -318,9 +329,13 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OBST </span>(float) direction (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RELY </span>(float) first (agent) second (agent)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TMVT </span>(integer) x (float) y (float)</td></tr><tr><td class="description">
 <p>returns 1 if TARG could move to (x, y) and still be in room system, otherwise returns 0</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VELO </span>(command) xvel (float) yvel (float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VELX </span>(variable)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VELY </span>(variable)</td></tr><tr><td class="description">
@@ -522,9 +537,23 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VAxx </span>(variable)</td></tr><tr><td class="description">
 <p>script-local variables, 00 to 99</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">_P1_ </span>(variable)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">_P2_ </span>(variable)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>vehicles</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CABN </span>(command) left (integer) top (integer) right (integer) bottom (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CABW </span>(command) cap (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
-<p>186 commands: 27% of DS-era CEE; 105 documented commands: 14% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DPAS </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p>drop all agents matching classifier from target vehicle</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GPAS </span>(command) family (integer) genus (integer) species (integer) options (integer)</td></tr><tr><td class="description">
+<p>pick up all nearby agents matching classifier, as passengers to target vehicle</p>
+<p>options = 0 to pick up based on agent bounding rect, or 1 to pick up based on cabin rect</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SPAS </span>(command) vehicle (agent) passenger (agent)</td></tr><tr><td class="description">
+<p>make specified vehicle agent pick up specified passenger</p>
+</td></tr></table><br>
+<p>197 commands: 28% of DS-era CEE; 111 documented commands: 15% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>

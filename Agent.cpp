@@ -26,6 +26,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   visible(true), family(f), genus(g), species(s), zorder(p), vm(this), timerrate(0) {
   velx.setFloat(0.0f);
   vely.setFloat(0.0f);
+  accg = 0.3f;
+  sufferphysics = false;
 }
 
 void Agent::moveTo(float _x, float _y) {
@@ -35,8 +37,9 @@ void Agent::moveTo(float _x, float _y) {
 void Agent::fireScript(unsigned char event) {
 	script &s = world.scriptorium.getScript(family, genus, species, event);
 	if (s.lines.empty()) return;
+	vm.setTarg(this);
 	vm.fireScript(s, (event == 9));
-	vm.targ = this;
+	
 	std::cout << "Agent::fireScript fired " << (unsigned int)family << " " << (unsigned int)genus << " " << species << " ";
 	const std::string n = world.catalogue.getAgentName(family, genus, species);
 	if (n.size())
@@ -45,19 +48,43 @@ void Agent::fireScript(unsigned char event) {
 }
 
 void Agent::tick() {
-	if (accg) {
-		/*vely = velx + accg;
-		float destx = x + velx;
-		float desty = y + vely;
-
+	if (sufferphysics && accg) {
+		float newvely = vely.floatValue + accg;
+		float destx = x + velx.floatValue;
+		float desty = y + newvely;
+		//std::cout << x << ", " << y << ": " << destx << ", " << desty << "! " << accg << "\n";
 		Room *r1 = world.map.roomAt((unsigned int)x, (unsigned int)y);
-		Room *r2 = world.map.roomAt((unsigned int)destx, (unsigned int)desty);
+		if (!r1) {
+			std::cout << "not doing physics on agent, outside room system!\n";
+		}
+		Room *r2 = world.map.roomAt((unsigned int)destx + getWidth(), (unsigned int)desty + getHeight());
+		Room *r3 = world.map.roomAt((unsigned int)destx, (unsigned int)desty);
 
-		if (r1 == r2) {
+		if (r1 && (r1 == r2) && (r2 == r3)) {
+			vely.setFloat(newvely);
 			moveTo(destx, desty);
-		} else {
+		} else if (r1) {
 			physicsHandler p;
-		}*/
+
+			//std::cout << x + getWidth() / 2 << " " << y + getHeight() << " " << destx + (getWidth() / 2) << " " << desty + getHeight() << " " << r1->x_left << " " << r1->y_left_floor << " " << r1->x_right << " " << r1->y_right_floor << "\n";
+
+			bool c = p.collidePoints(x + (getWidth() / 2), y + getHeight(), destx + (getWidth() / 2), desty + getHeight(),
+					r1->x_left, r1->y_left_floor, r1->x_right, r1->y_right_floor);
+			
+			if (c) {
+				vely.setFloat(0);
+				destx = p.getCollisionX() - (getWidth() / 2);
+				desty = p.getCollisionY() - getHeight();
+			} else {
+				vely.setFloat(newvely);
+			}
+
+			r1 = world.map.roomAt(destx, desty);
+			r2 = world.map.roomAt(destx + getWidth(), desty + getHeight());
+
+			if ((r1 && r2) && (r1 == r2))
+				moveTo(destx, desty);
+		}
 	}
 
 	if (timerrate) {

@@ -253,14 +253,14 @@ void caosVM::c_ENUM() {
 
 		if (x == r) {
 			enumdata[currentline] = x + 1;
-			targ = *i;
+			setTarg(*i);
 			linestack.push_back(currentline);
 			return;
 		}
 	}
 	
 	enumdata[currentline] = 1; // TODO: erase it instead?
-	targ = owner;
+	setTarg(owner);
 	jumpToAfterEquivalentNext();
 }
 
@@ -277,7 +277,7 @@ void caosVM::c_ESEE() {
 
 	// TODO: should probably implement this (ESEE)
 	
-	targ = owner;
+	setTarg(owner);
 	jumpToAfterEquivalentNext();
 }
 
@@ -294,7 +294,7 @@ void caosVM::c_ETCH() {
 
 	// TODO: should probably implement this (ESEE)
 	
-	targ = owner;
+	setTarg(owner);
 	jumpToAfterEquivalentNext();
 }
 
@@ -311,7 +311,7 @@ void caosVM::c_EPAS() {
 
 	// TODO: should probably implement this (ESEE)
 	
-	targ = owner;
+	setTarg(owner);
 	jumpToAfterEquivalentNext();
 }
 

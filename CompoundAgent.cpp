@@ -52,31 +52,36 @@ CompoundPart *CompoundAgent::part(unsigned int id) {
 }
 
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	renderer->render(getSprite(), firstimg /* + getCurrentSprite() */, xoffset + x, yoffset + y);
+	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y);
 }
 
 CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsigned short _species, unsigned int plane,
 				std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
 				Agent(_family, _genus, _species, plane) {
 	// CAOS docs seem to imply initial part is part 1 in NEW: COMP, but rest of docs call it part 0
-	CompoundPart *p = new DullPart(0, spritefile, firstimage, imagecount, 0, 0, 0);
+	// TODO: we ignore image count acos it sucks
+	CompoundPart *p = new DullPart(0, spritefile, firstimage, 0, 0, 0);
 	addPart(p);
 }
 
-CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int imgcnt,
+CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg,
 						unsigned int _x, unsigned int _y, unsigned int _z) {
 	id = _id;
 	firstimg = fimg;
-	imagecount = imgcnt;
 	x = _x;
 	y = _y;
 	zorder = _z;
 	sprite = gallery.getImage(spritefile);
 	assert(sprite);
+	pose = 0;
 }
 
-DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int imgcnt, unsigned int _x, unsigned int _y,
-			 unsigned int _z) : CompoundPart(_id, spritefile, fimg, imgcnt, _x, _y, _z)  {
+DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+			 unsigned int _z) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
+}
+
+ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+			               unsigned int _z, std::string animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
 }
 
 // TODO: combine identical code from SimpleAgent/CompoundAgent

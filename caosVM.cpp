@@ -26,7 +26,7 @@ caosVM::caosVM(Agent *o) {
 	// todo: if owner is Creature, set _it_
 	// todo: http://www.gamewaredevelopment.co.uk/cdn/cdn_more.php?CDN_article_id=37 discusses
 	// how targ is usually set to owner in event scripts, think about that
-	targ = owner;
+	setTarg(owner);
 	resetScriptState();
 }
 
@@ -204,7 +204,7 @@ void caosVM::resetScriptState() {
 	noschedule = false;
 	blockingticks = 0;
 
-	targ = 0;
+	setTarg(0);
 	_it_ = 0;
 
 	_p_[0].reset(); _p_[1].reset();

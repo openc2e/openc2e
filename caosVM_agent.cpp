@@ -34,7 +34,7 @@ void caosVM::c_RTAR() {
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
-	targ = 0;
+	setTarg(0);
 	// todo
 }
 
@@ -50,14 +50,14 @@ void caosVM::c_NEW_SIMP() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
 
 	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, first_image, image_count);
 	a->setImage(sprite_file);
 	world.addAgent(a);
-	targ = a;
+	setTarg(a);
 }
 
 /**
@@ -72,13 +72,13 @@ void caosVM::c_NEW_COMP() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
 
 	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	world.addAgent(a);
-	targ = a;
+	setTarg(a);
 }
 
 /**
@@ -93,13 +93,13 @@ void caosVM::c_NEW_VHCL() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
 
 	Vehicle *a = new Vehicle(family, genus, species, plane, sprite_file, first_image, image_count);
 	world.addAgent(a);
-	targ = a;
+	setTarg(a);
 }
 
 /**
@@ -139,7 +139,16 @@ void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
 
-	// TODO
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+	if (c) {
+		CompoundPart *p = c->part(part);
+		p->setPose(pose);
+	} else {
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ);
+		caos_assert(a);
+		a->setPose(pose);
+	}
 }
 
 /**
@@ -150,7 +159,7 @@ void caosVM::c_POSE() {
 void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
-	assert(targ);
+	caos_assert(targ);
 	targ->setAttributes(attr);
 }
 
@@ -161,7 +170,7 @@ void caosVM::c_ATTR() {
 */
 void caosVM::v_ATTR() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	result.setInt(targ->getAttributes());
 }
 
@@ -171,7 +180,7 @@ void caosVM::v_ATTR() {
 void caosVM::c_TICK() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(tickrate)
-	assert(targ);
+	caos_assert(targ);
 	targ->setTimerRate(tickrate);
 }
 
@@ -192,7 +201,7 @@ void caosVM::c_BHVR() {
 void caosVM::c_TARG() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
-	targ = a;
+	setTarg(a);
 }
 
 /**
@@ -210,11 +219,18 @@ void caosVM::v_FROM() {
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
 
-	// TODO: handle compound agents/parts
+	caos_assert(targ);
 
-	assert(targ);
-	SimpleAgent *n = (SimpleAgent *)targ;
-	result.setInt(n->getCurrentSprite());
+	CompoundAgent *n = dynamic_cast<CompoundAgent *>(targ);
+	if (n) {
+		CompoundPart *p = n->part(part);
+		result.setInt(p->getPose());
+		// TODO
+	} else {
+		SimpleAgent *n = dynamic_cast<SimpleAgent *>(targ);
+		caos_assert(n);
+		result.setInt(n->getPose());
+	}
 }
 
 /**
@@ -241,13 +257,21 @@ void caosVM::c_ANIM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(poselist)
 
-	// todo: compound agent stuff
-	assert(targ);
+	std::vector<unsigned int> *animation;
 
-	// todo: !!	
-	if (typeid(*targ) != typeid(SimpleAgent)) return;
- 	SimpleAgent *a = (SimpleAgent *)targ;
-	a->animation.clear();
+	caos_assert(targ);
+
+	SimpleAgent *a;
+ 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+	if (c) {
+		animation = &c->part(part)->animation;
+	} else {
+		a = dynamic_cast<SimpleAgent *>(targ);
+		caos_assert(a);
+		animation = &a->animation;
+	}
+	
+	animation->clear();
 
 	std::string oh;
 	for (unsigned int i = 0; i < poselist.size(); i++) {
@@ -256,15 +280,18 @@ void caosVM::c_ANIM() {
 			oh += poselist[i];
 		} else {
 			unsigned int j = (unsigned int)atoi(oh.c_str());
-			a->animation.push_back(j);
+			animation->push_back(j);
 			oh.clear();
 		}
 	}
 	if (!oh.empty()) {
 		unsigned int j = (unsigned int)atoi(oh.c_str());
-		a->animation.push_back(j);
+		animation->push_back(j);
 	}
-	if (!a->animation.empty()) { a->setFrameNo(0); }
+	if (!animation->empty()) {
+		if (c) c->part(part)->setFrameNo(0);
+		else a->setFrameNo(0);
+	}
 }
 
 /**
@@ -316,7 +343,7 @@ void caosVM::v_CARR() {
 */
 void caosVM::v_FMLY() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	result.setInt(targ->family);
 }
 
@@ -327,7 +354,7 @@ void caosVM::v_FMLY() {
 */
 void caosVM::v_GNUS() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	result.setInt(targ->genus);
 }
 
@@ -338,7 +365,7 @@ void caosVM::v_GNUS() {
 */
 void caosVM::v_SPCS() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	result.setInt(targ->species);
 }
 
@@ -349,7 +376,7 @@ void caosVM::v_SPCS() {
 */
 void caosVM::v_PLNE() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	result.setInt(targ->zorder);
 }
 
@@ -386,9 +413,9 @@ void caosVM::c_MESG_WRT() {
 */
 void caosVM::v_TOTL() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 255);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 65535);
 
 	unsigned int x = 0;
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
@@ -408,8 +435,8 @@ void caosVM::v_TOTL() {
 void caosVM::c_SHOW() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(visibility)
-	assert((visibility == 0) || (visibility == 1));
-	assert(targ);
+	caos_assert((visibility == 0) || (visibility == 1));
+	caos_assert(targ);
 	targ->visible = visibility;
 }
 
@@ -418,7 +445,7 @@ void caosVM::c_SHOW() {
 */
 void caosVM::v_POSX() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	result.setFloat(targ->x);
 }
 

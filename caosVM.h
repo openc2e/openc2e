@@ -27,8 +27,7 @@
 //#define CAOSDEBUGDETAIL
 
 class caosVM {
-//protected:
-public: // right now, Agent::fireEvent sets targ itself
+protected:
 	// script state...
 	script *currentscript;
 	unsigned int currentline;
@@ -43,6 +42,7 @@ public: // right now, Agent::fireEvent sets targ itself
 	caosVar var[100]; // might want to make this a map, for memory efficiency
 	caosVar _p_[2]; // might want to add this onto the end of above map, if done
 	Agent *targ, *owner, *_it_;
+	unsigned int part;
 	
 	void resetScriptState(); // resets everything except OWNR
 	
@@ -56,6 +56,8 @@ public: // right now, Agent::fireEvent sets targ itself
 	void jumpToAfterEquivalentNext();
 
 public:
+	void setTarg(Agent *a) { targ = a; part = 0; }
+
 	// map
 	void v_ADDM();
 	void c_BRMI();
@@ -128,6 +130,8 @@ public:
 	void v_SIN_();
 	void v_TAN_();
 	void v_SQRT();
+	void v_P1();
+	void v_P2();
 
 	// flow
 	void c_DOIF();
@@ -196,7 +200,6 @@ public:
 	void v_POSX();
 	void v_POSY();
 	void c_FRAT();
-	void c_NOHH();
 	void c_OVER();
 
 	// motion
@@ -229,6 +232,7 @@ public:
 	void c_STIM_WRIT();
 	void c_ZOMB();
 	void c_DIRN();
+	void c_NOHH();
 	
 	// sounds
 	void c_SNDE();

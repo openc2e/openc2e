@@ -30,15 +30,7 @@ Agent(family, genus, species, plane) {
 	first_image = firstimage;
 	image_count = imagecount;
 	setAttributes(0);
-}
-
-unsigned int SimpleAgent::getFirstImage() {
-	// todo: adjust for BASE
-	return first_image;
-}
-
-unsigned int SimpleAgent::getImageCount() {
-	return image_count;
+	pose = 0;
 }
 
 void SimpleAgent::setImage(std::string img) {
@@ -75,15 +67,7 @@ unsigned int SimpleAgent::getAttributes() {
 void SimpleAgent::setFrameNo(unsigned int f) {
 	assert(f < animation.size());
 	frameno = f;
-}
-
-unsigned int SimpleAgent::getCurrentSprite() {
-	if (!animation.empty()) {
-		assert(frameno < animation.size());
-		return getFirstImage() + animation[frameno];
-	} else {
-		return getFirstImage() + 0; // TODO!!!
-	}
+	pose = animation[frameno]; // TODO: should start from BASE
 }
 
 void SimpleAgent::tick() {
@@ -108,3 +92,4 @@ void SimpleAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
 	renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC);
 }
+

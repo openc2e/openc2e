@@ -27,7 +27,8 @@ void drawWorld() {
 			unsigned int whereweare = j * (test->totalheight / 128) + i;
 			SDL_Rect destrect;
 			destrect.x = (j * 128) - adjustx + m->x(); destrect.y = (i * 128) - adjusty + m->y();
-			SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
+			if ((destrect.x >= -128) && (destrect.y >= -128) && (destrect.x - 128 <= backend.getWidth()) && (destrect.y - 128 <= backend.getHeight()))
+				SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
 		}
 	}
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {

@@ -25,21 +25,27 @@
 class CompoundPart {
 protected:
 	creaturesImage *sprite;
-	unsigned int firstimg, imagecount;
+	unsigned int firstimg, pose, frameno;
 
 public:
+	std::vector<unsigned int> animation;
 	creaturesImage *getSprite() { return sprite; }
 	unsigned int x, y, zorder, id;
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 	unsigned int getWidth() { return sprite->width(firstimg); }
 	unsigned int getHeight() { return sprite->height(firstimg); }
+	unsigned int getPose() { return pose; }
+	unsigned int getCurrentSprite() { return firstimg + pose; }
+	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
+	void setPose(unsigned int p) { pose = p; }
 				
 	bool operator < (const CompoundPart *b) const {
 		return zorder < b->zorder;
 	}
 	
-	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int imgcnt, unsigned int _x, unsigned int _y,
+	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 				 unsigned int _z);
+	virtual ~CompoundPart() { }
 };
 
 class ButtonPart : public CompoundPart {
@@ -60,8 +66,7 @@ public:
 
 class DullPart : public CompoundPart {
 public:
-	DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int imgcnt, unsigned int _x, unsigned int _y,
-			 unsigned int _z);
+	DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y, unsigned int _z);
 };
 
 class FixedTextPart : public CompoundPart {
@@ -87,10 +92,6 @@ protected:
     std::vector<CompoundPart *> parts;
 
 public:
-	// TODO: we share all these with SimpleAgent
-	bool carryable, mouseable, activateable, invisible, floatable;
-	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
-	
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 								std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 		

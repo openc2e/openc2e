@@ -10,11 +10,11 @@ using namespace std;
 */
 
 void testGenetics() {
-	ifstream f("/Users/fuzzie/c2e/creatures3/Genetics/norn.bengal46.gen.brain.gen", std::ios::binary);
+	ifstream f("/home/fuzzie/creatures3/Genetics/norn.bengal46.gen.brain.gen", std::ios::binary);
 	assert(!f.fail());
 	f >> noskipws;
 
-	ofstream o("/Users/fuzzie/test.gen", std::ios::binary);
+	ofstream o("/home/fuzzie/test.gen", std::ios::binary);
 	assert(!o.fail());
 	genomeFile g;
 	f >> g;
@@ -57,10 +57,10 @@ void testCatalogue() {
 
 int main() {
 	try {
-//		cout << "\n*** genome test\n\n";
-//		testGenetics();
-		cout << "\n*** catalogue test\n\n";
-		testCatalogue();
+		cout << "\n*** genome test\n\n";
+		testGenetics();
+//		cout << "\n*** catalogue test\n\n";
+//		testCatalogue();
 		cout << "\n*** done\n";
 	} catch (creaturesException &t) {
 		cout << "exception raised: " << t.what() << "!\n";

@@ -356,3 +356,24 @@ void caosVM::v_SQRT() {
 	
 	result.setFloat(sqrt(x));
 }
+
+/**
+ _P1_ (variable)
+*/
+void caosVM::v_P1() {
+	VM_VERIFY_SIZE(0)
+
+	result = _p_[0];
+	result.setVariable(&_p_[0]);
+}
+
+/**
+ _P2_ (variable)
+*/
+void caosVM::v_P2() {
+	VM_VERIFY_SIZE(0)
+		
+	result = _p_[1];
+	result.setVariable(&_p_[1]);
+}
+

@@ -30,7 +30,11 @@ void caosVM::c_PART() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part_id)
 
-	// todo
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	assert(a);
+	// TODO: this isn't entirely right, we should check it exists instead (maybe part should be a pointer?)
+	assert(part_id < a->partCount());
+	part = part_id;
 }
 
 /**
@@ -50,12 +54,10 @@ void caosVM::c_PAT_DULL() {
 	
 	assert(part > 0);
 	assert(targ);
-	
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
 	assert(a);
 
-	// TODO: 0 represents 'image_count', apparently irrelevant in PAT: DULL, remove it from constructor
-	CompoundPart *p = new DullPart(part, sprite, first_image, 0, x, y, plane);
+	CompoundPart *p = new DullPart(part, sprite, first_image, x, y, plane);
 	a->addPart(p);
 }
 
@@ -84,12 +86,12 @@ void caosVM::c_PAT_BUTT() {
 	assert(part > 0);
 	assert((option == 0) || (option == 1));
 	assert(targ);
-	
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
 	assert(a);
-	
-/*	CompoundPart *p = 0; // TODO
-	a->addPart(p); */
+
+	// TODO TODO TODO we don't take image_count!!
+	CompoundPart *p = new ButtonPart(part, sprite, first_image, x, y, plane, hoveranim, messageid, option);
+	a->addPart(p);
 }
 
 /**
@@ -103,9 +105,9 @@ void caosVM::c_PAT_KILL() {
 	
 	assert(part > 0);
 	assert(targ);
-
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
 	assert(a);
 	
 	a->delPart(part);
 }
+

@@ -25,7 +25,7 @@ bool physicsHandler::collidePoints(float ax1, float ay1, float ax2, float ay2,
 
 	bool gotx = false;
 	float x, y;
-	
+
 	if ((ax1 - ax2) != 0) {
 		if (ax1 == 0) {
 			ab = ((ax2 * ay1) - (ax1 * ay2)) / (ax2 - ax1);
@@ -88,20 +88,20 @@ bool physicsHandler::collidePoints(float ax1, float ay1, float ax2, float ay2,
 		x = (y - ab) / am;
 	}
 
-	if (ax1 > ax2) {
-		if (x < ax2) return false;
-		if (x > ax1) return false;
+	if (ay1 > ay2) {
+		if (y < ay2) return false;
+		if (y > ay1) return false;
 	} else {
-		if (x > ax2) return false;
-		if (x < ax1) return false;
+		if (y > ay2) return false;
+		if (y < ay1) return false;
 	}
 
-	if (bx1 > bx2) {
-		if (x < bx2) return false;
-		if (x > bx1) return false;
+	if (by1 > by2) {
+		if (y < by2) return false;
+		if (y > by1) return false;
 	} else {
-		if (x > bx2) return false;
-		if (x < bx1) return false;
+		if (y > by2) return false;
+		if (y < by1) return false;
 	}
 
 	finalx = x;

@@ -34,3 +34,39 @@ void caosVM::c_STIM_WRIT() {
 	
 	// TODO
 }
+
+/**
+ NOHH (command)
+
+ tell target creature to stop holding hands with the pointer
+*/
+void caosVM::c_NOHH() {
+	VM_VERIFY_SIZE(0)
+
+	// TODO
+}
+
+/**
+ ZOMB (command) zombie (integer)
+
+ pass 1 to disconnect brain and motor of target creature, and 0 to undo
+*/
+void caosVM::c_ZOMB() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(zombie)
+
+	// TODO
+}
+
+/**
+ DIRN (command) direction (integer)
+
+ change target creatures to face a different direction
+*/
+void caosVM::c_DIRN() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(zombie)
+
+	// TODO
+}
+

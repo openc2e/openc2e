@@ -25,36 +25,40 @@
 #include "caosVM.h" // caosVar and caosVM below
 
 class Agent {
+	friend struct agentzorder;
+	friend class caosVM;
+
+protected:
+	caosVar var[100]; // OVxx
+	caosVM vm;
+
 public:
+	bool carryable, mouseable, activateable, invisible, floatable;
+	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
+	
 	bool visible;
 	unsigned char family, genus;
 	unsigned short species;
 	unsigned int zorder;
-	caosVar var[100]; // OVxx
 	unsigned int tickssincelasttimer, timerrate;
 	caosVar velx, vely;
 	float accg;
-	
-	caosVM vm;
-
-	void fireScript(unsigned char event);
-	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	float x, y;
+	
+	void fireScript(unsigned char event);
 	void moveTo(float, float);
-	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
-	virtual bool isSimple() { return false; }
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
+	
+	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent() { }
 
 	virtual void setAttributes(unsigned int attr) = 0;
 	virtual unsigned int getAttributes() = 0;
-
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
 
 	virtual void tick();
-
-	friend struct agentzorder;
+	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 };
 
 struct agentzorder {
