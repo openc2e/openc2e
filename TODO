@@ -1,0 +1,11 @@
+* make agents z-order themselves properly
+* look at the room code
+* start implementing agent event script infrastructure
+* implement galleries (agents sharing images)
+* do some kind of tick() [needed for animation/physics/events at least]
+  * start implementing physics
+  * implement animation
+* look at starting the sound code (and integrating SDL_mixer)
+* look at using mmap() for backgrounds, to save memory. to do this, we might have to write an endian-swapper.
+* make the tokeniser work out command vs function stuff itself
+  * .. and then remove it from the runtime (eg, we don't need seperate cmd/func)

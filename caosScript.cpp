@@ -185,6 +185,8 @@ caosScript::caosScript(std::istream &in) {
 		std::list<token> t;
 		std::string s;
 		std::getline(in, s);
+		if (s[s.size() - 1] == '\r')
+			s.erase(s.end() - 1);
 		try {
 			tokenise(s, t);
 			if (!t.empty()) {
@@ -192,7 +194,7 @@ caosScript::caosScript(std::istream &in) {
 				rawlines.push_back(s);
 			}
 		} catch (tokeniseFailure f) {
-			std::cerr << "failed to tokenise line #" << lineno << "\n";
+			std::cerr << "failed to tokenise line #" << lineno << "(" << s << ")\n";
 		}
 	}
 
