@@ -28,28 +28,43 @@
 class Agent;
 
 struct caosVar {
-	unsigned char flags;
-	int intValue;
-	float floatValue;
-	std::string stringValue;
-	Agent *agentValue;
-	caosVar *variableValue;
+	enum variableType {
+		NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING, VARREF
+	};
 
-	void reset() { flags = 0; }
+	variableType type;
+
+	/* XXX: we need both the variable reference and value. this 
+	 * really ought not to exist.
+	 */
+	caosVar *variableValue;
+	
+	/* This is not in the union so its constructor and destructors get called
+	 * at the appropriate times.
+	 */
+	std::string stringValue;
+
+	union {
+		int intValue;
+		float floatValue;
+		Agent *agentValue;
+	};
+
+	void reset() { type = NULLTYPE; stringValue.clear(); variableValue = NULL; }
 	caosVar() { reset(); setInt(0); }
 	//virtual ~caosVar() { } // we don't truly need this.
 
 	//bool empty() { return (flags == 0); }
-	bool hasInt() { return (flags & 1); }
-	void setInt(int i) { flags = flags | 1; intValue = i; }
-	bool hasFloat() { return (flags & 2); }
-	void setFloat(float i) { flags = flags | 2; floatValue = i; }
-	bool hasString() { return (flags & 4); }
-	void setString(std::string i) { flags = flags | 4; stringValue = i; }
-	bool hasAgent() { return (flags & 8); }
-	void setAgent(Agent *i) { flags = flags | 8; agentValue = i; }
-	bool hasVariable() { return (flags & 16); }
-	void setVariable(caosVar *i) { flags = flags | 16; variableValue = i; }
+	bool hasInt() { return type == INTEGER; }
+	void setInt(int i) { type = INTEGER; intValue = i; }
+	bool hasFloat() { return type == FLOAT; }
+	void setFloat(float i) { type = FLOAT; floatValue = i; }
+	bool hasString() { return type == STRING; }
+	void setString(const std::string &i) { type = STRING; stringValue = i; }
+	bool hasAgent() { return type == AGENT; }
+	void setAgent(Agent *i) { type = AGENT; agentValue = i; }
+	bool hasVariable() { return variableValue != NULL; }
+	void setVariable(caosVar *i) { variableValue = i; }
 	//virtual void notifyChanged() { }
 
 	bool operator == (caosVar &v);
