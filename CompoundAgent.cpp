@@ -23,7 +23,9 @@
 #include <algorithm> // sort
 
 void CompoundAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
-//	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y);	
+	for (std::vector<CompoundPart *>::iterator i = parts.begin(); i != parts.end(); i++) {
+		(*i)->render(renderer, xoffset + x, yoffset + y);
+	}
 }
 
 void CompoundAgent::addPart(CompoundPart *p) {
