@@ -223,19 +223,24 @@ caosScript::caosScript(std::istream &in) {
 	cmdinfo *rscr = getCmdInfo("RSCR", true); assert(rscr != 0);
 	cmdinfo *endm = getCmdInfo("ENDM", true); assert(endm != 0);
 	script *currscrip = &installer;
-
+	bool doneinstaller = false;
+	
 	for (unsigned int i = 0; i < lines.size(); i++) {
 		std::list<token> &l = lines[i];
 		if (l.front().cmd != 0) {
 			if (l.front().cmd == scrp) {
+				assert(l.size() == 5);
+				// todo: verify event script doesn't already exist, maybe? don't know
+				// what real engine does
 				// FIXME
 				currscrip = &removal;
 			} else if (l.front().cmd == rscr) {
 				currscrip = &removal;
 			} else if (l.front().cmd == endm) {
-				currscrip = 0;
+				currscrip->lines.push_back(l);
+				currscrip->rawlines.push_back(rawlines[i]);
+				currscrip = &installer;
 			} else {
-				assert(currscrip != 0);
 				currscrip->lines.push_back(l);
 				currscrip->rawlines.push_back(rawlines[i]);
 			}

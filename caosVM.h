@@ -65,7 +65,7 @@ public:
 	void c_OUTV();
 	void c_SCRP(); // dummy
 	void c_RSCR(); // dummy
-	void c_ENDM(); // dummy
+	void c_ENDM();
 
 	// variables
 	void c_SETV();

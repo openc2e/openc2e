@@ -77,5 +77,5 @@ void caosVM::c_RSCR() {
  ENDM (command)
 */
 void caosVM::c_ENDM() {
-	cerr << "hit ENDM. shouldn't ever happen.\n";
+	c_STOP();
 }
