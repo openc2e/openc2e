@@ -22,8 +22,23 @@
 
 #include <SDL/SDL.h>
 #include "creaturesImage.h"
+#include "endianlove.h"
+
+struct sample {
+    uint8 *data;
+    uint32 dpos;
+    uint32 dlen;
+};
 
 class SDLBackend {
+protected:
+	static const unsigned int nosounds = 12;
+	bool sounds_bitmap[12];
+	sample sounds[12];
+
+	void mixAudio(uint8 *stream, int len);
+	friend void mixAudio(SDLBackend *backend, uint8 *stream, int len);
+	
 public:
 	SDL_Surface *screen;
 	

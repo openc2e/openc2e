@@ -30,16 +30,16 @@ using std::cerr;
  */
 void caosVM::v_ADDM() {
 	VM_VERIFY_SIZE(5)
-  VM_PARAM_STRING(background)
-  VM_PARAM_INTEGER(height)
-  VM_PARAM_INTEGER(width)
-  VM_PARAM_INTEGER(y)
-  VM_PARAM_INTEGER(x)
+	VM_PARAM_STRING(background)
+	VM_PARAM_INTEGER(height)
+	VM_PARAM_INTEGER(width)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
 
-  MetaRoom *r = new MetaRoom(x, y, width, height, background);
+	MetaRoom *r = new MetaRoom(x, y, width, height, background);
 	caosVar v;
-  v.setInt(world.map.addMetaRoom(r));
-  result = v;
+	v.setInt(world.map.addMetaRoom(r));
+	result = v;
 }
 
 /**
@@ -49,6 +49,7 @@ void caosVM::v_ADDM() {
  */
 void caosVM::c_BRMI() {
 	VM_VERIFY_SIZE(2)
+	
 	VM_PARAM_INTEGER(room_base)
 	VM_PARAM_INTEGER(metaroom_base)
 	// todo
@@ -63,6 +64,7 @@ void caosVM::c_MAPD() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(height)
 	VM_PARAM_INTEGER(width)
+
 	world.map.SetMapDimensions(width, height);
 }
 
@@ -73,6 +75,7 @@ void caosVM::c_MAPD() {
  */
 void caosVM::c_MAPK() {
 	VM_VERIFY_SIZE(0)
+
 	world.map.Reset();
 }
 
@@ -106,6 +109,7 @@ void caosVM::c_RTYP() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(roomtype)
 	VM_PARAM_INTEGER(roomid)
+
 	Room *room = world.map.getRoom(roomid);
 	assert(room);
 	room->type = roomtype;
@@ -117,6 +121,7 @@ void caosVM::c_RTYP() {
 void caosVM::v_RTYP() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(roomid)
+
 	Room *room = world.map.getRoom(roomid);
 	if (room)
 		result.setInt(room->type);
@@ -133,9 +138,9 @@ void caosVM::c_DOOR() {
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
-/*	Room *r1 = world.map.getRoom(room1);
-	Room *r2 = world.map.getRoom(room2); */
-//	cerr << "unimplemented: DOOR\n";
+	// TODO
+	Room *r1 = world.map.getRoom(room1);
+	Room *r2 = world.map.getRoom(room2);
 }
 
 /**
@@ -165,7 +170,7 @@ void caosVM::v_ROOM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(agent)
 	
-//	cerr << "unimplemented: ROOM\n";
+	// TODO
 	result.setInt(0);
 }
 
@@ -176,6 +181,7 @@ void caosVM::v_ROOM() {
 */
 void caosVM::v_LEFT() {
 	VM_VERIFY_SIZE(0)
+	
 	result.setInt(3);
 }
 
@@ -186,6 +192,7 @@ void caosVM::v_LEFT() {
 */
 void caosVM::v_RGHT() {
 	VM_VERIFY_SIZE(0)
+	
 	result.setInt(3);
 }
 
@@ -196,6 +203,7 @@ void caosVM::v_RGHT() {
 */
 void caosVM::v_UP() {
 	VM_VERIFY_SIZE(0)
+	
 	result.setInt(3);
 }
 
@@ -206,5 +214,31 @@ void caosVM::v_UP() {
 */
 void caosVM::v_DOWN() {
 	VM_VERIFY_SIZE(0)
+	
 	result.setInt(3);
+}
+
+/**
+ PROP (command) roomid (integer) caindex (integer) cavalue (float)
+*/
+void caosVM::c_PROP() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_FLOAT(cavalue)
+	VM_PARAM_INTEGER(caindex)
+	VM_PARAM_INTEGER(roomid)
+
+	Room *room = world.map.getRoom(roomid);
+	// TODO
+}
+
+/**
+ PROP (float) roomid (integer) caindex (integer)
+*/
+void caosVM::v_PROP() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(caindex)
+	VM_PARAM_INTEGER(roomid)
+
+	Room *room = world.map.getRoom(roomid);
+	result.setFloat(1.0f); // TODO: don't hardcode
 }

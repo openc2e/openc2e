@@ -229,6 +229,7 @@
 		};
 		E7004EE7065F8143000FB224 = {
 			children = (
+				E736326F074AB3020041F72E,
 				E711E01007481AF700EDF13D,
 				E711E00F07481AEB00EDF13D,
 				E7004EF9065F8199000FB224,
@@ -392,6 +393,44 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
+		E736326F074AB3020041F72E = {
+			children = (
+				E7363270074AB3220041F72E,
+				E7363271074AB3220041F72E,
+			);
+			isa = PBXGroup;
+			name = "music classes";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7363270074AB3220041F72E = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = mngfile.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7363271074AB3220041F72E = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = mngfile.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7363272074AB3220041F72E = {
+			fileRef = E7363270074AB3220041F72E;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E7363273074AB3220041F72E = {
+			fileRef = E7363271074AB3220041F72E;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		E748CFD2066538E000BF1F9A = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
@@ -462,6 +501,7 @@
 				E711E00A07481ADC00EDF13D,
 				E711E00B07481ADC00EDF13D,
 				E711E00C07481ADC00EDF13D,
+				E7363273074AB3220041F72E,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -650,6 +690,7 @@
 				E711E00907481ADC00EDF13D,
 				E711E00D07481ADC00EDF13D,
 				E711E00E07481ADC00EDF13D,
+				E7363272074AB3220041F72E,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

@@ -23,7 +23,7 @@
 #include "caosScript.h"
 #include <map>
 
-#define CAOSDEBUG
+//#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
 
 class caosVM {
@@ -71,6 +71,8 @@ public:
 	void v_RGHT();
 	void v_UP();
 	void v_DOWN();
+	void c_PROP();
+	void v_PROP();
 	
 	// camera
 	void c_CMRT();
@@ -123,7 +125,7 @@ public:
 	void c_SUBR();
 	void c_RETN();
 	void c_ENUM();
-	voic c_ESEE();
+	void c_ESEE();
 	void c_NEXT();
 	
 	// debug
@@ -178,6 +180,7 @@ public:
 	void v_VELX();
 	void v_VELY();
 	void v_OBST();
+	void v_TMVT();
 
 	// scripts
 	void c_INST();

@@ -28,5 +28,5 @@ void caosVM::c_CLAC() {
   VM_VERIFY_SIZE(1)
   VM_PARAM_INTEGER(message)
   
-  cerr << "unimplemented: CLAC\n";
+  // TODO
 }

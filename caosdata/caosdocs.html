@@ -74,7 +74,8 @@
 <p>set targ to random agent with given family/genus/species</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SHOW </span>(command) visibility (integer)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>set visibility of agent to cameras. 0 = invisible, 1 = visible.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SPCS </span>(integer)</td></tr><tr><td class="description">
 <p>return species of TARG agent</p>
 </td></tr></table><br>
@@ -180,6 +181,9 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ENUM </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ESEE </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p>like ENUM, but iterate through agents OWNR can see (todo: document exact rules)</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">EVER </span>(command)</td></tr><tr><td class="description">
 <p>Jump back to the matching LOOP, no matter what.</p>
 </td></tr></table><br>
@@ -231,6 +235,10 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">MAPK </span>(command)  </td></tr><tr><td class="description">
 <p>reset the map (call map::reset)</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PROP </span>(command) roomid (integer) caindex (integer) cavalue (float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PROP </span>(float) roomid (integer) caindex (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RATE </span>(command) roomtype (integer) caindex (integer) gain (float) loss (float) diffusion (float)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RGHT </span>(integer)</td></tr><tr><td class="description">
@@ -253,6 +261,9 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OBST </span>(float) direction (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TMVT </span>(integer) x (float) y (float)</td></tr><tr><td class="description">
+<p>returns 1 if TARG could move to (x, y) and still be in room system, otherwise returns 0</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VELX </span>(variable)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VELY </span>(variable)</td></tr><tr><td class="description">
@@ -422,4 +433,4 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VAxx </span>(variable)</td></tr><tr><td class="description">
 <p>script-local variables, 00 to 99</p>
 </td></tr></table><br>
-<p>141 documented commands: 20% of DS-era CEE, plus 6 openc2e-specific commands</p></body></html>
+<p>145 documented commands: 20% of DS-era CEE, plus 6 openc2e-specific commands</p></body></html>

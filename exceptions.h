@@ -6,7 +6,7 @@ protected:
 
 public:
 	creaturesException(const char *s) throw() { r = s; }
-	const char* what() throw() { return r; }
+	const char* what() const throw() { return r; }
 };
 
 class genomeException : public creaturesException {

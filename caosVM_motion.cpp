@@ -29,7 +29,7 @@ using std::cerr;
 void caosVM::c_ELAS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(elas)
-	cerr << "unimplemented: ELAS\n";
+	// TODO
 }
 
 /**
@@ -58,6 +58,7 @@ void caosVM::v_VELX() {
 */
 void caosVM::v_VELY() {
 	VM_VERIFY_SIZE(0)
+
 	assert(targ);
 	result = targ->vely;
 	result.setVariable(&targ->vely);
@@ -69,5 +70,20 @@ void caosVM::v_VELY() {
 void caosVM::v_OBST() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(direction) assert(direction >= 0); assert(direction <= 3);
+
 	result.setFloat(0.0f);
+}
+
+/**
+ TMVT (integer) x (float) y (float)
+ 
+ returns 1 if TARG could move to (x, y) and still be in room system, otherwise returns 0
+*/
+void caosVM::v_TMVT() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+
+	assert(targ);
+	result.setInt(0); // TODO: don't hardcode
 }

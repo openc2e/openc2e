@@ -18,9 +18,13 @@
  */
 
 #include <iostream>
+#include "exceptions.h"
 
 // assertFailure segfaults the app
-class assertFailure { public: assertFailure() { char *n = 0; *n = 0; } };
+class assertFailure : public creaturesException {
+public:
+	assertFailure(const char *x) throw() : creaturesException(x) { }
+};
 
 #undef assert
-#define assert(x) if (!(x)) { std::cerr << "openc2e assert failed: " << #x << "\n"; throw assertFailure(); }
+#define assert(x) if (!(x)) { throw assertFailure(#x); }

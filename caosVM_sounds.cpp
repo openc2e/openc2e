@@ -39,7 +39,7 @@ void caosVM::c_MMSC() {
 	VM_PARAM_STRING(track_name)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-//	cerr << "unimplemented: MMSC\n";
+	// TODO
 }
 
 /**
@@ -49,7 +49,7 @@ void caosVM::v_MMSC() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-//	cerr << "unimplemented: MMSC\n";
+	// TODO
 	result.setString("");
 }
 
@@ -61,7 +61,7 @@ void caosVM::c_RMSC() {
 	VM_PARAM_STRING(track_name)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-//	cerr << "unimplemented: RMSC\n";
+	// TODO
 }
 
 /**
@@ -71,6 +71,6 @@ void caosVM::v_RMSC() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-//	cerr << "unimplemented: RMSC\n";
+	// TODO
 	result.setString("");
 }

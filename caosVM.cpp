@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "openc2e.h"
 #include <iostream>
 
 caosVM::caosVM(Agent *o) {
@@ -40,7 +41,9 @@ bool caosVar::operator == (caosVar &v) {
 	} else if (this->hasAgent() && v.hasAgent()) {
 		return (this->agentValue == v.agentValue);
 	}
+#ifdef CAOSDEBUG
 	std::cerr << "caosVar operator == couldn't compare " << this->dump() << " and " << v.dump() << "\n";
+#endif
 	return false;
 }
 
@@ -51,7 +54,9 @@ bool caosVar::operator > (caosVar &v) {
 		float two = (v.hasFloat() ? v.floatValue : v.intValue);
 		return (one > two);
 	}
+#ifdef CAOSDEBUG
 	std::cerr << "caosVar operator > couldn't compare " << this->dump() << " and " << v.dump() << "\n";
+#endif
 	return false;
 }
 
@@ -62,7 +67,9 @@ bool caosVar::operator < (caosVar &v) {
 		float two = (v.hasFloat() ? v.floatValue : v.intValue);
 		return (one < two);
 	}
+#ifdef CAOSDEBUG
 	std::cerr << "caosVar operator < couldn't compare " << this->dump() << " and " << v.dump() << "\n";
+#endif
 	return false;
 }
 
@@ -214,10 +221,14 @@ void caosVM::resetScriptState() {
 void caosVM::tick() {
 	if (blockingticks) { blockingticks--; return; }
 	if (!currentscript) return;
-	while (currentline < currentscript->lines.size()) {
+	unsigned int n = 0;
+	// run 5 lines per tick
+	while ((currentline < currentscript->lines.size()) && (noschedule || n < 5)) {
 		runCurrentLine();
+		n++;
 	}
-	currentscript = 0;
+	if (currentline == currentscript->lines.size())
+		currentscript = 0;
 }
 
 void caosVM::runCurrentLine() {
@@ -226,9 +237,14 @@ void caosVM::runCurrentLine() {
 	try {
 		if (!b.empty()) internalRun(b, true);
 	} catch (badParamException e) {
-		std::cerr << "caught badParamException running " << currentscript->rawlines[i] << "\n";
+#ifdef CAOSDEBUG
+		std::cerr << "caught badParamException while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+#endif
 	} catch (notEnoughParamsException e) {
-		std::cerr << "caught notEnoughParamsException running " << currentscript->rawlines[i] << "\n";
+		std::cerr << "caught notEnoughParamsException while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+	} catch (assertFailure e) {
+		std::cerr << "caught assert failure '" << e.what() << "' while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		currentline = currentscript->lines.size();
 	}
 	/* Generally, we want to proceed to the next line. Sometimes, opcodes will change the
 		current line from under us, and in those instances, we should leave it alone. */

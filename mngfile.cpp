@@ -19,8 +19,6 @@ void decryptbuf(char * buf, int len) {
 
 MNGFile::MNGFile(string n) {
 	name = n;
-	FILE * temp; // XXX: zap this
-	char filename[255];
 	
 	f = fopen(name.c_str(), "r");
 	if(!f) {
@@ -80,7 +78,7 @@ MNGFile::MNGFile(string n) {
 void MNGFile::enumerateSamples() {
 	vector< pair< string, pair< char *, int > > >::iterator i;
 	for(i = samples.begin(); i != samples.end(); i++) {
-		printf("Position: %i Length: %i\n", (*i).second.first, (*i).second.second);
+		printf("Position: %i Length: %i\n", (unsigned int)(*i).second.first, (*i).second.second);
 		// PlaySound((*i).second.first, (*i).second.second);
 	}
 }

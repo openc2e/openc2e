@@ -138,7 +138,7 @@ void caosVM::v_NULL() {
 void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
-	cerr << "unimplemented: POSE\n";
+	// TODO
 }
 
 /**
@@ -180,7 +180,7 @@ void caosVM::c_TICK() {
 void caosVM::c_BHVR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(bhvr)
-	cerr << "unimplemented: BHVR\n";
+	// TODO
 }
 
 /**
@@ -200,7 +200,7 @@ void caosVM::c_TARG() {
 void caosVM::v_FROM() {
 	VM_VERIFY_SIZE(0)
 	result.setAgent(0);
-	cerr << "unimplemented: FROM\n";
+	// TODO
 }
 
 /**
@@ -208,7 +208,7 @@ void caosVM::v_FROM() {
 */
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: POSE\n";
+	// TODO
 }
 
 /**
@@ -220,7 +220,7 @@ void caosVM::v_POSE() {
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
-	cerr << "unimplemented: KILL\n";
+	// TODO: KILL
 }
 
 /**
@@ -266,7 +266,7 @@ void caosVM::c_ANIM() {
 */
 void caosVM::v_ABBA() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: ABBA\n";
+	// TODO
 }
 
 /**
@@ -275,7 +275,7 @@ void caosVM::v_ABBA() {
 void caosVM::c_BASE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(index)
-	cerr << "unimplemented: BASE\n";
+	// TODO
 }
 
 /**
@@ -283,7 +283,7 @@ void caosVM::c_BASE() {
 */
 void caosVM::v_BASE() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: BASE\n";
+	// TODO
 }
 
 /**
@@ -291,7 +291,7 @@ void caosVM::v_BASE() {
 */
 void caosVM::v_BHVR() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: BHVR\n";
+	// TODO
 }
 
 /**

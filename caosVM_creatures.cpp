@@ -31,5 +31,6 @@ void caosVM::c_STIM_WRIT() {
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
 	VM_PARAM_AGENT(creature)
-	cerr << "unimplemented: STIM WRIT\n";
+	
+	// TODO
 }
