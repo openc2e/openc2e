@@ -1,0 +1,26 @@
+* unit tests for the non-ifblock flow stuff 
+* fuzzie, 06/06/04
+
+DBG: OUTS "TEST: flow: 2 tests"
+
+* test LOOP .. UNTL
+SETV VA00 0
+LOOP
+ ADDV VA00 1
+UNTL VA00 eq 3
+DOIF VA00 eq 3
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test REPS .. REPE
+SETV VA00 0
+REPS 4
+ ADDV VA00 1
+REPE
+DOIF VA00 eq 4
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI

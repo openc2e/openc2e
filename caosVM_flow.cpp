@@ -79,10 +79,19 @@ void caosVM::c_ENDI() {
 void caosVM::c_REPS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(reps)
+	assert(reps > 0)
+	repstack.push_back(reps);
+	linestack.push_back(currentline + 1);
 }
 
 void caosVM::c_REPE() {
 	VM_VERIFY_SIZE(0)
+	int i = repstack.back() - 1;
+	repstack.pop_back();
+	if (i) {
+		repstack.push_back(i);
+		currentline = linestack.back();
+	}
 }
 
 void caosVM::c_LOOP() {

@@ -34,6 +34,7 @@ protected:
 	unsigned int currentline;
 	std::vector<bool> truthstack;
 	std::vector<unsigned int> linestack;
+	std::vector<int> repstack;
 
 	script *currentscript;
 
