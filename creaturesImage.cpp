@@ -76,7 +76,7 @@ creaturesImage *imageGallery::getImage(std::string name) {
 	if (!tryOpen(in, "./data/Images/", name + ".s16", s16)) {
 		if (!tryOpen(in, "./data/Images/", name + ".c16", c16)) {
 			bool lasttry = tryOpen(in, "./data/Backgrounds/", name, blk);
-			assert(lasttry);
+			if (!lasttry) return 0;
 			gallery[name] = new blkImage(in);
 		} else {
 			gallery[name] = new c16Image(in);
