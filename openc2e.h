@@ -22,4 +22,5 @@
 // assertFailure segfaults the app
 class assertFailure { public: assertFailure() { char *n = 0; *n = 0; } };
 
+#undef assert
 #define assert(x) if (!(x)) { std::cerr << "openc2e assert failed: " << #x << "\n"; throw assertFailure(); }

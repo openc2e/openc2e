@@ -98,7 +98,7 @@ s16Image::s16Image(std::istream &in) {
 		buffers[i] = new unsigned short[widths[i] * heights[i]];
 		in.seekg(offsets[i], std::ios::beg);
 		in.read((char *)buffers[i], (widths[i] * heights[i] * 2));
-		for (unsigned int k = 0; k < (widths[i] * heights[i]); k++) {
+		for (unsigned int k = 0; k < (unsigned int) (widths[i] * heights[i]); k++) {
 			((unsigned short *)buffers[i])[k] = swapEndianShort(((unsigned short *)buffers[i])[k]);
 		}
 	}

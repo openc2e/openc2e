@@ -119,8 +119,8 @@ void caosVM::c_DOOR() {
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
-	Room *r1 = world.map.getRoom(room1);
-	Room *r2 = world.map.getRoom(room2);
+/*	Room *r1 = world.map.getRoom(room1);
+	Room *r2 = world.map.getRoom(room2); */
 	cout << "unimplemented: DOOR\n";
 }
 

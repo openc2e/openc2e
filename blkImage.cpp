@@ -31,7 +31,7 @@ blkImage::blkImage(std::istream &in) {
 	totalwidth = width * 128; totalheight = height * 128;
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 
-	assert(m_numframes == (width * height));
+	assert(m_numframes == (unsigned int) (width * height));
 
 	widths = new uint16[m_numframes];
 	heights = new uint16[m_numframes];
