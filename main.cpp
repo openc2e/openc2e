@@ -176,14 +176,14 @@ extern "C" int main(int argc, char *argv[]) {
 							case SDLK_DOWN:
 								adjusty += 20; break;
 							case SDLK_1:
-								if (world.map.getMetaRoomCount == 1)
+								if (world.map.getMetaRoomCount() == 1)
 									break;
 								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id - 1);
 								adjustx = world.map.getCurrentMetaRoom()->x();
 								adjusty = world.map.getCurrentMetaRoom()->y();
 								break;
 							case SDLK_2:
-								if (world.map.getMetaRoomCount == world.map.getCurrentMetaRoom()->id)
+								if (world.map.getMetaRoomCount() == world.map.getCurrentMetaRoom()->id)
 									break;
 								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id + 1);
 								adjustx = world.map.getCurrentMetaRoom()->x();
