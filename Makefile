@@ -1,9 +1,12 @@
-SOURCES = $(wildcard *.c) $(wildcard *.cpp) 
+CXXFILES = $(wildcard *.cpp) $(wildcard tools/*.cpp)
+CFILES = $(wildcard *.c) $(wildcard tools/*.c) 
+
+SOURCES = $(CXXFILES) $(CFILES)
 HEADERS = $(wildcard *.h)
 EVERYTHING = $(SOURCES) $(HEADERS)
 
-SOURCEDEPS = $(patsubst %.cpp,.deps/%.dpp,$(wildcard *.cpp)) \
-			 $(patsubst %.c,.deps/%.d,$(wildcard *.c))
+SOURCEDEPS = $(patsubst %.cpp,.deps/%.dpp,$(CXXFILES)) \
+			 $(patsubst %.c,.deps/%.d,$(CFILES))
 
 OPENC2E = \
 	Agent.o \
@@ -51,33 +54,32 @@ OPENC2E = \
 	SDLBackend.o \
 	SDL_gfxPrimitives.o \
 	SimpleAgent.o \
+	SkeletalCreature.o \
 	streamutils.o \
 	Vehicle.o \
 	World.o
 
 LDFLAGS=-lboost_filesystem $(shell sdl-config --static-libs) -lz
-CFLAGS=-ggdb3 $(shell sdl-config --cflags)
+CFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 CPPFLAGS=$(CFLAGS)
 
-all: openc2e filetests praydumper
+all: openc2e tools/filetests tools/praydumper
 
-#.deps/%.d: %.c .deps
-#	$(CC) -M $(CFLAGS) -o "$@.tmp" $<
-#	(cat "$@.tmp"; echo; sed "s|$<|$@|g" < "$@.tmp") > $@
+%.o: %.cpp
+	$(CXX) $(CPPFLAGS) -o $@ -c $<
 
-#.deps/%.dpp: %.cpp .deps
-#	$(CC) -M $(CFLAGS) -o "$@.tmp" $<
-#	(cat "$@.tmp"; echo; sed "s|$<|$@|g" < "$@.tmp") > $@
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 # shamelessly ripped from info make, with tweaks
 .deps/%.d: %.c
-	mkdir -p .deps; \
+	mkdir -p `dirname $@`; \
 	$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
 .deps/%.dpp: %.cpp
-	mkdir -p .deps; \
+	mkdir -p `dirname $@`; \
 	$(CXX) -M $(CPPFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
@@ -93,14 +95,14 @@ include .deps/meta
 openc2e: $(OPENC2E)
 	g++ $(LDFLAGS) $(CXXFLAGS) -o $@ $^
 
-filetests: filetests.o genomeFile.o streamutils.o Catalogue.o
+tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
 	g++ $(LDFLAGS) $(CXXFLAGS) -o $@ $^
 
-praydumper: praydumper.o pray.o
+tools/praydumper: tools/praydumper.o pray.o
 	g++ $(LDFLAGS) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -f *.o openc2e filetests praydumper
+	rm -f *.o openc2e filetests praydumper tools/*.o
 	rm -rf .deps
 
 
