@@ -21,6 +21,28 @@
 #include <iostream>
 #include "openc2e.h"
 
+void caosVM::jumpToAfterEquivalentNext() {
+	// todo: add non-ENUM things
+	cmdinfo *next = getCmdInfo("NEXT", true); assert(next != 0);
+	cmdinfo *enu = getCmdInfo("ENUM", true); assert(enu != 0);
+
+	int stack = 0;
+	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
+		token front = currentscript->lines[i].front();
+		if (front.cmd == enu) {
+			stack++
+		} else if (front.cmd == next) {
+			if (stack) stack--;
+			else {
+				currentline = i + 1;
+				return;
+			}
+		}
+	}
+	currentline = currentscript->lines.size();
+	std::cerr << "caosVM: couldn't find matching NEXT, stopping script\n";
+}
+
 void caosVM::jumpToNextIfBlock() {
 	cmdinfo *doif = getCmdInfo("DOIF", true); assert(doif != 0);
 	cmdinfo *elif = getCmdInfo("ELIF", true); assert(elif != 0);
@@ -43,7 +65,7 @@ void caosVM::jumpToNextIfBlock() {
 		}
 	}
 	currentline = currentscript->lines.size();
-	std::cerr << "couldn't find matching block for IF blocks, stopping script\n";
+	std::cerr << "caosVM: couldn't find matching block for IF blocks, stopping script\n";
 }
 
 /**
@@ -194,4 +216,33 @@ void caosVM::c_RETN() {
 	assert(!linestack.empty());
 	currentline = linestack.back();
 	linestack.pop_back();
+}
+
+/**
+ NEXT (command)
+*/
+void caosVM::c_NEXT() {
+	VM_VERIFY_SIZE(0)
+	assert(!linestack.empty());
+	currentline = linestack.back();
+	linestack.pop_back();
+}
+
+/**
+ ENUM (command) family (integer) genus (integer) species (integer)
+*/
+void caosVM::c_ENUM() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+
+	jumpToAfterEquivalentNext();
+	linestack.push_back(currentline);
+	repstack.push_back(0);
+	std::cerr << "unimplemented: ENUM\n";
+
+	// TODO: actual code here
+	
+	targ = owner;
 }

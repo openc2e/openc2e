@@ -6,7 +6,6 @@
 
 #include "World.h"
 #include "SimpleAgent.h"
-#include "caosVM.h"
 #include "SDLBackend.h"
 
 #include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
@@ -51,6 +50,7 @@ extern "C" int main(int argc, char *argv[]) {
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004 Alyssa Milburn\n\n";
 
 	setupCommandPointers();
+	world.init();
 
 	char *dir = "data/Bootstrap/001 World/";
 	if (argc > 1) dir = argv[1];
@@ -96,7 +96,6 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 
 	backend.init();
-	world.init();
 
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		world.map.SetCurrentMetaRoom(j);
@@ -139,6 +138,14 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + adjustx, event.motion.y + adjusty);
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						std::cout << "got mouse click" << std::endl;
+						Agent *a = world.agentAt(adjustx + event.button.x, adjusty + event.button.y);
+						if (a) a->fireScript(1);
+						else std::cout << "(mouse click ignored)" << std::endl;
+					}
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {

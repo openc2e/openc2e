@@ -19,6 +19,7 @@
 
 #include "Map.h"
 #include "Agent.h"
+#include "Scriptorium.h"
 #include <set>
 #include <map>
 
@@ -37,7 +38,10 @@ public:
 	std::multiset<Agent *, agentzorder> agents;
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 
+	Scriptorium scriptorium;
+
 	void addAgent(Agent *a);
+	Agent *agentAt(unsigned int x, unsigned int y);
 	Agent *hand() { return theHand; }
 	
 	World();

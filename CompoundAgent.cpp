@@ -36,7 +36,7 @@ void CompoundAgent::addPart(CompoundPart *p) {
 	std::sort(parts.begin(), parts.end());
 }
 
-void CompoundAgent::delPart(int id) {
+void CompoundAgent::delPart(unsigned int id) {
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
 		if ((*x)->id == id) { parts.erase(x); return; }
 	}
@@ -108,5 +108,7 @@ unsigned int CompoundAgent::getAttributes() {
 }
 
 void CompoundAgent::tick() {
+	Agent::tick();
+
 	// TODO: implement CompoundAgent ticks for animation
 }

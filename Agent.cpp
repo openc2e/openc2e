@@ -18,11 +18,25 @@
  */
 
 #include "Agent.h"
+#include "World.h"
+#include <iostream>
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  family(f), genus(g), species(s), zorder(p), visible(true) {
+  visible(true), family(f), genus(g), species(s), zorder(p), vm(this) {
 }
 
 void Agent::moveTo(unsigned int _x, unsigned int _y) {
 	x = _x; y = _y;
+}
+
+void Agent::fireScript(unsigned char event) {
+	script &s = world.scriptorium.getScript(family, genus, species, event);
+	if (s.lines.empty()) return;
+	vm.fireScript(s, (event == 9));
+	vm.targ = this;
+	std::cout << "Agent::fireScript fired " << (unsigned int)family << " " << (unsigned int)genus << " " << species << " " << (unsigned int)event << std::endl;
+}
+
+void Agent::tick() {
+	vm.tick();
 }

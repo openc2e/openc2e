@@ -22,7 +22,7 @@
 
 #include "creaturesImage.h"
 #include "SDLBackend.h"
-#include "caosScript.h" // for caosVar in Agent
+#include "caosVM.h" // caosVar and caosVM below
 
 class Agent {
 public:
@@ -31,7 +31,10 @@ public:
 	unsigned short species;
 	unsigned int zorder;
 	caosVar var[100]; // OVxx
+	
+	caosVM vm;
 
+	void fireScript(unsigned char event);
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	unsigned int x, y;
 	void moveTo(unsigned int, unsigned int);
@@ -42,7 +45,7 @@ public:
 	virtual void setAttributes(unsigned int attr) = 0;
 	virtual unsigned int getAttributes() = 0;
 
-	virtual void tick() = 0;
+	virtual void tick();
 
 	friend struct agentzorder;
 };

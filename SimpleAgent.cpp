@@ -87,6 +87,7 @@ unsigned int SimpleAgent::getCurrentSprite() {
 }
 
 void SimpleAgent::tick() {
+	Agent::tick();
 	if (!animation.empty()) {
 		unsigned int f = frameno + 1;
 		if (f == animation.size()) return;

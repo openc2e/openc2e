@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "openc2e.h"
+#include "World.h"
 #include <iostream>
 #include <sstream>
 
@@ -95,6 +96,9 @@ std::string caosScript::dump() {
 	return out;
 }
 
+// TODO: debug use only?
+std::map<std::string, bool> seenbadsymbols;
+
 token makeToken(std::string &src, bool str, token &lasttok) {
 	token r;
 	// todo: hrr. we shouldn't be doing this on every tokenisation pass
@@ -122,7 +126,11 @@ token makeToken(std::string &src, bool str, token &lasttok) {
 			if (varnumber != -1) r.varnumber = varnumber;
 		}
 		if (!r.cmd && !r.func) {
-			std::cerr << "parser failed to find a match for presumed function \"" << src << "\"\n";
+			if (!seenbadsymbols[src]) {
+				std::cerr << "caosScript parser failed to find presumed function \"" << src << "\": each missing function is reported only once\n";
+				seenbadsymbols[src] = true;
+			}
+
 			throw tokeniseFailure();
 		}
 	} else { // presumably we have a comparison
@@ -209,7 +217,7 @@ caosScript::caosScript(std::istream &in) {
 				rawlines.push_back(s);
 			}
 		} catch (tokeniseFailure f) {
-			std::cerr << "failed to tokenise line #" << lineno << "(" << s << ")\n";
+			// std::cerr << "failed to tokenise line #" << lineno << "(" << s << ")\n";
 		}
 	}
 
@@ -232,10 +240,18 @@ caosScript::caosScript(std::istream &in) {
 		if (l.front().cmd != 0) {
 			if (l.front().cmd == scrp) {
 				assert(l.size() == 5);
+				int one, two, three, four;
+				std::list<token>::iterator i = l.begin();
+				// TODO: shouldn't add scripts here, should store them for optional addition
+				i++; assert(i->isvar); assert(i->var.hasInt()); one = i->var.intValue;
+				i++; assert(i->isvar); assert(i->var.hasInt()); two = i->var.intValue;
+				i++; assert(i->isvar); assert(i->var.hasInt()); three = i->var.intValue;
+				i++; assert(i->isvar); assert(i->var.hasInt()); four = i->var.intValue;
+				std::cout << "caosScript: script " << one << " " << two << " " << three << " " << four
+					<< " being added to scriptorium.\n";
+				currscrip = &(world.scriptorium.getScript(one, two, three, four));
 				// todo: verify event script doesn't already exist, maybe? don't know
 				// what real engine does
-				// FIXME
-				currscrip = &removal;
 			} else if (l.front().cmd == rscr) {
 				currscrip = &removal;
 			} else if (l.front().cmd == endm) {

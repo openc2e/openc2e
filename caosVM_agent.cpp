@@ -223,14 +223,6 @@ void caosVM::c_KILL() {
 }
 
 /**
- NEXT (command)
-*/
-void caosVM::c_NEXT() {
-	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: NEXT\n";
-}
-
-/**
  ANIM (command) poselist (byte-string)
 
  set the animation string for TARG, in the format '1 2 3 4'
@@ -383,6 +375,7 @@ void caosVM::c_MESG_WRT() {
  TOTL (integer) family (integer) genus (integer) species (integer)
 */
 void caosVM::v_TOTL() {
+	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
@@ -393,6 +386,7 @@ void caosVM::v_TOTL() {
  SHOW (command) visibility (integer)
 */
 void caosVM::c_SHOW() {
+	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(visibility)
 	assert((visibility == 0) || (visibility == 1));
 	assert(targ);

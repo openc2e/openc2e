@@ -44,3 +44,17 @@ void World::tick() {
 	}
 	// todo: tick rooms
 }
+
+Agent *World::agentAt(unsigned int x, unsigned int y) {
+	Agent *temp = 0;
+
+	// we're looking for the *last* agent in the set which is at this location (ie, topmost)
+	// TODO: this is a bit of a silly hack because I don't calculate agent cores atm
+	for (std::multiset<Agent *, agentzorder>::iterator i = agents.begin(); i != agents.end(); i++) {
+		if ((*i)->x <= x) if ((*i)->y <= y) if (((*i) -> x + 20) >= x) if (((*i) -> y + 20) >= y)
+			if ((*i) != theHand)
+				temp = *i;
+	}
+	
+	return temp;
+}

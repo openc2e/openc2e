@@ -181,7 +181,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SHADOW = NO;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = NO;
@@ -349,6 +349,7 @@
 				E74DB7B706B460B300004BD4,
 				E7F127FF072C2C200023ADBD,
 				E7F12849072C47750023ADBD,
+				E7B0D7E7073BD6F6005B376D,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -533,6 +534,7 @@
 				E7EAD59806B7E16A0040B1C9,
 				E7F127FD072C2C090023ADBD,
 				E7F1284A072C47750023ADBD,
+				E7B0D7E8073BD6F6005B376D,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -970,6 +972,34 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
+		E7B0D7E5073BD6F5005B376D = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = Scriptorium.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7B0D7E6073BD6F6005B376D = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = Scriptorium.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7B0D7E7073BD6F6005B376D = {
+			fileRef = E7B0D7E5073BD6F5005B376D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E7B0D7E8073BD6F6005B376D = {
+			fileRef = E7B0D7E6073BD6F6005B376D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		E7E679630663419C004F1581 = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
@@ -1163,6 +1193,8 @@
 		};
 		E7E67AC4066368CA004F1581 = {
 			children = (
+				E7B0D7E5073BD6F5005B376D,
+				E7B0D7E6073BD6F6005B376D,
 				E7F127FE072C2C200023ADBD,
 				E77717C506AF0FDA00507FAF,
 				E7E67AC9066368D8004F1581,

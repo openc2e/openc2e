@@ -17,30 +17,41 @@
  *
  */
 
+#ifndef _CAOSVM_H
+#define _CAOSVM_H
+
 #include "caosScript.h"
 
 #define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
 
 class caosVM {
-protected:
-	caosVar var[100];
-	caosVar _p_[2];
-	
-	std::vector<caosVar> params;
-	caosVar result;
-	bool truth;
-	
-	Agent *targ, *owner, *_it_;
-
+//protected:
+public: // right now, Agent::fireEvent sets targ itself
+	// script state...
+	script *currentscript;
 	unsigned int currentline;
 	std::vector<bool> truthstack;
 	std::vector<unsigned int> linestack;
-	std::vector<int> repstack;
+	std::vector<unsigned int> repstack;
+	bool locked, noschedule;
+	unsigned int blockingticks;
 
-	script *currentscript;
-
+	// ...which includes variables accessible to script
+	caosVar var[100]; // might want to make this a map, for memory efficiency
+	caosVar _p_[2]; // might want to add this onto the end of above map, if done
+	Agent *targ, *owner, *_it_;
+	
+	void resetScriptState(); // resets everything except OWNR
+	
+	// variables to pass data to/from opcodes
+	std::vector<caosVar> params;
+	caosVar result;
+	bool truth;
 	signed char varnumber; // VAxx/OVxx hack
+
+	void jumpToNextIfBlock();
+	void jumpToAfterEquivalentNext();
 
 public:
 	// map
@@ -104,6 +115,8 @@ public:
 	void c_GSUB();
 	void c_SUBR();
 	void c_RETN();
+	void c_ENUM();
+	void c_NEXT();
 	
 	// debug
 	void c_TEST_PASS();
@@ -130,7 +143,6 @@ public:
 	void v_FROM();
 	void v_POSE();
 	void c_KILL();
-	void c_NEXT();
 	void c_SCRX();
 	void c_ANIM();
 	void v_ATTR();
@@ -204,9 +216,10 @@ public:
 	void c_CLAC();
 
 	void runCurrentLine();
-	void jumpToNextIfBlock();
-	caosVar internalRun(std::list<token> &tokens, bool first);
+	caosVar internalRun(std::list<token> &tokens, bool first); // run a command, as represented by tokens
 	void runEntirely(script &s);
+	void tick();
+	void fireScript(script &s, bool nointerrupt);
 
 	caosVM(Agent *o);
 
@@ -259,3 +272,5 @@ class tokeniseFailure { };
 #define VM_PARAM_DECIMAL(name) caosVar name = params.back(); \
 	if ((!name.hasFloat()) && (!name.hasInt())) { throw badParamException(); } \
 	params.pop_back();
+
+#endif

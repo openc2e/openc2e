@@ -26,6 +26,7 @@ caosVM::caosVM(Agent *o) {
 	// todo: http://www.gamewaredevelopment.co.uk/cdn/cdn_more.php?CDN_article_id=37 discusses
 	// how targ is usually set to owner in event scripts, think about that
 	targ = owner;
+	resetScriptState();
 }
 
 bool caosVar::operator == (caosVar &v) {
@@ -178,29 +179,59 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 }
 
 void caosVM::runEntirely(script &s) {
+	resetScriptState();
 	currentscript = &s;
-	unsigned int i = 0;
-	linestack.clear();
-	while (i < s.lines.size()) {
-		currentline = i;
-		std::list<token> b = s.lines[i];
-		try {
-			if (!b.empty()) internalRun(b, true);
-		} catch (badParamException e) {
-			std::cerr << "caught badParamException running " << s.rawlines[i] << "\n";
-		} catch (notEnoughParamsException e) {
-			std::cerr << "caught notEnoughParamsException running " << s.rawlines[i] << "\n";
-		}
-		if (currentline != i) {
-			i = currentline; // move to the line the flow wants us to
-		} else {
-			i++; // next line
-		}
+	while (currentline < currentscript->lines.size()) {
+		runCurrentLine();
 	}
-	if (!linestack.empty()) std::cerr << "warning: linestack wasn't empty at the end of runEntirely\n";
+	currentscript = 0;
+}
+
+void caosVM::fireScript(script &s, bool nointerrupt) {
+	if (locked) return; // can't interrupt scripts which called LOCK
+	if (currentscript && nointerrupt) return; // don't interrupt scripts with a timer script
+	resetScriptState();
+	currentscript = &s;
+}
+
+void caosVM::resetScriptState() {
+	truthstack.clear();
+	linestack.clear();
+	repstack.clear();
+
+	currentscript = 0;
+	currentline = 0;
+	locked = false;
+	noschedule = false;
+	blockingticks = 0;
+
+	targ = 0;
+	_it_ = 0;
+
+	_p_[0].reset(); _p_[1].reset();
+	for (unsigned int i = 0; i < 100; i++) { var[i].reset(); }
+}
+
+void caosVM::tick() {
+	if (blockingticks) { blockingticks--; return; }
+	if (!currentscript) return;
+	while (currentline < currentscript->lines.size()) {
+		runCurrentLine();
+	}
 	currentscript = 0;
 }
 
 void caosVM::runCurrentLine() {
+	unsigned int i = currentline;
+	std::list<token> b = currentscript->lines[currentline];
+	try {
+		if (!b.empty()) internalRun(b, true);
+	} catch (badParamException e) {
+		std::cerr << "caught badParamException running " << currentscript->rawlines[i] << "\n";
+	} catch (notEnoughParamsException e) {
+		std::cerr << "caught notEnoughParamsException running " << currentscript->rawlines[i] << "\n";
+	}
+	/* Generally, we want to proceed to the next line. Sometimes, opcodes will change the
+		current line from under us, and in those instances, we should leave it alone. */
+	if (currentline == i) currentline++;
 }
-

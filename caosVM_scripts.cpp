@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "World.h"
 #include <iostream>
 using std::cerr;
 
@@ -28,7 +29,8 @@ using std::cerr;
  */
 void caosVM::c_INST() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: INST\n";
+	noschedule = true;
+	locked = true;
 }
 
 /**
@@ -38,7 +40,11 @@ void caosVM::c_INST() {
  */
 void caosVM::c_SLOW() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: SLOW\n";
+	if (!noschedule) cerr << "can't call SLOW on a script not in INST mode";
+	else {
+		noschedule = false;
+		locked = false;
+	}
 }
 
 /**
@@ -48,7 +54,7 @@ void caosVM::c_SLOW() {
  */
 void caosVM::c_LOCK() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: LOCK\n";
+	locked = true;
 }
 
 /**
@@ -58,7 +64,9 @@ void caosVM::c_LOCK() {
  */
 void caosVM::c_UNLK() {
 	VM_VERIFY_SIZE(0)
-	cerr << "unimplemented: UNLK\n";
+	if (noschedule) cerr << "can't call UNLK on script in INST mode\n";
+	else if (!locked) cerr << "can't call UNLK on a script not in LOCK mode";
+	else locked = false;
 }
 
 /**
@@ -69,7 +77,8 @@ void caosVM::c_UNLK() {
 void caosVM::c_WAIT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(ticks)
-	cerr << "unimplemented: WAIT\n";
+	assert(ticks > 0); // todo: is this right?
+	blockingticks = ticks;
 }
 
 /**
@@ -81,15 +90,15 @@ void caosVM::c_STOP() {
 }
 
 /**
- SCRX (command) event (integer) family (integer) genus (integer) species (integer)
+ SCRX (command) family (integer) genus (integer) species (integer) event (integer)
 
  delete the event script in question
 */
 void caosVM::c_SCRX() {
 	VM_VERIFY_SIZE(4)
+	VM_PARAM_INTEGER(event) assert(event >= 0); assert(event <= 255);
 	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
-	VM_PARAM_INTEGER(event) assert(event >= 0); assert(event <= 255);
-	cerr << "unimplemented: SCRX\n";
+	world.scriptorium.delScript(family, genus, species, event);
 }

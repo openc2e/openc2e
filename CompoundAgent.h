@@ -95,7 +95,7 @@ public:
 	unsigned int partCount() { return parts.size(); }
 	CompoundPart *part(unsigned int id);
 	void addPart(CompoundPart *);
-	void delPart(int);
+	void delPart(unsigned int);
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
 	virtual void tick();
