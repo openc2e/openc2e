@@ -54,11 +54,17 @@ void prayFile::read(istream &s) {
 		*/
 
 		// TODO: read the taggable agent blocks from a configuration file
-		if (strncmp(stringid, "AGNT", 4) == 0) // Creatures Adventures/Creatures 3 agent
-			b = new tagPrayBlock();
-		else if (strncmp(stringid, "DSAG", 4) == 0) // Docking Station agent
-			b = new tagPrayBlock();
-		else if (strncmp(stringid, "LIVE", 4) == 0) // Sea-Monkeys agent
+		// note we're probably missing warp blocks, playground blocks (if they exist), sea-monkeys blocks
+		bool tagblock;
+		tagblock = !strncmp(stringid, "AGNT", 4); // Creatures Adventures/Creatures 3 agent
+		if (!tagblock) tagblock = !strncmp(stringid, "DSAG", 4); // Docking Station agent
+		if (!tagblock) tagblock = !strncmp(stringid, "LIVE", 4); // Sea-Monkeys agent
+		if (!tagblock) tagblock = !strncmp(stringid, "EXPC", 4); // Creatures creature info
+		if (!tagblock) tagblock = !strncmp(stringid, "DSEX", 4); // DS creature info
+		if (!tagblock) tagblock = !strncmp(stringid, "SFAM", 4); // starter family info
+		if (!tagblock) tagblock = !strncmp(stringid, "EGGS", 4); // eggs info
+		if (!tagblock) tagblock = !strncmp(stringid, "DFAM", 4); // DS starter family info
+		if (tagblock)
 			b = new tagPrayBlock();
 		else
 			b = new unknownPrayBlock();
