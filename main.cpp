@@ -8,6 +8,8 @@
 #include "World.h"
 #include "caosVM.h"
 
+// testy!
+
 extern "C" int main(int argc, char *argv[]) {
 /*	if (argc != 2) {
 		std::cout << "syntax: openc2e filename";
