@@ -232,12 +232,12 @@ void caosVM::runCurrentLine() {
 		if (!b.empty()) internalRun(b, true);
 	} catch (badParamException e) {
 //#ifdef CAOSDEBUG
-		std::cerr << "caught badParamException"; // while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		std::cerr << "caught badParamException\n"; // while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
 //#endif
 	} catch (notEnoughParamsException e) {
-		std::cerr << "caught notEnoughParamsException"; // while running '" << currentscript->rawlines[i]; << "' (line " << i << ")\n";
+		std::cerr << "caught notEnoughParamsException\n"; // while running '" << currentscript->rawlines[i]; << "' (line " << i << ")\n";
 	} catch (assertFailure e) {
-		std::cerr << "caught assert failure '" << e.what(); // << "' while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		std::cerr << "caught assert failure '" << e.what() << "'\n"; // << "' while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
 		currentline = currentscript->lines.size();
 	}
 	/* Generally, we want to proceed to the next line. Sometimes, opcodes will change the
