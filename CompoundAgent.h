@@ -37,6 +37,7 @@ public:
 	unsigned int getHeight() { return sprite->height(firstimg); }
 	unsigned int getPose() { return pose; }
 	unsigned int getCurrentSprite() { return firstimg + pose; }
+	unsigned int getFrameNo() { return frameno; }
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { pose = p; }
 				
@@ -92,6 +93,8 @@ class CompoundAgent : public Agent {
 protected:
     std::vector<CompoundPart *> parts;
 
+	unsigned int width, height;
+
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 								std::string spritefile, unsigned int firstimage, unsigned int imagecount);
@@ -103,8 +106,8 @@ public:
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
 	virtual void tick();
-	virtual unsigned int getWidth() { return parts[0]->getWidth(); }
-	virtual unsigned int getHeight() { return parts[0]->getHeight(); }
+	virtual unsigned int getWidth() { return width; }
+	virtual unsigned int getHeight() { return height; }
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 };

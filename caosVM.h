@@ -31,6 +31,7 @@ protected:
 	// script state...
 	script *currentscript;
 	unsigned int currentline;
+	bool blocking;
 	std::vector<bool> truthstack;
 	std::vector<unsigned int> linestack;
 	std::vector<unsigned int> repstack;
@@ -82,6 +83,8 @@ public:
 	void v_GMAP();
 	void c_LINK();
 	void v_GRID();
+	void c_EMIT();
+	void v_WALL();
 	
 	// camera
 	void c_CMRT();
@@ -202,6 +205,9 @@ public:
 	void v_POSY();
 	void c_FRAT();
 	void c_OVER();
+	void c_PUHL();
+	void v_VISI();
+	void v_POSL();
 
 	// motion
 	void c_ELAS();
@@ -210,10 +216,16 @@ public:
 	void v_VELY();
 	void v_OBST();
 	void v_TMVT();
+	void v_TMVF();
 	void v_RELY();
 	void c_VELO();
 	void c_ACCG();
 	void v_ACCG();
+	void c_AERO();
+	void v_AERO();
+	void c_MVSF();
+	void c_FRIC();
+	void v_FRIC();
 	
 	// scripts
 	void c_INST();
@@ -228,13 +240,16 @@ public:
 	void c_PAT_DULL();
 	void c_PAT_BUTT();
 	void c_PAT_KILL();
+	void c_FCUS();
 
 	// creatures
 	void c_STIM_WRIT();
 	void c_ZOMB();
 	void c_DIRN();
 	void c_NOHH();
-	
+	void v_HHLD();
+	void c_MVFT();
+
 	// sounds
 	void c_SNDE();
 	void c_SNDC();

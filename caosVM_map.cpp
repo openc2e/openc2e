@@ -324,3 +324,25 @@ void caosVM::v_GRID() {
 	VM_PARAM_AGENT(agent)
 }
 
+/**
+ EMIT (command) ca_index (integer) amount (float)
+
+ make the target agent continually emit the specified amount of the specified CA into the room
+*/
+void caosVM::c_EMIT() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_FLOAT(amount)
+	VM_PARAM_INTEGER(ca_index)
+}
+
+/**
+ WALL (integer)
+
+ returns direction of last wall target agent collided with
+*/
+void caosVM::v_WALL() {
+	VM_VERIFY_SIZE(0)
+
+	v_DOWN();
+}
+

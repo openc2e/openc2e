@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include <iostream>
+#include "openc2e.h"
 using std::cerr;
 
 /**
@@ -70,3 +71,29 @@ void caosVM::c_DIRN() {
 	// TODO
 }
 
+/**
+ HHLD (agent)
+
+ return creatures holding hands with pointer, or NULL if none
+*/
+void caosVM::v_HHLD() {
+	VM_VERIFY_SIZE(0)
+
+	result.setAgent(0);
+}
+
+/**
+ MVFT (command) x (float) y (float)
+
+ move target creature foot to (x, y)
+*/
+void caosVM::c_MVFT() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+
+	caos_assert(targ);
+
+	// TODO: dynamic_cast to Creature *
+}
+	

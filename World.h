@@ -43,7 +43,7 @@ public:
 	Catalogue catalogue;
 
 	void addAgent(Agent *a);
-	Agent *agentAt(unsigned int x, unsigned int y);
+	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
 	Agent *hand() { return theHand; }
 	
 	World();

@@ -49,6 +49,7 @@ public:
 	void setPose(unsigned int p) { pose = p; }
 	unsigned int getPose() { return pose; }
 	unsigned int getCurrentSprite() { return first_image + pose; }
+	unsigned int getFrameNo() { return frameno; }
 
 	virtual void tick();
 };

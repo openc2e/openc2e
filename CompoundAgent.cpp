@@ -26,6 +26,14 @@ void CompoundAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	for (std::vector<CompoundPart *>::iterator i = parts.begin(); i != parts.end(); i++) {
 		(*i)->render(renderer, xoffset + (int)x, yoffset + (int)y);
 	}
+
+	// draw core
+	int xoff = xoffset + x;
+	int yoff = yoffset + y;
+	renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF0000CC);
+	renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
+	renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
+	renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC);
 }
 
 void CompoundAgent::addPart(CompoundPart *p) {
@@ -34,6 +42,9 @@ void CompoundAgent::addPart(CompoundPart *p) {
 	// todo: we should prbly insert at the right place, not call sort
 	parts.push_back(p);
 	std::sort(parts.begin(), parts.end());
+
+	if (width < p->getWidth()) width = p->getWidth();
+	if (height < p->getHeight()) height = p->getHeight();
 }
 
 void CompoundAgent::delPart(unsigned int id) {
@@ -52,7 +63,7 @@ CompoundPart *CompoundAgent::part(unsigned int id) {
 }
 
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y);
+	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y);							
 }
 
 CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsigned short _species, unsigned int plane,
@@ -62,6 +73,9 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	// TODO: we ignore image count acos it sucks
 	CompoundPart *p = new DullPart(0, spritefile, firstimage, 0, 0, 0);
 	addPart(p);
+
+	width = p->getWidth();
+	height = p->getHeight();
 }
 
 CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg,

@@ -477,7 +477,7 @@ void caosVM::c_SHOW() {
 void caosVM::v_POSX() {
 	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
-	result.setFloat(targ->x);
+	result.setFloat(targ->x + (targ->getWidth() / 2));
 }
 
 /**
@@ -486,7 +486,7 @@ void caosVM::v_POSX() {
 void caosVM::v_POSY() {
 	VM_VERIFY_SIZE(0)
 	assert(targ);
-	result.setFloat(targ->y);
+	result.setFloat(targ->y + (targ->getHeight() / 2));
 }
 
 /**
@@ -509,6 +509,38 @@ void caosVM::c_OVER() {
 
 	assert(targ);
 
-	// TODO: wait for completion of animation of current agent/part
+	int fno, animsize;
+	
+ 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+	if (c) {
+		CompoundPart *p = c->part(part);
+		fno = p->getFrameNo();
+		animsize = p->animation.size();
+	} else {
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ);
+		caos_assert(a);
+		fno = a->getFrameNo();
+		animsize = a->animation.size();
+	}
+
+	if (fno + 1 == animsize) blocking = false;
+	else if (animsize == 0) blocking = false;
+	else blocking = true;
+}
+
+/**
+ PUHL (command) pose (integer) x (integer) y (integer)
+
+ set relative x/y coords for TARG's pickup point
+ pose is -1 for all poses, or a pose relative to the base specified in NEW: (not BASE)
+*/
+void caosVM::c_PUHL() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(pose)
+
+	assert(targ);
+	// TODO
 }
 

@@ -41,7 +41,7 @@ void caosVM::c_INST() {
  */
 void caosVM::c_SLOW() {
 	VM_VERIFY_SIZE(0)
-	if (!noschedule) cerr << "can't call SLOW on a script not in INST mode";
+	if (!noschedule) cerr << "can't call SLOW on a script not in INST mode\n";
 	else {
 		noschedule = false;
 		//locked = false;
@@ -66,7 +66,7 @@ void caosVM::c_LOCK() {
 void caosVM::c_UNLK() {
 	VM_VERIFY_SIZE(0)
 	/*if (noschedule) cerr << "can't call UNLK on script in INST mode\n";
-	else */ if (!locked) cerr << "can't call UNLK on a script not in LOCK mode";
+	else */ if (!locked) cerr << "can't call UNLK on a script not in LOCK mode\n";
 	else locked = false;
 }
 

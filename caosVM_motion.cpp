@@ -81,11 +81,25 @@ void caosVM::v_OBST() {
 */
 void caosVM::v_TMVT() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_INTEGER(y)
-	VM_PARAM_INTEGER(x)
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
 
 	assert(targ);
-	result.setInt(0); // TODO: don't hardcode
+	result.setInt(1); // TODO: don't hardcode
+}
+
+/**
+ TMVF (integer) x (float) y (float)
+ 
+ returns 1 if target create could move foot to (x, y) and still be in room system, otherwise returns 0
+*/
+void caosVM::v_TMVF() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+
+	assert(targ);
+	result.setInt(1); // TODO: don't hardcode
 }
 
 /**
@@ -107,6 +121,27 @@ void caosVM::v_ACCG() {
 
 	assert(targ);
 	result.setFloat(targ->accg);
+}
+
+/**
+ AERO (command) aero (float)
+*/
+void caosVM::c_AERO() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(aero)
+
+	assert(targ);
+	targ->aero = aero;
+}
+
+/**
+ AERO (float)
+*/
+void caosVM::v_AERO() {
+	VM_VERIFY_SIZE(0)
+	
+	assert(targ);
+	result.setFloat(targ->aero);
 }
 
 /**
@@ -137,5 +172,36 @@ void caosVM::c_VELO() {
 	targ->velx.setFloat(velx);
 	targ->vely.reset();
 	targ->vely.setFloat(vely);
+}
+
+/**
+ MVSF (command) x (float) y (float)
+
+ move the target agent to an area inside the room system at about (x, y)
+*/
+void caosVM::c_MVSF() {
+	// TODO
+	c_MVTO();
+}
+
+/**
+ FRIC (float)
+*/
+void caosVM::v_FRIC() {
+	VM_VERIFY_SIZE(0)
+	
+	assert(targ);
+	result.setFloat(targ->friction);
+}
+
+/**
+ FRIC (command) friction (integer)
+*/
+void caosVM::c_FRIC() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(friction) caos_assert(friction >= 0); caos_assert(friction <= 100);
+
+	assert(targ);
+	targ->friction = friction;
 }
 

@@ -167,7 +167,7 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						std::cout << "got mouse click" << std::endl;
-						Agent *a = world.agentAt(adjustx + event.button.x, adjusty + event.button.y);
+						Agent *a = world.agentAt(adjustx + event.button.x, adjusty + event.button.y, true);
 						if (a) a->fireScript(1);
 						else std::cout << "(mouse click ignored)" << std::endl;
 					}

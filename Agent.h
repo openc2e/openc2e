@@ -42,7 +42,8 @@ public:
 	unsigned int zorder;
 	unsigned int tickssincelasttimer, timerrate;
 	caosVar velx, vely;
-	float accg;
+	float accg, aero;
+	unsigned int friction;
 	float x, y;
 	
 	void fireScript(unsigned short event);

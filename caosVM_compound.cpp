@@ -111,3 +111,22 @@ void caosVM::c_PAT_KILL() {
 	a->delPart(part);
 }
 
+/**
+ FCUS (command)
+
+ focus current targeted part, which must be a PAT: TEXT
+ if target is null, then unfocus current part
+*/
+void caosVM::c_FCUS() {
+	VM_VERIFY_SIZE(0)
+
+	if (!targ) {
+		// TODO
+	} else {
+		CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ);
+		caos_assert(c);
+		TextEntryPart *p = dynamic_cast<TextEntryPart *>(c->part(part));
+		caos_assert(p);
+		// TODO
+	}
+}

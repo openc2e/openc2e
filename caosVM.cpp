@@ -206,6 +206,7 @@ void caosVM::resetScriptState() {
 	locked = false;
 	noschedule = false;
 	blockingticks = 0;
+	blocking = false;
 
 	setTarg(0);
 	_it_ = 0;
@@ -221,6 +222,7 @@ void caosVM::tick() {
 	// run 5 lines per tick
 	while ((currentline < currentscript->lines.size()) && (noschedule || n < 5)) {
 		runCurrentLine();
+		if (blocking) return; // todo: should we check for noschedule/etc?
 		n++;
 	}
 	if (currentline == currentscript->lines.size()) {
@@ -237,7 +239,7 @@ void caosVM::runCurrentLine() {
 		if (!b.empty()) internalRun(b, true);
 	} catch (badParamException e) {
 //#ifdef CAOSDEBUG
-		std::cerr << "caught badParamException\n"; // while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		std::cerr << "caught badParamException while running '" << currentscript->dumpLine(currentline) << "' (line #" << i << ")" << std::endl;
 //#endif
 	} catch (notEnoughParamsException e) {
 		std::cerr << "caught notEnoughParamsException\n"; // while running '" << currentscript->rawlines[i]; << "' (line " << i << ")\n";
@@ -248,5 +250,5 @@ void caosVM::runCurrentLine() {
 	}
 	/* Generally, we want to proceed to the next line. Sometimes, opcodes will change the
 		current line from under us, and in those instances, we should leave it alone. */
-	if (currentline == i) currentline++;
+	if ((currentline == i) && (!blocking)) currentline++;
 }
