@@ -18,6 +18,7 @@
  */
 
 #include "Camera.h"
+#include "World.h"
 
 Camera::Camera() {
 	x = 0;
@@ -27,15 +28,34 @@ Camera::Camera() {
 	trackedagent = 0;
 }
 
-void Camera::goToMetaroom(MetaRoom *m, int x, int y, cameratransition transition) {
+MetaRoom *Camera::getMetaRoom() {
+	return world.map.getMetaRoom(metaroom);
+}
+
+void Camera::goToMetaRoom(unsigned int m) {
+	metaroom = m;
+	x = getMetaRoom()->x();
+	y = getMetaRoom()->y();
+}
+
+void Camera::goToMetaRoom(unsigned int m, int _x, int _y, cameratransition transition) {
+	metaroom = m;
+	x = _x;
+	y = _y;
+	// TODO: transition
 }
 
 void Camera::moveTo(int _x, int _y, panstyle pan) {
+	x = _x;
+	y = _y;
+	// TODO: panning
 }
 
 void Camera::trackAgent(class Agent *a, int xp, int yp, trackstyle s, cameratransition transition) {
+	// TODO
 }
 
 void Camera::tick() {
+	// TODO
 }
 					

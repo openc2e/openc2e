@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef _OPENC2E_CAMERA_H
+#define _OPENC2E_CAMERA_H
+
 #include "MetaRoom.h"
 #include "SDLBackend.h"
 
@@ -27,7 +30,7 @@ enum panstyle { jump = 0, smoothscroll = 1, smoothscrollifvisible = 2 };
 class Camera {
 protected:
 	unsigned int x, y;
-	MetaRoom *metaroom;
+	unsigned int metaroom;
 
 	bool panning;
 	unsigned int destx, desty;
@@ -44,8 +47,10 @@ public:
 	unsigned int const getY() { return y; }
 	unsigned int const getXCentre() { return x + (getWidth() / 2); }
 	unsigned int const getYCentre() { return y + (getHeight() / 2); }
-	
-	void goToMetaroom(MetaRoom *m, int x, int y, cameratransition transition);
+
+	MetaRoom *getMetaRoom();
+	void goToMetaRoom(unsigned int m);
+	void goToMetaRoom(unsigned int m, int x, int y, cameratransition transition);
 	void moveTo(int _x, int _y, panstyle pan);
 	void trackAgent(class Agent *a, int xp, int yp, trackstyle s, cameratransition transition);
 
@@ -62,4 +67,6 @@ public:
 	unsigned int const getWidth() { return backend->getWidth(); }
 	unsigned int const getHeight() { return backend->getHeight(); }
 };
+
+#endif
 

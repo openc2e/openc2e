@@ -9,6 +9,7 @@
 #include "boost/filesystem/convenience.hpp"
 
 #include "World.h"
+#include "caosVM.h"
 #include "SimpleAgent.h"
 #include "SDLBackend.h"
 
@@ -18,11 +19,12 @@
 SDLBackend backend;
 
 SDL_Surface **backsurfs[20]; // todo: grab metaroom count, don't arbitarily define 20
-int adjustx, adjusty;
 bool showrooms = false, paused = false;
 
 void drawWorld() {
-	MetaRoom *m = world.map.getCurrentMetaRoom();
+	int adjustx = world.camera.getX();
+	int adjusty = world.camera.getY();
+	MetaRoom *m = world.camera.getMetaRoom();
 	blkImage *test = m->backImage();
 	for (unsigned int i = 0; i < (test->totalheight / 128); i++) {
 		for (unsigned int j = 0; j < (test->totalwidth / 128); j++) {
@@ -38,8 +40,8 @@ void drawWorld() {
 	}
 	if (showrooms) {
 		Room *r = world.map.roomAt(world.hand()->x, world.hand()->y);
-		for (std::vector<Room *>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
-				 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
+		for (std::vector<Room *>::iterator i = world.camera.getMetaRoom()->rooms.begin();
+				 i != world.camera.getMetaRoom()->rooms.end(); i++) {
 			unsigned int col = 0xFFFF00CC;
 			if (*i == r) col = 0xFF00FFCC;
 			else if (r) {
@@ -89,6 +91,9 @@ extern "C" int main(int argc, char *argv[]) {
 	setupCommandPointers();
 	world.init();
 	world.catalogue.initFrom("data/Catalogue/");
+	// moved backend.init() here because we need the camera to be valid - fuzzie
+	backend.init();
+	world.camera.setBackend(&backend);
 
 	std::vector<std::string> scripts;
 	fs::path scriptdir((argc > 1 ? argv[1] : "data/Bootstrap/001 World/"), fs::native);
@@ -132,10 +137,9 @@ extern "C" int main(int argc, char *argv[]) {
 
 	if (world.map.getMetaRoomCount() == 0) {
 		std::cerr << "\nNo metarooms found in given directory (" << scriptdir.native_directory_string() << "), exiting.\n";
+		SDL_Quit();
 		return 0;
 	}
-
-	backend.init();
 
 	SDLNet_Init();
 	TCPsocket listensocket = 0;
@@ -151,8 +155,7 @@ extern "C" int main(int argc, char *argv[]) {
 	std::cout << "listening on port " << listenport << std::endl;
 
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
-		world.map.SetCurrentMetaRoom(j);
-		MetaRoom *m = world.map.getCurrentMetaRoom();
+		MetaRoom *m = world.map.getMetaRoom(j);
 		blkImage *test = m->backImage();
 		assert(test != 0);
 
@@ -168,10 +171,7 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 	}
 	
-	world.map.SetCurrentMetaRoom(0);
-	
-	adjustx = world.map.getCurrentMetaRoom()->x();
-	adjusty = world.map.getCurrentMetaRoom()->y();
+	world.camera.goToMetaRoom(0);
 	drawWorld();
 
 	bool done = false;
@@ -228,12 +228,13 @@ extern "C" int main(int argc, char *argv[]) {
 					backend.resizeNotify(event.resize.w, event.resize.h);
 					break;
 				case SDL_MOUSEMOTION:
-					world.hand()->moveTo(event.motion.x + adjustx, event.motion.y + adjusty);
+					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						std::cout << "got mouse click" << std::endl;
-						Agent *a = world.agentAt(adjustx + event.button.x, adjusty + event.button.y, true);
+						// TODO: just take the world.hand() x/y here?
+						Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), true);
 						if (a) {
 							if (a->clik != -1) {
 								// TODO: handle CLIK
@@ -263,18 +264,14 @@ extern "C" int main(int argc, char *argv[]) {
 							case SDLK_q:
 								done = true; break;
 							case SDLK_PAGEDOWN:
-								if (world.map.getCurrentMetaRoom()->id == 0)
+								if (world.camera.getMetaRoom()->id == 0)
 									break;
-								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id - 1);
-								adjustx = world.map.getCurrentMetaRoom()->x();
-								adjusty = world.map.getCurrentMetaRoom()->y();
+								world.camera.goToMetaRoom(world.camera.getMetaRoom()->id - 1);
 								break;
 							case SDLK_PAGEUP:
-								if ((world.map.getMetaRoomCount() - 1) == world.map.getCurrentMetaRoom()->id)
+								if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
 									break;
-								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id + 1);
-								adjustx = world.map.getCurrentMetaRoom()->x();
-								adjusty = world.map.getCurrentMetaRoom()->y();
+								world.camera.goToMetaRoom(world.camera.getMetaRoom()->id + 1);
 								break;
 							default:
 								break;
@@ -315,23 +312,25 @@ extern "C" int main(int argc, char *argv[]) {
 		if (vely <= -maxspeed) vely = -maxspeed;
 
 		if (velx || vely) {
-			int adjustbyx = (int) velx;
-			int adjustbyy = (int) vely;
-			if ((adjustx + adjustbyx) < (int)world.map.getCurrentMetaRoom()->x())
-				adjustbyx = world.map.getCurrentMetaRoom()->x() - adjustx;
+			int adjustx = world.camera.getX(), adjusty = world.camera.getY();
+			int adjustbyx = (int)velx, adjustbyy = (int) vely;
+			
+			if ((adjustx + adjustbyx) < (int)world.camera.getMetaRoom()->x())
+				adjustbyx = world.camera.getMetaRoom()->x() - adjustx;
 			else if ((adjustx + adjustbyx + backend.getWidth()) >
-					(world.map.getCurrentMetaRoom()->x() + world.map.getCurrentMetaRoom()->width()))
-				adjustbyx = world.map.getCurrentMetaRoom()->x() + 
-					world.map.getCurrentMetaRoom()->width() - backend.getWidth() - adjustx;
-			if ((adjusty + adjustbyy) < (int)world.map.getCurrentMetaRoom()->y())
-				adjustbyy = world.map.getCurrentMetaRoom()->y() - adjusty;
+					(world.camera.getMetaRoom()->x() + world.camera.getMetaRoom()->width()))
+				adjustbyx = world.camera.getMetaRoom()->x() + 
+					world.camera.getMetaRoom()->width() - backend.getWidth() - adjustx;
+			
+			if ((adjusty + adjustbyy) < (int)world.camera.getMetaRoom()->y())
+				adjustbyy = world.camera.getMetaRoom()->y() - adjusty;
 			else if ((adjusty + adjustbyy + backend.getHeight()) > 
-					(world.map.getCurrentMetaRoom()->y() + world.map.getCurrentMetaRoom()->height()))
-				adjustbyy = world.map.getCurrentMetaRoom()->y() + 
-					world.map.getCurrentMetaRoom()->height() - backend.getHeight() - adjusty;
+					(world.camera.getMetaRoom()->y() + world.camera.getMetaRoom()->height()))
+				adjustbyy = world.camera.getMetaRoom()->y() + 
+					world.camera.getMetaRoom()->height() - backend.getHeight() - adjusty;
+			
 			world.hand()->moveTo(world.hand()->x + adjustbyx, world.hand()->y + adjustbyy);
-			adjustx += adjustbyx;
-			adjusty += adjustbyy;
+			world.camera.moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
 		}
 	}
 
@@ -344,3 +343,4 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 	return 0;
 }
+

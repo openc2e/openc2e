@@ -22,6 +22,7 @@
 #include "physics.h"
 #include <iostream>
 #include <sstream>
+#include "caosVM.h"
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
   visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0) {

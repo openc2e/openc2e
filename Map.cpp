@@ -22,7 +22,6 @@
 #include <iostream>
 
 void Map::Reset() {
-	currroom = 0;
 	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
 		delete *i;
 	}
@@ -38,11 +37,6 @@ void Map::SetMapDimensions(unsigned int w, unsigned int h) {
 	height = h;
 }
 
-void Map::SetCurrentMetaRoom(unsigned int room) {
-	assert(room < metarooms.size());
-	currroom = room;
-}
-
 int Map::addMetaRoom(MetaRoom *m) {
 	// todo: check if it's outlying
 	metarooms.push_back(m);
@@ -53,11 +47,6 @@ int Map::addMetaRoom(MetaRoom *m) {
 MetaRoom *Map::getMetaRoom(unsigned int room) {
 	assert(room < metarooms.size());
 	return metarooms[room];
-}
-
-MetaRoom *Map::getCurrentMetaRoom() {
-	assert(currroom < metarooms.size());
-	return metarooms[currroom];
 }
 
 Room *Map::getRoom(unsigned int r) {

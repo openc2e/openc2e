@@ -18,6 +18,7 @@
  */
 
 #include "Agent.h"
+#include "caosVM.h"
 #include <iostream>
 using std::cerr;
 

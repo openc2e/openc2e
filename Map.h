@@ -25,7 +25,6 @@ protected:
 	unsigned int width, height;
 	std::vector<MetaRoom *> metarooms;
 	std::vector<Room *> rooms;
-	unsigned int currroom;
 
 	friend class MetaRoom;
 
@@ -33,10 +32,8 @@ public:
 	void Reset();
 	void SetMapDimensions(unsigned int, unsigned int);
 
-	void SetCurrentMetaRoom(unsigned int);
 	int addMetaRoom(MetaRoom *);
 	MetaRoom *getMetaRoom(unsigned int);
-	MetaRoom *getCurrentMetaRoom();
 	
 	unsigned int getMetaRoomCount();
 	Room *getRoom(unsigned int);

@@ -35,16 +35,9 @@ void caosVM::c_META() {
 	VM_PARAM_INTEGER(camera_x)
 	VM_PARAM_INTEGER(metaroom_id)
 
-	// todo: transitions
-
 	assert(metaroom_id >= 0);
 	assert((unsigned int)metaroom_id < world.map.getMetaRoomCount());
-	world.map.SetCurrentMetaRoom(metaroom_id);
-
-/*
-	adjustx = world.map.getCurrentMetaRoom()->x() + camera_x;
-	adjusty = world.map.getCurrentMetaRoom()->y() + camera_y;
-*/
+	world.camera.goToMetaRoom(metaroom_id, camera_x, camera_y, (cameratransition)transition);
 }
 
 /**
@@ -69,7 +62,7 @@ void caosVM::c_CMRA() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	// TODO
+	world.camera.moveTo(x, y, (panstyle)pan);
 }
 
 /**
@@ -81,7 +74,7 @@ void caosVM::c_CMRP() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	// TODO
+	world.camera.moveTo(x - (world.camera.getWidth() / 2), y - (world.camera.getHeight() / 2), (panstyle)pan);
 }
 
 /**
@@ -108,7 +101,7 @@ void caosVM::v_CMRY() {
 void caosVM::v_WNDW() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(0); // TODO
+	result.setInt(world.camera.getWidth());
 }
 
 /**
@@ -117,7 +110,7 @@ void caosVM::v_WNDW() {
 void caosVM::v_WNDH() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(0); // TODO
+	result.setInt(world.camera.getHeight());
 }
 
 /**

@@ -22,7 +22,7 @@
 
 #include "creaturesImage.h"
 #include "SDLBackend.h"
-#include "caosVM.h" // caosVar and caosVM below
+#include "caosVar.h"
 #include "AgentRef.h"
 #include <set>
 
@@ -39,7 +39,7 @@ class Agent {
 protected:
 	caosVar var[100]; // OVxx
 	AgentRef self;
-	caosVM *vm;
+	class caosVM *vm;
 
 	void zotrefs();
 
