@@ -248,10 +248,10 @@ x_libraries = @x_libraries@
 ####### kdevelop will overwrite this part!!! (begin)##########
 bin_PROGRAMS = openc2e
 
-openc2e_SOURCES = caosVM_sounds.cpp caosVM_creatures.cpp caosVM_motion.cpp caosVM_scripts.cpp caoshashes.cpp caosVM_compound.cpp caosVM_variables.cpp caosVM_flow.cpp caosdata.cpp caosVM_agent.cpp World.cpp Vehicle.cpp SimpleAgent.cpp Room.cpp MetaRoom.cpp Map.cpp main.cpp Creature.cpp CompoundAgent.cpp caosVM_map.cpp caosVM_core.cpp caosVM_cmdinfo.cpp caosVM_camera.cpp caosVM.cpp caosScript.cpp Camera.cpp c16Image.cpp blkImage.cpp Agent.cpp 
+openc2e_SOURCES = caosVM_time.cpp caosVM_sounds.cpp caosVM_creatures.cpp caosVM_motion.cpp caosVM_scripts.cpp caoshashes.cpp caosVM_compound.cpp caosVM_variables.cpp caosVM_flow.cpp caosdata.cpp caosVM_agent.cpp World.cpp Vehicle.cpp SimpleAgent.cpp Room.cpp MetaRoom.cpp Map.cpp main.cpp Creature.cpp CompoundAgent.cpp caosVM_map.cpp caosVM_core.cpp caosVM_cmdinfo.cpp caosVM_camera.cpp caosVM.cpp caosScript.cpp Camera.cpp c16Image.cpp blkImage.cpp Agent.cpp 
 openc2e_LDADD = /usr/lib/libSDL.la /usr/lib/libSDL_gfx.la
 
-EXTRA_DIST = Agent.cpp Agent.h blkImage.cpp blkImage.h c16Image.cpp c16Image.h Camera.cpp Camera.h caosScript.cpp caosVM.cpp caosVM.h caosVM_camera.cpp caosVM_cmdinfo.cpp caosVM_core.cpp caosVM_map.cpp CompoundAgent.cpp CompoundAgent.h Creature.cpp Creature.h creaturesImage.h endianlove.h main.cpp Map.cpp Map.h MetaRoom.cpp MetaRoom.h Room.cpp Room.h SimpleAgent.cpp SimpleAgent.h Vehicle.cpp Vehicle.h World.cpp World.h caosVM_agent.cpp caosVM_cmdinfo.h caosdata.cpp caosVM_flow.cpp caosVM_variables.cpp caosVM_compound.cpp caoshashes.cpp caosVM_scripts.cpp caosVM_motion.cpp caosVM_creatures.cpp caosVM_sounds.cpp openc2e.h caosScript.h TODO 
+EXTRA_DIST = Agent.cpp Agent.h blkImage.cpp blkImage.h c16Image.cpp c16Image.h Camera.cpp Camera.h caosScript.cpp caosVM.cpp caosVM.h caosVM_camera.cpp caosVM_cmdinfo.cpp caosVM_core.cpp caosVM_map.cpp CompoundAgent.cpp CompoundAgent.h Creature.cpp Creature.h creaturesImage.h endianlove.h main.cpp Map.cpp Map.h MetaRoom.cpp MetaRoom.h Room.cpp Room.h SimpleAgent.cpp SimpleAgent.h Vehicle.cpp Vehicle.h World.cpp World.h caosVM_agent.cpp caosVM_cmdinfo.h caosdata.cpp caosVM_flow.cpp caosVM_variables.cpp caosVM_compound.cpp caoshashes.cpp caosVM_scripts.cpp caosVM_motion.cpp caosVM_creatures.cpp caosVM_sounds.cpp openc2e.h caosScript.h TODO caosVM_time.cpp 
 
 ####### kdevelop will overwrite this part!!! (end)############
 # set the include path found by configure
@@ -266,13 +266,13 @@ CONFIG_CLEAN_FILES =
 bin_PROGRAMS = openc2e$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
-am_openc2e_OBJECTS = caosVM_sounds.$(OBJEXT) caosVM_creatures.$(OBJEXT) \
-	caosVM_motion.$(OBJEXT) caosVM_scripts.$(OBJEXT) \
-	caoshashes.$(OBJEXT) caosVM_compound.$(OBJEXT) \
-	caosVM_variables.$(OBJEXT) caosVM_flow.$(OBJEXT) \
-	caosdata.$(OBJEXT) caosVM_agent.$(OBJEXT) World.$(OBJEXT) \
-	Vehicle.$(OBJEXT) SimpleAgent.$(OBJEXT) Room.$(OBJEXT) \
-	MetaRoom.$(OBJEXT) Map.$(OBJEXT) main.$(OBJEXT) \
+am_openc2e_OBJECTS = caosVM_time.$(OBJEXT) caosVM_sounds.$(OBJEXT) \
+	caosVM_creatures.$(OBJEXT) caosVM_motion.$(OBJEXT) \
+	caosVM_scripts.$(OBJEXT) caoshashes.$(OBJEXT) \
+	caosVM_compound.$(OBJEXT) caosVM_variables.$(OBJEXT) \
+	caosVM_flow.$(OBJEXT) caosdata.$(OBJEXT) caosVM_agent.$(OBJEXT) \
+	World.$(OBJEXT) Vehicle.$(OBJEXT) SimpleAgent.$(OBJEXT) \
+	Room.$(OBJEXT) MetaRoom.$(OBJEXT) Map.$(OBJEXT) main.$(OBJEXT) \
 	Creature.$(OBJEXT) CompoundAgent.$(OBJEXT) caosVM_map.$(OBJEXT) \
 	caosVM_core.$(OBJEXT) caosVM_cmdinfo.$(OBJEXT) \
 	caosVM_camera.$(OBJEXT) caosVM.$(OBJEXT) caosScript.$(OBJEXT) \
@@ -306,6 +306,7 @@ DEP_FILES = ./$(DEPDIR)/Agent.Po ./$(DEPDIR)/Camera.Po \
 	./$(DEPDIR)/caosVM_motion.Po \
 	./$(DEPDIR)/caosVM_scripts.Po \
 	./$(DEPDIR)/caosVM_sounds.Po \
+	./$(DEPDIR)/caosVM_time.Po \
 	./$(DEPDIR)/caosVM_variables.Po \
 	./$(DEPDIR)/caosdata.Po ./$(DEPDIR)/caoshashes.Po \
 	./$(DEPDIR)/main.Po
@@ -395,6 +396,7 @@ include ./$(DEPDIR)/caosVM_map.Po
 include ./$(DEPDIR)/caosVM_motion.Po
 include ./$(DEPDIR)/caosVM_scripts.Po
 include ./$(DEPDIR)/caosVM_sounds.Po
+include ./$(DEPDIR)/caosVM_time.Po
 include ./$(DEPDIR)/caosVM_variables.Po
 include ./$(DEPDIR)/caosdata.Po
 include ./$(DEPDIR)/caoshashes.Po

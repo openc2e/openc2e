@@ -120,6 +120,9 @@ public:
 	void c_RMSC();
 	void v_RMSC();
 
+	// time
+	void v_PACE();
+
 	void runCurrentLine();
 	void pushLineOntoStack(int);
 	int popStackLine();

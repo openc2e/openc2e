@@ -85,6 +85,7 @@ void setupCommandPointers() {
 	FUNCDEF(ADDR, 7)
 	FUNCDEF(MMSC, 2)
 	FUNCDEF(RMSC, 2)
+	FUNCDEF(PACE, 0)
 
 	cmdinfo n1(std::string("DBG: OUTS"), 1, false, &caosVM::c_DBG_OUTS);
 	doublecmds.push_back(n1);

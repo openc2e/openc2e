@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include <stdlib.h> // rand()
 
 /*
  VAxx (variable)
@@ -128,8 +129,12 @@ void caosVM::v_RAND() {
 	VM_PARAM_INTEGER(value2)
 	VM_PARAM_INTEGER(value1)
 
-	// todo;
-	result.setInt(0); // !
+	int diff = value2 - value1 + 1;
+	double r = (rand() / (double)((unsigned int)RAND_MAX + 1));
+
+	result.setInt((int)((r * diff) + value1));
+
+	// todo: we should call srand at the start of our code somewhere
 }
 
 /*
