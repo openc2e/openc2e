@@ -19,7 +19,7 @@
 
 #include "caosVM.h"
 
-/*
+/**
  META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)
  
  set metaroom current camera is pointing at. coordinates point to top left of new
@@ -36,7 +36,7 @@ void caosVM::c_META() {
 	// todo
 }
 
-/*
+/**
  CMRT (command) pan (integer)
 
  centre current camera on TARG.

@@ -25,7 +25,7 @@
 #include <iostream>
 using std::cerr;
 
-/*
+/**
  RTAR (command) family (integer) genus (integer) species (integer)
 
  set targ to random agent with given family/genus/species
@@ -39,7 +39,7 @@ void caosVM::c_RTAR() {
 	// todo
 }
 
-/*
+/**
  NEW: SIMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
 
  create a new simple object with given family/genus/species, given spritefile with image_count sprites
@@ -79,12 +79,22 @@ void caosVM::c_NEW_COMP() {
 	targ.setAgent(a);
 }
 
+/**
+ TARG (agent)
+
+ return TARG
+*/
 void caosVM::v_TARG() {
 	VM_VERIFY_SIZE(0)
 	result = targ;
 	result.setVariable(&targ);
 }
 
+/**
+ NULL (agent)
+
+ return null (zero) agent
+*/
 void caosVM::v_NULL() {
 	VM_VERIFY_SIZE(0)
 	result.setAgent(0);
@@ -96,6 +106,11 @@ void caosVM::c_POSE() {
 	cerr << "unimplemented: POSE\n";
 }
 
+/**
+ ATTR (command) attr (integer)
+
+ set attributes of TARG agent
+*/
 void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
@@ -103,6 +118,11 @@ void caosVM::c_ATTR() {
 	targ.agentValue->setAttributes(attr);
 }
 
+/**
+ ATTR (integer)
+
+ return attributes of TARG agent
+*/
 void caosVM::v_ATTR() {
 	VM_VERIFY_SIZE(0)
 	assert(targ.hasAgent());
@@ -121,6 +141,11 @@ void caosVM::c_BHVR() {
 	cerr << "unimplemented: BHVR\n";
 }
 
+/**
+ TARG (command) agent (agent)
+
+ set TARG to given agent
+*/
 void caosVM::c_TARG() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
@@ -139,17 +164,26 @@ void caosVM::v_POSE() {
 	cerr << "unimplemented: POSE\n";
 }
 
+/**
+ KILL (command) agent (agent)
+*/
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
 	cerr << "unimplemented: KILL\n";
 }
 
+/**
+ NEXT (command
+*/
 void caosVM::c_NEXT() {
 	VM_VERIFY_SIZE(0)
 	cerr << "unimplemented: NEXT\n";
 }
 
+/**
+ SCRX (command) event (integer) species (integer) genus (integer) family (integer)
+*/
 void caosVM::c_SCRX() {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(family)
@@ -194,6 +228,9 @@ void caosVM::v_ABBA() {
 	cerr << "unimplemented: ABBA\n";
 }
 
+/**
+ BASE (command) index (integer)
+*/
 void caosVM::c_BASE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(index)
@@ -215,30 +252,45 @@ void caosVM::v_CARR() {
 	cerr << "unimplemented: CARR\n";
 }
 
+/**
+ FMLY (integer)
+*/
 void caosVM::v_FMLY() {
 	VM_VERIFY_SIZE(0)
 	assert(targ.hasAgent());
 	result.setInt(targ.agentValue->family);
 }
 
+/**
+ GNUS (integer)
+*/
 void caosVM::v_GNUS() {
 	VM_VERIFY_SIZE(0)
 	assert(targ.hasAgent());
 	result.setInt(targ.agentValue->genus);
 }
 
+/**
+ SPCS (integer)
+*/
 void caosVM::v_SPCS() {
 	VM_VERIFY_SIZE(0)
 	assert(targ.hasAgent());
 	result.setInt(targ.agentValue->species);
 }
 
+/**
+ PLNE (integer)
+*/
 void caosVM::v_PLNE() {
 	VM_VERIFY_SIZE(0)
 	assert(targ.hasAgent());
 	result.setInt(targ.agentValue->zorder);
 }
 
+/**
+ PNTR (agent)
+*/
 void caosVM::v_PNTR() {
 	VM_VERIFY_SIZE(0)
 	result.setAgent(world.hand());

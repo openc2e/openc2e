@@ -21,15 +21,19 @@
 
 #define CMDDEF(x, y) { cmdinfo *tmp = &cmds[phash_cmd(*((int *)#x))]; \
 	tmp->notokens = y; tmp->name = #x; tmp->method = &caosVM::c_ ## x; }
-#define NULLDEF(x) { cmdinfo *tmp = &cmds[phash_cmd(*((int *)#x))]; \
-	tmp->notokens = 0; tmp->name = #x; tmp->method = &caosVM::null; }
 #define DBLCMDDEF(x) { cmdinfo *tmp = &cmds[phash_cmd(*(int *)x)]; \
 	tmp->name = x; tmp->twotokens = true; }
-#define CMDDEFCOLON(x, y) { std::string cmdname = std::string(#x) + ":"; \
+#define DBLFUNCDEF(x) { cmdinfo *tmp = &funcs[phash_func(*(int *)x)]; \
+	tmp->name = x; tmp->twotokens = true; }
+/*#define CMDDEFCOLON(x, y) { std::string cmdname = std::string(#x) + ":"; \
 	cmdinfo *tmp = &cmds[phash_cmd(*((int *)(cmdname.c_str())))]; \
-	tmp->notokens = y; tmp->name = cmdname; tmp->method = &caosVM::c_ ## x; }
+	tmp->notokens = y; tmp->name = cmdname; tmp->method = &caosVM::c_ ## x; } */
 #define FUNCDEF(x, y) { cmdinfo *tmp = &funcs[phash_func(*((int *)#x))]; \
-tmp->notokens = y; tmp->name = #x; tmp->method = &caosVM::v_ ## x; }
+	tmp->notokens = y; tmp->name = #x; tmp->method = &caosVM::v_ ## x; }
+#define DBLCMD(x, y, z) { cmdinfo n(std::string(x), z, false, &caosVM::c_ ## y); \
+	doublecmds.push_back(n); }
+#define DBLFUNC(x, y, z) { cmdinfo n(std::string(x), z, false, &caosVM::v_ ## y); \
+	doublefuncs.push_back(n); }
 
 extern cmdinfo *cmds, *funcs;
 extern std::vector<cmdinfo> doublecmds, doublefuncs;

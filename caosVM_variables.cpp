@@ -22,7 +22,7 @@
 #include <iostream>
 #include "openc2e.h"
 
-/*
+/**
  VAxx (variable)
 
  script-local variables, 00 to 99 (todo: is this right?)
@@ -35,7 +35,7 @@ void caosVM::v_VAxx() {
 	result.setVariable(&var[varnumber]); // todo: not just zero
 }
 
-/*
+/**
  SETV (command) var (variable) value (decimal)
 
  sets given variable to given number [int/float]
@@ -53,7 +53,7 @@ void caosVM::c_SETV() {
 	var->notifyChanged(); // do we need this? if so, stick it everywhere else
 }
 
-/*
+/**
  SETA (command) var (variable) value (agent)
 
  sets given variable to given agent
@@ -66,7 +66,7 @@ void caosVM::c_SETA() {
 	var->setAgent(value);
 }
 
-/*
+/**
  OVxx (variable)
 
  agent-local variables from TARG, 00 to 99
@@ -80,7 +80,7 @@ void caosVM::v_OVxx() {
 	result.setVariable(&var[varnumber]); // todo: not just zero
 }
 
-/*
+/**
  MODV (command) var (variable) mod (integer)
 
  returns var % mod
@@ -93,7 +93,7 @@ void caosVM::c_MODV() {
 	v->setInt(v->intValue % mod);
 }
 
-/*
+/**
  ADDV (command) var (variable) add (integer)
 
  returns var + add
@@ -110,7 +110,7 @@ void caosVM::c_ADDV() {
 		throw badParamException();
 }
 
-/*
+/**
  SUBV (command) var (variable) sub (integer)
 
  returns var - sub
@@ -127,7 +127,7 @@ void caosVM::c_SUBV() {
 		throw badParamException();
 }
 
-/*
+/**
  NEGV (command) var (variable)
 
  returns a negated variable (eg 1 to -1, -3 to 3)
@@ -143,7 +143,7 @@ void caosVM::c_NEGV() {
 		throw badParamException();
 }
 
-/*
+/**
   MULV (command) var (variable) mul (decimal)
 
   returns var * mul
@@ -160,7 +160,7 @@ void caosVM::c_MULV() {
 		throw badParamException();
 }
 
-/*
+/**
  RAND (integer) value1 (integer) value2 (integer)
 
  return a random integer between value1 and value2 inclusive

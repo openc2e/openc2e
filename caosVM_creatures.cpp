@@ -21,7 +21,7 @@
 #include <iostream>
 using std::cerr;
 
-/*
+/**
  STIM WRIT (command) creature (agent) stimulus (integer) strength (float)
 
  send stimulus to specific creature

@@ -23,7 +23,7 @@
 using std::cout;
 using std::cerr;
 
-/*
+/**
  DBG: OUTS (command) val (string)
  
  output a string to the debug log
@@ -35,7 +35,7 @@ void caosVM::c_DBG_OUTS() {
 	cout << val << "\n";
 }
 
-/*
+/**
  DBG: OUTV (command) val (decimal)
  
  output a decimal value to the debug log
@@ -69,7 +69,7 @@ void caosVM::c_OUTV() {
 	}
 }
 
-/*
+/**
 	GAME (variable) name (string)
 
 	returns game variable with name given (unchecked)
@@ -81,6 +81,23 @@ void caosVM::v_GAME() {
 	result.setVariable(&gamehack);
 }
 
-void caosVM::null() {
-	cout << "caosVM::null() was called!\n";
+/**
+ SCRP (command)
+*/
+void caosVM::c_SCRP() {
+	std::cout << "hit SCRP. shouldn't ever happen.\n";
+}
+
+/**
+ RSCR (command)
+*/
+void caosVM::c_RSCR() {
+	std::cout << "hit RSCR. shouldn't ever happen.\n";
+}
+
+/**
+ ENDM (command)
+*/
+void caosVM::c_ENDM() {
+	std::cout << "hit ENDM. shouldn't ever happen.\n";
 }

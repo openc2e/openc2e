@@ -52,6 +52,9 @@ void caosVM::jumpToNextIfBlock() {
 	std::cout << "couldn't find matching block for IF blocks, stopping script\n";
 }
 
+/**
+ DOIF (command) condition (condition)
+*/
 void caosVM::c_DOIF() {
 	VM_VERIFY_SIZE(0)
 	truthstack.push_back(false);
@@ -59,6 +62,9 @@ void caosVM::c_DOIF() {
 	else { truthstack.pop_back(); truthstack.push_back(true); }
 }
 
+/**
+ ELIF (command) condition (condition)
+*/
 void caosVM::c_ELIF() {
 	VM_VERIFY_SIZE(0)
 	assert(!truthstack.empty());
@@ -66,18 +72,28 @@ void caosVM::c_ELIF() {
 	else { truthstack.pop_back(); truthstack.push_back(true); }
 }
 
+/**
+ ELSE (command)
+*/
 void caosVM::c_ELSE() {
 	VM_VERIFY_SIZE(0)
+	assert(!truthstack.empty());
 	assert(truthstack.back());
 	jumpToNextIfBlock();
 }
 
+/**
+ ENDI (command)
+*/
 void caosVM::c_ENDI() {
 	VM_VERIFY_SIZE(0)
 	assert(!truthstack.empty());
 	truthstack.pop_back();
 }
 
+/**
+ REPS (command) reps (integer)
+*/
 void caosVM::c_REPS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(reps)
@@ -86,6 +102,9 @@ void caosVM::c_REPS() {
 	linestack.push_back(currentline + 1);
 }
 
+/**
+ REPE (command)
+*/
 void caosVM::c_REPE() {
 	VM_VERIFY_SIZE(0)
 	assert(!linestack.empty());
@@ -98,17 +117,26 @@ void caosVM::c_REPE() {
 	} else linestack.pop_back();
 }
 
+/**
+ LOOP (command)
+*/
 void caosVM::c_LOOP() {
 	VM_VERIFY_SIZE(0)
 	linestack.push_back(currentline + 1);
 }
 
+/**
+ EVER (command)
+*/
 void caosVM::c_EVER() {
 	VM_VERIFY_SIZE(0)
 	assert(!linestack.empty());
 	currentline = linestack.back();
 }
 
+/**
+ UNTL (command) condition (condition)
+*/
 void caosVM::c_UNTL() {
 	VM_VERIFY_SIZE(0)
 	assert(!linestack.empty());
@@ -116,6 +144,9 @@ void caosVM::c_UNTL() {
 	else linestack.pop_back();
 }
 
+/**
+ GSUB (command) label (label)
+*/
 void caosVM::c_GSUB() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(label)
@@ -132,12 +163,18 @@ void caosVM::c_GSUB() {
 	std::cout << "warning: GSUB didn't find matching SUBR for " << label << ", ignoring\n";
 }
 
+/**
+ SUBR (command) label (label)
+*/
 void caosVM::c_SUBR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(label)
 	c_STOP(); // a SUBR acts like a STOP if encountered during execution
 }
 
+/**
+ RETN (command)
+*/
 void caosVM::c_RETN() {
 	VM_VERIFY_SIZE(0)
 	assert(!linestack.empty());

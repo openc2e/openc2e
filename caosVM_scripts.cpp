@@ -21,7 +21,7 @@
 #include <iostream>
 using std::cerr;
 
-/*
+/**
  INST (command)
 
  don't release control to the scheduler until end of script or SLOW
@@ -31,7 +31,7 @@ void caosVM::c_INST() {
 	cerr << "unimplemented: INST\n";
 }
 
-/*
+/**
  SLOW (command)
 
  reverts effects of INST
@@ -41,7 +41,7 @@ void caosVM::c_SLOW() {
 	cerr << "unimplemented: SLOW\n";
 }
 
-/*
+/**
  LOCK (command)
 
  prevent agent script from being interrupted by another
@@ -51,7 +51,7 @@ void caosVM::c_LOCK() {
 	cerr << "unimplemented: LOCK\n";
 }
 
-/*
+/**
  UNLK (command)
 
  reverts effects of LOCK
@@ -61,7 +61,7 @@ void caosVM::c_UNLK() {
 	cerr << "unimplemented: UNLK\n";
 }
 
-/*
+/**
  WAIT (command) ticks (integer)
 
  stop the script from running for a number of ticks

@@ -23,7 +23,7 @@
 #include <iostream>
 using std::cout;
 
-/*
+/**
  ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)
  
  create metaroom. return id of created metaroom.
@@ -42,7 +42,7 @@ void caosVM::v_ADDM() {
   result = v;
 }
 
-/*
+/**
  BRMI (command) metaroom_base (integer) room_base (integer)
  
  set metaroom/room bases, i have no idea why/if we need this
@@ -54,7 +54,7 @@ void caosVM::c_BRMI() {
 	// todo
 }
 
-/*
+/**
  MAPD (command) width (integer) height (integer)
  
  set the map dimensions, inside which we place metarooms
@@ -66,7 +66,7 @@ void caosVM::c_MAPD() {
 	world.map.SetMapDimensions(width, height);
 }
 
-/*
+/**
  MAPK (command)  
  
  reset the map (call map::reset)

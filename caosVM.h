@@ -57,9 +57,11 @@ public:
 	
 	// core
 	void v_GAME();
-	void null();
 	void c_OUTS();
 	void c_OUTV();
+	void c_SCRP(); // dummy
+	void c_RSCR(); // dummy
+	void c_ENDM(); // dummy
 
 	// variables
 	void c_SETV();

@@ -19,7 +19,7 @@
 
 #include "caosVM.h"
 
-/*
+/**
  PACE (float)
 
  return speed factor of last ten ticks. < 1.0 = engine is ticking slower than BUZZ rating.
