@@ -17,3 +17,44 @@
  *
  */
 
+#include "MetaRoom.h"
+#include "SDLBackend.h"
+
+class Camera {
+protected:
+	unsigned int x, y;
+	MetaRoom *metaroom;
+
+	bool panning;
+	unsigned int destx, desty;
+	float velx, vely;
+
+	class Agent *trackedagent;
+	
+public:
+	virtual unsigned int const getWidth() = 0;
+	virtual unsigned int const getHeight() = 0;
+	void setSize(int width, int height);
+
+	unsigned int const getX() { return x; }
+	unsigned int const getY() { return y; }
+	unsigned int const getXCentre() { return x + (getWidth() / 2); }
+	unsigned int const getYCentre() { return y + (getHeight() / 2); }
+	void moveTo(int width, int height, bool pan);
+	void moveToCentered(int width, int height, bool pan);
+
+	void trackAgent(class Agent *a);
+
+	void tick();
+};
+
+class MainCamera : public Camera {
+protected:
+	SDLBackend *backend;
+
+public:
+	MainCamera(SDLBackend *b);
+	unsigned int const getWidth() { return backend->getWidth(); }
+	unsigned int const getHeight() { return backend->getHeight(); }
+};
+
