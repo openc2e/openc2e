@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef __OPENC2E_H
+#define __OPENC2E_H
+
 #include <iostream>
 #include "exceptions.h"
 
@@ -28,3 +31,5 @@ public:
 
 #undef assert
 #define assert(x) if (!(x)) { throw assertFailure(#x); }
+
+#endif

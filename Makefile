@@ -249,10 +249,10 @@ x_libraries = @x_libraries@
 ####### kdevelop will overwrite this part!!! (begin)##########
 bin_PROGRAMS = openc2e
 
-openc2e_SOURCES = mngfile.cpp genomeFile.cpp streamutils.cpp caosVM_input.cpp caosVM_debug.cpp SDL_gfxPrimitives.c SDLBackend.cpp mmapifstream.cpp Scriptorium.cpp fileSwapper.cpp Catalogue.cpp caosVM_resources.cpp pray.cpp creaturesImage.cpp caosVM_time.cpp caosVM_sounds.cpp caosVM_creatures.cpp caosVM_motion.cpp caosVM_scripts.cpp caoshashes.cpp caosVM_compound.cpp caosVM_variables.cpp caosVM_flow.cpp caosdata.cpp caosVM_agent.cpp World.cpp Vehicle.cpp SimpleAgent.cpp Room.cpp MetaRoom.cpp Map.cpp main.cpp Creature.cpp CompoundAgent.cpp caosVM_map.cpp caosVM_core.cpp caosVM_cmdinfo.cpp caosVM_camera.cpp caosVM.cpp caosScript.cpp Camera.cpp c16Image.cpp blkImage.cpp Agent.cpp 
+openc2e_SOURCES = caosVM_vehicles.cpp mngfile.cpp genomeFile.cpp streamutils.cpp caosVM_input.cpp caosVM_debug.cpp SDL_gfxPrimitives.c SDLBackend.cpp mmapifstream.cpp Scriptorium.cpp fileSwapper.cpp Catalogue.cpp caosVM_resources.cpp pray.cpp creaturesImage.cpp caosVM_time.cpp caosVM_sounds.cpp caosVM_creatures.cpp caosVM_motion.cpp caosVM_scripts.cpp caoshashes.cpp caosVM_compound.cpp caosVM_variables.cpp caosVM_flow.cpp caosdata.cpp caosVM_agent.cpp World.cpp Vehicle.cpp SimpleAgent.cpp Room.cpp MetaRoom.cpp Map.cpp main.cpp Creature.cpp CompoundAgent.cpp caosVM_map.cpp caosVM_core.cpp caosVM_cmdinfo.cpp caosVM_camera.cpp caosVM.cpp caosScript.cpp Camera.cpp c16Image.cpp blkImage.cpp Agent.cpp 
 openc2e_LDADD = /usr/lib/libSDL.la /usr/lib/libSDL_gfx.la /usr/lib/libz.a /usr/lib/libboost_filesystem.so
 
-EXTRA_DIST = Agent.cpp Agent.h blkImage.cpp blkImage.h c16Image.cpp c16Image.h Camera.cpp Camera.h caosScript.cpp caosVM.cpp caosVM.h caosVM_camera.cpp caosVM_cmdinfo.cpp caosVM_core.cpp caosVM_map.cpp CompoundAgent.cpp CompoundAgent.h Creature.cpp Creature.h creaturesImage.h endianlove.h main.cpp Map.cpp Map.h MetaRoom.cpp MetaRoom.h Room.cpp Room.h SimpleAgent.cpp SimpleAgent.h Vehicle.cpp Vehicle.h World.cpp World.h caosVM_agent.cpp caosVM_cmdinfo.h caosdata.cpp caosVM_flow.cpp caosVM_variables.cpp caosVM_compound.cpp caoshashes.cpp caosVM_scripts.cpp caosVM_motion.cpp caosVM_creatures.cpp caosVM_sounds.cpp openc2e.h caosScript.h TODO caosVM_time.cpp creaturesImage.cpp caoshashes.h pray.cpp agentfile.h caosVM_resources.cpp SDL_gfxPrimitives_font.h Catalogue.cpp fileSwapper.cpp fileSwapper.h Scriptorium.cpp Scriptorium.h mmapifstream.cpp mmapifstream.h SDLBackend.cpp SDLBackend.h SDL_gfxPrimitives.c SDL_gfxPrimitives.h caosVM_debug.cpp caosVM_input.cpp exceptions.h Catalogue.h streamutils.cpp genomeFile.cpp genome.h mngfile.cpp mngfile.h 
+EXTRA_DIST = Agent.cpp Agent.h blkImage.cpp blkImage.h c16Image.cpp c16Image.h Camera.cpp Camera.h caosScript.cpp caosVM.cpp caosVM.h caosVM_camera.cpp caosVM_cmdinfo.cpp caosVM_core.cpp caosVM_map.cpp CompoundAgent.cpp CompoundAgent.h Creature.cpp Creature.h creaturesImage.h endianlove.h main.cpp Map.cpp Map.h MetaRoom.cpp MetaRoom.h Room.cpp Room.h SimpleAgent.cpp SimpleAgent.h Vehicle.cpp Vehicle.h World.cpp World.h caosVM_agent.cpp caosVM_cmdinfo.h caosdata.cpp caosVM_flow.cpp caosVM_variables.cpp caosVM_compound.cpp caoshashes.cpp caosVM_scripts.cpp caosVM_motion.cpp caosVM_creatures.cpp caosVM_sounds.cpp openc2e.h caosScript.h TODO caosVM_time.cpp creaturesImage.cpp caoshashes.h pray.cpp agentfile.h caosVM_resources.cpp SDL_gfxPrimitives_font.h Catalogue.cpp fileSwapper.cpp fileSwapper.h Scriptorium.cpp Scriptorium.h mmapifstream.cpp mmapifstream.h SDLBackend.cpp SDLBackend.h SDL_gfxPrimitives.c SDL_gfxPrimitives.h caosVM_debug.cpp caosVM_input.cpp exceptions.h Catalogue.h streamutils.cpp genomeFile.cpp genome.h mngfile.cpp mngfile.h caosVM_vehicles.cpp 
 
 ####### kdevelop will overwrite this part!!! (end)############
 # set the include path found by configure
@@ -267,11 +267,12 @@ CONFIG_CLEAN_FILES =
 bin_PROGRAMS = openc2e$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
-am_openc2e_OBJECTS = mngfile.$(OBJEXT) genomeFile.$(OBJEXT) \
-	streamutils.$(OBJEXT) caosVM_input.$(OBJEXT) \
-	caosVM_debug.$(OBJEXT) SDL_gfxPrimitives.$(OBJEXT) \
-	SDLBackend.$(OBJEXT) mmapifstream.$(OBJEXT) \
-	Scriptorium.$(OBJEXT) fileSwapper.$(OBJEXT) Catalogue.$(OBJEXT) \
+am_openc2e_OBJECTS = caosVM_vehicles.$(OBJEXT) mngfile.$(OBJEXT) \
+	genomeFile.$(OBJEXT) streamutils.$(OBJEXT) \
+	caosVM_input.$(OBJEXT) caosVM_debug.$(OBJEXT) \
+	SDL_gfxPrimitives.$(OBJEXT) SDLBackend.$(OBJEXT) \
+	mmapifstream.$(OBJEXT) Scriptorium.$(OBJEXT) \
+	fileSwapper.$(OBJEXT) Catalogue.$(OBJEXT) \
 	caosVM_resources.$(OBJEXT) pray.$(OBJEXT) \
 	creaturesImage.$(OBJEXT) caosVM_time.$(OBJEXT) \
 	caosVM_sounds.$(OBJEXT) caosVM_creatures.$(OBJEXT) \
@@ -287,13 +288,14 @@ am_openc2e_OBJECTS = mngfile.$(OBJEXT) genomeFile.$(OBJEXT) \
 	Camera.$(OBJEXT) c16Image.$(OBJEXT) blkImage.$(OBJEXT) \
 	Agent.$(OBJEXT)
 #>- openc2e_OBJECTS = $(am_openc2e_OBJECTS)
-#>+ 22
+#>+ 23
 openc2e_final_OBJECTS = SDL_gfxPrimitives.o openc2e.all_cpp.o 
-openc2e_nofinal_OBJECTS = mngfile.$(OBJEXT) genomeFile.$(OBJEXT) \
-	streamutils.$(OBJEXT) caosVM_input.$(OBJEXT) \
-	caosVM_debug.$(OBJEXT) SDL_gfxPrimitives.$(OBJEXT) \
-	SDLBackend.$(OBJEXT) mmapifstream.$(OBJEXT) \
-	Scriptorium.$(OBJEXT) fileSwapper.$(OBJEXT) Catalogue.$(OBJEXT) \
+openc2e_nofinal_OBJECTS = caosVM_vehicles.$(OBJEXT) mngfile.$(OBJEXT) \
+	genomeFile.$(OBJEXT) streamutils.$(OBJEXT) \
+	caosVM_input.$(OBJEXT) caosVM_debug.$(OBJEXT) \
+	SDL_gfxPrimitives.$(OBJEXT) SDLBackend.$(OBJEXT) \
+	mmapifstream.$(OBJEXT) Scriptorium.$(OBJEXT) \
+	fileSwapper.$(OBJEXT) Catalogue.$(OBJEXT) \
 	caosVM_resources.$(OBJEXT) pray.$(OBJEXT) \
 	creaturesImage.$(OBJEXT) caosVM_time.$(OBJEXT) \
 	caosVM_sounds.$(OBJEXT) caosVM_creatures.$(OBJEXT) \
@@ -347,13 +349,14 @@ am__depfiles_maybe = depfiles
 #>- 	./$(DEPDIR)/caosVM_sounds.Po \
 #>- 	./$(DEPDIR)/caosVM_time.Po \
 #>- 	./$(DEPDIR)/caosVM_variables.Po \
+#>- 	./$(DEPDIR)/caosVM_vehicles.Po \
 #>- 	./$(DEPDIR)/caosdata.Po ./$(DEPDIR)/caoshashes.Po \
 #>- 	./$(DEPDIR)/creaturesImage.Po \
 #>- 	./$(DEPDIR)/fileSwapper.Po \
 #>- 	./$(DEPDIR)/genomeFile.Po ./$(DEPDIR)/main.Po \
 #>- 	./$(DEPDIR)/mmapifstream.Po ./$(DEPDIR)/mngfile.Po \
 #>- 	./$(DEPDIR)/pray.Po ./$(DEPDIR)/streamutils.Po
-#>+ 67
+#>+ 69
 #DEP_FILES =   $(DEPDIR)/openc2e.all_cpp.P  ./$(DEPDIR)/Agent.Po ./$(DEPDIR)/Camera.Po \
 #		./$(DEPDIR)/Catalogue.Po \
 #		./$(DEPDIR)/CompoundAgent.Po \
@@ -381,6 +384,7 @@ am__depfiles_maybe = depfiles
 #		./$(DEPDIR)/caosVM_sounds.Po \
 #		./$(DEPDIR)/caosVM_time.Po \
 #		./$(DEPDIR)/caosVM_variables.Po \
+#		./$(DEPDIR)/caosVM_vehicles.Po \
 #		./$(DEPDIR)/caosdata.Po ./$(DEPDIR)/caoshashes.Po \
 #		./$(DEPDIR)/creaturesImage.Po \
 #		./$(DEPDIR)/fileSwapper.Po \
@@ -414,6 +418,7 @@ DEP_FILES =   ./$(DEPDIR)/Agent.Po ./$(DEPDIR)/Camera.Po \
 		./$(DEPDIR)/caosVM_sounds.Po \
 		./$(DEPDIR)/caosVM_time.Po \
 		./$(DEPDIR)/caosVM_variables.Po \
+		./$(DEPDIR)/caosVM_vehicles.Po \
 		./$(DEPDIR)/caosdata.Po ./$(DEPDIR)/caoshashes.Po \
 		./$(DEPDIR)/creaturesImage.Po \
 		./$(DEPDIR)/fileSwapper.Po \
@@ -540,6 +545,7 @@ include ./$(DEPDIR)/caosVM_scripts.Po
 include ./$(DEPDIR)/caosVM_sounds.Po
 include ./$(DEPDIR)/caosVM_time.Po
 include ./$(DEPDIR)/caosVM_variables.Po
+include ./$(DEPDIR)/caosVM_vehicles.Po
 include ./$(DEPDIR)/caosdata.Po
 include ./$(DEPDIR)/caoshashes.Po
 include ./$(DEPDIR)/creaturesImage.Po
@@ -639,7 +645,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH
 #>- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 #>+ 4
-KDE_DIST=praydumper.cpp unittest.pl SDLMain.m filetests.cpp BUILDING SDLMain.h 
+KDE_DIST=praydumper.cpp unittest.pl openc2e SDLMain.m filetests.cpp BUILDING SDLMain.h 
 
 DISTFILES= $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) $(KDE_DIST)
 
@@ -768,11 +774,11 @@ force-reedit:
 
 
 #>+ 11
-openc2e.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/mngfile.cpp $(srcdir)/genomeFile.cpp $(srcdir)/streamutils.cpp $(srcdir)/caosVM_input.cpp $(srcdir)/caosVM_debug.cpp $(srcdir)/SDLBackend.cpp $(srcdir)/mmapifstream.cpp $(srcdir)/Scriptorium.cpp $(srcdir)/fileSwapper.cpp $(srcdir)/Catalogue.cpp $(srcdir)/caosVM_resources.cpp $(srcdir)/pray.cpp $(srcdir)/creaturesImage.cpp $(srcdir)/caosVM_time.cpp $(srcdir)/caosVM_sounds.cpp $(srcdir)/caosVM_creatures.cpp $(srcdir)/caosVM_motion.cpp $(srcdir)/caosVM_scripts.cpp $(srcdir)/caoshashes.cpp $(srcdir)/caosVM_compound.cpp $(srcdir)/caosVM_variables.cpp $(srcdir)/caosVM_flow.cpp $(srcdir)/caosdata.cpp $(srcdir)/caosVM_agent.cpp $(srcdir)/World.cpp $(srcdir)/Vehicle.cpp $(srcdir)/SimpleAgent.cpp $(srcdir)/Room.cpp $(srcdir)/MetaRoom.cpp $(srcdir)/Map.cpp $(srcdir)/main.cpp $(srcdir)/Creature.cpp $(srcdir)/CompoundAgent.cpp $(srcdir)/caosVM_map.cpp $(srcdir)/caosVM_core.cpp $(srcdir)/caosVM_cmdinfo.cpp $(srcdir)/caosVM_camera.cpp $(srcdir)/caosVM.cpp $(srcdir)/caosScript.cpp $(srcdir)/Camera.cpp $(srcdir)/c16Image.cpp $(srcdir)/blkImage.cpp $(srcdir)/Agent.cpp 
+openc2e.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/caosVM_vehicles.cpp $(srcdir)/mngfile.cpp $(srcdir)/genomeFile.cpp $(srcdir)/streamutils.cpp $(srcdir)/caosVM_input.cpp $(srcdir)/caosVM_debug.cpp $(srcdir)/SDLBackend.cpp $(srcdir)/mmapifstream.cpp $(srcdir)/Scriptorium.cpp $(srcdir)/fileSwapper.cpp $(srcdir)/Catalogue.cpp $(srcdir)/caosVM_resources.cpp $(srcdir)/pray.cpp $(srcdir)/creaturesImage.cpp $(srcdir)/caosVM_time.cpp $(srcdir)/caosVM_sounds.cpp $(srcdir)/caosVM_creatures.cpp $(srcdir)/caosVM_motion.cpp $(srcdir)/caosVM_scripts.cpp $(srcdir)/caoshashes.cpp $(srcdir)/caosVM_compound.cpp $(srcdir)/caosVM_variables.cpp $(srcdir)/caosVM_flow.cpp $(srcdir)/caosdata.cpp $(srcdir)/caosVM_agent.cpp $(srcdir)/World.cpp $(srcdir)/Vehicle.cpp $(srcdir)/SimpleAgent.cpp $(srcdir)/Room.cpp $(srcdir)/MetaRoom.cpp $(srcdir)/Map.cpp $(srcdir)/main.cpp $(srcdir)/Creature.cpp $(srcdir)/CompoundAgent.cpp $(srcdir)/caosVM_map.cpp $(srcdir)/caosVM_core.cpp $(srcdir)/caosVM_cmdinfo.cpp $(srcdir)/caosVM_camera.cpp $(srcdir)/caosVM.cpp $(srcdir)/caosScript.cpp $(srcdir)/Camera.cpp $(srcdir)/c16Image.cpp $(srcdir)/blkImage.cpp $(srcdir)/Agent.cpp 
 	@echo 'creating openc2e.all_cpp.cpp ...'; \
 	rm -f openc2e.all_cpp.files openc2e.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> openc2e.all_cpp.final; \
-	for file in mngfile.cpp genomeFile.cpp streamutils.cpp caosVM_input.cpp caosVM_debug.cpp SDLBackend.cpp mmapifstream.cpp Scriptorium.cpp fileSwapper.cpp Catalogue.cpp caosVM_resources.cpp pray.cpp creaturesImage.cpp caosVM_time.cpp caosVM_sounds.cpp caosVM_creatures.cpp caosVM_motion.cpp caosVM_scripts.cpp caoshashes.cpp caosVM_compound.cpp caosVM_variables.cpp caosVM_flow.cpp caosdata.cpp caosVM_agent.cpp World.cpp Vehicle.cpp SimpleAgent.cpp Room.cpp MetaRoom.cpp Map.cpp main.cpp Creature.cpp CompoundAgent.cpp caosVM_map.cpp caosVM_core.cpp caosVM_cmdinfo.cpp caosVM_camera.cpp caosVM.cpp caosScript.cpp Camera.cpp c16Image.cpp blkImage.cpp Agent.cpp ; do \
+	for file in caosVM_vehicles.cpp mngfile.cpp genomeFile.cpp streamutils.cpp caosVM_input.cpp caosVM_debug.cpp SDLBackend.cpp mmapifstream.cpp Scriptorium.cpp fileSwapper.cpp Catalogue.cpp caosVM_resources.cpp pray.cpp creaturesImage.cpp caosVM_time.cpp caosVM_sounds.cpp caosVM_creatures.cpp caosVM_motion.cpp caosVM_scripts.cpp caoshashes.cpp caosVM_compound.cpp caosVM_variables.cpp caosVM_flow.cpp caosdata.cpp caosVM_agent.cpp World.cpp Vehicle.cpp SimpleAgent.cpp Room.cpp MetaRoom.cpp Map.cpp main.cpp Creature.cpp CompoundAgent.cpp caosVM_map.cpp caosVM_core.cpp caosVM_cmdinfo.cpp caosVM_camera.cpp caosVM.cpp caosScript.cpp Camera.cpp c16Image.cpp blkImage.cpp Agent.cpp ; do \
 	  echo "#include \"$$file\"" >> openc2e.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> openc2e.all_cpp.final; \
 	done; \

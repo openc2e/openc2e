@@ -1,3 +1,6 @@
+#ifndef __C2EEXCEPTIONS_H
+#define __C2EEXCEPTIONS_H
+
 #include <exception>
 
 class creaturesException : public std::exception {
@@ -14,3 +17,4 @@ public:
 	genomeException(const char *s) throw() : creaturesException(s) { }
 };
 
+#endif

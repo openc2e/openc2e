@@ -19,6 +19,8 @@
 
 #include "caosVM.h"
 #include <iostream>
+#include "openc2e.h"
+#include "Vehicle.h"
 
 /**
  CABN (command) left (integer) top (integer) right (integer) bottom (integer)

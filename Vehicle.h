@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef __VEHICLE_H
+#define __VEHICLE_H
+
 #include "CompoundAgent.h"
 #include "openc2e.h"
 
@@ -33,5 +36,6 @@ public:
 
 	void setCabinRect(int l, int t, int r, int b) { cabinleft = l; cabintop = t; cabinright = r; cabinbottom = b; }
 	void setCapacity(unsigned int c) { assert(c > 0); capacity = c; }
-}
+};
 
+#endif

@@ -290,7 +290,7 @@ void caosVM::v_GRAP() {
 
  return the id of the metaroom at (x, y), or -1 otherwise
 */
-void caosVM::v_GRAP() {
+void caosVM::v_GMAP() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)

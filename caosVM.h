@@ -73,6 +73,10 @@ public:
 	void v_DOWN();
 	void c_PROP();
 	void v_PROP();
+	void c_PERM();
+	void v_PERM();
+	void v_GRAP();
+	void v_GMAP();
 	
 	// camera
 	void c_CMRT();
@@ -138,6 +142,8 @@ public:
 	void c_TEST_FINI();
 	void c_DBG_OUTS();
 	void c_DBG_OUTV();
+	void v_UNID();
+	void v_AGNT();
 
 	// agent
 	void c_NEW_COMP();
@@ -202,6 +208,7 @@ public:
 
 	// sounds
 	void c_SNDE();
+	void c_SNDC();
 	void c_MMSC();
 	void v_MMSC();
 	void c_RMSC();
@@ -231,6 +238,10 @@ public:
 	
 	// input
 	void c_CLAC();
+
+	// vehicles
+	void c_CABN();
+	void c_CABW();
 
 	void runCurrentLine();
 	caosVar internalRun(std::list<token> &tokens, bool first); // run a command, as represented by tokens
