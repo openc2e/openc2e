@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "World.h"
 
 /**
  META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)
@@ -29,11 +30,21 @@
  */
 void caosVM::c_META() {
 	VM_VERIFY_SIZE(4)
-  VM_PARAM_INTEGER(transition)
-  VM_PARAM_INTEGER(camera_y)
-  VM_PARAM_INTEGER(camera_x)
-  VM_PARAM_INTEGER(metaroom_id)
-	// todo
+	VM_PARAM_INTEGER(transition)
+	VM_PARAM_INTEGER(camera_y)
+	VM_PARAM_INTEGER(camera_x)
+	VM_PARAM_INTEGER(metaroom_id)
+
+	// todo: transitions
+
+	assert(metaroom_id >= 0);
+	assert((unsigned int)metaroom_id < world.map.getMetaRoomCount());
+	world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id - 1);
+
+/*
+	adjustx = world.map.getCurrentMetaRoom()->x() + camera_x;
+	adjusty = world.map.getCurrentMetaRoom()->y() + camera_y;
+*/
 }
 
 /**
