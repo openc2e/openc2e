@@ -37,6 +37,8 @@ protected:
 
 	void zotrefs();
 
+	int unid;
+
 public:
 	bool carryable, mouseable, activateable, invisible, floatable;
 	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
@@ -70,6 +72,9 @@ public:
 	virtual void tick();
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	virtual void kill();
+
+	int getUNID();
+	std::string identify() const;
 };
 
 struct agentzorder {

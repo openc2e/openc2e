@@ -85,3 +85,21 @@ Agent *World::agentAt(unsigned int x, unsigned int y, bool needs_activateable) {
 	
 	return temp;
 }
+
+int World::getUNID(Agent *whofor) {
+	do {
+		int unid = rand();
+		if (!unidmap[unid]) {
+			unidmap[unid] = whofor;
+			return unid;
+		}
+	} while (1);
+}
+
+void World::freeUNID(int unid) {
+	unidmap.erase(unid);
+}
+
+Agent *World::lookupUNID(int unid) {
+	return unidmap[unid];
+}

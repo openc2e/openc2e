@@ -41,6 +41,7 @@ public:
 	std::map<std::string, caosVar> variables;
 	std::vector<caosVM *> vmpool;
 	std::vector<Agent *> killqueue;
+	std::map<int, Agent *> unidmap;
 	
 	Scriptorium scriptorium;
 	Catalogue catalogue;
@@ -56,6 +57,11 @@ public:
 	void init();
 
 	void tick();
+
+	int World::getUNID(Agent *whofor);
+	void World::freeUNID(int unid);
+
+	Agent *lookupUNID(int unid);
 };
 
 extern World world;

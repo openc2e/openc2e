@@ -19,6 +19,8 @@
 
 #include "caosVM.h"
 #include "openc2e.h"
+#include "Agent.h"
+#include "World.h"
 #include <iostream>
 using std::cerr;
 using std::cout;
@@ -115,11 +117,14 @@ void caosVM::c_TEST_FINI() {
 
  return unique id of target agent
  this is NO GOOD for persisting!
+
+XXX: when serialization support work, this might well become good for
+     persisting :)
 */
 void caosVM::v_UNID() {
 	VM_VERIFY_SIZE(0)
 	assert(targ);
-	result.setInt((int)targ.get()); // TODO: pointers are no good, AGNT needs to be able to detect deletion!
+	result.setInt(targ->getUNID());
 }
 
 /**
@@ -131,6 +136,6 @@ void caosVM::v_AGNT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(id)
 
-	result.setAgent((Agent *)id); // TODO: see UNID
+	result.setAgent(world.lookupUNID(id));
 }
 

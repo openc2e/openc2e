@@ -21,6 +21,7 @@
 #include "World.h"
 #include "physics.h"
 #include <iostream>
+#include <sstream>
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
   visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0) {
@@ -33,6 +34,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   self.next = self.prev = &self;
   immortal = dying = false;
 	x = 0.0f; y = 0.0f;
+	unid = -1;
 }
 
 Agent::~Agent() {
@@ -40,6 +42,8 @@ Agent::~Agent() {
 	if (vm)
 		world.freeVM(vm);
 	zotrefs();
+	if (unid != -1)
+		world.freeUNID(unid);
 }
 
 void Agent::moveTo(float _x, float _y) {
@@ -140,3 +144,21 @@ void Agent::zotrefs() {
 		self.next->clear();
 }
 
+int Agent::getUNID() {
+      if (unid != -1)
+              return unid;
+      return unid = world.getUNID(this);
+}
+
+std::string Agent::identify() const {
+	std::ostringstream o;
+	o << (int)family << " " << (int)genus << species << " ";
+	const std::string n = world.catalogue.getAgentName(family, genus, species);
+	if (n.size())
+		o << "(" + n + ")";
+	if (unid != -1)
+		o << " unid " << unid;
+	else
+		o << " (no unid assigned)";
+	return o.str();
+}
