@@ -337,6 +337,7 @@
 				E74DB7B506B460B300004BD4,
 				E74DB7B606B460B300004BD4,
 				E74DB7B706B460B300004BD4,
+				E7F127FF072C2C200023ADBD,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -519,6 +520,7 @@
 				E74DB7DD06B460B300004BD4,
 				E74DB7DE06B460B300004BD4,
 				E7EAD59806B7E16A0040B1C9,
+				E7F127FD072C2C090023ADBD,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1149,6 +1151,8 @@
 		};
 		E7E67AC4066368CA004F1581 = {
 			children = (
+				E7F127FE072C2C200023ADBD,
+				E7F127FC072C2C090023ADBD,
 				E77717C506AF0FDA00507FAF,
 				E7E67AC9066368D8004F1581,
 				E7E67AC8066368D8004F1581,
@@ -1265,6 +1269,34 @@
 		};
 		E7EAD59806B7E16A0040B1C9 = {
 			fileRef = E7EAD59706B7E16A0040B1C9;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E7F127FC072C2C090023ADBD = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = caosVM_debug.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7F127FD072C2C090023ADBD = {
+			fileRef = E7F127FC072C2C090023ADBD;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E7F127FE072C2C200023ADBD = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = caosScript.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E7F127FF072C2C200023ADBD = {
+			fileRef = E7F127FE072C2C200023ADBD;
 			isa = PBXBuildFile;
 			settings = {
 			};

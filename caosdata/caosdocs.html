@@ -164,29 +164,45 @@
 </td></tr></table><br>
 <h1>flow</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DOIF </span>(command) condition (condition)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Part of a DOIF/ELIF/ELSE/ENDI block. Jump to the next</p>
+<p>part of the block if condition is false, otherwise continue</p>
+<p>executing.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ELIF </span>(command) condition (condition)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous</p>
+<p>DOIF/ELIF conditions have been true, and condition evaluates</p>
+<p>to true, then the code in the ELIF block is executed.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ELSE </span>(command)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is</p>
+<p>jumped to when none of the previous DOIF/ELIF conditions are true.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ENDI </span>(command)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>The end of a DOIF/ELIF/ELSE/ENDI block.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">EVER </span>(command)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Jump back to the matching LOOP, no matter what.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GSUB </span>(command) label (label)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Jump to a subroutine defined by SUBR with label 'label'.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">LOOP </span>(command)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>The start of a LOOP..EVER or LOOP..UNTL loop.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">REPE </span>(command)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">REPS </span>(command) reps (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RETN </span>(command)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Return from a subroutine called with GSUB.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SUBR </span>(command) label (label)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Define the start of a subroute to be called with GSUB, with label 'label'.</p>
+<p>If the command is encountered during execution, it acts like a STOP.</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">UNTL </span>(command) condition (condition)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>Jump back to the matching LOOP unless the condition evaluates to true.</p>
+</td></tr></table><br>
 <h1>input</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CLAC </span>(command) message (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>

@@ -115,12 +115,10 @@ extern "C" int main(int argc, char *argv[]) {
 	Uint32 videoflags = SDL_SWSURFACE + SDL_RESIZABLE;
 	SDL_Event event;
 
-	if ( SDL_Init(initflags) < 0 ) {
-		std::cerr << "SDL init failed: " << SDL_GetError();
+	if (SDL_Init(initflags) < 0) {
+		std::cerr << "SDL init failed: " << SDL_GetError() << std::endl;
 		return 1;
 	}
-
-	assert(world.map.getMetaRoomCount() != 0);
 
 	world.init();
 
@@ -136,11 +134,11 @@ extern "C" int main(int argc, char *argv[]) {
 		backsurfs[m->id] = new SDL_Surface *[test->numframes()];
 		for (unsigned int i = 0; i < test->numframes(); i++) {
 			backsurfs[m->id][i] = SDL_CreateRGBSurfaceFrom(test->data(i),
-																							test->width(i),
-																							test->height(i),
-																							16, // depth
-																							test->width(i) * 2, // pitch
-																							0xF800, 0x07E0, 0x001F, 0); // RGBA mask
+														   test->width(i),
+														   test->height(i),
+														   16, // depth
+														   test->width(i) * 2, // pitch
+														   0xF800, 0x07E0, 0x001F, 0); // RGBA mask
 			assert(backsurfs[m->id][i] != 0);
 		}
 	}

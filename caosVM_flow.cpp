@@ -48,6 +48,10 @@ void caosVM::jumpToNextIfBlock() {
 
 /**
  DOIF (command) condition (condition)
+ 
+ Part of a DOIF/ELIF/ELSE/ENDI block. Jump to the next
+ part of the block if condition is false, otherwise continue
+ executing.
 */
 void caosVM::c_DOIF() {
 	VM_VERIFY_SIZE(0)
@@ -58,6 +62,10 @@ void caosVM::c_DOIF() {
 
 /**
  ELIF (command) condition (condition)
+ 
+ Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous
+ DOIF/ELIF conditions have been true, and condition evaluates
+ to true, then the code in the ELIF block is executed.
 */
 void caosVM::c_ELIF() {
 	VM_VERIFY_SIZE(0)
@@ -68,6 +76,9 @@ void caosVM::c_ELIF() {
 
 /**
  ELSE (command)
+ 
+ Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is
+ jumped to when none of the previous DOIF/ELIF conditions are true.
 */
 void caosVM::c_ELSE() {
 	VM_VERIFY_SIZE(0)
@@ -78,6 +89,8 @@ void caosVM::c_ELSE() {
 
 /**
  ENDI (command)
+ 
+ The end of a DOIF/ELIF/ELSE/ENDI block.
 */
 void caosVM::c_ENDI() {
 	VM_VERIFY_SIZE(0)
@@ -113,6 +126,8 @@ void caosVM::c_REPE() {
 
 /**
  LOOP (command)
+ 
+ The start of a LOOP..EVER or LOOP..UNTL loop.
 */
 void caosVM::c_LOOP() {
 	VM_VERIFY_SIZE(0)
@@ -121,6 +136,8 @@ void caosVM::c_LOOP() {
 
 /**
  EVER (command)
+ 
+ Jump back to the matching LOOP, no matter what.
 */
 void caosVM::c_EVER() {
 	VM_VERIFY_SIZE(0)
@@ -130,6 +147,8 @@ void caosVM::c_EVER() {
 
 /**
  UNTL (command) condition (condition)
+ 
+ Jump back to the matching LOOP unless the condition evaluates to true.
 */
 void caosVM::c_UNTL() {
 	VM_VERIFY_SIZE(0)
@@ -140,6 +159,8 @@ void caosVM::c_UNTL() {
 
 /**
  GSUB (command) label (label)
+ 
+ Jump to a subroutine defined by SUBR with label 'label'.
 */
 void caosVM::c_GSUB() {
 	VM_VERIFY_SIZE(1)
@@ -159,15 +180,20 @@ void caosVM::c_GSUB() {
 
 /**
  SUBR (command) label (label)
+ 
+ Define the start of a subroute to be called with GSUB, with label 'label'.
+ If the command is encountered during execution, it acts like a STOP.
 */
 void caosVM::c_SUBR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(label)
-	c_STOP(); // a SUBR acts like a STOP if encountered during execution
+	c_STOP();
 }
 
 /**
  RETN (command)
+ 
+ Return from a subroutine called with GSUB.
 */
 void caosVM::c_RETN() {
 	VM_VERIFY_SIZE(0)
