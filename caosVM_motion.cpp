@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "openc2e.h"
 #include "Agent.h"
+#include "AgentRef.h"
 #include <iostream>
 using std::cerr;
 
@@ -220,3 +221,21 @@ void caosVM::c_FRIC() {
 	targ->friction = friction;
 }
 
+/**
+ FALL (integer)
+
+ Return 1 if TARG is moving due to gravity, 0 otherwise
+*/
+void caosVM::v_FALL() {
+	VM_VERIFY_SIZE(0)
+	caos_assert(targ);
+
+	float accg = targ->accg;
+	float vely = targ->vely.getFloat();
+	if (accg != 0 && vely != 0) {
+		// XXX: this probably isn't quite correct, but it's close enough for
+		// now. Hook it into the physics system properly later
+		result.setInt(1);
+	} else
+		result.setInt(0);
+}

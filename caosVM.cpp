@@ -151,7 +151,7 @@ void caosVM::resetScriptState() {
 	truthstack.clear();
 	linestack.clear();
 	repstack.clear();
-	enumdata.clear();
+	enumstack.clear();
 
 	currentscript = 0;
 	currentline = 0;

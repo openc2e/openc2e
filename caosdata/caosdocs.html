@@ -32,6 +32,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GNUS </span>(integer)</td></tr><tr><td class="description">
 <p>return genus of TARG agent</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">HGHT </span>(integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">KILL </span>(command) agent (agent)</td></tr><tr><td class="description">
 <p>destroy the agent in question. you can't destroy PNTR.</p>
 <p>remember, use DEAD first for creatures!</p>
@@ -113,6 +115,11 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TOTL </span>(integer) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TRAN </span>(integer) x (integer) y (integer)</td></tr><tr><td class="description">
+<p>Tests if the pixel at (x,y) on TARG is transparent</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TRAN </span>(command) transparency (integer) part_no (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">WDTH </span>(integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>camera</h1>
@@ -184,6 +191,11 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRP </span>(command) family (integer) genus (integer) species (integer) event (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>creatures</h1>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ASLP </span>(command) sleeping (integer)</td></tr><tr><td class="description">
+<p>Set whether the creature in TARG is asleep</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CHEM </span>(command) chemical (integer) adjustment (float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DIRN </span>(command) direction (integer)</td></tr><tr><td class="description">
 <p>change target creatures to face a different direction</p>
 </td></tr></table><br>
@@ -198,6 +210,9 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">STIM WRIT </span>(command) creature (agent) stimulus (integer) strength (float)</td></tr><tr><td class="description">
 <p>send stimulus to specific creature</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SWAY SHOU </span>(command) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) </td></tr><tr><td class="description">
+<p>Adjust these four drives in all creatures which can hear OWNR</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ZOMB </span>(command) zombie (integer)</td></tr><tr><td class="description">
 <p>pass 1 to disconnect brain and motor of target creature, and 0 to undo</p>
@@ -300,6 +315,8 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ADDR </span>(integer) metaroomid (integer) x_left (integer) x_right (integer) y_left_ceiling (integer) y_right_ceiling (integer) y_left_floor (integer) y_right_floor (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ALTR </span>(command) room_id (integer) ca_index (integer) delta (float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">BRMI </span>(command) metaroom_base (integer) room_base (integer)</td></tr><tr><td class="description">
 <p>set metaroom/room bases, i have no idea why/if we need this</p>
 </td></tr></table><br>
@@ -369,6 +386,9 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ELAS </span>(command) elas (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">FALL </span>(integer)</td></tr><tr><td class="description">
+<p>Return 1 if TARG is moving due to gravity, 0 otherwise</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">FRIC </span>(float)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">FRIC </span>(command) friction (integer)</td></tr><tr><td class="description">
@@ -622,4 +642,4 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SPAS </span>(command) vehicle (agent) passenger (agent)</td></tr><tr><td class="description">
 <p>make specified vehicle agent pick up specified passenger</p>
 </td></tr></table><br>
-<p>223 commands: 32% of DS-era CEE; 121 documented commands: 17% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>
+<p>231 commands: 33% of DS-era CEE; 125 documented commands: 17% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>

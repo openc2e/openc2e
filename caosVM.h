@@ -36,7 +36,7 @@ protected:
 	std::vector<bool> truthstack;
 	std::vector<unsigned int> linestack;
 	std::vector<unsigned int> repstack;
-	std::map<unsigned int, unsigned int> enumdata;
+	std::vector<std::vector<AgentRef> > enumstack;
 	bool locked, noschedule;
 	unsigned int blockingticks;
 
@@ -55,7 +55,7 @@ protected:
 	signed char varnumber; // VAxx/OVxx hack
 
 	void jumpToNextIfBlock();
-	void jumpToAfterEquivalentNext();
+	void jumpToEquivalentNext();
 
 public:
 	void setTarg(const AgentRef &a) { targ = a; part = 0; }
@@ -87,6 +87,7 @@ public:
 	void v_GRID();
 	void c_EMIT();
 	void v_WALL();
+	void c_ALTR();
 	
 	// camera
 	void c_CMRT();
@@ -220,6 +221,9 @@ public:
 	void c_TINT();
 	void c_RNGE();
 	void v_RNGE();
+	void v_TRAN();
+	void c_TRAN();
+	void v_HGHT();
 
 	// motion
 	void c_ELAS();
@@ -239,6 +243,7 @@ public:
 	void c_MVSF();
 	void c_FRIC();
 	void v_FRIC();
+	void v_FALL();
 	
 	// scripts
 	void c_INST();
@@ -257,11 +262,14 @@ public:
 
 	// creatures
 	void c_STIM_WRIT();
+	void c_SWAY_SHOU();
+	void c_ASLP();
 	void c_ZOMB();
 	void c_DIRN();
 	void c_NOHH();
 	void v_HHLD();
 	void c_MVFT();
+	void c_CHEM();
 
 	// sounds
 	void c_SNDE();

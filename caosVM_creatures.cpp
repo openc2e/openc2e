@@ -37,6 +37,40 @@ void caosVM::c_STIM_WRIT() {
 }
 
 /**
+ SWAY SHOU (command) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) 
+
+ Adjust these four drives in all creatures which can hear OWNR
+*/
+void caosVM::c_SWAY_SHOU() {
+	VM_VERIFY_SIZE(8)
+	VM_PARAM_FLOAT(adjust4)
+	VM_PARAM_INTEGER(drive4)
+	VM_PARAM_FLOAT(adjust3)
+	VM_PARAM_INTEGER(drive3)
+	VM_PARAM_FLOAT(adjust2)
+	VM_PARAM_INTEGER(drive2)
+	VM_PARAM_FLOAT(adjust1)
+	VM_PARAM_INTEGER(drive1)
+
+	caos_assert(owner);
+	//TODO
+}
+
+/**
+ ASLP (command) sleeping (integer)
+
+ Set whether the creature in TARG is asleep
+*/
+void caosVM::c_ASLP() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(asleep)
+
+	caos_assert(targ);
+
+	//TODO
+}
+
+/**
  NOHH (command)
 
  tell target creature to stop holding hands with the pointer
@@ -97,3 +131,15 @@ void caosVM::c_MVFT() {
 	// TODO: dynamic_cast to Creature *
 }
 	
+/**
+ CHEM (command) chemical (integer) adjustment (float)
+*/
+void caosVM::c_CHEM() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_FLOAT(adjustment)
+	VM_PARAM_INTEGER(chemical)
+
+	caos_assert(targ);
+
+	// TODO
+}

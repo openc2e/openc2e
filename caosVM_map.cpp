@@ -253,7 +253,11 @@ void caosVM::v_PROP() {
 void caosVM::c_PERM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(perm)
-	assert((perm >= 1) && (perm <= 100));
+	
+	// C3 rocklice set perm to 0, ick.
+	
+	if (perm < 1) perm = 1;
+	if (perm > 100) perm = 100;
 
 	// TODO
 }
@@ -343,6 +347,18 @@ void caosVM::c_EMIT() {
 void caosVM::v_WALL() {
 	VM_VERIFY_SIZE(0)
 
+	// XXX: fix this
 	v_DOWN();
 }
 
+/**
+ ALTR (command) room_id (integer) ca_index (integer) delta (float)
+*/
+void caosVM::c_ALTR() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_FLOAT(delta);
+	VM_PARAM_INTEGER(ca_index);
+	VM_PARAM_INTEGER(room_id);
+
+	// TODO
+}

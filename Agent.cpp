@@ -109,11 +109,11 @@ void Agent::tick() {
 			} else
 				vely.setFloat(0);
 		}
-	// TODO: check velx!
-	} else if (vely.hasFloat()) {
-		y = y + vely.floatValue;
-	} else if (vely.hasInt()) {
-		y = y + vely.intValue;
+	} else {
+		if (vely.hasDecimal())
+			y = y + vely.getFloat();
+		if (velx.hasDecimal())
+			x = x + velx.getFloat();
 	}
 
 	if (timerrate) {

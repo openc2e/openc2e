@@ -23,7 +23,7 @@
 #include "World.h" // enum
 #include <cmath>   // sqrt
 
-void caosVM::jumpToAfterEquivalentNext() {
+void caosVM::jumpToEquivalentNext() {
 	// todo: add non-ENUM things
 	cmdinfo *next = getCmdInfo("NEXT", true); assert(next != 0);
 	cmdinfo *enu = getCmdInfo("ENUM", true); assert(enu != 0);
@@ -39,7 +39,7 @@ void caosVM::jumpToAfterEquivalentNext() {
 		} else if (front.func == next) {
 			if (stack) stack--;
 			else {
-				currentline = i + 1;
+				currentline = i;
 				return;
 			}
 		}
@@ -229,9 +229,22 @@ void caosVM::c_RETN() {
 */
 void caosVM::c_NEXT() {
 	VM_VERIFY_SIZE(0)
-	assert(!linestack.empty());
+	assert(!enumstack.empty());
+	/* Remove any agents which disappeared mysteriously */
+	while (!enumstack.back().empty() && !enumstack.back().back())
+		enumstack.back().pop_back();
+	/* If we're the first line in the enumeration block, or are out of
+	 * agents to enumerate, pop off the stack and just return.
+	 */
+	if (currentline == linestack.back() || enumstack.back().empty()) {
+		enumstack.pop_back();
+		linestack.pop_back();
+		setTarg(owner);
+		return;
+	}
+	setTarg(enumstack.back().back());
+	enumstack.back().pop_back();
 	currentline = linestack.back();
-	linestack.pop_back();
 }
 
 /**
@@ -243,26 +256,24 @@ void caosVM::c_ENUM() {
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 
-	// TODO: fix mess of 'r' initialisation
-	unsigned int r = (enumdata.count(currentline) == 0 ? 1 : enumdata[currentline]), x = 0;
-
-	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		if ((*i)->family == family)
-			if ((*i)->genus == genus)
-				if ((*i)->species == species)
-					x++;
-
-		if (x == r) {
-			enumdata[currentline] = x + 1;
-			setTarg(*i);
-			linestack.push_back(currentline);
-			return;
-		}
-	}
+	enumstack.push_back(std::vector<AgentRef>());
+	linestack.push_back(currentline + 1); // loop entry
 	
-	enumdata[currentline] = 1; // TODO: erase it instead?
-	setTarg(owner);
-	jumpToAfterEquivalentNext();
+	for (std::multiset<Agent *, agentzorder>::iterator i
+			= world.agents.begin(); i != world.agents.end(); i++) {
+		Agent *a = (*i);
+		if (species && species != a->species) continue;
+		if (genus && genus != a->genus) continue;
+		if (family && family != a->family) continue;
+
+		enumstack.back().push_back(a);
+	}
+
+/*	std::cout << "ENUM " << (int) family << " " << (int) genus << " "
+		<< (int) species << " found a total of " << enumstack.back().size()
+		<< " agents." << std::endl; */
+
+	jumpToEquivalentNext();
 }
 
 /**
@@ -276,36 +287,33 @@ void caosVM::c_ESEE() {
 	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 
-	caos_assert(owner);
+	enumstack.push_back(std::vector<AgentRef>());
+	linestack.push_back(currentline + 1); // loop entry
+	
+	for (std::multiset<Agent *, agentzorder>::iterator i
+			= world.agents.begin(); i != world.agents.end(); i++) {
+		Agent *a = (*i);
+		if (species && species != a->species) continue;
+		if (genus && genus != a->genus) continue;
+		if (family && family != a->family) continue;
 
-	// Copied from ENUM.
-	// TODO: fix mess of 'r' initialisation
-	unsigned int r = (enumdata.count(currentline) == 0 ? 1 : enumdata[currentline]), x = 0;
-
-	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		// XXX: measure from center?
 		double deltax = (*i)->x - owner->x;
 		double deltay = (*i)->y - owner->y;
 		deltax *= deltax;
 		deltay *= deltay;
 
 		double distance = sqrt(deltax + deltay);
-		if (distance <= owner->range)
-			if ((*i)->family == family)
-				if ((*i)->genus == genus)
-					if ((*i)->species == species)
-						x++;
+		if (distance > owner->range) continue;
 
-		if (x == r) {
-			enumdata[currentline] = x + 1;
-			setTarg(*i);
-			linestack.push_back(currentline);
-			return;
-		}
+		enumstack.back().push_back(a);
 	}
-	
-	enumdata[currentline] = 1; // TODO: erase it instead?
-	setTarg(owner);
-	jumpToAfterEquivalentNext();
+
+/*	std::cout << "ESEE " << (int) family << " " << (int) genus << " "
+		<< (int) species << " found a total of " << enumstack.back().size()
+		<< " agents." << std::endl; */
+
+	jumpToEquivalentNext();
 }
 
 /**
@@ -322,7 +330,8 @@ void caosVM::c_ETCH() {
 	// TODO: should probably implement this (ESEE)
 	
 	setTarg(owner);
-	jumpToAfterEquivalentNext();
+	jumpToEquivalentNext();
+	currentline++;
 }
 
 /**
@@ -339,6 +348,7 @@ void caosVM::c_EPAS() {
 	// TODO: should probably implement this (ESEE)
 	
 	setTarg(owner);
-	jumpToAfterEquivalentNext();
+	jumpToEquivalentNext();
+	currentline++;
 }
 

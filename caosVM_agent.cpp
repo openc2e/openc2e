@@ -21,6 +21,8 @@
 #include "openc2e.h"
 #include "Vehicle.h"
 #include "World.h"
+#include "creaturesImage.h"
+#include "SimpleAgent.h"
 #include <iostream>
 using std::cerr;
 
@@ -35,7 +37,24 @@ void caosVM::c_RTAR() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 	setTarg(0);
-	// todo
+
+	/* XXX: maybe use a map of classifier -> agents? */
+	std::vector<Agent *> temp;
+	for (std::multiset<Agent *, agentzorder>::iterator i
+		= world.agents.begin(); i != world.agents.end(); i++) {
+		
+		Agent *a = (*i);
+		
+		if (species && species != a->species) continue;
+		if (genus && genus != a->genus) continue;
+		if (family && family != a->family) continue;
+
+		temp.push_back(a);
+	}
+
+	if (temp.size() == 0) return;
+	int i = rand() % temp.size();
+	setTarg(temp[i]);
 }
 
 /**
@@ -325,6 +344,8 @@ void caosVM::v_BASE() {
 */
 void caosVM::v_BHVR() {
 	VM_VERIFY_SIZE(0)
+
+	result.setInt(0);
 	// TODO
 }
 
@@ -638,5 +659,67 @@ void caosVM::v_RNGE() {
 	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
 	result.setFloat(targ->range);
+}
+
+/**
+ TRAN (integer) x (integer) y (integer)
+
+ Tests if the pixel at (x,y) on TARG is transparent
+*/
+void caosVM::v_TRAN() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+
+	SimpleAgent *a;
+	caos_assert(targ);
+	try {
+		a = dynamic_cast<SimpleAgent *>(targ.get());
+	} catch (std::exception e) {
+		// TODO: TRAN on other agents
+		// (if lc2e even allows that)
+		result.setInt(0);
+		return;
+	}
+
+	creaturesImage *i = a->getSprite();
+	int index = a->getCurrentSprite();
+
+	unsigned char *data = (unsigned char *)i->data(index);
+	// XXX: do we measure from center?
+	int w = i->width(index);
+	int h = i->height(index);
+
+	caos_assert(x < w);
+	caos_assert(x >= 0);
+	caos_assert(y < h);
+	caos_assert(y >= 0);
+	
+	if (data[w * y + x] == 0)
+		result.setInt(1);
+	else
+		result.setInt(0);
+}
+	
+/**
+ TRAN (command) transparency (integer) part_no (integer)
+*/
+void caosVM::c_TRAN() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(part_no)
+	VM_PARAM_INTEGER(transparency)
+
+	caos_assert(targ);
+	// TODO
+}
+
+/**
+ HGHT (integer)
+*/
+void caosVM::v_HGHT() {
+	VM_VERIFY_SIZE(0)
+	caos_assert(targ);
+
+	result.setInt(targ->getHeight());
 }
 

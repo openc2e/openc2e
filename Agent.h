@@ -48,7 +48,7 @@ public:
 	unsigned short species;
 	unsigned int zorder;
 	unsigned int tickssincelasttimer, timerrate;
-	caosVar velx, vely;
+	caosVar velx, vely; // XXX: should these be basic floats?
 	float accg, aero;
 	unsigned int friction;
 	float x, y;
