@@ -100,13 +100,13 @@ include .deps/meta
 #		$($(wildcard *.cpp):.cpp=.dpp)
 
 openc2e: $(OPENC2E)
-	g++ $(LDFLAGS) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^
 
 tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
-	g++ $(LDFLAGS) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^
 
 tools/praydumper: tools/praydumper.o pray.o
-	g++ $(LDFLAGS) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^
 
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
