@@ -32,6 +32,15 @@ void caosVM::c_SNDE() {
 }
 
 /**
+ SNDC (command) filename (string)
+*/
+void caosVM::c_SNDC() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(filename)
+	cout << "sndc tried to play " << filename << std::endl;
+}
+
+/**
  MMSC (command) x (integer) y (integer) track_name (string)
 */
 void caosVM::c_MMSC() {

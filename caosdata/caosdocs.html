@@ -136,6 +136,9 @@
 <p>send stimulus to specific creature</p>
 </td></tr></table><br>
 <h1>debug</h1>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">AGNT </span>(agent) id (integer)</td></tr><tr><td class="description">
+<p>return agent, given input from UNID, or NULL if agent has been deleted</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DBG: OUTS </span>(command) val (string)</td></tr><tr><td class="description">
 <p>output a string to the debug log</p>
 </td></tr></table><br>
@@ -165,6 +168,10 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TEST STRT </span>(command)</td></tr><tr><td class="description">
 <p>openc2e-only</p>
 <p>start a single test, continuing until TEST PASS/FAIL/FINI</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">UNID </span>(integer)</td></tr><tr><td class="description">
+<p>return unique id of target agent</p>
+<p>this is NO GOOD for persisting!</p>
 </td></tr></table><br>
 <h1>flow</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DOIF </span>(command) condition (condition)</td></tr><tr><td class="description">
@@ -226,6 +233,12 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DOWN </span>(integer)</td></tr><tr><td class="description">
 <p>returns the down constant (3)</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GRAP </span>(integer) x (float) y (float)</td></tr><tr><td class="description">
+<p>return the id of the metaroom at (x, y), or -1 otherwise</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GMAP </span>(integer) x (float) y (float)</td></tr><tr><td class="description">
+<p>return the id of the metaroom at (x, y), or -1 otherwise</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">LEFT </span>(integer)</td></tr><tr><td class="description">
 <p>returns the left constant (0)</p>
 </td></tr></table><br>
@@ -234,6 +247,12 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">MAPK </span>(command)  </td></tr><tr><td class="description">
 <p>reset the map (call map::reset)</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PERM </span>(command) perm (integer)</td></tr><tr><td class="description">
+<p>set target agent's permiability, 1 to 100</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PERM </span>(integer)</td></tr><tr><td class="description">
+<p>return target agent's permiability</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PROP </span>(command) roomid (integer) caindex (integer) cavalue (float)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
@@ -355,6 +374,8 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">MMSC </span>(string) x (integer) y (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SNDC </span>(command) filename (string)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SNDE </span>(command) filename (string)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>time</h1>
@@ -436,4 +457,9 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VAxx </span>(variable)</td></tr><tr><td class="description">
 <p>script-local variables, 00 to 99</p>
 </td></tr></table><br>
-<p>146 documented commands: 21% of DS-era CEE, plus 6 openc2e-specific commands</p></body></html>
+<h1>vehicles</h1>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CABN </span>(command) left (integer) top (integer) right (integer) bottom (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CABW </span>(command) cap (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>155 documented commands: 22% of DS-era CEE, plus 6 openc2e-specific commands</p></body></html>

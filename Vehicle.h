@@ -18,11 +18,20 @@
  */
 
 #include "CompoundAgent.h"
+#include "openc2e.h"
 
-// hey is Vehicle really a CompoundAgent?
 class Vehicle : public CompoundAgent {
+protected:
+	int cabinleft, cabintop, cabinright, cabinbottom;
+	unsigned int capacity;
+
 public:
+	// TODO: cabinleft/cabintop/cabinright/cabinbottom should default to bounding rect of part 0
 	Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
-								std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
-		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) { }
-};
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
+		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) { capacity = 0; }
+
+	void setCabinRect(int l, int t, int r, int b) { cabinleft = l; cabintop = t; cabinright = r; cabinbottom = b; }
+	void setCapacity(unsigned int c) { assert(c > 0); capacity = c; }
+}
+

@@ -110,3 +110,27 @@ void caosVM::c_TEST_FINI() {
 	VM_VERIFY_SIZE(0)
 }
 
+/**
+ UNID (integer)
+
+ return unique id of target agent
+ this is NO GOOD for persisting!
+*/
+void caosVM::v_UNID() {
+	VM_VERIFY_SIZE(0)
+	assert(targ);
+	result.setInt((int)targ); // TODO: pointers are no good, AGNT needs to be able to detect deletion!
+}
+
+/**
+ AGNT (agent) id (integer)
+
+ return agent, given input from UNID, or NULL if agent has been deleted
+*/
+void caosVM::v_AGNT() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(id)
+
+	result.setAgent((Agent *)id); // TODO: see UNID
+}
+

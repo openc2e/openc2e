@@ -242,3 +242,64 @@ void caosVM::v_PROP() {
 	Room *room = world.map.getRoom(roomid);
 	result.setFloat(1.0f); // TODO: don't hardcode
 }
+
+/**
+ PERM (command) perm (integer)
+
+ set target agent's permiability, 1 to 100
+*/
+void caosVM::c_PERM() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(perm)
+	assert((perm >= 1) && (perm <= 100));
+
+	// TODO
+}
+
+/**
+ PERM (integer)
+
+ return target agent's permiability
+*/
+void caosVM::v_PERM() {
+	VM_VERIFY_SIZE(0)
+
+	result.setInt(100); // TODO: don't hardcode
+}
+
+/**
+ GRAP (integer) x (float) y (float)
+
+ return the id of the metaroom at (x, y), or -1 otherwise
+*/
+void caosVM::v_GRAP() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+
+	Room *room = world.map.roomAt(x, y);
+	if (room) {
+		result.setInt(room->id);
+	} else {
+		result.setInt(-1);
+	}
+}
+
+/**
+ GMAP (integer) x (float) y (float)
+
+ return the id of the metaroom at (x, y), or -1 otherwise
+*/
+void caosVM::v_GRAP() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+
+	MetaRoom *room = world.map.metaRoomAt(x, y);
+	if (room) {
+		result.setInt(room->id);
+	} else {
+		result.setInt(-1);
+	}
+}
+

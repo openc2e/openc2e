@@ -253,7 +253,7 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>14</integer>
+									<integer>16</integer>
 									<integer>4</integer>
 									<integer>3</integer>
 									<integer>2</integer>
@@ -294,7 +294,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>caosVM_cmdinfo.h</string>
+								<string>caosVM_core.cpp</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -302,18 +302,18 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>caosVM_cmdinfo.h</string>
+										<string>caosVM_core.cpp</string>
 										<key>bookmark</key>
-										<string>E71EB1DD07B000AA00D6DB3F</string>
+										<string>E71EB1F607B0059800D6DB3F</string>
 										<key>history</key>
 										<array>
 											<string>E71EB18807AFFABD00D6DB3F</string>
-											<string>E71EB1A307AFFE0000D6DB3F</string>
 											<string>E71EB1AF07AFFE7C00D6DB3F</string>
 											<string>E71EB1B407AFFEAC00D6DB3F</string>
 											<string>E71EB1C807AFFFDB00D6DB3F</string>
 											<string>E71EB1C907AFFFDB00D6DB3F</string>
-											<string>E71EB1CA07AFFFDB00D6DB3F</string>
+											<string>E71EB1E307B0052F00D6DB3F</string>
+											<string>E71EB1E407B0052F00D6DB3F</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -328,6 +328,7 @@
 											<string>E71EB1B607AFFEAC00D6DB3F</string>
 											<string>E71EB1CB07AFFFDB00D6DB3F</string>
 											<string>E71EB1CC07AFFFDB00D6DB3F</string>
+											<string>E71EB1E507B0052F00D6DB3F</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -448,7 +449,7 @@
 										<key>PBXProjectModuleLabel</key>
 										<string>caosdata.cpp</string>
 										<key>bookmark</key>
-										<string>E71EB1DE07B000AA00D6DB3F</string>
+										<string>E71EB1F707B0059800D6DB3F</string>
 										<key>history</key>
 										<array>
 											<string>E71EB1D007B0004C00D6DB3F</string>
