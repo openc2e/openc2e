@@ -25,25 +25,29 @@
 #include <algorithm>
 
 std::string token::dump() {
+	std::string src;
 	if (type == CAOSVAR) return var.dump();
 	else if (type == BYTESTRING) return "(bytestring: TODO) "; // TODO
-	else if (type == POSSIBLEFUNC) return data + " ";
+	else if (type == POSSIBLEFUNC) src = data + " ";
 	else if (type == LABEL) return data + " ";
-	else if (type == FUNCTION) return func->name + " "; // TODO
+	else if (type == FUNCTION) src = func->name + " "; // TODO
 	else if (type == COMPARISON) {
 		switch (comparison) {
-			case EQ: return "EQ ";
-			case NE: return "NE ";
-			case GT: return "GT ";
-			case GE: return "GE ";
-			case LT: return "LT ";
-			case LE: return "LE ";
-			case AND: return "AND ";
-			case OR: return "OR ";
+			case EQ: return "eq ";
+			case NE: return "ne ";
+			case GT: return "gt ";
+			case GE: return "ge ";
+			case LT: return "lt ";
+			case LE: return "le ";
+			case AND: return "and ";
+			case OR: return "or ";
 			default: return "[bad comparison!] ";
 		}
+	} else {
+		return "[bad token!] ";
 	}
-	return "[bad token!] ";
+	std::transform(src.begin(), src.end(), src.begin(), tolower);	
+	return src;
 }
 
 inline std::string stringify(double x) {
@@ -163,7 +167,6 @@ token makeToken(std::string &src) {
 	return r;
 }
 
-// TODO: "blah"blah shouldn't result in "blah" and blah as tokens, it should DIE
 void tokeniseLine(std::string s, std::vector<token> &t) {
 	std::string currtoken;
 	token lasttoken;
@@ -313,7 +316,9 @@ caosScript::caosScript(std::istream &in) {
 				currscrip->lines.push_back(destline);
 			}
 		} catch (tokeniseFailure f) {
-			std::cerr << f.what() << ": ";
+			std::string firsttok = tokens[loc].dump();
+			firsttok.erase(firsttok.end() - 1);
+			std::cerr << f.what() << " at token '" << firsttok << "'\n [";
 			if (loc == 1)
 				std::cerr << tokens[0].dump();
 			else if (loc > 1)
@@ -321,7 +326,7 @@ caosScript::caosScript(std::istream &in) {
 			std::cerr << "{@}" << tokens[loc].dump();
 			if (tokens.size() > (loc + 1))
 				std::cerr << tokens[loc + 1].dump();
-			std::cerr << "\n";
+			std::cerr << "]\n";
 
 			// make sure to zap the install script
 			installer.lines.clear();

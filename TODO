@@ -4,5 +4,4 @@
 * make the images detect 555/565 themselves
 * start implementing physics
 * look at starting the sound code (and integrating SDL_mixer)
-* make the tokeniser work out command vs function stuff itself
-  * .. and then remove it from the runtime (eg, we don't need seperate cmd/func)
+* comparison should be 'condition', fuzzie sucks, regexp time!
