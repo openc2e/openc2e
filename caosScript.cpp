@@ -220,6 +220,7 @@ void slurpTokens(unsigned int &loc, std::vector<token> &tokens, std::list<token>
 		else throw tokeniseFailure("Expected a command");
 	}
 
+	// TODO: nicer error handling here (ie, work out functions/commands)
 	if (c->twotokens) {
 		loc++;
 		if (tokens[loc].type != token::POSSIBLEFUNC) {
@@ -227,6 +228,13 @@ void slurpTokens(unsigned int &loc, std::vector<token> &tokens, std::list<token>
 			throw tokeniseFailure("Expected a command or function");
 		}
 		c = getSecondCmd(c, tokens[loc].data, !func);
+		if (!c) {
+			loc--;
+			// this makes the error output 'nice'
+			tokens[loc].data = tokens[loc].data + " " + tokens[loc + 1].data;
+			tokens.erase(tokens.begin() + loc + 1);
+			throw tokeniseFailure("Expected a command or function");
+		}
 	}
 
 	token us;

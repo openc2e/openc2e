@@ -65,6 +65,5 @@ cmdinfo *getSecondCmd(cmdinfo *first, std::string cmd, bool command) {
 			if (!i->name.compare(complete)) return &(*i);
 		}
 	}
-	std::cerr << "getSecondCmd failed to find '" << complete << "' :-/\n";
 	return 0;
 }
