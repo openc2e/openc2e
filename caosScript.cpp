@@ -166,6 +166,9 @@ void tokenise(std::string s, std::list<token> &t) {
 			}
 			t.push_back(makeToken(currtoken, true, lasttoken));
 			currtoken.clear();
+		} else if (*i == '*') {
+			// start of a comment. forget the rest of the line.
+			i = s.end() - 1;
 		} else {
 			currtoken += *i;
 		}

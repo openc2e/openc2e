@@ -5,6 +5,7 @@
 #include "openc2e.h"
 #include <iostream>
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include "World.h"
 #include "SimpleAgent.h"
@@ -59,6 +60,8 @@ void drawWorld() {
 }
 
 extern "C" int main(int argc, char *argv[]) {
+	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004 Alyssa Milburn\n\n";
+
 	char *dir = "data/Bootstrap/001 World/";
 	if (argc > 1) dir = argv[1];
 
@@ -68,9 +71,11 @@ extern "C" int main(int argc, char *argv[]) {
 	dirh = opendir(dir);
 	assert(dirh);
 	for (dirent *dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
-		// we assume everything except . and .. is a cos file
-		if (strcmp(dirp->d_name, ".") && strcmp(dirp->d_name, ".."))
-			scripts.push_back(std::string(dir) + dirp->d_name);
+		std::string fname = std::string(dir) + dirp->d_name;
+		struct stat buf;
+		stat(fname.c_str(), &buf);
+		if (S_ISREG(buf.st_mode))
+			scripts.push_back(fname);
 	}
 	closedir(dirh);
 
@@ -93,6 +98,11 @@ extern "C" int main(int argc, char *argv[]) {
 		testvm.runEntirely(testscript.installer);
 		std::cout.flush();
 		std::cerr.flush();
+	}
+
+	if (world.map.getMetaRoomCount() == 0) {
+		std::cout << "\nNo metarooms found in given directory (" << dir << "), exiting.\n";
+		return 0;
 	}
 
 	Uint32 initflags = SDL_INIT_VIDEO;
