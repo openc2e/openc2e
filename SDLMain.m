@@ -164,7 +164,8 @@ void CustomApplicationMain (argc, argv)
     /* Set up the menubar */
     [NSApp setMainMenu:[[NSMenu alloc] init]];
     setupAppleMenu();
-    setupWindowMenu();
+	/* TODO: Disabled because breaks on tiger */
+    /* setupWindowMenu(); */
     
     /* Create SDLMain and make it the app delegate */
     sdlMain = [[SDLMain alloc] init];
