@@ -32,6 +32,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   self.ref = this;
   self.next = self.prev = &self;
   immortal = dying = false;
+	x = 0.0f; y = 0.0f;
 }
 
 Agent::~Agent() {
