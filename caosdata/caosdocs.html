@@ -1,0 +1,150 @@
+<h2>RTAR</h2><p> RTAR (command) family (integer) genus (integer) species (integer)<br>
+ set targ to random agent with given family/genus/species
+</p>
+<h2>NEW: SIMP</h2><p> NEW: SIMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)<br>
+ create a new simple object with given family/genus/species, given spritefile with image_count sprites
+ available starting at first_image in the spritefile, at the screen depth given by plane
+</p>
+<h2>NEW: COMP</h2><p> NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)<br></p>
+<h2>TARG</h2><p> TARG (agent)<br>
+ return TARG
+</p>
+<h2>NULL</h2><p> NULL (agent)<br>
+ return null (zero) agent
+</p>
+<h2>ATTR</h2><p> ATTR (command) attr (integer)<br>
+ set attributes of TARG agent
+</p>
+<h2>ATTR</h2><p> ATTR (integer)<br>
+ return attributes of TARG agent
+</p>
+<h2>TICK</h2><p> TICK (command) tickrate (integer)<br></p>
+<h2>BHVR</h2><p> BHVR (command) bhvr (integer)<br></p>
+<h2>TARG</h2><p> TARG (command) agent (agent)<br>
+ set TARG to given agent
+</p>
+<h2>FROM</h2><p> FROM (agent)<br></p>
+<h2>KILL</h2><p> KILL (command) agent (agent)<br></p>
+<h2>NEXT</h2><p> NEXT (command)<br></p>
+<h2>SCRX</h2><p> SCRX (command) event (integer) species (integer) genus (integer) family (integer)<br></p>
+<h2>ANIM</h2><p> ANIM (command) poselist (byte-string)<br></p>
+<h2>BASE</h2><p> BASE (command) index (integer)<br></p>
+<h2>BASE</h2><p> BASE (integer)<br></p>
+<h2>BHVR</h2><p> BHVR (integer)<br></p>
+<h2>FMLY</h2><p> FMLY (integer)<br></p>
+<h2>GNUS</h2><p> GNUS (integer)<br></p>
+<h2>SPCS</h2><p> SPCS (integer)<br></p>
+<h2>PLNE</h2><p> PLNE (integer)<br></p>
+<h2>PNTR</h2><p> PNTR (agent)<br></p>
+<h2>META</h2><p> META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)<br> 
+ set metaroom current camera is pointing at. coordinates point to top left of new
+ camera position.
+ 
+ transition: 0 for none, 1 for flip horz, 2 for burst
+</p>
+<h2>CMRT</h2><p> CMRT (command) pan (integer)<br>
+ centre current camera on TARG.
+
+ pan: 0 for none (jump), 1 for smooth scroll if in same metaroom, 2 for smooth scroll if visible
+</p>
+<h2>PART</h2><p> PART (command) part_id (integer)<br></p>
+<h2>DBG: OUTS</h2><p> DBG: OUTS (command) val (string)<br> 
+ output a string to the debug log
+</p>
+<h2>DBG: OUTV</h2><p> DBG: OUTV (command) val (decimal)<br> 
+ output a decimal value to the debug log
+</p>
+<h2>OUTS</h2><p> OUTS (command) val (string)<br></p>
+<h2>OUTV</h2><p> OUTV (command) val (decimal)<br></p>
+<h2>GAME</h2><p>	GAME (variable) name (string)<br>
+	returns game variable with name given (unchecked)
+</p>
+<h2>SCRP</h2><p> SCRP (command)<br></p>
+<h2>RSCR</h2><p> RSCR (command)<br></p>
+<h2>ENDM</h2><p> ENDM (command)<br></p>
+<h2>STIM WRIT</h2><p> STIM WRIT (command) creature (agent) stimulus (integer) strength (float)<br>
+ send stimulus to specific creature
+</p>
+<h2>DOIF</h2><p> DOIF (command) condition (condition)<br></p>
+<h2>ELIF</h2><p> ELIF (command) condition (condition)<br></p>
+<h2>ELSE</h2><p> ELSE (command)<br></p>
+<h2>ENDI</h2><p> ENDI (command)<br></p>
+<h2>REPS</h2><p> REPS (command) reps (integer)<br></p>
+<h2>REPE</h2><p> REPE (command)<br></p>
+<h2>LOOP</h2><p> LOOP (command)<br></p>
+<h2>EVER</h2><p> EVER (command)<br></p>
+<h2>UNTL</h2><p> UNTL (command) condition (condition)<br></p>
+<h2>GSUB</h2><p> GSUB (command) label (label)<br></p>
+<h2>SUBR</h2><p> SUBR (command) label (label)<br></p>
+<h2>RETN</h2><p> RETN (command)<br></p>
+<h2>ADDM</h2><p> ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)<br> 
+ create metaroom. return id of created metaroom.
+</p>
+<h2>BRMI</h2><p> BRMI (command) metaroom_base (integer) room_base (integer)<br> 
+ set metaroom/room bases, i have no idea why/if we need this
+</p>
+<h2>MAPD</h2><p> MAPD (command) width (integer) height (integer)<br> 
+ set the map dimensions, inside which we place metarooms
+</p>
+<h2>MAPK</h2><p> MAPK (command)  <br> 
+ reset the map (call map::reset)
+</p>
+<h2>ADDR</h2><p> ADDR (integer) metaroomid (integer) x_left (integer) x_right (integer) y_left_ceiling (integer) y_right_ceiling (integer) y_left_floor (integer) y_right_floor (integer)<br></p>
+<h2>RTYP</h2><p> RTYP (command) roomid (integer) roomtype (integer)<br></p>
+<h2>DOOR</h2><p> DOOR (command) room1 (integer) room2 (integer) perm (integer)<br></p>
+<h2>RATE</h2><p> RATE (command) roomtype (integer) caindex (integer) gain (float) loss (float) diffusion (float)<br></p>
+<h2>ELAS</h2><p> ELAS (command) elas (integer)<br></p>
+<h2>MVTO</h2><p> MVTO (command) x (integer) y (integer)<br></p>
+<h2>INST</h2><p> INST (command)<br>
+ don't release control to the scheduler until end of script or SLOW
+</p>
+<h2>SLOW</h2><p> SLOW (command)<br>
+ reverts effects of INST
+</p>
+<h2>LOCK</h2><p> LOCK (command)<br>
+ prevent agent script from being interrupted by another
+</p>
+<h2>UNLK</h2><p> UNLK (command)<br>
+ reverts effects of LOCK
+</p>
+<h2>WAIT</h2><p> WAIT (command) ticks (integer)<br>
+ stop the script from running for a number of ticks
+</p>
+<h2>STOP</h2><p> STOP (command)<br></p>
+<h2>PACE</h2><p> PACE (float)<br>
+ return speed factor of last ten ticks. < 1.0 = engine is ticking slower than BUZZ rating.
+ > 1.0 = engine is ticking faster.
+</p>
+<h2>VAxx</h2><p> VAxx (variable)<br>
+ script-local variables, 00 to 99 (todo: is this right?)
+</p>
+<h2>SETV</h2><p> SETV (command) var (variable) value (decimal)<br>
+ sets given variable to given number [int/float]
+</p>
+<h2>SETA</h2><p> SETA (command) var (variable) value (agent)<br>
+ sets given variable to given agent
+</p>
+<h2>OVxx</h2><p> OVxx (variable)<br>
+ agent-local variables from TARG, 00 to 99
+</p>
+<h2>MODV</h2><p> MODV (command) var (variable) mod (integer)<br>
+ returns var % mod
+</p>
+<h2>ADDV</h2><p> ADDV (command) var (variable) add (integer)<br>
+ returns var + add
+</p>
+<h2>SUBV</h2><p> SUBV (command) var (variable) sub (integer)<br>
+ returns var - sub
+</p>
+<h2>NEGV</h2><p> NEGV (command) var (variable)<br>
+ returns a negated variable (eg 1 to -1, -3 to 3)
+</p>
+<h2>MULV</h2><p>  MULV (command) var (variable) mul (decimal)<br>
+  returns var * mul
+</p>
+<h2>RAND</h2><p> RAND (integer) value1 (integer) value2 (integer)<br>
+ return a random integer between value1 and value2 inclusive
+</p>
+<h2>REAF</h2><p> REAF (command)<br>
+ reread catalogue files
+</p>
