@@ -37,10 +37,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 
 Agent::~Agent() {
 	assert(!immortal);
-	if (vm) {
+	if (vm)
 		world.freeVM(vm);
-		vm = NULL;
-	}
 	zotrefs();
 }
 
