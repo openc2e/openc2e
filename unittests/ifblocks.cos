@@ -1,38 +1,100 @@
-* unit tests for DOIF/ELIF/ELSE/ENDI blocks
+* unit tests for DOIF/ELIF/ELSE/ENDI blocks and comparison operators
 * fuzzie, 06/06/04
 
-DBG: OUTS "TEST: ifblocks: 5 tests"
+DBG: OUTS "TEST: ifblocks: 15 tests"
 
+* test equality
 DOIF 1 eq 1
  DBG: OUTS "PASS"
 ELSE
  DBG: OUTS "FAIL"
 ENDI
 
+* test non-equality
+DOIF 1 ne 2
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test greater than
 DOIF 1 > 2
  DBG: OUTS "FAIL"
 ELSE
  DBG: OUTS "PASS"
 ENDI
 
+* test less than
 DOIF 1 < 2
  DBG: OUTS "PASS"
 ELSE
  DBG: OUTS "FAIL"
 ENDI
 
-DOIF 1 eq 2
+* test le #1
+DOIF 1 <= 1
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test le #2
+DOIF 1 <= 2
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test le #3
+DOIF 2 <= 1
  DBG: OUTS "FAIL"
 ELSE
  DBG: OUTS "PASS"
 ENDI
 
+* test ge #1
+DOIF 1 >= 1
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test ge #2
+DOIF 1 >= 2
+ DBG: OUTS "FAIL"
+ELSE
+ DBG: OUTS "PASS"
+ENDI
+
+* test ge #3
+DOIF 2 >= 1
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test AND
 DOIF 1 eq 1 AND 2 eq 2
  DBG: OUTS "PASS"
 ELSE
  DBG: OUTS "FAIL"
 ENDI
 
+* test OR #1
+DOIF 1 eq 1 OR 1 eq 2
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test OR #2
+DOIF 1 eq 2 OR 2 eq 3
+ DBG: OUTS "FAIL"
+ELSE
+ DBG: OUTS "PASS"
+ENDI
+
+* test embedded if blocks
 DOIF 1 eq 2
  DOIF 1 eq 1
   DBG: OUTS "FAIL"
@@ -45,4 +107,13 @@ ELSE
  ELSE
   DBG: OUTS "FAIL"
  ENDI
+ENDI
+
+* test ELIF
+DOIF 1 eq 2
+ DBG: OUTS "FAIL"
+ELIF 1 eq 1
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
 ENDI
