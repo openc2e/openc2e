@@ -386,3 +386,18 @@ void caosVM::v_PNTR() {
 	VM_VERIFY_SIZE(0)
 	result.setAgent(world.hand());
 }
+
+/**
+ MESG WRIT (command) agent (agent) message_id (integer)
+*/
+void caosVM::c_MESG_WRIT() {
+	VM_VERIFY_SIZE(2)
+}
+
+/**
+ MESG WRT+ (command) agent (agent) message_id (integer) param_1 (anything) param_2 (anything) delay (integer)
+*/
+void caosVM::c_MESG_WRT() {
+	VM_VERIFY_SIZE(5)
+}
+

@@ -69,6 +69,10 @@ sub writedocsanddata {
 		if (length($one) == 3) {
 			$one = $one . ":";
 		}
+		if (length($two) == 3) {
+			# not sure if this is right for future cases - fuzzie
+			$two = $two . "+"; # MESG WRT+
+		}
 		$newname = $one . " " . $two;
 	}
 	if ($doclines) {

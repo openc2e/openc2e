@@ -126,6 +126,8 @@ public:
 	void v_PLNE();
 	void v_PNTR();
 	void v_OWNR();
+	void c_MESG_WRIT();
+	void c_MESG_WRT();
 
 	// motion
 	void c_ELAS();
