@@ -45,8 +45,10 @@ void c16Image::readHeader(std::istream &in) {
 	}
 }
 
-c16Image::c16Image(std::istream &in) {
-	readHeader(in);
+c16Image::c16Image(std::istream *in) {
+	stream = in;
+
+	readHeader(*in);
 	
 	buffers = new void *[m_numframes];
 	
@@ -56,16 +58,16 @@ c16Image::c16Image(std::istream &in) {
 		buffers[i] = new char[widths[i] * heights[i] * 2];
 		uint16 *bufferpos = (uint16 *)buffers[i];
 		for (unsigned int j = 0; j < heights[i]; j++) {
-			in.seekg(lineoffsets[i][j], std::ios::beg);
+			in->seekg(lineoffsets[i][j], std::ios::beg);
 			while (true) {
-				uint16 tag; in.read((char *)&tag, 2); tag = swapEndianShort(tag);
+				uint16 tag; in->read((char *)&tag, 2); tag = swapEndianShort(tag);
 				if (tag == 0) break;
 				bool transparentrun = ((tag & 0x0001) == 0);
 				uint16 runlength = (tag & 0xFFFE) >> 1;
 				if (transparentrun)
 					memset((char *)bufferpos, 0, (runlength * 2));
 				else {
-					in.read((char *)bufferpos, (runlength * 2));
+					in->read((char *)bufferpos, (runlength * 2));
 					for (unsigned int k = 0; k < runlength; k++) {
 						bufferpos[k] = swapEndianShort(bufferpos[k]);
 					}
@@ -96,8 +98,10 @@ void s16Image::readHeader(std::istream &in) {
 	}
 }
 
-s16Image::s16Image(std::istream &in) {
-	readHeader(in);
+s16Image::s16Image(std::istream *in) {
+	stream = in;
+
+	readHeader(*in);
 	
 	buffers = new void *[m_numframes];
 
@@ -105,8 +109,8 @@ s16Image::s16Image(std::istream &in) {
 	// todo: we assume the file format is valid here. we shouldn't.
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		buffers[i] = new unsigned short[widths[i] * heights[i]];
-		in.seekg(offsets[i], std::ios::beg);
-		in.read((char *)buffers[i], (widths[i] * heights[i] * 2));
+		in->seekg(offsets[i], std::ios::beg);
+		in->read((char *)buffers[i], (widths[i] * heights[i] * 2));
 		for (unsigned int k = 0; k < (unsigned int) (widths[i] * heights[i]); k++) {
 			((unsigned short *)buffers[i])[k] = swapEndianShort(((unsigned short *)buffers[i])[k]);
 		}

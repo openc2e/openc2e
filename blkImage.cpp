@@ -64,15 +64,17 @@ void blkImage::writeHeader(std::ostream &s) {
 	}
 }
 
-blkImage::blkImage(std::istream &in) {
-  readHeader(in);
+blkImage::blkImage(std::istream *in) {
+	stream = in;
+
+  readHeader(*in);
 	
 	buffers = new void *[m_numframes];
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		in.seekg(offsets[i], std::ios::beg);
+		in->seekg(offsets[i], std::ios::beg);
 		buffers[i] = new uint16[128 * 128];
-		in.read((char *)buffers[i], 128 * 128 * 2);
+		in->read((char *)buffers[i], 128 * 128 * 2);
 	}
 
   delete[] offsets;

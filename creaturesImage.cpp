@@ -38,28 +38,28 @@ creaturesImage *imageGallery::getImage(std::string name) {
 
 	// step two: try opening it in .c16 form first, then try .s16 form
 	std::string filename = "./data/Images/" + name + ".c16";
-	std::ifstream in(filename.c_str());
-	if (!in.is_open()) {
+	std::ifstream *in = new std::ifstream(filename.c_str());
+	if (!in->is_open()) {
 		filename = "./data/Images/" + name + ".s16";
-		in.clear();
-		in.open(filename.c_str());
-		if (!in.is_open()) { // final try: this might be in the format 'name.blk'
-			in.clear();
+		in->clear();
+		in->open(filename.c_str());
+		if (!in->is_open()) { // final try: this might be in the format 'name.blk'
+			in->clear();
 #ifdef __C2E_LITTLEENDIAN
 			filename = "./data/Backgrounds/" + name;
 #else
 			filename = "./data/Backgrounds/" + name + ".big";
 #endif
-			in.open(filename.c_str());
+			in->open(filename.c_str());
 #ifdef __C2E_BIGENDIAN
-			if (!in.is_open()) {
+			if (!in->is_open()) {
 				fileSwapper f;
 				f.convertblk("./data/Backgrounds/", name);
-				in.clear();
-				in.open(filename.c_str());
+				in->clear();
+				in->open(filename.c_str());
 			}
 #endif
-			assert(in.is_open());
+			assert(in->is_open());
 			std::cout << "imageGallery: opened " << filename << "\n";
 			gallery[name] = new blkImage(in);
 		} else {

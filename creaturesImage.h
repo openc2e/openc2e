@@ -22,6 +22,7 @@
 
 #include <string>
 #include <map>
+#include <fstream>
 #include "endianlove.h"
 
 class creaturesImage {
@@ -34,9 +35,12 @@ protected:
   void **buffers;
 	uint32 *offsets;
 	bool is_565;
+	
+	std::ifstream *stream;
   
 public:
-  creaturesImage() { refcount = 0; }
+	creaturesImage() { refcount = 0; stream = 0; }
+	virtual ~creaturesImage() { if (stream) delete stream; }
 	bool is565() { return is_565; }
   unsigned int numframes() { return m_numframes; }
   virtual unsigned int width(unsigned int frame) { return widths[frame]; }
