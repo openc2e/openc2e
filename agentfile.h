@@ -1,9 +1,7 @@
-#include "creatures.h"
-
 #include <vector>
 #include <string>
-
-namespace creatures {
+#include <istream>
+#include <ostream>
 
 using namespace std;
 
@@ -13,14 +11,14 @@ protected:
   virtual void read(istream &) = 0;
   virtual void write(ostream &) const = 0;
 
-  virtual void rawRead(uint32, uint8 *) = 0;
-  virtual uint8 *rawWrite(uint32 &) const = 0;
- 
+  virtual void rawRead(unsigned int, unsigned char *) = 0;
+  virtual unsigned char *rawWrite(unsigned int &) const = 0;
+
   friend istream &operator >> (istream &s, block &f) { f.read(s); return s; }
   friend ostream &operator << (ostream &s, const block &f) { f.write(s); return s; }
 
 public:
-  uint8 blockid[4];
+  unsigned char blockid[4];
 
   virtual const string &name() const = 0;
   virtual ~block() { }
@@ -30,8 +28,8 @@ public:
 class fileBlock : public block {
 public:
   virtual const string &filename() const = 0;
-  virtual uint32 length() const = 0;
-  virtual uint8 *getBuffer() const = 0;
+  virtual unsigned int length() const = 0;
+  virtual unsigned char *getBuffer() const = 0;
 };
 
 //! old-style agent block [abstract]
@@ -52,39 +50,39 @@ public:
 //! a pray chunk made up of tags, eg the AGNT block
 class tagPrayBlock : public prayBlock {
 protected:
-  virtual void rawRead(uint32, uint8 *);
-  virtual uint8 *rawWrite(uint32 &) const;
- 
+  virtual void rawRead(unsigned int, unsigned char *);
+  virtual unsigned char *rawWrite(unsigned int &) const;
+
 public:
-  vector<pair<string, uint32> > intvalues;
+  vector<pair<string, unsigned int> > intvalues;
   vector<pair<string, string> > strvalues;
 };
 
 //! an unknown pray chunk
 class unknownPrayBlock : public prayBlock {
 protected:
-  virtual void rawRead(uint32, uint8 *);
-  virtual uint8 *rawWrite(uint32 &) const;
+  virtual void rawRead(unsigned int, unsigned char *);
+  virtual unsigned char *rawWrite(unsigned int &) const;
 
 public:
-  uint32 len;
-  uint8 *buf;
+  unsigned int len;
+  unsigned char *buf;
 };
 
 //! 'FILE' pray chunk
 class filePrayBlock : public unknownPrayBlock, public fileBlock {
 public:
   const string &filename() const { return name(); }
-  uint32 length() const { return len; }
-  uint8 *getBuffer() const { return buf; }
+  unsigned int length() const { return len; }
+  unsigned char *getBuffer() const { return buf; }
   const string &name() const { return unknownPrayBlock::name(); }
 };
 
 //! faked creatures1 COB block (containing an agent) [unimplemented]
 class c1CobBlock : public oldAgentBlock {
 protected:
-  virtual void rawRead(uint32, uint8 *);
-  virtual uint8 *rawWrite(uint32 &) const;
+  virtual void rawRead(unsigned int, unsigned char *);
+  virtual unsigned char *rawWrite(unsigned int &) const;
 };
 
 //! creatures2 COB block [abstract] [unimplemented]
@@ -97,37 +95,37 @@ protected:
 //! a c2 agent block [unimplemented]
 class agentCobBlock : public oldAgentBlock, public c2CobBlock {
 protected:
-  virtual void rawRead(uint32, uint8 *);
-  virtual uint8 *rawWrite(uint32 &) const;
+  virtual void rawRead(unsigned int, unsigned char *);
+  virtual unsigned char *rawWrite(unsigned int &) const;
 };
 
 //! a c2 file block [unimplemented]
 class fileCobBlock : public c2CobBlock, public fileBlock {
 protected:
-  virtual void rawRead(uint32, uint8 *);
-  virtual uint8 *rawWrite(uint32 &) const;
+  virtual void rawRead(unsigned int, unsigned char *);
+  virtual unsigned char *rawWrite(unsigned int &) const;
 };
 
 //! a c2 authorinfo block [unimplemented]
 class authorInfoCobBlock : public c2CobBlock {
 protected:
-  virtual void rawRead(uint32, uint8 *);
-  virtual uint8 *rawWrite(uint32 &) const;
+  virtual void rawRead(unsigned int, unsigned char *);
+  virtual unsigned char *rawWrite(unsigned int &) const;
 };
 
 //! an unknown cob block [unimplemented]
 class unknownCobBlock : public c2CobBlock {
 protected:
-  virtual void rawRead(uint32, uint8 *);
-  virtual uint8 *rawWrite(uint32 &) const;
+  virtual void rawRead(unsigned int, unsigned char *);
+  virtual unsigned char *rawWrite(unsigned int &) const;
 
 public:
-  uint32 len;
-  uint8 *buf;
+  unsigned int len;
+  unsigned char *buf;
 };
 
 // a file consisting of blocks [abstract]
-class blockFile : public creaturesFile {
+class blockFile {
 protected:
   virtual void read(istream &) = 0;
   virtual void write(ostream &) const = 0;
@@ -161,5 +159,3 @@ protected:
   virtual void read(istream &);
   virtual void write(ostream &) const;
 };
-
-}

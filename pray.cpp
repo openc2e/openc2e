@@ -1,16 +1,16 @@
-#include "agent.h"
+#include "agentfile.h"
 #include "zlib.h"
 
 #include <exception>
 
-namespace creatures {
+class badPrayMajicException { };
 
 // *** prayFile
 
 void prayFile::read(istream &s) {
-  uint8 majic[4];
-  s.read(majic, 4);
-  if (strncmp((char *)majic, "PRAY", 4) != 0) throw exception("bad majic for a PRAY file");
+  unsigned char majic[4];
+  s.read((char *)majic, 4);
+  if (strncmp((char *)majic, "PRAY", 4) != 0) throw badPrayMajicException();
 
   while (true) {
     char stringid[4];
@@ -22,16 +22,16 @@ void prayFile::read(istream &s) {
 
 		/*
 		  known pray blocks:
-		
+
 		  AGNT, DSAG : tag blocks
 		  PHOT, GENE, FILE : various file blocks
       GLST: CreaturesArchive file blocks
 
 		  unknown pray blocks (there are more, I don't have a copy of C3 atm =/):
-		
+
 		  CREA (CreaturesArchive file?), DSEX (tag block?)
 		*/
-		
+
     // TODO: read the taggable agent blocks from a configuration file
     if (strncmp(stringid, "AGNT", 4) == 0) // Creatures Adventures/Creatures 3 agent
       b = new tagPrayBlock();
@@ -55,28 +55,28 @@ void prayFile::write(ostream &s) const {
 // *** prayBlock
 
 void prayBlock::read(istream &s) {
-  uint8 x[128];
-  s.read(&x, 128);
+  unsigned char x[128];
+  s.read((char *)&x, 128);
 
   blockname = (char *)x;
 
-  uint32 size, usize, flags;
-  s.read(&size, 4);
-  s.read(&usize, 4);
-  s.read(&flags, 4);
+  unsigned int size, usize, flags;
+  s.read((char *)&size, 4);
+  s.read((char *)&usize, 4);
+  s.read((char *)&flags, 4);
 
-  uint8 *buf;
-  buf = new uint8[size];
-  s.read(buf, size);
+  unsigned char *buf;
+  buf = new unsigned char[size];
+  s.read((char *)buf, size);
 
   if ((flags & 1) != 0) {
     // decompress the block
-    uint8 *dest = new uint8[usize];
+    unsigned char *dest = new unsigned char[usize];
 
     if (uncompress(dest, (uLongf *)&usize, buf, size) != Z_OK) {
       delete dest; delete buf;
 
-      throw exception("failed to decompress a PRAY chunk");
+      throw "failed to decompress a PRAY chunk";
     }
 
     delete buf;
@@ -89,15 +89,15 @@ void prayBlock::read(istream &s) {
 }
 
 void prayBlock::write(ostream &s) const {
-  s.write(blockid, 4);
+  s.write((char *)blockid, 4);
 
-  uint8 x[128];
+  unsigned char x[128];
   memset(x, 0, 128);
   memcpy(x, blockname.c_str(), blockname.size());
-  s.write(&x, 128);
+  s.write((char *)&x, 128);
 
-  uint32 usize, size;
-  uint8 *b = rawWrite(usize);
+  unsigned int usize, size;
+  unsigned char *b = rawWrite(usize);
 
   bool compressed;
 
@@ -105,7 +105,7 @@ void prayBlock::write(ostream &s) const {
   compressed = false;
   size = usize;
 #else
-  uint8 *newbuf = new uint8[usize + 12];
+  unsigned char *newbuf = new unsigned char[usize + 12];
   size = usize + 12;
   if (compress(newbuf, (uLongf *)&size, b, usize) != Z_OK) {
     // fallback to uncompressed data
@@ -124,25 +124,25 @@ void prayBlock::write(ostream &s) const {
   }
 #endif
 
-  s.write(&size, 4);
-  s.write(&usize, 4);
+  s.write((char *)&size, 4);
+  s.write((char *)&usize, 4);
 
-  uint8 flags = compressed ? 1 : 0;
-  s.write(&flags, 4);
+  unsigned char flags = compressed ? 1 : 0;
+  s.write((char *)&flags, 4);
 
-  s.write(b, size);
+  s.write((char *)b, size);
 }
 
 // *** unknownPrayBlock
 
-void unknownPrayBlock::rawRead(uint32 v, uint8 *b) {
-  buf = new uint8[v];
+void unknownPrayBlock::rawRead(unsigned int v, unsigned char *b) {
+  buf = new unsigned char[v];
   memcpy(buf, b, v);
   len = v;
 }
- 
-uint8 *unknownPrayBlock::rawWrite(uint32 &l) const {
-  uint8 *b = new uint8[len];
+
+unsigned char *unknownPrayBlock::rawWrite(unsigned int &l) const {
+  unsigned char *b = new unsigned char[len];
   memcpy(b, buf, len);
   l = len;
   return b;
@@ -158,8 +158,8 @@ uint8 *unknownPrayBlock::rawWrite(uint32 &l) const {
   (string = 4-byte length followed by actual data)
 */
 
-char *tagStringRead(uint8 *&ptr) {
-  uint32 len = *(uint32 *)ptr;
+char *tagStringRead(unsigned char *&ptr) {
+  unsigned int len = *(unsigned int *)ptr;
   ptr += 4;
 
   // TODO: fixme: rewrite this code properly
@@ -170,29 +170,29 @@ char *tagStringRead(uint8 *&ptr) {
   return b;
 }
 
-void tagStringWrite(uint8 *&ptr, string &s) {
-  *(uint32 *)ptr = s.size(); ptr += 4;
+void tagStringWrite(unsigned char *&ptr, string &s) {
+  *(unsigned int *)ptr = s.size(); ptr += 4;
   memcpy(ptr, s.c_str(), s.size()); ptr += s.size();
 }
 
-void tagPrayBlock::rawRead(uint32 v, uint8 *b) {
-  uint8 *ptr = b;
+void tagPrayBlock::rawRead(unsigned int v, unsigned char *b) {
+  unsigned char *ptr = b;
 
-  uint32 nointvalues = *(uint32 *)ptr; ptr += 4;
+  unsigned int nointvalues = *(unsigned int *)ptr; ptr += 4;
 
-  for (uint32 i = 0; i < nointvalues; i++) {
-    pair<string, uint32> value;
+  for (unsigned int i = 0; i < nointvalues; i++) {
+    pair<string, unsigned int> value;
 
     value.first = tagStringRead(ptr);
-    value.second = *(uint32 *)ptr;
+    value.second = *(unsigned int *)ptr;
     ptr += 4;
 
     intvalues.push_back(value);
   }
 
-  uint32 nostrvalues = *(uint32 *)ptr; ptr += 4;
+  unsigned int nostrvalues = *(unsigned int *)ptr; ptr += 4;
 
-  for (uint32 i = 0; i < nostrvalues; i++) {
+  for (unsigned int i = 0; i < nostrvalues; i++) {
     pair<string, string> value;
 
     value.first = tagStringRead(ptr);
@@ -202,31 +202,29 @@ void tagPrayBlock::rawRead(uint32 v, uint8 *b) {
   }
 }
 
-uint8 *tagPrayBlock::rawWrite(uint32 &l) const {
+unsigned char *tagPrayBlock::rawWrite(unsigned int &l) const {
   l = 8;
 
-  for (vector<pair<string, uint32> >::iterator x = ((tagPrayBlock *)this)->intvalues.begin(); x != ((tagPrayBlock *)this)->intvalues.end(); x++)
+  for (vector<pair<string, unsigned int> >::iterator x = ((tagPrayBlock *)this)->intvalues.begin(); x != ((tagPrayBlock *)this)->intvalues.end(); x++)
     l = l + 8 + (*x).first.size();
 
   for (vector<pair<string, string> >::iterator x = ((tagPrayBlock *)this)->strvalues.begin(); x != ((tagPrayBlock *)this)->strvalues.end(); x++)
     l = l + 8 + (*x).first.size() + (*x).second.size();
 
-  uint8 *buf = new uint8[l];
-  uint8 *ptr = buf;
+  unsigned char *buf = new unsigned char[l];
+  unsigned char *ptr = buf;
 
-  *(uint32 *)ptr = intvalues.size(); ptr += 4;
-  for (vector<pair<string, uint32> >::iterator x = ((tagPrayBlock *)this)->intvalues.begin(); x != ((tagPrayBlock *)this)->intvalues.end(); x++) {
+  *(unsigned int *)ptr = intvalues.size(); ptr += 4;
+  for (vector<pair<string, unsigned int> >::iterator x = ((tagPrayBlock *)this)->intvalues.begin(); x != ((tagPrayBlock *)this)->intvalues.end(); x++) {
     tagStringWrite(ptr, (*x).first);
-    *(uint32 *)ptr = (*x).second; ptr += 4;
+    *(unsigned int *)ptr = (*x).second; ptr += 4;
   }
 
-  *(uint32 *)ptr = strvalues.size(); ptr += 4;
+  *(unsigned int *)ptr = strvalues.size(); ptr += 4;
   for (vector<pair<string, string> >::iterator x = ((tagPrayBlock *)this)->strvalues.begin(); x != ((tagPrayBlock *)this)->strvalues.end(); x++) {
     tagStringWrite(ptr, (*x).first);
     tagStringWrite(ptr, (*x).second);
   }
 
   return buf;
-}
-
 }
