@@ -30,21 +30,21 @@ void drawWorld() {
 			SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
 		}
 	}
+	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		(*i)->render(&backend, -adjustx, -adjusty);
+	}
 	if (showrooms) {
 		for (std::vector<Room *>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
 				 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
 			// ceiling
-			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFFFF00CC);
 			// floor
-			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFFFF00CC);
 			// left side
-			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFFFF00CC);
 			// right side
-			aalineColor(backend.screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFFFF00CC);
 		}
-	}
-	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		(*i)->render(&backend, -adjustx, -adjusty);
 	}
 	SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
 }
@@ -166,15 +166,21 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
+						int adjustbyx = 0, adjustbyy = 0;
+						
 						switch (event.key.keysym.sym) {
 							case SDLK_LEFT:
-								adjustx -= 20; break;
+								adjustbyx = -20;
+								break;
 							case SDLK_RIGHT:
-								adjustx += 20; break;
+								adjustbyx = 20;
+								break;
 							case SDLK_UP:
-								adjusty -= 20; break;
+								adjustbyy = -20;
+								break;
 							case SDLK_DOWN:
-								adjusty += 20; break;
+								adjustbyy = 20;
+								break;
 							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
 								showrooms = !showrooms; break;
 							case SDLK_q:
@@ -195,6 +201,24 @@ extern "C" int main(int argc, char *argv[]) {
 								break;
 							default:
 								break;
+						}
+
+						if (adjustbyx || adjustbyy) {
+							if ((adjustx + adjustbyx) < (int)world.map.getCurrentMetaRoom()->x())
+								adjustbyx = world.map.getCurrentMetaRoom()->x() - adjustx;
+							else if ((adjustx + adjustbyx + backend.getWidth()) >
+									(world.map.getCurrentMetaRoom()->x() + world.map.getCurrentMetaRoom()->width()))
+								adjustbyx = world.map.getCurrentMetaRoom()->x() + 
+									world.map.getCurrentMetaRoom()->width() - backend.getWidth() - adjustx;
+							if ((adjusty + adjustbyy) < (int)world.map.getCurrentMetaRoom()->y())
+								adjustbyy = world.map.getCurrentMetaRoom()->y() - adjusty;
+							else if ((adjusty + adjustbyy + backend.getHeight()) > 
+									(world.map.getCurrentMetaRoom()->y() + world.map.getCurrentMetaRoom()->height()))
+								adjustbyy = world.map.getCurrentMetaRoom()->y() + 
+									world.map.getCurrentMetaRoom()->height() - backend.getHeight() - adjusty;
+							world.hand()->moveTo(world.hand()->x + adjustbyx, world.hand()->y + adjustbyy);
+							adjustx += adjustbyx;
+							adjusty += adjustbyy;
 						}
 					}
 					break;
