@@ -80,7 +80,7 @@ protected:
 	std::map<unsigned int, CompoundPart *> parts;
 
 public:
-	CompoundAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
+	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 								unsigned int firstimage, unsigned int imagecount) :
 		SimpleAgent(family, genus, species, plane, firstimage, imagecount) { }
 		

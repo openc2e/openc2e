@@ -79,3 +79,17 @@ void caosVM::c_STOP() {
 	VM_VERIFY_SIZE(0)
 	currentline = currentscript->lines.size();
 }
+
+/**
+ SCRX (command) event (integer) family (integer) genus (integer) species (integer)
+
+ delete the event script in question
+*/
+void caosVM::c_SCRX() {
+	VM_VERIFY_SIZE(4)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+	VM_PARAM_INTEGER(event) assert(event >= 0); assert(event <= 255);
+	cerr << "unimplemented: SCRX\n";
+}

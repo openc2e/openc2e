@@ -50,9 +50,9 @@ void caosVM::c_NEW_SIMP() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(family)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
 
 	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, first_image, image_count);
 	a->setImage(sprite_file);
@@ -73,9 +73,9 @@ void caosVM::c_NEW_COMP() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(family)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
 
 	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, first_image, image_count);
 	a->setImage(sprite_file);
@@ -96,9 +96,9 @@ void caosVM::c_NEW_VHCL() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
-	VM_PARAM_INTEGER(species)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(family)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
 
 	Vehicle *a = new Vehicle(family, genus, species, plane, first_image, image_count);
 	a->setImage(sprite_file);
@@ -237,20 +237,6 @@ void caosVM::c_KILL() {
 void caosVM::c_NEXT() {
 	VM_VERIFY_SIZE(0)
 	cerr << "unimplemented: NEXT\n";
-}
-
-/**
- SCRX (command) event (integer) species (integer) genus (integer) family (integer)
-
- delete the event script in question
-*/
-void caosVM::c_SCRX() {
-	VM_VERIFY_SIZE(4)
-	VM_PARAM_INTEGER(family)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(species)
-	VM_PARAM_INTEGER(event)
-	cerr << "unimplemented: SCRX\n";
 }
 
 /**

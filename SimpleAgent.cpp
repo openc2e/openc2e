@@ -24,7 +24,7 @@
 #include "c16Image.h"
 #include "openc2e.h"
 
-SimpleAgent::SimpleAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
+SimpleAgent::SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 												unsigned int firstimage, unsigned int imagecount) :
 Agent(family, genus, species, plane) {
 	first_image = firstimage;

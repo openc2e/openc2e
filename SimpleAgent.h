@@ -35,7 +35,7 @@ public:
 
 	std::vector<unsigned int> animation;
 
-	SimpleAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
+	SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 							unsigned int firstimage, unsigned int imagecount);
 	unsigned int getFirstImage();
 	unsigned int getImageCount();

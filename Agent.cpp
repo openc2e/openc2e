@@ -19,7 +19,7 @@
 
 #include "Agent.h"
 
-Agent::Agent(unsigned int f, unsigned int g, unsigned int s, unsigned int p) :
+Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
   family(f), genus(g), species(s), zorder(p) {
 }
 
