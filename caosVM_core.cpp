@@ -38,12 +38,12 @@ void caosVM::c_OUTS() {
 			assert((i + 1) < val.size());
 			i++;
 			if (val[i] == 'n') {
-				cout << '\n';
+				*outputstream << '\n';
 			} else {
-				cout << val[i];
+				*outputstream << val[i];
 			}
 		} else {
-			cout << val[i];
+			*outputstream << val[i];
 		}
 	}
 }
@@ -57,9 +57,9 @@ void caosVM::c_OUTV() {
 
 	if (val.hasFloat()) {
 		// TODO: DS spits things like '4.000000' and '-5.000000', we don't
-		cout << val.floatValue;
+		*outputstream << val.floatValue;
 	} else {
-		cout << val.intValue;
+		*outputstream << val.intValue;
 	}
 }
 

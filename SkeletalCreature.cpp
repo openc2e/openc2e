@@ -53,12 +53,12 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite) {
 	return _postfix;
 }
 
-SkeletalCreature::SkeletalCreature(unsigned int s, unsigned int b, bool f, lifestage t) {
+SkeletalCreature::SkeletalCreature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant, unsigned int s, unsigned int b, lifestage t)
+ : Creature(g, _family, is_female, _variant) {
 	species = s;
 	assert(species < 4);
 	breed = b;
 	assert(breed < 26);
-	female = f;
 	stage = t;
 	// todo: check lifestage
 	facialexpression = 0;

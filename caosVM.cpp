@@ -26,6 +26,11 @@ caosVM::caosVM(const AgentRef &o) {
 	setOwner(o);
 	setTarg(owner);
 	resetScriptState();
+	
+	// this should prbly be reset in resetScriptState(), but right now
+	// runEntirely and the such call that, which means we can't reliably
+	// set the output stream at all, sooooo it goes here for now - fuzzie
+	setOutputStream(std::cout);
 }
 
 bool handleComparison(caosVar &one, caosVar &two, comparisonType compare) {

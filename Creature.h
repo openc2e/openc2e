@@ -22,11 +22,15 @@
 class Creature : public Agent {
 protected:
 	// biochemistry
-	unsigned char chemicals[256];
-	unsigned char variant;
-	bool is_female;
-	class genomeFile *genome;
+	float chemicals[256];
 
-	Creature(genomeFile *g, unsigned char _family, bool female, unsigned char _variant);
+	// non-specific bits
+	unsigned int variant;
+	bool female;
+	class genomeFile *genome;
+	bool alive;
+
+public:
+	Creature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant);
 };
 

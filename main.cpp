@@ -216,7 +216,10 @@ extern "C" int main(int argc, char *argv[]) {
 			std::istringstream s(data);
 			caosScript script(s);
 			caosVM vm(0);
+			std::ostringstream o;
+			vm.setOutputStream(o);
 			vm.runEntirely(script.installer);
+			SDLNet_TCP_Send(connection, (void *)o.str().c_str(), o.str().size());
 
 			SDLNet_TCP_Close(connection);
 		}

@@ -5,13 +5,12 @@
 #include "genome.h"
 
 #include "openc2e.h"
-#include "Agent.h"
+#include "Creature.h"
 
-class SkeletalCreature {
+class SkeletalCreature : public Creature {
 private:
 	unsigned int species;
 	unsigned int breed;
-	bool female;
 	lifestage stage;
 
 	unsigned int direction;
@@ -29,7 +28,7 @@ private:
 	std::string dataString(unsigned int _stage, bool sprite);
 
 public:
-	SkeletalCreature(unsigned int s, unsigned int b, bool f, lifestage t);
+	SkeletalCreature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant, unsigned int s, unsigned int b, lifestage t);
 	void render(SDLBackend *renderer, int xoffset, int yoffset);
 	void recalculateSkeleton();
 	unsigned int getPose(unsigned int i) { return pose[i]; }

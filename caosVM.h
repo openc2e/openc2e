@@ -22,6 +22,7 @@
 
 #include "caosScript.h"
 #include <map>
+#include <ostream>
 #include "AgentRef.h"
 
 //#define CAOSDEBUG
@@ -42,6 +43,7 @@ protected:
 	std::vector<std::vector<AgentRef> > enumstack;
 	bool locked, noschedule;
 	unsigned int blockingticks;
+	std::ostream *outputstream;
 
 	// ...which includes variables accessible to script
 	caosVar var[100]; // might want to make this a map, for memory efficiency
@@ -64,6 +66,7 @@ public:
 	void setTarg(const AgentRef &a) { targ = a; part = 0; }
 	void setVariables(caosVar &one, caosVar &two) { _p_[0] = one; _p_[1] = two; }
 	void setOwner(Agent *a) { owner = a; }
+	void setOutputStream(std::ostream &o) { outputstream = &o; }
 
 	// map
 	void v_ADDM();

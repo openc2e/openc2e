@@ -19,3 +19,8 @@
 
 #include "Creature.h"
 
+Creature::Creature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant)
+ : Agent(_family, 0, 0, 0) { // TODO: fill in correct values
+	female = is_female;
+}
+
