@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "openc2e.h"
 #include "CompoundAgent.h"
 #include "SimpleAgent.h"
 #include "World.h"
@@ -98,7 +99,8 @@ void caosVM::c_POSE() {
 void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
-	cerr << "unimplemented: ATTR\n";
+	assert(targ.hasAgent());
+	targ.agentValue->setAttributes(attr);
 }
 
 void caosVM::c_TICK() {

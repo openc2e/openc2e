@@ -36,7 +36,7 @@ void drawWorld() {
 		// right side
 		aalineColor(screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
 	}
-	for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		// note: right now, we know we only have SimpleAgents in the world.
 		SimpleAgent *agent = (SimpleAgent *)(*i);
 		creaturesImage *j = agent->getSprite();

@@ -20,7 +20,7 @@
 #include "Agent.h"
 
 Agent::Agent(unsigned int f, unsigned int g, unsigned int s, unsigned int p) :
-  family(f), genus(g), species(s), plane(p) {
+  family(f), genus(g), species(s), zorder(p) {
 }
 
 void Agent::moveTo(unsigned int _x, unsigned int _y) {

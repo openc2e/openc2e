@@ -36,16 +36,16 @@ struct caosVar {
 	caosVar() { reset(); }
 	virtual ~caosVar() { } // we don't truly need this.
 
-	bool hasInt() { return (flags & 0x1); }
-	void setInt(int i) { flags = flags | 0x1; intValue = i; }
-	bool hasFloat() { return (flags & 0x2); }
-	void setFloat(float i) { flags = flags | 0x2; floatValue = i; }
-	bool hasString() { return (flags & 0x4); }
-	void setString(std::string i) { flags = flags | 0x4; stringValue = i; }
-	bool hasAgent() { return (flags & 0x8); }
-	void setAgent(Agent *i) { flags = flags | 0x8; agentValue = i; }
-	bool hasVariable() { return (flags & 0x16); }
-	void setVariable(caosVar *i) { flags = flags | 0x16; variableValue = i; }
+	bool hasInt() { return (flags & 1); }
+	void setInt(int i) { flags = flags | 1; intValue = i; }
+	bool hasFloat() { return (flags & 2); }
+	void setFloat(float i) { flags = flags | 2; floatValue = i; }
+	bool hasString() { return (flags & 4); }
+	void setString(std::string i) { flags = flags | 4; stringValue = i; }
+	bool hasAgent() { return (flags & 8); }
+	void setAgent(Agent *i) { flags = flags | 8; agentValue = i; }
+	bool hasVariable() { return (flags & 16); }
+	void setVariable(caosVar *i) { flags = flags | 16; variableValue = i; }
 	virtual void notifyChanged() { }
 
 	bool operator == (caosVar &v);

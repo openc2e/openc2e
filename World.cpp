@@ -27,5 +27,5 @@ World::World() {
 }
 
 void World::addAgent(Agent *a) {
-	agents.push_back(a);
+	agents.insert(a);
 }

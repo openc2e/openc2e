@@ -28,13 +28,17 @@ protected:
 	unsigned int first_image, image_count;
 
 public:
+	bool carryable, mouseable, activateable, invisible, floatable;
+	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
+
 	SimpleAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
-							unsigned int firstimage, unsigned int imagecount) :
-		Agent(family, genus, species, plane) { first_image = firstimage; image_count = imagecount; }
+							unsigned int firstimage, unsigned int imagecount);
 	unsigned int getFirstImage();
 	unsigned int getImageCount();
 	void setImage(std::string img);
 	virtual bool isSimple() { return false; }
+	virtual void setAttributes(unsigned int attr);
+	virtual unsigned int getAttributes();
 };
 
 #endif

@@ -25,7 +25,7 @@
 class Agent {
 protected:
 	unsigned int family, genus, species;
-	unsigned int plane;
+	unsigned int zorder;
 	creaturesImage *sprite;
 
 public:
@@ -35,6 +35,17 @@ public:
 	Agent(unsigned int f, unsigned int g, unsigned int s, unsigned int p);
 	virtual bool isSimple() { return false; }
 	virtual ~Agent() { }
+
+	virtual void setAttributes(unsigned int attr) = 0;
+	virtual unsigned int getAttributes() = 0;
+
+	friend struct agentzorder;
+};
+
+struct agentzorder {
+  bool operator()(const Agent *s1, const Agent *s2) const {
+    return s1->zorder < s2->zorder;
+  }
 };
 
 #endif

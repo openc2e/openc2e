@@ -19,7 +19,7 @@
 
 #include "Map.h"
 #include "Agent.h"
-#include <list>
+#include <set>
 #include <map>
 
 struct cainfo {
@@ -31,7 +31,7 @@ struct cainfo {
 class World {
 public:
 	Map map;
-	std::list<Agent *> agents;
+	std::multiset<Agent *, agentzorder> agents;
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 
 	void addAgent(Agent *a);

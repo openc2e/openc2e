@@ -1,4 +1,4 @@
-* make agents z-order themselves properly
+* do the stack stuff (make doif work)
 * look at the room code
 * start implementing agent event script infrastructure
 * implement galleries (agents sharing images)
