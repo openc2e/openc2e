@@ -63,15 +63,19 @@ extern "C" int main(int argc, char *argv[]) {
 	std::vector<std::string> scripts;
 	fs::path scriptdir((argc > 1 ? argv[1] : "data/Bootstrap/001 World/"), fs::native);
 
-	if (fs::exists(scriptdir) && fs::is_directory(scriptdir)) {
-		fs::directory_iterator fsend;
-		for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
-			try {
-				if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
-					scripts.push_back(i->native_file_string());
-			} catch (fs::filesystem_error &ex) {
-				std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+	if (fs::exists(scriptdir)) {
+		if (fs::is_directory(scriptdir)) {
+			fs::directory_iterator fsend;
+			for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
+				try {
+					if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
+						scripts.push_back(i->native_file_string());
+				} catch (fs::filesystem_error &ex) {
+					std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+				}
 			}
+		} else {
+			scripts.push_back(scriptdir.native_file_string());
 		}
 	} else {
 		if (argc > 1) {
@@ -98,7 +102,7 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout << "executing script " << *i << "...\n";
 		std::cout.flush();
 		std::cerr.flush();
-		//testvm.runEntirely(testscript.installer);
+		testvm.runEntirely(testscript.installer);
 		std::cout.flush();
 		std::cerr.flush();
 	}

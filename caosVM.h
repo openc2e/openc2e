@@ -180,6 +180,7 @@ public:
 	void c_SHOW();
 	void v_POSX();
 	void v_POSY();
+	void c_FRAT();
 
 	// motion
 	void c_ELAS();
@@ -242,6 +243,21 @@ public:
 	// vehicles
 	void c_CABN();
 	void c_CABW();
+
+	// ports
+	void c_PRT_BANG();
+	void v_PRT_FRMA();
+	void v_PRT_FROM();
+	void c_PRT_INEW();
+	void v_PRT_ITOT();
+	void c_PRT_IZAP();
+	void c_PRT_JOIN();
+	void c_PRT_KRAK();
+	void v_PRT_NAME();
+	void c_PRT_ONEW();
+	void v_PRT_OTOT();
+	void c_PRT_OZAP();
+	void c_PRT_SEND();
 
 	void runCurrentLine();
 	caosVar internalRun(std::list<token> &tokens, bool first); // run a command, as represented by tokens

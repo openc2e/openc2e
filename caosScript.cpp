@@ -56,9 +56,9 @@ std::string caosVar::dump() {
 	if (hasString()) {
 		return std::string("\"") + stringValue + "\" ";
 	} else if (hasInt()) {
-		return stringify(intValue);
+		return stringify(intValue) + " ";
 	} else if (hasFloat()) {
-		return stringify(floatValue);
+		return stringify(floatValue) + " ";
 	} else {
 		return "[bad caosVar!] ";
 	}
@@ -68,30 +68,22 @@ std::string cmdinfo::dump() {
 	return std::string("[command: ") + name + "] ";
 }
 
-#define _SHOW_RAWLINES
 std::string script::dump() {
 	std::string out;
 	for (unsigned int i = 0; i < lines.size(); i++) {
-#ifdef _SHOW_RAWLINES
-		out += std::string("[rawline: ") + rawlines[i] + "]\n";
-#endif
 		for (std::list<token>::iterator j = lines[i].begin(); j != lines[i].end(); j++) {
 			out += j->dump();
 		}
-#ifdef _SHOW_RAWLINES
-		out += "\n\n";
-#else
 		out += "\n";
-#endif
 	}
 	return out;
 }
 
 std::string caosScript::dump() {
 	std::string out = "installation script:\n" + installer.dump();
-	out += "removal script:\n" + removal.dump();
+	out += "\nremoval script:\n" + removal.dump();
 	for (std::vector<script>::iterator i = scripts.begin(); i != scripts.end(); i++) {
-		out += "agent script:\n" + i->dump();
+		out += "\nagent script:\n" + i->dump();
 	}
 	return out;
 }
@@ -330,12 +322,15 @@ caosScript::caosScript(std::istream &in) {
 			if (tokens.size() > (loc + 1))
 				std::cerr << tokens[loc + 1].dump();
 			std::cerr << "\n";
+
+			// make sure to zap the install script
+			installer.lines.clear();
+			return; // parse failure -> byebye
 		}
-		std::cout << "parsed line: ";
-		for (std::list<token>::iterator i = destline.begin(); i != destline.end(); i++) {
+		/*for (std::list<token>::iterator i = destline.begin(); i != destline.end(); i++) {
 			std::cout << (*i).dump();
 		}
-		std::cout << "\n";
+		std::cout << "\n";*/
 
 		loc++;
 	}

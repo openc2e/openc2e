@@ -89,7 +89,6 @@ struct token {
 
 struct script {
 	std::vector<std::list<token> > lines;
-	std::vector<std::string> rawlines;
 
 	std::string dump();
 };

@@ -28,15 +28,14 @@ void caosVM::jumpToAfterEquivalentNext() {
 	cmdinfo *enu = getCmdInfo("ENUM", true); assert(enu != 0);
 	cmdinfo *esee = getCmdInfo("ESEE", true); assert(esee != 0);
 
-// XXX PARSER XXX
-/*	int stack = 0;
+	int stack = 0;
 	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		token front = currentscript->lines[i].front();
-		if (front.cmd == enu) {
+		if (front.func == enu) {
 			stack++;
-		} else if (front.cmd == esee) {
+		} else if (front.func == esee) {
 			stack++;
-		} else if (front.cmd == next) {
+		} else if (front.func == next) {
 			if (stack) stack--;
 			else {
 				currentline = i + 1;
@@ -46,7 +45,6 @@ void caosVM::jumpToAfterEquivalentNext() {
 	}
 	currentline = currentscript->lines.size();
 	std::cerr << "caosVM: couldn't find matching NEXT, stopping script\n";
-*/
 }
 
 void caosVM::jumpToNextIfBlock() {
@@ -55,26 +53,24 @@ void caosVM::jumpToNextIfBlock() {
 	cmdinfo *els = getCmdInfo("ELSE", true); assert(els != 0);
 	cmdinfo *endi = getCmdInfo("ENDI", true); assert(endi != 0);
 	int stack = 0;
-	/// XXX PARSER XXX
-/*
+	
 	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		token front = currentscript->lines[i].front();
-		if (front.cmd == doif) {
+		if (front.func == doif) {
 			stack++;
-		} else if (front.cmd == endi) {
+		} else if (front.func == endi) {
 			if (stack) { stack--; continue; }
 			currentline = i; return;
 		} else if (stack) {
 			continue;
-		} else if ((front.cmd == elif) && !truthstack.back()) {
+		} else if ((front.func == elif) && !truthstack.back()) {
 			currentline = i; return;
-		} else if ((front.cmd == els) && !truthstack.back()) {
+		} else if ((front.func == els) && !truthstack.back()) {
 			currentline = i + 1; return; // we don't NEED to actually run 'else'
 		}
 	}
 	currentline = currentscript->lines.size();
 	std::cerr << "caosVM: couldn't find matching block for IF blocks, stopping script\n";
-*/
 }
 
 /**
@@ -190,17 +186,16 @@ void caosVM::c_UNTL() {
 void caosVM::c_GSUB() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(label)
-	assert(label.size());
 	cmdinfo *subr = getCmdInfo("SUBR", true); assert(subr != 0);
-	// XXX PARSER XXX
-	/* for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
+	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
 		std::list<token>::iterator j = currentscript->lines[i].begin();
-		if (((*j).cmd == subr) && ((*++j).var.stringValue == label)) {
+		// we're assuming that ++j is a label here, but the parser should force that issue
+		if (((*j).func == subr) && ((*++j).data == label)) {
 			linestack.push_back(currentline + 1);
 			currentline = i + 1;
 			return;
 		}
-	} */
+	}
 	std::cerr << "warning: GSUB didn't find matching SUBR for " << label << ", ignoring\n";
 }
 

@@ -9,6 +9,7 @@ my %doublefuncs;
 
 my $parsingdoc = 0;
 my $count = 0;
+my $doccount = 0;
 
 my $doclines;
 my $docs;
@@ -108,8 +109,9 @@ sub writedocsanddata {
 			$j++;
 			$thisdoc .= "<p>" . $_ . "</p>\n";
 		}
-		$thisdoc .= '<p><font color="#ff0000">undocumented</font></p>'if ($j == 0);
+		$thisdoc .= '<p><font color="#ff0000">undocumented</font></p>' if ($j == 0);
 		$thisdoc .= $table3 . "\n";
+		$doccount++ unless ($j == 0);
 		$count++;
 		$$docs{$section}{$newname} .= $thisdoc;
 	} else {
@@ -175,8 +177,9 @@ foreach my $sect (sort keys(%$docs)) {
 	}
 }
 # 6 below = number of openc2e-specific commands
-my $p = int(($count - 6) * 100 / 666);
-print docfile "<p>" . $count . " documented commands: " . $p . "% of DS-era CEE, plus 6 openc2e-specific commands</p>";
+my $p = int(($doccount - 6) * 100 / 666);
+my $q = int(($count - 6) * 100 / 666);
+print docfile "<p>" . $count . " commands: " . $q . "% of DS-era CEE; " . $doccount . " documented commands: " . $p . "% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p>";
 print docfile "</body></html>";
 close(docfile);
 

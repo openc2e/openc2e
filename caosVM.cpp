@@ -93,37 +93,30 @@ bool handleComparison(caosVar &one, caosVar &two, comparisonType compare) {
 }
 
 caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
-	// XXX PARSER XXX
-/*
 	// v- this is the command/function we're executing
 	std::vector<caosVar> ourparams;
 	token maintoken = tokens.front();
 	tokens.pop_front();
-	if (maintoken.isvar) {
-#ifdef CAOSDEBUG
-		std::cerr << "internalRun got a var as the first token (" << maintoken.dump() << ")\n";
-#endif
-		throw badParamException();
-	}
-	cmdinfo *us = (first ? maintoken.cmd : maintoken.func);
-	if (!us) {
-#ifdef CAOSDEBUG
-		std::cerr << "internalRun couldn't find cmdinfo for the first token (" << maintoken.dump() << ")\n";
-#endif
-		throw badParamException();
-	}
+	assert(maintoken.type == token::FUNCTION);
+	cmdinfo *us = maintoken.func;
 #ifdef CAOSDEBUGDETAIL
 	std::cerr << "internalRun called for " << us->dump() << "\n";
 #endif
 	// if the command/function needs parameters, we suck them up
 	for (unsigned int i = 0; i < us->notokens; i++) {
 		if (tokens.empty()) throw notEnoughParamsException();
-		token atoken = tokens.front();
-		if (!atoken.isvar) {
+		token &atoken = tokens.front();
+		if (atoken.type == token::FUNCTION) {
 			// if the token used for this parameter is a command/function
 			// then we execute it, passing it a reference to our tokens
 			// so it can suck them up (obviously we want them gone)
 			ourparams.push_back(internalRun(tokens, false));
+		} else if (atoken.type == token::LABEL) {
+			// temporary hack for labels
+			tokens.pop_front();
+			caosVar v;
+			v.setString(atoken.data);
+			ourparams.push_back(v);
 		} else {
 			tokens.pop_front();
 			ourparams.push_back(atoken.var);
@@ -137,7 +130,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 
 			// grab [token] [condition] [token]
 			caosVar first, second;
-			if (tokens.front().isvar) {
+			if (tokens.front().type == token::CAOSVAR) {
 				first = tokens.front().var;
 				tokens.pop_front();
 			} else {
@@ -147,7 +140,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 			// we die if this isn't valid in handleException
 			comparisonType comparison = tokens.front().comparison; tokens.pop_front();
 
-			if (tokens.front().isvar) {
+			if (tokens.front().type == token::CAOSVAR) {
 				second = tokens.front().var;
 				tokens.pop_front();
 			} else {
@@ -178,12 +171,10 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	if (!params.empty()) {
 		std::cerr << "warning: CAOS function " << maintoken.dump() << " didn't pop all parameters!\n";
 	}
-	if (first && !tokens.empty()) {
-		// assume there's another command on this line
-		internalRun(tokens, true);
-	}
+	if (first)
+		assert(tokens.empty());
 	return result;
-*/}
+}
 
 void caosVM::runEntirely(script &s) {
 	resetScriptState();
@@ -233,6 +224,7 @@ void caosVM::tick() {
 		currentscript = 0;
 }
 
+// XXX TODO fuzzie commented out the error reporting lines below because rawlines no longer exists
 void caosVM::runCurrentLine() {
 	unsigned int i = currentline;
 	std::list<token> b = currentscript->lines[currentline];
@@ -240,12 +232,12 @@ void caosVM::runCurrentLine() {
 		if (!b.empty()) internalRun(b, true);
 	} catch (badParamException e) {
 //#ifdef CAOSDEBUG
-		std::cerr << "caught badParamException while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		std::cerr << "caught badParamException"; // while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
 //#endif
 	} catch (notEnoughParamsException e) {
-		std::cerr << "caught notEnoughParamsException while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		std::cerr << "caught notEnoughParamsException"; // while running '" << currentscript->rawlines[i]; << "' (line " << i << ")\n";
 	} catch (assertFailure e) {
-		std::cerr << "caught assert failure '" << e.what() << "' while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
+		std::cerr << "caught assert failure '" << e.what(); // << "' while running '" << currentscript->rawlines[i] << "' (line " << i << ")\n";
 		currentline = currentscript->lines.size();
 	}
 	/* Generally, we want to proceed to the next line. Sometimes, opcodes will change the

@@ -430,3 +430,15 @@ void caosVM::v_POSY() {
 	assert(targ);
 	result.setFloat(targ->y);
 }
+
+/**
+ FRAT (command) framerate (integer)
+*/
+void caosVM::c_FRAT() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(framerate)
+
+	assert(targ);
+
+	// TODO
+}
