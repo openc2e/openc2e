@@ -23,6 +23,7 @@
 #include <algorithm> // sort
 
 void CompoundAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
+	// todo: we're ignoring zorder here..
 	for (std::vector<CompoundPart *>::iterator i = parts.begin(); i != parts.end(); i++) {
 		(*i)->render(renderer, xoffset + (int)x, yoffset + (int)y);
 	}
@@ -49,7 +50,7 @@ void CompoundAgent::addPart(CompoundPart *p) {
 
 void CompoundAgent::delPart(unsigned int id) {
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-		if ((*x)->id == id) { parts.erase(x); delete *x; return; }
+		if ((*x)->id == id) { delete *x; parts.erase(x); return; }
 	}
 	
 	throw "oops"; // TODO: handle this exception properly
