@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include <stdlib.h> // rand()
+#include <iostream>
 
 /*
  VAxx (variable)

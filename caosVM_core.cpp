@@ -32,7 +32,7 @@ void caosVM::c_DBG_OUTS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(val)
 
-	cerr << val << "\n";
+	cout << val << "\n";
 }
 
 /*
@@ -45,9 +45,9 @@ void caosVM::c_DBG_OUTV() {
 	VM_PARAM_DECIMAL(val)
 	
 	if (val.hasFloat()) {
-		cerr << val.floatValue;
+		cout << val.floatValue;
 	} else {
-		cerr << val.intValue;
+		cout << val.intValue;
 	}
 }	
 

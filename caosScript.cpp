@@ -130,6 +130,8 @@ token makeToken(std::string &src, bool str, token &lasttok) {
 		else if (src == ">") r.comparison = GT;
 		else if (src == "<=") r.comparison = LE;
 		else if (src == "<") r.comparison = LT;
+		else if (src == "AND") r.comparison = AND;
+		else if (src == "OR") r.comparison = OR;
 		else throw tokeniseFailure();
 	}
 	return r;

@@ -86,6 +86,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	// v- this is the command/function we're executing
 	std::vector<caosVar> ourparams;
 	token maintoken = tokens.front();
+	// std::cout << "internalRun called for " << maintoken.dump() << "\n";
 	tokens.pop_front();
 	if (maintoken.isvar) throw badParamException();
 	cmdinfo *us = (first ? maintoken.cmd : maintoken.func);
