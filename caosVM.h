@@ -150,6 +150,25 @@ public:
 	// time
 	void v_PACE();
 
+	// resources
+	void v_PRAY_AGTI();
+	void v_PRAY_AGTS();
+	void v_PRAY_BACK();
+	void v_PRAY_COUN();
+	void v_PRAY_DEPS();
+	void v_PRAY_EXPO();
+	void v_PRAY_FILE();
+	void v_PRAY_FORE();
+	void c_PRAY_GARB();
+	void v_PRAY_IMPO();
+	void v_PRAY_INJT();
+	void v_PRAY_KILL();
+	void v_PRAY_MAKE();
+	void v_PRAY_NEXT();
+	void v_PRAY_PREV();
+	void c_PRAY_REFR();
+	void v_PRAY_TEST();
+
 	void runCurrentLine();
 	void jumpToNextIfBlock();
 	caosVar internalRun(std::list<token> &tokens, bool first);

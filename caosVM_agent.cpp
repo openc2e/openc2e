@@ -42,7 +42,7 @@ void caosVM::c_RTAR() {
 /**
  NEW: SIMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
 
- create a new simple object with given family/genus/species, given spritefile with image_count sprites
+ create a new simple agent with given family/genus/species, given spritefile with image_count sprites
  available starting at first_image in the spritefile, at the screen depth given by plane
 */
 void caosVM::c_NEW_SIMP() {
@@ -61,8 +61,12 @@ void caosVM::c_NEW_SIMP() {
 	targ.reset();
 	targ.setAgent(a);
 }
+
 /**
  NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
+
+ create a new composite agent with given family/genus/species, given spritefile with image_count sprites
+ available starting at first_image in the spritefile, with the first part at the screen depth given by plane
 */
 void caosVM::c_NEW_COMP() {
 	VM_VERIFY_SIZE(7)
@@ -183,6 +187,9 @@ void caosVM::v_POSE() {
 
 /**
  KILL (command) agent (agent)
+
+ destroy the agent in question. you can't destroy PNTR.
+ remember, use DEAD first for creatures!
 */
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
@@ -200,6 +207,8 @@ void caosVM::c_NEXT() {
 
 /**
  SCRX (command) event (integer) species (integer) genus (integer) family (integer)
+
+ delete the event script in question
 */
 void caosVM::c_SCRX() {
 	VM_VERIFY_SIZE(4)
@@ -212,6 +221,11 @@ void caosVM::c_SCRX() {
 
 /**
  ANIM (command) poselist (byte-string)
+
+ set the animation string for TARG, in the format '1 2 3 4'
+ if it ends with '255', loop back to beginning; if it ends with '255 X', loop back to frame X
+
+ <i>todo: compound agent stuff</i>
 */
 void caosVM::c_ANIM() {
 	VM_VERIFY_SIZE(1)
@@ -287,6 +301,8 @@ void caosVM::v_CARR() {
 
 /**
  FMLY (integer)
+
+ return family of TARG agent
 */
 void caosVM::v_FMLY() {
 	VM_VERIFY_SIZE(0)
@@ -296,6 +312,8 @@ void caosVM::v_FMLY() {
 
 /**
  GNUS (integer)
+
+ return genus of TARG agent
 */
 void caosVM::v_GNUS() {
 	VM_VERIFY_SIZE(0)
@@ -305,6 +323,8 @@ void caosVM::v_GNUS() {
 
 /**
  SPCS (integer)
+
+ return species of TARG agent
 */
 void caosVM::v_SPCS() {
 	VM_VERIFY_SIZE(0)
@@ -314,6 +334,8 @@ void caosVM::v_SPCS() {
 
 /**
  PLNE (integer)
+
+ return plane (z-order) of TARG agent
 */
 void caosVM::v_PLNE() {
 	VM_VERIFY_SIZE(0)
@@ -323,6 +345,8 @@ void caosVM::v_PLNE() {
 
 /**
  PNTR (agent)
+
+ return the pointer agent (the hand)
 */
 void caosVM::v_PNTR() {
 	VM_VERIFY_SIZE(0)

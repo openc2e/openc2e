@@ -39,7 +39,11 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SCRX (command) event (integer) species (integer) genus (integer) family (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ANIM (command) poselist (byte-string)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>set the animation string for TARG, in the format '1 2 3 4'</p>
+<p>if it ends with '255', loop back to beginning</p>
+<p>if it ends with '255 X', loop back to frame X</p>
+<p><i>todo: compound agent stuff</i></p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ABBA (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">BASE (command) index (integer)</td></tr><tr><td class="description">
@@ -51,15 +55,20 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">CARR (agent)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">FMLY (integer)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>return family of TARG agent</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">GNUS (integer)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>return genus of TARG agent</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">SPCS (integer)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>return species of TARG agent</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PLNE (integer)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>return plane (z-order) of TARG agent</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PNTR (agent)</td></tr><tr><td class="description">
-<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<p>return the pointer agent (the hand)</p>
+</td></tr></table><br>
 <h1>camera</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)</td></tr><tr><td class="description">
 <p>set metaroom current camera is pointing at. coordinates point to top left of new</p>
 <p>camera position.</p>
@@ -140,6 +149,62 @@
 <h1>motion</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">ELAS (command) elas (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">MVTO (command) x (integer) y (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<h1>resources</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY AGTI (integer) resource (string) tag (string) default (integer)</td></tr><tr><td class="description">
+<p>using the specified resource, returns the integer value associated with the given tag,</p>
+<p>or default if the tag doesn't exist</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY AGTS (string) resource (string) tag (string) default (string)</td></tr><tr><td class="description">
+<p>using the specified resource, returns the string value associated with the given tag,</p>
+<p>or default if the tag doesn't exist</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY BACK (string) type (string) last (string)</td></tr><tr><td class="description">
+<p>returns the name of the resource of the specified type which is immediately previous to last</p>
+<p>see PRAY PREV if you want to loop around</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY COUN (integer) type (string)</td></tr><tr><td class="description">
+<p>return the number of resources of the specified type available</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY DEPS (integer) name (string) install (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY EXPO (integer) type (string)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY FILE (integer) name (integer) type (integer) install (integer)</td></tr><tr><td class="description">
+<p>install a file with given resource name and type</p>
+<p>if install is 0, the install doesn't actually happen, it's just tested</p>
+<p>returns 0 on success, 1 on failure</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY FORE (string) type (string) last (string)</td></tr><tr><td class="description">
+<p>returns the name of the resource of the specified type which is immediately after last</p>
+<p>see PRAY NEXT if you don't want to loop around</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY GARB (command) force (integer)</td></tr><tr><td class="description">
+<p>if force is 0, make the pray manager garbage-collect resources</p>
+<p>otherwise, make the pray manager empty its cache entirely</p>
+<p>recommended to be called after intensive PRAY usage, eg agent installation</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY IMPO (integer) moniker (string) doit (integer) keepfile (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY INJT (integer) name (string) install (integer) report (variable)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY KILL (integer) resource (string)</td></tr><tr><td class="description">
+<p>deletes from disk the file containing the given resource</p>
+<p>returns 1 upon success, or 0 upon failure (typically no such resource)</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY MAKE (integer) journalspot (integer) journalname (string) prayspot (integer) name (string) report (variable)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY NEXT (string) type (string) last (string)</td></tr><tr><td class="description">
+<p>returns the name of the resource of the specified type which is immediately after last</p>
+<p>see PRAY FORE if you don't want to loop around</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY PREV (string) type (string) last (string)</td></tr><tr><td class="description">
+<p>returns the name of the resource of the specified type which is immediately previous to last</p>
+<p>see PRAY BACK if you don't want to loop around</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY REFR (command)</td></tr><tr><td class="description">
+<p>make the pray manager check for deleted/new files in the resource directory</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">PRAY TEST (integer) name (string)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>scripts</h1><br><table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command">INST (command)</td></tr><tr><td class="description">
 <p>don't release control to the scheduler until end of script or SLOW</p>
