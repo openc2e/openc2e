@@ -13,7 +13,7 @@ using namespace std;
 enum lifestage { baby = 0, child = 1, adolescent = 2, youth = 3, adult = 4, old = 5, senile = 6 };
 
 class gene;
-class geneNote;
+struct geneNote;
 class organGene;
 	
 //! A class for handling Creatures genome (.gen) files.

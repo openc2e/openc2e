@@ -46,7 +46,7 @@ void genomeFile::readNotes(istream &s) {
 			}
     		}
 
-		uint8 ver;
+		uint8 ver = 0;
 
 		while ((ver != 0x02) && (!(s.fail() || s.eof())))
 			s >> ver;
@@ -521,7 +521,7 @@ void creatureStimulus::read(istream &s) {
 
 void oldBrainLobe::write(ostream &s) const {
 	s << x << y << width << height << perceptflag << nominalthreshold << leakagerate << reststate << inputgain;
-	s.write(staterule, (cversion == 1) ? 8 : 12);
+	s.write((char *)staterule, (cversion == 1) ? 8 : 12);
 	s << flags;
 
 	s << dendrite1 << dendrite2;
@@ -529,7 +529,7 @@ void oldBrainLobe::write(ostream &s) const {
 
 void oldBrainLobe::read(istream &s) {
 	s >> x >> y >> width >> height >> perceptflag >> nominalthreshold >> leakagerate >> reststate >> inputgain;
-	s.read(staterule, (cversion == 1) ? 8 : 12);
+	s.read((char *)staterule, (cversion == 1) ? 8 : 12);
 	s >> flags;
 
 	s >> dendrite1 >> dendrite2;
@@ -552,15 +552,15 @@ ostream &operator << (ostream &s, const oldDendriteInfo &i) {
 	s << i.minstr << i.maxstr << i.migrateflag << i.relaxsuscept << i.relaxSTW << i.LTWgainrate;
 
 	s << i.strgain;
-	s.write(i.strgainrule, (i.cversion == 1) ? 8 : 12);
+	s.write((char *)i.strgainrule, (i.cversion == 1) ? 8 : 12);
 	s << i.strloss;
-	s.write(i.strlossrule, (i.cversion == 1) ? 8 : 12);
-	s.write(i.susceptrule, (i.cversion == 1) ? 8 : 12);
-	s.write(i.relaxrule, (i.cversion == 1) ? 8 : 12);
+	s.write((char *)i.strlossrule, (i.cversion == 1) ? 8 : 12);
+	s.write((char *)i.susceptrule, (i.cversion == 1) ? 8 : 12);
+	s.write((char *)i.relaxrule, (i.cversion == 1) ? 8 : 12);
 
 	if (i.cversion == 2) {
-		s.write(i.backproprule, 12);
-		s.write(i.forproprule, 12);
+		s.write((char *)i.backproprule, 12);
+		s.write((char *)i.forproprule, 12);
 	}
 
 	return s;
@@ -571,15 +571,15 @@ istream &operator >> (istream &s, oldDendriteInfo &i) {
 	s >> i.minstr >> i.maxstr >> i.migrateflag >> i.relaxsuscept >> i.relaxSTW >> i.LTWgainrate;
 
 	s >> i.strgain;
-	s.read(i.strgainrule, (i.cversion == 1) ? 8 : 12);
+	s.read((char *)i.strgainrule, (i.cversion == 1) ? 8 : 12);
 	s >> i.strloss;
-	s.read(i.strlossrule, (i.cversion == 1) ? 8 : 12);
-	s.read(i.susceptrule, (i.cversion == 1) ? 8 : 12);
-	s.read(i.relaxrule, (i.cversion == 1) ? 8 : 12);
+	s.read((char *)i.strlossrule, (i.cversion == 1) ? 8 : 12);
+	s.read((char *)i.susceptrule, (i.cversion == 1) ? 8 : 12);
+	s.read((char *)i.relaxrule, (i.cversion == 1) ? 8 : 12);
 
 	if (i.cversion == 2) {
-		s.read(i.backproprule, 12);
-		s.read(i.forproprule, 12);
+		s.read((char *)i.backproprule, 12);
+		s.read((char *)i.forproprule, 12);
 	}
 
 	return s;
