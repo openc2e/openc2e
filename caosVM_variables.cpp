@@ -61,6 +61,11 @@ void caosVM::v_OVxx() {
 	result.setVariable(&var[0]); // todo: not just zero
 }
 
+/*
+ MODV (command) var (variable) mod (integer)
+
+ returns var % mod
+*/
 void caosVM::c_MODV() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(mod)
@@ -69,6 +74,11 @@ void caosVM::c_MODV() {
 	v->setInt(v->intValue % mod);
 }
 
+/*
+ ADDV (command) var (variable) add (integer)
+
+ returns var + add
+*/
 void caosVM::c_ADDV() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(add)
@@ -81,6 +91,11 @@ void caosVM::c_ADDV() {
 		throw badParamException();
 }
 
+/*
+ SUBV (command) var (variable) sub (integer)
+
+ returns var - sub
+*/
 void caosVM::c_SUBV() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(sub)
@@ -93,8 +108,13 @@ void caosVM::c_SUBV() {
 		throw badParamException();
 }
 
+/*
+ NEGV (command) var (variable)
+
+ returns a negated variable (eg 1 to -1, -3 to 3)
+*/
 void caosVM::c_NEGV() {
-	VM_VERIFY_SIZE(2)
+	VM_VERIFY_SIZE(1)
 	VM_PARAM_VARIABLE(v)
 	if (v->hasFloat())
 		v->setFloat(-v->floatValue);
@@ -106,6 +126,8 @@ void caosVM::c_NEGV() {
 
 /*
   MULV (command) var (variable) mul (decimal)
+
+  returns var * mul
 */
 void caosVM::c_MULV() {
 	VM_VERIFY_SIZE(2)
