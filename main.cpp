@@ -75,15 +75,19 @@ extern "C" int main(int argc, char *argv[]) {
 	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
 		std::ifstream script(i->c_str());
 		assert(script.is_open());
+		std::cout << "loading script " << *i << "...\n";
+		std::cout.flush();
+		std::cerr.flush();
 		caosScript testscript(script);
 		caosVM testvm(0);
 		/* std::cout << "dump of script:\n";
 		std::cout << testscript.dump(); */
+		std::cout.flush();
+		std::cerr.flush();
 		std::cout << "executing script " << *i << "...\n";
 		std::cout.flush();
 		std::cerr.flush();
-		testvm.script = &testscript;
-		testvm.runEntirely();
+		testvm.runEntirely(testscript.installer);
 		std::cout.flush();
 		std::cerr.flush();
 	}
@@ -98,6 +102,8 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout << "SDL init failed: " << SDL_GetError();
 		return 1;
 	}
+
+	assert(world.map.getMetaRoomCount() != 0);
 
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		world.map.SetCurrentMetaRoom(j);

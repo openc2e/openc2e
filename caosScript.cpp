@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "openc2e.h"
 #include <iostream>
 #include <sstream>
 
@@ -67,7 +68,7 @@ std::string cmdinfo::dump() {
 }
 
 #define _SHOW_RAWLINES
-std::string caosScript::dump() {
+std::string script::dump() {
 	std::string out;
 	for (unsigned int i = 0; i < lines.size(); i++) {
 #ifdef _SHOW_RAWLINES
@@ -81,6 +82,15 @@ std::string caosScript::dump() {
 #else
 		out += "\n";
 #endif
+	}
+	return out;
+}
+
+std::string caosScript::dump() {
+	std::string out = installer.dump();
+	out += removal.dump();
+	for (std::vector<script>::iterator i = scripts.begin(); i != scripts.end(); i++) {
+		out += i->dump();
 	}
 	return out;
 }
@@ -169,7 +179,9 @@ caosScript::caosScript(std::istream &in) {
 	std::vector<std::list<token> > lines;
 	std::vector<std::string> rawlines;
 
+	int lineno = 0;
 	while (!in.fail()) {
+		lineno++;
 		std::list<token> t;
 		std::string s;
 		std::getline(in, s);
@@ -180,15 +192,42 @@ caosScript::caosScript(std::istream &in) {
 				rawlines.push_back(s);
 			}
 		} catch (tokeniseFailure f) {
-			// we should throw out an error here, but for the purposes of testing..
-			rawlines.push_back("BROKEN: " + s);
-			lines.push_back(t);
+			std::cerr << "failed to tokenise line #" << lineno << "\n";
 		}
 	}
 
-	installer.lines = lines;
-	installer.rawlines = rawlines;
+	// we don't find scrp tokens which aren't on seperate lines here.
+	// the fix for this is probably to split things up between lines
+	// at tokenisation time..
+
 	/*
-		todo: go through the lines, find scrp / rscr tokens, rip them out
+	  okay, here we go through the scrip we've parsed, and strip out
+	  the individual script elements - ie, installation script, removal
+	  script, and agent scripts
 	*/
+	cmdinfo *scrp = getCmdInfo("SCRP", true); assert(scrp != 0);
+	cmdinfo *rscr = getCmdInfo("RSCR", true); assert(rscr != 0);
+	cmdinfo *endm = getCmdInfo("ENDM", true); assert(endm != 0);
+	script *currscrip = &installer;
+
+	for (unsigned int i = 0; i < lines.size(); i++) {
+		std::list<token> &l = lines[i];
+		if (l.front().cmd != 0) {
+			if (l.front().cmd == scrp) {
+				// FIXME
+				currscrip = &removal;
+			} else if (l.front().cmd == rscr) {
+				currscrip = &removal;
+			} else if (l.front().cmd == endm) {
+				currscrip = 0;
+			} else {
+				assert(currscrip != 0);
+				currscrip->lines.push_back(l);
+				currscrip->rawlines.push_back(rawlines[i]);
+			}
+		} else {
+			bool wewantedacommandhere = false;
+			assert(wewantedacommandhere);
+		}
+	}
 }

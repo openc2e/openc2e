@@ -155,9 +155,9 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	return result;
 }
 
-void caosVM::runEntirely() {
-  for (std::vector<std::list<token> >::iterator i = script->lines.begin();
-			 i != script->lines.end(); i++) {
+void caosVM::runEntirely(script &s) {
+  for (std::vector<std::list<token> >::iterator i = s.lines.begin();
+			 i != s.lines.end(); i++) {
 		std::list<token> b = *i;
 		try {
 			if (!b.empty()) internalRun(b, true);

@@ -33,10 +33,10 @@ protected:
 
 	int currentline;
 	//	std::stack<int> stack;
-		
-public:
-	caosScript *script; // todo: THIS SHOULD BE PRIVATE!
 
+	script *currentscript;
+
+public:
 	// map
 	void v_ADDM();
 	void c_BRMI();
@@ -124,7 +124,7 @@ public:
 	void pushLineOntoStack(int);
 	int popStackLine();
 	caosVar internalRun(std::list<token> &tokens, bool first);
-	void runEntirely();
+	void runEntirely(script &s);
 
 	caosVM(Agent *o);
 
