@@ -25,7 +25,6 @@
 World world;
 
 World::World() {
-	setupCommandPointers();
 }
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet

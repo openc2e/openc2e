@@ -62,6 +62,8 @@ void drawWorld() {
 extern "C" int main(int argc, char *argv[]) {
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004 Alyssa Milburn\n\n";
 
+	setupCommandPointers();
+
 	char *dir = "data/Bootstrap/001 World/";
 	if (argc > 1) dir = argv[1];
 
