@@ -160,6 +160,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 void caosVM::runEntirely(script &s) {
 	currentscript = &s;
 	unsigned int i = 0;
+	linestack.clear();
 	while (i < s.lines.size()) {
 		currentline = i;
 		std::list<token> b = s.lines[i];
@@ -176,6 +177,7 @@ void caosVM::runEntirely(script &s) {
 			i++; // next line
 		}
 	}
+	if (!linestack.empty()) std::cout << "warning: linestack wasn't empty at the end of runEntirely\n";
 	currentscript = 0;
 }
 

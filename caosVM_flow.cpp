@@ -84,3 +84,19 @@ void caosVM::c_REPS() {
 void caosVM::c_REPE() {
 	VM_VERIFY_SIZE(0)
 }
+
+void caosVM::c_LOOP() {
+	VM_VERIFY_SIZE(0)
+	linestack.push_back(currentline);
+}
+
+void caosVM::c_EVER() {
+	VM_VERIFY_SIZE(0)
+	currentline = linestack.back();
+}
+
+void caosVM::c_UNTL() {
+	VM_VERIFY_SIZE(0)
+	if (!truth) currentline = linestack.back();
+	else linestack.pop_back();
+}

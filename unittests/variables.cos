@@ -1,7 +1,7 @@
 * unit tests for variables
 * fuzzie, 06/06/04
 
-DBG: OUTS "TEST: variables: 5 tests"
+DBG: OUTS "TEST: variables: 7 tests"
 
 * test setv
 SETV VA00 1

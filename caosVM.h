@@ -31,8 +31,9 @@ protected:
 	
 	Agent *owner, *_it_;
 
-	int currentline;
+	unsigned int currentline;
 	std::vector<bool> truthstack;
+	std::vector<unsigned int> linestack;
 
 	script *currentscript;
 
@@ -79,6 +80,9 @@ public:
 	void c_REPE();
 	void c_ELSE();
 	void c_ELIF();
+	void c_LOOP();
+	void c_EVER();
+	void c_UNTL();
 	
 	// debug (currently in core)
 	void c_DBG_OUTS();

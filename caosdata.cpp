@@ -34,6 +34,10 @@ void setupCommandPointers() {
 	cmds[phash_cmd(*(int *)"ELIF")].needscondition = true;
 	CMDDEF(ELSE, 0)
 	CMDDEF(ENDI, 0)
+	CMDDEF(LOOP, 0)
+	CMDDEF(EVER, 0)
+	CMDDEF(UNTL, 0)
+	cmds[phash_cmd(*(int *)"UNTL")].needscondition = true;
 	CMDDEF(REAF, 0)
 	CMDDEF(MODV, 2)
 	CMDDEF(SUBV, 2)

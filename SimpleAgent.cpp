@@ -43,7 +43,7 @@ unsigned int SimpleAgent::getImageCount() {
 
 void SimpleAgent::setImage(std::string img) {
 	std::string filename = "./data/Images/" + img + ".c16";
-	std::cerr << "opening " << filename << "\n";
+	std::cout << "opening " << filename << "\n";
 	std::ifstream i(filename.c_str());
 	assert(i.is_open());
 	sprite = new c16Image(i);
