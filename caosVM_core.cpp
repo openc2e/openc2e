@@ -37,7 +37,7 @@ void caosVM::c_OUTS() {
  OUTV (command) val (decimal)
 */
 void caosVM::c_OUTV() {
-  VM_VERIFY_SIZE(1)
+	VM_VERIFY_SIZE(1)
 	VM_PARAM_DECIMAL(val)
 
 	if (val.hasFloat()) {
@@ -53,6 +53,8 @@ void caosVM::c_OUTV() {
 	returns game variable with name given (unchecked)
 */
 void caosVM::v_GAME() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(name)
 	// todo: ;-)
 	static caosVar gamehack;
 	result = gamehack;
@@ -63,6 +65,7 @@ void caosVM::v_GAME() {
  SCRP (command)
 */
 void caosVM::c_SCRP() {
+	VM_VERIFY_SIZE(0)
 	cerr << "hit SCRP. shouldn't ever happen.\n";
 }
 
@@ -70,6 +73,7 @@ void caosVM::c_SCRP() {
  RSCR (command)
 */
 void caosVM::c_RSCR() {
+	VM_VERIFY_SIZE(0)
 	cerr << "hit RSCR. shouldn't ever happen.\n";
 }
 
@@ -77,5 +81,6 @@ void caosVM::c_RSCR() {
  ENDM (command)
 */
 void caosVM::c_ENDM() {
+	VM_VERIFY_SIZE(0)
 	c_STOP();
 }
