@@ -1,14 +1,21 @@
 CFLAGS = -O
 
+all : perfect generatehex
+
 .cc.o:
 	gcc $(CFLAGS) -c $<
 
 O = lookupa.o recycle.o perfhex.o perfect.o
 
-const64 : $(O)
+perfect : $(O)
 	gcc -o perfect $(O) -lm
 
+generatehex : main.o
+	gcc -o generatehex main.o
+
 # DEPENDENCIES
+
+main.o : main.c
 
 lookupa.o : lookupa.c standard.h lookupa.h
 
