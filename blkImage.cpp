@@ -48,6 +48,9 @@ blkImage::blkImage(std::istream &in) {
 		in.seekg(offsets[i], std::ios::beg);
 		buffers[i] = new uint16[128 * 128];
 		in.read((char *)buffers[i], 128 * 128 * 2);
+		for (unsigned int k = 0; k < 128 * 128; k++) {
+			((unsigned short *)buffers[i])[k] = swapEndianShort(((unsigned short *)buffers[i])[k]);
+		}
 	}
 
   delete[] offsets;

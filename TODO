@@ -1,5 +1,6 @@
 * implement ENUM/ESEE/ETCH/EPAS/NEXT
 * look at the room code
+* make the images detect 555/565 themselves
 * start implementing agent event script infrastructure
 * start implementing physics
 * look at starting the sound code (and integrating SDL_mixer)

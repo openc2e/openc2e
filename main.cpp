@@ -121,6 +121,9 @@ extern "C" int main(int argc, char *argv[]) {
 
 	world.init();
 
+	screen = SDL_SetVideoMode(640, 480, video_bpp, videoflags);
+	assert(screen != 0);
+
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		world.map.SetCurrentMetaRoom(j);
 		MetaRoom *m = world.map.getCurrentMetaRoom();
@@ -139,9 +142,6 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 	}
 	
-	screen = SDL_SetVideoMode(640, 480, video_bpp, videoflags);
-	assert(screen != 0);
-
 	SDL_WM_SetCaption("openc2e - Creatures 3", "openc2e");
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);
@@ -176,11 +176,15 @@ extern "C" int main(int argc, char *argv[]) {
 							case SDLK_DOWN:
 								adjusty += 20; break;
 							case SDLK_1:
+								if (world.map.getMetaRoomCount == 1)
+									break;
 								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id - 1);
 								adjustx = world.map.getCurrentMetaRoom()->x();
 								adjusty = world.map.getCurrentMetaRoom()->y();
 								break;
 							case SDLK_2:
+								if (world.map.getMetaRoomCount == world.map.getCurrentMetaRoom()->id)
+									break;
 								world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id + 1);
 								adjustx = world.map.getCurrentMetaRoom()->x();
 								adjusty = world.map.getCurrentMetaRoom()->y();
