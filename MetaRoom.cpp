@@ -19,24 +19,20 @@
 
 #include "MetaRoom.h"
 #include "World.h"
-#include <fstream>
+#include "creaturesImage.h"
 #include <assert.h>
 
 MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
 	xloc = _x; yloc = _y; wid = _width; hei = _height;
-	// todo: use gallery
-	// if (back.compare("norn3.0")) return;
-	std::string filename = std::string("./data/Backgrounds/") + back + std::string(".blk");
-	std::ifstream i(filename.c_str());
-	assert(i.is_open());
-	background = new blkImage(i);
+	background = (blkImage *)gallery.getImage(back + ".blk");
+	assert(background);
 }
 
 MetaRoom::~MetaRoom() {
 	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		delete *i;
 	}
-	delete background; // todo: use gallery
+	gallery.delImage(background);
 }
 
 unsigned int MetaRoom::addRoom(Room *r) {

@@ -19,6 +19,7 @@
 
 #include "creaturesImage.h"
 #include "c16Image.h"
+#include "blkImage.h"
 #include "openc2e.h"
 #include <iostream>
 #include <fstream>
@@ -41,11 +42,19 @@ creaturesImage *imageGallery::getImage(std::string name) {
 		filename = "./data/Images/" + name + ".s16";
 		in.clear();
 		in.open(filename.c_str());
-		assert(in.is_open());
-		std::cout << "imageGallery: opening " << filename << "\n";
-		gallery[name] = new s16Image(in);
+		if (!in.is_open()) {
+			in.clear();
+			filename = "./data/Backgrounds/" + name;
+			in.open(filename.c_str());
+			assert(in.is_open());
+			std::cout << "imageGallery: opened " << filename << "\n";
+			gallery[name] = new blkImage(in);
+		} else {
+			std::cout << "imageGallery: opened " << filename << "\n";
+			gallery[name] = new s16Image(in);
+		}
 	} else {
-		std::cout << "imageGallery: opening " << filename << "\n";
+		std::cout << "imageGallery: opened " << filename << "\n";
 		gallery[name] = new c16Image(in);
 	}
 	return gallery[name];
