@@ -18,6 +18,7 @@
  */
 
 #include <SDL/SDL.h>
+#include "creaturesImage.h"
 
 class SDLBackend {
 public:
@@ -27,4 +28,5 @@ public:
 	unsigned int ticks() { return SDL_GetTicks(); }
 	void init();
 	void resizeNotify(int width, int height);
+	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y);
 };

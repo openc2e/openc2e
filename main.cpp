@@ -44,21 +44,7 @@ void drawWorld() {
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		// note: right now, we know we only have SimpleAgents in the world.
 		SimpleAgent *agent = (SimpleAgent *)(*i);
-		creaturesImage *j = agent->getSprite();
-		SDL_Surface *surf;
-
-		unsigned int img = agent->getCurrentSprite();
-		surf = SDL_CreateRGBSurfaceFrom(j->data(img),
-																		j->width(img),
-																		j->height(img),
-																		16, // depth
-																		j->width(img) * 2, // pitch
-																		0xF800, 0x07E0, 0x001F, 0); // RGBA mask
-		SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
-		SDL_Rect destrect;
-		destrect.x = agent->x - adjustx; destrect.y = agent->y - adjusty;
-		SDL_BlitSurface(surf, 0, backend.screen, &destrect);
-		SDL_FreeSurface(surf);
+		backend.render(agent->getSprite(), agent->getCurrentSprite(), agent->x - adjustx, agent->y - adjusty);
 	}
 	SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
 }

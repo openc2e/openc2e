@@ -38,3 +38,17 @@ void SDLBackend::init() {
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);
 }
+
+void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y) {
+	SDL_Surface *surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
+												 image->width(frame),
+												 image->height(frame),
+												 16, // depth
+												 image->width(frame) * 2, // pitch
+												 0xF800, 0x07E0, 0x001F, 0); // RGBA mask
+	SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
+	SDL_Rect destrect;
+	destrect.x = x; destrect.y = y;
+	SDL_BlitSurface(surf, 0, screen, &destrect);
+	SDL_FreeSurface(surf);
+}
