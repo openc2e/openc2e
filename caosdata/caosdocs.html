@@ -318,8 +318,9 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>time</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PACE </span>(float)</td></tr><tr><td class="description">
-<p>return speed factor of last ten ticks. < 1.0 = engine is ticking slower than BUZZ rating.</p>
-<p>> 1.0 = engine is ticking faster.</p>
+<p>return speed factor of last ten ticks.</p>
+<p>< 1.0 = engine is ticking slower than BUZZ rating. > 1.0 = engine is ticking faster.</p>
+<p>You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is below 1.0.</p>
 </td></tr></table><br>
 <h1>variables</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ADDV </span>(command) var (variable) add (integer)</td></tr><tr><td class="description">

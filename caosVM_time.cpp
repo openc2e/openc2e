@@ -22,8 +22,11 @@
 /**
  PACE (float)
 
- return speed factor of last ten ticks. < 1.0 = engine is ticking slower than BUZZ rating.
- > 1.0 = engine is ticking faster.
+ return speed factor of last ten ticks.
+ 
+ < 1.0 = engine is ticking slower than BUZZ rating. > 1.0 = engine is ticking faster.
+
+ You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is below 1.0.
 */
 void caosVM::v_PACE() {
 	// todo: we should calculate this
