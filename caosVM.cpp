@@ -26,7 +26,6 @@ caosVM::caosVM(const AgentRef &o) {
 	setOwner(o);
 	setTarg(owner);
 	resetScriptState();
-	freed = false;
 	stopping = false;
 }
 

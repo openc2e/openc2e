@@ -140,3 +140,4 @@ void Agent::zotrefs() {
 	while (self.next != &self)
 		self.next->clear();
 }
+

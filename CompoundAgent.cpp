@@ -49,7 +49,7 @@ void CompoundAgent::addPart(CompoundPart *p) {
 
 void CompoundAgent::delPart(unsigned int id) {
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-		if ((*x)->id == id) { parts.erase(x); return; }
+		if ((*x)->id == id) { parts.erase(x); delete *x; return; }
 	}
 	
 	throw "oops"; // TODO: handle this exception properly
@@ -73,6 +73,12 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	// TODO: we ignore image count acos it sucks
 	CompoundPart *p = new DullPart(0, spritefile, firstimage, 0, 0, 0);
 	addPart(p);
+}
+
+CompoundAgent::~CompoundAgent() {
+	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
+		delete *x;
+	}
 }
 
 CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg,

@@ -98,6 +98,7 @@ protected:
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 								std::string spritefile, unsigned int firstimage, unsigned int imagecount);
+	virtual ~CompoundAgent();
 		
 	unsigned int partCount() { return parts.size(); }
 	CompoundPart *part(unsigned int id);

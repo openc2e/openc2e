@@ -41,13 +41,11 @@ caosVM *World::getVM(Agent *a) {
 		caosVM *x = vmpool.back();
 		vmpool.pop_back();
 		x->setOwner(a);
-		x->freed = false;
 		return x;
 	}
 }
 
 void World::freeVM(caosVM *v) {
-	if (v->freed) return;
 	v->setOwner(0);
 	vmpool.push_back(v);
 }
@@ -63,6 +61,7 @@ void World::tick() {
 	while (killqueue.size()) {
 		Agent *rip = killqueue.back();
 		killqueue.pop_back();
+		assert(rip->dying);
 		agents.erase(rip);
 		delete rip;
 	}
