@@ -109,6 +109,33 @@ void caosVM::c_MODV() {
 }
 
 /**
+ ANDV (command) var (variable) and (integer)
+
+ returns var & and
+*/
+void caosVM::c_ANDV() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(andv)
+	VM_PARAM_VARIABLE(v)
+	if (!v->hasInt()) throw badParamException();
+	v->setInt(v->intValue & andv);
+}
+
+/**
+ ORRV (command) var (variable) or (integer)
+
+ returns var | or
+*/
+void caosVM::c_ORRV() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(orv)
+	VM_PARAM_VARIABLE(v)
+	if (!v->hasInt()) throw badParamException();
+	v->setInt(v->intValue | orv);
+}
+
+
+/**
  ADDV (command) var (variable) add (integer)
 
  returns var + add

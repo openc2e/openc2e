@@ -136,6 +136,8 @@ public:
 	void v_SQRT();
 	void v_P1();
 	void v_P2();
+	void c_ANDV();
+	void c_ORRV();
 
 	// flow
 	void c_DOIF();
@@ -194,7 +196,6 @@ public:
 	void v_FMLY();
 	void v_GNUS();
 	void v_SPCS();
-	void v_PLNE();
 	void v_PNTR();
 	void v_OWNR();
 	void c_MESG_WRIT();
@@ -208,6 +209,12 @@ public:
 	void c_PUHL();
 	void v_VISI();
 	void v_POSL();
+	void v_POST();
+	void v_POSB();
+	void v_POSR();
+	void v_PLNE();
+	void c_PLNE();
+	void v_WDTH();
 
 	// motion
 	void c_ELAS();
@@ -257,6 +264,7 @@ public:
 	void v_MMSC();
 	void c_RMSC();
 	void v_RMSC();
+	void c_SNDL();
 
 	// time
 	void v_PACE();

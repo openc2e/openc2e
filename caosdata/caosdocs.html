@@ -63,12 +63,22 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PLNE </span>(integer)</td></tr><tr><td class="description">
 <p>return plane (z-order) of TARG agent</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PLNE </span>(command) depth (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PNTR </span>(agent)</td></tr><tr><td class="description">
 <p>return the pointer agent (the hand)</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSB </span>(float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSE </span>(command) pose (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSE </span>(integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSL </span>(float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSR </span>(float)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POST </span>(float)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">POSX </span>(float)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
@@ -96,6 +106,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TICK </span>(command) tickrate (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TOTL </span>(integer) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">WDTH </span>(integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>camera</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CMRA </span>(command) x (integer) y (integer) pan (integer)</td></tr><tr><td class="description">
@@ -492,6 +504,8 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SNDE </span>(command) filename (string)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SNDL </span>(command) filename (string)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>time</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PACE </span>(float)</td></tr><tr><td class="description">
 <p>return speed factor of last ten ticks.</p>
@@ -507,6 +521,9 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ADDV </span>(command) var (variable) add (integer)</td></tr><tr><td class="description">
 <p>returns var + add</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ANDV </span>(command) var (variable) and (integer)</td></tr><tr><td class="description">
+<p>returns var & and</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ASIN </span>(float) x (float)</td></tr><tr><td class="description">
 <p>returns arcsine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
@@ -534,6 +551,9 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">NEGV </span>(command) var (variable)</td></tr><tr><td class="description">
 <p>returns a negated variable (eg 1 to -1, -3 to 3)</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ORRV </span>(command) var (variable) or (integer)</td></tr><tr><td class="description">
+<p>returns var | or</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">OVxx </span>(variable)</td></tr><tr><td class="description">
 <p>agent-local variables from TARG, 00 to 99</p>
@@ -590,4 +610,4 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SPAS </span>(command) vehicle (agent) passenger (agent)</td></tr><tr><td class="description">
 <p>make specified vehicle agent pick up specified passenger</p>
 </td></tr></table><br>
-<p>209 commands: 30% of DS-era CEE; 119 documented commands: 16% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>
+<p>218 commands: 31% of DS-era CEE; 121 documented commands: 17% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>

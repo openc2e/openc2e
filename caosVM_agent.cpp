@@ -396,9 +396,6 @@ unsigned int calculateScriptId(unsigned int message_id) {
 			return 0;
 		case 0: /* activate 1 */
 		case 1: /* activate 2 */
-		case 3: /* hit */
-		case 4: /* pickup */
-		case 5: /* drop */
 			return message_id - 1;
 	}
 
@@ -485,7 +482,7 @@ void caosVM::v_POSX() {
 */
 void caosVM::v_POSY() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	result.setFloat(targ->y + (targ->getHeight() / 2));
 }
 
@@ -496,7 +493,7 @@ void caosVM::c_FRAT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(framerate)
 
-	assert(targ);
+	caos_assert(targ);
 
 	// TODO
 }
@@ -507,7 +504,7 @@ void caosVM::c_FRAT() {
 void caosVM::c_OVER() {
 	VM_VERIFY_SIZE(0)
 
-	assert(targ);
+	caos_assert(targ);
 
 	int fno, animsize;
 	
@@ -540,7 +537,69 @@ void caosVM::c_PUHL() {
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(pose)
 
-	assert(targ);
+	caos_assert(targ);
 	// TODO
+}
+
+/**
+ POSL (float)
+*/
+void caosVM::v_POSL() {
+	VM_VERIFY_SIZE(0)
+
+	caos_assert(targ);
+	result.setFloat(targ->x);
+}
+
+/**
+ POST (float)
+*/
+void caosVM::v_POST() {
+	VM_VERIFY_SIZE(0)
+
+	caos_assert(targ);
+	result.setFloat(targ->y);
+}
+
+/**
+ POSR (float)
+*/
+void caosVM::v_POSR() {
+	VM_VERIFY_SIZE(0)
+
+	caos_assert(targ);
+	result.setFloat(targ->x + targ->getWidth());
+}
+
+/**
+ POSB (float)
+*/
+void caosVM::v_POSB() {
+	VM_VERIFY_SIZE(0)
+
+	caos_assert(targ);
+	result.setFloat(targ->y + targ->getHeight());
+}
+
+/**
+ WDTH (integer)
+*/
+void caosVM::v_WDTH() {
+	VM_VERIFY_SIZE(0)
+
+	caos_assert(targ);
+	result.setInt(targ->getWidth());
+}
+
+/**
+ PLNE (command) depth (integer)
+*/
+void caosVM::c_PLNE() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(depth)
+
+	caos_assert(targ);
+	targ->zorder = depth;
+	// TODO: resort the storage vector!
 }
 
