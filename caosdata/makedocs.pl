@@ -8,7 +8,10 @@ my %doublecmds;
 my %doublefuncs;
 
 my $parsingdoc = 0;
+
 my $doclines;
+my $docs;
+my $section;
 
 my %funcs;
 my %voids;
@@ -82,9 +85,10 @@ sub writedocsanddata {
 		# todo: make sure the documentation command name is equivalent to $name
 		writedata($name, $firstline, $type, $newname);
 		
+		my $thisdoc;
 		$doclines =~ s/\n/<br>/;
 		$firstline =~ s/^([^(]*)/<span class="command">$1<\/span>/;
-		print docfile $table1, $firstline, $table2, "\n";
+		$thisdoc = $table1 . $firstline . $table2 . "\n";
 		my $i = 0;
 		my $j = 0;
 		foreach (@lines) {
@@ -93,10 +97,11 @@ sub writedocsanddata {
 			$_ =~ s/^\s*(.*)\s*$/$1/;
 			next unless $_;
 			$j++;
-			print docfile "<p>", $_, "</p>\n";
+			$thisdoc .= "<p>" . $_ . "</p>\n";
 		}
-		print docfile '<p><font color="#ff0000">undocumented</font></p>'if ($j == 0);
-		print docfile $table3 . "\n";
+		$thisdoc .= '<p><font color="#ff0000">undocumented</font></p>'if ($j == 0);
+		$thisdoc .= $table3 . "\n";
+		$$docs{$section}{$newname} .= $thisdoc;
 	} else {
 	  print "command/function '", $newname, "' wasn't processed because it has no documentation. add at least a prototype.\n";
 	}
@@ -109,9 +114,8 @@ open(docfile, ">caosdocs.html");
 print docfile '<html><head><title>openc2e CAOS documentation</title><link rel=stylesheet href="caosdocs.css"></head><body>';
 
 foreach my $fname (@files) {
-  my $section = $fname;
+	$section = $fname;
 	$section =~ s/^\.\.\/caosVM_(.*).cpp$/$1/;
-  print docfile "<h1>" . $section . "</h1><br>"; 
 	open(filehandle, $fname);
 	while(<filehandle>) {
 		if (/^void caosVM::/) {
@@ -150,6 +154,14 @@ foreach my $fname (@files) {
 	close(filehandle);
 }
 
+foreach my $sect (sort keys(%$docs)) {
+	print docfile "<h1>" . $sect . "</h1>\n";
+	my $t = $$docs{$sect};
+	foreach my $data (sort keys(%$t)) {
+		print docfile $$docs{$sect}{$data};
+	}
+}
+print docfile "</body></html>";
 close(docfile);
 
 # now, generate prehash files
