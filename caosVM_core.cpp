@@ -94,6 +94,14 @@ void caosVM::c_RSCR() {
 }
 
 /**
+ ISCR (command)
+*/
+void caosVM::c_ISCR() {
+	VM_VERIFY_SIZE(0)
+	cerr << "hit ISCR. shouldn't ever happen.\n";
+}
+
+/**
  ENDM (command)
 */
 void caosVM::c_ENDM() {

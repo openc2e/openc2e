@@ -317,6 +317,8 @@ caosScript::caosScript(std::istream &in) {
 				// what real engine does
 			} else if (destline.begin()->func->name == "RSCR") {
 				currscrip = &removal;
+			} else if (destline.begin()->func->name == "ISCR") {
+				currscrip = &installer;
 			} else if (destline.begin()->func->name == "ENDM") {
 				currscrip->lines.push_back(destline);
 				currscrip = &installer;

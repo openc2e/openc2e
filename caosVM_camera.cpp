@@ -57,5 +57,102 @@ void caosVM::c_META() {
 void caosVM::c_CMRT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pan)
-	// todo
+	// TODO
 }
+
+/**
+ CMRA (command) x (integer) y (integer) pan (integer)
+*/
+void caosVM::c_CMRA() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(pan)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+
+	// TODO
+}
+
+/**
+ CMRP (command) x (integer) y (integer) pan (integer)
+*/
+void caosVM::c_CMRP() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(pan)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+
+	// TODO
+}
+
+/**
+ CMRX (integer)
+*/
+void caosVM::v_CMRX() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+
+/**
+ CMRY (integer)
+*/
+void caosVM::v_CMRY() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+
+/**
+ WNDW (integer)
+*/
+void caosVM::v_WNDW() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+
+/**
+ WNDH (integer)
+*/
+void caosVM::v_WNDH() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+
+/**
+ WNDB (integer)
+*/
+void caosVM::v_WNDB() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+
+/**
+ WNDL (integer)
+*/
+void caosVM::v_WNDL() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+
+/**
+ WNDR (integer)
+*/
+void caosVM::v_WNDR() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+
+/**
+ WNDT (integer)
+*/
+void caosVM::v_WNDT() {
+	VM_VERIFY_SIZE(0)
+	
+	result.setInt(0); // TODO
+}
+

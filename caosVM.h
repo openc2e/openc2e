@@ -83,6 +83,16 @@ public:
 	// camera
 	void c_CMRT();
 	void c_META();
+	void c_CMRA();
+	void c_CMRP();
+	void v_CMRX();
+	void v_CMRY();
+	void v_WNDW();
+	void v_WNDH();
+	void v_WNDB();
+	void v_WNDL();
+	void v_WNDR();
+	void v_WNDT();
 	
 	// core
 	void v_GAME();
@@ -90,6 +100,7 @@ public:
 	void c_OUTV();
 	void c_SCRP(); // dummy
 	void c_RSCR(); // dummy
+	void c_ISCR(); // dummy
 	void c_ENDM();
 
 	// variables
