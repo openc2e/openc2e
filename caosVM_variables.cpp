@@ -36,6 +36,19 @@ void caosVM::v_VAxx() {
 }
 
 /**
+ SETS (command) var (variable) value (string)
+
+ sets given variable to given string
+*/
+void caosVM::c_SETS() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_STRING(value)
+	VM_PARAM_VARIABLE(var)
+	var->reset();
+	var->setString(value);
+}
+
+/**
  SETV (command) var (variable) value (decimal)
 
  sets given variable to given number [int/float]

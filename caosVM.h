@@ -77,6 +77,7 @@ public:
 	void c_ADDV();
 	void c_SETA();
 	void c_DIVV();
+	void c_SETS();
 
 	// flow
 	void c_DOIF();
