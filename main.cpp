@@ -174,10 +174,8 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
-						int adjustbyx = 0, adjustbyy = 0;
-						
 						switch (event.key.keysym.sym) {
-							case SDLK_LEFT:
+						/*	case SDLK_LEFT:
 								adjustbyx = -20;
 								break;
 							case SDLK_RIGHT:
@@ -188,7 +186,7 @@ extern "C" int main(int argc, char *argv[]) {
 								break;
 							case SDLK_DOWN:
 								adjustbyy = 20;
-								break;
+								break; */
 							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
 								showrooms = !showrooms; break;
 							case SDLK_q:
@@ -211,24 +209,7 @@ extern "C" int main(int argc, char *argv[]) {
 								break;
 						}
 
-						if (adjustbyx || adjustbyy) {
-							if ((adjustx + adjustbyx) < (int)world.map.getCurrentMetaRoom()->x())
-								adjustbyx = world.map.getCurrentMetaRoom()->x() - adjustx;
-							else if ((adjustx + adjustbyx + backend.getWidth()) >
-									(world.map.getCurrentMetaRoom()->x() + world.map.getCurrentMetaRoom()->width()))
-								adjustbyx = world.map.getCurrentMetaRoom()->x() + 
-									world.map.getCurrentMetaRoom()->width() - backend.getWidth() - adjustx;
-							if ((adjusty + adjustbyy) < (int)world.map.getCurrentMetaRoom()->y())
-								adjustbyy = world.map.getCurrentMetaRoom()->y() - adjusty;
-							else if ((adjusty + adjustbyy + backend.getHeight()) > 
-									(world.map.getCurrentMetaRoom()->y() + world.map.getCurrentMetaRoom()->height()))
-								adjustbyy = world.map.getCurrentMetaRoom()->y() + 
-									world.map.getCurrentMetaRoom()->height() - backend.getHeight() - adjusty;
-							world.hand()->moveTo(world.hand()->x + adjustbyx, world.hand()->y + adjustbyy);
-							adjustx += adjustbyx;
-							adjusty += adjustbyy;
-						}
-					}
+				}
 					break;
 				case SDL_QUIT:
 					done = true;
@@ -236,6 +217,50 @@ extern "C" int main(int argc, char *argv[]) {
 				default:
 					break;
 			}
+		}
+
+		static float accelspeed = 15, decelspeed = .8, maxspeed = 25;
+		static float velx = 0;
+		static float vely = 0;
+		Uint8 *keys = SDL_GetKeyState(NULL);
+		if (keys[SDLK_LEFT])
+			velx -= accelspeed;
+		if (keys[SDLK_RIGHT])
+			velx += accelspeed;
+		if (!keys[SDLK_LEFT] && !keys[SDLK_RIGHT]) {
+			velx *= decelspeed;
+		}
+		if (keys[SDLK_UP])
+			vely -= accelspeed;
+		if (keys[SDLK_DOWN])
+			vely += accelspeed;
+		if (!keys[SDLK_UP] && !keys[SDLK_DOWN]) {
+			vely *= decelspeed;
+		}
+
+		if (velx >=  maxspeed) velx =  maxspeed;
+		if (velx <= -maxspeed) velx = -maxspeed;
+		if (vely >=  maxspeed) vely =  maxspeed;
+		if (vely <= -maxspeed) vely = -maxspeed;
+
+		if (velx || vely) {
+			int adjustbyx = (int) velx;
+			int adjustbyy = (int) vely;
+			if ((adjustx + adjustbyx) < (int)world.map.getCurrentMetaRoom()->x())
+				adjustbyx = world.map.getCurrentMetaRoom()->x() - adjustx;
+			else if ((adjustx + adjustbyx + backend.getWidth()) >
+					(world.map.getCurrentMetaRoom()->x() + world.map.getCurrentMetaRoom()->width()))
+				adjustbyx = world.map.getCurrentMetaRoom()->x() + 
+					world.map.getCurrentMetaRoom()->width() - backend.getWidth() - adjustx;
+			if ((adjusty + adjustbyy) < (int)world.map.getCurrentMetaRoom()->y())
+				adjustbyy = world.map.getCurrentMetaRoom()->y() - adjusty;
+			else if ((adjusty + adjustbyy + backend.getHeight()) > 
+					(world.map.getCurrentMetaRoom()->y() + world.map.getCurrentMetaRoom()->height()))
+				adjustbyy = world.map.getCurrentMetaRoom()->y() + 
+					world.map.getCurrentMetaRoom()->height() - backend.getHeight() - adjusty;
+			world.hand()->moveTo(world.hand()->x + adjustbyx, world.hand()->y + adjustbyy);
+			adjustx += adjustbyx;
+			adjusty += adjustbyy;
 		}
 	}
 	
