@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef _SDLBACKEND_H
+#define _SDLBACKEND_H
+
 #include <SDL/SDL.h>
 #include "creaturesImage.h"
 
@@ -30,3 +33,5 @@ public:
 	void resizeNotify(int width, int height);
 	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y);
 };
+
+#endif
