@@ -97,6 +97,11 @@ std::string caosScript::dump() {
 
 token makeToken(std::string &src, bool str, token &lasttok) {
 	token r;
+	// todo: hrr. we shouldn't be doing this on every tokenisation pass
+	if ((lasttok.cmd) && ( (lasttok.cmd == getCmdInfo("GSUB", true)) || (lasttok.cmd == getCmdInfo("SUBR", true))) ) {
+		r.var.setString(src);
+		return r;
+	}
 	if (str) { // handle strings (and arrays, at present)
 		r.var.setString(src);
 	} else if ((isdigit(src[0])) || (src[0] == '.') || (src[0] == '-')) { // handle digits

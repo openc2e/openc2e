@@ -84,6 +84,9 @@ public:
 	void c_LOOP();
 	void c_EVER();
 	void c_UNTL();
+	void c_GSUB();
+	void c_SUBR();
+	void c_RETN();
 	
 	// debug (currently in core)
 	void c_DBG_OUTS();
@@ -118,6 +121,7 @@ public:
 	void c_LOCK();
 	void c_UNLK();
 	void c_WAIT();
+	void c_STOP();
 
 	// compound
 	void c_PART();

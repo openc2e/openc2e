@@ -1,4 +1,6 @@
-* do the stack stuff (make enum/etc work)
+* tokenise labels somehow
+  * implement GSUB/SUBR/RETN, and maybe GOTO
+* implement ENUM/ESEE/ETCH/EPAS/NEXT
 * look at the room code
 * start implementing agent event script infrastructure
 * implement galleries (agents sharing images)

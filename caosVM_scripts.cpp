@@ -71,3 +71,8 @@ void caosVM::c_WAIT() {
 	VM_PARAM_INTEGER(ticks)
 	cerr << "unimplemented: WAIT\n";
 }
+
+void caosVM::c_STOP() {
+	VM_VERIFY_SIZE(0)
+	currentline = currentscript->lines.size();
+}

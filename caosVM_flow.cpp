@@ -61,6 +61,7 @@ void caosVM::c_DOIF() {
 
 void caosVM::c_ELIF() {
 	VM_VERIFY_SIZE(0)
+	assert(!truthstack.empty());
 	if (!truth || truthstack.back()) jumpToNextIfBlock();
 	else { truthstack.pop_back(); truthstack.push_back(true); }
 }
@@ -73,6 +74,7 @@ void caosVM::c_ELSE() {
 
 void caosVM::c_ENDI() {
 	VM_VERIFY_SIZE(0)
+	assert(!truthstack.empty());
 	truthstack.pop_back();
 }
 
@@ -86,26 +88,59 @@ void caosVM::c_REPS() {
 
 void caosVM::c_REPE() {
 	VM_VERIFY_SIZE(0)
+	assert(!linestack.empty());
+	assert(!repstack.empty());
 	int i = repstack.back() - 1;
 	repstack.pop_back();
 	if (i) {
 		repstack.push_back(i);
 		currentline = linestack.back();
-	}
+	} else linestack.pop_back();
 }
 
 void caosVM::c_LOOP() {
 	VM_VERIFY_SIZE(0)
-	linestack.push_back(currentline);
+	linestack.push_back(currentline + 1);
 }
 
 void caosVM::c_EVER() {
 	VM_VERIFY_SIZE(0)
+	assert(!linestack.empty());
 	currentline = linestack.back();
 }
 
 void caosVM::c_UNTL() {
 	VM_VERIFY_SIZE(0)
+	assert(!linestack.empty());
 	if (!truth) currentline = linestack.back();
 	else linestack.pop_back();
+}
+
+void caosVM::c_GSUB() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(label)
+	assert(label.size());
+	cmdinfo *subr = getCmdInfo("SUBR", true); assert(subr != 0);
+	for (unsigned int i = currentline + 1; i < currentscript->lines.size(); i++) {
+		std::list<token>::iterator j = currentscript->lines[i].begin();
+		if (((*j).cmd == subr) && ((*++j).var.stringValue == label)) {
+			linestack.push_back(currentline + 1);
+			currentline = i + 1;
+			return;
+		}
+	}
+	std::cout << "warning: GSUB didn't find matching SUBR for " << label << ", ignoring\n";
+}
+
+void caosVM::c_SUBR() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(label)
+	c_STOP(); // a SUBR acts like a STOP if encountered during execution
+}
+
+void caosVM::c_RETN() {
+	VM_VERIFY_SIZE(0)
+	assert(!linestack.empty());
+	currentline = linestack.back();
+	linestack.pop_back();
 }
