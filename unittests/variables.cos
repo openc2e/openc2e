@@ -1,7 +1,7 @@
 * unit tests for variables
 * fuzzie, 06/06/04
 
-DBG: OUTS "TEST: variables: 7 tests"
+DBG: OUTS "TEST: variables: 8 tests"
 
 * test setv
 SETV VA00 1
@@ -60,6 +60,16 @@ ENDI
 SETV VA01 8
 SETV VA00 7
 DOIF VA01 eq 8 AND VA00 eq 7
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+
+* test setv with va00/va01, from nornagon
+SETV VA00 1
+SETV VA01 0
+SETV VA00 VA01
+DOIF VA00 eq VA01
  DBG: OUTS "PASS"
 ELSE
  DBG: OUTS "FAIL"
