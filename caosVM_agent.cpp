@@ -116,7 +116,8 @@ void caosVM::c_BHVR() {
 void caosVM::c_TARG() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
-	cerr << "unimplemented: TARG\n";
+	targ.reset();
+	targ.setAgent(a);
 }
 
 void caosVM::v_FROM() {

@@ -71,3 +71,23 @@ unsigned int Map::getMetaRoomCount() {
 unsigned int Map::getRoomCount() {
 	return rooms.size();
 }
+
+MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
+	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
+		MetaRoom *r = *i;
+		if ((_x > r->x()) && (_y > r->y()))
+			if ((_x < (r->x() + r->width())) && (_y < (r->y() + r->height())))
+				return r;
+	}
+	return 0;
+}
+
+Room *Map::roomAt(unsigned int _x, unsigned int _y) {
+	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		Room *r = *i;
+		if ((_x > r->x_left) && (_x < r->x_right))
+			// todo: we should check y position somehow
+				return r;
+	}
+	return 0;
+}

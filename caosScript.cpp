@@ -166,6 +166,9 @@ void tokenise(std::string s, std::list<token> &t) {
 }
 
 caosScript::caosScript(std::istream &in) {
+	std::vector<std::list<token> > lines;
+	std::vector<std::string> rawlines;
+
 	while (!in.fail()) {
 		std::list<token> t;
 		std::string s;
@@ -183,6 +186,8 @@ caosScript::caosScript(std::istream &in) {
 		}
 	}
 
+	installer.lines = lines;
+	installer.rawlines = rawlines;
 	/*
 		todo: go through the lines, find scrp / rscr tokens, rip them out
 	*/

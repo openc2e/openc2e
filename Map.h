@@ -32,11 +32,16 @@ protected:
 public:
 	void Reset();
 	void SetMapDimensions(unsigned int, unsigned int);
+
 	void SetCurrentMetaRoom(unsigned int);
 	int addMetaRoom(MetaRoom *);
 	MetaRoom *getMetaRoom(unsigned int);
 	MetaRoom *getCurrentMetaRoom();
-	Room *getRoom(unsigned int);
+	
 	unsigned int getMetaRoomCount();
+	Room *getRoom(unsigned int);
 	unsigned int getRoomCount();
+
+	MetaRoom *metaRoomAt(unsigned int, unsigned int);
+	Room *roomAt(unsigned int, unsigned int);
 };
