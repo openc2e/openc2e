@@ -47,6 +47,7 @@ public:
 
 	void setFrameNo(unsigned int);
 	void setPose(unsigned int p) { pose = p; }
+	void setFramerate(unsigned int f) { /* TODO */ }
 	unsigned int getPose() { return pose; }
 	unsigned int getCurrentSprite() { return first_image + pose; }
 	unsigned int getFrameNo() { return frameno; }

@@ -40,6 +40,7 @@ public:
 	unsigned int getFrameNo() { return frameno; }
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { pose = p; }
+	void setFramerate(unsigned int f) { /* TODO */ }
 				
 	bool operator < (const CompoundPart *b) const {
 		return zorder < b->zorder;

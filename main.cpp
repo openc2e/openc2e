@@ -42,8 +42,8 @@ void drawWorld() {
 			unsigned int col = 0xFFFF00CC;
 			if (*i == r) col = 0xFF00FFCC;
 			else if (r)
-				for (std::vector<Room *>::iterator j = (**i).neighbours.begin(); j != (**i).neighbours.end(); j++) {
-					if (*j == r) col = 0x00FFFFCC;
+				for (std::vector<std::pair<unsigned int, Room *> >::iterator j = (**i).neighbours.begin(); j != (**i).neighbours.end(); j++) {
+					if (j->second == r) col = 0x00FFFFCC;
 				}
 			// ceiling
 			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, col);

@@ -104,8 +104,19 @@ void Agent::tick() {
 			r2 = world.map.roomAt(destx + getWidth(), desty + getHeight());
 
 			if ((r1 && r2)) {
-				moveTo(destx, desty);
-				vely.setFloat(newvely);
+				bool hacked = false;
+				if (r1 != r2) // quick hack
+					for (std::vector<std::pair<unsigned int, Room *> >::iterator i = r1->neighbours.begin(); i != r1->neighbours.end(); i++) {
+						if ((i->second == r2) && (i->first == 100)) { // check for PERM=100
+							moveTo(destx, desty + 1);
+							vely.setFloat(newvely);
+							hacked = true;
+						}
+					}
+				if (!hacked) {
+					moveTo(destx, desty);
+					vely.setFloat(newvely);
+				}
 			} else
 				vely.setFloat(0);
 		}

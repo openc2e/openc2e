@@ -517,7 +517,15 @@ void caosVM::c_FRAT() {
 
 	caos_assert(targ);
 
-	// TODO
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	if (c) {
+		CompoundPart *p = c->part(part);
+		p->setFramerate(framerate);
+	} else {
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
+		caos_assert(a);
+		a->setFramerate(framerate);
+	}
 }
 
 /**
@@ -671,13 +679,12 @@ void caosVM::v_TRAN() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	SimpleAgent *a;
 	caos_assert(targ);
-	try {
-		a = dynamic_cast<SimpleAgent *>(targ.get());
-	} catch (std::exception e) {
+	SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
+	if (!a) {
 		// TODO: TRAN on other agents
 		// (if lc2e even allows that)
+		// it seems to work for compound agents - fuzzie
 		result.setInt(0);
 		return;
 	}

@@ -141,8 +141,8 @@ void caosVM::c_DOOR() {
 	// TODO: handle perm
 	Room *r1 = world.map.getRoom(room1);
 	Room *r2 = world.map.getRoom(room2);
-	r1->neighbours.push_back(r2);
-	r2->neighbours.push_back(r1);
+	r1->neighbours.push_back(std::pair<unsigned int, Room *>(perm, r2));
+	r2->neighbours.push_back(std::pair<unsigned int, Room *>(perm, r1));
 }
 
 /**
