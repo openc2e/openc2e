@@ -38,5 +38,5 @@ public:
 	MetaRoom *getCurrentMetaRoom();
 	Room *getRoom(unsigned int);
 	unsigned int getMetaRoomCount();
+	unsigned int getRoomCount();
 };
-

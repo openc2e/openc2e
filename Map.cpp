@@ -27,7 +27,7 @@ void Map::Reset() {
 		delete *i;
 	}
 	metarooms.clear();
-	rooms.clear(); // metaroom destructor handles
+	rooms.clear();
 	std::cout << "map reset\n";
 }
 
@@ -66,4 +66,8 @@ Room *Map::getRoom(unsigned int r) {
 
 unsigned int Map::getMetaRoomCount() {
 	return metarooms.size();
+}
+
+unsigned int Map::getRoomCount() {
+	return rooms.size();
 }

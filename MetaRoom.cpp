@@ -32,6 +32,13 @@ MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
 	background = new blkImage(i);
 }
 
+MetaRoom::~MetaRoom() {
+	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		delete *i;
+	}
+	delete background; // todo: use gallery
+}
+
 unsigned int MetaRoom::addRoom(Room *r) {
 	rooms.push_back(r);
 	world.map.rooms.push_back(r);

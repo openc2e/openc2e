@@ -44,6 +44,7 @@ public:
 	unsigned int id;
 
 	MetaRoom(int _x, int _y, int width, int height, std::string back);
+	~MetaRoom();
 };
 
 #endif

@@ -15,9 +15,9 @@ int adjustx, adjusty;
 void drawWorld() {
 	MetaRoom *m = world.map.getCurrentMetaRoom();
 	blkImage *test = m->backImage();
-	for (int i = 0; i < (test->totalheight / 128); i++) {
-		for (int j = 0; j < (test->totalwidth / 128); j++) {
-			int whereweare = j * (test->totalheight / 128) + i;
+	for (unsigned int i = 0; i < (test->totalheight / 128); i++) {
+		for (unsigned int j = 0; j < (test->totalwidth / 128); j++) {
+			unsigned int whereweare = j * (test->totalheight / 128) + i;
 			SDL_Rect destrect;
 			destrect.x = (j * 128) - adjustx + m->x(); destrect.y = (i * 128) - adjusty + m->y();
 			SDL_BlitSurface(backsurfs[m->id][whereweare], 0, screen, &destrect);
@@ -63,14 +63,14 @@ extern "C" int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	for (int j = 0; j < world.map.getMetaRoomCount(); j++) {
+	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		world.map.SetCurrentMetaRoom(j);
 		MetaRoom *m = world.map.getCurrentMetaRoom();
 		blkImage *test = m->backImage();
 		assert(test != 0);
 
 		backsurfs[m->id] = new SDL_Surface *[test->numframes()];
-		for (int i = 0; i < test->numframes(); i++) {
+		for (unsigned int i = 0; i < test->numframes(); i++) {
 			backsurfs[m->id][i] = SDL_CreateRGBSurfaceFrom(test->data(i),
 																							test->width(i),
 																							test->height(i),
