@@ -26,10 +26,12 @@
 cmdinfo *cmds, *funcs;
 std::vector<cmdinfo> doublecmds, doublefuncs;
 
+signed char varnumber;
+
 cmdinfo *getCmdInfo(std::string cmd, bool command) {
 	// std::cerr << "getCmdInfo called with '" << cmd << "' (wanting " << (command ? "command" : "function") << ")\n";
 	assert(cmd.size() == 4);
-	signed char varnumber = -1;
+	varnumber = -1;
 	transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
 	if (isdigit(cmd[2])) {// handle vaxx etc
 		varnumber = atoi(cmd.c_str() + 2);
@@ -44,7 +46,10 @@ cmdinfo *getCmdInfo(std::string cmd, bool command) {
 	if (i > (command ? 246 : 511)) return 0; // todo: do we need this?
 	cmdinfo *x = (command ? &cmds[i] : &funcs[i]);
 	if ((!x->twotokens) && (!x->method)) return 0;
-	if (x->name.compare(cmd)) return 0;
+	if (x->name.compare(cmd)) {
+		// std::cout << "getCmdInfo wanted " << cmd << " but got " << x->name << " out of the hash table!\n";
+		return 0;
+	}
 	// todo: set varnumber
 	return x;
 }

@@ -36,6 +36,8 @@ protected:
 
 	script *currentscript;
 
+	signed char varnumber; // VAxx/OVxx hack
+
 public:
 	// map
 	void v_ADDM();
@@ -156,6 +158,7 @@ struct cmdinfo {
 					name(n), notokens(o), twotokens(t), method(m) { needscondition = false; }
 };
 
+extern signed char varnumber;
 cmdinfo *getCmdInfo(std::string cmd, bool command);
 cmdinfo *getSecondCmd(cmdinfo *first, std::string src, bool command);
 

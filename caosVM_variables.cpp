@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include <stdlib.h> // rand()
 #include <iostream>
+#include "openc2e.h"
 
 /*
  VAxx (variable)
@@ -28,8 +29,10 @@
  */
 void caosVM::v_VAxx() {
 	VM_VERIFY_SIZE(0)
-	result = var[0];
-	result.setVariable(&var[0]); // todo: not just zero
+	assert(varnumber > -1);
+	assert(varnumber < 100);
+	result = var[varnumber];
+	result.setVariable(&var[varnumber]); // todo: not just zero
 }
 
 /*
@@ -57,9 +60,11 @@ void caosVM::c_SETV() {
  */
 void caosVM::v_OVxx() {
 	VM_VERIFY_SIZE(0)
+	assert(varnumber > -1);
+	assert(varnumber < 100);
 	// COUGH COUGH BROKEN (var != OVxx)
-	result = var[0];
-	result.setVariable(&var[0]); // todo: not just zero
+	result = var[varnumber];
+	result.setVariable(&var[varnumber]); // todo: not just zero
 }
 
 /*

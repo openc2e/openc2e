@@ -148,6 +148,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	params = ourparams;
 	result.reset();
 	//std::cout << "internalRun executing " << us->dump() << "\n";
+	varnumber = maintoken.varnumber; // VAxx/OVxx hack
 	(this->*(us->method))();
 	if (first && !tokens.empty()) {
 		// assume there's another command on this line

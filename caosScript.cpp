@@ -113,6 +113,8 @@ token makeToken(std::string &src, bool str, token &lasttok) {
 		} else {
 			r.cmd = getCmdInfo(src, true);
 			r.func = getCmdInfo(src, false);
+			// this is a global hack from caosVM_cmdinfo for VAxx/OVxx
+			if (varnumber != -1) r.varnumber = varnumber;
 		}
 		if (!r.cmd && !r.func) throw tokeniseFailure();
 	} else { // presumably we have a comparison

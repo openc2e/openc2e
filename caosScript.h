@@ -65,6 +65,7 @@ struct token {
 	struct cmdinfo *cmd, *func;
 	bool isvar;
 	comparisonType comparison;
+	signed char varnumber;
 
 	std::string dump();
 
