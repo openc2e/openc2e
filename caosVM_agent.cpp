@@ -174,6 +174,10 @@ void caosVM::c_ANIM() {
 			oh.clear();
 		}
 	}
+	if (!oh.empty()) {
+		unsigned int j = (unsigned int)atoi(oh.c_str());
+		a->animation.push_back(j);
+	}
 	if (!a->animation.empty()) { a->setFrameNo(0); }
 	if (a->animation.empty()) { std::cout << "warning: ANIM produced an empty animation string\n"; }
 }
