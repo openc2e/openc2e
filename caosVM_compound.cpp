@@ -18,6 +18,8 @@
  */
 
 #include "caosVM.h"
+#include "CompoundAgent.h"
+#include "openc2e.h"
 
 /**
  PART (command) part_id (integer)
@@ -47,6 +49,14 @@ void caosVM::c_PAT_DULL() {
 	VM_PARAM_INTEGER(part)
 	
 	assert(part > 0);
+	assert(targ);
+	
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	assert(a);
+
+	// TODO: 0 represents 'image_count', apparently irrelevant in PAT: DULL, remove it from constructor
+	CompoundPart *p = new DullPart(part, sprite, first_image, 0, x, y, plane);
+	a->addPart(p);
 }
 
 /**
@@ -73,6 +83,13 @@ void caosVM::c_PAT_BUTT() {
 	
 	assert(part > 0);
 	assert((option == 0) || (option == 1));
+	assert(targ);
+	
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	assert(a);
+	
+/*	CompoundPart *p = 0; // TODO
+	a->addPart(p); */
 }
 
 /**
@@ -83,4 +100,12 @@ void caosVM::c_PAT_BUTT() {
 void caosVM::c_PAT_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part)
+	
+	assert(part > 0);
+	assert(targ);
+
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ);
+	assert(a);
+	
+	a->delPart(part);
 }

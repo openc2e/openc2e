@@ -22,11 +22,10 @@
 
 caosVM::caosVM(Agent *o) {
 	owner = o;
-	// if owner is Creature, set _it_
-	targ.reset();
+	// todo: if owner is Creature, set _it_
 	// todo: http://www.gamewaredevelopment.co.uk/cdn/cdn_more.php?CDN_article_id=37 discusses
 	// how targ is usually set to owner in event scripts, think about that
-	targ.setAgent(0);
+	targ = owner;
 }
 
 bool caosVar::operator == (caosVar &v) {

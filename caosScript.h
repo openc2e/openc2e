@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef CAOSSCRIPT_H
+#define CAOSSCRIPT_H
+
 #include <vector>
 #include <list>
 #include <string>
@@ -36,6 +39,7 @@ struct caosVar {
 	caosVar() { reset(); }
 	virtual ~caosVar() { } // we don't truly need this.
 
+	bool empty() { return (flags == 0); }
 	bool hasInt() { return (flags & 1); }
 	void setInt(int i) { flags = flags | 1; intValue = i; }
 	bool hasFloat() { return (flags & 2); }
@@ -88,3 +92,5 @@ public:
 
 	std::string dump();
 };
+
+#endif

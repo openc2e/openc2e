@@ -26,13 +26,12 @@ class caosVM {
 protected:
 	caosVar var[100];
 	caosVar _p_[2];
-	caosVar targ;
 	
 	std::vector<caosVar> params;
 	caosVar result;
 	bool truth;
 	
-	Agent *owner, *_it_;
+	Agent *targ, *owner, *_it_;
 
 	unsigned int currentline;
 	std::vector<bool> truthstack;
@@ -81,6 +80,16 @@ public:
 	void c_SETA();
 	void c_DIVV();
 	void c_SETS();
+	void v_UFOS();
+	void v_MODU();
+	void v_GNAM();
+	void c_ABSV();
+	void v_ACOS();
+	void v_ASIN();
+	void v_ATAN();
+	void v_COS_();
+	void v_SIN_();
+	void v_TAN_();
 
 	// flow
 	void c_DOIF();
@@ -138,6 +147,8 @@ public:
 	void v_OWNR();
 	void c_MESG_WRIT();
 	void c_MESG_WRT();
+	void v_TOTL();
+	void c_SHOW();
 
 	// motion
 	void c_ELAS();

@@ -121,7 +121,10 @@ token makeToken(std::string &src, bool str, token &lasttok) {
 			// this is a global hack from caosVM_cmdinfo for VAxx/OVxx
 			if (varnumber != -1) r.varnumber = varnumber;
 		}
-		if (!r.cmd && !r.func) throw tokeniseFailure();
+		if (!r.cmd && !r.func) {
+			std::cerr << "parser failed to find a match for presumed function \"" << src << "\"\n";
+			throw tokeniseFailure();
+		}
 	} else { // presumably we have a comparison
 		transform(src.begin(), src.end(), src.begin(), toupper);
 		// todo: make this a hash table?
@@ -223,7 +226,6 @@ caosScript::caosScript(std::istream &in) {
 	cmdinfo *rscr = getCmdInfo("RSCR", true); assert(rscr != 0);
 	cmdinfo *endm = getCmdInfo("ENDM", true); assert(endm != 0);
 	script *currscrip = &installer;
-	bool doneinstaller = false;
 	
 	for (unsigned int i = 0; i < lines.size(); i++) {
 		std::list<token> &l = lines[i];
@@ -245,8 +247,7 @@ caosScript::caosScript(std::istream &in) {
 				currscrip->rawlines.push_back(rawlines[i]);
 			}
 		} else {
-			bool wewantedacommandhere = false;
-			assert(wewantedacommandhere);
+			std::cerr << "skipping rawline '" << rawlines[i] << "' because first parsed token wasn't a command (this is likely to be a bug in openc2e)\n";
 		}
 	}
 }

@@ -18,21 +18,23 @@
  */
 
 #include "caosVM.h"
+#include "Agent.h"
 #include <stdlib.h> // rand()
 #include <iostream>
+#include <math.h> // abs()/fabs()
 #include "openc2e.h"
 
 /**
  VAxx (variable)
 
- script-local variables, 00 to 99 (todo: is this right?)
+ script-local variables, 00 to 99
  */
 void caosVM::v_VAxx() {
 	VM_VERIFY_SIZE(0)
 	assert(varnumber > -1);
 	assert(varnumber < 100);
 	result = var[varnumber];
-	result.setVariable(&var[varnumber]); // todo: not just zero
+	result.setVariable(&var[varnumber]);
 }
 
 /**
@@ -88,9 +90,9 @@ void caosVM::v_OVxx() {
 	VM_VERIFY_SIZE(0)
 	assert(varnumber > -1);
 	assert(varnumber < 100);
-	// COUGH COUGH BROKEN (var != OVxx)
-	result = var[varnumber];
-	result.setVariable(&var[varnumber]); // todo: not just zero
+	assert(targ);
+	result = targ->var[varnumber];
+	result.setVariable(&(targ->var[varnumber]));
 }
 
 /**
@@ -118,8 +120,12 @@ void caosVM::c_ADDV() {
 	if (v->hasFloat())
 		v->setFloat(v->floatValue + (add.hasFloat() ? add.floatValue : add.intValue));
 	else if (v->hasInt())
-	  v->setInt((int)(v->intValue + (add.hasFloat() ? add.floatValue : add.intValue)));
-	else
+		v->setInt((int)(v->intValue + (add.hasFloat() ? add.floatValue : add.intValue)));
+	else if (v->empty()) {
+		// c3's Robin2.cos does 'addv va66 1' at the top without initialising va66
+		if (add.hasFloat()) v->setFloat(add.floatValue);
+		else v->setInt(add.intValue);
+	} else
 		throw badParamException();
 }
 
@@ -221,3 +227,120 @@ void caosVM::c_REAF() {
 	// todo
 }
 
+/**
+ UFOS (string)
+ 
+ return 'uname -a' on platforms which support it, or OS details in another format otherwise
+*/
+void caosVM::v_UFOS() {
+	VM_VERIFY_SIZE(0)
+	result.setString("some random platform"); // TODO
+}
+
+/**
+ MODU (string)
+ 
+ returns Docking Station engine string for now, should return modules loaded and display engine type
+*/
+void caosVM::v_MODU() {
+	VM_VERIFY_SIZE(0)
+	result.setString("OriginalDisplay SDL (netbabel 148)");
+}
+
+/**
+ GNAM (string)
+ 
+ returns running game (eg "Docking Station")
+*/
+void caosVM::v_GNAM() {
+	VM_VERIFY_SIZE(0)
+	result.setString("Docking Station"); // todo
+}
+
+/**
+ ABSV (command) var (decimal variable)
+ 
+ modifies var if negative so that its value is positive
+*/
+void caosVM::c_ABSV() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_VARIABLE(var)
+	
+	if (var->hasFloat()) var->setFloat(fabs(var->floatValue));
+	else if (var->hasInt()) var->setInt(abs(var->intValue));
+	else throw badParamException();
+}
+
+// TODO: all the below functions actually work in radians right now ;)
+
+/**
+ ACOS (float) x (float)
+ 
+ returns arccosine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font>
+*/
+void caosVM::v_ACOS() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(x)
+	
+	result.setFloat(acos(x));
+}
+
+/**
+ ASIN (float) x (float)
+ 
+ returns arcsine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font>
+*/
+void caosVM::v_ASIN() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(x)
+	
+	result.setFloat(asin(x));
+}
+
+/**
+ ATAN (float) x (float)
+ 
+ returns arctangent of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font>
+*/
+void caosVM::v_ATAN() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(x)
+	
+	result.setFloat(atan(x));
+}
+
+/**
+ COS_ (float) x (float)
+ 
+ returns cosine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font>
+*/
+void caosVM::v_COS_() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(x)
+	
+	result.setFloat(cos(x));
+}
+
+/**
+ SIN_ (float) x (float)
+ 
+ returns sine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font>
+*/
+void caosVM::v_SIN_() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(x)
+	
+	result.setFloat(sin(x));
+}
+
+/**
+ TAN_ (float) x (float)
+ 
+ returns tangent of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font>
+*/
+void caosVM::v_TAN_() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_FLOAT(x)
+	
+	result.setFloat(tan(x));
+}

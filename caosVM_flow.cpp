@@ -53,9 +53,8 @@ void caosVM::jumpToNextIfBlock() {
 */
 void caosVM::c_DOIF() {
 	VM_VERIFY_SIZE(0)
-	truthstack.push_back(false);
+	truthstack.push_back(truth);
 	if (!truth) jumpToNextIfBlock();
-	else { truthstack.pop_back(); truthstack.push_back(true); }
 }
 
 /**

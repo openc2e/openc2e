@@ -22,12 +22,15 @@
 
 #include "creaturesImage.h"
 #include "SDLBackend.h"
+#include "caosScript.h" // for caosVar in Agent
 
 class Agent {
 public:
+	bool visible;
 	unsigned char family, genus;
 	unsigned short species;
 	unsigned int zorder;
+	caosVar var[100]; // OVxx
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	unsigned int x, y;
