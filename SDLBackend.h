@@ -39,14 +39,18 @@ protected:
 	void mixAudio(uint8 *stream, int len);
 	friend void mixAudio(SDLBackend *backend, uint8 *stream, int len);
 	
+	int width, height;
+
 public:
 	SDL_Surface *screen;
 	
 public:
 	unsigned int ticks() { return SDL_GetTicks(); }
 	void init();
-	void resizeNotify(int width, int height);
+	void resizeNotify(int _w, int _h);
 	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y);
+	int getWidth() const { return width; }
+	int getHeight() const { return height; }
 };
 
 #endif

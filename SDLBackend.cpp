@@ -47,7 +47,9 @@ void SDLBackend::mixAudio(uint8 *stream, int len) {
 	}
 }
 
-void SDLBackend::resizeNotify(int width, int height) {
+void SDLBackend::resizeNotify(int _w, int _h) {
+	width = _w;
+	height = _h;
 	screen = SDL_SetVideoMode(width, height, 0, SDL_SWSURFACE + SDL_RESIZABLE);
 	assert(screen != 0);
 }
