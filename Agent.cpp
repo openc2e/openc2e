@@ -25,20 +25,22 @@
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
   visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0) {
-  velx.setFloat(0.0f);
-  vely.setFloat(0.0f);
-  accg = 0.3f;
-  range = 0; // XXX: find out what CEE actually uses
-  sufferphysics = false;
-  self.ref = this;
-  self.next = self.prev = &self;
-  immortal = dying = false;
+	velx.setFloat(0.0f);
+	vely.setFloat(0.0f);
+	accg = 0.3f;
+	range = 500;
+	sufferphysics = false;
 	x = 0.0f; y = 0.0f;
+	
+	// AgentRef stuff
+	self.ref = this;
+	self.next = self.prev = &self;
+	
+	dying = false;
 	unid = -1;
 }
 
 Agent::~Agent() {
-	assert(!immortal);
 	if (vm)
 		world.freeVM(vm);
 	zotrefs();
@@ -154,8 +156,6 @@ void Agent::tick() {
 
 void Agent::kill() {
 	assert(!dying);
-	if (immortal)
-		return;
 	dying = true; // what a world, what a world...
 	if (vm)
 		vm->stop();
@@ -176,7 +176,7 @@ int Agent::getUNID() {
 
 std::string Agent::identify() const {
 	std::ostringstream o;
-	o << (int)family << " " << (int)genus << species << " ";
+	o << (int)family << " " << (int)genus << " " << species << " ";
 	const std::string n = world.catalogue.getAgentName(family, genus, species);
 	if (n.size())
 		o << "(" + n + ")";
@@ -186,3 +186,4 @@ std::string Agent::identify() const {
 		o << " (no unid assigned)";
 	return o.str();
 }
+

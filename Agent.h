@@ -55,7 +55,7 @@ public:
 
 	float range;
 
-	bool immortal, dying;
+	bool dying;
 	
 	void fireScript(unsigned short event);
 	void moveTo(float, float);
