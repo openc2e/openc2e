@@ -22,7 +22,7 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 		if (i[i.size() - 1] == '\r') i.erase(i.size() - 1);
 		// TODO: \\ -> \, handle \n, anything else?
 
-		boost::char_separator<char> sep(" ");
+		boost::char_separator<char> sep(" \t");
 		boost::tokenizer<boost::char_separator<char> > tok(i, sep);
 		for (boost::tokenizer<boost::char_separator<char> >::iterator b = tok.begin(); b != tok.end(); b++) {
 			std::string y = *b;
@@ -33,7 +33,8 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 				break;
 			}
 
-			// assert((!wasparsingstring) || (stage == 2));
+			if (parsingarray) assert(stage < 3);
+			if (parsingtag) assert(stage < 2);
 
 			if (y == "TAG") {
 				assert(!parsingtag);
@@ -66,10 +67,6 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 				else {
 					std::string r = y;
 					r.erase(r.size() - 1);
-					if (parsingtag || parsingarray) {
-						assert(stage == 1);
-						if (parsingarray) stage = 2;
-					}
 					assert(parsingstring);
 					parsingstring = false;
 					wasparsingstring = true;
@@ -85,10 +82,14 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 			}
 
 			if (wasparsingstring && ((!parsingarray) && (!parsingtag))) {
-				std::cout << "catalogue appending value: " << t << std::endl;
+//				std::cout << "catalogue appending value: " << t << std::endl;
 				wasparsingstring = false;
 				x.push_back(t);
 				t.clear();
+			} else if (wasparsingstring) {
+				assert(stage == 1);
+				stage = 2;
+				wasparsingstring = false;
 			}
 		}
 
@@ -99,7 +100,7 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 			if (parsingarray || parsingtag) {
 				// TODO: once we fill in arraysize, uncomment following				
 				// if (parsingarray) assert(arraysize != 0);
-				std::cout << "catalogue starting to parse tag/array: " << t << std::endl;
+//				std::cout << "catalogue starting to parse tag/array: " << t << std::endl;
 				x = c.data[t];
 			}
 		}
