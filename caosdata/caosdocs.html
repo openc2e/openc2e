@@ -71,9 +71,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RTAR </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
 <p>set targ to random agent with given family/genus/species</p>
 </td></tr></table><br>
-<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRX </span>(command) event (integer) species (integer) genus (integer) family (integer)</td></tr><tr><td class="description">
-<p>delete the event script in question</p>
-</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SHOW </span>(command) visibility (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SPCS </span>(integer)</td></tr><tr><td class="description">
 <p>return species of TARG agent</p>
 </td></tr></table><br>
@@ -84,6 +83,8 @@
 <p>set TARG to given agent</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TICK </span>(command) tickrate (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TOTL </span>(integer) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>camera</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CMRT </span>(command) pan (integer)</td></tr><tr><td class="description">
@@ -294,6 +295,9 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">LOCK </span>(command)</td></tr><tr><td class="description">
 <p>prevent agent script from being interrupted by another</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRX </span>(command) event (integer) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p>delete the event script in question</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SLOW </span>(command)</td></tr><tr><td class="description">
 <p>reverts effects of INST</p>
 </td></tr></table><br>
@@ -323,11 +327,32 @@
 <p>You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is below 1.0.</p>
 </td></tr></table><br>
 <h1>variables</h1>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ABSV </span>(command) var (decimal variable)</td></tr><tr><td class="description">
+<p>modifies var if negative so that its value is positive</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ACOS </span>(float) x (float)</td></tr><tr><td class="description">
+<p>returns arccosine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ADDV </span>(command) var (variable) add (integer)</td></tr><tr><td class="description">
 <p>returns var + add</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ASIN </span>(float) x (float)</td></tr><tr><td class="description">
+<p>returns arcsine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ATAN </span>(float) x (float)</td></tr><tr><td class="description">
+<p>returns arctangent of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">COS_ </span>(float) x (float)</td></tr><tr><td class="description">
+<p>returns cosine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">DIVV </span>(command) var (variable) div (decimal)</td></tr><tr><td class="description">
 <p>returns var / mul</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GNAM </span>(string)</td></tr><tr><td class="description">
+<p>returns running game (eg "Docking Station")</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">MODU </span>(string)</td></tr><tr><td class="description">
+<p>returns Docking Station engine string for now, should return modules loaded and display engine type</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">MODV </span>(command) var (variable) mod (integer)</td></tr><tr><td class="description">
 <p>returns var % mod</p>
@@ -356,10 +381,19 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SETV </span>(command) var (variable) value (decimal)</td></tr><tr><td class="description">
 <p>sets given variable to given number [int/float]</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SIN_ </span>(float) x (float)</td></tr><tr><td class="description">
+<p>returns sine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SUBV </span>(command) var (variable) sub (integer)</td></tr><tr><td class="description">
 <p>returns var - sub</p>
 </td></tr></table><br>
-<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VAxx </span>(variable)</td></tr><tr><td class="description">
-<p>script-local variables, 00 to 99 (todo: is this right?)</p>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TAN_ </span>(float) x (float)</td></tr><tr><td class="description">
+<p>returns tangent of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
 </td></tr></table><br>
-</body></html>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">UFOS </span>(string)</td></tr><tr><td class="description">
+<p>return 'uname -a' on platforms which support it, or OS details in another format otherwise</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VAxx </span>(variable)</td></tr><tr><td class="description">
+<p>script-local variables, 00 to 99</p>
+</td></tr></table><br>
+<p>130 documented commands: 18% of DS-era CEE, plus 6 openc2e-specific commands</p></body></html>
