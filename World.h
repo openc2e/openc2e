@@ -21,6 +21,7 @@
 #include "Agent.h"
 #include "Scriptorium.h"
 #include "Catalogue.h"
+#include "Camera.h"
 #include <set>
 #include <map>
 
@@ -48,6 +49,7 @@ public:
 	std::string handName;
 	float pace;
 	unsigned int ticktime;
+	MainCamera camera;
 
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
 	Agent *hand() { return theHand; }

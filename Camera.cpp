@@ -19,3 +19,23 @@
 
 #include "Camera.h"
 
+Camera::Camera() {
+	x = 0;
+	y = 0;
+	metaroom = 0;
+	panning = false;
+	trackedagent = 0;
+}
+
+void Camera::goToMetaroom(MetaRoom *m, int x, int y, cameratransition transition) {
+}
+
+void Camera::moveTo(int _x, int _y, panstyle pan) {
+}
+
+void Camera::trackAgent(class Agent *a, int xp, int yp, trackstyle s, cameratransition transition) {
+}
+
+void Camera::tick() {
+}
+					
