@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef _ENDIANLOVE_H
+#define _ENDIANLOVE_H
+
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
@@ -41,10 +44,5 @@ typedef unsigned int uint32;
 
 #endif
 
-#include <fstream>
-
-uint16 read16(std::istream &s);
-void write16(std::ostream &s, uint16 v);
-uint32 read32(std::istream &s);
-void write32(std::ostream &s, uint32 v);
+#endif
 

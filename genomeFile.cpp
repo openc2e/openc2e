@@ -1,5 +1,5 @@
 #include "genome.h"
-#include "endianlove.h"
+#include "streamutils.h"
 #include <typeinfo>
 #include <exception>
 #include <iostream>
