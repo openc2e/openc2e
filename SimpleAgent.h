@@ -18,10 +18,23 @@
  */
 
 #include "Agent.h"
+#include <string>
+
+#ifndef _C2E_SIMPLEAGENT_H
+#define _C2E_SIMPLEAGENT_H
 
 class SimpleAgent : public Agent {
+protected:
+	unsigned int first_image, image_count;
+
 public:
-	SimpleAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane) :
-		Agent(family, genus, species, plane) { }
+	SimpleAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
+							unsigned int firstimage, unsigned int imagecount) :
+		Agent(family, genus, species, plane) { first_image = firstimage; image_count = imagecount; }
+	unsigned int getFirstImage();
+	unsigned int getImageCount();
+	void setImage(std::string img);
+	virtual bool isSimple() { return false; }
 };
 
+#endif

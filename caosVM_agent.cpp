@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "CompoundAgent.h"
 #include "SimpleAgent.h"
+#include "World.h"
 #include <iostream>
 using std::cerr;
 
@@ -53,9 +54,10 @@ void caosVM::c_NEW_SIMP() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 
-	Agent *a = new SimpleAgent(family, genus, species, plane);
-	// todo: setup image stuff
-	// todo: add to world
+	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, first_image, image_count);
+	a->setImage(sprite_file);
+	world.addAgent(a);
+	targ.reset();
 	targ.setAgent(a);
 }
 
@@ -69,9 +71,10 @@ void caosVM::c_NEW_COMP() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 
-	Agent *a = new CompoundAgent(family, genus, species, plane);
-	// todo: setup image stuff
-	// todo: add to world
+	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, first_image, image_count);
+	a->setImage(sprite_file);
+	world.addAgent(a);
+	targ.reset();
 	targ.setAgent(a);
 }
 

@@ -18,4 +18,25 @@
  */
 
 #include "SimpleAgent.h"
+#include <string>
+#include <fstream>
+#include <iostream>
+#include "c16Image.h"
+#include "openc2e.h"
 
+unsigned int SimpleAgent::getFirstImage() {
+	// todo: adjust for BASE
+	return first_image;
+}
+
+unsigned int SimpleAgent::getImageCount() {
+	return image_count;
+}
+
+void SimpleAgent::setImage(std::string img) {
+	std::string filename = "./data/Images/" + img + ".c16";
+	std::cerr << "opening " << filename << "\n";
+	std::ifstream i(filename.c_str());
+	assert(i.is_open());
+	sprite = new c16Image(i);
+}

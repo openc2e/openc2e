@@ -17,11 +17,12 @@
  *
  */
 
-#include "Agent.h"
+#include "SimpleAgent.h"
 
-class CompoundAgent : public Agent {
+class CompoundAgent : public SimpleAgent {
 public:
-	CompoundAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane) :
-		Agent(family, genus, species, plane) { }
+	CompoundAgent(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
+								unsigned int firstimage, unsigned int imagecount) :
+		SimpleAgent(family, genus, species, plane, firstimage, imagecount) { }
 };
 

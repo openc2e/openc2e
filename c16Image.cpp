@@ -19,9 +19,10 @@
 
 #include "c16Image.h"
 #include "endianlove.h"
+#include "openc2e.h"
 
 c16Image::c16Image(std::istream &in) {
-  uint32 flags; uint16 spritecount; bool is_565;
+	uint32 flags; uint16 spritecount; bool is_565;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	// is_valid = (flags & 0x02);

@@ -33,6 +33,8 @@ public:
 	Map map;
 	std::list<Agent *> agents;
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
+
+	void addAgent(Agent *a);
 	
 	World();
 };

@@ -25,3 +25,7 @@ World world;
 World::World() {
 	setupCommandPointers();
 }
+
+void World::addAgent(Agent *a) {
+	agents.push_back(a);
+}

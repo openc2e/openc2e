@@ -18,6 +18,8 @@
  */
 
 #include "caosVM.h"
+#include "openc2e.h"
+#include "Agent.h"
 #include <iostream>
 using std::cerr;
 
@@ -31,5 +33,6 @@ void caosVM::c_MVTO() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	cerr << "unimplemented: MVTO\n";
+	assert(targ.agentValue);
+	targ.agentValue->moveTo(x, y);
 }

@@ -26,9 +26,15 @@ class Agent {
 protected:
 	unsigned int family, genus, species;
 	unsigned int plane;
-public:
 	creaturesImage *sprite;
+
+public:
+	creaturesImage *getSprite() { return sprite; }
+	unsigned int x, y;
+	void moveTo(unsigned int, unsigned int);
 	Agent(unsigned int f, unsigned int g, unsigned int s, unsigned int p);
+	virtual bool isSimple() { return false; }
+	virtual ~Agent() { }
 };
 
 #endif
