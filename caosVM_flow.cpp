@@ -197,7 +197,7 @@ void caosVM::c_GSUB() {
 			return;
 		}
 	}
-	std::cerr << "warning: GSUB didn't find matching SUBR for " << label << ", ignoring\n";
+	std::cerr << "warning: GSUB didn't find matching SUBR for " << label << " in " << (owner ? owner->identify() : "unowned script") << ", ignoring\n";
 }
 
 /**

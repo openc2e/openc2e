@@ -224,6 +224,8 @@ public:
 	void v_TRAN();
 	void c_TRAN();
 	void v_HGHT();
+	void c_HAND();
+	void v_HAND();
 
 	// motion
 	void c_ELAS();

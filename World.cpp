@@ -25,6 +25,7 @@
 World world;
 
 World::World() {
+	handName = "hand";
 }
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet

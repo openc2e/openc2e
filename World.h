@@ -45,6 +45,7 @@ public:
 	
 	Scriptorium scriptorium;
 	Catalogue catalogue;
+	std::string handName;
 
 	void addAgent(Agent *a);
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
