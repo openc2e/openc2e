@@ -10,17 +10,16 @@
 	};
 	29B97313FDCFA39411CA2CEA = {
 		activeBuildStyle = 4A9504CCFFE6A4B311CA0CBA;
-		activeExecutable = E7004EBB065F3F6F000FB224;
-		activeTarget = 29B97326FDCFA39411CA2CEA;
+		activeExecutable = E74DB7E306B460B300004BD4;
+		activeTarget = E74DB79F06B460B300004BD4;
 		addToTargets = (
-			29B97326FDCFA39411CA2CEA,
 		);
 		breakpoints = (
 			E765979B06B1C6AB00A0CA58,
 		);
 		codeSenseManager = E7004EC7065F3F9D000FB224;
 		executables = (
-			E7004EBB065F3F6F000FB224,
+			E74DB7E306B460B300004BD4,
 		);
 		perUserDictionary = {
 			PBXConfiguration.PBXFileTableDataSource3.PBXErrorsWarningsDataSource = {
@@ -42,9 +41,9 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					430,
+					206,
 					20,
-					79,
+					206,
 					43,
 					43,
 					20,
@@ -88,10 +87,10 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					347,
-					77,
+					324,
+					54,
 					20,
-					77,
+					54,
 					43,
 					43,
 				);
@@ -105,7 +104,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 112455298;
+			PBXPerProjectTemplateStateSaveDate = 112484442;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -268,6 +267,17 @@
 						recursive = 1;
 						regex = "?*\\.[mcMC]";
 						root = "<PROJECT>";
+					};
+				},
+				{
+					PBXTransientLocationAtTop = bottom;
+					clz = XDDesignSmartGroup;
+					description = "Displays Xdesign models";
+					globalID = 2E4A936305E6979E00701470;
+					name = Design;
+					preferences = {
+						image = Design;
+						isLeaf = 0;
 					};
 				},
 			);
@@ -650,9 +660,16 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "165 240 745 464 0 0 1024 746 ";
 			};
-			PBXWorkspaceStateSaveDate = 112455298;
+			PBXWorkspaceStateSaveDate = 112484442;
 		};
 		perUserProjectItems = {
+			E74DB7E506B460E700004BD4 = E74DB7E506B460E700004BD4;
+			E74DB7E606B460E700004BD4 = E74DB7E606B460E700004BD4;
+			E74DB7E706B4610B00004BD4 = E74DB7E706B4610B00004BD4;
+			E74DB7E806B4610D00004BD4 = E74DB7E806B4610D00004BD4;
+			E74DB7E906B4612C00004BD4 = E74DB7E906B4612C00004BD4;
+			E74DB7EA06B4614900004BD4 = E74DB7EA06B4614900004BD4;
+			E74DB7ED06B4617A00004BD4 = E74DB7ED06B4617A00004BD4;
 			E765975D06B1C0E400A0CA58 = E765975D06B1C0E400A0CA58;
 			E765976006B1C0F200A0CA58 = E765976006B1C0F200A0CA58;
 			E765976106B1C0F200A0CA58 = E765976106B1C0F200A0CA58;
@@ -723,33 +740,8 @@
 		userBuildSettings = {
 		};
 	};
-	29B97326FDCFA39411CA2CEA = {
-		activeExec = 0;
-		executables = (
-			E7004EBB065F3F6F000FB224,
-		);
-	};
-	E7004EBB065F3F6F000FB224 = {
-		activeArgIndex = 2147483647;
-		activeArgIndices = (
-		);
-		argumentStrings = (
-		);
-		configStateDict = {
-		};
-		debuggerPlugin = GDBDebugging;
-		dylibVariantSuffix = "";
-		enableDebugStr = 1;
-		environmentEntries = (
-		);
-		isa = PBXExecutable;
-		name = openc2e;
-		shlibInfoDictList = (
-		);
-		sourceDirectories = (
-		);
-	};
 	E7004EC6065F3F9D000FB224 = {
+		fallbackIsa = XCSourceControlManager;
 		isa = PBXSourceControlManager;
 		scmConfiguration = {
 		};
@@ -763,6 +755,7 @@
 		wantsCodeCompletionAutoPopup = 0;
 		wantsCodeCompletionAutoSuggestions = 0;
 		wantsCodeCompletionCaseSensitivity = 1;
+		wantsCodeCompletionListAlways = 1;
 		wantsCodeCompletionOnlyMatchingItems = 1;
 		wantsCodeCompletionParametersIncluded = 1;
 		wantsCodeCompletionPlaceholdersInserted = 1;
@@ -804,6 +797,100 @@
 			sepNavSelRange = "{2258, 0}";
 			sepNavVisRect = "{{0, 2}, {569, 446}}";
 		};
+	};
+	E74DB79F06B460B300004BD4 = {
+		activeExec = 0;
+		executables = (
+			E74DB7E306B460B300004BD4,
+		);
+	};
+	E74DB7E306B460B300004BD4 = {
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		configStateDict = {
+		};
+		cppStopOnCatchEnabled = 0;
+		cppStopOnThrowEnabled = 0;
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		isa = PBXExecutable;
+		libgmallocEnabled = 0;
+		name = openc2e;
+		shlibInfoDictList = (
+		);
+		sourceDirectories = (
+		);
+	};
+	E74DB7E506B460E700004BD4 = {
+		fRef = E765976E06B1C47A00A0CA58;
+		isa = PBXBookmark;
+	};
+	E74DB7E606B460E700004BD4 = {
+		fRef = E765976E06B1C47A00A0CA58;
+		isa = PBXTextBookmark;
+		name = "SDL_gfxPrimitives.c: 3287";
+		rLen = 0;
+		rLoc = 70425;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
+	};
+	E74DB7E706B4610B00004BD4 = {
+		fRef = E765976E06B1C47A00A0CA58;
+		isa = PBXTextBookmark;
+		name = "SDL_gfxPrimitives.c: 3287";
+		rLen = 0;
+		rLoc = 70425;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
+	};
+	E74DB7E806B4610D00004BD4 = {
+		fRef = E765976E06B1C47A00A0CA58;
+		isa = PBXTextBookmark;
+		name = "SDL_gfxPrimitives.c: 3287";
+		rLen = 0;
+		rLoc = 70425;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
+	};
+	E74DB7E906B4612C00004BD4 = {
+		fRef = E765976E06B1C47A00A0CA58;
+		isa = PBXTextBookmark;
+		name = "SDL_gfxPrimitives.c: 3287";
+		rLen = 0;
+		rLoc = 70425;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
+	};
+	E74DB7EA06B4614900004BD4 = {
+		fRef = E765976E06B1C47A00A0CA58;
+		isa = PBXTextBookmark;
+		name = "SDL_gfxPrimitives.c: 3287";
+		rLen = 0;
+		rLoc = 70425;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
+	};
+	E74DB7ED06B4617A00004BD4 = {
+		fRef = E765976E06B1C47A00A0CA58;
+		isa = PBXTextBookmark;
+		name = "SDL_gfxPrimitives.c: 3287";
+		rLen = 0;
+		rLoc = 70425;
+		rType = 0;
+		vrLen = 0;
+		vrLoc = 0;
 	};
 	E765975D06B1C0E400A0CA58 = {
 		fRef = E77716E406AF0C9900507FAF;
@@ -855,11 +942,19 @@
 		vrLen = 813;
 		vrLoc = 746;
 	};
+	E765976D06B1C47A00A0CA58 = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {562, 8820}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {562, 406}}";
+		};
+	};
 	E765976E06B1C47A00A0CA58 = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {734, 51925}}";
-			sepNavSelRange = "{70627, 22}";
-			sepNavVisRect = "{{0, 46053}, {561, 141}}";
+			sepNavIntBoundsRect = "{{0, 0}, {734, 51926}}";
+			sepNavSelRange = "{70425, 0}";
+			sepNavVisRect = "{{0, 0}, {0, 0}}";
+			sepNavWindowFrame = "{{15, 183}, {750, 558}}";
 		};
 	};
 	E765979B06B1C6AB00A0CA58 = {
