@@ -184,6 +184,8 @@ extern "C" int main(int argc, char *argv[]) {
 								adjusty += 20; break;
 							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
 								showrooms = !showrooms; break;
+							case SDLK_q:
+								done = true; break;
 							case SDLK_PAGEDOWN:
 								if (world.map.getCurrentMetaRoom()->id == 0)
 									break;
@@ -204,7 +206,7 @@ extern "C" int main(int argc, char *argv[]) {
 					}
 					break;
 				case SDL_QUIT:
-					done = 1;
+					done = true;
 					break;
 				default:
 					break;

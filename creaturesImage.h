@@ -45,6 +45,8 @@ public:
   void addRef() { refcount++; }
   void delRef() { refcount--; }
   unsigned int refCount() { return refcount; }
+	
+	friend class fileSwapper;
 };
 
 class imageGallery {

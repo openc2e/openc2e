@@ -1,8 +1,8 @@
 /*
- *  blkImage.h
+ *  fileSwapper.h
  *  openc2e
  *
- *  Created by Alyssa Milburn on Tue May 25 2004.
+ *  Created by Alyssa Milburn on Fri Jul 23 2004.
  *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -17,15 +17,15 @@
  *
  */
 
-#include "creaturesImage.h"
-#include <istream>
+#include <string>
 
-class blkImage : public creaturesImage {
+/*
+  Creatures file formats are little-endian. In order to mmap() them on big-endian,
+  we need to convert them. This class is a grouping for the conversion code.
+ */
+class fileSwapper {
 public:
-	unsigned int totalwidth, totalheight;
-
-	blkImage() { }
-  blkImage(std::istream &);
-	void readHeader(std::istream &in);
-	void writeHeader(std::ostream &s);
+/*	void convertc16(std::string directory, std::string name);
+	void converts16(std::string directory, std::string name); */
+	void convertblk(std::string directory, std::string name);
 };
