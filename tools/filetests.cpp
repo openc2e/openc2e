@@ -1,4 +1,5 @@
 #include "genome.h"
+#include "Catalogue.h"
 #include <fstream>
 #include <typeinfo>
 
@@ -40,15 +41,32 @@ void testGenetics() {
   }
 }
 
-int main() {
-  try {
-    cout << "\n*** genome test\n\n";
-    testGenetics();
-    cout << "\n*** done\n";
-  } catch (creatures::exception &t) {
-    cout << "exception raised: " << t.what() << "!\n";
-    return -1;
-  }
+void testCatalogue() {
+	Catalogue c;
+	c.initFrom("data/Catalogue/");
 
-  return 0;
+	cout << "\n*** dumping catalogue\n";
+
+	for (std::map<std::string, std::vector<string> >::iterator i = c.data.begin(); i != c.data.end(); i++) {
+		cout << endl << "TAG \"" << i->first << "\"" << endl;
+		for (std::vector<std::string>::iterator j = i->second.begin(); j != i->second.end(); j++) {
+			cout << "\"" << *j << "\"" << endl;
+		}
+	}
 }
+
+int main() {
+	try {
+//		cout << "\n*** genome test\n\n";
+//		testGenetics();
+		cout << "\n*** catalogue test\n\n";
+		testCatalogue();
+		cout << "\n*** done\n";
+	} catch (creaturesException &t) {
+		cout << "exception raised: " << t.what() << "!\n";
+		return -1;
+	}
+
+	return 0;
+}
+
