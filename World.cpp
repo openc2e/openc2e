@@ -34,6 +34,22 @@ void World::init() {
 	addAgent(theHand);
 }
 
+caosVM *World::getVM(Agent *a) {
+	if (vmpool.empty()) {
+		return new caosVM(a);
+	} else {
+		caosVM *x = vmpool.back();
+		vmpool.pop_back();
+		x->setOwner(a);
+		return x;
+	}
+}
+
+void World::freeVM(caosVM *v) {
+	v->setOwner(0);
+	vmpool.push_back(v);
+}
+
 void World::addAgent(Agent *a) {
 	agents.insert(a);
 }

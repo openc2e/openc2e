@@ -39,13 +39,17 @@ public:
 	std::multiset<Agent *, agentzorder> agents;
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
-
+	std::vector<caosVM *> vmpool;
+	
 	Scriptorium scriptorium;
 	Catalogue catalogue;
 
 	void addAgent(Agent *a);
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
 	Agent *hand() { return theHand; }
+	
+	caosVM *getVM(Agent *owner);
+	void freeVM(caosVM *);
 	
 	World();
 	void init();

@@ -59,6 +59,7 @@ protected:
 public:
 	void setTarg(Agent *a) { targ = a; part = 0; }
 	void setVariables(caosVar &one, caosVar &two) { _p_[0] = one; _p_[1] = two; }
+	void setOwner(Agent *a) { owner = a; }
 
 	// map
 	void v_ADDM();

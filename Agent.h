@@ -30,7 +30,7 @@ class Agent {
 
 protected:
 	caosVar var[100]; // OVxx
-	caosVM vm;
+	caosVM *vm;
 
 public:
 	bool carryable, mouseable, activateable, invisible, floatable;

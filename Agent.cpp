@@ -23,7 +23,7 @@
 #include <iostream>
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  visible(true), family(f), genus(g), species(s), zorder(p), vm(this), timerrate(0) {
+  visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0) {
   velx.setFloat(0.0f);
   vely.setFloat(0.0f);
   accg = 0.3f;
@@ -38,8 +38,9 @@ void Agent::moveTo(float _x, float _y) {
 void Agent::fireScript(unsigned short event) {
 	script &s = world.scriptorium.getScript(family, genus, species, event);
 	if (s.lines.empty()) return;
-	vm.fireScript(s, (event == 9));
-	vm.setTarg(this);
+	if (!vm) vm = world.getVM(this);
+	vm->fireScript(s, (event == 9));
+	vm->setTarg(this);
 	
 	// This slows us down too much :)
 #if 0
@@ -104,6 +105,6 @@ void Agent::tick() {
 		}
 	}
 
-	vm.tick();
+	if (vm) vm->tick();
 }
 

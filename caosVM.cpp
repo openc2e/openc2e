@@ -19,13 +19,11 @@
 
 #include "caosVM.h"
 #include "openc2e.h"
+#include "World.h"
 #include <iostream>
 
 caosVM::caosVM(Agent *o) {
-	owner = o;
-	// todo: if owner is Creature, set _it_
-	// todo: http://www.gamewaredevelopment.co.uk/cdn/cdn_more.php?CDN_article_id=37 discusses
-	// how targ is usually set to owner in event scripts, think about that
+	setOwner(o);
 	setTarg(owner);
 	resetScriptState();
 }
@@ -170,8 +168,8 @@ void caosVM::resetScriptState() {
 }
 
 void caosVM::tick() {
+	assert(currentscript);
 	if (blockingticks) { blockingticks--; return; }
-	if (!currentscript) return;
 	unsigned int n = 0;
 	// run 5 lines per tick
 	while ((currentline < currentscript->lines.size()) && (noschedule || n < 5)) {
@@ -181,6 +179,8 @@ void caosVM::tick() {
 	}
 	if (currentline == currentscript->lines.size()) {
 		currentscript = 0;
+		owner->vm = 0;
+		world.freeVM(this);
 		locked = false;
 	}
 }

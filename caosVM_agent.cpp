@@ -432,7 +432,7 @@ void caosVM::c_MESG_WRT() {
 	// I'm not sure how to handle the 'delay'; is it a background delay, or do we actually block for delay ticks?
 	
 	agent->fireScript(calculateScriptId(message_id));
-	agent->vm.setVariables(param_1, param_2);
+	agent->vm->setVariables(param_1, param_2);
 	// TODO: set _p_ in agent's VM to param_1 and param_2
 }
 
