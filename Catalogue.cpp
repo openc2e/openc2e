@@ -20,7 +20,7 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 		unsigned int stage = 0;
 		std::string t;
 		if (i[i.size() - 1] == '\r') i.erase(i.size() - 1);
-		// TODO: \\ -> \, anything else?
+		// TODO: \\ -> \, handle \n, anything else?
 
 		boost::char_separator<char> sep(" ");
 		boost::tokenizer<boost::char_separator<char> > tok(i, sep);
@@ -51,31 +51,29 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 				if (y.size() == 1) {
 					if (parsingstring) { parsingstring = false; wasparsingstring = true; }
 					else parsingstring = true;
-					continue;
+				} else {
+					std::string r = y;
+					r.erase(r.begin());
+					if (parsingtag || parsingarray) {
+						assert(stage == 1);
+					}
+					parsingstring = true;
+					if (y[y.size() - 1] == '"') { r.erase(r.size() - 1); parsingstring = false; wasparsingstring = true; }
+					t += r;
 				}
-				std::string r = y;
-				r.erase(r.begin());
-				if (parsingtag || parsingarray) {
-					assert(stage == 1);
-				}
-				parsingstring = true;
-				if (y[y.size() - 1] == '"') { r.erase(r.size() - 1); parsingstring = false; wasparsingstring = true; }
-				t += r;
 			} else if (y[y.size() - 1] == '"') {
-				if (y[y.size() - 2] == '\\') { t += y; continue; }
-				std::string r = y;
-				r.erase(r.size() - 1);
-				if (parsingtag || parsingarray) {
-					assert(stage == 1);
-					if (parsingarray) stage = 2;
-				}
-				assert(parsingstring);
-				parsingstring = false;
-				wasparsingstring = true;
-				t += " " + r;
-				if ((!parsingtag) && (!parsingarray)) {
-					std::cout << "catalogue appending value: " << t << std::endl;
-					x.push_back(t);
+				if (y[y.size() - 2] == '\\') t += y;
+				else {
+					std::string r = y;
+					r.erase(r.size() - 1);
+					if (parsingtag || parsingarray) {
+						assert(stage == 1);
+						if (parsingarray) stage = 2;
+					}
+					assert(parsingstring);
+					parsingstring = false;
+					wasparsingstring = true;
+					t += " " + r;
 				}
 			} else if (stage == 2) {
 				// check for a number, store it in arraysize..
@@ -84,6 +82,13 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 				t += " " + y;
 			} else {
 				std::cerr << "ERROR: didn't understand token '" << y << "' in: " << i << std::endl;
+			}
+
+			if (wasparsingstring && ((!parsingarray) && (!parsingtag))) {
+				std::cout << "catalogue appending value: " << t << std::endl;
+				wasparsingstring = false;
+				x.push_back(t);
+				t.clear();
 			}
 		}
 
