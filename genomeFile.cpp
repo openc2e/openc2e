@@ -42,7 +42,7 @@ void genomeFile::readNotes(istream &s) {
 			// TODO: we currently skip all the notes
 			for (int i = 0; i < 19; i++) {
 				uint16 skip = read16(s);
-				uint8 dummy[skip]; s.read((char *)dummy, skip);
+				uint8 *dummy = new uint8[skip]; s.read((char *)dummy, skip); delete[] dummy;
 			}
     		}
 
@@ -73,9 +73,9 @@ void genomeFile::readNotes(istream &s) {
 		s.read(buffer, buflen);
 		n->description = buffer;
 		buflen = read16(s);
-		delete buffer; buffer = new char[buflen];
+		delete[] buffer; buffer = new char[buflen];
 		n->comments = buffer;
-		delete buffer;		
+		delete[] buffer;		
 	}
 }
 
