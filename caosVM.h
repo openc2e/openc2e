@@ -339,7 +339,7 @@ public:
 	void runEntirely(script &s);
 	void tick();
 	void stop();
-	void fireScript(script &s, bool nointerrupt);
+	bool fireScript(script &s, bool nointerrupt);
 
 	caosVM(const AgentRef &o);
 

@@ -46,6 +46,8 @@ public:
 	Scriptorium scriptorium;
 	Catalogue catalogue;
 	std::string handName;
+	float pace;
+	unsigned int ticktime;
 
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
 	Agent *hand() { return theHand; }

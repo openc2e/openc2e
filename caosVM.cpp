@@ -140,11 +140,13 @@ void caosVM::runEntirely(script &s) {
 	currentscript = 0;
 }
 
-void caosVM::fireScript(script &s, bool nointerrupt) {
-	if (locked) return; // can't interrupt scripts which called LOCK
-	if (currentscript && nointerrupt) return; // don't interrupt scripts with a timer script
+bool caosVM::fireScript(script &s, bool nointerrupt) {
+	if (locked) return false; // can't interrupt scripts which called LOCK
+	if (currentscript && nointerrupt) return false; // don't interrupt scripts with a timer script
+
 	resetScriptState();
 	currentscript = &s;
+	return true;
 }
 
 void caosVM::resetScriptState() {
@@ -191,7 +193,7 @@ void caosVM::runCurrentLine() {
 	} catch (badParamException e) {
 		std::cerr << "caught badParamException while running '" << currentscript->dumpLine(currentline) << "' (line #" << i << ")" << std::endl;
 	} catch (notEnoughParamsException e) {
-		std::cerr << "caught notEnoughParamsException - this is an openc2e bug!\n";
+		std::cerr << "caught notEnoughParamsException while running '" << currentscript->dumpLine(currentline) << "' (line #" << i << ") - this is an openc2e bug!" << std::endl;
 	} catch (assertFailure e) {
 		std::cerr.flush();
 		std::cerr << "caught assert failure '" << e.what() << "' while running '" << currentscript->dumpLine(currentline) << "' (line #" << i << ")" << std::endl;

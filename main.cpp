@@ -1,3 +1,4 @@
+#include <sstream> // for istringstream, used in networking code
 #include <fstream>
 #include "openc2e.h"
 #include <iostream>
@@ -97,14 +98,14 @@ extern "C" int main(int argc, char *argv[]) {
 
 	std::sort(scripts.begin(), scripts.end());
 	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
-		std::ifstream script(i->c_str());
-		assert(script.is_open());
+		std::ifstream s(i->c_str());
+		assert(s.is_open());
 		std::cout << "executing script " << *i << "...\n";
 		std::cout.flush();
 		std::cerr.flush();
-		caosScript testscript(script);
-		caosVM testvm(0);
-		testvm.runEntirely(testscript.installer);
+		caosScript script(s);
+		caosVM vm(0);
+		vm.runEntirely(script.installer);
 		std::cout.flush();
 		std::cerr.flush();
 	}
@@ -155,17 +156,48 @@ extern "C" int main(int argc, char *argv[]) {
 
 	bool done = false;
 	unsigned int tickdata = 0;
+	unsigned int ticktime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	unsigned int ticktimeptr = 0;
 	while (!done) {
-		if (!paused && (backend.ticks() > (tickdata + 50))) {
-			world.tick(); // TODO: use BUZZ value
+		/*
+		 we calculate PACE below, but it's inaccurate because drawWorld(), our biggest cpu consumer, isn't in the loop
+		 this is because it makes the game seem terribly unresponsive..
+		*/
+		if (!paused && (backend.ticks() > (tickdata + world.ticktime))) {
+			ticktime[ticktimeptr] = backend.ticks();
+			
+			world.tick();
+			
+			ticktime[ticktimeptr] = backend.ticks() - ticktime[ticktimeptr];
+			ticktimeptr++;
+			if (ticktimeptr == 10) ticktimeptr = 0;
+			float avgtime = 0;
+			for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktime[i] / world.ticktime);
+			world.pace = avgtime / 10;
+			
 			tickdata = backend.ticks();
 		}
+			
 		drawWorld();
 		
-		TCPsocket connection;
+		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
+			std::string data;
+			bool done = false;
 
-		while (connection = SDLNet_TCP_Accept(listensocket)) {
-			std::cerr << "ignoring TCP connection!\n";
+			while (!done) {
+				char buffer;
+				int i = SDLNet_TCP_Recv(connection, &buffer, 1);
+				if (i == 1) {
+					data = data + buffer;
+					if ((data.size() > 3) && (data.find("rscr", data.size() - 4) != data.npos)) done = true;
+				} else done = true;
+			}
+
+			std::istringstream s(data);
+			caosScript script(s);
+			caosVM vm(0);
+			vm.runEntirely(script.installer);
+
 			SDLNet_TCP_Close(connection);
 		}
 
@@ -233,7 +265,7 @@ extern "C" int main(int argc, char *argv[]) {
 			}
 		}
 
-		static float accelspeed = 15, decelspeed = .8, maxspeed = 25;
+		static float accelspeed = 8, decelspeed = .5, maxspeed = 64;
 		static float velx = 0;
 		static float vely = 0;
 		Uint8 *keys = SDL_GetKeyState(NULL);

@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "World.h"
 
 /**
  PACE (float)
@@ -30,5 +31,6 @@
 */
 void caosVM::v_PACE() {
 	// todo: we should calculate this
-	result.setFloat(1.0f);
+	result.setFloat(world.pace);
 }
+

@@ -39,7 +39,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	dying = false;
 	unid = -1;
 
-	world.agents.insert(this);
+	zorder_iter = world.agents.insert(this);
 }
 
 Agent::~Agent() {
@@ -61,8 +61,8 @@ void Agent::fireScript(unsigned short event) {
 	script &s = world.scriptorium.getScript(family, genus, species, event);
 	if (s.lines.empty()) return;
 	if (!vm) vm = world.getVM(this);
-	vm->fireScript(s, (event == 9));
-	vm->setTarg(this);
+	if (vm->fireScript(s, (event == 9)))
+		vm->setTarg(this);
 	
 	// This slows us down too much :)
 #if 0
@@ -174,7 +174,7 @@ void Agent::zotrefs() {
 void Agent::setZOrder(unsigned int z) {
 	zorder = z;
 	world.agents.erase(zorder_iter);
-	world.agents.insert(this);
+	zorder_iter = world.agents.insert(this);
 }
 
 int Agent::getUNID() {

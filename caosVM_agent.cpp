@@ -397,7 +397,7 @@ void caosVM::v_SPCS() {
 void caosVM::v_PLNE() {
 	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
-	result.setInt(targ->zorder);
+	result.setInt(targ->getZOrder());
 }
 
 /**
@@ -528,6 +528,8 @@ void caosVM::c_FRAT() {
 
 /**
  OVER (command)
+
+ wait until the animation of the target agent or part is over
 */
 void caosVM::c_OVER() {
 	VM_VERIFY_SIZE(0)
@@ -627,8 +629,7 @@ void caosVM::c_PLNE() {
 	VM_PARAM_INTEGER(depth)
 
 	caos_assert(targ);
-	targ->zorder = depth;
-	// TODO: resort the storage vector!
+	targ->setZOrder(depth);
 }
 
 /**

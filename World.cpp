@@ -26,6 +26,7 @@ World world;
 
 World::World() {
 	handName = "hand";
+	ticktime = 50;
 }
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
