@@ -17,7 +17,7 @@
  *
  */
 
-#include "caosVM.h"
+#include "Agent.h"
 #include <iostream>
 using std::cerr;
 
@@ -27,6 +27,27 @@ using std::cerr;
 void caosVM::c_CLAC() {
   VM_VERIFY_SIZE(1)
   VM_PARAM_INTEGER(message)
-  
-  // TODO
+
+  caos_assert(targ);
+
+  targ->clac[0] = calculateScriptId(message);
+  targ->clik = -1;
 }
+
+/**
+ CLIK (command) msg1 (integer) msg2 (integer) msg3 (integer)
+*/
+void caosVM::c_CLIK() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(msg3)
+	VM_PARAM_INTEGER(msg2)
+	VM_PARAM_INTEGER(msg1)
+
+	caos_assert(targ);
+	
+	targ->clac[0] = calculateScriptId(msg1);
+	targ->clac[1] = calculateScriptId(msg2);
+	targ->clac[2] = calculateScriptId(msg3);
+	targ->clik = 0;
+}
+

@@ -27,6 +27,9 @@
 //#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
 
+// caosVM_agent.cpp:
+unsigned int calculateScriptId(unsigned int message_id);
+
 class caosVM {
 protected:
 	// script state...
@@ -311,6 +314,7 @@ public:
 	
 	// input
 	void c_CLAC();
+	void c_CLIK();
 
 	// vehicles
 	void c_CABN();

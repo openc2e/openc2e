@@ -416,7 +416,7 @@ unsigned int calculateScriptId(unsigned int message_id) {
 			return 0;
 		case 0: /* activate 1 */
 		case 1: /* activate 2 */
-			return message_id - 1;
+			return message_id + 1;
 	}
 
 	return message_id;

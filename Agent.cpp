@@ -31,6 +31,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	range = 500;
 	sufferphysics = false;
 	x = 0.0f; y = 0.0f;
+	clac[0] = 1; // activate 1
+	clik = -1;
 	
 	// AgentRef stuff
 	self.ref = this;

@@ -51,6 +51,7 @@ protected:
 	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
 
 public:
+	int clac[3]; int clik;
 	bool carryable, mouseable, activateable, invisible, floatable;
 	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
 	
