@@ -65,7 +65,7 @@ void caosVM::c_SETV() {
 	} else { // VM_PARAM_DECIMAL guarantees us float || int
 		var->setInt(value.intValue);
 	}
-	var->notifyChanged(); // do we need this? if so, stick it everywhere else
+//	var->notifyChanged(); // do we need this? if so, stick it everywhere else
 }
 
 /**

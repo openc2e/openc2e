@@ -37,7 +37,7 @@ struct caosVar {
 
 	void reset() { flags = 0; }
 	caosVar() { reset(); }
-	virtual ~caosVar() { } // we don't truly need this.
+	//virtual ~caosVar() { } // we don't truly need this.
 
 	bool empty() { return (flags == 0); }
 	bool hasInt() { return (flags & 1); }
@@ -50,7 +50,7 @@ struct caosVar {
 	void setAgent(Agent *i) { flags = flags | 8; agentValue = i; }
 	bool hasVariable() { return (flags & 16); }
 	void setVariable(caosVar *i) { flags = flags | 16; variableValue = i; }
-	virtual void notifyChanged() { }
+	//virtual void notifyChanged() { }
 
 	bool operator == (caosVar &v);
 	bool operator != (caosVar &v) { return !(*this == v); }
