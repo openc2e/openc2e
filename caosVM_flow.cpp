@@ -124,7 +124,7 @@ void caosVM::c_ENDI() {
 void caosVM::c_REPS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(reps)
-	assert(reps > 0)
+	assert(reps > 0);
 	repstack.push_back(reps);
 	linestack.push_back(currentline + 1);
 }

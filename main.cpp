@@ -52,6 +52,8 @@ void drawWorld() {
 namespace fs = boost::filesystem;
 
 extern "C" int main(int argc, char *argv[]) {
+	try {
+		
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004 Alyssa Milburn\n\n";
 
 	setupCommandPointers();
@@ -61,16 +63,23 @@ extern "C" int main(int argc, char *argv[]) {
 	std::vector<std::string> scripts;
 	fs::path scriptdir((argc > 1 ? argv[1] : "data/Bootstrap/001 World/"), fs::native);
 
-	assert(fs::exists(scriptdir));
-	assert(fs::is_directory(scriptdir));
-	fs::directory_iterator fsend;
-	for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
-		try {
-			if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
-				scripts.push_back(i->native_file_string());
-		} catch (fs::filesystem_error &ex) {
-			std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+	if (fs::exists(scriptdir) && fs::is_directory(scriptdir)) {
+		fs::directory_iterator fsend;
+		for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
+			try {
+				if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
+					scripts.push_back(i->native_file_string());
+			} catch (fs::filesystem_error &ex) {
+				std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+			}
 		}
+	} else {
+		if (argc > 1) {
+			std::cerr << "couldn't find script directory (trying " << argv[1] << ")!\n";
+		} else {
+			std::cerr << "couldn't find bootstrap directory!\n";
+		}
+		return 1;
 	}
 
 	std::sort(scripts.begin(), scripts.end());
@@ -196,5 +205,9 @@ extern "C" int main(int argc, char *argv[]) {
 	
 	SDL_Quit();
 
-	return(0);
+	} catch (creaturesException &e) {
+		std::cerr << "dying due to exception in main: " << e.what() << "\n";
+		return 1;
+	}
+	return 0;
 }

@@ -111,7 +111,7 @@ void Catalogue::reset() {
 	data.clear();
 }
 
-void Catalogue::initFrom(boost::filesystem::path path) {
+void Catalogue::initFrom(fs::path path) {
 	assert(fs::exists(path));
 	assert(fs::is_directory(path));
 	
@@ -137,3 +137,12 @@ void Catalogue::initFrom(boost::filesystem::path path) {
 	}	
 }
 
+const std::string Catalogue::getAgentName(unsigned char family, unsigned char genus, unsigned short species) const {
+	char buf[26]; // 11 + (3 + 1) + (3 + 1) + (5 + 1) + 1
+	sprintf(buf, "Agent Help %i %i %i", family, genus, species);
+	if (hasTag(buf)) {
+		return getTag(buf)[0];
+	} else {
+		return "";
+	}
+}

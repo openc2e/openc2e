@@ -36,14 +36,20 @@ void Agent::fireScript(unsigned char event) {
 	if (s.lines.empty()) return;
 	vm.fireScript(s, (event == 9));
 	vm.targ = this;
-	std::cout << "Agent::fireScript fired " << (unsigned int)family << " " << (unsigned int)genus << " " << species << " " << (unsigned int)event << std::endl;
+	std::cout << "Agent::fireScript fired " << (unsigned int)family << " " << (unsigned int)genus << " " << species << " ";
+	const std::string n = world.catalogue.getAgentName(family, genus, species);
+	if (n.size())
+		std::cout << "(" << n << ") ";
+	std::cout << (unsigned int)event << std::endl;
 }
 
 void Agent::tick() {
 	if (timerrate) {
 		tickssincelasttimer++;
-		if (tickssincelasttimer == timerrate)
+		if (tickssincelasttimer == timerrate) {
 			fireScript(9);
+			tickssincelasttimer = 0;
+		}
 	}
 
 	vm.tick();

@@ -91,7 +91,7 @@ protected:
   virtual void write(ostream &) const = 0;
   virtual void read(istream &) = 0;
 
-  friend genomeFile;
+  friend class genomeFile;
 
 public:
   geneNote note;

@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "openc2e.h"
 #include <iostream>
 
 using std::cout;
