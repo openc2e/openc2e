@@ -19,6 +19,9 @@
 
 #include "caosScript.h"
 
+#define CAOSDEBUG
+//#define CAOSDEBUGDETAIL
+
 class caosVM {
 protected:
 	caosVar var[100];

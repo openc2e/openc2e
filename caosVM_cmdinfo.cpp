@@ -37,19 +37,21 @@ cmdinfo *getCmdInfo(std::string cmd, bool command) {
 		varnumber = atoi(cmd.c_str() + 2);
 		cmd[2] = 'x';
 		cmd[3] = 'x';
-		// ^- ha ha bz2 forgot to uppercase the x's :P
 	}
-	// todo: um we shouldn't use phash_cmd for functions
 	unsigned int i = (command ?
 										phash_cmd(*((int *)cmd.c_str())) :
 										phash_func(*((int *)cmd.c_str())) );
 	cmdinfo *x = (command ? &cmds[i] : &funcs[i]);
 	if ((!x->twotokens) && (!x->method)) return 0;
 	if (x->name.compare(cmd)) {
-		//std::cerr << "getCmdInfo wanted " << cmd << " but got " << x->name << " out of the hash table!\n";
+#ifdef CAOSDEBUGDETAIL
+		// eventually, this should be moved to CAOSDEBUG
+		// but for now, the idiot parser calls getCmdInfo with command set to both true and false
+		// so we need to fix that first
+		std::cerr << "getCmdInfo wanted " << cmd << " but got " << x->name << " out of the hash table!\n";
+#endif
 		return 0;
 	}
-	// todo: set varnumber
 	return x;
 }
 

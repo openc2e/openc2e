@@ -20,9 +20,6 @@
 #include "caosVM.h"
 #include <iostream>
 
-#define CAOSDEBUG
-//#define CAOSDEBUGDETAIL
-
 caosVM::caosVM(Agent *o) {
 	owner = o;
 	// if owner is Creature, set _it_
@@ -33,6 +30,7 @@ caosVM::caosVM(Agent *o) {
 }
 
 bool caosVar::operator == (caosVar &v) {
+	// todo: should be able to compare int and float, apparently
 	if (this->hasInt() && v.hasInt()) {
 		return (this->intValue == v.intValue);
 	} else if (this->hasFloat() && v.hasFloat()) {
@@ -47,6 +45,8 @@ bool caosVar::operator == (caosVar &v) {
 }
 
 bool caosVar::operator > (caosVar &v) {
+	// todo: should be able to compare int and float, apparently
+	// todo: should be able to compare strings, apparently
 	if (this->hasInt() && v.hasInt()) {
 		return (this->intValue > v.intValue);
 	} else if (this->hasFloat() && v.hasFloat()) {
@@ -57,6 +57,8 @@ bool caosVar::operator > (caosVar &v) {
 }
 
 bool caosVar::operator < (caosVar &v) {
+	// todo: should be able to compare int and float, apparently
+	// todo: should be able to compare strings, apparently
 	if (this->hasInt() && v.hasInt()) {
 		return (this->intValue < v.intValue);
 	} else if (this->hasFloat() && v.hasFloat()) {
