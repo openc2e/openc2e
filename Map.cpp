@@ -27,8 +27,9 @@ void Map::Reset() {
 		delete *i;
 	}
 	metarooms.clear();
+	// todo: metarooms should be responsible for deleting rooms, so use the following instead of clear:
+	// assert(rooms.empty());
 	rooms.clear();
-	std::cout << "map reset\n";
 }
 
 void Map::SetMapDimensions(unsigned int w, unsigned int h) {
