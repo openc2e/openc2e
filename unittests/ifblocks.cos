@@ -1,7 +1,7 @@
 * unit tests for DOIF/ELIF/ELSE/ENDI blocks and comparison operators
 * fuzzie, 06/06/04
 
-DBG: OUTS "TEST: ifblocks: 15 tests"
+DBG: OUTS "TEST: ifblocks: 17 tests"
 
 * test equality
 DOIF 1 eq 1
@@ -9,9 +9,19 @@ DOIF 1 eq 1
 ELSE
  DBG: OUTS "FAIL"
 ENDI
+DOIF 0.5 eq 0.5
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
 
 * test non-equality
 DOIF 1 ne 2
+ DBG: OUTS "PASS"
+ELSE
+ DBG: OUTS "FAIL"
+ENDI
+DOIF 0.5 ne 0.7
  DBG: OUTS "PASS"
 ELSE
  DBG: OUTS "FAIL"

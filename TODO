@@ -5,3 +5,6 @@
 * start implementing physics
 * look at starting the sound code (and integrating SDL_mixer)
 * comparison should be 'condition', fuzzie sucks, regexp time!
+* the parser doesn't do bytestrings correctly
+* we don't parse characters or binary integers correctly
+* parser should provide line numbers for flow control
