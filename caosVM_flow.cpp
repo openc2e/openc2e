@@ -280,3 +280,38 @@ void caosVM::c_ESEE() {
 	targ = owner;
 	jumpToAfterEquivalentNext();
 }
+
+/**
+ ETCH (command) family (integer) genus (integer) species (integer)
+
+ like ENUM, but iterate through agents OWNR is touching
+*/
+void caosVM::c_ETCH() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+
+	// TODO: should probably implement this (ESEE)
+	
+	targ = owner;
+	jumpToAfterEquivalentNext();
+}
+
+/**
+ EPAS (command) family (integer) genus (integer) species (integer)
+
+ like ENUM, but iterate through OWNR vehicle's passengers
+*/
+void caosVM::c_EPAS() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 255);
+	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
+	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 65535);
+
+	// TODO: should probably implement this (ESEE)
+	
+	targ = owner;
+	jumpToAfterEquivalentNext();
+}
+

@@ -131,7 +131,7 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RSCR </span>(command)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
-<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRP </span>(command)</td></tr><tr><td class="description">
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SCRP </span>(command) family (integer) genus (integer) species (integer) event (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <h1>creatures</h1>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">STIM WRIT </span>(command) creature (agent) stimulus (integer) strength (float)</td></tr><tr><td class="description">
@@ -190,8 +190,14 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ENUM </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">EPAS </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p>like ENUM, but iterate through OWNR vehicle's passengers</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ESEE </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
 <p>like ENUM, but iterate through agents OWNR can see (todo: document exact rules)</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ETCH </span>(command) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
+<p>like ENUM, but iterate through agents OWNR is touching</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">EVER </span>(command)</td></tr><tr><td class="description">
 <p>Jump back to the matching LOOP, no matter what.</p>
@@ -241,9 +247,13 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GRAP </span>(integer) x (float) y (float)</td></tr><tr><td class="description">
 <p>return the id of the metaroom at (x, y), or -1 otherwise</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">GRID </span>(integer) agent (agent) direction (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">LEFT </span>(integer)</td></tr><tr><td class="description">
 <p>returns the left constant (0)</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">LINK </span>(command) room1 (integer) room2 (integer) perm (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">MAPD </span>(command) width (integer) height (integer)</td></tr><tr><td class="description">
 <p>set the map dimensions, inside which we place metarooms</p>
 </td></tr></table><br>
@@ -491,4 +501,4 @@
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">CABW </span>(command) cap (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
-<p>169 commands: 24% of DS-era CEE; 103 documented commands: 14% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>
+<p>173 commands: 25% of DS-era CEE; 105 documented commands: 14% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>

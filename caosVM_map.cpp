@@ -303,3 +303,22 @@ void caosVM::v_GMAP() {
 	}
 }
 
+/**
+ LINK (command) room1 (integer) room2 (integer) perm (integer)
+*/
+void caosVM::c_LINK() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(perm)
+	VM_PARAM_INTEGER(room2)
+	VM_PARAM_INTEGER(room1)
+}
+
+/**
+ GRID (integer) agent (agent) direction (integer)
+*/
+void caosVM::v_GRID() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_AGENT(agent)
+}
+

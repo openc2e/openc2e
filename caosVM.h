@@ -77,6 +77,8 @@ public:
 	void v_PERM();
 	void v_GRAP();
 	void v_GMAP();
+	void c_LINK();
+	void v_GRID();
 	
 	// camera
 	void c_CMRT();
@@ -131,6 +133,8 @@ public:
 	void c_RETN();
 	void c_ENUM();
 	void c_ESEE();
+	void c_ETCH();
+	void c_EPAS();
 	void c_NEXT();
 	
 	// debug
@@ -181,6 +185,7 @@ public:
 	void v_POSX();
 	void v_POSY();
 	void c_FRAT();
+	void c_NOHH();
 
 	// motion
 	void c_ELAS();
@@ -189,7 +194,9 @@ public:
 	void v_VELY();
 	void v_OBST();
 	void v_TMVT();
-
+	void v_RELY();
+	void c_VELO();
+	
 	// scripts
 	void c_INST();
 	void c_SLOW();
@@ -206,7 +213,9 @@ public:
 
 	// creatures
 	void c_STIM_WRIT();
-
+	void c_ZOMB();
+	void c_DIRN();
+	
 	// sounds
 	void c_SNDE();
 	void c_SNDC();
@@ -243,7 +252,10 @@ public:
 	// vehicles
 	void c_CABN();
 	void c_CABW();
-
+	void c_SPAS();
+	void c_GPAS();
+	void c_DPAS();
+	
 	// ports
 	void c_PRT_BANG();
 	void v_PRT_FRMA();

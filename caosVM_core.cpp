@@ -77,10 +77,11 @@ void caosVM::v_GAME() {
 }
 
 /**
- SCRP (command)
+ SCRP (command) family (integer) genus (integer) species (integer) event (integer)
 */
 void caosVM::c_SCRP() {
-	VM_VERIFY_SIZE(0)
+	VM_VERIFY_SIZE(4)
+	// TODO: throw something more intimidating
 	cerr << "hit SCRP. shouldn't ever happen.\n";
 }
 
