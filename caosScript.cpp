@@ -87,10 +87,10 @@ std::string script::dump() {
 }
 
 std::string caosScript::dump() {
-	std::string out = installer.dump();
-	out += removal.dump();
+	std::string out = "installation script:\n" + installer.dump();
+	out += "removal script:\n" + removal.dump();
 	for (std::vector<script>::iterator i = scripts.begin(); i != scripts.end(); i++) {
-		out += i->dump();
+		out += "agent script:\n" + i->dump();
 	}
 	return out;
 }
