@@ -49,9 +49,7 @@ void caosVM::jumpToNextIfBlock() {
 /**
  DOIF (command) condition (condition)
  
- Part of a DOIF/ELIF/ELSE/ENDI block. Jump to the next
- part of the block if condition is false, otherwise continue
- executing.
+ Part of a DOIF/ELIF/ELSE/ENDI block. Jump to the next part of the block if condition is false, otherwise continue executing.
 */
 void caosVM::c_DOIF() {
 	VM_VERIFY_SIZE(0)
@@ -63,9 +61,7 @@ void caosVM::c_DOIF() {
 /**
  ELIF (command) condition (condition)
  
- Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous
- DOIF/ELIF conditions have been true, and condition evaluates
- to true, then the code in the ELIF block is executed.
+ Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
 */
 void caosVM::c_ELIF() {
 	VM_VERIFY_SIZE(0)
@@ -77,8 +73,7 @@ void caosVM::c_ELIF() {
 /**
  ELSE (command)
  
- Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is
- jumped to when none of the previous DOIF/ELIF conditions are true.
+ Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
 */
 void caosVM::c_ELSE() {
 	VM_VERIFY_SIZE(0)

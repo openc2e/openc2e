@@ -39,7 +39,7 @@ void caosVM::c_META() {
 
 	assert(metaroom_id >= 0);
 	assert((unsigned int)metaroom_id < world.map.getMetaRoomCount());
-	world.map.SetCurrentMetaRoom(world.map.getCurrentMetaRoom()->id - 1);
+	world.map.SetCurrentMetaRoom(metaroom_id);
 
 /*
 	adjustx = world.map.getCurrentMetaRoom()->x() + camera_x;

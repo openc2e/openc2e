@@ -1,6 +1,3 @@
-#include <SDL/SDL.h>
-#include "SDL_gfxPrimitives.h"
-
 #include <fstream>
 #include "openc2e.h"
 #include <iostream>
@@ -10,8 +7,12 @@
 #include "World.h"
 #include "SimpleAgent.h"
 #include "caosVM.h"
+#include "SDLBackend.h"
 
-SDL_Surface *screen;
+#include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
+
+SDLBackend backend;
+
 SDL_Surface **backsurfs[20]; // todo: grab metaroom count, don't arbitarily define 20
 int adjustx, adjusty;
 bool showrooms = false, paused = false;
@@ -24,20 +25,20 @@ void drawWorld() {
 			unsigned int whereweare = j * (test->totalheight / 128) + i;
 			SDL_Rect destrect;
 			destrect.x = (j * 128) - adjustx + m->x(); destrect.y = (i * 128) - adjusty + m->y();
-			SDL_BlitSurface(backsurfs[m->id][whereweare], 0, screen, &destrect);
+			SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
 		}
 	}
 	if (showrooms) {
 		for (std::vector<Room *>::iterator i = world.map.getCurrentMetaRoom()->rooms.begin();
 				 i != world.map.getCurrentMetaRoom()->rooms.end(); i++) {
 			// ceiling
-			aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_ceiling - adjusty, 0xFF000077);
 			// floor
-			aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
 			// left side
-			aalineColor(screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_left - adjustx, (**i).y_left_ceiling - adjusty, (**i).x_left - adjustx, (**i).y_left_floor - adjusty, 0xFF000077);
 			// right side
-			aalineColor(screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
+			aalineColor(backend.screen, (**i).x_right  - adjustx, (**i).y_right_ceiling - adjusty, (**i).x_right - adjustx, (**i).y_right_floor - adjusty, 0xFF000077);
 		}
 	}
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
@@ -56,10 +57,10 @@ void drawWorld() {
 		SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
 		SDL_Rect destrect;
 		destrect.x = agent->x - adjustx; destrect.y = agent->y - adjusty;
-		SDL_BlitSurface(surf, 0, screen, &destrect);
+		SDL_BlitSurface(surf, 0, backend.screen, &destrect);
 		SDL_FreeSurface(surf);
 	}
-	SDL_UpdateRect(screen, 0, 0, 0, 0);
+	SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
 }
 
 extern "C" int main(int argc, char *argv[]) {
@@ -110,20 +111,8 @@ extern "C" int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	Uint32 initflags = SDL_INIT_VIDEO;
-	Uint8 video_bpp = 0;
-	Uint32 videoflags = SDL_SWSURFACE + SDL_RESIZABLE;
-	SDL_Event event;
-
-	if (SDL_Init(initflags) < 0) {
-		std::cerr << "SDL init failed: " << SDL_GetError() << std::endl;
-		return 1;
-	}
-
+	backend.init();
 	world.init();
-
-	screen = SDL_SetVideoMode(640, 480, video_bpp, videoflags);
-	assert(screen != 0);
 
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		world.map.SetCurrentMetaRoom(j);
@@ -145,10 +134,6 @@ extern "C" int main(int argc, char *argv[]) {
 	
 	world.map.SetCurrentMetaRoom(0);
 	
-	SDL_WM_SetCaption("openc2e - Creatures 3", "openc2e");
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	SDL_ShowCursor(false);
-
 	adjustx = world.map.getCurrentMetaRoom()->x();
 	adjusty = world.map.getCurrentMetaRoom()->y();
 	drawWorld();
@@ -156,15 +141,15 @@ extern "C" int main(int argc, char *argv[]) {
 	bool done = false;
 	unsigned int tickdata = 0;
 	while (!done) {
-		if (!paused && (SDL_GetTicks() > tickdata + 50)) world.tick(); // TODO: use BUZZ value
-		tickdata = SDL_GetTicks();
+		if (!paused && (backend.ticks() > tickdata + 50)) world.tick(); // TODO: use BUZZ value
+		tickdata = backend.ticks();
 		drawWorld();
 
+		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:
-					screen = SDL_SetVideoMode(event.resize.w, event.resize.h, video_bpp, videoflags);
-					assert(screen != 0);
+					backend.resizeNotify(event.resize.w, event.resize.h);
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + adjustx, event.motion.y + adjusty);

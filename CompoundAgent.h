@@ -89,4 +89,3 @@ public:
 	void addPart(int, CompoundPart *);
 	void delPart(int);
 };
-
