@@ -17,15 +17,22 @@
  *
  */
 
+#ifndef _OPENC2E_MMAPIFSTREAM_H
+#define _OPENC2E_MMAPIFSTREAM_H
+
 #include <string>
 #include <fstream>
 
 // todo: write destructor
 class mmapifstream : public std::ifstream {
 public:
+	bool live;
 	unsigned int filesize;
 	char *map;
+	mmapifstream() { live = false; }
 	mmapifstream(std::string filename);
 	~mmapifstream();
 	void mmapopen(std::string filename);
 };
+
+#endif

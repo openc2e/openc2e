@@ -19,20 +19,23 @@
 
 #include "creaturesImage.h"
 #include <istream>
+#include "mmapifstream.h"
 
 class c16Image : public creaturesImage {
 private:
 	unsigned int **lineoffsets;
 
 public:
-	c16Image();
-  c16Image(std::ifstream *);
+	c16Image() { }
+  c16Image(mmapifstream *);
 	void readHeader(std::istream &in);
+	void writeHeader(std::ostream &out);
 };
 
 class s16Image : public creaturesImage {
 public:
-	s16Image();
-  s16Image(std::ifstream *);
+	s16Image() { }
+  s16Image(mmapifstream *);
 	void readHeader(std::istream &in);
+	void writeHeader(std::ostream &out);
 };

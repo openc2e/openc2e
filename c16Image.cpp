@@ -24,7 +24,7 @@ void c16Image::readHeader(std::istream &in) {
 	uint32 flags; uint16 spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
-	// is_valid = (flags & 0x02);
+	assert(flags & 0x02);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 
   widths = new unsigned short[m_numframes];
@@ -45,7 +45,27 @@ void c16Image::readHeader(std::istream &in) {
 	}
 }
 
-c16Image::c16Image(std::ifstream *in) {
+void c16Image::writeHeader(std::ostream &s) {
+	unsigned int dw; unsigned short w;
+	
+	assert(false);
+	
+	dw = (is_565 ? 1 : 0);
+	dw = swapEndianLong(dw); s.write((char *)&dw, 4);
+	w = m_numframes;
+	w = swapEndianShort(w); s.write((char *)&w, 2);
+	
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		dw = offsets[i];
+		dw = swapEndianLong(dw); s.write((char *)&dw, 4);
+		w = widths[i];
+		w = swapEndianShort(w); s.write((char *)&w, 2);
+		w = heights[i];
+		w = swapEndianShort(w); s.write((char *)&w, 2);
+	}
+}
+
+c16Image::c16Image(mmapifstream *in) {
 	stream = in;
 
 	readHeader(*in);
@@ -98,23 +118,33 @@ void s16Image::readHeader(std::istream &in) {
 	}
 }
 
-s16Image::s16Image(std::ifstream *in) {
+void s16Image::writeHeader(std::ostream &s) {
+	unsigned int dw; unsigned short w;
+	
+	dw = (is_565 ? 1 : 0);
+	dw = swapEndianLong(dw); s.write((char *)&dw, 4);
+	w = m_numframes;
+	w = swapEndianShort(w); s.write((char *)&w, 2);
+	
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		dw = offsets[i];
+		dw = swapEndianLong(dw); s.write((char *)&dw, 4);
+		w = widths[i];
+		w = swapEndianShort(w); s.write((char *)&w, 2);
+		w = heights[i];
+		w = swapEndianShort(w); s.write((char *)&w, 2);
+	}
+}
+
+s16Image::s16Image(mmapifstream *in) {
 	stream = in;
 
 	readHeader(*in);
 	
 	buffers = new void *[m_numframes];
 
-	// read the files. this involves seeking around, and is hence immensely ghey
-	// todo: we assume the file format is valid here. we shouldn't.
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i] = new unsigned short[widths[i] * heights[i]];
-		in->seekg(offsets[i], std::ios::beg);
-		in->read((char *)buffers[i], (widths[i] * heights[i] * 2));
-		for (unsigned int k = 0; k < (unsigned int) (widths[i] * heights[i]); k++) {
-			((unsigned short *)buffers[i])[k] = swapEndianShort(((unsigned short *)buffers[i])[k]);
-		}
-	}
+	for (unsigned int i = 0; i < m_numframes; i++)
+		buffers[i] = in->map + offsets[i];
 
 	delete[] offsets;
 }

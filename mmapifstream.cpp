@@ -20,8 +20,10 @@
 #include "mmapifstream.h"
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <iostream> // debug needs only
 
 mmapifstream::mmapifstream(std::string filename) {
+	live = false;
 	mmapopen(filename);
 }
 
@@ -30,24 +32,29 @@ void mmapifstream::mmapopen(std::string filename) {
 	if (!is_open()) return;
 	// todo: store the FILE* somewhere?
 	FILE *f = fopen(filename.c_str(), "r");
-	if (!f) {
+	assert(f);
+/*	if (!f) {
 		close();
 		setstate(failbit);
 		perror("fopen");
 		return;
-	}
+	} */
 
 	// now do the mmap (work out filesize, then mmap)
 	int fno = fileno(f);
 	seekg(0, std::ios::end);
 	filesize = tellg();
+	assert((int)filesize != -1);
 	seekg(0, std::ios::beg);
-	
+
 	void *mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, fno, 0);
 	assert(mapr != (void *)-1);
-	map = (char *)mapr;	
+	map = (char *)mapr;
+	
+	live = true;
 }
 
 mmapifstream::~mmapifstream() {
-	munmap(map, filesize);
+	if (live)
+		munmap(map, filesize);
 }

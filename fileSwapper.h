@@ -25,7 +25,7 @@
  */
 class fileSwapper {
 public:
-/*	void convertc16(std::string directory, std::string name);
-	void converts16(std::string directory, std::string name); */
+	void convertc16(std::string directory, std::string name);
+	void converts16(std::string directory, std::string name);
 	void convertblk(std::string directory, std::string name);
 };

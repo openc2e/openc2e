@@ -48,9 +48,9 @@ void blkImage::writeHeader(std::ostream &s) {
 	
 	dw = (is_565 ? 1 : 0);
 	dw = swapEndianLong(dw); s.write((char *)&dw, 4);
-	w = totalwidth / 128; assert(w * 128 == totalwidth);
+	w = totalwidth / 128; assert((unsigned int)(w * 128) == totalwidth);
 	w = swapEndianShort(w); s.write((char *)&w, 2);
-	w = totalheight / 128; assert(w * 128 == totalheight);
+	w = totalheight / 128; assert((unsigned int)(w * 128) == totalheight);
 	w = swapEndianShort(w); s.write((char *)&w, 2);
 	w = m_numframes; assert(m_numframes == (unsigned int) ((totalwidth / 128) * (totalheight / 128)));
 	w = swapEndianShort(w); s.write((char *)&w, 2);

@@ -27,6 +27,38 @@
 
 imageGallery gallery;
 
+enum filetype { blk, s16, c16 };
+
+bool tryOpen(mmapifstream *in, std::string dir, std::string filename, filetype ft) {
+	std::string fname = dir + filename;
+#ifdef __C2E_BIGENDIAN
+  fname = fname + ".big";
+#endif
+	in->clear();
+	in->mmapopen(fname.c_str());
+#ifdef __C2E_BIGENDIAN
+	if (!in->is_open()) {
+		// todo: work out whether the to-be-converted from file exists here
+		// todo: spout a "trying to convert file" message here
+		fileSwapper f;
+		switch (ft) {
+			case blk:
+				f.convertblk(dir, filename);
+				break;
+			case s16:
+				f.converts16(dir, filename);
+				break;
+			case c16:
+				f.convertc16(dir, filename);
+				break;
+		}
+		in->clear();
+		in->mmapopen(fname.c_str());
+	}
+#endif
+	return in->is_open();
+}
+
 creaturesImage *imageGallery::getImage(std::string name) {
 	// step one: see if the image is already in the gallery
 	std::map<std::string, creaturesImage *>::iterator i = gallery.find(name);
@@ -37,39 +69,22 @@ creaturesImage *imageGallery::getImage(std::string name) {
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
-	std::string filename = "./data/Images/" + name + ".c16";
-	mmapifstream *in = new mmapifstream(filename.c_str());
-	if (!in->is_open()) {
-		filename = "./data/Images/" + name + ".s16";
-		in->clear();
-		in->mmapopen(filename.c_str());
-		if (!in->is_open()) { // final try: this might be in the format 'name.blk'
-			in->clear();
-#ifdef __C2E_LITTLEENDIAN
-			filename = "./data/Backgrounds/" + name;
-#else
-			filename = "./data/Backgrounds/" + name + ".big";
-#endif
-			in->mmapopen(filename.c_str());
-#ifdef __C2E_BIGENDIAN
-			if (!in->is_open()) {
-				fileSwapper f;
-				f.convertblk("./data/Backgrounds/", name);
-				in->clear();
-				in->mmapopen(filename.c_str());
-			}
-#endif
-			assert(in->is_open());
-			std::cout << "imageGallery: opened " << filename << "\n";
+	mmapifstream *in = new mmapifstream();
+
+	std::cout << "imageGallery is trying to open '" << name << "'" << std::endl;
+
+	if (!tryOpen(in, "./data/Images/", name + ".s16", s16)) {
+		if (!tryOpen(in, "./data/Images/", name + ".c16", c16)) {
+			bool lasttry = tryOpen(in, "./data/Backgrounds/", name, blk);
+			assert(lasttry);
 			gallery[name] = new blkImage(in);
 		} else {
-			std::cout << "imageGallery: opened " << filename << "\n";
-			gallery[name] = new s16Image(in);
+			gallery[name] = new c16Image(in);
 		}
 	} else {
-		std::cout << "imageGallery: opened " << filename << "\n";
-		gallery[name] = new c16Image(in);
+		gallery[name] = new s16Image(in);
 	}
+
 	return gallery[name];
 }
 

@@ -20,13 +20,62 @@
 #include "fileSwapper.h"
 #include <fstream>
 #include "blkImage.h"
+#include "c16Image.h"
 
-/* void convertc16(std::string directory, std::string name);
-void converts16(std::string directory, std::string name); */
+void fileSwapper::convertc16(std::string directory, std::string name) {
+	std::ifstream in((directory + name).c_str());
+	if (!in.is_open()) return;
+	std::ofstream out((directory + name + ".big").c_str());
+	assert(out.is_open());
+	
+	// okay. read the damn file.
+	c16Image img;
+	img.readHeader(in);
+}
+
+void fileSwapper::converts16(std::string directory, std::string name) {
+	std::ifstream in((directory + name).c_str());
+	if (!in.is_open()) return;
+	std::ofstream out((directory + name + ".big").c_str());
+	assert(out.is_open());
+	
+	// okay. read the damn file.
+	s16Image img;
+	img.readHeader(in);
+
+	img.buffers = new void *[img.m_numframes];
+	
+	for (unsigned int i = 0; i < img.m_numframes; i++) {
+		img.buffers[i] = new unsigned short[img.widths[i] * img.heights[i]];
+		in.seekg(img.offsets[i], std::ios::beg);
+		in.read((char *)img.buffers[i], (img.widths[i] * img.heights[i] * 2));
+		for (unsigned int k = 0; k < (unsigned int) (img.widths[i] * img.heights[i]); k++) {
+			((unsigned short *)img.buffers[i])[k] = swapEndianShort(((unsigned short *)img.buffers[i])[k]);
+		}
+	}
+
+	// okay, now we get the exciting bit, we get to write it to disk!
+	// step one: calculate offsets
+	unsigned int offset = 6 + (8 * img.m_numframes);
+	for (unsigned int i = 0; i < img.m_numframes; i++) {
+		img.offsets[i] = offset;
+		offset += img.widths[i] * img.heights[i] * 2;
+	}
+	
+	// step two: write data
+	img.writeHeader(out);
+	for (unsigned int i = 0; i < img.m_numframes; i++) {
+		out.write((char *)img.buffers[i], img.widths[i] * img.heights[i] * 2);
+	}
+	
+	for (unsigned int i = 0; i < img.m_numframes; i++) {
+		delete (uint16 *)img.buffers[i];
+	}
+}
 
 void fileSwapper::convertblk(std::string directory, std::string name) {
 	std::ifstream in((directory + name).c_str());
-	assert(in.is_open());
+	if (!in.is_open()) return;
 	std::ofstream out((directory + name + ".big").c_str());
 	assert(out.is_open());
 
