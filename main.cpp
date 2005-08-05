@@ -259,9 +259,9 @@ extern "C" int main(int argc, char *argv[]) {
 							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false);
 							if (handAgent) {
 								if (handAgent->mouseable) // hack: agentAt should check this
-									handAgent = 0;
-								else
 									handAgent->fireScript(4); // pickup
+								else
+									handAgent = 0;
 							}
 						}
 					}

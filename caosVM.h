@@ -147,6 +147,7 @@ public:
 	void v_P2();
 	void c_ANDV();
 	void c_ORRV();
+	void c_ADDS();
 
 	// flow
 	void c_DOIF();

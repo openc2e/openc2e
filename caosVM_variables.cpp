@@ -38,6 +38,20 @@ void caosVM::v_VAxx() {
 }
 
 /**
+ ADDS (command) var (variable) value (string)
+
+ var = var + value (ie, concaternate stings)
+*/
+void caosVM::c_ADDS() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_STRING(value)
+	VM_PARAM_VARIABLE(variable)
+
+	assert(variable->hasString());
+	variable->setString(variable->stringValue + value);
+}
+
+/**
  SETS (command) var (variable) value (string)
 
  sets given variable to given string
