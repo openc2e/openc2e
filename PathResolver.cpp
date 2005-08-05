@@ -38,7 +38,7 @@ static bool checkDirCache(path &dir);
 static bool doCacheDir(path &dir);
 
 /* C++ is far too verbose for its own good */
-string toLowerCase(string in) {
+static string toLowerCase(string in) {
     transform(in.begin(), in.end(), in.begin(), (int(*)(int))tolower);
     return in;
 }

@@ -62,17 +62,18 @@ OPENC2E = \
 	World.o \
 	PathResolver.o
 
-LDFLAGS=-lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net
-CFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
-CPPFLAGS=$(CFLAGS)
+XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net
+COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
+XCFLAGS=$(CFLAGS) $(COREFLAGS)
+XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
 all: openc2e tools/filetests tools/praydumper
 
 %.o: %.cpp
-	$(CXX) $(CPPFLAGS) -o $@ -c $<
+	$(CXX) $(XCPPFLAGS) -o $@ -c $<
 
 %.o: %.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(XCFLAGS) -o $@ -c $<
 
 caosdata.cpp caoshashes.cpp: $(wildcard caosVM_*.cpp)
 	cd caosdata; \
@@ -82,13 +83,13 @@ caosdata.cpp caoshashes.cpp: $(wildcard caosVM_*.cpp)
 # shamelessly ripped from info make, with tweaks
 .deps/%.d: %.c
 	mkdir -p `dirname $@`; \
-	$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+	$(CC) -M $(XCPPFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
 .deps/%.dpp: %.cpp
 	mkdir -p `dirname $@`; \
-	$(CXX) -M $(CPPFLAGS) $< > $@.$$$$; \
+	$(CXX) -M $(XCPPFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
@@ -101,13 +102,13 @@ include .deps/meta
 #		$($(wildcard *.cpp):.cpp=.dpp)
 
 openc2e: $(OPENC2E)
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
 tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
 tools/praydumper: tools/praydumper.o pray.o
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
