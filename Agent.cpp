@@ -101,42 +101,41 @@ void Agent::tick() {
 		/*} else */ if (r1) { // if we *are* actually in a room
 			// Otherwise, check the motion pixel-by-pixel. Oh boy.
 		
-			bool moved = true, collided = false;
+			bool moved = false, collided = false;
 
 			int ix = x, iy = y, idestx = destx, idesty = desty;
+            int dx = (ix < idestx ? 1 : -1);
+            int dy = (iy < idesty ? 1 : -1);
 			
-			if ((ix == idestx) && (iy != idesty)) { // vertical line
-				int direction = (iy < idesty ? 1 : -1);
+            while (ix != idestx || iy != idesty) {
+                // We just alternate here. There's probably a more
+                // accurate method, but meh
 
-				while (iy != idesty) {
-					iy += direction;
-
-					Room *room1 = world.map.roomAt(ix, iy);
-					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
-					if ((!room1) || (!room2)) {
-						iy -= direction;
-						collided = true;
-						break;
-					}
-				}
-			} else if ((iy == idesty) && (ix != idestx)) { // horizontal line
-				int direction = (ix < idestx ? 1 : -1);
-
-				while (ix != idestx) {
-					ix += direction;
+				if (iy != idesty) {
+					iy += dy;
 
 					Room *room1 = world.map.roomAt(ix, iy);
 					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
 					if ((!room1) || (!room2)) {
-						ix -= direction;
+						iy -= dy;
 						collided = true;
 						break;
 					}
 				}
-			} else if ((iy != idesty) && (ix != idestx)) { // sloped line
-				// TODO
-				moved = false;
-			} else moved = false; // else we ain't going anywhere
+
+				if (ix != idestx) {
+					ix += dx;
+
+					Room *room1 = world.map.roomAt(ix, iy);
+					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
+					if ((!room1) || (!room2)) {
+						ix -= dx;
+						collided = true;
+						break;
+					}
+				}
+                moved = true;
+			}
 			
 			vely.setFloat(newvely);
 			
