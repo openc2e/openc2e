@@ -336,6 +336,48 @@ void caosVM::v_GRID() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(direction)
 	VM_PARAM_AGENT(agent)
+
+	float agentx = agent->x + (agent->getWidth() / 2);
+	float agenty = agent->y + (agent->getHeight() / 2);
+	Room *sourceroom = world.map.roomAt(agentx, agenty);
+	if (!sourceroom) {
+		// (should we REALLY check for it being in the room system, here?)
+		cerr << agent->identify() << " tried using GRID but isn't in the room system!\n";
+		result.setInt(-1);
+		return;
+	}
+	Room *foundroom = 0;
+
+	if ((direction == 0) || (direction == 1)) {
+		int movement = (direction == 0 ? -1 : 1);
+
+		int x = agentx;
+		while (true) {
+			x += movement;
+			Room *r = world.map.roomAt(x, agenty);
+			if (r != sourceroom) {
+				foundroom = r;
+				break;
+			}
+		}
+	} else if ((direction == 2) || (direction == 3)) {
+		int movement = (direction == 2 ? -1 : 1);
+	
+		int y = agenty;
+		while (true) {
+			y += movement;
+			Room *r = world.map.roomAt(agentx, y);
+			if (r != sourceroom) {
+				foundroom = r;
+				break;
+			}
+		}
+	} else cerr << "GRID got an unknown direction!\n";
+
+	if (foundroom)
+		result.setInt(foundroom->id);
+	else
+		result.setInt(-1);
 }
 
 /**
@@ -357,7 +399,7 @@ void caosVM::c_EMIT() {
 void caosVM::v_WALL() {
 	VM_VERIFY_SIZE(0)
 
-	// XXX: fix this
+	// TODO XXX: fix this
 	v_DOWN();
 }
 
