@@ -87,58 +87,62 @@ void Agent::tick() {
 		//std::cout << x << ", " << y << ": " << destx << ", " << desty << "! " << accg << "\n";
 		Room *r1 = world.map.roomAt((unsigned int)x, (unsigned int)y);
 		if (!r1) {
-			std::cout << "not doing physics on agent, outside room system!\n";
+			std::cout << "not doing physics on agent " << identify() << ", outside room system!\n";
 		}
 		Room *r2 = world.map.roomAt((unsigned int)destx + getWidth(), (unsigned int)desty + getHeight());
 		Room *r3 = world.map.roomAt((unsigned int)destx, (unsigned int)desty);
 
-		if (r1 && (r1 == r2) && (r2 == r3)) {
-			vely.setFloat(newvely);
-			moveTo(destx, desty);
-		} else if (r1) {
-			physicsHandler p;
-
-			//std::cout << x + getWidth() / 2 << " " << y + getHeight() << " " << destx + (getWidth() / 2) << " " << desty + getHeight() << " " << r1->x_left << " " << r1->y_left_floor << " " << r1->x_right << " " << r1->y_right_floor << "\n";
-
-			bool c = p.collidePoints(x + (getWidth() / 2), y + getHeight(), destx + (getWidth() / 2), desty + getHeight(),
-					r1->x_left, r1->y_left_floor, r1->x_right, r1->y_right_floor);
+		//if (r1 && (r1 == r2) && (r2 == r3)) {
+			// If the object is already in a room, and the destination point is also in the room,
+			// for now we don't bother checking. We *should*, because (crazily) it could take a
+			// path out of the room and back in again, once we're doing more than dumb velocity.
+		//	vely.setFloat(newvely);
+		//	moveTo(destx, desty);
+		/*} else */ if (r1) { // if we *are* actually in a room
+			// Otherwise, check the motion pixel-by-pixel. Oh boy.
 		
-			bool hitfloor = false;
-			if (c) {
-				destx = p.getCollisionX() - (getWidth() / 2);
-				desty = p.getCollisionY() - getHeight();
-				if (desty != y) hitfloor = true;
-			}
+			bool moved = true;
 
-			r1 = world.map.roomAt(destx, desty);
-			r2 = world.map.roomAt(destx + getWidth() - 1, desty + getHeight() - 1);
+			int ix = x, iy = y, idestx = destx, idesty = desty;
+			
+			if ((ix == idestx) && (iy != idesty)) { // vertical line
+				int direction = (iy < idesty ? 1 : -1);
 
-			if (r1 && r2) {
-				// quick hack to see if we can travel to the next room
-				bool hacked = false;
-				if (r1 != r2) {
-					if (r1->doors[r2] && r1->doors[r2]->perm == 100) {
-						moveTo(destx, desty + 2);
-						vely.setFloat(newvely);
-						hacked = true;
+				while (iy != idesty) {
+					iy += direction;
+
+					Room *room1 = world.map.roomAt(ix, iy);
+					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
+					if ((!room1) || (!room2)) {
+						iy -= direction;
+						break;
 					}
 				}
-				if (!hacked) {
-					// okay, we can't travel to the next room.
-					moveTo(destx, desty);
-					// this is supposed to only fire if we hit the floor, but it's sort of iffy
-					vely.setFloat(newvely);
-					if (hitfloor) {
-						fireScript(6); // script Collision
-						if (vm) vm->setVariables(velx, vely);
+			} else if ((iy == idesty) && (ix != idestx)) { // horizontal line
+				int direction = (ix < idestx ? 1 : -1);
+
+				while (ix != idestx) {
+					ix += direction;
+
+					Room *room1 = world.map.roomAt(ix, iy);
+					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
+					if ((!room1) || (!room2)) {
+						ix -= direction;
+						break;
 					}
-					// then set vely to 0 so we don't do stupid things
-					vely.setFloat(0);
 				}
-			} else {
-				// we're not in the room system..
-				vely.setFloat(0);
+			} else if ((iy != idesty) && (ix != idestx)) { // sloped line
+				// TODO
+				moved = false;
+			} else moved = false; // else we ain't going anywhere
+			
+			if (moved) { // if we did actually try and go somewhere
+				// TODO: this totally destroys floatness!
+				x = ix;
+				y = iy;
 			}
+			
+			vely.setFloat(newvely);
 		}
 	} else {
 		if (vely.hasDecimal())
