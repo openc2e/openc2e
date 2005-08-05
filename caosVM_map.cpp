@@ -140,6 +140,7 @@ void caosVM::c_DOOR() {
 	// TODO: handle perm
 	Room *r1 = world.map.getRoom(room1);
 	Room *r2 = world.map.getRoom(room2);
+	caos_assert(r1); caos_assert(r2);
 	RoomDoor *door = r1->doors[r2];
 	if (!door) {
 		door = new RoomDoor;
@@ -182,8 +183,11 @@ void caosVM::v_ROOM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(agent)
 	
-	// TODO
-	result.setInt(0);
+	Room *r = world.map.roomAt(agent->x + (agent->getWidth() / 2), agent->y + (agent->getHeight() / 2));
+	if (r)
+		result.setInt(r->id);
+	else
+		result.setInt(-1);
 }
 
 /**

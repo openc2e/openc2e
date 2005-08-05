@@ -45,12 +45,14 @@ int Map::addMetaRoom(MetaRoom *m) {
 }
 
 MetaRoom *Map::getMetaRoom(unsigned int room) {
-	assert(room < metarooms.size());
+	if (room >= metarooms.size())
+		return 0;
 	return metarooms[room];
 }
 
 Room *Map::getRoom(unsigned int r) {
-	assert(r < rooms.size());
+	if (r >= rooms.size())
+		return 0;
 	return rooms[r];
 }
 
