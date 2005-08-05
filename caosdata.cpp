@@ -28,7 +28,8 @@ void setupCommandPointers() {
 	cmds = new cmdinfo[cmd_RANGE];
 	funcs = new cmdinfo[func_RANGE];
 
-	CMDDEF(RTAR, 3)
+	FUNCDEF(TOUC, 2)
+CMDDEF(RTAR, 3)
 DBLCMDDEF("NEW:")
 DBLCMD("NEW: SIMP", NEW_SIMP, 7)
 DBLCMD("NEW: COMP", NEW_COMP, 7)

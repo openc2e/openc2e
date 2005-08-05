@@ -27,6 +27,36 @@
 using std::cerr;
 
 /**
+ TOUC (integer) first (agent) second (agent)
+*/
+void caosVM::v_TOUC() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_AGENT(second)
+	VM_PARAM_AGENT(first)
+
+	result.setInt(0);
+
+	// I did this at 4:30am and have no idea if it works - fuzzie
+	if (first->x < second->x) {
+		if ((first->x + first->getWidth()) < second->x)
+			return;
+	} else {
+		if ((second->x + second->getWidth()) < first->x)
+			return;
+	}
+
+	if (first->y < second->y) {
+		if ((first->y + first->getHeight()) < second->y)
+			return;
+	} else {
+		if ((second->y + second->getHeight()) < first->y)
+			return;
+	}
+
+	result.setInt(1);
+}
+
+/**
  RTAR (command) family (integer) genus (integer) species (integer)
 
  set targ to random agent with given family/genus/species

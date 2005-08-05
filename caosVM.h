@@ -232,6 +232,7 @@ public:
 	void v_HGHT();
 	void c_HAND();
 	void v_HAND();
+	void v_TOUC();
 
 	// motion
 	void c_ELAS();
