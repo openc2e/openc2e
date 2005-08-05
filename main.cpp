@@ -154,6 +154,8 @@ extern "C" int main(int argc, char *argv[]) {
 	assert(listensocket);
 	std::cout << "listening on port " << listenport << std::endl;
 
+	Agent *handAgent = 0;
+
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		MetaRoom *m = world.map.getMetaRoom(j);
 		blkImage *test = m->backImage();
@@ -196,6 +198,9 @@ extern "C" int main(int argc, char *argv[]) {
 			world.pace = avgtime / 10;
 			
 			tickdata = backend.ticks();
+
+			if (handAgent)
+				handAgent->moveTo(world.hand()->x + 2, world.hand()->y + 2);
 		}
 			
 		drawWorld();
@@ -245,6 +250,14 @@ extern "C" int main(int argc, char *argv[]) {
 								a->fireScript(a->clac[0]);
 						}
 						else std::cout << "(mouse click ignored)" << std::endl;
+					} else if (event.button.button == SDL_BUTTON_RIGHT) {
+						// for now, hack!
+						if (handAgent)
+							handAgent = 0;
+						else {
+							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false);
+							if (!handAgent->mouseable) handAgent = 0; // hack: agentAt should check this
+						}
 					}
 					break;
 				case SDL_KEYDOWN:
