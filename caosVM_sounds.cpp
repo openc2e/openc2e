@@ -29,7 +29,7 @@ using std::cerr;
 void caosVM::c_SNDE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
-	cout << "snde tried to play " << filename << std::endl;
+	//cout << "snde tried to play " << filename << std::endl;
 }
 
 /**
@@ -38,7 +38,7 @@ void caosVM::c_SNDE() {
 void caosVM::c_SNDC() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
-	cout << "sndc tried to play " << filename << std::endl;
+	//cout << "sndc tried to play " << filename << std::endl;
 }
 
 /**
@@ -47,7 +47,7 @@ void caosVM::c_SNDC() {
 void caosVM::c_SNDL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
-	cout << "sndl tried to play " << filename << std::endl;
+	//cout << "sndl tried to play " << filename << std::endl;
 }
 
 /**
@@ -102,3 +102,4 @@ void caosVM::c_FADE() {
 	caos_assert(targ);
 	//TODO
 }
+

@@ -252,11 +252,17 @@ extern "C" int main(int argc, char *argv[]) {
 						else std::cout << "(mouse click ignored)" << std::endl;
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
 						// for now, hack!
-						if (handAgent)
+						if (handAgent) {
+							handAgent->fireScript(5); // drop
 							handAgent = 0;
-						else {
+						} else {
 							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false);
-							if (!handAgent->mouseable) handAgent = 0; // hack: agentAt should check this
+							if (handAgent) {
+								if (handAgent->mouseable) // hack: agentAt should check this
+									handAgent = 0;
+								else
+									handAgent->fireScript(4); // pickup
+							}
 						}
 					}
 					break;
