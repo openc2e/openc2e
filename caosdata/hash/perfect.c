@@ -622,8 +622,7 @@ hashform *form;                                           /* user directives */
   }
 
   /* allocate working memory */
-  *tabb = (bstuff *)malloc((size_t)(sizeof(bstuff)*(*blen)), 
-			   "perfect.c, tabb");
+  *tabb = (bstuff *)malloc((size_t)(sizeof(bstuff)*(*blen))); 
   tabq  = (qstuff *)remalloc(sizeof(qstuff)*(*blen+1), "perfect.c, tabq");
   tabh  = (hstuff *)remalloc(sizeof(hstuff)*(form->perfect == MINIMAL_HP ? 
 					     nkeys : *smax),
@@ -898,10 +897,8 @@ hashform *form;                                           /* user directives */
 	  *blen *= 2;
 	  free(tabq);
 	  free(*tabb);
-	  *tabb  = (bstuff *)malloc((size_t)(sizeof(bstuff)*(*blen)),
-				    "perfect.c, tabb");
-	  tabq  = (qstuff *)malloc((size_t)(sizeof(qstuff)*(*blen+1)),
-				   "perfect.c, tabq");
+	  *tabb  = (bstuff *)malloc((size_t)(sizeof(bstuff)*(*blen)));
+	  tabq  = (qstuff *)malloc((size_t)(sizeof(qstuff)*(*blen+1)));
 	}
 	else
 	{
@@ -928,10 +925,8 @@ hashform *form;                                           /* user directives */
 	  *blen *= 2;
 	  free(*tabb);
 	  free(tabq);
-	  *tabb  = (bstuff *)malloc((size_t)(sizeof(bstuff)*(*blen)),
-				    "perfect.c, tabb");
-	  tabq  = (qstuff *)malloc((size_t)(sizeof(qstuff)*(*blen+1)),
-				   "perfect.c, tabq");
+	  *tabb  = (bstuff *)malloc((size_t)(sizeof(bstuff)*(*blen)));
+	  tabq  = (qstuff *)malloc((size_t)(sizeof(qstuff)*(*blen+1)));
 	  --trysalt;               /* we know this salt got distinct (A,B) */
 	}
 	else
