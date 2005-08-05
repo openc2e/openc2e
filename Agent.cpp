@@ -101,7 +101,7 @@ void Agent::tick() {
 		/*} else */ if (r1) { // if we *are* actually in a room
 			// Otherwise, check the motion pixel-by-pixel. Oh boy.
 		
-			bool moved = true;
+			bool moved = true, collided = false;
 
 			int ix = x, iy = y, idestx = destx, idesty = desty;
 			
@@ -115,6 +115,7 @@ void Agent::tick() {
 					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
 					if ((!room1) || (!room2)) {
 						iy -= direction;
+						collided = true;
 						break;
 					}
 				}
@@ -128,6 +129,7 @@ void Agent::tick() {
 					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
 					if ((!room1) || (!room2)) {
 						ix -= direction;
+						collided = true;
 						break;
 					}
 				}
@@ -136,13 +138,19 @@ void Agent::tick() {
 				moved = false;
 			} else moved = false; // else we ain't going anywhere
 			
+			vely.setFloat(newvely);
+			
 			if (moved) { // if we did actually try and go somewhere
 				// TODO: this totally destroys floatness!
 				x = ix;
 				y = iy;
+				
+				if (collided) {
+					fireScript(6);
+					if (vm) vm->setVariables(velx, vely);
+					vely.setFloat(0);
+				}
 			}
-			
-			vely.setFloat(newvely);
 		}
 	} else {
 		if (vely.hasDecimal())
