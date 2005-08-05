@@ -65,7 +65,7 @@ caosVar caosVM::internalRun(std::list<token> &tokens, bool first) {
 	// if the command/function needs parameters, we suck them up
 	for (unsigned int i = 0; i < us->notokens; i++) {
 		if (tokens.empty()) throw notEnoughParamsException();
-		token &atoken = tokens.front();
+		token atoken = tokens.front();
 		if (atoken.type == token::FUNCTION) {
 			// if the token used for this parameter is a command/function
 			// then we execute it, passing it a reference to our tokens
