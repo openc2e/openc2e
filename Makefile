@@ -59,7 +59,8 @@ OPENC2E = \
 	SkeletalCreature.o \
 	streamutils.o \
 	Vehicle.o \
-	World.o
+	World.o \
+	PathResolver.o
 
 LDFLAGS=-lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net
 CFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.

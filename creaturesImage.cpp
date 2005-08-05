@@ -22,6 +22,7 @@
 #include "blkImage.h"
 #include "openc2e.h"
 #include "fileSwapper.h"
+#include "PathResolver.h"
 #include <iostream>
 #include <fstream>
 
@@ -35,6 +36,7 @@ bool tryOpen(mmapifstream *in, std::string dir, std::string filename, filetype f
   if (ft != c16) fname = fname + ".big";
 #endif
 	in->clear();
+	resolveFile(fname);
 	in->mmapopen(fname.c_str());
 #ifdef __C2E_BIGENDIAN
 	if (!in->is_open()) {
@@ -53,6 +55,7 @@ bool tryOpen(mmapifstream *in, std::string dir, std::string filename, filetype f
 				break;
 		}
 		in->clear();
+		resolveFile(fname);
 		in->mmapopen(fname.c_str());
 	}
 #endif
