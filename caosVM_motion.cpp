@@ -21,6 +21,7 @@
 #include "openc2e.h"
 #include "Agent.h"
 #include "AgentRef.h"
+#include "World.h"
 #include <iostream>
 using std::cerr;
 
@@ -67,12 +68,57 @@ void caosVM::v_VELY() {
 
 /**
  OBST (float) direction (integer)
+
+ returns distance from target agent to nearest wall that it might collide with in given direction
+ (except right now it just gives the direction to the nearest wall at world edge - fuzzie)
 */
 void caosVM::v_OBST() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(direction) assert(direction >= 0); assert(direction <= 3);
 
-	result.setFloat(0.0f);
+	// TODO: fix 'might collide with' issue
+	// note: this code is mostly copied from GRID - fuzzie
+
+	// TODO: this code should calculate distance *from agent*, not *from centre point*, i expect
+	// someone check with DS? - fuzzie
+
+	float agentx = targ->x + (targ->getWidth() / 2);
+	float agenty = targ->y + (targ->getHeight() / 2);
+	Room *sourceroom = world.map.roomAt(agentx, agenty);
+	if (!sourceroom) {
+		// (should we REALLY check for it being in the room system, here?)
+		cerr << targ->identify() << " tried using OBST but isn't in the room system!\n";
+		result.setInt(-1);
+		return;
+	}
+
+	int distance = 0;
+	
+	if ((direction == 0) || (direction == 1)) {
+		int movement = (direction == 0 ? -1 : 1);
+
+		int x = agentx;
+		while (true) {
+			x += movement;
+			Room *r = world.map.roomAt(x, agenty);
+			if (!r)
+				break;
+			distance++;
+		}
+	} else if ((direction == 2) || (direction == 3)) {
+		int movement = (direction == 2 ? -1 : 1);
+	
+		int y = agenty;
+		while (true) {
+			y += movement;
+			Room *r = world.map.roomAt(agentx, y);
+			if (!r)
+				break;
+			distance++;
+		}
+	} else cerr << "OBST got an unknown direction!\n";
+
+	result.setInt(distance);
 }
 
 /**
@@ -86,7 +132,10 @@ void caosVM::v_TMVT() {
 	VM_PARAM_FLOAT(x)
 
 	assert(targ);
-	result.setInt(1); // TODO: don't hardcode
+	// TODO: do this properly
+	Room *r1 = world.map.roomAt(x, y);
+	Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + (targ->getHeight() / 2));
+	result.setInt((r1 && r2) ? 1 : 0);
 }
 
 /**
