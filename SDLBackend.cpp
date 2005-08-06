@@ -61,7 +61,6 @@ void SDLBackend::playFile(std::string filename) {
 	while (i < nosounds) {
 		if (sounds[i] == 0) break;
 		if (!Mix_Playing(soundchannels[i])) {
-			Mix_FreeChunk(sounds[i]);
 			sounds[i] = 0;
 			break;
 		}
@@ -69,11 +68,17 @@ void SDLBackend::playFile(std::string filename) {
 	}
 	
 	if (i == nosounds) return; // no free slots, so return
-	
-	std::string fname = "data/Sounds/" + filename + ".wav"; // TODO: case sensitivity stuff
-	//std::cout << "trying to play " << fname << std::endl;
-	sounds[i] = Mix_LoadWAV(fname.c_str());
-	if (!sounds[i]) return;
+
+	std::map<std::string, Mix_Chunk *>::iterator it = soundcache.find(filename);
+	if (it != soundcache.end()) {
+		sounds[i] = (*it).second;
+	} else {
+		std::string fname = "data/Sounds/" + filename + ".wav"; // TODO: case sensitivity stuff
+		//std::cout << "trying to load " << fname << std::endl;
+		sounds[i] = Mix_LoadWAV(fname.c_str());
+		if (!sounds[i]) return;
+		soundcache[filename] = sounds[i];
+	}
 
 	soundchannels[i] = Mix_PlayChannel(-1, sounds[i], 0);
 	// Mix_SetPosition(soundschannels[i], angle in degrees, distance from 0 (near) to 255);

@@ -24,6 +24,7 @@
 #include "SDL_mixer.h"
 #include "creaturesImage.h"
 #include "endianlove.h"
+#include <map>
 
 extern class SDLBackend *g_backend; // global hack, for now
 
@@ -33,6 +34,8 @@ protected:
 	static const unsigned int nosounds = 12;
 	Mix_Chunk *sounds[12];
 	int soundchannels[12];
+
+	std::map<std::string, Mix_Chunk *> soundcache;
 	
 	int width, height;
 
