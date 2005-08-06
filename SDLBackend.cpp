@@ -22,30 +22,7 @@
 #include "openc2e.h"
 #include <strings.h> // bzero
 
-void mixAudio(SDLBackend *backend, uint8 *stream, int len) {
-	backend->mixAudio(stream, len);
-}
-
-void SDLBackend::mixAudio(uint8 *stream, int len) {
-	bzero(stream, len);
-
-	for (unsigned int i = 0; i < nosounds; ++i) {
-		if (!sounds_bitmap[i]) continue;
-		
-		unsigned int amount;
-		// if there isn't len audio left in the stream, make sure we 
-		if (sounds[i].dpos + len > sounds[i].dlen) {
-			amount = sounds[i].dlen - sounds[i].dpos;
-		} else {
-			amount = len;
-		}
-		
-		SDL_MixAudio(stream, &sounds[i].data[sounds[i].dpos], amount, SDL_MIX_MAXVOLUME);
-		
-		sounds[i].dpos += amount;
-		if (sounds[i].dpos == sounds[i].dlen) sounds_bitmap[i] = false;
-	}
-}
+SDLBackend *g_backend;
 
 void SDLBackend::resizeNotify(int _w, int _h) {
 	width = _w;
@@ -55,20 +32,49 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 }
 
 void SDLBackend::init() {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0) {
 		std::cerr << "SDL init failed: " << SDL_GetError() << std::endl;
 		assert(false);
 	}
-	
-	for (unsigned int i = 0; i < nosounds; ++i) {
-		sounds_bitmap[i] = false;
+
+	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0) {
+		std::cerr << "SDL_mixer init failed: " << Mix_GetError() << std::endl;
+		assert(false);
 	}
 
+	for (unsigned int i = 0; i++; i < nosounds) {
+		sounds[i] = 0;
+	}
+	
 	resizeNotify(640, 480);
 	
 	SDL_WM_SetCaption("openc2e - Creatures 3 (development build)", "openc2e");
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);
+}
+
+void SDLBackend::playFile(std::string filename) {
+	unsigned int i = 0;
+
+	while (i < nosounds) {
+		if (sounds[i] == 0) break;
+		if (!Mix_Playing(soundchannels[i])) {
+			Mix_FreeChunk(sounds[i]);
+			sounds[i] = 0;
+			break;
+		}
+		i++;
+	}
+	
+	if (i == nosounds) return; // no free slots, so return
+	
+	std::string fname = "data/Sounds/" + filename + ".wav"; // TODO: case sensitivity stuff
+	//std::cout << "trying to play " << fname << std::endl;
+	sounds[i] = Mix_LoadWAV(fname.c_str());
+	if (!sounds[i]) return;
+
+	soundchannels[i] = Mix_PlayChannel(-1, sounds[i], 0);
+	// Mix_SetPosition(soundschannels[i], angle in degrees, distance from 0 (near) to 255);
 }
 
 void SDLBackend::renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour) {
@@ -88,3 +94,4 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int 
 	SDL_BlitSurface(surf, 0, screen, &destrect);
 	SDL_FreeSurface(surf);
 }
+

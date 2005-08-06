@@ -23,6 +23,8 @@
 using std::cout;
 using std::cerr;
 
+#include "SDLBackend.h" // hack for now
+
 /**
  SNDE (command) filename (string)
 */
@@ -30,6 +32,8 @@ void caosVM::c_SNDE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 	//cout << "snde tried to play " << filename << std::endl;
+
+	g_backend->playFile(filename);
 }
 
 /**
@@ -39,6 +43,8 @@ void caosVM::c_SNDC() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 	//cout << "sndc tried to play " << filename << std::endl;
+
+	g_backend->playFile(filename);
 }
 
 /**

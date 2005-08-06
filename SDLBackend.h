@@ -21,23 +21,17 @@
 #define _SDLBACKEND_H
 
 #include <SDL/SDL.h>
+#include "SDL_mixer.h"
 #include "creaturesImage.h"
 #include "endianlove.h"
 
-struct sample {
-    uint8 *data;
-    uint32 dpos;
-    uint32 dlen;
-};
+extern class SDLBackend *g_backend; // global hack, for now
 
 class SDLBackend {
 protected:
 	static const unsigned int nosounds = 12;
-	bool sounds_bitmap[12];
-	sample sounds[12];
-
-	void mixAudio(uint8 *stream, int len);
-	friend void mixAudio(SDLBackend *backend, uint8 *stream, int len);
+	Mix_Chunk *sounds[12];
+	int soundchannels[12];
 	
 	int width, height;
 
@@ -45,9 +39,11 @@ public:
 	SDL_Surface *screen;
 	
 public:
+	SDLBackend() { g_backend = this; }
 	unsigned int ticks() { return SDL_GetTicks(); }
 	void init();
 	void resizeNotify(int _w, int _h);
+	void playFile(std::string filename);
 	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y);
 	void renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour);
 	int getWidth() const { return width; }
