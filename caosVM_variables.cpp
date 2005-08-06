@@ -414,3 +414,39 @@ void caosVM::v_P2() {
 	result.setVariable(&_p_[1]);
 }
 
+/**
+ AVAR (variable) agent (agent) index (integer)
+*/
+void caosVM::v_AVAR() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(index)
+	VM_PARAM_AGENT(agent)
+
+	assert(index > -1);
+	assert(index < 100);
+	assert(agent);
+	result = agent->var[index];
+	result.setVariable(&(agent->var[index]));
+}
+
+/**
+ VTOS (string) value (decimal)
+*/
+void caosVM::v_VTOS() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_DECIMAL(value)
+
+	// TODO: this is hacky!
+	char buffer[20];
+
+	if (value.hasInt()) {
+		sprintf(buffer, "%i", value.intValue);
+	} else {
+		caos_assert(value.hasFloat());
+		// TODO: this format isn't right (see OUTS also)
+		sprintf(buffer, "0%f", value.floatValue);
+	}
+
+	result.setString(buffer);
+}
+

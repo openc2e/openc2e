@@ -97,6 +97,8 @@
 <p>set relative x/y coords for TARG's pickup point</p>
 <p>pose is -1 for all poses, or a pose relative to the base specified in NEW: (not BASE)</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">PUPT </span>(command) pose (integer) x (integer) y (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RNGE </span>(command) distance (float)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">RNGE </span>(integer)</td></tr><tr><td class="description">
@@ -118,6 +120,9 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TICK </span>(command) tickrate (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TICK </span>(integer)</td></tr><tr><td class="description">
+<p>return tick rate of TARG</p>
+</td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TINT </span>(command) red_tint (integer) green_tint (integer) blue_tint (integer) rotation (integer) swap (integer)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">TOTL </span>(integer) family (integer) genus (integer) species (integer)</td></tr><tr><td class="description">
@@ -234,6 +239,9 @@
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SWAY SHOU </span>(command) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) </td></tr><tr><td class="description">
 <p>Adjust these four drives in all creatures which can hear OWNR</p>
+</td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VOCB </span>(command)</td></tr><tr><td class="description">
+<p>make target creature learn all vocabulary immediately</p>
 </td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ZOMB </span>(command) zombie (integer)</td></tr><tr><td class="description">
 <p>pass 1 to disconnect brain and motor of target creature, and 0 to undo</p>
@@ -589,6 +597,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">ATAN </span>(float) x (float)</td></tr><tr><td class="description">
 <p>returns arctangent of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">AVAR </span>(variable) agent (agent) index (integer)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">COS_ </span>(float) x (float)</td></tr><tr><td class="description">
 <p>returns cosine of x in degrees <font color="#ff0000">(currently radians, which is incorrect)</font></p>
 </td></tr></table><br>
@@ -649,6 +659,8 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VAxx </span>(variable)</td></tr><tr><td class="description">
 <p>script-local variables, 00 to 99</p>
 </td></tr></table><br>
+<table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">VTOS </span>(string) value (decimal)</td></tr><tr><td class="description">
+<p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">_P1_ </span>(variable)</td></tr><tr><td class="description">
 <p><font color="#ff0000">undocumented</font></p></td></tr></table><br>
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">_P2_ </span>(variable)</td></tr><tr><td class="description">
@@ -668,4 +680,4 @@
 <table align=center border=1 cellpadding=3 cellspacing=0 width="99%"><tr><td class="command"><span class="command">SPAS </span>(command) vehicle (agent) passenger (agent)</td></tr><tr><td class="description">
 <p>make specified vehicle agent pick up specified passenger</p>
 </td></tr></table><br>
-<p>240 commands: 35% of DS-era CEE; 133 documented commands: 19% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>
+<p>245 commands: 35% of DS-era CEE; 135 documented commands: 19% of DS-era CEE<br>(plus 6 openc2e-specific commands)</p></body></html>

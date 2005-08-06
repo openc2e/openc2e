@@ -198,3 +198,18 @@ void caosVM::v_CREA() {
 	else result.setInt(0);
 }
 
+/**
+ VOCB (command)
+
+ make target creature learn all vocabulary immediately
+*/
+void caosVM::c_VOCB() {
+	VM_VERIFY_SIZE(0)
+	
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
