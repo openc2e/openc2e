@@ -104,7 +104,7 @@ void caosVM::v_RMSC() {
  FADE (command)
 */
 void caosVM::c_FADE() {
-	VM_VERIFY_SIZE(2)
+	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
 	//TODO
 }
