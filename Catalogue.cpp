@@ -29,13 +29,15 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 
 			// std::cout << "Catalogue tokenizer got " << y << std::endl;
 
-			if (y[0] == '#') {
+			if ((y[0] == '#') || (y[0] == '*')) {
 				break;
 			}
 
 			if (parsingarray) assert(stage < 3);
 			if (parsingtag) assert(stage < 2);
-
+			
+			if (y == "OVERRIDE") continue; // TODO: handle this correctly, maybe (it's a DS thing) - fuzzie
+			
 			if (y == "TAG") {
 				assert(!parsingtag);
 				assert(!parsingarray);
