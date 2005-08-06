@@ -29,6 +29,7 @@ extern class SDLBackend *g_backend; // global hack, for now
 
 class SDLBackend {
 protected:
+	bool soundenabled;
 	static const unsigned int nosounds = 12;
 	Mix_Chunk *sounds[12];
 	int soundchannels[12];

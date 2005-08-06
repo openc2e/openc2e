@@ -38,9 +38,9 @@ void SDLBackend::init() {
 	}
 
 	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0) {
-		std::cerr << "SDL_mixer init failed: " << Mix_GetError() << std::endl;
-		assert(false);
-	}
+		std::cerr << "SDL_mixer init failed, disabling sound: " << Mix_GetError() << std::endl;
+		soundenabled = false;
+	} else soundenabled = true;
 
 	for (unsigned int i = 0; i++; i < nosounds) {
 		sounds[i] = 0;
@@ -54,6 +54,8 @@ void SDLBackend::init() {
 }
 
 void SDLBackend::playFile(std::string filename) {
+	if (!soundenabled) return;
+
 	unsigned int i = 0;
 
 	while (i < nosounds) {
