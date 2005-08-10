@@ -98,9 +98,15 @@ void caosVM::v_OBST() {
 		int movement = (direction == 0 ? -1 : 1);
 
 		int x = agentx;
+		Room *r = 0;
 		while (true) {
 			x += movement;
-			Room *r = world.map.roomAt(x, agenty);
+			if (r) {
+				if (!r->containsPoint(x, agenty))
+					r = world.map.roomAt(x, agenty);
+			} else {
+				r = world.map.roomAt(x, agenty);
+			}
 			if (!r)
 				break;
 			distance++;
@@ -109,9 +115,15 @@ void caosVM::v_OBST() {
 		int movement = (direction == 2 ? -1 : 1);
 	
 		int y = agenty;
+		Room *r = 0;
 		while (true) {
 			y += movement;
-			Room *r = world.map.roomAt(agentx, y);
+			if (r) {
+				if (!r->containsPoint(agentx, y))
+					r = world.map.roomAt(agentx, y);
+			} else {
+				r = world.map.roomAt(agentx, y);
+			}
 			if (!r)
 				break;
 			distance++;
