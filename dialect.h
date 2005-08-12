@@ -35,6 +35,7 @@ class Dialect {
 		}
 		virtual bool parseOne(class caosScript *s);
 		virtual void handleToken(class caosScript *s, token *t);
+		virtual void eof() {};
 		virtual ~Dialect() {};
 };
 
@@ -44,6 +45,9 @@ class OneShotDialect : public Dialect {
 	public:
 		void doParse(class caosScript *s) {
 			Dialect::parseOne(s);
+		}
+		void eof() {
+			throw caosException("unexpected EOF");
 		}
 };
 

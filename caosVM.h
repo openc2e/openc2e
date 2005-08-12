@@ -433,7 +433,10 @@ public:
 
 typedef void (caosVM::*caosVMmethod)();
 
-class notEnoughParamsException { };
+class notEnoughParamsException : caosException {
+	public:
+		notEnoughParamsException() : caosException("Not enough parameters") {}
+};
 class badParamException : public caosException {
 	public:
 		badParamException() : caosException("parameter type mismatch") {}

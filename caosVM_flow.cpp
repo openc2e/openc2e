@@ -274,6 +274,8 @@ void caosVM::c_CALL() {
  Run commands as caos code. If inline, copy _IT_ VAxx TARG OWNR, etc. If state_trans, copy FROM and OWNR. if !throws or catches, catch errors and stuff them in report (XXX: non-conforming)
 */
 
+// XXX: exception catching is very broken right now
+
 void caosVM::v_CAOS() {
 	// XXX: capture output
 	VM_PARAM_VARIABLE(report)
@@ -303,20 +305,23 @@ void caosVM::v_CAOS() {
 	sub->_p_[1] = p2;
 	try {
 		std::istringstream iss(commands);
+		std::ostringstream oss;
 		caosScript *s = new caosScript("CAOS command");
 		s->parse(iss);
 		s->installScripts();
+		sub->outputstream = &oss;
 		sub->runEntirely(s->installer);
-	} catch (std::exception &e) {
+		result.setString(oss.str());
+	} catch (caosException &e) {
 		if (!throws || catches) {
 			report->setString(e.what());
+			result.setString("###");
 		} else {
 			world.freeVM(sub);
 			throw e;
 		}
 	}
 	world.freeVM(sub);
-	result.setString("XXX");
 }
 
 

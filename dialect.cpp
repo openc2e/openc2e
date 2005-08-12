@@ -74,8 +74,10 @@ void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {
 bool Dialect::parseOne(caosScript *s) {
 	token *t;
 	t = getToken();
-	if (!t)
+	if (!t) {
+		eof();
 		return false;
+	}
 	handleToken(s, t);
 	return true;
 }
