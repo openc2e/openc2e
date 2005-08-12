@@ -22,6 +22,7 @@
 #include "openc2e.h"
 #include "World.h" // enum
 #include <cmath>   // sqrt
+#include <sstream>
 
 /**
  DOIF (command) condition (condition)
@@ -265,6 +266,57 @@ void caosVM::c_CALL() {
 		world.freeVM(newvm);
 
 	stop_loop = true;
+}
+
+/**
+ CAOS (string) inline (integer) state_trans (integer) p1 (anything) p2 (anything) commands (string) throws (integer) catches (integer) report (variable)
+
+ Run commands as caos code. If inline, copy _IT_ VAxx TARG OWNR, etc. If state_trans, copy FROM and OWNR. if !throws or catches, catch errors and stuff them in report (XXX: non-conforming)
+*/
+
+void caosVM::v_CAOS() {
+	// XXX: capture output
+	VM_PARAM_VARIABLE(report)
+	VM_PARAM_INTEGER(catches)
+	VM_PARAM_INTEGER(throws)
+	VM_PARAM_STRING(commands)
+	VM_PARAM_VALUE(p2)
+	VM_PARAM_VALUE(p1)
+	VM_PARAM_INTEGER(state_trans)
+	VM_PARAM_INTEGER(inl)
+	
+	caosVM *sub = world.getVM(NULL);
+	if (inl) {
+		for (int i = 0; i < 100; i++)
+			sub->var[i] = var[i];
+		sub->targ = targ;
+		sub->_it_ = _it_;
+		sub->part = part;
+		sub->owner = owner;
+		// sub->from = from;
+	}
+	if (state_trans) {
+		sub->owner = owner;
+		// sub->from = from;
+	}
+	sub->_p_[0] = p1;
+	sub->_p_[1] = p2;
+	try {
+		std::istringstream iss(commands);
+		caosScript *s = new caosScript("CAOS command");
+		s->parse(iss);
+		s->installScripts();
+		sub->runEntirely(s->installer);
+	} catch (std::exception &e) {
+		if (!throws || catches) {
+			report->setString(e.what());
+		} else {
+			world.freeVM(sub);
+			throw e;
+		}
+	}
+	world.freeVM(sub);
+	result.setString("XXX");
 }
 
 

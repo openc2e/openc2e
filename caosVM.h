@@ -233,6 +233,7 @@ public:
 	void c_EPAS();
 	void c_NEXT();
 	void c_CALL();
+	void v_CAOS();
 	
 	// debug
 	void c_TEST_PASS();
