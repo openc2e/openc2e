@@ -85,7 +85,7 @@ void caosVM::v_OBST() {
 	Room *sourceroom = world.map.roomAt(agentx, agenty);
 	if (!sourceroom) {
 		// (should we REALLY check for it being in the room system, here?)
-		cerr << targ->identify() << " tried using OBST but isn't in the room system!\n";
+		//cerr << targ->identify() << " tried using OBST but isn't in the room system!\n";
 		result.setInt(-1);
 		return;
 	}
