@@ -25,3 +25,4 @@ void write16(std::ostream &s, uint16 v);
 uint32 read32(std::istream &s);
 void write32(std::ostream &s, uint32 v);
 
+/* vim: set noet: */

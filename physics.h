@@ -259,3 +259,4 @@ Point operator+(const Vector &v, const Point &p);
 Point operator+(const Point &p, const Vector &v);
 
 #endif
+/* vim: set noet: */

@@ -98,7 +98,7 @@ DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, 
 }
 
 ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-			               unsigned int _z, std::string animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
+						   unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
 }
 
 // TODO: combine identical code from SimpleAgent/CompoundAgent
@@ -149,3 +149,4 @@ void CompoundPart::tick() {
 	}
 }
 
+/* vim: set noet: */

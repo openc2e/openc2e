@@ -179,3 +179,4 @@ protected:
 	virtual void read(istream &);
 	virtual void write(ostream &) const;
 };
+/* vim: set noet: */

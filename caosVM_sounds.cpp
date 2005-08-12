@@ -109,3 +109,4 @@ void caosVM::c_FADE() {
 	//TODO
 }
 
+/* vim: set noet: */

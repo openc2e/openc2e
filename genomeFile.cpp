@@ -17,7 +17,7 @@ geneNote *genomeFile::findNote(uint8 type, uint8 subtype, uint8 which) {
 	if (typeid(*t) == typeid(organGene))
 		for (vector<gene *>::iterator y = ((organGene *)t)->genes.begin(); y != ((organGene *)t)->genes.end(); y++) {
 			gene *s = *y;
-        		if ((uint8)s->type() == type)
+				if ((uint8)s->type() == type)
 				if ((uint8)s->subtype() == subtype)
 					if ((uint8)s->note.which == which)
 						return &s->note;
@@ -44,7 +44,7 @@ void genomeFile::readNotes(istream &s) {
 				uint16 skip = read16(s);
 				uint8 *dummy = new uint8[skip]; s.read((char *)dummy, skip); delete[] dummy;
 			}
-    		}
+			}
 
 		uint16 ver = 0;
 
@@ -141,8 +141,8 @@ gene *genomeFile::nextGene(istream &s) {
 		|| (typeid(*g) == typeid(bioEmitter)))
 		|| (typeid(*g) == typeid(bioReceptor))) {
 		if (currorgan == 0) {
-        		if (cversion == 1) genes.push_back(g); // Creatures 1 doesn't have organs
-        		else throw genomeException("reaction/emitter/receptor without an attached organ");
+				if (cversion == 1) genes.push_back(g); // Creatures 1 doesn't have organs
+				else throw genomeException("reaction/emitter/receptor without an attached organ");
 		} else currorgan->genes.push_back(g);
 	} else {
 		genes.push_back(g);
@@ -581,3 +581,4 @@ istream &operator >> (istream &s, oldDendriteInfo &i) {
 	return s;
 }
 
+/* vim: set noet: */

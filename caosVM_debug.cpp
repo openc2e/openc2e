@@ -119,7 +119,7 @@ void caosVM::c_TEST_FINI() {
  this is NO GOOD for persisting!
 
 XXX: when serialization support work, this might well become good for
-     persisting :)
+	 persisting :)
 */
 void caosVM::v_UNID() {
 	VM_VERIFY_SIZE(0)
@@ -139,3 +139,4 @@ void caosVM::v_AGNT() {
 	result.setAgent(world.lookupUNID(id));
 }
 
+/* vim: set noet: */

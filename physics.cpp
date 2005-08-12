@@ -158,3 +158,4 @@ int main() {
 }
 #endif
 
+/* vim: set noet: */

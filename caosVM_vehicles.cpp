@@ -92,3 +92,4 @@ void caosVM::c_DPAS() {
 	// TODO
 }
 
+/* vim: set noet: */

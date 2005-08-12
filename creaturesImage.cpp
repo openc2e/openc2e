@@ -104,3 +104,4 @@ void imageGallery::delImage(creaturesImage *in) {
 	}
 }
 
+/* vim: set noet: */

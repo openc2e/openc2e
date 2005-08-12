@@ -57,7 +57,7 @@ protected:
 
 public:
 	ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-			   unsigned int _z, std::string animhover, int msgid, int option);
+			   unsigned int _z, const bytestring &animhover, int msgid, int option);
 };
 
 class CameraPart : public CompoundPart {
@@ -92,7 +92,7 @@ public:
 
 class CompoundAgent : public Agent {
 protected:
-    std::vector<CompoundPart *> parts;
+	std::vector<CompoundPart *> parts;
 
 	unsigned int width, height;
 
@@ -113,3 +113,4 @@ public:
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 };
+/* vim: set noet: */

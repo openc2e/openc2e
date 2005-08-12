@@ -42,3 +42,4 @@ public:
 	MetaRoom *metaRoomAt(unsigned int, unsigned int);
 	Room *roomAt(unsigned int, unsigned int);
 };
+/* vim: set noet: */

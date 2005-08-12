@@ -73,39 +73,52 @@ void caosVM::v_GAME() {
 	VM_PARAM_STRING(name)
 
 	caosVar &i = world.variables[name];
-	result = i;
-	result.setVariable(&i);
+	valueStack.push_back(&i);
 }
 
 /**
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
+ %pragma noparse
 */
-void caosVM::c_SCRP() {
-	VM_VERIFY_SIZE(4)
-	// TODO: throw something more intimidating
-	cerr << "hit SCRP. shouldn't ever happen.\n";
-}
 
 /**
  RSCR (command)
+ %pragma noparse
+ 
 */
-void caosVM::c_RSCR() {
-	VM_VERIFY_SIZE(0)
-	cerr << "hit RSCR. shouldn't ever happen.\n";
-}
 
 /**
  ISCR (command)
+
+ XXX
 */
 void caosVM::c_ISCR() {
 	VM_VERIFY_SIZE(0)
-	cerr << "hit ISCR. shouldn't ever happen.\n";
+	// STOP
 }
 
 /**
  ENDM (command)
 */
 void caosVM::c_ENDM() {
-	VM_VERIFY_SIZE(0)
-	c_STOP();
+	stop();
 }
+
+
+/**
+ RGAM (command)
+
+ No-op for now.
+ */
+void caosVM::c_RGAM() {}
+
+/**
+ MOWS (integer)
+
+ Returns whether the lawn was cut last sunday or not.
+ */
+void caosVM::v_MOWS() {
+	result.setInt(0); // We're too busy coding to mow the lawn.
+}
+
+/* vim: set noet: */

@@ -59,3 +59,4 @@ void Camera::tick() {
 	// TODO
 }
 					
+/* vim: set noet: */

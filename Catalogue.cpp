@@ -148,3 +148,4 @@ const std::string Catalogue::getAgentName(unsigned char family, unsigned char ge
 		return "";
 	}
 }
+/* vim: set noet: */

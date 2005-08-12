@@ -289,12 +289,12 @@ void caosVM::v_POSE() {
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
-	if (a != world.hand())
+	if (a != AgentRef(world.hand()))
 		a->kill();
 }
 
 /**
- ANIM (command) poselist (byte-string)
+ ANIM (command) poselist (bytestring)
 
  set the animation string for TARG, in the format '1 2 3 4'
  if it ends with '255', loop back to beginning; if it ends with '255 X', loop back to frame X
@@ -303,7 +303,7 @@ void caosVM::c_KILL() {
 */
 void caosVM::c_ANIM() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_STRING(poselist)
+	VM_PARAM_BYTESTR(bs)
 
 	std::vector<unsigned int> *animation;
 
@@ -319,23 +319,8 @@ void caosVM::c_ANIM() {
 		animation = &a->animation;
 	}
 	
-	animation->clear();
+	*animation = bs;
 
-	std::string oh;
-	for (unsigned int i = 0; i < poselist.size(); i++) {
-		if (poselist[i] != ' ') {
-			if (!isdigit(poselist[i])) throw badParamException();
-			oh += poselist[i];
-		} else {
-			unsigned int j = (unsigned int)atoi(oh.c_str());
-			animation->push_back(j);
-			oh.clear();
-		}
-	}
-	if (!oh.empty()) {
-		unsigned int j = (unsigned int)atoi(oh.c_str());
-		animation->push_back(j);
-	}
 	if (!animation->empty()) {
 		if (c) c->part(part)->setFrameNo(0);
 		else a->setFrameNo(0);
@@ -471,9 +456,8 @@ void caosVM::c_MESG_WRIT() {
 void caosVM::c_MESG_WRT() {
 	VM_VERIFY_SIZE(5)
 	VM_PARAM_INTEGER(delay)
-	// TODO: make into macros
-	caosVar param_2 = params.back(); params.pop_back();
-	caosVar param_1 = params.back(); params.pop_back();
+	VM_PARAM_VALUE(param_2)
+	VM_PARAM_VALUE(param_1)
 	VM_PARAM_INTEGER(message_id)
 	VM_PARAM_AGENT(agent)
 
@@ -556,33 +540,47 @@ void caosVM::c_FRAT() {
 	}
 }
 
+class blockUntilOver : public blockCond {
+	protected:
+		AgentRef targ;
+		int part;
+	public:
+		blockUntilOver(Agent *t, int p) : targ(t), part(p) {}
+		virtual bool operator()() {
+			bool blocking;
+			int fno, animsize;
+
+			if (!targ) return false;
+			
+			CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+			if (c) {
+				CompoundPart *p = c->part(part);
+				fno = p->getFrameNo();
+				animsize = p->animation.size();
+			} else {
+				SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
+				caos_assert(a);
+				fno = a->getFrameNo();
+				animsize = a->animation.size();
+			}
+
+			if (fno + 1 == animsize) blocking = false;
+			else if (animsize == 0) blocking = false;
+			else blocking = true; 
+			return blocking;
+		}
+};
+  
+
 /**
  OVER (command)
 
  wait until the animation of the target agent or part is over
 */
 void caosVM::c_OVER() {
-	VM_VERIFY_SIZE(0)
-
 	caos_assert(targ);
-
-	int fno, animsize;
 	
- 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c) {
-		CompoundPart *p = c->part(part);
-		fno = p->getFrameNo();
-		animsize = p->animation.size();
-	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-		caos_assert(a);
-		fno = a->getFrameNo();
-		animsize = a->animation.size();
-	}
-
-	if (fno + 1 == animsize) blocking = false;
-	else if (animsize == 0) blocking = false;
-	else blocking = true;
+	startBlocking(new blockUntilOver(targ, part));
 }
 
 /**
@@ -806,3 +804,4 @@ void caosVM::c_PUPT() {
 	// TODO
 }
 
+/* vim: set noet: */

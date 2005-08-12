@@ -24,3 +24,4 @@ Creature::Creature(genomeFile *g, unsigned char _family, bool is_female, unsigne
 	female = is_female;
 }
 
+/* vim: set noet: */

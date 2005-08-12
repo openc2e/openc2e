@@ -1,0 +1,84 @@
+body {
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+#index li {
+    /* try to fit it all in one line */
+    display: inline;
+}
+
+.command {
+    border-style: groove;
+    margin-bottom: 1em;
+}
+
+.header {
+    border-bottom: groove;
+    background: #f8f8ff;
+}
+
+.cmdname {
+    color: navy;
+    font-size: larger
+}
+
+.cmdtype {
+    font-size: smaller;
+    font-style: italic;
+}
+
+.argname {
+    text-transform: uppercase;
+}
+
+.argtype {
+    font-size: smaller;
+    font-style: italic;
+}
+
+.nodocs {
+    font-size: smaller;
+    font-style: italic;
+}
+
+.description {
+    border-bottom: groove;
+    background-color: #f8f8f8;
+}
+
+.administrivia {
+    font-size: smaller;
+    margin: 0;
+    padding: 0;
+}
+
+.administrivia ul {
+    margin: 0;
+    padding: 0;
+}
+
+.administrivia li {
+    list-style-type: none;
+}
+
+.administrivia li li {
+    list-style-type: disc;
+}
+
+.status {
+    border-bottom: groove;
+    font-size: smaller;
+}
+
+
+.st_ok {
+    background-color: #88ff88;
+}
+
+.st_todo {
+    background-color: #ff8888;
+}
+
+.st_maybe {
+    background-color: #8888ff;
+}

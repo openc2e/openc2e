@@ -149,3 +149,4 @@ void caosVM::v_WNDT() {
 	result.setInt(0); // TODO
 }
 
+/* vim: set noet: */

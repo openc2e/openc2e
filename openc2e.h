@@ -21,7 +21,11 @@
 #define __OPENC2E_H
 
 #include <iostream>
+#include <cassert>
+#include <vector>
 #include "exceptions.h"
+
+typedef std::vector<unsigned int> bytestring;
 
 // assertFailure segfaults the app
 class assertFailure : public creaturesException {
@@ -29,8 +33,7 @@ public:
 	assertFailure(const char *x) throw() : creaturesException(x) { }
 };
 
-#undef assert
-#define caos_assert(x) if (!(x)) { throw assertFailure(#x); }
-#define assert(x) caos_assert(x)
+#define caos_assert(x) if (!(x)) { throw tracedAssertFailure(#x, __FILE__, __LINE__); }
 
 #endif
+/* vim: set noet: */

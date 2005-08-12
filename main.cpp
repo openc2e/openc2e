@@ -12,6 +12,7 @@
 #include "caosVM.h"
 #include "SimpleAgent.h"
 #include "SDLBackend.h"
+#include "dialect.h"
 
 #include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
 #include "SDL_net.h"
@@ -88,7 +89,7 @@ extern "C" int main(int argc, char *argv[]) {
 		
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2005 Alyssa Milburn\n\n";
 
-	setupCommandPointers();
+	registerDelegates();
 	world.init();
 	world.catalogue.initFrom("data/Catalogue/");
 	// moved backend.init() here because we need the camera to be valid - fuzzie
@@ -128,11 +129,19 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout << "executing script " << *i << "...\n";
 		std::cout.flush();
 		std::cerr.flush();
-		caosScript script(s);
-		caosVM vm(0);
-		vm.runEntirely(script.installer);
+		try {
+			caosScript *script = new caosScript(*i);
+			script->parse(s);
+			caosVM vm(0);
+			script->installScripts();
+			vm.runEntirely(script->installer);
+		} catch (creaturesException &e) {
+			std::cerr << "script exec failed due to exception " << e.what();
+			std::cerr << std::endl;
+		}
 		std::cout.flush();
 		std::cerr.flush();
+//        Collectable::doCollect();
 	}
 
 	if (world.map.getMetaRoomCount() == 0) {
@@ -181,6 +190,7 @@ extern "C" int main(int argc, char *argv[]) {
 	unsigned int ticktime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	unsigned int ticktimeptr = 0;
 	while (!done) {
+//        Collectable::doCollect();
 		/*
 		 we calculate PACE below, but it's inaccurate because drawWorld(), our biggest cpu consumer, isn't in the loop
 		 this is because it makes the game seem terribly unresponsive..
@@ -219,11 +229,13 @@ extern "C" int main(int argc, char *argv[]) {
 			}
 
 			std::istringstream s(data);
-			caosScript script(s);
+			caosScript *script = new caosScript("<network>");
+			script->parse(s);
+			script->installScripts();
 			caosVM vm(0);
 			std::ostringstream o;
 			vm.setOutputStream(o);
-			vm.runEntirely(script.installer);
+			vm.runEntirely(script->installer);
 			SDLNet_TCP_Send(connection, (void *)o.str().c_str(), o.str().size());
 
 			SDLNet_TCP_Close(connection);
@@ -264,6 +276,13 @@ extern "C" int main(int argc, char *argv[]) {
 									handAgent = 0;
 							}
 						}
+					} else if (event.button.button = SDL_BUTTON_MIDDLE) {
+						Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), true);
+						if (a)
+							std::cout << "Agent under mouse is " << a->identify();
+						else
+							std::cout << "No agent under cursor";
+						std::cout << std::endl;
 					}
 					break;
 				case SDL_KEYDOWN:
@@ -366,3 +385,4 @@ extern "C" int main(int argc, char *argv[]) {
 	return 0;
 }
 
+/* vim: set noet: */

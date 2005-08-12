@@ -29,9 +29,9 @@
 #endif
 
 static inline std::string stringify(double x) {
-        std::ostringstream o;
-        if (!(o << x)) throw "stringify() failed";
-        return o.str();
+		std::ostringstream o;
+		if (!(o << x)) throw "stringify() failed";
+		return o.str();
 }
 
 std::string caosVar::dump() const {
@@ -83,3 +83,4 @@ bool caosVar::operator < (const caosVar &v) const {
 }
 
 
+/* vim: set noet: */

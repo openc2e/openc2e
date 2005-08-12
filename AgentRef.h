@@ -65,3 +65,4 @@ public:
 
 #endif
 
+/* vim: set noet: */

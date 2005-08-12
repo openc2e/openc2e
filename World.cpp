@@ -27,6 +27,7 @@ World world;
 World::World() {
 	handName = "hand";
 	ticktime = 50;
+	tickcount = 0;
 }
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
@@ -61,6 +62,7 @@ void World::tick() {
 		assert(rip->dying);
 		delete rip;
 	}
+	tickcount++;
 	// todo: tick rooms
 }
 
@@ -96,3 +98,4 @@ void World::freeUNID(int unid) {
 Agent *World::lookupUNID(int unid) {
 	return unidmap[unid];
 }
+/* vim: set noet: */

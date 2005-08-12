@@ -31,18 +31,79 @@
 // caosVM_agent.cpp:
 unsigned int calculateScriptId(unsigned int message_id);
 
+#define LVAL 1
+#define RVAL 2
+#define BYTESTR 4
+					
+struct vmStackItem {
+	public:
+		int type;
+		caosVar i_val;
+		caosVar *p_val;
+		std::vector<unsigned int> bytestring;
+
+		vmStackItem(const caosVar &v) {
+			i_val = v;
+			p_val = &i_val;
+			type = LVAL;
+		}
+
+		vmStackItem(caosVar *p) {
+			p_val = p;
+			type = LVAL | RVAL;
+		}
+
+		vmStackItem(std::vector<unsigned int> bs) {
+			bytestring = bs;
+			type = BYTESTR;
+		}
+
+		vmStackItem(const vmStackItem &orig) {
+			type = orig.type;
+			i_val = orig.i_val;
+			if (type & RVAL) {
+				p_val = orig.p_val;
+			}
+			else p_val = &i_val;
+			bytestring = orig.bytestring;
+		}
+};
+
+struct callStackItem {
+	std::vector<vmStackItem> valueStack;
+	caosOp *nip;
+};
+
+typedef class caosVM *caosVM_p;
+
+class blockCond {
+	public:
+		virtual bool operator()() = 0;
+		virtual ~blockCond() {}
+};
+
 class caosVM {
-protected:
+public:
+	
+	blockCond *blocking;
+
+	void startBlocking(blockCond *whileWhat);
+	bool isBlocking();
+	
+	// nb, ptr is immutable, class is mutable
+	// This is so the stack manipulation macros work in the op classes as well
+	const caosVM_p vm; // == this
+	
 	// script state...
 	script *currentscript;
-	unsigned int currentline;
-	bool blocking;
-	std::vector<bool> truthstack;
-	std::vector<unsigned int> linestack;
-	std::vector<unsigned int> repstack;
-	std::vector<std::vector<AgentRef> > enumstack;
-	bool locked, noschedule;
-	unsigned int blockingticks;
+	caosOp *nip, *cip;
+	
+	bool inst, lock;
+	int timeslice;
+
+	std::vector<vmStackItem> valueStack;
+	std::vector<callStackItem> callStack;
+	
 	std::ostream *outputstream;
 
 	// ...which includes variables accessible to script
@@ -52,16 +113,17 @@ protected:
 	unsigned int part;
 	
 	void resetScriptState(); // resets everything except OWNR
-	
-	// variables to pass data to/from opcodes
-	std::vector<caosVar> params;
+
+protected:
+	inline void returnVariable(caosVar &cv) {
+		valueStack.push_back(&cv);
+	}
+private:
+	void resetCore();
+public:
+
 	caosVar result;
-	bool truth;
-	signed char varnumber; // VAxx/OVxx hack
-
-	void jumpToNextIfBlock();
-	void jumpToEquivalentNext();
-
+	
 public:
 	void setTarg(const AgentRef &a) { targ = a; part = 0; }
 	void setVariables(caosVar &one, caosVar &two) { _p_[0] = one; _p_[1] = two; }
@@ -268,6 +330,9 @@ public:
 	void c_WAIT();
 	void c_STOP();
 
+	void c_RGAM();
+	void v_MOWS();
+
 	// compound
 	void c_PART();
 	void c_PAT_DULL();
@@ -349,62 +414,68 @@ public:
 	void c_PRT_OZAP();
 	void c_PRT_SEND();
 
-	void runCurrentLine();
-	caosVar internalRun(std::list<token> &tokens, bool first); // run a command, as represented by tokens
-	void runEntirely(script &s);
+	void runOp();
+	void runTimeslice(int units);
+	void runEntirely(script *s);
+
 	void tick();
 	void stop();
-	bool fireScript(script &s, bool nointerrupt);
+	bool fireScript(script *s, bool nointerrupt);
 
 	caosVM(const AgentRef &o);
+
+	bool stopped() { return !cip; }
 
 	friend void setupCommandPointers();
 };
 
 typedef void (caosVM::*caosVMmethod)();
 
-struct cmdinfo {
-	std::string name;
-	unsigned int notokens;
-	bool twotokens;
-	bool needscondition;
-	/*
-	 * 0 = two-part command
-	 * otherwise, pointer to the method
-	 */
-	caosVMmethod method;
-	
-	std::string dump();
-	cmdinfo() { method = 0; twotokens = needscondition = false; }
-	cmdinfo(std::string n, unsigned int o, bool t, caosVMmethod m) :
-					name(n), notokens(o), twotokens(t), method(m) { needscondition = false; }
+class notEnoughParamsException { };
+class badParamException : public caosException {
+	public:
+		badParamException() : caosException("parameter type mismatch") {}
 };
 
-extern signed char varnumber;
-cmdinfo *getCmdInfo(std::string cmd, bool command);
-cmdinfo *getSecondCmd(cmdinfo *first, std::string src, bool command);
+#define VM_VERIFY_SIZE(n) // no-op, we assert in the pops. orig: if (params.size() != n) { throw notEnoughParamsException(); }
+static inline void VM_STACK_CHECK(const caosVM *vm) {
+	if (!vm->valueStack.size())
+		throw notEnoughParamsException();
+}
+#define VM_PARAM_VALUE(name) caosVar name; { VM_STACK_CHECK(vm); \
+	vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & LVAL)) { throw badParamException(); } \
+	name = *__x.p_val; } vm->valueStack.pop_back();
+#define VM_PARAM_STRING(name) std::string name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & LVAL)) { throw badParamException(); } \
+	if (!__x.p_val->hasString()) { throw badParamException(); } \
+	name = __x.p_val->getString(); } vm->valueStack.pop_back();
+#define VM_PARAM_INTEGER(name) int name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & LVAL)) { throw badParamException(); } \
+	if (!__x.p_val->hasNumber()) { throw badParamException(); } \
+	name = __x.p_val->getInt(); } vm->valueStack.pop_back();
+#define VM_PARAM_FLOAT(name) float name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & LVAL)) { throw badParamException(); } \
+	if (!__x.p_val->hasNumber()) { throw badParamException(); } \
+	name = __x.p_val->getFloat(); } vm->valueStack.pop_back();
+#define VM_PARAM_AGENT(name) Agent *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & LVAL)) { throw badParamException(); } \
+	if (!__x.p_val->hasAgent()) { throw badParamException(); } \
+	name = __x.p_val->getAgent(); } vm->valueStack.pop_back();
+#define VM_PARAM_VARIABLE(name) caosVar *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & RVAL)) { throw badParamException(); } \
+	name = __x.p_val; } vm->valueStack.pop_back();
+#define VM_PARAM_DECIMAL(name) caosVar name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & LVAL)) { throw badParamException(); } \
+	if (!__x.p_val->hasDecimal()) { throw badParamException(); } \
+	name = *__x.p_val; } vm->valueStack.pop_back();
+#define VM_PARAM_BYTESTR(name) std::vector<unsigned int> name; { \
+	VM_STACK_CHECK(vm); \
+	vmStackItem __x = vm->valueStack.back(); \
+	if (!(__x.type & BYTESTR)) { throw badParamException(); } \
+	name = __x.bytestring; } vm->valueStack.pop_back();
 
-class notEnoughParamsException { };
-class badParamException { };
-
-#define VM_VERIFY_SIZE(n) if (params.size() != n) { throw notEnoughParamsException(); }
-#define VM_PARAM_STRING(name) std::string name; { caosVar __x = params.back(); \
-	if (!__x.hasString()) { throw badParamException(); } \
-	name = __x.getString(); } params.pop_back();
-#define VM_PARAM_INTEGER(name) int name; { caosVar __x = params.back(); \
-	if (!__x.hasDecimal()) { throw badParamException(); } \
-	else name = __x.getInt(); } params.pop_back();
-#define VM_PARAM_FLOAT(name) float name; { caosVar __x = params.back(); \
-	if (!__x.hasDecimal()) { throw badParamException(); } \
-	name = __x.getFloat(); } params.pop_back();
-#define VM_PARAM_AGENT(name) Agent *name; { caosVar __x = params.back(); \
-	if (!__x.hasAgent()) { throw badParamException(); } \
-	name = __x.getAgent(); } params.pop_back();
-#define VM_PARAM_VARIABLE(name) caosVar *name; { caosVar __x = params.back(); \
-	if (!__x.hasVariable()) { throw badParamException(); } \
-	name = __x.getVariable(); } params.pop_back();
-#define VM_PARAM_DECIMAL(name) caosVar name = params.back(); \
-	if (!name.hasDecimal()) { throw badParamException(); } \
-	params.pop_back();
+#define STUB throw caosException("stub in " __FILE__)
 
 #endif
+/* vim: set noet: */

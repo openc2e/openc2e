@@ -60,3 +60,4 @@ void AgentRef::dump() const {
 	std::cerr << "AgentRef " << (void *)this << " pointing to " << (void *)ref << ", next=" << (void *)next <<
 		" prev=" << (void *)prev << std::endl;
 }
+/* vim: set noet: */

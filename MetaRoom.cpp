@@ -41,3 +41,4 @@ unsigned int MetaRoom::addRoom(Room *r) {
 	r->id = world.map.rooms.size() - 1;
 	return r->id;
 }
+/* vim: set noet: */

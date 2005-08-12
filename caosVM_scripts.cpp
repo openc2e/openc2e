@@ -29,7 +29,7 @@ using std::cerr;
  */
 void caosVM::c_INST() {
 	VM_VERIFY_SIZE(0)
-	noschedule = true;
+	inst = true;
 	// TODO: do we need a state similar to locked? i commented it out because it doesn't seem right - fuzzie
 	//locked = true;
 }
@@ -42,7 +42,7 @@ void caosVM::c_INST() {
 void caosVM::c_SLOW() {
 	VM_VERIFY_SIZE(0)
 	
-	noschedule = false;
+	inst = false;
 }
 
 /**
@@ -52,7 +52,7 @@ void caosVM::c_SLOW() {
  */
 void caosVM::c_LOCK() {
 	VM_VERIFY_SIZE(0)
-	locked = true;
+	lock = true;
 }
 
 /**
@@ -63,8 +63,21 @@ void caosVM::c_LOCK() {
 void caosVM::c_UNLK() {
 	VM_VERIFY_SIZE(0)
 	
-	locked = false;
+	lock = false;
 }
+
+class blockUntilTime : public blockCond {
+	protected:
+		unsigned int end;
+	public:
+		bool operator()() {
+			if (world.tickcount < end)
+				return true;
+			return false;
+		}
+
+		blockUntilTime(int delta) : end(world.tickcount + delta) {}
+};
 
 /**
  WAIT (command) ticks (integer)
@@ -74,8 +87,9 @@ void caosVM::c_UNLK() {
 void caosVM::c_WAIT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(ticks)
-	assert(ticks > 0); // todo: is this right?
-	blockingticks = ticks;
+
+	caos_assert(ticks > 0); // todo: is this right?
+	startBlocking(new blockUntilTime(ticks));
 }
 
 /**
@@ -83,7 +97,7 @@ void caosVM::c_WAIT() {
 */
 void caosVM::c_STOP() {
 	VM_VERIFY_SIZE(0)
-	currentline = currentscript->lines.size();
+	stop();
 }
 
 /**
@@ -99,3 +113,4 @@ void caosVM::c_SCRX() {
 	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
 	world.scriptorium.delScript(family, genus, species, event);
 }
+/* vim: set noet: */

@@ -2,8 +2,8 @@
    with thanks to vadim for helping out
 
    TODO:
-    * hair tidiness/untidiness (offset by 0 to 2 multiplied by 16)
-    * render hairs/ears .. at the moment we avoid them, we lack zorder sanity too
+	* hair tidiness/untidiness (offset by 0 to 2 multiplied by 16)
+	* render hairs/ears .. at the moment we avoid them, we lack zorder sanity too
 */
 
 #include "SkeletalCreature.h"
@@ -179,3 +179,4 @@ void SkeletalCreature::setPose(std::string s) {
 	recalculateSkeleton();
 }
 
+/* vim: set noet: */

@@ -134,9 +134,10 @@ void caosVM::c_PRT_OZAP() {
 /**
  PRT: SEND (command) id (integer) data (anything)
 */
-void caosVM::c_PRT_SEND() {
+void caosVM::c_PRT_SEND() { // TODO
 	VM_VERIFY_SIZE(2)
-	params.pop_back(); // TODO
+	VM_PARAM_VALUE(data)
 	VM_PARAM_INTEGER(id)
 }
 
+/* vim: set noet: */

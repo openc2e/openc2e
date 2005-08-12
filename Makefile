@@ -15,13 +15,10 @@ OPENC2E = \
 	blkImage.o \
 	c16Image.o \
 	Camera.o \
-	caosdata.o \
-	caoshashes.o \
 	caosScript.o \
 	caosVar.o \
 	caosVM_agent.o \
 	caosVM_camera.o \
-	caosVM_cmdinfo.o \
 	caosVM_compound.o \
 	caosVM_core.o \
 	caosVM.o \
@@ -60,14 +57,36 @@ OPENC2E = \
 	streamutils.o \
 	Vehicle.o \
 	World.o \
-	PathResolver.o
+	PathResolver.o \
+	cmddata.o \
+	lex.yy.o \
+	lexutil.o \
+	dialect.o
 
+CFLAGS += -W -Wall -Wno-conversion -Wno-unused
 XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net -lSDL_mixer
 COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
-all: openc2e tools/filetests tools/praydumper
+all: openc2e tools/filetests tools/praydumper docs
+
+docs: docs.html
+
+commandinfo.yml: $(wildcard caosVM_*.cpp) parsedocs.pl
+	perl parsedocs.pl $(wildcard caosVM_*.cpp) > commandinfo.yml
+
+docs.html: writehtml.pl commandinfo.yml
+	perl writehtml.pl > docs.html
+
+cmddata.cpp: commandinfo.yml writecmds.pl
+	perl writecmds.pl commandinfo.yml > cmddata.cpp
+
+lex.yy.cpp lex.yy.h: caos.l
+	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h caos.l
+
+## lex.yy.h deps aren't detected evidently
+caosScript.o: lex.yy.h lex.yy.cpp
 
 %.o: %.cpp
 	$(CXX) $(XCPPFLAGS) -o $@ -c $<
@@ -75,22 +94,17 @@ all: openc2e tools/filetests tools/praydumper
 %.o: %.c
 	$(CC) $(XCFLAGS) -o $@ -c $<
 
-caosdata.cpp caoshashes.cpp: $(wildcard caosVM_*.cpp)
-	cd caosdata; \
-	chmod u+x *.sh *.pl; \
-	./build.sh
-
 # shamelessly ripped from info make, with tweaks
-.deps/%.d: %.c
-	mkdir -p `dirname $@`; \
-	$(CC) -M $(XCPPFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+.deps/%.d: %.c lex.yy.h
+	mkdir -p `dirname $@` && \
+	$(CC) -M $(XCPPFLAGS) $< > $@.$$$$ && \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@ && \
 	rm -f $@.$$$$
 
-.deps/%.dpp: %.cpp
-	mkdir -p `dirname $@`; \
-	$(CXX) -M $(XCPPFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+.deps/%.dpp: %.cpp lex.yy.h
+	mkdir -p `dirname $@` && \
+	$(CXX) -M $(XCPPFLAGS) $< > $@.$$$$ && \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@ && \
 	rm -f $@.$$$$
 
 .deps/meta: $(SOURCEDEPS)
@@ -113,5 +127,9 @@ tools/praydumper: tools/praydumper.o pray.o
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
 	rm -rf .deps
+	rm -f commandinfo.yml lex.yy.cpp lex.yy.h cmddata.cpp
 
-.PHONY: clean all dep
+test: openc2e 
+	perl -MTest::Harness -e 'runtests(glob("unittests/*.t"))'
+
+.PHONY: clean all dep docs

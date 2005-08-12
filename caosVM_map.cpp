@@ -214,6 +214,7 @@ void caosVM::v_RGHT() {
 
 /**
  _UP_ (integer)
+ %pragma implementation caosVM::v_UP
  
  returns the up constant (2)
 */
@@ -418,3 +419,4 @@ void caosVM::c_ALTR() {
 
 	// TODO
 }
+/* vim: set noet: */

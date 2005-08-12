@@ -30,7 +30,7 @@ class Agent;
 class caosVar {
 	protected:
 		enum variableType {
-			NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING, VARREF
+			NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
 		};
 
 		variableType type;
@@ -42,18 +42,18 @@ class caosVar {
 		AgentRef agent;
 
 		std::string string;
-		// XXX: GET RID OF THIS
-		caosVar *vptr;
 
 	public:
 		void reset() {
 			string.clear();
 			type = NULLTYPE;
-			vptr = NULL;
+		}
+
+		bool isNull() {
+			return type == NULLTYPE;
 		}
 
 		caosVar() {
-			vptr = NULL;
 			type = INTEGER;
 			values.intValue = 0;
 		}
@@ -62,15 +62,14 @@ class caosVar {
 			string = copyFrom.string;
 			type = copyFrom.type;
 			values = copyFrom.values;
-			vptr = copyFrom.vptr;
 		}
 
 		caosVar &operator=(const caosVar &copyFrom) {
 			string = copyFrom.string;
 			type = copyFrom.type;
 			values = copyFrom.values;
-			vptr = copyFrom.vptr;
 			agent = copyFrom.agent;
+			return *this;
 		}
 
 		bool isEmpty() const { return type == NULLTYPE; }
@@ -79,6 +78,7 @@ class caosVar {
 		bool hasAgent() const { return type == AGENT; }
 		bool hasString() const { return type == STRING; }
 		bool hasDecimal() const { return type == INTEGER || type == FLOAT; }
+		bool hasNumber() const { return hasDecimal(); }
 		
 		void setInt(int i) { reset(); type = INTEGER; values.intValue = i; }
 		void setFloat(float i) { reset(); type = FLOAT; values.floatValue = i; }
@@ -131,17 +131,6 @@ class caosVar {
 			return agent;
 		}
 
-		// XXX: GET RID OF THIS
-		void setVariable(caosVar *v) {
-			vptr = v;
-		}
-		bool hasVariable() const {
-			return vptr;
-		}
-		caosVar *getVariable() const {
-			return vptr;
-		}
-
 		bool operator == (const caosVar &v) const;
 		bool operator != (const caosVar &v) const { return !(*this == v); }
 		bool operator > (const caosVar &v) const;
@@ -166,3 +155,4 @@ class caosVar {
 #endif
 
 #endif
+/* vim: set noet: */

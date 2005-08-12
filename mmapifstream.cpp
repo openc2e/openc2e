@@ -76,3 +76,4 @@ mmapifstream::~mmapifstream() {
 		munmap(map, filesize);
 #endif
 }
+/* vim: set noet: */

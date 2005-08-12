@@ -48,7 +48,7 @@ public:
 	Catalogue catalogue;
 	std::string handName;
 	float pace;
-	unsigned int ticktime;
+	unsigned int ticktime, tickcount;
 	MainCamera camera;
 
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
@@ -69,3 +69,4 @@ public:
 };
 
 extern World world;
+/* vim: set noet: */

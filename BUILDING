@@ -1,11 +1,7 @@
-* standard autoconf/automake/configure/make system.
+* 'Just type make' build system
 
 * if you add a CAOS function, you need to:
  * add prototype to caosVM.h
  * add implementation in a caosVM_category.cpp file
  * make sure you add documentation before the implementation in the same format as everything else
- * run build.sh from caosdata/, this will:
-  * regenerate the documentation
-	* regenerate caosdata.cpp
-	* generate perfect hashes, and from them caoshashes.h and caoshashes.cpp
-	* copy all of the above back into the source tree
+ * make sure it works, and add a %status done

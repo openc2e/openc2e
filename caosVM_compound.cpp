@@ -31,9 +31,9 @@ void caosVM::c_PART() {
 	VM_PARAM_INTEGER(part_id)
 
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	assert(a);
+	caos_assert(a);
 	// TODO: this isn't entirely right, we should check it exists instead (maybe part should be a pointer?)
-	assert(part_id < a->partCount());
+	caos_assert(part_id < a->partCount());
 	part = part_id;
 }
 
@@ -52,10 +52,10 @@ void caosVM::c_PAT_DULL() {
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
 	
-	assert(part > 0);
-	assert(targ);
+	caos_assert(part > 0);
+	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	assert(a);
+	caos_assert(a);
 
 	CompoundPart *p = new DullPart(part, sprite, first_image, x, y, plane);
 	a->addPart(p);
@@ -74,7 +74,7 @@ void caosVM::c_PAT_BUTT() {
 	VM_VERIFY_SIZE(10)
 	VM_PARAM_INTEGER(option)
 	VM_PARAM_INTEGER(messageid)
-	VM_PARAM_STRING(hoveranim)
+	VM_PARAM_BYTESTR(hoveranim)
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
@@ -83,11 +83,11 @@ void caosVM::c_PAT_BUTT() {
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
 	
-	assert(part > 0);
-	assert((option == 0) || (option == 1));
-	assert(targ);
+	caos_assert(part > 0);
+	caos_assert((option == 0) || (option == 1));
+	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	assert(a);
+	caos_assert(a);
 
 	// TODO TODO TODO we don't take image_count!!
 	CompoundPart *p = new ButtonPart(part, sprite, first_image, x, y, plane, hoveranim, messageid, option);
@@ -103,10 +103,10 @@ void caosVM::c_PAT_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part)
 	
-	assert(part > 0);
-	assert(targ);
+	caos_assert(part > 0);
+	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	assert(a);
+	caos_assert(a);
 	
 	a->delPart(part);
 }
@@ -130,3 +130,4 @@ void caosVM::c_FCUS() {
 		// TODO
 	}
 }
+/* vim: set noet: */

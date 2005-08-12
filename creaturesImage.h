@@ -65,3 +65,4 @@ public:
 extern imageGallery gallery;
 
 #endif
+/* vim: set noet: */

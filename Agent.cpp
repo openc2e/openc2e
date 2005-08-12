@@ -61,8 +61,7 @@ void Agent::moveTo(float _x, float _y) {
 void Agent::fireScript(unsigned short event) {
 	if (dying) return;
 
-	script &s = world.scriptorium.getScript(family, genus, species, event);
-	if (s.lines.empty()) return;
+	script *s = world.scriptorium.getScript(family, genus, species, event);
 	if (!vm) vm = world.getVM(this);
 	if (vm->fireScript(s, (event == 9)))
 		vm->setTarg(this);
@@ -87,7 +86,7 @@ void Agent::tick() {
 		//std::cout << x << ", " << y << ": " << destx << ", " << desty << "! " << accg << "\n";
 		Room *r1 = world.map.roomAt((unsigned int)x, (unsigned int)y);
 		if (!r1) {
-			std::cout << "not doing physics on agent " << identify() << ", outside room system!\n";
+//			std::cout << "not doing physics on agent " << identify() << ", outside room system!\n";
 		}
 		Room *r2 = world.map.roomAt((unsigned int)destx + getWidth(), (unsigned int)desty + getHeight());
 		Room *r3 = world.map.roomAt((unsigned int)destx, (unsigned int)desty);
@@ -104,12 +103,12 @@ void Agent::tick() {
 			bool moved = false, collided = false;
 
 			int ix = x, iy = y, idestx = destx, idesty = desty;
-            int dx = (ix < idestx ? 1 : -1);
-            int dy = (iy < idesty ? 1 : -1);
+			int dx = (ix < idestx ? 1 : -1);
+			int dy = (iy < idesty ? 1 : -1);
 			
-            while (ix != idestx || iy != idesty) {
-                // We just alternate here. There's probably a more
-                // accurate method, but meh
+			while (ix != idestx || iy != idesty) {
+				// We just alternate here. There's probably a more
+				// accurate method, but meh
 
 				if (iy != idesty) {
 					iy += dy;
@@ -134,7 +133,7 @@ void Agent::tick() {
 						break;
 					}
 				}
-                moved = true;
+				moved = true;
 			}
 			
 			vely.setFloat(newvely);
@@ -166,8 +165,14 @@ void Agent::tick() {
 		}
 	}
 
-	if (vm)
+	if (vm) {
 		vm->tick();
+		if (vm->stopped()) {
+			world.freeVM(vm);
+			vm = NULL;
+		}
+	}
+		
 }
 
 void Agent::kill() {
@@ -191,9 +196,9 @@ void Agent::setZOrder(unsigned int z) {
 }
 
 int Agent::getUNID() {
-      if (unid != -1)
-              return unid;
-      return unid = world.getUNID(this);
+	  if (unid != -1)
+			  return unid;
+	  return unid = world.getUNID(this);
 }
 
 std::string Agent::identify() const {
@@ -213,3 +218,4 @@ bool agentzorder::operator ()(const Agent *s1, const Agent *s2) const {
 	return s1->zorder < s2->zorder;
 }
 
+/* vim: set noet: */

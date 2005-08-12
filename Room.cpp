@@ -19,3 +19,4 @@
 
 #include "Room.h"
 
+/* vim: set noet: */

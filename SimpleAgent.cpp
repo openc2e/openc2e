@@ -93,3 +93,4 @@ void SimpleAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC);
 }
 
+/* vim: set noet: */

@@ -213,3 +213,4 @@ void caosVM::c_VOCB() {
 	// TODO
 }
 
+/* vim: set noet: */
