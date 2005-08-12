@@ -18,9 +18,6 @@ void Scriptorium::addScript(unsigned char family, unsigned char genus, unsigned 
 	std::map<unsigned short, script *> &m = getScripts(calculateValue(family, genus, species));
 	if (m[event])
 		m[event]->release();
-	std::cerr << "map script " << (int)family << " " << (int)genus << " " <<
-		species << " " << event << " to " << (void *)s << " was " 
-		<< (void *)m[event] << std::endl;
 	m[event] = s;
 	s->retain();
 }
