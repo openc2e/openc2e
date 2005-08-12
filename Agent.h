@@ -25,6 +25,7 @@
 #include "caosVar.h"
 #include "AgentRef.h"
 #include <set>
+#include <list>
 
 struct agentzorder {
 	bool operator()(const class Agent *s1, const class Agent *s2) const;
@@ -43,6 +44,7 @@ protected:
 	class caosVM *vm;
 
 	void zotrefs();
+	void zotstack();
 
 	bool dying;
 	int unid;
@@ -50,6 +52,8 @@ protected:
 	unsigned int tickssincelasttimer, timerrate;
 
 	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
+	std::list<caosVM *> vmstack; // for CALL etc
+
 
 public:
 	int clac[3]; int clik;
@@ -72,6 +76,7 @@ public:
 	void fireScript(unsigned short event);
 	void moveTo(float, float);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
+	void pushVM(caosVM *newvm);
 	
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
@@ -88,6 +93,8 @@ public:
 	virtual void setZOrder(unsigned int plane);
 	virtual unsigned int getZOrder() const { return zorder; }
 
+	class script *findScript(unsigned short event);
+	
 	int getUNID();
 	std::string identify() const;
 };

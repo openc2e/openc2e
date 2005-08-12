@@ -45,10 +45,20 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	zorder_iter = world.agents.insert(this);
 }
 
+void Agent::zotstack() {
+	std::list<caosVM *>::iterator i = vmstack.begin();
+	while (i != vmstack.end()) {
+		world.freeVM(*i);
+	}
+	vmstack.clear();
+}
+
+
 Agent::~Agent() {
 	world.agents.erase(zorder_iter);
 	if (vm)
 		world.freeVM(vm);
+	zotstack();
 	zotrefs();
 	if (unid != -1)
 		world.freeUNID(unid);
@@ -58,13 +68,19 @@ void Agent::moveTo(float _x, float _y) {
 	x = _x; y = _y;
 }
 
+script *Agent::findScript(unsigned short event) {
+	return world.scriptorium.getScript(family, genus, species, event);
+}
+
 void Agent::fireScript(unsigned short event) {
 	if (dying) return;
 
-	script *s = world.scriptorium.getScript(family, genus, species, event);
+	script *s = findScript(event);
 	if (!vm) vm = world.getVM(this);
-	if (vm->fireScript(s, (event == 9)))
+	if (vm->fireScript(s, (event == 9))) {
 		vm->setTarg(this);
+		zotstack();
+	}
 	
 	// This slows us down too much :)
 #if 0
@@ -171,8 +187,11 @@ void Agent::tick() {
 			world.freeVM(vm);
 			vm = NULL;
 		}
+	} 
+	if (!vm && !vmstack.empty()) {
+		vm = vmstack.front();
+		vmstack.pop_front();
 	}
-		
 }
 
 void Agent::kill() {
@@ -216,6 +235,13 @@ std::string Agent::identify() const {
 
 bool agentzorder::operator ()(const Agent *s1, const Agent *s2) const {
 	return s1->zorder < s2->zorder;
+}
+
+void Agent::pushVM(caosVM *newvm) {
+	assert(newvm);
+	if (vm)
+		vmstack.push_front(vm);
+	vm = newvm;
 }
 
 /* vim: set noet: */

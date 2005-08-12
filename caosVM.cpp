@@ -56,6 +56,7 @@ inline bool caosVM::isBlocking() {
 }
 
 void caosVM::startBlocking(blockCond *whileWhat) {
+	inst = false;
 	if (blocking)
 		throw creaturesException("trying to block with a block condition in-place");
 	blocking = whileWhat;
@@ -153,7 +154,8 @@ void caosVM::tick() {
 
 void caosVM::runTimeslice(int units) {
 	timeslice = units;
-	while (currentscript && (timeslice > 0 || inst)) {
+	stop_loop = false;
+	while (currentscript && !stop_loop && (timeslice > 0 || inst)) {
 		if (isBlocking()) return;
 		runOp();
 	}

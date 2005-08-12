@@ -98,7 +98,7 @@ public:
 	script *currentscript;
 	caosOp *nip, *cip;
 	
-	bool inst, lock;
+	bool inst, lock, stop_loop;
 	int timeslice;
 
 	std::vector<vmStackItem> valueStack;
@@ -232,6 +232,7 @@ public:
 	void c_ETCH();
 	void c_EPAS();
 	void c_NEXT();
+	void c_CALL();
 	
 	// debug
 	void c_TEST_PASS();

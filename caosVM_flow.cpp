@@ -196,6 +196,7 @@ void caosVM::c_ESEE() {
  ETCH (command) family (integer) genus (integer) species (integer)
  %pragma parserclass ENUMhelper
  %pragma retc -1
+ %status stub
 
  like ENUM, but iterate through agents OWNR is touching
 */
@@ -215,6 +216,7 @@ void caosVM::c_ETCH() {
  EPAS (command) family (integer) genus (integer) species (integer)
  %pragma parserclass ENUMhelper
  %pragma retc -1
+ %status stub
 
  like ENUM, but iterate through OWNR vehicle's passengers
 */
@@ -229,5 +231,41 @@ void caosVM::c_EPAS() {
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 }
+
+/**
+ CALL (command) script_no (integer) p1 (any) p2 (any)
+
+ <p>Calls script_no on OWNR, then waits for it to return. The invoked script
+ will inherit the caller's INST setting, but any changes it makes to it will
+ be reversed once it returns - so eg if you call a script when in INST mode,
+ it calls OVEr and returns, you'll still be in INST.</p>
+ 
+ <p>Script variables (VAxx) will not be preserved - you'll have to use OVxx
+ for any parameters.</p>
+ */
+void caosVM::c_CALL() {
+	VM_PARAM_VALUE(p2)
+	VM_PARAM_VALUE(p1)
+	VM_PARAM_INTEGER(script_no)
+
+	caos_assert(owner);
+	caos_assert(script_no > 0 && script_no < 65536);
+
+	script *s = owner->findScript(script_no);
+	if (!s) return;
+	caosVM *newvm = world.getVM(owner);
+	
+	if (newvm->fireScript(s, false)) {
+		newvm->setTarg(owner);
+		newvm->inst = inst;
+		newvm->_p_[0] = p1;
+		newvm->_p_[1] = p2;
+		owner->pushVM(newvm);
+	} else
+		world.freeVM(newvm);
+
+	stop_loop = true;
+}
+
 
 /* vim: set noet: */
