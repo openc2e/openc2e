@@ -27,11 +27,11 @@ WORDANY     [a-zA-Z0-9:?!_+-]
 [-+]?{DIGIT}*\.{DIGIT}+ lex_lineno = yylineno;  return make_float(atof(yytext));
 [-+]?{DIGIT}+           lex_lineno = yylineno;  return make_int(atoi(yytext));
 
-"<"                      lex_lineno = yylineno;  return make_word("lt");
-">"                      lex_lineno = yylineno;  return make_word("gt");
+"<>"                     lex_lineno = yylineno;  return make_word("ne");
 "<="                     lex_lineno = yylineno;  return make_word("le");
 ">="                     lex_lineno = yylineno;  return make_word("ge");
-"<>"                     lex_lineno = yylineno;  return make_word("ne");
+"<"                      lex_lineno = yylineno;  return make_word("lt");
+">"                      lex_lineno = yylineno;  return make_word("gt");
 "="                      lex_lineno = yylineno;  return make_word("eq");
 "&&"                     lex_lineno = yylineno;  return make_word("and");
 "||"                     lex_lineno = yylineno;  return make_word("or");

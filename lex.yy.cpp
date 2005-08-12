@@ -406,10 +406,10 @@ struct yy_trans_info
 static yyconst flex_int16_t yy_accept[56] =
     {   0,
         0,    0,    0,    0,    0,    0,    0,    0,   26,   24,
-       23,   23,   19,   24,   24,    1,   24,   24,    6,    7,
-       12,    8,    4,   15,   24,   24,   25,   17,   16,   18,
-       22,   21,   22,    0,   13,    1,    0,    6,    5,    9,
-       11,   10,    4,    2,   14,   16,   20,    0,    0,    0,
+       23,   23,   19,   24,   24,    1,   24,   24,    6,   10,
+       12,   11,    4,   15,   24,   24,   25,   17,   16,   18,
+       22,   21,   22,    0,   13,    1,    0,    6,    5,    8,
+        7,    9,    4,    2,   14,   16,   20,    0,    0,    0,
         0,    0,    0,    3,    0
     } ;
 
@@ -855,27 +855,27 @@ lex_lineno = yylineno;  return make_int(atoi(yytext));
 case 7:
 YY_RULE_SETUP
 #line 30 "caos.l"
-lex_lineno = yylineno;  return make_word("lt");
+lex_lineno = yylineno;  return make_word("ne");
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 31 "caos.l"
-lex_lineno = yylineno;  return make_word("gt");
+lex_lineno = yylineno;  return make_word("le");
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 32 "caos.l"
-lex_lineno = yylineno;  return make_word("le");
+lex_lineno = yylineno;  return make_word("ge");
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 33 "caos.l"
-lex_lineno = yylineno;  return make_word("ge");
+lex_lineno = yylineno;  return make_word("lt");
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 34 "caos.l"
-lex_lineno = yylineno;  return make_word("ne");
+lex_lineno = yylineno;  return make_word("gt");
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
