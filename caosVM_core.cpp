@@ -83,8 +83,7 @@ void caosVM::v_GAME() {
 
 /**
  RSCR (command)
- %pragma noparse
- 
+ %pragma noparse 
 */
 
 /**
