@@ -99,6 +99,8 @@ extern "C" int main(int argc, char *argv[]) {
 	std::vector<std::string> scripts;
 	fs::path scriptdir((argc > 1 ? argv[1] : "data/Bootstrap/001 World/"), fs::native);
 
+	bool singlescript = false;
+	
 	if (fs::exists(scriptdir)) {
 		if (fs::is_directory(scriptdir)) {
 			fs::directory_iterator fsend;
@@ -112,6 +114,7 @@ extern "C" int main(int argc, char *argv[]) {
 			}
 		} else {
 			scripts.push_back(scriptdir.native_file_string());
+			singlescript = true;
 		}
 	} else {
 		if (argc > 1) {
@@ -145,7 +148,8 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 
 	if (world.map.getMetaRoomCount() == 0) {
-		std::cerr << "\nNo metarooms found in given directory (" << scriptdir.native_directory_string() << "), exiting.\n";
+		if (!singlescript)
+			std::cerr << "\nNo metarooms found in given directory (" << scriptdir.native_directory_string() << "), exiting.\n";
 		SDL_Quit();
 		return 0;
 	}
