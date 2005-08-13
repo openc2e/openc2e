@@ -174,7 +174,7 @@ void caosVM::v_OWNR() {
  return null (zero) agent
 */
 void caosVM::v_NULL() {
-	const static AgentRef nullref;
+	static const AgentRef nullref;
 	VM_VERIFY_SIZE(0)
 	result.setAgent(nullref);
 }
