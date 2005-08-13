@@ -42,6 +42,7 @@ caosVM::caosVM(const AgentRef &o)
 	currentscript = NULL;
 	cip = nip = NULL;
 	blocking = NULL;
+	inputstream = 0; outputstream = 0;
 	resetCore();
 }
 

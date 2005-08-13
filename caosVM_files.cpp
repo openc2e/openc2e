@@ -55,7 +55,7 @@ void caosVM::c_FILE_GLOB() {
 
 /**
  FILE ICLO (command)
- %status probablyok
+ %status maybe
 */
 void caosVM::c_FILE_ICLO() {
 	if (inputstream) {
@@ -72,7 +72,7 @@ void caosVM::c_FILE_ICLO() {
 
 /**
  FILE IOPE (command) directory (integer) filename (string)
- %status probablyok
+ %status maybe
 */
 void caosVM::c_FILE_IOPE() {
 	VM_PARAM_STRING(filename)
@@ -97,7 +97,7 @@ void caosVM::c_FILE_JDEL() {
 
 /**
  FILE OCLO (command)
- %status probablyok
+ %status maybe
 */
 void caosVM::c_FILE_OCLO() {
 	// TODO: right now, cout is hooked up to outputstream by default, someday when this
@@ -115,7 +115,7 @@ void caosVM::c_FILE_OCLO() {
 
 /**
  FILE OFLU (command)
- %status probablyok
+ %status maybe
 */
 void caosVM::c_FILE_OFLU() {
 	if (outputstream)
@@ -124,7 +124,7 @@ void caosVM::c_FILE_OFLU() {
 
 /**
  FILE OOPE (command) directory (integer) filename (string) append (integer)
- %status probablyok
+ %status maybe
 */
 void caosVM::c_FILE_OOPE() {
 	VM_PARAM_INTEGER(append)
@@ -151,23 +151,33 @@ void caosVM::v_FVWM() {
 
 /**
  INNF (float)
- %status stub
+ %status maybe
 */
 void caosVM::v_INNF() {
-	// TODO
+	if (!inputstream)
+		throw caosException("no input stream in INNF!");
+
+	float f = 0.0f;
+	*inputstream >> f;
+	result.setFloat(f);
 }
 
 /**
  INNI (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_INNI() {
-	// TODO
+	if (!inputstream)
+		throw caosException("no input stream in INNI!");
+
+	int i = 0;
+	*inputstream >> i;
+	result.setInt(i);
 }
 
 /**
  INNL (string)
- %status probablyok
+ %status maybe
 */
 void caosVM::v_INNL() {
 	if (!inputstream)
@@ -179,7 +189,7 @@ void caosVM::v_INNL() {
 
 /**
  INOK (integer)
- %status probablyok
+ %status maybe
 */
 void caosVM::v_INOK() {
 	if (!inputstream)
