@@ -74,7 +74,6 @@ void caosVM::c_SETV() {
 	} else { // VM_PARAM_DECIMAL guarantees us float || int
 		var->setInt(value.intValue);
 	}
-//	var->notifyChanged(); // do we need this? if so, stick it everywhere else
 }
 
 /**
@@ -167,7 +166,7 @@ void caosVM::c_SUBV() {
 	if (v->hasFloat())
 		v->setFloat(v->floatValue - (sub.hasFloat() ? sub.floatValue : sub.intValue));
 	else if (v->hasInt())
-	  v->setInt((int)(v->intValue - (sub.hasFloat() ? sub.floatValue : sub.intValue)));
+		v->setInt((int)(v->intValue - (sub.hasFloat() ? sub.floatValue : sub.intValue)));
 	else
 		throw badParamException();
 }
