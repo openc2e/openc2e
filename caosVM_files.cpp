@@ -78,6 +78,8 @@ void caosVM::c_FILE_IOPE() {
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
 
+	c_FILE_ICLO();
+	
 	std::string fullfilename = calculateFilename(directory, filename);
 	inputstream = new std::ifstream(fullfilename.c_str());
 }
@@ -130,6 +132,8 @@ void caosVM::c_FILE_OOPE() {
 	VM_PARAM_INTEGER(append)
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
+
+	c_FILE_OCLO();
 
 	std::string fullfilename = calculateFilename(directory, filename);
 
