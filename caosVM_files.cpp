@@ -193,9 +193,9 @@ void caosVM::v_INOK() {
 
 /**
  WEBB (command) url (string)
+ %status stub
 
  launches the specified URL, prepended with http:// (so you'd only specify, say, 'hostname/blah.html'), in the user's browser.
- %status stub
 */
 void caosVM::c_WEBB() {
 	VM_PARAM_STRING(url)
