@@ -17,6 +17,7 @@ BEGIN {
 		*captext = sub ($) {
 			my $t = shift;
 			$t =~ s/^([a-z])/uc $1/e;
+			return $t;
 		};
 	} else {
 		*captext = sub ($) {
