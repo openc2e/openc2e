@@ -123,6 +123,15 @@ __END__
 					<div class="st_maybe">
 						This command probably works, but it has not been annotated with its status.
 					</div>
+					[% ELSIF op.status == 'maybe' %]
+					<div class="st_maybe">
+						This command is believed to work, but has not yet been thoroughly tested.
+					</div>
+					[% ELSIF op.status == 'broken' %]
+					<div class="st_todo">
+						This command is partially implemented but missing large amounts
+						of functionality.
+					</div>
 					[% ELSIF op.status == 'ok' || op.status == 'done' %]
 					<div class="st_ok">
 						This command works properly.
