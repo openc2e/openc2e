@@ -95,6 +95,7 @@ class caosGSUB : public caosOp {
 #define CEQ 1
 #define CLT 2
 #define CGT 4
+#define CMASK (CEQ | CLT | CGT)
 #define CLE (CEQ | CLT)
 #define CGE (CEQ | CGT)
 #define CNE (CLT | CGT)

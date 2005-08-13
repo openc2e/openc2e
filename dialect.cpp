@@ -55,7 +55,7 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 		}
 
 		caosOp *jumpTarget = isOr ? success : failure;
-		if (!isOr) compar = ~compar;
+		if (!isOr) compar = ~compar & CMASK;
 		
 		s->current->thread(new caosCond(compar, jumpTarget));
 		if (isLast) break;
