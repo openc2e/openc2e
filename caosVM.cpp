@@ -139,6 +139,9 @@ void caosVM::resetCore() {
 	inst = lock = 0;
 	timeslice = 0;
 
+	c_FILE_ICLO(); // make sure input stream is freed
+	inputstream = 0; // .. possibly not strictly necessary, when all is bugfree
+	c_FILE_OCLO(); // make sure output stream is freed
 	outputstream = &cout;
 
 	_it_ = NULL;

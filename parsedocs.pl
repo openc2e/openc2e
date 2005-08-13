@@ -14,6 +14,7 @@ my %fnmap = ( # default category mappings
 	'caosVM_creatures.cpp' => 'Creatures',
 	'caosVM_compound.cpp' => 'Compound agents',
 	'caosVM_debug.cpp' => 'Debugging',
+	'caosVM_files.cpp' => 'Files',
 	'caosVM_flow.cpp' => 'Flow control',
 	'caosVM_input.cpp' => 'Input',
 	'caosVM_map.cpp' => 'Map',

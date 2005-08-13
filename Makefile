@@ -24,6 +24,7 @@ OPENC2E = \
 	caosVM.o \
 	caosVM_creatures.o \
 	caosVM_debug.o \
+	caosVM_files.o \
 	caosVM_flow.o \
 	caosVM_input.o \
 	caosVM_map.o \

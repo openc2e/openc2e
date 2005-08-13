@@ -22,6 +22,7 @@
 
 #include "caosScript.h"
 #include <map>
+#include <istream>
 #include <ostream>
 #include "AgentRef.h"
 
@@ -104,6 +105,7 @@ public:
 	std::vector<vmStackItem> valueStack;
 	std::vector<callStackItem> callStack;
 	
+	std::istream *inputstream;
 	std::ostream *outputstream;
 
 	// ...which includes variables accessible to script
@@ -415,6 +417,21 @@ public:
 	void v_PRT_OTOT();
 	void c_PRT_OZAP();
 	void c_PRT_SEND();
+
+	// files
+	void c_FILE_GLOB();
+	void c_FILE_ICLO();
+	void c_FILE_IOPE();
+	void c_FILE_JDEL();
+	void c_FILE_OCLO();
+	void c_FILE_OFLU();
+	void c_FILE_OOPE();
+	void v_FVWM();
+	void v_INNF();
+	void v_INNI();
+	void v_INNL();
+	void v_INOK();
+	void c_WEBB();
 
 	void runOp();
 	void runTimeslice(int units);
