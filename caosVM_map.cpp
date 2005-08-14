@@ -277,7 +277,8 @@ void caosVM::c_PERM() {
 	if (perm < 1) perm = 1;
 	if (perm > 100) perm = 100;
 
-	// TODO
+	caos_assert(targ);
+	targ->perm = perm;
 }
 
 /**
@@ -288,7 +289,8 @@ void caosVM::c_PERM() {
 void caosVM::v_PERM() {
 	VM_VERIFY_SIZE(0)
 
-	result.setInt(100); // TODO: don't hardcode
+	caos_assert(targ);
+	result.setInt(targ->perm);
 }
 
 /**

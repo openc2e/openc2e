@@ -66,6 +66,7 @@ public:
 	caosVar velx, vely; // XXX: should these be basic floats?
 	float accg, aero;
 	unsigned int friction;
+	int perm;
 	float x, y;
 
 	float range;
