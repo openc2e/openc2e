@@ -40,20 +40,22 @@ void Map::SetMapDimensions(unsigned int w, unsigned int h) {
 int Map::addMetaRoom(MetaRoom *m) {
 	// todo: check if it's outlying
 	metarooms.push_back(m);
-	m->id = metarooms.size() - 1;
+	m->id = metaroom_base++;
 	return m->id;
 }
 
 MetaRoom *Map::getMetaRoom(unsigned int room) {
-	if (room >= metarooms.size())
-		return 0;
-	return metarooms[room];
+	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++)
+		if ((*i)->id == room)
+			return *i;
+	return 0;
 }
 
 Room *Map::getRoom(unsigned int r) {
-	if (r >= rooms.size())
-		return 0;
-	return rooms[r];
+	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++)
+		if ((*i)->id == r)
+			return *i;
+	return 0;
 }
 
 unsigned int Map::getMetaRoomCount() {

@@ -29,6 +29,10 @@ protected:
 	friend class MetaRoom;
 
 public:
+	unsigned int room_base, metaroom_base;
+	
+	Map() { width = 0; height = 0; room_base = 0; metaroom_base = 0; }
+
 	void Reset();
 	void SetMapDimensions(unsigned int, unsigned int);
 

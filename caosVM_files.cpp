@@ -33,6 +33,7 @@ std::string calculateFilename(int directory, std::string filename) {
 	}
 
 	// sanitise string: remove leading dots, replace slashes with underscores
+	// todo: check DS behaviour for backslashes (a problem on Windows)
 	std::string::size_type r;
 	while ((r = filename.find("/", 0)) != std::string::npos)
 		filename.replace(r, 1, "_");

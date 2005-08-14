@@ -52,7 +52,9 @@ void caosVM::c_BRMI() {
 	
 	VM_PARAM_INTEGER(room_base)
 	VM_PARAM_INTEGER(metaroom_base)
-	// todo
+
+	world.map.room_base = room_base;
+	world.map.metaroom_base = metaroom_base;
 }
 
 /**
@@ -96,6 +98,7 @@ void caosVM::v_ADDR() {
 			y_left_ceiling, y_right_ceiling,
 			y_left_floor, y_right_floor);
 	MetaRoom *m = world.map.getMetaRoom(metaroomid);
+	caos_assert(m);
 	r->metaroom = m;
 	r->id = m->addRoom(r);
 	result.setInt(r->id);
