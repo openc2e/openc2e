@@ -35,8 +35,16 @@ int main(int argc, char **argv) {
 				cout << "\"" << y->first << "\" " << y->second << endl;
 			}
 			for (vector<pair<string, string> >::iterator y = b->strvalues.begin(); y != b->strvalues.end(); y++) {
-				// todo: s/"/\\"/ in the data (use find/replace methods of string)
-				cout << "\"" << y->first << "\" \"" << y->second << "\"" << endl;
+				std::string name = y->first;
+				if ((name.substr(0, 7) ==  "Script ") || (name.substr(0, 13) == "Remove script")) {
+					name = (*x)->name() + " - " + name + ".cos";
+					ofstream output(name.c_str());
+					output.write(y->second.c_str(), y->second.size());
+					cout << "\"" << y->first << "\" @ \"" << name << "\"" << endl;
+				} else {
+					// todo: s/"/\\"/ in the data (use find/replace methods of string)
+					cout << "\"" << y->first << "\" \"" << y->second << "\"" << endl;
+				}
 			}
 		} else {
 			unknownPrayBlock *b = dynamic_cast<unknownPrayBlock *>(*x);
