@@ -5,7 +5,8 @@ use warnings;
 
 use YAML;
 
-my $id = '$Id$'
+# this may also appear as something like openc2e/mirror/trunk/writehtml.pl 43539 2005-08-15T00:44:28.013173Z bdonlan (between dollar-sign Id dollar-sign)
+my $id = '$Id$';
 
 sub captext ($);
 
