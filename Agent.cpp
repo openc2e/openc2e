@@ -101,9 +101,15 @@ void Agent::positionAudio(SoundSlot *slot) {
 	float xoffset = x - world.camera.getXCentre();
 	float yoffset = y - world.camera.getYCentre();
 	int distance = (sqrt(xoffset*xoffset + yoffset*yoffset) * 1000) / 255;
-	int angle = (atanf(abs(yoffset) / abs(xoffset)) / (2*M_PI)) * 360;
-	if (xoffset < 0) angle += 180;
-	if (yoffset < 0) angle += 90;
+	int angle;
+	if (xoffset == 0) {
+		if (yoffset > 0) angle = 90;
+		else angle = 270;
+	} else {
+		angle = (atanf(abs(yoffset) / abs(xoffset)) / (2*M_PI)) * 360;
+		if (xoffset < 0) angle += 180;
+		if (yoffset < 0) angle += 90;
+	}
 
 	slot->adjustPanning(angle, distance);
 }
