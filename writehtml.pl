@@ -54,6 +54,8 @@ foreach my $key (keys %catsort) {
 my @catl = map { { name => captext($_), ents => $catsort{$_}, anchor => esc($_) } } sort keys %catsort;
 my $time = scalar gmtime;
 print <<END;
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/2002/REC-xhtml1-20020801/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
 		<title>CAOS command reference - openc2e</title>
@@ -80,9 +82,30 @@ my %st_insert = (
 
 $st_insert{stub} = $st_insert{todo};
 
+print <<END;
+	<div id="sidebar">
+	<h6>Commands</h6>
+	<ul>
+END
+
+foreach my $key (grep { /^c_/ } sort keys %{$data->{ops}}) {
+	print qq{<li><a href="#k_$key">$data->{ops}{$key}{name}</a></li>};
+}
+
+print <<END;
+	</ul><hr />
+	<h6>Expressions</h6>
+	<ul>
+END
+
+foreach my $key (grep { /^v_/ } sort keys %{$data->{ops}}) {
+	print qq{<li><a href="#k_$key">$data->{ops}{$key}{name}</a></li>};
+}
+	
+print '</ul></div><div id="content">';
 
 foreach my $cat (@catl) {
-	print qq{<div class=category" id="c_$cat->{anchor}">\n};
+	print qq{<div class="category" id="c_$cat->{anchor}">\n};
 	print qq{<h2>$cat->{name}</h2><hr/>\n};
 	foreach my $op (@{$cat->{ents}}) {
 		print qq{<div class="command" id="k_$op->{key}">\n};
@@ -126,7 +149,7 @@ foreach my $cat (@catl) {
 	print qq{</div>};
 }
 
-print qq{</body></html>};
+print qq{</div></body></html>};
 
 
 

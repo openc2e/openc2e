@@ -7,9 +7,36 @@ body {
     display: inline;
 }
 
+#sidebar {
+    float: left;
+    clear: left;
+    font-size: x-small;
+    border: 1px black solid;
+    size: 10em;
+    background: #cee6f8;
+}
+
+#sidebar h6 {
+    font-size: small;
+    margin: 1em 0em 1em 0em;
+    text-align: center;
+}
+
+#content {
+}
+
+.category hr {
+    margin-left: 1em;
+}
+
+.category h2 {
+    margin-left: 5em;
+}
+
 .command {
     border-style: groove;
     margin-bottom: 1em;
+    margin-left: 8em;
 }
 
 .header {
