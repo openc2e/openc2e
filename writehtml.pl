@@ -81,6 +81,7 @@ my %st_insert = (
 );
 
 $st_insert{stub} = $st_insert{todo};
+$st_insert{done} = $st_insert{ok};
 
 print <<END;
 	<div id="sidebar">
@@ -89,7 +90,8 @@ print <<END;
 END
 
 foreach my $key (grep { /^c_/ } sort keys %{$data->{ops}}) {
-	print qq{<li><a href="#k_$key">$data->{ops}{$key}{name}</a></li>};
+	my $class = $st_insert{$data->{ops}{$key}{status}}[0] || 'st_wtf';
+	print qq{<li><a class="$class" href="#k_$key">$data->{ops}{$key}{name}</a></li>};
 }
 
 print <<END;
@@ -99,7 +101,8 @@ print <<END;
 END
 
 foreach my $key (grep { /^v_/ } sort keys %{$data->{ops}}) {
-	print qq{<li><a href="#k_$key">$data->{ops}{$key}{name}</a></li>};
+	my $class = $st_insert{$data->{ops}{$key}{status}}[0] || 'st_wtf';
+	print qq{<li><a class="$class" href="#k_$key">$data->{ops}{$key}{name}</a></li>};
 }
 	
 print '</ul></div><div id="content">';
@@ -123,7 +126,7 @@ foreach my $cat (@catl) {
 			print qq{<div class="docs">$op->{description}</div>\n};
 		}
 		print qq{</div><div class="status">};
-		if (exists $st_insert{$op->{status}}) {
+		if (defined $st_insert{$op->{status}}[0]) {
 			print qq{<div class="$st_insert{$op->{status}}[0]">};
 			print $st_insert{$op->{status}}[1];
 			print qq{</div>};
