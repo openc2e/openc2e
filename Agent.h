@@ -90,6 +90,7 @@ public:
 	virtual void tick();
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	virtual void kill();
+	void stopScript();
 
 	virtual void setZOrder(unsigned int plane);
 	virtual unsigned int getZOrder() const { return zorder; }

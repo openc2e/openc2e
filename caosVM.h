@@ -305,6 +305,7 @@ public:
 	void v_TOUC();
 	void v_TICK();
 	void c_PUPT();
+	void c_STPT();
 	
 	// motion
 	void c_ELAS();

@@ -195,10 +195,12 @@ void Agent::tick() {
 }
 
 void Agent::kill() {
+	// Should we remove from the ENUM etc stuff?
 	assert(!dying);
 	dying = true; // what a world, what a world...
 	if (vm)
 		vm->stop();
+	zotstack();
 	zotrefs();
 	world.killqueue.push_back(this);
 }
@@ -242,6 +244,11 @@ void Agent::pushVM(caosVM *newvm) {
 	if (vm)
 		vmstack.push_front(vm);
 	vm = newvm;
+}
+
+void Agent::stopScript() {
+	zotstack();
+	vm->stop();
 }
 
 /* vim: set noet: */

@@ -804,4 +804,15 @@ void caosVM::c_PUPT() {
 	// TODO
 }
 
+/**
+ STPT (command)
+ %status maybe
+
+ Stop the script running in TARG, if any.
+ */
+void caosVM::c_STPT() {
+	caos_assert(targ)
+    targ->stopScript();
+}
+
 /* vim: set noet: */
