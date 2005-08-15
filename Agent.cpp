@@ -46,6 +46,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	zorder_iter = world.agents.insert(this);
 
 	soundslot = 0;
+	displaycore = false;
 }
 
 void Agent::zotstack() {
@@ -142,37 +143,150 @@ void Agent::tick() {
 		
 			bool moved = false, collided = false;
 
+			int collidedirection = -1;
+
 			int ix = x, iy = y, idestx = destx, idesty = desty;
 			int dx = (ix < idestx ? 1 : -1);
 			int dy = (iy < idesty ? 1 : -1);
+
+			Room *room1 = 0, *room2 = 0, *room3 = 0, *room4 = 0;
+			Room *oroom1, *oroom2, *oroom3, *oroom4;
 			
 			while (ix != idestx || iy != idesty) {
 				// We just alternate here. There's probably a more
 				// accurate method, but meh
 
+				bool movedy = false, movedx = false;
+				
 				if (iy != idesty) {
+					movedy = true;
 					iy += dy;
-
-					Room *room1 = world.map.roomAt(ix, iy);
-					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
-					if ((!room1) || (!room2)) {
-						iy -= dy;
-						collided = true;
-						break;
-					}
 				}
-
+	
 				if (ix != idestx) {
+					movedx = true;
 					ix += dx;
-
-					Room *room1 = world.map.roomAt(ix, iy);
-					Room *room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
-					if ((!room1) || (!room2)) {
-						ix -= dx;
-						collided = true;
-						break;
-					}
 				}
+
+				oroom1 = room1;
+				oroom2 = room2;
+				oroom3 = room3;
+				oroom4 = room4;
+
+				if (room1) {
+					if (!room1->containsPoint(ix, iy))
+						room1 = 0;	
+				} else room1 = 0;
+				if (!room1) room1 = world.map.roomAt(ix, iy);
+					
+				if (room2) {
+					if (!room2->containsPoint(ix + getWidth(), iy + getHeight()))
+						room2 = 0;
+				} else room2 = 0;
+				if (!room2) room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
+
+				if (room3) {
+					if (!room3->containsPoint(ix, iy + getHeight()))
+						room3 = 0;
+				} else room3 = 0;
+				if (!room3) room3 = world.map.roomAt(ix, iy + getHeight());
+
+				if (room4) {
+					if (!room4->containsPoint(ix + getWidth(), iy))
+						room4 = 0;
+				} else room4 = 0;
+				if (!room4) room4 = world.map.roomAt(ix + getWidth(), iy);
+
+				if ((!room1) || (!room2) || (!room3) || (!room4)) {
+					if (movedy) {
+						iy -= dy;
+						collided = true; // .. but only if moved is true
+					}
+					if (movedx) {
+						ix -= dx;
+						collided = true; // .. again
+					}
+
+					if (!moved) break;
+
+					/*
+					 * now we need to work out which direction of wall we collided against
+					 *
+					 * possibilities:
+					 *
+					 * we may have collided with the ceiling of the old room1/room4
+					 * the floor of the old room2/room3
+					 * the left wall of the old room1/room3
+					 * or the right wall of the old room2/room4
+					 *
+					 * todo: we can use dx/dy to work out whether there's any possibility of having collided with walls
+					 * (ie, if we're going in the opposite direction)
+					 */
+					for (unsigned int i = 0; i < 4; i++) {
+						for (unsigned int j = 0; j < 2; j++) {
+							Room *r = 0;
+							Line l;
+							switch (i) {
+								case 0:
+									if (j == 0) r = oroom1; else r = oroom4;
+									l = r->top;
+									break;
+								case 1:
+									if (j == 0) r = oroom2; else r = oroom3;
+									l = r->bot;
+									break;
+								case 2:
+									if (j == 0) r = oroom1; else r = oroom3;
+									l = r->left;
+									break;
+								case 3:
+									if (j == 0) r = oroom2; else r = oroom4;
+									l = r->right;
+									break;
+							}
+
+							bool foundpoint = false;
+							for (int k = 0; k < 4; k++) {
+								Point p;
+
+								switch (k) {
+									case 0: p = Point(ix, iy); break;
+									case 1: p = Point(ix + getWidth(), iy); break;
+									case 2: p = Point(ix, iy + getHeight()); break;
+									case 3: p = Point(ix + getWidth(), iy + getHeight()); break;
+								}
+
+								/* std::cout << "testing point (" << p.x << ", " << p.y << ") with line ";
+								std::cout << "(" << l.getStart().x << ", " << l.getStart().y << ") to ";
+								std::cout << "(" << l.getEnd().x << ", " << l.getEnd().y << ")" << std::endl; */
+								
+								if (l.containsPoint(p)) {
+									// std::cout << "found point!" << std::endl;
+									foundpoint = true;
+									break;
+								}
+							}
+					
+							if (foundpoint) {
+								switch (i) {
+									case 0: collidedirection = 2; break; // _UP_
+									case 1: collidedirection = 3; break; // DOWN
+									case 2: collidedirection = 0; break; // LEFT
+									case 3: collidedirection = 1; break; // RGHT
+								}
+								
+								i = 4; break; // break out of both loops
+							}
+						}
+					}
+
+					if (collidedirection == -1)
+						std::cout << "huh? " << identify() << " collided with a wall, but we can't work out which!" << std::endl;
+
+					collided = true;
+					break;
+				}
+				
 				moved = true;
 			}
 			
@@ -184,6 +298,7 @@ void Agent::tick() {
 				y = iy;
 				
 				if (collided) {
+					lastcollidedirection = collidedirection;
 					fireScript(6);
 					if (vm) vm->setVariables(velx, vely);
 					vely.setFloat(0);

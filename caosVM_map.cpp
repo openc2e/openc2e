@@ -201,7 +201,7 @@ void caosVM::v_ROOM() {
 void caosVM::v_LEFT() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(3);
+	result.setInt(0);
 }
 
 /**
@@ -212,7 +212,7 @@ void caosVM::v_LEFT() {
 void caosVM::v_RGHT() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(3);
+	result.setInt(1);
 }
 
 /**
@@ -224,7 +224,7 @@ void caosVM::v_RGHT() {
 void caosVM::v_UP() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(3);
+	result.setInt(2);
 }
 
 /**
@@ -409,8 +409,8 @@ void caosVM::c_EMIT() {
 void caosVM::v_WALL() {
 	VM_VERIFY_SIZE(0)
 
-	// TODO XXX: fix this
-	v_DOWN();
+	caos_assert(targ);
+	result.setInt(targ->lastcollidedirection);
 }
 
 /**

@@ -834,7 +834,18 @@ void caosVM::c_PUPT() {
  */
 void caosVM::c_STPT() {
 	caos_assert(targ)
-    targ->stopScript();
+	targ->stopScript();
+}
+
+/**
+ DCOR (command) core_on (integer)
+ %status done
+*/
+void caosVM::c_DCOR() {
+	VM_PARAM_INTEGER(core_on)
+
+	caos_assert(targ);
+	targ->displaycore = core_on;
 }
 
 /* vim: set noet: */

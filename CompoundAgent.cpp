@@ -28,13 +28,15 @@ void CompoundAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
 		(*i)->render(renderer, xoffset + (int)x, yoffset + (int)y);
 	}
 
-	// draw core
-	/*int xoff = xoffset + x;
-	int yoff = yoffset + y;
-	renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF0000CC);
-	renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
-	renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
-	renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC); */
+	if (displaycore) {
+		// draw core
+		int xoff = xoffset + x;
+		int yoff = yoffset + y;
+		renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF0000CC);
+		renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
+		renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
+		renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC);
+	}
 }
 
 void CompoundAgent::addPart(CompoundPart *p) {

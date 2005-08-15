@@ -48,11 +48,10 @@ public:
 	unsigned int id;
 	class MetaRoom *metaroom;
 
-	bool containsPoint(unsigned int x, unsigned int y) {
-		
+	bool containsPoint(unsigned int x, unsigned int y) {	
 		if (x > x_right || x < x_left) { return false; }
-		if (bot.pointAtX(x).y > y) { return false; }
-		if (top.pointAtX(x).y < y) { return false; }
+		if (bot.pointAtX(x).y < y) { return false; }
+		if (top.pointAtX(x).y > y) { return false; }
 		return true;
 	}
 	
@@ -69,8 +68,8 @@ public:
 		if (x_l > x_r) SWAP(x_l, x_r);
 		x_left = x_l;
 		x_right = x_r;
-		if (y_l_b > y_l_t) SWAP(y_l_b, y_l_t);
-		if (y_r_b > y_r_t) SWAP(y_r_b, y_r_t);
+		if (y_l_b < y_l_t) SWAP(y_l_b, y_l_t);
+		if (y_r_b < y_r_t) SWAP(y_r_b, y_r_t);
 #undef SWAP
 		y_left_ceiling = y_l_t;
 		y_right_ceiling = y_r_t;

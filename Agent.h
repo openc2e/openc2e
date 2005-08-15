@@ -51,6 +51,10 @@ protected:
 	unsigned int zorder;
 	unsigned int tickssincelasttimer, timerrate;
 
+	bool displaycore;
+
+	int lastcollidedirection;
+
 	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
 	std::list<caosVM *> vmstack; // for CALL etc
 

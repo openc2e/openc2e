@@ -192,21 +192,38 @@ class Line {
 		double xIntercept() const { return x_icept; }
 		double yIntercept() const { return y_icept; }
 		double getSlope() const { return slope; }
+		const Point &getStart() const { return start; }
+		const Point &getEnd() const { return end; }
 
+		// TODO: this code hasn't really been tested - fuzzie
+		bool containsPoint(Point p) const {
+			if (type == VERTICAL) {
+				bool is_v = (start.x == p.x);
+				bool is_h = containsY(p.y);
+				// TODO
+				//bool is_v = (start.x > (p.x + 0.5)) && (start.x < (p.x - 0.5));
+				//bool is_h = (start.y > (p.y + 0.5)) && (start.y < (p.y - 0.5));
+				return (is_v && is_h);
+			} else {
+				Point point_on_line = pointAtX(p.x);
+				return (point_on_line.y > (p.y - 1)) && (point_on_line.y < (p.y + 1));
+			}
+		}
+					
 		Point pointAtX(double x) const
 			{ return Point(x, (x - start.x) * slope + start.y); }
 		Point pointAtY(double y) const
 			{ return Point((y - start.y) / slope + start.x, y); }
 
 		bool containsX(double x) const {
-			return x > start.x && x < end.x;
+			return x >= start.x && x <= end.x;
 		}
 
 		bool containsY(double y) const {
 			if (start.y > end.y)
-				return y < start.y && y > end.y;
+				return y <= start.y && y >= end.y;
 			else
-				return y > start.y && y < end.y;
+				return y >= start.y && y <= end.y;
 		}
 
 };
