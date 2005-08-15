@@ -119,7 +119,7 @@ foreach my $key (grep { /^v_/ } sort keys %{$data->{ops}}) {
 	
 print '</ul></div><div id="content">';
 
-print '<div class="summary">';
+print '<div id="summary">';
 print scalar keys %{$data->{ops}}, " commands in total; ";
 print join ", ", @cstat;
 print ".</div>";
