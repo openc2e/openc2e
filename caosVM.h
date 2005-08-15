@@ -360,6 +360,7 @@ public:
 	void c_CHEM();
 	void v_CREA();
 	void c_VOCB();
+	void c_DEAD();
 	
 	// sounds
 	void c_SNDE();

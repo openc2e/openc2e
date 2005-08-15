@@ -213,4 +213,15 @@ void caosVM::c_VOCB() {
 	// TODO
 }
 
+/**
+ DEAD (command)
+
+ kill target creature biologically
+*/
+void caosVM::c_DEAD() {
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+}
+
 /* vim: set noet: */
