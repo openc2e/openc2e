@@ -5,6 +5,8 @@ use warnings;
 
 use YAML;
 
+my $id = '$Id: $'
+
 sub captext ($);
 
 BEGIN {
