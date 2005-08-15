@@ -72,6 +72,7 @@ foreach my $c (@catl) {
 }
 print "</ul></div>\n";
 
+
 my %st_insert = (
 	todo => ['st_todo', 'This command is not yet implemented.', 'stubs', 0],
 	probablyok => ['st_maybe', 'This command probably works, but it has not been annotated with its status.', 'unknown', 0],
@@ -93,6 +94,13 @@ foreach my $clas (qw(ok broken maybe probablyok todo)) {
 		push @cstat, "$st_insert{$clas}[3] $st_insert{$clas}[2]";
 	}
 }
+
+print '<div id="summary">';
+print scalar keys %{$data->{ops}}, " commands in total; ";
+print join ", ", @cstat;
+print ".</div>";
+
+
 
 
 print <<END;
@@ -118,12 +126,6 @@ foreach my $key (grep { /^v_/ } sort keys %{$data->{ops}}) {
 }
 	
 print '</ul></div><div id="content">';
-
-print '<div id="summary">';
-print scalar keys %{$data->{ops}}, " commands in total; ";
-print join ", ", @cstat;
-print ".</div>";
-
 foreach my $cat (@catl) {
 	print qq{<div class="category" id="c_$cat->{anchor}">\n};
 	print qq{<h2>$cat->{name}</h2><hr/>\n};
