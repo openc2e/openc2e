@@ -30,7 +30,14 @@
 
  script-local variables, 00 to 99
  */
-// TODO: parser for VAxx
+
+/**
+ MVxx (variable)
+ %pragma noparse
+ %status maybe
+
+ Like OVxx, only for OWNR, not TARG.
+ */
 
 /**
  ADDS (command) var (variable) value (string)

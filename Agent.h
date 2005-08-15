@@ -37,6 +37,7 @@ class Agent {
 	friend class AgentRef;
 	friend class World;
 	friend class opOVxx;
+	friend class opMVxx;
 
 protected:
 	caosVar var[100]; // OVxx

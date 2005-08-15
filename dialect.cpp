@@ -129,6 +129,18 @@ class opOVxx : public caosOp {
 		}
 };
 
+class opMVxx : public caosOp {
+	protected:
+		const int index;
+	public:
+		opMVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			caos_assert(vm->owner);
+			vm->valueStack.push_back(&vm->owner->var[index]);
+		}
+};
+
 class opBytestr : public caosOp {
 	protected:
 		std::vector<unsigned int> bytestr;
@@ -162,7 +174,12 @@ class ExprDialect : public OneShotDialect {
 									throw parseException("bad ovxx");
 								s->current->thread(new opOVxx(atoi(word.c_str() + 2)));
 								return;
-							} 
+							} else if (word[0] == 'm' && word[1] == 'v') {
+								if(!(isdigit(word[2]) && isdigit(word[3])))
+									throw parseException("bad mvxx");
+								s->current->thread(new opMVxx(atoi(word.c_str() + 2)));
+								return;
+							}
 						}
 					}
 					Dialect::handleToken(s, t);
