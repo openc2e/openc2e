@@ -77,6 +77,21 @@ void caosVM::v_GAME() {
 }
 
 /**
+ DELG (command) name (string)
+
+ deletes given game variable
+*/
+void caosVM::c_DELG() {
+	VM_PARAM_STRING(name)
+
+	std::map<std::string, caosVar>::iterator i = world.variables.find(name);
+	if (i != world.variables.end())
+		world.variables.erase(i);
+	else
+		std::cerr << "DELG got told to delete '" << name << "' but it doesn't exist!" << std::endl;
+}
+
+/**
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
  %pragma noparse
 */

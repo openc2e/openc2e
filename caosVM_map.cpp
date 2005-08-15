@@ -79,7 +79,7 @@ void caosVM::v_MAPW() {
 	result.setInt(world.map.getWidth());
 }
 
-/*
+/**
  MAPH (integer)
 
  return height of world map
@@ -99,7 +99,7 @@ void caosVM::c_MAPK() {
 	world.map.Reset();
 }
 
-/*
+/**
  BKDS (string) metaroomid (integer)
  %status stub
 */

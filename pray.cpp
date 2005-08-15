@@ -194,9 +194,9 @@ char *tagStringRead(unsigned char *&ptr) {
 	ptr += 4;
 
 	// TODO: fixme: rewrite this code properly
-	static char b[50001];
-	memcpy(b, ptr, (len < 50000) ? len : 50000);
-	b[(len < 50000) ? len : 50000] = 0;
+	static char b[500001];
+	memcpy(b, ptr, (len < 500000) ? len : 500000);
+	b[(len < 500000) ? len : 500000] = 0;
 	ptr += len;
 	return b;
 }

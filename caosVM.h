@@ -178,6 +178,7 @@ public:
 	
 	// core
 	void v_GAME();
+	void c_DELG();
 	void c_OUTS();
 	void c_OUTV();
 	void c_SCRP(); // dummy
