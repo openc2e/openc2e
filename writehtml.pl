@@ -5,7 +5,7 @@ use warnings;
 
 use YAML;
 
-my $id = '$Id: $'
+my $id = '$Id$'
 
 sub captext ($);
 
