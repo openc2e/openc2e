@@ -73,15 +73,27 @@ foreach my $c (@catl) {
 print "</ul></div>\n";
 
 my %st_insert = (
-	todo => ['st_todo', 'This command is not yet implemented.'],
-	probablyok => ['st_maybe', 'This command probably works, but it has not been annotated with its status.'],
-	maybe => ['st_maybe', 'This command is believed to work, but has not yet been thoroughly tested.'],
-	broken => ['st_todo', 'This command is partially implemented but missing large amounts of functionality, or is nonconformant in some vital way.'],
-	ok => ['st_ok', 'This command works properly.'],
+	todo => ['st_todo', 'This command is not yet implemented.', 'stubs', 0],
+	probablyok => ['st_maybe', 'This command probably works, but it has not been annotated with its status.', 'unknown', 0],
+	maybe => ['st_maybe', 'This command is believed to work, but has not yet been thoroughly tested.', 'untested', 0],
+	broken => ['st_todo', 'This command is partially implemented but missing large amounts of functionality, or is nonconformant in some vital way.', 'broken', 0],
+	ok => ['st_ok', 'This command works properly.', 'done', 0],
 );
 
 $st_insert{stub} = $st_insert{todo};
 $st_insert{done} = $st_insert{ok};
+
+foreach my $op (values %{$data->{ops}}) {
+	$st_insert{$op->{status}}[3]++;
+}
+
+my @cstat;
+foreach my $clas (qw(ok broken maybe probablyok todo)) {
+	if ($st_insert{$clas}[3] != 0) {
+		push @cstat, "$st_insert{$clas}[3] $st_insert{$clas}[2]";
+	}
+}
+
 
 print <<END;
 	<div id="sidebar">
@@ -106,6 +118,11 @@ foreach my $key (grep { /^v_/ } sort keys %{$data->{ops}}) {
 }
 	
 print '</ul></div><div id="content">';
+
+print '<div class="summary">';
+print scalar keys %{$data->{ops}}, " commands in total; ";
+print join ", ", @cstat;
+print ".</div>";
 
 foreach my $cat (@catl) {
 	print qq{<div class="category" id="c_$cat->{anchor}">\n};
