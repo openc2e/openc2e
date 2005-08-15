@@ -23,6 +23,7 @@
 #include <iostream>
 #include <sstream>
 #include "caosVM.h"
+#include "SDLBackend.h"
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
   visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0) {
@@ -43,6 +44,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	unid = -1;
 
 	zorder_iter = world.agents.insert(this);
+
+	soundslot = 0;
 }
 
 void Agent::zotstack() {
@@ -92,8 +95,23 @@ void Agent::fireScript(unsigned short event) {
 #endif
 }
 
+void Agent::positionAudio(SoundSlot *slot) {
+	assert(slot);
+
+	float xoffset = x - world.camera.getXCentre();
+	float yoffset = y - world.camera.getYCentre();
+	int distance = (sqrt(xoffset*xoffset + yoffset*yoffset) * 1000) / 255;
+	int angle = (atanf(abs(yoffset) / abs(xoffset)) / (2*M_PI)) * 360;
+	if (xoffset < 0) angle += 180;
+	if (yoffset < 0) angle += 90;
+
+	slot->adjustPanning(angle, distance);
+}
+
 void Agent::tick() {
 	if (dying) return;
+
+	if (soundslot) positionAudio(soundslot);
 
 	if (sufferphysics && accg) {
 		float newvely = vely.floatValue + accg;

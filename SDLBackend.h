@@ -28,12 +28,25 @@
 
 extern class SDLBackend *g_backend; // global hack, for now
 
+struct SoundSlot {
+	int soundchannel;
+	Mix_Chunk *sound;
+	class Agent *agent;
+
+	SoundSlot() { sound = 0; }
+
+	void play();
+	void playLooped();
+	void adjustPanning(int angle, int distance);
+	void fadeOut();
+	void stop();
+};
+
 class SDLBackend {
 protected:
 	bool soundenabled;
 	static const unsigned int nosounds = 12;
-	Mix_Chunk *sounds[12];
-	int soundchannels[12];
+	SoundSlot sounddata[12];
 
 	std::map<std::string, Mix_Chunk *> soundcache;
 	
@@ -47,7 +60,7 @@ public:
 	unsigned int ticks() { return SDL_GetTicks(); }
 	void init();
 	void resizeNotify(int _w, int _h);
-	void playFile(std::string filename);
+	SoundSlot *getAudioSlot(std::string filename);
 	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y);
 	void renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour);
 	int getWidth() const { return width; }

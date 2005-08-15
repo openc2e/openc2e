@@ -19,6 +19,8 @@
 
 #include "openc2e.h"
 #include "caosVM.h"
+#include "Agent.h"
+#include "World.h"
 #include <iostream>
 using std::cout;
 using std::cerr;
@@ -31,9 +33,14 @@ using std::cerr;
 void caosVM::c_SNDE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
-	//cout << "snde tried to play " << filename << std::endl;
 
-	g_backend->playFile(filename);
+	caos_assert(targ);
+	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
+	SoundSlot *s = g_backend->getAudioSlot(filename);
+	if (s) {
+		s->play();
+		targ->positionAudio(s);
+	}
 }
 
 /**
@@ -42,9 +49,15 @@ void caosVM::c_SNDE() {
 void caosVM::c_SNDC() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
-	//cout << "sndc tried to play " << filename << std::endl;
 
-	g_backend->playFile(filename);
+	caos_assert(targ);
+	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
+	SoundSlot *s = g_backend->getAudioSlot(filename);
+	if (s) {
+		targ->soundslot = s;
+		s->play();
+		targ->positionAudio(s);
+	}
 }
 
 /**
@@ -53,7 +66,15 @@ void caosVM::c_SNDC() {
 void caosVM::c_SNDL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
-	//cout << "sndl tried to play " << filename << std::endl;
+
+	caos_assert(targ);
+	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
+	SoundSlot *s = g_backend->getAudioSlot(filename);
+	if (s) {
+		targ->soundslot = s;
+		s->playLooped();
+		targ->positionAudio(s);
+	}
 }
 
 /**
@@ -105,8 +126,19 @@ void caosVM::v_RMSC() {
 */
 void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)
+		
 	caos_assert(targ);
-	//TODO
+	if (targ->soundslot)
+		targ->soundslot->fadeOut();
+}
+
+/**
+ STPC (command)
+*/
+void caosVM::c_STPC() {
+	caos_assert(targ);
+	if (targ->soundslot)
+		targ->soundslot->stop();
 }
 
 /* vim: set noet: */

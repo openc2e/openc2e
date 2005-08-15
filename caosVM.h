@@ -370,6 +370,7 @@ public:
 	void v_RMSC();
 	void c_SNDL();
 	void c_FADE();
+	void c_STPC();
 
 	// time
 	void v_PACE();

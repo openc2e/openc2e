@@ -54,7 +54,9 @@ protected:
 	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
 	std::list<caosVM *> vmstack; // for CALL etc
 
-
+	struct SoundSlot *soundslot;
+	void positionAudio(SoundSlot *);
+	
 public:
 	int clac[3]; int clik;
 	bool carryable, mouseable, activateable, invisible, floatable;

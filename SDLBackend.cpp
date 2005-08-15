@@ -24,6 +24,27 @@
 
 SDLBackend *g_backend;
 
+void SoundSlot::play() {
+	soundchannel = Mix_PlayChannel(-1, sound, 0);
+}
+
+void SoundSlot::playLooped() {
+	soundchannel = Mix_PlayChannel(-1, sound, -1);
+}
+
+void SoundSlot::adjustPanning(int angle, int distance) {
+	Mix_SetPosition(soundchannel, angle, distance);
+}
+
+void SoundSlot::fadeOut() {
+	Mix_FadeOutChannel(soundchannel, 500); // TODO: is 500 a good value?
+}
+
+void SoundSlot::stop() {
+	Mix_HaltChannel(soundchannel);
+	sound = 0;
+}
+
 void SDLBackend::resizeNotify(int _w, int _h) {
 	width = _w;
 	height = _h;
@@ -42,10 +63,6 @@ void SDLBackend::init() {
 		soundenabled = false;
 	} else soundenabled = true;
 
-	for (unsigned int i = 0; i++; i < nosounds) {
-		sounds[i] = 0;
-	}
-	
 	resizeNotify(640, 480);
 	
 	SDL_WM_SetCaption("openc2e - Creatures 3 (development build)", "openc2e");
@@ -53,35 +70,34 @@ void SDLBackend::init() {
 	SDL_ShowCursor(false);
 }
 
-void SDLBackend::playFile(std::string filename) {
-	if (!soundenabled) return;
+SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
+	if (!soundenabled) return 0;
 
 	unsigned int i = 0;
 
 	while (i < nosounds) {
-		if (sounds[i] == 0) break;
-		if (!Mix_Playing(soundchannels[i])) {
-			sounds[i] = 0;
+		if (sounddata[i].sound == 0) break;
+		if (!Mix_Playing(sounddata[i].soundchannel)) {
+			sounddata[i].sound = 0;
 			break;
 		}
 		i++;
 	}
 	
-	if (i == nosounds) return; // no free slots, so return
+	if (i == nosounds) return 0; // no free slots, so return
 
 	std::map<std::string, Mix_Chunk *>::iterator it = soundcache.find(filename);
 	if (it != soundcache.end()) {
-		sounds[i] = (*it).second;
+		sounddata[i].sound = (*it).second;
 	} else {
 		std::string fname = "data/Sounds/" + filename + ".wav"; // TODO: case sensitivity stuff
 		//std::cout << "trying to load " << fname << std::endl;
-		sounds[i] = Mix_LoadWAV(fname.c_str());
-		if (!sounds[i]) return;
-		soundcache[filename] = sounds[i];
+		sounddata[i].sound = Mix_LoadWAV(fname.c_str());
+		if (!sounddata[i].sound) return 0; // TODO: spout error
+		soundcache[filename] = sounddata[i].sound;
 	}
 
-	soundchannels[i] = Mix_PlayChannel(-1, sounds[i], 0);
-	// Mix_SetPosition(soundschannels[i], angle in degrees, distance from 0 (near) to 255);
+	return &sounddata[i];
 }
 
 void SDLBackend::renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour) {
