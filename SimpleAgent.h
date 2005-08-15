@@ -31,6 +31,8 @@ protected:
 	unsigned int pose, frameno;
 
 public:
+	unsigned int base_offset;
+
 	std::vector<unsigned int> animation;
 
 	SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
@@ -49,7 +51,7 @@ public:
 	void setPose(unsigned int p) { pose = p; }
 	void setFramerate(unsigned int f) { /* TODO */ }
 	unsigned int getPose() { return pose; }
-	unsigned int getCurrentSprite() { return first_image + pose; }
+	unsigned int getCurrentSprite() { return first_image + base_offset + pose; }
 	unsigned int getFrameNo() { return frameno; }
 
 	virtual void tick();

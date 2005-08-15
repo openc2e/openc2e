@@ -341,7 +341,20 @@ void caosVM::v_ABBA() {
 void caosVM::c_BASE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(index)
-	// TODO
+
+	caos_assert(targ);
+
+	/*
+	 * TODO: check the behaviour of base_offset, and also
+	 * use accessor methods
+	 */
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	if (c) {
+		// TODO
+	} else {
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
+		a->base_offset = index;
+	}
 }
 
 /**
@@ -349,7 +362,16 @@ void caosVM::c_BASE() {
 */
 void caosVM::v_BASE() {
 	VM_VERIFY_SIZE(0)
-	// TODO
+		
+	caos_assert(targ);
+ 	
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	if (c) {
+		result.setInt(-1); // TODO
+	} else {
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
+		result.setInt(a->base_offset);
+	}
 }
 
 /**

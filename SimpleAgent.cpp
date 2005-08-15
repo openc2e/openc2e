@@ -31,6 +31,7 @@ Agent(family, genus, species, plane) {
 	image_count = imagecount;
 	setAttributes(0);
 	pose = 0;
+	base_offset = 0;
 }
 
 void SimpleAgent::setImage(std::string img) {
