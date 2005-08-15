@@ -89,7 +89,7 @@ foreach my $cat (@catl) {
 			print qq{<span class="argtype">$arg->{type}</span>\n};
 		}
 		print qq{</div><div class="description">};
-		unless (defined $op->{docs}) {
+		unless (defined $op->{description}) {
 			print qq{<div class="nodocs">This command is currently undocumented.</div>\n};
 		} else {
 			print qq{<div class="docs">$op->{description}</div>\n};
