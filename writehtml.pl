@@ -49,6 +49,7 @@ foreach my $key (keys %catsort) {
 }
 
 my @catl = map { { name => captext($_), ents => $catsort{$_}, anchor => esc($_) } } sort keys %catsort;
+my $time = scalar gmtime;
 print <<END;
 <html>
 	<head>
@@ -57,6 +58,7 @@ print <<END;
 	</head>
 	<body>
 		<h1>CAOS command reference - openc2e dev build</h1>
+                <i>Last updated $time</i>
 		<div id="index"><ul>
 END
 
