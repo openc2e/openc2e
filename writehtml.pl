@@ -63,7 +63,7 @@ print <<END;
 	</head>
 	<body>
 		<h1>CAOS command reference - openc2e dev build</h1>
-                <i>Last updated $time</i>
+                <i>Last updated $time (UTC)</i>
 		<div id="index"><ul>
 END
 
