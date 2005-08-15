@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use YAML;
-use Template;
 
 sub captext ($);
 
@@ -34,20 +33,9 @@ sub esc ($) {
 
 my $data = YAML::LoadFile('commandinfo.yml');
 
-foreach my $key (keys %{$data->{ops}}) {
-	$data->{ops}{$key}{key} = $key;
-	$data->{ops}{$key}{hasdocs} = defined($data->{ops}{$key}{description});
-	if ($data->{ops}{$key}{pragma}) {
-	   my @pragma;
-	   foreach my $pkey (sort keys %{$data->{ops}{$key}{pragma}}) {
-		   push @pragma, { key => $pkey, value => $data->{ops}{$key}{pragma}{$pkey}};
-	   }
-	   $data->{ops}{$key}{pragma} = \@pragma;
-   }
-}
-
 my %catsort;
 foreach my $key (sort keys %{$data->{ops}}) {
+	$data->{ops}{$key}{key} = $key;
 	push @{$catsort{$data->{ops}{$key}{category}}}, $data->{ops}{$key};
 }
 
@@ -61,15 +49,7 @@ foreach my $key (keys %catsort) {
 }
 
 my @catl = map { { name => captext($_), ents => $catsort{$_}, anchor => esc($_) } } sort keys %catsort;
-
-my $vars = {
-	categories => \@catl
-};
-
-my $tt = new Template;
-$tt->process(\*DATA, $vars) or die $tt->error(), "\n";
-
-__END__
+print <<END;
 <html>
 	<head>
 		<title>CAOS command reference - openc2e</title>
@@ -78,90 +58,74 @@ __END__
 	<body>
 		<h1>CAOS command reference - openc2e dev build</h1>
 		<div id="index"><ul>
-			[% FOREACH cat = categories %]
-			<li><a href="#c_[%- cat.anchor -%]">[% cat.name %]</a></li>
-			[% END %]
-		</ul></div>
-		[% FOREACH cat = categories %]
-		<div class="category" id="c_[%- cat.anchor -%]">
-			<h2>[% cat.name %]</h2><hr/>
-			<!-- XXX: hr is not semantic -->
+END
 
-			[% FOREACH op = cat.ents %]
-			<div class="command" id="k_[% op.key %]">
-				<div class="header">
-					<span class="cmdname">
-						[% op.name %]
-					</span>
-					<span class="cmdtype">
-						([% op.type %])
-					</span>
-					[% FOREACH arg = op.arguments -%]
-					<span class="argname">
-						[% arg.name %]
-					</span>
-					<span class="argtype">
-						([% arg.type %])
-					</span>
-					[% END %]
-				</div>
-				<div class="description">
-				[% UNLESS op.hasdocs %]
-				<div class="nodocs">This command is currently undocumented.</div>
-				[% ELSE %]
-				<div class="docs">
-					[% op.description %]
-				</div>
-				[% END %]
-				</div>
-				<div class="status">
-					[% IF op.status == 'todo' || op.status == 'stub' %]
-					<div class="st_todo">
-						This command is not yet implemented.
-					</div>
-					[% ELSIF op.status == 'probablyok' %]
-					<div class="st_maybe">
-						This command probably works, but it has not been annotated with its status.
-					</div>
-					[% ELSIF op.status == 'maybe' %]
-					<div class="st_maybe">
-						This command is believed to work, but has not yet been thoroughly tested.
-					</div>
-					[% ELSIF op.status == 'broken' %]
-					<div class="st_todo">
-						This command is partially implemented but missing large amounts
-						of functionality.
-					</div>
-					[% ELSIF op.status == 'ok' || op.status == 'done' %]
-					<div class="st_ok">
-						This command works properly.
-					</div>
-					[% ELSE %]
-					<div class="st_wtf">
-						This command has an unknown status tag of: [% op.status %]. Please beat whoever set that status with a shovel or some other heavy object.
-					</div>
-					[% END %]
-				</div>	
+foreach my $c (@catl) {
+	print "<li><a href=\"#c_", $c->{anchor}, "\">", $c->{name}, "</a></li>\n";
+}
+print "</ul></div>\n";
 
-				<div class="administrivia">
-					<ul>
-						<li>Implemented in: [% op.filename %]</li>
-						<li>Implementation function (may be wrong):
-							[% op.implementation %]
-						</li>
-						[% IF op.pragma %]
-						<li>Pragmas:
-						<ul>
-							[% FOREACH pragma = op.pragma %]
-							<li> [% pragma.key %] =&gt; [% pragma.value %] </li>
-							[% END %]
-						</ul>
-						[% END %]
-					</ul>
-				</div>
-			</div> <!-- command -->
-			[% END %]
-		</div> <!-- category -->
-		[% END %]
-	</body>
-</html>
+my %st_insert = (
+	todo => ['st_todo', 'This command is not yet implemented.'],
+	probablyok => ['st_maybe', 'This command probably works, but it has not been annotated with its status.'],
+	maybe => ['st_maybe', 'This command is believed to work, but has not yet been thoroughly tested.'],
+	broken => ['st_todo', 'This command is partially implemented but missing large amounts of functionality, or is nonconformant in some vital way.'],
+	ok => ['st_ok', 'This command works properly.'],
+);
+
+$st_insert{stub} = $st_insert{todo};
+
+
+foreach my $cat (@catl) {
+	print qq{<div class=category" id="c_$cat->{anchor}">\n};
+	print qq{<h2>$cat->{name}</h2><hr/>\n};
+	foreach my $op (@{$cat->{ents}}) {
+		print qq{<div class="command" id="k_$op->{key}">\n};
+		print qq{<div class="header">\n};
+		print qq{<span class="cmdname">$op->{name}</span>\n};
+		print qq{<span class="cmdtype">$op->{type}</span>\n};
+		foreach my $arg (@{$op->{arguments}}) {
+			print qq{<span class="argname">$arg->{name}</span>\n};
+			print qq{<span class="argtype">$arg->{type}</span>\n};
+		}
+		print qq{</div><div class="description">};
+		unless (defined $op->{docs}) {
+			print qq{<div class="nodocs">This command is currently undocumented.</div>\n};
+		} else {
+			print qq{<div class="docs">$op->{description}</div>\n};
+		}
+		print qq{</div><div class="status">};
+		if (exists $st_insert{$op->{status}}) {
+			print qq{<div class="$st_insert{$op->{status}}[0]">};
+			print $st_insert{$op->{status}}[1];
+			print qq{</div>};
+		} else {
+			print qq{<div class="st_wtf">This command has an unknown status tag of: $op->{status}.};
+			print qq{Please beat whoever set that status with a shovel or some other heavy object.};
+			print qq{</div>};
+		}
+		print qq{</div>};
+		print qq{<div class="administrivia"><ul>};
+		print qq{<li>Implemented in: $op->{filename}</li>};
+		print qq{<li>Implementation functions (may be wrong): $op->{implementation}</li>};
+		if ($op->{pragma}) {
+			print qq{<li>Pragmas:<ul>};
+			foreach my $pk (sort keys %{$op->{pragma}}) {
+				print qq{<li>$pk =&gt; $op->{pragma}{$pk}</li>};
+			}
+			print qq{</ul></li>};
+		}
+		print qq{</ul></div>};
+		print qq{</div>};
+	}
+	print qq{</div>};
+}
+
+print qq{</body></html>};
+
+
+
+
+
+
+		
