@@ -98,6 +98,26 @@ void caosVM::c_SETA() {
 // TODO: OVxx parser
 
 /**
+ TYPE (integer) value (anything)
+*/
+void caosVM::v_TYPE() {
+	VM_PARAM_VALUE(value)
+
+	caos_assert(!value.isEmpty());
+
+	if (value.hasInt())
+		result.setInt(0);
+	else if (value.hasFloat())
+		result.setInt(1);
+	else if (value.hasString())
+		result.setInt(2);
+	else if (value.hasAgent()) {
+		// TODO
+		result.setInt(3);
+	}
+}
+
+/**
  MODV (command) var (variable) mod (integer)
 
  returns var % mod

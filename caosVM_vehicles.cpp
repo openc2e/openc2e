@@ -92,4 +92,13 @@ void caosVM::c_DPAS() {
 	// TODO
 }
 
+/**
+ CABP (command) plane (integer)
+*/
+void caosVM::c_CABP() {
+	VM_PARAM_INTEGER(plane)
+
+	// TODO
+}
+
 /* vim: set noet: */

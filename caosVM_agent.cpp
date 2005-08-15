@@ -848,4 +848,15 @@ void caosVM::c_DCOR() {
 	targ->displaycore = core_on;
 }
 
+/**
+ MIRA (command) mirror_on (integer)
+*/
+void caosVM::c_MIRA() {
+	VM_PARAM_INTEGER(mirror_on)
+
+	caos_assert(targ);
+
+	// TODO
+}
+
 /* vim: set noet: */

@@ -298,4 +298,14 @@ void caosVM::v_FALL() {
 	} else
 		result.setInt(0);
 }
+
+/**
+ MOVS (integer)
+*/
+void caosVM::v_MOVS() {
+	caos_assert(targ);
+
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */

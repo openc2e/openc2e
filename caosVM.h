@@ -219,6 +219,7 @@ public:
 	void v_VTOS();
 	void v_AVAR();
 	void v_CHAR();
+	void v_TYPE();
 
 	// flow
 	void c_DOIF();
@@ -311,6 +312,7 @@ public:
 	void c_PUPT();
 	void c_STPT();
 	void c_DCOR();
+	void c_MIRA();
 	
 	// motion
 	void c_ELAS();
@@ -331,6 +333,7 @@ public:
 	void c_FRIC();
 	void v_FRIC();
 	void v_FALL();
+	void v_MOVS();
 	
 	// scripts
 	void c_INST();
@@ -410,6 +413,7 @@ public:
 	void c_SPAS();
 	void c_GPAS();
 	void c_DPAS();
+	void c_CABP();
 	
 	// ports
 	void c_PRT_BANG();
