@@ -35,6 +35,8 @@ public:
 
 	void Reset();
 	void SetMapDimensions(unsigned int, unsigned int);
+	unsigned int getWidth() { return width; }
+	unsigned int getHeight() { return height; }
 
 	int addMetaRoom(MetaRoom *);
 	MetaRoom *getMetaRoom(unsigned int);

@@ -71,6 +71,24 @@ void caosVM::c_MAPD() {
 }
 
 /**
+ MAPW (integer)
+ 
+ return width of world map
+*/
+void caosVM::v_MAPW() {
+	result.setInt(world.map.getWidth());
+}
+
+/*
+ MAPH (integer)
+
+ return height of world map
+*/
+void caosVM::v_MAPH() {
+	result.setInt(world.map.getHeight());
+}
+
+/**
  MAPK (command)  
  
  reset the map (call map::reset)
@@ -79,6 +97,19 @@ void caosVM::c_MAPK() {
 	VM_VERIFY_SIZE(0)
 
 	world.map.Reset();
+}
+
+/*
+ BKDS (string) metaroomid (integer)
+ %status stub
+*/
+void caosVM::v_BKDS() {
+	VM_PARAM_INTEGER(metaroomid)
+	
+	MetaRoom *m = world.map.getMetaRoom(metaroomid);
+	caos_assert(m);
+
+	result.setString(""); // TODO
 }
 
 /**

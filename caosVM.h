@@ -158,6 +158,9 @@ public:
 	void c_EMIT();
 	void v_WALL();
 	void c_ALTR();
+	void v_MAPW();
+	void v_MAPH();
+	void v_BKDS();
 	
 	// camera
 	void c_CMRT();
