@@ -113,7 +113,7 @@ void Agent::tick() {
 
 	if (soundslot) positionAudio(soundslot);
 
-	if (sufferphysics && accg) {
+	if (sufferphysics) {
 		float newvely = vely.floatValue + accg;
 		float destx = x + velx.floatValue;
 		float desty = y + newvely;
