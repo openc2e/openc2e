@@ -111,10 +111,10 @@ foreach my $cat (@catl) {
 		print qq{<div class="command" id="k_$op->{key}">\n};
 		print qq{<div class="header">\n};
 		print qq{<span class="cmdname">$op->{name}</span>\n};
-		print qq{<span class="cmdtype">$op->{type}</span>\n};
+		print qq{<span class="cmdtype">($op->{type})</span>\n};
 		foreach my $arg (@{$op->{arguments}}) {
 			print qq{<span class="argname">$arg->{name}</span>\n};
-			print qq{<span class="argtype">$arg->{type}</span>\n};
+			print qq{<span class="argtype">($arg->{type})</span>\n};
 		}
 		print qq{</div><div class="description">};
 		unless (defined $op->{description}) {
