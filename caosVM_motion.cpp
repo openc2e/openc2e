@@ -46,6 +46,17 @@ void caosVM::c_MVTO() {
 }
 
 /**
+ MVBY (command) x (float) y (float)
+*/
+void caosVM::c_MVBY() {
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+
+	assert(targ);
+	targ->moveTo(targ->x + x, targ->y + y);
+}
+
+/**
  VELX (variable)
 */
 void caosVM::v_VELX() {

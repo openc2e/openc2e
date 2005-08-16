@@ -849,7 +849,18 @@ void caosVM::c_DCOR() {
 }
 
 /**
+ MIRA (integer)
+ %status stub
+*/
+void caosVM::v_MIRA() {
+	caos_assert(targ);
+
+	result.setInt(0); // TODO
+}
+ 
+/**
  MIRA (command) mirror_on (integer)
+ %status stub
 */
 void caosVM::c_MIRA() {
 	VM_PARAM_INTEGER(mirror_on)

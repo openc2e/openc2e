@@ -313,6 +313,7 @@ public:
 	void c_STPT();
 	void c_DCOR();
 	void c_MIRA();
+	void v_MIRA();
 	
 	// motion
 	void c_ELAS();
@@ -334,6 +335,7 @@ public:
 	void v_FRIC();
 	void v_FALL();
 	void v_MOVS();
+	void c_MVBY();
 	
 	// scripts
 	void c_INST();
@@ -369,6 +371,10 @@ public:
 	void v_CREA();
 	void c_VOCB();
 	void c_DEAD();
+	void c_NORN();
+	void v_NORN();
+	void v_ZOMB();
+	void v_DEAD();
 	
 	// sounds
 	void c_SNDE();
@@ -414,6 +420,10 @@ public:
 	void c_GPAS();
 	void c_DPAS();
 	void c_CABP();
+	void c_RPAS();
+	void v_RPAS();
+	void c_CABV();
+	void v_CABV();
 	
 	// ports
 	void c_PRT_BANG();

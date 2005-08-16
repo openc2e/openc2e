@@ -25,6 +25,7 @@ using std::cerr;
 
 /**
  STIM SHOU (command) stimulus (integer) strength (float)
+ %status stub
 
  send stimulus to all creatures who can hear OWNR
 */
@@ -38,6 +39,7 @@ void caosVM::c_STIM_SHOU() {
 
 /**
  STIM SIGN (command) stimulus (integer) strength (float)
+ %status stub
 
  send stimulus to all creatures who can see OWNR
 */
@@ -51,6 +53,7 @@ void caosVM::c_STIM_SIGN() {
 
 /**
  STIM TACT (command) stimulus (integer) strength (float)
+ %status stub
 
  send stimulus to all creatures who are touching OWNR
 */
@@ -64,6 +67,7 @@ void caosVM::c_STIM_TACT() {
 
 /**
  STIM WRIT (command) creature (agent) stimulus (integer) strength (float)
+ %status stub
 
  send stimulus to specific creature
 */
@@ -78,6 +82,7 @@ void caosVM::c_STIM_WRIT() {
 
 /**
  SWAY SHOU (command) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) 
+ %status stub
 
  Adjust these four drives in all creatures which can hear OWNR
 */
@@ -98,6 +103,7 @@ void caosVM::c_SWAY_SHOU() {
 
 /**
  ASLP (command) sleeping (integer)
+ %status stub
 
  Set whether the creature in TARG is asleep
 */
@@ -112,6 +118,7 @@ void caosVM::c_ASLP() {
 
 /**
  NOHH (command)
+ %status stub
 
  tell target creature to stop holding hands with the pointer
 */
@@ -123,6 +130,7 @@ void caosVM::c_NOHH() {
 
 /**
  ZOMB (command) zombie (integer)
+ %status stub
 
  pass 1 to disconnect brain and motor of target creature, and 0 to undo
 */
@@ -134,9 +142,20 @@ void caosVM::c_ZOMB() {
 }
 
 /**
- DIRN (command) direction (integer)
+ ZOMB (integer)
+ %status stub
 
- change target creatures to face a different direction
+ return 1 if target creature is zombified, or 0 otherwise
+*/
+void caosVM::v_ZOMB() {
+	result.setInt(0); // TODO
+}
+
+/**
+ DIRN (command) direction (integer)
+ %status stub
+
+ change target creature to face a different direction
 */
 void caosVM::c_DIRN() {
 	VM_VERIFY_SIZE(1)
@@ -147,17 +166,19 @@ void caosVM::c_DIRN() {
 
 /**
  HHLD (agent)
+ %status stub
 
  return creatures holding hands with pointer, or NULL if none
 */
 void caosVM::v_HHLD() {
 	VM_VERIFY_SIZE(0)
 
-	result.setAgent(0);
+	result.setAgent(0); // TODO
 }
 
 /**
  MVFT (command) x (float) y (float)
+ %status stub
 
  move target creature foot to (x, y)
 */
@@ -173,6 +194,7 @@ void caosVM::c_MVFT() {
 	
 /**
  CHEM (command) chemical (integer) adjustment (float)
+ %status stub
 */
 void caosVM::c_CHEM() {
 	VM_VERIFY_SIZE(2)
@@ -186,6 +208,7 @@ void caosVM::c_CHEM() {
 
 /**
  CREA (integer) agent (agent)
+ %status done
 
  return 1 if agent is a creature, or 0 otherwise
 */
@@ -200,6 +223,7 @@ void caosVM::v_CREA() {
 
 /**
  VOCB (command)
+ %status stub
 
  make target creature learn all vocabulary immediately
 */
@@ -215,6 +239,7 @@ void caosVM::c_VOCB() {
 
 /**
  DEAD (command)
+ %status stub
 
  kill target creature biologically
 */
@@ -222,6 +247,40 @@ void caosVM::c_DEAD() {
 	caos_assert(targ);
 	Creature *c = dynamic_cast<Creature *>(targ.get());
 	caos_assert(c);
+
+	// TODO
+}
+
+/*
+ DEAD (integer)
+ %status stub
+
+ return 1 if target creature is dead, or 0 otherwise
+*/
+void caosVM::v_DEAD() {
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	result.setInt(0); // TODO
+}
+
+/*
+ NORN (command) creature (agent)
+ %status stub
+*/
+void caosVM::c_NORN() {
+	VM_PARAM_AGENT(creature)
+
+	// TODO
+}
+
+/*
+ NORN (agent)
+ %status stub
+*/
+void caosVM::v_NORN() {
+	result.setAgent(0); // TODO
 }
 
 /* vim: set noet: */
