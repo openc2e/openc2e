@@ -145,7 +145,7 @@ void caosVM::v_CABV() {
 	result.setInt(-1); // TODO
 }
 
-/*
+/**
  RPAS (command) vehicle (agent) passenger (agent)
 */
 void caosVM::c_RPAS() {

@@ -251,7 +251,7 @@ void caosVM::c_DEAD() {
 	// TODO
 }
 
-/*
+/**
  DEAD (integer)
  %status stub
 
@@ -265,7 +265,7 @@ void caosVM::v_DEAD() {
 	result.setInt(0); // TODO
 }
 
-/*
+/**
  NORN (command) creature (agent)
  %status stub
 */
@@ -275,7 +275,7 @@ void caosVM::c_NORN() {
 	// TODO
 }
 
-/*
+/**
  NORN (agent)
  %status stub
 */
