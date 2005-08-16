@@ -45,7 +45,6 @@ class simpleCaosOp : public caosOp {
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			int stackc = vm->valueStack.size();
-			vm->result.reset();
 			(vm->*handler)();
 			int delta = vm->valueStack.size() - stackc;
 			if (!vm->result.isNull())

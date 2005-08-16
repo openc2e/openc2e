@@ -440,7 +440,6 @@ void caosVM::v_AVAR() {
 	assert(index > -1);
 	assert(index < 100);
 	assert(agent);
-	result = agent->var[index];
 	returnVariable(agent->var[index]);
 }
 
