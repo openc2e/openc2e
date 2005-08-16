@@ -314,6 +314,7 @@ public:
 	void c_DCOR();
 	void c_MIRA();
 	void v_MIRA();
+	void v_DISQ();
 	
 	// motion
 	void c_ELAS();

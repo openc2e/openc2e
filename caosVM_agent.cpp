@@ -870,4 +870,21 @@ void caosVM::c_MIRA() {
 	// TODO
 }
 
+/*
+ DISQ (float) other (agent)
+ %status maybe
+
+ return square of distance of centre points of TARG and other agents
+*/
+void caosVM::v_DISQ() {
+	VM_PARAM_AGENT(other)
+
+	caos_assert(targ);
+	
+	float x = (targ->x + (targ->getWidth() / 2)) - (other->x + (other->getWidth() / 2));
+	float y = (targ->y + (targ->getHeight() / 2)) - (other->y + (other->getHeight() / 2));
+
+	result.setFloat(x*x + y*y);
+}
+
 /* vim: set noet: */
