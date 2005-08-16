@@ -870,7 +870,7 @@ void caosVM::c_MIRA() {
 	// TODO
 }
 
-/*
+/**
  DISQ (float) other (agent)
  %status maybe
 
