@@ -149,8 +149,9 @@ void Agent::tick() {
 			int dx = (ix < idestx ? 1 : -1);
 			int dy = (iy < idesty ? 1 : -1);
 
-			Room *room1 = 0, *room2 = 0, *room3 = 0, *room4 = 0;
-			Room *oroom1, *oroom2, *oroom3, *oroom4;
+			Room *room[4];
+			Room *oroom[4];
+			for (unsigned int i = 0; i < 4; i++) room[i] = 0;
 			
 			while (ix != idestx || iy != idesty) {
 				// We just alternate here. There's probably a more
@@ -168,36 +169,36 @@ void Agent::tick() {
 					ix += dx;
 				}
 
-				oroom1 = room1;
-				oroom2 = room2;
-				oroom3 = room3;
-				oroom4 = room4;
+				for (unsigned int i = 0; i < 4; i++) oroom[i] = room[i];
 
-				if (room1) {
-					if (!room1->containsPoint(ix, iy))
-						room1 = 0;	
-				} else room1 = 0;
-				if (!room1) room1 = world.map.roomAt(ix, iy);
+				if (room[0]) {
+					if (!room[0]->containsPoint(ix, iy))
+						room[0] = 0;	
+				} else room[0] = 0;
+				if (!room[0]) room[0] = world.map.roomAt(ix, iy);
 					
-				if (room2) {
-					if (!room2->containsPoint(ix + getWidth(), iy + getHeight()))
-						room2 = 0;
-				} else room2 = 0;
-				if (!room2) room2 = world.map.roomAt(ix + getWidth(), iy + getHeight());
+				if (room[1]) {
+					if (!room[1]->containsPoint(ix + getWidth(), iy + getHeight()))
+						room[1] = 0;
+				} else room[1] = 0;
+				if (!room[1]) room[1] = world.map.roomAt(ix + getWidth(), iy + getHeight());
 
-				if (room3) {
-					if (!room3->containsPoint(ix, iy + getHeight()))
-						room3 = 0;
-				} else room3 = 0;
-				if (!room3) room3 = world.map.roomAt(ix, iy + getHeight());
+				if (room[2]) {
+					if (!room[2]->containsPoint(ix, iy + getHeight()))
+						room[2] = 0;
+				} else room[2] = 0;
+				if (!room[2]) room[2] = world.map.roomAt(ix, iy + getHeight());
 
-				if (room4) {
-					if (!room4->containsPoint(ix + getWidth(), iy))
-						room4 = 0;
-				} else room4 = 0;
-				if (!room4) room4 = world.map.roomAt(ix + getWidth(), iy);
+				if (room[3]) {
+					if (!room[3]->containsPoint(ix + getWidth(), iy))
+						room[3] = 0;
+				} else room[3] = 0;
+				if (!room[3]) room[3] = world.map.roomAt(ix + getWidth(), iy);
 
-				if ((!room1) || (!room2) || (!room3) || (!room4)) {
+				bool cannotmove = false;
+				cannotmove = (!room[0]) || (!room[1]) || (!room[2]) || (!room[3]);
+			
+				if (cannotmove) {
 					if (movedy) {
 						iy -= dy;
 						collided = true; // .. but only if moved is true
@@ -228,19 +229,19 @@ void Agent::tick() {
 							Line l;
 							switch (i) {
 								case 0:
-									if (j == 0) r = oroom1; else r = oroom4;
+									if (j == 0) r = oroom[0]; else r = oroom[3];
 									l = r->top;
 									break;
 								case 1:
-									if (j == 0) r = oroom2; else r = oroom3;
+									if (j == 0) r = oroom[1]; else r = oroom[2];
 									l = r->bot;
 									break;
 								case 2:
-									if (j == 0) r = oroom1; else r = oroom3;
+									if (j == 0) r = oroom[0]; else r = oroom[2];
 									l = r->left;
 									break;
 								case 3:
-									if (j == 0) r = oroom2; else r = oroom4;
+									if (j == 0) r = oroom[1]; else r = oroom[3];
 									l = r->right;
 									break;
 							}
