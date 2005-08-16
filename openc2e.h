@@ -33,7 +33,7 @@ public:
 	assertFailure(const char *x) throw() : creaturesException(x) { }
 };
 
-#define caos_assert(x) if (!(x)) { throw tracedAssertFailure(#x, __FILE__, __LINE__); }
+#define caos_assert(x) if (!(x)) { throw caosException(#x); }
 
 #endif
 /* vim: set noet: */
