@@ -64,13 +64,7 @@ print <<END;
 	<body>
 		<h1>CAOS command reference - openc2e dev build</h1>
                 <i>Last updated $time (UTC)</i>
-		<div id="index"><ul>
 END
-
-foreach my $c (@catl) {
-	print "<li><a href=\"#c_", $c->{anchor}, "\">", $c->{name}, "</a></li>\n";
-}
-print "</ul></div>\n";
 
 
 my %st_insert = (
@@ -99,6 +93,12 @@ print '<div id="summary">';
 print scalar keys %{$data->{ops}}, " commands in total; ";
 print join ", ", @cstat;
 print ".</div>";
+print '<div id="index"><ul>';
+foreach my $c (@catl) {
+	print "<li><a href=\"#c_", $c->{anchor}, "\">", $c->{name}, "</a></li>\n";
+}
+print "</ul></div>\n";
+
 
 
 
