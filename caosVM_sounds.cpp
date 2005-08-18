@@ -56,6 +56,7 @@ void caosVM::c_SNDC() {
 	if (s) {
 		targ->soundslot = s;
 		s->play();
+		s->agent = targ.get();
 		targ->positionAudio(s);
 	}
 }
@@ -73,6 +74,7 @@ void caosVM::c_SNDL() {
 	if (s) {
 		targ->soundslot = s;
 		s->playLooped();
+		s->agent = targ.get();
 		targ->positionAudio(s);
 	}
 }

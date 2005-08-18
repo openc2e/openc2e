@@ -38,6 +38,7 @@ class Agent {
 	friend class World;
 	friend class opOVxx;
 	friend class opMVxx;
+	friend class SDLBackend; // TODO: should we make soundslot public instead?
 
 protected:
 	caosVar var[100]; // OVxx

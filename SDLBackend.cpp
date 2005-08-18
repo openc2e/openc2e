@@ -20,6 +20,7 @@
 #include "SDLBackend.h"
 #include "SDL_gfxPrimitives.h"
 #include "openc2e.h"
+#include "Agent.h"
 #include <strings.h> // bzero
 
 SDLBackend *g_backend;
@@ -79,12 +80,16 @@ SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
 		if (sounddata[i].sound == 0) break;
 		if (!Mix_Playing(sounddata[i].soundchannel)) {
 			sounddata[i].sound = 0;
+			if (sounddata[i].agent)
+				sounddata[i].agent->soundslot = 0;
 			break;
 		}
 		i++;
 	}
 	
 	if (i == nosounds) return 0; // no free slots, so return
+
+	sounddata[i].agent = 0;
 
 	std::map<std::string, Mix_Chunk *>::iterator it = soundcache.find(filename);
 	if (it != soundcache.end()) {
