@@ -109,22 +109,38 @@ const static struct option longopts[] = {
 		NULL,
 		'v'
 	},
+	{	"data",
+		required_argument,
+		NULL,
+		'd'
+	},
+	{	"bootstrap",
+		required_argument,
+		NULL,
+		'b'
+	},
 	{ NULL, 0, NULL, 0 }
 };
 
-const static char optstring[] = "hvs";
+const static char optstring[] = "hvsd:b:";
+
+static const char data_default[] = "./data";
+static const char bootstrap_suffix[] = "/Bootstrap/001 World";
 
 static void opt_help(const char *exename) {
 	if (!exename) // argc == 0? o_O
 		exename = "openc2e";
-	std::cout << "Usage: " << exename << " [--help|-h] [--version|-v] [--nosound] [bootstrap]" << std::endl;
-	std::cout << "Runs the openc2e creatures engine using data stored in the directory \"data\" under" << std::endl <<
-		"the current directory, and bootstrap in [bootstrap], or \"data/Bootstrap/001 World\"" << std::endl <<
-		"if not specified." << std::endl;
+	std::cout << "Usage: " << exename << " [options]" << std::endl;
 	std::cout << std::endl;
 	printf("  %-20s %s\n", "-h, -?, --help", "shows this help");
 	printf("  %-20s %s\n", "-v, --version", "shows program version");
 	printf("  %-20s %s\n", "-s, --silent", "disables game sounds");
+	printf("  %-20s %s\n", "-d, --data", "sets base path for game data");
+	printf("  %-20s %s\n", "-b, --bootstrap", "sets bootstrap directory");
+	std::cout << std::endl <<
+		"If --data is not specified, it defaults to \"" << data_default << "\". If --bootstrap is"<< std::endl <<
+		"not specified, it defaults to \"<data directory>" << bootstrap_suffix << "\"."	<< std::endl;
+
 }
 
 static void opt_version() {
@@ -136,13 +152,16 @@ static void opt_version() {
 		"...please don't sue us." << std::endl;
 }
 
+std::string datapath;
 extern "C" int main(int argc, char *argv[]) {
 	try {
 		
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2005 Alyssa Milburn\n\n";
 	int optret;
 	bool enable_sound = true;
-	const char *bootstrap = "data/Bootstrap/001 World";
+	std::string bootstrap;
+	std::string data;
+	bool bs_specd = false, d_specd = false;
 	while (-1 != (optret = getopt_long(argc, argv, optstring, longopts, NULL))) {
 		switch (optret) {
 			case 'h': //fallthru
@@ -155,20 +174,46 @@ extern "C" int main(int argc, char *argv[]) {
 			case 's':
 				enable_sound = false;
 				break;
+			case 'd':
+				if (d_specd) {
+					std::cerr << "Error: --data specified twice." << std::endl;
+					opt_help(argv[0]);
+					return 1;
+				}
+				d_specd = true;
+				data = optarg;
+				break;
+			case 'b':
+				if (bs_specd) {
+					std::cerr << "Error: --bootstrap specified twice." << std::endl;
+					opt_help(argv[0]);
+					return 1;
+				}
+				bs_specd = true;
+				bootstrap = optarg;
+				break;
 		}
 	}
+
+	if (!d_specd) {
+		data = data_default;
+	}
+
+	if (!bs_specd) {
+		bootstrap = data + bootstrap_suffix;
+	}
 	
-	if (optind > argc) {
+	if (optind < argc) {
 		// too many args
 		opt_help(argv[0]);
 		return 1;
-	} else if (optind == argc - 1) {
-		bootstrap = argv[argc];
 	}
+
+	datapath = data;
 
 	registerDelegates();
 	world.init();
-	world.catalogue.initFrom("data/Catalogue/");
+	world.catalogue.initFrom(fs::path(datapath + "/Catalogue/", fs::native));
 	// moved backend.init() here because we need the camera to be valid - fuzzie
 	backend.init(enable_sound);
 	world.camera.setBackend(&backend);
