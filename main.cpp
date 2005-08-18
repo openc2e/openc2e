@@ -1,3 +1,7 @@
+#define _GNU_SOURCE // for getopt_long
+
+#include <getopt.h>
+
 #include <sstream> // for istringstream, used in networking code
 #include <fstream>
 #include "openc2e.h"
@@ -84,10 +88,81 @@ void drawWorld() {
 
 namespace fs = boost::filesystem;
 
+extern "C" {
+	extern char *optarg;
+	extern int optind, opterr, optopt;
+}
+
+int arg_no_sound = 0;
+
+const static struct option longopts[] = {
+	{	"nosound",
+		no_argument,
+		&arg_no_sound,
+		1
+	},
+	{	"help",
+		no_argument,
+		NULL,
+		'h'
+	},
+	{	"version",
+		no_argument,
+		NULL,
+		'v'
+	},
+	{ NULL, 0, NULL, 0 }
+};
+
+const static char optstring[] = "hv";
+
+static void opt_help(const char *exename) {
+	if (!exename) // argc == 0? o_O
+		exename = "openc2e";
+	std::cout << "Usage: " << exename << " [--help|-h] [--version|-v] [--nosound] [bootstrap]" << std::endl;
+	std::cout << "Runs the openc2e creatures engine using data stored in 'data' under" << std::endl <<
+		"the current directory, and bootstrap in [bootstrap], or data/Bootstrap/001 world" << std::endl <<
+		"if not specified." << std::endl;
+	std::cout << std::endl;
+	printf("  %-20s %s\n", "-h, -?, --help", "shows this help");
+	printf("  %-20s %s\n", "-v, --version", "shows program version");
+	printf("  %-20s %s\n", "--nosound", "disables game sounds");
+}
+
+static void opt_version() {
+	// We already showed the primary version bit, just throw in some random
+	// legalese
+	std::cout << 
+		"This is free software; see the source for copying conditions.  There is NO" << std::endl <<
+		"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << std::endl << std::endl <<
+		"...please don't sue us." << std::endl;
+}
+
 extern "C" int main(int argc, char *argv[]) {
 	try {
 		
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2005 Alyssa Milburn\n\n";
+	int optret;
+	const char *bootstrap = "data/Bootstrap/001 World";
+	while (-1 != (optret = getopt_long(argc, argv, optstring, longopts, NULL))) {
+		switch (optret) {
+			case 'h':
+			case '?':
+				opt_help(argv[0]);
+				return 0;
+			case 'v':
+				opt_version();
+				return 0;
+		}
+	}
+	
+	if (optind > argc) {
+		// too many args
+		opt_help(argv[0]);
+		return 1;
+	} else if (optind == argc - 1) {
+		bootstrap = argv[argc];
+	}
 
 	registerDelegates();
 	world.init();
@@ -97,7 +172,7 @@ extern "C" int main(int argc, char *argv[]) {
 	world.camera.setBackend(&backend);
 
 	std::vector<std::string> scripts;
-	fs::path scriptdir((argc > 1 ? argv[1] : "data/Bootstrap/001 World/"), fs::native);
+	fs::path scriptdir(bootstrap, fs::native);
 
 	bool singlescript = false;
 	

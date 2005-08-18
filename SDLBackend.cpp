@@ -53,13 +53,17 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 	assert(screen != 0);
 }
 
+extern int arg_no_sound;
 void SDLBackend::init() {
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0) {
 		std::cerr << "SDL init failed: " << SDL_GetError() << std::endl;
 		assert(false);
 	}
 
-	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0) {
+	if (arg_no_sound) {
+		std::cerr << "Sound disabled per user request." << std::endl;
+		soundenabled = false;
+	} else if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0) {
 		std::cerr << "SDL_mixer init failed, disabling sound: " << Mix_GetError() << std::endl;
 		soundenabled = false;
 	} else soundenabled = true;
