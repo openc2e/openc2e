@@ -118,8 +118,8 @@ static void opt_help(const char *exename) {
 	if (!exename) // argc == 0? o_O
 		exename = "openc2e";
 	std::cout << "Usage: " << exename << " [--help|-h] [--version|-v] [--nosound] [bootstrap]" << std::endl;
-	std::cout << "Runs the openc2e creatures engine using data stored in 'data' under" << std::endl <<
-		"the current directory, and bootstrap in [bootstrap], or data/Bootstrap/001 world" << std::endl <<
+	std::cout << "Runs the openc2e creatures engine using data stored in the directory \"data\" under" << std::endl <<
+		"the current directory, and bootstrap in [bootstrap], or \"data/Bootstrap/001 World\"" << std::endl <<
 		"if not specified." << std::endl;
 	std::cout << std::endl;
 	printf("  %-20s %s\n", "-h, -?, --help", "shows this help");
