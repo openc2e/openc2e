@@ -220,6 +220,11 @@ public:
 	void v_AVAR();
 	void v_CHAR();
 	void v_TYPE();
+	void v_ITOF();
+	void v_FTOI();
+	void v_STRL();
+	void v_READ();
+	void v_WILD();
 
 	// flow
 	void c_DOIF();
