@@ -93,13 +93,11 @@ extern "C" {
 	extern int optind, opterr, optopt;
 }
 
-int arg_no_sound = 0;
-
 const static struct option longopts[] = {
-	{	"nosound",
+	{	"silent",
 		no_argument,
-		&arg_no_sound,
-		1
+		NULL,
+		's',
 	},
 	{	"help",
 		no_argument,
@@ -114,7 +112,7 @@ const static struct option longopts[] = {
 	{ NULL, 0, NULL, 0 }
 };
 
-const static char optstring[] = "hv";
+const static char optstring[] = "hvs";
 
 static void opt_help(const char *exename) {
 	if (!exename) // argc == 0? o_O
@@ -126,7 +124,7 @@ static void opt_help(const char *exename) {
 	std::cout << std::endl;
 	printf("  %-20s %s\n", "-h, -?, --help", "shows this help");
 	printf("  %-20s %s\n", "-v, --version", "shows program version");
-	printf("  %-20s %s\n", "--nosound", "disables game sounds");
+	printf("  %-20s %s\n", "-s, --silent", "disables game sounds");
 }
 
 static void opt_version() {
@@ -143,16 +141,20 @@ extern "C" int main(int argc, char *argv[]) {
 		
 	std::cout << "openc2e, built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2005 Alyssa Milburn\n\n";
 	int optret;
+	bool enable_sound = true;
 	const char *bootstrap = "data/Bootstrap/001 World";
 	while (-1 != (optret = getopt_long(argc, argv, optstring, longopts, NULL))) {
 		switch (optret) {
-			case 'h':
-			case '?':
+			case 'h': //fallthru
+			case '?': // -?, or any unrecognized option
 				opt_help(argv[0]);
 				return 0;
 			case 'v':
 				opt_version();
 				return 0;
+			case 's':
+				enable_sound = false;
+				break;
 		}
 	}
 	
@@ -168,7 +170,7 @@ extern "C" int main(int argc, char *argv[]) {
 	world.init();
 	world.catalogue.initFrom("data/Catalogue/");
 	// moved backend.init() here because we need the camera to be valid - fuzzie
-	backend.init();
+	backend.init(enable_sound);
 	world.camera.setBackend(&backend);
 
 	std::vector<std::string> scripts;

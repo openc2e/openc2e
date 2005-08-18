@@ -58,7 +58,7 @@ public:
 public:
 	SDLBackend() { g_backend = this; }
 	unsigned int ticks() { return SDL_GetTicks(); }
-	void init();
+	void init(bool enable_sound);
 	void resizeNotify(int _w, int _h);
 	SoundSlot *getAudioSlot(std::string filename);
 	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y);
