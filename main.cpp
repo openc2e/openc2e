@@ -1,4 +1,6 @@
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE // for getopt_long
+#endif
 
 #include <getopt.h>
 
