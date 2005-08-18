@@ -367,13 +367,11 @@ public:
 	void c_STIM_TACT();
 	void c_STIM_WRIT();
 	void c_SWAY_SHOU();
-	void c_ASLP();
 	void c_ZOMB();
 	void c_DIRN();
 	void c_NOHH();
 	void v_HHLD();
 	void c_MVFT();
-	void c_CHEM();
 	void v_CREA();
 	void c_VOCB();
 	void c_DEAD();
@@ -381,6 +379,13 @@ public:
 	void v_NORN();
 	void v_ZOMB();
 	void v_DEAD();
+	void c_URGE_SIGN();
+	void c_DRIV();
+	void v_DRIV();
+	void c_CHEM();
+	void v_CHEM();
+	void c_ASLP();
+	void v_ASLP();
 	
 	// sounds
 	void c_SNDE();

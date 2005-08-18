@@ -102,21 +102,6 @@ void caosVM::c_SWAY_SHOU() {
 }
 
 /**
- ASLP (command) sleeping (integer)
- %status stub
-
- Set whether the creature in TARG is asleep
-*/
-void caosVM::c_ASLP() {
-	VM_VERIFY_SIZE(1)
-	VM_PARAM_INTEGER(asleep)
-
-	caos_assert(targ);
-
-	//TODO
-}
-
-/**
  NOHH (command)
  %status stub
 
@@ -193,20 +178,6 @@ void caosVM::c_MVFT() {
 }
 	
 /**
- CHEM (command) chemical (integer) adjustment (float)
- %status stub
-*/
-void caosVM::c_CHEM() {
-	VM_VERIFY_SIZE(2)
-	VM_PARAM_FLOAT(adjustment)
-	VM_PARAM_INTEGER(chemical)
-
-	caos_assert(targ);
-
-	// TODO
-}
-
-/**
  CREA (integer) agent (agent)
  %status done
 
@@ -281,6 +252,117 @@ void caosVM::c_NORN() {
 */
 void caosVM::v_NORN() {
 	result.setAgent(0); // TODO
+}
+
+/**
+ URGE SIGN (command) noun_stim (float) verb_id (integer) verb_stim (float)
+ %status stub
+
+ Urge all creatures who can see OWNR to perform the given action on OWNR.
+ The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
+*/
+void caosVM::c_URGE_SIGN() {
+	VM_PARAM_FLOAT(verb_stim)
+	VM_PARAM_INTEGER(verb_id)
+	VM_PARAM_FLOAT(noun_stim)
+
+	// TODO
+}
+
+/**
+ DRIV (command) drive_id (integer) adjust (float)
+ %status stub
+
+ Modifies the level of a drive in target creature by adjust, which can range from -1.0 (decrease) to 1.0 (increase).
+*/
+void caosVM::c_DRIV() {
+	VM_PARAM_FLOAT(adjust)
+	VM_PARAM_INTEGER(drive_id)
+
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ DRIV (float) drive_id (integer)
+ %status stub
+
+ Returns the level of a drive (0.0 to 1.0) in target creature.
+*/
+void caosVM::v_DRIV() {
+	VM_PARAM_INTEGER(drive_id)
+
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ CHEM (command) chemical_id (integer) adjust (float)
+ %status stub
+
+ Modifies the level of a chemical in target creature's bloodstream by adjust, which can range from -1.0 (decrease) to 1.0 (increase).
+*/
+void caosVM::c_CHEM() {
+	VM_PARAM_FLOAT(adjust)
+	VM_PARAM_INTEGER(chemical_id)
+
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ CHEM (float) chemical_id (integer)
+ %status stub
+
+ Returns the level of a chemical (0.0 to 1.0) in target creature's bloodstream.
+*/
+void caosVM::v_CHEM() {
+	VM_PARAM_INTEGER(chemical_id)
+	
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ ASLP (command) asleep (integer)
+ %status stub
+
+ If asleep is 1, make target creature sleep. If asleep is 0, make target creature wake.
+*/
+void caosVM::c_ASLP() {
+	VM_PARAM_INTEGER(asleep)
+	
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ ASLP (integer)
+ %status stub
+
+ Returns 1 if target creature is asleep, or 0 otherwise.
+*/
+void caosVM::v_ASLP() {
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	result.setInt(0); // TODO
 }
 
 /* vim: set noet: */
