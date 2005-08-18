@@ -75,6 +75,20 @@ class caosException : public std::exception {
 			cache = NULL;
 		}
 
+		caosException(const std::string &d, const char *file, int line) throw() {
+			try {
+				std::ostringstream oss;
+				oss << d << " from " << file << ':' << line;
+				desc_is_mine = true;
+				fn_is_mine = false;
+				desc = strdup(oss.str().c_str());
+				filename = NULL;
+				this->line = -1;
+				op = NULL;
+				cache = NULL;
+			} catch(...) { abort(); }
+		}
+
 		caosException(const char *d) throw() {
 			desc_is_mine = false;
 			fn_is_mine = false;
