@@ -18,17 +18,44 @@
  */
 
 #include "Agent.h"
+#include "genome.h"
+
+class Organ {
+public:
+};
+
+class Brain {
+public:
+};
 
 class Creature : public Agent {
 protected:
+	std::vector<Organ *> organs;
+	Brain brain;
+
 	// biochemistry
 	float chemicals[256];
 
 	// non-specific bits
 	unsigned int variant;
 	bool female;
-	class genomeFile *genome;
-	bool alive;
+	genomeFile *genome;
+	
+	bool alive, asleep, dreaming;
+
+	bool zombie;
+
+	unsigned int age; // in ticks
+	lifestage stage;
+
+	Agent *attention, *focus;
+
+	// clothes
+	// linguistic stuff
+
+	// drives
+	// to-be-processed instincts
+	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
 
 public:
 	Creature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant);
