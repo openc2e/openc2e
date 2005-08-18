@@ -541,7 +541,7 @@ void caosVM::v_ITOF() {
 	result.setFloat(number);
 }
 
-/*
+/**
  FTOI (integer) number (float)
  %status maybe
 
@@ -553,7 +553,7 @@ void caosVM::v_FTOI() {
 	result.setInt(number);
 }
 
-/*
+/**
  STRL (integer) string (string)
  %status maybe
 
@@ -565,7 +565,7 @@ void caosVM::v_STRL() {
 	result.setInt(string.size());
 }
 
-/*
+/**
  READ (string) tag (string) offset (integer)
  %status maybe
 
@@ -592,7 +592,7 @@ std::string stringFromInt(int i) {
 	return std::string(buffer);
 }
 
-/*
+/**
  WILD (string) family (integer) genus (integer) species (integer) tag (string) offset (integer)
  %status maybe
 
