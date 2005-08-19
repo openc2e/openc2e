@@ -10,6 +10,8 @@
 #include "lex.mng.h"
 
 mngFlexLexer *mnglexer = NULL;
+MNGFile *g_mngfile = NULL;
+extern int mngparse(); // parser
 
 void decryptbuf(char * buf, int len) {
 	int i;
@@ -52,6 +54,12 @@ MNGFile::MNGFile(string n) {
 	if(! script) throw MNGFileException("malloc failed", errno);
 	memcpy(script, map + scriptoffset, scriptlength);
 	decryptbuf(script, scriptlength);
+
+	std::istringstream tehscript(script);
+	mngrestart(&tehscript);
+	g_mngfile = this;
+	mngparse();
+	g_mngfile = 0;
 	
 	/* XXX: Parsing code
 	while((res = yylex()) != 0) {

@@ -1,15 +1,13 @@
 #include "mngfile.h"
-#include <fstream>
-#include "mngparser.tab.hpp"
-
-extern int mngparse();
+#include <iostream>
 
 int main(int argc, char **argv) {
 	if (argc != 2) return 1;
 
-	std::ifstream in(argv[1]);
-	mngrestart(&in);
-	
-	mngparse();	
+	try {
+		MNGFile mng(argv[1]);
+	} catch (MNGFileException &e) {
+		std::cout << e.what();
+	}
 }
 

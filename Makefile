@@ -133,7 +133,7 @@ tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
 tools/praydumper: tools/praydumper.o pray.o
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
-tools/mngtest: tools/mngtest.o mngutil.o mngparser.tab.o lex.mng.o
+tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
 clean:

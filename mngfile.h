@@ -1,11 +1,15 @@
 #include <string>
 #include <vector>
+#include <list>
 #include <istream>
 #include "exceptions.h"
 
 using namespace std;
 
 void mngrestart(std::istream *is);
+
+class MNGNode {
+};
 
 class MNGFile {
 	private:
@@ -16,20 +20,21 @@ class MNGFile {
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;
 		vector< pair< string, pair< char *, int > > > samples;
+		list<MNGNode *> nodes;
 	
 	public:
 		 MNGFile(string);
 		 void enumerateSamples();
 		 ~MNGFile();
+		 void add(MNGNode *n) { nodes.push_front(n); }
 };
-	
+
+extern MNGFile *g_mngfile;
+
 class MNGFileException : public creaturesException {
 	public:
 		int error;
 		MNGFileException(const char * m, int e) throw() : creaturesException(m) { error = e; }
-};
-
-class MNGNode {
 };
 
 class MNGNamedNode : public MNGNode {
@@ -43,14 +48,18 @@ public:
 class MNGEffectDecNode : public MNGNamedNode { // effectdec
 public:
 	MNGEffectDecNode(std::string n) : MNGNamedNode(n) { }
+	std::list<MNGNode *> *children; // stagelist
 };
 
 class MNGStageNode : public MNGNode { // stage
+public:
+	std::list<MNGNode *> *children; // stagesettinglist
 };
 
 class MNGTrackDecNode : public MNGNamedNode { // trackdec
 public:
 	MNGTrackDecNode(std::string n) : MNGNamedNode(n) { }
+	std::list<MNGNode *> *children; // track
 };
 
 class MNGEffectNode : public MNGNamedNode { // effect
@@ -133,11 +142,13 @@ public:
 class MNGLoopLayerNode : public MNGNamedNode { // looplayerdec
 public:
 	MNGLoopLayerNode(std::string n) : MNGNamedNode(n) { }
+	std::list<MNGNode *> *children;
 };
 
 class MNGAleotoricLayerNode : public MNGNamedNode { // aleotoriclayerdec
 public:
 	MNGAleotoricLayerNode(std::string n) : MNGNamedNode(n) { }
+	std::list<MNGNode *> *children;
 };
 
 class MNGAddNode : public MNGBinaryExpression { // add
@@ -227,5 +238,15 @@ protected:
 
 public:
 	MNGConditionNode(MNGVariableNode *v, float o, float t) { variable = v; one = o; two = t; }
+};
+
+class MNGUpdateNode : public MNGNode { // update
+public:
+	std::list<MNGNode *> *children; // assignmentlist
+};
+
+class MNGVoiceNode : public MNGNode { // voiceblock
+public:
+	std::list<MNGNode *> *children; // voicecommands
 };
 
