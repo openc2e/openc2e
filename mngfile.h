@@ -11,6 +11,7 @@ void mngrestart(std::istream *is);
 class MNGNode {
 public:
 	virtual std::string dump() { return "[unknown node]"; }
+	virtual ~MNGNode() { }
 };
 
 class MNGFile {
@@ -74,12 +75,14 @@ public:
 	MNGEffectDecNode(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children; // stagelist
 	virtual std::string dump() { return std::string("Effect(" + name + ") { ") + dumpChildren(children) + "}\n"; }
+	virtual ~MNGEffectDecNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
 class MNGStageNode : public MNGNode { // stage
 public:
 	std::list<MNGNode *> *children; // stagesettinglist
 	virtual std::string dump() { return std::string("Stage { ") + dumpChildren(children) + "}\n"; }
+	virtual ~MNGStageNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
 class MNGTrackDecNode : public MNGNamedNode { // trackdec
@@ -87,6 +90,7 @@ public:
 	MNGTrackDecNode(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children; // track
 	virtual std::string dump() { return std::string("Track(" + name + ") { ") + dumpChildren(children) + "}\n"; }
+	virtual ~MNGTrackDecNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
 class MNGEffectNode : public MNGNamedNode { // effect
@@ -104,6 +108,7 @@ protected:
 
 public:
 	MNGBinaryExpression(MNGExpression *o, MNGExpression *t) { one = o; two = t; }
+	virtual ~MNGBinaryExpression() { delete one; delete two; }
 };
 
 class MNGConstantNode : public MNGExpression { // MNG_number
@@ -182,6 +187,7 @@ public:
 	MNGLoopLayerNode(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children;
 	virtual std::string dump() { return std::string("LoopLayer(" + name + ") { ") + dumpChildren(children) + "}\n"; }
+	virtual ~MNGLoopLayerNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
 class MNGAleotoricLayerNode : public MNGNamedNode { // aleotoriclayerdec
@@ -189,6 +195,7 @@ public:
 	MNGAleotoricLayerNode(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children;
 	virtual std::string dump() { return std::string("AleotoricLayer(" + name + ") { ") + dumpChildren(children) + "}\n"; }
+	virtual ~MNGAleotoricLayerNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
 class MNGAddNode : public MNGBinaryExpression { // add
@@ -294,6 +301,7 @@ protected:
 public:
 	MNGAssignmentNode(MNGVariableNode *v, MNGExpression *e) { variable = v; expression = e; }
 	std::string dump() { return variable->dump() + " = " + expression->dump(); }
+	virtual ~MNGAssignmentNode() { delete variable; delete expression; }
 };
 
 class MNGConditionNode : public MNGNode { // assignment
@@ -304,17 +312,20 @@ protected:
 public:
 	MNGConditionNode(MNGVariableNode *v, float o, float t) { variable = v; one = o; two = t; }
 	std::string dump() { return "Condition(" + variable->dump() + ", " + MNGConstantNode(one).dump() + ", " + MNGConstantNode(two).dump() + ")"; } // hacky..
+	virtual ~MNGConditionNode() { delete variable; }
 };
 
 class MNGUpdateNode : public MNGNode { // update
 public:
 	std::list<MNGNode *> *children; // assignmentlist
 	virtual std::string dump() { return std::string("Update { ") + dumpChildren(children) + "}\n"; }
+	virtual ~MNGUpdateNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
 class MNGVoiceNode : public MNGNode { // voiceblock
 public:
 	std::list<MNGNode *> *children; // voicecommands
 	virtual std::string dump() { return std::string("Update { ") + dumpChildren(children) + "}\n"; }
+	virtual ~MNGVoiceNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
