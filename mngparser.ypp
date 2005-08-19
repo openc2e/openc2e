@@ -15,6 +15,7 @@
 	class MNGNode *node;
 	class MNGExpression *expr;
 	class MNGExpressionContainer *container;
+	class MNGVariable *variable;
 }
  
 %token MNG_Variable
@@ -49,8 +50,9 @@
 %token MNG_comment
 
 %type <container> pan effectvolume layervolume tempodelay delay fadein fadeout beatlength beatsynch updaterate
-%type <node> effectdec stage stagesetting trackdec aleotoriclayerdec looplayerdec tracksetting wave effect interval variabledec updateblock voiceblock aleotoriclayercommand looplayercommand
-%type <expr> expression add subtract multiply divide sinewave cosinewave random variable
+%type <node> effectdec stage stagesetting trackdec aleotoriclayerdec looplayerdec tracksetting wave effect interval variabledec updateblock voiceblock aleotoriclayercommand looplayercommand assignment
+%type <expr> expression add subtract multiply divide sinewave cosinewave random
+%type <variable> variable
 
 %%
 
@@ -176,14 +178,14 @@ assignmentlist: assignment { }
 	| assignmentlist assignment { }
 ;
 
-assignment: variable '=' expression { }
+assignment: variable '=' expression { $$ = new MNGAssignment($1, $3); }
 	| MNG_comment { }
 ;
 
-variable: MNG_name { }
-	| MNG_Interval { }
-	| MNG_Volume { }
-	| MNG_Pan { }
+variable: MNG_name { $$ = new MNGVariable($1); }
+	| MNG_Interval { $$ = new MNGVariable(INTERVAL); }
+	| MNG_Volume { $$ = new MNGVariable(VOLUME); }
+	| MNG_Pan { $$ = new MNGVariable(PAN); }
 ;
 
 expression: add { $$ = $1; }
@@ -229,7 +231,7 @@ voicecommand: wave { }
 	| updateblock { }
 ;
 
-interval: MNG_Interval '(' expression ')' { }
+interval: MNG_Interval '(' expression ')' { $$ = new MNGIntervalNode($3); }
 ;
 
 condition: MNG_Condition '(' variable ',' MNG_number ',' MNG_number ')' { }

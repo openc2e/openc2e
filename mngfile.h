@@ -185,3 +185,29 @@ public:
 	MNGWaveNode(std::string n) : MNGNamedNode(n) { }
 };
 
+class MNGIntervalNode : public MNGExpressionContainer { // interval
+public:
+	MNGIntervalNode(MNGExpression *n) : MNGExpressionContainer(n) { }
+};
+
+enum variabletypes { NAMED, INTERVAL, VOLUME, PAN };
+
+class MNGVariable : public MNGExpression { // variable
+protected:
+	std::string name;
+	variabletypes variabletype;
+
+public:
+	MNGVariable(std::string n) { variabletype = NAMED; name = n; }
+	MNGVariable(variabletypes t) { variabletype = t; }
+};
+
+class MNGAssignment : public MNGNode { // assignment
+protected:
+	MNGVariable *variable;
+	MNGExpression *expression;
+	
+public:
+	MNGAssignment(MNGVariable *v, MNGExpression *e) { variable = v; expression = e; }
+};
+
