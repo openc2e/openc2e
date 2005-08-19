@@ -6,6 +6,7 @@ int main(int argc, char **argv) {
 
 	try {
 		MNGFile mng(argv[1]);
+		std::cout << mng.dump();
 	} catch (MNGFileException &e) {
 		std::cout << e.what();
 	}
