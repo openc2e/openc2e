@@ -1,0 +1,246 @@
+%{
+	extern char *mngtext;
+	extern void mngerror(char const *);
+	#include "lex.mng.h"
+	extern mngFlexLexer *mnglexer;
+	int mnglex(void) { return mnglexer->yylex(); }
+	#include <stdio.h>
+	#include "mngfile.h"
+%}
+
+%union
+{
+	float number;
+	char *string;
+	class MNGNode *node;
+	class MNGExpression *expr;
+	class MNGExpressionContainer *container;
+}
+ 
+%token MNG_Variable
+%token MNG_Effect
+%token MNG_Track
+%token MNG_Stage
+%token MNG_Pan
+%token MNG_Volume
+%token MNG_Delay
+%token MNG_TempoDelay
+%token MNG_Random
+%token MNG_FadeIn
+%token MNG_FadeOut
+%token MNG_BeatLength
+%token MNG_AleotoricLayer
+%token MNG_LoopLayer
+%token MNG_Update
+%token MNG_Add
+%token MNG_Subtract
+%token MNG_Multiply
+%token MNG_Divide
+%token MNG_SineWave
+%token MNG_CosineWave
+%token MNG_Voice
+%token MNG_Interval
+%token MNG_Condition
+%token MNG_BeatSynch
+%token MNG_UpdateRate
+%token MNG_Wave
+%token <number> MNG_number
+%token <string> MNG_name
+%token MNG_comment
+
+%type <container> pan effectvolume layervolume tempodelay delay fadein fadeout beatlength beatsynch updaterate
+%type <node> effectdec stage stagesetting trackdec aleotoriclayerdec looplayerdec tracksetting wave effect interval variabledec updateblock voiceblock aleotoriclayercommand looplayercommand
+%type <expr> expression add subtract multiply divide sinewave cosinewave random variable
+
+%%
+
+statementlist: statement { }
+	| statementlist statement { }
+;
+
+statement: effectdec { }
+	| trackdec { }
+	| variabledec { }
+	| MNG_comment { }
+;
+
+variabledec: MNG_Variable '(' MNG_name ',' expression ')' { }
+;
+
+effectdec: MNG_Effect '(' MNG_name ')' '{' stagelist '}' { $$ = new MNGEffectDecNode($3); }
+;
+
+stagelist: stage { }
+	| stagelist stage { }
+;
+
+stage: MNG_Stage '{' stagesettinglist '}' { $$ = new MNGStageNode(); }
+	| MNG_comment { }
+;
+
+stagesettinglist: stagesetting { }
+	| stagesettinglist stagesetting { }
+;
+
+stagesetting: pan { $$ = $1; }
+	| effectvolume { $$ = $1; }
+	| delay { $$ = $1; }
+	| tempodelay { $$ = $1; }
+	| MNG_comment { }
+;
+
+pan: MNG_Pan '(' expression ')' { $$ = new MNGPanNode($3); }
+;
+
+effectvolume: MNG_Volume '(' expression ')' { $$ = new MNGEffectVolumeNode($3); }
+;
+
+layervolume: MNG_Volume '(' expression ')' { $$ = new MNGLayerVolumeNode($3); }
+;
+
+delay: MNG_Delay '(' expression ')' { $$ = new MNGDelayNode($3); }
+;
+
+tempodelay: MNG_TempoDelay '(' expression ')' { $$ = new MNGTempoDelayNode($3); }
+;
+
+random: MNG_Random '(' expression ',' expression ')' { $$ = new MNGRandomNode($3, $5); }
+;
+
+trackdec: MNG_Track '(' MNG_name ')' '{' track '}' { $$ = new MNGTrackDecNode($3); }
+;
+
+track: tracksetting { }
+	| track tracksetting { }
+;
+
+tracksetting: aleotoriclayerdec { $$ = $1; }
+	| looplayerdec { $$ = $1; }
+	| fadein { $$ = $1; }
+	| fadeout { $$ = $1; }
+	| beatlength { $$ = $1; }
+	| layervolume { $$ = $1; }
+	| MNG_comment { }
+;
+
+fadein: MNG_FadeIn '(' expression ')' { $$ = new MNGFadeInNode($3); }
+;
+
+fadeout: MNG_FadeOut '(' expression ')' { $$ = new MNGFadeOutNode($3); }
+;
+
+beatlength: MNG_BeatLength '(' expression ')' { $$ = new MNGBeatLengthNode($3); }
+;
+
+aleotoriclayerdec: MNG_AleotoricLayer '(' MNG_name ')' '{' aleotoriclayer '}' { $$ = new MNGAleotoricLayerNode($3); }
+;
+
+looplayerdec: MNG_LoopLayer '(' MNG_name ')' '{' looplayer '}' { $$ = new MNGAleotoricLayerNode($3); }
+;
+
+aleotoriclayer: aleotoriclayercommand { }
+	| aleotoriclayer aleotoriclayercommand { }
+;
+
+looplayer: looplayercommand { }
+	| looplayer looplayercommand { }
+;
+
+aleotoriclayercommand: effect { $$ = $1; }
+	| MNG_comment { }
+	| layervolume { $$ = $1; }
+	| variabledec { $$ = $1; }
+	| updateblock { $$ = $1; }
+	| voiceblock { $$ = $1; }
+	| beatsynch { $$ = $1; }
+	| updaterate { $$ = $1; }
+	| interval { $$ = $1; }
+;
+
+looplayercommand: MNG_comment { }
+	| layervolume { $$ = $1; }
+	| variabledec { $$ = $1; }
+	| updateblock { $$ = $1; }
+	| beatsynch { $$ = $1; }
+	| wave { $$ = $1; }
+	| interval { $$ = $1; }
+;
+
+effect: MNG_Effect '(' MNG_name ')' { $$ = new MNGEffectNode($3); }
+;
+
+updateblock: MNG_Update '{' assignmentlist '}' { }
+;
+
+assignmentlist: assignment { }
+	| assignmentlist assignment { }
+;
+
+assignment: variable '=' expression { }
+	| MNG_comment { }
+;
+
+variable: MNG_name { }
+	| MNG_Interval { }
+	| MNG_Volume { }
+	| MNG_Pan { }
+;
+
+expression: add { $$ = $1; }
+	| subtract { $$ = $1; }
+	| multiply { $$ = $1; }
+	| divide { $$ = $1; }
+	| sinewave { $$ = $1; }
+	| cosinewave { $$ = $1; }
+	| random { $$ = $1; }
+	| variable { $$ = $1; }
+	| MNG_number { $$ = new MNGConstantNode($1); }
+;
+
+add: MNG_Add '(' expression ',' expression ')' { $$ = new MNGAddNode($3, $5); }
+;
+
+subtract: MNG_Subtract '(' expression ',' expression ')' { $$ = new MNGSubtractNode($3, $5); }
+;
+
+multiply: MNG_Multiply '(' expression ',' expression ')' { $$ = new MNGMultiplyNode($3, $5); }
+;
+
+divide: MNG_Divide '(' expression ',' expression ')' { $$ = new MNGDivideNode($3, $5); }
+;
+
+sinewave: MNG_SineWave '(' expression ',' expression ')' { $$ = new MNGSineWaveNode($3, $5); }
+;
+
+cosinewave: MNG_CosineWave '(' expression ',' expression ')' { $$ = new MNGCosineWaveNode($3, $5); }
+;
+
+voiceblock: MNG_Voice '{' voicecommands '}' { }
+;
+
+voicecommands: voicecommand { }
+	| voicecommands voicecommand { }
+;
+
+voicecommand: wave { }
+	| interval { }
+	| effect { }
+	| condition { }
+	| updateblock { }
+;
+
+interval: MNG_Interval '(' expression ')' { }
+;
+
+condition: MNG_Condition '(' variable ',' MNG_number ',' MNG_number ')' { }
+;
+
+beatsynch: MNG_BeatSynch '(' expression ')' { $$ = new MNGUpdateRateNode($3); }
+;
+
+updaterate: MNG_UpdateRate '(' expression ')' { $$ = new MNGUpdateRateNode($3); }
+;
+
+wave: MNG_Wave '(' MNG_name ')' { $$ = new MNGWaveNode($3); }
+;
+

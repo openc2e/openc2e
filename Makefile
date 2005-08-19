@@ -62,7 +62,9 @@ OPENC2E = \
 	cmddata.o \
 	lex.yy.o \
 	lexutil.o \
-	dialect.o
+	dialect.o \
+	lex.mng.o \
+	mngparser.tab.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
 XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net -lSDL_mixer
@@ -70,7 +72,7 @@ COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
-all: openc2e tools/filetests tools/praydumper docs
+all: openc2e tools/mngtest tools/filetests tools/praydumper docs
 
 docs: docs.html
 
@@ -82,6 +84,12 @@ docs.html: writehtml.pl commandinfo.yml
 
 cmddata.cpp: commandinfo.yml writecmds.pl
 	perl writecmds.pl commandinfo.yml > cmddata.cpp
+
+lex.mng.cpp lex.mng.h: mng.l mngparser.tab.hpp
+	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
+
+mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
+	bison -d --name-prefix=mng mngparser.ypp
 
 lex.yy.cpp lex.yy.h: caos.l
 	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h caos.l
@@ -125,10 +133,13 @@ tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
 tools/praydumper: tools/praydumper.o pray.o
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
+tools/mngtest: tools/mngtest.o mngutil.o mngparser.tab.o lex.mng.o
+	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
 	rm -rf .deps
-	rm -f commandinfo.yml lex.yy.cpp lex.yy.h cmddata.cpp
+	rm -f commandinfo.yml lex.yy.cpp lex.yy.h lex.mng.cpp lex.mng.h mngparser.tab.cpp mngparser.tab.hpp cmddata.cpp
 
 test: openc2e 
 	perl -MTest::Harness -e 'runtests(glob("unittests/*.t"))'

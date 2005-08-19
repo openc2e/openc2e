@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <errno.h>
 #include <SDL/SDL.h>
+#include "lex.mng.h"
+
+mngFlexLexer *mnglexer = NULL;
 
 void decryptbuf(char * buf, int len) {
 	int i;
@@ -89,5 +92,16 @@ MNGFile::~MNGFile() {
 	munmap(map, filesize);
 	fclose(f);
 }	
+
+void mngrestart(std::istream *is) {
+	if (mnglexer)
+		delete mnglexer;
+	mnglexer = new mngFlexLexer();
+	mnglexer->yyrestart(is);
+}
+
+void mngerror(char const *s) {
+	throw s; // TODO: probably should have an MNG-specific class
+}
 
 /* vim: set noet: */
