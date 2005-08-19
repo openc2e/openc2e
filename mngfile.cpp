@@ -23,6 +23,8 @@ void decryptbuf(char * buf, int len) {
 }
 
 MNGFile::MNGFile(string n) {
+	sampleno = 0;
+
 	name = n;
 	
 	f = fopen(name.c_str(), "r");
@@ -31,7 +33,6 @@ MNGFile::MNGFile(string n) {
 	}
 	
 	// Hack to obtain the filesize
-
 	fseek(f, 0, SEEK_END);
 	filesize = ftell(f);
 	
@@ -42,35 +43,12 @@ MNGFile::MNGFile(string n) {
 	}
 	
 	// Read metavariables from beginning of file
-
 	numsamples = swapEndianLong(*((int *) map));
 	scriptoffset = swapEndianLong(*(((int *) map) + 1));
 	scriptend = swapEndianLong(*(((int *) map) + 3));
 	scriptlength = scriptend - scriptoffset;
 
-	// Read and decode the MNG script
-
-	script = (char *) malloc(scriptlength * sizeof(char));
-	if(! script) throw MNGFileException("malloc failed", errno);
-	memcpy(script, map + scriptoffset, scriptlength);
-	decryptbuf(script, scriptlength);
-
-	std::istringstream tehscript(script);
-	mngrestart(&tehscript);
-	g_mngfile = this;
-	mngparse();
-	g_mngfile = 0;
-	
-	/* XXX: Parsing code
-	while((res = yylex()) != 0) {
-		printf("Token encountered: %s", names[res]);
-		if(res == T_TOKEN) printf(" token: %s", lex_token);
-		if(res == T_NUMBER) printf(" number: %f", lex_number);
-		if(res == T_NAME) printf(" name: %s", lex_text); 
-		if(res == T_WAVE) numwaves++;
-		printf("\n"); 
-	}  */
-
+	// read the samples
 	for(int i = 0; i < numsamples; i++) {
 		// Sample offsets and lengths are stored in pairs after the initial 16 bytes
 		int position = swapEndianLong(*((int *) map + 3 + (2 * i)));
@@ -82,14 +60,26 @@ MNGFile::MNGFile(string n) {
 		int size = swapEndianLong(*((int *) (map + position)));
 		position += 4; // Skip the size field
 		
-		samples.push_back(make_pair(string("hi"), make_pair(map + position, size)));
+		samples.push_back(make_pair(map + position, size));
 	}
+
+	// now we have the samples, read and decode the MNG script
+	script = (char *) malloc(scriptlength * sizeof(char));
+	if(! script) throw MNGFileException("malloc failed", errno);
+	memcpy(script, map + scriptoffset, scriptlength);
+	decryptbuf(script, scriptlength);
+
+	std::istringstream tehscript(script);
+	mngrestart(&tehscript);
+	g_mngfile = this;
+	mngparse();
+	g_mngfile = 0;
 }
 
 void MNGFile::enumerateSamples() {
-	vector< pair< string, pair< char *, int > > >::iterator i;
+	vector< pair< char *, int > >::iterator i;
 	for(i = samples.begin(); i != samples.end(); i++) {
-		printf("Position: %i Length: %i\n", (unsigned int)(*i).second.first, (*i).second.second);
+		printf("Position: %i Length: %i\n", (unsigned int)(*i).first, (*i).second);
 		// PlaySound((*i).second.first, (*i).second.second);
 	}
 }

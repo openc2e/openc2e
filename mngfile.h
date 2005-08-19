@@ -19,14 +19,16 @@ class MNGFile {
 		string name;
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;
-		vector< pair< string, pair< char *, int > > > samples;
+		vector< pair< char *, int > > samples;
 		list<MNGNode *> nodes;
+		unsigned int sampleno;
 	
 	public:
 		 MNGFile(string);
 		 void enumerateSamples();
 		 ~MNGFile();
 		 void add(MNGNode *n) { nodes.push_front(n); }
+		 pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
 };
 
 extern MNGFile *g_mngfile;
@@ -192,8 +194,11 @@ public:
 };
 
 class MNGWaveNode : public MNGNamedNode { // wave
+protected:
+	pair<char *, int> *sample;
+
 public:
-	MNGWaveNode(std::string n) : MNGNamedNode(n) { }
+	MNGWaveNode(std::string n) : MNGNamedNode(n) { sample = g_mngfile->getNextSample(); }
 };
 
 class MNGIntervalNode : public MNGExpressionContainer { // interval
