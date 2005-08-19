@@ -1,6 +1,7 @@
 %option noyywrap
 %option nodefault
 %option yylineno
+	#include <vector>
 	#include "mngparser.tab.hpp"
 %%
 [\n\r ]	;

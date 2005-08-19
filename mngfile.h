@@ -190,24 +190,42 @@ public:
 	MNGIntervalNode(MNGExpression *n) : MNGExpressionContainer(n) { }
 };
 
+class MNGVariableDecNode : public MNGNamedNode {
+protected:
+	// TODO: we should evaluate this right away, and delete the unwanted node
+	MNGExpression *initialexpression;
+	
+public:
+	MNGVariableDecNode(std::string n, MNGExpression *e) : MNGNamedNode(n) { initialexpression = e; }
+};
+
 enum variabletypes { NAMED, INTERVAL, VOLUME, PAN };
 
-class MNGVariable : public MNGExpression { // variable
+class MNGVariableNode : public MNGExpression { // variable
 protected:
 	std::string name;
 	variabletypes variabletype;
 
 public:
-	MNGVariable(std::string n) { variabletype = NAMED; name = n; }
-	MNGVariable(variabletypes t) { variabletype = t; }
+	MNGVariableNode(std::string n) { variabletype = NAMED; name = n; }
+	MNGVariableNode(variabletypes t) { variabletype = t; }
 };
 
-class MNGAssignment : public MNGNode { // assignment
+class MNGAssignmentNode : public MNGNode { // assignment
 protected:
-	MNGVariable *variable;
+	MNGVariableNode *variable;
 	MNGExpression *expression;
 	
 public:
-	MNGAssignment(MNGVariable *v, MNGExpression *e) { variable = v; expression = e; }
+	MNGAssignmentNode(MNGVariableNode *v, MNGExpression *e) { variable = v; expression = e; }
+};
+
+class MNGConditionNode : public MNGNode { // assignment
+protected:
+	MNGVariableNode *variable;
+	float one, two;
+
+public:
+	MNGConditionNode(MNGVariableNode *v, float o, float t) { variable = v; one = o; two = t; }
 };
 
