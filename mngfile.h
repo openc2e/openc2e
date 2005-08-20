@@ -371,7 +371,7 @@ public:
 		return "MNGVariableNodeIsConfused"; // TODO: exception? :P
 	}
 
-	void set(float n) { assert(variabletype != NAMED); real->set(n); }
+	void set(float n) { assert(variabletype == NAMED); real->set(n); } // TODO
 	float evaluate() {
 		switch (variabletype) {
 			case NAMED: return real->evaluate();
