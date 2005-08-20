@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 #include <istream>
 #include "exceptions.h"
 
@@ -8,9 +9,20 @@ using namespace std;
 
 void mngrestart(std::istream *is);
 
+struct processState {
+	class MNGLayer *layer;
+	class MNGFile *mngfile;
+	class MNGVoiceNode *voice;
+	class MNGStageNode *stage;
+	class MNGTrackDecNode *track;
+	
+	processState(class MNGFile *m) { mngfile = m; layer = 0; voice = 0; stage = 0; track = 0; }
+};
+
 class MNGNode {
 public:
 	virtual std::string dump() { return "[unknown node]"; }
+	virtual void postProcess(processState *s) { } // walk the tree, setting up parent pointers correctly
 	virtual ~MNGNode() { }
 };
 
@@ -23,11 +35,11 @@ class MNGFile {
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;
 		vector< pair< char *, int > > samples;
-		list<class MNGVariableDecNode *> variables;
 		list<MNGNode *> nodes;
 		unsigned int sampleno;
 	
 	public:
+		list<class MNGVariableDecNode *> variables; // TODO: should be private?
 		 MNGFile(string);
 		 void enumerateSamples();
 		 ~MNGFile();
@@ -66,11 +78,7 @@ public:
 
 inline std::string dumpChildren(std::list<MNGNode *> *c) {
 	std::string t = "\n";
-
-	for (std::list<MNGNode *>::iterator i = c->begin(); i != c->end(); i++) {
-		t = t + (*i)->dump() + "\n";
-	}
-
+	for (std::list<MNGNode *>::iterator i = c->begin(); i != c->end(); i++) t = t + (*i)->dump() + "\n";
 	return t;
 }
 
@@ -79,6 +87,7 @@ public:
 	MNGEffectDecNode(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children; // stagelist
 	virtual std::string dump() { return std::string("Effect(" + name + ") { ") + dumpChildren(children) + "}\n"; }
+	virtual void postProcess(processState *s) { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); }
 	virtual ~MNGEffectDecNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
@@ -86,6 +95,7 @@ class MNGStageNode : public MNGNode { // stage
 public:
 	std::list<MNGNode *> *children; // stagesettinglist
 	virtual std::string dump() { return std::string("Stage { ") + dumpChildren(children) + "}\n"; }
+	virtual void postProcess(processState *s) { s->stage = this; for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); s->stage = 0; }
 	virtual ~MNGStageNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
@@ -93,8 +103,8 @@ class MNGTrackDecNode : public MNGNamedNode { // trackdec
 public:
 	MNGTrackDecNode(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children; // track
-	void postProcess();
 	virtual std::string dump() { return std::string("Track(" + name + ") { ") + dumpChildren(children) + "}\n"; }
+	virtual void postProcess(processState *s) { s->track = this; for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); s->track = 0; }
 	virtual ~MNGTrackDecNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
@@ -115,6 +125,7 @@ protected:
 
 public:
 	MNGBinaryExpression(MNGExpression *o, MNGExpression *t) { one = o; two = t; }
+	virtual void postProcess(processState *s) { one->postProcess(s); two->postProcess(s); }
 	virtual ~MNGBinaryExpression() { delete one; delete two; }
 };
 
@@ -134,6 +145,7 @@ protected:
 
 public:
 	MNGExpressionContainer(MNGExpression *n) { subnode = n; }
+	virtual void postProcess(processState *s) { subnode->postProcess(s); }
 };
 
 class MNGPanNode : public MNGExpressionContainer { // pan
@@ -195,7 +207,14 @@ class MNGLayer : public MNGNamedNode {
 public:
 	MNGLayer(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children;
+	std::map<std::string, class MNGVariableDecNode *> variables;
 	void setChildren(std::list<MNGNode *> *);
+	virtual void postProcess(processState *s) {
+		s->layer = this;
+		for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++)
+			(*i)->postProcess(s);
+		s->layer = 0;
+	}
 	virtual ~MNGLayer() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
@@ -282,12 +301,15 @@ public:
 
 class MNGVariableDecNode : public MNGNamedNode {
 protected:
-	// TODO: we should evaluate this right away, and delete the unwanted node
-	MNGExpression *initialexpression;
+	float value;
 	
 public:
-	MNGVariableDecNode(std::string n, MNGExpression *e) : MNGNamedNode(n) { initialexpression = e; }
-	std::string dump() { return std::string("Variable(") + name + ", " + initialexpression->dump() + ")"; }
+	// TODO: we should ensure the expression passed here is a constant.. ?
+	MNGVariableDecNode(std::string n, MNGExpression *e) : MNGNamedNode(n) { value = e->evaluate(); delete e; }
+	std::string dump() { return std::string("Variable(") + name + ", " + MNGConstantNode(value).dump() + ")"; } // TODO: note this gives the /current/ value. also, hacky.
+	void set(float n) { value = n; }
+	float evaluate() { return value; }
+	virtual void postProcess(processState *s) { s->layer->variables[name] = this; }
 };
 
 enum variabletypes { NAMED, INTERVAL, VOLUME, PAN };
@@ -296,10 +318,48 @@ class MNGVariableNode : public MNGExpression { // variable
 protected:
 	std::string name;
 	variabletypes variabletype;
+	MNGVariableDecNode *real;
+	
+	union {
+	class MNGLayer *layer;
+	class MNGVoiceNode *voice;
+	class MNGStageNode *stage;
+	class MNGTrackDecNode *track;
+	};
 
 public:
-	MNGVariableNode(std::string n) { variabletype = NAMED; name = n; }
-	MNGVariableNode(variabletypes t) { variabletype = t; }
+	// TODO: i'm assuming layer clears them all, ie, it really is a union. is that right? - fuzzie
+	MNGVariableNode(std::string n) { layer = 0; variabletype = NAMED; name = n; }
+	MNGVariableNode(variabletypes t) { layer = 0; variabletype = t; }
+	virtual void postProcess(processState *s) {
+		switch (variabletype) {
+			case NAMED:
+				// TODO: make sure variables[name] exists, if not, look up globally
+				real = s->layer->variables[name];
+				break;
+
+			case INTERVAL:
+				if (s->voice) voice = s->voice;
+				else if (s->layer) layer = s->layer;
+				else throw "wah"; // TODO
+				break;
+				
+			case PAN:
+				if (s->stage) stage = s->stage;
+				else throw "wah"; // TODO
+				break;
+
+			case VOLUME:
+				if (s->stage) stage = s->stage;
+				else if (s->layer) layer = s->layer;
+				else if (s->track) track = s->track;
+				else throw "wah"; // TODO
+				break;
+
+			default:
+				throw "wah"; // TODO
+		}
+	}
 	std::string dump() {
 		switch (variabletype) {
 			case NAMED: return name;
@@ -311,7 +371,17 @@ public:
 		return "MNGVariableNodeIsConfused"; // TODO: exception? :P
 	}
 
-	float evaluate() { return 0; } // TODO
+	void set(float n) { assert(variabletype != NAMED); real->set(n); }
+	float evaluate() {
+		switch (variabletype) {
+			case NAMED: return real->evaluate();
+			case INTERVAL: return 0; // TODO
+			case VOLUME: return 0; // TODO
+			case PAN: return 0; // TODO
+		}
+
+		return 0; // TODO: exception!
+	}
 };
 
 class MNGAssignmentNode : public MNGNode { // assignment
@@ -323,7 +393,15 @@ public:
 	MNGAssignmentNode(MNGVariableNode *v, MNGExpression *e) { variable = v; expression = e; }
 	std::string dump() { return variable->dump() + " = " + expression->dump(); }
 	virtual ~MNGAssignmentNode() { delete variable; delete expression; }
+	void evaluate() { variable->set(expression->evaluate()); }
+	virtual void postProcess(processState *s) { variable->postProcess(s); expression->postProcess(s); }
 };
+
+inline std::string dumpAssignmentChildren(std::list<MNGAssignmentNode *> *c) {
+	std::string t = "\n";
+	for (std::list<MNGAssignmentNode *>::iterator i = c->begin(); i != c->end(); i++) t = t + (*i)->dump() + "\n";
+	return t;
+}
 
 class MNGConditionNode : public MNGNode { // condition
 protected:
@@ -333,20 +411,24 @@ protected:
 public:
 	MNGConditionNode(MNGVariableNode *v, float o, float t) { variable = v; one = o; two = t; }
 	std::string dump() { return "Condition(" + variable->dump() + ", " + MNGConstantNode(one).dump() + ", " + MNGConstantNode(two).dump() + ")"; } // hacky..
+	virtual void postProcess(processState *s) { variable->postProcess(s); }
 	virtual ~MNGConditionNode() { delete variable; }
 };
 
 class MNGUpdateNode : public MNGNode { // update
 public:
-	std::list<MNGNode *> *children; // assignmentlist
-	virtual std::string dump() { return std::string("Update { ") + dumpChildren(children) + "}\n"; }
-	virtual ~MNGUpdateNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
+	std::list<MNGAssignmentNode *> *children; // assignmentlist
+	virtual std::string dump() { return std::string("Update { ") + dumpAssignmentChildren(children) + "}\n"; }
+	virtual void postProcess(processState *s) { for (std::list<MNGAssignmentNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); }
+	virtual ~MNGUpdateNode() { for (std::list<MNGAssignmentNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
+	void evaluate() { for (std::list<MNGAssignmentNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->evaluate(); }
 };
 
 class MNGVoiceNode : public MNGNode { // voiceblock
 public:
 	std::list<MNGNode *> *children; // voicecommands
 	virtual std::string dump() { return std::string("Voice { ") + dumpChildren(children) + "}\n"; }
+	virtual void postProcess(processState *s) { s->voice = this; for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); s->voice = 0; }
 	virtual ~MNGVoiceNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 

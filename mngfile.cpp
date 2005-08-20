@@ -74,6 +74,11 @@ MNGFile::MNGFile(string n) {
 	g_mngfile = this;
 	mngparse();
 	g_mngfile = 0;
+
+	processState *p = new processState(this);
+	for (std::list<MNGNode *>::iterator i = nodes.begin(); i != nodes.end(); i++)
+		(*i)->postProcess(p);
+	delete p;
 }
 
 void MNGFile::enumerateSamples() {
