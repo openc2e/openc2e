@@ -18,9 +18,14 @@
 	class MNGExpressionContainer *container;
 	class MNGVariableNode *variable;
 	class MNGVariableDecNode *variabledec;
+	class MNGTrackDecNode *trackdec;
+	class MNGEffectDecNode *effectdec;
 	class MNGAssignmentNode *assignment;
+	class MNGStageNode *stage;
+	class MNGLayer *layer;
 	std::list<class MNGAssignmentNode *> *assignmentarray;
 	std::list<class MNGNode *> *array;
+	std::list<class MNGStageNode *> *stagearray;
 }
  
 %token MNG_Variable
@@ -55,13 +60,17 @@
 %token MNG_comment
 
 %type <container> pan effectvolume layervolume tempodelay delay fadein fadeout beatlength beatsynch updaterate
-%type <node> effectdec stage stagesetting trackdec aleotoriclayerdec looplayerdec tracksetting wave effect interval updateblock voiceblock aleotoriclayercommand looplayercommand voicecommand condition
+%type <node> stagesetting aleotoriclayerdec looplayerdec tracksetting wave effect interval updateblock voiceblock aleotoriclayercommand looplayercommand voicecommand condition
 %type <expr> expression add subtract multiply divide sinewave cosinewave random
 %type <variable> variable
-%type <array> stagelist stagesettinglist track aleotoriclayer looplayer voicecommands
+%type <array> stagesettinglist track aleotoriclayer looplayer voicecommands
 %type <assignment> assignment
 %type <assignmentarray> assignmentlist
 %type <variabledec> variabledec
+%type <effectdec> effectdec
+%type <trackdec> trackdec
+%type <stage> stage
+%type <stagearray> stagelist
 
 %%
 
@@ -71,7 +80,7 @@ statementlist: statement { }
 
 statement: effectdec { g_mngfile->add($1); }
 	| trackdec { g_mngfile->add($1); }
-	| variabledec { g_mngfile->addVariable($1); }
+	| variabledec { g_mngfile->add($1); }
 	| MNG_comment { }
 ;
 
@@ -81,7 +90,7 @@ variabledec: MNG_Variable '(' MNG_name ',' expression ')' { $$ = new MNGVariable
 effectdec: MNG_Effect '(' MNG_name ')' '{' stagelist '}' { $$ = new MNGEffectDecNode($3); ((MNGEffectDecNode *)$$)->children = $6; }
 ;
 
-stagelist: stage { $$ = new std::list<MNGNode *>; if ($1) $$->push_back($1); }
+stagelist: stage { $$ = new std::list<MNGStageNode *>; if ($1) $$->push_back($1); }
 	| stagelist stage { $$ = $1; if ($2) $$->push_back($2); }
 ;
 

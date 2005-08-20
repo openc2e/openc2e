@@ -77,8 +77,11 @@ MNGFile::MNGFile(string n) {
 	g_mngfile = 0;
 
 	processState *p = new processState(this);
-	for (std::list<MNGNode *>::iterator i = nodes.begin(); i != nodes.end(); i++)
-		(*i)->postProcess(p);
+	for (std::map<std::string, MNGEffectDecNode *>::iterator i = effects.begin(); i != effects.end(); i++)
+		(*i).second->postProcess(p);
+	for (std::map<std::string, MNGTrackDecNode *>::iterator i = tracks.begin(); i != tracks.end(); i++)
+		(*i).second->postProcess(p);
+	// don't call postProcess on variabledec!
 	delete p;
 }
 

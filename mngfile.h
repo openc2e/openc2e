@@ -26,42 +26,6 @@ public:
 	virtual ~MNGNode() { }
 };
 
-class MNGFile {
-	private:
-		FILE * f;
-		long filesize;
-		char * map;
-		string name;
-		int numsamples, scriptoffset, scriptlength, scriptend;
-		char * script;
-		vector< pair< char *, int > > samples;
-		list<MNGNode *> nodes;
-		unsigned int sampleno;
-	
-	public:
-		list<class MNGVariableDecNode *> variables; // TODO: should be private?
-		 MNGFile(string);
-		 void enumerateSamples();
-		 ~MNGFile();
-		 void add(MNGNode *n) { nodes.push_back(n); }
-		 void addVariable(class MNGVariableDecNode *n) { variables.push_back(n); }
-		 pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
-
-		 std::string dump() {
-		 	std::string t = "\n";
-
-			for (std::list<MNGNode *>::iterator i = nodes.begin(); i != nodes.end(); i++) {
-				t = t + (*i)->dump() + "\n";
-			}
-
-			// TODO: dump variables
-
-			return t;
-		}
-};
-
-extern MNGFile *g_mngfile;
-
 class MNGFileException : public creaturesException {
 	public:
 		int error;
@@ -74,6 +38,7 @@ protected:
 
 public:
 	MNGNamedNode(std::string n) { name = n; }
+	std::string getName() { return name; }
 };
 
 inline std::string dumpChildren(std::list<MNGNode *> *c) {
@@ -82,21 +47,21 @@ inline std::string dumpChildren(std::list<MNGNode *> *c) {
 	return t;
 }
 
-class MNGEffectDecNode : public MNGNamedNode { // effectdec
-public:
-	MNGEffectDecNode(std::string n) : MNGNamedNode(n) { }
-	std::list<MNGNode *> *children; // stagelist
-	virtual std::string dump() { return std::string("Effect(" + name + ") { ") + dumpChildren(children) + "}\n"; }
-	virtual void postProcess(processState *s) { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); }
-	virtual ~MNGEffectDecNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
-};
-
 class MNGStageNode : public MNGNode { // stage
 public:
 	std::list<MNGNode *> *children; // stagesettinglist
 	virtual std::string dump() { return std::string("Stage { ") + dumpChildren(children) + "}\n"; }
 	virtual void postProcess(processState *s) { s->stage = this; for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); s->stage = 0; }
 	virtual ~MNGStageNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
+};
+
+class MNGEffectDecNode : public MNGNamedNode { // effectdec
+public:
+	MNGEffectDecNode(std::string n) : MNGNamedNode(n) { }
+	std::list<class MNGStageNode *> *children; // stagelist
+	virtual std::string dump() { return std::string("Effect(" + name + ") { ") + /*dumpEffectChildren(children)*/ + "}\n"; } // TODO!!!
+	virtual void postProcess(processState *s) { for (std::list<MNGStageNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); }
+	virtual ~MNGEffectDecNode() { for (std::list<MNGStageNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
 
 class MNGTrackDecNode : public MNGNamedNode { // trackdec
@@ -284,15 +249,6 @@ public:
 	std::string dump() { return std::string("UpdateRate(") + subnode->dump() + ")"; }
 };
 
-class MNGWaveNode : public MNGNamedNode { // wave
-protected:
-	pair<char *, int> *sample;
-
-public:
-	MNGWaveNode(std::string n) : MNGNamedNode(n) { sample = g_mngfile->getNextSample(); }
-	std::string dump() { return std::string("Wave(") + name + ")"; }
-};
-
 class MNGIntervalNode : public MNGExpressionContainer { // interval
 public:
 	MNGIntervalNode(MNGExpression *n) : MNGExpressionContainer(n) { }
@@ -431,4 +387,52 @@ public:
 	virtual void postProcess(processState *s) { s->voice = this; for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) (*i)->postProcess(s); s->voice = 0; }
 	virtual ~MNGVoiceNode() { for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++) delete *i; delete children; }
 };
+
+class MNGFile {
+	private:
+		FILE * f;
+		long filesize;
+		char * map;
+		string name;
+		int numsamples, scriptoffset, scriptlength, scriptend;
+		char * script;
+		vector< pair< char *, int > > samples;
+		std::map<std::string, class MNGEffectDecNode *> effects;
+		std::map<std::string, class MNGTrackDecNode *> tracks;
+		unsigned int sampleno;
+	
+	public:
+		std::map<std::string, class MNGVariableDecNode *> variables; // TODO: should be private?
+		 MNGFile(string);
+		 void enumerateSamples();
+		 ~MNGFile();
+		 void add(class MNGEffectDecNode *n) { effects[n->getName()] = n; }
+		 void add(class MNGTrackDecNode *n) { tracks[n->getName()] = n; }
+		 void add(class MNGVariableDecNode *n) { variables[n->getName()] = n; }
+		 pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
+
+		 std::string dump() {
+		 	std::string t = "\n";
+
+			/*for (std::list<MNGNode *>::iterator i = nodes.begin(); i != nodes.end(); i++) {
+				t = t + (*i)->dump() + "\n";
+			} */
+
+			// TODO: dump variables/tracks/effects
+
+			return t;
+		}
+};
+
+extern MNGFile *g_mngfile;
+
+class MNGWaveNode : public MNGNamedNode { // wave
+protected:
+	pair<char *, int> *sample;
+
+public:
+	MNGWaveNode(std::string n) : MNGNamedNode(n) { sample = g_mngfile->getNextSample(); }
+	std::string dump() { return std::string("Wave(") + name + ")"; }
+};
+
 
