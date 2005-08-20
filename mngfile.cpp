@@ -64,7 +64,8 @@ MNGFile::MNGFile(string n) {
 	}
 
 	// now we have the samples, read and decode the MNG script
-	script = (char *) malloc(scriptlength * sizeof(char));
+	script = (char *) malloc(scriptlength + 1);
+	script[scriptlength] = 0;
 	if(! script) throw MNGFileException("malloc failed", errno);
 	memcpy(script, map + scriptoffset, scriptlength);
 	decryptbuf(script, scriptlength);
