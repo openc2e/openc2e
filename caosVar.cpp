@@ -65,6 +65,8 @@ bool caosVar::operator == (const caosVar &v) const {
 bool caosVar::operator > (const caosVar &v) const {
 	if (this->hasDecimal() && v.hasDecimal()) {
 		return this->getFloat() > v.getFloat();
+	} else if (this->hasString() && v.hasString()) {
+		return this->getString() > v.getString();
 	}
 	// todo: should be able to compare strings, apparently
 	
@@ -75,6 +77,8 @@ bool caosVar::operator > (const caosVar &v) const {
 bool caosVar::operator < (const caosVar &v) const {
 	if (this->hasDecimal() && v.hasDecimal()) {
 		return this->getFloat() < v.getFloat();
+	} else if (this->hasString() && v.hasString()) {
+		return this->getString() < v.getString();
 	}
 	// todo: should be able to compare strings, apparently
 	
