@@ -1,1 +1,1 @@
-system('./openc2e', 'unittests/ifblocks.cos');
+system('./openc2e', '-b', 'unittests/ifblocks.cos');

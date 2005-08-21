@@ -1,1 +1,1 @@
-system('./openc2e', 'unittests/file.cos');
+system('./openc2e', '-b', 'unittests/file.cos');
