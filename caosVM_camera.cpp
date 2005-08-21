@@ -36,7 +36,7 @@ void caosVM::c_META() {
 	VM_PARAM_INTEGER(metaroom_id)
 
 	assert(metaroom_id >= 0);
-	assert((unsigned int)metaroom_id < world.map.getMetaRoomCount());
+	// TODO assert((unsigned int)metaroom_id < world.map.getMetaRoomCount());
 	world.camera.goToMetaRoom(metaroom_id, camera_x, camera_y, (cameratransition)transition);
 }
 

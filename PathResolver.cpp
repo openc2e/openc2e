@@ -76,7 +76,12 @@ bool resolveFile(string &srcPath) {
 
 	orig = dir / lcpath(leaf);
 	string fn = orig.string();
-	
+
+	if (exists(orig)) {
+		srcPath = fn;
+		return true;
+	}
+
 	map<string, string>::iterator i = cache.find(fn);
 	if (i == cache.end())
 		return false;
