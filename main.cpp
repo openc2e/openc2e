@@ -339,24 +339,21 @@ extern "C" int main(int argc, char *argv[]) {
 		 this is because it makes the game seem terribly unresponsive..
 		*/
 		if (!paused && (backend.ticks() > (tickdata + world.ticktime))) {
-			ticktime[ticktimeptr] = backend.ticks();
+			tickdata = backend.ticks();
 			
 			world.tick();
+			if (handAgent) // TODO: do this in world.tick()
+				handAgent->moveTo(world.hand()->x + 2, world.hand()->y + 2);
 			drawWorld();
 			
-			ticktime[ticktimeptr] = backend.ticks() - ticktime[ticktimeptr];
+			ticktime[ticktimeptr] = backend.ticks() - tickdata;
 			ticktimeptr++;
 			if (ticktimeptr == 10) ticktimeptr = 0;
 			float avgtime = 0;
 			for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktime[i] / world.ticktime);
 			world.pace = avgtime / 10;
-			
-			tickdata = backend.ticks();
 
 			ticked = true;
-
-			if (handAgent)
-				handAgent->moveTo(world.hand()->x + 2, world.hand()->y + 2);
 		}
 		
 		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
