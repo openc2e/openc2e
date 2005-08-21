@@ -24,7 +24,7 @@
  META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)
  
  set metaroom current camera is pointing at. coordinates point to top left of new
- camera position.
+ camera position. set a coordinate to -1 to use the top-left corner of the metaroom.
  
  transition: 0 for none, 1 for flip horz, 2 for burst
  */
@@ -36,8 +36,13 @@ void caosVM::c_META() {
 	VM_PARAM_INTEGER(metaroom_id)
 
 	assert(metaroom_id >= 0);
-	// TODO assert((unsigned int)metaroom_id < world.map.getMetaRoomCount());
-	world.camera.goToMetaRoom(metaroom_id, camera_x, camera_y, (cameratransition)transition);
+	MetaRoom *m = world.map.getMetaRoom(metaroom_id);
+	if (!m) return; // DS does 'meta 0 -1 -1 0' in !map.cos for some stupid reason
+	
+	int camerax = camera_x; if (camerax == -1) camerax = m->x();
+	int cameray = camera_y; if (cameray == -1) cameray = m->y();
+	
+	world.camera.goToMetaRoom(metaroom_id, camerax, cameray, (cameratransition)transition);
 }
 
 /**
