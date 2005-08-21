@@ -65,8 +65,9 @@ void caosVM::c_OUTV() {
 
 /**
 	GAME (variable) name (string)
+	%status maybe
 
-	returns game variable with name given (unchecked)
+	returns game variable with name given
 */
 void caosVM::v_GAME() {
 	VM_VERIFY_SIZE(1)
@@ -75,6 +76,21 @@ void caosVM::v_GAME() {
 	caosVar &i = world.variables[name];
 	valueStack.push_back(&i);
 }
+
+/**
+ EAME (variable) name (string)
+ %status maybe
+
+ returns temporary game variable with name given
+*/
+void caosVM::v_EAME() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(name)
+
+	caosVar &i = world.eame_variables[name];
+	valueStack.push_back(&i);
+}
+
 
 /**
  DELG (command) name (string)
