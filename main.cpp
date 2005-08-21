@@ -128,6 +128,7 @@ const static char optstring[] = "hvsd:b:";
 
 static const char data_default[] = "./data";
 static const char bootstrap_suffix[] = "/Bootstrap/001 World";
+static const char bootstrapDS_suffix[] = "/Bootstrap/010 Docking Station";
 
 static void opt_help(const char *exename) {
 	if (!exename) // argc == 0? o_O
@@ -203,6 +204,9 @@ extern "C" int main(int argc, char *argv[]) {
 
 	if (!bs_specd) {
 		bootstrap = data + bootstrap_suffix;
+		fs::path scriptdir(bootstrap, fs::native);
+		if (!fs::exists(scriptdir))
+			bootstrap = data + bootstrapDS_suffix;
 	}
 	
 	if (optind < argc) {
