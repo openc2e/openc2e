@@ -294,7 +294,7 @@ extern "C" int main(int argc, char *argv[]) {
 	Agent *handAgent = 0;
 
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
-		MetaRoom *m = world.map.getMetaRoom(j);
+		MetaRoom *m = world.map.getArrayMetaRoom(j);
 		blkImage *test = m->backImage();
 		assert(test != 0);
 

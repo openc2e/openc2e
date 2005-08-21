@@ -40,6 +40,7 @@ public:
 
 	int addMetaRoom(MetaRoom *);
 	MetaRoom *getMetaRoom(unsigned int);
+	MetaRoom *getArrayMetaRoom(unsigned int i) { return metarooms[i]; } // TODO: hack!
 	
 	unsigned int getMetaRoomCount();
 	Room *getRoom(unsigned int);
