@@ -403,7 +403,7 @@ extern "C" int main(int argc, char *argv[]) {
 									handAgent = 0;
 							}
 						}
-					} else if (event.button.button = SDL_BUTTON_MIDDLE) {
+					} else if (event.button.button == SDL_BUTTON_MIDDLE) {
 						Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), true);
 						if (a)
 							std::cout << "Agent under mouse is " << a->identify();
@@ -414,6 +414,8 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
+						MetaRoom *n;
+						
 						switch (event.key.keysym.sym) {
 						/*	case SDLK_LEFT:
 								adjustbyx = -20;
@@ -434,12 +436,16 @@ extern "C" int main(int argc, char *argv[]) {
 							case SDLK_PAGEDOWN:
 								if (world.camera.getMetaRoom()->id == 0)
 									break;
-								world.camera.goToMetaRoom(world.camera.getMetaRoom()->id - 1);
+								n = world.map.getMetaRoom(world.camera.getMetaRoom()->id - 1);
+								if (n)
+									world.camera.goToMetaRoom(n->id);
 								break;
 							case SDLK_PAGEUP:
 								if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
 									break;
-								world.camera.goToMetaRoom(world.camera.getMetaRoom()->id + 1);
+								n = world.map.getMetaRoom(world.camera.getMetaRoom()->id + 1);
+								if (n)
+									world.camera.goToMetaRoom(n->id);
 								break;
 							default:
 								break;
