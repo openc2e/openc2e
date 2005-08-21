@@ -310,7 +310,6 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 	}
 	
-	world.camera.goToMetaRoom(0);
 	drawWorld();
 
 	bool done = false;
