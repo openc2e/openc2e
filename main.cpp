@@ -331,6 +331,8 @@ extern "C" int main(int argc, char *argv[]) {
 	unsigned int ticktime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	unsigned int ticktimeptr = 0;
 	while (!done) {
+		bool ticked = false;
+		
 //        Collectable::doCollect();
 		/*
 		 we calculate PACE below, but it's inaccurate because drawWorld(), our biggest cpu consumer, isn't in the loop
@@ -340,6 +342,7 @@ extern "C" int main(int argc, char *argv[]) {
 			ticktime[ticktimeptr] = backend.ticks();
 			
 			world.tick();
+			drawWorld();
 			
 			ticktime[ticktimeptr] = backend.ticks() - ticktime[ticktimeptr];
 			ticktimeptr++;
@@ -350,11 +353,11 @@ extern "C" int main(int argc, char *argv[]) {
 			
 			tickdata = backend.ticks();
 
+			ticked = true;
+
 			if (handAgent)
 				handAgent->moveTo(world.hand()->x + 2, world.hand()->y + 2);
 		}
-			
-		drawWorld();
 		
 		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
 			std::string data;
@@ -475,6 +478,7 @@ extern "C" int main(int argc, char *argv[]) {
 			}
 		}
 
+		if (ticked) {
 		static float accelspeed = 8, decelspeed = .5, maxspeed = 64;
 		static float velx = 0;
 		static float vely = 0;
@@ -520,6 +524,7 @@ extern "C" int main(int argc, char *argv[]) {
 			world.hand()->moveTo(world.hand()->x + adjustbyx, world.hand()->y + adjustbyy);
 			world.camera.moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
 		}
+		} // ticked
 	}
 
 	SDLNet_Quit();
