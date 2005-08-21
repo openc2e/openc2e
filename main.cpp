@@ -205,8 +205,12 @@ extern "C" int main(int argc, char *argv[]) {
 	if (!bs_specd) {
 		bootstrap = data + bootstrap_suffix;
 		fs::path scriptdir(bootstrap, fs::native);
-		if (!fs::exists(scriptdir))
+		if (!fs::exists(scriptdir)) {
+			caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
+			caosVar contents; contents.setInt(1);
+			world.eame_variables[name] = contents;
 			bootstrap = data + bootstrapDS_suffix;
+		}
 	}
 	
 	if (optind < argc) {

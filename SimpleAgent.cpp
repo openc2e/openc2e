@@ -36,7 +36,7 @@ Agent(family, genus, species, plane) {
 
 void SimpleAgent::setImage(std::string img) {
 	sprite = gallery.getImage(img);
-	assert(sprite);
+	caos_assert(sprite);
 }
 
 void SimpleAgent::setAttributes(unsigned int attr) {

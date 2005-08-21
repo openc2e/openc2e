@@ -91,7 +91,7 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 	y = _y;
 	zorder = _z;
 	sprite = gallery.getImage(spritefile);
-	assert(sprite);
+	caos_assert(sprite);
 	pose = 0;
 }
 

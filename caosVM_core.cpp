@@ -78,14 +78,14 @@ void caosVM::v_GAME() {
 }
 
 /**
- EAME (variable) name (string)
+ EAME (variable) name (anything)
  %status maybe
 
  returns temporary game variable with name given
 */
 void caosVM::v_EAME() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_STRING(name)
+	VM_PARAM_VALUE(name)
 
 	caosVar &i = world.eame_variables[name];
 	valueStack.push_back(&i);
