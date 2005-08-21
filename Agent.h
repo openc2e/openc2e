@@ -42,6 +42,7 @@ class Agent {
 
 protected:
 	caosVar var[100]; // OVxx
+	std::map<caosVar, caosVar> name_variables;
 	AgentRef self;
 	class caosVM *vm;
 

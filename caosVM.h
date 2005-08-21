@@ -225,6 +225,7 @@ public:
 	void v_STRL();
 	void v_READ();
 	void v_WILD();
+	void v_NAME();
 
 	// flow
 	void c_DOIF();

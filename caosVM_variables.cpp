@@ -624,4 +624,15 @@ void caosVM::v_WILD() {
 	result.setString(t[offset]);
 }
 
+/**
+ NAME (variable) name (anything)
+ %status maybe
+*/
+void caosVM::v_NAME() {
+	VM_PARAM_VALUE(name)
+		
+	caos_assert(targ);
+	valueStack.push_back(&targ->name_variables[name]);
+}
+
 /* vim: set noet: */
