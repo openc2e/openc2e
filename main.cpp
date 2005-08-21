@@ -216,7 +216,13 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 
 	datapath = data;
-
+	
+	fs::path datadir(datapath, fs::native);
+	if (!fs::exists(datadir)) {
+		std::cerr << "data path '" << datapath << "' doesn't exist, try --help" << std::endl;
+		return 1;
+	}
+	
 	registerDelegates();
 	world.init();
 	world.catalogue.initFrom(fs::path(datapath + "/Catalogue/", fs::native));
