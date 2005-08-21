@@ -3,6 +3,7 @@
 #include <list>
 #include <map>
 #include <istream>
+#include <cmath>
 #include "exceptions.h"
 
 using namespace std;

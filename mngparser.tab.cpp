@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 1.875d.  */
+/* A Bison parser, made by GNU Bison 2.0.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
    Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
@@ -45,8 +45,7 @@
 /* Using locations.  */
 #define YYLSP_NEEDED 0
 
-/* If NAME_PREFIX is specified substitute the variables and functions
-   names.  */
+/* Substitute the variable and function names.  */
 #define yyparse mngparse
 #define yylex   mnglex
 #define yyerror mngerror
@@ -168,11 +167,12 @@ typedef union YYSTYPE {
 	class MNGEffectDecNode *effectdec;
 	class MNGAssignmentNode *assignment;
 	class MNGStageNode *stage;
+	class MNGLayer *layer;
 	std::list<class MNGAssignmentNode *> *assignmentarray;
 	std::list<class MNGNode *> *array;
 	std::list<class MNGStageNode *> *stagearray;
 } YYSTYPE;
-/* Line 191 of yacc.c.  */
+/* Line 190 of yacc.c.  */
 #line 177 "mngparser.tab.cpp"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -184,7 +184,7 @@ typedef union YYSTYPE {
 /* Copy the second part of user declarations.  */
 
 
-/* Line 214 of yacc.c.  */
+/* Line 213 of yacc.c.  */
 #line 189 "mngparser.tab.cpp"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
@@ -200,14 +200,10 @@ typedef union YYSTYPE {
 
 # ifdef YYSTACK_USE_ALLOCA
 #  if YYSTACK_USE_ALLOCA
-#   define YYSTACK_ALLOC alloca
-#  endif
-# else
-#  if defined (alloca) || defined (_ALLOCA_H)
-#   define YYSTACK_ALLOC alloca
-#  else
 #   ifdef __GNUC__
 #    define YYSTACK_ALLOC __builtin_alloca
+#   else
+#    define YYSTACK_ALLOC alloca
 #   endif
 #  endif
 # endif
@@ -401,16 +397,16 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned short int yyrline[] =
 {
-       0,    76,    76,    77,    80,    81,    82,    83,    86,    89,
-      92,    93,    96,    97,   100,   101,   104,   105,   106,   107,
-     108,   111,   114,   117,   120,   123,   126,   129,   132,   133,
-     136,   137,   138,   139,   140,   141,   142,   145,   148,   151,
-     154,   157,   160,   161,   164,   165,   168,   169,   170,   171,
-     172,   173,   174,   175,   176,   179,   180,   181,   182,   183,
-     184,   185,   188,   191,   194,   195,   198,   199,   202,   203,
-     204,   205,   208,   209,   210,   211,   212,   213,   214,   215,
-     216,   219,   222,   225,   228,   231,   234,   237,   240,   241,
-     244,   245,   246,   247,   248,   251,   254,   257,   260,   263
+       0,    77,    77,    78,    81,    82,    83,    84,    87,    90,
+      93,    94,    97,    98,   101,   102,   105,   106,   107,   108,
+     109,   112,   115,   118,   121,   124,   127,   130,   133,   134,
+     137,   138,   139,   140,   141,   142,   143,   146,   149,   152,
+     155,   158,   161,   162,   165,   166,   169,   170,   171,   172,
+     173,   174,   175,   176,   177,   180,   181,   182,   183,   184,
+     185,   186,   189,   192,   195,   196,   199,   200,   203,   204,
+     205,   206,   209,   210,   211,   212,   213,   214,   215,   216,
+     217,   220,   223,   226,   229,   232,   235,   238,   241,   242,
+     245,   246,   247,   248,   249,   252,   255,   258,   261,   264
 };
 #endif
 
@@ -707,19 +703,52 @@ do								\
     }								\
 while (0)
 
+
 #define YYTERROR	1
 #define YYERRCODE	256
 
-/* YYLLOC_DEFAULT -- Compute the default location (before the actions
-   are run).  */
 
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
 #ifndef YYLLOC_DEFAULT
-# define YYLLOC_DEFAULT(Current, Rhs, N)		\
-   ((Current).first_line   = (Rhs)[1].first_line,	\
-    (Current).first_column = (Rhs)[1].first_column,	\
-    (Current).last_line    = (Rhs)[N].last_line,	\
-    (Current).last_column  = (Rhs)[N].last_column)
+# define YYLLOC_DEFAULT(Current, Rhs, N)				\
+    do									\
+      if (N)								\
+	{								\
+	  (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
+	  (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
+	  (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
+	  (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
+	}								\
+      else								\
+	{								\
+	  (Current).first_line   = (Current).last_line   =		\
+	    YYRHSLOC (Rhs, 0).last_line;				\
+	  (Current).first_column = (Current).last_column =		\
+	    YYRHSLOC (Rhs, 0).last_column;				\
+	}								\
+    while (0)
 #endif
+
+
+/* YY_LOCATION_PRINT -- Print the location on the stream.
+   This macro was not mandated originally: define only if we know
+   we won't break user code: when these are the locations we know.  */
+
+#ifndef YY_LOCATION_PRINT
+# if YYLTYPE_IS_TRIVIAL
+#  define YY_LOCATION_PRINT(File, Loc)			\
+     fprintf (File, "%d.%d-%d.%d",			\
+              (Loc).first_line, (Loc).first_column,	\
+              (Loc).last_line,  (Loc).last_column)
+# else
+#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# endif
+#endif
+
 
 /* YYLEX -- calling `yylex' with the right arguments.  */
 
@@ -743,19 +772,13 @@ do {						\
     YYFPRINTF Args;				\
 } while (0)
 
-# define YYDSYMPRINT(Args)			\
-do {						\
-  if (yydebug)					\
-    yysymprint Args;				\
-} while (0)
-
-# define YYDSYMPRINTF(Title, Token, Value, Location)		\
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location)		\
 do {								\
   if (yydebug)							\
     {								\
       YYFPRINTF (stderr, "%s ", Title);				\
       yysymprint (stderr, 					\
-                  Token, Value);	\
+                  Type, Value);	\
       YYFPRINTF (stderr, "\n");					\
     }								\
 } while (0)
@@ -822,8 +845,7 @@ do {					\
 int yydebug;
 #else /* !YYDEBUG */
 # define YYDPRINTF(Args)
-# define YYDSYMPRINT(Args)
-# define YYDSYMPRINTF(Title, Token, Value, Location)
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location)
 # define YY_STACK_PRINT(Bottom, Top)
 # define YY_REDUCE_PRINT(Rule)
 #endif /* !YYDEBUG */
@@ -840,10 +862,6 @@ int yydebug;
    Do not make this value too large; the results are undefined if
    SIZE_MAX < YYSTACK_BYTES (YYMAXDEPTH)
    evaluated with infinite-precision integer arithmetic.  */
-
-#if defined (YYMAXDEPTH) && YYMAXDEPTH == 0
-# undef YYMAXDEPTH
-#endif
 
 #ifndef YYMAXDEPTH
 # define YYMAXDEPTH 10000
@@ -926,15 +944,15 @@ yysymprint (yyoutput, yytype, yyvaluep)
   (void) yyvaluep;
 
   if (yytype < YYNTOKENS)
-    {
-      YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
-# ifdef YYPRINT
-      YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
-# endif
-    }
+    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
+
+# ifdef YYPRINT
+  if (yytype < YYNTOKENS)
+    YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
+# endif
   switch (yytype)
     {
       default:
@@ -950,16 +968,21 @@ yysymprint (yyoutput, yytype, yyvaluep)
 
 #if defined (__STDC__) || defined (__cplusplus)
 static void
-yydestruct (int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
 #else
 static void
-yydestruct (yytype, yyvaluep)
+yydestruct (yymsg, yytype, yyvaluep)
+    const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
 #endif
 {
   /* Pacify ``unused variable'' warnings.  */
   (void) yyvaluep;
+
+  if (!yymsg)
+    yymsg = "Deleting";
+  YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
 
   switch (yytype)
     {
@@ -988,10 +1011,10 @@ int yyparse ();
 
 
 
-/* The lookahead symbol.  */
+/* The look-ahead symbol.  */
 int yychar;
 
-/* The semantic value of the lookahead symbol.  */
+/* The semantic value of the look-ahead symbol.  */
 YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
@@ -1027,7 +1050,7 @@ yyparse ()
   int yyresult;
   /* Number of tokens to shift before error messages enabled.  */
   int yyerrstatus;
-  /* Lookahead token as an internal (translated) token number.  */
+  /* Look-ahead token as an internal (translated) token number.  */
   int yytoken = 0;
 
   /* Three stacks and their tools:
@@ -1078,6 +1101,8 @@ yyparse ()
   yyssp = yyss;
   yyvsp = yyvs;
 
+
+  yyvsp[0] = yylval;
 
   goto yysetstate;
 
@@ -1168,18 +1193,18 @@ yyparse ()
 yybackup:
 
 /* Do appropriate processing given the current state.  */
-/* Read a lookahead token if we need one and don't already have one.  */
+/* Read a look-ahead token if we need one and don't already have one.  */
 /* yyresume: */
 
-  /* First try to decide what to do without reference to lookahead token.  */
+  /* First try to decide what to do without reference to look-ahead token.  */
 
   yyn = yypact[yystate];
   if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a lookahead token if don't already have one.  */
+  /* Not known => get a look-ahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -1194,7 +1219,7 @@ yybackup:
   else
     {
       yytoken = YYTRANSLATE (yychar);
-      YYDSYMPRINTF ("Next token is", yytoken, &yylval, &yylloc);
+      YY_SYMBOL_PRINT ("Next token is", yytoken, &yylval, &yylloc);
     }
 
   /* If the proper action on seeing token YYTOKEN is to reduce or to
@@ -1214,8 +1239,8 @@ yybackup:
   if (yyn == YYFINAL)
     YYACCEPT;
 
-  /* Shift the lookahead token.  */
-  YYDPRINTF ((stderr, "Shifting token %s, ", yytname[yytoken]));
+  /* Shift the look-ahead token.  */
+  YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
 
   /* Discard the token being shifted unless it is eof.  */
   if (yychar != YYEOF)
@@ -1265,500 +1290,500 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 76 "mngparser.ypp"
-    { ;}
-    break;
-
-  case 3:
 #line 77 "mngparser.ypp"
     { ;}
     break;
 
+  case 3:
+#line 78 "mngparser.ypp"
+    { ;}
+    break;
+
   case 4:
-#line 80 "mngparser.ypp"
-    { g_mngfile->add(yyvsp[0].effectdec); ;}
+#line 81 "mngparser.ypp"
+    { g_mngfile->add((yyvsp[0].effectdec)); ;}
     break;
 
   case 5:
-#line 81 "mngparser.ypp"
-    { g_mngfile->add(yyvsp[0].trackdec); ;}
+#line 82 "mngparser.ypp"
+    { g_mngfile->add((yyvsp[0].trackdec)); ;}
     break;
 
   case 6:
-#line 82 "mngparser.ypp"
-    { g_mngfile->add(yyvsp[0].variabledec); ;}
+#line 83 "mngparser.ypp"
+    { g_mngfile->add((yyvsp[0].variabledec)); ;}
     break;
 
   case 7:
-#line 83 "mngparser.ypp"
+#line 84 "mngparser.ypp"
     { ;}
     break;
 
   case 8:
-#line 86 "mngparser.ypp"
-    { yyval.variabledec = new MNGVariableDecNode(yyvsp[-3].string, yyvsp[-1].expr); ;}
+#line 87 "mngparser.ypp"
+    { (yyval.variabledec) = new MNGVariableDecNode((yyvsp[-3].string), (yyvsp[-1].expr)); ;}
     break;
 
   case 9:
-#line 89 "mngparser.ypp"
-    { yyval.effectdec = new MNGEffectDecNode(yyvsp[-4].string); ((MNGEffectDecNode *)yyval.effectdec)->children = yyvsp[-1].stagearray; ;}
+#line 90 "mngparser.ypp"
+    { (yyval.effectdec) = new MNGEffectDecNode((yyvsp[-4].string)); ((MNGEffectDecNode *)(yyval.effectdec))->children = (yyvsp[-1].stagearray); ;}
     break;
 
   case 10:
-#line 92 "mngparser.ypp"
-    { yyval.stagearray = new std::list<MNGStageNode *>; if (yyvsp[0].stage) yyval.stagearray->push_back(yyvsp[0].stage); ;}
+#line 93 "mngparser.ypp"
+    { (yyval.stagearray) = new std::list<MNGStageNode *>; if ((yyvsp[0].stage)) (yyval.stagearray)->push_back((yyvsp[0].stage)); ;}
     break;
 
   case 11:
-#line 93 "mngparser.ypp"
-    { yyval.stagearray = yyvsp[-1].stagearray; if (yyvsp[0].stage) yyval.stagearray->push_back(yyvsp[0].stage); ;}
+#line 94 "mngparser.ypp"
+    { (yyval.stagearray) = (yyvsp[-1].stagearray); if ((yyvsp[0].stage)) (yyval.stagearray)->push_back((yyvsp[0].stage)); ;}
     break;
 
   case 12:
-#line 96 "mngparser.ypp"
-    { yyval.stage = new MNGStageNode(); ((MNGStageNode *)yyval.stage)->children = yyvsp[-1].array; ;}
+#line 97 "mngparser.ypp"
+    { (yyval.stage) = new MNGStageNode(); ((MNGStageNode *)(yyval.stage))->children = (yyvsp[-1].array); ;}
     break;
 
   case 13:
-#line 97 "mngparser.ypp"
-    { yyval.stage = 0; ;}
+#line 98 "mngparser.ypp"
+    { (yyval.stage) = 0; ;}
     break;
 
   case 14:
-#line 100 "mngparser.ypp"
-    { yyval.array = new std::list<MNGNode *>; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 101 "mngparser.ypp"
+    { (yyval.array) = new std::list<MNGNode *>; if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 15:
-#line 101 "mngparser.ypp"
-    { yyval.array = yyvsp[-1].array; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 102 "mngparser.ypp"
+    { (yyval.array) = (yyvsp[-1].array); if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 16:
-#line 104 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 105 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 17:
-#line 105 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 106 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 18:
-#line 106 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 107 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 19:
-#line 107 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 108 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 20:
-#line 108 "mngparser.ypp"
-    { yyval.node = 0; ;}
+#line 109 "mngparser.ypp"
+    { (yyval.node) = 0; ;}
     break;
 
   case 21:
-#line 111 "mngparser.ypp"
-    { yyval.container = new MNGPanNode(yyvsp[-1].expr); ;}
+#line 112 "mngparser.ypp"
+    { (yyval.container) = new MNGPanNode((yyvsp[-1].expr)); ;}
     break;
 
   case 22:
-#line 114 "mngparser.ypp"
-    { yyval.container = new MNGEffectVolumeNode(yyvsp[-1].expr); ;}
+#line 115 "mngparser.ypp"
+    { (yyval.container) = new MNGEffectVolumeNode((yyvsp[-1].expr)); ;}
     break;
 
   case 23:
-#line 117 "mngparser.ypp"
-    { yyval.container = new MNGLayerVolumeNode(yyvsp[-1].expr); ;}
+#line 118 "mngparser.ypp"
+    { (yyval.container) = new MNGLayerVolumeNode((yyvsp[-1].expr)); ;}
     break;
 
   case 24:
-#line 120 "mngparser.ypp"
-    { yyval.container = new MNGDelayNode(yyvsp[-1].expr); ;}
+#line 121 "mngparser.ypp"
+    { (yyval.container) = new MNGDelayNode((yyvsp[-1].expr)); ;}
     break;
 
   case 25:
-#line 123 "mngparser.ypp"
-    { yyval.container = new MNGTempoDelayNode(yyvsp[-1].expr); ;}
+#line 124 "mngparser.ypp"
+    { (yyval.container) = new MNGTempoDelayNode((yyvsp[-1].expr)); ;}
     break;
 
   case 26:
-#line 126 "mngparser.ypp"
-    { yyval.expr = new MNGRandomNode(yyvsp[-3].expr, yyvsp[-1].expr); ;}
+#line 127 "mngparser.ypp"
+    { (yyval.expr) = new MNGRandomNode((yyvsp[-3].expr), (yyvsp[-1].expr)); ;}
     break;
 
   case 27:
-#line 129 "mngparser.ypp"
-    { yyval.trackdec = new MNGTrackDecNode(yyvsp[-4].string); ((MNGTrackDecNode *)yyval.trackdec)->children = yyvsp[-1].array; ;}
+#line 130 "mngparser.ypp"
+    { (yyval.trackdec) = new MNGTrackDecNode((yyvsp[-4].string)); ((MNGTrackDecNode *)(yyval.trackdec))->children = (yyvsp[-1].array); ;}
     break;
 
   case 28:
-#line 132 "mngparser.ypp"
-    { yyval.array = new std::list<MNGNode *>; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 133 "mngparser.ypp"
+    { (yyval.array) = new std::list<MNGNode *>; if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 29:
-#line 133 "mngparser.ypp"
-    { yyval.array = yyvsp[-1].array; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 134 "mngparser.ypp"
+    { (yyval.array) = (yyvsp[-1].array); if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 30:
-#line 136 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 137 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 31:
-#line 137 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 138 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 32:
-#line 138 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 139 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 33:
-#line 139 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 140 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 34:
-#line 140 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 141 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 35:
-#line 141 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 142 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 36:
-#line 142 "mngparser.ypp"
-    { yyval.node = 0; ;}
+#line 143 "mngparser.ypp"
+    { (yyval.node) = 0; ;}
     break;
 
   case 37:
-#line 145 "mngparser.ypp"
-    { yyval.container = new MNGFadeInNode(yyvsp[-1].expr); ;}
+#line 146 "mngparser.ypp"
+    { (yyval.container) = new MNGFadeInNode((yyvsp[-1].expr)); ;}
     break;
 
   case 38:
-#line 148 "mngparser.ypp"
-    { yyval.container = new MNGFadeOutNode(yyvsp[-1].expr); ;}
+#line 149 "mngparser.ypp"
+    { (yyval.container) = new MNGFadeOutNode((yyvsp[-1].expr)); ;}
     break;
 
   case 39:
-#line 151 "mngparser.ypp"
-    { yyval.container = new MNGBeatLengthNode(yyvsp[-1].expr); ;}
+#line 152 "mngparser.ypp"
+    { (yyval.container) = new MNGBeatLengthNode((yyvsp[-1].expr)); ;}
     break;
 
   case 40:
-#line 154 "mngparser.ypp"
-    { yyval.node = new MNGAleotoricLayerNode(yyvsp[-4].string); ((MNGAleotoricLayerNode *)yyval.node)->children = yyvsp[-1].array; ;}
+#line 155 "mngparser.ypp"
+    { (yyval.node) = new MNGAleotoricLayerNode((yyvsp[-4].string)); ((MNGAleotoricLayerNode *)(yyval.node))->children = (yyvsp[-1].array); ;}
     break;
 
   case 41:
-#line 157 "mngparser.ypp"
-    { yyval.node = new MNGLoopLayerNode(yyvsp[-4].string); ((MNGLoopLayerNode *)yyval.node)->children = yyvsp[-1].array; ;}
+#line 158 "mngparser.ypp"
+    { (yyval.node) = new MNGLoopLayerNode((yyvsp[-4].string)); ((MNGLoopLayerNode *)(yyval.node))->children = (yyvsp[-1].array); ;}
     break;
 
   case 42:
-#line 160 "mngparser.ypp"
-    { yyval.array = new std::list<MNGNode *>; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 161 "mngparser.ypp"
+    { (yyval.array) = new std::list<MNGNode *>; if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 43:
-#line 161 "mngparser.ypp"
-    { yyval.array = yyvsp[-1].array; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 162 "mngparser.ypp"
+    { (yyval.array) = (yyvsp[-1].array); if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 44:
-#line 164 "mngparser.ypp"
-    { yyval.array = new std::list<MNGNode *>; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 165 "mngparser.ypp"
+    { (yyval.array) = new std::list<MNGNode *>; if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 45:
-#line 165 "mngparser.ypp"
-    { yyval.array = yyvsp[-1].array; if (yyvsp[0].node) yyval.array->push_back(yyvsp[0].node); ;}
+#line 166 "mngparser.ypp"
+    { (yyval.array) = (yyvsp[-1].array); if ((yyvsp[0].node)) (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 46:
-#line 168 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 169 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 47:
-#line 169 "mngparser.ypp"
-    { yyval.node = 0; ;}
+#line 170 "mngparser.ypp"
+    { (yyval.node) = 0; ;}
     break;
 
   case 48:
-#line 170 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 171 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 49:
-#line 171 "mngparser.ypp"
-    { yyval.node = yyvsp[0].variabledec; ;}
+#line 172 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].variabledec); ;}
     break;
 
   case 50:
-#line 172 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 173 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 51:
-#line 173 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 174 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 52:
-#line 174 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 175 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 53:
-#line 175 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 176 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 54:
-#line 176 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 177 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 55:
-#line 179 "mngparser.ypp"
-    { yyval.node = 0; ;}
+#line 180 "mngparser.ypp"
+    { (yyval.node) = 0; ;}
     break;
 
   case 56:
-#line 180 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 181 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 57:
-#line 181 "mngparser.ypp"
-    { yyval.node = yyvsp[0].variabledec; ;}
+#line 182 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].variabledec); ;}
     break;
 
   case 58:
-#line 182 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 183 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 59:
-#line 183 "mngparser.ypp"
-    { yyval.node = yyvsp[0].container; ;}
+#line 184 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].container); ;}
     break;
 
   case 60:
-#line 184 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 185 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 61:
-#line 185 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 186 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 62:
-#line 188 "mngparser.ypp"
-    { yyval.node = new MNGEffectNode(yyvsp[-1].string); ;}
+#line 189 "mngparser.ypp"
+    { (yyval.node) = new MNGEffectNode((yyvsp[-1].string)); ;}
     break;
 
   case 63:
-#line 191 "mngparser.ypp"
-    { yyval.node = new MNGUpdateNode(); ((MNGUpdateNode *)yyval.node)->children = yyvsp[-1].assignmentarray; ;}
+#line 192 "mngparser.ypp"
+    { (yyval.node) = new MNGUpdateNode(); ((MNGUpdateNode *)(yyval.node))->children = (yyvsp[-1].assignmentarray); ;}
     break;
 
   case 64:
-#line 194 "mngparser.ypp"
-    { yyval.assignmentarray = new std::list<MNGAssignmentNode *>; if (yyvsp[0].assignment) yyval.assignmentarray->push_back(yyvsp[0].assignment); ;}
+#line 195 "mngparser.ypp"
+    { (yyval.assignmentarray) = new std::list<MNGAssignmentNode *>; if ((yyvsp[0].assignment)) (yyval.assignmentarray)->push_back((yyvsp[0].assignment)); ;}
     break;
 
   case 65:
-#line 195 "mngparser.ypp"
-    { yyval.assignmentarray = yyvsp[-1].assignmentarray; if (yyvsp[0].assignment) yyval.assignmentarray->push_back(yyvsp[0].assignment); ;}
+#line 196 "mngparser.ypp"
+    { (yyval.assignmentarray) = (yyvsp[-1].assignmentarray); if ((yyvsp[0].assignment)) (yyval.assignmentarray)->push_back((yyvsp[0].assignment)); ;}
     break;
 
   case 66:
-#line 198 "mngparser.ypp"
-    { yyval.assignment = new MNGAssignmentNode(yyvsp[-2].variable, yyvsp[0].expr); ;}
+#line 199 "mngparser.ypp"
+    { (yyval.assignment) = new MNGAssignmentNode((yyvsp[-2].variable), (yyvsp[0].expr)); ;}
     break;
 
   case 67:
-#line 199 "mngparser.ypp"
-    { yyval.assignment = 0; ;}
+#line 200 "mngparser.ypp"
+    { (yyval.assignment) = 0; ;}
     break;
 
   case 68:
-#line 202 "mngparser.ypp"
-    { yyval.variable = new MNGVariableNode(yyvsp[0].string); ;}
+#line 203 "mngparser.ypp"
+    { (yyval.variable) = new MNGVariableNode((yyvsp[0].string)); ;}
     break;
 
   case 69:
-#line 203 "mngparser.ypp"
-    { yyval.variable = new MNGVariableNode(INTERVAL); ;}
+#line 204 "mngparser.ypp"
+    { (yyval.variable) = new MNGVariableNode(INTERVAL); ;}
     break;
 
   case 70:
-#line 204 "mngparser.ypp"
-    { yyval.variable = new MNGVariableNode(VOLUME); ;}
+#line 205 "mngparser.ypp"
+    { (yyval.variable) = new MNGVariableNode(VOLUME); ;}
     break;
 
   case 71:
-#line 205 "mngparser.ypp"
-    { yyval.variable = new MNGVariableNode(PAN); ;}
+#line 206 "mngparser.ypp"
+    { (yyval.variable) = new MNGVariableNode(PAN); ;}
     break;
 
   case 72:
-#line 208 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].expr; ;}
+#line 209 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].expr); ;}
     break;
 
   case 73:
-#line 209 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].expr; ;}
+#line 210 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].expr); ;}
     break;
 
   case 74:
-#line 210 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].expr; ;}
+#line 211 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].expr); ;}
     break;
 
   case 75:
-#line 211 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].expr; ;}
+#line 212 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].expr); ;}
     break;
 
   case 76:
-#line 212 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].expr; ;}
+#line 213 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].expr); ;}
     break;
 
   case 77:
-#line 213 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].expr; ;}
+#line 214 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].expr); ;}
     break;
 
   case 78:
-#line 214 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].expr; ;}
+#line 215 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].expr); ;}
     break;
 
   case 79:
-#line 215 "mngparser.ypp"
-    { yyval.expr = yyvsp[0].variable; ;}
+#line 216 "mngparser.ypp"
+    { (yyval.expr) = (yyvsp[0].variable); ;}
     break;
 
   case 80:
-#line 216 "mngparser.ypp"
-    { yyval.expr = new MNGConstantNode(yyvsp[0].number); ;}
+#line 217 "mngparser.ypp"
+    { (yyval.expr) = new MNGConstantNode((yyvsp[0].number)); ;}
     break;
 
   case 81:
-#line 219 "mngparser.ypp"
-    { yyval.expr = new MNGAddNode(yyvsp[-3].expr, yyvsp[-1].expr); ;}
+#line 220 "mngparser.ypp"
+    { (yyval.expr) = new MNGAddNode((yyvsp[-3].expr), (yyvsp[-1].expr)); ;}
     break;
 
   case 82:
-#line 222 "mngparser.ypp"
-    { yyval.expr = new MNGSubtractNode(yyvsp[-3].expr, yyvsp[-1].expr); ;}
+#line 223 "mngparser.ypp"
+    { (yyval.expr) = new MNGSubtractNode((yyvsp[-3].expr), (yyvsp[-1].expr)); ;}
     break;
 
   case 83:
-#line 225 "mngparser.ypp"
-    { yyval.expr = new MNGMultiplyNode(yyvsp[-3].expr, yyvsp[-1].expr); ;}
+#line 226 "mngparser.ypp"
+    { (yyval.expr) = new MNGMultiplyNode((yyvsp[-3].expr), (yyvsp[-1].expr)); ;}
     break;
 
   case 84:
-#line 228 "mngparser.ypp"
-    { yyval.expr = new MNGDivideNode(yyvsp[-3].expr, yyvsp[-1].expr); ;}
+#line 229 "mngparser.ypp"
+    { (yyval.expr) = new MNGDivideNode((yyvsp[-3].expr), (yyvsp[-1].expr)); ;}
     break;
 
   case 85:
-#line 231 "mngparser.ypp"
-    { yyval.expr = new MNGSineWaveNode(yyvsp[-3].expr, yyvsp[-1].expr); ;}
+#line 232 "mngparser.ypp"
+    { (yyval.expr) = new MNGSineWaveNode((yyvsp[-3].expr), (yyvsp[-1].expr)); ;}
     break;
 
   case 86:
-#line 234 "mngparser.ypp"
-    { yyval.expr = new MNGCosineWaveNode(yyvsp[-3].expr, yyvsp[-1].expr); ;}
+#line 235 "mngparser.ypp"
+    { (yyval.expr) = new MNGCosineWaveNode((yyvsp[-3].expr), (yyvsp[-1].expr)); ;}
     break;
 
   case 87:
-#line 237 "mngparser.ypp"
-    { yyval.node = new MNGVoiceNode(); ((MNGVoiceNode *)yyval.node)->children = yyvsp[-1].array; ;}
+#line 238 "mngparser.ypp"
+    { (yyval.node) = new MNGVoiceNode(); ((MNGVoiceNode *)(yyval.node))->children = (yyvsp[-1].array); ;}
     break;
 
   case 88:
-#line 240 "mngparser.ypp"
-    { yyval.array = new std::list<MNGNode *>; yyval.array->push_back(yyvsp[0].node); ;}
+#line 241 "mngparser.ypp"
+    { (yyval.array) = new std::list<MNGNode *>; (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 89:
-#line 241 "mngparser.ypp"
-    { yyval.array = yyvsp[-1].array; yyval.array->push_back(yyvsp[0].node); ;}
+#line 242 "mngparser.ypp"
+    { (yyval.array) = (yyvsp[-1].array); (yyval.array)->push_back((yyvsp[0].node)); ;}
     break;
 
   case 90:
-#line 244 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 245 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 91:
-#line 245 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 246 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 92:
-#line 246 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 247 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 93:
-#line 247 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 248 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 94:
-#line 248 "mngparser.ypp"
-    { yyval.node = yyvsp[0].node; ;}
+#line 249 "mngparser.ypp"
+    { (yyval.node) = (yyvsp[0].node); ;}
     break;
 
   case 95:
-#line 251 "mngparser.ypp"
-    { yyval.node = new MNGIntervalNode(yyvsp[-1].expr); ;}
+#line 252 "mngparser.ypp"
+    { (yyval.node) = new MNGIntervalNode((yyvsp[-1].expr)); ;}
     break;
 
   case 96:
-#line 254 "mngparser.ypp"
-    { yyval.node = new MNGConditionNode(yyvsp[-5].variable, yyvsp[-3].number, yyvsp[-1].number); ;}
+#line 255 "mngparser.ypp"
+    { (yyval.node) = new MNGConditionNode((yyvsp[-5].variable), (yyvsp[-3].number), (yyvsp[-1].number)); ;}
     break;
 
   case 97:
-#line 257 "mngparser.ypp"
-    { yyval.container = new MNGUpdateRateNode(yyvsp[-1].expr); ;}
+#line 258 "mngparser.ypp"
+    { (yyval.container) = new MNGUpdateRateNode((yyvsp[-1].expr)); ;}
     break;
 
   case 98:
-#line 260 "mngparser.ypp"
-    { yyval.container = new MNGUpdateRateNode(yyvsp[-1].expr); ;}
+#line 261 "mngparser.ypp"
+    { (yyval.container) = new MNGUpdateRateNode((yyvsp[-1].expr)); ;}
     break;
 
   case 99:
-#line 263 "mngparser.ypp"
-    { yyval.node = new MNGWaveNode(yyvsp[-1].string); ;}
+#line 264 "mngparser.ypp"
+    { (yyval.node) = new MNGWaveNode((yyvsp[-1].string)); ;}
     break;
 
 
     }
 
-/* Line 1010 of yacc.c.  */
-#line 1762 "mngparser.tab.cpp"
+/* Line 1037 of yacc.c.  */
+#line 1787 "mngparser.tab.cpp"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1858,7 +1883,7 @@ yyerrlab:
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse lookahead token after an
+      /* If just tried and failed to reuse look-ahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
@@ -1868,23 +1893,22 @@ yyerrlab:
 	  if (yychar == YYEOF)
 	     for (;;)
 	       {
+
 		 YYPOPSTACK;
 		 if (yyssp == yyss)
 		   YYABORT;
-		 YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
-		 yydestruct (yystos[*yyssp], yyvsp);
+		 yydestruct ("Error: popping",
+                             yystos[*yyssp], yyvsp);
 	       }
         }
       else
 	{
-	  YYDSYMPRINTF ("Error: discarding", yytoken, &yylval, &yylloc);
-	  yydestruct (yytoken, &yylval);
+	  yydestruct ("Error: discarding", yytoken, &yylval);
 	  yychar = YYEMPTY;
-
 	}
     }
 
-  /* Else will try to reuse lookahead token after shifting the error
+  /* Else will try to reuse look-ahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -1901,7 +1925,7 @@ yyerrorlab:
      goto yyerrorlab;
 #endif
 
-  yyvsp -= yylen;
+yyvsp -= yylen;
   yyssp -= yylen;
   yystate = *yyssp;
   goto yyerrlab1;
@@ -1931,8 +1955,8 @@ yyerrlab1:
       if (yyssp == yyss)
 	YYABORT;
 
-      YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
-      yydestruct (yystos[yystate], yyvsp);
+
+      yydestruct ("Error: popping", yystos[yystate], yyvsp);
       YYPOPSTACK;
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1941,10 +1965,11 @@ yyerrlab1:
   if (yyn == YYFINAL)
     YYACCEPT;
 
-  YYDPRINTF ((stderr, "Shifting error token, "));
-
   *++yyvsp = yylval;
 
+
+  /* Shift the error token. */
+  YY_SYMBOL_PRINT ("Shifting", yystos[yyn], yyvsp, yylsp);
 
   yystate = yyn;
   goto yynewstate;
@@ -1961,6 +1986,9 @@ yyacceptlab:
 | yyabortlab -- YYABORT comes here.  |
 `-----------------------------------*/
 yyabortlab:
+  yydestruct ("Error: discarding lookahead",
+              yytoken, &yylval);
+  yychar = YYEMPTY;
   yyresult = 1;
   goto yyreturn;
 

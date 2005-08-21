@@ -12,9 +12,31 @@
 
 Dialect *cmd_dialect, *exp_dialect;
 
+/*
+ * If the inverse of an AND condition succeeds, jump to next OR (foo) bit, or
+ * fail.
+ * 
+ * If an OR condition succeeds, jump to next AND (foo) or succeed.
+ *
+ * At the end, if the last condition was AND, succeed. Else, fail.
+ *
+ * The first condition is considered to be an AND.
+ *
+ * This code makes a lot of noop jump targets, might this be a problem?
+ * TODO: noop compactor
+ */
 void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
+	bool wasAnd = true;
+	caosOp *nextAnd, *nextOr;
+	nextAnd = new caosNoop();
+	s->current->addOp(nextAnd);
+	nextOr = new caosNoop();
+	s->current->addOp(nextOr);
 	while(1) {
+		caosOp *entry = new caosNoop();
+		s->current->thread(entry);
 		exp_dialect->doParse(s);
+		
 		token *comparison = getToken(TOK_WORD);
 		std::string cword = comparison->word;
 		int compar;
@@ -31,15 +53,9 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 		else if (cword == "ne")
 			compar = CNE;
 		exp_dialect->doParse(s);
-		
 
-		/*
-		 * If the next bind is or, we jump to success.
-		 * Otherwise, we negate and jump to failure.
-		 * The last item is always considered or-ed.
-		 */
-		int isOr = 1;
-		int isLast = 0;
+		bool isOr = true;
+		bool isLast = false;
 
 		struct token *peek = tokenPeek();
 		if (!peek)
@@ -47,20 +63,33 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 		if (peek->type == TOK_WORD) {
 			if (peek->word == "and") {
 				getToken();
-				isOr = 0;
+				isOr = false;
 			} else if (peek->word == "or")
 				getToken();
-			else
-				isLast = 1;
+			else isLast = true;
 		}
 
-		caosOp *jumpTarget = isOr ? success : failure;
+		if (isOr) {
+			nextOr->setSuccessor(entry);
+			nextOr = new caosNoop();
+			s->current->addOp(nextOr);
+		} else {
+			nextAnd->setSuccessor(entry);
+			nextAnd = new caosNoop();
+			s->current->addOp(nextAnd);
+		}
+		
+		caosOp *jumpTarget = isOr ? nextAnd : nextOr;
 		if (!isOr) compar = ~compar & CMASK;
 		
 		s->current->thread(new caosCond(compar, jumpTarget));
+		wasAnd = !isOr;
+		
 		if (isLast) break;
 	}
-	s->current->last->setSuccessor(failure);
+	nextAnd->setSuccessor(success);
+	nextOr->setSuccessor(failure);
+	s->current->last->setSuccessor(wasAnd ? success : failure);
 }
 
 void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {

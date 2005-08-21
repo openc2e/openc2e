@@ -1,8 +1,8 @@
 * unit tests for DOIF/ELIF/ELSE/ENDI blocks and comparison operators
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: ifblocks: 18 tests"
-DBG: OUTS "1..18"
+DBG: OUTS "# TEST: ifblocks: 17 tests"
+DBG: OUTS "1..19"
 
 * test equality
 DOIF 1 eq 1
@@ -129,10 +129,18 @@ ELSE
  DBG: OUTS "not ok 17"
 ENDI
 
-* test AND and OR, ie, ordering
-DOIF 1 ne 1 and 2 eq 3 and 4 eq 5 or 1 eq 1
+* test associativity
+* (1 == 2 && 2 == 1) || 1 == 1
+DOIF 1 gt 2 and 2 lt 1 or 1 eq 1
  DBG: OUTS "ok 18"
 ELSE
  DBG: OUTS "not ok 18"
+ENDI
+
+* test AND and OR, ie, ordering
+DOIF 1 ne 1 and 2 eq 3 and 4 eq 5 or 1 eq 1
+ DBG: OUTS "ok 19"
+ELSE
+ DBG: OUTS "not ok 19"
 ENDI
 
