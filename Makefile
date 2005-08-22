@@ -104,15 +104,15 @@ caosScript.o: lex.yy.h lex.yy.cpp
 	$(CC) $(XCFLAGS) -o $@ -c $<
 
 # shamelessly ripped from info make, with tweaks
-.deps/%.d: %.c lex.yy.h
+.deps/%.d: %.c lex.yy.h lex.mng.h
 	mkdir -p `dirname $@` && \
-	$(CC) -M $(XCPPFLAGS) $< > $@.$$$$ && \
+	$(CC) -MP -M $(XCPPFLAGS) $< > $@.$$$$ && \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@ && \
 	rm -f $@.$$$$
 
-.deps/%.dpp: %.cpp lex.yy.h
+.deps/%.dpp: %.cpp lex.yy.h lex.mng.h
 	mkdir -p `dirname $@` && \
-	$(CXX) -M $(XCPPFLAGS) $< > $@.$$$$ && \
+	$(CXX) -MP -M $(XCPPFLAGS) $< > $@.$$$$ && \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@ && \
 	rm -f $@.$$$$
 
