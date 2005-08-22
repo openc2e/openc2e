@@ -54,7 +54,10 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 }
 
 void SDLBackend::init(bool enable_sound) {
-	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0) {
+	int init = SDL_INIT_VIDEO;
+	if (enable_sound) init |= SDL_INIT_AUDIO;
+
+	if (SDL_Init(init) < 0) {
 		std::cerr << "SDL init failed: " << SDL_GetError() << std::endl;
 		assert(false);
 	}
