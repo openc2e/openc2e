@@ -77,10 +77,10 @@ bool resolveFile_(string &srcPath) {
 	orig = dir / lcpath(leaf);
 	string fn = orig.string();
 
-/*	if (exists(orig)) {
+	if (exists(orig)) {
 		srcPath = fn;
 		return true;
-	}*/
+	}
 
 	map<string, string>::iterator i = cache.find(fn);
 	if (i == cache.end()) {
@@ -94,12 +94,12 @@ bool resolveFile_(string &srcPath) {
 bool resolveFile(std::string &path) {
 	std::string orig = path;
 	bool res = resolveFile_(path);
-	std::cerr << orig << " -> ";
+	/*std::cerr << orig << " -> ";
 	if (!res)
 		std::cerr << "(nil)";
 	else
 		std::cerr << path;
-	std::cerr << std::endl;
+	std::cerr << std::endl;*/
 	return res;
 }
 
