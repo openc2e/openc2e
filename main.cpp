@@ -400,19 +400,19 @@ extern "C" int main(int argc, char *argv[]) {
 							if (a->clik != -1) {
 								// TODO: handle CLIK
 							} else if (a->clac[0] != -1)
-								a->fireScript(a->clac[0]);
+								a->fireScript(a->clac[0], world.hand());
 						}
 						else std::cout << "(mouse click ignored)" << std::endl;
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
 						// for now, hack!
 						if (handAgent) {
-							handAgent->fireScript(5); // drop
+							handAgent->fireScript(5, world.hand()); // drop
 							handAgent = 0;
 						} else {
 							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false);
 							if (handAgent) {
 								if (handAgent->mouseable) // hack: agentAt should check this
-									handAgent->fireScript(4); // pickup
+									handAgent->fireScript(4, world.hand()); // pickup
 								else
 									handAgent = 0;
 							}

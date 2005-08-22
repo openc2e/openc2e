@@ -76,12 +76,12 @@ script *Agent::findScript(unsigned short event) {
 	return world.scriptorium.getScript(family, genus, species, event);
 }
 
-void Agent::fireScript(unsigned short event) {
+void Agent::fireScript(unsigned short event, Agent *from) {
 	if (dying) return;
 
 	script *s = findScript(event);
 	if (!vm) vm = world.getVM(this);
-	if (vm->fireScript(s, (event == 9))) {
+	if (vm->fireScript(s, (event == 9), from)) {
 		vm->setTarg(this);
 		zotstack();
 	}
@@ -300,7 +300,7 @@ void Agent::tick() {
 				
 				if (collided) {
 					lastcollidedirection = collidedirection;
-					fireScript(6);
+					fireScript(6); // TODO: include this?
 					if (vm) vm->setVariables(velx, vely);
 					vely.setFloat(0);
 				}
@@ -316,7 +316,7 @@ void Agent::tick() {
 	if (timerrate) {
 		tickssincelasttimer++;
 		if (tickssincelasttimer == timerrate) {
-			fireScript(9);
+			fireScript(9); // TODO: include this?
 			tickssincelasttimer = 0;
 		}
 	}

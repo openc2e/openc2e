@@ -110,7 +110,7 @@ void caosVM::runEntirely(script *s) {
 	stop(); // probably redundant, but eh
 }
 
-bool caosVM::fireScript(script *s, bool nointerrupt) {
+bool caosVM::fireScript(script *s, bool nointerrupt, Agent *frm) {
 	if (!s) return false;
 	if (lock) return false; // can't interrupt scripts which called LOCK
 	if (currentscript && nointerrupt) return false; // don't interrupt scripts with a timer script
@@ -120,6 +120,7 @@ bool caosVM::fireScript(script *s, bool nointerrupt) {
 	currentscript->retain();
 	cip = nip = s->entry;
 	targ = owner;
+	from.set(frm);
 	return true;
 }
 
@@ -146,6 +147,7 @@ void caosVM::resetCore() {
 	outputstream = &cout;
 
 	_it_ = NULL;
+	from = NULL;
 	targ = owner;
 
 	_p_[0].reset(); _p_[0].setInt(0); _p_[1].reset(); _p_[1].setInt(0);

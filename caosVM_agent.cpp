@@ -253,11 +253,10 @@ void caosVM::c_TARG() {
 
 /**
  FROM (agent)
+ %status maybe
 */
 void caosVM::v_FROM() {
-	VM_VERIFY_SIZE(0)
-	result.setAgent(0);
-	// TODO
+	result.setAgent(from);
 }
 
 /**
@@ -469,7 +468,7 @@ void caosVM::c_MESG_WRIT() {
 
 	caos_assert(agent);
 
-	agent->fireScript(calculateScriptId(message_id));
+	agent->fireScript(calculateScriptId(message_id), owner.get());
 }
 
 /**
@@ -487,7 +486,7 @@ void caosVM::c_MESG_WRT() {
 
 	// I'm not sure how to handle the 'delay'; is it a background delay, or do we actually block for delay ticks?
 	
-	agent->fireScript(calculateScriptId(message_id));
+	agent->fireScript(calculateScriptId(message_id), owner.get());
 	agent->vm->setVariables(param_1, param_2);
 	// TODO: set _p_ in agent's VM to param_1 and param_2
 }

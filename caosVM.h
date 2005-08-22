@@ -111,7 +111,7 @@ public:
 	// ...which includes variables accessible to script
 	caosVar var[100]; // might want to make this a map, for memory efficiency
 	caosVar _p_[2]; // might want to add this onto the end of above map, if done
-	AgentRef targ, owner, _it_;
+	AgentRef targ, owner, _it_, from;
 	unsigned int part;
 	
 	void resetScriptState(); // resets everything except OWNR
@@ -474,7 +474,7 @@ public:
 
 	void tick();
 	void stop();
-	bool fireScript(script *s, bool nointerrupt);
+	bool fireScript(script *s, bool nointerrupt, Agent *frm = 0);
 
 	caosVM(const AgentRef &o);
 

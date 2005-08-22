@@ -83,7 +83,7 @@ public:
 	float floatingx, floatinyy;
 	AgentRef floatingrelative;
 
-	void fireScript(unsigned short event);
+	void fireScript(unsigned short event, Agent *from = 0);
 	void moveTo(float, float);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	void pushVM(caosVM *newvm);
