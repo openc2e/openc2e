@@ -69,7 +69,7 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 			else isLast = true;
 		}
 
-		if (isOr) {
+		if (!wasAnd) {
 			nextOr->setSuccessor(entry);
 			nextOr = new caosNoop();
 			s->current->addOp(nextOr);

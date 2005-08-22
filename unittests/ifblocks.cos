@@ -150,6 +150,8 @@ ELSE
  DBG: OUTS "not ok 20"
 ENDI
 
+SETV VA00 MOWS
+
 * test AND #2
 DOIF 1 eq 2 AND 2 eq 2
  DBG: OUTS "not ok 21"
