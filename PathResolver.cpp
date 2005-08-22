@@ -62,7 +62,7 @@ bool resolveFile(path &p) {
 	return true;
 }
 
-bool resolveFile(string &srcPath) {
+bool resolveFile_(string &srcPath) {
 	path orig(srcPath, native);
 	if (exists(orig))
 		return true;
@@ -77,16 +77,30 @@ bool resolveFile(string &srcPath) {
 	orig = dir / lcpath(leaf);
 	string fn = orig.string();
 
-	if (exists(orig)) {
+/*	if (exists(orig)) {
 		srcPath = fn;
 		return true;
-	}
+	}*/
 
 	map<string, string>::iterator i = cache.find(fn);
-	if (i == cache.end())
+	if (i == cache.end()) {
+		assert(!exists(orig));
 		return false;
+	}
 	srcPath = cache[fn];
 	return true;
+}
+
+bool resolveFile(std::string &path) {
+	std::string orig = path;
+	bool res = resolveFile_(path);
+	std::cerr << orig << " -> ";
+	if (!res)
+		std::cerr << "(nil)";
+	else
+		std::cerr << path;
+	std::cerr << std::endl;
+	return res;
 }
 
 /* If dir is cached, do nothing.

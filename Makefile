@@ -72,7 +72,7 @@ COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
-all: openc2e tools/mngtest tools/filetests tools/praydumper docs
+all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest
 
 docs: docs.html
 
@@ -135,6 +135,10 @@ tools/praydumper: tools/praydumper.o pray.o
 
 tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+
+tools/pathtest: tools/pathtest.o PathResolver.o
+	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+
 
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
