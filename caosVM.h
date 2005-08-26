@@ -362,6 +362,7 @@ public:
 	void c_PART();
 	void c_PAT_DULL();
 	void c_PAT_BUTT();
+	void c_PAT_FIXD();
 	void c_PAT_KILL();
 	void c_FCUS();
 
@@ -427,6 +428,8 @@ public:
 	// input
 	void c_CLAC();
 	void c_CLIK();
+	void c_IMSK();
+	void v_IMSK();
 
 	// vehicles
 	void c_CABN();

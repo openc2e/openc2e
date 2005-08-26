@@ -95,6 +95,30 @@ void caosVM::c_PAT_BUTT() {
 }
 
 /**
+ PAT: FIXD (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) fontsprite (string)
+ %status maybe
+*/
+void caosVM::c_PAT_FIXD() {
+	VM_PARAM_STRING(fontsprite)
+	VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_STRING(sprite)
+	VM_PARAM_INTEGER(part)	
+	
+	caos_assert(part > 0);
+	caos_assert(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);
+	
+	// TODO TODO TODO we don't take image_count!!
+	CompoundPart *p = new FixedTextPart(part, sprite, first_image, x, y, plane, fontsprite);
+	a->addPart(p);
+}
+
+/**
  PAT: KILL (command) part (integer)
  
  kill the specified part of the TARGed compound agent/vehicle

@@ -24,7 +24,8 @@ using std::cerr;
 
 /**
  CLAC (command) message (integer)
- */
+ %status maybe
+*/
 void caosVM::c_CLAC() {
   VM_VERIFY_SIZE(1)
   VM_PARAM_INTEGER(message)
@@ -37,6 +38,7 @@ void caosVM::c_CLAC() {
 
 /**
  CLIK (command) msg1 (integer) msg2 (integer) msg3 (integer)
+ %status maybe
 */
 void caosVM::c_CLIK() {
 	VM_VERIFY_SIZE(3)
@@ -50,6 +52,34 @@ void caosVM::c_CLIK() {
 	targ->clac[1] = calculateScriptId(msg2);
 	targ->clac[2] = calculateScriptId(msg3);
 	targ->clik = 0;
+}
+
+/**
+ IMSK (command) flags (integer)
+ %status stub
+
+ Set the input event flags for the target agent, which tell the engine which events the agent requires scripts to be fired for.
+ For example, setting the "key up" flag means the target agent has the relevant script executed every time a key is released.
+
+ Add the following values together to calculate the flags parameter: 1 for key down, 2 for key up, 3 for mouse move, 4 for mouse down, 16 for mouse up, 32 for mouse wheel movement and 64 for (translated) keypress.
+
+ TODO: link to the script details (event numbers and parameters).
+*/
+void caosVM::c_IMSK() {
+	VM_PARAM_INTEGER(flags)
+
+	caos_assert(targ);
+	// TODO
+}
+
+/**
+ IMSK (integer)
+ %status stub
+
+ Returns the input event flags for the target agent. See the IMSK command for details.
+*/
+void caosVM::v_IMSK() {
+	result.setInt(0); // TODO
 }
 
 /* vim: set noet: */
