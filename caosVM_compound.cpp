@@ -216,7 +216,7 @@ void caosVM::c_PTXT() {
 	// TODO
 }	
 
-/*
+/**
  PTXT (string)
  %status stub
 
