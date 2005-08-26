@@ -28,6 +28,7 @@ using std::cerr;
 
 /**
  TOUC (integer) first (agent) second (agent)
+ %status maybe
 */
 void caosVM::v_TOUC() {
 	VM_VERIFY_SIZE(2)
@@ -58,6 +59,7 @@ void caosVM::v_TOUC() {
 
 /**
  RTAR (command) family (integer) genus (integer) species (integer)
+ %status maybe
 
  set targ to random agent with given family/genus/species
  */ 
@@ -89,6 +91,7 @@ void caosVM::c_RTAR() {
 
 /**
  NEW: SIMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
+ %status maybe
 
  create a new simple agent with given family/genus/species, given spritefile with image_count sprites
  available starting at first_image in the spritefile, at the screen depth given by plane
@@ -110,6 +113,7 @@ void caosVM::c_NEW_SIMP() {
 
 /**
  NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
+ %status maybe
 
  create a new composite agent with given family/genus/species, given spritefile with image_count sprites
  available starting at first_image in the spritefile, with the first part at the screen depth given by plane
@@ -130,6 +134,7 @@ void caosVM::c_NEW_COMP() {
 
 /**
  NEW: VHCL (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
+ %status maybe
 
  create a new vehicle agent with given family/genus/species, given spritefile with image_count sprites
  available starting at first_image in the spritefile, with the first part at the screen depth given by plane
@@ -150,6 +155,7 @@ void caosVM::c_NEW_VHCL() {
 
 /**
  TARG (agent)
+ %status maybe
 
  return TARG
 */
@@ -160,6 +166,7 @@ void caosVM::v_TARG() {
 
 /**
  OWNR (agent)
+ %status maybe
  
  return OWNR
 */
@@ -170,6 +177,7 @@ void caosVM::v_OWNR() {
 
 /**
  NULL (agent)
+ %status maybe
 
  return null (zero) agent
 */
@@ -181,6 +189,7 @@ void caosVM::v_NULL() {
 
 /**
  POSE (command) pose (integer)
+ %status maybe
 */
 void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
@@ -200,6 +209,7 @@ void caosVM::c_POSE() {
 
 /**
  ATTR (command) attr (integer)
+ %status maybe
 
  set attributes of TARG agent
 */
@@ -212,6 +222,7 @@ void caosVM::c_ATTR() {
 
 /**
  ATTR (integer)
+ %status maybe
 
  return attributes of TARG agent
 */
@@ -223,6 +234,7 @@ void caosVM::v_ATTR() {
 
 /**
  TICK (command) tickrate (integer)
+ %status maybe
 */
 void caosVM::c_TICK() {
 	VM_VERIFY_SIZE(1)
@@ -233,6 +245,7 @@ void caosVM::c_TICK() {
 
 /**
  BHVR (command) bhvr (integer)
+ %status stub
 */
 void caosVM::c_BHVR() {
 	VM_VERIFY_SIZE(1)
@@ -242,6 +255,7 @@ void caosVM::c_BHVR() {
 
 /**
  TARG (command) agent (agent)
+ %status maybe
 
  set TARG to given agent
 */
@@ -261,6 +275,7 @@ void caosVM::v_FROM() {
 
 /**
  POSE (integer)
+ %status maybe
 */
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
@@ -281,6 +296,7 @@ void caosVM::v_POSE() {
 
 /**
  KILL (command) agent (agent)
+ %status maybe
 
  destroy the agent in question. you can't destroy PNTR.
  remember, use DEAD first for creatures!
@@ -294,6 +310,7 @@ void caosVM::c_KILL() {
 
 /**
  ANIM (command) poselist (bytestring)
+ %status maybe
 
  set the animation string for TARG, in the format '1 2 3 4'
  if it ends with '255', loop back to beginning; if it ends with '255 X', loop back to frame X
@@ -328,6 +345,7 @@ void caosVM::c_ANIM() {
 
 /**
  ABBA (integer)
+ %status stub
 */
 void caosVM::v_ABBA() {
 	VM_VERIFY_SIZE(0)
@@ -336,6 +354,7 @@ void caosVM::v_ABBA() {
 
 /**
  BASE (command) index (integer)
+ %status maybe
 */
 void caosVM::c_BASE() {
 	VM_VERIFY_SIZE(1)
@@ -358,6 +377,7 @@ void caosVM::c_BASE() {
 
 /**
  BASE (integer)
+ %status maybe
 */
 void caosVM::v_BASE() {
 	VM_VERIFY_SIZE(0)
@@ -375,6 +395,7 @@ void caosVM::v_BASE() {
 
 /**
  BHVR (integer)
+ %status maybe
 */
 void caosVM::v_BHVR() {
 	VM_VERIFY_SIZE(0)
@@ -385,6 +406,7 @@ void caosVM::v_BHVR() {
 
 /**
  CARR (agent)
+ %status maybe
 */
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
@@ -394,6 +416,7 @@ void caosVM::v_CARR() {
 
 /**
  FMLY (integer)
+ %status maybe
 
  return family of TARG agent
 */
@@ -405,6 +428,7 @@ void caosVM::v_FMLY() {
 
 /**
  GNUS (integer)
+ %status maybe
 
  return genus of TARG agent
 */
@@ -416,6 +440,7 @@ void caosVM::v_GNUS() {
 
 /**
  SPCS (integer)
+ %status maybe
 
  return species of TARG agent
 */
@@ -427,6 +452,7 @@ void caosVM::v_SPCS() {
 
 /**
  PLNE (integer)
+ %status maybe
 
  return plane (z-order) of TARG agent
 */
@@ -438,6 +464,7 @@ void caosVM::v_PLNE() {
 
 /**
  PNTR (agent)
+ %status maybe
 
  return the pointer agent (the hand)
 */
@@ -460,6 +487,7 @@ unsigned int calculateScriptId(unsigned int message_id) {
 
 /**
  MESG WRIT (command) agent (agent) message_id (integer)
+ %status maybe
 */
 void caosVM::c_MESG_WRIT() {
 	VM_VERIFY_SIZE(2)
@@ -473,6 +501,7 @@ void caosVM::c_MESG_WRIT() {
 
 /**
  MESG WRT+ (command) agent (agent) message_id (integer) param_1 (anything) param_2 (anything) delay (integer)
+ %status maybe
 */
 void caosVM::c_MESG_WRT() {
 	VM_VERIFY_SIZE(5)
@@ -493,6 +522,7 @@ void caosVM::c_MESG_WRT() {
 
 /**
  TOTL (integer) family (integer) genus (integer) species (integer)
+ %status maybe
 */
 void caosVM::v_TOTL() {
 	VM_VERIFY_SIZE(3)
@@ -512,6 +542,7 @@ void caosVM::v_TOTL() {
 
 /**
  SHOW (command) visibility (integer)
+ %status maybe
  
  set visibility of agent to cameras. 0 = invisible, 1 = visible.
 */
@@ -525,6 +556,7 @@ void caosVM::c_SHOW() {
 
 /**
  POSX (float)
+ %status maybe
 */
 void caosVM::v_POSX() {
 	VM_VERIFY_SIZE(0)
@@ -534,6 +566,7 @@ void caosVM::v_POSX() {
 
 /**
  POSY (float)
+ %status maybe
 */
 void caosVM::v_POSY() {
 	VM_VERIFY_SIZE(0)
@@ -543,6 +576,7 @@ void caosVM::v_POSY() {
 
 /**
  FRAT (command) framerate (integer)
+ %status maybe
 */
 void caosVM::c_FRAT() {
 	VM_VERIFY_SIZE(1)
@@ -595,6 +629,7 @@ class blockUntilOver : public blockCond {
 
 /**
  OVER (command)
+ %status maybe
 
  wait until the animation of the target agent or part is over
 */
@@ -606,6 +641,7 @@ void caosVM::c_OVER() {
 
 /**
  PUHL (command) pose (integer) x (integer) y (integer)
+ %status maybe
 
  set relative x/y coords for TARG's pickup point
  pose is -1 for all poses, or a pose relative to the base specified in NEW: (not BASE)
@@ -622,6 +658,7 @@ void caosVM::c_PUHL() {
 
 /**
  POSL (float)
+ %status maybe
 */
 void caosVM::v_POSL() {
 	VM_VERIFY_SIZE(0)
@@ -632,6 +669,7 @@ void caosVM::v_POSL() {
 
 /**
  POST (float)
+ %status maybe
 */
 void caosVM::v_POST() {
 	VM_VERIFY_SIZE(0)
@@ -642,6 +680,7 @@ void caosVM::v_POST() {
 
 /**
  POSR (float)
+ %status maybe
 */
 void caosVM::v_POSR() {
 	VM_VERIFY_SIZE(0)
@@ -652,6 +691,7 @@ void caosVM::v_POSR() {
 
 /**
  POSB (float)
+ %status maybe
 */
 void caosVM::v_POSB() {
 	VM_VERIFY_SIZE(0)
@@ -662,6 +702,7 @@ void caosVM::v_POSB() {
 
 /**
  WDTH (integer)
+ %status maybe
 */
 void caosVM::v_WDTH() {
 	VM_VERIFY_SIZE(0)
@@ -672,6 +713,7 @@ void caosVM::v_WDTH() {
 
 /**
  PLNE (command) depth (integer)
+ %status maybe
 */
 void caosVM::c_PLNE() {
 	VM_VERIFY_SIZE(1)
@@ -683,6 +725,7 @@ void caosVM::c_PLNE() {
 
 /**
  TINT (command) red_tint (integer) green_tint (integer) blue_tint (integer) rotation (integer) swap (integer)
+ %status maybe
 */
 void caosVM::c_TINT() {
 	VM_VERIFY_SIZE(5)
@@ -699,6 +742,7 @@ void caosVM::c_TINT() {
 
 /**
  RNGE (command) distance (float)
+ %status maybe
 */
 void caosVM::c_RNGE() {
 	VM_VERIFY_SIZE(1)
@@ -710,6 +754,7 @@ void caosVM::c_RNGE() {
 
 /**
  RNGE (integer)
+ %status maybe
 */
 void caosVM::v_RNGE() {
 	VM_VERIFY_SIZE(0)
@@ -719,6 +764,7 @@ void caosVM::v_RNGE() {
 
 /**
  TRAN (integer) x (integer) y (integer)
+ %status maybe
 
  Tests if the pixel at (x,y) on TARG is transparent
 */
@@ -758,6 +804,7 @@ void caosVM::v_TRAN() {
 	
 /**
  TRAN (command) transparency (integer) part_no (integer)
+ %status maybe
 */
 void caosVM::c_TRAN() {
 	VM_VERIFY_SIZE(2)
@@ -770,6 +817,7 @@ void caosVM::c_TRAN() {
 
 /**
  HGHT (integer)
+ %status maybe
 */
 void caosVM::v_HGHT() {
 	VM_VERIFY_SIZE(0)
@@ -780,6 +828,7 @@ void caosVM::v_HGHT() {
 
 /**
  HAND (string)
+ %status maybe
 
  returns the name of the hand; default is 'hand'
 */
@@ -791,6 +840,7 @@ void caosVM::v_HAND() {
 
 /**
  HAND (command) name (string)
+ %status maybe
 
  set the name of the hand
 */
@@ -803,6 +853,7 @@ void caosVM::c_HAND() {
 
 /**
  TICK (integer)
+ %status maybe
 
  return tick rate of TARG
 */
@@ -815,6 +866,7 @@ void caosVM::v_TICK() {
 
 /**
  PUPT (command) pose (integer) x (integer) y (integer)
+ %status stub
 */
 void caosVM::c_PUPT() {
 	VM_VERIFY_SIZE(3)
