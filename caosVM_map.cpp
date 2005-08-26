@@ -25,6 +25,7 @@ using std::cerr;
 
 /**
  ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)
+ %status maybe
  
  create metaroom. return id of created metaroom.
  */
@@ -43,7 +44,24 @@ void caosVM::v_ADDM() {
 }
 
 /**
+ ADDB (command) metaroom_id (integer) background (string)
+ %status stub
+
+ Add a new background to an existing metaroom, to be displayed with BKGD.
+*/
+void caosVM::c_ADDB() {
+	VM_PARAM_STRING(background)
+	VM_PARAM_INTEGER(metaroomid)
+	
+	MetaRoom *m = world.map.getMetaRoom(metaroomid);
+	caos_assert(m);
+
+	// TODO
+}
+
+/**
  BRMI (command) metaroom_base (integer) room_base (integer)
+ %status maybe
  
  set metaroom/room bases, i have no idea why/if we need this
  */
@@ -59,6 +77,7 @@ void caosVM::c_BRMI() {
 
 /**
  MAPD (command) width (integer) height (integer)
+ %status maybe
  
  set the map dimensions, inside which we place metarooms
  */
@@ -72,6 +91,7 @@ void caosVM::c_MAPD() {
 
 /**
  MAPW (integer)
+ %status maybe
  
  return width of world map
 */
@@ -81,6 +101,7 @@ void caosVM::v_MAPW() {
 
 /**
  MAPH (integer)
+ %status maybe
 
  return height of world map
 */
@@ -90,6 +111,7 @@ void caosVM::v_MAPH() {
 
 /**
  MAPK (command)  
+ %status maybe
  
  reset the map (call map::reset)
  */
@@ -114,6 +136,7 @@ void caosVM::v_BKDS() {
 
 /**
  ADDR (integer) metaroomid (integer) x_left (integer) x_right (integer) y_left_ceiling (integer) y_right_ceiling (integer) y_left_floor (integer) y_right_floor (integer)
+ %status maybe
 */
 void caosVM::v_ADDR() {
 	VM_VERIFY_SIZE(7)
@@ -137,6 +160,7 @@ void caosVM::v_ADDR() {
 
 /**
  RTYP (command) roomid (integer) roomtype (integer)
+ %status maybe
 */
 void caosVM::c_RTYP() {
 	VM_VERIFY_SIZE(2)
@@ -150,6 +174,7 @@ void caosVM::c_RTYP() {
 
 /**
  RTYP (integer) roomid (integer)
+ %status maybe
 */
 void caosVM::v_RTYP() {
 	VM_VERIFY_SIZE(1)
@@ -164,6 +189,7 @@ void caosVM::v_RTYP() {
 
 /**
  DOOR (command) room1 (integer) room2 (integer) perm (integer)
+ %status maybe
 */
 void caosVM::c_DOOR() {
 	VM_VERIFY_SIZE(3)
@@ -192,6 +218,7 @@ void caosVM::c_DOOR() {
 
 /**
  RATE (command) roomtype (integer) caindex (integer) gain (float) loss (float) diffusion (float)
+ %status maybe
 */
 void caosVM::c_RATE() {
 	VM_VERIFY_SIZE(5)
@@ -210,6 +237,7 @@ void caosVM::c_RATE() {
 
 /**
  ROOM (integer) agent (agent)
+ %status maybe
  
  returns the room the midpoint of the agent is inside
 */
@@ -226,6 +254,7 @@ void caosVM::v_ROOM() {
 
 /**
  LEFT (integer)
+ %status maybe
  
  returns the left constant (0)
 */
@@ -237,6 +266,7 @@ void caosVM::v_LEFT() {
 
 /**
  RGHT (integer)
+ %status maybe
  
  returns the right constant (1)
 */
@@ -248,6 +278,7 @@ void caosVM::v_RGHT() {
 
 /**
  _UP_ (integer)
+ %status maybe
  %pragma implementation caosVM::v_UP
  
  returns the up constant (2)
@@ -260,6 +291,7 @@ void caosVM::v_UP() {
 
 /**
  DOWN (integer)
+ %status maybe
  
  returns the down constant (3)
 */
@@ -271,6 +303,7 @@ void caosVM::v_DOWN() {
 
 /**
  PROP (command) roomid (integer) caindex (integer) cavalue (float)
+ %status stub
 */
 void caosVM::c_PROP() {
 	VM_VERIFY_SIZE(3)
@@ -284,6 +317,7 @@ void caosVM::c_PROP() {
 
 /**
  PROP (float) roomid (integer) caindex (integer)
+ %status stub
 */
 void caosVM::v_PROP() {
 	VM_VERIFY_SIZE(2)
@@ -296,6 +330,7 @@ void caosVM::v_PROP() {
 
 /**
  PERM (command) perm (integer)
+ %status maybe
 
  set target agent's permiability, 1 to 100
 */
@@ -314,6 +349,7 @@ void caosVM::c_PERM() {
 
 /**
  PERM (integer)
+ %status maybe
 
  return target agent's permiability
 */
@@ -326,6 +362,7 @@ void caosVM::v_PERM() {
 
 /**
  GRAP (integer) x (float) y (float)
+ %status maybe
 
  return the id of the metaroom at (x, y), or -1 otherwise
 */
@@ -344,6 +381,7 @@ void caosVM::v_GRAP() {
 
 /**
  GMAP (integer) x (float) y (float)
+ %status maybe
 
  return the id of the metaroom at (x, y), or -1 otherwise
 */
@@ -362,16 +400,20 @@ void caosVM::v_GMAP() {
 
 /**
  LINK (command) room1 (integer) room2 (integer) perm (integer)
+ %status stub
 */
 void caosVM::c_LINK() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(perm)
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
+
+	// TODO
 }
 
 /**
  GRID (integer) agent (agent) direction (integer)
+ %status maybe
 */
 void caosVM::v_GRID() {
 	VM_VERIFY_SIZE(2)
@@ -423,6 +465,7 @@ void caosVM::v_GRID() {
 
 /**
  EMIT (command) ca_index (integer) amount (float)
+ %status stub
 
  make the target agent continually emit the specified amount of the specified CA into the room
 */
@@ -430,10 +473,13 @@ void caosVM::c_EMIT() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(amount)
 	VM_PARAM_INTEGER(ca_index)
+
+	// TODO
 }
 
 /**
  WALL (integer)
+ %status maybe
 
  returns direction of last wall target agent collided with
 */
@@ -446,6 +492,7 @@ void caosVM::v_WALL() {
 
 /**
  ALTR (command) room_id (integer) ca_index (integer) delta (float)
+ %status stub
 */
 void caosVM::c_ALTR() {
 	VM_VERIFY_SIZE(3)
@@ -455,4 +502,5 @@ void caosVM::c_ALTR() {
 
 	// TODO
 }
+
 /* vim: set noet: */

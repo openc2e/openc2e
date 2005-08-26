@@ -134,6 +134,7 @@ public:
 
 	// map
 	void v_ADDM();
+	void c_ADDB();
 	void c_BRMI();
 	void c_MAPD();
 	void c_MAPK();

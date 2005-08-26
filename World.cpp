@@ -33,7 +33,11 @@ World::World() {
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
 void World::init() {
 	theHand = new SimpleAgent(2, 1, 1, UINT_MAX, 0, 0);
-	((SimpleAgent *)theHand)->setImage("hand");
+	try {
+		((SimpleAgent *)theHand)->setImage("hand");
+	} catch (caosException &e) {
+		((SimpleAgent *)theHand)->setImage("syst"); // Creatures Village
+	}
 }
 
 caosVM *World::getVM(Agent *a) {
