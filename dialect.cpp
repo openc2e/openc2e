@@ -116,7 +116,7 @@ void Dialect::handleToken(caosScript *s, token *t) {
 		throw parseFailure(std::string("unexpected non-word ") + t->dump());
 	std::string word = t->word;
 	if (delegates.find(word) == delegates.end())
-		throw parseException(std::string("no delegate for word ") + word);
+		throw parseException(std::string("no delegate for ") + t->dump());
 	parseDelegate &p = *delegates[word];
 	p(s, this);
 }
