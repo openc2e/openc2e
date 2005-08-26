@@ -163,6 +163,7 @@ public:
 	void v_BKDS();
 	
 	// camera
+	void v_VISI();
 	void c_CMRT();
 	void c_META();
 	void c_CMRA();
@@ -298,7 +299,6 @@ public:
 	void c_FRAT();
 	void c_OVER();
 	void c_PUHL();
-	void v_VISI();
 	void v_POSL();
 	void v_POST();
 	void v_POSB();

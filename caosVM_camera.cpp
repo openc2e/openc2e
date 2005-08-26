@@ -21,6 +21,31 @@
 #include "World.h"
 
 /**
+ VISI (integer) checkall (integer)
+ %status maybe
+
+ Returns 1 if target agent is on camera, or 0 otherwise. If checkall is 0, only checks main camera, otherwise checks all.
+*/
+void caosVM::v_VISI() {
+	VM_PARAM_INTEGER(checkall)
+
+	// TODO: check non-main cameras
+	// TODO: do compound parts stick out of the agent?
+	
+	caos_assert(targ);
+	
+	if (targ->x > (world.camera.getX() + world.camera.getWidth()))
+		if (targ->y > (world.camera.getY() + world.camera.getHeight()))
+			if ((targ->x + targ->getWidth()) < world.camera.getX())
+				if ((targ->y + targ->getHeight()) < world.camera.getY()) {
+					result.setInt(0);
+					return;
+				}
+
+	result.setInt(1);
+}
+
+/**
  META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)
  
  set metaroom current camera is pointing at. coordinates point to top left of new
