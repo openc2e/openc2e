@@ -173,4 +173,57 @@ void caosVM::c_FCUS() {
 		// TODO
 	}
 }
+
+/**
+ FRMT (command) left_margin (integer) top_margin (integer) right_margin (integer) button_margin (integer) line_spacing (integer) char_spacing (integer) justification (integer)
+ %status stub
+
+ alters the appearance of the target text part. the spacing values and margins are to be specified in pixels. justification can be 0 for left, 1 for right, 2 for center, 4 for bottom, 8 for middle or 16 for 'last page scroll' (TODO?), and you can add these together (except 0/1 are mutually exclusive, obviously).
+*/
+void caosVM::c_FRMT() {
+	VM_PARAM_INTEGER(justification)
+	VM_PARAM_INTEGER(char_spacing)
+	VM_PARAM_INTEGER(line_spacing)
+	VM_PARAM_INTEGER(bottom_margin)
+	VM_PARAM_INTEGER(right_margin)
+	VM_PARAM_INTEGER(top_margin)
+	VM_PARAM_INTEGER(left_margin)
+
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	/*TextPart *p = dynamic_cast<TextPart *>(c->part(part));
+	caos_assert(p);*/
+	
+	// TODO
+}
+
+/**
+ PTXT (command) text (string)
+ %status stub
+ 
+ sets the text of the current text part
+*/
+void caosVM::c_PTXT() {
+	VM_PARAM_STRING(text)
+
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	/*TextPart *p = dynamic_cast<TextPart *>(c->part(part));
+	caos_assert(p);*/
+	
+	// TODO
+}	
+
+/*
+ PTXT (string)
+ %status stub
+
+ returns the text of the current text part
+*/
+void caosVM::v_PTXT() {
+	result.setString(""); // TODO
+}
+
 /* vim: set noet: */

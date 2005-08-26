@@ -366,6 +366,9 @@ public:
 	void c_PAT_FIXD();
 	void c_PAT_KILL();
 	void c_FCUS();
+	void c_FRMT();
+	void c_PTXT();
+	void v_PTXT();
 
 	// creatures
 	void c_STIM_SHOU();
