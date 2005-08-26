@@ -47,6 +47,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 
 	soundslot = 0;
 	displaycore = false;
+
+	floatingx = floatingy = 0;
 }
 
 void Agent::zotstack() {
@@ -311,6 +313,19 @@ void Agent::tick() {
 			y = y + vely.getFloat();
 		if (velx.hasDecimal())
 			x = x + velx.getFloat();
+	}
+
+	if (floatable) {
+		// TODO: should probably be done at the end of the tick after all agents have been repositioned
+		// (or be a child of the parent agent, so it always gets set after it)
+		
+		if (floatingagent) {
+			x = floatingagent->x + floatingx;
+			y = floatingagent->y + floatingy;
+		} else {
+			x = world.camera.getX() + floatingx;
+			y = world.camera.getY() + floatingy;
+		}
 	}
 
 	if (timerrate) {

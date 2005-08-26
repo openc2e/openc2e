@@ -80,8 +80,8 @@ public:
 
 	float range;
 
-	float floatingx, floatinyy;
-	AgentRef floatingrelative;
+	float floatingx, floatingy;
+	AgentRef floatingagent;
 
 	void fireScript(unsigned short event, Agent *from = 0);
 	void moveTo(float, float);

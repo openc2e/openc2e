@@ -27,6 +27,7 @@ using std::cerr;
 
 /**
  ELAS (command) elas (integer)
+ %status stub
 */
 void caosVM::c_ELAS() {
 	VM_VERIFY_SIZE(1)
@@ -36,6 +37,7 @@ void caosVM::c_ELAS() {
 
 /**
  MVTO (command) x (float) y (float)
+ %status maybe
 */
 void caosVM::c_MVTO() {
 	VM_VERIFY_SIZE(2)
@@ -47,6 +49,7 @@ void caosVM::c_MVTO() {
 
 /**
  MVBY (command) x (float) y (float)
+ %status maybe
 */
 void caosVM::c_MVBY() {
 	VM_PARAM_FLOAT(y)
@@ -58,6 +61,7 @@ void caosVM::c_MVBY() {
 
 /**
  VELX (variable)
+ %status maybe
 */
 void caosVM::v_VELX() {
 	VM_VERIFY_SIZE(0)
@@ -67,6 +71,7 @@ void caosVM::v_VELX() {
 
 /**
  VELY (variable)
+ %status maybe
 */
 void caosVM::v_VELY() {
 	VM_VERIFY_SIZE(0)
@@ -77,6 +82,7 @@ void caosVM::v_VELY() {
 
 /**
  OBST (float) direction (integer)
+ %status maybe
 
  returns distance from target agent to nearest wall that it might collide with in given direction
  (except right now it just gives the direction to the nearest wall at world edge - fuzzie)
@@ -144,6 +150,7 @@ void caosVM::v_OBST() {
 
 /**
  TMVT (integer) x (float) y (float)
+ %status maybe
  
  returns 1 if TARG could move to (x, y) and still be in room system, otherwise returns 0
 */
@@ -161,6 +168,7 @@ void caosVM::v_TMVT() {
 
 /**
  TMVF (integer) x (float) y (float)
+ %status stub
  
  returns 1 if target create could move foot to (x, y) and still be in room system, otherwise returns 0
 */
@@ -175,6 +183,7 @@ void caosVM::v_TMVF() {
 
 /**
  ACCG (command) accel (float)
+ %status maybe
 */
 void caosVM::c_ACCG() {
 	VM_VERIFY_SIZE(1)
@@ -186,6 +195,7 @@ void caosVM::c_ACCG() {
 
 /**
  ACCG (float)
+ %status maybe
 */
 void caosVM::v_ACCG() {
 	VM_VERIFY_SIZE(0)
@@ -196,6 +206,7 @@ void caosVM::v_ACCG() {
 
 /**
  AERO (command) aero (float)
+ %status maybe
 */
 void caosVM::c_AERO() {
 	VM_VERIFY_SIZE(1)
@@ -207,6 +218,7 @@ void caosVM::c_AERO() {
 
 /**
  AERO (float)
+ %status maybe
 */
 void caosVM::v_AERO() {
 	VM_VERIFY_SIZE(0)
@@ -217,6 +229,7 @@ void caosVM::v_AERO() {
 
 /**
  RELX (float) first (agent) second (agent)
+ %status maybe
 */
 void caosVM::v_RELX() {
 	VM_VERIFY_SIZE(2)
@@ -232,6 +245,7 @@ void caosVM::v_RELX() {
 
 /**
  RELY (float) first (agent) second (agent)
+ %status maybe
 */
 void caosVM::v_RELY() {
 	VM_VERIFY_SIZE(2)
@@ -247,6 +261,7 @@ void caosVM::v_RELY() {
 
 /**
  VELO (command) xvel (float) yvel (float)
+ %status maybe
 */
 void caosVM::c_VELO() {
 	VM_VERIFY_SIZE(2)
@@ -262,6 +277,7 @@ void caosVM::c_VELO() {
 
 /**
  MVSF (command) x (float) y (float)
+ %status stub
 
  move the target agent to an area inside the room system at about (x, y)
 */
@@ -272,6 +288,7 @@ void caosVM::c_MVSF() {
 
 /**
  FRIC (float)
+ %status maybe
 */
 void caosVM::v_FRIC() {
 	VM_VERIFY_SIZE(0)
@@ -282,6 +299,7 @@ void caosVM::v_FRIC() {
 
 /**
  FRIC (command) friction (integer)
+ %status maybe
 */
 void caosVM::c_FRIC() {
 	VM_VERIFY_SIZE(1)
@@ -293,6 +311,7 @@ void caosVM::c_FRIC() {
 
 /**
  FALL (integer)
+ %status stub
 
  Return 1 if TARG is moving due to gravity, 0 otherwise
 */
@@ -317,6 +336,35 @@ void caosVM::v_MOVS() {
 	caos_assert(targ);
 
 	result.setInt(0); // TODO
+}
+
+/**
+ FLTO (command) x (float) y (float)
+ %status maybe
+
+ Set the target agent to float its top-left corner (x, y) away from the top-left corner of the FREL agent.
+*/
+void caosVM::c_FLTO() {
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+
+	caos_assert(targ)
+	targ->floatingx = x;
+	targ->floatingy = y;
+}
+
+/**
+ FREL (command) agent (agent)
+ %status maybe
+
+ Set the agent the target agent floats relative to. You must set the 'floatable' attribute for this to work.
+ The default is NULL, which means the target agent floats relative to the main camera.
+*/
+void caosVM::c_FREL() {
+	VM_PARAM_AGENT(agent)
+
+	caos_assert(targ)
+	targ->floatingagent = agent;
 }
 
 /* vim: set noet: */
