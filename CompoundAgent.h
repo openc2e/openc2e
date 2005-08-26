@@ -26,6 +26,8 @@ class CompoundPart {
 protected:
 	creaturesImage *sprite;
 	unsigned int firstimg, pose, frameno;
+	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+				 unsigned int _z);
 
 public:
 	std::vector<unsigned int> animation;
@@ -46,8 +48,6 @@ public:
 		return zorder < b->zorder;
 	}
 	
-	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-				 unsigned int _z);
 	virtual ~CompoundPart() { }
 };
 
@@ -72,7 +72,18 @@ public:
 	DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y, unsigned int _z);
 };
 
-class FixedTextPart : public CompoundPart {
+class TextPart : public CompoundPart {
+protected:
+	std::string text;
+	TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y, unsigned int _z)
+		: CompoundPart(_id, spritefile, fimg, _x, _y, _z) { }
+
+public:
+	void setText(std::string t) { text = t; }
+	std::string getText() { return text; }
+};
+
+class FixedTextPart : public TextPart {
 public:
 	FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 				  unsigned int _z, std::string fontsprite);
@@ -84,7 +95,7 @@ public:
 			  unsigned int _z, unsigned int novalues);
 };
 
-class TextEntryPart : public CompoundPart {
+class TextEntryPart : public TextPart {
 public:
 	TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 				  unsigned int _z, unsigned int msgid, std::string fontsprite);

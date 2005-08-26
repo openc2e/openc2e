@@ -364,6 +364,7 @@ public:
 	void c_PAT_DULL();
 	void c_PAT_BUTT();
 	void c_PAT_FIXD();
+	void c_PAT_TEXT();
 	void c_PAT_KILL();
 	void c_FCUS();
 	void c_FRMT();
@@ -434,6 +435,7 @@ public:
 	void c_CLIK();
 	void c_IMSK();
 	void v_IMSK();
+	void v_KEYD();
 
 	// vehicles
 	void c_CABN();

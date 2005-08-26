@@ -104,8 +104,13 @@ ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fi
 }
 
 FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-		                                  unsigned int _z, std::string fontsprite) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
+		                                  unsigned int _z, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z) {
 	// TODO: load fontsprite
+}
+
+TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z) {
+	// TODO: load fontsprite, msgid
 }
 
 // TODO: combine identical code from SimpleAgent/CompoundAgent

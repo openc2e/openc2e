@@ -79,6 +79,19 @@ void caosVM::c_IMSK() {
  Returns the input event flags for the target agent. See the IMSK command for details.
 */
 void caosVM::v_IMSK() {
+	caos_assert(targ);
+	result.setInt(0); // TODO
+}
+
+/**
+ KEYD (integer) keycode (inteer)
+ %status stub
+
+ Returns 1 if the specified key is held down, or 0 otherwise.
+*/
+void caosVM::v_KEYD() {
+	VM_PARAM_INTEGER(keycode) // TODO: keycodes are what .. ? raw codes?
+
 	result.setInt(0); // TODO
 }
 

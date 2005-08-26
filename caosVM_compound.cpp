@@ -138,6 +138,32 @@ void caosVM::c_PAT_FIXD() {
 }
 
 /**
+ PAT: TEXT (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) message_id (integer) fontsprite (string)
+ %status maybe
+*/
+void caosVM::c_PAT_TEXT() {
+	VM_PARAM_STRING(fontsprite)
+	VM_PARAM_INTEGER(message_id)
+	VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_STRING(sprite)
+	VM_PARAM_INTEGER(part)	
+	
+	caos_assert(part >= 0);
+	caos_assert(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);
+	
+	// TODO TODO TODO we don't take image_count!!
+	CompoundPart *p = new TextEntryPart(part, sprite, first_image, x, y, plane, message_id, fontsprite);
+	a->addPart(p);
+}
+
+
+/**
  PAT: KILL (command) part (integer)
  
  kill the specified part of the TARGed compound agent/vehicle
@@ -192,15 +218,15 @@ void caosVM::c_FRMT() {
 	caos_assert(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
-	/*TextPart *p = dynamic_cast<TextPart *>(c->part(part));
-	caos_assert(p);*/
+	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
+	caos_assert(p);
 	
 	// TODO
 }
 
 /**
  PTXT (command) text (string)
- %status stub
+ %status maybe
  
  sets the text of the current text part
 */
@@ -210,20 +236,26 @@ void caosVM::c_PTXT() {
 	caos_assert(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
-	/*TextPart *p = dynamic_cast<TextPart *>(c->part(part));
-	caos_assert(p);*/
-	
-	// TODO
+	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
+	caos_assert(p);
+
+	p->setText(text);
 }	
 
 /**
  PTXT (string)
- %status stub
+ %status maybe
 
  returns the text of the current text part
 */
 void caosVM::v_PTXT() {
-	result.setString(""); // TODO
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
+	caos_assert(p);
+	
+	result.setString(p->getText());
 }
 
 /* vim: set noet: */
