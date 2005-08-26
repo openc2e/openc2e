@@ -114,7 +114,7 @@ void caosVM::c_PAT_BUTT() {
 }
 
 /**
- PAT: FIXD (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) fontsprite (string)
+ PAT: FIXD (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) fontsprite (string)
  %status maybe
 */
 void caosVM::c_PAT_FIXD() {
@@ -132,13 +132,12 @@ void caosVM::c_PAT_FIXD() {
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	
-	// TODO TODO TODO we don't take image_count!!
 	CompoundPart *p = new FixedTextPart(part, sprite, first_image, x, y, plane, fontsprite);
 	a->addPart(p);
 }
 
 /**
- PAT: TEXT (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) message_id (integer) fontsprite (string)
+ PAT: TEXT (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) message_id (integer) fontsprite (string)
  %status maybe
 */
 void caosVM::c_PAT_TEXT() {
@@ -157,7 +156,6 @@ void caosVM::c_PAT_TEXT() {
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	
-	// TODO TODO TODO we don't take image_count!!
 	CompoundPart *p = new TextEntryPart(part, sprite, first_image, x, y, plane, message_id, fontsprite);
 	a->addPart(p);
 }
