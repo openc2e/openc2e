@@ -360,6 +360,7 @@ public:
 
 	// compound
 	void c_PART();
+	void v_PART();
 	void c_PAT_DULL();
 	void c_PAT_BUTT();
 	void c_PAT_FIXD();

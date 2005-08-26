@@ -30,12 +30,33 @@ void caosVM::c_PART() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part_id)
 
+	caos_assert(part_id > 0);
+	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	// TODO: this isn't entirely right, we should check it exists instead (maybe part should be a pointer?)
 	caos_assert(part_id < a->partCount());
 	part = part_id;
 }
+
+/**
+ PART (integer) part_id (integer)
+
+ return 1 if the given part number exists on the target agent, or 0 otherwise.
+*/
+void caosVM::v_PART() {
+	VM_PARAM_INTEGER(part_id)
+
+	caos_assert(part_id > 0); // TODO: should we do this?
+	caos_assert(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);
+	// TODO: this isn't entirely right, we should check it exists instead (maybe part should be a pointer?)
+	if (part_id < a->partCount())
+		result.setInt(1);
+	else
+		result.setInt(0);
+}	
 
 /**
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer)
