@@ -30,12 +30,11 @@ void caosVM::c_PART() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part_id)
 
-	caos_assert(part_id > 0);
+	caos_assert(part_id >= 0);
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
-	// TODO: this isn't entirely right, we should check it exists instead (maybe part should be a pointer?)
-	caos_assert(part_id < a->partCount());
+	caos_assert(a->part(part_id));
 	part = part_id;
 }
 
@@ -47,12 +46,11 @@ void caosVM::c_PART() {
 void caosVM::v_PART() {
 	VM_PARAM_INTEGER(part_id)
 
-	caos_assert(part_id > 0); // TODO: should we do this?
+	caos_assert(part_id >= 0); // TODO: should we do this?
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
-	// TODO: this isn't entirely right, we should check it exists instead (maybe part should be a pointer?)
-	if (part_id < a->partCount())
+	if (a->part(part_id))
 		result.setInt(1);
 	else
 		result.setInt(0);
@@ -73,7 +71,7 @@ void caosVM::c_PAT_DULL() {
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
 	
-	caos_assert(part > 0);
+	caos_assert(part >= 0);
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
@@ -104,7 +102,7 @@ void caosVM::c_PAT_BUTT() {
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
 	
-	caos_assert(part > 0);
+	caos_assert(part >= 0);
 	caos_assert((option == 0) || (option == 1));
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
@@ -129,7 +127,7 @@ void caosVM::c_PAT_FIXD() {
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)	
 	
-	caos_assert(part > 0);
+	caos_assert(part >= 0);
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
@@ -148,7 +146,7 @@ void caosVM::c_PAT_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part)
 	
-	caos_assert(part > 0);
+	caos_assert(part >= 0);
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
