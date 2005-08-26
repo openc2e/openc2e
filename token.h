@@ -58,6 +58,7 @@ struct token {
 				oss << "BROKEN";
 				break;
 		}
+		oss << " (line " << yyline << ")";
 		return oss.str();
 	}
 };
