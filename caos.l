@@ -21,8 +21,8 @@ WORDANY     [a-zA-Z0-9:?!_+-]
 
 \*[^\r\n]*
 
-\\.         lex_lineno = yylineno; return make_int(yytext[1]);
-%[01][01][01][01][01][01][01][01]   lex_lineno = yylineno; return make_bin(yytext);
+\'.\'       lex_lineno = yylineno; return make_int(yytext[1]);
+%[01]*                 lex_lineno = yylineno; return make_bin(yytext);
 {WORDINIT}{WORDANY}*                lex_lineno = yylineno; return make_word(yytext);
 [-+]?{DIGIT}*\.{DIGIT}+ lex_lineno = yylineno;  return make_float(atof(yytext));
 [-+]?{DIGIT}+           lex_lineno = yylineno;  return make_int(atoi(yytext));
