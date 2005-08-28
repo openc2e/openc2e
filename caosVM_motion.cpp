@@ -43,7 +43,7 @@ void caosVM::c_MVTO() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
-	assert(targ);
+	caos_assert(targ);
 	targ->moveTo(x, y);
 }
 
@@ -55,7 +55,7 @@ void caosVM::c_MVBY() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	assert(targ);
+	caos_assert(targ);
 	targ->moveTo(targ->x + x, targ->y + y);
 }
 
@@ -65,7 +65,7 @@ void caosVM::c_MVBY() {
 */
 void caosVM::v_VELX() {
 	VM_VERIFY_SIZE(0)
-	assert(targ);
+	caos_assert(targ);
 	vm->valueStack.push_back(&targ->velx);
 }
 
@@ -76,7 +76,7 @@ void caosVM::v_VELX() {
 void caosVM::v_VELY() {
 	VM_VERIFY_SIZE(0)
 
-	assert(targ);
+	caos_assert(targ);
 	vm->valueStack.push_back(&targ->vely);
 }
 
@@ -89,7 +89,7 @@ void caosVM::v_VELY() {
 */
 void caosVM::v_OBST() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_INTEGER(direction) assert(direction >= 0); assert(direction <= 3);
+	VM_PARAM_INTEGER(direction) caos_assert(direction >= 0); caos_assert(direction <= 3);
 
 	// TODO: fix 'might collide with' issue
 	// note: this code is mostly copied from GRID - fuzzie
@@ -159,7 +159,7 @@ void caosVM::v_TMVT() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	assert(targ);
+	caos_assert(targ);
 	// TODO: do this properly
 	Room *r1 = world.map.roomAt(x, y);
 	Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + (targ->getHeight() / 2));
@@ -177,7 +177,7 @@ void caosVM::v_TMVF() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	assert(targ);
+	caos_assert(targ);
 	result.setInt(1); // TODO: don't hardcode
 }
 
@@ -189,7 +189,7 @@ void caosVM::c_ACCG() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(accel)
 
-	assert(targ);
+	caos_assert(targ);
 	targ->accg = accel;
 }
 
@@ -200,7 +200,7 @@ void caosVM::c_ACCG() {
 void caosVM::v_ACCG() {
 	VM_VERIFY_SIZE(0)
 
-	assert(targ);
+	caos_assert(targ);
 	result.setFloat(targ->accg);
 }
 
@@ -212,7 +212,7 @@ void caosVM::c_AERO() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(aero)
 
-	assert(targ);
+	caos_assert(targ);
 	targ->aero = aero;
 }
 
@@ -223,7 +223,7 @@ void caosVM::c_AERO() {
 void caosVM::v_AERO() {
 	VM_VERIFY_SIZE(0)
 	
-	assert(targ);
+	caos_assert(targ);
 	result.setFloat(targ->aero);
 }
 
@@ -268,7 +268,7 @@ void caosVM::c_VELO() {
 	VM_PARAM_FLOAT(vely)
 	VM_PARAM_FLOAT(velx)
 
-	assert(targ);
+	caos_assert(targ);
 	targ->velx.reset();
 	targ->velx.setFloat(velx);
 	targ->vely.reset();
@@ -293,7 +293,7 @@ void caosVM::c_MVSF() {
 void caosVM::v_FRIC() {
 	VM_VERIFY_SIZE(0)
 	
-	assert(targ);
+	caos_assert(targ);
 	result.setFloat(targ->friction);
 }
 
@@ -305,7 +305,7 @@ void caosVM::c_FRIC() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(friction) caos_assert(friction >= 0); caos_assert(friction <= 100);
 
-	assert(targ);
+	caos_assert(targ);
 	targ->friction = friction;
 }
 
