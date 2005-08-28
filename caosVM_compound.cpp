@@ -23,6 +23,7 @@
 
 /**
  PART (command) part_id (integer)
+ %status maybe
  
  set the part number of the TARGed compound agent/vehicle to work on (ANIM/POSE use this, amongst other commands).
 */
@@ -40,6 +41,7 @@ void caosVM::c_PART() {
 
 /**
  PART (integer) part_id (integer)
+ %status maybe
 
  return 1 if the given part number exists on the target agent, or 0 otherwise.
 */
@@ -58,6 +60,7 @@ void caosVM::v_PART() {
 
 /**
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer)
+ %status maybe
 
  create a new 'dull' part for the TARGed compound agent/vehicle which does nothing but display an image.
  number part ids beginning at 1. x/y/plane are relative to the agent you're working on.
@@ -82,6 +85,7 @@ void caosVM::c_PAT_DULL() {
 
 /**
  PAT: BUTT (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) hoveranim (byte-string) messageid (integer) option (integer)
+ %status maybe
  
  creates a new 'button' part for the TARGed compound agent/vehicle
  number part ids beginning at 1. x/y/plane are relative to the agent you're working on.
@@ -161,6 +165,7 @@ void caosVM::c_PAT_TEXT() {
 
 /**
  PAT: KILL (command) part (integer)
+ %status maybe
  
  kill the specified part of the TARGed compound agent/vehicle
 */
@@ -178,6 +183,7 @@ void caosVM::c_PAT_KILL() {
 
 /**
  FCUS (command)
+ %status maybe
 
  focus current targeted part, which must be a PAT: TEXT
  if target is null, then unfocus current part
