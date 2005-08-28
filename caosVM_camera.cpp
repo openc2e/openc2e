@@ -92,7 +92,14 @@ void caosVM::v_META() {
 void caosVM::c_CMRT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pan)
-	// TODO
+
+	caos_assert(targ);
+	
+	MetaRoom *r = world.map.metaRoomAt(targ->x, targ->y);
+	int xpos = targ->x - (world.camera.getWidth() / 2) - (targ->getWidth() / 2);
+	int ypos = targ->y - (world.camera.getHeight() / 2) - (targ->getHeight() / 2);
+	if (r)
+		world.camera.goToMetaRoom(r->id, xpos, ypos, (cameratransition)pan); // TODO: pan okay?
 }
 
 /**
