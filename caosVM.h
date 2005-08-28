@@ -398,6 +398,9 @@ public:
 	void v_CHEM();
 	void c_ASLP();
 	void v_ASLP();
+	void c_APPR();
+	void c_UNCS();
+	void v_UNCS();
 	
 	// sounds
 	void c_SNDE();

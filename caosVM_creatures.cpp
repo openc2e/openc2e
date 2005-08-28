@@ -365,4 +365,46 @@ void caosVM::v_ASLP() {
 	result.setInt(0); // TODO
 }
 
+/**
+ APPR (command)
+ %status stub
+
+ Make target creature approach the IT agent (or if none, an agent of that category using CAs), blocking until it makes it there or gives up.
+*/
+void caosVM::c_APPR() {
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ UNCS (command) unconscious (integer)
+ %status stub
+
+ Make creature conscious if 0, or unconscious if 1.
+*/
+void caosVM::c_UNCS() {
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ UNCS (integer)
+ %status stub
+
+ Return 1 if target creature is unconscious, or 0 otherwise.
+*/
+void caosVM::v_UNCS() {
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */
