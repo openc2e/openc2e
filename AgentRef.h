@@ -30,6 +30,7 @@ class AgentRef {
 protected:
 	AgentRef *next, *prev;
 	Agent *ref;
+	void checkLife() const;
 
 public:
 	void dump() const;
@@ -59,7 +60,7 @@ public:
 	void set(Agent *a);
 	void set(const AgentRef &r);
 
-	Agent *get() const { return ref; }
+	Agent *get() const { checkLife(); return ref; }
 };
 		
 

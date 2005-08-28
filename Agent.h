@@ -65,6 +65,10 @@ protected:
 	void positionAudio(SoundSlot *);
 	
 public:
+	inline bool isDying() const {
+		return dying;
+	}
+	
 	int clac[3]; int clik;
 	bool carryable, mouseable, activateable, invisible, floatable;
 	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;

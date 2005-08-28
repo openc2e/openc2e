@@ -22,6 +22,12 @@
 #include <cassert>
 #include <iostream>
 
+void AgentRef::checkLife() const {
+	// XXX: this only hides the problem :|
+	if (ref && ref->isDying()) // XXX: aliasing problems?
+		const_cast<AgentRef *>(this)->clear();
+}
+
 void AgentRef::clear() {
 	if (!ref) return;
 	next->prev = prev;
@@ -32,7 +38,7 @@ void AgentRef::clear() {
 
 void AgentRef::set(Agent *a) {
 	clear();
-	if (!a) return;
+	if (!a || a->isDying()) return;
 
 	// Verify consistency of the linked list
 	assert(a->self.ref == a);
