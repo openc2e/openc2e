@@ -47,6 +47,7 @@ void caosVM::v_VISI() {
 
 /**
  META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)
+ %status maybe
  
  set metaroom current camera is pointing at. coordinates point to top left of new
  camera position. set a coordinate to -1 to use the top-left corner of the metaroom.
@@ -72,6 +73,7 @@ void caosVM::c_META() {
 
 /**
  CMRT (command) pan (integer)
+ %status maybe
 
  centre current camera on TARG.
 
@@ -85,6 +87,7 @@ void caosVM::c_CMRT() {
 
 /**
  CMRA (command) x (integer) y (integer) pan (integer)
+ %status maybe
 */
 void caosVM::c_CMRA() {
 	VM_VERIFY_SIZE(3)
@@ -97,6 +100,7 @@ void caosVM::c_CMRA() {
 
 /**
  CMRP (command) x (integer) y (integer) pan (integer)
+ %status maybe
 */
 void caosVM::c_CMRP() {
 	VM_VERIFY_SIZE(3)
@@ -109,24 +113,27 @@ void caosVM::c_CMRP() {
 
 /**
  CMRX (integer)
+ %status maybe
 */
 void caosVM::v_CMRX() {
 	VM_VERIFY_SIZE(0)
-	
-	result.setInt(0); // TODO
+
+	result.setInt(world.camera.getXCentre());
 }
 
 /**
  CMRY (integer)
+ %status maybe
 */
 void caosVM::v_CMRY() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(0); // TODO
+	result.setInt(world.camera.getYCentre());
 }
 
 /**
  WNDW (integer)
+ %status maybe
 */
 void caosVM::v_WNDW() {
 	VM_VERIFY_SIZE(0)
@@ -136,6 +143,7 @@ void caosVM::v_WNDW() {
 
 /**
  WNDH (integer)
+ %status maybe
 */
 void caosVM::v_WNDH() {
 	VM_VERIFY_SIZE(0)
@@ -145,38 +153,42 @@ void caosVM::v_WNDH() {
 
 /**
  WNDB (integer)
+ %status maybe
 */
 void caosVM::v_WNDB() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(0); // TODO
+	result.setInt(world.camera.getY() + world.camera.getHeight());
 }
 
 /**
  WNDL (integer)
+ %status maybe
 */
 void caosVM::v_WNDL() {
 	VM_VERIFY_SIZE(0)
-	
-	result.setInt(0); // TODO
+
+	result.setInt(world.camera.getX());
 }
 
 /**
  WNDR (integer)
+ %status maybe
 */
 void caosVM::v_WNDR() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(0); // TODO
+	result.setInt(world.camera.getX() + world.camera.getWidth());
 }
 
 /**
  WNDT (integer)
+ %status maybe
 */
 void caosVM::v_WNDT() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(0); // TODO
+	result.setInt(world.camera.getY());
 }
 
 /* vim: set noet: */
