@@ -177,7 +177,12 @@ public:
 	void v_WNDL();
 	void v_WNDR();
 	void v_WNDT();
-	
+
+	// world
+	void c_SAVE();
+	void c_QUIT();
+	void v_WNAM();
+
 	// core
 	void v_GAME();
 	void v_EAME();

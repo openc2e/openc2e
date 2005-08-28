@@ -36,6 +36,7 @@ OPENC2E = \
 	caosVM_time.o \
 	caosVM_variables.o \
 	caosVM_vehicles.o \
+	caosVM_world.o \
 	Catalogue.o \
 	CompoundAgent.o \
 	Creature.o \
