@@ -167,6 +167,7 @@ public:
 	void v_VISI();
 	void c_CMRT();
 	void c_META();
+	void v_META();
 	void c_CMRA();
 	void c_CMRP();
 	void v_CMRX();
@@ -419,6 +420,7 @@ public:
 	void c_SNDL();
 	void c_FADE();
 	void c_STPC();
+	void c_STRK();
 
 	// time
 	void v_PACE();

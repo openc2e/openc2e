@@ -72,6 +72,16 @@ void caosVM::c_META() {
 }
 
 /**
+ META (integer)
+ %status maybe
+
+ Returns the metaroom the current camera is looking at.
+*/
+void caosVM::v_META() {
+	result.setInt(world.camera.getMetaRoom()->id);
+}
+
+/**
  CMRT (command) pan (integer)
  %status maybe
 

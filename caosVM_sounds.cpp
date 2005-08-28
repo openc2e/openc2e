@@ -29,6 +29,7 @@ using std::cerr;
 
 /**
  SNDE (command) filename (string)
+ %status maybe
 */
 void caosVM::c_SNDE() {
 	VM_VERIFY_SIZE(1)
@@ -45,6 +46,7 @@ void caosVM::c_SNDE() {
 
 /**
  SNDC (command) filename (string)
+ %status maybe
 */
 void caosVM::c_SNDC() {
 	VM_VERIFY_SIZE(1)
@@ -63,6 +65,7 @@ void caosVM::c_SNDC() {
 
 /**
  SNDL (command) filename (string)
+ %status maybe
 */
 void caosVM::c_SNDL() {
 	VM_VERIFY_SIZE(1)
@@ -81,6 +84,7 @@ void caosVM::c_SNDL() {
 
 /**
  MMSC (command) x (integer) y (integer) track_name (string)
+ %status stub
 */
 void caosVM::c_MMSC() {
 	VM_VERIFY_SIZE(3)
@@ -92,6 +96,7 @@ void caosVM::c_MMSC() {
 
 /**
  MMSC (string) x (integer) y (integer)
+ %status stub
 */
 void caosVM::v_MMSC() {
 	VM_VERIFY_SIZE(2)
@@ -103,6 +108,7 @@ void caosVM::v_MMSC() {
 
 /**
  RMSC (command) x (integer) y (integer) track_name (string)
+ %status stub
 */
 void caosVM::c_RMSC() {
 	VM_VERIFY_SIZE(3)
@@ -114,6 +120,7 @@ void caosVM::c_RMSC() {
 
 /**
  MMSC (string) x (integer) y (integer)
+ %status stub
 */
 void caosVM::v_RMSC() {
 	VM_VERIFY_SIZE(2)
@@ -125,6 +132,7 @@ void caosVM::v_RMSC() {
 
 /**
  FADE (command)
+ %status maybe
 */
 void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)
@@ -136,11 +144,25 @@ void caosVM::c_FADE() {
 
 /**
  STPC (command)
+ %status maybe
 */
 void caosVM::c_STPC() {
 	caos_assert(targ);
 	if (targ->soundslot)
 		targ->soundslot->stop();
+}
+
+/**
+ STRK (command) latency (integer) track (string)
+ %status stub
+
+ Play the specified music track. It will play for at least latency seconds.
+*/
+void caosVM::c_STRK() {
+	VM_PARAM_STRING(track)
+	VM_PARAM_INTEGER(latency)
+
+	// TODO
 }
 
 /* vim: set noet: */
