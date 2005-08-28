@@ -635,4 +635,30 @@ void caosVM::v_NAME() {
 	valueStack.push_back(&targ->name_variables[name]);
 }
 
+/**
+ SUBS (string) value (string) start (integer) count (integer)
+ %status maybe
+
+ Returns the text in a string starting at 'start' into the string (starting at 1), and with 'count' characters.
+*/
+void caosVM::v_SUBS() {
+	VM_PARAM_INTEGER(count)
+	VM_PARAM_INTEGER(start)
+	VM_PARAM_STRING(value)
+
+	result.setString(value.substr(start - 1, count)); // TODO: check start/count are valid?
+}
+
+/**
+ STOI (integer) string (string)
+ %status maybe
+
+ Returns the provided string as an integer, or 0 if it can't be converted.
+*/
+void caosVM::v_STOI() {
+	VM_PARAM_STRING(string)
+
+	result.setInt(atoi(string.c_str()));
+}
+
 /* vim: set noet: */

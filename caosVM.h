@@ -230,6 +230,8 @@ public:
 	void v_READ();
 	void v_WILD();
 	void v_NAME();
+	void v_SUBS();
+	void v_STOI();
 
 	// flow
 	void c_DOIF();
