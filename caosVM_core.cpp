@@ -26,30 +26,40 @@ using std::cout;
 using std::cerr;
 
 /**
+ OUTX (command) val (string)
+ %status maybe
+*/
+void caosVM::c_OUTX() {
+	VM_PARAM_STRING(val)
+	
+	std::string oh = "\"";
+	
+	for (unsigned int i = 0; i < val.size(); i++) {
+		switch (val[i]) {
+			case '\r': oh += "\\r";
+			case '\n': oh += "\\n";
+			case '\t': oh += "\\t";
+			default: oh + val[i];
+		}
+	}
+
+	*outputstream << oh << "\"";
+}
+
+/**
  OUTS (command) val (string)
+ %status maybe
 */
 void caosVM::c_OUTS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(val)
 
-	// TODO
-	for (unsigned int i = 0; i < val.size(); i++) {
-		if (val[i] == '\\') {
-			assert((i + 1) < val.size());
-			i++;
-			if (val[i] == 'n') {
-				*outputstream << '\n';
-			} else {
-				*outputstream << val[i];
-			}
-		} else {
-			*outputstream << val[i];
-		}
-	}
+	*outputstream << val;
 }
 
 /**
  OUTV (command) val (decimal)
+ %status maybe
 */
 void caosVM::c_OUTV() {
 	VM_VERIFY_SIZE(1)
@@ -94,6 +104,7 @@ void caosVM::v_EAME() {
 
 /**
  DELG (command) name (string)
+ %status maybe
 
  deletes given game variable
 */
@@ -109,16 +120,19 @@ void caosVM::c_DELG() {
 
 /**
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
+ %status done
  %pragma noparse
 */
 
 /**
  RSCR (command)
+ %status done
  %pragma noparse 
 */
 
 /**
  ISCR (command)
+ %status stub
 
  XXX
 */
@@ -129,14 +143,15 @@ void caosVM::c_ISCR() {
 
 /**
  ENDM (command)
+ %status done
 */
 void caosVM::c_ENDM() {
 	stop();
 }
 
-
 /**
  RGAM (command)
+ %status stub
 
  No-op for now.
  */
@@ -144,6 +159,7 @@ void caosVM::c_RGAM() {}
 
 /**
  MOWS (integer)
+ %status stub
 
  Returns whether the lawn was cut last sunday or not.
  */

@@ -19,9 +19,11 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include "SDLBackend.h"
 
 /**
  PACE (float)
+ %status maybe
 
  return speed factor of last ten ticks.
  
@@ -30,8 +32,105 @@
  You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is below 1.0.
 */
 void caosVM::v_PACE() {
-	// todo: we should calculate this
 	result.setFloat(world.pace);
+}
+
+/**
+ BUZZ (command) interval (integer)
+ %status maybe
+*/
+void caosVM::c_BUZZ() {
+	VM_PARAM_INTEGER(interval)
+
+	world.ticktime = interval;
+}
+
+/**
+ BUZZ (integer)
+ %status maybe
+*/
+void caosVM::v_BUZZ() {
+	result.setInt(world.ticktime);
+}
+
+/**
+ DATE (integer)
+ %status stub
+
+ Returns the day in the season of the current game world, starting at 0.
+*/
+void caosVM::v_DATE() {
+	result.setInt(0); // TODO
+}
+
+/**
+ HIST DATE (integer)
+ %pragma implementation caosVM::v_DATE
+ %status stub
+ 
+ Returns the day in the season of the current game world, starting at 0. Identical to DATE.
+*/
+
+/**
+ SEAN (integer)
+ %status stub
+
+ Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter.
+*/
+void caosVM::v_SEAN() {
+	result.setInt(0); // TODO
+}
+
+/**
+ HIST SEAN (integer)
+ %pragma implementation caosVM::v_SEAN
+ %status stub
+
+ Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter. Identical to SEAN.
+*/
+
+/**
+ TIME (integer)
+ %status stub
+
+ Returns the time of day in the current game world. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night.
+*/
+void caosVM::v_TIME() {
+	result.setInt(0); // TODO
+}
+
+/**
+ HIST TIME (integer)
+ %pragma implementation caosVM::v_TIME
+ %status stub
+ 
+ Returns the time of day in the current game world. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night. Identical to TIME.
+*/
+
+/**
+ YEAR (integer)
+ %status stub
+
+ Returns the number of game years elapsed in the current world.
+*/
+void caosVM::v_YEAR() {
+	result.setInt(0); // TODO
+}
+
+/**
+ HIST YEAR (integer)
+ %pragma implementation caosVM::v_YEAR
+ %status stub
+
+ Returns the number of game years elapsed. Identical to YEAR.
+*/
+
+/**
+ MSEC (integer)
+ %status maybe
+*/
+void caosVM::v_MSEC() {
+	result.setInt(g_backend->ticks());
 }
 
 /* vim: set noet: */

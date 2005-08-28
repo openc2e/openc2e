@@ -182,6 +182,7 @@ public:
 	void v_GAME();
 	void v_EAME();
 	void c_DELG();
+	void c_OUTX();
 	void c_OUTS();
 	void c_OUTV();
 	void c_SCRP(); // dummy
@@ -411,6 +412,13 @@ public:
 
 	// time
 	void v_PACE();
+	void c_BUZZ();
+	void v_BUZZ();
+	void v_DATE();
+	void v_SEAN();
+	void v_TIME();
+	void v_YEAR();
+	void v_MSEC();
 
 	// resources
 	void v_PRAY_AGTI();
