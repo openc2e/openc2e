@@ -304,6 +304,9 @@ void caosVM::v_POSE() {
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
+
+	caos_assert(a);
+
 	if (a != AgentRef(world.hand()))
 		a->kill();
 }
