@@ -133,4 +133,50 @@ void caosVM::v_MSEC() {
 	result.setInt(g_backend->ticks());
 }
 
+/**
+ WPAU (command) paused (integer)
+ %status stub
+ 
+ If paused is 0, enable world ticks, otherwise (1) disable them.
+*/
+void caosVM::c_WPAU() {
+	VM_PARAM_INTEGER(paused)
+
+	// TODO
+}
+
+/**
+ WPAU (integer)
+ %status stub
+
+ Returns 1 if world ticks are paused, or 0 otherwise.
+*/
+void caosVM::v_WPAU() {
+	result.setInt(0); // TODO
+}
+
+/**
+ PAUS (command) paused (integer)
+ %status stub
+
+ If paused is 0, unpause target agent, otherwise (1) pause it.
+*/
+void caosVM::c_PAUS() {
+	VM_PARAM_INTEGER(paused)
+
+	caos_assert(targ);
+
+	// TODO
+}
+
+/**
+ PAUS (integer)
+ %status stub
+
+ Returns 1 if target agent is paused, or 0 otherwise.
+*/
+void caosVM::v_PAUS() {
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */

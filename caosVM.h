@@ -431,6 +431,10 @@ public:
 	void v_TIME();
 	void v_YEAR();
 	void v_MSEC();
+	void c_PAUS();
+	void v_PAUS();
+	void c_WPAU();
+	void v_WPAU();
 
 	// resources
 	void v_PRAY_AGTI();
