@@ -551,6 +551,7 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	if (!(__x.type & LVAL)) { throw badParamException(); } \
 	if (!__x.p_val->hasAgent()) { throw badParamException(); } \
 	name = __x.p_val->getAgent(); } vm->valueStack.pop_back();
+#define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) caos_assert(name);
 #define VM_PARAM_VARIABLE(name) caosVar *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	if (!(__x.type & RVAL)) { throw badParamException(); } \
 	name = __x.p_val; } vm->valueStack.pop_back();

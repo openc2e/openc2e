@@ -32,8 +32,8 @@ using std::cerr;
 */
 void caosVM::v_TOUC() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_AGENT(second)
-	VM_PARAM_AGENT(first)
+	VM_PARAM_VALIDAGENT(second)
+	VM_PARAM_VALIDAGENT(first)
 
 	result.setInt(0);
 
@@ -303,9 +303,7 @@ void caosVM::v_POSE() {
 */
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_AGENT(a)
-
-	caos_assert(a);
+	VM_PARAM_VALIDAGENT(a)
 
 	if (a != AgentRef(world.hand()))
 		a->kill();
@@ -495,9 +493,7 @@ unsigned int calculateScriptId(unsigned int message_id) {
 void caosVM::c_MESG_WRIT() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(message_id)
-	VM_PARAM_AGENT(agent);
-
-	caos_assert(agent);
+	VM_PARAM_VALIDAGENT(agent);
 
 	agent->fireScript(calculateScriptId(message_id), owner.get());
 }
@@ -512,9 +508,7 @@ void caosVM::c_MESG_WRT() {
 	VM_PARAM_VALUE(param_2)
 	VM_PARAM_VALUE(param_1)
 	VM_PARAM_INTEGER(message_id)
-	VM_PARAM_AGENT(agent)
-
-	caos_assert(agent);
+	VM_PARAM_VALIDAGENT(agent)
 
 	// I'm not sure how to handle the 'delay'; is it a background delay, or do we actually block for delay ticks?
 	
@@ -931,7 +925,7 @@ void caosVM::c_MIRA() {
  return square of distance of centre points of TARG and other agents
 */
 void caosVM::v_DISQ() {
-	VM_PARAM_AGENT(other)
+	VM_PARAM_VALIDAGENT(other)
 
 	caos_assert(targ);
 	
