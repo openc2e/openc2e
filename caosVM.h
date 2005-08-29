@@ -504,6 +504,13 @@ public:
 	void v_INOK();
 	void c_WEBB();
 
+	// net
+	void c_NET_PASS();
+	void v_NET_PASS();
+	void c_NET_LINE();
+	void v_NET_LINE();
+	void v_NET_ERRA();
+
 	void runOp();
 	void runTimeslice(int units);
 	void runEntirely(script *s);

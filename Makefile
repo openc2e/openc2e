@@ -29,6 +29,7 @@ OPENC2E = \
 	caosVM_input.o \
 	caosVM_map.o \
 	caosVM_motion.o \
+	caosVM_net.o \
 	caosVM_ports.o \
 	caosVM_resources.o \
 	caosVM_scripts.o \
