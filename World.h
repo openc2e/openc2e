@@ -18,7 +18,7 @@
  */
 
 #include "Map.h"
-#include "Agent.h"
+#include "PointerAgent.h"
 #include "Scriptorium.h"
 #include "Catalogue.h"
 #include "Camera.h"
@@ -33,7 +33,7 @@ struct cainfo {
 
 class World {
 protected:
-	Agent *theHand;
+	PointerAgent *theHand;
 
 public:
 	Map map;
@@ -47,13 +47,12 @@ public:
 	
 	Scriptorium scriptorium;
 	Catalogue catalogue;
-	std::string handName;
 	float pace;
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
 
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
-	Agent *hand() { return theHand; }
+	PointerAgent *hand() { return theHand; }
 	
 	caosVM *getVM(Agent *owner);
 	void freeVM(caosVM *);

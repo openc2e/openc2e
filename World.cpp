@@ -25,14 +25,13 @@
 World world;
 
 World::World() {
-	handName = "hand";
 	ticktime = 50;
 	tickcount = 0;
 }
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
 void World::init() {
-	theHand = new SimpleAgent(2, 1, 1, UINT_MAX, 0, 0);
+	theHand = new PointerAgent();
 	try {
 		((SimpleAgent *)theHand)->setImage("hand");
 	} catch (caosException &e) {

@@ -50,6 +50,7 @@ OPENC2E = \
 	mmapifstream.o \
 	mngfile.o \
 	physics.o \
+	PointerAgent.o \
 	pray.o \
 	Room.o \
 	Scriptorium.o \

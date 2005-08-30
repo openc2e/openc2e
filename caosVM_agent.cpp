@@ -832,7 +832,7 @@ void caosVM::v_HGHT() {
 void caosVM::v_HAND() {
 	VM_VERIFY_SIZE(0)
 
-	result.setString(world.handName);
+	result.setString(world.hand()->name);
 }
 
 /**
@@ -845,7 +845,7 @@ void caosVM::c_HAND() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(name)
 
-	world.handName = name;
+	world.hand()->name = name;
 }
 
 /**
