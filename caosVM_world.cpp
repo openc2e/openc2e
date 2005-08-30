@@ -21,6 +21,16 @@
 #include "World.h"
 
 /**
+ LOAD (command) worldname (string)
+ %status stub
+*/
+void caosVM::c_LOAD() {
+	VM_PARAM_STRING(worldname)
+
+	// TODO
+}
+
+/**
  SAVE (command)
  %status stub
 

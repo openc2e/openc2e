@@ -17,7 +17,8 @@
  *
  */
 
-#include "Agent.h"
+#include "World.h"
+#include "CompoundAgent.h"
 #include "caosVM.h"
 #include <iostream>
 using std::cerr;
@@ -93,6 +94,30 @@ void caosVM::v_KEYD() {
 	VM_PARAM_INTEGER(keycode) // TODO: keycodes are what .. ? raw codes?
 
 	result.setInt(0); // TODO
+}
+
+/**
+ HOTS (agent)
+ %status maybe
+*/
+void caosVM::v_HOTS() {
+	Agent *a = world.agentAt(world.hand()->x, world.hand()->y); // TODO: use hotspot
+	
+	result.setAgent(a);
+}
+
+/**
+ HOTP (integer)
+ %status stub
+*/
+void caosVM::v_HOTP() {
+	Agent *a = world.agentAt(world.hand()->x, world.hand()->y);
+	if (a) {
+		CompoundAgent *c = dynamic_cast<CompoundAgent *>(a);
+		if (c) {
+			result.setInt(0); // TODO
+		} else result.setInt(0);
+	} else result.setInt(-1);
 }
 
 /* vim: set noet: */

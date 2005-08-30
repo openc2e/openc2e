@@ -180,6 +180,7 @@ public:
 	void v_WNDT();
 
 	// world
+	void c_LOAD();
 	void c_SAVE();
 	void c_QUIT();
 	void v_WNAM();
@@ -332,6 +333,7 @@ public:
 	void c_MIRA();
 	void v_MIRA();
 	void v_DISQ();
+	void c_ALPH();
 	
 	// motion
 	void c_ELAS();
@@ -461,6 +463,8 @@ public:
 	void c_IMSK();
 	void v_IMSK();
 	void v_KEYD();
+	void v_HOTS();
+	void v_HOTP();
 
 	// vehicles
 	void c_CABN();

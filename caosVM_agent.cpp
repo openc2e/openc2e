@@ -935,4 +935,17 @@ void caosVM::v_DISQ() {
 	result.setFloat(x*x + y*y);
 }
 
+/**
+ ALPH (command) alpha_value (integer) enable (integer)
+ %status stub
+*/
+void caosVM::c_ALPH() {
+	VM_PARAM_INTEGER(enable)
+	VM_PARAM_INTEGER(alpha_value) caos_assert(0 <= alpha_value <= 255);
+
+	caos_assert(targ);
+
+	// TODO
+}
+
 /* vim: set noet: */
