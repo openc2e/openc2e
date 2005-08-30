@@ -52,7 +52,7 @@ void CompoundAgent::delPart(unsigned int id) {
 		if ((*x)->id == id) { delete *x; parts.erase(x); return; }
 	}
 	
-	throw "oops"; // TODO: handle this exception properly
+	throw caosException("delPart got a bad id"); // TODO: handle this exception properly
 }
 
 CompoundPart *CompoundAgent::part(unsigned int id) {
