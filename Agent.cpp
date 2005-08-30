@@ -308,11 +308,16 @@ void Agent::tick() {
 				}
 			}
 		}
-	} else {
+	} else if (!floatable) {
 		if (vely.hasDecimal())
 			y = y + vely.getFloat();
 		if (velx.hasDecimal())
 			x = x + velx.getFloat();
+	} else { // handle floating..
+		if (vely.hasDecimal())
+			floatingy = floatingy + vely.getFloat();
+		if (velx.hasDecimal())
+			floatingx = floatingx + velx.getFloat();
 	}
 
 	if (floatable) {
