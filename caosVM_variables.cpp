@@ -583,6 +583,45 @@ void caosVM::v_READ() {
 	result.setString(t[offset]);
 }
 
+/**
+ CATI (integer) family (integer) genus (integer) species (integer)
+ %status maybe
+*/
+void caosVM::v_CATI() {
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family) // TODO: check values are in range
+
+	char buffer[40];
+	snprintf(buffer, 40, "%i %i 0", family, genus); // 0 is a hack so we don't have to do any real work here
+	
+	caos_assert(world.catalogue.hasTag("Agent Classifiers"));
+	const std::vector<std::string> &t = world.catalogue.getTag("Agent Classifiers");
+	for (unsigned int i = 0; i < t.size(); i++)
+		if (t[i] == buffer) {
+			result.setInt(i);
+			return;
+		}
+
+	result.setInt(-1);
+}
+
+/**
+ CATX (string) category_id (integer)
+ %status maybe
+*/
+void caosVM::v_CATX() {
+	VM_PARAM_INTEGER(category_id)
+
+	caos_assert(world.catalogue.hasTag("Agent Categories"));
+	const std::vector<std::string> &t = world.catalogue.getTag("Agent Categories");
+	if (-1 < category_id < t.size())
+		result.setString(t[category_id]);
+	else
+		result.setString("");
+		
+}
+
 std::string stringFromInt(int i) {
 	// TODO: hacky? also, put somewhere more appropriate
 	

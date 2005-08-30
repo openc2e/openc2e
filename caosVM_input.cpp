@@ -120,4 +120,25 @@ void caosVM::v_HOTP() {
 	} else result.setInt(-1);
 }
 
+/**
+ PURE (command) value (integer)
+ %status maybe
+*/
+void caosVM::c_PURE() {
+	VM_PARAM_INTEGER(value)
+
+	world.hand()->handle_events = value;
+}
+
+/**
+ PURE (integer)
+ %status maybe
+*/
+void caosVM::v_PURE() {
+	if (world.hand()->handle_events)
+		result.setInt(1);
+	else
+		result.setInt(0);
+}
+
 /* vim: set noet: */

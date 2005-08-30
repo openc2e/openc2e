@@ -24,6 +24,7 @@
 // TODO: change imagecount?
 PointerAgent::PointerAgent() : SimpleAgent(2, 1, 1, UINT_MAX, 0, 0) {
 	name = "hand";
+	handle_events = false;
 }
 
 /* vim: set noet: */

@@ -25,6 +25,7 @@
 class PointerAgent : public SimpleAgent {
 public:
 	std::string name;
+	bool handle_events;
 
 	PointerAgent();
 };

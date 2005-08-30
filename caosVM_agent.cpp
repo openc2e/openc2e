@@ -948,4 +948,14 @@ void caosVM::c_ALPH() {
 	// TODO
 }
 
+/**
+ HELD (agent)
+ %status stub
+
+ Returns the agent currently held by the target, or a random one if there are more than one.
+*/
+void caosVM::v_HELD() {
+	result.setAgent(0);
+}
+
 /* vim: set noet: */

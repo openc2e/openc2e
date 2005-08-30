@@ -235,6 +235,8 @@ public:
 	void v_FTOI();
 	void v_STRL();
 	void v_READ();
+	void v_CATI();
+	void v_CATX();
 	void v_WILD();
 	void v_NAME();
 	void v_SUBS();
@@ -334,6 +336,7 @@ public:
 	void v_MIRA();
 	void v_DISQ();
 	void c_ALPH();
+	void v_HELD();
 	
 	// motion
 	void c_ELAS();
@@ -465,6 +468,8 @@ public:
 	void v_KEYD();
 	void v_HOTS();
 	void v_HOTP();
+	void c_PURE();
+	void v_PURE();
 
 	// vehicles
 	void c_CABN();
