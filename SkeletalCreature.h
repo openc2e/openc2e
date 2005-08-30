@@ -40,6 +40,8 @@ public:
 	void setEyesClosed(bool e) { eyesclosed = e; }
 	unsigned int getFacialExpression() { return facialexpression; }
 	void setFacialExpression(unsigned int f) { assert (f < 6); facialexpression = f; }
+	unsigned int getWidth() { return width; }
+	unsigned int getHeight() { return height; }
 };
 
 /* vim: set noet: */

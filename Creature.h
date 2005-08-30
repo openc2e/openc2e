@@ -59,6 +59,8 @@ protected:
 
 public:
 	Creature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant);
+	void setAttributes(unsigned int attr);
+	unsigned int getAttributes();
 };
 
 /* vim: set noet: */

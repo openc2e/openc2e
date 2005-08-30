@@ -98,7 +98,7 @@ void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
 		else // everything else
 			ourpose = pose[i];
 
-		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset);
+		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset + x, party[i] + adjusty + yoffset + y);
 	}
 }
 
@@ -135,8 +135,8 @@ void SkeletalCreature::recalculateSkeleton() {
 
 			if (x < lowestx) { lowestx = x; }
 			if (y < lowesty) { lowesty = y; }
-			if (x + images[i]->width(pose[i]) > highestx) { highestx = x; }
-			if (y + images[i]->height(pose[i]) > highesty) { highesty = y; }
+			if (x + images[i]->width(pose[i]) > highestx) { highestx = x + images[i]->width(pose[i]); }
+			if (y + images[i]->height(pose[i]) > highesty) { highesty = y + images[i]->height(pose[i]); }
 		}
 	}
 
