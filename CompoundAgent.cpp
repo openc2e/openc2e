@@ -69,6 +69,7 @@ void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsigned short _species, unsigned int plane,
 				std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
 				Agent(_family, _genus, _species, plane), width(0), height(0) {
+	setAttributes(0);
 	// TODO: we ignore image count acos it sucks
 	CompoundPart *p = new DullPart(0, spritefile, firstimage, 0, 0, 0);
 	addPart(p);
