@@ -184,6 +184,19 @@ ostream &operator << (ostream &s, const genomeFile &f) {
 	return s;
 }
 
+gene *genomeFile::getGene(uint8 type, uint8 subtype, unsigned int seq) {
+	unsigned int c = 0;
+	for (vector<gene *>::iterator i = genes.begin(); i != genes.end(); i++) {
+		if ((*i)->type() == type)
+			if ((*i)->subtype() == subtype) {
+				c++;
+				if (seq == c) return *i;
+			}
+	}
+
+	return 0;
+}
+
 uint8 geneFlags::operator () () const {
 	return ((_mutable?1:0) + (dupable?2:0) + (delable?4:0) + (maleonly?8:0) +
 		(femaleonly?16:0) + (notexpressed?32:0) + (reserved1?64:0) + (reserved2?128:0));

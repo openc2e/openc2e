@@ -35,6 +35,8 @@ public:
 
   void readNotes(istream &);
   void writeNotes(ostream &);
+
+  gene *getGene(uint8 type, uint8 subtype, unsigned int seq);
 };
 
 struct geneNote {
