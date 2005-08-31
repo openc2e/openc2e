@@ -27,6 +27,9 @@ private:
 
 	std::string dataString(unsigned int _stage, bool sprite);
 
+	unsigned int gaiti;
+	creatureGait *gaitgene;
+
 public:
 	SkeletalCreature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant, unsigned int s, unsigned int b, lifestage t);
 	void render(SDLBackend *renderer, int xoffset, int yoffset);
@@ -34,6 +37,9 @@ public:
 	unsigned int getPose(unsigned int i) { return pose[i]; }
 	void setPose(unsigned int p);
 	void setPose(std::string s);
+	void setPoseGene(unsigned int p);
+	void setGaitGene(unsigned int g);
+	void gaitTick();
 	unsigned int getPregnancy() { return pregnancy; }
 	void setPregnancy(unsigned int p) { assert(p < 4); pregnancy = p; }
 	bool getEyesClosed() { return eyesclosed; }

@@ -8,6 +8,8 @@
 
 #include "SkeletalCreature.h"
 
+#include <typeinfo> // TODO: remove when genome system is fixed
+
 struct bodypartinfo {
 	char letter;
 	int parent;
@@ -179,4 +181,46 @@ void SkeletalCreature::setPose(std::string s) {
 	recalculateSkeleton();
 }
 
+void SkeletalCreature::setPoseGene(unsigned int poseno) {
+	/* TODO: this sets by sequence, now, not the 'poseno' inside the gene.
+	 * this is what the POSE caos command does. is this right? - fuzzie */
+	creaturePose *g = (creaturePose *)genome->getGene(2, 3, poseno);
+	assert(g); // TODO: -> caos_assert
+
+	gaitgene = 0;
+}
+
+void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(creatureGait)) {
+			creatureGait *g = (creatureGait *)(*i);
+			if (g->drive == gaitdrive) {
+				gaitgene = g;
+				gaiti = 0;
+			}
+		}
+	}
+
+	// explode!
+	gaitgene = 0;
+	gaitTick();
+}
+
+void SkeletalCreature::gaitTick() {
+	if (!gaitgene) return;
+	uint8 pose = gaitgene->pose[gaiti];
+	creaturePose *poseg = 0;
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(creaturePose)) {
+			creaturePose *g = (creaturePose *)(*i);
+			if (g->poseno == pose)
+				poseg = g;
+			
+		}
+	}
+	assert(poseg); // TODO: don't assert. caos_assert? but this means a bad genome file, always.
+	setPose(poseg->getPoseString());
+	gaiti++; if (gaiti > 7) gaiti = 0;
+}
+		
 /* vim: set noet: */
