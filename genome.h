@@ -466,7 +466,8 @@ public:
   uint8 pose[16];
 
   int poseLength() const { return (cversion == 3) ? 16 : 15; }
-
+  std::string getPoseString() const { return std::string((char *)pose, poseLength()); }
+  
   creaturePose(uint8 v) : creatureGene(v) { }
   char *name() { return "Pose"; }
 };
