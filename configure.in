@@ -1,0 +1,73 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.59)
+AC_INIT(openc2e, 0.1, BUG-REPORT-ADDRESS)
+AM_INIT_AUTOMAKE
+AC_CONFIG_SRCDIR([openc2e.h])
+AC_CONFIG_HEADER([config.h])
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_LIBTOOL
+AC_PROG_LEX
+if test "x$LEX" != "xflex" ; then
+  AC_MSG_ERROR(flex not found)
+fi
+
+AC_CHECK_PROG(HAVE_SDL_CONFIG, sdl-config, true, false)
+if test "x$HAVE_SDL_CONFIG" != "xtrue" ; then
+  AC_MSG_ERROR(Can't find sdl-config in your PATH, aborting)
+fi
+SDL_CFLAGS=`sdl-config --cflags`
+# XXX: static libs support ?
+SDL_LDFLAGS=`sdl-config --libs`
+CFLAGS="$CFLAGS $SDL_CFLAGS"
+CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+LDFLAGS="$LDFLAGS $SDL_LDFLAGS"
+
+# Checks for libraries.
+# FIXME: Replace `main' with a function in `-lSDL_mixer':
+AC_CHECK_LIB([SDL_mixer], [main])
+# FIXME: Replace `main' with a function in `-lSDL_net':
+AC_CHECK_LIB([SDL_net], [main])
+AC_CHECK_LIB([SDL], [main])
+# FIXME: Replace `main' with a function in `-lboost_filesystem':
+AC_CHECK_LIB([boost_filesystem], [main])
+AC_CHECK_LIB([m], [sqrt])
+# FIXME: Replace `main' with a function in `-lz':
+AC_CHECK_LIB([z], [compress])
+ACX_PTHREAD(, AC_ERROR(We need pthreads to compile)) # XXX
+AC_MSG_CHECKING(if your C compiler accepts __thread)
+AC_TRY_COMPILE([], [static __thread int tls = 42;], [
+                AC_MSG_RESULT(yes)
+                TLS_OK=yes
+                ], [
+                    AC_MSG_RESULT(no)
+                    TLS_OK=no
+                    AC_MSG_ERROR(__thread not supported)
+                    ])
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([inttypes.h limits.h stdlib.h string.h strings.h unistd.h])
+AC_CHECK_HEADERS([zlib.h])
+AC_LANG_CPLUSPLUS
+AC_CHECK_HEADERS([FlexLexer.h boost/filesystem/path.hpp iostream map])
+AC_LANG_C
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_FUNC_MMAP
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([memset munmap pow sqrt strdup])
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

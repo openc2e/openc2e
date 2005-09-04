@@ -9,6 +9,7 @@
 %option noyywrap
 %option nodefault
 %option yylineno
+%option c++
 %x L_BYTESTR
 %x L_STRING
 %x L_COMMENT
