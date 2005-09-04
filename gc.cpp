@@ -31,19 +31,11 @@ GCPool::~GCPool() {
 
 void GCPool::clear() {
 	pthread_mutex_lock(&mutex);
-	GCObject *ptr = chain->_next;
-	while (ptr != chain) {
-		GCObject *next = ptr->_next;
-		// We must manually remove it from the chain since we
-		// hold the lock.
-		assert(!ptr->_refcount);
-		ptr->_owner = NULL;
-		ptr->_next->_prev = ptr->_prev;
-		ptr->_prev->_next = ptr->_next;
-		ptr->_next = ptr->_prev = NULL;
-
+	while (chain->_next != chain) {
+		GCObject *ptr = chain->_next;
+		pthread_mutex_unlock(&mutex);
 		delete ptr;
-		ptr = next;
+		pthread_mutex_lock(&mutex);
 	}
 	pthread_mutex_unlock(&mutex);
 }
