@@ -1,53 +1,51 @@
 #include "gc.h"
-#include <deque>
-#include <climits>
-#include <iostream>
 
-#include <csignal>
+static __thread GCPool *outer_pool = NULL;
 
-void *last_alloc = NULL;
-std::list<Collectable *> Collectable::collect_queue;
-
-bool Collectable::gc__nowcollecting = false;
-
-void *Collectable::operator new(size_t size) {
-	void *buf = malloc(size);
-	if (!buf)
-		throw std::bad_alloc();
-	assert(!last_alloc);
-	last_alloc = buf;
-	return buf;
+GCPool *GCObject::_findPool() {
+	return outer_pool;
 }
 
-void Collectable::operator delete(void *ptr) {
-	Collectable *c = reinterpret_cast<Collectable *>(ptr);
-	assert(c);
-	assert(c->baseptr == last_alloc);
-	assert(gc__nowcollecting);
-	free(c->baseptr);
-	last_alloc = NULL;
+GCPool::GCPool() {
+	pthread_mutexattr_t ma;
+	pthread_mutexattr_init(&ma);
+#ifdef PTHREAD_MUTEX_ADAPTIVE_NP
+	pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_ADAPTIVE_NP);
+#endif
+	pthread_mutex_init(&mutex, &ma);
+	pthread_mutexattr_destroy(&ma);
+	
+	chain = new GCObject();
+	chain->_next = chain->_prev = chain;
+	chain->_owner = this;
+	chain->_refcount = 0;
+	parent = outer_pool;
+	outer_pool = this;
 }
 
-void Collectable::doCollect() {
-	while (!collect_queue.empty()) {
-		std::list<Collectable *>::iterator head = collect_queue.begin();
-		Collectable *item = *head;
-		collect_queue.erase(head);
-		assert(item->refcount >= 0);
-		if (item->refcount) {
-			std::cerr << "WARN: gc found a live object in the collect queue, this should not happen." << std::endl << '\t'; item->dbgdump();
-			continue;
-		}
-		if (!item->queued) {
-			std::cerr << "WARN: gc found an object which thinks it's not queued, this should not happen. ptr="  << std::endl << '\t'; item->dbgdump();
-			continue;
-		}
-		assert(!gc__nowcollecting);
-		gc__nowcollecting = true;
-		last_alloc = item->baseptr;
-		delete item;
-		assert(!last_alloc);
-		gc__nowcollecting = false;
+GCPool::~GCPool() {
+	clear();
+	delete chain;
+	outer_pool = parent;
+}
+
+void GCPool::clear() {
+	pthread_mutex_lock(&mutex);
+	GCObject *ptr = chain->_next;
+	while (ptr != chain) {
+		GCObject *next = ptr->_next;
+		// We must manually remove it from the chain since we
+		// hold the lock.
+		assert(!ptr->_refcount);
+		ptr->_owner = NULL;
+		ptr->_next->_prev = ptr->_prev;
+		ptr->_prev->_next = ptr->_next;
+		ptr->_next = ptr->_prev = NULL;
+
+		delete ptr;
+		ptr = next;
 	}
+	pthread_mutex_unlock(&mutex);
 }
+
 /* vim: set noet: */

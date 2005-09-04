@@ -67,7 +67,8 @@ OPENC2E = \
 	lexutil.o \
 	dialect.o \
 	lex.mng.o \
-	mngparser.tab.o
+	mngparser.tab.o \
+	gc.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
 XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net -lSDL_mixer
@@ -75,7 +76,7 @@ COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
-all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest
+all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/gctest
 
 docs: docs.html
 
@@ -142,6 +143,8 @@ tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
 tools/pathtest: tools/pathtest.o PathResolver.o
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
+tools/gctest: tools/gctest.o gc.o
+	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
