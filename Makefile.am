@@ -112,3 +112,4 @@ lex.mng.cpp lex.mng.h: mng.l mngparser.tab.hpp
 	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
 
 caosScript.o: lex.yy.h
+mngfile.o: lex.mng.h
