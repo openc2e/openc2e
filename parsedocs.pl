@@ -5,6 +5,8 @@ use warnings;
 
 use YAML;
 
+my @variants = qw(c3 cv);
+
 $SIG{__WARN__} = sub { die $_[0] };
 
 my %fnmap = ( # default category mappings
@@ -145,7 +147,7 @@ while (<>) {
 	$desc .= "\n";
 	
 	
-	$prev = $data{$key} = {
+	my $cd = {
 		type => $ctype,
 		name => $fullname,
 		match => $cname,
@@ -156,23 +158,29 @@ while (<>) {
 		status => $status,
 		category => $cat,
 	};
-	if ($cns && $cns ne '') {
-		$data{$key}{namespace} = lc $cns;
-		$ns{lc $cns} = 1;
-	}
 	if (%pragma) {
-		$data{$key}{pragma} = \%pragma;
+		$cd->{pragma} = \%pragma;
 	}
-}
+	if ($cns && $cns ne '') {
+		$cd->{namespace} = lc $cns;
+	}
+	if ($cd->{status}) {
+		$cd->{status} = 'probablyok';
+	}
+	$prev = $cd;
+	
+	my @v = @variants;
+	if ($pragma{variants}) {
+		@v = grep { $_ ne ''; } split ' ', $pragma{variants};
+	}
 
-foreach my $v (values %data) {
-	if (!$v->{status}) {
-		$v->{status} = 'probablyok';
+	for my $v (@v) {
+		$data{$v}{$key} = $cd;
 	}
 }
 
 print Dump {
-	ops => \%data,
+	variants => \%data,
 	namespaces => [keys %ns],
 };
 # vim: set noet: 

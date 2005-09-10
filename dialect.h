@@ -16,10 +16,10 @@ class parseDelegate {
 class DefaultParser : public parseDelegate {
 	protected:
 		void (caosVM::*handler)();
-		int idx;
+		const cmdinfo *cd;
 	public:
-		DefaultParser(void (caosVM::*h)(), int i) :
-			handler(h), idx(i) {}
+		DefaultParser(void (caosVM::*h)(), const cmdinfo *i) :
+			handler(h), cd(i) {}
 		virtual void operator()(class caosScript *s, class Dialect *curD);
 };
 
@@ -39,7 +39,11 @@ class Dialect {
 		virtual ~Dialect() {};
 };
 
-extern Dialect *cmd_dialect, *exp_dialect;
+struct Variant {
+	Dialect *cmd_dialect, *exp_dialect;
+};
+
+extern map<std::string, Variant *> variants;
 
 class OneShotDialect : public Dialect {
 	public:
@@ -59,9 +63,9 @@ class DoifDialect : public Dialect {
 	protected:
 		caosOp *success, *failure, *exit;
 	public:
-		DoifDialect(caosOp *s, caosOp *f, caosOp *e)
+		DoifDialect(caosScript *scr, caosOp *s, caosOp *f, caosOp *e)
 			: success(s), failure(f), exit(e) {
-				delegates = cmd_dialect->delegates; // XXX
+				delegates = scr->v->cmd_dialect->delegates; // XXX
 			}
 		void handleToken(class caosScript *s, token *t); 
 };
@@ -81,7 +85,7 @@ class DoifParser : public parseDelegate {
 			parseCondition(s, success, failure);
 			
 			s->current->last = success;
-			DoifDialect d(success, failure, exit);
+			DoifDialect d(s, success, failure, exit);
 			d.doParse(s);
 		}
 };
@@ -107,13 +111,13 @@ class parseREPS : public parseDelegate {
 			caosOp *exit = new caosNoop();
 			s->current->addOp(exit);
 			
-			exp_dialect->parseOne(s); // repcount
+			s->v->exp_dialect->parseOne(s); // repcount
 			caosOp *entry = new caosREPS(exit);
 			s->current->thread(entry);
 
 			Dialect d;
 			REPE r;
-			d.delegates = cmd_dialect->delegates;
+			d.delegates = s->v->cmd_dialect->delegates;
 			d.delegates["repe"] = &r;
 
 			d.doParse(s);
@@ -155,7 +159,7 @@ class parseLOOP : public parseDelegate {
 
 			Dialect d;
 			EVER ever(entry); UNTL untl(entry, exit);
-			d.delegates = cmd_dialect->delegates;
+			d.delegates = s->v->cmd_dialect->delegates;
 			d.delegates["ever"] = &ever;
 			d.delegates["untl"] = &untl;
 
@@ -208,7 +212,7 @@ class ENUMhelper : public parseDelegate {
 	protected:
 		DefaultParser p;
 	public:
-		ENUMhelper(void (caosVM::*h)(), int i) :
+		ENUMhelper(void (caosVM::*h)(), const cmdinfo *i) :
 			p(h,i) {}
 
 		void operator() (class caosScript *s, class Dialect *curD) {
@@ -220,13 +224,17 @@ class ENUMhelper : public parseDelegate {
 			
 			Dialect d;
 			NEXT n;
-			d.delegates = cmd_dialect->delegates;
+			d.delegates = s->v->cmd_dialect->delegates;
 			d.delegates["next"] = &n;
 			
 			d.doParse(s);
 			s->current->thread(entry);
 			s->current->last = exit;
 		}
+};
+class ExprDialect : public OneShotDialect {
+	public:
+		void handleToken(caosScript *s, token *t);
 };
 
 void registerDelegates();

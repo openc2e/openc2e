@@ -271,7 +271,7 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout.flush();
 		std::cerr.flush();
 		try {
-			caosScript *script = new caosScript(*i);
+			caosScript *script = new caosScript("c3", *i); // XXX
 			script->parse(s);
 			caosVM vm(0);
 			script->installScripts();
@@ -370,7 +370,7 @@ extern "C" int main(int argc, char *argv[]) {
 			}
 
 			std::istringstream s(data);
-			caosScript *script = new caosScript("<network>");
+			caosScript *script = new caosScript("c3", "<network>"); // XXX
 			script->parse(s);
 			script->installScripts();
 			caosVM vm(0);

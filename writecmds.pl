@@ -20,54 +20,61 @@ print <<ENDHEAD;
 #include <iostream>
 
 using namespace std;
-
-const cmdinfo cmds[] = {
 ENDHEAD
 
-my $idx = 0;
+foreach my $variant (sort keys %{$data->{variants}}) {
+	print "static const cmdinfo v_", $variant, "_cmds[] = {\n";
 
-$data = $data->{ops};
+	my $idx = 0;
+	my $d = $data;
+	my $data = $d->{variants}{$variant};
 
-foreach my $key (sort keys %$data) {
-	my $cedocs = cescape($data->{$key}{description} || "UNDOCUMENTED");
-	my $argc = scalar @{$data->{$key}{arguments}};
-	my $name = lc $data->{$key}{match};
-	my $fullname = $data->{$key}{name};
-	my $retc = $data->{$key}{type} eq 'command' ? 0 : 1;
-	if (defined $data->{$key}{pragma}{retc}) {
-		$retc = $data->{$key}{pragma}{retc};
-	}
-	my $delegate;
-	if ($data->{$key}{pragma}{noparse}) {
-		$delegate = undef;
-	} elsif ($data->{$key}{pragma}{parser}) {
-		$delegate = $data->{$key}{pragma}{parser};
-	} else {
-		my $class = 'DefaultParser';
-		if ($data->{$key}{pragma}{parserclass}) {
-			$class = $data->{$key}{pragma}{parserclass};
+	foreach my $key (sort keys %$data) {
+		my $cedocs = cescape($data->{$key}{description} || "UNDOCUMENTED");
+		my $argc = scalar @{$data->{$key}{arguments}};
+		my $name = lc $data->{$key}{match};
+		my $fullname = $data->{$key}{name};
+		my $retc = $data->{$key}{type} eq 'command' ? 0 : 1;
+		if (defined $data->{$key}{pragma}{retc}) {
+			$retc = $data->{$key}{pragma}{retc};
 		}
-		$delegate = qq{new $class(&$data->{$key}{implementation}, $idx)};
-	}
-		
-	$data->{$key}{delegate} = $delegate;
-	print <<ENDDATA;
-	{ // $idx
-		"$name",
-		"$fullname",
-		"$cedocs",
-		$argc,
-		$retc
-	},
+		my $delegate;
+		if ($data->{$key}{pragma}{noparse}) {
+			$delegate = undef;
+		} elsif ($data->{$key}{pragma}{parser}) {
+			$delegate = $data->{$key}{pragma}{parser};
+		} else {
+			my $class = 'DefaultParser';
+			if ($data->{$key}{pragma}{parserclass}) {
+				$class = $data->{$key}{pragma}{parserclass};
+			}
+			$delegate = qq{new $class(&$data->{$key}{implementation}, &v_${\$variant}_cmds[$idx])};
+		}
+			
+		$data->{$key}{delegate} = $delegate;
+		print <<ENDDATA;
+		{ // $idx
+			"$name",
+			"$fullname",
+			"$cedocs",
+			$argc,
+			$retc
+		},
 ENDDATA
-	$idx++;
-}
+		$idx++;
+	}
 
-print <<ENDTAIL;
+	print <<ENDTAIL;
 	{ NULL, NULL, NULL, 0, 0 }
 };
 
-void registerAutoDelegates() {
+static void registerAutoDelegates_$variant() {
+	if (!variants["$variant"]) {
+		variants["$variant"] = new Variant();
+		variants["$variant"]->exp_dialect = new ExprDialect();
+		variants["$variant"]->cmd_dialect = new Dialect();
+	}
+	Variant *v = variants["$variant"];
 	std::map<std::string, NamespaceDelegate *> nsswitch_cmd, nsswitch_exp;
 #define NS_REG(m, ns, name, d) do { \\
 	if (m.find(ns) == m.end()) \\
@@ -76,35 +83,44 @@ void registerAutoDelegates() {
 } while (0)
 ENDTAIL
 
-foreach my $key (keys %$data) {
-	if (defined($data->{$key}{delegate})) {
-		my $type = $data->{$key}{type} eq 'command' ? 'cmd' : 'exp';
-		if ($data->{$key}{namespace}) {
-			my $c = $data->{$key}{type} eq 'command';
-			print "NS_REG(nsswitch_$type, \"";
-			print $data->{$key}{namespace};
-			print "\", \"", lc($data->{$key}{match}), "\", ";
-			print $data->{$key}{delegate}, ");\n";
-		} else {
-			print $type;
-			print "_dialect->delegates[\"", lc($data->{$key}{match}), "\"] = ";
-			print $data->{$key}{delegate}, ";\n";
+	foreach my $key (keys %$data) {
+		if (defined($data->{$key}{delegate})) {
+			my $type = $data->{$key}{type} eq 'command' ? 'cmd' : 'exp';
+			if ($data->{$key}{namespace}) {
+				my $c = $data->{$key}{type} eq 'command';
+				print "NS_REG(nsswitch_$type, \"";
+				print $data->{$key}{namespace};
+				print "\", \"", lc($data->{$key}{match}), "\", ";
+				print $data->{$key}{delegate}, ");\n";
+			} else {
+				print q{v->};
+				print $type;
+				print "_dialect->delegates[\"", lc($data->{$key}{match}), "\"] = ";
+				print $data->{$key}{delegate}, ";\n";
+			}
 		}
 	}
-}
 
-for my $T (qw(cmd exp)) {
-print <<END;
+	for my $T (qw(cmd exp)) {
+		print <<END;
 	{
 		std::map<std::string, NamespaceDelegate *>::iterator i = nsswitch_$T.begin();
 		while (i != nsswitch_$T.end()) {
 			std::string name = (*i).first;
 			NamespaceDelegate *d = (*i).second;
-			${T}_dialect->delegates[name] = d;
+			v->${T}_dialect->delegates[name] = d;
 			i++;
 		}
 	}
 END
+	}
+	print "#undef NS_REG\n";
+	print "}\n"; # end of registerAutoDelegates
+} # end of variant loop
+	
+print "\nvoid registerAutoDelegates() {\n";
+foreach my $variant (sort keys %{$data->{variants}}) {
+	print "    registerAutoDelegates_$variant();\n";
 }
 print "}\n";
 

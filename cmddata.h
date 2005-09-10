@@ -10,7 +10,6 @@ struct cmdinfo {
 	// TODO: arg types
 };
 
-extern const cmdinfo cmds[];
 void registerAutoDelegates();
 
 #endif

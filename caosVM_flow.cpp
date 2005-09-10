@@ -306,7 +306,7 @@ void caosVM::v_CAOS() {
 	try {
 		std::istringstream iss(commands);
 		std::ostringstream oss;
-		caosScript *s = new caosScript("CAOS command");
+		caosScript *s = new caosScript("c3", "CAOS command"); // XXX: variant
 		s->parse(iss);
 		s->installScripts();
 		sub->outputstream = &oss;

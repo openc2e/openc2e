@@ -38,10 +38,10 @@ class caosNoop : public caosOp {
 
 class simpleCaosOp : public caosOp {
 	protected:
+		const cmdinfo *ci;
 		ophandler handler;
-		int idx;
 	public:
-		simpleCaosOp(ophandler h, int i) : handler(h), idx(i) {}
+		simpleCaosOp(ophandler h, const cmdinfo *i) : handler(h), ci(i) {}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			int stackc = vm->valueStack.size();
@@ -49,10 +49,10 @@ class simpleCaosOp : public caosOp {
 			int delta = vm->valueStack.size() - stackc;
 			if (!vm->result.isNull())
 				delta++;
-			if (cmds[idx].retc != -1 && 
-					delta != cmds[idx].retc - cmds[idx].argc) {
+			if (ci->retc != -1 && 
+					delta != ci->retc - ci->argc) {
 				std::cerr << "Warning: return count mismatch for op "
-					<< cmds[idx].fullname << ", delta=" << delta
+					<< ci->fullname << ", delta=" << delta
 					<< std::endl;
 			}
 		}

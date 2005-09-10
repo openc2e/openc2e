@@ -29,8 +29,10 @@
 
 class Agent;
 class caosOp;
+class Variant;
 
 struct script { //: public Collectable {
+	const Variant *variant;
 	std::string filename;
 	std::vector<class caosOp *> allOps;
 	std::map<std::string, class caosOp *> gsub;
@@ -39,7 +41,7 @@ struct script { //: public Collectable {
 	// add op as the next opcode
 	void thread(caosOp *op);
 	void addOp(caosOp *op);
-	script(const std::string &fn);
+	script(const Variant *v, const std::string &fn);
 	~script();
 //	std::string dump();
 //	std::string dumpLine(unsigned int);
@@ -50,6 +52,7 @@ struct script { //: public Collectable {
 };
 
 struct residentScript {
+	Variant *variant;
 	int fmly, gnus, spcs, scrp;
 	script *s;
 
@@ -71,12 +74,13 @@ struct residentScript {
 
 class caosScript { //: Collectable {
 public:
+	const Variant *v;
 	std::string filename;
 	script *installer, *removal;
 	std::vector<residentScript> scripts;
 	script *current;
 
-	caosScript(const std::string &fn);
+	caosScript(const std::string &variant, const std::string &fn);
 	void parse(std::istream &in);
 	~caosScript();
 	void installScripts();

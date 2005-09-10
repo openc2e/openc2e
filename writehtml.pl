@@ -36,6 +36,9 @@ sub esc ($) {
 
 my $data = YAML::LoadFile('commandinfo.yml');
 
+# XXX
+$data = { ops => $data->{variants}{c3} };
+
 my %catsort;
 foreach my $key (sort keys %{$data->{ops}}) {
 	$data->{ops}{$key}{key} = $key;

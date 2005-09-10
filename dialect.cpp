@@ -10,7 +10,7 @@
 #include "caosVar.h"
 #include "Agent.h"
 
-Dialect *cmd_dialect, *exp_dialect;
+std::map<std::string, Variant *> variants;
 
 /*
  * If the inverse of an AND condition succeeds, jump to next OR (foo) bit, or
@@ -35,7 +35,7 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 	while(1) {
 		caosOp *entry = new caosNoop();
 		s->current->thread(entry);
-		exp_dialect->doParse(s);
+		s->v->exp_dialect->doParse(s);
 		
 		token *comparison = getToken(TOK_WORD);
 		std::string cword = comparison->word;
@@ -52,7 +52,7 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 			compar = CLE;
 		else if (cword == "ne")
 			compar = CNE;
-		exp_dialect->doParse(s);
+		s->v->exp_dialect->doParse(s);
 
 		bool isOr = true;
 		bool isLast = false;
@@ -93,10 +93,10 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 }
 
 void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {
-	int argc = cmds[idx].argc;
+	int argc = cd->argc;
 	while(argc--)
-		exp_dialect->doParse(s);
-	s->current->thread(new simpleCaosOp(handler, idx));
+		s->v->exp_dialect->doParse(s);
+	s->current->thread(new simpleCaosOp(handler, cd));
 }
 
 
@@ -182,45 +182,42 @@ class opBytestr : public caosOp {
 };
 
 
-class ExprDialect : public OneShotDialect {
-	public:
-		void handleToken(caosScript *s, token *t) {
-			switch (t->type) {
-				case TOK_CONST:
-					s->current->thread(new ConstOp(t->constval));
-					break;
-				case TOK_WORD:
-					{
-						std::string word = t->word;
-						if (word.size() == 4) {
-							if (word[0] == 'v' && word[1] == 'a') {
-								if(!(isdigit(word[2]) && isdigit(word[3])))
-									throw parseException("bad vaxx");
-								s->current->thread(new opVAxx(atoi(word.c_str() + 2)));
-								return;
-							} else if (word[0] == 'o' && word[1] == 'v') {
-								if(!(isdigit(word[2]) && isdigit(word[3])))
-									throw parseException("bad ovxx");
-								s->current->thread(new opOVxx(atoi(word.c_str() + 2)));
-								return;
-							} else if (word[0] == 'm' && word[1] == 'v') {
-								if(!(isdigit(word[2]) && isdigit(word[3])))
-									throw parseException("bad mvxx");
-								s->current->thread(new opMVxx(atoi(word.c_str() + 2)));
-								return;
-							}
-						}
+void ExprDialect::handleToken(caosScript *s, token *t) {
+	switch (t->type) {
+		case TOK_CONST:
+			s->current->thread(new ConstOp(t->constval));
+			break;
+		case TOK_WORD:
+			{
+				std::string word = t->word;
+				if (word.size() == 4) {
+					if (word[0] == 'v' && word[1] == 'a') {
+						if(!(isdigit(word[2]) && isdigit(word[3])))
+							throw parseException("bad vaxx");
+						s->current->thread(new opVAxx(atoi(word.c_str() + 2)));
+						return;
+					} else if (word[0] == 'o' && word[1] == 'v') {
+						if(!(isdigit(word[2]) && isdigit(word[3])))
+							throw parseException("bad ovxx");
+						s->current->thread(new opOVxx(atoi(word.c_str() + 2)));
+						return;
+					} else if (word[0] == 'm' && word[1] == 'v') {
+						if(!(isdigit(word[2]) && isdigit(word[3])))
+							throw parseException("bad mvxx");
+						s->current->thread(new opMVxx(atoi(word.c_str() + 2)));
+						return;
 					}
-					Dialect::handleToken(s, t);
-					return;
-				case TOK_BYTESTR:
-					s->current->thread(new opBytestr(t->bytestr));
-					break;
-				default:
-					assert(false);
+				}
 			}
-		}
-};
+			Dialect::handleToken(s, t);
+			return;
+		case TOK_BYTESTR:
+			s->current->thread(new opBytestr(t->bytestr));
+			break;
+		default:
+			assert(false);
+	}
+}
 
 void DoifDialect::handleToken(class caosScript *s, token *t) {
 	if (t->type == TOK_WORD) {
@@ -258,8 +255,6 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 
 	
 void registerDelegates() {
-	cmd_dialect = new Dialect();
-	exp_dialect = new ExprDialect();
 	registerAutoDelegates();
 }
 /* vim: set noet: */

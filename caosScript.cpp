@@ -52,7 +52,7 @@ script::~script() {
 }
 
 
-script::script(const std::string &fn) {
+script::script(const Variant *v, const std::string &fn) : variant(v) {
 	filename = fn;
 	entry = last = new caosNoop();
 	allOps.push_back(entry);
@@ -68,8 +68,8 @@ class ENDM : public parseDelegate {
 
 class BaseDialect : public Dialect {
 	public:
-		BaseDialect() {
-			delegates = cmd_dialect->delegates;
+		BaseDialect(caosScript *s) {
+			delegates = s->v->cmd_dialect->delegates;
 		}
 
 		virtual void handleToken(class caosScript *s, token *t) {
@@ -77,7 +77,7 @@ class BaseDialect : public Dialect {
 				if (t->word == "rscr") {
 					if (s->removal)
 						throw parseException("multiple rscr not allowed");
-					s->current = s->removal = new script(s->filename);
+					s->current = s->removal = new script(s->v, s->filename);
 					s->removal->retain();
 					return;
 				}
@@ -105,14 +105,14 @@ class BaseDialect : public Dialect {
 					}
 					Dialect d;
 					ENDM endm;
-					d.delegates = cmd_dialect->delegates;
+					d.delegates = s->v->cmd_dialect->delegates;
 					d.delegates["endm"] = &endm;
 					struct residentScript scr(
 							fmly.constval.getInt(),
 							gnus.constval.getInt(),
 							spcs.constval.getInt(),
 							scrp.constval.getInt(),
-							new script(s->filename));
+							new script(s->v, s->filename));
 					s->current = scr.s;
 					d.doParse(s);
 					s->current = s->installer;
@@ -127,8 +127,11 @@ class BaseDialect : public Dialect {
 		}
 };
 
-caosScript::caosScript(const std::string &fn) {
-	current = installer = new script(fn);
+caosScript::caosScript(const std::string &variant, const std::string &fn) {
+	v = variants[variant];
+	if (!v)
+		throw caosException(std::string("Unknown variant ") + variant);
+	current = installer = new script(v, fn);
 	current->retain();
 	removal = NULL;
 	filename = fn;
@@ -138,7 +141,7 @@ void caosScript::parse(std::istream &in) {
 
 	yyrestart(&in);
 
-	BaseDialect d;
+	BaseDialect d(this);
 	d.doParse(this);
 
 }
