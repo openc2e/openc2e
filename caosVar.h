@@ -33,19 +33,26 @@ class caosVar {
 			NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
 		};
 
-		variableType type;
 
 		union {
 			int intValue;
 			float floatValue;
+			AgentRef *refValue;
+			std::string *stringValue;
 		} values;
-		AgentRef agent;
 
-		std::string string;
-
+		variableType type;
 	public:
 		void reset() {
-			string.clear();
+			switch (type) {
+				case AGENT:
+					delete values.refValue;
+					break;
+				case STRING:
+					delete values.stringValue;
+					break;
+				default: break;
+			}
 			type = NULLTYPE;
 		}
 
@@ -58,18 +65,41 @@ class caosVar {
 			values.intValue = 0;
 		}
 
-		caosVar(const caosVar &copyFrom) : agent(copyFrom.agent) {
-			string = copyFrom.string;
-			type = copyFrom.type;
-			values = copyFrom.values;
+		~caosVar() {
+			switch (type) {
+				case STRING:
+					delete values.stringValue;
+					break;
+				case AGENT:
+					delete values.refValue;
+					break;
+				default: break;
+			}
 		}
 
 		caosVar &operator=(const caosVar &copyFrom) {
-			string = copyFrom.string;
 			type = copyFrom.type;
-			values = copyFrom.values;
-			agent = copyFrom.agent;
+			switch (type) {
+				case INTEGER:
+				case FLOAT:
+					values = copyFrom.values;
+					break;
+				case STRING:
+					values.stringValue = new std::string(*copyFrom.values.stringValue);
+					break;
+				case AGENT:
+					values.refValue = new AgentRef(*copyFrom.values.refValue);
+					break;
+				case NULLTYPE:
+					break;
+				default: assert(0);
+			}
 			return *this;
+		}
+
+		caosVar(const caosVar &copyFrom) : type(copyFrom.type) {
+			type = NULLTYPE;
+			*this = copyFrom;
 		}
 
 		bool isEmpty() const { return type == NULLTYPE; }
@@ -83,14 +113,25 @@ class caosVar {
 		void setInt(int i) { reset(); type = INTEGER; values.intValue = i; }
 		void setFloat(float i) { reset(); type = FLOAT; values.floatValue = i; }
 		void setAgent(Agent *i) {
-			reset(); type = AGENT; agent = i;
+			if (type == AGENT)
+				values.refValue->set(i);
+			else {
+				reset();
+				type = AGENT;
+				values.refValue = new AgentRef(i);
+			}
 		}
 		void setAgent(const AgentRef &r) {
-			reset(); type = AGENT; agent = r;
+			setAgent(r.get());
 		}
 		void setString(const std::string &i) {
-			type = STRING;
-			string = i;
+			if (type == STRING)
+				*values.stringValue = i;
+			else {
+				reset();
+				type = STRING;
+				values.stringValue = new std::string(i);
+			}
 		}
 
 		int getInt() const {
@@ -113,22 +154,22 @@ class caosVar {
 
 		void getString(std::string &s) const {
 			caos_assert(hasString());
-			s = string;
+			s = *values.stringValue;
 		}
 
 		std::string getString() const {
 			caos_assert(hasString());
-			return string;
+			return *values.stringValue;
 		}
 
 		Agent *getAgent() const {
 			caos_assert(hasAgent());
-			return agent.get();
+			return values.refValue->get();
 		}
 
 		const AgentRef &getAgentRef() const {
 			caos_assert(hasAgent());
-			return agent;
+			return *values.refValue;
 		}
 
 		bool operator == (const caosVar &v) const;
@@ -150,8 +191,6 @@ class caosVar {
 #define stringValue getString()
 #define agentValue getAgent()
 
-// XXX: GET RID OF THIS
-#define variableValue getVariable()
 #endif
 
 #endif

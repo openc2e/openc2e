@@ -36,11 +36,15 @@ static inline std::string stringify(double x) {
 
 std::string caosVar::dump() const {
 	if (type == STRING) {
-		return std::string("\"") + string + "\" ";
+		return std::string("\"") + *values.stringValue + "\" ";
 	} else if (type == INTEGER) {
 		return stringify(values.intValue) + " ";
 	} else if (type == FLOAT) {
 		return stringify(values.floatValue) + " ";
+	} else if (type == AGENT) {
+		char ptrbuf[64];
+		sprintf(ptrbuf, "Agent %p", values.refValue->get());
+		return std::string(ptrbuf);
 	} else {
 		return "[bad caosVar!] ";
 	}
@@ -53,7 +57,7 @@ bool caosVar::operator == (const caosVar &v) const {
 	} else if (this->hasDecimal() && v.hasDecimal()) {
 		return this->getFloat() == v.getFloat();
 	} else if (this->hasString() && v.hasString()) {
-		return this->string == v.string;
+		return this->getString() == v.getString();
 	} else if (this->hasAgent() && v.hasAgent()) {
 		return this->getAgent() == v.getAgent();
 	}
@@ -68,7 +72,6 @@ bool caosVar::operator > (const caosVar &v) const {
 	} else if (this->hasString() && v.hasString()) {
 		return this->getString() > v.getString();
 	}
-	// todo: should be able to compare strings, apparently
 	
 	std::cerr << "caosVar operator > couldn't compare " << this->dump() << " and " << v.dump() << "\n";
 	return false;
@@ -80,7 +83,6 @@ bool caosVar::operator < (const caosVar &v) const {
 	} else if (this->hasString() && v.hasString()) {
 		return this->getString() < v.getString();
 	}
-	// todo: should be able to compare strings, apparently
 	
 	std::cerr << "caosVar operator < couldn't compare " << this->dump() << " and " << v.dump() << "\n";
 	return false;

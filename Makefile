@@ -76,7 +76,7 @@ COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
-all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/gctest
+all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/gctest tools/memstats
 
 docs: docs.html
 
@@ -144,6 +144,9 @@ tools/pathtest: tools/pathtest.o PathResolver.o
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
 tools/gctest: tools/gctest.o gc.o
+	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+
+tools/memstats: tools/memstats.o $(patsubst main.o,,$(OPENC2E))
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
 clean:

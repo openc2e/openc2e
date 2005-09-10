@@ -274,6 +274,7 @@ public:
 	void c_TEST_FINI();
 	void c_DBG_OUTS();
 	void c_DBG_OUTV();
+	void c_DBG_MALLOC();
 	void v_UNID();
 	void v_AGNT();
 

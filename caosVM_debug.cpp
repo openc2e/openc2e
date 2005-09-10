@@ -22,6 +22,10 @@
 #include "Agent.h"
 #include "World.h"
 #include <iostream>
+
+#include "malloc.h"
+#include <sstream>
+
 using std::cerr;
 using std::cout;
 
@@ -138,5 +142,30 @@ void caosVM::v_AGNT() {
 
 	result.setAgent(world.lookupUNID(id));
 }
+
+/**
+ DBG: MALLOC (command)
+
+ Dumps some malloc stats to stderr.
+*/
+void caosVM::c_DBG_MALLOC() {
+	VM_VERIFY_SIZE(0)
+	
+	struct mallinfo mi = mallinfo();
+#define MPRINT(name) \
+	fprintf(stderr, "%10s = %d\n", #name, mi. name)
+	MPRINT(arena);
+	MPRINT(ordblks);
+	MPRINT(smblks);
+	MPRINT(hblks);
+	MPRINT(hblkhd);
+	MPRINT(usmblks);
+	MPRINT(fsmblks);
+	MPRINT(uordblks);
+	MPRINT(fordblks);
+	MPRINT(keepcost);
+	malloc_stats();
+}
+	
 
 /* vim: set noet: */
