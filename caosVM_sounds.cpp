@@ -119,7 +119,7 @@ void caosVM::c_RMSC() {
 }
 
 /**
- MMSC (string) x (integer) y (integer)
+ RMSC (string) x (integer) y (integer)
  %status stub
 */
 void caosVM::v_RMSC() {

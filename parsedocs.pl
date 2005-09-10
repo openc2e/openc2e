@@ -175,6 +175,10 @@ while (<>) {
 	}
 
 	for my $v (@v) {
+		if (exists $data{$v}{$key}) {
+			print STDERR "Name collision for ($key) in variant $v\n";
+			exit 1;
+		}
 		$data{$v}{$key} = $cd;
 	}
 }
