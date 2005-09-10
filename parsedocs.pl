@@ -164,7 +164,7 @@ while (<>) {
 	if ($cns && $cns ne '') {
 		$cd->{namespace} = lc $cns;
 	}
-	if ($cd->{status}) {
+	unless ($cd->{status}) {
 		$cd->{status} = 'probablyok';
 	}
 	$prev = $cd;
