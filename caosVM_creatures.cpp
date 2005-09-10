@@ -23,6 +23,13 @@
 #include "Creature.h"
 using std::cerr;
 
+Creature *caosVM::getTargCreature() {
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	caos_assert(c);
+	return c;
+}
+
 /**
  STIM SHOU (command) stimulus (integer) strength (float)
  %status stub
@@ -33,7 +40,7 @@ void caosVM::c_STIM_SHOU() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
-	
+
 	// TODO
 }
 
@@ -110,6 +117,7 @@ void caosVM::c_SWAY_SHOU() {
 void caosVM::c_NOHH() {
 	VM_VERIFY_SIZE(0)
 
+	Creature *c = getTargCreature();
 	// TODO
 }
 
@@ -123,6 +131,8 @@ void caosVM::c_ZOMB() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(zombie)
 
+	Creature *c = getTargCreature();
+
 	// TODO
 }
 
@@ -133,6 +143,7 @@ void caosVM::c_ZOMB() {
  return 1 if target creature is zombified, or 0 otherwise
 */
 void caosVM::v_ZOMB() {
+	Creature *c = getTargCreature();
 	result.setInt(0); // TODO
 }
 
@@ -146,6 +157,7 @@ void caosVM::c_DIRN() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(zombie)
 
+	Creature *c = getTargCreature();
 	// TODO
 }
 
@@ -172,7 +184,7 @@ void caosVM::c_MVFT() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	caos_assert(targ);
+	Creature *c = getTargCreature();
 
 	// TODO: dynamic_cast to Creature *
 }
@@ -201,9 +213,7 @@ void caosVM::v_CREA() {
 void caosVM::c_VOCB() {
 	VM_VERIFY_SIZE(0)
 	
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	// TODO
 }
@@ -215,9 +225,7 @@ void caosVM::c_VOCB() {
  kill target creature biologically
 */
 void caosVM::c_DEAD() {
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	// TODO
 }
@@ -229,9 +237,7 @@ void caosVM::c_DEAD() {
  return 1 if target creature is dead, or 0 otherwise
 */
 void caosVM::v_DEAD() {
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	result.setInt(0); // TODO
 }
@@ -279,9 +285,7 @@ void caosVM::c_DRIV() {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(drive_id)
 
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	// TODO
 }
@@ -295,9 +299,7 @@ void caosVM::c_DRIV() {
 void caosVM::v_DRIV() {
 	VM_PARAM_INTEGER(drive_id)
 
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	result.setFloat(0.0f); // TODO
 }
@@ -312,9 +314,7 @@ void caosVM::c_CHEM() {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(chemical_id)
 
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	// TODO
 }
@@ -328,9 +328,7 @@ void caosVM::c_CHEM() {
 void caosVM::v_CHEM() {
 	VM_PARAM_INTEGER(chemical_id)
 	
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	result.setFloat(0.0f); // TODO
 }
@@ -344,9 +342,7 @@ void caosVM::v_CHEM() {
 void caosVM::c_ASLP() {
 	VM_PARAM_INTEGER(asleep)
 	
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	// TODO
 }
@@ -358,9 +354,7 @@ void caosVM::c_ASLP() {
  Returns 1 if target creature is asleep, or 0 otherwise.
 */
 void caosVM::v_ASLP() {
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	result.setInt(0); // TODO
 }
@@ -372,9 +366,7 @@ void caosVM::v_ASLP() {
  Make target creature approach the IT agent (or if none, an agent of that category using CAs), blocking until it makes it there or gives up.
 */
 void caosVM::c_APPR() {
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	// TODO
 }
@@ -386,9 +378,7 @@ void caosVM::c_APPR() {
  Make creature conscious if 0, or unconscious if 1.
 */
 void caosVM::c_UNCS() {
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	// TODO
 }
@@ -400,9 +390,7 @@ void caosVM::c_UNCS() {
  Return 1 if target creature is unconscious, or 0 otherwise.
 */
 void caosVM::v_UNCS() {
-	caos_assert(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
-	caos_assert(c);
+	Creature *c = getTargCreature();
 
 	result.setInt(0); // TODO
 }

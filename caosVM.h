@@ -132,6 +132,8 @@ public:
 	void setOwner(Agent *a) { owner = a; }
 	void setOutputStream(std::ostream &o) { outputstream = &o; }
 
+	class Creature *getTargCreature();
+
 	// map
 	void v_ADDM();
 	void c_ADDB();
