@@ -111,6 +111,12 @@ const static struct option longopts[] = {
 		NULL,
 		'v'
 	},
+	{
+		"gametype",
+		required_argument,
+		NULL,
+		'g'
+	},
 	{	"data",
 		required_argument,
 		NULL,
@@ -140,6 +146,7 @@ static void opt_help(const char *exename) {
 	printf("  %-20s %s\n", "-s, --silent", "disables game sounds");
 	printf("  %-20s %s\n", "-d, --data", "sets base path for game data");
 	printf("  %-20s %s\n", "-b, --bootstrap", "sets bootstrap directory");
+	printf("  %-20s %s\n", "-g, --gametype", "sets the game type (cv or c3, c3 by default)");
 	std::cout << std::endl <<
 		"If --data is not specified, it defaults to \"" << data_default << "\". If --bootstrap is"<< std::endl <<
 		"not specified, it defaults to \"<data directory>" << bootstrap_suffix << "\"."	<< std::endl;
@@ -165,6 +172,7 @@ extern "C" int main(int argc, char *argv[]) {
 	std::string bootstrap;
 	std::string data;
 	bool bs_specd = false, d_specd = false;
+	std::string gametype = "c3";
 	while (-1 != (optret = getopt_long(argc, argv, optstring, longopts, NULL))) {
 		switch (optret) {
 			case 'h': //fallthru
@@ -194,6 +202,14 @@ extern "C" int main(int argc, char *argv[]) {
 				}
 				bs_specd = true;
 				bootstrap = optarg;
+				break;
+			case 'g':
+				gametype = optarg;
+				if ((gametype != "c3") && (gametype != "cv")) {
+					std::cerr << "Error: unrecognized game type." << std::endl;
+					opt_help(argv[0]);
+					return 1;
+				}
 				break;
 		}
 	}
@@ -271,7 +287,7 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout.flush();
 		std::cerr.flush();
 		try {
-			caosScript *script = new caosScript("c3", *i); // XXX
+			caosScript *script = new caosScript(gametype, *i); // XXX
 			script->parse(s);
 			caosVM vm(0);
 			script->installScripts();
@@ -323,7 +339,7 @@ extern "C" int main(int argc, char *argv[]) {
 			assert(backsurfs[m->id][i] != 0);
 		}
 	}
-	
+
 	drawWorld();
 
 	bool done = false;
@@ -370,7 +386,7 @@ extern "C" int main(int argc, char *argv[]) {
 			}
 
 			std::istringstream s(data);
-			caosScript *script = new caosScript("c3", "<network>"); // XXX
+			caosScript *script = new caosScript(gametype, "<network>"); // XXX
 			script->parse(s);
 			script->installScripts();
 			caosVM vm(0);
