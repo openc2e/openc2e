@@ -367,8 +367,8 @@ void c2eBrainTract::write(ostream &s) const {
 	write16(s, destlobe_lowerbound);
 	write16(s, destlobe_upperbound);
 	write16(s, dest_noconnections);
-	s << randomdendrites << norandomconnections;
-	for (int i = 0; i < 8; i++) s << spare[i];
+	s << randomdendrites << norandomconnections << srcvar << destvar;
+	for (int i = 0; i < 6; i++) s << spare[i];
 	for (int i = 0; i < 48; i++) s << initialiserule[i];
 	for (int i = 0; i < 48; i++) s << updaterule[i];
 }
@@ -383,8 +383,8 @@ void c2eBrainTract::read(istream &s) {
 	destlobe_lowerbound = read16(s);
 	destlobe_upperbound = read16(s);
 	dest_noconnections = read16(s);
-	s >> randomdendrites >> norandomconnections;
-	for (int i = 0; i < 8; i++) s >> spare[i];
+	s >> randomdendrites >> norandomconnections >> srcvar >> destvar;
+	for (int i = 0; i < 6; i++) s >> spare[i];
 	for (int i = 0; i < 48; i++) s >> initialiserule[i];
 	for (int i = 0; i < 48; i++) s >> updaterule[i];
 }

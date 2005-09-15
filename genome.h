@@ -258,9 +258,11 @@ public:
   uint16 destlobe_lowerbound;
   uint16 destlobe_upperbound;
   uint16 dest_noconnections;
-  uint8 randomdendrites;
-  uint8 norandomconnections;
-  uint8 spare[8];
+  uint8 randomdendrites; // flag
+  uint8 norandomconnections; // flag
+  uint8 srcvar;
+  uint8 destvar;
+  uint8 spare[6];
   uint8 initialiserule[48];
   uint8 updaterule[48];
 
