@@ -272,7 +272,7 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 	} else {
 		if (argc > 1) {
-			std::cerr << "couldn't find script directory (trying " << argv[1] << ")!\n";
+			std::cerr << "couldn't find script directory (trying " << scriptdir.native_file_string() << ")!\n";
 		} else {
 			std::cerr << "couldn't find bootstrap directory!\n";
 		}
