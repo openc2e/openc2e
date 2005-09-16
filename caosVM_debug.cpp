@@ -23,7 +23,7 @@
 #include "World.h"
 #include <iostream>
 
-#include "malloc.h"
+// #include "malloc.h" <- unportable horror!
 #include <sstream>
 
 using std::cerr;
@@ -146,12 +146,13 @@ void caosVM::v_AGNT() {
 /**
  DBG: MALLOC (command)
 
- Dumps some malloc stats to stderr.
+ Dumps some malloc stats to stderr. Except, doesn't, because it's unportable horror. - fuzzie
 */
 void caosVM::c_DBG_MALLOC() {
 	VM_VERIFY_SIZE(0)
 	
-	struct mallinfo mi = mallinfo();
+	// more unportable horror!
+/*	struct mallinfo mi = mallinfo();
 #define MPRINT(name) \
 	fprintf(stderr, "%10s = %d\n", #name, mi. name)
 	MPRINT(arena);
@@ -164,7 +165,7 @@ void caosVM::c_DBG_MALLOC() {
 	MPRINT(uordblks);
 	MPRINT(fordblks);
 	MPRINT(keepcost);
-	malloc_stats();
+	malloc_stats(); */
 }
 	
 

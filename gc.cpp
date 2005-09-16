@@ -1,6 +1,7 @@
 #include "gc.h"
 
-static __thread GCPool *outer_pool = NULL;
+// static __thread GCPool *outer_pool = NULL; <- more unportable code from bd_, it seems
+static GCPool *outer_pool = NULL;
 
 GCPool *GCObject::_findPool() {
 	return outer_pool;

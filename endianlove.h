@@ -25,8 +25,11 @@ typedef unsigned short uint16;
 typedef unsigned int uint32;
 
 // you must define one, and only one, of the following two. otherwise things won't work.
-//#define __C2E_BIGENDIAN
+#ifdef __APPLE__
+#define __C2E_BIGENDIAN
+#else
 #define __C2E_LITTLEENDIAN
+#endif
 
 #ifdef __C2E_LITTLEENDIAN
 
