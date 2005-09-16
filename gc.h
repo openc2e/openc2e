@@ -16,6 +16,8 @@
  * In short, use your own locks around GCObject calls, and if a GCObject has a
  * refcount of zero and you want to pass it between threads, make sure it isn't
  * nuked in the meantime.
+ *
+ * Note: thread-safety is broken on platforms that don't do __thread ATM, sorry
  */
 
 class GCObject;

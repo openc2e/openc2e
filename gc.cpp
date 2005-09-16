@@ -1,7 +1,13 @@
 #include "gc.h"
 
-// static __thread GCPool *outer_pool = NULL; <- more unportable code from bd_, it seems
+#if defined(__linux__) && defined(__GNUC__)
+static __thread GCPool *outer_pool = NULL;
+#else
+// If LINUX_TLS is not defined, do not use pools in multiple threads.
+// And have a really good idea of what you're doing before release()ing or
+// renew()ing in alternate threads
 static GCPool *outer_pool = NULL;
+#endif
 
 GCPool *GCObject::_findPool() {
 	return outer_pool;
