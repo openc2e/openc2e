@@ -26,9 +26,13 @@ typedef unsigned int uint32;
 
 // you must define one, and only one, of the following two. otherwise things won't work.
 #ifdef __APPLE__
-#define __C2E_BIGENDIAN
+ #define __C2E_BIGENDIAN
 #else
-#define __C2E_LITTLEENDIAN
+ #ifdef __PPC__
+  #define __C2E_BIGENDIAN
+ #else
+  #define __C2E_LITTLEENDIAN
+ #endif
 #endif
 
 #ifdef __C2E_LITTLEENDIAN

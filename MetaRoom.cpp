@@ -25,7 +25,7 @@
 MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
 	xloc = _x; yloc = _y; wid = _width; hei = _height;
 	background = (blkImage *)gallery.getImage(back + ".blk");
-	assert(background);
+	caos_assert(background);
 }
 
 MetaRoom::~MetaRoom() {
