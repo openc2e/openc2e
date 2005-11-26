@@ -97,8 +97,10 @@ bool tryOpen(mmapifstream *in, std::string fname, filetype ft) {
 		switch (ft) {
 			case blk:
 				f.convertblk(realfile.native_file_string(), cachefile.native_file_string());
+				break;
 			case s16:
 				f.converts16(realfile.native_file_string(), cachefile.native_file_string());
+				break;
 			default:
 				return true; // c16 hack
 		}
