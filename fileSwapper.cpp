@@ -23,12 +23,12 @@
 #include "c16Image.h"
 #include "openc2e.h"
 
-void fileSwapper::convertc16(std::string directory, std::string name) {
+void fileSwapper::convertc16(std::string src, std::string dest) {
 	assert(false); // unimplemented
 
-	std::ifstream in((directory + name).c_str());
+	std::ifstream in(src.c_str());
 	if (!in.is_open()) return;
-	std::ofstream out((directory + name + ".big").c_str());
+	std::ofstream out(dest.c_str());
 	assert(out.is_open());
 	
 	// okay. read the damn file.
@@ -36,10 +36,10 @@ void fileSwapper::convertc16(std::string directory, std::string name) {
 	img.readHeader(in);
 }
 
-void fileSwapper::converts16(std::string directory, std::string name) {
-	std::ifstream in((directory + name).c_str());
+void fileSwapper::converts16(std::string src, std::string dest) {
+	std::ifstream in(src.c_str());
 	if (!in.is_open()) return;
-	std::ofstream out((directory + name + ".big").c_str());
+	std::ofstream out(dest.c_str());
 	assert(out.is_open());
 	
 	// okay. read the damn file.
@@ -76,10 +76,10 @@ void fileSwapper::converts16(std::string directory, std::string name) {
 	}
 }
 
-void fileSwapper::convertblk(std::string directory, std::string name) {
-	std::ifstream in((directory + name).c_str());
+void fileSwapper::convertblk(std::string src, std::string dest) {
+	std::ifstream in(src.c_str());
 	if (!in.is_open()) return;
-	std::ofstream out((directory + name + ".big").c_str());
+	std::ofstream out(dest.c_str());
 	assert(out.is_open());
 
 	// okay. read the damn file.

@@ -25,8 +25,8 @@
  */
 class fileSwapper {
 public:
-	void convertc16(std::string directory, std::string name);
-	void converts16(std::string directory, std::string name);
-	void convertblk(std::string directory, std::string name);
+	void convertc16(std::string src, std::string dest);
+	void converts16(std::string src, std::string dest);
+	void convertblk(std::string src, std::string dest);
 };
 /* vim: set noet: */
