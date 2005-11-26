@@ -58,7 +58,7 @@ bool resolveFile(path &p) {
 	string s = p.string();
 	if (!resolveFile(s))
 		return false;
-	p = path(s);
+	p = path(s, native);
 	return true;
 }
 
