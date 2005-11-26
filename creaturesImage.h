@@ -51,6 +51,7 @@ public:
   unsigned int refCount() { return refcount; }
 	
 	friend class fileSwapper;
+	friend class c16Image; // so duplicateTo can create a s16Image as required
 };
 
 class imageGallery {

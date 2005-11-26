@@ -24,6 +24,8 @@
   we need to convert them. This class is a grouping for the conversion code.
  */
 class fileSwapper {
+private:
+	void convertsprite(class s16Image &src, std::string dest);
 public:
 	void convertc16(std::string src, std::string dest);
 	void converts16(std::string src, std::string dest);

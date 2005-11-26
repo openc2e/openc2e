@@ -23,24 +23,39 @@
 #include "c16Image.h"
 #include "openc2e.h"
 
-void fileSwapper::convertc16(std::string src, std::string dest) {
-	assert(false); // unimplemented
-
-	std::ifstream in(src.c_str());
-	if (!in.is_open()) return;
+void fileSwapper::convertsprite(s16Image &img, std::string dest) {
 	std::ofstream out(dest.c_str());
 	assert(out.is_open());
+
+	// okay, now we get the exciting bit, we get to write it to disk!
+	// step one: calculate offsets
+	unsigned int offset = 6 + (8 * img.m_numframes);
+	for (unsigned int i = 0; i < img.m_numframes; i++) {
+		img.offsets[i] = offset;
+		offset += img.widths[i] * img.heights[i] * 2;
+	}
+
+	// step two: write data
+	img.writeHeader(out);
+	for (unsigned int i = 0; i < img.m_numframes; i++) {
+		out.write((char *)img.buffers[i], img.widths[i] * img.heights[i] * 2);
+	}
+}
+
+void fileSwapper::convertc16(std::string src, std::string dest) {
+	mmapifstream in(src.c_str());
+	if (!in.is_open()) return;
 	
 	// okay. read the damn file.
-	c16Image img;
-	img.readHeader(in);
+	c16Image img(&in);
+	s16Image i;
+	img.duplicateTo(&i);
+	convertsprite(i, dest);
 }
 
 void fileSwapper::converts16(std::string src, std::string dest) {
 	std::ifstream in(src.c_str());
 	if (!in.is_open()) return;
-	std::ofstream out(dest.c_str());
-	assert(out.is_open());
 	
 	// okay. read the damn file.
 	s16Image img;
@@ -57,23 +72,12 @@ void fileSwapper::converts16(std::string src, std::string dest) {
 		}
 	}
 
-	// okay, now we get the exciting bit, we get to write it to disk!
-	// step one: calculate offsets
-	unsigned int offset = 6 + (8 * img.m_numframes);
+	convertsprite(img, dest);
+
 	for (unsigned int i = 0; i < img.m_numframes; i++) {
-		img.offsets[i] = offset;
-		offset += img.widths[i] * img.heights[i] * 2;
+		delete[] (uint16 *)img.buffers[i];
 	}
-	
-	// step two: write data
-	img.writeHeader(out);
-	for (unsigned int i = 0; i < img.m_numframes; i++) {
-		out.write((char *)img.buffers[i], img.widths[i] * img.heights[i] * 2);
-	}
-	
-	for (unsigned int i = 0; i < img.m_numframes; i++) {
-		delete (uint16 *)img.buffers[i];
-	}
+	delete[] img.offsets;
 }
 
 void fileSwapper::convertblk(std::string src, std::string dest) {
@@ -112,7 +116,7 @@ void fileSwapper::convertblk(std::string src, std::string dest) {
 	}
 
 	for (unsigned int i = 0; i < img.m_numframes; i++) {
-		delete (uint16 *)img.buffers[i];
+		delete[] (uint16 *)img.buffers[i];
 	}
 }
 /* vim: set noet: */

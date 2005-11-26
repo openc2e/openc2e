@@ -27,15 +27,15 @@ private:
 
 public:
 	c16Image() { }
-  c16Image(mmapifstream *);
+	c16Image(mmapifstream *);
 	void readHeader(std::istream &in);
-	void writeHeader(std::ostream &out);
+	void duplicateTo(class s16Image *);
 };
 
 class s16Image : public creaturesImage {
 public:
 	s16Image() { }
-  s16Image(mmapifstream *);
+	s16Image(mmapifstream *);
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &out);
 };

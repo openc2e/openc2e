@@ -28,6 +28,7 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <sys/types.h> // passwd*
 #include <pwd.h> // getpwuid
 
@@ -56,7 +57,7 @@ path cacheDirectory() {
 	return p;
 }
 
-bool tryOpen(mmapifstream *in, std::string fname, filetype ft) {
+bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype ft) {
 	path cachefile, realfile;
 	std::string cachename;
 
@@ -77,17 +78,25 @@ bool tryOpen(mmapifstream *in, std::string fname, filetype ft) {
 	
 	// work out where the cached file should be
 	cachename = cacheDirectory().native_directory_string() + "/" + fname;
+	if (ft == c16) { // TODO: we should really stop the caller from appending .s16/.c16
+		cachename.erase(cachename.end() - 4, cachename.end());
+		cachename.append(".s16");
+	}
+
 #ifdef __C2E_BIGENDIAN
 	cachename = cachename + ".big";
 #endif
 	cachefile = path(cachename, native);
 
 	if (resolveFile(cachefile)) {
+		std::cout << "using cached version: " << cachefile.native_file_string() << std::endl;
 		// TODO: check for up-to-date-ness
 		in->clear();
 		in->mmapopen(cachefile.native_file_string());
-		return in->is_open();
+		if (ft == c16) ft = s16;
+		goto done;
 	}
+	std::cout << "couldn't find cached version: " << cachefile.native_file_string() << std::endl;
 
 	in->clear();
 	in->mmapopen(realfile.native_file_string());
@@ -101,14 +110,28 @@ bool tryOpen(mmapifstream *in, std::string fname, filetype ft) {
 			case s16:
 				f.converts16(realfile.native_file_string(), cachefile.native_file_string());
 				break;
+			case c16:
+				//cachefile = change_extension(cachefile, "");
+				//cachefile = change_extension(cachefile, ".s16.big");
+				f.convertc16(realfile.native_file_string(), cachefile.native_file_string());
+				ft = s16;
+				break;
 			default:
-				return true; // c16 hack
+				return true; // TODO: exception?
 		}
 		in->close(); // TODO: close the mmap too! how?
 		if (!exists(cachefile)) return false; // TODO: exception?
 		in->mmapopen(cachefile.native_file_string());
 	}
 #endif
+done:
+	if (in->is_open()) {
+		switch (ft) {
+			case blk: img = new blkImage(in); break;
+			case c16: img = new c16Image(in); break; // this should never happen, actually, once we're done
+			case s16: img = new s16Image(in); break;
+		}
+	}
 	return in->is_open();
 }
 
@@ -127,20 +150,21 @@ creaturesImage *imageGallery::getImage(std::string name) {
 
 	// step two: try opening it in .c16 form first, then try .s16 form
 	mmapifstream *in = new mmapifstream();
+	creaturesImage *img;
 
-	if (!tryOpen(in, name + ".s16", s16)) {
-		if (!tryOpen(in, name + ".c16", c16)) {
-			bool lasttry = tryOpen(in, name, blk);
+	if (!tryOpen(in, img, name + ".s16", s16)) {
+		if (!tryOpen(in, img, name + ".c16", c16)) {
+			bool lasttry = tryOpen(in, img, name, blk);
 			if (!lasttry) {
 				std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
 				return 0;
 			}
-			gallery[name] = new blkImage(in);
+			gallery[name] = img;
 		} else {
-			gallery[name] = new c16Image(in);
+			gallery[name] = img;
 		}
 	} else {
-		gallery[name] = new s16Image(in);
+		gallery[name] = img;
 	}
 	
 	in->close(); // doesn't close the mmap, which we still need :)

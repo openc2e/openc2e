@@ -27,7 +27,7 @@ void c16Image::readHeader(std::istream &in) {
 	assert(flags & 0x02);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 
-  widths = new unsigned short[m_numframes];
+	widths = new unsigned short[m_numframes];
 	heights = new unsigned short[m_numframes];
 	lineoffsets = new unsigned int *[m_numframes];
 
@@ -45,30 +45,17 @@ void c16Image::readHeader(std::istream &in) {
 	}
 }
 
-void c16Image::writeHeader(std::ostream &s) {
-	assert(false); // unimplemented
-
-	unsigned int dw; unsigned short w;
-	
-	assert(false);
-	
-	dw = (is_565 ? 1 : 0);
-	dw = swapEndianLong(dw); s.write((char *)&dw, 4);
-	w = m_numframes;
-	w = swapEndianShort(w); s.write((char *)&w, 2);
-	
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		dw = offsets[i];
-		dw = swapEndianLong(dw); s.write((char *)&dw, 4);
-		w = widths[i];
-		w = swapEndianShort(w); s.write((char *)&w, 2);
-		w = heights[i];
-		w = swapEndianShort(w); s.write((char *)&w, 2);
-	}
+void c16Image::duplicateTo(s16Image *img) {
+	img->is_565 = is_565;
+	img->m_numframes = m_numframes;
+	img->offsets = new unsigned int[m_numframes];
+	img->widths = widths;
+	img->heights = heights;
+	img->buffers = buffers;
 }
 
 c16Image::c16Image(mmapifstream *in) {
-	stream = in;
+	//stream = in; TODO: think about this .. but for now, it breaks fileSwapper because the stream and c16Image are on-the-stack
 
 	readHeader(*in);
 	
