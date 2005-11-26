@@ -43,7 +43,6 @@ void mmapifstream::mmapopen(std::string filename) {
 	HANDLE hMap = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
 	void *mapr = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
 #else
-	// todo: store the FILE* somewhere?
 	FILE *f = fopen(filename.c_str(), "r");
 	assert(f);
 /*	if (!f) {
@@ -61,6 +60,7 @@ void mmapifstream::mmapopen(std::string filename) {
 	seekg(0, std::ios::beg);
 
 	void *mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, fno, 0);
+	fclose(f); // we don't need it, now!
 #endif
 
 	assert(mapr != (void *)-1);
