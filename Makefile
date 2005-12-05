@@ -71,7 +71,7 @@ OPENC2E = \
 	gc.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
-XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --static-libs) -lz -lm -lSDL_net -lSDL_mixer
+XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer
 COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
@@ -92,6 +92,8 @@ cmddata.cpp: commandinfo.yml writecmds.pl
 lex.mng.cpp lex.mng.h: mng.l mngparser.tab.hpp
 	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
 
+mngfile.o: lex.mng.cpp
+
 mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
 	bison -d --name-prefix=mng mngparser.ypp
 
@@ -101,32 +103,18 @@ lex.yy.cpp lex.yy.h: caos.l
 ## lex.yy.h deps aren't detected evidently
 caosScript.o: lex.yy.h lex.yy.cpp
 
+## based on automake stuff
 %.o: %.cpp
-	$(CXX) $(XCPPFLAGS) -o $@ -c $<
+	mkdir -p .deps/`dirname $<` && \
+	$(CXX) $(XCPPFLAGS) -MP -MD -MF .deps/$<.Td -o $@ -c $< && \
+	mv .deps/$<.Td .deps/$<.d
 
 %.o: %.c
-	$(CC) $(XCFLAGS) -o $@ -c $<
+	mkdir -p .deps && \
+	$(CC) $(XCFLAGS) -MP -MD -MF .deps/$<.Td -o $@ -c $< && \
+	mv .deps/$<.Td .deps/$<.d
 
-# shamelessly ripped from info make, with tweaks
-.deps/%.d: %.c lex.yy.h lex.mng.h
-	mkdir -p `dirname $@` && \
-	$(CC) -MP -M $(XCPPFLAGS) $< > $@.$$$$ && \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@ && \
-	rm -f $@.$$$$
-
-.deps/%.dpp: %.cpp lex.yy.h lex.mng.h
-	mkdir -p `dirname $@` && \
-	$(CXX) -MP -M $(XCPPFLAGS) $< > $@.$$$$ && \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@ && \
-	rm -f $@.$$$$
-
-.deps/meta: $(SOURCEDEPS)
-	mkdir -p .deps; \
-	cat $(SOURCEDEPS) > .deps/meta
-
-include .deps/meta
-#include $($(wildcard *.c):.c=.d) \
-#		$($(wildcard *.cpp):.cpp=.dpp)
+include $(shell find .deps -name '*.d' -type f 2>/dev/null || true)
 
 openc2e: $(OPENC2E)
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
