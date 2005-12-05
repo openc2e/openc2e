@@ -110,7 +110,7 @@ caosScript.o: lex.yy.h lex.yy.cpp
 	mv .deps/$<.Td .deps/$<.d
 
 %.o: %.c
-	mkdir -p .deps && \
+	mkdir -p .deps/`dirname $<` && \
 	$(CC) $(XCFLAGS) -MP -MD -MF .deps/$<.Td -o $@ -c $< && \
 	mv .deps/$<.Td .deps/$<.d
 
