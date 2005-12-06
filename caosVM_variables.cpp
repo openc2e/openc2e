@@ -242,7 +242,7 @@ void caosVM::c_DIVV() {
 	} else if (v->hasInt() || v->hasFloat()) {
 		// floating point division
 		v->setFloat((v->hasFloat() ? v->floatValue : v->intValue) /
-					(div.hasFloat() ? div.floatValue : v->intValue));
+					(div.hasFloat() ? div.floatValue : div.intValue));
 	} else
 		throw badParamException();
 }
