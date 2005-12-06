@@ -48,7 +48,7 @@ public:
 	virtual unsigned int getHeight() { return sprite->height(first_image); }
 
 	void setFrameNo(unsigned int);
-	void setPose(unsigned int p) { pose = p; }
+	void setPose(unsigned int p) { animation.clear(); pose = p; }
 	void setFramerate(unsigned int f) { /* TODO */ }
 	unsigned int getPose() { return pose; }
 	unsigned int getCurrentSprite() { return first_image + base_offset + pose; }
