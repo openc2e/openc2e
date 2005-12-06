@@ -53,6 +53,8 @@ void caosVM::c_DBG_OUTV() {
 	} else {
 		cout << val.intValue;
 	}
+
+	cout << std::endl;
 }
 
 /**

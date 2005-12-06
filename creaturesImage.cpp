@@ -71,8 +71,6 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 			realfile = path(datapath + "/Images/" + fname, native); break;
 	}
 
-	std::cout << "looking for " << realfile.native_file_string() << std::endl;
-
 	// if it doesn't exist, too bad, give up.
 	if (!resolveFile(realfile)) return false;
 	
@@ -89,7 +87,6 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 	cachefile = path(cachename, native);
 
 	if (resolveFile(cachefile)) {
-		std::cout << "using cached version: " << cachefile.native_file_string() << std::endl;
 		// TODO: check for up-to-date-ness
 		in->clear();
 		in->mmapopen(cachefile.native_file_string());
