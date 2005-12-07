@@ -41,6 +41,7 @@ class Dialect {
 
 struct Variant {
 	Dialect *cmd_dialect, *exp_dialect;
+	const cmdinfo *cmds;
 };
 
 extern map<std::string, Variant *> variants;

@@ -60,6 +60,8 @@ while (<>) {
 		)* )
 		\s*$
 	}x;
+	my $firstline = $_;
+	
 	my ($cns, $cname, $ctype, $argdata) = ($1, $2, $3, $4);
 	if (defined $cns) {
 		$cns =~ s/\s//g;
@@ -143,9 +145,11 @@ while (<>) {
 		$impl = $pragma{implementation};
 	}
 
+	$firstline =~ s/^\s*//;
 	my $desc = join("\n", @lines);
 	$desc .= "\n";
 	
+	$desc = $firstline . "\n" . $desc;
 	
 	my $cd = {
 		type => $ctype,

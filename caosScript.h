@@ -35,13 +35,15 @@ class Variant;
 struct script { //: public Collectable {
 	protected:
 		bool linked;
-		const Variant *variant;
 
 		// position 0 is reserved in the below vector
 		std::vector<int> relocations;
 		// pos-0 needs to be initted to a caosNoop
 		std::vector<class caosOp *> allOps;
 	public:
+		const Variant *variant;
+		const Variant *getVariant() const { return variant; };
+		
 		const std::string filename;
 
 		caosOp *getOp(int idx) const {

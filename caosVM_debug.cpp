@@ -22,6 +22,10 @@
 #include "Agent.h"
 #include "World.h"
 #include <iostream>
+#include "cmddata.h"
+#include <cctype>
+#include "dialect.h"
+#include <algorithm>
 
 // #include "malloc.h" <- unportable horror!
 #include <sstream>
@@ -194,4 +198,30 @@ void caosVM::c_DBG_TRACE() {
 	vm->trace = en;
 }
 
+/**
+ MANN (command) cmd (string)
+ %status ok
+ 
+ Looks up documentation on cmd and spits it on the current output socket
+*/
+void caosVM::c_MANN() {
+	VM_PARAM_STRING(cmd)
+	transform(cmd.begin(), cmd.end(), cmd.begin(), (int(*)(int))toupper);
+
+	const cmdinfo *cmds = NULL;
+	if (currentscript) {
+		const Variant *v = currentscript->getVariant();
+		if (v)
+			cmds = v->cmds;
+	}
+	if (!cmds)
+		cmds = variants["c3"]->cmds;
+	// we're not too worried about the performance of this...
+	for (int i = 0; cmds[i].name; i++) {
+		if (strcmp(cmds[i].fullname, cmd.c_str()))
+			continue;
+		*outputstream << cmds[i].docs;
+		return;
+	}
+}
 /* vim: set noet: */

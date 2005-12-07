@@ -278,6 +278,7 @@ public:
 	void c_DBG_OUTV();
 	void c_DBG_MALLOC();
 	void c_DBG_TRACE();
+	void c_MANN();
 	void v_UNID();
 	void v_AGNT();
 
