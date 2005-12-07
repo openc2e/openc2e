@@ -147,6 +147,7 @@ void caosVM::v_CABV() {
 
 /**
  RPAS (command) vehicle (agent) passenger (agent)
+ %status stub
 */
 void caosVM::c_RPAS() {
 	VM_PARAM_AGENT(passenger)

@@ -23,6 +23,7 @@
 
 /**
  PRT: BANG (command) strength (integer)
+ %status stub
 */
 void caosVM::c_PRT_BANG() {
 	VM_VERIFY_SIZE(1)
@@ -31,6 +32,7 @@ void caosVM::c_PRT_BANG() {
 
 /**
  PRT: FRMA (agent) inputport (integer)
+ %status stub
 */
 void caosVM::v_PRT_FRMA() {
 	VM_VERIFY_SIZE(1)
@@ -39,6 +41,7 @@ void caosVM::v_PRT_FRMA() {
 
 /**
  PRT: FROM (integer) inputport (integer)
+ %status stub
 */
 void caosVM::v_PRT_FROM() {
 	VM_VERIFY_SIZE(1)
@@ -47,6 +50,7 @@ void caosVM::v_PRT_FROM() {
 
 /**
  PRT: INEW (command) id (integer) name (string) desc (string) x (integer) y (integer) msgnum (integer)
+ %status stub
 */
 void caosVM::c_PRT_INEW() {
 	VM_VERIFY_SIZE(6)
@@ -60,6 +64,7 @@ void caosVM::c_PRT_INEW() {
 
 /**
  PRT: ITOT (integer)
+ %status stub
 */
 void caosVM::v_PRT_ITOT() {
 	VM_VERIFY_SIZE(0)
@@ -67,6 +72,7 @@ void caosVM::v_PRT_ITOT() {
 
 /**
  PRT: IZAP (command) id (integer)
+ %status stub
 */
 void caosVM::c_PRT_IZAP() {
 	VM_VERIFY_SIZE(1)
@@ -75,6 +81,7 @@ void caosVM::c_PRT_IZAP() {
 
 /**
  PRT: JOIN (command) source (agent) outputport (integer) dest (agent) inputport (integer)
+ %status stub
 */
 void caosVM::c_PRT_JOIN() {
 	VM_VERIFY_SIZE(4)
@@ -86,6 +93,7 @@ void caosVM::c_PRT_JOIN() {
 
 /**
  PRT: KRAK (command) agent (agent) in_or_out (integer) port (integer)
+ %status stub
 */
 void caosVM::c_PRT_KRAK() {
 	VM_VERIFY_SIZE(3)
@@ -96,6 +104,7 @@ void caosVM::c_PRT_KRAK() {
 
 /**
  PRT: NAME (string) agent (agent) in_or_out (integer) port (integer)
+ %status stub
 */
 void caosVM::v_PRT_NAME() {
 	VM_VERIFY_SIZE(0)
@@ -106,6 +115,7 @@ void caosVM::v_PRT_NAME() {
 
 /**
  PRT: ONEW (command) id (integer) name (string) desc (string) x (integer) y (integer)
+ %status stub
 */
 void caosVM::c_PRT_ONEW() {
 	VM_VERIFY_SIZE(5)
@@ -118,6 +128,7 @@ void caosVM::c_PRT_ONEW() {
 
 /**
  PRT: OTOT (integer)
+ %status stub
 */
 void caosVM::v_PRT_OTOT() {
 	VM_VERIFY_SIZE(0)
@@ -125,6 +136,7 @@ void caosVM::v_PRT_OTOT() {
 
 /**
  PRT: OZAP (command) id (integer)
+ %status stub
 */
 void caosVM::c_PRT_OZAP() {
 	VM_VERIFY_SIZE(1)
@@ -133,6 +145,7 @@ void caosVM::c_PRT_OZAP() {
 
 /**
  PRT: SEND (command) id (integer) data (anything)
+ %status stub
 */
 void caosVM::c_PRT_SEND() { // TODO
 	VM_VERIFY_SIZE(2)

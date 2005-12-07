@@ -24,6 +24,7 @@ using std::cerr;
 
 /**
  INST (command)
+ %status maybe
 
  don't release control to the scheduler until end of script or SLOW
  */
@@ -36,6 +37,7 @@ void caosVM::c_INST() {
 
 /**
  SLOW (command)
+ %status maybe
 
  reverts effects of INST
  */
@@ -47,6 +49,7 @@ void caosVM::c_SLOW() {
 
 /**
  LOCK (command)
+ %status maybe
 
  prevent agent script from being interrupted by another
  */
@@ -57,6 +60,7 @@ void caosVM::c_LOCK() {
 
 /**
  UNLK (command)
+ %status maybe
 
  reverts effects of LOCK
  */
@@ -81,6 +85,7 @@ class blockUntilTime : public blockCond {
 
 /**
  WAIT (command) ticks (integer)
+ %status maybe
 
  stop the script from running for a number of ticks
  */
@@ -94,6 +99,7 @@ void caosVM::c_WAIT() {
 
 /**
  STOP (command)
+ %status maybe
 */
 void caosVM::c_STOP() {
 	VM_VERIFY_SIZE(0)
@@ -102,6 +108,7 @@ void caosVM::c_STOP() {
 
 /**
  SCRX (command) family (integer) genus (integer) species (integer) event (integer)
+ %status maybe
 
  delete the event script in question
 */

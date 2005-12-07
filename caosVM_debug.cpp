@@ -31,6 +31,7 @@ using std::cout;
 
 /**
  DBG: OUTS (command) val (string)
+ %status stub
 
  output a string to the debug log
 */
@@ -41,6 +42,7 @@ void caosVM::c_DBG_OUTS() {
 
 /**
  DBG: OUTV (command) val (decimal)
+ %status stub
  
  output a decimal value to the debug log
 */
@@ -59,6 +61,7 @@ void caosVM::c_DBG_OUTV() {
 
 /**
  TEST PASS (command)
+ %status stub
 
  openc2e-only
  signal a single test pass
@@ -69,6 +72,7 @@ void caosVM::c_TEST_PASS() {
 
 /**
  TEST FAIL (command)
+ %status stub
 
  openc2e-only
  signal a single test fail
@@ -79,6 +83,7 @@ void caosVM::c_TEST_FAIL() {
 
 /**
  TEST INIT (command) notests (integer)
+ %status stub
 
  openc2e-only
  initialise the testing system, there will be notests tests
@@ -90,6 +95,7 @@ void caosVM::c_TEST_INIT() {
 
 /**
  TEST CHEK (command) comparison (comparison)
+ %status stub
 
  openc2e-only
  signal a test pass if comparison is true, or a fail otherwise
@@ -100,6 +106,7 @@ void caosVM::c_TEST_CHEK() {
 
 /**
  TEST STRT (command)
+ %status stub
 
  openc2e-only
  start a single test, continuing until TEST PASS/FAIL/FINI
@@ -110,6 +117,7 @@ void caosVM::c_TEST_STRT() {
 
 /**
  TEST FINI (command)
+ %status stub
 
  openc2e-only
  signal a single test fail if there has been no TEST/FAIL since last TEST STRT
@@ -120,6 +128,7 @@ void caosVM::c_TEST_FINI() {
 
 /**
  UNID (integer)
+ %status maybe
 
  return unique id of target agent
  this is NO GOOD for persisting!
@@ -135,6 +144,7 @@ void caosVM::v_UNID() {
 
 /**
  AGNT (agent) id (integer)
+ %status maybe
 
  return agent, given input from UNID, or NULL if agent has been deleted
 */
@@ -147,6 +157,7 @@ void caosVM::v_AGNT() {
 
 /**
  DBG: MALLOC (command)
+ %status stub
 
  Dumps some malloc stats to stderr. Except, doesn't, because it's unportable horror. - fuzzie
 */

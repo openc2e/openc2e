@@ -245,7 +245,7 @@ void caosVM::c_TICK() {
 
 /**
  BHVR (command) bhvr (integer)
- %status stub
+ %status maybe
 */
 void caosVM::c_BHVR() {
 	VM_VERIFY_SIZE(1)
@@ -503,7 +503,7 @@ void caosVM::v_PNTR() {
 }
 
 unsigned int calculateScriptId(unsigned int message_id) {
-	// aka, why oh why is this needed?
+	// aka, why oh why is this needed? Silly CL.
 
 	switch (message_id) {
 		case 2: /* deactivate */
@@ -752,7 +752,7 @@ void caosVM::c_PLNE() {
 
 /**
  TINT (command) red_tint (integer) green_tint (integer) blue_tint (integer) rotation (integer) swap (integer)
- %status maybe
+ %status stub
 */
 void caosVM::c_TINT() {
 	VM_VERIFY_SIZE(5)

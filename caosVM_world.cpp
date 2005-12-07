@@ -34,7 +34,10 @@ void caosVM::c_LOAD() {
  SAVE (command)
  %status stub
 
- Save the world at the end of the current tick. Beware; if you don't put this in an INST, it might save directly after your SAVE call (meaning upon loading, the script will execute the next instruction, often QUIT or LOAD, which is bad).
+ Save the world at the end of the current tick. Beware; if you don't put this
+ in an INST, it might save directly after your SAVE call (meaning upon loading,
+ the script will execute the next instruction, often QUIT or LOAD, which is
+ bad).
 */
 void caosVM::c_SAVE() {
 	// TODO

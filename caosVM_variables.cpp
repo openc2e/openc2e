@@ -248,10 +248,10 @@ void caosVM::c_DIVV() {
 }
 
 /**
-  MULV (command) var (variable) mul (decimal)
+ MULV (command) var (variable) mul (decimal)
  %status maybe
 
-  returns var * mul
+ returns var * mul
 */
 void caosVM::c_MULV() {
 	VM_VERIFY_SIZE(2)
@@ -393,6 +393,7 @@ void caosVM::v_ATAN() {
 
 /**
  COS_ (float) x (float)
+ %status maybe
  
  returns cosine of x in degrees
 */
@@ -457,6 +458,7 @@ void caosVM::v_SQRT() {
 /**
  _P1_ (variable)
  %pragma implementation caosVM::v_P1
+ %status maybe
 */
 void caosVM::v_P1() {
 	VM_VERIFY_SIZE(0)
@@ -467,6 +469,7 @@ void caosVM::v_P1() {
 /**
  _P2_ (variable)
  %pragma implementation caosVM::v_P2
+ %status maybe
 */
 void caosVM::v_P2() {
 	VM_VERIFY_SIZE(0)
@@ -476,6 +479,7 @@ void caosVM::v_P2() {
 
 /**
  AVAR (variable) agent (agent) index (integer)
+ %status maybe
 */
 void caosVM::v_AVAR() {
 	VM_VERIFY_SIZE(2)
@@ -635,10 +639,12 @@ std::string stringFromInt(int i) {
  WILD (string) family (integer) genus (integer) species (integer) tag (string) offset (integer)
  %status maybe
 
- Searches for a catalogue tag starting with tag and matching the given family/genus/species.
- For instance, 'Agent Help 2 3 4' where family is 2, genus is 3 and species is 4.
- If it doesn't find it, it sets the minor value to 0 repeatedly until it either finds one, or discovers 'tag 0 0 0' doesn't exist, at which point an error is thrown.
- If it does find a suitable one, it returns the string at offset inside the tag. See READ.
+ Searches for a catalogue tag starting with tag and matching the given
+ family/genus/species.  For instance, 'Agent Help 2 3 4' where family is 2,
+ genus is 3 and species is 4.  If it doesn't find it, it sets the minor value
+ to 0 repeatedly until it either finds one, or discovers 'tag 0 0 0' doesn't
+ exist, at which point an error is thrown.  If it does find a suitable one, it
+ returns the string at offset inside the tag. See READ.
 */
 void caosVM::v_WILD() {
 	VM_PARAM_INTEGER(offset)

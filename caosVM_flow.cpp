@@ -107,6 +107,7 @@
 
 /**
  RETN (command)
+ %status maybe
  %pragma retc -1
  
  Return from a subroutine called with GSUB.
@@ -127,6 +128,7 @@ void caosVM::c_RETN() {
 
 /**
  ENUM (command) family (integer) genus (integer) species (integer)
+ %status maybe
  %pragma parserclass ENUMhelper
  %pragma retc -1
 
@@ -157,6 +159,7 @@ void caosVM::c_ENUM() {
 
 /**
  ESEE (command) family (integer) genus (integer) species (integer)
+ %status maybe
  %pragma parserclass ENUMhelper
  %pragma retc -1
  
@@ -235,6 +238,7 @@ void caosVM::c_EPAS() {
 
 /**
  CALL (command) script_no (integer) p1 (any) p2 (any)
+ %status maybe
 
  <p>Calls script_no on OWNR, then waits for it to return. The invoked script
  will inherit the caller's INST setting, but any changes it makes to it will
@@ -270,6 +274,7 @@ void caosVM::c_CALL() {
 
 /**
  CAOS (string) inline (integer) state_trans (integer) p1 (anything) p2 (anything) commands (string) throws (integer) catches (integer) report (variable)
+ %status maybe
 
  Run commands as caos code. If inline, copy _IT_ VAxx TARG OWNR, etc. If state_trans, copy FROM and OWNR. if !throws or catches, catch errors and stuff them in report (XXX: non-conforming)
 */
