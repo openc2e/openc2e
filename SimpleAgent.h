@@ -34,6 +34,10 @@ public:
 	unsigned int base_offset;
 
 	std::vector<unsigned int> animation;
+	bool is_transparent;
+	unsigned char transparency;
+	unsigned char framerate;
+	unsigned int framedelay;
 
 	SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 							unsigned int firstimage, unsigned int imagecount);
@@ -49,7 +53,7 @@ public:
 
 	void setFrameNo(unsigned int);
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
-	void setFramerate(unsigned int f) { /* TODO */ }
+	void setFramerate(unsigned int f) { framerate = f; framedelay = 0; }
 	unsigned int getPose() { return pose; }
 	unsigned int getCurrentSprite() { return first_image + base_offset + pose; }
 	unsigned int getFrameNo() { return frameno; }

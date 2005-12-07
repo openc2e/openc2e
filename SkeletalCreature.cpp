@@ -100,7 +100,7 @@ void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
 		else // everything else
 			ourpose = pose[i];
 
-		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset + x, party[i] + adjusty + yoffset + y);
+		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset + x, party[i] + adjusty + yoffset + y, false, 0);
 	}
 }
 

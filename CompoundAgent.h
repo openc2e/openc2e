@@ -31,6 +31,10 @@ protected:
 
 public:
 	std::vector<unsigned int> animation;
+	bool is_transparent;
+	unsigned char framerate;
+	unsigned int framedelay;
+	unsigned char transparency;
 	creaturesImage *getSprite() { return sprite; }
 	unsigned int x, y, zorder, id;
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
@@ -42,7 +46,7 @@ public:
 	unsigned int getFrameNo() { return frameno; }
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
-	void setFramerate(unsigned int f) { /* TODO */ }
+	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
 				
 	bool operator < (const CompoundPart *b) const {
 		return zorder < b->zorder;

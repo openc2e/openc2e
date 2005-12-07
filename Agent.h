@@ -78,7 +78,6 @@ public:
 	bool cr_can_hit, cr_can_eat, cr_can_pickup;
 	
 	bool visible;
-	unsigned char transparency;
 
 	unsigned char family, genus;
 	unsigned short species;

@@ -115,7 +115,7 @@ void SDLBackend::renderLine(unsigned int x1, unsigned int y1, unsigned int x2, u
 	aalineColor(screen, x1, y1, x2, y2, colour);
 }
 
-void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y) {
+void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y, bool trans, unsigned char transparency) {
 	SDL_Surface *surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
 												 image->width(frame),
 												 image->height(frame),
@@ -123,6 +123,7 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int 
 												 image->width(frame) * 2, // pitch
 												 0xF800, 0x07E0, 0x001F, 0); // RGBA mask
 	SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
+	if (trans) SDL_SetAlpha(surf, SDL_SRCALPHA, 255 - transparency);
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;
 	SDL_BlitSurface(surf, 0, screen, &destrect);

@@ -63,7 +63,7 @@ CompoundPart *CompoundAgent::part(unsigned int id) {
 }
 
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y);
+	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, is_transparent, transparency);
 }
 
 CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsigned short _species, unsigned int plane,
@@ -93,6 +93,9 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 	sprite = gallery.getImage(spritefile);
 	caos_assert(sprite);
 	pose = 0;
+	is_transparent = false;
+	framerate = 1;
+	framedelay = 0;
 }
 
 DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
@@ -152,13 +155,21 @@ void CompoundAgent::tick() {
 
 void CompoundPart::tick() {
 	if (!animation.empty()) {
-		unsigned int f = frameno + 1;
-		if (f == animation.size()) return;
-		if (animation[f] == 255) {
-			if (f == (animation.size() - 1)) f = 0;
-			else f = animation[f + 1];
+                if (framerate > 1) {
+			framedelay++;
+			if (framedelay == (1 << framerate - 1))
+				framedelay = 0;
 		}
-		setFrameNo(f);
+		
+		if (framedelay == 0) {
+			unsigned int f = frameno + 1;
+			if (f == animation.size()) return;
+			if (animation[f] == 255) {
+				if (f == (animation.size() - 1)) f = 0;
+				else f = animation[f + 1];
+			}
+			setFrameNo(f);
+		}
 	}
 }
 

@@ -615,10 +615,12 @@ void caosVM::c_FRAT() {
 	if (c) {
 		CompoundPart *p = c->part(part);
 		p->setFramerate(framerate);
+		p->framedelay = 0;
 	} else {
 		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
 		caos_assert(a);
 		a->setFramerate(framerate);
+		a->framedelay = 0;
 	}
 }
 
@@ -975,7 +977,17 @@ void caosVM::c_ALPH() {
 
 	caos_assert(targ);
 
-	targ->transparency = alpha_value;
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	if (c) {
+		CompoundPart *p = c->part(part);
+		p->is_transparent = enable;
+		p->transparency = alpha_value;
+	} else {
+		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
+		caos_assert(a);
+		a->is_transparent = enable;
+		a->transparency = alpha_value;
+	}
 }
 
 /**

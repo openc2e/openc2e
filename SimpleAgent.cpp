@@ -32,6 +32,9 @@ Agent(family, genus, species, plane) {
 	setAttributes(0);
 	pose = 0;
 	base_offset = 0;
+	is_transparent = false;
+	framerate = 1;
+	framedelay = 0;
 }
 
 void SimpleAgent::setImage(std::string img) {
@@ -74,20 +77,27 @@ void SimpleAgent::setFrameNo(unsigned int f) {
 void SimpleAgent::tick() {
 	Agent::tick();
 	if (!animation.empty()) {
-		unsigned int f = frameno + 1;
-		if (f == animation.size()) return;
-		if (animation[f] == 255) {
-			if (f == (animation.size() - 1)) f = 0;
-			else f = animation[f + 1];
+		if (framerate > 1) {
+			framedelay++;
+			if (framedelay == (1 << framerate - 1))
+				framedelay = 0;
 		}
-		setFrameNo(f);
+		if (framedelay == 0) {
+			unsigned int f = frameno + 1;
+			if (f == animation.size()) return;
+			if (animation[f] == 255) {
+				if (f == (animation.size() - 1)) f = 0;
+				else f = animation[f + 1];
+			}
+			setFrameNo(f);
+		}
 	}
 }
 
 void SimpleAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	int xoff = xoffset + (int)x;
 	int yoff = yoffset + (int)y;
-	renderer->render(getSprite(), getCurrentSprite(), xoff, yoff);
+	renderer->render(getSprite(), getCurrentSprite(), xoff, yoff, is_transparent, transparency);
 	if (displaycore) {
 		renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF0000CC);
 		renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
