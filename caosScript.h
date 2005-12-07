@@ -46,7 +46,7 @@ struct script { //: public Collectable {
 
 		caosOp *getOp(int idx) const {
 			assert (idx >= 0);
-			return idx >= allOps.size() ? NULL : allOps[idx];
+			return (unsigned int)idx >= allOps.size() ? NULL : allOps[idx];
 		}
 		
 		std::map<std::string, int> gsub;
