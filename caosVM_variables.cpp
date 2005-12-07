@@ -28,6 +28,7 @@
 /**
  VAxx (variable)
  %pragma noparse
+ %status maybe
 
  script-local variables, 00 to 99
  */
@@ -104,6 +105,7 @@ void caosVM::c_SETA() {
 /**
  OVxx (variable)
  %pragma noparse
+ %status maybe
 
  agent-local variables from TARG, 00 to 99
  */

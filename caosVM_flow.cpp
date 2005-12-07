@@ -27,6 +27,7 @@
 /**
  DOIF (command) condition (condition)
  %pragma parser new DoifParser()
+ %status maybe
  
  Part of a DOIF/ELIF/ELSE/ENDI block. Jump to the next part of the block if condition is false, otherwise continue executing.
 */
@@ -34,6 +35,7 @@
 /**
  ELIF (command) condition (condition)
  %pragma noparse
+ %status maybe
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
 */
@@ -42,6 +44,7 @@
 /**
  ELSE (command)
  %pragma noparse
+ %status maybe
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
 */
@@ -49,6 +52,7 @@
 /**
  ENDI (command)
  %pragma noparse
+ %status maybe
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
 */
@@ -56,6 +60,7 @@
 /**
  REPS (command) reps (integer)
  %pragma parser new parseREPS()
+ %status maybe
 
  The start of a REPS...REPE loop. The body of the loop will be executed (reps)
  times.
@@ -64,6 +69,7 @@
 /**
  REPE (command)
  %pragma noparse
+ %status maybe
 
  The end of a REPS...REPE loop.
 */
@@ -71,6 +77,7 @@
 /**
  LOOP (command)
  %pragma parser new parseLOOP()
+ %status maybe
  
  The start of a LOOP..EVER or LOOP..UNTL loop.
 */
@@ -78,6 +85,7 @@
 /**
  EVER (command)
  %pragma noparse
+ %status maybe
  
  Jump back to the matching LOOP, no matter what.
 */
@@ -85,6 +93,7 @@
 /**
  UNTL (command) condition (condition)
  %pragma noparse
+ %status maybe
  
  Jump back to the matching LOOP unless the condition evaluates to true.
 */
@@ -93,6 +102,7 @@
  GSUB (command) label (label)
  %pragma parser new parseGSUB()
  %pragma retc -1
+ %status maybe
  
  Jump to a subroutine defined by SUBR with label 'label'.
 */
@@ -100,6 +110,7 @@
 /**
  SUBR (command) label (label)
  %pragma parser new parseSUBR()
+ %status maybe
  
  Define the start of a subroute to be called with GSUB, with label 'label'.
  If the command is encountered during execution, it acts like a STOP.
@@ -109,6 +120,7 @@
  RETN (command)
  %status maybe
  %pragma retc -1
+ %status maybe
  
  Return from a subroutine called with GSUB.
 */
@@ -123,6 +135,7 @@ void caosVM::c_RETN() {
 /**
  NEXT (command)
  %pragma noparse
+ %status maybe
 
 */
 
