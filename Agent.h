@@ -76,7 +76,7 @@ public:
 	bool visible;
 	unsigned char family, genus;
 	unsigned short species;
-	caosVar velx, vely; // XXX: should these be basic floats?
+	caosVar velx, vely;
 	float accg, aero;
 	unsigned int friction;
 	int perm;
