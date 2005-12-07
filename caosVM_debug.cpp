@@ -181,5 +181,17 @@ void caosVM::c_DBG_MALLOC() {
 	malloc_stats(); */
 }
 	
+/**
+ DBG: TRACE (command) enable (integer)
+ %status ok
+
+ Enables/disables opcode tracing to cerr.
+*/
+void caosVM::c_DBG_TRACE() {
+	VM_VERIFY_SIZE(0)
+	VM_PARAM_INTEGER(en)
+
+	vm->trace = en;
+}
 
 /* vim: set noet: */

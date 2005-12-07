@@ -26,29 +26,75 @@
 #include <istream>
 #include <map>
 #include "caosVar.h"
+#include <cassert>
 
 class Agent;
 class caosOp;
 class Variant;
 
 struct script { //: public Collectable {
-	const Variant *variant;
-	std::string filename;
-	std::vector<class caosOp *> allOps;
-	std::map<std::string, class caosOp *> gsub;
-	caosOp *entry, *last;
+	protected:
+		bool linked;
+		const Variant *variant;
 
-	// add op as the next opcode
-	void thread(caosOp *op);
-	void addOp(caosOp *op);
-	script(const Variant *v, const std::string &fn);
-	~script();
-//	std::string dump();
-//	std::string dumpLine(unsigned int);
+		// position 0 is reserved in the below vector
+		std::vector<int> relocations;
+		// pos-0 needs to be initted to a caosNoop
+		std::vector<class caosOp *> allOps;
+	public:
+		const std::string filename;
 
-	void release(){}
-	void retain(){}
+		caosOp *getOp(int idx) const {
+			assert (idx >= 0);
+			return idx >= allOps.size() ? NULL : allOps[idx];
+		}
+		
+		std::map<std::string, int> gsub;
+		int getNextIndex() { return allOps.size(); }
+		// add op as the next opcode
+		void thread(caosOp *op);
+		script(const Variant *v, const std::string &fn);
+		~script();
+		std::string dump();
+	//	std::string dumpLine(unsigned int);
 
+		void link();
+		
+		void release(){}
+		void retain(){}
+
+		int newRelocation() {
+			assert (!linked);
+			int idx = relocations.size();
+			relocations.push_back(0);
+			return -idx;
+		}
+
+		// fix relocation r to point to the next op to be emitted
+		// XXX: maybe make relocations lightweight classes, so we
+		// can identify leaks.
+
+		void fixRelocation(int r, int p) {
+			assert (!linked);
+			assert (r < 0);
+			r = -r;
+			assert (relocations[r] == 0);
+			// check for a loop
+			int i = p;
+			while (i < 0) {
+				if (i == r)
+					throw creaturesException("relocation loop found");
+				i = relocations[-i];
+			}
+			
+			relocations[r] = p;
+		}
+			
+		void fixRelocation(int r) {
+			fixRelocation(r, getNextIndex());
+		}
+
+		
 };
 
 struct residentScript {

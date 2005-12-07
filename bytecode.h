@@ -4,42 +4,63 @@
 #include "caosVM.h"
 #include "lexutil.h"
 #include "cmddata.h"
+#include "caosScript.h"
+#include <cstdio>
 
 class script;
 
 typedef void (caosVM::*ophandler)();
 class caosOp {
 	public:
+		// on entry vm->nip = our position + 1
 		virtual void execute(caosVM *vm) {
 			vm->timeslice -= evalcost;
-			vm->nip = successor;
-		}
-		void setSuccessor(caosOp *succ) {
-			successor = succ;
 		}
 		void setCost(int cost) {
 			evalcost = cost;
 		}
-		caosOp() : evalcost(1), successor(NULL), owned(false), yyline(lex_lineno) {}
+		virtual void relocate(const std::vector<int> &relocations) {}
+		caosOp() : evalcost(1), owned(false), yyline(lex_lineno) {}
 		virtual ~caosOp() {};
+		virtual std::string dump() { return "UNKNOWN"; }
 		int getlineno() const { return yyline; }
+		int getIndex()  const { return index;  }
 	protected:
-		int yyline; // HORRIBLE HACK
+		int index;
 		int evalcost;
-		caosOp *successor;
-		bool owned; // if it's been addOp()ed
-		friend void script::addOp(caosOp *op);
+		bool owned; // if it's been threaded
+		int yyline; // HORRIBLE HACK
+		friend void script::thread(caosOp *op);
 };
 
 class caosNoop : public caosOp {
 	public:
 		caosNoop() { evalcost = 0; }
+		std::string dump() { return std::string("noop"); }
+};
+
+class caosJMP : public caosOp {
+	protected:
+		int p;
+	public:
+		caosJMP(int p_) : p(p_) { evalcost = 0; }
+		void execute(caosVM *vm) { vm->nip = p; }
+		void relocate(const std::vector<int> &relocations) {
+			if (p < 0)
+				p = relocations[-p];
+			assert (p > 0);
+		}
+		std::string dump() { 
+			char buf[16];
+			sprintf(buf, "JMP %08d", p);
+			return std::string(buf);
+		}
 };
 
 class simpleCaosOp : public caosOp {
 	protected:
-		const cmdinfo *ci;
 		ophandler handler;
+		const cmdinfo *ci;
 	public:
 		simpleCaosOp(ophandler h, const cmdinfo *i) : handler(h), ci(i) {}
 		void execute(caosVM *vm) {
@@ -56,13 +77,22 @@ class simpleCaosOp : public caosOp {
 					<< std::endl;
 			}
 		}
+		std::string dump() {
+			return std::string(ci->fullname);
+		}
 };
 
 class caosREPS : public caosOp {
 	protected:
-		caosOp *exit;
+		int exit;
 	public:
-		caosREPS(caosOp *exit_) : exit(exit_) {}
+		caosREPS(int exit_) : exit(exit_) {}
+		void relocate(const std::vector<int> &relocations) {
+			if (exit < 0) {
+				exit = relocations[-exit];
+			}
+			assert(exit > 0);
+		}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			VM_PARAM_INTEGER(i)
@@ -73,13 +103,14 @@ class caosREPS : public caosOp {
 			}
 			vm->result.setInt(i - 1);
 		}
+		std::string dump() { return std::string("REPS"); }
 };
 		
 class caosGSUB : public caosOp {
 	protected:
-		caosOp *targ;
+		int targ;
 	public:
-		caosGSUB(caosOp *targ_) : targ(targ_) {}
+		caosGSUB(int targ_) : targ(targ_) {}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			callStackItem i;
@@ -88,6 +119,18 @@ class caosGSUB : public caosOp {
 			vm->callStack.push_back(i);
 			vm->valueStack.clear();
 			vm->nip = targ;
+		}
+		void relocate(const std::vector<int> &relocations) {
+			if (targ < 0) {
+				targ = relocations[-targ];
+			}
+			assert(targ > 0);
+		}
+
+		std::string dump() { 
+			char buf[16];
+			sprintf(buf, "GSUB %08d", targ);
+			return std::string(buf);
 		}
 };
 
@@ -100,12 +143,27 @@ class caosGSUB : public caosOp {
 #define CGE (CEQ | CGT)
 #define CNE (CLT | CGT)
 
+extern const char *cnams[];
+
 class caosCond : public caosOp {
 	protected:
 		int cond;
-		caosOp *branch;
+		int branch;
 	public:
-		caosCond(int condition, caosOp *br)
+		std::string dump() { 
+			char buf[64];
+			const char *c = NULL;
+			if (cond < CMASK && cond > 0)
+				c = cnams[cond];
+			if (c)
+				sprintf(buf, "COND %s %08d", c, branch);
+			else
+				sprintf(buf, "COND BAD %d %08d", cond, branch);
+			return std::string(buf);
+		}
+				
+			
+		caosCond(int condition, int br)
 			: cond(condition), branch(br) {}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
@@ -150,13 +208,20 @@ class caosCond : public caosOp {
 			if (cres & cond)
 				vm->nip = branch;
 		}
+
+		void relocate(const std::vector<int> &relocations) {
+			if (branch < 0) {
+				branch = relocations[-branch];
+			}
+			assert(branch > 0);
+		}
 };
 
 class caosENUM_POP : public caosOp {
 	protected:
-		caosOp *exit;
+		int exit;
 	public:
-		caosENUM_POP(caosOp *exit_) : exit(exit_) {}
+		caosENUM_POP(int exit_) : exit(exit_) {}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			VM_PARAM_VALUE(v);
@@ -170,6 +235,27 @@ class caosENUM_POP : public caosOp {
 				return;
 			}
 			vm->setTarg(v.getAgent());
+		}
+		void relocate(const std::vector<int> &relocations) {
+			if (exit < 0) {
+				exit = relocations[-exit];
+			}
+			assert(exit > 0);
+		}
+		std::string dump() {
+			char buf[24];
+			sprintf(buf, "ENUM_POP %08d", exit);
+			return std::string(buf);
+		}
+};
+
+class caosSTOP : public caosOp {
+	public:
+		void execute(caosVM *vm) {
+			vm->stop();
+		}
+		std::string dump() {
+			return std::string("STOP");
 		}
 };
 

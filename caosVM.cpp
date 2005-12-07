@@ -40,10 +40,11 @@ caosVM::caosVM(const AgentRef &o)
 {
 	owner = o;
 	currentscript = NULL;
-	cip = nip = NULL;
+	cip = nip = 0;
 	blocking = NULL;
 	inputstream = 0; outputstream = 0;
 	resetCore();
+	trace = false;
 }
 
 inline bool caosVM::isBlocking() {
@@ -65,20 +66,25 @@ void caosVM::startBlocking(blockCond *whileWhat) {
 
 inline void caosVM::runOp() {
 	cip = nip;
-	nip = &abortop; // detect misbehaved ops
-	if (cip == NULL) {
+	nip++;
+	caosOp *op = currentscript->getOp(cip);
+	if (!op) {
 		stop();
 		return;
 	}
 	result.reset(); // xxx this belongs in opcode maybe
 	try {
-		cip->execute(this);
+		if (trace) {
+			fprintf(stderr, "Trace: %08d ", cip);
+			std::cerr << op->dump() << std::endl;
+		}
+		op->execute(this);
 	} catch (creaturesException &e) {
 		std::cerr << "script stopped due to exception " << e.what() << endl;
 		stop();
 		return;
 	} catch (caosException &e) {
-		e.trace(currentscript->filename.c_str(), cip->getlineno(), cip);
+		e.trace(currentscript->filename.c_str(), op->getlineno(), op);
 		std::cerr << "script stopped due to exception " << e.what() << endl;
 		stop();
 		return;
@@ -88,7 +94,7 @@ inline void caosVM::runOp() {
 }
 
 void caosVM::stop() {
-	cip = nip = NULL;
+	cip = nip = 0;
 	if (currentscript)
 		currentscript->release();
 	currentscript = NULL;
@@ -98,9 +104,10 @@ void caosVM::stop() {
 void caosVM::runEntirely(script *s) {
 	currentscript = s;
 	currentscript->retain();
-	cip = nip = s->entry;
-	while (nip) {
+	cip = nip = 0;
+	while (true) {
 		runOp();
+		if (!currentscript) break;
 		if (blocking) {
 			delete blocking;
 			blocking = NULL;
@@ -118,7 +125,7 @@ bool caosVM::fireScript(script *s, bool nointerrupt, Agent *frm) {
 	resetScriptState();
 	currentscript = s;
 	currentscript->retain();
-	cip = nip = s->entry;
+	cip = nip = 0;
 	targ = owner;
 	from.set(frm);
 	return true;

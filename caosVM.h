@@ -72,7 +72,7 @@ struct vmStackItem {
 
 struct callStackItem {
 	std::vector<vmStackItem> valueStack;
-	caosOp *nip;
+	int nip;
 };
 
 typedef class caosVM *caosVM_p;
@@ -86,6 +86,8 @@ class blockCond {
 class caosVM {
 public:
 	
+	bool trace;
+
 	blockCond *blocking;
 
 	void startBlocking(blockCond *whileWhat);
@@ -97,7 +99,7 @@ public:
 	
 	// script state...
 	script *currentscript;
-	caosOp *nip, *cip;
+	int nip, cip;
 	
 	bool inst, lock, stop_loop;
 	int timeslice;
@@ -275,6 +277,7 @@ public:
 	void c_DBG_OUTS();
 	void c_DBG_OUTV();
 	void c_DBG_MALLOC();
+	void c_DBG_TRACE();
 	void v_UNID();
 	void v_AGNT();
 
@@ -534,7 +537,7 @@ public:
 
 	caosVM(const AgentRef &o);
 
-	bool stopped() { return !cip; }
+	bool stopped() { return !currentscript; }
 
 	friend void setupCommandPointers();
 };

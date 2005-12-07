@@ -22,19 +22,15 @@ std::map<std::string, Variant *> variants;
  *
  * The first condition is considered to be an AND.
  *
- * This code makes a lot of noop jump targets, might this be a problem?
- * TODO: noop compactor
+ * gogo relocations
  */
-void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
+void parseCondition(caosScript *s, int success, int failure) {
 	bool wasAnd = true;
-	caosOp *nextAnd, *nextOr;
-	nextAnd = new caosNoop();
-	s->current->addOp(nextAnd);
-	nextOr = new caosNoop();
-	s->current->addOp(nextOr);
+	int nextAnd, nextOr;
+	nextAnd = s->current->newRelocation();
+	nextOr  = s->current->newRelocation();
 	while(1) {
-		caosOp *entry = new caosNoop();
-		s->current->thread(entry);
+		int entry = s->current->getNextIndex();
 		s->v->exp_dialect->doParse(s);
 		
 		token *comparison = getToken(TOK_WORD);
@@ -70,16 +66,14 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 		}
 
 		if (!wasAnd) {
-			nextOr->setSuccessor(entry);
-			nextOr = new caosNoop();
-			s->current->addOp(nextOr);
+			s->current->fixRelocation(nextOr, entry);
+			nextOr = s->current->newRelocation();
 		} else {
-			nextAnd->setSuccessor(entry);
-			nextAnd = new caosNoop();
-			s->current->addOp(nextAnd);
+			s->current->fixRelocation(nextAnd, entry);
+			nextAnd = s->current->newRelocation();
 		}
 		
-		caosOp *jumpTarget = isOr ? nextAnd : nextOr;
+		int jumpTarget = isOr ? nextAnd : nextOr;
 		if (!isOr) compar = ~compar & CMASK;
 		
 		s->current->thread(new caosCond(compar, jumpTarget));
@@ -87,9 +81,9 @@ void parseCondition(caosScript *s, caosOp *success, caosOp *failure) {
 		
 		if (isLast) break;
 	}
-	nextAnd->setSuccessor(success);
-	nextOr->setSuccessor(failure);
-	s->current->last->setSuccessor(wasAnd ? success : failure);
+	s->current->fixRelocation(nextAnd, success);
+	s->current->fixRelocation(nextOr,  failure);
+	s->current->thread(new caosJMP(wasAnd ? success : failure));
 }
 
 void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {
@@ -133,6 +127,11 @@ class ConstOp : public caosOp {
 		ConstOp(const caosVar &val) {
 			constVal = val;
 		}
+
+		std::string dump() {
+			return std::string("CONST ") + constVal.dump();
+		}
+
 };
 
 class opVAxx : public caosOp {
@@ -143,6 +142,12 @@ class opVAxx : public caosOp {
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			vm->valueStack.push_back(&vm->var[index]);
+		}
+
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "VA%02d", index);
+			return std::string(buf);
 		}
 };
 
@@ -156,6 +161,11 @@ class opOVxx : public caosOp {
 			caos_assert(vm->targ);
 			vm->valueStack.push_back(&vm->targ->var[index]);
 		}
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "OV%02d", index);
+			return std::string(buf);
+		}
 };
 
 class opMVxx : public caosOp {
@@ -168,6 +178,11 @@ class opMVxx : public caosOp {
 			caos_assert(vm->owner);
 			vm->valueStack.push_back(&vm->owner->var[index]);
 		}
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "MV%02d", index);
+			return std::string(buf);
+		}
 };
 
 class opBytestr : public caosOp {
@@ -178,6 +193,16 @@ class opBytestr : public caosOp {
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			vm->valueStack.push_back(bytestr);
+		}
+
+		std::string dump() {
+			std::ostringstream oss;
+			oss << "BYTESTR [ ";
+			for (int i = 0; i < bytestr.size(); i++) {
+				oss << i << " ";
+			}
+			oss << "]";
+			return oss.str();
 		}
 };
 
@@ -223,29 +248,27 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 	if (t->type == TOK_WORD) {
 		if (t->word == "endi") {
 			if (failure) // we don't have an else clause
-				s->current->thread(failure);
-			s->current->thread(exit);
+				s->current->fixRelocation(failure);
 			stop = true;
 			return;
 		}
 		if (t->word == "else") {
 			if (!failure)
 				throw new parseException("double else clause is forbidden");
-			s->current->thread(exit);
-			s->current->last = failure;
-			failure = NULL;
+			s->current->thread(new caosJMP(exit));
+			s->current->fixRelocation(failure);
+			failure = 0;
 			return;
 		}
 		if (t->word == "elif") {
 			// emuluate an else-doif-endi block
 			if (!failure)
 				throw new parseException("double else clause is forbidden");
-			s->current->thread(exit);
-			s->current->last = failure;
-			failure = NULL;
+			s->current->thread(new caosJMP(exit));
+			s->current->fixRelocation(failure);
+			failure = 0;
 			DoifParser dip;
 			dip(s, this);
-			s->current->thread(exit);
 			stop = true;
 			return;
 		}

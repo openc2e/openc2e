@@ -57,13 +57,13 @@ class OneShotDialect : public Dialect {
 
 // XXX: these don't really belong here
 
-void parseCondition(caosScript *s, caosOp *success, caosOp *failure);
+void parseCondition(caosScript *s, int success, int failure);
 
 class DoifDialect : public Dialect {
 	protected:
-		caosOp *success, *failure, *exit;
+		int success, failure, exit;
 	public:
-		DoifDialect(caosScript *scr, caosOp *s, caosOp *f, caosOp *e)
+		DoifDialect(caosScript *scr, int s, int f, int e)
 			: success(s), failure(f), exit(e) {
 				delegates = scr->v->cmd_dialect->delegates; // XXX
 			}
@@ -72,21 +72,19 @@ class DoifDialect : public Dialect {
 
 class DoifParser : public parseDelegate {
 	protected:
-		caosOp *success, *failure, *exit;
 	public:
 		virtual void operator()(class caosScript *s, class Dialect *curD) {
-			success = new caosNoop();
-			failure = new caosNoop();
-			exit = new caosNoop();
-			s->current->addOp(success);
-			s->current->addOp(failure);
-			s->current->addOp(exit);
+			int success, failure, exit;
+			success = s->current->newRelocation();
+			failure = s->current->newRelocation();
+			exit    = s->current->newRelocation();
 			
 			parseCondition(s, success, failure);
 			
-			s->current->last = success;
 			DoifDialect d(s, success, failure, exit);
+			s->current->fixRelocation(success);
 			d.doParse(s);
+			s->current->fixRelocation(exit);
 		}
 };
 		
@@ -108,12 +106,11 @@ class REPE : public parseDelegate {
 class parseREPS : public parseDelegate {
 	public:
 		void operator() (class caosScript *s, class Dialect *curD) {
-			caosOp *exit = new caosNoop();
-			s->current->addOp(exit);
-			
+			int exit = s->current->newRelocation();
+
 			s->v->exp_dialect->parseOne(s); // repcount
-			caosOp *entry = new caosREPS(exit);
-			s->current->thread(entry);
+			int entry = s->current->getNextIndex();
+			s->current->thread(new caosREPS(exit));
 
 			Dialect d;
 			REPE r;
@@ -121,27 +118,27 @@ class parseREPS : public parseDelegate {
 			d.delegates["repe"] = &r;
 
 			d.doParse(s);
-			s->current->last->setSuccessor(entry);
-			s->current->last = exit;
+			s->current->thread(new caosJMP(entry));
+			s->current->fixRelocation(exit);
 		}
 };
 
 class EVER : public parseDelegate {
 	protected:
-		caosOp *exit;
+		int exit;
 	public:
-		EVER(caosOp *exit_) : exit(exit_) {}
+		EVER(int exit_) : exit(exit_) {}
 		void operator() (class caosScript *s, class Dialect *curD) {
-			s->current->thread(exit);
+			s->current->thread(new caosJMP(exit));
 			curD->stop = true;
 		}
 };
 
 class UNTL : public parseDelegate {
 	protected:
-		caosOp *entry, *exit;
+		int entry, exit;
 	public:
-		UNTL(caosOp *en, caosOp *ex) : entry(en), exit(ex) {}
+		UNTL(int en, int ex) : entry(en), exit(ex) {}
 		void operator() (class caosScript *s, class Dialect *curD) {
 			parseCondition(s, exit, entry);
 			curD->stop = true;
@@ -151,11 +148,8 @@ class UNTL : public parseDelegate {
 class parseLOOP : public parseDelegate {
 	public:
 		void operator() (class caosScript *s, class Dialect *curD) {
-			caosOp *exit = new caosNoop();
-			s->current->addOp(exit);
-			
-			caosOp *entry = new caosNoop();
-			s->current->thread(entry);
+			int exit = s->current->newRelocation();
+			int entry = s->current->getNextIndex();
 
 			Dialect d;
 			EVER ever(entry); UNTL untl(entry, exit);
@@ -164,9 +158,7 @@ class parseLOOP : public parseDelegate {
 			d.delegates["untl"] = &untl;
 
 			d.doParse(s);
-			// No need to thread - if we use UNTL, we _will_ go to either
-			// entry or exit
-			s->current->last = exit;
+			s->current->fixRelocation(exit);
 		}
 };
 
@@ -176,10 +168,9 @@ class parseGSUB : public parseDelegate {
 		void operator() (class caosScript *s, class Dialect *curD) {
 			token *t = getToken(TOK_WORD);
 			std::string label = t->word;
-			caosOp *targ = s->current->gsub[label];
+			int targ = s->current->gsub[label];
 			if (!targ) {
-				targ = new caosNoop();
-				s->current->addOp(targ);
+				targ = s->current->newRelocation();
 				s->current->gsub[label] = targ;
 			}
 			s->current->thread(new caosGSUB(targ));
@@ -189,15 +180,14 @@ class parseGSUB : public parseDelegate {
 class parseSUBR : public parseDelegate {
 	public:
 		void operator() (class caosScript *s, class Dialect *curD) {
+			s->current->thread(new caosSTOP());
+
 			token *t = getToken(TOK_WORD);
 			std::string label = t->word;
-			caosOp *targ = s->current->gsub[label];
-			if (!targ) {
-				targ = new caosNoop();
-				s->current->addOp(targ);
-				s->current->gsub[label] = targ;
-			}
-			s->current->last = targ;
+			int r = s->current->gsub[label];
+			if (r)
+				s->current->fixRelocation(r);
+			s->current->gsub[label] = s->current->getNextIndex();
 		}
 };
 
@@ -217,10 +207,9 @@ class ENUMhelper : public parseDelegate {
 
 		void operator() (class caosScript *s, class Dialect *curD) {
 			(p)(s, curD);
-			caosOp *exit = new caosNoop();
-			caosOp *entry = new caosENUM_POP(exit);
-			s->current->thread(entry);
-			s->current->addOp(exit);
+			int exit = s->current->newRelocation();
+			int entry = s->current->getNextIndex();
+			s->current->thread(new caosENUM_POP(exit));
 			
 			Dialect d;
 			NEXT n;
@@ -228,8 +217,8 @@ class ENUMhelper : public parseDelegate {
 			d.delegates["next"] = &n;
 			
 			d.doParse(s);
-			s->current->thread(entry);
-			s->current->last = exit;
+			s->current->thread(new caosJMP(entry));
+			s->current->fixRelocation(exit);
 		}
 };
 class ExprDialect : public OneShotDialect {

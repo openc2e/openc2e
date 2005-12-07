@@ -33,16 +33,11 @@ using std::string;
 
 class unexpectedEOIexception { };
 
-void script::addOp(caosOp *op) {
-	if (op->owned) return;
-	op->owned = true;
-	allOps.push_back(op);
-}
-
 void script::thread(caosOp *op) {
-	addOp(op);
-	last->setSuccessor(op);
-	last = op;
+	assert (!op->owned && !linked);
+	op->owned = true;
+	op->index = allOps.size();
+	allOps.push_back(op);
 }
 
 script::~script() {
@@ -51,13 +46,58 @@ script::~script() {
 		delete *i++;
 }
 
-
-script::script(const Variant *v, const std::string &fn) : variant(v) {
-	filename = fn;
-	entry = last = new caosNoop();
-	allOps.push_back(entry);
+void script::link() {
+	thread(new caosSTOP());
+	assert(!linked);
+//	std::cout << "Pre-link:" << std::endl << dump();
+	// check relocations
+	for (int i = 1; i < relocations.size(); i++) {
+		// handle relocations-to-relocations
+		int p = relocations[i];
+		while (p < 0)
+			p = relocations[-p];
+		relocations[i] = p;
+	}
+	for (int i = 0; i < allOps.size(); i++) {
+		allOps[i]->relocate(relocations);
+	}
+	linked = true;
+//	std::cout << "Post-link:" << std::endl << dump();
 }
 
+script::script(const Variant *v, const std::string &fn)
+	: variant(v), filename(fn) {
+	allOps.push_back(new caosNoop());
+	relocations.push_back(0);
+	linked = false;
+}
+
+std::string script::dump() {
+	std::ostringstream oss;
+	oss << "Relocations:" << std::endl;
+	for (int i = 1; i < relocations.size(); i++) {
+		char buf[32];
+		sprintf(buf, "%08d -> %08d", i, relocations[i]);
+		oss << buf << std::endl;
+	}
+	oss << "Code:" << std::endl;
+	for (int i = 0; i < allOps.size(); i++) {
+		char buf[16];
+		sprintf(buf, "%08d: ", i);
+		oss << buf;
+		oss << allOps[i]->dump();
+		oss << std::endl;
+	}
+	return oss.str();
+}
+
+#if 0
+// for gdb
+static int dump_out(script *s) {
+	std::cerr << s->dump() << std::endl;
+}
+#endif
+	
 
 class ENDM : public parseDelegate {
 	public:
@@ -144,6 +184,14 @@ void caosScript::parse(std::istream &in) {
 	BaseDialect d(this);
 	d.doParse(this);
 
+	installer->link();
+	if (removal)
+		removal->link();
+	std::vector<residentScript>::iterator i = scripts.begin();
+	while (i != scripts.end()) {
+		i->s->link();
+		i++;
+	}
 }
 
 caosScript::~caosScript() {

@@ -68,7 +68,8 @@ OPENC2E = \
 	dialect.o \
 	lex.mng.o \
 	mngparser.tab.o \
-	gc.o
+	gc.o \
+	bytecode.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
 XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer

@@ -291,7 +291,9 @@ extern "C" int main(int argc, char *argv[]) {
 			script->parse(s);
 			caosVM vm(0);
 			script->installScripts();
+//			std::cout << script->installer->dump();
 			vm.runEntirely(script->installer);
+
 		} catch (creaturesException &e) {
 			std::cerr << "script exec failed due to exception " << e.what();
 			std::cerr << std::endl;
