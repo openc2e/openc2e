@@ -118,7 +118,6 @@
 
 /**
  RETN (command)
- %status maybe
  %pragma retc -1
  %status maybe
  
