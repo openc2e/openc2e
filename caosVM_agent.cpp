@@ -257,17 +257,17 @@ void caosVM::c_BHVR() {
 	targ->cr_can_push = targ->cr_can_pull = targ->cr_can_stop =
 		targ->cr_can_hit = targ->cr_can_eat = targ->cr_can_pickup = false;
 	
-	if (bhvr & 0x1 == 0x1) // creature can push
+	if (bhvr & 0x1) // creature can push
 		targ->cr_can_push = true;
-	if (bhvr & 0x2 == 0x2) // creature can pull
+	if (bhvr & 0x2) // creature can pull
 		targ->cr_can_pull = true;
-	if (bhvr & 0x4 == 0x4) // creature can stop
+	if (bhvr & 0x4) // creature can stop
 		targ->cr_can_stop = true;
-	if (bhvr & 0x8 == 0x8) // creature can hit
+	if (bhvr & 0x8) // creature can hit
 		targ->cr_can_hit = true;
-	if (bhvr & 0x10 == 0x10) // creature can eat
+	if (bhvr & 0x10) // creature can eat
 		targ->cr_can_eat = true;
-	if (bhvr & 0x20 == 0x20) // creature can pick up
+	if (bhvr & 0x20) // creature can pick up
 		targ->cr_can_pickup = true;
 }
 
