@@ -53,6 +53,8 @@ void caosVM::c_SNDC() {
 	VM_PARAM_STRING(filename)
 
 	caos_assert(targ);
+	if (targ->soundslot)
+		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
 	SoundSlot *s = g_backend->getAudioSlot(filename);
 	if (s) {
@@ -72,6 +74,8 @@ void caosVM::c_SNDL() {
 	VM_PARAM_STRING(filename)
 
 	caos_assert(targ);
+	if (targ->soundslot)
+		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
 	SoundSlot *s = g_backend->getAudioSlot(filename);
 	if (s) {
