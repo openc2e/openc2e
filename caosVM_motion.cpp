@@ -236,9 +236,8 @@ void caosVM::v_RELX() {
 	VM_PARAM_AGENT(second)
 	VM_PARAM_AGENT(first)
 
-	// TODO: should we divide by 2.0 to get float answer?
-	float one = first->x + (first->getWidth() / 2);
-	float two = second->x + (second->getWidth() / 2);
+	float one = first->x + (first->getWidth() / 2.0);
+	float two = second->x + (second->getWidth() / 2.0);
 
 	result.setFloat(two - one);
 }
@@ -252,9 +251,8 @@ void caosVM::v_RELY() {
 	VM_PARAM_AGENT(second)
 	VM_PARAM_AGENT(first)
 
-	// TODO: should we divide by 2.0 to get float answer? check it with the second lift in the norn terrarium..
-	float one = first->y + (first->getHeight() / 2);
-	float two = second->y + (second->getHeight() / 2);
+	float one = first->y + (first->getHeight() / 2.0);
+	float two = second->y + (second->getHeight() / 2.0);
 
 	result.setFloat(two - one);
 }
