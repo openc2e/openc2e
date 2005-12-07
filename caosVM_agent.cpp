@@ -250,7 +250,25 @@ void caosVM::c_TICK() {
 void caosVM::c_BHVR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(bhvr)
-	// TODO
+	
+	caos_assert(targ);
+
+	// reset bhvr
+	targ->cr_can_push = targ->cr_can_pull = targ->cr_can_stop =
+		targ->cr_can_hit = targ->cr_can_eat = targ->cr_can_pickup = false;
+	
+	if (bhvr & 0x1 == 0x1) // creature can push
+		targ->cr_can_push = true;
+	if (bhvr & 0x2 == 0x2) // creature can pull
+		targ->cr_can_pull = true;
+	if (bhvr & 0x4 == 0x4) // creature can stop
+		targ->cr_can_stop = true;
+	if (bhvr & 0x8 == 0x8) // creature can hit
+		targ->cr_can_hit = true;
+	if (bhvr & 0x10 == 0x10) // creature can eat
+		targ->cr_can_eat = true;
+	if (bhvr & 0x20 == 0x20) // creature can pick up
+		targ->cr_can_pickup = true;
 }
 
 /**
@@ -401,13 +419,23 @@ void caosVM::v_BASE() {
 void caosVM::v_BHVR() {
 	VM_VERIFY_SIZE(0)
 
-	result.setInt(0);
-	// TODO
+	caos_assert(targ);
+	
+	unsigned char bvr = 0;
+
+	if (targ->cr_can_push) bvr += 0x1;
+	if (targ->cr_can_pull) bvr += 0x2;
+	if (targ->cr_can_stop) bvr += 0x4;
+	if (targ->cr_can_hit) bvr += 0x8;
+	if (targ->cr_can_eat) bvr += 0x10;
+	if (targ->cr_can_pickup) bvr += 0x20;
+
+	result.setInt(bvr);
 }
 
 /**
  CARR (agent)
- %status maybe
+ %status stub
 */
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
@@ -475,6 +503,8 @@ void caosVM::v_PNTR() {
 }
 
 unsigned int calculateScriptId(unsigned int message_id) {
+	// aka, why oh why is this needed?
+
 	switch (message_id) {
 		case 2: /* deactivate */
 			return 0;
@@ -558,7 +588,7 @@ void caosVM::c_SHOW() {
 void caosVM::v_POSX() {
 	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
-	result.setFloat(targ->x + (targ->getWidth() / 2));
+	result.setFloat(targ->x + (targ->getWidth() / 2.0));
 }
 
 /**
@@ -568,7 +598,7 @@ void caosVM::v_POSX() {
 void caosVM::v_POSY() {
 	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
-	result.setFloat(targ->y + (targ->getHeight() / 2));
+	result.setFloat(targ->y + (targ->getHeight() / 2.0));
 }
 
 /**
@@ -638,7 +668,7 @@ void caosVM::c_OVER() {
 
 /**
  PUHL (command) pose (integer) x (integer) y (integer)
- %status maybe
+ %status stub
 
  set relative x/y coords for TARG's pickup point
  pose is -1 for all poses, or a pose relative to the base specified in NEW: (not BASE)
@@ -801,7 +831,7 @@ void caosVM::v_TRAN() {
 	
 /**
  TRAN (command) transparency (integer) part_no (integer)
- %status maybe
+ %status stub
 */
 void caosVM::c_TRAN() {
 	VM_VERIFY_SIZE(2)
@@ -937,7 +967,7 @@ void caosVM::v_DISQ() {
 
 /**
  ALPH (command) alpha_value (integer) enable (integer)
- %status stub
+ %status maybe
 */
 void caosVM::c_ALPH() {
 	VM_PARAM_INTEGER(enable)
@@ -945,7 +975,7 @@ void caosVM::c_ALPH() {
 
 	caos_assert(targ);
 
-	// TODO
+	targ->transparency = alpha_value;
 }
 
 /**
@@ -956,6 +986,8 @@ void caosVM::c_ALPH() {
 */
 void caosVM::v_HELD() {
 	result.setAgent(0);
+
+	// TODO
 }
 
 /* vim: set noet: */

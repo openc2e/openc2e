@@ -342,6 +342,7 @@ void caosVM::v_FALL() {
 
 /**
  MOVS (integer)
+ %status stub
 */
 void caosVM::v_MOVS() {
 	caos_assert(targ);

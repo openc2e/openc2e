@@ -70,12 +70,20 @@ public:
 	}
 	
 	int clac[3]; int clik;
+	// attr
 	bool carryable, mouseable, activateable, invisible, floatable;
 	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
+	// bhvr
+	bool cr_can_push, cr_can_pull, cr_can_stop;
+	bool cr_can_hit, cr_can_eat, cr_can_pickup;
 	
 	bool visible;
+	unsigned char transparency;
+
 	unsigned char family, genus;
 	unsigned short species;
+
+	// motion
 	caosVar velx, vely;
 	float accg, aero;
 	unsigned int friction;
