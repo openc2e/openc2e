@@ -79,7 +79,7 @@ public:
 	caosVar velx, vely;
 	float accg, aero;
 	unsigned int friction;
-	int perm;
+	int perm, elas;
 	float x, y;
 
 	float range;

@@ -32,7 +32,20 @@ using std::cerr;
 void caosVM::c_ELAS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(elas)
-	// TODO
+
+	caos_assert(targ);
+	targ->elas = elas;
+}
+
+/***
+ ELAS (integer)
+ %status maybe
+*/
+void caosVM::v_ELAS() {
+	VM_VERIFY_SIZE(0)
+
+	caos_assert(targ);
+	result.setInt(targ->elas);
 }
 
 /**

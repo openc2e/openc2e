@@ -343,6 +343,7 @@ public:
 	
 	// motion
 	void c_ELAS();
+	void v_ELAS();
 	void c_MVTO();
 	void v_VELX();
 	void v_VELY();
