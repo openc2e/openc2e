@@ -38,7 +38,7 @@ imageGallery gallery;
 
 enum filetype { blk, s16, c16 };
 
-path cacheDirectory() {
+path homeDirectory() {
 	path p;
 	char *envhome = getenv("HOME");
 	if (envhome)
@@ -49,7 +49,11 @@ path cacheDirectory() {
 		std::cerr << "Can't work out what your home directory is, giving up and using /tmp for now." << std::endl;
 		p = path("/tmp", native); // sigh
 	}
-	p = path(p.native_directory_string() + "/.openc2e", native);
+	return p;
+}
+
+path cacheDirectory() {
+	path p = path(homeDirectory().native_directory_string() + "/.openc2e", native);
 	if (!exists(p))
 		create_directory(p);
 	else if (!is_directory(p))

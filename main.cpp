@@ -89,6 +89,7 @@ void drawWorld() {
 }
 
 namespace fs = boost::filesystem;
+extern fs::path homeDirectory(); // creaturesImage.cpp
 
 extern "C" {
 	extern char *optarg;
@@ -321,7 +322,17 @@ extern "C" int main(int argc, char *argv[]) {
 		listensocket = SDLNet_TCP_Open(&ip); 
 	}
 	assert(listensocket);
+	
 	std::cout << "listening on port " << listenport << std::endl;
+	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
+	if (!fs::exists(p))
+		fs::create_directory(p);
+	if (fs::is_directory(p)) {
+		std::ofstream f((p.native_directory_string() + "/port").c_str(), ios::trunc);
+		char buf[6];
+		snprintf(buf, 6, "%i", listenport);
+		f << buf;
+	}		
 
 	Agent *handAgent = 0;
 
