@@ -260,4 +260,31 @@ void caosVM::v_PTXT() {
 	result.setString(p->getText());
 }
 
+/**
+ PNXT (integer) previous_part (integer)
+ %status maybe
+
+ returns the next part of the TARG compound agent, or the first part if you pass -1, or -1 if you're at the end
+*/
+void caosVM::v_PNXT() {
+	VM_PARAM_INTEGER(previous_part)
+
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+
+	// TODO: this might not be the best way to do this..
+	CompoundPart *curpart = 0;
+	
+	for (std::vector<CompoundPart *>::iterator x = c->parts.begin(); x != c->parts.end(); x++) {
+		unsigned int i = (*x)->id;
+		if ((int)i > previous_part)
+			if (!curpart || i < curpart->id)
+				curpart = *x;
+	}
+
+	if (curpart) result.setInt(curpart->id);
+	else result.setInt(-1);
+}
+
 /* vim: set noet: */

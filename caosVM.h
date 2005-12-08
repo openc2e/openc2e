@@ -393,6 +393,7 @@ public:
 	void c_FRMT();
 	void c_PTXT();
 	void v_PTXT();
+	void v_PNXT();
 
 	// creatures
 	void c_STIM_SHOU();

@@ -127,5 +127,7 @@ public:
 	virtual unsigned int getHeight() { return height; }
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
+
+	friend class caosVM;
 };
 /* vim: set noet: */
