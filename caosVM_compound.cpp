@@ -173,7 +173,7 @@ void caosVM::c_PAT_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part)
 	
-	caos_assert(part >= 0);
+	caos_assert(part > 0);
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
