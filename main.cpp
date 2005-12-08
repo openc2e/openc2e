@@ -399,14 +399,19 @@ extern "C" int main(int argc, char *argv[]) {
 			}
 
 			std::istringstream s(data);
-			caosScript *script = new caosScript(gametype, "<network>"); // XXX
-			script->parse(s);
-			script->installScripts();
-			caosVM vm(0);
-			std::ostringstream o;
-			vm.setOutputStream(o);
-			vm.runEntirely(script->installer);
-			SDLNet_TCP_Send(connection, (void *)o.str().c_str(), o.str().size());
+			try {
+				caosScript *script = new caosScript(gametype, "<network>"); // XXX
+				script->parse(s);
+				script->installScripts();
+				caosVM vm(0);
+				std::ostringstream o;
+				vm.setOutputStream(o);
+				vm.runEntirely(script->installer);
+				SDLNet_TCP_Send(connection, (void *)o.str().c_str(), o.str().size());
+			} catch (creaturesException &e) {
+				std::string o = std::string("### EXCEPTION: ") + e.what();
+				SDLNet_TCP_Send(connection, (void *)o.c_str(), o.size());
+			}
 
 			SDLNet_TCP_Close(connection);
 		}
