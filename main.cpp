@@ -383,7 +383,7 @@ extern "C" int main(int argc, char *argv[]) {
 			world.pace = avgtime / 10;
 
 			ticked = true;
-		}
+		} else SDL_Delay(10);
 		
 		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
 			std::string data;
