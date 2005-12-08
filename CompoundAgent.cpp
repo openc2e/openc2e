@@ -21,9 +21,16 @@
 #include "openc2e.h"
 #include "c16Image.h"
 #include <algorithm> // sort
+#include <iostream> // debug only!
+#include <functional> // binary_function
+
+// the list of parts is a list of pointers to CompoundPart, so we need a custom sort
+struct less_part : public std::binary_function<CompoundPart *, CompoundPart *, bool> {
+	bool operator()(CompoundPart *x, CompoundPart *y) { return *x < *y; }
+};
 
 void CompoundAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	// todo: we're ignoring zorder here..
+	// todo: we're ignoring zorder here.. (it's handled by the sort in addPart)
 	for (std::vector<CompoundPart *>::iterator i = parts.begin(); i != parts.end(); i++) {
 		(*i)->render(renderer, xoffset + (int)x, yoffset + (int)y);
 	}
@@ -44,7 +51,7 @@ void CompoundAgent::addPart(CompoundPart *p) {
 
 	// todo: we should prbly insert at the right place, not call sort
 	parts.push_back(p);
-	std::sort(parts.begin(), parts.end());
+	std::sort(parts.begin(), parts.end(), less_part());
 }
 
 void CompoundAgent::delPart(unsigned int id) {

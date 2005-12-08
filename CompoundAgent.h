@@ -48,8 +48,8 @@ public:
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
 				
-	bool operator < (const CompoundPart *b) const {
-		return zorder < b->zorder;
+	bool operator < (const CompoundPart &b) const {
+		return zorder < b.zorder;
 	}
 	
 	virtual ~CompoundPart() { }
