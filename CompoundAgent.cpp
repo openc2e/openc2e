@@ -21,7 +21,6 @@
 #include "openc2e.h"
 #include "c16Image.h"
 #include <algorithm> // sort
-#include <iostream> // debug only!
 #include <functional> // binary_function
 
 // the list of parts is a list of pointers to CompoundPart, so we need a custom sort
@@ -69,10 +68,6 @@ CompoundPart *CompoundAgent::part(unsigned int id) {
 	return 0;
 }
 
-void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, is_transparent, transparency);
-}
-
 CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsigned short _species, unsigned int plane,
 				std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
 				Agent(_family, _genus, _species, plane), width(0), height(0) {
@@ -88,40 +83,6 @@ CompoundAgent::~CompoundAgent() {
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
 		delete *x;
 	}
-}
-
-CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg,
-						unsigned int _x, unsigned int _y, unsigned int _z) {
-	id = _id;
-	firstimg = fimg;
-	x = _x;
-	y = _y;
-	zorder = _z;
-	sprite = gallery.getImage(spritefile);
-	caos_assert(sprite);
-	pose = 0;
-	is_transparent = false;
-	framerate = 1;
-	framedelay = 0;
-}
-
-DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-			 unsigned int _z) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
-}
-
-ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-						   unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
-	// TODO: store animhover, msgid and option
-}
-
-FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-		                                  unsigned int _z, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z) {
-	// TODO: load fontsprite
-}
-
-TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z) {
-	// TODO: load fontsprite, msgid
 }
 
 // TODO: combine identical code from SimpleAgent/CompoundAgent
@@ -157,26 +118,6 @@ void CompoundAgent::tick() {
 
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
 		(*x)->tick();
-	}
-}
-
-void CompoundPart::tick() {
-	if (!animation.empty()) {
-                if (framerate > 1) {
-			framedelay++;
-			if (framedelay == (1 << framerate - 1))
-				framedelay = 0;
-		}
-		
-		if (framedelay == 0) {
-			unsigned int f = frameno + 1;
-			if (f == animation.size()) return;
-			if (animation[f] == 255) {
-				if (f == (animation.size() - 1)) f = 0;
-				else f = animation[f + 1];
-			}
-			setFrameNo(f);
-		}
 	}
 }
 

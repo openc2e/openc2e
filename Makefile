@@ -40,6 +40,7 @@ OPENC2E = \
 	caosVM_world.o \
 	Catalogue.o \
 	CompoundAgent.o \
+	CompoundPart.o \
 	Creature.o \
 	creaturesImage.o \
 	fileSwapper.o \
