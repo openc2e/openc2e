@@ -329,8 +329,6 @@ void caosVM::c_ANIM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_BYTESTR(bs)
 
-	std::vector<unsigned int> *animation;
-
 	caos_assert(targ);
 
  	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
@@ -339,7 +337,37 @@ void caosVM::c_ANIM() {
 	caos_assert(p);
 	c->part(part)->animation = bs;
 	
-	if (!bs.empty()) c->part(part)->setFrameNo(0);
+	if (!bs.empty()) c->part(part)->setFrameNo(0); // TODO: correct?
+}
+
+/**
+ ANMS (command) poselist (string)
+ %status stub
+
+ exactly like ANIM, only using a string and not a bytestring for source.
+*/
+void caosVM::c_ANMS() {
+	VM_PARAM_STRING(poselist)
+
+	// TODO: technically, we should parse this properly, also do error checking
+	std::vector<unsigned int> animation;
+
+	std::string t;
+	for (unsigned int i = 0; i < poselist.size(); i++) {
+		if (poselist[i] == ' ')
+			if (!t.empty())
+				animation.push_back(atoi(t.c_str()));
+		else
+			t = t + poselist[i];
+	}
+
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	c->part(part)->animation = animation;
+	
+	if (!animation.empty()) c->part(part)->setFrameNo(0); // TODO: correct?
 }
 
 /**
@@ -959,6 +987,31 @@ void caosVM::v_HELD() {
 	result.setAgent(0);
 
 	// TODO
+}
+
+/**
+ GALL (command) spritefile (string) first_image (integer)
+ %status stub
+
+ Change the sprite file and first image associated with the current agent or part.
+*/
+void caosVM::c_GALL() {
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_STRING(spritefile)
+}
+
+/**
+ GALL (string)
+ %status maybe
+
+ Return the name of the sprite file associated with the current agent or part.
+*/
+void caosVM::v_GALL() {
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	result.setString(p->getSprite()->name);
 }
 
 /* vim: set noet: */

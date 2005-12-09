@@ -39,6 +39,8 @@ protected:
 	std::ifstream *stream;
   
 public:
+	std::string name;
+
 	creaturesImage() { refcount = 0; stream = 0; }
 	virtual ~creaturesImage() { if (stream) delete stream; }
 	bool is565() { return is_565; }

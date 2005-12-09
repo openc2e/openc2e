@@ -302,6 +302,7 @@ public:
 	void c_KILL();
 	void c_SCRX();
 	void c_ANIM();
+	void c_ANMS();
 	void v_ATTR();
 	void v_ABBA();
 	void c_BASE();
@@ -347,6 +348,8 @@ public:
 	void v_DISQ();
 	void c_ALPH();
 	void v_HELD();
+	void c_GALL();
+	void v_GALL();
 	
 	// motion
 	void c_ELAS();
@@ -531,6 +534,16 @@ public:
 	void c_NET_LINE();
 	void v_NET_LINE();
 	void v_NET_ERRA();
+
+	// genetics
+	void c_GENE_CLON();
+	void c_GENE_CROS();
+	void c_GENE_KILL();
+	void c_GENE_LOAD();
+	void c_GENE_MOVE();
+	void v_GTOS();
+	void v_MTOA();
+	void v_MTOC();
 
 	void runOp();
 	void runTimeslice(int units);

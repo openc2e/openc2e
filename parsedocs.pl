@@ -18,6 +18,7 @@ my %fnmap = ( # default category mappings
 	'caosVM_debug.cpp' => 'Debugging',
 	'caosVM_files.cpp' => 'Files',
 	'caosVM_flow.cpp' => 'Flow control',
+	'caosVM_genetics.cpp' => 'Genetics',
 	'caosVM_input.cpp' => 'Input',
 	'caosVM_map.cpp' => 'Map',
 	'caosVM_motion.cpp' => 'Motion',
@@ -28,6 +29,7 @@ my %fnmap = ( # default category mappings
 	'caosVM_time.cpp' => 'Time',
 	'caosVM_variables.cpp' => 'Variables',
 	'caosVM_vehicles.cpp' => 'Vehicles',
+	'caosVM_world.cpp' => 'World',
 );
 
 my %data;

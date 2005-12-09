@@ -64,6 +64,7 @@ path cacheDirectory() {
 bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype ft) {
 	path cachefile, realfile;
 	std::string cachename;
+	std::string basename = fname; basename.erase(basename.end() - 4, basename.end()); 
 
 	// work out where the real file should be
 	switch (ft) {
@@ -132,6 +133,7 @@ done:
 			case c16: img = new c16Image(in); break; // this should never happen, actually, once we're done
 			case s16: img = new s16Image(in); break;
 		}
+		img->name = basename;
 	}
 	return in->is_open();
 }
