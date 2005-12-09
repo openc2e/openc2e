@@ -19,8 +19,9 @@
 
 #include "World.h"
 #include "caosVM.h" // for setupCommandPointers()
-#include "SimpleAgent.h"
+#include "PointerAgent.h"
 #include <limits.h> // for MAXINT
+#include "creaturesImage.h"
 
 World world;
 
@@ -31,12 +32,10 @@ World::World() {
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
 void World::init() {
-	theHand = new PointerAgent();
-	try {
-		((SimpleAgent *)theHand)->setImage("hand");
-	} catch (caosException &e) {
-		((SimpleAgent *)theHand)->setImage("syst"); // Creatures Village
-	}
+	if (gallery.getImage("hand")) // TODO: we refcount one too many here, i expect // TODO: we refcount one too many here, i expect
+		theHand = new PointerAgent("hand");
+	else	
+		theHand = new PointerAgent("syst"); // Creatures Village
 }
 
 caosVM *World::getVM(Agent *a) {

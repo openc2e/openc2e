@@ -16,7 +16,7 @@
 
 #include "World.h"
 #include "caosVM.h"
-#include "SimpleAgent.h"
+#include "PointerAgent.h"
 #include "SDLBackend.h"
 #include "dialect.h"
 

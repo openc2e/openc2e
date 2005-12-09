@@ -27,7 +27,7 @@ public:
 	std::string name;
 	bool handle_events;
 
-	PointerAgent();
+	PointerAgent(std::string spritefile);
 };
 
 #endif

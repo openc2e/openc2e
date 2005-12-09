@@ -20,9 +20,9 @@
 #include "caosVM.h"
 #include "openc2e.h"
 #include "Vehicle.h"
+#include "PointerAgent.h"
 #include "World.h"
 #include "creaturesImage.h"
-#include "SimpleAgent.h"
 #include <iostream>
 using std::cerr;
 
@@ -106,8 +106,7 @@ void caosVM::c_NEW_SIMP() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, first_image, image_count);
-	a->setImage(sprite_file);
+	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	setTarg(a);
 }
 
@@ -197,14 +196,9 @@ void caosVM::c_POSE() {
 
 	caos_assert(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c) {
-		CompoundPart *p = c->part(part);
-		p->setPose(pose);
-	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-		caos_assert(a);
-		a->setPose(pose);
-	}
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	p->setPose(pose);
 }
 
 /**
@@ -301,15 +295,10 @@ void caosVM::v_POSE() {
 	caos_assert(targ);
 
 	CompoundAgent *n = dynamic_cast<CompoundAgent *>(targ.get());
-	if (n) {
-		CompoundPart *p = n->part(part);
-		result.setInt(p->getPose());
-		// TODO
-	} else {
-		SimpleAgent *n = dynamic_cast<SimpleAgent *>(targ.get());
-		caos_assert(n);
-		result.setInt(n->getPose());
-	}
+	caos_assert(n);
+	CompoundPart *p = n->part(part);
+	caos_assert(p);
+	result.setInt(p->getPose());
 }
 
 /**
@@ -344,22 +333,13 @@ void caosVM::c_ANIM() {
 
 	caos_assert(targ);
 
-	SimpleAgent *a;
  	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c) {
-		animation = &c->part(part)->animation;
-	} else {
-		a = dynamic_cast<SimpleAgent *>(targ.get());
-		caos_assert(a);
-		animation = &a->animation;
-	}
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	c->part(part)->animation = bs;
 	
-	*animation = bs;
-
-	if (!animation->empty()) {
-		if (c) c->part(part)->setFrameNo(0);
-		else a->setFrameNo(0);
-	}
+	if (!bs.empty()) c->part(part)->setFrameNo(0);
 }
 
 /**
@@ -386,12 +366,8 @@ void caosVM::c_BASE() {
 	 * use accessor methods
 	 */
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c) {
-		// TODO
-	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-		a->base_offset = index;
-	}
+	caos_assert(c);
+	// TODO
 }
 
 /**
@@ -404,12 +380,8 @@ void caosVM::v_BASE() {
 	caos_assert(targ);
  	
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c) {
-		result.setInt(-1); // TODO
-	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-		result.setInt(a->base_offset);
-	}
+	caos_assert(c);
+	result.setInt(-1); // TODO
 }
 
 /**
@@ -612,16 +584,11 @@ void caosVM::c_FRAT() {
 	caos_assert(targ);
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c) {
-		CompoundPart *p = c->part(part);
-		p->setFramerate(framerate);
-		p->framedelay = 0;
-	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-		caos_assert(a);
-		a->setFramerate(framerate);
-		a->framedelay = 0;
-	}
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	p->setFramerate(framerate);
+	p->framedelay = 0;
 }
 
 class blockUntilOver : public blockCond {
@@ -637,16 +604,11 @@ class blockUntilOver : public blockCond {
 			if (!targ) return false;
 			
 			CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-			if (c) {
-				CompoundPart *p = c->part(part);
-				fno = p->getFrameNo();
-				animsize = p->animation.size();
-			} else {
-				SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-				caos_assert(a);
-				fno = a->getFrameNo();
-				animsize = a->animation.size();
-			}
+			caos_assert(c);
+			CompoundPart *p = c->part(part);
+			caos_assert(p);
+			fno = p->getFrameNo();
+			animsize = p->animation.size();
 
 			if (fno + 1 == animsize) blocking = false;
 			else if (animsize == 0) blocking = false;
@@ -803,7 +765,9 @@ void caosVM::v_TRAN() {
 	VM_PARAM_INTEGER(x)
 
 	caos_assert(targ);
-	SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
+	// TODO
+	result.setInt(0);
+	/*SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
 	if (!a) {
 		// TODO: TRAN on other agents
 		// (if lc2e even allows that)
@@ -828,7 +792,7 @@ void caosVM::v_TRAN() {
 	if (data[w * y + x] == 0)
 		result.setInt(1);
 	else
-		result.setInt(0);
+		result.setInt(0); */
 }
 	
 /**
@@ -978,16 +942,11 @@ void caosVM::c_ALPH() {
 	caos_assert(targ);
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c) {
-		CompoundPart *p = c->part(part);
-		p->is_transparent = enable;
-		p->transparency = alpha_value;
-	} else {
-		SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-		caos_assert(a);
-		a->is_transparent = enable;
-		a->transparency = alpha_value;
-	}
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	p->is_transparent = enable;
+	p->transparency = alpha_value;
 }
 
 /**

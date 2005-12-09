@@ -18,7 +18,7 @@
  */
 
 #include "World.h"
-#include "CompoundAgent.h"
+#include "PointerAgent.h"
 #include "caosVM.h"
 #include <iostream>
 using std::cerr;

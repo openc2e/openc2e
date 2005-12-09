@@ -63,7 +63,7 @@ protected:
 
 	struct SoundSlot *soundslot;
 	void positionAudio(SoundSlot *);
-	
+
 public:
 	inline bool isDying() const {
 		return dying;

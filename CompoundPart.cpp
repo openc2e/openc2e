@@ -20,6 +20,7 @@
 #include "CompoundPart.h"
 #include "openc2e.h"
 #include "c16Image.h"
+#include "SDLBackend.h"
 
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, is_transparent, transparency);

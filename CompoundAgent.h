@@ -17,7 +17,10 @@
  *
  */
 
-#include "SimpleAgent.h"
+#ifndef _COMPOUNDAGENT_H
+#define _COMPOUNDAGENT_H
+
+#include "Agent.h"
 #include "creaturesImage.h"
 #include <map>
 #include <string>
@@ -48,4 +51,6 @@ public:
 
 	friend class caosVM;
 };
+
+#endif
 /* vim: set noet: */

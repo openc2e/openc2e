@@ -18,10 +18,10 @@
  */
 
 #include "Map.h"
-#include "PointerAgent.h"
 #include "Scriptorium.h"
 #include "Catalogue.h"
 #include "Camera.h"
+#include "Agent.h"
 #include <set>
 #include <map>
 
@@ -33,7 +33,7 @@ struct cainfo {
 
 class World {
 protected:
-	PointerAgent *theHand;
+	class PointerAgent *theHand;
 
 public:
 	Map map;
@@ -52,7 +52,7 @@ public:
 	MainCamera camera;
 
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
-	PointerAgent *hand() { return theHand; }
+	class PointerAgent *hand() { return theHand; }
 	
 	caosVM *getVM(Agent *owner);
 	void freeVM(caosVM *);

@@ -22,7 +22,7 @@
 #include "openc2e.h"
 
 // TODO: change imagecount?
-PointerAgent::PointerAgent() : SimpleAgent(2, 1, 1, UINT_MAX, 0, 0) {
+PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, UINT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = false;
 }
