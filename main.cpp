@@ -33,18 +33,30 @@ void drawWorld() {
 	int adjusty = world.camera.getY();
 	MetaRoom *m = world.camera.getMetaRoom();
 	blkImage *test = m->backImage();
+
+	// draw the blk
 	for (unsigned int i = 0; i < (test->totalheight / 128); i++) {
 		for (unsigned int j = 0; j < (test->totalwidth / 128); j++) {
+			// figure out which block number to use
 			unsigned int whereweare = j * (test->totalheight / 128) + i;
+			
 			SDL_Rect destrect;
-			destrect.x = (j * 128) - adjustx + m->x(); destrect.y = (i * 128) - adjusty + m->y();
-			if ((destrect.x >= -128) && (destrect.y >= -128) && (destrect.x - 128 <= backend.getWidth()) && (destrect.y - 128 <= backend.getHeight()))
+			destrect.x = (j * 128) - adjustx + m->x();
+			destrect.y = (i * 128) - adjusty + m->y();
+
+			// if the block's on screen, blit it.
+			if ((destrect.x >= -128) && (destrect.y >= -128) &&
+					(destrect.x - 128 <= backend.getWidth()) &&
+					(destrect.y - 128 <= backend.getHeight()))
 				SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
 		}
 	}
+
+	// render all the agents
 	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		(*i)->render(&backend, -adjustx, -adjusty);
 	}
+
 	if (showrooms) {
 		Room *r = world.map.roomAt(world.hand()->x, world.hand()->y);
 		for (std::vector<Room *>::iterator i = world.camera.getMetaRoom()->rooms.begin();
@@ -85,7 +97,8 @@ void drawWorld() {
 					col);
 		}
 	}
-	SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
+	//SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
+	SDL_Flip(backend.screen);
 }
 
 namespace fs = boost::filesystem;
