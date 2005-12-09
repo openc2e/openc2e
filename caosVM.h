@@ -279,6 +279,7 @@ public:
 	void c_DBG_MALLOC();
 	void c_DBG_TRACE();
 	void c_MANN();
+	void c_DBG_DISA();
 	void v_UNID();
 	void v_AGNT();
 

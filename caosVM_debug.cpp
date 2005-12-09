@@ -224,4 +224,27 @@ void caosVM::c_MANN() {
 		return;
 	}
 }
+
+/**
+ DBG: DISA (command) family (integer) genus (integer) species (integer) event (integer)
+ %status ok
+
+ Dumps the "bytecode" of the indicated script to the current output channel.
+ Note that this isn't really bytecode yet (though that's a possible future
+ improvement ...)
+
+ If the script is not found no output will be generated.
+ */
+void caosVM::c_DBG_DISA() {
+	VM_PARAM_INTEGER(event)
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+
+	script *s = world.scriptorium.getScript(family, genus, species, event);
+	if (!s) return;
+
+	*outputstream << s->dump();
+}
+
 /* vim: set noet: */
