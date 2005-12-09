@@ -29,7 +29,7 @@
 class CompoundPart {
 protected:
 	creaturesImage *sprite;
-	unsigned int firstimg, pose, frameno;
+	unsigned int firstimg, pose, frameno, base;
 	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
 				 unsigned int _z);
 
@@ -46,11 +46,13 @@ public:
 	unsigned int getWidth() { return sprite->width(firstimg); }
 	unsigned int getHeight() { return sprite->height(firstimg); }
 	unsigned int getPose() { return pose; }
-	unsigned int getCurrentSprite() { return firstimg + pose; }
+	unsigned int getBase() { return base; }
+	unsigned int getCurrentSprite() { return firstimg + base + pose; }
 	unsigned int getFrameNo() { return frameno; }
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
+	void setBase(unsigned int b) { base = b; }
 				
 	bool operator < (const CompoundPart &b) const {
 		return zorder < b.zorder;

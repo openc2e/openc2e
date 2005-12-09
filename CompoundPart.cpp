@@ -36,6 +36,7 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 	sprite = gallery.getImage(spritefile);
 	caos_assert(sprite);
 	pose = 0;
+	base = 0;
 	is_transparent = false;
 	framerate = 1;
 	framedelay = 0;

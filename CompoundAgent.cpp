@@ -54,6 +54,8 @@ void CompoundAgent::addPart(CompoundPart *p) {
 }
 
 void CompoundAgent::delPart(unsigned int id) {
+	caos_assert(id != 0);
+
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
 		if ((*x)->id == id) { delete *x; parts.erase(x); return; }
 	}

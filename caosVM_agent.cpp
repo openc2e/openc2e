@@ -361,13 +361,11 @@ void caosVM::c_BASE() {
 
 	caos_assert(targ);
 
-	/*
-	 * TODO: check the behaviour of base_offset, and also
-	 * use accessor methods
-	 */
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
-	// TODO
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	p->setBase(index);
 }
 
 /**
@@ -381,7 +379,9 @@ void caosVM::v_BASE() {
  	
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
-	result.setInt(-1); // TODO
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	result.setInt(p->getBase());
 }
 
 /**

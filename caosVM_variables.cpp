@@ -24,6 +24,8 @@
 #include <math.h> // abs()/fabs()
 #include "openc2e.h"
 #include "World.h"
+#include <cctype> // toupper/tolower
+#include <algorithm> // transform
 
 /**
  VAxx (variable)
@@ -556,7 +558,7 @@ void caosVM::v_ITOF() {
 void caosVM::v_FTOI() {
 	VM_PARAM_FLOAT(number)
 
-	result.setInt(number);
+	result.setInt((int)number);
 }
 
 /**
@@ -706,6 +708,32 @@ void caosVM::v_STOI() {
 	VM_PARAM_STRING(string)
 
 	result.setInt(atoi(string.c_str()));
+}
+
+/**
+ LOWA (string) string (string)
+ %status maybe
+
+ Return lower-cased version of a string.
+*/
+void caosVM::v_LOWA() {
+	VM_PARAM_STRING(string)
+
+	std::transform(string.begin(), string.end(), string.begin(), (int(*)(int))tolower);
+	result.setString(string);
+}
+
+/**
+ UPPA (string) string (string)
+ %status maybe
+
+ Return upper-cased version of a string.
+*/
+void caosVM::v_UPPA() {
+	VM_PARAM_STRING(string)
+
+	std::transform(string.begin(), string.end(), string.begin(), (int(*)(int))toupper);
+	result.setString(string);
 }
 
 /* vim: set noet: */
