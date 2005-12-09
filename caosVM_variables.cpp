@@ -668,7 +668,7 @@ void caosVM::v_WILD() {
 			}
 		}
 	}
-	const std::vector<std::string> &t = world.catalogue.getTag(tag);
+	const std::vector<std::string> &t = world.catalogue.getTag(searchstring);
 	caos_assert(offset < t.size());
 	result.setString(t[offset]);
 }
