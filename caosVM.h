@@ -247,6 +247,7 @@ public:
 	void v_STOI();
 	void v_LOWA();
 	void v_UPPA();
+	void v_SINS();
 
 	// flow
 	void c_DOIF();

@@ -736,4 +736,25 @@ void caosVM::v_UPPA() {
 	result.setString(string);
 }
 
+/**
+ SINS (integer) string (string) index (integer) searchstring (string)
+ %status maybe
+
+ Searches for an occurance of searchstring inside string, starting at the given index inside string (first character is 1).
+ The index of the searchstring inside the string is returned, or -1 if the searchstring wasn't found.
+*/
+void caosVM::v_SINS() {
+	VM_PARAM_STRING(searchstring)
+	VM_PARAM_INTEGER(index) caos_assert(index > 0);
+	VM_PARAM_STRING(string)
+
+	// TODO: check for string having a size, perhaps?
+	std::string::size_type i = string.find(searchstring, index - 1);
+
+	if (i == string.npos)
+		result.setInt(-1);
+	else
+		result.setInt(i + 1);
+}
+
 /* vim: set noet: */
