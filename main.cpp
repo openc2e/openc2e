@@ -308,7 +308,7 @@ extern "C" int main(int argc, char *argv[]) {
 //			std::cout << script->installer->dump();
 			vm.runEntirely(script->installer);
 
-		} catch (creaturesException &e) {
+		} catch (std::exception &e) {
 			std::cerr << "script exec failed due to exception " << e.what();
 			std::cerr << std::endl;
 		}
