@@ -49,7 +49,7 @@ void SoundSlot::stop() {
 void SDLBackend::resizeNotify(int _w, int _h) {
 	width = _w;
 	height = _h;
-	screen = SDL_SetVideoMode(width, height, 0, SDL_SWSURFACE + SDL_RESIZABLE);
+	screen = SDL_SetVideoMode(width, height, 0, SDL_RESIZABLE);
 	assert(screen != 0);
 }
 
