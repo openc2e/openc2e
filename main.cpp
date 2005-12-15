@@ -434,6 +434,9 @@ extern "C" int main(int argc, char *argv[]) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:
 					backend.resizeNotify(event.resize.w, event.resize.h);
+					for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+						(*i)->fireScript(123, 0); // window resized script
+					}
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
