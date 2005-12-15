@@ -74,7 +74,7 @@ Agent *World::agentAt(unsigned int x, unsigned int y, bool needs_activateable) {
 	// we're looking for the *last* agent in the set which is at this location (ie, topmost)
 	// TODO: this needs to check if agents are USEFUL (ie, not background scenery etc)
 	for (std::multiset<Agent *, agentzorder>::iterator i = agents.begin(); i != agents.end(); i++) {
-		if ((*i)->x <= x) if ((*i)->y <= y) if (((*i) -> x + (*i)->getWidth()) >= x) if (((*i) -> y + (*i)->getHeight()) >= y)
+		if ((*i)->x <= x) if ((*i)->y <= y) if (((*i) -> x + (*i)->getCheckWidth()) >= x) if (((*i) -> y + (*i)->getCheckHeight()) >= y)
 			if ((*i) != theHand)
 				if ((!needs_activateable) || (*i)->activateable)
 					temp = *i;

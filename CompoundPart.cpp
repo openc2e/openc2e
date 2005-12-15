@@ -47,8 +47,10 @@ DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, 
 }
 
 ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
-						   unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
-	// TODO: store animhover, msgid and option
+	unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
+	messageid = msgid;
+	hitopaquepixelsonly = (option == 1);
+	hoveranimation = animhover;
 }
 
 FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
