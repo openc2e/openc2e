@@ -63,7 +63,11 @@ public:
 
 class ButtonPart : public CompoundPart {
 protected:
-	bool hittransparentpixelsonly;
+	bool hitopaquepixelsonly;
+	int messageid;
+	bytestring hoveranimation;
+
+	friend class CompoundAgent;
 
 public:
 	ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
