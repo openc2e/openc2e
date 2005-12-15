@@ -52,6 +52,10 @@ void CompoundAgent::addPart(CompoundPart *p) {
 	// todo: we should prbly insert at the right place, not call sort
 	parts.push_back(p);
 	std::sort(parts.begin(), parts.end(), less_part());
+
+	// this is an icky hack..
+	if (p->x + p->getWidth() > fullwidth) fullwidth = p->x + p->getWidth();
+	if (p->y + p->getHeight() > fullheight) fullheight = p->y + p->getHeight();
 }
 
 void CompoundAgent::delPart(unsigned int id) {
@@ -78,8 +82,8 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	// TODO: we ignore image count acos it sucks
 	CompoundPart *p = new DullPart(0, spritefile, firstimage, 0, 0, 0);
 	addPart(p);
-	width = p->getWidth();
-	height = p->getHeight();
+	fullwidth = width = p->getWidth();
+	fullheight = height = p->getHeight();
 }
 
 CompoundAgent::~CompoundAgent() {

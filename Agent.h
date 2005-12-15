@@ -107,6 +107,10 @@ public:
 	virtual unsigned int getAttributes() = 0;
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
+	// TODO: following two functions are horrible hacks, to workaround the issue that compound parts are
+	// often not inside the width/height of the parent agent
+	virtual unsigned int getCheckWidth() { return getWidth(); }
+	virtual unsigned int getCheckHeight() { return getHeight(); }
 
 	virtual void tick();
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;

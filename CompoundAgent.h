@@ -30,7 +30,9 @@ class CompoundAgent : public Agent {
 protected:
 	std::vector<CompoundPart *> parts;
 
+	// TODO: see note below
 	unsigned int width, height;
+	unsigned int fullwidth, fullheight; // getCheckXXX hack, see Agent.h
 
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
@@ -44,8 +46,11 @@ public:
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
 	virtual void tick();
+	// TODO: i'm pretty sure width/height are always of the first part.. - fuzzie
 	virtual unsigned int getWidth() { return width; }
 	virtual unsigned int getHeight() { return height; }
+	virtual unsigned int getCheckWidth() { return fullwidth; }
+	virtual unsigned int getCheckHeight() { return fullheight; }
 	void handleClick(float, float);
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
