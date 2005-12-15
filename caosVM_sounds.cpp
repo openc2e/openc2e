@@ -201,6 +201,9 @@ void caosVM::v_VOLM() {
  %status stub
 */
 void caosVM::v_MUTE() {
+	VM_PARAM_INTEGER(eormask)
+	VM_PARAM_INTEGER(andmask)
+
 	result.setInt(0); // TODO
 }
 
