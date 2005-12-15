@@ -1014,4 +1014,25 @@ void caosVM::v_GALL() {
 	result.setString(p->getSprite()->name);
 }
 
+/**
+ SEEE (integer) first (agent) second (agent)
+ %status maybe
+
+ Return 1 if the first agent can see the other, or 0 otherwise.
+*/
+void caosVM::v_SEEE() {
+	VM_PARAM_VALIDAGENT(second)
+	VM_PARAM_VALIDAGENT(first)
+
+	// TODO: handle walls, creature invisibility
+	float x = (first->x + (first->getWidth() / 2)) - (second->x + (second->getWidth() / 2));
+	float y = (first->y + (first->getHeight() / 2)) - (second->y + (second->getHeight() / 2));
+	float z = sqrt(x*x + y*y);
+
+	if (z > first->range)
+		result.setInt(0);
+	else
+		result.setInt(1);
+}
+
 /* vim: set noet: */

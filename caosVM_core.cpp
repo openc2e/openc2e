@@ -167,4 +167,24 @@ void caosVM::v_MOWS() {
 	result.setInt(0); // We're too busy coding to mow the lawn.
 }
 
+/**
+ VMNR (integer)
+ %status maybe
+
+ Returns the minor version number of the engine.
+*/
+void caosVM::v_VMNR() {
+	result.setInt(1);
+}
+
+/**
+ VMJR (integer)
+ %status maybe
+
+ Returns the major version number of the engine.
+*/
+void caosVM::v_VMJR() {
+	result.setInt(0);
+}
+
 /* vim: set noet: */

@@ -212,4 +212,24 @@ void caosVM::v_WNDT() {
 	result.setInt(world.camera.getY());
 }
 
+/**
+ WDOW (command)
+ %status stub
+
+ Toggle full-screen mode.
+*/
+void caosVM::c_WDOW() {
+	// TODO
+}
+
+/**
+ WDOW (integer)
+ %status stub
+
+ Return 1 if in full-screen mode, or 0 otherwise (windowed).
+*/
+void caosVM::v_WDOW() {
+	result.setInt(0);
+}
+
 /* vim: set noet: */

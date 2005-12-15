@@ -182,6 +182,8 @@ public:
 	void v_WNDL();
 	void v_WNDR();
 	void v_WNDT();
+	void c_WDOW();
+	void v_WDOW();
 
 	// world
 	void c_LOAD();
@@ -200,6 +202,8 @@ public:
 	void c_RSCR(); // dummy
 	void c_ISCR(); // dummy
 	void c_ENDM();
+	void v_VMNR();
+	void v_VMJR();
 
 	// variables
 	void c_SETV();
@@ -248,6 +252,7 @@ public:
 	void v_LOWA();
 	void v_UPPA();
 	void v_SINS();
+	void v_REAQ();
 
 	// flow
 	void c_DOIF();
@@ -351,6 +356,7 @@ public:
 	void v_HELD();
 	void c_GALL();
 	void v_GALL();
+	void v_SEEE();
 	
 	// motion
 	void c_ELAS();
@@ -401,6 +407,9 @@ public:
 	void c_PTXT();
 	void v_PTXT();
 	void v_PNXT();
+	void c_PAGE();
+	void v_PAGE();
+	void v_NPGS();
 
 	// creatures
 	void c_STIM_SHOU();
@@ -442,6 +451,9 @@ public:
 	void c_FADE();
 	void c_STPC();
 	void c_STRK();
+	void c_VOLM();
+	void v_VOLM();
+	void v_MUTE();
 
 	// time
 	void v_PACE();

@@ -169,4 +169,39 @@ void caosVM::c_STRK() {
 	// TODO
 }
 
+/**
+ VOLM (command) type (integer) volume (integer)
+ %status stub
+
+ Changes the volume of the specified type of audio; 0 for sound effects, 1 for midi or 2 for dynamic music.
+ Volume is from -10000 (silent) to 0 (maximum).
+*/
+void caosVM::c_VOLM() {
+	VM_PARAM_INTEGER(volume)
+	VM_PARAM_INTEGER(type)
+
+	// TODO
+}
+
+/**
+ VOLM (integer) type (integer)
+ %status stub
+
+ Return the volumne of the specified type of audio; 0 for sound effects, 1 for midi or 2 for dynamic music.
+ Volume is from -10000 (silent) to 0 (maximum).
+*/
+void caosVM::v_VOLM() {
+	VM_PARAM_INTEGER(type)
+
+	result.setInt(0); // TODO
+}
+
+/**
+ MUTE (integer) andmask (integer) eormask (integer)
+ %status stub
+*/
+void caosVM::v_MUTE() {
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */

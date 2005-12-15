@@ -592,6 +592,21 @@ void caosVM::v_READ() {
 }
 
 /**
+ REAQ (integer) tag (string)
+ %status maybe
+
+ Returns 1 if the specified catalogue tag exists, or 0 otherwise.
+*/
+void caosVM::v_REAQ() {
+	VM_PARAM_STRING(tag)
+
+	if (world.catalogue.hasTag(tag))
+		result.setInt(1);
+	else
+		result.setInt(0);
+}
+
+/**
  CATI (integer) family (integer) genus (integer) species (integer)
  %status maybe
 */

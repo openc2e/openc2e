@@ -287,4 +287,60 @@ void caosVM::v_PNXT() {
 	else result.setInt(-1);
 }
 
+/**
+ PAGE (command) page (integer)
+ %status stub
+
+ Set the zero-based page number of the current text part.
+*/
+void caosVM::c_PAGE() {
+	VM_PARAM_INTEGER(page)
+
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
+	caos_assert(t);
+
+	// TODO
+}
+
+/**
+ PAGE (integer)
+ %status stub
+
+ Returns the zero-based page number of the current text part.
+*/
+void caosVM::v_PAGE() {
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
+	caos_assert(t);
+
+	result.setInt(0); // TODO
+}
+
+/**
+ NPGS (integer)
+ %status stub
+
+ Returns the number of pages for the current text part.
+*/
+void caosVM::v_NPGS() {
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
+	caos_assert(t);
+
+	result.setInt(1); // TODO
+}
+
 /* vim: set noet: */
