@@ -78,7 +78,11 @@ void caosVM::c_META() {
  Returns the metaroom the current camera is looking at.
 */
 void caosVM::v_META() {
-	result.setInt(world.camera.getMetaRoom()->id);
+	if (world.camera.getMetaRoom())
+		result.setInt(world.camera.getMetaRoom()->id);
+	else // this is a hack for empathic vendor.cos in DS, which uses META before it's setup
+		// TODO: work out what we should do instead of the hack
+		result.setInt(-1);
 }
 
 /**
