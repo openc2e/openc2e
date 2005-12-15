@@ -441,15 +441,11 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						std::cout << "got mouse click" << std::endl;
-						// TODO: just take the world.hand() x/y here?
-						Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), true);
-						if (a) {
-							if (a->clik != -1) {
-								// TODO: handle CLIK
-							} else if (a->clac[0] != -1)
-								a->fireScript(a->clac[0], world.hand());
-						}
-						else std::cout << "(mouse click ignored)" << std::endl;
+						Agent *a = world.agentAt(world.hand()->x, world.hand()->y, false);
+						if (a)
+							a->handleClick(world.hand()->x - a->x, world.hand()->y - a->y);
+						else
+							std::cout << "(mouse click ignored)" << std::endl;
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
 						// for now, hack!
 						if (handAgent) {

@@ -46,6 +46,7 @@ public:
 	virtual void tick();
 	virtual unsigned int getWidth() { return width; }
 	virtual unsigned int getHeight() { return height; }
+	void handleClick(float, float);
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 

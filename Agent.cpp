@@ -98,6 +98,14 @@ void Agent::fireScript(unsigned short event, Agent *from) {
 #endif
 }
 
+void Agent::handleClick(float clickx, float clicky) {
+	if (clik != -1) {
+		// TODO: handle CLIK
+	} else if (clac[0] != -1) {
+		fireScript(clac[0], (Agent *)world.hand());
+	}
+}
+
 void Agent::positionAudio(SoundSlot *slot) {
 	assert(slot);
 

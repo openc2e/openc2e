@@ -20,6 +20,7 @@
 #include "CompoundAgent.h"
 #include "openc2e.h"
 #include "c16Image.h"
+#include <World.h>
 #include <algorithm> // sort
 #include <functional> // binary_function
 
@@ -113,6 +114,29 @@ unsigned int CompoundAgent::getAttributes() {
 	a += (camerashy ? 256: 0);
 	a += (rotatable ? 1024: 0);
 	return a + (presence ? 2048: 0);
+}
+
+unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
+
+#include <iostream>
+
+void CompoundAgent::handleClick(float clickx, float clicky) {
+	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
+		// TODO: are TextEntryParts clickable too?
+		ButtonPart *b = dynamic_cast<ButtonPart *>(*x);
+		if (b) {
+			if ((clickx >= b->x) && (clicky >= b->y) &&
+				(clickx <= b->x + b->getWidth()) && (clicky <= b->y + b->getHeight())) {
+				fireScript(calculateScriptId(b->messageid), (Agent *)world.hand());
+				// TODO: do we need to return here, or should we always passthrough to Agent::handleClick?
+				return;
+			}
+		}
+	}
+
+	// TODO: this check should possibly be in Agent::handleClick, along with the attribute
+	if (activateable)
+		Agent::handleClick(clickx, clicky);
 }
 
 void CompoundAgent::tick() {
