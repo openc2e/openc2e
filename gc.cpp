@@ -14,6 +14,7 @@ GCPool *GCObject::_findPool() {
 }
 
 GCPool::GCPool() {
+#ifndef _WIN32
 	pthread_mutexattr_t ma;
 	pthread_mutexattr_init(&ma);
 #ifdef PTHREAD_MUTEX_ADAPTIVE_NP
@@ -21,7 +22,8 @@ GCPool::GCPool() {
 #endif
 	pthread_mutex_init(&mutex, &ma);
 	pthread_mutexattr_destroy(&ma);
-	
+#endif
+
 	chain = new GCObject();
 	chain->_next = chain->_prev = chain;
 	chain->_owner = this;

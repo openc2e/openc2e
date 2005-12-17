@@ -5,7 +5,14 @@
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#ifndef _WIN32
 #include <pthread.h>
+#else
+// TODO: evil and hacky pthread disabling
+#define pthread_mutex_t int
+#define pthread_mutex_lock(x)
+#define pthread_mutex_unlock(x)
+#endif
 
 /* Thread-safety:
  * GCPools are tracked seperately in each thread.
