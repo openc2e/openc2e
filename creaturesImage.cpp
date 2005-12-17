@@ -29,8 +29,10 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#ifndef _WIN32
 #include <sys/types.h> // passwd*
 #include <pwd.h> // getpwuid
+#endif
 
 using namespace boost::filesystem;
 
@@ -38,6 +40,7 @@ imageGallery gallery;
 
 enum filetype { blk, s16, c16 };
 
+#ifndef _WIN32
 path homeDirectory() {
 	path p;
 	char *envhome = getenv("HOME");
@@ -51,6 +54,14 @@ path homeDirectory() {
 	}
 	return p;
 }
+#else
+path homeDirectory() {
+	path p = path("./temp", native);
+	if (!exists(p))
+		create_directory(p);
+	return p;
+}
+#endif
 
 path cacheDirectory() {
 	path p = path(homeDirectory().native_directory_string() + "/.openc2e", native);
