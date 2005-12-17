@@ -578,7 +578,9 @@ extern "C" int main(int argc, char *argv[]) {
 		} // ticked
 	}
 
+#ifndef _WIN32
 	SDLNet_Quit();
+#endif
 	SDL_Quit();
 
 	} catch (creaturesException &e) {

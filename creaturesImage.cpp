@@ -56,6 +56,7 @@ path homeDirectory() {
 }
 #else
 path homeDirectory() {
+	// TODO: fix this!
 	path p = path("./temp", native);
 	if (!exists(p))
 		create_directory(p);
