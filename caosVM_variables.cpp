@@ -27,6 +27,10 @@
 #include <cctype> // toupper/tolower
 #include <algorithm> // transform
 
+#ifdef _MSC_VER
+#define snprintf _snprintf // guh guh guh ><
+#endif
+
 /**
  VAxx (variable)
  %pragma noparse

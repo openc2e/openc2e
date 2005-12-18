@@ -20,7 +20,7 @@
 #include "CompoundAgent.h"
 #include "openc2e.h"
 #include "c16Image.h"
-#include <World.h>
+#include "World.h"
 #include <algorithm> // sort
 #include <functional> // binary_function
 

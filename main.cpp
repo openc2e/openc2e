@@ -11,6 +11,7 @@
 #include "openc2e.h"
 #include <iostream>
 #include <algorithm>
+#include <stdio.h>
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "boost/filesystem/exception.hpp"
@@ -24,6 +25,10 @@
 
 #include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
 #include "SDL_net.h"
+
+#ifdef _MSC_VER
+#define snprintf _snprintf // guh guh guh ><
+#endif
 
 SDLBackend backend;
 
@@ -106,6 +111,7 @@ void drawWorld() {
 namespace fs = boost::filesystem;
 extern fs::path homeDirectory(); // creaturesImage.cpp
 
+#ifndef _WIN32
 extern "C" {
 	extern char *optarg;
 	extern int optind, opterr, optopt;
@@ -145,6 +151,7 @@ const static struct option longopts[] = {
 	},
 	{ NULL, 0, NULL, 0 }
 };
+#endif
 
 const static char optstring[] = "hvsd:b:";
 

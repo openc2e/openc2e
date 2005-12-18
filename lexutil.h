@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cctype>
 #include <vector>
+#include <algorithm>
 
 #include "token.h"
 

@@ -21,7 +21,6 @@
 #include "SDL_gfxPrimitives.h"
 #include "openc2e.h"
 #include "Agent.h"
-#include <strings.h> // bzero
 
 SDLBackend *g_backend;
 

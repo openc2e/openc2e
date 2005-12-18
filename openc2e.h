@@ -20,6 +20,10 @@
 #ifndef __OPENC2E_H
 #define __OPENC2E_H
 
+#ifdef _MSC_VER
+# define M_PI           3.14159265358979323846  /* pi */
+#endif
+
 #include <iostream>
 #include <cassert>
 #include <vector>
