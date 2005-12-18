@@ -23,9 +23,7 @@
 #include "dialect.h"
 
 #include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
-#ifndef _WIN32
 #include "SDL_net.h"
-#endif
 
 SDLBackend backend;
 
@@ -332,7 +330,6 @@ extern "C" int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-#ifndef _WIN32
 	SDLNet_Init();
 	TCPsocket listensocket = 0;
 	int listenport = 20000;
@@ -355,7 +352,6 @@ extern "C" int main(int argc, char *argv[]) {
 		snprintf(buf, 6, "%i", listenport);
 		f << buf;
 	}
-#endif
 
 	Agent *handAgent = 0;
 
@@ -408,7 +404,6 @@ extern "C" int main(int argc, char *argv[]) {
 			ticked = true;
 		} else SDL_Delay(10);
 
-#ifndef _WIN32
 		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
 			std::string data;
 			bool done = false;
@@ -439,7 +434,6 @@ extern "C" int main(int argc, char *argv[]) {
 
 			SDLNet_TCP_Close(connection);
 		}
-#endif
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -584,9 +578,7 @@ extern "C" int main(int argc, char *argv[]) {
 		} // ticked
 	}
 
-#ifndef _WIN32
 	SDLNet_Quit();
-#endif
 	SDL_Quit();
 
 	} catch (creaturesException &e) {
