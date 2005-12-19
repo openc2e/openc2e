@@ -49,6 +49,7 @@ public:
 	unsigned int getBase() { return base; }
 	unsigned int getCurrentSprite() { return firstimg + base + pose; }
 	unsigned int getFrameNo() { return frameno; }
+	unsigned int getFirstImg() { return firstimg; }
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }

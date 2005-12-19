@@ -342,7 +342,7 @@ void caosVM::c_ANIM() {
 
 /**
  ANMS (command) poselist (string)
- %status stub
+ %status maybe
 
  exactly like ANIM, only using a string and not a bytestring for source.
 */
@@ -372,11 +372,20 @@ void caosVM::c_ANMS() {
 
 /**
  ABBA (integer)
- %status stub
+ %status maybe
+
+ Returns the first_image (ie, absolute base) value for the current agent/part.
 */
 void caosVM::v_ABBA() {
 	VM_VERIFY_SIZE(0)
-	// TODO
+	
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+
+	result.setInt(p->getFirstImg());
 }
 
 /**

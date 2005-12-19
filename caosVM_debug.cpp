@@ -35,7 +35,7 @@ using std::cout;
 
 /**
  DBG: OUTS (command) val (string)
- %status stub
+ %status maybe
 
  output a string to the debug log
 */
@@ -46,7 +46,7 @@ void caosVM::c_DBG_OUTS() {
 
 /**
  DBG: OUTV (command) val (decimal)
- %status stub
+ %status maybe
  
  output a decimal value to the debug log
 */
