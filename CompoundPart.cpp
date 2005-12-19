@@ -67,7 +67,7 @@ void CompoundPart::tick() {
 	if (!animation.empty()) {
                 if (framerate > 1) {
 			framedelay++;
-			if (framedelay == (1 << framerate - 1))
+			if (framedelay == framerate + 1)
 				framedelay = 0;
 		}
 		
