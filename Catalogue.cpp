@@ -19,7 +19,7 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 		bool wasparsingstring = false, parsingstring = false, parsingtag = false, parsingarray = false;
 		unsigned int stage = 0;
 		std::string t;
-		if (i[i.size() - 1] == '\r') i.erase(i.size() - 1);
+		if ((i.size() > 0) && (i[i.size() - 1] == '\r')) i.erase(i.size() - 1);
 		// TODO: \\ -> \, handle \n, anything else?
 
 		boost::char_separator<char> sep(" \t");
