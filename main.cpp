@@ -28,6 +28,7 @@
 
 #ifdef _MSC_VER
 #define snprintf _snprintf // guh guh guh ><
+#undef main // because SDL is stupid
 #endif
 
 SDLBackend backend;

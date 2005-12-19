@@ -357,6 +357,8 @@ public:
 	void c_GALL();
 	void v_GALL();
 	void v_SEEE();
+	void v_TINT();
+	void c_TINO();
 	
 	// motion
 	void c_ELAS();
@@ -439,6 +441,9 @@ public:
 	void c_APPR();
 	void c_UNCS();
 	void v_UNCS();
+	void v_FACE();
+	void c_LIKE();
+	void v_LIMB();
 	
 	// sounds
 	void c_SNDE();
@@ -557,6 +562,10 @@ public:
 	void v_GTOS();
 	void v_MTOA();
 	void v_MTOC();
+	
+	// history
+	void v_HIST_NAME();
+	void v_OOWW();
 
 	void runOp();
 	void runTimeslice(int units);
