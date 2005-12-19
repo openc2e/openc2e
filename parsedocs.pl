@@ -19,6 +19,7 @@ my %fnmap = ( # default category mappings
 	'caosVM_files.cpp' => 'Files',
 	'caosVM_flow.cpp' => 'Flow control',
 	'caosVM_genetics.cpp' => 'Genetics',
+	'caosVM_history.cpp' => 'History',
 	'caosVM_input.cpp' => 'Input',
 	'caosVM_map.cpp' => 'Map',
 	'caosVM_motion.cpp' => 'Motion',

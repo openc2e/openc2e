@@ -473,6 +473,7 @@ public:
 	void v_PAUS();
 	void c_WPAU();
 	void v_WPAU();
+	void v_RTIF();
 
 	// resources
 	void v_PRAY_AGTI();

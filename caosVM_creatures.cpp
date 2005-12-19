@@ -395,4 +395,47 @@ void caosVM::v_UNCS() {
 	result.setInt(0); // TODO
 }
 
+/* TODO: there's a string variation of this, which we have no way of handling right now. fixit! */
+/**
+ FACE (integer)
+ %status stub
+
+ Return the front-facing pose for the current facial expression of the target creature.
+*/
+void caosVM::v_FACE() {
+	Creature *c = getTargCreature();
+
+	result.setInt(0); // TODO
+}
+
+/**
+ LIKE (command) creature (agent)
+ %status stub
+ 
+ Cause target creature to state an opinion about the specified creature.
+*/
+void caosVM::c_LIKE() {
+	VM_PARAM_VALIDAGENT(creature)
+
+	Creature *c = getTargCreature();
+}
+
+/**
+ LIMB (string) bodypart (integer) genus (integer) gender (integer) age (integer) variant (integer)
+ %status stub
+ 
+ Returns the filename for the specified part of a creature, substituting as necessary.
+*/
+void caosVM::v_LIMB() {
+	VM_PARAM_INTEGER(variant)
+	VM_PARAM_INTEGER(age)
+	VM_PARAM_INTEGER(gender)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(bodypart)
+	
+	Creature *c = getTargCreature();
+	
+	result.setString(""); // TODO
+}
+
 /* vim: set noet: */

@@ -179,4 +179,21 @@ void caosVM::v_PAUS() {
 	result.setInt(0); // TODO
 }
 
+/**
+ RTIF (string) timestamp (integer) format (string)
+ %status maybe
+
+ Returns the result of strftime with the current timestamp and format.
+*/
+void caosVM::v_RTIF() {
+	VM_PARAM_STRING(format)
+	VM_PARAM_INTEGER(timestamp)
+	
+	char buffer[1000]; // no idea what maximum length should be.. we can't really do this dynamically
+	time_t tstamp = timestamp;
+	strftime(buffer, 1000, format.c_str(), gmtime(&tstamp)); // TODO: does gmtime return null?
+
+	result.setString(buffer);
+}
+
 /* vim: set noet: */

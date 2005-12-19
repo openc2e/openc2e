@@ -1007,6 +1007,7 @@ void caosVM::c_GALL() {
  Return the name of the sprite file associated with the current agent or part.
 */
 void caosVM::v_GALL() {
+	caos_assert(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
@@ -1033,6 +1034,35 @@ void caosVM::v_SEEE() {
 		result.setInt(0);
 	else
 		result.setInt(1);
+}
+
+/**
+ TINT (integer) attribute (integer)
+ %status stub
+
+ Return the tint value for target agent. Pass 1 for red, 2 for blue, 3 for green, 4 for rotation or 5 for swap.
+*/
+void caosVM::v_TINT() {
+	VM_PARAM_INTEGER(attribute)
+
+	caos_assert(targ);
+	result.setInt(0); // TODO
+}
+
+/**
+ TINO (command) red (integer) green (integer) blue (integer) rotation (integer) swap (integer)
+ %status stub
+
+ Works like the TINT command, but only applies the tint to the current frame, and discards the rest.
+*/
+void caosVM::c_TINO() {
+	VM_PARAM_INTEGER(swap)
+	VM_PARAM_INTEGER(rotation)
+	VM_PARAM_INTEGER(blue)
+	VM_PARAM_INTEGER(green)
+	VM_PARAM_INTEGER(red)
+
+	// TODO
 }
 
 /* vim: set noet: */
