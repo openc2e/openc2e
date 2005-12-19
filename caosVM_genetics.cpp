@@ -84,7 +84,8 @@ void caosVM::c_GENE_LOAD() {
 
 /**
  GENE MOVE (command) dest_agent (agent) dest_slot (integer) src_agent (agent) src_slot (integer)
- % status stub
+ %status stub
+
  Move a genome to another slot.
 */
 void caosVM::c_GENE_MOVE() {
