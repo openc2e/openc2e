@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "World.h"
 #include "SDLBackend.h"
+#include <time.h> // gmtime and strftime
 
 /**
  PACE (float)
