@@ -33,12 +33,12 @@ mmapifstream::mmapifstream(std::string filename) {
 }
 
 void mmapifstream::mmapopen(std::string filename) {
-	open(filename.c_str());
+	open(filename.c_str(), std::ios::binary);
 	if (!is_open()) return;
 
 #ifdef _WIN32
 	// todo: store the handle somewhere?
-	HANDLE hFile = CreateFile(filename.c_str(), GENERIC_READ, FILE_SHARE_READ,
+	HANDLE hFile = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ,
 		NULL, OPEN_EXISTING, 0, NULL);
 	HANDLE hMap = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
 	void *mapr = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
