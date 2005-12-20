@@ -457,12 +457,9 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
-						std::cout << "got mouse click" << std::endl;
 						Agent *a = world.agentAt(world.hand()->x, world.hand()->y, false);
 						if (a)
 							a->handleClick(world.hand()->x - a->x, world.hand()->y - a->y);
-						else
-							std::cout << "(mouse click ignored)" << std::endl;
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
 						// for now, hack!
 						if (handAgent) {
