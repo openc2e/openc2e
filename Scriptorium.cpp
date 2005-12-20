@@ -16,7 +16,7 @@ inline unsigned int Scriptorium::calculateValue(unsigned char family, unsigned c
 
 void Scriptorium::addScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event, script *s) {
 	std::map<unsigned short, script *> &m = getScripts(calculateValue(family, genus, species));
-	if (m[event])
+	if (m.find(event) != m.end())
 		m[event]->release();
 	m[event] = s;
 	s->retain();
@@ -24,13 +24,24 @@ void Scriptorium::addScript(unsigned char family, unsigned char genus, unsigned 
 
 void Scriptorium::delScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
 	std::map<unsigned short, script *> &i = getScripts(calculateValue(family, genus, species));
-	if (i[event])
+	if (i.find(event) != i.end())
 		i[event]->release();
 	i.erase(i.find(event));
 	// todo: zap from the main map if there is none left of that value
 }
 
 script *Scriptorium::getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
-	return getScripts(calculateValue(family, genus, species))[event];
+	std::map<unsigned short, script *> &x = getScripts(calculateValue(family, genus, species));
+	if (x.find(event) == x.end()) {
+		std::map<unsigned short, script *> &x = getScripts(calculateValue(family, genus, 0));
+		if (x.find(event) == x.end()) {
+			std::map<unsigned short, script *> &x = getScripts(calculateValue(family, 0, 0));
+			if (x.find(event) == x.end())
+				return 0;
+			else
+				return x[event];
+		} else return x[event];
+	} else return x[event];
 }
+
 /* vim: set noet: */
