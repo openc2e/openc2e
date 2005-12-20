@@ -28,6 +28,7 @@ public:
 	bool handle_events;
 
 	PointerAgent(std::string spritefile);
+	void firePointerScript(unsigned short event, Agent *src);
 };
 
 #endif

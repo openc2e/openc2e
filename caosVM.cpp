@@ -118,7 +118,7 @@ void caosVM::runEntirely(script *s) {
 }
 
 bool caosVM::fireScript(script *s, bool nointerrupt, Agent *frm) {
-	if (!s) return false;
+	assert(s);
 	if (lock) return false; // can't interrupt scripts which called LOCK
 	if (currentscript && nointerrupt) return false; // don't interrupt scripts with a timer script
 

@@ -20,11 +20,23 @@
 #include "PointerAgent.h"
 #include "c16Image.h"
 #include "openc2e.h"
+#include "World.h"
+#include "caosVM.h"
 
 // TODO: change imagecount?
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, UINT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = false;
+}
+
+void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
+	script *s = src->findScript(event);
+	if (!s) return;
+	if (!vm) vm = world.getVM(this);
+	if (vm->fireScript(s, false, src)) { // TODO: should FROM be src?
+		vm->setTarg(this);
+		zotstack();
+	}
 }
 
 /* vim: set noet: */

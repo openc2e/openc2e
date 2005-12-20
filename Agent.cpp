@@ -73,6 +73,7 @@ void Agent::fireScript(unsigned short event, Agent *from) {
 	if (dying) return;
 
 	script *s = findScript(event);
+	if (!s) return;
 	if (!vm) vm = world.getVM(this);
 	if (vm->fireScript(s, (event == 9), from)) {
 		vm->setTarg(this);

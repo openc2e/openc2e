@@ -458,19 +458,25 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						Agent *a = world.agentAt(world.hand()->x, world.hand()->y, false);
-						if (a)
+						if (a) {
 							a->handleClick(world.hand()->x - a->x, world.hand()->y - a->y);
+							// TODO: not sure how to handle the following properly, needs research..
+							world.hand()->firePointerScript(101, a); // Pointer Activate 1
+						} else
+							world.hand()->fireScript(116, 0); // Pointer Clicked Background
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
 						// for now, hack!
 						if (handAgent) {
 							handAgent->fireScript(5, world.hand()); // drop
+							world.hand()->firePointerScript(105, handAgent); // Pointer Drop
 							handAgent = 0;
 						} else {
 							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false);
 							if (handAgent) {
-								if (handAgent->mouseable) // hack: agentAt should check this
+								if (handAgent->mouseable) { // hack: agentAt should check this
 									handAgent->fireScript(4, world.hand()); // pickup
-								else
+									world.hand()->firePointerScript(104, handAgent); // Pointer Pickup
+								} else
 									handAgent = 0;
 							}
 						}
