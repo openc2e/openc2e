@@ -40,6 +40,7 @@ protected:
 public:
 	MNGNamedNode(std::string n) { name = n; }
 	std::string getName() { return name; }
+    virtual std::string dump() { return std::string("[unknown named node: ") + getName() + "]"; }
 };
 
 inline std::string dumpChildren(std::list<MNGNode *> *c) {
@@ -413,15 +414,19 @@ class MNGFile {
 		 pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
 
 		 std::string dump() {
-		 	std::string t = "\n";
+			
+			std::ostringstream oss;
 
-			/*for (std::list<MNGNode *>::iterator i = nodes.begin(); i != nodes.end(); i++) {
-				t = t + (*i)->dump() + "\n";
-			} */
+            std::map<std::string, class MNGEffectDecNode *>::iterator ei;
+            std::map<std::string, class MNGTrackDecNode *>::iterator ti;
 
-			// TODO: dump variables/tracks/effects
+            for (ei = effects.begin(); ei != effects.end(); ei++)
+				oss << ei->first << " " << ei->second->dump() << std::endl;
+                
+            for (ti = tracks.begin(); ti != tracks.end(); ti++)
+				oss << ti->first << " " << ti->second->dump() << std::endl;
 
-			return t;
+			return oss.str();
 		}
 };
 
@@ -435,5 +440,4 @@ public:
 	MNGWaveNode(std::string n) : MNGNamedNode(n) { sample = g_mngfile->getNextSample(); }
 	std::string dump() { return std::string("Wave(") + name + ")"; }
 };
-
 

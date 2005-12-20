@@ -72,7 +72,7 @@ void caosVM::c_RTAR() {
 
 	/* XXX: maybe use a map of classifier -> agents? */
 	std::vector<Agent *> temp;
-	for (std::multiset<Agent *, agentzorder>::iterator i
+	for (std::list<Agent *>::iterator i
 		= world.agents.begin(); i != world.agents.end(); i++) {
 		
 		Agent *a = (*i);
@@ -567,7 +567,7 @@ void caosVM::v_TOTL() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	unsigned int x = 0;
-	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if ((*i)->family == family)
 			if ((*i)->genus == genus)
 				if ((*i)->species == species)

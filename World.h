@@ -34,10 +34,12 @@ struct cainfo {
 class World {
 protected:
 	class PointerAgent *theHand;
-
 public:
 	Map map;
-	std::multiset<Agent *, agentzorder> agents;
+
+	std::multiset<Agent *, agentzorder> zorder;
+	std::list<Agent *> agents;
+	
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
 	std::map<caosVar, caosVar> eame_variables; // non-serialised

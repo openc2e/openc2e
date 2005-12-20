@@ -49,27 +49,27 @@ protected:
 	void zotrefs();
 	void zotstack();
 
-	bool dying;
 	int unid;
 	unsigned int zorder;
 	unsigned int tickssincelasttimer, timerrate;
 
-	bool displaycore;
 
 	int lastcollidedirection;
 
 	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
+	std::list<Agent *>::iterator agents_iter;
 	std::list<caosVM *> vmstack; // for CALL etc
 
 	struct SoundSlot *soundslot;
 	void positionAudio(SoundSlot *);
+	bool dying;
+	bool displaycore;
 
 public:
 	inline bool isDying() const {
 		return dying;
 	}
 	
-	int clac[3]; int clik;
 	// attr
 	bool carryable, mouseable, activateable, invisible, floatable;
 	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
@@ -79,6 +79,7 @@ public:
 	
 	bool visible;
 
+	int clac[3]; int clik;
 	unsigned char family, genus;
 	unsigned short species;
 

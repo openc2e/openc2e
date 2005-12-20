@@ -61,7 +61,7 @@ void drawWorld() {
 	}
 
 	// render all the agents
-	for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::multiset<Agent *, agentzorder>::iterator i = world.zorder.begin(); i != world.zorder.end(); i++) {
 		(*i)->render(&backend, -adjustx, -adjusty);
 	}
 
@@ -448,7 +448,7 @@ extern "C" int main(int argc, char *argv[]) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:
 					backend.resizeNotify(event.resize.w, event.resize.h);
-					for (std::multiset<Agent *, agentzorder>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+					for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 						(*i)->fireScript(123, 0); // window resized script
 					}
 					break;

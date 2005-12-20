@@ -43,12 +43,13 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	dying = false;
 	unid = -1;
 
-	zorder_iter = world.agents.insert(this);
-
 	soundslot = 0;
 	displaycore = false;
 
 	floatingx = floatingy = 0;
+
+	zorder_iter = world.zorder.insert(this);
+	agents_iter = world.agents.insert(++world.agents.begin(), this);
 }
 
 void Agent::zotstack() {
@@ -59,16 +60,6 @@ void Agent::zotstack() {
 	vmstack.clear();
 }
 
-
-Agent::~Agent() {
-	world.agents.erase(zorder_iter);
-	if (vm)
-		world.freeVM(vm);
-	zotstack();
-	zotrefs();
-	if (unid != -1)
-		world.freeUNID(unid);
-}
 
 void Agent::moveTo(float _x, float _y) {
 	x = _x; y = _y;
@@ -362,14 +353,24 @@ void Agent::tick() {
 	}
 }
 
+Agent::~Agent() {
+	world.agents.erase(agents_iter);
+	if (vm)
+		world.freeVM(vm);
+	zotstack();
+	zotrefs();
+}
+
 void Agent::kill() {
-	// Should we remove from the ENUM etc stuff?
 	assert(!dying);
 	dying = true; // what a world, what a world...
 	if (vm)
 		vm->stop();
 	zotstack();
 	zotrefs();
+	if (unid != -1)
+		world.freeUNID(unid);
+	world.zorder.erase(zorder_iter);
 	world.killqueue.push_back(this);
 }
 
@@ -379,9 +380,10 @@ void Agent::zotrefs() {
 }
 
 void Agent::setZOrder(unsigned int z) {
+	if (dying) return;
+	world.zorder.erase(zorder_iter);
 	zorder = z;
-	world.agents.erase(zorder_iter);
-	zorder_iter = world.agents.insert(this);
+	world.zorder.insert(this);
 }
 
 int Agent::getUNID() {

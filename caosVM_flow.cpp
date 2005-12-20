@@ -157,7 +157,7 @@ void caosVM::c_ENUM() {
 	nullv.reset();
 	valueStack.push_back(nullv);
 	
-	for (std::multiset<Agent *, agentzorder>::iterator i
+	for (std::list<Agent *>::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
 		Agent *a = (*i);
 		if (species && species != a->species) continue;
@@ -187,7 +187,7 @@ void caosVM::c_ESEE() {
 	nullv.reset();
 	valueStack.push_back(nullv);
 	
-	for (std::multiset<Agent *, agentzorder>::iterator i
+	for (std::list<Agent *>::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
 		Agent *a = (*i);
 		if (species && species != a->species) continue;
