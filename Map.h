@@ -29,6 +29,14 @@ protected:
 	friend class MetaRoom;
 
 public:
+	/* Get a room, any room.
+	 *
+	 * For those times when you really, really need a room.
+	 */
+	MetaRoom *getFallbackMetaroom() {
+		return metarooms.size() == 0 ? NULL : metarooms[0];
+	}
+	
 	unsigned int room_base, metaroom_base;
 	
 	Map() { width = 0; height = 0; room_base = 0; metaroom_base = 0; }

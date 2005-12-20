@@ -37,9 +37,19 @@ SDL_Surface **backsurfs[20]; // todo: grab metaroom count, don't arbitarily defi
 bool showrooms = false, paused = false;
 
 void drawWorld() {
+	MetaRoom *m = world.camera.getMetaRoom();
+	if (!m) {
+		// Whoops - the room we're in vanished, or maybe we were never in one?
+		// Try to get a new one ...
+		m = world.map.getFallbackMetaroom();
+		if (!m) {
+			std::cerr << "ERROR: No metarooms! Panicing ..." << std::endl;
+			abort();
+		}
+		world.camera.goToMetaRoom(m->id);
+	}
 	int adjustx = world.camera.getX();
 	int adjusty = world.camera.getY();
-	MetaRoom *m = world.camera.getMetaRoom();
 	blkImage *test = m->backImage();
 
 	// draw the blk

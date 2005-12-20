@@ -72,9 +72,11 @@ class simpleCaosOp : public caosOp {
 				delta++;
 			if (ci->retc != -1 && 
 					delta != ci->retc - ci->argc) {
-				std::cerr << "Warning: return count mismatch for op "
+				std::ostringstream oss;
+				oss << "return count mismatch for op "
 					<< ci->fullname << ", delta=" << delta
 					<< std::endl;
+				throw caosException(oss.str());
 			}
 		}
 		std::string dump() {

@@ -67,11 +67,13 @@ void caosVM::startBlocking(blockCond *whileWhat) {
 inline void caosVM::runOp() {
 	cip = nip;
 	nip++;
+	script *scr = currentscript;
 	caosOp *op = currentscript->getOp(cip);
 	if (!op) {
 		stop();
 		return;
 	}
+	scr->retain();
 	result.reset(); // xxx this belongs in opcode maybe
 	try {
 		if (trace) {
@@ -82,15 +84,18 @@ inline void caosVM::runOp() {
 	} catch (creaturesException &e) {
 		std::cerr << "script stopped due to exception " << e.what() << endl;
 		stop();
+		scr->release();
 		return;
 	} catch (caosException &e) {
-		e.trace(currentscript->filename.c_str(), op->getlineno(), op);
+		e.trace(scr->filename.c_str(), op->getlineno(), op);
 		std::cerr << "script stopped due to exception " << e.what() << endl;
 		stop();
+		scr->release();
 		return;
 	}
 	if (!result.isNull())
 		valueStack.push_back(result);
+	scr->release();
 }
 
 void caosVM::stop() {

@@ -34,6 +34,7 @@ protected:
 
 public:
 	void dump() const;
+	
 	AgentRef() { ref = NULL; next = NULL; prev = NULL; }
 	AgentRef(Agent *a) { ref = NULL; next = NULL; prev = NULL; set(a);
 		}

@@ -23,9 +23,7 @@
 #include <iostream>
 
 void AgentRef::checkLife() const {
-	// XXX: this only hides the problem :|
-	if (ref && ref->isDying()) // XXX: aliasing problems?
-		const_cast<AgentRef *>(this)->clear();
+	assert(!ref || !ref->isDying());
 }
 
 void AgentRef::clear() {

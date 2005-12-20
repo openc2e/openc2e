@@ -100,6 +100,7 @@ void caosVM::c_WAIT() {
 /**
  STOP (command)
  %status maybe
+ %pragma retc -1
 */
 void caosVM::c_STOP() {
 	VM_VERIFY_SIZE(0)
