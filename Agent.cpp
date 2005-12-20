@@ -384,7 +384,7 @@ void Agent::setZOrder(unsigned int z) {
 	if (dying) return;
 	world.zorder.erase(zorder_iter);
 	zorder = z;
-	world.zorder.insert(this);
+	zorder_iter = world.zorder.insert(this);
 }
 
 int Agent::getUNID() {
