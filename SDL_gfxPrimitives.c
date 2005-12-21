@@ -2938,7 +2938,10 @@ int filledEllipseRGBA(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rx, Sint16 r
 /* ----- filled pie */
 
 /* Low-speed float pie-calc implementation by drawing polygons/lines. */
-
+//Stupid hack to work around a bug in MSVC 7.1
+#ifdef _MSC_VER
+#pragma optimize("g", off)
+#endif
 int doPieColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Sint16 end, Uint32 color, Uint8 filled)
 {
     Sint16 left, right, top, bottom;
@@ -3060,6 +3063,9 @@ int doPieColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, 
 
     return (result);
 }
+#ifdef _MSC_VER
+#pragma optimize("g", on)
+#endif
 
 int pieColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, 
 		Sint16 start, Sint16 end, Uint32 color) 

@@ -2,9 +2,7 @@
 #define _GNU_SOURCE // for getopt_long
 #endif
 
-#ifndef _WIN32
 #include <getopt.h>
-#endif
 
 #include <sstream> // for istringstream, used in networking code
 #include <fstream>
@@ -122,7 +120,6 @@ void drawWorld() {
 namespace fs = boost::filesystem;
 extern fs::path homeDirectory(); // creaturesImage.cpp
 
-#ifndef _WIN32
 extern "C" {
 	extern char *optarg;
 	extern int optind, opterr, optopt;
@@ -162,7 +159,6 @@ const static struct option longopts[] = {
 	},
 	{ NULL, 0, NULL, 0 }
 };
-#endif
 
 const static char optstring[] = "hvsd:b:";
 
@@ -207,7 +203,6 @@ extern "C" int main(int argc, char *argv[]) {
 	std::string data;
 	bool bs_specd = false, d_specd = false;
 	std::string gametype = "c3";
-#ifndef _WIN32
 	while (-1 != (optret = getopt_long(argc, argv, optstring, longopts, NULL))) {
 		switch (optret) {
 			case 'h': //fallthru
@@ -248,7 +243,6 @@ extern "C" int main(int argc, char *argv[]) {
 				break;
 		}
 	}
-#endif
 	
 	if (!d_specd) {
 		data = data_default;
@@ -265,13 +259,11 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 	}
 
-#ifndef _WIN32
 	if (optind < argc) {
 		// too many args
 		opt_help(argv[0]);
 		return 1;
 	}
-#endif
 
 	datapath = data;
 	
