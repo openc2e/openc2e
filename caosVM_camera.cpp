@@ -34,13 +34,11 @@ void caosVM::v_VISI() {
 	
 	caos_assert(targ);
 	
-	if (targ->x > (world.camera.getX() + world.camera.getWidth()))
-		if (targ->y > (world.camera.getY() + world.camera.getHeight()))
-			if ((targ->x + targ->getWidth()) < world.camera.getX())
-				if ((targ->y + targ->getHeight()) < world.camera.getY()) {
-					result.setInt(0);
-					return;
-				}
+	if ((targ->x > (world.camera.getX() + world.camera.getWidth())) || ((targ->x + targ->getWidth()) < world.camera.getX()) ||
+		(targ->y > (world.camera.getY() + world.camera.getHeight())) || ((targ->y + targ->getHeight()) < world.camera.getY())) {
+		result.setInt(0);
+		return;
+	}
 
 	result.setInt(1);
 }
