@@ -438,4 +438,17 @@ void caosVM::v_LIMB() {
 	result.setString(""); // TODO
 }
 
+/**
+ ORDR SHOU (command) speech (string)
+ %status stub
+
+ Makes target speak specified speech to all creatures in hearing range.
+*/
+void caosVM::c_ORDR_SHOU() {
+	VM_PARAM_STRING(speech)
+
+	caos_assert(targ);
+	// TODO
+}
+
 /* vim: set noet: */

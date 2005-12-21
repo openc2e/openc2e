@@ -445,6 +445,7 @@ public:
 	void v_FACE();
 	void c_LIKE();
 	void v_LIMB();
+	void c_ORDR_SHOU();
 	
 	// sounds
 	void c_SNDE();
