@@ -424,7 +424,7 @@ extern "C" int main(int argc, char *argv[]) {
 
 		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
 			IPaddress *remote_ip = SDLNet_TCP_GetPeerAddress(connection);
-			char *rip = (char *)&remote_ip->host;
+			unsigned char *rip = (unsigned char *)&remote_ip->host;
 			if ((rip[0] != 127) || (rip[1] != 0) || (rip[2] != 0) || (rip[3] != 1)) {
 				std::cout << "Someone tried connecting via non-localhost address! IP: " << (int)rip[0] << "." << (int)rip[1] << "." << (int)rip[2] << "." << (int)rip[3] << std::endl;
 				SDLNet_TCP_Close(connection);
