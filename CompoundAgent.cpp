@@ -53,9 +53,9 @@ void CompoundAgent::addPart(CompoundPart *p) {
 	parts.push_back(p);
 	std::sort(parts.begin(), parts.end(), less_part());
 
-	// this is an icky hack..
-	if (p->x + p->getWidth() > fullwidth) fullwidth = p->x + p->getWidth();
-	if (p->y + p->getHeight() > fullheight) fullheight = p->y + p->getHeight();
+	// this is an icky hack.. for instance, it doesn't take account of negative x/y (which we don't have any way of handling right now)
+	if (p->x + (int)p->getWidth() > (int)fullwidth) fullwidth = p->x + p->getWidth();
+	if (p->y + (int)p->getHeight() > (int)fullheight) fullheight = p->y + p->getHeight();
 }
 
 void CompoundAgent::delPart(unsigned int id) {

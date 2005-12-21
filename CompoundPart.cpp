@@ -27,7 +27,7 @@ void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 }
 
 CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg,
-						unsigned int _x, unsigned int _y, unsigned int _z) {
+						int _x, int _y, unsigned int _z) {
 	id = _id;
 	firstimg = fimg;
 	x = _x;
@@ -42,23 +42,23 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 	framedelay = 0;
 }
 
-DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			 unsigned int _z) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
 }
 
-ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 	unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
 	messageid = msgid;
 	hitopaquepixelsonly = (option == 1);
 	hoveranimation = animhover;
 }
 
-FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z) {
 	// TODO: load fontsprite
 }
 
-TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, unsigned int _x, unsigned int _y,
+TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z) {
 	// TODO: load fontsprite, msgid
 }
