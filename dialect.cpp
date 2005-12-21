@@ -55,8 +55,8 @@ void parseCondition(caosScript *s, int success, int failure) {
 
 		struct token *peek = tokenPeek();
 		if (!peek)
-			throw parseException("unexpected eoi");
-		if (peek->type == TOK_WORD) {
+			isLast = true;
+		else if (peek->type == TOK_WORD) {
 			if (peek->word == "and") {
 				getToken();
 				isOr = false;

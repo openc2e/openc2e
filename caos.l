@@ -32,6 +32,7 @@ WORDANY     [a-zA-Z0-9:?!_+-]
 ">="                     lex_lineno = yylineno;  return make_word("ge");
 "<"                      lex_lineno = yylineno;  return make_word("lt");
 ">"                      lex_lineno = yylineno;  return make_word("gt");
+"=="                     lex_lineno = yylineno;  return make_word("eq");
 "="                      lex_lineno = yylineno;  return make_word("eq");
 "&&"                     lex_lineno = yylineno;  return make_word("and");
 "||"                     lex_lineno = yylineno;  return make_word("or");
