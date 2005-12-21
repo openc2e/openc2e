@@ -261,6 +261,16 @@ class caosSTOP : public caosOp {
 		}
 };
 
+class caosAssert : public caosOp {
+	public:
+		void execute(caosVM *vm) {
+			throw caosException("DBG: ASRT failed");
+		}
+		std::string dump() {
+			return std::string("ASSERT FAILURE");
+		}
+};
+
 #endif
 
 /* vim: set noet: */

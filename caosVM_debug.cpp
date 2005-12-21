@@ -247,4 +247,12 @@ void caosVM::c_DBG_DISA() {
 	*outputstream << s->dump();
 }
 
+/**
+ DBG: ASRT (command) condition (condition)
+ %pragma parser new AssertParser()
+ %status maybe
+
+ Blow up unless condition is true
+*/
+
 /* vim: set noet: */

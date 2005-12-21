@@ -89,6 +89,21 @@ class DoifParser : public parseDelegate {
 		}
 };
 		
+class AssertParser : public parseDelegate {
+	protected:
+	public:
+		virtual void operator()(class caosScript *s, class Dialect *curD) {
+			int success, failure;
+			success = s->current->newRelocation();
+			failure = s->current->newRelocation();
+			parseCondition(s, success, failure);
+
+			s->current->fixRelocation(failure);
+			s->current->thread(new caosAssert());
+			s->current->fixRelocation(success);
+		}
+};
+
 class NamespaceDelegate : public parseDelegate {
 	public:
 		OneShotDialect dialect;

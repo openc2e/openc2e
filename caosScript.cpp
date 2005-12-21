@@ -66,7 +66,19 @@ void script::link() {
 }
 
 script::script(const Variant *v, const std::string &fn)
-	: variant(v), filename(fn) {
+	: fmly(-1), gnus(-1), spcs(-1), scrp(-1),
+	  variant(v), filename(fn)
+{
+	allOps.push_back(new caosNoop());
+	relocations.push_back(0);
+	linked = false;
+}
+	
+script::script(const Variant *v, const std::string &fn,
+		int fmly_, int gnus_, int spcs_, int scrp_)
+	: fmly(fmly_), gnus(gnus_), spcs(spcs_), scrp(scrp_),
+	  variant(v), filename(fn)
+{
 	allOps.push_back(new caosNoop());
 	relocations.push_back(0);
 	linked = false;
@@ -147,13 +159,12 @@ class BaseDialect : public Dialect {
 					ENDM endm;
 					d.delegates = s->v->cmd_dialect->delegates;
 					d.delegates["endm"] = &endm;
-					struct residentScript scr(
-							fmly.constval.getInt(),
-							gnus.constval.getInt(),
-							spcs.constval.getInt(),
-							scrp.constval.getInt(),
-							new script(s->v, s->filename));
-					s->current = scr.s;
+					script *scr = new script(s->v, s->filename,
+									fmly.constval.getInt(),
+									gnus.constval.getInt(),
+									spcs.constval.getInt(),
+									scrp.constval.getInt());
+					s->current = scr;
 					d.doParse(s);
 					s->current = s->installer;
 					assert(s->current);
@@ -187,9 +198,9 @@ void caosScript::parse(std::istream &in) {
 	installer->link();
 	if (removal)
 		removal->link();
-	std::vector<residentScript>::iterator i = scripts.begin();
+	std::vector<script *>::iterator i = scripts.begin();
 	while (i != scripts.end()) {
-		i->s->link();
+		(*i)->link();
 		i++;
 	}
 }
@@ -198,15 +209,16 @@ caosScript::~caosScript() {
 	installer->release();
 	if (removal)
 		removal->release();
-	std::vector<residentScript>::iterator i = scripts.begin();
+	std::vector<script *>::iterator i = scripts.begin();
 	while (i != scripts.end())
-		i++->s->release();
+		(*i)->release();
 }
 
 void caosScript::installScripts() {
-	std::vector<residentScript>::iterator i = scripts.begin();
+	std::vector<script *>::iterator i = scripts.begin();
 	while (i != scripts.end()) {
-		world.scriptorium.addScript(i->fmly, i->gnus, i->spcs, i->scrp, i->s);
+		script *s = *i;
+		world.scriptorium.addScript(s->fmly, s->gnus, s->spcs, s->scrp, s);
 		i++;
 	}
 }

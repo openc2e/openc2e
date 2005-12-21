@@ -393,6 +393,10 @@ public:
 	void c_UNLK();
 	void c_WAIT();
 	void c_STOP();
+	void v_CODE();
+	void v_CODF();
+	void v_CODG();
+	void v_CODS();
 
 	void c_RGAM();
 	void v_MOWS();

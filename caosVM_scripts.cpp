@@ -115,10 +115,86 @@ void caosVM::c_STOP() {
 */
 void caosVM::c_SCRX() {
 	VM_VERIFY_SIZE(4)
-	VM_PARAM_INTEGER(event) assert(event >= 0); assert(event <= 255);
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
+	VM_PARAM_INTEGER(event) 
+	caos_assert(event >= 0); 
+	caos_assert(event <= 255);
+	VM_PARAM_INTEGER(species) 
+	caos_assert(species >= 0); 
+	caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) 
+	caos_assert(genus >= 0); 
+	caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) 
+	caos_assert(family >= 0); 
+	caos_assert(family <= 255);
 	world.scriptorium.delScript(family, genus, species, event);
+}
+
+/**
+ CODE (integer)
+
+ Return script number running in the target. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script)
+*/
+void caosVM::v_CODE() {
+	caos_assert(targ);
+	int res;
+	if (targ->vm && targ->vm->currentscript)
+		res = targ->vm->currentscript->scrp;
+	else
+		res = -1;
+	
+	result.setInt(res);
+}
+
+/**
+ CODF (integer)
+
+ Return script family running in the target. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script)
+*/
+void caosVM::v_CODF() {
+	caos_assert(targ);
+	int res;
+	if (targ->vm && targ->vm->currentscript)
+		res = targ->vm->currentscript->fmly;
+	else
+		res = -1;
+	
+	result.setInt(res);
+}
+
+/**
+ CODG (integer)
+
+ Return script genus running in the target. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script)
+*/
+void caosVM::v_CODG() {
+	caos_assert(targ);
+	int res;
+	if (targ->vm && targ->vm->currentscript)
+		res = targ->vm->currentscript->gnus;
+	else
+		res = -1;
+	
+	result.setInt(res);
+}
+
+/**
+ CODS (integer)
+
+ Return script species running in the target. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script)
+*/
+void caosVM::v_CODS() {
+	caos_assert(targ);
+	int res;
+	if (targ->vm && targ->vm->currentscript)
+		res = targ->vm->currentscript->spcs;
+	else
+		res = -1;
+	
+	result.setInt(res);
 }
 /* vim: set noet: */

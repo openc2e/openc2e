@@ -34,6 +34,7 @@ class Variant;
 
 struct script { //: public Collectable {
 	protected:
+		
 		bool linked;
 
 		// position 0 is reserved in the below vector
@@ -41,6 +42,7 @@ struct script { //: public Collectable {
 		// pos-0 needs to be initted to a caosNoop
 		std::vector<class caosOp *> allOps;
 	public:
+		const int fmly, gnus, spcs, scrp;
 		const Variant *variant;
 		const Variant *getVariant() const { return variant; };
 		
@@ -55,6 +57,8 @@ struct script { //: public Collectable {
 		int getNextIndex() { return allOps.size(); }
 		// add op as the next opcode
 		void thread(caosOp *op);
+		script(const Variant *v, const std::string &fn,
+				int fmly_, int gnus_, int spcs_, int scrp_);
 		script(const Variant *v, const std::string &fn);
 		~script();
 		std::string dump();
@@ -99,33 +103,12 @@ struct script { //: public Collectable {
 		
 };
 
-struct residentScript {
-	Variant *variant;
-	int fmly, gnus, spcs, scrp;
-	script *s;
-
-	~residentScript() {
-		s->release();
-	}
-
-	residentScript(int f, int g, int s_, int scrp_, script *scr)
-		: fmly(f), gnus(g), spcs(s_), scrp(scrp_), s(scr) {
-			s->retain();
-	}
-
-	residentScript(const residentScript &rs) {
-		fmly = rs.fmly; gnus = rs.gnus; spcs = rs.spcs; scrp = rs.scrp;
-		s = rs.s;
-		s->retain();
-	}
-};
-
 class caosScript { //: Collectable {
 public:
 	const Variant *v;
 	std::string filename;
 	script *installer, *removal;
-	std::vector<residentScript> scripts;
+	std::vector<script *> scripts;
 	script *current;
 
 	caosScript(const std::string &variant, const std::string &fn);
