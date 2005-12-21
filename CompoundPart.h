@@ -88,15 +88,32 @@ public:
 	DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z);
 };
 
+struct linedata {
+	std::string text;
+	unsigned int width;
+
+	void reset() { text = ""; width = 0; }
+	linedata() { reset(); }
+};
+
 class TextPart : public CompoundPart {
 protected:
+	std::vector<linedata> lines;
+	std::vector<unsigned int> pages;
 	std::string text;
-	TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z)
-		: CompoundPart(_id, spritefile, fimg, _x, _y, _z) { }
+	creaturesImage *textsprite;
+	int leftmargin, topmargin, rightmargin, bottommargin;
+	int linespacing, charspacing;
+	bool left_align, center_align, bottom_align, middle_align, last_page_scroll;
+	TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite);
+	void recalculateData();
+	unsigned int calculateWordWidth(std::string word);
 
 public:
-	void setText(std::string t) { text = t; }
+	void setText(std::string t) { text = t; recalculateData(); }
 	std::string getText() { return text; }
+	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
+	void setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll);
 };
 
 class FixedTextPart : public TextPart {

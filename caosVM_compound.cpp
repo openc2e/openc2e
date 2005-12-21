@@ -222,8 +222,9 @@ void caosVM::c_FRMT() {
 	caos_assert(c);
 	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
 	caos_assert(p);
-	
-	// TODO
+
+	p->setFormat(left_margin, top_margin, right_margin, bottom_margin, line_spacing, char_spacing, 
+			(!(justification & 1)), (justification & 2), (justification & 4), (justification & 8), (justification & 16));
 }
 
 /**
