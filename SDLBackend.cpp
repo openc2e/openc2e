@@ -71,7 +71,7 @@ void SDLBackend::init(bool enable_sound) {
 
 	resizeNotify(800, 600);
 	
-	SDL_WM_SetCaption("openc2e - Creatures 3 (development build)", "openc2e");
+	SDL_WM_SetCaption("openc2e (development build " __DATE__ ")", "openc2e");
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);
 }
