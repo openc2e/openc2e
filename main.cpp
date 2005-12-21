@@ -371,7 +371,7 @@ extern "C" int main(int argc, char *argv[]) {
 		f << buf;
 	}
 
-	Agent *handAgent = 0;
+	AgentRef handAgent;
 
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		MetaRoom *m = world.map.getArrayMetaRoom(j);
