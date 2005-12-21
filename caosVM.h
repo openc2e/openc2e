@@ -184,6 +184,7 @@ public:
 	void v_WNDT();
 	void c_WDOW();
 	void v_WDOW();
+	void c_TRCK();
 
 	// world
 	void c_LOAD();
@@ -566,6 +567,7 @@ public:
 	
 	// history
 	void v_HIST_NAME();
+	void c_HIST_EVNT();
 	void v_OOWW();
 
 	void runOp();

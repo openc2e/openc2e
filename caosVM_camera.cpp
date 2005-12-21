@@ -230,4 +230,23 @@ void caosVM::v_WDOW() {
 	result.setInt(0);
 }
 
+/**
+ TRCK (command) agent (agent) xpercent (integer) ypercent (integer) style (integer) transition (integer)
+ %status maybe
+
+ Tell the current camera to track the specified agent, or set to NULL to stop tracking.
+ xpercent and ypercent define a rectangle on the screen which the camera should keep the tracked agent inside.
+ style 0 is brittle, tracking is broken easily. style 1 is flexible, moving the camera back inside the rectangle resumes tracking. style 3 is hard, you can't move outside the rectangle.
+ transition: 0 for none, 1 for flip horz, 2 for burst
+*/
+void caosVM::c_TRCK() {
+	VM_PARAM_INTEGER(transition)
+	VM_PARAM_INTEGER(style)
+	VM_PARAM_INTEGER(ypercent)
+	VM_PARAM_INTEGER(xpercent)
+	VM_PARAM_VALIDAGENT(agent)
+
+	world.camera.trackAgent(agent, xpercent, ypercent, (trackstyle)style, (cameratransition)transition);
+}
+
 /* vim: set noet: */

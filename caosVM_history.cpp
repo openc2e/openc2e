@@ -44,4 +44,19 @@ void caosVM::v_HIST_NAME() {
 	result.setString(""); // TODO
 }
 
+/**
+ HIST EVNT (command) moniker (string) type (integer) relatedmoniker1 (string) relatedmoniker2 (string)
+ %status stub
+
+ Fire a life event of the specified type with the specified moniker.
+*/
+void caosVM::c_HIST_EVNT() {
+	VM_PARAM_STRING(relatedmoniker2)
+	VM_PARAM_STRING(relatedmoniker1)
+	VM_PARAM_INTEGER(type)
+	VM_PARAM_STRING(moniker)
+
+	// TODO
+}
+
 /* vim: set noet: */
