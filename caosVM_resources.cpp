@@ -27,6 +27,11 @@
  or default if the tag doesn't exist
 */
 void caosVM::v_PRAY_AGTI() {
+	VM_PARAM_INTEGER(_default)
+	VM_PARAM_STRING(tag)
+	VM_PARAM_STRING(resource)
+
+	result.setInt(0); // TODO
 }
 
 /**
@@ -37,6 +42,11 @@ void caosVM::v_PRAY_AGTI() {
  or default if the tag doesn't exist
 */
 void caosVM::v_PRAY_AGTS() {
+	VM_PARAM_INTEGER(_default)
+	VM_PARAM_STRING(tag)
+	VM_PARAM_STRING(resource)
+
+	result.setInt(0); // TODO
 }
 
 /**
@@ -47,6 +57,10 @@ void caosVM::v_PRAY_AGTS() {
  see PRAY PREV if you want to loop around
 */
 void caosVM::v_PRAY_BACK() {
+	VM_PARAM_STRING(last)
+	VM_PARAM_STRING(type)
+
+	result.setString(""); // TODO
 }
 
 /**
@@ -56,6 +70,9 @@ void caosVM::v_PRAY_BACK() {
  return the number of resources of the specified type available
 */
 void caosVM::v_PRAY_COUN() {
+	VM_PARAM_STRING(type)
+
+	result.setInt(0); // TODO
 }
 
 /**
@@ -63,6 +80,10 @@ void caosVM::v_PRAY_COUN() {
  %status stub
 */
 void caosVM::v_PRAY_DEPS() {
+	VM_PARAM_INTEGER(install)
+	VM_PARAM_STRING(name)
+
+	result.setInt(0); // TODO
 }
 
 /**
@@ -70,6 +91,9 @@ void caosVM::v_PRAY_DEPS() {
  %status stub
 */
 void caosVM::v_PRAY_EXPO() {
+	VM_PARAM_STRING(type)
+
+	result.setInt(0); // TODO
 }
 
 /**
@@ -81,6 +105,11 @@ void caosVM::v_PRAY_EXPO() {
  returns 0 on success, 1 on failure
 */
 void caosVM::v_PRAY_FILE() {
+	VM_PARAM_INTEGER(install)
+	VM_PARAM_INTEGER(type)
+	VM_PARAM_STRING(name)
+
+	result.setInt(1); // TODO
 }
 
 /**
@@ -91,6 +120,10 @@ void caosVM::v_PRAY_FILE() {
  see PRAY NEXT if you don't want to loop around
 */
 void caosVM::v_PRAY_FORE() {
+	VM_PARAM_STRING(last)
+	VM_PARAM_STRING(type)
+
+	result.setString(""); // TODO
 }
 
 /**
@@ -103,6 +136,9 @@ void caosVM::v_PRAY_FORE() {
  recommended to be called after intensive PRAY usage, eg agent installation
 */
 void caosVM::c_PRAY_GARB() {
+	VM_PARAM_INTEGER(force)
+
+	// TODO
 }
 
 /**
@@ -110,6 +146,11 @@ void caosVM::c_PRAY_GARB() {
  %status stub
 */
 void caosVM::v_PRAY_IMPO() {
+	VM_PARAM_INTEGER(keepfile)
+	VM_PARAM_INTEGER(doit)
+	VM_PARAM_STRING(moniker)
+
+	result.setInt(4); // TODO
 }
 
 /**
@@ -117,6 +158,11 @@ void caosVM::v_PRAY_IMPO() {
  %status stub
 */
 void caosVM::v_PRAY_INJT() {
+	VM_PARAM_VARIABLE(report)
+	VM_PARAM_INTEGER(install)
+	VM_PARAM_STRING(name)
+
+	result.setInt(-1); // TODO
 }
 
 /**
@@ -128,6 +174,9 @@ void caosVM::v_PRAY_INJT() {
  returns 1 upon success, or 0 upon failure (typically no such resource)
 */
 void caosVM::v_PRAY_KILL() {
+	VM_PARAM_STRING(resource)
+
+	result.setInt(0); // TODO
 }
 
 /**
@@ -135,6 +184,14 @@ void caosVM::v_PRAY_KILL() {
  %status stub
 */
 void caosVM::v_PRAY_MAKE() {
+	VM_PARAM_VARIABLE(report)
+	VM_PARAM_STRING(name)
+	VM_PARAM_INTEGER(prayspot)
+	VM_PARAM_STRING(journalname)
+	VM_PARAM_INTEGER(journalspot)
+
+	result.setInt(1); // TODO
+	report->setString("hat u");
 }
 
 /**
@@ -145,6 +202,10 @@ void caosVM::v_PRAY_MAKE() {
  see PRAY FORE if you don't want to loop around
 */
 void caosVM::v_PRAY_NEXT() {
+	VM_PARAM_STRING(last)
+	VM_PARAM_STRING(type)
+
+	result.setString(""); // TODO
 }
 
 /**
@@ -155,6 +216,10 @@ void caosVM::v_PRAY_NEXT() {
  see PRAY BACK if you don't want to loop around
 */
 void caosVM::v_PRAY_PREV() {
+	VM_PARAM_STRING(last)
+	VM_PARAM_STRING(type)
+
+	result.setString(""); // TODO
 }
 
 /**
@@ -164,6 +229,7 @@ void caosVM::v_PRAY_PREV() {
  make the pray manager check for deleted/new files in the resource directory
 */
 void caosVM::c_PRAY_REFR() {
+	// TODO
 }
 
 /**
@@ -171,5 +237,9 @@ void caosVM::c_PRAY_REFR() {
  %status stub
 */
 void caosVM::v_PRAY_TEST() {
+	VM_PARAM_STRING(name)
+		
+	result.setInt(0); // TODO
 }
+
 /* vim: set noet: */
