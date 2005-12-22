@@ -111,7 +111,7 @@ protected:
 	unsigned int calculateWordWidth(std::string word);
 
 public:
-	void setText(std::string t) { text = t; recalculateData(); }
+	void setText(std::string t);
 	std::string getText() { return text; }
 	unsigned int noPages() { return pages.size(); }
 	void setPage(unsigned int p) { currpage = p; }

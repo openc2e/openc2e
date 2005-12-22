@@ -66,6 +66,30 @@ TextPart::TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, 
 	currpage = 0;
 }
 
+void TextPart::setText(std::string t) {
+	text.clear();
+
+	// parse and remove the <tint> tagging
+	for (unsigned int i = 0; i < t.size(); i++) {
+		if ((t[i] == '<') && (t.size() > i+4))
+			if ((t[i + 1] == 't') && (t[i + 2] == 'i') && (t[i + 3] == 'n') && (t[i + 4] == 't')) {
+				i += 5;
+				std::string tintinfo;
+				if (t[i] == ' ') i++; // skip initial space, if any
+				for (; i < t.size(); i++) {
+					if (t[i] == '>') 
+						break;
+					tintinfo += t[i];
+				}
+				// TODO: handle contents of tintinfo somehow
+				continue;
+			}
+		text += t[i];
+	}
+	
+	recalculateData();
+}
+
 void TextPart::setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll) {
 	leftmargin = left;
 	topmargin = top;
@@ -114,20 +138,6 @@ void TextPart::recalculateData() {
 		// first, retrieve a word from the text
 		std::string word;
 		for (; i < text.size(); i++) {
-			if ((text[i] == '<') && (text.size() > i+4))
-				if ((text[i + 1] == 't') && (text[i + 2] == 'i') && (text[i + 3] == 'n') && (text[i + 4] == 't')) {
-					i += 5;
-					std::string tintinfo;
-					if (text[i] == ' ') i++; // skip initial space, if any
-					for (; i < text.size(); i++) {
-						if (text[i] == '>') {
-							i++;
-							break;
-						}
-						tintinfo += text[i];
-					}
-					// TODO: handle contents of tintinfo somehow
-				}
 			if ((text[i] == ' ') || (text[i] == '\n')) {
 				if (text[i] == '\n') newline = true;
 				i++;
