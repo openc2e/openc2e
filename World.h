@@ -53,6 +53,9 @@ public:
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
 
+	AgentRef focusagent; unsigned int focuspart;
+	void setFocus(class CompoundAgent *a, class TextEntryPart *p);
+
 	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
 	class PointerAgent *hand() { return theHand; }
 	

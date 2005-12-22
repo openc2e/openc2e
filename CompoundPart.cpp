@@ -91,6 +91,14 @@ void TextPart::setText(std::string t) {
 	recalculateData();
 }
 
+void TextEntryPart::setText(std::string t) {
+	TextPart::setText(t);
+
+	// place caret at the end of the text
+	caretline = lines.size() - 1;
+	caretchar = lines[caretline].text.size();
+}
+
 void TextPart::setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll) {
 	leftmargin = left;
 	topmargin = top;

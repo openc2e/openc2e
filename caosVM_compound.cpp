@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "CompoundAgent.h"
 #include "openc2e.h"
+#include "World.h"
 
 /**
  PART (command) part_id (integer)
@@ -191,14 +192,14 @@ void caosVM::c_PAT_KILL() {
 void caosVM::c_FCUS() {
 	VM_VERIFY_SIZE(0)
 
-	if (!targ) {
-		// TODO
-	} else {
+	if (!targ)
+		world.setFocus(0, 0);
+	else {
 		CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 		caos_assert(c);
 		TextEntryPart *p = dynamic_cast<TextEntryPart *>(c->part(part));
 		caos_assert(p);
-		// TODO
+		world.setFocus(c, p);
 	}
 }
 

@@ -20,6 +20,7 @@
 #include "World.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "PointerAgent.h"
+#include "CompoundAgent.h" // for setFocus
 #include <limits.h> // for MAXINT
 #include "creaturesImage.h"
 
@@ -52,6 +53,26 @@ caosVM *World::getVM(Agent *a) {
 void World::freeVM(caosVM *v) {
 	v->setOwner(0);
 	vmpool.push_back(v);
+}
+
+void World::setFocus(CompoundAgent *a, TextEntryPart *p) {
+	// Unfocus the current agent. Not sure if c2e always does this (what if the agent/part is bad?).
+        if (focusagent) {
+		CompoundAgent *c = dynamic_cast<CompoundAgent *>(focusagent.get());
+		assert(c);
+		TextEntryPart *p = dynamic_cast<TextEntryPart *>(c->part(focuspart));
+		if (p)
+			p->loseFocus();
+	}
+
+	if (!p)
+		focusagent.clear();
+	else {
+		assert(p == a->part(p->id));
+		p->gainFocus();
+		focusagent = a;
+		focuspart = p->id;
+	}
 }
 
 void World::tick() {
