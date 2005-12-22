@@ -980,10 +980,17 @@ void caosVM::c_ALPH() {
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
-	p->is_transparent = enable;
-	p->transparency = alpha_value;
+	if (part == -1) {
+		for (std::vector<CompoundPart *>::iterator i = c->parts.begin(); i != c->parts.end(); i++) {
+			(*i)->is_transparent = enable;
+			(*i)->transparency = alpha_value;
+		}
+	} else {
+		CompoundPart *p = c->part(part);
+		caos_assert(p);
+		p->is_transparent = enable;
+		p->transparency = alpha_value;
+	}
 }
 
 /**

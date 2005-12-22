@@ -32,11 +32,11 @@ void caosVM::c_PART() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part_id)
 
-	caos_assert(part_id >= 0);
+	caos_assert((part_id >= 0) || (part_id == -1));
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
-	caos_assert(a->part(part_id));
+	caos_assert(a->part(part_id) || (part_id == -1));
 	part = part_id;
 }
 
