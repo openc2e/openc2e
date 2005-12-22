@@ -116,7 +116,8 @@ public:
 	unsigned int noPages() { return pages.size(); }
 	void setPage(unsigned int p) { currpage = p; }
 	unsigned int getPage() { return currpage; }
-	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
+	void render(class SDLBackend *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
+	void render(class SDLBackend *renderer, int xoffset, int yoffset) { render(renderer, xoffset, yoffset, 0); }
 	void setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll);
 };
 
@@ -137,6 +138,10 @@ private:
 	static creaturesImage *caretsprite;
 	unsigned int caretpose;
 	bool focused;
+	unsigned int caretline, caretchar;
+	void renderCaret(class SDLBackend *renderer, int xoffset, int yoffset);
+
+	friend class TextPart;
 
 public:
 	TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,

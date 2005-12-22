@@ -64,6 +64,7 @@ TextPart::TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, 
 	linespacing = 0; charspacing = 0;
 	left_align = false; center_align = false; bottom_align = false; middle_align = false; last_page_scroll = false;
 	currpage = 0;
+	recalculateData(); // ie, insert a blank first page
 }
 
 void TextPart::setText(std::string t) {
@@ -121,15 +122,18 @@ unsigned int TextPart::calculateWordWidth(std::string word) {
  * Recalculate the data used for rendering the text part.
  */
 void TextPart::recalculateData() {
+	linedata currentdata;
+
 	lines.clear();
 	pages.clear();
-	if (text.size() == 0) return;
 	pages.push_back(0);
+	if (text.size() == 0) {
+		lines.push_back(currentdata); // blank line, so caret is rendered in TextEntryParts
+		return;
+	}
 
 	unsigned int textwidth = getWidth() - leftmargin - rightmargin;
 	unsigned int textheight = getHeight() - topmargin - bottommargin;
-
-	linedata currentdata;
 
 	unsigned int currenty = 0, usedheight = 0;
 	unsigned int i = 0;
@@ -195,10 +199,8 @@ void TextPart::recalculateData() {
 	}
 }
 
-void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
+void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
 	CompoundPart::render(renderer, xoffset + x, yoffset + y);
-
-	if (pages.size() == 0) return;
 	
 	unsigned int xoff = xoffset + x + leftmargin;
 	unsigned int yoff = yoffset + y + topmargin;
@@ -209,16 +211,19 @@ void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	unsigned int startline = pages[currpage];
 	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
 	for (unsigned int i = startline; i < endline; i++) {
-		unsigned int currentx = 0;
+		unsigned int currentx = 0, somex = xoff;
+		if (center_align)
+			somex = somex + ((textwidth - lines[i].width) / 2);
 		for (unsigned int x = 0; x < lines[i].text.size(); x++) {
 			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
 			int spriteid = lines[i].text[x] - 32;
-			if (center_align)
-				renderer->render(textsprite, spriteid, xoff + currentx + ((textwidth - lines[i].width) / 2), yoff + currenty, false, 0);
-			else
-				renderer->render(textsprite, spriteid, xoff + currentx, yoff + currenty, false, 0);
+			renderer->render(textsprite, spriteid, somex + currentx, yoff + currenty, false, 0);
+			if ((caretdata) && (caretdata->caretline == i) && (caretdata->caretchar == x))
+				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 			currentx += textsprite->width(spriteid) + charspacing;
 		}
+		if ((caretdata) && (caretdata->caretline == i) && (caretdata->caretchar == lines[i].text.size()))
+			caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);		
 		currenty += textsprite->height(0) + linespacing;
 	}
 }
@@ -233,11 +238,18 @@ TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned 
 	if (!caretsprite) { caretsprite = gallery.getImage("cursor"); caos_assert(caretsprite); }
 
 	caretpose = 0;
+	caretline = 0;
+	caretchar = 0;
 	focused = false;
 }
 
 void TextEntryPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	TextPart::render(renderer, xoffset, yoffset);
+	TextPart::render(renderer, xoffset, yoffset, (focused ? this : 0));
+}
+
+void TextEntryPart::renderCaret(SDLBackend *renderer, int xoffset, int yoffset) {
+	// TODO: fudge xoffset/yoffset as required
+	renderer->render(caretsprite, caretpose, xoffset, yoffset, false, 0);
 }
 
 void TextEntryPart::tick() {
