@@ -290,7 +290,7 @@ void caosVM::v_PNXT() {
 
 /**
  PAGE (command) page (integer)
- %status stub
+ %status maybe
 
  Set the zero-based page number of the current text part.
 */
@@ -305,12 +305,12 @@ void caosVM::c_PAGE() {
 	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
 	caos_assert(t);
 
-	// TODO
+	t->setPage(page);
 }
 
 /**
  PAGE (integer)
- %status stub
+ %status maybe
 
  Returns the zero-based page number of the current text part.
 */
@@ -323,12 +323,12 @@ void caosVM::v_PAGE() {
 	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
 	caos_assert(t);
 
-	result.setInt(0); // TODO
+	result.setInt(t->getPage());
 }
 
 /**
  NPGS (integer)
- %status stub
+ %status maybe
 
  Returns the number of pages for the current text part.
 */
@@ -341,7 +341,7 @@ void caosVM::v_NPGS() {
 	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
 	caos_assert(t);
 
-	result.setInt(1); // TODO
+	result.setInt(t->noPages());
 }
 
 /* vim: set noet: */

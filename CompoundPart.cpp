@@ -61,6 +61,7 @@ TextPart::TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, 
 	leftmargin = 8; topmargin = 8; rightmargin = 8; bottommargin = 8;
 	linespacing = 0; charspacing = 0;
 	left_align = false; center_align = false; bottom_align = false; middle_align = false; last_page_scroll = false;
+	currpage = 0;
 }
 
 void TextPart::setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll) {
@@ -95,6 +96,9 @@ unsigned int TextPart::calculateWordWidth(std::string word) {
  */
 void TextPart::recalculateData() {
 	lines.clear();
+	pages.clear();
+	if (text.size() == 0) return;
+	pages.push_back(0);
 
 	unsigned int textwidth = getWidth() - leftmargin - rightmargin;
 	unsigned int textheight = getHeight() - topmargin - bottommargin;
@@ -104,6 +108,7 @@ void TextPart::recalculateData() {
 	unsigned int currenty = 0, usedheight = 0;
 	unsigned int i = 0;
 	while (i < text.size()) {
+		bool newline = false;
 		// first, retrieve a word from the text
 		std::string word;
 		for (; i < text.size(); i++) {
@@ -121,7 +126,8 @@ void TextPart::recalculateData() {
 					}
 					// TODO: handle contents of tintinfo somehow
 				}
-			if ((text[i] == ' ') || (text[i] == '\n')) { 
+			if ((text[i] == ' ') || (text[i] == '\n')) {
+				if (text[i] == '\n') newline = true;
 				i++;
 				break;
 			}
@@ -135,6 +141,7 @@ void TextPart::recalculateData() {
 		if (currentdata.text.size() > 0)
 			possiblelen = wordlen + spacelen;
 		// TODO: set usedheight as appropriate/needed
+		usedheight = textsprite->height(0);
 		if (currentdata.width + possiblelen <= textwidth) {
 			// the rest of the word fits on the current line, so that's okay.
 			// add a space if we're not the first word on this line
@@ -143,7 +150,11 @@ void TextPart::recalculateData() {
 			currentdata.width += possiblelen;
 		} else if (wordlen <= textwidth) {
 			// the rest of the word doesn't fit on the current line, but does on the next line.
-			currenty += usedheight;
+			currenty += usedheight + linespacing;
+			if (currenty > textheight) {
+				currenty = 0;
+				pages.push_back(lines.size());
+			}
 			lines.push_back(currentdata);
 			currentdata.reset();
 
@@ -154,7 +165,16 @@ void TextPart::recalculateData() {
 			// we should output as much as possible and then go backwards
 		}
 
-		// we should force a newline here if necessary (ie, if the last char is '\n', except not in the last case)
+		// we force a newline here if necessary (ie, if the last char is '\n', except not in the last case)
+		if ((i < text.size()) && (newline)) {
+			currenty += usedheight + linespacing;
+			if (currenty > textheight) {
+				currenty = 0;
+				pages.push_back(lines.size());
+			}
+			lines.push_back(currentdata);
+			currentdata.reset();
+		}
 	}
 
 	if (currentdata.text.size() > 0) {
@@ -165,6 +185,8 @@ void TextPart::recalculateData() {
 
 void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	CompoundPart::render(renderer, xoffset + x, yoffset + y);
+
+	if (pages.size() == 0) return;
 	
 	unsigned int xoff = xoffset + x + leftmargin;
 	unsigned int yoff = yoffset + y + topmargin;
@@ -172,13 +194,15 @@ void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	unsigned int textheight = getHeight() - topmargin - bottommargin;
 
 	unsigned int currenty = 0, usedheight = 0;
-	for (std::vector<linedata>::iterator i = lines.begin(); i != lines.end(); i++) {
+	unsigned int startline = pages[currpage];
+	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
+	for (unsigned int i = startline; i < endline; i++) {
 		unsigned int currentx = 0;
-		for (unsigned int x = 0; x < i->text.size(); x++) {
-			if (i->text[x] < 32) continue; // TODO: replace with space or similar?
-			int spriteid = i->text[x] - 32;
+		for (unsigned int x = 0; x < lines[i].text.size(); x++) {
+			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
+			int spriteid = lines[i].text[x] - 32;
 			if (center_align)
-				renderer->render(textsprite, spriteid, xoff + currentx + ((textwidth - i->width) / 2), yoff + currenty, false, 0);
+				renderer->render(textsprite, spriteid, xoff + currentx + ((textwidth - lines[i].width) / 2), yoff + currenty, false, 0);
 			else
 				renderer->render(textsprite, spriteid, xoff + currentx, yoff + currenty, false, 0);
 			currentx += textsprite->width(spriteid) + charspacing;

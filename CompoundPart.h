@@ -100,6 +100,7 @@ class TextPart : public CompoundPart {
 protected:
 	std::vector<linedata> lines;
 	std::vector<unsigned int> pages;
+	unsigned int currpage;
 	std::string text;
 	creaturesImage *textsprite;
 	int leftmargin, topmargin, rightmargin, bottommargin;
@@ -112,6 +113,9 @@ protected:
 public:
 	void setText(std::string t) { text = t; recalculateData(); }
 	std::string getText() { return text; }
+	unsigned int noPages() { return pages.size(); }
+	void setPage(unsigned int p) { currpage = p; }
+	unsigned int getPage() { return currpage; }
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
 	void setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll);
 };
