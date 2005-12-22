@@ -384,6 +384,8 @@ extern "C" int main(int argc, char *argv[]) {
 
 	drawWorld();
 
+	SDL_EnableUNICODE(1); // bz2 and I both think this is the only way to get useful ascii out of SDL
+
 	bool done = false;
 	unsigned int tickdata = 0;
 	unsigned int ticktime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -504,22 +506,6 @@ extern "C" int main(int argc, char *argv[]) {
 						MetaRoom *n;
 						
 						switch (event.key.keysym.sym) {
-						/*	case SDLK_LEFT:
-								adjustbyx = -20;
-								break;
-							case SDLK_RIGHT:
-								adjustbyx = 20;
-								break;
-							case SDLK_UP:
-								adjustbyy = -20;
-								break;
-							case SDLK_DOWN:
-								adjustbyy = 20;
-								break; */
-							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
-								showrooms = !showrooms; break;
-							case SDLK_q:
-								done = true; break;
 							case SDLK_PAGEDOWN:
 								if (world.camera.getMetaRoom()->id == 0)
 									break;
@@ -534,7 +520,27 @@ extern "C" int main(int argc, char *argv[]) {
 								if (n)
 									world.camera.goToMetaRoom(n->id);
 								break;
+							case SDLK_BACKSPACE:
+								if (world.focusagent) {
+									TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
+									t->handleKey(0);
+								}
+								break;
+							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
+								if (!world.focusagent) { showrooms = !showrooms; break; }
+							case SDLK_q:
+								if (!world.focusagent) { done = true; break; }
 							default:
+								if (event.key.keysym.unicode) {
+									if ((event.key.keysym.unicode & 0xFF80) == 0) {
+										char ch = event.key.keysym.unicode & 0x7F;
+										if (world.focusagent) {
+											// TODO: why isn't focuspart a TextEntryPart*?
+											TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
+											t->handleKey(ch);
+										}
+									}
+								}
 								break;
 						}
 

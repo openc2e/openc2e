@@ -149,6 +149,7 @@ public:
 	void setText(std::string t);
 	void gainFocus() { focused = true; caretpose = 0; }
 	void loseFocus() { focused = false; }
+	void handleKey(char c);
 	void tick();
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
 };

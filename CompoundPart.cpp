@@ -99,6 +99,19 @@ void TextEntryPart::setText(std::string t) {
 	caretchar = lines[caretline].text.size();
 }
 
+void TextEntryPart::handleKey(char c) {
+	// TODO: this is dumb
+	if (c == 0) {
+		if (text.size() == 0) return;
+		text.erase(text.end() - 1);
+		caretchar--; // TODO: it's not this simple!
+	} else {
+		text += c;
+		caretchar++; // TODO: it's not this simple!
+	}
+	recalculateData();
+}
+
 void TextPart::setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll) {
 	leftmargin = left;
 	topmargin = top;
@@ -179,6 +192,7 @@ void TextPart::recalculateData() {
 				currenty = 0;
 				pages.push_back(lines.size());
 			}
+			currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 			lines.push_back(currentdata);
 			currentdata.reset();
 
@@ -203,6 +217,7 @@ void TextPart::recalculateData() {
 
 	if (currentdata.text.size() > 0) {
 		currenty += usedheight;
+		currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 		lines.push_back(currentdata);
 	}
 }
