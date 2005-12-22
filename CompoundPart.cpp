@@ -22,6 +22,8 @@
 #include "c16Image.h"
 #include "SDLBackend.h"
 
+creaturesImage *TextEntryPart::caretsprite = 0;
+
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, is_transparent, transparency);
 }
@@ -218,7 +220,24 @@ FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned 
 
 TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z, fontsprite) {
-	// TODO: store msgid
+	if (!caretsprite) { caretsprite = gallery.getImage("cursor"); caos_assert(caretsprite); }
+
+	caretpose = 0;
+	focused = false;
+}
+
+void TextEntryPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
+	TextPart::render(renderer, xoffset, yoffset);
+}
+
+void TextEntryPart::tick() {
+	CompoundPart::tick();
+
+	if (focused) {
+		caretpose++;
+		if (caretpose == caretsprite->numframes())
+			caretpose = 0;
+	}
 }
 
 void CompoundPart::tick() {

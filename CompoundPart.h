@@ -133,9 +133,18 @@ public:
 };
 
 class TextEntryPart : public TextPart {
+private:
+	static creaturesImage *caretsprite;
+	unsigned int caretpose;
+	bool focused;
+
 public:
 	TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				  unsigned int _z, unsigned int msgid, std::string fontsprite);
+	void gainFocus() { focused = true; caretpose = 0; }
+	void loseFocus() { focused = false; }
+	void tick();
+	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
 };
 
 #endif
