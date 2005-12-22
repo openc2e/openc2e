@@ -28,7 +28,7 @@ Camera::Camera() {
 	trackedagent = 0;
 }
 
-MetaRoom *Camera::getMetaRoom() {
+MetaRoom * const Camera::getMetaRoom() {
 	return world.map.getMetaRoom(metaroom);
 }
 
@@ -43,20 +43,56 @@ void Camera::goToMetaRoom(unsigned int m, int _x, int _y, cameratransition trans
 	x = _x;
 	y = _y;
 	// TODO: transition
+	
+	checkBounds();
 }
 
 void Camera::moveTo(int _x, int _y, panstyle pan) {
 	x = _x;
 	y = _y;
 	// TODO: panning
+	
+	checkBounds();
 }
 
 void Camera::trackAgent(class Agent *a, int xp, int yp, trackstyle s, cameratransition transition) {
 	// TODO
 }
 
+void Camera::checkBounds() {
+	MetaRoom *m = getMetaRoom();
+	if (!m) return;
+	
+	if (x < m->x()) {
+		x = m->x();
+	} else if (x + getWidth() > m->x() + m->width()) {
+		x = m->x() + m->width() - getWidth();
+	}
+
+	if (y < m->y()) {
+		y = m->y();
+	} else if (y + getHeight() > m->y() + m->height()) {
+		y = m->y() + m->height() - getHeight();
+	}
+}
+
 void Camera::tick() {
 	// TODO
 }
-					
+
+unsigned int const MainCamera::getWidth() {
+	if ((!getMetaRoom()) || (backend->getWidth() < getMetaRoom()->width()))
+		return backend->getWidth();
+	else
+		return getMetaRoom()->width();
+}
+
+unsigned int const MainCamera::getHeight() {
+	if ((!getMetaRoom()) || (backend->getHeight() < getMetaRoom()->height()))
+		return backend->getHeight();
+	else
+		return getMetaRoom()->height();
+}
+
+
 /* vim: set noet: */
