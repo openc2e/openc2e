@@ -217,7 +217,7 @@ void TextPart::recalculateData() {
 
 	if (currentdata.text.size() > 0) {
 		currenty += usedheight;
-		currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
+		if (text[text.size() -1] == ' ') currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 		lines.push_back(currentdata);
 	}
 }
