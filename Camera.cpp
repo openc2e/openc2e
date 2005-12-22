@@ -63,13 +63,13 @@ void Camera::checkBounds() {
 	MetaRoom *m = getMetaRoom();
 	if (!m) return;
 	
-	if (x < m->x()) {
+	if (x < (int)m->x()) {
 		x = m->x();
 	} else if (x + getWidth() > m->x() + m->width()) {
 		x = m->x() + m->width() - getWidth();
 	}
 
-	if (y < m->y()) {
+	if (y < (int)m->y()) {
 		y = m->y();
 	} else if (y + getHeight() > m->y() + m->height()) {
 		y = m->y() + m->height() - getHeight();

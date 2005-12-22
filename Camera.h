@@ -29,7 +29,7 @@ enum panstyle { jump = 0, smoothscroll = 1, smoothscrollifvisible = 2 };
 
 class Camera {
 protected:
-	unsigned int x, y;
+	int x, y;
 	unsigned int metaroom;
 
 	bool panning;
