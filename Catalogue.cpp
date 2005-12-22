@@ -87,7 +87,19 @@ std::istream &operator >> (std::istream &s, Catalogue &c) {
 //				std::cout << "catalogue appending value: " << t << std::endl;
 				wasparsingstring = false;
 				assert(x != 0);
-				x->push_back(t);
+				/* hack to handle '\n', until someone rewrites the catalogue parser (hint hint) */
+				std::string newtext;
+				for (unsigned int z = 0; z < t.size(); z++) {
+					if (t[z] == '\\') {
+						switch (t[z + 1]) { // will die on end-of-string, but it's a hack..
+							case 'n': newtext += '\n'; break;
+							case '\\': newtext += '\\'; break;
+							default: newtext += '\\'; z--; break; // counteract the z++ below
+						}
+						z++;
+					} else newtext += t[z];
+				}
+				x->push_back(newtext);
 				t.clear();
 			} else if (wasparsingstring) {
 				assert(stage == 1);
