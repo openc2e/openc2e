@@ -22,7 +22,7 @@
 #include "dialect.h"
 
 #include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
-#include "SDL_net.h"
+#include <SDL_net.h>
 
 #ifdef _MSC_VER
 #define snprintf _snprintf // guh guh guh ><

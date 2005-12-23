@@ -21,7 +21,6 @@
 #define __AGENT_H
 
 #include "creaturesImage.h"
-#include "SDLBackend.h"
 #include "caosVar.h"
 #include "AgentRef.h"
 #include <set>
@@ -114,7 +113,7 @@ public:
 	virtual unsigned int getCheckHeight() { return getHeight(); }
 
 	virtual void tick();
-	virtual void render(SDLBackend *renderer, int xoffset, int yoffset) = 0;
+	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	virtual void kill();
 	void stopScript();
 

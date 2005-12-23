@@ -21,7 +21,7 @@
 #define _SDLBACKEND_H
 
 #include <SDL/SDL.h>
-#include "SDL_mixer.h"
+#include <SDL_mixer.h>
 #include "creaturesImage.h"
 #include "endianlove.h"
 #include <map>
