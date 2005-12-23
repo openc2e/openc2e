@@ -685,6 +685,20 @@ void caosVM::c_PUHL() {
 }
 
 /**
+ PUHL (integer) pose (integer) x_or_y (integer)
+ %status stub
+
+ Return the coordinate for TARG's picket point. x_or_y should be 1 for x, or 2 for y.
+*/
+void caosVM::v_PUHL() {
+	VM_PARAM_INTEGER(x_or_y)
+	VM_PARAM_INTEGER(pose)
+
+	caos_assert(targ);
+	result.setInt(0); // TODO
+}
+
+/**
  POSL (float)
  %status maybe
 */

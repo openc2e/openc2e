@@ -330,6 +330,7 @@ public:
 	void c_FRAT();
 	void c_OVER();
 	void c_PUHL();
+	void v_PUHL();
 	void v_POSL();
 	void v_POST();
 	void v_POSB();
@@ -437,6 +438,7 @@ public:
 	void v_ZOMB();
 	void v_DEAD();
 	void c_URGE_SIGN();
+	void c_URGE_WRIT();
 	void c_DRIV();
 	void v_DRIV();
 	void c_CHEM();

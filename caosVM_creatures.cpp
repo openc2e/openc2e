@@ -276,6 +276,23 @@ void caosVM::c_URGE_SIGN() {
 }
 
 /**
+ URGE WRIT (command) creature (agent) noun_id (integer) noun_stim (float) verb_id (integer) verb_stim (float)
+ %status stub
+
+ Urge the specified creature to perform the specified action (verb) on the specified object type (noun).
+ Provide a stim greater than 1 to force, and an id of -1 and a stim greater than 1 to unforce.
+*/
+void caosVM::c_URGE_WRIT() {
+	VM_PARAM_FLOAT(verb_stim)
+	VM_PARAM_INTEGER(verb_id)
+	VM_PARAM_FLOAT(noun_stim)
+	VM_PARAM_INTEGER(noun_id)
+	VM_PARAM_VALIDAGENT(creature)
+
+	// TODO
+}
+
+/**
  DRIV (command) drive_id (integer) adjust (float)
  %status stub
 
