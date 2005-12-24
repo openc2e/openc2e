@@ -240,7 +240,7 @@ void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset, TextEntryP
 		for (unsigned int x = 0; x < lines[i].text.size(); x++) {
 			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
 			int spriteid = lines[i].text[x] - 32;
-			renderer->render(textsprite, spriteid, somex + currentx, yoff + currenty, false, 0);
+			renderer->render(textsprite, spriteid, somex + currentx, yoff + currenty, is_transparent, transparency);
 			if ((caretdata) && (caretdata->caretline == i) && (caretdata->caretchar == x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 			currentx += textsprite->width(spriteid) + charspacing;
@@ -272,7 +272,7 @@ void TextEntryPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 
 void TextEntryPart::renderCaret(SDLBackend *renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
-	renderer->render(caretsprite, caretpose, xoffset, yoffset, false, 0);
+	renderer->render(caretsprite, caretpose, xoffset, yoffset, is_transparent, transparency);
 }
 
 void TextEntryPart::tick() {
