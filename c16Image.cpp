@@ -46,7 +46,6 @@ void c16Image::readHeader(std::istream &in) {
 }
 
 void c16Image::duplicateTo(s16Image *img) {
-	// TODO: we need to /copy/ this stuff!
 	img->is_565 = is_565;
 	img->m_numframes = m_numframes;
 	img->offsets = 0;
@@ -62,7 +61,18 @@ void c16Image::duplicateTo(s16Image *img) {
 }
 
 void s16Image::duplicateTo(s16Image *img) {
-	// TODO
+	img->is_565 = is_565;
+	img->m_numframes = m_numframes;
+	img->offsets = 0;
+	img->widths = new unsigned short[m_numframes];
+	memcpy(img->widths, widths, m_numframes * sizeof(unsigned short));
+	img->heights = new unsigned short[m_numframes];
+	memcpy(img->heights, heights, m_numframes * sizeof(unsigned short));
+	img->buffers = new void *[m_numframes];
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		img->buffers[i] = new char[widths[i] * heights[i] * 2];
+		memcpy(img->buffers[i], buffers[i], widths[i] * heights[i] * 2);
+	}
 }
 
 c16Image::c16Image(mmapifstream *in) {
@@ -167,6 +177,128 @@ c16Image::~c16Image() {
 		delete (uint16 *)buffers[i];
 	delete[] buffers;
 	// TODO: we should never have 'offsets' left over here, but .. we should check
+}
+
+void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
+	assert(!stream); // this only works on duplicated images
+
+	if (128 == r == g == b == rotation == swap) return; // duh
+
+	/*
+	 * CDN:
+	 * if rotation >= 128
+	 * absRot = rotation-128
+	 * else
+	 * absRot = 128 - rotation
+	 * endif
+	 * invRot = 127-absRot
+	 */
+	int absRot;
+	if (rotation >= 128)
+		absRot = (int)rotation - 128;
+	else
+		absRot = 128 - (int)rotation;
+	int invRot = 127 - absRot;
+
+	/*
+	 * CDN:
+	 * if swap >= 128
+	 * absSwap = swap - 128
+	 * else
+	 * absSwap = 128 - swap
+	 * endif
+	 * invSwap = 127-absSwap
+	 */
+	int absSwap;
+	if (swap >= 128)
+		absSwap = (int)swap - 128;
+	else
+		absSwap = 128 - (int)swap;
+	int invSwap = 127 - absSwap;
+	
+	/*
+	 * CDN:
+	 * redTint = red-128
+	 * greenTint = green-128
+	 * blueTint = blue-128
+	 */
+
+	int redTint = (int)r - 128;
+	int greenTint = (int)g - 128;
+	int blueTint = (int)b - 128;
+	std::cout << "tint: " << redTint << ", " << greenTint << ", " << blueTint << std::endl;
+
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		for (unsigned int j = 0; j < heights[i]; j++) {
+			for (unsigned int k = 0; k < widths[i]; k++) {
+				unsigned short v = ((unsigned short *)buffers[i])[(j * widths[i]) + k];
+				if (v == 0) continue;
+
+				/*
+				 * CDN:
+				 * tempRed = RedValue + redTint;
+				 * tempGreen = GreenValue + greenTint;
+				 * tempBlue = BlueValue + blueTint;
+				 */
+				int red = (((uint32)(v) & 0xf800) >> 8) + redTint;
+				if (red < 0) red = 0; else if (red > 255) red = 255;
+				int green = (((uint32)(v) & 0x07e0) >> 3) + greenTint;
+				if (green < 0) green = 0; else if (green > 255) green = 255;
+				int blue = (((uint32)(v) & 0x001f) << 3) + blueTint;
+				if (blue < 0) blue = 0; else if (blue > 255) blue = 255;
+
+				/*
+				 * CDN:
+				 * if (rotation < 128)
+				 * rotRed = ((absRot * tempBlue) + (invRot * tempRed)) / 256
+				 * rotGreen = ((absRot * tempRed) + (invRot * tempGreen)) / 256
+				 * rotBlue = ((absRot * tempGreen) + (invRot * tempBlue)) / 256
+				 * endif
+				 */
+				
+				int rotRed, rotGreen, rotBlue;
+				/*if (rotation < 128) {
+					rotRed = ((absRot * blue) + (invRot * red)) / 256;
+					rotGreen = ((absRot * red) + (invRot * green)) / 256;
+					rotBlue = ((absRot * green) + (invRot * blue)) / 256;
+				} else if (rotation > 128) {
+					// TODO: This isn't actually given in the pseudocode, and I don't get how it works.
+					rotRed = ((absRot * green) + (invRot * red)) / 256;
+					rotGreen = ((absRot * red) + (invRot * blue)) / 256;
+					rotBlue = ((absRot * blue) + (invRot * green)) / 256;
+
+				} else*/ {
+					rotRed = red; rotGreen = green; rotBlue = blue;
+				}
+
+				/*
+				 * CDN:
+				 * swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed))/256
+				 * swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue))/256
+				 *
+				 * fuzzie notes that this doesn't seem to be a no-op for swap=128..
+				 */
+				/*int swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed)) / 256;
+				int swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue)) / 256;*/
+				
+				int swappedRed = rotRed, swappedBlue = rotBlue;
+
+				/*
+				 * SetColour(definedcolour to (swappedRed,rotGreen,swappedBlue))
+				 */
+				swappedRed = (swappedRed << 8) & 0xf800;
+				rotGreen = (rotGreen << 3) & 0x7e0;
+				swappedBlue = (swappedBlue >> 3) & 0x1f;
+				v = (swappedRed | rotGreen | swappedBlue);
+				/*
+				 * if definedcolour ==0 SetColour(definedcolour to (1,1,1))
+				 */
+				if (v == 0)
+					v = (1 << 11 | 1 << 5 | 1);
+				((unsigned short *)buffers[i])[(j * widths[i]) + k] = v;
+			}
+		}
+	}
 }
 
 /* vim: set noet: */

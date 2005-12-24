@@ -49,6 +49,7 @@ public:
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &out);
 	void duplicateTo(class s16Image *);
+	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 
 	friend class c16Image;
 	friend class fileSwapper;

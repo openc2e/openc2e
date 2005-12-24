@@ -28,7 +28,7 @@
 
 class CompoundPart {
 protected:
-	creaturesImage *sprite;
+	creaturesImage *origsprite, *sprite;
 	unsigned int firstimg, pose, frameno, base;
 	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
@@ -55,6 +55,7 @@ public:
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
 	void setBase(unsigned int b) { base = b; }
+	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 				
 	bool operator < (const CompoundPart &b) const {
 		return zorder < b.zorder;

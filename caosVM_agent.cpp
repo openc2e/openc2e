@@ -779,7 +779,12 @@ void caosVM::c_TINT() {
 
 	caos_assert(targ);
 
-	// TODO
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+
+	p->tint(red_tint, green_tint, blue_tint, rotation, swap);
 }
 
 /**

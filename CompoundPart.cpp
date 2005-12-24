@@ -35,7 +35,7 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 	x = _x;
 	y = _y;
 	zorder = _z;
-	sprite = gallery.getImage(spritefile);
+	origsprite = sprite = gallery.getImage(spritefile);
 	caos_assert(sprite);
 	pose = 0;
 	base = 0;
@@ -45,7 +45,16 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 }
 
 CompoundPart::~CompoundPart() {
-	gallery.delImage(sprite);
+	gallery.delImage(origsprite);
+	if (origsprite != sprite) delete sprite;
+}
+
+void CompoundPart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
+	if (origsprite != sprite) delete sprite;
+	s16Image *newsprite = new s16Image();
+	sprite = newsprite;
+	((duppableImage *)origsprite)->duplicateTo(newsprite);
+	newsprite->tint(r, g, b, rotation, swap);
 }
 
 DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
