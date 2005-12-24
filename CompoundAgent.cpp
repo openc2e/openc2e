@@ -81,9 +81,9 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	setAttributes(0);
 	// TODO: we ignore image count acos it sucks
 	CompoundPart *p = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
-	addPart(p);
 	fullwidth = width = p->getWidth();
 	fullheight = height = p->getHeight();
+	addPart(p);
 }
 
 CompoundAgent::~CompoundAgent() {

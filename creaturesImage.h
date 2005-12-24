@@ -41,7 +41,7 @@ public:
 	std::string name;
 
 	creaturesImage() { refcount = 0; stream = 0; }
-	virtual ~creaturesImage() { if (stream) delete stream; }
+	virtual ~creaturesImage() { assert(!refcount); if (stream) delete stream; }
 	bool is565() { return is_565; }
 	unsigned int numframes() { return m_numframes; }
 	virtual unsigned int width(unsigned int frame) { return widths[frame]; }

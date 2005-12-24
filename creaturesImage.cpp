@@ -190,6 +190,7 @@ creaturesImage *imageGallery::getImage(std::string name) {
 	
 	in->close(); // doesn't close the mmap, which we still need :)
 
+	gallery[name]->addRef();
 	return gallery[name];
 }
 
