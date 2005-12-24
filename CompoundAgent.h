@@ -43,8 +43,6 @@ public:
 	CompoundPart *part(unsigned int id);
 	void addPart(CompoundPart *);
 	void delPart(unsigned int);
-	virtual void setAttributes(unsigned int attr);
-	virtual unsigned int getAttributes();
 	virtual void tick();
 	// TODO: i'm pretty sure width/height are always of the first part.. - fuzzie
 	virtual unsigned int getWidth() { return width; }

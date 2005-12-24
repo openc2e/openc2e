@@ -61,8 +61,8 @@ protected:
 
 	struct SoundSlot *soundslot;
 	void positionAudio(SoundSlot *);
-	bool dying;
-	bool displaycore;
+	bool dying : 1;
+	bool displaycore : 1;
 
 public:
 	inline bool isDying() const {
@@ -70,13 +70,25 @@ public:
 	}
 	
 	// attr
-	bool carryable, mouseable, activateable, invisible, floatable;
-	bool suffercollisions, sufferphysics, camerashy, rotatable, presence;
+	bool carryable : 1;
+	bool mouseable : 1;
+	bool activateable : 1;
+	bool invisible : 1;
+	bool floatable : 1;
+	bool suffercollisions : 1;
+	bool sufferphysics : 1;
+	bool camerashy : 1;
+	bool rotatable :1 ;
+	bool presence : 1;
 	// bhvr
-	bool cr_can_push, cr_can_pull, cr_can_stop;
-	bool cr_can_hit, cr_can_eat, cr_can_pickup;
+	bool cr_can_push : 1;
+	bool cr_can_pull : 1;
+	bool cr_can_stop : 1;
+	bool cr_can_hit : 1;
+	bool cr_can_eat : 1;
+	bool cr_can_pickup : 1;
 	
-	bool visible;
+	bool visible : 1;
 
 	int clac[3]; int clik;
 	unsigned char family, genus;
@@ -103,8 +115,6 @@ public:
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
 
-	virtual void setAttributes(unsigned int attr) = 0;
-	virtual unsigned int getAttributes() = 0;
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
 	// TODO: following two functions are horrible hacks, to workaround the issue that compound parts are
@@ -124,6 +134,9 @@ public:
 	
 	int getUNID();
 	std::string identify() const;
+
+	virtual void setAttributes(unsigned int attr);
+	virtual unsigned int getAttributes();
 };
 
 #endif
