@@ -21,6 +21,7 @@
 #include "openc2e.h"
 #include "c16Image.h"
 #include "SDLBackend.h"
+#include "CompoundAgent.h"
 
 creaturesImage *TextEntryPart::caretsprite = 0;
 
@@ -28,7 +29,7 @@ void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, is_transparent, transparency);
 }
 
-CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg,
+CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
 						int _x, int _y, unsigned int _z) {
 	id = _id;
 	firstimg = fimg;
@@ -42,6 +43,7 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 	is_transparent = false;
 	framerate = 1;
 	framedelay = 0;
+	parent = p;
 }
 
 CompoundPart::~CompoundPart() {
@@ -57,19 +59,19 @@ void CompoundPart::tint(unsigned char r, unsigned char g, unsigned char b, unsig
 	newsprite->tint(r, g, b, rotation, swap);
 }
 
-DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-			 unsigned int _z) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
+DullPart::DullPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+			 unsigned int _z) : CompoundPart(p, _id, spritefile, fimg, _x, _y, _z) {
 }
 
-ButtonPart::ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-	unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
+ButtonPart::ButtonPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(p, _id, spritefile, fimg, _x, _y, _z) {
 	messageid = msgid;
 	hitopaquepixelsonly = (option == 1);
 	hoveranimation = animhover;
 }
 
-TextPart::TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
-	                : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
+TextPart::TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
+	                : CompoundPart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = gallery.getImage(fontsprite);
 	caos_assert(textsprite);
 	caos_assert(textsprite->numframes() == 224);
@@ -116,12 +118,16 @@ void TextEntryPart::setText(std::string t) {
 	caretchar = lines[caretline].text.size();
 }
 
+unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
+
 void TextEntryPart::handleKey(char c) {
 	// TODO: this is dumb
-	if (c == 0) {
+	if (c == 0) { // backspace
 		if (text.size() == 0) return;
 		text.erase(text.end() - 1);
 		caretchar--; // TODO: it's not this simple!
+	} else if (c == 1) { // return
+		parent->fireScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
 	} else {
 		text += c;
 		caretchar++; // TODO: it's not this simple!
@@ -204,11 +210,10 @@ void TextPart::recalculateData() {
 			currentdata.width += possiblelen;
 		} else if (wordlen <= textwidth) {
 			// the rest of the word doesn't fit on the current line, but does on the next line.
-			currenty += usedheight + linespacing;
-			if (currenty > textheight) {
+			if (currenty + usedheight > textheight) {
 				currenty = 0;
 				pages.push_back(lines.size());
-			}
+			} else currenty += usedheight + linespacing;
 			currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 			lines.push_back(currentdata);
 			currentdata.reset();
@@ -268,13 +273,13 @@ void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset, TextEntryP
 	}
 }
 
-FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-		                                  unsigned int _z, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z, fontsprite) {
+FixedTextPart::FixedTextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+		                                  unsigned int _z, std::string fontsprite) : TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
 	// nothing, hopefully.. :)
 }
 
-TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z, fontsprite) {
+TextEntryPart::TextEntryPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
 	// TODO: hm, this never gets freed..
 	if (!caretsprite) { caretsprite = gallery.getImage("cursor"); caos_assert(caretsprite); }
 
@@ -282,6 +287,7 @@ TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned 
 	caretline = 0;
 	caretchar = 0;
 	focused = false;
+	messageid = msgid;
 }
 
 void TextEntryPart::render(SDLBackend *renderer, int xoffset, int yoffset) {

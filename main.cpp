@@ -526,6 +526,12 @@ extern "C" int main(int argc, char *argv[]) {
 									t->handleKey(0);
 								}
 								break;
+							case SDLK_RETURN:
+								if (world.focusagent) {
+									TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
+									t->handleKey(1);
+								}
+								break;
 							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
 								if (!world.focusagent) { showrooms = !showrooms; break; }
 							case SDLK_q:

@@ -80,7 +80,7 @@ void caosVM::c_PAT_DULL() {
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
-	CompoundPart *p = new DullPart(part, sprite, first_image, x, y, plane);
+	CompoundPart *p = new DullPart(a, part, sprite, first_image, x, y, plane);
 	a->addPart(p);
 }
 
@@ -114,7 +114,7 @@ void caosVM::c_PAT_BUTT() {
 	caos_assert(a);
 
 	// TODO TODO TODO we don't take image_count!!
-	CompoundPart *p = new ButtonPart(part, sprite, first_image, x, y, plane, hoveranim, messageid, option);
+	CompoundPart *p = new ButtonPart(a, part, sprite, first_image, x, y, plane, hoveranim, messageid, option);
 	a->addPart(p);
 }
 
@@ -136,7 +136,7 @@ void caosVM::c_PAT_FIXD() {
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	
-	CompoundPart *p = new FixedTextPart(part, sprite, first_image, x, y, plane, fontsprite);
+	CompoundPart *p = new FixedTextPart(a, part, sprite, first_image, x, y, plane, fontsprite);
 	a->addPart(p);
 }
 
@@ -159,7 +159,7 @@ void caosVM::c_PAT_TEXT() {
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	
-	CompoundPart *p = new TextEntryPart(part, sprite, first_image, x, y, plane, message_id, fontsprite);
+	CompoundPart *p = new TextEntryPart(a, part, sprite, first_image, x, y, plane, message_id, fontsprite);
 	a->addPart(p);
 }
 

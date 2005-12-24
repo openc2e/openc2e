@@ -26,11 +26,14 @@
 #include <string>
 #include <vector>
 
+class CompoundAgent;
+
 class CompoundPart {
 protected:
 	creaturesImage *origsprite, *sprite;
 	unsigned int firstimg, pose, frameno, base;
-	CompoundPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	CompoundAgent *parent;
+	CompoundPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
 
 public:
@@ -73,20 +76,20 @@ protected:
 	friend class CompoundAgent;
 
 public:
-	ButtonPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	ButtonPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, const bytestring &animhover, int msgid, int option);
 };
 
 class CameraPart : public CompoundPart {
 public:
-	CameraPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	CameraPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
 			   unsigned int camerawidth, unsigned int cameraheight);
 };
 
 class DullPart : public CompoundPart {
 public:
-	DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z);
+	DullPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z);
 };
 
 struct linedata {
@@ -107,7 +110,7 @@ protected:
 	int leftmargin, topmargin, rightmargin, bottommargin;
 	int linespacing, charspacing;
 	bool left_align, center_align, bottom_align, middle_align, last_page_scroll;
-	TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite);
+	TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite);
 	~TextPart();
 	void recalculateData();
 	unsigned int calculateWordWidth(std::string word);
@@ -125,13 +128,13 @@ public:
 
 class FixedTextPart : public TextPart {
 public:
-	FixedTextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	FixedTextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				  unsigned int _z, std::string fontsprite);
 };
 
 class GraphPart : public CompoundPart {
 public:
-	GraphPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	GraphPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			  unsigned int _z, unsigned int novalues);
 };
 
@@ -141,12 +144,13 @@ private:
 	unsigned int caretpose;
 	bool focused;
 	unsigned int caretline, caretchar;
+	unsigned int messageid;
 	void renderCaret(class SDLBackend *renderer, int xoffset, int yoffset);
 
 	friend class TextPart;
 
 public:
-	TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	TextEntryPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				  unsigned int _z, unsigned int msgid, std::string fontsprite);
 	void setText(std::string t);
 	void gainFocus() { focused = true; caretpose = 0; }
