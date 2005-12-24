@@ -27,6 +27,8 @@ void fileSwapper::convertsprite(s16Image &img, std::string dest) {
 	std::ofstream out(dest.c_str());
 	assert(out.is_open());
 
+	img.offsets = new unsigned int[img.m_numframes];
+
 	// okay, now we get the exciting bit, we get to write it to disk!
 	// step one: calculate offsets
 	unsigned int offset = 6 + (8 * img.m_numframes);
@@ -40,14 +42,16 @@ void fileSwapper::convertsprite(s16Image &img, std::string dest) {
 	for (unsigned int i = 0; i < img.m_numframes; i++) {
 		out.write((char *)img.buffers[i], img.widths[i] * img.heights[i] * 2);
 	}
+
+	delete[] img.offsets;
 }
 
 void fileSwapper::convertc16(std::string src, std::string dest) {
-	mmapifstream in(src.c_str());
-	if (!in.is_open()) return;
+	mmapifstream *in = new mmapifstream(src.c_str()); // auto-freed by the c16Image below
+	if (!in->is_open()) { delete in; return; }
 	
 	// okay. read the damn file.
-	c16Image img(&in);
+	c16Image img(in);
 	s16Image i;
 	img.duplicateTo(&i);
 	convertsprite(i, dest);
@@ -71,13 +75,9 @@ void fileSwapper::converts16(std::string src, std::string dest) {
 			((unsigned short *)img.buffers[i])[k] = swapEndianShort(((unsigned short *)img.buffers[i])[k]);
 		}
 	}
+	delete[] img.offsets;
 
 	convertsprite(img, dest);
-
-	for (unsigned int i = 0; i < img.m_numframes; i++) {
-		delete[] (uint16 *)img.buffers[i];
-	}
-	delete[] img.offsets;
 }
 
 void fileSwapper::convertblk(std::string src, std::string dest) {

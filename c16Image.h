@@ -21,22 +21,37 @@
 #include <istream>
 #include "mmapifstream.h"
 
-class c16Image : public creaturesImage {
+class duppableImage : public creaturesImage {
+public:
+	virtual void duplicateTo(class s16Image *) = 0;
+};
+
+class c16Image : public duppableImage {
 private:
 	unsigned int **lineoffsets;
 
 public:
 	c16Image() { }
 	c16Image(mmapifstream *);
+	~c16Image();
 	void readHeader(std::istream &in);
 	void duplicateTo(class s16Image *);
 };
 
-class s16Image : public creaturesImage {
+class s16Image : public duppableImage {
+private:
+	uint32 *offsets;
+
 public:
 	s16Image() { }
 	s16Image(mmapifstream *);
+	~s16Image();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &out);
+	void duplicateTo(class s16Image *);
+
+	friend class c16Image;
+	friend class fileSwapper;
 };
+
 /* vim: set noet: */

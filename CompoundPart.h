@@ -60,7 +60,7 @@ public:
 		return zorder < b.zorder;
 	}
 	
-	virtual ~CompoundPart() { }
+	virtual ~CompoundPart();
 };
 
 class ButtonPart : public CompoundPart {
@@ -107,6 +107,7 @@ protected:
 	int linespacing, charspacing;
 	bool left_align, center_align, bottom_align, middle_align, last_page_scroll;
 	TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite);
+	~TextPart();
 	void recalculateData();
 	unsigned int calculateWordWidth(std::string word);
 

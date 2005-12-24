@@ -46,16 +46,27 @@ void c16Image::readHeader(std::istream &in) {
 }
 
 void c16Image::duplicateTo(s16Image *img) {
+	// TODO: we need to /copy/ this stuff!
 	img->is_565 = is_565;
 	img->m_numframes = m_numframes;
-	img->offsets = new unsigned int[m_numframes];
-	img->widths = widths;
-	img->heights = heights;
-	img->buffers = buffers;
+	img->offsets = 0;
+	img->widths = new unsigned short[m_numframes];
+	memcpy(img->widths, widths, m_numframes * sizeof(unsigned short));
+	img->heights = new unsigned short[m_numframes];
+	memcpy(img->heights, heights, m_numframes * sizeof(unsigned short));
+	img->buffers = new void *[m_numframes];
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		img->buffers[i] = new char[widths[i] * heights[i] * 2];
+		memcpy(img->buffers[i], buffers[i], widths[i] * heights[i] * 2);
+	}
+}
+
+void s16Image::duplicateTo(s16Image *img) {
+	// TODO
 }
 
 c16Image::c16Image(mmapifstream *in) {
-	//stream = in; TODO: think about this .. but for now, it breaks fileSwapper because the stream and c16Image are on-the-stack
+	stream = in;
 
 	readHeader(*in);
 	
@@ -95,7 +106,7 @@ void s16Image::readHeader(std::istream &in) {
 	is_565 = (flags & 0x01);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 	
-  widths = new unsigned short[m_numframes];
+	widths = new unsigned short[m_numframes];
 	heights = new unsigned short[m_numframes];
 	offsets = new unsigned int[m_numframes];
 
@@ -137,4 +148,25 @@ s16Image::s16Image(mmapifstream *in) {
 
 	delete[] offsets;
 }
+
+s16Image::~s16Image() {
+	delete[] widths;
+	delete[] heights;
+	if (!stream) { // make sure this isn't a damn mmapifstream..
+		for (unsigned int i = 0; i < m_numframes; i++)
+			delete (uint16 *)buffers[i];
+		delete[] buffers;
+	}
+	// TODO: we should never have 'offsets' left over here, but .. we should check
+}
+
+c16Image::~c16Image() {
+	delete[] widths;
+	delete[] heights;
+	for (unsigned int i = 0; i < m_numframes; i++)
+		delete (uint16 *)buffers[i];
+	delete[] buffers;
+	// TODO: we should never have 'offsets' left over here, but .. we should check
+}
+
 /* vim: set noet: */

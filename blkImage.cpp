@@ -68,7 +68,7 @@ void blkImage::writeHeader(std::ostream &s) {
 blkImage::blkImage(mmapifstream *in) {
 	stream = in;
 
-  readHeader(*in);
+	readHeader(*in);
 	
 	buffers = new void *[m_numframes];
 	
@@ -77,7 +77,10 @@ blkImage::blkImage(mmapifstream *in) {
 }
 
 blkImage::~blkImage() {
+	delete[] widths;
+	delete[] heights;
 	delete[] buffers;
 	delete[] offsets;
 }
+
 /* vim: set noet: */

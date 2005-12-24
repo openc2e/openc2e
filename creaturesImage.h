@@ -30,10 +30,9 @@ private:
 	unsigned int refcount;
 
 protected:
-  unsigned int m_numframes;
-  unsigned short *widths, *heights;
-  void **buffers;
-	uint32 *offsets;
+	unsigned int m_numframes;
+	unsigned short *widths, *heights;
+	void **buffers;
 	bool is_565;
 	
 	std::ifstream *stream;
@@ -44,13 +43,13 @@ public:
 	creaturesImage() { refcount = 0; stream = 0; }
 	virtual ~creaturesImage() { if (stream) delete stream; }
 	bool is565() { return is_565; }
-  unsigned int numframes() { return m_numframes; }
-  virtual unsigned int width(unsigned int frame) { return widths[frame]; }
-  virtual unsigned int height(unsigned int frame) { return heights[frame]; }
-  virtual void *data(unsigned int frame) { return buffers[frame]; }
-  void addRef() { refcount++; }
-  void delRef() { refcount--; }
-  unsigned int refCount() { return refcount; }
+	unsigned int numframes() { return m_numframes; }
+	virtual unsigned int width(unsigned int frame) { return widths[frame]; }
+	virtual unsigned int height(unsigned int frame) { return heights[frame]; }
+	virtual void *data(unsigned int frame) { return buffers[frame]; }
+	void addRef() { refcount++; }
+	void delRef() { refcount--; }
+	unsigned int refCount() { return refcount; }
 	
 	friend class fileSwapper;
 	friend class c16Image; // so duplicateTo can create a s16Image as required

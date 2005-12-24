@@ -44,6 +44,10 @@ CompoundPart::CompoundPart(unsigned int _id, std::string spritefile, unsigned in
 	framedelay = 0;
 }
 
+CompoundPart::~CompoundPart() {
+	gallery.delImage(sprite);
+}
+
 DullPart::DullPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			 unsigned int _z) : CompoundPart(_id, spritefile, fimg, _x, _y, _z) {
 }
@@ -65,6 +69,10 @@ TextPart::TextPart(unsigned int _id, std::string spritefile, unsigned int fimg, 
 	left_align = false; center_align = false; bottom_align = false; middle_align = false; last_page_scroll = false;
 	currpage = 0;
 	recalculateData(); // ie, insert a blank first page
+}
+
+TextPart::~TextPart() {
+	gallery.delImage(textsprite);
 }
 
 void TextPart::setText(std::string t) {
@@ -258,6 +266,7 @@ FixedTextPart::FixedTextPart(unsigned int _id, std::string spritefile, unsigned 
 
 TextEntryPart::TextEntryPart(unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(_id, spritefile, fimg, _x, _y, _z, fontsprite) {
+	// TODO: hm, this never gets freed..
 	if (!caretsprite) { caretsprite = gallery.getImage("cursor"); caos_assert(caretsprite); }
 
 	caretpose = 0;

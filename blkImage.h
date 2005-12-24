@@ -21,13 +21,19 @@
 #include "mmapifstream.h"
 
 class blkImage : public creaturesImage {
+private:
+	uint32 *offsets;
+
 public:
 	unsigned int totalwidth, totalheight;
 
 	blkImage() { }
-  blkImage(mmapifstream *);
+	blkImage(mmapifstream *);
 	~blkImage();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &s);
+
+	friend class fileSwapper;
 };
+
 /* vim: set noet: */
