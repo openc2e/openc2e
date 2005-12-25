@@ -55,8 +55,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 }
 
 void Agent::zotstack() {
-	std::list<caosVM *>::iterator i = vmstack.begin();
-	while (i != vmstack.end()) {
+	for (std::list<caosVM *>::iterator i = vmstack.begin(); i != vmstack.end(); i++) {
 		world.freeVM(*i);
 	}
 	vmstack.clear();
