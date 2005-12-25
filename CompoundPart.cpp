@@ -227,11 +227,10 @@ void TextPart::recalculateData() {
 
 		// we force a newline here if necessary (ie, if the last char is '\n', except not in the last case)
 		if ((i < text.size()) && (newline)) {
-			currenty += usedheight + linespacing;
-			if (currenty > textheight) {
+			if (currenty + usedheight > textheight) {
 				currenty = 0;
 				pages.push_back(lines.size());
-			}
+			} else currenty += usedheight + linespacing;
 			lines.push_back(currentdata);
 			currentdata.reset();
 		}
