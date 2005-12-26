@@ -53,7 +53,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
 
-	 emitca_index = -1; emitca_amount = 0.0f;
+	emitca_index = -1; emitca_amount = 0.0f;
 }
 
 void Agent::zotstack() {
