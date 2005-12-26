@@ -347,10 +347,13 @@ void Agent::tick() {
 	}
 
 	if (vm) {
-		vm->tick();
-		if (vm && vm->stopped()) {
-			world.freeVM(vm);
-			vm = NULL;
+		vm->timeslice = 5;
+		while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
+			vm->tick();
+			if (vm && vm->stopped()) {
+				world.freeVM(vm);
+				vm = NULL;
+			}
 		}
 	} 
 	if (!vm && !vmstack.empty()) {

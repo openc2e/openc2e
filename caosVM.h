@@ -577,7 +577,6 @@ public:
 	void v_OOWW();
 
 	void runOp();
-	void runTimeslice(int units);
 	void runEntirely(script *s);
 
 	void tick();

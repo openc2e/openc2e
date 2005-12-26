@@ -137,6 +137,7 @@ bool caosVM::fireScript(script *s, bool nointerrupt, Agent *frm) {
 	cip = nip = 0;
 	targ = owner;
 	from.set(frm);
+	timeslice = 1;
 	return true;
 }
 
@@ -170,11 +171,6 @@ void caosVM::resetCore() {
 }
 
 void caosVM::tick() {
-	runTimeslice(5);
-}
-
-void caosVM::runTimeslice(int units) {
-	timeslice = units;
 	stop_loop = false;
 	while (currentscript && !stop_loop && (timeslice > 0 || inst)) {
 		if (isBlocking()) return;

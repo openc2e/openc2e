@@ -273,7 +273,6 @@ void caosVM::c_CALL() {
 	caosVM *newvm = world.getVM(owner);
 	
 	if (newvm->fireScript(s, false)) { // TODO: include OWNR? presumably not..
-		newvm->setTarg(owner);
 		newvm->inst = inst;
 		newvm->_p_[0] = p1;
 		newvm->_p_[1] = p2;

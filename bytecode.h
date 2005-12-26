@@ -14,7 +14,7 @@ class caosOp {
 	public:
 		// on entry vm->nip = our position + 1
 		virtual void execute(caosVM *vm) {
-			vm->timeslice -= evalcost;
+			if (!vm->inst) vm->timeslice -= evalcost;
 		}
 		void setCost(int cost) {
 			evalcost = cost;
