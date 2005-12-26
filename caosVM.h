@@ -84,8 +84,7 @@ class blockCond {
 };
 
 class caosVM {
-public:
-	
+public:	
 	bool trace;
 
 	blockCond *blocking;

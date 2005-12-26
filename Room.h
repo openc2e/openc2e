@@ -48,6 +48,8 @@ public:
 	unsigned int id;
 	class MetaRoom *metaroom;
 
+	float ca[16];
+
 	bool containsPoint(unsigned int x, unsigned int y) {	
 		if (x > x_right || x < x_left) { return false; }
 		if (bot.pointAtX(x).y < y) { return false; }
@@ -86,7 +88,9 @@ public:
 		top = Line(ul, ur);
 		bot = Line(bl, br);
 	}
-		
+
+	Room();
+	void tick();
 };
 
 #endif

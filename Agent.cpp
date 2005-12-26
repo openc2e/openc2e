@@ -52,6 +52,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	agents_iter = world.agents.insert(++world.agents.begin(), this);
 
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
+
+	 emitca_index = -1; emitca_amount = 0.0f;
 }
 
 void Agent::zotstack() {
@@ -77,18 +79,11 @@ void Agent::fireScript(unsigned short event, Agent *from) {
 	if (!s) return;
 	if (!vm) vm = world.getVM(this);
 	if (vm->fireScript(s, (event == 9), from)) {
-		vm->setTarg(this);
 		zotstack();
+	} else if (vm->stopped()) {
+		world.freeVM(vm);
+		vm = 0;
 	}
-	
-	// This slows us down too much :)
-#if 0
-	std::cout << "Agent::fireScript fired " << (unsigned int)family << " " << (unsigned int)genus << " " << species << " ";
-	const std::string n = world.catalogue.getAgentName(family, genus, species);
-	if (n.size())
-		std::cout << "(" << n << ") ";
-	std::cout << (unsigned int)event << std::endl;
-#endif
 }
 
 void Agent::handleClick(float clickx, float clicky) {
@@ -120,6 +115,15 @@ void Agent::positionAudio(SoundSlot *slot) {
 
 void Agent::tick() {
 	if (dying) return;
+
+	if (emitca_amount != 0.0f) {
+		Room *r = world.map.roomAt(x, y);
+		if (r) {
+			r->ca[emitca_index] += emitca_amount;
+			if (r->ca[emitca_index] <= 0.0f) r->ca[emitca_index] = 0.0f;
+			else if (r->ca[emitca_index] >= 1.0f) r->ca[emitca_index] = 1.0f;
+		}
+	}
 
 	if (soundslot) positionAudio(soundslot);
 
@@ -344,7 +348,7 @@ void Agent::tick() {
 
 	if (vm) {
 		vm->tick();
-		if (vm->stopped()) {
+		if (vm && vm->stopped()) {
 			world.freeVM(vm);
 			vm = NULL;
 		}
@@ -366,8 +370,11 @@ Agent::~Agent() {
 void Agent::kill() {
 	assert(!dying);
 	dying = true; // what a world, what a world...
-	if (vm)
+	if (vm) {
 		vm->stop();
+		world.freeVM(vm);
+		vm = 0;
+	}
 	zotstack();
 	zotrefs();
 	if (unid != -1)

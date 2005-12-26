@@ -168,7 +168,7 @@ void caosVM::c_RTYP() {
 	VM_PARAM_INTEGER(roomid)
 
 	Room *room = world.map.getRoom(roomid);
-	assert(room);
+	caos_assert(room);
 	room->type = roomtype;
 }
 
@@ -197,7 +197,6 @@ void caosVM::c_DOOR() {
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
-	// TODO: handle perm
 	Room *r1 = world.map.getRoom(room1);
 	Room *r2 = world.map.getRoom(room2);
 	caos_assert(r1); caos_assert(r2);
@@ -303,29 +302,36 @@ void caosVM::v_DOWN() {
 
 /**
  PROP (command) roomid (integer) caindex (integer) cavalue (float)
- %status stub
+ %status maybe
 */
 void caosVM::c_PROP() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(cavalue)
 	VM_PARAM_INTEGER(caindex)
 	VM_PARAM_INTEGER(roomid)
+	
+	caos_assert(0.0f <= cavalue <= 1.0f);
+	caos_assert(0 <= caindex <= 15);
 
 	Room *room = world.map.getRoom(roomid);
-	// TODO
+	caos_assert(room);
+	room->ca[caindex] = cavalue;
 }
 
 /**
  PROP (float) roomid (integer) caindex (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_PROP() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(caindex)
 	VM_PARAM_INTEGER(roomid)
+	
+	caos_assert(0 <= caindex <= 15);
 
 	Room *room = world.map.getRoom(roomid);
-	result.setFloat(1.0f); // TODO: don't hardcode
+	caos_assert(room);
+	result.setFloat(room->ca[caindex]);
 }
 
 /**
@@ -339,6 +345,7 @@ void caosVM::c_PERM() {
 	VM_PARAM_INTEGER(perm)
 	
 	// C3 rocklice set perm to 0, ick.
+	// TODO: is perm of 0 possible?
 	
 	if (perm < 1) perm = 1;
 	if (perm > 100) perm = 100;
@@ -418,7 +425,7 @@ void caosVM::c_LINK() {
 void caosVM::v_GRID() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(direction)
-	VM_PARAM_AGENT(agent)
+	VM_PARAM_VALIDAGENT(agent)
 
 	float agentx = agent->x + (agent->getWidth() / 2);
 	float agenty = agent->y + (agent->getHeight() / 2);
@@ -464,7 +471,7 @@ void caosVM::v_GRID() {
 }
 
 /**
- EMIT (command) ca_index (integer) amount (float)
+ EMIT (command) caindex (integer) amount (float)
  %status stub
 
  make the target agent continually emit the specified amount of the specified CA into the room
@@ -472,7 +479,10 @@ void caosVM::v_GRID() {
 void caosVM::c_EMIT() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(amount)
-	VM_PARAM_INTEGER(ca_index)
+	VM_PARAM_INTEGER(caindex)
+	
+	caos_assert(0 <= caindex <= 15);
+	caos_assert(targ);
 
 	// TODO
 }
@@ -491,16 +501,28 @@ void caosVM::v_WALL() {
 }
 
 /**
- ALTR (command) room_id (integer) ca_index (integer) delta (float)
- %status stub
+ ALTR (command) roomid (integer) caindex (integer) delta (float)
+ %status maybe
 */
 void caosVM::c_ALTR() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(delta);
-	VM_PARAM_INTEGER(ca_index);
-	VM_PARAM_INTEGER(room_id);
+	VM_PARAM_INTEGER(caindex);
+	VM_PARAM_INTEGER(roomid);
+	
+	caos_assert(0 <= caindex <= 15);
 
-	// TODO
+	Room *room;
+	if (roomid == -1) {
+		caos_assert(targ);
+		room = world.map.roomAt(targ->x + (targ->getWidth() / 2), targ->y + (targ->getHeight() / 2));
+	} else
+		room = world.map.getRoom(roomid);
+	caos_assert(room);
+	float newvalue = room->ca[caindex] + delta;
+	if (newvalue < 0.0f) newvalue = 0.0f;
+	else if (newvalue > 1.0f) newvalue = 1.0f;
+	room->ca[caindex] = newvalue;
 }
 
 /* vim: set noet: */

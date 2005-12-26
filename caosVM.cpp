@@ -58,6 +58,9 @@ inline bool caosVM::isBlocking() {
 }
 
 void caosVM::startBlocking(blockCond *whileWhat) {
+	if (!owner)
+		// TODO: should this just fail to block?
+		throw creaturesException("trying to block in a non-blockable script");
 	inst = false;
 	if (blocking)
 		throw creaturesException("trying to block with a block condition in-place");
@@ -100,10 +103,10 @@ inline void caosVM::runOp() {
 
 void caosVM::stop() {
 	cip = nip = 0;
+	lock = false;
 	if (currentscript)
 		currentscript->release();
 	currentscript = NULL;
-	resetCore();
 }
 
 void caosVM::runEntirely(script *s) {
@@ -123,6 +126,7 @@ void caosVM::runEntirely(script *s) {
 }
 
 bool caosVM::fireScript(script *s, bool nointerrupt, Agent *frm) {
+	assert(owner);
 	assert(s);
 	if (lock) return false; // can't interrupt scripts which called LOCK
 	if (currentscript && nointerrupt) return false; // don't interrupt scripts with a timer script
@@ -142,7 +146,6 @@ void caosVM::resetScriptState() {
 }
 
 void caosVM::resetCore() {
-
 	if (blocking)
 		delete blocking;
 	blocking = NULL;
@@ -160,7 +163,7 @@ void caosVM::resetCore() {
 
 	_it_ = NULL;
 	from = NULL;
-	targ = owner;
+	setTarg(owner);
 
 	_p_[0].reset(); _p_[0].setInt(0); _p_[1].reset(); _p_[1].setInt(0);
 	for (unsigned int i = 0; i < 100; i++) { var[i].reset(); var[i].setInt(0); }

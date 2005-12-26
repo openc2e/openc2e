@@ -19,4 +19,12 @@
 
 #include "Room.h"
 
+Room::Room() {
+	for (unsigned int i = 0; i < 16; i++)
+		ca[i] = 0.0f;
+}
+
+void Room::tick() {
+}
+
 /* vim: set noet: */

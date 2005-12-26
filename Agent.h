@@ -52,7 +52,7 @@ protected:
 	unsigned int zorder;
 	unsigned int tickssincelasttimer, timerrate;
 
-
+	int emitca_index; float emitca_amount;
 	int lastcollidedirection;
 
 	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
