@@ -48,7 +48,7 @@ public:
 	unsigned int id;
 	class MetaRoom *metaroom;
 
-	float ca[16];
+	float ca[20];
 
 	bool containsPoint(unsigned int x, unsigned int y) {	
 		if (x > x_right || x < x_left) { return false; }

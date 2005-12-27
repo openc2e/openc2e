@@ -20,7 +20,7 @@
 #include "Room.h"
 
 Room::Room() {
-	for (unsigned int i = 0; i < 16; i++)
+	for (unsigned int i = 0; i < 20; i++)
 		ca[i] = 0.0f;
 }
 
