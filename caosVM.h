@@ -511,6 +511,8 @@ public:
 	void v_HOTP();
 	void c_PURE();
 	void v_PURE();
+	void v_MOPX();
+	void v_MOPY();
 
 	// vehicles
 	void c_CABN();

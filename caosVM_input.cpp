@@ -108,15 +108,22 @@ void caosVM::v_HOTS() {
 
 /**
  HOTP (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_HOTP() {
 	Agent *a = world.agentAt(world.hand()->x, world.hand()->y);
 	if (a) {
 		CompoundAgent *c = dynamic_cast<CompoundAgent *>(a);
-		if (c) {
-			result.setInt(0); // TODO
-		} else result.setInt(0);
+		caos_assert(c);
+		int clickx = world.hand()->x - a->x, clicky = world.hand()->y - a->y;
+		// TODO: can't we put this code in CompoundAgent?
+		for (std::vector<CompoundPart *>::iterator x = c->parts.begin(); x != c->parts.end(); x++)
+			if ((clickx >= (*x)->x) && (clicky >= (*x)->y) &&
+				(clickx <= (*x)->x + (*x)->getWidth()) && (clicky <= (*x)->y + (*x)->getHeight())) {
+				result.setInt((*x)->id);
+				return;
+			}
+		result.setInt(-1); // TODO: is this right?
 	} else result.setInt(-1);
 }
 
@@ -139,6 +146,22 @@ void caosVM::v_PURE() {
 		result.setInt(1);
 	else
 		result.setInt(0);
+}
+
+/**
+ MOPX (integer)
+ %status maybe
+*/
+void caosVM::v_MOPX() {
+	result.setInt(world.hand()->x);
+}
+
+/**
+ MOPY (integer)
+ %status maybe
+*/
+void caosVM::v_MOPY() {
+	result.setInt(world.hand()->y);
 }
 
 /* vim: set noet: */
