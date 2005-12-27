@@ -43,6 +43,9 @@ protected:
 	std::vector<scriptevent> scriptqueue;
 
 public:
+
+	bool quitting, saving;
+	
 	Map map;
 
 	std::multiset<Agent *, agentzorder> zorder;

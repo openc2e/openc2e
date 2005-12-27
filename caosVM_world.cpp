@@ -34,23 +34,25 @@ void caosVM::c_LOAD() {
  SAVE (command)
  %status stub
 
- Save the world at the end of the current tick. Beware; if you don't put this
+ Save the world at the start of the next tick. Beware; if you don't put this
  in an INST, it might save directly after your SAVE call (meaning upon loading,
  the script will execute the next instruction, often QUIT or LOAD, which is
  bad).
 */
 void caosVM::c_SAVE() {
-	// TODO
+	// note, world.saving doesn't mean anything yet
+	world.saving = true;
 }
 
 /**
  QUIT (command)
- %status stub
+ %status maybe
 
- Quit the game engine at the end of the current tick.
+ Quit the game engine at the start of the nexttick
 */
 void caosVM::c_QUIT() {
 	// TODO
+	world.quitting = true;
 }
 
 /**

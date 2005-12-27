@@ -29,6 +29,7 @@ World world;
 World::World() {
 	ticktime = 50;
 	tickcount = 0;
+	quitting = saving = false;
 }
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
@@ -90,6 +91,8 @@ void World::setFocus(CompoundAgent *a, TextEntryPart *p) {
 }
 
 void World::tick() {
+	if (saving) {} // TODO: save
+	if (quitting) { exit(0); }
 	// Tick all agents.
 	for (std::list<Agent *>::iterator i = agents.begin(); i != agents.end(); i++) {
 		(**i).tick();
