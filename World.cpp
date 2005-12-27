@@ -58,7 +58,6 @@ void World::freeVM(caosVM *v) {
 void World::queueScript(unsigned short event, AgentRef agent, AgentRef from, caosVar p0, caosVar p1) {
 	scriptevent e;
 
-	assert(event);
 	assert(agent);
 
 	e.scriptno = event;
@@ -98,7 +97,6 @@ void World::tick() {
 	
 	// Process the script queue.
 	for (std::vector<scriptevent>::iterator i = scriptqueue.begin(); i != scriptqueue.end(); i++) {
-		assert(i->scriptno); // to catch a weird bug..
 		if (i->agent && i->agent->fireScript(i->scriptno, i->from)) {
 			assert(i->agent->vm);
 			i->agent->vm->setVariables(i->p[0], i->p[1]);
