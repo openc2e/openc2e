@@ -472,7 +472,7 @@ void caosVM::v_GRID() {
 
 /**
  EMIT (command) caindex (integer) amount (float)
- %status stub
+ %status maybe
 
  make the target agent continually emit the specified amount of the specified CA into the room
 */
@@ -481,10 +481,11 @@ void caosVM::c_EMIT() {
 	VM_PARAM_FLOAT(amount)
 	VM_PARAM_INTEGER(caindex)
 	
-	caos_assert(0 <= caindex <= 15);
+	caos_assert(0 <= caindex <= 15 || caindex == -1);
 	caos_assert(targ);
 
-	// TODO
+	targ->emitca_index = caindex;
+	targ->emitca_amount = amount;
 }
 
 /**

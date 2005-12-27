@@ -109,7 +109,7 @@ public:
 	float floatingx, floatingy;
 	AgentRef floatingagent;
 
-	void queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
+	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
 	void moveTo(float, float);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	void pushVM(caosVM *newvm);

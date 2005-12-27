@@ -992,7 +992,10 @@ void caosVM::v_DISQ() {
 */
 void caosVM::c_ALPH() {
 	VM_PARAM_INTEGER(enable)
-	VM_PARAM_INTEGER(alpha_value) caos_assert(0 <= alpha_value <= 255);
+	VM_PARAM_INTEGER(alpha_value)
+	
+	if (alpha_value < 0) alpha_value = 0;
+	else if (alpha_value > 255) alpha_value = 255;
 
 	caos_assert(targ);
 

@@ -88,10 +88,13 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 	return false;
 }
 
-void Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {
-	if (dying) return;
-
-	world.queueScript(event, this, from, p0, p1);
+bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {
+	if (dying) return false;
+	if (findScript(event)) {
+		world.queueScript(event, this, from, p0, p1);
+		return true;
+	}
+	return false;
 }
 
 void Agent::handleClick(float clickx, float clicky) {
@@ -124,7 +127,7 @@ void Agent::positionAudio(SoundSlot *slot) {
 void Agent::tick() {
 	if (dying) return;
 
-	if (emitca_amount != 0.0f) {
+	if (emitca_index != -1 && emitca_amount != 0.0f) {
 		Room *r = world.map.roomAt(x, y);
 		if (r) {
 			r->ca[emitca_index] += emitca_amount;
