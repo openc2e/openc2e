@@ -310,8 +310,8 @@ void caosVM::c_PROP() {
 	VM_PARAM_INTEGER(caindex)
 	VM_PARAM_INTEGER(roomid)
 	
-	caos_assert(0.0f <= cavalue <= 1.0f);
-	caos_assert(0 <= caindex <= 15);
+	caos_assert(0.0f <= cavalue && cavalue <= 1.0f);
+	caos_assert(0 <= caindex && caindex <= 15);
 
 	Room *room = world.map.getRoom(roomid);
 	caos_assert(room);
@@ -327,7 +327,7 @@ void caosVM::v_PROP() {
 	VM_PARAM_INTEGER(caindex)
 	VM_PARAM_INTEGER(roomid)
 	
-	caos_assert(0 <= caindex <= 15);
+	caos_assert(0 <= caindex && caindex <= 15);
 
 	Room *room = world.map.getRoom(roomid);
 	caos_assert(room);
@@ -481,7 +481,7 @@ void caosVM::c_EMIT() {
 	VM_PARAM_FLOAT(amount)
 	VM_PARAM_INTEGER(caindex)
 	
-	caos_assert(0 <= caindex <= 15 || caindex == -1);
+	caos_assert((0 <= caindex && caindex <= 15) || caindex == -1);
 	caos_assert(targ);
 
 	targ->emitca_index = caindex;
@@ -511,7 +511,7 @@ void caosVM::c_ALTR() {
 	VM_PARAM_INTEGER(caindex);
 	VM_PARAM_INTEGER(roomid);
 	
-	caos_assert(0 <= caindex <= 15);
+	caos_assert(0 <= caindex && caindex <= 15);
 
 	Room *room;
 	if (roomid == -1) {
