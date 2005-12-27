@@ -31,9 +31,17 @@ struct cainfo {
 	float diffusion;
 };
 
+struct scriptevent {
+	unsigned short scriptno;
+	AgentRef agent, from;
+	caosVar p[2];
+};
+
 class World {
 protected:
 	class PointerAgent *theHand;
+	std::vector<scriptevent> scriptqueue;
+
 public:
 	Map map;
 
@@ -61,6 +69,7 @@ public:
 	
 	caosVM *getVM(Agent *owner);
 	void freeVM(caosVM *);
+	void queueScript(unsigned short event, AgentRef agent, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
 	
 	World();
 	void init();

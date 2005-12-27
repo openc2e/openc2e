@@ -72,25 +72,33 @@ script *Agent::findScript(unsigned short event) {
 	return world.scriptorium.getScript(family, genus, species, event);
 }
 
-void Agent::fireScript(unsigned short event, Agent *from) {
-	if (dying) return;
+bool Agent::fireScript(unsigned short event, Agent *from) {
+	if (dying) return false;
 
 	script *s = findScript(event);
-	if (!s) return;
+	if (!s) return false;
 	if (!vm) vm = world.getVM(this);
 	if (vm->fireScript(s, (event == 9), from)) {
 		zotstack();
+		return true;
 	} else if (vm->stopped()) {
 		world.freeVM(vm);
 		vm = 0;
 	}
+	return false;
+}
+
+void Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {
+	if (dying) return;
+
+	world.queueScript(event, this, from, p0, p1);
 }
 
 void Agent::handleClick(float clickx, float clicky) {
 	if (clik != -1) {
 		// TODO: handle CLIK
 	} else if (clac[0] != -1) {
-		fireScript(clac[0], (Agent *)world.hand());
+		queueScript(clac[0], (Agent *)world.hand());
 	}
 }
 
@@ -307,7 +315,7 @@ void Agent::tick() {
 				
 				if (collided) {
 					lastcollidedirection = collidedirection;
-					fireScript(6); // TODO: include this?
+					queueScript(6); // TODO: include this?
 					if (vm) vm->setVariables(velx, vely);
 					vely.setFloat(0);
 				}
@@ -341,21 +349,28 @@ void Agent::tick() {
 	if (timerrate) {
 		tickssincelasttimer++;
 		if (tickssincelasttimer == timerrate) {
-			fireScript(9); // TODO: include this?
+			queueScript(9); // TODO: include this?
 			tickssincelasttimer = 0;
 		}
 	}
 
-	if (vm) {
-		vm->timeslice = 5;
-		while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
-			vm->tick();
-			if (vm && vm->stopped()) {
-				world.freeVM(vm);
-				vm = NULL;
-			}
+	if (vm) vmTick();
+}
+
+void Agent::vmTick() {
+	assert(vm);
+
+	if (!vm->timeslice) vm->timeslice = 5;
+
+	while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
+		vm->tick();
+		if (vm && vm->stopped()) {
+			world.freeVM(vm);
+			vm = NULL;
 		}
-	} 
+	}
+	if (vm) vm->timeslice = 0;
+	
 	if (!vm && !vmstack.empty()) {
 		vm = vmstack.front();
 		vmstack.pop_front();

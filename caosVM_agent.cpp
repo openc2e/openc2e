@@ -534,7 +534,7 @@ void caosVM::c_MESG_WRIT() {
 	VM_PARAM_INTEGER(message_id)
 	VM_PARAM_VALIDAGENT(agent);
 
-	agent->fireScript(calculateScriptId(message_id), owner.get());
+	agent->queueScript(calculateScriptId(message_id), owner.get());
 }
 
 /**
@@ -550,10 +550,9 @@ void caosVM::c_MESG_WRT() {
 	VM_PARAM_VALIDAGENT(agent)
 
 	// I'm not sure how to handle the 'delay'; is it a background delay, or do we actually block for delay ticks?
-	
-	agent->fireScript(calculateScriptId(message_id), owner.get());
-	agent->vm->setVariables(param_1, param_2);
-	// TODO: set _p_ in agent's VM to param_1 and param_2
+	if (delay != 0) return; // TODO: fuzzie can't work out how on earth this works in c2e, someone fixit
+
+	agent->queueScript(calculateScriptId(message_id), owner.get(), param_1, param_2);
 }
 
 /**

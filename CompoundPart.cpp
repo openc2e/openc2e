@@ -127,7 +127,7 @@ void TextEntryPart::handleKey(char c) {
 		text.erase(text.end() - 1);
 		caretchar--; // TODO: it's not this simple!
 	} else if (c == 1) { // return
-		parent->fireScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
+		parent->queueScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
 	} else {
 		text += c;
 		caretchar++; // TODO: it's not this simple!

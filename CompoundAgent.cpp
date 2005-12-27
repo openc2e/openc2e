@@ -103,7 +103,7 @@ void CompoundAgent::handleClick(float clickx, float clicky) {
 			ButtonPart *b = dynamic_cast<ButtonPart *>(*x);
 			if (b) {
 				// TODO: check button transparency if needed
-				fireScript(calculateScriptId(b->messageid), (Agent *)world.hand());
+				queueScript(calculateScriptId(b->messageid), (Agent *)world.hand());
 				// TODO: do we need to return here, or should we always passthrough to Agent::handleClick?
 				return;
 			}

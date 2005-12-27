@@ -461,7 +461,7 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_VIDEORESIZE:
 					backend.resizeNotify(event.resize.w, event.resize.h);
 					for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-						(*i)->fireScript(123, 0); // window resized script
+						(*i)->queueScript(123, 0); // window resized script
 					}
 					break;
 				case SDL_MOUSEMOTION:
@@ -475,18 +475,18 @@ extern "C" int main(int argc, char *argv[]) {
 							// TODO: not sure how to handle the following properly, needs research..
 							world.hand()->firePointerScript(101, a); // Pointer Activate 1
 						} else
-							world.hand()->fireScript(116, 0); // Pointer Clicked Background
+							world.hand()->queueScript(116, 0); // Pointer Clicked Background
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
 						// for now, hack!
 						if (handAgent) {
-							handAgent->fireScript(5, world.hand()); // drop
+							handAgent->queueScript(5, world.hand()); // drop
 							world.hand()->firePointerScript(105, handAgent); // Pointer Drop
 							handAgent = 0;
 						} else {
 							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false);
 							if (handAgent) {
 								if (handAgent->mouseable) { // hack: agentAt should check this
-									handAgent->fireScript(4, world.hand()); // pickup
+									handAgent->queueScript(4, world.hand()); // pickup
 									world.hand()->firePointerScript(104, handAgent); // Pointer Pickup
 								} else
 									handAgent = 0;

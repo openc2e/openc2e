@@ -63,6 +63,9 @@ protected:
 	void positionAudio(SoundSlot *);
 	bool dying : 1;
 	bool displaycore : 1;
+	
+	void vmTick();
+	bool fireScript(unsigned short event, Agent *from = 0);
 
 public:
 	inline bool isDying() const {
@@ -106,7 +109,7 @@ public:
 	float floatingx, floatingy;
 	AgentRef floatingagent;
 
-	void fireScript(unsigned short event, Agent *from = 0);
+	void queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
 	void moveTo(float, float);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	void pushVM(caosVM *newvm);

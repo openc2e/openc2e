@@ -55,6 +55,21 @@ void World::freeVM(caosVM *v) {
 	vmpool.push_back(v);
 }
 
+void World::queueScript(unsigned short event, AgentRef agent, AgentRef from, caosVar p0, caosVar p1) {
+	scriptevent e;
+
+	assert(event);
+	assert(agent);
+
+	e.scriptno = event;
+	e.agent = agent;
+	e.from = from;
+	e.p[0] = p0;
+	e.p[1] = p1;
+
+	scriptqueue.push_back(e);
+}
+
 void World::setFocus(CompoundAgent *a, TextEntryPart *p) {
 	// Unfocus the current agent. Not sure if c2e always does this (what if the agent/part is bad?).
         if (focusagent) {
@@ -76,15 +91,32 @@ void World::setFocus(CompoundAgent *a, TextEntryPart *p) {
 }
 
 void World::tick() {
+	// Tick all agents.
 	for (std::list<Agent *>::iterator i = agents.begin(); i != agents.end(); i++) {
 		(**i).tick();
 	}
+	
+	// Process the script queue.
+	for (std::vector<scriptevent>::iterator i = scriptqueue.begin(); i != scriptqueue.end(); i++) {
+		assert(i->scriptno); // to catch a weird bug..
+		if (i->agent && i->agent->fireScript(i->scriptno, i->from)) {
+			assert(i->agent->vm);
+			i->agent->vm->setVariables(i->p[0], i->p[1]);
+			i->agent->vmTick();
+		}
+	}
+	scriptqueue.clear();
+	
+	// Do the actual killing of agent objects.
+	// TODO: should we do this before+after the script queue processing? - fuzzie
 	while (killqueue.size()) {
 		Agent *rip = killqueue.back();
 		killqueue.pop_back();
 		assert(rip->dying);
 		delete rip;
 	}
+
+
 	tickcount++;
 	// todo: tick rooms
 }
@@ -121,4 +153,5 @@ void World::freeUNID(int unid) {
 Agent *World::lookupUNID(int unid) {
 	return unidmap[unid];
 }
+
 /* vim: set noet: */
