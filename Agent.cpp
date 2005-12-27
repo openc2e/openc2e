@@ -31,7 +31,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	vely.setFloat(0.0f);
 	accg = 0.3f;
 	range = 500;
-	sufferphysics = false;
+	sufferphysics = false; falling = false;
 	x = 0.0f; y = 0.0f;
 	clac[0] = 1; // activate 1
 	clik = -1;
@@ -139,6 +139,7 @@ void Agent::tick() {
 
 	if (soundslot) positionAudio(soundslot);
 
+	falling = false;
 	if (sufferphysics) {
 		float newvely = vely.floatValue + accg;
 		float destx = x + velx.floatValue;
@@ -221,13 +222,14 @@ void Agent::tick() {
 					if (movedy) {
 						iy -= dy;
 						collided = true; // .. but only if moved is true
+						falling = true;
 					}
 					if (movedx) {
 						ix -= dx;
 						collided = true; // .. again
 					}
 
-					if (!moved) break;
+					if (!moved) { falling = false; break; }
 
 					/*
 					 * now we need to work out which direction of wall we collided against

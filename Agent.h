@@ -103,6 +103,7 @@ public:
 	unsigned int friction;
 	int perm, elas;
 	float x, y;
+	bool falling : 1; // TODO: icky hack, possibly
 
 	float range;
 

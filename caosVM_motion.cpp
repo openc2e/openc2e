@@ -330,13 +330,10 @@ void caosVM::v_FALL() {
 	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
 
-	float accg = targ->accg;
-	float vely = targ->vely.getFloat();
-	if (accg != 0 && vely != 0) {
-		// XXX: this probably isn't quite correct, but it's close enough for
-		// now. Hook it into the physics system properly later
+	// XXX: this probably isn't quite correct, but it's close enough for now.
+	if (targ->falling)
 		result.setInt(1);
-	} else
+	else
 		result.setInt(0);
 }
 
