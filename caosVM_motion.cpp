@@ -112,23 +112,24 @@ void caosVM::v_OBST() {
 
 	float agentx = targ->x + (targ->getWidth() / 2);
 	float agenty = targ->y + (targ->getHeight() / 2);
-	Room *sourceroom = world.map.roomAt(agentx, agenty);
+/*	Room *sourceroom = world.map.roomAt(agentx, agenty);
 	if (!sourceroom) {
 		// (should we REALLY check for it being in the room system, here?)
 		//cerr << targ->identify() << " tried using OBST but isn't in the room system!\n";
 		result.setInt(-1);
 		return;
-	}
+	}*/
 
 	int distance = 0;
 	
 	if ((direction == 0) || (direction == 1)) {
 		int movement = (direction == 0 ? -1 : 1);
+		if (direction == 0) agentx = targ->x;
+		else agentx = targ->x + targ->getWidth();
 
 		int x = agentx;
 		Room *r = 0;
 		while (true) {
-			x += movement;
 			if (r) {
 				if (!r->containsPoint(x, agenty))
 					r = world.map.roomAt(x, agenty);
@@ -137,15 +138,17 @@ void caosVM::v_OBST() {
 			}
 			if (!r)
 				break;
+			x += movement;
 			distance++;
 		}
 	} else if ((direction == 2) || (direction == 3)) {
 		int movement = (direction == 2 ? -1 : 1);
+		if (direction == 2) agenty = targ->y;
+		else agenty = targ->y + targ->getHeight();
 	
 		int y = agenty;
 		Room *r = 0;
 		while (true) {
-			y += movement;
 			if (r) {
 				if (!r->containsPoint(agentx, y))
 					r = world.map.roomAt(agentx, y);
@@ -154,6 +157,7 @@ void caosVM::v_OBST() {
 			}
 			if (!r)
 				break;
+			y += movement;
 			distance++;
 		}
 	} else cerr << "OBST got an unknown direction!\n";
