@@ -8,6 +8,7 @@
     static std::string cat_str;
 %%
 \#[^\n\r]*[\n\r]*   // comment
+\*[^\n\r]*[\n\r]*   // comment
 TAG                 return CTOK_TAG;
 ARRAY               return CTOK_ARRAY;
 OVERRIDE            return CTOK_OVERRIDE;
