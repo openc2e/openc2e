@@ -152,8 +152,6 @@ while (<>) {
 	my $desc = join("\n", @lines);
 	$desc .= "\n";
 	
-	$desc = $firstline . "\n" . $desc;
-	
 	my $cd = {
 		type => $ctype,
 		name => $fullname,
