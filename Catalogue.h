@@ -5,6 +5,15 @@
 #include <istream>
 #include <boost/filesystem/path.hpp>
 #include <list>
+#include "exceptions.h"
+
+class catalogueException : public creaturesException {
+	public:
+		catalogueException(const char *s) throw()
+			: creaturesException(s) {}
+		catalogueException(const std::string &s) throw()
+			: creaturesException(s) {}
+};	
 
 class Catalogue {
 //protected:

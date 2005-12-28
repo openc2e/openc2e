@@ -5,6 +5,7 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/tokenizer.hpp>
+#include <iostream>
 
 #include <cctype>
 
@@ -62,13 +63,17 @@ extern int cataparse();
 
 void cataerror(const char *err) {
 	// XXX: we may leak here - memory pools?
-	throw creaturesException(err);
+	throw catalogueException(err);
+}
+void catalogueParseError(int lineno) {
+	std::ostringstream oss;
+	oss << "Catalogue parse error at line " << lineno << std::endl;
+	
+	throw catalogueException(oss.str());
 }
 
 std::istream &operator >> (std::istream &s, Catalogue &c) {
 	catalogueFlexLexer lex(&s);
-	assert(!catalexer);
-	assert(!parsing_cat);
 	catalexer = &lex;
 	parsing_cat = &c;
 			
@@ -91,9 +96,11 @@ void Catalogue::initFrom(fs::path path) {
 	std::cout << "Catalogue is reading " << path.native_directory_string() << std::endl;
 
 	fs::directory_iterator end;
+	std::string file;
 	for (fs::directory_iterator i(path); i != end; ++i) {
 		try {
 			if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".catalogue")) {
+				file = (*i).string();
 				std::string x = fs::basename(*i);
 				// TODO: '-en-GB' exists too, this doesn't work for that
 				if ((x.size() > 3) && (x[x.size() - 3] == '-')) {
@@ -104,7 +111,11 @@ void Catalogue::initFrom(fs::path path) {
 				fs::ifstream f(*i);
 				f >> *this;
 			}
-		} catch (const std::exception &ex) {
+		}
+		catch (const catalogueException &ex) {
+			std::cerr << "Error reading catalogue file " << file << ":" << std::endl << '\t' << ex.what() << std::endl;
+		}
+		catch (const std::exception &ex) {
 			std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
 		}
 	}	
