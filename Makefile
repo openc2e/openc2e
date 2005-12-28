@@ -157,8 +157,10 @@ clean:
 test: openc2e 
 	perl -MTest::Harness -e 'runtests(glob("unittests/*.t"))'
 
-headerdeps.png: $(wildcard *.h) $(wildcard *.hpp) mngparser.tab.hpp catalogue.tab.hpp lex.mng.h lex.yy.h catalogue.lex.h
-	tools/depgraph.sh $^ > headerdeps.dot
-	dot -Tpng -o $@ headerdeps.dot
+headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) mngparser.tab.hpp catalogue.tab.hpp lex.mng.h lex.yy.h catalogue.lex.h
+	tools/depgraph.sh $^ > $@
+
+headerdeps.png: headerdeps.dot
+	dot -Tpng -o $@ $^
 
 .PHONY: clean all dep docs
