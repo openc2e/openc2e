@@ -24,11 +24,14 @@
 #include "World.h"
 #include "creaturesImage.h"
 #include <iostream>
+
 using std::cerr;
 
 /**
  TOUC (integer) first (agent) second (agent)
  %status maybe
+
+ Determines whether the two given agents are touching.  Returns 0 or 1.
 */
 void caosVM::v_TOUC() {
 	VM_VERIFY_SIZE(2)
@@ -61,7 +64,7 @@ void caosVM::v_TOUC() {
  RTAR (command) family (integer) genus (integer) species (integer)
  %status maybe
 
- set targ to random agent with given family/genus/species
+ Sets TARG to a random agent with the given family/genus/species.
  */ 
 void caosVM::c_RTAR() {
 	VM_VERIFY_SIZE(3)
@@ -93,8 +96,8 @@ void caosVM::c_RTAR() {
  NEW: SIMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
  %status maybe
 
- create a new simple agent with given family/genus/species, given spritefile with image_count sprites
- available starting at first_image in the spritefile, at the screen depth given by plane
+ Creates a new simple agent with given family/genus/species, given spritefile with image_count sprites
+ available starting at first_image in the spritefile, at the screen depth given by plane.
 */
 void caosVM::c_NEW_SIMP() {
 	VM_VERIFY_SIZE(7)
@@ -114,8 +117,8 @@ void caosVM::c_NEW_SIMP() {
  NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
  %status maybe
 
- create a new composite agent with given family/genus/species, given spritefile with image_count sprites
- available starting at first_image in the spritefile, with the first part at the screen depth given by plane
+ Creates a new composite agent with given family/genus/species, given spritefile with image_count sprites
+ available starting at first_image in the spritefile, with the first part at the screen depth given by plane.
 */
 void caosVM::c_NEW_COMP() {
 	VM_VERIFY_SIZE(7)
@@ -135,8 +138,8 @@ void caosVM::c_NEW_COMP() {
  NEW: VHCL (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
  %status maybe
 
- create a new vehicle agent with given family/genus/species, given spritefile with image_count sprites
- available starting at first_image in the spritefile, with the first part at the screen depth given by plane
+ Creates a new vehicle agent with given family/genus/species, given spritefile with image_count sprites
+ available starting at first_image in the spritefile, with the first part at the screen depth given by plane.
 */
 void caosVM::c_NEW_VHCL() {
 	VM_VERIFY_SIZE(7)
@@ -156,7 +159,7 @@ void caosVM::c_NEW_VHCL() {
  TARG (agent)
  %status maybe
 
- return TARG
+ Returns TARG, the currently-targeted agent.
 */
 void caosVM::v_TARG() {
 	VM_VERIFY_SIZE(0)
@@ -167,7 +170,7 @@ void caosVM::v_TARG() {
  OWNR (agent)
  %status maybe
  
- return OWNR
+ Returns OWNR, the agent that is running the script.
 */
 void caosVM::v_OWNR() {
 	VM_VERIFY_SIZE(0)
@@ -178,7 +181,7 @@ void caosVM::v_OWNR() {
  NULL (agent)
  %status maybe
 
- return null (zero) agent
+ Returns a null (zero) agent.
 */
 void caosVM::v_NULL() {
 	static const AgentRef nullref;
@@ -189,6 +192,8 @@ void caosVM::v_NULL() {
 /**
  POSE (command) pose (integer)
  %status maybe
+
+ Sets the displayed sprite of TARG to the frame in the sprite file with the given integer.
 */
 void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
@@ -205,8 +210,8 @@ void caosVM::c_POSE() {
  ATTR (command) attr (integer)
  %status maybe
 
- set attributes of TARG agent
-*/
+ Sets attributes of the TARG agent.
+.*/
 void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
@@ -218,7 +223,7 @@ void caosVM::c_ATTR() {
  ATTR (integer)
  %status maybe
 
- return attributes of TARG agent
+ Returns attributes of the TARG agent.
 */
 void caosVM::v_ATTR() {
 	VM_VERIFY_SIZE(0)
@@ -229,6 +234,9 @@ void caosVM::v_ATTR() {
 /**
  TICK (command) tickrate (integer)
  %status maybe
+
+ Initiates the agent timer-- the Timer script will then be run once every tickrate ticks.
+ Setting tickrate to zero will stop the timer.
 */
 void caosVM::c_TICK() {
 	VM_VERIFY_SIZE(1)
@@ -240,6 +248,8 @@ void caosVM::c_TICK() {
 /**
  BHVR (command) bhvr (integer)
  %status maybe
+
+ Sets the behaviour of the TARG agent.
 */
 void caosVM::c_BHVR() {
 	VM_VERIFY_SIZE(1)
@@ -269,7 +279,7 @@ void caosVM::c_BHVR() {
  TARG (command) agent (agent)
  %status maybe
 
- set TARG to given agent
+ Sets TARG (the target agent) to the given agent.
 */
 void caosVM::c_TARG() {
 	VM_VERIFY_SIZE(1)
@@ -280,6 +290,8 @@ void caosVM::c_TARG() {
 /**
  FROM (agent)
  %status maybe
+
+ Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
 void caosVM::v_FROM() {
 	result.setAgent(from);
@@ -288,6 +300,9 @@ void caosVM::v_FROM() {
 /**
  POSE (integer)
  %status maybe
+
+ Returns the number of the frame in the agent's sprite file that is currently being 
+ displayed.
 */
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
@@ -305,8 +320,8 @@ void caosVM::v_POSE() {
  KILL (command) agent (agent)
  %status maybe
 
- destroy the agent in question. you can't destroy PNTR.
- remember, use DEAD first for creatures!
+ Destroys the agent in question. However, you cannot destroy PNTR.
+ Remember, use DEAD first for Creatures!
 */
 void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
@@ -320,8 +335,8 @@ void caosVM::c_KILL() {
  ANIM (command) poselist (bytestring)
  %status maybe
 
- set the animation string for TARG, in the format '1 2 3 4'
- if it ends with '255', loop back to beginning; if it ends with '255 X', loop back to frame X
+ Sets the animation string for TARG, in the format '1 2 3 4'.
+ If it ends with '255', loops back to beginning; if it ends with '255 X', loops back to frame X.
 
  <i>todo: compound agent stuff</i>
 */
@@ -344,7 +359,7 @@ void caosVM::c_ANIM() {
  ANMS (command) poselist (string)
  %status maybe
 
- exactly like ANIM, only using a string and not a bytestring for source.
+ Exactly like ANIM, only using a string and not a bytestring for poselist source.
 */
 void caosVM::c_ANMS() {
 	VM_PARAM_STRING(poselist)
@@ -391,6 +406,9 @@ void caosVM::v_ABBA() {
 /**
  BASE (command) index (integer)
  %status maybe
+
+ Sets the frame in the TARG agent's spritefile that will be used as its base image.
+ This is relative to the first image set with one of the NEW: commands.
 */
 void caosVM::c_BASE() {
 	VM_VERIFY_SIZE(1)
@@ -408,6 +426,8 @@ void caosVM::c_BASE() {
 /**
  BASE (integer)
  %status maybe
+
+ Returns the frame in the TARG agent's spritefile being used as the BASE image. 
 */
 void caosVM::v_BASE() {
 	VM_VERIFY_SIZE(0)
@@ -424,6 +444,8 @@ void caosVM::v_BASE() {
 /**
  BHVR (integer)
  %status maybe
+
+ Returns the behaviour of the TARG agent.
 */
 void caosVM::v_BHVR() {
 	VM_VERIFY_SIZE(0)
@@ -445,6 +467,9 @@ void caosVM::v_BHVR() {
 /**
  CARR (agent)
  %status stub
+
+ Returns the agent that is carrying the TARG agent.  If TARG is not being carried, returns 
+ NULL. 
 */
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
@@ -456,7 +481,7 @@ void caosVM::v_CARR() {
  FMLY (integer)
  %status maybe
 
- return family of TARG agent
+ Returns the family of the TARG agent.
 */
 void caosVM::v_FMLY() {
 	VM_VERIFY_SIZE(0)
@@ -468,7 +493,7 @@ void caosVM::v_FMLY() {
  GNUS (integer)
  %status maybe
 
- return genus of TARG agent
+ Returns the genus of the TARG agent.
 */
 void caosVM::v_GNUS() {
 	VM_VERIFY_SIZE(0)
@@ -480,7 +505,7 @@ void caosVM::v_GNUS() {
  SPCS (integer)
  %status maybe
 
- return species of TARG agent
+ Returns the species of the TARG agent.
 */
 void caosVM::v_SPCS() {
 	VM_VERIFY_SIZE(0)
@@ -492,7 +517,7 @@ void caosVM::v_SPCS() {
  PLNE (integer)
  %status maybe
 
- return plane (z-order) of TARG agent
+ Returns the plane (z-order) of the TARG agent.
 */
 void caosVM::v_PLNE() {
 	VM_VERIFY_SIZE(0)
@@ -504,7 +529,7 @@ void caosVM::v_PLNE() {
  PNTR (agent)
  %status maybe
 
- return the pointer agent (the hand)
+ Returns the pointer agent (the Hand).
 */
 void caosVM::v_PNTR() {
 	VM_VERIFY_SIZE(0)
@@ -528,6 +553,9 @@ unsigned int calculateScriptId(unsigned int message_id) {
 /**
  MESG WRIT (command) agent (agent) message_id (integer)
  %status maybe
+
+ Sends a message of type message_id to the given agent.  FROM will be set to OWNR unless 
+ there is no agent involved in sending the message.
 */
 void caosVM::c_MESG_WRIT() {
 	VM_VERIFY_SIZE(2)
@@ -540,6 +568,10 @@ void caosVM::c_MESG_WRIT() {
 /**
  MESG WRT+ (command) agent (agent) message_id (integer) param_1 (anything) param_2 (anything) delay (integer)
  %status maybe
+
+ Sends a message of type message_id to the given agent, much like MESG WRIT, but with the 
+ addition of parameters.  The message will be sent after waiting the number of ticks set 
+ in delay (except doesn't, right now.  Delay must be set to zero for now.)
 */
 void caosVM::c_MESG_WRT() {
 	VM_VERIFY_SIZE(5)
@@ -558,6 +590,8 @@ void caosVM::c_MESG_WRT() {
 /**
  TOTL (integer) family (integer) genus (integer) species (integer)
  %status maybe
+
+ Returns the total number of in-game agents matching the given family/genus/species.
 */
 void caosVM::v_TOTL() {
 	VM_VERIFY_SIZE(3)
@@ -579,7 +613,7 @@ void caosVM::v_TOTL() {
  SHOW (command) visibility (integer)
  %status maybe
  
- set visibility of agent to cameras. 0 = invisible, 1 = visible.
+ Sets visibility of the TARG agent to cameras. 0 = invisible, 1 = visible.
 */
 void caosVM::c_SHOW() {
 	VM_VERIFY_SIZE(1)
@@ -592,6 +626,8 @@ void caosVM::c_SHOW() {
 /**
  POSX (float)
  %status maybe
+
+ Returns the X position of the TARG agent in the world.
 */
 void caosVM::v_POSX() {
 	VM_VERIFY_SIZE(0)
@@ -602,6 +638,8 @@ void caosVM::v_POSX() {
 /**
  POSY (float)
  %status maybe
+
+ Returns the Y position of the TARG agent in the world.
 */
 void caosVM::v_POSY() {
 	VM_VERIFY_SIZE(0)
@@ -612,6 +650,9 @@ void caosVM::v_POSY() {
 /**
  FRAT (command) framerate (integer)
  %status maybe
+
+ Sets the delay between frame changes of the TARG agent or current PART.
+ Must be from 1 to 255, 1 being the normal rate, 2 being half as quickly, and so on.
 */
 void caosVM::c_FRAT() {
 	VM_VERIFY_SIZE(1)
@@ -659,7 +700,7 @@ class blockUntilOver : public blockCond {
  OVER (command)
  %status maybe
 
- wait until the animation of the target agent or part is over
+ Waits (blocks the TARG agent) until the animation of the TARG agent or PART is over.
 */
 void caosVM::c_OVER() {
 	caos_assert(targ);
@@ -671,8 +712,8 @@ void caosVM::c_OVER() {
  PUHL (command) pose (integer) x (integer) y (integer)
  %status stub
 
- set relative x/y coords for TARG's pickup point
- pose is -1 for all poses, or a pose relative to the base specified in NEW: (not BASE)
+ Sets relative x/y coordinates for TARG's pickup point.
+ Pose is -1 for all poses, or a pose relative to the first image specified in NEW: (not BASE).
 */
 void caosVM::c_PUHL() {
 	VM_VERIFY_SIZE(3)
@@ -688,7 +729,7 @@ void caosVM::c_PUHL() {
  PUHL (integer) pose (integer) x_or_y (integer)
  %status stub
 
- Return the coordinate for TARG's picket point. x_or_y should be 1 for x, or 2 for y.
+ Returns the coordinate for TARG's pickup point. x_or_y should be 1 for x, or 2 for y.
 */
 void caosVM::v_PUHL() {
 	VM_PARAM_INTEGER(x_or_y)
@@ -701,6 +742,8 @@ void caosVM::v_PUHL() {
 /**
  POSL (float)
  %status maybe
+
+ Returns the position of the left side of TARG's bounding box.
 */
 void caosVM::v_POSL() {
 	VM_VERIFY_SIZE(0)
@@ -712,6 +755,8 @@ void caosVM::v_POSL() {
 /**
  POST (float)
  %status maybe
+
+ Returns the position of the top side of TARG's bounding box.
 */
 void caosVM::v_POST() {
 	VM_VERIFY_SIZE(0)
@@ -723,6 +768,8 @@ void caosVM::v_POST() {
 /**
  POSR (float)
  %status maybe
+
+ Returns the position of the right side of TARG's bounding box.
 */
 void caosVM::v_POSR() {
 	VM_VERIFY_SIZE(0)
@@ -734,6 +781,8 @@ void caosVM::v_POSR() {
 /**
  POSB (float)
  %status maybe
+
+ Returns the position of the bottom side of TARG's bounding box.
 */
 void caosVM::v_POSB() {
 	VM_VERIFY_SIZE(0)
@@ -745,6 +794,8 @@ void caosVM::v_POSB() {
 /**
  WDTH (integer)
  %status maybe
+
+ Returns the TARG agent's width.
 */
 void caosVM::v_WDTH() {
 	VM_VERIFY_SIZE(0)
@@ -756,6 +807,8 @@ void caosVM::v_WDTH() {
 /**
  PLNE (command) depth (integer)
  %status maybe
+
+ Sets the plane (the z-order) of the TARG agent.  Higher values are closer to the camera.
 */
 void caosVM::c_PLNE() {
 	VM_VERIFY_SIZE(1)
@@ -768,6 +821,8 @@ void caosVM::c_PLNE() {
 /**
  TINT (command) red_tint (integer) green_tint (integer) blue_tint (integer) rotation (integer) swap (integer)
  %status maybe
+
+ Sets the tinting of the TARG agent to the given red, blue, and green values.
 */
 void caosVM::c_TINT() {
 	VM_VERIFY_SIZE(5)
@@ -790,6 +845,8 @@ void caosVM::c_TINT() {
 /**
  RNGE (command) distance (float)
  %status maybe
+
+ Sets the TARG agent's range (i.e., the distance it can see and hear).
 */
 void caosVM::c_RNGE() {
 	VM_VERIFY_SIZE(1)
@@ -802,6 +859,8 @@ void caosVM::c_RNGE() {
 /**
  RNGE (integer)
  %status maybe
+
+ Returns the TARG agent's range.
 */
 void caosVM::v_RNGE() {
 	VM_VERIFY_SIZE(0)
@@ -813,7 +872,8 @@ void caosVM::v_RNGE() {
  TRAN (integer) x (integer) y (integer)
  %status maybe
 
- Tests if the pixel at (x,y) on TARG is transparent
+ Tests if the pixel at (x,y) on the TARG agent is transparent.
+ Returns 0 or 1.
 */
 void caosVM::v_TRAN() {
 	VM_VERIFY_SIZE(2)
@@ -854,6 +914,10 @@ void caosVM::v_TRAN() {
 /**
  TRAN (command) transparency (integer) part_no (integer)
  %status stub
+
+ Sets the TARG agent's behaviour with regard to transparency.  If set to 1, invisible 
+ parts of the agent can't be clicked.  If 0, anywhere on the agent (including transparent 
+ parts) can be clicked.
 */
 void caosVM::c_TRAN() {
 	VM_VERIFY_SIZE(2)
@@ -867,6 +931,8 @@ void caosVM::c_TRAN() {
 /**
  HGHT (integer)
  %status maybe
+
+ Returns the TARG agent's height.
 */
 void caosVM::v_HGHT() {
 	VM_VERIFY_SIZE(0)
@@ -879,7 +945,7 @@ void caosVM::v_HGHT() {
  HAND (string)
  %status maybe
 
- returns the name of the hand; default is 'hand'
+ Returns the name of the Hand; default is 'hand'.
 */
 void caosVM::v_HAND() {
 	VM_VERIFY_SIZE(0)
@@ -891,7 +957,7 @@ void caosVM::v_HAND() {
  HAND (command) name (string)
  %status maybe
 
- set the name of the hand
+ Sets the name of the Hand.
 */
 void caosVM::c_HAND() {
 	VM_VERIFY_SIZE(1)
@@ -904,7 +970,7 @@ void caosVM::c_HAND() {
  TICK (integer)
  %status maybe
 
- return tick rate of TARG
+ Return the agent timer tick rate of the TARG agent.
 */
 void caosVM::v_TICK() {
 	VM_VERIFY_SIZE(0)
@@ -916,6 +982,9 @@ void caosVM::v_TICK() {
 /**
  PUPT (command) pose (integer) x (integer) y (integer)
  %status stub
+
+ Sets relative x/y coordinates for the location in the world where the TARG agent picks up 
+ objects.  The pose is relative to the first image set in NEW: (not BASE).
 */
 void caosVM::c_PUPT() {
 	VM_VERIFY_SIZE(3)
@@ -931,7 +1000,7 @@ void caosVM::c_PUPT() {
  %status maybe
 
  Stop the script running in TARG, if any.
- */
+*/
 void caosVM::c_STPT() {
 	caos_assert(targ)
 	targ->stopScript();
@@ -940,6 +1009,9 @@ void caosVM::c_STPT() {
 /**
  DCOR (command) core_on (integer)
  %status done
+
+ Turns the display of the TARG agent's physical core on and off. Gives a general idea of 
+ its size and location (including invisible agents).
 */
 void caosVM::c_DCOR() {
 	VM_PARAM_INTEGER(core_on)
@@ -951,6 +1023,8 @@ void caosVM::c_DCOR() {
 /**
  MIRA (integer)
  %status stub
+
+ Turns mirroring of the TARG agent's current sprite on or off (0 or 1).
 */
 void caosVM::v_MIRA() {
 	caos_assert(targ);
@@ -961,6 +1035,8 @@ void caosVM::v_MIRA() {
 /**
  MIRA (command) mirror_on (integer)
  %status stub
+
+ Determines whether or not the TARG agent's current sprite is mirrored. Returns 0 or 1.
 */
 void caosVM::c_MIRA() {
 	VM_PARAM_INTEGER(mirror_on)
@@ -974,7 +1050,8 @@ void caosVM::c_MIRA() {
  DISQ (float) other (agent)
  %status maybe
 
- return square of distance of centre points of TARG and other agents
+ Calculates the square of the distance between the centers of the TARG agent and the given 
+ agent.
 */
 void caosVM::v_DISQ() {
 	VM_PARAM_VALIDAGENT(other)
@@ -990,6 +1067,9 @@ void caosVM::v_DISQ() {
 /**
  ALPH (command) alpha_value (integer) enable (integer)
  %status maybe
+
+ Sets the degree of alpha blending on the TARG agent, to a value from 0 (solid) to 256 
+ (invisible). The second parameter will turn alpha blending on and off.
 */
 void caosVM::c_ALPH() {
 	VM_PARAM_INTEGER(enable)
@@ -1019,7 +1099,7 @@ void caosVM::c_ALPH() {
  HELD (agent)
  %status stub
 
- Returns the agent currently held by the target, or a random one if there are more than one.
+ Returns the agent currently held by the TARG agent, or a random one if there are more than one.
 */
 void caosVM::v_HELD() {
 	result.setAgent(0);
@@ -1031,7 +1111,7 @@ void caosVM::v_HELD() {
  GALL (command) spritefile (string) first_image (integer)
  %status stub
 
- Change the sprite file and first image associated with the current agent or part.
+ Changes the sprite file and first image associated with the TARG agent or current PART.
 */
 void caosVM::c_GALL() {
 	VM_PARAM_INTEGER(first_image)
@@ -1042,7 +1122,7 @@ void caosVM::c_GALL() {
  GALL (string)
  %status maybe
 
- Return the name of the sprite file associated with the current agent or part.
+ Returns the name of the sprite file associated with the TARG agent or current PART.
 */
 void caosVM::v_GALL() {
 	caos_assert(targ);
@@ -1057,7 +1137,7 @@ void caosVM::v_GALL() {
  SEEE (integer) first (agent) second (agent)
  %status maybe
 
- Return 1 if the first agent can see the other, or 0 otherwise.
+ Returns 1 if the first agent can see the other, or 0 otherwise.
 */
 void caosVM::v_SEEE() {
 	VM_PARAM_VALIDAGENT(second)
@@ -1078,7 +1158,7 @@ void caosVM::v_SEEE() {
  TINT (integer) attribute (integer)
  %status stub
 
- Return the tint value for target agent. Pass 1 for red, 2 for blue, 3 for green, 4 for rotation or 5 for swap.
+ Returns the tint value for TARG agent. Pass 1 for red, 2 for blue, 3 for green, 4 for rotation or 5 for swap.
 */
 void caosVM::v_TINT() {
 	VM_PARAM_INTEGER(attribute)
