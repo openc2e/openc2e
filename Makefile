@@ -97,9 +97,8 @@ cmddata.cpp: commandinfo.yml writecmds.pl
 lex.mng.cpp lex.mng.h: mng.l
 	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
 
-catalogue.lex.cpp catalogue.lex.h: catalogue.l
+catalogue.lex.cpp catalogue.lex.h: catalogue.l catalogue.tab.hpp
 	flex -+ --prefix=catalogue -d -o catalogue.lex.cpp --header-file=catalogue.lex.h catalogue.l 
-
 	
 mngfile.o: lex.mng.cpp
 
