@@ -71,7 +71,9 @@ OPENC2E = \
 	dialect.o \
 	lex.mng.o \
 	mngparser.tab.o \
-	bytecode.o
+	bytecode.o \
+	catalogue.lex.o \
+	catalogue.tab.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
 XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer
@@ -93,13 +95,20 @@ docs.html: writehtml.pl commandinfo.yml
 cmddata.cpp: commandinfo.yml writecmds.pl
 	perl writecmds.pl commandinfo.yml > cmddata.cpp
 
-lex.mng.cpp lex.mng.h: mng.l mngparser.tab.hpp
+lex.mng.cpp lex.mng.h: mng.l
 	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
 
+catalogue.lex.cpp catalogue.lex.h: catalogue.l
+	flex -+ --prefix=catalogue -d -o catalogue.lex.cpp --header-file=catalogue.lex.h catalogue.l 
+
+	
 mngfile.o: lex.mng.cpp
 
 mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
 	bison -d --name-prefix=mng mngparser.ypp
+
+catalogue.tab.cpp catalogue.tab.hpp: catalogue.ypp
+	bison -d --name-prefix=cata catalogue.ypp
 
 lex.yy.cpp lex.yy.h: caos.l
 	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h caos.l
@@ -119,6 +128,7 @@ caosScript.o: lex.yy.h lex.yy.cpp
 	mv .deps/$<.Td .deps/$<.d
 
 include $(shell find .deps -name '*.d' -type f 2>/dev/null || true)
+Catalogue.o: catalogue.lex.h catalogue.tab.hpp
 
 openc2e: $(OPENC2E)
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^

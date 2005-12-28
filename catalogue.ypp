@@ -1,0 +1,59 @@
+%{
+    #include "Catalogue.h"
+    #include "catalogue.lex.h"
+    extern catalogueFlexLexer *catalexer;
+    extern Catalogue *parsing_cat;
+    static int catalex(void) { return catalexer->yylex(); }
+    #include <list>
+
+    extern void cataerror(char const *);
+%}
+
+%union {
+    std::string *string;
+    int number;
+
+    bool boolean_v;
+    std::list<std::string> *list;
+}
+
+%token CTOK_TAG
+%token CTOK_ARRAY
+%token CTOK_OVERRIDE
+%token <string> CTOK_STR
+%token <number> CTOK_INT
+
+%type <list> strings
+%type <boolean_v> maybeOverride
+
+%%
+
+root: cgroup {}
+    | root cgroup {}
+    ;
+
+cgroup:
+    CTOK_TAG maybeOverride CTOK_STR strings
+    { parsing_cat->addVals(*$3, $2, -1, *$4);
+      delete $4; delete $3;
+    }
+  | CTOK_ARRAY maybeOverride CTOK_STR CTOK_INT strings
+    { parsing_cat->addVals(*$3, $2, $4, *$5);
+      delete $5; delete $3;
+    }
+  ;
+
+maybeOverride:
+    CTOK_OVERRIDE { $$ = true;  }
+  |               { $$ = false; }
+  ;
+
+strings:
+    CTOK_STR strings
+    { $2->push_front(*$1); delete $1; $$ = $2; }
+  | { $$ = new std::list<std::string>(); }
+  ;
+
+%%
+
+

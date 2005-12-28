@@ -4,6 +4,7 @@
 #include <vector>
 #include <istream>
 #include <boost/filesystem/path.hpp>
+#include <list>
 
 class Catalogue {
 //protected:
@@ -19,6 +20,12 @@ public:
   
 	void reset();
 	void initFrom(boost::filesystem::path path);
+
+	void addVals(std::string &title, bool override, int count, const std::list<std::string> &vals);
 };
+
+/* For lexer/parser, don't use for anything else. */
+
+char catalogue_descape(char c);
 
 /* vim: set noet: */
