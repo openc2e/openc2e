@@ -617,6 +617,7 @@ void caosVM::c_FRAT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(framerate)
 
+	caos_assert(framerate >= 1 && framerate <= 255);
 	caos_assert(targ);
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
