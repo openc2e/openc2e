@@ -157,6 +157,7 @@ while (<>) {
 		name => $fullname,
 		match => $cname,
 		arguments => \@args,
+		syntaxstring => $firstline,
 		description => @lines ? $desc : undef,
 		filename => $file,
 		implementation => $impl,
