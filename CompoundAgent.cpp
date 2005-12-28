@@ -97,7 +97,9 @@ unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cp
 #include <iostream>
 
 void CompoundAgent::handleClick(float clickx, float clicky) {
-	for (std::vector<CompoundPart *>::iterator x = parts.end() -1; x != parts.begin() - 1; x--) {
+	std::vector<CompoundPart *>::iterator x = parts.end();
+	while (x != parts.begin()) {
+		x--;
 		if ((clickx >= (*x)->x) && (clicky >= (*x)->y) &&
 				(clickx <= (*x)->x + (*x)->getWidth()) && (clicky <= (*x)->y + (*x)->getHeight())) {
 			ButtonPart *b = dynamic_cast<ButtonPart *>(*x);
