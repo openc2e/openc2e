@@ -129,6 +129,7 @@ caosScript.o: lex.yy.h lex.yy.cpp
 
 include $(shell find .deps -name '*.d' -type f 2>/dev/null || true)
 Catalogue.o: catalogue.lex.h catalogue.tab.hpp
+lex.mng.o: mngparser.tab.hpp
 
 openc2e: $(OPENC2E)
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
