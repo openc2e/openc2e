@@ -19,7 +19,6 @@
 
 #include "creaturesImage.h"
 #include <istream>
-#include "mmapifstream.h"
 
 class duppableImage : public creaturesImage {
 public:
@@ -32,7 +31,7 @@ private:
 
 public:
 	c16Image() { }
-	c16Image(mmapifstream *);
+	c16Image(shared_ptr<mapped_file> in);
 	~c16Image();
 	void readHeader(std::istream &in);
 	void duplicateTo(class s16Image *);
@@ -44,7 +43,7 @@ private:
 
 public:
 	s16Image() { }
-	s16Image(mmapifstream *);
+	s16Image(shared_ptr<mapped_file>);
 	~s16Image();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &out);

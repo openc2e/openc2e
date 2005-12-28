@@ -18,7 +18,9 @@
  */
 
 #include "creaturesImage.h"
-#include "mmapifstream.h"
+#include <boost/iostreams/device/mapped_file.hpp>
+
+using boost::iostreams::mapped_file;
 
 class blkImage : public creaturesImage {
 private:
@@ -28,7 +30,7 @@ public:
 	unsigned int totalwidth, totalheight;
 
 	blkImage() { }
-	blkImage(mmapifstream *);
+	blkImage(shared_ptr<mapped_file> in);
 	~blkImage();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &s);

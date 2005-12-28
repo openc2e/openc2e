@@ -58,7 +58,6 @@ OPENC2E = \
 	main.o \
 	Map.o \
 	MetaRoom.o \
-	mmapifstream.o \
 	mngfile.o \
 	mngparser.tab.o \
 	PathResolver.o \
@@ -76,7 +75,7 @@ OPENC2E = \
 	World.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
-XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer
+XLDFLAGS=$(LDFLAGS) -lboost_filesystem -lboost_iostreams $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer
 COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)

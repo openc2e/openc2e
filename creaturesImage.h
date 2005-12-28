@@ -24,6 +24,11 @@
 #include <map>
 #include <fstream>
 #include "endianlove.h"
+#include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/smart_ptr.hpp>
+
+using boost::iostreams::mapped_file;
+using boost::shared_ptr;
 
 class creaturesImage {
 private:
@@ -35,13 +40,14 @@ protected:
 	void **buffers;
 	bool is_565;
 	
-	std::ifstream *stream;
+	shared_ptr<mapped_file> map_file;
   
 public:
 	std::string name;
 
-	creaturesImage() { refcount = 0; stream = 0; }
-	virtual ~creaturesImage() { assert(!refcount); if (stream) delete stream; }
+	creaturesImage() { refcount = 0; }
+	creaturesImage(shared_ptr<mapped_file> f) : map_file(f) { refcount = 0; }
+	virtual ~creaturesImage() { assert(!refcount); }
 	bool is565() { return is_565; }
 	unsigned int numframes() { return m_numframes; }
 	virtual unsigned int width(unsigned int frame) { return widths[frame]; }
@@ -59,6 +65,7 @@ class imageGallery {
 protected:
 	std::map<std::string, creaturesImage *> gallery;
 
+	shared_ptr<mapped_file> map_file;
 public:
 	creaturesImage *getImage(std::string name);
 	void delImage(creaturesImage *i);

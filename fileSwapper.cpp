@@ -47,8 +47,8 @@ void fileSwapper::convertsprite(s16Image &img, std::string dest) {
 }
 
 void fileSwapper::convertc16(std::string src, std::string dest) {
-	mmapifstream *in = new mmapifstream(src.c_str()); // auto-freed by the c16Image below
-	if (!in->is_open()) { delete in; return; }
+	shared_ptr<mapped_file> in(new mapped_file(src.c_str()));
+	if (!in->is_open()) return;
 	
 	// okay. read the damn file.
 	c16Image img(in);
