@@ -117,7 +117,7 @@ void caosVM::v_HOTP() {
 		caos_assert(c);
 		int clickx = world.hand()->x - a->x, clicky = world.hand()->y - a->y;
 		// TODO: can't we put this code in CompoundAgent?
-		for (std::vector<CompoundPart *>::iterator x = c->parts.begin(); x != c->parts.end(); x++)
+		for (std::vector<CompoundPart *>::iterator x = c->parts.end() - 1; x != c->parts.begin() - 1; x--)
 			if ((clickx >= (*x)->x) && (clicky >= (*x)->y) &&
 				(clickx <= (*x)->x + (*x)->getWidth()) && (clicky <= (*x)->y + (*x)->getHeight())) {
 				result.setInt((*x)->id);
