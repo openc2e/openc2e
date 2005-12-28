@@ -526,4 +526,20 @@ void caosVM::c_ALTR() {
 	room->ca[caindex] = newvalue;
 }
 
+/**
+ RLOC (string) roomid (integer)
+ %status maybe
+*/
+void caosVM::v_RLOC() {
+	VM_PARAM_INTEGER(roomid)
+
+	Room *r = world.map.getRoom(roomid);
+	caos_assert(r);
+
+	char buffer[100];
+	snprintf(buffer, 100, "%d %d %d %d %d %d", r->x_left, r->x_right, r->y_left_ceiling, r->y_right_ceiling, r->y_left_floor, r->y_right_floor);
+
+	result.setString(buffer);
+}
+
 /* vim: set noet: */

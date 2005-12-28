@@ -205,7 +205,7 @@ void caosVM::c_FCUS() {
 
 /**
  FRMT (command) left_margin (integer) top_margin (integer) right_margin (integer) button_margin (integer) line_spacing (integer) char_spacing (integer) justification (integer)
- %status stub
+ %status maybe
 
  alters the appearance of the target text part. the spacing values and margins are to be specified in pixels. justification can be 0 for left, 1 for right, 2 for center, 4 for bottom, 8 for middle or 16 for 'last page scroll' (TODO?), and you can add these together (except 0/1 are mutually exclusive, obviously).
 */

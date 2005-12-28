@@ -730,6 +730,18 @@ void caosVM::v_STOI() {
 }
 
 /**
+ STOF (float) string (string)
+ %status maybe
+
+ Returns the provided string as a float, or 0 if it can't be converted.
+*/
+void caosVM::v_STOF() {
+	VM_PARAM_STRING(string)
+		
+	result.setFloat(atof(string.c_str()));
+}
+
+/**
  LOWA (string) string (string)
  %status maybe
 

@@ -249,4 +249,22 @@ void caosVM::c_TRCK() {
 	world.camera.trackAgent(agent, xpercent, ypercent, (trackstyle)style, (cameratransition)transition);
 }
 
+/**
+ LINE (command) x1 (integer) y1 (integer) x2 (integer) y2 (integer) r (integer) g (integer) b (integer) stipple_on (integer) stipple_off (integer)
+ %status stub
+*/
+void caosVM::c_LINE() {
+	VM_PARAM_INTEGER(stipple_off)
+	VM_PARAM_INTEGER(stipple_on)
+	VM_PARAM_INTEGER(b)
+	VM_PARAM_INTEGER(g)
+	VM_PARAM_INTEGER(r)
+	VM_PARAM_INTEGER(y2)
+	VM_PARAM_INTEGER(x2)
+	VM_PARAM_INTEGER(y1)
+	VM_PARAM_INTEGER(x1)
+	
+	caos_assert(targ);
+	// TODO
+}
 /* vim: set noet: */

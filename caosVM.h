@@ -165,6 +165,7 @@ public:
 	void v_MAPW();
 	void v_MAPH();
 	void v_BKDS();
+	void v_RLOC();
 	
 	// camera
 	void v_VISI();
@@ -184,6 +185,7 @@ public:
 	void c_WDOW();
 	void v_WDOW();
 	void c_TRCK();
+	void c_LINE();
 
 	// world
 	void c_LOAD();
@@ -249,6 +251,7 @@ public:
 	void v_NAME();
 	void v_SUBS();
 	void v_STOI();
+	void v_STOF();
 	void v_LOWA();
 	void v_UPPA();
 	void v_SINS();

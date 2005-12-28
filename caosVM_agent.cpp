@@ -766,7 +766,7 @@ void caosVM::c_PLNE() {
 
 /**
  TINT (command) red_tint (integer) green_tint (integer) blue_tint (integer) rotation (integer) swap (integer)
- %status stub
+ %status maybe
 */
 void caosVM::c_TINT() {
 	VM_VERIFY_SIZE(5)
