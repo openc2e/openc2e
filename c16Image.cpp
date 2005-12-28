@@ -19,20 +19,13 @@
 
 #include "c16Image.h"
 #include "openc2e.h"
-#include <boost/iostreams/stream.hpp>
-
-using boost::iostreams::stream;
 
 void c16Image::readHeader(std::istream &in) {
-	assert(in.good());
-	uint32 flags = 0xffffffff;
-	uint16 spritecount = 0xffff;
-	in.read((char *)&flags, 4);
-	flags = swapEndianLong(flags);
+	uint32 flags; uint16 spritecount;
+	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	assert(flags & 0x02);
-	in.read((char *)&spritecount, 2);
-	m_numframes = swapEndianShort(spritecount);
+	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 
 	widths = new unsigned short[m_numframes];
 	heights = new unsigned short[m_numframes];
@@ -40,9 +33,8 @@ void c16Image::readHeader(std::istream &in) {
 
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		uint32 offset = 0xffffffff;
+		uint32 offset;
 		in.read((char *)&offset, 4); offset = swapEndianLong(offset);
-		assert(offset != 0xffffffff);
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
 		lineoffsets[i] = new unsigned int[heights[i]];
@@ -83,11 +75,8 @@ void s16Image::duplicateTo(s16Image *img) {
 	}
 }
 
-c16Image::c16Image(shared_ptr<mapped_file> inm) {
-//	map_file = inm;
-
-	stream<mapped_file> *in = new stream<mapped_file>(*inm);
-	in->exceptions(std::ios_base::badbit);
+c16Image::c16Image(mmapifstream *in) {
+	stream = in;
 
 	readHeader(*in);
 	
@@ -119,7 +108,6 @@ c16Image::c16Image(shared_ptr<mapped_file> inm) {
 		delete[] lineoffsets[i];
 	}
 	delete[] lineoffsets;
-	delete in;
 }
 
 void s16Image::readHeader(std::istream &in) {
@@ -158,17 +146,15 @@ void s16Image::writeHeader(std::ostream &s) {
 	}
 }
 
-s16Image::s16Image(shared_ptr<mapped_file> in) {
-	map_file = in;
+s16Image::s16Image(mmapifstream *in) {
+	stream = in;
 
-	stream<mapped_file> ins(*in);	
-	ins.exceptions(std::ios_base::badbit);
-	readHeader(ins);
+	readHeader(*in);
 	
 	buffers = new void *[m_numframes];
 
 	for (unsigned int i = 0; i < m_numframes; i++)
-		buffers[i] = in->data() + offsets[i];
+		buffers[i] = in->map + offsets[i];
 
 	delete[] offsets;
 }
@@ -176,7 +162,7 @@ s16Image::s16Image(shared_ptr<mapped_file> in) {
 s16Image::~s16Image() {
 	delete[] widths;
 	delete[] heights;
-	if (!map_file) { // make sure this isn't a damn mmapifstream..
+	if (!stream) { // make sure this isn't a damn mmapifstream..
 		for (unsigned int i = 0; i < m_numframes; i++)
 			delete (uint16 *)buffers[i];
 		delete[] buffers;
@@ -194,7 +180,7 @@ c16Image::~c16Image() {
 }
 
 void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
-	assert(!map_file); // this only works on duplicated images
+	assert(!stream); // this only works on duplicated images
 
 	if (128 == r == g == b == rotation == swap) return; // duh
 

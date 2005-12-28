@@ -79,8 +79,7 @@ path cacheDirectory() {
 	return p;
 }
 
-bool tryOpen(creaturesImage *&img, std::string fname, filetype ft) {
-	shared_ptr<mapped_file> p(new mapped_file());
+bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype ft) {
 	path cachefile, realfile;
 	std::string cachename;
 	std::string basename = fname; basename.erase(basename.end() - 4, basename.end()); 
@@ -112,15 +111,17 @@ bool tryOpen(creaturesImage *&img, std::string fname, filetype ft) {
 
 	if (resolveFile(cachefile)) {
 		// TODO: check for up-to-date-ness
-		p->open(cachefile.native_file_string());
+		in->clear();
+		in->mmapopen(cachefile.native_file_string());
 		if (ft == c16) ft = s16;
 		goto done;
 	}
 	std::cout << "couldn't find cached version: " << cachefile.native_file_string() << std::endl;
 
-	p->open(realfile.native_file_string());
+	in->clear();
+	in->mmapopen(realfile.native_file_string());
 #ifdef __C2E_BIGENDIAN
-	if (p->is_open()) {
+	if (in->is_open()) {
 		fileSwapper f;
 		switch (ft) {
 			case blk:
@@ -135,21 +136,24 @@ bool tryOpen(creaturesImage *&img, std::string fname, filetype ft) {
 				f.convertc16(realfile.native_file_string(), cachefile.native_file_string());
 				ft = s16;
 				break;
+			default:
+				return true; // TODO: exception?
 		}
+		in->close(); // TODO: close the mmap too! how?
 		if (!exists(cachefile)) return false; // TODO: exception?
-		p->open(cachefile.native_file_string());
+		in->mmapopen(cachefile.native_file_string());
 	}
 #endif
 done:
-	if (p->is_open()) {
+	if (in->is_open()) {
 		switch (ft) {
-			case blk: img = new blkImage(p); break;
-			case c16: img = new c16Image(p); break; // this should never happen, actually, once we're done
-			case s16: img = new s16Image(p); break;
+			case blk: img = new blkImage(in); break;
+			case c16: img = new c16Image(in); break; // this should never happen, actually, once we're done
+			case s16: img = new s16Image(in); break;
 		}
 		img->name = basename;
 	}
-	return true;
+	return in->is_open();
 }
 
 /*
@@ -166,15 +170,26 @@ creaturesImage *imageGallery::getImage(std::string name) {
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
+	mmapifstream *in = new mmapifstream();
 	creaturesImage *img;
-	if (!tryOpen(img, name + ".s16", s16))
-		if (!tryOpen(img, name + ".c16", c16))
-			if (!tryOpen(img, name, blk)) {
+
+	if (!tryOpen(in, img, name + ".s16", s16)) {
+		if (!tryOpen(in, img, name + ".c16", c16)) {
+			bool lasttry = tryOpen(in, img, name, blk);
+			if (!lasttry) {
 				std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
 				return 0;
 			}
-	gallery[name] = img;
+			gallery[name] = img;
+		} else {
+			gallery[name] = img;
+		}
+	} else {
+		gallery[name] = img;
+	}
 	
+	in->close(); // doesn't close the mmap, which we still need :)
+
 	gallery[name]->addRef();
 	return gallery[name];
 }

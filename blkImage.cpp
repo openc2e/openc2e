@@ -20,32 +20,15 @@
 #include "openc2e.h"
 #include "blkImage.h"
 #include <iostream>
-#include <boost/iostreams/stream.hpp>
-
-using boost::iostreams::stream;
 
 void blkImage::readHeader(std::istream &in) {
-	assert(in.good());
-	uint32 flags = 0xffffffff;
-	uint16 width = 0xffff;
-	uint16 height = 0xffff;
-	uint16 spritecount = 0xffff;
-	
-	in.read((char *)&flags, 4);
-	assert(in.good());
-	flags = swapEndianLong(flags);
-	
+	uint32 flags; uint16 width, height, spritecount;
+	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
-	
-	in.read((char *)&width, 2);
-	width = swapEndianShort(width);
-	
-	in.read((char *)&height, 2);
-	height = swapEndianShort(height);
-	
+	in.read((char *)&width, 2); width = swapEndianShort(width);
+	in.read((char *)&height, 2); height = swapEndianShort(height);
 	totalwidth = width * 128; totalheight = height * 128;
-	in.read((char *)&spritecount, 2);
-	m_numframes = swapEndianShort(spritecount);
+	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 	
 	assert(m_numframes == (unsigned int) (width * height));	
 
@@ -82,19 +65,15 @@ void blkImage::writeHeader(std::ostream &s) {
 	}
 }
 
-blkImage::blkImage(shared_ptr<mapped_file> in) {
-	// This code is duplicated across all three file formats -
-	// needs unification
-	std::cerr << "map size " << in->size() << std::endl;
-	map_file = in;
-	stream<mapped_file> ins(*in);	
-	ins.exceptions (std::ios_base::badbit);
-	readHeader(ins);
+blkImage::blkImage(mmapifstream *in) {
+	stream = in;
+
+	readHeader(*in);
 	
 	buffers = new void *[m_numframes];
 	
 	for (unsigned int i = 0; i < m_numframes; i++)
-		buffers[i] = in->data() + offsets[i];
+		buffers[i] = in->map + offsets[i];
 }
 
 blkImage::~blkImage() {
