@@ -79,7 +79,7 @@ path cacheDirectory() {
 	return p;
 }
 
-shared_ptr<mapped_file> tryOpen(creaturesImage *&img, std::string fname, filetype ft) {
+bool tryOpen(creaturesImage *&img, std::string fname, filetype ft) {
 	shared_ptr<mapped_file> p(new mapped_file());
 	path cachefile, realfile;
 	std::string cachename;
@@ -96,7 +96,7 @@ shared_ptr<mapped_file> tryOpen(creaturesImage *&img, std::string fname, filetyp
 	}
 
 	// if it doesn't exist, too bad, give up.
-	if (!resolveFile(realfile)) return shared_ptr<mapped_file>();
+	if (!resolveFile(realfile)) return false;
 	
 	// work out where the cached file should be
 	cachename = cacheDirectory().native_directory_string() + "/" + fname;
@@ -136,7 +136,7 @@ shared_ptr<mapped_file> tryOpen(creaturesImage *&img, std::string fname, filetyp
 				ft = s16;
 				break;
 		}
-		if (!exists(cachefile)) return shared_ptr<mapped_file>(); // TODO: exception?
+		if (!exists(cachefile)) return false; // TODO: exception?
 		p->open(cachefile.native_file_string());
 	}
 #endif
@@ -148,8 +148,8 @@ done:
 			case s16: img = new s16Image(p); break;
 		}
 		img->name = basename;
-	} else p.reset();
-	return p;
+	}
+	return true;
 }
 
 /*
@@ -167,16 +167,12 @@ creaturesImage *imageGallery::getImage(std::string name) {
 
 	// step two: try opening it in .c16 form first, then try .s16 form
 	creaturesImage *img;
-	map_file.reset();
-	map_file = tryOpen(img, name + ".s16", s16);
-	if (!map_file)
-		map_file = tryOpen(img, name + ".c16", c16);
-	if (!map_file)
-		map_file = tryOpen(img, name, blk);
-	if (!map_file) {
-		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
-		return 0;
-	}
+	if (!tryOpen(img, name + ".s16", s16))
+		if (!tryOpen(img, name + ".c16", c16))
+			if (!tryOpen(img, name, blk)) {
+				std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
+				return 0;
+			}
 	gallery[name] = img;
 	
 	gallery[name]->addRef();

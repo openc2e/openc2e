@@ -65,7 +65,6 @@ class imageGallery {
 protected:
 	std::map<std::string, creaturesImage *> gallery;
 
-	shared_ptr<mapped_file> map_file;
 public:
 	creaturesImage *getImage(std::string name);
 	void delImage(creaturesImage *i);
