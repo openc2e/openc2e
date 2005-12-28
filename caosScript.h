@@ -27,12 +27,15 @@
 #include <map>
 #include "caosVar.h"
 #include <cassert>
+#include <boost/shared_ptr.hpp>
 
 class Agent;
 class caosOp;
 class Variant;
 
-struct script { //: public Collectable {
+using boost::shared_ptr;
+
+struct script {
 	protected:
 		
 		bool linked;
@@ -66,9 +69,6 @@ struct script { //: public Collectable {
 
 		void link();
 		
-		void release(){}
-		void retain(){}
-
 		int newRelocation() {
 			assert (!linked);
 			int idx = relocations.size();
@@ -107,17 +107,14 @@ class caosScript { //: Collectable {
 public:
 	const Variant *v;
 	std::string filename;
-	script *installer, *removal;
-	std::vector<script *> scripts;
-	script *current;
+	shared_ptr<script> installer, removal;
+	std::vector<shared_ptr<script> > scripts;
+	shared_ptr<script> current;
 
 	caosScript(const std::string &variant, const std::string &fn);
 	void parse(std::istream &in);
 	~caosScript();
 	void installScripts();
-
-	void release() {}
-	void retain() {}
 };
 
 #endif

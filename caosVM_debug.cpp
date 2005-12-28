@@ -241,7 +241,7 @@ void caosVM::c_DBG_DISA() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 
-	script *s = world.scriptorium.getScript(family, genus, species, event);
+	shared_ptr<script> s = world.scriptorium.getScript(family, genus, species, event);
 	if (!s) return;
 
 	*outputstream << s->dump();

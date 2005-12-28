@@ -268,7 +268,7 @@ void caosVM::c_CALL() {
 	caos_assert(owner);
 	caos_assert(script_no > 0 && script_no < 65536);
 
-	script *s = owner->findScript(script_no);
+	shared_ptr<script> s = owner->findScript(script_no);
 	if (!s) return;
 	caosVM *newvm = world.getVM(owner);
 	

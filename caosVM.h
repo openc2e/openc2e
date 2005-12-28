@@ -97,7 +97,7 @@ public:
 	const caosVM_p vm; // == this
 	
 	// script state...
-	script *currentscript;
+	shared_ptr<script> currentscript;
 	int nip, cip;
 	
 	bool inst, lock, stop_loop;
@@ -579,11 +579,11 @@ public:
 	void v_OOWW();
 
 	void runOp();
-	void runEntirely(script *s);
+	void runEntirely(shared_ptr<script> s);
 
 	void tick();
 	void stop();
-	bool fireScript(script *s, bool nointerrupt, Agent *frm = 0);
+	bool fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm = 0);
 
 	caosVM(const AgentRef &o);
 

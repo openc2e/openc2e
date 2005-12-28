@@ -44,6 +44,9 @@ script::~script() {
 	std::vector<class caosOp *>::iterator i = allOps.begin();
 	while (i != allOps.end())
 		delete *i++;
+	allOps.clear();
+	relocations.clear();
+	gsub.clear();
 }
 
 void script::link() {
@@ -105,7 +108,7 @@ std::string script::dump() {
 
 #if 0
 // for gdb
-static int dump_out(script *s) {
+static int dump_out(shared_ptr<script> s) {
 	std::cerr << s->dump() << std::endl;
 }
 #endif
@@ -129,8 +132,7 @@ class BaseDialect : public Dialect {
 				if (t->word == "rscr") {
 					if (s->removal)
 						throw parseException("multiple rscr not allowed");
-					s->current = s->removal = new script(s->v, s->filename);
-					s->removal->retain();
+					s->current = s->removal = shared_ptr<script>(new script(s->v, s->filename));
 					return;
 				}
 				if (t->word == "scrp") {
@@ -159,11 +161,12 @@ class BaseDialect : public Dialect {
 					ENDM endm;
 					d.delegates = s->v->cmd_dialect->delegates;
 					d.delegates["endm"] = &endm;
-					script *scr = new script(s->v, s->filename,
-									fmly.constval.getInt(),
-									gnus.constval.getInt(),
-									spcs.constval.getInt(),
-									scrp.constval.getInt());
+					shared_ptr<script> scr = shared_ptr<script>(
+									new script(s->v, s->filename,
+										fmly.constval.getInt(),
+										gnus.constval.getInt(),
+										spcs.constval.getInt(),
+										scrp.constval.getInt()));
 					s->current = scr;
 					d.doParse(s);
 					s->current = s->installer;
@@ -182,9 +185,7 @@ caosScript::caosScript(const std::string &variant, const std::string &fn) {
 	v = variants[variant];
 	if (!v)
 		throw caosException(std::string("Unknown variant ") + variant);
-	current = installer = new script(v, fn);
-	current->retain();
-	removal = NULL;
+	current = installer = shared_ptr<script> (new script(v, fn));
 	filename = fn;
 }
 
@@ -198,7 +199,7 @@ void caosScript::parse(std::istream &in) {
 	installer->link();
 	if (removal)
 		removal->link();
-	std::vector<script *>::iterator i = scripts.begin();
+	std::vector<shared_ptr<script> >::iterator i = scripts.begin();
 	while (i != scripts.end()) {
 		(*i)->link();
 		i++;
@@ -206,18 +207,13 @@ void caosScript::parse(std::istream &in) {
 }
 
 caosScript::~caosScript() {
-	installer->release();
-	if (removal)
-		removal->release();
-	std::vector<script *>::iterator i = scripts.begin();
-	while (i != scripts.end())
-		(*i)->release();
+	// Nothing to do, yay shared_ptr!
 }
 
 void caosScript::installScripts() {
-	std::vector<script *>::iterator i = scripts.begin();
+	std::vector<shared_ptr<script> >::iterator i = scripts.begin();
 	while (i != scripts.end()) {
-		script *s = *i;
+		shared_ptr<script> s = *i;
 		world.scriptorium.addScript(s->fmly, s->gnus, s->spcs, s->scrp, s);
 		i++;
 	}

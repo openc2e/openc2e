@@ -31,7 +31,7 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, UINT_M
 
 // TODO: this should have a queueScript equiv too
 void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
-	script *s = src->findScript(event);
+	shared_ptr<script> s = src->findScript(event);
 	if (!s) return;
 	if (!vm) vm = world.getVM(this);
 	if (vm->fireScript(s, false, src)) { // TODO: should FROM be src?

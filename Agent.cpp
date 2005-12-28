@@ -68,14 +68,14 @@ void Agent::moveTo(float _x, float _y) {
 	x = _x; y = _y;
 }
 
-script *Agent::findScript(unsigned short event) {
+shared_ptr<script> Agent::findScript(unsigned short event) {
 	return world.scriptorium.getScript(family, genus, species, event);
 }
 
 bool Agent::fireScript(unsigned short event, Agent *from) {
 	if (dying) return false;
 
-	script *s = findScript(event);
+	shared_ptr<script> s = findScript(event);
 	if (!s) return false;
 	if (!vm) vm = world.getVM(this);
 	if (vm->fireScript(s, (event == 9), from)) {

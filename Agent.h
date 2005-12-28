@@ -25,6 +25,10 @@
 #include "AgentRef.h"
 #include <set>
 #include <list>
+#include <boost/shared_ptr.hpp>
+
+class script;
+using boost::shared_ptr;
 
 struct agentzorder {
 	bool operator()(const class Agent *s1, const class Agent *s2) const;
@@ -134,7 +138,7 @@ public:
 	virtual void setZOrder(unsigned int plane);
 	virtual unsigned int getZOrder() const { return zorder; }
 
-	class script *findScript(unsigned short event);
+	class shared_ptr<script> findScript(unsigned short event);
 	
 	int getUNID();
 	std::string identify() const;

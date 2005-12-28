@@ -71,7 +71,6 @@ OPENC2E = \
 	dialect.o \
 	lex.mng.o \
 	mngparser.tab.o \
-	gc.o \
 	bytecode.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
@@ -81,7 +80,7 @@ XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
 default: openc2e tools/praydumper docs
-all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/gctest tools/memstats
+all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest  tools/memstats
 
 docs: docs.html
 
@@ -136,9 +135,6 @@ tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
 tools/pathtest: tools/pathtest.o PathResolver.o
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
-tools/gctest: tools/gctest.o gc.o
-	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
-
 tools/memstats: tools/memstats.o $(patsubst main.o,,$(OPENC2E))
 	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
 
@@ -146,7 +142,7 @@ clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
 	rm -rf .deps
 	rm -f commandinfo.yml lex.yy.cpp lex.yy.h lex.mng.cpp lex.mng.h mngparser.tab.cpp mngparser.tab.hpp cmddata.cpp
-	rm -f tools/filetests tools/gctest tools/memstats tools/mngtest tools/pathtest tools/praydumper
+	rm -f tools/filetests tools/memstats tools/mngtest tools/pathtest tools/praydumper
 
 test: openc2e 
 	perl -MTest::Harness -e 'runtests(glob("unittests/*.t"))'
