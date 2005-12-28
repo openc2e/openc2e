@@ -135,10 +135,8 @@ shared_ptr<mapped_file> tryOpen(creaturesImage *&img, std::string fname, filetyp
 				f.convertc16(realfile.native_file_string(), cachefile.native_file_string());
 				ft = s16;
 				break;
-			default:
-				return true; // TODO: exception?
 		}
-		if (!exists(cachefile)) return false; // TODO: exception?
+		if (!exists(cachefile)) return shared_ptr<mapped_file>(); // TODO: exception?
 		p->open(cachefile.native_file_string());
 	}
 #endif
@@ -181,7 +179,7 @@ creaturesImage *imageGallery::getImage(std::string name) {
 	}
 	gallery[name] = img;
 	
-	gallery[name]->addRef(); // shared_ptr?
+	gallery[name]->addRef();
 	return gallery[name];
 }
 
