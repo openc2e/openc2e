@@ -13,6 +13,7 @@ OPENC2E = \
 	AgentRef.o \
 	attFile.o \
 	blkImage.o \
+	bytecode.o \
 	c16Image.o \
 	Camera.o \
 	caosScript.o \
@@ -21,7 +22,6 @@ OPENC2E = \
 	caosVM_camera.o \
 	caosVM_compound.o \
 	caosVM_core.o \
-	caosVM.o \
 	caosVM_creatures.o \
 	caosVM_debug.o \
 	caosVM_files.o \
@@ -32,6 +32,7 @@ OPENC2E = \
 	caosVM_map.o \
 	caosVM_motion.o \
 	caosVM_net.o \
+	caosVM.o \
 	caosVM_ports.o \
 	caosVM_resources.o \
 	caosVM_scripts.o \
@@ -40,18 +41,27 @@ OPENC2E = \
 	caosVM_variables.o \
 	caosVM_vehicles.o \
 	caosVM_world.o \
+	catalogue.lex.o \
 	Catalogue.o \
+	catalogue.tab.o \
+	cmddata.o \
 	CompoundAgent.o \
 	CompoundPart.o \
 	Creature.o \
 	creaturesImage.o \
+	dialect.o \
 	fileSwapper.o \
 	genomeFile.o \
+	lex.mng.o \
+	lexutil.o \
+	lex.yy.o \
 	main.o \
 	Map.o \
 	MetaRoom.o \
 	mmapifstream.o \
 	mngfile.o \
+	mngparser.tab.o \
+	PathResolver.o \
 	physics.o \
 	PointerAgent.o \
 	pray.o \
@@ -63,17 +73,7 @@ OPENC2E = \
 	SkeletalCreature.o \
 	streamutils.o \
 	Vehicle.o \
-	World.o \
-	PathResolver.o \
-	cmddata.o \
-	lex.yy.o \
-	lexutil.o \
-	dialect.o \
-	lex.mng.o \
-	mngparser.tab.o \
-	bytecode.o \
-	catalogue.lex.o \
-	catalogue.tab.o
+	World.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused
 XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer
