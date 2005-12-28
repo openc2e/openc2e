@@ -4,6 +4,6 @@ echo "digraph {"
 #    echo -n $i | sed 's/\.//g'
 #    echo " [label=\"$i\"];"
 #done
-grep '^[ \t]*#include "' "$@"|sed 's/^\([^:]*\):[ \t]*#include "\([^"]*\)".*$/"\2" -> "\1";/'
+grep '^[ \t]*#include "' "$@"|sed 's/^\([^:]*\):[ \t]*#include "\([^"]*\)".*$/"\2" -> "\1";/'|sort|uniq
 
 echo }
