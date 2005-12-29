@@ -97,10 +97,15 @@ public:
 
 struct linedata {
 	std::string text;
-	unsigned int width;
+	unsigned int offset, width;
 
-	void reset() { text = ""; width = 0; }
-	linedata() { reset(); }
+	void reset(unsigned int o) { offset = o; text = ""; width = 0; }
+	linedata() { reset(0); }
+};
+
+struct texttintinfo {
+	creaturesImage *sprite;
+	unsigned int offset;
 };
 
 enum horizontalalign { left, center, right };
@@ -108,6 +113,7 @@ enum verticalalign { top, middle, bottom };
 
 class TextPart : public CompoundPart {
 protected:
+	std::vector<texttintinfo> tints;
 	std::vector<linedata> lines;
 	std::vector<unsigned int> pages;
 	std::vector<unsigned int> pageheights;
@@ -126,6 +132,7 @@ protected:
 	~TextPart();
 	void recalculateData();
 	unsigned int calculateWordWidth(std::string word);
+	void addTint(std::string tintinfo);
 
 public:
 	virtual void setText(std::string t);

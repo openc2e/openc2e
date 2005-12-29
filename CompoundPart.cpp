@@ -93,11 +93,56 @@ TextPart::TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, u
 }
 
 TextPart::~TextPart() {
+	for (std::vector<texttintinfo>::iterator i = tints.begin(); i != tints.end(); i++)
+		if (i->sprite != textsprite)
+			delete i->sprite;	
 	gallery.delImage(textsprite);
+}
+
+void TextPart::addTint(std::string tintinfo) {
+	// add a tint, starting at text.size(), using the data in tintinfo
+	// TODO: there's some caching to be done here, but tinting is rather rare, so..
+	
+	unsigned short r = 128, g = 128, b = 128, rot = 128, swap = 128;
+	int where = 0;
+	std::string cur;
+	for (unsigned int i = 0; i <= tintinfo.size(); i++) {
+		if (i == tintinfo.size() || tintinfo[i] == ' ') {
+			unsigned short val = atoi(cur.c_str());
+			if (val >= 0 && val <= 256) {
+				switch (where) {
+					case 0: r = val; break;
+					case 1: g = val; break;
+					case 2: b = val; break;
+					case 3: rot = val; break;
+					case 4: swap = val; break;
+				}
+			} // TODO: else explode();
+			where++;
+			cur = "";
+			if (where > 4) break;
+		} else cur += tintinfo[i];
+	}
+
+	texttintinfo t;
+	t.offset = text.size();
+
+	if (!(r == g == b == rot == swap == 128)) {
+		s16Image *tintedsprite = new s16Image();
+		((duppableImage *)textsprite)->duplicateTo(tintedsprite);
+		tintedsprite->tint(r, g, b, rot, swap);
+		t.sprite = tintedsprite;
+	} else t.sprite = textsprite;
+
+	tints.push_back(t);
 }
 
 void TextPart::setText(std::string t) {
 	text.clear();
+	for (std::vector<texttintinfo>::iterator i = tints.begin(); i != tints.end(); i++)
+		if (i->sprite != textsprite)
+			delete i->sprite;
+	tints.clear();
 
 	// parse and remove the <tint> tagging
 	for (unsigned int i = 0; i < t.size(); i++) {
@@ -111,7 +156,7 @@ void TextPart::setText(std::string t) {
 						break;
 					tintinfo += t[i];
 				}
-				// TODO: handle contents of tintinfo somehow
+				addTint(tintinfo);
 				continue;
 			}
 		text += t[i];
@@ -193,6 +238,7 @@ void TextPart::recalculateData() {
 	unsigned int i = 0;
 	while (i < text.size()) {
 		bool newline = false;
+		unsigned int startoffset = i;
 		// first, retrieve a word from the text
 		std::string word;
 		for (; i < text.size(); i++) {
@@ -227,7 +273,7 @@ void TextPart::recalculateData() {
 			} else currenty += usedheight + linespacing;
 			currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 			lines.push_back(currentdata);
-			currentdata.reset();
+			currentdata.reset(startoffset);
 
 			currentdata.text += word;
 			currentdata.width += wordlen;
@@ -244,7 +290,7 @@ void TextPart::recalculateData() {
 				currenty = 0;
 			} else currenty += usedheight + linespacing;
 			lines.push_back(currentdata);
-			currentdata.reset();
+			currentdata.reset(startoffset);
 		}
 	}
 
@@ -272,7 +318,8 @@ void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEn
 		currenty = (textheight - pageheights[currpage]) / 2;
 	unsigned int startline = pages[currpage];
 	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
-	for (unsigned int i = startline; i < endline; i++) {
+	creaturesImage *sprite = textsprite; unsigned int currtint = 0;
+	for (unsigned int i = startline; i < endline; i++) {	
 		unsigned int currentx = 0, somex = xoff;
 		if (horz_align == right)
 			somex = somex + (textwidth - lines[i].width);
@@ -280,9 +327,14 @@ void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEn
 			somex = somex + ((textwidth - lines[i].width) / 2);
 
 		for (unsigned int x = 0; x < lines[i].text.size(); x++) {
+			if (currtint < tints.size() && tints[currtint].offset == lines[i].offset + x) {
+				sprite = tints[currtint].sprite;
+				currtint++;
+			}
+		
 			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
 			int spriteid = lines[i].text[x] - 32;
-			renderer->render(textsprite, spriteid, somex + currentx, yoff + currenty, is_transparent, transparency);
+			renderer->render(sprite, spriteid, somex + currentx, yoff + currenty, is_transparent, transparency);
 			if ((caretdata) && (caretdata->caretline == i) && (caretdata->caretchar == x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 			currentx += textsprite->width(spriteid) + charspacing;
