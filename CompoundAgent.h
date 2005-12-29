@@ -44,9 +44,8 @@ public:
 	void addPart(CompoundPart *);
 	void delPart(unsigned int);
 	virtual void tick();
-	// TODO: i'm pretty sure width/height are always of the first part.. - fuzzie
-	virtual unsigned int getWidth() { return width; }
-	virtual unsigned int getHeight() { return height; }
+	virtual unsigned int getWidth() { return part(0)->getWidth(); }
+	virtual unsigned int getHeight() { return part(0)->getHeight(); }
 	virtual unsigned int getCheckWidth() { return fullwidth; }
 	virtual unsigned int getCheckHeight() { return fullheight; }
 	void handleClick(float, float);
