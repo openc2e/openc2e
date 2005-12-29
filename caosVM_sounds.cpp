@@ -207,4 +207,16 @@ void caosVM::v_MUTE() {
 	result.setInt(0); // TODO
 }
 
+/**
+ SEZZ (command) text (string)
+ %status stub
+*/
+void caosVM::c_SEZZ() {
+	VM_PARAM_STRING(text)
+
+	caos_assert(targ);
+
+	// TODO
+}
+
 /* vim: set noet: */

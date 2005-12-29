@@ -469,6 +469,7 @@ public:
 	void c_VOLM();
 	void v_VOLM();
 	void v_MUTE();
+	void c_SEZZ();
 
 	// time
 	void v_PACE();
