@@ -162,7 +162,7 @@ private:
 	static creaturesImage *caretsprite;
 	unsigned int caretpose;
 	bool focused;
-	unsigned int caretline, caretchar;
+	unsigned int caretpos;
 	unsigned int messageid;
 	void renderCaret(class SDLBackend *renderer, int xoffset, int yoffset);
 

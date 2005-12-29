@@ -169,8 +169,7 @@ void TextEntryPart::setText(std::string t) {
 	TextPart::setText(t);
 
 	// place caret at the end of the text
-	caretline = lines.size() - 1;
-	caretchar = lines[caretline].text.size();
+	caretpos = text.size();
 }
 
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
@@ -180,12 +179,12 @@ void TextEntryPart::handleKey(char c) {
 	if (c == 0) { // backspace
 		if (text.size() == 0) return;
 		text.erase(text.end() - 1);
-		caretchar--; // TODO: it's not this simple!
+		caretpos--; // TODO: it's not this simple!
 	} else if (c == 1) { // return
 		parent->queueScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
 	} else {
 		text += c;
-		caretchar++; // TODO: it's not this simple!
+		caretpos++; // TODO: it's not this simple!
 	}
 	recalculateData();
 }
@@ -335,11 +334,11 @@ void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEn
 			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
 			int spriteid = lines[i].text[x] - 32;
 			renderer->render(sprite, spriteid, somex + currentx, yoff + currenty, is_transparent, transparency);
-			if ((caretdata) && (caretdata->caretline == i) && (caretdata->caretchar == x))
+			if ((caretdata) && (caretdata->caretpos == lines[i].offset + x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 			currentx += textsprite->width(spriteid) + charspacing;
 		}
-		if ((caretdata) && (caretdata->caretline == i) && (caretdata->caretchar == lines[i].text.size()))
+		if ((caretdata) && (caretdata->caretpos == lines[i].offset + lines[i].text.size()))
 			caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);		
 		currenty += textsprite->height(0) + linespacing;
 	}
@@ -356,8 +355,7 @@ TextEntryPart::TextEntryPart(CompoundAgent *p, unsigned int _id, std::string spr
 	if (!caretsprite) { caretsprite = gallery.getImage("cursor"); caos_assert(caretsprite); }
 
 	caretpose = 0;
-	caretline = 0;
-	caretchar = 0;
+	caretpos = 0;
 	focused = false;
 	messageid = msgid;
 }
