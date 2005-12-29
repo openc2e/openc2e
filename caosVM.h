@@ -20,16 +20,11 @@
 #ifndef _CAOSVM_H
 #define _CAOSVM_H
 
-//#include "caosScript.h"
+#include "caosScript.h"
 #include <map>
 #include <istream>
 #include <ostream>
 #include "AgentRef.h"
-#include <boost/shared_ptr.hpp>
-#include "caosVar.h"
-
-using boost::shared_ptr;
-class script;
 
 //#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL

@@ -24,7 +24,12 @@
 #include <string>
 #include <cassert>
 #include "AgentRef.h"
-#include "serialization.h"
+
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
 
 class Agent;
 
@@ -218,8 +223,7 @@ class caosVar {
 		std::string dump() const;
 };
 
-BOOST_CLASS_EXPORT(caosVar)
-BOOST_CLASS_VERSION(caosVar, 0)
+//BOOST_CLASS_EXPORT(caosVar)
 
 // Compatibility hacks
 // All of these are deprecated, of course

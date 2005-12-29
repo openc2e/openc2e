@@ -7,6 +7,7 @@
 #include "caosVM.h"
 
 #include <string>
+std::string datapath; // because some files link to it
 
 int main() {
 #define PSIZE(t) printf("Size of (%s): %zu\n", #t, sizeof (t))

@@ -28,9 +28,6 @@
 #include "caosVar.h"
 #include <cassert>
 #include <boost/shared_ptr.hpp>
-//#include "bytecode.h"
-#include "serialization.h"
-#include "dialect.h"
 
 class Agent;
 class caosOp;
@@ -39,29 +36,6 @@ class Variant;
 using boost::shared_ptr;
 
 struct script {
-	private:
-	friend class boost::serialization::access;
-	template<class Archive>
-		void load(Archive &ar, unsigned long version) {
-			ar & linked & relocations & allOps &
-				fmly & gnus & spcs & scrp;
-			std::string vname;
-			ar & vname;
-			if (variants.find(vname) == variants.end())
-				abort(); // XXX
-			variant = variants[vname];
-			ar & filename & gsub;
-		}
-	template<class Archive>
-		void save(Archive &ar, unsigned long version) const {
-			ar & linked & relocations & allOps &
-				fmly & gnus & spcs & scrp;
-			ar & variant->name;
-			ar & filename & gsub;
-		}
-
-		BOOST_SERIALIZATION_SPLIT_MEMBER()
-			
 	protected:
 		
 		bool linked;
@@ -69,31 +43,26 @@ struct script {
 		// position 0 is reserved in the below vector
 		std::vector<int> relocations;
 		// pos-0 needs to be initted to a caosNoop
-		std::vector<shared_ptr<caosOp> > allOps;
-
-		script() : variant(NULL) {} // Deserialization only
+		std::vector<class caosOp *> allOps;
 	public:
-		int fmly, gnus, spcs, scrp;
-		Variant *variant;
+		const int fmly, gnus, spcs, scrp;
+		const Variant *variant;
 		const Variant *getVariant() const { return variant; };
 		
-		std::string filename;
+		const std::string filename;
 
 		caosOp *getOp(int idx) const {
 			assert (idx >= 0);
-			if ((unsigned int) idx >= allOps.size())
-				return NULL;
-			else
-				return allOps[idx].get();
+			return (unsigned int)idx >= allOps.size() ? NULL : allOps[idx];
 		}
 		
 		std::map<std::string, int> gsub;
 		int getNextIndex() { return allOps.size(); }
 		// add op as the next opcode
 		void thread(caosOp *op);
-		script(Variant *v, const std::string &fn,
+		script(const Variant *v, const std::string &fn,
 				int fmly_, int gnus_, int spcs_, int scrp_);
-		script(Variant *v, const std::string &fn);
+		script(const Variant *v, const std::string &fn);
 		~script();
 		std::string dump();
 	//	std::string dumpLine(unsigned int);
@@ -130,13 +99,13 @@ struct script {
 		void fixRelocation(int r) {
 			fixRelocation(r, getNextIndex());
 		}
-};
-BOOST_CLASS_EXPORT(script)
 
+		
+};
 
 class caosScript { //: Collectable {
 public:
-	Variant *v;
+	const Variant *v;
 	std::string filename;
 	shared_ptr<script> installer, removal;
 	std::vector<shared_ptr<script> > scripts;
@@ -146,31 +115,7 @@ public:
 	void parse(std::istream &in);
 	~caosScript();
 	void installScripts();
-
-	caosScript() : v(NULL) {} // For deserialization only
-private:
-friend class boost::serialization::access;
-template<class Archive>
-	void load(Archive &ar, unsigned long version) {
-		std::string vname;
-		ar & vname;
-		if (variants.find(vname) == variants.end())
-			abort(); // XXX
-		v = variants[vname];
-		ar & filename & installer & removal
-		   & scripts  & current;
-	}
-template<class Archive>
-	void save(Archive &ar, unsigned long version) const {
-		ar & v->name;
-		ar & filename & installer & removal
-		   & scripts  & current;
-	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER()
-
-
 };
-BOOST_CLASS_EXPORT(caosScript)
+
 #endif
 /* vim: set noet: */

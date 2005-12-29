@@ -9,127 +9,8 @@
 #include "exceptions.h"
 #include "caosVar.h"
 #include "Agent.h"
-#include "bytecode.h"
-#include "caosVM.h"
 
 std::map<std::string, Variant *> variants;
-
-class DoifDialect : public Dialect {
-	protected:
-		int success, failure, exit;
-	public:
-		DoifDialect(caosScript *scr, int s, int f, int e)
-			: success(s), failure(f), exit(e)
-			{
-				delegates = scr->v->cmd_dialect->delegates; // XXX
-			}
-		void handleToken(class caosScript *s, token *t); 
-};
-
-void DoifParser::operator()(class caosScript *s, class Dialect *curD) {
-	int success, failure, exit;
-	success = s->current->newRelocation();
-	failure = s->current->newRelocation();
-	exit    = s->current->newRelocation();
-	
-	parseCondition(s, success, failure);
-	
-	DoifDialect d(s, success, failure, exit);
-	s->current->fixRelocation(success);
-	d.doParse(s);
-	s->current->fixRelocation(exit);
-}
-
-void AssertParser::operator()(class caosScript *s, class Dialect *curD) {
-	int success, failure;
-	success = s->current->newRelocation();
-	failure = s->current->newRelocation();
-	parseCondition(s, success, failure);
-
-	s->current->fixRelocation(failure);
-	s->current->thread(new caosAssert());
-	s->current->fixRelocation(success);
-}
-
-void parseREPS::operator() (class caosScript *s, class Dialect *curD) {
-			int exit = s->current->newRelocation();
-
-			s->v->exp_dialect->parseOne(s); // repcount
-			int entry = s->current->getNextIndex();
-			s->current->thread(new caosREPS(exit));
-
-			Dialect d;
-			REPE r;
-			d.delegates = s->v->cmd_dialect->delegates;
-			d.delegates["repe"] = &r;
-
-			d.doParse(s);
-			s->current->thread(new caosJMP(entry));
-			s->current->fixRelocation(exit);
-		}
-
-void EVER::operator() (class caosScript *s, class Dialect *curD) {
-	s->current->thread(new caosJMP(exit));
-	curD->stop = true;
-}
-
-void UNTL::operator() (class caosScript *s, class Dialect *curD) {
-	parseCondition(s, exit, entry);
-	curD->stop = true;
-}
-
-void parseLOOP::operator() (class caosScript *s, class Dialect *curD) {
-	int exit = s->current->newRelocation();
-	int entry = s->current->getNextIndex();
-
-	Dialect d;
-	EVER ever(entry); UNTL untl(entry, exit);
-	d.delegates = s->v->cmd_dialect->delegates;
-	d.delegates["ever"] = &ever;
-	d.delegates["untl"] = &untl;
-
-	d.doParse(s);
-	s->current->fixRelocation(exit);
-}
-
-void parseGSUB::operator() (class caosScript *s, class Dialect *curD) {
-	token *t = getToken(TOK_WORD);
-	std::string label = t->word;
-	int targ = s->current->gsub[label];
-	if (!targ) {
-		targ = s->current->newRelocation();
-		s->current->gsub[label] = targ;
-	}
-	s->current->thread(new caosGSUB(targ));
-}
-
-void parseSUBR::operator() (class caosScript *s, class Dialect *curD) {
-	s->current->thread(new caosSTOP());
-
-	token *t = getToken(TOK_WORD);
-	std::string label = t->word;
-	int r = s->current->gsub[label];
-	if (r)
-		s->current->fixRelocation(r);
-	s->current->gsub[label] = s->current->getNextIndex();
-}
-
-void ENUMhelper::operator() (class caosScript *s, class Dialect *curD) {
-	(p)(s, curD);
-	int exit = s->current->newRelocation();
-	int entry = s->current->getNextIndex();
-	s->current->thread(new caosENUM_POP(exit));
-
-	Dialect d;
-	NEXT n;
-	d.delegates = s->v->cmd_dialect->delegates;
-	d.delegates["next"] = &n;
-
-	d.doParse(s);
-	s->current->thread(new caosJMP(entry));
-	s->current->fixRelocation(exit);
-}
-
 
 /*
  * If the inverse of an AND condition succeeds, jump to next OR (foo) bit, or
@@ -234,6 +115,98 @@ void Dialect::handleToken(caosScript *s, token *t) {
 	p(s, this);
 }
 
+class ConstOp : public caosOp {
+	protected:
+		caosVar constVal;
+	public:
+		virtual void execute(caosVM *vm) {
+			vm->valueStack.push_back(constVal);
+			caosOp::execute(vm);
+		}
+
+		ConstOp(const caosVar &val) {
+			constVal = val;
+		}
+
+		std::string dump() {
+			return std::string("CONST ") + constVal.dump();
+		}
+
+};
+
+class opVAxx : public caosOp {
+	protected:
+		const int index;
+	public:
+		opVAxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			vm->valueStack.push_back(&vm->var[index]);
+		}
+
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "VA%02d", index);
+			return std::string(buf);
+		}
+};
+
+class opOVxx : public caosOp {
+	protected:
+		const int index;
+	public:
+		opOVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			caos_assert(vm->targ);
+			vm->valueStack.push_back(&vm->targ->var[index]);
+		}
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "OV%02d", index);
+			return std::string(buf);
+		}
+};
+
+class opMVxx : public caosOp {
+	protected:
+		const int index;
+	public:
+		opMVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			caos_assert(vm->owner);
+			vm->valueStack.push_back(&vm->owner->var[index]);
+		}
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "MV%02d", index);
+			return std::string(buf);
+		}
+};
+
+class opBytestr : public caosOp {
+	protected:
+		std::vector<unsigned int> bytestr;
+	public:
+		opBytestr(const std::vector<unsigned int> &bs) : bytestr(bs) {}
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			vm->valueStack.push_back(bytestr);
+		}
+
+		std::string dump() {
+			std::ostringstream oss;
+			oss << "BYTESTR [ ";
+			for (int i = 0; i < bytestr.size(); i++) {
+				oss << i << " ";
+			}
+			oss << "]";
+			return oss.str();
+		}
+};
+
+
 void ExprDialect::handleToken(caosScript *s, token *t) {
 	switch (t->type) {
 		case TOK_CONST:
@@ -306,15 +279,5 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 	
 void registerDelegates() {
 	registerAutoDelegates();
-	map<std::string, Variant *>::iterator i = variants.begin();
-	while (i != variants.end()) {
-		Variant *v = i->second;
-		const cmdinfo *p = v->cmds;
-		while (p->key) {
-			v->keyref[std::string(p->key)] = p;
-			p++;
-		}
-		i++;
-	}
 }
 /* vim: set noet: */

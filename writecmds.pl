@@ -18,7 +18,6 @@ print "// Generated at ".scalar (localtime)."\n\n";
 print <<ENDHEAD2;
 #include "cmddata.h"
 #include "dialect.h"
-#include "caosVM.h"
 #include <string>
 #include <map>
 #include <iostream>
@@ -44,8 +43,6 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			$retc = $data->{$key}{pragma}{retc};
 		}
 		my $delegate;
-		my $handler;
-		$handler = 'NULL';
 		if ($data->{$key}{pragma}{noparse}) {
 			$delegate = undef;
 		} elsif ($data->{$key}{pragma}{parser}) {
@@ -55,33 +52,29 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			if ($data->{$key}{pragma}{parserclass}) {
 				$class = $data->{$key}{pragma}{parserclass};
 			}
-			$delegate = qq{new $class(&v_${\$variant}_cmds[$idx])};
-			$handler = qq{&$data->{$key}{implementation}};
+			$delegate = qq{new $class(&$data->{$key}{implementation}, &v_${\$variant}_cmds[$idx])};
 		}
 			
 		$data->{$key}{delegate} = $delegate;
 		print <<ENDDATA;
-		{    $idx,
-			"$key",
-			"$variant",
+		{ // $idx
 			"$name",
 			"$fullname",
 			"$syntax $cedocs",
 			$argc,
-			$retc,
-			$handler
+			$retc
 		},
 ENDDATA
 		$idx++;
 	}
 
 	print <<ENDTAIL;
-	{ -1, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL }
+	{ NULL, NULL, NULL, 0, 0 }
 };
 
 static void registerAutoDelegates_$variant() {
 	if (!variants["$variant"]) {
-		variants["$variant"] = new Variant("$variant");
+		variants["$variant"] = new Variant();
 		variants["$variant"]->cmds = v_${variant}_cmds;
 		variants["$variant"]->exp_dialect = new ExprDialect();
 		variants["$variant"]->cmd_dialect = new Dialect();

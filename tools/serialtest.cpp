@@ -1,21 +1,18 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include "serialization.h"
-#include "caosScript.h"
-#include "bytecode.h"
-#include <sstream>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <fstream>
 #include <iostream>
-#ifndef CV
 #define CV 1
-#endif
 
 #if CV
 #include "caosVar.h"
 #endif
-
-using namespace std;
 
 class foo {
     public:
@@ -31,10 +28,7 @@ class foo {
             }
 };
 
-std::string testString("inst doif 0 eq 0 outv 42 else outs \"Basic mathematics have failed us :(\\n\" endi gsub foobie stop subr foobie dbg: outs \"teh foobie\\n\" retn rscr");
-
 int main(void) {
-    registerDelegates();
 
     std::ofstream ofs("sertest.dat");
 #if CV
@@ -44,10 +38,6 @@ int main(void) {
     intv.setInt(42);
     floatv.setFloat(0.5);
 #endif
-    istringstream iss(testString);
-    caosScript iscr("c3", "test");
-    iscr.parse(iss);
-    std::cout << iscr.installer->dump();
     {
         const foo v(42);
         boost::archive::text_oarchive oa(ofs);
@@ -55,14 +45,12 @@ int main(void) {
 #if CV
         oa << (const caosVar &)null << (const caosVar &)str << (const caosVar &)intv << (const caosVar &)floatv;
 #endif
-        oa << (const caosScript &)iscr;
     }
     ofs.close();
 
 #if CV
     caosVar nnull, nstr, nintv, nfloatv;
 #endif
-    caosScript script;
     {
         foo v;
         std::ifstream ifs("sertest.dat", std::ios::binary);
@@ -72,9 +60,7 @@ int main(void) {
 #if CV
         ia >> nnull >> nstr >> nintv >> nfloatv;
 #endif
-        ia >> script;
     }
-    std::cout << script.installer->dump();
 
 #if CV
 #define D(x) std::cout << #x << " = " << x.dump() << std::endl

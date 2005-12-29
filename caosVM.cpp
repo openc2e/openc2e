@@ -27,6 +27,14 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+class caosAbort : public caosOp {
+	public:
+		void execute(caosVM *vm) {
+			cerr << "Bad! Some opcode forgot to set its successor" << endl;
+			caos_assert(false);
+		}
+} abortop;
+
 caosVM::caosVM(const AgentRef &o)
 	: vm(this)
 {
