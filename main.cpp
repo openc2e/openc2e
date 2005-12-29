@@ -317,12 +317,11 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout.flush();
 		std::cerr.flush();
 		try {
-			caosScript *script = new caosScript(gametype, *i); // XXX
-			script->parse(s);
+			caosScript script(gametype, *i);
+			script.parse(s);
 			caosVM vm(0);
-			script->installScripts();
-//			std::cout << script->installer->dump();
-			vm.runEntirely(script->installer);
+			script.installScripts();
+			vm.runEntirely(script.installer);
 
 		} catch (std::exception &e) {
 			std::cerr << "script exec failed due to exception " << e.what();
@@ -330,7 +329,6 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 		std::cout.flush();
 		std::cerr.flush();
-//        Collectable::doCollect();
 	}
 
 	if (world.map.getMetaRoomCount() == 0) {
