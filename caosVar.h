@@ -25,13 +25,54 @@
 #include <cassert>
 #include "AgentRef.h"
 
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
+
 class Agent;
 
 class caosVar {
-	protected:
+	private:
+		friend class boost::serialization::access;
+
+		template<class Archive>
+			void save(Archive & ar, const unsigned int version) const
+			{
+				ar & type;
+				switch (type) {
+					case NULLTYPE: break;
+					case AGENT: assert(0); break;
+					case INTEGER: ar & values.intValue; break;
+					case FLOAT: ar & values.floatValue; break;
+					case STRING: ar & *values.stringValue; break;
+					default: assert(0);
+				}
+			}
+		template<class Archive>
+			void load(Archive & ar, const unsigned int version)
+			{
+				reset();
+				ar & type;
+				switch (type) {
+					case NULLTYPE: break;
+					case AGENT: assert(0); break;
+					case INTEGER: ar & values.intValue; break;
+					case FLOAT: ar & values.floatValue; break;
+					case STRING:
+								values.stringValue = new std::string();
+								ar & *values.stringValue; break;
+					default: assert(0);
+				}
+			}
+
+		BOOST_SERIALIZATION_SPLIT_MEMBER()
+	public:
 		enum variableType {
 			NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
 		};
+	protected:
 
 
 		union {
@@ -43,6 +84,8 @@ class caosVar {
 
 		variableType type;
 	public:
+		variableType getType() const { return type; }
+		
 		void reset() {
 			switch (type) {
 				case AGENT:
@@ -179,6 +222,8 @@ class caosVar {
 
 		std::string dump() const;
 };
+
+//BOOST_CLASS_EXPORT(caosVar)
 
 // Compatibility hacks
 // All of these are deprecated, of course

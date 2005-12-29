@@ -76,8 +76,8 @@ OPENC2E = \
 	Vehicle.o \
 	World.o
 
-CFLAGS += -W -Wall -Wno-conversion -Wno-unused
-XLDFLAGS=$(LDFLAGS) -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer
+CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT
+XLDFLAGS=$(LDFLAGS) -lboost_serialization -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer -lpthread
 COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
@@ -132,22 +132,25 @@ Catalogue.o: catalogue.lex.h catalogue.tab.hpp
 lex.mng.o: mngparser.tab.hpp
 
 openc2e: $(OPENC2E)
-	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
-	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/praydumper: tools/praydumper.o pray.o
-	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
-	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/pathtest: tools/pathtest.o PathResolver.o
-	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/memstats: tools/memstats.o $(patsubst main.o,,$(OPENC2E))
-	$(CXX) $(XLDFLAGS) $(XCXXFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
+
+tools/serialtest: tools/serialtest.o caosVar.o AgentRef.o
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
