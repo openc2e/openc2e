@@ -94,7 +94,7 @@ bool resolveFile_(string &srcPath) {
 bool resolveFile(std::string &path) {
 	std::string orig = path;
 	bool res = resolveFile_(path);
-#if 1
+#if 0
 	std::cerr << orig << " -> ";
 	if (!res)
 		std::cerr << "(nil)";
