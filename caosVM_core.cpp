@@ -28,6 +28,9 @@ using std::cerr;
 /**
  OUTX (command) val (string)
  %status maybe
+
+ Prints the given string on the output stream, after first quoting it and transforming 
+ escapes in the string to quoted escapes.
 */
 void caosVM::c_OUTX() {
 	VM_PARAM_STRING(val)
@@ -49,6 +52,8 @@ void caosVM::c_OUTX() {
 /**
  OUTS (command) val (string)
  %status maybe
+
+ Prints the given string to the output stream.  Does nothing when run inside a script.
 */
 void caosVM::c_OUTS() {
 	VM_VERIFY_SIZE(1)
@@ -60,6 +65,8 @@ void caosVM::c_OUTS() {
 /**
  OUTV (command) val (decimal)
  %status maybe
+
+ Prints the given decimal value to the ouput stream.  Does nothing when run inside a script.
 */
 void caosVM::c_OUTV() {
 	VM_VERIFY_SIZE(1)
@@ -74,10 +81,10 @@ void caosVM::c_OUTV() {
 }
 
 /**
-	GAME (variable) name (string)
-	%status maybe
+ GAME (variable) name (string)
+ %status maybe
 
-	returns game variable with name given
+ Returns the game variable with the given name.
 */
 void caosVM::v_GAME() {
 	VM_VERIFY_SIZE(1)
@@ -91,7 +98,7 @@ void caosVM::v_GAME() {
  EAME (variable) name (anything)
  %status maybe
 
- returns temporary game variable with name given
+ Returns the temporary game variable with the given name.
 */
 void caosVM::v_EAME() {
 	VM_VERIFY_SIZE(1)
@@ -106,7 +113,7 @@ void caosVM::v_EAME() {
  DELG (command) name (string)
  %status maybe
 
- deletes given game variable
+ Deletes the game variable with the given name.
 */
 void caosVM::c_DELG() {
 	VM_PARAM_STRING(name)
@@ -122,19 +129,24 @@ void caosVM::c_DELG() {
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
  %status done
  %pragma noparse
+
+ Marks the beginning of a normal script applying to the agent with the given classifier 
+ info.
 */
 
 /**
  RSCR (command)
  %status done
- %pragma noparse 
+ %pragma noparse
+
+ Marks the beginning of a removal script.
 */
 
 /**
  ISCR (command)
  %status stub
 
- XXX
+ Marks the beginning of an installer script.
 */
 void caosVM::c_ISCR() {
 	VM_VERIFY_SIZE(0)
@@ -144,6 +156,8 @@ void caosVM::c_ISCR() {
 /**
  ENDM (command)
  %status done
+
+ Marks the end of a script.
 */
 void caosVM::c_ENDM() {
 	stop();
@@ -153,8 +167,8 @@ void caosVM::c_ENDM() {
  RGAM (command)
  %status stub
 
- No-op for now.
- */
+ Restore all game variables to their saved or default values.
+*/
 void caosVM::c_RGAM() {}
 
 /**
@@ -162,7 +176,7 @@ void caosVM::c_RGAM() {}
  %status stub
 
  Returns whether the lawn was cut last sunday or not.
- */
+*/
 void caosVM::v_MOWS() {
 	result.setInt(0); // We're too busy coding to mow the lawn.
 }

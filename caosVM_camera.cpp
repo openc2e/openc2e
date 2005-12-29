@@ -24,7 +24,8 @@
  VISI (integer) checkall (integer)
  %status maybe
 
- Returns 1 if target agent is on camera, or 0 otherwise. If checkall is 0, only checks main camera, otherwise checks all.
+ Returns 1 if the TARG agent is on camera, or 0 otherwise. If checkall is 0, only checks 
+ main camera, otherwise checks all.
 */
 void caosVM::v_VISI() {
 	VM_PARAM_INTEGER(checkall)
@@ -47,10 +48,10 @@ void caosVM::v_VISI() {
  META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)
  %status maybe
  
- set metaroom current camera is pointing at. coordinates point to top left of new
- camera position. set a coordinate to -1 to use the top-left corner of the metaroom.
+ Sets the metaroom that the current camera is pointing at.  Coordinates point to top left of new
+ camera position.  Set a coordinate to -1 to use the top-left corner of the metaroom.
  
- transition: 0 for none, 1 for flip horz, 2 for burst
+ Transition: 0 for none, 1 for flip horzizontally, 2 for burst.
  */
 void caosVM::c_META() {
 	VM_VERIFY_SIZE(4)
@@ -87,10 +88,11 @@ void caosVM::v_META() {
  CMRT (command) pan (integer)
  %status maybe
 
- centre current camera on TARG.
+ Focuses the current camera on the TARG agent.
 
- pan: 0 for none (jump), 1 for smooth scroll if in same metaroom, 2 for smooth scroll if visible
- */
+ Set pan to 0 for no panning (jump), 1 for smooth scrolling if in the same metaroom, or 2 
+ for smooth scrolling if the given location is already visible.
+*/
 void caosVM::c_CMRT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pan)
@@ -107,6 +109,11 @@ void caosVM::c_CMRT() {
 /**
  CMRA (command) x (integer) y (integer) pan (integer)
  %status maybe
+
+ Sets the position of the current camera so that the top left corner of the view is at the 
+ given coordinates.
+
+ Set pan to 0 for no panning (jump), or 1 for smooth scrolling if in the same metaroom.
 */
 void caosVM::c_CMRA() {
 	VM_VERIFY_SIZE(3)
@@ -120,6 +127,11 @@ void caosVM::c_CMRA() {
 /**
  CMRP (command) x (integer) y (integer) pan (integer)
  %status maybe
+
+ Sets the position of the current camera so that the view centers on the given coordinates.
+
+ Set pan to 0 for no panning (jump), 1 for smooth scrolling if in the same metaroom, or 2 
+ for smooth scrolling if the given location is already visible.
 */
 void caosVM::c_CMRP() {
 	VM_VERIFY_SIZE(3)
@@ -133,6 +145,8 @@ void caosVM::c_CMRP() {
 /**
  CMRX (integer)
  %status maybe
+
+ Returns the X position at the center of the current camera's view.
 */
 void caosVM::v_CMRX() {
 	VM_VERIFY_SIZE(0)
@@ -143,6 +157,8 @@ void caosVM::v_CMRX() {
 /**
  CMRY (integer)
  %status maybe
+
+ Returns the Y position at the center of the current camera's view.
 */
 void caosVM::v_CMRY() {
 	VM_VERIFY_SIZE(0)
@@ -153,6 +169,8 @@ void caosVM::v_CMRY() {
 /**
  WNDW (integer)
  %status maybe
+
+ Returns the width of the current camera's view.
 */
 void caosVM::v_WNDW() {
 	VM_VERIFY_SIZE(0)
@@ -163,6 +181,8 @@ void caosVM::v_WNDW() {
 /**
  WNDH (integer)
  %status maybe
+
+ Returns the height of the current camera's view.
 */
 void caosVM::v_WNDH() {
 	VM_VERIFY_SIZE(0)
@@ -173,6 +193,8 @@ void caosVM::v_WNDH() {
 /**
  WNDB (integer)
  %status maybe
+
+ Returns the position of the bottom edge of the current camera's view.
 */
 void caosVM::v_WNDB() {
 	VM_VERIFY_SIZE(0)
@@ -183,6 +205,8 @@ void caosVM::v_WNDB() {
 /**
  WNDL (integer)
  %status maybe
+
+ Returns the position of the left edge of the current camera's view.
 */
 void caosVM::v_WNDL() {
 	VM_VERIFY_SIZE(0)
@@ -193,6 +217,8 @@ void caosVM::v_WNDL() {
 /**
  WNDR (integer)
  %status maybe
+
+ Returns the position of the right edge of the current camera's view.
 */
 void caosVM::v_WNDR() {
 	VM_VERIFY_SIZE(0)
@@ -203,6 +229,8 @@ void caosVM::v_WNDR() {
 /**
  WNDT (integer)
  %status maybe
+
+ Returns the position of the top edge of the current camera's view.
 */
 void caosVM::v_WNDT() {
 	VM_VERIFY_SIZE(0)
@@ -214,7 +242,7 @@ void caosVM::v_WNDT() {
  WDOW (command)
  %status stub
 
- Toggle full-screen mode.
+ Toggles full-screen mode on and off.
 */
 void caosVM::c_WDOW() {
 	// TODO
@@ -224,7 +252,7 @@ void caosVM::c_WDOW() {
  WDOW (integer)
  %status stub
 
- Return 1 if in full-screen mode, or 0 otherwise (windowed).
+ Returns 1 if in full-screen mode, or 0 otherwise (windowed).
 */
 void caosVM::v_WDOW() {
 	result.setInt(0);
@@ -236,8 +264,10 @@ void caosVM::v_WDOW() {
 
  Tell the current camera to track the specified agent, or set to NULL to stop tracking.
  xpercent and ypercent define a rectangle on the screen which the camera should keep the tracked agent inside.
- style 0 is brittle, tracking is broken easily. style 1 is flexible, moving the camera back inside the rectangle resumes tracking. style 3 is hard, you can't move outside the rectangle.
- transition: 0 for none, 1 for flip horz, 2 for burst
+ Style 0 is brittle-- tracking is broken easily.  Style 1 is flexible-- moving the camera 
+ back inside the rectangle resumes tracking.  Style 3 is hard-- you can't move outside the 
+ rectangle.
+ Rransition: 0 for none, 1 for flip horizontal, 2 for burst.
 */
 void caosVM::c_TRCK() {
 	VM_PARAM_INTEGER(transition)
@@ -252,6 +282,14 @@ void caosVM::c_TRCK() {
 /**
  LINE (command) x1 (integer) y1 (integer) x2 (integer) y2 (integer) r (integer) g (integer) b (integer) stipple_on (integer) stipple_off (integer)
  %status stub
+
+ Draw a line between two endpoints with the given coordinates, in the color specified by 
+ the given red, green, and blue values. 
+ 
+ Set stipple_on to a number of pixels to alternate for stippling, or set stipple_off to 
+ turn stippling off.
+
+ Setting the the endpoints to the same point will remove all lines for the agent.
 */
 void caosVM::c_LINE() {
 	VM_PARAM_INTEGER(stipple_off)
