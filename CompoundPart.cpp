@@ -26,6 +26,11 @@
 creaturesImage *TextEntryPart::caretsprite = 0;
 
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
+	if (parent->visible)
+		partRender(renderer, xoffset + parent->x, yoffset + parent->y);
+}
+
+void CompoundPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, is_transparent, transparency);
 }
 
@@ -44,11 +49,16 @@ CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string sprit
 	framerate = 1;
 	framedelay = 0;
 	parent = p;
+	addToWorld();
 }
 
 CompoundPart::~CompoundPart() {
 	gallery.delImage(origsprite);
 	if (origsprite != sprite) delete sprite;
+}
+
+unsigned int CompoundPart::getZOrder() const {
+	return parent->getZOrder() + zorder;
 }
 
 void CompoundPart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
@@ -243,8 +253,8 @@ void TextPart::recalculateData() {
 	}
 }
 
-void TextPart::render(SDLBackend *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
-	CompoundPart::render(renderer, xoffset + x, yoffset + y);
+void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
+	CompoundPart::partRender(renderer, xoffset + x, yoffset + y);
 	
 	unsigned int xoff = xoffset + x + leftmargin;
 	unsigned int yoff = yoffset + y + topmargin;
@@ -289,8 +299,8 @@ TextEntryPart::TextEntryPart(CompoundAgent *p, unsigned int _id, std::string spr
 	messageid = msgid;
 }
 
-void TextEntryPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	TextPart::render(renderer, xoffset, yoffset, (focused ? this : 0));
+void TextEntryPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
+	TextPart::partRender(renderer, xoffset, yoffset, (focused ? this : 0));
 }
 
 void TextEntryPart::renderCaret(SDLBackend *renderer, int xoffset, int yoffset) {

@@ -92,6 +92,13 @@ CompoundAgent::~CompoundAgent() {
 	}
 }
 
+void CompoundAgent::setZOrder(unsigned int plane) {
+	Agent::setZOrder(plane);
+	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
+		(*x)->updateZOrder();
+	}
+}
+
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
 
 #include <iostream>

@@ -22,13 +22,14 @@
 
 #include "openc2e.h"
 #include "creaturesImage.h"
+#include "renderable.h"
 #include <map>
 #include <string>
 #include <vector>
 
 class CompoundAgent;
 
-class CompoundPart {
+class CompoundPart : public renderable {
 protected:
 	creaturesImage *origsprite, *sprite;
 	unsigned int firstimg, pose, frameno, base;
@@ -46,6 +47,7 @@ public:
 	int x, y;
 	unsigned int zorder, id;
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
+	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
 	virtual void tick();
 	unsigned int getWidth() { return sprite->width(firstimg); }
 	unsigned int getHeight() { return sprite->height(firstimg); }
@@ -54,6 +56,7 @@ public:
 	unsigned int getCurrentSprite() { return firstimg + base + pose; }
 	unsigned int getFrameNo() { return frameno; }
 	unsigned int getFirstImg() { return firstimg; }
+	unsigned int getZOrder() const;
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
@@ -121,8 +124,8 @@ public:
 	unsigned int noPages() { return pages.size(); }
 	void setPage(unsigned int p) { currpage = p; }
 	unsigned int getPage() { return currpage; }
-	void render(class SDLBackend *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
-	void render(class SDLBackend *renderer, int xoffset, int yoffset) { render(renderer, xoffset, yoffset, 0); }
+	void partRender(class SDLBackend *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
+	void partRender(class SDLBackend *renderer, int xoffset, int yoffset) { partRender(renderer, xoffset, yoffset, 0); }
 	void setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll);
 };
 
@@ -157,7 +160,7 @@ public:
 	void loseFocus() { focused = false; }
 	void handleKey(char c);
 	void tick();
-	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
+	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
 };
 
 #endif

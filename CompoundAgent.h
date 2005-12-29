@@ -49,6 +49,7 @@ public:
 	virtual unsigned int getCheckWidth() { return fullwidth; }
 	virtual unsigned int getCheckHeight() { return fullheight; }
 	void handleClick(float, float);
+	void setZOrder(unsigned int plane);
 
 	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 

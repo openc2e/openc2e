@@ -69,9 +69,8 @@ void drawWorld() {
 	}
 
 	// render all the agents
-	for (std::multiset<Agent *, agentzorder>::iterator i = world.zorder.begin(); i != world.zorder.end(); i++) {
-		if ((*i)->visible)
-			(*i)->render(&backend, -adjustx, -adjusty);
+	for (std::multiset<renderable *, renderablezorder>::iterator i = world.renders.begin(); i != world.renders.end(); i++) {
+		(*i)->render(&backend, -adjustx, -adjusty);
 	}
 
 	if (showrooms) {
