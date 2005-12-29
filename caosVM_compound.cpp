@@ -224,8 +224,17 @@ void caosVM::c_FRMT() {
 	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
 	caos_assert(p);
 
-	p->setFormat(left_margin, top_margin, right_margin, bottom_margin, line_spacing, char_spacing, 
-			(!(justification & 1)), (justification & 2), (justification & 4), (justification & 8), (justification & 16));
+	horizontalalign h;
+	if ((justification & 3) == 1) h = right;
+	else if ((justification & 3) == 2) h = center;
+	else h = left;
+	
+	verticalalign v;
+	if ((justification & 12) == 4) v = bottom;
+	else if ((justification & 12) == 8) v = middle;
+	else v = top; // TODO: i haven't verified this is the correct fallback - fuzzie
+	
+	p->setFormat(left_margin, top_margin, right_margin, bottom_margin, line_spacing, char_spacing, h, v, (justification & 16));
 }
 
 /**

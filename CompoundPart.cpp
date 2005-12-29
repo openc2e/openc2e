@@ -87,7 +87,7 @@ TextPart::TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, u
 	caos_assert(textsprite->numframes() == 224);
 	leftmargin = 8; topmargin = 8; rightmargin = 8; bottommargin = 8;
 	linespacing = 0; charspacing = 0;
-	left_align = false; center_align = false; bottom_align = false; middle_align = false; last_page_scroll = false;
+	horz_align = left; vert_align = top;
 	currpage = 0;
 	recalculateData(); // ie, insert a blank first page
 }
@@ -145,17 +145,15 @@ void TextEntryPart::handleKey(char c) {
 	recalculateData();
 }
 
-void TextPart::setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll) {
+void TextPart::setFormat(int left, int top, int right, int bottom, int line, int _char, horizontalalign horza, verticalalign verta, bool lastpagescroll) {
 	leftmargin = left;
 	topmargin = top;
 	rightmargin = right;
 	bottommargin = bottom;
 	linespacing = line;
 	charspacing = _char;
-	left_align = lefta;
-	center_align = centera;
-	bottom_align = bottoma;
-	middle_align = middlea;
+	horz_align = horza;
+	vert_align = verta;
 	last_page_scroll = lastpagescroll;
 	recalculateData();
 }
@@ -180,8 +178,10 @@ void TextPart::recalculateData() {
 
 	lines.clear();
 	pages.clear();
+	pageheights.clear();
 	pages.push_back(0);
 	if (text.size() == 0) {
+		pageheights.push_back(0);
 		lines.push_back(currentdata); // blank line, so caret is rendered in TextEntryParts
 		return;
 	}
@@ -221,8 +221,9 @@ void TextPart::recalculateData() {
 		} else if (wordlen <= textwidth) {
 			// the rest of the word doesn't fit on the current line, but does on the next line.
 			if (currenty + usedheight > textheight) {
-				currenty = 0;
+				pageheights.push_back(currenty);
 				pages.push_back(lines.size());
+				currenty = 0;
 			} else currenty += usedheight + linespacing;
 			currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 			lines.push_back(currentdata);
@@ -238,8 +239,9 @@ void TextPart::recalculateData() {
 		// we force a newline here if necessary (ie, if the last char is '\n', except not in the last case)
 		if ((i < text.size()) && (newline)) {
 			if (currenty + usedheight > textheight) {
-				currenty = 0;
+				pageheights.push_back(currenty);
 				pages.push_back(lines.size());
+				currenty = 0;
 			} else currenty += usedheight + linespacing;
 			lines.push_back(currentdata);
 			currentdata.reset();
@@ -248,9 +250,11 @@ void TextPart::recalculateData() {
 
 	if (currentdata.text.size() > 0) {
 		currenty += usedheight;
-		if (text[text.size() -1] == ' ') currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
+		if (text[text.size() - 1] == ' ') currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 		lines.push_back(currentdata);
 	}
+	
+	pageheights.push_back(currenty);
 }
 
 void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
@@ -262,12 +266,19 @@ void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEn
 	unsigned int textheight = getHeight() - topmargin - bottommargin;
 
 	unsigned int currenty = 0, usedheight = 0;
+	if (vert_align == bottom)
+		currenty = textheight - pageheights[currpage];
+	else if (vert_align == middle)
+		currenty = (textheight - pageheights[currpage]) / 2;
 	unsigned int startline = pages[currpage];
 	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
 	for (unsigned int i = startline; i < endline; i++) {
 		unsigned int currentx = 0, somex = xoff;
-		if (center_align)
+		if (horz_align == right)
+			somex = somex + (textwidth - lines[i].width);
+		else if (horz_align == center)
 			somex = somex + ((textwidth - lines[i].width) / 2);
+
 		for (unsigned int x = 0; x < lines[i].text.size(); x++) {
 			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
 			int spriteid = lines[i].text[x] - 32;

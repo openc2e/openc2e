@@ -103,16 +103,25 @@ struct linedata {
 	linedata() { reset(); }
 };
 
+enum horizontalalign { left, center, right };
+enum verticalalign { top, middle, bottom };
+
 class TextPart : public CompoundPart {
 protected:
 	std::vector<linedata> lines;
 	std::vector<unsigned int> pages;
+	std::vector<unsigned int> pageheights;
 	unsigned int currpage;
 	std::string text;
+	
 	creaturesImage *textsprite;
+	
 	int leftmargin, topmargin, rightmargin, bottommargin;
 	int linespacing, charspacing;
-	bool left_align, center_align, bottom_align, middle_align, last_page_scroll;
+	horizontalalign horz_align;
+	verticalalign vert_align;	
+	bool last_page_scroll;
+
 	TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite);
 	~TextPart();
 	void recalculateData();
@@ -126,7 +135,7 @@ public:
 	unsigned int getPage() { return currpage; }
 	void partRender(class SDLBackend *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
 	void partRender(class SDLBackend *renderer, int xoffset, int yoffset) { partRender(renderer, xoffset, yoffset, 0); }
-	void setFormat(int left, int top, int right, int bottom, int line, int _char, bool lefta, bool centera, bool bottoma, bool middlea, bool lastpagescroll);
+	void setFormat(int left, int top, int right, int bottom, int line, int _char, horizontalalign horza, verticalalign verta, bool lastpagescroll);
 };
 
 class FixedTextPart : public TextPart {
