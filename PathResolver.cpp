@@ -31,7 +31,7 @@
 using namespace std;
 using namespace boost::filesystem;
 
-static set<string> dircache;
+static map<string, std::time_t> dircache;
 static map<string, string> cache;
 
 static bool checkDirCache(path &dir);
@@ -94,14 +94,17 @@ bool resolveFile_(string &srcPath) {
 bool resolveFile(std::string &path) {
 	std::string orig = path;
 	bool res = resolveFile_(path);
-	/*std::cerr << orig << " -> ";
+#if 1
+	std::cerr << orig << " -> ";
 	if (!res)
 		std::cerr << "(nil)";
 	else
 		std::cerr << path;
-	std::cerr << std::endl;*/
+	std::cerr << std::endl;
+#endif
 	return res;
 }
+
 
 /* If dir is cached, do nothing.
  * If dir exists, cache it.
@@ -110,8 +113,10 @@ bool resolveFile(std::string &path) {
  * If we find a dir, return true. Else, false.
  */
 bool checkDirCache(path &dir) {
-	if (dircache.end() != dircache.find(dir.string()))
-		return true;
+	if (dircache.end() != dircache.find(dir.string())) {
+		if (exists(dir) && last_write_time(dir) == dircache[dir.string()])
+			return true;
+	}
 	if (exists(dir))
 		return doCacheDir(dir);
 	if (dir.empty())
@@ -134,7 +139,7 @@ bool doCacheDir(path &dir) {
 		val = lcleaf(cur).string();
 		cache[val] = key;
 	}
-	dircache.insert(dir.string());
+	dircache[dir.string()] = last_write_time(dir);
 	return true;
 }
 /* vim: set noet: */

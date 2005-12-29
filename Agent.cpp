@@ -385,6 +385,7 @@ void Agent::vmTick() {
 
 Agent::~Agent() {
 	world.agents.erase(agents_iter);
+	world.zorder.erase(zorder_iter);
 	if (vm)
 		world.freeVM(vm);
 	zotstack();
@@ -403,7 +404,6 @@ void Agent::kill() {
 	zotrefs();
 	if (unid != -1)
 		world.freeUNID(unid);
-	world.zorder.erase(zorder_iter);
 	world.killqueue.push_back(this);
 }
 
