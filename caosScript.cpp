@@ -23,6 +23,7 @@
 #include "World.h"
 #include "token.h"
 #include "dialect.h"
+#include "bytecode.h"
 #include "lex.yy.h"
 #include <iostream>
 #include <sstream>
@@ -37,16 +38,10 @@ void script::thread(caosOp *op) {
 	assert (!op->owned && !linked);
 	op->owned = true;
 	op->index = allOps.size();
-	allOps.push_back(op);
+	allOps.push_back(shared_ptr<caosOp>(op));
 }
 
 script::~script() {
-	std::vector<class caosOp *>::iterator i = allOps.begin();
-	while (i != allOps.end())
-		delete *i++;
-	allOps.clear();
-	relocations.clear();
-	gsub.clear();
 }
 
 void script::link() {
@@ -68,21 +63,21 @@ void script::link() {
 //	std::cout << "Post-link:" << std::endl << dump();
 }
 
-script::script(const Variant *v, const std::string &fn)
+script::script(Variant *v, const std::string &fn)
 	: fmly(-1), gnus(-1), spcs(-1), scrp(-1),
 	  variant(v), filename(fn)
 {
-	allOps.push_back(new caosNoop());
+	allOps.push_back(shared_ptr<caosOp>(new caosNoop()));
 	relocations.push_back(0);
 	linked = false;
 }
 	
-script::script(const Variant *v, const std::string &fn,
+script::script(Variant *v, const std::string &fn,
 		int fmly_, int gnus_, int spcs_, int scrp_)
 	: fmly(fmly_), gnus(gnus_), spcs(spcs_), scrp(scrp_),
 	  variant(v), filename(fn)
 {
-	allOps.push_back(new caosNoop());
+	allOps.push_back(shared_ptr<caosOp>(new caosNoop()));
 	relocations.push_back(0);
 	linked = false;
 }

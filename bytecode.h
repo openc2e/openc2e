@@ -1,21 +1,22 @@
 #ifndef BYTECODE_H
 #define BYTECODE_H 1
 
-#include "caosVM.h"
 #include "lexutil.h"
 #include "cmddata.h"
-#include "caosScript.h"
+//#include "caosScript.h"
 #include <cstdio>
+#include "serialization.h"
+#include "dialect.h"
+#include "caosVar.h"
 
 class script;
+class caosVM;
 
 typedef void (caosVM::*ophandler)();
 class caosOp {
 	public:
 		// on entry vm->nip = our position + 1
-		virtual void execute(caosVM *vm) {
-			if (!vm->inst) vm->timeslice -= evalcost;
-		}
+		virtual void execute(caosVM *vm);
 		void setCost(int cost) {
 			evalcost = cost;
 		}
@@ -30,21 +31,41 @@ class caosOp {
 		int evalcost;
 		bool owned; // if it's been threaded
 		int yyline; // HORRIBLE HACK
-		friend void script::thread(caosOp *op);
+		friend class script;
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			ar & index;
+			ar & evalcost;
+			ar & owned;
+			ar & yyline;
+		}
+			
 };
+BOOST_CLASS_EXPORT(caosOp)
 
 class caosNoop : public caosOp {
 	public:
 		caosNoop() { evalcost = 0; }
 		std::string dump() { return std::string("noop"); }
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+		}
 };
+
+BOOST_CLASS_EXPORT(caosNoop)
 
 class caosJMP : public caosOp {
 	protected:
 		int p;
+		caosJMP() : p(INT_MIN) {} // Deserialization
 	public:
 		caosJMP(int p_) : p(p_) { evalcost = 0; }
-		void execute(caosVM *vm) { vm->nip = p; }
+		void execute(caosVM *vm);
 		void relocate(const std::vector<int> &relocations) {
 			if (p < 0)
 				p = relocations[-p];
@@ -55,38 +76,70 @@ class caosJMP : public caosOp {
 			sprintf(buf, "JMP %08d", p);
 			return std::string(buf);
 		}
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & p;
+		}
 };
 
+BOOST_CLASS_EXPORT(caosJMP)
 class simpleCaosOp : public caosOp {
 	protected:
-		ophandler handler;
 		const cmdinfo *ci;
 	public:
-		simpleCaosOp(ophandler h, const cmdinfo *i) : handler(h), ci(i) {}
-		void execute(caosVM *vm) {
-			caosOp::execute(vm);
-			int stackc = vm->valueStack.size();
-			(vm->*handler)();
-			int delta = vm->valueStack.size() - stackc;
-			if (!vm->result.isNull())
-				delta++;
-			if (ci->retc != -1 && 
-					delta != ci->retc - ci->argc) {
-				std::ostringstream oss;
-				oss << "return count mismatch for op "
-					<< ci->fullname << ", delta=" << delta
-					<< std::endl;
-				throw caosException(oss.str());
-			}
-		}
+		simpleCaosOp() : ci(NULL) {};
+
+		void setCmdInfo(const cmdinfo *ci_) { ci = ci_; }
+		
+		simpleCaosOp(ophandler h, const cmdinfo *i) : ci(i) {}
+		void execute(caosVM *vm);
 		std::string dump() {
 			return std::string(ci->fullname);
 		}
+		const cmdinfo *getCmdInfo() const { return ci; }
+	private:
+		friend class boost::serialization::access;
+		template<class Archive>
+		void save(Archive &ar, unsigned long version) const {
+			SER_BASE(ar, caosOp);
+			std::string key(ci->key);
+			std::string variant(ci->variant);
+			ar & key & variant;
+		}
+
+		template<class Archive>
+		void load(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			std::string key, variant;
+			ar & key & variant;
+			if (variants.find(variant) == variants.end())
+                abort(); // XXX
+            Variant *v = variants[variant];
+            
+            if (v->keyref.find(key) == v->keyref.end())
+                abort(); // XXx
+			ci = v->keyref[key];
+		}
+
+		BOOST_SERIALIZATION_SPLIT_MEMBER()
+
 };
+BOOST_CLASS_EXPORT(simpleCaosOp)
 
 class caosREPS : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & exit;
+		}
 	protected:
 		int exit;
+		caosREPS() : exit(INT_MIN) {} // Deserialization
 	public:
 		caosREPS(int exit_) : exit(exit_) {}
 		void relocate(const std::vector<int> &relocations) {
@@ -95,33 +148,26 @@ class caosREPS : public caosOp {
 			}
 			assert(exit > 0);
 		}
-		void execute(caosVM *vm) {
-			caosOp::execute(vm);
-			VM_PARAM_INTEGER(i)
-			caos_assert(i >= 0);
-			if (i == 0) {
-				vm->nip = exit;
-				return;
-			}
-			vm->result.setInt(i - 1);
-		}
+		void execute(caosVM *vm);
 		std::string dump() { return std::string("REPS"); }
 };
 		
+BOOST_CLASS_EXPORT(caosREPS)
+
 class caosGSUB : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & targ;
+		}
 	protected:
 		int targ;
+		caosGSUB() : targ(INT_MIN) { } // Deserialization
 	public:
 		caosGSUB(int targ_) : targ(targ_) {}
-		void execute(caosVM *vm) {
-			caosOp::execute(vm);
-			callStackItem i;
-			i.valueStack = vm->valueStack; // XXX: a bit slow?
-			i.nip = vm->nip;
-			vm->callStack.push_back(i);
-			vm->valueStack.clear();
-			vm->nip = targ;
-		}
+		void execute(caosVM *vm);
 		void relocate(const std::vector<int> &relocations) {
 			if (targ < 0) {
 				targ = relocations[-targ];
@@ -136,6 +182,8 @@ class caosGSUB : public caosOp {
 		}
 };
 
+BOOST_CLASS_EXPORT(caosGSUB)
+
 // Condition classes
 #define CEQ 1
 #define CLT 2
@@ -148,9 +196,18 @@ class caosGSUB : public caosOp {
 extern const char *cnams[];
 
 class caosCond : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & cond & branch;
+		}
 	protected:
 		int cond;
 		int branch;
+
+		caosCond() : cond(0), branch(INT_MIN) {} // Deserialization
 	public:
 		std::string dump() { 
 			char buf[64];
@@ -167,49 +224,7 @@ class caosCond : public caosOp {
 			
 		caosCond(int condition, int br)
 			: cond(condition), branch(br) {}
-		void execute(caosVM *vm) {
-			caosOp::execute(vm);
-			
-			VM_PARAM_VALUE(arg2);
-			VM_PARAM_VALUE(arg1);
-
-			int cres;
-			if (arg2.hasString() && arg1.hasString()) {
-				std::string str1 = arg1.getString();
-				std::string str2 = arg2.getString();
-				
-				if (str1 < str2)
-					cres = CLT;
-				else if (str1 > str2)
-					cres = CGT;
-				else
-					cres = CEQ;
-			} else if (arg2.hasDecimal() && arg1.hasDecimal()) {
-				float val1 = arg1.getFloat();
-				float val2 = arg2.getFloat();
-
-				if (val1 < val2)
-					cres = CLT;
-				else if (val1 > val2)
-					cres = CGT;
-				else
-					cres = CEQ;
-			} else if (arg2.hasAgent() && arg1.hasAgent()) {
-				if (cond != CEQ && cond != CNE)
-					throw caosException("invalid comparison for agents");
-				Agent *a1, *a2;
-				a1 = arg1.getAgent();
-				a2 = arg2.getAgent();
-				if (a1 == a2)
-					cres = CEQ;
-				else
-					cres = CNE;
-				// the next bit is needed for some missing GAME etc
-			} else cres = CNE;
-
-			if (cres & cond)
-				vm->nip = branch;
-		}
+		void execute(caosVM *vm);
 
 		void relocate(const std::vector<int> &relocations) {
 			if (branch < 0) {
@@ -218,26 +233,23 @@ class caosCond : public caosOp {
 			assert(branch > 0);
 		}
 };
+BOOST_CLASS_EXPORT(caosCond)
 
 class caosENUM_POP : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & exit;
+		}
 	protected:
 		int exit;
+
+		caosENUM_POP() : exit(INT_MIN) {} // Deserialization
 	public:
 		caosENUM_POP(int exit_) : exit(exit_) {}
-		void execute(caosVM *vm) {
-			caosOp::execute(vm);
-			VM_PARAM_VALUE(v);
-			if (v.isNull()) { // no more values
-				vm->nip = exit;
-				vm->targ = vm->owner;
-				return;
-			}
-			if (v.getAgent() == NULL) { // killed?
-				vm->nip = vm->cip;
-				return;
-			}
-			vm->setTarg(v.getAgent());
-		}
+		void execute(caosVM *vm);
 		void relocate(const std::vector<int> &relocations) {
 			if (exit < 0) {
 				exit = relocations[-exit];
@@ -250,18 +262,30 @@ class caosENUM_POP : public caosOp {
 			return std::string(buf);
 		}
 };
+BOOST_CLASS_EXPORT(caosENUM_POP)
 
 class caosSTOP : public caosOp {
-	public:
-		void execute(caosVM *vm) {
-			vm->stop();
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
 		}
+	public:
+		void execute(caosVM *vm);
 		std::string dump() {
 			return std::string("STOP");
 		}
 };
-
+BOOST_CLASS_EXPORT(caosSTOP)
+	
 class caosAssert : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+		}
 	public:
 		void execute(caosVM *vm) {
 			throw caosException("DBG: ASRT failed");
@@ -270,6 +294,124 @@ class caosAssert : public caosOp {
 			return std::string("ASSERT FAILURE");
 		}
 };
+BOOST_CLASS_EXPORT(caosAssert)
+
+class ConstOp : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & constVal;
+		}
+	protected:
+		caosVar constVal;
+		ConstOp() { constVal.reset(); }
+	public:
+		virtual void execute(caosVM *vm);
+
+		ConstOp(const caosVar &val) {
+			constVal = val;
+		}
+
+		std::string dump() {
+			return std::string("CONST ") + constVal.dump();
+		}
+};
+BOOST_CLASS_EXPORT(ConstOp)
+
+class opVAxx : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & index;
+		}
+	protected:
+		int index;
+		opVAxx() : index(0) {}
+	public:
+		opVAxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) ;
+			
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "VA%02d", index);
+			return std::string(buf);
+		}
+};
+BOOST_CLASS_EXPORT(opVAxx)
+
+class opOVxx : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & index;
+		}
+	protected:
+		int index;
+		opOVxx() : index(0) {}
+	public:
+		opOVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm);
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "OV%02d", index);
+			return std::string(buf);
+		}
+};
+BOOST_CLASS_EXPORT(opOVxx)
+
+class opMVxx : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & index;
+		}
+	protected:
+		int index;
+		opMVxx() : index(0) {}
+	public:
+		opMVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm);
+		std::string dump() {
+			char buf[16];
+			sprintf(buf, "MV%02d", index);
+			return std::string(buf);
+		}
+};
+BOOST_CLASS_EXPORT(opMVxx)
+	
+class opBytestr : public caosOp {
+	private:
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, unsigned long version) {
+			SER_BASE(ar, caosOp);
+			ar & bytestr;
+		}
+	protected:
+		std::vector<unsigned int> bytestr;
+		opBytestr() {}
+	public:
+		opBytestr(const std::vector<unsigned int> &bs) : bytestr(bs) {}
+		void execute(caosVM *vm); 
+		std::string dump() {
+			std::ostringstream oss;
+			oss << "BYTESTR [ ";
+			for (unsigned int i = 0; i < bytestr.size(); i++) {
+				oss << i << " ";
+			}
+			oss << "]";
+			return oss.str();
+		}
+};
+BOOST_CLASS_EXPORT(opBytestr)
 
 #endif
 

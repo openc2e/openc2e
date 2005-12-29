@@ -61,6 +61,7 @@ OPENC2E = \
 	mmapifstream.o \
 	mngfile.o \
 	mngparser.tab.o \
+	openc2e.o \
 	PathResolver.o \
 	physics.o \
 	PointerAgent.o \
@@ -134,7 +135,7 @@ lex.mng.o: mngparser.tab.hpp
 openc2e: $(OPENC2E)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
+tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o catalogue.lex.o  catalogue.tab.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/praydumper: tools/praydumper.o pray.o
@@ -149,7 +150,7 @@ tools/pathtest: tools/pathtest.o PathResolver.o
 tools/memstats: tools/memstats.o $(patsubst main.o,,$(OPENC2E))
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/serialtest: tools/serialtest.o caosVar.o AgentRef.o
+tools/serialtest: tools/serialtest.o $(patsubst main.o,,$(OPENC2E))
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 clean:

@@ -2,10 +2,12 @@
 #define DIALECT_H 1
 
 #include "token.h"
-#include "bytecode.h"
-#include "caosScript.h"
+//#include "caosScript.h"
 #include "cmddata.h"
 #include <map>
+
+class script;
+class caosScript;
 
 class parseDelegate {
 	public:
@@ -18,8 +20,8 @@ class DefaultParser : public parseDelegate {
 		void (caosVM::*handler)();
 		const cmdinfo *cd;
 	public:
-		DefaultParser(void (caosVM::*h)(), const cmdinfo *i) :
-			handler(h), cd(i) {}
+		DefaultParser(const cmdinfo *i) :
+			handler(i->handler), cd(i) {}
 		virtual void operator()(class caosScript *s, class Dialect *curD);
 };
 
@@ -40,11 +42,16 @@ class Dialect {
 };
 
 struct Variant {
+	std::string name;
 	Dialect *cmd_dialect, *exp_dialect;
 	const cmdinfo *cmds;
+	std::map<std::string, const cmdinfo *> keyref;
+
+	Variant(const char *n) : name(n) {}
+	Variant(const std::string &n) : name(n) {}
 };
 
-extern map<std::string, Variant *> variants;
+extern std::map<std::string, Variant *> variants;
 
 class OneShotDialect : public Dialect {
 	public:
@@ -56,52 +63,20 @@ class OneShotDialect : public Dialect {
 		}
 };
 
-// XXX: these don't really belong here
+// XXX: these really don't belong here
 
 void parseCondition(caosScript *s, int success, int failure);
-
-class DoifDialect : public Dialect {
-	protected:
-		int success, failure, exit;
-	public:
-		DoifDialect(caosScript *scr, int s, int f, int e)
-			: success(s), failure(f), exit(e) {
-				delegates = scr->v->cmd_dialect->delegates; // XXX
-			}
-		void handleToken(class caosScript *s, token *t); 
-};
 
 class DoifParser : public parseDelegate {
 	protected:
 	public:
-		virtual void operator()(class caosScript *s, class Dialect *curD) {
-			int success, failure, exit;
-			success = s->current->newRelocation();
-			failure = s->current->newRelocation();
-			exit    = s->current->newRelocation();
-			
-			parseCondition(s, success, failure);
-			
-			DoifDialect d(s, success, failure, exit);
-			s->current->fixRelocation(success);
-			d.doParse(s);
-			s->current->fixRelocation(exit);
-		}
+		virtual void operator()(class caosScript *s, class Dialect *curD);
 };
 		
 class AssertParser : public parseDelegate {
 	protected:
 	public:
-		virtual void operator()(class caosScript *s, class Dialect *curD) {
-			int success, failure;
-			success = s->current->newRelocation();
-			failure = s->current->newRelocation();
-			parseCondition(s, success, failure);
-
-			s->current->fixRelocation(failure);
-			s->current->thread(new caosAssert());
-			s->current->fixRelocation(success);
-		}
+		virtual void operator()(class caosScript *s, class Dialect *curD);
 };
 
 class NamespaceDelegate : public parseDelegate {
@@ -121,22 +96,7 @@ class REPE : public parseDelegate {
 
 class parseREPS : public parseDelegate {
 	public:
-		void operator() (class caosScript *s, class Dialect *curD) {
-			int exit = s->current->newRelocation();
-
-			s->v->exp_dialect->parseOne(s); // repcount
-			int entry = s->current->getNextIndex();
-			s->current->thread(new caosREPS(exit));
-
-			Dialect d;
-			REPE r;
-			d.delegates = s->v->cmd_dialect->delegates;
-			d.delegates["repe"] = &r;
-
-			d.doParse(s);
-			s->current->thread(new caosJMP(entry));
-			s->current->fixRelocation(exit);
-		}
+		void operator() (class caosScript *s, class Dialect *curD);
 };
 
 class EVER : public parseDelegate {
@@ -144,10 +104,7 @@ class EVER : public parseDelegate {
 		int exit;
 	public:
 		EVER(int exit_) : exit(exit_) {}
-		void operator() (class caosScript *s, class Dialect *curD) {
-			s->current->thread(new caosJMP(exit));
-			curD->stop = true;
-		}
+		void operator() (class caosScript *s, class Dialect *curD);
 };
 
 class UNTL : public parseDelegate {
@@ -155,56 +112,24 @@ class UNTL : public parseDelegate {
 		int entry, exit;
 	public:
 		UNTL(int en, int ex) : entry(en), exit(ex) {}
-		void operator() (class caosScript *s, class Dialect *curD) {
-			parseCondition(s, exit, entry);
-			curD->stop = true;
-		}
+		void operator() (class caosScript *s, class Dialect *curD);
 };
 
 class parseLOOP : public parseDelegate {
 	public:
-		void operator() (class caosScript *s, class Dialect *curD) {
-			int exit = s->current->newRelocation();
-			int entry = s->current->getNextIndex();
-
-			Dialect d;
-			EVER ever(entry); UNTL untl(entry, exit);
-			d.delegates = s->v->cmd_dialect->delegates;
-			d.delegates["ever"] = &ever;
-			d.delegates["untl"] = &untl;
-
-			d.doParse(s);
-			s->current->fixRelocation(exit);
-		}
+		void operator() (class caosScript *s, class Dialect *curD) ;
 };
 
 
 class parseGSUB : public parseDelegate {
 	public:
-		void operator() (class caosScript *s, class Dialect *curD) {
-			token *t = getToken(TOK_WORD);
-			std::string label = t->word;
-			int targ = s->current->gsub[label];
-			if (!targ) {
-				targ = s->current->newRelocation();
-				s->current->gsub[label] = targ;
-			}
-			s->current->thread(new caosGSUB(targ));
-		}
+		void operator() (class caosScript *s, class Dialect *curD) ;
 };
 
 class parseSUBR : public parseDelegate {
 	public:
-		void operator() (class caosScript *s, class Dialect *curD) {
-			s->current->thread(new caosSTOP());
+		void operator() (class caosScript *s, class Dialect *curD) ;
 
-			token *t = getToken(TOK_WORD);
-			std::string label = t->word;
-			int r = s->current->gsub[label];
-			if (r)
-				s->current->fixRelocation(r);
-			s->current->gsub[label] = s->current->getNextIndex();
-		}
 };
 
 class NEXT : public parseDelegate {
@@ -218,25 +143,12 @@ class ENUMhelper : public parseDelegate {
 	protected:
 		DefaultParser p;
 	public:
-		ENUMhelper(void (caosVM::*h)(), const cmdinfo *i) :
-			p(h,i) {}
+		ENUMhelper(const cmdinfo *i) :
+			p(i) {}
 
-		void operator() (class caosScript *s, class Dialect *curD) {
-			(p)(s, curD);
-			int exit = s->current->newRelocation();
-			int entry = s->current->getNextIndex();
-			s->current->thread(new caosENUM_POP(exit));
-			
-			Dialect d;
-			NEXT n;
-			d.delegates = s->v->cmd_dialect->delegates;
-			d.delegates["next"] = &n;
-			
-			d.doParse(s);
-			s->current->thread(new caosJMP(entry));
-			s->current->fixRelocation(exit);
-		}
+		void operator() (class caosScript *s, class Dialect *curD) ;
 };
+
 class ExprDialect : public OneShotDialect {
 	public:
 		void handleToken(caosScript *s, token *t);
