@@ -38,6 +38,8 @@ my %ns;
 
 my $prev;
 
+my $missing_status = 0;
+
 while (<>) {
 	my $file = $ARGV;
 	
@@ -139,6 +141,11 @@ while (<>) {
 		}
 	}
 
+	if (!$status) {
+		$missing_status++;
+		print STDERR "Missing \%status for $fullname\n";
+	}
+
 	if (!$cat) {
 		$cat = lc $fnmap{$file} || 'unknown';
 	}
@@ -187,6 +194,11 @@ while (<>) {
 		}
 		$data{$v}{$key} = $cd;
 	}
+}
+
+if ($missing_status) {
+	print STDERR "$missing_status commands are missing \%status, fixit.\n";
+	exit 1;
 }
 
 print Dump {

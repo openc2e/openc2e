@@ -132,6 +132,7 @@ void caosVM::c_SCRX() {
 
 /**
  CODE (integer)
+ %status maybe
 
  Return script number running in the target. Returns -1 if target is not
  running anything (or if it's running something that's not an event script)
@@ -149,6 +150,7 @@ void caosVM::v_CODE() {
 
 /**
  CODF (integer)
+ %status maybe
 
  Return script family running in the target. Returns -1 if target is not
  running anything (or if it's running something that's not an event script)
@@ -166,6 +168,7 @@ void caosVM::v_CODF() {
 
 /**
  CODG (integer)
+ %status maybe
 
  Return script genus running in the target. Returns -1 if target is not
  running anything (or if it's running something that's not an event script)
@@ -183,6 +186,7 @@ void caosVM::v_CODG() {
 
 /**
  CODS (integer)
+ %status maybe
 
  Return script species running in the target. Returns -1 if target is not
  running anything (or if it's running something that's not an event script)
