@@ -26,6 +26,9 @@ using std::cerr;
 /**
  CLAC (command) message (integer)
  %status maybe
+
+ Sets the type of message sent to the TARG agent when clicked.  If set to -1, no message
+ will be sent.  Using this command will override and reset the value set with CLIK.
 */
 void caosVM::c_CLAC() {
   VM_VERIFY_SIZE(1)
@@ -40,6 +43,10 @@ void caosVM::c_CLAC() {
 /**
  CLIK (command) msg1 (integer) msg2 (integer) msg3 (integer)
  %status maybe
+
+ Sets three different message types that will sent to the TARG agent when clicked, on a 
+ rotating basis.  Setting any of the three types to -1 will cause it to be ignored. Using
+ this command will override and reset the value set by CLAC.
 */
 void caosVM::c_CLIK() {
 	VM_VERIFY_SIZE(3)
@@ -59,8 +66,9 @@ void caosVM::c_CLIK() {
  IMSK (command) flags (integer)
  %status stub
 
- Set the input event flags for the target agent, which tell the engine which events the agent requires scripts to be fired for.
- For example, setting the "key up" flag means the target agent has the relevant script executed every time a key is released.
+ Sets the input event flags for the target agent, which tell the engine which events the 
+ agent requires scripts to be fired for. For example, setting the "key up" flag means the 
+ target agent has the relevant script executed every time a key is released.
 
  Add the following values together to calculate the flags parameter: 1 for key down, 2 for key up, 3 for mouse move, 4 for mouse down, 16 for mouse up, 32 for mouse wheel movement and 64 for (translated) keypress.
 
@@ -99,6 +107,8 @@ void caosVM::v_KEYD() {
 /**
  HOTS (agent)
  %status maybe
+
+ Returns the agent that is currently underneath the Hand.
 */
 void caosVM::v_HOTS() {
 	Agent *a = world.agentAt(world.hand()->x, world.hand()->y); // TODO: use hotspot
@@ -109,6 +119,10 @@ void caosVM::v_HOTS() {
 /**
  HOTP (integer)
  %status maybe
+
+ Returns the PART of the agent (given by HOTS) that is currently underneath the Hand.
+
+ Transparency of the parts themselves is ignored.
 */
 void caosVM::v_HOTP() {
 	Agent *a = world.agentAt(world.hand()->x, world.hand()->y);
@@ -133,6 +147,10 @@ void caosVM::v_HOTP() {
 /**
  PURE (command) value (integer)
  %status maybe
+
+ Turns the normal pointing and clicking behavior of the Hand on and off.
+
+ If set to off, CLIK and CLAC will not work, and clicking events must be handled by IMSK.
 */
 void caosVM::c_PURE() {
 	VM_PARAM_INTEGER(value)
@@ -143,6 +161,8 @@ void caosVM::c_PURE() {
 /**
  PURE (integer)
  %status maybe
+
+ Returns whether the normal pointing and clicking behavior of the Hand is on or off.
 */
 void caosVM::v_PURE() {
 	if (world.hand()->handle_events)
@@ -154,6 +174,8 @@ void caosVM::v_PURE() {
 /**
  MOPX (integer)
  %status maybe
+
+ Returns the current X coordinate of the Hand in the world.
 */
 void caosVM::v_MOPX() {
 	result.setInt(world.hand()->x);
@@ -162,6 +184,8 @@ void caosVM::v_MOPX() {
 /**
  MOPY (integer)
  %status maybe
+
+ Returns the current Y coordinate of the Hand in the world.
 */
 void caosVM::v_MOPY() {
 	result.setInt(world.hand()->y);

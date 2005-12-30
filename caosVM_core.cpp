@@ -175,7 +175,13 @@ void caosVM::c_RGAM() {}
  MOWS (integer)
  %status stub
 
- Returns whether the lawn was cut last sunday or not.
+ Returns whether the lawn was cut last Sunday or not, in theory.
+ How the C2E engine determines this, and whose lawn, exactly, and whether or not it 
+ takes into account the fact that the lawn may have been mown on Saturday or Friday, and 
+ whether it will cut you any slack if it's winter and the grass isn't growing much, is 
+ currently unknown.
+
+ In openc2e, currently a no-op (ie, the lawn is never, ever cut properly).
 */
 void caosVM::v_MOWS() {
 	result.setInt(0); // We're too busy coding to mow the lawn.
