@@ -49,13 +49,13 @@ public:
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
 	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
 	virtual void tick();
-	unsigned int getWidth() { return sprite->width(firstimg); }
-	unsigned int getHeight() { return sprite->height(firstimg); }
 	unsigned int getPose() { return pose; }
 	unsigned int getBase() { return base; }
 	unsigned int getCurrentSprite() { return firstimg + base + pose; }
 	unsigned int getFrameNo() { return frameno; }
 	unsigned int getFirstImg() { return firstimg; }
+	unsigned int getWidth() { return sprite->width(getCurrentSprite()); }
+	unsigned int getHeight() { return sprite->height(getCurrentSprite()); }
 	unsigned int getZOrder() const;
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { animation.clear(); pose = p; }

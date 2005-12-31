@@ -66,7 +66,6 @@ protected:
 	struct SoundSlot *soundslot;
 	void positionAudio(SoundSlot *);
 	bool dying : 1;
-	bool displaycore : 1;
 	
 	void vmTick();
 	bool fireScript(unsigned short event, Agent *from = 0);
@@ -104,6 +103,7 @@ public:
 	bool imsk_translated_char : 1;
 	
 	bool visible : 1;
+	bool displaycore : 1;
 
 	int clac[3]; int clik;
 	unsigned char family, genus;
