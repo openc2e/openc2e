@@ -355,7 +355,7 @@ extern "C" int main(int argc, char *argv[]) {
 	if (!fs::exists(p))
 		fs::create_directory(p);
 	if (fs::is_directory(p)) {
-		std::ofstream f((p.native_directory_string() + "/port").c_str(), ios::trunc);
+		std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
 		char buf[6];
 		snprintf(buf, 6, "%i", listenport);
 		f << buf;

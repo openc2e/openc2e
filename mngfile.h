@@ -6,8 +6,6 @@
 #include <cmath>
 #include "exceptions.h"
 
-using namespace std;
-
 void mngrestart(std::istream *is);
 
 struct processState {
@@ -40,7 +38,7 @@ protected:
 public:
 	MNGNamedNode(std::string n) { name = n; }
 	std::string getName() { return name; }
-    virtual std::string dump() { return std::string("[unknown named node: ") + getName() + "]"; }
+	virtual std::string dump() { return std::string("[unknown named node: ") + getName() + "]"; }
 };
 
 inline std::string dumpChildren(std::list<MNGNode *> *c) {
@@ -395,35 +393,34 @@ class MNGFile {
 		FILE * f;
 		long filesize;
 		char * map;
-		string name;
+		std::string name;
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;
-		vector< pair< char *, int > > samples;
+		std::vector< std::pair< char *, int > > samples;
 		std::map<std::string, class MNGEffectDecNode *> effects;
 		std::map<std::string, class MNGTrackDecNode *> tracks;
 		unsigned int sampleno;
 	
 	public:
 		std::map<std::string, class MNGVariableDecNode *> variables; // TODO: should be private?
-		 MNGFile(string);
-		 void enumerateSamples();
-		 ~MNGFile();
-		 void add(class MNGEffectDecNode *n) { effects[n->getName()] = n; }
-		 void add(class MNGTrackDecNode *n) { tracks[n->getName()] = n; }
-		 void add(class MNGVariableDecNode *n) { variables[n->getName()] = n; }
-		 pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
+		MNGFile(std::string);
+		void enumerateSamples();
+		~MNGFile();
+		void add(class MNGEffectDecNode *n) { effects[n->getName()] = n; }
+		void add(class MNGTrackDecNode *n) { tracks[n->getName()] = n; }
+		void add(class MNGVariableDecNode *n) { variables[n->getName()] = n; }
+		std::pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
 
-		 std::string dump() {
-			
+		std::string dump() {	
 			std::ostringstream oss;
 
-            std::map<std::string, class MNGEffectDecNode *>::iterator ei;
-            std::map<std::string, class MNGTrackDecNode *>::iterator ti;
+			std::map<std::string, class MNGEffectDecNode *>::iterator ei;
+			std::map<std::string, class MNGTrackDecNode *>::iterator ti;
 
-            for (ei = effects.begin(); ei != effects.end(); ei++)
+            		for (ei = effects.begin(); ei != effects.end(); ei++)
 				oss << ei->first << " " << ei->second->dump() << std::endl;
                 
-            for (ti = tracks.begin(); ti != tracks.end(); ti++)
+            		for (ti = tracks.begin(); ti != tracks.end(); ti++)
 				oss << ti->first << " " << ti->second->dump() << std::endl;
 
 			return oss.str();
@@ -434,7 +431,7 @@ extern MNGFile *g_mngfile;
 
 class MNGWaveNode : public MNGNamedNode { // wave
 protected:
-	pair<char *, int> *sample;
+	std::pair<char *, int> *sample;
 
 public:
 	MNGWaveNode(std::string n) : MNGNamedNode(n) { sample = g_mngfile->getNextSample(); }

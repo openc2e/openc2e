@@ -12,14 +12,12 @@
 
 #include "token.h"
 
-using namespace std;
-
 extern int lex_lineno;
 
 void lexreset();
 
-extern vector<unsigned int> bytestr;
-extern string temp_str;
+extern std::vector<unsigned int> bytestr;
+extern std::string temp_str;
 
 static inline int make_int(int v) {
 	lasttok.type = TOK_CONST;
@@ -47,9 +45,9 @@ static inline int make_float(float f) {
 }
 
 static inline int make_word(const char *str) {
-	string result = str;
+	std::string result = str;
 	lasttok.type = TOK_WORD;
-	transform(result.begin(), result.end(), result.begin(), (int(*)(int))tolower);
+	std::transform(result.begin(), result.end(), result.begin(), (int(*)(int))tolower);
 	lasttok.word = result;
 	lasttok.yyline = lex_lineno;
 	return 1;

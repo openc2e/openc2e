@@ -7,7 +7,9 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+using std::ostream;
+using std::istream;
+using std::vector;
 
 /*
   not 100% sure about this enum ... is 'baby' equal to 'embryo', or is 'embryo'
@@ -40,9 +42,9 @@ public:
 };
 
 struct geneNote {
-  string description;
-  string comments;
-  uint8 which;
+	std::string description;
+	std::string comments;
+	uint8 which;
 };
 
 //! header flags of a gene

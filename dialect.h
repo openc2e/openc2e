@@ -44,7 +44,7 @@ struct Variant {
 	const cmdinfo *cmds;
 };
 
-extern map<std::string, Variant *> variants;
+extern std::map<std::string, Variant *> variants;
 
 class OneShotDialect : public Dialect {
 	public:

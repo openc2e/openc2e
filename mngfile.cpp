@@ -22,7 +22,7 @@ void decryptbuf(char * buf, int len) {
 	}
 }
 
-MNGFile::MNGFile(string n) {
+MNGFile::MNGFile(std::string n) {
 	sampleno = 0;
 
 	name = n;
@@ -60,7 +60,7 @@ MNGFile::MNGFile(string n) {
 		int size = swapEndianLong(*((int *) (map + position)));
 		position += 4; // Skip the size field
 		
-		samples.push_back(make_pair(map + position, size));
+		samples.push_back(std::make_pair(map + position, size));
 	}
 
 	// now we have the samples, read and decode the MNG script
@@ -86,7 +86,7 @@ MNGFile::MNGFile(string n) {
 }
 
 void MNGFile::enumerateSamples() {
-	vector< pair< char *, int > >::iterator i;
+	std::vector< std::pair< char *, int > >::iterator i;
 	for(i = samples.begin(); i != samples.end(); i++) {
 		printf("Position: %i Length: %i\n", (unsigned int)(*i).first, (*i).second);
 		// PlaySound((*i).second.first, (*i).second.second);

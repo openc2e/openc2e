@@ -28,7 +28,8 @@
 #include <algorithm>
 #include <iostream>
 
-using namespace std;
+using std::map;
+using std::string;
 using namespace boost::filesystem;
 
 static map<string, std::time_t> dircache;

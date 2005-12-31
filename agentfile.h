@@ -22,7 +22,11 @@
 #include <istream>
 #include <ostream>
 
-using namespace std;
+using std::istream;
+using std::ostream;
+using std::string;
+using std::vector;
+using std::pair;
 
 //! base class for blocks [abstract]
 class block {

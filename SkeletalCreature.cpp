@@ -80,7 +80,7 @@ SkeletalCreature::SkeletalCreature(genomeFile *g, unsigned char _family, bool is
 			if (images[i] == 0) stage_to_try--;
 		}
 		assert(images[i] != 0);
-		ifstream in(std::string(datapath + "/Body Data/" + x + dataString(stage_to_try, false) + ".att").c_str());
+		std::ifstream in(std::string(datapath + "/Body Data/" + x + dataString(stage_to_try, false) + ".att").c_str());
 		in >> att[i];
 	}
 

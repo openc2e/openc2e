@@ -3,6 +3,13 @@
 #include <fstream>
 #include <unistd.h>
 
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::ifstream;
+using std::ofstream;
+using std::vector;
+
 int main(int argc, char **argv) {
 	bool outputfiles = true, notags = false, usageerror = false;
 	int ch;

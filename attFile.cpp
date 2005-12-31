@@ -1,9 +1,8 @@
 #include "attFile.h"
 #include <boost/tokenizer.hpp>
 using namespace boost;
-using namespace std;
 
-istream &operator >> (istream &i, attFile &f) {
+std::istream &operator >> (std::istream &i, attFile &f) {
 	f.nolines = 0;
 
 	std::string s;

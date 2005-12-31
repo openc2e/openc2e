@@ -6,8 +6,8 @@
 
 int lex_lineno;
 
-vector<unsigned int> bytestr;
-string temp_str;
+std::vector<unsigned int> bytestr;
+std::string temp_str;
 
 static token *peektok = NULL;
 token lasttok;

@@ -4,8 +4,6 @@
 #include <exception>
 #include <iostream>
 
-using namespace std;
-
 geneNote *genomeFile::findNote(uint8 type, uint8 subtype, uint8 which) {
 	for (vector<gene *>::iterator x = genes.begin(); x != genes.end(); x++) {
 		gene *t = *x;
@@ -31,7 +29,7 @@ void genomeFile::readNotes(istream &s) {
 	if (cversion == 3) {
 		uint16 gnover = read16(s);
 		uint16 nosvnotes = read16(s);
-		cout << "we have " << nosvnotes << " notes" << endl;
+		std::cout << "we have " << nosvnotes << " notes" << std::endl;
 
 		for (int i = 0; i < nosvnotes; i++) {
 			uint16 type = read16(s);
@@ -164,7 +162,7 @@ istream &operator >> (istream &s, genomeFile &f) {
 	f.cversion = majic[0] - 48; // 48 = ASCII '0'
 	if ((f.cversion < 1) || (f.cversion > 3)) throw genomeException("unsupported genome version in majic");
 
-	cout << "creaturesGenomeFile: reading genome of version " << (unsigned int)f.cversion << ".\n";
+	std::cout << "creaturesGenomeFile: reading genome of version " << (unsigned int)f.cversion << ".\n";
 	f.currorgan = 0;
 	while (f.nextGene(s) != 0);
 	f.currorgan = 0;
