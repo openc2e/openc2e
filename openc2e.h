@@ -22,6 +22,7 @@
 
 #ifdef _MSC_VER
 # define M_PI           3.14159265358979323846  /* pi */
+# define snprintf _snprintf // guh guh guh ><
 #endif
 
 #include <iostream>

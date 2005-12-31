@@ -51,7 +51,8 @@ public:
 	Agent &operator*() const { return *ref; }
 	Agent *operator->() const { return ref; }
 	bool operator!() const { return !ref; }
-	operator bool() const { return ref; }
+	/* This next line breaks builds with MSVC, tossing errors about ambiguous operators.
+	operator bool() const { return ref; } */
 	operator Agent *() const { return ref; }
 	bool operator==(const AgentRef &r) const { return r.ref == ref; }
 	bool operator==(const Agent *r) const { return r == ref; }

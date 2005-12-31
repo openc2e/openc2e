@@ -24,6 +24,7 @@
 #include <map>
 #include <fstream>
 #include "endianlove.h"
+#include <cassert>
 
 class creaturesImage {
 private:
