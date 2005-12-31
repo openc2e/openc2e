@@ -52,6 +52,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	agents_iter = world.agents.insert(++world.agents.begin(), this);
 
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
+	imsk_key_down = imsk_key_up = imsk_mouse_move = imsk_mouse_down = imsk_mouse_up = imsk_mouse_wheel = imsk_translated_char = false;
 
 	emitca_index = -1; emitca_amount = 0.0f;
 }

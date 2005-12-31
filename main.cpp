@@ -501,8 +501,38 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
-						MetaRoom *n;
-						
+						int key = backend.translateKey(event.key.keysym.sym);
+						if (key != -1) {
+							if (world.focusagent) {
+								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
+								t->handleSpecialKey(key);
+							}
+
+							caosVar k;
+							k.setInt(key);
+							for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+								if ((*i)->imsk_key_down)
+									(*i)->queueScript(73, 0, k); // key down script
+							}
+						}
+
+						if ((event.key.keysym.unicode) && ((event.key.keysym.unicode & 0xFF80) == 0) && (event.key.keysym.unicode >= 32)) {
+							key = event.key.keysym.unicode & 0x7F;
+							if (world.focusagent) {
+								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
+								t->handleKey(key);
+							}
+
+							caosVar k;
+							k.setInt(key);
+							for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+								if ((*i)->imsk_translated_char)
+									(*i)->queueScript(79, 0, k); // translated char script
+							}
+						}
+					
+					/*
+					 	MetaRoom *n;
 						switch (event.key.keysym.sym) {
 							case SDLK_PAGEDOWN:
 								if (world.camera.getMetaRoom()->id == 0)
@@ -518,37 +548,13 @@ extern "C" int main(int argc, char *argv[]) {
 								if (n)
 									world.camera.goToMetaRoom(n->id);
 								break;
-							case SDLK_BACKSPACE:
-								if (world.focusagent) {
-									TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-									t->handleKey(0);
-								}
-								break;
-							case SDLK_RETURN:
-								if (world.focusagent) {
-									TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-									t->handleKey(1);
-								}
-								break;
 							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
 								if (!world.focusagent) { showrooms = !showrooms; break; }
 							case SDLK_q:
 								if (!world.focusagent) { done = true; break; }
-							default:
-								if (event.key.keysym.unicode) {
-									if ((event.key.keysym.unicode & 0xFF80) == 0) {
-										char ch = event.key.keysym.unicode & 0x7F;
-										if (world.focusagent) {
-											// TODO: why isn't focuspart a TextEntryPart*?
-											TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-											t->handleKey(ch);
-										}
-									}
-								}
-								break;
 						}
-
-				}
+					*/
+					}
 					break;
 				case SDL_QUIT:
 					done = true;

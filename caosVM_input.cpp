@@ -19,6 +19,7 @@
 
 #include "World.h"
 #include "PointerAgent.h"
+#include "SDLBackend.h" // SDLBackend::keyDown
 #include "caosVM.h"
 #include <iostream>
 using std::cerr;
@@ -70,7 +71,7 @@ void caosVM::c_CLIK() {
  agent requires scripts to be fired for. For example, setting the "key up" flag means the 
  target agent has the relevant script executed every time a key is released.
 
- Add the following values together to calculate the flags parameter: 1 for key down, 2 for key up, 3 for mouse move, 4 for mouse down, 16 for mouse up, 32 for mouse wheel movement and 64 for (translated) keypress.
+ Add the following values together to calculate the flags parameter: 1 for key down, 2 for key up, 4 for mouse move, 8 for mouse down, 16 for mouse up, 32 for mouse wheel movement and 64 for (translated) keypress.
 
  TODO: link to the script details (event numbers and parameters).
 */
@@ -78,6 +79,13 @@ void caosVM::c_IMSK() {
 	VM_PARAM_INTEGER(flags)
 
 	caos_assert(targ);
+	targ->imsk_key_down = (flags & 1);
+	targ->imsk_key_up = (flags & 2);
+	targ->imsk_mouse_move = (flags & 4);
+	targ->imsk_mouse_down = (flags & 8);
+	targ->imsk_mouse_up = (flags & 16);
+	targ->imsk_mouse_wheel = (flags & 32);
+	targ->imsk_translated_char = (flags & 64);
 	// TODO
 }
 
@@ -94,14 +102,17 @@ void caosVM::v_IMSK() {
 
 /**
  KEYD (integer) keycode (inteer)
- %status stub
+ %status maybe
 
  Returns 1 if the specified key is held down, or 0 otherwise.
 */
 void caosVM::v_KEYD() {
-	VM_PARAM_INTEGER(keycode) // TODO: keycodes are what .. ? raw codes?
+	VM_PARAM_INTEGER(keycode) // keycodes are crazy broken windows things
 
-	result.setInt(0); // TODO
+	if (g_backend->keyDown(keycode))
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /**

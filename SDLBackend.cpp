@@ -129,3 +129,63 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int 
 	SDL_FreeSurface(surf);
 }
 
+// left out: menu, select, execute, snapshot, numeric keypad, f keys
+#define keytrans_size 25
+struct _keytrans { int sdl, windows; } keytrans[keytrans_size] = {
+	{ SDLK_BACKSPACE, 8 },
+	{ SDLK_TAB, 9 },
+	{ SDLK_CLEAR, 12 },
+	{ SDLK_RETURN, 13 },
+	{ SDLK_RSHIFT, 16 },
+	{ SDLK_LSHIFT, 16 },
+	{ SDLK_RCTRL, 17 },
+	{ SDLK_LCTRL, 17 },
+	{ SDLK_PAUSE, 19 },
+	{ SDLK_CAPSLOCK, 20 },
+	{ SDLK_ESCAPE, 27 },
+	{ SDLK_SPACE, 32 },
+	{ SDLK_PAGEUP, 33 },
+	{ SDLK_PAGEDOWN, 34 },
+	{ SDLK_END, 35 },
+	{ SDLK_HOME, 36 },
+	{ SDLK_LEFT, 37 },
+	{ SDLK_UP, 38 },
+	{ SDLK_RIGHT, 39 },
+	{ SDLK_DOWN, 40 },
+	{ SDLK_PRINT, 42 },
+	{ SDLK_INSERT, 45 },
+	{ SDLK_DELETE, 46 },
+	{ SDLK_NUMLOCK, 144 }
+};
+
+// TODO: handle f keys (112-123 under windows, SDLK_F1 = 282 under sdl)
+ 
+// TODO: this is possibly not a great idea, we should maybe maintain our own state table
+bool SDLBackend::keyDown(int key) {
+	Uint8 *keystate = SDL_GetKeyState(NULL);
+	
+	for (unsigned int i = 0; i < keytrans_size; i++) {
+		if (keytrans[i].windows == key)
+			if (keystate[keytrans[i].sdl])
+				return true;
+	}
+
+	return false;
+}
+
+int SDLBackend::translateKey(int key) {
+	if (key >= 97 && key <= 122) { // letters
+		return key - 32; // capitalise
+	}
+	if (key >= 48 && key <= 57) { // numbers
+		return key;
+	}
+
+	for (unsigned int i = 0; i < keytrans_size; i++) {
+		if (keytrans[i].sdl == key)
+			return keytrans[i].windows;
+	}
+
+	return -1;
+}
+

@@ -94,6 +94,14 @@ public:
 	bool cr_can_hit : 1;
 	bool cr_can_eat : 1;
 	bool cr_can_pickup : 1;
+	// imsk
+	bool imsk_key_down : 1;
+	bool imsk_key_up : 1;
+	bool imsk_mouse_move : 1;
+	bool imsk_mouse_down : 1;
+	bool imsk_mouse_up : 1;
+	bool imsk_mouse_wheel : 1;
+	bool imsk_translated_char : 1;
 	
 	bool visible : 1;
 

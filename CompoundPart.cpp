@@ -109,7 +109,7 @@ void TextPart::addTint(std::string tintinfo) {
 	for (unsigned int i = 0; i <= tintinfo.size(); i++) {
 		if (i == tintinfo.size() || tintinfo[i] == ' ') {
 			unsigned short val = atoi(cur.c_str());
-			if (val >= 0 && val <= 256) {
+			if (val <= 256) {
 				switch (where) {
 					case 0: r = val; break;
 					case 1: g = val; break;
@@ -175,16 +175,46 @@ void TextEntryPart::setText(std::string t) {
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
 
 void TextEntryPart::handleKey(char c) {
-	// TODO: this is dumb
-	if (c == 0) { // backspace
-		if (text.size() == 0) return;
-		text.erase(text.end() - 1);
-		caretpos--; // TODO: it's not this simple!
-	} else if (c == 1) { // return
-		parent->queueScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
-	} else {
-		text += c;
-		caretpos++; // TODO: it's not this simple!
+	text += c;
+	caretpos++;
+	recalculateData();
+}
+
+void TextEntryPart::handleSpecialKey(char c) {
+	switch (c) {
+		case 8: // backspace
+			if (text.size() == 0) return;
+			text.erase(caretpos - 1, caretpos); // TODO: broken
+			caretpos--;
+			break;
+
+		case 13: // return
+			// TODO: check if we should do this or a newline
+			parent->queueScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
+			break;
+
+		case 37: // left
+			if (caretpos == 0) return;
+			caretpos--;
+			break;
+
+		case 39: // right
+			if (caretpos == text.size()) return;
+			caretpos++;
+			break;
+
+		case 38: // up
+		case 40: // down
+			break;
+
+		case 46: // delete
+			if ((text.size() == 0) || (caretpos >= text.size()))
+				return;
+			text.erase(caretpos);
+			break;
+
+		default:
+			return;
 	}
 	recalculateData();
 }

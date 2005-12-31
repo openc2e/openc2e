@@ -175,6 +175,7 @@ public:
 	void gainFocus() { focused = true; caretpose = 0; }
 	void loseFocus() { focused = false; }
 	void handleKey(char c);
+	void handleSpecialKey(char c);
 	void tick();
 	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
 };

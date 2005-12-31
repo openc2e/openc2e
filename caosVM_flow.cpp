@@ -327,6 +327,7 @@ void caosVM::v_CAOS() {
 		s->installScripts();
 		sub->outputstream = &oss;
 		sub->runEntirely(s->installer);
+		sub->outputstream = &std::cout;
 		result.setString(oss.str());
 	} catch (caosException &e) {
 		if (!throws || catches) {
