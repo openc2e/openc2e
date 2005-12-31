@@ -370,7 +370,11 @@ void Agent::vmTick() {
 	if (!vm->timeslice) vm->timeslice = 5;
 
 	while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
-		vm->tick();
+		try {
+			vm->tick();
+		} catch (std::exception &e) {
+			// TODO: do something with this? empty the stack?
+		}
 		if (vm && vm->stopped()) {
 			world.freeVM(vm);
 			vm = NULL;

@@ -322,7 +322,6 @@ extern "C" int main(int argc, char *argv[]) {
 			caosVM vm(0);
 			script.installScripts();
 			vm.runEntirely(script.installer);
-
 		} catch (std::exception &e) {
 			std::cerr << "script exec failed due to exception " << e.what();
 			std::cerr << std::endl;

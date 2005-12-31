@@ -329,13 +329,13 @@ void caosVM::v_CAOS() {
 		sub->runEntirely(s->installer);
 		sub->outputstream = &std::cout;
 		result.setString(oss.str());
-	} catch (caosException &e) {
+	} catch (std::exception &e) {
 		if (!throws || catches) {
 			report->setString(e.what());
 			result.setString("###");
 		} else {
 			world.freeVM(sub);
-			throw e;
+			throw;
 		}
 	}
 	world.freeVM(sub);
