@@ -124,7 +124,7 @@ void World::tick() {
 
 Agent *World::agentAt(unsigned int x, unsigned int y, bool needs_activateable) {
 	// TODO: this needs to check if agents are USEFUL (ie, not background scenery etc)
-	for (std::multiset<CompoundPart *, agentzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
+	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
 		unsigned int ax = x - (*i)->getParent()->x;
 		unsigned int ay = y - (*i)->getParent()->y;
 		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (*i)->getWidth()) >= ax) if (((*i) -> y + (*i)->getHeight()) >= ay)
