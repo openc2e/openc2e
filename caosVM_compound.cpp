@@ -26,7 +26,8 @@
  PART (command) part_id (integer)
  %status maybe
  
- set the part number of the TARGed compound agent/vehicle to work on (ANIM/POSE use this, amongst other commands).
+ Sets the part number of the TARGeted compound agent or vehicle to work on (ANIM/POSE use this, 
+ amongst other commands).
 */
 void caosVM::c_PART() {
 	VM_VERIFY_SIZE(1)
@@ -44,7 +45,7 @@ void caosVM::c_PART() {
  PART (integer) part_id (integer)
  %status maybe
 
- return 1 if the given part number exists on the target agent, or 0 otherwise.
+ Returns 1 if the given part number exists on the target agent, or 0 if otherwise.
 */
 void caosVM::v_PART() {
 	VM_PARAM_INTEGER(part_id)
@@ -63,8 +64,8 @@ void caosVM::v_PART() {
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer)
  %status maybe
 
- create a new 'dull' part for the TARGed compound agent/vehicle which does nothing but display an image.
- number part ids beginning at 1. x/y/plane are relative to the agent you're working on.
+ Adds a new 'dull' part to the TARGed compound agent/vehicle which does nothing but display an image.
+ Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.
 */
 void caosVM::c_PAT_DULL() {
 	VM_VERIFY_SIZE(6)
@@ -88,11 +89,11 @@ void caosVM::c_PAT_DULL() {
  PAT: BUTT (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) hoveranim (byte-string) messageid (integer) option (integer)
  %status maybe
  
- creates a new 'button' part for the TARGed compound agent/vehicle
- number part ids beginning at 1. x/y/plane are relative to the agent you're working on.
- hoveranim is the animation to use when the part is mouseovered - see ANIM for details
- messageid is the message sent when the button is clicked - _p1_ of the message is set to the part number
- if option is 1, mouseclicks/hovers only apply to non-transparent areas. otherwise, option should be 0.
+ Adds a new 'button' part to the TARGed compound agent/vehicle.
+ Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.
+ 'hoveranim' is the animation to use when the part is mouse-overed - see ANIM for details.
+ 'messageid' is the message sent when the button is clicked - _p1_ of the message is set to the part number.
+ If option is 1, mouseclicks/hovers only apply to non-transparent areas. otherwise, option should be 0.
 */
 void caosVM::c_PAT_BUTT() {
 	VM_VERIFY_SIZE(10)
@@ -121,6 +122,10 @@ void caosVM::c_PAT_BUTT() {
 /**
  PAT: FIXD (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) fontsprite (string)
  %status maybe
+
+ Adds a new 'fixed' text part to the TARGed compound agent/vehicle,
+ Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.
+ The 'first_image' frame of the given sprite file will be used underneath the text, which is set with PTXT.
 */
 void caosVM::c_PAT_FIXD() {
 	VM_PARAM_STRING(fontsprite)
@@ -143,6 +148,11 @@ void caosVM::c_PAT_FIXD() {
 /**
  PAT: TEXT (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) message_id (integer) fontsprite (string)
  %status maybe
+
+ Adds a new text entry part to the TARGed compound agent/vehicle.
+ Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.
+ The 'first_image' frame of the given sprite file will be used underneath the text.  The part will 
+ gain the focus when FCUS is called or when it is clicked.  A message of the given type will be sent.
 */
 void caosVM::c_PAT_TEXT() {
 	VM_PARAM_STRING(fontsprite)
@@ -168,7 +178,7 @@ void caosVM::c_PAT_TEXT() {
  PAT: KILL (command) part (integer)
  %status maybe
  
- kill the specified part of the TARGed compound agent/vehicle
+ Kills the specified part of the TARGed compound agent or vehicle.
 */
 void caosVM::c_PAT_KILL() {
 	VM_VERIFY_SIZE(1)
@@ -186,8 +196,8 @@ void caosVM::c_PAT_KILL() {
  FCUS (command)
  %status maybe
 
- focus current targeted part, which must be a PAT: TEXT
- if target is null, then unfocus current part
+ Focus the current targeted part, which must be a PAT: TEXT.
+ If the target is null, then the current part will be unfocused.
 */
 void caosVM::c_FCUS() {
 	VM_VERIFY_SIZE(0)
@@ -207,7 +217,9 @@ void caosVM::c_FCUS() {
  FRMT (command) left_margin (integer) top_margin (integer) right_margin (integer) button_margin (integer) line_spacing (integer) char_spacing (integer) justification (integer)
  %status maybe
 
- alters the appearance of the target text part. the spacing values and margins are to be specified in pixels. justification can be 0 for left, 1 for right, 2 for center, 4 for bottom, 8 for middle or 16 for 'last page scroll' (TODO?), and you can add these together (except 0/1 are mutually exclusive, obviously).
+ Alters the appearance of the target text part.  The spacing values and margins are to be specified in 
+ pixels.  Justification can be 0 for left, 1 for right, 2 for center, 4 for bottom, 8 for middle or 16 
+ for 'last page scroll' (TODO?), and you can add these together (except 0/1 are mutually exclusive, obviously).
 */
 void caosVM::c_FRMT() {
 	VM_PARAM_INTEGER(justification)
@@ -241,7 +253,7 @@ void caosVM::c_FRMT() {
  PTXT (command) text (string)
  %status maybe
  
- sets the text of the current text part
+ Sets the text displayed in the current text part.
 */
 void caosVM::c_PTXT() {
 	VM_PARAM_STRING(text)
@@ -259,7 +271,7 @@ void caosVM::c_PTXT() {
  PTXT (string)
  %status maybe
 
- returns the text of the current text part
+ Returns the text displayed in the current text part.
 */
 void caosVM::v_PTXT() {
 	caos_assert(targ);
@@ -275,7 +287,8 @@ void caosVM::v_PTXT() {
  PNXT (integer) previous_part (integer)
  %status maybe
 
- returns the next part of the TARG compound agent, or the first part if you pass -1, or -1 if you're at the end
+ Returns the next part of the TARG compound agent or vehicle, (or -1 if you have reached the end, or 
+ the first part if you go past -1).
 */
 void caosVM::v_PNXT() {
 	VM_PARAM_INTEGER(previous_part)
@@ -302,7 +315,7 @@ void caosVM::v_PNXT() {
  PAGE (command) page (integer)
  %status maybe
 
- Set the zero-based page number of the current text part.
+ Sets the zero-based page number of the current text part.  This must be less than NPGS.
 */
 void caosVM::c_PAGE() {
 	VM_PARAM_INTEGER(page)

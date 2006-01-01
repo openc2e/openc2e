@@ -37,7 +37,7 @@ using std::cout;
  DBG: OUTS (command) val (string)
  %status maybe
 
- output a string to the debug log
+ Outputs a string to the debug log.
 */
 void caosVM::c_DBG_OUTS() {
 	c_OUTS();
@@ -48,7 +48,7 @@ void caosVM::c_DBG_OUTS() {
  DBG: OUTV (command) val (decimal)
  %status maybe
  
- output a decimal value to the debug log
+ Outputs a decimal value to the debug log.
 */
 void caosVM::c_DBG_OUTV() {
 	VM_VERIFY_SIZE(1)
@@ -67,8 +67,8 @@ void caosVM::c_DBG_OUTV() {
  TEST PASS (command)
  %status stub
 
- openc2e-only
- signal a single test pass
+ (openc2e-only)
+ Signals a single test pass.
 */
 void caosVM::c_TEST_PASS() {
 	VM_VERIFY_SIZE(0)
@@ -78,8 +78,8 @@ void caosVM::c_TEST_PASS() {
  TEST FAIL (command)
  %status stub
 
- openc2e-only
- signal a single test fail
+ (openc2e-only)
+ Signals a single test fail.
 */
 void caosVM::c_TEST_FAIL() {
 	VM_VERIFY_SIZE(0)
@@ -89,8 +89,8 @@ void caosVM::c_TEST_FAIL() {
  TEST INIT (command) notests (integer)
  %status stub
 
- openc2e-only
- initialise the testing system, there will be notests tests
+ (openc2e-only)
+ Initialises the testing system.  There will be 'notests' tests run.
 */
 void caosVM::c_TEST_INIT() {
 	VM_VERIFY_SIZE(1)
@@ -101,8 +101,8 @@ void caosVM::c_TEST_INIT() {
  TEST CHEK (command) comparison (comparison)
  %status stub
 
- openc2e-only
- signal a test pass if comparison is true, or a fail otherwise
+ (openc2e-only)
+ Signals a test pass if comparison is true, or a fail otherwise.
 */
 void caosVM::c_TEST_CHEK() {
 	VM_VERIFY_SIZE(0)
@@ -112,8 +112,8 @@ void caosVM::c_TEST_CHEK() {
  TEST STRT (command)
  %status stub
 
- openc2e-only
- start a single test, continuing until TEST PASS/FAIL/FINI
+ (openc2e-only)
+ Starts a single test, continuing until TEST PASS/FAIL/FINI.
 */
 void caosVM::c_TEST_STRT() {
 	VM_VERIFY_SIZE(0)
@@ -123,8 +123,8 @@ void caosVM::c_TEST_STRT() {
  TEST FINI (command)
  %status stub
 
- openc2e-only
- signal a single test fail if there has been no TEST/FAIL since last TEST STRT
+ (openc2e-only)
+ Signals a single test fail if there has been no TEST/FAIL since last TEST STRT.
 */
 void caosVM::c_TEST_FINI() {
 	VM_VERIFY_SIZE(0)
@@ -134,10 +134,10 @@ void caosVM::c_TEST_FINI() {
  UNID (integer)
  %status maybe
 
- return unique id of target agent
- this is NO GOOD for persisting!
+ Returns the unique ID of the target agent.
+ This is currently no good for persisting.
 
-XXX: when serialization support work, this might well become good for
+XXX: when serialization support works, this might well become good for
 	 persisting :)
 */
 void caosVM::v_UNID() {
@@ -150,7 +150,7 @@ void caosVM::v_UNID() {
  AGNT (agent) id (integer)
  %status maybe
 
- return agent, given input from UNID, or NULL if agent has been deleted
+ Returns the agent with the given UNID, or NULL if agent has been deleted.
 */
 void caosVM::v_AGNT() {
 	VM_VERIFY_SIZE(1)
@@ -202,7 +202,7 @@ void caosVM::c_DBG_TRACE() {
  MANN (command) cmd (string)
  %status ok
  
- Looks up documentation on cmd and spits it on the current output socket
+ Looks up documentation on the given command and spits it on the current output socket.
 */
 void caosVM::c_MANN() {
 	VM_PARAM_STRING(cmd)
@@ -231,7 +231,7 @@ void caosVM::c_MANN() {
 
  Dumps the "bytecode" of the indicated script to the current output channel.
  Note that this isn't really bytecode yet (though that's a possible future
- improvement ...)
+ improvement).
 
  If the script is not found no output will be generated.
  */
@@ -252,7 +252,7 @@ void caosVM::c_DBG_DISA() {
  %pragma parser new AssertParser()
  %status maybe
 
- Blow up unless condition is true
+ Blows up unless the given condition is true.
 */
 
 /* vim: set noet: */
