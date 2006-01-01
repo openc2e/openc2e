@@ -29,33 +29,12 @@ struct less_part : public std::binary_function<CompoundPart *, CompoundPart *, b
 	bool operator()(CompoundPart *x, CompoundPart *y) { return *x < *y; }
 };
 
-void CompoundAgent::render(SDLBackend *renderer, int xoffset, int yoffset) {
-	// todo: we're ignoring zorder here.. (it's handled by the sort in addPart)
-	for (std::vector<CompoundPart *>::iterator i = parts.begin(); i != parts.end(); i++) {
-		(*i)->render(renderer, xoffset + (int)x, yoffset + (int)y);
-	}
-
-	if (displaycore) {
-		// draw core
-		int xoff = xoffset + x;
-		int yoff = yoffset + y;
-		renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF0000CC);
-		renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
-		renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
-		renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC);
-	}
-}
-
 void CompoundAgent::addPart(CompoundPart *p) {
 	assert(!part(p->id)); // todo: handle better
 
 	// todo: we should prbly insert at the right place, not call sort
 	parts.push_back(p);
 	std::sort(parts.begin(), parts.end(), less_part());
-
-	// this is an icky hack.. for instance, it doesn't take account of negative x/y (which we don't have any way of handling right now)
-	if (p->x + (int)p->getWidth() > (int)fullwidth) fullwidth = p->x + p->getWidth();
-	if (p->y + (int)p->getHeight() > (int)fullheight) fullheight = p->y + p->getHeight();
 }
 
 void CompoundAgent::delPart(unsigned int id) {
@@ -77,12 +56,10 @@ CompoundPart *CompoundAgent::part(unsigned int id) {
 
 CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsigned short _species, unsigned int plane,
 				std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
-				Agent(_family, _genus, _species, plane), width(0), height(0) {
+				Agent(_family, _genus, _species, plane) {
 	setAttributes(0);
 	// TODO: we ignore image count acos it sucks
 	CompoundPart *p = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
-	fullwidth = width = p->getWidth();
-	fullheight = height = p->getHeight();
 	addPart(p);
 }
 

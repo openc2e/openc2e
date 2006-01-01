@@ -25,18 +25,18 @@ bool renderablezorder::operator ()(const renderable *s1, const renderable *s2) c
 }
 
 void renderable::addToWorld() {
-	zorder_iter = world.renders.insert(this);
+	renders_iter = world.renders.insert(this);
 	added = true;
 }
 
 void renderable::updateZOrder() {
-	world.renders.erase(zorder_iter);
-	zorder_iter = world.renders.insert(this);
+	world.renders.erase(renders_iter);
+	renders_iter = world.renders.insert(this);
 }
 
 renderable::~renderable() {
 	if (added)
-		world.renders.erase(zorder_iter);
+		world.renders.erase(renders_iter);
 }
 
 /* vim: set noet: */

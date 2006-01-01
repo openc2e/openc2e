@@ -22,7 +22,7 @@
 #include "Catalogue.h"
 #include "Camera.h"
 #include "Agent.h"
-#include "renderable.h"
+#include "CompoundPart.h"
 #include <set>
 #include <map>
 
@@ -48,8 +48,8 @@ public:
 	
 	Map map;
 
-	std::multiset<Agent *, agentzorder> zorder;
-	std::multiset<renderable *, renderablezorder> renders;
+	std::multiset<CompoundPart *, partzorder> zorder; // sorted from top to bottom
+	std::multiset<renderable *, renderablezorder> renders; // sorted from bottom to top
 	std::list<Agent *> agents;
 	
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;

@@ -30,10 +30,6 @@ class CompoundAgent : public Agent {
 protected:
 	std::vector<CompoundPart *> parts;
 
-	// TODO: see note below
-	unsigned int width, height;
-	unsigned int fullwidth, fullheight; // getCheckXXX hack, see Agent.h
-
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 								std::string spritefile, unsigned int firstimage, unsigned int imagecount);
@@ -46,12 +42,8 @@ public:
 	virtual void tick();
 	virtual unsigned int getWidth() { return part(0)->getWidth(); }
 	virtual unsigned int getHeight() { return part(0)->getHeight(); }
-	virtual unsigned int getCheckWidth() { return fullwidth; }
-	virtual unsigned int getCheckHeight() { return fullheight; }
 	void handleClick(float, float);
 	void setZOrder(unsigned int plane);
-
-	virtual void render(SDLBackend *renderer, int xoffset, int yoffset);
 
 	friend class caosVM;
 };

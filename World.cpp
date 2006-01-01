@@ -123,19 +123,17 @@ void World::tick() {
 }
 
 Agent *World::agentAt(unsigned int x, unsigned int y, bool needs_activateable) {
-	Agent *temp = 0;
-
-	// we're looking for the *last* agent in the set which is at this location (ie, topmost)
 	// TODO: this needs to check if agents are USEFUL (ie, not background scenery etc)
-	// TODO: we might well need to do more checking on compound agents
-	for (std::multiset<Agent *, agentzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
-		if ((*i)->x <= x) if ((*i)->y <= y) if (((*i) -> x + (*i)->getCheckWidth()) >= x) if (((*i) -> y + (*i)->getCheckHeight()) >= y)
-			if ((*i) != theHand)
-				if ((!needs_activateable) || (*i)->activateable)
-					temp = *i;
+	for (std::multiset<CompoundPart *, agentzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
+		unsigned int ax = x - (*i)->getParent()->x;
+		unsigned int ay = y - (*i)->getParent()->y;
+		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (*i)->getWidth()) >= ax) if (((*i) -> y + (*i)->getHeight()) >= ay)
+			if ((*i)->getParent() != theHand)
+				if ((!needs_activateable) || (*i)->getParent()->activateable)
+					return (*i)->getParent();
 	}
 	
-	return temp;
+	return 0;
 }
 
 int World::getUNID(Agent *whofor) {

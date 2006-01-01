@@ -29,12 +29,12 @@ struct renderablezorder {
 class renderable {
 protected:
 	bool added;
-	std::multiset<renderable *, renderablezorder>::iterator zorder_iter;
+	std::multiset<renderable *, renderablezorder>::iterator renders_iter;
 		
 public:
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	virtual unsigned int getZOrder() const = 0;
-	void updateZOrder();
+	virtual void updateZOrder();
 	void addToWorld();
 	renderable() { added = false; }
 	virtual ~renderable();

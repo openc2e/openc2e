@@ -32,7 +32,7 @@ private:
 
 public:
 	SkeletalCreature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant, unsigned int s, unsigned int b, lifestage t);
-	void render(SDLBackend *renderer, int xoffset, int yoffset);
+	//void render(SDLBackend *renderer, int xoffset, int yoffset);
 	void recalculateSkeleton();
 	unsigned int getPose(unsigned int i) { return pose[i]; }
 	void setPose(unsigned int p);

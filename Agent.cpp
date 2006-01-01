@@ -48,7 +48,6 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 
 	floatingx = floatingy = 0;
 
-	zorder_iter = world.zorder.insert(this);
 	agents_iter = world.agents.insert(++world.agents.begin(), this);
 
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
@@ -394,7 +393,6 @@ void Agent::vmTick() {
 
 Agent::~Agent() {
 	world.agents.erase(agents_iter);
-	world.zorder.erase(zorder_iter);
 	if (vm)
 		world.freeVM(vm);
 	zotstack();
@@ -423,9 +421,7 @@ void Agent::zotrefs() {
 
 void Agent::setZOrder(unsigned int z) {
 	if (dying) return;
-	world.zorder.erase(zorder_iter);
 	zorder = z;
-	zorder_iter = world.zorder.insert(this);
 }
 
 int Agent::getUNID() {

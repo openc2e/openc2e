@@ -87,7 +87,7 @@ SkeletalCreature::SkeletalCreature(genomeFile *g, unsigned char _family, bool is
 	setPose(0);
 }
 
-void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
+/*void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	for (int j = 0; j < 14; j++) {
 		int i = cee_zorder[direction][j];
 
@@ -103,7 +103,7 @@ void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
 
 		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset + x, party[i] + adjusty + yoffset + y, false, 0);
 	}
-}
+}*/
 
 void SkeletalCreature::recalculateSkeleton() {
 	int lowestx = 0, lowesty = 0, highestx = 0, highesty = 0;

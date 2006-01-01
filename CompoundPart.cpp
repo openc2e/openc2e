@@ -1,5 +1,5 @@
 /*
- *  CompoundAgent.cpp
+ *  CompoundPart.cpp
  *  openc2e
  *
  *  Created by Alyssa Milburn on Tue May 25 2004.
@@ -18,10 +18,14 @@
  */
 
 #include "CompoundPart.h"
-#include "openc2e.h"
+#include "World.h"
 #include "c16Image.h"
 #include "SDLBackend.h"
 #include "CompoundAgent.h"
+
+bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
+	return s1->getZOrder() > s2->getZOrder();
+}
 
 creaturesImage *TextEntryPart::caretsprite = 0;
 
@@ -60,15 +64,23 @@ CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string sprit
 	framedelay = 0;
 	parent = p;
 	addToWorld();
+	zorder_iter = world.zorder.insert(this);
 }
 
 CompoundPart::~CompoundPart() {
 	gallery.delImage(origsprite);
 	if (origsprite != sprite) delete sprite;
+	world.zorder.erase(zorder_iter);
 }
 
 unsigned int CompoundPart::getZOrder() const {
 	return parent->getZOrder() + zorder;
+}
+
+void CompoundPart::updateZOrder() {
+	renderable::updateZOrder();
+	world.zorder.erase(zorder_iter);
+	zorder_iter = world.zorder.insert(this);	
 }
 
 void CompoundPart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
