@@ -26,7 +26,6 @@ bool renderablezorder::operator ()(const renderable *s1, const renderable *s2) c
 
 void renderable::addToWorld() {
 	renders_iter = world.renders.insert(this);
-	added = true;
 }
 
 void renderable::updateZOrder() {
@@ -35,8 +34,7 @@ void renderable::updateZOrder() {
 }
 
 renderable::~renderable() {
-	if (added)
-		world.renders.erase(renders_iter);
+	world.renders.erase(renders_iter);
 }
 
 /* vim: set noet: */

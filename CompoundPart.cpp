@@ -49,12 +49,12 @@ void CompoundPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
 }
 
 CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
-						int _x, int _y, unsigned int _z) {
+						int _x, int _y, unsigned int _z) : zorder(_z), parent(p) {
+	addToWorld();
 	id = _id;
 	firstimg = fimg;
 	x = _x;
 	y = _y;
-	zorder = _z;
 	origsprite = sprite = gallery.getImage(spritefile);
 	caos_assert(sprite);
 	pose = 0;
@@ -62,8 +62,6 @@ CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string sprit
 	is_transparent = false;
 	framerate = 1;
 	framedelay = 0;
-	parent = p;
-	addToWorld();
 	zorder_iter = world.zorder.insert(this);
 }
 

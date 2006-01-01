@@ -28,7 +28,6 @@ struct renderablezorder {
 
 class renderable {
 protected:
-	bool added;
 	std::multiset<renderable *, renderablezorder>::iterator renders_iter;
 		
 public:
@@ -36,7 +35,6 @@ public:
 	virtual unsigned int getZOrder() const = 0;
 	virtual void updateZOrder();
 	void addToWorld();
-	renderable() { added = false; }
 	virtual ~renderable();
 };
 
