@@ -37,7 +37,7 @@ void caosVM::c_SNDE() {
 
 	caos_assert(targ);
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = g_backend->getAudioSlot(filename);
+	SoundSlot *s = world.backend.getAudioSlot(filename);
 	if (s) {
 		s->play();
 		targ->positionAudio(s);
@@ -56,7 +56,7 @@ void caosVM::c_SNDC() {
 	if (targ->soundslot)
 		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = g_backend->getAudioSlot(filename);
+	SoundSlot *s = world.backend.getAudioSlot(filename);
 	if (s) {
 		targ->soundslot = s;
 		s->play();
@@ -77,7 +77,7 @@ void caosVM::c_SNDL() {
 	if (targ->soundslot)
 		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = g_backend->getAudioSlot(filename);
+	SoundSlot *s = world.backend.getAudioSlot(filename);
 	if (s) {
 		targ->soundslot = s;
 		s->playLooped();

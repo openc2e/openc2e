@@ -139,6 +139,7 @@ public:
 	virtual unsigned int getCheckHeight() { return getHeight(); }
 
 	virtual void tick();
+	void physicsTick();
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	virtual void kill();
 	void stopScript();

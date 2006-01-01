@@ -21,101 +21,12 @@
 #include "SDLBackend.h"
 #include "dialect.h"
 
-#include "SDL_gfxPrimitives.h" // remove once code is moved to SDLBackend
 #include <SDL_net.h>
 
 #ifdef _MSC_VER
 #define snprintf _snprintf // guh guh guh ><
 #undef main // because SDL is stupid
 #endif
-
-SDLBackend backend;
-
-SDL_Surface **backsurfs[20]; // todo: grab metaroom count, don't arbitarily define 20
-bool showrooms = false, paused = false;
-
-void drawWorld() {
-	MetaRoom *m = world.camera.getMetaRoom();
-	if (!m) {
-		// Whoops - the room we're in vanished, or maybe we were never in one?
-		// Try to get a new one ...
-		m = world.map.getFallbackMetaroom();
-		if (!m) {
-			std::cerr << "ERROR: No metarooms! Panicing ..." << std::endl;
-			abort();
-		}
-		world.camera.goToMetaRoom(m->id);
-	}
-	int adjustx = world.camera.getX();
-	int adjusty = world.camera.getY();
-	blkImage *test = m->backImage();
-
-	// draw the blk
-	for (unsigned int i = 0; i < (test->totalheight / 128); i++) {
-		for (unsigned int j = 0; j < (test->totalwidth / 128); j++) {
-			// figure out which block number to use
-			unsigned int whereweare = j * (test->totalheight / 128) + i;
-			
-			SDL_Rect destrect;
-			destrect.x = (j * 128) - adjustx + m->x();
-			destrect.y = (i * 128) - adjusty + m->y();
-
-			// if the block's on screen, blit it.
-			if ((destrect.x >= -128) && (destrect.y >= -128) &&
-					(destrect.x - 128 <= backend.getWidth()) &&
-					(destrect.y - 128 <= backend.getHeight()))
-				SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
-		}
-	}
-
-	// render all the agents
-	for (std::multiset<renderable *, renderablezorder>::iterator i = world.renders.begin(); i != world.renders.end(); i++) {
-		(*i)->render(&backend, -adjustx, -adjusty);
-	}
-
-	if (showrooms) {
-		Room *r = world.map.roomAt(world.hand()->x, world.hand()->y);
-		for (std::vector<Room *>::iterator i = world.camera.getMetaRoom()->rooms.begin();
-				 i != world.camera.getMetaRoom()->rooms.end(); i++) {
-			unsigned int col = 0xFFFF00CC;
-			if (*i == r) col = 0xFF00FFCC;
-			else if (r) {
-				if ((**i).doors[r])
-					col = 0x00FFFFCC;
-			}
-			// ceiling
-			aalineColor(backend.screen,
-					(**i).x_left - adjustx,
-					(**i).y_left_ceiling - adjusty,
-					(**i).x_right - adjustx,
-					(**i).y_right_ceiling - adjusty,
-					col);
-			// floor
-			aalineColor(backend.screen, 
-					(**i).x_left - adjustx, 
-					(**i).y_left_floor - adjusty,
-					(**i).x_right - adjustx,
-					(**i).y_right_floor - adjusty,
-					col);
-			// left side
-			aalineColor(backend.screen,
-					(**i).x_left - adjustx,
-					(**i).y_left_ceiling - adjusty,
-					(**i).x_left - adjustx,
-					(**i).y_left_floor - adjusty,
-					col);
-			// right side
-			aalineColor(backend.screen,
-					(**i).x_right  - adjustx,
-					(**i).y_right_ceiling - adjusty,
-					(**i).x_right - adjustx,
-					(**i).y_right_floor - adjusty,
-					col);
-		}
-	}
-	//SDL_UpdateRect(backend.screen, 0, 0, 0, 0);
-	SDL_Flip(backend.screen);
-}
 
 namespace fs = boost::filesystem;
 extern fs::path homeDirectory(); // creaturesImage.cpp
@@ -192,7 +103,6 @@ static void opt_version() {
 		"...please don't sue us." << std::endl;
 }
 
-std::string datapath;
 extern "C" int main(int argc, char *argv[]) {
 	try {
 		
@@ -265,20 +175,20 @@ extern "C" int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	datapath = data;
+	world.datapath = data;
 	
-	fs::path datadir(datapath, fs::native);
+	fs::path datadir(world.datapath, fs::native);
 	if (!fs::exists(datadir)) {
-		std::cerr << "data path '" << datapath << "' doesn't exist, try --help" << std::endl;
+		std::cerr << "data path '" << world.datapath << "' doesn't exist, try --help" << std::endl;
 		return 1;
 	}
 	
 	registerDelegates();
 	world.init();
-	world.catalogue.initFrom(fs::path(datapath + "/Catalogue/", fs::native));
+	world.catalogue.initFrom(fs::path(world.datapath + "/Catalogue/", fs::native));
 	// moved backend.init() here because we need the camera to be valid - fuzzie
-	backend.init(enable_sound);
-	world.camera.setBackend(&backend);
+	world.backend.init(enable_sound);
+	world.camera.setBackend(&world.backend); // TODO: hrr
 
 	std::vector<std::string> scripts;
 	fs::path scriptdir(bootstrap, fs::native);
@@ -367,19 +277,19 @@ extern "C" int main(int argc, char *argv[]) {
 		blkImage *test = m->backImage();
 		assert(test != 0);
 
-		backsurfs[m->id] = new SDL_Surface *[test->numframes()];
+		world.backsurfs[m->id] = new SDL_Surface *[test->numframes()];
 		for (unsigned int i = 0; i < test->numframes(); i++) {
-			backsurfs[m->id][i] = SDL_CreateRGBSurfaceFrom(test->data(i),
+			world.backsurfs[m->id][i] = SDL_CreateRGBSurfaceFrom(test->data(i),
 														   test->width(i),
 														   test->height(i),
 														   16, // depth
 														   test->width(i) * 2, // pitch
 														   0xF800, 0x07E0, 0x001F, 0); // RGBA mask
-			assert(backsurfs[m->id][i] != 0);
+			assert(world.backsurfs[m->id][i] != 0);
 		}
 	}
 
-	drawWorld();
+	world.drawWorld();
 
 	SDL_EnableUNICODE(1); // bz2 and I both think this is the only way to get useful ascii out of SDL
 
@@ -395,15 +305,15 @@ extern "C" int main(int argc, char *argv[]) {
 		 we calculate PACE below, but it's inaccurate because drawWorld(), our biggest cpu consumer, isn't in the loop
 		 this is because it makes the game seem terribly unresponsive..
 		*/
-		if (!paused && (backend.ticks() > (tickdata + world.ticktime))) {
-			tickdata = backend.ticks();
+		if (!world.paused && (world.backend.ticks() > (tickdata + world.ticktime))) {
+			tickdata = world.backend.ticks();
 			
 			world.tick();
 			if (handAgent) // TODO: do this in world.tick()
 				handAgent->moveTo(world.hand()->x + 2, world.hand()->y + 2);
-			drawWorld();
+			world.drawWorld();
 			
-			ticktime[ticktimeptr] = backend.ticks() - tickdata;
+			ticktime[ticktimeptr] = world.backend.ticks() - tickdata;
 			ticktimeptr++;
 			if (ticktimeptr == 10) ticktimeptr = 0;
 			float avgtime = 0;
@@ -456,7 +366,7 @@ extern "C" int main(int argc, char *argv[]) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:
-					backend.resizeNotify(event.resize.w, event.resize.h);
+					world.backend.resizeNotify(event.resize.w, event.resize.h);
 					for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 						(*i)->queueScript(123, 0); // window resized script
 					}
@@ -500,7 +410,7 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
-						int key = backend.translateKey(event.key.keysym.sym);
+						int key = world.backend.translateKey(event.key.keysym.sym);
 						if (key != -1) {
 							if (world.focusagent) {
 								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
@@ -596,17 +506,17 @@ extern "C" int main(int argc, char *argv[]) {
 			
 			if ((adjustx + adjustbyx) < (int)world.camera.getMetaRoom()->x())
 				adjustbyx = world.camera.getMetaRoom()->x() - adjustx;
-			else if ((adjustx + adjustbyx + backend.getWidth()) >
+			else if ((adjustx + adjustbyx + world.camera.getWidth()) >
 					(world.camera.getMetaRoom()->x() + world.camera.getMetaRoom()->width()))
 				adjustbyx = world.camera.getMetaRoom()->x() + 
-					world.camera.getMetaRoom()->width() - backend.getWidth() - adjustx;
+					world.camera.getMetaRoom()->width() - world.camera.getWidth() - adjustx;
 			
 			if ((adjusty + adjustbyy) < (int)world.camera.getMetaRoom()->y())
 				adjustbyy = world.camera.getMetaRoom()->y() - adjusty;
-			else if ((adjusty + adjustbyy + backend.getHeight()) > 
+			else if ((adjusty + adjustbyy + world.camera.getHeight()) > 
 					(world.camera.getMetaRoom()->y() + world.camera.getMetaRoom()->height()))
 				adjustbyy = world.camera.getMetaRoom()->y() + 
-					world.camera.getMetaRoom()->height() - backend.getHeight() - adjusty;
+					world.camera.getMetaRoom()->height() - world.camera.getHeight() - adjusty;
 			
 			world.hand()->moveTo(world.hand()->x + adjustbyx, world.hand()->y + adjustbyy);
 			world.camera.moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);

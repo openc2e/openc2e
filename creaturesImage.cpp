@@ -21,6 +21,7 @@
 #include "c16Image.h"
 #include "blkImage.h"
 #include "openc2e.h"
+#include "World.h"
 #include "fileSwapper.h"
 
 #ifndef _WIN32
@@ -87,11 +88,11 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 	// work out where the real file should be
 	switch (ft) {
 		case blk:
-			realfile = path(datapath + "/Backgrounds/" + fname, native); break;
+			realfile = path(world.datapath + "/Backgrounds/" + fname, native); break;
 
 		case c16:
 		case s16:
-			realfile = path(datapath + "/Images/" + fname, native); break;
+			realfile = path(world.datapath + "/Images/" + fname, native); break;
 	}
 
 	// if it doesn't exist, too bad, give up.

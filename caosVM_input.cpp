@@ -19,7 +19,6 @@
 
 #include "World.h"
 #include "PointerAgent.h"
-#include "SDLBackend.h" // SDLBackend::keyDown
 #include "caosVM.h"
 #include <iostream>
 using std::cerr;
@@ -109,7 +108,7 @@ void caosVM::v_IMSK() {
 void caosVM::v_KEYD() {
 	VM_PARAM_INTEGER(keycode) // keycodes are crazy broken windows things
 
-	if (g_backend->keyDown(keycode))
+	if (world.backend.keyDown(keycode))
 		result.setInt(1);
 	else
 		result.setInt(0);

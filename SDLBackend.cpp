@@ -21,6 +21,7 @@
 #include "SDL_gfxPrimitives.h"
 #include "openc2e.h"
 #include "Agent.h"
+#include "World.h"
 
 SDLBackend *g_backend;
 
@@ -100,7 +101,7 @@ SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
 	if (it != soundcache.end()) {
 		sounddata[i].sound = (*it).second;
 	} else {
-		std::string fname = datapath + "/Sounds/" + filename + ".wav"; // TODO: case sensitivity stuff
+		std::string fname = world.datapath + "/Sounds/" + filename + ".wav"; // TODO: case sensitivity stuff
 		//std::cout << "trying to load " << fname << std::endl;
 		sounddata[i].sound = Mix_LoadWAV(fname.c_str());
 		if (!sounddata[i].sound) return 0; // TODO: spout error

@@ -156,4 +156,88 @@ Agent *World::lookupUNID(int unid) {
 	return unidmap[unid];
 }
 
+void World::drawWorld() {
+	MetaRoom *m = camera.getMetaRoom();
+	if (!m) {
+		// Whoops - the room we're in vanished, or maybe we were never in one?
+		// Try to get a new one ...
+		m = map.getFallbackMetaroom();
+		if (!m) {
+			std::cerr << "ERROR: No metarooms! Panicing ..." << std::endl;
+			abort();
+		}
+		camera.goToMetaRoom(m->id);
+	}
+	int adjustx = camera.getX();
+	int adjusty = camera.getY();
+	blkImage *test = m->backImage();
+
+	// draw the blk
+	for (unsigned int i = 0; i < (test->totalheight / 128); i++) {
+		for (unsigned int j = 0; j < (test->totalwidth / 128); j++) {
+			// figure out which block number to use
+			unsigned int whereweare = j * (test->totalheight / 128) + i;
+			
+			SDL_Rect destrect;
+			destrect.x = (j * 128) - adjustx + m->x();
+			destrect.y = (i * 128) - adjusty + m->y();
+
+			// if the block's on screen, blit it.
+			if ((destrect.x >= -128) && (destrect.y >= -128) &&
+					(destrect.x - 128 <= backend.getWidth()) &&
+					(destrect.y - 128 <= backend.getHeight()))
+				SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
+		}
+	}
+
+	// render all the agents
+	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
+		(*i)->render(&backend, -adjustx, -adjusty);
+	}
+
+	if (showrooms) {
+		Room *r = map.roomAt(hand()->x, hand()->y);
+		for (std::vector<Room *>::iterator i = camera.getMetaRoom()->rooms.begin();
+				 i != camera.getMetaRoom()->rooms.end(); i++) {
+			unsigned int col = 0xFFFF00CC;
+			if (*i == r) col = 0xFF00FFCC;
+			else if (r) {
+				if ((**i).doors[r])
+					col = 0x00FFFFCC;
+			}
+			// ceiling
+			backend.renderLine(
+					(**i).x_left - adjustx,
+					(**i).y_left_ceiling - adjusty,
+					(**i).x_right - adjustx,
+					(**i).y_right_ceiling - adjusty,
+					col);
+			// floor
+			backend.renderLine(
+					(**i).x_left - adjustx, 
+					(**i).y_left_floor - adjusty,
+					(**i).x_right - adjustx,
+					(**i).y_right_floor - adjusty,
+					col);
+			// left side
+			backend.renderLine(
+					(**i).x_left - adjustx,
+					(**i).y_left_ceiling - adjusty,
+					(**i).x_left - adjustx,
+					(**i).y_left_floor - adjusty,
+					col);
+			// right side
+			backend.renderLine(
+					(**i).x_right  - adjustx,
+					(**i).y_right_ceiling - adjusty,
+					(**i).x_right - adjustx,
+					(**i).y_right_floor - adjusty,
+					col);
+		}
+	}
+
+	SDL_Flip(backend.screen);
+}
+
+
 /* vim: set noet: */

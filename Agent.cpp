@@ -125,21 +125,7 @@ void Agent::positionAudio(SoundSlot *slot) {
 	slot->adjustPanning(angle, distance);
 }
 
-void Agent::tick() {
-	if (dying) return;
-
-	if (emitca_index != -1 && emitca_amount != 0.0f) {
-		assert(0 <= emitca_index && emitca_index <= 19);
-		Room *r = world.map.roomAt(x, y);
-		if (r) {
-			r->ca[emitca_index] += emitca_amount;
-			if (r->ca[emitca_index] <= 0.0f) r->ca[emitca_index] = 0.0f;
-			else if (r->ca[emitca_index] >= 1.0f) r->ca[emitca_index] = 1.0f;
-		}
-	}
-
-	if (soundslot) positionAudio(soundslot);
-
+void Agent::physicsTick() {
 	falling = false;
 	if (sufferphysics) {
 		float newvely = vely.floatValue + accg;
@@ -352,6 +338,24 @@ void Agent::tick() {
 			y = world.camera.getY() + floatingy;
 		}
 	}
+}
+
+void Agent::tick() {
+	if (dying) return;
+
+	if (emitca_index != -1 && emitca_amount != 0.0f) {
+		assert(0 <= emitca_index && emitca_index <= 19);
+		Room *r = world.map.roomAt(x, y);
+		if (r) {
+			r->ca[emitca_index] += emitca_amount;
+			if (r->ca[emitca_index] <= 0.0f) r->ca[emitca_index] = 0.0f;
+			else if (r->ca[emitca_index] >= 1.0f) r->ca[emitca_index] = 1.0f;
+		}
+	}
+
+	if (soundslot) positionAudio(soundslot);
+
+	physicsTick();
 
 	if (timerrate) {
 		tickssincelasttimer++;

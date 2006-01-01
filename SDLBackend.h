@@ -26,8 +26,6 @@
 #include "endianlove.h"
 #include <map>
 
-extern class SDLBackend *g_backend; // global hack, for now
-
 struct SoundSlot {
 	int soundchannel;
 	Mix_Chunk *sound;
@@ -56,7 +54,7 @@ public:
 	SDL_Surface *screen;
 	
 public:
-	SDLBackend() { g_backend = this; }
+	SDLBackend() { }
 	unsigned int ticks() { return SDL_GetTicks(); }
 	void init(bool enable_sound);
 	void resizeNotify(int _w, int _h);

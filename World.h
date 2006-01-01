@@ -44,8 +44,7 @@ protected:
 	std::vector<scriptevent> scriptqueue;
 
 public:
-
-	bool quitting, saving;
+	bool quitting, saving, paused;
 	
 	Map map;
 
@@ -62,9 +61,13 @@ public:
 	
 	Scriptorium scriptorium;
 	Catalogue catalogue;
+	std::string datapath;
 	float pace;
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
+	SDLBackend backend;
+	bool showrooms;
+	SDL_Surface **backsurfs[20]; // TODO: this is a horrible horrible icky hack
 
 	AgentRef focusagent; unsigned int focuspart;
 	void setFocus(class CompoundAgent *a, class TextEntryPart *p);
@@ -80,6 +83,7 @@ public:
 	void init();
 
 	void tick();
+	void drawWorld();
 
 	int World::getUNID(Agent *whofor);
 	void World::freeUNID(int unid);
