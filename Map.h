@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef _OPENC2E_MAP_H
+#define _OPENC2E_MAP_H
+
 #include "MetaRoom.h"
 #include <vector>
 
@@ -57,4 +60,6 @@ public:
 	MetaRoom *metaRoomAt(unsigned int, unsigned int);
 	Room *roomAt(unsigned int, unsigned int);
 };
+
+#endif
 /* vim: set noet: */
