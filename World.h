@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef _WORLD_H
+#define _WORLD_H
+
 #include "Map.h"
 #include "Scriptorium.h"
 #include "Catalogue.h"
@@ -92,4 +95,5 @@ public:
 };
 
 extern World world;
+#endif
 /* vim: set noet: */

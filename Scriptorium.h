@@ -7,6 +7,9 @@
  *
  */
 
+#ifndef _SCRIPTORIUM_H
+#define _SCRIPTORIUM_H
+
 #include "caosScript.h"
 #include <map>
 
@@ -24,4 +27,6 @@ public:
 	void delScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event);
 	shared_ptr<script> getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event);
 };
+
+#endif
 /* vim: set noet: */

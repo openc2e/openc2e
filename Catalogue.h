@@ -1,3 +1,6 @@
+#ifndef _CATALOGUE_H
+#define _CATALOGUE_H
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -37,4 +40,5 @@ public:
 
 char catalogue_descape(char c);
 
+#endif
 /* vim: set noet: */
