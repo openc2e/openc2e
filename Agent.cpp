@@ -206,6 +206,8 @@ void Agent::physicsTick() {
 			Room *room[4];
 			Room *oroom[4];
 			for (unsigned int i = 0; i < 4; i++) room[i] = 0;
+
+			if (accg) falling = true;
 			
 			while (ix != idestx || iy != idesty) {
 				// We just alternate here. There's probably a more
@@ -216,7 +218,6 @@ void Agent::physicsTick() {
 				if (iy != idesty) {
 					movedy = true;
 					iy += dy;
-					if (dy == 1) falling = true;
 				}
 	
 				if (ix != idestx) {
