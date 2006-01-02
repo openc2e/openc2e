@@ -582,7 +582,7 @@ void caosVM::c_MESG_WRT() {
 	VM_PARAM_VALIDAGENT(agent)
 
 	// I'm not sure how to handle the 'delay'; is it a background delay, or do we actually block for delay ticks?
-	if (delay != 0) return; // TODO: fuzzie can't work out how on earth this works in c2e, someone fixit
+	// TODO: fuzzie can't work out how on earth delays work in c2e, someone fixit
 
 	agent->queueScript(calculateScriptId(message_id), owner.get(), param_1, param_2);
 }

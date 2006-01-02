@@ -99,7 +99,7 @@ void World::tick() {
 	}
 	
 	// Process the script queue.
-	for (std::vector<scriptevent>::iterator i = scriptqueue.begin(); i != scriptqueue.end(); i++) {
+	for (std::list<scriptevent>::iterator i = scriptqueue.begin(); i != scriptqueue.end(); i++) {
 		if (i->agent && i->agent->fireScript(i->scriptno, i->from)) {
 			assert(i->agent->vm);
 			i->agent->vm->setVariables(i->p[0], i->p[1]);

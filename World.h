@@ -44,7 +44,7 @@ struct scriptevent {
 class World {
 protected:
 	class PointerAgent *theHand;
-	std::vector<scriptevent> scriptqueue;
+	std::list<scriptevent> scriptqueue;
 
 public:
 	bool quitting, saving, paused;
