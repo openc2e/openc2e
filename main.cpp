@@ -518,7 +518,6 @@ extern "C" int main(int argc, char *argv[]) {
 				adjustbyy = world.camera.getMetaRoom()->y() + 
 					world.camera.getMetaRoom()->height() - world.camera.getHeight() - adjusty;
 			
-			world.hand()->moveTo(world.hand()->x + adjustbyx, world.hand()->y + adjustbyy);
 			world.camera.moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
 		}
 		} // ticked

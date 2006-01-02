@@ -27,6 +27,10 @@
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, UINT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = false;
+
+	// float relative to main camera
+	floatable = true;
+	floatSetup();
 }
 
 // TODO: this should have a queueScript equiv too
