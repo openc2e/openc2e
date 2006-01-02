@@ -249,6 +249,7 @@ public:
 	void v_CATX();
 	void v_WILD();
 	void v_NAME();
+	void v_MAME();
 	void v_SUBS();
 	void v_STOI();
 	void v_STOF();
@@ -388,6 +389,8 @@ public:
 	void c_MVBY();
 	void c_FLTO();
 	void c_FREL();
+	void v_FLTX();
+	void v_FLTY();
 	
 	// scripts
 	void c_INST();
@@ -412,6 +415,7 @@ public:
 	void c_PAT_FIXD();
 	void c_PAT_TEXT();
 	void c_PAT_KILL();
+	void c_PAT_MOVE();
 	void c_FCUS();
 	void c_FRMT();
 	void c_PTXT();

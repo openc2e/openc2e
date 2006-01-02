@@ -188,8 +188,30 @@ void caosVM::c_PAT_KILL() {
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
+	caos_assert(a->part(part));
 	
 	a->delPart(part);
+}
+
+/**
+ PAT: MOVE (command) part (integer) x (float) y (float)
+ %status maybe
+
+ move the compound part specified to the new relative position specified
+*/
+void caosVM::c_PAT_MOVE() {
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+	VM_PARAM_INTEGER(part)
+
+	caos_assert(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);
+	CompoundPart *p = a->part(part);
+	caos_assert(p);
+
+	p->x = x;
+	p->y = y;
 }
 
 /**

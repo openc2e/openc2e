@@ -704,6 +704,17 @@ void caosVM::v_NAME() {
 }
 
 /**
+ MAME (variable) name (anything)
+ %status maybe
+*/
+void caosVM::v_MAME() {
+	VM_PARAM_VALUE(name)
+
+	caos_assert(owner);
+	valueStack.push_back(&owner->name_variables[name]);
+}
+
+/**
  SUBS (string) value (string) start (integer) count (integer)
  %status maybe
 

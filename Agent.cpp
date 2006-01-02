@@ -46,10 +46,9 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	soundslot = 0;
 	displaycore = false;
 
-	floatingx = floatingy = 0;
-
 	agents_iter = world.agents.insert(++world.agents.begin(), this);
 
+	floatable = false; setAttributes(0);
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
 	imsk_key_down = imsk_key_up = imsk_mouse_move = imsk_mouse_down = imsk_mouse_up = imsk_mouse_wheel = imsk_translated_char = false;
 
@@ -63,9 +62,58 @@ void Agent::zotstack() {
 	vmstack.clear();
 }
 
-
 void Agent::moveTo(float _x, float _y) {
+	float xoffset = _x - x;
+	float yoffset = _y - y;		
+	
 	x = _x; y = _y;
+
+	for (std::vector<AgentRef>::iterator i = floated.begin(); i != floated.end(); i++) {
+		assert(*i);
+		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
+	}
+}
+
+void Agent::floatTo(AgentRef a) {
+	if (floatable) floatRelease();
+	floatingagent = a;
+	if (floatable) floatSetup();
+}
+
+void Agent::floatTo(float x, float y) {
+	if (floatingagent) {
+		moveTo(floatingagent->x + x, floatingagent->y + y);
+	} else {
+		moveTo(world.camera.getX() + x, world.camera.getY() + y);
+	}
+}
+
+void Agent::floatSetup() {
+	if (floatingagent)
+		floatingagent->addFloated(this);
+	else
+		world.camera.addFloated(this);
+}
+
+void Agent::floatRelease() {
+	if (floatingagent) {
+		floatingagent->delFloated(this);
+	} else
+		world.camera.delFloated(this);
+}
+
+void Agent::addFloated(AgentRef a) {
+	assert(a);
+	assert(a != floatingagent); // loops are bad, mmkay
+	floated.push_back(a);
+}
+
+void Agent::delFloated(AgentRef a) {
+	assert(a);
+	std::vector<AgentRef>::iterator i = std::find(floated.begin(), floated.end(), a);
+	//if (i == floated.end()) return;
+	assert(i != floated.end());
+	floated.erase(i);
 }
 
 shared_ptr<script> Agent::findScript(unsigned short event) {
@@ -313,29 +361,14 @@ void Agent::physicsTick() {
 				}
 			}
 		}
-	} else if (!floatable) {
+	} else {
+		float newx = x, newy = y;
 		if (vely.hasDecimal())
-			y = y + vely.getFloat();
+			newy = y + vely.getFloat();
 		if (velx.hasDecimal())
-			x = x + velx.getFloat();
-	} else { // handle floating..
-		if (vely.hasDecimal())
-			floatingy = floatingy + vely.getFloat();
-		if (velx.hasDecimal())
-			floatingx = floatingx + velx.getFloat();
-	}
-
-	if (floatable) {
-		// TODO: should probably be done at the end of the tick after all agents have been repositioned
-		// (or be a child of the parent agent, so it always gets set after it)
-		
-		if (floatingagent) {
-			x = floatingagent->x + floatingx;
-			y = floatingagent->y + floatingy;
-		} else {
-			x = world.camera.getX() + floatingx;
-			y = world.camera.getY() + floatingy;
-		}
+			newx = x + velx.getFloat();
+		if (vely.hasDecimal() || velx.hasDecimal())
+			moveTo(newx, newy);
 	}
 }
 
@@ -401,6 +434,7 @@ Agent::~Agent() {
 
 void Agent::kill() {
 	assert(!dying);
+	if (floatable) floatRelease();
 	dying = true; // what a world, what a world...
 	if (vm) {
 		vm->stop();
@@ -464,7 +498,12 @@ void Agent::setAttributes(unsigned int attr) {
 	mouseable = (attr & 2);
 	activateable = (attr & 4);
 	invisible = (attr & 16);
-	floatable = (attr & 32);
+	bool newfloatable = (attr & 32);
+	if (floatable && !newfloatable)
+		floatRelease();
+	else if (!floatable && newfloatable)
+		floatSetup();
+	floatable = newfloatable;
 	suffercollisions = (attr & 64);
 	sufferphysics = (attr & 128);
 	camerashy = (attr & 256);

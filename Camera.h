@@ -22,6 +22,7 @@
 
 #include "MetaRoom.h"
 #include "SDLBackend.h"
+#include "AgentRef.h"
 
 enum cameratransition { none = 0, fliphorz = 1, burst = 2 };
 enum trackstyle { brittle = 0, flexible = 1, hard = 2 };
@@ -36,7 +37,7 @@ protected:
 	unsigned int destx, desty;
 	float velx, vely;
 
-	class Agent *trackedagent;
+	AgentRef trackedagent;
 	
 public:
 	Camera();
@@ -51,8 +52,8 @@ public:
 	MetaRoom * const getMetaRoom();
 	void goToMetaRoom(unsigned int m);
 	void goToMetaRoom(unsigned int m, int x, int y, cameratransition transition);
-	void moveTo(int _x, int _y, panstyle pan);
-	void trackAgent(class Agent *a, int xp, int yp, trackstyle s, cameratransition transition);
+	virtual void moveTo(int _x, int _y, panstyle pan = jump);
+	void trackAgent(AgentRef a, int xp, int yp, trackstyle s, cameratransition transition);
 	void checkBounds();
 
 	void tick();
@@ -63,12 +64,17 @@ public:
 class MainCamera : public Camera {
 protected:
 	SDLBackend *backend;
+	std::vector<AgentRef> floated;
 
 public:
 	MainCamera() { backend = 0; }
 	void setBackend(SDLBackend *b) { backend = b; }
 	unsigned int const getWidth();
 	unsigned int const getHeight();
+	void moveTo(int _x, int _y, panstyle pan);
+	
+	void addFloated(AgentRef);
+	void delFloated(AgentRef);
 };
 
 #endif

@@ -110,6 +110,8 @@ void caosVM::v_OBST() {
 	// TODO: this code should calculate distance *from agent*, not *from centre point*, i expect
 	// someone check with DS? - fuzzie
 
+	caos_assert(targ);
+
 	float agentx = targ->x + (targ->getWidth() / 2);
 	float agenty = targ->y + (targ->getHeight() / 2);
 /*	Room *sourceroom = world.map.roomAt(agentx, agenty);
@@ -362,8 +364,7 @@ void caosVM::c_FLTO() {
 	VM_PARAM_FLOAT(x)
 
 	caos_assert(targ)
-	targ->floatingx = x;
-	targ->floatingy = y;
+	targ->floatTo(x, y);
 }
 
 /**
@@ -377,7 +378,33 @@ void caosVM::c_FREL() {
 	VM_PARAM_AGENT(agent)
 
 	caos_assert(targ)
-	targ->floatingagent = agent;
+	targ->floatTo(agent);
+}
+
+/**
+ FLTX (float)
+ %status maybe
+*/
+void caosVM::v_FLTX() {
+	caos_assert(targ);
+
+	if (targ->floatingagent)
+		result.setFloat(targ->floatingagent->x - targ->x);
+	else
+		result.setFloat(world.camera.getX() - targ->x);
+}
+
+/**
+ FLTY (float)
+ %status maybe
+*/
+void caosVM::v_FLTY() {
+	caos_assert(targ);
+	
+	if (targ->floatingagent)
+		result.setFloat(targ->floatingagent->x - targ->x);
+	else
+		result.setFloat(world.camera.getX() - targ->x);
 }
 
 /* vim: set noet: */
