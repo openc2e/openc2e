@@ -21,8 +21,10 @@
 #include "World.h"
 
 Camera::Camera() {
-	x = 0;
-	y = 0;
+	// TODO: I set these to some high value due to stupidly-floating agents at (0, 0)
+	// however, you'd think the proper engine wouldn't do this .. init order issues?
+	x = 5000;
+	y = 5000;
 	metaroom = 0;
 	panning = false;
 }

@@ -75,6 +75,9 @@ void Agent::moveTo(float _x, float _y) {
 }
 
 void Agent::floatTo(AgentRef a) {
+	std::vector<AgentRef>::iterator i = std::find(floated.begin(), floated.end(), a);
+	assert(i == floated.end()); // loops are bad, mmkay
+
 	if (floatable) floatRelease();
 	floatingagent = a;
 	if (floatable) floatSetup();
