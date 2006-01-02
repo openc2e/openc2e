@@ -216,6 +216,7 @@ void Agent::physicsTick() {
 				if (iy != idesty) {
 					movedy = true;
 					iy += dy;
+					if (dy == 1) falling = true;
 				}
 	
 				if (ix != idestx) {
@@ -256,7 +257,6 @@ void Agent::physicsTick() {
 					if (movedy) {
 						iy -= dy;
 						collided = true; // .. but only if moved is true
-						falling = true;
 					}
 					if (movedx) {
 						ix -= dx;
@@ -349,9 +349,7 @@ void Agent::physicsTick() {
 			vely.setFloat(newvely);
 			
 			if (moved) { // if we did actually try and go somewhere
-				// TODO: this totally destroys floatness!
-				x = ix;
-				y = iy;
+				moveTo(ix, iy);
 				
 				if (collided) {
 					lastcollidedirection = collidedirection;
