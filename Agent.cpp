@@ -44,7 +44,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	unid = -1;
 
 	soundslot = 0;
-	displaycore = false;
+	paused = displaycore = false;
 
 	agents_iter = world.agents.insert(++world.agents.begin(), this);
 
@@ -376,6 +376,10 @@ void Agent::physicsTick() {
 
 void Agent::tick() {
 	if (dying) return;
+	
+	if (soundslot) positionAudio(soundslot);
+
+	if (paused) return;
 
 	if (emitca_index != -1 && emitca_amount != 0.0f) {
 		assert(0 <= emitca_index && emitca_index <= 19);
@@ -386,8 +390,6 @@ void Agent::tick() {
 			else if (r->ca[emitca_index] >= 1.0f) r->ca[emitca_index] = 1.0f;
 		}
 	}
-
-	if (soundslot) positionAudio(soundslot);
 
 	physicsTick();
 
@@ -448,6 +450,7 @@ void Agent::kill() {
 	if (unid != -1)
 		world.freeUNID(unid);
 	world.killqueue.push_back(this);
+	if (soundslot) soundslot->stop();
 }
 
 void Agent::zotrefs() {

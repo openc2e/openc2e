@@ -157,7 +157,7 @@ void caosVM::v_WPAU() {
 
 /**
  PAUS (command) paused (integer)
- %status stub
+ %status maybe
 
  If paused is 0, unpause target agent, otherwise (1) pause it.
 */
@@ -166,17 +166,22 @@ void caosVM::c_PAUS() {
 
 	caos_assert(targ);
 
-	// TODO
+	targ->paused = paused;
 }
 
 /**
  PAUS (integer)
- %status stub
+ %status maybe
 
  Returns 1 if target agent is paused, or 0 otherwise.
 */
 void caosVM::v_PAUS() {
-	result.setInt(0); // TODO
+	caos_assert(targ);
+
+	if (targ->paused)
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /**
