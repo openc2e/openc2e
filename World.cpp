@@ -122,15 +122,15 @@ void World::tick() {
 	// todo: tick rooms
 }
 
-Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency) {
-	CompoundPart *p = partAt(x, y, obey_all_transparency);
+Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {
+	CompoundPart *p = partAt(x, y, obey_all_transparency, needs_mouseable);
 	if (p)
 		return p->getParent();
 	else
 		return 0;
 }
 
-CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency) {
+CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {
 	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
 		int ax = (int)x - (*i)->getParent()->x;
 		int ay = (int)y - (*i)->getParent()->y;
@@ -140,6 +140,8 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 					if (obey_all_transparency || (*i)->id == 0)
 						if ((*i)->transparentAt(ax - (*i)->x, ay - (*i)->y))
 							continue;
+			if (needs_mouseable && !((*i)->getParent()->mouseable))
+				continue;
 			return *i;
 		}
 	}

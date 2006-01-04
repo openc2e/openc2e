@@ -390,13 +390,10 @@ extern "C" int main(int argc, char *argv[]) {
 							world.hand()->firePointerScript(105, handAgent); // Pointer Drop
 							handAgent = 0;
 						} else {
-							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false);
+							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false, true);
 							if (handAgent) {
-								if (handAgent->mouseable) { // hack: agentAt should check this
-									handAgent->queueScript(4, world.hand()); // pickup
-									world.hand()->firePointerScript(104, handAgent); // Pointer Pickup
-								} else
-									handAgent = 0;
+								handAgent->queueScript(4, world.hand()); // pickup
+								world.hand()->firePointerScript(104, handAgent); // Pointer Pickup
 							}
 						}
 					} else if (event.button.button == SDL_BUTTON_MIDDLE) {
