@@ -73,9 +73,10 @@ public:
 	SDL_Surface **backsurfs[20]; // TODO: this is a horrible horrible icky hack
 
 	AgentRef focusagent; unsigned int focuspart;
-	void setFocus(class CompoundAgent *a, class TextEntryPart *p);
+	void setFocus(class TextEntryPart *p);
 
-	Agent *agentAt(unsigned int x, unsigned int y, bool needs_mouseable = false);
+	Agent *agentAt(unsigned int x, unsigned int y, bool obey_all_transparency = false);
+	CompoundPart *partAt(unsigned int x, unsigned int y, bool obey_all_transparency = false);
 	class PointerAgent *hand() { return theHand; }
 	
 	caosVM *getVM(Agent *owner);

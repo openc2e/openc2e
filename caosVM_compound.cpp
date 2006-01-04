@@ -225,13 +225,13 @@ void caosVM::c_FCUS() {
 	VM_VERIFY_SIZE(0)
 
 	if (!targ)
-		world.setFocus(0, 0);
+		world.setFocus(0);
 	else {
 		CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 		caos_assert(c);
 		TextEntryPart *p = dynamic_cast<TextEntryPart *>(c->part(part));
 		caos_assert(p);
-		world.setFocus(c, p);
+		world.setFocus(p);
 	}
 }
 

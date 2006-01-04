@@ -203,6 +203,7 @@ void caosVM::c_POSE() {
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
+	caos_assert(p);
 	p->setPose(pose);
 }
 
@@ -473,6 +474,7 @@ void caosVM::v_BHVR() {
 */
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
+	caos_assert(targ);
 	// TODO
 	result.setAgent(0);
 }
@@ -887,39 +889,20 @@ void caosVM::v_TRAN() {
 	VM_PARAM_INTEGER(x)
 
 	caos_assert(targ);
-	// TODO
-	result.setInt(0);
-	/*SimpleAgent *a = dynamic_cast<SimpleAgent *>(targ.get());
-	if (!a) {
-		// TODO: TRAN on other agents
-		// (if lc2e even allows that)
-		// it seems to work for compound agents - fuzzie
-		result.setInt(0);
-		return;
-	}
-
-	creaturesImage *i = a->getSprite();
-	int index = a->getCurrentSprite();
-
-	unsigned char *data = (unsigned char *)i->data(index);
-	// XXX: do we measure from center?
-	int w = i->width(index);
-	int h = i->height(index);
-
-	caos_assert(x < w);
-	caos_assert(x >= 0);
-	caos_assert(y < h);
-	caos_assert(y >= 0);
-	
-	if (data[w * y + x] == 0)
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);
+	CompoundPart *p = a->part(0); assert(p);
+	caos_assert(x >= 0 && x <= p->getWidth());
+	caos_assert(y >= 0 && y <= p->getHeight());
+	if (p->transparentAt(x, y))
 		result.setInt(1);
 	else
-		result.setInt(0); */
+		result.setInt(0);
 }
 	
 /**
  TRAN (command) transparency (integer) part_no (integer)
- %status stub
+ %status maybe
 
  Sets the TARG agent's behaviour with regard to transparency.  If set to 1, invisible 
  parts of the agent can't be clicked.  If 0, anywhere on the agent (including transparent 
@@ -931,7 +914,12 @@ void caosVM::c_TRAN() {
 	VM_PARAM_INTEGER(transparency)
 
 	caos_assert(targ);
-	// TODO
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);	
+	// TODO: handle -1?
+	CompoundPart *p = a->part(part_no);
+	caos_assert(p);
+	p->is_transparent = transparency;
 }
 
 /**
@@ -1090,14 +1078,14 @@ void caosVM::c_ALPH() {
 	caos_assert(c);
 	if (part == -1) {
 		for (std::vector<CompoundPart *>::iterator i = c->parts.begin(); i != c->parts.end(); i++) {
-			(*i)->is_transparent = enable;
-			(*i)->transparency = alpha_value;
+			(*i)->has_alpha = enable;
+			(*i)->alpha = alpha_value;
 		}
 	} else {
 		CompoundPart *p = c->part(part);
 		caos_assert(p);
-		p->is_transparent = enable;
-		p->transparency = alpha_value;
+		p->has_alpha = enable;
+		p->alpha = alpha_value;
 	}
 }
 

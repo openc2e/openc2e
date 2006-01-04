@@ -24,6 +24,7 @@
 class duppableImage : public creaturesImage {
 public:
 	virtual void duplicateTo(class s16Image *) = 0;
+	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 };
 
 class c16Image : public duppableImage {

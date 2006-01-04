@@ -42,7 +42,6 @@ public:
 	virtual void tick();
 	virtual unsigned int getWidth() { return part(0)->getWidth(); }
 	virtual unsigned int getHeight() { return part(0)->getHeight(); }
-	void handleClick(float, float);
 	void setZOrder(unsigned int plane);
 
 	friend class caosVM;

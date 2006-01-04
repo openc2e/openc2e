@@ -33,8 +33,8 @@ protected:
 public:
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset) = 0;
 	virtual unsigned int getZOrder() const = 0;
-	virtual void updateZOrder();
-	void addToWorld();
+	virtual void zapZOrder();
+	virtual void addZOrder();
 	virtual ~renderable();
 };
 

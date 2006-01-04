@@ -135,23 +135,11 @@ void caosVM::v_HOTS() {
  Transparency of the parts themselves is ignored.
 */
 void caosVM::v_HOTP() {
-	Agent *a = world.agentAt(world.hand()->x, world.hand()->y);
-	if (a) {
-		CompoundAgent *c = dynamic_cast<CompoundAgent *>(a);
-		caos_assert(c);
-		int clickx = world.hand()->x - a->x, clicky = world.hand()->y - a->y;
-		// TODO: can't we put this code in CompoundAgent?
-		std::vector<CompoundPart *>::iterator x = c->parts.end();
-		while (x != c->parts.begin()) {
-			x--;
-			if ((clickx >= (*x)->x) && (clicky >= (*x)->y) &&
-				(clickx <= (*x)->x + (*x)->getWidth()) && (clicky <= (*x)->y + (*x)->getHeight())) {
-				result.setInt((*x)->id);
-				return;
-			}
-		}
-		result.setInt(-1); // TODO: is this right?
-	} else result.setInt(-1);
+	CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y);
+	if (a)
+		result.setInt(a->id);
+	else
+		result.setInt(-1);
 }
 
 /**

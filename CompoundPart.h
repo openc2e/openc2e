@@ -44,16 +44,17 @@ protected:
 
 public:
 	std::vector<unsigned int> animation;
-	bool is_transparent;
+	bool has_alpha, is_transparent;
 	unsigned char framerate;
 	unsigned int framedelay;
-	unsigned char transparency;
+	unsigned char alpha;
 	creaturesImage *getSprite() { return sprite; }
 	int x, y;
 	unsigned int zorder, id;
 	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
 	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
 	virtual void tick();
+	virtual void handleClick(float, float);
 	unsigned int getPose() { return pose; }
 	unsigned int getBase() { return base; }
 	unsigned int getCurrentSprite() { return firstimg + base + pose; }
@@ -63,12 +64,14 @@ public:
 	unsigned int getHeight() { return sprite->height(getCurrentSprite()); }
 	unsigned int getZOrder() const;
 	CompoundAgent *getParent() { return parent; }
-	void updateZOrder();
+	void zapZOrder();
+	void addZOrder();
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
 	void setPose(unsigned int p) { animation.clear(); pose = p; }
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
 	void setBase(unsigned int b) { base = b; }
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
+	bool transparentAt(unsigned int x, unsigned int y);
 				
 	bool operator < (const CompoundPart &b) const {
 		return zorder < b.zorder;
@@ -88,6 +91,7 @@ protected:
 public:
 	ButtonPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, const bytestring &animhover, int msgid, int option);
+	void handleClick(float, float);
 };
 
 class CameraPart : public CompoundPart {
@@ -181,6 +185,7 @@ public:
 	void setText(std::string t);
 	void gainFocus() { focused = true; caretpose = 0; }
 	void loseFocus() { focused = false; }
+	void handleClick(float, float);
 	void handleKey(char c);
 	void handleSpecialKey(char c);
 	void tick();

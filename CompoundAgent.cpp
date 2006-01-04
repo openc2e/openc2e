@@ -70,39 +70,8 @@ CompoundAgent::~CompoundAgent() {
 
 void CompoundAgent::setZOrder(unsigned int plane) {
 	Agent::setZOrder(plane);
-	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-		(*x)->updateZOrder();
-	}
-}
-
-unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
-
-#include <iostream>
-
-void CompoundAgent::handleClick(float clickx, float clicky) {
-	std::vector<CompoundPart *>::iterator x = parts.end();
-	while (x != parts.begin()) {
-		x--;
-		if ((clickx >= (*x)->x) && (clicky >= (*x)->y) &&
-				(clickx <= (*x)->x + (*x)->getWidth()) && (clicky <= (*x)->y + (*x)->getHeight())) {
-			ButtonPart *b = dynamic_cast<ButtonPart *>(*x);
-			if (b) {
-				// TODO: check button transparency if needed
-				queueScript(calculateScriptId(b->messageid), (Agent *)world.hand());
-				// TODO: do we need to return here, or should we always passthrough to Agent::handleClick?
-				return;
-			}
-			TextEntryPart *t = dynamic_cast<TextEntryPart *>(*x);
-			if (t) {
-				world.setFocus(this, t);
-				return;
-			}
-		}
-	}
-
-	// TODO: this check should possibly be in Agent::handleClick, along with the attribute
-	if (activateable)
-		Agent::handleClick(clickx, clicky);
+	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) (*x)->zapZOrder();
+	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) (*x)->addZOrder();
 }
 
 void CompoundAgent::tick() {

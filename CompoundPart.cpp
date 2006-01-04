@@ -24,6 +24,11 @@
 #include "CompoundAgent.h"
 
 bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
+	if (s1->getZOrder() == s2->getZOrder()) {
+		// part 0 is often at the same plane as other parts..
+		// TODO: is this correct fix?
+		return s1->id > s2->id;
+	}
 	return s1->getZOrder() > s2->getZOrder();
 }
 
@@ -31,8 +36,9 @@ creaturesImage *TextEntryPart::caretsprite = 0;
 
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
+		assert(getCurrentSprite() < getSprite()->numframes());
 		partRender(renderer, xoffset + parent->x, yoffset + parent->y);
-		if (parent->displaycore && (id == 0)) {
+		if (parent->displaycore /*&& (id == 0)*/) {
 			// TODO: tsk, this should be drawn along with the other craziness on the line plane, i expect
 			int xoff = xoffset + parent->x + x;
 			int yoff = yoffset + parent->y + y;
@@ -45,13 +51,20 @@ void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 }
 
 void CompoundPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
-	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, is_transparent, transparency);
+	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha);
+}
+
+bool CompoundPart::transparentAt(unsigned int x, unsigned int y) {
+	return ((duppableImage *)getSprite())->transparentAt(getCurrentSprite(), x, y);
+}
+
+void CompoundPart::handleClick(float clickx, float clicky) {
+	parent->handleClick(clickx + parent->x, clicky + parent->y);
 }
 
 CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
-						int _x, int _y, unsigned int _z) : zorder(_z), parent(p) {
-	addToWorld();
-	id = _id;
+						int _x, int _y, unsigned int _z) : zorder(_z), parent(p), id(_id) {
+	addZOrder();
 	firstimg = fimg;
 	x = _x;
 	y = _y;
@@ -59,10 +72,10 @@ CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string sprit
 	caos_assert(sprite);
 	pose = 0;
 	base = 0;
-	is_transparent = false;
+	has_alpha = false;
+	is_transparent = true;
 	framerate = 1;
 	framedelay = 0;
-	zorder_iter = world.zorder.insert(this);
 }
 
 CompoundPart::~CompoundPart() {
@@ -75,9 +88,13 @@ unsigned int CompoundPart::getZOrder() const {
 	return parent->getZOrder() + zorder;
 }
 
-void CompoundPart::updateZOrder() {
-	renderable::updateZOrder();
+void CompoundPart::zapZOrder() {
+	renderable::zapZOrder();
 	world.zorder.erase(zorder_iter);
+}
+
+void CompoundPart::addZOrder() {
+	renderable::addZOrder();
 	zorder_iter = world.zorder.insert(this);	
 }
 
@@ -98,6 +115,12 @@ ButtonPart::ButtonPart(CompoundAgent *p, unsigned int _id, std::string spritefil
 	messageid = msgid;
 	hitopaquepixelsonly = (option == 1);
 	hoveranimation = animhover;
+}
+
+unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
+
+void ButtonPart::handleClick(float x, float y) {
+	parent->queueScript(calculateScriptId(messageid), (Agent *)world.hand()); // TODO: pass x/y as p1/p2?
 }
 
 TextPart::TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
@@ -193,6 +216,10 @@ void TextEntryPart::setText(std::string t) {
 }
 
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
+
+void TextEntryPart::handleClick(float clickx, float clicky) {
+	world.setFocus(this);
+}
 
 void TextEntryPart::handleKey(char c) {
 	text += c;
@@ -383,7 +410,7 @@ void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEn
 		
 			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
 			int spriteid = lines[i].text[x] - 32;
-			renderer->render(sprite, spriteid, somex + currentx, yoff + currenty, is_transparent, transparency);
+			renderer->render(sprite, spriteid, somex + currentx, yoff + currenty, has_alpha, alpha);
 			if ((caretdata) && (caretdata->caretpos == lines[i].offset + x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 			currentx += textsprite->width(spriteid) + charspacing;
@@ -416,7 +443,7 @@ void TextEntryPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
 
 void TextEntryPart::renderCaret(SDLBackend *renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
-	renderer->render(caretsprite, caretpose, xoffset, yoffset, is_transparent, transparency);
+	renderer->render(caretsprite, caretpose, xoffset, yoffset, has_alpha, alpha);
 }
 
 void TextEntryPart::tick() {

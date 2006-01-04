@@ -146,6 +146,12 @@ void s16Image::writeHeader(std::ostream &s) {
 	}
 }
 
+bool duppableImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+	unsigned int offset = (y * widths[frame]) + x;
+	unsigned short *buffer = (unsigned short *)buffers[frame];
+	return (buffer[offset] == 0);
+}
+
 s16Image::s16Image(mmapifstream *in) {
 	stream = in;
 

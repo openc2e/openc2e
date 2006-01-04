@@ -376,11 +376,11 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
-						Agent *a = world.agentAt(world.hand()->x, world.hand()->y, false);
-						if (a) {
-							a->handleClick(world.hand()->x - a->x, world.hand()->y - a->y);
+						CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y, false);
+						if (a /* && a->canActivate() */) { // TODO
+							a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
 							// TODO: not sure how to handle the following properly, needs research..
-							world.hand()->firePointerScript(101, a); // Pointer Activate 1
+							world.hand()->firePointerScript(101, a->getParent()); // Pointer Activate 1
 						} else
 							world.hand()->queueScript(116, 0); // Pointer Clicked Background
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {

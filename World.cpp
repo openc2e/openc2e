@@ -70,7 +70,8 @@ void World::queueScript(unsigned short event, AgentRef agent, AgentRef from, cao
 	scriptqueue.push_back(e);
 }
 
-void World::setFocus(CompoundAgent *a, TextEntryPart *p) {
+// TODO: eventually, the part should be referenced via a weak_ptr, maaaaybe?
+void World::setFocus(TextEntryPart *p) {
 	// Unfocus the current agent. Not sure if c2e always does this (what if the agent/part is bad?).
         if (focusagent) {
 		CompoundAgent *c = dynamic_cast<CompoundAgent *>(focusagent.get());
@@ -83,9 +84,8 @@ void World::setFocus(CompoundAgent *a, TextEntryPart *p) {
 	if (!p)
 		focusagent.clear();
 	else {
-		assert(p == a->part(p->id));
 		p->gainFocus();
-		focusagent = a;
+		focusagent = p->getParent();
 		focuspart = p->id;
 	}
 }
@@ -122,15 +122,26 @@ void World::tick() {
 	// todo: tick rooms
 }
 
-Agent *World::agentAt(unsigned int x, unsigned int y, bool needs_activateable) {
-	// TODO: this needs to check if agents are USEFUL (ie, not background scenery etc)
+Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency) {
+	CompoundPart *p = partAt(x, y, obey_all_transparency);
+	if (p)
+		return p->getParent();
+	else
+		return 0;
+}
+
+CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency) {
 	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
-		unsigned int ax = x - (*i)->getParent()->x;
-		unsigned int ay = y - (*i)->getParent()->y;
-		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (*i)->getWidth()) >= ax) if (((*i) -> y + (*i)->getHeight()) >= ay)
-			if ((*i)->getParent() != theHand)
-				if ((!needs_activateable) || (*i)->getParent()->activateable)
-					return (*i)->getParent();
+		int ax = (int)x - (*i)->getParent()->x;
+		int ay = (int)y - (*i)->getParent()->y;
+		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (int)(*i)->getWidth()) >= ax) if (((*i) -> y + (int)(*i)->getHeight()) >= ay)
+			if ((*i)->getParent() != theHand) {
+				if ((*i)->is_transparent)
+					if (obey_all_transparency || (*i)->id == 0)
+						if ((*i)->transparentAt(ax - (*i)->x, ay - (*i)->y))
+							continue;
+			return *i;
+		}
 	}
 	
 	return 0;
