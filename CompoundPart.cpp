@@ -24,12 +24,16 @@
 #include "CompoundAgent.h"
 
 bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
-	if (s1->getZOrder() == s2->getZOrder()) {
+	// TODO: unsure about all of this, needs a check (but seems to work)
+	if (s1->getParent()->getZOrder() == s2->getParent()->getZOrder()) {
 		// part 0 is often at the same plane as other parts..
 		// TODO: is this correct fix?
-		return s1->id > s2->id;
+		if (s1->getParent() == s2->getParent())
+			return s1->id > s2->id;
+		else
+			return s1->getZOrder() > s2->getZOrder();
 	}
-	return s1->getZOrder() > s2->getZOrder();
+	return s1->getParent()->getZOrder() > s2->getParent()->getZOrder();
 }
 
 creaturesImage *TextEntryPart::caretsprite = 0;

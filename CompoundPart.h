@@ -63,7 +63,7 @@ public:
 	unsigned int getWidth() { return sprite->width(getCurrentSprite()); }
 	unsigned int getHeight() { return sprite->height(getCurrentSprite()); }
 	unsigned int getZOrder() const;
-	CompoundAgent *getParent() { return parent; }
+	CompoundAgent *getParent() const { return parent; }
 	void zapZOrder();
 	void addZOrder();
 	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
