@@ -392,13 +392,24 @@ extern "C" int main(int argc, char *argv[]) {
 								case SDL_BUTTON_LEFT: button.setInt(1); break;
 								case SDL_BUTTON_RIGHT: button.setInt(2); break;
 								case SDL_BUTTON_MIDDLE: button.setInt(4); break;
-								default: assert(false);
 							}
 
-							if (event.type == SDL_MOUSEBUTTONUP)
-								(*i)->queueScript(77, 0, button); // Raw Mouse Up
+							if (button.hasInt()) {
+								if (event.type == SDL_MOUSEBUTTONUP)
+									(*i)->queueScript(77, 0, button); // Raw Mouse Up
+								else
+									(*i)->queueScript(76, 0, button); // Raw Mouse Down
+							}
+						}
+						if ((event.type == SDL_MOUSEBUTTONDOWN &&
+							(event.button.button == SDL_BUTTON_WHEELUP || event.button.button == SDL_BUTTON_WHEELDOWN) &&
+							(*i)->imsk_mouse_wheel)) {
+							caosVar delta;
+							if (event.button.button == SDL_BUTTON_WHEELDOWN)
+								delta.setInt(120);
 							else
-								(*i)->queueScript(76, 0, button); // Raw Mouse Down
+								delta.setInt(-120);
+							(*i)->queueScript(78, 0, delta); // Raw Mouse Wheel
 						}
 					}
 
