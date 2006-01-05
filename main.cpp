@@ -406,9 +406,9 @@ extern "C" int main(int argc, char *argv[]) {
 							(*i)->imsk_mouse_wheel)) {
 							caosVar delta;
 							if (event.button.button == SDL_BUTTON_WHEELDOWN)
-								delta.setInt(120);
-							else
 								delta.setInt(-120);
+							else
+								delta.setInt(120);
 							(*i)->queueScript(78, 0, delta); // Raw Mouse Wheel
 						}
 					}
