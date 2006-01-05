@@ -121,6 +121,15 @@ void Catalogue::initFrom(fs::path path) {
 	}	
 }
 
+std::string stringFromInt(int i) {
+	// TODO: hacky? also, put somewhere more appropriate
+	
+	char buffer[20]; // more than enough
+	snprintf(buffer, 20, "%i", i);
+
+	return std::string(buffer);
+}
+
 const std::string Catalogue::getAgentName(unsigned char family, unsigned char genus, unsigned short species) const {
 	char buf[26]; // 11 + (3 + 1) + (3 + 1) + (5 + 1) + 1
 	sprintf(buf, "Agent Help %i %i %i", family, genus, species);
@@ -130,4 +139,17 @@ const std::string Catalogue::getAgentName(unsigned char family, unsigned char ge
 		return "";
 	}
 }
+
+std::string Catalogue::calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const {
+	std::string searchstring = tag + " " + stringFromInt(family) + " " + stringFromInt(genus) + " " + stringFromInt(species);
+	if (hasTag(searchstring)) return searchstring;
+	searchstring = tag + " " + stringFromInt(family) + " " + stringFromInt(genus) + " 0";
+	if (hasTag(searchstring)) return searchstring;
+	searchstring = tag + " " + stringFromInt(family) + " 0 0";
+	if (hasTag(searchstring)) return searchstring;
+	searchstring = tag + "0 0 0";
+	if (hasTag(searchstring)) return searchstring;
+	return "";
+}
+
 /* vim: set noet: */

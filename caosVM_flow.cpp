@@ -249,6 +249,24 @@ void caosVM::c_EPAS() {
 }
 
 /**
+ ECON (command) agent (agent)
+ %pragma parserclass ENUMhelper
+ %pragma retc -1
+ %status stub
+
+ like ECON, but iterate through OWNR vehicle's passengers
+*/
+void caosVM::c_ECON() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_VALIDAGENT(agent)
+
+	// TODO: should probably implement this (ESEE)
+
+	caosVar nullv; nullv.reset();
+	valueStack.push_back(nullv);
+}
+
+/**
  CALL (command) script_no (integer) p1 (any) p2 (any)
  %status maybe
 

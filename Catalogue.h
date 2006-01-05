@@ -29,6 +29,7 @@ public:
 	const std::vector<std::string> &getTag(std::string t) const { return (*data.find(t)).second; }
 	bool hasTag(std::string t) const { return (data.find(t) != data.end()); }
 	const std::string getAgentName(unsigned char family, unsigned char genus, unsigned short species) const;
+	std::string calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const;
   
 	void reset();
 	void initFrom(boost::filesystem::path path);

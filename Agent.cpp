@@ -414,6 +414,7 @@ void Agent::vmTick() {
 			vm->tick();
 		} catch (std::exception &e) {
 			// TODO: do something with this? empty the stack?
+			std::cerr << "Agent::vmTick on " << identify() << " caught exception: " << e.what() << std::endl;
 		}
 		if (vm && vm->stopped()) {
 			world.freeVM(vm);

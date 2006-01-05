@@ -246,6 +246,7 @@ public:
 	void v_STRL();
 	void v_READ();
 	void v_CATI();
+	void v_CATA();
 	void v_CATX();
 	void v_WILD();
 	void v_NAME();
@@ -275,6 +276,7 @@ public:
 	void c_ESEE();
 	void c_ETCH();
 	void c_EPAS();
+	void c_ECON();
 	void c_NEXT();
 	void c_CALL();
 	void v_CAOS();

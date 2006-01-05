@@ -384,13 +384,15 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN:
 					for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-						if ((*i)->imsk_mouse_down) {
+						if ((event.type == SDL_MOUSEBUTTONUP && (*i)->imsk_mouse_up) ||
+							(event.type == SDL_MOUSEBUTTONDOWN && (*i)->imsk_mouse_down)) {
 							caosVar button;
 							switch (event.button.button) {
 								// TODO: the values here make fuzzie suspicious that c2e combines these events
 								case SDL_BUTTON_LEFT: button.setInt(1); break;
 								case SDL_BUTTON_RIGHT: button.setInt(2); break;
 								case SDL_BUTTON_MIDDLE: button.setInt(4); break;
+								default: assert(false);
 							}
 
 							if (event.type == SDL_MOUSEBUTTONUP)

@@ -610,6 +610,30 @@ void caosVM::v_REAQ() {
 		result.setInt(0);
 }
 
+int findCategory(unsigned char family, unsigned char genus, unsigned short species) {
+	char buffer[40];
+	snprintf(buffer, 40, "%i %i 0", family, genus); // TODO: 0 is a hack so we don't have to do any real work here
+	
+	caos_assert(world.catalogue.hasTag("Agent Classifiers"));
+	const std::vector<std::string> &t = world.catalogue.getTag("Agent Classifiers");
+	for (unsigned int i = 0; i < t.size(); i++)
+		if (t[i] == buffer) {
+			return i;
+		}
+
+	return -1;
+}
+
+/**
+ CATA (integer)
+ %status maybe
+*/
+void caosVM::v_CATA() {
+	caos_assert(targ);
+
+	result.setInt(findCategory(targ->family, targ->genus, targ->species));
+}
+
 /**
  CATI (integer) family (integer) genus (integer) species (integer)
  %status maybe
@@ -619,18 +643,7 @@ void caosVM::v_CATI() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family) // TODO: check values are in range
 
-	char buffer[40];
-	snprintf(buffer, 40, "%i %i 0", family, genus); // 0 is a hack so we don't have to do any real work here
-	
-	caos_assert(world.catalogue.hasTag("Agent Classifiers"));
-	const std::vector<std::string> &t = world.catalogue.getTag("Agent Classifiers");
-	for (unsigned int i = 0; i < t.size(); i++)
-		if (t[i] == buffer) {
-			result.setInt(i);
-			return;
-		}
-
-	result.setInt(-1);
+	result.setInt(findCategory(family, genus, species));
 }
 
 /**
@@ -642,20 +655,11 @@ void caosVM::v_CATX() {
 
 	caos_assert(world.catalogue.hasTag("Agent Categories"));
 	const std::vector<std::string> &t = world.catalogue.getTag("Agent Categories");
-	if (-1 < category_id < t.size())
+	if (-1 < category_id && category_id < t.size())
 		result.setString(t[category_id]);
 	else
 		result.setString("");
 		
-}
-
-std::string stringFromInt(int i) {
-	// TODO: hacky? also, put somewhere more appropriate
-	
-	char buffer[20]; // more than enough
-	snprintf(buffer, 20, "%i", i);
-
-	return std::string(buffer);
 }
 
 /**
@@ -676,19 +680,12 @@ void caosVM::v_WILD() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 
-	std::string searchstring = tag + " " + stringFromInt(family) + " " + stringFromInt(genus) + " " + stringFromInt(species);
-	if (!world.catalogue.hasTag(searchstring)) {
-		searchstring = tag + " " + stringFromInt(family) + " " + stringFromInt(genus) + " 0";
-		if (!world.catalogue.hasTag(searchstring)) {
-			searchstring = tag + " " + stringFromInt(family) + " 0 0";
-			if (!world.catalogue.hasTag(searchstring)) {
-				searchstring = tag + "0 0 0";
-				caos_assert(world.catalogue.hasTag(searchstring));
-			}
-		}
-	}
-	const std::vector<std::string> &t = world.catalogue.getTag(searchstring);
-	caos_assert(offset < t.size());
+	std::string searchstring = world.catalogue.calculateWildcardTag(tag, family, genus, species); // calculate tag name
+	caos_assert(searchstring.size()); // check we found a tag
+
+	const std::vector<std::string> &t = world.catalogue.getTag(searchstring); // retrieve tag
+	caos_assert(offset < t.size()); // check the offset is useful for the tag we found
+
 	result.setString(t[offset]);
 }
 

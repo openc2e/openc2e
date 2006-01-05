@@ -117,6 +117,8 @@ void caosVM::c_SWAY_SHOU() {
 void caosVM::c_NOHH() {
 	VM_VERIFY_SIZE(0)
 
+	if (!targ) return; // DS agent help, at least, does 'targ hhld nohh'
+	
 	Creature *c = getTargCreature();
 	// TODO
 }
