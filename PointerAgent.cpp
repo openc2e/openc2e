@@ -26,7 +26,7 @@
 // TODO: change imagecount?
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, UINT_MAX, spritefile, 0, 0) {
 	name = "hand";
-	handle_events = false;
+	handle_events = true;
 
 	// float relative to main camera
 	floatable = true;

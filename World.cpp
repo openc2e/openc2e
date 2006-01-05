@@ -34,6 +34,7 @@ World::World() {
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
 void World::init() {
+	// TODO: pick up hand image name from "Pointer Information" catalogue tag
 	if (gallery.getImage("hand")) // TODO: we refcount one too many here, i expect // TODO: we refcount one too many here, i expect
 		theHand = new PointerAgent("hand");
 	else	

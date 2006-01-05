@@ -146,14 +146,14 @@ void caosVM::v_HOTP() {
  PURE (command) value (integer)
  %status maybe
 
- Turns the normal pointing and clicking behavior of the Hand on and off.
+ Turns the normal pointing and clicking behavior of the Hand on (0) and off (1).
 
  If set to off, CLIK and CLAC will not work, and clicking events must be handled by IMSK.
 */
 void caosVM::c_PURE() {
 	VM_PARAM_INTEGER(value)
 
-	world.hand()->handle_events = value;
+	world.hand()->handle_events = !value;
 }
 
 /**
@@ -163,10 +163,11 @@ void caosVM::c_PURE() {
  Returns whether the normal pointing and clicking behavior of the Hand is on or off.
 */
 void caosVM::v_PURE() {
+	// TODO: alex claims PURE is inverse behaviour for the command, is this true for this function too? (assuming it is for now)
 	if (world.hand()->handle_events)
-		result.setInt(1);
-	else
 		result.setInt(0);
+	else
+		result.setInt(1);
 }
 
 /**

@@ -373,17 +373,46 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
+					for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+						if ((*i)->imsk_mouse_move) {
+							caosVar x; x.setInt(world.hand()->x);
+							caosVar y; y.setInt(world.hand()->y);
+							(*i)->queueScript(75, 0, x, y); // Raw Mouse Move
+						}
+					}
 					break;
+				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN:
+					for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+						if ((*i)->imsk_mouse_down) {
+							caosVar button;
+							switch (event.button.button) {
+								// TODO: the values here make fuzzie suspicious that c2e combines these events
+								case SDL_BUTTON_LEFT: button.setInt(1); break;
+								case SDL_BUTTON_RIGHT: button.setInt(2); break;
+								case SDL_BUTTON_MIDDLE: button.setInt(4); break;
+							}
+
+							if (event.type == SDL_MOUSEBUTTONUP)
+								(*i)->queueScript(77, 0, button); // Raw Mouse Up
+							else
+								(*i)->queueScript(76, 0, button); // Raw Mouse Down
+						}
+					}
+
+					if (!world.hand()->handle_events) break;
+					if (event.type != SDL_MOUSEBUTTONDOWN) break;
+
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y, false);
 						if (a /* && a->canActivate() */) { // TODO
-							a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
+							if (!a->getParent()->paused) a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
 							// TODO: not sure how to handle the following properly, needs research..
 							world.hand()->firePointerScript(101, a->getParent()); // Pointer Activate 1
 						} else
 							world.hand()->queueScript(116, 0); // Pointer Clicked Background
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
+						if (world.paused) break; // TODO: wrong?
 						// for now, hack!
 						if (handAgent) {
 							handAgent->queueScript(5, world.hand()); // drop
