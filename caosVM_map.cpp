@@ -542,4 +542,14 @@ void caosVM::v_RLOC() {
 	result.setString(buffer);
 }
 
+/**
+ DMAP (command) mapon (integer)
+ %status maybe
+*/
+void caosVM::c_DMAP() {
+	VM_PARAM_INTEGER(mapon)
+		
+	world.showrooms = mapon;
+}
+
 /* vim: set noet: */
