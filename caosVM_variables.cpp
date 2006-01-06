@@ -544,7 +544,7 @@ void caosVM::v_CHAR() {
  Converts given integer to a float.
 */
 void caosVM::v_ITOF() {
-	VM_PARAM_INTEGER(number)
+	VM_PARAM_FLOAT(number) // watson tells me this function is COMPLETELY pointless - fuzzie
 
 	result.setFloat(number);
 }
@@ -553,12 +553,12 @@ void caosVM::v_ITOF() {
  FTOI (integer) number (float)
  %status maybe
 
- Converts given float to an integer.
+ Converts given float to an integer, by rounding.
 */
 void caosVM::v_FTOI() {
-	VM_PARAM_FLOAT(number)
+	VM_PARAM_INTEGER(number)
 
-	result.setInt((int)number);
+	result.setInt(number);
 }
 
 /**

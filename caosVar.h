@@ -182,7 +182,7 @@ class caosVar {
 			if (type == INTEGER) {
 				return values.intValue;
 			} else {
-				return (int)values.floatValue;
+				return (int)(values.floatValue + 0.5f);
 			}
 		}
 
