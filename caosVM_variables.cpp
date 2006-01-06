@@ -360,11 +360,11 @@ void caosVM::c_ABSV() {
 void caosVM::v_ACOS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
-	
-	float f = x / 360;
-	f = f * (M_PI * 2);
-	
-	result.setFloat(acos(f));
+
+	double f = acos(x);
+	f = f * 360;
+	f = f / (M_PI * 2);
+	result.setFloat(f);
 }
 
 /**
@@ -377,10 +377,10 @@ void caosVM::v_ASIN() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
 	
-	float f = x / 360;
-	f = f * (M_PI * 2);
-	
-	result.setFloat(asin(f));
+	double f = asin(x);
+	f = f * 360;
+	f = f / (M_PI * 2);
+	result.setFloat(f);
 }
 
 /**
@@ -392,11 +392,11 @@ void caosVM::v_ASIN() {
 void caosVM::v_ATAN() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
-
-	float f = x / 360;
-	f = f * (M_PI * 2);
 	
-	result.setFloat(atan(f));
+	double f = atan(x);
+	f = f * 360;
+	f = f / (M_PI * 2);
+	result.setFloat(f);
 }
 
 /**
@@ -409,11 +409,9 @@ void caosVM::v_COS_() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
 	
-	float f = cos(x);
-	f = f / (M_PI * 2);
-	f = f * 360;
-	
-	result.setFloat(f);
+	double f = x * (M_PI * 2);	
+	f = f / 360;
+	result.setFloat(cos(f));
 }
 
 /**
@@ -426,11 +424,10 @@ void caosVM::v_SIN_() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
 	
-	float f = sin(x);
-	f = f / (M_PI * 2);
-	f = f * 360;
+	double f = x * (M_PI * 2);	
+	f = f / 360;
 	
-	result.setFloat(f);
+	result.setFloat(sin(f));
 }
 
 /**
@@ -443,11 +440,10 @@ void caosVM::v_TAN_() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
 
-	float f = tan(x);
-	f = f / (M_PI * 2);
-	f = f * 360;
+	double f = x * (M_PI * 2);	
+	f = f / 360;
 	
-	result.setFloat(f);
+	result.setFloat(tan(f));
 }
 
 /**
