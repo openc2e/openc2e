@@ -34,10 +34,11 @@
 
 /**
  ELIF (command) condition (condition)
- %pragma noparse
+ %pragma parser new DoifParser()
  %status maybe
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
+ If found outside a DOIF block, it is equivalent to a DOIF. If you take advantage of this behavior, you should be shot.
 */
 
 
