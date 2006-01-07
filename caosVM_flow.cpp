@@ -285,7 +285,7 @@ void caosVM::c_CALL() {
 	VM_PARAM_INTEGER(script_no)
 
 	caos_assert(owner);
-	caos_assert(script_no > 0 && script_no < 65536);
+	caos_assert(script_no >= 0 && script_no < 65536);
 
 	shared_ptr<script> s = owner->findScript(script_no);
 	if (!s) return;
