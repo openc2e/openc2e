@@ -29,7 +29,8 @@
  %pragma parser new DoifParser()
  %status maybe
  
- Part of a DOIF/ELIF/ELSE/ENDI block. Jump to the next part of the block if condition is false, otherwise continue executing.
+ Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
+ otherwise continues executing the script.
 */
 
 /**
@@ -38,7 +39,7 @@
  %status maybe
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
- If found outside a DOIF block, it is equivalent to a DOIF. If you take advantage of this behavior, you should be shot.
+ If found outside a DOIF block, it is equivalent to a DOIF. If you take advantage of this behavior, fuzzie is of the opinion that you should be shot.
 */
 
 
@@ -63,8 +64,7 @@
  %pragma parser new parseREPS()
  %status maybe
 
- The start of a REPS...REPE loop. The body of the loop will be executed (reps)
- times.
+ The start of a REPS...REPE loop. The body of the loop will be executed (reps) times.
 */
 
 /**
@@ -80,7 +80,7 @@
  %pragma parser new parseLOOP()
  %status maybe
  
- The start of a LOOP..EVER or LOOP..UNTL loop.
+ The start of a LOOP...EVER or LOOP...UNTL loop.
 */
 
 /**
@@ -88,7 +88,7 @@
  %pragma noparse
  %status maybe
  
- Jump back to the matching LOOP, no matter what.
+ Jumps back to the matching LOOP, no matter what.
 */
 
 /**
@@ -96,7 +96,7 @@
  %pragma noparse
  %status maybe
  
- Jump back to the matching LOOP unless the condition evaluates to true.
+ Jumps back to the matching LOOP unless the condition evaluates to true.
 */
 
 /**
@@ -105,7 +105,7 @@
  %pragma retc -1
  %status maybe
  
- Jump to a subroutine defined by SUBR with label 'label'.
+ Jumps to a subroutine defined by SUBR with label (label).
 */
 
 /**
@@ -113,7 +113,7 @@
  %pragma parser new parseSUBR()
  %status maybe
  
- Define the start of a subroute to be called with GSUB, with label 'label'.
+ Defines the start of a subroute to be called with GSUB, with label (label).
  If the command is encountered during execution, it acts like a STOP.
 */
 
@@ -122,7 +122,7 @@
  %pragma retc -1
  %status maybe
  
- Return from a subroutine called with GSUB.
+ Returns from a subroutine called with GSUB.
 */
 void caosVM::c_RETN() {
 	if (callStack.empty())
@@ -137,6 +137,7 @@ void caosVM::c_RETN() {
  %pragma noparse
  %status maybe
 
+ The end of an ENUM...NEXT loop.
 */
 
 /**
@@ -145,7 +146,7 @@ void caosVM::c_RETN() {
  %pragma parserclass ENUMhelper
  %pragma retc -1
 
- Loop through all agents with the given classifier. 0 on any field is a
+ Loops through all agents with the given classifier.  0 on any field is a
  wildcard. The loop body is terminated by a NEXT.
 */
 void caosVM::c_ENUM() {
@@ -176,7 +177,9 @@ void caosVM::c_ENUM() {
  %pragma parserclass ENUMhelper
  %pragma retc -1
  
- like ENUM, but iterate through agents OWNR can see (todo: document exact rules)
+ Simular to ENUM, but iterates through agents visible to OWNR.  An agent can be seen if it is within the
+ range set by RNGE, and is visible (this includes the PERM value of walls that lie between them,
+ and, if the agent is a Creature, it not having the 'invisible' attribute).
 */
 void caosVM::c_ESEE() {
 	VM_VERIFY_SIZE(3)
@@ -215,7 +218,7 @@ void caosVM::c_ESEE() {
  %pragma retc -1
  %status stub
 
- like ENUM, but iterate through agents OWNR is touching
+ Similar to ENUM, but iterates through the agents OWNR is touching.
 */
 void caosVM::c_ETCH() {
 	VM_VERIFY_SIZE(3)
@@ -235,7 +238,7 @@ void caosVM::c_ETCH() {
  %pragma retc -1
  %status stub
 
- like ENUM, but iterate through OWNR vehicle's passengers
+ Similar to ENUM, but iterates through the OWNR vehicle's passengers.
 */
 void caosVM::c_EPAS() {
 	VM_VERIFY_SIZE(3)
@@ -255,7 +258,7 @@ void caosVM::c_EPAS() {
  %pragma retc -1
  %status stub
 
- like ECON, but iterate through OWNR vehicle's passengers
+ Loops through all the agents in the connective system containing the given agent.
 */
 void caosVM::c_ECON() {
 	VM_VERIFY_SIZE(3)
@@ -271,13 +274,13 @@ void caosVM::c_ECON() {
  CALL (command) script_no (integer) p1 (any) p2 (any)
  %status maybe
 
- <p>Calls script_no on OWNR, then waits for it to return. The invoked script
+ Calls script_no on OWNR, then waits for it to return. The invoked script
  will inherit the caller's INST setting, but any changes it makes to it will
  be reversed once it returns - so eg if you call a script when in INST mode,
- it calls OVEr and returns, you'll still be in INST.</p>
+ it calls OVEr and returns, you'll still be in INST.
  
- <p>Script variables (VAxx) will not be preserved - you'll have to use OVxx
- for any parameters.</p>
+ Script variables (VAxx) will not be preserved - you'll have to use OVxx
+ for any parameters.
  */
 void caosVM::c_CALL() {
 	VM_PARAM_VALUE(p2)
@@ -306,7 +309,8 @@ void caosVM::c_CALL() {
  CAOS (string) inline (integer) state_trans (integer) p1 (anything) p2 (anything) commands (string) throws (integer) catches (integer) report (variable)
  %status maybe
 
- Run commands as caos code. If inline, copy _IT_ VAxx TARG OWNR, etc. If state_trans, copy FROM and OWNR. if !throws or catches, catch errors and stuff them in report (XXX: non-conforming)
+ Runs commands as caos code immediately. If inline, copy _IT_ VAxx TARG OWNR, etc. If state_trans, copy FROM and 
+ OWNR.  If an error occurs, it catches it and stuffs it in the report. (XXX: non-conforming)
 */
 
 // XXX: exception catching is very broken right now

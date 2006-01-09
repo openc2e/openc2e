@@ -48,6 +48,9 @@ std::string calculateFilename(int directory, std::string filename) {
 /**
  FILE GLOB (command) directory (integer) filespec (string)
  %status stub
+
+ Globs the given directory (pass 1 for the world directory, or 0 for the main directory) for the 
+ given filespec, and puts it on the input stream for use by INNI, INOK, or INNL.
 */
 void caosVM::c_FILE_GLOB() {
 	VM_PARAM_STRING(filespec)
@@ -58,6 +61,8 @@ void caosVM::c_FILE_GLOB() {
 /**
  FILE ICLO (command)
  %status maybe
+
+ Disconnects everything from the input stream.
 */
 void caosVM::c_FILE_ICLO() {
 	if (inputstream) {
@@ -75,6 +80,10 @@ void caosVM::c_FILE_ICLO() {
 /**
  FILE IOPE (command) directory (integer) filename (string)
  %status maybe
+
+ Puts the given filename in the given directory (pass 1 for the world directory, or 0 for the main 
+ directory) on the current VM's input stream, for use by INOK, INNL, INNI and INNF.
+ If a file is already open, it will be closed first.
 */
 void caosVM::c_FILE_IOPE() {
 	VM_PARAM_STRING(filename)
@@ -89,6 +98,9 @@ void caosVM::c_FILE_IOPE() {
 /**
  FILE JDEL (command) directory (integer) filename (string)
  %status stub
+
+ Removes the given file in the given directory (pass 1 for the world directory, or 0 for the main 
+ directory) immediately.
 */
 void caosVM::c_FILE_JDEL() {
 	VM_PARAM_STRING(filename)
@@ -102,6 +114,8 @@ void caosVM::c_FILE_JDEL() {
 /**
  FILE OCLO (command)
  %status maybe
+
+ Disconnects everything from the output stream.
 */
 void caosVM::c_FILE_OCLO() {
 	// TODO: right now, cout is hooked up to outputstream by default, someday when this
@@ -120,6 +134,8 @@ void caosVM::c_FILE_OCLO() {
 /**
  FILE OFLU (command)
  %status maybe
+
+ Flushes the current output stream; if this is a file, all data in the buffer will be written to it.
 */
 void caosVM::c_FILE_OFLU() {
 	if (outputstream)
@@ -129,6 +145,10 @@ void caosVM::c_FILE_OFLU() {
 /**
  FILE OOPE (command) directory (integer) filename (string) append (integer)
  %status maybe
+
+ Puts the given filename in the given directory (pass 1 for the world directory, or 0 for the main
+ directory) on the current VM's output stream.
+ If a file is already open, it will be closed first. 
 */
 void caosVM::c_FILE_OOPE() {
 	VM_PARAM_INTEGER(append)
@@ -148,6 +168,8 @@ void caosVM::c_FILE_OOPE() {
 /**
  FVWM (string) name (string)
  %status stub
+
+ Returns an safe (not-in-use) filename for naming worlds and other saved files.
 */
 void caosVM::v_FVWM() {
 	VM_PARAM_STRING(name)
@@ -158,6 +180,8 @@ void caosVM::v_FVWM() {
 /**
  INNF (float)
  %status maybe
+
+ Fetches a float from the current input stream, or 0.0 if there is no data.
 */
 void caosVM::v_INNF() {
 	if (!inputstream)
@@ -171,6 +195,8 @@ void caosVM::v_INNF() {
 /**
  INNI (integer)
  %status maybe
+
+ Fetches an integer from the current input stream, or 0 if there is no data.
 */
 void caosVM::v_INNI() {
 	if (!inputstream)
@@ -184,6 +210,8 @@ void caosVM::v_INNI() {
 /**
  INNL (string)
  %status maybe
+
+ Fetches a string of text from the input stream.
 */
 void caosVM::v_INNL() {
 	if (!inputstream)
@@ -196,6 +224,8 @@ void caosVM::v_INNL() {
 /**
  INOK (integer)
  %status maybe
+
+ Determines whether the current input stream is usable (0 or 1).
 */
 void caosVM::v_INOK() {
 	if (!inputstream)
@@ -211,7 +241,7 @@ void caosVM::v_INOK() {
  WEBB (command) url (string)
  %status stub
 
- launches the specified URL, prepended with http:// (so you'd only specify, say, 'hostname/blah.html'), in the user's browser.
+ Launches the specified URL, prepended with 'http://' (so you'd only specify, for example, 'example.com/foo.html'), in the user's browser.
 */
 void caosVM::c_WEBB() {
 	VM_PARAM_STRING(url)
