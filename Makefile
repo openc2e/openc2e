@@ -77,7 +77,7 @@ OPENC2E = \
 	World.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT
-XLDFLAGS=$(LDFLAGS) -lboost_serialization -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer -lpthread
+XLDFLAGS=$(LDFLAGS) -lboost_program_options -lboost_serialization -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer -lpthread
 COREFLAGS=-ggdb3 $(shell sdl-config --cflags) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)

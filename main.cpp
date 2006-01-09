@@ -1,8 +1,8 @@
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE // for getopt_long
-#endif
+#include <cstdlib> // EXIT_FAILURE
 
-#include <getopt.h>
+#ifndef EXIT_FAILURE
+#define EXIT_FAILURE 1
+#endif
 
 #include <sstream> // for istringstream, used in networking code
 #include <fstream>
@@ -14,6 +14,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/program_options.hpp>
 
 #include "World.h"
 #include "caosVM.h"
@@ -29,70 +30,11 @@
 #endif
 
 namespace fs = boost::filesystem;
+namespace po = boost::program_options;
 extern fs::path homeDirectory(); // creaturesImage.cpp
-
-extern "C" {
-	extern char *optarg;
-	extern int optind, opterr, optopt;
-}
-
-const static struct option longopts[] = {
-	{	"silent",
-		no_argument,
-		NULL,
-		's',
-	},
-	{	"help",
-		no_argument,
-		NULL,
-		'h'
-	},
-	{	"version",
-		no_argument,
-		NULL,
-		'v'
-	},
-	{
-		"gametype",
-		required_argument,
-		NULL,
-		'g'
-	},
-	{	"data",
-		required_argument,
-		NULL,
-		'd'
-	},
-	{	"bootstrap",
-		required_argument,
-		NULL,
-		'b'
-	},
-	{ NULL, 0, NULL, 0 }
-};
-
-const static char optstring[] = "hvsd:b:";
-
 static const char data_default[] = "./data";
 static const char bootstrap_suffix[] = "/Bootstrap/001 World";
 static const char bootstrapDS_suffix[] = "/Bootstrap/010 Docking Station";
-
-static void opt_help(const char *exename) {
-	if (!exename) // argc == 0? o_O
-		exename = "openc2e";
-	std::cout << "Usage: " << exename << " [options]" << std::endl;
-	std::cout << std::endl;
-	printf("  %-20s %s\n", "-h, -?, --help", "shows this help");
-	printf("  %-20s %s\n", "-v, --version", "shows program version");
-	printf("  %-20s %s\n", "-s, --silent", "disables game sounds");
-	printf("  %-20s %s\n", "-d, --data", "sets base path for game data");
-	printf("  %-20s %s\n", "-b, --bootstrap", "sets bootstrap directory");
-	printf("  %-20s %s\n", "-g, --gametype", "sets the game type (cv or c3, c3 by default)");
-	std::cout << std::endl <<
-		"If --data is not specified, it defaults to \"" << data_default << "\". If --bootstrap is"<< std::endl <<
-		"not specified, it defaults to \"<data directory>" << bootstrap_suffix << "\"."	<< std::endl;
-
-}
 
 static void opt_version() {
 	// We already showed the primary version bit, just throw in some random
@@ -109,70 +51,56 @@ extern "C" int main(int argc, char *argv[]) {
 	std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2005 Alyssa Milburn and others\n\n";
 	int optret;
 	bool enable_sound = true;
-	std::string bootstrap;
-	std::string data;
+	std::vector<std::string> bootstrap;
+	std::vector<std::string> data_vec;
+	std::string data = data_default;
 	bool bs_specd = false, d_specd = false;
 	std::string gametype = "c3";
-	while (-1 != (optret = getopt_long(argc, argv, optstring, longopts, NULL))) {
-		switch (optret) {
-			case 'h': //fallthru
-			case '?': // -?, or any unrecognized option
-				opt_help(argv[0]);
-				return 0;
-			case 'v':
-				opt_version();
-				return 0;
-			case 's':
-				enable_sound = false;
-				break;
-			case 'd':
-				if (d_specd) {
-					std::cerr << "Error: --data specified twice." << std::endl;
-					opt_help(argv[0]);
-					return 1;
-				}
-				d_specd = true;
-				data = optarg;
-				break;
-			case 'b':
-				if (bs_specd) {
-					std::cerr << "Error: --bootstrap specified twice." << std::endl;
-					opt_help(argv[0]);
-					return 1;
-				}
-				bs_specd = true;
-				bootstrap = optarg;
-				break;
-			case 'g':
-				gametype = optarg;
-				if ((gametype != "c3") && (gametype != "cv")) {
-					std::cerr << "Error: unrecognized game type." << std::endl;
-					opt_help(argv[0]);
-					return 1;
-				}
-				break;
-		}
-	}
+
+	po::options_description desc;
+	desc.add_options()
+		("help,h", "Display help on command-line options")
+		("version,V", "Display openc2e version")
+		("silent,s", "Disable all sounds")
+		("data-path,d", po::value< std::vector<std::string> >(&data_vec)->composing(),
+		 "Set the path to the data directory") // TODO: backend support for multiple dirs
+		("bootstrap,b", po::value< std::vector<std::string> >(&bootstrap)->composing(),
+		 "Sets or adds a path or COS file to bootstrap from")
+		("gametype,g", po::value< std::string >(&gametype), "Set the game type (cv or c3)")
+		;
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+
+	enable_sound = !vm.count("silent");
 	
-	if (!d_specd) {
-		data = data_default;
+	if (vm.count("help")) {
+		std::cout << desc << std::endl;
+		return EXIT_FAILURE;
 	}
 
-	if (!bs_specd) {
-		bootstrap = data + bootstrap_suffix;
-		fs::path scriptdir(bootstrap, fs::native);
+	if (vm.count("version")) {
+		opt_version();
+		return EXIT_FAILURE;
+	}
+
+	if (vm.count("data-path") > 1) {
+		std::cerr << "Multiple data paths not yet supported." << std::endl;
+		return EXIT_FAILURE;
+	} else if (vm.count("data-path") == 1) {
+		data = data_vec[0];
+	}
+
+	if (bootstrap.size() == 0) {
+		std::string bootstrap_p = data + bootstrap_suffix;
+		fs::path scriptdir(bootstrap_p, fs::native);
 		if (!fs::exists(scriptdir)) {
 			caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
 			caosVar contents; contents.setInt(1);
 			world.eame_variables[name] = contents;
-			bootstrap = data + bootstrapDS_suffix;
+			bootstrap_p = data + bootstrapDS_suffix;
 		}
-	}
-
-	if (optind < argc) {
-		// too many args
-		opt_help(argv[0]);
-		return 1;
+		bootstrap.push_back(bootstrap_p);
 	}
 
 	world.datapath = data;
@@ -191,33 +119,39 @@ extern "C" int main(int argc, char *argv[]) {
 	world.camera.setBackend(&world.backend); // TODO: hrr
 
 	std::vector<std::string> scripts;
-	fs::path scriptdir(bootstrap, fs::native);
-
-	bool singlescript = false;
 	
-	if (fs::exists(scriptdir)) {
-		if (fs::is_directory(scriptdir)) {
-			fs::directory_iterator fsend;
-			for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
-				try {
-					if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
-						scripts.push_back(i->native_file_string());
-				} catch (fs::filesystem_error &ex) {
-					std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+	for (std::vector< std::string >::iterator bsi = bootstrap.begin(); bsi != bootstrap.end(); bsi++) {
+		fs::path scriptdir(*bsi, fs::native);
+		
+		if (fs::exists(scriptdir)) {
+			if (fs::is_directory(scriptdir)) {
+				fs::directory_iterator fsend;
+				for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
+					try {
+						if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
+							scripts.push_back(i->native_file_string());
+					} catch (fs::filesystem_error &ex) {
+						std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+					}
 				}
+			} else {
+				scripts.push_back(scriptdir.native_file_string());
 			}
 		} else {
-			scripts.push_back(scriptdir.native_file_string());
-			singlescript = true;
+			if (argc > 1) {
+				std::cerr << "couldn't find script directory (trying " << scriptdir.native_file_string() << ")!\n";
+			} else {
+				std::cerr << "couldn't find bootstrap directory!\n";
+			}
 		}
-	} else {
-		if (argc > 1) {
-			std::cerr << "couldn't find script directory (trying " << scriptdir.native_file_string() << ")!\n";
-		} else {
-			std::cerr << "couldn't find bootstrap directory!\n";
-		}
-		return 1;
 	}
+
+	if (!scripts.size()) {
+		std::cerr << "Couldn't find any bootstrap scripts, aborting." << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	bool singlescript = (scripts.size() == 1);
 
 	std::sort(scripts.begin(), scripts.end());
 	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
@@ -241,8 +175,8 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 
 	if (world.map.getMetaRoomCount() == 0) {
-		if (!singlescript)
-			std::cerr << "\nNo metarooms found in given directory (" << scriptdir.native_directory_string() << "), exiting.\n";
+		if (!singlescript) // XXX: needed?
+			std::cerr << "\nNo metarooms found in given bootstrap directories or files, exiting." << std::endl;
 		SDL_Quit();
 		return 0;
 	}
