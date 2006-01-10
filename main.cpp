@@ -122,6 +122,7 @@ extern "C" int main(int argc, char *argv[]) {
 	
 	for (std::vector< std::string >::iterator bsi = bootstrap.begin(); bsi != bootstrap.end(); bsi++) {
 		fs::path scriptdir(*bsi, fs::native);
+		std::vector< std::string > bs_scripts;
 		
 		if (fs::exists(scriptdir)) {
 			if (fs::is_directory(scriptdir)) {
@@ -129,7 +130,7 @@ extern "C" int main(int argc, char *argv[]) {
 				for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
 					try {
 						if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
-							scripts.push_back(i->native_file_string());
+							bs_scripts.push_back(i->native_file_string());
 					} catch (fs::filesystem_error &ex) {
 						std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
 					}
@@ -144,6 +145,8 @@ extern "C" int main(int argc, char *argv[]) {
 				std::cerr << "couldn't find bootstrap directory!\n";
 			}
 		}
+		std::sort(bs_scripts.begin(), bs_scripts.end());
+		std::copy(bs_scripts.begin(), bs_scripts.end(), inserter(scripts, scripts.end()));
 	}
 
 	if (!scripts.size()) {
@@ -153,7 +156,6 @@ extern "C" int main(int argc, char *argv[]) {
 
 	bool singlescript = (scripts.size() == 1);
 
-	std::sort(scripts.begin(), scripts.end());
 	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
 		std::ifstream s(i->c_str());
 		assert(s.is_open());
