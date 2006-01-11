@@ -24,6 +24,7 @@
 #include <string>
 #include <cassert>
 #include "AgentRef.h"
+#include "slaballoc.h"
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -32,6 +33,29 @@
 #include <boost/serialization/utility.hpp>
 
 class Agent;
+
+
+struct stringwrap {
+	std::string str;
+
+	stringwrap() {}
+	stringwrap(const std::string &s) : str(s) {}
+	stringwrap(const stringwrap &sw) : str(sw.str) {}
+	
+	SLAB_CLASS(stringwrap)
+};
+
+struct agentwrap {
+	AgentRef ref;
+
+	agentwrap() {}
+	agentwrap(const AgentRef &r) : ref(r) {}
+	agentwrap(const agentwrap &w) : ref(w.ref) {}
+
+	SLAB_CLASS(agentwrap)
+};
+
+extern SlabAllocator caosVarSlab;
 
 class caosVar {
 	private:
@@ -61,8 +85,8 @@ class caosVar {
 					case INTEGER: ar & values.intValue; break;
 					case FLOAT: ar & values.floatValue; break;
 					case STRING:
-								values.stringValue = new std::string();
-								ar & *values.stringValue; break;
+						values.stringValue = new(caosVarSlab) stringwrap();
+						ar & values.stringValue->str; break;
 					default: assert(0);
 				}
 			}
@@ -78,8 +102,8 @@ class caosVar {
 		union {
 			int intValue;
 			float floatValue;
-			AgentRef *refValue;
-			std::string *stringValue;
+			agentwrap *refValue;
+			stringwrap *stringValue;
 		} values;
 
 		variableType type;
@@ -109,15 +133,7 @@ class caosVar {
 		}
 
 		~caosVar() {
-			switch (type) {
-				case STRING:
-					delete values.stringValue;
-					break;
-				case AGENT:
-					delete values.refValue;
-					break;
-				default: break;
-			}
+			reset();
 		}
 
 		caosVar &operator=(const caosVar &copyFrom) {
@@ -128,10 +144,10 @@ class caosVar {
 					values = copyFrom.values;
 					break;
 				case STRING:
-					values.stringValue = new std::string(*copyFrom.values.stringValue);
+					values.stringValue = new(caosVarSlab) stringwrap(copyFrom.values.stringValue->str);
 					break;
 				case AGENT:
-					values.refValue = new AgentRef(*copyFrom.values.refValue);
+					values.refValue = new(caosVarSlab) agentwrap(copyFrom.values.refValue->ref);
 					break;
 				case NULLTYPE:
 					break;
@@ -157,11 +173,11 @@ class caosVar {
 		void setFloat(float i) { reset(); type = FLOAT; values.floatValue = i; }
 		void setAgent(Agent *i) {
 			if (type == AGENT)
-				values.refValue->set(i);
+				values.refValue->ref.set(i);
 			else {
 				reset();
 				type = AGENT;
-				values.refValue = new AgentRef(i);
+				values.refValue = new(caosVarSlab) agentwrap(i);
 			}
 		}
 		void setAgent(const AgentRef &r) {
@@ -173,7 +189,7 @@ class caosVar {
 			else {
 				reset();
 				type = STRING;
-				values.stringValue = new std::string(i);
+				values.stringValue = new(caosVarSlab) stringwrap(i);
 			}
 		}
 
@@ -197,22 +213,22 @@ class caosVar {
 
 		void getString(std::string &s) const {
 			caos_assert(hasString());
-			s = *values.stringValue;
+			s = values.stringValue->str;
 		}
 
 		std::string getString() const {
 			caos_assert(hasString());
-			return *values.stringValue;
+			return values.stringValue->str;
 		}
 
 		Agent *getAgent() const {
 			caos_assert(hasAgent());
-			return values.refValue->get();
+			return values.refValue->ref.get();
 		}
 
 		const AgentRef &getAgentRef() const {
 			caos_assert(hasAgent());
-			return *values.refValue;
+			return values.refValue->ref;
 		}
 
 		bool operator == (const caosVar &v) const;

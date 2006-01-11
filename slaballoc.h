@@ -14,97 +14,202 @@ class SlabAllocator {
 	protected:
 
 		size_t objsz;
+		virtual size_t tail_data() const { return 0; };
 
-		size_t unitsz() {
+
+		struct slab_head {
+			bool reserved;
+			struct slab_head *next;
+			size_t extent;
+			size_t elements;
+			size_t objsz, tail;
+			SlabAllocator *owner;
+		};
+			
+		struct alloc_head {
+			slab_head *slab;
+			alloc_head *next; // Overlaps data
+		};
+
+		size_t unitsz(size_t objsz) {
 			size_t sz = objsz;
-			// Assumption: void ** is aligned to the same or stricter
-			// boundraries than T
+			// Assumption: Pointers are aligned to the same or stricter
+			// boundraries than all other types
 			//
-			// Otherwise with sizeof T == 7 and sizeof void ** == 8
+			// Otherwise with objsz == 7 and sizeof slab_head * == 8
 			// you'd end up with 54-byte blocks
-			if (sz < sizeof(void **))
-				sz = sizeof(void **);
-			else if (sz % sizeof(void **))
-				sz += (sizeof(void **)) - (sz % sizeof(void **));
+			//
+			// XXX: if there's padding after alloc_head.slab we explode
+			assert((size_t)&((alloc_head *)NULL)->next == sizeof (slab_head *));
+			if (sz < sizeof(slab_head *))
+				sz = sizeof(slab_head *);
+			else if (sz % sizeof(slab_head *))
+				sz += (sizeof(slab_head *)) - (sz % sizeof(slab_head *));
 			return sz;
 		}
-				
-		size_t count, freect, block_mult;
-		void **p_free; // A chain through free blocks
-		void **p_head; // A chain through the beginnings of the blocks
-		// head is used for destructor freeing and clear()
 
+		// Find how many unitsz fit in target - sizeof slab_head
+		size_t alloc_count(size_t unitsz, size_t target) {
+			target -= sizeof(slab_head);
+			return target / unitsz;
+		}
+	
+		size_t count, freect, memy_usage, memy_reserved, memy_free;
+		ssize_t block_mult;
+		alloc_head *p_free; // A chain through free blocks
+		slab_head *p_head; // A chain through the beginnings of the blocks
+		// head is used for destructor freeing and clear()
+		slab_head *p_bad;  // A chain through blocks which can't be reallocated
+		
 		
 		void get_block() {
 			assert(!freect);
-			size_t unit = unitsz();
-			size_t alloc = sizeof(void **) + unit * block_mult;
+			size_t unit = unitsz(objsz + tail_data());
+			size_t items = block_mult;
+			if (block_mult < 0)
+				items = alloc_count(unit, -block_mult);
+			else
+				items = block_mult;
+			size_t extent = unit * items;
+			size_t alloc = sizeof(slab_head) + extent;
 			void *chunk = malloc(alloc);
 			if (!chunk)
 				throw std::bad_alloc();
-			*(void **)chunk = p_head;
-			p_head = (void **)chunk;
+			slab_head *old_head = p_head;
+			p_head = (slab_head *)chunk;
+			p_head->next = old_head;
+			p_head->extent = extent;
+			p_head->elements = items;
+			p_head->owner = this;
+			p_head->reserved = false;
+			p_head->objsz = objsz;
+			p_head->tail = tail_data();
+
+			unsigned char *dataspace = (unsigned char *)(p_head + 1);
 			
-			for (size_t i = 0; i < block_mult; i++) {
-				unsigned char *p = (unsigned char *)chunk;
-				p += sizeof(void **) + i * unit;
-				void **pp = (void **)p;
-				*pp = this->p_free;
-				this->p_free = pp;
+			for (size_t i = 0; i < items; i++) {
+				unsigned char *p = dataspace + i * unit;
+				alloc_head *ah = (alloc_head *)p;
+				ah->slab = p_head;
+				ah->next = p_free;
+				p_free = ah;
 				freect++;
 				count++;
 			}
+
+			memy_usage += alloc;
+			memy_free += extent;
 		}
 
 		static void null_destructor(void *) throw() {}
-	public:
-		virtual void *alloc(size_t sz, destructor_t dest = null_destructor) {
-			(void)dest;
-			if (sz > this->objsz) {
+
+	protected:
+		virtual alloc_head *_alloc(size_t sz) {
+			sz += sizeof(slab_head *);
+			if (sz < sizeof(alloc_head))
+				sz = sizeof(alloc_head);
+			if (sz > objsz) {
 				// libcpp is playing nasty tricks on us, blah
-				this->freect = 0;
-				this->p_free = NULL;
-				this->objsz = sz;
+				freect = 0;
+				p_free = NULL;
+				objsz = sz;
+				memy_reserved += memy_free;
+				memy_free = 0;
+				p_bad = p_head;
+
+				for (slab_head *h = p_bad; h && !h->reserved; h++)
+					h->reserved = true;
 			}
-			if (!this->p_free) get_block();
-			assert(this->p_free);
-			
-			void *p = (void *)this->p_free;
-			this->p_free = (void **)*this->p_free;
+			if (!p_free) get_block();
+			assert(p_free);
+
+			alloc_head *p = p_free;
+			p_free = p->next;
+
 			freect--;
+			memy_free -= objsz;
+
+			assert(p->slab->owner == this);
+			
 			return p;
 		}
 
-		virtual void release(void *p) {
-			void **p_ = (void **)p;
-			*p_ = this->p_free;
-			this->p_free = p_;
-			this->freect++;
+		virtual void _release(alloc_head *p) {
+			if (p->slab->reserved)
+				return;
+			p->next = p_free;
+			p_free = p;
+			freect++;
+			memy_free += objsz;
 		}
 
-		SlabAllocator(size_t bm = 32)
-			: objsz(sizeof(void **)), count(0), freect(0),
+	public:
+		/* Allocate sz bytes of data with the dest destructor callback,
+		 * and return a pointer to the buffer.
+		 *
+		 * Note that this class does not use dest; use DestructingSlab
+		 * if you need destruction when the slab goes away.
+		 */
+		virtual void *alloc(size_t sz, destructor_t dest = null_destructor) {
+			(void)dest;
+			alloc_head *ah = _alloc(sz);
+			return (void *)&ah->next;
+		}
+		
+		/* Free the previously allocated data pointed to by p. */
+		virtual void release(void *p) {
+			alloc_head ahs;
+			unsigned char *cp = (unsigned char *)p;
+			cp -= ((unsigned char *)&ahs.next - (unsigned char *)&ahs);
+			_release((alloc_head *)cp);
+		}
+
+		/* Arguments:
+		 *
+		 * size_t objsz_ - the expected size of an allocation in the slab
+		 *   Note that, while it is not an error to allocate something
+		 *   larger than this, if said allocation is not the first to be
+		 *   done in the slab it will result in wasted memory until and
+		 *   unless clear() is called.
+		 * ssize_t bm
+		 *   If bm is positive, indicates the number of objects in each slab.
+		 *   If negative, indicates the target size of a slab, in bytes.
+		 */
+		SlabAllocator(size_t objsz_ = sizeof(void **), ssize_t bm = -4096)
+			: objsz(objsz_), count(0), freect(0),
+			  memy_usage(0), memy_reserved(0), memy_free(0),
 			  block_mult(bm), p_free(NULL), p_head(NULL)
-			  {}
+		  {
+			  objsz += sizeof(slab_head *);
+		  }
 
 		// Note: deleting using ~SlabAllocator or clear() do _NOT_
 		// call destructors! Use DestructingSlab
 
 		virtual ~SlabAllocator() { clear(); }
 
+		/* Free all allocations in the slab, and release all slab memory
+		 * to the system.
+		 */
 		virtual void clear() {
 			while (p_head) {
-				void **pp = p_head;
-				p_head = (void **)*pp;
+				slab_head *pp = p_head;
+				p_head = pp->next;
 				free((void *)pp);
 			}
 			freect = count = 0;
-			p_free = p_head = NULL;
+			p_free = NULL;
+			p_head = NULL;
+			memy_usage = memy_reserved = memy_free = 0;
 		}
 
 		size_t free_elements() const { return freect; }
 		size_t total_elements() const { return count; }
 		size_t used_elements() const { return count - freect; }
+
+		size_t memory_usage() const { return memy_usage; }
+		size_t memory_free() const { return memy_free; }
+		size_t memory_reserved() const { return memy_reserved; }
 
 		/* Some workarounds for C++ weirdness.
 		 * 
@@ -117,30 +222,25 @@ class SlabAllocator {
 		 * be called before operator delete (and thus, o_del).
 		 */
 		static void *o_new(size_t sz, destructor_t dest, SlabAllocator &slab) {
-			SlabAllocator *sa = &slab;
-			size_t bsz = sizeof(sa) + sz;
-			unsigned char *cp = (unsigned char *)slab.alloc(bsz, dest);
-			*(SlabAllocator **)cp = sa;
-			return (void *)(cp + sizeof sa);
+			return (void *)&slab._alloc(sz)->next;
 		}
 
 		static void *o_new(size_t sz) {
-			SlabAllocator *sa = NULL;
-			size_t bsz = sizeof(sa) + sz;
-			unsigned char *cp = (unsigned char *)malloc(bsz);
-			*(SlabAllocator **)cp = sa;
-			return (void *)(cp + sizeof sa);
+			alloc_head *ah = (alloc_head *)malloc(sizeof(&ah->slab) + sz);
+			ah->slab = NULL;
+			return (void *)&ah->next;
 		}
 
 		static void o_del(void *p) {
-			SlabAllocator *sa;
+			alloc_head ahs;
 			unsigned char *cp = (unsigned char *)p;
-			cp -= sizeof sa;
-			sa = *(SlabAllocator **)cp;
-			if (sa)
-				sa->release((void *)cp);
+			cp -= ((unsigned char *)&ahs.next - (unsigned char *)&ahs);
+			alloc_head *ap = (alloc_head *)cp;
+			
+			if (ap->slab)
+				ap->slab->owner->_release(ap);
 			else
-				free((void *)cp);
+				free((void *)ap);
 		}
 
 };
@@ -159,7 +259,8 @@ class DestructingSlab : public SlabAllocator {
 		destructor_info *p_dest;
 	public:
 
-		DestructingSlab(size_t bm = 32) : SlabAllocator(bm) {
+		DestructingSlab(size_t objsz_ = sizeof(void **),
+					size_t bm = 32) : SlabAllocator(objsz_, bm) {
 			p_dest = NULL;
 		}
 		

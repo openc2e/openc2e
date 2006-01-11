@@ -163,7 +163,7 @@ void caosVM::v_AGNT() {
  DBG: MALLOC (command)
  %status stub
 
- Dumps some malloc stats to stderr. Except, doesn't, because it's unportable horror. - fuzzie
+ Dumps some random memory stats to stderr.
 */
 void caosVM::c_DBG_MALLOC() {
 	VM_VERIFY_SIZE(0)
@@ -183,6 +183,11 @@ void caosVM::c_DBG_MALLOC() {
 	MPRINT(fordblks);
 	MPRINT(keepcost);
 	malloc_stats(); */
+	
+	std::cerr << "caosSlab free=" << caosVarSlab.free_elements() <<
+				 " used=" << caosVarSlab.used_elements() <<
+				 " total=" << caosVarSlab.total_elements() <<
+				 std::endl;
 }
 	
 /**

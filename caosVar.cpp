@@ -28,6 +28,8 @@
 #error meh, copy the stuff out of caosVar.h and drop it here
 #endif
 
+SlabAllocator caosVarSlab((sizeof(agentwrap) > sizeof(stringwrap) ? sizeof(agentwrap) : sizeof(stringwrap)), -32768);
+
 static inline std::string stringify(double x) {
 	std::ostringstream o;
 	if (!(o << x)) throw "stringify() failed";
@@ -36,14 +38,14 @@ static inline std::string stringify(double x) {
 
 std::string caosVar::dump() const {
 	if (type == STRING) {
-		return std::string("\"") + *values.stringValue + "\" ";
+		return std::string("\"") + values.stringValue->str + "\" ";
 	} else if (type == INTEGER) {
 		return stringify(values.intValue) + " ";
 	} else if (type == FLOAT) {
 		return stringify(values.floatValue) + " ";
 	} else if (type == AGENT) {
 		char ptrbuf[64];
-		sprintf(ptrbuf, "Agent %p", values.refValue->get());
+		sprintf(ptrbuf, "Agent %p", values.refValue->ref.get());
 		return std::string(ptrbuf);
 	} else {
 		return "[bad caosVar!] ";
