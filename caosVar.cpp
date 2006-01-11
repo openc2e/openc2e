@@ -28,7 +28,7 @@
 #error meh, copy the stuff out of caosVar.h and drop it here
 #endif
 
-SlabAllocator caosVarSlab((sizeof(agentwrap) > sizeof(stringwrap) ? sizeof(agentwrap) : sizeof(stringwrap)), -32768);
+SlabAllocator caosVarSlab((sizeof(agentwrap) > sizeof(stringwrap) ? sizeof(agentwrap) : sizeof(stringwrap)), 32768);
 
 static inline std::string stringify(double x) {
 	std::ostringstream o;

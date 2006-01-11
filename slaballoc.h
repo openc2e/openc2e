@@ -60,7 +60,7 @@ class SlabAllocator {
 		}
 	
 		size_t count, freect, memy_usage, memy_reserved, memy_free;
-		ssize_t block_mult;
+		size_t block_size;
 		alloc_head *p_free; // A chain through free blocks
 		slab_head *p_head; // A chain through the beginnings of the blocks
 		// head is used for destructor freeing and clear()
@@ -71,11 +71,8 @@ class SlabAllocator {
 			assert(!freect);
 			size_t objsz = unitsz(this->objsz);
 			size_t unit = objsz + tail_data();
-			size_t items = block_mult;
-			if (block_mult < 0)
-				items = alloc_count(unit, -block_mult);
-			else
-				items = block_mult;
+			size_t items = alloc_count(unit, block_size);
+			assert(items != 0);
 			size_t extent = unit * items;
 			size_t alloc = sizeof(slab_head) + extent;
 			void *chunk = malloc(alloc);
@@ -177,14 +174,13 @@ class SlabAllocator {
 		 *   larger than this, if said allocation is not the first to be
 		 *   done in the slab it will result in wasted memory until and
 		 *   unless clear() is called.
-		 * ssize_t bm
-		 *   If bm is positive, indicates the number of objects in each slab.
-		 *   If negative, indicates the target size of a slab, in bytes.
+		 * size_t bm
+		 *   Indicates the target size of a slab, in bytes.
 		 */
-		SlabAllocator(size_t objsz_ = sizeof(void **), ssize_t bm = -4096)
+		SlabAllocator(size_t objsz_ = sizeof(void **), size_t bm = 4096)
 			: objsz(objsz_), count(0), freect(0),
 			  memy_usage(0), memy_reserved(0), memy_free(0),
-			  block_mult(bm), p_free(NULL), p_head(NULL)
+			  block_size(bm), p_free(NULL), p_head(NULL)
 		  {
 			  objsz += sizeof(slab_head *);
 		  }
