@@ -27,14 +27,15 @@ Region random_in(const Region &tr) {
 }
 
 int main() {
+	std::cerr << "rbr=" << sizeof(RBranch<Region>) << "rn=" << sizeof(RNode<Region>) << "rd=" << sizeof(RData<Region>) << std::endl;
 	try {
 		std::vector<Region> testVec;
 		srand(time(NULL));
 		RTree<Region> tree;
-		for (int i = 0; i < 5000; i++) {
-			int x1 = rand() % 50000;
+		for (int i = 0; i < 500; i++) {
+			int x1 = rand(); // % 50000;
 			int x2 = x1 + rand() % 125;
-			int y1 = rand() % 50000;
+			int y1 = rand(); // % 50000;
 			int y2 = y1 + rand() % 125;
 
 			if (x1 > x2) {

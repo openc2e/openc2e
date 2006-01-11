@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <list>
 #include <deque>
+#include "slaballoc.h"
 
 // REGION_MAX should be odd, or adjust REGION_MIN manually
 #define REGION_MAX 5
@@ -87,12 +88,14 @@ struct Region {
 
 template <class T> struct RBranch;
 template <class T> struct RData;
+template <class T> class RTree;
 
 template <class T>
 struct RNode {
 	Region r;
 	RBranch<T> *parent;
-	int parent_idx;
+	unsigned int parent_idx;
+	RTree<T> *tree;
 
 	virtual void scan(const Region &target, std::vector<RData<T> *> &list) = 0;
 	virtual RData<T> *scan(const Region &target) = 0;
@@ -100,7 +103,7 @@ struct RNode {
 	virtual RBranch<T> *chooseleaf(const Region &)
 	{ assert(false); }
 
-	RNode(const Region &r_) : r(r_), parent(NULL), parent_idx(-1)
+	RNode(const Region &r_, RTree<T> *t) : r(r_), parent(NULL), parent_idx(UINT_MAX), tree(t)
 	{
 	}
 
@@ -115,7 +118,7 @@ struct RNode {
 
 template <class T>
 struct RBranch : public RNode<T> {
-	int child_count; // : CLD_BITS;
+	unsigned int child_count; // : CLD_BITS;
 	bool is_leaf : 1; // if true, all of children are RLeafs 
 	RNode<T> *children[REGION_MAX];
 
@@ -125,9 +128,10 @@ struct RBranch : public RNode<T> {
 
 	virtual size_t inner_size() const { return isz; }
 
-	void expensive_checks(bool local = false) {
+	void expensive_checks() {
+#ifdef RTREE_DEBUG
 		Region r_ = this->r;
-		for (int i = 0; i < child_count; i++) {
+		for (unsigned int i = 0; i < child_count; i++) {
 			assert(children[i]->parent == this);
 			assert(children[i]->parent_idx == i);
 			children[i]->expensive_checks();
@@ -138,6 +142,7 @@ struct RBranch : public RNode<T> {
 			std::cerr << dump();
 			abort();
 		}
+#endif
 	}
 
 	void minimize() {
@@ -145,7 +150,7 @@ struct RBranch : public RNode<T> {
 		this->sz = children[0]->size();
 		this->isz = children[0]->inner_size() + 1;
 		this->r = children[0]->r;
-		for (int i = 1; i < child_count; i++) {
+		for (unsigned int i = 1; i < child_count; i++) {
 			this->r = this->r.expand(children[i]->r);
 			this->sz += children[i]->size();
 			this->isz += children[i]->inner_size();
@@ -170,11 +175,11 @@ struct RBranch : public RNode<T> {
 		recalc_up();
 	}
 
-	void drop_kid(int idx, std::deque<RNode<T> *> &reloc, RBranch<T> *&root) { // not yet used
-		assert(child_count && idx >= 0 && idx < child_count);
+	void drop_kid(unsigned int idx, std::deque<RNode<T> *> &reloc, RBranch<T> *&root) { // not yet used
+		assert(child_count && idx < child_count);
 		child_count--;
 		
-		for (int i = idx; i < child_count; i++) {
+		for (unsigned int i = idx; i < child_count; i++) {
 			children[i] = children[i + 1];
 			children[i]->parent_idx = i;
 		}
@@ -190,7 +195,7 @@ struct RBranch : public RNode<T> {
 			return;
 		}
 
-		minimize();
+		recalc_up();
 	}
 
 	void add_multi(RNode<T> **n, int count) {
@@ -206,7 +211,7 @@ struct RBranch : public RNode<T> {
 		recalc_up();
 	}
 
-	RBranch(const Region &r) : RNode<T>(r) {
+	RBranch(const Region &r, RTree<T> *t) : RNode<T>(r, t) {
 		// Convenience for the main RTree initializer
 		child_count = 0;
 		is_leaf = true;
@@ -217,7 +222,7 @@ struct RBranch : public RNode<T> {
 	virtual void scan(const Region &target, std::vector<RData<T> *> &list) {
 		if (!this->r.overlaps(target))
 			return;
-		for (int i = 0; i < child_count; i++)
+		for (unsigned int i = 0; i < child_count; i++)
 			if (children[i]->r.overlaps(target))
 				children[i]->scan(target, list);
 	}
@@ -225,7 +230,7 @@ struct RBranch : public RNode<T> {
 	virtual RData<T> *scan(const Region &target) {
 		if (!this->r.overlaps(target))
 			return NULL;
-		for (int i = 0; i < child_count; i++) {
+		for (unsigned int i = 0; i < child_count; i++) {
 			if (children[i]->r.overlaps(target)) {
 				RData<T> *ret = children[i]->scan(target);
 				if (ret) return ret;
@@ -241,7 +246,7 @@ struct RBranch : public RNode<T> {
 		RBranch<T> *best = dynamic_cast<RBranch<T> *>(children[0]);
 		unsigned long expansion = ULONG_MAX;
 
-		for (int i = 0; i < child_count; i++) {
+		for (unsigned int i = 0; i < child_count; i++) {
 			u64_t orig_area = children[i]->r.area();
 			u64_t new_area  = children[i]->r.expand(target).area();
 			u64_t exp       = new_area - orig_area;
@@ -366,8 +371,8 @@ struct RBranch : public RNode<T> {
 	void split(RBranch<T> *&root) {
 		assert(child_count == REGION_MAX);
 		
-		int split = child_count / 2;
-		RBranch<T> *newbranch = new RBranch<T>(children[split]->r);
+		unsigned int split = child_count / 2;
+		RBranch<T> *newbranch = new(this->tree->branches) RBranch<T>(children[split]->r, this->tree);
 
 		newbranch->is_leaf = this->is_leaf;
 
@@ -384,12 +389,12 @@ struct RBranch : public RNode<T> {
 		child_count = n1.size();
 		newbranch->child_count = n2.size();
 
-		for (int i = 0; i < child_count; i++) {
+		for (unsigned int i = 0; i < child_count; i++) {
 			children[i]->parent = this;
 			children[i]->parent_idx = i;
 		}
 		
-		for (int i = 0; i < newbranch->child_count; i++) {
+		for (unsigned int i = 0; i < newbranch->child_count; i++) {
 			newbranch->children[i]->parent = newbranch;
 			newbranch->children[i]->parent_idx = i;
 		}
@@ -398,7 +403,7 @@ struct RBranch : public RNode<T> {
 		newbranch->minimize();
 		
 		if (!this->parent) { // Need to make a new root!
-			root = new RBranch<T>(this->r);
+			root = new(this->tree->branches) RBranch<T>(this->r, this->tree);
 			root->is_leaf = false;
 			root->insert(this, root);
 		}
@@ -417,7 +422,7 @@ struct RBranch : public RNode<T> {
 		Region test(children[0]->r);
 		std::ostringstream oss;
 		oss << "RBranch " << this->r.to_s() << " {" << std::endl;
-		for (int i = 0; i < child_count; i++) {
+		for (unsigned int i = 0; i < child_count; i++) {
 			oss << "#" << i << " " << children[i]->dump() << std::endl;
 			test = test.expand(children[i]->r);
 		}
@@ -432,6 +437,8 @@ struct RBranch : public RNode<T> {
 		oss << "}" << std::endl;
 		return oss.str();
 	}
+
+	SLAB_CLASS(RBranch<T>)
 };
 
 template<class T>
@@ -453,22 +460,39 @@ struct RData : public RNode<T> {
 		return NULL;
 	}
 
-	RData(const Region &r_, const T &obj_) : RNode<T>(r_), obj(obj_) { }
+	RData(const Region &r_, RTree<T> *t, const T &obj_) : RNode<T>(r_, t), obj(obj_) { }
 
 	std::string dump() {
 		std::ostringstream oss;
 		oss << "RData " << this->r.to_s() << " -> " << /* obj.to_s() */ (void *)&obj << std::endl;
 		return oss.str();
 	}
+
+	SLAB_CLASS(RData<T>)
 };
 
 template <class T>
 class RTree {
 	protected:
 		RBranch<T> *root;
+		SlabAllocator branches;
+		SlabAllocator leaves;
 	public:
 
+		void free_node(RNode<T> *n) {
+			RBranch<T> *br = dynamic_cast<RBranch<T> *>(n);
+			if (br) {
+				delete br;
+				return;
+			}
+
+			RData<T> *d = dynamic_cast<RData<T> *>(n);
+			assert(d);
+			delete d;
+		}
+		
 		friend class ptr;
+		friend class RBranch<T>;
 
 		class ptr {
 			// Wrapper to enforce encapsulation
@@ -488,7 +512,7 @@ class RTree {
 					std::deque<RNode<T> *> reloc;
 					assert(node && node->parent);
 					node->parent->drop_kid(node->parent_idx, reloc, tree->root);
-					delete node;
+					tree->free_node(node);
 
 					while (!reloc.empty()) {
 						RNode<T> *node = reloc.front();
@@ -496,13 +520,13 @@ class RTree {
 						RBranch<T> *br = dynamic_cast<RBranch<T> *>(node);
 						if (br) {
 							// This is probably slightly inefficient but should work
-							for (int i = 0; i < br->child_count; i++) {
+							for (unsigned int i = 0; i < br->child_count; i++) {
 								reloc.push_back(br->children[i]);
 							}
-							delete br;
+							tree->free_node(br);
 						} else {
 							if (!tree->root)
-								tree->root = new RBranch<T>(node->r);
+								tree->root = new(this->tree->branches) RBranch<T>(node->r, tree);
 							tree->root->chooseleaf(node->r)->insert(node, tree->root);
 						}
 					}
@@ -513,9 +537,9 @@ class RTree {
 		RTree() : root(NULL) {}
 		
 		void insert(const Region &r, const T &val) {
-			RData<T> *node = new RData<T>(r, val);
+			RData<T> *node = new(leaves) RData<T>(r, this, val);
 			if (!root)
-				root = new RBranch<T>(r);
+				root = new(branches) RBranch<T>(r, this);
 			root->chooseleaf(r)->insert(node, root);
 			check();
 		}
