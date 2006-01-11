@@ -83,7 +83,6 @@ struct Region {
 		assert(xmin <= xmax);
 		assert(ymin <= ymax);
 	}
-	
 };
 
 template <class T> struct RBranch;
@@ -476,20 +475,10 @@ class RTree {
 	protected:
 		RBranch<T> *root;
 		SlabAllocator branches;
-		SlabAllocator leaves;
+		DestructingSlab leaves;
 	public:
 
-		void free_node(RNode<T> *n) {
-			RBranch<T> *br = dynamic_cast<RBranch<T> *>(n);
-			if (br) {
-				delete br;
-				return;
-			}
-
-			RData<T> *d = dynamic_cast<RData<T> *>(n);
-			assert(d);
-			delete d;
-		}
+		void free_node(RNode<T> *n) { delete n; }
 		
 		friend class ptr;
 		friend class RBranch<T>;

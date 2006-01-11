@@ -15,6 +15,17 @@ struct rcmp
 	}
 };
 
+struct R2 : public Region {
+	bool ok;
+	~R2() {
+		std::cerr << "R2 dest " << to_s() << " ok " << ok << std::endl;
+		ok = false;
+	}
+
+	R2(const Region &r) : Region(r), ok(true) {}
+	R2(int x1, int x2, int y1, int y2) : Region(x1,x2,y1,y2), ok(true) {}
+};
+
 Region random_in(const Region &tr) {
 	double rp1 = (double)rand() / (double)RAND_MAX;
 	double rp2 = (double)rand() / (double)RAND_MAX;
@@ -29,9 +40,9 @@ Region random_in(const Region &tr) {
 int main() {
 	std::cerr << "rbr=" << sizeof(RBranch<Region>) << "rn=" << sizeof(RNode<Region>) << "rd=" << sizeof(RData<Region>) << std::endl;
 	try {
-		std::vector<Region> testVec;
+		std::vector<R2> testVec;
 		srand(time(NULL));
-		RTree<Region> tree;
+		RTree<R2> tree;
 		for (int i = 0; i < 500; i++) {
 			int x1 = rand(); // % 50000;
 			int x2 = x1 + rand() % 125;
@@ -56,13 +67,13 @@ int main() {
 				continue;
 			}
 				
-			testVec.push_back(Region(x1, x2, y1, y2));
+			testVec.push_back(R2(r));
 		}
 
 		bool allok = true;
 		
 		int ct = 0;
-		for (std::vector<Region>::iterator i = testVec.begin(); i != testVec.end(); i++) {
+		for (std::vector<R2>::iterator i = testVec.begin(); i != testVec.end(); i++) {
 			tree.insert(*i, *i);
 			ct++;
 //			if (ct % 100 == 0)
@@ -71,7 +82,7 @@ int main() {
 		std::cerr << std::endl << "size=" << tree.size() << "inner=" << tree.inner_size() << std::endl;
 
 		ct = 0;
-		for (std::vector<Region>::iterator i = testVec.begin(); i != testVec.end(); i++) {
+		for (std::vector<R2>::iterator i = testVec.begin(); i != testVec.end(); i++) {
 			if (ct++ % 100 == 0)
 				fprintf(stderr, "\rchk %06d", ct);
 			std::cout << "Verify of " << (*i).to_s() << "... ";
@@ -80,9 +91,9 @@ int main() {
 			std::cout << q.to_s() << "... ";
 			bool ok = false;
 
-			std::vector<RTree<Region>::ptr> results = tree.find(q);
+			std::vector<RTree<R2>::ptr> results = tree.find(q);
 			std::cout << results.size() << " results ... ";
-			for (std::vector<RTree<Region>::ptr>::iterator ci = results.begin(); ci != results.end(); ci++) {
+			for (std::vector<RTree<R2>::ptr>::iterator ci = results.begin(); ci != results.end(); ci++) {
 				if ((*ci).data() == *i) {
 					ok = true;
 					(*ci).erase();
@@ -93,7 +104,7 @@ int main() {
 			results = tree.find(q);
 			
 			std::cout << results.size() << " results postdel ... ";
-			for (std::vector<RTree<Region>::ptr>::iterator ci = results.begin(); ci != results.end(); ci++) {
+			for (std::vector<RTree<R2>::ptr>::iterator ci = results.begin(); ci != results.end(); ci++) {
 				if ((*ci).data() == *i) {
 					ok = false;
 					break;
@@ -114,6 +125,11 @@ int main() {
 		else
 			std::cout << "All ok";
 		std::cout << std::endl;
+	
+		testVec.clear();
+		std::cout << "sz=" << tree.size() << "isz=" << tree.inner_size() << std::endl;
+		std::cout << "alloc/free test: " << std::endl;
+		tree.insert(Region(1,2,3,4), R2(1,2,3,4));
 	} catch (std::exception &e) {
 		std::cout << "abort: " << e.what();
 	}
