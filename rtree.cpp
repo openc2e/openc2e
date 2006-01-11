@@ -77,20 +77,28 @@ int main() {
 			Region q = random_in(*i);
 			assert(q.overlaps((*i)));
 			std::cout << q.to_s() << "... ";
-			Region *result = tree.find_one(q);
 			bool ok = false;
-			if (result && *result == *i) {
-				ok = true;
-			} else {
-				std::vector<RTree<Region>::ptr> results = tree.find(q);
-				std::cout << results.size() << " results ... ";
-				for (std::vector<RTree<Region>::ptr>::iterator ci = results.begin(); ci != results.end(); ci++) {
-					if ((*ci).data() == *i) {
-						ok = true;
-						break;
-					}
+
+			std::vector<RTree<Region>::ptr> results = tree.find(q);
+			std::cout << results.size() << " results ... ";
+			for (std::vector<RTree<Region>::ptr>::iterator ci = results.begin(); ci != results.end(); ci++) {
+				if ((*ci).data() == *i) {
+					ok = true;
+					(*ci).erase();
+					break;
 				}
 			}
+
+			results = tree.find(q);
+			
+			std::cout << results.size() << " results postdel ... ";
+			for (std::vector<RTree<Region>::ptr>::iterator ci = results.begin(); ci != results.end(); ci++) {
+				if ((*ci).data() == *i) {
+					ok = false;
+					break;
+				}
+			}
+
 // */
 			if (ok)
 				std::cout << "ok";

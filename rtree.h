@@ -10,9 +10,11 @@
 #include <cstdio>
 #include <algorithm>
 #include <list>
+#include <deque>
 
-#define REGION_MAX 50
-#define REGION_MIN 24
+// REGION_MAX should be odd, or adjust REGION_MIN manually
+#define REGION_MAX 5
+#define REGION_MIN (int)(REGION_MAX / 2)
 
 typedef unsigned long long u64_t;
 
@@ -168,14 +170,27 @@ struct RBranch : public RNode<T> {
 		recalc_up();
 	}
 
-	void drop_kid(int idx) { // not yet used
+	void drop_kid(int idx, std::deque<RNode<T> *> &reloc, RBranch<T> *&root) { // not yet used
 		assert(child_count && idx >= 0 && idx < child_count);
-		if (idx == child_count - 1)
-			child_count--;
-		for (int i = idx; i < child_count - 1; i++) {
+		child_count--;
+		
+		for (int i = idx; i < child_count; i++) {
 			children[i] = children[i + 1];
 			children[i]->parent_idx = i;
 		}
+
+		if (child_count < REGION_MIN) {
+			reloc.push_back(this);
+			if (this->parent)
+				this->parent->drop_kid(this->parent_idx, reloc, root);
+			else {
+				assert(root == this);
+				root = NULL;
+			}
+			return;
+		}
+
+		minimize();
 	}
 
 	void add_multi(RNode<T> **n, int count) {
@@ -453,21 +468,48 @@ class RTree {
 		RBranch<T> *root;
 	public:
 
+		friend class ptr;
+
 		class ptr {
 			// Wrapper to enforce encapsulation
 			protected:
 				RData<T> *node;
+				RTree<T> *tree;
 			public:
-				const Region &region() const { return node->r; }
-				T &data() { return node->obj; }
+				const Region &region() const { assert(node); return node->r; }
+				T &data() { assert(node); return node->obj; }
 			protected:
 				friend std::vector<ptr> RTree::find(const Region &r);
-				ptr(RData<T> *n) : node(n) { }
-				ptr(RData<T> &n) : node(&n) {}
+				ptr(RData<T> *n, RTree<T> *t) : node(n), tree(t) { }
+				ptr(RData<T> &n, RTree<T> *t) : node(&n), tree(t) {}
 			public:
-				ptr(const ptr &p) : node(p.node) {}
+				ptr(const ptr &p) : node(p.node), tree(p.tree) {}
+				void erase() {
+					std::deque<RNode<T> *> reloc;
+					assert(node && node->parent);
+					node->parent->drop_kid(node->parent_idx, reloc, tree->root);
+					delete node;
+
+					while (!reloc.empty()) {
+						RNode<T> *node = reloc.front();
+						reloc.pop_front();
+						RBranch<T> *br = dynamic_cast<RBranch<T> *>(node);
+						if (br) {
+							// This is probably slightly inefficient but should work
+							for (int i = 0; i < br->child_count; i++) {
+								reloc.push_back(br->children[i]);
+							}
+							delete br;
+						} else {
+							if (!tree->root)
+								tree->root = new RBranch<T>(node->r);
+							tree->root->chooseleaf(node->r)->insert(node, tree->root);
+						}
+					}
+				}
 		};
 		
+						
 		RTree() : root(NULL) {}
 		
 		void insert(const Region &r, const T &val) {
@@ -478,13 +520,14 @@ class RTree {
 			check();
 		}
 		std::vector<ptr> find(const Region &r) {
+			if (!root) return std::vector<ptr>();
 			std::vector<RData<T> *> list;
 			root->scan(r, list);
 
 			typename std::vector<RData<T> *>::iterator i = list.begin();
 			std::vector<ptr> out;
 			while (i != list.end()) {
-				out.push_back(ptr(*i));
+				out.push_back(ptr(*i, this));
 				i++;
 			}
 
