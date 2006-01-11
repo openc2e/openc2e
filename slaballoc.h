@@ -14,7 +14,6 @@ class SlabAllocator {
 	protected:
 
 		size_t objsz;
-		virtual size_t tail_data() const { return 0; };
 
 
 		struct slab_head {
@@ -48,6 +47,12 @@ class SlabAllocator {
 			return sz;
 		}
 
+		/* How much padding to add after the end of the data segment.
+		 * Subclasses should add values to the return value of this,
+		 * if they want to store private data there.
+		 */
+		virtual size_t tail_data() const { return 0; }
+		
 		// Find how many unitsz fit in target - sizeof slab_head
 		size_t alloc_count(size_t unitsz, size_t target) {
 			target -= sizeof(slab_head);
@@ -64,7 +69,8 @@ class SlabAllocator {
 		
 		void get_block() {
 			assert(!freect);
-			size_t unit = unitsz(objsz + tail_data());
+			size_t objsz = unitsz(this->objsz);
+			size_t unit = objsz + tail_data();
 			size_t items = block_mult;
 			if (block_mult < 0)
 				items = alloc_count(unit, -block_mult);
@@ -254,8 +260,13 @@ class DestructingSlab : public SlabAllocator {
 			destructor_info *next;
 			destructor_info *prev;
 			destructor_t dest;
+			alloc_head *ah;
 		};
 
+		virtual size_t tail_data() const {
+			return SlabAllocator::tail_data() + sizeof(destructor_info);
+		}
+		
 		destructor_info *p_dest;
 	public:
 
@@ -264,28 +275,26 @@ class DestructingSlab : public SlabAllocator {
 			p_dest = NULL;
 		}
 		
-		virtual void *alloc(size_t sz, destructor_t dest) {
-			sz += sizeof(destructor_info);
-			unsigned char *cp =
-				(unsigned char *)SlabAllocator::alloc(sz, SlabAllocator::null_destructor);
-			destructor_info *dp = (destructor_info *)cp;
-
-			if (p_dest && p_dest->next)
-				assert(p_dest->next->prev == p_dest);
-
-			
-			dp->next = p_dest;
-			if (dp->next)
-				dp->next->prev = dp;
-			dp->prev = NULL;
-			dp->dest = dest;
-			p_dest = dp;
-			return (void *)(cp + sizeof (*dp));
+		virtual void *alloc(size_t sz, destructor_t dest = null_destructor) {
+			alloc_head *ah = _alloc(sz);
+			unsigned char *up = (unsigned char *)&ah->next;
+			up += ah->slab->objsz + SlabAllocator::tail_data();
+			destructor_info *di = (destructor_info *)up;
+			di->next = p_dest;
+			if (di->next)
+				di->next->prev = di;
+			di->prev = NULL;
+			di->dest = dest;
+			di->ah = ah;
+			return (void *)&ah->next;
 		}
 
 		virtual void release(void *p) {
 			unsigned char *cp = (unsigned char *)p;
-			cp -= sizeof (destructor_info);
+			cp -= sizeof (alloc_head *);
+			alloc_head *ah = (alloc_head *)cp;
+			
+			cp += ah->slab->objsz + SlabAllocator::tail_data();
 			destructor_info *dp = (destructor_info *)cp;
 
 			if (dp->next)
@@ -294,14 +303,17 @@ class DestructingSlab : public SlabAllocator {
 				dp->prev->next = dp->next;
 			else
 				p_dest = dp->next;
+			assert(dp->ah == ah);
 
-			SlabAllocator::release((void *)cp);
+			_release(ah);
 		}
 
 		virtual void clear() {
 			while (p_dest) {
-				unsigned char *cp = (unsigned char *)p_dest;
-				cp += sizeof(destructor_info);
+				alloc_head *ah = p_dest->ah;
+				unsigned char *cp = (unsigned char *)ah;
+				cp += sizeof (slab_head *);
+
 				p_dest->dest((void *)cp);
 				/* It'd be faster to just run all the destructors then zot the entire
 				 * pool, but if any destructor frees memory in the meantime this
@@ -309,7 +321,7 @@ class DestructingSlab : public SlabAllocator {
 				 *
 				 * For now, release properly.
 				 */
-				release(p_dest);
+				release((void *)cp);
 			}
 			SlabAllocator::clear();
 		}
