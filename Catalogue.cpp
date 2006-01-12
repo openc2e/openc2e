@@ -136,7 +136,6 @@ std::string stringFromInt(int i) {
 const std::string Catalogue::getAgentName(unsigned char family, unsigned char genus, unsigned short species) const {
 	std::string buf;
 	buf = str(boost::format("Agent Help %d %d %d") % (int)family % (int)genus % species);
-	std::cerr << "cat " << buf << std::endl;
 	if (hasTag(buf)) {
 		return getTag(buf)[0];
 	} else {
