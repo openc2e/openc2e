@@ -23,10 +23,13 @@
 
 #include <iostream>
 #include <sstream>
+#include <boost/format.hpp>
 
 #ifdef DONT_INLINE_CAOSVAR_ACCESSORS
 #error meh, copy the stuff out of caosVar.h and drop it here
 #endif
+
+using boost::str;
 
 SlabAllocator caosVarSlab((sizeof(agentwrap) > sizeof(stringwrap) ? sizeof(agentwrap) : sizeof(stringwrap)), 32768);
 
@@ -44,9 +47,7 @@ std::string caosVar::dump() const {
 	} else if (type == FLOAT) {
 		return stringify(values.floatValue) + " ";
 	} else if (type == AGENT) {
-		char ptrbuf[64];
-		sprintf(ptrbuf, "Agent %p", values.refValue->ref.get());
-		return std::string(ptrbuf);
+		return str(boost::format("Agent %p") % values.refValue->ref.get());
 	} else {
 		return "[bad caosVar!] ";
 	}

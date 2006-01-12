@@ -5,11 +5,14 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/format.hpp>
 #include <iostream>
 
 #include <cctype>
 
 #include "openc2e.h"
+
+using boost::str;
 
 namespace fs = boost::filesystem;
 
@@ -131,8 +134,9 @@ std::string stringFromInt(int i) {
 }
 
 const std::string Catalogue::getAgentName(unsigned char family, unsigned char genus, unsigned short species) const {
-	char buf[26]; // 11 + (3 + 1) + (3 + 1) + (5 + 1) + 1
-	sprintf(buf, "Agent Help %i %i %i", family, genus, species);
+	std::string buf;
+	buf = str(boost::format("Agent Help %d %d %d") % (int)family % (int)genus % species);
+	std::cerr << "cat " << buf << std::endl;
 	if (hasTag(buf)) {
 		return getTag(buf)[0];
 	} else {

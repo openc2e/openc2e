@@ -7,6 +7,11 @@
 #include "caosScript.h"
 #include <cstdio>
 
+#include <sstream>
+#include <boost/format.hpp>
+
+using boost::str; // boost::format convertor
+
 class script;
 
 typedef void (caosVM::*ophandler)();
@@ -51,9 +56,7 @@ class caosJMP : public caosOp {
 			assert (p > 0);
 		}
 		std::string dump() { 
-			char buf[16];
-			sprintf(buf, "JMP %08d", p);
-			return std::string(buf);
+			return str(boost::format("JMP %08d") % p);
 		}
 };
 
@@ -130,9 +133,7 @@ class caosGSUB : public caosOp {
 		}
 
 		std::string dump() { 
-			char buf[16];
-			sprintf(buf, "GSUB %08d", targ);
-			return std::string(buf);
+			return str(boost::format("GSUB %08d") % targ);
 		}
 };
 
@@ -153,15 +154,14 @@ class caosCond : public caosOp {
 		int branch;
 	public:
 		std::string dump() { 
-			char buf[64];
-			const char *c = NULL;
+			std::ostringstream oss;
+			const char *c;
 			if (cond < CMASK && cond > 0)
 				c = cnams[cond];
 			if (c)
-				sprintf(buf, "COND %s %08d", c, branch);
+				return str(boost::format("COND %s %08d") % c % branch);
 			else
-				sprintf(buf, "COND BAD %d %08d", cond, branch);
-			return std::string(buf);
+				return str(boost::format("COND BAD %d %08d") % cond % branch);
 		}
 				
 			
@@ -245,9 +245,7 @@ class caosENUM_POP : public caosOp {
 			assert(exit > 0);
 		}
 		std::string dump() {
-			char buf[24];
-			sprintf(buf, "ENUM_POP %08d", exit);
-			return std::string(buf);
+			return str(boost::format("ENUM_POP %08d") % exit);
 		}
 };
 

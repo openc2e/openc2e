@@ -28,6 +28,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cstring>
+#include <boost/format.hpp>
 
 using std::string;
 
@@ -91,15 +92,12 @@ std::string script::dump() {
 	std::ostringstream oss;
 	oss << "Relocations:" << std::endl;
 	for (int i = 1; i < relocations.size(); i++) {
-		char buf[32];
-		sprintf(buf, "%08d -> %08d", i, relocations[i]);
-		oss << buf << std::endl;
+		oss << boost::format("%08d -> %08d") % i % relocations[i]
+			<< std::endl;
 	}
 	oss << "Code:" << std::endl;
 	for (int i = 0; i < allOps.size(); i++) {
-		char buf[16];
-		sprintf(buf, "%08d: ", i);
-		oss << buf;
+		oss << boost::format("%08d: ") % i;
 		oss << allOps[i]->dump();
 		oss << std::endl;
 	}

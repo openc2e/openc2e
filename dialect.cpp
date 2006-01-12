@@ -10,6 +10,11 @@
 #include "caosVar.h"
 #include "Agent.h"
 
+#include <sstream>
+#include <boost/format.hpp>
+
+using boost::str;
+
 std::map<std::string, Variant *> variants;
 
 /*
@@ -145,9 +150,7 @@ class opVAxx : public caosOp {
 		}
 
 		std::string dump() {
-			char buf[16];
-			sprintf(buf, "VA%02d", index);
-			return std::string(buf);
+			return str(boost::format("VA%02d") % index);
 		}
 };
 
@@ -162,9 +165,7 @@ class opOVxx : public caosOp {
 			vm->valueStack.push_back(&vm->targ->var[index]);
 		}
 		std::string dump() {
-			char buf[16];
-			sprintf(buf, "OV%02d", index);
-			return std::string(buf);
+			return str(boost::format("OV%02d") % index);
 		}
 };
 
@@ -179,9 +180,7 @@ class opMVxx : public caosOp {
 			vm->valueStack.push_back(&vm->owner->var[index]);
 		}
 		std::string dump() {
-			char buf[16];
-			sprintf(buf, "MV%02d", index);
-			return std::string(buf);
+			return str(boost::format("MV%02d") % index);
 		}
 };
 

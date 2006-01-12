@@ -29,6 +29,7 @@
 
 // #include "malloc.h" <- unportable horror!
 #include <sstream>
+#include <boost/format.hpp>
 
 using std::cerr;
 using std::cout;
@@ -55,7 +56,7 @@ void caosVM::c_DBG_OUTV() {
 	VM_PARAM_DECIMAL(val)
 
 	if (val.hasFloat()) {
-		cout << val.floatValue;
+		cout << boost::format("%0.06f") % val.floatValue;
 	} else {
 		cout << val.intValue;
 	}

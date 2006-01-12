@@ -22,8 +22,12 @@
 #include "World.h"
 #include <iostream>
 
+#include <boost/format.hpp>
+
 using std::cout;
 using std::cerr;
+
+using boost::format;
 
 /**
  OUTX (command) val (string)
@@ -73,8 +77,7 @@ void caosVM::c_OUTV() {
 	VM_PARAM_DECIMAL(val)
 
 	if (val.hasFloat()) {
-		// TODO: DS spits things like '4.000000' and '-5.000000', we don't
-		*outputstream << val.floatValue;
+		*outputstream << boost::format("%0.06f") % val.floatValue;
 	} else {
 		*outputstream << val.intValue;
 	}
