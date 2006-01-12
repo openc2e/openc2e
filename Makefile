@@ -134,7 +134,7 @@ lex.mng.o: mngparser.tab.hpp
 openc2e: $(OPENC2E)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o
+tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o catalogue.lex.o catalogue.tab.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/praydumper: tools/praydumper.o pray.o
