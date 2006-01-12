@@ -53,6 +53,9 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	imsk_key_down = imsk_key_up = imsk_mouse_move = imsk_mouse_down = imsk_mouse_up = imsk_mouse_wheel = imsk_translated_char = false;
 
 	emitca_index = -1; emitca_amount = 0.0f;
+
+	if (findScript(10))
+		queueScript(10); // constructor
 }
 
 void Agent::zotstack() {
@@ -123,8 +126,56 @@ shared_ptr<script> Agent::findScript(unsigned short event) {
 	return world.scriptorium.getScript(family, genus, species, event);
 }
 
+#include "PointerAgent.h"
+#include "Creature.h"
 bool Agent::fireScript(unsigned short event, Agent *from) {
 	if (dying) return false;
+
+	Creature *c;
+	if (event <= 3 || event == 4 || event == 12)
+		c = dynamic_cast<Creature *>(from);
+
+	switch (event) {
+		case 0: // deactivate
+			if (c && !cr_can_stop) return false;
+			break;
+		case 1: // activate 1
+			if (c && !cr_can_push) return false;
+			break;
+		case 2: // activate 2
+			if (c && !cr_can_pull) return false;
+			break;
+		case 3: // hit
+			if (c && !cr_can_hit) return false;
+			break;
+		case 4: // pickup
+			if (c && !cr_can_pickup) return false;
+			// TODO: handle pickup
+			break;
+		case 5: // drop
+			// TODO: handle drop
+			break;
+		case 12: // eat
+			if (c && !cr_can_eat) return false;
+			break;
+		case 13: // hold hands with pointer
+			if (c) {
+				// TODO
+			}
+			break;
+		case 14: // stop holding hands with pointer
+			if (c) {
+				// TODO
+			}
+			break;
+		case 92: // TODO: hack for 'UI Mouse Down' event - we need a real event system!
+			std::cout << "faking event 92 on " << identify() << std::endl;
+			CompoundPart *p = world.partAt(world.hand()->x, world.hand()->y);
+			caos_assert(p && p->getParent() == this);
+			p->handleClick(world.hand()->x - p->x - p->getParent()->x, world.hand()->y - p->y - p->getParent()->y);
+			// TODO: we're [obviously] missing firing the pointer script here, but it's a hack for now
+			break;
+	}
 
 	shared_ptr<script> s = findScript(event);
 	if (!s) return false;
@@ -139,22 +190,15 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 	return false;
 }
 
-#include "PointerAgent.h"
 bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {
-	if (event == 92) { // TODO: hack for 'UI Mouse Down' event - we need a real event system!
-		std::cout << "faking event 92 on " << identify() << std::endl;
-		CompoundPart *p = world.partAt(world.hand()->x, world.hand()->y);
-		caos_assert(p && p->getParent() == this);
-		p->handleClick(world.hand()->x - p->x - p->getParent()->x, world.hand()->y - p->y - p->getParent()->y);
-		// TODO: we're [obviously] missing firing the pointer script here, but it's a hack for now
-		return false; // TODO: is this right? does anything care?
-	}
-
 	if (dying) return false;
-	if (findScript(event)) {
+
+	// TODO: fuzzie removed this check because the stuff in fireScript needs to be called even if there's no script
+	// however, we could probably optimise by only bothering adding it to the queue if it's a script# this is necessary for :)
+	//if (findScript(event)) {
 		world.queueScript(event, this, from, p0, p1);
 		return true;
-	}
+	//}
 	return false;
 }
 
