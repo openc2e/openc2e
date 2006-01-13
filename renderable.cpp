@@ -33,15 +33,20 @@ bool renderablezorder::operator ()(const renderable *s1, const renderable *s2) c
 }
 
 void renderable::zapZOrder() {
+	assert(added);
 	world.renders.erase(renders_iter);
+	added = false;
 }
 
 void renderable::addZOrder() {
+	assert(!added);
 	renders_iter = world.renders.insert(this);
+	added = true;
 }
 
 renderable::~renderable() {
-	world.renders.erase(renders_iter);
+	if (added)
+		world.renders.erase(renders_iter);
 }
 
 /* vim: set noet: */

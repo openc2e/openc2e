@@ -66,10 +66,10 @@ public:
 	CompoundAgent *getParent() const { return parent; }
 	void zapZOrder();
 	void addZOrder();
-	void setFrameNo(unsigned int f) { frameno = f; pose = animation[f]; } // todo: assert it's in the range
-	void setPose(unsigned int p) { animation.clear(); pose = p; }
+	void setFrameNo(unsigned int f);
+	void setPose(unsigned int p);
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
-	void setBase(unsigned int b) { base = b; }
+	void setBase(unsigned int b);
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 	bool transparentAt(unsigned int x, unsigned int y);
 				

@@ -61,6 +61,27 @@ void CompoundPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha);
 }
 
+void CompoundPart::setFrameNo(unsigned int f) {
+	assert(f < animation.size());
+	assert(firstimg + base + animation[f] < getSprite()->numframes());
+	
+	frameno = f;
+	pose = animation[f];
+}
+
+void CompoundPart::setPose(unsigned int p) {
+	assert(firstimg + base + p < getSprite()->numframes());
+
+	animation.clear();
+	pose = p;
+}
+		
+void CompoundPart::setBase(unsigned int b) {
+	assert(firstimg + b + pose < getSprite()->numframes());
+
+	base = b;
+}
+
 bool CompoundPart::transparentAt(unsigned int x, unsigned int y) {
 	return ((duppableImage *)getSprite())->transparentAt(getCurrentSprite(), x, y);
 }
@@ -71,12 +92,15 @@ void CompoundPart::handleClick(float clickx, float clicky) {
 
 CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
 						int _x, int _y, unsigned int _z) : zorder(_z), parent(p), id(_id) {
-	addZOrder();
+	origsprite = sprite = gallery.getImage(spritefile);
 	firstimg = fimg;
+	caos_assert(sprite);
+	caos_assert(sprite->numframes() > firstimg);
+	
+	addZOrder();
+
 	x = _x;
 	y = _y;
-	origsprite = sprite = gallery.getImage(spritefile);
-	caos_assert(sprite);
 	pose = 0;
 	base = 0;
 	has_alpha = false;
