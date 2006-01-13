@@ -502,6 +502,7 @@ void CompoundPart::tick() {
 				if (f == (animation.size() - 1)) f = 0;
 				else f = animation[f + 1];
 			}
+			// TODO: check f is valid..
 			setFrameNo(f);
 		}
 	}

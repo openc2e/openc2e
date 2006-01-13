@@ -204,6 +204,7 @@ void caosVM::c_POSE() {
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
 	caos_assert(p);
+	caos_assert(p->getFirstImg() + p->getBase() + pose < p->getSprite()->numframes());
 	p->setPose(pose);
 }
 
@@ -421,6 +422,7 @@ void caosVM::c_BASE() {
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
 	caos_assert(p);
+	caos_assert(p->getFirstImg() + index + p->getPose() < p->getSprite()->numframes());
 	p->setBase(index);
 }
 
