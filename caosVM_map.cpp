@@ -309,8 +309,11 @@ void caosVM::c_PROP() {
 	VM_PARAM_FLOAT(cavalue)
 	VM_PARAM_INTEGER(caindex)
 	VM_PARAM_INTEGER(roomid)
-	
-	caos_assert(0.0f <= cavalue && cavalue <= 1.0f);
+
+	if (cavalue > 1.0f)
+		cavalue = 1.0f;
+	else
+		caos_assert(0.0f <= cavalue);
 	caos_assert(0 <= caindex && caindex <= 19);
 
 	Room *room = world.map.getRoom(roomid);
