@@ -33,8 +33,6 @@ namespace fs = boost::filesystem;
 namespace po = boost::program_options;
 extern fs::path homeDirectory(); // creaturesImage.cpp
 static const char data_default[] = "./data";
-static const char bootstrap_suffix[] = "/Bootstrap/001 World";
-static const char bootstrapDS_suffix[] = "/Bootstrap/010 Docking Station";
 
 static void opt_version() {
 	// We already showed the primary version bit, just throw in some random
@@ -53,9 +51,8 @@ extern "C" int main(int argc, char *argv[]) {
 	bool enable_sound = true;
 	std::vector<std::string> bootstrap;
 	std::vector<std::string> data_vec;
-	std::string data = data_default;
 	bool bs_specd = false, d_specd = false;
-	std::string gametype = "c3";
+	world.gametype = "c3";
 
 	po::options_description desc;
 	desc.add_options()
@@ -66,7 +63,7 @@ extern "C" int main(int argc, char *argv[]) {
 		 "Set the path to the data directory") // TODO: backend support for multiple dirs
 		("bootstrap,b", po::value< std::vector<std::string> >(&bootstrap)->composing(),
 		 "Sets or adds a path or COS file to bootstrap from")
-		("gametype,g", po::value< std::string >(&gametype), "Set the game type (cv or c3)")
+		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (cv or c3)")
 		;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -76,40 +73,27 @@ extern "C" int main(int argc, char *argv[]) {
 	
 	if (vm.count("help")) {
 		std::cout << desc << std::endl;
-		return EXIT_FAILURE;
+		return 0;
 	}
 
 	if (vm.count("version")) {
 		opt_version();
-		return EXIT_FAILURE;
+		return 0;
 	}
 
-	if (vm.count("data-path") > 1) {
-		std::cerr << "Multiple data paths not yet supported." << std::endl;
-		return EXIT_FAILURE;
-	} else if (vm.count("data-path") == 1) {
-		data = data_vec[0];
-	}
+	if (vm.count("data-path") == 0)
+		data_vec.push_back(data_default);
 
-	if (bootstrap.size() == 0) {
-		std::string bootstrap_p = data + bootstrap_suffix;
-		fs::path scriptdir(bootstrap_p, fs::native);
-		if (!fs::exists(scriptdir)) {
-			caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
-			caosVar contents; contents.setInt(1);
-			world.eame_variables[name] = contents;
-			bootstrap_p = data + bootstrapDS_suffix;
+	for (std::vector<std::string>::iterator i = data_vec.begin(); i != data_vec.end(); i++) {
+		fs::path datadir(*i, fs::native);
+		if (!fs::exists(datadir)) {
+			std::cerr << "data path '" << *i << "' doesn't exist, try --help" << std::endl;
+			return 1;
 		}
-		bootstrap.push_back(bootstrap_p);
+		world.data_directories.push_back(datadir);
 	}
-
-	world.datapath = data;
 	
-	fs::path datadir(world.datapath, fs::native);
-	if (!fs::exists(datadir)) {
-		std::cerr << "data path '" << world.datapath << "' doesn't exist, try --help" << std::endl;
-		return 1;
-	}
+	world.datapath = *(data_vec.begin());
 	
 	registerDelegates();
 	world.init();
@@ -118,67 +102,21 @@ extern "C" int main(int argc, char *argv[]) {
 	world.backend.init(enable_sound);
 	world.camera.setBackend(&world.backend); // TODO: hrr
 
-	std::vector<std::string> scripts;
+	if (bootstrap.size() == 0) {
+		world.executeBootstrap(false);
+	} else {
+		std::vector<std::string> scripts;
 	
-	for (std::vector< std::string >::iterator bsi = bootstrap.begin(); bsi != bootstrap.end(); bsi++) {
-		fs::path scriptdir(*bsi, fs::native);
-		std::vector< std::string > bs_scripts;
-		
-		if (fs::exists(scriptdir)) {
-			if (fs::is_directory(scriptdir)) {
-				fs::directory_iterator fsend;
-				for (fs::directory_iterator i(scriptdir); i != fsend; ++i) {
-					try {
-						if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".cos"))
-							bs_scripts.push_back(i->native_file_string());
-					} catch (fs::filesystem_error &ex) {
-						std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
-					}
-				}
-			} else {
-				scripts.push_back(scriptdir.native_file_string());
-			}
-		} else {
-			if (argc > 1) {
-				std::cerr << "couldn't find script directory (trying " << scriptdir.native_file_string() << ")!\n";
-			} else {
-				std::cerr << "couldn't find bootstrap directory!\n";
-			}
+		for (std::vector< std::string >::iterator bsi = bootstrap.begin(); bsi != bootstrap.end(); bsi++) {
+			fs::path scriptdir(*bsi, fs::native);
+			if (!fs::exists(scriptdir))
+				std::cerr << "couldn't find a specified script directory (trying " << *bsi << ")!\n";
+			world.executeBootstrap(scriptdir);
 		}
-		std::sort(bs_scripts.begin(), bs_scripts.end());
-		std::copy(bs_scripts.begin(), bs_scripts.end(), inserter(scripts, scripts.end()));
-	}
-
-	if (!scripts.size()) {
-		std::cerr << "Couldn't find any bootstrap scripts, aborting." << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	bool singlescript = (scripts.size() == 1);
-
-	for (std::vector<std::string>::iterator i = scripts.begin(); i != scripts.end(); i++) {
-		std::ifstream s(i->c_str());
-		assert(s.is_open());
-		std::cout << "executing script " << *i << "...\n";
-		std::cout.flush();
-		std::cerr.flush();
-		try {
-			caosScript script(gametype, *i);
-			script.parse(s);
-			caosVM vm(0);
-			script.installScripts();
-			vm.runEntirely(script.installer);
-		} catch (std::exception &e) {
-			std::cerr << "script exec failed due to exception " << e.what();
-			std::cerr << std::endl;
-		}
-		std::cout.flush();
-		std::cerr.flush();
 	}
 
 	if (world.map.getMetaRoomCount() == 0) {
-		if (!singlescript) // XXX: needed?
-			std::cerr << "\nNo metarooms found in given bootstrap directories or files, exiting." << std::endl;
+		std::cerr << "\nNo metarooms found in given bootstrap directories or files, exiting." << std::endl;
 		SDL_Quit();
 		return 0;
 	}
@@ -282,7 +220,7 @@ extern "C" int main(int argc, char *argv[]) {
 
 			std::istringstream s(data);
 			try {
-				caosScript *script = new caosScript(gametype, "<network>"); // XXX
+				caosScript *script = new caosScript(world.gametype, "<network>"); // XXX
 				script->parse(s);
 				script->installScripts();
 				caosVM vm(0);

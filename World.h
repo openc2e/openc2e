@@ -28,6 +28,7 @@
 #include "CompoundPart.h"
 #include <set>
 #include <map>
+#include <boost/filesystem/path.hpp>
 
 struct cainfo {
 	float gain;
@@ -61,10 +62,11 @@ public:
 	std::vector<caosVM *> vmpool;
 	std::vector<Agent *> killqueue;
 	std::map<int, Agent *> unidmap;
-	
+
+	std::vector<boost::filesystem::path> data_directories;
 	Scriptorium scriptorium;
 	Catalogue catalogue;
-	std::string datapath;
+	std::string gametype, datapath; // TODO: remove datapath
 	float pace;
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
@@ -85,6 +87,10 @@ public:
 	
 	World();
 	void init();
+	
+	void executeInitScript(boost::filesystem::path p);
+	void executeBootstrap(boost::filesystem::path p);
+	void executeBootstrap(bool switcher);
 
 	void tick();
 	void drawWorld();

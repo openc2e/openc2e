@@ -24,6 +24,9 @@
 #include <limits.h> // for MAXINT
 #include "creaturesImage.h"
 
+#include <boost/filesystem/convenience.hpp>
+namespace fs = boost::filesystem;
+
 World world;
 
 World::World() {
@@ -251,5 +254,81 @@ void World::drawWorld() {
 	SDL_Flip(backend.screen);
 }
 
+void World::executeInitScript(fs::path p) {
+	assert(fs::exists(p));
+	assert(!fs::is_directory(p));
+
+	std::string x = p.native_file_string();
+	std::ifstream s(x.c_str());
+	assert(s.is_open());
+	std::cout << "executing script " << x << "...\n";
+	std::cout.flush(); std::cerr.flush();
+	try {
+		caosScript script(gametype, x);
+		script.parse(s);
+		caosVM vm(0);
+		script.installScripts();
+		vm.runEntirely(script.installer);
+	} catch (std::exception &e) {
+		std::cerr << "script exec failed due to exception " << e.what() << std::endl;
+	}
+	std::cout.flush(); std::cerr.flush();
+}
+
+void World::executeBootstrap(fs::path p) {
+	if (!fs::is_directory(p)) {
+		executeInitScript(p);
+		return;
+	}
+
+	std::vector<fs::path> scripts;
+	
+	fs::directory_iterator fsend;
+	for (fs::directory_iterator d(p); d != fsend; ++d) {
+		if ((!fs::is_directory(*d)) && (fs::extension(*d) == ".cos"))
+			scripts.push_back(*d);
+	}
+
+	std::sort(scripts.begin(), scripts.end());
+	for (std::vector<fs::path>::iterator i = scripts.begin(); i != scripts.end(); i++)
+		executeInitScript(*i);
+}
+
+void World::executeBootstrap(bool switcher) {
+	// TODO: this code is possibly wrong with multiple bootstrap directories
+	std::multimap<unsigned int, fs::path> bootstraps;
+
+	std::cout << "executing all bootstraps" << std::endl;
+
+	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
+		assert(fs::exists(*i));
+		assert(fs::is_directory(*i));
+		std::cout << "executing bootstraps in " << i->native_directory_string() << std::endl;
+		if (fs::is_directory(*i / "/Bootstrap/")) {
+			std::cout << "found bootstrap dir" << std::endl;
+			fs::directory_iterator fsend;
+			// iterate through each bootstrap directory
+			for (fs::directory_iterator d(*i / "/Bootstrap/"); d != fsend; ++d) {
+				if (fs::exists(*d) && fs::is_directory(*d)) {
+					std::string s = (*d).leaf();
+					std::cout << "wondering about " << s << std::endl; 
+					if (s.size() > 3) {
+						char x[4]; x[0] = s[0]; x[1] = s[1]; x[2] = s[2]; x[3] = 0;
+						if (!(isdigit(x[0]) && isdigit(x[1]) && isdigit(x[2]))) continue; // TODO: correct?
+						unsigned int z = atoi(x);
+						if (switcher && z != 0) continue;
+						if (!switcher && z == 0) continue;
+
+						bootstraps.insert(std::pair<unsigned int, fs::path>(z, *d));
+					}
+				}
+			}
+		}
+	}
+
+	for (std::multimap<unsigned int, fs::path>::iterator i = bootstraps.begin(); i != bootstraps.end(); i++) {
+		executeBootstrap(i->second);
+	}
+}
 
 /* vim: set noet: */
