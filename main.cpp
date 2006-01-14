@@ -100,6 +100,13 @@ extern "C" int main(int argc, char *argv[]) {
 	world.backend.init(enable_sound);
 	world.camera.setBackend(&world.backend); // TODO: hrr
 
+	if (world.data_directories.size() < 2) {
+		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
+		caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
+		caosVar contents; contents.setInt(1);
+		world.eame_variables[name] = contents;
+	}
+	
 	if (bootstrap.size() == 0) {
 		world.executeBootstrap(false);
 	} else {
