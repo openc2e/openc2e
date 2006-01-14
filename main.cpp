@@ -93,11 +93,9 @@ extern "C" int main(int argc, char *argv[]) {
 		world.data_directories.push_back(datadir);
 	}
 	
-	world.datapath = *(data_vec.begin());
-	
 	registerDelegates();
 	world.init();
-	world.catalogue.initFrom(fs::path(world.datapath + "/Catalogue/", fs::native));
+	world.initCatalogue();
 	// moved backend.init() here because we need the camera to be valid - fuzzie
 	world.backend.init(enable_sound);
 	world.camera.setBackend(&world.backend); // TODO: hrr

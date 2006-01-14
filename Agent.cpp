@@ -550,7 +550,8 @@ void Agent::pushVM(caosVM *newvm) {
 
 void Agent::stopScript() {
 	zotstack();
-	vm->stop();
+	if (vm)
+		vm->stop();
 }
 
 void Agent::setAttributes(unsigned int attr) {

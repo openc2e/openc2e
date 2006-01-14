@@ -88,15 +88,15 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 	// work out where the real file should be
 	switch (ft) {
 		case blk:
-			realfile = path(world.datapath + "/Backgrounds/" + fname, native); break;
+			realfile = path(world.findFile(std::string("/Backgrounds/") + fname), native); break;
 
 		case c16:
 		case s16:
-			realfile = path(world.datapath + "/Images/" + fname, native); break;
+			realfile = path(world.findFile(std::string("/Images/") + fname), native); break;
 	}
 
 	// if it doesn't exist, too bad, give up.
-	if (!resolveFile(realfile)) return false;
+	if (!exists(realfile)) return false;
 	
 	// work out where the cached file should be
 	cachename = cacheDirectory().native_directory_string() + "/" + fname;

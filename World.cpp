@@ -305,13 +305,11 @@ void World::executeBootstrap(bool switcher) {
 		assert(fs::is_directory(*i));
 		std::cout << "executing bootstraps in " << i->native_directory_string() << std::endl;
 		if (fs::is_directory(*i / "/Bootstrap/")) {
-			std::cout << "found bootstrap dir" << std::endl;
 			fs::directory_iterator fsend;
 			// iterate through each bootstrap directory
 			for (fs::directory_iterator d(*i / "/Bootstrap/"); d != fsend; ++d) {
 				if (fs::exists(*d) && fs::is_directory(*d)) {
 					std::string s = (*d).leaf();
-					std::cout << "wondering about " << s << std::endl; 
 					if (s.size() > 3) {
 						char x[4]; x[0] = s[0]; x[1] = s[1]; x[2] = s[2]; x[3] = 0;
 						if (!(isdigit(x[0]) && isdigit(x[1]) && isdigit(x[2]))) continue; // TODO: correct?
@@ -329,6 +327,29 @@ void World::executeBootstrap(bool switcher) {
 	for (std::multimap<unsigned int, fs::path>::iterator i = bootstraps.begin(); i != bootstraps.end(); i++) {
 		executeBootstrap(i->second);
 	}
+}
+
+void World::initCatalogue() {
+	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
+		assert(fs::exists(*i));
+		assert(fs::is_directory(*i));
+
+		if (fs::is_directory(*i / "/Catalogue/"))
+			catalogue.initFrom(*i / "/Catalogue/");
+	}
+}
+
+#include "PathResolver.h"
+std::string World::findFile(std::string name) {
+	// Go backwards, so we find files in more 'modern' directories first..
+	for (int i = data_directories.size() - 1; i != -1; i--) {
+		fs::path p = data_directories[i];
+		std::string r = (p / fs::path(name, fs::native)).native_directory_string();
+		if (resolveFile(r))
+			return r;
+	}
+	
+	return "";
 }
 
 /* vim: set noet: */

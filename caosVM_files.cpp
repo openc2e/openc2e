@@ -27,9 +27,9 @@ std::string calculateFilename(int directory, std::string filename) {
 	std::string fullfilename;
 	switch (directory) {
 		// TODO: point at the correct journal directories
-		case 0: fullfilename = world.datapath + "/Journal/"; break;
-		case 1: fullfilename = world.datapath + "/Journal/"; break;
-		case 2: fullfilename = world.datapath + "/Journal/"; break;
+		case 0: fullfilename = world.getUserDataDir() + "/Journal/"; break;
+		case 1: fullfilename = world.getUserDataDir() + "/Journal/"; break;
+		case 2: fullfilename = world.getUserDataDir() + "/Journal/"; break;
 		default: throw caosException("unknown directory in FILE OOPE");
 	}
 

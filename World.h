@@ -66,7 +66,7 @@ public:
 	std::vector<boost::filesystem::path> data_directories;
 	Scriptorium scriptorium;
 	Catalogue catalogue;
-	std::string gametype, datapath; // TODO: remove datapath
+	std::string gametype;
 	float pace;
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
@@ -87,10 +87,14 @@ public:
 	
 	World();
 	void init();
+	void initCatalogue();
 	
 	void executeInitScript(boost::filesystem::path p);
 	void executeBootstrap(boost::filesystem::path p);
 	void executeBootstrap(bool switcher);
+
+	std::string getUserDataDir() { return data_directories.begin()->native_directory_string(); } // TODO
+	std::string findFile(std::string path);
 
 	void tick();
 	void drawWorld();
