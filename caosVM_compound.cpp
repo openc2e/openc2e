@@ -109,7 +109,7 @@ void caosVM::c_PAT_BUTT() {
 	VM_PARAM_INTEGER(part)
 	
 	caos_assert(part >= 0);
-	caos_assert((option == 0) || (option == 1));
+	// caos_assert((option == 0) || (option == 1)); .. I've seen '1000' and '255' used, so, gah. TODO: make sure all non-zero values are identical
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
