@@ -529,6 +529,25 @@ void caosVM::v_CHAR() {
 }
 
 /**
+ CHAR (command) string (variable) index (integer) character (integer)
+ %status maybe
+*/
+void caosVM::c_CHAR() {
+	VM_PARAM_INTEGER(character)
+	VM_PARAM_INTEGER(index)
+	VM_PARAM_VARIABLE(str)
+
+	caos_assert(0 <= character && character <= 255);
+	
+	caos_assert(str->hasString());
+	std::string mystr = str->getString();
+	caos_assert(mystr.size() >= index);
+
+	mystr[index - 1] = (unsigned char)character;
+	str->setString(mystr);
+}
+
+/**
  ITOF (float) number (integer)
  %status maybe
 

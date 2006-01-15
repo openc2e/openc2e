@@ -575,4 +575,30 @@ void caosVM::v_ERID() {
 	result.setString(out);
 }
 
+/**
+ DELR (command) room_id (integer)
+ %status stub
+*/
+void caosVM::c_DELR() {
+	VM_PARAM_INTEGER(room_id)
+
+	Room *r = world.map.getRoom(room_id);
+	caos_assert(r);
+
+	// TODO
+}
+
+/**
+ DELM (command) metaroom_id (integer)
+ %status stub
+*/
+void caosVM::c_DELM() {
+	VM_PARAM_INTEGER(metaroom_id)
+
+	MetaRoom *r = world.map.getMetaRoom(metaroom_id);
+	caos_assert(r);
+
+	// TODO
+}
+
 /* vim: set noet: */

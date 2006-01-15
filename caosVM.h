@@ -168,6 +168,8 @@ public:
 	void v_RLOC();
 	void c_DMAP();
 	void v_ERID();
+	void c_DELR();
+	void c_DELM();
 	
 	// camera
 	void v_VISI();
@@ -242,6 +244,7 @@ public:
 	void v_VTOS();
 	void v_AVAR();
 	void v_CHAR();
+	void c_CHAR();
 	void v_TYPE();
 	void v_ITOF();
 	void v_FTOI();
