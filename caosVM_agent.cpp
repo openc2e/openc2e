@@ -31,7 +31,7 @@ using std::cerr;
  TOUC (integer) first (agent) second (agent)
  %status maybe
 
- Determines whether the two given agents are touching.  Returns 0 or 1.
+ Determines whether the two given agents are touching.  Returns 0 (if not) or 1 (if so).
 */
 void caosVM::v_TOUC() {
 	VM_VERIFY_SIZE(2)
@@ -90,6 +90,36 @@ void caosVM::c_RTAR() {
 	if (temp.size() == 0) return;
 	int i = rand() % temp.size();
 	setTarg(temp[i]);
+}
+
+/**
+ TTAR (command) family (integer) genus (integer) species (integer)
+ %status stub
+*/
+void caosVM::c_TTAR() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+	
+	caos_assert(targ);
+	
+	setTarg(0); // TODO
+}
+
+/**
+ STAR (command) family (integer) genus (integer) species (integer)
+ %status stub
+*/
+void caosVM::c_STAR() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+	
+	caos_assert(targ);
+	
+	setTarg(0); // TODO
 }
 
 /**

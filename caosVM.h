@@ -309,6 +309,8 @@ public:
 	void v_NULL();
 	void c_POSE();
 	void c_RTAR();
+	void c_TTAR();
+	void c_STAR();
 	void v_TARG();
 	void c_ATTR();
 	void c_TICK();
