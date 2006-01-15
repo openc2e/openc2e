@@ -167,6 +167,7 @@ public:
 	void v_BKDS();
 	void v_RLOC();
 	void c_DMAP();
+	void v_ERID();
 	
 	// camera
 	void v_VISI();

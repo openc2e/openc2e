@@ -21,6 +21,7 @@
 #include "World.h"
 #include <assert.h>
 #include <iostream>
+#include <boost/format.hpp>
 using std::cerr;
 
 /**
@@ -539,10 +540,7 @@ void caosVM::v_RLOC() {
 	Room *r = world.map.getRoom(roomid);
 	caos_assert(r);
 
-	char buffer[100];
-	snprintf(buffer, 100, "%d %d %d %d %d %d", r->x_left, r->x_right, r->y_left_ceiling, r->y_right_ceiling, r->y_left_floor, r->y_right_floor);
-
-	result.setString(buffer);
+	result.setString(boost::str(boost::format("%d %d %d %d %d %d") % r->x_left % r->x_right % r->y_left_ceiling % r->y_right_ceiling % r->y_left_floor % r->y_right_floor));
 }
 
 /**
@@ -553,6 +551,28 @@ void caosVM::c_DMAP() {
 	VM_PARAM_INTEGER(mapon)
 		
 	world.showrooms = mapon;
+}
+
+/**
+ ERID (string) metaroom_id (integer)
+ %status maybe
+*/
+void caosVM::v_ERID() {
+	VM_PARAM_INTEGER(metaroom_id)
+
+	std::string out;
+
+	if (metaroom_id == -1) {
+		// TODO
+	} else {
+		MetaRoom *r = world.map.getMetaRoom(metaroom_id);
+		for (std::vector<Room *>::iterator i = r->rooms.begin(); i != r->rooms.end(); i++) {
+			if (out.size() > 0) out = out + " ";
+			out = out + boost::str(boost::format("%d") % (*i)->id);
+		}
+	}
+
+	result.setString(out);
 }
 
 /* vim: set noet: */

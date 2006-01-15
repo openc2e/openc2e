@@ -26,10 +26,7 @@
 #include "World.h"
 #include <cctype> // toupper/tolower
 #include <algorithm> // transform
-
-#ifdef _MSC_VER
-#define snprintf _snprintf // guh guh guh ><
-#endif
+#include <boost/format.hpp>
 
 /**
  VAxx (variable)
@@ -506,18 +503,12 @@ void caosVM::v_VTOS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_DECIMAL(value)
 
-	// TODO: this is hacky!
-	char buffer[20];
-
 	if (value.hasInt()) {
-		snprintf(buffer, 20, "%i", value.intValue);
+		result.setString(boost::str(boost::format("%i") % value.intValue));
 	} else {
-		caos_assert(value.hasFloat());
 		// TODO: this format isn't right (see OUTS also)
-		snprintf(buffer, 20, "0%f", value.floatValue);
+		result.setString(boost::str(boost::format("%f") % value.floatValue));
 	}
-
-	result.setString(buffer);
 }
 
 /**
@@ -607,8 +598,7 @@ void caosVM::v_REAQ() {
 }
 
 int findCategory(unsigned char family, unsigned char genus, unsigned short species) {
-	char buffer[40];
-	snprintf(buffer, 40, "%i %i 0", family, genus); // TODO: 0 is a hack so we don't have to do any real work here
+	std::string buffer =  boost::str(boost::format("%i %i 0") % family % genus); // TODO: 0 is a hack so we don't have to do any real work here
 	
 	caos_assert(world.catalogue.hasTag("Agent Classifiers"));
 	const std::vector<std::string> &t = world.catalogue.getTag("Agent Classifiers");

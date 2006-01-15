@@ -5,6 +5,7 @@
 #include <istream>
 #include <cmath>
 #include "exceptions.h"
+#include <boost/format.hpp>
 
 void mngrestart(std::istream *is);
 
@@ -100,7 +101,7 @@ protected:
 
 public:
 	MNGConstantNode(float n) { value = n; }
-	std::string dump() { char buf[20]; snprintf(buf, 20, "%f", value); return buf; }
+	std::string dump() { return boost::str(boost::format("%f") % value); }
 	float evaluate() { return value; }
 };
 

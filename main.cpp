@@ -15,6 +15,7 @@
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/program_options.hpp>
+#include <boost/format.hpp>
 
 #include "World.h"
 #include "caosVM.h"
@@ -25,7 +26,6 @@
 #include <SDL_net.h>
 
 #ifdef _MSC_VER
-#define snprintf _snprintf // guh guh guh ><
 #undef main // because SDL is stupid
 #endif
 
@@ -144,9 +144,7 @@ extern "C" int main(int argc, char *argv[]) {
 		fs::create_directory(p);
 	if (fs::is_directory(p)) {
 		std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
-		char buf[6];
-		snprintf(buf, 6, "%i", listenport);
-		f << buf;
+		f << boost::str(boost::format("%d") % listenport);
 	}
 
 	AgentRef handAgent;

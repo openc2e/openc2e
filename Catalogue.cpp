@@ -126,11 +126,7 @@ void Catalogue::initFrom(fs::path path) {
 
 std::string stringFromInt(int i) {
 	// TODO: hacky? also, put somewhere more appropriate
-	
-	char buffer[20]; // more than enough
-	snprintf(buffer, 20, "%i", i);
-
-	return std::string(buffer);
+	return boost::str(boost::format("%d") % i);
 }
 
 const std::string Catalogue::getAgentName(unsigned char family, unsigned char genus, unsigned short species) const {
