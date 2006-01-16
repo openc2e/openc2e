@@ -2,8 +2,8 @@
  *  pray.cpp
  *  openc2e
  *
- *  Created by Alyssa Milburn on Tue Aug 28 2001.
- *  Copyright (c) 2001,2004 Alyssa Milburn. All rights reserved.
+ *  Created by Alyssa Milburn on Mon Jan 16 2006.
+ *  Copyright (c) 2006 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -17,248 +17,154 @@
  *
  */
 
-#include "agentfile.h"
-#include "zlib.h"
+#include "pray.h"
+#include "exceptions.h"
 #include "endianlove.h"
+#include "zlib.h"
 
-#include <exception>
+prayFile::prayFile(fs::path filepath) {
+	path = filepath;
+	file.open(path.native_directory_string().c_str(), std::ios::binary);
+	if (!file.is_open())
+		throw creaturesException(std::string("couldn't open PRAY file ") + path.native_directory_string());
+	
+	char majic[4];
+	file.read(majic, 4);
+	if (strncmp(majic, "PRAY", 4) != 0)
+		throw creaturesException(std::string("bad magic of PRAY file ") + path.native_directory_string());
 
-class badPrayMajicException { };
-class decompressFailure { };
-
-// *** prayFile
-
-void prayFile::read(istream &s) {
-	unsigned char majic[4];
-	s.read((char *)majic, 4);
-	if (strncmp((char *)majic, "PRAY", 4) != 0) throw badPrayMajicException();
-
-	while (true) {
-		char stringid[4];
-		for (int i = 0; i < 4; i++) s >> stringid[i];
-
-		if (s.fail() || s.eof()) return;
-
-		prayBlock *b;
-
-		/*
-			known pray blocks:
-
-			AGNT, DSAG : tag blocks
-			PHOT, GENE, FILE : various file blocks
-			GLST: CreaturesArchive file blocks
-
-			unknown pray blocks (there are more, I don't have a copy of C3 atm =/):
-
-			CREA (CreaturesArchive file?), DSEX (tag block?)
-		*/
-
-		// TODO: read the taggable agent blocks from a configuration file
-		// note we're probably missing warp blocks, playground blocks (if they exist), sea-monkeys blocks
-		bool tagblock;
-		tagblock = !strncmp(stringid, "AGNT", 4); // Creatures Adventures/Creatures 3 agent
-		if (!tagblock) tagblock = !strncmp(stringid, "DSAG", 4); // Docking Station agent
-		if (!tagblock) tagblock = !strncmp(stringid, "LIVE", 4); // Sea-Monkeys agent
-		if (!tagblock) tagblock = !strncmp(stringid, "EXPC", 4); // Creatures creature info
-		if (!tagblock) tagblock = !strncmp(stringid, "DSEX", 4); // DS creature info
-		if (!tagblock) tagblock = !strncmp(stringid, "SFAM", 4); // starter family info
-		if (!tagblock) tagblock = !strncmp(stringid, "EGGS", 4); // eggs info
-		if (!tagblock) tagblock = !strncmp(stringid, "DFAM", 4); // DS starter family info
-		if (tagblock)
-			b = new tagPrayBlock();
-		else
-			b = new unknownPrayBlock();
-
-		memcpy(b->blockid, stringid, 4);
-		s >> *b;
+	while (!file.eof()) {
+		// TODO: catch exceptions, and free all blocks before passing it up the stack
+		prayBlock *b = new prayBlock(this);
 		blocks.push_back(b);
+		
+		file.peek(); // make sure eof() gets set
 	}
 }
 
-void prayFile::write(ostream &s) const {
-	s << "PRAY";
-
-	for (vector<block *>::iterator x = ((prayFile *)this)->blocks.begin(); x != ((prayFile *)this)->blocks.end(); x++)
-		s << **x;
+prayFile::~prayFile() {
+	for (std::vector<prayBlock *>::iterator i = blocks.begin(); i != blocks.end(); i++) {
+		delete *i;
+	}
 }
 
-// *** prayBlock
+prayManager::~prayManager() {
+	for (std::vector<prayFile *>::iterator i = files.begin(); i != files.end(); i++) {
+		delete *i;
+	}
 
-void prayBlock::read(istream &s) {
-	unsigned char x[128];
-	s.read((char *)&x, 128);
+	assert(blocks.size() == 0);
+}
 
-	blockname = (char *)x;
+void prayManager::update() {
+	// TODO
+}
 
-	unsigned int size, usize, flags;
-	s.read((char *)&size, 4); size = swapEndianLong(size);
-	s.read((char *)&usize, 4); usize = swapEndianLong(usize);
-	s.read((char *)&flags, 4); flags = swapEndianLong(flags);
+prayBlock::prayBlock(prayFile *p) {
+	std::istream &file = p->getStream();
 
-	unsigned char *buf;
-	buf = new unsigned char[size];
-	s.read((char *)buf, size);
+	char stringid[5]; stringid[4] = 0;
+	file.read(stringid, 4);
+	type = stringid;
 
-	if ((flags & 1) != 0) {
-		// decompress the block
-		unsigned char *dest = new unsigned char[usize];
+	char nameid[129]; nameid[128] = 0;
+	file.read(nameid, 128);
+	name = nameid;
 
-		if (uncompress(dest, (uLongf *)&usize, buf, size) != Z_OK) {
-			delete dest; delete buf;
+	file.read((char *)&compressedsize, 4); compressedsize = swapEndianLong(compressedsize);
+	file.read((char *)&size, 4); size = swapEndianLong(size);
+	unsigned int flags;
+	file.read((char *)&flags, 4); flags = swapEndianLong(flags);
+	compressed = ((flags & 1) == 1);
+	if (!compressed && size != compressedsize)
+		throw creaturesException("Size doesn't match compressed size for uncompressed block.");
 
-			throw decompressFailure();
+	// Skip the data for this block.
+	offset = file.tellg();
+	file.seekg(compressedsize, std::ios::cur);
+
+	loaded = false;
+	tagsloaded = false;
+	buffer = 0;
+	parent = p;
+}
+
+prayBlock::~prayBlock() {
+	if (loaded)
+		delete buffer;
+}
+
+void prayBlock::load() {
+	std::istream &file = parent->getStream();
+
+	file.clear();
+	file.seekg(offset);
+	if (!file.good())
+		throw creaturesException("Failed to seek to block offset.");
+
+	buffer = new unsigned char[size];
+	if (compressed) {
+		// TODO: check pray_uncompress_sanity_check
+		char *src = new char[compressedsize];
+		file.read(src, compressedsize);
+		unsigned int usize;
+		if (uncompress((Bytef *)buffer, (uLongf *)&usize, (Bytef *)src, size) != Z_OK) {
+			delete buffer; delete src;
+			throw creaturesException("Failed to decompress block.");
 		}
-
-		delete buf;
-		buf = dest;
-	}
-
-	rawRead(size, buf);
-
-	delete buf;
-}
-
-void prayBlock::write(ostream &s) const {
-	s.write((char *)blockid, 4);
-
-	unsigned char x[128];
-	memset(x, 0, 128);
-	memcpy(x, blockname.c_str(), blockname.size());
-	s.write((char *)&x, 128);
-
-	unsigned int usize, size;
-	unsigned char *b = rawWrite(usize);
-
-	bool compressed;
-
-#ifdef NO_COMPRESS_PRAY
-	compressed = false;
-	size = usize;
-#else
-	unsigned char *newbuf = new unsigned char[usize + 12];
-	size = usize + 12;
-	if (compress(newbuf, (uLongf *)&size, b, usize) != Z_OK) {
-		// fallback to uncompressed data
-		delete newbuf;
-		size = usize;
-		compressed = false;
-	} else if (size >= usize) {
-		// the compressed block is larger than the uncompressed block
-		// fallback to uncompressed data
-		delete newbuf;
-		size = usize;
-		compressed = false;
+		delete src;
+		if (usize != size) {
+			delete buffer;
+			throw creaturesException("Decompressed data is not the correct size.");
+		}
 	} else {
-		delete b; b = newbuf;
-		compressed = true;
+		file.read((char *)buffer, size);
 	}
-#endif
-
-	unsigned int esize = swapEndianLong(size); s.write((char *)&esize, 4);
-	unsigned int eusize = swapEndianLong(usize); s.write((char *)&eusize, 4);
-
-	unsigned int flags = swapEndianLong(compressed ? 1 : 0);
-	s.write((char *)&flags, 4);
-
-	s.write((char *)b, size);
+	loaded = true;
 }
 
-// *** unknownPrayBlock
-
-void unknownPrayBlock::rawRead(unsigned int v, unsigned char *b) {
-	buf = new unsigned char[v];
-	memcpy(buf, b, v);
-	len = v;
-}
-
-unsigned char *unknownPrayBlock::rawWrite(unsigned int &l) const {
-	unsigned char *b = new unsigned char[len];
-	memcpy(b, buf, len);
-	l = len;
-	return b;
-}
-
-// *** tagPrayBlock
-
-/*
-  format of tag pray blocks:
-
-  4-byte nointvalues, then the values: [string name, int value]
-  4-byte nostrvalues, then the values: [string name, string value]
-  (string = 4-byte length followed by actual data)
-*/
-
-char *tagStringRead(unsigned char *&ptr) {
+std::string tagStringRead(unsigned char *&ptr) {
 	unsigned int len = *(unsigned int *)ptr;
 	len = swapEndianLong(len);
 	ptr += 4;
 
-	// TODO: fixme: rewrite this code properly
-	static char b[500001];
-	memcpy(b, ptr, (len < 500000) ? len : 500000);
-	b[(len < 500000) ? len : 500000] = 0;
+	unsigned char *data = ptr;
 	ptr += len;
-	return b;
+
+	return std::string((char *)data, len);
 }
+	
+void prayBlock::parseTags() {
+	if (tagsloaded)
+		throw creaturesException("Attempt to load tags when already loaded.");
 
-void tagStringWrite(unsigned char *&ptr, string &s) {
-	*(unsigned int *)ptr = swapEndianLong(s.size()); ptr += 4;
-	memcpy(ptr, s.c_str(), s.size()); ptr += s.size();
-}
+	if (!loaded)
+		load();
 
-void tagPrayBlock::rawRead(unsigned int v, unsigned char *b) {
-	unsigned char *ptr = b;
+	tagsloaded = true;
 
-	unsigned int nointvalues = swapEndianLong(*(unsigned int *)ptr);
-	ptr += 4;
+	unsigned char *ptr = buffer;
+
+	unsigned int nointvalues = swapEndianLong(*(unsigned int *)ptr); ptr += 4;
 
 	for (unsigned int i = 0; i < nointvalues; i++) {
-		pair<string, unsigned int> value;
+		std::string n = tagStringRead(ptr);
+		unsigned int v = swapEndianLong(*(unsigned int *)ptr); ptr += 4;
 
-		value.first = tagStringRead(ptr);
-		value.second = swapEndianLong(*(unsigned int *)ptr);
-		ptr += 4;
-
-		intvalues.push_back(value);
+		if (integerValues.find(n) != integerValues.end())
+			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
+		integerValues[n] = v;
 	}
 
-	unsigned int nostrvalues = swapEndianLong(*(unsigned int *)ptr);
-	ptr += 4;
+	unsigned int nostrvalues = swapEndianLong(*(unsigned int *)ptr); ptr += 4;
 
 	for (unsigned int i = 0; i < nostrvalues; i++) {
-		pair<string, string> value;
-
-		value.first = tagStringRead(ptr);
-		value.second = tagStringRead(ptr);
-
-		strvalues.push_back(value);
+		std::string n = tagStringRead(ptr);
+		std::string v = tagStringRead(ptr);
+		if (stringValues.find(n) != stringValues.end()) // TODO: check integers too?
+			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
+		stringValues[n] = v;
 	}
 }
 
-unsigned char *tagPrayBlock::rawWrite(unsigned int &l) const {
-	l = 8;
-
-	for (vector<pair<string, unsigned int> >::iterator x = ((tagPrayBlock *)this)->intvalues.begin(); x != ((tagPrayBlock *)this)->intvalues.end(); x++)
-		l = l + 8 + (*x).first.size();
-
-	for (vector<pair<string, string> >::iterator x = ((tagPrayBlock *)this)->strvalues.begin(); x != ((tagPrayBlock *)this)->strvalues.end(); x++)
-		l = l + 8 + (*x).first.size() + (*x).second.size();
-
-	unsigned char *buf = new unsigned char[l];
-	unsigned char *ptr = buf;
-
-	*(unsigned int *)ptr = swapEndianLong(intvalues.size()); ptr += 4;
-	for (vector<pair<string, unsigned int> >::iterator x = ((tagPrayBlock *)this)->intvalues.begin(); x != ((tagPrayBlock *)this)->intvalues.end(); x++) {
-		tagStringWrite(ptr, (*x).first);
-		*(unsigned int *)ptr = swapEndianLong((*x).second); ptr += 4;
-	}
-
-	*(unsigned int *)ptr = swapEndianLong(strvalues.size()); ptr += 4;
-	for (vector<pair<string, string> >::iterator x = ((tagPrayBlock *)this)->strvalues.begin(); x != ((tagPrayBlock *)this)->strvalues.end(); x++) {
-		tagStringWrite(ptr, (*x).first);
-		tagStringWrite(ptr, (*x).second);
-	}
-
-	return buf;
-}
 /* vim: set noet: */
