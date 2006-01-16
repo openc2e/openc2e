@@ -60,7 +60,7 @@ extern "C" int main(int argc, char *argv[]) {
 		("version,V", "Display openc2e version")
 		("silent,s", "Disable all sounds")
 		("data-path,d", po::value< std::vector<std::string> >(&data_vec)->composing(),
-		 "Set the path to the data directory") // TODO: backend support for multiple dirs
+		 "Set the path to the data directory")
 		("bootstrap,b", po::value< std::vector<std::string> >(&bootstrap)->composing(),
 		 "Sets or adds a path or COS file to bootstrap from")
 		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (cv or c3)")
