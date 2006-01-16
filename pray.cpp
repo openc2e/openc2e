@@ -48,18 +48,6 @@ prayFile::~prayFile() {
 	}
 }
 
-prayManager::~prayManager() {
-	for (std::vector<prayFile *>::iterator i = files.begin(); i != files.end(); i++) {
-		delete *i;
-	}
-
-	assert(blocks.size() == 0);
-}
-
-void prayManager::update() {
-	// TODO
-}
-
 prayBlock::prayBlock(prayFile *p) {
 	std::istream &file = p->getStream();
 
@@ -135,8 +123,7 @@ std::string tagStringRead(unsigned char *&ptr) {
 }
 	
 void prayBlock::parseTags() {
-	if (tagsloaded)
-		throw creaturesException("Attempt to load tags when already loaded.");
+	if (tagsloaded) return;
 
 	if (!loaded)
 		load();

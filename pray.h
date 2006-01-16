@@ -66,8 +66,8 @@ public:
 	std::map<std::string, std::string> stringValues;
 	std::map<std::string, int> integerValues;
 
+	bool isCompressed() { return compressed; }
 	bool isLoaded() { return loaded; }
-	bool tagsLoaded() { assert(loaded); return tagsloaded; }
 	prayFile *getParent() { return parent; }
 	std::string getType() { return type; }
 	std::string getName() { return name; }
@@ -83,6 +83,8 @@ public:
 	std::map<std::string, prayBlock *> blocks;
 
 	~prayManager();
+	void addFile(prayFile *);
+	void removeFile(prayFile *);
 	void update();
 };
 

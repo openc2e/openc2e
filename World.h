@@ -26,6 +26,7 @@
 #include "Camera.h"
 #include "Agent.h"
 #include "CompoundPart.h"
+#include "pray.h"
 #include <set>
 #include <map>
 #include <boost/filesystem/path.hpp>
@@ -66,6 +67,7 @@ public:
 	std::vector<boost::filesystem::path> data_directories;
 	Scriptorium scriptorium;
 	Catalogue catalogue;
+	prayManager praymanager;
 	std::string gametype;
 	float pace;
 	unsigned int ticktime, tickcount;

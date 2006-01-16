@@ -18,10 +18,11 @@
  */
 
 #include "caosVM.h"
+#include "World.h"
 
 /**
  PRAY AGTI (integer) resource (string) tag (string) default (integer)
- %status stub
+ %status maybe
 
  using the specified resource, returns the integer value associated with the given tag,
  or default if the tag doesn't exist
@@ -31,22 +32,38 @@ void caosVM::v_PRAY_AGTI() {
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
 
-	result.setInt(0); // TODO
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(resource);
+	caos_assert(i != world.praymanager.blocks.end());
+
+	prayBlock *p = i->second;
+	p->parseTags();
+	if (p->integerValues.find(tag) == p->integerValues.end())
+		result.setInt(_default);
+	else
+		result.setInt(p->integerValues[tag]);
 }
 
 /**
  PRAY AGTS (string) resource (string) tag (string) default (string)
- %status stub
+ %status maybe
 
  using the specified resource, returns the string value associated with the given tag,
  or default if the tag doesn't exist
 */
 void caosVM::v_PRAY_AGTS() {
-	VM_PARAM_INTEGER(_default)
+	VM_PARAM_STRING(_default)
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
 
-	result.setInt(0); // TODO
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(resource);
+	caos_assert(i != world.praymanager.blocks.end());
+
+	prayBlock *p = i->second;
+	p->parseTags();
+	if (p->stringValues.find(tag) == p->stringValues.end())
+		result.setString(_default);
+	else
+		result.setString(p->stringValues[tag]);
 }
 
 /**
@@ -196,7 +213,7 @@ void caosVM::v_PRAY_MAKE() {
 
 /**
  PRAY NEXT (string) type (string) last (string)
- %status stub
+ %status maybe
 
  returns the name of the resource of the specified type which is immediately after last
  see PRAY FORE if you don't want to loop around
@@ -205,7 +222,30 @@ void caosVM::v_PRAY_NEXT() {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 
-	result.setString(""); // TODO
+	prayBlock *firstblock = 0, *currblock = 0;
+	bool foundblock = false;
+	for (std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.begin(); i != world.praymanager.blocks.end(); i++) {
+		if (i->second->type == type) {
+			currblock = i->second;
+			
+			// Store the first block if we didn't already find one, for possible use later.
+			if (!firstblock) firstblock = currblock;
+			
+			// If this is the resource we want, grab it!
+			if (foundblock) {
+				result.setString(currblock->name);
+				return;
+			}
+
+			// If this is the resource we're looking for, make a note to grab the next one.
+			if (last == currblock->name)
+				foundblock = true;
+		}
+	}
+
+	if (foundblock) result.setString(firstblock->name); // loop around to first block
+	else if (currblock) result.setString(currblock->name); // default to last block
+	else result.setString(""); // yarr, failure. TODO: is this correct behaviour?
 }
 
 /**
@@ -224,22 +264,33 @@ void caosVM::v_PRAY_PREV() {
 
 /**
  PRAY REFR (command)
- %status stub
+ %status maybe
 
  make the pray manager check for deleted/new files in the resource directory
 */
 void caosVM::c_PRAY_REFR() {
-	// TODO
+	world.praymanager.update();
 }
 
 /**
  PRAY TEST (integer) name (string)
- %status stub
+ %status maybe
 */
 void caosVM::v_PRAY_TEST() {
 	VM_PARAM_STRING(name)
-		
-	result.setInt(0); // TODO
+
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
+	if (i == world.praymanager.blocks.end())
+		result.setInt(0);
+	else {
+		prayBlock *p = i->second;
+		if (p->isLoaded())
+			result.setInt(1);
+		else if (p->isCompressed())
+			result.setInt(3);
+		else
+			result.setInt(2);
+	}
 }
 
 /* vim: set noet: */

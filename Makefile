@@ -65,6 +65,7 @@ OPENC2E = \
 	physics.o \
 	PointerAgent.o \
 	pray.o \
+	prayManager.o \
 	renderable.o \
 	Room.o \
 	Scriptorium.o \
