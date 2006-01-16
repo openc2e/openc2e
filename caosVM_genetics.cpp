@@ -123,7 +123,7 @@ void caosVM::v_MTOA() {
  MTOC (agent) moniker (string)
  %status stub
 
- Return the live creature with the given moniker, or NULL if there isn't one.
+ Return the live creature with the given moniker, or NULL if none.
 */
 void caosVM::v_MTOC() {
 	VM_PARAM_STRING(moniker)

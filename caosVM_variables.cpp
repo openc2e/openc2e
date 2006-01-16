@@ -33,7 +33,7 @@
  %pragma noparse
  %status maybe
 
- script-local variables, 00 to 99
+ Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
  */
 
 /**
@@ -48,7 +48,7 @@
  ADDS (command) var (variable) value (string)
  %status maybe
 
- var = var + value (ie, concaternate stings)
+ Append the given string to the given variable.
 */
 void caosVM::c_ADDS() {
 	VM_VERIFY_SIZE(2)
@@ -63,7 +63,7 @@ void caosVM::c_ADDS() {
  SETS (command) var (variable) value (string)
  %status maybe
 
- sets given variable to given string
+ Sets the given variable to the given string.
 */
 void caosVM::c_SETS() {
 	VM_VERIFY_SIZE(2)
@@ -77,7 +77,7 @@ void caosVM::c_SETS() {
  SETV (command) var (variable) value (decimal)
  %status maybe
 
- sets given variable to given number [int/float]
+ Sets the given variable to the given decimal value.
  */
 void caosVM::c_SETV() {
 	VM_VERIFY_SIZE(2)
@@ -95,7 +95,7 @@ void caosVM::c_SETV() {
  SETA (command) var (variable) value (agent)
  %status maybe
 
- sets given variable to given agent
+ Sets the given variable to the given agent.
 */
 void caosVM::c_SETA() {
 	VM_VERIFY_SIZE(2)
@@ -110,13 +110,15 @@ void caosVM::c_SETA() {
  %pragma noparse
  %status maybe
 
- agent-local variables from TARG, 00 to 99
+ Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
  */
 // TODO: OVxx parser
 
 /**
  TYPE (integer) value (anything)
  %status maybe
+
+ Returns a integer value representing the type of data in 'value'.  0 is integer, 1 is float, 2 is string, 3 is agent.
 */
 void caosVM::v_TYPE() {
 	VM_PARAM_VALUE(value)
@@ -139,7 +141,7 @@ void caosVM::v_TYPE() {
  MODV (command) var (variable) mod (integer)
  %status maybe
 
- returns var % mod
+ Divides the given variable by the given integer, and returns the remainder (var % mod).
 */
 void caosVM::c_MODV() {
 	VM_VERIFY_SIZE(2)
@@ -153,7 +155,7 @@ void caosVM::c_MODV() {
  ANDV (command) var (variable) and (integer)
  %status maybe
 
- returns var & and
+ Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
 */
 void caosVM::c_ANDV() {
 	VM_VERIFY_SIZE(2)
@@ -167,7 +169,7 @@ void caosVM::c_ANDV() {
  ORRV (command) var (variable) or (integer)
  %status maybe
 
- returns var | or
+ Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
 */
 void caosVM::c_ORRV() {
 	VM_VERIFY_SIZE(2)
@@ -182,7 +184,7 @@ void caosVM::c_ORRV() {
  ADDV (command) var (variable) add (integer)
  %status maybe
 
- returns var + add
+ Adds the given integer to the given variable and returns the result.
 */
 void caosVM::c_ADDV() {
 	VM_VERIFY_SIZE(2)
@@ -200,7 +202,7 @@ void caosVM::c_ADDV() {
  SUBV (command) var (variable) sub (integer)
  %status maybe
 
- returns var - sub
+ Subtracts the given integer from the given variable and returns the result.
 */
 void caosVM::c_SUBV() {
 	VM_VERIFY_SIZE(2)
@@ -218,7 +220,7 @@ void caosVM::c_SUBV() {
  NEGV (command) var (variable)
  %status maybe
 
- returns a negated variable (eg 1 to -1, -3 to 3)
+ Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
 */
 void caosVM::c_NEGV() {
 	VM_VERIFY_SIZE(1)
@@ -235,7 +237,7 @@ void caosVM::c_NEGV() {
  DIVV (command) var (variable) div (decimal)
  %status maybe
  
- returns var / mul
+ Divides the given variable by the given integer and returns the result.
 */
 void caosVM::c_DIVV() {
 	VM_VERIFY_SIZE(2)
@@ -256,7 +258,7 @@ void caosVM::c_DIVV() {
  MULV (command) var (variable) mul (decimal)
  %status maybe
 
- returns var * mul
+ Multiplies the given variable by the given integer and returns the result.
 */
 void caosVM::c_MULV() {
 	VM_VERIFY_SIZE(2)
@@ -274,7 +276,7 @@ void caosVM::c_MULV() {
  RAND (integer) value1 (integer) value2 (integer)
  %status maybe
 
- return a random integer between value1 and value2 inclusive
+ Returns a random integer between 'value1' and 'value2', inclusive.
  */
 void caosVM::v_RAND() {
 	VM_VERIFY_SIZE(2)
@@ -293,7 +295,7 @@ void caosVM::v_RAND() {
  REAF (command)
  %status stub
 
- reread catalogue files
+ Re-reads all catalogue files.
  */
 void caosVM::c_REAF() {
 	VM_VERIFY_SIZE(0)
@@ -304,7 +306,7 @@ void caosVM::c_REAF() {
  UFOS (string)
  %status stub
  
- return 'uname -a' on platforms which support it, or OS details in another format otherwise
+ Returns 'uname -a' on platforms which support it, or OS details in another format otherwise.
 */
 void caosVM::v_UFOS() {
 	VM_VERIFY_SIZE(0)
@@ -315,7 +317,7 @@ void caosVM::v_UFOS() {
  MODU (string)
  %status stub
  
- returns Docking Station engine string for now, should return modules loaded and display engine type
+ Returns the Docking Station engine string for now.  Should return modules loaded and display engine type.
 */
 void caosVM::v_MODU() {
 	VM_VERIFY_SIZE(0)
@@ -326,7 +328,7 @@ void caosVM::v_MODU() {
  GNAM (string)
  %status stub
  
- returns running game (eg "Docking Station")
+ Returns the currently-running game (like "Docking Station").
 */
 void caosVM::v_GNAM() {
 	VM_VERIFY_SIZE(0)
@@ -337,7 +339,7 @@ void caosVM::v_GNAM() {
  ABSV (command) var (decimal variable)
  %status maybe
  
- modifies var if negative so that its value is positive
+ Modifies the given variable, if negative, so that its value is positive (absolute value).
 */
 void caosVM::c_ABSV() {
 	VM_VERIFY_SIZE(1)
@@ -352,7 +354,7 @@ void caosVM::c_ABSV() {
  ACOS (float) x (float)
  %status maybe
  
- returns arccosine of x in degrees
+ Returns the arccosine of x in degrees.
 */
 void caosVM::v_ACOS() {
 	VM_VERIFY_SIZE(1)
@@ -368,7 +370,7 @@ void caosVM::v_ACOS() {
  ASIN (float) x (float)
  %status maybe
  
- returns arcsine of x in degrees
+ Returns the arcsine of x in degrees.
 */
 void caosVM::v_ASIN() {
 	VM_VERIFY_SIZE(1)
@@ -384,7 +386,7 @@ void caosVM::v_ASIN() {
  ATAN (float) x (float)
  %status maybe
  
- returns arctangent of x in degrees
+ Returns the arctangent of x in degrees.
 */
 void caosVM::v_ATAN() {
 	VM_VERIFY_SIZE(1)
@@ -400,7 +402,7 @@ void caosVM::v_ATAN() {
  COS_ (float) x (float)
  %status maybe
  
- returns cosine of x in degrees
+ Returns the cosine of x in degrees.
 */
 void caosVM::v_COS_() {
 	VM_VERIFY_SIZE(1)
@@ -415,7 +417,7 @@ void caosVM::v_COS_() {
  SIN_ (float) x (float)
  %status maybe
  
- returns sine of x in degrees
+ Returns the sine of x in degrees.
 */
 void caosVM::v_SIN_() {
 	VM_VERIFY_SIZE(1)
@@ -431,7 +433,7 @@ void caosVM::v_SIN_() {
  TAN_ (float) x (float)
  %status maybe
  
- returns tangent of x in degrees
+ Returns the tangent of x in degrees.
 */
 void caosVM::v_TAN_() {
 	VM_VERIFY_SIZE(1)
@@ -447,7 +449,7 @@ void caosVM::v_TAN_() {
  SQRT (float) v (float)
  %status maybe
  
- returns square root of v
+ Returns the square root of v.
 */
 void caosVM::v_SQRT() {
 	VM_VERIFY_SIZE(1)
@@ -460,6 +462,8 @@ void caosVM::v_SQRT() {
  _P1_ (variable)
  %pragma implementation caosVM::v_P1
  %status maybe
+
+ The first argument given to the current script.
 */
 void caosVM::v_P1() {
 	VM_VERIFY_SIZE(0)
@@ -471,6 +475,8 @@ void caosVM::v_P1() {
  _P2_ (variable)
  %pragma implementation caosVM::v_P2
  %status maybe
+
+ The second argument given to the current script.
 */
 void caosVM::v_P2() {
 	VM_VERIFY_SIZE(0)
@@ -481,6 +487,8 @@ void caosVM::v_P2() {
 /**
  AVAR (variable) agent (agent) index (integer)
  %status maybe
+
+ Returns the value of OVxx for the given agent, where xx is equal to 'index'.
 */
 void caosVM::v_AVAR() {
 	VM_VERIFY_SIZE(2)
@@ -515,8 +523,8 @@ void caosVM::v_VTOS() {
  CHAR (integer) str (string) index (integer)
  %status maybe
 
- Returns the character at position index of string.
- Indexes begin at 1.
+ Returns the character at position 'index' of the given string.
+ Indexes start at 1.
 */
 void caosVM::v_CHAR() {
 	VM_VERIFY_SIZE(2)
@@ -531,6 +539,9 @@ void caosVM::v_CHAR() {
 /**
  CHAR (command) string (variable) index (integer) character (integer)
  %status maybe
+
+ Sets the character at position 'index' of the given string.
+ Indexes start at 1. 
 */
 void caosVM::c_CHAR() {
 	VM_PARAM_INTEGER(character)
@@ -551,7 +562,7 @@ void caosVM::c_CHAR() {
  ITOF (float) number (integer)
  %status maybe
 
- Converts given integer to a float.
+ Converts the given integer to a float.
 */
 void caosVM::v_ITOF() {
 	VM_PARAM_FLOAT(number) // watson tells me this function is COMPLETELY pointless - fuzzie
@@ -563,7 +574,7 @@ void caosVM::v_ITOF() {
  FTOI (integer) number (float)
  %status maybe
 
- Converts given float to an integer, by rounding.
+ Converts the given float to an integer, by rounding.
 */
 void caosVM::v_FTOI() {
 	VM_PARAM_INTEGER(number)
@@ -575,7 +586,7 @@ void caosVM::v_FTOI() {
  STRL (integer) string (string)
  %status maybe
 
- Returns the length of the given string.
+ Returns the length in characters of the given string.
 */
 void caosVM::v_STRL() {
 	VM_PARAM_STRING(string)
@@ -587,7 +598,7 @@ void caosVM::v_STRL() {
  READ (string) tag (string) offset (integer)
  %status maybe
 
- Returns the value of the string at offset inside the given catalogue tag.
+ Returns the value of the string at 'offset' inside the given catalogue tag.
  Offsets start at zero. Throws an error if tag doesn't exist.
 */
 void caosVM::v_READ() {
@@ -632,6 +643,8 @@ int findCategory(unsigned char family, unsigned char genus, unsigned short speci
 /**
  CATA (integer)
  %status maybe
+
+ Returns the agent category of the TARG agent.
 */
 void caosVM::v_CATA() {
 	caos_assert(targ);
@@ -642,6 +655,8 @@ void caosVM::v_CATA() {
 /**
  CATI (integer) family (integer) genus (integer) species (integer)
  %status maybe
+
+ Returns the agent category for the given family/genus/species.
 */
 void caosVM::v_CATI() {
 	VM_PARAM_INTEGER(species)
@@ -654,6 +669,8 @@ void caosVM::v_CATI() {
 /**
  CATX (string) category_id (integer)
  %status maybe
+
+ Returns a string containing the name of the given category.
 */
 void caosVM::v_CATX() {
 	VM_PARAM_INTEGER(category_id)
@@ -671,7 +688,7 @@ void caosVM::v_CATX() {
  WILD (string) family (integer) genus (integer) species (integer) tag (string) offset (integer)
  %status maybe
 
- Searches for a catalogue tag starting with tag and matching the given
+ Searches for a catalogue tag starting with 'tag' and matching the given
  family/genus/species.  For instance, 'Agent Help 2 3 4' where family is 2,
  genus is 3 and species is 4.  If it doesn't find it, it sets the minor value
  to 0 repeatedly until it either finds one, or discovers 'tag 0 0 0' doesn't
@@ -697,6 +714,8 @@ void caosVM::v_WILD() {
 /**
  NAME (variable) name (anything)
  %status maybe
+
+ Named, agent-local variables (like OVxx) in the TARG agent.
 */
 void caosVM::v_NAME() {
 	VM_PARAM_VALUE(name)
@@ -708,6 +727,8 @@ void caosVM::v_NAME() {
 /**
  MAME (variable) name (anything)
  %status maybe
+
+ Like NAME variables, except for OWNR rather than TARG.
 */
 void caosVM::v_MAME() {
 	VM_PARAM_VALUE(name)
@@ -758,7 +779,7 @@ void caosVM::v_STOF() {
  LOWA (string) string (string)
  %status maybe
 
- Return lower-cased version of a string.
+ Return a lower-cased version of a string.
 */
 void caosVM::v_LOWA() {
 	VM_PARAM_STRING(string)
@@ -771,7 +792,7 @@ void caosVM::v_LOWA() {
  UPPA (string) string (string)
  %status maybe
 
- Return upper-cased version of a string.
+ Return an upper-cased version of a string.
 */
 void caosVM::v_UPPA() {
 	VM_PARAM_STRING(string)
@@ -784,8 +805,8 @@ void caosVM::v_UPPA() {
  SINS (integer) string (string) index (integer) searchstring (string)
  %status maybe
 
- Searches for an occurance of searchstring inside string, starting at the given index inside string (first character is 1).
- The index of the searchstring inside the string is returned, or -1 if the searchstring wasn't found.
+ Searches for an occurance of 'searchstring' inside 'string', starting at the given index inside 'string' (first character is 1).
+ The index of the 'searchstring' inside the string is returned, or -1 if the searchstring wasn't found.
 */
 void caosVM::v_SINS() {
 	VM_PARAM_STRING(searchstring)

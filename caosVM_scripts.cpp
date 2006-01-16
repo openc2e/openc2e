@@ -26,7 +26,8 @@ using std::cerr;
  INST (command)
  %status maybe
 
- don't release control to the scheduler until end of script or SLOW
+ Forces the following commands to be executed in one tick, rather than scheduling them, until SLOW or the end 
+ of the script is encountered.
  */
 void caosVM::c_INST() {
 	VM_VERIFY_SIZE(0)
@@ -39,7 +40,7 @@ void caosVM::c_INST() {
  SLOW (command)
  %status maybe
 
- reverts effects of INST
+ Reverses the effects of INST.
  */
 void caosVM::c_SLOW() {
 	VM_VERIFY_SIZE(0)
@@ -51,7 +52,7 @@ void caosVM::c_SLOW() {
  LOCK (command)
  %status maybe
 
- prevent agent script from being interrupted by another
+ Prevent the script from being interrupted by another until UNLK or the end of the script is encountered.
  */
 void caosVM::c_LOCK() {
 	VM_VERIFY_SIZE(0)
@@ -62,7 +63,7 @@ void caosVM::c_LOCK() {
  UNLK (command)
  %status maybe
 
- reverts effects of LOCK
+ Reverses the effects of LOCK.
  */
 void caosVM::c_UNLK() {
 	VM_VERIFY_SIZE(0)
@@ -87,7 +88,7 @@ class blockUntilTime : public blockCond {
  WAIT (command) ticks (integer)
  %status maybe
 
- stop the script from running for a number of ticks
+ Stops the script from running for the given number of ticks.
  */
 void caosVM::c_WAIT() {
 	VM_VERIFY_SIZE(1)
@@ -101,6 +102,8 @@ void caosVM::c_WAIT() {
  STOP (command)
  %status maybe
  %pragma retc -1
+
+ Aborts the script.
 */
 void caosVM::c_STOP() {
 	VM_VERIFY_SIZE(0)
@@ -111,7 +114,7 @@ void caosVM::c_STOP() {
  SCRX (command) family (integer) genus (integer) species (integer) event (integer)
  %status maybe
 
- delete the event script in question
+ Deletes the event script in question from the scriptoruium.
 */
 void caosVM::c_SCRX() {
 	VM_VERIFY_SIZE(4)
@@ -134,8 +137,8 @@ void caosVM::c_SCRX() {
  CODE (integer)
  %status maybe
 
- Return script number running in the target. Returns -1 if target is not
- running anything (or if it's running something that's not an event script)
+ Returns script number running in the TARG agent. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODE() {
 	caos_assert(targ);
@@ -152,8 +155,8 @@ void caosVM::v_CODE() {
  CODF (integer)
  %status maybe
 
- Return script family running in the target. Returns -1 if target is not
- running anything (or if it's running something that's not an event script)
+ Returns script family running in the TARG agent. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODF() {
 	caos_assert(targ);
@@ -170,8 +173,8 @@ void caosVM::v_CODF() {
  CODG (integer)
  %status maybe
 
- Return script genus running in the target. Returns -1 if target is not
- running anything (or if it's running something that's not an event script)
+ Returns script genus running in the target. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODG() {
 	caos_assert(targ);
@@ -188,8 +191,8 @@ void caosVM::v_CODG() {
  CODS (integer)
  %status maybe
 
- Return script species running in the target. Returns -1 if target is not
- running anything (or if it's running something that's not an event script)
+ Returns script species running in the target. Returns -1 if target is not
+ running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODS() {
 	caos_assert(targ);
