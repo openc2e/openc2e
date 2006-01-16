@@ -171,7 +171,8 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 		case 92: // TODO: hack for 'UI Mouse Down' event - we need a real event system!
 			std::cout << "faking event 92 on " << identify() << std::endl;
 			CompoundPart *p = world.partAt(world.hand()->x, world.hand()->y);
-			caos_assert(p && p->getParent() == this);
+			if (!p || p->getParent() != this) // if something is horridly broken here, return
+				return false; // was caos_assert(p && p->getParent() == this);
 			p->handleClick(world.hand()->x - p->x - p->getParent()->x, world.hand()->y - p->y - p->getParent()->y);
 			// TODO: we're [obviously] missing firing the pointer script here, but it's a hack for now
 			break;
