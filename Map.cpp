@@ -39,10 +39,10 @@ void Map::SetMapDimensions(unsigned int w, unsigned int h) {
 
 int Map::addMetaRoom(MetaRoom *m) {
 	// todo: check if it's outlying
-	metarooms.push_back(m);
 	while (getMetaRoom(metaroom_base))
 		metaroom_base++;
 	m->id = metaroom_base++;
+	metarooms.push_back(m);
 	return m->id;
 }
 
