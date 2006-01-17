@@ -190,6 +190,7 @@ public:
 	void v_WDOW();
 	void c_TRCK();
 	void c_LINE();
+	void v_SNAX();
 
 	// world
 	void c_LOAD();

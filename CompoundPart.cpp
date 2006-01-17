@@ -115,6 +115,18 @@ CompoundPart::~CompoundPart() {
 	world.zorder.erase(zorder_iter);
 }
 
+void CompoundPart::changeSprite(std::string spritefile, unsigned int fimg) {
+	creaturesImage *spr = gallery.getImage(spritefile);
+	caos_assert(spr);
+	caos_assert(spr->numframes() > fimg);
+	// TODO: either assertions to ensure the pose/base are valid, or reset them
+	firstimg = fimg;
+	gallery.delImage(origsprite);
+	// TODO: should we preserve tint?
+	if (origsprite != sprite) delete sprite;
+	origsprite = sprite = spr;
+}
+
 unsigned int CompoundPart::getZOrder() const {
 	return parent->getZOrder() + zorder;
 }

@@ -1135,13 +1135,20 @@ void caosVM::v_HELD() {
 
 /**
  GALL (command) spritefile (string) first_image (integer)
- %status stub
+ %status maybe
 
  Changes the sprite file and first image associated with the TARG agent or current PART.
 */
 void caosVM::c_GALL() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(spritefile)
+
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	p->changeSprite(spritefile, first_image);
 }
 
 /**

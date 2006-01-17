@@ -261,8 +261,8 @@ void World::executeInitScript(fs::path p) {
 	std::string x = p.native_file_string();
 	std::ifstream s(x.c_str());
 	assert(s.is_open());
-	std::cout << "executing script " << x << "...\n";
-	std::cout.flush(); std::cerr.flush();
+	//std::cout << "executing script " << x << "...\n";
+	//std::cout.flush(); std::cerr.flush();
 	try {
 		caosScript script(gametype, x);
 		script.parse(s);
@@ -270,7 +270,7 @@ void World::executeInitScript(fs::path p) {
 		script.installScripts();
 		vm.runEntirely(script.installer);
 	} catch (std::exception &e) {
-		std::cerr << "script exec failed due to exception " << e.what() << std::endl;
+		std::cerr << "exec of \"" << p.leaf() << "\" failed due to exception " << e.what() << std::endl;
 	}
 	std::cout.flush(); std::cerr.flush();
 }
@@ -298,16 +298,14 @@ void World::executeBootstrap(bool switcher) {
 	// TODO: this code is possibly wrong with multiple bootstrap directories
 	std::multimap<unsigned int, fs::path> bootstraps;
 
-	std::cout << "executing all bootstraps" << std::endl;
-
 	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
 		assert(fs::exists(*i));
 		assert(fs::is_directory(*i));
-		std::cout << "executing bootstraps in " << i->native_directory_string() << std::endl;
-		if (fs::is_directory(*i / "/Bootstrap/")) {
+		fs::path b(*i / "/Bootstrap/");
+		if (fs::exists(b) && fs::is_directory(b)) {
 			fs::directory_iterator fsend;
 			// iterate through each bootstrap directory
-			for (fs::directory_iterator d(*i / "/Bootstrap/"); d != fsend; ++d) {
+			for (fs::directory_iterator d(b); d != fsend; ++d) {
 				if (fs::exists(*d) && fs::is_directory(*d)) {
 					std::string s = (*d).leaf();
 					if (s.size() > 3) {
@@ -334,8 +332,9 @@ void World::initCatalogue() {
 		assert(fs::exists(*i));
 		assert(fs::is_directory(*i));
 
-		if (fs::is_directory(*i / "/Catalogue/"))
-			catalogue.initFrom(*i / "/Catalogue/");
+		fs::path c(*i / "/Catalogue/");
+		if (fs::exists(c) && fs::is_directory(c))
+			catalogue.initFrom(c);
 	}
 }
 
@@ -350,6 +349,10 @@ std::string World::findFile(std::string name) {
 	}
 	
 	return "";
+}
+
+std::string World::getUserDataDir() {
+	return (data_directories.end() - 1)->native_directory_string();
 }
 
 /* vim: set noet: */

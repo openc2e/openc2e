@@ -19,6 +19,8 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include <boost/filesystem/convenience.hpp>
+namespace fs = boost::filesystem;
 
 /**
  PRAY AGTI (integer) resource (string) tag (string) default (integer)
@@ -126,7 +128,71 @@ void caosVM::v_PRAY_FILE() {
 	VM_PARAM_INTEGER(type)
 	VM_PARAM_STRING(name)
 
-	result.setInt(1); // TODO
+	std::string directory;
+
+	switch (type) {
+		case 0: directory = "/"; break; // main
+		case 1: directory = "/Sounds/"; break; // sounds
+		case 2: directory = "/Images/"; break; // images
+		case 3: directory = "/Genetics/"; break; // genetics
+		case 4: directory = "/Body Data/"; break; // body data
+		case 5: directory = "/Overlay Data/"; break; // overlay data
+		case 6: directory = "/Backgrounds/"; break; // backgrounds
+		case 7: directory = "/Catalogue/"; break; // catalogue
+		//case 8: directory = "/Bootstrap/"; break; // bootstrap
+		//case 9: directory = "/My Worlds/"; break; // my worlds
+		case 10: directory = "/My Creatures/"; break; // my creatures
+		case 11: directory = "/My Agents/"; break; // my agents
+	}
+
+	caos_assert(!directory.empty());
+
+	fs::path dir = fs::path(world.getUserDataDir(), fs::native) / fs::path(directory, fs::native);
+	if (!fs::exists(dir))
+		fs::create_directory(dir);
+	caos_assert(fs::exists(dir) && fs::is_directory(dir));
+
+	fs::path outputfile = dir / fs::path(name, fs::native);
+	if (fs::exists(outputfile)) {
+		// TODO: update file if necessary? check it's not a directory :P
+		result.setInt(0);
+		return;
+	}
+
+	fs::path possiblefile = fs::path(directory, fs::native) / fs::path(name, fs::native);
+	if (!world.findFile(possiblefile.native_directory_string()).empty()) {
+		// TODO: we need to return 'okay' if the file exists anywhere, but someone needs to work out update behaviour (see other comment above, also)
+		result.setInt(0);
+		return;
+	}
+
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
+	if (i == world.praymanager.blocks.end()) {
+		std::cout << "PRAY FILE: couldn't find block " << name << std::endl;
+		result.setInt(1);
+		return;
+	}
+	
+	prayBlock *p = i->second;
+	if (p->type != "FILE") {
+		std::cout << "PRAY FILE: block " << name << " is " << p->type << " not FILE" << std::endl;
+		// TODO: correct behaviour? possibly not..
+		result.setInt(1);
+		return;
+	}
+
+	if (install == 0) {
+		// TODO: work out if we've tested enough
+		result.setInt(0);
+		return;
+	}
+
+	p->load();
+	std::ofstream output(outputfile.native_directory_string().c_str());
+	output.write((char *)p->getBuffer(), p->getSize());
+	// p->unload();
+		
+	result.setInt(0); // TODO
 }
 
 /**

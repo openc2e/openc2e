@@ -232,7 +232,6 @@ void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned 
 	int redTint = (int)r - 128;
 	int greenTint = (int)g - 128;
 	int blueTint = (int)b - 128;
-	std::cout << "tint: " << redTint << ", " << greenTint << ", " << blueTint << std::endl;
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		for (unsigned int j = 0; j < heights[i]; j++) {

@@ -95,7 +95,7 @@ public:
 	void executeBootstrap(boost::filesystem::path p);
 	void executeBootstrap(bool switcher);
 
-	std::string getUserDataDir() { return data_directories.begin()->native_directory_string(); } // TODO
+	std::string getUserDataDir();
 	std::string findFile(std::string path);
 
 	void tick();

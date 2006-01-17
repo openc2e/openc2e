@@ -70,6 +70,7 @@ public:
 	void setPose(unsigned int p);
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
 	void setBase(unsigned int b);
+	void changeSprite(std::string spritefile, unsigned int fimg);
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 	bool transparentAt(unsigned int x, unsigned int y);
 				

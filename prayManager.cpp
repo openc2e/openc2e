@@ -61,20 +61,35 @@ void prayManager::removeFile(prayFile *f) {
 
 void prayManager::update() {
 	if (files.size() != 0) return; // TODO: Handle actual update cases, rather than just the initial init.
-	
+
+	if (!world.catalogue.hasTag("Pray System File Extensions"))
+		throw creaturesException("couldn't find the catalogue tag \"Pray System File Extensions\"");
+
+	const std::vector<std::string> &extensions = world.catalogue.getTag("Pray System File Extensions");
+
 	for (std::vector<fs::path>::iterator i = world.data_directories.begin(); i != world.data_directories.end(); i++) {
 		assert(fs::exists(*i));
 		assert(fs::is_directory(*i));
 
 		fs::path praydir(*i / fs::path("/My Agents/", fs::native));
 		
-		if (fs::is_directory(praydir)) {
+		if (fs::exists(praydir) && fs::is_directory(praydir)) {
 			fs::directory_iterator fsend;
 			for (fs::directory_iterator d(praydir); d != fsend; ++d) {
-				// TODO: language checking!
-				std::cout << "scanning PRAY file " << d->native_directory_string() << std::endl;
-				prayFile *p = new prayFile(*d);
-				addFile(p);
+				for (std::vector<std::string>::const_iterator z = extensions.begin(); z != extensions.end(); z++) {
+					std::string x = fs::extension(*d);
+					x.erase(x.begin());
+					if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
+						// TODO: language checking!
+						//std::cout << "scanning PRAY file " << d->native_directory_string() << std::endl;
+						try {
+							prayFile *p = new prayFile(*d);
+							addFile(p);
+						} catch (creaturesException &e) {
+							std::cerr << "PRAY file " << d->native_directory_string() << "failed to load: " << e.what() << std::endl;
+						}
+					}
+				}
 			}
 		}
 	}

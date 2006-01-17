@@ -96,7 +96,7 @@ void Catalogue::initFrom(fs::path path) {
 	assert(fs::exists(path));
 	assert(fs::is_directory(path));
 	
-	std::cout << "Catalogue is reading " << path.native_directory_string() << std::endl;
+	//std::cout << "Catalogue is reading " << path.native_directory_string() << std::endl;
 
 	fs::directory_iterator end;
 	std::string file;
@@ -110,7 +110,7 @@ void Catalogue::initFrom(fs::path path) {
 					// TODO: this is NOT how we should do it
 					continue; // skip all localised files
 				}
-				std::cout << "Catalogue file '" << x << "' being read" << std::endl;
+				//std::cout << "Catalogue file '" << x << "' being read" << std::endl;
 				fs::ifstream f(*i);
 				f >> *this;
 			}

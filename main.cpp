@@ -32,6 +32,7 @@
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
 extern fs::path homeDirectory(); // creaturesImage.cpp
+extern fs::path cacheDirectory(); // creaturesImage.cpp
 static const char data_default[] = "./data";
 
 static void opt_version() {
@@ -107,6 +108,8 @@ extern "C" int main(int argc, char *argv[]) {
 		caosVar contents; contents.setInt(1);
 		world.eame_variables[name] = contents;
 	}
+
+	world.data_directories.push_back(cacheDirectory());
 	
 	if (bootstrap.size() == 0) {
 		world.executeBootstrap(false);
@@ -115,8 +118,10 @@ extern "C" int main(int argc, char *argv[]) {
 	
 		for (std::vector< std::string >::iterator bsi = bootstrap.begin(); bsi != bootstrap.end(); bsi++) {
 			fs::path scriptdir(*bsi, fs::native);
-			if (!fs::exists(scriptdir))
+			if (!fs::exists(scriptdir)) {
 				std::cerr << "couldn't find a specified script directory (trying " << *bsi << ")!\n";
+				continue;
+			}
 			world.executeBootstrap(scriptdir);
 		}
 	}

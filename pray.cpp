@@ -95,10 +95,18 @@ void prayBlock::load() {
 		// TODO: check pray_uncompress_sanity_check
 		char *src = new char[compressedsize];
 		file.read(src, compressedsize);
-		unsigned int usize;
-		if (uncompress((Bytef *)buffer, (uLongf *)&usize, (Bytef *)src, size) != Z_OK) {
+		unsigned int usize = size;
+		int r = uncompress((Bytef *)buffer, (uLongf *)&usize, (Bytef *)src, size);
+		if (r != Z_OK) {
 			delete buffer; delete src;
-			throw creaturesException("Failed to decompress block.");
+			std::string o = "Unknown error";
+			switch (r) {
+				case Z_MEM_ERROR: o = "Out of memory"; break;
+				case Z_BUF_ERROR: o = "Out of buffer space"; break;
+				case Z_DATA_ERROR: o = "Corrupt data"; break;
+			}
+			o = o + " while decompressing PRAY block \"" + name + "\"";
+			throw creaturesException(o);
 		}
 		delete src;
 		if (usize != size) {
