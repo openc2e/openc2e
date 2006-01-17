@@ -191,6 +191,7 @@ public:
 	void c_TRCK();
 	void c_LINE();
 	void v_SNAX();
+	void c_SCAM();
 
 	// world
 	void c_LOAD();
@@ -424,6 +425,7 @@ public:
 	void c_PAT_BUTT();
 	void c_PAT_FIXD();
 	void c_PAT_TEXT();
+	void c_PAT_CMRA();
 	void c_PAT_KILL();
 	void c_PAT_MOVE();
 	void c_FCUS();
@@ -434,6 +436,7 @@ public:
 	void c_PAGE();
 	void v_PAGE();
 	void v_NPGS();
+	void c_GRPV();
 
 	// creatures
 	void c_STIM_SHOU();

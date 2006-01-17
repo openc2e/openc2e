@@ -173,6 +173,29 @@ void caosVM::c_PAT_TEXT() {
 	a->addPart(p);
 }
 
+/**
+ PAT: CMRA (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) viewwidth (integer) viewheight (integer) camerawidth (integer) cameraheight(integer)
+ %status stub
+*/
+void caosVM::c_PAT_CMRA() {
+	VM_PARAM_INTEGER(cameraheight)
+	VM_PARAM_INTEGER(camerawidth)
+	VM_PARAM_INTEGER(viewheight)
+	VM_PARAM_INTEGER(viewwidth)
+	VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_STRING(sprite)
+	VM_PARAM_INTEGER(part)
+
+	caos_assert(part >= 0);
+	caos_assert(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);
+
+	// TODO
+}
 
 /**
  PAT: KILL (command) part (integer)
@@ -387,6 +410,23 @@ void caosVM::v_NPGS() {
 	caos_assert(t);
 
 	result.setInt(t->noPages());
+}
+
+/**
+ GRPV (command) line (integer) value (float)
+ %status stub
+*/
+void caosVM::c_GRPV() {
+	VM_PARAM_FLOAT(value)
+	VM_PARAM_INTEGER(line)
+
+	caos_assert(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	GraphPart *t = dynamic_cast<GraphPart *>(p);
+	caos_assert(t);
 }
 
 /* vim: set noet: */

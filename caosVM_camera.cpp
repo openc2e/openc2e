@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include "CompoundAgent.h"
 
 /**
  VISI (integer) checkall (integer)
@@ -318,6 +319,24 @@ void caosVM::v_SNAX() {
 		result.setInt(1);
 	else if (!world.findFile(std::string("/Images/") + filename + ".c16").empty())
 		result.setInt(1);
+}
+
+/**
+ SCAM (command) agent (agent) part (integer)
+ %status stub
+*/
+void caosVM::c_SCAM() {
+	VM_PARAM_INTEGER(part)
+	VM_PARAM_VALIDAGENT(agent)
+
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(agent);
+	caos_assert(a);
+	CompoundPart *p = a->part(part);
+	caos_assert(p);
+	CameraPart *c = dynamic_cast<CameraPart *>(p);
+	caos_assert(c);
+
+	// TODO
 }
 
 /* vim: set noet: */
