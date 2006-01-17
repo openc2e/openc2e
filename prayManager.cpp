@@ -76,18 +76,16 @@ void prayManager::update() {
 		if (fs::exists(praydir) && fs::is_directory(praydir)) {
 			fs::directory_iterator fsend;
 			for (fs::directory_iterator d(praydir); d != fsend; ++d) {
-				for (std::vector<std::string>::const_iterator z = extensions.begin(); z != extensions.end(); z++) {
-					std::string x = fs::extension(*d);
-					x.erase(x.begin());
-					if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
-						// TODO: language checking!
-						//std::cout << "scanning PRAY file " << d->native_directory_string() << std::endl;
-						try {
-							prayFile *p = new prayFile(*d);
-							addFile(p);
-						} catch (creaturesException &e) {
-							std::cerr << "PRAY file " << d->native_directory_string() << "failed to load: " << e.what() << std::endl;
-						}
+				std::string x = fs::extension(*d);
+				x.erase(x.begin());
+				if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
+					// TODO: language checking!
+					//std::cout << "scanning PRAY file " << d->native_directory_string() << std::endl;
+					try {
+						prayFile *p = new prayFile(*d);
+						addFile(p);
+					} catch (creaturesException &e) {
+						std::cerr << "PRAY file \"" << d->native_directory_string() << "\" failed to load: " << e.what() << std::endl;
 					}
 				}
 			}
