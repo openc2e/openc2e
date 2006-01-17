@@ -160,6 +160,8 @@ extern "C" int main(int argc, char *argv[]) {
 		blkImage *test = m->backImage();
 		assert(test != 0);
 
+		assert(world.backsurfs.find(m->id) == world.backsurfs.end());
+
 		world.backsurfs[m->id] = new SDL_Surface *[test->numframes()];
 		for (unsigned int i = 0; i < test->numframes(); i++) {
 			world.backsurfs[m->id][i] = SDL_CreateRGBSurfaceFrom(test->data(i),

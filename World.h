@@ -74,7 +74,7 @@ public:
 	MainCamera camera;
 	SDLBackend backend;
 	bool showrooms;
-	SDL_Surface **backsurfs[20]; // TODO: this is a horrible horrible icky hack
+	std::map<unsigned int, SDL_Surface **> backsurfs; // TODO: this is a horrible horrible icky hack
 
 	AgentRef focusagent; unsigned int focuspart;
 	void setFocus(class TextEntryPart *p);
