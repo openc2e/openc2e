@@ -31,7 +31,7 @@
 
 using boost::str;
 
-SlabAllocator caosVarSlab((sizeof(agentwrap) > sizeof(stringwrap) ? sizeof(agentwrap) : sizeof(stringwrap)), 32768);
+SlabAllocator caosVarSlab((sizeof(agentwrap) > sizeof(stringwrap) ? sizeof(agentwrap) : sizeof(stringwrap)), 32768, false);
 
 static inline std::string stringify(double x) {
 	std::ostringstream o;

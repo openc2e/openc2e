@@ -65,7 +65,7 @@ class SlabAllocator {
 		slab_head *p_head; // A chain through the beginnings of the blocks
 		// head is used for destructor freeing and clear()
 		slab_head *p_bad;  // A chain through blocks which can't be reallocated
-		
+		bool autofree;
 		
 		void get_block() {
 			assert(!freect);
@@ -176,11 +176,16 @@ class SlabAllocator {
 		 *   unless clear() is called.
 		 * size_t bm
 		 *   Indicates the target size of a slab, in bytes.
+		 * bool af
+		 *   Whether to free the memory of this slab on destruction
+		 *   It's best to set this to false for globals, to prevent
+		 *   weird order-of-destruction effects.
 		 */
-		SlabAllocator(size_t objsz_ = sizeof(void **), size_t bm = 4096)
+		SlabAllocator(size_t objsz_ = sizeof(void **), size_t bm = 4096, bool af = true)
 			: objsz(objsz_), count(0), freect(0),
 			  memy_usage(0), memy_reserved(0), memy_free(0),
-			  block_size(bm), p_free(NULL), p_head(NULL)
+			  block_size(bm), p_free(NULL), p_head(NULL),
+			  autofree(af)
 		  {
 			  objsz += sizeof(slab_head *);
 		  }
@@ -188,7 +193,7 @@ class SlabAllocator {
 		// Note: deleting using ~SlabAllocator or clear() do _NOT_
 		// call destructors! Use DestructingSlab
 
-		virtual ~SlabAllocator() { clear(); }
+		virtual ~SlabAllocator() { if (autofree) clear(); }
 
 		/* Free all allocations in the slab, and release all slab memory
 		 * to the system.
