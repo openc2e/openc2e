@@ -192,6 +192,7 @@ public:
 	void c_LINE();
 	void v_SNAX();
 	void c_SCAM();
+	void c_ZOOM();
 
 	// world
 	void c_LOAD();
@@ -484,6 +485,8 @@ public:
 	void c_NEW_CREA();
 	void c_LTCY();
 	void c_MATE();
+	void v_DRV();
+	void v_IITT();
 	
 	// sounds
 	void c_SNDE();

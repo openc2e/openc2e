@@ -339,4 +339,16 @@ void caosVM::c_SCAM() {
 	// TODO
 }
 
+/**
+ ZOOM (command) pixels (integer) x (integer) y (integer)
+ %status stub
+*/
+void caosVM::c_ZOOM() {
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(pixels)
+
+	// TODO
+}
+
 /* vim: set noet: */

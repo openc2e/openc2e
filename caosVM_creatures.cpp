@@ -604,4 +604,23 @@ void caosVM::c_MATE() {
 	// TODO
 }
 
+/**
+ DRV! (integer)
+ %status stub
+ %pragma implementation caosVM::v_DRV
+*/
+void caosVM::v_DRV() {
+	Creature *c = getTargCreature();
+	result.setInt(0); // TODO
+}
+
+/**
+ IITT (agent)
+ %status stub
+*/
+void caosVM::v_IITT() {
+	Creature *c = getTargCreature();
+	result.setAgent(0); // TODO
+}
+
 /* vim: set noet: */
