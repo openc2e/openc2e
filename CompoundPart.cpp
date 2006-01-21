@@ -43,7 +43,6 @@ creaturesImage *TextEntryPart::caretsprite = 0;
 
 void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
-		assert(getCurrentSprite() < getSprite()->numframes());
 		partRender(renderer, xoffset + parent->x, yoffset + parent->y);
 		if (parent->displaycore /*&& (id == 0)*/) {
 			// TODO: tsk, this should be drawn along with the other craziness on the line plane, i expect
@@ -57,11 +56,12 @@ void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	}
 }
 
-void CompoundPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
+void SpritePart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
+	assert(getCurrentSprite() < getSprite()->numframes());
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha);
 }
 
-void CompoundPart::setFrameNo(unsigned int f) {
+void SpritePart::setFrameNo(unsigned int f) {
 	assert(f < animation.size());
 	assert(firstimg + base + animation[f] < getSprite()->numframes());
 	
@@ -69,53 +69,64 @@ void CompoundPart::setFrameNo(unsigned int f) {
 	pose = animation[f];
 }
 
-void CompoundPart::setPose(unsigned int p) {
+void SpritePart::setPose(unsigned int p) {
 	assert(firstimg + base + p < getSprite()->numframes());
 
 	animation.clear();
 	pose = p;
 }
 		
-void CompoundPart::setBase(unsigned int b) {
+void SpritePart::setBase(unsigned int b) {
 	assert(firstimg + b + pose < getSprite()->numframes());
 
 	base = b;
 }
 
-bool CompoundPart::transparentAt(unsigned int x, unsigned int y) {
+bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 	return ((duppableImage *)getSprite())->transparentAt(getCurrentSprite(), x, y);
 }
 
-void CompoundPart::handleClick(float clickx, float clicky) {
+void SpritePart::handleClick(float clickx, float clicky) {
 	parent->handleClick(clickx + parent->x, clicky + parent->y);
 }
 
-CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
-						int _x, int _y, unsigned int _z) : zorder(_z), parent(p), id(_id) {
-	origsprite = sprite = gallery.getImage(spritefile);
-	firstimg = fimg;
-	caos_assert(sprite);
-	caos_assert(sprite->numframes() > firstimg);
-	
-	addZOrder();
-
+CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, int _x, int _y, int _z) : zorder(_z), parent(p), id(_id) {
+	addZOrder();	
 	x = _x;
 	y = _y;
+	
+	has_alpha = false;
+}
+
+CompoundPart::~CompoundPart() {
+	world.zorder.erase(zorder_iter);
+}
+
+SpritePart::SpritePart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
+						int _x, int _y, unsigned int _z) : CompoundPart(p, _id, _x, _y, _z) {
+	try {
+		origsprite = sprite = gallery.getImage(spritefile);
+		firstimg = fimg;
+		caos_assert(sprite);
+		caos_assert(sprite->numframes() > firstimg);
+	} catch (std::exception e) {
+		zapZOrder();
+		throw;
+	}
+	
 	pose = 0;
 	base = 0;
-	has_alpha = false;
 	is_transparent = true;
 	framerate = 1;
 	framedelay = 0;
 }
 
-CompoundPart::~CompoundPart() {
+SpritePart::~SpritePart() {
 	gallery.delImage(origsprite);
 	if (origsprite != sprite) delete sprite;
-	world.zorder.erase(zorder_iter);
 }
 
-void CompoundPart::changeSprite(std::string spritefile, unsigned int fimg) {
+void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	creaturesImage *spr = gallery.getImage(spritefile);
 	caos_assert(spr);
 	caos_assert(spr->numframes() > fimg);
@@ -141,7 +152,7 @@ void CompoundPart::addZOrder() {
 	zorder_iter = world.zorder.insert(this);	
 }
 
-void CompoundPart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
+void SpritePart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
 	if (origsprite != sprite) delete sprite;
 	s16Image *newsprite = new s16Image();
 	sprite = newsprite;
@@ -150,11 +161,11 @@ void CompoundPart::tint(unsigned char r, unsigned char g, unsigned char b, unsig
 }
 
 DullPart::DullPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-			 unsigned int _z) : CompoundPart(p, _id, spritefile, fimg, _x, _y, _z) {
+			 unsigned int _z) : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 }
 
 ButtonPart::ButtonPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-	unsigned int _z, const bytestring &animhover, int msgid, int option) : CompoundPart(p, _id, spritefile, fimg, _x, _y, _z) {
+	unsigned int _z, const bytestring &animhover, int msgid, int option) : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	messageid = msgid;
 	hitopaquepixelsonly = (option == 1);
 	hoveranimation = animhover;
@@ -167,7 +178,7 @@ void ButtonPart::handleClick(float x, float y) {
 }
 
 TextPart::TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
-	                : CompoundPart(p, _id, spritefile, fimg, _x, _y, _z) {
+	                : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = gallery.getImage(fontsprite);
 	caos_assert(textsprite);
 	caos_assert(textsprite->numframes() == 224);
@@ -423,7 +434,7 @@ void TextPart::recalculateData() {
 }
 
 void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
-	CompoundPart::partRender(renderer, xoffset + x, yoffset + y);
+	SpritePart::partRender(renderer, xoffset + x, yoffset + y);
 	
 	unsigned int xoff = xoffset + x + leftmargin;
 	unsigned int yoff = yoffset + y + topmargin;
@@ -499,7 +510,7 @@ void TextEntryPart::tick() {
 	}
 }
 
-void CompoundPart::tick() {
+void SpritePart::tick() {
 	if (!animation.empty()) {
                 if (framerate > 1) {
 			framedelay++;
@@ -518,6 +529,12 @@ void CompoundPart::tick() {
 			setFrameNo(f);
 		}
 	}
+}
+
+CameraPart::CameraPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+		unsigned int _z, unsigned int viewwidth, unsigned int viewheight, unsigned int camerawidth, unsigned int cameraheight)
+		: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
+	// TODO: set viewwidth/viewheight and use for getWidth/getHeight, store camerawidth/cameraheight
 }
 
 /* vim: set noet: */

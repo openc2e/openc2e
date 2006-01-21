@@ -27,6 +27,16 @@
 
 using std::cerr;
 
+SpritePart *caosVM::getCurrentSpritePart() {
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+	CompoundPart *p = c->part(part);
+	caos_assert(p);
+	SpritePart *s = dynamic_cast<SpritePart *>(p);
+	caos_assert(s);
+	return s;
+}
+
 /**
  TOUC (integer) first (agent) second (agent)
  %status maybe
@@ -229,11 +239,7 @@ void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
 
-	caos_assert(targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
+	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p->getFirstImg() + p->getBase() + pose < p->getSprite()->numframes());
 	p->setPose(pose);
 }
@@ -341,10 +347,7 @@ void caosVM::v_POSE() {
 
 	caos_assert(targ);
 
-	CompoundAgent *n = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(n);
-	CompoundPart *p = n->part(part);
-	caos_assert(p);
+	SpritePart *p = getCurrentSpritePart();
 	result.setInt(p->getPose());
 }
 
@@ -378,13 +381,10 @@ void caosVM::c_ANIM() {
 
 	caos_assert(targ);
 
- 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
-	c->part(part)->animation = bs;
+	SpritePart *p = getCurrentSpritePart();
+	p->animation = bs;
 	
-	if (!bs.empty()) c->part(part)->setFrameNo(0); // TODO: correct?
+	if (!bs.empty()) p->setFrameNo(0); // TODO: correct?
 }
 
 /**
@@ -408,13 +408,10 @@ void caosVM::c_ANMS() {
 			t = t + poselist[i];
 	}
 
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
-	c->part(part)->animation = animation;
+	SpritePart *p = getCurrentSpritePart();
+	p->animation = animation;
 	
-	if (!animation.empty()) c->part(part)->setFrameNo(0); // TODO: correct?
+	if (!animation.empty()) p->setFrameNo(0); // TODO: correct?
 }
 
 /**
@@ -426,12 +423,7 @@ void caosVM::c_ANMS() {
 void caosVM::v_ABBA() {
 	VM_VERIFY_SIZE(0)
 	
-	caos_assert(targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
-
+	SpritePart *p = getCurrentSpritePart();
 	result.setInt(p->getFirstImg());
 }
 
@@ -448,10 +440,7 @@ void caosVM::c_BASE() {
 
 	caos_assert(targ);
 
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
+	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p->getFirstImg() + index + p->getPose() < p->getSprite()->numframes());
 	p->setBase(index);
 }
@@ -464,13 +453,8 @@ void caosVM::c_BASE() {
 */
 void caosVM::v_BASE() {
 	VM_VERIFY_SIZE(0)
-		
-	caos_assert(targ);
- 	
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
+			
+	SpritePart *p = getCurrentSpritePart();
 	result.setInt(p->getBase());
 }
 
@@ -695,10 +679,7 @@ void caosVM::c_FRAT() {
 	caos_assert(framerate >= 1 && framerate <= 255);
 	caos_assert(targ);
 
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
+	SpritePart *p = getCurrentSpritePart();
 	p->setFramerate(framerate);
 	p->framedelay = 0;
 }
@@ -714,11 +695,14 @@ class blockUntilOver : public blockCond {
 			int fno, animsize;
 
 			if (!targ) return false;
-			
+
 			CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-			caos_assert(c);
-			CompoundPart *p = c->part(part);
+			caos_assert(c)
+			CompoundPart *s = c->part(part);
+			caos_assert(s);
+			SpritePart *p = dynamic_cast<SpritePart *>(s);
 			caos_assert(p);
+			
 			fno = p->getFrameNo();
 			animsize = p->animation.size();
 
@@ -872,13 +856,7 @@ void caosVM::c_TINT() {
 	assert(swap >= 0 && swap <= 256);
 	assert(rotation >= 0 && rotation <= 256);
 
-	caos_assert(targ);
-
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
-
+	SpritePart *p = getCurrentSpritePart();
 	p->tint(red_tint, green_tint, blue_tint, rotation, swap);
 }
 
@@ -923,7 +901,9 @@ void caosVM::v_TRAN() {
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
-	CompoundPart *p = a->part(0); assert(p);
+	CompoundPart *s = a->part(0); assert(s);
+	SpritePart *p = dynamic_cast<SpritePart *>(s);
+	caos_assert(p);
 	caos_assert(x >= 0 && x <= p->getWidth());
 	caos_assert(y >= 0 && y <= p->getHeight());
 	if (p->transparentAt(x, y))
@@ -947,9 +927,11 @@ void caosVM::c_TRAN() {
 
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(a);	
+	caos_assert(a);
 	// TODO: handle -1?
-	CompoundPart *p = a->part(part_no);
+	CompoundPart *s = a->part(part_no);
+	caos_assert(s);
+	SpritePart *p = dynamic_cast<SpritePart *>(s);
 	caos_assert(p);
 	p->is_transparent = transparency;
 }
@@ -1143,11 +1125,7 @@ void caosVM::c_GALL() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(spritefile)
 
-	caos_assert(targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
+	SpritePart *p = getCurrentSpritePart();
 	p->changeSprite(spritefile, first_image);
 }
 
@@ -1158,11 +1136,7 @@ void caosVM::c_GALL() {
  Returns the name of the sprite file associated with the TARG agent or current PART.
 */
 void caosVM::v_GALL() {
-	caos_assert(targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
-	caos_assert(p);
+	SpritePart *p = getCurrentSpritePart();
 	result.setString(p->getSprite()->name);
 }
 

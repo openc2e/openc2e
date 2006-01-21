@@ -36,22 +36,49 @@ class CompoundAgent;
 class CompoundPart : public renderable {
 protected:
 	std::multiset<CompoundPart *, partzorder>::iterator zorder_iter;
+	CompoundAgent *parent;
+
+	CompoundPart(CompoundAgent *p, unsigned int _id, int _x, int _y, int _z);
+
+public:
+	int x, y;
+	unsigned int zorder, id;
+
+	bool has_alpha;
+	unsigned char alpha;
+
+	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
+	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset) = 0;
+	virtual void tick() { }
+	virtual void handleClick(float, float) { }
+	virtual unsigned int getWidth() = 0;
+	virtual unsigned int getHeight() = 0;
+	
+	CompoundAgent *getParent() const { return parent; }
+	unsigned int getZOrder() const;
+	void zapZOrder();
+	void addZOrder();
+
+	bool operator < (const CompoundPart &b) const {
+		return zorder < b.zorder;
+	}
+
+	virtual ~CompoundPart();
+};
+
+class SpritePart : public CompoundPart {
+protected:
 	creaturesImage *origsprite, *sprite;
 	unsigned int firstimg, pose, frameno, base;
-	CompoundAgent *parent;
-	CompoundPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	SpritePart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
 
 public:
 	std::vector<unsigned int> animation;
-	bool has_alpha, is_transparent;
+	bool is_transparent;
 	unsigned char framerate;
 	unsigned int framedelay;
-	unsigned char alpha;
 	creaturesImage *getSprite() { return sprite; }
-	int x, y;
-	unsigned int zorder, id;
-	virtual void render(class SDLBackend *renderer, int xoffset, int yoffset);
 	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
 	virtual void tick();
 	virtual void handleClick(float, float);
@@ -62,10 +89,6 @@ public:
 	unsigned int getFirstImg() { return firstimg; }
 	unsigned int getWidth() { return sprite->width(getCurrentSprite()); }
 	unsigned int getHeight() { return sprite->height(getCurrentSprite()); }
-	unsigned int getZOrder() const;
-	CompoundAgent *getParent() const { return parent; }
-	void zapZOrder();
-	void addZOrder();
 	void setFrameNo(unsigned int f);
 	void setPose(unsigned int p);
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
@@ -73,15 +96,11 @@ public:
 	void changeSprite(std::string spritefile, unsigned int fimg);
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 	bool transparentAt(unsigned int x, unsigned int y);
-				
-	bool operator < (const CompoundPart &b) const {
-		return zorder < b.zorder;
-	}
-	
-	virtual ~CompoundPart();
+
+	virtual ~SpritePart();
 };
 
-class ButtonPart : public CompoundPart {
+class ButtonPart : public SpritePart {
 protected:
 	bool hitopaquepixelsonly;
 	int messageid;
@@ -95,14 +114,14 @@ public:
 	void handleClick(float, float);
 };
 
-class CameraPart : public CompoundPart {
+class CameraPart : public SpritePart {
 public:
 	CameraPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
 			   unsigned int camerawidth, unsigned int cameraheight);
 };
 
-class DullPart : public CompoundPart {
+class DullPart : public SpritePart {
 public:
 	DullPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z);
 };
@@ -123,7 +142,7 @@ struct texttintinfo {
 enum horizontalalign { left, center, right };
 enum verticalalign { top, middle, bottom };
 
-class TextPart : public CompoundPart {
+class TextPart : public SpritePart {
 protected:
 	std::vector<texttintinfo> tints;
 	std::vector<linedata> lines;
@@ -163,7 +182,7 @@ public:
 				  unsigned int _z, std::string fontsprite);
 };
 
-class GraphPart : public CompoundPart {
+class GraphPart : public SpritePart {
 public:
 	GraphPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			  unsigned int _z, unsigned int novalues);

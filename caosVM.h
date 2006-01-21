@@ -134,6 +134,7 @@ public:
 	void setOutputStream(std::ostream &o) { outputstream = &o; }
 
 	class Creature *getTargCreature();
+	class SpritePart *getCurrentSpritePart();
 
 	// map
 	void v_ADDM();

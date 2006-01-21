@@ -194,7 +194,8 @@ void caosVM::c_PAT_CMRA() {
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
-	// TODO
+	CompoundPart *p = new CameraPart(a, part, sprite, first_image, x, y, plane, viewwidth, viewheight, camerawidth, cameraheight);
+	a->addPart(p);
 }
 
 /**
@@ -427,6 +428,8 @@ void caosVM::c_GRPV() {
 	caos_assert(p);
 	GraphPart *t = dynamic_cast<GraphPart *>(p);
 	caos_assert(t);
+
+	// TODO
 }
 
 /* vim: set noet: */
