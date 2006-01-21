@@ -117,7 +117,7 @@ void caosVM::v_PRAY_EXPO() {
 
 /**
  PRAY FILE (integer) name (integer) type (integer) install (integer)
- %status stub
+ %status maybe
 
  install a file with given resource name and type
  if install is 0, the install doesn't actually happen, it's just tested
