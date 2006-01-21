@@ -477,4 +477,131 @@ void caosVM::c_ORDR_SHOU() {
 	// TODO
 }
 
+/**
+ DREA (command) dream (integer)
+ %status stub
+*/
+void caosVM::c_DREA() {
+	VM_PARAM_INTEGER(dream)
+
+	Creature *c = getTargCreature();
+	// TODO
+}
+
+/**
+ DREA (integer)
+ %status stub
+*/
+void caosVM::v_DREA() {
+	Creature *c = getTargCreature();
+	result.setInt(0); // TODO
+}
+
+/**
+ BORN (command)
+ %status stub
+*/
+void caosVM::c_BORN() {
+	Creature *c = getTargCreature();
+	// TODO
+}
+
+/**
+ CAGE (integer)
+ %status stub
+*/
+void caosVM::v_CAGE() {
+	Creature *c = getTargCreature();
+	result.setInt(0); // TODO
+}
+
+/**
+ BYIT (integer)
+ %status stub
+*/
+void caosVM::v_BYIT() {
+	Creature *c = getTargCreature();
+	result.setInt(0); // TODO
+}
+
+/**
+ _IT_ (agent)
+ %status maybe
+ %pragma implementation caosVM::v_IT
+*/
+void caosVM::v_IT() {
+	caos_assert(owner);
+	caos_assert(dynamic_cast<Creature *>(owner.get())); // TODO: return null instead?
+	result.setAgent(_it_);
+}
+
+/**
+ DFTX (float)
+ %status stub
+*/
+void caosVM::v_DFTX() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ DFTY (float)
+ %status stub
+*/
+void caosVM::v_DFTY() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ NEWC (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer)
+ %status stub
+*/
+void caosVM::c_NEWC() {
+	VM_PARAM_INTEGER(variant)
+	VM_PARAM_INTEGER(sex)
+	VM_PARAM_INTEGER(gene_slot)
+	VM_PARAM_VALIDAGENT(gene_agent)
+	VM_PARAM_INTEGER(family)
+
+	targ = NULL; // TODO
+}
+
+/**
+ NEW: CREA (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer)
+ %status stub
+*/
+void caosVM::c_NEW_CREA() {
+	VM_PARAM_INTEGER(variant)
+	VM_PARAM_INTEGER(sex)
+	VM_PARAM_INTEGER(gene_slot)
+	VM_PARAM_VALIDAGENT(gene_agent)
+	VM_PARAM_INTEGER(family)
+
+	targ = NULL; // TODO
+}
+
+/**
+ LTCY (command) action (integer) min (integer) max (integer)
+ %status stub
+*/
+void caosVM::c_LTCY() {
+	VM_PARAM_INTEGER(max); caos_assert(max >= 0 && max <= 255);
+	VM_PARAM_INTEGER(min); caos_assert(min >= 0 && min <= 255);
+	VM_PARAM_INTEGER(action);
+
+	Creature *c = getTargCreature();
+	// TODO
+}
+
+/**
+ MATE (command)
+ %status stub
+*/
+void caosVM::c_MATE() {
+	Creature *c = getTargCreature();
+	caos_assert(_it_);
+	Creature *t = dynamic_cast<Creature *>(_it_.get());
+	caos_assert(t);
+	// TODO
+}
+
 /* vim: set noet: */

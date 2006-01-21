@@ -375,6 +375,7 @@ public:
 	void v_SEEE();
 	void v_TINT();
 	void c_TINO();
+	void c_DROP();
 	
 	// motion
 	void c_ELAS();
@@ -471,6 +472,18 @@ public:
 	void c_LIKE();
 	void v_LIMB();
 	void c_ORDR_SHOU();
+	void c_DREA();
+	void v_DREA();
+	void c_BORN();
+	void v_CAGE();
+	void v_BYIT();
+	void v_IT();
+	void v_DFTX();
+	void v_DFTY();
+	void c_NEWC();
+	void c_NEW_CREA();
+	void c_LTCY();
+	void c_MATE();
 	
 	// sounds
 	void c_SNDE();

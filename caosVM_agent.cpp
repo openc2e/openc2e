@@ -1216,4 +1216,14 @@ void caosVM::c_TINO() {
 	// TODO
 }
 
+/**
+ DROP (command)
+ %status stub
+*/
+void caosVM::c_DROP() {
+	caos_assert(targ);
+
+	// TODO
+}
+
 /* vim: set noet: */
