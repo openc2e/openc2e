@@ -104,15 +104,10 @@ CompoundPart::~CompoundPart() {
 
 SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
 						int _x, int _y, unsigned int _z) : CompoundPart(p, _id, _x, _y, _z) {
-	try {
-		origsprite = sprite = gallery.getImage(spritefile);
-		firstimg = fimg;
-		caos_assert(sprite);
-		caos_assert(sprite->numframes() > firstimg);
-	} catch (std::exception e) {
-		zapZOrder();
-		throw;
-	}
+	origsprite = sprite = gallery.getImage(spritefile);
+	firstimg = fimg;
+	caos_assert(sprite);
+	caos_assert(sprite->numframes() > firstimg);
 	
 	pose = 0;
 	base = 0;
