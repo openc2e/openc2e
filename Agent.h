@@ -82,12 +82,14 @@ public:
 	bool carryable : 1;
 	bool mouseable : 1;
 	bool activateable : 1;
+	bool greedycabin : 1;
 	bool invisible : 1;
 	bool floatable : 1;
 	bool suffercollisions : 1;
 	bool sufferphysics : 1;
 	bool camerashy : 1;
-	bool rotatable :1 ;
+	bool openaircabin : 1;
+	bool rotatable : 1;
 	bool presence : 1;
 	// bhvr
 	bool cr_can_push : 1;

@@ -559,6 +559,7 @@ void Agent::setAttributes(unsigned int attr) {
 	carryable = (attr & 1);
 	mouseable = (attr & 2);
 	activateable = (attr & 4);
+	greedycabin = (attr & 8);
 	invisible = (attr & 16);
 	bool newfloatable = (attr & 32);
 	if (floatable && !newfloatable)
@@ -569,6 +570,7 @@ void Agent::setAttributes(unsigned int attr) {
 	suffercollisions = (attr & 64);
 	sufferphysics = (attr & 128);
 	camerashy = (attr & 256);
+	openaircabin = (attr & 512);
 	rotatable = (attr & 1024);
 	presence = (attr & 2048);
 }
@@ -577,11 +579,13 @@ unsigned int Agent::getAttributes() {
 	unsigned int a = (carryable ? 1 : 0);
 	a += (mouseable ? 2: 0);
 	a += (activateable ? 4: 0);
+	a += (greedycabin ? 8: 0);
 	a += (invisible ? 16: 0);
 	a += (floatable ? 32: 0);
 	a += (suffercollisions ? 64: 0);
 	a += (sufferphysics ? 128: 0);
 	a += (camerashy ? 256: 0);
+	a += (openaircabin ? 512: 0);
 	a += (rotatable ? 1024: 0);
 	return a + (presence ? 2048: 0);
 }
