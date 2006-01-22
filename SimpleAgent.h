@@ -24,10 +24,16 @@
 #ifndef _C2E_SIMPLEAGENT_H
 #define _C2E_SIMPLEAGENT_H
 
-class SimpleAgent : public CompoundAgent {
+class SimpleAgent : public Agent {
+protected:
+	DullPart *dullpart;
+
 public:
 	SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 							std::string spritefile, unsigned int firstimage, unsigned int imagecount);
+	virtual ~SimpleAgent();
+	void setZOrder(unsigned int plane);
+	CompoundPart *part(unsigned int id);
 };
 
 #endif

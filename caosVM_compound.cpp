@@ -35,9 +35,7 @@ void caosVM::c_PART() {
 
 	caos_assert((part_id >= 0) || (part_id == -1));
 	caos_assert(targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(a);
-	caos_assert(a->part(part_id) || (part_id == -1));
+	caos_assert(targ->part(part_id) || (part_id == -1));
 	part = part_id;
 }
 
@@ -52,9 +50,7 @@ void caosVM::v_PART() {
 
 	caos_assert(part_id >= 0); // TODO: should we do this?
 	caos_assert(targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(a);
-	if (a->part(part_id))
+	if (targ->part(part_id))
 		result.setInt(1);
 	else
 		result.setInt(0);
@@ -341,7 +337,14 @@ void caosVM::v_PNXT() {
 
 	caos_assert(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
+	
+	if (!c) { // handle non-compound agents
+		if (previous_part == -1)
+			result.setInt(0);
+		else
+			result.setInt(-1);
+		return;
+	}
 
 	// TODO: this might not be the best way to do this..
 	CompoundPart *curpart = 0;

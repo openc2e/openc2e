@@ -21,7 +21,7 @@
 #include "World.h"
 #include "c16Image.h"
 #include "SDLBackend.h"
-#include "CompoundAgent.h"
+#include "Agent.h"
 
 bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
 	// TODO: unsure about all of this, needs a check (but seems to work)
@@ -90,7 +90,7 @@ void SpritePart::handleClick(float clickx, float clicky) {
 	parent->handleClick(clickx + parent->x, clicky + parent->y);
 }
 
-CompoundPart::CompoundPart(CompoundAgent *p, unsigned int _id, int _x, int _y, int _z) : zorder(_z), parent(p), id(_id) {
+CompoundPart::CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z) : zorder(_z), parent(p), id(_id) {
 	addZOrder();	
 	x = _x;
 	y = _y;
@@ -102,7 +102,7 @@ CompoundPart::~CompoundPart() {
 	world.zorder.erase(zorder_iter);
 }
 
-SpritePart::SpritePart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
+SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
 						int _x, int _y, unsigned int _z) : CompoundPart(p, _id, _x, _y, _z) {
 	try {
 		origsprite = sprite = gallery.getImage(spritefile);
@@ -160,11 +160,11 @@ void SpritePart::tint(unsigned char r, unsigned char g, unsigned char b, unsigne
 	newsprite->tint(r, g, b, rotation, swap);
 }
 
-DullPart::DullPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+DullPart::DullPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			 unsigned int _z) : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 }
 
-ButtonPart::ButtonPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+ButtonPart::ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 	unsigned int _z, const bytestring &animhover, int msgid, int option) : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	messageid = msgid;
 	hitopaquepixelsonly = (option == 1);
@@ -177,7 +177,7 @@ void ButtonPart::handleClick(float x, float y) {
 	parent->queueScript(calculateScriptId(messageid), (Agent *)world.hand()); // TODO: pass x/y as p1/p2?
 }
 
-TextPart::TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
+TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
 	                : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = gallery.getImage(fontsprite);
 	caos_assert(textsprite);
@@ -475,12 +475,12 @@ void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEn
 	}
 }
 
-FixedTextPart::FixedTextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+FixedTextPart::FixedTextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, std::string fontsprite) : TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
 	// nothing, hopefully.. :)
 }
 
-TextEntryPart::TextEntryPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+TextEntryPart::TextEntryPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
 	// TODO: hm, this never gets freed..
 	if (!caretsprite) { caretsprite = gallery.getImage("cursor"); caos_assert(caretsprite); }
@@ -531,7 +531,7 @@ void SpritePart::tick() {
 	}
 }
 
-CameraPart::CameraPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		unsigned int _z, unsigned int viewwidth, unsigned int viewheight, unsigned int camerawidth, unsigned int cameraheight)
 		: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	// TODO: set viewwidth/viewheight and use for getWidth/getHeight, store camerawidth/cameraheight

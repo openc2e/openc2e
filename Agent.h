@@ -23,6 +23,7 @@
 #include "creaturesImage.h"
 #include "caosVar.h"
 #include "AgentRef.h"
+#include "CompoundPart.h"
 #include <set>
 #include <list>
 #include <boost/shared_ptr.hpp>
@@ -139,19 +140,17 @@ public:
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
 
-	virtual unsigned int getWidth() = 0;
-	virtual unsigned int getHeight() = 0;
-	// TODO: following two functions are horrible hacks, to workaround the issue that compound parts are
-	// often not inside the width/height of the parent agent
-	virtual unsigned int getCheckWidth() { return getWidth(); }
-	virtual unsigned int getCheckHeight() { return getHeight(); }
-
+	virtual CompoundPart *part(unsigned int id) = 0;
+	
+	unsigned int getWidth() { return part(0)->getWidth(); }
+	unsigned int getHeight() { return part(0)->getHeight(); }
+	
 	virtual void tick();
 	void physicsTick();
 	virtual void kill();
 	void stopScript();
 
-	virtual void setZOrder(unsigned int plane);
+	virtual void setZOrder(unsigned int plane); // should be overridden!
 	virtual unsigned int getZOrder() const { return zorder; }
 
 	class shared_ptr<script> findScript(unsigned short event);

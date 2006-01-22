@@ -40,8 +40,6 @@ public:
 	void addPart(CompoundPart *);
 	void delPart(unsigned int);
 	virtual void tick();
-	virtual unsigned int getWidth() { return part(0)->getWidth(); }
-	virtual unsigned int getHeight() { return part(0)->getHeight(); }
 	void setZOrder(unsigned int plane);
 
 	friend class caosVM;

@@ -27,18 +27,18 @@
 #include <string>
 #include <vector>
 
+class Agent;
+
 struct partzorder {
 	bool operator()(const class CompoundPart *s1, const class CompoundPart *s2) const;
 };
 
-class CompoundAgent;
-
 class CompoundPart : public renderable {
 protected:
 	std::multiset<CompoundPart *, partzorder>::iterator zorder_iter;
-	CompoundAgent *parent;
+	Agent *parent;
 
-	CompoundPart(CompoundAgent *p, unsigned int _id, int _x, int _y, int _z);
+	CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z);
 
 public:
 	int x, y;
@@ -54,7 +54,7 @@ public:
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
 	
-	CompoundAgent *getParent() const { return parent; }
+	Agent *getParent() const { return parent; }
 	unsigned int getZOrder() const;
 	void zapZOrder();
 	void addZOrder();
@@ -70,7 +70,7 @@ class SpritePart : public CompoundPart {
 protected:
 	creaturesImage *origsprite, *sprite;
 	unsigned int firstimg, pose, frameno, base;
-	SpritePart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
 
 public:
@@ -106,24 +106,22 @@ protected:
 	int messageid;
 	bytestring hoveranimation;
 
-	friend class CompoundAgent;
-
 public:
-	ButtonPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, const bytestring &animhover, int msgid, int option);
 	void handleClick(float, float);
 };
 
 class CameraPart : public SpritePart {
 public:
-	CameraPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
 			   unsigned int camerawidth, unsigned int cameraheight);
 };
 
 class DullPart : public SpritePart {
 public:
-	DullPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z);
+	DullPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z);
 };
 
 struct linedata {
@@ -159,7 +157,7 @@ protected:
 	verticalalign vert_align;	
 	bool last_page_scroll;
 
-	TextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite);
+	TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite);
 	~TextPart();
 	void recalculateData();
 	unsigned int calculateWordWidth(std::string word);
@@ -178,13 +176,13 @@ public:
 
 class FixedTextPart : public TextPart {
 public:
-	FixedTextPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	FixedTextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				  unsigned int _z, std::string fontsprite);
 };
 
 class GraphPart : public SpritePart {
 public:
-	GraphPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	GraphPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			  unsigned int _z, unsigned int novalues);
 };
 
@@ -200,7 +198,7 @@ private:
 	friend class TextPart;
 
 public:
-	TextEntryPart(CompoundAgent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	TextEntryPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				  unsigned int _z, unsigned int msgid, std::string fontsprite);
 	void setText(std::string t);
 	void gainFocus() { focused = true; caretpose = 0; }

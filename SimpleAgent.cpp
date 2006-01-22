@@ -26,7 +26,22 @@
 
 SimpleAgent::SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 			 std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
-CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
+	Agent(family, genus, species, plane) {
+	dullpart = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
+}
+
+SimpleAgent::~SimpleAgent() {
+	delete dullpart;
+}
+
+void SimpleAgent::setZOrder(unsigned int plane) {
+	Agent::setZOrder(plane);
+	dullpart->zapZOrder();
+	dullpart->addZOrder();
+}
+
+CompoundPart *SimpleAgent::part(unsigned int id) {
+	return dullpart;
 }
 
 /* vim: set noet: */

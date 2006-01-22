@@ -28,9 +28,8 @@
 using std::cerr;
 
 SpritePart *caosVM::getCurrentSpritePart() {
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
-	CompoundPart *p = c->part(part);
+	caos_assert(targ);
+	CompoundPart *p = targ->part(part);
 	caos_assert(p);
 	SpritePart *s = dynamic_cast<SpritePart *>(p);
 	caos_assert(s);
@@ -696,9 +695,8 @@ class blockUntilOver : public blockCond {
 
 			if (!targ) return false;
 
-			CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-			caos_assert(c)
-			CompoundPart *s = c->part(part);
+			caos_assert(targ)
+			CompoundPart *s = targ->part(part);
 			caos_assert(s);
 			SpritePart *p = dynamic_cast<SpritePart *>(s);
 			caos_assert(p);
@@ -899,9 +897,7 @@ void caosVM::v_TRAN() {
 	VM_PARAM_INTEGER(x)
 
 	caos_assert(targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(a);
-	CompoundPart *s = a->part(0); assert(s);
+	CompoundPart *s = targ->part(0); assert(s);
 	SpritePart *p = dynamic_cast<SpritePart *>(s);
 	caos_assert(p);
 	caos_assert(x >= 0 && x <= p->getWidth());
@@ -926,10 +922,8 @@ void caosVM::c_TRAN() {
 	VM_PARAM_INTEGER(transparency)
 
 	caos_assert(targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(a);
 	// TODO: handle -1?
-	CompoundPart *s = a->part(part_no);
+	CompoundPart *s = targ->part(part_no);
 	caos_assert(s);
 	SpritePart *p = dynamic_cast<SpritePart *>(s);
 	caos_assert(p);
@@ -1090,7 +1084,7 @@ void caosVM::c_ALPH() {
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
-	if (part == -1) {
+	if (c && part == -1) {
 		for (std::vector<CompoundPart *>::iterator i = c->parts.begin(); i != c->parts.end(); i++) {
 			(*i)->has_alpha = enable;
 			(*i)->alpha = alpha_value;
