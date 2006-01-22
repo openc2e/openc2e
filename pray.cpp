@@ -95,8 +95,12 @@ void prayBlock::load() {
 		// TODO: check pray_uncompress_sanity_check
 		char *src = new char[compressedsize];
 		file.read(src, compressedsize);
+		if (!file.good()) {
+			delete buffer;
+			throw creaturesException("Failed to read all of compressed block.");
+		}
 		unsigned int usize = size;
-		int r = uncompress((Bytef *)buffer, (uLongf *)&usize, (Bytef *)src, size);
+		int r = uncompress((Bytef *)buffer, (uLongf *)&usize, (Bytef *)src, compressedsize);
 		if (r != Z_OK) {
 			delete buffer; delete src;
 			std::string o = "Unknown error";
@@ -115,6 +119,10 @@ void prayBlock::load() {
 		}
 	} else {
 		file.read((char *)buffer, size);
+		if (!file.good()) {
+			delete buffer;
+			throw creaturesException("Failed to read all of uncompressed block.");
+		}
 	}
 	loaded = true;
 }
