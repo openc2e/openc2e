@@ -33,6 +33,7 @@ public:
 							std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	virtual ~SimpleAgent();
 	void setZOrder(unsigned int plane);
+	void tick();
 	CompoundPart *part(unsigned int id);
 };
 
