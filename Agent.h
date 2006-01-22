@@ -47,6 +47,7 @@ class Agent {
 protected:
 	caosVar var[100]; // OVxx
 	std::map<caosVar, caosVar> name_variables;
+	std::map<unsigned int, shared_ptr<class genomeFile> > slots;
 	AgentRef self;
 	class caosVM *vm;
 

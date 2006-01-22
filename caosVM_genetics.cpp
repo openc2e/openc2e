@@ -18,6 +18,9 @@
  */
 
 #include "caosVM.h"
+#include "World.h"
+#include "genome.h"
+#include <fstream>
 
 /**
  GENE CLON (command) dest_agent (agent) dest_slot (integer) src_agent (agent) src_slot (integer)
@@ -79,7 +82,20 @@ void caosVM::c_GENE_LOAD() {
 	VM_PARAM_INTEGER(slot)
 	VM_PARAM_VALIDAGENT(agent)
 
-	// TODO
+	// TODO: wildcards
+	
+	std::string gfilename = world.findFile(std::string("/Genetics/") + genefile + ".gen");
+	caos_assert(!gfilename.empty());
+	
+	shared_ptr<genomeFile> p(new genomeFile());
+
+	std::ifstream gfile(gfilename.c_str(), std::ios::binary);
+	caos_assert(gfile.is_open());
+	gfile >> std::noskipws;
+
+	gfile >> *(p.get());
+
+	agent->slots[slot] = p;
 }
 
 /**
