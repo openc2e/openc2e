@@ -19,8 +19,56 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
 namespace fs = boost::filesystem;
+
+bool prayInstall(std::string name, unsigned int type, bool actually_install) {	
+	std::string directory = world.praymanager.getResourceDir(type);
+	caos_assert(!directory.empty());
+
+	fs::path dir = fs::path(world.getUserDataDir(), fs::native) / fs::path(directory, fs::native);
+	if (!fs::exists(dir))
+		fs::create_directory(dir);
+	caos_assert(fs::exists(dir) && fs::is_directory(dir));
+
+	fs::path outputfile = dir / fs::path(name, fs::native);
+	if (fs::exists(outputfile)) {
+		// TODO: update file if necessary? check it's not a directory :P
+		return true;
+	}
+
+	fs::path possiblefile = fs::path(directory, fs::native) / fs::path(name, fs::native);
+	if (!world.findFile(possiblefile.native_directory_string()).empty()) {
+		// TODO: we need to return 'okay' if the file exists anywhere, but someone needs to work out update behaviour (see other comment above, also)
+		return true;
+	}
+
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
+	if (i == world.praymanager.blocks.end()) {
+		std::cout << "PRAY FILE: couldn't find block " << name << std::endl;
+		return false;
+	}
+	
+	prayBlock *p = i->second;
+	if (p->type != "FILE") {
+		std::cout << "PRAY FILE: block " << name << " is " << p->type << " not FILE" << std::endl;
+		// TODO: correct behaviour? possibly not..
+		return false;
+	}
+
+	if (!actually_install) {
+		// TODO: work out if we've tested enough
+		return true;
+	}
+
+	p->load();
+	std::ofstream output(outputfile.native_directory_string().c_str());
+	output.write((char *)p->getBuffer(), p->getSize());
+	// p->unload();
+		
+	return true;
+}
 
 /**
  PRAY AGTI (integer) resource (string) tag (string) default (integer)
@@ -102,7 +150,51 @@ void caosVM::v_PRAY_DEPS() {
 	VM_PARAM_INTEGER(install)
 	VM_PARAM_STRING(name)
 
-	result.setInt(0); // TODO
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
+	caos_assert(i != world.praymanager.blocks.end());
+
+	prayBlock *p = i->second;
+	p->parseTags();
+
+	std::map<std::string, int>::iterator j = p->integerValues.find("Agent Type");
+	if (j == p->integerValues.end()) {
+		result.setInt(-1);
+		return;
+	}
+	// I have no idea what this is, so let's just error out when it's not zero, pending fix. - fuzzie
+	caos_assert(j->second == 0);
+
+	j = p->integerValues.find("Dependency Count");
+	if (j == p->integerValues.end()) {
+		result.setInt(-2);
+		return;
+	}
+	int nodeps = j->second; caos_assert(nodeps >= 0);
+
+	for (unsigned int z = 1; z <= nodeps; z++) {
+		std::string depcatname = boost::str(boost::format("Dependency Category %d") % z);
+		std::string depname = boost::str(boost::format("Dependency %d") % z);
+		j = p->integerValues.find(depcatname);
+		if (j == p->integerValues.end()) {
+			result.setInt(-2 - nodeps - z);
+			return;
+		}
+		int depcat = j->second; caos_assert(depcat >= 0 && depcat <= 11);
+		std::map<std::string, std::string>::iterator k = p->stringValues.find(depname);
+		if (k == p->stringValues.end()) {
+			result.setInt(-2 - z);
+			return;
+		}
+		std::string dep = k->second;
+
+		// TODO: CL docs say 2*count to 3*count is the category ID for that dependency being invalid
+		if (!prayInstall(dep, depcat, (install != 0))) {
+			result.setInt(z);
+			return;
+		}
+	}
+
+	result.setInt(0);
 }
 
 /**
@@ -128,71 +220,10 @@ void caosVM::v_PRAY_FILE() {
 	VM_PARAM_INTEGER(type)
 	VM_PARAM_STRING(name)
 
-	std::string directory;
-
-	switch (type) {
-		case 0: directory = "/"; break; // main
-		case 1: directory = "/Sounds/"; break; // sounds
-		case 2: directory = "/Images/"; break; // images
-		case 3: directory = "/Genetics/"; break; // genetics
-		case 4: directory = "/Body Data/"; break; // body data
-		case 5: directory = "/Overlay Data/"; break; // overlay data
-		case 6: directory = "/Backgrounds/"; break; // backgrounds
-		case 7: directory = "/Catalogue/"; break; // catalogue
-		//case 8: directory = "/Bootstrap/"; break; // bootstrap
-		//case 9: directory = "/My Worlds/"; break; // my worlds
-		case 10: directory = "/My Creatures/"; break; // my creatures
-		case 11: directory = "/My Agents/"; break; // my agents
-	}
-
-	caos_assert(!directory.empty());
-
-	fs::path dir = fs::path(world.getUserDataDir(), fs::native) / fs::path(directory, fs::native);
-	if (!fs::exists(dir))
-		fs::create_directory(dir);
-	caos_assert(fs::exists(dir) && fs::is_directory(dir));
-
-	fs::path outputfile = dir / fs::path(name, fs::native);
-	if (fs::exists(outputfile)) {
-		// TODO: update file if necessary? check it's not a directory :P
+	if (prayInstall(name, type, (install != 0)))
 		result.setInt(0);
-		return;
-	}
-
-	fs::path possiblefile = fs::path(directory, fs::native) / fs::path(name, fs::native);
-	if (!world.findFile(possiblefile.native_directory_string()).empty()) {
-		// TODO: we need to return 'okay' if the file exists anywhere, but someone needs to work out update behaviour (see other comment above, also)
-		result.setInt(0);
-		return;
-	}
-
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
-	if (i == world.praymanager.blocks.end()) {
-		std::cout << "PRAY FILE: couldn't find block " << name << std::endl;
+	else
 		result.setInt(1);
-		return;
-	}
-	
-	prayBlock *p = i->second;
-	if (p->type != "FILE") {
-		std::cout << "PRAY FILE: block " << name << " is " << p->type << " not FILE" << std::endl;
-		// TODO: correct behaviour? possibly not..
-		result.setInt(1);
-		return;
-	}
-
-	if (install == 0) {
-		// TODO: work out if we've tested enough
-		result.setInt(0);
-		return;
-	}
-
-	p->load();
-	std::ofstream output(outputfile.native_directory_string().c_str());
-	output.write((char *)p->getBuffer(), p->getSize());
-	// p->unload();
-		
-	result.setInt(0); // TODO
 }
 
 /**

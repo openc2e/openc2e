@@ -75,18 +75,5 @@ public:
 	unsigned int getSize() { return size; }
 };
 
-class prayManager {
-protected:
-	std::vector<prayFile *> files;
-
-public:
-	std::map<std::string, prayBlock *> blocks;
-
-	~prayManager();
-	void addFile(prayFile *);
-	void removeFile(prayFile *);
-	void update();
-};
-
 #endif
 /* vim: set noet: */

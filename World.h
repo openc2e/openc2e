@@ -26,7 +26,7 @@
 #include "Camera.h"
 #include "Agent.h"
 #include "CompoundPart.h"
-#include "pray.h"
+#include "prayManager.h"
 #include <set>
 #include <map>
 #include <boost/filesystem/path.hpp>

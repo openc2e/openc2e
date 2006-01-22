@@ -17,7 +17,7 @@
  *
  */
 
-#include "pray.h"
+#include "prayManager.h"
 #include "exceptions.h"
 #include "World.h" // data_directories
 #include <boost/filesystem/convenience.hpp>
@@ -91,6 +91,25 @@ void prayManager::update() {
 			}
 		}
 	}
+}
+
+std::string prayManager::getResourceDir(unsigned int type) {
+	switch (type) {
+		case 0: return "/"; // main
+		case 1: return "/Sounds/"; // sounds
+		case 2: return "/Images/"; // images
+		case 3: return "/Genetics/"; // genetics
+		case 4: return "/Body Data/"; // body data
+		case 5: return "/Overlay Data/"; // overlay data
+		case 6: return "/Backgrounds/";// backgrounds
+		case 7: return "/Catalogue/"; // catalogue
+		//case 8: return "/Bootstrap/"; // bootstrap
+		//case 9: return "/My Worlds/"; // my worlds
+		case 10: return "/My Creatures/";// my creatures
+		case 11: return "/My Agents/"; // my agents
+	}
+
+	return "";
 }
 
 /* vim: set noet: */
