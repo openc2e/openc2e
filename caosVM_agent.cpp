@@ -1083,14 +1083,13 @@ void caosVM::c_ALPH() {
 	caos_assert(targ);
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	caos_assert(c);
 	if (c && part == -1) {
 		for (std::vector<CompoundPart *>::iterator i = c->parts.begin(); i != c->parts.end(); i++) {
 			(*i)->has_alpha = enable;
 			(*i)->alpha = alpha_value;
 		}
 	} else {
-		CompoundPart *p = c->part(part);
+		CompoundPart *p = targ->part(part);
 		caos_assert(p);
 		p->has_alpha = enable;
 		p->alpha = alpha_value;
