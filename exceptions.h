@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <assert.h>
+#include <boost/shared_ptr.hpp>
 
 class creaturesException : public std::exception {
 protected:
@@ -35,24 +36,11 @@ class caosException : public std::exception {
 		char *filename;
 		int line;
 		class caosOp *op;
+		boost::shared_ptr<class script> scr;
 
 		mutable const char *cache;
 		
-		const char *cacheDesc() const throw() {
-			if (cache)
-				return cache;
-			if (filename) {
-				std::ostringstream oss;
-				oss << desc;
-				oss << " at " << filename;
-				if (line != -1)
-					oss << ":" << line;
-				cache = strdup(oss.str().c_str());
-			} else {
-				cache = desc;
-			}
-			return cache;
-		}
+		const char *cacheDesc() const throw();
 	public:
 
 		~caosException() throw() {
@@ -104,7 +92,8 @@ class caosException : public std::exception {
 			return cacheDesc();
 		}
 
-		void trace(const char *filename, int line, caosOp *op) {
+		void trace(const char *filename, int line, boost::shared_ptr<script> s, caosOp *op) {
+			scr = s;
 			this->filename = strdup(filename);
 			fn_is_mine = true;
 			this->line = line;
@@ -113,6 +102,9 @@ class caosException : public std::exception {
 				free(const_cast<char *>(cache));
 			cache = NULL;
 		}
+
+		caosOp *getOp() const { return op; }
+		boost::shared_ptr<script> getScript() const { return scr; }
 };
 		
 		

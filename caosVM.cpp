@@ -88,7 +88,7 @@ inline void caosVM::runOp() {
 		stop();
 		throw;
 	} catch (caosException &e) {
-		e.trace(scr->filename.c_str(), op->getlineno(), op);
+		e.trace(scr->filename.c_str(), op->getlineno(), scr, op);
 		//std::cerr << "script stopped due to exception " << e.what() << endl;
 		stop();
 		throw;

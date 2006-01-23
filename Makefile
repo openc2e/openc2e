@@ -50,6 +50,7 @@ OPENC2E = \
 	Creature.o \
 	creaturesImage.o \
 	dialect.o \
+	exceptions.o \
 	fileSwapper.o \
 	genomeFile.o \
 	lex.mng.o \
