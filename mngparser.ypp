@@ -184,6 +184,7 @@ looplayercommand: MNG_comment { $$ = 0; }
 	| beatsynch { $$ = $1; }
 	| wave { $$ = $1; }
 	| interval { $$ = $1; }
+	| updaterate { $$ = $1; }
 ;
 
 effect: MNG_Effect '(' MNG_name ')' { $$ = new MNGEffectNode($3); }
