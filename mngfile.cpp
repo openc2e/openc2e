@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "endianlove.h"
+#include "exceptions.h"
 #include <stdio.h>
 #include "mngfile.h"
 #include <sys/mman.h>
@@ -108,7 +109,7 @@ void mngrestart(std::istream *is) {
 }
 
 void mngerror(char const *s) {
-	throw s; // TODO: probably should have an MNG-specific class
+	throw creaturesException(s);
 }
 
 /* vim: set noet: */

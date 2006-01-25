@@ -298,23 +298,24 @@ public:
 			case INTERVAL:
 				if (s->voice) voice = s->voice;
 				else if (s->layer) layer = s->layer;
-				else throw "wah"; // TODO
+				else throw creaturesException("wah, interval in variable node confused me"); // TODO
 				break;
 				
 			case PAN:
 				if (s->stage) stage = s->stage;
-				else throw "wah"; // TODO
+				else if (s->layer) layer = s->layer;
+				else throw creaturesException("wah, pan in variable node confused me"); // TODO
 				break;
 
 			case VOLUME:
 				if (s->stage) stage = s->stage;
 				else if (s->layer) layer = s->layer;
 				else if (s->track) track = s->track;
-				else throw "wah"; // TODO
+				else throw creaturesException("wah, volume in variable node confused me"); // TODO
 				break;
 
 			default:
-				throw "wah"; // TODO
+				throw creaturesException("wah, unknown variabletype in variable node"); // TODO
 		}
 	}
 	std::string dump() {
@@ -397,9 +398,6 @@ class MNGFile {
 		std::string name;
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;
-		std::vector< std::pair< char *, int > > samples;
-		std::map<std::string, class MNGEffectDecNode *> effects;
-		std::map<std::string, class MNGTrackDecNode *> tracks;
 		unsigned int sampleno;
 	
 	public:
@@ -411,6 +409,9 @@ class MNGFile {
 		void add(class MNGTrackDecNode *n) { tracks[n->getName()] = n; }
 		void add(class MNGVariableDecNode *n) { variables[n->getName()] = n; }
 		std::pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
+		std::vector< std::pair< char *, int > > samples;
+		std::map<std::string, class MNGEffectDecNode *> effects;
+		std::map<std::string, class MNGTrackDecNode *> tracks;
 
 		std::string dump() {	
 			std::ostringstream oss;
