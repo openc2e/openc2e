@@ -20,7 +20,8 @@
 #include "caosVM.h"
 #include <iostream>
 #include "openc2e.h"
-#include "Creature.h"
+#include "World.h"
+#include "SkeletalCreature.h"
 using std::cerr;
 
 Creature *caosVM::getTargCreature() {
@@ -248,24 +249,24 @@ void caosVM::v_DEAD() {
 
 /**
  NORN (command) creature (agent)
- %status stub
+ %status maybe
 
- Returns the target Creature.
+ Sets the target Creature to the given one.
 */
 void caosVM::c_NORN() {
 	VM_PARAM_AGENT(creature)
 
-	// TODO
+	world.selectCreature(creature);
 }
 
 /**
  NORN (agent)
- %status stub
+ %status maybe
 
- Sets the target Creature to the given one.
+ Returns the target Creature.
 */
 void caosVM::v_NORN() {
-	result.setAgent(0); // TODO
+	result.setAgent(world.selectedcreature);
 }
 
 /**
@@ -553,7 +554,7 @@ void caosVM::v_DFTY() {
 
 /**
  NEWC (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer)
- %status stub
+ %status maybe
 */
 void caosVM::c_NEWC() {
 	VM_PARAM_INTEGER(variant)
@@ -562,7 +563,15 @@ void caosVM::c_NEWC() {
 	VM_PARAM_VALIDAGENT(gene_agent)
 	VM_PARAM_INTEGER(family)
 
-	targ = NULL; // TODO
+	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
+	caos_assert(i != gene_agent->slots.end());
+
+	// TODO: if sex is 0, randomise to 1 or 2
+	// TODO: if variant is 0, randomise between 1 and 8
+	SkeletalCreature *c = new SkeletalCreature(i->second, family, (sex == 2), variant);
+	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
+
+	setTarg(c);
 }
 
 /**

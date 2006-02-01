@@ -19,9 +19,16 @@
 
 #include "Creature.h"
 
-Creature::Creature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant)
- : Agent(_family, 0, 0, 0) { // TODO: fill in correct values
+Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
+ : Agent(_family, 0, 0, 0) {
+	caos_assert(g);
+	genome = g;
 	female = is_female;
+	variant = _variant;
+	// TODO: genus = <work out genus (ie, grendel/norn/whatever)>
+	species = (female ? 2 : 1);
+	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
+	zorder = 1500;
 }
 
 /* vim: set noet: */

@@ -48,21 +48,19 @@ unsigned int cee_zorder[4][14] = {
 // needed for setPose(string) at least .. maybe cee_bodyparts should be indexed by letter
 unsigned int cee_lookup[17] = { 1, 0, 2, 7, 11, 3, 8, 12, 4, 9, 5, 10, 6, 13, 14, 15, 16 };
 
-std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite) {
+std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed) {
+	// TODO: dataspecies is nonsense in c1
 	char _postfix[4] = "XXX";
-	_postfix[0] = '0' + species + ((sprite && female) ? 4 : 0);
+	_postfix[0] = '0' + dataspecies + ((sprite && female) ? 4 : 0);
 	_postfix[1] = '0' + _stage;
-	_postfix[2] = 'a' + breed;
+	_postfix[2] = 'a' + databreed;
 	return _postfix;
 }
 
-SkeletalCreature::SkeletalCreature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant, unsigned int s, unsigned int b, lifestage t)
+SkeletalCreature::SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
  : Creature(g, _family, is_female, _variant) {
-	species = s;
-	assert(species < 4);
-	breed = b;
-	assert(breed < 26);
-	stage = t;
+	skeleton = new SkeletonPart(this);
+	stage = baby;
 	// todo: check lifestage
 	facialexpression = 0;
 	pregnancy = 0;
@@ -70,24 +68,57 @@ SkeletalCreature::SkeletalCreature(genomeFile *g, unsigned char _family, bool is
 
 	imageGallery gallery;
 
+	creatureAppearance *appearance[5] = { 0, 0, 0, 0, 0 };
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(creatureAppearance)) {
+			creatureAppearance *x = (creatureAppearance *)(*i);
+			caos_assert(x->part <= 4); // TODO
+			caos_assert(!appearance[x->part]); // TODO
+			appearance[x->part] = x;
+		}
+	}
+
 	for (int i = 0; i < 14; i++) {
 		// try this stage and the stages below it to find data which worksforus
 		images[i] = 0;
 		char x = cee_bodyparts[i].letter;
 		int stage_to_try = stage;
+		creatureAppearance *partapp = 0;
+		if (x == 'a' || x >= 'o') {
+			// head
+			partapp = appearance[0];
+		} else if (x == 'b') {
+			// body
+			partapp = appearance[1];
+		} else if (x >= 'c' && x <= 'h') {
+			// legs
+			partapp = appearance[2];
+		} else if (x >= 'i' && x <= 'm') {
+			// arms
+			partapp = appearance[3];
+		} else if (x == 'n') {
+			// tail
+			partapp = appearance[4];
+		}
+		caos_assert(partapp); // TODO
+	
 		while (stage_to_try > -1 && images[i] == 0) {
-			images[i] = gallery.getImage(x + dataString(stage_to_try, true));
+			images[i] = gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
 			if (images[i] == 0) stage_to_try--;
 		}
-		assert(images[i] != 0);
-		std::ifstream in(std::string(world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false) + ".att")).c_str());
+		assert(images[i] != 0); // TODO: shouldn't kill engine :P
+		std::ifstream in(std::string(world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att")).c_str());
 		in >> att[i];
 	}
 
 	setPose(0);
 }
 
-/*void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
+SkeletalCreature::~SkeletalCreature() {
+	delete skeleton;
+}
+
+void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	for (int j = 0; j < 14; j++) {
 		int i = cee_zorder[direction][j];
 
@@ -101,9 +132,9 @@ SkeletalCreature::SkeletalCreature(genomeFile *g, unsigned char _family, bool is
 		else // everything else
 			ourpose = pose[i];
 
-		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset + x, party[i] + adjusty + yoffset + y, false, 0);
+		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, false, 0);
 	}
-}*/
+}
 
 void SkeletalCreature::recalculateSkeleton() {
 	int lowestx = 0, lowesty = 0, highestx = 0, highesty = 0;
@@ -223,5 +254,26 @@ void SkeletalCreature::gaitTick() {
 	setPose(poseg->getPoseString());
 	gaiti++; if (gaiti > 7) gaiti = 0;
 }
-		
+
+CompoundPart *SkeletalCreature::part(unsigned int id) {
+	return skeleton;
+}
+
+void SkeletalCreature::setZOrder(unsigned int plane) {
+	Agent::setZOrder(plane);
+	skeleton->zapZOrder();
+	skeleton->addZOrder();
+}
+
+SkeletonPart::SkeletonPart(SkeletalCreature *p) : CompoundPart(p, 0, 0, 0, 0) {
+}
+
+void SkeletonPart::tick() {
+}
+
+void SkeletonPart::partRender(class SDLBackend *renderer, int xoffset, int yoffset) {
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(parent);
+	c->render(renderer, xoffset, yoffset);	
+}
+
 /* vim: set noet: */

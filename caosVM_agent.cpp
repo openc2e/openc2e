@@ -21,6 +21,7 @@
 #include "openc2e.h"
 #include "Vehicle.h"
 #include "PointerAgent.h"
+#include "SkeletalCreature.h"
 #include "World.h"
 #include "creaturesImage.h"
 #include <iostream>
@@ -237,6 +238,9 @@ void caosVM::v_NULL() {
 void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
+
+	SkeletalCreature *s = dynamic_cast<SkeletalCreature *>(targ.get());
+	if (s) return; // TODO
 
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p->getFirstImg() + p->getBase() + pose < p->getSprite()->numframes());

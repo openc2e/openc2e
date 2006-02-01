@@ -19,6 +19,9 @@
 
 #include "Agent.h"
 #include "genome.h"
+#include <boost/shared_ptr.hpp>
+
+using boost::shared_ptr;
 
 class Organ {
 public:
@@ -39,7 +42,7 @@ protected:
 	// non-specific bits
 	unsigned int variant;
 	bool female;
-	genomeFile *genome;
+	shared_ptr<genomeFile> genome;
 	
 	bool alive, asleep, dreaming;
 
@@ -58,7 +61,7 @@ protected:
 	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
 
 public:
-	Creature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant);
+	Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
 };
 
 /* vim: set noet: */

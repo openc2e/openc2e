@@ -23,6 +23,7 @@
 #include "CompoundAgent.h" // for setFocus
 #include <limits.h> // for MAXINT
 #include "creaturesImage.h"
+#include "Creature.h"
 
 #include <boost/filesystem/convenience.hpp>
 namespace fs = boost::filesystem;
@@ -355,6 +356,16 @@ std::string World::findFile(std::string name) {
 
 std::string World::getUserDataDir() {
 	return (data_directories.end() - 1)->native_directory_string();
+}
+
+void World::selectCreature(Agent *a) {
+	if (a) {
+		Creature *c = dynamic_cast<Creature *>(a);
+		caos_assert(c);
+	}
+	selectedcreature = a;
+
+	// TODO: send script 120 (selected creature changed) as needed
 }
 
 /* vim: set noet: */

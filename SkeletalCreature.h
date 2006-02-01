@@ -9,8 +9,8 @@
 
 class SkeletalCreature : public Creature {
 private:
-	unsigned int species;
-	unsigned int breed;
+	class SkeletonPart *skeleton;
+
 	lifestage stage;
 
 	unsigned int direction;
@@ -25,14 +25,15 @@ private:
 	int width, height, adjustx, adjusty;
 	int partx[14], party[14];
 
-	std::string dataString(unsigned int _stage, bool sprite);
+	std::string dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed);
 
 	unsigned int gaiti;
 	creatureGait *gaitgene;
 
 public:
-	SkeletalCreature(genomeFile *g, unsigned char _family, bool is_female, unsigned char _variant, unsigned int s, unsigned int b, lifestage t);
-	//void render(SDLBackend *renderer, int xoffset, int yoffset);
+	SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
+	virtual ~SkeletalCreature();
+	void render(SDLBackend *renderer, int xoffset, int yoffset);
 	void recalculateSkeleton();
 	unsigned int getPose(unsigned int i) { return pose[i]; }
 	void setPose(unsigned int p);
@@ -46,8 +47,20 @@ public:
 	void setEyesClosed(bool e) { eyesclosed = e; }
 	unsigned int getFacialExpression() { return facialexpression; }
 	void setFacialExpression(unsigned int f) { assert (f < 6); facialexpression = f; }
-	unsigned int getWidth() { return width; }
-	unsigned int getHeight() { return height; }
+	unsigned int getSkelWidth() { return width; }
+	unsigned int getSkelHeight() { return height; }
+
+	CompoundPart *part(unsigned int id);
+	void setZOrder(unsigned int plane);
+};
+
+class SkeletonPart : public CompoundPart {
+public:
+	SkeletonPart(SkeletalCreature *p);
+	void tick();
+	void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
+	unsigned int getWidth() { return ((SkeletalCreature *)parent)->getSkelWidth(); }
+	unsigned int getHeight() { return ((SkeletalCreature *)parent)->getSkelHeight(); }
 };
 
 /* vim: set noet: */

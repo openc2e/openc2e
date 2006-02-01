@@ -76,6 +76,8 @@ public:
 	bool showrooms;
 	std::map<unsigned int, SDL_Surface **> backsurfs; // TODO: this is a horrible horrible icky hack
 
+	AgentRef selectedcreature;
+	void selectCreature(Agent *c);
 	AgentRef focusagent; unsigned int focuspart;
 	void setFocus(class TextEntryPart *p);
 
