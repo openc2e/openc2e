@@ -66,8 +66,14 @@ SkeletalCreature::SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _fami
 	pregnancy = 0;
 	eyesclosed = false;
 
-	imageGallery gallery;
+	for (int i = 0; i < 14; i++) {
+		images[i] = 0;
+	}
 
+	skeletonInit();
+}
+
+void SkeletalCreature::skeletonInit() {
 	creatureAppearance *appearance[5] = { 0, 0, 0, 0, 0 };
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureAppearance)) {
@@ -80,6 +86,8 @@ SkeletalCreature::SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _fami
 
 	for (int i = 0; i < 14; i++) {
 		// try this stage and the stages below it to find data which worksforus
+		if (images[i])
+			gallery.delImage(images[i]);
 		images[i] = 0;
 		char x = cee_bodyparts[i].letter;
 		int stage_to_try = stage;
@@ -295,6 +303,12 @@ void SkeletonPart::tick() {
 void SkeletonPart::partRender(class SDLBackend *renderer, int xoffset, int yoffset) {
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(parent);
 	c->render(renderer, xoffset, yoffset);	
+}
+
+void SkeletalCreature::ageCreature() {
+	Creature::ageCreature();
+
+	skeletonInit();
 }
 
 /* vim: set noet: */

@@ -62,6 +62,9 @@ protected:
 
 public:
 	Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
+
+	virtual void ageCreature();
+	lifestage getAge() { return stage; }
 };
 
 /* vim: set noet: */

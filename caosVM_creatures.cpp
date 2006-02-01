@@ -509,11 +509,11 @@ void caosVM::c_BORN() {
 
 /**
  CAGE (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_CAGE() {
 	Creature *c = getTargCreature();
-	result.setInt(0); // TODO
+	result.setInt((int)c->getAge());
 }
 
 /**
@@ -630,6 +630,19 @@ void caosVM::v_DRV() {
 void caosVM::v_IITT() {
 	Creature *c = getTargCreature();
 	result.setAgent(0); // TODO
+}
+
+/**
+ AGES (command) times (integer)
+ %status maybe
+*/
+void caosVM::c_AGES() {
+	VM_PARAM_INTEGER(times)
+	
+	Creature *c = getTargCreature();
+	for (unsigned int i = 0; i < times; i++) {
+		c->ageCreature();
+	}
 }
 
 /* vim: set noet: */

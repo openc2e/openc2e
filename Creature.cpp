@@ -31,4 +31,9 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	zorder = 1500;
 }
 
+void Creature::ageCreature() {
+	if (stage < senile) // TODO
+		stage = (lifestage)((int)stage + 1);
+}
+
 /* vim: set noet: */

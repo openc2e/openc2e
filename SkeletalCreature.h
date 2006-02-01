@@ -11,8 +11,6 @@ class SkeletalCreature : public Creature {
 private:
 	class SkeletonPart *skeleton;
 
-	lifestage stage;
-
 	unsigned int direction;
 	unsigned int pose[14];
 	unsigned int facialexpression;
@@ -34,6 +32,7 @@ public:
 	SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
 	virtual ~SkeletalCreature();
 	void render(SDLBackend *renderer, int xoffset, int yoffset);
+	void skeletonInit();
 	void recalculateSkeleton();
 	unsigned int getPose(unsigned int i) { return pose[i]; }
 	void setPose(unsigned int p);
@@ -54,6 +53,8 @@ public:
 
 	CompoundPart *part(unsigned int id);
 	void setZOrder(unsigned int plane);
+
+	void ageCreature();
 };
 
 class SkeletonPart : public CompoundPart {

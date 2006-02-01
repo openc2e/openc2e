@@ -488,6 +488,7 @@ public:
 	void c_MATE();
 	void v_DRV();
 	void v_IITT();
+	void c_AGES();
 	
 	// sounds
 	void c_SNDE();
