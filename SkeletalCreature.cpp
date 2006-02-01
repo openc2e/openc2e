@@ -133,7 +133,25 @@ void SkeletalCreature::render(SDLBackend *renderer, int xoffset, int yoffset) {
 			ourpose = pose[i];
 
 		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, false, 0);
+
+		// if (displaycore) {
+			// TODO: we draw a lot of points twice here :)
+			int atx = attachmentX(i, 0) + xoffset, aty = attachmentY(i, 0) + yoffset;
+			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF0000CC);
+			renderer->renderLine(atx, aty - 1, atx, aty + 1, 0xFF0000CC);
+			atx = attachmentX(i, 1) + xoffset; aty = attachmentY(i, 1) + yoffset;
+			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF0000CC);
+			renderer->renderLine(atx, aty - 1, atx, aty + 1, 0xFF0000CC);
+		// }
 	}
+}
+
+int SkeletalCreature::attachmentX(unsigned int part, unsigned int id) {
+	return partx[part] + att[part].attachments[pose[part]][0 + (id * 2)] + adjustx;
+}
+
+int SkeletalCreature::attachmentY(unsigned int part, unsigned int id) {
+	return party[part] + att[part].attachments[pose[part]][1 + (id * 2)] + adjusty;
 }
 
 void SkeletalCreature::recalculateSkeleton() {
@@ -153,17 +171,17 @@ void SkeletalCreature::recalculateSkeleton() {
 			int x, y;
 
 			if (part->parent == 0) { // linking to body
-				int bodyx = bodyattinfo.attachments[pose[0]][part->attorder * 2];
-				int bodyy = bodyattinfo.attachments[pose[0]][(part->attorder * 2) + 1];
-
-				x = bodyx - attachx;
-				y = bodyy - attachy;
+				x = bodyattinfo.attachments[pose[0]][part->attorder * 2];
+				y = bodyattinfo.attachments[pose[0]][(part->attorder * 2) + 1];
 			} else { // extra limb
 				attFile &parentattinfo = att[part->parent];
 
-				x = partx[part->parent] + parentattinfo.attachments[pose[part->parent]][part->attorder * 2] - attachx; 
-				y = party[part->parent] + parentattinfo.attachments[pose[part->parent]][(part->attorder * 2) + 1] - attachy;
+				x = partx[part->parent] + parentattinfo.attachments[pose[part->parent]][part->attorder * 2]; 
+				y = party[part->parent] + parentattinfo.attachments[pose[part->parent]][(part->attorder * 2) + 1];
 			}
+
+			x = x - attachx;
+			y = y - attachy;
 
 			partx[i] = x; party[i] = y;
 
@@ -177,9 +195,12 @@ void SkeletalCreature::recalculateSkeleton() {
 	adjustx = -lowestx;
 	adjusty = -lowesty;
 	width = highestx - lowestx;
-	height = highesty - lowesty;
+	//height = highesty - lowesty;
+	int leftfoot = party[11] + att[11].attachments[pose[11]][3];
+	int rightfoot = party[12] + att[12].attachments[pose[12]][3];
+	height = (leftfoot < rightfoot ? rightfoot : leftfoot) - lowesty;
 }
-
+	
 void SkeletalCreature::setPose(unsigned int p) {
 	direction = 0;
 	for (int i = 0; i < 14; i++)

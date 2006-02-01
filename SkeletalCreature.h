@@ -49,6 +49,8 @@ public:
 	void setFacialExpression(unsigned int f) { assert (f < 6); facialexpression = f; }
 	unsigned int getSkelWidth() { return width; }
 	unsigned int getSkelHeight() { return height; }
+	int attachmentX(unsigned int part, unsigned int id);
+	int attachmentY(unsigned int part, unsigned int id);
 
 	CompoundPart *part(unsigned int id);
 	void setZOrder(unsigned int plane);
