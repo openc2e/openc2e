@@ -320,14 +320,32 @@ void caosVM::c_VELO() {
 
 /**
  MVSF (command) x (float) y (float)
- %status stub
+ %status maybe
 
  Move the target agent to an area inside the room system at about (x, y).
  This allows 'safe' moves.
 */
 void caosVM::c_MVSF() {
-	// TODO
-	c_MVTO();
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+	caos_assert(targ);
+
+	// TODO: this is a silly hack, to cater for simplest case (where we just need to nudge the agent up a bit)
+	unsigned int tries = 0;
+	while (tries < 150) {
+		Room *r1 = world.map.roomAt(x + (targ->getWidth() / 2), y - tries);
+		Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + targ->getHeight() - tries);
+		if (r1 && r2) {
+			// if they're in the same room, we're fine, otherwise, make sure they're at least connected
+			// (hacky, but who cares, given the whole thing is a hack)
+			if (r1 == r2 || r1->doors.find(r2) != r1->doors.end()) {
+				targ->moveTo(x, y - tries);
+				return;
+			}
+		}
+		tries++;
+	}
+	caos_assert(false); // boom, we failed to move somewhere safe
 }
 
 /**
