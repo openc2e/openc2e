@@ -239,6 +239,15 @@ class caosVar {
 		std::string dump() const;
 };
 
+struct caosVarCompare {
+	bool operator()(const caosVar &v1, const caosVar &v2) {
+		if (v1.getType() == v2.getType())
+			return v1 < v2;
+		else
+			return v1.getType() < v2.getType();
+	}
+};
+
 //BOOST_CLASS_EXPORT(caosVar)
 
 // Compatibility hacks

@@ -59,7 +59,7 @@ public:
 	
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
-	std::map<caosVar, caosVar> eame_variables; // non-serialised
+	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	std::vector<caosVM *> vmpool;
 	std::vector<Agent *> killqueue;
 	std::map<int, Agent *> unidmap;
