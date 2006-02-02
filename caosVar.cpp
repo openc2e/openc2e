@@ -65,8 +65,7 @@ bool caosVar::operator == (const caosVar &v) const {
 		return this->getAgent() == v.getAgent();
 	}
 
-	std::cerr << "caosVar operator == couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-	return false;
+	throw caosException(std::string("caosVar operator == couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
 bool caosVar::operator > (const caosVar &v) const {
@@ -76,8 +75,7 @@ bool caosVar::operator > (const caosVar &v) const {
 		return this->getString() > v.getString();
 	}
 	
-	std::cerr << "caosVar operator > couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-	return false;
+	throw caosException(std::string("caosVar operator > couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
 bool caosVar::operator < (const caosVar &v) const {
@@ -87,8 +85,7 @@ bool caosVar::operator < (const caosVar &v) const {
 		return this->getString() < v.getString();
 	}
 	
-	std::cerr << "caosVar operator < couldn't compare " << this->dump() << " and " << v.dump() << "\n";
-	return false;
+	throw caosException(std::string("caosVar operator < couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
 

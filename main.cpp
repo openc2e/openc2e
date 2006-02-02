@@ -96,8 +96,11 @@ extern "C" int main(int argc, char *argv[]) {
 	
 	registerDelegates();
 	world.init();
+	std::cout << "Reading catalogue files..." << std::endl;
 	world.initCatalogue();
+	std::cout << "Reading PRAY files..." << std::endl;
 	world.praymanager.update();
+	std::cout << "Initialising backend..." << std::endl;
 	// moved backend.init() here because we need the camera to be valid - fuzzie
 	world.backend.init(enable_sound);
 	world.camera.setBackend(&world.backend); // TODO: hrr
@@ -111,6 +114,7 @@ extern "C" int main(int argc, char *argv[]) {
 
 	world.data_directories.push_back(cacheDirectory());
 	
+	std::cout << "Executing initial scripts..." << std::endl;
 	if (bootstrap.size() == 0) {
 		world.executeBootstrap(false);
 	} else {

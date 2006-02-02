@@ -527,14 +527,14 @@ int Agent::getUNID() {
 
 std::string Agent::identify() const {
 	std::ostringstream o;
-	o << (int)family << " " << (int)genus << " " << species << " ";
+	o << (int)family << " " << (int)genus << " " << species;
 	const std::string n = world.catalogue.getAgentName(family, genus, species);
 	if (n.size())
-		o << "(" + n + ")";
-	if (unid != -1)
+		o << " (" + n + ")";
+	/*if (unid != -1)
 		o << " unid " << unid;
 	else
-		o << " (no unid assigned)";
+		o << " (no unid assigned)"; */
 	return o.str();
 }
 

@@ -202,7 +202,8 @@ void SkeletalCreature::recalculateSkeleton() {
 
 	adjustx = -lowestx;
 	adjusty = -lowesty;
-	width = highestx - lowestx;
+	//width = highestx - lowestx;
+	width = 50;
 	//height = highesty - lowesty;
 	int leftfoot = party[11] + att[11].attachments[pose[11]][3];
 	int rightfoot = party[12] + att[12].attachments[pose[12]][3];
