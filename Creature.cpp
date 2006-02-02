@@ -25,7 +25,6 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	genome = g;
 	female = is_female;
 	variant = _variant;
-	// TODO: genus = <work out genus (ie, grendel/norn/whatever)>
 	species = (female ? 2 : 1);
 	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
 	zorder = 1500;
@@ -34,6 +33,9 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 		if (typeid(*(*i)) == typeid(bioInitialConcentration)) {
 			bioInitialConcentration *b = (bioInitialConcentration *)(*i);
 			chemicals[b->chemical] = b->quantity / 255.0f; // TODO: correctness unchecked
+		} else if (typeid(*(*i)) == typeid(creatureGenus)) {
+			creatureGenus *g = (creatureGenus *)(*i);
+			genus = g->genus + 1;
 		}
 	}
 	alive = true; // ?
