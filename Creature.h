@@ -44,14 +44,14 @@ protected:
 	bool female;
 	shared_ptr<genomeFile> genome;
 	
-	bool alive, asleep, dreaming;
+	bool alive, asleep, dreaming, tickage;
 
 	bool zombie;
 
 	unsigned int age; // in ticks
 	lifestage stage;
 
-	Agent *attention, *focus;
+	AgentRef attention, focus;
 
 	// clothes
 	// linguistic stuff
@@ -62,9 +62,26 @@ protected:
 
 public:
 	Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
+	virtual ~Creature();
+	void tick();
 
 	virtual void ageCreature();
-	lifestage getAge() { return stage; }
+	lifestage getStage() { return stage; }
+	void adjustChemical(unsigned char id, float value);
+	float getChemical(unsigned char id) { return chemicals[id]; }
+	unsigned int getVariant() { return variant; }
+	void setAsleep(bool asleep);
+	bool isAsleep() { return asleep; }
+	void setDreaming(bool dreaming);
+	bool isDreaming() { return dreaming; }
+	bool isFemale() { return female; }
+	bool isAlive() { return alive; }
+	void setZombie(bool z) { zombie = z; }
+	bool isZombie() { return zombie; }
+	unsigned int getAge() { return age; }
+	
+	void born();
+	void die();
 };
 
 /* vim: set noet: */

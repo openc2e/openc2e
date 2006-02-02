@@ -29,11 +29,66 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	species = (female ? 2 : 1);
 	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
 	zorder = 1500;
+
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(bioInitialConcentration)) {
+			bioInitialConcentration *b = (bioInitialConcentration *)(*i);
+			chemicals[b->chemical] = b->quantity / 255.0f; // TODO: correctness unchecked
+		}
+	}
+	alive = true; // ?
+	asleep = false; // ?
+	dreaming = false; // ?
+	tickage = false;
+	zombie = false;
+}
+
+Creature::~Creature() {
+	for (std::vector<Organ *>::iterator i = organs.begin(); i != organs.end(); i++) {
+		delete *i;
+	}
 }
 
 void Creature::ageCreature() {
 	if (stage < senile) // TODO
 		stage = (lifestage)((int)stage + 1);
+}
+
+void Creature::adjustChemical(unsigned char id, float value) {
+	chemicals[id] += value;
+	// TODO: clamp?
+}
+
+void Creature::setAsleep(bool a) {
+	// TODO: skeletalcreature might need to close eyes? or should that just be done during the skeletal update?
+	if (!a && dreaming)
+		setDreaming(false);
+	asleep = a;
+}
+
+void Creature::setDreaming(bool d) {
+	if (d && !asleep)
+		setAsleep(true);
+	dreaming = d;
+}
+
+void Creature::born() {
+	// TODO: life event?
+	tickage = true;
+}
+
+void Creature::die() {
+	// TODO: life event?
+	// TODO: disable brain/biochemistry updates, trigger die script?
+	// skeletalcreature eyes, also? see setAsleep comment
+	alive = false;
+}
+
+void Creature::tick() {
+	Agent::tick();
+	if (paused) return;
+
+	if (tickage) age++;
 }
 
 /* vim: set noet: */

@@ -126,7 +126,7 @@ void caosVM::c_NOHH() {
 
 /**
  ZOMB (command) zombie (integer)
- %status stub
+ %status maybe
 
  Turns the zombification of the target Creature on and off.  Set to 1 to disconnect the brain and 
  motor of the target Creature, and 0 to undo.
@@ -137,18 +137,18 @@ void caosVM::c_ZOMB() {
 
 	Creature *c = getTargCreature();
 
-	// TODO
+	c->setZombie(zombie);
 }
 
 /**
  ZOMB (integer)
- %status stub
+ %status maybe
 
  Returns 1 if target Creature is zombified, or 0 if otherwise.
 */
 void caosVM::v_ZOMB() {
 	Creature *c = getTargCreature();
-	result.setInt(0); // TODO
+	result.setInt(c->isZombie());
 }
 
 /**
@@ -225,26 +225,26 @@ void caosVM::c_VOCB() {
 
 /**
  DEAD (command)
- %status stub
+ %status maybe
 
  Kill the target Creature biologically.
 */
 void caosVM::c_DEAD() {
 	Creature *c = getTargCreature();
 
-	// TODO
+	c->die();
 }
 
 /**
  DEAD (integer)
- %status stub
+ %status maybe
 
  Determines whether the target Creature is dead (0 or 1).
 */
 void caosVM::v_DEAD() {
 	Creature *c = getTargCreature();
 
-	result.setInt(0); // TODO
+	result.setInt(!c->isAlive());
 }
 
 /**
@@ -332,7 +332,7 @@ void caosVM::v_DRIV() {
 
 /**
  CHEM (command) chemical_id (integer) adjust (float)
- %status stub
+ %status maybe
 
  Modifies the level of a chemical in target Creature's bloodstream by adjust, which can range from -1.0 (decrease) to 1.0 (increase).
 */
@@ -342,12 +342,12 @@ void caosVM::c_CHEM() {
 
 	Creature *c = getTargCreature();
 
-	// TODO
+	c->adjustChemical(chemical_id, adjust);
 }
 
 /**
  CHEM (float) chemical_id (integer)
- %status stub
+ %status maybe
 
  Returns the level of a chemical (0.0 to 1.0) in target creature's bloodstream.
 */
@@ -356,12 +356,12 @@ void caosVM::v_CHEM() {
 	
 	Creature *c = getTargCreature();
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(c->getChemical(chemical_id));
 }
 
 /**
  ASLP (command) asleep (integer)
- %status stub
+ %status maybe
 
  If asleep is 1, makes the target creature sleep. If asleep is 0, makes the target creature wake.
 */
@@ -370,7 +370,7 @@ void caosVM::c_ASLP() {
 	
 	Creature *c = getTargCreature();
 
-	// TODO
+	c->setAsleep(asleep);
 }
 
 /**
@@ -382,7 +382,7 @@ void caosVM::c_ASLP() {
 void caosVM::v_ASLP() {
 	Creature *c = getTargCreature();
 
-	result.setInt(0); // TODO
+	result.setInt(c->isAsleep());
 }
 
 /**
@@ -445,6 +445,8 @@ void caosVM::c_LIKE() {
 	VM_PARAM_VALIDAGENT(creature)
 
 	Creature *c = getTargCreature();
+
+	// TODO
 }
 
 /**
@@ -480,31 +482,31 @@ void caosVM::c_ORDR_SHOU() {
 
 /**
  DREA (command) dream (integer)
- %status stub
+ %status maybe
 */
 void caosVM::c_DREA() {
 	VM_PARAM_INTEGER(dream)
 
 	Creature *c = getTargCreature();
-	// TODO
+	c->setDreaming(dream);
 }
 
 /**
  DREA (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_DREA() {
 	Creature *c = getTargCreature();
-	result.setInt(0); // TODO
+	result.setInt(c->isDreaming());
 }
 
 /**
  BORN (command)
- %status stub
+ %status maybe
 */
 void caosVM::c_BORN() {
 	Creature *c = getTargCreature();
-	// TODO
+	c->born();
 }
 
 /**
@@ -513,7 +515,7 @@ void caosVM::c_BORN() {
 */
 void caosVM::v_CAGE() {
 	Creature *c = getTargCreature();
-	result.setInt((int)c->getAge());
+	result.setInt((int)c->getStage());
 }
 
 /**
@@ -585,7 +587,8 @@ void caosVM::c_NEW_CREA() {
 	VM_PARAM_VALIDAGENT(gene_agent)
 	VM_PARAM_INTEGER(family)
 
-	targ = NULL; // TODO
+	c_NEWC(); // TODO
+	//targ = NULL; // TODO
 }
 
 /**
