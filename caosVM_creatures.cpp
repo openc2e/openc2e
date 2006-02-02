@@ -645,4 +645,35 @@ void caosVM::c_AGES() {
 	}
 }
 
+/**
+ LOCI (command) type (integer) organ (integer) tissue (integer) id (integer) value (float)
+ %status stub
+*/
+void caosVM::c_LOCI() {
+	VM_PARAM_FLOAT(value)
+	VM_PARAM_INTEGER(id)
+	VM_PARAM_INTEGER(tissue)
+	VM_PARAM_INTEGER(organ)
+	VM_PARAM_INTEGER(type)
+
+	Creature *c = getTargCreature();
+
+	// TODO
+}
+
+/**
+ LOCI (float) type (integer) organ (integer) tissue (integer) id (integer)
+ %status stub
+*/
+void caosVM::v_LOCI() {
+	VM_PARAM_INTEGER(id)
+	VM_PARAM_INTEGER(tissue)
+	VM_PARAM_INTEGER(organ)
+	VM_PARAM_INTEGER(type)
+
+	Creature *c = getTargCreature();
+
+	result.setFloat(0.0f); // TODO
+}
+
 /* vim: set noet: */

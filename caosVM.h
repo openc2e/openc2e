@@ -431,6 +431,7 @@ public:
 	void c_PAT_CMRA();
 	void c_PAT_KILL();
 	void c_PAT_MOVE();
+	void c_PAT_GRPH();
 	void c_FCUS();
 	void c_FRMT();
 	void c_PTXT();
@@ -440,6 +441,7 @@ public:
 	void v_PAGE();
 	void v_NPGS();
 	void c_GRPV();
+	void c_GRPL();
 
 	// creatures
 	void c_STIM_SHOU();
@@ -489,6 +491,8 @@ public:
 	void v_DRV();
 	void v_IITT();
 	void c_AGES();
+	void c_LOCI();
+	void v_LOCI();
 	
 	// sounds
 	void c_SNDE();

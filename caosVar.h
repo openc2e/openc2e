@@ -240,7 +240,7 @@ class caosVar {
 };
 
 struct caosVarCompare {
-	bool operator()(const caosVar &v1, const caosVar &v2) {
+	bool operator()(const caosVar &v1, const caosVar &v2) const {
 		if (v1.getType() == v2.getType())
 			return v1 < v2;
 		else
