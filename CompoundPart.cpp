@@ -430,7 +430,7 @@ void TextPart::recalculateData() {
 }
 
 void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
-	SpritePart::partRender(renderer, xoffset + x, yoffset + y);
+	SpritePart::partRender(renderer, xoffset, yoffset);
 	
 	unsigned int xoff = xoffset + x + leftmargin;
 	unsigned int yoff = yoffset + y + topmargin;
