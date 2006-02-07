@@ -34,15 +34,34 @@ World::World() {
 	ticktime = 50;
 	tickcount = 0;
 	quitting = saving = false;
+	theHand = 0;
 }
 
 // annoyingly, if we put this in the constructor, imageGallery isn't available yet
 void World::init() {
-	// TODO: pick up hand image name from "Pointer Information" catalogue tag
-	if (gallery.getImage("hand")) // TODO: we refcount one too many here, i expect // TODO: we refcount one too many here, i expect
+	// First, try initialising the mouse cursor from the catalogue tag.
+	if (catalogue.hasTag("Pointer Information")) {
+		const std::vector<std::string> &pointerinfo = catalogue.getTag("Pointer Information");
+		if (pointerinfo.size() >= 3) {
+			creaturesImage *img = gallery.getImage(pointerinfo[2]);
+			if (img) {
+				theHand = new PointerAgent(pointerinfo[2]);
+				// TODO: set family/genus/species based on the first entry (normally "2 1 1")
+				// TODO: work out what second entry is ("2 2" normally?! "7 7" in CV)
+				gallery.delImage(img);
+			}
+		}
+	}
+	
+	// If for some reason we failed to do that (missing/bad catalogue tag? missing file?), try falling back to a sane default.
+	if (!theHand) {
+		creaturesImage *img = gallery.getImage("hand"); // as used in C2, C3 and DS
+		if (!img)
+			throw creaturesException("no \"Pointer Information\" catalogue tag, and fallback failed");
 		theHand = new PointerAgent("hand");
-	else	
-		theHand = new PointerAgent("syst"); // Creatures Village
+		gallery.delImage(img);
+		std::cout << "Warning: No \"Pointer Information\" catalogue tag, defaulting to 'hand'." << std::endl;
+	}
 }
 
 caosVM *World::getVM(Agent *a) {
