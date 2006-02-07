@@ -70,4 +70,42 @@ void caosVM::v_NET_ERRA() {
 	result.setInt(0);
 }
 
+/**
+ NET: ULIN (integer) username (string)
+ %status stub
+
+ Networking is not supported in openc2e, so always returns 0.
+*/
+void caosVM::v_NET_ULIN() {
+	result.setInt(0);
+}
+
+/**
+ NET: WHOZ (command)
+ %status stub
+
+ Networking is not supported in openc2e, so does nothing.
+*/
+void caosVM::c_NET_WHOZ() {
+}
+
+/**
+ NET: WHON (command) username (string)
+ %status stub
+
+ Networking is not supported in openc2e, so does nothing.
+*/
+void caosVM::c_NET_WHON() {
+}
+
+/**
+ NET: USER (string)
+ %status stub
+
+ Networking is not supported in openc2e, so returns an empty string.
+*/
+void caosVM::v_NET_USER() {
+	result.setString("");
+}
+
 /* vim: set noet: */

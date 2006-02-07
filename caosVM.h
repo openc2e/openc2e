@@ -611,6 +611,10 @@ public:
 	void c_NET_LINE();
 	void v_NET_LINE();
 	void v_NET_ERRA();
+	void v_NET_ULIN();
+	void c_NET_WHOZ();
+	void c_NET_WHON();
+	void v_NET_USER();
 
 	// genetics
 	void c_GENE_CLON();
