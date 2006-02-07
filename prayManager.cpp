@@ -62,8 +62,10 @@ void prayManager::removeFile(prayFile *f) {
 void prayManager::update() {
 	if (files.size() != 0) return; // TODO: Handle actual update cases, rather than just the initial init.
 
-	if (!world.catalogue.hasTag("Pray System File Extensions"))
-		throw creaturesException("couldn't find the catalogue tag \"Pray System File Extensions\"");
+	if (!world.catalogue.hasTag("Pray System File Extensions")) {
+		std::cout << "Warning: Catalogue tag \"Pray System File Extensions\" wasn't found, so no PRAY files will be loaded." << std::endl;
+		return;
+	}
 
 	const std::vector<std::string> &extensions = world.catalogue.getTag("Pray System File Extensions");
 
