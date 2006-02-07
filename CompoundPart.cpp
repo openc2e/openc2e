@@ -169,7 +169,8 @@ ButtonPart::ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
 
 void ButtonPart::handleClick(float x, float y) {
-	parent->queueScript(calculateScriptId(messageid), (Agent *)world.hand()); // TODO: pass x/y as p1/p2?
+	caosVar v; v.setInt(id); // _p1_ is id of part, according to Edynn code
+	parent->queueScript(calculateScriptId(messageid), (Agent *)world.hand(), v);
 }
 
 TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)

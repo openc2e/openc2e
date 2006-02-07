@@ -375,7 +375,7 @@ void caosVM::c_ASLP() {
 
 /**
  ASLP (integer)
- %status stub
+ %status maybe
 
  Determines whether the target Creature is asleep.
 */

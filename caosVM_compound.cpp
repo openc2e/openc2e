@@ -230,7 +230,7 @@ void caosVM::c_PAT_KILL() {
 	caos_assert(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
-	caos_assert(a->part(part));
+	if (!a->part(part)) return; // Edynn does PAT: KILL on nonexistant parts
 	
 	a->delPart(part);
 }
