@@ -575,6 +575,21 @@ void caosVM::v_RLOC() {
 }
 
 /**
+ MLOC (string) metaroomid (integer)
+ %status maybe
+
+ Returns a string containing the location of the given metaroom in the following format: x y width height
+*/
+void caosVM::v_MLOC() {
+	VM_PARAM_INTEGER(metaroomid)
+
+	MetaRoom *r = world.map.getMetaRoom(metaroomid);
+	caos_assert(r);
+
+	result.setString(boost::str(boost::format("%d %d %d %d") % r->x() % r->y() % r->width() % r->height()));
+}
+
+/**
  DMAP (command) mapon (integer)
  %status maybe
 

@@ -171,6 +171,7 @@ public:
 	void v_ERID();
 	void c_DELR();
 	void c_DELM();
+	void v_MLOC();
 	
 	// camera
 	void v_VISI();
@@ -267,6 +268,10 @@ public:
 	void v_UPPA();
 	void v_SINS();
 	void v_REAQ();
+	void c_DELN();
+	void v_REAN();
+	void c_NAMN();
+	void v_GAMN();
 
 	// flow
 	void c_DOIF();
@@ -493,6 +498,7 @@ public:
 	void c_AGES();
 	void c_LOCI();
 	void v_LOCI();
+	void v_TAGE();
 	
 	// sounds
 	void c_SNDE();

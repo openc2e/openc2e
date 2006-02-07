@@ -679,4 +679,15 @@ void caosVM::v_LOCI() {
 	result.setFloat(0.0f); // TODO
 }
 
+/**
+ TAGE (integer)
+ %status maybe
+
+ Returns age of target creature, in ticks. Only counts ticks since it was BORN.
+*/
+void caosVM::v_TAGE() {
+	Creature *c = getTargCreature();
+	result.setInt(c->getAge());
+}
+
 /* vim: set noet: */

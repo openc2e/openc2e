@@ -822,4 +822,85 @@ void caosVM::v_SINS() {
 		result.setInt(i + 1);
 }
 
+/**
+ REAN (integer) tag (string)
+ %status maybe
+ 
+ Return number of strings associated with the catalogue tag specified.
+*/
+void caosVM::v_REAN() {
+	VM_PARAM_STRING(tag)
+		
+	if (!world.catalogue.hasTag(tag))
+		result.setInt(0);
+	else {
+		const std::vector<std::string> &t = world.catalogue.getTag(tag);
+		result.setInt(t.size());
+	}
+}
+
+/**
+ DELN (command) name (anything)
+ %status maybe
+
+ Delete the specified NAME variable on the target agent.
+*/
+void caosVM::c_DELN() {
+	VM_PARAM_VALUE(name)
+
+	caos_assert(targ);
+	std::map<caosVar, caosVar, caosVarCompare>::iterator i = targ->name_variables.find(name);
+	caos_assert(i != targ->name_variables.end()); // TODO: correct behaviour, or should we just return?
+	targ->name_variables.erase(i);
+}
+
+/**
+ GAMN (string) previous (string)
+ %status maybe
+*/
+void caosVM::v_GAMN() {
+	VM_PARAM_STRING(previous)
+
+	// TODO: we assume that GAME variables don't have an empty string
+	if (previous.empty()) {
+		if (world.variables.size() == 0)
+			result.setString("");
+		else
+			result.setString(world.variables.begin()->first);
+	} else {
+		std::map<std::string, caosVar>::iterator i = world.variables.find(previous);
+		caos_assert(i != world.variables.end()); // TODO: this probably isn't correct behaviour
+		i++;
+		if (i == world.variables.end())
+			result.setString("");
+		else
+			result.setString(i->first);
+	}
+}
+
+/**
+ NAMN (command) previous (variable)
+ %status maybe
+*/
+void caosVM::c_NAMN() {
+	VM_PARAM_VARIABLE(previous)
+
+	caos_assert(targ);
+	// TODO: we assume that NAME variables don't have an empty string
+	if (previous->hasString() && previous->getString().empty()) {
+		if (targ->name_variables.size() == 0)
+			result.setString("");
+		else
+			result = targ->name_variables.begin()->first;
+	} else {
+		std::map<caosVar, caosVar, caosVarCompare>::iterator i = targ->name_variables.find(*previous);
+		caos_assert(i != targ->name_variables.end()); // TODO: this probably isn't correct behaviour
+		i++;
+		if (i == targ->name_variables.end())
+			result.setString("");
+		else
+			result = i->first;
+	}
+}
+
 /* vim: set noet: */
