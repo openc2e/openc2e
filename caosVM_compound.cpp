@@ -197,6 +197,8 @@ void caosVM::c_PAT_CMRA() {
 /**
  PAT: GRPH (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) numvalues (integer)
  %status maybe
+
+ 
 */
 void caosVM::c_PAT_GRPH() {
 	VM_PARAM_INTEGER(numvalues)
@@ -441,6 +443,8 @@ void caosVM::v_NPGS() {
 /**
  GRPV (command) line (integer) value (float)
  %status stub
+
+ Add the given value to the given line on a graph.
 */
 void caosVM::c_GRPV() {
 	VM_PARAM_FLOAT(value)
@@ -460,6 +464,9 @@ void caosVM::c_GRPV() {
 /**
  GRPL (command) red (integer) green (integer) blue (integer) min (float) max (float)
  %status stub
+
+ Add a new line to a graph created with PAT: GRPH with the given 
+ characteristics.
 */
 void caosVM::c_GRPL() {
 	VM_PARAM_FLOAT(max)

@@ -310,6 +310,9 @@ void caosVM::c_LINE() {
 /**
  SNAX (integer) filename (string)
  %status maybe
+
+ Determines whether or not the given image file exists in the world 
+ images directory (0 or 1).
 */
 void caosVM::v_SNAX() {
 	VM_PARAM_STRING(filename)
@@ -324,6 +327,9 @@ void caosVM::v_SNAX() {
 /**
  SCAM (command) agent (agent) part (integer)
  %status stub
+
+ Sets which camera to use in camera macro commands.  If 'agent' and 
+ 'part' are NULL, the main camera will be used.
 */
 void caosVM::c_SCAM() {
 	VM_PARAM_INTEGER(part)
@@ -342,6 +348,10 @@ void caosVM::c_SCAM() {
 /**
  ZOOM (command) pixels (integer) x (integer) y (integer)
  %status stub
+
+ Zoom the current camera by the given number of pixels on the given x/y 
+ coordinates in the world.  If the coordinates are set to -1, the 
+ current center position of the camera's view will be used.
 */
 void caosVM::c_ZOOM() {
 	VM_PARAM_INTEGER(y)

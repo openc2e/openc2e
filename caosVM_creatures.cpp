@@ -128,7 +128,7 @@ void caosVM::c_NOHH() {
  ZOMB (command) zombie (integer)
  %status maybe
 
- Turns the zombification of the target Creature on and off.  Set to 1 to disconnect the brain and 
+ Turns zombification of the target Creature on and off.  Set to 1 to disconnect the brain and 
  motor of the target Creature, and 0 to undo.
 */
 void caosVM::c_ZOMB() {
@@ -483,6 +483,10 @@ void caosVM::c_ORDR_SHOU() {
 /**
  DREA (command) dream (integer)
  %status maybe
+
+ Turns a Creature's dreaming on and off.  A Creature's instincts are 
+ processed while it is dreaming.  If it is not asleep already, then it 
+ will be made to sleep before dreaming begins.
 */
 void caosVM::c_DREA() {
 	VM_PARAM_INTEGER(dream)
@@ -494,6 +498,8 @@ void caosVM::c_DREA() {
 /**
  DREA (integer)
  %status maybe
+
+ Returns whether or not the target Creature is dreaming (0 or 1).
 */
 void caosVM::v_DREA() {
 	Creature *c = getTargCreature();
@@ -503,6 +509,9 @@ void caosVM::v_DREA() {
 /**
  BORN (command)
  %status maybe
+
+ Registers the birth of the target Creature, and sends a birth event to 
+ the game.
 */
 void caosVM::c_BORN() {
 	Creature *c = getTargCreature();
@@ -512,6 +521,8 @@ void caosVM::c_BORN() {
 /**
  CAGE (integer)
  %status maybe
+
+ Returns the integer value of the target Creature's current life stage.
 */
 void caosVM::v_CAGE() {
 	Creature *c = getTargCreature();
@@ -521,6 +532,9 @@ void caosVM::v_CAGE() {
 /**
  BYIT (integer)
  %status stub
+
+ Determines whether or not the target Creature can reach the IT agent (0 
+ or 1).
 */
 void caosVM::v_BYIT() {
 	Creature *c = getTargCreature();
@@ -531,6 +545,9 @@ void caosVM::v_BYIT() {
  _IT_ (agent)
  %status maybe
  %pragma implementation caosVM::v_IT
+
+ Returns the agent that the OWNR creature was focused on when the 
+ current script began running.
 */
 void caosVM::v_IT() {
 	caos_assert(owner);

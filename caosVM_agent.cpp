@@ -105,6 +105,9 @@ void caosVM::c_RTAR() {
 /**
  TTAR (command) family (integer) genus (integer) species (integer)
  %status stub
+
+ Locates a random agent that is touching OWNR (see ETCH) and that 
+ matches the given classifier, and sets it to TARG.
 */
 void caosVM::c_TTAR() {
 	VM_VERIFY_SIZE(3)
@@ -120,6 +123,9 @@ void caosVM::c_TTAR() {
 /**
  STAR (command) family (integer) genus (integer) species (integer)
  %status stub
+
+ Locates a random agent that is visible to OWNR (see ESEE) and that
+ matches the given classifier, then sets it to TARG.
 */
 void caosVM::c_STAR() {
 	VM_VERIFY_SIZE(3)
@@ -138,6 +144,7 @@ void caosVM::c_STAR() {
 
  Creates a new simple agent with given family/genus/species, given spritefile with image_count sprites
  available starting at first_image in the spritefile, at the screen depth given by plane.
+ TARG is set to the newly-created agent.
 */
 void caosVM::c_NEW_SIMP() {
 	VM_VERIFY_SIZE(7)
@@ -1190,6 +1197,8 @@ void caosVM::c_TINO() {
 /**
  DROP (command)
  %status stub
+
+ Causes the TARG agent to drop what it is carrying in a safe location.
 */
 void caosVM::c_DROP() {
 	caos_assert(targ);
