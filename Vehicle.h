@@ -35,7 +35,7 @@ public:
 		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) { capacity = 0; }
 
 	void setCabinRect(int l, int t, int r, int b) { cabinleft = l; cabintop = t; cabinright = r; cabinbottom = b; }
-	void setCapacity(unsigned int c) { assert(c > 0); capacity = c; }
+	void setCapacity(unsigned int c) { capacity = c; }
 };
 
 #endif

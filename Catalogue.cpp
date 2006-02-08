@@ -146,7 +146,7 @@ std::string Catalogue::calculateWildcardTag(std::string tag, unsigned char famil
 	if (hasTag(searchstring)) return searchstring;
 	searchstring = tag + " " + stringFromInt(family) + " 0 0";
 	if (hasTag(searchstring)) return searchstring;
-	searchstring = tag + "0 0 0";
+	searchstring = tag + " 0 0 0";
 	if (hasTag(searchstring)) return searchstring;
 	return "";
 }
