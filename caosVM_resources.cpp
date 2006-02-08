@@ -113,6 +113,52 @@ int prayInstallDeps(std::string name, bool actually_install) {
 	return 0;
 }
 
+//used by PRAY BACK, PRAY FORE, PRAY NEXT and PRAY PREV to implement their functionality
+std::string findBlock(std::string type, std::string last, bool forward, bool loop) {
+	prayBlock *firstblock = 0, *currblock = 0;
+	bool foundblock = false;
+	
+	if (world.praymanager.blocks.size() == 0) return ""; // We definitely can't find anything in that case!
+	
+	// Where do we start?
+	std::map<std::string, prayBlock *>::iterator i;
+	if (forward)
+		i = world.praymanager.blocks.begin();
+	else {
+		i = world.praymanager.blocks.end();
+		i--;
+	}
+	
+	// Loop through all the blocks.
+	while (true) {
+		if (i->second->type == type) {
+			currblock = i->second;
+			
+			// Store the first block if we didn't already find one, for possible use later.
+			if (!firstblock)
+				firstblock = currblock;
+			
+			// If this is the resource we want, grab it!
+			if (foundblock)
+				return currblock->name;
+
+			// If this is the resource we're looking for, make a note to grab the next one.
+			if (last == currblock->name)
+				foundblock = true;
+		}
+		
+		// Step through the list. Break if we need to.
+		if (!forward && i == world.praymanager.blocks.begin()) break;
+		if (forward) i++; else i--;
+		if (forward && i == world.praymanager.blocks.end()) break;
+	}
+
+	if (foundblock && loop) return firstblock->name; // loop around to first-found block
+	else if (!foundblock && currblock) return firstblock->name; // default to first-found block (XXX this is in direct opposition to what CAOS docs say!)
+	
+	return ""; // yarr, failure.
+}
+
 /**
  PRAY AGTI (integer) resource (string) tag (string) default (integer)
  %status maybe
@@ -161,7 +207,7 @@ void caosVM::v_PRAY_AGTS() {
 
 /**
  PRAY BACK (string) type (string) last (string)
- %status stub
+ %status maybe
 
  returns the name of the resource of the specified type which is immediately previous to last
  see PRAY PREV if you want to loop around
@@ -170,19 +216,24 @@ void caosVM::v_PRAY_BACK() {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 
-	result.setString(""); // TODO
+	result.setString(findBlock(type, last, false, false));
 }
 
 /**
  PRAY COUN (integer) type (string)
- %status stub
+ %status maybe
 
  return the number of resources of the specified type available
 */
 void caosVM::v_PRAY_COUN() {
 	VM_PARAM_STRING(type)
 
-	result.setInt(0); // TODO
+	unsigned int count = 0;
+	for (std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.begin(); i != world.praymanager.blocks.end(); i++)
+		if (i->second->type == type)
+			count++;
+	
+	result.setInt(count);
 }
 
 /**
@@ -227,16 +278,16 @@ void caosVM::v_PRAY_FILE() {
 
 /**
  PRAY FORE (string) type (string) last (string)
- %status stub
+ %status maybe
 
  returns the name of the resource of the specified type which is immediately after last
- see PRAY NEXT if you don't want to loop around
+ see PRAY NEXT if you want to loop around
 */
 void caosVM::v_PRAY_FORE() {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 
-	result.setString(""); // TODO
+	result.setString(findBlock(type, last, true, false));
 }
 
 /**
@@ -369,36 +420,13 @@ void caosVM::v_PRAY_MAKE() {
 void caosVM::v_PRAY_NEXT() {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
-
-	prayBlock *firstblock = 0, *currblock = 0;
-	bool foundblock = false;
-	for (std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.begin(); i != world.praymanager.blocks.end(); i++) {
-		if (i->second->type == type) {
-			currblock = i->second;
-			
-			// Store the first block if we didn't already find one, for possible use later.
-			if (!firstblock) firstblock = currblock;
-			
-			// If this is the resource we want, grab it!
-			if (foundblock) {
-				result.setString(currblock->name);
-				return;
-			}
-
-			// If this is the resource we're looking for, make a note to grab the next one.
-			if (last == currblock->name)
-				foundblock = true;
-		}
-	}
-
-	if (foundblock) result.setString(firstblock->name); // loop around to first block
-	else if (currblock) result.setString(currblock->name); // default to last block
-	else result.setString(""); // yarr, failure. TODO: is this correct behaviour?
+	
+	result.setString(findBlock(type, last, true, true));
 }
 
 /**
  PRAY PREV (string) type (string) last (string)
- %status stub
+ %status maybe
 
  returns the name of the resource of the specified type which is immediately previous to last
  see PRAY BACK if you don't want to loop around
@@ -407,7 +435,7 @@ void caosVM::v_PRAY_PREV() {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 
-	result.setString(""); // TODO
+	result.setString(findBlock(type, last, false, true));
 }
 
 /**
