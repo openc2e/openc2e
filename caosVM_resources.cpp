@@ -313,7 +313,7 @@ void caosVM::v_PRAY_INJT() {
 		caosVM *vm = world.getVM(NULL);
 		try {
 			std::istringstream iss(script);
-			caosScript script(world.gametype, name + " - PRAY block '" + scriptname + "'");
+			caosScript script(world.gametype, name + " - PRAY " + scriptname);
 			script.parse(iss);
 			script.installScripts();
 			vm->runEntirely(script.installer);
@@ -321,6 +321,7 @@ void caosVM::v_PRAY_INJT() {
 			world.freeVM(vm);
 			result.setInt(-2);
 			report->setString(scriptname);
+			std::cerr << "PRAY INJT caught exception trying to inject " << name << " - PRAY " << scriptname << ": " << e.what() << std::endl;
 			return;
 		}
 		world.freeVM(vm);
