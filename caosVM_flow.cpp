@@ -353,6 +353,7 @@ void caosVM::v_CAOS() {
 		sub->outputstream = &std::cout;
 		result.setString(oss.str());
 	} catch (std::exception &e) {
+		sub->outputstream = &std::cout;
 		if (!throws || catches) {
 			report->setString(e.what());
 			result.setString("###");

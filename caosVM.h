@@ -201,6 +201,7 @@ public:
 	void c_SAVE();
 	void c_QUIT();
 	void v_WNAM();
+	void v_WUID();
 
 	// core
 	void v_GAME();

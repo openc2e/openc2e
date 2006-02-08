@@ -66,4 +66,15 @@ void caosVM::v_WNAM() {
 	result.setString("oh"); // TODO
 }
 
+/**
+ WUID (string)
+ %status stub
+
+ Returns the unique identifier (moniker?) of the current world.
+*/
+void caosVM::v_WUID() {
+	// result.setString(world.moniker);
+	result.setString("dock-aaaaa-bbbbb-ccccc-ddddd"); // TODO
+}
+
 /* vim: set noet: */

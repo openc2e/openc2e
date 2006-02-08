@@ -108,7 +108,7 @@ void Catalogue::initFrom(fs::path path) {
 				// TODO: '-en-GB' exists too, this doesn't work for that
 				if ((x.size() > 3) && (x[x.size() - 3] == '-')) {
 					// TODO: this is NOT how we should do it
-					continue; // skip all localised files
+					if (x[x.size() - 2] != 'e' || x[x.size() - 1] != 'n') continue; // skip all non-english localised files
 				}
 				//std::cout << "Catalogue file '" << x << "' being read" << std::endl;
 				fs::ifstream f(*i);

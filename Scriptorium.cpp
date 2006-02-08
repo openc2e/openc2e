@@ -20,9 +20,22 @@ void Scriptorium::addScript(unsigned char family, unsigned char genus, unsigned 
 }
 
 void Scriptorium::delScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
-	std::map<unsigned short, shared_ptr<script> > &i = getScripts(calculateValue(family, genus, species));
-	i.erase(i.find(event));
-	// todo: zap from the main map if there is none left of that value
+	// Retrieve the list of scripts for the classifier, return if there aren't any.
+	std::map<unsigned int, std::map<unsigned short, shared_ptr<script> > >::iterator x = scripts.find(calculateValue(family, genus, species));
+	if (x == scripts.end())
+		return;
+
+	// Retrieve the script, return if it doesn't exist.
+	std::map<unsigned short, shared_ptr<script> >::iterator j = x->second.find(event);
+	if (j == x->second.end())
+		return;
+
+	// Erase the script.
+	x->second.erase(j);
+
+	// If there are no scripts left, erase the whole list of scripts for this classifier.
+	if (x->second.size() == 0)
+		scripts.erase(x);
 }
 
 shared_ptr<script> Scriptorium::getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
