@@ -70,6 +70,49 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	return true;
 }
 
+int prayInstallDeps(std::string name, bool actually_install) {
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
+	caos_assert(i != world.praymanager.blocks.end());
+
+	prayBlock *p = i->second;
+	p->parseTags();
+
+	std::map<std::string, int>::iterator j = p->integerValues.find("Agent Type");
+	if (j == p->integerValues.end()) {
+		return -1;
+	}
+	// I have no idea what this is, so let's just error out when it's not zero, pending fix. - fuzzie
+	caos_assert(j->second == 0);
+
+	j = p->integerValues.find("Dependency Count");
+	if (j == p->integerValues.end()) {
+		return -2;
+	}
+	int nodeps = j->second; caos_assert(nodeps >= 0);
+
+	for (unsigned int z = 1; z <= nodeps; z++) {
+		std::string depcatname = boost::str(boost::format("Dependency Category %d") % z);
+		std::string depname = boost::str(boost::format("Dependency %d") % z);
+		j = p->integerValues.find(depcatname);
+		if (j == p->integerValues.end()) {
+			return (-2 - nodeps - z);
+		}
+		int depcat = j->second; caos_assert(depcat >= 0 && depcat <= 11);
+		std::map<std::string, std::string>::iterator k = p->stringValues.find(depname);
+		if (k == p->stringValues.end()) {
+			return (-2 - z);
+		}
+		std::string dep = k->second;
+
+		// TODO: CL docs say 2*count to 3*count is the category ID for that dependency being invalid
+		if (!prayInstall(dep, depcat, actually_install)) {
+			return z;
+		}
+	}
+
+	return 0;
+}
+
 /**
  PRAY AGTI (integer) resource (string) tag (string) default (integer)
  %status maybe
@@ -150,51 +193,7 @@ void caosVM::v_PRAY_DEPS() {
 	VM_PARAM_INTEGER(install)
 	VM_PARAM_STRING(name)
 
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
-	caos_assert(i != world.praymanager.blocks.end());
-
-	prayBlock *p = i->second;
-	p->parseTags();
-
-	std::map<std::string, int>::iterator j = p->integerValues.find("Agent Type");
-	if (j == p->integerValues.end()) {
-		result.setInt(-1);
-		return;
-	}
-	// I have no idea what this is, so let's just error out when it's not zero, pending fix. - fuzzie
-	caos_assert(j->second == 0);
-
-	j = p->integerValues.find("Dependency Count");
-	if (j == p->integerValues.end()) {
-		result.setInt(-2);
-		return;
-	}
-	int nodeps = j->second; caos_assert(nodeps >= 0);
-
-	for (unsigned int z = 1; z <= nodeps; z++) {
-		std::string depcatname = boost::str(boost::format("Dependency Category %d") % z);
-		std::string depname = boost::str(boost::format("Dependency %d") % z);
-		j = p->integerValues.find(depcatname);
-		if (j == p->integerValues.end()) {
-			result.setInt(-2 - nodeps - z);
-			return;
-		}
-		int depcat = j->second; caos_assert(depcat >= 0 && depcat <= 11);
-		std::map<std::string, std::string>::iterator k = p->stringValues.find(depname);
-		if (k == p->stringValues.end()) {
-			result.setInt(-2 - z);
-			return;
-		}
-		std::string dep = k->second;
-
-		// TODO: CL docs say 2*count to 3*count is the category ID for that dependency being invalid
-		if (!prayInstall(dep, depcat, (install != 0))) {
-			result.setInt(z);
-			return;
-		}
-	}
-
-	result.setInt(0);
+	result.setInt(prayInstallDeps(name, install != 0));
 }
 
 /**
@@ -269,14 +268,65 @@ void caosVM::v_PRAY_IMPO() {
 
 /**
  PRAY INJT (integer) name (string) install (integer) report (variable)
- %status stub
+ %status maybe
 */
 void caosVM::v_PRAY_INJT() {
 	VM_PARAM_VARIABLE(report)
 	VM_PARAM_INTEGER(install)
 	VM_PARAM_STRING(name)
 
-	result.setInt(-1); // TODO
+	// Try installing the dependencies.
+	int r = prayInstallDeps(name, install != 0);
+	if (r != 0) {
+		result.setInt(-3);
+		report->setInt(r);
+		return;
+	}
+	
+	// Now grab the relevant block..
+	std::map<std::string, prayBlock *>::iterator i = world.praymanager.blocks.find(name);
+	caos_assert(i != world.praymanager.blocks.end());
+	prayBlock *p = i->second;
+	p->parseTags();
+	
+	// .. grab the script count ..
+	std::map<std::string, int>::iterator j = p->integerValues.find("Script Count");
+	if (j == p->integerValues.end()) {
+		result.setInt(-3); // TODO: this isn't really a dependency fail, what do I do here?
+		return;
+	}
+	int noscripts = j->second; caos_assert(noscripts >= 0);
+
+	// .. and iterate over the scripts.
+	for (unsigned int z = 1; z <= noscripts; z++) {
+		// First, retrieve the script.
+		std::string scriptname = boost::str(boost::format("Script %d") % z);
+		std::map<std::string, std::string>::iterator k = p->stringValues.find(scriptname);
+		if (k == p->stringValues.end()) {
+			result.setInt(-1);
+			report->setString(scriptname);
+			return;
+		}
+		std::string script = k->second;
+
+		// Then, execute it.
+		caosVM *vm = world.getVM(NULL);
+		try {
+			std::istringstream iss(script);
+			caosScript script(world.gametype, name + " - PRAY block '" + scriptname + "'");
+			script.parse(iss);
+			script.installScripts();
+			vm->runEntirely(script.installer);
+		} catch (std::exception &e) {
+			world.freeVM(vm);
+			result.setInt(-2);
+			report->setString(scriptname);
+			return;
+		}
+		world.freeVM(vm);
+	}
+	
+	result.setInt(0);
 }
 
 /**

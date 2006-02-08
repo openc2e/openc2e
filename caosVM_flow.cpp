@@ -345,11 +345,11 @@ void caosVM::v_CAOS() {
 	try {
 		std::istringstream iss(commands);
 		std::ostringstream oss;
-		caosScript *s = new caosScript("c3", "CAOS command"); // XXX: variant
-		s->parse(iss);
-		s->installScripts();
+		caosScript s("c3", "CAOS command"); // XXX: variant
+		s.parse(iss);
+		s.installScripts();
 		sub->outputstream = &oss;
-		sub->runEntirely(s->installer);
+		sub->runEntirely(s.installer);
 		sub->outputstream = &std::cout;
 		result.setString(oss.str());
 	} catch (std::exception &e) {
