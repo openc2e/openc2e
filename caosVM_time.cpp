@@ -64,12 +64,16 @@ void caosVM::v_DATE() {
 }
 
 /**
- HIST DATE (integer)
- %pragma implementation caosVM::v_DATE
+ HIST DATE (integer) tick (integer)
  %status stub
  
- Returns the day in the season of the current game world, starting at 0. Identical to DATE.
+ Returns the day in the season of the current game world at the specified world tick, starting at 0. See DATE.
 */
+void caosVM::v_HIST_DATE() {
+	VM_PARAM_INTEGER(tick)
+
+	result.setInt(0); // TODO
+}
 
 /**
  SEAN (integer)
@@ -83,11 +87,15 @@ void caosVM::v_SEAN() {
 
 /**
  HIST SEAN (integer)
- %pragma implementation caosVM::v_SEAN
  %status stub
 
- Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter. Identical to SEAN.
+ Returns the current game world season at the specified world tick. 0 is spring, 1 is summer, 2 is autumn and 3 is winter. See SEAN.
 */
+void caosVM::v_HIST_SEAN() {
+	VM_PARAM_INTEGER(tick)
+
+	result.setInt(0); // TODO
+}
 
 /**
  TIME (integer)
@@ -101,11 +109,15 @@ void caosVM::v_TIME() {
 
 /**
  HIST TIME (integer)
- %pragma implementation caosVM::v_TIME
  %status stub
  
- Returns the time of day in the current game world. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night. Identical to TIME.
+ Returns the time of day in the current game world at the specified world tick. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night. See TIME.
 */
+void caosVM::v_HIST_TIME() {
+	VM_PARAM_INTEGER(tick)
+
+	result.setInt(0); // TODO
+}
 
 /**
  YEAR (integer)
@@ -119,11 +131,15 @@ void caosVM::v_YEAR() {
 
 /**
  HIST YEAR (integer)
- %pragma implementation caosVM::v_YEAR
  %status stub
 
- Returns the number of game years elapsed. Identical to YEAR.
+ Returns the number of game years elapsed at the specified world tick. See YEAR.
 */
+void caosVM::v_HIST_YEAR() {
+	VM_PARAM_INTEGER(tick)
+
+	result.setInt(0); // TODO
+}
 
 /**
  MSEC (integer)

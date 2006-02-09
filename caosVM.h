@@ -531,9 +531,13 @@ public:
 	void v_PACE();
 	void c_BUZZ();
 	void v_BUZZ();
+	void v_HIST_DATE();
 	void v_DATE();
+	void v_HIST_SEAN();
 	void v_SEAN();
+	void v_HIST_TIME();
 	void v_TIME();
+	void v_HIST_YEAR();
 	void v_YEAR();
 	void v_MSEC();
 	void c_PAUS();
@@ -638,8 +642,35 @@ public:
 	void v_MTOC();
 	
 	// history
-	void v_HIST_NAME();
+	void v_HIST_CAGE();
+	void v_HIST_COUN();
+	void v_HIST_CROS();
 	void c_HIST_EVNT();
+	void v_HIST_FIND();
+	void v_HIST_FINR();
+	void v_HIST_FOTO();
+	void c_HIST_FOTO();
+	void v_HIST_GEND();
+	void v_HIST_GNUS();
+	void v_HIST_MON1();
+	void v_HIST_MON2();
+	void v_HIST_MUTE();
+	void v_HIST_NAME();
+	void c_HIST_NAME();
+	void v_HIST_NETU();
+	void v_HIST_NEXT();
+	void v_HIST_PREV();
+	void v_HIST_RTIM();
+	void v_HIST_TAGE();
+	void v_HIST_TYPE();
+	void c_HIST_UTXT();
+	void v_HIST_UTXT();
+	void v_HIST_VARI();
+	void c_HIST_WIPE();
+	void v_HIST_WNAM();
+	void v_HIST_WTIK();
+	void v_HIST_WUID();
+	void v_HIST_WVET();
 	void v_OOWW();
 
 	void runOp();
