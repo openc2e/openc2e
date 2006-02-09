@@ -195,6 +195,8 @@ public:
 	void v_SNAX();
 	void c_SCAM();
 	void c_ZOOM();
+	void c_SNAP();
+	void v_LOFT();
 
 	// world
 	void c_LOAD();

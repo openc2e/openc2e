@@ -361,4 +361,31 @@ void caosVM::c_ZOOM() {
 	// TODO
 }
 
+/**
+ SNAP (command) filename (string) x (integer) y (integer) width (integer) height (integer) zoom (integer)
+ %status stub
+
+ Take a snapshot and save it to the given filename (don't include the extension). x/y are the centerpoint, width/height the size, and zoom the percentage to zoom out.
+*/
+void caosVM::c_SNAP() {
+	VM_PARAM_INTEGER(zoom)
+	VM_PARAM_INTEGER(height)
+	VM_PARAM_INTEGER(width)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_STRING(filename)
+
+	// TODO
+}
+
+/**
+ LOFT (integer) filename (string)
+ %status stub
+*/
+void caosVM::v_LOFT() {
+	VM_PARAM_STRING(filename)
+
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */
