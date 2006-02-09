@@ -86,7 +86,7 @@ void caosVM::v_SEAN() {
 }
 
 /**
- HIST SEAN (integer)
+ HIST SEAN (integer) tick (integer)
  %status stub
 
  Returns the current game world season at the specified world tick. 0 is spring, 1 is summer, 2 is autumn and 3 is winter. See SEAN.
@@ -108,7 +108,7 @@ void caosVM::v_TIME() {
 }
 
 /**
- HIST TIME (integer)
+ HIST TIME (integer) tick (integer)
  %status stub
  
  Returns the time of day in the current game world at the specified world tick. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night. See TIME.
@@ -130,7 +130,7 @@ void caosVM::v_YEAR() {
 }
 
 /**
- HIST YEAR (integer)
+ HIST YEAR (integer) tick (integer)
  %status stub
 
  Returns the number of game years elapsed at the specified world tick. See YEAR.
