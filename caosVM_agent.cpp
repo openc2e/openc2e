@@ -1206,4 +1206,65 @@ void caosVM::c_DROP() {
 	// TODO
 }
 
+AgentRef findNextAgent(AgentRef previous, unsigned char family, unsigned char genus, unsigned short species, bool forward) {
+	if (world.agents.size() == 0) return AgentRef(); // shouldn't happen..
+	
+	AgentRef firstagent;
+	bool foundagent = false;
+
+	std::list<Agent *>::iterator i;
+	if (forward)
+		i = world.agents.begin();
+	else {
+		// TODO: i doubt this works
+		i = world.agents.end();
+		i--;
+	}
+
+	// Loop through all the agents.
+	while (true) {
+		if ((*i)->family == family || family == 0)
+			if ((*i)->genus == genus || genus == 0)
+				if ((*i)->species == species || species == 0) {
+					if (!firstagent) firstagent = *i;
+					if (foundagent) return *i; // This is the agent we want!
+					if (*i == previous) foundagent = true;
+				}
+		
+		// Step through the list. Break if we need to.
+		if (!forward && i == world.agents.begin()) break;
+		if (forward) i++; else i--;
+		if (forward && i == world.agents.end()) break;
+	}
+	
+	// Either we didn't find the previous agent, or we're at the end. Either way, return the first agent found.
+	return firstagent;
+}
+
+/**
+ NCLS (agent) previous (agent) family (integer) genus (integer) species (integer)
+ %status maybe
+*/
+void caosVM::v_NCLS() {
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+	VM_PARAM_AGENT(previous)
+
+	result.setAgent(findNextAgent(previous, family, genus, species, true));
+}
+
+/**
+ PCLS (agent) previous (agent) family (integer) genus (integer) species (integer)
+ %status maybe
+*/
+void caosVM::v_PCLS() {
+	VM_PARAM_INTEGER(species)
+	VM_PARAM_INTEGER(genus)
+	VM_PARAM_INTEGER(family)
+	VM_PARAM_AGENT(previous)
+
+	result.setAgent(findNextAgent(previous, family, genus, species, false));
+}
+
 /* vim: set noet: */

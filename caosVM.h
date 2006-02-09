@@ -384,6 +384,8 @@ public:
 	void v_TINT();
 	void c_TINO();
 	void c_DROP();
+	void v_NCLS();
+	void v_PCLS();
 	
 	// motion
 	void c_ELAS();
@@ -423,6 +425,7 @@ public:
 	void v_CODF();
 	void v_CODG();
 	void v_CODS();
+	void c_JECT();
 
 	void c_RGAM();
 	void v_MOWS();

@@ -204,4 +204,19 @@ void caosVM::v_CODS() {
 	
 	result.setInt(res);
 }
+
+/**
+ JECT (command) file (string) flags (integer)
+ %status stub
+
+ Inject a script from the current bootstrap. 'file' must be the full filename.
+ Flags can be 1 for remove script, 2 for event scripts and 4 for install script.
+*/
+void caosVM::c_JECT() {
+	VM_PARAM_INTEGER(flags)
+	VM_PARAM_STRING(file)
+
+	// TODO
+}
+
 /* vim: set noet: */
