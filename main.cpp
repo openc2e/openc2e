@@ -94,6 +94,8 @@ extern "C" int main(int argc, char *argv[]) {
 		world.data_directories.push_back(datadir);
 	}
 	
+	world.data_directories.push_back(cacheDirectory());
+	
 	registerDelegates();
 	std::cout << "Reading catalogue files..." << std::endl;
 	world.initCatalogue();
@@ -105,14 +107,12 @@ extern "C" int main(int argc, char *argv[]) {
 	world.backend.init(enable_sound);
 	world.camera.setBackend(&world.backend); // TODO: hrr
 
-	if (world.data_directories.size() < 2) {
+	if (world.data_directories.size() < 3) {
 		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
 		caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
 		caosVar contents; contents.setInt(1);
 		world.eame_variables[name] = contents;
 	}
-
-	world.data_directories.push_back(cacheDirectory());
 	
 	std::cout << "Executing initial scripts..." << std::endl;
 	if (bootstrap.size() == 0) {
