@@ -345,7 +345,8 @@ void caosVM::c_MVSF() {
 		}
 		tries++;
 	}
-	caos_assert(false); // boom, we failed to move somewhere safe
+	
+	throw creaturesException("MVSF failed to find a safe place");
 }
 
 /**
