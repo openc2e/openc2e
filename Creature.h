@@ -25,6 +25,16 @@ using boost::shared_ptr;
 
 class Organ {
 public:
+	std::vector<bioGene *> genes;
+
+	organGene *ourGene;
+
+	float lifeforce, shorttermlifeforce;
+	float repairfactor, injuryfactor;
+
+	float getEnergyCost();
+
+	void tick();
 };
 
 class Brain {
@@ -79,6 +89,9 @@ public:
 	void setZombie(bool z) { zombie = z; }
 	bool isZombie() { return zombie; }
 	unsigned int getAge() { return age; }
+
+	unsigned int noOrgans() { return organs.size(); }
+	Organ *getOrgan(unsigned int i) { return organs[i]; }
 	
 	void born();
 	void die();

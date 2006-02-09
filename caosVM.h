@@ -500,6 +500,13 @@ public:
 	void c_LOCI();
 	void v_LOCI();
 	void v_TAGE();
+	void v_ORGN();
+	void v_ORGF();
+	void v_ORGI();
+	void c_SOUL();
+	void v_SOUL();
+	void v_DECN();
+	void v_ATTN();
 	
 	// sounds
 	void c_SNDE();

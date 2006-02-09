@@ -238,7 +238,7 @@ void caosVM::v_PRAY_COUN() {
 
 /**
  PRAY DEPS (integer) name (string) install (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_PRAY_DEPS() {
 	VM_PARAM_INTEGER(install)

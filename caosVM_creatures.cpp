@@ -707,4 +707,92 @@ void caosVM::v_TAGE() {
 	result.setInt(c->getAge());
 }
 
+/**
+ ORGN (integer)
+ %status maybe
+*/
+void caosVM::v_ORGN() {
+	Creature *c = getTargCreature();
+	result.setInt(c->noOrgans());
+}
+
+/**
+ ORGF (float) organ (integer) value (integer)
+ %status stub
+*/
+void caosVM::v_ORGF() {
+	VM_PARAM_INTEGER(value)
+	VM_PARAM_INTEGER(organ)
+	
+	Creature *c = getTargCreature();
+	caos_assert(organ >= 0 && organ < c->noOrgans());
+	Organ *o = c->getOrgan(organ);
+
+	switch (value) {
+		// TODO
+		default: throw creaturesException("Unknown value for ORGF");
+	}
+}
+
+/**
+ ORGI (integer) organ (integer) value (integer)
+ %status stub
+*/
+void caosVM::v_ORGI() {
+	VM_PARAM_INTEGER(value)
+	VM_PARAM_INTEGER(organ)
+	
+	Creature *c = getTargCreature();
+	caos_assert(organ >= 0 && organ < c->noOrgans());
+	Organ *o = c->getOrgan(organ);
+
+	switch (value) {
+		// TODO
+		default: throw creaturesException("Unknown value for ORGI");
+	}
+}
+
+/**
+ SOUL (command) part (integer) on (integer)
+ %status stub
+*/
+void caosVM::c_SOUL() {
+	VM_PARAM_INTEGER(on)
+	VM_PARAM_INTEGER(part)
+	caos_assert(part >= 0 && part <= 8);
+
+	Creature *c = getTargCreature();
+	// TODO
+}
+	
+/**
+ SOUL (integer) part (integer)
+ %status stub
+*/
+void caosVM::v_SOUL() {
+	VM_PARAM_INTEGER(part)
+	caos_assert(part >= 0 && part <= 8);
+		
+	Creature *c = getTargCreature();
+	result.setInt(1); // TODO
+}
+
+/**
+ DECN (integer)
+ %status stub
+*/
+void caosVM::v_DECN() {
+	Creature *c = getTargCreature();
+	result.setInt(0); // TODO
+}
+
+/**
+ ATTN (integer)
+ %status stub
+*/
+void caosVM::v_ATTN() {
+	Creature *c = getTargCreature();
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */
