@@ -164,6 +164,13 @@ extern "C" int main(int argc, char *argv[]) {
 		blkImage *test = m->backImage();
 		assert(test != 0);
 
+		unsigned int rmask, gmask, bmask;
+		if (test->is565()) {
+			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
+		} else {
+			rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
+		}
+	
 		assert(world.backsurfs.find(m->id) == world.backsurfs.end());
 
 		world.backsurfs[m->id] = new SDL_Surface *[test->numframes()];
@@ -173,7 +180,7 @@ extern "C" int main(int argc, char *argv[]) {
 														   test->height(i),
 														   16, // depth
 														   test->width(i) * 2, // pitch
-														   0xF800, 0x07E0, 0x001F, 0); // RGBA mask
+														   rmask, gmask, bmask, 0); // RGBA mask
 			assert(world.backsurfs[m->id][i] != 0);
 		}
 	}

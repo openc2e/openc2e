@@ -117,12 +117,18 @@ void SDLBackend::renderLine(unsigned int x1, unsigned int y1, unsigned int x2, u
 }
 
 void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y, bool trans, unsigned char transparency) {
+	unsigned int rmask, gmask, bmask;
+	if (image->is565()) {
+		rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
+	} else {
+		rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
+	}
 	SDL_Surface *surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
 												 image->width(frame),
 												 image->height(frame),
 												 16, // depth
 												 image->width(frame) * 2, // pitch
-												 0xF800, 0x07E0, 0x001F, 0); // RGBA mask
+												 rmask, gmask, bmask, 0); // RGBA mask
 	SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
 	if (trans) SDL_SetAlpha(surf, SDL_SRCALPHA, 255 - transparency);
 	SDL_Rect destrect;
