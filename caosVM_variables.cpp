@@ -889,17 +889,17 @@ void caosVM::c_NAMN() {
 	// TODO: we assume that NAME variables don't have an empty string
 	if (previous->hasString() && previous->getString().empty()) {
 		if (targ->name_variables.size() == 0)
-			result.setString("");
+			previous->setString("");
 		else
-			result = targ->name_variables.begin()->first;
+			*previous = targ->name_variables.begin()->first;
 	} else {
 		std::map<caosVar, caosVar, caosVarCompare>::iterator i = targ->name_variables.find(*previous);
 		caos_assert(i != targ->name_variables.end()); // TODO: this probably isn't correct behaviour
 		i++;
 		if (i == targ->name_variables.end())
-			result.setString("");
+			previous->setString("");
 		else
-			result = i->first;
+			*previous = i->first;
 	}
 }
 

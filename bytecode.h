@@ -77,8 +77,7 @@ class simpleCaosOp : public caosOp {
 					delta != ci->retc - ci->argc) {
 				std::ostringstream oss;
 				oss << "return count mismatch for op "
-					<< ci->fullname << ", delta=" << delta
-					<< std::endl;
+					<< ci->fullname << ", delta=" << delta;
 				throw caosException(oss.str());
 			}
 		}
