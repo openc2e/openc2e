@@ -217,4 +217,12 @@ void caosVM::v_RTIF() {
 	result.setString(buffer);
 }
 
+/**
+ RTIM (integer)
+ %status maybe
+*/
+void caosVM::v_RTIM() {
+	result.setInt(time(0));
+}
+
 /* vim: set noet: */

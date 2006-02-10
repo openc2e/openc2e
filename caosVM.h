@@ -547,6 +547,7 @@ public:
 	void c_WPAU();
 	void v_WPAU();
 	void v_RTIF();
+	void v_RTIM();
 
 	// resources
 	void v_PRAY_AGTI();
