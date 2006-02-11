@@ -360,6 +360,8 @@ void caosVM::v_PRAY_INJT() {
 		}
 		std::string script = k->second;
 
+		if (!install) continue;
+		
 		// Then, execute it.
 		caosVM *vm = world.getVM(NULL);
 		try {
