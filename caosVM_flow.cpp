@@ -293,15 +293,12 @@ void caosVM::c_CALL() {
 	shared_ptr<script> s = owner->findScript(script_no);
 	if (!s) return;
 	caosVM *newvm = world.getVM(owner);
-	
-	if (newvm->fireScript(s, false)) { // TODO: include OWNR? presumably not..
-		newvm->inst = inst;
-		newvm->_p_[0] = p1;
-		newvm->_p_[1] = p2;
-		owner->pushVM(newvm);
-	} else
-		world.freeVM(newvm);
 
+	assert(newvm->fireScript(s, false));
+	newvm->inst = inst;
+	newvm->_p_[0] = p1;
+	newvm->_p_[1] = p2;
+	owner->pushVM(newvm);
 	stop_loop = true;
 }
 
