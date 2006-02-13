@@ -275,12 +275,8 @@ class caosFACE : public caosOp {
 		caosFACE (enum ci_type t_) : t(t_) {}
 		void execute(caosVM *vm) {
 			switch (t) {
-				case CI_STRING:
-					vm->result.setString("STUB");
-					break;
-				default:
-					vm->result.setInt(-1);
-					break;
+				case CI_STRING: vm->s_FACE(); break;
+				default:        vm->v_FACE(); break;
 			}
 		}
 };

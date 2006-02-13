@@ -488,6 +488,8 @@ public:
 	void c_APPR();
 	void c_UNCS();
 	void v_UNCS();
+	void v_FACE();
+	void s_FACE();
 	void c_LIKE();
 	void v_LIMB();
 	void c_ORDR_SHOU();

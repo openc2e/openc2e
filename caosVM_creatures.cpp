@@ -430,6 +430,13 @@ void caosVM::v_UNCS() {
 
  Returns the front-facing pose for the current facial expression of the target creature.
 */
+void caosVM::v_FACE() {
+	result.setInt(-1);
+}
+
+void caosVM::s_FACE() {
+	result.setString("STUB");
+}
 
 /**
  LIKE (command) creature (agent)
