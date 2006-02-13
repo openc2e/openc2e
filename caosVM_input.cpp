@@ -100,7 +100,7 @@ void caosVM::v_IMSK() {
 }
 
 /**
- KEYD (integer) keycode (inteer)
+ KEYD (integer) keycode (integer)
  %status maybe
 
  Returns 1 if the specified key is held down, or 0 otherwise.

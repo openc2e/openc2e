@@ -5,6 +5,23 @@ use warnings;
 
 use YAML;
 
+my %tdisp = (
+	'float' => 'CI_NUMERIC',
+	'integer' => 'CI_NUMERIC',
+	'string' => 'CI_STRING',
+	'agent' => 'CI_AGENT',
+	'bytestring' => 'CI_BYTESTR',
+	'variable' => 'CI_VARIABLE',
+	'any' => 'CI_OTHER',
+	'anything' => 'CI_OTHER',
+	'condition' => '(err)',
+	'comparison' => '(err)',
+	'decimal' => 'CI_NUMERIC',
+	'decimal variable' => 'CI_OTHER',
+	'byte-string' => 'CI_BYTESTR',
+	'label' => '(err)',
+);
+
 # zero-tolerance policy
 $SIG{__WARN__} = sub { die $_[0] };
 
@@ -25,8 +42,9 @@ print <<ENDHEAD2;
 ENDHEAD2
 
 foreach my $variant (sort keys %{$data->{variants}}) {
-	print "static const cmdinfo v_", $variant, "_cmds[] = {\n";
-
+	my $defn = "static const cmdinfo v_". $variant. "_cmds[] = {\n";
+	my $argdef = '';
+	
 	my $idx = 0;
 	my $d = $data;
 	my $data = $d->{variants}{$variant};
@@ -53,22 +71,55 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			}
 			$delegate = qq{new $class(&$data->{$key}{implementation}, &v_${\$variant}_cmds[$idx])};
 		}
+
+		my $args;
+		if (defined $data->{$key}{arguments}) {
+			my $as = '';
+			foreach my $arg (@{$data->{$key}{arguments}}) {
+				my $t = 'CI_OTHER';
+				if (defined $tdisp{$arg->{type}}) {
+					$t = $tdisp{$arg->{type}};
+				} else {
+					if (!exists $tdisp{$arg->{type}}) {
+						print STDERR "Warning: unknown $arg->{type} in $key ($data->{$key}{filename})\n";
+						undef $tdisp{$arg->{type}}
+					}
+				}
+				if ($t eq '(err)') {
+					undef $as; 
+					last;
+				}
+				$as .= "$t, ";
+			}
+			if (defined $as) {
+				$as .= 'CI_END';
+				$args = "{ $as }";
+			}
+		}
+		my $argp = "NULL";
+		if (defined $args) {
+			print "static const enum ci_types a_",$variant,"_$key","[] = $args;\n";
+			$argp = "a_$variant"."_$key";
+		}
+
+		
 			
 		$data->{$key}{delegate} = $delegate;
-		print <<ENDDATA;
+		$defn .= <<ENDDATA;
 		{ // $idx
 			"$name",
 			"$fullname",
 			"$syntax $cedocs",
 			$argc,
-			$retc
+			$retc,
+			$argp
 		},
 ENDDATA
 		$idx++;
 	}
 
-	print <<ENDTAIL;
-	{ NULL, NULL, NULL, 0, 0 }
+	print $defn.<<ENDTAIL;
+	{ NULL, NULL, NULL, 0, 0, NULL }
 };
 
 static void registerAutoDelegates_$variant() {
