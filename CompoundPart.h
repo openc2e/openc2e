@@ -1,5 +1,5 @@
 /*
- *  CompoundAgent.h
+ *  CompoundPart.h
  *  openc2e
  *
  *  Created by Alyssa Milburn on Tue May 25 2004.
@@ -110,13 +110,6 @@ public:
 	ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, const bytestring &animhover, int msgid, int option);
 	void handleClick(float, float);
-};
-
-class CameraPart : public SpritePart {
-public:
-	CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
-			   unsigned int camerawidth, unsigned int cameraheight);
 };
 
 class DullPart : public SpritePart {

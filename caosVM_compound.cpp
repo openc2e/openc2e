@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "CompoundAgent.h"
+#include "CameraPart.h"
 #include "openc2e.h"
 #include "World.h"
 

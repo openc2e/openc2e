@@ -61,6 +61,16 @@ public:
 	virtual ~Camera() {}
 };
 
+class PartCamera : public Camera {
+protected:
+	class CameraPart *part;
+
+public:
+	PartCamera(class CameraPart *p) { part = p; }
+	unsigned int const getWidth();
+	unsigned int const getHeight();
+};
+
 class MainCamera : public Camera {
 protected:
 	SDLBackend *backend;

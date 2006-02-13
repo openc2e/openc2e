@@ -18,6 +18,7 @@
  */
 
 #include "Camera.h"
+#include "CameraPart.h"
 #include "World.h"
 
 Camera::Camera() {
@@ -116,5 +117,12 @@ unsigned int const MainCamera::getHeight() {
 		return getMetaRoom()->height();
 }
 
+unsigned int const PartCamera::getWidth() {
+	return part->cameraWidth();
+}
+
+unsigned int const PartCamera::getHeight() {
+	return part->cameraHeight();
+}
 
 /* vim: set noet: */

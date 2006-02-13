@@ -26,6 +26,9 @@
 #include <ostream>
 #include "AgentRef.h"
 
+#include <boost/weak_ptr.hpp>
+using boost::weak_ptr;
+
 //#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
 
@@ -114,6 +117,8 @@ public:
 	caosVar _p_[2]; // might want to add this onto the end of above map, if done
 	AgentRef targ, owner, _it_, from;
 	unsigned int part;
+	weak_ptr<class Camera> camera;
+	class Camera *getCamera();
 	
 	void resetScriptState(); // resets everything except OWNR
 

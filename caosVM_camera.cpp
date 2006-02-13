@@ -20,6 +20,13 @@
 #include "caosVM.h"
 #include "World.h"
 #include "CompoundAgent.h"
+#include "CameraPart.h"
+
+Camera *caosVM::getCamera() {
+	Camera *c = camera.lock().get();
+	if (!c) c = &world.camera;
+	return c;
+}
 
 /**
  VISI (integer) checkall (integer)
@@ -67,8 +74,8 @@ void caosVM::c_META() {
 	
 	int camerax = camera_x; if (camerax == -1) camerax = m->x();
 	int cameray = camera_y; if (cameray == -1) cameray = m->y();
-	
-	world.camera.goToMetaRoom(metaroom_id, camerax, cameray, (cameratransition)transition);
+
+	getCamera()->goToMetaRoom(metaroom_id, camerax, cameray, (cameratransition)transition);
 }
 
 /**
@@ -78,8 +85,8 @@ void caosVM::c_META() {
  Returns the metaroom the current camera is looking at.
 */
 void caosVM::v_META() {
-	if (world.camera.getMetaRoom())
-		result.setInt(world.camera.getMetaRoom()->id);
+	if (getCamera()->getMetaRoom())
+		result.setInt(getCamera()->getMetaRoom()->id);
 	else // this is a hack for empathic vendor.cos in DS, which uses META before it's setup
 		// TODO: work out what we should do instead of the hack
 		result.setInt(-1);
@@ -101,10 +108,10 @@ void caosVM::c_CMRT() {
 	caos_assert(targ);
 	
 	MetaRoom *r = world.map.metaRoomAt(targ->x, targ->y);
-	int xpos = targ->x - (world.camera.getWidth() / 2) - (targ->getWidth() / 2);
-	int ypos = targ->y - (world.camera.getHeight() / 2) - (targ->getHeight() / 2);
+	int xpos = targ->x - (getCamera()->getWidth() / 2) - (targ->getWidth() / 2);
+	int ypos = targ->y - (getCamera()->getHeight() / 2) - (targ->getHeight() / 2);
 	if (r)
-		world.camera.goToMetaRoom(r->id, xpos, ypos, (cameratransition)pan); // TODO: pan okay?
+		getCamera()->goToMetaRoom(r->id, xpos, ypos, (cameratransition)pan); // TODO: pan okay?
 }
 
 /**
@@ -121,8 +128,8 @@ void caosVM::c_CMRA() {
 	VM_PARAM_INTEGER(pan)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-
-	world.camera.moveTo(x, y, (panstyle)pan);
+	
+	getCamera()->moveTo(x, y, (panstyle)pan);
 }
 
 /**
@@ -139,8 +146,8 @@ void caosVM::c_CMRP() {
 	VM_PARAM_INTEGER(pan)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-
-	world.camera.moveTo(x - (world.camera.getWidth() / 2), y - (world.camera.getHeight() / 2), (panstyle)pan);
+	
+	getCamera()->moveTo(x - (getCamera()->getWidth() / 2), y - (getCamera()->getHeight() / 2), (panstyle)pan);
 }
 
 /**
@@ -151,8 +158,8 @@ void caosVM::c_CMRP() {
 */
 void caosVM::v_CMRX() {
 	VM_VERIFY_SIZE(0)
-
-	result.setInt(world.camera.getXCentre());
+	
+	result.setInt(getCamera()->getXCentre());
 }
 
 /**
@@ -164,7 +171,7 @@ void caosVM::v_CMRX() {
 void caosVM::v_CMRY() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(world.camera.getYCentre());
+	result.setInt(getCamera()->getYCentre());
 }
 
 /**
@@ -176,7 +183,7 @@ void caosVM::v_CMRY() {
 void caosVM::v_WNDW() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(world.camera.getWidth());
+	result.setInt(getCamera()->getWidth());
 }
 
 /**
@@ -188,7 +195,7 @@ void caosVM::v_WNDW() {
 void caosVM::v_WNDH() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(world.camera.getHeight());
+	result.setInt(getCamera()->getHeight());
 }
 
 /**
@@ -200,7 +207,7 @@ void caosVM::v_WNDH() {
 void caosVM::v_WNDB() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(world.camera.getY() + world.camera.getHeight());
+	result.setInt(getCamera()->getY() + getCamera()->getHeight());
 }
 
 /**
@@ -212,7 +219,7 @@ void caosVM::v_WNDB() {
 void caosVM::v_WNDL() {
 	VM_VERIFY_SIZE(0)
 
-	result.setInt(world.camera.getX());
+	result.setInt(getCamera()->getX());
 }
 
 /**
@@ -224,7 +231,7 @@ void caosVM::v_WNDL() {
 void caosVM::v_WNDR() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(world.camera.getX() + world.camera.getWidth());
+	result.setInt(getCamera()->getX() + getCamera()->getWidth());
 }
 
 /**
@@ -236,7 +243,7 @@ void caosVM::v_WNDR() {
 void caosVM::v_WNDT() {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(world.camera.getY());
+	result.setInt(getCamera()->getY());
 }
 
 /**
@@ -277,7 +284,7 @@ void caosVM::c_TRCK() {
 	VM_PARAM_INTEGER(xpercent)
 	VM_PARAM_VALIDAGENT(agent)
 
-	world.camera.trackAgent(agent, xpercent, ypercent, (trackstyle)style, (cameratransition)transition);
+	getCamera()->trackAgent(agent, xpercent, ypercent, (trackstyle)style, (cameratransition)transition);
 }
 
 /**
@@ -326,15 +333,20 @@ void caosVM::v_SNAX() {
 
 /**
  SCAM (command) agent (agent) part (integer)
- %status stub
+ %status maybe
 
  Sets which camera to use in camera macro commands.  If 'agent' and 
  'part' are NULL, the main camera will be used.
 */
 void caosVM::c_SCAM() {
 	VM_PARAM_INTEGER(part)
-	VM_PARAM_VALIDAGENT(agent)
+	VM_PARAM_AGENT(agent)
 
+	if (!agent) {
+		camera.reset();
+		return;
+	}
+	
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(agent);
 	caos_assert(a);
 	CompoundPart *p = a->part(part);
@@ -342,7 +354,7 @@ void caosVM::c_SCAM() {
 	CameraPart *c = dynamic_cast<CameraPart *>(p);
 	caos_assert(c);
 
-	// TODO
+	camera = c->getCamera();
 }
 
 /**

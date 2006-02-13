@@ -18,6 +18,8 @@
  */
 
 #include "CompoundPart.h"
+#include "CameraPart.h"
+#include "Camera.h"
 #include "World.h"
 #include "c16Image.h"
 #include "SDLBackend.h"
@@ -528,9 +530,13 @@ void SpritePart::tick() {
 }
 
 CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-		unsigned int _z, unsigned int viewwidth, unsigned int viewheight, unsigned int camerawidth, unsigned int cameraheight)
+		unsigned int _z, unsigned int view_width, unsigned int view_height, unsigned int camera_width, unsigned int camera_height)
 		: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
-	// TODO: set viewwidth/viewheight and use for getWidth/getHeight, store camerawidth/cameraheight
+	viewwidth = view_width;
+	viewheight = view_height;
+	camerawidth = camera_width;
+	cameraheight = camera_height;
+	camera = shared_ptr<Camera>(new PartCamera(this));
 }
 
 GraphPart::GraphPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
