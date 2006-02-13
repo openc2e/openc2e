@@ -232,10 +232,14 @@ void Agent::positionAudio(SoundSlot *slot) {
 
 void Agent::physicsTick() {
 	falling = false;
+
+	float destx = x + velx.floatValue;
+	float desty = y + vely.floatValue;
 	if (sufferphysics) {
-		float newvely = vely.floatValue + accg;
-		float destx = x + velx.floatValue;
-		float desty = y + newvely;
+		desty += accg;
+	}
+	
+	if (suffercollisions) {
 		//std::cout << x << ", " << y << ": " << destx << ", " << desty << "! " << accg << "\n";
 		Room *r1 = world.map.roomAt((unsigned int)x, (unsigned int)y);
 		if (!r1) {
@@ -405,7 +409,7 @@ void Agent::physicsTick() {
 				moved = true;
 			}
 			
-			vely.setFloat(newvely);
+			if (sufferphysics) vely.setFloat(vely.floatValue + accg);
 			
 			if (moved) { // if we did actually try and go somewhere
 				moveTo(ix, iy);
@@ -419,13 +423,8 @@ void Agent::physicsTick() {
 			}
 		}
 	} else {
-		float newx = x, newy = y;
-		if (vely.hasDecimal())
-			newy = y + vely.getFloat();
-		if (velx.hasDecimal())
-			newx = x + velx.getFloat();
 		if (vely.hasDecimal() || velx.hasDecimal())
-			moveTo(newx, newy);
+			moveTo(destx, desty);
 	}
 }
 
