@@ -268,6 +268,23 @@ class caosAssert : public caosOp {
 		}
 };
 
+class caosFACE : public caosOp {
+	protected:
+		const enum ci_type t;
+	public:
+		caosFACE (enum ci_type t_) : t(t_) {}
+		void execute(caosVM *vm) {
+			switch (t) {
+				case CI_STRING:
+					vm->result.setString("STUB");
+					break;
+				default:
+					vm->result.setInt(-1);
+					break;
+			}
+		}
+};
+
 #endif
 
 /* vim: set noet: */

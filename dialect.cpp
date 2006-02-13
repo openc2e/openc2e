@@ -93,8 +93,11 @@ void parseCondition(caosScript *s, int success, int failure) {
 
 void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {
 	int argc = cd->argc;
-	while(argc--)
+	for (int i = 0; i < argc; i++) {
+		if (cd->argtypes)
+			s->v->exp_dialect->set_expect(cd->argtypes[i]);
 		s->v->exp_dialect->doParse(s);
+	}
 	s->current->thread(new simpleCaosOp(handler, cd));
 }
 
@@ -117,7 +120,7 @@ void Dialect::handleToken(caosScript *s, token *t) {
 	if (delegates.find(word) == delegates.end())
 		throw parseException(std::string("no delegate for ") + t->dump());
 	parseDelegate &p = *delegates[word];
-	p(s, this);
+	p(s, this, expect);
 }
 
 class ConstOp : public caosOp {
@@ -275,7 +278,6 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 	Dialect::handleToken(s, t);
 }
 
-	
 void registerDelegates() {
 	registerAutoDelegates();
 }

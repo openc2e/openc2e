@@ -426,14 +426,10 @@ void caosVM::v_UNCS() {
 /**
  FACE (integer)
  %status stub
+ %pragma parser new FACEhelper()
 
  Returns the front-facing pose for the current facial expression of the target creature.
 */
-void caosVM::v_FACE() {
-	Creature *c = getTargCreature();
-
-	result.setInt(0); // TODO
-}
 
 /**
  LIKE (command) creature (agent)

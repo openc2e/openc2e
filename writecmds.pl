@@ -98,7 +98,7 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 		}
 		my $argp = "NULL";
 		if (defined $args) {
-			print "static const enum ci_types a_",$variant,"_$key","[] = $args;\n";
+			print "static const enum ci_type a_",$variant,"_$key","[] = $args;\n";
 			$argp = "a_$variant"."_$key";
 		}
 

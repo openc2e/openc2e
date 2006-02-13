@@ -9,7 +9,12 @@
 
 class parseDelegate {
 	public:
-		virtual void operator()(class caosScript *s, class Dialect *curD) = 0;
+		virtual void operator()(class caosScript *s, class Dialect *curD) {
+			(*this)(s, curD, CI_OTHER);
+		}
+		virtual void operator()(class caosScript *s, class Dialect *curD, enum ci_type expect_type) {
+			(*this)(s, curD);
+		}
 		virtual ~parseDelegate() {}
 };
 
@@ -24,6 +29,10 @@ class DefaultParser : public parseDelegate {
 };
 
 class Dialect {
+	protected:
+		enum ci_type expect; // THIS IS A HORRIBLE HACK
+		                     // THANKS A LOT CL
+							 // YOU RUINED MY BEAUTIFUL PARSER DESIGN
 	public:
 		bool stop;
 
@@ -37,6 +46,7 @@ class Dialect {
 		virtual void handleToken(class caosScript *s, token *t);
 		virtual void eof() {};
 		virtual ~Dialect() {};
+		void set_expect(enum ci_type e) { expect = e; }
 };
 
 struct Variant {
@@ -238,11 +248,20 @@ class ENUMhelper : public parseDelegate {
 		}
 };
 class ExprDialect : public OneShotDialect {
+	protected:
 	public:
 		void handleToken(caosScript *s, token *t);
 };
 
 void registerDelegates();
+
+class FACEhelper : public parseDelegate {
+	/* I hate you, CL --bd */
+	public:
+		void operator() (class caosScript *s, class Dialect *curD, enum ci_type t) {
+			s->current->thread(new caosFACE(t));
+		}
+};
 
 #endif
 

@@ -1,7 +1,7 @@
 #ifndef CMDDATA_H
 #define CMDDATA_H 1
 
-enum ci_types {
+enum ci_type {
 	CI_OTHER = -1,
 	CI_END = 0,
 	CI_NUMERIC,
@@ -17,7 +17,7 @@ struct cmdinfo {
 	const char *docs;
 	int argc;
 	int retc;
-	const enum ci_types *argtypes;
+	const enum ci_type *argtypes;
 };
 
 void registerAutoDelegates();
