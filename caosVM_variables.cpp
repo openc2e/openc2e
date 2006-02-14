@@ -28,6 +28,10 @@
 #include <algorithm> // transform
 #include <boost/format.hpp>
 
+#include "Vehicle.h"
+#include "PointerAgent.h"
+#include "Creature.h"
+
 /**
  VAxx (variable)
  %pragma noparse
@@ -132,9 +136,26 @@ void caosVM::v_TYPE() {
 	else if (value.hasString())
 		result.setInt(2);
 	else if (value.hasAgent()) {
-		// TODO
-		result.setInt(3);
-	}
+		Agent *a = value.getAgent();
+		if (a == 0)
+			result.setInt(-1);
+		else if (typeid(*a) == typeid(SimpleAgent))
+			result.setInt(3);
+		else if (typeid(*a) == typeid(PointerAgent))
+			result.setInt(4);
+		else if (typeid(*a) == typeid(CompoundAgent))
+			result.setInt(5);
+		else if (typeid(*a) == typeid(Vehicle))
+			result.setInt(6);
+		else {
+			Creature *c = dynamic_cast<Creature *>(a);
+			if (c)
+				result.setInt(7);
+			else
+				result.setInt(-2); // unknown agent
+		}
+	} else
+		throw creaturesException("caosVar confused us terribly in TYPE");
 }
 
 /**

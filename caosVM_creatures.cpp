@@ -422,7 +422,6 @@ void caosVM::v_UNCS() {
 	result.setInt(0); // TODO
 }
 
-/* TODO: there's a string variation of this, which we have no way of handling right now. fixit! */
 /**
  FACE (integer)
  %status stub
@@ -431,11 +430,21 @@ void caosVM::v_UNCS() {
  Returns the front-facing pose for the current facial expression of the target creature.
 */
 void caosVM::v_FACE() {
+	Creature *c = getTargCreature();
+	
 	result.setInt(-1);
 }
 
+/* // TODO: doc parser needs fixing so we can include this without a conflict
+ FACE (string)
+ %status stub
+
+ Returns the current sprite filename for the face of the target creature.
+*/
 void caosVM::s_FACE() {
-	result.setString("STUB");
+	Creature *c = getTargCreature();
+	
+	result.setString("");
 }
 
 /**
