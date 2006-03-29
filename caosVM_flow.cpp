@@ -151,12 +151,11 @@ void caosVM::c_RETN() {
 */
 void caosVM::c_ENUM() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	caosVar nullv;
-	nullv.reset();
+	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
 	for (std::list<Agent *>::iterator i
@@ -183,12 +182,13 @@ void caosVM::c_ENUM() {
 */
 void caosVM::c_ESEE() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 	
-	caosVar nullv;
-	nullv.reset();
+	caos_assert(owner);
+	
+	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
 	for (std::list<Agent *>::iterator i
@@ -216,20 +216,43 @@ void caosVM::c_ESEE() {
  ETCH (command) family (integer) genus (integer) species (integer)
  %pragma parserclass ENUMhelper
  %pragma retc -1
- %status stub
+ %status maybe
 
  Similar to ENUM, but iterates through the agents OWNR is touching.
 */
 void caosVM::c_ETCH() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	// TODO: should probably implement this (ESEE)
+	caos_assert(owner);
 	
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
+	
+	for (std::list<Agent *>::iterator i
+			= world.agents.begin(); i != world.agents.end(); i++) {
+		Agent *a = (*i);
+		if (species && species != a->species) continue;
+		if (genus && genus != a->genus) continue;
+		if (family && family != a->family) continue;
+
+		if (a->x < owner->x) {
+			if ((a->x + a->getWidth()) < owner->x) continue;
+		} else {
+			if ((owner->x + owner->getWidth()) < a->x) continue;
+		}
+		
+		if (a->y < owner->y) {
+			if ((a->y + a->getHeight()) < owner->y) continue;
+		} else {
+			if ((owner->y + owner->getHeight()) < a->y) continue;
+		}
+
+		caosVar v; v.setAgent(a);
+		valueStack.push_back(v);
+	}
 }
 
 /**
@@ -242,9 +265,9 @@ void caosVM::c_ETCH() {
 */
 void caosVM::c_EPAS() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species) assert(species >= 0); assert(species <= 65535);
-	VM_PARAM_INTEGER(genus) assert(genus >= 0); assert(genus <= 255);
-	VM_PARAM_INTEGER(family) assert(family >= 0); assert(family <= 255);
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	// TODO: should probably implement this (ESEE)
 
