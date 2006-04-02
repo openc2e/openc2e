@@ -75,6 +75,10 @@ void Agent::moveTo(float _x, float _y) {
 		assert(*i);
 		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
 	}
+
+	if (carrying) {
+		// TODO: move carried object
+	}
 }
 
 void Agent::floatTo(AgentRef a) {
@@ -150,10 +154,13 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 			break;
 		case 4: // pickup
 			if (c && !cr_can_pickup) return false;
-			// TODO: handle pickup
+			if (!from) break;
+			from->carry(this); // TODO: correct behaviour?
 			break;
 		case 5: // drop
-			// TODO: handle drop
+			if (!from) break;
+			if (from != carriedby) break;
+			from->dropCarried(); // TODO: correct?
 			break;
 		case 12: // eat
 			if (c && !cr_can_eat) return false;
@@ -494,6 +501,7 @@ Agent::~Agent() {
 void Agent::kill() {
 	assert(!dying);
 	if (floatable) floatRelease();
+	dropCarried();
 	dying = true; // what a world, what a world...
 	if (vm) {
 		vm->stop();
@@ -511,6 +519,16 @@ void Agent::kill() {
 void Agent::zotrefs() {
 	while (self.next != &self)
 		self.next->clear();
+}
+
+unsigned int Agent::getZOrder() const {
+	if (carriedby) {
+		// TODO: check for overflow
+		// TODO: is adding our own zorder here correct behaviour? someone should check
+		return carriedby->getZOrder() + zorder;
+	} else {
+		return zorder;
+	}
 }
 
 void Agent::setZOrder(unsigned int z) {
@@ -538,7 +556,7 @@ std::string Agent::identify() const {
 }
 
 bool agentzorder::operator ()(const Agent *s1, const Agent *s2) const {
-	return s1->zorder < s2->zorder;
+	return s1->getZOrder() < s2->getZOrder();
 }
 
 void Agent::pushVM(caosVM *newvm) {
@@ -589,5 +607,29 @@ unsigned int Agent::getAttributes() {
 	return a + (presence ? 2048: 0);
 }
 
+void Agent::carry(AgentRef a) {
+	// TODO: check for infinite loops (eg, us carrying an agent which is carrying us) :)
+
+	if (carrying)
+		dropCarried();
+
+	carrying = a;
+	if (!carrying) return;
+
+	a->carriedby = AgentRef(this);
+	// TODO: move carrying agent to the right position
+	// TODO: this doesn't reorder children or anything..
+	carrying->setZOrder(carrying->zorder);
+}
+
+void Agent::dropCarried() {
+	if (!carrying) return;
+	
+	carrying->carriedby = AgentRef(0);
+	// TODO: this doesn't reorder children or anything..
+	carrying->setZOrder(carrying->zorder);
+	
+	carrying = AgentRef(0);
+}
 
 /* vim: set noet: */

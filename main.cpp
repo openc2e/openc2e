@@ -157,8 +157,6 @@ extern "C" int main(int argc, char *argv[]) {
 		f << boost::str(boost::format("%d") % listenport);
 	}
 
-	AgentRef handAgent;
-
 	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
 		MetaRoom *m = world.map.getArrayMetaRoom(j);
 		blkImage *test = m->backImage();
@@ -205,8 +203,8 @@ extern "C" int main(int argc, char *argv[]) {
 			tickdata = world.backend.ticks();
 			
 			world.tick();
-			if (handAgent) // TODO: do this in world.tick()
-				handAgent->moveTo(world.hand()->x + 2, world.hand()->y + 2);
+			if (world.hand()->carrying) // TODO: do this in world.tick()
+				world.hand()->carrying->moveTo(world.hand()->x + 2, world.hand()->y + 2);
 			world.drawWorld();
 			
 			ticktime[ticktimeptr] = world.backend.ticks() - tickdata;
@@ -322,16 +320,19 @@ extern "C" int main(int argc, char *argv[]) {
 							world.hand()->queueScript(116, 0); // Pointer Clicked Background
 					} else if (event.button.button == SDL_BUTTON_RIGHT) {
 						if (world.paused) break; // TODO: wrong?
-						// for now, hack!
-						if (handAgent) {
-							handAgent->queueScript(5, world.hand()); // drop
-							world.hand()->firePointerScript(105, handAgent); // Pointer Drop
-							handAgent = 0;
+						
+						// picking up and dropping are implictly handled by the scripts (well, messages) 4 and 5	
+						// TODO: check if this is correct behaviour, one issue is that this isn't instant, another
+						// is the messages might only be fired in c2e when you use MESG WRIT, in which case we'll
+						// need to manually set world.hand()->carrying to NULL and a here, respectively - fuzzie
+						if (world.hand()->carrying) {
+							world.hand()->carrying->queueScript(5, world.hand()); // drop
+							world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
 						} else {
-							handAgent = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false, true);
-							if (handAgent) {
-								handAgent->queueScript(4, world.hand()); // pickup
-								world.hand()->firePointerScript(104, handAgent); // Pointer Pickup
+							Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false, true);
+							if (a) {
+								a->queueScript(4, world.hand()); // pickup
+								world.hand()->firePointerScript(104, a); // Pointer Pickup
 							}
 						}
 					} else if (event.button.button == SDL_BUTTON_MIDDLE) {

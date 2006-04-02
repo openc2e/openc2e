@@ -24,7 +24,7 @@
 #include "caosVM.h"
 
 // TODO: change imagecount?
-PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, UINT_MAX, spritefile, 0, 0) {
+PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = true;
 
@@ -35,6 +35,7 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, UINT_M
 
 // TODO: this should have a queueScript equiv too
 void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
+	assert(src); // TODO: I /think/ this should only be called by the engine..
 	shared_ptr<script> s = src->findScript(event);
 	if (!s) return;
 	if (!vm) vm = world.getVM(this);

@@ -493,7 +493,7 @@ void caosVM::v_BHVR() {
 
 /**
  CARR (agent)
- %status stub
+ %status maybe
 
  Returns the agent that is carrying the TARG agent.  If TARG is not being carried, returns 
  NULL. 
@@ -501,8 +501,8 @@ void caosVM::v_BHVR() {
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
 	caos_assert(targ);
-	// TODO
-	result.setAgent(0);
+	
+	result.setAgent(targ->carriedby);
 }
 
 /**

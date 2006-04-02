@@ -74,6 +74,9 @@ protected:
 	bool fireScript(unsigned short event, Agent *from = 0);
 
 public:
+	AgentRef carrying;
+	AgentRef carriedby;
+	
 	inline bool isDying() const {
 		return dying;
 	}
@@ -134,6 +137,9 @@ public:
 	void floatTo(AgentRef);
 	void floatTo(float x, float y);
 
+	void dropCarried();
+	void carry(AgentRef);
+
 	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
 	void moveTo(float, float);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
@@ -154,7 +160,7 @@ public:
 	void stopScript();
 
 	virtual void setZOrder(unsigned int plane); // should be overridden!
-	virtual unsigned int getZOrder() const { return zorder; }
+	virtual unsigned int getZOrder() const;
 
 	class shared_ptr<script> findScript(unsigned short event);
 	
