@@ -737,7 +737,7 @@ void caosVM::c_OVER() {
 
 /**
  PUHL (command) pose (integer) x (integer) y (integer)
- %status stub
+ %status maybe
 
  Sets relative x/y coordinates for TARG's pickup point.
  Pose is -1 for all poses, or a pose relative to the first image specified in NEW: (not BASE).
@@ -749,12 +749,25 @@ void caosVM::c_PUHL() {
 	VM_PARAM_INTEGER(pose)
 
 	caos_assert(targ);
-	// TODO
+
+	if (pose == -1) {
+		SpritePart *s = dynamic_cast<SpritePart *>(targ->part(0));
+		if (s) {
+			for (unsigned int i = 0; i < (s->getFirstImg() + s->getSprite()->numframes()); i++) {
+				targ->carried_points[i] = std::pair<int, int>(x, y);
+			}
+		} else {
+			// ..Assume a single pose for non-sprite parts.
+			targ->carried_points[0] = std::pair<int, int>(x, y);
+		}
+	} else {
+		targ->carried_points[pose] = std::pair<int, int>(x, y);
+	}
 }
 
 /**
  PUHL (integer) pose (integer) x_or_y (integer)
- %status stub
+ %status maybe
 
  Returns the coordinate for TARG's pickup point. x_or_y should be 1 for x, or 2 for y.
 */
@@ -763,7 +776,14 @@ void caosVM::v_PUHL() {
 	VM_PARAM_INTEGER(pose)
 
 	caos_assert(targ);
-	result.setInt(0); // TODO
+
+	// TODO: this creates the variable if it doesn't exist yet, correct behaviour?
+	if (x_or_y == 1) {
+		result.setInt(targ->carried_points[pose].first);
+	} else {
+		caos_assert(x_or_y == 2);
+		result.setInt(targ->carried_points[pose].second);
+	}
 }
 
 /**
@@ -994,7 +1014,7 @@ void caosVM::v_TICK() {
 
 /**
  PUPT (command) pose (integer) x (integer) y (integer)
- %status stub
+ %status maybe
 
  Sets relative x/y coordinates for the location in the world where the TARG agent picks up 
  objects.  The pose is relative to the first image set in NEW: (not BASE).
@@ -1005,7 +1025,22 @@ void caosVM::c_PUPT() {
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(pose)
 
-	// TODO
+	caos_assert(targ);
+	
+	// this is basically a copy of PUHL, change that first
+	if (pose == -1) {
+		SpritePart *s = dynamic_cast<SpritePart *>(targ->part(0));
+		if (s) {
+			for (unsigned int i = 0; i < (s->getFirstImg() + s->getSprite()->numframes()); i++) {
+				targ->carry_points[i] = std::pair<int, int>(x, y);
+			}
+		} else {
+			// ..Assume a single pose for non-sprite parts.
+			targ->carry_points[0] = std::pair<int, int>(x, y);
+		}
+	} else {
+		targ->carry_points[pose] = std::pair<int, int>(x, y);
+	}
 }
 
 /**

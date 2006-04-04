@@ -65,10 +65,13 @@ void Agent::zotstack() {
 	vmstack.clear();
 }
 
-void Agent::moveTo(float _x, float _y) {
+void Agent::moveTo(float _x, float _y, bool force) {
+	if (carriedby && !force) return;
+	
+	// TODO: what if we move while being carried? doomy explosions ensue, that's what!
 	float xoffset = _x - x;
 	float yoffset = _y - y;		
-	
+
 	x = _x; y = _y;
 
 	for (std::vector<AgentRef>::iterator i = floated.begin(); i != floated.end(); i++) {
@@ -76,9 +79,7 @@ void Agent::moveTo(float _x, float _y) {
 		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
 	}
 
-	if (carrying) {
-		// TODO: move carried object
-	}
+	adjustCarried();
 }
 
 void Agent::floatTo(AgentRef a) {
@@ -154,12 +155,17 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 			break;
 		case 4: // pickup
 			if (c && !cr_can_pickup) return false;
-			if (!from) break;
+			if (!from) return false;
+			if (from == world.hand()) {
+				if (!mouseable) return false;
+			} else if (!c) {
+				if (!carryable) return false;
+			}
 			from->carry(this); // TODO: correct behaviour?
 			break;
 		case 5: // drop
-			if (!from) break;
-			if (from != carriedby) break;
+			if (!from) return false;
+			if (from != carriedby) return false;
 			from->dropCarried(); // TODO: correct?
 			break;
 		case 12: // eat
@@ -239,6 +245,8 @@ void Agent::positionAudio(SoundSlot *slot) {
 
 void Agent::physicsTick() {
 	falling = false;
+
+	if (carriedby) return; // We don't move when carried, so what's the point?
 
 	float destx = x + velx.floatValue;
 	float desty = y + vely.floatValue;
@@ -620,6 +628,7 @@ void Agent::carry(AgentRef a) {
 	// TODO: move carrying agent to the right position
 	// TODO: this doesn't reorder children or anything..
 	carrying->setZOrder(carrying->zorder);
+	adjustCarried();
 }
 
 void Agent::dropCarried() {
@@ -630,6 +639,37 @@ void Agent::dropCarried() {
 	carrying->setZOrder(carrying->zorder);
 	
 	carrying = AgentRef(0);
+}
+
+void Agent::adjustCarried() {
+	if (!carrying) return;
+
+	unsigned int ourpose = 0, theirpose = 0;
+
+	SpritePart *s;
+	if (s = dynamic_cast<SpritePart *>(part(0)))
+		ourpose = s->getBase() + s->getPose();
+	if (s = dynamic_cast<SpritePart *>(carrying->part(0)))
+		theirpose = s->getBase() + s->getPose();
+
+	int xoffset = 0, yoffset = 0;
+	
+	std::map<unsigned int, std::pair<int, int> >::iterator i = carry_points.find(ourpose);
+	if (i != carry_points.end()) {
+		xoffset += i->second.first;
+		yoffset += i->second.second;
+	}
+
+	i = carrying->carried_points.find(theirpose);
+	if (i != carrying->carried_points.end()) {
+		xoffset -= i->second.first;
+		yoffset -= i->second.second;
+	} else if (s) {
+		// c2e seems to default to (width / 2, 0)? don't know .. TODO look into this more
+		xoffset -= s->getSprite()->width(s->getCurrentSprite()) / 2;
+	}
+
+	carrying->moveTo(x + xoffset, y + yoffset, true);
 }
 
 /* vim: set noet: */

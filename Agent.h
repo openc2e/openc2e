@@ -73,6 +73,8 @@ protected:
 	void vmTick();
 	bool fireScript(unsigned short event, Agent *from = 0);
 
+	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
+
 public:
 	AgentRef carrying;
 	AgentRef carriedby;
@@ -139,9 +141,10 @@ public:
 
 	void dropCarried();
 	void carry(AgentRef);
+	void adjustCarried();
 
 	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
-	void moveTo(float, float);
+	void moveTo(float, float, bool force = false);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	void pushVM(caosVM *newvm);
 	virtual void handleClick(float, float);

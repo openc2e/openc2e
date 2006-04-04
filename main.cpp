@@ -203,8 +203,8 @@ extern "C" int main(int argc, char *argv[]) {
 			tickdata = world.backend.ticks();
 			
 			world.tick();
-			if (world.hand()->carrying) // TODO: do this in world.tick()
-				world.hand()->carrying->moveTo(world.hand()->x + 2, world.hand()->y + 2);
+			//if (world.hand()->carrying) // TODO: do this in world.tick()
+			//	world.hand()->carrying->moveTo(world.hand()->x + 2, world.hand()->y + 2);
 			world.drawWorld();
 			
 			ticktime[ticktimeptr] = world.backend.ticks() - tickdata;
