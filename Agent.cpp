@@ -248,8 +248,8 @@ void Agent::physicsTick() {
 
 	if (carriedby) return; // We don't move when carried, so what's the point?
 
-	float destx = x + velx.floatValue;
-	float desty = y + vely.floatValue;
+	float destx = x + velx.getFloat();
+	float desty = y + vely.getFloat();
 	if (sufferphysics) {
 		desty += accg;
 	}
@@ -424,7 +424,7 @@ void Agent::physicsTick() {
 				moved = true;
 			}
 			
-			if (sufferphysics) vely.setFloat(vely.floatValue + accg);
+			if (sufferphysics) vely.setFloat(vely.getFloat() + accg);
 			
 			if (moved) { // if we did actually try and go somewhere
 				moveTo(ix, iy);

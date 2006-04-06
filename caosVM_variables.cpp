@@ -60,7 +60,7 @@ void caosVM::c_ADDS() {
 	VM_PARAM_VARIABLE(variable)
 
 	assert(variable->hasString());
-	variable->setString(variable->stringValue + value);
+	variable->setString(variable->getString() + value);
 }
 
 /**
@@ -89,9 +89,9 @@ void caosVM::c_SETV() {
 	VM_PARAM_VARIABLE(var)
 	var->reset();
 	if (value.hasFloat()) {
-		var->setFloat(value.floatValue);
+		var->setFloat(value.getFloat());
 	} else { // VM_PARAM_DECIMAL guarantees us float || int
-		var->setInt(value.intValue);
+		var->setInt(value.getInt());
 	}
 }
 
@@ -169,7 +169,7 @@ void caosVM::c_MODV() {
 	VM_PARAM_INTEGER(mod)
 	VM_PARAM_VARIABLE(v) // integer
 	if (!v->hasInt()) throw badParamException();
-	v->setInt(v->intValue % mod);
+	v->setInt(v->getInt() % mod);
 }
 
 /**
@@ -183,7 +183,7 @@ void caosVM::c_ANDV() {
 	VM_PARAM_INTEGER(andv)
 	VM_PARAM_VARIABLE(v)
 	if (!v->hasInt()) throw badParamException();
-	v->setInt(v->intValue & andv);
+	v->setInt(v->getInt() & andv);
 }
 
 /**
@@ -197,7 +197,7 @@ void caosVM::c_ORRV() {
 	VM_PARAM_INTEGER(orv)
 	VM_PARAM_VARIABLE(v)
 	if (!v->hasInt()) throw badParamException();
-	v->setInt(v->intValue | orv);
+	v->setInt(v->getInt() | orv);
 }
 
 
@@ -212,9 +212,9 @@ void caosVM::c_ADDV() {
 	VM_PARAM_DECIMAL(add)
 	VM_PARAM_VARIABLE(v)
 	if (v->hasFloat())
-		v->setFloat(v->floatValue + (add.hasFloat() ? add.floatValue : add.intValue));
+		v->setFloat(v->getFloat() + (add.hasFloat() ? add.getFloat() : add.getInt()));
 	else if (v->hasInt())
-		v->setInt((int)(v->intValue + (add.hasFloat() ? add.floatValue : add.intValue)));
+		v->setInt((int)(v->getInt() + (add.hasFloat() ? add.getFloat() : add.getInt())));
 	else
 		throw badParamException();
 }
@@ -230,9 +230,9 @@ void caosVM::c_SUBV() {
 	VM_PARAM_DECIMAL(sub)
 	VM_PARAM_VARIABLE(v)
 	if (v->hasFloat())
-		v->setFloat(v->floatValue - (sub.hasFloat() ? sub.floatValue : sub.intValue));
+		v->setFloat(v->getFloat() - (sub.hasFloat() ? sub.getFloat() : sub.getInt()));
 	else if (v->hasInt())
-		v->setInt((int)(v->intValue - (sub.hasFloat() ? sub.floatValue : sub.intValue)));
+		v->setInt((int)(v->getInt() - (sub.hasFloat() ? sub.getFloat() : sub.getInt())));
 	else
 		throw badParamException();
 }
@@ -247,9 +247,9 @@ void caosVM::c_NEGV() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VARIABLE(v)
 	if (v->hasFloat())
-		v->setFloat(-v->floatValue);
+		v->setFloat(-v->getFloat());
 	else if (v->hasInt())
-		v->setInt(-v->intValue);
+		v->setInt(-v->getInt());
 	else
 		throw badParamException();
 }
@@ -266,11 +266,11 @@ void caosVM::c_DIVV() {
 	VM_PARAM_VARIABLE(v)
 	if (v->hasInt() && div.hasInt()) {
 		// integer division
-		v->setInt(v->intValue / div.intValue);
+		v->setInt(v->getInt() / div.getInt());
 	} else if (v->hasInt() || v->hasFloat()) {
 		// floating point division
-		v->setFloat((v->hasFloat() ? v->floatValue : v->intValue) /
-					(div.hasFloat() ? div.floatValue : div.intValue));
+		v->setFloat((v->hasFloat() ? v->getFloat() : v->getInt()) /
+					(div.hasFloat() ? div.getFloat() : div.getInt()));
 	} else
 		throw badParamException();
 }
@@ -286,9 +286,9 @@ void caosVM::c_MULV() {
 	VM_PARAM_DECIMAL(mul)
 	VM_PARAM_VARIABLE(v)
 	if (v->hasFloat())
-		v->setFloat(v->floatValue * (mul.hasFloat() ? mul.floatValue : mul.intValue));
+		v->setFloat(v->getFloat() * (mul.hasFloat() ? mul.getFloat() : mul.getInt()));
 	else if (v->hasInt())
-		v->setInt((int)(v->intValue * (mul.hasFloat() ? mul.floatValue : mul.intValue)));
+		v->setInt((int)(v->getInt() * (mul.hasFloat() ? mul.getFloat() : mul.getInt())));
 	else
 		throw badParamException();
 }
@@ -366,8 +366,8 @@ void caosVM::c_ABSV() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VARIABLE(var)
 	
-	if (var->hasFloat()) var->setFloat(fabs(var->floatValue));
-	else if (var->hasInt()) var->setInt(abs(var->intValue));
+	if (var->hasFloat()) var->setFloat(fabs(var->getFloat()));
+	else if (var->hasInt()) var->setInt(abs(var->getInt()));
 	else throw badParamException();
 }
 
@@ -533,10 +533,10 @@ void caosVM::v_VTOS() {
 	VM_PARAM_DECIMAL(value)
 
 	if (value.hasInt()) {
-		result.setString(boost::str(boost::format("%i") % value.intValue));
+		result.setString(boost::str(boost::format("%i") % value.getInt()));
 	} else {
 		// TODO: this format isn't right (see OUTS also)
-		result.setString(boost::str(boost::format("%f") % value.floatValue));
+		result.setString(boost::str(boost::format("%f") % value.getFloat()));
 	}
 }
 

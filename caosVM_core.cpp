@@ -77,9 +77,9 @@ void caosVM::c_OUTV() {
 	VM_PARAM_DECIMAL(val)
 
 	if (val.hasFloat()) {
-		*outputstream << boost::format("%0.06f") % val.floatValue;
+		*outputstream << boost::format("%0.06f") % val.getFloat();
 	} else {
-		*outputstream << val.intValue;
+		*outputstream << val.getInt();
 	}
 }
 

@@ -56,9 +56,9 @@ void caosVM::c_DBG_OUTV() {
 	VM_PARAM_DECIMAL(val)
 
 	if (val.hasFloat()) {
-		cout << boost::format("%0.06f") % val.floatValue;
+		cout << boost::format("%0.06f") % val.getFloat();
 	} else {
-		cout << val.intValue;
+		cout << val.getInt();
 	}
 
 	cout << std::endl;

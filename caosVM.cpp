@@ -47,7 +47,7 @@ caosVM::caosVM(const AgentRef &o)
 	trace = false;
 }
 
-inline bool caosVM::isBlocking() {
+bool caosVM::isBlocking() {
 	if (!blocking) return false;
 	bool bl = (*blocking)();
 	if (!bl) {
