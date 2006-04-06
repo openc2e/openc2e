@@ -12,6 +12,7 @@
 
 #if CV
 #include "caosVar.h"
+#include "ser/caosVar.h"
 #endif
 
 class foo {

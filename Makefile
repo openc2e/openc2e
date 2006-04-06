@@ -8,7 +8,7 @@ EVERYTHING = $(SOURCES) $(HEADERS)
 SOURCEDEPS = $(patsubst %.cpp,.deps/%.dpp,$(CXXFILES)) \
 			 $(patsubst %.c,.deps/%.d,$(CFILES))
 
-OPENC2E = \
+OPENC2E_CORE = \
 	Agent.o \
 	AgentRef.o \
 	attFile.o \
@@ -56,7 +56,6 @@ OPENC2E = \
 	lex.mng.o \
 	lexutil.o \
 	lex.yy.o \
-	main.o \
 	Map.o \
 	MetaRoom.o \
 	mmapifstream.o \
@@ -77,6 +76,8 @@ OPENC2E = \
 	streamutils.o \
 	Vehicle.o \
 	World.o
+
+OPENC2E = $(OPENC2E_CORE) main.o
 
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE
 XLDFLAGS=$(LDFLAGS) -lboost_program_options -lboost_serialization -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer -lpthread
@@ -151,7 +152,7 @@ tools/pathtest: tools/pathtest.o PathResolver.o
 tools/memstats: tools/memstats.o $(patsubst main.o,,$(OPENC2E))
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/serialtest: tools/serialtest.o caosVar.o AgentRef.o
+tools/serialtest: tools/serialtest.o $(OPENC2E_CORE)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 clean:

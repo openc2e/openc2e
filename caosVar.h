@@ -26,11 +26,7 @@
 #include "AgentRef.h"
 #include "slaballoc.h"
 
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/utility.hpp>
+#include "serialization.h"
 
 class Agent;
 
@@ -57,45 +53,13 @@ struct agentwrap {
 
 extern SlabAllocator caosVarSlab;
 
+enum variableType {
+	NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
+};
 class caosVar {
 	private:
-		friend class boost::serialization::access;
-
-		template<class Archive>
-			void save(Archive & ar, const unsigned int version) const
-			{
-				ar & type;
-				switch (type) {
-					case NULLTYPE: break;
-					case AGENT: assert(0); break;
-					case INTEGER: ar & values.intValue; break;
-					case FLOAT: ar & values.floatValue; break;
-					case STRING: ar & *values.stringValue; break;
-					default: assert(0);
-				}
-			}
-		template<class Archive>
-			void load(Archive & ar, const unsigned int version)
-			{
-				reset();
-				ar & type;
-				switch (type) {
-					case NULLTYPE: break;
-					case AGENT: assert(0); break;
-					case INTEGER: ar & values.intValue; break;
-					case FLOAT: ar & values.floatValue; break;
-					case STRING:
-						values.stringValue = new(caosVarSlab) stringwrap();
-						ar & values.stringValue->str; break;
-					default: assert(0);
-				}
-			}
-
-		BOOST_SERIALIZATION_SPLIT_MEMBER()
+		FRIEND_SERIALIZE(caosVar)
 	public:
-		enum variableType {
-			NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
-		};
 	protected:
 
 
@@ -247,21 +211,6 @@ struct caosVarCompare {
 			return v1.getType() < v2.getType();
 	}
 };
-
-//BOOST_CLASS_EXPORT(caosVar)
-
-// Compatibility hacks
-// All of these are deprecated, of course
-
-#ifndef IN_CAOSVAR_CPP
-#define floatValue getFloat()
-#define intValue getInt()
-
-// Grep for this later and replace with reference-passing version
-#define stringValue getString()
-#define agentValue getAgent()
-
-#endif
 
 #endif
 /* vim: set noet: */
