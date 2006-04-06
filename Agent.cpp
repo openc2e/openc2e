@@ -647,9 +647,9 @@ void Agent::adjustCarried() {
 	unsigned int ourpose = 0, theirpose = 0;
 
 	SpritePart *s;
-	if (s = dynamic_cast<SpritePart *>(part(0)))
+	if ((s = dynamic_cast<SpritePart *>(part(0))))
 		ourpose = s->getBase() + s->getPose();
-	if (s = dynamic_cast<SpritePart *>(carrying->part(0)))
+	if ((s = dynamic_cast<SpritePart *>(carrying->part(0))))
 		theirpose = s->getBase() + s->getPose();
 
 	int xoffset = 0, yoffset = 0;
