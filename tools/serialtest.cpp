@@ -31,7 +31,7 @@ class foo {
             }
 };
 
-int main(void) {
+int main(int argc, char **argv) {
 
     registerDelegates();
 
@@ -45,7 +45,13 @@ int main(void) {
     floatv.setFloat(0.5);
 
     std::istringstream ss("inst sets va00 \"hello world\\n\" outv 42 outs \"\\n\" outs va00 slow stop rscr");
-    scr.parse(ss);
+
+    if (argc != 2)
+        scr.parse(ss);
+    else {
+        std::ifstream ifs(argv[1]);
+        scr.parse(ifs);
+    }
     
     {
         const foo v(42);
