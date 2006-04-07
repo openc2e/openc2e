@@ -89,7 +89,7 @@ MNGFile::MNGFile(std::string n) {
 void MNGFile::enumerateSamples() {
 	std::vector< std::pair< char *, int > >::iterator i;
 	for(i = samples.begin(); i != samples.end(); i++) {
-		printf("Position: %i Length: %i\n", (*i).first, (*i).second);
+		printf("Position: \"%p\" Length: %i\n", (void *)(*i).first, (*i).second);
 		// PlaySound((*i).second.first, (*i).second.second);
 	}
 }

@@ -8,12 +8,14 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #define CV 1
 
-#if CV
 #include "caosVar.h"
 #include "ser/caosVar.h"
-#endif
+#include "caosScript.h"
+#include "ser/caosScript.h"
+
 
 class foo {
     public:
@@ -31,36 +33,39 @@ class foo {
 
 int main(void) {
 
+    registerDelegates();
+
     std::ofstream ofs("sertest.dat");
-#if CV
     caosVar null, str, intv, floatv;
+    caosScript scr("c3", "<test input>");
+
     null.reset();
     str.setString("Hello, world!");
     intv.setInt(42);
     floatv.setFloat(0.5);
-#endif
+
+    std::istringstream ss("inst sets va00 \"hello world\\n\" outv 42 outs \"\\n\" outs va00 slow stop rscr");
+    scr.parse(ss);
+    
     {
         const foo v(42);
         boost::archive::text_oarchive oa(ofs);
         oa << v;
-#if CV
         oa << (const caosVar &)null << (const caosVar &)str << (const caosVar &)intv << (const caosVar &)floatv;
-#endif
+        oa << (const caosScript &)scr;
     }
     ofs.close();
 
-#if CV
     caosVar nnull, nstr, nintv, nfloatv;
-#endif
+    caosScript si;
     {
         foo v;
         std::ifstream ifs("sertest.dat", std::ios::binary);
         boost::archive::text_iarchive ia(ifs);
         ia >> v;
         std::cout << "v.i = " << v.i << std::endl;
-#if CV
         ia >> nnull >> nstr >> nintv >> nfloatv;
-#endif
+        ia >> si;
     }
 
 #if CV
@@ -69,5 +74,6 @@ int main(void) {
 #define D(x) do { } while (0)
 #endif
     D(nnull); D(nstr); D(nintv); D(nfloatv);
+    std::cout << si.installer->dump() << std::endl;
     return 0;
 }

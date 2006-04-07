@@ -50,6 +50,7 @@ class caosJMP : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(caosJMP);
 		int p;
+		caosJMP() {}
 	public:
 		caosJMP(int p_) : p(p_) { evalcost = 0; }
 		void execute(caosVM *vm) { vm->nip = p; }
@@ -67,6 +68,7 @@ class simpleCaosOp : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(simpleCaosOp);
 		const cmdinfo *ci;
+		simpleCaosOp() {}
 	public:
 		simpleCaosOp(const cmdinfo *i) : ci(i) {}
 		void execute(caosVM *vm) {
@@ -93,6 +95,7 @@ class caosREPS : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(caosREPS);
 		int exit;
+		caosREPS() {}
 	public:
 		caosREPS(int exit_) : exit(exit_) {}
 		void relocate(const std::vector<int> &relocations) {
@@ -118,6 +121,7 @@ class caosGSUB : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(caosGSUB);
 		int targ;
+		caosGSUB () {}
 	public:
 		caosGSUB(int targ_) : targ(targ_) {}
 		void execute(caosVM *vm) {
@@ -157,6 +161,7 @@ class caosCond : public caosOp {
 		FRIEND_SERIALIZE(caosCond);
 		int cond;
 		int branch;
+		caosCond() {}
 	public:
 		std::string dump() { 
 			std::ostringstream oss;
@@ -228,6 +233,7 @@ class caosENUM_POP : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(caosENUM_POP);
 		int exit;
+		caosENUM_POP() {}
 	public:
 		caosENUM_POP(int exit_) : exit(exit_) {}
 		void execute(caosVM *vm) {
@@ -277,7 +283,9 @@ class caosAssert : public caosOp {
 
 class caosFACE : public caosOp {
 	protected:
-		const enum ci_type t;
+		FRIEND_SERIALIZE(caosFACE);
+		enum ci_type t;
+		caosFACE() {}
 	public:
 		caosFACE (enum ci_type t_) : t(t_) {}
 		void execute(caosVM *vm) {
@@ -290,7 +298,9 @@ class caosFACE : public caosOp {
 
 class opBytestr : public caosOp {
 	protected:
+		FRIEND_SERIALIZE(opBytestr);
 		std::vector<unsigned int> bytestr;
+		opBytestr () {}
 	public:
 		opBytestr(const std::vector<unsigned int> &bs) : bytestr(bs) {}
 		void execute(caosVM *vm) {
@@ -311,7 +321,9 @@ class opBytestr : public caosOp {
 
 class ConstOp : public caosOp {
 	protected:
+		FRIEND_SERIALIZE(ConstOp);
 		caosVar constVal;
+		ConstOp() {}
 	public:
 		virtual void execute(caosVM *vm) {
 			vm->valueStack.push_back(constVal);
@@ -330,7 +342,9 @@ class ConstOp : public caosOp {
 
 class opVAxx : public caosOp {
 	protected:
-		const int index;
+		FRIEND_SERIALIZE(opVAxx);
+		int index;
+		opVAxx() {}
 	public:
 		opVAxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
 		void execute(caosVM *vm) {
@@ -345,7 +359,9 @@ class opVAxx : public caosOp {
 
 class opOVxx : public caosOp {
 	protected:
-		const int index;
+		FRIEND_SERIALIZE(opOVxx);
+		int index;
+		opOVxx() {}
 	public:
 		opOVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
 		void execute(caosVM *vm) {
@@ -360,7 +376,9 @@ class opOVxx : public caosOp {
 
 class opMVxx : public caosOp {
 	protected:
-		const int index;
+		FRIEND_SERIALIZE(opMVxx);
+		int index;
+		opMVxx() {}
 	public:
 		opMVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
 		void execute(caosVM *vm) {

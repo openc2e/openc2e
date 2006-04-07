@@ -201,6 +201,7 @@ void registerDelegates() {
 	std::map<std::string, Variant *>::iterator it = variants.begin();
 	while (it != variants.end()) {
 		Variant *v = (*it).second;
+		v->name = (*it).first;
 		const cmdinfo *cmd = v->cmds;
 
 		while (cmd->key) {

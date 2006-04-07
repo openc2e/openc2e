@@ -14,6 +14,10 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/utility.hpp>
 
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #define SER_PROTO(friend, fname, c, const) \
     template <class Archive> friend void fname(Archive &ar, const c & obj, const unsigned int version)
 
@@ -46,7 +50,7 @@
     } }
     
 #define SER_BASE(ar,bc) \
-    do { ar & boost::serialization::base_object<bc>(*this); } while (0)
+    do { ar & boost::serialization::base_object<bc>(obj); } while (0)
 
 #define SAVE(c) WRAP_SPLIT(c); SER_PROTO(, o_save, c, const)
 #define LOAD(c) SER_PROTO(, o_load, c,)

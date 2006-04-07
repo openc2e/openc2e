@@ -1,9 +1,9 @@
 #ifndef SER_AGENTREF_H
 #define SER_AGENTREF_H 1
 
-#include "serialization.h"
-#include "ser/Agent.h" // This loop is safe; template instantiation is deferred
-#include "AgentRef.h"
+#include <serialization.h>
+#include <ser/Agent.h> // This loop is safe; template instantiation is deferred
+#include <AgentRef.h>
 
 LOAD(AgentRef) {
     Agent *agent;

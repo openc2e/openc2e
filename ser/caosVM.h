@@ -1,10 +1,10 @@
 #ifndef SER_CAOSVM_H
 #define SER_CAOSVM_H 1
 
-#include "ser/caosScript.h"
-#include "ser/AgentRef.h"
-#include "serialization.h"
-#include "caosScript.h"
+#include <ser/caosScript.h>
+#include <ser/AgentRef.h>
+#include <serialization.h>
+#include <caosScript.h>
 
 
 WRAP_SERIALIZE(vmStackItem);

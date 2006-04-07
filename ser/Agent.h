@@ -1,10 +1,10 @@
 #ifndef SER_AGENT_H
 #define SER_AGENT_H 1
 
-#include "ser/AgentRef.h"
-#include "ser/caosVar.h"
-#include "serialization.h"
-#include "Agent.h"
+#include <ser/AgentRef.h>
+#include <ser/caosVar.h>
+#include <serialization.h>
+#include <Agent.h>
 
 SERIALIZE(Agent) {
     assert(!obj.dying);

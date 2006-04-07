@@ -1,9 +1,10 @@
 #ifndef SER_BYTECODE_H
 #define SER_BYTECODE_H 1
 
-#include "ser/caosVar.h"
-#include "serialization.h"
-#include "bytecode.h"
+#include <bytecode.h>
+#include <ser/caosVar.h>
+#include <serialization.h>
+#include <dialect.h>
 
 SERIALIZE(caosOp) {
     ar & obj.index;
@@ -18,34 +19,26 @@ SERIALIZE(caosNoop) {
 
 SERIALIZE(caosJMP) {
     SER_BASE(ar, caosOp);
-    ar & p;
+    ar & obj.p;
 }
 
-SAVE(const cmdinfo *) {
-    if (!obj) {
-        ar & std::string("");
-    } else {
-        ar & std::string(obj->key);
-    }
-}
+typedef cmdinfo *c_cmdinfo_t;
 
-LOAD(const cmdinfo *) {
-    std::string name;
-    ar & name;
-
-    if (name == "") {
-        obj = NULL;
-    } else {
-        if (op_key_map.find(name) == op_key_map.end())
-            throw new creaturesException(std::string("Operation key not found: ") + name);
-        obj = op_key_map[name];
-    }
-}
-
-SERIALIZE(simpleCaosOp) {
+SAVE(simpleCaosOp) {
     SER_BASE(ar, caosOp);
+    std::string key = obj.ci->key;
+    ar & key;
+}
 
-    ar & obj.ci;
+LOAD(simpleCaosOp) {
+    SER_BASE(ar, caosOp);
+    
+    std::string key;
+    ar & key;
+
+    if (op_key_map.find(key) == op_key_map.end())
+        throw new creaturesException(std::string("Operation key not found: ") + key);
+    obj.ci = op_key_map[key];
 }
 
 SERIALIZE(caosREPS) {
@@ -88,9 +81,9 @@ SERIALIZE(ConstOp) {
         ar & obj.index; \
     }
 
-SER_xVxx(op_VAxx);
-SER_xVxx(op_OAxx);
-SER_xVxx(op_MAxx);
+SER_xVxx(opVAxx);
+SER_xVxx(opOVxx);
+SER_xVxx(opMVxx);
 
 #undef SER_xVxx
 

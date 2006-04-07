@@ -1,8 +1,8 @@
 #ifndef SER_CAOSVAR_H
 #define SER_CAOSVAR_H 1
 
-#include "caosVar.h"
-#include "serialization.h"
+#include <caosVar.h>
+#include <serialization.h>
 
 SAVE(caosVar) {
     ar & obj.type;

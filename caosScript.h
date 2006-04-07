@@ -28,6 +28,7 @@
 #include "caosVar.h"
 #include <cassert>
 #include <boost/shared_ptr.hpp>
+#include "serialization.h"
 
 class Agent;
 class caosOp;
@@ -37,6 +38,7 @@ using boost::shared_ptr;
 
 struct script {
 	protected:
+		FRIEND_SERIALIZE(script);
 		
 		bool linked;
 
@@ -44,12 +46,14 @@ struct script {
 		std::vector<int> relocations;
 		// pos-0 needs to be initted to a caosNoop
 		std::vector<class caosOp *> allOps;
+
+		script() {}
 	public:
-		const int fmly, gnus, spcs, scrp;
+		int fmly, gnus, spcs, scrp;
 		const Variant *variant;
 		const Variant *getVariant() const { return variant; };
 		
-		const std::string filename;
+		std::string filename;
 
 		caosOp *getOp(int idx) const {
 			assert (idx >= 0);
@@ -112,6 +116,7 @@ public:
 	shared_ptr<script> current;
 
 	caosScript(const std::string &variant, const std::string &fn);
+	caosScript() { v = NULL; }
 	void parse(std::istream &in);
 	~caosScript();
 	void installScripts();
