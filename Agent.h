@@ -27,6 +27,7 @@
 #include <set>
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include <serialization.h>
 
 class script;
 using boost::shared_ptr;
@@ -44,7 +45,15 @@ class Agent {
 	friend class opMVxx;
 	friend class SDLBackend; // TODO: should we make soundslot public instead?
 
+	FRIEND_SERIALIZE(Agent);
+	
 protected:
+	bool initialized;
+private:
+	void core_init();
+	Agent() { core_init(); } // for boost only
+protected:
+
 	caosVar var[100]; // OVxx
 	std::map<caosVar, caosVar, caosVarCompare> name_variables;
 	std::map<unsigned int, shared_ptr<class genomeFile> > slots;

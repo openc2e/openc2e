@@ -149,7 +149,7 @@ tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
 tools/pathtest: tools/pathtest.o PathResolver.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/memstats: tools/memstats.o $(patsubst main.o,,$(OPENC2E))
+tools/memstats: tools/memstats.o $(OPENC2E_CORE)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/serialtest: tools/serialtest.o $(OPENC2E_CORE)

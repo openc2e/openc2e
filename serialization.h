@@ -14,30 +14,43 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/utility.hpp>
 
+#define SER_PROTO(friend, fname, c, const) \
+    template <class Archive> friend void fname(Archive &ar, const c & obj, const unsigned int version)
+
 // put this in serializable classes, to befriend any serializers in use
 #define FRIEND_SERIALIZE(c) \
     friend class boost::serialization::access; \
-    template<class Archive> friend void o_save(Archive & ar, const c & obj, const unsigned int version); \
-    template<class Archive> friend void o_load(Archive & ar, c & obj, const unsigned int version); \
-    template<class Archive> friend void o_serialize(Archive & ar, c & obj, const unsigned int version);
+    SER_PROTO(friend, o_save, c, const); \
+    SER_PROTO(friend, o_load, c, ); \
+    SER_PROTO(friend, o_serialize, c, );
+
 
 #define WRAP_SPLIT(c) \
+    BOOST_SERIALIZATION_SPLIT_FREE(c); \
+    BOOST_CLASS_EXPORT(c); \
     namespace boost { namespace serialization { \
-        template <class Archive> inline void load(Archive & ar, c & obj, const unsigned int version) { \
+        SER_PROTO(inline, load, c,) { \
             o_load(ar, obj, version); \
         } \
-        template <class Archive> inline void save(Archive & ar, const c & obj, const unsigned int version) { \
+        SER_PROTO(inline, save, c, const) { \
             o_save(ar, obj, version); \
         } \
     } }
 
 #define WRAP_SERIALIZE(c) \
+    BOOST_CLASS_EXPORT(c); \
     namespace boost { namespace serialization { \
-        template <class Archive> inline void serialize(Archive & ar, c & obj, const unsigned int version) { \
+        SER_PROTO(inline, serialize, c,) { \
             o_serialize(ar, obj, version); \
         } \
     } }
     
+#define SER_BASE(ar,bc) \
+    do { ar & boost::serialization::base_object<bc>(*this); } while (0)
+
+#define SAVE(c) WRAP_SPLIT(c); SER_PROTO(, o_save, c, const)
+#define LOAD(c) SER_PROTO(, o_load, c,)
+#define SERIALIZE(c) WRAP_SERIALIZE(c); SER_PROTO(, o_serialize, c,)
 
 #endif
 

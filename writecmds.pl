@@ -60,6 +60,7 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			$retc = $data->{$key}{pragma}{retc};
 		}
 		my $delegate;
+		my $implementation = "NULL";
 		if ($data->{$key}{pragma}{noparse}) {
 			$delegate = undef;
 		} elsif ($data->{$key}{pragma}{parser}) {
@@ -69,7 +70,8 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			if ($data->{$key}{pragma}{parserclass}) {
 				$class = $data->{$key}{pragma}{parserclass};
 			}
-			$delegate = qq{new $class(&$data->{$key}{implementation}, &v_${\$variant}_cmds[$idx])};
+			$implementation = "&$data->{$key}{implementation}";
+			$delegate = qq{new $class(&v_${\$variant}_cmds[$idx])};
 		}
 
 		my $args;
@@ -105,21 +107,24 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 		
 			
 		$data->{$key}{delegate} = $delegate;
+		$data->{$key}{idx} = $idx;
 		$defn .= <<ENDDATA;
 		{ // $idx
+			"$variant $key",
 			"$name",
 			"$fullname",
 			"$syntax $cedocs",
 			$argc,
 			$retc,
-			$argp
+			$argp,
+			$implementation
 		},
 ENDDATA
 		$idx++;
 	}
 
 	print $defn.<<ENDTAIL;
-	{ NULL, NULL, NULL, 0, 0, NULL }
+	{ NULL, NULL, NULL, NULL, 0, 0, NULL, NULL }
 };
 
 static void registerAutoDelegates_$variant() {

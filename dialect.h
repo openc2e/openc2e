@@ -20,11 +20,10 @@ class parseDelegate {
 
 class DefaultParser : public parseDelegate {
 	protected:
-		void (caosVM::*handler)();
 		const cmdinfo *cd;
 	public:
-		DefaultParser(void (caosVM::*h)(), const cmdinfo *i) :
-			handler(h), cd(i) {}
+		DefaultParser(const cmdinfo *i) :
+			cd(i) {}
 		virtual void operator()(class caosScript *s, class Dialect *curD);
 };
 
@@ -52,9 +51,11 @@ class Dialect {
 struct Variant {
 	Dialect *cmd_dialect, *exp_dialect;
 	const cmdinfo *cmds;
+	std::string name;
 };
 
 extern std::map<std::string, Variant *> variants;
+extern std::map<std::string, const cmdinfo *> op_key_map;
 
 class OneShotDialect : public Dialect {
 	public:
@@ -228,8 +229,8 @@ class ENUMhelper : public parseDelegate {
 	protected:
 		DefaultParser p;
 	public:
-		ENUMhelper(void (caosVM::*h)(), const cmdinfo *i) :
-			p(h,i) {}
+		ENUMhelper(const cmdinfo *i) :
+			p(i) {}
 
 		void operator() (class caosScript *s, class Dialect *curD) {
 			(p)(s, curD);

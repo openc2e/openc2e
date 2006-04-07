@@ -25,6 +25,7 @@
 #include <istream>
 #include <ostream>
 #include "AgentRef.h"
+#include "serialization.h"
 
 #include <boost/weak_ptr.hpp>
 using boost::weak_ptr;
@@ -60,6 +61,7 @@ struct vmStackItem {
 		vmStackItem(std::vector<unsigned int> bs) {
 			bytestring = bs;
 			type = BYTESTR;
+			p_val = NULL;
 		}
 
 		vmStackItem(const vmStackItem &orig) {
@@ -81,6 +83,7 @@ struct callStackItem {
 typedef class caosVM *caosVM_p;
 
 class blockCond {
+	// XXX NOT SERIALIZABLE FIXME
 	public:
 		virtual bool operator()() = 0;
 		virtual ~blockCond() {}

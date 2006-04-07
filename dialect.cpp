@@ -98,7 +98,7 @@ void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {
 			s->v->exp_dialect->set_expect(cd->argtypes[i]);
 		s->v->exp_dialect->doParse(s);
 	}
-	s->current->thread(new simpleCaosOp(handler, cd));
+	s->current->thread(new simpleCaosOp(cd));
 }
 
 
@@ -278,7 +278,20 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 	Dialect::handleToken(s, t);
 }
 
+std::map<std::string, const cmdinfo *> op_key_map;
+
 void registerDelegates() {
 	registerAutoDelegates();
+
+	std::map<std::string, Variant *>::iterator it = variants.begin();
+	while (it != variants.end()) {
+		Variant *v = (*it).second;
+		const cmdinfo *cmd = v->cmds;
+
+		while (cmd->key) {
+			op_key_map[std::string(cmd->key)] = cmd;
+			cmd++;
+		}
+	}
 }
 /* vim: set noet: */

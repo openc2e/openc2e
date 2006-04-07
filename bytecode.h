@@ -31,6 +31,7 @@ class caosOp {
 		int getlineno() const { return yyline; }
 		int getIndex()  const { return index;  }
 	protected:
+		FRIEND_SERIALIZE(caosOp);
 		int index;
 		int evalcost;
 		bool owned; // if it's been threaded
@@ -46,6 +47,7 @@ class caosNoop : public caosOp {
 
 class caosJMP : public caosOp {
 	protected:
+		FRIEND_SERIALIZE(caosJMP);
 		int p;
 	public:
 		caosJMP(int p_) : p(p_) { evalcost = 0; }
@@ -62,14 +64,14 @@ class caosJMP : public caosOp {
 
 class simpleCaosOp : public caosOp {
 	protected:
-		ophandler handler;
+		FRIEND_SERIALIZE(simpleCaosOp);
 		const cmdinfo *ci;
 	public:
-		simpleCaosOp(ophandler h, const cmdinfo *i) : handler(h), ci(i) {}
+		simpleCaosOp(const cmdinfo *i) : ci(i) {}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			int stackc = vm->valueStack.size();
-			(vm->*handler)();
+			(vm->*(ci->handler))();
 			int delta = vm->valueStack.size() - stackc;
 			if (!vm->result.isNull())
 				delta++;
@@ -88,6 +90,7 @@ class simpleCaosOp : public caosOp {
 
 class caosREPS : public caosOp {
 	protected:
+		FRIEND_SERIALIZE(caosREPS);
 		int exit;
 	public:
 		caosREPS(int exit_) : exit(exit_) {}
@@ -112,6 +115,7 @@ class caosREPS : public caosOp {
 		
 class caosGSUB : public caosOp {
 	protected:
+		FRIEND_SERIALIZE(caosGSUB);
 		int targ;
 	public:
 		caosGSUB(int targ_) : targ(targ_) {}
@@ -149,6 +153,7 @@ extern const char *cnams[];
 
 class caosCond : public caosOp {
 	protected:
+		FRIEND_SERIALIZE(caosCond);
 		int cond;
 		int branch;
 	public:
@@ -220,6 +225,7 @@ class caosCond : public caosOp {
 
 class caosENUM_POP : public caosOp {
 	protected:
+		FRIEND_SERIALIZE(caosENUM_POP);
 		int exit;
 	public:
 		caosENUM_POP(int exit_) : exit(exit_) {}

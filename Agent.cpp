@@ -25,8 +25,19 @@
 #include "caosVM.h"
 #include "SDLBackend.h"
 
+void Agent::core_init() {
+	initialized = false;
+	// AgentRef stuff
+	self.ref = this;
+	self.next = self.prev = &self;
+}
+
+
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0) {
+  visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0)
+{
+	core_init();
+	initialized = true;
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
 	accg = 0.3f;
@@ -35,10 +46,6 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	x = 0.0f; y = 0.0f;
 	clac[0] = 1; // activate 1
 	clik = -1;
-	
-	// AgentRef stuff
-	self.ref = this;
-	self.next = self.prev = &self;
 	
 	dying = false;
 	unid = -1;
@@ -499,6 +506,8 @@ void Agent::vmTick() {
 }
 
 Agent::~Agent() {
+	if (!initialized) return;
+	
 	world.agents.erase(agents_iter);
 	if (vm)
 		world.freeVM(vm);

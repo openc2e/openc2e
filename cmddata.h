@@ -1,6 +1,8 @@
 #ifndef CMDDATA_H
 #define CMDDATA_H 1
 
+class caosVM;
+
 enum ci_type {
 	CI_OTHER = -1,
 	CI_END = 0,
@@ -12,12 +14,14 @@ enum ci_type {
 };
 
 struct cmdinfo {
+	const char *key;
 	const char *name;
 	const char *fullname;
 	const char *docs;
 	int argc;
 	int retc;
 	const enum ci_type *argtypes;
+	void (caosVM::*handler)();
 };
 
 void registerAutoDelegates();
