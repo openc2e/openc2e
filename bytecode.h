@@ -311,7 +311,7 @@ class opBytestr : public caosOp {
 		std::string dump() {
 			std::ostringstream oss;
 			oss << "BYTESTR [ ";
-			for (int i = 0; i < bytestr.size(); i++) {
+			for (unsigned int i = 0; i < bytestr.size(); i++) {
 				oss << i << " ";
 			}
 			oss << "]";
