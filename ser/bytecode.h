@@ -12,12 +12,10 @@ SERIALIZE(caosOp) {
     ar & obj.yyline;
 }
 
-BOOST_EXPORT_CLASS(caosNoop);
 SERIALIZE(caosNoop) {
     SER_BASE(ar, caosOp);
 }
 
-BOOST_EXPORT_CLASS(caosJMP);
 SERIALIZE(caosJMP) {
     SER_BASE(ar, caosOp);
     ar & p;
@@ -44,41 +42,57 @@ LOAD(const cmdinfo *) {
     }
 }
 
-BOOST_EXPORT_CLASS(simpleCaosOp);
 SERIALIZE(simpleCaosOp) {
     SER_BASE(ar, caosOp);
 
     ar & obj.ci;
 }
 
-BOOST_EXPORT_CLASS(caosREPS);
 SERIALIZE(caosREPS) {
     SER_BASE(ar, caosOp);
     ar & obj.exit;
 }
 
-BOOST_EXPORT_CLASS(caosGSUB);
 SERIALIZE(caosGSUB) {
     SER_BASE(ar, caosOp);
     ar & obj.targ;
 }
 
-BOOST_EXPORT_CLASS(caosCond);
 SERIALIZE(caosCond) {
     SER_BASE(ar, caosOp);
     ar & obj.cond & obj.branch;
 }
 
-BOOST_EXPORT_CLASS(caosENUM_POP);
 SERIALIZE(caosENUM_POP) {
     SER_BASE(ar, caosOp);
     ar & obj.exit;
 }
 
-BOOST_EXPORT_CLASS(caosSTOP);
 SERIALIZE(caosSTOP) {
-    SER_BASE(ar, caosSTOP);
+    SER_BASE(ar, caosOp);
 }
+
+SERIALIZE(opBytestr) {
+    SER_BASE(ar, caosOp);
+    ar & obj.bytestr;
+}
+
+SERIALIZE(ConstOp) {
+    SER_BASE(ar, caosOp);
+    ar & obj.constVal;
+}
+
+#define SER_xVxx(c) \
+    SERIALIZE(c) { \
+        SER_BASE(ar, caosOp); \
+        ar & obj.index; \
+    }
+
+SER_xVxx(op_VAxx);
+SER_xVxx(op_OAxx);
+SER_xVxx(op_MAxx);
+
+#undef SER_xVxx
 
 #endif
 

@@ -5,6 +5,7 @@
 #include "lexutil.h"
 #include "cmddata.h"
 #include "caosScript.h"
+#include "Agent.h"
 #include <cstdio>
 
 #include <sstream>
@@ -286,6 +287,92 @@ class caosFACE : public caosOp {
 			}
 		}
 };
+
+class opBytestr : public caosOp {
+	protected:
+		std::vector<unsigned int> bytestr;
+	public:
+		opBytestr(const std::vector<unsigned int> &bs) : bytestr(bs) {}
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			vm->valueStack.push_back(bytestr);
+		}
+
+		std::string dump() {
+			std::ostringstream oss;
+			oss << "BYTESTR [ ";
+			for (int i = 0; i < bytestr.size(); i++) {
+				oss << i << " ";
+			}
+			oss << "]";
+			return oss.str();
+		}
+};
+
+class ConstOp : public caosOp {
+	protected:
+		caosVar constVal;
+	public:
+		virtual void execute(caosVM *vm) {
+			vm->valueStack.push_back(constVal);
+			caosOp::execute(vm);
+		}
+
+		ConstOp(const caosVar &val) {
+			constVal = val;
+		}
+
+		std::string dump() {
+			return std::string("CONST ") + constVal.dump();
+		}
+
+};
+
+class opVAxx : public caosOp {
+	protected:
+		const int index;
+	public:
+		opVAxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			vm->valueStack.push_back(&vm->var[index]);
+		}
+
+		std::string dump() {
+			return str(boost::format("VA%02d") % index);
+		}
+};
+
+class opOVxx : public caosOp {
+	protected:
+		const int index;
+	public:
+		opOVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			caos_assert(vm->targ);
+			vm->valueStack.push_back(&vm->targ->var[index]);
+		}
+		std::string dump() {
+			return str(boost::format("OV%02d") % index);
+		}
+};
+
+class opMVxx : public caosOp {
+	protected:
+		const int index;
+	public:
+		opMVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		void execute(caosVM *vm) {
+			caosOp::execute(vm);
+			caos_assert(vm->owner);
+			vm->valueStack.push_back(&vm->owner->var[index]);
+		}
+		std::string dump() {
+			return str(boost::format("MV%02d") % index);
+		}
+};
+
 
 #endif
 
