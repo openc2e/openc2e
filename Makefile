@@ -86,7 +86,7 @@ XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
 default: openc2e tools/praydumper docs
-all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest  tools/memstats
+all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/memstats
 
 docs: docs.html
 
@@ -159,7 +159,7 @@ clean:
 	rm -f *.o openc2e filetests praydumper tools/*.o
 	rm -rf .deps
 	rm -f commandinfo.yml lex.yy.cpp lex.yy.h lex.mng.cpp lex.mng.h mngparser.tab.cpp mngparser.tab.hpp cmddata.cpp
-	rm -f tools/filetests tools/memstats tools/mngtest tools/pathtest tools/praydumper
+	rm -f tools/filetests tools/memstats tools/mngtest tools/pathtest tools/praydumper tools/serialtest
 	rm -f headerdeps.dot headerdeps.png
 
 test: openc2e 
