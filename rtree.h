@@ -12,6 +12,7 @@
 #include <list>
 #include <deque>
 #include "slaballoc.h"
+#include "serialization.h"
 
 // REGION_MAX should be odd, or adjust REGION_MIN manually
 #define REGION_MAX 5
@@ -22,6 +23,13 @@ typedef unsigned long long u64_t;
 struct Region {
 	int xmin, xmax;
 	int ymin, ymax;
+
+    template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & xmin & xmax;
+            ar & ymin & ymax;
+        }
 
 	bool contains(int x, int y) const {
 		return (x >= xmin && x <= xmax &&
@@ -560,6 +568,40 @@ class RTree {
 				return "NULL";
 			return root->dump();
 		}
+
+        template<class Archive>
+            void save(Archive & ar, const unsigned int version) const {
+                std::vector<RData<T> *> list;
+                Region za_warudo(INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+                if (root)
+                    root->scan(za_warudo, list);
+                size_t len = list.size();
+                assert(len == size());
+                ar & len;
+                for (std::vector<RData<T> *>::iterator it = list.start();
+                        it != list.end(); it++)
+                {
+                    ar & (*it)->r & (*it)->obj;
+                }
+            }
+
+        template<class Archive>
+            void load(Archive & ar, const unsigned int version) {
+                leaves.clear();
+                branches.clear();
+                root = NULL;
+
+                size_t len;
+                ar & len;
+                
+                for (size_t i = 0; i < len; i++) {
+                    Region r;
+                    T obj;
+
+                    ar & r & obj;
+                    insert(r, obj);
+                }
+            }
 
 		void check() { if (root) root->expensive_checks(); }
 		size_t size() const { return root ? root->size() : 0; }
