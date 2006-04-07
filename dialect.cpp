@@ -292,6 +292,8 @@ void registerDelegates() {
 			op_key_map[std::string(cmd->key)] = cmd;
 			cmd++;
 		}
+
+		it++;
 	}
 }
 /* vim: set noet: */
