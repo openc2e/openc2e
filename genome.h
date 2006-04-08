@@ -128,7 +128,7 @@ public:
   bool isBrain() { return brainorgan; }
 
   uint8 clockrate;
-  uint8 repairrate;
+  uint8 damagerate;
   uint8 lifeforce;
   uint8 biotickstart;
   uint8 atpdamagecoefficient;

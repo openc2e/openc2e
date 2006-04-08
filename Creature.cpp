@@ -93,4 +93,49 @@ void Creature::tick() {
 	if (tickage) age++;
 }
 
+/*****************************************************************************/
+
+Organ::Organ(Creature *p, organGene *g) {
+	parent = p; assert(parent);
+	ourGene = g; assert(ourGene);
+	lifeforce = ourGene->lifeforce;
+	shorttermlifeforce = lifeforce;
+
+	repairrate = 0.0f; // TODO: ???
+	clockrate = 1.0f; // TODO: ???
+	injurytoapply = 0.0f;
+}
+
+float Organ::getEnergyCost() {
+	// TODO: is genes.size() always the size we want?
+	// TODO: is it really 0.000391258 or did I just fail at rounding?
+	return ourGene->genes.size() * 0.000391258;
+}
+
+void Organ::tick() {
+	if (lifeforce == 0.0f) return; // We're dead!
+	
+	tickInjury();
+}
+
+void Organ::tickInjury() {
+	// Apply injury to short-term life force, if necessary
+	if (injurytoapply != 0.0f) {
+		shorttermlifeforce -= injurytoapply;
+
+		if (shorttermlifeforce < 0.0f) shorttermlifeforce = 0.0f;
+	}
+
+	// Repair organ if possible
+	shorttermlifeforce += repairrate;
+
+	// Converge lifeforce upon short-term lifeforce, ie real damage
+	if (shorttermlifeforce < lifeforce)
+		lifeforce -= ourGene->damagerate; // TODO: probably nonsense
+
+	// Make sure we didn't go too far.
+	if (shorttermlifeforce > lifeforce)
+		shorttermlifeforce = lifeforce;
+}
+
 /* vim: set noet: */

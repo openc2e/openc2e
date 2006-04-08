@@ -23,17 +23,25 @@
 
 using boost::shared_ptr;
 
-class Organ {
-public:
-	std::vector<bioGene *> genes;
+class Creature;
 
+class Organ {
+protected:
+	Creature *parent;	
 	organGene *ourGene;
 
+	// variables
 	float lifeforce, shorttermlifeforce;
-	float repairfactor, injuryfactor;
+	
+	// locuses
+	float repairrate, clockrate, injurytoapply;
+
+	void tickInjury();
+
+public:
+	Organ(Creature *p, organGene *g);
 
 	float getEnergyCost();
-
 	void tick();
 };
 
