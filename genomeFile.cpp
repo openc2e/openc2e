@@ -543,7 +543,7 @@ void oldBrainLobe::read(istream &s) {
 }
 
 void organGene::write(ostream &s) const {
-	s << clockrate << repairrate << lifeforce << biotickstart << atpdamagecoefficient;
+	s << clockrate << damagerate << lifeforce << biotickstart << atpdamagecoefficient;
 
 	// iterate through children
 	for (vector<gene *>::iterator x = ((organGene *)this)->genes.begin(); x != ((organGene *)this)->genes.end(); x++)
@@ -551,7 +551,7 @@ void organGene::write(ostream &s) const {
 }
 
 void organGene::read(istream &s) {
-	s >> clockrate >> repairrate >> lifeforce >> biotickstart >> atpdamagecoefficient;
+	s >> clockrate >> damagerate >> lifeforce >> biotickstart >> atpdamagecoefficient;
 }
 
 ostream &operator << (ostream &s, const oldDendriteInfo &i) {
