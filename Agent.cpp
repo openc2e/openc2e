@@ -638,6 +638,9 @@ void Agent::carry(AgentRef a) {
 	// TODO: this doesn't reorder children or anything..
 	carrying->setZOrder(carrying->zorder);
 	adjustCarried();
+
+	// fire 'Got Carried Agent'
+	queueScript(124, carrying); // TODO: is this the correct param?
 }
 
 void Agent::dropCarried() {
@@ -646,6 +649,9 @@ void Agent::dropCarried() {
 	carrying->carriedby = AgentRef(0);
 	// TODO: this doesn't reorder children or anything..
 	carrying->setZOrder(carrying->zorder);
+
+	// fire 'Lost Carried Agent'
+	queueScript(125, carrying); // TODO: is this the correct param?
 	
 	carrying = AgentRef(0);
 }
