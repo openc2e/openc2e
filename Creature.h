@@ -30,6 +30,9 @@ protected:
 	Creature *parent;	
 	organGene *ourGene;
 
+	// data
+	float energycost;
+	
 	// variables
 	float lifeforce, shorttermlifeforce;
 	
@@ -38,10 +41,13 @@ protected:
 
 	void tickInjury();
 
+	// TODO: is this correct magic number?
+	float ATPDamageCoefficient() { return ourGene->atpdamagecoefficient * 15.3787f; }
+
 public:
 	Organ(Creature *p, organGene *g);
 
-	float getEnergyCost();
+	float getEnergyCost() { return energycost; }
 	void tick();
 };
 
@@ -56,6 +62,7 @@ protected:
 
 	// biochemistry
 	float chemicals[256];
+	float halflife_timers[256];
 
 	// non-specific bits
 	unsigned int variant;
@@ -77,6 +84,8 @@ protected:
 	// drives
 	// to-be-processed instincts
 	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
+
+	void tickBiochemistry();
 
 public:
 	Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
