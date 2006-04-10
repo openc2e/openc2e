@@ -128,7 +128,7 @@ ENDDATA
 };
 
 static void registerAutoDelegates_$variant() {
-	if (!variants["$variant"]) {
+	if (variants.find("$variant") != variants.end()) {
 		variants["$variant"] = new Variant();
 		variants["$variant"]->cmds = v_${variant}_cmds;
 		variants["$variant"]->exp_dialect = new ExprDialect();
