@@ -30,6 +30,8 @@
 #include <boost/weak_ptr.hpp>
 using boost::weak_ptr;
 
+typedef boost::shared_ptr<const std::vector<unsigned int> > bytestring_t;
+
 //#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
 
@@ -40,39 +42,98 @@ unsigned int calculateScriptId(unsigned int message_id);
 #define RVAL 2
 #define BYTESTR 4
 					
-struct vmStackItem {
+class badParamException : public caosException {
 	public:
-		int type;
-		caosVar i_val;
-		caosVar *p_val;
-		std::vector<unsigned int> bytestring;
+		badParamException() : caosException("parameter type mismatch") {}
+};
+
+class vmStackItem {
+	protected:
+
+		struct visit_lval : public boost::static_visitor<const caosVar &> {
+			
+			const caosVar &operator()(const caosVar &i) const {
+				return i;
+			}
+
+			const caosVar &operator()(caosVar *i) const {
+				return *i;
+			}
+
+			const caosVar &operator()(const bytestring_t &) const {
+				throw badParamException();
+			}
+				
+		};
+
+		struct visit_rval : public boost::static_visitor<caosVar *> {
+			caosVar *operator()(caosVar *i) const {
+				return i;
+			}
+			caosVar *operator()(const caosVar &i) const {
+				throw badParamException();
+			}
+			caosVar *operator()(const bytestring_t &) const {
+				throw badParamException();
+			}
+		};
+
+		struct visit_bs : public boost::static_visitor<bytestring_t> {
+			bytestring_t operator()(const bytestring_t &i) const {
+				return i;
+			}
+			bytestring_t operator()(caosVar *i) const {
+				throw badParamException();
+			}
+			bytestring_t operator()(const caosVar &i) const {
+				throw badParamException();
+			}
+		};
+				
+		boost::variant<caosVar, caosVar *, bytestring_t> value;
+
+	public:
 
 		vmStackItem(const caosVar &v) {
-			i_val = v;
-			p_val = &i_val;
-			type = LVAL;
+			value = v;
 		}
 
 		vmStackItem(caosVar *p) {
-			p_val = p;
-			type = LVAL | RVAL;
+			value = p;
 		}
 
-		vmStackItem(std::vector<unsigned int> bs) {
-			bytestring = bs;
-			type = BYTESTR;
-			p_val = NULL;
+		vmStackItem(bytestring_t bs) {
+			value = bs;
 		}
 
 		vmStackItem(const vmStackItem &orig) {
-			type = orig.type;
-			i_val = orig.i_val;
-			if (type & RVAL) {
-				p_val = orig.p_val;
-			}
-			else p_val = &i_val;
-			bytestring = orig.bytestring;
+			value = orig.value;
 		}
+
+		const caosVar &getLVal() const {
+			try {
+				return boost::apply_visitor(visit_lval(), value);
+			} catch (boost::bad_visit &e) {
+				throw badParamException();
+			}
+		}
+
+		caosVar *getRVal() const {
+			try {
+				return boost::apply_visitor(visit_rval(), value);
+			} catch (boost::bad_visit &e) {
+				throw badParamException();
+			}
+		}
+
+		bytestring_t getByteStr() {
+			try {
+				return boost::apply_visitor(visit_bs(), value);
+			} catch (boost::bad_visit &e) {
+				throw badParamException();
+			}
+		}
+		
 };
 
 struct callStackItem {
@@ -705,10 +766,6 @@ class notEnoughParamsException : caosException {
 	public:
 		notEnoughParamsException() : caosException("Not enough parameters") {}
 };
-class badParamException : public caosException {
-	public:
-		badParamException() : caosException("parameter type mismatch") {}
-};
 
 #define VM_VERIFY_SIZE(n) // no-op, we assert in the pops. orig: if (params.size() != n) { throw notEnoughParamsException(); }
 static inline void VM_STACK_CHECK(const caosVM *vm) {
@@ -717,37 +774,24 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 }
 #define VM_PARAM_VALUE(name) caosVar name; { VM_STACK_CHECK(vm); \
 	vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & LVAL)) { throw badParamException(); } \
-	name = *__x.p_val; } vm->valueStack.pop_back();
+	name = __x.getLVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_STRING(name) std::string name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & LVAL)) { throw badParamException(); } \
-	if (!__x.p_val->hasString()) { throw badParamException(); } \
-	name = __x.p_val->getString(); } vm->valueStack.pop_back();
+	name = __x.getLVal().getString(); } vm->valueStack.pop_back();
 #define VM_PARAM_INTEGER(name) int name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & LVAL)) { throw badParamException(); } \
-	if (!__x.p_val->hasNumber()) { throw badParamException(); } \
-	name = __x.p_val->getInt(); } vm->valueStack.pop_back();
+	name = __x.getLVal().getInt(); } vm->valueStack.pop_back();
 #define VM_PARAM_FLOAT(name) float name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & LVAL)) { throw badParamException(); } \
-	if (!__x.p_val->hasNumber()) { throw badParamException(); } \
-	name = __x.p_val->getFloat(); } vm->valueStack.pop_back();
+	name = __x.getLVal().getFloat(); } vm->valueStack.pop_back();
 #define VM_PARAM_AGENT(name) Agent *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & LVAL)) { throw badParamException(); } \
-	if (!__x.p_val->hasAgent()) { throw badParamException(); } \
-	name = __x.p_val->getAgent(); } vm->valueStack.pop_back();
+	name = __x.getLVal().getAgent(); } vm->valueStack.pop_back();
 #define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) caos_assert(name);
 #define VM_PARAM_VARIABLE(name) caosVar *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & RVAL)) { throw badParamException(); } \
-	name = __x.p_val; } vm->valueStack.pop_back();
+	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_DECIMAL(name) caosVar name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & LVAL)) { throw badParamException(); } \
-	if (!__x.p_val->hasDecimal()) { throw badParamException(); } \
-	name = *__x.p_val; } vm->valueStack.pop_back();
+	name = __x.getLVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_BYTESTR(name) std::vector<unsigned int> name; { \
 	VM_STACK_CHECK(vm); \
 	vmStackItem __x = vm->valueStack.back(); \
-	if (!(__x.type & BYTESTR)) { throw badParamException(); } \
-	name = __x.bytestring; } vm->valueStack.pop_back();
+	name = *__x.getByteStr(); } vm->valueStack.pop_back();
 
 #define STUB throw caosException("stub in " __FILE__)
 

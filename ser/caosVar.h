@@ -3,34 +3,27 @@
 
 #include <caosVar.h>
 #include <serialization.h>
+#include <boost/serialization/variant.hpp>
+#include <caosVM.h>
 
-SAVE(caosVar) {
-    ar & obj.type;
-    switch (obj.type) {
-        case NULLTYPE: break;
-        case AGENT: /*ar << obj.values.agentValue.ref;*/ assert(0); break;
-        case INTEGER: ar << obj.values.intValue; break;
-        case FLOAT: ar << obj.values.floatValue; break;
-        case STRING: ar << obj.values.stringValue->str; break;
-        default: assert(0);
-    }
+// XXX: stub so serialtest works until everything else serializes
+SAVE(AgentRef) {}
+LOAD(AgentRef) { obj = NULL; }
+
+// XXX belongs in ser/caosVM.h
+SAVE(bytestring_t) {
+    ar & *obj;
 }
 
-template<class Archive>
-void o_load(Archive & ar, caosVar & obj, const unsigned int version)
-{
-    obj.reset();
+LOAD(bytestring_t) {
+    std::vector<unsigned int> *v = new std::vector<unsigned int>;
+    ar & *v;
+    obj = bytestring_t(v);
+}
+
+SERIALIZE(caosVar) {
     ar & obj.type;
-    switch (obj.type) {
-        case NULLTYPE: break;
-        case AGENT: /* ar >> obj.values.agentValue.ref; */ assert(0); break;
-        case INTEGER: ar >> obj.values.intValue; break;
-        case FLOAT: ar >> obj.values.floatValue; break;
-        case STRING:
-            obj.values.stringValue = new(caosVarSlab) stringwrap();
-            ar >> obj.values.stringValue->str; break;
-        default: assert(0);
-    }
+    ar & obj.value;
 }
 
 #endif
