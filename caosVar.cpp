@@ -38,7 +38,7 @@ static inline std::string stringify(double x) {
 }
 
 std::string caosVar::dump() const {
-	switch(type) {
+	switch(getType()) {
 		case STRING:
 			return str(boost::format("String \"%s\" ") % getString());
 			break;

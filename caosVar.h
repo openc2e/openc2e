@@ -26,112 +26,152 @@
 #include <cassert>
 #include "AgentRef.h"
 #include "slaballoc.h"
+#include <typeinfo>
 
 #include "serialization.h"
 
 class Agent;
 
+class wrongCaosVarTypeException : public creaturesException {
+	public:
+		wrongCaosVarTypeException() throw() : creaturesException("Wrong caos variable type") {}
+		wrongCaosVarTypeException(const char *s) throw() : creaturesException(s) { }
+		wrongCaosVarTypeException(const std::string &s) throw() : creaturesException(s) { }
+};
+
+struct nulltype_tag { };
+
 enum variableType {
 	NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
 };
+
 class caosVar {
 	private:
 		FRIEND_SERIALIZE(caosVar)
-	public:
 	protected:
+		struct typeVisit : public boost::static_visitor<variableType> {
+			variableType operator()(int) const { return INTEGER; }
+			variableType operator()(float) const { return FLOAT; }
+			variableType operator()(const std::string &) const { return STRING; }
+			variableType operator()(const AgentRef &) const { return AGENT; }
+			variableType operator()(nulltype_tag) const { return NULLTYPE; }
+		};
 
+#define BAD_TYPE(et, gt) \
+		const et &operator()(const gt &) const { \
+			throw wrongCaosVarTypeException( \
+					"Wrong caosVar type: Expected " #et ", got " #gt \
+					); \
+		}
+		
+		struct intVisit : public boost::static_visitor<int> {
+			int operator()(int i) const { return i; }
+			int operator()(float f) const { return (int)f; }
+			BAD_TYPE(int, std::string);
+			BAD_TYPE(int, AgentRef);
+			BAD_TYPE(int, nulltype_tag);
+		};
 
-		boost::variant< int, float, AgentRef, std::string> value;
+		struct floatVisit : public boost::static_visitor<float> {
+			float operator()(int i) const { return (float)i; }
+			float operator()(float f) const { return f; }
+			BAD_TYPE(float, std::string);
+			BAD_TYPE(float, AgentRef);
+			BAD_TYPE(float, nulltype_tag);
+		};
 
-		variableType type;
+		struct stringVisit : public boost::static_visitor<const std::string &> {
+			const std::string &operator()(const std::string &s) const {
+				return s;
+			}
+			BAD_TYPE(std::string, AgentRef);
+			BAD_TYPE(std::string, nulltype_tag);
+			BAD_TYPE(std::string, int);
+			BAD_TYPE(std::string, float);
+		};
+		
+		struct agentVisit : public boost::static_visitor<const AgentRef &> {
+			const AgentRef &operator()(const AgentRef &a) const {
+				return a;
+			}
+			BAD_TYPE(AgentRef, std::string);
+			BAD_TYPE(AgentRef, nulltype_tag);
+			BAD_TYPE(AgentRef, int);
+			BAD_TYPE(AgentRef, float);
+		};
+			
+#undef BAD_TYPE
+		boost::variant<int, float, AgentRef, std::string, nulltype_tag> value;
+
 	public:
-		variableType getType() const { return type; }
+		variableType getType() const {
+			return boost::apply_visitor(typeVisit(), value);
+		}
 		
 		void reset() {
-			value = (int)0;
-			type = NULLTYPE;
+			value = nulltype_tag();
 		}
 
 		bool isNull() {
-			return type == NULLTYPE;
+			return getType() == NULLTYPE;
 		}
 
 		caosVar() {
-			type = INTEGER;
-			value = 0;
 		}
 
 		~caosVar() {
 		}
 
 		caosVar &operator=(const caosVar &copyFrom) {
-			type = copyFrom.type;
 			value = copyFrom.value;
 			return *this;
 		}
 
-		caosVar(const caosVar &copyFrom) : type(copyFrom.type) {
-			*this = copyFrom;
-		}
+		caosVar(const caosVar &copyFrom) : value(copyFrom.value) { }
+		
 
-		bool isEmpty() const { return type == NULLTYPE; }
-		bool hasInt() const { return type == INTEGER; }
-		bool hasFloat() const { return type == FLOAT; }
-		bool hasAgent() const { return type == AGENT; }
-		bool hasString() const { return type == STRING; }
-		bool hasDecimal() const { return type == INTEGER || type == FLOAT; }
+		bool isEmpty() const { return getType() == NULLTYPE; }
+		bool hasInt() const { return getType() == INTEGER; }
+		bool hasFloat() const { return getType() == FLOAT; }
+		bool hasAgent() const { return getType() == AGENT; }
+		bool hasString() const { return getType() == STRING; }
+		bool hasDecimal() const { return getType() == INTEGER || getType() == FLOAT; }
 		bool hasNumber() const { return hasDecimal(); }
 		
-		void setInt(int i) { type = INTEGER; value = i; }
-		void setFloat(float i) { type = FLOAT; value = i; }
+		void setInt(int i) { value = i; }
+		void setFloat(float i) { value = i; }
 		void setAgent(Agent *i) {
-			type = AGENT;
 			value = AgentRef(i);
 		}
 		void setAgent(const AgentRef &r) {
 			setAgent(r.get());
 		}
 		void setString(const std::string &i) {
-			type = STRING;
 			value = i;
 		}
 
 		int getInt() const {
-			caos_assert(hasDecimal());
-			if (type == INTEGER) {
-				return boost::get<int>(value);
-			} else {
-				return (int)boost::get<float>(value);
-			}
+			return boost::apply_visitor(intVisit(), value);
 		}
 
 		float getFloat() const {
-			caos_assert(hasDecimal());
-			if (type == FLOAT) {
-				return boost::get<float>(value);
-			} else {
-				return (float)boost::get<int>(value);
-			}
+			return boost::apply_visitor(floatVisit(), value);
 		}
 
 		void getString(std::string &s) const {
-			caos_assert(hasString());
-			s = boost::get<std::string>(value);
+			s = getString();
 		}
 
-		std::string getString() const {
-			caos_assert(hasString());
-			return boost::get<std::string>(value);
+		const std::string &getString() const {
+			return boost::apply_visitor(stringVisit(), value);
 		}
 
 		Agent *getAgent() const {
-			caos_assert(hasAgent());
-			return boost::get<AgentRef>(value).get();
+			return getAgentRef().get();
 		}
 
-		const AgentRef getAgentRef() const {
-			caos_assert(hasAgent());
-			return boost::get<AgentRef>(value).get();
+		const AgentRef &getAgentRef() const {
+			return boost::apply_visitor(agentVisit(), value);
 		}
 
 		bool operator == (const caosVar &v) const;

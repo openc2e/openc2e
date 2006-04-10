@@ -21,8 +21,9 @@ LOAD(bytestring_t) {
     obj = bytestring_t(v);
 }
 
+SERIALIZE(nulltype_tag) { }
+
 SERIALIZE(caosVar) {
-    ar & obj.type;
     ar & obj.value;
 }
 
