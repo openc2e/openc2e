@@ -222,9 +222,8 @@ void registerDelegates() {
 		v->name = (*it).first;
 		const cmdinfo *cmd = v->cmds;
 
-		while (cmd->key) {
-			op_key_map[std::string(cmd->key)] = cmd;
-			cmd++;
+		for (int i = 0; cmd[i].key; i++) {
+			op_key_map[std::string(cmd[i].key)] = &cmd[i];
 		}
 
 		it++;
