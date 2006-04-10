@@ -27,7 +27,7 @@
 #include <set>
 #include <list>
 #include <boost/shared_ptr.hpp>
-#include <serialization.h>
+#include "serialization.h"
 
 class script;
 using boost::shared_ptr;

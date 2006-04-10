@@ -63,7 +63,7 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	}
 
 	p->load();
-	std::ofstream output(outputfile.native_directory_string().c_str());
+	std::ofstream output(outputfile.native_directory_string().c_str(), std::ios::binary);
 	output.write((char *)p->getBuffer(), p->getSize());
 	// p->unload();
 		
