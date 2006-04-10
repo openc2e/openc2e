@@ -23,5 +23,6 @@ int main() {
     PSIZE(std::string);
     PSIZE(caosVar);
     PSIZE(caosVM);
+    PSIZE(boost::weak_ptr<Agent>);
     return 0;
 }

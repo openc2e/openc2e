@@ -84,17 +84,17 @@ void caosVM::c_RTAR() {
 	setTarg(0);
 
 	/* XXX: maybe use a map of classifier -> agents? */
-	std::vector<Agent *> temp;
-	for (std::list<Agent *>::iterator i
+	std::vector<boost::shared_ptr<Agent> > temp;
+	for (std::list<boost::shared_ptr<Agent> >::iterator i
 		= world.agents.begin(); i != world.agents.end(); i++) {
 		
-		Agent *a = (*i);
+		Agent *a = i->get();
 		
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		temp.push_back(a);
+		temp.push_back(*i);
 	}
 
 	if (temp.size() == 0) return;
@@ -372,8 +372,9 @@ void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALIDAGENT(a)
 
-	if (a != AgentRef(world.hand()))
+	if (a.get() != world.hand()) {
 		a->kill();
+	}
 }
 
 /**
@@ -628,7 +629,7 @@ void caosVM::v_TOTL() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	unsigned int x = 0;
-	for (std::list<Agent *>::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if ((*i)->family == family)
 			if ((*i)->genus == genus)
 				if ((*i)->species == species)
@@ -1247,7 +1248,7 @@ AgentRef findNextAgent(AgentRef previous, unsigned char family, unsigned char ge
 	AgentRef firstagent;
 	bool foundagent = false;
 
-	std::list<Agent *>::iterator i;
+	std::list<boost::shared_ptr<Agent> >::iterator i;
 	if (forward)
 		i = world.agents.begin();
 	else {
@@ -1258,12 +1259,13 @@ AgentRef findNextAgent(AgentRef previous, unsigned char family, unsigned char ge
 
 	// Loop through all the agents.
 	while (true) {
-		if ((*i)->family == family || family == 0)
-			if ((*i)->genus == genus || genus == 0)
-				if ((*i)->species == species || species == 0) {
-					if (!firstagent) firstagent = *i;
-					if (foundagent) return *i; // This is the agent we want!
-					if (*i == previous) foundagent = true;
+		Agent *a = i->get();
+		if (a->family == family || family == 0)
+			if (a->genus == genus || genus == 0)
+				if (a->species == species || species == 0) {
+					if (!firstagent) firstagent = a;
+					if (foundagent) return AgentRef(a); // This is the agent we want!
+					if (a == previous) foundagent = true;
 				}
 		
 		// Step through the list. Break if we need to.

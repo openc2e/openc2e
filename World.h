@@ -55,14 +55,13 @@ public:
 
 	std::multiset<CompoundPart *, partzorder> zorder; // sorted from top to bottom
 	std::multiset<renderable *, renderablezorder> renders; // sorted from bottom to top
-	std::list<Agent *> agents;
+	std::list<boost::shared_ptr<Agent> > agents;
 	
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
 	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	std::vector<caosVM *> vmpool;
-	std::vector<Agent *> killqueue;
-	std::map<int, Agent *> unidmap;
+	std::map<int, boost::weak_ptr<Agent> > unidmap;
 
 	std::vector<boost::filesystem::path> data_directories;
 	Scriptorium scriptorium;
@@ -77,7 +76,7 @@ public:
 	std::map<unsigned int, SDL_Surface **> backsurfs; // TODO: this is a horrible horrible icky hack
 
 	AgentRef selectedcreature;
-	void selectCreature(Agent *c);
+	void selectCreature(boost::shared_ptr<Agent> c);
 	AgentRef focusagent; unsigned int focuspart;
 	void setFocus(class TextEntryPart *p);
 

@@ -23,45 +23,25 @@
 #include <iostream>
 
 void AgentRef::checkLife() const {
-	assert(!ref || !ref->isDying());
-}
-
-void AgentRef::clear() {
-	if (!ref) return;
-	next->prev = prev;
-	prev->next = next;
-	ref = NULL;
-	next = prev = NULL;
+	assert(ref.expired() || !(ref.lock()->isDying()));
 }
 
 void AgentRef::set(Agent *a) {
-	clear();
-	if (!a || a->isDying()) return;
-
-	// Verify consistency of the linked list
-	assert(a->self.ref == a);
-	assert(a->self.next->prev = &a->self);
-	assert(a->self.prev->next = &a->self);
-
-	// We insert ourselves at a->self.next
-	next = a->self.next;
-	prev = &a->self;
-
-	next->prev = this;
-	prev->next = this;
-
-	ref = a;
-}
-
-void AgentRef::set(const AgentRef &r) {
-	/* Since r is const, we can't touch it directly.
-	 * Pass its ref to set(Agent*)
-	 */
-	set(r.ref);
+	if (a)
+		set(a->self);
+	else
+		ref.reset();
 }
 
 void AgentRef::dump() const {
-	std::cerr << "AgentRef " << (void *)this << " pointing to " << (void *)ref << ", next=" << (void *)next <<
-		" prev=" << (void *)prev << std::endl;
+	std::cerr << "AgentRef " << (void *)this << " pointing to " << (void *)ref.lock().get() << std::endl;
 }
+
+boost::shared_ptr<Agent> AgentRef::lock() const {
+	boost::shared_ptr<Agent> p = ref.lock();
+	if (p && p->isDying())
+		p.reset();
+	return p;
+}
+
 /* vim: set noet: */

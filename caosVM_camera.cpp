@@ -347,7 +347,7 @@ void caosVM::c_SCAM() {
 		return;
 	}
 	
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(agent);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(agent.get());
 	caos_assert(a);
 	CompoundPart *p = a->part(part);
 	caos_assert(p);

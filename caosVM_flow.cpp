@@ -158,9 +158,9 @@ void caosVM::c_ENUM() {
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
-	for (std::list<Agent *>::iterator i
+	for (std::list<boost::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
-		Agent *a = (*i);
+		boost::shared_ptr<Agent> a = (*i);
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
@@ -191,9 +191,9 @@ void caosVM::c_ESEE() {
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
-	for (std::list<Agent *>::iterator i
+	for (std::list<boost::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
-		Agent *a = (*i);
+		boost::shared_ptr<Agent> a = (*i);
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
@@ -231,9 +231,9 @@ void caosVM::c_ETCH() {
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
-	for (std::list<Agent *>::iterator i
+	for (std::list<boost::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
-		Agent *a = (*i);
+		boost::shared_ptr<Agent> a = (*i);
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;

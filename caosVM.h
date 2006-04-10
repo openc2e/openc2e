@@ -781,9 +781,9 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	name = __x.getLVal().getInt(); } vm->valueStack.pop_back();
 #define VM_PARAM_FLOAT(name) float name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getFloat(); } vm->valueStack.pop_back();
-#define VM_PARAM_AGENT(name) Agent *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+#define VM_PARAM_AGENT(name) boost::shared_ptr<Agent> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getAgent(); } vm->valueStack.pop_back();
-#define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) caos_assert(name);
+#define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) caos_assert(name.get() != NULL);
 #define VM_PARAM_VARIABLE(name) caosVar *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_DECIMAL(name) caosVar name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \

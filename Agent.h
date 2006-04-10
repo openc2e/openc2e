@@ -71,7 +71,7 @@ protected:
 	int lastcollidedirection;
 
 	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
-	std::list<Agent *>::iterator agents_iter;
+	std::list<boost::shared_ptr<Agent> >::iterator agents_iter;
 	std::list<caosVM *> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
 

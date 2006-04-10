@@ -27,9 +27,6 @@
 
 void Agent::core_init() {
 	initialized = false;
-	// AgentRef stuff
-	self.ref = this;
-	self.next = self.prev = &self;
 }
 
 
@@ -53,7 +50,10 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	soundslot = 0;
 	paused = displaycore = false;
 
-	agents_iter = world.agents.insert(++world.agents.begin(), this);
+	boost::shared_ptr<Agent> s_self(this);
+	
+	agents_iter = world.agents.insert(++world.agents.begin(), s_self);
+	self = s_self;
 
 	floatable = false; setAttributes(0);
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
@@ -508,7 +508,6 @@ void Agent::vmTick() {
 Agent::~Agent() {
 	if (!initialized) return;
 	
-	world.agents.erase(agents_iter);
 	if (vm)
 		world.freeVM(vm);
 	zotstack();
@@ -519,23 +518,23 @@ void Agent::kill() {
 	assert(!dying);
 	if (floatable) floatRelease();
 	dropCarried();
+	self.clear();
+	
 	dying = true; // what a world, what a world...
+
 	if (vm) {
 		vm->stop();
 		world.freeVM(vm);
 		vm = 0;
 	}
+	
 	zotstack();
 	zotrefs();
-	if (unid != -1)
-		world.freeUNID(unid);
-	world.killqueue.push_back(this);
+	world.agents.erase(agents_iter);
 	if (soundslot) soundslot->stop();
 }
 
 void Agent::zotrefs() {
-	while (self.next != &self)
-		self.next->clear();
 }
 
 unsigned int Agent::getZOrder() const {

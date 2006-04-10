@@ -144,7 +144,7 @@ class caosVar {
 			value = AgentRef(i);
 		}
 		void setAgent(const AgentRef &r) {
-			setAgent(r.get());
+			value = r;
 		}
 		void setString(const std::string &i) {
 			value = i;
@@ -166,8 +166,8 @@ class caosVar {
 			return boost::apply_visitor(stringVisit(), value);
 		}
 
-		Agent *getAgent() const {
-			return getAgentRef().get();
+		boost::shared_ptr<Agent> getAgent() const {
+			return getAgentRef().lock();
 		}
 
 		const AgentRef &getAgentRef() const {

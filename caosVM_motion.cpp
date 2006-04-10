@@ -291,8 +291,8 @@ void caosVM::v_RELX() {
 */
 void caosVM::v_RELY() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_AGENT(second)
-	VM_PARAM_AGENT(first)
+	VM_PARAM_VALIDAGENT(second)
+	VM_PARAM_VALIDAGENT(first)
 
 	float one = first->y + (first->getHeight() / 2.0);
 	float two = second->y + (second->getHeight() / 2.0);

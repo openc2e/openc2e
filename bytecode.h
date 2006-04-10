@@ -226,7 +226,7 @@ class caosCond : public caosOp {
 			} else if (arg2.hasAgent() && arg1.hasAgent()) {
 				if (cond != CEQ && cond != CNE)
 					throw caosException("invalid comparison for agents");
-				Agent *a1, *a2;
+				boost::shared_ptr<Agent> a1, a2;
 				a1 = arg1.getAgent();
 				a2 = arg2.getAgent();
 				if (a1 == a2)

@@ -49,7 +49,7 @@ std::string caosVar::dump() const {
 			return str(boost::format("Float %f ") % getFloat());
 			break;
 		case AGENT:
-			return str(boost::format("Agent %p ") % (Agent *)getAgent());
+			return str(boost::format("Agent %p ") % (Agent *)getAgent().get());
 			break;
 		default:
 			return "[bad caosVar!] ";

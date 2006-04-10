@@ -116,10 +116,18 @@ void World::setFocus(TextEntryPart *p) {
 
 void World::tick() {
 	if (saving) {} // TODO: save
-	if (quitting) { exit(0); }
+	if (quitting) {
+		// due to destruction ordering we must explicitly destroy all agents here
+		agents.clear();
+		exit(0);
+	}
 	// Tick all agents.
-	for (std::list<Agent *>::iterator i = agents.begin(); i != agents.end(); i++) {
-		(**i).tick();
+	
+	std::list<boost::shared_ptr<Agent> >::iterator i = agents.begin();
+	while (i != agents.end()) {
+		boost::shared_ptr<Agent> a = *i;
+		i++;
+		a->tick();
 	}
 	
 	// Process the script queue.
@@ -131,16 +139,6 @@ void World::tick() {
 		}
 	}
 	scriptqueue.clear();
-	
-	// Do the actual killing of agent objects.
-	// TODO: should we do this before+after the script queue processing? - fuzzie
-	while (killqueue.size()) {
-		Agent *rip = killqueue.back();
-		killqueue.pop_back();
-		assert(rip->dying);
-		delete rip;
-	}
-
 
 	tickcount++;
 	// todo: tick rooms
@@ -178,8 +176,8 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 int World::getUNID(Agent *whofor) {
 	do {
 		int unid = rand();
-		if (!unidmap[unid]) {
-			unidmap[unid] = whofor;
+		if (unidmap[unid].expired()) {
+			unidmap[unid] = whofor->self.lock();
 			return unid;
 		}
 	} while (1);
@@ -190,7 +188,7 @@ void World::freeUNID(int unid) {
 }
 
 Agent *World::lookupUNID(int unid) {
-	return unidmap[unid];
+	return unidmap[unid].lock().get();
 }
 
 void World::drawWorld() {
@@ -377,9 +375,9 @@ std::string World::getUserDataDir() {
 	return (data_directories.end() - 1)->native_directory_string();
 }
 
-void World::selectCreature(Agent *a) {
+void World::selectCreature(boost::shared_ptr<Agent> a) {
 	if (a) {
-		Creature *c = dynamic_cast<Creature *>(a);
+		Creature *c = dynamic_cast<Creature *>(a.get());
 		caos_assert(c);
 	}
 	selectedcreature = a;
