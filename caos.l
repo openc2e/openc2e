@@ -51,4 +51,3 @@ WORDANY     [a-zA-Z0-9:?!_+-]
 [ \t\n\r]     // eat whitespace
 .                         parse_error(yytext, yylineno);
 %%
-
