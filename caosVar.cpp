@@ -3,7 +3,7 @@
  *  openc2e
  *
  *  Created by Bryan Donlan on Thu Mar 10 2005.
- *  Copyright (c) 2004 Alyssa Milburn and Bryan Donlan. All rights reserved.
+ *  Copyright (c) 2005-2006 Alyssa Milburn and Bryan Donlan. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

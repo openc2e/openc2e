@@ -66,7 +66,7 @@ static void opt_version() {
 extern "C" int main(int argc, char *argv[]) {
 	try {
 		
-	std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2005 Alyssa Milburn and others\n\n";
+	std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2006 Alyssa Milburn and others\n\n";
 	int optret;
 	bool enable_sound = true;
 	std::vector<std::string> bootstrap;
