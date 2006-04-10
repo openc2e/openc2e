@@ -31,8 +31,6 @@
 
 using boost::str;
 
-SlabAllocator caosVarSlab((sizeof(agentwrap) > sizeof(stringwrap) ? sizeof(agentwrap) : sizeof(stringwrap)), 32768, false);
-
 static inline std::string stringify(double x) {
 	std::ostringstream o;
 	if (!(o << x)) throw "stringify() failed";
@@ -40,17 +38,23 @@ static inline std::string stringify(double x) {
 }
 
 std::string caosVar::dump() const {
-	if (type == STRING) {
-		return std::string("\"") + values.stringValue->str + "\" ";
-	} else if (type == INTEGER) {
-		return stringify(values.intValue) + " ";
-	} else if (type == FLOAT) {
-		return stringify(values.floatValue) + " ";
-	} else if (type == AGENT) {
-		return str(boost::format("Agent %p") % values.refValue->ref.get());
-	} else {
-		return "[bad caosVar!] ";
-	}
+	switch(type) {
+		case STRING:
+			return str(boost::format("String \"%s\" ") % getString());
+			break;
+		case INTEGER:
+			return str(boost::format("Int %d ") % getInt());
+			break;
+		case FLOAT:
+			return str(boost::format("Float %f ") % getFloat());
+			break;
+		case AGENT:
+			return str(boost::format("Agent %p ") % (Agent *)getAgent());
+			break;
+		default:
+			return "[bad caosVar!] ";
+			break;
+	};
 }
 
 bool caosVar::operator == (const caosVar &v) const {

@@ -20,6 +20,7 @@
 #ifndef CAOSVAR_H
 #define CAOSVAR_H 1
 
+#include "boost/variant.hpp"
 #include "openc2e.h"
 #include <string>
 #include <cassert>
@@ -29,29 +30,6 @@
 #include "serialization.h"
 
 class Agent;
-
-
-struct stringwrap {
-	std::string str;
-
-	stringwrap() {}
-	stringwrap(const std::string &s) : str(s) {}
-	stringwrap(const stringwrap &sw) : str(sw.str) {}
-	
-	SLAB_CLASS(stringwrap)
-};
-
-struct agentwrap {
-	AgentRef ref;
-
-	agentwrap() {}
-	agentwrap(const AgentRef &r) : ref(r) {}
-	agentwrap(const agentwrap &w) : ref(w.ref) {}
-
-	SLAB_CLASS(agentwrap)
-};
-
-extern SlabAllocator caosVarSlab;
 
 enum variableType {
 	NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
@@ -63,27 +41,14 @@ class caosVar {
 	protected:
 
 
-		union {
-			int intValue;
-			float floatValue;
-			agentwrap *refValue;
-			stringwrap *stringValue;
-		} values;
+		boost::variant< int, float, AgentRef, std::string> value;
 
 		variableType type;
 	public:
 		variableType getType() const { return type; }
 		
 		void reset() {
-			switch (type) {
-				case AGENT:
-					delete values.refValue;
-					break;
-				case STRING:
-					delete values.stringValue;
-					break;
-				default: break;
-			}
+			value = (int)0;
 			type = NULLTYPE;
 		}
 
@@ -93,35 +58,19 @@ class caosVar {
 
 		caosVar() {
 			type = INTEGER;
-			values.intValue = 0;
+			value = 0;
 		}
 
 		~caosVar() {
-			reset();
 		}
 
 		caosVar &operator=(const caosVar &copyFrom) {
 			type = copyFrom.type;
-			switch (type) {
-				case INTEGER:
-				case FLOAT:
-					values = copyFrom.values;
-					break;
-				case STRING:
-					values.stringValue = new(caosVarSlab) stringwrap(copyFrom.values.stringValue->str);
-					break;
-				case AGENT:
-					values.refValue = new(caosVarSlab) agentwrap(copyFrom.values.refValue->ref);
-					break;
-				case NULLTYPE:
-					break;
-				default: assert(0);
-			}
+			value = copyFrom.value;
 			return *this;
 		}
 
 		caosVar(const caosVar &copyFrom) : type(copyFrom.type) {
-			type = NULLTYPE;
 			*this = copyFrom;
 		}
 
@@ -133,66 +82,56 @@ class caosVar {
 		bool hasDecimal() const { return type == INTEGER || type == FLOAT; }
 		bool hasNumber() const { return hasDecimal(); }
 		
-		void setInt(int i) { reset(); type = INTEGER; values.intValue = i; }
-		void setFloat(float i) { reset(); type = FLOAT; values.floatValue = i; }
+		void setInt(int i) { type = INTEGER; value = i; }
+		void setFloat(float i) { type = FLOAT; value = i; }
 		void setAgent(Agent *i) {
-			if (type == AGENT)
-				values.refValue->ref.set(i);
-			else {
-				reset();
-				type = AGENT;
-				values.refValue = new(caosVarSlab) agentwrap(i);
-			}
+			type = AGENT;
+			value = AgentRef(i);
 		}
 		void setAgent(const AgentRef &r) {
 			setAgent(r.get());
 		}
 		void setString(const std::string &i) {
-			if (type == STRING)
-				*values.stringValue = i;
-			else {
-				reset();
-				type = STRING;
-				values.stringValue = new(caosVarSlab) stringwrap(i);
-			}
+			type = STRING;
+			value = i;
 		}
 
 		int getInt() const {
 			caos_assert(hasDecimal());
 			if (type == INTEGER) {
-				return values.intValue;
+				return boost::get<int>(value);
 			} else {
-				return (int)(values.floatValue + 0.5f);
+				return (int)boost::get<float>(value);
 			}
 		}
 
 		float getFloat() const {
 			caos_assert(hasDecimal());
 			if (type == FLOAT) {
-				return values.floatValue;
+				return boost::get<float>(value);
 			} else {
-				return (float)values.intValue;
+				return (float)boost::get<int>(value);
 			}
 		}
 
 		void getString(std::string &s) const {
 			caos_assert(hasString());
-			s = values.stringValue->str;
+			s = boost::get<std::string>(value);
 		}
 
 		std::string getString() const {
 			caos_assert(hasString());
-			return values.stringValue->str;
+			return boost::get<std::string>(value);
 		}
 
 		Agent *getAgent() const {
 			caos_assert(hasAgent());
-			return values.refValue->ref.get();
+			return boost::get<AgentRef>(value).get();
 		}
 
-		const AgentRef &getAgentRef() const {
+		const AgentRef getAgentRef() const {
 			caos_assert(hasAgent());
-			return values.refValue->ref;
+			return boost::get<AgentRef>(value).get();
 		}
 
 		bool operator == (const caosVar &v) const;

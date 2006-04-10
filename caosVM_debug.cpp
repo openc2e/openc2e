@@ -185,10 +185,10 @@ void caosVM::c_DBG_MALLOC() {
 	MPRINT(keepcost);
 	malloc_stats(); */
 	
-	std::cerr << "caosSlab free=" << caosVarSlab.free_elements() <<
+	/*std::cerr << "caosSlab free=" << caosVarSlab.free_elements() <<
 				 " used=" << caosVarSlab.used_elements() <<
 				 " total=" << caosVarSlab.total_elements() <<
-				 std::endl;
+				 std::endl;*/
 }
 	
 /**
