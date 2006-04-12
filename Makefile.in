@@ -81,8 +81,8 @@ OPENC2E = $(OPENC2E_CORE) main.o
 
 DEBUGFLAGS=-ggdb3 -O0
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE
-XLDFLAGS=$(LDFLAGS) -lboost_program_options -lboost_serialization -lboost_filesystem $(shell sdl-config --libs) -lz -lm -lSDL_net -lSDL_mixer -lpthread
-COREFLAGS=$(DEBUGFLAGS) $(shell sdl-config --cflags) -I.
+XLDFLAGS=$(LDFLAGS) -lboost_program_options -lboost_serialization -lboost_filesystem @sdl.lflags@ -lz -lm -lSDL_net -lSDL_mixer -lpthread
+COREFLAGS=$(DEBUGFLAGS) @sdl.cflags@ -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
