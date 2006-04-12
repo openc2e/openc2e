@@ -172,4 +172,4 @@ headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) $(wildcard ser/*.h) mngparser.
 headerdeps.png: headerdeps.dot
 	dot -Tpng -o $@ $^
 
-.PHONY: clean all dep docs
+.PHONY: clean all dep docs test
