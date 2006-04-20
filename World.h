@@ -73,7 +73,6 @@ public:
 	MainCamera camera;
 	SDLBackend backend;
 	bool showrooms;
-	std::map<unsigned int, SDL_Surface **> backsurfs; // TODO: this is a horrible horrible icky hack
 
 	AgentRef selectedcreature;
 	void selectCreature(boost::shared_ptr<Agent> c);

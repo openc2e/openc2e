@@ -221,7 +221,7 @@ void World::drawWorld() {
 			if ((destrect.x >= -128) && (destrect.y >= -128) &&
 					(destrect.x - 128 <= backend.getWidth()) &&
 					(destrect.y - 128 <= backend.getHeight()))
-				SDL_BlitSurface(backsurfs[m->id][whereweare], 0, backend.screen, &destrect);
+				SDL_BlitSurface(m->backsurfs[whereweare], 0, backend.screen, &destrect);
 		}
 	}
 

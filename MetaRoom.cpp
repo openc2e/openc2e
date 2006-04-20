@@ -21,11 +21,34 @@
 #include "World.h"
 #include "creaturesImage.h"
 #include <assert.h>
+#include "SDLBackend.h"
 
 MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
 	xloc = _x; yloc = _y; wid = _width; hei = _height;
-	background = (blkImage *)gallery.getImage(back + ".blk");
-	caos_assert(background);
+	if (back.empty()) {
+		background = 0;
+		backsurfs = 0;
+	} else {
+		background = (blkImage *)gallery.getImage(back + ".blk");
+		caos_assert(background);
+
+		// TODO: This probably doesn't belong in the constructor. Or, perhaps, in MetaRoom at all.
+		unsigned int rmask, gmask, bmask;
+		if (background->is565()) {
+			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
+		} else {
+			rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
+		}
+
+		backsurfs = new SDL_Surface *[background->numframes()];
+		assert(backsurfs);
+		for (unsigned int i = 0; i < background->numframes(); i++) {
+			backsurfs[i] = SDL_CreateRGBSurfaceFrom(background->data(i), background->width(i),
+					background->height(i), 16 /* depth */, background->width(i) * 2 /* pitch */,
+					rmask, gmask, bmask, 0);
+			assert(backsurfs[i]);
+		}
+	}
 }
 
 MetaRoom::~MetaRoom() {

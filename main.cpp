@@ -176,32 +176,6 @@ extern "C" int main(int argc, char *argv[]) {
 		f << boost::str(boost::format("%d") % listenport);
 	}
 
-	for (unsigned int j = 0; j < world.map.getMetaRoomCount(); j++) {
-		MetaRoom *m = world.map.getArrayMetaRoom(j);
-		blkImage *test = m->backImage();
-		assert(test != 0);
-
-		unsigned int rmask, gmask, bmask;
-		if (test->is565()) {
-			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
-		} else {
-			rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
-		}
-	
-		assert(world.backsurfs.find(m->id) == world.backsurfs.end());
-
-		world.backsurfs[m->id] = new SDL_Surface *[test->numframes()];
-		for (unsigned int i = 0; i < test->numframes(); i++) {
-			world.backsurfs[m->id][i] = SDL_CreateRGBSurfaceFrom(test->data(i),
-														   test->width(i),
-														   test->height(i),
-														   16, // depth
-														   test->width(i) * 2, // pitch
-														   rmask, gmask, bmask, 0); // RGBA mask
-			assert(world.backsurfs[m->id][i] != 0);
-		}
-	}
-
 	world.drawWorld();
 
 	SDL_EnableUNICODE(1); // bz2 and I both think this is the only way to get useful ascii out of SDL

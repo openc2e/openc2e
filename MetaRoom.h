@@ -25,12 +25,16 @@
 #include <string>
 #include <vector>
 
+struct SDL_Surface;
+
 class MetaRoom {
 protected:
 	unsigned int xloc, yloc, wid, hei;
 	blkImage *background;
 	
 public:
+	SDL_Surface **backsurfs; // TODO: hack
+
 	std::vector<Room *> rooms;
 
 	unsigned int x() { return xloc; }
