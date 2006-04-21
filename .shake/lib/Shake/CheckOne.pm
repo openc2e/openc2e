@@ -8,8 +8,8 @@ use base 'Shake::Check';
 
 our $VERSION = 0.01;
 
-sub fullname { shift->prefix }
-sub name { undef }
+sub name { shift->prefix }
+sub shortname { undef }
 
 
 

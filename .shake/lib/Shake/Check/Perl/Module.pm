@@ -14,22 +14,17 @@ sub initialize {
 	$self->{module} = $module;
 }
 
-sub desc {
+sub msg {
 	my ($self) = @_;
 
 	return "checking for $self->{module}";
 }
 
-sub can_cache { 0 }
+sub can_cache { 1 }
 
-sub name {
+sub shortname {
 	my ($self) = @_;
 	return $self->{module};
-}
-
-sub human_name {
-	my $self = shift;
-	return "the $self->{module} perl module";
 }
 
 sub run {

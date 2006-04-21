@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use lib '.shake';
+use lib '.shake/lib';
 use Shake::Script;
 use Shake::Checks qw( 
-	Program 
+	Program
+	Program::Version
 	C::Compiler
 	Cpp::Compiler
 	C::Endian
 	C::Header
 	Perl::Module 
-	Version
 	SDL::CFlags
 	SDL::LFlags
 );
@@ -22,7 +22,7 @@ check_cpp_compiler();
 check_c_endian(compiler => lookup('cpp.compiler'));
 check_perl_module('YAML');
 check_program('flex');
-check_version('flex', '2.5.31');
+check_program_version('flex', '2.5.31');
 check_program('sdl-config');
 check_program('bison');
 check_sdl_cflags();
@@ -49,5 +49,5 @@ ensure (
 	default  => 'required',
 );
 
-write_config();
 configure('Makefile');
+save_config();

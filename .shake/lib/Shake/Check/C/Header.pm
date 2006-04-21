@@ -17,7 +17,7 @@ sub initialize {
 	$self->{compiler} = $args{compiler} or die "Test requires a C compiler";
 }
 
-sub desc {
+sub msg {
 	my ($self) = @_;
 
 	return "checking for $self->{header}";
@@ -25,17 +25,12 @@ sub desc {
 
 sub can_cache { 1 }
 
-sub name {
+sub shortname {
 	my ($self) = @_;
 	my $name = $self->{header};
 	$name =~ s/\.h(pp)?$//;
 	$name =~ s/[^.\w]/_/g;
 	return $name;
-}
-
-sub human_name {
-	my $self = shift;
-	return "the $self->{header} header";
 }
 
 sub run {

@@ -1,33 +1,51 @@
 # vim: set ts=4 sw=4 noexpandtab si ai sta tw=100:
 # This module is copyrighted, see end of file for details.
-package Shake::Check::Cpp::Compiler;
+package Shake::Check::Program;
 use strict;
 use warnings;
-
-use Shake::Check::Program;
-use base 'Shake::Check::Program';
+use Shake::Check;
+use File::Spec;
+use base 'Shake::Check';
 
 our $VERSION = 0.01;
 
 sub initialize {
-	my ($self) = @_;
-	$self->{program} = 'c++';
+	my ($self, $program) = @_;
+	$self->{program} = $program;
 }
 
-sub desc {
+sub msg {
 	my ($self) = @_;
 
 	return "checking for $self->{program}";
 }
 
-sub can_cache { 1 }
+sub can_cache { 0 }
 
-sub fullname { shift->prefix }
-sub name { undef }
+sub shortname {
+	my ($self) = @_;
+	return $self->{program};
+}
 
-sub human_name {
-	my $self = shift;
-	return "a C compiler";
+sub run {
+	my ($self) = @_;
+	my $prog = $self->{program};
+	my $sep = ':';
+	
+	if ($^O eq 'MSWin32') {
+		$prog .= ".exe";
+		$sep = ';';
+	}
+	
+	my @path = split($sep, $ENV{PATH});
+	foreach my $dir (@path) {
+		my $path = File::Spec->join($dir, $prog);
+		if (-e $path) {
+			return $path;
+		}
+	}
+	
+	return undef;
 }
 
 1;
@@ -84,4 +102,3 @@ You should have received a copy of the GNU General Public License
 along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-1;

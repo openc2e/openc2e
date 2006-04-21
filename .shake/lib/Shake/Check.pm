@@ -6,7 +6,7 @@ use warnings;
 use Shake::Base;
 use base 'Shake::Base';
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub prefix {
 	my ($self) = @_;
@@ -17,22 +17,14 @@ sub prefix {
 	return lc $prefix
 }
 
-sub name    {
+sub shortname    {
 	die "implement me";
 }
 
-sub fullname {
+sub name {
 	my ($self) = @_;
 	
-	return $self->prefix . "." . $self->name
-}
-
-sub human_name {
-	shift->fullname;
-}
-
-sub desc {
-	die "implement me";
+	return $self->prefix . "." . $self->shortname
 }
 
 sub version {
@@ -76,36 +68,50 @@ List required parameters for new().
 This class implements the following methods:
 
 
-=head2 name(Z<>)
+=head2 shortname(Z<>)
 
 Returns the base name of the test, e.g. "gcc".
+
+You should overload this method, or inherit from L<Shake::CheckOne> instead of L<Shake::Check>.
 
 =head2 prefix(Z<>)
 
 Returns the prefix of the test, e.g. "program".
 
-=head2 fullname(Z<>)
+You do not need to overload this method.
 
-Returns C<join('.', $self-E<gt>prefix(), $self-E<gt>name())>
+=head2 name(Z<>)
 
-=head2 desc(Z<>)
+Returns C<join('.', $self-E<gt>prefix(), $self-E<gt>shortname())>
+
+You do not need to overload this method.
+
+=head2 msg(Z<>)
 
 Returns a string like "checking for foo".
 The string MUST NOT end with a newline.
+
+You B<must> overload this method.
 
 =head2 version(Z<>)
 
 Returns the version of the test. This should be the same between all instances
 of a class.
 
+You do not need to overload this method.
+
 =head2 is_fresh($val)
 
 Returns 0 if the test needs to be run() again and 1 if the test data is still fresh.
 $val is the previously-returned value of run().
 
+This returns 0. Overload it to change the behavior.
+
 =head2 can_cache(Z<>)
 
 This returns true if the test can be cached.
+
+The default is 0, no caching.
 
 =head2 run($config)
 
@@ -114,6 +120,8 @@ A true value (a string, usually) will indicate whatever was found.
 If a check fails (for example, can't compile example program) an exception is raised.
 
 $config is a L<Shake::Config> object (or compatible, in the case of L<Shake::Cache>.
+
+You B<must> overload this method.
 
 =head1 BUGS
 

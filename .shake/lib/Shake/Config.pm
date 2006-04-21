@@ -8,11 +8,32 @@ use Carp;
 use Shake::Base;
 use base 'Shake::Base';
 
-our $VERSION = 0.01;
+our $VERSION = 0.10;
 
 sub initialize {
 	my ($self, $cache) = @_;
 	$self->{results} = {};
+}
+
+sub save {
+	require Data::Dumper;
+	my ($self, $file) = @_;
+	my $fh = new IO::File($file, 'w') or die "Can't open $file for output: $!";
+	$fh->print(
+		Data::Dumper::Dumper($self->results)
+	);
+	$fh->close;
+}
+
+sub load {
+	my ($self, $file) = @_;
+	$self->{results} = do $file;
+	if ($@) {
+		die $@;
+	}
+	if (not $self->{results}) {
+		die "Failed loading saved config!";
+	}
 }
 
 
@@ -25,6 +46,9 @@ sub define {
 
 sub lookup {
 	my ($self, $key, $what) = @_;
+	unless (exists $self->{results}{$key}) {
+		die "Unknown feature: $key\n";
+	}
 	return $self->{results}{$key}{$what || 'value'};
 }
 
@@ -41,14 +65,14 @@ sub has {
 }
 sub run {
 	my ($self, $check) = @_;
-	my $name = $check->fullname;
-	print $check->desc, "... ";
+	my $name = $check->name;
+	print $check->msg, "... ";
 	
 	my $rv = eval {
 		my $val = $check->run($self);
 		$self->{results}{$name} = {
 			version => $check->version,
-			desc   => $check->human_name,
+			msg     => $check->msg,
 			value   => $val,
 		};
 		

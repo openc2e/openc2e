@@ -9,15 +9,20 @@ use base 'Exporter';
 use Carp;
 
 our $VERSION   = 0.01;
-our @EXPORT    = qw( %option shake_init lookup checks ensure write_config configure );
+our @EXPORT    = qw( $checking %option shake_init lookup have checks ensure save_config configure );
 our @EXPORT_OK = qw( $Config );
 our $Config;
+our $checking = 1;
 our %option = (
 	prefix => '/usr/local',
 );
 
 sub lookup {
 	$Config->lookup(@_);
+}
+
+sub have {
+	$Config->has(@_);
 }
 
 sub shake_init {
@@ -27,7 +32,7 @@ sub shake_init {
 		require Shake::Config;
 		$Config = new Shake::Config;
 	}
-
+	
 	GetOptions(\%option, 
 		qw(
 			prefix=s
@@ -38,6 +43,7 @@ sub shake_init {
 	if ($option{'dist'}) {
 		require Shake::Dist;
 		Shake::Dist::make_dist();
+		exit 0;
 	}
 	
 	print "configuring $pkg $version (report bugs to $author)\n";
@@ -47,11 +53,16 @@ sub shake_init {
 	$Config->define(PREFIX  => $option{prefix});
 }
 
-sub write_config {
-	my $file = "config.yml";
-	require YAML;
-	print "creating config.yml\n";
-	YAML::DumpFile($file, $Config->results);
+sub save_config {
+	my $file = ".shake/config.pl";
+	
+	unless (-d '.shake') {
+		mkdir '.shake' or die "mkdir(.shake): $!";
+	}
+	
+	print "saving config... ";
+	$Config->save($file);
+	print "done.\n";
 }
 
 sub configure {
@@ -62,7 +73,7 @@ sub configure {
 
 	print "writing $file... ";
 	while (defined ($line = $in->getline)) {
-		$line =~ s/@([.\w]+?)@/$Config->lookup($1) || ''/ge;
+		$line =~ s/@([-:.\w]+?)@/$Config->lookup($1) || ''/ge;
 		$out->print($line);
 	}
 	print "done.\n";
@@ -86,7 +97,7 @@ sub ensure {
 		if (not $Config->has($feature)) {
 			if ($default eq 'required' or $required{$feature}) {
 				$die++;
-				warn "*** Error: ", ucfirst($Config->lookup($feature, 'desc')), " is required\n";
+				warn "*** Error: required check ``$feature'' failed.\n";
 			}
 		}	
 	}
