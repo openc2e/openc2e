@@ -51,8 +51,9 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	paused = displaycore = false;
 
 	boost::shared_ptr<Agent> s_self(this);
-	
-	agents_iter = world.agents.insert(++world.agents.begin(), s_self);
+
+	world.agents.push_front(s_self);
+	agents_iter = world.agents.begin();
 	self = s_self;
 
 	floatable = false; setAttributes(0);
