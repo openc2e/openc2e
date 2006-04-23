@@ -10,6 +10,25 @@ use IO::File;
 use Shake::CheckOne;
 use base 'Shake::CheckOne';
 
+
+use constant PROGRAM => <<'CODE';
+#include <stdio.h>
+int am_big_endian()
+{
+	long one = 1;
+	return !(*((char *)(&one)));
+}
+int main()
+{
+	if (am_big_endian())
+		puts("big");
+	else
+		puts("little");
+
+	return 0;
+}
+CODE
+
 our $VERSION = 0.01;
 
 sub initialize {
@@ -28,32 +47,27 @@ sub can_cache { 1 }
 sub run {
 	my ($self, $config) = @_;
 	my $cc = $self->{compiler};
-	my $src = <<"	CODE";
-	#include <stdio.h>
-	int am_big_endian()
-	{
-		long one = 1;
-		return !(*((char *)(&one)));
-	}
-	int main()
-	{
-		if (am_big_endian())
-			puts("big");
-		else
-			puts("little");
-
-		return 0;
-	}
-	CODE
-	my ($fh, $file) = mkstemps("shakeXXXXX", ".c");
-	my $exe = mktemp('checkXXXX');
-	print $fh $src;
+	
+	my ($fh, $srcfile) = mkstemps('shake-XXXXXX', '.c') or die "failed to get temp .c file";
+	my $exefile = mktemp('shake-check-XXXXXX') or die "Failed to get temp .exe file";
+	$exefile .= '.exe';
+	
+	print $fh PROGRAM;
 	close $fh;
-	system($cc, '-o', $exe, $file);
-	my $rv = `./$exe`;
-	chomp $rv;
-	unlink($exe);
-	unlink($file);
+	
+	system($cc, '-o', $exefile, $srcfile);
+	die "failed to compile C file into executable" unless $? == 0;
+
+	my $rv = `./$exefile`;
+	
+	if ($? == 0) {
+		chomp $rv;
+	} else {
+		$rv = undef;
+	}
+	
+	unlink($exefile);
+	unlink($srcfile);
 
 	return $rv;
 }
