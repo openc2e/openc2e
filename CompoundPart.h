@@ -95,6 +95,7 @@ public:
 	void setBase(unsigned int b);
 	void changeSprite(std::string spritefile, unsigned int fimg);
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
+	virtual bool isTransparent() { return is_transparent; }
 	bool transparentAt(unsigned int x, unsigned int y);
 
 	virtual ~SpritePart();
@@ -110,6 +111,7 @@ public:
 	ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, const bytestring &animhover, int msgid, int option);
 	void handleClick(float, float);
+	bool isTransparent() { return hitopaquepixelsonly; }
 };
 
 class DullPart : public SpritePart {
@@ -201,6 +203,7 @@ public:
 	void handleSpecialKey(char c);
 	void tick();
 	virtual void partRender(class SDLBackend *renderer, int xoffset, int yoffset);
+	bool isTransparent() { return false; }
 };
 
 #endif

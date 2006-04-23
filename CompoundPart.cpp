@@ -29,11 +29,8 @@ bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) con
 	// TODO: unsure about all of this, needs a check (but seems to work)
 	if (s1->getParent()->getZOrder() == s2->getParent()->getZOrder()) {
 		// part 0 is often at the same plane as other parts..
-		// TODO: is this correct fix?
+		// TODO: is this correct fix? I suspect not, we should be sorting by reaction order, not id.
 		if (s1->getParent() == s2->getParent()) {
-			// TODO: evil hack by fuzzie because she's not sure how on earth this ordering works, still :(
-			if (dynamic_cast<const FixedTextPart *>(s2)) return true;
-			
 			return s1->id > s2->id;
 		} else
 			return s1->getZOrder() > s2->getZOrder();

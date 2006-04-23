@@ -158,12 +158,10 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 		int ay = (int)y - (*i)->getParent()->y;
 		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (int)(*i)->getWidth()) >= ax) if (((*i) -> y + (int)(*i)->getHeight()) >= ay)
 			if ((*i)->getParent() != theHand) {
-				// TODO: meh, think more about transparency
 				SpritePart *s = dynamic_cast<SpritePart *>(*i);
-				if (s && s->is_transparent)
-					if (obey_all_transparency || s->id == 0)
-						if (s->transparentAt(ax - s->x, ay - s->y))
-							continue;
+				if (s && s->isTransparent())
+					if (s->transparentAt(ax - s->x, ay - s->y))
+						continue;
 				if (needs_mouseable && !((*i)->getParent()->mouseable))
 					continue;
 				return *i;
