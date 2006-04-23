@@ -59,15 +59,14 @@ sub run {
 	die "failed to compile C file into executable" unless $? == 0;
 
 	my $rv = `./$exefile`;
-	
-	if ($? == 0) {
-		chomp $rv;
-	} else {
-		$rv = undef;
-	}
-	
-	unlink($exefile);
-	unlink($srcfile);
+	die "failed to run endian test program" unless $? == 0;
+
+	chomp $rv;
+	eval {
+		unlink($srcfile);
+		unlink($exefile);
+	};
+	warn "failed to unlink temp files...\n" if $@;
 
 	return $rv;
 }
