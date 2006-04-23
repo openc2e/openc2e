@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Fatal 'unlink';
 use File::Temp 'mkstemps';
+use File::Spec;
 use Shake::Check;
 use base 'Shake::Check';
 
@@ -37,10 +38,11 @@ sub run {
 	my ($self) = @_;
 	my $cc = $self->{compiler};
 	my $flags = $self->{cflags};
+	my $devnull = File::Spec->devnull;
 	my ($fh, $srcfile) = mkstemps("testXXXXX", ".c");
 	print $fh "#include <$self->{header}>\n";
 	close $fh;
-	my $status = system($cc, split(/\s+/, $flags), '-E', '-o', '/dev/null', $srcfile);
+	my $status = system($cc, split(/\s+/, $flags), '-E', '-o', $devnull, $srcfile);
 	unlink($srcfile);
 
 	if ($status != 0) {
