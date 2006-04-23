@@ -30,6 +30,7 @@ struct less_part : public std::binary_function<CompoundPart *, CompoundPart *, b
 };
 
 void CompoundAgent::addPart(CompoundPart *p) {
+	assert(p);
 	assert(!part(p->id)); // todo: handle better
 
 	// todo: we should prbly insert at the right place, not call sort
@@ -59,6 +60,7 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 				Agent(_family, _genus, _species, plane) {
 	// TODO: we ignore image count acos it sucks
 	CompoundPart *p = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
+	caos_assert(p);
 	addPart(p);
 }
 
