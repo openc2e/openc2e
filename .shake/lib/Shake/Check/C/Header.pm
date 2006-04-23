@@ -38,8 +38,15 @@ sub run {
 	my ($self) = @_;
 	my $cc = $self->{compiler};
 	my $flags = $self->{cflags};
-	my $devnull = File::Spec->devnull;
-	my ($fh, $srcfile) = mkstemps("testXXXXX", ".c");
+	my $devnull = do {
+		if ($^O eq 'cygwin') {
+			# I smell the stench of Cygwin...
+			"nul";
+		} else {
+			File::Spec->devnull
+		}
+	};
+	my ($fh, $srcfile) = mkstemps("c-header-XXXXX", ".c");
 	print $fh "#include <$self->{header}>\n";
 	close $fh;
 	my $status = system($cc, split(/\s+/, $flags), '-E', '-o', $devnull, $srcfile);
