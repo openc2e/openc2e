@@ -418,7 +418,7 @@ void TextPart::recalculateData() {
 				currenty = 0;
 			} else currenty += usedheight + linespacing;
 			lines.push_back(currentdata);
-			currentdata.reset(startoffset);
+			currentdata.reset(i);
 		}
 	}
 
