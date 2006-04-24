@@ -79,7 +79,7 @@ void prayManager::update() {
 			fs::directory_iterator fsend;
 			for (fs::directory_iterator d(praydir); d != fsend; ++d) {
 				std::string x = fs::extension(*d);
-				x.erase(x.begin());
+				if (!x.empty()) x.erase(x.begin());
 				if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
 					// TODO: language checking!
 					//std::cout << "scanning PRAY file " << d->native_directory_string() << std::endl;
