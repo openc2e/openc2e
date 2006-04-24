@@ -39,10 +39,15 @@ print <<ENDHEAD2;
 #include <map>
 #include <iostream>
 
+#ifdef VCHACK
+#define CDATA
+#else
+#define CDATA const
+#endif
 ENDHEAD2
 
 foreach my $variant (sort keys %{$data->{variants}}) {
-	my $defn = "static const cmdinfo v_". $variant. "_cmds[] = {\n";
+	my $defn = "static CDATA cmdinfo v_". $variant. "_cmds[] = {\n";
 	my $argdef = '';
 	
 	my $idx = 0;
@@ -106,25 +111,26 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 
 		
 			
+		$data->{$key}{impl} = $implementation;
 		$data->{$key}{delegate} = $delegate;
 		$data->{$key}{idx} = $idx;
 		$defn .= <<ENDDATA;
 		{ // $idx
+			$implementation,
 			"$variant $key",
 			"$name",
 			"$fullname",
 			"$syntax $cedocs",
 			$argc,
 			$retc,
-			$argp,
-			$implementation
+			$argp
 		},
 ENDDATA
 		$idx++;
 	}
 
 	print $defn.<<ENDTAIL;
-	{ NULL, NULL, NULL, NULL, 0, 0, NULL, NULL }
+	{ NULL, NULL, NULL, NULL, NULL, 0, 0, NULL }
 };
 
 static void registerAutoDelegates_$variant() {
@@ -143,6 +149,8 @@ static void registerAutoDelegates_$variant() {
 } while (0)
 ENDTAIL
 
+	my $hfixup = '';
+
 	foreach my $key (keys %$data) {
 		if (defined($data->{$key}{delegate})) {
 			my $type = $data->{$key}{type} eq 'command' ? 'cmd' : 'exp';
@@ -158,6 +166,7 @@ ENDTAIL
 				print "_dialect->delegates[\"", lc($data->{$key}{match}), "\"] = ";
 				print $data->{$key}{delegate}, ";\n";
 			}
+			$hfixup .= "v_${variant}_cmds[$data->{$key}{idx}].handler = $data->{$key}{impl};\n";
 		}
 	}
 
@@ -174,6 +183,11 @@ ENDTAIL
 	}
 END
 	}
+	print <<END;
+#ifdef VCHACK
+$hfixup
+#endif
+END
 	print "#undef NS_REG\n";
 	print "}\n"; # end of registerAutoDelegates
 } # end of variant loop

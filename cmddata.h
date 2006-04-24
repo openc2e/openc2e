@@ -32,6 +32,7 @@ enum ci_type {
 };
 
 struct cmdinfo {
+	void (caosVM::*handler)();
 	const char *key;
 	const char *name;
 	const char *fullname;
@@ -39,7 +40,6 @@ struct cmdinfo {
 	int argc;
 	int retc;
 	const enum ci_type *argtypes;
-	void (caosVM::*handler)();
 };
 
 void registerAutoDelegates();
