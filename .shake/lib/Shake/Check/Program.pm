@@ -20,7 +20,7 @@ sub msg {
 	return "checking for $self->{program}";
 }
 
-sub can_cache { 0 }
+sub can_cache { 1 }
 
 sub shortname {
 	my ($self) = @_;

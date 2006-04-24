@@ -8,6 +8,10 @@ use Exporter;
 use base 'Exporter';
 use Carp;
 
+use Shake::Cache;
+use Shake::Config;
+use Shake::Config::Cached;
+
 our $VERSION   = 0.01;
 our @EXPORT    = qw( $checking %option shake_init lookup have checks ensure save_config configure );
 our @EXPORT_OK = qw( $Config );
@@ -28,19 +32,26 @@ sub have {
 sub shake_init {
 	my ($pkg, $version, $author) = @_;
 	
-	unless ($Config) {
-		require Shake::Config;
-		$Config = new Shake::Config;
-	}
-	
 	GetOptions(\%option, 
 		qw(
+			define|D=s%
+			no-cache
 			prefix=s
 			dist
 		)
-	);
+	) or exit(1);
 
-	if ($option{'dist'}) {
+	unless ($Config) {
+		if (exists $option{'no-cache'} or Shake::Cache->is_disabled) {
+			$Config = new Shake::Config;
+		} else {
+			$Config = new Shake::Config::Cached (
+				new Shake::Cache,
+			)
+		}
+	}
+	
+	if ($option{dist}) {
 		require Shake::Dist;
 		Shake::Dist::make_dist();
 		exit 0;
@@ -102,8 +113,7 @@ sub ensure {
 		}	
 	}
 
-	die "*** Fatal: Missing requirements.\n" if $die;
-	
+	die "*** Fatal: Missing requirements.\n" if $die;	
 }
 
 sub hash_of_list {

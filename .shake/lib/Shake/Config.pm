@@ -63,24 +63,33 @@ sub has {
 	my ($self, $key) = @_;
 	defined $self->{results}{$key}{value};
 }
+
+sub run_check {
+	my ($self, $check) = @_;
+	return $check->run($self),
+}
+
 sub run {
 	my ($self, $check) = @_;
 	my $name = $check->name;
 	print $check->msg, "... ";
 	
 	my $rv = eval {
-		my $val = $check->run($self);
+		my ($val, $note) = $self->run_check($check);
 		$self->{results}{$name} = {
+			value   => $val,
 			version => $check->version,
 			msg     => $check->msg,
-			value   => $val,
 		};
-		
+		my $s = '';
+		if ($note) {
+			$s = " ($note)";
+		}
 		if (defined $val) {
-			print "$val\n";
+			print "$val$s\n";
 			return 1;
 		} else {
-			print "no\n";
+			print "no$s\n";
 			return 0;
 		}
 	};

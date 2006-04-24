@@ -9,7 +9,7 @@ use File::Spec;
 use Shake::Check;
 use base 'Shake::Check';
 
-our $VERSION = 0.01;
+our $VERSION = 0.05;
 
 sub initialize {
 	my ($self, $header, %args) = @_;
