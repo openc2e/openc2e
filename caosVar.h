@@ -32,11 +32,11 @@
 
 class Agent;
 
-class wrongCaosVarTypeException : public creaturesException {
+class wrongCaosVarTypeException : public caosException {
 	public:
-		wrongCaosVarTypeException() throw() : creaturesException("Wrong caos variable type") {}
-		wrongCaosVarTypeException(const char *s) throw() : creaturesException(s) { }
-		wrongCaosVarTypeException(const std::string &s) throw() : creaturesException(s) { }
+		wrongCaosVarTypeException() throw() : caosException("Wrong caos variable type") {}
+		wrongCaosVarTypeException(const char *s) throw() : caosException(s) { }
+		wrongCaosVarTypeException(const std::string &s) throw() : caosException(s) { }
 };
 
 struct nulltype_tag { };
