@@ -49,6 +49,7 @@ class Agent {
 	
 protected:
 	bool initialized;
+	virtual void finishInit();
 private:
 	void core_init();
 	Agent() { core_init(); } // for boost only

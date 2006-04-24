@@ -600,6 +600,8 @@ void caosVM::c_NEWC() {
 	// TODO: if sex is 0, randomise to 1 or 2
 	// TODO: if variant is 0, randomise between 1 and 8
 	SkeletalCreature *c = new SkeletalCreature(i->second, family, (sex == 2), variant);
+	c->finishInit();
+
 	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
 
 	setTarg(c);

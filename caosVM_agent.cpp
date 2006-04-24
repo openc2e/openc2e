@@ -157,6 +157,7 @@ void caosVM::c_NEW_SIMP() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, sprite_file, first_image, image_count);
+	a->finishInit();
 	setTarg(a);
 }
 
@@ -178,6 +179,7 @@ void caosVM::c_NEW_COMP() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, sprite_file, first_image, image_count);
+	a->finishInit();
 	setTarg(a);
 }
 
@@ -199,6 +201,7 @@ void caosVM::c_NEW_VHCL() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	Vehicle *a = new Vehicle(family, genus, species, plane, sprite_file, first_image, image_count);
+	a->finishInit();
 	setTarg(a);
 }
 

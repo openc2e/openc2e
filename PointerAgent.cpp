@@ -27,6 +27,10 @@
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = true;
+}
+
+void PointerAgent::finishInit() {
+	Agent::finishInit();
 
 	// float relative to main camera
 	floatable = true;

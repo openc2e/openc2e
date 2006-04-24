@@ -46,6 +46,7 @@ void World::init() {
 			creaturesImage *img = gallery.getImage(pointerinfo[2]);
 			if (img) {
 				theHand = new PointerAgent(pointerinfo[2]);
+				theHand->finishInit();
 				// TODO: set family/genus/species based on the first entry (normally "2 1 1")
 				// TODO: work out what second entry is ("2 2" normally?! "7 7" in CV)
 				gallery.delImage(img);
@@ -59,6 +60,7 @@ void World::init() {
 		if (!img)
 			throw creaturesException("no \"Pointer Information\" catalogue tag, and fallback failed");
 		theHand = new PointerAgent("hand");
+		theHand->finishInit();
 		gallery.delImage(img);
 		std::cout << "Warning: No \"Pointer Information\" catalogue tag, defaulting to 'hand'." << std::endl;
 	}

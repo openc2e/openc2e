@@ -50,17 +50,19 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	soundslot = 0;
 	paused = displaycore = false;
 
-	boost::shared_ptr<Agent> s_self(this);
-
-	world.agents.push_front(s_self);
-	agents_iter = world.agents.begin();
-	self = s_self;
-
 	floatable = false; setAttributes(0);
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
 	imsk_key_down = imsk_key_up = imsk_mouse_move = imsk_mouse_down = imsk_mouse_up = imsk_mouse_wheel = imsk_translated_char = false;
 
 	emitca_index = -1; emitca_amount = 0.0f;
+}
+
+void Agent::finishInit() {
+	boost::shared_ptr<Agent> s_self(this);
+
+	world.agents.push_front(s_self);
+	agents_iter = world.agents.begin();
+	self = s_self;
 
 	if (findScript(10))
 		queueScript(10); // constructor
