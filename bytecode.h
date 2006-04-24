@@ -213,6 +213,16 @@ class caosCond : public caosOp {
 					cres = CGT;
 				else
 					cres = CEQ;
+			} else if (arg2.hasInt() && arg1.hasInt()) {
+				int val1 = arg1.getInt();
+				int val2 = arg2.getInt();
+
+				if (val1 < val2)
+					cres = CLT;
+				else if (val1 > val2)
+					cres = CGT;
+				else
+					cres = CEQ;
 			} else if (arg2.hasDecimal() && arg1.hasDecimal()) {
 				float val1 = arg1.getFloat();
 				float val2 = arg2.getFloat();
