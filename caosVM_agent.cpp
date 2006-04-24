@@ -50,7 +50,11 @@ void caosVM::v_TOUC() {
 
 	result.setInt(0);
 
-	// I did this at 4:30am and have no idea if it works - fuzzie
+	// TODO: c2e docs say it only checks if bounding lines overlap, implement it like that?
+	
+	// this check should probably be integrated into line overlap check?
+	if (first == second) return;
+
 	if (first->x < second->x) {
 		if ((first->x + first->getWidth()) < second->x)
 			return;

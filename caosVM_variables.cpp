@@ -264,6 +264,10 @@ void caosVM::c_DIVV() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(div)
 	VM_PARAM_VARIABLE(v)
+
+	caos_assert(div.hasDecimal());
+	caos_assert(div.getFloat() != 0.0f);
+	
 	if (v->hasInt() && div.hasInt()) {
 		// integer division
 		v->setInt(v->getInt() / div.getInt());
