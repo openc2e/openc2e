@@ -35,6 +35,7 @@ print "// Generated at ".scalar (localtime)."\n\n";
 print <<ENDHEAD2;
 #include "cmddata.h"
 #include "dialect.h"
+#include "caosVM.h"
 #include <string>
 #include <map>
 #include <iostream>
@@ -45,6 +46,9 @@ print <<ENDHEAD2;
 #define CDATA const
 #endif
 ENDHEAD2
+
+my $disp_id = 0x00000001;
+my @disp_tbl;
 
 foreach my $variant (sort keys %{$data->{variants}}) {
 	my $defn = "static CDATA cmdinfo v_". $variant. "_cmds[] = {\n";
@@ -65,7 +69,7 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			$retc = $data->{$key}{pragma}{retc};
 		}
 		my $delegate;
-		my $implementation = "NULL";
+		my $implementation = undef;
 		if ($data->{$key}{pragma}{noparse}) {
 			$delegate = undef;
 		} elsif ($data->{$key}{pragma}{parser}) {
@@ -75,7 +79,8 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			if ($data->{$key}{pragma}{parserclass}) {
 				$class = $data->{$key}{pragma}{parserclass};
 			}
-			$implementation = "&$data->{$key}{implementation}";
+			$data->{$key}{implementation} =~ s/caosVM:://;
+			$implementation = "$data->{$key}{implementation}";
 			$delegate = qq{new $class(&v_${\$variant}_cmds[$idx])};
 		}
 
@@ -111,12 +116,12 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 
 		
 			
-		$data->{$key}{impl} = $implementation;
 		$data->{$key}{delegate} = $delegate;
 		$data->{$key}{idx} = $idx;
+		my $did = sprintf "0x%08X", $disp_id;
 		$defn .= <<ENDDATA;
 		{ // $idx
-			$implementation,
+			$did,
 			"$variant $key",
 			"$name",
 			"$fullname",
@@ -126,11 +131,13 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			$argp
 		},
 ENDDATA
+		$disp_tbl[$disp_id] = $implementation;
+		$data->{$key}{disp_id} = $disp_id++;
 		$idx++;
 	}
 
 	print $defn.<<ENDTAIL;
-	{ NULL, NULL, NULL, NULL, NULL, 0, 0, NULL }
+	{ 0, NULL, NULL, NULL, NULL, 0, 0, NULL }
 };
 
 static void registerAutoDelegates_$variant() {
@@ -149,8 +156,6 @@ static void registerAutoDelegates_$variant() {
 } while (0)
 ENDTAIL
 
-	my $hfixup = '';
-
 	foreach my $key (keys %$data) {
 		if (defined($data->{$key}{delegate})) {
 			my $type = $data->{$key}{type} eq 'command' ? 'cmd' : 'exp';
@@ -166,7 +171,6 @@ ENDTAIL
 				print "_dialect->delegates[\"", lc($data->{$key}{match}), "\"] = ";
 				print $data->{$key}{delegate}, ";\n";
 			}
-			$hfixup .= "v_${variant}_cmds[$data->{$key}{idx}].handler = $data->{$key}{impl};\n";
 		}
 	}
 
@@ -183,11 +187,6 @@ ENDTAIL
 	}
 END
 	}
-	print <<END;
-#ifdef VCHACK
-$hfixup
-#endif
-END
 	print "#undef NS_REG\n";
 	print "}\n"; # end of registerAutoDelegates
 } # end of variant loop
@@ -197,6 +196,29 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 	print "    registerAutoDelegates_$variant();\n";
 }
 print "}\n";
+
+
+print "\nvoid dispatchCAOS(class caosVM *vm, int idx) {\n";
+print "\tswitch (idx) {\n";
+
+for (1..$#disp_tbl) {
+	if (defined $disp_tbl[$_]) {
+		printf "\tcase 0x%08X:\n", $_;
+		print "\t\tvm->", $disp_tbl[$_], "();\n";
+		print "\t\tbreak;\n";
+	}
+}
+
+print <<END;
+	default:
+		{
+			std::ostringstream oss;
+			oss << "INTERNAL ERROR: idx not found, " << idx;
+			throw new creaturesException(oss.str());
+		}
+	}
+}
+END
 
 exit 0;
 

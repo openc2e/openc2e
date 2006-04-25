@@ -93,7 +93,7 @@ class simpleCaosOp : public caosOp {
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			int stackc = vm->valueStack.size();
-			(vm->*(ci->handler))();
+			dispatchCAOS(vm, ci->disp_id);
 			int delta = vm->valueStack.size() - stackc;
 			if (!vm->result.isNull())
 				delta++;
