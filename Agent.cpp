@@ -533,7 +533,7 @@ void Agent::kill() {
 	
 	zotstack();
 	zotrefs();
-	world.agents.erase(agents_iter);
+	agents_iter->reset();
 	if (soundslot) soundslot->stop();
 }
 

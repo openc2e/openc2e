@@ -132,6 +132,13 @@ void World::tick() {
 	std::list<boost::shared_ptr<Agent> >::iterator i = agents.begin();
 	while (i != agents.end()) {
 		boost::shared_ptr<Agent> a = *i;
+		if (!a) {
+			std::list<boost::shared_ptr<Agent> >::iterator i2 = i;
+			i2++;
+			agents.erase(i);
+			i = i2;
+			continue;
+		}
 		i++;
 		a->tick();
 	}

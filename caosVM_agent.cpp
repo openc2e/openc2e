@@ -93,6 +93,7 @@ void caosVM::c_RTAR() {
 		= world.agents.begin(); i != world.agents.end(); i++) {
 		
 		Agent *a = i->get();
+		if (!a) continue;
 		
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
@@ -637,6 +638,7 @@ void caosVM::v_TOTL() {
 
 	unsigned int x = 0;
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		if (!*i) continue;
 		if ((*i)->family == family)
 			if ((*i)->genus == genus)
 				if ((*i)->species == species)
@@ -1267,7 +1269,7 @@ AgentRef findNextAgent(AgentRef previous, unsigned char family, unsigned char ge
 	// Loop through all the agents.
 	while (true) {
 		Agent *a = i->get();
-		if (a->family == family || family == 0)
+		if (a && (a->family == family || family == 0))
 			if (a->genus == genus || genus == 0)
 				if (a->species == species || species == 0) {
 					if (!firstagent) firstagent = a;

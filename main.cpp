@@ -256,12 +256,14 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_VIDEORESIZE:
 					world.backend.resizeNotify(event.resize.w, event.resize.h);
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+						if (!*i) continue;
 						(*i)->queueScript(123, 0); // window resized script
 					}
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+						if (!*i) continue;
 						if ((*i)->imsk_mouse_move) {
 							caosVar x; x.setInt(world.hand()->x);
 							caosVar y; y.setInt(world.hand()->y);
@@ -272,6 +274,7 @@ extern "C" int main(int argc, char *argv[]) {
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN:
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+						if (!*i) continue;
 						if ((event.type == SDL_MOUSEBUTTONUP && (*i)->imsk_mouse_up) ||
 							(event.type == SDL_MOUSEBUTTONDOWN && (*i)->imsk_mouse_down)) {
 							caosVar button;
@@ -350,6 +353,7 @@ extern "C" int main(int argc, char *argv[]) {
 							caosVar k;
 							k.setInt(key);
 							for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+								if (!*i) continue;
 								if ((*i)->imsk_key_down)
 									(*i)->queueScript(73, 0, k); // key down script
 							}
@@ -365,6 +369,7 @@ extern "C" int main(int argc, char *argv[]) {
 							caosVar k;
 							k.setInt(key);
 							for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+								if (!*i) continue;
 								if ((*i)->imsk_translated_char)
 									(*i)->queueScript(79, 0, k); // translated char script
 							}
