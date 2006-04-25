@@ -170,7 +170,7 @@ s16Image::~s16Image() {
 	delete[] heights;
 	if (!stream) { // make sure this isn't a damn mmapifstream..
 		for (unsigned int i = 0; i < m_numframes; i++)
-			delete (uint16 *)buffers[i];
+			delete[] (uint16 *)buffers[i];
 		delete[] buffers;
 	}
 	// TODO: we should never have 'offsets' left over here, but .. we should check
@@ -180,7 +180,7 @@ c16Image::~c16Image() {
 	delete[] widths;
 	delete[] heights;
 	for (unsigned int i = 0; i < m_numframes; i++)
-		delete (uint16 *)buffers[i];
+		delete[] (uint16 *)buffers[i];
 	delete[] buffers;
 	// TODO: we should never have 'offsets' left over here, but .. we should check
 }

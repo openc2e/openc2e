@@ -79,7 +79,7 @@ prayBlock::prayBlock(prayFile *p) {
 
 prayBlock::~prayBlock() {
 	if (loaded)
-		delete buffer;
+		delete[] buffer;
 }
 
 void prayBlock::load() {
@@ -96,13 +96,13 @@ void prayBlock::load() {
 		char *src = new char[compressedsize];
 		file.read(src, compressedsize);
 		if (!file.good()) {
-			delete buffer;
+			delete[] buffer;
 			throw creaturesException("Failed to read all of compressed block.");
 		}
 		unsigned int usize = size;
 		int r = uncompress((Bytef *)buffer, (uLongf *)&usize, (Bytef *)src, compressedsize);
 		if (r != Z_OK) {
-			delete buffer; delete src;
+			delete[] buffer; delete[] src;
 			std::string o = "Unknown error";
 			switch (r) {
 				case Z_MEM_ERROR: o = "Out of memory"; break;
@@ -112,15 +112,15 @@ void prayBlock::load() {
 			o = o + " while decompressing PRAY block \"" + name + "\"";
 			throw creaturesException(o);
 		}
-		delete src;
+		delete[] src;
 		if (usize != size) {
-			delete buffer;
+			delete[] buffer;
 			throw creaturesException("Decompressed data is not the correct size.");
 		}
 	} else {
 		file.read((char *)buffer, size);
 		if (!file.good()) {
-			delete buffer;
+			delete[] buffer;
 			throw creaturesException("Failed to read all of uncompressed block.");
 		}
 	}
