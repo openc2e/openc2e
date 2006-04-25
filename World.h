@@ -48,6 +48,8 @@ protected:
 	class PointerAgent *theHand;
 	std::list<scriptevent> scriptqueue;
 
+	~World() { agents.clear(); }
+
 public:
 	bool quitting, saving, paused;
 	
