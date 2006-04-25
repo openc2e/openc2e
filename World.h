@@ -48,8 +48,6 @@ protected:
 	class PointerAgent *theHand;
 	std::list<scriptevent> scriptqueue;
 
-	~World() { agents.clear(); }
-
 public:
 	bool quitting, saving, paused;
 	
@@ -69,6 +67,7 @@ public:
 	Scriptorium scriptorium;
 	Catalogue catalogue;
 	prayManager praymanager;
+	imageGallery gallery;
 	std::string gametype;
 	float pace;
 	unsigned int ticktime, tickcount;
@@ -90,6 +89,7 @@ public:
 	void queueScript(unsigned short event, AgentRef agent, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
 	
 	World();
+	~World();
 	void init();
 	void initCatalogue();
 	

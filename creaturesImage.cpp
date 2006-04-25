@@ -43,8 +43,6 @@
 
 using namespace boost::filesystem;
 
-imageGallery gallery;
-
 enum filetype { blk, s16, c16 };
 
 #ifndef _WIN32

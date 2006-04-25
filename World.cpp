@@ -37,7 +37,11 @@ World::World() {
 	theHand = 0;
 }
 
-// annoyingly, if we put this in the constructor, imageGallery isn't available yet
+World::~World() {
+	agents.clear();
+}
+
+// annoyingly, if we put this in the constructor, the catalogue isn't available yet
 void World::init() {
 	// First, try initialising the mouse cursor from the catalogue tag.
 	if (catalogue.hasTag("Pointer Information")) {

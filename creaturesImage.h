@@ -65,7 +65,5 @@ public:
 	void delImage(creaturesImage *i);
 };
 
-extern imageGallery gallery;
-
 #endif
 /* vim: set noet: */

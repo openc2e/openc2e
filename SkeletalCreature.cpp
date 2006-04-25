@@ -105,7 +105,7 @@ void SkeletalCreature::skeletonInit() {
 	for (int i = 0; i < 14; i++) {
 		// try this stage and the stages below it to find data which worksforus
 		if (images[i])
-			gallery.delImage(images[i]);
+			world.gallery.delImage(images[i]);
 		images[i] = 0;
 		char x = cee_bodyparts[i].letter;
 		int stage_to_try = stage;
@@ -129,7 +129,7 @@ void SkeletalCreature::skeletonInit() {
 		caos_assert(partapp); // TODO
 	
 		while (stage_to_try > -1 && images[i] == 0) {
-			images[i] = gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
+			images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
 			if (images[i] == 0) stage_to_try--;
 		}
 		assert(images[i] != 0); // TODO: shouldn't kill engine :P

@@ -29,7 +29,7 @@ MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
 		background = 0;
 		backsurfs = 0;
 	} else {
-		background = (blkImage *)gallery.getImage(back + ".blk");
+		background = (blkImage *)world.gallery.getImage(back + ".blk");
 		caos_assert(background);
 
 		// TODO: This probably doesn't belong in the constructor. Or, perhaps, in MetaRoom at all.
@@ -55,7 +55,7 @@ MetaRoom::~MetaRoom() {
 	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		delete *i;
 	}
-	gallery.delImage(background);
+	world.gallery.delImage(background);
 }
 
 unsigned int MetaRoom::addRoom(Room *r) {

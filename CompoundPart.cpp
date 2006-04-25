@@ -103,7 +103,7 @@ CompoundPart::~CompoundPart() {
 
 SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
 						int _x, int _y, unsigned int _z) : CompoundPart(p, _id, _x, _y, _z) {
-	origsprite = sprite = gallery.getImage(spritefile);
+	origsprite = sprite = world.gallery.getImage(spritefile);
 	firstimg = fimg;
 	caos_assert(sprite);
 	caos_assert(sprite->numframes() > firstimg);
@@ -116,17 +116,17 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 }
 
 SpritePart::~SpritePart() {
-	gallery.delImage(origsprite);
+	world.gallery.delImage(origsprite);
 	if (origsprite != sprite) delete sprite;
 }
 
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
-	creaturesImage *spr = gallery.getImage(spritefile);
+	creaturesImage *spr = world.gallery.getImage(spritefile);
 	caos_assert(spr);
 	caos_assert(spr->numframes() > fimg);
 	// TODO: either assertions to ensure the pose/base are valid, or reset them
 	firstimg = fimg;
-	gallery.delImage(origsprite);
+	world.gallery.delImage(origsprite);
 	// TODO: should we preserve tint?
 	if (origsprite != sprite) delete sprite;
 	origsprite = sprite = spr;
@@ -174,7 +174,7 @@ void ButtonPart::handleClick(float x, float y) {
 
 TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
 	                : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
-	textsprite = gallery.getImage(fontsprite);
+	textsprite = world.gallery.getImage(fontsprite);
 	caos_assert(textsprite);
 	caos_assert(textsprite->numframes() == 224);
 	leftmargin = 8; topmargin = 8; rightmargin = 8; bottommargin = 8;
@@ -188,7 +188,7 @@ TextPart::~TextPart() {
 	for (std::vector<texttintinfo>::iterator i = tints.begin(); i != tints.end(); i++)
 		if (i->sprite != textsprite)
 			delete i->sprite;	
-	gallery.delImage(textsprite);
+	world.gallery.delImage(textsprite);
 }
 
 void TextPart::addTint(std::string tintinfo) {
@@ -478,7 +478,7 @@ FixedTextPart::FixedTextPart(Agent *p, unsigned int _id, std::string spritefile,
 TextEntryPart::TextEntryPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
 	// TODO: hm, this never gets freed..
-	if (!caretsprite) { caretsprite = gallery.getImage("cursor"); caos_assert(caretsprite); }
+	if (!caretsprite) { caretsprite = world.gallery.getImage("cursor"); caos_assert(caretsprite); }
 
 	caretpose = 0;
 	caretpos = 0;
