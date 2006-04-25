@@ -441,8 +441,7 @@ void Agent::physicsTick() {
 				
 				if (collided) {
 					lastcollidedirection = collidedirection;
-					queueScript(6); // TODO: include this?
-					if (vm) vm->setVariables(velx, vely);
+					queueScript(6, 0, velx, vely); // TODO: include this?
 					vely.setFloat(0);
 				}
 			}
@@ -485,6 +484,7 @@ void Agent::tick() {
 
 void Agent::vmTick() {
 	assert(vm);
+	shared_ptr<Agent> keep = self.lock(); // make sure we don't get deleted from under ourselves
 
 	if (!vm->timeslice) vm->timeslice = 5;
 
