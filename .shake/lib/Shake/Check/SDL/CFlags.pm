@@ -4,8 +4,8 @@ package Shake::Check::SDL::CFlags;
 use strict;
 use warnings;
 
-use Shake::CheckOne;
-use base 'Shake::CheckOne';
+use Shake::Check;
+use base 'Shake::Check';
 
 our $VERSION = 0.02;
 

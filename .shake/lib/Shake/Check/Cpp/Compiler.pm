@@ -5,8 +5,8 @@ use strict;
 use warnings;
 
 use Shake::Check::Program;
-use Shake::CheckOne;
-use base 'Shake::CheckOne';
+use Shake::Check;
+use base 'Shake::Check';
 
 our $VERSION = 0.02;
 

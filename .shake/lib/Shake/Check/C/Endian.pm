@@ -7,9 +7,8 @@ use warnings;
 use Fatal 'unlink';
 use File::Temp 'mkstemps', 'mktemp';
 use IO::File;
-use Shake::CheckOne;
-use base 'Shake::CheckOne';
-
+use Shake::Check;
+use base 'Shake::Check';
 
 use constant PROGRAM => <<'CODE';
 #include <stdio.h>
@@ -29,7 +28,7 @@ int main()
 }
 CODE
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub initialize {
 	my ($self, %args) = @_;

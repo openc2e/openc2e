@@ -13,8 +13,8 @@ use constant SCHEMA => q{
 		name    VARCHAR(255) NOT NULL,
 		value   TEXT         NULL,
 		version FLOAT        NOT NULL,
-		created UNIXTIME     NOT NULL,
-		updated UNIXTIME     NOT NULL,
+		created UNIXTIME     NOT NULL DEFAULT now(),
+		updated UNIXTIME     NOT NULL DEFAUKT now(),
 		UNIQUE (name, version)
 	)
 };
@@ -51,7 +51,12 @@ sub initialize {
 		{ PrintError => 0, RaiseError => 1, AutoCommit => 1 });
 	$self->{dbh}   = $dbh;
 	$self->setup() if $need_setup;
+	
+	$dbh->func( 'now', 0, sub { return time }, 'create_function' );
+	$dbh->func( 'regexp', 2, sub { $_[0] =~ $_[1] }, 'create_function' );
 }
+
+sub dbh { shift->{dbh} }
 
 sub is_disabled { $Disabled }
 
