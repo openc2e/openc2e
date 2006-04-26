@@ -18,12 +18,14 @@
  */
 
 #include "Creature.h"
+#include "World.h"
 #include <cmath> // powf
 
 Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
  : Agent(_family, 0, 0, 0) {
 	caos_assert(g);
 	genome = g;
+	slots[0] = g;
 	female = is_female;
 	variant = _variant;
 	species = (female ? 2 : 1);
@@ -91,6 +93,9 @@ void Creature::setDreaming(bool d) {
 
 void Creature::born() {
 	// TODO: life event?
+	world.history.getMoniker(world.history.findMoniker(genome)).wasBorn();
+	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(3, "", ""); // born event, parents..
+
 	tickage = true;
 }
 

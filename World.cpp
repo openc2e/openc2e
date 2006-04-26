@@ -25,6 +25,7 @@
 #include "creaturesImage.h"
 #include "Creature.h"
 
+#include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
 namespace fs = boost::filesystem;
 
@@ -397,4 +398,20 @@ void World::selectCreature(boost::shared_ptr<Agent> a) {
 	// TODO: send script 120 (selected creature changed) as needed
 }
 
+std::string World::generateMoniker(std::string basename) {
+	// TODO: is there a better way to handle this? incoming basename is from catalogue files..
+	if (basename.size() != 4) {
+		std::cout << "World::generateMoniker got passed '" << basename << "' as a basename which isn't 4 characters, so ignoring it" << std::endl;
+		basename = "xxxx";
+	}
+
+	std::string x = basename;
+	for (unsigned int i = 0; i < 4; i++) {
+		unsigned int n = (unsigned int) (0xfffff * (rand() / (RAND_MAX + 1.0)));
+		x = x + "-" + boost::str(boost::format("%05x") % n);
+	}
+	
+	return x;
+}
+	
 /* vim: set noet: */

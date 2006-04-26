@@ -602,6 +602,7 @@ void caosVM::c_NEWC() {
 	SkeletalCreature *c = new SkeletalCreature(i->second, family, (sex == 2), variant);
 	c->finishInit();
 
+	world.history.getMoniker(world.history.findMoniker(i->second)).moveToCreature(c);
 	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
 
 	setTarg(c);

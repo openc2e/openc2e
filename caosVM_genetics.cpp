@@ -19,7 +19,7 @@
 
 #include "caosVM.h"
 #include "World.h"
-#include "genome.h"
+#include "Creature.h"
 #include <fstream>
 
 /**
@@ -96,6 +96,9 @@ void caosVM::c_GENE_LOAD() {
 	gfile >> *(p.get());
 
 	agent->slots[slot] = p;
+	std::string d = world.history.newMoniker(p);
+	world.history.getMoniker(d).addEvent(2, "", genefile);
+	world.history.getMoniker(d).moveToAgent(agent);
 }
 
 /**
@@ -115,35 +118,44 @@ void caosVM::c_GENE_MOVE() {
 
 /**
  GTOS (string) slot (integer)
- %status stub
+ %status maybe
  
  Return the moniker stored in the given gene slot of the target agent.
 */
 void caosVM::v_GTOS() {
 	VM_PARAM_INTEGER(slot)
-	result.setString(""); // TODO
+
+	caos_assert(targ);
+	caos_assert(targ->slots.find(slot) != targ->slots.end());
+	shared_ptr<class genomeFile> g = targ->slots[slot];
+	result.setString(world.history.findMoniker(g));
 }
 
 /**
  MTOA (agent) moniker (string)
- %status stub
+ %status maybe
 
  Return the agent which has the given moniker stored in a gene slot, or NULL if none.
 */
 void caosVM::v_MTOA() {
 	VM_PARAM_STRING(moniker)
-	result.setAgent(0); // TODO
+
+	caos_assert(world.history.hasMoniker(moniker));
+	result.setAgent(world.history.getMoniker(moniker).owner);
 }
 
 /**
  MTOC (agent) moniker (string)
- %status stub
+ %status maybe
 
  Return the live creature with the given moniker, or NULL if none.
 */
 void caosVM::v_MTOC() {
 	VM_PARAM_STRING(moniker)
-	result.setAgent(0); // TODO
+
+	caos_assert(world.history.hasMoniker(moniker));
+	Agent *a = world.history.getMoniker(moniker).owner;
+	result.setAgent(dynamic_cast<Creature *>(a));
 }
 
 /* vim: set noet: */

@@ -27,6 +27,7 @@
 #include "Agent.h"
 #include "CompoundPart.h"
 #include "prayManager.h"
+#include "historyManager.h"
 #include <set>
 #include <map>
 #include <boost/filesystem/path.hpp>
@@ -68,6 +69,8 @@ public:
 	Catalogue catalogue;
 	prayManager praymanager;
 	imageGallery gallery;
+	historyManager history;
+		
 	std::string gametype;
 	float pace;
 	unsigned int ticktime, tickcount;
@@ -100,6 +103,8 @@ public:
 	std::string getUserDataDir();
 	std::string findFile(std::string path);
 
+	std::string generateMoniker(std::string basename);
+	
 	void tick();
 	void drawWorld();
 

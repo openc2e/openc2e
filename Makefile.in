@@ -53,6 +53,7 @@ OPENC2E_CORE = \
 	exceptions.o \
 	fileSwapper.o \
 	genomeFile.o \
+	historyManager.o \
 	lex.mng.o \
 	lexutil.o \
 	lex.yy.o \
