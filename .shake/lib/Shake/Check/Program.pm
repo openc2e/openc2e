@@ -14,6 +14,10 @@ sub initialize {
 	$self->{program} = $program;
 }
 
+sub dummy {
+	shift->new('dummy');
+}
+
 sub msg {
 	my ($self) = @_;
 

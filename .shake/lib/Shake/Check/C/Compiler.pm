@@ -17,7 +17,7 @@ sub initialize {
 		new Shake::Check::Program 'cc',
 	];
 }
-
+sub dummy { shift->new }
 sub msg {
 	my ($self) = @_;
 

@@ -66,7 +66,7 @@ sub has {
 
 sub run_check {
 	my ($self, $check) = @_;
-	return $check->run($self),
+	return (scalar $check->run($self), undef);
 }
 
 sub run {

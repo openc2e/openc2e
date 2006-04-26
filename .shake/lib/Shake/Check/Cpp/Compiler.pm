@@ -18,6 +18,8 @@ sub initialize {
 	];
 }
 
+sub dummy { shift->new }
+
 sub msg {
 	my ($self) = @_;
 

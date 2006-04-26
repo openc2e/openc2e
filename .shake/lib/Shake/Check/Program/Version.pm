@@ -14,6 +14,7 @@ sub initialize {
 	$self->{program} = $program;
 	$self->{version} = $version;
 }
+sub dummy { shift->new('dummy', '1.10') }
 
 sub msg {
 	my ($self) = @_;

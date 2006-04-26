@@ -18,6 +18,10 @@ sub initialize {
 	$self->{compiler} = $args{compiler} or die "Test requires a C compiler";
 }
 
+sub dummy {
+	return shift->new('stdio', compiler => 'gcc');
+}
+
 sub msg {
 	my ($self) = @_;
 

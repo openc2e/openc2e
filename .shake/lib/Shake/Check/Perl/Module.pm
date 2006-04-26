@@ -13,7 +13,7 @@ sub initialize {
 	my ($self, $module) = @_;
 	$self->{module} = $module;
 }
-
+sub dummy { shift->new('Dummy') }
 sub msg {
 	my ($self) = @_;
 

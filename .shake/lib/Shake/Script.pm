@@ -31,18 +31,19 @@ sub have {
 
 sub shake_init {
 	my ($pkg, $version, $author) = @_;
-	
+
+	Getopt::Long::Configure('gnu_getopt');
 	GetOptions(\%option, 
 		qw(
 			define|D=s%
-			no-cache
+			nocache
 			prefix=s
 			dist
 		)
 	) or exit(1);
 
 	unless ($Config) {
-		if (exists $option{'no-cache'} or Shake::Cache->is_disabled) {
+		if (exists $option{'nocache'} or Shake::Cache->is_disabled) {
 			$Config = new Shake::Config;
 		} else {
 			$Config = new Shake::Config::Cached (

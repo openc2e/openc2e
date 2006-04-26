@@ -31,6 +31,10 @@ sub can_cache { undef }
 sub run {
 	my ($self) = @_;
 	die "implement me";
-}
 
+	#return $val;
+}
+sub dummy {
+	shift->new()
+}
 1;

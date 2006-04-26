@@ -35,6 +35,10 @@ sub initialize {
 	$self->{compiler} = $args{compiler} or die "Test must be passed a C compiler to use!";
 }
 
+sub dummy {
+	shift->new(compiler => 'gcc');
+}
+
 sub msg {
 	my ($self) = @_;
 
