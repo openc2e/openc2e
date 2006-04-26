@@ -37,6 +37,7 @@ struct agentzorder {
 };
 
 class Agent {
+	
 	friend struct agentzorder;
 	friend class caosVM;
 	friend class AgentRef;
@@ -44,12 +45,14 @@ class Agent {
 	friend class opOVxx;
 	friend class opMVxx;
 	friend class SDLBackend; // TODO: should we make soundslot public instead?
+	friend class LifeAssert;
 
 	FRIEND_SERIALIZE(Agent);
 	
 protected:
 	bool initialized;
 	virtual void finishInit();
+	int lifecount;
 private:
 	void core_init();
 	Agent() { core_init(); } // for boost only
@@ -183,6 +186,36 @@ public:
 	virtual void setAttributes(unsigned int attr);
 	virtual unsigned int getAttributes();
 };
+
+class LifeAssert {
+	protected:
+		Agent *p;
+	public:
+		LifeAssert(const AgentRef &ref) {
+			p = ref.get();
+			assert(p);
+			p->lifecount++;
+		}
+		LifeAssert(const boost::weak_ptr<Agent> &p_) {
+			p = p_.lock().get();
+			assert(p);
+			p->lifecount++;
+		}
+		LifeAssert(const boost::shared_ptr<Agent> &p_) {
+			p = p_.get();
+			assert(p);
+			p->lifecount++;
+		}
+		LifeAssert(Agent *p_) {
+			p = p_;
+			assert(p);
+			p->lifecount++;
+		}
+		~LifeAssert() {
+			p->lifecount--;
+		}
+};
+
 
 #endif
 /* vim: set noet: */

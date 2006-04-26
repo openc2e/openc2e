@@ -145,10 +145,11 @@ void World::tick() {
 	
 	// Process the script queue.
 	for (std::list<scriptevent>::iterator i = scriptqueue.begin(); i != scriptqueue.end(); i++) {
-		if (i->agent && i->agent->fireScript(i->scriptno, i->from)) {
-			assert(i->agent->vm);
-			i->agent->vm->setVariables(i->p[0], i->p[1]);
-			i->agent->vmTick();
+		boost::shared_ptr<Agent> agent = i->agent.lock();
+		if (agent && agent->fireScript(i->scriptno, i->from)) {
+			assert(agent->vm);
+			agent->vm->setVariables(i->p[0], i->p[1]);
+			agent->vmTick();
 		}
 	}
 	scriptqueue.clear();

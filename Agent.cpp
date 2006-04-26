@@ -27,6 +27,7 @@
 
 void Agent::core_init() {
 	initialized = false;
+	lifecount = 0;
 }
 
 
@@ -453,6 +454,7 @@ void Agent::physicsTick() {
 }
 
 void Agent::tick() {
+	LifeAssert la(this);
 	if (dying) return;
 	
 	if (soundslot) positionAudio(soundslot);
@@ -484,7 +486,7 @@ void Agent::tick() {
 
 void Agent::vmTick() {
 	assert(vm);
-	shared_ptr<Agent> keep = self.lock(); // make sure we don't get deleted from under ourselves
+	LifeAssert la(this);
 
 	if (!vm->timeslice) vm->timeslice = 5;
 
@@ -509,6 +511,8 @@ void Agent::vmTick() {
 }
 
 Agent::~Agent() {
+	assert(lifecount == 0);
+
 	if (!initialized) return;
 	
 	if (vm)
