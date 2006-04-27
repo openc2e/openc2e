@@ -9,7 +9,15 @@ use Shake::Base;
 use base 'Shake::Base';
 
 our $VERSION  = 0.01;
-our $Disabled = undef;
+our $Disabled;
+
+BEGIN {
+	eval {
+		require DBI;
+		require DBD::SQLite;
+	};
+	$Disabled = $@;
+}
 
 sub initialize {
 	my ($self, $file) = @_;
@@ -104,12 +112,6 @@ sub clear_all {
 }
 
 sub is_disabled { $Disabled }
-sub BEGIN {
-	eval {
-		require DBI;
-		require DBD::SQLite;
-	};
-	$Disabled = $@;
-}
+
 
 1;
