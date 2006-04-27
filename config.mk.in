@@ -1,0 +1,2 @@
+SDL_CFLAGS=@sdl.cflags@
+SDL_LFLAGS=@sdl.lflags@
