@@ -48,7 +48,15 @@ void monikerData::init(shared_ptr<genomeFile> f) {
 	
 	assert(f);
 	genome = f;
-	// TODO: set genus?
+
+	for (vector<gene *>::iterator i = f->genes.begin(); i != f->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(creatureGenus)) {
+			// initialize genus
+			creatureGenus *g = (creatureGenus *)(*i);
+			genus = g->genus + 1;
+			break;
+		}
+	}
 }
 
 historyevent &monikerData::addEvent(unsigned int event, std::string moniker1, std::string moniker2) {
@@ -143,7 +151,8 @@ std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
 	}
 
 	if (extensions) {
-		// TODO: pick random friendly name from extensions
+		unsigned int i = (int) (extensions->size() * (rand() / (RAND_MAX + 1.0)));
+		basename = (*extensions)[i];
 	}
 	
 	std::string newmoniker = world.generateMoniker(basename);
@@ -175,7 +184,7 @@ monikerData &historyManager::getMoniker(std::string s) {
 
 std::string historyManager::findMoniker(shared_ptr<genomeFile> g) {
 	for (std::map<std::string, monikerData>::iterator i = monikers.begin(); i != monikers.end(); i++) {
-		if (i->second.genome == g) return i->first;
+		if (i->second.genome.lock() == g) return i->first;
 	}
 
 	return "";

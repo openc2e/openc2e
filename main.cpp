@@ -64,6 +64,8 @@ static void opt_version() {
 }
 
 extern "C" int main(int argc, char *argv[]) {
+	srand(time(NULL));
+
 	try {
 		
 	std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2006 Alyssa Milburn and others\n\n";

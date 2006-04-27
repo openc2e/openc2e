@@ -24,9 +24,10 @@
 #include "genome.h"
 #include <vector>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 using boost::shared_ptr;
+using boost::weak_ptr;
 
 struct historyevent {
 	unsigned int eventno;
@@ -50,7 +51,7 @@ private:
 	monikerstatus status;
 
 public:
-	shared_ptr<genomeFile> genome;
+	weak_ptr<genomeFile> genome;
 	AgentRef owner;
 	std::vector<historyevent> events;
 	int gender;
