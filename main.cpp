@@ -347,7 +347,8 @@ extern "C" int main(int argc, char *argv[]) {
 						if (key != -1) {
 							if (world.focusagent) {
 								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-								t->handleSpecialKey(key);
+								if (t)
+									t->handleSpecialKey(key);
 							}
 
 							caosVar k;
@@ -363,7 +364,8 @@ extern "C" int main(int argc, char *argv[]) {
 							key = event.key.keysym.unicode & 0x7F;
 							if (world.focusagent) {
 								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-								t->handleKey(key);
+								if (t)
+									t->handleKey(key);
 							}
 
 							caosVar k;

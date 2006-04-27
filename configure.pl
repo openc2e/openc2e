@@ -49,5 +49,5 @@ ensure (
 	default  => 'required',
 );
 
-configure('Makefile');
+configure('config.mk');
 save_config();

@@ -1,3 +1,5 @@
+include config.mk
+
 CXXFILES = $(wildcard *.cpp) $(wildcard tools/*.cpp)
 CFILES = $(wildcard *.c) $(wildcard tools/*.c) 
 
@@ -82,8 +84,8 @@ OPENC2E = $(OPENC2E_CORE) main.o
 
 DEBUGFLAGS=-ggdb3 -O0
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE
-XLDFLAGS=$(LDFLAGS) -lboost_program_options -lboost_serialization -lboost_filesystem @sdl.lflags@ -lz -lm -lSDL_net -lSDL_mixer -lpthread
-COREFLAGS=$(DEBUGFLAGS) @sdl.cflags@ -I.
+XLDFLAGS=$(LDFLAGS) -lboost_program_options -lboost_serialization -lboost_filesystem $(SDL_LFLAGS) -lz -lm -lSDL_net -lSDL_mixer -lpthread
+COREFLAGS=$(DEBUGFLAGS) $(SDL_CFLAGS) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
@@ -158,7 +160,7 @@ tools/serialtest: tools/serialtest.o $(OPENC2E_CORE)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 clean:
-	rm -f *.o openc2e filetests praydumper tools/*.o
+	rm -f *.o openc2e filetests praydumper tools/*.o config.mk
 	rm -rf .deps
 	rm -f commandinfo.yml lex.yy.cpp lex.yy.h lex.mng.cpp lex.mng.h mngparser.tab.cpp mngparser.tab.hpp cmddata.cpp
 	rm -f tools/filetests tools/memstats tools/mngtest tools/pathtest tools/praydumper tools/serialtest
@@ -172,5 +174,8 @@ headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) $(wildcard ser/*.h) mngparser.
 
 headerdeps.png: headerdeps.dot
 	dot -Tpng -o $@ $^
+
+config.mk: config.mk.in
+	./configure.pl
 
 .PHONY: clean all dep docs test
