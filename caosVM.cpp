@@ -157,6 +157,7 @@ void caosVM::resetCore() {
 	_it_ = NULL;
 	from = NULL;
 	setTarg(owner);
+	part = 0;
 
 	_p_[0].reset(); _p_[0].setInt(0); _p_[1].reset(); _p_[1].setInt(0);
 	for (unsigned int i = 0; i < 100; i++) { var[i].reset(); var[i].setInt(0); }

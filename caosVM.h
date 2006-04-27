@@ -197,7 +197,7 @@ public:
 	caosVar result;
 	
 public:
-	void setTarg(const AgentRef &a) { targ = a; part = 0; }
+	void setTarg(const AgentRef &a) { targ = a; }
 	void setVariables(caosVar &one, caosVar &two) { _p_[0] = one; _p_[1] = two; }
 	void setOwner(Agent *a) { owner = a; }
 	void setOutputStream(std::ostream &o) { outputstream = &o; }
