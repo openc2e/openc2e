@@ -129,7 +129,12 @@ class caosVar {
 
 		caosVar(const caosVar &copyFrom) : value(copyFrom.value) { }
 		
-
+		caosVar(int v) { setInt(v); }
+		caosVar(float v) { setFloat(v); }
+		caosVar(Agent *v) { setAgent(v); }
+		caosVar(const AgentRef &v) { setAgent(v); }
+		caosVar(std::string &v) { setString(v); } 
+		
 		bool isEmpty() const { return getType() == NULLTYPE; }
 		bool hasInt() const { return getType() == INTEGER; }
 		bool hasFloat() const { return getType() == FLOAT; }

@@ -40,11 +40,14 @@ historyevent::historyevent(unsigned int eno, Creature *c) {
 	}
 }
 
-void monikerData::init(shared_ptr<genomeFile> f) {
+void monikerData::init(std::string m, shared_ptr<genomeFile> f) {
+	moniker = m;
 	status = unreferenced;
 	warpveteran = false;
 	variant = -1;
 	gender = -1;
+	no_crossover_points = 0;
+	no_point_mutations = 0;
 	
 	assert(f);
 	genome = f;
@@ -66,6 +69,13 @@ historyevent &monikerData::addEvent(unsigned int event, std::string moniker1, st
 	events.push_back(historyevent(event, c));
 	events.back().monikers[0] = moniker1;
 	events.back().monikers[1] = moniker2;
+
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		if (!*i) continue;
+
+		(*i)->queueScript(127, 0, moniker, (int)(events.size() - 1)); // new life event
+	}
+	
 	return events.back();
 }
 
@@ -166,7 +176,7 @@ std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
 
 	newmoniker = "001-" + newmoniker; // TODO: bad hack we should use the generation number here!
 
-	monikers[newmoniker].init(genome);
+	monikers[newmoniker].init(newmoniker, genome);
 	return newmoniker;
 }
 

@@ -49,6 +49,7 @@ enum monikerstatus { referenced = 1, creature = 2, borncreature = 3, exported = 
 class monikerData {
 private:
 	monikerstatus status;
+	std::string moniker;
 
 public:
 	weak_ptr<genomeFile> genome;
@@ -61,7 +62,7 @@ public:
 	bool warpveteran;
 	unsigned int no_crossover_points, no_point_mutations;
 	
-	void init(shared_ptr<genomeFile>);
+	void init(std::string, shared_ptr<genomeFile>);
 	historyevent &addEvent(unsigned int event, std::string moniker1 = "", std::string moniker2 = "");
 	void moveToAgent(AgentRef a);
 	void moveToCreature(AgentRef c);
