@@ -81,6 +81,7 @@ path cacheDirectory() {
 bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype ft) {
 	path cachefile, realfile;
 	std::string cachename;
+	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
 	std::string basename = fname; basename.erase(basename.end() - 4, basename.end()); 
 
 	// work out where the real file should be
@@ -160,6 +161,8 @@ done:
  * extension. To retrieve a background, pass the full filename (ie, with .blk).
  */
 creaturesImage *imageGallery::getImage(std::string name) {
+	if (name.empty()) return 0; // empty sprites definitely don't exist
+
 	// step one: see if the image is already in the gallery
 	std::map<std::string, creaturesImage *>::iterator i = gallery.find(name);
 	if (i != gallery.end()) {
