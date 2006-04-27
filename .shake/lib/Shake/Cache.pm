@@ -15,6 +15,7 @@ sub initialize {
 	my ($self, $file) = @_;
 	$file ||= find_cache();
 
+	die "I am disabled!" if $Disabled;
 	my $need_setup = not -e $file;
 	my $dbh        = DBI->connect("dbi:SQLite:dbname=$file", "", "", 
 		{ PrintError => 0, RaiseError => 1, AutoCommit => 1 });
@@ -108,7 +109,6 @@ sub BEGIN {
 		require DBI;
 		require DBD::SQLite;
 	};
-
 	$Disabled = $@;
 }
 

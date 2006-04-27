@@ -13,7 +13,7 @@ use Shake::Config;
 use Shake::Config::Cached;
 
 our $VERSION   = 0.01;
-our @EXPORT    = qw( $checking %option shake_init lookup have checks ensure save_config configure );
+our @EXPORT    = qw( $checking %option shake_init define lookup have checks ensure save_config configure );
 our @EXPORT_OK = qw( $Config );
 our $Config;
 our $checking = 1;
@@ -27,6 +27,10 @@ sub lookup {
 
 sub have {
 	$Config->has(@_);
+}
+
+sub define {
+	$Config->define(@_);
 }
 
 sub shake_init {
@@ -83,9 +87,19 @@ sub configure {
 	my $out = new IO::File($file, 'w')     or die "Can't open $file for output\n";
 	my $line;
 
+	my $lookup = sub {
+		my $f = shift;
+		my $val = $Config->lookup($f);
+		if (not defined $val) {
+			return '';
+		} else {
+			return $val;
+		}
+	};
+
 	print "writing $file... ";
 	while (defined ($line = $in->getline)) {
-		$line =~ s/@([-:.\w]+?)@/$Config->lookup($1) || ''/ge;
+		$line =~ s/@([-:.\w]+?)@/$lookup->($1)/ge;
 		$out->print($line);
 	}
 	print "done.\n";
