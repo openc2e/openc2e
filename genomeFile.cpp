@@ -311,8 +311,8 @@ void bioNeuroEmitter::read(istream &s) {
 
 void bioReaction::write(ostream &s) const {
 	for (int i = 0; i < 4; i++) {
-		s << reactant[i];
 		s << quantity[i];
+		s << reactant[i];
 	}
 	
 	s << rate;
@@ -320,8 +320,8 @@ void bioReaction::write(ostream &s) const {
 
 void bioReaction::read(istream &s) {
 	for (int i = 0; i < 4; i++) {
-		s >> reactant[i];
 		s >> quantity[i];
+		s >> reactant[i];
 	}
 	
 	s >> rate;
