@@ -34,10 +34,10 @@ protected:
 	float energycost;
 	
 	// variables
-	float lifeforce, shorttermlifeforce;
+	float lifeforce, shorttermlifeforce, longtermlifeforce;
 	
 	// locuses
-	float repairrate, clockrate, injurytoapply;
+	float damagerate, repairrate, clockrate, injurytoapply;
 
 	void tickInjury();
 

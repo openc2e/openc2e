@@ -135,9 +135,9 @@ void Creature::tickBiochemistry() {
 					chemicals[x] = 0.0f;
 				} else {
 					// reaction rate = 1.0 - 0.5**(1.0 / 2.2**(rate * 32.0 / 255.0))
-					float halflife = 1.0 - powf(0.5, 1.0 / powf(2.2, (d->halflives[x] * 32.0) / 255.0));
+					float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (d->halflives[x] * 32.0) / 255.0));
 
-					chemicals[x] -= chemicals[x] * halflife;
+					chemicals[x] -= chemicals[x] * rate;
 				}
 			}
 		}
@@ -150,18 +150,19 @@ Organ::Organ(Creature *p, organGene *g) {
 	parent = p; assert(parent);
 	ourGene = g; assert(ourGene);
 	lifeforce = ourGene->lifeforce * (1000000.0f / 255.0f);
-	shorttermlifeforce = lifeforce;
+	longtermlifeforce = shorttermlifeforce = lifeforce;
 
-	repairrate = 0.0f; // TODO: ???
+	repairrate = 0.0f;
 	clockrate = ourGene->clockrate / 255.0f;
 	injurytoapply = 0.0f;
+	damagerate = ourGene->damagerate / 255.0f;
 
 	// TODO: is genes.size() always the size we want?
 	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
 }
 
 void Organ::tick() {
-	if (lifeforce == 0.0f) return; // We're dead!
+	if (longtermlifeforce == 0.0f) return; // We're dead!
 	
 	tickInjury();
 
@@ -173,29 +174,34 @@ void Organ::tick() {
 }
 
 void Organ::tickInjury() {
-	// Repair organ if possible
-	shorttermlifeforce += repairrate;
+	// TODO: this might not be done in the right order
+	// TODO: this might not all be correct
 
-	// Apply injury to short-term life force, if necessary
-	if (injurytoapply != 0.0f) {
-		shorttermlifeforce -= injurytoapply;
-		// TODO: add to chem 127 [injury]
+	// *** decay life force
+	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
+	longtermlifeforce -= longtermlifeforce * (1.0f / 1000000.0f);
 
-		if (shorttermlifeforce < 0.0f) shorttermlifeforce = 0.0f;
-	}
+	// *** long-term damage
+	float diff = longtermlifeforce - shorttermlifeforce;
+	longtermlifeforce = longtermlifeforce - (diff * damagerate); // damagerate always <= 1.0
 
-	// Converge lifeforce upon short-term lifeforce, ie real damage
-	if (shorttermlifeforce < lifeforce) {
-		// TODO: subtract from chem 127 [injury]
-		lifeforce -= (ourGene->damagerate * (1.0f / 255.0f)); // TODO: probably nonsense
-	}
+	// *** repair
+	float repair = diff * repairrate; // repairrate always <= 1.00
+	shorttermlifeforce += repair;
+	// adjust Injury chemical (TODO: de-hardcode)
+	parent->adjustChemical(127, repair / lifeforce);
 
-	// Make sure we didn't go too far.
-	if (shorttermlifeforce > lifeforce)
-		shorttermlifeforce = lifeforce;
+	// *** immediate injury
+	shorttermlifeforce -= injurytoapply;
+	if (shorttermlifeforce < 0.0f)
+		shorttermlifeforce = 0.0f;
+	// adjust Injury chemical (TODO: de-hardcode)
+	parent->adjustChemical(127, injurytoapply / lifeforce);
 }
 
 void Organ::processReaction(bioReaction &g) {
+	// TODO: this might not all be correct
+
 	float ratio = 1.0f, ratio2 = 1.0f;
 	if (g.reactant[0] != 0) {
 		assert(g.quantity[0] != 0); // TODO
