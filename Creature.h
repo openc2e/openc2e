@@ -62,7 +62,6 @@ protected:
 
 	// biochemistry
 	float chemicals[256];
-	float halflife_timers[256];
 
 	// non-specific bits
 	unsigned int variant;

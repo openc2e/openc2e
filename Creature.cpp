@@ -118,29 +118,27 @@ void Creature::tick() {
 void Creature::tickBiochemistry() {
 	// tick organs
 	for (std::vector<Organ *>::iterator x = organs.begin(); x != organs.end(); x++) {
+		// TODO: we don't deal with clockrate here
 		(*x)->tick();
 	}
 
 	// process half-lives for chemicals
+	// TODO: we should only do this every four ticks
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(bioHalfLives)) {
 			bioHalfLives *d = dynamic_cast<bioHalfLives *>(*i);
 			assert(d);
 
-			// TODO: this seems like an absolutely absurd way to do this, so it's probably
-			// wrong! research and fix it!
 			for (unsigned int x = 0; x < 256; x++) {
-				halflife_timers[x] += 1; // increase timer by one tick
-				
-				// Here, we use a magical constant, which depends on the C3 genome kit
-				// being right about timescales (we assume tick == 50ms, like c2e).
-				// TODO: lookup table better than this?
-				float halflife = powf(1.104005, d->halflives[x]);
+				// TODO: lookup table better than this? or at least precalculation
+				if (d->halflives[x] == 0) {
+					// 0 is a special case for half-lives
+					chemicals[x] = 0.0f;
+				} else {
+					// reaction rate = 1.0 - 0.5**(1.0 / 2.2**(rate * 32.0 / 255.0))
+					float halflife = 1.0 - powf(0.5, 1.0 / powf(2.2, (d->halflives[x] * 32.0) / 255.0));
 
-				// if we've exceeded the timer, reset and halve chemical level
-				if (halflife_timers[x] >= halflife) {
-					halflife_timers[x] = 0;
-					chemicals[x] = chemicals[x] / 2.0f;
+					chemicals[x] -= chemicals[x] * halflife;
 				}
 			}
 		}
@@ -156,12 +154,11 @@ Organ::Organ(Creature *p, organGene *g) {
 	shorttermlifeforce = lifeforce;
 
 	repairrate = 0.0f; // TODO: ???
-	clockrate = 1.0f; // TODO: ???
+	clockrate = ourGene->clockrate / 255.0f;
 	injurytoapply = 0.0f;
 
 	// TODO: is genes.size() always the size we want?
-	// TODO: is it really 0.000391258 or did I just fail at rounding?
-	energycost = ourGene->genes.size() * 0.000391258;
+	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
 }
 
 void Organ::tick() {
@@ -177,13 +174,16 @@ void Organ::tickInjury() {
 	// Apply injury to short-term life force, if necessary
 	if (injurytoapply != 0.0f) {
 		shorttermlifeforce -= injurytoapply;
+		// TODO: add to chem 127 [injury]
 
 		if (shorttermlifeforce < 0.0f) shorttermlifeforce = 0.0f;
 	}
 
 	// Converge lifeforce upon short-term lifeforce, ie real damage
-	if (shorttermlifeforce < lifeforce)
+	if (shorttermlifeforce < lifeforce) {
+		// TODO: subtract from chem 127 [injury]
 		lifeforce -= (ourGene->damagerate * (1.0f / 255.0f)); // TODO: probably nonsense
+	}
 
 	// Make sure we didn't go too far.
 	if (shorttermlifeforce > lifeforce)
