@@ -32,9 +32,6 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
 	zorder = 1500;
 
-	for (unsigned int i = 0; i < 256; i++)
-		halflife_timers[i] = 0.0f;
-
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(bioInitialConcentration)) {
 			// initialise chemical levels
@@ -75,7 +72,9 @@ void Creature::ageCreature() {
 
 void Creature::adjustChemical(unsigned char id, float value) {
 	chemicals[id] += value;
-	// TODO: clamp?
+
+	if (chemicals[id] < 0.0f) chemicals[id] = 0.0f;
+	else if (chemicals[id] > 1.0f) chemicals[id] = 1.0f;
 }
 
 void Creature::setAsleep(bool a) {
@@ -165,6 +164,12 @@ void Organ::tick() {
 	if (lifeforce == 0.0f) return; // We're dead!
 	
 	tickInjury();
+
+	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(bioReaction)) {
+			processReaction(*(bioReaction *)(*i));
+		}
+	}
 }
 
 void Organ::tickInjury() {
@@ -188,6 +193,31 @@ void Organ::tickInjury() {
 	// Make sure we didn't go too far.
 	if (shorttermlifeforce > lifeforce)
 		shorttermlifeforce = lifeforce;
+}
+
+void Organ::processReaction(bioReaction &g) {
+	float ratio = 1.0f, ratio2 = 1.0f;
+	if (g.reactant[0] != 0) {
+		assert(g.quantity[0] != 0); // TODO
+		ratio = parent->getChemical(g.reactant[0]) / (float)g.quantity[0];
+	}
+	if (g.reactant[1] != 0) {
+		assert(g.quantity[1] != 0); // TODO
+		ratio2 = parent->getChemical(g.reactant[1]) / (float)g.quantity[1];
+	}
+	if (ratio2 < ratio)
+		ratio = ratio2;
+
+	if (ratio == 0.0f) return;
+
+	float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (g.rate * 32.0) / 255.0));
+
+	ratio = ratio * rate;
+
+	parent->adjustChemical(g.reactant[0], -(ratio * (float)g.quantity[0]));
+	parent->adjustChemical(g.reactant[1], -(ratio * (float)g.quantity[1]));
+	parent->adjustChemical(g.reactant[2], ratio * (float)g.quantity[2]);
+	parent->adjustChemical(g.reactant[3], ratio * (float)g.quantity[3]);
 }
 
 /* vim: set noet: */

@@ -44,6 +44,8 @@ protected:
 	// TODO: is this correct magic number?
 	float ATPDamageCoefficient() { return ourGene->atpdamagecoefficient * 15.3787f; }
 
+	void processReaction(bioReaction &);
+
 public:
 	Organ(Creature *p, organGene *g);
 
