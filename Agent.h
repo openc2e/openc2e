@@ -57,6 +57,7 @@ private:
 	void core_init();
 	Agent() { core_init(); } // for boost only
 protected:
+	int lastScript;
 
 	caosVar var[100]; // OVxx
 	std::map<caosVar, caosVar, caosVarCompare> name_variables;

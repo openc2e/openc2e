@@ -35,6 +35,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0)
 {
 	core_init();
+	lastScript = -1;
 	initialized = true;
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
@@ -209,6 +210,7 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 	if (!vm) { madevm = true; vm = world.getVM(this); }
 	
 	if (vm->fireScript(s, (event == 9), from)) {
+		lastScript = event;
 		zotstack();
 		return true;
 	} else if (madevm) {
@@ -499,7 +501,7 @@ void Agent::vmTick() {
 			vm->tick();
 		} catch (std::exception &e) {
 			// TODO: do something with this? empty the stack?
-			std::cerr << "Agent::vmTick on " << identify() << " caught exception: " << e.what() << std::endl;
+			std::cerr << "Agent::vmTick on " << identify() << " (script " << lastScript << ") caught exception: " << e.what() << std::endl;
 		}
 		if (vm && vm->stopped()) {
 			world.freeVM(vm);
