@@ -57,6 +57,8 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	dreaming = false; // ?
 	tickage = false;
 	zombie = false;
+
+	biochemticks = 0;
 }
 
 Creature::~Creature() {
@@ -71,6 +73,8 @@ void Creature::ageCreature() {
 }
 
 void Creature::adjustChemical(unsigned char id, float value) {
+	if (id == 0) return;
+	
 	chemicals[id] += value;
 
 	if (chemicals[id] < 0.0f) chemicals[id] = 0.0f;
@@ -115,14 +119,20 @@ void Creature::tick() {
 }
 
 void Creature::tickBiochemistry() {
+	// only process biochem every 4 ticks
+	// TODO: correct? should probably apply to brain too, at least
+	biochemticks++;
+	if (biochemticks == 4)
+		biochemticks = 0;
+	else
+		return;
+	
 	// tick organs
 	for (std::vector<Organ *>::iterator x = organs.begin(); x != organs.end(); x++) {
-		// TODO: we don't deal with clockrate here
 		(*x)->tick();
 	}
 
 	// process half-lives for chemicals
-	// TODO: we should only do this every four ticks
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(bioHalfLives)) {
 			bioHalfLives *d = dynamic_cast<bioHalfLives *>(*i);
@@ -156,47 +166,79 @@ Organ::Organ(Creature *p, organGene *g) {
 	clockrate = ourGene->clockrate / 255.0f;
 	injurytoapply = 0.0f;
 	damagerate = ourGene->damagerate / 255.0f;
+	biotick = ourGene->biotickstart / 255.0f;
+	atpdamagecoefficient = ourGene->atpdamagecoefficient * (lifeforce / (255.0f * 255.0f));
 
 	// TODO: is genes.size() always the size we want?
 	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
 }
 
 void Organ::tick() {
-	if (longtermlifeforce == 0.0f) return; // We're dead!
+	if (longtermlifeforce <= 0.5f) return; // We're dead!
+
+	biotick += clockrate;
+
+	bool ticked = false;
 	
-	tickInjury();
+	// if it's our turn to tick..
+	if (biotick >= 1.0f) {
+		ticked = true;
+		// .. push the biotick back down
+		biotick -= 1.0f;
 
-	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(bioReaction)) {
-			processReaction(*(bioReaction *)(*i));
+		// *** energy consumption
+		// chem 35 = ATP, chem 36 = ADP (TODO: fix hardcoding)
+		float atplevel = parent->getChemical(35);
+		bool hadenergy = false;
+		if (atplevel >= energycost) {
+			hadenergy = true;
+			parent->adjustChemical(35, -energycost);
+			parent->adjustChemical(36, energycost);
+			
+			// *** tick emitters
+			for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++)
+				if (typeid(*(*i)) == typeid(bioEmitter))
+					processEmitter(*(bioEmitter *)(*i));
+			
+			// *** tick reactions
+			for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++)
+				if (typeid(*(*i)) == typeid(bioReaction))
+					processReaction(*(bioReaction *)(*i));
+		} else {
+			// *** out of energy damage	
+			applyInjury(atpdamagecoefficient);
 		}
+
+		// *** long-term damage
+		float diff = longtermlifeforce - shorttermlifeforce;
+		longtermlifeforce = longtermlifeforce - (diff * damagerate); // damagerate always <= 1.0
+
+		// *** repair injuries
+		float repair = diff * repairrate; // repairrate always <= 1.00
+		shorttermlifeforce += repair;
+		// adjust Injury chemical (TODO: de-hardcode)
+		parent->adjustChemical(127, -repair / lifeforce);
+
+		if (injurytoapply)
+			applyInjury(injurytoapply);
 	}
-}
-
-void Organ::tickInjury() {
-	// TODO: this might not be done in the right order
-	// TODO: this might not all be correct
-
+	
+	// *** tick receptors
+	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++)
+		if (typeid(*(*i)) == typeid(bioReceptor))
+			processReceptor(*(bioReceptor *)(*i), ticked);
+	
 	// *** decay life force
 	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
 	longtermlifeforce -= longtermlifeforce * (1.0f / 1000000.0f);
+}
 
-	// *** long-term damage
-	float diff = longtermlifeforce - shorttermlifeforce;
-	longtermlifeforce = longtermlifeforce - (diff * damagerate); // damagerate always <= 1.0
-
-	// *** repair
-	float repair = diff * repairrate; // repairrate always <= 1.00
-	shorttermlifeforce += repair;
-	// adjust Injury chemical (TODO: de-hardcode)
-	parent->adjustChemical(127, repair / lifeforce);
-
-	// *** immediate injury
-	shorttermlifeforce -= injurytoapply;
+void Organ::applyInjury(float value) {
+	shorttermlifeforce -= value;
 	if (shorttermlifeforce < 0.0f)
 		shorttermlifeforce = 0.0f;
 	// adjust Injury chemical (TODO: de-hardcode)
-	parent->adjustChemical(127, injurytoapply / lifeforce);
+	parent->adjustChemical(127, value / lifeforce);
 }
 
 void Organ::processReaction(bioReaction &g) {
@@ -216,6 +258,7 @@ void Organ::processReaction(bioReaction &g) {
 
 	if (ratio == 0.0f) return;
 
+	// TODO: lookup table better than this? or at least precalculation
 	float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (g.rate * 32.0) / 255.0));
 
 	ratio = ratio * rate;
@@ -224,6 +267,14 @@ void Organ::processReaction(bioReaction &g) {
 	parent->adjustChemical(g.reactant[1], -(ratio * (float)g.quantity[1]));
 	parent->adjustChemical(g.reactant[2], ratio * (float)g.quantity[2]);
 	parent->adjustChemical(g.reactant[3], ratio * (float)g.quantity[3]);
+}
+
+void Organ::processEmitter(bioEmitter &g) {
+	// TODO
+}
+
+void Organ::processReceptor(bioReceptor &g, bool checkchem) {
+	// TODO
 }
 
 /* vim: set noet: */

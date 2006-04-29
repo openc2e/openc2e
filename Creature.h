@@ -31,20 +31,19 @@ protected:
 	organGene *ourGene;
 
 	// data
-	float energycost;
+	float energycost, atpdamagecoefficient;
 	
 	// variables
 	float lifeforce, shorttermlifeforce, longtermlifeforce;
 	
 	// locuses
-	float damagerate, repairrate, clockrate, injurytoapply;
+	float biotick, damagerate, repairrate, clockrate, injurytoapply;
 
-	void tickInjury();
-
-	// TODO: is this correct magic number?
-	float ATPDamageCoefficient() { return ourGene->atpdamagecoefficient * 15.3787f; }
+	void applyInjury(float);
 
 	void processReaction(bioReaction &);
+	void processEmitter(bioEmitter &);
+	void processReceptor(bioReceptor &, bool checkchem);
 
 public:
 	Organ(Creature *p, organGene *g);
@@ -85,6 +84,8 @@ protected:
 	// drives
 	// to-be-processed instincts
 	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
+
+	unsigned int biochemticks;
 
 	void tickBiochemistry();
 
