@@ -204,14 +204,18 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 
 	shared_ptr<script> s = findScript(event);
 	if (!s) return false;
-	if (!vm) vm = world.getVM(this);
+	
+	bool madevm = false;
+	if (!vm) { madevm = true; vm = world.getVM(this); }
+	
 	if (vm->fireScript(s, (event == 9), from)) {
 		zotstack();
 		return true;
-	} else if (vm->stopped()) {
+	} else if (madevm) {
 		world.freeVM(vm);
 		vm = 0;
 	}
+
 	return false;
 }
 
