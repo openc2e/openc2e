@@ -79,8 +79,9 @@ inline void caosVM::runOp() {
 	result.reset(); // xxx this belongs in opcode maybe
 	try {
 		if (trace) {
-			fprintf(stderr, "Trace: %08d ", cip);
-			std::cerr << op->dump() << std::endl;
+			std::cerr
+				<< boost::str(boost::format("optrace: %p @%08d ") % (void *)this % cip)
+				<< op->dump() << std::endl;
 		}
 		op->execute(this);
 	} catch (creaturesException &e) {
@@ -163,6 +164,8 @@ void caosVM::resetCore() {
 	for (unsigned int i = 0; i < 100; i++) { var[i].reset(); var[i].setInt(0); }
 
 	camera.reset();
+
+	trace = false;
 }
 
 void caosVM::tick() {
