@@ -28,7 +28,6 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/split_free.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/utility.hpp>
 
@@ -36,6 +35,8 @@
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/export.hpp>
+
 #define SER_PROTO(friend, fname, c, const) \
     template <class Archive> friend void fname(Archive &ar, const c & obj, const unsigned int version)
 
