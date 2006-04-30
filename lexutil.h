@@ -101,9 +101,9 @@ static inline int make_string() {
 }
 
 static inline int push_bytestr(unsigned int bs) {
-	if (bs < 0 || bs > 255) {
+	if (bs > 255) {
 		std::ostringstream oss;
-		//oss << "Byte string element out of range (0 <= " << bs << " < 256) at line " << yylineno << ", near " << yytext;
+		oss << "Byte string element out of range (0 <= " << bs << " < 256) at line " << lex_lineno;
 		throw new parseException(oss.str());
 	}
 	bytestr.push_back(bs);
