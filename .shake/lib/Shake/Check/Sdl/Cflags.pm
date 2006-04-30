@@ -1,6 +1,6 @@
 # vim: set ts=4 sw=4 noexpandtab si ai sta tw=100:
 # This module is copyrighted, see end of file for details.
-package Shake::Check::SDL::CFlags;
+package Shake::Check::Sdl::Cflags;
 use strict;
 use warnings;
 
@@ -10,21 +10,22 @@ use base 'Shake::Check';
 our $VERSION = 0.02;
 
 sub initialize {
-	my ($self) = @_;
+	my ($self, $sdlconfig) = @_;
+	$self->{sdlconfig} = $sdlconfig;
 }
 
 sub msg {
 	my ($self) = @_;
-
-	return "checking sdl-config --cflags";
+	return "checking sdl compiler flags";
 }
 
 sub can_cache { 1 }
 
 sub run {
 	my ($self, $config) = @_;
-	die "Test requires sdl-config" unless $config->has('program.sdl-config');
-	my $rv = `sdl-config --cflags`;
+
+	my $sdlconfig = $self->{sdlconfig};
+	my $rv = `"$sdlconfig" --cflags`;
 	chomp $rv;
 
 	return $rv;

@@ -7,7 +7,7 @@ use Shake::Script::Checks qw(
 	program program.version
 	c.compiler c.endian c.header
 	sdl.cflags sdl.lflags
-	cpp.compiler
+	cpp.compiler cpp.boost.version
 	perl.module
 );
 
@@ -23,6 +23,8 @@ check('program', 'sdl-config');
 check('program', 'bison');
 check('sdl.cflags');
 check('sdl.lflags');
+check('cpp.boost.version', '1.33.0', compiler => lookup('cpp.compiler'));
+
 
 check(
 	'c.header' => $_,
