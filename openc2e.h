@@ -40,7 +40,8 @@ public:
 #define caos_assert(x) if (!(x)) { throw caosException(#x, __FILE__, __LINE__); }
 #define ensure(x) do {\
 	bool ensure__v = (x); \
-	assert(ensure__v && #x); \
+	if (!ensure__v) \
+		assert(ensure__v && (x)); \
 } while (0)
 
 #endif
