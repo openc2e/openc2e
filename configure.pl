@@ -21,8 +21,8 @@ check('program', 'flex');
 check('program.version', 'flex', '2.5.31');
 check('program', 'sdl-config');
 check('program', 'bison');
-check('sdl.cflags');
-check('sdl.lflags');
+check('sdl.cflags', lookup('program.sdl-config'));
+check('sdl.lflags', lookup('program.sdl-config'));
 check('cpp.boost.version', '1.33.0', compiler => lookup('cpp.compiler'));
 
 
