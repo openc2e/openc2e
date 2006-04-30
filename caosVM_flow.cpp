@@ -319,6 +319,7 @@ void caosVM::c_CALL() {
 	shared_ptr<script> s = owner->findScript(script_no);
 	if (!s) return;
 	caosVM *newvm = world.getVM(owner);
+	newvm->trace = trace;
 
 	assert(newvm->fireScript(s, false));
 	newvm->inst = inst;
