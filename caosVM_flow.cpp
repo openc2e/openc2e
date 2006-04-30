@@ -303,7 +303,7 @@ void caosVM::c_ECON() {
  Calls script_no on OWNR, then waits for it to return. The invoked script
  will inherit the caller's INST setting, but any changes it makes to it will
  be reversed once it returns - so eg if you call a script when in INST mode,
- it calls OVEr and returns, you'll still be in INST.
+ it calls OVER and returns, you'll still be in INST.
  
  Script variables (VAxx) will not be preserved - you'll have to use OVxx
  for any parameters.
@@ -327,6 +327,7 @@ void caosVM::c_CALL() {
 	newvm->_p_[1] = p2;
 	owner->pushVM(newvm);
 	stop_loop = true;
+	timeslice = 0; // This shouldn't be necessary... but just in case
 }
 
 /**
