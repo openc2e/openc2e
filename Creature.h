@@ -25,10 +25,33 @@ using boost::shared_ptr;
 
 class Creature;
 
+struct Reaction {
+	bioReaction *data;
+	float rate;
+	void init(bioReaction *);
+};
+
+struct Receptor {
+	bioReceptor *data;
+	bool processed;
+	float lastvalue;
+	Reaction *lastReaction;
+	void init(bioReceptor *, Reaction *);
+};
+
+struct Emitter {
+	bioEmitter *data;
+	void init(bioEmitter *);
+};
+
 class Organ {
 protected:
 	Creature *parent;	
 	organGene *ourGene;
+
+	std::vector<Reaction> reactions;
+	std::vector<Receptor> receptors;
+	std::vector<Emitter> emitters;
 
 	// data
 	float energycost, atpdamagecoefficient;
@@ -41,9 +64,9 @@ protected:
 
 	void applyInjury(float);
 
-	void processReaction(bioReaction &);
-	void processEmitter(bioEmitter &);
-	void processReceptor(bioReceptor &, bool checkchem);
+	void processReaction(Reaction &);
+	void processEmitter(Emitter &);
+	void processReceptor(Receptor &, bool checkchem);
 
 public:
 	Organ(Creature *p, organGene *g);

@@ -139,7 +139,6 @@ void Creature::tickBiochemistry() {
 			assert(d);
 
 			for (unsigned int x = 0; x < 256; x++) {
-				// TODO: lookup table better than this? or at least precalculation
 				if (d->halflives[x] == 0) {
 					// 0 is a special case for half-lives
 					chemicals[x] = 0.0f;
@@ -171,6 +170,21 @@ Organ::Organ(Creature *p, organGene *g) {
 
 	// TODO: is genes.size() always the size we want?
 	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
+	
+	Reaction *r = 0; // we need to store the previous reaction for possible receptor use
+	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(bioReaction)) {
+			reactions.push_back(Reaction());
+			r = &reactions.back();
+			reactions.back().init((bioReaction *)(*i));
+		} else if (typeid(*(*i)) == typeid(bioEmitter)) {
+			emitters.push_back(Emitter());
+			emitters.back().init((bioEmitter *)(*i));
+		} else if (typeid(*(*i)) == typeid(bioEmitter)) {
+			receptors.push_back(Receptor());
+			receptors.back().init((bioReceptor *)(*i), r);
+		}
+	}
 }
 
 void Organ::tick() {
@@ -196,14 +210,12 @@ void Organ::tick() {
 			parent->adjustChemical(36, energycost);
 			
 			// *** tick emitters
-			for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++)
-				if (typeid(*(*i)) == typeid(bioEmitter))
-					processEmitter(*(bioEmitter *)(*i));
+			for (vector<Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
+				processEmitter(*i);
 			
 			// *** tick reactions
-			for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++)
-				if (typeid(*(*i)) == typeid(bioReaction))
-					processReaction(*(bioReaction *)(*i));
+			for (vector<Reaction>::iterator i = reactions.begin(); i != reactions.end(); i++)
+				processReaction(*i);
 		} else {
 			// *** out of energy damage	
 			applyInjury(atpdamagecoefficient);
@@ -224,9 +236,8 @@ void Organ::tick() {
 	}
 	
 	// *** tick receptors
-	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++)
-		if (typeid(*(*i)) == typeid(bioReceptor))
-			processReceptor(*(bioReceptor *)(*i), ticked);
+	for (vector<Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
+		processReceptor(*i, ticked);
 	
 	// *** decay life force
 	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
@@ -241,7 +252,9 @@ void Organ::applyInjury(float value) {
 	parent->adjustChemical(127, value / lifeforce);
 }
 
-void Organ::processReaction(bioReaction &g) {
+void Organ::processReaction(Reaction &d) {
+	bioReaction &g = *d.data;
+	
 	// TODO: this might not all be correct
 
 	float ratio = 1.0f, ratio2 = 1.0f;
@@ -258,8 +271,7 @@ void Organ::processReaction(bioReaction &g) {
 
 	if (ratio == 0.0f) return;
 
-	// TODO: lookup table better than this? or at least precalculation
-	float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (g.rate * 32.0) / 255.0));
+	float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (1.0 - d.rate) * 32.0));
 
 	ratio = ratio * rate;
 
@@ -269,12 +281,39 @@ void Organ::processReaction(bioReaction &g) {
 	parent->adjustChemical(g.reactant[3], ratio * (float)g.quantity[3]);
 }
 
-void Organ::processEmitter(bioEmitter &g) {
+void Organ::processEmitter(Emitter &d) {
 	// TODO
 }
 
-void Organ::processReceptor(bioReceptor &g, bool checkchem) {
+void Organ::processReceptor(Receptor &d, bool checkchem) {
+	if (checkchem) {
+		// TODO
+
+		d.processed = true;
+		d.lastvalue = 0.0f; // TODO: chem result
+	}
+
+	if (!d.processed) return;
+	
 	// TODO
+}
+
+void Reaction::init(bioReaction *g) {
+	data = g;
+
+	// rate is stored in genome as 0 fastest, 255 slowest
+	// reversed in game, i think .. TODO: check this
+	rate = 1.0 - (g->rate / 255.0);
+}
+
+void Receptor::init(bioReceptor *g, Reaction *r) {
+	data = g;
+	processed = false;
+	lastReaction = r;
+}
+
+void Emitter::init(bioEmitter *g) {
+	data = g;
 }
 
 /* vim: set noet: */
