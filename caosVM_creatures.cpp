@@ -83,7 +83,10 @@ void caosVM::c_STIM_WRIT() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
-	VM_PARAM_AGENT(creature)
+	VM_PARAM_VALIDAGENT(creature)
+	
+	Creature *c = dynamic_cast<Creature *>(creature.get());
+	if (!c) return; // ignored on non-creatures
 	
 	// TODO
 }
@@ -202,7 +205,7 @@ void caosVM::c_MVFT() {
 */
 void caosVM::v_CREA() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_AGENT(agent)
+	VM_PARAM_VALIDAGENT(agent)
 
 	Creature *c = dynamic_cast<Creature *>(agent.get());
 	if (c) result.setInt(1);
@@ -298,6 +301,9 @@ void caosVM::c_URGE_WRIT() {
 	VM_PARAM_INTEGER(noun_id)
 	VM_PARAM_VALIDAGENT(creature)
 
+	Creature *c = dynamic_cast<Creature *>(creature.get());
+	if (!c) return; // ignored on non-creatures
+	
 	// TODO
 }
 
@@ -310,9 +316,11 @@ void caosVM::c_URGE_WRIT() {
 void caosVM::c_DRIV() {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(drive_id)
-
-	Creature *c = getTargCreature();
-
+	
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	if (!c) return; // ignored on non-creatures
+	
 	// TODO
 }
 
@@ -340,8 +348,10 @@ void caosVM::c_CHEM() {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(chemical_id)
 
-	Creature *c = getTargCreature();
-
+	caos_assert(targ);
+	Creature *c = dynamic_cast<Creature *>(targ.get());
+	if (!c) return; // ignored on non-creatures
+	
 	c->adjustChemical(chemical_id, adjust);
 }
 
