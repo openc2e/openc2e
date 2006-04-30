@@ -321,13 +321,12 @@ void caosVM::c_CALL() {
 	caosVM *newvm = world.getVM(owner);
 	newvm->trace = trace;
 
-	assert(newvm->fireScript(s, false));
+	ensure(newvm->fireScript(s, false));
 	newvm->inst = inst;
 	newvm->_p_[0] = p1;
 	newvm->_p_[1] = p2;
 	owner->pushVM(newvm);
 	stop_loop = true;
-	timeslice = 0; // This shouldn't be necessary... but just in case
 }
 
 /**
