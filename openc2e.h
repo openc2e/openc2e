@@ -32,13 +32,16 @@
 
 typedef std::vector<unsigned int> bytestring;
 
-// assertFailure segfaults the app
 class assertFailure : public creaturesException {
 public:
 	assertFailure(const char *x) throw() : creaturesException(x) { }
 };
 
 #define caos_assert(x) if (!(x)) { throw caosException(#x, __FILE__, __LINE__); }
+#define ensure(x) do {\
+	bool ensure__v = (x); \
+	assert(ensure__v && #x); \
+} while (0)
 
 #endif
 /* vim: set noet: */
