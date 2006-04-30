@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <list>
 #include <deque>
+#include <boost/lambda/lambda.hpp>
 #include "slaballoc.h"
 #include "serialization.h"
 
@@ -37,6 +38,7 @@
 #define REGION_MIN (int)(REGION_MAX / 2)
 
 typedef unsigned long long u64_t;
+using namespace boost::lambda;
 
 struct Region {
 	int xmin, xmax;
@@ -594,20 +596,18 @@ class RTree {
 			return root->dump();
 		}
 
+		
 		template<class Archive>
 			void save(Archive & ar, const unsigned int version) const {
-				std::vector<RData<T> *> list;
+				std::vector<RData<T> *> l;
 				Region za_warudo(INT_MIN, INT_MIN, INT_MAX, INT_MAX);
 				if (root)
-					root->scan(za_warudo, list);
-				size_t len = list.size();
+					root->scan(za_warudo, l);
+				size_t len = l.size();
 				assert(len == size());
 				ar & len;
-				for (std::vector<RData<T> *>::iterator it = list.start();
-						it != list.end(); it++)
-				{
-					ar & (*it)->r & (*it)->obj;
-				}
+				std::for_each(l.start(), l.end(),
+						ar & (*_1)->* &RData<T>::r & (*_1)->* &RData<T>::obj);
 			}
 
 		template<class Archive>

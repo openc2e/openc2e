@@ -290,7 +290,7 @@ class DestructingSlab : public SlabAllocator {
 	public:
 
 		DestructingSlab(size_t objsz_ = sizeof(void **),
-					size_t bm = 32) : SlabAllocator(objsz_, bm) {
+					size_t bm = 4096) : SlabAllocator(objsz_, bm) {
 			p_dest = NULL;
 		}
 		
