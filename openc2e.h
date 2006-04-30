@@ -30,7 +30,7 @@
 #include <string>
 #include "exceptions.h"
 
-typedef std::vector<unsigned int> bytestring;
+typedef std::basic_string<unsigned char> bytestring_t;
 
 class assertFailure : public creaturesException {
 public:

@@ -416,13 +416,16 @@ void caosVM::c_ANMS() {
 	VM_PARAM_STRING(poselist)
 
 	// TODO: technically, we should parse this properly, also do error checking
-	std::vector<unsigned int> animation;
+	bytestring_t animation;
 
 	std::string t;
 	for (unsigned int i = 0; i < poselist.size(); i++) {
 		if (poselist[i] == ' ')
-			if (!t.empty())
-				animation.push_back(atoi(t.c_str()));
+			if (!t.empty()) {
+				int n = atoi(t.c_str());
+				caos_assert(n >= 0 && n < 256);
+				animation.push_back(n);
+			}
 		else
 			t = t + poselist[i];
 	}

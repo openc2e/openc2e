@@ -74,7 +74,7 @@ protected:
 				 unsigned int _z);
 
 public:
-	std::vector<unsigned int> animation;
+	bytestring_t animation;
 	bool is_transparent;
 	unsigned char framerate;
 	unsigned int framedelay;
@@ -105,11 +105,11 @@ class ButtonPart : public SpritePart {
 protected:
 	bool hitopaquepixelsonly;
 	int messageid;
-	bytestring hoveranimation;
+	bytestring_t hoveranimation;
 
 public:
 	ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-			   unsigned int _z, const bytestring &animhover, int msgid, int option);
+			   unsigned int _z, const bytestring_t &animhover, int msgid, int option);
 	void handleClick(float, float);
 	bool isTransparent() { return hitopaquepixelsonly; }
 };

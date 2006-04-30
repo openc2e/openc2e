@@ -159,7 +159,7 @@ DullPart::DullPart(Agent *p, unsigned int _id, std::string spritefile, unsigned 
 }
 
 ButtonPart::ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-	unsigned int _z, const bytestring &animhover, int msgid, int option) : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
+	unsigned int _z, const bytestring_t &animhover, int msgid, int option) : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	messageid = msgid;
 	hitopaquepixelsonly = (option == 1);
 	hoveranimation = animhover;

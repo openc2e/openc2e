@@ -34,7 +34,7 @@ extern int lex_lineno;
 
 void lexreset();
 
-extern std::vector<unsigned int> bytestr;
+extern bytestring_t bytestr;
 extern std::string temp_str;
 
 static inline int make_int(int v) {
@@ -101,6 +101,11 @@ static inline int make_string() {
 }
 
 static inline int push_bytestr(unsigned int bs) {
+	if (bs < 0 || bs > 255) {
+		std::ostringstream oss;
+		//oss << "Byte string element out of range (0 <= " << bs << " < 256) at line " << yylineno << ", near " << yytext;
+		throw new parseException(oss.str());
+	}
 	bytestr.push_back(bs);
 	lasttok.yyline = lex_lineno;
 	return 1;

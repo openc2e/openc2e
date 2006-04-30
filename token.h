@@ -19,6 +19,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H 1
 
+#include "openc2e.h"
 #include "caosVar.h"
 #include <vector>
 #include <iostream>
@@ -32,7 +33,7 @@ struct token {
 	int yyline;
 
 	toktype type;
-	std::vector<unsigned int> bytestr;
+	bytestring_t bytestr;
 	std::string word;
 	caosVar constval;
 
@@ -66,10 +67,10 @@ struct token {
 				break;
 			case TOK_BYTESTR:
 				{
-					std::vector<unsigned int>::iterator i = bytestr.begin();
+					bytestring_t::iterator i = bytestr.begin();
 					oss << "bytestr ";
 					while (i != bytestr.end())
-						oss << *i++ << " ";
+						oss << (int)*i++ << " ";
 				}
 				break;
 			default:

@@ -331,9 +331,7 @@ class opBytestr : public caosOp {
 		bytestring_t bytestr;
 		opBytestr () {}
 	public:
-		opBytestr(const std::vector<unsigned int> &bs) {
-			bytestr = bytestring_t(new std::vector<unsigned int>(bs));
-		}
+		opBytestr(bytestring_t bs) : bytestr(bs) {}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			vm->valueStack.push_back(bytestr);
@@ -342,8 +340,8 @@ class opBytestr : public caosOp {
 		std::string dump() {
 			std::ostringstream oss;
 			oss << "BYTESTR [ ";
-			for (unsigned int i = 0; i < (*bytestr).size(); i++) {
-				oss << i << " ";
+			for (unsigned int i = 0; i < bytestr.size(); i++) {
+				oss << (int)bytestr[i] << " ";
 			}
 			oss << "]";
 			return oss.str();

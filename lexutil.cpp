@@ -24,7 +24,7 @@
 
 int lex_lineno;
 
-std::vector<unsigned int> bytestr;
+bytestring_t bytestr;
 std::string temp_str;
 
 static token *peektok = NULL;

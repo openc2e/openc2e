@@ -20,6 +20,7 @@
 #ifndef _CAOSVM_H
 #define _CAOSVM_H
 
+#include "openc2e.h"
 #include "caosScript.h"
 #include <map>
 #include <istream>
@@ -29,8 +30,6 @@
 
 #include <boost/weak_ptr.hpp>
 using boost::weak_ptr;
-
-typedef boost::shared_ptr<const std::vector<unsigned int> > bytestring_t;
 
 //#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
@@ -382,6 +381,7 @@ public:
 	void c_DBG_DISA();
 	void v_UNID();
 	void v_AGNT();
+	void v_DBG_IDNT();
 
 	// agent
 	void c_NEW_COMP();
@@ -792,10 +792,10 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_DECIMAL(name) caosVar name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal(); } vm->valueStack.pop_back();
-#define VM_PARAM_BYTESTR(name) std::vector<unsigned int> name; { \
+#define VM_PARAM_BYTESTR(name) bytestring_t name; { \
 	VM_STACK_CHECK(vm); \
 	vmStackItem __x = vm->valueStack.back(); \
-	name = *__x.getByteStr(); } vm->valueStack.pop_back();
+	name = __x.getByteStr(); } vm->valueStack.pop_back();
 
 #define STUB throw caosException("stub in " __FILE__)
 

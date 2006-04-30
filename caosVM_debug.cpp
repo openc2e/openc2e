@@ -261,4 +261,21 @@ void caosVM::c_DBG_DISA() {
  Blows up unless the given condition is true.
 */
 
+/**
+ DBG: IDNT (string) agent (agent)
+ %status ok
+
+ (openc2e-only)
+ Return a nicely-formatted string identifying the classifier of the agent,
+ using the catalogue to find the name if possible.
+*/
+void caosVM::v_DBG_IDNT() {
+	VM_PARAM_AGENT(a)
+	
+	if (!a)
+		result.setString("(null)");
+	else
+		result.setString(a->identify());
+}
+
 /* vim: set noet: */
