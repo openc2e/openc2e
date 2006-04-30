@@ -108,4 +108,36 @@ void caosVM::v_NET_USER() {
 	result.setString("");
 }
 
+/**
+ NET: FROM (string) resource_name (string)
+ %status stub
+ 
+ Networking is not supported in openc2e, so returns an empty string.
+*/
+void caosVM::v_NET_FROM() {
+	result.setString("");
+}
+
+/**
+ NET: EXPO (integer) chunk_type (string) dest_user (string)
+ %status stub
+
+ Networking is not supported in openc2e, so always returns 0.
+*/
+void caosVM::v_NET_EXPO() {
+	result.setInt(0);
+}
+
+/**
+ NET: RUSO (command) result (variable)
+ %status stub
+
+ Networking is not supported in openc2e, so sets result to an empty string.
+*/
+void caosVM::c_NET_RUSO() {
+	VM_PARAM_VARIABLE(result)
+
+	result->setString("");
+}
+
 /* vim: set noet: */

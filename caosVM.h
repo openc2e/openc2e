@@ -618,6 +618,7 @@ public:
 	void v_WPAU();
 	void v_RTIF();
 	void v_RTIM();
+	void v_WTIK();
 
 	// resources
 	void v_PRAY_AGTI();
@@ -703,6 +704,9 @@ public:
 	void c_NET_WHOZ();
 	void c_NET_WHON();
 	void v_NET_USER();
+	void v_NET_FROM();
+	void v_NET_EXPO();
+	void c_NET_RUSO();
 
 	// genetics
 	void c_GENE_CLON();

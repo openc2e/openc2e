@@ -225,4 +225,12 @@ void caosVM::v_RTIM() {
 	result.setInt(time(0));
 }
 
+/**
+ WTIK (integer)
+ %status maybe
+*/
+void caosVM::v_WTIK() {
+	result.setInt(world.tickcount);
+}
+
 /* vim: set noet: */
