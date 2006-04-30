@@ -3,34 +3,31 @@ use strict;
 use warnings;
 use lib '.shake/lib';
 use Shake::Script;
-use Shake::Checks qw( 
-	Program
-	Program::Version
-	C::Compiler
-	Cpp::Compiler
-	C::Endian
-	C::Header
-	Perl::Module 
-	SDL::CFlags
-	SDL::LFlags
+use Shake::Script::Checks qw( 
+	program program.version
+	c.compiler c.endian c.header
+	sdl.cflags sdl.lflags
+	cpp.compiler
+	perl.module
 );
 
 shake_init("openc2e", "???", 'dylanwh@gmail.com');
 
-check_c_compiler();
-check_cpp_compiler();
-check_c_endian(compiler => lookup('cpp.compiler'));
-check_perl_module('YAML');
-check_program('flex');
-check_program_version('flex', '2.5.31');
-check_program('sdl-config');
-check_program('bison');
-check_sdl_cflags();
-check_sdl_lflags();
+check('c.compiler');
+check('cpp.compiler');
+check('c.endian', compiler => lookup('cpp.compiler'));
+check('perl.module', 'YAML');
+check('program', 'flex');
+check('program.version', 'flex', '2.5.31');
+check('program', 'sdl-config');
+check('program', 'bison');
+check('sdl.cflags');
+check('sdl.lflags');
 
-check_c_header($_,
-	cflags => lookup('sdl.cflags'),
-	compiler => lookup('cpp.compiler'),
+check(
+	'c.header' => $_,
+	cflags     => lookup('sdl.cflags'),
+	compiler   => lookup('cpp.compiler'),
 ) foreach qw( SDL_mixer.h SDL_net.h );
 
 my @boost_crap = qw( 
@@ -41,13 +38,11 @@ my @boost_crap = qw(
 	boost/shared_ptr.hpp
 );
 
-check_c_header($_,
-	compiler => lookup('cpp.compiler'),
+check(
+	'c.header' => $_,
+	compiler   => lookup('cpp.compiler'),
 ) foreach @boost_crap;
 
-ensure (
-	default  => 'required',
-);
+shake_done();
 
 configure('config.mk');
-save_config();

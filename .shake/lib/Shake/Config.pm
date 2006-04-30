@@ -61,7 +61,7 @@ sub features {
 
 sub has {
 	my ($self, $key) = @_;
-	defined $self->{results}{$key}{value};
+	exists $self->{results}{$key} and defined $self->{results}{$key}{value};
 }
 
 sub run_check {
@@ -69,17 +69,29 @@ sub run_check {
 	return (scalar $check->run($self), undef);
 }
 
+sub _check {
+	my ($self, $check) = @_;
+	my $name = $check->name;
+	if (exists $self->{results}{$name} and not exists $self->{results}{$name}{version}) {
+		return ($self->lookup($name), 'overriden');
+	} else {
+		$self->run_check($check);
+	}
+}
+
+
 sub run {
 	my ($self, $check) = @_;
 	my $name = $check->name;
 	print $check->msg, "... ";
 	
 	my $rv = eval {
-		my ($val, $note) = $self->run_check($check);
+		my ($val, $note) = $self->_check($check);
 		$self->{results}{$name} = {
 			value   => $val,
 			version => $check->version,
 			msg     => $check->msg,
+			note    => $note,
 		};
 		my $s = '';
 		if ($note) {

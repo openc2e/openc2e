@@ -8,38 +8,40 @@ use Exporter;
 use base 'Exporter';
 use Carp;
 
+use Shake::Util 'module_to_filename';
 use Shake::Cache;
 use Shake::Config;
 use Shake::Config::Cached;
 
 our $VERSION   = 0.01;
-our @EXPORT    = qw( $checking %option shake_init define lookup have checks ensure save_config configure );
-our @EXPORT_OK = qw( $Config );
+our @EXPORT    = qw( %option shake_init shake_done check configure );
+our @EXPORT_OK = qw( load_check );
 our $Config;
-our $checking = 1;
+our %Check;
 our %option = (
 	prefix => '/usr/local',
 );
 
-sub lookup {
-	$Config->lookup(@_);
-}
 
-sub have {
-	$Config->has(@_);
-}
-
-sub define {
-	$Config->define(@_);
+{ no strict 'refs';
+	foreach my $f (qw( lookup has define override )) {
+		push @EXPORT, $f;
+		*$f = sub { $Config->$f(@_) };
+	}
 }
 
 sub shake_init {
 	my ($pkg, $version, $author) = @_;
+	my (%define, @undefine);
+	$option{define} = \%define;
+	$option{undefine} = \@undefine;
+	$|++;
 
 	Getopt::Long::Configure('gnu_getopt');
 	GetOptions(\%option, 
 		qw(
 			define|D=s%
+			undefine|undef|U=s@
 			nocache
 			prefix=s
 			dist
@@ -56,17 +58,43 @@ sub shake_init {
 		}
 	}
 	
-	if ($option{dist}) {
-		require Shake::Dist;
-		Shake::Dist::make_dist();
-		exit 0;
-	}
-	
 	print "configuring $pkg $version (report bugs to $author)\n";
 	$Config->define(PACKAGE => $pkg);
 	$Config->define(VERSION => $version);
 	$Config->define(AUTHOR  => $author);
 	$Config->define(PREFIX  => $option{prefix});
+
+	foreach (@undefine) {
+		$define{$_} = undef;
+	}
+
+	if (%define) {
+		print "will override: ", join(', ', keys %define), "\n";
+	}
+	$Config->define($_ => $define{$_}) foreach keys %define;
+}
+
+
+sub load_check {
+	my ($name, $class) = @_;
+	if (not defined $class) {
+		$class = 'Shake::Check::' . join('::', map(ucfirst($_), split(/\./, $name)));
+	}
+	my $file = module_to_filename($class);
+	eval {
+		require $file;
+	};
+	if ($@) {
+		die "Failed to load check module for $name ($class)\nError: $@";
+	}
+	$Check{$name} = $class;
+}
+
+
+sub check {
+	my $name = shift;
+	my $class = $Check{$name} or die "Unknown check: $name\n";
+	$Config->run( $class->new(@_) );
 }
 
 sub save_config {
@@ -85,50 +113,62 @@ sub configure {
 	my ($file) = @_;
 	my $in = new IO::File("$file.in", 'r') or die "Can't open $file.in for input\n";
 	my $out = new IO::File($file, 'w')     or die "Can't open $file for output\n";
-	my $line;
+	local $/ = undef;
 
 	my $lookup = sub {
 		my $f = shift;
-		my $val = $Config->lookup($f);
+		my $val = eval { $Config->lookup($f) };
 		if (not defined $val) {
 			return '';
 		} else {
 			return $val;
 		}
 	};
+	my $eval = sub {
+		my $rv = eval shift;
+		die $@ if $@;
+		return $rv;
+	};
 
 	print "writing $file... ";
-	while (defined ($line = $in->getline)) {
-		$line =~ s/@([-:.\w]+?)@/$lookup->($1)/ge;
-		$out->print($line);
-	}
+	my $content = $in->getline();
+	$content =~ s/@([-:.\w]+?)@/$lookup->($1)/ge;
+	$content =~ s/@\{(.+?)\}@/$eval->($1)/seg;
+	$out->print($content);
 	print "done.\n";
+
 
 	$in->close;
 	$out->close;
 }
-sub ensure {
-	my (%args) = @_;
-	my $default = $args{default};
-	my %required = hash_of_list(@{ $args{required} });
-	my %optional = hash_of_list(@{ $args{optional} });
 
-	if ($default ne 'optional' and $default ne 'required') {
-		croak "default must be one of required or optional!";
-	}
+sub ensure {
+	my ($required, $optional) = @_;
+	my %required = hash_of_list($required ? @$required : $Config->features);
+	my %optional = hash_of_list($optional ? @$optional : ());
 
 	my $die = 0;
 	foreach my $feature ($Config->features) {
 		next if $optional{$feature};
 		if (not $Config->has($feature)) {
-			if ($default eq 'required' or $required{$feature}) {
+			if ($required{$feature}) {
 				$die++;
 				warn "*** Error: required check ``$feature'' failed.\n";
 			}
 		}	
 	}
 
-	die "*** Fatal: Missing requirements.\n" if $die;	
+	die "*** Fatal: Missing requirements.\n" if $die;
+}
+
+sub shake_done {
+	my %args = @_;
+	ensure($args{required}, $args{optional});
+	save_config();
+	if ($option{dist}) {
+		require Shake::Script::Dist;
+		Shake::Script::Dist::dist();
+	}
 }
 
 sub hash_of_list {

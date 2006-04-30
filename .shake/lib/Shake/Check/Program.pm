@@ -37,15 +37,22 @@ sub run {
 	my $sep = ':';
 	
 	if ($^O eq 'MSWin32') {
-		$prog .= ".exe";
 		$sep = ';';
 	}
 	
 	my @path = split($sep, $ENV{PATH});
 	foreach my $dir (@path) {
 		my $path = File::Spec->join($dir, $prog);
-		if (-e $path) {
-			return $path;
+		if ($^O ne 'MSWin32') {
+			if (-e $path) {
+				return $path;
+			}
+		} else {
+			foreach my $suf (qw( bat exe cmd )) {
+				if (-e "$path.$suf") {
+					return "$path.$suf";
+				}
+			}
 		}
 	}
 	
