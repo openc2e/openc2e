@@ -66,7 +66,15 @@ class caosVar {
 		
 		struct intVisit : public boost::static_visitor<int> {
 			int operator()(int i) const { return i; }
-			int operator()(float f) const { return (int)f; }
+			int operator()(float f) const {
+				// horror necessary for rounding without C99
+				int x = (int)f; float diff = f - x;
+				if (f >= 0.0f) {
+					if (diff >= 0.5f) return ++x; else return x;
+				} else {
+					if (diff <= -0.5f) return --x; else return x;
+				}
+			}
 			BAD_TYPE(int, std::string);
 			BAD_TYPE(int, AgentRef);
 			BAD_TYPE(int, nulltype_tag);
