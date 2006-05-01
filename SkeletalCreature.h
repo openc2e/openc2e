@@ -73,6 +73,9 @@ public:
 	void setZOrder(unsigned int plane);
 
 	void ageCreature();
+
+	std::string getFaceSpriteName();
+	unsigned int getFaceSpriteFrame();
 };
 
 class SkeletonPart : public CompoundPart {

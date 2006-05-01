@@ -434,27 +434,29 @@ void caosVM::v_UNCS() {
 
 /**
  FACE (integer)
- %status stub
+ %status maybe
  %pragma parser new FACEhelper()
 
  Returns the front-facing pose for the current facial expression of the target creature.
 */
 void caosVM::v_FACE() {
-	Creature *c = getTargCreature();
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(getTargCreature());
+	caos_assert(c);
 	
-	result.setInt(-1);
+	result.setInt(c->getFaceSpriteFrame());
 }
 
 /* // TODO: doc parser needs fixing so we can include this without a conflict
  FACE (string)
- %status stub
+ %status maybe
 
  Returns the current sprite filename for the face of the target creature.
 */
 void caosVM::s_FACE() {
-	Creature *c = getTargCreature();
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(getTargCreature());
+	caos_assert(c);
 	
-	result.setString("");
+	result.setString(c->getFaceSpriteName());
 }
 
 /**

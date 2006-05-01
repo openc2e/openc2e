@@ -330,4 +330,21 @@ void SkeletalCreature::ageCreature() {
 	skeletonInit();
 }
 
+std::string SkeletalCreature::getFaceSpriteName() {
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(creatureAppearance)) {
+			creatureAppearance *x = (creatureAppearance *)(*i);
+			if (x->part == 0) {
+				return std::string("a") + dataString(0, true, x->species, x->variant);
+			}
+		}
+	}
+
+	caos_assert(false); // TODO: mmh
+}
+
+unsigned int SkeletalCreature::getFaceSpriteFrame() {
+	return 9 + (eyesclosed ? 16 : 0) + (facialexpression * 32);
+}
+
 /* vim: set noet: */
