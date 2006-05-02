@@ -47,12 +47,13 @@ struct Emitter {
 	unsigned char sampletick;
 	float *locus;
 	float threshold, gain;
-	void init(bioEmitter *);
+	void init(bioEmitter *, class Organ *);
 };
 
 class Organ {
 protected:
 	friend struct Receptor;
+	friend struct Emitter;
 	
 	Creature *parent;	
 	organGene *ourGene;
@@ -76,6 +77,8 @@ protected:
 	void processReaction(Reaction &);
 	void processEmitter(Emitter &);
 	void processReceptor(Receptor &, bool checkchem);
+	
+	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int **receptors);
 
 public:
 	Organ(Creature *p, organGene *g);
@@ -119,6 +122,15 @@ protected:
 
 	unsigned int biochemticks;
 
+	// loci
+	float lifestageloci[7];
+	float muscleenergy;
+	float floatingloci[32];
+	float fertile, pregnant, ovulate, receptive, chanceofmutation, degreeofmutation;
+	float dead;
+	float senses[14], involaction[8], gaitloci[16];
+	float drives[20];
+
 	void tickBiochemistry();
 
 public:
@@ -146,6 +158,8 @@ public:
 	
 	void born();
 	void die();
+	
+	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 };
 
 /* vim: set noet: */

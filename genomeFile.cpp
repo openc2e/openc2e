@@ -353,7 +353,7 @@ void c2eBrainLobe::write(ostream &s) const {
 	s << red << green << blue;
 	s << WTA << tissue;
 
-	for (int i = 0; i < 8; i++) s << spare[i];
+	for (int i = 0; i < 8; i++) s << spare[i]; // first byte = flags?
 	for (int i = 0; i < 48; i++) s << initialiserule[i];
 	for (int i = 0; i < 48; i++) s << updaterule[i];
 }
@@ -369,7 +369,7 @@ void c2eBrainLobe::read(istream &s) {
 	s >> red >> green >> blue;
 	s >> WTA >> tissue;
 
-	for (int i = 0; i < 8; i++) s >> spare[i];
+	for (int i = 0; i < 8; i++) s >> spare[i]; // first byte = flags?
 	for (int i = 0; i < 48; i++) s >> initialiserule[i];
 	for (int i = 0; i < 48; i++) s >> updaterule[i];
 }

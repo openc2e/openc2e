@@ -60,6 +60,17 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	zombie = false;
 
 	biochemticks = 0;
+
+	// initialise loci
+	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0.0f;
+	muscleenergy = 0.0f;
+	for (unsigned int i = 0; i < 32; i++) floatingloci[i] = 0.0f;
+	fertile = pregnant = ovulate = receptive = chanceofmutation = degreeofmutation = 0.0f;
+	dead = 0.0f;
+	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0.0f;
+	for (unsigned int i = 0; i < 16; i++) gaitloci[i] = 0.0f;
+	for (unsigned int i = 0; i < 14; i++) senses[i] = 0.0f;
+	for (unsigned int i = 0; i < 20; i++) drives[i] = 0.0f;
 }
 
 Creature::~Creature() {
@@ -102,6 +113,7 @@ void Creature::born() {
 
 void Creature::die() {
 	// TODO: life event?
+	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(7, "", ""); // died event
 	// TODO: disable brain/biochemistry updates, trigger die script?
 	// skeletalcreature eyes, also? see setAsleep comment
 	alive = false;
@@ -109,11 +121,17 @@ void Creature::die() {
 
 void Creature::tick() {
 	Agent::tick();
+	// TODO: should we tick some things even if dead?
 	if ((paused) || (!alive)) return;
 
 	if (tickage) age++;
 
+	senses[0] = 1.0f;
+	senses[9] = 1.0f; // air quality
+	
 	tickBiochemistry();
+
+	if (dead != 0.0f) die();
 }
 
 void Creature::tickBiochemistry() {
@@ -151,6 +169,69 @@ void Creature::tickBiochemistry() {
 	}
 }
 
+float *Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
+	switch (o) {
+		case 0: // brain
+			{
+			// t = lobe tissue id
+			unsigned int neuronid = o/3, stateno = o%3;
+			return 0; // TODO
+			}
+
+		case 1: // creature
+			switch (t) {
+				case 0: // somatic
+					if (receptor) {
+						if (l > 6) break;
+						return &lifestageloci[t];
+					} else if (l == 0) return &muscleenergy;
+					break;
+
+				case 1: // circulatory
+					if (l > 31) break;
+					return &floatingloci[l];
+
+				case 2: // reproductive
+					if (!receptor) {
+						if (l == 0) return &fertile;
+						else if (l == 1) return &pregnant;
+						l = l - 2;
+					}
+					switch (l) {
+						case 0: return &ovulate;
+						case 1: return &receptive;
+						case 2: return &chanceofmutation;
+						case 3: return &degreeofmutation;
+					}
+					break;
+					
+				case 3: // immune
+					if (l == 0) return &dead;
+					break;
+				
+				case 4: // sensorimotor
+					if (!receptor) {
+						if (l < 14) return &senses[l];
+						l -= 14;
+					}
+					if (l < 8) return &involaction[l];
+					l -= 8;
+					if (l < 16) return &gaitloci[l];
+					break;
+
+				case 5: // drives
+					if (l < 20) return &drives[l];
+					break;
+			}
+
+	}
+
+	std::cout << "Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
+		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
+		<< std::endl;
+	return 0;
+}
+ 
 /*****************************************************************************/
 
 Organ::Organ(Creature *p, organGene *g) {
@@ -177,7 +258,7 @@ Organ::Organ(Creature *p, organGene *g) {
 			reactions.back()->init((bioReaction *)(*i));
 		} else if (typeid(*(*i)) == typeid(bioEmitter)) {
 			emitters.push_back(Emitter());
-			emitters.back().init((bioEmitter *)(*i));
+			emitters.back().init((bioEmitter *)(*i), this);
 		} else if (typeid(*(*i)) == typeid(bioReceptor)) {
 			receptors.push_back(Receptor());
 			receptors.back().init((bioReceptor *)(*i), this, r);
@@ -291,9 +372,12 @@ void Organ::processEmitter(Emitter &d) {
 	bioEmitter &g = *d.data;
 	
 	if (d.sampletick != g.rate) {
+		assert(d.sampletick < g.rate);
 		d.sampletick++;
 		return;
-	} else d.sampletick = 0;
+	}
+	
+	d.sampletick = 0;
 
 	if (!d.locus) return;
 	float f = *d.locus;
@@ -350,6 +434,42 @@ void Organ::processReceptor(Receptor &d, bool checkchem) {
 		*d.locus = f;
 }
 
+float *Organ::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int**receptors) {
+	if (receptors) *receptors = 0;
+
+	switch (o) {
+		case 2: // organ
+			if (t == 0)
+				switch (l) {
+					case 0: // clock rate
+						if (receptors) *receptors = &clockratereceptors;
+						return &clockrate;
+					case 1: // repair rate
+						if (receptors) *receptors = &repairratereceptors;
+						return &repairrate;
+					case 2: // injury to apply
+						// TODO
+						/*if (receptors) *receptors = &injuryreceptors;
+						return &injurytoapply;*/
+						return 0;
+				}
+			break;
+		case 3: // reaction
+			if (t == 0 && l == 0) { // reaction rate
+				shared_ptr<Reaction> r = reactions.back();
+				if (!r) {
+					std::cout << "Organ::getLocusPointer failed to find a reaction" << std::endl;
+					return 0;
+				} else {
+					if (receptors) *receptors = &r->receptors;
+					return &r->rate;
+				}
+			}
+	}
+
+	return parent->getLocusPointer(receptor, o, t, l);
+}
+
 void Reaction::init(bioReaction *g) {
 	data = g;
 
@@ -358,56 +478,21 @@ void Reaction::init(bioReaction *g) {
 	rate = 1.0 - (g->rate / 255.0);
 }
 
-void Receptor::init(bioReceptor *g, Organ *o, shared_ptr<Reaction> r) {
+void Receptor::init(bioReceptor *g, Organ *parent, shared_ptr<Reaction> r) {
 	data = g;
 	processed = false;
 	nominal = g->nominal / 255.0f;
 	threshold = g->threshold / 255.0f;
 	gain = g->gain / 255.0f;
-	locus = 0;
-	receptors = 0;
-	switch (g->organ) {
-		case 2: // organ
-			if (!g->tissue)
-				std::cout << "organ tissue sulk: " << int(g->tissue) << std::endl;
-			else switch (g->locus) {
-				case 0:
-					locus = &o->clockrate;
-					receptors = &o->clockratereceptors;
-					break;
-				case 1:
-					locus = &o->repairrate;
-					receptors = &o->repairratereceptors;
-					break;
-				case 2:
-					/*
-					locus = &o->injurytoapply;
-					receptors = &o->injuryreceptors;
-					*/
-					break;
-
-				default:
-					std::cout << "organ locus sulk: " << int(g->locus) << std::endl;
-			}
-			break;
-		case 3: // reaction
-			if (g->tissue == 0 && g->locus == 0) {
-				if (!r)
-					std::cout << "hm, no reaction" << std::endl;
-				else {
-					locus = &r->rate;
-					receptors = &r->receptors;
-				}
-			} else std::cout << "sulk: " << int(g->tissue) << ", " << int(g->locus) << std::endl;
-	}
+	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus, &receptors);
 }
 
-void Emitter::init(bioEmitter *g) {
+void Emitter::init(bioEmitter *g, Organ *parent) {
 	data = g;
 	sampletick = 0;
 	threshold = g->threshold / 255.0f;
 	gain = g->gain / 255.0f;
-	locus = 0; // TODO: setup
+	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus, 0);
 }
 
 /* vim: set noet: */
