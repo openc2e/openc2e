@@ -27,6 +27,7 @@
 #include <set>
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include "serialization.h"
 
 class script;
@@ -36,7 +37,7 @@ struct agentzorder {
 	bool operator()(const class Agent *s1, const class Agent *s2) const;
 };
 
-class Agent {
+class Agent : public boost::enable_shared_from_this<Agent> {
 	
 	friend struct agentzorder;
 	friend class caosVM;
@@ -62,7 +63,6 @@ protected:
 	caosVar var[100]; // OVxx
 	std::map<caosVar, caosVar, caosVarCompare> name_variables;
 	std::map<unsigned int, shared_ptr<class genomeFile> > slots;
-	AgentRef self;
 	class caosVM *vm;
 
 	void zotrefs();

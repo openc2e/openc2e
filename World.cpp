@@ -190,7 +190,7 @@ int World::getUNID(Agent *whofor) {
 	do {
 		int unid = rand();
 		if (unidmap[unid].expired()) {
-			unidmap[unid] = whofor->self.lock();
+			unidmap[unid] = whofor->shared_from_this();
 			return unid;
 		}
 	} while (1);

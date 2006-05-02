@@ -60,11 +60,10 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 }
 
 void Agent::finishInit() {
-	boost::shared_ptr<Agent> s_self(this);
-
-	world.agents.push_front(s_self);
+	// shared_from_this() can only be used if these is at least one extant
+	// shared_ptr which owns this
+	world.agents.push_front(boost::shared_ptr<Agent>(this));
 	agents_iter = world.agents.begin();
-	self = s_self;
 
 	if (findScript(10))
 		queueScript(10); // constructor
@@ -531,7 +530,6 @@ void Agent::kill() {
 	assert(!dying);
 	if (floatable) floatRelease();
 	dropCarried();
-	self.clear();
 	
 	dying = true; // what a world, what a world...
 

@@ -27,8 +27,8 @@ void AgentRef::checkLife() const {
 }
 
 void AgentRef::set(Agent *a) {
-	if (a)
-		set(a->self);
+	if (a && !a->isDying())
+		set(a->shared_from_this());
 	else
 		ref.reset();
 }
