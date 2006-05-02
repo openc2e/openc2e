@@ -282,7 +282,29 @@ void Organ::processReaction(Reaction &d) {
 }
 
 void Organ::processEmitter(Emitter &d) {
-	// TODO
+	bioEmitter &g = *d.data;
+	
+	if (d.sampletick != g.rate) {
+		d.sampletick++;
+		return;
+	} else d.sampletick = 0;
+
+	if (!d.locus) return;
+	float f = *d.locus;
+	if (g.clear) *d.locus = 0.0f;
+	if (g.invert) f = 1.0f - f;
+
+	float threshold = g.threshold / 255.0f;
+	float gain = g.gain / 255.0f;
+
+	if (g.digital) {
+		if (f < threshold) return;
+		parent->adjustChemical(g.chemical, gain);
+	} else {
+		float f = (f - threshold) * gain;
+		if (f > 0.0f) // TODO: correct check?
+			parent->adjustChemical(g.chemical, f);
+	}
 }
 
 void Organ::processReceptor(Receptor &d, bool checkchem) {
@@ -310,10 +332,13 @@ void Receptor::init(bioReceptor *g, Reaction *r) {
 	data = g;
 	processed = false;
 	lastReaction = r;
+	locus = 0; // TODO: setup
 }
 
 void Emitter::init(bioEmitter *g) {
 	data = g;
+	sampletick = 0;
+	locus = 0; // TODO: setup
 }
 
 /* vim: set noet: */

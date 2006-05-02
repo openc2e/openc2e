@@ -338,7 +338,8 @@ public:
   uint8 rate;
   uint8 gain;
   bool clear; // 1 in flags
-  bool invert; // 2 in flags
+  bool digital; // 2 in flags
+  bool invert; // 4 in flags
 
   bioEmitter(uint8 v) : bioGene(v) { }
   char *name() { return "Emitter"; }

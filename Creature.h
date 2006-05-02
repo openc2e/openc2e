@@ -36,11 +36,14 @@ struct Receptor {
 	bool processed;
 	float lastvalue;
 	Reaction *lastReaction;
+	float *locus;
 	void init(bioReceptor *, Reaction *);
 };
 
 struct Emitter {
 	bioEmitter *data;
+	unsigned char sampletick;
+	float *locus;
 	void init(bioEmitter *);
 };
 

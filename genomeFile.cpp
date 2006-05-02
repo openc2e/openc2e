@@ -257,7 +257,7 @@ istream &operator >> (istream &s, gene &g) {
 
 void bioEmitter::write(ostream &s) const {
 	s << organ << tissue << locus << chemical << threshold << rate << gain;
-	uint8 flags = (clear?1:0) + (invert?2:0);
+	uint8 flags = (clear?1:0) + (digital?2:0) + (invert?4:0);
 	s << flags;
 }
 
@@ -266,7 +266,8 @@ void bioEmitter::read(istream &s) {
 	uint8 flags;
 	s >> flags;
 	clear = ((flags & 1) != 0);
-	invert = ((flags & 2) != 0);
+	digital = ((flags & 2) != 0);
+	invert = ((flags & 4) != 0);
 }
 
 void bioHalfLives::write(ostream &s) const {
