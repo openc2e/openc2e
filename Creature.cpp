@@ -388,7 +388,7 @@ void Organ::processEmitter(Emitter &d) {
 		if (f < d.threshold) return;
 		parent->adjustChemical(g.chemical, d.gain);
 	} else {
-		float f = (f - d.threshold) * d.gain;
+		f = (f - d.threshold) * d.gain;
 		if (f > 0.0f) // TODO: correct check?
 			parent->adjustChemical(g.chemical, f);
 	}
@@ -448,9 +448,8 @@ float *Organ::getLocusPointer(bool receptor, unsigned char o, unsigned char t, u
 						if (receptors) *receptors = &repairratereceptors;
 						return &repairrate;
 					case 2: // injury to apply
-						// TODO
-						/*if (receptors) *receptors = &injuryreceptors;
-						return &injurytoapply;*/
+						if (receptors) *receptors = &injuryreceptors;
+						return &injurytoapply;
 						return 0;
 				}
 			break;
