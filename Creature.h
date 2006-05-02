@@ -28,6 +28,7 @@ class Creature;
 struct Reaction {
 	bioReaction *data;
 	float rate;
+	unsigned int receptors;
 	void init(bioReaction *);
 };
 
@@ -35,24 +36,28 @@ struct Receptor {
 	bioReceptor *data;
 	bool processed;
 	float lastvalue;
-	Reaction *lastReaction;
 	float *locus;
-	void init(bioReceptor *, Reaction *);
+	unsigned int *receptors;
+	float nominal, threshold, gain;
+	void init(bioReceptor *, class Organ *, shared_ptr<Reaction>);
 };
 
 struct Emitter {
 	bioEmitter *data;
 	unsigned char sampletick;
 	float *locus;
+	float threshold, gain;
 	void init(bioEmitter *);
 };
 
 class Organ {
 protected:
+	friend struct Receptor;
+	
 	Creature *parent;	
 	organGene *ourGene;
 
-	std::vector<Reaction> reactions;
+	std::vector<shared_ptr<Reaction> > reactions;
 	std::vector<Receptor> receptors;
 	std::vector<Emitter> emitters;
 
@@ -64,6 +69,7 @@ protected:
 	
 	// locuses
 	float biotick, damagerate, repairrate, clockrate, injurytoapply;
+	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
 
 	void applyInjury(float);
 

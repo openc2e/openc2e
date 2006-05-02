@@ -171,18 +171,18 @@ Organ::Organ(Creature *p, organGene *g) {
 	// TODO: is genes.size() always the size we want?
 	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
 	
-	Reaction *r = 0; // we need to store the previous reaction for possible receptor use
+	shared_ptr<Reaction> r; // we need to store the previous reaction for possible receptor use
 	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(bioReaction)) {
-			reactions.push_back(Reaction());
-			r = &reactions.back();
-			reactions.back().init((bioReaction *)(*i));
+			reactions.push_back(shared_ptr<Reaction>(new Reaction()));
+			r = reactions.back();
+			reactions.back()->init((bioReaction *)(*i));
 		} else if (typeid(*(*i)) == typeid(bioEmitter)) {
 			emitters.push_back(Emitter());
 			emitters.back().init((bioEmitter *)(*i));
-		} else if (typeid(*(*i)) == typeid(bioEmitter)) {
+		} else if (typeid(*(*i)) == typeid(bioReceptor)) {
 			receptors.push_back(Receptor());
-			receptors.back().init((bioReceptor *)(*i), r);
+			receptors.back().init((bioReceptor *)(*i), this, r);
 		}
 	}
 }
@@ -214,8 +214,8 @@ void Organ::tick() {
 				processEmitter(*i);
 			
 			// *** tick reactions
-			for (vector<Reaction>::iterator i = reactions.begin(); i != reactions.end(); i++)
-				processReaction(*i);
+			for (vector<shared_ptr<Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
+				processReaction(**i);
 		} else {
 			// *** out of energy damage	
 			applyInjury(atpdamagecoefficient);
@@ -235,9 +235,17 @@ void Organ::tick() {
 			applyInjury(injurytoapply);
 	}
 	
-	// *** tick receptors
+	// *** tick receptors	
+	for (vector<shared_ptr<Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
+	clockratereceptors = 0; repairratereceptors = 0; injuryreceptors = 0;
+		
 	for (vector<Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
 		processReceptor(*i, ticked);
+	
+	for (vector<shared_ptr<Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) if ((*i)->receptors > 0) (*i)->rate /= (*i)->receptors;
+	if (clockratereceptors > 0) clockrate /= clockratereceptors;
+	if (repairratereceptors > 0) repairrate /= repairratereceptors;
+	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;
 	
 	// *** decay life force
 	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
@@ -294,30 +302,54 @@ void Organ::processEmitter(Emitter &d) {
 	if (g.clear) *d.locus = 0.0f;
 	if (g.invert) f = 1.0f - f;
 
-	float threshold = g.threshold / 255.0f;
-	float gain = g.gain / 255.0f;
-
 	if (g.digital) {
-		if (f < threshold) return;
-		parent->adjustChemical(g.chemical, gain);
+		if (f < d.threshold) return;
+		parent->adjustChemical(g.chemical, d.gain);
 	} else {
-		float f = (f - threshold) * gain;
+		float f = (f - d.threshold) * d.gain;
 		if (f > 0.0f) // TODO: correct check?
 			parent->adjustChemical(g.chemical, f);
 	}
 }
 
 void Organ::processReceptor(Receptor &d, bool checkchem) {
+	bioReceptor &g = *d.data;
+	
+	/*
+	 * This code has issues..
+	 *
+	 * eg, if you have two receptors pointing at a non-local locus,
+	 * we just stomp over it in order, so the last receptor always get it
+	 * while c2e seems to alternate between them (possibly organ clockrate stuff)
+	 *
+	 */
+	
 	if (checkchem) {
-		// TODO
-
 		d.processed = true;
-		d.lastvalue = 0.0f; // TODO: chem result
+		d.lastvalue = parent->getChemical(g.chemical);
 	}
 
 	if (!d.processed) return;
-	
-	// TODO
+	if (!d.locus) return;
+
+	float f;
+	if (g.digital)
+		f = d.lastvalue > d.threshold ? d.gain : 0.0f;
+	else
+		f = (d.lastvalue - d.threshold) * d.gain;
+	if (g.inverted) f *= -1.0f;
+	f += d.nominal;
+
+	if (f < 0.0f) f = 0.0f; else if (f > 1.0f) f = 1.0f; // TODO: correct?
+
+	if (f == 0.0f && g.organ == 1 && g.tissue == 3 && g.locus == 0) // evil check for "Die if non-zero!" locus
+		return;
+	else if (d.receptors) {
+		if (*d.receptors == 0) *d.locus = 0.0f;
+		(*d.receptors)++;
+		*d.locus += f;
+	} else
+		*d.locus = f;
 }
 
 void Reaction::init(bioReaction *g) {
@@ -328,16 +360,55 @@ void Reaction::init(bioReaction *g) {
 	rate = 1.0 - (g->rate / 255.0);
 }
 
-void Receptor::init(bioReceptor *g, Reaction *r) {
+void Receptor::init(bioReceptor *g, Organ *o, shared_ptr<Reaction> r) {
 	data = g;
 	processed = false;
-	lastReaction = r;
-	locus = 0; // TODO: setup
+	nominal = g->nominal / 255.0f;
+	threshold = g->threshold / 255.0f;
+	gain = g->gain / 255.0f;
+	locus = 0;
+	receptors = 0;
+	switch (g->organ) {
+		case 2: // organ
+			if (!g->tissue)
+				std::cout << "organ tissue sulk: " << int(g->tissue) << std::endl;
+			else switch (g->locus) {
+				case 0:
+					locus = &o->clockrate;
+					receptors = &o->clockratereceptors;
+					break;
+				case 1:
+					locus = &o->repairrate;
+					receptors = &o->repairratereceptors;
+					break;
+				case 2:
+					/*
+					locus = &o->injurytoapply;
+					receptors = &o->injuryreceptors;
+					*/
+					break;
+
+				default:
+					std::cout << "organ locus sulk: " << int(g->locus) << std::endl;
+			}
+			break;
+		case 3: // reaction
+			if (g->tissue == 0 && g->locus == 0) {
+				if (!r)
+					std::cout << "hm, no reaction" << std::endl;
+				else {
+					locus = &r->rate;
+					receptors = &r->receptors;
+				}
+			} else std::cout << "sulk: " << int(g->tissue) << ", " << int(g->locus) << std::endl;
+	}
 }
 
 void Emitter::init(bioEmitter *g) {
 	data = g;
 	sampletick = 0;
+	threshold = g->threshold / 255.0f;
+	gain = g->gain / 255.0f;
 	locus = 0; // TODO: setup
 }
 
