@@ -32,6 +32,8 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
 	zorder = 1500;
 
+	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
+	
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(bioInitialConcentration)) {
 			// initialise chemical levels
@@ -46,8 +48,7 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 			organGene *o = dynamic_cast<organGene *>(*i);
 			assert(o);
 			if (!o->isBrain()) { // TODO: handle brain organ
-				Organ *x = new Organ(this, o);
-				organs.push_back(x);
+				organs.push_back(shared_ptr<Organ>(new Organ(this, o)));
 			}
 		}
 	}
@@ -62,9 +63,6 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 }
 
 Creature::~Creature() {
-	for (std::vector<Organ *>::iterator i = organs.begin(); i != organs.end(); i++) {
-		delete *i;
-	}
 }
 
 void Creature::ageCreature() {
@@ -128,7 +126,7 @@ void Creature::tickBiochemistry() {
 		return;
 	
 	// tick organs
-	for (std::vector<Organ *>::iterator x = organs.begin(); x != organs.end(); x++) {
+	for (std::vector<shared_ptr<Organ> >::iterator x = organs.begin(); x != organs.end(); x++) {
 		(*x)->tick();
 	}
 

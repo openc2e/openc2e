@@ -753,7 +753,7 @@ void caosVM::v_ORGF() {
 	
 	Creature *c = getTargCreature();
 	caos_assert(organ >= 0 && organ < c->noOrgans());
-	Organ *o = c->getOrgan(organ);
+	shared_ptr<Organ> o = c->getOrgan(organ);
 
 	switch (value) {
 		// TODO
@@ -771,7 +771,7 @@ void caosVM::v_ORGI() {
 	
 	Creature *c = getTargCreature();
 	caos_assert(organ >= 0 && organ < c->noOrgans());
-	Organ *o = c->getOrgan(organ);
+	shared_ptr<Organ> o = c->getOrgan(organ);
 
 	switch (value) {
 		// TODO

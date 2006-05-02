@@ -90,7 +90,7 @@ public:
 
 class Creature : public Agent {
 protected:
-	std::vector<Organ *> organs;
+	std::vector<shared_ptr<Organ> > organs;
 	Brain brain;
 
 	// biochemistry
@@ -142,7 +142,7 @@ public:
 	unsigned int getAge() { return age; }
 
 	unsigned int noOrgans() { return organs.size(); }
-	Organ *getOrgan(unsigned int i) { return organs[i]; }
+	shared_ptr<Organ> getOrgan(unsigned int i) { return organs[i]; }
 	
 	void born();
 	void die();
