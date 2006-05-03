@@ -310,7 +310,7 @@ extern "C" int main(int argc, char *argv[]) {
 					if (event.type != SDL_MOUSEBUTTONDOWN) break;
 
 					if (event.button.button == SDL_BUTTON_LEFT) {
-						CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y, true);
+						CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y);
 						if (a /* && a->canActivate() */) { // TODO
 							if (!a->getParent()->paused) a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
 							// TODO: not sure how to handle the following properly, needs research..

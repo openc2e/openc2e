@@ -135,7 +135,7 @@ void caosVM::v_HOTS() {
  Transparency of the parts themselves is ignored.
 */
 void caosVM::v_HOTP() {
-	CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y);
+	CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y, false);
 	if (a)
 		result.setInt(a->id);
 	else

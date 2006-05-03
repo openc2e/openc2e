@@ -168,17 +168,24 @@ Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency
 }
 
 CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {
+	Agent *transagent = 0;
+	if (!obey_all_transparency)
+		transagent = agentAt(x, y, true, needs_mouseable);
+
 	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
 		int ax = (int)x - (*i)->getParent()->x;
 		int ay = (int)y - (*i)->getParent()->y;
 		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (int)(*i)->getWidth()) >= ax) if (((*i) -> y + (int)(*i)->getHeight()) >= ay)
 			if ((*i)->getParent() != theHand) {
 				SpritePart *s = dynamic_cast<SpritePart *>(*i);
-				if (s && s->isTransparent())
+				if (s && s->isTransparent() && obey_all_transparency)
 					if (s->transparentAt(ax - s->x, ay - s->y))
 						continue;
 				if (needs_mouseable && !((*i)->getParent()->mouseable))
 					continue;
+				if (!obey_all_transparency)
+					if ((*i)->getParent() != transagent)
+						continue;
 				return *i;
 			}
 	}
