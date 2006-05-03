@@ -309,33 +309,33 @@ void caosVM::c_URGE_WRIT() {
 
 /**
  DRIV (command) drive_id (integer) adjust (float)
- %status stub
+ %status maybe
 
  Modifies the level of a drive in target Creature by the given level, which can range from -1.0 (decrease) to 1.0 (increase).
 */
 void caosVM::c_DRIV() {
 	VM_PARAM_FLOAT(adjust)
-	VM_PARAM_INTEGER(drive_id)
+	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id < 20);
 	
 	caos_assert(targ);
 	Creature *c = dynamic_cast<Creature *>(targ.get());
 	if (!c) return; // ignored on non-creatures
-	
-	// TODO
+
+	c->adjustDrive(drive_id, adjust);
 }
 
 /**
  DRIV (float) drive_id (integer)
- %status stub
+ %status maybe
 
  Returns the level of a drive (0.0 to 1.0) in target Creature.
 */
 void caosVM::v_DRIV() {
-	VM_PARAM_INTEGER(drive_id)
+	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id < 20);
 
 	Creature *c = getTargCreature();
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(c->getDrive(drive_id));
 }
 
 /**
@@ -694,7 +694,7 @@ void caosVM::c_AGES() {
 
 /**
  LOCI (command) type (integer) organ (integer) tissue (integer) id (integer) value (float)
- %status stub
+ %status maybe
 */
 void caosVM::c_LOCI() {
 	VM_PARAM_FLOAT(value)
@@ -705,12 +705,14 @@ void caosVM::c_LOCI() {
 
 	Creature *c = getTargCreature();
 
-	// TODO
+	float *f = c->getLocusPointer(!type, organ, tissue, id);
+	caos_assert(f);
+	*f = value;
 }
 
 /**
  LOCI (float) type (integer) organ (integer) tissue (integer) id (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_LOCI() {
 	VM_PARAM_INTEGER(id)
@@ -720,7 +722,9 @@ void caosVM::v_LOCI() {
 
 	Creature *c = getTargCreature();
 
-	result.setFloat(0.0f); // TODO
+	float *f = c->getLocusPointer(!type, organ, tissue, id);
+	caos_assert(f);
+	result.setFloat(*f);
 }
 
 /**
@@ -745,7 +749,7 @@ void caosVM::v_ORGN() {
 
 /**
  ORGF (float) organ (integer) value (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_ORGF() {
 	VM_PARAM_INTEGER(value)
@@ -756,14 +760,23 @@ void caosVM::v_ORGF() {
 	shared_ptr<Organ> o = c->getOrgan(organ);
 
 	switch (value) {
-		// TODO
+		case 0: result.setFloat(o->getClockRate()); break;
+		case 1: result.setFloat(o->getShortTermLifeforce() / o->getInitialLifeforce()); break;
+		case 2: result.setFloat(o->getRepairRate()); break;
+		case 3: result.setFloat(o->getInjuryToApply()); break;
+		case 4: result.setFloat(o->getInitialLifeforce()); break;
+		case 5: result.setFloat(o->getShortTermLifeforce()); break;
+		case 6: result.setFloat(o->getLongTermLifeforce()); break;
+		case 7: result.setFloat(o->getDamageRate()); break;
+		case 8: result.setFloat(o->getEnergyCost()); break;
+		case 9: result.setFloat(o->getATPDamageCoefficient()); break;
 		default: throw creaturesException("Unknown value for ORGF");
 	}
 }
 
 /**
  ORGI (integer) organ (integer) value (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_ORGI() {
 	VM_PARAM_INTEGER(value)
@@ -774,7 +787,9 @@ void caosVM::v_ORGI() {
 	shared_ptr<Organ> o = c->getOrgan(organ);
 
 	switch (value) {
-		// TODO
+		case 0: result.setInt(o->getReceptorCount()); break;
+		case 1: result.setInt(o->getEmitterCount()); break;
+		case 2: result.setInt(o->getReactionCount()); break;
 		default: throw creaturesException("Unknown value for ORGI");
 	}
 }

@@ -90,6 +90,14 @@ void Creature::adjustChemical(unsigned char id, float value) {
 	else if (chemicals[id] > 1.0f) chemicals[id] = 1.0f;
 }
 
+void Creature::adjustDrive(unsigned int id, float value) {
+	assert(id < 20);
+	drives[id] += value;
+
+	if (drives[id] < 0.0f) drives[id] = 0.0f;
+	else if (drives[id] > 1.0f) drives[id] = 1.0f;
+}
+
 void Creature::setAsleep(bool a) {
 	// TODO: skeletalcreature might need to close eyes? or should that just be done during the skeletal update?
 	if (!a && dreaming)

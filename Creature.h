@@ -72,7 +72,6 @@ protected:
 	float biotick, damagerate, repairrate, clockrate, injurytoapply;
 	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
 
-	void applyInjury(float);
 
 	void processReaction(Reaction &);
 	void processEmitter(Emitter &);
@@ -82,9 +81,23 @@ protected:
 
 public:
 	Organ(Creature *p, organGene *g);
-
-	float getEnergyCost() { return energycost; }
 	void tick();
+
+	float getClockRate() { return clockrate; }
+	float getRepairRate() { return repairrate; }
+	float getDamageRate() { return damagerate; }
+	float getEnergyCost() { return energycost; }
+	float getInjuryToApply() { return injurytoapply; }
+	float getInitialLifeforce() { return lifeforce; }
+	float getShortTermLifeforce() { return shorttermlifeforce; }
+	float getLongTermLifeforce() { return longtermlifeforce; }
+	float getATPDamageCoefficient() { return atpdamagecoefficient; }
+	
+	unsigned int getReceptorCount() { return receptors.size(); }
+	unsigned int getEmitterCount() { return emitters.size(); }
+	unsigned int getReactionCount() { return reactions.size(); }
+	
+	void applyInjury(float);
 };
 
 class Brain {
@@ -142,6 +155,9 @@ public:
 	lifestage getStage() { return stage; }
 	void adjustChemical(unsigned char id, float value);
 	float getChemical(unsigned char id) { return chemicals[id]; }
+	void adjustDrive(unsigned int id, float value);
+	float getDrive(unsigned int id) { return drives[id]; }
+
 	unsigned int getVariant() { return variant; }
 	void setAsleep(bool asleep);
 	bool isAsleep() { return asleep; }
