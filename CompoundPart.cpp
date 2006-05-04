@@ -66,6 +66,7 @@ void SpritePart::setFrameNo(unsigned int f) {
 	
 	frameno = f;
 	pose = animation[f];
+	spriteno = firstimg + base + pose;
 }
 
 void SpritePart::setPose(unsigned int p) {
@@ -73,11 +74,10 @@ void SpritePart::setPose(unsigned int p) {
 
 	animation.clear();
 	pose = p;
+	spriteno = firstimg + base + pose;
 }
 		
 void SpritePart::setBase(unsigned int b) {
-	assert(firstimg + b + pose < getSprite()->numframes());
-
 	base = b;
 }
 
@@ -110,6 +110,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	
 	pose = 0;
 	base = 0;
+	spriteno = firstimg;
 	is_transparent = true;
 	framerate = 1;
 	framedelay = 0;
@@ -124,8 +125,11 @@ void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	creaturesImage *spr = world.gallery.getImage(spritefile);
 	caos_assert(spr);
 	caos_assert(spr->numframes() > fimg);
-	// TODO: either assertions to ensure the pose/base are valid, or reset them
+	// TODO: should we preserve base/pose here, instead?
+	pose = 0;
+	base = 0;
 	firstimg = fimg;
+	spriteno = fimg;
 	world.gallery.delImage(origsprite);
 	// TODO: should we preserve tint?
 	if (origsprite != sprite) delete sprite;

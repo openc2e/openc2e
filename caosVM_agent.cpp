@@ -463,7 +463,6 @@ void caosVM::c_BASE() {
 	caos_assert(targ);
 
 	SpritePart *p = getCurrentSpritePart();
-	caos_assert(p->getFirstImg() + index + p->getPose() < p->getSprite()->numframes());
 	p->setBase(index);
 }
 

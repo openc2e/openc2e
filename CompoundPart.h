@@ -69,7 +69,7 @@ public:
 class SpritePart : public CompoundPart {
 protected:
 	creaturesImage *origsprite, *sprite;
-	unsigned int firstimg, pose, frameno, base;
+	unsigned int firstimg, pose, frameno, base, spriteno;
 	SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
 
@@ -84,7 +84,7 @@ public:
 	virtual void handleClick(float, float);
 	unsigned int getPose() { return pose; }
 	unsigned int getBase() { return base; }
-	unsigned int getCurrentSprite() { return firstimg + base + pose; }
+	unsigned int getCurrentSprite() { return spriteno; }
 	unsigned int getFrameNo() { return frameno; }
 	unsigned int getFirstImg() { return firstimg; }
 	unsigned int getWidth() { return sprite->width(getCurrentSprite()); }
