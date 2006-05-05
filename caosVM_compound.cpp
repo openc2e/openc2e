@@ -35,8 +35,6 @@ void caosVM::c_PART() {
 	VM_PARAM_INTEGER(part_id)
 
 	caos_assert((part_id >= 0) || (part_id == -1));
-	caos_assert(targ);
-	caos_assert(targ->part(part_id) || (part_id == -1));
 	part = part_id;
 }
 

@@ -164,6 +164,7 @@ void caosVM::c_NEW_SIMP() {
 	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	a->finishInit();
 	setTarg(a);
+	part = 0; // TODO: correct?
 }
 
 /**
@@ -186,6 +187,7 @@ void caosVM::c_NEW_COMP() {
 	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	a->finishInit();
 	setTarg(a);
+	part = 0; // TODO: correct?
 }
 
 /**
@@ -208,6 +210,7 @@ void caosVM::c_NEW_VHCL() {
 	Vehicle *a = new Vehicle(family, genus, species, plane, sprite_file, first_image, image_count);
 	a->finishInit();
 	setTarg(a);
+	part = 0; // TODO: correct?
 }
 
 /**
