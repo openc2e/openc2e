@@ -264,6 +264,8 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
+					if (event.motion.state & SDL_BUTTON(2)) // middle mouse button scrolling
+						world.camera.moveTo(world.camera.getX() - event.motion.xrel, world.camera.getY() - event.motion.yrel, jump);
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 						if (!*i) continue;
 						if ((*i)->imsk_mouse_move) {
