@@ -233,4 +233,12 @@ void caosVM::v_WTIK() {
 	result.setInt(world.tickcount);
 }
 
+/**
+ RACE (integer)
+ %status maybe
+*/
+void caosVM::v_RACE() {
+	result.setInt(world.race);
+}
+
 /* vim: set noet: */

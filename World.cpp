@@ -34,6 +34,8 @@ World world;
 World::World() {
 	ticktime = 50;
 	tickcount = 0;
+	race = 50; // sensible default?
+	pace = 0.0f; // sensible default?
 	quitting = saving = false;
 	theHand = 0;
 }

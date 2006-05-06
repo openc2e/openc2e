@@ -120,7 +120,7 @@ void caosVM::c_SCRX() {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(event) 
 	caos_assert(event >= 0); 
-	caos_assert(event <= 255);
+	caos_assert(event <= 65535);
 	VM_PARAM_INTEGER(species) 
 	caos_assert(species >= 0); 
 	caos_assert(species <= 65535);
@@ -217,6 +217,21 @@ void caosVM::c_JECT() {
 	VM_PARAM_STRING(file)
 
 	// TODO
+}
+
+/**
+ SORQ (integer) family (integer) genus (integer) species (integer) event (integer)
+ %status maybe
+*/
+void caosVM::v_SORQ() {
+	VM_PARAM_INTEGER(event) caos_assert(event >= 0 && event <= 65535);
+	VM_PARAM_INTEGER(species) caos_assert(event >= 0 && event <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(event >= 0 && event <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(event >= 0 && event <= 255);
+
+	shared_ptr<script> s = world.scriptorium.getScript(family, genus, species, event);
+	if (s) result.setInt(1);
+	else result.setInt(0);
 }
 
 /* vim: set noet: */

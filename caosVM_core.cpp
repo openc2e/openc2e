@@ -207,4 +207,15 @@ void caosVM::v_VMJR() {
 	result.setInt(0);
 }
 
+/**
+ WOLF (integer) andmask (integer) eormask (integer)
+ %status stub
+*/
+void caosVM::v_WOLF() {
+	VM_PARAM_INTEGER(eormask)
+	VM_PARAM_INTEGER(andmask)
+
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */

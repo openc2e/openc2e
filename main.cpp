@@ -187,20 +187,14 @@ extern "C" int main(int argc, char *argv[]) {
 	unsigned int tickdata = 0;
 	unsigned int ticktime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	unsigned int ticktimeptr = 0;
+	unsigned int lasttimestamp = world.backend.ticks();
 	while (!done) {
 		bool ticked = false;
 		
-//        Collectable::doCollect();
-		/*
-		 we calculate PACE below, but it's inaccurate because drawWorld(), our biggest cpu consumer, isn't in the loop
-		 this is because it makes the game seem terribly unresponsive..
-		*/
 		if (!world.paused && (world.backend.ticks() > (tickdata + world.ticktime))) {
 			tickdata = world.backend.ticks();
 			
 			world.tick();
-			//if (world.hand()->carrying) // TODO: do this in world.tick()
-			//	world.hand()->carrying->moveTo(world.hand()->x + 2, world.hand()->y + 2);
 			world.drawWorld();
 			
 			ticktime[ticktimeptr] = world.backend.ticks() - tickdata;
@@ -210,6 +204,9 @@ extern "C" int main(int argc, char *argv[]) {
 			for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktime[i] / world.ticktime);
 			world.pace = avgtime / 10;
 
+			world.race = world.backend.ticks() - lasttimestamp;
+			lasttimestamp = world.backend.ticks();
+			
 			ticked = true;
 		} else SDL_Delay(10);
 

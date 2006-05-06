@@ -240,6 +240,10 @@ public:
 	void c_DELR();
 	void c_DELM();
 	void v_MLOC();
+	void v_HIRP();
+	void v_LORP();
+	void v_TORX();
+	void v_TORY();
 	
 	// camera
 	void v_VISI();
@@ -286,6 +290,7 @@ public:
 	void c_ENDM();
 	void v_VMNR();
 	void v_VMJR();
+	void v_WOLF();
 
 	// variables
 	void c_SETV();
@@ -497,7 +502,8 @@ public:
 	void v_CODG();
 	void v_CODS();
 	void c_JECT();
-
+	void v_SORQ();
+	
 	void c_RGAM();
 	void v_MOWS();
 
@@ -582,6 +588,13 @@ public:
 	void v_SOUL();
 	void v_DECN();
 	void v_ATTN();
+	void v_DIRN();
+	void c_TOUC();
+	void c_FORF();
+	void c_WALK();
+	void c_FACE();
+	void c_DONE();
+	void c_SAYN();
 	
 	// sounds
 	void c_SNDE();
@@ -598,6 +611,7 @@ public:
 	void v_VOLM();
 	void v_MUTE();
 	void c_SEZZ();
+	void c_VOIS();
 
 	// time
 	void v_PACE();
@@ -619,6 +633,7 @@ public:
 	void v_RTIF();
 	void v_RTIM();
 	void v_WTIK();
+	void v_RACE();
 
 	// resources
 	void v_PRAY_AGTI();
@@ -651,6 +666,9 @@ public:
 	void v_PURE();
 	void v_MOPX();
 	void v_MOPY();
+	void v_SCOL();
+	void v_CLAC();
+	void v_CLIK();
 
 	// vehicles
 	void c_CABN();

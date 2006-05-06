@@ -169,6 +169,18 @@ void caosVM::c_DIRN() {
 }
 
 /**
+ DIRN (integer)
+ %status stub
+
+ Returns the direction the target Creatures is facing.
+*/
+void caosVM::v_DIRN() {
+	Creature *c = getTargCreature();
+	
+	result.setInt(-1); // TODO
+}
+	
+/**
  HHLD (agent)
  %status stub
 
@@ -430,6 +442,17 @@ void caosVM::v_UNCS() {
 	Creature *c = getTargCreature();
 
 	result.setInt(0); // TODO
+}
+
+/**
+ FACE (command) number (integer)
+ %status stub
+*/
+void caosVM::c_FACE() {
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(getTargCreature());
+	caos_assert(c);
+
+	// TODO
 }
 
 /**
@@ -835,6 +858,60 @@ void caosVM::v_DECN() {
 void caosVM::v_ATTN() {
 	Creature *c = getTargCreature();
 	result.setInt(0); // TODO
+}
+
+/**
+ TOUC (command)
+ %status stub
+*/
+void caosVM::c_TOUC() {
+	Creature *c = getTargCreature();
+
+	// TODO
+}
+
+/**
+ FORF (command) creature (agent)
+ %status stub
+*/
+void caosVM::c_FORF() {
+	VM_PARAM_VALIDAGENT(creature)
+		
+	Creature *c = getTargCreature();
+	Creature *learn = dynamic_cast<Creature *>(creature.get());
+	caos_assert(learn);
+
+	// TODO
+}
+
+/**
+ WALK (command)
+ %status stub
+*/
+void caosVM::c_WALK() {
+	Creature *c = getTargCreature();
+
+	// TODO
+}
+
+/**
+ DONE (command)
+ %status stub
+*/
+void caosVM::c_DONE() {
+	Creature *c = getTargCreature();
+
+	// TODO
+}
+
+/**
+ SAYN (command)
+ %status stub
+*/
+void caosVM::c_SAYN() {
+	Creature *c = getTargCreature();
+
+	// TODO
 }
 
 /* vim: set noet: */

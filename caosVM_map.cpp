@@ -655,4 +655,73 @@ void caosVM::c_DELM() {
 	// TODO
 }
 
+/**
+ HIRP (integer) roomid (integer) caindex (integer) direction (integer)
+ %status stub
+*/
+void caosVM::v_HIRP() {
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(caindex) caos_assert(0 <= caindex && caindex <= 19);
+	VM_PARAM_INTEGER(roomid)
+	
+	Room *r = world.map.getRoom(roomid);
+	caos_assert(r);
+
+	result.setInt(roomid); // TODO
+}
+
+/**
+ LORP (integer) roomid (integer) caindex (integer) direction (integer)
+ %status stub
+*/
+void caosVM::v_LORP() {
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(caindex) caos_assert(0 <= caindex && caindex <= 19);
+	VM_PARAM_INTEGER(roomid)
+	
+	Room *r = world.map.getRoom(roomid);
+	caos_assert(r);
+
+	result.setInt(roomid); // TODO
+}
+
+/**
+ TORX (float) roomid (integer)
+ %status maybe
+*/
+void caosVM::v_TORX() {
+	VM_PARAM_INTEGER(roomid)
+
+	Room *r = world.map.getRoom(roomid);
+	caos_assert(r);
+	caos_assert(targ);
+
+	float centrex = r->x_left + ((r->x_right - r->x_left) / 2);
+	result.setFloat(centrex - targ->x);
+}
+
+/**
+ TORY (float) roomid (integer)
+ %status maybe
+*/
+void caosVM::v_TORY() {
+	VM_PARAM_INTEGER(roomid)
+
+	Room *r = world.map.getRoom(roomid);
+	caos_assert(r);
+	caos_assert(targ);
+
+	// TODO: calculate this however c2e does it.. or at least check this is right
+	float topy = (r->y_left_ceiling - r->y_right_ceiling) / 2;
+	if (topy >= 0.0f) topy = r->y_left_ceiling + topy;
+	else topy = r->y_right_ceiling - topy;
+
+	float bottomy = (r->y_left_floor - r->y_right_floor) / 2;
+	if (bottomy >= 0.0f) topy = r->y_left_floor + bottomy;
+	else bottomy = r->y_right_floor - bottomy;
+
+	float centrey = topy + ((bottomy - topy) / 2);
+	result.setFloat(centrey - targ->y);
+}
+
 /* vim: set noet: */

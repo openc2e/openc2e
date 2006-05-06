@@ -219,4 +219,16 @@ void caosVM::c_SEZZ() {
 	// TODO
 }
 
+/**
+ VOIS (command) voice (string)
+ %status stub
+*/
+void caosVM::c_VOIS() {
+	VM_PARAM_STRING(voice)
+	
+	caos_assert(targ);
+
+	// TODO
+}
+
 /* vim: set noet: */

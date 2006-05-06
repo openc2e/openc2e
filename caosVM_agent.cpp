@@ -1159,14 +1159,15 @@ void caosVM::c_ALPH() {
 
 /**
  HELD (agent)
- %status stub
+ %status maybe
 
  Returns the agent currently held by the TARG agent, or a random one if there are more than one.
 */
 void caosVM::v_HELD() {
-	result.setAgent(0);
-
-	// TODO
+	caos_assert(targ);
+	
+	// TODO: how does 'more than one' occur?
+	result.setAgent(targ->carrying);
 }
 
 /**

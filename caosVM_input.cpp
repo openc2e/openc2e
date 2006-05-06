@@ -41,6 +41,18 @@ void caosVM::c_CLAC() {
 }
 
 /**
+ CLAC (integer)
+ %status maybe
+*/
+void caosVM::v_CLAC() {
+	caos_assert(targ);
+	if (targ->clik != -1)
+		result.setInt(targ->clac[0]);
+	else
+		result.setInt(-2);
+}
+
+/**
  CLIK (command) msg1 (integer) msg2 (integer) msg3 (integer)
  %status maybe
 
@@ -60,6 +72,25 @@ void caosVM::c_CLIK() {
 	targ->clac[1] = calculateScriptId(msg2);
 	targ->clac[2] = calculateScriptId(msg3);
 	targ->clik = 0;
+}
+
+/**
+ CLIK (integer) data (integer)
+ %status maybe
+*/
+void caosVM::v_CLIK() {
+	VM_PARAM_INTEGER(data)
+	
+	caos_assert(targ);
+
+	if (targ->clik == -1)
+		result.setInt(-2);
+	else switch (data) {
+		case 0: result.setInt(targ->clik); break;
+		case 1: result.setInt(targ->clac[0]); break;
+		case 2: result.setInt(targ->clac[1]); break;
+		case 3: result.setInt(targ->clac[2]); break;
+	}
 }
 
 /**
@@ -188,6 +219,19 @@ void caosVM::v_MOPX() {
 */
 void caosVM::v_MOPY() {
 	result.setInt(world.hand()->y);
+}
+
+/**
+ SCOL (integer) andmask (integer) eormask (integer) upspeeds (bytestring) downspeeds (bytestring)
+ %status stub
+*/
+void caosVM::v_SCOL() {
+	VM_PARAM_BYTESTR(downspeeds)
+	VM_PARAM_BYTESTR(upspeeds)
+	VM_PARAM_INTEGER(eormask)
+	VM_PARAM_INTEGER(andmask)
+
+	result.setInt(0); // TODO
 }
 
 /* vim: set noet: */

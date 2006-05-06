@@ -73,6 +73,7 @@ public:
 		
 	std::string gametype;
 	float pace;
+	unsigned int race;
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
 	SDLBackend backend;
