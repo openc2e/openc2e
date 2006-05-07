@@ -1319,4 +1319,30 @@ void caosVM::v_PCLS() {
 	result.setAgent(findNextAgent(previous, family, genus, species, false));
 }
 
+/**
+ TCOR (integer) topy (float) bottomy (float) leftx (float) rightx (float)
+ %status stub
+*/
+void caosVM::v_TCOR() {
+	VM_PARAM_FLOAT(rightx)
+	VM_PARAM_FLOAT(leftx)
+	VM_PARAM_FLOAT(bottomy)
+	VM_PARAM_FLOAT(topy)
+
+	result.setInt(0); // TODO
+}
+
+/**
+ CORE (command) topy (float) bottomy (float) leftx (float) rightx (float)
+ %status stub
+*/
+void caosVM::c_CORE() {
+	VM_PARAM_FLOAT(rightx)
+	VM_PARAM_FLOAT(leftx)
+	VM_PARAM_FLOAT(bottomy)
+	VM_PARAM_FLOAT(topy)
+
+	// TODO
+}
+
 /* vim: set noet: */

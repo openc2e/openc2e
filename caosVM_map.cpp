@@ -724,4 +724,17 @@ void caosVM::v_TORY() {
 	result.setFloat(centrey - targ->y);
 }
 
+/**
+ CACL (command) family (integer) genus (integer) species (integer) caindex (integer)
+ %status stub
+*/
+void caosVM::c_CACL() {
+	VM_PARAM_INTEGER(caindex) caos_assert(0 <= caindex && caindex <= 19);
+	VM_PARAM_INTEGER(species) caos_assert(0 <= species && species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(0 <= genus && genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(0 <= family && family <= 255);
+
+	// TODO
+}
+
 /* vim: set noet: */

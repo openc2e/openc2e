@@ -709,6 +709,16 @@ void caosVM::v_CATX() {
 }
 
 /**
+ CATO (command) category_id (integer)
+ %status stub
+*/
+void caosVM::c_CATO() {
+	VM_PARAM_INTEGER(category_id)
+
+	// TODO
+}
+
+/**
  WILD (string) family (integer) genus (integer) species (integer) tag (string) offset (integer)
  %status maybe
 

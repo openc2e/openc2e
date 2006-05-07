@@ -244,6 +244,7 @@ public:
 	void v_LORP();
 	void v_TORX();
 	void v_TORY();
+	void c_CACL();
 	
 	// camera
 	void v_VISI();
@@ -334,6 +335,7 @@ public:
 	void v_CATI();
 	void v_CATA();
 	void v_CATX();
+	void c_CATO();
 	void v_WILD();
 	void v_NAME();
 	void v_MAME();
@@ -462,6 +464,8 @@ public:
 	void c_DROP();
 	void v_NCLS();
 	void v_PCLS();
+	void v_TCOR();
+	void c_CORE();
 	
 	// motion
 	void c_ELAS();
