@@ -50,6 +50,11 @@ void Camera::goToMetaRoom(unsigned int m, int _x, int _y, cameratransition trans
 void Camera::moveTo(int _x, int _y, panstyle pan) {
 	x = _x;
 	y = _y;
+
+	MetaRoom *m = world.map.metaRoomAt(x, y);
+	if (m)
+		metaroom = m->id;
+	
 	// TODO: panning
 	
 	checkBounds();
