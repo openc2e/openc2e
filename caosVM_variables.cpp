@@ -59,7 +59,7 @@ void caosVM::c_ADDS() {
 	VM_PARAM_STRING(value)
 	VM_PARAM_VARIABLE(variable)
 
-	assert(variable->hasString());
+	caos_assert(variable->hasString());
 	variable->setString(variable->getString() + value);
 }
 
@@ -520,9 +520,8 @@ void caosVM::v_AVAR() {
 	VM_PARAM_INTEGER(index)
 	VM_PARAM_AGENT(agent)
 
-	assert(index > -1);
-	assert(index < 100);
-	assert(agent);
+	caos_assert(index >= 0 && index < 100);
+	caos_assert(agent);
 	returnVariable(agent->var[index]);
 }
 

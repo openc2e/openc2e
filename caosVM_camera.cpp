@@ -68,7 +68,7 @@ void caosVM::c_META() {
 	VM_PARAM_INTEGER(camera_x)
 	VM_PARAM_INTEGER(metaroom_id)
 
-	assert(metaroom_id >= 0);
+	caos_assert(metaroom_id >= 0);
 	MetaRoom *m = world.map.getMetaRoom(metaroom_id);
 	if (!m) return; // DS does 'meta 0 -1 -1 0' in !map.cos for some stupid reason
 	

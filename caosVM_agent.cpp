@@ -894,11 +894,11 @@ void caosVM::c_TINT() {
 	VM_PARAM_INTEGER(green_tint)
 	VM_PARAM_INTEGER(red_tint)
 
-	assert(red_tint >= 0 && red_tint <= 256);
-	assert(green_tint >= 0 && green_tint <= 256);
-	assert(blue_tint >= 0 && blue_tint <= 256);
-	assert(swap >= 0 && swap <= 256);
-	assert(rotation >= 0 && rotation <= 256);
+	caos_assert(red_tint >= 0 && red_tint <= 256);
+	caos_assert(green_tint >= 0 && green_tint <= 256);
+	caos_assert(blue_tint >= 0 && blue_tint <= 256);
+	caos_assert(swap >= 0 && swap <= 256);
+	caos_assert(rotation >= 0 && rotation <= 256);
 
 	SpritePart *p = getCurrentSpritePart();
 	p->tint(red_tint, green_tint, blue_tint, rotation, swap);
