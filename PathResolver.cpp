@@ -29,10 +29,11 @@
 #include <iostream>
 
 using std::map;
+using std::set;
 using std::string;
 using namespace boost::filesystem;
 
-static map<string, std::time_t> dircache;
+static set<string> dircache;
 static map<string, string> cache;
 
 static bool checkDirCache(path &dir);
@@ -57,8 +58,13 @@ static path lcleaf(path &orig) {
 
 bool resolveFile(path &p) {
 	string s = p.string();
-	if (!resolveFile(s))
-		return false;
+	if (!resolveFile(s)) {
+		// Maybe something changed underneath us; reset the cache and try again
+		cache.clear();
+		dircache.clear();
+		if (!resolveFile(s))
+			return false;
+	}
 	p = path(s, native);
 	return true;
 }
@@ -118,10 +124,7 @@ bool checkDirCache(path &dir) {
 		dir = path(".");
 //	std::cerr << "checkDirCache: " << dir.string() << std::endl;
 	if (dircache.end() != dircache.find(dir.string())) {
-		if (exists(dir) && last_write_time(dir) == dircache[dir.string()]) {
-//			std::cerr << " cached! " << std::endl;
-			return true;
-		}
+		return true;
 	}
 	if (exists(dir))
 		return doCacheDir(dir);
@@ -147,7 +150,7 @@ bool doCacheDir(path &dir) {
 //		std::cerr << "Cache put: " << val << " -> " << key << std::endl;
 		cache[val] = key;
 	}
-	dircache[dir.string()] = last_write_time(dir);
+	dircache.insert(dir.string());
 	return true;
 }
 /* vim: set noet: */
