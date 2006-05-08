@@ -114,9 +114,14 @@ bool resolveFile(std::string &path) {
  * If we find a dir, return true. Else, false.
  */
 bool checkDirCache(path &dir) {
+	if (dir == path())
+		dir = path(".");
+//	std::cerr << "checkDirCache: " << dir.string() << std::endl;
 	if (dircache.end() != dircache.find(dir.string())) {
-		if (exists(dir) && last_write_time(dir) == dircache[dir.string()])
+		if (exists(dir) && last_write_time(dir) == dircache[dir.string()]) {
+//			std::cerr << " cached! " << std::endl;
 			return true;
+		}
 	}
 	if (exists(dir))
 		return doCacheDir(dir);
@@ -131,6 +136,7 @@ bool checkDirCache(path &dir) {
 /* Cache a dir. Return true for success.
  */
 bool doCacheDir(path &dir) {
+//	std::cerr << "cacheing: " << dir.string() << std::endl;
 	directory_iterator it(dir);
 	directory_iterator fsend;
 	while (it != fsend) {
@@ -138,6 +144,7 @@ bool doCacheDir(path &dir) {
 		string key, val;
 		key = cur.string();
 		val = lcleaf(cur).string();
+//		std::cerr << "Cache put: " << val << " -> " << key << std::endl;
 		cache[val] = key;
 	}
 	dircache[dir.string()] = last_write_time(dir);

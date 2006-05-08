@@ -11,14 +11,8 @@ SAVE(AgentRef) {}
 LOAD(AgentRef) { obj = NULL; }
 
 // XXX belongs in ser/caosVM.h
-SAVE(bytestring_t) {
-    ar & *obj;
-}
-
-LOAD(bytestring_t) {
-    std::vector<unsigned int> *v = new std::vector<unsigned int>;
-    ar & *v;
-    obj = bytestring_t(v);
+SERIALIZE(bytestring_t) {
+    ar & obj;
 }
 
 SERIALIZE(nulltype_tag) { }
