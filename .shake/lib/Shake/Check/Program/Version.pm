@@ -4,10 +4,11 @@ package Shake::Check::Program::Version;
 use strict;
 use warnings;
 
+use Shake::Util 'version_ge';
 use Shake::Check;
 use base 'Shake::Check';
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub initialize {
 	my ($self, $program, $version) = @_;
@@ -22,8 +23,6 @@ sub msg {
 	return "checking for $self->{program} >= $self->{version}";
 }
 
-sub can_cache { 1 }
-
 sub shortname {
 	my ($self) = @_;
 	return $self->{program};
@@ -34,9 +33,10 @@ sub run {
 	my $prog = $self->{program};
 	my $v = $self->{version};
 	my $out = `$prog --version`;
+	chomp $out;
 	my ($pn, $pv) = split(/\s+/, $out);
 
-	if ($pv ge $v) {
+	if (version_ge($pv, $v)) {
 		return $pv;
 	} else {
 		return undef;

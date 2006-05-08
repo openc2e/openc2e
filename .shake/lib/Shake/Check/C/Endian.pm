@@ -45,8 +45,6 @@ sub msg {
 	return "checking endianness";
 }
 
-sub can_cache { 1 }
-
 sub run {
 	my ($self, $config) = @_;
 	my $cc = $self->{compiler};

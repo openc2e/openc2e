@@ -28,8 +28,6 @@ sub msg {
 	return "checking for $self->{header}";
 }
 
-sub can_cache { 1 }
-
 sub shortname {
 	my ($self) = @_;
 	my $name = $self->{header};

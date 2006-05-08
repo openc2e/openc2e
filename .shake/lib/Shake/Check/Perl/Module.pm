@@ -20,8 +20,6 @@ sub msg {
 	return "checking for $self->{module}";
 }
 
-sub can_cache { 1 }
-
 sub shortname {
 	my ($self) = @_;
 	return $self->{module};

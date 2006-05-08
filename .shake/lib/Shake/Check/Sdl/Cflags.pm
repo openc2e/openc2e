@@ -7,7 +7,7 @@ use warnings;
 use Shake::Check;
 use base 'Shake::Check';
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub initialize {
 	my ($self, $sdlconfig) = @_;
@@ -18,8 +18,6 @@ sub msg {
 	my ($self) = @_;
 	return "checking sdl compiler flags";
 }
-
-sub can_cache { 1 }
 
 sub run {
 	my ($self, $config) = @_;

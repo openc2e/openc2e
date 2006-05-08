@@ -25,8 +25,8 @@ sub name {
 
 sub shortname { undef }
 sub version   { shift->VERSION() }
-sub is_fresh  { undef }
-sub can_cache { undef }
+sub is_fresh  { 1 }
+sub can_cache { 1 }
 
 sub run {
 	my ($self) = @_;

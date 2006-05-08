@@ -40,6 +40,7 @@ sub shake_init {
 	Getopt::Long::Configure('gnu_getopt');
 	GetOptions(\%option, 
 		qw(
+			rerun|R
 			define|D=s%
 			undefine|undef|U=s@
 			nocache
@@ -59,6 +60,10 @@ sub shake_init {
 	}
 	
 	print "configuring $pkg $version (report bugs to $author)\n";
+	if ($option{rerun}) {
+		print "running in rerun mode...\n";
+		$Config->load('.shake/config.pl');
+	}
 	$Config->define(PACKAGE => $pkg);
 	$Config->define(VERSION => $version);
 	$Config->define(AUTHOR  => $author);
@@ -130,7 +135,7 @@ sub configure {
 		return $rv;
 	};
 
-	print "writing $file... ";
+	print "configuring $file... ";
 	my $content = $in->getline();
 	$content =~ s/@([-:.\w]+?)@/$lookup->($1)/ge;
 	$content =~ s/@\{(.+?)\}@/$eval->($1)/seg;

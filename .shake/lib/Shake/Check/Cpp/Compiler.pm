@@ -26,8 +26,6 @@ sub msg {
 	return "checking for a C++ compiler";
 }
 
-sub can_cache { 1 }
-
 sub run {
 	my $self = shift;
 	my @checks = @{ $self->{checks} };

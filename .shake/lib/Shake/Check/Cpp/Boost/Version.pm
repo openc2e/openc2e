@@ -7,6 +7,7 @@ use warnings;
 use Fatal 'unlink';
 use File::Temp 'mkstemps', 'mktemp';
 use IO::File;
+use Shake::Util 'version_ge';
 use Shake::Check;
 use base 'Shake::Check';
 
@@ -28,7 +29,7 @@ int main(int argc, char *argv[])
 }
 CODE
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub initialize {
 	my ($self, $version, %args) = @_;
@@ -45,8 +46,6 @@ sub msg {
 
 	return "checking boost version >= $self->{version}";
 }
-
-sub can_cache { 1 }
 
 sub run {
 	my ($self, $config) = @_;
@@ -72,11 +71,7 @@ sub run {
 	};
 	warn "failed to unlink temp files...\n" if $@;
 
-	if (length($rv) != length($self->{version})) {
-		die "version strings must be the same length: $rv vs. $self->{version}";
-	}
-	
-	if ($rv ge $self->{version}) {
+	if (version_ge($rv, $self->{version})) {
 		return $rv;
 	} else {
 		return undef;

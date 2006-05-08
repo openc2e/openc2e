@@ -28,6 +28,9 @@ sub save {
 sub load {
 	my ($self, $file) = @_;
 	$self->{results} = do $file;
+	foreach my $f (keys %{ $self->{results} }) {
+		$self->{results}{$f}{note} = 'saved';
+	}
 	if ($@) {
 		die $@;
 	}
@@ -72,7 +75,7 @@ sub run_check {
 sub _check {
 	my ($self, $check) = @_;
 	my $name = $check->name;
-	if (exists $self->{results}{$name} and not exists $self->{results}{$name}{version}) {
+	if (exists $self->{results}{$name}) {
 		return ($self->lookup($name), 'overriden');
 	} else {
 		$self->run_check($check);
