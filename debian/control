@@ -1,0 +1,13 @@
+Source: openc2e
+Section: unknown
+Priority: optional
+Maintainer: Bryan Donlan <bdonlan@gmail.com>
+Build-Depends: debhelper (>= 4.0.0), perl, libyaml-perl, libsdl1.2debian-all, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, libsdl-mixer1.2-dev, flex, bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev
+Standards-Version: 3.6.2
+
+Package: openc2e
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Free creatures engine
+ TODO: writeme
+ <insert long description, indented with spaces>
