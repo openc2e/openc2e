@@ -310,6 +310,8 @@ void caosVM::c_FRMT() {
 	if ((justification & 12) == 4) v = bottom;
 	else if ((justification & 12) == 8) v = middle;
 	else v = top; // TODO: i haven't verified this is the correct fallback - fuzzie
+
+	if (char_spacing == 1) char_spacing = 0; // TODO: horrible hack to try and fix issues
 	
 	p->setFormat(left_margin, top_margin, right_margin, bottom_margin, line_spacing, char_spacing, h, v, (justification & 16));
 }
