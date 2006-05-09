@@ -136,7 +136,7 @@ class vmStackItem {
 };
 
 struct callStackItem {
-	std::vector<vmStackItem> valueStack;
+	boost::shared_ptr<std::vector<vmStackItem> > valueStack;
 	int nip;
 };
 

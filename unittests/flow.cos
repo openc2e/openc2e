@@ -2,7 +2,7 @@
 * fuzzie, 06/06/04
 
 DBG: OUTS "# Flow control"
-DBG: OUTS "1..3"
+DBG: OUTS "1..7"
 
 * test LOOP .. UNTL
 SETV VA00 0
@@ -35,7 +35,20 @@ ELSE
  DBG: OUTS "not ok 3 - GSUB"
 ENDI
 
+* GSUB loops
+SETV VA00 4
+REPS 4
+  GSUB t2
+REPE
+
 * for GSUB test
 SUBR test
  SETV VA00 1
+RETN
+
+SUBR t2
+ OUTS "ok "
+ OUTV VA00
+ OUTS " - GSUB iteration\n"
+ ADDV VA00 1
 RETN

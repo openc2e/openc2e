@@ -146,7 +146,11 @@ class caosGSUB : public caosOp {
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			callStackItem i;
-			i.valueStack = vm->valueStack; // XXX: a bit slow?
+			i.valueStack =
+				boost::shared_ptr<std::vector<vmStackItem> >(
+						new std::vector<vmStackItem>
+				);
+			i.valueStack->swap(vm->valueStack);
 			i.nip = vm->nip;
 			vm->callStack.push_back(i);
 			vm->valueStack.clear();
