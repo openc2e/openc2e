@@ -172,6 +172,8 @@ class Line {
 			if (l.type != NORMAL)
 				return l.intersect(*this, where);
 			
+			assert(l.type == NORMAL && type == NORMAL);
+			
 			double x, y;
 
 			/* y = m1 * x + b1
