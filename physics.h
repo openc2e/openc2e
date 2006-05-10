@@ -68,6 +68,7 @@ class Line {
 				default: std::cout << "?? (" << type << ")"; break;
 			}
 			std::cout << std::endl;
+			sanity_check();
 		}
 
 		Line() {
@@ -95,10 +96,10 @@ class Line {
 				
 			if (s.x == e.x) {
 				type = VERTICAL;
-				x_icept = s.y;
+				x_icept = s.x;
 			} else if (s.y == e.y) {
 				type = HORIZONTAL;
-				y_icept = s.x;
+				y_icept = s.y;
 				slope = 0;
 			} else {
 				type = NORMAL;
@@ -106,11 +107,11 @@ class Line {
 				/* y = mx + b
 				 * b = y - mx
 				 */
-				x_icept = start.y - slope * start.x;
+				y_icept = start.y - slope * start.x;
 				/* 0 = mx + b
 				 * x = -b/m
 				 */
-				y_icept = -x_icept/slope;
+				x_icept = -y_icept/slope;
 			}
 		}
 
@@ -223,9 +224,22 @@ class Line {
 		}
 					
 		Point pointAtX(double x) const
-			{ return Point(x, (x - start.x) * slope + start.y); }
+			{ 
+				assert(type != VERTICAL);
+				if (type == NORMAL)
+					return Point(x, (x - start.x) * slope + start.y); 
+				else
+					return Point(x, start.y);
+				
+			}
 		Point pointAtY(double y) const
-			{ return Point((y - start.y) / slope + start.x, y); }
+			{
+				assert(type != HORIZONTAL);
+				if (type == NORMAL)
+					return Point((y - start.y) / slope + start.x, y);
+				else
+					return Point(start.x, y);
+			}
 
 		bool containsX(double x) const {
 			return x >= start.x && x <= end.x;
@@ -236,6 +250,16 @@ class Line {
 				return y <= start.y && y >= end.y;
 			else
 				return y >= start.y && y <= end.y;
+		}
+
+		void sanity_check() {
+			if (type == NORMAL) {
+				double xp = pointAtY(yIntercept()).x;
+				double yp = pointAtX(xIntercept()).y;
+				assert(fabs(xp) < 1);
+				assert(fabs(yp) < 1);
+			}
+
 		}
 
 };
