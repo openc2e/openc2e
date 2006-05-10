@@ -21,7 +21,6 @@
 #define PHYSICS_H 1
 
 #include <iostream> // XXX debug
-#include <cstring> // memcpy
 #include <cmath>   // sqrt
 #include <algorithm> // swap
 
@@ -39,12 +38,14 @@ struct Point {
 	float x, y;
 	Point() { x = y = 0; }
 	Point(float _x, float _y) : x(_x), y(_y) {}
-	Point(const Point &p) { memcpy(this, &p, sizeof p); }
+	Point(const Point &p) : x(p.x), y(p.y) { }
 
 	bool operator==(const Point &p) { return x == p.x && y == p.y; }
 	bool operator!=(const Point &p) { return !(*this == p); }
 	Point &operator=(const Point &r) {
-		memcpy(this, &r, sizeof r); return *this;
+		x = r.x;
+		y = r.y;
+		return *this;
 	}
 };
 
