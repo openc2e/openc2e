@@ -20,8 +20,10 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H 1
 
+#include <iostream> // XXX debug
 #include <cstring> // memcpy
 #include <cmath>   // sqrt
+#include <algorithm> // swap
 
 class physicsHandler {
 private:
@@ -55,6 +57,19 @@ class Line {
 		linetype type;
 	public:
 
+		void dump() {
+			std::cout << "pst = (" << start.x << "," << start.y << ") end=(" << end.x << "," << end.y << ")" << std::endl;
+			std::cout << "xi = " << x_icept << " yi = " << y_icept << " m=" << slope << std::endl;
+			std::cout << "type = ";
+			switch (type) {
+				case NORMAL: std::cout << "NORMAL"; break;
+				case HORIZONTAL: std::cout << "HORIZ"; break;
+				case VERTICAL: std::cout << "VERT"; break;
+				default: std::cout << "?? (" << type << ")"; break;
+			}
+			std::cout << std::endl;
+		}
+
 		Line() {
 			start = Point(0,0);
 			end = Point(1,1);
@@ -72,31 +87,12 @@ class Line {
 			type = l.type;
 		}
 		
-		Line(const Point &_s, const Point &_e) {
-			Point s, e;
-			if (s.x > e.x) {
-				/* _s and _e are references, but we can't use = because it's
-				 * overloaded. Ick.
-				 */
-				s = _e;
-				e = _s;
-			} else {
-				s = _s;
-				e = _e;
-			}
+		Line(Point s, Point e) {
+			if (s.x > e.x)
+				std::swap(s, e);
 			start = s;
 			end = e;
 				
-			/* Use Cramer's law to solve for x and y intercepts.
-			 * We solve for a and b in:
-			 *
-			 * ax1 + by1 = 1
-			 * ax2 + by2 = 1
-			 *
-			 * And take the reciprocal of a and b. If one is zero, then
-			 * we have a horizontal or vertical line.
-			 */
-			double d, a, b;
 			if (s.x == e.x) {
 				type = VERTICAL;
 				x_icept = s.y;
@@ -105,29 +101,16 @@ class Line {
 				y_icept = s.x;
 				slope = 0;
 			} else {
-				/* | x1 y1 |
-				 * |       | = d
-				 * | x2 y2 |
-				 */
-				d = (s.x * e.y) - (s.y * e.x);
-				/* | 1  y1 |
-				 * |       | = dx
-				 * | 1  y2 |
-				 *
-				 * a = dx / d
-				 */
-				a = (s.y - e.y) / d;
-				/* | x1  1 |
-				 * |       | = dy
-				 * | x2  1 |
-				 *
-				 * b = dy / d
-				 */
-				b = (s.x - e.x) / d;
-				x_icept = 1/a;
-				y_icept = 1/b;
 				type = NORMAL;
-				slope = (e.y - s.y)/(e.x - s.x);
+				slope = (end.y - start.y) / (end.x - start.x);
+				/* y = mx + b
+				 * b = y - mx
+				 */
+				x_icept = start.y - slope * start.x;
+				/* 0 = mx + b
+				 * x = -b/m
+				 */
+				y_icept = -x_icept/slope;
 			}
 		}
 
@@ -184,21 +167,19 @@ class Line {
 				where = Point(start.x, y);
 				return true;
 			}
-			double d, dx, dy, a1, b1, a2, b2, x, y;
-			/*
-			 * a1x + b1y = 1
-			 * a2x + b2y = 1
-			 */
-			a1 = 1/y_icept;
-			b1 = 1/x_icept;
-			a2 = 1/l.y_icept;
-			b2 = 1/l.x_icept;
+			double x, y;
 
-			d = a1 * b2 - a2 * b1;
-			dx = b1 - b2;
-			dy = a1 - a2;
-			x = dx / d;
-			y = dy / d;
+			/* y = m1 * x + b1
+			 * y = m2 * x + b2
+			 *
+			 * m1 * x + b1 = m2 * x + b2
+			 * Solving for x:
+			 * b1 - b2 = (m2 - m1) x
+			 * x = (b1 - b2) / (m2 - m1)
+			 */
+			x = (y_icept - l.y_icept) / (l.slope - slope);
+			y = slope * x + y_icept;
+			
 			if (x > start.x && x < end.x &&
 					x > l.start.x && x < l.end.x) {
 				where = Point(x,y);
