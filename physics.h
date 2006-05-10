@@ -166,9 +166,8 @@ class Line {
 				}
 				if (!l.containsX(start.x))
 					return false;
-				double y = l.slope * start.x + l.y_icept;
-				where = Point(start.x, y);
-				return true;
+				where = l.pointAtX(start.x);
+				return containsY(where.y);
 			}
 
 			if (l.type != NORMAL)
