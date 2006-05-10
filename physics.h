@@ -58,19 +58,7 @@ class Line {
 		linetype type;
 	public:
 
-		void dump() {
-			std::cout << "pst = (" << start.x << "," << start.y << ") end=(" << end.x << "," << end.y << ")" << std::endl;
-			std::cout << "xi = " << x_icept << " yi = " << y_icept << " m=" << slope << std::endl;
-			std::cout << "type = ";
-			switch (type) {
-				case NORMAL: std::cout << "NORMAL"; break;
-				case HORIZONTAL: std::cout << "HORIZ"; break;
-				case VERTICAL: std::cout << "VERT"; break;
-				default: std::cout << "?? (" << type << ")"; break;
-			}
-			std::cout << std::endl;
-			sanity_check();
-		}
+		void dump() const;
 
 		Line() {
 			start = Point(0,0);
@@ -89,32 +77,7 @@ class Line {
 			type = l.type;
 		}
 		
-		Line(Point s, Point e) {
-			if (s.x > e.x)
-				std::swap(s, e);
-			start = s;
-			end = e;
-				
-			if (s.x == e.x) {
-				type = VERTICAL;
-				x_icept = s.x;
-			} else if (s.y == e.y) {
-				type = HORIZONTAL;
-				y_icept = s.y;
-				slope = 0;
-			} else {
-				type = NORMAL;
-				slope = (end.y - start.y) / (end.x - start.x);
-				/* y = mx + b
-				 * b = y - mx
-				 */
-				y_icept = start.y - slope * start.x;
-				/* 0 = mx + b
-				 * x = -b/m
-				 */
-				x_icept = -y_icept/slope;
-			}
-		}
+		Line(Point s, Point e);
 
 		Line &operator=(const Line &l) {
 			start = l.start;
@@ -126,77 +89,7 @@ class Line {
 			return *this;
 		}
 
-		
-		bool intersect(const Line &l, Point &where) const {
-			if (type == HORIZONTAL) {
-				if (l.type == HORIZONTAL)
-					return l.start.y == start.y;
-				// XXX: set where to something useful
-				if (l.type == VERTICAL) {
-					if (!(l.containsY(start.y) && containsX(l.start.x)))
-						return false;
-					where.x = l.start.x;
-					where.y = start.y;
-					return true;
-				}
-				if (l.type == NORMAL) {
-					/* mx + b = y
-					 * mx = y - b
-					 * x = (y - b) / m
-					 */
-					double x = (start.y - l.y_icept) / l.slope;
-					if (l.containsX(x) && containsX(x)) {
-						where = Point(x, start.y);
-						return true;
-					}
-					else return false;
-				}
-				
-			}
-			if (type == VERTICAL) {
-				if (l.type == VERTICAL)
-					return l.start.x == start.x;
-				// XXX: set where to something useful
-				if (l.type == HORIZONTAL) {
-					if (!(l.containsX(start.x) && containsY(l.start.y)))
-						return false;
-					where.x = start.x;
-					where.y = l.start.y;
-					return true;
-				}
-				if (!l.containsX(start.x))
-					return false;
-				where = l.pointAtX(start.x);
-				return containsY(where.y);
-			}
-
-			if (l.type != NORMAL)
-				return l.intersect(*this, where);
-			
-			assert(l.type == NORMAL && type == NORMAL);
-			
-			double x, y;
-
-			if (slope == l.slope)
-				return false; // XXX handle parallel overlap sanely
-
-			/* y = m1 * x + b1
-			 * y = m2 * x + b2
-			 *
-			 * m1 * x + b1 = m2 * x + b2
-			 * Solving for x:
-			 * b1 - b2 = (m2 - m1) x
-			 * x = (b1 - b2) / (m2 - m1)
-			 */
-			x = (y_icept - l.y_icept) / (l.slope - slope);
-			y = slope * x + y_icept;
-			
-			if (containsX(x) && l.containsX(x)) {
-				where = Point(x,y);
-				return true;
-			}
-			return false;
-		}
+		bool intersect(const Line &l, Point &where) const; 
 
 		linetype getType() const { return type; }
 		double xIntercept() const { return x_icept; }
@@ -254,16 +147,7 @@ class Line {
 				return y >= start.y && y <= end.y;
 		}
 
-		void sanity_check() {
-			if (type == NORMAL) {
-				double xp = pointAtY(yIntercept()).x;
-				double yp = pointAtX(xIntercept()).y;
-				assert(fabs(xp) < 1);
-				assert(fabs(yp) < 1);
-			}
-
-		}
-
+		void sanity_check() const;
 };
 
 class Vector {

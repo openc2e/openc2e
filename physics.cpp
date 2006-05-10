@@ -27,154 +27,125 @@ Point operator+(const Point &p, const Vector &v)  {
 	return Point(p.x + v.x, p.y + v.y);
 }
 
-/*
- * collidePoints
- *
- * pass it the beginning and end points of two line segments
- * it will return true if they collide, and false otherwise
- * 
- * getCollisionX() and getCollisionY() will give you the point
- * we haven't entirely checked if points are right if you pass
- * two segments of a same line
- *
- * written in a few hours of equation-driven insanity by fuzzie
- * and bz2 on 8th Feb 2005
- *
- * TODO:
- *
- * we can precalculate some 'a' line segments because they're already known
- * (eg, room boundaries) .. so we should do this
-*/
-bool physicsHandler::collidePoints(float ax1, float ay1, float ax2, float ay2,
-		float bx1, float by1, float bx2, float by2) {
-
-	float am, ab, bm, bb;
-
-	bool gotx = false;
-	float x, y;
-
-	if ((ax1 - ax2) != 0) {
-		if (ax1 == 0) {
-			ab = ((ax2 * ay1) - (ax1 * ay2)) / (ax2 - ax1);
-			am = (ay2 - ab) / ax2;
-		} else {
-			ab = ((ax1 * ay2) - (ax2 * ay1)) / (ax1 - ax2);
-			am = (ay1 - ab) / ax1;
-		}
-	} else {
-		gotx = true;
-		x = ax1;
+void Line::dump() const {
+	std::cout << "pst = (" << start.x << "," << start.y << ") end=(" << end.x << "," << end.y << ")" << std::endl;
+	std::cout << "xi = " << x_icept << " yi = " << y_icept << " m=" << slope << std::endl;
+	std::cout << "type = ";
+	switch (type) {
+		case NORMAL: std::cout << "NORMAL"; break;
+		case HORIZONTAL: std::cout << "HORIZ"; break;
+		case VERTICAL: std::cout << "VERT"; break;
+		default: std::cout << "?? (" << type << ")"; break;
 	}
+	std::cout << std::endl;
+	sanity_check();
+}
 
-	if ((bx1 - bx2) != 0) {
-		if (bx1 == 0) {
-			bb = ((bx2 * by1) - (bx1 * by2)) / (bx2 - bx1);
-			bm = (by2 - bb) / bx2;
-		} else {
-			bb = ((bx1 * by2) - (bx2 * by1)) / (bx1 - bx2);
-			bm = (by1 - bb) / bx1;
-		}
-		if(gotx)
-			y = (bm * x) + bb;
+Line::Line(Point s, Point e) {
+	if (s.x > e.x)
+		std::swap(s, e);
+	start = s;
+	end = e;
+		
+	if (s.x == e.x) {
+		type = VERTICAL;
+		x_icept = s.x;
+	} else if (s.y == e.y) {
+		type = HORIZONTAL;
+		y_icept = s.y;
+		slope = 0;
 	} else {
-		if (gotx) {
-			if(ax1 == bx1) {
-				float higha = (ay1 > ay2 ? ay1 : ay2);
-				float highb = (by1 > by2 ? by1 : by2);
-				float lowa = (ay1 < ay2 ? ay1 : ay2);
-				float lowb = (by1 < by2 ? by1 : by2);
-				if(higha >= highb && lowa <= highb) { finalx = ax1; finaly = highb; return true; }
-				else if(highb >= higha && lowb <= higha) { finalx = ax1; finaly = lowb; return true; }
-				return false;
-			} else
-				return false;
-		} else {
-			gotx = true;
-			x = bx1;
-			y = (am * x) + ab;
-		}
+		type = NORMAL;
+		slope = (end.y - start.y) / (end.x - start.x);
+		/* y = mx + b
+		 * b = y - mx
+		 */
+		y_icept = start.y - slope * start.x;
+		/* 0 = mx + b
+		 * x = -b/m
+		 */
+		x_icept = -y_icept/slope;
 	}
+}
 
-	if(! gotx) {
-		if(bm == am) {
-			if(bb == ab) {
-				float higha = (ax1 > ax2 ? ax1 : ax2);
-				float highb = (bx1 > bx2 ? bx1 : bx2);
-				float lowa = (ax1 < ax2 ? ax1 : ax2);
-				float lowb = (bx1 < bx2 ? bx1 : bx2);
-				if(higha >= highb && lowa <= highb) finalx = highb;
-				else if(highb >= higha && lowb <= higha) finalx = lowb;
-				else return false;
-				finaly = (am * finalx) + ab;
+bool Line::intersect(const Line &l, Point &where) const {
+	if (type == HORIZONTAL) {
+		if (l.type == HORIZONTAL)
+			return l.start.y == start.y;
+		// XXX: set where to something useful
+		if (l.type == VERTICAL) {
+			if (!(l.containsY(start.y) && containsX(l.start.x)))
+				return false;
+			where.x = l.start.x;
+			where.y = start.y;
+			return true;
+		}
+		if (l.type == NORMAL) {
+			/* mx + b = y
+			 * mx = y - b
+			 * x = (y - b) / m
+			 */
+			double x = (start.y - l.y_icept) / l.slope;
+			if (l.containsX(x) && containsX(x)) {
+				where = Point(x, start.y);
 				return true;
-			} else {
-				return false;
 			}
+			else return false;
 		}
-		y = ((bm * ab) - (bb * am)) / (bm - am);
-		x = (y - ab) / am;
+		
+	}
+	if (type == VERTICAL) {
+		if (l.type == VERTICAL)
+			return l.start.x == start.x;
+		// XXX: set where to something useful
+		if (l.type == HORIZONTAL) {
+			if (!(l.containsX(start.x) && containsY(l.start.y)))
+				return false;
+			where.x = start.x;
+			where.y = l.start.y;
+			return true;
+		}
+		if (!l.containsX(start.x))
+			return false;
+		where = l.pointAtX(start.x);
+		return containsY(where.y);
 	}
 
-	if (ay1 > ay2) {
-		if (y < ay2) return false;
-		if (y > ay1) return false;
-	} else {
-		if (y > ay2) return false;
-		if (y < ay1) return false;
-	}
-
-	if (by1 > by2) {
-		if (y < by2) return false;
-		if (y > by1) return false;
-	} else {
-		if (y > by2) return false;
-		if (y < by1) return false;
-	}
-
-	finalx = x;
-	finaly = y;
-
-	//cout << "collision at (" << x << ", " << y << ")\n";
-
-	return true;
-}
-
-#if 0
-#include <iostream>
-#include <assert.h>
-using namespace std;
-
-// test code
-int main() {
-	physicsHandler p;
+	if (l.type != NORMAL)
+		return l.intersect(*this, where);
 	
-	// Single horizontal line, not overlapping
-	assert(! p.collidePoints(0, 2, 2, 2, 3, 2, 4, 2));
-	// Single horizontal line, overlapping
-	assert(p.collidePoints(1, 2, 3, 2, 2, 2, 0, 2));
-	cout << "collision at (" << p.getCollisionX() << ", " << p.getCollisionY() << ")\n";
-	// Parallel vertical lines
-	assert(! p.collidePoints(1, 4, 1, 0, 2, 4, 2, 0));
-	// Parallel horizontal lines
-	assert(! p.collidePoints(0, 2, 2, 2, 1, 3, 2, 3));
-	// Single vertical line, overlapping
-	assert(p.collidePoints(0, 5, 0, 0, 0, 1, 0, 2));
-	cout << "collision at (" << p.getCollisionX() << ", " << p.getCollisionY() << ")\n";
-	// Single vertical line, not overlapping
-	assert(! p.collidePoints(0, 1, 0, 2, 0, 4, 0, 5));
-	// Single diagonal line, not overlapping
-	assert(! p.collidePoints(0, 0, 2, 2, 3, 3, 4, 4));
-	// Single diagonal line, overlapping
-	assert(p.collidePoints(2, 4, 4, 2, 3, 3, 5, 1));
-	cout << "collision at (" << p.getCollisionX() << ", " << p.getCollisionY() << ")\n";
-	// Parallel diagonal lines
-	assert(! p.collidePoints(2, 2, 0, 4, 2, 4, 4, 2));
-	// Colliding diagonal lines
-	assert(p.collidePoints(0, 0, 4, 4, 4, 0, 0, 4));
-	cout << "collision at (" << p.getCollisionX() << ", " << p.getCollisionY() << ")\n";
-	// Non-colliding diagonal lines
-	assert(! p.collidePoints(2, 1, 1, 4, 3, 1, 4, 4));
+	assert(l.type == NORMAL && type == NORMAL);
+	
+	double x, y;
+
+	if (slope == l.slope)
+		return false; // XXX handle parallel overlap sanely
+
+	/* y = m1 * x + b1
+	 * y = m2 * x + b2
+	 *
+	 * m1 * x + b1 = m2 * x + b2
+	 * Solving for x:
+	 * b1 - b2 = (m2 - m1) x
+	 * x = (b1 - b2) / (m2 - m1)
+	 */
+	x = (y_icept - l.y_icept) / (l.slope - slope);
+	y = slope * x + y_icept;
+	
+	if (containsX(x) && l.containsX(x)) {
+		where = Point(x,y);
+		return true;
+	}
+	return false;
 }
-#endif
+
+void Line::sanity_check() const {
+	if (type == NORMAL) {
+		double xp = pointAtY(yIntercept()).x;
+		double yp = pointAtX(xIntercept()).y;
+		assert(fabs(xp) < 1);
+		assert(fabs(yp) < 1);
+	}
+}
 
 /* vim: set noet: */
