@@ -38,6 +38,7 @@ World::World() {
 	pace = 0.0f; // sensible default?
 	quitting = saving = false;
 	theHand = 0;
+	showrooms = false;
 }
 
 World::~World() {
