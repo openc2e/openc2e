@@ -145,7 +145,7 @@ class Line {
 					 * x = (y - b) / m
 					 */
 					double x = (start.y - l.y_icept) / l.slope;
-					if (l.containsX(x)) {
+					if (l.containsX(x) && containsX(x)) {
 						where = Point(x, start.y);
 						return true;
 					}
@@ -191,8 +191,7 @@ class Line {
 			x = (y_icept - l.y_icept) / (l.slope - slope);
 			y = slope * x + y_icept;
 			
-			if (x > start.x && x < end.x &&
-					x > l.start.x && x < l.end.x) {
+			if (containsX(x) && l.containsX(x)) {
 				where = Point(x,y);
 				return true;
 			}
