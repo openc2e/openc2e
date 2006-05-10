@@ -177,6 +177,9 @@ class Line {
 			
 			double x, y;
 
+			if (slope == l.slope)
+				return false; // XXX handle parallel overlap sanely
+
 			/* y = m1 * x + b1
 			 * y = m2 * x + b2
 			 *
