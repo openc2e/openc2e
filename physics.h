@@ -203,15 +203,20 @@ class Line {
 		// TODO: this code hasn't really been tested - fuzzie
 		bool containsPoint(Point p) const {
 			if (type == VERTICAL) {
-				bool is_v = (start.x == p.x);
-				bool is_h = containsY(p.y);
+				bool is_x = fabs(start.x - p.x) < 1;
+				bool is_y = containsY(p.y);
 				// TODO
 				//bool is_v = (start.x > (p.x + 0.5)) && (start.x < (p.x - 0.5));
 				//bool is_h = (start.y > (p.y + 0.5)) && (start.y < (p.y - 0.5));
-				return (is_v && is_h);
+				return (is_x && is_y);
+			} else if (type == HORIZONTAL) {
+				bool is_y = fabs(start.y - p.y) < 1;
+				bool is_x = containsX(p.x);
+
+				return is_x && is_y;
 			} else {
 				Point point_on_line = pointAtX(p.x);
-				return (point_on_line.y > (p.y - 1)) && (point_on_line.y < (p.y + 1));
+				return containsX(p.x) && fabs(point_on_line.y - p.y) < 1;
 			}
 		}
 					
