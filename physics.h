@@ -147,6 +147,7 @@ class Line {
 						where = Point(x, start.y);
 						return true;
 					}
+					else return false;
 				}
 				
 			}
