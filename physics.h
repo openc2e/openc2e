@@ -125,7 +125,7 @@ class Line {
 		}
 
 		
-		bool intersect(Line l, Point &where) const {
+		bool intersect(const Line &l, Point &where) const {
 			if (type == HORIZONTAL) {
 				if (l.type == HORIZONTAL)
 					return l.start.y == start.y;
@@ -161,12 +161,16 @@ class Line {
 					where.y = l.start.y;
 					return true;
 				}
-				if (l.containsX(start.x))
+				if (!l.containsX(start.x))
 					return false;
 				double y = l.slope * start.x + l.y_icept;
 				where = Point(start.x, y);
 				return true;
 			}
+
+			if (l.type != NORMAL)
+				return l.intersect(*this, where);
+			
 			double x, y;
 
 			/* y = m1 * x + b1
