@@ -2,7 +2,7 @@
 #define SER_BYTECODE_H 1
 
 #include <bytecode.h>
-#include <ser/caosVar.h>
+#include "ser/s_caosVar.h"
 #include <serialization.h>
 #include <dialect.h>
 

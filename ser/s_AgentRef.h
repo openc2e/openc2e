@@ -2,7 +2,7 @@
 #define SER_AGENTREF_H 1
 
 #include <serialization.h>
-#include <ser/Agent.h> // This loop is safe; template instantiation is deferred
+#include "ser/s_Agent.h" // This loop is safe; template instantiation is deferred
 #include <AgentRef.h>
 
 LOAD(AgentRef) {

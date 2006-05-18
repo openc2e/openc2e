@@ -2,9 +2,9 @@
 #define SER_CAOSSCRIPT_H 1
 
 #include <serialization.h>
-#include <ser/caosVar.h>
+#include "ser/s_caosVar.h"
 #include <caosScript.h>
-#include <ser/bytecode.h>
+#include "ser/s_bytecode.h"
 
 typedef Variant *v_type;
 static inline Variant *findVariant(const std::string &name) {

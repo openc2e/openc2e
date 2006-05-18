@@ -1,8 +1,8 @@
 #ifndef SER_CAOSVM_H
 #define SER_CAOSVM_H 1
 
-#include <ser/caosScript.h>
-#include <ser/AgentRef.h>
+#include "ser/s_caosScript.h"
+#include "ser/s_AgentRef.h"
 #include <serialization.h>
 #include <caosScript.h>
 

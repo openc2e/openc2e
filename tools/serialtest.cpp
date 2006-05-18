@@ -12,9 +12,9 @@
 #define CV 1
 
 #include "caosVar.h"
-#include "ser/caosVar.h"
+#include "ser/s_caosVar.h"
 #include "caosScript.h"
-#include "ser/caosScript.h"
+#include "ser/s_caosScript.h"
 
 
 class foo {

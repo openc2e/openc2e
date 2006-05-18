@@ -1,8 +1,8 @@
 #ifndef SER_AGENT_H
 #define SER_AGENT_H 1
 
-#include <ser/AgentRef.h>
-#include <ser/caosVar.h>
+#include "ser/s_AgentRef.h"
+#include "ser/s_caosVar.h"
 #include <serialization.h>
 #include <Agent.h>
 
