@@ -40,6 +40,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
 	accg = 0.3f;
+	aero = 0;
 	range = 500;
 	sufferphysics = false; falling = false;
 	x = 0.0f; y = 0.0f;
@@ -455,6 +456,13 @@ void Agent::physicsTick() {
 	} else {
 		if (vely.hasDecimal() || velx.hasDecimal())
 			moveTo(destx, desty);
+	}
+
+	if (sufferphysics && (aero != 0)) {
+		// reduce speed according to AERO
+		// TODO: aero should be an integer!
+		velx.setFloat(velx.getFloat() - (velx.getFloat() * (aero / 100.0f)));
+		vely.setFloat(vely.getFloat() - (vely.getFloat() * (aero / 100.0f)));
 	}
 }
 
