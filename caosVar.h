@@ -28,8 +28,6 @@
 #include "slaballoc.h"
 #include <typeinfo>
 
-#include "serialization.h"
-
 class Agent;
 
 class wrongCaosVarTypeException : public caosException {

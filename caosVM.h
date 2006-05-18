@@ -26,7 +26,6 @@
 #include <istream>
 #include <ostream>
 #include "AgentRef.h"
-#include "serialization.h"
 
 #include <boost/weak_ptr.hpp>
 using boost::weak_ptr;

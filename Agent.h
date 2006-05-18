@@ -28,7 +28,7 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include "serialization.h"
+#include "openc2e.h"
 
 class script;
 using boost::shared_ptr;

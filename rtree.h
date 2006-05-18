@@ -31,7 +31,7 @@
 #include <deque>
 #include <boost/lambda/lambda.hpp>
 #include "slaballoc.h"
-#include "serialization.h"
+#include "openc2e.h"
 
 // REGION_MAX should be odd, or adjust REGION_MIN manually
 #define REGION_MAX 5

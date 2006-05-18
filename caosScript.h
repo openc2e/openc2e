@@ -28,7 +28,7 @@
 #include "caosVar.h"
 #include <cassert>
 #include <boost/shared_ptr.hpp>
-#include "serialization.h"
+#include "openc2e.h"
 
 class Agent;
 class caosOp;
