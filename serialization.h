@@ -66,5 +66,19 @@
 #define LOAD(c) SER_PROTO(, o_load, c,)
 #define SERIALIZE(c) WRAP_SERIALIZE(c); SER_PROTO(, o_serialize, c,)
 
+inline static void STUB_DIE(const std::string &msg, const char *f, unsigned int l) {
+    std::cerr << "A trickery! SER_STUB'd: " << msg << "@" << f << ":" << l << std::endl;
+    abort();
+}
+
+#define SER_STUB_BASE(c, type) \
+    type(c) { \
+        STUB_DIE(std::string(#type " stubbed for " #c), __FILE__, __LINE__); \
+    }
+
+#define SAVE_STUB(c) SER_STUB_BASE(c, SAVE)
+#define LOAD_STUB(c) SER_STUB_BASE(c, LOAD)
+#define SERIALIZE_STUB(c) SER_STUB_BASE(c, SERIALIZE)
+
 #endif
 
