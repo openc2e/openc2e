@@ -648,11 +648,11 @@ void caosVM::c_NEWC() {
  %status stub
 */
 void caosVM::c_NEW_CREA() {
-	VM_PARAM_INTEGER(variant)
+	/*VM_PARAM_INTEGER(variant)
 	VM_PARAM_INTEGER(sex)
 	VM_PARAM_INTEGER(gene_slot)
 	VM_PARAM_VALIDAGENT(gene_agent)
-	VM_PARAM_INTEGER(family)
+	VM_PARAM_INTEGER(family)*/
 
 	c_NEWC(); // TODO
 	//targ = NULL; // TODO
