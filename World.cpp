@@ -260,7 +260,7 @@ void World::drawWorld() {
 			unsigned int col = 0xFFFF00CC;
 			if (*i == r) col = 0xFF00FFCC;
 			else if (r) {
-				if ((**i).doors[r])
+				if ((**i).doors.find(r) != (**i).doors.end())
 					col = 0x00FFFFCC;
 			}
 			// ceiling
