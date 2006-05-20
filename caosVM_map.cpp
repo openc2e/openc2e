@@ -212,9 +212,8 @@ void caosVM::c_DOOR() {
 	Room *r1 = world.map.getRoom(room1);
 	Room *r2 = world.map.getRoom(room2);
 	caos_assert(r1); caos_assert(r2);
-	RoomDoor *door = r1->doors[r2];
-	if (!door) {
-		door = new RoomDoor;
+	if (r1->doors.find(r2) == r1->doors.end()) {
+		RoomDoor *door = new RoomDoor;
 		door->first = r1;
 		door->second = r2;
 		door->perm = perm;
@@ -223,6 +222,7 @@ void caosVM::c_DOOR() {
 		r1->nearby.insert(r2);
 		r2->nearby.insert(r1);
 	} else {
+		RoomDoor *door = r1->doors[r2];
 		door->perm = perm;
 	}
 }

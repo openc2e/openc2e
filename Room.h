@@ -50,8 +50,8 @@ public:
 
 	float ca[20];
 
-	bool containsPoint(unsigned int x, unsigned int y) {	
-		if (x > x_right || x < x_left) { return false; }
+	bool containsPoint(float x, float y) {	
+		if (x > (float)x_right || x < (float)x_left) { return false; }
 		if (bot.pointAtX(x).y < y) { return false; }
 		if (top.pointAtX(x).y > y) { return false; }
 		return true;

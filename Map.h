@@ -58,7 +58,10 @@ public:
 	unsigned int getRoomCount();
 
 	MetaRoom *metaRoomAt(unsigned int, unsigned int);
-	Room *roomAt(unsigned int, unsigned int);
+	Room *roomAt(float, float);
+
+	bool collideLineWithRoomSystem(Point src, Point dest, Room *&room, Point &where, Line &wall, unsigned int &walldir, int perm);
+	bool collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room *&newroom, Point &where, Line &wall, unsigned int &walldir, int perm);
 };
 
 #endif

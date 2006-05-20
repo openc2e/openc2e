@@ -49,4 +49,8 @@ void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
 	}
 }
 
+void PointerAgent::physicsTick() {
+	// TODO: this is a hack, which does nothing, because we set a velocity in main() but also move the cursor manually
+}
+
 /* vim: set noet: */

@@ -192,8 +192,10 @@ void caosVM::v_TMVT() {
 
 	caos_assert(targ);
 	// TODO: do this properly
-	Room *r1 = world.map.roomAt(x, y);
-	Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + (targ->getHeight() / 2));
+	//Room *r1 = world.map.roomAt(x, y);
+	//Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + (targ->getHeight() / 2));
+	Room *r1 = world.map.roomAt(x + (targ->getWidth() / 2), y);
+	Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + targ->getHeight());
 	result.setInt((r1 && r2) ? 1 : 0);
 }
 

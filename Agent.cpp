@@ -41,6 +41,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	vely.setFloat(0.0f);
 	accg = 0.3f;
 	aero = 0;
+	elas = 0;
+	perm = 50; // TODO: correct default?
 	range = 500;
 	sufferphysics = false; falling = false;
 	x = 0.0f; y = 0.0f;
@@ -265,194 +267,107 @@ void Agent::physicsTick() {
 
 	if (carriedby) return; // We don't move when carried, so what's the point?
 
+	// set destination point based on velocities
 	float destx = x + velx.getFloat();
 	float desty = y + vely.getFloat();
+
 	if (sufferphysics) {
+		// increase speed according to accg
+		// TODO: should we be changing vely first, instead of after a successful move (below)?
 		desty += accg;
 	}
 	
 	if (suffercollisions) {
-		//std::cout << x << ", " << y << ": " << destx << ", " << desty << "! " << accg << "\n";
-		Room *r1 = world.map.roomAt((unsigned int)x, (unsigned int)y);
-		if (!r1) {
-//			std::cout << "not doing physics on agent " << identify() << ", outside room system!\n";
-		}
-		Room *r2 = world.map.roomAt((unsigned int)destx + getWidth(), (unsigned int)desty + getHeight());
-		Room *r3 = world.map.roomAt((unsigned int)destx, (unsigned int)desty);
+		float lastdistance = 1000000.0f;
+		bool collided = false;
+		Line wall; // only valid when collided
+		unsigned int collidedirection; // only valid when collided
+		Point bestmove;
 
-		//if (r1 && (r1 == r2) && (r2 == r3)) {
-			// If the object is already in a room, and the destination point is also in the room,
-			// for now we don't bother checking. We *should*, because (crazily) it could take a
-			// path out of the room and back in again, once we're doing more than dumb velocity.
-		//	vely.setFloat(newvely);
-		//	moveTo(destx, desty);
-		/*} else */ if (r1) { // if we *are* actually in a room
-			// Otherwise, check the motion pixel-by-pixel. Oh boy.
-		
-			bool moved = false, collided = false;
-
-			int collidedirection = -1;
-
-			int ix = x, iy = y, idestx = destx, idesty = desty;
-			int dx = (ix < idestx ? 1 : -1);
-			int dy = (iy < idesty ? 1 : -1);
-
-			Room *room[4];
-			Room *oroom[4];
-			for (unsigned int i = 0; i < 4; i++) room[i] = 0;
-
-			if (accg) falling = true;
-			
-			while (ix != idestx || iy != idesty) {
-				// We just alternate here. There's probably a more
-				// accurate method, but meh
-
-				bool movedy = false, movedx = false;
-				
-				if (iy != idesty) {
-					movedy = true;
-					iy += dy;
-				}
-	
-				if (ix != idestx) {
-					movedx = true;
-					ix += dx;
-				}
-
-				for (unsigned int i = 0; i < 4; i++) oroom[i] = room[i];
-
-				if (room[0]) {
-					if (!room[0]->containsPoint(ix, iy))
-						room[0] = 0;	
-				} else room[0] = 0;
-				if (!room[0]) room[0] = world.map.roomAt(ix, iy);
-					
-				if (room[1]) {
-					if (!room[1]->containsPoint(ix + getWidth(), iy + getHeight()))
-						room[1] = 0;
-				} else room[1] = 0;
-				if (!room[1]) room[1] = world.map.roomAt(ix + getWidth(), iy + getHeight());
-
-				if (room[2]) {
-					if (!room[2]->containsPoint(ix, iy + getHeight()))
-						room[2] = 0;
-				} else room[2] = 0;
-				if (!room[2]) room[2] = world.map.roomAt(ix, iy + getHeight());
-
-				if (room[3]) {
-					if (!room[3]->containsPoint(ix + getWidth(), iy))
-						room[3] = 0;
-				} else room[3] = 0;
-				if (!room[3]) room[3] = world.map.roomAt(ix + getWidth(), iy);
-
-				bool cannotmove = false;
-				cannotmove = (!room[0]) || (!room[1]) || (!room[2]) || (!room[3]);
-			
-				if (cannotmove) {
-					if (movedy) {
-						iy -= dy;
-						collided = true; // .. but only if moved is true
-					}
-					if (movedx) {
-						ix -= dx;
-						collided = true; // .. again
-					}
-
-					if (!moved) { falling = false; break; }
-
-					/*
-					 * now we need to work out which direction of wall we collided against
-					 *
-					 * possibilities:
-					 *
-					 * we may have collided with the ceiling of the old room1/room4
-					 * the floor of the old room2/room3
-					 * the left wall of the old room1/room3
-					 * or the right wall of the old room2/room4
-					 *
-					 * todo: we can use dx/dy to work out whether there's any possibility of having collided with walls
-					 * (ie, if we're going in the opposite direction)
-					 */
-					for (unsigned int i = 0; i < 4; i++) {
-						for (unsigned int j = 0; j < 2; j++) {
-							Room *r = 0;
-							Line l;
-							switch (i) {
-								case 0:
-									if (j == 0) r = oroom[0]; else r = oroom[3];
-									l = r->top;
-									break;
-								case 1:
-									if (j == 0) r = oroom[1]; else r = oroom[2];
-									l = r->bot;
-									break;
-								case 2:
-									if (j == 0) r = oroom[0]; else r = oroom[2];
-									l = r->left;
-									break;
-								case 3:
-									if (j == 0) r = oroom[1]; else r = oroom[3];
-									l = r->right;
-									break;
-							}
-
-							bool foundpoint = false;
-							for (int k = 0; k < 4; k++) {
-								Point p;
-
-								switch (k) {
-									case 0: p = Point(ix, iy); break;
-									case 1: p = Point(ix + getWidth(), iy); break;
-									case 2: p = Point(ix, iy + getHeight()); break;
-									case 3: p = Point(ix + getWidth(), iy + getHeight()); break;
-								}
-
-								/* std::cout << "testing point (" << p.x << ", " << p.y << ") with line ";
-								std::cout << "(" << l.getStart().x << ", " << l.getStart().y << ") to ";
-								std::cout << "(" << l.getEnd().x << ", " << l.getEnd().y << ")" << std::endl; */
-								
-								if (l.containsPoint(p)) {
-									// std::cout << "found point!" << std::endl;
-									foundpoint = true;
-									break;
-								}
-							}
-					
-							if (foundpoint) {
-								switch (i) {
-									case 0: collidedirection = 2; break; // _UP_
-									case 1: collidedirection = 3; break; // DOWN
-									case 2: collidedirection = 0; break; // LEFT
-									case 3: collidedirection = 1; break; // RGHT
-								}
-								
-								i = 4; break; // break out of both loops
-							}
-						}
-					}
-
-					if (collidedirection == -1)
-						std::cout << "huh? " << identify() << " collided with a wall, but we can't work out which!" << std::endl;
-
-					collided = true;
+		// iterate through all four points of the bounding box
+		for (unsigned int i = 0; i < 4; i++) {
+			float srcx, srcy;
+			switch (i) {
+				case 0: // bottom (goes first because most common collision)
+					srcx = x + (getWidth() / 2);
+					srcy = y + getHeight();
 					break;
-				}
-				
-				moved = true;
+
+				case 1: // top
+					srcx = x + (getWidth() / 2);
+					srcy = y;
+					break;
+
+				case 2: // left
+					srcx = x;
+					srcy = y + (getHeight() / 2);
+					break;
+
+				case 3: // right
+					srcx = x + getWidth();
+					srcy = y + (getHeight() / 2);
+					break;
 			}
 			
-			if (sufferphysics) vely.setFloat(vely.getFloat() + accg);
-			
-			if (moved) { // if we did actually try and go somewhere
-				moveTo(ix, iy);
-				
-				if (collided) {
-					lastcollidedirection = collidedirection;
-					queueScript(6, 0, velx, vely); // TODO: include this?
+			Room *ourRoom = world.map.roomAt(srcx, srcy);
+			if (!ourRoom) {
+				if (!displaycore)
+					std::cout << "agent " << identify() << " is out of room system at (" << srcx << ", " << srcy << "), displaying core!" << std::endl;
+				displaycore = true;
+				return; // out of room system
+			}
+
+			Point src(srcx, srcy), dest(destx + (srcx - x), desty + (srcy - y));	
+			unsigned int local_collidedirection;
+			Line local_wall;
+		
+			// this changes src to the point at which we end up
+			bool local_collided = world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, local_wall, local_collidedirection, perm);
+
+			float dist;
+			if (src.x == srcx && src.y == srcy)
+				dist = 0.0f;
+			else {
+				float xdiff = src.x - srcx;
+				float ydiff = src.y - srcy;
+				dist = xdiff*xdiff + ydiff*ydiff;
+			}
+
+			if (dist >= lastdistance) {
+				assert(i != 0); // this had better not be our first collision!
+				continue; // further away than a previous collision
+			}
+
+			lastdistance = dist;
+			bestmove.x = x + (src.x - srcx);
+			bestmove.y = y + (src.y - srcy);
+			collidedirection = local_collidedirection;
+			wall = local_wall;
+			collided = local_collided;
+
+			if (dist == 0.0f)
+				break; // no point checking any more, is there?
+		}	
+
+		// *** do actual movement
+		if (lastdistance != 0.0f) {	
+			moveTo(bestmove.x, bestmove.y);
+		
+			if (collided) {
+				lastcollidedirection = collidedirection;
+				queueScript(6, 0, velx, vely); // TODO: include this? .. we need to include SOMETHING, c3 ball checks for <3
+
+				if (elas != 0) {
+					// TODO: take into account 'wall'
+					//velx.setFloat(-velx.getFloat() * (elas / 100.0f)); 
+					vely.setFloat(-vely.getFloat() * (elas / 100.0f)); 
+				} else				
 					vely.setFloat(0);
-				}
+			} else if (sufferphysics && accg != 0) {
+				falling = true; // TODO: icky
+				vely.setFloat(vely.getFloat() + accg);
 			}
-		}
+		} else { velx.setFloat(0); vely.setFloat(0); } // TODO: correct?
 	} else {
 		if (vely.hasDecimal() || velx.hasDecimal())
 			moveTo(destx, desty);

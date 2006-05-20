@@ -208,6 +208,10 @@ extern "C" int main(int argc, char *argv[]) {
 			lasttimestamp = world.backend.ticks();
 			
 			ticked = true;
+			
+			// TODO: correct behaviour? hrm :/
+			world.hand()->velx.setFloat(world.hand()->velx.getFloat() / 2.0f);
+			world.hand()->vely.setFloat(world.hand()->vely.getFloat() / 2.0f);
 		} else SDL_Delay(10);
 
 		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
@@ -261,6 +265,8 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_MOUSEMOTION:
 					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
+					world.hand()->velx.setInt(event.motion.xrel * 4);
+					world.hand()->vely.setInt(event.motion.yrel * 4);
 					if (event.motion.state & SDL_BUTTON(2)) // middle mouse button scrolling
 						world.camera.moveTo(world.camera.getX() - event.motion.xrel, world.camera.getY() - event.motion.yrel, jump);
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
@@ -326,6 +332,10 @@ extern "C" int main(int argc, char *argv[]) {
 						if (world.hand()->carrying) {
 							world.hand()->carrying->queueScript(5, world.hand()); // drop
 							world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
+
+							// TODO: do this in the pointer agent?
+							world.hand()->carrying->velx.setFloat(world.hand()->velx.getFloat());
+							world.hand()->carrying->vely.setFloat(world.hand()->vely.getFloat());
 						} else {
 							Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false, true);
 							if (a) {

@@ -30,6 +30,7 @@ public:
 	PointerAgent(std::string spritefile);
 	void finishInit();
 	void firePointerScript(unsigned short event, Agent *src);
+	void physicsTick();
 };
 
 #endif

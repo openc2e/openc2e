@@ -172,7 +172,7 @@ public:
 	unsigned int getHeight() { return part(0)->getHeight(); }
 	
 	virtual void tick();
-	void physicsTick();
+	virtual void physicsTick();
 	virtual void kill();
 	void stopScript();
 
