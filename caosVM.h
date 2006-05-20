@@ -787,7 +787,7 @@ public:
 
 typedef void (caosVM::*caosVMmethod)();
 
-class notEnoughParamsException : caosException {
+class notEnoughParamsException : public caosException {
 	public:
 		notEnoughParamsException() : caosException("Not enough parameters") {}
 };
