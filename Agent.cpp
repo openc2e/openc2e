@@ -555,7 +555,7 @@ void Agent::setAttributes(unsigned int attr) {
 	presence = (attr & 2048);
 }
 
-unsigned int Agent::getAttributes() {
+unsigned int Agent::getAttributes() const {
 	unsigned int a = (carryable ? 1 : 0);
 	a += (mouseable ? 2: 0);
 	a += (activateable ? 4: 0);

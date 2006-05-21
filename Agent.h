@@ -187,7 +187,7 @@ public:
 	std::string identify() const;
 
 	virtual void setAttributes(unsigned int attr);
-	virtual unsigned int getAttributes();
+	virtual unsigned int getAttributes() const;
 };
 
 class LifeAssert {
