@@ -25,6 +25,7 @@
 #include <utility>
 #include "physics.h"
 #include <iostream>
+#include <algorithm>
 
 using std::cerr;
 
@@ -66,13 +67,11 @@ public:
 			unsigned int y_r_b
 			) {
 
-#define SWAP(x,y) do { unsigned int t = (x); (x) = (y); (y) = (t); } while (0)
-		if (x_l > x_r) SWAP(x_l, x_r);
+		if (x_l > x_r) std::swap(x_l, x_r);
 		x_left = x_l;
 		x_right = x_r;
-		if (y_l_b < y_l_t) SWAP(y_l_b, y_l_t);
-		if (y_r_b < y_r_t) SWAP(y_r_b, y_r_t);
-#undef SWAP
+		if (y_l_b < y_l_t) std::swap(y_l_b, y_l_t);
+		if (y_r_b < y_r_t) std::swap(y_r_b, y_r_t);
 		y_left_ceiling = y_l_t;
 		y_right_ceiling = y_r_t;
 		y_left_floor = y_l_b;
