@@ -19,7 +19,6 @@
 
 #include "Agent.h"
 #include "World.h"
-#include "physics.h"
 #include <iostream>
 #include <sstream>
 #include "caosVM.h"
@@ -262,6 +261,37 @@ void Agent::positionAudio(SoundSlot *slot) {
 	slot->adjustPanning(angle, distance);
 }
 
+Point Agent::boundingBoxPoint(unsigned int n) {
+	Point p;
+	
+	switch (n) {
+		case 0: // left
+			p.x = x;
+			p.y = y + (getHeight() / 2);
+			break;
+
+		case 1: // right
+			p.x = x + getWidth();
+			p.y = y + (getHeight() / 2);
+			break;
+
+		case 2: // top
+			p.x = x + (getWidth() / 2);
+			p.y = y;
+			break;
+
+		case 3: // bottom
+			p.x = x + (getWidth() / 2);
+			p.y = y + getHeight();
+			break;
+
+		default:
+			throw creaturesException("Agent::boundingBoxPoint got unknown direction");
+	}
+
+	return p;
+}
+
 void Agent::physicsTick() {
 	falling = false;
 
@@ -286,28 +316,11 @@ void Agent::physicsTick() {
 
 		// iterate through all four points of the bounding box
 		for (unsigned int i = 0; i < 4; i++) {
-			float srcx, srcy;
-			switch (i) {
-				case 0: // bottom (goes first because most common collision)
-					srcx = x + (getWidth() / 2);
-					srcy = y + getHeight();
-					break;
+			// this mess is because we want to start with the bottom point - DOWN (3) - before the others, for efficiency
+			Point src = boundingBoxPoint((i == 0) ? 3 : i - 1);
 
-				case 1: // top
-					srcx = x + (getWidth() / 2);
-					srcy = y;
-					break;
-
-				case 2: // left
-					srcx = x;
-					srcy = y + (getHeight() / 2);
-					break;
-
-				case 3: // right
-					srcx = x + getWidth();
-					srcy = y + (getHeight() / 2);
-					break;
-			}
+			// store values
+			float srcx = src.x, srcy = src.y;
 			
 			Room *ourRoom = world.map.roomAt(srcx, srcy);
 			if (!ourRoom) {
@@ -316,8 +329,8 @@ void Agent::physicsTick() {
 				displaycore = true;
 				return; // out of room system
 			}
-
-			Point src(srcx, srcy), dest(destx + (srcx - x), desty + (srcy - y));	
+			
+			Point dest(destx + (srcx - x), desty + (srcy - y));
 			unsigned int local_collidedirection;
 			Line local_wall;
 		

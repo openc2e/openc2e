@@ -29,6 +29,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "openc2e.h"
+#include "physics.h"
 
 class script;
 using boost::shared_ptr;
@@ -170,6 +171,7 @@ public:
 	
 	unsigned int getWidth() { return part(0)->getWidth(); }
 	unsigned int getHeight() { return part(0)->getHeight(); }
+	Point boundingBoxPoint(unsigned int n);
 	
 	virtual void tick();
 	virtual void physicsTick();
