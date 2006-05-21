@@ -22,8 +22,10 @@ SERIALIZE(Agent) {
     ar & obj.vmStack;
     ar & obj.floated;
 
+
     // XXX: sound?
     
+    ar & obj.carry_points & obj.carried_points;
     ar & obj.carrying & obj.carriedby;
 
     // attr
