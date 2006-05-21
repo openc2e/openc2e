@@ -297,6 +297,8 @@ void Agent::physicsTick() {
 
 	if (carriedby) return; // We don't move when carried, so what's the point?
 
+	if (x == 0 && y == 0) return; // TODO: is this correct behaviour? :P
+
 	// set destination point based on velocities
 	float destx = x + velx.getFloat();
 	float desty = y + vely.getFloat();
