@@ -92,12 +92,14 @@ Room *Map::roomAt(float _x, float _y) {
 bool Map::collideLineWithRoomSystem(Point src, Point dest, Room *&room, Point &where, Line &wall, unsigned int &walldir, int perm) {
 	Room *newRoom = 0;
 
+	where = src;
+	
 	while (true) {
-		if (!collideLineWithRoomBoundaries(src, dest, room, newRoom, where, wall, walldir, perm))
+		if (!collideLineWithRoomBoundaries(where, dest, room, newRoom, where, wall, walldir, perm))
 			return false; // failure
 		if (!newRoom)
 			return true; // collision
-		if (src == dest)
+		if (where == dest)
 			return false; // got there
 		
 		assert(newRoom != room); // tsk

@@ -116,67 +116,43 @@ void caosVM::v_OBST() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(direction) caos_assert(direction >= 0); caos_assert(direction <= 3);
 
-	// TODO: fix 'might collide with' issue
-	// note: this code is mostly copied from GRID - fuzzie
-
-	// TODO: this code should calculate distance *from agent*, not *from centre point*, i expect
-	// someone check with DS? - fuzzie
-
+	/*
+	 * TODO: CL's docs say to return "a very large number" if distance is greater than rnge - if (!collided)?
+	 * also, this code is untested :) - fuzzie
+	 */
+	
 	caos_assert(targ);
+	
+	Point src = targ->boundingBoxPoint(direction);
+	Point dest = src;
 
-	float agentx = targ->x + (targ->getWidth() / 2);
-	float agenty = targ->y + (targ->getHeight() / 2);
-/*	Room *sourceroom = world.map.roomAt(agentx, agenty);
-	if (!sourceroom) {
-		// (should we REALLY check for it being in the room system, here?)
-		//cerr << targ->identify() << " tried using OBST but isn't in the room system!\n";
-		result.setInt(-1);
+	switch (direction) {
+		case 0: // left
+			dest.x -= targ->range; break;
+		case 1: // right
+			dest.x += targ->range; break;
+		case 2: // top
+			dest.y -= targ->range; break;
+		case 3: // bottom
+			dest.y += targ->range; break;
+	}
+
+	Room *ourRoom = world.map.roomAt(src.x, src.y);
+	if (!ourRoom) {
+		// TODO: is this correct behaviour?
+		result.setFloat(0.0f);
 		return;
-	}*/
+	}
 
-	int distance = 0;
-	
-	if ((direction == 0) || (direction == 1)) {
-		int movement = (direction == 0 ? -1 : 1);
-		if (direction == 0) agentx = targ->x;
-		else agentx = targ->x + targ->getWidth();
+	unsigned int dummy1; Line dummy2; Point point;
+	bool collided = world.map.collideLineWithRoomSystem(src, dest, ourRoom, point, dummy2, dummy1, targ->perm);
 
-		int x = agentx;
-		Room *r = 0;
-		while (true) {
-			if (r) {
-				if (!r->containsPoint(x, agenty))
-					r = world.map.roomAt(x, agenty);
-			} else {
-				r = world.map.roomAt(x, agenty);
-			}
-			if (!r)
-				break;
-			x += movement;
-			distance++;
-		}
-	} else if ((direction == 2) || (direction == 3)) {
-		int movement = (direction == 2 ? -1 : 1);
-		if (direction == 2) agenty = targ->y;
-		else agenty = targ->y + targ->getHeight();
-	
-		int y = agenty;
-		Room *r = 0;
-		while (true) {
-			if (r) {
-				if (!r->containsPoint(agentx, y))
-					r = world.map.roomAt(agentx, y);
-			} else {
-				r = world.map.roomAt(agentx, y);
-			}
-			if (!r)
-				break;
-			y += movement;
-			distance++;
-		}
-	} else cerr << "OBST got an unknown direction!\n";
-
-	result.setInt(distance);
+	switch (direction) {
+		case 0: result.setFloat(src.x - point.x); break;
+		case 1: result.setFloat(point.x - src.x); break;
+		case 2: result.setFloat(src.y - point.y); break;
+		case 3: result.setFloat(point.y - src.y); break;
+	}
 }
 
 /**

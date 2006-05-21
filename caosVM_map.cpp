@@ -344,7 +344,7 @@ void caosVM::c_PROP() {
  PROP (float) roomid (integer) caindex (integer)
  %status maybe
 
- Returns the level of the given CA in the given room.
+ Returns the level of the given CA in the given room, or 0 if a roomid of -1 is passed.
 */
 void caosVM::v_PROP() {
 	VM_VERIFY_SIZE(2)
@@ -353,9 +353,14 @@ void caosVM::v_PROP() {
 	
 	caos_assert(0 <= caindex && caindex <= 19);
 
+	if (roomid == -1) {
+		result.setFloat(0.0f);
+		return;
+	}
+	
 	Room *room = world.map.getRoom(roomid);
 	caos_assert(room);
-	result.setFloat(room->ca[caindex]);
+		result.setFloat(room->ca[caindex]);
 }
 
 /**
@@ -453,50 +458,37 @@ void caosVM::c_LINK() {
 */
 void caosVM::v_GRID() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(direction) caos_assert(direction >= 0); caos_assert(direction <= 3);
 	VM_PARAM_VALIDAGENT(agent)
 
-	float agentx = agent->x + (agent->getWidth() / 2);
-	float agenty = agent->y + (agent->getHeight() / 2);
-	Room *sourceroom = world.map.roomAt(agentx, agenty);
-	if (!sourceroom) {
+	caos_assert(targ);
+	Point src = targ->boundingBoxPoint(direction);
+	Point dest = src;
+	
+	switch (direction) {
+		case 0: // left
+			dest.x -= targ->range; break;
+		case 1: // right
+			dest.x += targ->range; break;
+		case 2: // top 
+			dest.y -= targ->range; break;
+		case 3: // bottom 
+			dest.y += targ->range; break;
+	}
+	
+	Room *ourRoom = world.map.roomAt(src.x, src.y);
+	if (!ourRoom) {
 		// (should we REALLY check for it being in the room system, here?)
 		cerr << agent->identify() << " tried using GRID but isn't in the room system!\n";
 		result.setInt(-1);
 		return;
 	}
-	Room *foundroom = 0;
 
-	if ((direction == 0) || (direction == 1)) {
-		int movement = (direction == 0 ? -1 : 1);
+	unsigned int dummy1; Line dummy2; Point point; Room *room;
+	bool collided = world.map.collideLineWithRoomBoundaries(src, dest, ourRoom, room, point, dummy2, dummy1, targ->perm);
 
-		int x = agentx;
-		while (true) {
-			x += movement;
-			Room *r = world.map.roomAt(x, agenty);
-			if (r != sourceroom) {
-				foundroom = r;
-				break;
-			}
-		}
-	} else if ((direction == 2) || (direction == 3)) {
-		int movement = (direction == 2 ? -1 : 1);
-	
-		int y = agenty;
-		while (true) {
-			y += movement;
-			Room *r = world.map.roomAt(agentx, y);
-			if (r != sourceroom) {
-				foundroom = r;
-				break;
-			}
-		}
-	} else cerr << "GRID got an unknown direction!\n";
-
-	if (foundroom)
-		result.setInt(foundroom->id);
-	else
-		result.setInt(-1);
+	if (!room) result.setInt(-1);
+	else result.setInt(room->id);
 }
 
 /**
