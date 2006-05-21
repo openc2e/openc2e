@@ -159,14 +159,14 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 			// work out which room is next along our movement vector
 			// TODO: this code utterly sucks, doesn't work properly
 			float newx, newy;
-			if (temppoint == src) { // TODO: this is not an accurate check!! likely cause of falling through PERM
+			/*if (temppoint == src) { // TODO: this is not an accurate check!! likely cause of falling through PERM
 				// we might be on a PERM line! check backwards.
 				newx = temppoint.x + (src.x <= dest.x ? (src.x == dest.x ? 0.0 : -0.5) : 0.5);
 				newy = temppoint.y + (src.y <= dest.y ? (src.y == dest.y ? 0.0 : -0.5) : 0.5);
-			} else {
+			} else {*/
 				newx = temppoint.x + (src.x <= dest.x ? (src.x == dest.x ? 0.0 : 0.5) : -0.5);
 				newy = temppoint.y + (src.y <= dest.y ? (src.y == dest.y ? 0.0 : 0.5) : -0.5);
-			}
+			//}
 
 			if (room->containsPoint(newx, newy)) { // if a little along our movement vector is still in our room, forget it
 				/*std::cout << "physics debug: next room is original room at (" << temppoint.x << ", " << temppoint.y << ")" << std::endl;
@@ -194,13 +194,13 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 				}
 			}
 
-			if (temppoint == src) { // if we're just doing the backwards PERM check
+			/*if (temppoint == src) { // if we're just doing the backwards PERM check
 				if (!foundroom || nextroom != 0) {
 					// either there's no previous room or PERM let us into the previous room..
 					// ..so forget this collision
 					break;
 				}
-			}
+			}*/
 		
 			Room *z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
 			if (!z) {
