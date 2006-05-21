@@ -3,8 +3,8 @@
 
 #include "ser/s_caosScript.h"
 #include "ser/s_AgentRef.h"
-#include <serialization.h>
-#include <caosScript.h>
+#include "serialization.h"
+#include "caosScript.h"
 
 
 WRAP_SERIALIZE(vmStackItem);

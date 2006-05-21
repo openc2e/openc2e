@@ -3,8 +3,8 @@
 
 #include "ser/s_AgentRef.h"
 #include "ser/s_caosVar.h"
-#include <serialization.h>
-#include <Agent.h>
+#include "serialization.h"
+#include "Agent.h"
 
 SERIALIZE(Agent) {
     assert(!obj.dying);

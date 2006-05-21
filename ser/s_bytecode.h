@@ -1,10 +1,10 @@
 #ifndef SER_BYTECODE_H
 #define SER_BYTECODE_H 1
 
-#include <bytecode.h>
+#include "bytecode.h"
 #include "ser/s_caosVar.h"
-#include <serialization.h>
-#include <dialect.h>
+#include "serialization.h"
+#include "dialect.h"
 
 SERIALIZE(caosOp) {
     ar & obj.index;

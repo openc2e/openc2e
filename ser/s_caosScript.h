@@ -1,9 +1,9 @@
 #ifndef SER_CAOSSCRIPT_H
 #define SER_CAOSSCRIPT_H 1
 
-#include <serialization.h>
+#include "serialization.h"
 #include "ser/s_caosVar.h"
-#include <caosScript.h>
+#include "caosScript.h"
 #include "ser/s_bytecode.h"
 
 typedef Variant *v_type;
