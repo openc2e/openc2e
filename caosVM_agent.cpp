@@ -31,9 +31,8 @@ using std::cerr;
 SpritePart *caosVM::getCurrentSpritePart() {
 	caos_assert(targ);
 	CompoundPart *p = targ->part(part);
-	caos_assert(p);
+	if (!p) return 0;
 	SpritePart *s = dynamic_cast<SpritePart *>(p);
-	caos_assert(s);
 	return s;
 }
 
@@ -261,6 +260,7 @@ void caosVM::c_POSE() {
 	if (s) return; // TODO
 
 	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 	caos_assert(p->getFirstImg() + p->getBase() + pose < p->getSprite()->numframes());
 	p->setPose(pose);
 }
@@ -360,8 +360,7 @@ void caosVM::v_FROM() {
  POSE (integer)
  %status maybe
 
- Returns the number of the frame in the agent's sprite file that is currently being 
- displayed.
+ Returns the number of the frame in the TARG part/agent's sprite file that is currently being displayed, or -1 if part# doesn't exist on a compound agent.
 */
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
@@ -369,7 +368,10 @@ void caosVM::v_POSE() {
 	caos_assert(targ);
 
 	SpritePart *p = getCurrentSpritePart();
-	result.setInt(p->getPose());
+	if (p)
+		result.setInt(p->getPose());
+	else
+		result.setInt(-1);
 }
 
 /**
@@ -404,6 +406,7 @@ void caosVM::c_ANIM() {
 	caos_assert(targ);
 
 	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 	p->animation = bs;
 	
 	if (!bs.empty()) p->setFrameNo(0); // TODO: correct?
@@ -434,6 +437,7 @@ void caosVM::c_ANMS() {
 	}
 
 	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 	p->animation = animation;
 	
 	if (!animation.empty()) p->setFrameNo(0); // TODO: correct?
@@ -443,13 +447,16 @@ void caosVM::c_ANMS() {
  ABBA (integer)
  %status maybe
 
- Returns the first_image (ie, absolute base) value for the current agent/part.
+ Returns the first_image (ie, absolute base) value for the current agent/part, or -1 if part# doesn't exist on a compound agent.
 */
 void caosVM::v_ABBA() {
 	VM_VERIFY_SIZE(0)
 	
 	SpritePart *p = getCurrentSpritePart();
-	result.setInt(p->getFirstImg());
+	if (p)
+		result.setInt(p->getFirstImg());
+	else
+		result.setInt(-1);
 }
 
 /**
@@ -466,6 +473,7 @@ void caosVM::c_BASE() {
 	caos_assert(targ);
 
 	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 	p->setBase(index);
 }
 
@@ -473,13 +481,16 @@ void caosVM::c_BASE() {
  BASE (integer)
  %status maybe
 
- Returns the frame in the TARG agent's spritefile being used as the BASE image. 
+ Returns the frame in the TARG agent/part's spritefile being used as the BASE image, or -1 if part# doesn't exist on a compound agent.
 */
 void caosVM::v_BASE() {
 	VM_VERIFY_SIZE(0)
-			
+		
 	SpritePart *p = getCurrentSpritePart();
-	result.setInt(p->getBase());
+	if (p)
+		result.setInt(p->getBase());
+	else
+		result.setInt(-1);
 }
 
 /**
@@ -705,6 +716,7 @@ void caosVM::c_FRAT() {
 	caos_assert(targ);
 
 	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 	p->setFramerate(framerate);
 	p->framedelay = 0;
 }
@@ -901,6 +913,7 @@ void caosVM::c_TINT() {
 	caos_assert(rotation >= 0 && rotation <= 256);
 
 	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 	p->tint(red_tint, green_tint, blue_tint, rotation, swap);
 }
 
@@ -1181,6 +1194,7 @@ void caosVM::c_GALL() {
 	VM_PARAM_STRING(spritefile)
 
 	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 	p->changeSprite(spritefile, first_image);
 }
 
@@ -1188,11 +1202,14 @@ void caosVM::c_GALL() {
  GALL (string)
  %status maybe
 
- Returns the name of the sprite file associated with the TARG agent or current PART.
+ Returns the name of the sprite file associated with the TARG agent or current PART, or a blank string if part# is invalid on a compound agent.
 */
 void caosVM::v_GALL() {
 	SpritePart *p = getCurrentSpritePart();
-	result.setString(p->getSprite()->name);
+	if (p)
+		result.setString(p->getSprite()->name);
+	else
+		result.setString("");
 }
 
 /**
