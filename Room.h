@@ -29,6 +29,8 @@
 
 using std::cerr;
 
+#define CA_COUNT 20
+
 struct RoomDoor {
 	class Room *first, *second;
 	unsigned short perm;
@@ -49,7 +51,7 @@ public:
 	unsigned int id;
 	class MetaRoom *metaroom;
 
-	float ca[20];
+	float ca[CA_COUNT];
 
 	bool containsPoint(float x, float y) {	
 		if (x > (float)x_right || x < (float)x_left) { return false; }
@@ -86,6 +88,9 @@ public:
 		right = Line(ur, br);
 		top = Line(ul, ur);
 		bot = Line(bl, br);
+
+		for (int i = 0; i < CA_COUNT; i++)
+			ca[i] = 0;
 	}
 
 	Room();

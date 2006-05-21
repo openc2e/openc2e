@@ -23,6 +23,7 @@
 #include <iostream> // XXX debug
 #include <cmath>   // sqrt
 #include <algorithm> // swap
+#include "openc2e.h" // FRIEND_SERIALIZE
 
 struct Point {
 	float x, y;
@@ -43,6 +44,7 @@ enum linetype { NORMAL, HORIZONTAL, VERTICAL };
 
 class Line {
 	protected:
+		FRIEND_SERIALIZE(Line);
 		Point start, end;
 		double x_icept, y_icept, slope;
 		linetype type;
@@ -143,6 +145,10 @@ class Line {
 class Vector {
 	public:
 		double x, y;
+		Vector() {
+			x = y = 0;
+		}
+
 		Vector(double _x, double _y) {
 			x = _x;
 			y = _y;

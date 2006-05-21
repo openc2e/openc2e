@@ -80,7 +80,10 @@ OPENC2E_CORE = \
 	Vehicle.o \
 	World.o
 
-OPENC2E = $(OPENC2E_CORE) main.o
+SERIALIZATION = caosVM_ser_real.o
+SERSTUB = caosVM_ser_stub.o
+OPENC2E = $(OPENC2E_CORE) $(SERSTUB) main.o
+OPENC2E_S = $(OPENC2E_CORE) $(SERIALIZATION) main.o
 
 DEBUGFLAGS=-ggdb3 -O0
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE
@@ -141,6 +144,9 @@ lex.mng.o: mngparser.tab.hpp
 openc2e: $(OPENC2E)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
+openc2e_s: $(OPENC2E_S)
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
+
 tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o catalogue.lex.o catalogue.tab.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
@@ -156,7 +162,7 @@ tools/pathtest: tools/pathtest.o PathResolver.o
 tools/memstats: tools/memstats.o $(OPENC2E_CORE)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/serialtest: tools/serialtest.o $(OPENC2E_CORE)
+tools/serialtest: tools/serialtest.o $(OPENC2E_CORE) $(SERIALIZATION)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 clean:

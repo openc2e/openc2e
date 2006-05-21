@@ -22,6 +22,7 @@
 
 #include "Room.h"
 #include "blkImage.h"
+#include "openc2e.h"
 #include <string>
 #include <vector>
 
@@ -29,9 +30,12 @@ struct SDL_Surface;
 
 class MetaRoom {
 protected:
+	FRIEND_SERIALIZE(MetaRoom);
 	unsigned int xloc, yloc, wid, hei;
 	blkImage *background;
 	
+	MetaRoom() { backsurfs = NULL; }
+	void setup(int _x, int _y, int width, int height, const std::string &back);
 public:
 	SDL_Surface **backsurfs; // TODO: hack
 
@@ -47,7 +51,7 @@ public:
 
 	unsigned int id;
 
-	MetaRoom(int _x, int _y, int width, int height, std::string back);
+	MetaRoom(int _x, int _y, int width, int height, const std::string &back);
 	~MetaRoom();
 };
 

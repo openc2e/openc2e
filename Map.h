@@ -21,10 +21,12 @@
 #define _OPENC2E_MAP_H
 
 #include "MetaRoom.h"
+#include "openc2e.h"
 #include <vector>
 
 class Map {
 protected:
+	FRIEND_SERIALIZE(Map);
 	unsigned int width, height;
 	std::vector<MetaRoom *> metarooms;
 	std::vector<Room *> rooms;

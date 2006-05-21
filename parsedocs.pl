@@ -51,6 +51,7 @@ while (<>) {
 	}
 	$_ = <>;
 	defined $_ or exit;
+	$_ =~ s/^\s* \** \s*//x; # accept leading * etc
 	next unless m{
 		^\s*
 		# DBG: and the like
@@ -103,7 +104,7 @@ while (<>) {
 	my @lines;
 	DOCLINE: while (<>) {
 		last DOCLINE if m{\*/};
-		$_ =~ m{^\s*(.*?)\s*$};
+		$_ =~ m{^\s* (?: \* \s* )* (.*?) \s*$}x;
 		push @lines, $1;
 	}
 	shift @lines while (@lines && $lines[0] eq '');

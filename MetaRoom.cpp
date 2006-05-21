@@ -23,7 +23,7 @@
 #include <assert.h>
 #include "SDLBackend.h"
 
-MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
+void MetaRoom::setup(int _x, int _y, int _width, int _height, const std::string &back) {
 	xloc = _x; yloc = _y; wid = _width; hei = _height;
 	if (back.empty()) {
 		background = 0;
@@ -49,6 +49,9 @@ MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, std::string back) {
 			assert(backsurfs[i]);
 		}
 	}
+}
+MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back) {
+	setup(_x, _y, _width, _height, back);
 }
 
 MetaRoom::~MetaRoom() {

@@ -771,6 +771,10 @@ public:
 	void v_HIST_WVET();
 	void v_OOWW();
 
+	// serialization test functions
+	void c_SERS_MAPP();
+	void c_SERL_MAPP();
+
 	void runOp();
 	void runEntirely(shared_ptr<script> s);
 
