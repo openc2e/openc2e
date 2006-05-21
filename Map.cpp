@@ -201,7 +201,18 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 					break;
 				}
 			}
-			
+		
+			Room *z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
+			if (!z) {
+				// TODO: commented out this error message for sake of fuzzie's sanity, but it's still an issue
+				/*std::cout << "physics bug: fell out of room system at (" << where.x << ", " << where.y << ")" << std::endl;
+				std::cout << "room line: (" << x[i].getStart().x << ", " << x[i].getStart().y << ") to ";
+				std::cout << "(" << x[i].getEnd().x << ", " << x[i].getEnd().y << ")" << std::endl;
+				std::cout << "movement line: (" << movement.getStart().x << ", " << movement.getStart().y << ") to ";
+				std::cout << "(" << movement.getEnd().x << ", " << movement.getEnd().y << ")" << std::endl;*/
+				return false; // go away
+			}
+
 			// it is nearer and not the same room, so make it our priority
 			distance = d;
 			foundsomething = true;
@@ -209,16 +220,6 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 			wall = x[i];
 			walldir = i;
 			newroom = nextroom;
-
-			Room *z = roomAt(where.x, where.y); // TODO: evil performance-killing debug check
-			if (!z) {
-				std::cout << "physics bug: fell out of room system at (" << where.x << ", " << where.y << ")" << std::endl;
-				std::cout << "room line: (" << x[i].getStart().x << ", " << x[i].getStart().y << ") to ";
-				std::cout << "(" << x[i].getEnd().x << ", " << x[i].getEnd().y << ")" << std::endl;
-				std::cout << "movement line: (" << movement.getStart().x << ", " << movement.getStart().y << ") to ";
-				std::cout << "(" << movement.getEnd().x << ", " << movement.getEnd().y << ")" << std::endl;
-				return false; // go away
-			}
 		}
 	}
 
