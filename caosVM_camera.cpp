@@ -282,7 +282,7 @@ void caosVM::c_TRCK() {
 	VM_PARAM_INTEGER(style)
 	VM_PARAM_INTEGER(ypercent)
 	VM_PARAM_INTEGER(xpercent)
-	VM_PARAM_VALIDAGENT(agent)
+	VM_PARAM_AGENT(agent)
 
 	getCamera()->trackAgent(agent, xpercent, ypercent, (trackstyle)style, (cameratransition)transition);
 }
