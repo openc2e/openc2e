@@ -54,7 +54,7 @@ public:
   vector<gene *> genes;
 
   void readNotes(istream &);
-  void writeNotes(ostream &);
+  void writeNotes(ostream &) const;
 
   gene *getGene(uint8 type, uint8 subtype, unsigned int seq);
 };

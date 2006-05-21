@@ -91,7 +91,7 @@ void genomeFile::readNotes(istream &s) {
 	}
 }
 
-void genomeFile::writeNotes(ostream &s) {
+void genomeFile::writeNotes(ostream &s) const {
 	// TODO
 }
 
