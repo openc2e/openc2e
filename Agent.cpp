@@ -253,7 +253,7 @@ void Agent::positionAudio(SoundSlot *slot) {
 		if (yoffset > 0) angle = 90;
 		else angle = 270;
 	} else {
-		angle = (atanf(abs(yoffset) / abs(xoffset)) / (2*M_PI)) * 360;
+		angle = (atanf(fabs(yoffset) / fabs(xoffset)) / (2*M_PI)) * 360;
 		if (xoffset < 0) angle += 180;
 		if (yoffset < 0) angle += 90;
 	}
