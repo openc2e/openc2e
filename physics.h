@@ -24,16 +24,6 @@
 #include <cmath>   // sqrt
 #include <algorithm> // swap
 
-class physicsHandler {
-private:
-	float finalx, finaly;
-	
-public:
-	bool collidePoints(float, float, float, float, float, float, float, float);
-	float getCollisionX() { return finalx; }
-	float getCollisionY() { return finaly; }
-};
-
 struct Point {
 	float x, y;
 	Point() { x = y = 0; }
