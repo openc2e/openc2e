@@ -43,8 +43,6 @@ public:
 	unsigned int x_left, x_right, y_left_ceiling, y_right_ceiling;
 	unsigned int y_left_floor, y_right_floor;
 
-	Point ul, ur, bl, br;
-	
 	Line left, right, top, bot;
 	
 	unsigned int type;
@@ -59,41 +57,11 @@ public:
 		if (top.pointAtX(x).y > y) { return false; }
 		return true;
 	}
+
+	bool containsPoint(Point p) { return containsPoint(p.x, p.y); }
 	
-	Room(
-			unsigned int x_l, 
-			unsigned int x_r,
-			unsigned int y_l_t,
-			unsigned int y_r_t,
-			unsigned int y_l_b,
-			unsigned int y_r_b
-			) {
-
-		if (x_l > x_r) std::swap(x_l, x_r);
-		x_left = x_l;
-		x_right = x_r;
-		if (y_l_b < y_l_t) std::swap(y_l_b, y_l_t);
-		if (y_r_b < y_r_t) std::swap(y_r_b, y_r_t);
-		y_left_ceiling = y_l_t;
-		y_right_ceiling = y_r_t;
-		y_left_floor = y_l_b;
-		y_right_floor = y_r_b;
-
-		ul = Point(x_l, y_l_t);
-		ur = Point(x_r, y_r_t);
-		bl = Point(x_l, y_l_b);
-		br = Point(x_r, y_r_b);
-
-		left = Line(ul, bl);
-		right = Line(ur, br);
-		top = Line(ul, ur);
-		bot = Line(bl, br);
-
-		for (int i = 0; i < CA_COUNT; i++)
-			ca[i] = 0;
-	}
-
 	Room();
+	Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int y_r_t, unsigned int y_l_b, unsigned int y_r_b);
 	void tick();
 };
 

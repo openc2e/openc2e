@@ -19,4 +19,15 @@
 
 #include "Vehicle.h"
 
+Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
+		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
+	capacity = 0;
+
+	cabinleft = x;
+	cabinright = x + getWidth();
+	cabintop = y;
+	cabinbottom = y + getHeight();
+}
+
 /* vim: set noet: */
