@@ -51,6 +51,7 @@ public:
 	void addRef() { refcount++; }
 	void delRef() { refcount--; }
 	unsigned int refCount() { return refcount; }
+	virtual std::string serializedName() { return name; }
 	
 	friend class fileSwapper;
 	friend class c16Image; // so duplicateTo can create a s16Image as required

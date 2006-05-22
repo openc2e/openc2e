@@ -35,6 +35,7 @@ public:
 	~blkImage();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &s);
+	virtual std::string serializedName() { return name + ".blk"; }
 
 	friend class fileSwapper;
 };
