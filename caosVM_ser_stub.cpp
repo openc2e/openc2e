@@ -28,7 +28,6 @@
 
 void caosVM::c_SERS_MAPP() {
     VM_PARAM_STRING(filename)
-    // Stubbed!
     STUB;
 }
 
@@ -42,6 +41,27 @@ void caosVM::c_SERS_MAPP() {
  */
 void caosVM::c_SERL_MAPP() {
     VM_PARAM_STRING(filename)
-    // Stubbed!
+    STUB;
+}
+
+/**
+ * SERS SCRP (command) filename (string)
+ * %status maybe
+ *
+ * Saves the scriptorium to the specified file
+ */
+void caosVM::c_SERS_SCRP() {
+    VM_PARAM_STRING(filename)
+    STUB;
+}
+
+/**
+ * SERL SCRP (command) filename (string)
+ * %status maybe
+ *
+ * Loads the scriptorium from the specified file
+ */
+void caosVM::c_SERL_SCRP() {
+    VM_PARAM_STRING(filename)
     STUB;
 }

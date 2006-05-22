@@ -65,6 +65,14 @@ SERIALIZE(caosSTOP) {
     SER_BASE(ar, caosOp);
 }
 
+SERIALIZE(caosAssert) {
+    SER_BASE(ar, caosOp);
+}
+
+SERIALIZE(caosFACE) {
+    SER_BASE(ar, caosOp);
+}
+
 SERIALIZE(opBytestr) {
     SER_BASE(ar, caosOp);
     ar & obj.bytestr;

@@ -47,7 +47,7 @@ class caosOp {
 		virtual void relocate(const std::vector<int> &relocations) {}
 		caosOp() : evalcost(1), owned(false), yyline(lex_lineno) {}
 		virtual ~caosOp() {};
-		virtual std::string dump() { return "UNKNOWN"; }
+		virtual std::string dump() = 0;
 		int getlineno() const { return yyline; }
 		int getIndex()  const { return index;  }
 	protected:
@@ -327,6 +327,7 @@ class caosFACE : public caosOp {
 				default:        vm->v_FACE(); break;
 			}
 		}
+		virtual std::string dump() { return std::string("FACE"); }
 };
 
 class opBytestr : public caosOp {

@@ -33,6 +33,9 @@ class caosAbort : public caosOp {
 			cerr << "Bad! Some opcode forgot to set its successor" << endl;
 			caos_assert(false);
 		}
+		virtual std::string dump() {
+			return std::string("INTERNAL ERROR (you should never see this)");
+		}
 } abortop;
 
 caosVM::caosVM(const AgentRef &o)

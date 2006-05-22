@@ -775,6 +775,8 @@ public:
 	// serialization test functions
 	void c_SERS_MAPP();
 	void c_SERL_MAPP();
+	void c_SERS_SCRP();
+	void c_SERL_SCRP();
 
 	void runOp();
 	void runEntirely(shared_ptr<script> s);
