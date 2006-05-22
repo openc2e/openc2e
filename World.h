@@ -44,6 +44,8 @@ struct scriptevent {
 	caosVar p[2];
 };
 
+class SDLBackend;
+
 class World {
 protected:
 	class PointerAgent *theHand;
@@ -76,7 +78,7 @@ public:
 	unsigned int race;
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
-	SDLBackend backend;
+	SDLBackend *backend;
 	bool showrooms;
 
 	AgentRef selectedcreature;

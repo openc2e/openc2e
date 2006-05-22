@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include "SDLBackend.h"
 #include <time.h> // gmtime and strftime
 
 /**
@@ -146,7 +147,7 @@ void caosVM::v_HIST_YEAR() {
  %status maybe
 */
 void caosVM::v_MSEC() {
-	result.setInt(world.backend.ticks());
+	result.setInt(world.backend->ticks());
 }
 
 /**

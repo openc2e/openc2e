@@ -72,7 +72,7 @@ void SDLBackend::init(bool enable_sound) {
 
 	resizeNotify(800, 600);
 	
-	SDL_WM_SetCaption("openc2e (development build " __DATE__ ")", "openc2e");
+	SDL_WM_SetCaption("openc2e (development build)", "openc2e");
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);
 }
@@ -124,11 +124,10 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int 
 		rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
 	}
 	SDL_Surface *surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
-												 image->width(frame),
-												 image->height(frame),
-												 16, // depth
-												 image->width(frame) * 2, // pitch
-												 rmask, gmask, bmask, 0); // RGBA mask
+							image->width(frame), image->height(frame),
+							16, // depth
+							image->width(frame) * 2, // pitch
+							rmask, gmask, bmask, 0); // RGBA mask
 	// TODO: presumably there's a nicer way of doing this than dynamic_cast :P
 	if (!dynamic_cast<blkImage *>(image)) SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
 	if (trans) SDL_SetAlpha(surf, SDL_SRCALPHA, 255 - transparency);
@@ -136,6 +135,10 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int 
 	destrect.x = x; destrect.y = y;
 	SDL_BlitSurface(surf, 0, screen, &destrect);
 	SDL_FreeSurface(surf);
+}
+
+void SDLBackend::renderDone() {
+	SDL_Flip(screen);
 }
 
 // left out: menu, select, execute, snapshot, numeric keypad, f keys
@@ -183,7 +186,7 @@ bool SDLBackend::keyDown(int key) {
 }
 
 int SDLBackend::translateKey(int key) {
-	if (key >= 97 && key <= 122) { // letters
+	if (key >= 97 && key <= 122) { // lowercase letters
 		return key - 32; // capitalise
 	}
 	if (key >= 48 && key <= 57) { // numbers

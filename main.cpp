@@ -125,9 +125,10 @@ extern "C" int main(int argc, char *argv[]) {
 	std::cout << "Reading PRAY files..." << std::endl;
 	world.praymanager.update();
 	std::cout << "Initialising backend..." << std::endl;
+	world.backend = new SDLBackend();
 	// moved backend.init() here because we need the camera to be valid - fuzzie
-	world.backend.init(enable_sound);
-	world.camera.setBackend(&world.backend); // TODO: hrr
+	world.backend->init(enable_sound);
+	world.camera.setBackend(world.backend); // TODO: hrr
 
 	if (world.data_directories.size() < 3) {
 		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
@@ -187,25 +188,25 @@ extern "C" int main(int argc, char *argv[]) {
 	unsigned int tickdata = 0;
 	unsigned int ticktime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	unsigned int ticktimeptr = 0;
-	unsigned int lasttimestamp = world.backend.ticks();
+	unsigned int lasttimestamp = world.backend->ticks();
 	while (!done) {
 		bool ticked = false;
 		
-		if (!world.paused && (world.backend.ticks() > (tickdata + world.ticktime))) {
-			tickdata = world.backend.ticks();
+		if (!world.paused && (world.backend->ticks() > (tickdata + world.ticktime))) {
+			tickdata = world.backend->ticks();
 			
 			world.tick();
 			world.drawWorld();
 			
-			ticktime[ticktimeptr] = world.backend.ticks() - tickdata;
+			ticktime[ticktimeptr] = world.backend->ticks() - tickdata;
 			ticktimeptr++;
 			if (ticktimeptr == 10) ticktimeptr = 0;
 			float avgtime = 0;
 			for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktime[i] / world.ticktime);
 			world.pace = avgtime / 10;
 
-			world.race = world.backend.ticks() - lasttimestamp;
-			lasttimestamp = world.backend.ticks();
+			world.race = world.backend->ticks() - lasttimestamp;
+			lasttimestamp = world.backend->ticks();
 			
 			ticked = true;
 			
@@ -257,7 +258,7 @@ extern "C" int main(int argc, char *argv[]) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:
-					world.backend.resizeNotify(event.resize.w, event.resize.h);
+					world.backend->resizeNotify(event.resize.w, event.resize.h);
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 						if (!*i) continue;
 						(*i)->queueScript(123, 0); // window resized script
@@ -354,7 +355,7 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
-						int key = world.backend.translateKey(event.key.keysym.sym);
+						int key = world.backend->translateKey(event.key.keysym.sym);
 						if (key != -1) {
 							if (world.focusagent) {
 								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);

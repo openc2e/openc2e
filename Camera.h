@@ -21,7 +21,6 @@
 #define _OPENC2E_CAMERA_H
 
 #include "MetaRoom.h"
-#include "SDLBackend.h"
 #include "AgentRef.h"
 
 enum cameratransition { none = 0, fliphorz = 1, burst = 2 };
@@ -73,7 +72,7 @@ public:
 
 class MainCamera : public Camera {
 protected:
-	SDLBackend *backend;
+	class SDLBackend *backend;
 	std::vector<AgentRef> floated;
 
 public:

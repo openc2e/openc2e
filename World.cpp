@@ -24,6 +24,7 @@
 #include <limits.h> // for MAXINT
 #include "creaturesImage.h"
 #include "Creature.h"
+#include "SDLBackend.h"
 
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -39,6 +40,7 @@ World::World() {
 	quitting = saving = false;
 	theHand = 0;
 	showrooms = false;
+	backend = 0;
 }
 
 World::~World() {
@@ -215,6 +217,8 @@ Agent *World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
+	assert(backend);
+
 	MetaRoom *m = camera.getMetaRoom();
 	if (!m) {
 		// Whoops - the room we're in vanished, or maybe we were never in one?
@@ -241,15 +245,15 @@ void World::drawWorld() {
 
 			// if the block's on screen, render it.
 			if ((destx >= -128) && (desty >= -128) &&
-					(destx - 128 <= backend.getWidth()) &&
-					(desty - 128 <= backend.getHeight()))
-				backend.render(bkgd, whereweare, destx, desty, false, 0);
+					(destx - 128 <= backend->getWidth()) &&
+					(desty - 128 <= backend->getHeight()))
+				backend->render(bkgd, whereweare, destx, desty, false, 0);
 		}
 	}
 
 	// render all the agents
 	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
-		(*i)->render(&backend, -adjustx, -adjusty);
+		(*i)->render(backend, -adjustx, -adjusty);
 	}
 
 	if (showrooms) {
@@ -263,28 +267,28 @@ void World::drawWorld() {
 					col = 0x00FFFFCC;
 			}
 			// ceiling
-			backend.renderLine(
+			backend->renderLine(
 					(**i).x_left - adjustx,
 					(**i).y_left_ceiling - adjusty,
 					(**i).x_right - adjustx,
 					(**i).y_right_ceiling - adjusty,
 					col);
 			// floor
-			backend.renderLine(
+			backend->renderLine(
 					(**i).x_left - adjustx, 
 					(**i).y_left_floor - adjusty,
 					(**i).x_right - adjustx,
 					(**i).y_right_floor - adjusty,
 					col);
 			// left side
-			backend.renderLine(
+			backend->renderLine(
 					(**i).x_left - adjustx,
 					(**i).y_left_ceiling - adjusty,
 					(**i).x_left - adjustx,
 					(**i).y_left_floor - adjusty,
 					col);
 			// right side
-			backend.renderLine(
+			backend->renderLine(
 					(**i).x_right  - adjustx,
 					(**i).y_right_ceiling - adjusty,
 					(**i).x_right - adjustx,
@@ -293,7 +297,7 @@ void World::drawWorld() {
 		}
 	}
 
-	SDL_Flip(backend.screen);
+	backend->renderDone();
 }
 
 void World::executeInitScript(fs::path p) {

@@ -49,10 +49,8 @@ protected:
 	std::map<std::string, Mix_Chunk *> soundcache;
 	
 	int width, height;
-
-public:
 	SDL_Surface *screen;
-	
+
 public:
 	SDLBackend() { }
 	unsigned int ticks() { return SDL_GetTicks(); }
@@ -61,6 +59,7 @@ public:
 	SoundSlot *getAudioSlot(std::string filename);
 	void render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y, bool trans, unsigned char transparency);
 	void renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour);
+	void renderDone();
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
 	bool keyDown(int key);

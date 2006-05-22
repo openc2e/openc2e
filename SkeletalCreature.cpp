@@ -26,6 +26,7 @@
 
 #include "SkeletalCreature.h"
 #include "World.h"
+#include "SDLBackend.h"
 
 #include <typeinfo> // TODO: remove when genome system is fixed
 
