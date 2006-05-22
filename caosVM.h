@@ -465,6 +465,7 @@ public:
 	void v_PCLS();
 	void v_TCOR();
 	void c_CORE();
+	void v_TWIN();
 	
 	// motion
 	void c_ELAS();

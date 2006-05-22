@@ -1362,4 +1362,15 @@ void caosVM::c_CORE() {
 	// TODO
 }
 
+/**
+ TWIN (agent) source (agent) null_vars (integer)
+ %status stub
+*/
+void caosVM::v_TWIN() {
+	VM_PARAM_INTEGER(null_vars)
+	VM_PARAM_VALIDAGENT(source)
+
+	result.setAgent(0); // TODO
+}
+
 /* vim: set noet: */

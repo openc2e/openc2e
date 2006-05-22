@@ -188,27 +188,48 @@ void caosVM::c_ESEE() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 	
 	caos_assert(owner);
+	float ownerx = (owner->x + owner->getWidth() / 2);
+	float ownery = (owner->y + owner->getHeight() / 2);
+	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
+	Room *ownerroom = world.map.roomAt(ownerx, ownery);
 	
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
+
+	if (!ownermeta) return;
+	if (!ownerroom) return;
 	
 	for (std::list<boost::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
 		boost::shared_ptr<Agent> a = (*i);
 		if (!a) continue;
+		
+		// TODO: if owner is a creature, skip stuff with invisible attribute
+		
+		// verify species/genus/family
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		// XXX: measure from center?
-		double deltax = (*i)->x - owner->x;
-		double deltay = (*i)->y - owner->y;
-		deltax *= deltax;
-		deltay *= deltay;
+		// verify we're in the same metaroom as owner, and in a room
+		float thisx = a->x + (a->getWidth() / 2);
+		float thisy = a->y + (a->getHeight() / 2);
+		MetaRoom *m = world.map.metaRoomAt(thisx, thisy);
+		if (m != ownermeta) continue;
+		Room *r = world.map.roomAt(thisx, thisy);
+		
+		// compare squared distance with range
+		double deltax = thisx - ownerx; deltax *= deltax;
+		double deltay = thisy - ownery; deltay *= deltay;
+		if ((deltax + deltay) > (owner->range * owner->range)) continue;
 
-		double distance = sqrt(deltax + deltay);
-		if (distance > owner->range) continue;
-
+		// do the actual visibiltiy check using a line between centers
+		Point src(ownerx, ownery), dest(thisx, thisy);
+		Line dummywall; unsigned int dummydir;
+		world.map.collideLineWithRoomSystem(src, dest, ownerroom, src, dummywall, dummydir, owner->perm);
+		if (src != dest) continue;
+		
+		// okay, we can see this agent!
 		caosVar v; v.setAgent(a);
 		valueStack.push_back(v);
 	}

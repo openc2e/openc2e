@@ -85,7 +85,8 @@ void caosVM::c_GENE_LOAD() {
 	// TODO: wildcards
 	
 	std::string gfilename = world.findFile(std::string("/Genetics/") + genefile + ".gen");
-	caos_assert(!gfilename.empty());
+	if (gfilename.empty())
+		throw creaturesException("failed to find genome file '" + genefile + '"');
 	
 	shared_ptr<genomeFile> p(new genomeFile());
 
