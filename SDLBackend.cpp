@@ -129,7 +129,8 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int 
 												 16, // depth
 												 image->width(frame) * 2, // pitch
 												 rmask, gmask, bmask, 0); // RGBA mask
-	SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
+	// TODO: presumably there's a nicer way of doing this than dynamic_cast :P
+	if (!dynamic_cast<blkImage *>(image)) SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
 	if (trans) SDL_SetAlpha(surf, SDL_SRCALPHA, 255 - transparency);
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;
