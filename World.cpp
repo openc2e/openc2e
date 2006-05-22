@@ -228,23 +228,22 @@ void World::drawWorld() {
 	}
 	int adjustx = camera.getX();
 	int adjusty = camera.getY();
-	blkImage *test = m->backImage();
+	blkImage *bkgd = m->getBackground(""); // TODO
 
 	// draw the blk
-	for (unsigned int i = 0; i < (test->totalheight / 128); i++) {
-		for (unsigned int j = 0; j < (test->totalwidth / 128); j++) {
+	for (unsigned int i = 0; i < (bkgd->totalheight / 128); i++) {
+		for (unsigned int j = 0; j < (bkgd->totalwidth / 128); j++) {
 			// figure out which block number to use
-			unsigned int whereweare = j * (test->totalheight / 128) + i;
+			unsigned int whereweare = j * (bkgd->totalheight / 128) + i;
 			
-			SDL_Rect destrect;
-			destrect.x = (j * 128) - adjustx + m->x();
-			destrect.y = (i * 128) - adjusty + m->y();
+			int destx = (j * 128) - adjustx + m->x();
+			int desty = (i * 128) - adjusty + m->y();
 
-			// if the block's on screen, blit it.
-			if ((destrect.x >= -128) && (destrect.y >= -128) &&
-					(destrect.x - 128 <= backend.getWidth()) &&
-					(destrect.y - 128 <= backend.getHeight()))
-				SDL_BlitSurface(m->backsurfs[whereweare], 0, backend.screen, &destrect);
+			// if the block's on screen, render it.
+			if ((destx >= -128) && (desty >= -128) &&
+					(destx - 128 <= backend.getWidth()) &&
+					(desty - 128 <= backend.getHeight()))
+				backend.render(bkgd, whereweare, destx, desty, false, 0);
 		}
 	}
 

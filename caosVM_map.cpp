@@ -46,7 +46,7 @@ void caosVM::v_ADDM() {
 
 /**
  ADDB (command) metaroom_id (integer) background (string)
- %status stub
+ %status maybe
 
  Adds a new background to an existing metaroom, to be displayed with BKGD.
 */
@@ -57,7 +57,7 @@ void caosVM::c_ADDB() {
 	MetaRoom *m = world.map.getMetaRoom(metaroomid);
 	caos_assert(m);
 
-	// TODO
+	m->addBackground(background);
 }
 
 /**
@@ -124,7 +124,7 @@ void caosVM::c_MAPK() {
 
 /**
  BKDS (string) metaroomid (integer)
- %status stub
+ %status maybe
 
  Determines all of the background names in use by the given metaroom, and returns them in a comma-seperated string.
 */
@@ -134,7 +134,16 @@ void caosVM::v_BKDS() {
 	MetaRoom *m = world.map.getMetaRoom(metaroomid);
 	caos_assert(m);
 
-	result.setString(""); // TODO
+	std::vector<std::string> backs = m->backgroundList();
+	std::string s;
+	for (std::vector<std::string>::iterator i = backs.begin(); i != backs.end(); i++) {
+		if (s.empty())
+			s = *i;
+		else
+			s = s + "," + *i;
+	}
+			
+	result.setString(s);
 }
 
 /**

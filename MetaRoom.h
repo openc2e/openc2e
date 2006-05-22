@@ -25,6 +25,7 @@
 #include "openc2e.h"
 #include <string>
 #include <vector>
+#include <map>
 
 struct SDL_Surface;
 
@@ -32,22 +33,23 @@ class MetaRoom {
 protected:
 	FRIEND_SERIALIZE(MetaRoom);
 	unsigned int xloc, yloc, wid, hei;
-	blkImage *background;
+	std::map<std::string, blkImage *> backgrounds;
+	blkImage *firstback;
 	
-	MetaRoom() { backsurfs = NULL; }
-	void setup(int _x, int _y, int width, int height, const std::string &back);
-public:
-	SDL_Surface **backsurfs; // TODO: hack
+	MetaRoom() { firstback = 0; }
 
+public:
 	std::vector<Room *> rooms;
 
 	unsigned int x() { return xloc; }
 	unsigned int y() { return yloc; }
 	unsigned int width() { return wid; }
 	unsigned int height() { return hei; }
-	blkImage *backImage() { return background; }
 
 	unsigned int addRoom(Room *);
+	void addBackground(std::string);
+	blkImage *getBackground(std::string);
+	std::vector<std::string> backgroundList();
 
 	unsigned int id;
 

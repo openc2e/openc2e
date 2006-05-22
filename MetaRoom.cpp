@@ -23,42 +23,44 @@
 #include <assert.h>
 #include "SDLBackend.h"
 
-void MetaRoom::setup(int _x, int _y, int _width, int _height, const std::string &back) {
-	xloc = _x; yloc = _y; wid = _width; hei = _height;
-	if (back.empty()) {
-		background = 0;
-		backsurfs = 0;
-	} else {
-		background = (blkImage *)world.gallery.getImage(back + ".blk");
-		caos_assert(background);
-
-		// TODO: This probably doesn't belong in the constructor. Or, perhaps, in MetaRoom at all.
-		unsigned int rmask, gmask, bmask;
-		if (background->is565()) {
-			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
-		} else {
-			rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
-		}
-
-		backsurfs = new SDL_Surface *[background->numframes()];
-		assert(backsurfs);
-		for (unsigned int i = 0; i < background->numframes(); i++) {
-			backsurfs[i] = SDL_CreateRGBSurfaceFrom(background->data(i), background->width(i),
-					background->height(i), 16 /* depth */, background->width(i) * 2 /* pitch */,
-					rmask, gmask, bmask, 0);
-			assert(backsurfs[i]);
-		}
-	}
-}
 MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back) {
-	setup(_x, _y, _width, _height, back);
+	xloc = _x; yloc = _y; wid = _width; hei = _height; firstback = 0;
+	if (!back.empty())
+		addBackground(back);
 }
 
+void MetaRoom::addBackground(std::string back) {
+	caos_assert(!back.empty());
+	caos_assert(backgrounds.find(back) == backgrounds.end());
+	
+	blkImage *background = dynamic_cast<blkImage *>(world.gallery.getImage(back + ".blk"));
+	caos_assert(background);
+
+	backgrounds[back] = background;
+	if (!firstback) firstback = background;
+}
+
+std::vector<std::string> MetaRoom::backgroundList() {
+	std::vector<std::string> b;
+	for (std::map<std::string, blkImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
+		b.push_back(i->first);
+	return b;
+}
+
+blkImage *MetaRoom::getBackground(std::string back) {
+	if (back.empty()) return firstback;
+	if (backgrounds.find(back) != backgrounds.end()) return 0;
+	return backgrounds[back];
+}
+	
 MetaRoom::~MetaRoom() {
 	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		delete *i;
 	}
-	world.gallery.delImage(background);
+
+	for (std::map<std::string, blkImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++) {
+		world.gallery.delImage(i->second);
+	}
 }
 
 unsigned int MetaRoom::addRoom(Room *r) {
@@ -67,4 +69,5 @@ unsigned int MetaRoom::addRoom(Room *r) {
 	r->id = world.map.room_base++;
 	return r->id;
 }
+
 /* vim: set noet: */
