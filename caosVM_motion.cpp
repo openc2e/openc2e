@@ -27,7 +27,7 @@ using std::cerr;
 
 /**
  ELAS (command) elas (integer)
- %status stub
+ %status maybe
 
  Sets the elasticity (in other words, bounciness) of the TARG agent.
 */
@@ -357,7 +357,7 @@ void caosVM::c_FRIC() {
 
 /**
  FALL (integer)
- %status stub
+ %status maybe
 
  Returns 1 if the TARG agent is moving due to gravity, or 0 if otherwise.
 */
