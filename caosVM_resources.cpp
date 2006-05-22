@@ -66,6 +66,12 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	std::ofstream output(outputfile.native_directory_string().c_str(), std::ios::binary);
 	output.write((char *)p->getBuffer(), p->getSize());
 	// p->unload();
+	
+	if (type == 7) {
+		output.flush(); output.close();
+		// TODO: verify it is a catalogue file first, perhaps?
+		world.catalogue.addFile(outputfile);
+	}
 		
 	return true;
 }

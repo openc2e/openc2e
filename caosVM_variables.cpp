@@ -318,13 +318,15 @@ void caosVM::v_RAND() {
 
 /**
  REAF (command)
- %status stub
+ %status maybe
 
  Re-reads all catalogue files.
  */
 void caosVM::c_REAF() {
 	VM_VERIFY_SIZE(0)
-	// TODO
+
+	world.catalogue.reset();
+	world.initCatalogue();
 }
 
 /**

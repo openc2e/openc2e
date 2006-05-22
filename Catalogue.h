@@ -51,6 +51,7 @@ public:
 	std::string calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const;
   
 	void reset();
+	void addFile(boost::filesystem::path path);
 	void initFrom(boost::filesystem::path path);
 
 	void addVals(std::string &title, bool override, int count, const std::list<std::string> &vals);

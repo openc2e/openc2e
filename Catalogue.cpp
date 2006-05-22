@@ -111,6 +111,18 @@ void Catalogue::reset() {
 	data.clear();
 }
 
+void Catalogue::addFile(fs::path path) {
+	assert(fs::exists(path));
+	assert(!fs::is_directory(path));
+
+	try {
+		fs::ifstream f(path);
+		f >> *this;
+	} catch (const catalogueException &ex) {
+		std::cerr << "Error reading catalogue file " << path.string() << ":" << std::endl << '\t' << ex.what() << std::endl;
+	}
+}
+
 void Catalogue::initFrom(fs::path path) {
 	assert(fs::exists(path));
 	assert(fs::is_directory(path));
@@ -122,20 +134,15 @@ void Catalogue::initFrom(fs::path path) {
 	for (fs::directory_iterator i(path); i != end; ++i) {
 		try {
 			if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".catalogue")) {
-				file = (*i).string();
 				std::string x = fs::basename(*i);
 				// TODO: '-en-GB' exists too, this doesn't work for that
 				if ((x.size() > 3) && (x[x.size() - 3] == '-')) {
 					// TODO: this is NOT how we should do it
 					if (x[x.size() - 2] != 'e' || x[x.size() - 1] != 'n') continue; // skip all non-english localised files
 				}
-				//std::cout << "Catalogue file '" << x << "' being read" << std::endl;
-				fs::ifstream f(*i);
-				f >> *this;
+
+				addFile(*i);
 			}
-		}
-		catch (const catalogueException &ex) {
-			std::cerr << "Error reading catalogue file " << file << ":" << std::endl << '\t' << ex.what() << std::endl;
 		}
 		catch (const std::exception &ex) {
 			std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
