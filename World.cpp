@@ -68,11 +68,11 @@ void World::init() {
 	if (!theHand) {
 		creaturesImage *img = gallery.getImage("hand"); // as used in C2, C3 and DS
 		if (!img)
-			throw creaturesException("no \"Pointer Information\" catalogue tag, and fallback failed");
+			throw creaturesException("no valid \"Pointer Information\" catalogue tag, and fallback failed");
 		theHand = new PointerAgent("hand");
 		theHand->finishInit();
 		gallery.delImage(img);
-		std::cout << "Warning: No \"Pointer Information\" catalogue tag, defaulting to 'hand'." << std::endl;
+		std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to 'hand'." << std::endl;
 	}
 }
 
