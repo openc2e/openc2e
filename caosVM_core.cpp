@@ -43,10 +43,13 @@ void caosVM::c_OUTX() {
 	
 	for (unsigned int i = 0; i < val.size(); i++) {
 		switch (val[i]) {
-			case '\r': oh += "\\r";
-			case '\n': oh += "\\n";
-			case '\t': oh += "\\t";
-			default: oh + val[i];
+			case '\r': oh += "\\r"; break;
+			case '\n': oh += "\\n"; break;
+			case '\t': oh += "\\t"; break;
+			case '\\': oh += "\\\\"; break;
+			case '"': oh += "\\\""; break;
+			case '\'': oh += "\\'"; break;
+			default: oh += val[i];
 		}
 	}
 
