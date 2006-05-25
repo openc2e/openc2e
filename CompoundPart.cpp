@@ -284,43 +284,33 @@ void TextEntryPart::handleSpecialKey(char c) {
 	switch (c) {
 		case 8: // backspace
 			if (caretpos == 0) return;
-			{
-				std::string::iterator x = text.begin();
-				for (unsigned int i = 0; i < caretpos - 1; i++)
-					x++;
-				text.erase(x);
-			}
+			text.erase(text.begin() + (caretpos - 1));
 			caretpos--;
 			break;
 
 		case 13: // return
 			// TODO: check if we should do this or a newline
 			parent->queueScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
-			break;
+			return;
 
 		case 37: // left
 			if (caretpos == 0) return;
 			caretpos--;
-			break;
+			return;
 
 		case 39: // right
 			if (caretpos == text.size()) return;
 			caretpos++;
-			break;
+			return;
 
 		case 38: // up
 		case 40: // down
-			break;
+			return;
 
 		case 46: // delete
 			if ((text.size() == 0) || (caretpos >= text.size()))
 				return;
-			{
-				std::string::iterator x = text.begin();
-				for (unsigned int i = 0; i < caretpos; i++)
-					x++;
-				text.erase(x);
-			}
+			text.erase(text.begin() + caretpos);
 			break;
 
 		default:
