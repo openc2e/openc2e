@@ -167,12 +167,11 @@ void caosVM::v_TMVT() {
 	VM_PARAM_FLOAT(x)
 
 	caos_assert(targ);
-	// TODO: do this properly
-	//Room *r1 = world.map.roomAt(x, y);
-	//Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + (targ->getHeight() / 2));
-	Room *r1 = world.map.roomAt(x + (targ->getWidth() / 2), y);
-	Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + targ->getHeight());
-	result.setInt((r1 && r2) ? 1 : 0);
+
+	if (targ->validInRoomSystem())
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /**
@@ -308,21 +307,17 @@ void caosVM::c_MVSF() {
 	VM_PARAM_FLOAT(x)
 	caos_assert(targ);
 
+	float origx = targ->x, origy = targ->y; // preserve
+
 	// TODO: this is a silly hack, to cater for simplest case (where we just need to nudge the agent up a bit)
 	unsigned int tries = 0;
 	while (tries < 150) {
-		Room *r1 = world.map.roomAt(x + (targ->getWidth() / 2), y - tries);
-		Room *r2 = world.map.roomAt(x + (targ->getWidth() / 2), y + targ->getHeight() - tries);
-		if (r1 && r2) {
-			// if they're in the same room, we're fine, otherwise, make sure they're at least connected
-			// (hacky, but who cares, given the whole thing is a hack)
-			if (r1 == r2 || r1->doors.find(r2) != r1->doors.end()) {
-				targ->moveTo(x, y - tries);
-				return;
-			}
-		}
+		targ->moveTo(x, y - tries);
+		if (targ->validInRoomSystem()) return;
 		tries++;
 	}
+
+	targ->x = x; targ->y = y;
 	
 	throw creaturesException("MVSF failed to find a safe place");
 }

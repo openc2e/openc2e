@@ -292,6 +292,29 @@ Point Agent::boundingBoxPoint(unsigned int n) {
 	return p;
 }
 
+bool Agent::validInRoomSystem() {
+	for (unsigned int i = 0; i < 4; i++) {
+		Point src, dest;
+		switch (i) {
+			case 0: src = boundingBoxPoint(3); dest = boundingBoxPoint(0); break; // bottom to left
+			case 1: src = boundingBoxPoint(3); dest = boundingBoxPoint(1); break; // bottom to right
+			case 2: src = boundingBoxPoint(2); dest = boundingBoxPoint(0); break; // top to left
+			case 3: src = boundingBoxPoint(2); dest = boundingBoxPoint(1); break; // top to right
+		}
+		float srcx = src.x, srcy = src.y;
+		
+		Room *ourRoom = world.map.roomAt(srcx, srcy);
+		if (!ourRoom) return false;
+
+		unsigned int dir; Line wall;
+		world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, perm);
+
+		if (src != dest) return false;
+	}
+
+	return true;
+}
+
 void Agent::physicsTick() {
 	falling = false;
 

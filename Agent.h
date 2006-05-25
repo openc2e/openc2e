@@ -178,6 +178,8 @@ public:
 	virtual void kill();
 	void stopScript();
 
+	bool validInRoomSystem();
+
 	virtual void setZOrder(unsigned int plane); // should be overridden!
 	virtual unsigned int getZOrder() const;
 
