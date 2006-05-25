@@ -275,7 +275,7 @@ void TextEntryPart::handleClick(float clickx, float clicky) {
 }
 
 void TextEntryPart::handleKey(char c) {
-	text += c;
+	text.insert(caretpos, 1, c);
 	caretpos++;
 	recalculateData();
 }
@@ -283,8 +283,13 @@ void TextEntryPart::handleKey(char c) {
 void TextEntryPart::handleSpecialKey(char c) {
 	switch (c) {
 		case 8: // backspace
-			if (text.size() == 0) return;
-			text.erase(caretpos - 1, caretpos); // TODO: broken
+			if (caretpos == 0) return;
+			{
+				std::string::iterator x = text.begin();
+				for (unsigned int i = 0; i < caretpos - 1; i++)
+					x++;
+				text.erase(x);
+			}
 			caretpos--;
 			break;
 
@@ -310,12 +315,20 @@ void TextEntryPart::handleSpecialKey(char c) {
 		case 46: // delete
 			if ((text.size() == 0) || (caretpos >= text.size()))
 				return;
-			text.erase(caretpos);
+			{
+				std::string::iterator x = text.begin();
+				for (unsigned int i = 0; i < caretpos; i++)
+					x++;
+				text.erase(x);
+			}
 			break;
 
 		default:
 			return;
 	}
+
+	assert(caretpos <= text.size());
+
 	recalculateData();
 }
 
