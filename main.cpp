@@ -331,12 +331,16 @@ extern "C" int main(int argc, char *argv[]) {
 						// is the messages might only be fired in c2e when you use MESG WRIT, in which case we'll
 						// need to manually set world.hand()->carrying to NULL and a here, respectively - fuzzie
 						if (world.hand()->carrying) {
-							world.hand()->carrying->queueScript(5, world.hand()); // drop
-							world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
+							if (!world.hand()->carrying->sufferphysics || world.hand()->carrying->validInRoomSystem()) {
+								world.hand()->carrying->queueScript(5, world.hand()); // drop
+								world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
 
-							// TODO: do this in the pointer agent?
-							world.hand()->carrying->velx.setFloat(world.hand()->velx.getFloat());
-							world.hand()->carrying->vely.setFloat(world.hand()->vely.getFloat());
+								// TODO: do this in the pointer agent?
+								world.hand()->carrying->velx.setFloat(world.hand()->velx.getFloat());
+								world.hand()->carrying->vely.setFloat(world.hand()->vely.getFloat());
+							} else {
+								// TODO: some kind of "fail to drop" animation/sound?
+							}
 						} else {
 							Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false, true);
 							if (a) {
