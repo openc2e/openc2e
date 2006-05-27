@@ -404,9 +404,44 @@ void Agent::physicsTick() {
 				queueScript(6, 0, velx, vely); // TODO: include this? .. we need to include SOMETHING, c3 ball checks for <3
 
 				if (elas != 0) {
-					// TODO: take into account 'wall'
-					//velx.setFloat(-velx.getFloat() * (elas / 100.0f)); 
-					vely.setFloat(-vely.getFloat() * (elas / 100.0f)); 
+					if (wall.getType() == HORIZONTAL) {
+						vely.setFloat(-vely.getFloat());
+					} else if (wall.getType() == VERTICAL) {
+						velx.setFloat(-velx.getFloat());
+					} else {
+						// line starts always have a lower x value than the end
+						float xdiff = wall.getEnd().x - wall.getStart().x;
+						float ydiff = wall.getEnd().y - wall.getStart().y;
+						float fvelx = velx.getFloat(), fvely = vely.getFloat();
+					
+						// calculate input/slope angles
+						double inputangle;
+						if (fvelx == 0.0f) {
+							if (fvely > 0.0f)
+								inputangle = M_PI / 2.0;
+							else
+								inputangle = 3 * (M_PI / 2.0);
+						} else {
+							inputangle = atan(fvely / fvelx);
+						}
+						double slopeangle = atan(-ydiff / xdiff); // xdiff != 0 because wall isn't vertical
+
+						// calculate output angle
+						double outputangle = slopeangle + (slopeangle - inputangle) + M_PI;
+
+						// turn back into component velocities
+						double vectorlength = sqrt(fvelx*fvelx + fvely*fvely);
+						float xoutput = cos(outputangle) * vectorlength;
+						float youtput = sin(outputangle) * vectorlength;
+
+						velx.setFloat(xoutput);
+						vely.setFloat(-youtput);
+					}
+
+					if (elas != 100.0f) {
+						velx.setFloat(velx.getFloat() * (elas / 100.0f));
+						vely.setFloat(vely.getFloat() * (elas / 100.0f));
+					}
 				} else				
 					vely.setFloat(0);
 			} else if (sufferphysics && accg != 0) {
