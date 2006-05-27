@@ -172,6 +172,7 @@ public:
 	unsigned int getWidth() { return part(0)->getWidth(); }
 	unsigned int getHeight() { return part(0)->getHeight(); }
 	Point boundingBoxPoint(unsigned int n);
+	static Point boundingBoxPoint(unsigned int n, Point p, unsigned int w, unsigned int h);
 	
 	virtual void tick();
 	virtual void physicsTick();
@@ -179,6 +180,7 @@ public:
 	void stopScript();
 
 	bool validInRoomSystem();
+	static bool validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);
 
 	virtual void setZOrder(unsigned int plane); // should be overridden!
 	virtual unsigned int getZOrder() const;

@@ -381,11 +381,9 @@ void caosVM::v_PROP() {
 void caosVM::c_PERM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(perm)
-	
-	// C3 rocklice set perm to 0, ick.
-	// TODO: is perm of 0 possible?
-	
-	if (perm < 1) perm = 1;
+
+	// TODO: setting of 0 valid?
+	if (perm < 0) perm = 0;
 	if (perm > 100) perm = 100;
 
 	caos_assert(targ);

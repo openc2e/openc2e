@@ -168,7 +168,7 @@ void caosVM::v_TMVT() {
 
 	caos_assert(targ);
 
-	if (targ->validInRoomSystem())
+	if (targ->validInRoomSystem(Point(x, y), targ->getWidth(), targ->getHeight(), targ->perm))
 		result.setInt(1);
 	else
 		result.setInt(0);
@@ -307,18 +307,15 @@ void caosVM::c_MVSF() {
 	VM_PARAM_FLOAT(x)
 	caos_assert(targ);
 
-	float origx = targ->x, origy = targ->y; // preserve
-
 	// TODO: this is a silly hack, to cater for simplest case (where we just need to nudge the agent up a bit)
 	unsigned int tries = 0;
 	while (tries < 150) {
-		targ->moveTo(x, y - tries);
-		if (targ->validInRoomSystem()) return;
+		if (targ->validInRoomSystem(Point(x, y - tries), targ->getWidth(), targ->getHeight(), targ->perm)) {
+			targ->moveTo(x, y - tries);
+		}
 		tries++;
 	}
 
-	targ->x = x; targ->y = y;
-	
 	throw creaturesException("MVSF failed to find a safe place");
 }
 

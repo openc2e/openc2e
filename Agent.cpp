@@ -262,27 +262,31 @@ void Agent::positionAudio(SoundSlot *slot) {
 }
 
 Point Agent::boundingBoxPoint(unsigned int n) {
+	return boundingBoxPoint(n, Point(x, y), getWidth(), getHeight());
+}
+
+Point Agent::boundingBoxPoint(unsigned int n, Point in, unsigned int w, unsigned int h) {
 	Point p;
 	
 	switch (n) {
 		case 0: // left
-			p.x = x;
-			p.y = y + (getHeight() / 2);
+			p.x = in.x;
+			p.y = in.y + (h / 2.0f);
 			break;
 
 		case 1: // right
-			p.x = x + getWidth();
-			p.y = y + (getHeight() / 2);
+			p.x = in.x + w;
+			p.y = in.y + (h / 2.0f);
 			break;
 
 		case 2: // top
-			p.x = x + (getWidth() / 2);
-			p.y = y;
+			p.x = in.x + (w / 2.0f);
+			p.y = in.y;
 			break;
 
 		case 3: // bottom
-			p.x = x + (getWidth() / 2);
-			p.y = y + getHeight();
+			p.x = in.x + (w / 2.0f);
+			p.y = in.y + h;
 			break;
 
 		default:
@@ -293,13 +297,17 @@ Point Agent::boundingBoxPoint(unsigned int n) {
 }
 
 bool Agent::validInRoomSystem() {
+	return validInRoomSystem(Point(x, y), getWidth(), getHeight(), perm);
+}
+
+bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
 	for (unsigned int i = 0; i < 4; i++) {
 		Point src, dest;
 		switch (i) {
-			case 0: src = boundingBoxPoint(3); dest = boundingBoxPoint(0); break; // bottom to left
-			case 1: src = boundingBoxPoint(3); dest = boundingBoxPoint(1); break; // bottom to right
-			case 2: src = boundingBoxPoint(2); dest = boundingBoxPoint(0); break; // top to left
-			case 3: src = boundingBoxPoint(2); dest = boundingBoxPoint(1); break; // top to right
+			case 0: src = boundingBoxPoint(3, p, w, h); dest = boundingBoxPoint(0, p, w, h); break; // bottom to left
+			case 1: src = boundingBoxPoint(3, p, w, h); dest = boundingBoxPoint(1, p, w, h); break; // bottom to right
+			case 2: src = boundingBoxPoint(2, p, w, h); dest = boundingBoxPoint(0, p, w, h); break; // top to left
+			case 3: src = boundingBoxPoint(2, p, w, h); dest = boundingBoxPoint(1, p, w, h); break; // top to right
 		}
 		float srcx = src.x, srcy = src.y;
 		
@@ -307,7 +315,7 @@ bool Agent::validInRoomSystem() {
 		if (!ourRoom) return false;
 
 		unsigned int dir; Line wall;
-		world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, perm);
+		world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, testperm);
 
 		if (src != dest) return false;
 	}
