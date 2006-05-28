@@ -191,8 +191,8 @@ void caosVM::c_ESEE() {
 	if (owner) seeing = owner; else seeing = targ;
 	valid_agent(seeing);
 	
-	float ownerx = (seeing->x + seeing->getWidth() / 2);
-	float ownery = (seeing->y + seeing->getHeight() / 2);
+	float ownerx = (seeing->x + seeing->getWidth() / 2.0f);
+	float ownery = (seeing->y + seeing->getHeight() / 2.0f);
 	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
 	Room *ownerroom = world.map.roomAt(ownerx, ownery);
 	
@@ -215,8 +215,8 @@ void caosVM::c_ESEE() {
 		if (family && family != a->family) continue;
 
 		// verify we're in the same metaroom as owner, and in a room
-		float thisx = a->x + (a->getWidth() / 2);
-		float thisy = a->y + (a->getHeight() / 2);
+		float thisx = a->x + (a->getWidth() / 2.0f);
+		float thisy = a->y + (a->getHeight() / 2.0f);
 		MetaRoom *m = world.map.metaRoomAt(thisx, thisy);
 		if (m != ownermeta) continue;
 		Room *r = world.map.roomAt(thisx, thisy);

@@ -269,7 +269,7 @@ void caosVM::v_ROOM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(agent)
 	
-	Room *r = world.map.roomAt(agent->x + (agent->getWidth() / 2), agent->y + (agent->getHeight() / 2));
+	Room *r = world.map.roomAt(agent->x + (agent->getWidth() / 2.0f), agent->y + (agent->getHeight() / 2.0f));
 	if (r)
 		result.setInt(r->id);
 	else
@@ -547,7 +547,7 @@ void caosVM::c_ALTR() {
 	Room *room;
 	if (roomid == -1) {
 		valid_agent(targ);
-		room = world.map.roomAt(targ->x + (targ->getWidth() / 2), targ->y + (targ->getHeight() / 2));
+		room = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 	} else
 		room = world.map.getRoom(roomid);
 	caos_assert(room);
@@ -695,7 +695,7 @@ void caosVM::v_TORX() {
 	caos_assert(r);
 	valid_agent(targ);
 
-	float centrex = r->x_left + ((r->x_right - r->x_left) / 2);
+	float centrex = r->x_left + ((r->x_right - r->x_left) / 2.0f);
 	result.setFloat(centrex - targ->x);
 }
 
@@ -711,15 +711,15 @@ void caosVM::v_TORY() {
 	valid_agent(targ);
 
 	// TODO: calculate this however c2e does it.. or at least check this is right
-	float topy = (r->y_left_ceiling - r->y_right_ceiling) / 2;
+	float topy = (r->y_left_ceiling - r->y_right_ceiling) / 2.0f;
 	if (topy >= 0.0f) topy = r->y_left_ceiling + topy;
 	else topy = r->y_right_ceiling - topy;
 
-	float bottomy = (r->y_left_floor - r->y_right_floor) / 2;
+	float bottomy = (r->y_left_floor - r->y_right_floor) / 2.0f;
 	if (bottomy >= 0.0f) topy = r->y_left_floor + bottomy;
 	else bottomy = r->y_right_floor - bottomy;
 
-	float centrey = topy + ((bottomy - topy) / 2);
+	float centrey = topy + ((bottomy - topy) / 2.0f);
 	result.setFloat(centrey - targ->y);
 }
 

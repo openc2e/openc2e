@@ -686,7 +686,7 @@ void caosVM::c_SHOW() {
 void caosVM::v_POSX() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(targ);
-	result.setFloat(targ->x + (targ->getWidth() / 2.0));
+	result.setFloat(targ->x + (targ->getWidth() / 2.0f));
 }
 
 /**
@@ -698,7 +698,7 @@ void caosVM::v_POSX() {
 void caosVM::v_POSY() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(targ);
-	result.setFloat(targ->y + (targ->getHeight() / 2.0));
+	result.setFloat(targ->y + (targ->getHeight() / 2.0f));
 }
 
 /**
@@ -1133,8 +1133,8 @@ void caosVM::v_DISQ() {
 
 	valid_agent(targ);
 	
-	float x = (targ->x + (targ->getWidth() / 2)) - (other->x + (other->getWidth() / 2));
-	float y = (targ->y + (targ->getHeight() / 2)) - (other->y + (other->getHeight() / 2));
+	float x = (targ->x + (targ->getWidth() / 2.0f)) - (other->x + (other->getWidth() / 2.0f));
+	float y = (targ->y + (targ->getHeight() / 2.0f)) - (other->y + (other->getHeight() / 2.0f));
 
 	result.setFloat(x*x + y*y);
 }
@@ -1222,8 +1222,8 @@ void caosVM::v_SEEE() {
 	VM_PARAM_VALIDAGENT(first)
 
 	// TODO: handle walls, creature invisibility
-	float x = (first->x + (first->getWidth() / 2)) - (second->x + (second->getWidth() / 2));
-	float y = (first->y + (first->getHeight() / 2)) - (second->y + (second->getHeight() / 2));
+	float x = (first->x + (first->getWidth() / 2.0f)) - (second->x + (second->getWidth() / 2.0f));
+	float y = (first->y + (first->getHeight() / 2.0f)) - (second->y + (second->getHeight() / 2.0f));
 	float z = sqrt(x*x + y*y);
 
 	if (z > first->range)

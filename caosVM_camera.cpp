@@ -108,8 +108,8 @@ void caosVM::c_CMRT() {
 	valid_agent(targ);
 	
 	MetaRoom *r = world.map.metaRoomAt(targ->x, targ->y);
-	int xpos = targ->x - (getCamera()->getWidth() / 2) - (targ->getWidth() / 2);
-	int ypos = targ->y - (getCamera()->getHeight() / 2) - (targ->getHeight() / 2);
+	int xpos = targ->x - (getCamera()->getWidth() / 2.0f) - (targ->getWidth() / 2.0f);
+	int ypos = targ->y - (getCamera()->getHeight() / 2.0f) - (targ->getHeight() / 2.0f);
 	if (r)
 		getCamera()->goToMetaRoom(r->id, xpos, ypos, (cameratransition)pan); // TODO: pan okay?
 }
