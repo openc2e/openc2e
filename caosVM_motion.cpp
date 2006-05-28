@@ -312,6 +312,7 @@ void caosVM::c_MVSF() {
 	while (tries < 150) {
 		if (targ->validInRoomSystem(Point(x, y - tries), targ->getWidth(), targ->getHeight(), targ->perm)) {
 			targ->moveTo(x, y - tries);
+			return;
 		}
 		tries++;
 	}
