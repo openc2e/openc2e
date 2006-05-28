@@ -263,6 +263,7 @@ public:
 	void c_WDOW();
 	void v_WDOW();
 	void c_TRCK();
+	void v_TRCK();
 	void c_LINE();
 	void v_SNAX();
 	void c_SCAM();

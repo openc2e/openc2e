@@ -94,7 +94,8 @@ void caosVM::c_WAIT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(ticks)
 
-	caos_assert(ticks > 0); // todo: is this right?
+	caos_assert(ticks >= 0); // TODO: is this right?
+	if (ticks == 0) return;
 	startBlocking(new blockUntilTime(ticks));
 }
 

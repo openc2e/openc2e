@@ -288,6 +288,16 @@ void caosVM::c_TRCK() {
 }
 
 /**
+ TRCK (agent)
+ %status maybe
+
+ Returns agent being tracked by the current camera, if any.
+*/
+void caosVM::v_TRCK() {
+	result.setAgent(getCamera()->trackedAgent());
+}
+
+/**
  LINE (command) x1 (integer) y1 (integer) x2 (integer) y2 (integer) r (integer) g (integer) b (integer) stipple_on (integer) stipple_off (integer)
  %status stub
 

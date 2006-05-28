@@ -217,7 +217,7 @@ void caosVM::c_MVFT() {
 */
 void caosVM::v_CREA() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_VALIDAGENT(agent)
+	VM_PARAM_AGENT(agent)
 
 	Creature *c = dynamic_cast<Creature *>(agent.get());
 	if (c) result.setInt(1);

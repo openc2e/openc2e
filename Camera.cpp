@@ -85,7 +85,7 @@ void MainCamera::delFloated(AgentRef a) {
 }
 
 void Camera::trackAgent(AgentRef a, int xp, int yp, trackstyle s, cameratransition transition) {
-	// TODO
+	trackedagent = a; // TODO
 }
 
 void Camera::checkBounds() {
