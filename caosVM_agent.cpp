@@ -1221,15 +1221,31 @@ void caosVM::v_SEEE() {
 	VM_PARAM_VALIDAGENT(second)
 	VM_PARAM_VALIDAGENT(first)
 
-	// TODO: handle walls, creature invisibility
-	float x = (first->x + (first->getWidth() / 2.0f)) - (second->x + (second->getWidth() / 2.0f));
-	float y = (first->y + (first->getHeight() / 2.0f)) - (second->y + (second->getHeight() / 2.0f));
-	float z = sqrt(x*x + y*y);
+	result.setInt(0);
+	
+	// TODO: handle creature invisibility
 
-	if (z > first->range)
-		result.setInt(0);
-	else
-		result.setInt(1);
+	// calculate centres
+	float ownerx = first->x + (first->getWidth() / 2.0f), ownery = first->y + (first->getHeight() / 2.0f);
+	float thisx = second->x + (second->getWidth() / 2.0f), thisy = second->y + (second->getHeight() / 2.0f);
+	
+	// verify they're in the same metarooms and they're both in rooms
+	if (world.map.metaRoomAt(ownerx, ownery) != world.map.metaRoomAt(thisx, thisy)) return;
+	Room *ownerroom = world.map.roomAt(ownerx, ownery); if (!ownerroom) return;
+	if (!world.map.roomAt(thisx, thisy)) return;
+
+	// compare squared distance with range
+	float deltax = thisx - ownerx; deltax *= deltax;
+	float deltay = thisy - ownery; deltay *= deltay;
+	if ((deltax + deltay) > (first->range * first->range)) return;
+
+	// do the actual visibiltiy check using a line between centers
+	Point src(ownerx, ownery), dest(thisx, thisy);
+	Line dummywall; unsigned int dummydir;
+	world.map.collideLineWithRoomSystem(src, dest, ownerroom, src, dummywall, dummydir, first->perm);
+	if (src != dest) return;
+
+	result.setInt(1);
 }
 
 /**
