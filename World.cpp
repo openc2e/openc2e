@@ -342,7 +342,7 @@ void World::executeBootstrap(fs::path p) {
 
 void World::executeBootstrap(bool switcher) {
 	// TODO: this code is possibly wrong with multiple bootstrap directories
-	std::multimap<unsigned int, fs::path> bootstraps;
+	std::multimap<std::string, fs::path> bootstraps;
 
 	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
 		assert(fs::exists(*i));
@@ -354,21 +354,19 @@ void World::executeBootstrap(bool switcher) {
 			for (fs::directory_iterator d(b); d != fsend; ++d) {
 				if (fs::exists(*d) && fs::is_directory(*d)) {
 					std::string s = (*d).leaf();
-					if (s.size() > 3) {
-						char x[4]; x[0] = s[0]; x[1] = s[1]; x[2] = s[2]; x[3] = 0;
-						if (!(isdigit(x[0]) && isdigit(x[1]) && isdigit(x[2]))) continue; // TODO: correct?
-						unsigned int z = atoi(x);
-						if (switcher && z != 0) continue;
-						if (!switcher && z == 0) continue;
-
-						bootstraps.insert(std::pair<unsigned int, fs::path>(z, *d));
+					if (s == "000 Switcher") {
+						if (!switcher) continue;
+					} else {
+						if (switcher) continue;
 					}
+					
+					bootstraps.insert(std::pair<std::string, fs::path>(s, *d));
 				}
 			}
 		}
 	}
 
-	for (std::multimap<unsigned int, fs::path>::iterator i = bootstraps.begin(); i != bootstraps.end(); i++) {
+	for (std::multimap<std::string, fs::path>::iterator i = bootstraps.begin(); i != bootstraps.end(); i++) {
 		executeBootstrap(i->second);
 	}
 }
