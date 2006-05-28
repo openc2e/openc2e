@@ -177,9 +177,9 @@ void caosVM::c_ENUM() {
  %pragma parserclass ENUMhelper
  %pragma retc -1
  
- Simular to ENUM, but iterates through agents visible to OWNR.  An agent can be seen if it is within the
- range set by RNGE, and is visible (this includes the PERM value of walls that lie between them,
- and, if the agent is a Creature, it not having the 'invisible' attribute).
+ Simular to ENUM, but iterates through agents visible to OWNR, or visible to TARG in an install script.
+ An agent can be seen if it is within the range set by RNGE, and is visible (this includes the PERM value
+ of walls that lie between them, and, if the agent is a Creature, it not having the 'invisible' attribute).
 */
 void caosVM::c_ESEE() {
 	VM_VERIFY_SIZE(3)
@@ -187,9 +187,12 @@ void caosVM::c_ESEE() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 	
-	valid_agent(owner);
-	float ownerx = (owner->x + owner->getWidth() / 2);
-	float ownery = (owner->y + owner->getHeight() / 2);
+	Agent *seeing;
+	if (owner) seeing = owner; else seeing = targ;
+	valid_agent(seeing);
+	
+	float ownerx = (seeing->x + seeing->getWidth() / 2);
+	float ownery = (seeing->y + seeing->getHeight() / 2);
 	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
 	Room *ownerroom = world.map.roomAt(ownerx, ownery);
 	
@@ -221,12 +224,12 @@ void caosVM::c_ESEE() {
 		// compare squared distance with range
 		double deltax = thisx - ownerx; deltax *= deltax;
 		double deltay = thisy - ownery; deltay *= deltay;
-		if ((deltax + deltay) > (owner->range * owner->range)) continue;
+		if ((deltax + deltay) > (seeing->range * seeing->range)) continue;
 
 		// do the actual visibiltiy check using a line between centers
 		Point src(ownerx, ownery), dest(thisx, thisy);
 		Line dummywall; unsigned int dummydir;
-		world.map.collideLineWithRoomSystem(src, dest, ownerroom, src, dummywall, dummydir, owner->perm);
+		world.map.collideLineWithRoomSystem(src, dest, ownerroom, src, dummywall, dummydir, seeing->perm);
 		if (src != dest) continue;
 		
 		// okay, we can see this agent!
@@ -241,7 +244,7 @@ void caosVM::c_ESEE() {
  %pragma retc -1
  %status maybe
 
- Similar to ENUM, but iterates through the agents OWNR is touching.
+ Similar to ENUM, but iterates through the agents OWNR is touching, or TARG is touching in an install script.
 */
 void caosVM::c_ETCH() {
 	VM_VERIFY_SIZE(3)
@@ -249,7 +252,9 @@ void caosVM::c_ETCH() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	valid_agent(owner);
+	Agent *touching;
+	if (owner) touching = owner; else touching = targ;
+	valid_agent(touching);
 	
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
@@ -262,16 +267,16 @@ void caosVM::c_ETCH() {
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		if (a->x < owner->x) {
-			if ((a->x + a->getWidth()) < owner->x) continue;
+		if (a->x < touching->x) {
+			if ((a->x + a->getWidth()) < touching->x) continue;
 		} else {
-			if ((owner->x + owner->getWidth()) < a->x) continue;
+			if ((touching->x + touching->getWidth()) < a->x) continue;
 		}
 		
-		if (a->y < owner->y) {
-			if ((a->y + a->getHeight()) < owner->y) continue;
+		if (a->y < touching->y) {
+			if ((a->y + a->getHeight()) < touching->y) continue;
 		} else {
-			if ((owner->y + owner->getHeight()) < a->y) continue;
+			if ((touching->y + touching->getHeight()) < a->y) continue;
 		}
 
 		caosVar v; v.setAgent(a);
