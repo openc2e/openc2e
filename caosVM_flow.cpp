@@ -191,8 +191,8 @@ void caosVM::c_ESEE() {
 	if (owner) seeing = owner; else seeing = targ;
 	valid_agent(seeing);
 	
-	float ownerx = (seeing->x + seeing->getWidth() / 2.0f);
-	float ownery = (seeing->y + seeing->getHeight() / 2.0f);
+	float ownerx = (seeing->x + (seeing->getWidth() / 2.0f));
+	float ownery = (seeing->y + (seeing->getHeight() / 2.0f));
 	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
 	Room *ownerroom = world.map.roomAt(ownerx, ownery);
 	
@@ -220,6 +220,7 @@ void caosVM::c_ESEE() {
 		MetaRoom *m = world.map.metaRoomAt(thisx, thisy);
 		if (m != ownermeta) continue;
 		Room *r = world.map.roomAt(thisx, thisy);
+		if (!r) continue;
 		
 		// compare squared distance with range
 		double deltax = thisx - ownerx; deltax *= deltax;
@@ -229,7 +230,8 @@ void caosVM::c_ESEE() {
 		// do the actual visibiltiy check using a line between centers
 		Point src(ownerx, ownery), dest(thisx, thisy);
 		Line dummywall; unsigned int dummydir;
-		world.map.collideLineWithRoomSystem(src, dest, ownerroom, src, dummywall, dummydir, seeing->perm);
+		Room *newroom = ownerroom;
+		world.map.collideLineWithRoomSystem(src, dest, newroom, src, dummywall, dummydir, seeing->perm);
 		if (src != dest) continue;
 		
 		// okay, we can see this agent!
