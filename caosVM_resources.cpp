@@ -379,7 +379,7 @@ void caosVM::v_PRAY_INJT() {
 		} catch (std::exception &e) {
 			world.freeVM(vm);
 			result.setInt(-2);
-			report->setString(scriptname);
+			report->setString(scriptname + " error: " + e.what());
 			std::cerr << "PRAY INJT caught exception trying to inject " << name << " - PRAY " << scriptname << ": " << e.what() << std::endl;
 			return;
 		}

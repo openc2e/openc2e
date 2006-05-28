@@ -317,6 +317,9 @@ void caosVM::c_MVSF() {
 		tries++;
 	}
 
+	// TODO: temp hack to shut scripts up
+	targ->kill();
+	if (owner) owner->kill();
 	throw creaturesException("MVSF failed to find a safe place");
 }
 
