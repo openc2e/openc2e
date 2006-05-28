@@ -225,13 +225,26 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {
 	if (dying) return false;
 
-	// TODO: fuzzie removed this check because the stuff in fireScript needs to be called even if there's no script
-	// however, we could probably optimise by only bothering adding it to the queue if it's a script# this is necessary for :)
-	//if (findScript(event)) {
-		world.queueScript(event, this, from, p0, p1);
-		return true;
-	//}
-	return false;
+	// only bother firing the event if either it exists, or it's one with engine code attached
+	// TODO: why don't we do the engine checks/etc here?
+	switch (event) {
+		default:
+			if (!findScript(event)) return false;
+
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 12:
+		case 13:
+		case 14:
+		case 92:
+			world.queueScript(event, this, from, p0, p1);
+	}
+	
+	return true;
 }
 
 void Agent::handleClick(float clickx, float clicky) {
@@ -502,6 +515,11 @@ void Agent::vmTick() {
 	while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
 		try {
 			vm->tick();
+		} catch (invalidAgentException &e) {
+			// try letting the exception script handle it
+			if (!queueScript(255)) {
+				std::cerr << "Agent::vmTick on " << identify() << " (script " << lastScript << ") caught unhandled invalid agent: " << e.what() << std::endl;
+			}
 		} catch (std::exception &e) {
 			// TODO: do something with this? empty the stack?
 			std::cerr << "Agent::vmTick on " << identify() << " (script " << lastScript << ") caught exception: " << e.what() << std::endl;

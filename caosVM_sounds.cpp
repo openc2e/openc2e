@@ -35,7 +35,7 @@ void caosVM::c_SNDE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
 	SoundSlot *s = world.backend->getAudioSlot(filename);
 	if (s) {
@@ -52,7 +52,7 @@ void caosVM::c_SNDC() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	if (targ->soundslot)
 		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
@@ -73,7 +73,7 @@ void caosVM::c_SNDL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	if (targ->soundslot)
 		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
@@ -141,7 +141,7 @@ void caosVM::v_RMSC() {
 void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)
 		
-	caos_assert(targ);
+	valid_agent(targ);
 	if (targ->soundslot)
 		targ->soundslot->fadeOut();
 }
@@ -151,7 +151,7 @@ void caosVM::c_FADE() {
  %status maybe
 */
 void caosVM::c_STPC() {
-	caos_assert(targ);
+	valid_agent(targ);
 	if (targ->soundslot)
 		targ->soundslot->stop();
 }
@@ -214,7 +214,7 @@ void caosVM::v_MUTE() {
 void caosVM::c_SEZZ() {
 	VM_PARAM_STRING(text)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO
 }
@@ -226,7 +226,7 @@ void caosVM::c_SEZZ() {
 void caosVM::c_VOIS() {
 	VM_PARAM_STRING(voice)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO
 }

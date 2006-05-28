@@ -25,7 +25,7 @@
 using std::cerr;
 
 Creature *caosVM::getTargCreature() {
-	caos_assert(targ);
+	valid_agent(targ);
 	Creature *c = dynamic_cast<Creature *>(targ.get());
 	caos_assert(c);
 	return c;
@@ -108,7 +108,7 @@ void caosVM::c_SWAY_SHOU() {
 	VM_PARAM_FLOAT(adjust1)
 	VM_PARAM_INTEGER(drive1)
 
-	caos_assert(owner);
+	valid_agent(owner);
 	//TODO
 }
 
@@ -329,7 +329,7 @@ void caosVM::c_DRIV() {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id < 20);
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	Creature *c = dynamic_cast<Creature *>(targ.get());
 	if (!c) return; // ignored on non-creatures
 
@@ -360,7 +360,7 @@ void caosVM::c_CHEM() {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(chemical_id)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	Creature *c = dynamic_cast<Creature *>(targ.get());
 	if (!c) return; // ignored on non-creatures
 	
@@ -523,7 +523,7 @@ void caosVM::v_LIMB() {
 void caosVM::c_ORDR_SHOU() {
 	VM_PARAM_STRING(speech)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	// TODO
 }
 
@@ -597,7 +597,7 @@ void caosVM::v_BYIT() {
  current script began running.
 */
 void caosVM::v_IT() {
-	caos_assert(owner);
+	valid_agent(owner);
 	caos_assert(dynamic_cast<Creature *>(owner.get())); // TODO: return null instead?
 	result.setAgent(_it_);
 }

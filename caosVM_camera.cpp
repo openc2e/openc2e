@@ -41,7 +41,7 @@ void caosVM::v_VISI() {
 	// TODO: check non-main cameras
 	// TODO: do compound parts stick out of the agent?
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	if ((targ->x > (world.camera.getX() + world.camera.getWidth())) || ((targ->x + targ->getWidth()) < world.camera.getX()) ||
 		(targ->y > (world.camera.getY() + world.camera.getHeight())) || ((targ->y + targ->getHeight()) < world.camera.getY())) {
@@ -105,7 +105,7 @@ void caosVM::c_CMRT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pan)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	MetaRoom *r = world.map.metaRoomAt(targ->x, targ->y);
 	int xpos = targ->x - (getCamera()->getWidth() / 2) - (targ->getWidth() / 2);
@@ -310,7 +310,7 @@ void caosVM::c_LINE() {
 	VM_PARAM_INTEGER(y1)
 	VM_PARAM_INTEGER(x1)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	// TODO
 }
 

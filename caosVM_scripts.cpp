@@ -141,7 +141,7 @@ void caosVM::c_SCRX() {
  running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODE() {
-	caos_assert(targ);
+	valid_agent(targ);
 	int res;
 	if (targ->vm && targ->vm->currentscript)
 		res = targ->vm->currentscript->scrp;
@@ -159,7 +159,7 @@ void caosVM::v_CODE() {
  running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODF() {
-	caos_assert(targ);
+	valid_agent(targ);
 	int res;
 	if (targ->vm && targ->vm->currentscript)
 		res = targ->vm->currentscript->fmly;
@@ -177,7 +177,7 @@ void caosVM::v_CODF() {
  running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODG() {
-	caos_assert(targ);
+	valid_agent(targ);
 	int res;
 	if (targ->vm && targ->vm->currentscript)
 		res = targ->vm->currentscript->gnus;
@@ -195,7 +195,7 @@ void caosVM::v_CODG() {
  running anything (or if it's running something that's not an event script).
 */
 void caosVM::v_CODS() {
-	caos_assert(targ);
+	valid_agent(targ);
 	int res;
 	if (targ->vm && targ->vm->currentscript)
 		res = targ->vm->currentscript->spcs;

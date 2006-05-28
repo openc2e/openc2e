@@ -48,7 +48,7 @@ void caosVM::v_PART() {
 	VM_PARAM_INTEGER(part_id)
 
 	caos_assert(part_id >= 0); // TODO: should we do this?
-	caos_assert(targ);
+	valid_agent(targ);
 	if (targ->part(part_id))
 		result.setInt(1);
 	else
@@ -72,7 +72,7 @@ void caosVM::c_PAT_DULL() {
 	VM_PARAM_INTEGER(part)
 	
 	caos_assert(part >= 0);
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
@@ -105,7 +105,7 @@ void caosVM::c_PAT_BUTT() {
 	
 	caos_assert(part >= 0);
 	// caos_assert((option == 0) || (option == 1)); .. I've seen '1000' and '255' used, so, gah. TODO: make sure all non-zero values are identical
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
@@ -132,7 +132,7 @@ void caosVM::c_PAT_FIXD() {
 	VM_PARAM_INTEGER(part)	
 	
 	caos_assert(part >= 0);
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	
@@ -160,7 +160,7 @@ void caosVM::c_PAT_TEXT() {
 	VM_PARAM_INTEGER(part)	
 	
 	caos_assert(part >= 0);
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	
@@ -185,7 +185,7 @@ void caosVM::c_PAT_CMRA() {
 	VM_PARAM_INTEGER(part)
 
 	caos_assert(part >= 0);
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
@@ -209,7 +209,7 @@ void caosVM::c_PAT_GRPH() {
 	VM_PARAM_INTEGER(part)
 	
 	caos_assert(part >= 0);
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
@@ -228,7 +228,7 @@ void caosVM::c_PAT_KILL() {
 	VM_PARAM_INTEGER(part)
 	
 	caos_assert(part > 0);
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	if (!a->part(part)) return; // Edynn does PAT: KILL on nonexistant parts
@@ -247,7 +247,7 @@ void caosVM::c_PAT_MOVE() {
 	VM_PARAM_FLOAT(x)
 	VM_PARAM_INTEGER(part)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 	CompoundPart *p = a->part(part);
@@ -295,7 +295,7 @@ void caosVM::c_FRMT() {
 	VM_PARAM_INTEGER(top_margin)
 	VM_PARAM_INTEGER(left_margin)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
@@ -325,7 +325,7 @@ void caosVM::c_FRMT() {
 void caosVM::c_PTXT() {
 	VM_PARAM_STRING(text)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
@@ -341,7 +341,7 @@ void caosVM::c_PTXT() {
  Returns the text displayed in the current text part.
 */
 void caosVM::v_PTXT() {
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	TextPart *p = dynamic_cast<TextPart *>(c->part(part));
@@ -360,7 +360,7 @@ void caosVM::v_PTXT() {
 void caosVM::v_PNXT() {
 	VM_PARAM_INTEGER(previous_part)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	
 	if (!c) { // handle non-compound agents
@@ -394,7 +394,7 @@ void caosVM::v_PNXT() {
 void caosVM::c_PAGE() {
 	VM_PARAM_INTEGER(page)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
@@ -412,7 +412,7 @@ void caosVM::c_PAGE() {
  Returns the zero-based page number of the current text part.
 */
 void caosVM::v_PAGE() {
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
@@ -430,7 +430,7 @@ void caosVM::v_PAGE() {
  Returns the number of pages for the current text part.
 */
 void caosVM::v_NPGS() {
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
@@ -451,7 +451,7 @@ void caosVM::c_GRPV() {
 	VM_PARAM_FLOAT(value)
 	VM_PARAM_INTEGER(line)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	CompoundPart *p = c->part(part);
@@ -476,7 +476,7 @@ void caosVM::c_GRPL() {
 	VM_PARAM_INTEGER(green)
 	VM_PARAM_INTEGER(red)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(c);
 	CompoundPart *p = c->part(part);

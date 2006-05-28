@@ -35,7 +35,7 @@ void caosVM::c_ELAS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(elas)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->elas = elas;
 }
 
@@ -48,7 +48,7 @@ void caosVM::c_ELAS() {
 void caosVM::v_ELAS() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->elas);
 }
 
@@ -62,7 +62,7 @@ void caosVM::c_MVTO() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->moveTo(x, y);
 }
 
@@ -76,7 +76,7 @@ void caosVM::c_MVBY() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->moveTo(targ->x + x, targ->y + y);
 }
 
@@ -88,7 +88,7 @@ void caosVM::c_MVBY() {
 */
 void caosVM::v_VELX() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	vm->valueStack.push_back(&targ->velx);
 }
 
@@ -101,7 +101,7 @@ void caosVM::v_VELX() {
 void caosVM::v_VELY() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	vm->valueStack.push_back(&targ->vely);
 }
 
@@ -121,7 +121,7 @@ void caosVM::v_OBST() {
 	 * also, this code is untested :) - fuzzie
 	 */
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	Point src = targ->boundingBoxPoint(direction);
 	Point dest = src;
@@ -166,7 +166,7 @@ void caosVM::v_TMVT() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	if (targ->validInRoomSystem(Point(x, y), targ->getWidth(), targ->getHeight(), targ->perm))
 		result.setInt(1);
@@ -185,7 +185,7 @@ void caosVM::v_TMVF() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(1); // TODO: don't hardcode
 }
 
@@ -199,7 +199,7 @@ void caosVM::c_ACCG() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(accel)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->accg = accel;
 }
 
@@ -212,7 +212,7 @@ void caosVM::c_ACCG() {
 void caosVM::v_ACCG() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->accg);
 }
 
@@ -226,7 +226,7 @@ void caosVM::c_AERO() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(aero)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->aero = aero;
 }
 
@@ -239,7 +239,7 @@ void caosVM::c_AERO() {
 void caosVM::v_AERO() {
 	VM_VERIFY_SIZE(0)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->aero);
 }
 
@@ -288,7 +288,7 @@ void caosVM::c_VELO() {
 	VM_PARAM_FLOAT(vely)
 	VM_PARAM_FLOAT(velx)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->velx.reset();
 	targ->velx.setFloat(velx);
 	targ->vely.reset();
@@ -305,7 +305,7 @@ void caosVM::c_VELO() {
 void caosVM::c_MVSF() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO: this is a silly hack, to cater for simplest case (where we just need to nudge the agent up a bit)
 	unsigned int tries = 0;
@@ -332,7 +332,7 @@ void caosVM::c_MVSF() {
 void caosVM::v_FRIC() {
 	VM_VERIFY_SIZE(0)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->friction);
 }
 
@@ -347,7 +347,7 @@ void caosVM::c_FRIC() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(friction) caos_assert(friction >= 0); caos_assert(friction <= 100);
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->friction = friction;
 }
 
@@ -359,7 +359,7 @@ void caosVM::c_FRIC() {
 */
 void caosVM::v_FALL() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// XXX: this probably isn't quite correct, but it's close enough for now.
 	if (targ->falling)
@@ -376,7 +376,7 @@ void caosVM::v_FALL() {
  floating, 3 is inside a vehicle, and 4 is being carried.
 */
 void caosVM::v_MOVS() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	result.setInt(0); // TODO
 }
@@ -391,7 +391,7 @@ void caosVM::c_FLTO() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	caos_assert(targ)
+	valid_agent(targ)
 	targ->floatTo(x, y);
 }
 
@@ -405,7 +405,7 @@ void caosVM::c_FLTO() {
 void caosVM::c_FREL() {
 	VM_PARAM_AGENT(agent)
 
-	caos_assert(targ)
+	valid_agent(targ)
 	targ->floatTo(agent);
 }
 
@@ -416,7 +416,7 @@ void caosVM::c_FREL() {
  Returns the x value of the TARG agent's floating vector.
 */
 void caosVM::v_FLTX() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	if (targ->floatingagent)
 		result.setFloat(targ->floatingagent->x - targ->x);
@@ -431,7 +431,7 @@ void caosVM::v_FLTX() {
  Returns the y value of the TARG agent's floating vector.
 */
 void caosVM::v_FLTY() {
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	if (targ->floatingagent)
 		result.setFloat(targ->floatingagent->x - targ->x);

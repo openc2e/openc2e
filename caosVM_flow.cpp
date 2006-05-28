@@ -187,7 +187,7 @@ void caosVM::c_ESEE() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 	
-	caos_assert(owner);
+	valid_agent(owner);
 	float ownerx = (owner->x + owner->getWidth() / 2);
 	float ownery = (owner->y + owner->getHeight() / 2);
 	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
@@ -249,7 +249,7 @@ void caosVM::c_ETCH() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	caos_assert(owner);
+	valid_agent(owner);
 	
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
@@ -334,7 +334,7 @@ void caosVM::c_CALL() {
 	VM_PARAM_VALUE(p1)
 	VM_PARAM_INTEGER(script_no)
 
-	caos_assert(owner);
+	valid_agent(owner);
 	caos_assert(script_no >= 0 && script_no < 65536);
 
 	shared_ptr<script> s = owner->findScript(script_no);

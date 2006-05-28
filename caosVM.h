@@ -799,6 +799,12 @@ class notEnoughParamsException : public caosException {
 		notEnoughParamsException() : caosException("Not enough parameters") {}
 };
 
+class invalidAgentException : public caosException {
+	public:
+		invalidAgentException() : caosException("Invalid agent handle") {}
+		invalidAgentException(const char *d) : caosException(d) {}
+};
+
 #define VM_VERIFY_SIZE(n) // no-op, we assert in the pops. orig: if (params.size() != n) { throw notEnoughParamsException(); }
 static inline void VM_STACK_CHECK(const caosVM *vm) {
 	if (!vm->valueStack.size())
@@ -815,7 +821,8 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	name = __x.getLVal().getFloat(); } vm->valueStack.pop_back();
 #define VM_PARAM_AGENT(name) boost::shared_ptr<Agent> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getAgent(); } vm->valueStack.pop_back();
-#define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) caos_assert(name.get() != NULL);
+// TODO: is usage of valid_agent correct here, or should we be caos_asserting?
+#define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) valid_agent(name);
 #define VM_PARAM_VARIABLE(name) caosVar *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_DECIMAL(name) caosVar name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
@@ -826,6 +833,8 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	name = __x.getByteStr(); } vm->valueStack.pop_back();
 
 #define STUB throw caosException("stub in " __FILE__)
+
+#define valid_agent(x) { if (!(x)) throw invalidAgentException(#x); }
 
 #endif
 /* vim: set noet: */

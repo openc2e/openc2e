@@ -35,7 +35,7 @@ void caosVM::c_CLAC() {
   VM_VERIFY_SIZE(1)
   VM_PARAM_INTEGER(message)
 
-  caos_assert(targ);
+  valid_agent(targ);
 
   targ->clac[0] = calculateScriptId(message);
   targ->clik = -1;
@@ -46,7 +46,7 @@ void caosVM::c_CLAC() {
  %status maybe
 */
 void caosVM::v_CLAC() {
-	caos_assert(targ);
+	valid_agent(targ);
 	if (targ->clik != -1)
 		result.setInt(targ->clac[0]);
 	else
@@ -67,7 +67,7 @@ void caosVM::c_CLIK() {
 	VM_PARAM_INTEGER(msg2)
 	VM_PARAM_INTEGER(msg1)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	targ->clac[0] = calculateScriptId(msg1);
 	targ->clac[1] = calculateScriptId(msg2);
@@ -82,7 +82,7 @@ void caosVM::c_CLIK() {
 void caosVM::v_CLIK() {
 	VM_PARAM_INTEGER(data)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 
 	if (targ->clik == -1)
 		result.setInt(-2);
@@ -109,7 +109,7 @@ void caosVM::v_CLIK() {
 void caosVM::c_IMSK() {
 	VM_PARAM_INTEGER(flags)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->imsk_key_down = (flags & 1);
 	targ->imsk_key_up = (flags & 2);
 	targ->imsk_mouse_move = (flags & 4);
@@ -127,7 +127,7 @@ void caosVM::c_IMSK() {
  Returns the input event flags for the target agent. See the IMSK command for details.
 */
 void caosVM::v_IMSK() {
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(0); // TODO
 }
 

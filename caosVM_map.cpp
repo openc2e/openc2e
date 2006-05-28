@@ -386,7 +386,7 @@ void caosVM::c_PERM() {
 	if (perm < 0) perm = 0;
 	if (perm > 100) perm = 100;
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->perm = perm;
 }
 
@@ -399,7 +399,7 @@ void caosVM::c_PERM() {
 void caosVM::v_PERM() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->perm);
 }
 
@@ -468,7 +468,7 @@ void caosVM::v_GRID() {
 	VM_PARAM_INTEGER(direction) caos_assert(direction >= 0); caos_assert(direction <= 3);
 	VM_PARAM_VALIDAGENT(agent)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	Point src = targ->boundingBoxPoint(direction);
 	Point dest = src;
 	
@@ -510,7 +510,7 @@ void caosVM::c_EMIT() {
 	VM_PARAM_INTEGER(caindex)
 	
 	caos_assert((0 <= caindex && caindex <= 19) || caindex == -1);
-	caos_assert(targ);
+	valid_agent(targ);
 
 	targ->emitca_index = caindex;
 	targ->emitca_amount = amount;
@@ -525,7 +525,7 @@ void caosVM::c_EMIT() {
 void caosVM::v_WALL() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->lastcollidedirection);
 }
 
@@ -546,7 +546,7 @@ void caosVM::c_ALTR() {
 
 	Room *room;
 	if (roomid == -1) {
-		caos_assert(targ);
+		valid_agent(targ);
 		room = world.map.roomAt(targ->x + (targ->getWidth() / 2), targ->y + (targ->getHeight() / 2));
 	} else
 		room = world.map.getRoom(roomid);
@@ -693,7 +693,7 @@ void caosVM::v_TORX() {
 
 	Room *r = world.map.getRoom(roomid);
 	caos_assert(r);
-	caos_assert(targ);
+	valid_agent(targ);
 
 	float centrex = r->x_left + ((r->x_right - r->x_left) / 2);
 	result.setFloat(centrex - targ->x);
@@ -708,7 +708,7 @@ void caosVM::v_TORY() {
 
 	Room *r = world.map.getRoom(roomid);
 	caos_assert(r);
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO: calculate this however c2e does it.. or at least check this is right
 	float topy = (r->y_left_ceiling - r->y_right_ceiling) / 2;

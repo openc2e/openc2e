@@ -143,7 +143,7 @@ XXX: when serialization support works, this might well become good for
 */
 void caosVM::v_UNID() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->getUNID());
 }
 

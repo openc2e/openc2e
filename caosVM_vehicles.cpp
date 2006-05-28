@@ -33,7 +33,7 @@ void caosVM::c_CABN() {
 	VM_PARAM_INTEGER(top)
 	VM_PARAM_INTEGER(left)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 	v->setCabinRect(left, top, right, bottom);
@@ -47,7 +47,7 @@ void caosVM::c_CABW() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(cap)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 	v->setCapacity(cap);
@@ -82,7 +82,7 @@ void caosVM::c_GPAS() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 }
@@ -100,7 +100,7 @@ void caosVM::c_DPAS() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 }
@@ -112,7 +112,7 @@ void caosVM::c_DPAS() {
 void caosVM::c_CABP() {
 	VM_PARAM_INTEGER(plane)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 
@@ -126,7 +126,7 @@ void caosVM::c_CABP() {
 void caosVM::c_CABV() {
 	VM_PARAM_INTEGER(room_id)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 	
@@ -138,7 +138,7 @@ void caosVM::c_CABV() {
  %status stub
 */
 void caosVM::v_CABV() {
-	caos_assert(targ);
+	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 

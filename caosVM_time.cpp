@@ -181,7 +181,7 @@ void caosVM::v_WPAU() {
 void caosVM::c_PAUS() {
 	VM_PARAM_INTEGER(paused)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	targ->paused = paused;
 }
@@ -193,7 +193,7 @@ void caosVM::c_PAUS() {
  Returns 1 if target agent is paused, or 0 otherwise.
 */
 void caosVM::v_PAUS() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	if (targ->paused)
 		result.setInt(1);

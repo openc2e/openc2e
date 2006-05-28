@@ -29,7 +29,7 @@
 using std::cerr;
 
 SpritePart *caosVM::getCurrentSpritePart() {
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundPart *p = targ->part(part);
 	if (!p) return 0;
 	SpritePart *s = dynamic_cast<SpritePart *>(p);
@@ -119,7 +119,7 @@ void caosVM::c_TTAR() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 	
-	caos_assert(targ);
+	valid_agent(owner);
 	
 	setTarg(0); // TODO
 }
@@ -137,7 +137,7 @@ void caosVM::c_STAR() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	setTarg(0); // TODO
 }
@@ -274,7 +274,7 @@ void caosVM::c_POSE() {
 void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->setAttributes(attr);
 }
 
@@ -286,7 +286,7 @@ void caosVM::c_ATTR() {
 */
 void caosVM::v_ATTR() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->getAttributes());
 }
 
@@ -300,7 +300,7 @@ void caosVM::v_ATTR() {
 void caosVM::c_TICK() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(tickrate)
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->setTimerRate(tickrate);
 }
 
@@ -314,7 +314,7 @@ void caosVM::c_BHVR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(bhvr)
 	
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// reset bhvr
 	targ->cr_can_push = targ->cr_can_pull = targ->cr_can_stop =
@@ -365,7 +365,7 @@ void caosVM::v_FROM() {
 void caosVM::v_POSE() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	SpritePart *p = getCurrentSpritePart();
 	if (p)
@@ -403,7 +403,7 @@ void caosVM::c_ANIM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_BYTESTR(bs)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);
@@ -470,7 +470,7 @@ void caosVM::c_BASE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(index)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);
@@ -502,7 +502,7 @@ void caosVM::v_BASE() {
 void caosVM::v_BHVR() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	unsigned char bvr = 0;
 
@@ -525,7 +525,7 @@ void caosVM::v_BHVR() {
 */
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	result.setAgent(targ->carriedby);
 }
@@ -538,7 +538,7 @@ void caosVM::v_CARR() {
 */
 void caosVM::v_FMLY() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->family);
 }
 
@@ -550,7 +550,7 @@ void caosVM::v_FMLY() {
 */
 void caosVM::v_GNUS() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->genus);
 }
 
@@ -562,7 +562,7 @@ void caosVM::v_GNUS() {
 */
 void caosVM::v_SPCS() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->species);
 }
 
@@ -574,7 +574,7 @@ void caosVM::v_SPCS() {
 */
 void caosVM::v_PLNE() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->getZOrder());
 }
 
@@ -673,7 +673,7 @@ void caosVM::c_SHOW() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(visibility)
 	caos_assert((visibility == 0) || (visibility == 1));
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->visible = visibility;
 }
 
@@ -685,7 +685,7 @@ void caosVM::c_SHOW() {
 */
 void caosVM::v_POSX() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->x + (targ->getWidth() / 2.0));
 }
 
@@ -697,7 +697,7 @@ void caosVM::v_POSX() {
 */
 void caosVM::v_POSY() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->y + (targ->getHeight() / 2.0));
 }
 
@@ -713,7 +713,7 @@ void caosVM::c_FRAT() {
 	VM_PARAM_INTEGER(framerate)
 
 	caos_assert(framerate >= 1 && framerate <= 255);
-	caos_assert(targ);
+	valid_agent(targ);
 
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);
@@ -733,7 +733,6 @@ class blockUntilOver : public blockCond {
 
 			if (!targ) return false;
 
-			caos_assert(targ)
 			CompoundPart *s = targ->part(part);
 			caos_assert(s);
 			SpritePart *p = dynamic_cast<SpritePart *>(s);
@@ -757,7 +756,7 @@ class blockUntilOver : public blockCond {
  Waits (blocks the TARG agent) until the animation of the TARG agent or PART is over.
 */
 void caosVM::c_OVER() {
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	startBlocking(new blockUntilOver(targ, part));
 }
@@ -775,7 +774,7 @@ void caosVM::c_PUHL() {
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(pose)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	if (pose == -1) {
 		SpritePart *s = dynamic_cast<SpritePart *>(targ->part(0));
@@ -802,7 +801,7 @@ void caosVM::v_PUHL() {
 	VM_PARAM_INTEGER(x_or_y)
 	VM_PARAM_INTEGER(pose)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO: this creates the variable if it doesn't exist yet, correct behaviour?
 	if (x_or_y == 1) {
@@ -822,7 +821,7 @@ void caosVM::v_PUHL() {
 void caosVM::v_POSL() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->x);
 }
 
@@ -835,7 +834,7 @@ void caosVM::v_POSL() {
 void caosVM::v_POST() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->y);
 }
 
@@ -848,7 +847,7 @@ void caosVM::v_POST() {
 void caosVM::v_POSR() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->x + targ->getWidth());
 }
 
@@ -861,7 +860,7 @@ void caosVM::v_POSR() {
 void caosVM::v_POSB() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->y + targ->getHeight());
 }
 
@@ -874,7 +873,7 @@ void caosVM::v_POSB() {
 void caosVM::v_WDTH() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->getWidth());
 }
 
@@ -888,7 +887,7 @@ void caosVM::c_PLNE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(depth)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->setZOrder(depth);
 }
 
@@ -927,7 +926,7 @@ void caosVM::c_RNGE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(distance)
 
-	caos_assert(targ)
+	valid_agent(targ)
 	targ->range = distance;
 }
 
@@ -939,7 +938,7 @@ void caosVM::c_RNGE() {
 */
 void caosVM::v_RNGE() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setFloat(targ->range);
 }
 
@@ -955,7 +954,7 @@ void caosVM::v_TRAN() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	CompoundPart *s = targ->part(0); assert(s);
 	SpritePart *p = dynamic_cast<SpritePart *>(s);
 	caos_assert(p);
@@ -980,7 +979,7 @@ void caosVM::c_TRAN() {
 	VM_PARAM_INTEGER(part_no)
 	VM_PARAM_INTEGER(transparency)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	// TODO: handle -1?
 	CompoundPart *s = targ->part(part_no);
 	caos_assert(s);
@@ -997,7 +996,7 @@ void caosVM::c_TRAN() {
 */
 void caosVM::v_HGHT() {
 	VM_VERIFY_SIZE(0)
-	caos_assert(targ);
+	valid_agent(targ);
 
 	result.setInt(targ->getHeight());
 }
@@ -1036,7 +1035,7 @@ void caosVM::c_HAND() {
 void caosVM::v_TICK() {
 	VM_VERIFY_SIZE(0)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(targ->timerrate);
 }
 
@@ -1053,7 +1052,7 @@ void caosVM::c_PUPT() {
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(pose)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	// this is basically a copy of PUHL, change that first
 	if (pose == -1) {
@@ -1078,7 +1077,7 @@ void caosVM::c_PUPT() {
  Stop the script running in TARG, if any.
 */
 void caosVM::c_STPT() {
-	caos_assert(targ)
+	valid_agent(targ)
 	targ->stopScript();
 }
 
@@ -1092,7 +1091,7 @@ void caosVM::c_STPT() {
 void caosVM::c_DCOR() {
 	VM_PARAM_INTEGER(core_on)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	targ->displaycore = core_on;
 }
 
@@ -1103,7 +1102,7 @@ void caosVM::c_DCOR() {
  Turns mirroring of the TARG agent's current sprite on or off (0 or 1).
 */
 void caosVM::v_MIRA() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	result.setInt(0); // TODO
 }
@@ -1117,7 +1116,7 @@ void caosVM::v_MIRA() {
 void caosVM::c_MIRA() {
 	VM_PARAM_INTEGER(mirror_on)
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO
 }
@@ -1132,7 +1131,7 @@ void caosVM::c_MIRA() {
 void caosVM::v_DISQ() {
 	VM_PARAM_VALIDAGENT(other)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	float x = (targ->x + (targ->getWidth() / 2)) - (other->x + (other->getWidth() / 2));
 	float y = (targ->y + (targ->getHeight() / 2)) - (other->y + (other->getHeight() / 2));
@@ -1154,7 +1153,7 @@ void caosVM::c_ALPH() {
 	if (alpha_value < 0) alpha_value = 0;
 	else if (alpha_value > 255) alpha_value = 255;
 
-	caos_assert(targ);
+	valid_agent(targ);
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
 	if (c && part == -1) {
@@ -1177,7 +1176,7 @@ void caosVM::c_ALPH() {
  Returns the agent currently held by the TARG agent, or a random one if there are more than one.
 */
 void caosVM::v_HELD() {
-	caos_assert(targ);
+	valid_agent(targ);
 	
 	// TODO: how does 'more than one' occur?
 	result.setAgent(targ->carrying);
@@ -1242,7 +1241,7 @@ void caosVM::v_SEEE() {
 void caosVM::v_TINT() {
 	VM_PARAM_INTEGER(attribute)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	result.setInt(0); // TODO
 }
 
@@ -1269,7 +1268,7 @@ void caosVM::c_TINO() {
  Causes the TARG agent to drop what it is carrying in a safe location.
 */
 void caosVM::c_DROP() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO
 }

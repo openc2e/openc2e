@@ -673,7 +673,7 @@ int findCategory(unsigned char family, unsigned char genus, unsigned short speci
  Returns the agent category of the TARG agent.
 */
 void caosVM::v_CATA() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	result.setInt(findCategory(targ->family, targ->genus, targ->species));
 }
@@ -756,7 +756,7 @@ void caosVM::v_WILD() {
 void caosVM::v_NAME() {
 	VM_PARAM_VALUE(name)
 		
-	caos_assert(targ);
+	valid_agent(targ);
 	valueStack.push_back(&targ->name_variables[name]);
 }
 
@@ -769,7 +769,7 @@ void caosVM::v_NAME() {
 void caosVM::v_MAME() {
 	VM_PARAM_VALUE(name)
 
-	caos_assert(owner);
+	valid_agent(owner);
 	valueStack.push_back(&owner->name_variables[name]);
 }
 
@@ -884,7 +884,7 @@ void caosVM::v_REAN() {
 void caosVM::c_DELN() {
 	VM_PARAM_VALUE(name)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	std::map<caosVar, caosVar, caosVarCompare>::iterator i = targ->name_variables.find(name);
 	caos_assert(i != targ->name_variables.end()); // TODO: correct behaviour, or should we just return?
 	targ->name_variables.erase(i);
@@ -921,7 +921,7 @@ void caosVM::v_GAMN() {
 void caosVM::c_NAMN() {
 	VM_PARAM_VARIABLE(previous)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	// TODO: we assume that NAME variables don't have an empty string
 	if (previous->hasString() && previous->getString().empty()) {
 		if (targ->name_variables.size() == 0)

@@ -126,7 +126,7 @@ void caosVM::c_GENE_MOVE() {
 void caosVM::v_GTOS() {
 	VM_PARAM_INTEGER(slot)
 
-	caos_assert(targ);
+	valid_agent(targ);
 	caos_assert(targ->slots.find(slot) != targ->slots.end());
 	shared_ptr<class genomeFile> g = targ->slots[slot];
 	result.setString(world.history.findMoniker(g));
