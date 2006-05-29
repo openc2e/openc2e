@@ -153,4 +153,65 @@ bool doCacheDir(path &dir) {
 	dircache.insert(dir.string());
 	return true;
 }
+
+static void constructSearchPattern(const std::string &wild, std::vector<std::string> &l) {
+	std::string::const_iterator i = wild.begin();
+	l.push_back(std::string());
+	while (i != wild.end()) {
+		if (*i != '*')
+			l.back().push_back(*i);
+		else
+			l.push_back(std::string());
+		i++;
+	}
+}
+
+static bool checkSearchPattern(const std::string &match, const std::vector<std::string> &l) {
+	size_t p = 0;
+	std::vector<std::string>::const_iterator it = l.begin();
+	while (it != l.end()) {
+		p = match.find(*it, p);
+		if (p == std::string::npos)
+			return false;
+		it++;
+	}
+	if (match.substr(match.length() - l.back().length()) != l.back())
+		return false;
+	return true;
+}
+
+// XXX: this might not handle new files too well...
+std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
+	wild = toLowerCase(wild);
+
+	path dirp(dir, native);
+	dirp.normalize();
+	if (!resolveFile(dirp))
+		return std::vector<std::string>();
+	dir = dirp.string();
+
+	if (!doCacheDir(dirp))
+		return std::vector<std::string>();
+	std::vector<std::string> l, results;
+	constructSearchPattern(wild, l);
+
+	std::string lcdir = toLowerCase(dir);
+	std::map<string, string>::iterator skey = cache.lower_bound(lcdir);
+	for (; skey != cache.end(); skey++) {
+		if (skey->first.length() < lcdir.length())
+			break;
+		std::string dirpart, filepart; // XXX: we should use boost fops, maybe
+		dirpart = skey->first.substr(0, lcdir.length());
+		if (dirpart != lcdir)
+			break;
+		if (skey->first.length() < lcdir.length() + 2)
+			continue;
+		filepart = toLowerCase(skey->first.substr(lcdir.length() + 1));
+		if (!checkSearchPattern(filepart, l))
+			continue;
+		results.push_back(skey->second);
+	}
+	return results;
+}
+
 /* vim: set noet: */

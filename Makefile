@@ -93,7 +93,7 @@ XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
 default: openc2e tools/praydumper docs
-all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/memstats
+all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/memstats tools/wildtest
 
 docs: docs.html
 
@@ -157,6 +157,9 @@ tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/pathtest: tools/pathtest.o PathResolver.o
+	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
+
+tools/wildtest: tools/wildtest.o PathResolver.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/memstats: tools/memstats.o $(OPENC2E_CORE)

@@ -21,6 +21,7 @@
 #define PATHRESOLVER_H 1
 
 #include <string>
+#include <vector>
 #include <boost/filesystem/path.hpp>
 
 /* resolveFile
@@ -30,6 +31,8 @@
 bool resolveFile(std::string &srcPath);
 
 bool resolveFile(boost::filesystem::path &path);
+
+std::vector<std::string> findByWildcard(std::string dir, std::string wild);
 
 #endif
 
