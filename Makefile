@@ -169,7 +169,7 @@ tools/serialtest: tools/serialtest.o $(OPENC2E_CORE) $(SERIALIZATION)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 clean:
-	rm -f *.o openc2e filetests praydumper tools/*.o config.mk
+	rm -f *.o openc2e openc2e_s filetests praydumper tools/*.o config.mk
 	rm -rf .deps
 	rm -f commandinfo.yml lex.yy.cpp lex.yy.h lex.mng.cpp lex.mng.h mngparser.tab.cpp mngparser.tab.hpp cmddata.cpp
 	rm -f tools/filetests tools/memstats tools/mngtest tools/pathtest tools/praydumper tools/serialtest
