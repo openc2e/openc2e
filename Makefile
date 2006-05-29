@@ -187,4 +187,6 @@ headerdeps.png: headerdeps.dot
 config.mk: config.mk.in
 	./configure.pl
 
+generated: catalogue.tab.hpp lex.yy.h mngparser.tab.hpp catalogue.lex.h lex.mng.h docs.html cmddata.cpp
+
 .PHONY: clean all dep docs test
