@@ -180,8 +180,10 @@ static bool checkSearchPattern(const std::string &match, const std::vector<std::
 	return true;
 }
 
-// XXX: this might not handle new files too well...
 std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
+	cache.clear();
+	dircache.clear();
+
 	wild = toLowerCase(wild);
 
 	path dirp(dir, native);
