@@ -395,6 +395,20 @@ std::string World::findFile(std::string name) {
 	return "";
 }
 
+std::vector<std::string> World::findFiles(std::string dir, std::string wild) {
+	std::vector<std::string> possibles;
+	
+	// Go backwards, so we find files in more 'modern' directories first..
+	for (int i = data_directories.size() - 1; i != -1; i--) {
+		fs::path p = data_directories[i];
+		std::string r = (p / fs::path(dir, fs::native)).native_directory_string();
+		std::vector<std::string> results = findByWildcard(r, wild);
+		possibles.insert(possibles.end(), results.begin(), results.end()); // merge results
+	}
+
+	return possibles;
+}
+
 std::string World::getUserDataDir() {
 	return (data_directories.end() - 1)->native_directory_string();
 }

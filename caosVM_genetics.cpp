@@ -82,11 +82,10 @@ void caosVM::c_GENE_LOAD() {
 	VM_PARAM_INTEGER(slot)
 	VM_PARAM_VALIDAGENT(agent)
 
-	// TODO: wildcards
-	
-	std::string gfilename = world.findFile(std::string("/Genetics/") + genefile + ".gen");
-	if (gfilename.empty())
+	std::vector<std::string> possibles = world.findFiles("/Genetics/", genefile + ".gen");
+	if (possibles.empty())
 		throw creaturesException("failed to find genome file '" + genefile + '"');
+	std::string gfilename = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
 	
 	shared_ptr<genomeFile> p(new genomeFile());
 

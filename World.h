@@ -105,6 +105,7 @@ public:
 
 	std::string getUserDataDir();
 	std::string findFile(std::string path);
+	std::vector<std::string> findFiles(std::string dir, std::string wild);
 
 	std::string generateMoniker(std::string basename);
 	
