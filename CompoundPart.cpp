@@ -57,7 +57,7 @@ void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 
 void SpritePart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
 	assert(getCurrentSprite() < getSprite()->numframes());
-	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha);
+	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha, draw_mirrored);
 }
 
 void SpritePart::setFrameNo(unsigned int f) {
@@ -114,6 +114,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	is_transparent = true;
 	framerate = 1;
 	framedelay = 0;
+	draw_mirrored = false;
 }
 
 SpritePart::~SpritePart() {

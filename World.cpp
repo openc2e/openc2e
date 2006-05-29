@@ -247,7 +247,7 @@ void World::drawWorld() {
 			if ((destx >= -128) && (desty >= -128) &&
 					(destx - 128 <= backend->getWidth()) &&
 					(desty - 128 <= backend->getHeight()))
-				backend->render(bkgd, whereweare, destx, desty, false, 0);
+				backend->render(bkgd, whereweare, destx, desty);
 		}
 	}
 

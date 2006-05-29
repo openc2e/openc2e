@@ -1097,28 +1097,37 @@ void caosVM::c_DCOR() {
 
 /**
  MIRA (integer)
- %status stub
+ %status maybe
 
- Turns mirroring of the TARG agent's current sprite on or off (0 or 1).
+ Determines whether or not the TARG agent's current sprite is mirrored. Returns 0 or 1.
 */
 void caosVM::v_MIRA() {
 	valid_agent(targ);
+	
+	// TODO: correct?
+	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
 
-	result.setInt(0); // TODO
+	result.setInt(p->draw_mirrored);
 }
  
 /**
  MIRA (command) mirror_on (integer)
- %status stub
+ %status maybe
 
- Determines whether or not the TARG agent's current sprite is mirrored. Returns 0 or 1.
+ Turns mirroring of the TARG agent's current sprite on or off (0 or 1).
 */
 void caosVM::c_MIRA() {
 	VM_PARAM_INTEGER(mirror_on)
 
 	valid_agent(targ);
 
-	// TODO
+	// TODO: what does 'current sprite' mean?
+	// TODO: correct?
+	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
+
+	p->draw_mirrored = mirror_on;
 }
 
 /**

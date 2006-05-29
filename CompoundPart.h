@@ -76,6 +76,7 @@ protected:
 public:
 	bytestring_t animation;
 	bool is_transparent;
+	bool draw_mirrored;
 	unsigned char framerate;
 	unsigned int framedelay;
 	creaturesImage *getSprite() { return sprite; }

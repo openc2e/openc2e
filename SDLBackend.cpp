@@ -112,11 +112,51 @@ SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
 	return &sounddata[i];
 }
 
-void SDLBackend::renderLine(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int colour) {
+void SDLBackend::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
 	aalineColor(screen, x1, y1, x2, y2, colour);
 }
 
-void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int x, unsigned int y, bool trans, unsigned char transparency) {
+//*** code to mirror 16bpp surface - slow, we should cache this!
+
+Uint16 *pixelPtr(SDL_Surface *surf, int x, int y) {
+	return (Uint16 *)((Uint8 *)surf->pixels + (y * surf->pitch) + (x * 2));
+}
+
+SDL_Surface *MirrorSurface(SDL_Surface *surf) {
+	SDL_Surface* newsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, surf->w, surf->h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
+	SDL_BlitSurface(surf, 0, newsurf, 0);
+
+	if (SDL_MUSTLOCK(newsurf))
+		if (SDL_LockSurface(newsurf) == -1) {
+			SDL_FreeSurface(newsurf);
+			throw creaturesException("SDLBackend failed to lock surface for mirroring");
+		}
+
+	for (unsigned int y = 0; y < newsurf->h; y++) {
+		for (unsigned int x = 0; x < (newsurf->w / 2); x++) {
+			Uint16 *one = pixelPtr(newsurf, x, y);
+			Uint16 *two = pixelPtr(newsurf, (newsurf->w - 1) - x, y);
+			Uint16 temp = *one;
+			*one = *two;
+			*two = temp;
+		}
+	}
+	
+	if (SDL_MUSTLOCK(newsurf))
+		SDL_UnlockSurface(newsurf);
+
+	return newsurf;
+}
+
+//*** end mirror code
+
+void SDLBackend::render(creaturesImage *image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror) {
+	// don't bother rendering off-screen stuff
+	if (x >= width) return; if (y >= height) return;
+	if ((x + image->width(frame)) <= 0) return;
+	if ((y + image->height(frame)) <= 0) return;
+
+	// create surface
 	unsigned int rmask, gmask, bmask;
 	if (image->is565()) {
 		rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
@@ -128,12 +168,30 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, unsigned int 
 							16, // depth
 							image->width(frame) * 2, // pitch
 							rmask, gmask, bmask, 0); // RGBA mask
+	
+	// try mirroring, if necessary
+	try {
+		if (mirror) {
+			SDL_Surface *newsurf = MirrorSurface(surf);
+			SDL_FreeSurface(surf);
+			surf = newsurf;
+		}
+	} catch (std::exception &e) {
+		SDL_FreeSurface(surf);
+		throw;
+	}
+	
+	// set colour-keying/alpha
 	// TODO: presumably there's a nicer way of doing this than dynamic_cast :P
 	if (!dynamic_cast<blkImage *>(image)) SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
 	if (trans) SDL_SetAlpha(surf, SDL_SRCALPHA, 255 - transparency);
+	
+	// do actual blit
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;
 	SDL_BlitSurface(surf, 0, screen, &destrect);
+
+	// free surface
 	SDL_FreeSurface(surf);
 }
 
