@@ -196,13 +196,13 @@ std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
 	constructSearchPattern(wild, l);
 
 	std::string lcdir = toLowerCase(dir);
-	std::map<string, string>::iterator skey = cache.lower_bound(lcdir);
+	std::map<string, string>::iterator skey = cache.lower_bound(dir);
 	for (; skey != cache.end(); skey++) {
 		if (skey->first.length() < lcdir.length())
 			break;
 		std::string dirpart, filepart; // XXX: we should use boost fops, maybe
 		dirpart = skey->first.substr(0, lcdir.length());
-		if (dirpart != lcdir)
+		if (dirpart != dir)
 			break;
 		if (skey->first.length() < lcdir.length() + 2)
 			continue;
