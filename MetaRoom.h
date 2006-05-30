@@ -33,8 +33,8 @@ class MetaRoom {
 protected:
 	FRIEND_SERIALIZE(MetaRoom);
 	unsigned int xloc, yloc, wid, hei;
-	std::map<std::string, blkImage *> backgrounds;
-	blkImage *firstback;
+	std::map<std::string, creaturesImage *> backgrounds;
+	creaturesImage *firstback;
 	
 	MetaRoom() { firstback = 0; }
 

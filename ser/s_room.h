@@ -38,7 +38,6 @@ SERIALIZE(Room) {
     ar & obj.y_left_ceiling & obj.y_right_ceiling;
     ar & obj.y_left_floor & obj.y_right_floor;
 
-    ar & obj.ul & obj.ur & obj.bl & obj.br;
     ar & obj.left & obj.right & obj.top & obj.bot;
 
     ar & obj.type & obj.id;

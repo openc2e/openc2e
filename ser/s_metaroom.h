@@ -23,25 +23,11 @@
 #include "ser/s_room.h"
 #include "MetaRoom.h"
 #include "serialization.h"
+#include "ser/s_creaturesImage.h"
 
-SAVE(MetaRoom) {
+SERIALIZE(MetaRoom) {
     ar & obj.xloc & obj.yloc & obj.wid & obj.hei;
-    if (obj.background)
-        ar & obj.background->name;
-    else {
-        std::string s("");
-        ar & s;
-    }
-    ar & obj.rooms & obj.id;
-}
-
-LOAD(MetaRoom) {
-    ar & obj.xloc & obj.yloc & obj.wid & obj.hei;
-    std::string backname;
-    ar & backname;
-
-    obj.setup(obj.xloc, obj.yloc, obj.wid, obj.hei, backname);
-    ar & obj.rooms & obj.id;
+    ar & obj.backgrounds & obj.firstback;
 }
 
 #endif

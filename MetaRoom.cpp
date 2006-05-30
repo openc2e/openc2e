@@ -42,15 +42,21 @@ void MetaRoom::addBackground(std::string back) {
 
 std::vector<std::string> MetaRoom::backgroundList() {
 	std::vector<std::string> b;
-	for (std::map<std::string, blkImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
+	for (std::map<std::string, creaturesImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
 		b.push_back(i->first);
 	return b;
 }
 
 blkImage *MetaRoom::getBackground(std::string back) {
-	if (back.empty()) return firstback;
+	if (back.empty()) {
+		blkImage *blk = dynamic_cast<blkImage *>(firstback);
+		assert(blk || !firstback);
+		return blk;
+	}
 	if (backgrounds.find(back) != backgrounds.end()) return 0;
-	return backgrounds[back];
+	blkImage *blk = dynamic_cast<blkImage *>(backgrounds[back]);
+	assert(blk || !backgrounds[back]);
+	return blk;
 }
 	
 MetaRoom::~MetaRoom() {
@@ -58,7 +64,7 @@ MetaRoom::~MetaRoom() {
 		delete *i;
 	}
 
-	for (std::map<std::string, blkImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++) {
+	for (std::map<std::string, creaturesImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++) {
 		world.gallery.delImage(i->second);
 	}
 }
