@@ -177,7 +177,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 				return false;*/
 				continue; // continue, bad collision
 			}
-		
+
 			Room *nextroom = 0;
 			bool foundroom = false;
 
@@ -193,6 +193,9 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 					break;
 				}
 			}
+			
+			if (!foundroom && !nextroom)
+				nextroom = roomAt(newx, newy);
 
 			/*if (temppoint == src) { // if we're just doing the backwards PERM check
 				if (!foundroom || nextroom != 0) {
