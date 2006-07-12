@@ -112,8 +112,8 @@ public:
 	void tick();
 	void drawWorld();
 
-	int World::getUNID(Agent *whofor);
-	void World::freeUNID(int unid);
+	int getUNID(Agent *whofor);
+	void freeUNID(int unid);
 
 	Agent *lookupUNID(int unid);
 };
