@@ -3,13 +3,14 @@
 package Shake::Check::Cpp::Boost::Version;
 use strict;
 use warnings;
+use Shake::Check;
+use base 'Shake::Check';
 
 use Fatal 'unlink';
 use File::Temp 'mkstemps', 'mktemp';
 use IO::File;
 use Shake::Util 'version_ge';
-use Shake::Check;
-use base 'Shake::Check';
+use Shake::Check::Cpp::Compiler;
 
 use constant PROGRAM => <<'CODE';
 #include <cstdio>
@@ -33,23 +34,21 @@ our $VERSION = 0.03;
 
 sub initialize {
 	my ($self, $version, %args) = @_;
-	$self->{compiler} = $args{compiler} or die "Test must be passed a C++ compiler to use!";
-	$self->{version}  = $version
-}
-
-sub dummy {
-	shift->new('1.0.0', compiler => 'g++');
+	$self->{version}  = $version;
+	$self->requires(
+		new Shake::Check::Cpp::Compiler,
+	);
 }
 
 sub msg {
 	my ($self) = @_;
 
-	return "checking boost version >= $self->{version}";
+	return "boost version >= $self->{version}";
 }
 
 sub run {
-	my ($self, $config) = @_;
-	my $cc = $self->{compiler};
+	my ($self, $engine) = @_;
+	my $cc = $engine->lookup('cpp.compiler');
 	
 	my ($fh, $srcfile) = mkstemps('shake-XXXXXX', '.cpp') or die "failed to get temp .cpp file";
 	my $exefile = mktemp('shake-check-XXXXXX') or die "Failed to get temp .exe file";

@@ -3,8 +3,12 @@
 package Shake::Base;
 use strict;
 use warnings;
+use Carp;
+use Exporter;
+use base 'Exporter';
 
-our $VERSION = 0.01;
+our @EXPORT = 'fields';
+our $VERSION = 0.02;
 
 sub new {
 	my $class = shift;
@@ -20,5 +24,21 @@ sub invoke {
 }
 
 sub initialize { }
+
+sub fields (@) {
+	no strict 'refs';
+    my $package = caller;
+    foreach my $field (@_) {
+    	croak "$field is already defined in $package" if defined &{"${package}::$field"};
+    	*{"${package}::$field"} = sub {
+    		my $self = shift;
+    		if (@_ == 0) {
+    			return $self->{$field};
+    		} else {
+    			return $self->{$field} = shift;
+    		}
+    	};
+    }
+}
 
 1;

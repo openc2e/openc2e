@@ -1,6 +1,6 @@
 # vim: set ts=4 sw=4 noexpandtab si ai sta tw=100:
 # This module is copyrighted, see end of file for details.
-package Shake::Check::C::Header;
+package Shake::Check::Cpp::Header;
 use strict;
 use warnings;
 use Shake::Check;
@@ -9,7 +9,7 @@ use base 'Shake::Check';
 use Fatal 'unlink';
 use File::Temp 'mkstemps';
 use File::Spec;
-use Shake::Check::C::Compiler;
+use Shake::Check::Cpp::Compiler;
 
 our $VERSION = 0.05;
 
@@ -17,7 +17,7 @@ sub initialize {
 	my ($self, $header, %args) = @_;
 	$self->{header} = $header;
 	$self->requires(
-		new Shake::Check::C::Compiler,
+		new Shake::Check::Cpp::Compiler,
 	);
 }
 
@@ -37,8 +37,8 @@ sub shortname {
 
 sub run {
 	my ($self, $engine) = @_;
-	my $cc = $engine->lookup('c.compiler');
-	my $flags = $engine->lookup('CFLAGS') || '';
+	my $cc = $engine->lookup('cpp.compiler');
+	my $flags = $engine->lookup('CXXFLAGS') || '';
 	my $devnull = do {
 		if ($^O eq 'cygwin') {
 			# I smell the stench of Cygwin...

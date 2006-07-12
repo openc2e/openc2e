@@ -21,7 +21,7 @@ sub dummy {
 sub msg {
 	my ($self) = @_;
 
-	return "checking for $self->{program}";
+	return "for $self->{program}";
 }
 
 sub shortname {

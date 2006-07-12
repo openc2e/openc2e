@@ -5,8 +5,36 @@ use strict;
 use warnings;
 use Shake::Base;
 use base 'Shake::Base';
+use File::Temp ();
 
 our $VERSION = 0.03;
+
+sub tempfile {
+	my ($self, @args) = @_;
+	my $t = $self->prefix;
+	$t =~ s![\\/.]!_!g;
+	my $file = new File::Temp (TEMPLATE => "shake_$t-XXXXXX", @args);
+	push @{ $self->{files} }, $file;
+	return $file;
+}
+
+sub tempfilled {
+	my ($self, $content, @args) = @_;
+	my $file = $self->tempfile(@args);
+	print $file $content;
+	close $file;
+	return $file->filename;
+}
+
+sub tempname {
+	my ($self, @args) = @_;
+	my $file = $self->tempfile(@args);
+	close $file;
+	unlink $file;
+	return "$file";
+}
+
+sub tempexe { shift->tempname($^O eq 'MSWin32' ? (SUFFIX => '.exe') : () ) }
 
 sub prefix {
 	my ($self) = @_;
@@ -24,9 +52,20 @@ sub name {
 }
 
 sub shortname { undef }
-sub version   { shift->VERSION() }
-sub is_fresh  { 1 }
-sub can_cache { 1 }
+sub is_fresh  { 1     }
+sub can_cache { 1     }
+sub version   { 
+	shift->VERSION() 
+}
+
+sub requires {
+	my $self = shift;
+	if (@_ == 0) {
+		return @{ $self->{requires} || [] };
+	} else {
+		$self->{requires} = [ @_ ];
+	}
+}
 
 sub run {
 	my ($self) = @_;
@@ -34,6 +73,7 @@ sub run {
 
 	#return $val;
 }
+
 sub dummy {
 	shift->new()
 }

@@ -8,30 +8,7 @@ use base 'Exporter';
 
 our $VERSION = 0.01;
 our @EXPORT = ();
-our @EXPORT_OK = qw( loaded_modules module_to_filename version_ge );
-
-sub loaded_modules {
-	my @modules;
-	
-	foreach my $file (keys %INC) {
-		push @modules, filename_to_module($file);
-	}
-	
-	return @modules;
-}
-
-sub module_to_filename {
-	my $class = shift;
-	$class =~ s!::!/!g;
-	return "$class.pm";
-}
-
-sub filename_to_module {
-	my $file = shift;
-	$file =~ s!/!::!g;
-	$file =~ s/\.pm$//;
-	return $file;
-}
+our @EXPORT_OK = qw( version_ge );
 
 sub version_ge {
 	my ($ourversion, $reqversion) = @_;

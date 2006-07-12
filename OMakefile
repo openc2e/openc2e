@@ -1,0 +1,129 @@
+########################################################################
+# Subdirectories.
+# You may want to include some subdirectories in this project.
+# If so, define the subdirectory targets and uncomment this section.
+#
+
+# .SUBDIRS:
+
+################################################
+# Configuration.  You might want to modify any of these
+# configuration variables.
+#
+
+# CC = gcc
+# CFLAGS +=
+# AS = as
+# ASFLAGS +=
+# LD = ld
+# LDFLAGS +=
+# INCLUDES +=
+
+include config.mk
+
+CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE $(SDL_CFLAGS)
+CXXFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE $(SDL_CFLAGS)
+LDFLAGS += -lboost_program_options -lboost_serialization -lboost_filesystem $(SDL_LDFLAGS) -lz -lm -lSDL_net -lSDL_mixer -lpthread
+
+################################################
+# Uncomment the following section if you want
+# to build a C program in the current directory.
+#
+
+CORE =  \
+	Agent \
+	AgentRef \
+	attFile \
+	blkImage \
+	bytecode \
+	c16Image \
+	Camera \
+	caosScript \
+	caosVar \
+	caosVM_agent \
+	caosVM_camera \
+	caosVM_compound \
+	caosVM_core \
+	caosVM_creatures \
+	caosVM_debug \
+	caosVM_files \
+	caosVM_flow \
+	caosVM_genetics \
+	caosVM_history \
+	caosVM_input \
+	caosVM_map \
+	caosVM_motion \
+	caosVM_net \
+	caosVM \
+	caosVM_ports \
+	caosVM_resources \
+	caosVM_scripts \
+	caosVM_sounds \
+	caosVM_time \
+	caosVM_variables \
+	caosVM_vehicles \
+	caosVM_world \
+	catalogue.lex \
+	Catalogue \
+	catalogue.tab \
+	cmddata \
+	CompoundAgent \
+	CompoundPart \
+	Creature \
+	creaturesImage \
+	dialect \
+	exceptions \
+	fileSwapper \
+	genomeFile \
+	historyManager \
+	lex.mng \
+	lexutil \
+	lex.yy \
+	Map \
+	MetaRoom \
+	mmapifstream \
+	mngfile \
+	mngparser.tab \
+	PathResolver \
+	physics \
+	PointerAgent \
+	pray \
+	prayManager \
+	renderable \
+	Room \
+	Scriptorium \
+	SDLBackend \
+	SDL_gfxPrimitives \
+	SimpleAgent \
+	SkeletalCreature \
+	streamutils \
+	Vehicle \
+	World
+
+SERIALIZATION = caosVM_ser_real
+SERSTUB = caosVM_ser_stub
+OPENC2E = $(CORE) $(SERSTUB) main
+OPENC2E_S = $(CORE) $(SERIALIZATION) main
+
+
+MAIN = openc2e
+
+.DEFAULT: $(MAIN)$(EXE)
+
+CGeneratedFiles(lex.yy.cpp lex.yy.h cmddata.cpp mngparser.tab.cpp mngparser.tab.hpp)
+CProgram($(MAIN), $(OPENC2E))
+
+lex.mng.cpp lex.mng.h: mng.l
+	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
+
+mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
+	bison -d --name-prefix=mng mngparser.ypp
+
+cmddata.cpp: commandinfo.yml writecmds.pl
+	perl writecmds.pl commandinfo.yml > cmddata.cpp
+
+commandinfo.yml: $(glob caosVM_*.cpp) parsedocs.pl
+	perl parsedocs.pl $(glob caosVM_*.cpp) > commandinfo.yml
+
+lex.yy.cpp lex.yy.h: caos.l
+	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h caos.l

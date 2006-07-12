@@ -1,2 +1,4 @@
 SDL_CFLAGS=@sdl.cflags@
-SDL_LFLAGS=@sdl.lflags@
+SDL_LDFLAGS=@sdl.lflags@
+#CXX=@cpp.compiler@
+#CXXFLAGS=@CXXFLAGS@

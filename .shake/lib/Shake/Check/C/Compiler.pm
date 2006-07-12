@@ -21,7 +21,7 @@ sub dummy { shift->new }
 sub msg {
 	my ($self) = @_;
 
-	return "checking for a C compiler";
+	return "for a C compiler";
 }
 
 sub run {

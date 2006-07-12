@@ -1,6 +1,6 @@
 # vim: set ts=4 sw=4 noexpandtab si ai sta tw=100:
 # This module is copyrighted, see end of file for details.
-package Shake::Check::C::Endian;
+package Shake::Check::Endian;
 use strict;
 use warnings;
 
@@ -10,6 +10,8 @@ use IO::File;
 use Shake::Check;
 use base 'Shake::Check';
 
+use Shake::Check::C::Compiler;
+
 use constant PROGRAM => <<'CODE';
 #include <stdio.h>
 int am_big_endian()
@@ -17,6 +19,7 @@ int am_big_endian()
 	long one = 1;
 	return !(*((char *)(&one)));
 }
+
 int main()
 {
 	if (am_big_endian())
@@ -28,11 +31,16 @@ int main()
 }
 CODE
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub initialize {
 	my ($self, %args) = @_;
-	$self->{compiler} = $args{compiler} or die "Test must be passed a C compiler to use!";
+	}
+
+sub requires {
+	return (
+		new Shake::Check::C::Compiler
+	);
 }
 
 sub dummy {
@@ -42,12 +50,12 @@ sub dummy {
 sub msg {
 	my ($self) = @_;
 
-	return "checking endianness";
+	return "endianness";
 }
 
 sub run {
-	my ($self, $config) = @_;
-	my $cc = $self->{compiler};
+	my ($self, $engine) = @_;
+	my $cc = $engine->lookup('c.compiler');
 	
 	my ($fh, $srcfile) = mkstemps('shake-XXXXXX', '.c') or die "failed to get temp .c file";
 	my $exefile = mktemp('shake-check-XXXXXX') or die "Failed to get temp .exe file";

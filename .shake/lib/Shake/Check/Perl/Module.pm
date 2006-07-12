@@ -17,7 +17,7 @@ sub dummy { shift->new('Dummy') }
 sub msg {
 	my ($self) = @_;
 
-	return "checking for $self->{module}";
+	return "for $self->{module}";
 }
 
 sub shortname {
