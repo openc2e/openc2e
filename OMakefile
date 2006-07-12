@@ -11,14 +11,6 @@
 # configuration variables.
 #
 
-# CC = gcc
-# CFLAGS +=
-# AS = as
-# ASFLAGS +=
-# LD = ld
-# LDFLAGS +=
-# INCLUDES +=
-
 include config.mk
 
 CORE =  \

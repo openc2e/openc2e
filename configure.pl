@@ -25,15 +25,10 @@ check('program', 'bison');
 check('sdl');
 
 my $cxxflags = '-W -Wall -Wno-conversion -Wno-unused -DYYERROR_VERBOSE';
-set CXXFLAGS => join(' ', lookup('sdl.cflags'), $ENV{CXXFLAGS} || '', $cxxflags);
-set LDFLAGS  => join(' ', qw( 
-	-lboost_program_options 
-	-lboost_serialization 
-	-lboost_filesystem ),
-	lookup('sdl.lflags'),
-	$ENV{'LDFLAGS'} || '',
-	qw( -lz -lm -lSDL_net -lSDL_mixer -lpthread ));
-
+my $ldflags  = '-lboost_program_options -lboost_serialization -lboost_filesystem -lz -lm -lSDL_net -lSDL_mixer -lpthread';
+set CXXFLAGS => join(' ', lookup('sdl.cflags'), $ENV{CXXFLAGS}  || '', $cxxflags);
+set LDFLAGS  => join(' ', lookup('sdl.lflags'), $ENV{'LDFLAGS'} || '', $ldflags);
+	
 check('cpp.boost.version', '1.33.0');
 check( 'cpp.header' => $_ ) for qw(
 	SDL_mixer.h
