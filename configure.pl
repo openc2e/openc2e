@@ -42,6 +42,7 @@ check( 'cpp.header' => $_ ) for qw(
 
 
 
+configure('config.om');
 configure('config.mk');
 
 done();

@@ -1,0 +1,77 @@
+# vim: set ft=make:
+CORE =  \
+	Agent \
+	AgentRef \
+	attFile \
+	blkImage \
+	bytecode \
+	c16Image \
+	Camera \
+	caosScript \
+	caosVar \
+	caosVM_agent \
+	caosVM_camera \
+	caosVM_compound \
+	caosVM_core \
+	caosVM_creatures \
+	caosVM_debug \
+	caosVM_files \
+	caosVM_flow \
+	caosVM_genetics \
+	caosVM_history \
+	caosVM_input \
+	caosVM_map \
+	caosVM_motion \
+	caosVM_net \
+	caosVM \
+	caosVM_ports \
+	caosVM_resources \
+	caosVM_scripts \
+	caosVM_sounds \
+	caosVM_time \
+	caosVM_variables \
+	caosVM_vehicles \
+	caosVM_world \
+	catalogue.lex \
+	Catalogue \
+	catalogue.tab \
+	cmddata \
+	CompoundAgent \
+	CompoundPart \
+	Creature \
+	creaturesImage \
+	dialect \
+	exceptions \
+	fileSwapper \
+	genomeFile \
+	historyManager \
+	lex.mng \
+	lexutil \
+	lex.yy \
+	Map \
+	MetaRoom \
+	mmapifstream \
+	mngfile \
+	mngparser.tab \
+	PathResolver \
+	physics \
+	PointerAgent \
+	pray \
+	prayManager \
+	renderable \
+	Room \
+	Scriptorium \
+	SDLBackend \
+	SDL_gfxPrimitives \
+	SimpleAgent \
+	SkeletalCreature \
+	streamutils \
+	Vehicle \
+	World
+
+SERIALIZATION = caosVM_ser_real
+SERSTUB       = caosVM_ser_stub
+OPENC2E       = $(CORE) $(SERSTUB) main
+OPENC2E_S     = $(CORE) $(SERIALIZATION) main
+
+
