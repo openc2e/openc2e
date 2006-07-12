@@ -24,7 +24,15 @@ check('program', 'bison');
 # this sets sdl, sdl.cflags, and sdl.lflags
 check('sdl');
 
-set CXXFLAGS => join(' ', lookup('sdl.cflags'), $ENV{CXXFLAGS} || '');
+my $cxxflags = '-W -Wall -Wno-conversion -Wno-unused -DYYERROR_VERBOSE';
+set CXXFLAGS => join(' ', lookup('sdl.cflags'), $ENV{CXXFLAGS} || '', $cxxflags);
+set LDFLAGS  => join(' ', qw( 
+	-lboost_program_options 
+	-lboost_serialization 
+	-lboost_filesystem ),
+	lookup('sdl.lflags'),
+	$ENV{'LDFLAGS'} || '',
+	qw( -lz -lm -lSDL_net -lSDL_mixer -lpthread ));
 
 check('cpp.boost.version', '1.33.0');
 check( 'cpp.header' => $_ ) for qw(
@@ -38,7 +46,7 @@ check( 'cpp.header' => $_ ) for qw(
 );
 
 
-configure('config.mk');
 
+configure('config.mk');
 
 done();

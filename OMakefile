@@ -21,15 +21,6 @@
 
 include config.mk
 
-CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE $(SDL_CFLAGS)
-CXXFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE $(SDL_CFLAGS)
-LDFLAGS += -lboost_program_options -lboost_serialization -lboost_filesystem $(SDL_LDFLAGS) -lz -lm -lSDL_net -lSDL_mixer -lpthread
-
-################################################
-# Uncomment the following section if you want
-# to build a C program in the current directory.
-#
-
 CORE =  \
 	Agent \
 	AgentRef \
@@ -101,12 +92,10 @@ CORE =  \
 	World
 
 SERIALIZATION = caosVM_ser_real
-SERSTUB = caosVM_ser_stub
-OPENC2E = $(CORE) $(SERSTUB) main
-OPENC2E_S = $(CORE) $(SERIALIZATION) main
-
-
-MAIN = openc2e
+SERSTUB       = caosVM_ser_stub
+OPENC2E       = $(CORE) $(SERSTUB) main
+OPENC2E_S     = $(CORE) $(SERIALIZATION) main
+MAIN          = openc2e
 
 .DEFAULT: $(MAIN)$(EXE)
 
