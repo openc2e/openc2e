@@ -26,8 +26,8 @@ check('sdl');
 
 my $cxxflags = '-W -Wall -Wno-conversion -Wno-unused -DYYERROR_VERBOSE';
 my $ldflags  = '-lboost_program_options -lboost_serialization -lboost_filesystem -lz -lm -lSDL_net -lSDL_mixer -lpthread';
-set CXXFLAGS => join(' ', lookup('sdl.cflags'), $ENV{CXXFLAGS}  || '', $cxxflags);
-set LDFLAGS  => join(' ', lookup('sdl.lflags'), $ENV{'LDFLAGS'} || '', $ldflags);
+set CXXFLAGS => join(' ', $ENV{CXXFLAGS}  || '', lookup('sdl.cflags'), $cxxflags);
+set LDFLAGS  => join(' ', $ENV{LDFLAGS} || '', lookup('sdl.lflags'), $ldflags);
 	
 check('cpp.boost.version', '1.33.0');
 check( 'cpp.header' => $_ ) for qw(
