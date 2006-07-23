@@ -23,6 +23,7 @@
 #include "AgentRef.h"
 #include "World.h"
 #include <iostream>
+#include <boost/format.hpp>
 using std::cerr;
 
 /**
@@ -317,10 +318,20 @@ void caosVM::c_MVSF() {
 		tries++;
 	}
 
-	// TODO: temp hack to shut scripts up
-	targ->kill();
-	if (owner) owner->kill();
-	throw creaturesException("MVSF failed to find a safe place");
+	// second hacky attempt, move from side to side (+/- 50) and up a little
+	for (unsigned int xadjust = 0; xadjust < 50; xadjust++) {
+		for (unsigned int yadjust = 0; yadjust < 50; yadjust++) {
+			if (targ->validInRoomSystem(Point(x - xadjust, y - yadjust), targ->getWidth(), targ->getHeight(), targ->perm))
+				targ->moveTo(x - xadjust, y - yadjust);
+			else if (targ->validInRoomSystem(Point(x + xadjust, y - yadjust), targ->getWidth(), targ->getHeight(), targ->perm))
+				targ->moveTo(x + xadjust, y - yadjust);
+			else
+				continue;
+			return;
+		}
+	}
+
+	throw creaturesException(boost::str(boost::format("MVSF failed to find a safe place around (%d, %d)") % x % y));
 }
 
 /**
