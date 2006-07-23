@@ -368,6 +368,35 @@ extern "C" int main(int argc, char *argv[]) {
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
+						caosVar v = world.variables["engine_debug_keys"];
+						if (v.hasInt() && v.getInt() == 1) {
+							Uint8 *keystate = SDL_GetKeyState(NULL);
+							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+								switch (event.key.keysym.sym) {
+									case SDLK_INSERT:
+										world.showrooms = !world.showrooms;
+										break;
+
+									case SDLK_PAUSE:
+										// TODO: debug pause game
+										break;
+
+									case SDLK_SPACE:
+										// TODO: force tick
+										break;
+
+									case SDLK_PAGEUP:
+										// TODO: previous metaroom
+										break;
+
+									case SDLK_PAGEDOWN:
+										// TODO: next metaroom
+										break;
+
+									default: break; // to shut up warnings
+								}
+							}
+						}
 						int key = world.backend->translateKey(event.key.keysym.sym);
 						if (key != -1) {
 							if (world.focusagent) {

@@ -75,6 +75,26 @@ void World::init() {
 		gallery.delImage(img);
 		std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to 'hand'." << std::endl;
 	}
+
+	// *** set defaults for non-zero GAME engine variables
+	// TODO: this should be doing during world init, rather than global init
+	// TODO: not complete
+	caosVar v;
+	variables.clear();
+
+	// core engine bits
+	v.setInt(1); variables["engine_debug_keys"] = v;
+	v.setInt(1); variables["engine_full_screen_toggle"] = v;
+	v.setInt(9998); variables["engine_plane_for_lines"] = v;
+	v.setInt(6); variables["engine_zlib_compression"] = v;
+
+	// creature pregnancy
+	v.setInt(1); variables["engine_multiple_birth_maximum"] = v;
+	v.setFloat(0.5f); variables["engine_multiple_birth_identical_chance"] = v;
+	
+	// port lines
+	v.setFloat(600.0f); variables["engine_distance_before_port_line_warns"] = v;
+	v.setFloat(800.0f); variables["engine_distance_before_port_line_snaps"] = v;
 }
 
 caosVM *World::getVM(Agent *a) {
