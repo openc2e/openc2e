@@ -85,6 +85,7 @@ protected:
 	void positionAudio(SoundSlot *);
 	bool dying : 1;
 	
+	void unhandledException(std::string info, bool wasscript);
 	void vmTick();
 	bool fireScript(unsigned short event, Agent *from = 0);
 

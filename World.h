@@ -79,7 +79,7 @@ public:
 	unsigned int ticktime, tickcount;
 	MainCamera camera;
 	SDLBackend *backend;
-	bool showrooms;
+	bool showrooms, autokill;
 
 	AgentRef selectedcreature;
 	void selectCreature(boost::shared_ptr<Agent> c);

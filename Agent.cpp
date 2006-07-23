@@ -23,12 +23,12 @@
 #include <sstream>
 #include "caosVM.h"
 #include "SDLBackend.h"
+#include <boost/format.hpp>
 
 void Agent::core_init() {
 	initialized = false;
 	lifecount = 0;
 }
-
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
   visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0)
@@ -371,7 +371,7 @@ void Agent::physicsTick() {
 			Room *ourRoom = world.map.roomAt(srcx, srcy);
 			if (!ourRoom) {
 				if (!displaycore)
-					std::cout << "agent " << identify() << " is out of room system at (" << srcx << ", " << srcy << "), displaying core!" << std::endl;
+					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % srcx % srcy), false);
 				displaycore = true;
 				return; // out of room system
 			}
@@ -494,6 +494,7 @@ void Agent::tick() {
 	}
 
 	physicsTick();
+	if (dying) return; // in case we were autokilled
 
 	if (timerrate) {
 		tickssincelasttimer++;
@@ -504,6 +505,22 @@ void Agent::tick() {
 	}
 
 	if (vm) vmTick();
+}
+
+void Agent::unhandledException(std::string info, bool wasscript) {
+	// TODO: do something with this? empty the stack?
+	if (world.autokill) {
+		kill();
+		if (wasscript)
+			std::cerr << identify() << " was autokilled during script " << lastScript << " due to: " << info << std::endl;
+		else
+			std::cerr << identify() << " was autokilled due to: " << info << std::endl;
+	} else {
+		if (wasscript)
+			std::cerr << identify() << " caused an exception during script " << lastScript << ": " << info << std::endl;
+		else
+			std::cerr << identify() << " caused an exception: " << info << std::endl;
+	}
 }
 
 void Agent::vmTick() {
@@ -517,12 +534,10 @@ void Agent::vmTick() {
 			vm->tick();
 		} catch (invalidAgentException &e) {
 			// try letting the exception script handle it
-			if (!queueScript(255)) {
-				std::cerr << "Agent::vmTick on " << identify() << " (script " << lastScript << ") caught unhandled invalid agent: " << e.what() << std::endl;
-			}
+			if (!queueScript(255))
+				unhandledException(e.what(), true);
 		} catch (std::exception &e) {
-			// TODO: do something with this? empty the stack?
-			std::cerr << "Agent::vmTick on " << identify() << " (script " << lastScript << ") caught exception: " << e.what() << std::endl;
+			unhandledException(e.what(), true);
 		}
 		if (vm && vm->stopped()) {
 			world.freeVM(vm);

@@ -40,6 +40,7 @@ World::World() {
 	quitting = saving = false;
 	theHand = 0;
 	showrooms = false;
+	autokill = false;
 	backend = 0;
 }
 

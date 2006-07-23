@@ -86,6 +86,7 @@ extern "C" int main(int argc, char *argv[]) {
 		("bootstrap,b", po::value< std::vector<std::string> >(&bootstrap)->composing(),
 		 "Sets or adds a path or COS file to bootstrap from")
 		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (cv or c3)")
+		("autokill,a", "Enable autokill")
 		;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -101,6 +102,11 @@ extern "C" int main(int argc, char *argv[]) {
 	if (vm.count("version")) {
 		opt_version();
 		return 0;
+	}
+
+	if (vm.count("autokill")) {
+		std::cout << "Enabling autokill..." << std::endl;
+		world.autokill = true;
 	}
 
 	if (vm.count("data-path") == 0)
