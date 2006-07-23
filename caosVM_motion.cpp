@@ -308,6 +308,13 @@ void caosVM::c_MVSF() {
 	VM_PARAM_FLOAT(x)
 	valid_agent(targ);
 
+	// TODO: various agents do "mvsf 0 0" without suffercollisions set, so
+	// presumably we shouldn't check room boundaries then. someone verify this.
+	if (!targ->suffercollisions) {
+		targ->moveTo(x, y);
+		return;
+	}
+
 	// TODO: this is a silly hack, to cater for simplest case (where we just need to nudge the agent up a bit)
 	unsigned int tries = 0;
 	while (tries < 150) {
