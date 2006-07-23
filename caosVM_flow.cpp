@@ -23,6 +23,7 @@
 #include "World.h" // enum
 #include <cmath>   // sqrt
 #include <sstream>
+#include "AgentHelpers.h"
 
 /**
  DOIF (command) condition (condition)
@@ -186,56 +187,17 @@ void caosVM::c_ESEE() {
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
-	
+
 	Agent *seeing;
 	if (owner) seeing = owner; else seeing = targ;
 	valid_agent(seeing);
-	
-	float ownerx = (seeing->x + (seeing->getWidth() / 2.0f));
-	float ownery = (seeing->y + (seeing->getHeight() / 2.0f));
-	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
-	Room *ownerroom = world.map.roomAt(ownerx, ownery);
-	
+
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 
-	if (!ownermeta) return;
-	if (!ownerroom) return;
-	
-	for (std::list<boost::shared_ptr<Agent> >::iterator i
-			= world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = (*i);
-		if (!a) continue;
-		
-		// TODO: if owner is a creature, skip stuff with invisible attribute
-		
-		// verify species/genus/family
-		if (species && species != a->species) continue;
-		if (genus && genus != a->genus) continue;
-		if (family && family != a->family) continue;
-
-		// verify we're in the same metaroom as owner, and in a room
-		float thisx = a->x + (a->getWidth() / 2.0f);
-		float thisy = a->y + (a->getHeight() / 2.0f);
-		MetaRoom *m = world.map.metaRoomAt(thisx, thisy);
-		if (m != ownermeta) continue;
-		Room *r = world.map.roomAt(thisx, thisy);
-		if (!r) continue;
-		
-		// compare squared distance with range
-		double deltax = thisx - ownerx; deltax *= deltax;
-		double deltay = thisy - ownery; deltay *= deltay;
-		if ((deltax + deltay) > (seeing->range * seeing->range)) continue;
-
-		// do the actual visibiltiy check using a line between centers
-		Point src(ownerx, ownery), dest(thisx, thisy);
-		Line dummywall; unsigned int dummydir;
-		Room *newroom = ownerroom;
-		world.map.collideLineWithRoomSystem(src, dest, newroom, src, dummywall, dummydir, seeing->perm);
-		if (src != dest) continue;
-		
-		// okay, we can see this agent!
-		caosVar v; v.setAgent(a);
+	std::vector<boost::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
+	for (std::vector<boost::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
+		caosVar v; v.setAgent(*i);
 		valueStack.push_back(v);
 	}
 }

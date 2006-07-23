@@ -25,6 +25,7 @@
 #include "World.h"
 #include "creaturesImage.h"
 #include <iostream>
+#include "AgentHelpers.h"
 
 using std::cerr;
 
@@ -81,9 +82,10 @@ void caosVM::v_TOUC() {
  */ 
 void caosVM::c_RTAR() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(family)
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
+	
 	setTarg(0);
 
 	/* XXX: maybe use a map of classifier -> agents? */
@@ -115,10 +117,10 @@ void caosVM::c_RTAR() {
 */
 void caosVM::c_TTAR() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(family)
-	
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
+
 	valid_agent(owner);
 	
 	setTarg(0); // TODO
@@ -126,20 +128,27 @@ void caosVM::c_TTAR() {
 
 /**
  STAR (command) family (integer) genus (integer) species (integer)
- %status stub
+ %status maybe
 
  Locates a random agent that is visible to OWNR (see ESEE) and that
  matches the given classifier, then sets it to TARG.
 */
 void caosVM::c_STAR() {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(species)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(family)
-	
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
+
 	valid_agent(targ);
+        
+	Agent *seeing;
+	if (owner) seeing = owner; else seeing = targ;
+	valid_agent(seeing);
+
+	std::vector<boost::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
+	unsigned int i = (int) (agents.size() * (rand() / (RAND_MAX + 1.0)));
 	
-	setTarg(0); // TODO
+	setTarg(agents[i]);
 }
 
 /**
@@ -1230,31 +1239,10 @@ void caosVM::v_SEEE() {
 	VM_PARAM_VALIDAGENT(second)
 	VM_PARAM_VALIDAGENT(first)
 
-	result.setInt(0);
-	
-	// TODO: handle creature invisibility
-
-	// calculate centres
-	float ownerx = first->x + (first->getWidth() / 2.0f), ownery = first->y + (first->getHeight() / 2.0f);
-	float thisx = second->x + (second->getWidth() / 2.0f), thisy = second->y + (second->getHeight() / 2.0f);
-	
-	// verify they're in the same metarooms and they're both in rooms
-	if (world.map.metaRoomAt(ownerx, ownery) != world.map.metaRoomAt(thisx, thisy)) return;
-	Room *ownerroom = world.map.roomAt(ownerx, ownery); if (!ownerroom) return;
-	if (!world.map.roomAt(thisx, thisy)) return;
-
-	// compare squared distance with range
-	float deltax = thisx - ownerx; deltax *= deltax;
-	float deltay = thisy - ownery; deltay *= deltay;
-	if ((deltax + deltay) > (first->range * first->range)) return;
-
-	// do the actual visibiltiy check using a line between centers
-	Point src(ownerx, ownery), dest(thisx, thisy);
-	Line dummywall; unsigned int dummydir;
-	world.map.collideLineWithRoomSystem(src, dest, ownerroom, src, dummywall, dummydir, first->perm);
-	if (src != dest) return;
-
-	result.setInt(1);
+	if (agentIsVisible(first.get(), second.get()))
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /**
