@@ -30,8 +30,8 @@
 # but you probably want to keep the Common file.
 #
 open build/C
-open build/OCaml
-open build/LaTeX
+#open build/OCaml
+#open build/LaTeX
 
 #
 # The command-line variables are defined *after* the

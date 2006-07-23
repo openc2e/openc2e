@@ -4,7 +4,7 @@
 # If so, define the subdirectory targets and uncomment this section.
 #
 
-.SUBDIRS: tools
+#.SUBDIRS: tools
 
 ################################################
 # Configuration.  You might want to modify any of these
