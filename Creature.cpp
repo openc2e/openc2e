@@ -136,10 +136,16 @@ void Creature::tick() {
 
 	if (tickage) age++;
 
-	senses[0] = 1.0f;
-	senses[9] = 1.0f; // air quality
+	senses[0] = 1.0f; // always-on
+	senses[9] = 1.0f; // air quality (TODO)
 	
 	tickBiochemistry();
+
+	// lifestage checks
+	for (unsigned int i = 0; i < 7; i++) {
+		if ((lifestageloci[i] != 0.0f) && (stage == (lifestage)i))
+			ageCreature();
+	}
 
 	if (dead != 0.0f) die();
 }
@@ -195,7 +201,7 @@ float *Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t
 				case 0: // somatic
 					if (receptor) {
 						if (l > 6) break;
-						return &lifestageloci[t];
+						return &lifestageloci[l];
 					} else if (l == 0) return &muscleenergy;
 					break;
 
