@@ -35,6 +35,8 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
 	
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !female) continue;
+		if ((*i)->header.flags.maleonly && female) continue;
 		if (typeid(*(*i)) == typeid(bioInitialConcentration)) {
 			// initialise chemical levels
 			bioInitialConcentration *b = (bioInitialConcentration *)(*i);
@@ -158,6 +160,8 @@ void Creature::tickBiochemistry() {
 
 	// process half-lives for chemicals
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !female) continue;
+		if ((*i)->header.flags.maleonly && female) continue;
 		if (typeid(*(*i)) == typeid(bioHalfLives)) {
 			bioHalfLives *d = dynamic_cast<bioHalfLives *>(*i);
 			assert(d);
@@ -260,6 +264,8 @@ Organ::Organ(Creature *p, organGene *g) {
 	
 	shared_ptr<Reaction> r; // we need to store the previous reaction for possible receptor use
 	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
+		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
 		if (typeid(*(*i)) == typeid(bioReaction)) {
 			reactions.push_back(shared_ptr<Reaction>(new Reaction()));
 			r = reactions.back();
