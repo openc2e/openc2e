@@ -146,9 +146,12 @@ void caosVM::c_STAR() {
 	valid_agent(seeing);
 
 	std::vector<boost::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
-	unsigned int i = (int) (agents.size() * (rand() / (RAND_MAX + 1.0)));
-	
-	setTarg(agents[i]);
+	if (agents.size() == 0) {
+		setTarg(0);
+	} else {
+		unsigned int i = (int) (agents.size() * (rand() / (RAND_MAX + 1.0)));
+		setTarg(agents[i]);
+	}
 }
 
 /**
