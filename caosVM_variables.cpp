@@ -939,4 +939,21 @@ void caosVM::c_NAMN() {
 	}
 }
 
+/**
+ * POWV (command) value (variable) exponent (decimal)
+ * %status maybe
+ *
+ * Raises value to the exponent power, and saves the result back in value.
+ * Results are undefined if value is negative.
+ *
+ * Openc2e-only command
+ */
+
+void caosVM::c_POWV() {
+	VM_PARAM_FLOAT(exponent)
+	VM_PARAM_VARIABLE(value)
+	
+	value->setFloat(powf(value->getFloat(), exponent));
+}
+
 /* vim: set noet: */

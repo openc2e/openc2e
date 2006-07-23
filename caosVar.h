@@ -27,6 +27,7 @@
 #include "AgentRef.h"
 #include "slaballoc.h"
 #include <typeinfo>
+#include "physics.h"
 
 class Agent;
 
@@ -40,7 +41,7 @@ class wrongCaosVarTypeException : public caosException {
 struct nulltype_tag { };
 
 enum variableType {
-	NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING
+	NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING, VECTOR
 };
 
 class caosVar {
@@ -53,6 +54,7 @@ class caosVar {
 			variableType operator()(const std::string &) const { return STRING; }
 			variableType operator()(const AgentRef &) const { return AGENT; }
 			variableType operator()(nulltype_tag) const { return NULLTYPE; }
+			variableType operator()(const Vector &) const { return VECTOR; }
 		};
 
 #define BAD_TYPE(et, gt) \
@@ -73,6 +75,9 @@ class caosVar {
 					if (diff <= -0.5f) return --x; else return x;
 				}
 			}
+			int operator()(const Vector &v) const {
+				return (int)v.getMagnitude();
+			}
 			BAD_TYPE(int, std::string);
 			BAD_TYPE(int, AgentRef);
 			BAD_TYPE(int, nulltype_tag);
@@ -81,6 +86,7 @@ class caosVar {
 		struct floatVisit : public boost::static_visitor<float> {
 			float operator()(int i) const { return (float)i; }
 			float operator()(float f) const { return f; }
+			float operator()(const Vector &v) const { return v.getMagnitude(); }
 			BAD_TYPE(float, std::string);
 			BAD_TYPE(float, AgentRef);
 			BAD_TYPE(float, nulltype_tag);
@@ -94,6 +100,7 @@ class caosVar {
 			BAD_TYPE(std::string, nulltype_tag);
 			BAD_TYPE(std::string, int);
 			BAD_TYPE(std::string, float);
+			BAD_TYPE(std::string, Vector);
 		};
 		
 		struct agentVisit : public boost::static_visitor<const AgentRef &> {
@@ -104,10 +111,23 @@ class caosVar {
 			BAD_TYPE(AgentRef, nulltype_tag);
 			BAD_TYPE(AgentRef, int);
 			BAD_TYPE(AgentRef, float);
+			BAD_TYPE(AgentRef, Vector);
 		};
+
+		struct vectorVisit : public boost::static_visitor<const Vector &> {
+			const Vector &operator()(const Vector &v) const {
+				return v;
+			}
+            BAD_TYPE(Vector, std::string);
+            BAD_TYPE(Vector, nulltype_tag);
+            BAD_TYPE(Vector, int);
+            BAD_TYPE(Vector, float);
+            BAD_TYPE(Vector, AgentRef);
+		};
+
 			
 #undef BAD_TYPE
-		boost::variant<int, float, AgentRef, std::string, nulltype_tag> value;
+		boost::variant<int, float, AgentRef, std::string, nulltype_tag, Vector> value;
 
 	public:
 		variableType getType() const {
@@ -139,15 +159,17 @@ class caosVar {
 		caosVar(float v) { setFloat(v); }
 		caosVar(Agent *v) { setAgent(v); }
 		caosVar(const AgentRef &v) { setAgent(v); }
-		caosVar(std::string &v) { setString(v); } 
+		caosVar(const std::string &v) { setString(v); } 
+		caosVar(const Vector &v) { setVector(v); }
 		
 		bool isEmpty() const { return getType() == NULLTYPE; }
 		bool hasInt() const { return getType() == INTEGER; }
 		bool hasFloat() const { return getType() == FLOAT; }
 		bool hasAgent() const { return getType() == AGENT; }
 		bool hasString() const { return getType() == STRING; }
-		bool hasDecimal() const { return getType() == INTEGER || getType() == FLOAT; }
+		bool hasDecimal() const { return getType() == INTEGER || getType() == FLOAT || getType() == VECTOR; }
 		bool hasNumber() const { return hasDecimal(); }
+		bool hasVector() const { return getType() == VECTOR; }
 		
 		void setInt(int i) { value = i; }
 		void setFloat(float i) { value = i; }
@@ -159,6 +181,9 @@ class caosVar {
 		}
 		void setString(const std::string &i) {
 			value = i;
+		}
+		void setVector(const Vector &v) {
+			value = v;
 		}
 
 		int getInt() const {
@@ -183,6 +208,10 @@ class caosVar {
 
 		const AgentRef &getAgentRef() const {
 			return boost::apply_visitor(agentVisit(), value);
+		}
+
+		const Vector &getVector() const {
+			return boost::apply_visitor(vectorVisit(), value);
 		}
 
 		bool operator == (const caosVar &v) const;

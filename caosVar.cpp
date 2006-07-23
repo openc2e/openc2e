@@ -67,6 +67,8 @@ bool caosVar::operator == (const caosVar &v) const {
 		return this->getString() == v.getString();
 	} else if (this->hasAgent() && v.hasAgent()) {
 		return this->getAgent() == v.getAgent();
+	} else if (this->hasVector() && v.hasVector()) {
+		return this->getVector() == v.getVector();
 	}
 
 	throw caosException(std::string("caosVar operator == couldn't compare ") + this->dump() + "and " + v.dump());
@@ -77,6 +79,17 @@ bool caosVar::operator > (const caosVar &v) const {
 		return this->getFloat() > v.getFloat();
 	} else if (this->hasString() && v.hasString()) {
 		return this->getString() > v.getString();
+	} else if (this->hasVector() && v.hasVector()) {
+		// XXX this is totally arbitrary
+		const Vector &v1 = this->getVector();
+		const Vector &v2 = v.getVector();
+		if (v1.x > v2.x)
+			return true;
+		else if (v1.x < v2.x)
+			return false;
+		else if (v1.y > v2.y)
+			return true;
+		else return false;
 	}
 	
 	throw caosException(std::string("caosVar operator > couldn't compare ") + this->dump() + "and " + v.dump());
@@ -87,6 +100,8 @@ bool caosVar::operator < (const caosVar &v) const {
 		return this->getFloat() < v.getFloat();
 	} else if (this->hasString() && v.hasString()) {
 		return this->getString() < v.getString();
+	} else if (this->hasVector() && v.hasVector()) {
+		return (*this != v) && !(*this > v);
 	}
 	
 	throw caosException(std::string("caosVar operator < couldn't compare ") + this->dump() + "and " + v.dump());

@@ -39,8 +39,6 @@ open build/C
 #
 DefineCommandVars()
 
-include vars.om
-include config.om
 #
 # Include the OMakefile in this directory.
 #

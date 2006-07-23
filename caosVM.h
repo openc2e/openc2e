@@ -350,6 +350,7 @@ public:
 	void v_REAN();
 	void c_NAMN();
 	void v_GAMN();
+	void c_POWV();
 
 	// flow
 	void c_DOIF();
@@ -772,6 +773,17 @@ public:
 	void v_HIST_WUID();
 	void v_HIST_WVET();
 	void v_OOWW();
+	// Vector ops
+	void v_VEC_MAKE();
+	void c_VEC_GETC();
+	void v_VEC_ANGL();
+	void c_VEC_SUBV();
+	void c_VEC_ADDV();
+	void c_VEC_MULV();
+	void v_VEC_UNIT();
+	void v_VEC_NULL();
+	void v_VEC_MAGN();
+
 
 	// serialization test functions
 	void c_SERS_MAPP();
@@ -821,6 +833,8 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	name = __x.getLVal().getInt(); } vm->valueStack.pop_back();
 #define VM_PARAM_FLOAT(name) float name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getFloat(); } vm->valueStack.pop_back();
+#define VM_PARAM_VECTOR(name) Vector name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+	name = __x.getLVal().getVector(); } vm->valueStack.pop_back();
 #define VM_PARAM_AGENT(name) boost::shared_ptr<Agent> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getAgent(); } vm->valueStack.pop_back();
 // TODO: is usage of valid_agent correct here, or should we be caos_asserting?

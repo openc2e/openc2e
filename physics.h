@@ -189,6 +189,18 @@ class Vector {
 		Vector operator*(double m) const {
 			return scale(m);
 		}
+
+		Vector operator+(const Vector &v) const {
+			return Vector(x + v.x, y + v.y);
+		}
+
+		Vector operator-(const Vector &v) const {
+			return Vector(x - v.x, y - v.y);
+		}
+
+		static Vector unitVector(double angle) {
+			return Vector(cos(angle), sin(angle));
+		}
 };
 Point operator+(const Vector &v, const Point &p);
 Point operator+(const Point &p, const Vector &v);
