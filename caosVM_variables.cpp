@@ -266,7 +266,7 @@ void caosVM::c_DIVV() {
 	VM_PARAM_VARIABLE(v)
 
 	caos_assert(div.hasDecimal());
-	caos_assert(div.getFloat() != 0.0f);
+	if (div.getFloat() == 0.0f) throw caosException("attempt to divide by zero");
 	
 	if (v->hasInt() && div.hasInt()) {
 		// integer division
