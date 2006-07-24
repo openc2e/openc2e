@@ -110,15 +110,15 @@ void Camera::tick() {
 }
 
 unsigned int const MainCamera::getWidth() {
-	if ((!getMetaRoom()) || (backend->getWidth() < getMetaRoom()->width()))
-		return backend->getWidth();
+	if ((!getMetaRoom()) || (backend->getMainSurface().getWidth() < getMetaRoom()->width()))
+		return backend->getMainSurface().getWidth();
 	else
 		return getMetaRoom()->width();
 }
 
 unsigned int const MainCamera::getHeight() {
-	if ((!getMetaRoom()) || (backend->getHeight() < getMetaRoom()->height()))
-		return backend->getHeight();
+	if ((!getMetaRoom()) || (backend->getMainSurface().getHeight() < getMetaRoom()->height()))
+		return backend->getMainSurface().getHeight();
 	else
 		return getMetaRoom()->height();
 }

@@ -40,6 +40,7 @@ public:
 	unsigned int const cameraWidth() { return camerawidth; }
 	unsigned int const cameraHeight() { return cameraheight; }
 	shared_ptr<Camera> &getCamera() { return camera; }
+	void partRender(class SDLSurface *renderer, int xoffset, int yoffset);
 };
 
 #endif

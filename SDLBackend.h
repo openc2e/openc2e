@@ -40,6 +40,22 @@ struct SoundSlot {
 	void stop();
 };
 
+class SDLSurface {
+	friend class SDLBackend;
+
+protected:
+	SDL_Surface *surface;
+	int width, height;
+
+public:
+	void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false);
+	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
+	void blitSurface(SDLSurface *src, int x, int y, int w, int h);
+	int getWidth() const { return width; }
+	int getHeight() const { return height; }
+	void renderDone();
+};
+
 class SDLBackend {
 protected:
 	bool soundenabled;
@@ -47,9 +63,8 @@ protected:
 	SoundSlot sounddata[12];
 
 	std::map<std::string, Mix_Chunk *> soundcache;
-	
-	int width, height;
-	SDL_Surface *screen;
+
+	SDLSurface mainsurface;
 
 public:
 	SDLBackend() { }
@@ -57,11 +72,9 @@ public:
 	void init(bool enable_sound);
 	void resizeNotify(int _w, int _h);
 	SoundSlot *getAudioSlot(std::string filename);
-	void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false);
-	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
-	void renderDone();
-	int getWidth() const { return width; }
-	int getHeight() const { return height; }
+	SDLSurface &getMainSurface() { return mainsurface; }
+	SDLSurface *newSurface(unsigned int width, unsigned int height);
+	void freeSurface(SDLSurface *surf);
 	bool keyDown(int key);
 	int translateKey(int key);
 };

@@ -47,10 +47,10 @@ void SoundSlot::stop() {
 }
 
 void SDLBackend::resizeNotify(int _w, int _h) {
-	width = _w;
-	height = _h;
-	screen = SDL_SetVideoMode(width, height, 0, SDL_RESIZABLE);
-	assert(screen != 0);
+	mainsurface.width = _w;
+	mainsurface.height = _h;
+	mainsurface.surface = SDL_SetVideoMode(_w, _h, 0, SDL_RESIZABLE);
+	assert(mainsurface.surface != 0);
 }
 
 void SDLBackend::init(bool enable_sound) {
@@ -112,8 +112,8 @@ SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
 	return &sounddata[i];
 }
 
-void SDLBackend::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
-	aalineColor(screen, x1, y1, x2, y2, colour);
+void SDLSurface::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
+	aalineColor(surface, x1, y1, x2, y2, colour);
 }
 
 //*** code to mirror 16bpp surface - slow, we should cache this!
@@ -132,8 +132,8 @@ SDL_Surface *MirrorSurface(SDL_Surface *surf) {
 			throw creaturesException("SDLBackend failed to lock surface for mirroring");
 		}
 
-	for (unsigned int y = 0; y < newsurf->h; y++) {
-		for (unsigned int x = 0; x < (newsurf->w / 2); x++) {
+	for (int y = 0; y < newsurf->h; y++) {
+		for (int x = 0; x < (newsurf->w / 2); x++) {
 			Uint16 *one = pixelPtr(newsurf, x, y);
 			Uint16 *two = pixelPtr(newsurf, (newsurf->w - 1) - x, y);
 			Uint16 temp = *one;
@@ -150,7 +150,7 @@ SDL_Surface *MirrorSurface(SDL_Surface *surf) {
 
 //*** end mirror code
 
-void SDLBackend::render(creaturesImage *image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror) {
+void SDLSurface::render(creaturesImage *image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror) {
 	// don't bother rendering off-screen stuff
 	if (x >= width) return; if (y >= height) return;
 	if ((x + image->width(frame)) <= 0) return;
@@ -189,14 +189,36 @@ void SDLBackend::render(creaturesImage *image, unsigned int frame, int x, int y,
 	// do actual blit
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;
-	SDL_BlitSurface(surf, 0, screen, &destrect);
+	SDL_BlitSurface(surf, 0, surface, &destrect);
 
 	// free surface
 	SDL_FreeSurface(surf);
 }
 
-void SDLBackend::renderDone() {
-	SDL_Flip(screen);
+void SDLSurface::renderDone() {
+	SDL_Flip(surface);
+}
+
+void SDLSurface::blitSurface(SDLSurface *src, int x, int y, int w, int h) {
+	// TODO: evil use of internal SDL api
+	SDL_Rect r; r.x = x; r.y = y; r.w = w; r.h = h;
+	SDL_SoftStretch(src->surface, 0, surface, &r);
+}
+
+SDLSurface *SDLBackend::newSurface(unsigned int w, unsigned int h) {
+	SDL_Surface *surf = mainsurface.surface;
+	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
+	assert(underlyingsurf);
+	SDLSurface *newsurf = new SDLSurface();
+	newsurf->surface = underlyingsurf;
+	newsurf->width = w;
+	newsurf->height = h;
+	return newsurf;
+}
+
+void SDLBackend::freeSurface(SDLSurface *surf) {
+	SDL_FreeSurface(surf->surface);
+	delete surf;
 }
 
 // left out: menu, select, execute, snapshot, numeric keypad, f keys

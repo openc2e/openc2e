@@ -40,7 +40,7 @@ bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) con
 
 creaturesImage *TextEntryPart::caretsprite = 0;
 
-void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
+void CompoundPart::render(SDLSurface *renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
 		partRender(renderer, xoffset + parent->x, yoffset + parent->y);
 		if (parent->displaycore /*&& (id == 0)*/) {
@@ -55,7 +55,7 @@ void CompoundPart::render(SDLBackend *renderer, int xoffset, int yoffset) {
 	}
 }
 
-void SpritePart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
+void SpritePart::partRender(SDLSurface *renderer, int xoffset, int yoffset) {
 	assert(getCurrentSprite() < getSprite()->numframes());
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha, draw_mirrored);
 }
@@ -436,7 +436,7 @@ void TextPart::recalculateData() {
 	pageheights.push_back(currenty);
 }
 
-void TextPart::partRender(SDLBackend *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
+void TextPart::partRender(SDLSurface *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
 	SpritePart::partRender(renderer, xoffset, yoffset);
 	
 	unsigned int xoff = xoffset + x + leftmargin;
@@ -494,11 +494,11 @@ TextEntryPart::TextEntryPart(Agent *p, unsigned int _id, std::string spritefile,
 	messageid = msgid;
 }
 
-void TextEntryPart::partRender(SDLBackend *renderer, int xoffset, int yoffset) {
+void TextEntryPart::partRender(SDLSurface *renderer, int xoffset, int yoffset) {
 	TextPart::partRender(renderer, xoffset, yoffset, (focused ? this : 0));
 }
 
-void TextEntryPart::renderCaret(SDLBackend *renderer, int xoffset, int yoffset) {
+void TextEntryPart::renderCaret(SDLSurface *renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
 	renderer->render(caretsprite, caretpose, xoffset, yoffset, has_alpha, alpha);
 }
@@ -542,6 +542,18 @@ CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	camerawidth = camera_width;
 	cameraheight = camera_height;
 	camera = shared_ptr<Camera>(new PartCamera(this));
+}
+
+void CameraPart::partRender(class SDLSurface *renderer, int xoffset, int yoffset) {
+	// TODO: hack to stop us rendering cameras inside cameras. better way?
+	if (renderer == &world.backend->getMainSurface()) {
+		SDLSurface *surface = world.backend->newSurface(viewwidth, viewheight);
+		world.drawWorld(camera.get(), surface);
+		renderer->blitSurface(surface, xoffset + x, yoffset + y, camerawidth, cameraheight);
+		world.backend->freeSurface(surface);
+	}
+	
+	SpritePart::partRender(renderer, xoffset, yoffset);
 }
 
 GraphPart::GraphPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,

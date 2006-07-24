@@ -111,6 +111,7 @@ public:
 	
 	void tick();
 	void drawWorld();
+	void drawWorld(Camera *cam, SDLSurface *surface);
 
 	int getUNID(Agent *whofor);
 	void freeUNID(int unid);

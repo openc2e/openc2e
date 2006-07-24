@@ -150,7 +150,7 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 	if (dying) return false;
 
 	Creature *c;
-	if (event <= 3 || event == 4 || event == 12)
+	if (event <= 3 || event == 4 || event == 12 || event == 13 || event == 14)
 		c = dynamic_cast<Creature *>(from);
 
 	switch (event) {

@@ -238,21 +238,23 @@ Agent *World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
+	drawWorld(&camera, &backend->getMainSurface());
+}
+
+void World::drawWorld(Camera *cam, SDLSurface *surface) {
 	assert(backend);
 
-	MetaRoom *m = camera.getMetaRoom();
+	MetaRoom *m = cam->getMetaRoom();
 	if (!m) {
 		// Whoops - the room we're in vanished, or maybe we were never in one?
 		// Try to get a new one ...
 		m = map.getFallbackMetaroom();
-		if (!m) {
-			std::cerr << "ERROR: No metarooms! Panicing ..." << std::endl;
-			abort();
-		}
-		camera.goToMetaRoom(m->id);
+		if (!m)
+			throw creaturesException("drawWorld() couldn't find any metarooms");
+		cam->goToMetaRoom(m->id);
 	}
-	int adjustx = camera.getX();
-	int adjusty = camera.getY();
+	int adjustx = cam->getX();
+	int adjusty = cam->getY();
 	blkImage *bkgd = m->getBackground(""); // TODO
 
 	// draw the blk
@@ -266,21 +268,21 @@ void World::drawWorld() {
 
 			// if the block's on screen, render it.
 			if ((destx >= -128) && (desty >= -128) &&
-					(destx - 128 <= backend->getWidth()) &&
-					(desty - 128 <= backend->getHeight()))
-				backend->render(bkgd, whereweare, destx, desty);
+					(destx - 128 <= surface->getWidth()) &&
+					(desty - 128 <= surface->getHeight()))
+				surface->render(bkgd, whereweare, destx, desty);
 		}
 	}
 
 	// render all the agents
 	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
-		(*i)->render(backend, -adjustx, -adjusty);
+		(*i)->render(surface, -adjustx, -adjusty);
 	}
 
 	if (showrooms) {
 		Room *r = map.roomAt(hand()->x, hand()->y);
-		for (std::vector<Room *>::iterator i = camera.getMetaRoom()->rooms.begin();
-				 i != camera.getMetaRoom()->rooms.end(); i++) {
+		for (std::vector<Room *>::iterator i = cam->getMetaRoom()->rooms.begin();
+				 i != cam->getMetaRoom()->rooms.end(); i++) {
 			unsigned int col = 0xFFFF00CC;
 			if (*i == r) col = 0xFF00FFCC;
 			else if (r) {
@@ -288,28 +290,28 @@ void World::drawWorld() {
 					col = 0x00FFFFCC;
 			}
 			// ceiling
-			backend->renderLine(
+			surface->renderLine(
 					(**i).x_left - adjustx,
 					(**i).y_left_ceiling - adjusty,
 					(**i).x_right - adjustx,
 					(**i).y_right_ceiling - adjusty,
 					col);
 			// floor
-			backend->renderLine(
+			surface->renderLine(
 					(**i).x_left - adjustx, 
 					(**i).y_left_floor - adjusty,
 					(**i).x_right - adjustx,
 					(**i).y_right_floor - adjusty,
 					col);
 			// left side
-			backend->renderLine(
+			surface->renderLine(
 					(**i).x_left - adjustx,
 					(**i).y_left_ceiling - adjusty,
 					(**i).x_left - adjustx,
 					(**i).y_left_floor - adjusty,
 					col);
 			// right side
-			backend->renderLine(
+			surface->renderLine(
 					(**i).x_right  - adjustx,
 					(**i).y_right_ceiling - adjusty,
 					(**i).x_right - adjustx,
@@ -318,7 +320,7 @@ void World::drawWorld() {
 		}
 	}
 
-	backend->renderDone();
+	surface->renderDone();
 }
 
 void World::executeInitScript(fs::path p) {
