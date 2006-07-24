@@ -29,6 +29,7 @@ my %fnmap = ( # default category mappings
 	'caosVM_sounds.cpp' => 'Sound',
 	'caosVM_time.cpp' => 'Time',
 	'caosVM_variables.cpp' => 'Variables',
+	'caosVM_vectors.cpp' => 'Vectors',
 	'caosVM_vehicles.cpp' => 'Vehicles',
 	'caosVM_world.cpp' => 'World',
 );

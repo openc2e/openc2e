@@ -33,12 +33,12 @@
  * Openc2e-only command
  */
 
-void caosVM::v_VEC_MAKE() {
-	VM_PARAM_FLOAT(y)
-	VM_PARAM_FLOAT(x)
+	void caosVM::v_VEC_MAKE() {
+		VM_PARAM_FLOAT(y)
+			VM_PARAM_FLOAT(x)
 
-	result.setVector(Vector(x, y));
-}
+			result.setVector(Vector(x, y));
+	}
 
 /**
  * VEC: GETC vec (vector) x (variable) y (variable)
@@ -49,14 +49,14 @@ void caosVM::v_VEC_MAKE() {
  * Openc2e-only command
  */
 
-void caosVM::c_VEC_GETC() {
-	VM_PARAM_VARIABLE(y)
-	VM_PARAM_VARIABLE(x)
-	VM_PARAM_VECTOR(vec)
+	void caosVM::c_VEC_GETC() {
+		VM_PARAM_VARIABLE(y)
+			VM_PARAM_VARIABLE(x)
+			VM_PARAM_VECTOR(vec)
 
-	x->setFloat(vec.x);
-	y->setFloat(vec.y);
-}
+			x->setFloat(vec.x);
+		y->setFloat(vec.y);
+	}
 
 /**
  * VEC: ANGL (float) vec (vector)
@@ -75,20 +75,20 @@ void caosVM::c_VEC_GETC() {
 void caosVM::v_VEC_ANGL() {
 	float ret;
 	VM_PARAM_VECTOR(vec)
-	
-	if (vec.x != 0) {
-		ret = atanf(fabsf(vec.y/vec.x))*180/PI;
-		if (vec.x < 0)
-			ret = 180 - ret;
-		if (vec.y < 0)
-			ret = -ret;
-	}
-	else if (vec.y > 0)
-		ret = 90;
-	else if (vec.y < 0)
-		ret = -90;
-	else if (vec.y == 0)
-		ret = 0;
+
+		if (vec.x != 0) {
+			ret = atanf(fabsf(vec.y/vec.x))*180/PI;
+			if (vec.x < 0)
+				ret = 180 - ret;
+			if (vec.y < 0)
+				ret = -ret;
+		}
+		else if (vec.y > 0)
+			ret = 90;
+		else if (vec.y < 0)
+			ret = -90;
+		else if (vec.y == 0)
+			ret = 0;
 
 	result.setFloat(ret);
 }
@@ -102,15 +102,15 @@ void caosVM::v_VEC_ANGL() {
  * Openc2e-only command.
  */
 
-void caosVM::c_VEC_SUBV() {
-	VM_PARAM_VECTOR(vec2)
-	VM_PARAM_VARIABLE(vec1)
+	void caosVM::c_VEC_SUBV() {
+		VM_PARAM_VECTOR(vec2)
+			VM_PARAM_VARIABLE(vec1)
 
-	if (!vec1->hasVector())
-		throw badParamException();
+			if (!vec1->hasVector())
+				throw badParamException();
 
-	vec1->setVector(vec1->getVector() - vec2);
-}
+		vec1->setVector(vec1->getVector() - vec2);
+	}
 
 /**
  * VEC: ADDV (command) vec1 (variable) vec2 (vector)
@@ -121,15 +121,15 @@ void caosVM::c_VEC_SUBV() {
  * Openc2e-only command.
  */
 
-void caosVM::c_VEC_ADDV() {
-	VM_PARAM_VECTOR(vec2)
-	VM_PARAM_VARIABLE(vec1)
+	void caosVM::c_VEC_ADDV() {
+		VM_PARAM_VECTOR(vec2)
+			VM_PARAM_VARIABLE(vec1)
 
-	if (!vec1->hasVector())
-		throw badParamException();
+			if (!vec1->hasVector())
+				throw badParamException();
 
-	vec1->setVector(vec1->getVector() + vec2);
-}
+		vec1->setVector(vec1->getVector() + vec2);
+	}
 
 /**
  * VEC: MULV (command) vec (variable) mag (decimal)
@@ -141,14 +141,14 @@ void caosVM::c_VEC_ADDV() {
  * Openc2e-only command
  */
 
-void caosVM::c_VEC_MULV() {
-	VM_PARAM_FLOAT(mag)
-	VM_PARAM_VARIABLE(vec)
+	void caosVM::c_VEC_MULV() {
+		VM_PARAM_FLOAT(mag)
+			VM_PARAM_VARIABLE(vec)
 
-	if (!vec->hasVector())
-		throw badParamException();
-	vec->setVector(vec->getVector().scale(mag));
-}
+			if (!vec->hasVector())
+				throw badParamException();
+		vec->setVector(vec->getVector().scale(mag));
+	}
 
 /**
  * VEC: UNIT (vector) angle (decimal)
@@ -159,11 +159,11 @@ void caosVM::c_VEC_MULV() {
  * Openc2e-only command,
  */
 
-void caosVM::v_VEC_UNIT() {
-	VM_PARAM_FLOAT(angle)
-	
-	result.setVector(Vector::unitVector(angle * PI / 180));
-}
+	void caosVM::v_VEC_UNIT() {
+		VM_PARAM_FLOAT(angle)
+
+			result.setVector(Vector::unitVector(angle * PI / 180));
+	}
 
 /**
  * VEC: NULL (vector)
@@ -173,9 +173,10 @@ void caosVM::v_VEC_UNIT() {
  *
  * Openc2e-only command
  */
-void caosVM::v_VEC_NULL() {
-	result.setVector(Vector(0,0));
-}
+
+	void caosVM::v_VEC_NULL() {
+		result.setVector(Vector(0,0));
+	}
 
 /**
  * VEC: MAGN (float) vec (vector)
@@ -185,8 +186,10 @@ void caosVM::v_VEC_NULL() {
  *
  * Openc2e-only command.
  */
-void caosVM::v_VEC_MAGN() {
-    VM_PARAM_VECTOR(vec)
+	void caosVM::v_VEC_MAGN() {
+		VM_PARAM_VECTOR(vec)
 
-    result.setFloat(vec.getMagnitude());
-}
+			result.setFloat(vec.getMagnitude());
+	}
+
+/* vim: set noet: */

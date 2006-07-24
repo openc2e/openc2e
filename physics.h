@@ -198,6 +198,10 @@ class Vector {
 			return Vector(x - v.x, y - v.y);
 		}
 
+		bool operator==(const Vector &v) const {
+			return (x == v.x) && (y == v.y);
+		}
+
 		static Vector unitVector(double angle) {
 			return Vector(cos(angle), sin(angle));
 		}

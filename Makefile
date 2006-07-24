@@ -42,6 +42,7 @@ OPENC2E_CORE = \
 	caosVM_sounds.o \
 	caosVM_time.o \
 	caosVM_variables.o \
+	caosVM_vectors.o \
 	caosVM_vehicles.o \
 	caosVM_world.o \
 	catalogue.lex.o \

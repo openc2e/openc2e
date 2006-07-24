@@ -20,6 +20,7 @@ my %tdisp = (
 	'decimal variable' => 'CI_OTHER',
 	'byte-string' => 'CI_BYTESTR',
 	'label' => '(err)',
+	'vector' => 'CI_VECTOR',
 );
 
 # zero-tolerance policy

@@ -51,6 +51,9 @@ std::string caosVar::dump() const {
 		case AGENT:
 			return str(boost::format("Agent %p ") % (Agent *)getAgent().get());
 			break;
+		case VECTOR:
+			return str(boost::format("Vector (%f, %f)") % getVector().x % getVector().y);
+			break;
 		default:
 			return "[bad caosVar!] ";
 			break;
