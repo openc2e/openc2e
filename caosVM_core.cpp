@@ -77,7 +77,7 @@ void caosVM::c_OUTS() {
 */
 void caosVM::c_OUTV() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_DECIMAL(val)
+	VM_PARAM_VALUE(val)
 
 	if (val.hasFloat()) {
 		*outputstream << boost::format("%0.06f") % val.getFloat();

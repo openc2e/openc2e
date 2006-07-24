@@ -35,13 +35,13 @@
 
 	void caosVM::v_VEC_MAKE() {
 		VM_PARAM_FLOAT(y)
-			VM_PARAM_FLOAT(x)
+		VM_PARAM_FLOAT(x)
 
-			result.setVector(Vector(x, y));
+		result.setVector(Vector(x, y));
 	}
 
 /**
- * VEC: GETC vec (vector) x (variable) y (variable)
+ * VEC: GETC (command) vec (vector) x (variable) y (variable)
  * %status maybe
  *
  * Extracts the components of vector vec and places them in x and y.
@@ -51,10 +51,10 @@
 
 	void caosVM::c_VEC_GETC() {
 		VM_PARAM_VARIABLE(y)
-			VM_PARAM_VARIABLE(x)
-			VM_PARAM_VECTOR(vec)
+		VM_PARAM_VARIABLE(x)
+		VM_PARAM_VECTOR(vec)
 
-			x->setFloat(vec.x);
+		x->setFloat(vec.x);
 		y->setFloat(vec.y);
 	}
 
@@ -76,19 +76,21 @@ void caosVM::v_VEC_ANGL() {
 	float ret;
 	VM_PARAM_VECTOR(vec)
 
-		if (vec.x != 0) {
-			ret = atanf(fabsf(vec.y/vec.x))*180/PI;
-			if (vec.x < 0)
-				ret = 180 - ret;
-			if (vec.y < 0)
-				ret = -ret;
-		}
-		else if (vec.y > 0)
-			ret = 90;
-		else if (vec.y < 0)
-			ret = -90;
-		else if (vec.y == 0)
-			ret = 0;
+	if (vec.x != 0) {
+		ret = atanf(fabsf(vec.y/vec.x))*180/PI;
+		if (vec.x < 0)
+			ret = 180 - ret;
+		if (vec.y < 0)
+			ret = -ret;
+	}
+	else if (vec.y > 0)
+		ret = 90;
+	else if (vec.y < 0)
+		ret = -90;
+	else if (vec.y == 0)
+		ret = 0;
+	if (ret == -180)
+		ret = 180; // hacky -_-;;
 
 	result.setFloat(ret);
 }
@@ -104,10 +106,10 @@ void caosVM::v_VEC_ANGL() {
 
 	void caosVM::c_VEC_SUBV() {
 		VM_PARAM_VECTOR(vec2)
-			VM_PARAM_VARIABLE(vec1)
+		VM_PARAM_VARIABLE(vec1)
 
-			if (!vec1->hasVector())
-				throw badParamException();
+		if (!vec1->hasVector())
+			throw badParamException();
 
 		vec1->setVector(vec1->getVector() - vec2);
 	}
@@ -123,10 +125,10 @@ void caosVM::v_VEC_ANGL() {
 
 	void caosVM::c_VEC_ADDV() {
 		VM_PARAM_VECTOR(vec2)
-			VM_PARAM_VARIABLE(vec1)
+		VM_PARAM_VARIABLE(vec1)
 
-			if (!vec1->hasVector())
-				throw badParamException();
+		if (!vec1->hasVector())
+			throw badParamException();
 
 		vec1->setVector(vec1->getVector() + vec2);
 	}
@@ -143,10 +145,10 @@ void caosVM::v_VEC_ANGL() {
 
 	void caosVM::c_VEC_MULV() {
 		VM_PARAM_FLOAT(mag)
-			VM_PARAM_VARIABLE(vec)
+		VM_PARAM_VARIABLE(vec)
 
-			if (!vec->hasVector())
-				throw badParamException();
+		if (!vec->hasVector())
+			throw badParamException();
 		vec->setVector(vec->getVector().scale(mag));
 	}
 
@@ -162,7 +164,7 @@ void caosVM::v_VEC_ANGL() {
 	void caosVM::v_VEC_UNIT() {
 		VM_PARAM_FLOAT(angle)
 
-			result.setVector(Vector::unitVector(angle * PI / 180));
+		result.setVector(Vector::unitVector(angle * PI / 180));
 	}
 
 /**
@@ -189,7 +191,22 @@ void caosVM::v_VEC_ANGL() {
 	void caosVM::v_VEC_MAGN() {
 		VM_PARAM_VECTOR(vec)
 
-			result.setFloat(vec.getMagnitude());
+		result.setFloat(vec.getMagnitude());
+	}
+
+/**
+ * VEC: SETV (command) dest (variable) src (vector)
+ * %status maybe
+ *
+ * Sets the variable passed in dest to the vector in src
+ *
+ * Openc2e-only command
+ */
+	void caosVM::c_VEC_SETV() {
+		VM_PARAM_VECTOR(src)
+		VM_PARAM_VARIABLE(dest)
+
+		dest->setVector(src);
 	}
 
 /* vim: set noet: */

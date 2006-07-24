@@ -53,7 +53,7 @@ void caosVM::c_DBG_OUTS() {
 */
 void caosVM::c_DBG_OUTV() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_DECIMAL(val)
+	VM_PARAM_VALUE(val)
 
 	if (val.hasFloat()) {
 		cout << boost::format("%0.06f") % val.getFloat();

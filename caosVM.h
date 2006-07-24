@@ -783,6 +783,7 @@ public:
 	void v_VEC_UNIT();
 	void v_VEC_NULL();
 	void v_VEC_MAGN();
+	void c_VEC_SETV();
 
 
 	// serialization test functions
