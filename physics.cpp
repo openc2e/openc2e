@@ -19,14 +19,6 @@
  */
 #include "physics.h"
 
-Point operator+(const Vector &v, const Point &p) {
-	return Point(p.x + v.x, p.y + v.y);
-}
-		
-Point operator+(const Point &p, const Vector &v)  {
-	return Point(p.x + v.x, p.y + v.y);
-}
-
 void Line::dump() const {
 	std::cout << "pst = (" << start.x << "," << start.y << ") end=(" << end.x << "," << end.y << ")" << std::endl;
 	std::cout << "xi = " << x_icept << " yi = " << y_icept << " m=" << slope << std::endl;

@@ -834,7 +834,7 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	name = __x.getLVal().getInt(); } vm->valueStack.pop_back();
 #define VM_PARAM_FLOAT(name) float name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getFloat(); } vm->valueStack.pop_back();
-#define VM_PARAM_VECTOR(name) Vector name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+#define VM_PARAM_VECTOR(name) Vector<float> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getVector(); } vm->valueStack.pop_back();
 #define VM_PARAM_AGENT(name) boost::shared_ptr<Agent> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getLVal().getAgent(); } vm->valueStack.pop_back();

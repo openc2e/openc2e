@@ -84,8 +84,8 @@ bool caosVar::operator > (const caosVar &v) const {
 		return this->getString() > v.getString();
 	} else if (this->hasVector() && v.hasVector()) {
 		// XXX this is totally arbitrary
-		const Vector &v1 = this->getVector();
-		const Vector &v2 = v.getVector();
+		const Vector<float> &v1 = this->getVector();
+		const Vector<float> &v2 = v.getVector();
 		if (v1.x > v2.x)
 			return true;
 		else if (v1.x < v2.x)

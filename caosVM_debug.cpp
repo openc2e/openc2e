@@ -60,7 +60,7 @@ void caosVM::c_DBG_OUTV() {
 	} else if (val.hasInt()) {
 		cout << val.getInt();
 	} else if (val.hasVector()) {
-		const Vector &v = val.getVector();
+		const Vector<float> &v = val.getVector();
 		*outputstream << boost::format("(%0.6f, %0.6f)") % v.x % v.y;
 	} else throw badParamException();
 

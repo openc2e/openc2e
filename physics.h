@@ -142,14 +142,15 @@ class Line {
 		void sanity_check() const;
 };
 
+template <class T = double>
 class Vector {
 	public:
-		double x, y;
+		T x, y;
 		Vector() {
 			x = y = 0;
 		}
 
-		Vector(double _x, double _y) {
+		Vector(T _x, T _y) {
 			x = _x;
 			y = _y;
 		}
@@ -159,17 +160,17 @@ class Vector {
 			y = e.y - s.y;
 		}
 
-		double getMagnitude() const { return sqrt(x*x+y*y); }
+		T getMagnitude() const { return sqrt(x*x+y*y); }
 		
 		Line extendFrom(const Point &p)  const {
 			return Line(p, Point(p.x + x, p.y + y));
 		}
 
-		Vector scaleToMagnitude(double m) const {
+		Vector scaleToMagnitude(T m) const {
 			return Vector(x/getMagnitude()*m, y/getMagnitude()*m);
 		}
 
-		Vector scale(double multiplier) const {
+		Vector scale(T multiplier) const {
 			return Vector(x * multiplier, y * multiplier);
 		}
 		
@@ -183,10 +184,10 @@ class Vector {
 			return true;
 		}
 
-		double getX() const { return x; }
-		double getY() const { return y; }
+		T getX() const { return x; }
+		T getY() const { return y; }
 
-		Vector operator*(double m) const {
+		Vector operator*(T m) const {
 			return scale(m);
 		}
 
@@ -202,12 +203,20 @@ class Vector {
 			return (x == v.x) && (y == v.y);
 		}
 
-		static Vector unitVector(double angle) {
+		static Vector unitVector(T angle) {
 			return Vector(cos(angle), sin(angle));
 		}
 };
-Point operator+(const Vector &v, const Point &p);
-Point operator+(const Point &p, const Vector &v);
+
+template <class T>
+Point operator+(const Vector<T> &v, const Point &p) {
+	return Point(v.x + p.x, v.y + p.y);
+}
+
+template <class T>
+Point operator+(const Point &p, const Vector<T> &v) {
+	return v + p;
+}
 
 #endif
 /* vim: set noet: */

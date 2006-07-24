@@ -37,7 +37,7 @@
 		VM_PARAM_FLOAT(y)
 		VM_PARAM_FLOAT(x)
 
-		result.setVector(Vector(x, y));
+		result.setVector(Vector<float>(x, y));
 	}
 
 /**
@@ -164,7 +164,7 @@ void caosVM::v_VEC_ANGL() {
 	void caosVM::v_VEC_UNIT() {
 		VM_PARAM_FLOAT(angle)
 
-		result.setVector(Vector::unitVector(angle * PI / 180));
+		result.setVector(Vector<float>::unitVector(angle * PI / 180));
 	}
 
 /**
@@ -177,7 +177,7 @@ void caosVM::v_VEC_ANGL() {
  */
 
 	void caosVM::v_VEC_NULL() {
-		result.setVector(Vector(0,0));
+		result.setVector(Vector<float>(0,0));
 	}
 
 /**
