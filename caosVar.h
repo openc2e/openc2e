@@ -118,11 +118,11 @@ class caosVar {
 			const Vector &operator()(const Vector &v) const {
 				return v;
 			}
-            BAD_TYPE(Vector, std::string);
-            BAD_TYPE(Vector, nulltype_tag);
-            BAD_TYPE(Vector, int);
-            BAD_TYPE(Vector, float);
-            BAD_TYPE(Vector, AgentRef);
+			BAD_TYPE(Vector, std::string);
+			BAD_TYPE(Vector, nulltype_tag);
+			BAD_TYPE(Vector, int);
+			BAD_TYPE(Vector, float);
+			BAD_TYPE(Vector, AgentRef);
 		};
 
 			
