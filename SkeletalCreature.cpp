@@ -103,9 +103,9 @@ void SkeletalCreature::skeletonInit() {
 		if (typeid(*(*i)) == typeid(creatureAppearance)) {
 			creatureAppearance *x = (creatureAppearance *)(*i);
 			if (x->part > 4)
-				throw creaturesException(boost::str(boost::format("SkeletalCreature didn't understand a gene with a part# of %d") % x->part));
+				throw creaturesException(boost::str(boost::format("SkeletalCreature didn't understand a gene with a part# of %d") % (int)x->part));
 			if (appearance[x->part])
-				throw creaturesException(boost::str(boost::format("SkeletalCreature got a duplicated gene for part# %d") % x->part));
+				throw creaturesException(boost::str(boost::format("SkeletalCreature got a duplicated gene for part# %d") % (int)x->part));
 			appearance[x->part] = x;
 		}
 	}
@@ -136,14 +136,14 @@ void SkeletalCreature::skeletonInit() {
 		}
 		// TODO: this exception won't necessary be handled, neither will the one below
 		if (!partapp)
-			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % x));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % (unsigned char)x));
 	
 		while (stage_to_try > -1 && images[i] == 0) {
 			images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
 			if (images[i] == 0) stage_to_try--;
 		}
 		if (images[i] == 0)
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % partapp->species % partapp->variant % stage));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % (int)stage));
 		std::ifstream in(std::string(world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att")).c_str());
 		in >> att[i];
 	}
