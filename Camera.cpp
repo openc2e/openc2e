@@ -49,6 +49,7 @@ void Camera::goToMetaRoom(unsigned int m, int _x, int _y, cameratransition trans
 }
 
 void Camera::moveTo(int _x, int _y, panstyle pan) {
+	// TODO: we don't break tracking according to trackingstyle.. atm updateTracking() calls this, also
 	x = _x;
 	y = _y;
 
@@ -85,7 +86,9 @@ void MainCamera::delFloated(AgentRef a) {
 }
 
 void Camera::trackAgent(AgentRef a, int xp, int yp, trackstyle s, cameratransition transition) {
-	trackedagent = a; // TODO
+	trackedagent = a;
+	trackingstyle = s;
+	updateTracking();
 }
 
 void Camera::checkBounds() {
@@ -106,7 +109,15 @@ void Camera::checkBounds() {
 }
 
 void Camera::tick() {
-	// TODO
+	updateTracking();
+}
+
+void Camera::updateTracking() {
+	if (!trackedagent) return;
+
+	int x = trackedagent->x - (getWidth() / 2);
+	int y = trackedagent->y - (getHeight() / 2);
+	moveTo(x, y);
 }
 
 unsigned int const MainCamera::getWidth() {
@@ -124,10 +135,12 @@ unsigned int const MainCamera::getHeight() {
 }
 
 unsigned int const PartCamera::getWidth() {
+	// TODO: update from ZOOM values
 	return part->cameraWidth();
 }
 
 unsigned int const PartCamera::getHeight() {
+	// TODO: update from ZOOM values
 	return part->cameraHeight();
 }
 

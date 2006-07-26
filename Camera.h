@@ -37,6 +37,7 @@ protected:
 	float velx, vely;
 
 	AgentRef trackedagent;
+	trackstyle trackingstyle;
 	
 public:
 	Camera();
@@ -57,6 +58,7 @@ public:
 	void checkBounds();
 
 	void tick();
+	void updateTracking();
 
 	virtual ~Camera() {}
 };
@@ -69,6 +71,8 @@ public:
 	PartCamera(class CameraPart *p) { part = p; }
 	unsigned int const getWidth();
 	unsigned int const getHeight();
+
+	void setZoom(int pixels, int _x, int _y);
 };
 
 class MainCamera : public Camera {
