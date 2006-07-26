@@ -23,6 +23,7 @@ my %fnmap = ( # default category mappings
 	'caosVM_input.cpp' => 'Input',
 	'caosVM_map.cpp' => 'Map',
 	'caosVM_motion.cpp' => 'Motion',
+	'caosVM_net.cpp' => 'Networking',
 	'caosVM_ports.cpp' => 'Ports',
 	'caosVM_resources.cpp' => 'Resources',
 	'caosVM_scripts.cpp' => 'Scripts',
