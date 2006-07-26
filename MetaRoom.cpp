@@ -31,7 +31,10 @@ MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &b
 
 void MetaRoom::addBackground(std::string back) {
 	caos_assert(!back.empty());
-	caos_assert(backgrounds.find(back) == backgrounds.end());
+	// TODO: cadv adds backgrounds which have already been added as the default, look into this,
+	// should we preserve the default once extra backgrounds have been added and change this to
+	// a caos_assert?
+	if (backgrounds.find(back) != backgrounds.end()) return;
 	
 	blkImage *background = dynamic_cast<blkImage *>(world.gallery.getImage(back + ".blk"));
 	caos_assert(background);
