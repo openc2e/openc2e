@@ -37,6 +37,34 @@ SpritePart *caosVM::getCurrentSpritePart() {
 	return s;
 }
 
+// TODO: move this elsewhere?
+bool agentsTouching(Agent *first, Agent *second) {
+	assert(first && second);
+
+	// TODO: c2e docs say it only checks if bounding lines overlap, implement it like that?
+	
+	// this check should probably be integrated into line overlap check?
+	if (first == second) return false;
+
+	if (first->x < second->x) {
+		if ((first->x + first->getWidth()) < second->x)
+			return false;
+	} else {
+		if ((second->x + second->getWidth()) < first->x)
+			return false;
+	}
+
+	if (first->y < second->y) {
+		if ((first->y + first->getHeight()) < second->y)
+			return false;
+	} else {
+		if ((second->y + second->getHeight()) < first->y)
+			return false;
+	}
+
+	return true;
+}
+
 /**
  TOUC (integer) first (agent) second (agent)
  %status maybe
@@ -48,30 +76,10 @@ void caosVM::v_TOUC() {
 	VM_PARAM_VALIDAGENT(second)
 	VM_PARAM_VALIDAGENT(first)
 
-	result.setInt(0);
-
-	// TODO: c2e docs say it only checks if bounding lines overlap, implement it like that?
-	
-	// this check should probably be integrated into line overlap check?
-	if (first == second) return;
-
-	if (first->x < second->x) {
-		if ((first->x + first->getWidth()) < second->x)
-			return;
-	} else {
-		if ((second->x + second->getWidth()) < first->x)
-			return;
-	}
-
-	if (first->y < second->y) {
-		if ((first->y + first->getHeight()) < second->y)
-			return;
-	} else {
-		if ((second->y + second->getHeight()) < first->y)
-			return;
-	}
-
-	result.setInt(1);
+	if (agentsTouching(first.get(), second.get()))
+		result.setInt(1);
+	else
+		result.setInt(1);
 }
 
 /**
@@ -104,13 +112,13 @@ void caosVM::c_RTAR() {
 	}
 
 	if (temp.size() == 0) return;
-	int i = rand() % temp.size();
+	int i = rand() % temp.size(); // TODO: better randomness
 	setTarg(temp[i]);
 }
 
 /**
  TTAR (command) family (integer) genus (integer) species (integer)
- %status stub
+ %status maybe
 
  Locates a random agent that is touching OWNR (see ETCH) and that 
  matches the given classifier, and sets it to TARG.
@@ -122,8 +130,28 @@ void caosVM::c_TTAR() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	valid_agent(owner);
-	
-	setTarg(0); // TODO
+
+	setTarg(0);
+
+	/* XXX: maybe use a map of classifier -> agents? */
+	std::vector<boost::shared_ptr<Agent> > temp;
+	for (std::list<boost::shared_ptr<Agent> >::iterator i
+		= world.agents.begin(); i != world.agents.end(); i++) {
+		
+		Agent *a = i->get();
+		if (!a) continue;
+		
+		if (species && species != a->species) continue;
+		if (genus && genus != a->genus) continue;
+		if (family && family != a->family) continue;
+
+		if (agentsTouching(owner, a))
+			temp.push_back(*i);
+	}
+
+	if (temp.size() == 0) return;
+	int i = rand() % temp.size(); // TODO: better randomness
+	setTarg(temp[i]);
 }
 
 /**
