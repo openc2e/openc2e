@@ -419,6 +419,22 @@ void caosVM::v_PRAY_MAKE() {
 }
 
 /**
+ NET: MAKE (integer) journalspot (integer) journalname (integer) user (string) report (variable)
+ %status stub
+
+ Networking is not supported in openc2e, so conveniently fails.
+*/
+void caosVM::v_NET_MAKE() {
+	VM_PARAM_VARIABLE(report)
+	VM_PARAM_STRING(user)
+	VM_PARAM_STRING(journalname)
+	VM_PARAM_INTEGER(journalspot)
+
+	result.setInt(1);
+	report->setString("Networking unsupported.");
+}
+
+/**
  PRAY NEXT (string) type (string) last (string)
  %status maybe
 

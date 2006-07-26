@@ -659,6 +659,7 @@ public:
 	void v_PRAY_PREV();
 	void c_PRAY_REFR();
 	void v_PRAY_TEST();
+	void v_NET_MAKE();
 	
 	// input
 	void c_CLAC();
@@ -719,18 +720,28 @@ public:
 	void c_WEBB();
 
 	// net
-	void c_NET_PASS();
-	void v_NET_PASS();
+	void v_NET_ERRA();	
+	void v_NET_EXPO();
+	void v_NET_FROM();
+	void c_NET_HEAD();
+	void c_NET_HEAR();
+	void v_NET_HOST();
 	void c_NET_LINE();
 	void v_NET_LINE();
-	void v_NET_ERRA();
-	void v_NET_ULIN();
-	void c_NET_WHOZ();
-	void c_NET_WHON();
-	void v_NET_USER();
-	void v_NET_FROM();
-	void v_NET_EXPO();
+	void c_NET_PASS();
+	void v_NET_PASS();
+	void v_NET_RAWE();
 	void c_NET_RUSO();
+	void c_NET_STAT();
+	void v_NET_ULIN();
+	void c_NET_UNIK();
+	void v_NET_USER();
+	void v_NET_WHAT();
+	void c_NET_WHOD();
+	void c_NET_WHOF();
+	void c_NET_WHON();
+	void c_NET_WHOZ();
+	void c_NET_WRIT();
 
 	// genetics
 	void c_GENE_CLON();
