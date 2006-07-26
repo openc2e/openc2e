@@ -29,6 +29,7 @@
 #include "SDLBackend.h"
 
 #include <typeinfo> // TODO: remove when genome system is fixed
+#include <boost/format.hpp>
 
 struct bodypartinfo {
 	char letter;
@@ -78,7 +79,6 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsig
 
 SkeletalCreature::SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
  : Creature(g, _family, is_female, _variant) {
-	skeleton = new SkeletonPart(this);
 	stage = baby;
 	// todo: check lifestage
 	facialexpression = 0;
@@ -88,17 +88,24 @@ SkeletalCreature::SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _fami
 	for (int i = 0; i < 14; i++) {
 		images[i] = 0;
 	}
-
+	
 	skeletonInit();
+
+	// needs to go last for now, so we can throw exceptions from skeletonInit
+	skeleton = new SkeletonPart(this);
 }
 
 void SkeletalCreature::skeletonInit() {
+	//TODO: the exception throwing in here needs some more thought
+
 	creatureAppearance *appearance[5] = { 0, 0, 0, 0, 0 };
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureAppearance)) {
 			creatureAppearance *x = (creatureAppearance *)(*i);
-			caos_assert(x->part <= 4); // TODO
-			caos_assert(!appearance[x->part]); // TODO
+			if (x->part > 4)
+				throw creaturesException(boost::str(boost::format("SkeletalCreature didn't understand a gene with a part# of %d") % x->part));
+			if (appearance[x->part])
+				throw creaturesException(boost::str(boost::format("SkeletalCreature got a duplicated gene for part# %d") % x->part));
 			appearance[x->part] = x;
 		}
 	}
@@ -127,13 +134,16 @@ void SkeletalCreature::skeletonInit() {
 			// tail
 			partapp = appearance[4];
 		}
-		caos_assert(partapp); // TODO
+		// TODO: this exception won't necessary be handled, neither will the one below
+		if (!partapp)
+			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % x));
 	
 		while (stage_to_try > -1 && images[i] == 0) {
 			images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
 			if (images[i] == 0) stage_to_try--;
 		}
-		assert(images[i] != 0); // TODO: shouldn't kill engine :P
+		if (images[i] == 0)
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % partapp->species % partapp->variant % stage));
 		std::ifstream in(std::string(world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att")).c_str());
 		in >> att[i];
 	}
