@@ -547,10 +547,14 @@ CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 void CameraPart::partRender(class SDLSurface *renderer, int xoffset, int yoffset) {
 	// TODO: hack to stop us rendering cameras inside cameras. better way?
 	if (renderer == &world.backend->getMainSurface()) {
-		SDLSurface *surface = world.backend->newSurface(viewwidth, viewheight);
-		world.drawWorld(camera.get(), surface);
-		renderer->blitSurface(surface, xoffset + x, yoffset + y, camerawidth, cameraheight);
-		world.backend->freeSurface(surface);
+		// make sure we're onscreen before bothering to do any work..
+		if (xoffset + x + viewwidth > 0 && yoffset + y + viewheight > 0 &&
+			xoffset + x < renderer->getWidth() && yoffset + y < renderer->getHeight()) {
+			SDLSurface *surface = world.backend->newSurface(viewwidth, viewheight);
+			world.drawWorld(camera.get(), surface);
+			renderer->blitSurface(surface, xoffset + x, yoffset + y, camerawidth, cameraheight);
+			world.backend->freeSurface(surface);
+		}
 	}
 	
 	SpritePart::partRender(renderer, xoffset, yoffset);
