@@ -27,6 +27,8 @@
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = true;
+	// TODO: verify attributes on the pointer in c2e
+	camerashy = true;
 }
 
 void PointerAgent::finishInit() {

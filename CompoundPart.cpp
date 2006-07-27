@@ -55,6 +55,10 @@ void CompoundPart::render(SDLSurface *renderer, int xoffset, int yoffset) {
 	}
 }
 
+bool CompoundPart::showOnRemoteCameras() {
+	return !parent->camerashy;
+}
+
 void SpritePart::partRender(SDLSurface *renderer, int xoffset, int yoffset) {
 	assert(getCurrentSprite() < getSprite()->numframes());
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha, draw_mirrored);

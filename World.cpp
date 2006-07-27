@@ -276,7 +276,8 @@ void World::drawWorld(Camera *cam, SDLSurface *surface) {
 
 	// render all the agents
 	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
-		(*i)->render(surface, -adjustx, -adjusty);
+		if ((*i)->showOnRemoteCameras() || cam == &camera)
+			(*i)->render(surface, -adjustx, -adjusty);
 	}
 
 	if (showrooms) {

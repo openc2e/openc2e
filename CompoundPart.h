@@ -53,6 +53,8 @@ public:
 	virtual void handleClick(float, float) { }
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
+
+	virtual bool showOnRemoteCameras();
 	
 	Agent *getParent() const { return parent; }
 	unsigned int getZOrder() const;
