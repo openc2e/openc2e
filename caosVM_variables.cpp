@@ -308,12 +308,20 @@ void caosVM::v_RAND() {
 	VM_PARAM_INTEGER(value2)
 	VM_PARAM_INTEGER(value1)
 
-	int diff = value2 - value1 + 1;
-	double r = (rand() / (double)((unsigned int)RAND_MAX + 1));
+	// TODO: i'm sure there's a better way to do this. tired. - fuzzie
+	int diff;
+	if (abs(value2) < abs(value1))
+		diff = abs(value1 - value2) + 1;
+	else
+		diff = abs(value2 - value1) + 1;
+	int val;
+	if (value2 < value1)
+		val = value2;
+	else
+		val = value1;
+	double r = rand() / ((unsigned int)RAND_MAX + 1.0);
 
-	result.setInt((int)((r * diff) + value1));
-
-	// TODO: we should call srand at the start of our code somewhere
+	result.setInt((int)(r * diff) + val);
 }
 
 /**
