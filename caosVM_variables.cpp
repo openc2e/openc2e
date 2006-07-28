@@ -289,10 +289,10 @@ void caosVM::c_MULV() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(mul)
 	VM_PARAM_VARIABLE(v)
-	if (v->hasFloat())
-		v->setFloat(v->getFloat() * (mul.hasFloat() ? mul.getFloat() : mul.getInt()));
-	else if (v->hasInt())
-		v->setInt((int)(v->getInt() * (mul.hasFloat() ? mul.getFloat() : mul.getInt())));
+	if (v->hasFloat() || mul.hasFloat())
+		v->setFloat(v->getFloat() * mul.getFloat());
+	else if (v->hasInt() && mul.hasInt())
+		v->setInt(v->getInt() * mul.getInt());
 	else
 		throw badParamException();
 }
