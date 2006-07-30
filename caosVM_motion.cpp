@@ -316,21 +316,23 @@ void caosVM::c_MVSF() {
 	}
 
 	// TODO: this is a silly hack, to cater for simplest case (where we just need to nudge the agent up a bit)
-	unsigned int tries = 0;
+	/*unsigned int tries = 0;
 	while (tries < 150) {
 		if (targ->validInRoomSystem(Point(x, y - tries), targ->getWidth(), targ->getHeight(), targ->perm)) {
 			targ->moveTo(x, y - tries);
 			return;
 		}
 		tries++;
-	}
+	}*/
 
-	// second hacky attempt, move from side to side (+/- 50) and up a little
-	for (unsigned int xadjust = 0; xadjust < 50; xadjust++) {
-		for (unsigned int yadjust = 0; yadjust < 50; yadjust++) {
+	// second hacky attempt, move from side to side (+/- width) and up (- height) a little
+	unsigned int trywidth = targ->getWidth() * 2; if (trywidth < 100) trywidth = 100;
+	unsigned int tryheight = targ->getHeight() * 2; if (tryheight < 100) tryheight = 100;
+	for (unsigned int xadjust = 0; xadjust < trywidth; xadjust++) {
+		for (unsigned int yadjust = 0; yadjust < tryheight; yadjust++) {
 			if (targ->validInRoomSystem(Point(x - xadjust, y - yadjust), targ->getWidth(), targ->getHeight(), targ->perm))
 				targ->moveTo(x - xadjust, y - yadjust);
-			else if (targ->validInRoomSystem(Point(x + xadjust, y - yadjust), targ->getWidth(), targ->getHeight(), targ->perm))
+			else if ((xadjust != 0) && targ->validInRoomSystem(Point(x + xadjust, y - yadjust), targ->getWidth(), targ->getHeight(), targ->perm))
 				targ->moveTo(x + xadjust, y - yadjust);
 			else
 				continue;
