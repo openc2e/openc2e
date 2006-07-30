@@ -108,7 +108,6 @@ void caosVM::stop() {
 }
 
 void caosVM::runEntirely(shared_ptr<script> s) {
-	resetCore();
 	currentscript = s;
 	cip = nip = 0;
 	while (true) {

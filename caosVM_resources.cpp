@@ -375,6 +375,7 @@ void caosVM::v_PRAY_INJT() {
 			caosScript script(world.gametype, name + " - PRAY " + scriptname);
 			script.parse(iss);
 			script.installScripts();
+			vm->resetCore();
 			vm->runEntirely(script.installer);
 		} catch (std::exception &e) {
 			world.freeVM(vm);

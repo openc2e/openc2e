@@ -341,6 +341,7 @@ void caosVM::v_CAOS() {
 	VM_PARAM_INTEGER(inl)
 	
 	caosVM *sub = world.getVM(NULL);
+	sub->resetCore();
 	if (inl) {
 		for (int i = 0; i < 100; i++)
 			sub->var[i] = var[i];
