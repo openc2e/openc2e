@@ -43,7 +43,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	elas = 0;
 	perm = 50; // TODO: correct default?
 	range = 500;
-	sufferphysics = false; falling = false;
+	sufferphysics = false; falling = true;
 	x = 0.0f; y = 0.0f;
 	clac[0] = 1; // activate 1
 	clik = -1;
@@ -337,8 +337,6 @@ bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testp
 }
 
 void Agent::physicsTick() {
-	falling = false;
-
 	if (carriedby) return; // We don't move when carried, so what's the point?
 
 	if (x == 0 && y == 0) return; // TODO: is this correct behaviour? :P
@@ -348,6 +346,9 @@ void Agent::physicsTick() {
 	float desty = y + vely.getFloat();
 
 	if (sufferphysics) {
+		// TODO: falling behaviour needs looking at more closely..
+		// .. but it shouldn't be 'false' by default on non-physics agents, so..
+		falling = false;
 		// increase speed according to accg
 		// TODO: should we be changing vely first, instead of after a successful move (below)?
 		desty += accg;
