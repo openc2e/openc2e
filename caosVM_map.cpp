@@ -453,7 +453,28 @@ void caosVM::c_LINK() {
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
+	Room *one = world.map.getRoom(room1);
+	Room *two = world.map.getRoom(room2);
+	caos_assert(one && two);
+
 	// TODO
+}
+
+/**
+ LINK (integer) room1 (integer) room2 (integer)
+ %status stub
+
+ Returns the permeability of the link between the given two rooms, or 0 if no link exists.
+*/
+void caosVM::v_LINK() {
+	VM_PARAM_INTEGER(room2)
+	VM_PARAM_INTEGER(room1)
+
+	Room *one = world.map.getRoom(room1);
+	Room *two = world.map.getRoom(room2);
+	caos_assert(one && two);
+
+	result.setInt(0); // TODO
 }
 
 /**

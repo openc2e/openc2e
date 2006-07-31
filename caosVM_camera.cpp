@@ -410,4 +410,32 @@ void caosVM::v_LOFT() {
 	result.setInt(0); // TODO
 }
 
+/**
+ BKGD (command) metaroom_id (integer) background (string) transition (integer)
+ %status stub
+*/
+void caosVM::c_BKGD() {
+	VM_PARAM_INTEGER(transition)
+	VM_PARAM_STRING(background)
+	VM_PARAM_INTEGER(metaroomid)
+
+	MetaRoom *metaroom = world.map.getMetaRoom(metaroomid);
+	caos_assert(metaroom);
+
+	// TODO
+}
+
+/**
+ BKGD (string) metaroom_id (integer)
+ %status stub
+*/
+void caosVM::v_BKGD() {
+	VM_PARAM_INTEGER(metaroomid)
+
+	MetaRoom *metaroom = world.map.getMetaRoom(metaroomid);
+	caos_assert(metaroom);
+
+	result.setString(""); // TODO
+}
+
 /* vim: set noet: */

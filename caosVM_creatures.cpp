@@ -113,6 +113,70 @@ void caosVM::c_SWAY_SHOU() {
 }
 
 /**
+ SWAY SIGN (command) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) 
+ %status stub
+
+ Adjusts these four drives in all Creatures who can see OWNR.
+*/
+void caosVM::c_SWAY_SIGN() {
+	VM_VERIFY_SIZE(8)
+	VM_PARAM_FLOAT(adjust4)
+	VM_PARAM_INTEGER(drive4)
+	VM_PARAM_FLOAT(adjust3)
+	VM_PARAM_INTEGER(drive3)
+	VM_PARAM_FLOAT(adjust2)
+	VM_PARAM_INTEGER(drive2)
+	VM_PARAM_FLOAT(adjust1)
+	VM_PARAM_INTEGER(drive1)
+
+	valid_agent(owner);
+	//TODO
+}
+
+/**
+ SWAY TACT (command) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) 
+ %status stub
+
+ Adjusts these four drives in all Creatures who are touching OWNR.
+*/
+void caosVM::c_SWAY_TACT() {
+	VM_VERIFY_SIZE(8)
+	VM_PARAM_FLOAT(adjust4)
+	VM_PARAM_INTEGER(drive4)
+	VM_PARAM_FLOAT(adjust3)
+	VM_PARAM_INTEGER(drive3)
+	VM_PARAM_FLOAT(adjust2)
+	VM_PARAM_INTEGER(drive2)
+	VM_PARAM_FLOAT(adjust1)
+	VM_PARAM_INTEGER(drive1)
+
+	valid_agent(owner);
+	//TODO
+}
+
+/**
+ SWAY WRIT (command) creature (agent) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) 
+ %status stub
+
+ Adjusts these four drives in the specified creature.
+*/
+void caosVM::c_SWAY_WRIT() {
+	VM_VERIFY_SIZE(8)
+	VM_PARAM_FLOAT(adjust4)
+	VM_PARAM_INTEGER(drive4)
+	VM_PARAM_FLOAT(adjust3)
+	VM_PARAM_INTEGER(drive3)
+	VM_PARAM_FLOAT(adjust2)
+	VM_PARAM_INTEGER(drive2)
+	VM_PARAM_FLOAT(adjust1)
+	VM_PARAM_INTEGER(drive1)
+	VM_PARAM_VALIDAGENT(creature)
+
+	valid_agent(owner);
+	//TODO
+}
+
+/**
  NOHH (command)
  %status stub
 
@@ -285,6 +349,21 @@ void caosVM::v_NORN() {
 }
 
 /**
+ URGE SHOU (command) noun_stim (float) verb_id (integer) verb_stim (float)
+ %status stub
+
+ Urges all Creatures who can hear OWNR to perform the given action on OWNR.
+ The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
+*/
+void caosVM::c_URGE_SHOU() {
+	VM_PARAM_FLOAT(verb_stim)
+	VM_PARAM_INTEGER(verb_id)
+	VM_PARAM_FLOAT(noun_stim)
+
+	// TODO
+}
+
+/**
  URGE SIGN (command) noun_stim (float) verb_id (integer) verb_stim (float)
  %status stub
 
@@ -292,6 +371,21 @@ void caosVM::v_NORN() {
  The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
 */
 void caosVM::c_URGE_SIGN() {
+	VM_PARAM_FLOAT(verb_stim)
+	VM_PARAM_INTEGER(verb_id)
+	VM_PARAM_FLOAT(noun_stim)
+
+	// TODO
+}
+
+/**
+ URGE TACT (command) noun_stim (float) verb_id (integer) verb_stim (float)
+ %status stub
+
+ Urges all Creatures who are touching OWNR to perform the given action on OWNR.
+ The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
+*/
+void caosVM::c_URGE_TACT() {
 	VM_PARAM_FLOAT(verb_stim)
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
@@ -522,6 +616,46 @@ void caosVM::v_LIMB() {
 */
 void caosVM::c_ORDR_SHOU() {
 	VM_PARAM_STRING(speech)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ ORDR SIGN (command) speech (string)
+ %status stub
+
+ Makes the target Creature speak the specified speech to all creatures that can see it.
+*/
+void caosVM::c_ORDR_SIGN() {
+	VM_PARAM_STRING(speech)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ ORDR TACT (command) speech (string)
+ %status stub
+
+ Makes the target Creature speak the specified speech to all creatures that are touching it.
+*/
+void caosVM::c_ORDR_TACT() {
+	VM_PARAM_STRING(speech)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ ORDR WRIT (command) creature (agent) speech (string)
+ %status stub
+
+ Makes the target Creature speak the specified speech to the specified creature.
+*/
+void caosVM::c_ORDR_WRIT() {
+	VM_PARAM_STRING(speech)
+	VM_PARAM_VALIDAGENT(creature)
 
 	valid_agent(targ);
 	// TODO

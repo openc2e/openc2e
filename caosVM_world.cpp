@@ -77,4 +77,21 @@ void caosVM::v_WUID() {
 	result.setString("dock-aaaaa-bbbbb-ccccc-ddddd"); // TODO
 }
 
+/**
+ WTNT (command) index (integer) red (integer) green (integer) blue (integer) rotation (integer) swap (integer)
+ %status stub
+
+ Sets an index in the mysterious global tint table to have the specified values. No, we have no idea what that means either.
+*/
+void caosVM::c_WTNT() {
+	VM_PARAM_INTEGER(swap)
+	VM_PARAM_INTEGER(rotation)
+	VM_PARAM_INTEGER(blue)
+	VM_PARAM_INTEGER(green)
+	VM_PARAM_INTEGER(red)
+	VM_PARAM_INTEGER(index)
+
+	// TODO
+}
+
 /* vim: set noet: */

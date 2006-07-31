@@ -226,6 +226,7 @@ public:
 	void v_GRAP();
 	void v_GMAP();
 	void c_LINK();
+	void v_LINK();
 	void v_GRID();
 	void c_EMIT();
 	void v_WALL();
@@ -270,6 +271,8 @@ public:
 	void c_ZOOM();
 	void c_SNAP();
 	void v_LOFT();
+	void c_BKGD();
+	void v_BKGD();
 
 	// world
 	void c_LOAD();
@@ -277,6 +280,7 @@ public:
 	void c_QUIT();
 	void v_WNAM();
 	void v_WUID();
+	void c_WTNT();
 
 	// core
 	void v_GAME();
@@ -390,6 +394,8 @@ public:
 	void v_UNID();
 	void v_AGNT();
 	void v_DBG_IDNT();
+	void c_DBG_PROF();
+	void c_DBG_CPRO();
 
 	// agent
 	void c_NEW_COMP();
@@ -541,6 +547,9 @@ public:
 	void c_STIM_TACT();
 	void c_STIM_WRIT();
 	void c_SWAY_SHOU();
+	void c_SWAY_SIGN();
+	void c_SWAY_TACT();
+	void c_SWAY_WRIT();
 	void c_ZOMB();
 	void c_DIRN();
 	void c_NOHH();
@@ -553,7 +562,9 @@ public:
 	void v_NORN();
 	void v_ZOMB();
 	void v_DEAD();
+	void c_URGE_SHOU();
 	void c_URGE_SIGN();
+	void c_URGE_TACT();
 	void c_URGE_WRIT();
 	void c_DRIV();
 	void v_DRIV();
@@ -569,6 +580,9 @@ public:
 	void c_LIKE();
 	void v_LIMB();
 	void c_ORDR_SHOU();
+	void c_ORDR_SIGN();
+	void c_ORDR_TACT();
+	void c_ORDR_WRIT();
 	void c_DREA();
 	void v_DREA();
 	void c_BORN();

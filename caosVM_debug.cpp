@@ -281,4 +281,24 @@ void caosVM::v_DBG_IDNT() {
 		result.setString(a->identify());
 }
 
+/**
+ DBG: PROF (command)
+ %status stub
+
+ Dumps the current agent profiling information to the output stream, in CSV format.
+*/
+void caosVM::c_DBG_PROF() {
+	// TODO
+}
+
+/**
+ DBG: CPRO (command)
+ %status stub
+
+ Clears the current agent profiling information.
+*/
+void caosVM::c_DBG_CPRO() {
+	// TODO
+}
+
 /* vim: set noet: */
