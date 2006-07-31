@@ -257,6 +257,9 @@ void World::drawWorld(Camera *cam, SDLSurface *surface) {
 	int adjusty = cam->getY();
 	blkImage *bkgd = m->getBackground(""); // TODO
 
+	// TODO: work out what c2e does when it doesn't have a background..
+	if (!bkgd) return;
+
 	// draw the blk
 	for (unsigned int i = 0; i < (bkgd->totalheight / 128); i++) {
 		for (unsigned int j = 0; j < (bkgd->totalwidth / 128); j++) {
