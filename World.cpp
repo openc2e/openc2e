@@ -35,6 +35,7 @@ World world;
 World::World() {
 	ticktime = 50;
 	tickcount = 0;
+	worldtickcount = 0;
 	race = 50; // sensible default?
 	pace = 0.0f; // sensible default?
 	quitting = saving = false;
@@ -182,6 +183,7 @@ void World::tick() {
 	scriptqueue.clear();
 
 	tickcount++;
+	worldtickcount++;
 	// todo: tick rooms
 }
 

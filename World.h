@@ -77,6 +77,7 @@ public:
 	float pace;
 	unsigned int race;
 	unsigned int ticktime, tickcount;
+	unsigned int worldtickcount;
 	MainCamera camera;
 	SDLBackend *backend;
 	bool showrooms, autokill;

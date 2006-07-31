@@ -438,4 +438,12 @@ void caosVM::v_BKGD() {
 	result.setString(""); // TODO
 }
 
+/**
+ FRSH (command)
+ %status stub
+*/
+void caosVM::c_FRSH() {
+	// TODO
+}
+
 /* vim: set noet: */

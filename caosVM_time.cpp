@@ -231,7 +231,7 @@ void caosVM::v_RTIM() {
  %status maybe
 */
 void caosVM::v_WTIK() {
-	result.setInt(world.tickcount);
+	result.setInt(world.worldtickcount);
 }
 
 /**
@@ -240,6 +240,14 @@ void caosVM::v_WTIK() {
 */
 void caosVM::v_RACE() {
 	result.setInt(world.race);
+}
+
+/**
+ ETIK (integer)
+ %status maybe
+*/
+void caosVM::v_ETIK() {
+	result.setInt(world.tickcount);
 }
 
 /* vim: set noet: */

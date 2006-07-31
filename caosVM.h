@@ -273,6 +273,7 @@ public:
 	void v_LOFT();
 	void c_BKGD();
 	void v_BKGD();
+	void c_FRSH();
 
 	// world
 	void c_LOAD();
@@ -654,6 +655,7 @@ public:
 	void v_RTIM();
 	void v_WTIK();
 	void v_RACE();
+	void v_ETIK();
 
 	// resources
 	void v_PRAY_AGTI();
