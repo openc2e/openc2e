@@ -68,6 +68,19 @@ unsigned int Map::getRoomCount() {
 	return rooms.size();
 }
 
+void Map::tick() {
+	// Three passes..
+	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
+		for (std::vector<Room *>::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+			(*i)->tick();
+	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
+		for (std::vector<Room *>::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+			(*i)->postTick();
+	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
+		for (std::vector<Room *>::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+			(*i)->resetTick();
+}
+
 MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
 		MetaRoom *r = *i;

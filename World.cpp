@@ -184,7 +184,8 @@ void World::tick() {
 
 	tickcount++;
 	worldtickcount++;
-	// todo: tick rooms
+
+	world.map.tick();
 }
 
 Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {

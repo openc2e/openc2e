@@ -18,10 +18,11 @@
  */
 
 #include "Room.h"
+#include "World.h"
 
 Room::Room() {
 	for (unsigned int i = 0; i < CA_COUNT; i++)
-		ca[i] = 0.0f;
+		ca[i] = catemp[i] = 0.0f;
 }
 
 Room::Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int y_r_t,
@@ -51,6 +52,57 @@ Room::Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int 
 }
 
 void Room::tick() {
+	if (world.carates.find(type) == world.carates.end()) return;
+	std::map<unsigned int, cainfo> &rates = world.carates[type];
+
+	for (unsigned int i = 0; i < CA_COUNT; i++) {
+		if (rates.find(i) == rates.end()) continue;
+		cainfo &info = rates[i];
+
+		// adjust for loss
+		ca[i] -= (ca[i] * info.loss);
+
+		if (catemp[i] > 1.0f) catemp[i] = 1.0f;
+		else if (catemp[i] < 0.0f) catemp[i] = 0.0f;
+
+		// adjust for gain from agents
+		if (catemp[i] > ca[i]) {
+			float diff = catemp[i] - ca[i];
+			catemp[i] = ca[i] + (diff * info.gain);
+			if (catemp[i] > 1.0f)
+				catemp[i] = 1.0f;
+		} else {
+			catemp[i] = ca[i];
+		}
+	}
+}
+
+void Room::postTick() {
+	if (world.carates.find(type) == world.carates.end()) return;
+	std::map<unsigned int, cainfo> &rates = world.carates[type];
+
+	for (unsigned int i = 0; i < CA_COUNT; i++) {
+		if (rates.find(i) == rates.end()) continue;
+		cainfo &info = rates[i];
+
+		ca[i] = catemp[i];
+
+		// adjust for diffusion to/from surrounding rooms
+		// TODO: absolutely no clue if this is correct
+		for (std::map<Room *,RoomDoor *>::iterator d = doors.begin(); d != doors.end(); d++) {
+			Room *dest = (d->second->first == this) ? d->second->second : d->second->first;
+			assert(dest);
+			float possiblediffusion = (dest->catemp[i] * info.diffusion * (d->second->perm / 100.0f));
+			if (possiblediffusion > 1.0f) possiblediffusion = 1.0f;
+			if (possiblediffusion > ca[i])
+				ca[i] = possiblediffusion;
+		}
+	}
+}
+
+void Room::resetTick() {
+	for (unsigned int i = 0; i < CA_COUNT; i++)
+		catemp[i] = 0.0f;
 }
 
 /* vim: set noet: */

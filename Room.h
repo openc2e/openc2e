@@ -49,7 +49,7 @@ public:
 	unsigned int id;
 	class MetaRoom *metaroom;
 
-	float ca[CA_COUNT];
+	float ca[CA_COUNT], catemp[CA_COUNT];
 
 	bool containsPoint(float x, float y) {	
 		if (x > (float)x_right || x < (float)x_left) { return false; }
@@ -63,6 +63,8 @@ public:
 	Room();
 	Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int y_r_t, unsigned int y_l_b, unsigned int y_r_b);
 	void tick();
+	void postTick();
+	void resetTick();
 };
 
 #endif

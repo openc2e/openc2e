@@ -64,6 +64,8 @@ public:
 
 	bool collideLineWithRoomSystem(Point src, Point dest, Room *&room, Point &where, Line &wall, unsigned int &walldir, int perm);
 	bool collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room *&newroom, Point &where, Line &wall, unsigned int &walldir, int perm);
+
+	void tick();
 };
 
 #endif

@@ -488,9 +488,9 @@ void Agent::tick() {
 		assert(0 <= emitca_index && emitca_index <= 19);
 		Room *r = world.map.roomAt(x, y);
 		if (r) {
-			r->ca[emitca_index] += emitca_amount;
-			if (r->ca[emitca_index] <= 0.0f) r->ca[emitca_index] = 0.0f;
-			else if (r->ca[emitca_index] >= 1.0f) r->ca[emitca_index] = 1.0f;
+			r->catemp[emitca_index] += emitca_amount;
+			/*if (r->catemp[emitca_index] <= 0.0f) r->catemp[emitca_index] = 0.0f;
+			else if (r->catemp[emitca_index] >= 1.0f) r->catemp[emitca_index] = 1.0f;*/
 		}
 	}
 

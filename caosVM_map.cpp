@@ -267,7 +267,7 @@ void caosVM::c_RATE() {
 */
 void caosVM::v_ROOM() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_AGENT(agent)
+	VM_PARAM_VALIDAGENT(agent)
 	
 	Room *r = world.map.roomAt(agent->x + (agent->getWidth() / 2.0f), agent->y + (agent->getHeight() / 2.0f));
 	if (r)
