@@ -48,7 +48,7 @@ Room::Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int 
 	bot = Line(bl, br);
 
 	for (unsigned int i = 0; i < CA_COUNT; i++)
-		ca[i] = 0.0f;
+		ca[i] = catemp[i] = 0.0f;
 }
 
 void Room::tick() {
