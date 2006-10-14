@@ -53,6 +53,16 @@ void caosVM::v_VISI() {
 }
 
 /**
+ ONTV (integer) checkall (integer)
+ %status maybe
+
+ Identical to VISI.
+*/
+void caosVM::v_ONTV() {
+	v_VISI();
+}
+
+/**
  META (command) metaroom_id (integer) camera_x (integer) camera_y (integer) transition (integer)
  %status maybe
  

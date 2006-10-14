@@ -231,4 +231,16 @@ void caosVM::c_VOIS() {
 	// TODO
 }
 
+/**
+ MIDI (command) midifile (string)
+ %status stub
+
+ Plays the MIDI file specified, or stops playing if passed an empty string.
+*/
+void caosVM::c_MIDI() {
+	VM_PARAM_STRING(midifile)
+
+	// TODO
+}
+
 /* vim: set noet: */

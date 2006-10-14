@@ -248,6 +248,7 @@ public:
 	
 	// camera
 	void v_VISI();
+	void v_ONTV();
 	void c_CMRT();
 	void c_META();
 	void v_META();
@@ -635,6 +636,7 @@ public:
 	void v_MUTE();
 	void c_SEZZ();
 	void c_VOIS();
+	void c_MIDI();
 
 	// time
 	void v_PACE();
