@@ -28,6 +28,18 @@ Camera *caosVM::getCamera() {
 	return c;
 }
 
+bool agentOnCamera(Agent *targ, bool checkall) {
+	// TODO: check non-main cameras
+	// TODO: do compound parts stick out of the agent?
+
+	if ((targ->x > (world.camera.getX() + world.camera.getWidth())) || ((targ->x + targ->getWidth()) < world.camera.getX()) ||
+		(targ->y > (world.camera.getY() + world.camera.getHeight())) || ((targ->y + targ->getHeight()) < world.camera.getY())) {
+			return false;
+	}
+
+	return true;
+}
+
 /**
  VISI (integer) checkall (integer)
  %status maybe
@@ -38,28 +50,29 @@ Camera *caosVM::getCamera() {
 void caosVM::v_VISI() {
 	VM_PARAM_INTEGER(checkall)
 
-	// TODO: check non-main cameras
-	// TODO: do compound parts stick out of the agent?
-	
 	valid_agent(targ);
-	
-	if ((targ->x > (world.camera.getX() + world.camera.getWidth())) || ((targ->x + targ->getWidth()) < world.camera.getX()) ||
-		(targ->y > (world.camera.getY() + world.camera.getHeight())) || ((targ->y + targ->getHeight()) < world.camera.getY())) {
-		result.setInt(0);
-		return;
-	}
 
-	result.setInt(1);
+	if (agentOnCamera(targ, checkall))
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /**
- ONTV (integer) checkall (integer)
+ ONTV (integer) agent (agent) checkall (integer)
  %status maybe
 
- Identical to VISI.
+ Returns 1 if the specified agent is on camera, or 0 otherwise. If checkall is 0, only checks 
+ main camera, otherwise checks all.
 */
 void caosVM::v_ONTV() {
-	v_VISI();
+	VM_PARAM_INTEGER(checkall)
+	VM_PARAM_VALIDAGENT(agent)
+
+	if (agentOnCamera(agent.get(), checkall))
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /**
