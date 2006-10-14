@@ -224,4 +224,12 @@ void caosVM::v_WOLF() {
 	result.setInt(0); // TODO
 }
 
+/**
+ LANG (string)
+ %status stub
+*/
+void caosVM::v_LANG() {
+	result.setString("en");
+}
+
 /* vim: set noet: */

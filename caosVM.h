@@ -297,6 +297,7 @@ public:
 	void v_VMNR();
 	void v_VMJR();
 	void v_WOLF();
+	void v_LANG();
 
 	// variables
 	void c_SETV();
@@ -693,6 +694,7 @@ public:
 	void v_SCOL();
 	void v_CLAC();
 	void v_CLIK();
+	void c_SCRL();
 
 	// vehicles
 	void c_CABN();

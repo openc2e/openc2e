@@ -235,4 +235,16 @@ void caosVM::v_SCOL() {
 	result.setInt(0); // TODO
 }
 
+/**
+ SCRL (command) enable (integer)
+ %status stub
+
+ Turns on (1) or off (0) keyboard/mouse scrolling.
+*/
+void caosVM::c_SCRL() {
+	VM_PARAM_INTEGER(enable)
+
+	// TODO
+}
+
 /* vim: set noet: */
