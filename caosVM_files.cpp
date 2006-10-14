@@ -22,6 +22,9 @@
 #include "World.h"
 #include <fstream>
 #include <iostream>
+#include <boost/format.hpp>
+#include <boost/filesystem/convenience.hpp>
+namespace fs = boost::filesystem;
 
 std::string calculateFilename(int directory, std::string filename) {
 	std::string fullfilename;
@@ -32,6 +35,11 @@ std::string calculateFilename(int directory, std::string filename) {
 		case 2: fullfilename = world.getUserDataDir() + "/Journal/"; break;
 		default: throw caosException("unknown directory in FILE OOPE");
 	}
+
+	fs::path dir = fs::path(fullfilename, fs::native);
+	if (!fs::exists(dir))
+		fs::create_directory(dir);
+	caos_assert(fs::exists(dir) && fs::is_directory(dir));
 
 	// sanitise string: remove leading dots, replace slashes with underscores
 	// todo: check DS behaviour for backslashes (a problem on Windows)
@@ -93,6 +101,11 @@ void caosVM::c_FILE_IOPE() {
 	
 	std::string fullfilename = calculateFilename(directory, filename);
 	inputstream = new std::ifstream(fullfilename.c_str());
+
+	if (inputstream->fail()) {
+		inputstream = 0;
+		throw caosException(boost::str(boost::format("FILE IOPE failed to open %s") % fullfilename));
+	}
 }
 
 /**
@@ -127,7 +140,7 @@ void caosVM::c_FILE_OCLO() {
 			oftest->close();
 			delete oftest;
 		}
-		outputstream = &std::cout; // always restore to default..
+		outputstream = &std::cout; // always restore to default.. TODO, should be null?
 	}
 }
 
@@ -163,6 +176,11 @@ void caosVM::c_FILE_OOPE() {
 		outputstream = new std::ofstream(fullfilename.c_str(), std::ios::app);
 	else	
 		outputstream = new std::ofstream(fullfilename.c_str(), std::ios::trunc);
+
+	if (outputstream->fail()) {
+		outputstream = &std::cout; // TODO: probably not the right fallback, should null?
+		throw caosException(boost::str(boost::format("FILE OOPE failed to open %s") % fullfilename));
+	}
 }
 
 /**
@@ -229,9 +247,9 @@ void caosVM::v_INNL() {
 */
 void caosVM::v_INOK() {
 	if (!inputstream)
-		throw caosException("inputstream not valid in INOK");
-
-	if (inputstream->fail())
+		result.setInt(0);
+		//throw caosException("inputstream not valid in INOK");
+	else if (inputstream->fail())
 		result.setInt(0);
 	else
 		result.setInt(1);
