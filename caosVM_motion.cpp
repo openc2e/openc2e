@@ -157,6 +157,24 @@ void caosVM::v_OBST() {
 }
 
 /**
+ TMVB (integer) deltax (float) deltay (float)
+ %status maybe
+
+ Returns 1 if the TARG agent could move by (deltax, deltay) and still be in room system, or 0 otherwise.
+*/
+void caosVM::v_TMVB() {
+	VM_PARAM_FLOAT(deltay)
+	VM_PARAM_FLOAT(deltax)
+
+	valid_agent(targ);
+
+	if (targ->validInRoomSystem(Point(targ->x + deltax, targ->y + deltay), targ->getWidth(), targ->getHeight(), targ->perm))
+		result.setInt(1);
+	else
+		result.setInt(0);
+}
+
+/**
  TMVT (integer) x (float) y (float)
  %status maybe
  
