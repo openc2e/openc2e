@@ -37,22 +37,12 @@ using boost::str;
 std::map<std::string, Variant *> variants;
 
 /*
- * If the inverse of an AND condition succeeds, jump to next OR (foo) bit, or
- * fail.
- * 
- * If an OR condition succeeds, jump to next AND (foo) or succeed.
- *
- * At the end, if the last condition was AND, succeed. Else, fail.
- *
- * The first condition is considered to be an AND.
- *
- * gogo relocations
+ * Since DOIFs don't short-circuit, just keep a flag indicating whether
+ * the current condition is true or not on the stack...
  */
 void parseCondition(caosScript *s, int success, int failure) {
-	bool wasAnd = true;
-	int nextAnd, nextOr;
-	nextAnd = s->current->newRelocation();
-	nextOr  = s->current->newRelocation();
+	bool isAnd = true;
+	s->current->thread(new ConstOp(caosVar(1)));
 	while(1) {
 		int entry = s->current->getNextIndex();
 		s->v->exp_dialect->doParse(s);
@@ -74,7 +64,7 @@ void parseCondition(caosScript *s, int success, int failure) {
 			compar = CNE;
 		s->v->exp_dialect->doParse(s);
 
-		bool isOr = true;
+		bool nextIsAnd = false;
 		bool isLast = false;
 
 		struct token *peek = tokenPeek();
@@ -83,31 +73,19 @@ void parseCondition(caosScript *s, int success, int failure) {
 		else if (peek->type == TOK_WORD) {
 			if (peek->word == "and") {
 				getToken();
-				isOr = false;
+				nextIsAnd = true;
 			} else if (peek->word == "or")
 				getToken();
 			else isLast = true;
 		}
-
-		if (!wasAnd) {
-			s->current->fixRelocation(nextOr, entry);
-			nextOr = s->current->newRelocation();
-		} else {
-			s->current->fixRelocation(nextAnd, entry);
-			nextAnd = s->current->newRelocation();
-		}
 		
-		int jumpTarget = isOr ? nextAnd : nextOr;
-		if (!isOr) compar = ~compar & CMASK;
-		
-		s->current->thread(new caosCond(compar, jumpTarget));
-		wasAnd = !isOr;
+		s->current->thread(new caosCond(compar, isAnd));
+		isAnd = nextIsAnd;
 		
 		if (isLast) break;
 	}
-	s->current->fixRelocation(nextAnd, success);
-	s->current->fixRelocation(nextOr,  failure);
-	s->current->thread(new caosJMP(wasAnd ? success : failure));
+	s->current->thread(new caosCJMP(success));
+	s->current->thread(new caosJMP(failure));
 }
 
 void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {

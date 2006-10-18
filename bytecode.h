@@ -83,6 +83,21 @@ class caosJMP : public caosOp {
 		}
 };
 
+class caosCJMP : public caosJMP {
+	FRIEND_SERIALIZE(caosCJMP);
+	public:
+		caosCJMP(int p_) : caosJMP(p_) {}
+		void execute(caosVM *vm) {
+			VM_PARAM_INTEGER(flag);
+
+			if (flag)
+				this->caosJMP::execute(vm);
+		}
+		std::string dump() {
+			return std::string("COND ") + this->caosJMP::dump();
+		}
+};
+
 class simpleCaosOp : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(simpleCaosOp);
@@ -183,28 +198,33 @@ class caosCond : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(caosCond);
 		int cond;
-		int branch;
+		bool isAnd;
 		caosCond() {}
 	public:
 		std::string dump() { 
 			std::ostringstream oss;
-			const char *c;
+			const char *c, *andMark;
 			if (cond < CMASK && cond > 0)
 				c = cnams[cond];
+
+			andMark = isAnd ? "AND" : "OR";
+
 			if (c)
-				return str(boost::format("COND %s %08d") % c % branch);
+				return str(boost::format("COND %s %s") % c % andMark);
 			else
-				return str(boost::format("COND BAD %d %08d") % cond % branch);
+				return str(boost::format("COND BAD %d %s") % cond % andMark);
 		}
 				
 			
-		caosCond(int condition, int br)
-			: cond(condition), branch(br) {}
+		caosCond(int condition, bool ia)
+			: cond(condition), isAnd(ia) {}
+
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			
 			VM_PARAM_VALUE(arg2);
 			VM_PARAM_VALUE(arg1);
+			VM_PARAM_INTEGER(flag);
 
 			int cres;
 			if (arg2.hasString() && arg1.hasString()) {
@@ -250,15 +270,14 @@ class caosCond : public caosOp {
 				// the next bit is needed for some missing GAME etc
 			} else cres = CNE;
 
-			if (cres & cond)
-				vm->nip = branch;
-		}
-
-		void relocate(const std::vector<int> &relocations) {
-			if (branch < 0) {
-				branch = relocations[-branch];
+			bool success = cres & cond;
+			if (isAnd) {
+				flag = flag && success;
+			} else {
+				flag = flag || success;
 			}
-			assert(branch > 0);
+
+			vm->result.setInt(flag);
 		}
 };
 
