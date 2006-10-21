@@ -188,8 +188,8 @@ caosScript::caosScript(const std::string &variant, const std::string &fn) {
 }
 
 void caosScript::parse(std::istream &in) {
-
-	yyrestart(&in);
+	// restart the token parser
+	yyrestart(&in, (v->name == "c2"));
 
 	BaseDialect d(this);
 	d.doParse(this);
@@ -215,6 +215,17 @@ void caosScript::installScripts() {
 		world.scriptorium.addScript(s->fmly, s->gnus, s->spcs, s->scrp, s);
 		i++;
 	}
+}
+
+void caosScript::installInstallScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short eventid) {
+	assert(v->name == "c2");
+
+	installer->fmly = family;
+	installer->gnus = genus;
+	installer->spcs = species;
+	installer->scrp = eventid;
+	
+	world.scriptorium.addScript(installer->fmly, installer->gnus, installer->spcs, installer->scrp, installer);
 }
 
 /* vim: set noet: */

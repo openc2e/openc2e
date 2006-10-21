@@ -25,7 +25,7 @@
 #include <iostream>
 #include <sstream>
 
-void yyrestart(std::istream *stream);
+void yyrestart(std::istream *stream, bool use_c2);
 
 enum toktype { ANYTOKEN = 0, EOI = 0, TOK_CONST, TOK_WORD, TOK_BYTESTR };
 

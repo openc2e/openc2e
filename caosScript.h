@@ -120,6 +120,7 @@ public:
 	void parse(std::istream &in);
 	~caosScript();
 	void installScripts();
+	void installInstallScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short eventid);
 };
 
 #endif

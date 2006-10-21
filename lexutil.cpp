@@ -18,6 +18,7 @@
  */
 #include "lexutil.h"
 #include "lex.yy.h"
+#include "lex.c2.h"
 #include "token.h"
 #include <vector>
 #include <string>
@@ -30,14 +31,26 @@ std::string temp_str;
 static token *peektok = NULL;
 token lasttok;
 
-static yyFlexLexer *lexer = NULL; // XXX!
+static c2eFlexLexer *lexer = NULL; // XXX!
+static c2FlexLexer *c2lexer = NULL;
 
-void yyrestart(std::istream *is) {
-	if (lexer)
-		delete lexer;
-	lexer = new yyFlexLexer();
+bool using_c2;
+
+void yyrestart(std::istream *is, bool use_c2) {
+	using_c2 = use_c2;
+
+	if (lexer) delete lexer;
+	if (c2lexer) delete c2lexer;
+	
 	lexreset();
-	lexer->yyrestart(is);
+	
+	if (using_c2) {
+		c2lexer = new c2FlexLexer();
+		c2lexer->yyrestart(is);
+	} else {
+		lexer = new c2eFlexLexer();
+		lexer->yyrestart(is);
+	}
 }
 
 void lexreset() {
@@ -57,8 +70,15 @@ token *getToken(toktype expected) {
 token *tokenPeek() {
 	if (peektok)
 		return peektok;
-	if (!lexer->yylex())
-		return NULL;
+	if (using_c2) {
+		assert(c2lexer);
+		if (!c2lexer->yylex())
+			return NULL;
+	} else {
+		assert(lexer);
+		if (!lexer->yylex())
+			return NULL;
+	}
 	peektok = &lasttok;
 	return peektok;
 }

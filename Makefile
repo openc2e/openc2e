@@ -58,6 +58,7 @@ OPENC2E_CORE = \
 	fileSwapper.o \
 	genomeFile.o \
 	historyManager.o \
+	lex.c2.o \
 	lex.mng.o \
 	lexutil.o \
 	lex.yy.o \
@@ -123,7 +124,10 @@ catalogue.tab.cpp catalogue.tab.hpp: catalogue.ypp
 	bison -d --name-prefix=cata catalogue.ypp
 
 lex.yy.cpp lex.yy.h: caos.l
-	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h caos.l
+	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h --prefix=c2e caos.l
+
+lex.c2.cpp lex.c2.h: c2caos.l
+	flex -+ -d -o lex.c2.cpp --header-file=lex.c2.h --prefix=c2 c2caos.l
 
 ## lex.yy.h deps aren't detected evidently
 caosScript.o: lex.yy.h lex.yy.cpp
@@ -189,6 +193,6 @@ headerdeps.png: headerdeps.dot
 config.mk: config.mk.in
 	./configure.pl
 
-generated: catalogue.tab.hpp lex.yy.h mngparser.tab.hpp catalogue.lex.h lex.mng.h docs.html cmddata.cpp
+generated: catalogue.tab.hpp lex.yy.h lex.c2.h mngparser.tab.hpp catalogue.lex.h lex.mng.h docs.html cmddata.cpp
 
 .PHONY: clean all dep docs test
