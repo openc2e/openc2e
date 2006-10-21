@@ -521,10 +521,27 @@ class Vehicle(CompoundObject):
 	def read(self, f):
 		CompoundObject.read(self, f)
 
-		x = f.read(36) # TODO
-		print "vehicle bytes: ",
-		for z in x: print "%02X" % ord(z),
-		print
+		x = f.read(9) # all nulls, TODO: assert
+
+		# TODO: a mystery!
+		a = read16(f)
+		x = read16(f)
+		assert x == 0
+		b = read16(f)
+		x = read8(f)
+		assert x == 0
+		print "mystery numbers: " + str(a) + ", " + str(b)
+
+		# TODO: this could all be nonsense, really
+		self.cabinleft = read32(f)
+		self.cabintop = read32(f)
+		self.cabinright = read32(f)
+		self.cabinbottom = read32(f)
+
+		print "cabin coords: " + str(self.cabinleft) + ", " + str(self.cabintop) + ", " + str(self.cabinright) + ", " + str(self.cabinbottom)
+
+		x = read32(f)
+		assert x == 0
 
 # TODO: is it Vehicle subclass?
 class Lift(Vehicle):
@@ -540,10 +557,10 @@ class CallButton(SimpleObject):
 	def read(self, f):
 		SimpleObject.read(self, f)
 
-		x = f.read(3) # TODO
-		print "call button bytes: ",
-		for z in x: print "%02X" % ord(z),
-		print
+		self.lift = slurpMFC(f, Lift)
+		assert self.lift
+		self.buttonid = read8(f)
+		print "button #" + str(self.buttonid) + " for lift " + str(self.lift)
 
 class Blackboard(CompoundObject):
 	def read(self, f):
