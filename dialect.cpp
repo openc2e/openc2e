@@ -128,6 +128,10 @@ void ExprDialect::handleToken(caosScript *s, token *t) {
 		case TOK_WORD:
 			{
 				std::string word = t->word;
+				if (expect == CI_BAREWORD) {
+					s->current->thread(new ConstOp(caosVar(word)));
+					return;
+				}
 				if (word.size() == 4) {
 					if (word[0] == 'v' && word[1] == 'a') {
 						if(!(isdigit(word[2]) && isdigit(word[3])))

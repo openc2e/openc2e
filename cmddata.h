@@ -29,7 +29,8 @@ enum ci_type {
 	CI_AGENT,
 	CI_VARIABLE,
 	CI_BYTESTR,
-	CI_VECTOR
+	CI_VECTOR,
+	CI_BAREWORD
 };
 
 struct cmdinfo {

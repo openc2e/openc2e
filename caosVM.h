@@ -399,6 +399,7 @@ public:
 	void v_DBG_IDNT();
 	void c_DBG_PROF();
 	void c_DBG_CPRO();
+	void v_DBG_STOK();
 
 	// agent
 	void c_NEW_COMP();

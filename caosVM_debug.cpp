@@ -301,4 +301,16 @@ void caosVM::c_DBG_CPRO() {
 	// TODO
 }
 
+/**
+ DBG: STOK (string) bareword (bareword)
+ %status ok
+
+ Returns the bare token in 'bareword' as a string.
+*/
+void caosVM::v_DBG_STOK() {
+	VM_PARAM_STRING(bareword)
+	
+	result.setString(bareword);
+}
+
 /* vim: set noet: */

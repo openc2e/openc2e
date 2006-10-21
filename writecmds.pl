@@ -21,6 +21,8 @@ my %tdisp = (
 	'byte-string' => 'CI_BYTESTR',
 	'label' => '(err)',
 	'vector' => 'CI_VECTOR',
+	'bareword' => 'CI_BAREWORD',
+	'token' => 'CI_BAREWORD',
 );
 
 # zero-tolerance policy
