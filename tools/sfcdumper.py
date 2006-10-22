@@ -139,35 +139,9 @@ class CRoom:
 		self.inorganicnutrients = read8(f)
 		self.organicnutrients = read8(f)
 		self.temperature = read8(f)
-		self.heatsource = read8(f)
-
-		# TODO: slurp up junk
-		# this is always 00 00 00 or FF FF FF
-		# it's only FF FF FF in eden rooms 126, 134, 135, 203 and 204
-		# these are all towards the bottom of the underwater area next to
-		# the biosphere..
-		self.firstjunk = f.read(3)
-		if self.firstjunk == chr(0) + chr(0) + chr(0):
-			self.firstjunk = False
-		else:
-			assert self.firstjunk == chr(0xff) + chr(0xff) + chr(0xff)
-			self.firstjunk = True
-
-		# slurp up some more data
+		self.heatsource = reads32(f)
 		self.pressure = read8(f)
-		self.pressuresource = read8(f)
-
-		# TODO: slurp up junk
-		# this is always 00 00 00 or FF FF FF
-		# it's only FF FF FF in eden rooms 140, 141, 237, 238, 239, 243 and 244
-		# 140 and 141 are above the near-to-start lake
-		# the rest are randomish topmost rooms in the sky
-		self.weirdjunk = read16(f) + read8(f)
-		if self.weirdjunk == 0:
-			self.weirdjunk = False
-		else:
-			assert self.weirdjunk == 65790
-			self.weirdjunk = True
+		self.pressuresource = reads32(f)
 
 		# wind x/y direction
 		self.windx = reads32(f)
@@ -175,19 +149,11 @@ class CRoom:
 
 		# slurp up some more data
 		self.lightlevel = read8(f)
-		self.lightsource = read8(f)
-
-		# TODO: slurp up junk
-		x = read16(f) + read8(f)
-		assert x == 0, "second junk in CRoom wasn't zero"
+		self.lightsource = reads32(f)
 
 		# slurp up some more data
 		self.radiation = read8(f)
-		self.radiationsource = read8(f)
-
-		# TODO: slurp up junk
-		x = read16(f) + read8(f)
-		assert x == 0, "third junk in CRoom wasn't zero"
+		self.radiationsource = reads32(f)
 
 		# TODO: slurp up 800 unknown bytes!
 		self.randombytes = f.read(800)
@@ -673,11 +639,18 @@ print
 
 roomtypes = ["In-Doors", "Surface", "Underwater", "Atmosphere"]
 dropstatuses = ["Never", "Above-floor", "Always"]
+doordirs = ["Left", "Right", "Up", "Down"]
 
 for i in data.rooms:
 	print "room # " + str(i.roomid) + " at (" + str(i.left) + ", " + str(i.top) + "), to (" + str(i.right) + ", " + str(i.bottom) + ")"
-	print "first junk: " + str(i.firstjunk)
-	print "weird junk: " + str(i.weirdjunk)
+	for j in range(4):
+		print "doors in direction " + doordirs[j] + ":",
+		if len(i.doordirections[j]) == 0:
+			print "None.",
+		for k in i.doordirections[j]:
+			if k != i.doordirections[j][0]: print ",",
+			print "openness " + str(k.openness) + " to room #" + str(k.otherroom),
+		print
 	print "wind: (" + str(i.windx) + ", " + str(i.windy) + ")"
 	print "room type: " + roomtypes[i.roomtype] + " (" + str(i.roomtype) + ")"
 	print "floor value: " + str(i.floorvalue)
