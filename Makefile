@@ -77,6 +77,7 @@ OPENC2E_CORE = \
 	Scriptorium.o \
 	SDLBackend.o \
 	SDL_gfxPrimitives.o \
+	SFCFile.o \
 	SimpleAgent.o \
 	SkeletalCreature.o \
 	streamutils.o \
