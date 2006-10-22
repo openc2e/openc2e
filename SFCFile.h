@@ -36,13 +36,15 @@
 
 class SFCClass;
 class MapData;
-class Object;
-class Scenery;
+class SFCObject;
+class SFCScenery;
 
-struct Script {
+struct SFCScript {
 	uint8 genus, family;
 	uint16 species, eventno;
 	std::string data;
+
+	void read(class SFCFile *);
 };
 
 class SFCFile {
@@ -57,9 +59,9 @@ private:
 
 public:
 	MapData *mapdata;
-	std::vector<Object *> objects;
-	std::vector<Scenery *> scenery;
-	std::vector<Script> scripts;
+	std::vector<SFCObject *> objects;
+	std::vector<SFCScenery *> scenery;
+	std::vector<SFCScript> scripts;
 
 	uint32 scrollx, scrolly;
 	// TODO: favourite places
@@ -75,6 +77,9 @@ public:
 	signed int reads32() { return (signed int)read32(); }
 	std::string readBytes(unsigned int n);
 	std::string readstring();
+
+	bool readingScenery() { return reading_scenery; }
+	bool readingCompound() { return reading_compound; }
 };
 
 class SFCClass {
@@ -141,14 +146,14 @@ class MapData : public SFCClass {
 public:
 	CGallery *background;
 	std::vector<CRoom *> rooms;
-	
+
 	// TODO: misc data
 	
 	MapData(SFCFile *p) : SFCClass(p) { }
 	void read();
 };
 
-class Entity : public SFCClass {
+class SFCEntity : public SFCClass {
 public:
 	CGallery *sprite;
 
@@ -167,9 +172,14 @@ public:
 	std::vector<std::pair<uint32, uint32> > pickup_points;
 
 	// TODO: misc data/flags
+	SFCEntity(SFCFile *p) : SFCClass(p) { }
+	void read();
 };
 
-class Object : public SFCClass {
+class SFCObject : public SFCClass {
+protected:
+	SFCObject(SFCFile *p) : SFCClass(p) { }
+
 public:
 	uint8 genus, family;
 	uint16 species;
@@ -190,54 +200,77 @@ public:
 
 	bool frozen;
 
-	std::vector<Script> scripts;
+	std::vector<SFCScript> scripts;
+	void read();
 };
 
-class CompoundObject : public Object {
+class SFCCompoundObject : public SFCObject {
 public:
-	std::vector<Entity *> parts;
+	std::vector<SFCEntity *> parts;
 	
 	// TODO: hotspots
 	// TODO: misc data
+
+	SFCCompoundObject(SFCFile *p) : SFCObject(p) { }
+	void read();
 };
 
-class Blackboard : public CompoundObject {
+class SFCBlackboard : public SFCCompoundObject {
 public:
 	uint32 textx, texty;
 	uint16 backgroundcolour, chalkcolour, aliascolour;
 	std::map<uint32, std::string> strings;
+
+	SFCBlackboard(SFCFile *p) : SFCCompoundObject(p) { }
+	void read();
 };
 
-class Vehicle : public CompoundObject {
+class SFCVehicle : public SFCCompoundObject {
 public:
 	uint32 cabinleft, cabintop, cabinright, cabinbottom;
 
 	// TODO: misc data
+
+	SFCVehicle(SFCFile *p) : SFCCompoundObject(p) { }
+	void read();
 };
 
-class Lift : public Vehicle {
-	// TODO: misc data
-};
-
-class SimpleObject : public Object {
-public:
-	Entity *entity;
-};
-
-class PointerTool : public SimpleObject {
+class SFCLift : public SFCVehicle {
 public:
 	// TODO: misc data
+
+	SFCLift(SFCFile *p) : SFCVehicle(p) { }
+	void read();
 };
 
-class CallButton : public SimpleObject {
+class SFCSimpleObject : public SFCObject {
 public:
-	Lift *ourLift;
-	unsigned int liftid;
+	SFCEntity *entity;
+
+	SFCSimpleObject(SFCFile *p) : SFCObject(p) { }
+	void read();
 };
 
-class Scenery : public SimpleObject {
+class SFCPointerTool : public SFCSimpleObject {
 public:
 	// TODO: misc data
+
+	SFCPointerTool(SFCFile *p) : SFCSimpleObject(p) { }
+	void read();
+};
+
+class SFCCallButton : public SFCSimpleObject {
+public:
+	SFCLift *ourLift;
+	uint8 liftid;
+
+	SFCCallButton(SFCFile *p) : SFCSimpleObject(p) { }
+	void read();
+};
+
+class SFCScenery : public SFCSimpleObject {
+public:
+	SFCScenery(SFCFile *p) : SFCSimpleObject(p) { }
 };
 
 #endif
