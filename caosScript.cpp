@@ -175,7 +175,9 @@ class BaseDialect : public Dialect {
 					return;
 				}
 				Dialect::handleToken(s, t);
-			} // if (t->type == TOK_WORD)
+			} else { // t->type != TOK_WORD
+				throw parseException("unexpected non-word token");
+			}
 		}
 };
 
