@@ -281,9 +281,10 @@ class Entity: # like a compound part?
 			print "part zorder: " + str(self.zorder2)
 
 		# TODO: finish decoding this
-		self.bhvr = f.read(4) # 3 bytes of click, 1 byte of touch
-		print "* bhvr:",
-		for z in self.bhvr: print "%02X" % ord(z),
+		self.clickbhvr = f.read(3)
+		self.touchbhvr = read8(f)
+		print "* touch bhvr: " + str(self.touchbhvr) + ", click bhvr:",
+		for z in self.clickbhvr: print "%02X" % ord(z),
 		print
 
 		# CompoundParts don't have the pickup data?
