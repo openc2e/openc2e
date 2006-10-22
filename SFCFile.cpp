@@ -67,9 +67,10 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		// completely new class, read details
 		uint16 schemaid = read16();
 		uint16 strlen = read16();
-		char temp[strlen];
+		char *temp = new char[strlen];
 		ourStream->read(temp, strlen);
 		std::string classname(temp, strlen);
+		delete[] temp;
 		
 		pid = storage.size();
 		
@@ -160,9 +161,11 @@ std::string SFCFile::readstring() {
 }
 
 std::string SFCFile::readBytes(unsigned int n) {
-	char temp[n];
+	char *temp = new char[n];
 	ourStream->read(temp, n);
-	return std::string(temp, n);
+	std::string t = std::string(temp, n);
+	delete[] temp;
+	return t;
 }
 
 // ------------------------------------------------------------------
