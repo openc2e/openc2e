@@ -104,7 +104,7 @@ static inline int push_bytestr(unsigned int bs) {
 	if (bs > 255) {
 		std::ostringstream oss;
 		oss << "Byte string element out of range (0 <= " << bs << " < 256) at line " << lex_lineno;
-		throw new parseException(oss.str());
+		throw parseException(oss.str());
 	}
 	bytestr.push_back(bs);
 	lasttok.yyline = lex_lineno;

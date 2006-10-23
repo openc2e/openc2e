@@ -85,7 +85,7 @@ public:
 	void setBackend(SDLBackend *b) { backend = b; }
 	unsigned int const getWidth();
 	unsigned int const getHeight();
-	void moveTo(int _x, int _y, panstyle pan);
+	void moveTo(int _x, int _y, panstyle pan = jump);
 	
 	void addFloated(AgentRef);
 	void delFloated(AgentRef);
