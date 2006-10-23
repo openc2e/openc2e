@@ -276,7 +276,9 @@ class Entity: # like a compound part?
 		self.zorder2 = reads32(f)
 		if self.zorder != self.zorder2:
 			# seems to only happen to CompoundObjects
-			assert readingcompound
+			# kaelis's Eden.sfc has this differing for obj#816!
+			# TODO: work out what the heck
+			#assert readingcompound
 			# TODO: is this, in fact, compound zorder
 			print "part zorder: " + str(self.zorder2)
 
@@ -362,11 +364,12 @@ class Object:
 		# TODO
 		x = read16(f)
 		assert x == 0
-		x = read16(f)
+		#x = read16(f)
 		#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
-		print "* third misc data: " + str(x)
-		x = read16(f)
+		#print "* third misc data: " + str(x)
+		#x = read16(f)
 		#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
+		x = read32(f)
 		print "* fourth misc data: " + str(x)
 
 		# OVxx variables
@@ -409,7 +412,7 @@ class Object:
 			eventno = read16(f)
 			species = read16(f)
 			script = readstring(f)
-			#print "event #" + str(eventno) + ": " + script
+			print "event #" + str(eventno) + " for " + str(family) + ", " + str(genus) + ", " + str(species) + ": " + script
 			self.scripts[eventno] = script
 
 class SimpleObject(Object):
@@ -619,7 +622,7 @@ for i in range(numscripts):
 	eventno = read16(f)
 	species = read16(f)
 	script = readstring(f)
-	#print "event #" + str(eventno) + ": " + script
+	print "event #" + str(eventno) + " for " + str(family) + ", " + str(genus) + ", " + str(species) + " (global): " + script
 	scripts[eventno] = script
 
 print
