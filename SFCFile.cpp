@@ -567,4 +567,110 @@ void SFCScript::read(SFCFile *f) {
 	data = f->readstring();
 }
 
+// ------------------------------------------------------------------
+
+#include "World.h"
+
+void SFCFile::copyToWorld() {
+	mapdata->copyToWorld();
+
+	for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
+		(*i)->copyToWorld();
+	}
+	
+	for (std::vector<SFCScenery *>::iterator i = scenery.begin(); i != scenery.end(); i++) {
+		(*i)->copyToWorld();
+	}
+
+	for (std::vector<SFCScript>::iterator i = scripts.begin(); i != scripts.end(); i++) {
+		i->install();
+	}
+	
+	world.camera.moveTo(scrollx, scrolly, jump);
+}
+
+void MapData::copyToWorld() {
+	creaturesImage *spr = world.gallery.getImage(background->filename);
+	// TODO: hardcoded size bad?
+	MetaRoom *r = new MetaRoom(0, 0, 8352, 2400, background->filename, spr);
+	world.map.addMetaRoom(r);
+
+	// TODO: rooms, etc ;)
+}
+
+void SFCObject::copyToWorld() {
+	// TODO: this is a stub, make it pure virtual when we're done implementing
+}
+
+#include "SimpleAgent.h"
+
+#include <iostream> // TODO: remove
+
+void SFCSimpleObject::copyToWorld() {
+	// construct our equivalent object
+	SimpleAgent *a = new SimpleAgent(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
+	a->finishInit();
+	//a->moveTo(entity->x - (a->part(0)->getWidth() / 2), entity->y - (a->part(0) -> getHeight() / 2));
+	a->moveTo(entity->x, entity->y);
+	
+	// copy data from ourselves
+	// TODO: attr
+	// TODO: bhvr click state
+	// TODO: ticking
+	// TODO: variables
+	a->perm = size; // TODO
+	// TODO: threat
+	a->range = range;
+	a->accg = accg;
+	a->velx.setInt(velx);
+	a->vely.setInt(vely);
+	a->elas = rest; // TODO
+	a->aero = aero;
+	a->paused = frozen; // TODO
+
+	// copy data from entity
+	DullPart *p = (DullPart *)a->part(0);
+	// pose
+	p->setPose(entity->currframe);
+	// animation
+	if (entity->haveanim) {
+		for (unsigned int i = 0; i < entity->animstring.size(); i++) {
+			if (entity->animstring[i] == 'R')
+				p->animation.push_back(255);
+			else {
+				assert(entity->animstring[i] >= 48 && entity->animstring[i] <= 57);
+				p->animation.push_back(entity->animstring[i] - 48);
+			}
+		}
+
+		// TODO: should make sure animation position == current pose
+		if (entity->animframe < p->animation.size()) {
+			if (p->animation[entity->animframe] == 255)
+				p->setFrameNo(0);
+			else
+				p->setFrameNo(entity->animframe);
+		} else p->animation.clear();
+	}
+	// TODO: bhvr
+	// TODO: pickup handles/points
+	// TODO: currframe
+	// TODO: imgoffset
+}
+
+#include <boost/format.hpp>
+#include <sstream>
+
+void SFCScript::install() {
+	std::string scriptinfo = boost::str(boost::format("<SFC script %d, %d, %d: %d>") % (int)family % (int)genus % species % eventno);
+	caosScript script(world.gametype, scriptinfo);
+	std::istringstream s(data);
+	try {
+		script.parse(s);
+		script.installInstallScript(family, genus, species, eventno);
+		script.installScripts();
+	} catch (std::exception &e) {
+		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.what() << std::endl;
+	}
+}
+
 /* vim: set noet: */

@@ -25,6 +25,7 @@
 #include "creaturesImage.h"
 #include "Creature.h"
 #include "SDLBackend.h"
+#include "SFCFile.h"
 
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -97,6 +98,10 @@ void World::init() {
 	// port lines
 	v.setFloat(600.0f); variables["engine_distance_before_port_line_warns"] = v;
 	v.setFloat(800.0f); variables["engine_distance_before_port_line_snaps"] = v;
+
+	// adjust to default tick rate for C1/C2 if necessary
+	if (gametype == "c1" || gametype == "c2")
+		ticktime = 100;
 }
 
 caosVM *World::getVM(Agent *a) {
@@ -377,6 +382,24 @@ void World::executeBootstrap(fs::path p) {
 }
 
 void World::executeBootstrap(bool switcher) {
+	if (gametype == "c2") {
+		// read from Eden.sfc
+		
+		if (data_directories.size() == 0)
+			throw creaturesException("C2 can't run without data directories!");
+
+		fs::path edenpath(data_directories[0] / "/Eden.sfc");
+		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
+			SFCFile sfc;
+			std::ifstream f(edenpath.native_directory_string().c_str(), std::ios::binary);
+			f >> std::noskipws;
+			sfc.read(&f);
+			sfc.copyToWorld();
+			return;
+		} else
+			throw creaturesException("couldn't find file Eden.sfc, required for C2");
+	}
+
 	// TODO: this code is possibly wrong with multiple bootstrap directories
 	std::multimap<std::string, fs::path> bootstraps;
 

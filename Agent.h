@@ -48,6 +48,7 @@ class Agent : public boost::enable_shared_from_this<Agent> {
 	friend class opMVxx;
 	friend class SDLBackend; // TODO: should we make soundslot public instead?
 	friend class LifeAssert;
+	friend class SFCSimpleObject;
 
 	FRIEND_SERIALIZE(Agent);
 	

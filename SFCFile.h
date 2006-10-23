@@ -45,6 +45,7 @@ struct SFCScript {
 	std::string data;
 
 	void read(class SFCFile *);
+	void install();
 };
 
 class SFCFile {
@@ -80,6 +81,8 @@ public:
 
 	bool readingScenery() { return reading_scenery; }
 	bool readingCompound() { return reading_compound; }
+
+	void copyToWorld();
 };
 
 class SFCClass {
@@ -151,6 +154,7 @@ public:
 	
 	MapData(SFCFile *p) : SFCClass(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCEntity : public SFCClass {
@@ -202,6 +206,7 @@ public:
 
 	std::vector<SFCScript> scripts;
 	void read();
+	virtual void copyToWorld() /* = 0 */;
 };
 
 class SFCCompoundObject : public SFCObject {
@@ -249,6 +254,7 @@ public:
 
 	SFCSimpleObject(SFCFile *p) : SFCObject(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCPointerTool : public SFCSimpleObject {
