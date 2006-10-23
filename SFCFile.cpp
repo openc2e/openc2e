@@ -370,7 +370,7 @@ void SFCEntity::read() {
 
 	// read part zorder
 	partzorder = read32();
-	if (zorder != partzorder) assert(parent->readingCompound());
+	//if (zorder != partzorder) assert(parent->readingCompound());
 
 	// TODO: read over unknown click bhvr bytes
 	readBytes(3);
