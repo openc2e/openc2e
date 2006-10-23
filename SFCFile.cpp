@@ -592,10 +592,49 @@ void SFCFile::copyToWorld() {
 void MapData::copyToWorld() {
 	creaturesImage *spr = world.gallery.getImage(background->filename);
 	// TODO: hardcoded size bad?
-	MetaRoom *r = new MetaRoom(0, 0, 8352, 2400, background->filename, spr);
-	world.map.addMetaRoom(r);
+	MetaRoom *m = new MetaRoom(0, 0, 8352, 2400, background->filename, spr);
+	world.map.addMetaRoom(m);
 
-	// TODO: rooms, etc ;)
+	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		CRoom *src = *i;
+		Room *r = new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom);
+		r->type = src->roomtype;
+		unsigned int roomid = m->addRoom(r);
+		assert(roomid == src->id);
+
+		// TODO: ca values, sources, wind, drop status, music
+		// TODO: floor points
+		// TODO: floor value
+	}
+	
+	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		CRoom *src = *i;
+
+		for (unsigned int j = 0; j < 4; j++) {
+			for (std::vector<CDoor *>::iterator k = src->doors[j].begin(); k < src->doors[j].end(); k++) {
+				CDoor *door = *k;
+				Room *r1 = world.map.getRoom(src->id);
+				Room *r2 = world.map.getRoom(door->otherroom);
+		
+				if (r1->doors.find(r2) == r1->doors.end()) {
+					// create a new door between rooms!
+					RoomDoor *roomdoor = new RoomDoor();
+					roomdoor->first = r1;
+					roomdoor->second = r2;
+					roomdoor->perm = door->openness;
+					r1->doors[r2] = roomdoor;
+					r2->doors[r1] = roomdoor;
+					// TODO: ADDR adds to nearby?
+				} else {
+					// sanity check
+					RoomDoor *roomdoor = r1->doors[r2];
+					assert(roomdoor->perm == door->openness);
+				}
+			}
+		}
+	}
+
+	// TODO: misc data?
 }
 
 void SFCObject::copyToWorld() {
@@ -614,10 +653,17 @@ void SFCSimpleObject::copyToWorld() {
 	a->moveTo(entity->x, entity->y);
 	
 	// copy data from ourselves
-	// TODO: attr
+	
+	// C2 attributes are a subset of c2e ones
+	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
+	a->setAttributes(attr);
+	
 	// TODO: bhvr click state
 	// TODO: ticking
-	// TODO: variables
+	
+	for (unsigned int i = 0; i < 100; i++)
+		a->var[i].setInt(variables[i]);
+	
 	a->perm = size; // TODO
 	// TODO: threat
 	a->range = range;
@@ -630,8 +676,10 @@ void SFCSimpleObject::copyToWorld() {
 
 	// copy data from entity
 	DullPart *p = (DullPart *)a->part(0);
+	
 	// pose
 	p->setPose(entity->currframe);
+	
 	// animation
 	if (entity->haveanim) {
 		for (unsigned int i = 0; i < entity->animstring.size(); i++) {
@@ -651,9 +699,9 @@ void SFCSimpleObject::copyToWorld() {
 				p->setFrameNo(entity->animframe);
 		} else p->animation.clear();
 	}
+
 	// TODO: bhvr
 	// TODO: pickup handles/points
-	// TODO: currframe
 	// TODO: imgoffset
 }
 
