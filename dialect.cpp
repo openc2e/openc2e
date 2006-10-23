@@ -171,7 +171,7 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 		}
 		if (t->word == "else") {
 			if (!failure)
-				throw new parseException("double else clause is forbidden");
+				throw parseException("double else clause is forbidden");
 			s->current->thread(new caosJMP(exit));
 			s->current->fixRelocation(failure);
 			failure = 0;
@@ -180,7 +180,7 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 		if (t->word == "elif") {
 			// emuluate an else-doif-endi block
 			if (!failure)
-				throw new parseException("double else clause is forbidden");
+				throw parseException("double else clause is forbidden");
 			s->current->thread(new caosJMP(exit));
 			s->current->fixRelocation(failure);
 			failure = 0;

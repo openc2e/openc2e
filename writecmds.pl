@@ -217,7 +217,7 @@ print <<END;
 		{
 			std::ostringstream oss;
 			oss << "INTERNAL ERROR: idx not found, " << idx;
-			throw new creaturesException(oss.str());
+			throw creaturesException(oss.str());
 		}
 	}
 }
