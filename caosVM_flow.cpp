@@ -29,6 +29,7 @@
  DOIF (command) condition (condition)
  %pragma parser new DoifParser()
  %status maybe
+ %pragma variants c2 cv c3
  
  Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
  otherwise continues executing the script.
@@ -48,6 +49,7 @@
  ELSE (command)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
 */
@@ -56,6 +58,7 @@
  ENDI (command)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
 */
@@ -64,6 +67,7 @@
  REPS (command) reps (integer)
  %pragma parser new parseREPS()
  %status maybe
+ %pragma variants c2 cv c3
 
  The start of a REPS...REPE loop. The body of the loop will be executed (reps) times.
 */
@@ -72,6 +76,7 @@
  REPE (command)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
 
  The end of a REPS...REPE loop.
 */
@@ -80,6 +85,7 @@
  LOOP (command)
  %pragma parser new parseLOOP()
  %status maybe
+ %pragma variants c2 cv c3
  
  The start of a LOOP...EVER or LOOP...UNTL loop.
 */
@@ -88,6 +94,7 @@
  EVER (command)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
  
  Jumps back to the matching LOOP, no matter what.
 */
@@ -96,6 +103,7 @@
  UNTL (command) condition (condition)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
  
  Jumps back to the matching LOOP unless the condition evaluates to true.
 */
@@ -105,6 +113,7 @@
  %pragma parser new parseGSUB()
  %pragma retc -1
  %status maybe
+ %pragma variants c2 cv c3
  
  Jumps to a subroutine defined by SUBR with label (label).
 */
@@ -113,6 +122,7 @@
  SUBR (command) label (label)
  %pragma parser new parseSUBR()
  %status maybe
+ %pragma variants c2 cv c3
  
  Defines the start of a subroute to be called with GSUB, with label (label).
  If the command is encountered during execution, it acts like a STOP.
@@ -122,6 +132,7 @@
  RETN (command)
  %pragma retc -1
  %status maybe
+ %pragma variants c2 cv c3
  
  Returns from a subroutine called with GSUB.
 */
@@ -137,6 +148,7 @@ void caosVM::c_RETN() {
  NEXT (command)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
 
  The end of an ENUM...NEXT loop.
 */
@@ -146,6 +158,7 @@ void caosVM::c_RETN() {
  %status maybe
  %pragma parserclass ENUMhelper
  %pragma retc -1
+ %pragma variants c2 cv c3
 
  Loops through all agents with the given classifier.  0 on any field is a
  wildcard. The loop body is terminated by a NEXT.
@@ -177,6 +190,7 @@ void caosVM::c_ENUM() {
  %status maybe
  %pragma parserclass ENUMhelper
  %pragma retc -1
+ %pragma variants c2 cv c3
  
  Simular to ENUM, but iterates through agents visible to OWNR, or visible to TARG in an install script.
  An agent can be seen if it is within the range set by RNGE, and is visible (this includes the PERM value
@@ -207,6 +221,7 @@ void caosVM::c_ESEE() {
  %pragma parserclass ENUMhelper
  %pragma retc -1
  %status maybe
+ %pragma variants c2 cv c3
 
  Similar to ENUM, but iterates through the agents OWNR is touching, or TARG is touching in an install script.
 */
@@ -289,6 +304,7 @@ void caosVM::c_ECON() {
 /**
  CALL (command) script_no (integer) p1 (any) p2 (any)
  %status maybe
+ %pragma variants c2 cv c3
 
  Calls script_no on OWNR, then waits for it to return. The invoked script
  will inherit the caller's INST setting, but any changes it makes to it will

@@ -134,18 +134,29 @@ void ExprDialect::handleToken(caosScript *s, token *t) {
 				}
 				if (word.size() == 4) {
 					if (word[0] == 'v' && word[1] == 'a') {
-						if(!(isdigit(word[2]) && isdigit(word[3])))
-							throw parseException("bad vaxx");
-						s->current->thread(new opVAxx(atoi(word.c_str() + 2)));
+						if (word[2] == 'r') {
+							if (!isdigit(word[3]))
+								throw parseException("non-digits found in VARx");
+							s->current->thread(new opVAxx(atoi(word.c_str() + 3)));
+						} else {
+							if (!(isdigit(word[2]) && isdigit(word[3])))
+								throw parseException("non-digits found in VAxx");
+							s->current->thread(new opVAxx(atoi(word.c_str() + 2)));
+						}
 						return;
 					} else if (word[0] == 'o' && word[1] == 'v') {
 						if(!(isdigit(word[2]) && isdigit(word[3])))
-							throw parseException("bad ovxx");
+							throw parseException("non-digits found in OVxx");
 						s->current->thread(new opOVxx(atoi(word.c_str() + 2)));
+						return;
+					} else if (word[0] == 'o' && word[1] == 'b' && word[2] == 'v') {
+						if (!isdigit(word[3]))
+							throw parseException("non-digits found in OBVx");
+						s->current->thread(new opOVxx(atoi(word.c_str() + 3)));
 						return;
 					} else if (word[0] == 'm' && word[1] == 'v') {
 						if(!(isdigit(word[2]) && isdigit(word[3])))
-							throw parseException("bad mvxx");
+							throw parseException("non-digits found in MVxx");
 						s->current->thread(new opMVxx(atoi(word.c_str() + 2)));
 						return;
 					}

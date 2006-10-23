@@ -36,9 +36,19 @@
  VAxx (variable)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
 
  Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
  */
+
+/*
+ VARx (variable)
+ %pragma noparse
+ %status maybe
+ %pragma variants c2
+
+ Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
+*/
 
 /**
  MVxx (variable)
@@ -80,6 +90,7 @@ void caosVM::c_SETS() {
 /**
  SETV (command) var (variable) value (decimal)
  %status maybe
+ %pragma variants c2 cv c3
 
  Sets the given variable to the given decimal value.
  */
@@ -113,10 +124,20 @@ void caosVM::c_SETA() {
  OVxx (variable)
  %pragma noparse
  %status maybe
+ %pragma variants c2 cv c3
 
  Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
  */
 // TODO: OVxx parser
+
+/*
+ OBVx (variable)
+ %pragma noparse
+ %status maybe
+ %pragma variants c2
+
+ Like OVxx, but restricted to 0-9. Legacy from Creatures 1.
+*/
 
 /**
  TYPE (integer) value (anything)
@@ -161,6 +182,7 @@ void caosVM::v_TYPE() {
 /**
  MODV (command) var (variable) mod (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Divides the given variable by the given integer, and returns the remainder (var % mod).
 */
@@ -175,6 +197,7 @@ void caosVM::c_MODV() {
 /**
  ANDV (command) var (variable) and (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
 */
@@ -189,6 +212,7 @@ void caosVM::c_ANDV() {
 /**
  ORRV (command) var (variable) or (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
 */
@@ -204,6 +228,7 @@ void caosVM::c_ORRV() {
 /**
  ADDV (command) var (variable) add (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Adds the given integer to the given variable and returns the result.
 */
@@ -222,6 +247,7 @@ void caosVM::c_ADDV() {
 /**
  SUBV (command) var (variable) sub (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Subtracts the given integer from the given variable and returns the result.
 */
@@ -240,6 +266,7 @@ void caosVM::c_SUBV() {
 /**
  NEGV (command) var (variable)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
 */
@@ -257,6 +284,7 @@ void caosVM::c_NEGV() {
 /**
  DIVV (command) var (variable) div (decimal)
  %status maybe
+ %pragma variants c2 cv c3
  
  Divides the given variable by the given integer and returns the result.
 */
@@ -282,6 +310,7 @@ void caosVM::c_DIVV() {
 /**
  MULV (command) var (variable) mul (decimal)
  %status maybe
+ %pragma variants c2 cv c3
 
  Multiplies the given variable by the given integer and returns the result.
 */
@@ -297,17 +326,7 @@ void caosVM::c_MULV() {
 		throw badParamException();
 }
 
-/**
- RAND (integer) value1 (integer) value2 (integer)
- %status maybe
-
- Returns a random integer between 'value1' and 'value2', inclusive.
- */
-void caosVM::v_RAND() {
-	VM_VERIFY_SIZE(2)
-	VM_PARAM_INTEGER(value2)
-	VM_PARAM_INTEGER(value1)
-
+int calculateRand(int value1, int value2) {
 	// TODO: i'm sure there's a better way to do this. tired. - fuzzie
 	int diff;
 	if (abs(value2) < abs(value1))
@@ -321,7 +340,22 @@ void caosVM::v_RAND() {
 		val = value1;
 	double r = rand() / ((unsigned int)RAND_MAX + 1.0);
 
-	result.setInt((int)(r * diff) + val);
+	return (int)(r * diff) + val;
+
+}
+
+/**
+ RAND (integer) value1 (integer) value2 (integer)
+ %status maybe
+
+ Returns a random integer between 'value1' and 'value2', inclusive.
+ */
+void caosVM::v_RAND() {
+	VM_VERIFY_SIZE(2)
+	VM_PARAM_INTEGER(value2)
+	VM_PARAM_INTEGER(value1)
+
+	result.setInt(calculateRand(value1, value2));
 }
 
 /**
@@ -497,6 +531,7 @@ void caosVM::v_SQRT() {
  _P1_ (variable)
  %pragma implementation caosVM::v_P1
  %status maybe
+ %pragma variants c2 cv c3
 
  The first argument given to the current script.
 */
@@ -510,6 +545,7 @@ void caosVM::v_P1() {
  _P2_ (variable)
  %pragma implementation caosVM::v_P2
  %status maybe
+ %pragma variants c2 cv c3
 
  The second argument given to the current script.
 */
@@ -962,6 +998,19 @@ void caosVM::c_POWV() {
 	VM_PARAM_VARIABLE(value)
 	
 	value->setFloat(powf(value->getFloat(), exponent));
+}
+
+/**
+ RNDV (command) var (variable) value1 (integer) value (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::c_RNDV() {
+	VM_PARAM_INTEGER(value2)
+	VM_PARAM_INTEGER(value1)
+	VM_PARAM_VARIABLE(var)
+
+	var->setInt(calculateRand(value1, value2));
 }
 
 /* vim: set noet: */

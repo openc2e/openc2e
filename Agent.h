@@ -149,6 +149,10 @@ public:
 
 	AgentRef floatingagent;
 
+	// Creatures 2
+	// TODO: size/grav likely duplicates of perm/falling
+	caosVar actv, thrt, size, grav;
+
 	void floatSetup();
 	void floatRelease();
 	void addFloated(AgentRef);

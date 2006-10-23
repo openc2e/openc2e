@@ -45,6 +45,12 @@ void caosVM::c_SNDE() {
 }
 
 /**
+ SNDE (command) filename (bareword)
+ %status maybe
+ %pragma variants c2
+*/
+
+/**
  SNDC (command) filename (string)
  %status maybe
 */
@@ -85,6 +91,12 @@ void caosVM::c_SNDL() {
 		targ->positionAudio(s);
 	}
 }
+
+/**
+ SNDL (command) filename (bareword)
+ %status maybe
+ %pragma variants c2
+*/
 
 /**
  MMSC (command) x (integer) y (integer) track_name (string)

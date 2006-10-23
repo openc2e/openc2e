@@ -358,6 +358,7 @@ public:
 	void c_NAMN();
 	void v_GAMN();
 	void c_POWV();
+	void c_RNDV();
 
 	// flow
 	void c_DOIF();
@@ -420,6 +421,7 @@ public:
 	void c_KILL();
 	void c_SCRX();
 	void c_ANIM();
+	void c_ANIM_c2();
 	void c_ANMS();
 	void v_ATTR();
 	void v_ABBA();
@@ -478,6 +480,10 @@ public:
 	void v_TCOR();
 	void c_CORE();
 	void v_TWIN();
+	void v_ACTV();
+	void v_THRT();
+	void v_SIZE();
+	void v_GRAV();
 	
 	// motion
 	void c_ELAS();
@@ -551,6 +557,10 @@ public:
 	void c_STIM_SIGN();
 	void c_STIM_TACT();
 	void c_STIM_WRIT();
+	void c_STIM_SHOU_c2();
+	void c_STIM_SIGN_c2();
+	void c_STIM_TACT_c2();
+	void c_STIM_WRIT_c2();
 	void c_SWAY_SHOU();
 	void c_SWAY_SIGN();
 	void c_SWAY_TACT();
@@ -620,6 +630,7 @@ public:
 	void c_FACE();
 	void c_DONE();
 	void c_SAYN();
+	void c_IMPT();
 	
 	// sounds
 	void c_SNDE();

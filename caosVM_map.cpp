@@ -192,6 +192,7 @@ void caosVM::c_RTYP() {
 /**
  RTYP (integer) roomid (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the 'type' of the given room, or -1 if 'roomid' is invalid.
 */
@@ -540,6 +541,7 @@ void caosVM::c_EMIT() {
 /**
  WALL (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the direction of the last wall the TARG agent collided with.
 */

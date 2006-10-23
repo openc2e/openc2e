@@ -26,6 +26,7 @@
 /**
  PART (command) part_id (integer)
  %status maybe
+ %pragma variants c2 cv c3
  
  Sets the part number of the TARGeted compound agent or vehicle to work on (ANIM/POSE use this, 
  amongst other commands).

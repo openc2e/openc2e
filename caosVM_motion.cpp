@@ -84,6 +84,7 @@ void caosVM::c_MVBY() {
 /**
  VELX (variable)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the current horizontal velocity, in pixels/tick, of the TARG agent.
 */
@@ -96,6 +97,7 @@ void caosVM::v_VELX() {
 /**
  VELY (variable)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the current vertical velocity, in pixels/tick, of the TARG agent.
 */
