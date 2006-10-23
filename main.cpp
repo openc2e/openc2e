@@ -244,13 +244,13 @@ extern "C" int main(int argc, char *argv[]) {
 
 			std::istringstream s(data);
 			try {
-				caosScript *script = new caosScript(world.gametype, "<network>"); // XXX
-				script->parse(s);
-				script->installScripts();
+				caosScript script(world.gametype, "<network>"); // XXX
+				script.parse(s);
+				script.installScripts();
 				caosVM vm(0);
 				std::ostringstream o;
 				vm.setOutputStream(o);
-				vm.runEntirely(script->installer);
+				vm.runEntirely(script.installer);
 				SDLNet_TCP_Send(connection, (void *)o.str().c_str(), o.str().size());
 			} catch (std::exception &e) {
 				std::string o = std::string("### EXCEPTION: ") + e.what();
