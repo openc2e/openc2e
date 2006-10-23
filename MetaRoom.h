@@ -32,7 +32,7 @@ struct SDL_Surface;
 class MetaRoom {
 protected:
 	FRIEND_SERIALIZE(MetaRoom);
-	unsigned int xloc, yloc, wid, hei;
+	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
 	std::map<std::string, creaturesImage *> backgrounds;
 	creaturesImage *firstback;
 	
@@ -45,15 +45,17 @@ public:
 	unsigned int y() { return yloc; }
 	unsigned int width() { return wid; }
 	unsigned int height() { return hei; }
+	unsigned int fullwidth() { return fullwid; }
+	unsigned int fullheight() { return fullhei; }
 
 	unsigned int addRoom(Room *);
-	void addBackground(std::string);
-	blkImage *getBackground(std::string);
+	void addBackground(std::string, creaturesImage * = 0);
+	creaturesImage *getBackground(std::string);
 	std::vector<std::string> backgroundList();
 
 	unsigned int id;
 
-	MetaRoom(int _x, int _y, int width, int height, const std::string &back);
+	MetaRoom(int _x, int _y, int width, int height, const std::string &back, creaturesImage * = 0);
 	~MetaRoom();
 };
 

@@ -150,7 +150,7 @@ SDL_Surface *MirrorSurface(SDL_Surface *surf) {
 
 //*** end mirror code
 
-void SDLSurface::render(creaturesImage *image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror) {
+void SDLSurface::render(creaturesImage *image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror, bool is_background) {
 	// don't bother rendering off-screen stuff
 	if (x >= width) return; if (y >= height) return;
 	if ((x + image->width(frame)) <= 0) return;
@@ -182,8 +182,7 @@ void SDLSurface::render(creaturesImage *image, unsigned int frame, int x, int y,
 	}
 	
 	// set colour-keying/alpha
-	// TODO: presumably there's a nicer way of doing this than dynamic_cast :P
-	if (!dynamic_cast<blkImage *>(image)) SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
+	if (!is_background) SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
 	if (trans) SDL_SetAlpha(surf, SDL_SRCALPHA, 255 - transparency);
 	
 	// do actual blit

@@ -68,13 +68,14 @@ void World::init() {
 	
 	// If for some reason we failed to do that (missing/bad catalogue tag? missing file?), try falling back to a sane default.
 	if (!theHand) {
-		creaturesImage *img = gallery.getImage("hand"); // as used in C2, C3 and DS
+		creaturesImage *img = gallery.getImage("hand"); // as used in C3 and DS
+		if (!img) img = gallery.getImage("syst"); // as used in C2 and CV
 		if (!img)
 			throw creaturesException("no valid \"Pointer Information\" catalogue tag, and fallback failed");
-		theHand = new PointerAgent("hand");
+		theHand = new PointerAgent(img->name);
 		theHand->finishInit();
 		gallery.delImage(img);
-		std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to 'hand'." << std::endl;
+		std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->name << "'." << std::endl;
 	}
 
 	// *** set defaults for non-zero GAME engine variables
@@ -258,25 +259,30 @@ void World::drawWorld(Camera *cam, SDLSurface *surface) {
 	}
 	int adjustx = cam->getX();
 	int adjusty = cam->getY();
-	blkImage *bkgd = m->getBackground(""); // TODO
+	creaturesImage *bkgd = m->getBackground(""); // TODO
 
 	// TODO: work out what c2e does when it doesn't have a background..
 	if (!bkgd) return;
 
+	assert(bkgd->numframes() > 0);
+
+	int sprwidth = bkgd->width(0);
+	int sprheight = bkgd->height(0);
+
 	// draw the blk
-	for (unsigned int i = 0; i < (bkgd->totalheight / 128); i++) {
-		for (unsigned int j = 0; j < (bkgd->totalwidth / 128); j++) {
+	for (unsigned int i = 0; i < (m->fullheight() / sprheight); i++) {
+		for (unsigned int j = 0; j < (m->fullwidth() / sprwidth); j++) {
 			// figure out which block number to use
-			unsigned int whereweare = j * (bkgd->totalheight / 128) + i;
+			unsigned int whereweare = j * (m->fullheight() / sprheight) + i;
 			
-			int destx = (j * 128) - adjustx + m->x();
-			int desty = (i * 128) - adjusty + m->y();
+			int destx = (j * sprwidth) - adjustx + m->x();
+			int desty = (i * sprheight) - adjusty + m->y();
 
 			// if the block's on screen, render it.
-			if ((destx >= -128) && (desty >= -128) &&
-					(destx - 128 <= surface->getWidth()) &&
-					(desty - 128 <= surface->getHeight()))
-				surface->render(bkgd, whereweare, destx, desty);
+			if ((destx >= -sprwidth) && (desty >= -sprheight) &&
+					(destx - sprwidth <= surface->getWidth()) &&
+					(desty - sprheight <= surface->getHeight()))
+				surface->render(bkgd, whereweare, destx, desty, false, 0, false, true);
 		}
 	}
 

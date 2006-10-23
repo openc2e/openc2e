@@ -48,7 +48,7 @@ protected:
 	int width, height;
 
 public:
-	void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false);
+	void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void blitSurface(SDLSurface *src, int x, int y, int w, int h);
 	int getWidth() const { return width; }
