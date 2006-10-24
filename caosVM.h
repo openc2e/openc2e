@@ -405,6 +405,7 @@ public:
 	// agent
 	void c_NEW_COMP();
 	void c_NEW_SIMP();
+	void c_NEW_SIMP_c2();
 	void c_NEW_VHCL();
 	void v_NULL();
 	void c_POSE();
@@ -484,6 +485,7 @@ public:
 	void v_THRT();
 	void v_SIZE();
 	void v_GRAV();
+	void c_SETV_CLS2();
 	
 	// motion
 	void c_ELAS();

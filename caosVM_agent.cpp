@@ -210,6 +210,27 @@ void caosVM::c_NEW_SIMP() {
 }
 
 /**
+ NEW: SIMP (command) sprite_file (bareword) image_count (integer) first_image (integer) plane (integer) clone (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::c_NEW_SIMP_c2
+*/
+void caosVM::c_NEW_SIMP_c2() {
+	VM_PARAM_INTEGER(clone)
+	VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
+
+	// TODO: we ignore clone
+	// TODO: should we init with 0/0/0 or with a different constructor?
+	SimpleAgent *a = new SimpleAgent(0, 0, 0, plane, sprite_file, first_image, image_count);
+	a->finishInit();
+	setTarg(a);
+	part = 0; // TODO: correct?
+}
+
+/**
  NEW: COMP (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
  %status maybe
 
@@ -1480,7 +1501,7 @@ void caosVM::v_TWIN() {
  %pragma variants c2
 */
 void caosVM::v_ACTV() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	vm->valueStack.push_back(&targ->actv);
 }
@@ -1491,7 +1512,7 @@ void caosVM::v_ACTV() {
  %pragma variants c2
 */
 void caosVM::v_THRT() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	vm->valueStack.push_back(&targ->thrt);
 }
@@ -1502,7 +1523,7 @@ void caosVM::v_THRT() {
  %pragma variants c2
 */
 void caosVM::v_SIZE() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO: stub because this likely == perm
 	vm->valueStack.push_back(&targ->size);
@@ -1514,10 +1535,29 @@ void caosVM::v_SIZE() {
  %pragma variants c2
 */
 void caosVM::v_GRAV() {
-	caos_assert(targ);
+	valid_agent(targ);
 
 	// TODO: stub because this likely == falling
 	vm->valueStack.push_back(&targ->grav);
+}
+
+/**
+ SETV CLS2 (command) family (integer) genus (integer) species (integer)
+ %status maybe
+ %pragma variants c2
+
+ Creatures 2 command to set the family, genus and species of an agent.
+*/
+void caosVM::c_SETV_CLS2() {
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
+
+	valid_agent(targ);
+
+	targ->family = family;
+	targ->genus = genus;
+	targ->species = species;
 }
 
 /* vim: set noet: */
