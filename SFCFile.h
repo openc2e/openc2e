@@ -195,7 +195,7 @@ public:
 
 	CGallery *sprite;
 
-	uint32 tick1, tick2;
+	uint32 tickreset, tickstate;
 
 	uint32 variables[100];
 

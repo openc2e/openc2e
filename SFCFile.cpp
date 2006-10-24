@@ -426,9 +426,9 @@ void SFCObject::read() {
 	sprite = (CGallery *)slurpMFC(TYPE_CGALLERY);
 	assert(sprite);
 
-	// TODO: read over unknown tick bytes
-	tick1 = read32();
-	tick2 = read32();
+	tickreset = read32();
+	tickstate = read32();
+	assert(tickreset >= tickstate);
 
 	// discard unknown bytes
 	assert(read16() == 0);
@@ -659,7 +659,10 @@ void SFCSimpleObject::copyToWorld() {
 	a->setAttributes(attr);
 	
 	// TODO: bhvr click state
-	// TODO: ticking
+	
+	// ticking
+	a->tickssincelasttimer = tickstate;
+	a->timerrate = tickreset;
 	
 	for (unsigned int i = 0; i < 100; i++)
 		a->var[i].setInt(variables[i]);

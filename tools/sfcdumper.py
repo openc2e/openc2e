@@ -1,5 +1,6 @@
 # sfcdumper
 # a utility to extract information from Creatures 2 SFC (world save) files
+# reverse-engineered by fuzzie and nornagon
 
 # TODO: a lot of reads probably need to be changed to signed reads
 # eg, room CA sources
@@ -354,12 +355,11 @@ class Object:
 		# our sprite
 		self.sprite = slurpMFC(f, CGallery)
 
-		# TODO
-		# these are identical when we do TICK x on a ptr agent
-		# but different and prbly neither are correct on the first of Eden..
-		self.tick1 = read32(f)
-		self.tick2 = read32(f) # <- more often correct, so far
-		print "* possibly tick data: " + str(self.tick1) + ", " + str(self.tick2)
+		# tick data
+		self.tickreset = read32(f)
+		self.tickstate = read32(f)
+		assert self.tickreset >= self.tickstate
+		print "* tick time: " + str(self.tickreset) + ", state: " + str(self.tickstate)
 
 		# TODO
 		x = read16(f)
