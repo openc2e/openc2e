@@ -475,7 +475,7 @@ extern "C" int main(int argc, char *argv[]) {
 			velx += accelspeed;
 		if (!keys[SDLK_LEFT] && !keys[SDLK_RIGHT]) {
 			velx *= decelspeed;
-			if (velx < 0.1) velx = 0;
+			if (fabs(velx) < 0.1) velx = 0;
 		}
 		if (keys[SDLK_UP])
 			vely -= accelspeed;
@@ -483,7 +483,7 @@ extern "C" int main(int argc, char *argv[]) {
 			vely += accelspeed;
 		if (!keys[SDLK_UP] && !keys[SDLK_DOWN]) {
 			vely *= decelspeed;
-			if (vely < 0.1) vely = 0;
+			if (fabs(vely) < 0.1) vely = 0;
 		}
 
 		if (velx >=  maxspeed) velx =  maxspeed;
