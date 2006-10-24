@@ -90,7 +90,8 @@ void caosVM::c_SETS() {
 /**
  SETV (command) var (variable) value (decimal)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants cv c3
+ %% Don't enable c2 here; we activate it with horrible hacks later
 
  Sets the given variable to the given decimal value.
  */

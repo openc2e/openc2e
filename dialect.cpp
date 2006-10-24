@@ -206,8 +206,31 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 
 std::map<std::string, const cmdinfo *> op_key_map;
 
+class HackySETVforC2 : public parseDelegate {
+	protected:
+		NamespaceDelegate *nd;
+		parseDelegate *pd;
+	public:
+		void operator() (class caosScript *s, class Dialect *curD) {
+			token *t = tokenPeek();
+			if (t->type == TOK_WORD && nd->dialect.delegates.find(t->word) != nd->dialect.delegates.end()) {
+				(*nd)(s, curD);
+			} else {
+				(*pd)(s, curD);
+			}
+		}
+
+		HackySETVforC2(NamespaceDelegate *n, parseDelegate *p) : nd(n), pd(p) {}
+};
+
 void registerDelegates() {
 	registerAutoDelegates();
+
+	variants[std::string("c2")]->cmd_dialect->delegates["setv"] = 
+		new HackySETVforC2(
+				(NamespaceDelegate *)(variants[std::string("c2")]->cmd_dialect->delegates["setv"]),
+				variants[std::string("c3")]->cmd_dialect->delegates["setv"]
+				);
 
 	std::map<std::string, Variant *>::iterator it = variants.begin();
 	while (it != variants.end()) {
