@@ -40,6 +40,9 @@
 #define TYPE_SCENERY 13
 #define TYPE_OBJECT 100
 
+#include <boost/format.hpp>
+#define sfccheck(x) if (!(x)) throw creaturesException(std::string("failure while reading SFC file: '" #x "' in " __FILE__ " at line ") + boost::str(boost::format("%d") % __LINE__));
+
 SFCFile::~SFCFile() {
 	// This contains all the objects we've constructed, so we can just zap this and
 	// everything neatly disappears.
@@ -52,7 +55,7 @@ void SFCFile::read(std::istream *i) {
 	ourStream = i;
 
 	mapdata = (MapData *)slurpMFC(TYPE_MAPDATA);
-	assert(mapdata);
+	sfccheck(mapdata);
 
 	// TODO: hackery to seek to the next bit
 	uint8 x = 0;
@@ -62,14 +65,14 @@ void SFCFile::read(std::istream *i) {
 	uint32 numobjects = read32();
 	for (unsigned int i = 0; i < numobjects; i++) {
 		SFCObject *o = (SFCObject *)slurpMFC(TYPE_OBJECT);
-		assert(o);
+		sfccheck(o);
 		objects.push_back(o);
 	}
 
 	uint32 numscenery = read32();
 	for (unsigned int i = 0; i < numscenery; i++) {
 		SFCScenery *o = (SFCScenery *)slurpMFC(TYPE_SCENERY);
-		assert(o);
+		sfccheck(o);
 		scenery.push_back(o);
 	}
 
@@ -96,7 +99,7 @@ bool validSFCType(unsigned int type, unsigned int reqtype) {
 }
 
 SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
-	assert(!ourStream->fail());
+	sfccheck(!ourStream->fail());
 
 	// read the pid (this only works up to 0x7ffe, but we'll cope)
 	uint16 pid = read16();
@@ -150,24 +153,24 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 	} else if ((pid & 0x8000) != 0x8000) {
 		// return an existing object
 		pid -= 1;
-		assert(pid < storage.size());
-		assert(validSFCType(types[pid], reqtype));
+		sfccheck(pid < storage.size());
+		sfccheck(validSFCType(types[pid], reqtype));
 		SFCClass *temp = storage[pid];
-		assert(temp);
+		sfccheck(temp);
 		return temp;
 	} else {
 		uint16 oldpid = pid;
 		// create a new object of an existing class
 		pid ^= 0x8000;
 		pid -= 1;
-		assert(pid < storage.size());
-		assert(!(storage[pid]));
+		sfccheck(pid < storage.size());
+		sfccheck(!(storage[pid]));
 	}
 
 	SFCClass *newobj;
 
 	// construct new object of specified type
-	assert(validSFCType(types[pid], reqtype));
+	sfccheck(validSFCType(types[pid], reqtype));
 	switch (types[pid]) {
 		case TYPE_MAPDATA: newobj = new MapData(this); break;
 		case TYPE_CGALLERY: newobj = new CGallery(this); break;
@@ -244,16 +247,16 @@ std::string SFCFile::readBytes(unsigned int n) {
 
 void MapData::read() {
 	// discard unknown bytes
-	assert(read16() == 1);
-	assert(read16() == 0);
+	sfccheck(read16() == 1);
+	sfccheck(read16() == 0);
 	read32(); read32(); read32();
 
 	background = (CGallery *)slurpMFC(TYPE_CGALLERY);
-	assert(background);
+	sfccheck(background);
 	uint32 norooms = read32();
 	for (unsigned int i = 0; i < norooms; i++) {
 		CRoom *temp = (CRoom*)slurpMFC(TYPE_CROOM);
-		assert(temp);
+		sfccheck(temp);
 		rooms.push_back(temp);
 	}
 }
@@ -279,14 +282,14 @@ void CDoor::read() {
 	otherroom = read16();
 	
 	// discard unknown bytes
-	assert(read16() == 0);
+	sfccheck(read16() == 0);
 }
 
 void CRoom::read() {
 	id = read32();
 
 	// magic constant?
-	assert(read16() == 2);
+	sfccheck(read16() == 2);
 
 	left = read32();
 	top = read32();
@@ -297,12 +300,12 @@ void CRoom::read() {
 		uint16 nodoors = read16();
 		for (unsigned int j = 0; j < nodoors; j++) {
 			CDoor *temp = (CDoor*)slurpMFC(TYPE_CDOOR);
-			assert(temp);
+			sfccheck(temp);
 			doors[i].push_back(temp);
 		}
 	}
 
-	roomtype = read32(); assert(roomtype < 4);
+	roomtype = read32(); sfccheck(roomtype < 4);
 
 	floorvalue = read8();
 	inorganicnutrients = read8();
@@ -331,16 +334,16 @@ void CRoom::read() {
 	}
 
 	// discard unknown bytes
-	assert(read32() == 0);
+	sfccheck(read32() == 0);
 
 	music = readstring();
-	dropstatus = read32(); assert(dropstatus < 3);
+	dropstatus = read32(); sfccheck(dropstatus < 3);
 }
 
 void SFCEntity::read() {
 	// read sprite
 	sprite = (CGallery *)slurpMFC(TYPE_CGALLERY);
-	assert(sprite);
+	sfccheck(sprite);
 
 	// read current frame and offset from base
 	currframe = read8();
@@ -354,7 +357,7 @@ void SFCEntity::read() {
 	// check if this agent is animated at present
 	uint8 animbyte = read8();
 	if (animbyte) {
-		assert(animbyte == 1);
+		sfccheck(animbyte == 1);
 		haveanim = true;
 
 		// read the animation frame
@@ -395,7 +398,7 @@ void SFCObject::read() {
 	// read genus, family and species
 	genus = read8();
 	family = read8();
-	assert(read16() == 0);
+	sfccheck(read16() == 0);
 	species = read16();
 
 	// read UNID
@@ -408,7 +411,7 @@ void SFCObject::read() {
 	attr = read16();
 
 	// discard unknown bytes
-	assert(read16() == 0);
+	sfccheck(read16() == 0);
 
 	// read unknown coords
 	left = read32();
@@ -424,14 +427,14 @@ void SFCObject::read() {
 
 	// read sprite
 	sprite = (CGallery *)slurpMFC(TYPE_CGALLERY);
-	assert(sprite);
+	sfccheck(sprite);
 
 	tickreset = read32();
 	tickstate = read32();
-	assert(tickreset >= tickstate);
+	sfccheck(tickreset >= tickstate);
 
 	// discard unknown bytes
-	assert(read16() == 0);
+	sfccheck(read16() == 0);
 	read32();
 
 	// read object variables
@@ -518,9 +521,9 @@ void SFCVehicle::read() {
 	// discard unknown bytes
 	readBytes(9);
 	read16();
-	assert(read16() == 0);
+	sfccheck(read16() == 0);
 	read16();
-	assert(read8() == 0);
+	sfccheck(read8() == 0);
 
 	// read cabin boundaries
 	cabinleft = read32();
@@ -529,7 +532,7 @@ void SFCVehicle::read() {
 	cabinbottom = read32();
 
 	// discard unknown bytes
-	assert(read32() == 0);
+	sfccheck(read32() == 0);
 }
 
 void SFCLift::read() {
@@ -600,7 +603,7 @@ void MapData::copyToWorld() {
 		Room *r = new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom);
 		r->type = src->roomtype;
 		unsigned int roomid = m->addRoom(r);
-		assert(roomid == src->id);
+		sfccheck(roomid == src->id);
 
 		// TODO: ca values, sources, wind, drop status, music
 		// TODO: floor points
@@ -628,7 +631,7 @@ void MapData::copyToWorld() {
 				} else {
 					// sanity check
 					RoomDoor *roomdoor = r1->doors[r2];
-					assert(roomdoor->perm == door->openness);
+					sfccheck(roomdoor->perm == door->openness);
 				}
 			}
 		}
@@ -689,7 +692,7 @@ void SFCSimpleObject::copyToWorld() {
 			if (entity->animstring[i] == 'R')
 				p->animation.push_back(255);
 			else {
-				assert(entity->animstring[i] >= 48 && entity->animstring[i] <= 57);
+				sfccheck(entity->animstring[i] >= 48 && entity->animstring[i] <= 57);
 				p->animation.push_back(entity->animstring[i] - 48);
 			}
 		}
