@@ -391,6 +391,7 @@ public:
 	void c_TEST_FINI();
 	void c_DBG_OUTS();
 	void c_DBG_OUTV();
+	void c_DBUG();
 	void c_DBG_MALLOC();
 	void c_DBG_TRACE();
 	void c_MANN();
@@ -486,6 +487,8 @@ public:
 	void v_SIZE();
 	void v_GRAV();
 	void c_SETV_CLS2();
+	void c_SLIM();
+	void c_BHVR_c2();
 	
 	// motion
 	void c_ELAS();
@@ -633,6 +636,7 @@ public:
 	void c_DONE();
 	void c_SAYN();
 	void c_IMPT();
+	void c_AIM();
 	
 	// sounds
 	void c_SNDE();

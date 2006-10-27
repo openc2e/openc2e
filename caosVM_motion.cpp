@@ -56,6 +56,7 @@ void caosVM::v_ELAS() {
 /**
  MVTO (command) x (float) y (float)
  %status maybe
+ %pragma variants c2 cv c3
 
  Places the TARG agent at the given x/y position in the world (using the upper left hand corner of the agent).
 */
@@ -70,6 +71,7 @@ void caosVM::c_MVTO() {
 /**
  MVBY (command) x (float) y (float)
  %status maybe
+ %pragma variants c2 cv c3
 
  Changes the TARG agent's position by the given relative distances.
 */

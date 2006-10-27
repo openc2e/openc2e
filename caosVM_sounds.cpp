@@ -149,6 +149,7 @@ void caosVM::v_RMSC() {
 /**
  FADE (command)
  %status maybe
+ %pragma variants c2 cv c3
 */
 void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)

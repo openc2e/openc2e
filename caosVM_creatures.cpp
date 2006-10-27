@@ -1156,4 +1156,16 @@ void caosVM::c_IMPT() {
 	// TODO
 }
 
+/**
+ AIM: (command) actionno (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_AIM() {
+	VM_PARAM_INTEGER(actionno)
+
+	// TODO: check for creature targ? who knows?
+	// TODO
+}
+
 /* vim: set noet: */

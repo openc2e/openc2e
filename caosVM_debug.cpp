@@ -46,6 +46,13 @@ void caosVM::c_DBG_OUTS() {
 }
 
 /**
+ DBGM (command) val (bareword)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::c_DBG_OUTS
+*/
+
+/**
  DBG: OUTV (command) val (decimal)
  %status maybe
  
@@ -65,6 +72,23 @@ void caosVM::c_DBG_OUTV() {
 	} else throw badParamException();
 
 	cout << std::endl;
+}
+
+/**
+ DBGV (command) val (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::c_DBG_OUTV
+*/
+
+/*
+ DBUG (command) val (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::c_DBUG() {
+	inst = true;
+	c_DBG_OUTV();
 }
 
 /**

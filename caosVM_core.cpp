@@ -70,6 +70,13 @@ void caosVM::c_OUTS() {
 }
 
 /**
+ DDE: PUTS (command) val (bareword)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::c_OUTS
+*/
+
+/**
  OUTV (command) val (decimal)
  %status maybe
 
@@ -88,6 +95,13 @@ void caosVM::c_OUTV() {
 		*outputstream << boost::format("(%0.6f, %0.6f)") % v.x % v.y;
 	} else throw badParamException();
 }
+
+/**
+ DDE: PUTV (command) val (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::c_OUTV
+*/
 
 /**
  GAME (variable) name (string)

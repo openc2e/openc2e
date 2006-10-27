@@ -70,6 +70,7 @@ void caosVM::c_SPAS() {
 /**
  GPAS (command) family (integer) genus (integer) species (integer) options (integer)
  %status stub
+ %pragma variants c2 cv c3
 
  pick up all nearby agents matching classifier, as passengers to target vehicle
  options = 0 to pick up based on agent bounding rect, or 1 to pick up based on cabin rect
@@ -90,6 +91,7 @@ void caosVM::c_GPAS() {
 /**
  DPAS (command) family (integer) genus (integer) species (integer)
  %status stub
+ %pragma variants c2 cv c3
 
  drop all agents matching classifier from target vehicle
 */

@@ -97,9 +97,18 @@ void caosVM::c_SETS() {
  */
 void caosVM::c_SETV() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_DECIMAL(value)
+	// TODO: hackery for c2
+	//VM_PARAM_DECIMAL(value)
+	VM_PARAM_VALUE(value)
 	VM_PARAM_VARIABLE(var)
 	var->reset();
+	
+	// TODO: hackery for c2
+	if (value.hasAgent()) {
+		var->setAgent(value.getAgent());
+		return;
+	} else caos_assert(value.hasDecimal());
+
 	if (value.hasFloat()) {
 		var->setFloat(value.getFloat());
 	} else { // VM_PARAM_DECIMAL guarantees us float || int

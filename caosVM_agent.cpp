@@ -715,6 +715,7 @@ unsigned int calculateScriptId(unsigned int message_id) {
 /**
  MESG WRIT (command) agent (agent) message_id (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Sends a message of type message_id to the given agent.  FROM will be set to OWNR unless 
  there is no agent involved in sending the message.
@@ -730,6 +731,7 @@ void caosVM::c_MESG_WRIT() {
 /**
  MESG WRT+ (command) agent (agent) message_id (integer) param_1 (anything) param_2 (anything) delay (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Sends a message of type message_id to the given agent, much like MESG WRIT, but with the 
  addition of parameters.  The message will be sent after waiting the number of ticks set 
@@ -1387,6 +1389,7 @@ void caosVM::c_TINO() {
 /**
  DROP (command)
  %status stub
+ %pragma variants c2 cv c3
 
  Causes the TARG agent to drop what it is carrying in a safe location.
 */
@@ -1558,6 +1561,30 @@ void caosVM::c_SETV_CLS2() {
 	targ->family = family;
 	targ->genus = genus;
 	targ->species = species;
+}
+
+/**
+ SLIM (command)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_SLIM() {
+	// TODO: probably shouldn't do anything, but make sure :)
+}
+
+/**
+ BHVR (command) click (integer) touch (integer)
+ %status stub
+ %pragma variants c2
+ %pragma implementation caosVM::c_BHVR_c2
+*/
+void caosVM::c_BHVR_c2() {
+	VM_PARAM_INTEGER(touch)
+	VM_PARAM_INTEGER(click)
+
+	valid_agent(targ);
+
+	// TODO
 }
 
 /* vim: set noet: */

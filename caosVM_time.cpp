@@ -79,6 +79,7 @@ void caosVM::v_HIST_DATE() {
 /**
  SEAN (integer)
  %status stub
+ %pragma variants c2 cv c3
 
  Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter.
 */
