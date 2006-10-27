@@ -722,7 +722,9 @@ public:
 	void c_CABW();
 	void c_SPAS();
 	void c_GPAS();
+	void c_GPAS_c2();
 	void c_DPAS();
+	void c_DPAS_c2();
 	void c_CABP();
 	void c_RPAS();
 	void v_RPAS();

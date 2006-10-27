@@ -70,7 +70,6 @@ void caosVM::c_SPAS() {
 /**
  GPAS (command) family (integer) genus (integer) species (integer) options (integer)
  %status stub
- %pragma variants c2 cv c3
 
  pick up all nearby agents matching classifier, as passengers to target vehicle
  options = 0 to pick up based on agent bounding rect, or 1 to pick up based on cabin rect
@@ -86,12 +85,27 @@ void caosVM::c_GPAS() {
 	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
+	
+	// TODO
+}
+
+/**
+ GPAS (command)
+ %status stub
+ %pragma variants c2
+ %pragma implementation caosVM::c_GPAS_c2
+*/
+void caosVM::c_GPAS_c2() {
+	valid_agent(targ);
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	caos_assert(v);
+	
+	// TODO
 }
 
 /**
  DPAS (command) family (integer) genus (integer) species (integer)
  %status stub
- %pragma variants c2 cv c3
 
  drop all agents matching classifier from target vehicle
 */
@@ -105,6 +119,22 @@ void caosVM::c_DPAS() {
 	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
+	
+	// TODO
+}
+
+/**
+ DPAS (command)
+ %status stub
+ %pragma variants c2
+ %pragma implementation caosVM::c_DPAS_c2
+*/
+void caosVM::c_DPAS_c2() {
+	valid_agent(targ);
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	caos_assert(v);
+
+	// TODO
 }
 
 /**
