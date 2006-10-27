@@ -212,6 +212,7 @@ public:
 	void v_ADDR();
 	void c_RTYP();
 	void v_RTYP();
+	void v_RTYP_c2();
 	void c_DOOR();
 	void c_RATE();
 	void v_ROOM();

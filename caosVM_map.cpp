@@ -192,7 +192,6 @@ void caosVM::c_RTYP() {
 /**
  RTYP (integer) roomid (integer)
  %status maybe
- %pragma variants c2 cv c3
 
  Returns the 'type' of the given room, or -1 if 'roomid' is invalid.
 */
@@ -205,6 +204,23 @@ void caosVM::v_RTYP() {
 		result.setInt(room->type);
 	else
 		result.setInt(-1);
+}
+
+/**
+ RTYP (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::v_RTYP_c2
+
+ Returns the room type of the room at the centre point of targ.
+*/
+void caosVM::v_RTYP_c2() {
+	valid_agent(targ);
+	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+	if (!r) result.setInt(-1);
+	else {
+		result.setInt(r->type);
+	}
 }
 
 /**
