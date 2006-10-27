@@ -371,17 +371,20 @@ void SFCEntity::read() {
 
 	if (parent->readingScenery()) return;
 
+	if (parent->readingCompound()) {
+		relx = read32();
+		rely = read32();
+		return;
+	}
+
 	// read part zorder
 	partzorder = read32();
-	//if (zorder != partzorder) assert(parent->readingCompound());
 
 	// TODO: read over unknown click bhvr bytes
 	readBytes(3);
 
 	// read BHVR touch
 	bhvrtouch = read8();
-
-	if (parent->readingCompound()) return;
 
 	// read pickup handles/points
 	uint16 num_pickup_handles = read16();
@@ -482,9 +485,11 @@ void SFCCompoundObject::read() {
 	for (unsigned int i = 0; i < numparts; i++) {
 		SFCEntity *e = (SFCEntity *)slurpMFC(TYPE_ENTITY);
 		if (!e) {
+			sfccheck(i != 0);
 			// if entity is null, discard unknown bytes
 			readBytes(8);
 		}
+		if (i == 0) sfccheck((e->relx == 0) && (e->rely == 0));
 
 		// push the entity, even if it is null..
 		parts.push_back(e);
@@ -640,13 +645,83 @@ void MapData::copyToWorld() {
 	// TODO: misc data?
 }
 
-void SFCObject::copyToWorld() {
-	// TODO: this is a stub, make it pure virtual when we're done implementing
+void copyEntityData(SFCEntity *entity, DullPart *p) {
+	// pose
+	p->setPose(entity->currframe);
+	
+	// animation
+	if (entity->haveanim) {
+		for (unsigned int i = 0; i < entity->animstring.size(); i++) {
+			if (entity->animstring[i] == 'R')
+				p->animation.push_back(255);
+			else {
+				sfccheck(entity->animstring[i] >= 48 && entity->animstring[i] <= 57);
+				p->animation.push_back(entity->animstring[i] - 48);
+			}
+		}
+
+		// TODO: should make sure animation position == current pose
+		if (entity->animframe < p->animation.size()) {
+			if (p->animation[entity->animframe] == 255)
+				p->setFrameNo(0);
+			else
+				p->setFrameNo(entity->animframe);
+		} else p->animation.clear();
+	}
+
+	// TODO: imgoffset
+}
+
+#include "CompoundAgent.h"
+
+void SFCCompoundObject::copyToWorld() {
+	sfccheck(parts.size() > 0);
+
+	// construct our equivalent object
+	CompoundAgent *a = new CompoundAgent(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	a->finishInit();
+	a->moveTo(parts[0]->x, parts[0]->y);
+
+	// C2 attributes are a subset of c2e ones
+	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
+	a->setAttributes(attr);
+	
+	// TODO: bhvr click state
+	
+	// ticking
+	a->tickssincelasttimer = tickstate;
+	a->timerrate = tickreset;
+	
+	for (unsigned int i = 0; i < 100; i++)
+		a->var[i].setInt(variables[i]);
+	
+	a->perm = size; // TODO
+	a->thrt.setInt(threat);
+	a->range = range;
+	a->accg = accg;
+	a->velx.setInt(velx);
+	a->vely.setInt(vely);
+	a->elas = rest; // TODO
+	a->aero = aero;
+	a->paused = frozen; // TODO
+
+	for (unsigned int i = 0; i < parts.size(); i++) {
+		SFCEntity *e = parts[i];
+		if (!e) continue;
+		DullPart *p;
+		if (i == 0) {
+			p = (DullPart *)a->part(0);
+		} else {
+			p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder - parts[0]->zorder);
+		}
+
+		copyEntityData(e, p);
+	}
+	
+	// TODO: hotspots!
 }
 
 #include "SimpleAgent.h"
-
-#include <iostream> // TODO: remove
 
 void SFCSimpleObject::copyToWorld() {
 	// construct our equivalent object
@@ -671,7 +746,7 @@ void SFCSimpleObject::copyToWorld() {
 		a->var[i].setInt(variables[i]);
 	
 	a->perm = size; // TODO
-	// TODO: threat
+	a->thrt.setInt(threat);
 	a->range = range;
 	a->accg = accg;
 	a->velx.setInt(velx);
@@ -682,33 +757,14 @@ void SFCSimpleObject::copyToWorld() {
 
 	// copy data from entity
 	DullPart *p = (DullPart *)a->part(0);
+	copyEntityData(entity, p);
 	
-	// pose
-	p->setPose(entity->currframe);
-	
-	// animation
-	if (entity->haveanim) {
-		for (unsigned int i = 0; i < entity->animstring.size(); i++) {
-			if (entity->animstring[i] == 'R')
-				p->animation.push_back(255);
-			else {
-				sfccheck(entity->animstring[i] >= 48 && entity->animstring[i] <= 57);
-				p->animation.push_back(entity->animstring[i] - 48);
-			}
-		}
-
-		// TODO: should make sure animation position == current pose
-		if (entity->animframe < p->animation.size()) {
-			if (p->animation[entity->animframe] == 255)
-				p->setFrameNo(0);
-			else
-				p->setFrameNo(entity->animframe);
-		} else p->animation.clear();
-	}
-
 	// TODO: bhvr
 	// TODO: pickup handles/points
-	// TODO: imgoffset
+}
+
+void SFCPointerTool::copyToWorld() {
+	// don't copy the cursor, for now at least :-)
 }
 
 #include <boost/format.hpp>

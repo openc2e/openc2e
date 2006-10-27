@@ -168,6 +168,8 @@ public:
 	uint8 animframe;
 	std::string animstring;
 
+	uint32 relx, rely;
+
 	uint32 partzorder;
 	uint8 bhvrclick; // TODO: appropriate? should be enum?
 	uint8 bhvrtouch;
@@ -206,7 +208,7 @@ public:
 
 	std::vector<SFCScript> scripts;
 	void read();
-	virtual void copyToWorld() /* = 0 */;
+	virtual void copyToWorld() = 0;
 };
 
 class SFCCompoundObject : public SFCObject {
@@ -218,6 +220,7 @@ public:
 
 	SFCCompoundObject(SFCFile *p) : SFCObject(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCBlackboard : public SFCCompoundObject {
@@ -263,6 +266,7 @@ public:
 
 	SFCPointerTool(SFCFile *p) : SFCSimpleObject(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCCallButton : public SFCSimpleObject {

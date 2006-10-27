@@ -274,14 +274,17 @@ class Entity: # like a compound part?
 		if readingscenery:
 			return
 
+		if readingcompound:
+			self.relx = read32(f)
+			self.rely = read32(f)
+			print "part offset: " + str(self.relx) + ", " + str(self.rely)
+			return
+
 		self.zorder2 = reads32(f)
 		if self.zorder != self.zorder2:
-			# seems to only happen to CompoundObjects
 			# kaelis's Eden.sfc has this differing for obj#816!
 			# TODO: work out what the heck
-			#assert readingcompound
-			# TODO: is this, in fact, compound zorder
-			print "part zorder: " + str(self.zorder2)
+			print "strange zorder: " + str(self.zorder2)
 
 		# TODO: finish decoding this
 		self.clickbhvr = f.read(3)
@@ -290,19 +293,17 @@ class Entity: # like a compound part?
 		for z in self.clickbhvr: print "%02X" % ord(z),
 		print
 
-		# CompoundParts don't have the pickup data?
-		if not readingcompound:
-			num_pickup_handles = read16(f)
-			self.pickup_handles = []
-			for i in xrange(num_pickup_handles):
-				self.pickup_handles.append((read32(f), read32(f)))
+		num_pickup_handles = read16(f)
+		self.pickup_handles = []
+		for i in xrange(num_pickup_handles):
+			self.pickup_handles.append((read32(f), read32(f)))
 
-			num_pickup_points = read16(f)
-			self.pickup_points = []
-			for i in xrange(num_pickup_points):
-				self.pickup_points.append((read32(f), read32(f)))
+		num_pickup_points = read16(f)
+		self.pickup_points = []
+		for i in xrange(num_pickup_points):
+			self.pickup_points.append((read32(f), read32(f)))
 
-			print "read " + str(len(self.pickup_handles)) + " pickup handles and " + str(len(self.pickup_points)) + " pickup points"
+		print "read " + str(len(self.pickup_handles)) + " pickup handles and " + str(len(self.pickup_points)) + " pickup points"
 
 class Object:
 	def partialread(self, f):
@@ -459,6 +460,9 @@ class CompoundObject(Object):
 				print "part bytes:",
 				for z in x: print "%02X" % ord(z),
 				print
+			if i == 0:
+				assert e, "part 0 was null"
+				assert e.relx == 0 and e.rely == 0
 			self.parts.append(e)
 		readingcompound = False
 
