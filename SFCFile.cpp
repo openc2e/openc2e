@@ -669,7 +669,7 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 		} else p->animation.clear();
 	}
 
-	// TODO: imgoffset
+	p->setBase(entity->imgoffset);
 }
 
 #include "CompoundAgent.h"
@@ -713,6 +713,7 @@ void SFCCompoundObject::copyToWorld() {
 			p = (DullPart *)a->part(0);
 		} else {
 			p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder - parts[0]->zorder);
+			a->addPart(p);
 		}
 
 		copyEntityData(e, p);
