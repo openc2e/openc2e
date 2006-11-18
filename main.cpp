@@ -85,7 +85,7 @@ extern "C" int main(int argc, char *argv[]) {
 		 "Set the path to the data directory")
 		("bootstrap,b", po::value< std::vector<std::string> >(&bootstrap)->composing(),
 		 "Sets or adds a path or COS file to bootstrap from")
-		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (cv or c3)")
+		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (c1, c2, cv or c3)")
 		("autokill,a", "Enable autokill")
 		;
 	po::variables_map vm;

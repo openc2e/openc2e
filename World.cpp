@@ -382,12 +382,13 @@ void World::executeBootstrap(fs::path p) {
 }
 
 void World::executeBootstrap(bool switcher) {
-	if (gametype == "c2") {
+	if ((gametype == "c1") || (gametype == "c2")) {
 		// read from Eden.sfc
 		
 		if (data_directories.size() == 0)
-			throw creaturesException("C2 can't run without data directories!");
+			throw creaturesException("C1/2 can't run without data directories!");
 
+		// TODO: case-sensitivity for the lose
 		fs::path edenpath(data_directories[0] / "/Eden.sfc");
 		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
 			SFCFile sfc;
@@ -397,7 +398,7 @@ void World::executeBootstrap(bool switcher) {
 			sfc.copyToWorld();
 			return;
 		} else
-			throw creaturesException("couldn't find file Eden.sfc, required for C2");
+			throw creaturesException("couldn't find file Eden.sfc, required for C1/2");
 	}
 
 	// TODO: this code is possibly wrong with multiple bootstrap directories
