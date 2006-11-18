@@ -1,9 +1,11 @@
+#!/usr/bin/python
 # sfcdumper
-# a utility to extract information from Creatures 2 SFC (world save) files
+# a utility to extract information from Creatures 1/2 SFC (world save) files
 # reverse-engineered by fuzzie and nornagon
 
 # TODO: a lot of reads probably need to be changed to signed reads
 # eg, room CA sources
+# TODO: lots of unknown values :)
 
 identifiers = {}
 try:
@@ -87,7 +89,7 @@ def slurpMFC(f, reqclass = None):
 	n.read(f)
 	return n
 
-# creatures 2 classes
+# creatures classes
 # this is where all the real logic is - read() slurps up the contents
 
 class CDoor:
@@ -98,7 +100,7 @@ class CDoor:
 		assert x == 0, "CDoor zero wasn't zero"
 
 # TODO:
-# we don't know where 'visited flag' or 'wind x/y' are...
+# we don't know where 'visited flag' is...
 
 nextroom = 0
 class CRoom:
@@ -156,7 +158,7 @@ class CRoom:
 		self.radiation = read8(f)
 		self.radiationsource = reads32(f)
 
-		# TODO: slurp up 800 unknown bytes!
+		# TODO: slurp up 800 unknown bytes! disease data?
 		self.randombytes = f.read(800)
 
 		# read floor points
@@ -211,27 +213,55 @@ class CGallery:
 
 class MapData:
 	def read(self, f):
-		# these could possibly be season/time of day/year/etc - fuzzie
-		x = read16(f) # TODO
-		assert x == 1, "First bytes of MapData were not one but " + str(x)
-		x = read16(f) # TODO
-		assert x == 0, "Second bytes of MapData were not zero but " + str(x)
+		global version
+		version = read32(f)
+		if version == 0:
+			print "this is a Creatures 1 SFC file"
+		elif version == 1:
+			print "this is a Creatures 2 SFC file"
+		else:
+			assert false, "didn't understand version " + str(version)
 		self.savecount = read16(f) # TODO: prbly not actually savecount
 		x = read16(f) # <- this is prbly uint32 bit
 		assert x == 0, "third bytes of MapData were not zero but " + str(x)
-		x = read32(f) # TODO who knows? 0 (common) or 4, so far
-		assert x == 0 or x == 4
-		x = read32(f) # TODO
-		assert x == 0, "fifth bytes of MapData were not zero but " + str(x)
+		if version == 1:
+			x = read32(f) # TODO who knows? 0 (common) or 4, so far
+			assert x == 0 or x == 4, "fourth bytes of MapData were not zero but " + str(x)
+			x = read32(f) # TODO
+			assert x == 0, "fifth bytes of MapData were not zero but " + str(x)
 
 		# sprite for background tiles
 		self.gallery = slurpMFC(f, CGallery)
 
 		# rooms
 		self.roomcount = read32(f)
+		print "trying to read " + str(self.roomcount) + " rooms"
 		self.rooms = []
 		for i in xrange(self.roomcount):
-			self.rooms.append(slurpMFC(f, CRoom))
+			if version == 0:
+				left = reads32(f)
+				top = read32(f)
+				right = reads32(f)
+				bottom = read32(f)
+				roomtype = read32(f)
+				assert roomtype < 3
+				roomtypes = ["Indoors", "Surface", "Undersea"]
+				print "room at (" + str(left) + ", " + str(top) + "), (" + str(right) + ", " + str(bottom) + ") - type " + roomtypes[roomtype]
+				# TODO
+				self.rooms.append(None)
+			else:
+				assert version == 1
+				self.rooms.append(slurpMFC(f, CRoom))
+
+		if version == 0:
+			# ground level data
+			self.groundlevel = []
+			for x in xrange(261):
+				self.groundlevel.append(read32(f))
+
+			# mysterious random bytes! like the in-room ones of C2
+			# disease data? TODO
+			self.randombytes = f.read(800)
 
 readingcompound = False
 readingscenery = False
@@ -245,10 +275,8 @@ class Entity: # like a compound part?
 		print "sprite file: " + self.sprite.filename
 
 		# currently displayed sprite details
-		# TODO: this is guesswork :)
 		self.currsprite = read8(f)
 		self.imageoffset = read8(f)
-		#self.currsprite = read16(f) # TODO: this is likely uint8?
 		print "curr sprite#: " + str(self.currsprite) + ", img offset: " + str(self.imageoffset)
 		
 		# zorder
@@ -265,7 +293,10 @@ class Entity: # like a compound part?
 		assert self.haveanim == 0 or self.haveanim == 1
 		if self.haveanim == 1:
 			self.animframe = read8(f)
-			self.animstring = f.read(99)
+			if version == 0:
+				self.animstring = f.read(32)
+			else:
+				self.animstring = f.read(99)
 			x = self.animstring.find("\0")
 			if x != -1:
 				self.animstring = self.animstring[:x]
@@ -293,6 +324,8 @@ class Entity: # like a compound part?
 		for z in self.clickbhvr: print "%02X" % ord(z),
 		print
 
+		if version == 0: return
+		
 		num_pickup_handles = read16(f)
 		self.pickup_handles = []
 		for i in xrange(num_pickup_handles):
@@ -307,12 +340,20 @@ class Entity: # like a compound part?
 
 class Object:
 	def partialread(self, f):
+		if version == 0:
+			x = read8(f)
+			assert x == 0, "Object lacking nulls at start, instead has " + str(x)
 		# genus/family/species
-		self.genus = read8(f)
-		self.family = read8(f)
-		x = read16(f)
-		assert x == 0, "Object lacking nulls at start"
-		self.species = read16(f)
+		if version == 0:
+			self.species = read8(f)
+			self.genus = read8(f)
+			self.family = read8(f)
+		else:
+			self.genus = read8(f)
+			self.family = read8(f)
+			x = read16(f)
+			assert x == 0, "Object lacking nulls at start, instead has " + str(x)
+			self.species = read16(f)
 
 		# print nice stuff!
 		identifier = getidentifier(self.family, self.genus, self.species)
@@ -322,96 +363,116 @@ class Object:
 			identifier = " - '" + identifier + "'"
 		print "agent " + self.__class__.__name__ + ": (" + str(self.family) + ", " + str(self.genus) + ", " + str(self.species) + ")" + identifier + ",",
 
-		# unid
-		self.unid = read32(f)
-		print "unid: " + str(self.unid)
+		if version == 0:
+			# TODO: decode all this
+			x = f.read(21)
+			print "unknown bytes:",
+			for z in x: print "%02X" % ord(z),
+			print
+		else:
+			# unid
+			self.unid = read32(f)
+			print "unid: " + str(self.unid)
 
-		# TODO
-		x = read8(f)
-		# TODO: 0 or 1 normally, but 'Hook', unid: 56314, at least, has it at 4
-		assert x == 0 or x == 1 or x == 4
-		print "* mysteriousness (0/1/4): " + str(x)
+			# TODO
+			x = read8(f)
+			# TODO: 0 or 1 normally, but 'Hook', unid: 56314, at least, has it at 4
+			assert x == 0 or x == 1 or x == 4
+			print "* mysteriousness (0/1/4): " + str(x)
 
-		# attributes
-		self.attr = read16(f)
-		print "attr: " + str(self.attr)
+			# attributes
+			self.attr = read16(f)
+			print "attr: " + str(self.attr)
 
-		# fuzzie thinks: 00 00, uint32 * 4, 00 00, bhvr click state
-		zarros = read16(f)
-		assert zarros == 0
-		one = read32(f)
-		two = read32(f)
-		three = read32(f)
-		four = read32(f)
+			# fuzzie thinks: 00 00, uint32 * 4, 00 00, bhvr click state
+			zarros = read16(f)
+			assert zarros == 0
+			one = read32(f)
+			two = read32(f)
+			three = read32(f)
+			four = read32(f)
 		
-		zarros = read16(f)
-		# drat, PointerTool in eden has this as 1803
-		#assert zarros == 0, "zarros: " + str(zarros)
-		if zarros != 0:
-			print "zarros: " + str(zarros)
+			zarros = read16(f)
+			# drat, PointerTool in eden has this as 1803
+			#assert zarros == 0, "zarros: " + str(zarros)
+			if zarros != 0:
+				print "zarros: " + str(zarros)
 		
-		self.bhvrclickstate = read8(f) # TODO: verify
-		print "coords? " + str(one) + ", " + str(two) + ", " + str(three) + ", " + str(four) + ", bhvr click state: " + str(self.bhvrclickstate)
+			self.bhvrclickstate = read8(f) # TODO: verify
+			print "coords? " + str(one) + ", " + str(two) + ", " + str(three) + ", " + str(four) + ", bhvr click state: " + str(self.bhvrclickstate)
 
 		# our sprite
 		self.sprite = slurpMFC(f, CGallery)
 
-		# tick data
-		self.tickreset = read32(f)
-		self.tickstate = read32(f)
-		assert self.tickreset >= self.tickstate
-		print "* tick time: " + str(self.tickreset) + ", state: " + str(self.tickstate)
+		if version == 0:
+			# TODO: decode all this
+			x = f.read(26)
+			print "unknown bytes:",
+			for z in x: print "%02X" % ord(z),
+			print
+		else:
+			# tick data
+			self.tickreset = read32(f)
+			self.tickstate = read32(f)
+			assert self.tickreset >= self.tickstate
+			print "* tick time: " + str(self.tickreset) + ", state: " + str(self.tickstate)
 
-		# TODO
-		x = read16(f)
-		assert x == 0
-		#x = read16(f)
-		#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
-		#print "* third misc data: " + str(x)
-		#x = read16(f)
-		#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
-		x = read32(f)
-		print "* fourth misc data: " + str(x)
+			# TODO
+			x = read16(f)
+			assert x == 0
+			#x = read16(f)
+			#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
+			#print "* third misc data: " + str(x)
+			#x = read16(f)
+			#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
+			x = read32(f)
+			print "* fourth misc data: " + str(x)
 
-		# OVxx variables
-		self.variables = []
-		for i in xrange(100):
-			self.variables.append(read32(f))
+			# OVxx variables
+			self.variables = []
+			for i in xrange(100):
+				self.variables.append(read32(f))
 	
-		# misc physics-ish data
-		self.size = read8(f)
-		self.range = read32(f)
-		x = read32(f) # TODO: FFFF FFFF?
-		if x != 0xffffffff:
-			print "* mysterious physicsish value: " + str(x)
-		self.accg = read32(f)
-		self.velx = reads32(f)
-		self.vely = reads32(f)
-		print "velx: " + str(self.velx) + ", vely: " + str(self.vely)
-		self.rest = read32(f)
-		self.aero = read32(f)
-		x = f.read(6) # TODO: unknown [for pointer: 0000 0400 0000]
-				# [for eden #1: d101 0400 0000]
-		print "* post-physics bytes:",
-		for z in x: print "%02X" % ord(z),
-		print
+			# misc physics-ish data
+			self.size = read8(f)
+			self.range = read32(f)
+			x = read32(f) # TODO: FFFF FFFF?
+			if x != 0xffffffff:
+				print "* mysterious physicsish value: " + str(x)
+			self.accg = read32(f)
+			self.velx = reads32(f)
+			self.vely = reads32(f)
+			print "velx: " + str(self.velx) + ", vely: " + str(self.vely)
+			self.rest = read32(f)
+			self.aero = read32(f)
+			x = f.read(6) # TODO: unknown [for pointer: 0000 0400 0000]
+					# [for eden #1: d101 0400 0000]
+			print "* post-physics bytes:",
+			for z in x: print "%02X" % ord(z),
+			print
 
-		self.threat = read8(f)
+			self.threat = read8(f)
 
-		print "accg: " + str(self.accg) + ", rest: " + str(self.rest) + ", aero: " + str(self.aero) + ", size: " + str(self.size) + ", range: " + str(self.range) + ", threat: " + str(self.threat)
+			print "accg: " + str(self.accg) + ", rest: " + str(self.rest) + ", aero: " + str(self.aero) + ", size: " + str(self.size) + ", range: " + str(self.range) + ", threat: " + str(self.threat)
 		
-		# TODO: 01 normally, 03 when frozen, 00 for scenery?
-		self.flags = read8(f)
-		assert self.flags == 0 or self.flags == 1 or self.flags == 3, str(self.flags)
+			# TODO: 01 normally, 03 when frozen, 00 for scenery?
+			self.flags = read8(f)
+			assert self.flags == 0 or self.flags == 1 or self.flags == 3, str(self.flags)
 
 		# TODO: sane scriptness
 		self.scripts = {}
 		numscripts = read32(f)
 		for i in range(numscripts):
-			genus = read8(f)
-			family = read8(f)
-			eventno = read16(f)
-			species = read16(f)
+			if version == 0:
+				eventno = read8(f)
+				species = read8(f)
+				genus = read8(f)
+				family = read8(f)
+			else:
+				genus = read8(f)
+				family = read8(f)
+				eventno = read16(f)
+				species = read16(f)
 			script = readstring(f)
 			print "event #" + str(eventno) + " for " + str(family) + ", " + str(genus) + ", " + str(species) + ": " + script
 			self.scripts[eventno] = script
@@ -427,7 +488,7 @@ class PointerTool(SimpleObject):
 	def read(self, f):
 		SimpleObject.read(self, f)
 
-		# TODO: data from eden is shown below
+		# TODO: data from C2 eden is shown below
 		# 02 00 00 00 02 00 00 00
 		# 00 00 00 00 00 00
 		# 67 65 74 00
@@ -436,7 +497,11 @@ class PointerTool(SimpleObject):
 		# 66 67 00 00
 		# 00 00 00 00 00 00 00 00 00
 		# CD CD CD CD CD CD CD CD CD CD CD CD
-		x = f.read(8 + 6 + 16 + 9 + 12)
+		# bear in mind CD CD CD CD is prbly unallocated memory from microsoft's CRT
+		if version == 0:
+			x = f.read(35)
+		else:
+			x = f.read(8 + 6 + 16 + 9 + 12)
 		print "pointer bytes: ",
 		for z in x: print "%02X" % ord(z),
 		print
@@ -486,7 +551,10 @@ class CompoundObject(Object):
 		# 00 00 00 00 01 00 00 00 02 00 00 00
 		# 00 00 00 00 01 00 00 00 02 00 00 00
 		# 01 01 01 02 02 02
-		x = f.read(24 + 12 + 12 + 6)
+		if version == 0:
+			x = f.read(6 * 4)
+		else:
+			x = f.read(24 + 12 + 12 + 6)
 		print "compound bytes: ",
 		for z in x: print "%02X" % ord(z),
 		print
@@ -500,7 +568,10 @@ class Vehicle(CompoundObject):
 		# TODO: a mystery!
 		a = read16(f)
 		x = read16(f)
-		assert x == 0
+		if version == 0:
+			pass # TODO
+		else:
+			assert x == 0
 		b = read16(f)
 		x = read8(f)
 		assert x == 0
@@ -522,7 +593,10 @@ class Lift(Vehicle):
 	def read(self, f):
 		Vehicle.read(self, f)
 
-		x = f.read(65) # TODO
+		if version == 0:
+			x = f.read(61) # TODO
+		else:
+			x = f.read(65) # TODO
 		print "lift bytes: ",
 		for z in x: print "%02X" % ord(z),
 		print
@@ -541,15 +615,27 @@ class Blackboard(CompoundObject):
 		CompoundObject.read(self, f)
 
 		# TODO: none of this is verified
-		self.textx = read32(f)
-		self.texty = read32(f)
-		self.backgroundcolour = read16(f)
-		self.chalkcolour = read16(f)
-		self.aliascolour = read16(f)
+		if version == 0:
+			self.textx = read8(f)
+			self.texty = read8(f)
+			self.backgroundcolour = read8(f)
+			self.chalkcolour = read8(f)
+			self.aliascolour = read8(f)
+		else:
+			self.textx = read32(f)
+			self.texty = read32(f)
+			self.backgroundcolour = read16(f)
+			self.chalkcolour = read16(f)
+			self.aliascolour = read16(f)
 		print "text at (" + str(self.textx) + ", " + str(self.texty) + ")"
 		print "colours: " + str(self.backgroundcolour) + ", " + str(self.chalkcolour) + ", " + str(self.aliascolour)
 
-		for i in xrange(48):
+		if version == 0:
+			totalwords = 16
+		else:
+			totalwords = 48
+
+		for i in xrange(totalwords):
 			num = read32(f)
 			x = f.read(11)
 			d = x.find("\0")
@@ -621,10 +707,16 @@ scripts = {}
 numscripts = read32(f)
 print "reading " + str(numscripts) + " scripts.."
 for i in range(numscripts):
-	genus = read8(f)
-	family = read8(f)
-	eventno = read16(f)
-	species = read16(f)
+	if version == 0:
+		eventno = read8(f)
+		species = read8(f)
+		genus = read8(f)
+		family = read8(f)
+	else:
+		genus = read8(f)
+		family = read8(f)
+		eventno = read16(f)
+		species = read16(f)
 	script = readstring(f)
 	print "event #" + str(eventno) + " for " + str(family) + ", " + str(genus) + ", " + str(species) + " (global): " + script
 	scripts[eventno] = script
@@ -640,6 +732,9 @@ zeros = read16(f)
 assert zeros == 0
 favplacename = readstring(f)
 print "aaaand, to finish off, our favourite place is: " + favplacename
+
+if version == 0:
+	sys.exit(0)
 
 print
 print "and now, for " + str(len(data.rooms)) + " rooms.."
