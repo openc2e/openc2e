@@ -361,14 +361,13 @@ class Object:
 			identifier = ""
 		else:
 			identifier = " - '" + identifier + "'"
-		print "agent " + self.__class__.__name__ + ": (" + str(self.family) + ", " + str(self.genus) + ", " + str(self.species) + ")" + identifier + ",",
+		print "agent " + self.__class__.__name__ + ": (" + str(self.family) + ", " + str(self.genus) + ", " + str(self.species) + ")" + identifier + ","
 
 		if version == 0:
-			# TODO: decode all this
-			x = f.read(21)
-			print "unknown bytes:",
-			for z in x: print "%02X" % ord(z),
-			print
+			x = read8(f)
+			# TODO: should make sure this is really only set for pointer?
+			# might be mysteriousness byte from c2..
+			if x: print "pointer-only byte was" + str(x)
 		else:
 			# unid
 			self.unid = read32(f)
@@ -380,18 +379,30 @@ class Object:
 			assert x == 0 or x == 1 or x == 4
 			print "* mysteriousness (0/1/4): " + str(x)
 
-			# attributes
+		# attributes
+		if version == 0:
+			# TODO: verify this sometime :)
+			self.attr = read8(f)
+		else:
 			self.attr = read16(f)
-			print "attr: " + str(self.attr)
+		print "attr: " + str(self.attr)
 
-			# fuzzie thinks: 00 00, uint32 * 4, 00 00, bhvr click state
+		if version == 1:
 			zarros = read16(f)
 			assert zarros == 0
-			one = read32(f)
-			two = read32(f)
-			three = read32(f)
-			four = read32(f)
+
+		one = read32(f)
+		two = read32(f)
+		three = read32(f)
+		four = read32(f)
 		
+		if version == 0:
+			zarros = read16(f)
+			assert zarros == 0, "zarros: " + str(zarros)
+
+			read8(f) # TODO: what's this? bhvr click state? if so, might as well use c2 code
+			print "coords? " + str(one) + ", " + str(two) + ", " + str(three) + ", " + str(four)
+		else:
 			zarros = read16(f)
 			# drat, PointerTool in eden has this as 1803
 			#assert zarros == 0, "zarros: " + str(zarros)
