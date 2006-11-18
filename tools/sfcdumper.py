@@ -415,19 +415,24 @@ class Object:
 		# our sprite
 		self.sprite = slurpMFC(f, CGallery)
 
+		# tick data
+		self.tickreset = read32(f)
+		self.tickstate = read32(f)
+		assert self.tickreset >= self.tickstate
+		print "* tick time: " + str(self.tickreset) + ", state: " + str(self.tickstate)
+
 		if version == 0:
-			# TODO: decode all this
-			x = f.read(26)
+			# TODO: decode this
+			x = f.read(6)
 			print "unknown bytes:",
 			for z in x: print "%02X" % ord(z),
 			print
-		else:
-			# tick data
-			self.tickreset = read32(f)
-			self.tickstate = read32(f)
-			assert self.tickreset >= self.tickstate
-			print "* tick time: " + str(self.tickreset) + ", state: " + str(self.tickstate)
 
+			# OBVx variables
+			self.variables = []
+			for i in xrange(3):
+				self.variables.append(read32(f))
+		else:
 			# TODO
 			x = read16(f)
 			assert x == 0
