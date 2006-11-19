@@ -52,6 +52,7 @@ class SFCFile {
 private:
 	bool reading_compound;
 	bool reading_scenery;
+	unsigned int ver;
 	
 	std::vector<SFCClass *> storage;
 	std::map<unsigned int, unsigned int> types;
@@ -81,6 +82,8 @@ public:
 
 	bool readingScenery() { return reading_scenery; }
 	bool readingCompound() { return reading_compound; }
+	void setVersion(unsigned int v);
+	unsigned int version() { return ver; }
 
 	void copyToWorld();
 };

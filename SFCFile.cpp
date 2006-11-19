@@ -18,6 +18,7 @@
  */
 
 #include "SFCFile.h"
+#include "World.h"
 #include "exceptions.h"
 
 /*
@@ -243,21 +244,62 @@ std::string SFCFile::readBytes(unsigned int n) {
 	return t;
 }
 
+void SFCFile::setVersion(unsigned int v) {
+	if (v == 0) {
+		sfccheck(world.gametype == "c1");
+	} else if (v == 1) {
+		sfccheck(world.gametype == "c2");
+	} else {
+		throw creaturesException(boost::str(boost::format("unknown version# %d") % v));
+	}
+
+	ver = v;
+}
+
 // ------------------------------------------------------------------
 
 void MapData::read() {
-	// discard unknown bytes
-	sfccheck(read16() == 1);
-	sfccheck(read16() == 0);
-	read32(); read32(); read32();
+	// read version (0 = c1, 1 = c2)
+	unsigned int ver = read32();
+	sfccheck((ver == 0) || (ver == 1));
+	parent->setVersion(ver);
 
+	// discard unknown bytes
+	read32();
+	if (parent->version() == 1) {
+		read32();
+		read32();
+	}
+
+	// background sprite
 	background = (CGallery *)slurpMFC(TYPE_CGALLERY);
 	sfccheck(background);
+
+	// room data
 	uint32 norooms = read32();
 	for (unsigned int i = 0; i < norooms; i++) {
-		CRoom *temp = (CRoom*)slurpMFC(TYPE_CROOM);
-		sfccheck(temp);
-		rooms.push_back(temp);
+		if (parent->version() == 0) {
+			// TODO
+			reads32(); // left
+			read32(); // top
+			reads32(); // right
+			read32(); // bottom
+			read32(); // roomtype
+			//sfccheck(roomtype < 3);
+		} else {
+			CRoom *temp = (CRoom*)slurpMFC(TYPE_CROOM);
+			sfccheck(temp);
+			rooms.push_back(temp);
+		}
+	}
+
+	// read groundlevel data
+	if (parent->version() == 0) {
+		for (unsigned int i = 0; i < 261; i++) {
+			read32(); // TODO
+		}
+
+		readBytes(800); // TODO
 	}
 }
 
@@ -364,7 +406,9 @@ void SFCEntity::read() {
 		animframe = read8();
 
 		// read the animation string
-		std::string tempstring = readBytes(99);
+		std::string tempstring;
+		if (parent->version() == 0) tempstring = readBytes(32);
+		else tempstring = readBytes(99);
 		// chop off non-null-terminated bits
 		animstring = std::string(tempstring.c_str());
 	} else haveanim = false;
@@ -386,6 +430,8 @@ void SFCEntity::read() {
 	// read BHVR touch
 	bhvrtouch = read8();
 
+	if (parent->version() == 0) return;
+
 	// read pickup handles/points
 	uint16 num_pickup_handles = read16();
 	for (unsigned int i = 0; i < num_pickup_handles; i++) {
@@ -399,22 +445,38 @@ void SFCEntity::read() {
 
 void SFCObject::read() {
 	// read genus, family and species
-	genus = read8();
-	family = read8();
-	sfccheck(read16() == 0);
-	species = read16();
+	if (parent->version() == 0) {
+		sfccheck(read8() == 0);
+		species = read8();
+		genus = read8();
+		family = read8();
+	} else {
+		genus = read8();
+		family = read8();
+		sfccheck(read16() == 0);
+		species = read16();
+	}
 
-	// read UNID
-	unid = read32();
+	if (parent->version() == 0) {
+		// discard unknown byte
+		read8();
+	} else {
+		// read UNID
+		unid = read32();
 
-	// discard unknown bytes
-	read8();
+		// discard unknown byte
+		read8();
+	}
 
 	// read ATTR
-	attr = read16();
+	if (parent->version() == 0)
+		attr = read8();
+	else
+		attr = read16();
 
 	// discard unknown bytes
-	sfccheck(read16() == 0);
+	if (parent->version() == 1)
+		sfccheck(read16() == 0);
 
 	// read unknown coords
 	left = read32();
@@ -426,7 +488,12 @@ void SFCObject::read() {
 	read16();
 
 	// read BHVR click state
-	bhvrclickstate = read8();
+	if (parent->version() == 1)
+		bhvrclickstate = read8();
+
+	// unknown byte (might be BHVR click state)
+	if (parent->version() == 0)
+		read8();
 
 	// read sprite
 	sprite = (CGallery *)slurpMFC(TYPE_CGALLERY);
@@ -441,32 +508,34 @@ void SFCObject::read() {
 	read32();
 
 	// read object variables
-	for (unsigned int i = 0; i < 100; i++)
+	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
 		variables[i] = read32();
 
-	// read physics values
-	size = read8();
-	range = read32();
+	if (parent->version() == 1) {
+		// read physics values
+		size = read8();
+		range = read32();
 	
-	// discard unknown bytes
-	read32();
+		// discard unknown bytes
+		read32();
 
-	// read physics values
-	accg = read32();
-	velx = reads32();
-	vely = reads32();
-	rest = read32();
-	aero = read32();
+		// read physics values
+		accg = read32();
+		velx = reads32();
+		vely = reads32();
+		rest = read32();
+		aero = read32();
 
-	// discard unknown bytes
-	readBytes(6);
+		// discard unknown bytes
+		readBytes(6);
 
-	// read threats
-	threat = read8();
+		// read threats
+		threat = read8();
 
-	// read flags
-	uint8 flags = read8();
-	frozen = (flags & 0x02);
+		// read flags
+		uint8 flags = read8();
+		frozen = (flags & 0x02);
+	}
 
 	// read scripts
 	uint32 numscripts = read32();
@@ -496,21 +565,32 @@ void SFCCompoundObject::read() {
 	}
 
 	// discard hotspot data for now
-	readBytes(150);
+	if (parent->version() == 0)
+		readBytes(120);
+	else
+		readBytes(150);
 }
 
 void SFCBlackboard::read() {
 	SFCCompoundObject::read();
 
 	// read text x/y position and colours
-	textx = read32();
-	texty = read32();
-	backgroundcolour = read16();
-	chalkcolour = read16();
-	aliascolour = read16();
+	if (parent->version() == 0) {
+		textx = read8();
+		texty = read8();
+		backgroundcolour = read8();
+		chalkcolour = read8();
+		aliascolour = read8();
+	} else {
+		textx = read32();
+		texty = read32();
+		backgroundcolour = read16();
+		chalkcolour = read16();
+		aliascolour = read16();
+	}
 
 	// read blackboard strings
-	for (unsigned int i = 0; i < 48; i++) {
+	for (unsigned int i = 0; i < (parent->version() == 0 ? 16 : 48); i++) {
 		uint32 value = read32();
 		std::string str = readBytes(11);
 		// chop off non-null-terminated bits
@@ -526,7 +606,9 @@ void SFCVehicle::read() {
 	// discard unknown bytes
 	readBytes(9);
 	read16();
-	sfccheck(read16() == 0);
+	unsigned short x = read16();
+	if (parent->version() == 1)
+		sfccheck(x == 0);
 	read16();
 	sfccheck(read8() == 0);
 
@@ -544,7 +626,10 @@ void SFCLift::read() {
 	SFCVehicle::read();
 	
 	// discard unknown bytes
-	readBytes(65);
+	if (parent->version() == 0)
+		readBytes(61);
+	else
+		readBytes(65);
 }
 
 void SFCSimpleObject::read() {
@@ -557,7 +642,10 @@ void SFCPointerTool::read() {
 	SFCSimpleObject::read();
 
 	// discard unknown bytes
-	readBytes(51);
+	if (parent->version() == 0)
+		readBytes(35);
+	else
+		readBytes(51);
 }
 
 void SFCCallButton::read() {
@@ -568,10 +656,17 @@ void SFCCallButton::read() {
 }
 
 void SFCScript::read(SFCFile *f) {
-	genus = f->read8();
-	family = f->read8();
-	eventno = f->read16();
-	species = f->read16();
+	if (f->version() == 0) {
+		eventno = f->read8();
+		species = f->read8();
+		genus = f->read8();
+		family = f->read8();
+	} else {
+		genus = f->read8();
+		family = f->read8();
+		eventno = f->read16();
+		species = f->read16();
+	}
 	data = f->readstring();
 }
 
