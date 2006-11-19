@@ -158,6 +158,7 @@ public:
 	MapData(SFCFile *p) : SFCClass(p) { }
 	void read();
 	void copyToWorld();
+	virtual ~MapData();
 };
 
 class SFCEntity : public SFCClass {

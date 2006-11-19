@@ -279,13 +279,15 @@ void MapData::read() {
 	uint32 norooms = read32();
 	for (unsigned int i = 0; i < norooms; i++) {
 		if (parent->version() == 0) {
-			// TODO
-			reads32(); // left
-			read32(); // top
-			reads32(); // right
-			read32(); // bottom
-			read32(); // roomtype
-			//sfccheck(roomtype < 3);
+			CRoom *temp = new CRoom(parent);
+			temp->id = i;
+			temp->left = reads32();
+			temp->top = read32();
+			temp->right = reads32();
+			temp->bottom = read32();
+			temp->roomtype = read32();
+			sfccheck(temp->roomtype < 3);
+			rooms.push_back(temp);
 		} else {
 			CRoom *temp = (CRoom*)slurpMFC(TYPE_CROOM);
 			sfccheck(temp);
@@ -300,6 +302,15 @@ void MapData::read() {
 		}
 
 		readBytes(800); // TODO
+	}
+}
+
+MapData::~MapData() {
+	// In C1, we create rooms which aren't MFC objects, so we need to destroy them afterwards.
+	if (parent->version() == 0) {
+		for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+			delete *i;
+		}
 	}
 }
 
@@ -704,11 +715,15 @@ void MapData::copyToWorld() {
 		unsigned int roomid = m->addRoom(r);
 		sfccheck(roomid == src->id);
 
-		// TODO: ca values, sources, wind, drop status, music
-		// TODO: floor points
-		// TODO: floor value
+		if (parent->version() == 1) {
+			// TODO: ca values, sources, wind, drop status, music
+			// TODO: floor points
+			// TODO: floor value
+		}
 	}
-	
+
+	if (parent->version() == 0) return;
+
 	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		CRoom *src = *i;
 
