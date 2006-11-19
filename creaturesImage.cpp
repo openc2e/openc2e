@@ -19,6 +19,7 @@
 
 #include "creaturesImage.h"
 #include "c16Image.h"
+#include "sprImage.h"
 #include "blkImage.h"
 #include "openc2e.h"
 #include "World.h"
@@ -43,7 +44,7 @@
 
 using namespace boost::filesystem;
 
-enum filetype { blk, s16, c16 };
+enum filetype { blk, s16, c16, spr };
 
 #ifndef _WIN32
 path homeDirectory() {
@@ -89,6 +90,7 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 		case blk:
 			realfile = path(world.findFile(std::string("/Backgrounds/") + fname), native); break;
 
+		case spr:
 		case c16:
 		case s16:
 			realfile = path(world.findFile(std::string("/Images/") + fname), native); break;
@@ -105,7 +107,8 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 	}
 
 #ifdef __C2E_BIGENDIAN
-	cachename = cachename + ".big";
+	if (ft != spr)
+		cachename = cachename + ".big";
 #endif
 	cachefile = path(cachename, native);
 
@@ -121,7 +124,7 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 	in->clear();
 	in->mmapopen(realfile.native_file_string());
 #ifdef __C2E_BIGENDIAN
-	if (in->is_open()) {
+	if (in->is_open() && (ft != spr)) {
 		fileSwapper f;
 		switch (ft) {
 			case blk:
@@ -150,6 +153,7 @@ done:
 			case blk: img = new blkImage(in); break;
 			case c16: img = new c16Image(in); break; // this should never happen, actually, once we're done
 			case s16: img = new s16Image(in); break;
+			case spr: img = new sprImage(in); break;
 		}
 		img->name = basename;
 	}
@@ -177,12 +181,16 @@ creaturesImage *imageGallery::getImage(std::string name) {
 
 	if (!tryOpen(in, img, name + ".s16", s16)) {
 		if (!tryOpen(in, img, name + ".c16", c16)) {
-			bool lasttry = tryOpen(in, img, name, blk);
-			if (!lasttry) {
-				std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
-				return 0;
+			if (!tryOpen(in, img, name + ".spr", spr)) {
+				bool lasttry = tryOpen(in, img, name, blk);
+				if (!lasttry) {
+					std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
+					return 0;
+				}
+				gallery[name] = img;
+			} else {
+				gallery[name] = img;
 			}
-			gallery[name] = img;
 		} else {
 			gallery[name] = img;
 		}

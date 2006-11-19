@@ -46,6 +46,7 @@ class SDLSurface {
 protected:
 	SDL_Surface *surface;
 	int width, height;
+	SDL_Color palette[256];
 
 public:
 	void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
@@ -77,6 +78,7 @@ public:
 	void freeSurface(SDLSurface *surf);
 	bool keyDown(int key);
 	int translateKey(int key);
+	void setPalette(uint8 *data);
 };
 
 #endif

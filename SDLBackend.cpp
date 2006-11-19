@@ -157,18 +157,30 @@ void SDLSurface::render(creaturesImage *image, unsigned int frame, int x, int y,
 	if ((y + image->height(frame)) <= 0) return;
 
 	// create surface
-	unsigned int rmask, gmask, bmask;
-	if (image->is565()) {
-		rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
+	SDL_Surface *surf;
+	if (image->bitdepth() == 8) {
+		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
+						image->width(frame), image->height(frame),
+						8, // depth
+						image->width(frame), // pitch
+						0, 0, 0, 0);
+		SDL_SetPalette(surf, SDL_LOGPAL, palette, 0, 256);
 	} else {
-		rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
+		assert(image->bitdepth() == 16);
+
+		unsigned int rmask, gmask, bmask;
+		if (image->is565()) {
+			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
+		} else {
+			rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
+		}
+		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
+						image->width(frame), image->height(frame),
+						16, // depth
+						image->width(frame) * 2, // pitch
+						rmask, gmask, bmask, 0); // RGBA mask
 	}
-	SDL_Surface *surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
-							image->width(frame), image->height(frame),
-							16, // depth
-							image->width(frame) * 2, // pitch
-							rmask, gmask, bmask, 0); // RGBA mask
-	
+
 	// try mirroring, if necessary
 	try {
 		if (mirror) {
@@ -278,5 +290,14 @@ int SDLBackend::translateKey(int key) {
 	}
 
 	return -1;
+}
+
+void SDLBackend::setPalette(uint8 *data) {
+	// TODO: we only set the palette on our main surface, so will fail for any C1 cameras!
+	for (unsigned int i = 0; i < 256; i++) {
+		mainsurface.palette[i].r = data[i * 3] * 4;
+		mainsurface.palette[i].g = data[(i * 3) + 1] * 4;
+		mainsurface.palette[i].b = data[(i * 3) + 2] * 4;
+	}
 }
 

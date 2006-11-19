@@ -104,6 +104,25 @@ void World::init() {
 		ticktime = 100;
 }
 
+void World::setBackend(SDLBackend *b) {
+	backend = b;
+
+	// load palette for C1
+	if (gametype == "c1") {
+		// TODO: case-sensitivity for the lose
+		fs::path palpath(data_directories[0] / "/Palettes/palette.dta");
+		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
+			uint8 *buf = new uint8[768];
+			std::ifstream f(palpath.native_directory_string().c_str(), std::ios::binary);
+			f >> std::noskipws;
+			f.read((char *)buf, 768);
+			backend->setPalette(buf);
+			delete[] buf;
+		} else
+			throw creaturesException("Couldn't find C1 palette data!");
+	}
+}
+
 caosVM *World::getVM(Agent *a) {
 	if (vmpool.empty()) {
 		return new caosVM(a);
@@ -498,5 +517,5 @@ std::string World::generateMoniker(std::string basename) {
 	
 	return x;
 }
-	
+
 /* vim: set noet: */

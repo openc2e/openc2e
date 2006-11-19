@@ -72,7 +72,7 @@ void caosVM::c_OUTS() {
 /**
  DDE: PUTS (command) val (bareword)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_OUTS
 */
 
@@ -99,7 +99,7 @@ void caosVM::c_OUTV() {
 /**
  DDE: PUTV (command) val (integer)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_OUTV
 */
 
@@ -152,7 +152,7 @@ void caosVM::c_DELG() {
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
  %status done
  %pragma noparse
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Marks the beginning of a normal script applying to the agent with the given classifier 
  info.
@@ -182,7 +182,7 @@ void caosVM::c_ISCR() {
 /**
  ENDM (command)
  %status done
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Marks the end of a script.
 */

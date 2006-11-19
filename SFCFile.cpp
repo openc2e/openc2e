@@ -672,8 +672,6 @@ void SFCScript::read(SFCFile *f) {
 
 // ------------------------------------------------------------------
 
-#include "World.h"
-
 void SFCFile::copyToWorld() {
 	mapdata->copyToWorld();
 
@@ -695,7 +693,8 @@ void SFCFile::copyToWorld() {
 void MapData::copyToWorld() {
 	creaturesImage *spr = world.gallery.getImage(background->filename);
 	// TODO: hardcoded size bad?
-	MetaRoom *m = new MetaRoom(0, 0, 8352, 2400, background->filename, spr);
+	unsigned int w = parent->version() == 0 ? 1200 : 2400;
+	MetaRoom *m = new MetaRoom(0, 0, 8352, w, background->filename, spr);
 	world.map.addMetaRoom(m);
 
 	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
@@ -743,6 +742,7 @@ void MapData::copyToWorld() {
 void copyEntityData(SFCEntity *entity, DullPart *p) {
 	// pose
 	p->setPose(entity->currframe);
+	p->setBase(entity->imgoffset);
 	
 	// animation
 	if (entity->haveanim) {
@@ -763,8 +763,6 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 				p->setFrameNo(entity->animframe);
 		} else p->animation.clear();
 	}
-
-	p->setBase(entity->imgoffset);
 }
 
 #include "CompoundAgent.h"
@@ -777,6 +775,7 @@ void SFCCompoundObject::copyToWorld() {
 	a->finishInit();
 	a->moveTo(parts[0]->x, parts[0]->y);
 
+	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
 	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
 	a->setAttributes(attr);
@@ -787,18 +786,20 @@ void SFCCompoundObject::copyToWorld() {
 	a->tickssincelasttimer = tickstate;
 	a->timerrate = tickreset;
 	
-	for (unsigned int i = 0; i < 100; i++)
+	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
 		a->var[i].setInt(variables[i]);
-	
-	a->perm = size; // TODO
-	a->thrt.setInt(threat);
-	a->range = range;
-	a->accg = accg;
-	a->velx.setInt(velx);
-	a->vely.setInt(vely);
-	a->elas = rest; // TODO
-	a->aero = aero;
-	a->paused = frozen; // TODO
+
+	if (parent->version() == 1) {
+		a->perm = size; // TODO
+		a->thrt.setInt(threat);
+		a->range = range;
+		a->accg = accg;
+		a->velx.setInt(velx);
+		a->vely.setInt(vely);
+		a->elas = rest; // TODO
+		a->aero = aero;
+		a->paused = frozen; // TODO
+	}
 
 	for (unsigned int i = 0; i < parts.size(); i++) {
 		SFCEntity *e = parts[i];
@@ -828,6 +829,7 @@ void SFCSimpleObject::copyToWorld() {
 	
 	// copy data from ourselves
 	
+	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
 	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
 	a->setAttributes(attr);
@@ -838,18 +840,20 @@ void SFCSimpleObject::copyToWorld() {
 	a->tickssincelasttimer = tickstate;
 	a->timerrate = tickreset;
 	
-	for (unsigned int i = 0; i < 100; i++)
+	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
 		a->var[i].setInt(variables[i]);
 	
-	a->perm = size; // TODO
-	a->thrt.setInt(threat);
-	a->range = range;
-	a->accg = accg;
-	a->velx.setInt(velx);
-	a->vely.setInt(vely);
-	a->elas = rest; // TODO
-	a->aero = aero;
-	a->paused = frozen; // TODO
+	if (parent->version() == 1) {
+		a->perm = size; // TODO
+		a->thrt.setInt(threat);
+		a->range = range;
+		a->accg = accg;
+		a->velx.setInt(velx);
+		a->vely.setInt(vely);
+		a->elas = rest; // TODO
+		a->aero = aero;
+		a->paused = frozen; // TODO
+	}
 
 	// copy data from entity
 	DullPart *p = (DullPart *)a->part(0);

@@ -131,7 +131,7 @@ extern "C" int main(int argc, char *argv[]) {
 	std::cout << "Reading PRAY files..." << std::endl;
 	world.praymanager.update();
 	std::cout << "Initialising backend..." << std::endl;
-	world.backend = new SDLBackend();
+	world.setBackend(new SDLBackend());
 	// moved backend.init() here because we need the camera to be valid - fuzzie
 	world.backend->init(enable_sound);
 	world.camera.setBackend(world.backend); // TODO: hrr

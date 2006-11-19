@@ -47,6 +47,7 @@ public:
 	unsigned int numframes() { return m_numframes; }
 	virtual unsigned int width(unsigned int frame) { return widths[frame]; }
 	virtual unsigned int height(unsigned int frame) { return heights[frame]; }
+	virtual unsigned int bitdepth() { return 16; }
 	virtual void *data(unsigned int frame) { return buffers[frame]; }
 	void addRef() { refcount++; }
 	void delRef() { refcount--; }

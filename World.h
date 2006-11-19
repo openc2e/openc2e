@@ -99,6 +99,7 @@ public:
 	~World();
 	void init();
 	void initCatalogue();
+	void setBackend(SDLBackend *b);
 	
 	void executeInitScript(boost::filesystem::path p);
 	void executeBootstrap(boost::filesystem::path p);

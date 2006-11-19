@@ -80,6 +80,7 @@ OPENC2E_CORE = \
 	SFCFile.o \
 	SimpleAgent.o \
 	SkeletalCreature.o \
+	sprImage.o \
 	streamutils.o \
 	Vehicle.o \
 	World.o
