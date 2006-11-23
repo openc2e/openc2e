@@ -35,6 +35,7 @@ protected:
 	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
 	std::map<std::string, creaturesImage *> backgrounds;
 	creaturesImage *firstback;
+	bool wraps;
 	
 	MetaRoom() { firstback = 0; }
 
@@ -47,6 +48,7 @@ public:
 	unsigned int height() { return hei; }
 	unsigned int fullwidth() { return fullwid; }
 	unsigned int fullheight() { return fullhei; }
+	bool wraparound() { return wraps; }
 
 	unsigned int addRoom(Room *);
 	void addBackground(std::string, creaturesImage * = 0);
@@ -55,7 +57,7 @@ public:
 
 	unsigned int id;
 
-	MetaRoom(int _x, int _y, int width, int height, const std::string &back, creaturesImage * = 0);
+	MetaRoom(int _x, int _y, int width, int height, const std::string &back, creaturesImage * = 0, bool wrap = false);
 	~MetaRoom();
 };
 

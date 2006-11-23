@@ -23,8 +23,10 @@
 #include <assert.h>
 #include "SDLBackend.h"
 
-MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, creaturesImage *spr) {
-	xloc = _x; yloc = _y; wid = _width; hei = _height; firstback = 0;
+MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, creaturesImage *spr, bool wrap) {
+	xloc = _x; yloc = _y; wid = _width; hei = _height; firstback = 0; wraps = wrap;
+
+	// if we were provided with a background, add it
 	if (!back.empty()) {
 		if (spr) {
 			addBackground(back, spr);
@@ -38,13 +40,14 @@ void MetaRoom::addBackground(std::string back, creaturesImage *spr) {
 	creaturesImage *backsprite;
 	unsigned int totalwidth, totalheight;
 
-	if (!spr) {
-		caos_assert(!back.empty());
-		// TODO: cadv adds backgrounds which have already been added as the default, look into this,
-		// should we preserve the default once extra backgrounds have been added and change this to
-		// a caos_assert?
-		if (backgrounds.find(back) != backgrounds.end()) return;
+	caos_assert(!back.empty());
+	// TODO: cadv adds backgrounds which have already been added as the default, look into this,
+	// should we preserve the default once extra backgrounds have been added and change this to
+	// a caos_assert?
+	if (backgrounds.find(back) != backgrounds.end()) return;
 	
+	if (!spr) {
+		// we weren't passed a sprite, so we need to load one
 		backsprite = world.gallery.getImage(back + ".blk");
 		blkImage *background = dynamic_cast<blkImage *>(backsprite);
 		caos_assert(background);
@@ -52,23 +55,29 @@ void MetaRoom::addBackground(std::string back, creaturesImage *spr) {
 		totalwidth = background->totalwidth;
 		totalheight = background->totalheight;
 	} else {
+		// we were provided with a sprite, so use it
 		backsprite = spr;
 		totalwidth = wid;
 		totalheight = hei;
 	}
 
+	// store the background
 	backgrounds[back] = backsprite;
-	if (!firstback) { 
+	if (!firstback) {
+		// set the first background
 		firstback = backsprite;
 		fullwid = totalwidth;
 		fullhei = totalheight;
 	} else {
+		// make sure other backgrounds are the same size
 		assert(totalwidth == fullwid);
 		assert(totalheight == fullhei);
 	}
 }
 
 std::vector<std::string> MetaRoom::backgroundList() {
+	// construct a temporary vector from our std::map
+
 	std::vector<std::string> b;
 	for (std::map<std::string, creaturesImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
 		b.push_back(i->first);
@@ -76,30 +85,36 @@ std::vector<std::string> MetaRoom::backgroundList() {
 }
 
 creaturesImage *MetaRoom::getBackground(std::string back) {
+	// return the first background by default
 	if (back.empty()) {
-		//blkImage *blk = dynamic_cast<blkImage *>(firstback);
-		//assert(blk || !firstback);
 		return firstback;
 	}
+	
+	// if this background name isn't found, return null
 	if (backgrounds.find(back) != backgrounds.end()) return 0;
-	//blkImage *blk = dynamic_cast<blkImage *>(backgrounds[back]);
-	//assert(blk || !backgrounds[back]);
+	
+	// otherwise, return the relevant background
 	return backgrounds[back];
 }
 	
 MetaRoom::~MetaRoom() {
+	// delete the rooms
 	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		delete *i;
 	}
 
+	// zap the background image references
 	for (std::map<std::string, creaturesImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++) {
 		world.gallery.delImage(i->second);
 	}
 }
 
 unsigned int MetaRoom::addRoom(Room *r) {
+	// add to both our local list and the global list
 	rooms.push_back(r);
 	world.map.rooms.push_back(r);
+
+	// set the id and return
 	r->id = world.map.room_base++;
 	return r->id;
 }

@@ -705,7 +705,7 @@ void MapData::copyToWorld() {
 	creaturesImage *spr = world.gallery.getImage(background->filename);
 	// TODO: hardcoded size bad?
 	unsigned int w = parent->version() == 0 ? 1200 : 2400;
-	MetaRoom *m = new MetaRoom(0, 0, 8352, w, background->filename, spr);
+	MetaRoom *m = new MetaRoom(0, 0, 8352, w, background->filename, spr, true);
 	world.map.addMetaRoom(m);
 
 	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {

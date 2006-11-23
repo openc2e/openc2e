@@ -95,12 +95,23 @@ void Camera::checkBounds() {
 	MetaRoom *m = getMetaRoom();
 	if (!m) return;
 	
-	if (x < (int)m->x()) {
-		moveTo(m->x(), y);
-	} else if (x + getWidth() > m->x() + m->width()) {
-		moveTo(m->x() + m->width() - getWidth(), y);
+	if (m->wraparound()) {
+		// handle wrapping around, if necessary
+		if (x < (int)m->x()) {
+			moveTo(x + m->width(), y);
+		} else if (x > (int)m->x() + (int)m->width()) {
+			moveTo(x - m->width(), y);
+		}
+	} else {
+		// refuse to move beyond the boundaries
+		if (x < (int)m->x()) {
+			moveTo(m->x(), y);
+		} else if (x + getWidth() > m->x() + m->width()) {
+			moveTo(m->x() + m->width() - getWidth(), y);
+		}
 	}
 
+	// refuse to move beyond the boundaries
 	if (y < (int)m->y()) {
 		moveTo(x, m->y());
 	} else if (y + getHeight() > m->y() + m->height()) {

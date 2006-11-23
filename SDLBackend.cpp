@@ -75,6 +75,8 @@ void SDLBackend::init(bool enable_sound) {
 	SDL_WM_SetCaption("openc2e (development build)", "openc2e");
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);
+	// bz2 and fuzzie both think this is the only way to get useful ascii out of SDL
+	SDL_EnableUNICODE(1);
 }
 
 SoundSlot *SDLBackend::getAudioSlot(std::string filename) {

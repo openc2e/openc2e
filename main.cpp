@@ -55,8 +55,7 @@ extern fs::path cacheDirectory(); // creaturesImage.cpp
 static const char data_default[] = "./data";
 
 static void opt_version() {
-	// We already showed the primary version bit, just throw in some random
-	// legalese
+	// We already showed the primary version bit, just throw in some random legalese
 	std::cout << 
 		"This is free software; see the source for copying conditions.  There is NO" << std::endl <<
 		"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << std::endl << std::endl <<
@@ -69,6 +68,8 @@ extern "C" int main(int argc, char *argv[]) {
 	try {
 		
 	std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2006 Alyssa Milburn and others\n\n";
+
+	// variables for command-line flags
 	int optret;
 	bool enable_sound = true;
 	std::vector<std::string> bootstrap;
@@ -76,6 +77,7 @@ extern "C" int main(int argc, char *argv[]) {
 	bool bs_specd = false, d_specd = false;
 	world.gametype = "c3";
 
+	// parse the command-line flags
 	po::options_description desc;
 	desc.add_options()
 		("help,h", "Display help on command-line options")
@@ -112,6 +114,7 @@ extern "C" int main(int argc, char *argv[]) {
 	if (vm.count("data-path") == 0)
 		data_vec.push_back(data_default);
 
+	// add all the data directories to the list
 	for (std::vector<std::string>::iterator i = data_vec.begin(); i != data_vec.end(); i++) {
 		fs::path datadir(*i, fs::native);
 		if (!fs::exists(datadir)) {
@@ -121,8 +124,10 @@ extern "C" int main(int argc, char *argv[]) {
 		world.data_directories.push_back(datadir);
 	}
 	
+	// finally, add our cache directory to the end
 	world.data_directories.push_back(cacheDirectory());
 	
+	// initial setup
 	registerDelegates();
 	std::cout << "Reading catalogue files..." << std::endl;
 	world.initCatalogue();
@@ -142,7 +147,8 @@ extern "C" int main(int argc, char *argv[]) {
 		caosVar contents; contents.setInt(1);
 		world.eame_variables[name] = contents;
 	}
-	
+
+	// execute the initial scripts!
 	std::cout << "Executing initial scripts..." << std::endl;
 	if (bootstrap.size() == 0) {
 		world.executeBootstrap(false);
@@ -159,12 +165,15 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 	}
 
+	// if there aren't any metarooms, we can't run a useful game, the user probably
+	// wanted to execute a CAOS script or something went badly wrong.
 	if (world.map.getMetaRoomCount() == 0) {
 		std::cerr << "\nNo metarooms found in given bootstrap directories or files, exiting." << std::endl;
 		SDL_Quit();
 		return 0;
 	}
 
+	// initialise the socket to listen for CAOS
 	SDLNet_Init();
 	TCPsocket listensocket = 0;
 	int listenport = 20000;
@@ -177,6 +186,7 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 	assert(listensocket);
 	
+	// inform the user of the port used, and store it in the relevant file
 	std::cout << "listening on port " << listenport << std::endl;
 	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
 	if (!fs::exists(p))
@@ -186,9 +196,8 @@ extern "C" int main(int argc, char *argv[]) {
 		f << boost::str(boost::format("%d") % listenport);
 	}
 
+	// do a first-pass draw of the world. TODO: correct?
 	world.drawWorld();
-
-	SDL_EnableUNICODE(1); // bz2 and I both think this is the only way to get useful ascii out of SDL
 
 	bool done = false;
 	unsigned int tickdata = 0;
@@ -197,7 +206,8 @@ extern "C" int main(int argc, char *argv[]) {
 	unsigned int lasttimestamp = world.backend->ticks();
 	while (!done) {
 		bool ticked = false;
-		
+	
+		// tick the world, if necessary
 		if (!world.paused && (world.backend->ticks() > (tickdata + world.ticktime))) {
 			tickdata = world.backend->ticks();
 			
@@ -221,7 +231,9 @@ extern "C" int main(int argc, char *argv[]) {
 			world.hand()->vely.setFloat(world.hand()->vely.getFloat() / 2.0f);
 		} else SDL_Delay(10);
 
+		// handle incoming network connections
 		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
+			// check this connection is coming from localhost
 			IPaddress *remote_ip = SDLNet_TCP_GetPeerAddress(connection);
 			unsigned char *rip = (unsigned char *)&remote_ip->host;
 			if ((rip[0] != 127) || (rip[1] != 0) || (rip[2] != 0) || (rip[3] != 1)) {
@@ -230,18 +242,20 @@ extern "C" int main(int argc, char *argv[]) {
 				continue;
 			}
 			
+			// read the data from the socket
 			std::string data;
 			bool done = false;
-
 			while (!done) {
 				char buffer;
 				int i = SDLNet_TCP_Recv(connection, &buffer, 1);
 				if (i == 1) {
 					data = data + buffer;
+					// TODO: maybe we should check for rscr\n like c2e seems to
 					if ((data.size() > 3) && (data.find("rscr", data.size() - 4) != data.npos)) done = true;
 				} else done = true;
 			}
 
+			// now parse and execute the CAOS we obtained
 			std::istringstream s(data);
 			try {
 				caosScript script(world.gametype, "<network>"); // XXX
@@ -257,9 +271,12 @@ extern "C" int main(int argc, char *argv[]) {
 				SDLNet_TCP_Send(connection, (void *)o.c_str(), o.size());
 			}
 
+			// and finally, close the connection
 			SDLNet_TCP_Close(connection);
 		}
 
+		// main SDL event loop
+		// TODO: this should be moved elsewhere
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -270,12 +287,18 @@ extern "C" int main(int argc, char *argv[]) {
 						(*i)->queueScript(123, 0); // window resized script
 					}
 					break;
+
 				case SDL_MOUSEMOTION:
+					// move the cursor
 					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
 					world.hand()->velx.setInt(event.motion.xrel * 4);
 					world.hand()->vely.setInt(event.motion.yrel * 4);
-					if (event.motion.state & SDL_BUTTON(2)) // middle mouse button scrolling
+					
+					// middle mouse button scrolling
+					if (event.motion.state & SDL_BUTTON(2))
 						world.camera.moveTo(world.camera.getX() - event.motion.xrel, world.camera.getY() - event.motion.yrel, jump);
+					
+					// notify agents
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 						if (!*i) continue;
 						if ((*i)->imsk_mouse_move) {
@@ -285,8 +308,10 @@ extern "C" int main(int argc, char *argv[]) {
 						}
 					}
 					break;
+
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN:
+					// notify agents
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 						if (!*i) continue;
 						if ((event.type == SDL_MOUSEBUTTONUP && (*i)->imsk_mouse_up) ||
@@ -321,6 +346,7 @@ extern "C" int main(int argc, char *argv[]) {
 					if (!world.hand()->handle_events) break;
 					if (event.type != SDL_MOUSEBUTTONDOWN) break;
 
+					// do our custom handling
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y);
 						if (a /* && a->canActivate() */) { // TODO
@@ -366,12 +392,16 @@ extern "C" int main(int argc, char *argv[]) {
 						std::cout << std::endl;
 					}
 					break;
+
 				case SDL_KEYDOWN:
 					if (event.key.type == SDL_KEYDOWN) {
+						// handle debug keys, if they're enabled
 						caosVar v = world.variables["engine_debug_keys"];
 						if (v.hasInt() && v.getInt() == 1) {
 							Uint8 *keystate = SDL_GetKeyState(NULL);
 							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+								MetaRoom *n; // for pageup/pagedown
+
 								switch (event.key.keysym.sym) {
 									case SDLK_INSERT:
 										world.showrooms = !world.showrooms;
@@ -387,10 +417,20 @@ extern "C" int main(int argc, char *argv[]) {
 
 									case SDLK_PAGEUP:
 										// TODO: previous metaroom
+										if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
+											break;
+										n = world.map.getMetaRoom(world.camera.getMetaRoom()->id + 1);
+										if (n)
+											world.camera.goToMetaRoom(n->id);
 										break;
 
 									case SDLK_PAGEDOWN:
 										// TODO: next metaroom
+										if (world.camera.getMetaRoom()->id == 0)
+											break;
+										n = world.map.getMetaRoom(world.camera.getMetaRoom()->id - 1);
+										if (n)
+											world.camera.goToMetaRoom(n->id);
 										break;
 
 									default: break; // to shut up warnings
@@ -398,13 +438,16 @@ extern "C" int main(int argc, char *argv[]) {
 							}
 						}
 						int key = world.backend->translateKey(event.key.keysym.sym);
+						// handle special keys
 						if (key != -1) {
+							// tell the agent with keyboard focus
 							if (world.focusagent) {
 								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
 								if (t)
 									t->handleSpecialKey(key);
 							}
 
+							// notify agents
 							caosVar k;
 							k.setInt(key);
 							for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
@@ -414,7 +457,9 @@ extern "C" int main(int argc, char *argv[]) {
 							}
 						}
 
+						// otherwise, handle a normal keypress if the unicode is in the ascii range
 						if ((event.key.keysym.unicode) && ((event.key.keysym.unicode & 0xFF80) == 0) && (event.key.keysym.unicode >= 32)) {
+							// tell the agent with keyboard focus
 							key = event.key.keysym.unicode & 0x7F;
 							if (world.focusagent) {
 								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
@@ -422,6 +467,7 @@ extern "C" int main(int argc, char *argv[]) {
 									t->handleKey(key);
 							}
 
+							// notify agents
 							caosVar k;
 							k.setInt(key);
 							for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
@@ -430,30 +476,6 @@ extern "C" int main(int argc, char *argv[]) {
 									(*i)->queueScript(79, 0, k); // translated char script
 							}
 						}
-					
-					/*
-					 	MetaRoom *n;
-						switch (event.key.keysym.sym) {
-							case SDLK_PAGEDOWN:
-								if (world.camera.getMetaRoom()->id == 0)
-									break;
-								n = world.map.getMetaRoom(world.camera.getMetaRoom()->id - 1);
-								if (n)
-									world.camera.goToMetaRoom(n->id);
-								break;
-							case SDLK_PAGEUP:
-								if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
-									break;
-								n = world.map.getMetaRoom(world.camera.getMetaRoom()->id + 1);
-								if (n)
-									world.camera.goToMetaRoom(n->id);
-								break;
-							case SDLK_r: // insert in Creatures, but my iBook has no insert key - fuzzie
-								if (!world.focusagent) { showrooms = !showrooms; break; }
-							case SDLK_q:
-								if (!world.focusagent) { done = true; break; }
-						}
-					*/
 					}
 					break;
 				case SDL_QUIT:
@@ -465,9 +487,12 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 
 		if (ticked) {
+		// keyboard-based scrolling
 		static float accelspeed = 8, decelspeed = .5, maxspeed = 64;
 		static float velx = 0;
 		static float vely = 0;
+
+		// check keys
 		Uint8 *keys = SDL_GetKeyState(NULL);
 		if (keys[SDLK_LEFT])
 			velx -= accelspeed;
@@ -486,16 +511,20 @@ extern "C" int main(int argc, char *argv[]) {
 			if (fabs(vely) < 0.1) vely = 0;
 		}
 
+		// enforced maximum speed
 		if (velx >=  maxspeed) velx =  maxspeed;
 		if (velx <= -maxspeed) velx = -maxspeed;
 		if (vely >=  maxspeed) vely =  maxspeed;
 		if (vely <= -maxspeed) vely = -maxspeed;
 
+		// do the actual movement
 		if (velx || vely) {
 			int adjustx = world.camera.getX(), adjusty = world.camera.getY();
 			int adjustbyx = (int)velx, adjustbyy = (int) vely;
 			
-			if ((adjustx + adjustbyx) < (int)world.camera.getMetaRoom()->x())
+			// These checks are handled in Camera::checkBounds() now, but we'll leave them commented
+			// for now, just in case.
+			/*if ((adjustx + adjustbyx) < (int)world.camera.getMetaRoom()->x())
 				adjustbyx = world.camera.getMetaRoom()->x() - adjustx;
 			else if ((adjustx + adjustbyx + world.camera.getWidth()) >
 					(world.camera.getMetaRoom()->x() + world.camera.getMetaRoom()->width()))
@@ -508,12 +537,14 @@ extern "C" int main(int argc, char *argv[]) {
 					(world.camera.getMetaRoom()->y() + world.camera.getMetaRoom()->height()))
 				adjustbyy = world.camera.getMetaRoom()->y() + 
 					world.camera.getMetaRoom()->height() - world.camera.getHeight() - adjusty;
-			
+			*/
+
 			world.camera.moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
 		}
 		} // ticked
 	}
 
+	// TODO: this belongs in the backend
 	SDLNet_Quit();
 	SDL_Quit();
 
