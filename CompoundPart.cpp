@@ -407,7 +407,7 @@ void TextPart::recalculateData() {
 				pageheights.push_back(currenty);
 				pages.push_back(lines.size());
 				currenty = 0;
-			} else currenty += usedheight + linespacing;
+			} else currenty += usedheight + linespacing + 1;
 			currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 			lines.push_back(currentdata);
 			currentdata.reset(startoffset);
@@ -425,7 +425,7 @@ void TextPart::recalculateData() {
 				pageheights.push_back(currenty);
 				pages.push_back(lines.size());
 				currenty = 0;
-			} else currenty += usedheight + linespacing;
+			} else currenty += usedheight + linespacing + 1;
 			lines.push_back(currentdata);
 			currentdata.reset(i);
 		}
@@ -478,7 +478,7 @@ void TextPart::partRender(SDLSurface *renderer, int xoffset, int yoffset, TextEn
 		}
 		if ((caretdata) && (caretdata->caretpos == lines[i].offset + lines[i].text.size()))
 			caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);		
-		currenty += textsprite->height(0) + linespacing;
+		currenty += textsprite->height(0) + linespacing + 1;
 	}
 }
 
