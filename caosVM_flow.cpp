@@ -29,7 +29,7 @@
  DOIF (command) condition (condition)
  %pragma parser new DoifParser()
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
  otherwise continues executing the script.
@@ -49,7 +49,7 @@
  ELSE (command)
  %pragma noparse
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
 */
@@ -58,7 +58,7 @@
  ENDI (command)
  %pragma noparse
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
 */
@@ -67,7 +67,7 @@
  REPS (command) reps (integer)
  %pragma parser new parseREPS()
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  The start of a REPS...REPE loop. The body of the loop will be executed (reps) times.
 */
@@ -76,7 +76,7 @@
  REPE (command)
  %pragma noparse
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  The end of a REPS...REPE loop.
 */
@@ -85,7 +85,7 @@
  LOOP (command)
  %pragma parser new parseLOOP()
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  The start of a LOOP...EVER or LOOP...UNTL loop.
 */
@@ -94,7 +94,7 @@
  EVER (command)
  %pragma noparse
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Jumps back to the matching LOOP, no matter what.
 */
@@ -103,7 +103,7 @@
  UNTL (command) condition (condition)
  %pragma noparse
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Jumps back to the matching LOOP unless the condition evaluates to true.
 */
@@ -113,7 +113,7 @@
  %pragma parser new parseGSUB()
  %pragma retc -1
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Jumps to a subroutine defined by SUBR with label (label).
 */
@@ -122,7 +122,7 @@
  SUBR (command) label (label)
  %pragma parser new parseSUBR()
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Defines the start of a subroute to be called with GSUB, with label (label).
  If the command is encountered during execution, it acts like a STOP.
@@ -132,7 +132,7 @@
  RETN (command)
  %pragma retc -1
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Returns from a subroutine called with GSUB.
 */
@@ -148,7 +148,7 @@ void caosVM::c_RETN() {
  NEXT (command)
  %pragma noparse
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  The end of an ENUM...NEXT loop.
 */
@@ -158,7 +158,7 @@ void caosVM::c_RETN() {
  %status maybe
  %pragma parserclass ENUMhelper
  %pragma retc -1
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Loops through all agents with the given classifier.  0 on any field is a
  wildcard. The loop body is terminated by a NEXT.

@@ -68,7 +68,7 @@ bool agentsTouching(Agent *first, Agent *second) {
 /**
  TOUC (integer) first (agent) second (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Determines whether the two given agents are touching.  Returns 0 (if not) or 1 (if so).
 */
@@ -212,7 +212,7 @@ void caosVM::c_NEW_SIMP() {
 /**
  NEW: SIMP (command) sprite_file (bareword) image_count (integer) first_image (integer) plane (integer) clone (integer)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_NEW_SIMP_c2
 */
 void caosVM::c_NEW_SIMP_c2() {
@@ -279,7 +279,7 @@ void caosVM::c_NEW_VHCL() {
 /**
  TARG (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns TARG, the currently-targeted agent.
 */
@@ -291,7 +291,7 @@ void caosVM::v_TARG() {
 /**
  OWNR (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Returns OWNR, the agent that is running the script.
 */
@@ -315,7 +315,7 @@ void caosVM::v_NULL() {
 /**
  POSE (command) pose (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Sets the displayed sprite of TARG to the frame in the sprite file with the given integer.
 */
@@ -361,7 +361,7 @@ void caosVM::v_ATTR() {
 /**
  TICK (command) tickrate (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Initiates the agent timer-- the Timer script will then be run once every tickrate ticks.
  Setting tickrate to zero will stop the timer.
@@ -406,7 +406,7 @@ void caosVM::c_BHVR() {
 /**
  TARG (command) agent (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Sets TARG (the target agent) to the given agent.
 */
@@ -419,7 +419,7 @@ void caosVM::c_TARG() {
 /**
  FROM (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
@@ -430,7 +430,7 @@ void caosVM::v_FROM() {
 /**
  POSE (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the number of the frame in the TARG part/agent's sprite file that is currently being displayed, or -1 if part# doesn't exist on a compound agent.
 */
@@ -449,7 +449,7 @@ void caosVM::v_POSE() {
 /**
  KILL (command) agent (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Destroys the agent in question. However, you cannot destroy PNTR.
  Remember, use DEAD first for Creatures!
@@ -488,7 +488,7 @@ void caosVM::c_ANIM() {
 /**
  ANIM (command) animstring (string)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_ANIM_c2
 
  Sets the animation string for TARG, in the format '1234'.
@@ -565,7 +565,7 @@ void caosVM::v_ABBA() {
 /**
  BASE (command) index (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Sets the frame in the TARG agent's spritefile that will be used as its base image.
  This is relative to the first image set with one of the NEW: commands.
@@ -620,6 +620,8 @@ void caosVM::v_BHVR() {
 	result.setInt(bvr);
 }
 
+// TODO: CARR in c1 (maybe c2?) checks OWNR, apparently.
+
 /**
  CARR (agent)
  %status maybe
@@ -638,7 +640,7 @@ void caosVM::v_CARR() {
 /**
  FMLY (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the family of the TARG agent.
 */
@@ -651,7 +653,7 @@ void caosVM::v_FMLY() {
 /**
  GNUS (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the genus of the TARG agent.
 */
@@ -664,7 +666,7 @@ void caosVM::v_GNUS() {
 /**
  SPCS (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the species of the TARG agent.
 */
@@ -689,7 +691,7 @@ void caosVM::v_PLNE() {
 /**
  PNTR (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the pointer agent (the Hand).
 */
@@ -715,7 +717,7 @@ unsigned int calculateScriptId(unsigned int message_id) {
 /**
  MESG WRIT (command) agent (agent) message_id (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Sends a message of type message_id to the given agent.  FROM will be set to OWNR unless 
  there is no agent involved in sending the message.
@@ -754,7 +756,7 @@ void caosVM::c_MESG_WRT() {
 /**
  TOTL (integer) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the total number of in-game agents matching the given family/genus/species.
 */
@@ -763,6 +765,8 @@ void caosVM::v_TOTL() {
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
+
+	// TODO: in c1, at least, TOTL allows use of wildcards
 
 	unsigned int x = 0;
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
@@ -866,7 +870,7 @@ class blockUntilOver : public blockCond {
 /**
  OVER (command)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Waits (blocks the TARG agent) until the animation of the TARG agent or PART is over.
 */
@@ -930,7 +934,7 @@ void caosVM::v_PUHL() {
 /**
  POSL (float)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the position of the left side of TARG's bounding box.
 */
@@ -944,7 +948,7 @@ void caosVM::v_POSL() {
 /**
  POST (float)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the position of the top side of TARG's bounding box.
 */
@@ -958,7 +962,7 @@ void caosVM::v_POST() {
 /**
  POSR (float)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the position of the right side of TARG's bounding box.
 */
@@ -972,7 +976,7 @@ void caosVM::v_POSR() {
 /**
  POSB (float)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the position of the bottom side of TARG's bounding box.
 */
@@ -986,7 +990,7 @@ void caosVM::v_POSB() {
 /**
  WDTH (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the TARG agent's width.
 */
@@ -1111,7 +1115,7 @@ void caosVM::c_TRAN() {
 /**
  HGHT (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the TARG agent's height.
 */
@@ -1389,7 +1393,7 @@ void caosVM::c_TINO() {
 /**
  DROP (command)
  %status stub
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Causes the TARG agent to drop what it is carrying in a safe location.
 */
@@ -1397,6 +1401,7 @@ void caosVM::c_DROP() {
 	valid_agent(targ);
 
 	// TODO
+	// TODO: only creatures in c1 (and c2?)
 }
 
 AgentRef findNextAgent(AgentRef previous, unsigned char family, unsigned char genus, unsigned short species, bool forward) {
@@ -1501,7 +1506,7 @@ void caosVM::v_TWIN() {
 /**
  ACTV (variable)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::v_ACTV() {
 	valid_agent(targ);
@@ -1575,7 +1580,7 @@ void caosVM::c_SLIM() {
 /**
  BHVR (command) click (integer) touch (integer)
  %status stub
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_BHVR_c2
 */
 void caosVM::c_BHVR_c2() {

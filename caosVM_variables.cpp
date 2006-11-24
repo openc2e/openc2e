@@ -45,7 +45,7 @@
  VARx (variable)
  %pragma noparse
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
 
  Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
 */
@@ -91,7 +91,7 @@ void caosVM::c_SETS() {
  SETV (command) var (variable) value (decimal)
  %status maybe
  %pragma variants cv c3
- %% Don't enable c2 here; we activate it with horrible hacks later
+ %% Don't enable c1 or c2 here; we activate them with horrible hacks later
 
  Sets the given variable to the given decimal value.
  */
@@ -144,10 +144,11 @@ void caosVM::c_SETA() {
  OBVx (variable)
  %pragma noparse
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
 
- Like OVxx, but restricted to 0-9. Legacy from Creatures 1.
+ Like OVxx, but restricted to 0-2 in C1, or 0-9 in C2. Legacy from Creatures 1.
 */
+// TODO: restrict to 0-2 in C1?
 
 /**
  TYPE (integer) value (anything)
@@ -192,7 +193,7 @@ void caosVM::v_TYPE() {
 /**
  MODV (command) var (variable) mod (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Divides the given variable by the given integer, and returns the remainder (var % mod).
 */
@@ -207,7 +208,7 @@ void caosVM::c_MODV() {
 /**
  ANDV (command) var (variable) and (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
 */
@@ -222,7 +223,7 @@ void caosVM::c_ANDV() {
 /**
  ORRV (command) var (variable) or (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
 */
@@ -234,11 +235,10 @@ void caosVM::c_ORRV() {
 	v->setInt(v->getInt() | orv);
 }
 
-
 /**
  ADDV (command) var (variable) add (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Adds the given integer to the given variable and returns the result.
 */
@@ -257,7 +257,7 @@ void caosVM::c_ADDV() {
 /**
  SUBV (command) var (variable) sub (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Subtracts the given integer from the given variable and returns the result.
 */
@@ -276,7 +276,7 @@ void caosVM::c_SUBV() {
 /**
  NEGV (command) var (variable)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
 */
@@ -294,7 +294,7 @@ void caosVM::c_NEGV() {
 /**
  DIVV (command) var (variable) div (decimal)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  
  Divides the given variable by the given integer and returns the result.
 */
@@ -320,7 +320,7 @@ void caosVM::c_DIVV() {
 /**
  MULV (command) var (variable) mul (decimal)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Multiplies the given variable by the given integer and returns the result.
 */
@@ -1013,7 +1013,7 @@ void caosVM::c_POWV() {
 /**
  RNDV (command) var (variable) value1 (integer) value (integer)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_RNDV() {
 	VM_PARAM_INTEGER(value2)

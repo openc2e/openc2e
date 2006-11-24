@@ -25,7 +25,7 @@ using std::cerr;
 /**
  INST (command)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Forces the following commands to be executed in one tick, rather than scheduling them, until SLOW or the end 
  of the script is encountered.
@@ -91,7 +91,7 @@ class blockUntilTime : public blockCond {
 /**
  WAIT (command) ticks (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Stops the script from running for the given number of ticks.
  */
@@ -108,7 +108,7 @@ void caosVM::c_WAIT() {
  STOP (command)
  %status maybe
  %pragma retc -1
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Aborts the script.
 */
@@ -120,7 +120,7 @@ void caosVM::c_STOP() {
 /**
  SCRX (command) family (integer) genus (integer) species (integer) event (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Deletes the event script in question from the scriptoruium.
 */

@@ -47,7 +47,14 @@ void caosVM::c_SNDE() {
 /**
  SNDE (command) filename (bareword)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
+*/
+
+/**
+ SNDV (command) filename (string)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::c_SNDE
 */
 
 /**
@@ -70,6 +77,12 @@ void caosVM::c_SNDC() {
 		targ->positionAudio(s);
 	}
 }
+
+/**
+ SNDC (command) filename (bareword)
+ %status maybe
+ %pragma variants c1 c2
+*/
 
 /**
  SNDL (command) filename (string)
@@ -95,7 +108,7 @@ void caosVM::c_SNDL() {
 /**
  SNDL (command) filename (bareword)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
 */
 
 /**
@@ -149,7 +162,7 @@ void caosVM::v_RMSC() {
 /**
  FADE (command)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)
@@ -162,6 +175,7 @@ void caosVM::c_FADE() {
 /**
  STPC (command)
  %status maybe
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_STPC() {
 	valid_agent(targ);
