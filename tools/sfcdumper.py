@@ -590,13 +590,24 @@ class Lift(Vehicle):
 	def read(self, f):
 		Vehicle.read(self, f)
 
-		if version == 0:
-			x = f.read(61) # TODO
-		else:
-			x = f.read(65) # TODO
-		print "lift bytes: ",
-		for z in x: print "%02X" % ord(z),
-		print
+#		if version == 0:
+#			x = f.read() # TODO
+		self.numcallbuttons = read32(f)
+		self.curcallbutton = read32(f)
+		self.mysterybytes = f.read(5)
+		assert self.mysterybytes == "\xff\xff\xff\xff\x00"
+		self.callbuttonys = []
+		for i in range(8):
+			self.callbuttonys.append(read32(f))
+			assert read16(f) == 0
+		print "call buttons defined: " + str(self.numcallbuttons)
+		print "current floor: " + str(self.curcallbutton)
+		print "call button y-vals: " + str(self.callbuttonys)
+		if version == 1:
+			x = f.read(4) # TODO
+			print "lift bytes: ",
+			for z in x: print "%02X" % ord(z),
+			print
 
 class CallButton(SimpleObject):
 	def read(self, f):
