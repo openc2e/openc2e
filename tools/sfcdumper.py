@@ -559,9 +559,11 @@ class Vehicle(CompoundObject):
 	def read(self, f):
 		CompoundObject.read(self, f)
 
-		# TODO: decode this, which is definitely not zero in C1's eden, even
-		x = f.read(9)
-		#assert x == "\0" * 9
+		# TODO: correct?
+		self.xvec = reads32(f)
+		self.yvec = reads32(f)
+		self.bump = read8(f)
+		print "xvec: " + str(self.xvec) + ", yvec: " + str(self.yvec) + ", bump flags: " + str(self.bump)
 
 		a = read16(f)
 		x = read16(f)
