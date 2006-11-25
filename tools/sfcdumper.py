@@ -421,12 +421,18 @@ class Object:
 		assert self.tickreset >= self.tickstate
 		print "* tick time: " + str(self.tickreset) + ", state: " + str(self.tickstate)
 
+		x = read16(f)
+		assert x == 0
+		self.currentsound = f.read(4)
+		if self.currentsound[0] != chr(0):
+			print "current sound: " + self.currentsound
+
 		if version == 0:
 			# TODO: decode this
-			x = f.read(6)
-			print "unknown bytes:",
-			for z in x: print "%02X" % ord(z),
-			print
+			#x = f.read(6)
+			#print "unknown bytes:",
+			#for z in x: print "%02X" % ord(z),
+			#print
 
 			# OBVx variables
 			self.variables = []
@@ -434,15 +440,9 @@ class Object:
 				self.variables.append(read32(f))
 		else:
 			# TODO
-			x = read16(f)
-			assert x == 0
 			#x = read16(f)
-			#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
-			#print "* third misc data: " + str(x)
-			#x = read16(f)
-			#assert x == 0 not null, as 'Bees', unid: 2604336 demonstrates
-			x = read32(f)
-			print "* fourth misc data: " + str(x)
+			#assert x == 0
+			#self.currentsound = f.read(4)
 
 			# OVxx variables
 			self.variables = []
@@ -588,8 +588,9 @@ class Vehicle(CompoundObject):
 	def read(self, f):
 		CompoundObject.read(self, f)
 
+		# TODO: decode this, which is definitely not zero in C1's eden, even
 		x = f.read(9)
-		assert x == "\0" * 9
+		#assert x == "\0" * 9
 
 		a = read16(f)
 		x = read16(f)
