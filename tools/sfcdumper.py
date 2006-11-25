@@ -561,6 +561,7 @@ class CompoundObject(Object):
 			#hotspotinfo['flag'] = read32(f)
 			#hotspotinfo['message'] = read32(f)
 			self.hotspots.append(hotspotinfo)
+		#print self.hotspots
 
 		# TODO
 		# FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
@@ -569,11 +570,19 @@ class CompoundObject(Object):
 		# 01 01 01 02 02 02
 		if version == 0:
 			x = f.read(6 * 4)
+			print "compound bytes: ",
+			for z in x: print "%02X" % ord(z),
+			print
 		else:
-			x = f.read(24 + 12 + 12 + 6)
-		print "compound bytes: ",
-		for z in x: print "%02X" % ord(z),
-		print
+			for i in range(6):
+				self.hotspots[i]['function'] = read32(f)
+			for i in range(6):
+				self.hotspots[i]['message'] = read16(f)
+				self.hotspots[i]['zero'] = read16(f)
+				assert self.hotspots[i]['zero'] == 0
+			for i in range(6):
+				self.hotspots[i]['mask'] = read8(f)
+		print self.hotspots
 
 class Vehicle(CompoundObject):
 	def read(self, f):
