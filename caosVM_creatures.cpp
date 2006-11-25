@@ -95,7 +95,7 @@ void caosVM::c_STIM_WRIT() {
  STIM SHOU (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %pragma implementation caosVM::c_STIM_SHOU_c2
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_STIM_SHOU_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -118,7 +118,7 @@ void caosVM::c_STIM_SHOU_c2() {
  STIM SIGN (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %pragma implementation caosVM::c_STIM_SIGN_c2
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_STIM_SIGN_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -141,7 +141,7 @@ void caosVM::c_STIM_SIGN_c2() {
  STIM TACT (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %pragma implementation caosVM::c_STIM_TACT_c2
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_STIM_TACT_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -164,7 +164,7 @@ void caosVM::c_STIM_TACT_c2() {
  STIM WRIT (command) creature (agent) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %pragma implementation caosVM::c_STIM_WRIT_c2
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_STIM_WRIT_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -413,6 +413,7 @@ void caosVM::c_DEAD() {
 /**
  DEAD (integer)
  %status maybe
+ %pragma variants c1 c2 cv c3
 
  Determines whether the target Creature is dead (0 or 1).
 */
@@ -437,6 +438,7 @@ void caosVM::c_NORN() {
 /**
  NORN (agent)
  %status maybe
+ %pragma variants c1 c2 cv c3
 
  Returns the target Creature.
 */
@@ -574,6 +576,7 @@ void caosVM::v_CHEM() {
 /**
  ASLP (command) asleep (integer)
  %status maybe
+ %pragma variants c1 c2 cv c3
 
  If asleep is 1, makes the target creature sleep. If asleep is 0, makes the target creature wake.
 */
@@ -588,6 +591,7 @@ void caosVM::c_ASLP() {
 /**
  ASLP (integer)
  %status maybe
+ %pragma variants c1 c2 cv c3
 
  Determines whether the target Creature is asleep.
 */
@@ -600,6 +604,7 @@ void caosVM::v_ASLP() {
 /**
  APPR (command)
  %status stub
+ %pragma variants c1 c2 cv c3
 
  Makes the target Creature approach the IT agent (or if none, an agent of that category using CAs), 
  blocking until it makes it there or gives up.
@@ -798,6 +803,7 @@ void caosVM::c_BORN() {
 /**
  CAGE (integer)
  %status maybe
+ %pragma variants c1 c2 cv c3
 
  Returns the integer value of the target Creature's current life stage.
 */
@@ -822,6 +828,7 @@ void caosVM::v_BYIT() {
  _IT_ (agent)
  %status maybe
  %pragma implementation caosVM::v_IT
+ %pragma variants c1 c2 cv c3
 
  Returns the agent that the OWNR creature was focused on when the 
  current script began running.
@@ -891,6 +898,7 @@ void caosVM::c_NEW_CREA() {
 /**
  LTCY (command) action (integer) min (integer) max (integer)
  %status stub
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_LTCY() {
 	VM_PARAM_INTEGER(max); caos_assert(max >= 0 && max <= 255);
@@ -917,6 +925,7 @@ void caosVM::c_MATE() {
  DRV! (integer)
  %status stub
  %pragma implementation caosVM::v_DRV
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::v_DRV() {
 	Creature *c = getTargCreature();
@@ -1093,6 +1102,7 @@ void caosVM::v_ATTN() {
 /**
  TOUC (command)
  %status stub
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_TOUC() {
 	Creature *c = getTargCreature();
@@ -1117,6 +1127,7 @@ void caosVM::c_FORF() {
 /**
  WALK (command)
  %status stub
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_WALK() {
 	Creature *c = getTargCreature();
@@ -1127,6 +1138,7 @@ void caosVM::c_WALK() {
 /**
  DONE (command)
  %status stub
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_DONE() {
 	Creature *c = getTargCreature();
@@ -1137,6 +1149,7 @@ void caosVM::c_DONE() {
 /**
  SAYN (command)
  %status stub
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_SAYN() {
 	Creature *c = getTargCreature();
@@ -1147,7 +1160,7 @@ void caosVM::c_SAYN() {
 /**
  IMPT (command) nudge (integer)
  %status stub
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_IMPT() {
 	VM_PARAM_INTEGER(nudge)
@@ -1159,7 +1172,7 @@ void caosVM::c_IMPT() {
 /**
  AIM: (command) actionno (integer)
  %status stub
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_AIM() {
 	VM_PARAM_INTEGER(actionno)
