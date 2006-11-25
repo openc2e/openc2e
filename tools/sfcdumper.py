@@ -427,28 +427,15 @@ class Object:
 		if self.currentsound[0] != chr(0):
 			print "current sound: " + self.currentsound
 
-		if version == 0:
-			# TODO: decode this
-			#x = f.read(6)
-			#print "unknown bytes:",
-			#for z in x: print "%02X" % ord(z),
-			#print
+		if version == 0: numvariables = 3
+		else: numvariables = 100
 
-			# OBVx variables
-			self.variables = []
-			for i in xrange(3):
-				self.variables.append(read32(f))
-		else:
-			# TODO
-			#x = read16(f)
-			#assert x == 0
-			#self.currentsound = f.read(4)
-
-			# OVxx variables
-			self.variables = []
-			for i in xrange(100):
-				self.variables.append(read32(f))
-	
+		# OBVx variables
+		self.variables = []
+		for i in xrange(numvariables):
+			self.variables.append(read32(f))
+		
+		if version == 1:
 			# misc physics-ish data
 			self.size = read8(f)
 			self.range = read32(f)
@@ -549,33 +536,17 @@ class CompoundObject(Object):
 
 		self.hotspots = []
 		for i in range(6):
-			# TODO: this is probably completely wrong!
-			# initial hotspot value:
-			# FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00
 			hotspotinfo = {}
-			hotspotinfo['left'] = read32(f)
-			hotspotinfo['top'] = read32(f)
-			hotspotinfo['right'] = read32(f)
-			hotspotinfo['bottom'] = read32(f)
-			#hotspotinfo['function'] = read32(f)
-			#hotspotinfo['flag'] = read32(f)
-			#hotspotinfo['message'] = read32(f)
+			hotspotinfo['left'] = reads32(f)
+			hotspotinfo['top'] = reads32(f)
+			hotspotinfo['right'] = reads32(f)
+			hotspotinfo['bottom'] = reads32(f)
 			self.hotspots.append(hotspotinfo)
-		#print self.hotspots
 
-		# TODO
-		# FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-		# 00 00 00 00 01 00 00 00 02 00 00 00
-		# 00 00 00 00 01 00 00 00 02 00 00 00
-		# 01 01 01 02 02 02
-		if version == 0:
-			x = f.read(6 * 4)
-			print "compound bytes: ",
-			for z in x: print "%02X" % ord(z),
-			print
-		else:
-			for i in range(6):
-				self.hotspots[i]['function'] = read32(f)
+		for i in range(6):
+			self.hotspots[i]['function'] = reads32(f)
+			
+		if version == 1:
 			for i in range(6):
 				self.hotspots[i]['message'] = read16(f)
 				self.hotspots[i]['zero'] = read16(f)
