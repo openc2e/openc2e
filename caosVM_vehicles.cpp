@@ -56,6 +56,7 @@ void caosVM::c_CABW() {
 /**
  SPAS (command) vehicle (agent) passenger (agent)
  %status stub
+ %pragma variants c1 c2 cv c3
 
  make specified vehicle agent pick up specified passenger
 */
@@ -63,6 +64,8 @@ void caosVM::c_SPAS() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_AGENT(passenger)
 	VM_PARAM_AGENT(vehicle)
+
+	// TODO: ensure passenger is a creature for c1/c2?
 
 	// TODO
 }
@@ -92,7 +95,7 @@ void caosVM::c_GPAS() {
 /**
  GPAS (command)
  %status stub
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_GPAS_c2
 */
 void caosVM::c_GPAS_c2() {
@@ -126,7 +129,7 @@ void caosVM::c_DPAS() {
 /**
  DPAS (command)
  %status stub
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_DPAS_c2
 */
 void caosVM::c_DPAS_c2() {

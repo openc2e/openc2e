@@ -32,6 +32,51 @@ Creature *caosVM::getTargCreature() {
 }
 
 /**
+ STM# SHOU (command) stimulusno (integer)
+ %status stub
+ %pragma variants c1 c2
+*/
+void caosVM::c_STM_SHOU() {
+	VM_PARAM_INTEGER(stimulusno)
+
+	// TODO
+}
+
+/**
+ STM# SIGN (command) stimulusno (integer)
+ %status stub
+ %pragma variants c1 c2
+*/
+void caosVM::c_STM_SIGN() {
+	VM_PARAM_INTEGER(stimulusno)
+
+	// TODO
+}
+
+/**
+ STM# TACT (command) stimulusno (integer)
+ %status stub
+ %pragma variants c1 c2
+*/
+void caosVM::c_STM_TACT() {
+	VM_PARAM_INTEGER(stimulusno)
+
+	// TODO
+}
+
+/**
+ STM# WRIT (command) object (agent) stimulusno (integer)
+ %status stub
+ %pragma variants c1 c2
+*/
+void caosVM::c_STM_WRIT() {
+	VM_PARAM_INTEGER(stimulusno)
+	VM_PARAM_VALIDAGENT(object)
+
+	// TODO
+}
+
+/**
  STIM SHOU (command) stimulus (integer) strength (float)
  %status stub
 

@@ -559,6 +559,10 @@ public:
 	void c_GRPL();
 
 	// creatures
+	void c_STM_SHOU();
+	void c_STM_SIGN();
+	void c_STM_TACT();
+	void c_STM_WRIT();
 	void c_STIM_SHOU();
 	void c_STIM_SIGN();
 	void c_STIM_TACT();
