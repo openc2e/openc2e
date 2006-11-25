@@ -588,9 +588,9 @@ class Vehicle(CompoundObject):
 	def read(self, f):
 		CompoundObject.read(self, f)
 
-		x = f.read(9) # all nulls, TODO: assert
+		x = f.read(9)
+		assert x == "\0" * 9
 
-		# TODO: a mystery!
 		a = read16(f)
 		x = read16(f)
 		if version == 0:
@@ -600,7 +600,7 @@ class Vehicle(CompoundObject):
 		b = read16(f)
 		x = read8(f)
 		assert x == 0
-		print "mystery numbers: " + str(a) + ", " + str(b)
+		print "vehicle coords: " + str(a) + ", " + str(b)
 
 		# TODO: this could all be nonsense, really
 		self.cabinleft = read32(f)
