@@ -395,22 +395,17 @@ class Object:
 		two = read32(f)
 		three = read32(f)
 		four = read32(f)
-		
-		if version == 0:
-			zarros = read16(f)
-			assert zarros == 0, "zarros: " + str(zarros)
 
-			read8(f) # TODO: what's this? bhvr click state? if so, might as well use c2 code
-			print "coords? " + str(one) + ", " + str(two) + ", " + str(three) + ", " + str(four)
+		zarros = read16(f)
+		if version == 0:
+			assert zarros == 0, "zarros: " + str(zarros)
 		else:
-			zarros = read16(f)
 			# drat, PointerTool in eden has this as 1803
-			#assert zarros == 0, "zarros: " + str(zarros)
 			if zarros != 0:
 				print "zarros: " + str(zarros)
-		
-			self.bhvrclickstate = read8(f) # TODO: verify
-			print "coords? " + str(one) + ", " + str(two) + ", " + str(three) + ", " + str(four) + ", bhvr click state: " + str(self.bhvrclickstate)
+
+		self.actv = read8(f)
+		print "coords? " + str(one) + ", " + str(two) + ", " + str(three) + ", " + str(four) + ", actv: " + str(self.actv)
 
 		# our sprite
 		self.sprite = slurpMFC(f, CGallery)
