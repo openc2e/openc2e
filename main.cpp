@@ -281,7 +281,10 @@ extern "C" int main(int argc, char *argv[]) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_VIDEORESIZE:
+					// notify the backend
 					world.backend->resizeNotify(event.resize.w, event.resize.h);
+
+					// notify agents
 					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 						if (!*i) continue;
 						(*i)->queueScript(123, 0); // window resized script
@@ -316,6 +319,7 @@ extern "C" int main(int argc, char *argv[]) {
 						if (!*i) continue;
 						if ((event.type == SDL_MOUSEBUTTONUP && (*i)->imsk_mouse_up) ||
 							(event.type == SDL_MOUSEBUTTONDOWN && (*i)->imsk_mouse_down)) {
+							// set the button value as necessary
 							caosVar button;
 							switch (event.button.button) {
 								// TODO: the values here make fuzzie suspicious that c2e combines these events
@@ -324,7 +328,8 @@ extern "C" int main(int argc, char *argv[]) {
 								case SDL_BUTTON_MIDDLE: button.setInt(4); break;
 							}
 
-							if (button.hasInt()) {
+							// if it was a mouse button we're interested in, then fire the relevant raw event
+							if (button.getInt() != 0) {
 								if (event.type == SDL_MOUSEBUTTONUP)
 									(*i)->queueScript(77, 0, button); // Raw Mouse Up
 								else
@@ -334,6 +339,7 @@ extern "C" int main(int argc, char *argv[]) {
 						if ((event.type == SDL_MOUSEBUTTONDOWN &&
 							(event.button.button == SDL_BUTTON_WHEELUP || event.button.button == SDL_BUTTON_WHEELDOWN) &&
 							(*i)->imsk_mouse_wheel)) {
+							// fire the mouse wheel event with the relevant delta value
 							caosVar delta;
 							if (event.button.button == SDL_BUTTON_WHEELDOWN)
 								delta.setInt(-120);
@@ -350,7 +356,10 @@ extern "C" int main(int argc, char *argv[]) {
 					if (event.button.button == SDL_BUTTON_LEFT) {
 						CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y);
 						if (a /* && a->canActivate() */) { // TODO
-							if (!a->getParent()->paused) a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
+							// if the agent isn't paused, tell it to handle a click
+							if (!a->getParent()->paused)
+								a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
+
 							// TODO: not sure how to handle the following properly, needs research..
 							world.hand()->firePointerScript(101, a->getParent()); // Pointer Activate 1
 						} else
