@@ -47,4 +47,10 @@ sprImage::~sprImage() {
 	delete[] offsets;
 }
 
+bool sprImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+	unsigned int offset = (y * widths[frame]) + x;
+	unsigned char *buffer = (unsigned char *)buffers[frame];
+	return (buffer[offset] == 0);
+}
+
 /* vim: set noet: */

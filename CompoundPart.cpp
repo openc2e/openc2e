@@ -86,7 +86,7 @@ void SpritePart::setBase(unsigned int b) {
 }
 
 bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
-	return ((duppableImage *)getSprite())->transparentAt(getCurrentSprite(), x, y);
+	return getSprite()->transparentAt(getCurrentSprite(), x, y);
 }
 
 void SpritePart::handleClick(float clickx, float clicky) {
@@ -156,6 +156,7 @@ void CompoundPart::addZOrder() {
 }
 
 void SpritePart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
+	assert(dynamic_cast<duppableImage *>(origsprite));
 	if (origsprite != sprite) delete sprite;
 	s16Image *newsprite = new s16Image();
 	sprite = newsprite;
@@ -229,6 +230,7 @@ void TextPart::addTint(std::string tintinfo) {
 	t.offset = text.size();
 
 	if (!(r == g == b == rot == swap == 128)) {
+		assert(dynamic_cast<duppableImage *>(textsprite));
 		s16Image *tintedsprite = new s16Image();
 		((duppableImage *)textsprite)->duplicateTo(tintedsprite);
 		tintedsprite->tint(r, g, b, rot, swap);

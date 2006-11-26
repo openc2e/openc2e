@@ -36,6 +36,7 @@ public:
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &s);
 	virtual std::string serializedName() { return name + ".blk"; }
+	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y) { return false; }
 
 	friend class fileSwapper;
 };

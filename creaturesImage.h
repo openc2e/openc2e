@@ -53,6 +53,7 @@ public:
 	void delRef() { refcount--; }
 	unsigned int refCount() { return refcount; }
 	virtual std::string serializedName() { return name; }
+	virtual bool transparentAt(unsigned int frame, unsigned int x, unsigned int y) = 0;
 	
 	friend class fileSwapper;
 	friend class c16Image; // so duplicateTo can create a s16Image as required
