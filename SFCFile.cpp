@@ -498,13 +498,8 @@ void SFCObject::read() {
 	// discard unknown bytes
 	read16();
 
-	// read BHVR click state
-	if (parent->version() == 1)
-		bhvrclickstate = read8();
-
-	// unknown byte (might be BHVR click state)
-	if (parent->version() == 0)
-		read8();
+	// read ACTV
+	actv = read8();
 
 	// read sprite
 	sprite = (CGallery *)slurpMFC(TYPE_CGALLERY);
@@ -709,20 +704,25 @@ void SFCScript::read(SFCFile *f) {
 // ------------------------------------------------------------------
 
 void SFCFile::copyToWorld() {
+	// add the map data
 	mapdata->copyToWorld();
 
-	for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
-		(*i)->copyToWorld();
-	}
-	
-	for (std::vector<SFCScenery *>::iterator i = scenery.begin(); i != scenery.end(); i++) {
-		(*i)->copyToWorld();
-	}
-
+	// install scripts
 	for (std::vector<SFCScript>::iterator i = scripts.begin(); i != scripts.end(); i++) {
 		i->install();
 	}
 	
+	// create normal objects
+	for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
+		(*i)->copyToWorld();
+	}
+
+	// create scenery
+	for (std::vector<SFCScenery *>::iterator i = scenery.begin(); i != scenery.end(); i++) {
+		(*i)->copyToWorld();
+	}
+
+	// move the camera to the correct position
 	world.camera.moveTo(scrollx, scrolly, jump);
 }
 
@@ -824,8 +824,10 @@ void SFCCompoundObject::copyToWorld() {
 	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
 	a->setAttributes(attr);
 	
-	// TODO: bhvr click state
-	
+	a->actv.setInt(actv);
+	// TODO: this is to activate mover scripts in c1, does it apply to c2 too? is it correct at all?
+	if ((parent->version() == 0) && actv) a->queueScript(actv);
+
 	// ticking
 	a->tickssincelasttimer = tickstate;
 	a->timerrate = tickreset;
@@ -878,7 +880,9 @@ void SFCSimpleObject::copyToWorld() {
 	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
 	a->setAttributes(attr);
 	
-	// TODO: bhvr click state
+	a->actv.setInt(actv);
+	// TODO: this is to activate mover scripts in c1, does it apply to c2 too? is it correct at all?
+	if ((parent->version() == 0) && actv) a->queueScript(actv);
 	
 	// ticking
 	a->tickssincelasttimer = tickstate;

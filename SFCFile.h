@@ -197,7 +197,7 @@ public:
 	uint32 unid; // needed?
 	uint16 attr;
 	uint32 left, top, right, bottom; // what is this?
-	uint8 bhvrclickstate;
+	uint8 actv;
 
 	std::string currentsound;
 
