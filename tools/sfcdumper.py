@@ -565,16 +565,19 @@ class Vehicle(CompoundObject):
 		self.bump = read8(f)
 		print "xvec: " + str(self.xvec) + ", yvec: " + str(self.yvec) + ", bump flags: " + str(self.bump)
 
-		a = read16(f)
-		x = read16(f)
+		self.coordx = read16(f)
 		if version == 0:
-			pass # TODO
+			x = f.read(2)
+			print "vehicl bytes:",
+			for z in x: print "%02X" % ord(z),
+			print
 		else:
+			x = read16(f)
 			assert x == 0
-		b = read16(f)
+		self.coordy = read16(f)
 		x = read8(f)
 		assert x == 0
-		print "vehicle coords: " + str(a) + ", " + str(b)
+		print "vehicle coords: " + str(self.coordx) + ", " + str(self.coordy)
 
 		# TODO: this could all be nonsense, really
 		self.cabinleft = read32(f)
