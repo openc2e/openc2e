@@ -299,19 +299,14 @@ void World::drawWorld(Camera *cam, SDLSurface *surface) {
 			// figure out which block number to use
 			unsigned int whereweare = j * (m->fullheight() / sprheight) + i;
 			
-			// make one pass for non-wraparound rooms, or three passes for wraparound ones
+			// make one pass for non-wraparound rooms, or two passes for wraparound ones
 			// TODO: implement this in a more sensible way, or at least optimise it
-			for (unsigned int z = 0; z < (m->wraparound() ? 3 : 1); z++) {
+			for (unsigned int z = 0; z < (m->wraparound() ? 2 : 1); z++) {
 				int destx = (j * sprwidth) - adjustx + m->x();
 				int desty = (i * sprheight) - adjusty + m->y();
 
-				if (z == 1) {
-					// try again, to the *right* of the normal area
-					destx += m->width();
-				} else if (z == 2) {
-					// try again, to the *left* of the normal room
-					destx -= m->width();
-				}
+				// if we're on the second pass, render to the *right* of the normal area
+				if (z == 1) destx += m->width();
 
 				// if the block's on screen, render it.
 				if ((destx >= -sprwidth) && (desty >= -sprheight) &&
@@ -325,7 +320,7 @@ void World::drawWorld(Camera *cam, SDLSurface *surface) {
 	// render all the agents
 	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
 		if ((*i)->showOnRemoteCameras() || cam == &camera) {
-			// three-pass for wraparound rooms, again
+			// three-pass for wraparound rooms, the third since agents often straddle the boundary
 			// TODO: same as above with background rendering
 			for (unsigned int z = 0; z < (m->wraparound() ? 3 : 1); z++) {
 				int newx = -adjustx, newy = -adjusty;
