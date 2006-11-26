@@ -25,15 +25,23 @@
 
 class Vehicle : public CompoundAgent {
 protected:
+	friend class SFCVehicle;
+
 	int cabinleft, cabintop, cabinright, cabinbottom;
 	unsigned int capacity;
+	unsigned int bump;
 
 public:
 	Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 
+	caosVar xvec, yvec;
+
 	void setCabinRect(int l, int t, int r, int b) { cabinleft = l; cabintop = t; cabinright = r; cabinbottom = b; }
 	void setCapacity(unsigned int c) { capacity = c; }
+	unsigned int getBump() { return bump; }
+
+	virtual void tick();
 };
 
 #endif

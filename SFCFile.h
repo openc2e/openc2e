@@ -199,6 +199,8 @@ public:
 	uint32 left, top, right, bottom; // what is this?
 	uint8 bhvrclickstate;
 
+	std::string currentsound;
+
 	CGallery *sprite;
 
 	uint32 tickreset, tickstate;
@@ -215,14 +217,23 @@ public:
 	virtual void copyToWorld() = 0;
 };
 
+struct SFCHotspot {
+	int left, top, right, bottom;
+	uint32 function;
+	uint16 message;
+	uint8 mask;
+};
+
 class SFCCompoundObject : public SFCObject {
+protected:
+	class CompoundAgent *ourAgent;
+
 public:
 	std::vector<SFCEntity *> parts;
-	
-	// TODO: hotspots
-	// TODO: misc data
 
-	SFCCompoundObject(SFCFile *p) : SFCObject(p) { }
+	SFCHotspot hotspots[6];
+
+	SFCCompoundObject(SFCFile *p) : SFCObject(p) { ourAgent = 0; }
 	void read();
 	void copyToWorld();
 };
@@ -240,11 +251,14 @@ public:
 class SFCVehicle : public SFCCompoundObject {
 public:
 	uint32 cabinleft, cabintop, cabinright, cabinbottom;
+	int xvec, yvec;
+	uint8 bump;
 
 	// TODO: misc data
 
 	SFCVehicle(SFCFile *p) : SFCCompoundObject(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCLift : public SFCVehicle {

@@ -191,4 +191,43 @@ void caosVM::c_RPAS() {
 	// TODO
 }
 
+/**
+ XVEC (variable)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::v_XVEC() {
+	valid_agent(targ);
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	caos_assert(v);
+	
+	vm->valueStack.push_back(&v->xvec);
+}
+
+/**
+ YVEC (variable)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::v_YVEC() {
+	valid_agent(targ);
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	caos_assert(v);
+	
+	vm->valueStack.push_back(&v->yvec);
+}
+
+/**
+ BUMP (integer)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::v_BUMP() {
+	valid_agent(targ);
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	caos_assert(v);
+
+	result.setInt(v->getBump());
+}
+
 /* vim: set noet: */

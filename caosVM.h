@@ -734,6 +734,9 @@ public:
 	void v_RPAS();
 	void c_CABV();
 	void v_CABV();
+	void v_XVEC();
+	void v_YVEC();
+	void v_BUMP();
 	
 	// ports
 	void c_PRT_BANG();

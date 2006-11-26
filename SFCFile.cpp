@@ -516,7 +516,11 @@ void SFCObject::read() {
 
 	// discard unknown bytes
 	sfccheck(read16() == 0);
-	read32();
+
+	// read currently-looping sound, if any
+	currentsound = readBytes(4);
+	if (currentsound[0] == 0)
+		currentsound.clear();
 
 	// read object variables
 	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
@@ -575,11 +579,29 @@ void SFCCompoundObject::read() {
 		parts.push_back(e);
 	}
 
-	// discard hotspot data for now
-	if (parent->version() == 0)
-		readBytes(120);
-	else
-		readBytes(150);
+	// read hotspot coordinates
+	for (unsigned int i = 0; i < 6; i++) {
+		hotspots[i].left = reads32();
+		hotspots[i].top = reads32();
+		hotspots[i].right = reads32();
+		hotspots[i].bottom = reads32();
+	}
+	
+	// read hotspot data
+	for (unsigned int i = 0; i < 6; i++) {
+		hotspots[i].function = read32();
+	}
+
+	if (parent->version() == 1) {
+		// read C2-specific hotspot data
+		for (unsigned int i = 0; i < 6; i++) {
+			hotspots[i].message = read16();
+			sfccheck(read16() == 0);
+		}
+		for (unsigned int i = 0; i < 6; i++) {
+			hotspots[i].mask = read8();
+		}
+	}
 }
 
 void SFCBlackboard::read() {
@@ -614,8 +636,11 @@ void SFCBlackboard::read() {
 void SFCVehicle::read() {
 	SFCCompoundObject::read();
 
+	xvec = reads32();
+	yvec = reads32();
+	bump = read8();
+	
 	// discard unknown bytes
-	readBytes(9);
 	read16();
 	unsigned short x = read16();
 	if (parent->version() == 1)
@@ -785,8 +810,12 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 void SFCCompoundObject::copyToWorld() {
 	sfccheck(parts.size() > 0);
 
-	// construct our equivalent object
-	CompoundAgent *a = new CompoundAgent(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	// construct our equivalent object, if necessary
+	if (!ourAgent)
+		ourAgent = new CompoundAgent(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+
+	// initialise the agent, move it into position
+	CompoundAgent *a = ourAgent;
 	a->finishInit();
 	a->moveTo(parts[0]->x, parts[0]->y);
 
@@ -876,10 +905,27 @@ void SFCSimpleObject::copyToWorld() {
 	
 	// TODO: bhvr
 	// TODO: pickup handles/points
+	// TODO: currentsound
 }
 
 void SFCPointerTool::copyToWorld() {
 	// don't copy the cursor, for now at least :-)
+}
+
+#include "Vehicle.h"
+
+void SFCVehicle::copyToWorld() {
+	Vehicle *a = new Vehicle(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	ourAgent = a;
+	SFCCompoundObject::copyToWorld();
+
+	// set cabin rectangle
+	a->setCabinRect(cabinleft, cabintop, cabinright, cabinbottom);
+
+	// set bump, xvec and yvec
+	a->bump = bump;
+	a->xvec.setInt(xvec);
+	a->yvec.setInt(yvec);
 }
 
 #include <boost/format.hpp>

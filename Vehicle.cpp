@@ -23,11 +23,21 @@ Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, 
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
 		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
 	capacity = 0;
+	bump = 0;
 
 	cabinleft = x;
 	cabinright = x + getWidth();
 	cabintop = y;
 	cabinbottom = y + getHeight();
+}
+
+void Vehicle::tick() {
+	CompoundAgent::tick();
+	if (paused) return;
+
+	// move by xvec/yvec!
+	x += xvec.getInt() / 256.0;
+	y += yvec.getInt() / 256.0;
 }
 
 /* vim: set noet: */
