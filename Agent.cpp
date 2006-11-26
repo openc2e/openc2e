@@ -45,7 +45,13 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	range = 500;
 	sufferphysics = false; falling = true;
 	x = 0.0f; y = 0.0f;
-	clac[0] = 1; // activate 1
+
+	// TODO: is this the correct default?
+	clac[0] = 0; // message# for activate 1
+	if (world.gametype == "c1" || world.gametype == "c2") {
+		// TODO: is this the correct default? (this is equivalent to bhvr click == 0)
+		clac[0] = -1; clac[1] = -1; clac[2] = -1;
+	}
 	clik = -1;
 	
 	dying = false;
@@ -248,10 +254,28 @@ bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar
 }
 
 void Agent::handleClick(float clickx, float clicky) {
+	if (world.gametype == "c1" || world.gametype == "c2") {
+		int action = -1;
+
+		// look up the relevant action for our ACTV state from the clac table
+		if ((unsigned int)actv.getInt() < 3)
+			action = clac[actv.getInt()];
+
+		if (action != -1) {
+			queueScript(calculateScriptId(action), (Agent *)world.hand());
+			// TODO: not sure if this is the right place to do this.
+			// c1 docs say it's done in 'HandleActivate', which doesn't
+			// sound like here or queueScript.
+			actv.setInt(calculateScriptId(action));
+		}
+
+		return;
+	}
+
 	if (clik != -1) {
 		// TODO: handle CLIK
 	} else if (clac[0] != -1) {
-		queueScript(clac[0], (Agent *)world.hand());
+		queueScript(calculateScriptId(clac[0]), (Agent *)world.hand());
 	}
 }
 

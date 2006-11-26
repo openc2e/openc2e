@@ -435,8 +435,10 @@ void SFCEntity::read() {
 	// read part zorder
 	partzorder = read32();
 
-	// TODO: read over unknown click bhvr bytes
-	readBytes(3);
+	// read bhvrclick
+	bhvrclick[0] = (signed char)read8();
+	bhvrclick[1] = (signed char)read8();
+	bhvrclick[2] = (signed char)read8();
 
 	// read BHVR touch
 	bhvrtouch = read8();
@@ -883,7 +885,12 @@ void SFCSimpleObject::copyToWorld() {
 	a->actv.setInt(actv);
 	// TODO: this is to activate mover scripts in c1, does it apply to c2 too? is it correct at all?
 	if ((parent->version() == 0) && actv) a->queueScript(actv);
-	
+
+	// copy bhvrclick data
+	a->clac[0] = entity->bhvrclick[0];
+	a->clac[1] = entity->bhvrclick[1];
+	a->clac[2] = entity->bhvrclick[2];
+
 	// ticking
 	a->tickssincelasttimer = tickstate;
 	a->timerrate = tickreset;

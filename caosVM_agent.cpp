@@ -25,6 +25,7 @@
 #include "World.h"
 #include "creaturesImage.h"
 #include <iostream>
+#include <boost/format.hpp>
 #include "AgentHelpers.h"
 
 using std::cerr;
@@ -1588,6 +1589,24 @@ void caosVM::c_BHVR_c2() {
 	VM_PARAM_INTEGER(click)
 
 	valid_agent(targ);
+
+	// see Agent::handleClick for details of what these values mean
+	switch (click) {
+		// clicks have no effect
+		case 0: targ->clac[0] = -1; targ->clac[1] = -1; targ->clac[2] = -1; break;
+		// monostable
+		case 1: targ->clac[0] = 0; targ->clac[1] = -1; targ->clac[2] = -1; break;
+		// retriggerable monostable
+		case 2: targ->clac[0] = 0; targ->clac[1] = 0; targ->clac[2] = -1; break;
+		// toggle
+		case 3: targ->clac[0] = 0; targ->clac[1] = 2; targ->clac[2] = -1; break;
+		// cycle
+		case 4: targ->clac[0] = 0; targ->clac[1] = 1; targ->clac[2] = 2; break;
+		default:
+			// C2, at least, seems to produce random garbage (going off the end of a
+			// lookup table?) in this situation .. let's not
+			throw creaturesException(boost::str(boost::format("silly BHVR click value: %d") % click));
+	}
 
 	// TODO
 }

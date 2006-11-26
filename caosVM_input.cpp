@@ -32,13 +32,13 @@ using std::cerr;
  will be sent.  Using this command will override and reset the value set with CLIK.
 */
 void caosVM::c_CLAC() {
-  VM_VERIFY_SIZE(1)
-  VM_PARAM_INTEGER(message)
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_INTEGER(message)
 
-  valid_agent(targ);
+	valid_agent(targ);
 
-  targ->clac[0] = calculateScriptId(message);
-  targ->clik = -1;
+	targ->clac[0] = message;
+	targ->clik = -1;
 }
 
 /**
@@ -47,6 +47,7 @@ void caosVM::c_CLAC() {
 */
 void caosVM::v_CLAC() {
 	valid_agent(targ);
+
 	if (targ->clik != -1)
 		result.setInt(targ->clac[0]);
 	else
@@ -69,9 +70,9 @@ void caosVM::c_CLIK() {
 
 	valid_agent(targ);
 	
-	targ->clac[0] = calculateScriptId(msg1);
-	targ->clac[1] = calculateScriptId(msg2);
-	targ->clac[2] = calculateScriptId(msg3);
+	targ->clac[0] = msg1;
+	targ->clac[1] = msg2;
+	targ->clac[2] = msg3;
 	targ->clik = 0;
 }
 

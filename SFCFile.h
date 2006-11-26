@@ -175,7 +175,7 @@ public:
 	uint32 relx, rely;
 
 	uint32 partzorder;
-	uint8 bhvrclick; // TODO: appropriate? should be enum?
+	int bhvrclick[3];
 	uint8 bhvrtouch;
 
 	std::vector<std::pair<uint32, uint32> > pickup_handles;
