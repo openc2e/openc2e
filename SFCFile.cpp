@@ -820,6 +820,7 @@ void SFCCompoundObject::copyToWorld() {
 	CompoundAgent *a = ourAgent;
 	a->finishInit();
 	a->moveTo(parts[0]->x, parts[0]->y);
+	a->queueScript(7); // enter scope
 
 	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
@@ -874,6 +875,7 @@ void SFCSimpleObject::copyToWorld() {
 	a->finishInit();
 	//a->moveTo(entity->x - (a->part(0)->getWidth() / 2), entity->y - (a->part(0) -> getHeight() / 2));
 	a->moveTo(entity->x, entity->y);
+	a->queueScript(7); // enter scope
 	
 	// copy data from ourselves
 	
