@@ -40,6 +40,22 @@ sprImage::sprImage(mmapifstream *in) {
 	}
 }
 
+/*
+ * Hacky fix for corrupt offset tables in SPR files.
+ * Only works if the file has 'normal' offsets we can predict, but this will only be called
+ * on known files anyway.
+ */
+void sprImage::fixBufferOffsets() {
+	// we can do this safely because we only have an mmapifstream constructor
+	mmapifstream *in = (mmapifstream *)stream;
+
+	unsigned int currpos = 2 + (8 * m_numframes);
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		buffers[i] = in->map + currpos;
+		currpos += widths[i] * heights[i];
+	}
+}
+
 sprImage::~sprImage() {
 	delete[] widths;
 	delete[] heights;

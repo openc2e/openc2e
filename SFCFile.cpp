@@ -729,8 +729,19 @@ void SFCFile::copyToWorld() {
 	world.camera.moveTo(scrollx, scrolly, jump);
 }
 
+#include "sprImage.h"
+#include <iostream>
+
 void MapData::copyToWorld() {
 	creaturesImage *spr = world.gallery.getImage(background->filename);
+	if (background->filename == "buro") {
+		// hack for Terra Nornia's corrupt background sprite
+		// TODO: can't we have a better check, eg checking if offsets are identical?
+		std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
+		sprImage *buro = dynamic_cast<sprImage *>(spr);
+		sfccheck(buro);
+		buro->fixBufferOffsets();
+	}
 	// TODO: hardcoded size bad?
 	unsigned int w = parent->version() == 0 ? 1200 : 2400;
 	MetaRoom *m = new MetaRoom(0, 0, 8352, w, background->filename, spr, true);
