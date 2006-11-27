@@ -459,7 +459,8 @@ void SFCEntity::read() {
 void SFCObject::read() {
 	// read genus, family and species
 	if (parent->version() == 0) {
-		sfccheck(read8() == 0);
+		//sfccheck(read8() == 0);
+		read8(); // discard unused portion of CLAS, i guess (so far has been 0 or 255)
 		species = read8();
 		genus = read8();
 		family = read8();

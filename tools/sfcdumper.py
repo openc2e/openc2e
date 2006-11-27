@@ -341,8 +341,12 @@ class Entity: # like a compound part?
 class Object:
 	def partialread(self, f):
 		if version == 0:
+			# TODO
+			# we should make sure this value doesn't actually matter.
+			# for now fuzzie is assuming it doesn't, it's presumably the unused portion
+			# of CLAS - it's not always zero, some Terra Nornia scenery has it as 0xff
 			x = read8(f)
-			assert x == 0, "Object lacking nulls at start, instead has " + str(x)
+			#assert x == 0, "Object lacking nulls at start, instead has " + str(x)
 		# genus/family/species
 		if version == 0:
 			self.species = read8(f)
