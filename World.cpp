@@ -69,8 +69,11 @@ void World::init() {
 	
 	// If for some reason we failed to do that (missing/bad catalogue tag? missing file?), try falling back to a sane default.
 	if (!theHand) {
-		creaturesImage *img = gallery.getImage("hand"); // as used in C3 and DS
-		if (!img) img = gallery.getImage("syst"); // as used in C2 and CV
+		creaturesImage *img;
+		if (gametype == "c3")
+			img = gallery.getImage("hand"); // as used in C3 and DS
+		else
+			img = gallery.getImage("syst"); // as used in C1, C2 and CV
 		if (!img)
 			throw creaturesException("no valid \"Pointer Information\" catalogue tag, and fallback failed");
 		theHand = new PointerAgent(img->name);
