@@ -542,17 +542,21 @@ class CompoundObject(Object):
 			hotspotinfo['bottom'] = reads32(f)
 			self.hotspots.append(hotspotinfo)
 
+		self.functions = []
 		for i in range(6):
-			self.hotspots[i]['function'] = reads32(f)
+			functioninfo = {}
+			functioninfo['hotspot'] = reads32(f)
+			self.functions.append(functioninfo)
 			
 		if version == 1:
 			for i in range(6):
-				self.hotspots[i]['message'] = read16(f)
-				self.hotspots[i]['zero'] = read16(f)
-				assert self.hotspots[i]['zero'] == 0
+				self.functions[i]['message'] = read16(f)
+				assert read16(f) == 0
 			for i in range(6):
-				self.hotspots[i]['mask'] = read8(f)
+				self.functions[i]['mask'] = read8(f)
+
 		print self.hotspots
+		print self.functions
 
 class Vehicle(CompoundObject):
 	def read(self, f):
