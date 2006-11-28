@@ -26,9 +26,15 @@
 #include <string>
 #include "CompoundPart.h"
 
+struct Hotspot {
+	int left, top, right, bottom;
+	int function;
+};
+
 class CompoundAgent : public Agent {
 protected:
 	std::vector<CompoundPart *> parts;
+	Hotspot hotspots[6];
 
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
@@ -41,6 +47,10 @@ public:
 	void delPart(unsigned int);
 	virtual void tick();
 	void setZOrder(unsigned int plane);
+
+	void handleClick(float, float);
+	void setHotspotLoc(unsigned int id, int l, int t, int r, int b);
+	void setHotspotFunc(unsigned int id, unsigned int f);
 
 	friend class caosVM;
 };

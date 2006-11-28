@@ -587,7 +587,7 @@ void SFCCompoundObject::read() {
 	
 	// read hotspot data
 	for (unsigned int i = 0; i < 6; i++) {
-		hotspots[i].function = read32();
+		hotspots[i].function = reads32();
 	}
 
 	if (parent->version() == 1) {
@@ -875,8 +875,13 @@ void SFCCompoundObject::copyToWorld() {
 
 		copyEntityData(e, p);
 	}
-	
-	// TODO: hotspots!
+
+	// add hotspots
+	for (unsigned int i = 0; i < 6; i++) {
+		a->setHotspotLoc(i, hotspots[i].left, hotspots[i].top, hotspots[i].right, hotspots[i].bottom);
+		a->setHotspotFunc(i, hotspots[i].function);
+		// TODO: c2 hotspot bits
+	}
 }
 
 #include "SimpleAgent.h"

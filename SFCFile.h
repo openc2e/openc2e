@@ -219,7 +219,7 @@ public:
 
 struct SFCHotspot {
 	int left, top, right, bottom;
-	uint32 function;
+	int function;
 	uint16 message;
 	uint8 mask;
 };
