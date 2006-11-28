@@ -20,9 +20,11 @@
 #ifndef _ENDIANLOVE_H
 #define _ENDIANLOVE_H
 
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned int uint32;
+#include <stdint.h>
+
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
 
 // you must define one, and only one, of the following two. otherwise things won't work.
 #ifdef __APPLE__

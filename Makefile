@@ -184,7 +184,7 @@ clean:
 	rm -f headerdeps.dot headerdeps.png
 
 test: openc2e 
-	perl -MTest::Harness -e 'runtests(glob("unittests/*.t"))'
+	perl runtests.pl
 
 headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) $(wildcard ser/*.h) mngparser.tab.hpp catalogue.tab.hpp lex.mng.h lex.yy.h catalogue.lex.h
 	tools/depgraph.sh $^ > $@
