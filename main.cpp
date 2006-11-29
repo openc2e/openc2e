@@ -23,13 +23,9 @@
 #define EXIT_FAILURE 1
 #endif
 
-#include <sstream> // for istringstream, used in networking code
-#include <fstream>
 #include "openc2e.h"
 #include <iostream>
-#include <algorithm>
 #include <stdio.h>
-#include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -37,12 +33,10 @@
 #include <boost/format.hpp>
 
 #include "World.h"
+#include "Engine.h"
 #include "caosVM.h"
-#include "PointerAgent.h"
 #include "SDLBackend.h"
-#include "dialect.h"
-
-#include <SDL_net.h>
+#include "dialect.h" // registerDelegates
 
 #ifdef _MSC_VER
 #undef main // because SDL is stupid
@@ -136,16 +130,27 @@ extern "C" int main(int argc, char *argv[]) {
 	std::cout << "Reading PRAY files..." << std::endl;
 	world.praymanager.update();
 	std::cout << "Initialising backend..." << std::endl;
-	world.setBackend(new SDLBackend());
-	// moved backend.init() here because we need the camera to be valid - fuzzie
-	world.backend->init(enable_sound);
-	world.camera.setBackend(world.backend); // TODO: hrr
+	engine.setBackend(new SDLBackend());
+	engine.backend->init();
+	if (enable_sound) engine.backend->soundInit();
+	world.camera.setBackend(engine.backend); // TODO: hrr
+	
+	int listenport = engine.backend->networkInit();
+	// inform the user of the port used, and store it in the relevant file
+	std::cout << "listening on port " << listenport << std::endl;
+	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
+	if (!fs::exists(p))
+		fs::create_directory(p);
+	if (fs::is_directory(p)) {
+		std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
+		f << boost::str(boost::format("%d") % listenport);
+	}
 
 	if (world.data_directories.size() < 3) {
 		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
 		caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
 		caosVar contents; contents.setInt(1);
-		world.eame_variables[name] = contents;
+		engine.eame_variables[name] = contents;
 	}
 
 	// execute the initial scripts!
@@ -169,393 +174,18 @@ extern "C" int main(int argc, char *argv[]) {
 	// wanted to execute a CAOS script or something went badly wrong.
 	if (world.map.getMetaRoomCount() == 0) {
 		std::cerr << "\nNo metarooms found in given bootstrap directories or files, exiting." << std::endl;
-		SDL_Quit();
+		engine.backend->shutdown();
 		return 0;
-	}
-
-	// initialise the socket to listen for CAOS
-	SDLNet_Init();
-	TCPsocket listensocket = 0;
-	int listenport = 20000;
-	while ((!listensocket) && (listenport < 20050)) {
-		listenport++;
-		IPaddress ip;
-
-		SDLNet_ResolveHost(&ip, 0, listenport);
-		listensocket = SDLNet_TCP_Open(&ip); 
-	}
-	assert(listensocket);
-	
-	// inform the user of the port used, and store it in the relevant file
-	std::cout << "listening on port " << listenport << std::endl;
-	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
-	if (!fs::exists(p))
-		fs::create_directory(p);
-	if (fs::is_directory(p)) {
-		std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
-		f << boost::str(boost::format("%d") % listenport);
 	}
 
 	// do a first-pass draw of the world. TODO: correct?
 	world.drawWorld();
 
-	bool done = false;
-	unsigned int tickdata = 0;
-	unsigned int ticktime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	unsigned int ticktimeptr = 0;
-	unsigned int lasttimestamp = world.backend->ticks();
-	while (!done) {
-		bool ticked = false;
-	
-		// tick the world, if necessary
-		if (!world.paused && (world.backend->ticks() > (tickdata + world.ticktime))) {
-			tickdata = world.backend->ticks();
-			
-			world.tick();
-			world.drawWorld();
-			
-			ticktime[ticktimeptr] = world.backend->ticks() - tickdata;
-			ticktimeptr++;
-			if (ticktimeptr == 10) ticktimeptr = 0;
-			float avgtime = 0;
-			for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktime[i] / world.ticktime);
-			world.pace = avgtime / 10;
-
-			world.race = world.backend->ticks() - lasttimestamp;
-			lasttimestamp = world.backend->ticks();
-			
-			ticked = true;
-			
-			// TODO: correct behaviour? hrm :/
-			world.hand()->velx.setFloat(world.hand()->velx.getFloat() / 2.0f);
-			world.hand()->vely.setFloat(world.hand()->vely.getFloat() / 2.0f);
-		} else SDL_Delay(10);
-
-		// handle incoming network connections
-		while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
-			// check this connection is coming from localhost
-			IPaddress *remote_ip = SDLNet_TCP_GetPeerAddress(connection);
-			unsigned char *rip = (unsigned char *)&remote_ip->host;
-			if ((rip[0] != 127) || (rip[1] != 0) || (rip[2] != 0) || (rip[3] != 1)) {
-				std::cout << "Someone tried connecting via non-localhost address! IP: " << (int)rip[0] << "." << (int)rip[1] << "." << (int)rip[2] << "." << (int)rip[3] << std::endl;
-				SDLNet_TCP_Close(connection);
-				continue;
-			}
-			
-			// read the data from the socket
-			std::string data;
-			bool done = false;
-			while (!done) {
-				char buffer;
-				int i = SDLNet_TCP_Recv(connection, &buffer, 1);
-				if (i == 1) {
-					data = data + buffer;
-					// TODO: maybe we should check for rscr\n like c2e seems to
-					if ((data.size() > 3) && (data.find("rscr", data.size() - 4) != data.npos)) done = true;
-				} else done = true;
-			}
-
-			// now parse and execute the CAOS we obtained
-			std::istringstream s(data);
-			try {
-				caosScript script(world.gametype, "<network>"); // XXX
-				script.parse(s);
-				script.installScripts();
-				caosVM vm(0);
-				std::ostringstream o;
-				vm.setOutputStream(o);
-				vm.runEntirely(script.installer);
-				SDLNet_TCP_Send(connection, (void *)o.str().c_str(), o.str().size());
-			} catch (std::exception &e) {
-				std::string o = std::string("### EXCEPTION: ") + e.what();
-				SDLNet_TCP_Send(connection, (void *)o.c_str(), o.size());
-			}
-
-			// and finally, close the connection
-			SDLNet_TCP_Close(connection);
-		}
-
-		// main SDL event loop
-		// TODO: this should be moved elsewhere
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			switch (event.type) {
-				case SDL_VIDEORESIZE:
-					// notify the backend
-					world.backend->resizeNotify(event.resize.w, event.resize.h);
-
-					// notify agents
-					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-						if (!*i) continue;
-						(*i)->queueScript(123, 0); // window resized script
-					}
-					break;
-
-				case SDL_MOUSEMOTION:
-					// move the cursor
-					world.hand()->moveTo(event.motion.x + world.camera.getX(), event.motion.y + world.camera.getY());
-					world.hand()->velx.setInt(event.motion.xrel * 4);
-					world.hand()->vely.setInt(event.motion.yrel * 4);
-					
-					// middle mouse button scrolling
-					if (event.motion.state & SDL_BUTTON(2))
-						world.camera.moveTo(world.camera.getX() - event.motion.xrel, world.camera.getY() - event.motion.yrel, jump);
-					
-					// notify agents
-					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-						if (!*i) continue;
-						if ((*i)->imsk_mouse_move) {
-							caosVar x; x.setInt(world.hand()->x);
-							caosVar y; y.setInt(world.hand()->y);
-							(*i)->queueScript(75, 0, x, y); // Raw Mouse Move
-						}
-					}
-					break;
-
-				case SDL_MOUSEBUTTONUP:
-				case SDL_MOUSEBUTTONDOWN:
-					// notify agents
-					for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-						if (!*i) continue;
-						if ((event.type == SDL_MOUSEBUTTONUP && (*i)->imsk_mouse_up) ||
-							(event.type == SDL_MOUSEBUTTONDOWN && (*i)->imsk_mouse_down)) {
-							// set the button value as necessary
-							caosVar button;
-							switch (event.button.button) {
-								// TODO: the values here make fuzzie suspicious that c2e combines these events
-								case SDL_BUTTON_LEFT: button.setInt(1); break;
-								case SDL_BUTTON_RIGHT: button.setInt(2); break;
-								case SDL_BUTTON_MIDDLE: button.setInt(4); break;
-							}
-
-							// if it was a mouse button we're interested in, then fire the relevant raw event
-							if (button.getInt() != 0) {
-								if (event.type == SDL_MOUSEBUTTONUP)
-									(*i)->queueScript(77, 0, button); // Raw Mouse Up
-								else
-									(*i)->queueScript(76, 0, button); // Raw Mouse Down
-							}
-						}
-						if ((event.type == SDL_MOUSEBUTTONDOWN &&
-							(event.button.button == SDL_BUTTON_WHEELUP || event.button.button == SDL_BUTTON_WHEELDOWN) &&
-							(*i)->imsk_mouse_wheel)) {
-							// fire the mouse wheel event with the relevant delta value
-							caosVar delta;
-							if (event.button.button == SDL_BUTTON_WHEELDOWN)
-								delta.setInt(-120);
-							else
-								delta.setInt(120);
-							(*i)->queueScript(78, 0, delta); // Raw Mouse Wheel
-						}
-					}
-
-					if (!world.hand()->handle_events) break;
-					if (event.type != SDL_MOUSEBUTTONDOWN) break;
-
-					// do our custom handling
-					if (event.button.button == SDL_BUTTON_LEFT) {
-						CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y);
-						if (a /* && a->canActivate() */) { // TODO
-							// if the agent isn't paused, tell it to handle a click
-							if (!a->getParent()->paused)
-								a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
-
-							// TODO: not sure how to handle the following properly, needs research..
-							world.hand()->firePointerScript(101, a->getParent()); // Pointer Activate 1
-						} else
-							world.hand()->queueScript(116, 0); // Pointer Clicked Background
-					} else if (event.button.button == SDL_BUTTON_RIGHT) {
-						if (world.paused) break; // TODO: wrong?
-						
-						// picking up and dropping are implictly handled by the scripts (well, messages) 4 and 5	
-						// TODO: check if this is correct behaviour, one issue is that this isn't instant, another
-						// is the messages might only be fired in c2e when you use MESG WRIT, in which case we'll
-						// need to manually set world.hand()->carrying to NULL and a here, respectively - fuzzie
-						if (world.hand()->carrying) {
-							if (!world.hand()->carrying->suffercollisions || world.hand()->carrying->validInRoomSystem()) {
-								world.hand()->carrying->queueScript(5, world.hand()); // drop
-								world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
-
-								// TODO: is this the correct check?
-								if (world.hand()->carrying->sufferphysics && world.hand()->carrying->suffercollisions) {
-									// TODO: do this in the pointer agent?
-									world.hand()->carrying->velx.setFloat(world.hand()->velx.getFloat());
-									world.hand()->carrying->vely.setFloat(world.hand()->vely.getFloat());
-								}
-							} else {
-								// TODO: some kind of "fail to drop" animation/sound?
-							}
-						} else {
-							Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), false, true);
-							if (a) {
-								a->queueScript(4, world.hand()); // pickup
-								world.hand()->firePointerScript(104, a); // Pointer Pickup
-							}
-						}
-					} else if (event.button.button == SDL_BUTTON_MIDDLE) {
-						Agent *a = world.agentAt(event.button.x + world.camera.getX(), event.button.y + world.camera.getY(), true);
-						if (a)
-							std::cout << "Agent under mouse is " << a->identify();
-						else
-							std::cout << "No agent under cursor";
-						std::cout << std::endl;
-					}
-					break;
-
-				case SDL_KEYDOWN:
-					if (event.key.type == SDL_KEYDOWN) {
-						// handle debug keys, if they're enabled
-						caosVar v = world.variables["engine_debug_keys"];
-						if (v.hasInt() && v.getInt() == 1) {
-							Uint8 *keystate = SDL_GetKeyState(NULL);
-							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
-								MetaRoom *n; // for pageup/pagedown
-
-								switch (event.key.keysym.sym) {
-									case SDLK_INSERT:
-										world.showrooms = !world.showrooms;
-										break;
-
-									case SDLK_PAUSE:
-										// TODO: debug pause game
-										break;
-
-									case SDLK_SPACE:
-										// TODO: force tick
-										break;
-
-									case SDLK_PAGEUP:
-										// TODO: previous metaroom
-										if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
-											break;
-										n = world.map.getMetaRoom(world.camera.getMetaRoom()->id + 1);
-										if (n)
-											world.camera.goToMetaRoom(n->id);
-										break;
-
-									case SDLK_PAGEDOWN:
-										// TODO: next metaroom
-										if (world.camera.getMetaRoom()->id == 0)
-											break;
-										n = world.map.getMetaRoom(world.camera.getMetaRoom()->id - 1);
-										if (n)
-											world.camera.goToMetaRoom(n->id);
-										break;
-
-									default: break; // to shut up warnings
-								}
-							}
-						}
-						int key = world.backend->translateKey(event.key.keysym.sym);
-						// handle special keys
-						if (key != -1) {
-							// tell the agent with keyboard focus
-							if (world.focusagent) {
-								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-								if (t)
-									t->handleSpecialKey(key);
-							}
-
-							// notify agents
-							caosVar k;
-							k.setInt(key);
-							for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-								if (!*i) continue;
-								if ((*i)->imsk_key_down)
-									(*i)->queueScript(73, 0, k); // key down script
-							}
-						}
-
-						// otherwise, handle a normal keypress if the unicode is in the ascii range
-						if ((event.key.keysym.unicode) && ((event.key.keysym.unicode & 0xFF80) == 0) && (event.key.keysym.unicode >= 32)) {
-							// tell the agent with keyboard focus
-							key = event.key.keysym.unicode & 0x7F;
-							if (world.focusagent) {
-								TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-								if (t)
-									t->handleKey(key);
-							}
-
-							// notify agents
-							caosVar k;
-							k.setInt(key);
-							for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-								if (!*i) continue;
-								if ((*i)->imsk_translated_char)
-									(*i)->queueScript(79, 0, k); // translated char script
-							}
-						}
-					}
-					break;
-				case SDL_QUIT:
-					done = true;
-					break;
-				default:
-					break;
-			}
-		}
-
-		if (ticked) {
-		// keyboard-based scrolling
-		static float accelspeed = 8, decelspeed = .5, maxspeed = 64;
-		static float velx = 0;
-		static float vely = 0;
-
-		// check keys
-		Uint8 *keys = SDL_GetKeyState(NULL);
-		if (keys[SDLK_LEFT])
-			velx -= accelspeed;
-		if (keys[SDLK_RIGHT])
-			velx += accelspeed;
-		if (!keys[SDLK_LEFT] && !keys[SDLK_RIGHT]) {
-			velx *= decelspeed;
-			if (fabs(velx) < 0.1) velx = 0;
-		}
-		if (keys[SDLK_UP])
-			vely -= accelspeed;
-		if (keys[SDLK_DOWN])
-			vely += accelspeed;
-		if (!keys[SDLK_UP] && !keys[SDLK_DOWN]) {
-			vely *= decelspeed;
-			if (fabs(vely) < 0.1) vely = 0;
-		}
-
-		// enforced maximum speed
-		if (velx >=  maxspeed) velx =  maxspeed;
-		if (velx <= -maxspeed) velx = -maxspeed;
-		if (vely >=  maxspeed) vely =  maxspeed;
-		if (vely <= -maxspeed) vely = -maxspeed;
-
-		// do the actual movement
-		if (velx || vely) {
-			int adjustx = world.camera.getX(), adjusty = world.camera.getY();
-			int adjustbyx = (int)velx, adjustbyy = (int) vely;
-			
-			// These checks are handled in Camera::checkBounds() now, but we'll leave them commented
-			// for now, just in case.
-			/*if ((adjustx + adjustbyx) < (int)world.camera.getMetaRoom()->x())
-				adjustbyx = world.camera.getMetaRoom()->x() - adjustx;
-			else if ((adjustx + adjustbyx + world.camera.getWidth()) >
-					(world.camera.getMetaRoom()->x() + world.camera.getMetaRoom()->width()))
-				adjustbyx = world.camera.getMetaRoom()->x() + 
-					world.camera.getMetaRoom()->width() - world.camera.getWidth() - adjustx;
-			
-			if ((adjusty + adjustbyy) < (int)world.camera.getMetaRoom()->y())
-				adjustbyy = world.camera.getMetaRoom()->y() - adjusty;
-			else if ((adjusty + adjustbyy + world.camera.getHeight()) > 
-					(world.camera.getMetaRoom()->y() + world.camera.getMetaRoom()->height()))
-				adjustbyy = world.camera.getMetaRoom()->y() + 
-					world.camera.getMetaRoom()->height() - world.camera.getHeight() - adjusty;
-			*/
-
-			world.camera.moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
-		}
-		} // ticked
+	while (!engine.done) {
+		engine.tick();
 	}
 
-	// TODO: this belongs in the backend
-	SDLNet_Quit();
-	SDL_Quit();
+	engine.backend->shutdown();
 
 	} catch (std::exception &e) {
 		std::cerr << "dying due to exception in main: " << e.what() << "\n";

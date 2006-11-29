@@ -22,6 +22,7 @@
 #include "openc2e.h"
 #include "Agent.h"
 #include "World.h"
+#include "Engine.h"
 
 SDLBackend *g_backend;
 
@@ -53,22 +54,14 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 	assert(mainsurface.surface != 0);
 }
 
-void SDLBackend::init(bool enable_sound) {
+void SDLBackend::init() {
+	soundenabled = false;
+	networkingup = false;
+
 	int init = SDL_INIT_VIDEO;
-	if (enable_sound) init |= SDL_INIT_AUDIO;
 
-	if (SDL_Init(init) < 0) {
-		std::cerr << "SDL init failed: " << SDL_GetError() << std::endl;
-		assert(false);
-	}
-
-	if (!enable_sound) {
-		std::cerr << "Sound disabled per user request." << std::endl;
-		soundenabled = false;
-	} else if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0) {
-		std::cerr << "SDL_mixer init failed, disabling sound: " << Mix_GetError() << std::endl;
-		soundenabled = false;
-	} else soundenabled = true;
+	if (SDL_Init(init) < 0)
+		throw creaturesException(std::string("SDL error during initialization: ") + SDL_GetError());
 
 	resizeNotify(800, 600);
 	
@@ -77,6 +70,145 @@ void SDLBackend::init(bool enable_sound) {
 	SDL_ShowCursor(false);
 	// bz2 and fuzzie both think this is the only way to get useful ascii out of SDL
 	SDL_EnableUNICODE(1);
+}
+
+void SDLBackend::soundInit() {
+	soundenabled = true;
+	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
+		throw creaturesException(std::string("SDL error during sound initialization: ") + SDL_GetError());
+	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
+		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
+}
+
+int SDLBackend::networkInit() {
+	if (SDLNet_Init() < 0)
+		throw creaturesException(std::string("SDL_net error during initialization: ") + SDLNet_GetError());
+	networkingup = true;
+
+	listensocket = 0;
+	int listenport = 20000;
+	while ((!listensocket) && (listenport < 20050)) {
+		listenport++;
+		IPaddress ip;
+
+		SDLNet_ResolveHost(&ip, 0, listenport);
+		listensocket = SDLNet_TCP_Open(&ip);
+	}
+	
+	if (!listensocket)
+		throw creaturesException(std::string("Failed to open a port to listen on."));
+
+	return listenport;
+}
+
+void SDLBackend::shutdown() {
+	SDL_Quit();
+	SDLNet_Quit();
+}
+
+void SDLBackend::handleEvents() {
+	if (networkingup)
+		handleNetworking();
+}
+
+void SDLBackend::handleNetworking() {
+	// handle incoming network connections
+	while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
+		// check this connection is coming from localhost
+		IPaddress *remote_ip = SDLNet_TCP_GetPeerAddress(connection);
+		unsigned char *rip = (unsigned char *)&remote_ip->host;
+		if ((rip[0] != 127) || (rip[1] != 0) || (rip[2] != 0) || (rip[3] != 1)) {
+			std::cout << "Someone tried connecting via non-localhost address! IP: " << (int)rip[0] << "." << (int)rip[1] << "." << (int)rip[2] << "." << (int)rip[3] << std::endl;
+			SDLNet_TCP_Close(connection);
+			continue;
+		}
+			
+		// read the data from the socket
+		std::string data;
+		bool done = false;
+		while (!done) {
+			char buffer;
+			int i = SDLNet_TCP_Recv(connection, &buffer, 1);
+			if (i == 1) {
+				data = data + buffer;
+				// TODO: maybe we should check for rscr\n like c2e seems to
+				if ((data.size() > 3) && (data.find("rscr", data.size() - 4) != data.npos)) done = true;
+			} else done = true;
+		}
+
+		// pass the data onto the engine, and send back our response
+		std::string tosend = engine.executeNetwork(data);
+		SDLNet_TCP_Send(connection, (void *)tosend.c_str(), tosend.size());
+		
+		// and finally, close the connection
+		SDLNet_TCP_Close(connection);
+	}
+}
+
+bool SDLBackend::pollEvent(SomeEvent &e) {
+	SDL_Event event;
+retry:
+	if (!SDL_PollEvent(&event)) return false;
+
+	switch (event.type) {
+		case SDL_VIDEORESIZE:
+			resizeNotify(event.resize.w, event.resize.h);
+			e.type = eventresizewindow;
+			e.x = event.resize.w;
+			e.y = event.resize.h;
+			break;
+
+		case SDL_MOUSEMOTION:
+			e.type = eventmousemove;
+			e.x = event.motion.x;
+			e.y = event.motion.y;
+			e.xrel = event.motion.xrel;
+			e.yrel = event.motion.yrel;
+			// TODO: button state
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			if (event.type == SDL_MOUSEBUTTONDOWN)
+				e.type = eventmousebuttondown;
+			else
+				e.type = eventmousebuttonup;
+			switch (event.button.button) {
+				case SDL_BUTTON_LEFT: e.button = buttonleft; break;
+				case SDL_BUTTON_RIGHT: e.button = buttonright; break;
+				case SDL_BUTTON_MIDDLE: e.button = buttonmiddle; break;
+				case SDL_BUTTON_WHEELDOWN: e.button = buttonwheeldown; break;
+				case SDL_BUTTON_WHEELUP: e.button = buttonwheelup; break;
+				default: goto retry;
+			}
+			e.x = event.button.x;
+			e.y = event.button.y;
+			break;
+
+		case SDL_KEYDOWN:
+			if ((event.key.keysym.unicode) && ((event.key.keysym.unicode & 0xFF80) == 0) && (event.key.keysym.unicode >= 32)) {
+				e.type = eventkeydown;
+				e.key = event.key.keysym.unicode & 0x7F;
+				return true;
+			} else { // TODO: should this be 'else'?
+				int key = translateKey(event.key.keysym.sym);
+				if (key != -1) {
+					e.type = eventspecialkeydown;
+					e.key = key;
+					return true;
+				}
+			}
+			goto retry;
+
+		case SDL_QUIT:
+			e.type = eventquit;
+			break;
+
+		default:
+			goto retry;
+	}
+	
+	return true;
 }
 
 SoundSlot *SDLBackend::getAudioSlot(std::string filename) {

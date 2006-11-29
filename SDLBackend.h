@@ -22,6 +22,7 @@
 
 #include <SDL/SDL.h>
 #include <SDL_mixer.h>
+#include <SDL_net.h>
 #include "creaturesImage.h"
 #include "endianlove.h"
 #include <map>
@@ -38,6 +39,16 @@ struct SoundSlot {
 	void adjustPanning(int angle, int distance);
 	void fadeOut();
 	void stop();
+};
+
+enum eventtype { eventquit, eventkeydown, eventspecialkeydown, eventmousebuttondown, eventmousebuttonup, eventmousemove, eventresizewindow };
+enum eventbuttons { buttonleft, buttonright, buttonmiddle, buttonwheeldown, buttonwheelup };
+
+struct SomeEvent {
+	eventtype type;
+	int x, y, xrel, yrel;
+	int key;
+	eventbuttons button;
 };
 
 class SDLSurface {
@@ -59,25 +70,40 @@ public:
 
 class SDLBackend {
 protected:
-	bool soundenabled;
+	bool soundenabled, networkingup;
 	static const unsigned int nosounds = 12;
 	SoundSlot sounddata[12];
 
 	std::map<std::string, Mix_Chunk *> soundcache;
 
 	SDLSurface mainsurface;
+	TCPsocket listensocket;
+
+	void handleNetworking();
+	void resizeNotify(int _w, int _h);
+	int translateKey(int key);
 
 public:
 	SDLBackend() { }
+	
+	void init();
+	void soundInit();
+	int networkInit();
+	void shutdown();
+
+	bool pollEvent(SomeEvent &e);
+	
 	unsigned int ticks() { return SDL_GetTicks(); }
-	void init(bool enable_sound);
-	void resizeNotify(int _w, int _h);
-	SoundSlot *getAudioSlot(std::string filename);
+	
+	void handleEvents();
+	
 	SDLSurface &getMainSurface() { return mainsurface; }
 	SDLSurface *newSurface(unsigned int width, unsigned int height);
 	void freeSurface(SDLSurface *surf);
+		
 	bool keyDown(int key);
-	int translateKey(int key);
+	
+	SoundSlot *getAudioSlot(std::string filename);
 	void setPalette(uint8 *data);
 };
 

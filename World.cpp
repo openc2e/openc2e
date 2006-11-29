@@ -18,6 +18,7 @@
  */
 
 #include "World.h"
+#include "Engine.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "PointerAgent.h"
 #include "CompoundAgent.h" // for setFocus
@@ -43,7 +44,6 @@ World::World() {
 	theHand = 0;
 	showrooms = false;
 	autokill = false;
-	backend = 0;
 }
 
 World::~World() {
@@ -107,25 +107,6 @@ void World::init() {
 		ticktime = 100;
 }
 
-void World::setBackend(SDLBackend *b) {
-	backend = b;
-
-	// load palette for C1
-	if (gametype == "c1") {
-		// TODO: case-sensitivity for the lose
-		fs::path palpath(data_directories[0] / "/Palettes/palette.dta");
-		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
-			uint8 *buf = new uint8[768];
-			std::ifstream f(palpath.native_directory_string().c_str(), std::ios::binary);
-			f >> std::noskipws;
-			f.read((char *)buf, 768);
-			backend->setPalette(buf);
-			delete[] buf;
-		} else
-			throw creaturesException("Couldn't find C1 palette data!");
-	}
-}
-
 caosVM *World::getVM(Agent *a) {
 	if (vmpool.empty()) {
 		return new caosVM(a);
@@ -183,8 +164,8 @@ void World::tick() {
 		agents.clear();
 		exit(0);
 	}
-	// Tick all agents.
-	
+
+	// Tick all agents, deleting as necessary.	
 	std::list<boost::shared_ptr<Agent> >::iterator i = agents.begin();
 	while (i != agents.end()) {
 		boost::shared_ptr<Agent> a = *i;
@@ -214,6 +195,10 @@ void World::tick() {
 	worldtickcount++;
 
 	world.map.tick();
+
+	// TODO: correct behaviour? hrm :/
+	world.hand()->velx.setFloat(world.hand()->velx.getFloat() / 2.0f);
+	world.hand()->vely.setFloat(world.hand()->vely.getFloat() / 2.0f);
 }
 
 Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {
@@ -269,11 +254,11 @@ Agent *World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
-	drawWorld(&camera, &backend->getMainSurface());
+	drawWorld(&camera, &engine.backend->getMainSurface());
 }
 
 void World::drawWorld(Camera *cam, SDLSurface *surface) {
-	assert(backend);
+	assert(surface);
 
 	MetaRoom *m = cam->getMetaRoom();
 	if (!m) {

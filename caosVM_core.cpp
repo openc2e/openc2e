@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "openc2e.h"
 #include "World.h"
+#include "Engine.h"
 #include <iostream>
 
 #include <boost/format.hpp>
@@ -127,7 +128,7 @@ void caosVM::v_EAME() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALUE(name)
 
-	caosVar &i = world.eame_variables[name];
+	caosVar &i = engine.eame_variables[name];
 	valueStack.push_back(&i);
 }
 

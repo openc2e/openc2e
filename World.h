@@ -62,7 +62,6 @@ public:
 	
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
-	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	std::vector<caosVM *> vmpool;
 	std::map<int, boost::weak_ptr<Agent> > unidmap;
 
@@ -79,7 +78,6 @@ public:
 	unsigned int ticktime, tickcount;
 	unsigned int worldtickcount;
 	MainCamera camera;
-	SDLBackend *backend;
 	bool showrooms, autokill;
 
 	AgentRef selectedcreature;
@@ -99,7 +97,6 @@ public:
 	~World();
 	void init();
 	void initCatalogue();
-	void setBackend(SDLBackend *b);
 	
 	void executeInitScript(boost::filesystem::path p);
 	void executeBootstrap(boost::filesystem::path p);

@@ -21,6 +21,7 @@
 #include "caosVM.h"
 #include "Agent.h"
 #include "World.h"
+#include "Engine.h"
 #include <iostream>
 using std::cout;
 using std::cerr;
@@ -37,7 +38,7 @@ void caosVM::c_SNDE() {
 
 	valid_agent(targ);
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = world.backend->getAudioSlot(filename);
+	SoundSlot *s = engine.backend->getAudioSlot(filename);
 	if (s) {
 		s->play();
 		targ->positionAudio(s);
@@ -69,7 +70,7 @@ void caosVM::c_SNDC() {
 	if (targ->soundslot)
 		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = world.backend->getAudioSlot(filename);
+	SoundSlot *s = engine.backend->getAudioSlot(filename);
 	if (s) {
 		targ->soundslot = s;
 		s->play();
@@ -96,7 +97,7 @@ void caosVM::c_SNDL() {
 	if (targ->soundslot)
 		targ->soundslot->stop();
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = world.backend->getAudioSlot(filename);
+	SoundSlot *s = engine.backend->getAudioSlot(filename);
 	if (s) {
 		targ->soundslot = s;
 		s->playLooped();

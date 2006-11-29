@@ -54,6 +54,7 @@ OPENC2E_CORE = \
 	Creature.o \
 	creaturesImage.o \
 	dialect.o \
+	Engine.o \
 	exceptions.o \
 	fileSwapper.o \
 	genomeFile.o \
