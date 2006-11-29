@@ -20,7 +20,23 @@
 #ifndef _ENDIANLOVE_H
 #define _ENDIANLOVE_H
 
-#ifdef __GNUC__
+#include <stdlib.h> // load the standard libraries for these defines
+
+#ifndef HAVE_STDINT
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+# define HAVE_STDINT 1
+#else
+# if defined(__GNUC_PREREQ) && __GNUC_PREREQ(4,0)
+#  define HAVE_STDINT 1
+# else
+#  define HAVE_STDINT 0
+# endif
+#endif
+
+#endif
+
+#if HAVE_STDINT
 
 #include <stdint.h>
 
