@@ -238,6 +238,9 @@ void caosVM::v_BUMP() {
  Teleport occupants of target vehicle to (x, y).
 */
 void caosVM::c_TELE() {
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+
 	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
