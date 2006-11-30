@@ -228,10 +228,10 @@ void registerDelegates() {
 
 	// apply our hacky SETV to the C1 and C2 dialects
 	variants[std::string("c1")]->cmd_dialect->delegates["setv"] = 
-		/*new HackySETVforC2(
-				(NamespaceDelegate *)(variants[std::string("c1")]->cmd_dialect->delegates["setv"]),*/
+		new HackySETVforC2(
+				(NamespaceDelegate *)(variants[std::string("c1")]->cmd_dialect->delegates["setv"]),
 				variants[std::string("c3")]->cmd_dialect->delegates["setv"]
-				/*)*/;
+				);
 	variants[std::string("c2")]->cmd_dialect->delegates["setv"] = 
 		new HackySETVforC2(
 				(NamespaceDelegate *)(variants[std::string("c2")]->cmd_dialect->delegates["setv"]),

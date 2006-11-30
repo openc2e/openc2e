@@ -233,6 +233,30 @@ void caosVM::c_STIM_WRIT_c2() {
 }
 
 /**
+ STIM FROM (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
+ %status stub
+ %pragma implementation caosVM::c_STIM_FROM_c1
+ %pragma variants c1
+*/
+void caosVM::c_STIM_FROM_c1() {
+	VM_PARAM_INTEGER(amount3)
+	VM_PARAM_INTEGER(chem3)
+	VM_PARAM_INTEGER(amount2)
+	VM_PARAM_INTEGER(chem2)
+	VM_PARAM_INTEGER(amount1)
+	VM_PARAM_INTEGER(chem1)
+	VM_PARAM_INTEGER(amount0)
+	VM_PARAM_INTEGER(chem0)
+	VM_PARAM_INTEGER(features)
+	VM_PARAM_INTEGER(intensity)
+	VM_PARAM_INTEGER(input)
+	VM_PARAM_INTEGER(significance)
+
+	valid_agent(from);
+	// TODO
+}
+
+/**
  SWAY SHOU (command) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) drive (integer) adjust (float) 
  %status stub
 

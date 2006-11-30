@@ -627,7 +627,7 @@ void caosVM::v_BHVR() {
 /**
  CARR (agent)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
  Returns the agent that is carrying the TARG agent.  If TARG is not being carried, returns 
  NULL. 
@@ -1610,6 +1610,80 @@ void caosVM::c_BHVR_c2() {
 	}
 
 	// TODO
+}
+
+/**
+ SETV CLAS (command) identifier (integer)
+ %status maybe
+ %pragma variants c1
+
+ Set family, genus and species of the target agent. Creatures 1 era command.
+*/
+void caosVM::c_SETV_CLAS() {
+	VM_PARAM_INTEGER(identifier)
+
+	valid_agent(targ);
+
+	targ->species = (identifier >> 8) & 0xff;
+	targ->genus = (identifier >> 16) & 0xff;
+	targ->family = (identifier >> 24) & 0xff;
+}
+
+/**
+ LIML (integer)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::v_LIML() {
+	// TODO: is this remotely sane? if so, unstub.
+	valid_agent(targ);
+	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+	if (r) result.setInt(r->x_left);
+	else result.setInt(0);
+}
+
+/**
+ LIMT (integer)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::v_LIMT() {
+	// TODO: is this remotely sane? if so, unstub.
+	valid_agent(targ);
+	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+	if (r) result.setInt(r->y_left_ceiling);
+	else result.setInt(0);
+}
+
+/**
+ LIMR (integer)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::v_LIMR() {
+	// TODO: is this remotely sane? if so, unstub.
+	valid_agent(targ);
+	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+	if (r) result.setInt(r->x_right);
+	else result.setInt(8352); // TODO
+}
+
+/**
+ LIMB (integer)
+ %status stub
+ %pragma variants c1
+ %pragma implementation caosVM::v_LIMB_c1
+*/
+void caosVM::v_LIMB_c1() {
+	// TODO: is this remotely sane? if so, unstub.
+	valid_agent(targ);
+	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+	if (r) result.setInt(r->y_left_floor);
+	else result.setInt(1200); // TODO
 }
 
 /* vim: set noet: */

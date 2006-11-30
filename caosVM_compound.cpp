@@ -22,6 +22,7 @@
 #include "CameraPart.h"
 #include "openc2e.h"
 #include "World.h"
+#include "Engine.h"
 
 /**
  PART (command) part_id (integer)
@@ -485,6 +486,73 @@ void caosVM::c_GRPL() {
 	GraphPart *t = dynamic_cast<GraphPart *>(p);
 	caos_assert(t);
 
+	// TODO
+}
+
+/**
+ BBD: WORD (command) index (integer) id (integer) text (string)
+ %status stub
+ %pragma variants c1 c2
+
+ Change the word at index to target blackboard, setting to the provided id and text.
+*/
+void caosVM::c_BBD_WORD() {
+	VM_PARAM_STRING(text)
+	VM_PARAM_INTEGER(id)
+	VM_PARAM_INTEGER(index)
+
+	if (engine.version == 1) {
+		caos_assert(index < 16);
+	} else {
+		caos_assert(index < 48);
+	}
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ BBD: SHOW (command) show (integer)
+ %status stub
+ %pragma variants c1 c2
+
+ If show is 1, draw the current text onto part 0 of the target blackboard. If 0,
+ remove it from the blackboard.
+*/
+void caosVM::c_BBD_SHOW() {
+	VM_PARAM_INTEGER(show)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ BBD: EMIT (command) audible (integer)
+ %status stub
+ %pragma variants c1 c2
+
+ Broadcast the current word of the target blackboard. If audible is 1, broadcast
+ to all nearby creatures. If 0, broadcast to all creatures looking at it.
+*/
+void caosVM::c_BBD_EMIT() {
+	VM_PARAM_INTEGER(audible)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ BBD: EDIT (command) allow (integer)
+ %status stub
+ %pragma variants c1
+
+ If allow is 1, switch target blackboard into editing mode, give it focus. If it
+ is 0, remove focus from target blackboard.
+*/
+void caosVM::c_BBD_EDIT() {
+	VM_PARAM_INTEGER(allow)
+
+	valid_agent(targ);
 	// TODO
 }
 

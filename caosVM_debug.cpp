@@ -48,7 +48,7 @@ void caosVM::c_DBG_OUTS() {
 /**
  DBGM (command) val (bareword)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_DBG_OUTS
 */
 
@@ -81,10 +81,10 @@ void caosVM::c_DBG_OUTV() {
  %pragma implementation caosVM::c_DBG_OUTV
 */
 
-/*
+/**
  DBUG (command) val (integer)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_DBUG() {
 	inst = true;

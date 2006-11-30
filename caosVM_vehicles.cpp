@@ -230,4 +230,19 @@ void caosVM::v_BUMP() {
 	result.setInt(v->getBump());
 }
 
+/**
+ TELE (command) x (integer) y (integer)
+ %status stub
+ %pragma variants c1
+
+ Teleport occupants of target vehicle to (x, y).
+*/
+void caosVM::c_TELE() {
+	valid_agent(targ);
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	caos_assert(v);
+
+	// TODO
+}
+
 /* vim: set noet: */

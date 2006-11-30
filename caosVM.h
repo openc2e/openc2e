@@ -246,6 +246,8 @@ public:
 	void v_TORX();
 	void v_TORY();
 	void c_CACL();
+	void v_WIND();
+	void v_TEMP();
 	
 	// camera
 	void v_VISI();
@@ -488,8 +490,13 @@ public:
 	void v_SIZE();
 	void v_GRAV();
 	void c_SETV_CLS2();
+	void c_SETV_CLAS();
 	void c_SLIM();
 	void c_BHVR_c2();
+	void v_LIML();
+	void v_LIMT();
+	void v_LIMR();
+	void v_LIMB_c1();
 	
 	// motion
 	void c_ELAS();
@@ -518,6 +525,7 @@ public:
 	void c_FREL();
 	void v_FLTX();
 	void v_FLTY();
+	void c_MCRT();
 	
 	// scripts
 	void c_INST();
@@ -557,6 +565,10 @@ public:
 	void v_NPGS();
 	void c_GRPV();
 	void c_GRPL();
+	void c_BBD_WORD();
+	void c_BBD_SHOW();
+	void c_BBD_EMIT();
+	void c_BBD_EDIT();
 
 	// creatures
 	void c_STM_SHOU();
@@ -567,6 +579,7 @@ public:
 	void c_STIM_SIGN();
 	void c_STIM_TACT();
 	void c_STIM_WRIT();
+	void c_STIM_FROM_c1();
 	void c_STIM_SHOU_c2();
 	void c_STIM_SIGN_c2();
 	void c_STIM_TACT_c2();
@@ -737,6 +750,7 @@ public:
 	void v_XVEC();
 	void v_YVEC();
 	void v_BUMP();
+	void c_TELE();
 	
 	// ports
 	void c_PRT_BANG();

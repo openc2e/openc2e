@@ -775,4 +775,26 @@ void caosVM::c_CACL() {
 	// TODO
 }
 
+/**
+ WIND (integer)
+ %status stub
+ %pragma variants c1
+
+ Always returns zero, since this command was stubbed in C1.
+*/
+void caosVM::v_WIND() {
+	result.setInt(0);
+}
+
+/**
+ TEMP (integer)
+ %status stub
+ %pragma variants c1
+
+ Always returns zero, since this command was stubbed in C1.
+*/
+void caosVM::v_TEMP() {
+	result.setInt(0);
+}
+
 /* vim: set noet: */
