@@ -102,18 +102,27 @@ public:
 	}
 	
 	// attr
-	bool carryable : 1;
-	bool mouseable : 1;
-	bool activateable : 1;
-	bool greedycabin : 1;
-	bool invisible : 1;
-	bool floatable : 1;
-	bool suffercollisions : 1;
-	bool sufferphysics : 1;
-	bool camerashy : 1;
-	bool openaircabin : 1;
-	bool rotatable : 1;
-	bool presence : 1;
+	caosVar attr;
+	// values which are always the same
+	bool carryable() { return attr.getInt() & 1; }
+	bool mouseable() { return attr.getInt() & 2; }
+	bool activateable() { return attr.getInt() & 4; }
+	bool greedycabin() { return attr.getInt() & 8; }
+	bool invisible() { return attr.getInt() & 16; }
+	bool floatable() { return attr.getInt() & 32; }
+	// version-specific values
+	// C1
+	bool groundbound() { return attr.getInt() & 64; }
+	bool roombound() { return attr.getInt() & 128; }
+	// C2 and c2e
+	bool suffercollisions() { return attr.getInt() & 64; }
+	bool sufferphysics() { return attr.getInt() & 128; }
+	// c2e
+	bool camerashy() { return attr.getInt() & 256; }
+	bool openaircabin() { return attr.getInt() & 512; }
+	bool rotatable() { return attr.getInt() & 1024; }
+	bool presence() { return attr.getInt() & 2048; }
+
 	// bhvr
 	bool cr_can_push : 1;
 	bool cr_can_pull : 1;
@@ -197,8 +206,8 @@ public:
 	int getUNID();
 	std::string identify() const;
 
-	virtual void setAttributes(unsigned int attr);
-	virtual unsigned int getAttributes() const;
+	void setAttributes(unsigned int a) { attr.setInt(a); }
+	unsigned int getAttributes() const { return attr.getInt(); }
 };
 
 class LifeAssert {

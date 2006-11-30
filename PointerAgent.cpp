@@ -28,14 +28,14 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MA
 	name = "hand";
 	handle_events = true;
 	// TODO: verify attributes on the pointer in c2e
-	camerashy = true;
+	attr.setInt(256); // camera shy
 }
 
 void PointerAgent::finishInit() {
 	Agent::finishInit();
 
 	// float relative to main camera
-	floatable = true;
+	attr.setInt(attr.getInt() & 32);
 	floatSetup();
 }
 

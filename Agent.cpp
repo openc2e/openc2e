@@ -19,6 +19,7 @@
 
 #include "Agent.h"
 #include "World.h"
+#include "Engine.h"
 #include <iostream>
 #include <sstream>
 #include "caosVM.h"
@@ -43,12 +44,12 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	elas = 0;
 	perm = 50; // TODO: correct default?
 	range = 500;
-	sufferphysics = false; falling = true;
+	falling = true;
 	x = 0.0f; y = 0.0f;
 
 	// TODO: is this the correct default?
 	clac[0] = 0; // message# for activate 1
-	if (world.gametype == "c1" || world.gametype == "c2") {
+	if (engine.version < 3) {
 		// TODO: is this the correct default? (this is equivalent to bhvr click == 0)
 		clac[0] = -1; clac[1] = -1; clac[2] = -1;
 	}
@@ -60,7 +61,6 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	soundslot = 0;
 	paused = displaycore = false;
 
-	floatable = false; setAttributes(0);
 	cr_can_push = cr_can_pull = cr_can_stop = cr_can_hit = cr_can_eat = cr_can_pickup = false; // TODO: check this
 	imsk_key_down = imsk_key_up = imsk_mouse_move = imsk_mouse_down = imsk_mouse_up = imsk_mouse_wheel = imsk_translated_char = false;
 
@@ -105,9 +105,9 @@ void Agent::floatTo(AgentRef a) {
 	std::vector<AgentRef>::iterator i = std::find(floated.begin(), floated.end(), a);
 	assert(i == floated.end()); // loops are bad, mmkay
 
-	if (floatable) floatRelease();
+	if (floatable()) floatRelease();
 	floatingagent = a;
-	if (floatable) floatSetup();
+	if (floatable()) floatSetup();
 }
 
 void Agent::floatTo(float x, float y) {
@@ -176,9 +176,9 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 			if (c && !cr_can_pickup) return false;
 			if (!from) return false;
 			if (from == world.hand()) {
-				if (!mouseable) return false;
+				if (!mouseable()) return false;
 			} else if (!c) {
-				if (!carryable) return false;
+				if (!carryable()) return false;
 			}
 			from->carry(this); // TODO: correct behaviour?
 			break;
@@ -254,7 +254,7 @@ bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar
 }
 
 void Agent::handleClick(float clickx, float clicky) {
-	if (world.gametype == "c1" || world.gametype == "c2") {
+	if (engine.version < 3) {
 		int action = -1;
 
 		// look up the relevant action for our ACTV state from the clac table
@@ -361,6 +361,8 @@ bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testp
 }
 
 void Agent::physicsTick() {
+	if (engine.version == 1) return; // C1 has no physics, and different attributes.
+
 	if (carriedby) return; // We don't move when carried, so what's the point?
 
 	if (x == 0 && y == 0) return; // TODO: is this correct behaviour? :P
@@ -369,7 +371,7 @@ void Agent::physicsTick() {
 	float destx = x + velx.getFloat();
 	float desty = y + vely.getFloat();
 
-	if (sufferphysics) {
+	if (sufferphysics()) {
 		// TODO: falling behaviour needs looking at more closely..
 		// .. but it shouldn't be 'false' by default on non-physics agents, so..
 		falling = false;
@@ -378,7 +380,7 @@ void Agent::physicsTick() {
 		desty += accg;
 	}
 	
-	if (suffercollisions) {
+	if (suffercollisions()) {
 		float lastdistance = 1000000.0f;
 		bool collided = false;
 		Line wall; // only valid when collided
@@ -482,7 +484,7 @@ void Agent::physicsTick() {
 					}
 				} else				
 					vely.setFloat(0);
-			} else if (sufferphysics && accg != 0) {
+			} else if (sufferphysics() && accg != 0) {
 				falling = true; // TODO: icky
 				vely.setFloat(vely.getFloat() + accg);
 			}
@@ -492,7 +494,7 @@ void Agent::physicsTick() {
 			moveTo(destx, desty);
 	}
 
-	if (sufferphysics && (aero != 0)) {
+	if (sufferphysics() && (aero != 0)) {
 		// reduce speed according to AERO
 		// TODO: aero should be an integer!
 		velx.setFloat(velx.getFloat() - (velx.getFloat() * (aero / 100.0f)));
@@ -590,7 +592,7 @@ Agent::~Agent() {
 
 void Agent::kill() {
 	assert(!dying);
-	if (floatable) floatRelease();
+	if (floatable()) floatRelease();
 	dropCarried();
 	
 	dying = true; // what a world, what a world...
@@ -659,41 +661,6 @@ void Agent::stopScript() {
 	zotstack();
 	if (vm)
 		vm->stop();
-}
-
-void Agent::setAttributes(unsigned int attr) {
-	carryable = (attr & 1);
-	mouseable = (attr & 2);
-	activateable = (attr & 4);
-	greedycabin = (attr & 8);
-	invisible = (attr & 16);
-	bool newfloatable = (attr & 32);
-	if (floatable && !newfloatable)
-		floatRelease();
-	else if (!floatable && newfloatable)
-		floatSetup();
-	floatable = newfloatable;
-	suffercollisions = (attr & 64);
-	sufferphysics = (attr & 128);
-	camerashy = (attr & 256);
-	openaircabin = (attr & 512);
-	rotatable = (attr & 1024);
-	presence = (attr & 2048);
-}
-
-unsigned int Agent::getAttributes() const {
-	unsigned int a = (carryable ? 1 : 0);
-	a += (mouseable ? 2: 0);
-	a += (activateable ? 4: 0);
-	a += (greedycabin ? 8: 0);
-	a += (invisible ? 16: 0);
-	a += (floatable ? 32: 0);
-	a += (suffercollisions ? 64: 0);
-	a += (sufferphysics ? 128: 0);
-	a += (camerashy ? 256: 0);
-	a += (openaircabin ? 512: 0);
-	a += (rotatable ? 1024: 0);
-	return a + (presence ? 2048: 0);
 }
 
 void Agent::carry(AgentRef a) {

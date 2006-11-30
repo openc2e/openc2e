@@ -35,6 +35,7 @@ Engine::Engine() {
 	tickdata = 0;
 	for (unsigned int i = 0; i < 10; i++) ticktimes[i] = 0;
 	ticktimeptr = 0;
+	version = 0; // TODO: something something
 }
 
 void Engine::setBackend(SDLBackend *b) {
@@ -266,12 +267,13 @@ void Engine::handleMouseButton(SomeEvent &event) {
 		// is the messages might only be fired in c2e when you use MESG WRIT, in which case we'll
 		// need to manually set world.hand()->carrying to NULL and a here, respectively - fuzzie
 		if (world.hand()->carrying) {
-			if (!world.hand()->carrying->suffercollisions || world.hand()->carrying->validInRoomSystem()) {
+			// TODO: c1 support - these attributes are invalid for c1
+			if (!world.hand()->carrying->suffercollisions() || world.hand()->carrying->validInRoomSystem()) {
 				world.hand()->carrying->queueScript(5, world.hand()); // drop
 				world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
 
 				// TODO: is this the correct check?
-				if (world.hand()->carrying->sufferphysics && world.hand()->carrying->suffercollisions) {
+				if (world.hand()->carrying->sufferphysics() && world.hand()->carrying->suffercollisions()) {
 					// TODO: do this in the pointer agent?
 					world.hand()->carrying->velx.setFloat(world.hand()->velx.getFloat());
 					world.hand()->carrying->vely.setFloat(world.hand()->vely.getFloat());

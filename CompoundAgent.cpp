@@ -21,6 +21,7 @@
 #include "openc2e.h"
 #include "c16Image.h"
 #include "World.h"
+#include "Engine.h" // version
 #include <algorithm> // sort
 #include <functional> // binary_function
 #include "caosVM.h" // calculateScriptId
@@ -92,7 +93,7 @@ void CompoundAgent::tick() {
 }
 
 void CompoundAgent::handleClick(float clickx, float clicky) {
-	if (world.gametype != "c1" && world.gametype != "c2") {
+	if (engine.version > 2) {
 		Agent::handleClick(clickx, clicky);
 		return;
 	}

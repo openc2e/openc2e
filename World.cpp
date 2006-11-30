@@ -102,8 +102,19 @@ void World::init() {
 	v.setFloat(600.0f); variables["engine_distance_before_port_line_warns"] = v;
 	v.setFloat(800.0f); variables["engine_distance_before_port_line_snaps"] = v;
 
+	// set engine version
+	// TODO: move this somewhere more sensible?
+	if (gametype == "c1")
+		engine.version = 1;
+	else if (gametype == "c2")
+		engine.version = 2;
+	else if (gametype == "c3" || gametype == "cv")
+		engine.version = 3;
+	else
+		throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % gametype));
+
 	// adjust to default tick rate for C1/C2 if necessary
-	if (gametype == "c1" || gametype == "c2")
+	if (engine.version < 3)
 		ticktime = 100;
 }
 
@@ -223,7 +234,7 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 				if (s && s->isTransparent() && obey_all_transparency)
 					if (s->transparentAt(ax - s->x, ay - s->y))
 						continue;
-				if (needs_mouseable && !((*i)->getParent()->mouseable))
+				if (needs_mouseable && !((*i)->getParent()->mouseable()))
 					continue;
 				if (!obey_all_transparency)
 					if ((*i)->getParent() != transagent)
@@ -404,7 +415,7 @@ void World::executeBootstrap(fs::path p) {
 }
 
 void World::executeBootstrap(bool switcher) {
-	if ((gametype == "c1") || (gametype == "c2")) {
+	if (engine.version < 3) {
 		// read from Eden.sfc
 		
 		if (data_directories.size() == 0)

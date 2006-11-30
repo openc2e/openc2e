@@ -347,16 +347,17 @@ void caosVM::c_ATTR() {
 }
 
 /**
- ATTR (integer)
+ ATTR (variable)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
 
- Returns attributes of the TARG agent.
+ Attributes of the TARG agent.
 */
 void caosVM::v_ATTR() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(targ);
-	result.setInt(targ->getAttributes());
+
+	vm->valueStack.push_back(&targ->attr);
 }
 
 /**

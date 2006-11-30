@@ -57,7 +57,7 @@ void CompoundPart::render(SDLSurface *renderer, int xoffset, int yoffset) {
 }
 
 bool CompoundPart::showOnRemoteCameras() {
-	return !parent->camerashy;
+	return !parent->camerashy();
 }
 
 void SpritePart::partRender(SDLSurface *renderer, int xoffset, int yoffset) {

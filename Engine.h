@@ -36,6 +36,7 @@ public:
 	
 	SDLBackend *backend;
 	bool done;
+	unsigned int version;
 
 	Engine();
 	void setBackend(SDLBackend *b);

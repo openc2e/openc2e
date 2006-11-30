@@ -332,7 +332,7 @@ void caosVM::c_MVSF() {
 
 	// TODO: various agents do "mvsf 0 0" without suffercollisions set, so
 	// presumably we shouldn't check room boundaries then. someone verify this.
-	if (!targ->suffercollisions) {
+	if (!targ->suffercollisions()) {
 		targ->moveTo(x, y);
 		return;
 	}
