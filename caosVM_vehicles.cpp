@@ -194,7 +194,7 @@ void caosVM::c_RPAS() {
 /**
  XVEC (variable)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::v_XVEC() {
 	valid_agent(targ);
@@ -207,7 +207,7 @@ void caosVM::v_XVEC() {
 /**
  YVEC (variable)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::v_YVEC() {
 	valid_agent(targ);
@@ -220,7 +220,7 @@ void caosVM::v_YVEC() {
 /**
  BUMP (integer)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::v_BUMP() {
 	valid_agent(targ);
@@ -233,7 +233,7 @@ void caosVM::v_BUMP() {
 /**
  TELE (command) x (integer) y (integer)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 
  Teleport occupants of target vehicle to (x, y).
 */
