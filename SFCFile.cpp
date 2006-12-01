@@ -585,13 +585,14 @@ void SFCCompoundObject::read() {
 		hotspots[i].bottom = reads32();
 	}
 	
-	// read hotspot data
+	// read hotspot function data
 	for (unsigned int i = 0; i < 6; i++) {
+		// (this is actually a map of function->hotspot)
 		hotspots[i].function = reads32();
 	}
 
 	if (parent->version() == 1) {
-		// read C2-specific hotspot data
+		// read C2-specific hotspot function data (again, actually maps function->hotspot)
 		for (unsigned int i = 0; i < 6; i++) {
 			hotspots[i].message = read16();
 			sfccheck(read16() == 0);
@@ -880,7 +881,7 @@ void SFCCompoundObject::copyToWorld() {
 	for (unsigned int i = 0; i < 6; i++) {
 		a->setHotspotLoc(i, hotspots[i].left, hotspots[i].top, hotspots[i].right, hotspots[i].bottom);
 		a->setHotspotFunc(i, hotspots[i].function);
-		// TODO: c2 hotspot bits
+		a->setHotspotFuncDetails(i, hotspots[i].message, hotspots[i].mask);
 	}
 }
 

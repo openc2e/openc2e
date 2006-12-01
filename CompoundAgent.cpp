@@ -67,7 +67,8 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	
 	for (unsigned int i = 0; i < 6; i++) {
 		hotspots[i].left = -1; hotspots[i].right = -1; hotspots[i].top = -1;
-		hotspots[i].bottom = -1; hotspots[i].function = -1;
+		hotspots[i].bottom = -1;
+		hotspotfunctions[i].hotspot = -1;
 	}
 }
 
@@ -101,17 +102,32 @@ void CompoundAgent::handleClick(float clickx, float clicky) {
 	// the hotspots are relative to us
 	clickx -= x; clicky -= y;
 
-	for (unsigned int i = 0; i < 6; i++) {
-		if (hotspots[i].function == -1) continue;
-		if (hotspots[i].left == -1) continue;
+	// TODO: this whole thing needs more thought/work
+
+	unsigned int i = 0;
+	if (engine.version == 1) i = 3; // skip C1 creature-only points
+	for (; i < 6; i++) {
+		if (hotspotfunctions[i].hotspot < 0) continue;
+		if (hotspotfunctions[i].hotspot >= 6) continue;
+		unsigned short func;
+		if (engine.version == 1) {
+			// C1: we only check 3/4/5
+			func = calculateScriptId(i - 3);
+		} else {
+			if (hotspotfunctions[i].mask == 1) continue; // creature only
+			func = calculateScriptId(hotspotfunctions[i].message);
+		}
+
+		int j = hotspotfunctions[i].hotspot;
+
+		if (hotspots[j].left == -1) continue;
 		// TODO: check other items for being -1?
 	
-		if (clickx >= hotspots[i].left && clickx <= hotspots[i].right)
-			if (clicky >= hotspots[i].top && clicky <= hotspots[i].bottom) {
-				// TODO: this isn't right for C2, at least
-				queueScript(calculateScriptId(hotspots[i].function), (Agent *)world.hand());
-				return;
-			}
+		if ((clickx >= hotspots[j].left && clickx <= hotspots[j].right) &&
+			(clicky >= hotspots[j].top && clicky <= hotspots[j].bottom)) {
+			queueScript(func, (Agent *)world.hand());
+			return;
+		}
 	}
 }
 
@@ -127,7 +143,21 @@ void CompoundAgent::setHotspotLoc(unsigned int id, int l, int t, int r, int b) {
 void CompoundAgent::setHotspotFunc(unsigned int id, unsigned int f) {
 	assert(id < 6);
 
-	hotspots[id].function = f;
+	hotspotfunctions[id].hotspot = f;
+	
+	// TODO: this tries to make c2 work nicely, necessary?
+	hotspotfunctions[id].mask = 3;
+	if (id < 3)
+		hotspotfunctions[id].message = calculateScriptId(id);
+	else
+		hotspotfunctions[id].message = calculateScriptId(id - 3);
+}
+
+void CompoundAgent::setHotspotFuncDetails(unsigned int id, uint16 m, uint8 f) {
+	assert(id < 6);
+
+	hotspotfunctions[id].message = m;
+	hotspotfunctions[id].mask = f;
 }
 
 /* vim: set noet: */

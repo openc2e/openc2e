@@ -28,13 +28,19 @@
 
 struct Hotspot {
 	int left, top, right, bottom;
-	int function;
+};
+
+struct HotspotFunction {
+	int hotspot;
+	uint16 message;
+	uint8 mask;
 };
 
 class CompoundAgent : public Agent {
 protected:
 	std::vector<CompoundPart *> parts;
 	Hotspot hotspots[6];
+	HotspotFunction hotspotfunctions[6];
 
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
@@ -50,7 +56,8 @@ public:
 
 	void handleClick(float, float);
 	void setHotspotLoc(unsigned int id, int l, int t, int r, int b);
-	void setHotspotFunc(unsigned int id, unsigned int f);
+	void setHotspotFunc(unsigned int id, unsigned int h);
+	void setHotspotFuncDetails(unsigned int id, uint16 message, uint8 flags);
 
 	friend class caosVM;
 };
