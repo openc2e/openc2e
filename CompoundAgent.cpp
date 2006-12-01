@@ -109,7 +109,7 @@ void CompoundAgent::handleClick(float clickx, float clicky) {
 		if (clickx >= hotspots[i].left && clickx <= hotspots[i].right)
 			if (clicky >= hotspots[i].top && clicky <= hotspots[i].bottom) {
 				// TODO: this isn't right for C2, at least
-				queueScript(calculateScriptId(hotspots[i].function));
+				queueScript(calculateScriptId(hotspots[i].function), (Agent *)world.hand());
 				return;
 			}
 	}
