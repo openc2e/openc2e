@@ -484,7 +484,7 @@ void caosVM::v_FLTY() {
 /**
  MCRT (command) x (integer) y (integer)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 
  Remove limits from target object and move it to (x, y).
 */
