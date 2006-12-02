@@ -145,7 +145,7 @@ ENDDATA
 	}
 
 	print $defn.<<ENDTAIL;
-	{ 0, NULL, NULL, NULL, NULL, 0, 0, NULL }
+	{ 0, NULL, NULL, NULL, NULL, 0, 0, NULL, 0 }
 };
 
 static void registerAutoDelegates_$variant() {
