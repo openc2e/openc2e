@@ -23,7 +23,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "c16Image.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 #include "Agent.h"
 
 bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
@@ -41,7 +41,7 @@ bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) con
 
 creaturesImage *TextEntryPart::caretsprite = 0;
 
-void CompoundPart::render(SDLSurface *renderer, int xoffset, int yoffset) {
+void CompoundPart::render(Surface *renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
 		partRender(renderer, xoffset + parent->x, yoffset + parent->y);
 		if (parent->displaycore /*&& (id == 0)*/) {
@@ -60,7 +60,7 @@ bool CompoundPart::showOnRemoteCameras() {
 	return !parent->camerashy();
 }
 
-void SpritePart::partRender(SDLSurface *renderer, int xoffset, int yoffset) {
+void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 	assert(getCurrentSprite() < getSprite()->numframes());
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha, draw_mirrored);
 }
@@ -443,7 +443,7 @@ void TextPart::recalculateData() {
 	pageheights.push_back(currenty);
 }
 
-void TextPart::partRender(SDLSurface *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
+void TextPart::partRender(Surface *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
 	SpritePart::partRender(renderer, xoffset, yoffset);
 	
 	unsigned int xoff = xoffset + x + leftmargin;
@@ -501,11 +501,11 @@ TextEntryPart::TextEntryPart(Agent *p, unsigned int _id, std::string spritefile,
 	messageid = msgid;
 }
 
-void TextEntryPart::partRender(SDLSurface *renderer, int xoffset, int yoffset) {
+void TextEntryPart::partRender(Surface *renderer, int xoffset, int yoffset) {
 	TextPart::partRender(renderer, xoffset, yoffset, (focused ? this : 0));
 }
 
-void TextEntryPart::renderCaret(SDLSurface *renderer, int xoffset, int yoffset) {
+void TextEntryPart::renderCaret(Surface *renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
 	renderer->render(caretsprite, caretpose, xoffset, yoffset, has_alpha, alpha);
 }
@@ -551,13 +551,13 @@ CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	camera = shared_ptr<Camera>(new PartCamera(this));
 }
 
-void CameraPart::partRender(class SDLSurface *renderer, int xoffset, int yoffset) {
+void CameraPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
 	// TODO: hack to stop us rendering cameras inside cameras. better way?
-	if (renderer == &engine.backend->getMainSurface()) {
+	if (renderer == engine.backend->getMainSurface()) {
 		// make sure we're onscreen before bothering to do any work..
 		if (xoffset + x + viewwidth > 0 && yoffset + y + viewheight > 0 &&
 			xoffset + x < renderer->getWidth() && yoffset + y < renderer->getHeight()) {
-			SDLSurface *surface = engine.backend->newSurface(viewwidth, viewheight);
+			Surface *surface = engine.backend->newSurface(viewwidth, viewheight);
 			world.drawWorld(camera.get(), surface);
 			renderer->blitSurface(surface, xoffset + x, yoffset + y, camerawidth, cameraheight);
 			engine.backend->freeSurface(surface);

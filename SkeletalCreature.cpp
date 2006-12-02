@@ -26,7 +26,7 @@
 
 #include "SkeletalCreature.h"
 #include "World.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 
 #include <typeinfo> // TODO: remove when genome system is fixed
 #include <boost/format.hpp>
@@ -155,7 +155,7 @@ SkeletalCreature::~SkeletalCreature() {
 	delete skeleton;
 }
 
-void SkeletalCreature::render(SDLSurface *renderer, int xoffset, int yoffset) {
+void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 	for (int j = 0; j < 14; j++) {
 		int i = cee_zorder[direction][j];
 
@@ -330,7 +330,7 @@ SkeletonPart::SkeletonPart(SkeletalCreature *p) : CompoundPart(p, 0, 0, 0, 0) {
 void SkeletonPart::tick() {
 }
 
-void SkeletonPart::partRender(class SDLSurface *renderer, int xoffset, int yoffset) {
+void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(parent);
 	c->render(renderer, xoffset, yoffset);	
 }

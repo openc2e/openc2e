@@ -20,7 +20,7 @@
 #include "Camera.h"
 #include "CameraPart.h"
 #include "World.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 
 Camera::Camera() {
 	// TODO: I set these to some high value due to stupidly-floating agents at (0, 0)
@@ -132,15 +132,15 @@ void Camera::updateTracking() {
 }
 
 unsigned int const MainCamera::getWidth() {
-	if ((!getMetaRoom()) || (backend->getMainSurface().getWidth() < getMetaRoom()->width()))
-		return backend->getMainSurface().getWidth();
+	if ((!getMetaRoom()) || (backend->getMainSurface()->getWidth() < getMetaRoom()->width()))
+		return backend->getMainSurface()->getWidth();
 	else
 		return getMetaRoom()->width();
 }
 
 unsigned int const MainCamera::getHeight() {
-	if ((!getMetaRoom()) || (backend->getMainSurface().getHeight() < getMetaRoom()->height()))
-		return backend->getMainSurface().getHeight();
+	if ((!getMetaRoom()) || (backend->getMainSurface()->getHeight() < getMetaRoom()->height()))
+		return backend->getMainSurface()->getHeight();
 	else
 		return getMetaRoom()->height();
 }

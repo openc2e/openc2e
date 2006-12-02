@@ -20,7 +20,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "PointerAgent.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 #include "caosVM.h"
 #include <iostream>
 using std::cerr;

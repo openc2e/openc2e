@@ -49,7 +49,7 @@ private:
 public:
 	SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
 	virtual ~SkeletalCreature();
-	void render(SDLSurface *renderer, int xoffset, int yoffset);
+	void render(Surface *renderer, int xoffset, int yoffset);
 	void skeletonInit();
 	void recalculateSkeleton();
 	unsigned int getPose(unsigned int i) { return pose[i]; }
@@ -82,7 +82,7 @@ class SkeletonPart : public CompoundPart {
 public:
 	SkeletonPart(SkeletalCreature *p);
 	void tick();
-	void partRender(class SDLSurface *renderer, int xoffset, int yoffset);
+	void partRender(class Surface *renderer, int xoffset, int yoffset);
 	unsigned int getWidth() { return ((SkeletalCreature *)parent)->getSkelWidth(); }
 	unsigned int getHeight() { return ((SkeletalCreature *)parent)->getSkelHeight(); }
 };

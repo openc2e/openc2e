@@ -46,7 +46,6 @@ class Agent : public boost::enable_shared_from_this<Agent> {
 	friend class World;
 	friend class opOVxx;
 	friend class opMVxx;
-	friend class SDLBackend; // TODO: should we make soundslot public instead?
 	friend class LifeAssert;
 	friend class SFCSimpleObject;
 	friend class SFCCompoundObject;
@@ -83,8 +82,7 @@ protected:
 	std::list<caosVM *> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
 
-	struct SoundSlot *soundslot;
-	void positionAudio(SoundSlot *);
+	void positionAudio(struct SoundSlot *);
 	bool dying : 1;
 	
 	void unhandledException(std::string info, bool wasscript);
@@ -94,6 +92,8 @@ protected:
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 
 public:
+	struct SoundSlot *soundslot;
+
 	AgentRef carrying;
 	AgentRef carriedby;
 	

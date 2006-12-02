@@ -26,23 +26,23 @@
 
 SDLBackend *g_backend;
 
-void SoundSlot::play() {
+void SDLSoundSlot::play() {
 	soundchannel = Mix_PlayChannel(-1, sound, 0);
 }
 
-void SoundSlot::playLooped() {
+void SDLSoundSlot::playLooped() {
 	soundchannel = Mix_PlayChannel(-1, sound, -1);
 }
 
-void SoundSlot::adjustPanning(int angle, int distance) {
+void SDLSoundSlot::adjustPanning(int angle, int distance) {
 	Mix_SetPosition(soundchannel, angle, distance);
 }
 
-void SoundSlot::fadeOut() {
+void SDLSoundSlot::fadeOut() {
 	Mix_FadeOutChannel(soundchannel, 500); // TODO: is 500 a good value?
 }
 
-void SoundSlot::stop() {
+void SDLSoundSlot::stop() {
 	Mix_HaltChannel(soundchannel);
 	sound = 0;
 }
@@ -344,13 +344,16 @@ void SDLSurface::renderDone() {
 	SDL_Flip(surface);
 }
 
-void SDLSurface::blitSurface(SDLSurface *src, int x, int y, int w, int h) {
+void SDLSurface::blitSurface(Surface *s, int x, int y, int w, int h) {
+	SDLSurface *src = dynamic_cast<SDLSurface *>(s);
+	assert(src);
+
 	// TODO: evil use of internal SDL api
 	SDL_Rect r; r.x = x; r.y = y; r.w = w; r.h = h;
 	SDL_SoftStretch(src->surface, 0, surface, &r);
 }
 
-SDLSurface *SDLBackend::newSurface(unsigned int w, unsigned int h) {
+Surface *SDLBackend::newSurface(unsigned int w, unsigned int h) {
 	SDL_Surface *surf = mainsurface.surface;
 	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
 	assert(underlyingsurf);
@@ -361,7 +364,10 @@ SDLSurface *SDLBackend::newSurface(unsigned int w, unsigned int h) {
 	return newsurf;
 }
 
-void SDLBackend::freeSurface(SDLSurface *surf) {
+void SDLBackend::freeSurface(Surface *s) {
+	SDLSurface *surf = dynamic_cast<SDLSurface *>(s);
+	assert(surf);
+
 	SDL_FreeSurface(surf->surface);
 	delete surf;
 }

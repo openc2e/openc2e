@@ -25,7 +25,6 @@
 #include <math.h>
 #include <unistd.h>
 #include <errno.h>
-#include <SDL/SDL.h>
 #include "lex.mng.h"
 
 mngFlexLexer *mnglexer = NULL;

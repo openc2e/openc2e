@@ -38,7 +38,7 @@ Engine::Engine() {
 	version = 0; // TODO: something something
 }
 
-void Engine::setBackend(SDLBackend *b) {
+void Engine::setBackend(Backend *b) {
 	backend = b;
 	lasttimestamp = backend->ticks();
 
@@ -221,6 +221,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 				case buttonleft: button.setInt(1); break;
 				case buttonright: button.setInt(2); break;
 				case buttonmiddle: button.setInt(4); break;
+				default: break;
 			}
 
 			// if it was a mouse button we're interested in, then fire the relevant raw event

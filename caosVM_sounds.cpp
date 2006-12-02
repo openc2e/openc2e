@@ -26,7 +26,7 @@
 using std::cout;
 using std::cerr;
 
-#include "SDLBackend.h" // hack for now
+#include "Backend.h" // hack for now
 
 /**
  SNDE (command) filename (string)

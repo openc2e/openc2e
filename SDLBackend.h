@@ -3,7 +3,7 @@
  *  openc2e
  *
  *  Created by Alyssa Milburn on Sun Oct 24 2004.
- *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
+ *  Copyright (c) 2004-2006 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,16 +23,13 @@
 #include <SDL/SDL.h>
 #include <SDL_mixer.h>
 #include <SDL_net.h>
-#include "creaturesImage.h"
-#include "endianlove.h"
-#include <map>
+#include "Backend.h"
 
-struct SoundSlot {
+struct SDLSoundSlot : public SoundSlot {
 	int soundchannel;
 	Mix_Chunk *sound;
-	class Agent *agent;
 
-	SoundSlot() { sound = 0; }
+	SDLSoundSlot() { sound = 0; }
 
 	void play();
 	void playLooped();
@@ -41,17 +38,7 @@ struct SoundSlot {
 	void stop();
 };
 
-enum eventtype { eventquit, eventkeydown, eventspecialkeydown, eventmousebuttondown, eventmousebuttonup, eventmousemove, eventresizewindow };
-enum eventbuttons { buttonleft, buttonright, buttonmiddle, buttonwheeldown, buttonwheelup };
-
-struct SomeEvent {
-	eventtype type;
-	int x, y, xrel, yrel;
-	int key;
-	eventbuttons button;
-};
-
-class SDLSurface {
+class SDLSurface : public Surface {
 	friend class SDLBackend;
 
 protected:
@@ -62,17 +49,17 @@ protected:
 public:
 	void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
-	void blitSurface(SDLSurface *src, int x, int y, int w, int h);
+	void blitSurface(Surface *src, int x, int y, int w, int h);
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
 	void renderDone();
 };
 
-class SDLBackend {
+class SDLBackend : public Backend {
 protected:
 	bool soundenabled, networkingup;
 	static const unsigned int nosounds = 12;
-	SoundSlot sounddata[12];
+	SDLSoundSlot sounddata[12];
 
 	std::map<std::string, Mix_Chunk *> soundcache;
 
@@ -97,9 +84,9 @@ public:
 	
 	void handleEvents();
 	
-	SDLSurface &getMainSurface() { return mainsurface; }
-	SDLSurface *newSurface(unsigned int width, unsigned int height);
-	void freeSurface(SDLSurface *surf);
+	Surface *getMainSurface() { return &mainsurface; }
+	Surface *newSurface(unsigned int width, unsigned int height);
+	void freeSurface(Surface *surf);
 		
 	bool keyDown(int key);
 	

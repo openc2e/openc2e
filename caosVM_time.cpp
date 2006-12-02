@@ -20,7 +20,7 @@
 #include "caosVM.h"
 #include "World.h"
 #include "Engine.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 #include <time.h> // gmtime and strftime
 
 /**

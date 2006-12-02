@@ -21,7 +21,7 @@
 #define _ENGINE_H
 
 #include "caosVar.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 #include <map>
 
 class Engine {
@@ -34,12 +34,12 @@ private:
 public:
 	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	
-	SDLBackend *backend;
+	Backend *backend;
 	bool done;
 	unsigned int version;
 
 	Engine();
-	void setBackend(SDLBackend *b);
+	void setBackend(Backend *b);
 	std::string executeNetwork(std::string in);
 	void tick();
 	void handleKeyboardScrolling();

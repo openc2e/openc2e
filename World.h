@@ -44,8 +44,6 @@ struct scriptevent {
 	caosVar p[2];
 };
 
-class SDLBackend;
-
 class World {
 protected:
 	class PointerAgent *theHand;
@@ -110,7 +108,7 @@ public:
 	
 	void tick();
 	void drawWorld();
-	void drawWorld(Camera *cam, SDLSurface *surface);
+	void drawWorld(Camera *cam, Surface *surface);
 
 	int getUNID(Agent *whofor);
 	void freeUNID(int unid);

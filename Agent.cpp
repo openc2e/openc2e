@@ -23,7 +23,7 @@
 #include <iostream>
 #include <sstream>
 #include "caosVM.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 #include <boost/format.hpp>
 
 void Agent::core_init() {

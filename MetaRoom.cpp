@@ -21,7 +21,7 @@
 #include "World.h"
 #include "creaturesImage.h"
 #include <assert.h>
-#include "SDLBackend.h"
+#include "Backend.h"
 
 MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, creaturesImage *spr, bool wrap) {
 	xloc = _x; yloc = _y; wid = _width; hei = _height; firstback = 0; wraps = wrap;

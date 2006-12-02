@@ -25,7 +25,7 @@
 #include <limits.h> // for MAXINT
 #include "creaturesImage.h"
 #include "Creature.h"
-#include "SDLBackend.h"
+#include "Backend.h"
 #include "SFCFile.h"
 
 #include <boost/format.hpp>
@@ -265,10 +265,10 @@ Agent *World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
-	drawWorld(&camera, &engine.backend->getMainSurface());
+	drawWorld(&camera, engine.backend->getMainSurface());
 }
 
-void World::drawWorld(Camera *cam, SDLSurface *surface) {
+void World::drawWorld(Camera *cam, Surface *surface) {
 	assert(surface);
 
 	MetaRoom *m = cam->getMetaRoom();

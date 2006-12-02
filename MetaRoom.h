@@ -27,8 +27,6 @@
 #include <vector>
 #include <map>
 
-struct SDL_Surface;
-
 class MetaRoom {
 protected:
 	FRIEND_SERIALIZE(MetaRoom);

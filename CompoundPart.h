@@ -47,8 +47,8 @@ public:
 	bool has_alpha;
 	unsigned char alpha;
 
-	virtual void render(class SDLSurface *renderer, int xoffset, int yoffset);
-	virtual void partRender(class SDLSurface *renderer, int xoffset, int yoffset) = 0;
+	virtual void render(class Surface *renderer, int xoffset, int yoffset);
+	virtual void partRender(class Surface *renderer, int xoffset, int yoffset) = 0;
 	virtual void tick() { }
 	virtual void handleClick(float, float) { }
 	virtual unsigned int getWidth() = 0;
@@ -82,7 +82,7 @@ public:
 	unsigned char framerate;
 	unsigned int framedelay;
 	creaturesImage *getSprite() { return sprite; }
-	virtual void partRender(class SDLSurface *renderer, int xoffset, int yoffset);
+	virtual void partRender(class Surface *renderer, int xoffset, int yoffset);
 	virtual void tick();
 	virtual void handleClick(float, float);
 	unsigned int getPose() { return pose; }
@@ -167,8 +167,8 @@ public:
 	unsigned int noPages() { return pages.size(); }
 	void setPage(unsigned int p) { currpage = p; }
 	unsigned int getPage() { return currpage; }
-	void partRender(class SDLSurface *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
-	void partRender(class SDLSurface *renderer, int xoffset, int yoffset) { partRender(renderer, xoffset, yoffset, 0); }
+	void partRender(class Surface *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
+	void partRender(class Surface *renderer, int xoffset, int yoffset) { partRender(renderer, xoffset, yoffset, 0); }
 	void setFormat(int left, int top, int right, int bottom, int line, int _char, horizontalalign horza, verticalalign verta, bool lastpagescroll);
 };
 
@@ -191,7 +191,7 @@ private:
 	bool focused;
 	unsigned int caretpos;
 	unsigned int messageid;
-	void renderCaret(class SDLSurface *renderer, int xoffset, int yoffset);
+	void renderCaret(class Surface *renderer, int xoffset, int yoffset);
 
 	friend class TextPart;
 
@@ -205,7 +205,7 @@ public:
 	void handleKey(char c);
 	void handleSpecialKey(char c);
 	void tick();
-	virtual void partRender(class SDLSurface *renderer, int xoffset, int yoffset);
+	virtual void partRender(class Surface *renderer, int xoffset, int yoffset);
 	bool isTransparent() { return false; }
 };
 
