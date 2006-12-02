@@ -18,6 +18,7 @@ OPENC2E_CORE = \
 	blkImage.o \
 	bytecode.o \
 	c16Image.o \
+	CallButton.o \
 	Camera.o \
 	caosScript.o \
 	caosVar.o \
@@ -63,6 +64,7 @@ OPENC2E_CORE = \
 	lex.mng.o \
 	lexutil.o \
 	lex.yy.o \
+	Lift.o \
 	Map.o \
 	MetaRoom.o \
 	mmapifstream.o \
