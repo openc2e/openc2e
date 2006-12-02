@@ -900,7 +900,11 @@ void SFCCompoundObject::copyToWorld() {
 
 void SFCSimpleObject::copyToWorld() {
 	// construct our equivalent object
-	SimpleAgent *a = new SimpleAgent(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
+	if (!ourAgent) {
+		ourAgent = new SimpleAgent(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
+	}
+	SimpleAgent *a = ourAgent;
+
 	a->finishInit();
 	//a->moveTo(entity->x - (a->part(0)->getWidth() / 2), entity->y - (a->part(0) -> getHeight() / 2));
 	a->moveTo(entity->x, entity->y);
@@ -957,8 +961,12 @@ void SFCPointerTool::copyToWorld() {
 #include "Vehicle.h"
 
 void SFCVehicle::copyToWorld() {
-	Vehicle *a = new Vehicle(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
-	ourAgent = a;
+	if (!ourAgent) {
+		ourAgent = new Vehicle(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	}
+	Vehicle *a = dynamic_cast<Vehicle *>(ourAgent);
+	assert(a);
+
 	SFCCompoundObject::copyToWorld();
 
 	// set cabin rectangle
@@ -968,6 +976,39 @@ void SFCVehicle::copyToWorld() {
 	a->bump = bump;
 	a->xvec.setInt(xvec);
 	a->yvec.setInt(yvec);
+}
+
+#include "Lift.h"
+
+void SFCLift::copyToWorld() {
+	Lift *a = new Lift(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	ourAgent = a;
+
+	SFCCompoundObject::copyToWorld();
+
+	// set current button
+	a->currentbutton = currentbutton;
+	
+	// set call button y locations
+	for (unsigned int i = 0; i < nobuttons; i++) {
+		a->callbuttony.push_back(callbuttony[i]);
+	}
+}
+
+#include "CallButton.h"
+
+void SFCCallButton::copyToWorld() {
+	CallButton *a = new CallButton(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
+	ourAgent = a;
+
+	SFCSimpleObject::copyToWorld();
+
+	// set lift
+	sfccheck(ourLift->ourAgent);
+	assert(dynamic_cast<Lift *>(ourLift->ourAgent));
+	a->lift = ourLift->ourAgent;
+
+	a->buttonid = liftid;
 }
 
 #include <boost/format.hpp>

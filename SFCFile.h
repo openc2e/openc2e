@@ -262,6 +262,8 @@ public:
 };
 
 class SFCLift : public SFCVehicle {
+	friend class SFCCallButton;
+
 public:
 	uint32 nobuttons;
 	uint32 currentbutton;
@@ -270,13 +272,17 @@ public:
 
 	SFCLift(SFCFile *p) : SFCVehicle(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCSimpleObject : public SFCObject {
+protected:
+	class SimpleAgent *ourAgent;
+
 public:
 	SFCEntity *entity;
 
-	SFCSimpleObject(SFCFile *p) : SFCObject(p) { }
+	SFCSimpleObject(SFCFile *p) : SFCObject(p) { ourAgent = 0; }
 	void read();
 	void copyToWorld();
 };
@@ -297,6 +303,7 @@ public:
 
 	SFCCallButton(SFCFile *p) : SFCSimpleObject(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCScenery : public SFCSimpleObject {
