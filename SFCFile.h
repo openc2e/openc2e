@@ -263,6 +263,9 @@ public:
 
 class SFCLift : public SFCVehicle {
 public:
+	uint32 nobuttons;
+	uint32 currentbutton;
+	uint32 callbuttony[8];
 	// TODO: misc data
 
 	SFCLift(SFCFile *p) : SFCVehicle(p) { }

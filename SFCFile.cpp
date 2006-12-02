@@ -659,12 +659,23 @@ void SFCVehicle::read() {
 
 void SFCLift::read() {
 	SFCVehicle::read();
+
+	nobuttons = read32();
+	currentbutton = read32();
 	
 	// discard unknown bytes
-	if (parent->version() == 0)
-		readBytes(61);
-	else
-		readBytes(65);
+	sfccheck(readBytes(5) == std::string("\xff\xff\xff\xff\x00", 5));
+
+	for (unsigned int i = 0; i < 8; i++) {
+		callbuttony[i] = read32();
+
+		// discard unknown bytes
+		sfccheck(read16() == 0);
+	}
+
+	// discard unknown bytes
+	if (parent->version() == 1)
+		read32();
 }
 
 void SFCSimpleObject::read() {
