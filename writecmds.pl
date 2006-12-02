@@ -117,7 +117,11 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			$argp = "a_$variant"."_$key";
 		}
 
-		
+		my $evalcost = $data->{$key}{evalcost}{default};
+
+		if (defined $data->{$key}{evalcost}{$variant}) {
+			$evalcost = $data->{$key}{evalcost}{$variant};
+		}
 			
 		$data->{$key}{delegate} = $delegate;
 		$data->{$key}{idx} = $idx;
@@ -131,7 +135,8 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			"$syntax $cedocs",
 			$argc,
 			$retc,
-			$argp
+			$argp,
+			$evalcost
 		},
 ENDDATA
 		$disp_tbl[$disp_id] = $implementation;

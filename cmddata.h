@@ -43,6 +43,7 @@ struct cmdinfo {
 	int argc;
 	int retc;
 	const enum ci_type *argtypes;
+	int evalcost;
 };
 
 void registerAutoDelegates();

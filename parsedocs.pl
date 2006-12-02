@@ -113,8 +113,16 @@ while (<>) {
 	pop @lines while (@lines && $lines[-1] eq '');
 
 	my %pragma;
+	my %evalcost;
 	my $status;
 	my $cat;
+
+	if ($ctype eq 'command') {
+		$evalcost{default} = 1;
+	} else {
+		$evalcost{default} = 0;
+	}
+
 	while (@lines && ($lines[0] =~ s{^\%([a-zA-Z]+)\s+}{} || $lines[0] =~ m{^\s*$})) {
 		my $l = shift @lines;
 		chomp $l;
@@ -139,6 +147,20 @@ while (<>) {
 				die "set category twice";
 			}
 			$cat = $l;
+		} elsif ($1 eq 'cost') {
+			print STDERR "ec l=$l\n";
+			if ($l =~ m{^\s*(-?\d+)\s*$}) {
+				$evalcost{default} = $1;
+			} elsif ($l =~ m{(\S+)\s+(-?\d+)\s*$}) {
+				my $cost = $2;
+				my @variants = split ',', $1;
+				for my $v (@variants) {
+					print STDERR "v=$v\n";
+					$evalcost{$v} = $cost;
+				}
+			} else {
+				die "malformed cost directive";
+			}
 		} else {
 			die "Unrecognized directive: $1";
 		}
@@ -173,6 +195,7 @@ while (<>) {
 		implementation => $impl,
 		status => $status,
 		category => $cat,
+		evalcost => \%evalcost,
 	};
 	if (%pragma) {
 		$cd->{pragma} = \%pragma;

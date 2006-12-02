@@ -45,7 +45,7 @@ class caosOp {
 			evalcost = cost;
 		}
 		virtual void relocate(const std::vector<int> &relocations) {}
-		caosOp() : evalcost(1), owned(false), yyline(lex_lineno) {}
+		caosOp() : evalcost(0), owned(false), yyline(lex_lineno) {}
 		virtual ~caosOp() {};
 		virtual std::string dump() = 0;
 		int getlineno() const { return yyline; }
@@ -61,7 +61,6 @@ class caosOp {
 
 class caosNoop : public caosOp {
 	public:
-		caosNoop() { evalcost = 0; }
 		std::string dump() { return std::string("noop"); }
 };
 
@@ -71,7 +70,7 @@ class caosJMP : public caosOp {
 		int p;
 		caosJMP() {}
 	public:
-		caosJMP(int p_) : p(p_) { evalcost = 0; }
+		caosJMP(int p_) : p(p_) { }
 		void execute(caosVM *vm) { vm->nip = p; }
 		void relocate(const std::vector<int> &relocations) {
 			if (p < 0)
@@ -104,7 +103,7 @@ class simpleCaosOp : public caosOp {
 		const cmdinfo *ci;
 		simpleCaosOp() {}
 	public:
-		simpleCaosOp(const cmdinfo *i) : ci(i) {}
+		simpleCaosOp(const cmdinfo *i) : ci(i) { evalcost = ci->evalcost; }
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			int stackc = vm->valueStack.size();
@@ -399,7 +398,7 @@ class opVAxx : public caosOp {
 		int index;
 		opVAxx() {}
 	public:
-		opVAxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		opVAxx(int i) : index(i) { assert(i >= 0 && i < 100); }
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			vm->valueStack.push_back(&vm->var[index]);
@@ -416,7 +415,7 @@ class opOVxx : public caosOp {
 		int index;
 		opOVxx() {}
 	public:
-		opOVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		opOVxx(int i) : index(i) { assert(i >= 0 && i < 100); }
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			caos_assert(vm->targ);
@@ -433,7 +432,7 @@ class opMVxx : public caosOp {
 		int index;
 		opMVxx() {}
 	public:
-		opMVxx(int i) : index(i) { assert(i >= 0 && i < 100); evalcost = 0; }
+		opMVxx(int i) : index(i) { assert(i >= 0 && i < 100); }
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			caos_assert(vm->owner);
