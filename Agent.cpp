@@ -554,7 +554,9 @@ void Agent::vmTick() {
 	assert(vm);
 	LifeAssert la(this);
 
-	if (!vm->timeslice) vm->timeslice = 5;
+	if (!vm->timeslice) {
+		vm->timeslice = (engine.version < 3) ? 1 : 5;
+	}
 
 	while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
 		try {
