@@ -23,9 +23,9 @@
 #include "genome.h"
 
 #include "openc2e.h"
-#include "Creature.h"
+#include "CreatureAgent.h"
 
-class SkeletalCreature : public Creature {
+class SkeletalCreature : public CreatureAgent {
 private:
 	class SkeletonPart *skeleton;
 

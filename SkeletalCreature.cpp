@@ -25,6 +25,7 @@
 */
 
 #include "SkeletalCreature.h"
+#include "Creature.h"
 #include "World.h"
 #include "Backend.h"
 
@@ -71,16 +72,14 @@ unsigned int cee_lookup[17] = { 1, 0, 2, 7, 11, 3, 8, 12, 4, 9, 5, 10, 6, 13, 14
 std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed) {
 	// TODO: dataspecies is nonsense in c1
 	char _postfix[4] = "XXX";
-	_postfix[0] = '0' + dataspecies + ((sprite && female) ? 4 : 0);
+	_postfix[0] = '0' + dataspecies + ((sprite && creature->isFemale()) ? 4 : 0);
 	_postfix[1] = '0' + _stage;
 	_postfix[2] = 'a' + databreed;
 	return _postfix;
 }
 
 SkeletalCreature::SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
- : Creature(g, _family, is_female, _variant) {
-	stage = baby;
-	// todo: check lifestage
+ : CreatureAgent(g, _family, is_female, _variant) {
 	facialexpression = 0;
 	pregnancy = 0;
 	eyesclosed = false;
@@ -99,7 +98,7 @@ void SkeletalCreature::skeletonInit() {
 	//TODO: the exception throwing in here needs some more thought
 
 	creatureAppearance *appearance[5] = { 0, 0, 0, 0, 0 };
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureAppearance)) {
 			creatureAppearance *x = (creatureAppearance *)(*i);
 			if (x->part > 4)
@@ -116,7 +115,7 @@ void SkeletalCreature::skeletonInit() {
 			world.gallery.delImage(images[i]);
 		images[i] = 0;
 		char x = cee_bodyparts[i].letter;
-		int stage_to_try = stage;
+		int stage_to_try = creature->getStage();
 		creatureAppearance *partapp = 0;
 		if (x == 'a' || x >= 'o') {
 			// head
@@ -143,7 +142,7 @@ void SkeletalCreature::skeletonInit() {
 			if (images[i] == 0) stage_to_try--;
 		}
 		if (images[i] == 0)
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % (int)stage));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % (int)creature->getStage()));
 		std::ifstream in(std::string(world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att")).c_str());
 		in >> att[i];
 	}
@@ -275,14 +274,14 @@ void SkeletalCreature::setPose(std::string s) {
 void SkeletalCreature::setPoseGene(unsigned int poseno) {
 	/* TODO: this sets by sequence, now, not the 'poseno' inside the gene.
 	 * this is what the POSE caos command does. is this right? - fuzzie */
-	creaturePose *g = (creaturePose *)genome->getGene(2, 3, poseno);
+	creaturePose *g = (creaturePose *)creature->genome->getGene(2, 3, poseno);
 	assert(g); // TODO: -> caos_assert
 
 	gaitgene = 0;
 }
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureGait)) {
 			creatureGait *g = (creatureGait *)(*i);
 			if (g->drive == gaitdrive) {
@@ -301,7 +300,7 @@ void SkeletalCreature::gaitTick() {
 	if (!gaitgene) return;
 	uint8 pose = gaitgene->pose[gaiti];
 	creaturePose *poseg = 0;
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creaturePose)) {
 			creaturePose *g = (creaturePose *)(*i);
 			if (g->poseno == pose)
@@ -336,13 +335,14 @@ void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset)
 }
 
 void SkeletalCreature::ageCreature() {
-	Creature::ageCreature();
+	//Creature::ageCreature();
+	// TODO: with reachitect, should be handling this some other way!
 
 	skeletonInit();
 }
 
 std::string SkeletalCreature::getFaceSpriteName() {
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureAppearance)) {
 			creatureAppearance *x = (creatureAppearance *)(*i);
 			if (x->part == 0) {

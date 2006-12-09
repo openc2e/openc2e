@@ -19,11 +19,12 @@
 
 #include "historyManager.h"
 #include "World.h"
+#include "CreatureAgent.h"
 #include "Creature.h"
 
 #include <boost/format.hpp>
 
-historyevent::historyevent(unsigned int eno, Creature *c) {
+historyevent::historyevent(unsigned int eno, CreatureAgent *c) {
 	timestamp = time(NULL);
 	eventno = eno;
 	worldtick = world.tickcount;
@@ -32,8 +33,8 @@ historyevent::historyevent(unsigned int eno, Creature *c) {
 	// TODO: networkid = world.username;
 	
 	if (c) {
-		tage = c->getAge();
-		stage = c->getStage();
+		tage = c->getCreature()->getAge();
+		stage = c->getCreature()->getStage();
 	} else {
 		tage = -1;
 		stage = baby; // TODO: correct?
@@ -63,8 +64,8 @@ void monikerData::init(std::string m, shared_ptr<genomeFile> f) {
 }
 
 historyevent &monikerData::addEvent(unsigned int event, std::string moniker1, std::string moniker2) {
-	Creature *c = 0;
-	if (owner) c = dynamic_cast<Creature *>(owner.get());	
+	CreatureAgent *c = 0;
+	if (owner) c = dynamic_cast<CreatureAgent *>(owner.get());	
 	
 	events.push_back(historyevent(event, c));
 	events.back().monikers[0] = moniker1;
@@ -93,19 +94,19 @@ void monikerData::moveToAgent(AgentRef a) {
 void monikerData::moveToCreature(AgentRef a) {
 	moveToAgent(a);
 	
-	Creature *c = dynamic_cast<Creature *>(owner.get());
+	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
 	assert(c);
 	status = creature;
 }
 
 void monikerData::wasBorn() {
 	assert(status == creature);
-	Creature *c = dynamic_cast<Creature *>(owner.get());
+	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
 	assert(c);
 	
 	status = borncreature;
-	gender = (c->isFemale() ? 2 : 1);
-	variant = c->getVariant();
+	gender = (c->getCreature()->isFemale() ? 2 : 1);
+	variant = c->getCreature()->getVariant();
 }
 
 monikerstatus monikerData::getStatus() {

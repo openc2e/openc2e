@@ -23,6 +23,7 @@
 
 using boost::shared_ptr;
 
+class CreatureAgent;
 class Creature;
 
 struct Reaction {
@@ -104,7 +105,7 @@ class Brain {
 public:
 };
 
-class Creature : public Agent {
+class Creature {
 protected:
 	std::vector<shared_ptr<Organ> > organs;
 	Brain brain;
@@ -115,7 +116,6 @@ protected:
 	// non-specific bits
 	unsigned int variant;
 	bool female;
-	shared_ptr<genomeFile> genome;
 	
 	bool alive, asleep, dreaming, tickage;
 
@@ -146,8 +146,13 @@ protected:
 
 	void tickBiochemistry();
 
+	CreatureAgent *parent;
+
 public:
-	Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
+	// TODO: should this be public?
+	shared_ptr<genomeFile> genome;
+	
+	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *p);
 	virtual ~Creature();
 	void tick();
 

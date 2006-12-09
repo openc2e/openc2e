@@ -30,7 +30,7 @@
 
 #include "Vehicle.h"
 #include "PointerAgent.h"
-#include "Creature.h"
+#include "CreatureAgent.h"
 
 /**
  VAxx (variable)
@@ -180,7 +180,7 @@ void caosVM::v_TYPE() {
 		else if (typeid(*a) == typeid(Vehicle))
 			result.setInt(6);
 		else {
-			Creature *c = dynamic_cast<Creature *>(a.get());
+			CreatureAgent *c = dynamic_cast<CreatureAgent *>(a.get());
 			if (c)
 				result.setInt(7);
 			else

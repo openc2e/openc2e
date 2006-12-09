@@ -53,6 +53,7 @@ OPENC2E_CORE = \
 	CompoundAgent.o \
 	CompoundPart.o \
 	Creature.o \
+	CreatureAgent.o \
 	creaturesImage.o \
 	dialect.o \
 	Engine.o \

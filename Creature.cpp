@@ -18,19 +18,19 @@
  */
 
 #include "Creature.h"
+#include "CreatureAgent.h"
 #include "World.h"
 #include <cmath> // powf
 
-Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
- : Agent(_family, 0, 0, 0) {
-	caos_assert(g);
+Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *p) {
+	assert(p);
+	parent = p;
+	assert(g);
 	genome = g;
-	slots[0] = g;
+	
 	female = is_female;
 	variant = _variant;
-	species = (female ? 2 : 1);
-	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
-	zorder = 1500;
+	stage = baby;
 
 	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
 	
@@ -44,7 +44,8 @@ Creature::Creature(shared_ptr<genomeFile> g, unsigned char _family, bool is_fema
 		} else if (typeid(*(*i)) == typeid(creatureGenus)) {
 			// initialize genus
 			creatureGenus *g = (creatureGenus *)(*i);
-			genus = g->genus + 1;
+			// TODO: correct to do this here?
+			parent->genus = g->genus + 1;
 		} else if (typeid(*(*i)) == typeid(organGene)) {
 			// create organ
 			organGene *o = dynamic_cast<organGene *>(*i);
@@ -130,9 +131,8 @@ void Creature::die() {
 }
 
 void Creature::tick() {
-	Agent::tick();
 	// TODO: should we tick some things even if dead?
-	if ((paused) || (!alive)) return;
+	if (!alive) return;
 
 	if (tickage) age++;
 

@@ -41,7 +41,7 @@ struct historyevent {
 	std::string worldname;
 	std::string worldmoniker;
 	unsigned int worldtick;
-	historyevent(unsigned int eno, class Creature * = 0);
+	historyevent(unsigned int eno, class CreatureAgent * = 0);
 };
 
 enum monikerstatus { referenced = 1, creature = 2, borncreature = 3, exported = 4, dead = 5, deadandkilled = 6, unreferenced = 7 };

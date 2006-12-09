@@ -151,13 +151,13 @@ shared_ptr<script> Agent::findScript(unsigned short event) {
 }
 
 #include "PointerAgent.h"
-#include "Creature.h"
+#include "CreatureAgent.h"
 bool Agent::fireScript(unsigned short event, Agent *from) {
 	if (dying) return false;
 
-	Creature *c;
+	CreatureAgent *c;
 	if (event <= 3 || event == 4 || event == 12 || event == 13 || event == 14)
-		c = dynamic_cast<Creature *>(from);
+		c = dynamic_cast<CreatureAgent *>(from);
 
 	switch (event) {
 		case 0: // deactivate

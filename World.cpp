@@ -24,7 +24,7 @@
 #include "CompoundAgent.h" // for setFocus
 #include <limits.h> // for MAXINT
 #include "creaturesImage.h"
-#include "Creature.h"
+#include "CreatureAgent.h"
 #include "Backend.h"
 #include "SFCFile.h"
 
@@ -508,7 +508,7 @@ std::string World::getUserDataDir() {
 
 void World::selectCreature(boost::shared_ptr<Agent> a) {
 	if (a) {
-		Creature *c = dynamic_cast<Creature *>(a.get());
+		CreatureAgent *c = dynamic_cast<CreatureAgent *>(a.get());
 		caos_assert(c);
 	}
 	selectedcreature = a;

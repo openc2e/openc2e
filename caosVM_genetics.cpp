@@ -19,7 +19,7 @@
 
 #include "caosVM.h"
 #include "World.h"
-#include "Creature.h"
+#include "CreatureAgent.h"
 #include <fstream>
 
 /**
@@ -155,7 +155,10 @@ void caosVM::v_MTOC() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	Agent *a = world.history.getMoniker(moniker).owner;
-	result.setAgent(dynamic_cast<Creature *>(a));
+	assert(a);
+	CreatureAgent *c = dynamic_cast<CreatureAgent *>(a);
+	assert(c);
+	result.setAgent(c);
 }
 
 /* vim: set noet: */

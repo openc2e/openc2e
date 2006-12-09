@@ -22,13 +22,14 @@
 #include "openc2e.h"
 #include "World.h"
 #include "SkeletalCreature.h"
+#include "Creature.h"
 using std::cerr;
 
 Creature *caosVM::getTargCreature() {
 	valid_agent(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
+	CreatureAgent *c = dynamic_cast<CreatureAgent *>(targ.get());
 	caos_assert(c);
-	return c;
+	return c->getCreature();
 }
 
 /**
@@ -713,7 +714,8 @@ void caosVM::v_UNCS() {
  %status stub
 */
 void caosVM::c_FACE() {
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(getTargCreature());
+	caos_assert(targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
 	caos_assert(c);
 
 	// TODO
@@ -727,9 +729,10 @@ void caosVM::c_FACE() {
  Returns the front-facing pose for the current facial expression of the target creature.
 */
 void caosVM::v_FACE() {
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(getTargCreature());
+	caos_assert(targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
 	caos_assert(c);
-	
+
 	result.setInt(c->getFaceSpriteFrame());
 }
 
@@ -740,9 +743,10 @@ void caosVM::v_FACE() {
  Returns the current sprite filename for the face of the target creature.
 */
 void caosVM::s_FACE() {
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(getTargCreature());
+	caos_assert(targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
 	caos_assert(c);
-	
+
 	result.setString(c->getFaceSpriteName());
 }
 
