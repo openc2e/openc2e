@@ -78,8 +78,7 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsig
 	return _postfix;
 }
 
-SkeletalCreature::SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
- : CreatureAgent(g, _family, is_female, _variant) {
+SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : CreatureAgent(_family, c) {
 	facialexpression = 0;
 	pregnancy = 0;
 	eyesclosed = false;
@@ -98,7 +97,7 @@ void SkeletalCreature::skeletonInit() {
 	//TODO: the exception throwing in here needs some more thought
 
 	creatureAppearance *appearance[5] = { 0, 0, 0, 0, 0 };
-	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureAppearance)) {
 			creatureAppearance *x = (creatureAppearance *)(*i);
 			if (x->part > 4)
@@ -274,14 +273,14 @@ void SkeletalCreature::setPose(std::string s) {
 void SkeletalCreature::setPoseGene(unsigned int poseno) {
 	/* TODO: this sets by sequence, now, not the 'poseno' inside the gene.
 	 * this is what the POSE caos command does. is this right? - fuzzie */
-	creaturePose *g = (creaturePose *)creature->genome->getGene(2, 3, poseno);
+	creaturePose *g = (creaturePose *)creature->getGenome()->getGene(2, 3, poseno);
 	assert(g); // TODO: -> caos_assert
 
 	gaitgene = 0;
 }
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
-	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureGait)) {
 			creatureGait *g = (creatureGait *)(*i);
 			if (g->drive == gaitdrive) {
@@ -300,7 +299,7 @@ void SkeletalCreature::gaitTick() {
 	if (!gaitgene) return;
 	uint8 pose = gaitgene->pose[gaiti];
 	creaturePose *poseg = 0;
-	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creaturePose)) {
 			creaturePose *g = (creaturePose *)(*i);
 			if (g->poseno == pose)
@@ -334,15 +333,12 @@ void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset)
 	c->render(renderer, xoffset, yoffset);	
 }
 
-void SkeletalCreature::ageCreature() {
-	//Creature::ageCreature();
-	// TODO: with reachitect, should be handling this some other way!
-
+void SkeletalCreature::creatureAged() {
 	skeletonInit();
 }
 
 std::string SkeletalCreature::getFaceSpriteName() {
-	for (vector<gene *>::iterator i = creature->genome->genes.begin(); i != creature->genome->genes.end(); i++) {
+	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureAppearance)) {
 			creatureAppearance *x = (creatureAppearance *)(*i);
 			if (x->part == 0) {

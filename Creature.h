@@ -3,7 +3,7 @@
  *  openc2e
  *
  *  Created by Alyssa Milburn on Tue May 25 2004.
- *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
+ *  Copyright (c) 2004-2006 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,42 +26,95 @@ using boost::shared_ptr;
 class CreatureAgent;
 class Creature;
 
-struct Reaction {
+class Creature {
+protected:
+	CreatureAgent *parent;
+	shared_ptr<genomeFile> genome;
+	
+	// non-specific bits
+	unsigned int variant;
+	bool female;
+	
+	bool alive, asleep, dreaming, tickage;
+	bool zombie;
+
+	unsigned int age; // in ticks
+	lifestage stage;
+
+	AgentRef attention, focus;
+
+	// linguistic stuff
+
+	// drives
+	// to-be-processed instincts
+	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
+	
+	void processGenes();
+	virtual void addGene(gene *);
+
+public:
+	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	void setAgent(CreatureAgent *a);
+	virtual ~Creature();
+	virtual void tick();
+
+	virtual void ageCreature();
+	lifestage getStage() { return stage; }
+
+	unsigned int getVariant() { return variant; }
+	void setAsleep(bool asleep);
+	bool isAsleep() { return asleep; }
+	void setDreaming(bool dreaming);
+	bool isDreaming() { return dreaming; }
+	bool isFemale() { return female; }
+	bool isAlive() { return alive; }
+	void setZombie(bool z) { zombie = z; }
+	bool isZombie() { return zombie; }
+	unsigned int getAge() { return age; }
+	shared_ptr<genomeFile> getGenome() { return genome; }
+	
+	void born();
+	void die();
+};
+
+// c2e
+
+struct c2eReaction {
 	bioReaction *data;
 	float rate;
 	unsigned int receptors;
 	void init(bioReaction *);
 };
 
-struct Receptor {
+struct c2eReceptor {
 	bioReceptor *data;
 	bool processed;
 	float lastvalue;
 	float *locus;
 	unsigned int *receptors;
 	float nominal, threshold, gain;
-	void init(bioReceptor *, class Organ *, shared_ptr<Reaction>);
+	void init(bioReceptor *, class c2eOrgan *, shared_ptr<c2eReaction>);
 };
 
-struct Emitter {
+struct c2eEmitter {
 	bioEmitter *data;
 	unsigned char sampletick;
 	float *locus;
 	float threshold, gain;
-	void init(bioEmitter *, class Organ *);
+	void init(bioEmitter *, class c2eOrgan *);
 };
 
-class Organ {
+class c2eOrgan {
 protected:
-	friend struct Receptor;
-	friend struct Emitter;
+	friend struct c2eReceptor;
+	friend struct c2eEmitter;
 	
-	Creature *parent;	
+	class c2eCreature *parent;	
 	organGene *ourGene;
 
-	std::vector<shared_ptr<Reaction> > reactions;
-	std::vector<Receptor> receptors;
-	std::vector<Emitter> emitters;
+	std::vector<shared_ptr<c2eReaction> > reactions;
+	std::vector<c2eReceptor> receptors;
+	std::vector<c2eEmitter> emitters;
 
 	// data
 	float energycost, atpdamagecoefficient;
@@ -73,15 +126,14 @@ protected:
 	float biotick, damagerate, repairrate, clockrate, injurytoapply;
 	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
 
-
-	void processReaction(Reaction &);
-	void processEmitter(Emitter &);
-	void processReceptor(Receptor &, bool checkchem);
+	void processReaction(c2eReaction &);
+	void processEmitter(c2eEmitter &);
+	void processReceptor(c2eReceptor &, bool checkchem);
 	
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int **receptors);
 
 public:
-	Organ(Creature *p, organGene *g);
+	c2eOrgan(c2eCreature *p, organGene *g);
 	void tick();
 
 	float getClockRate() { return clockrate; }
@@ -101,39 +153,11 @@ public:
 	void applyInjury(float);
 };
 
-class Brain {
-public:
-};
-
-class Creature {
+class c2eCreature : public Creature {
 protected:
-	std::vector<shared_ptr<Organ> > organs;
-	Brain brain;
-
 	// biochemistry
+	std::vector<shared_ptr<c2eOrgan> > organs;
 	float chemicals[256];
-
-	// non-specific bits
-	unsigned int variant;
-	bool female;
-	
-	bool alive, asleep, dreaming, tickage;
-
-	bool zombie;
-
-	unsigned int age; // in ticks
-	lifestage stage;
-
-	AgentRef attention, focus;
-
-	// clothes
-	// linguistic stuff
-
-	// drives
-	// to-be-processed instincts
-	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
-
-	unsigned int biochemticks;
 
 	// loci
 	float lifestageloci[7];
@@ -144,42 +168,25 @@ protected:
 	float senses[14], involaction[8], gaitloci[16];
 	float drives[20];
 
-	void tickBiochemistry();
+	bioHalfLives *halflives;
+	unsigned int biochemticks;
 
-	CreatureAgent *parent;
+	void tickBiochemistry();
+	void addGene(gene *);
 
 public:
-	// TODO: should this be public?
-	shared_ptr<genomeFile> genome;
-	
-	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *p);
-	virtual ~Creature();
+	c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+
 	void tick();
 
-	virtual void ageCreature();
-	lifestage getStage() { return stage; }
 	void adjustChemical(unsigned char id, float value);
 	float getChemical(unsigned char id) { return chemicals[id]; }
 	void adjustDrive(unsigned int id, float value);
 	float getDrive(unsigned int id) { return drives[id]; }
 
-	unsigned int getVariant() { return variant; }
-	void setAsleep(bool asleep);
-	bool isAsleep() { return asleep; }
-	void setDreaming(bool dreaming);
-	bool isDreaming() { return dreaming; }
-	bool isFemale() { return female; }
-	bool isAlive() { return alive; }
-	void setZombie(bool z) { zombie = z; }
-	bool isZombie() { return zombie; }
-	unsigned int getAge() { return age; }
-
 	unsigned int noOrgans() { return organs.size(); }
-	shared_ptr<Organ> getOrgan(unsigned int i) { return organs[i]; }
-	
-	void born();
-	void die();
-	
+	shared_ptr<c2eOrgan> getOrgan(unsigned int i) { return organs[i]; }
+
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 };
 

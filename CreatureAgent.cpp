@@ -20,15 +20,12 @@
 #include "CreatureAgent.h"
 #include "Creature.h"
 
-CreatureAgent::CreatureAgent(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant)
- : Agent(_family, 0, 0, 0) {
+CreatureAgent::CreatureAgent(unsigned char _family, Creature *c) : Agent(_family, 0, 0, 0) {
+	creature = c;
 	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
 	zorder = 1500;
-	slots[0] = g;
-	species = (is_female ? 2 : 1);
-	
-	caos_assert(g);
-	creature = new Creature(g, is_female, _variant, this);
+	slots[0] = creature->getGenome();
+	species = (creature->isFemale() ? 2 : 1);	
 }
 
 CreatureAgent::~CreatureAgent() {

@@ -3,7 +3,7 @@
  *  openc2e
  *
  *  Created by Alyssa Milburn on Tue May 25 2004.
- *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
+ *  Copyright (c) 2004-2006 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,9 +22,8 @@
 #include "World.h"
 #include <cmath> // powf
 
-Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *p) {
-	assert(p);
-	parent = p;
+Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) {
+	parent = 0;
 	assert(g);
 	genome = g;
 	
@@ -32,73 +31,51 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 	variant = _variant;
 	stage = baby;
 
-	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
-	
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if ((*i)->header.flags.femaleonly && !female) continue;
-		if ((*i)->header.flags.maleonly && female) continue;
-		if (typeid(*(*i)) == typeid(bioInitialConcentration)) {
-			// initialise chemical levels
-			bioInitialConcentration *b = (bioInitialConcentration *)(*i);
-			chemicals[b->chemical] = b->quantity / 255.0f; // TODO: correctness unchecked
-		} else if (typeid(*(*i)) == typeid(creatureGenus)) {
-			// initialize genus
-			creatureGenus *g = (creatureGenus *)(*i);
-			// TODO: correct to do this here?
-			parent->genus = g->genus + 1;
-		} else if (typeid(*(*i)) == typeid(organGene)) {
-			// create organ
-			organGene *o = dynamic_cast<organGene *>(*i);
-			assert(o);
-			if (!o->isBrain()) { // TODO: handle brain organ
-				organs.push_back(shared_ptr<Organ>(new Organ(this, o)));
-			}
-		}
-	}
-
 	alive = true; // ?
 	asleep = false; // ?
 	dreaming = false; // ?
 	tickage = false;
 	zombie = false;
-
-	biochemticks = 0;
-
-	// initialise loci
-	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0.0f;
-	muscleenergy = 0.0f;
-	for (unsigned int i = 0; i < 32; i++) floatingloci[i] = 0.0f;
-	fertile = pregnant = ovulate = receptive = chanceofmutation = degreeofmutation = 0.0f;
-	dead = 0.0f;
-	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0.0f;
-	for (unsigned int i = 0; i < 16; i++) gaitloci[i] = 0.0f;
-	for (unsigned int i = 0; i < 14; i++) senses[i] = 0.0f;
-	for (unsigned int i = 0; i < 20; i++) drives[i] = 0.0f;
 }
 
 Creature::~Creature() {
 }
 
+void Creature::processGenes() {
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !female) continue;
+		if ((*i)->header.flags.maleonly && female) continue;
+		addGene(*i);
+	}
+}
+
+void Creature::setAgent(CreatureAgent *a) {
+	parent = a;
+	assert(parent);
+
+	// TODO:
+	// so, doing this here seems sort of horrible, but we can't do it during initial setup
+	// because the only point is to set the genus of the parent agent..
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !female) continue;
+		if ((*i)->header.flags.maleonly && female) continue;
+			if (typeid(*(*i)) == typeid(creatureGenus)) {
+			// initialize genus
+			creatureGenus *g = (creatureGenus *)(*i);
+			parent->genus = g->genus + 1;
+		}
+	}
+}
+
+void Creature::addGene(gene *g) {
+}
+
 void Creature::ageCreature() {
 	if (stage < senile) // TODO
 		stage = (lifestage)((int)stage + 1);
-}
 
-void Creature::adjustChemical(unsigned char id, float value) {
-	if (id == 0) return;
-	
-	chemicals[id] += value;
-
-	if (chemicals[id] < 0.0f) chemicals[id] = 0.0f;
-	else if (chemicals[id] > 1.0f) chemicals[id] = 1.0f;
-}
-
-void Creature::adjustDrive(unsigned int id, float value) {
-	assert(id < 20);
-	drives[id] += value;
-
-	if (drives[id] < 0.0f) drives[id] = 0.0f;
-	else if (drives[id] > 1.0f) drives[id] = 1.0f;
+	assert(parent);
+	parent->creatureAged();
 }
 
 void Creature::setAsleep(bool a) {
@@ -135,6 +112,33 @@ void Creature::tick() {
 	if (!alive) return;
 
 	if (tickage) age++;
+}
+
+c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
+	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
+
+	biochemticks = 0;
+
+	// initialise loci
+	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0.0f;
+	muscleenergy = 0.0f;
+	for (unsigned int i = 0; i < 32; i++) floatingloci[i] = 0.0f;
+	fertile = pregnant = ovulate = receptive = chanceofmutation = degreeofmutation = 0.0f;
+	dead = 0.0f;
+	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0.0f;
+	for (unsigned int i = 0; i < 16; i++) gaitloci[i] = 0.0f;
+	for (unsigned int i = 0; i < 14; i++) senses[i] = 0.0f;
+	for (unsigned int i = 0; i < 20; i++) drives[i] = 0.0f;
+
+	halflives = 0;
+
+	processGenes();
+}
+
+void c2eCreature::tick() {
+	Creature::tick();
+	// TODO: should we tick some things even if dead?
+	if (!alive) return;
 
 	senses[0] = 1.0f; // always-on
 	senses[9] = 1.0f; // air quality (TODO)
@@ -150,7 +154,45 @@ void Creature::tick() {
 	if (dead != 0.0f) die();
 }
 
-void Creature::tickBiochemistry() {
+void c2eCreature::addGene(gene *g) {
+	Creature::addGene(g);
+
+	if (typeid(*g) == typeid(bioInitialConcentration)) {
+		// initialise chemical levels
+		bioInitialConcentration *b = (bioInitialConcentration *)(g);
+		chemicals[b->chemical] = b->quantity / 255.0f; // TODO: correctness unchecked
+	} else if (typeid(*g) == typeid(organGene)) {
+		// create organ
+		organGene *o = dynamic_cast<organGene *>(g);
+		assert(o);
+		if (!o->isBrain()) { // TODO: handle brain organ
+			organs.push_back(shared_ptr<c2eOrgan>(new c2eOrgan(this, o)));
+		}
+	} else if (typeid(*g) == typeid(bioHalfLives)) {
+		bioHalfLives *d = dynamic_cast<bioHalfLives *>(g);
+		assert(d);
+		halflives = d;
+	}
+}
+
+void c2eCreature::adjustChemical(unsigned char id, float value) {
+	if (id == 0) return;
+	
+	chemicals[id] += value;
+
+	if (chemicals[id] < 0.0f) chemicals[id] = 0.0f;
+	else if (chemicals[id] > 1.0f) chemicals[id] = 1.0f;
+}
+
+void c2eCreature::adjustDrive(unsigned int id, float value) {
+	assert(id < 20);
+	drives[id] += value;
+
+	if (drives[id] < 0.0f) drives[id] = 0.0f;
+	else if (drives[id] > 1.0f) drives[id] = 1.0f;
+}
+
+void c2eCreature::tickBiochemistry() {
 	// only process biochem every 4 ticks
 	// TODO: correct? should probably apply to brain too, at least
 	biochemticks++;
@@ -160,34 +202,26 @@ void Creature::tickBiochemistry() {
 		return;
 	
 	// tick organs
-	for (std::vector<shared_ptr<Organ> >::iterator x = organs.begin(); x != organs.end(); x++) {
+	for (std::vector<shared_ptr<c2eOrgan> >::iterator x = organs.begin(); x != organs.end(); x++) {
 		(*x)->tick();
 	}
 
 	// process half-lives for chemicals
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if ((*i)->header.flags.femaleonly && !female) continue;
-		if ((*i)->header.flags.maleonly && female) continue;
-		if (typeid(*(*i)) == typeid(bioHalfLives)) {
-			bioHalfLives *d = dynamic_cast<bioHalfLives *>(*i);
-			assert(d);
+	if (!halflives) return; // TODO: correct?
+	for (unsigned int x = 0; x < 256; x++) {
+		if (halflives->halflives[x] == 0) {
+			// 0 is a special case for half-lives
+			chemicals[x] = 0.0f;
+		} else {
+			// reaction rate = 1.0 - 0.5**(1.0 / 2.2**(rate * 32.0 / 255.0))
+			float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (halflives->halflives[x] * 32.0) / 255.0));
 
-			for (unsigned int x = 0; x < 256; x++) {
-				if (d->halflives[x] == 0) {
-					// 0 is a special case for half-lives
-					chemicals[x] = 0.0f;
-				} else {
-					// reaction rate = 1.0 - 0.5**(1.0 / 2.2**(rate * 32.0 / 255.0))
-					float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (d->halflives[x] * 32.0) / 255.0));
-
-					chemicals[x] -= chemicals[x] * rate;
-				}
-			}
+			chemicals[x] -= chemicals[x] * rate;
 		}
 	}
 }
 
-float *Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
+float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
 	switch (o) {
 		case 0: // brain
 			{
@@ -252,7 +286,7 @@ float *Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t
  
 /*****************************************************************************/
 
-Organ::Organ(Creature *p, organGene *g) {
+c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 	parent = p; assert(parent);
 	ourGene = g; assert(ourGene);
 	lifeforce = ourGene->lifeforce * (1000000.0f / 255.0f);
@@ -268,25 +302,25 @@ Organ::Organ(Creature *p, organGene *g) {
 	// TODO: is genes.size() always the size we want?
 	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
 	
-	shared_ptr<Reaction> r; // we need to store the previous reaction for possible receptor use
+	shared_ptr<c2eReaction> r; // we need to store the previous reaction for possible receptor use
 	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
 		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
 		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
 		if (typeid(*(*i)) == typeid(bioReaction)) {
-			reactions.push_back(shared_ptr<Reaction>(new Reaction()));
+			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction()));
 			r = reactions.back();
 			reactions.back()->init((bioReaction *)(*i));
 		} else if (typeid(*(*i)) == typeid(bioEmitter)) {
-			emitters.push_back(Emitter());
+			emitters.push_back(c2eEmitter());
 			emitters.back().init((bioEmitter *)(*i), this);
 		} else if (typeid(*(*i)) == typeid(bioReceptor)) {
-			receptors.push_back(Receptor());
+			receptors.push_back(c2eReceptor());
 			receptors.back().init((bioReceptor *)(*i), this, r);
 		}
 	}
 }
 
-void Organ::tick() {
+void c2eOrgan::tick() {
 	if (longtermlifeforce <= 0.5f) return; // We're dead!
 
 	biotick += clockrate;
@@ -309,11 +343,11 @@ void Organ::tick() {
 			parent->adjustChemical(36, energycost);
 			
 			// *** tick emitters
-			for (vector<Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
+			for (vector<c2eEmitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
 				processEmitter(*i);
 			
 			// *** tick reactions
-			for (vector<shared_ptr<Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
+			for (vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
 				processReaction(**i);
 		} else {
 			// *** out of energy damage	
@@ -335,13 +369,13 @@ void Organ::tick() {
 	}
 	
 	// *** tick receptors	
-	for (vector<shared_ptr<Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
+	for (vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
 	clockratereceptors = 0; repairratereceptors = 0; injuryreceptors = 0;
 		
-	for (vector<Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
+	for (vector<c2eReceptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
 		processReceptor(*i, ticked);
 	
-	for (vector<shared_ptr<Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) if ((*i)->receptors > 0) (*i)->rate /= (*i)->receptors;
+	for (vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) if ((*i)->receptors > 0) (*i)->rate /= (*i)->receptors;
 	if (clockratereceptors > 0) clockrate /= clockratereceptors;
 	if (repairratereceptors > 0) repairrate /= repairratereceptors;
 	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;
@@ -351,7 +385,7 @@ void Organ::tick() {
 	longtermlifeforce -= longtermlifeforce * (1.0f / 1000000.0f);
 }
 
-void Organ::applyInjury(float value) {
+void c2eOrgan::applyInjury(float value) {
 	shorttermlifeforce -= value;
 	if (shorttermlifeforce < 0.0f)
 		shorttermlifeforce = 0.0f;
@@ -359,7 +393,7 @@ void Organ::applyInjury(float value) {
 	parent->adjustChemical(127, value / lifeforce);
 }
 
-void Organ::processReaction(Reaction &d) {
+void c2eOrgan::processReaction(c2eReaction &d) {
 	bioReaction &g = *d.data;
 	
 	// TODO: this might not all be correct
@@ -388,7 +422,7 @@ void Organ::processReaction(Reaction &d) {
 	parent->adjustChemical(g.reactant[3], ratio * (float)g.quantity[3]);
 }
 
-void Organ::processEmitter(Emitter &d) {
+void c2eOrgan::processEmitter(c2eEmitter &d) {
 	bioEmitter &g = *d.data;
 	
 	if (d.sampletick != g.rate) {
@@ -414,7 +448,7 @@ void Organ::processEmitter(Emitter &d) {
 	}
 }
 
-void Organ::processReceptor(Receptor &d, bool checkchem) {
+void c2eOrgan::processReceptor(c2eReceptor &d, bool checkchem) {
 	bioReceptor &g = *d.data;
 	
 	/*
@@ -454,7 +488,7 @@ void Organ::processReceptor(Receptor &d, bool checkchem) {
 		*d.locus = f;
 }
 
-float *Organ::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int**receptors) {
+float *c2eOrgan::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int**receptors) {
 	if (receptors) *receptors = 0;
 
 	switch (o) {
@@ -475,7 +509,7 @@ float *Organ::getLocusPointer(bool receptor, unsigned char o, unsigned char t, u
 			break;
 		case 3: // reaction
 			if (t == 0 && l == 0) { // reaction rate
-				shared_ptr<Reaction> r = reactions.back();
+				shared_ptr<c2eReaction> r = reactions.back();
 				if (!r) {
 					std::cout << "Organ::getLocusPointer failed to find a reaction" << std::endl;
 					return 0;
@@ -489,7 +523,7 @@ float *Organ::getLocusPointer(bool receptor, unsigned char o, unsigned char t, u
 	return parent->getLocusPointer(receptor, o, t, l);
 }
 
-void Reaction::init(bioReaction *g) {
+void c2eReaction::init(bioReaction *g) {
 	data = g;
 
 	// rate is stored in genome as 0 fastest, 255 slowest
@@ -497,7 +531,7 @@ void Reaction::init(bioReaction *g) {
 	rate = 1.0 - (g->rate / 255.0);
 }
 
-void Receptor::init(bioReceptor *g, Organ *parent, shared_ptr<Reaction> r) {
+void c2eReceptor::init(bioReceptor *g, c2eOrgan *parent, shared_ptr<c2eReaction> r) {
 	data = g;
 	processed = false;
 	nominal = g->nominal / 255.0f;
@@ -506,7 +540,7 @@ void Receptor::init(bioReceptor *g, Organ *parent, shared_ptr<Reaction> r) {
 	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus, &receptors);
 }
 
-void Emitter::init(bioEmitter *g, Organ *parent) {
+void c2eEmitter::init(bioEmitter *g, c2eOrgan *parent) {
 	data = g;
 	sampletick = 0;
 	threshold = g->threshold / 255.0f;

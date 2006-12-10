@@ -32,6 +32,14 @@ Creature *caosVM::getTargCreature() {
 	return c->getCreature();
 }
 
+c2eCreature *getc2eCreature(Agent *a) {
+	if (!a) return 0;
+	CreatureAgent *b = dynamic_cast<CreatureAgent *>(a);
+	if (!b) return 0;
+	c2eCreature *c = dynamic_cast<c2eCreature *>(b->getCreature());
+	return c;
+}
+
 /**
  STM# SHOU (command) stimulusno (integer)
  %status stub
@@ -130,8 +138,8 @@ void caosVM::c_STIM_WRIT() {
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
 	VM_PARAM_VALIDAGENT(creature)
-	
-	Creature *c = dynamic_cast<Creature *>(creature.get());
+
+	c2eCreature *c = getc2eCreature(creature.get());
 	if (!c) return; // ignored on non-creatures
 	
 	// TODO
@@ -227,8 +235,9 @@ void caosVM::c_STIM_WRIT_c2() {
 	VM_PARAM_INTEGER(significance)
 	VM_PARAM_AGENT(creature)
 
-	Creature *c = dynamic_cast<Creature *>(creature.get());
-	if (!c) return; // ignored on non-creatures
+	// TODO
+	//oldCreature *c = getoldCreature(creature.get());
+	//if (!c) return; // ignored on non-creatures
 
 	// TODO
 }
@@ -449,7 +458,7 @@ void caosVM::v_CREA() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(agent)
 
-	Creature *c = dynamic_cast<Creature *>(agent.get());
+	CreatureAgent *c = dynamic_cast<CreatureAgent *>(agent.get());
 	if (c) result.setInt(1);
 	else result.setInt(0);
 }
@@ -575,7 +584,7 @@ void caosVM::c_URGE_WRIT() {
 	VM_PARAM_INTEGER(noun_id)
 	VM_PARAM_VALIDAGENT(creature)
 
-	Creature *c = dynamic_cast<Creature *>(creature.get());
+	c2eCreature *c = getc2eCreature(creature.get());
 	if (!c) return; // ignored on non-creatures
 	
 	// TODO
@@ -592,7 +601,7 @@ void caosVM::c_DRIV() {
 	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id < 20);
 	
 	valid_agent(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
+	c2eCreature *c = getc2eCreature(targ.get());
 	if (!c) return; // ignored on non-creatures
 
 	c->adjustDrive(drive_id, adjust);
@@ -607,7 +616,7 @@ void caosVM::c_DRIV() {
 void caosVM::v_DRIV() {
 	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id < 20);
 
-	Creature *c = getTargCreature();
+	c2eCreature *c = getc2eCreature(targ.get());
 
 	result.setFloat(c->getDrive(drive_id));
 }
@@ -623,7 +632,7 @@ void caosVM::c_CHEM() {
 	VM_PARAM_INTEGER(chemical_id)
 
 	valid_agent(targ);
-	Creature *c = dynamic_cast<Creature *>(targ.get());
+	c2eCreature *c = dynamic_cast<c2eCreature *>(targ.get());
 	if (!c) return; // ignored on non-creatures
 	
 	c->adjustChemical(chemical_id, adjust);
@@ -638,7 +647,7 @@ void caosVM::c_CHEM() {
 void caosVM::v_CHEM() {
 	VM_PARAM_INTEGER(chemical_id)
 	
-	Creature *c = getTargCreature();
+	c2eCreature *c = getc2eCreature(targ.get());
 
 	result.setFloat(c->getChemical(chemical_id));
 }
@@ -944,13 +953,15 @@ void caosVM::c_NEWC() {
 
 	// TODO: if sex is 0, randomise to 1 or 2
 	// TODO: if variant is 0, randomise between 1 and 8
-	SkeletalCreature *c = new SkeletalCreature(i->second, family, (sex == 2), variant);
-	c->finishInit();
+	c2eCreature *c = new c2eCreature(i->second, (sex == 2), variant);
+	SkeletalCreature *a = new SkeletalCreature(family, c);
+	a->finishInit();
+	c->setAgent(a);
 
-	world.history.getMoniker(world.history.findMoniker(i->second)).moveToCreature(c);
+	world.history.getMoniker(world.history.findMoniker(i->second)).moveToCreature(a);
 	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
 
-	setTarg(c);
+	setTarg(a);
 }
 
 /**
@@ -1038,7 +1049,7 @@ void caosVM::c_LOCI() {
 	VM_PARAM_INTEGER(organ)
 	VM_PARAM_INTEGER(type)
 
-	Creature *c = getTargCreature();
+	c2eCreature *c = getc2eCreature(targ.get());
 
 	float *f = c->getLocusPointer(!type, organ, tissue, id);
 	caos_assert(f);
@@ -1055,7 +1066,7 @@ void caosVM::v_LOCI() {
 	VM_PARAM_INTEGER(organ)
 	VM_PARAM_INTEGER(type)
 
-	Creature *c = getTargCreature();
+	c2eCreature *c = getc2eCreature(targ.get());
 
 	float *f = c->getLocusPointer(!type, organ, tissue, id);
 	caos_assert(f);
@@ -1078,7 +1089,7 @@ void caosVM::v_TAGE() {
  %status maybe
 */
 void caosVM::v_ORGN() {
-	Creature *c = getTargCreature();
+	c2eCreature *c = getc2eCreature(targ.get());
 	result.setInt(c->noOrgans());
 }
 
@@ -1090,9 +1101,9 @@ void caosVM::v_ORGF() {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(organ)
 	
-	Creature *c = getTargCreature();
+	c2eCreature *c = getc2eCreature(targ.get());
 	caos_assert(organ >= 0 && organ < c->noOrgans());
-	shared_ptr<Organ> o = c->getOrgan(organ);
+	shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {
 		case 0: result.setFloat(o->getClockRate()); break;
@@ -1117,9 +1128,9 @@ void caosVM::v_ORGI() {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(organ)
 	
-	Creature *c = getTargCreature();
+	c2eCreature *c = getc2eCreature(targ.get());
 	caos_assert(organ >= 0 && organ < c->noOrgans());
-	shared_ptr<Organ> o = c->getOrgan(organ);
+	shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {
 		case 0: result.setInt(o->getReceptorCount()); break;

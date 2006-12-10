@@ -28,9 +28,12 @@ class Creature;
 class CreatureAgent : public Agent {
 protected:
 	Creature *creature;
+	friend class Creature;
+
+	virtual void creatureAged() { }
 
 public:
-	CreatureAgent(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
+	CreatureAgent(unsigned char _family, Creature *c);
 	virtual ~CreatureAgent();
 	void tick();
 

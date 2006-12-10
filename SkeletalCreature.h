@@ -47,7 +47,7 @@ private:
 	creatureGait *gaitgene;
 
 public:
-	SkeletalCreature(shared_ptr<genomeFile> g, unsigned char _family, bool is_female, unsigned char _variant);
+	SkeletalCreature(unsigned char _family, Creature *c);
 	virtual ~SkeletalCreature();
 	void render(Surface *renderer, int xoffset, int yoffset);
 	void skeletonInit();
@@ -72,7 +72,7 @@ public:
 	CompoundPart *part(unsigned int id);
 	void setZOrder(unsigned int plane);
 
-	void ageCreature();
+	void creatureAged();
 
 	std::string getFaceSpriteName();
 	unsigned int getFaceSpriteFrame();
