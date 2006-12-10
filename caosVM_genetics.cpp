@@ -73,7 +73,7 @@ void caosVM::c_GENE_KILL() {
 
 /**
  GENE LOAD (command) agent (agent) slot (integer) genefile (string)
- %status stub
+ %status maybe
 
  Load a genome file into a slot. You can use * and ? wildcards in the filename.
 */
