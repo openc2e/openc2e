@@ -38,6 +38,7 @@ protected:
 	bool alive, asleep, dreaming, tickage;
 	bool zombie;
 
+	unsigned int ticks;
 	unsigned int age; // in ticks
 	lifestage stage;
 
@@ -75,6 +76,67 @@ public:
 	
 	void born();
 	void die();
+};
+
+// c1
+
+struct c1Reaction {
+	bioReaction *data;
+	void init(bioReaction *);
+};
+
+struct c1Receptor {
+	bioReceptor *data;
+	unsigned char *locus;
+	void init(bioReceptor *, class c1Creature *);
+};
+
+struct c1Emitter {
+	bioEmitter *data;
+	unsigned char *locus;
+	void init(bioEmitter *, class c1Creature *);
+};
+
+class c1Creature : public Creature {
+protected:
+	// biochemistry
+	unsigned char chemicals[256];
+	std::vector<shared_ptr<c1Reaction> > reactions;
+	std::vector<c1Receptor> receptors;
+	std::vector<c1Emitter> emitters;
+	
+	// loci
+	unsigned char floatingloci[8];
+	unsigned char muscleenergy;
+	unsigned char lifestageloci[7];
+	unsigned char fertile, receptive, pregnant;
+	unsigned char dead;
+	unsigned char senses[6], involaction[8], gaitloci[8];
+	unsigned char drives[16];
+
+	unsigned int biochemticks;
+	bioHalfLives *halflives;
+
+	void addGene(gene *);
+	void tickBiochemistry();
+	void processReaction(c1Reaction &);
+	void processEmitter(c1Emitter &);
+	void processReceptor(c1Receptor &);
+	inline unsigned int calculateTickMask(unsigned char);
+	inline unsigned int calculateMultiplier(unsigned char);
+
+public:
+	c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+
+	void tick();
+
+	void addChemical(unsigned char id, unsigned char val);
+	void subChemical(unsigned char id, unsigned char val);
+	unsigned char getChemical(unsigned char id) { return chemicals[id]; }
+	
+	unsigned char getDrive(unsigned int id) { assert(id < 16); return drives[id]; }
+	
+	unsigned char *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 };
 
 // c2e
@@ -169,7 +231,6 @@ protected:
 	float drives[20];
 
 	bioHalfLives *halflives;
-	unsigned int biochemticks;
 
 	void tickBiochemistry();
 	void addGene(gene *);
@@ -182,10 +243,10 @@ public:
 	void adjustChemical(unsigned char id, float value);
 	float getChemical(unsigned char id) { return chemicals[id]; }
 	void adjustDrive(unsigned int id, float value);
-	float getDrive(unsigned int id) { return drives[id]; }
+	float getDrive(unsigned int id) { assert(id < 20); return drives[id]; }
 
 	unsigned int noOrgans() { return organs.size(); }
-	shared_ptr<c2eOrgan> getOrgan(unsigned int i) { return organs[i]; }
+	shared_ptr<c2eOrgan> getOrgan(unsigned int i) { assert(i < organs.size()); return organs[i]; }
 
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 };

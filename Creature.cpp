@@ -36,6 +36,8 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 	dreaming = false; // ?
 	tickage = false;
 	zombie = false;
+
+	ticks = 0;
 }
 
 Creature::~Creature() {
@@ -108,16 +110,37 @@ void Creature::die() {
 }
 
 void Creature::tick() {
-	// TODO: should we tick some things even if dead?
+	ticks++;
+
 	if (!alive) return;
 
 	if (tickage) age++;
 }
 
-c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
-	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
+c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
+	assert(g->getVersion() == 1);
 
+	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0;
+	for (unsigned int i = 0; i < 8; i++) floatingloci[i] = 0;
+	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0;
+	muscleenergy = 0;
+	fertile = pregnant = receptive = 0;
+	dead = 0;
+	for (unsigned int i = 0; i < 6; i++) senses[i] = 0;
+	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0;
+	for (unsigned int i = 0; i < 8; i++) gaitloci[i] = 0;
+	for (unsigned int i = 0; i < 16; i++) drives[i] = 0;
+	
 	biochemticks = 0;
+	halflives = 0;
+
+	processGenes();
+}
+
+c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
+	assert(g->getVersion() == 3);
+
+	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
 
 	// initialise loci
 	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0.0f;
@@ -135,8 +158,27 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 	processGenes();
 }
 
-void c2eCreature::tick() {
+void c1Creature::tick() {
+	// TODO: should we tick some things even if dead?
+	if (!alive) return;
+
+	senses[0] = 255; // always-on
+	senses[1] = (asleep ? 255 : 0); // asleep
+
+	tickBiochemistry();
+
+	// lifestage checks
+	for (unsigned int i = 0; i < 7; i++) {
+		if ((lifestageloci[i] != 0) && (stage == (lifestage)i))
+			ageCreature();
+	}
+
+	if (dead != 0) die();
+
 	Creature::tick();
+}
+
+void c2eCreature::tick() {
 	// TODO: should we tick some things even if dead?
 	if (!alive) return;
 
@@ -152,6 +194,31 @@ void c2eCreature::tick() {
 	}
 
 	if (dead != 0.0f) die();
+	
+	Creature::tick();
+}
+
+void c1Creature::addGene(gene *g) {
+	Creature::addGene(g);
+
+	if (typeid(*g) == typeid(bioInitialConcentration)) {
+		// initialise chemical levels
+		bioInitialConcentration *b = (bioInitialConcentration *)(g);
+		chemicals[b->chemical] = b->quantity;
+	} else if (typeid(*g) == typeid(bioHalfLives)) {
+		bioHalfLives *d = dynamic_cast<bioHalfLives *>(g);
+		assert(d);
+		halflives = d;
+	} else if (typeid(*g) == typeid(bioReaction)) {
+		reactions.push_back(shared_ptr<c1Reaction>(new c1Reaction()));
+		reactions.back()->init((bioReaction *)(g));
+	} else if (typeid(*g) == typeid(bioEmitter)) {
+		emitters.push_back(c1Emitter());
+		emitters.back().init((bioEmitter *)(g), this);
+	} else if (typeid(*g) == typeid(bioReceptor)) {
+		receptors.push_back(c1Receptor());
+		receptors.back().init((bioReceptor *)(g), this);
+	}
 }
 
 void c2eCreature::addGene(gene *g) {
@@ -175,6 +242,22 @@ void c2eCreature::addGene(gene *g) {
 	}
 }
 
+void c1Creature::addChemical(unsigned char id, unsigned char val) {
+	if (id == 0) return;
+
+	// clipping..
+	if ((int)chemicals[id] + val > 255) chemicals[id] = 255;
+	else chemicals[id] += val;
+}
+
+void c1Creature::subChemical(unsigned char id, unsigned char val) {
+	if (id == 0) return;
+
+	// clipping..
+	if ((int)chemicals[id] - val < 0) chemicals[id] = 0;
+	else chemicals[id] -= val;
+}
+
 void c2eCreature::adjustChemical(unsigned char id, float value) {
 	if (id == 0) return;
 	
@@ -192,14 +275,66 @@ void c2eCreature::adjustDrive(unsigned int id, float value) {
 	else if (drives[id] > 1.0f) drives[id] = 1.0f;
 }
 
+// lookup table, snaffled from real creatures
+// TODO: work out if these are meaningful values :)
+unsigned int c1rates[32] = {
+	0, 0x32A5, 0x71DD, 0xAABB, 0xD110, 0xE758, 0xF35C,
+	0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999,
+	0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999,
+	0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999, 0xF999,
+	0xFFFF
+};
+
+inline unsigned int c1Creature::calculateMultiplier(unsigned char rate) {
+	return c1rates[rate];
+}
+
+inline unsigned int c1Creature::calculateTickMask(unsigned char rate) {
+	if (rate < 7) return 0;
+	else return (1 << ((unsigned int)rate - 7)) - 1;
+}
+
+void c1Creature::tickBiochemistry() {
+	// TODO: untested
+
+	if ((ticks % 5) != 0) return;
+	biochemticks++;
+
+	// process emitters
+	for (std::vector<c1Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++) {
+		processEmitter(*i);
+	}
+
+	// process receptors
+	for (std::vector<c1Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++) {
+		processReceptor(*i);
+	}
+
+	// process reactions
+	for (std::vector<shared_ptr<c1Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) {
+		processReaction(**i);
+	}
+
+	// process half-lives
+	if (!halflives) return; // TODO: correct?
+	for (unsigned int i = 0; i < 256; i++) {
+		// TODO: this code hasn't been tested thoroughly, but seems to agree with basic testing
+
+		// work out which rate we're dealing with
+		unsigned char rate = halflives->halflives[i] / 8;
+	
+		// if the tickmask doesn't want us to change things this tick, don't!
+		if ((biochemticks & calculateTickMask(rate)) != 0) continue;
+
+		// do the actual adjustment
+		chemicals[i] = (chemicals[i] * calculateMultiplier(rate)) / 65536;
+	}
+}
+
 void c2eCreature::tickBiochemistry() {
 	// only process biochem every 4 ticks
 	// TODO: correct? should probably apply to brain too, at least
-	biochemticks++;
-	if (biochemticks == 4)
-		biochemticks = 0;
-	else
-		return;
+	if ((ticks % 4) != 0) return;
 	
 	// tick organs
 	for (std::vector<shared_ptr<c2eOrgan> >::iterator x = organs.begin(); x != organs.end(); x++) {
@@ -219,6 +354,58 @@ void c2eCreature::tickBiochemistry() {
 			chemicals[x] -= chemicals[x] * rate;
 		}
 	}
+}
+
+unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
+	switch (o) {
+		case 0: // brain
+			return 0; // TODO
+
+		case 1: // creature
+			switch (t) {
+				case 0: // somantic
+					if (receptor) {
+						if (l > 7) break;
+						return &lifestageloci[l];
+					} else if (l == 0) return &muscleenergy;
+					break;
+
+				case 1: // circulatory
+					if (l > 8) break;
+					return &floatingloci[l];
+				
+				case 2: // reproductive
+					if (receptor) {
+						if (l == 0) return &fertile;
+						else if (l == 1) return &receptive;
+					} else {
+						if (l == 0) return &fertile;
+						else if (l == 1) return &pregnant;
+					}
+					break;
+
+				case 3: // immune
+					if (l == 0) return &dead;
+					break;
+
+				case 4: // sensorimotor
+					if (receptor) {
+						if (l < 8) return &involaction[l];
+						else if (l < 16) return &gaitloci[l - 8];
+					} else {
+						if (l < 6) return &senses[l];
+					}
+
+				case 5: // drive levels
+					if (l < 16) return &drives[l];
+			}
+	}
+
+	std::cout << "c1Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
+		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
+		<< std::endl;
+
+	return 0;
 }
 
 float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
@@ -247,7 +434,7 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
 					if (!receptor) {
 						if (l == 0) return &fertile;
 						else if (l == 1) return &pregnant;
-						l = l - 2;
+						l = l - 2; // TODO: this throws off error msg at end of function
 					}
 					switch (l) {
 						case 0: return &ovulate;
@@ -278,7 +465,7 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
 
 	}
 
-	std::cout << "Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
+	std::cout << "c2eCreature::getLocusPointer failed to interpret locus (" << (int)o << ", "
 		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
 		<< std::endl;
 	return 0;
@@ -393,6 +580,43 @@ void c2eOrgan::applyInjury(float value) {
 	parent->adjustChemical(127, value / lifeforce);
 }
 
+void c1Creature::processReaction(c1Reaction &d) {
+	// TODO: untested
+
+	bioReaction &g = *d.data;
+
+	// TODO: this might not all be correct
+
+	// work out which rate we're dealing with
+	unsigned char rate = g.rate / 8;
+	
+	// if the tickmask doesn't want us to change things this tick, don't!
+	if ((biochemticks & calculateTickMask(rate)) != 0) return;
+
+	unsigned char ratio = 255, ratio2 = 255;
+	if (g.reactant[0] != 0) {
+		assert(g.quantity[0] != 0); // TODO
+		ratio = getChemical(g.reactant[0]) / g.quantity[0];
+	}
+	if (g.reactant[1] != 0) {
+		assert(g.quantity[1] != 0); // TODO
+		ratio2 = getChemical(g.reactant[1]) / g.quantity[1];
+	}
+
+	// pick lowest ratio, if zero then return
+	if (ratio2 < ratio) ratio = ratio2;
+	if (ratio == 0) return;
+	
+	// calculate the actual adjustment
+	ratio = (ratio * calculateMultiplier(rate)) / 65536;
+
+	// change chemical levels
+	subChemical(g.reactant[0], ratio * g.quantity[0]);
+	subChemical(g.reactant[1], ratio * g.quantity[1]);
+	addChemical(g.reactant[2], ratio * g.quantity[2]);
+	addChemical(g.reactant[3], ratio * g.quantity[3]);
+}
+
 void c2eOrgan::processReaction(c2eReaction &d) {
 	bioReaction &g = *d.data;
 	
@@ -407,19 +631,46 @@ void c2eOrgan::processReaction(c2eReaction &d) {
 		assert(g.quantity[1] != 0); // TODO
 		ratio2 = parent->getChemical(g.reactant[1]) / (float)g.quantity[1];
 	}
-	if (ratio2 < ratio)
-		ratio = ratio2;
 
+	// pick lowest ratio, if zero then return
+	if (ratio2 < ratio) ratio = ratio2;
 	if (ratio == 0.0f) return;
 
+	// calculate the actual adjustment
 	float rate = 1.0 - powf(0.5, 1.0 / powf(2.2, (1.0 - d.rate) * 32.0));
-
 	ratio = ratio * rate;
 
+	// change chemical levels
 	parent->adjustChemical(g.reactant[0], -(ratio * (float)g.quantity[0]));
 	parent->adjustChemical(g.reactant[1], -(ratio * (float)g.quantity[1]));
 	parent->adjustChemical(g.reactant[2], ratio * (float)g.quantity[2]);
 	parent->adjustChemical(g.reactant[3], ratio * (float)g.quantity[3]);
+}
+
+void c1Creature::processEmitter(c1Emitter &d) {
+	// TODO: untested
+
+	bioEmitter &g = *d.data;
+
+	if ((biochemticks % g.rate) != 0) return;
+
+	if (!d.locus) return;
+	unsigned char f = *d.locus;
+	if (g.clear) *d.locus = 0;
+	if (g.invert) f = 255 - f;
+
+	if (g.digital) {
+		if (f < g.threshold) return;
+		addChemical(g.chemical, g.gain);
+	} else {
+		int r = (((int)f - g.threshold) * g.gain) / 255;
+		
+		// clip the result of the calculation to unsigned char, and reassign it
+		if (r < 0) r = 0; else if (r > 255) r = 255;
+		f = r;
+
+		addChemical(g.chemical, f);
+	}
 }
 
 void c2eOrgan::processEmitter(c2eEmitter &d) {
@@ -448,11 +699,41 @@ void c2eOrgan::processEmitter(c2eEmitter &d) {
 	}
 }
 
+void c1Creature::processReceptor(c1Receptor &d) {
+	// TODO: untested
+
+	bioReceptor &g = *d.data;
+
+	// TODO: same issues as c2eOrgan::processReceptor below, probably
+
+	if (!d.locus) return;
+
+	unsigned char f = chemicals[g.chemical];
+	int r;
+	if (g.digital)
+		r = f > g.threshold ? g.gain : 0;
+	else
+		// TODO: int promotion correct to makke this work out?
+		r = (((int)f - g.threshold) * g.gain) / 255;
+	
+	if (g.inverted) r = g.nominal - r;
+	else r += g.nominal;
+	
+	// clip the result of the calculation to unsigned char, and reassign it
+	if (r < 0) r = 0; else if (r > 255) r = 255;
+	f = r;
+
+	if (f == 0 && g.organ == 1 && g.tissue == 3 && g.locus == 0) // evil check for "Die if non-zero!" locus
+		return;
+	else
+		*d.locus = f;
+}
+
 void c2eOrgan::processReceptor(c2eReceptor &d, bool checkchem) {
 	bioReceptor &g = *d.data;
 	
 	/*
-	 * This code has issues..
+	 * TODO: This code has issues..
 	 *
 	 * eg, if you have two receptors pointing at a non-local locus,
 	 * we just stomp over it in order, so the last receptor always get it
@@ -523,6 +804,10 @@ float *c2eOrgan::getLocusPointer(bool receptor, unsigned char o, unsigned char t
 	return parent->getLocusPointer(receptor, o, t, l);
 }
 
+void c1Reaction::init(bioReaction *g) {
+	data = g;
+}
+
 void c2eReaction::init(bioReaction *g) {
 	data = g;
 
@@ -531,6 +816,11 @@ void c2eReaction::init(bioReaction *g) {
 	rate = 1.0 - (g->rate / 255.0);
 }
 
+void c1Receptor::init(bioReceptor *g, c1Creature *parent) {
+	data = g;
+	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus);
+}
+	
 void c2eReceptor::init(bioReceptor *g, c2eOrgan *parent, shared_ptr<c2eReaction> r) {
 	data = g;
 	processed = false;
@@ -538,6 +828,11 @@ void c2eReceptor::init(bioReceptor *g, c2eOrgan *parent, shared_ptr<c2eReaction>
 	threshold = g->threshold / 255.0f;
 	gain = g->gain / 255.0f;
 	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus, &receptors);
+}
+
+void c1Emitter::init(bioEmitter *g, c1Creature *parent) {
+	data = g;
+	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus);
 }
 
 void c2eEmitter::init(bioEmitter *g, c2eOrgan *parent) {
