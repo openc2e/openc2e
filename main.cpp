@@ -183,7 +183,7 @@ extern "C" int main(int argc, char *argv[]) {
 
 	while (!engine.done) {
 		engine.tick();
-	}
+	} // main loop
 
 	engine.backend->shutdown();
 

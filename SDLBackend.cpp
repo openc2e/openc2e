@@ -132,7 +132,7 @@ void SDLBackend::handleNetworking() {
 			if (i == 1) {
 				data = data + buffer;
 				// TODO: maybe we should check for rscr\n like c2e seems to
-				if ((data.size() > 3) && (data.find("rscr", data.size() - 4) != data.npos)) done = true;
+				if ((data.size() > 3) && (data.find("rscr\n", data.size() - 5) != data.npos)) done = true;
 			} else done = true;
 		}
 
