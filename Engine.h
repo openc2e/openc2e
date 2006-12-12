@@ -41,7 +41,9 @@ public:
 	Engine();
 	void setBackend(Backend *b);
 	std::string executeNetwork(std::string in);
-	void tick();
+	bool needsUpdate();
+	void update();
+	bool tick();
 	void handleKeyboardScrolling();
 	void processEvents();
 	void handleResizedWindow(SomeEvent &event);

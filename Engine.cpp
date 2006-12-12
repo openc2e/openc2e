@@ -75,31 +75,42 @@ std::string Engine::executeNetwork(std::string in) {
 	}
 }
 
-void Engine::tick() {
+bool Engine::needsUpdate() {
+	return (!world.paused) && (backend->ticks() > (tickdata + world.ticktime));
+}
+
+void Engine::update() {
+	tickdata = backend->ticks();
+			
+	world.tick();
+	// TODO: if (!backend->updateWorld())
+	world.drawWorld();
+
+	ticktimes[ticktimeptr] = backend->ticks() - tickdata;
+	ticktimeptr++;
+	if (ticktimeptr == 10) ticktimeptr = 0;
+	float avgtime = 0;
+	for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktimes[i] / world.ticktime);
+	world.pace = avgtime / 10;
+		
+	world.race = backend->ticks() - lasttimestamp;
+	lasttimestamp = backend->ticks();
+}
+
+bool Engine::tick() {
 	assert(backend);
 	backend->handleEvents();
 
 	// tick+draw the world, if necessary
-	if (!world.paused && (backend->ticks() > (tickdata + world.ticktime))) {
-		tickdata = backend->ticks();
-			
-		world.tick();
-		world.drawWorld();
-
-		ticktimes[ticktimeptr] = backend->ticks() - tickdata;
-		ticktimeptr++;
-		if (ticktimeptr == 10) ticktimeptr = 0;
-		float avgtime = 0;
-		for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktimes[i] / world.ticktime);
-		world.pace = avgtime / 10;
-		
-		handleKeyboardScrolling();
-
-		world.race = backend->ticks() - lasttimestamp;
-		lasttimestamp = backend->ticks();
-	} else SDL_Delay(10); // TODO: remove SDL dependency
+	bool needupdate = needsUpdate();
+	if (needupdate)
+		update();
 
 	processEvents();
+	if (needupdate)
+		handleKeyboardScrolling();
+
+	return needupdate;
 }
 
 void Engine::handleKeyboardScrolling() {

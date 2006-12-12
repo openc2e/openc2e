@@ -182,7 +182,8 @@ extern "C" int main(int argc, char *argv[]) {
 	world.drawWorld();
 
 	while (!engine.done) {
-		engine.tick();
+		if (!engine.tick()) // if the engine didn't need an update..
+			SDL_Delay(10); // .. delay for a short while
 	} // main loop
 
 	engine.backend->shutdown();
