@@ -516,6 +516,28 @@ void World::selectCreature(boost::shared_ptr<Agent> a) {
 	// TODO: send script 120 (selected creature changed) as needed
 }
 
+shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
+	std::vector<std::string> possibles = findFiles("/Genetics/", genefile + ".gen");
+	if (possibles.empty()) return shared_ptr<genomeFile>();
+	std::string gfilename = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
+
+	// TODO: change genefile to be the file we selected
+
+	shared_ptr<genomeFile> p(new genomeFile());
+	std::ifstream gfile(gfilename.c_str(), std::ios::binary);
+	caos_assert(gfile.is_open());
+	gfile >> std::noskipws;
+	gfile >> *(p.get());
+
+	return p;
+}
+
+void World::newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent) {
+	std::string d = history.newMoniker(g);
+	world.history.getMoniker(d).addEvent(2, "", genefile);
+	world.history.getMoniker(d).moveToAgent(agent);
+}
+
 std::string World::generateMoniker(std::string basename) {
 	// TODO: is there a better way to handle this? incoming basename is from catalogue files..
 	if (basename.size() != 4) {

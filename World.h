@@ -104,6 +104,8 @@ public:
 	std::string findFile(std::string path);
 	std::vector<std::string> findFiles(std::string dir, std::string wild);
 
+	void newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
+	shared_ptr<genomeFile> loadGenome(std::string &filename);
 	std::string generateMoniker(std::string basename);
 	
 	void tick();
