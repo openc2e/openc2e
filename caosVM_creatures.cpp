@@ -32,6 +32,14 @@ Creature *caosVM::getTargCreature() {
 	return c->getCreature();
 }
 
+c1Creature *getc1Creature(Agent *a) {
+	if (!a) return 0;
+	CreatureAgent *b = dynamic_cast<CreatureAgent *>(a);
+	if (!b) return 0;
+	c1Creature *c = dynamic_cast<c1Creature *>(b->getCreature());
+	return c;
+}
+
 c2eCreature *getc2eCreature(Agent *a) {
 	if (!a) return 0;
 	CreatureAgent *b = dynamic_cast<CreatureAgent *>(a);
@@ -629,13 +637,32 @@ void caosVM::v_DRIV() {
 */
 void caosVM::c_CHEM() {
 	VM_PARAM_FLOAT(adjust)
-	VM_PARAM_INTEGER(chemical_id)
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
 
 	valid_agent(targ);
-	c2eCreature *c = dynamic_cast<c2eCreature *>(targ.get());
+	c2eCreature *c = getc2eCreature(targ.get());
 	if (!c) return; // ignored on non-creatures
 	
 	c->adjustChemical(chemical_id, adjust);
+}
+
+/**
+ CHEM (command) chemical_id (integer) adjust (integer)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::c_CHEM_c1
+*/
+void caosVM::c_CHEM_c1() {
+	VM_PARAM_INTEGER(adjust)
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
+
+	// TODO: can adjust be negative?
+
+	valid_agent(targ);
+	c1Creature *c = getc1Creature(targ.get());
+	if (!c) return; // ignored on non-creatures
+	
+	c->addChemical(chemical_id, adjust);
 }
 
 /**
@@ -645,11 +672,29 @@ void caosVM::c_CHEM() {
  Returns the level of a chemical (0.0 to 1.0) in target creature's bloodstream.
 */
 void caosVM::v_CHEM() {
-	VM_PARAM_INTEGER(chemical_id)
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
 	
+	valid_agent(targ);
 	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
 
 	result.setFloat(c->getChemical(chemical_id));
+}
+
+/**
+ CHEM (integer) chemical_id (integer)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::v_CHEM_c1
+*/
+void caosVM::v_CHEM_c1() {
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
+	
+	valid_agent(targ);
+	c1Creature *c = getc1Creature(targ.get());
+	caos_assert(c);
+
+	result.setInt(c->getChemical(chemical_id));
 }
 
 /**
@@ -917,7 +962,7 @@ void caosVM::v_BYIT() {
 */
 void caosVM::v_IT() {
 	valid_agent(owner);
-	caos_assert(dynamic_cast<Creature *>(owner.get())); // TODO: return null instead?
+	caos_assert(dynamic_cast<CreatureAgent *>(owner.get())); // TODO: return null instead?
 	result.setAgent(_it_);
 }
 
@@ -977,6 +1022,36 @@ void caosVM::c_NEW_CREA() {
 
 	c_NEWC(); // TODO
 	//targ = NULL; // TODO
+}
+
+/**
+ NEW: CREA (command) moniker (integer) sex (integer)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::c_NEW_CREA_c1
+*/
+void caosVM::c_NEW_CREA_c1() {
+	VM_PARAM_INTEGER(sex)
+	VM_PARAM_INTEGER(moniker)
+
+	std::string realmoniker = std::string((char *)&moniker, 4);
+	shared_ptr<genomeFile> genome = world.loadGenome(realmoniker);
+	if (!genome)
+		throw creaturesException("failed to find genome file '" + realmoniker + '"');
+
+	caos_assert(genome->getVersion() == 1);
+
+	// TODO: if sex is 0, randomise to 1 or 2
+	// TODO: why do we even need to pass a variant here?
+	c1Creature *c = new c1Creature(genome, (sex == 2), 0);
+	SkeletalCreature *a = new SkeletalCreature(4, c);
+	a->finishInit();
+	c->setAgent(a);
+
+	a->slots[0] = genome;
+	world.newMoniker(genome, realmoniker, a);
+
+	setTarg(a);
 }
 
 /**

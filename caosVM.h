@@ -302,6 +302,7 @@ public:
 	void v_VMJR();
 	void v_WOLF();
 	void v_LANG();
+	void v_TOKN();
 
 	// variables
 	void c_SETV();
@@ -607,7 +608,9 @@ public:
 	void c_DRIV();
 	void v_DRIV();
 	void c_CHEM();
+	void c_CHEM_c1();
 	void v_CHEM();
+	void v_CHEM_c1();
 	void c_ASLP();
 	void v_ASLP();
 	void c_APPR();
@@ -631,6 +634,7 @@ public:
 	void v_DFTY();
 	void c_NEWC();
 	void c_NEW_CREA();
+	void c_NEW_CREA_c1();
 	void c_LTCY();
 	void c_MATE();
 	void v_DRV();

@@ -251,4 +251,18 @@ void caosVM::v_LANG() {
 	result.setString("en");
 }
 
+/**
+ TOKN (integer) token (bareword)
+ %status maybe
+ %pragma variants c1
+*/
+void caosVM::v_TOKN() {
+	VM_PARAM_STRING(token)
+
+	caos_assert(token.size() == 4);
+
+	int *data = (int *)token.c_str();
+	result.setInt(*data);
+}
+
 /* vim: set noet: */
