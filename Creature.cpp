@@ -298,7 +298,6 @@ void c1Creature::tickBiochemistry() {
 	// TODO: untested
 
 	if ((ticks % 5) != 0) return;
-	biochemticks++;
 
 	// process emitters
 	for (std::vector<c1Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++) {
@@ -329,6 +328,8 @@ void c1Creature::tickBiochemistry() {
 		// do the actual adjustment
 		chemicals[i] = (chemicals[i] * calculateMultiplier(rate)) / 65536;
 	}
+	
+	biochemticks++;
 }
 
 void c2eCreature::tickBiochemistry() {
