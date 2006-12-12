@@ -56,6 +56,8 @@ public:
   void readNotes(istream &);
   void writeNotes(ostream &) const;
 
+  uint8 getVersion() { return cversion; }
+
   gene *getGene(uint8 type, uint8 subtype, unsigned int seq);
 };
 

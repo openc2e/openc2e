@@ -174,16 +174,25 @@ gene *genomeFile::nextGene(istream &s) {
 
 istream &operator >> (istream &s, genomeFile &f) {
 	char majic[3]; s.read(majic, 3);
-	if (strncmp((char *)majic, "dna", 3) != 0) throw genomeException("bad majic for genome");
+	if (strncmp((char *)majic, "gen", 3) == 0) {
+		s >> majic[0];
+		if (majic[0] == 'e') f.cversion = 1;
+		else throw genomeException("bad majic for genome");
 
-	s >> majic[0];
-	f.cversion = majic[0] - 48; // 48 = ASCII '0'
-	if ((f.cversion < 1) || (f.cversion > 3)) throw genomeException("unsupported genome version in majic");
+		s.seekg(0, std::ios::beg);
+	} else {
+		if (strncmp((char *)majic, "dna", 3) != 0) throw genomeException("bad majic for genome");
+
+		s >> majic[0];
+		f.cversion = majic[0] - 48; // 48 = ASCII '0'
+		if ((f.cversion < 1) || (f.cversion > 3)) throw genomeException("unsupported genome version in majic");
+	}
 
 	std::cout << "creaturesGenomeFile: reading genome of version " << (unsigned int)f.cversion << ".\n";
 	f.currorgan = 0;
 	while (f.nextGene(s) != 0);
 	f.currorgan = 0;
+	std::cout << "creaturesGenomeFile: read " << (unsigned int)f.genes.size() << " top-level genes.\n";
 
 	return s;
 }
