@@ -607,8 +607,8 @@ void c1Creature::processReaction(c1Reaction &d) {
 	if (ratio2 < ratio) ratio = ratio2;
 	if (ratio == 0) return;
 	
-	// calculate the actual adjustment
-	ratio = (ratio * calculateMultiplier(rate)) / 65536;
+	// calculate the actual adjustment (can't go out of bounds)
+	ratio = ratio - ((ratio * calculateMultiplier(rate)) / 65536);
 
 	// change chemical levels
 	subChemical(g.reactant[0], ratio * g.quantity[0]);
