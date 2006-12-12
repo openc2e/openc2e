@@ -27,6 +27,7 @@
 #include "SkeletalCreature.h"
 #include "Creature.h"
 #include "World.h"
+#include "Engine.h"
 #include "Backend.h"
 
 #include <typeinfo> // TODO: remove when genome system is fixed
@@ -74,7 +75,10 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsig
 	char _postfix[4] = "XXX";
 	_postfix[0] = '0' + dataspecies + ((sprite && creature->isFemale()) ? 4 : 0);
 	_postfix[1] = '0' + _stage;
-	_postfix[2] = 'a' + databreed;
+	if (engine.version == 1)
+		_postfix[2] = '0' + databreed;
+	else
+		_postfix[2] = 'a' + databreed;
 	return _postfix;
 }
 
@@ -109,6 +113,9 @@ void SkeletalCreature::skeletonInit() {
 	}
 
 	for (int i = 0; i < 14; i++) {
+		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
+			if (i == 6 || i == 13) continue;
+
 		// try this stage and the stages below it to find data which worksforus
 		if (images[i])
 			world.gallery.delImage(images[i]);
@@ -136,6 +143,7 @@ void SkeletalCreature::skeletonInit() {
 		if (!partapp)
 			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % (unsigned char)x));
 	
+		if (engine.version == 1) partapp->species = 0; // TODO: don't stomp over the gene? :P
 		while (stage_to_try > -1 && images[i] == 0) {
 			images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
 			if (images[i] == 0) stage_to_try--;
@@ -157,6 +165,9 @@ void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 	for (int j = 0; j < 14; j++) {
 		int i = cee_zorder[direction][j];
 
+		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
+			if (i == 6 || i == 13) continue;
+
 		bodypartinfo *part = &cee_bodyparts[i];
 
 		unsigned int ourpose;
@@ -166,6 +177,8 @@ void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 			ourpose = pose[i] + (eyesclosed ? 16 : 0) + (facialexpression * 32);
 		else // everything else
 			ourpose = pose[i];
+
+		assert(images[i]);
 
 		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, false, 0);
 
@@ -193,6 +206,9 @@ void SkeletalCreature::recalculateSkeleton() {
 	int lowestx = 0, lowesty = 0, highestx = 0, highesty = 0;
 
 	for (int i = 0; i < 14; i++) {
+		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
+			if (i == 6 || i == 13) continue;
+
 		bodypartinfo *part = &cee_bodyparts[i];
 
 		if (part->parent == -1) {
