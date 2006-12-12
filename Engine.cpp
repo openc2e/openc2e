@@ -20,7 +20,6 @@
 #include "Engine.h"
 #include "World.h"
 #include "caosVM.h" // for setupCommandPointers()
-#include "SDLBackend.h"
 #include "PointerAgent.h"
 
 #include <boost/filesystem/path.hpp>
@@ -114,36 +113,38 @@ bool Engine::tick() {
 }
 
 void Engine::handleKeyboardScrolling() {
-	// TODO: remove SDL dependency
 	// keyboard-based scrolling
 	static float accelspeed = 8, decelspeed = .5, maxspeed = 64;
 	static float velx = 0;
 	static float vely = 0;
 
 	// check keys
-	Uint8 *keys = SDL_GetKeyState(NULL);
-	if (keys[SDLK_LEFT])
+	bool leftdown = backend->keyDown(37);
+	bool rightdown = backend->keyDown(39);
+	bool updown = backend->keyDown(38);
+	bool downdown = backend->keyDown(40);
+	if (leftdown)
 		velx -= accelspeed;
-	if (keys[SDLK_RIGHT])
+	if (rightdown)
 		velx += accelspeed;
-	if (!keys[SDLK_LEFT] && !keys[SDLK_RIGHT]) {
+	if (!leftdown && !rightdown) {
 		velx *= decelspeed;
 		if (fabs(velx) < 0.1) velx = 0;
 	}
-	if (keys[SDLK_UP])
+	if (updown)
 		vely -= accelspeed;
-	if (keys[SDLK_DOWN])
+	if (downdown)
 		vely += accelspeed;
-	if (!keys[SDLK_UP] && !keys[SDLK_DOWN]) {
+	if (!updown && !downdown) {
 		vely *= decelspeed;
 		if (fabs(vely) < 0.1) vely = 0;
 	}
 
 	// enforced maximum speed
 	if (velx >=  maxspeed) velx =  maxspeed;
-	if (velx <= -maxspeed) velx = -maxspeed;
+	else if (velx <= -maxspeed) velx = -maxspeed;
 	if (vely >=  maxspeed) vely =  maxspeed;
-	if (vely <= -maxspeed) vely = -maxspeed;
+	else if (vely <= -maxspeed) vely = -maxspeed;
 
 	// do the actual movement
 	if (velx || vely) {
