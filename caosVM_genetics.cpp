@@ -82,23 +82,14 @@ void caosVM::c_GENE_LOAD() {
 	VM_PARAM_INTEGER(slot)
 	VM_PARAM_VALIDAGENT(agent)
 
-	std::vector<std::string> possibles = world.findFiles("/Genetics/", genefile + ".gen");
-	if (possibles.empty())
+	shared_ptr<genomeFile> p = world.loadGenome(genefile);
+	if (!p)
 		throw creaturesException("failed to find genome file '" + genefile + '"');
-	std::string gfilename = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
 	
-	shared_ptr<genomeFile> p(new genomeFile());
-
-	std::ifstream gfile(gfilename.c_str(), std::ios::binary);
-	caos_assert(gfile.is_open());
-	gfile >> std::noskipws;
-
-	gfile >> *(p.get());
+	caos_assert(p->getVersion() == 3);
 
 	agent->slots[slot] = p;
-	std::string d = world.history.newMoniker(p);
-	world.history.getMoniker(d).addEvent(2, "", genefile);
-	world.history.getMoniker(d).moveToAgent(agent);
+	world.newMoniker(p, genefile, agent);
 }
 
 /**
