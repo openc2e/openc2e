@@ -119,7 +119,7 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 		if (ft == c16) ft = s16;
 		goto done;
 	}
-	std::cout << "couldn't find cached version: " << cachefile.native_file_string() << std::endl;
+	//std::cout << "couldn't find cached version: " << cachefile.native_file_string() << std::endl;
 
 	in->clear();
 	in->mmapopen(realfile.native_file_string());
