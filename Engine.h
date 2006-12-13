@@ -31,6 +31,10 @@ private:
 	unsigned int ticktimeptr;
 	unsigned int lasttimestamp;
 
+	bool cmdline_enable_sound;
+	bool cmdline_norun;
+	std::vector<std::string> cmdline_bootstrap;
+
 public:
 	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	
@@ -39,6 +43,7 @@ public:
 	unsigned int version;
 
 	Engine();
+	~Engine();
 	void setBackend(Backend *b);
 	std::string executeNetwork(std::string in);
 	bool needsUpdate();
@@ -51,6 +56,9 @@ public:
 	void handleMouseButton(SomeEvent &event);
 	void handleKeyDown(SomeEvent &event);
 	void handleSpecialKeyDown(SomeEvent &event);
+
+	bool parseCommandLine(int argc, char *argv[]);
+	bool initialSetup(Backend *b);
 };
 
 extern Engine engine;

@@ -12,7 +12,7 @@ for my $test (@tests) {
     open FILE, ">$wrapper";
     print FILE <<EOF;
 #!/usr/bin/perl
-exec("./openc2e", "-b", "$test");
+exec("./openc2e", "-n", "-b", "$test");
 EOF
     close FILE;
     chmod 0700, $wrapper;

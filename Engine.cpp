@@ -21,10 +21,14 @@
 #include "World.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "PointerAgent.h"
+#include "dialect.h" // registerDelegates
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/program_options.hpp>
+#include <boost/format.hpp>
 namespace fs = boost::filesystem;
+namespace po = boost::program_options;
 
 Engine engine;
 
@@ -35,6 +39,15 @@ Engine::Engine() {
 	for (unsigned int i = 0; i < 10; i++) ticktimes[i] = 0;
 	ticktimeptr = 0;
 	version = 0; // TODO: something something
+	
+	srand(time(NULL)); // good a place as any :)
+	
+	cmdline_enable_sound = true;
+	cmdline_norun = false;
+}
+
+Engine::~Engine() {
+	if (backend) delete backend;
 }
 
 void Engine::setBackend(Backend *b) {
@@ -389,6 +402,165 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 		if ((*i)->imsk_key_down)
 			(*i)->queueScript(73, 0, k); // key down script
 	}
+}
+
+extern fs::path homeDirectory(); // creaturesImage.cpp
+extern fs::path cacheDirectory(); // creaturesImage.cpp
+static const char data_default[] = "./data";
+
+static void opt_version() {
+	// We already showed the primary version bit, just throw in some random legalese
+	std::cout << 
+		"This is free software; see the source for copying conditions.  There is NO" << std::endl <<
+		"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << std::endl << std::endl <<
+		"...please don't sue us." << std::endl;
+}
+
+bool Engine::parseCommandLine(int argc, char *argv[]) {
+	// variables for command-line flags
+	int optret;
+	std::vector<std::string> data_vec;
+
+	// parse the command-line flags
+	po::options_description desc;
+	desc.add_options()
+		("help,h", "Display help on command-line options")
+		("version,V", "Display openc2e version")
+		("silent,s", "Disable all sounds")
+		("data-path,d", po::value< std::vector<std::string> >(&data_vec)->composing(),
+		 "Set the path to the data directory")
+		("bootstrap,b", po::value< std::vector<std::string> >(&cmdline_bootstrap)->composing(),
+		 "Sets or adds a path or COS file to bootstrap from")
+		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (c1, c2, cv or c3)")
+		("norun,n", "Don't run the game, just execute scripts")
+		("autokill,a", "Enable autokill")
+		;
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+
+	cmdline_enable_sound = !vm.count("silent");
+	cmdline_norun = vm.count("norun");
+	
+	if (vm.count("help")) {
+		std::cout << desc << std::endl;
+		return false;
+	}
+
+	if (vm.count("version")) {
+		opt_version();
+		return false;
+	}
+
+	if (vm.count("autokill")) {
+		world.autokill = true;
+	}
+
+	if (vm.count("data-path") == 0) {
+		std::cout << "Warning: No data path specified, trying default of '" << data_default << "', see --help if you need to specify one." << std::endl;
+		data_vec.push_back(data_default);
+	}
+
+	// add all the data directories to the list
+	for (std::vector<std::string>::iterator i = data_vec.begin(); i != data_vec.end(); i++) {
+		fs::path datadir(*i, fs::native);
+		if (!fs::exists(datadir)) {
+			throw creaturesException("data path '" + *i + "' doesn't exist");
+		}
+		world.data_directories.push_back(datadir);
+	}
+
+	return true;
+}
+
+bool Engine::initialSetup(Backend *b) {
+	assert(world.data_directories.size() > 0);
+
+	// autodetect gametype if necessary
+	if (world.gametype.empty()) {
+		std::cout << "Warning: No gametype specified, ";
+		// TODO: is this sane? what about CV?
+		if (!world.findFile("Creatures.exe").empty()) {
+			std::cout << "found Creatures.exe, assuming C1 (c1)";
+			world.gametype = "c1";
+		} else if (!world.findFile("Creatures2.exe").empty()) {
+			std::cout << "found Creatures2.exe, assuming C2 (c2)";
+			world.gametype = "c2";
+		} else {
+			std::cout << "assuming C3/DS (c3)";
+			world.gametype = "c3";
+		}
+		std::cout << ", see --help if you need to specify one." << std::endl;
+	}
+
+	// finally, add our cache directory to the end
+	world.data_directories.push_back(cacheDirectory());
+	
+	// initial setup
+	registerDelegates();
+	std::cout << "* Reading catalogue files..." << std::endl;
+	world.initCatalogue();
+	std::cout << "* Initial setup..." << std::endl;
+	world.init(); // just reads mouse cursor (we want this after the catalogue reading so we don't play "guess the filename")
+	std::cout << "* Reading PRAY files..." << std::endl;
+	world.praymanager.update();
+	std::cout << "* Initialising backend..." << std::endl;
+	// TODO: ideally we shouldn't bother with the backend if norun is set (but we need one right now, for MainCamera/CAOS)
+	engine.setBackend(b);
+	engine.backend->init();
+	if (cmdline_enable_sound) engine.backend->soundInit();
+	world.camera.setBackend(engine.backend); // TODO: hrr
+	
+	int listenport = engine.backend->networkInit();
+	// inform the user of the port used, and store it in the relevant file
+	std::cout << "Listening for connections on port " << listenport << "." << std::endl;
+	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
+	if (!fs::exists(p))
+		fs::create_directory(p);
+	if (fs::is_directory(p)) {
+		std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
+		f << boost::str(boost::format("%d") % listenport);
+	}
+
+	if (world.data_directories.size() < 3) {
+		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
+		caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
+		caosVar contents; contents.setInt(1);
+		engine.eame_variables[name] = contents;
+	}
+
+	// execute the initial scripts!
+	std::cout << "* Executing initial scripts..." << std::endl;
+	if (cmdline_bootstrap.size() == 0) {
+		world.executeBootstrap(false);
+	} else {
+		std::vector<std::string> scripts;
+	
+		for (std::vector< std::string >::iterator bsi = cmdline_bootstrap.begin(); bsi != cmdline_bootstrap.end(); bsi++) {
+			fs::path scriptdir(*bsi, fs::native);
+			if (!fs::exists(scriptdir)) {
+				std::cerr << "Warning: Couldn't find a specified script directory (trying " << *bsi << ")!\n";
+				continue;
+			}
+			world.executeBootstrap(scriptdir);
+		}
+	}
+
+	// if there aren't any metarooms, we can't run a useful game, the user probably
+	// wanted to execute a CAOS script or something went badly wrong.
+	if (!cmdline_norun && world.map.getMetaRoomCount() == 0) {
+		engine.backend->shutdown();
+		throw creaturesException("No metarooms found in given bootstrap directories or files");
+	}
+
+	if (cmdline_norun) {
+		// TODO: see comment above about avoiding backend when norun is set
+		std::cout << "Told not to run the world, so stopping now." << std::endl;
+		engine.backend->shutdown();
+		return false;
+	}
+
+	return true;
 }
 
 /* vim: set noet: */
