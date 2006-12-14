@@ -63,6 +63,7 @@ void parseCondition(caosScript *s, int success, int failure) {
 			compar = CLE;
 		else if (cword == "ne")
 			compar = CNE;
+		s->v->exp_dialect->set_expect(CI_ANYVALUE);
 		s->v->exp_dialect->doParse(s);
 
 		bool nextIsAnd = false;
