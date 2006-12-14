@@ -45,6 +45,7 @@ void parseCondition(caosScript *s, int success, int failure) {
 	s->current->thread(new ConstOp(caosVar(1)));
 	while(1) {
 		int entry = s->current->getNextIndex();
+		s->v->exp_dialect->set_expect(CI_ANYVALUE);
 		s->v->exp_dialect->doParse(s);
 		
 		token *comparison = getToken(TOK_WORD);

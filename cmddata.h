@@ -30,7 +30,8 @@ enum ci_type {
 	CI_VARIABLE,
 	CI_BYTESTR,
 	CI_VECTOR,
-	CI_BAREWORD
+	CI_BAREWORD,
+	CI_ANYVALUE
 };
 
 struct cmdinfo {
