@@ -449,4 +449,55 @@ void caosVM::v_OOWW() {
 	}
 }
 
+/**
+ EVNT (command) object (agent)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_EVNT() {
+	VM_PARAM_VALIDAGENT(object)
+
+	// TODO
+}
+
+/**
+ RMEV (command) object (agent)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_RMEV() {
+	VM_PARAM_VALIDAGENT(object)
+
+	// TODO
+}
+
+/**
+ DDE: NEGG (command)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_DDE_NEGG() {
+	// TODO
+}
+
+/**
+ DDE: DIED (command)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_DDE_DIED() {
+	// TODO
+}
+
+
+/**
+ DDE: LIVE (command)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_DDE_LIVE() {
+	// TODO
+}
+
+
 /* vim: set noet: */

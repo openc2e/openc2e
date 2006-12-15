@@ -857,6 +857,12 @@ public:
 	void v_HIST_WUID();
 	void v_HIST_WVET();
 	void v_OOWW();
+	void c_EVNT();
+	void c_RMEV();
+	void c_DDE_NEGG();
+	void c_DDE_DIED();
+	void c_DDE_LIVE();
+	
 	// Vector ops
 	void v_VEC_MAKE();
 	void c_VEC_GETC();
