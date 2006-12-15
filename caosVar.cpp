@@ -20,6 +20,7 @@
 #define IN_CAOSVAR_CPP
 
 #include "caosVar.h"
+#include "Engine.h" // version
 
 #include <iostream>
 #include <sstream>
@@ -72,6 +73,15 @@ bool caosVar::operator == (const caosVar &v) const {
 		return this->getAgent() == v.getAgent();
 	} else if (this->hasVector() && v.hasVector()) {
 		return this->getVector() == v.getVector();
+	} else if (engine.version < 3) {
+		// C1/C2 allow you to compare an agent to zero, since agents are integers..
+		// TODO: do this for >/< too?
+
+		if (this->hasInt() && this->getInt() == 0 && v.hasAgent()) {
+			return v.getAgent();
+		} else if (v.hasInt() && v.getInt() == 0 && this->hasAgent()) {
+			return this->getAgent();
+		}
 	}
 
 	throw caosException(std::string("caosVar operator == couldn't compare ") + this->dump() + "and " + v.dump());
