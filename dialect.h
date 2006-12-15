@@ -218,7 +218,7 @@ class parseGSUB : public parseDelegate {
 				targ = s->current->newRelocation();
 				s->current->gsub[label] = targ;
 			}
-			s->current->thread(new caosGSUB(targ));
+			s->current->thread(new caosGSUB(targ, label));
 		}
 };
 

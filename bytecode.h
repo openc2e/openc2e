@@ -154,9 +154,11 @@ class caosGSUB : public caosOp {
 	protected:
 		FRIEND_SERIALIZE(caosGSUB);
 		int targ;
+		std::string label;
 		caosGSUB () {}
 	public:
-		caosGSUB(int targ_) : targ(targ_) {}
+		caosGSUB(int targ_, const std::string &label_)
+			: targ(targ_), label(label_) {}
 		void execute(caosVM *vm) {
 			caosOp::execute(vm);
 			callStackItem i;
@@ -174,7 +176,11 @@ class caosGSUB : public caosOp {
 			if (targ < 0) {
 				targ = relocations[-targ];
 			}
-			assert(targ > 0);
+			if (targ <= 0) {
+				// someone forgot a SUBR :(
+				throw parseException("GSUB without SUBR: " + label);
+			}
+			label = ""; // don't need that anymore
 		}
 
 		std::string dump() { 
