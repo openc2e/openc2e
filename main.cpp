@@ -23,6 +23,7 @@
 #include "Engine.h"
 #include "World.h"
 #include "SDLBackend.h"
+#include "NullBackend.h"
 
 #ifdef _MSC_VER
 #undef main // because SDL is stupid
@@ -33,7 +34,12 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2006 Alyssa Milburn and others\n\n";
 
 		if (!engine.parseCommandLine(argc, argv)) return 1;
-		if (!engine.initialSetup(new SDLBackend())) return 0;
+		
+		Backend *b;
+		if (engine.noRun()) b = new NullBackend();
+		else b = new SDLBackend();
+		
+		if (!engine.initialSetup(b)) return 0;
 	
 		// do a first-pass draw of the world. TODO: correct?
 		world.drawWorld();

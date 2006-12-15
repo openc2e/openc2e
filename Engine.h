@@ -25,7 +25,7 @@
 #include <map>
 
 class Engine {
-private:
+protected:
 	unsigned int tickdata;
 	unsigned int ticktimes[10];
 	unsigned int ticktimeptr;
@@ -59,6 +59,8 @@ public:
 
 	bool parseCommandLine(int argc, char *argv[]);
 	bool initialSetup(Backend *b);
+
+	bool noRun() { return cmdline_norun; }
 };
 
 extern Engine engine;

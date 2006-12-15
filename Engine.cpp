@@ -510,14 +510,16 @@ bool Engine::initialSetup(Backend *b) {
 	world.camera.setBackend(engine.backend); // TODO: hrr
 	
 	int listenport = engine.backend->networkInit();
-	// inform the user of the port used, and store it in the relevant file
-	std::cout << "Listening for connections on port " << listenport << "." << std::endl;
-	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
-	if (!fs::exists(p))
-		fs::create_directory(p);
-	if (fs::is_directory(p)) {
-		std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
-		f << boost::str(boost::format("%d") % listenport);
+	if (listenport != -1) {
+		// inform the user of the port used, and store it in the relevant file
+		std::cout << "Listening for connections on port " << listenport << "." << std::endl;
+		fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
+		if (!fs::exists(p))
+			fs::create_directory(p);
+		if (fs::is_directory(p)) {
+			std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
+			f << boost::str(boost::format("%d") % listenport);
+		}
 	}
 
 	if (world.data_directories.size() < 3) {

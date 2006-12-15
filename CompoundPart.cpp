@@ -558,6 +558,7 @@ void CameraPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
 		if (xoffset + x + viewwidth > 0 && yoffset + y + viewheight > 0 &&
 			xoffset + x < renderer->getWidth() && yoffset + y < renderer->getHeight()) {
 			Surface *surface = engine.backend->newSurface(viewwidth, viewheight);
+			assert(surface); // TODO: good behaviour?
 			world.drawWorld(camera.get(), surface);
 			renderer->blitSurface(surface, xoffset + x, yoffset + y, camerawidth, cameraheight);
 			engine.backend->freeSurface(surface);
