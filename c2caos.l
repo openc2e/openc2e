@@ -19,6 +19,8 @@ WORDINIT    [a-zA-Z_]
 WORDANY     [#a-zA-Z0-9:?!_+-]
 %%
 
+f\*\*k	lex_lineno = yylineno; return make_word("f**k");
+
 \*[^\r\n]*
 
 \'.\'       lex_lineno = yylineno; return make_int(yytext[1]);

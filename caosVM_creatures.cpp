@@ -1397,3 +1397,15 @@ void caosVM::c_DREA_c1() {
 	// TODO
 }
 
+/**
+ F**K (command)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_FK() {
+	c1Creature *c = getc1Creature(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+

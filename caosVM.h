@@ -664,6 +664,7 @@ public:
 	void c_SNEZ();
 	void v_DRIV_c1();
 	void c_DREA_c1();
+	void c_FK();
 	
 	// sounds
 	void c_SNDE();
