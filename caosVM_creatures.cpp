@@ -1035,6 +1035,8 @@ void caosVM::c_NEW_CREA_c1() {
 	VM_PARAM_INTEGER(sex)
 	VM_PARAM_INTEGER(moniker)
 
+	caos_assert(moniker != 0);
+
 	std::string realmoniker = std::string((char *)&moniker, 4);
 	shared_ptr<genomeFile> genome = world.loadGenome(realmoniker);
 	if (!genome)
@@ -1341,4 +1343,57 @@ void caosVM::c_AIM() {
 	// TODO
 }
 
-/* vim: set noet: */
+/**
+ BABY (variable)
+ %status maybe
+ %pragma variants c1
+*/
+void caosVM::v_BABY() {
+	// TODO: check for creature targ?
+
+	valid_agent(targ);
+	vm->valueStack.push_back(&targ->babymoniker);
+}
+
+/**
+ SNEZ (command)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_SNEZ() {
+	Creature *c = getTargCreature();
+
+	// TODO
+}
+
+/**
+ DRIV (integer) drive (integer)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::v_DRIV_c1
+*/
+void caosVM::v_DRIV_c1() {
+	VM_PARAM_INTEGER(drive)
+	caos_assert(drive < 16);
+
+	c1Creature *c = getc1Creature(targ.get());
+	caos_assert(c);
+
+	result.setInt(c->getDrive(drive));
+}
+
+/**
+ DREA (command) max (integer)
+ %status stub
+ %pragma variants c1
+ %pragma implementation caosVM::c_DREA_c1
+*/
+void caosVM::c_DREA_c1() {
+	VM_PARAM_INTEGER(max)
+
+	c1Creature *c = getc1Creature(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+

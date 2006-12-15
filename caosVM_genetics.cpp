@@ -152,4 +152,17 @@ void caosVM::v_MTOC() {
 	result.setAgent(c);
 }
 
+/**
+ NEW: GENE (command) mum (integer) dad (integer) destination (variable)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_NEW_GENE() {
+	VM_PARAM_VARIABLE(destination)
+	VM_PARAM_INTEGER(dad)
+	VM_PARAM_INTEGER(mum)
+
+	destination->setInt(0); // TODO
+}
+
 /* vim: set noet: */

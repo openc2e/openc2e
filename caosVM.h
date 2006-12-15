@@ -498,6 +498,7 @@ public:
 	void v_LIMT();
 	void v_LIMR();
 	void v_LIMB_c1();
+	void v_OBJP();
 	
 	// motion
 	void c_ELAS();
@@ -659,6 +660,10 @@ public:
 	void c_SAYN();
 	void c_IMPT();
 	void c_AIM();
+	void v_BABY();
+	void c_SNEZ();
+	void v_DRIV_c1();
+	void c_DREA_c1();
 	
 	// sounds
 	void c_SNDE();
@@ -819,6 +824,7 @@ public:
 	void v_GTOS();
 	void v_MTOA();
 	void v_MTOC();
+	void c_NEW_GENE();
 	
 	// history
 	void v_HIST_CAGE();

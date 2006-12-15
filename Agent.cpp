@@ -65,6 +65,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	imsk_key_down = imsk_key_up = imsk_mouse_move = imsk_mouse_down = imsk_mouse_up = imsk_mouse_wheel = imsk_translated_char = false;
 
 	emitca_index = -1; emitca_amount = 0.0f;
+
+	objp.setAgent(0); // not strictly necessary
 }
 
 void Agent::finishInit() {

@@ -1573,7 +1573,7 @@ void caosVM::c_SETV_CLS2() {
 /**
  SLIM (command)
  %status stub
- %pragma variants c2
+ %pragma variants c1 c2
 */
 void caosVM::c_SLIM() {
 	// TODO: probably shouldn't do anything, but make sure :)
@@ -1631,7 +1631,7 @@ void caosVM::c_SETV_CLAS() {
 
 /**
  LIML (integer)
- %status stub
+ %status maybe
  %pragma variants c1
 */
 void caosVM::v_LIML() {
@@ -1645,7 +1645,7 @@ void caosVM::v_LIML() {
 
 /**
  LIMT (integer)
- %status stub
+ %status maybe
  %pragma variants c1
 */
 void caosVM::v_LIMT() {
@@ -1659,7 +1659,7 @@ void caosVM::v_LIMT() {
 
 /**
  LIMR (integer)
- %status stub
+ %status maybe
  %pragma variants c1
 */
 void caosVM::v_LIMR() {
@@ -1673,7 +1673,7 @@ void caosVM::v_LIMR() {
 
 /**
  LIMB (integer)
- %status stub
+ %status maybe
  %pragma variants c1
  %pragma implementation caosVM::v_LIMB_c1
 */
@@ -1684,6 +1684,16 @@ void caosVM::v_LIMB_c1() {
 
 	if (r) result.setInt(r->y_left_floor);
 	else result.setInt(1200); // TODO
+}
+
+/**
+ OBJP (variable)
+ %status maybe
+ %pragma variants c1 c2
+*/
+void caosVM::v_OBJP() {
+	valid_agent(targ);
+	vm->valueStack.push_back(&targ->objp);
 }
 
 /* vim: set noet: */

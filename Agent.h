@@ -159,6 +159,9 @@ public:
 
 	AgentRef floatingagent;
 
+	// Creatures 1/2 bits
+	caosVar objp, babymoniker;
+
 	// Creatures 2
 	// TODO: size/grav likely duplicates of perm/falling
 	caosVar actv, thrt, size, grav;
