@@ -365,7 +365,6 @@ public:
 	void c_RNDV();
 
 	// flow
-	void c_DOIF();
 	void c_ENDI();
 	void c_REPS();
 	void c_REPE();

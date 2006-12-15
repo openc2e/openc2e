@@ -56,12 +56,14 @@
 
 /**
  ENDI (command)
- %pragma noparse
  %status maybe
  %pragma variants c1 c2 cv c3
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
 */
+void caosVM::c_ENDI() {
+	throw caosException("Unmatched ENDI! wtf maet.");
+}
 
 /**
  REPS (command) reps (integer)
