@@ -631,10 +631,10 @@ void Agent::setZOrder(unsigned int z) {
 	zorder = z;
 }
 
-int Agent::getUNID() {
+int Agent::getUNID() const {
 	  if (unid != -1)
 			  return unid;
-	  return unid = world.getUNID(this);
+	  return unid = world.getUNID(const_cast<Agent *>(this));
 }
 
 std::string Agent::identify() const {

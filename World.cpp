@@ -249,7 +249,7 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 int World::getUNID(Agent *whofor) {
 	do {
 		int unid = rand();
-		if (unidmap[unid].expired()) {
+		if (unid && unidmap[unid].expired()) {
 			unidmap[unid] = whofor->shared_from_this();
 			return unid;
 		}

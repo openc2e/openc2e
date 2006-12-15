@@ -20,7 +20,8 @@
 #define IN_CAOSVAR_CPP
 
 #include "caosVar.h"
-#include "Engine.h" // version
+#include "AgentRef.h"
+#include "Agent.h"
 
 #include <iostream>
 #include <sstream>
@@ -63,27 +64,17 @@ std::string caosVar::dump() const {
 
 bool caosVar::operator == (const caosVar &v) const {
 	// todo: should be able to compare int and float, apparently
-	if (this->hasInt() && v.hasInt()) {
+	if (this->hasAgent() && v.hasAgent()) {
+		return this->getAgent() == v.getAgent();
+	} else if (this->hasInt() && v.hasInt()) {
 		return this->getInt() == v.getInt();
 	} else if (this->hasDecimal() && v.hasDecimal()) {
 		return this->getFloat() == v.getFloat();
 	} else if (this->hasString() && v.hasString()) {
 		return this->getString() == v.getString();
-	} else if (this->hasAgent() && v.hasAgent()) {
-		return this->getAgent() == v.getAgent();
 	} else if (this->hasVector() && v.hasVector()) {
 		return this->getVector() == v.getVector();
-	} else if (engine.version < 3) {
-		// C1/C2 allow you to compare an agent to zero, since agents are integers..
-		// TODO: do this for >/< too?
-
-		if (this->hasInt() && this->getInt() == 0 && v.hasAgent()) {
-			return v.getAgent();
-		} else if (v.hasInt() && v.getInt() == 0 && this->hasAgent()) {
-			return this->getAgent();
-		}
 	}
-
 	throw caosException(std::string("caosVar operator == couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
@@ -120,5 +111,9 @@ bool caosVar::operator < (const caosVar &v) const {
 	throw caosException(std::string("caosVar operator < couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
+int caosVar::intVisit::operator()(const AgentRef &a) const {
+	if (!a) return 0;
+	return a->getUNID();
+}
 
 /* vim: set noet: */

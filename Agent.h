@@ -70,7 +70,7 @@ protected:
 	void zotrefs();
 	void zotstack();
 
-	int unid;
+	mutable int unid;
 	unsigned int zorder;
 	unsigned int tickssincelasttimer, timerrate;
 
@@ -206,7 +206,7 @@ public:
 
 	class shared_ptr<script> findScript(unsigned short event);
 	
-	int getUNID();
+	int getUNID() const;
 	std::string identify() const;
 
 	void setAttributes(unsigned int a) { attr.setInt(a); }
