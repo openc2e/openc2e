@@ -325,50 +325,6 @@ void Engine::handleMouseButton(SomeEvent &event) {
 }
 
 void Engine::handleKeyDown(SomeEvent &event) {
-	// handle debug keys, if they're enabled
-	caosVar v = world.variables["engine_debug_keys"];
-	if (v.hasInt() && v.getInt() == 1) {
-		// TODO: fix
-		/*Uint8 *keystate = SDL_GetKeyState(NULL);
-		if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
-			MetaRoom *n; // for pageup/pagedown
-
-			switch (event.key.keysym.sym) {
-				case SDLK_INSERT:
-					world.showrooms = !world.showrooms;
-					break;
-
-				case SDLK_PAUSE:
-					// TODO: debug pause game
-					break;
-
-				case SDLK_SPACE:
-					// TODO: force tick
-					break;
-
-				case SDLK_PAGEUP:
-					// TODO: previous metaroom
-					if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
-						break;
-					n = world.map.getMetaRoom(world.camera.getMetaRoom()->id + 1);
-					if (n)
-						world.camera.goToMetaRoom(n->id);
-					break;
-
-				case SDLK_PAGEDOWN:
-					// TODO: next metaroom
-					if (world.camera.getMetaRoom()->id == 0)
-						break;
-					n = world.map.getMetaRoom(world.camera.getMetaRoom()->id - 1);
-					if (n)
-						world.camera.goToMetaRoom(n->id);
-					break;
-
-				default: break; // to shut up warnings
-			}
-		}*/
-	}
-
 	// tell the agent with keyboard focus
 	if (world.focusagent) {
 		TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
@@ -387,6 +343,48 @@ void Engine::handleKeyDown(SomeEvent &event) {
 }
 
 void Engine::handleSpecialKeyDown(SomeEvent &event) {
+	// handle debug keys, if they're enabled
+	caosVar v = world.variables["engine_debug_keys"];
+	if (v.hasInt() && v.getInt() == 1) {
+		if (backend->keyDown(16)) { // shift down
+			MetaRoom *n; // for pageup/pagedown
+
+			switch (event.key) {
+				case 45: // insert
+					world.showrooms = !world.showrooms;
+					break;
+
+				case 19: // pause
+					// TODO: debug pause game
+					break;
+
+				case 32: // space
+					// TODO: force tick
+					break;
+
+				case 33: // pageup
+					// TODO: previous metaroom
+					if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
+						break;
+					n = world.map.getMetaRoom(world.camera.getMetaRoom()->id + 1);
+					if (n)
+						world.camera.goToMetaRoom(n->id);
+					break;
+
+				case 34: // pagedown
+					// TODO: next metaroom
+					if (world.camera.getMetaRoom()->id == 0)
+						break;
+					n = world.map.getMetaRoom(world.camera.getMetaRoom()->id - 1);
+					if (n)
+						world.camera.goToMetaRoom(n->id);
+					break;
+
+				default: break; // to shut up warnings
+			}
+		}
+	}
+
 	// tell the agent with keyboard focus
 	if (world.focusagent) {
 		TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
