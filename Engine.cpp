@@ -553,6 +553,8 @@ bool Engine::initialSetup(Backend *b) {
 		throw creaturesException("No metarooms found in given bootstrap directories or files");
 	}
 
+	std::cout << "* Done startup." << std::endl;
+
 	if (cmdline_norun) {
 		// TODO: see comment above about avoiding backend when norun is set
 		std::cout << "Told not to run the world, so stopping now." << std::endl;
