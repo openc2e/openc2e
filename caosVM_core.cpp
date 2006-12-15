@@ -254,7 +254,7 @@ void caosVM::v_LANG() {
 /**
  TOKN (integer) token (bareword)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::v_TOKN() {
 	VM_PARAM_STRING(token)

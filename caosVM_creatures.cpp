@@ -754,6 +754,7 @@ void caosVM::c_UNCS() {
 /**
  UNCS (integer)
  %status stub
+ %pragma variants c2 cv c3
 
  Returns 1 if the target Creature is unconscious, or 0 otherwise.
 */

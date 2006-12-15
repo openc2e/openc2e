@@ -113,6 +113,7 @@ void caosVM::v_VELY() {
 /**
  OBST (float) direction (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Returns the distance from the TARG agent to the nearest wall that it might collide with in the given direction.
  (except right now it just gives the direction to the nearest wall at world edge - fuzzie)
@@ -123,9 +124,10 @@ void caosVM::v_OBST() {
 
 	/*
 	 * TODO: CL's docs say to return "a very large number" if distance is greater than rnge - if (!collided)?
+	 * TODO: c2 docs say "from the centre point of TARG".. same in c2e? or do we need a separate function?
 	 * also, this code is untested :) - fuzzie
 	 */
-	
+
 	valid_agent(targ);
 	
 	Point src = targ->boundingBoxPoint(direction);
