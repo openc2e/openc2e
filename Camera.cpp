@@ -21,6 +21,7 @@
 #include "CameraPart.h"
 #include "World.h"
 #include "Backend.h"
+#include "MetaRoom.h"
 
 Camera::Camera() {
 	// TODO: I set these to some high value due to stupidly-floating agents at (0, 0)

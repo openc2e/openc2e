@@ -20,7 +20,6 @@
 #ifndef _C2E_METAROOM_H
 #define _C2E_METAROOM_H
 
-#include "Room.h"
 #include "blkImage.h"
 #include "openc2e.h"
 #include <string>
@@ -38,7 +37,7 @@ protected:
 	MetaRoom() { firstback = 0; }
 
 public:
-	std::vector<Room *> rooms;
+	std::vector<class Room *> rooms;
 
 	unsigned int x() { return xloc; }
 	unsigned int y() { return yloc; }
@@ -48,7 +47,7 @@ public:
 	unsigned int fullheight() { return fullhei; }
 	bool wraparound() { return wraps; }
 
-	unsigned int addRoom(Room *);
+	unsigned int addRoom(class Room *);
 	void addBackground(std::string, creaturesImage * = 0);
 	creaturesImage *getBackground(std::string);
 	std::vector<std::string> backgroundList();

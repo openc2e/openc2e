@@ -25,6 +25,7 @@
 #include "caosVM.h"
 #include "Backend.h"
 #include <boost/format.hpp>
+#include "Room.h"
 
 void Agent::core_init() {
 	initialized = false;

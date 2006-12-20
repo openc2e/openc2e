@@ -27,6 +27,8 @@
 #include "CreatureAgent.h"
 #include "Backend.h"
 #include "SFCFile.h"
+#include "Room.h"
+#include "MetaRoom.h"
 
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -340,34 +342,15 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 				if ((**i).doors.find(r) != (**i).doors.end())
 					col = 0x00FFFFCC;
 			}
-			// ceiling
-			surface->renderLine(
-					(**i).x_left - adjustx,
-					(**i).y_left_ceiling - adjusty,
-					(**i).x_right - adjustx,
-					(**i).y_right_ceiling - adjusty,
-					col);
-			// floor
-			surface->renderLine(
-					(**i).x_left - adjustx, 
-					(**i).y_left_floor - adjusty,
-					(**i).x_right - adjustx,
-					(**i).y_right_floor - adjusty,
-					col);
-			// left side
-			surface->renderLine(
-					(**i).x_left - adjustx,
-					(**i).y_left_ceiling - adjusty,
-					(**i).x_left - adjustx,
-					(**i).y_left_floor - adjusty,
-					col);
-			// right side
-			surface->renderLine(
-					(**i).x_right  - adjustx,
-					(**i).y_right_ceiling - adjusty,
-					(**i).x_right - adjustx,
-					(**i).y_right_floor - adjusty,
-					col);
+
+			// rooms don't wrap over the boundary, so just draw twice
+			for (unsigned int z = 0; z < (m->wraparound() ? 2 : 1); z++) {
+				int newx = adjustx;
+				if (z == 1)
+					newx -= m->width();
+
+				(*i)->renderBorders(surface, newx, adjusty, col);
+			}
 		}
 	}
 

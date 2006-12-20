@@ -20,9 +20,12 @@
 #ifndef _OPENC2E_MAP_H
 #define _OPENC2E_MAP_H
 
-#include "MetaRoom.h"
+#include "physics.h"
 #include "openc2e.h"
 #include <vector>
+
+class Room;
+class MetaRoom;
 
 class Map {
 protected:

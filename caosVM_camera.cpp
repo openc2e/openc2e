@@ -21,6 +21,7 @@
 #include "World.h"
 #include "CompoundAgent.h"
 #include "CameraPart.h"
+#include "MetaRoom.h"
 
 Camera *caosVM::getCamera() {
 	Camera *c = camera.lock().get();

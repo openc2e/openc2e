@@ -19,6 +19,7 @@
 
 #include "Engine.h"
 #include "World.h"
+#include "MetaRoom.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "PointerAgent.h"
 #include "dialect.h" // registerDelegates

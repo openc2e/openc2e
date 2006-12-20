@@ -19,6 +19,7 @@
 
 #include "Room.h"
 #include "World.h"
+#include "Backend.h"
 
 Room::Room() {
 	for (unsigned int i = 0; i < CA_COUNT; i++)
@@ -103,6 +104,32 @@ void Room::postTick() {
 void Room::resetTick() {
 	for (unsigned int i = 0; i < CA_COUNT; i++)
 		catemp[i] = 0.0f;
+}
+
+void Room::renderBorders(class Surface *surface, int adjustx, int adjusty, unsigned int col) {
+	// ceiling
+	surface->renderLine(x_left - adjustx, y_left_ceiling - adjusty,
+			x_right - adjustx, y_right_ceiling - adjusty,
+			col);
+	// floor
+	surface->renderLine(x_left - adjustx, y_left_floor - adjusty,
+			x_right - adjustx, y_right_floor - adjusty,
+			col);
+	// left side
+	surface->renderLine(x_left - adjustx, y_left_ceiling - adjusty,
+			x_left - adjustx, y_left_floor - adjusty,
+			col);
+	// right side
+	surface->renderLine(x_right  - adjustx, y_right_ceiling - adjusty,
+			x_right - adjustx, y_right_floor - adjusty,
+			col);
+
+	// c2 floor points
+	for (unsigned int i = 1; i < floorpoints.size(); i++) {
+		surface->renderLine(x_left + floorpoints[i - 1].first - adjustx, y_left_floor - floorpoints[i - 1].second - adjusty,
+				x_left + floorpoints[i].first - adjustx, y_left_floor - floorpoints[i].second - adjusty,
+				col);
+	}
 }
 
 /* vim: set noet: */

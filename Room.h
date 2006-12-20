@@ -42,6 +42,8 @@ public:
 	std::set<Room *> nearby;
 	unsigned int x_left, x_right, y_left_ceiling, y_right_ceiling;
 	unsigned int y_left_floor, y_right_floor;
+	
+	std::vector<std::pair<unsigned int, unsigned int> > floorpoints;
 
 	Line left, right, top, bot;
 	
@@ -65,6 +67,8 @@ public:
 	void tick();
 	void postTick();
 	void resetTick();
+
+	void renderBorders(class Surface *surf, int xoffset, int yoffset, unsigned int col);
 };
 
 #endif

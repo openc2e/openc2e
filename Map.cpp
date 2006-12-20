@@ -19,6 +19,8 @@
 
 #include "Map.h"
 #include "openc2e.h"
+#include "Room.h"
+#include "MetaRoom.h"
 #include <iostream>
 
 void Map::Reset() {

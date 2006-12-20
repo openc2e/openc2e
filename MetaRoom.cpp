@@ -18,6 +18,7 @@
  */
 
 #include "MetaRoom.h"
+#include "Room.h"
 #include "World.h"
 #include "creaturesImage.h"
 #include <assert.h>

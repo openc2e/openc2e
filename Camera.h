@@ -20,7 +20,7 @@
 #ifndef _OPENC2E_CAMERA_H
 #define _OPENC2E_CAMERA_H
 
-#include "MetaRoom.h"
+#include <vector>
 #include "AgentRef.h"
 
 enum cameratransition { none = 0, fliphorz = 1, burst = 2 };
@@ -49,7 +49,7 @@ public:
 	unsigned int const getXCentre() { return x + (getWidth() / 2); }
 	unsigned int const getYCentre() { return y + (getHeight() / 2); }
 	
-	MetaRoom * const getMetaRoom();
+	class MetaRoom * const getMetaRoom();
 	void goToMetaRoom(unsigned int m);
 	void goToMetaRoom(unsigned int m, int x, int y, cameratransition transition);
 	virtual void moveTo(int _x, int _y, panstyle pan = jump);

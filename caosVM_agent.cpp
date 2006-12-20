@@ -27,6 +27,7 @@
 #include <iostream>
 #include <boost/format.hpp>
 #include "AgentHelpers.h"
+#include "Room.h" // LIML/LIMT etc
 
 using std::cerr;
 

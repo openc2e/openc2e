@@ -19,6 +19,8 @@
 
 #include "SFCFile.h"
 #include "World.h"
+#include "MetaRoom.h"
+#include "Room.h"
 #include "exceptions.h"
 
 /*
@@ -767,8 +769,9 @@ void MapData::copyToWorld() {
 		sfccheck(roomid == src->id);
 
 		if (parent->version() == 1) {
+			r->floorpoints = src->floorpoints;
+
 			// TODO: ca values, sources, wind, drop status, music
-			// TODO: floor points
 			// TODO: floor value
 		}
 	}

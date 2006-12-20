@@ -19,6 +19,8 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include "MetaRoom.h"
+#include "Room.h"
 #include <assert.h>
 #include <iostream>
 #include <boost/format.hpp>
