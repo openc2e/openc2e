@@ -78,11 +78,8 @@ class caosVar {
 			int operator()(const Vector<float> &v) const {
 				return (int)v.getMagnitude();
 			}
-			// Since we need Agent.h in scope, and Agent.h includes caosVar,
-			// we need to put this in the .cpp file
-			int operator()(const AgentRef &a) const;
-				
 			BAD_TYPE(int, std::string);
+			BAD_TYPE(int, AgentRef);
 			BAD_TYPE(int, nulltype_tag);
 		};
 
@@ -166,11 +163,11 @@ class caosVar {
 		caosVar(const Vector<float> &v) { setVector(v); }
 		
 		bool isEmpty() const { return getType() == NULLTYPE; }
-		bool hasInt() const { return getType() == INTEGER || getType() == AGENT; }
+		bool hasInt() const { return getType() == INTEGER; }
 		bool hasFloat() const { return getType() == FLOAT; }
 		bool hasAgent() const { return getType() == AGENT; }
 		bool hasString() const { return getType() == STRING; }
-		bool hasDecimal() const { return getType() == INTEGER || getType() == FLOAT || getType() == VECTOR || getType() == AGENT; }
+		bool hasDecimal() const { return getType() == INTEGER || getType() == FLOAT || getType() == VECTOR; }
 		bool hasNumber() const { return hasDecimal(); }
 		bool hasVector() const { return getType() == VECTOR; }
 		
