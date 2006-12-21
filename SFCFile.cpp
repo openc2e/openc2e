@@ -747,31 +747,60 @@ void SFCFile::copyToWorld() {
 #include <iostream>
 
 void MapData::copyToWorld() {
+	// find the background sprite
 	creaturesImage *spr = world.gallery.getImage(background->filename);
+	sfccheck(spr);
+
+	// check for Terra Nornia's corrupt background sprite
 	if (background->filename == "buro") {
-		// hack for Terra Nornia's corrupt background sprite
+		// apply stupid hack
 		// TODO: can't we have a better check, eg checking if offsets are identical?
 		std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
 		sprImage *buro = dynamic_cast<sprImage *>(spr);
 		sfccheck(buro);
 		buro->fixBufferOffsets();
 	}
+
+	// create the global metaroom
 	// TODO: hardcoded size bad?
 	unsigned int w = parent->version() == 0 ? 1200 : 2400;
 	MetaRoom *m = new MetaRoom(0, 0, 8352, w, background->filename, spr, true);
 	world.map.addMetaRoom(m);
 
 	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		// retrieve our room data
 		CRoom *src = *i;
+
+		// create a new room, set the type
 		Room *r = new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom);
-		r->type = src->roomtype;
+		r->type.setInt(src->roomtype);
+
+		// add the room to the world, ensure it matches the id we retrieved
 		unsigned int roomid = m->addRoom(r);
+		// TODO: correct check?
 		sfccheck(roomid == src->id);
 
 		if (parent->version() == 1) {
+			// set floor points
 			r->floorpoints = src->floorpoints;
 
-			// TODO: ca values, sources, wind, drop status, music
+			// set CAs
+			r->intr.setInt(src->inorganicnutrients);
+			r->ontr.setInt(src->organicnutrients);
+			r->temp.setInt(src->temperature);
+			r->pres.setInt(src->pressure);
+			r->lite.setInt(src->lightlevel);
+			r->radn.setInt(src->radiation);
+			r->hsrc.setInt(src->heatsource);
+			r->psrc.setInt(src->pressuresource);
+			r->lsrc.setInt(src->lightsource);
+			r->rsrc.setInt(src->radiationsource);
+
+			// set wind x/y
+			r->windx = src->windx;
+			r->windy = src->windy;
+
+			// TODO: drop status, music
 			// TODO: floor value
 		}
 	}

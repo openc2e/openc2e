@@ -53,8 +53,10 @@ Room::Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int 
 }
 
 void Room::tick() {
-	if (world.carates.find(type) == world.carates.end()) return;
-	std::map<unsigned int, cainfo> &rates = world.carates[type];
+	if (!type.hasInt()) return; // badness
+
+	if (world.carates.find(type.getInt()) == world.carates.end()) return;
+	std::map<unsigned int, cainfo> &rates = world.carates[type.getInt()];
 
 	for (unsigned int i = 0; i < CA_COUNT; i++) {
 		if (rates.find(i) == rates.end()) continue;
@@ -79,8 +81,10 @@ void Room::tick() {
 }
 
 void Room::postTick() {
-	if (world.carates.find(type) == world.carates.end()) return;
-	std::map<unsigned int, cainfo> &rates = world.carates[type];
+	if (!type.hasInt()) return; // badness
+
+	if (world.carates.find(type.getInt()) == world.carates.end()) return;
+	std::map<unsigned int, cainfo> &rates = world.carates[type.getInt()];
 
 	for (unsigned int i = 0; i < CA_COUNT; i++) {
 		if (rates.find(i) == rates.end()) continue;

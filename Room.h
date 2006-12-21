@@ -24,6 +24,7 @@
 #include <set>
 #include <utility>
 #include "physics.h"
+#include "caosVar.h"
 #include <iostream>
 #include <algorithm>
 
@@ -47,7 +48,12 @@ public:
 
 	Line left, right, top, bot;
 	
-	unsigned int type;
+	caosVar type;
+
+	// Creatures 2
+	caosVar temp, lite, radn, ontr, intr, pres, hsrc, lsrc, rsrc, psrc;
+	int windx, windy;
+
 	unsigned int id;
 	class MetaRoom *metaroom;
 

@@ -248,6 +248,17 @@ public:
 	void c_CACL();
 	void v_WIND();
 	void v_TEMP();
+	void v_LITE();
+	void v_RADN();
+	void v_ONTR();
+	void v_INTR();
+	void v_PRES();
+	void v_HSRC();
+	void v_LSRC();
+	void v_RSRC();
+	void v_PSRC();
+	void v_WNDX();
+	void v_WNDY();
 	
 	// camera
 	void v_VISI();

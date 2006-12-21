@@ -203,7 +203,7 @@ void caosVM::v_RTYP() {
 
 	Room *room = world.map.getRoom(roomid);
 	if (room)
-		result.setInt(room->type);
+		result.setInt(room->type.getInt());
 	else
 		result.setInt(-1);
 }
@@ -221,7 +221,7 @@ void caosVM::v_RTYP_c2() {
 	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 	if (!r) result.setInt(-1);
 	else {
-		result.setInt(r->type);
+		result.setInt(r->type.getInt());
 	}
 }
 
@@ -278,6 +278,10 @@ void caosVM::c_RATE() {
 	world.carates[roomtype][caindex] = info;
 }
 
+Room *roomContainingAgent(AgentRef agent) {
+	return world.map.roomAt(agent->x + (agent->getWidth() / 2.0f), agent->y + (agent->getHeight() / 2.0f));
+}
+
 /**
  ROOM (integer) agent (agent)
  %status maybe
@@ -288,7 +292,7 @@ void caosVM::v_ROOM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALIDAGENT(agent)
 	
-	Room *r = world.map.roomAt(agent->x + (agent->getWidth() / 2.0f), agent->y + (agent->getHeight() / 2.0f));
+	Room *r = roomContainingAgent(agent);
 	if (r)
 		result.setInt(r->id);
 	else
@@ -789,14 +793,149 @@ void caosVM::v_WIND() {
 }
 
 /**
- TEMP (integer)
- %status stub
- %pragma variants c1
-
- Always returns zero, since this command was stubbed in C1.
+ TEMP (variable)
+ %status maybe
+ %pragma variants c1 c2
 */
 void caosVM::v_TEMP() {
-	result.setInt(0);
+	// TODO: should this be a separate "return 0 always" stub for C1?
+
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->temp);
+}
+
+/**
+ LITE (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_LITE() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->lite);
+}
+
+/**
+ RADN (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_RADN() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->radn);
+}
+
+/**
+ ONTR (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_ONTR() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->ontr);
+}
+
+/**
+ INTR (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_INTR() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->intr);
+}
+
+/**
+ PRES (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_PRES() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->pres);
+}
+
+/**
+ HSRC (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_HSRC() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->hsrc);
+}
+
+/**
+ LSRC (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_LSRC() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->lsrc);
+}
+
+/**
+ RSRC (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_RSRC() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->rsrc);
+}
+
+/**
+ PSRC (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_PSRC() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	vm->valueStack.push_back(&r->psrc);
+}
+
+/**
+ WNDX (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_WNDX() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	result.setInt(r->windx);
+}
+
+/**
+ WNDY (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_WNDY() {
+	valid_agent(targ);
+	Room *r = roomContainingAgent(targ);
+	caos_assert(r);
+	result.setInt(r->windy);
 }
 
 /* vim: set noet: */
