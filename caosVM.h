@@ -716,6 +716,9 @@ public:
 	void v_WTIK();
 	void v_RACE();
 	void v_ETIK();
+	void v_SEAV();
+	void c_ASEA();
+	void v_TMOD();
 
 	// resources
 	void v_PRAY_AGTI();
@@ -771,6 +774,7 @@ public:
 	void v_YVEC();
 	void v_BUMP();
 	void c_TELE();
+	void c_DPS2();
 	
 	// ports
 	void c_PRT_BANG();

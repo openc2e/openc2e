@@ -248,4 +248,21 @@ void caosVM::c_TELE() {
 	// TODO
 }
 
+/**
+ DPS2 (command) gravity (integer)
+ %status stub
+ %pragma variants c2
+
+ Drop passengers of targ vehicle, like DPAS. If gravity is zero, passengers do not get gravity activated.
+*/
+void caosVM::c_DPS2() {
+	VM_PARAM_INTEGER(gravity)
+
+	valid_agent(targ);
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	caos_assert(v);
+
+	// TODO
+}
+
 /* vim: set noet: */

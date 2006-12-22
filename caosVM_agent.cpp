@@ -1633,7 +1633,7 @@ void caosVM::c_SETV_CLAS() {
 /**
  LIML (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::v_LIML() {
 	// TODO: is this remotely sane? if so, unstub.
@@ -1647,7 +1647,7 @@ void caosVM::v_LIML() {
 /**
  LIMT (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::v_LIMT() {
 	// TODO: is this remotely sane? if so, unstub.
@@ -1661,7 +1661,7 @@ void caosVM::v_LIMT() {
 /**
  LIMR (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::v_LIMR() {
 	// TODO: is this remotely sane? if so, unstub.
@@ -1675,7 +1675,7 @@ void caosVM::v_LIMR() {
 /**
  LIMB (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::v_LIMB_c1
 */
 void caosVM::v_LIMB_c1() {

@@ -252,4 +252,31 @@ void caosVM::v_ETIK() {
 	result.setInt(world.tickcount);
 }
 
+/**
+ ASEA (command)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_ASEA() {
+	// TODO
+}
+
+/**
+ TMOD (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_TMOD() {
+	result.setInt(0); // TODO
+}
+
+/**
+ SEAV (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_SEAV() {
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */
