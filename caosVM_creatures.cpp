@@ -1109,9 +1109,10 @@ void caosVM::v_IITT() {
 */
 void caosVM::c_AGES() {
 	VM_PARAM_INTEGER(times)
+	caos_assert(times >= 0);
 	
 	Creature *c = getTargCreature();
-	for (unsigned int i = 0; i < times; i++) {
+	for (int i = 0; i < times; i++) {
 		c->ageCreature();
 	}
 }
@@ -1180,7 +1181,7 @@ void caosVM::v_ORGF() {
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
-	caos_assert(organ >= 0 && organ < c->noOrgans());
+	caos_assert(organ >= 0 && (unsigned int)organ < c->noOrgans());
 	shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {
@@ -1207,7 +1208,7 @@ void caosVM::v_ORGI() {
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
-	caos_assert(organ >= 0 && organ < c->noOrgans());
+	caos_assert(organ >= 0 && (unsigned int)organ < c->noOrgans());
 	shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {

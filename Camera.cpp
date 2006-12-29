@@ -127,8 +127,9 @@ void Camera::tick() {
 void Camera::updateTracking() {
 	if (!trackedagent) return;
 
-	int x = trackedagent->x - (getWidth() / 2);
-	int y = trackedagent->y - (getHeight() / 2);
+	// TODO: not very intelligent :) also, are int casts correct?
+	int x = (int)trackedagent->x - (getWidth() / 2);
+	int y = (int)trackedagent->y - (getHeight() / 2);
 	moveTo(x, y);
 }
 

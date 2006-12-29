@@ -1085,8 +1085,8 @@ void caosVM::v_TRAN() {
 	CompoundPart *s = targ->part(0); assert(s);
 	SpritePart *p = dynamic_cast<SpritePart *>(s);
 	caos_assert(p);
-	caos_assert(x >= 0 && x <= p->getWidth());
-	caos_assert(y >= 0 && y <= p->getHeight());
+	caos_assert(x >= 0 && x <= (int)p->getWidth());
+	caos_assert(y >= 0 && y <= (int)p->getHeight());
 	if (p->transparentAt(x, y))
 		result.setInt(1);
 	else

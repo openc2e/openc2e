@@ -43,15 +43,15 @@ class SDLSurface : public Surface {
 
 protected:
 	SDL_Surface *surface;
-	int width, height;
+	unsigned int width, height;
 	SDL_Color palette[256];
 
 public:
 	void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void blitSurface(Surface *src, int x, int y, int w, int h);
-	int getWidth() const { return width; }
-	int getHeight() const { return height; }
+	unsigned int getWidth() const { return width; }
+	unsigned int getHeight() const { return height; }
 	void renderDone();
 };
 

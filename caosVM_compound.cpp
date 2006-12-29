@@ -67,6 +67,7 @@ void caosVM::v_PART() {
 void caosVM::c_PAT_DULL() {
 	VM_VERIFY_SIZE(6)
 	VM_PARAM_INTEGER(plane)
+	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(first_image)
@@ -98,6 +99,7 @@ void caosVM::c_PAT_BUTT() {
 	VM_PARAM_INTEGER(messageid)
 	VM_PARAM_BYTESTR(hoveranim)
 	VM_PARAM_INTEGER(plane)
+	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(image_count)
@@ -127,6 +129,7 @@ void caosVM::c_PAT_BUTT() {
 void caosVM::c_PAT_FIXD() {
 	VM_PARAM_STRING(fontsprite)
 	VM_PARAM_INTEGER(plane)
+	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(first_image)
@@ -155,6 +158,7 @@ void caosVM::c_PAT_TEXT() {
 	VM_PARAM_STRING(fontsprite)
 	VM_PARAM_INTEGER(message_id)
 	VM_PARAM_INTEGER(plane)
+	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(first_image)
@@ -180,6 +184,7 @@ void caosVM::c_PAT_CMRA() {
 	VM_PARAM_INTEGER(viewheight)
 	VM_PARAM_INTEGER(viewwidth)
 	VM_PARAM_INTEGER(plane)
+	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(first_image)
@@ -204,6 +209,7 @@ void caosVM::c_PAT_CMRA() {
 void caosVM::c_PAT_GRPH() {
 	VM_PARAM_INTEGER(numvalues)
 	VM_PARAM_INTEGER(plane)
+	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(first_image)
@@ -239,14 +245,15 @@ void caosVM::c_PAT_KILL() {
 }
 
 /**
- PAT: MOVE (command) part (integer) x (float) y (float)
+ PAT: MOVE (command) part (integer) x (integer) y (integer)
  %status maybe
 
  move the compound part specified to the new relative position specified
 */
 void caosVM::c_PAT_MOVE() {
-	VM_PARAM_FLOAT(y)
-	VM_PARAM_FLOAT(x)
+	// TODO: should x/y be int? original docs say 'decimal'
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(part)
 
 	valid_agent(targ);

@@ -27,8 +27,8 @@ public:
 	virtual void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false) { }
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) { }
 	virtual void blitSurface(Surface *src, int x, int y, int w, int h)  { }
-	virtual int getWidth() const { return 800; }
-	virtual int getHeight() const { return 600; }
+	virtual unsigned int getWidth() const { return 800; }
+	virtual unsigned int getHeight() const { return 600; }
 	virtual void renderDone() { }
 };
 

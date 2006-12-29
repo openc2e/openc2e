@@ -611,7 +611,8 @@ void caosVM::v_CHAR() {
 	VM_PARAM_INTEGER(index)
 	VM_PARAM_STRING(str)
 
-	caos_assert(str.size() >= index);
+	caos_assert(index >= 1);
+	caos_assert(str.size() >= (unsigned int)index);
 	
 	result.setInt(str[index - 1]);
 }
@@ -632,7 +633,8 @@ void caosVM::c_CHAR() {
 	
 	caos_assert(str->hasString());
 	std::string mystr = str->getString();
-	caos_assert(mystr.size() >= index);
+	caos_assert(index >= 1);
+	caos_assert(mystr.size() >= (unsigned int)index);
 
 	mystr[index - 1] = (unsigned char)character;
 	str->setString(mystr);
@@ -688,7 +690,8 @@ void caosVM::v_READ() {
 	// TODO: i'm not sure if we're meant to throw errors here. - fuzzie
 	caos_assert(world.catalogue.hasTag(tag));
 	const std::vector<std::string> &t = world.catalogue.getTag(tag);
-	caos_assert(offset < t.size());
+	caos_assert(offset >= 0);
+	caos_assert((unsigned int)offset < t.size());
 	result.setString(t[offset]);
 }
 
@@ -757,7 +760,7 @@ void caosVM::v_CATX() {
 
 	caos_assert(world.catalogue.hasTag("Agent Categories"));
 	const std::vector<std::string> &t = world.catalogue.getTag("Agent Categories");
-	if (-1 < category_id && category_id < t.size())
+	if (category_id >= 0 && (unsigned int)category_id < t.size())
 		result.setString(t[category_id]);
 	else
 		result.setString("");
@@ -796,7 +799,8 @@ void caosVM::v_WILD() {
 	caos_assert(searchstring.size()); // check we found a tag
 
 	const std::vector<std::string> &t = world.catalogue.getTag(searchstring); // retrieve tag
-	caos_assert(offset < t.size()); // check the offset is useful for the tag we found
+	caos_assert(offset >= 0);
+	caos_assert((unsigned int)offset < t.size()); // check the offset is useful for the tag we found
 
 	result.setString(t[offset]);
 }

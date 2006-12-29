@@ -96,7 +96,7 @@ int prayInstallDeps(std::string name, bool actually_install) {
 	}
 	int nodeps = j->second; caos_assert(nodeps >= 0);
 
-	for (unsigned int z = 1; z <= nodeps; z++) {
+	for (int z = 1; z <= nodeps; z++) {
 		std::string depcatname = boost::str(boost::format("Dependency Category %d") % z);
 		std::string depname = boost::str(boost::format("Dependency %d") % z);
 		j = p->integerValues.find(depcatname);
@@ -355,7 +355,7 @@ void caosVM::v_PRAY_INJT() {
 	int noscripts = j->second; caos_assert(noscripts >= 0);
 
 	// .. and iterate over the scripts.
-	for (unsigned int z = 1; z <= noscripts; z++) {
+	for (int z = 1; z <= noscripts; z++) {
 		// First, retrieve the script.
 		std::string scriptname = boost::str(boost::format("Script %d") % z);
 		std::map<std::string, std::string>::iterator k = p->stringValues.find(scriptname);

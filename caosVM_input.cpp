@@ -211,7 +211,7 @@ void caosVM::v_PURE() {
  Returns the current X coordinate of the Hand in the world.
 */
 void caosVM::v_MOPX() {
-	result.setInt(world.hand()->x);
+	result.setInt((int)world.hand()->x);
 }
 
 /**
@@ -221,7 +221,7 @@ void caosVM::v_MOPX() {
  Returns the current Y coordinate of the Hand in the world.
 */
 void caosVM::v_MOPY() {
-	result.setInt(world.hand()->y);
+	result.setInt((int)world.hand()->y);
 }
 
 /**

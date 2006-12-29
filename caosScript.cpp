@@ -55,14 +55,14 @@ void script::link() {
 	assert(!linked);
 //	std::cout << "Pre-link:" << std::endl << dump();
 	// check relocations
-	for (int i = 1; i < relocations.size(); i++) {
+	for (unsigned int i = 1; i < relocations.size(); i++) {
 		// handle relocations-to-relocations
 		int p = relocations[i];
 		while (p < 0)
 			p = relocations[-p];
 		relocations[i] = p;
 	}
-	for (int i = 0; i < allOps.size(); i++) {
+	for (unsigned int i = 0; i < allOps.size(); i++) {
 		allOps[i]->relocate(relocations);
 	}
 	linked = true;
@@ -91,12 +91,12 @@ script::script(const Variant *v, const std::string &fn,
 std::string script::dump() {
 	std::ostringstream oss;
 	oss << "Relocations:" << std::endl;
-	for (int i = 1; i < relocations.size(); i++) {
+	for (unsigned int i = 1; i < relocations.size(); i++) {
 		oss << boost::format("%08d -> %08d") % i % relocations[i]
 			<< std::endl;
 	}
 	oss << "Code:" << std::endl;
-	for (int i = 0; i < allOps.size(); i++) {
+	for (unsigned int i = 0; i < allOps.size(); i++) {
 		oss << boost::format("%08d: ") % i;
 		oss << allOps[i]->dump();
 		oss << std::endl;

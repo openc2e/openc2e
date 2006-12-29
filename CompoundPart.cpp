@@ -43,11 +43,11 @@ creaturesImage *TextEntryPart::caretsprite = 0;
 
 void CompoundPart::render(Surface *renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
-		partRender(renderer, xoffset + parent->x, yoffset + parent->y);
+		partRender(renderer, xoffset + (int)parent->x, yoffset + (int)parent->y);
 		if (parent->displaycore /*&& (id == 0)*/) {
 			// TODO: tsk, this should be drawn along with the other craziness on the line plane, i expect
-			int xoff = xoffset + parent->x + x;
-			int yoff = yoffset + parent->y + y;
+			int xoff = xoffset + (int)parent->x + x;
+			int yoff = yoffset + (int)parent->y + y;
 			renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF0000CC);
 			renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
 			renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
@@ -94,7 +94,7 @@ void SpritePart::handleClick(float clickx, float clicky) {
 	parent->handleClick(clickx + parent->x, clicky + parent->y);
 }
 
-CompoundPart::CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z) : zorder(_z), parent(p), id(_id) {
+CompoundPart::CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z) : parent(p), zorder(_z), id(_id) {
 	addZOrder();	
 	x = _x;
 	y = _y;
@@ -524,7 +524,7 @@ void SpritePart::tick() {
 	if (!animation.empty()) {
                 if (framerate > 1) {
 			framedelay++;
-			if (framedelay == framerate + 1)
+			if (framedelay == (unsigned int)framerate + 1)
 				framedelay = 0;
 		}
 		
@@ -556,7 +556,7 @@ void CameraPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
 	if (renderer == engine.backend->getMainSurface()) {
 		// make sure we're onscreen before bothering to do any work..
 		if (xoffset + x + viewwidth > 0 && yoffset + y + viewheight > 0 &&
-			xoffset + x < renderer->getWidth() && yoffset + y < renderer->getHeight()) {
+			xoffset + x < (int)renderer->getWidth() && yoffset + y < (int)renderer->getHeight()) {
 			Surface *surface = engine.backend->newSurface(viewwidth, viewheight);
 			assert(surface); // TODO: good behaviour?
 			world.drawWorld(camera.get(), surface);

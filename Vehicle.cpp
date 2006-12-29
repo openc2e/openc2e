@@ -25,10 +25,10 @@ Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, 
 	capacity = 0;
 	bump = 0;
 
-	cabinleft = x;
-	cabinright = x + getWidth();
-	cabintop = y;
-	cabinbottom = y + getHeight();
+	cabinleft = (int)x;
+	cabinright = (int)x + getWidth();
+	cabintop = (int)y;
+	cabinbottom = (int)y + getHeight();
 }
 
 void Vehicle::tick() {

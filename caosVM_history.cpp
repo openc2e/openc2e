@@ -30,7 +30,7 @@ void caosVM::v_HIST_CAGE() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	result.setInt(m.events[event].stage);
 }
 
@@ -111,7 +111,7 @@ void caosVM::v_HIST_FOTO() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setString(m.events[event].photo);
 }
@@ -127,7 +127,7 @@ void caosVM::c_HIST_FOTO() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	// TODO: handle magic (ie, atticing old photo)
 	m.events[event].photo = photo;
@@ -170,7 +170,7 @@ void caosVM::v_HIST_MON1() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setString(m.events[event].monikers[0]);
 }
@@ -185,7 +185,7 @@ void caosVM::v_HIST_MON2() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setString(m.events[event].monikers[1]);
 }
@@ -242,7 +242,7 @@ void caosVM::v_HIST_NETU() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setString(m.events[event].networkid);
 }
@@ -277,7 +277,7 @@ void caosVM::v_HIST_RTIM() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setInt(m.events[event].timestamp);
 }
@@ -292,7 +292,7 @@ void caosVM::v_HIST_TAGE() {
 	
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setInt(m.events[event].tage);
 }
@@ -307,7 +307,7 @@ void caosVM::v_HIST_TYPE() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setInt(m.events[event].eventno);
 }
@@ -323,7 +323,7 @@ void caosVM::c_HIST_UTXT() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	m.events[event].usertext = value;
 }
@@ -338,7 +338,7 @@ void caosVM::v_HIST_UTXT() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setString(m.events[event].usertext);
 }
@@ -379,7 +379,7 @@ void caosVM::v_HIST_WNAM() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setString(m.events[event].worldname); // TODO
 }
@@ -394,7 +394,7 @@ void caosVM::v_HIST_WTIK() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setInt(m.events[event].worldtick);
 }
@@ -409,7 +409,7 @@ void caosVM::v_HIST_WUID() {
 
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
-	caos_assert(event >= 0 && event < m.events.size());
+	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	result.setString(m.events[event].worldmoniker);
 }

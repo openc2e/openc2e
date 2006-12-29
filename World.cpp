@@ -228,8 +228,8 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 		transagent = agentAt(x, y, true, needs_mouseable);
 
 	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
-		int ax = (int)x - (*i)->getParent()->x;
-		int ay = (int)y - (*i)->getParent()->y;
+		int ax = (int)(x - (*i)->getParent()->x);
+		int ay = (int)(y - (*i)->getParent()->y);
 		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (int)(*i)->getWidth()) >= ax) if (((*i) -> y + (int)(*i)->getHeight()) >= ay)
 			if ((*i)->getParent() != theHand) {
 				SpritePart *s = dynamic_cast<SpritePart *>(*i);
@@ -311,8 +311,8 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 
 				// if the block's on screen, render it.
 				if ((destx >= -sprwidth) && (desty >= -sprheight) &&
-						(destx - sprwidth <= surface->getWidth()) &&
-						(desty - sprheight <= surface->getHeight()))
+						(destx - sprwidth <= (int)surface->getWidth()) &&
+						(desty - sprheight <= (int)surface->getHeight()))
 					surface->render(bkgd, whereweare, destx, desty, false, 0, false, true);
 			}
 		}

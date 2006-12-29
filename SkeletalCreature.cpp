@@ -238,8 +238,8 @@ void SkeletalCreature::recalculateSkeleton() {
 
 			if (x < lowestx) { lowestx = x; }
 			if (y < lowesty) { lowesty = y; }
-			if (x + images[i]->width(pose[i]) > highestx) { highestx = x + images[i]->width(pose[i]); }
-			if (y + images[i]->height(pose[i]) > highesty) { highesty = y + images[i]->height(pose[i]); }
+			if (x + (int)images[i]->width(pose[i]) > highestx) { highestx = x + images[i]->width(pose[i]); }
+			if (y + (int)images[i]->height(pose[i]) > highesty) { highesty = y + images[i]->height(pose[i]); }
 		}
 	}
 

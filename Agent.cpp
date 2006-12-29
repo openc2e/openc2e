@@ -33,7 +33,7 @@ void Agent::core_init() {
 }
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  visible(true), family(f), genus(g), species(s), zorder(p), vm(0), timerrate(0)
+  vm(0), zorder(p), timerrate(0), visible(true), family(f), genus(g), species(s)
 {
 	core_init();
 	lastScript = -1;
@@ -285,15 +285,17 @@ void Agent::handleClick(float clickx, float clicky) {
 void Agent::positionAudio(SoundSlot *slot) {
 	assert(slot);
 
+	// TODO: this is horribly, horribly broken
+
 	float xoffset = x - world.camera.getXCentre();
 	float yoffset = y - world.camera.getYCentre();
-	int distance = (sqrt(xoffset*xoffset + yoffset*yoffset) * 1000) / 255;
+	int distance = (int)((sqrt(xoffset*xoffset + yoffset*yoffset) * 1000) / 255);
 	int angle;
 	if (xoffset == 0) {
 		if (yoffset > 0) angle = 90;
 		else angle = 270;
 	} else {
-		angle = (atanf(fabs(yoffset) / fabs(xoffset)) / (2*M_PI)) * 360;
+		angle = (int)((atanf(fabs(yoffset) / fabs(xoffset)) / (2*M_PI)) * 360);
 		if (xoffset < 0) angle += 180;
 		if (yoffset < 0) angle += 90;
 	}
