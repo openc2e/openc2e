@@ -73,7 +73,7 @@
  */
 
 void caosVM::v_VEC_ANGL() {
-	float ret;
+	float ret = 0;
 	VM_PARAM_VECTOR(vec)
 
 	if (vec.x != 0) {

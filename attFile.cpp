@@ -31,7 +31,7 @@ std::istream &operator >> (std::istream &i, attFile &f) {
 		f.noattachments[f.nolines] = 0;
 		
 		bool havefirst = false;
-		unsigned int x;
+		unsigned int x = 0;
 		tokenizer<> tok(s);
 		for (tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); beg++) {
 			unsigned int val = atoi(beg->c_str());

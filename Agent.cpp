@@ -158,7 +158,7 @@ shared_ptr<script> Agent::findScript(unsigned short event) {
 bool Agent::fireScript(unsigned short event, Agent *from) {
 	if (dying) return false;
 
-	CreatureAgent *c;
+	CreatureAgent *c = 0;
 	if (event <= 3 || event == 4 || event == 12 || event == 13 || event == 14)
 		c = dynamic_cast<CreatureAgent *>(from);
 
@@ -389,7 +389,7 @@ void Agent::physicsTick() {
 		float lastdistance = 1000000.0f;
 		bool collided = false;
 		Line wall; // only valid when collided
-		unsigned int collidedirection; // only valid when collided
+		unsigned int collidedirection = 0; // only valid when collided
 		Point bestmove;
 
 		// iterate through all four points of the bounding box
