@@ -150,7 +150,13 @@ void SkeletalCreature::skeletonInit() {
 		}
 		if (images[i] == 0)
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % (int)creature->getStage()));
-		std::ifstream in(std::string(world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att")).c_str());
+
+		std::string attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att");
+		if (attfilename.empty())
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % stage_to_try));
+		std::ifstream in(attfilename.c_str());
+		if (in.fail())
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't load body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % stage_to_try));
 		in >> att[i];
 	}
 
