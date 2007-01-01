@@ -188,7 +188,7 @@ c16Image::~c16Image() {
 void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
 	assert(!stream); // this only works on duplicated images
 
-	if (128 == r == g == b == rotation == swap) return; // duh
+	if (128 == r && 128 == g && 128  == b && 128  == rotation && 128 == swap) return; // duh
 
 	/*
 	 * CDN:
@@ -260,21 +260,12 @@ void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned 
 				 * rotBlue = ((absRot * tempGreen) + (invRot * tempBlue)) / 256
 				 * endif
 				 */
-				
-				int rotRed, rotGreen, rotBlue;
-				/*if (rotation < 128) {
-					rotRed = ((absRot * blue) + (invRot * red)) / 256;
-					rotGreen = ((absRot * red) + (invRot * green)) / 256;
-					rotBlue = ((absRot * green) + (invRot * blue)) / 256;
-				} else if (rotation > 128) {
-					// TODO: This isn't actually given in the pseudocode, and I don't get how it works.
-					rotRed = ((absRot * green) + (invRot * red)) / 256;
-					rotGreen = ((absRot * red) + (invRot * blue)) / 256;
-					rotBlue = ((absRot * blue) + (invRot * green)) / 256;
 
-				} else*/ {
-					rotRed = red; rotGreen = green; rotBlue = blue;
-				}
+				int rotRed, rotGreen, rotBlue;
+				rotRed = ((blue * absRot) + (red * invRot)) / 128;
+				rotGreen = ((red * absRot) + (green * invRot)) / 128;
+				rotBlue = ((green * absRot) + (blue * invRot)) / 128;
+
 
 				/*
 				 * CDN:
@@ -283,10 +274,8 @@ void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned 
 				 *
 				 * fuzzie notes that this doesn't seem to be a no-op for swap=128..
 				 */
-				/*int swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed)) / 256;
-				int swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue)) / 256;*/
-				
-				int swappedRed = rotRed, swappedBlue = rotBlue;
+				int swappedRed = ((absSwap * blue) + (invSwap * red)) / 128;
+				int swappedBlue = ((absSwap * red) + (invSwap * blue)) / 128;
 
 				/*
 				 * SetColour(definedcolour to (swappedRed,rotGreen,swappedBlue))
