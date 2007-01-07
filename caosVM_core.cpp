@@ -145,8 +145,6 @@ void caosVM::c_DELG() {
 	std::map<std::string, caosVar>::iterator i = world.variables.find(name);
 	if (i != world.variables.end())
 		world.variables.erase(i);
-	else
-		std::cerr << "DELG got told to delete '" << name << "' but it doesn't exist!" << std::endl;
 }
 
 /**
