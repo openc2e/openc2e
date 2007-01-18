@@ -344,7 +344,18 @@ void caosVM::c_ATTR() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
 	valid_agent(targ);
+	
+	bool oldfloat = targ->floatable();
 	targ->setAttributes(attr);
+
+	// TODO: this is an icky hack to enable floating, we should write correct floating
+	// behaviour so we don't need to maintain floating lists like this :/
+	if (oldfloat != targ->floatable()) {
+		if (targ->floatable())
+			targ->floatSetup();
+		else
+			targ->floatRelease();
+	}
 }
 
 /**
