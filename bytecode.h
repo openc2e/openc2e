@@ -192,7 +192,9 @@ class caosGSUB : public caosOp {
 #define CEQ 1
 #define CLT 2
 #define CGT 4
-#define CMASK (CEQ | CLT | CGT)
+#define CBT 8
+#define CBF 16
+#define CMASK (CEQ | CLT | CGT | CBT | CBF)
 #define CLE (CEQ | CLT)
 #define CGE (CEQ | CGT)
 #define CNE (CLT | CGT)
@@ -252,6 +254,11 @@ class caosCond : public caosOp {
 					cres = CGT;
 				else
 					cres = CEQ;
+
+				if (val2 == (val1 & val2))
+					cres |= CBT;
+				if (0    == (val1 & val2))
+					cres |= CBF;
 			} else if (arg2.hasDecimal() && arg1.hasDecimal()) {
 				float val1 = arg1.getFloat();
 				float val2 = arg2.getFloat();

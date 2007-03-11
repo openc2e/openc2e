@@ -63,6 +63,10 @@ void parseCondition(caosScript *s, int success, int failure) {
 			compar = CLE;
 		else if (cword == "ne")
 			compar = CNE;
+		else if (cword == "bt")
+			compar = CBT;
+		else if (cword == "bf")
+			compar = CBF;
 		else
 			throw creaturesException("unexpected word during parseCondition: '" + comparison->word + "'"); // badness
 		s->v->exp_dialect->set_expect(CI_ANYVALUE);
