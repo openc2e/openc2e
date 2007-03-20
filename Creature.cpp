@@ -396,6 +396,7 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 					} else {
 						if (l < 6) return &senses[l];
 					}
+					break; // TODO: should this break be here? added it, but can't check, no internet
 
 				case 5: // drive levels
 					if (l < 16) return &drives[l];
@@ -432,17 +433,20 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
 					return &floatingloci[l];
 
 				case 2: // reproductive
-					if (!receptor) {
+					{ int val = l;
+
+					if (!receptor) { // emitter
 						if (l == 0) return &fertile;
 						else if (l == 1) return &pregnant;
-						l = l - 2; // TODO: this throws off error msg at end of function
+						val = l - 2;
 					}
-					switch (l) {
+
+					switch (val) {
 						case 0: return &ovulate;
 						case 1: return &receptive;
 						case 2: return &chanceofmutation;
 						case 3: return &degreeofmutation;
-					}
+					} }
 					break;
 					
 				case 3: // immune
@@ -450,13 +454,16 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
 					break;
 				
 				case 4: // sensorimotor
-					if (!receptor) {
-						if (l < 14) return &senses[l];
-						l -= 14;
+					{ int val = l;
+
+					if (!receptor) { // emitter
+						if (val < 14) return &senses[val];
+						val -= 14;
 					}
-					if (l < 8) return &involaction[l];
-					l -= 8;
-					if (l < 16) return &gaitloci[l];
+					if (val < 8) return &involaction[val];
+					val -= 8;
+					if (val < 16) return &gaitloci[val];
+					}
 					break;
 
 				case 5: // drives
@@ -786,14 +793,13 @@ float *c2eOrgan::getLocusPointer(bool receptor, unsigned char o, unsigned char t
 					case 2: // injury to apply
 						if (receptors) *receptors = &injuryreceptors;
 						return &injurytoapply;
-						return 0;
 				}
 			break;
 		case 3: // reaction
 			if (t == 0 && l == 0) { // reaction rate
 				shared_ptr<c2eReaction> r = reactions.back();
 				if (!r) {
-					std::cout << "Organ::getLocusPointer failed to find a reaction" << std::endl;
+					std::cout << "c2eOrgan::getLocusPointer failed to find a reaction" << std::endl;
 					return 0;
 				} else {
 					if (receptors) *receptors = &r->receptors;

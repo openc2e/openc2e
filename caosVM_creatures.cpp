@@ -997,7 +997,10 @@ void caosVM::c_NEWC() {
 	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
 	caos_assert(i != gene_agent->slots.end());
 
-	// TODO: if sex is 0, randomise to 1 or 2
+	// randomise sex if necessary
+	if (sex == 0) sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
+	caos_assert(sex == 1 || sex == 2); // TODO: correct?
+
 	// TODO: if variant is 0, randomise between 1 and 8
 	c2eCreature *c = new c2eCreature(i->second, (sex == 2), variant);
 	SkeletalCreature *a = new SkeletalCreature(family, c);
@@ -1044,7 +1047,10 @@ void caosVM::c_NEW_CREA_c1() {
 
 	caos_assert(genome->getVersion() == 1);
 
-	// TODO: if sex is 0, randomise to 1 or 2
+	// randomise sex if necessary
+	if (sex == 0) sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
+	caos_assert(sex == 1 || sex == 2); // TODO: correct?
+
 	// TODO: why do we even need to pass a variant here?
 	c1Creature *c = new c1Creature(genome, (sex == 2), 0);
 	SkeletalCreature *a = new SkeletalCreature(4, c);
