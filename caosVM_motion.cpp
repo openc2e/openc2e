@@ -303,6 +303,38 @@ void caosVM::v_RELY() {
 }
 
 /**
+ RELX (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::v_RELX_c2
+
+ Returns the relative horizontal distance between the script owner and the target agent.
+*/
+void caosVM::v_RELX_c2() {
+	valid_agent(targ);
+	valid_agent(owner);
+
+	// TODO: correct?
+	result.setInt((int)targ->x + (targ->getWidth() / 2) - ((int)owner->x + (owner->getWidth() / 2)));
+}
+
+/**
+ RELY (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::v_RELY_c2
+ 
+ Returns the relative vertical distance between the script owner and the target agent.
+*/
+void caosVM::v_RELY_c2() {
+	valid_agent(targ);
+	valid_agent(owner);
+
+	// TODO: correct?
+	result.setInt((int)targ->y + (targ->getHeight() / 2) - ((int)owner->y + (owner->getHeight() / 2)));
+}
+
+/**
  VELO (command) xvel (float) yvel (float)
  %status maybe
 

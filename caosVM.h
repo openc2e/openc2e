@@ -517,6 +517,8 @@ public:
 	void v_TMVF();
 	void v_RELX();
 	void v_RELY();
+	void v_RELX_c2();
+	void v_RELY_c2();
 	void c_VELO();
 	void c_ACCG();
 	void v_ACCG();
