@@ -634,12 +634,9 @@ void caosVM::v_BHVR() {
 	result.setInt(bvr);
 }
 
-// TODO: CARR in c1 (maybe c2?) checks OWNR, apparently.
-
 /**
  CARR (agent)
  %status maybe
- %pragma variants c1 c2 cv c3
 
  Returns the agent that is carrying the TARG agent.  If TARG is not being carried, returns 
  NULL. 
@@ -649,6 +646,22 @@ void caosVM::v_CARR() {
 	valid_agent(targ);
 	
 	result.setAgent(targ->carriedby);
+}
+
+/**
+ CARR (agent)
+ %status maybe
+ %pragma variants c1 c2
+ %pragma implementation caosVM::v_CARR_c1
+
+ Returns the agent that is carrying the OWNR agent.  If OWNR is not being carried, returns 
+ NULL. 
+*/
+void caosVM::v_CARR_c1() {
+	VM_VERIFY_SIZE(0)
+	valid_agent(owner);
+	
+	result.setAgent(owner->carriedby);
 }
 
 /**

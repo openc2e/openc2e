@@ -439,6 +439,7 @@ public:
 	void v_BASE();
 	void v_BHVR();
 	void v_CARR();
+	void v_CARR_c1();
 	void v_FMLY();
 	void v_GNUS();
 	void v_SPCS();
