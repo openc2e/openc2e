@@ -94,11 +94,15 @@ bool Engine::needsUpdate() {
 
 void Engine::update() {
 	tickdata = backend->ticks();
-			
+	
+	// tick the world
 	world.tick();
+
+	// draw the world
 	// TODO: if (!backend->updateWorld())
 	world.drawWorld();
 
+	// update our data for things like pace, race, ticktime, etc
 	ticktimes[ticktimeptr] = backend->ticks() - tickdata;
 	ticktimeptr++;
 	if (ticktimeptr == 10) ticktimeptr = 0;

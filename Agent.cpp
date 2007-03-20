@@ -36,6 +36,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
   vm(0), zorder(p), timerrate(0), visible(true), family(f), genus(g), species(s)
 {
 	core_init();
+
 	lastScript = -1;
 	initialized = true;
 	velx.setFloat(0.0f);
@@ -81,6 +82,7 @@ void Agent::finishInit() {
 }
 
 void Agent::zotstack() {
+	// Zap the VM stack.
 	for (std::list<caosVM *>::iterator i = vmstack.begin(); i != vmstack.end(); i++) {
 		world.freeVM(*i);
 	}
@@ -88,6 +90,9 @@ void Agent::zotstack() {
 }
 
 void Agent::moveTo(float _x, float _y, bool force) {
+	// Move ourselves to the specified location.
+
+	// if we're being carried and aren't being forced to move (prbly by our carrier), forget it
 	if (carriedby && !force) return;
 	
 	// TODO: what if we move while being carried? doomy explosions ensue, that's what!
@@ -156,6 +161,8 @@ shared_ptr<script> Agent::findScript(unsigned short event) {
 #include "PointerAgent.h"
 #include "CreatureAgent.h"
 bool Agent::fireScript(unsigned short event, Agent *from) {
+	// Start running the specified script on the VM of this agent, with FROM set to the provided agent.
+
 	if (dying) return false;
 
 	CreatureAgent *c = 0;
@@ -232,6 +239,8 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 }
 
 bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {
+	// Queue a script for execution on the VM of this agent.
+
 	if (dying) return false;
 
 	// only bother firing the event if either it exists, or it's one with engine code attached
@@ -257,6 +266,9 @@ bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar
 }
 
 void Agent::handleClick(float clickx, float clicky) {
+	// Handle a mouse click.
+
+	// old-style click handling (c1/c2)
 	if (engine.version < 3) {
 		int action = -1;
 
@@ -275,6 +287,7 @@ void Agent::handleClick(float clickx, float clicky) {
 		return;
 	}
 
+	// new-style click handling (c2e)
 	if (clik != -1) {
 		// TODO: handle CLIK
 	} else if (clac[0] != -1) {
@@ -339,10 +352,14 @@ Point Agent::boundingBoxPoint(unsigned int n, Point in, unsigned int w, unsigned
 }
 
 bool Agent::validInRoomSystem() {
+	// Return true if this agent is inside the world room system at present, or false if it isn't.
+
 	return validInRoomSystem(Point(x, y), getWidth(), getHeight(), perm);
 }
 
 bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
+	// Return true if this agent is inside the world room system at the specified point, or false if it isn't.
+
 	for (unsigned int i = 0; i < 4; i++) {
 		Point src, dest;
 		switch (i) {
@@ -508,13 +525,17 @@ void Agent::physicsTick() {
 }
 
 void Agent::tick() {
+	// sanity checks to stop ticks on dead agents
 	LifeAssert la(this);
 	if (dying) return;
 	
+	// reposition audio if we're playing any
 	if (soundslot) positionAudio(soundslot);
 
+	// don't tick paused agents
 	if (paused) return;
 
+	// CA updates
 	if (emitca_index != -1 && emitca_amount != 0.0f) {
 		assert(0 <= emitca_index && emitca_index <= 19);
 		Room *r = world.map.roomAt(x, y);
@@ -525,9 +546,11 @@ void Agent::tick() {
 		}
 	}
 
+	// tick the physics engine
 	physicsTick();
 	if (dying) return; // in case we were autokilled
 
+	// update the timer if needed, and then queue a timer event if necessary
 	if (timerrate) {
 		tickssincelasttimer++;
 		if (tickssincelasttimer == timerrate) {
@@ -536,6 +559,7 @@ void Agent::tick() {
 		}
 	}
 
+	// tick the agent VM
 	if (vm) vmTick();
 }
 
@@ -556,14 +580,19 @@ void Agent::unhandledException(std::string info, bool wasscript) {
 }
 
 void Agent::vmTick() {
-	assert(vm);
-	LifeAssert la(this);
+	// Tick the VM associated with this agent.
+	
+	assert(vm); // There must *be* a VM to tick.
+	LifeAssert la(this); // sanity check
 
+	// If we're out of timeslice, give ourselves some more (depending on the game type).
 	if (!vm->timeslice) {
 		vm->timeslice = (engine.version < 3) ? 1 : 5;
 	}
 
+	// Keep trying to run VMs while we don't run out of timeslice, end up with a blocked VM, or a VM stops.
 	while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
+		// Tell the VM to tick (using all available timeslice), catching exceptions as necessary.
 		try {
 			vm->tick();
 		} catch (invalidAgentException &e) {
@@ -573,13 +602,19 @@ void Agent::vmTick() {
 		} catch (std::exception &e) {
 			unhandledException(e.what(), true);
 		}
+		
+		// If the VM stopped, it's done.
 		if (vm && vm->stopped()) {
 			world.freeVM(vm);
 			vm = NULL;
 		}
 	}
+
+	// Zot any remaining timeslice, since we're done now.
 	if (vm) vm->timeslice = 0;
 	
+	// If there's no current VM but there's one on the call stack, a previous VM must have finished,
+	// pop one from the call stack to run next time.
 	if (!vm && !vmstack.empty()) {
 		vm = vmstack.front();
 		vmstack.pop_front();
@@ -703,6 +738,9 @@ void Agent::dropCarried() {
 }
 
 void Agent::adjustCarried() {
+	// Adjust the position of the agent we're carrying.
+	// TODO: this doesn't actually position the carried agent correctly, sigh
+
 	if (!carrying) return;
 
 	unsigned int ourpose = 0, theirpose = 0;

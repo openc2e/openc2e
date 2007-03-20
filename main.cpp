@@ -33,12 +33,15 @@ extern "C" int main(int argc, char *argv[]) {
 	try {
 		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2006 Alyssa Milburn and others\n\n";
 
+		// pass command-line flags to the engine, but do no other setup
 		if (!engine.parseCommandLine(argc, argv)) return 1;
 		
+		// depending on engine configuration, create either a null (does nothing) backend or a normal SDL one
 		Backend *b;
 		if (engine.noRun()) b = new NullBackend();
 		else b = new SDLBackend();
 		
+		// get the engine to do all the startup (read catalogue, loading world, etc)
 		if (!engine.initialSetup(b)) return 0;
 	
 		// do a first-pass draw of the world. TODO: correct?
@@ -49,6 +52,8 @@ extern "C" int main(int argc, char *argv[]) {
 				SDL_Delay(10); // .. delay for a short while
 		} // main loop
 
+		// we're done, be sure to shut our backend down
+		// TODO: really, the engine should do this for us (it already does if initialSetup returns false)
 		engine.backend->shutdown();
 	} catch (std::exception &e) {
 		std::cerr << "Fatal exception encountered: " << e.what() << "\n";
