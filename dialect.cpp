@@ -128,6 +128,18 @@ void Dialect::handleToken(caosScript *s, token *t) {
 	p(s, this, expect);
 }
 
+void Dialect::zotDelegates() {
+	// not a destructor because it seems that we're not guaranteed ownership
+	for (std::map<std::string, parseDelegate *>::iterator i = delegates.begin(); i != delegates.end(); i++) {
+		delete i->second;
+	}
+}
+
+NamespaceDelegate::~NamespaceDelegate() {
+	// we *do* own everything in a namespacedelegate, though. hoorah!
+	dialect.zotDelegates();
+}
+
 void ExprDialect::handleToken(caosScript *s, token *t) {
 	switch (t->type) {
 		case TOK_CONST:
@@ -229,6 +241,7 @@ class HackySETVforC2 : public parseDelegate {
 		}
 
 		HackySETVforC2(NamespaceDelegate *n, parseDelegate *p) : nd(n), pd(p) {}
+		virtual ~HackySETVforC2() { delete nd; }
 };
 
 void registerDelegates() {
@@ -259,4 +272,18 @@ void registerDelegates() {
 		it++;
 	}
 }
+
+void freeDelegates() {
+	std::map<std::string, Variant *>::iterator it = variants.begin();
+	while (it != variants.end()) {
+		if (it->second->cmd_dialect)
+			it->second->cmd_dialect->zotDelegates();
+		if (it->second->exp_dialect)
+			it->second->exp_dialect->zotDelegates();
+		delete it->second;
+
+		it++;
+	}	
+}
+
 /* vim: set noet: */

@@ -64,12 +64,15 @@ class Dialect {
 		virtual void eof() {};
 		virtual ~Dialect() {};
 		void set_expect(enum ci_type e) { expect = e; }
+		void zotDelegates();
 };
 
 struct Variant {
 	Dialect *cmd_dialect, *exp_dialect;
 	const cmdinfo *cmds;
 	std::string name;
+	Variant() { cmd_dialect = 0; exp_dialect = 0; }
+	virtual ~Variant() { if (cmd_dialect) delete cmd_dialect; if (exp_dialect) delete exp_dialect; }
 };
 
 extern std::map<std::string, Variant *> variants;
@@ -139,6 +142,7 @@ class NamespaceDelegate : public parseDelegate {
 		void operator() (class caosScript *s, class Dialect *curD) {
 			dialect.parseOne(s);
 		}
+		virtual ~NamespaceDelegate();
 };
 
 class REPE : public parseDelegate {
@@ -273,6 +277,7 @@ class ExprDialect : public OneShotDialect {
 };
 
 void registerDelegates();
+void freeDelegates();
 
 class FACEhelper : public parseDelegate {
 	/* I hate you, CL --bd */

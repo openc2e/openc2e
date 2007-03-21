@@ -52,9 +52,8 @@ extern "C" int main(int argc, char *argv[]) {
 				SDL_Delay(10); // .. delay for a short while
 		} // main loop
 
-		// we're done, be sure to shut our backend down
-		// TODO: really, the engine should do this for us (it already does if initialSetup returns false)
-		engine.backend->shutdown();
+		// we're done, be sure to shut stuff down
+		engine.shutdown();
 	} catch (std::exception &e) {
 		std::cerr << "Fatal exception encountered: " << e.what() << "\n";
 		return 1;

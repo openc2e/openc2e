@@ -554,7 +554,7 @@ bool Engine::initialSetup(Backend *b) {
 	// if there aren't any metarooms, we can't run a useful game, the user probably
 	// wanted to execute a CAOS script or something went badly wrong.
 	if (!cmdline_norun && world.map.getMetaRoomCount() == 0) {
-		engine.backend->shutdown();
+		shutdown();
 		throw creaturesException("No metarooms found in given bootstrap directories or files");
 	}
 
@@ -563,11 +563,16 @@ bool Engine::initialSetup(Backend *b) {
 	if (cmdline_norun) {
 		// TODO: see comment above about avoiding backend when norun is set
 		std::cout << "Told not to run the world, so stopping now." << std::endl;
-		engine.backend->shutdown();
+		shutdown();
 		return false;
 	}
 
 	return true;
+}
+
+void Engine::shutdown() {
+	engine.backend->shutdown();
+	freeDelegates(); // does nothing if there are none (ie, no call to initialSetup)
 }
 
 /* vim: set noet: */

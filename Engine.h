@@ -59,6 +59,7 @@ public:
 
 	bool parseCommandLine(int argc, char *argv[]);
 	bool initialSetup(Backend *b);
+	void shutdown();
 
 	bool noRun() { return cmdline_norun; }
 };
