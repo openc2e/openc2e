@@ -418,6 +418,7 @@ void caosVM::c_DIRN() {
 /**
  DIRN (integer)
  %status stub
+ %pragma variants c2 cv c3
 
  Returns the direction the target Creatures is facing.
 */
@@ -1365,7 +1366,7 @@ void caosVM::v_BABY() {
 /**
  SNEZ (command)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_SNEZ() {
 	Creature *c = getTargCreature();

@@ -504,6 +504,7 @@ public:
 	void v_LIMR();
 	void v_LIMB_c1();
 	void v_OBJP();
+	void v_XIST();
 	
 	// motion
 	void c_ELAS();

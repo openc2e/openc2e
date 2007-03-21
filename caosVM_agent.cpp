@@ -1181,6 +1181,7 @@ void caosVM::c_HAND() {
 /**
  TICK (integer)
  %status maybe
+ %pragma variants c2 cv c3
 
  Return the agent timer tick rate of the TARG agent.
 */
@@ -1719,6 +1720,22 @@ void caosVM::v_LIMB_c1() {
 void caosVM::v_OBJP() {
 	valid_agent(targ);
 	vm->valueStack.push_back(&targ->objp);
+}
+
+/**
+ XIST (integer) agent (agent)
+ %status maybe
+ %pragma variants c2
+
+ Undocumented C2 command; returns 1 if specified agent exists, or 0 otherwise (ie, if it is null).
+*/
+void caosVM::v_XIST() {
+	VM_PARAM_AGENT(agent)
+
+	if (agent.get())
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /* vim: set noet: */

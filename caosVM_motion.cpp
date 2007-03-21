@@ -447,11 +447,14 @@ void caosVM::v_FALL() {
 /**
  MOVS (integer)
  %status stub
+ %pragma variants c1 c2 cv c3
 
  Returns an integer representing the motion status of the TARG agent.  0 is autonomous, 1 is moving by mouse, 2 is 
  floating, 3 is inside a vehicle, and 4 is being carried.
 */
 void caosVM::v_MOVS() {
+	// TODO: check these values match c1
+
 	valid_agent(targ);
 
 	result.setInt(0); // TODO
