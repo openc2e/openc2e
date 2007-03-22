@@ -120,6 +120,10 @@ void World::init() {
 		ticktime = 100;
 }
 
+void World::shutdown() {
+	map.Reset();
+}
+
 caosVM *World::getVM(Agent *a) {
 	if (vmpool.empty()) {
 		return new caosVM(a);

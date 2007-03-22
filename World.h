@@ -95,6 +95,7 @@ public:
 	~World();
 	void init();
 	void initCatalogue();
+	void shutdown();
 	
 	void executeInitScript(boost::filesystem::path p);
 	void executeBootstrap(boost::filesystem::path p);

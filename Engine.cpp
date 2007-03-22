@@ -571,6 +571,7 @@ bool Engine::initialSetup(Backend *b) {
 }
 
 void Engine::shutdown() {
+	world.shutdown();
 	engine.backend->shutdown();
 	freeDelegates(); // does nothing if there are none (ie, no call to initialSetup)
 }
