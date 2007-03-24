@@ -149,13 +149,14 @@ public:
 
 	// motion
 	caosVar velx, vely;
-	float accg, aero;
+	caosVar accg, aero;
 	unsigned int friction;
 	int perm, elas;
+	caosVar rest;
 	float x, y;
 	bool falling : 1; // TODO: icky hack, possibly
 
-	float range;
+	caosVar range;
 
 	AgentRef floatingagent;
 

@@ -1090,7 +1090,20 @@ void caosVM::c_RNGE() {
 void caosVM::v_RNGE() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(targ);
-	result.setFloat(targ->range);
+	result.setFloat(targ->range.getFloat());
+}
+
+/**
+ RNGE (variable)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::v_RNGE_c2
+
+ Returns the TARG agent's range.
+*/
+void caosVM::v_RNGE_c2() {
+	valid_agent(targ);
+	vm->valueStack.push_back(&targ->range);
 }
 
 /**

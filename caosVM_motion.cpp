@@ -135,13 +135,13 @@ void caosVM::v_OBST() {
 
 	switch (direction) {
 		case 0: // left
-			dest.x -= targ->range; break;
+			dest.x -= targ->range.getFloat(); break;
 		case 1: // right
-			dest.x += targ->range; break;
+			dest.x += targ->range.getFloat(); break;
 		case 2: // top
-			dest.y -= targ->range; break;
+			dest.y -= targ->range.getFloat(); break;
 		case 3: // bottom
-			dest.y += targ->range; break;
+			dest.y += targ->range.getFloat(); break;
 	}
 
 	Room *ourRoom = world.map.roomAt(src.x, src.y);
@@ -238,7 +238,20 @@ void caosVM::v_ACCG() {
 	VM_VERIFY_SIZE(0)
 
 	valid_agent(targ);
-	result.setFloat(targ->accg);
+	result.setFloat(targ->accg.getFloat());
+}
+
+/**
+ ACCG (variable)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::v_ACCG_c2
+ 
+ Returns the TARG agent's free-fall acceleration, in pixels/tick squared.
+*/
+void caosVM::v_ACCG_c2() {
+	valid_agent(targ);
+	vm->valueStack.push_back(&targ->accg);
 }
 
 /**
@@ -265,7 +278,20 @@ void caosVM::v_AERO() {
 	VM_VERIFY_SIZE(0)
 	
 	valid_agent(targ);
-	result.setFloat(targ->aero);
+	result.setFloat(targ->aero.getFloat());
+}
+
+/**
+ AERO (variable)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::v_AERO_c2
+
+ Returns the aerodynamics of the TARG agent.
+*/
+void caosVM::v_AERO_c2() {
+	valid_agent(targ);
+	vm->valueStack.push_back(&targ->aero);
 }
 
 /**
@@ -528,5 +554,16 @@ void caosVM::v_FLTY() {
 void caosVM::c_MCRT() {
 	c_MVTO(); // TODO
 }
+
+/**
+ REST (variable)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::v_REST() {
+	valid_agent(targ);
+	vm->valueStack.push_back(&targ->rest);
+}
+
 
 /* vim: set noet: */

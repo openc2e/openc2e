@@ -33,7 +33,7 @@ bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoo
 	// compare squared distance with range
 	double deltax = thisx - ownerx; deltax *= deltax;
 	double deltay = thisy - ownery; deltay *= deltay;
-	if ((deltax + deltay) > (seeing->range * seeing->range)) return false;
+	if ((deltax + deltay) > (seeing->range.getFloat() * seeing->range.getFloat())) return false;
 
 	// do the actual visibiltiy check using a line between centers
 	Point src(ownerx, ownery), dest(thisx, thisy);

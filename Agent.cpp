@@ -399,7 +399,7 @@ void Agent::physicsTick() {
 		falling = false;
 		// increase speed according to accg
 		// TODO: should we be changing vely first, instead of after a successful move (below)?
-		desty += accg;
+		desty += accg.getFloat();
 	}
 	
 	if (suffercollisions()) {
@@ -508,7 +508,7 @@ void Agent::physicsTick() {
 					vely.setFloat(0);
 			} else if (sufferphysics() && accg != 0) {
 				falling = true; // TODO: icky
-				vely.setFloat(vely.getFloat() + accg);
+				vely.setFloat(vely.getFloat() + accg.getFloat());
 			}
 		} else { velx.setFloat(0); vely.setFloat(0); } // TODO: correct?
 	} else {
@@ -519,8 +519,8 @@ void Agent::physicsTick() {
 	if (sufferphysics() && (aero != 0)) {
 		// reduce speed according to AERO
 		// TODO: aero should be an integer!
-		velx.setFloat(velx.getFloat() - (velx.getFloat() * (aero / 100.0f)));
-		vely.setFloat(vely.getFloat() - (vely.getFloat() * (aero / 100.0f)));
+		velx.setFloat(velx.getFloat() - (velx.getFloat() * (aero.getFloat() / 100.0f)));
+		vely.setFloat(vely.getFloat() - (vely.getFloat() * (aero.getFloat() / 100.0f)));
 	}
 }
 

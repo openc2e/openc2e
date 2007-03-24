@@ -518,13 +518,13 @@ void caosVM::v_GRID() {
 	
 	switch (direction) {
 		case 0: // left
-			dest.x -= targ->range; break;
+			dest.x -= targ->range.getFloat(); break;
 		case 1: // right
-			dest.x += targ->range; break;
+			dest.x += targ->range.getFloat(); break;
 		case 2: // top 
-			dest.y -= targ->range; break;
+			dest.y -= targ->range.getFloat(); break;
 		case 3: // bottom 
-			dest.y += targ->range; break;
+			dest.y += targ->range.getFloat(); break;
 	}
 	
 	Room *ourRoom = world.map.roomAt(src.x, src.y);

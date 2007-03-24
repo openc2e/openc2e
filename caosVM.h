@@ -465,6 +465,7 @@ public:
 	void c_TINT();
 	void c_RNGE();
 	void v_RNGE();
+	void v_RNGE_c2();
 	void v_TRAN();
 	void c_TRAN();
 	void v_HGHT();
@@ -523,8 +524,10 @@ public:
 	void c_VELO();
 	void c_ACCG();
 	void v_ACCG();
+	void v_ACCG_c2();
 	void c_AERO();
 	void v_AERO();
+	void v_AERO_c2();
 	void c_MVSF();
 	void c_FRIC();
 	void v_FRIC();
@@ -536,6 +539,7 @@ public:
 	void v_FLTX();
 	void v_FLTY();
 	void c_MCRT();
+	void v_REST();
 	
 	// scripts
 	void c_INST();
