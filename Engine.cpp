@@ -136,11 +136,38 @@ void Engine::handleKeyboardScrolling() {
 	static float velx = 0;
 	static float vely = 0;
 
+	bool wasdMode = false;
+	caosVar v = world.variables["engine_wasd"];
+	if (v.hasInt()) {
+		switch (v.getInt()) {
+			case 1: // enable if CTRL is held
+				wasdMode = backend->keyDown(17); // CTRL
+				break;
+			case 2: // enable unconditionally
+				// (this needs agent support to suppress chat bubbles etc)
+				wasdMode = true;
+				break;
+			case 0: // disable
+				wasdMode = false;
+				break;
+			default: // disable
+				std::cout << "Warning: engine_wasd_scrolling is set to unknown value " << v.getInt() << std::endl;
+				world.variables["engine_wasd_scrolling"] = caosVar(0);
+				wasdMode = false;
+				break;
+		}
+	}
+
 	// check keys
-	bool leftdown = backend->keyDown(37);
-	bool rightdown = backend->keyDown(39);
-	bool updown = backend->keyDown(38);
-	bool downdown = backend->keyDown(40);
+	bool leftdown = backend->keyDown(37)
+		|| (wasdMode && a_down);
+	bool rightdown = backend->keyDown(39)
+		|| (wasdMode && d_down);
+	bool updown = backend->keyDown(38)
+		|| (wasdMode && w_down);
+	bool downdown = backend->keyDown(40)
+		|| (wasdMode && s_down);
+
 	if (leftdown)
 		velx -= accelspeed;
 	if (rightdown)
@@ -196,6 +223,10 @@ void Engine::processEvents() {
 
 			case eventspecialkeydown:
 				handleSpecialKeyDown(event);
+				break;
+
+			case eventspecialkeyup:
+				handleSpecialKeyUp(event);
 				break;
 				
 			case eventquit:
@@ -330,6 +361,14 @@ void Engine::handleMouseButton(SomeEvent &event) {
 }
 
 void Engine::handleKeyDown(SomeEvent &event) {
+
+	switch (event.key) {
+		case 'w': w_down = true; break;
+		case 'a': a_down = true; break;
+		case 's': s_down = true; break;
+		case 'd': d_down = true; break;
+	}
+
 	// tell the agent with keyboard focus
 	if (world.focusagent) {
 		TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
@@ -347,7 +386,40 @@ void Engine::handleKeyDown(SomeEvent &event) {
 	}
 }
 
+void Engine::handleSpecialKeyUp(SomeEvent &event) {
+	switch (event.key) {
+		case 0x57:
+			w_down = false;
+			break;
+		case 0x41:
+			a_down = false;
+			break;
+		case 0x53:
+			s_down = false;
+			break;
+		case 0x44:
+			d_down = false;
+			break;
+	}
+}
+
 void Engine::handleSpecialKeyDown(SomeEvent &event) {
+	switch (event.key) {
+		case 0x57:
+			w_down = true;
+			break;
+		case 0x41:
+			a_down = true;
+			break;
+		case 0x53:
+			s_down = true;
+			break;
+		case 0x44:
+			d_down = true;
+			break;
+	}
+
+
 	// handle debug keys, if they're enabled
 	caosVar v = world.variables["engine_debug_keys"];
 	if (v.hasInt() && v.getInt() == 1) {

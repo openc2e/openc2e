@@ -31,6 +31,8 @@ protected:
 	unsigned int ticktimeptr;
 	unsigned int lasttimestamp;
 
+	bool w_down, a_down, s_down, d_down;
+
 	bool cmdline_enable_sound;
 	bool cmdline_norun;
 	std::vector<std::string> cmdline_bootstrap;
@@ -56,6 +58,7 @@ public:
 	void handleMouseButton(SomeEvent &event);
 	void handleKeyDown(SomeEvent &event);
 	void handleSpecialKeyDown(SomeEvent &event);
+	void handleSpecialKeyUp(SomeEvent &event);
 
 	bool parseCommandLine(int argc, char *argv[]);
 	bool initialSetup(Backend *b);

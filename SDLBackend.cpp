@@ -185,6 +185,17 @@ retry:
 			e.y = event.button.y;
 			break;
 
+        case SDL_KEYUP:
+            {
+                int key = translateKey(event.key.keysym.sym);
+                if (key != -1) {
+                    e.type = eventspecialkeyup;
+                    e.key = key;
+                    return true;
+                }
+                goto retry;
+            }
+
 		case SDL_KEYDOWN:
 			if ((event.key.keysym.unicode) && ((event.key.keysym.unicode & 0xFF80) == 0) && (event.key.keysym.unicode >= 32)) {
 				e.type = eventkeydown;
@@ -199,6 +210,7 @@ retry:
 				}
 			}
 			goto retry;
+            break;
 
 		case SDL_QUIT:
 			e.type = eventquit;

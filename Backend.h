@@ -35,7 +35,7 @@ struct SoundSlot {
 	virtual ~SoundSlot() { }
 };
 
-enum eventtype { eventquit, eventkeydown, eventspecialkeydown, eventmousebuttondown, eventmousebuttonup, eventmousemove, eventresizewindow };
+enum eventtype { eventquit, eventkeydown, eventspecialkeyup, eventspecialkeydown, eventmousebuttondown, eventmousebuttonup, eventmousemove, eventresizewindow };
 enum eventbuttons { buttonleft, buttonright, buttonmiddle, buttonwheeldown, buttonwheelup };
 
 struct SomeEvent {
