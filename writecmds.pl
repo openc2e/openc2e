@@ -84,7 +84,7 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			}
 			$data->{$key}{implementation} =~ s/caosVM:://;
 			$implementation = "$data->{$key}{implementation}";
-			$delegate = qq{new $class(&v_${\$variant}_cmds[$idx])};
+			$delegate = qq{!$class (&v_${\$variant}_cmds[$idx])};
 		}
 
 		my $args;
@@ -164,8 +164,15 @@ static void registerAutoDelegates_$variant() {
 } while (0)
 ENDTAIL
 
+	my $static_idx = 0;
 	foreach my $key (keys %$data) {
 		if (defined($data->{$key}{delegate})) {
+			if ($data->{$key}{delegate} =~ m{!(\S+) (.+)}) {
+				my $i = $static_idx++;
+				print "static $1 static_data_$i$2;\n";
+				$data->{$key}{delegate} = "&static_data_$i";
+			}
+
 			my $type = $data->{$key}{type} eq 'command' ? 'cmd' : 'exp';
 			if ($data->{$key}{namespace}) {
 				my $c = $data->{$key}{type} eq 'command';
