@@ -84,7 +84,7 @@ foreach my $variant (sort keys %{$data->{variants}}) {
 			}
 			$data->{$key}{implementation} =~ s/caosVM:://;
 			$implementation = "$data->{$key}{implementation}";
-			$delegate = qq{!$class (&v_${\$variant}_cmds[$idx])};
+			$delegate = qq{new $class(&v_${\$variant}_cmds[$idx])};
 		}
 
 		my $args;
@@ -167,9 +167,13 @@ ENDTAIL
 	my $static_idx = 0;
 	foreach my $key (keys %$data) {
 		if (defined($data->{$key}{delegate})) {
-			if ($data->{$key}{delegate} =~ m{!(\S+) (.+)}) {
+			if ($data->{$key}{delegate} =~ m{^\s*new (\w+)(\(.*\))\s*$}) {
+				my ($class, $args) = ($1, $2);
+
+				if ($args eq '()') { $args = ''; }
+
 				my $i = $static_idx++;
-				print "static $1 static_data_$i$2;\n";
+				print "static $class static_data_$i$args;\n";
 				$data->{$key}{delegate} = "&static_data_$i";
 			}
 

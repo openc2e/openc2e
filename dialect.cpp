@@ -131,7 +131,8 @@ void Dialect::handleToken(caosScript *s, token *t) {
 void Dialect::zotDelegates() {
 	// not a destructor because it seems that we're not guaranteed ownership
 	for (std::map<std::string, parseDelegate *>::iterator i = delegates.begin(); i != delegates.end(); i++) {
-		delete i->second;
+//		delete i->second;
+//		XXX: This is disabled for now due to static allocation of, uh, most of them. >_>
 	}
 }
 
