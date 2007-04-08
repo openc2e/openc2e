@@ -157,9 +157,6 @@ static void registerAutoDelegates_$variant() {
 	}
 	Variant *v = variants["$variant"];
 	std::map<std::string, NamespaceDelegate *> nsswitch_cmd, nsswitch_exp;
-#define NS_REG(m, ns, name, d) do { \\
-	m[ns]->dialect.delegates[name] = d; \\
-} while (0)
 ENDTAIL
 
 	my $static_idx = 0;
@@ -186,12 +183,12 @@ ENDTAIL
 					$nsvar = "static_data_$i";
 					print "static NamespaceDelegate $nsvar;\n";
 					print "nsswitch_$type"."[\"".$data->{$key}{namespace}."\"] = &$nsvar;\n";
+					$static_ns{$nskey} = $nsvar;
 				}
 
-				print "NS_REG(nsswitch_$type, \"";
-				print $data->{$key}{namespace};
-				print "\", \"", lc($data->{$key}{match}), "\", ";
-				print $data->{$key}{delegate}, ");\n";
+				print "$static_ns{$nskey}.dialect.delegates[\"";
+				print lc($data->{$key}{match}), "\"]";
+				print "= $data->{$key}{delegate};\n";
 			} else {
 				print q{v->};
 				print $type;
@@ -214,7 +211,6 @@ ENDTAIL
 	}
 END
 	}
-	print "#undef NS_REG\n";
 	print "}\n"; # end of registerAutoDelegates
 } # end of variant loop
 	
