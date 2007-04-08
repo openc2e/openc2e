@@ -228,11 +228,11 @@ void DoifDialect::handleToken(class caosScript *s, token *t) {
 std::map<std::string, const cmdinfo *> op_key_map;
 
 class HackySETVforC2 : public parseDelegate {
-	protected:
+	public:
 		NamespaceDelegate *nd;
 		parseDelegate *pd;
-	public:
 		void operator() (class caosScript *s, class Dialect *curD) {
+			assert(pd && nd);
 			token *t = tokenPeek();
 			if (t->type == TOK_WORD && nd->dialect.delegates.find(t->word) != nd->dialect.delegates.end()) {
 				(*nd)(s, curD);
@@ -241,24 +241,23 @@ class HackySETVforC2 : public parseDelegate {
 			}
 		}
 
-		HackySETVforC2(NamespaceDelegate *n, parseDelegate *p) : nd(n), pd(p) {}
-		virtual ~HackySETVforC2() { delete nd; }
+		HackySETVforC2() : nd(NULL), pd(NULL) {}
 };
 
 void registerDelegates() {
+	static HackySETVforC2 setvc1, setvc2;
 	registerAutoDelegates();
 
+
+	setvc1.nd = (NamespaceDelegate *)(variants[std::string("c1")]->cmd_dialect->delegates["setv"]);
+	setvc2.nd = (NamespaceDelegate *)(variants[std::string("c2")]->cmd_dialect->delegates["setv"]);
+
+	setvc1.pd = variants[std::string("c3")]->cmd_dialect->delegates["setv"];
+	setvc2.pd = variants[std::string("c3")]->cmd_dialect->delegates["setv"];
+
 	// apply our hacky SETV to the C1 and C2 dialects
-	variants[std::string("c1")]->cmd_dialect->delegates["setv"] = 
-		new HackySETVforC2(
-				(NamespaceDelegate *)(variants[std::string("c1")]->cmd_dialect->delegates["setv"]),
-				variants[std::string("c3")]->cmd_dialect->delegates["setv"]
-				);
-	variants[std::string("c2")]->cmd_dialect->delegates["setv"] = 
-		new HackySETVforC2(
-				(NamespaceDelegate *)(variants[std::string("c2")]->cmd_dialect->delegates["setv"]),
-				variants[std::string("c3")]->cmd_dialect->delegates["setv"]
-				);
+	variants[std::string("c1")]->cmd_dialect->delegates["setv"] = &setvc1;
+	variants[std::string("c2")]->cmd_dialect->delegates["setv"] = &setvc2;
 
 	std::map<std::string, Variant *>::iterator it = variants.begin();
 	while (it != variants.end()) {
