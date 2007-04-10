@@ -190,7 +190,7 @@ TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned 
 	caos_assert(textsprite->numframes() == 224);
 	leftmargin = 8; topmargin = 8; rightmargin = 8; bottommargin = 8;
 	linespacing = 0; charspacing = 0;
-	horz_align = left; vert_align = top;
+	horz_align = leftalign; vert_align = top;
 	currpage = 0;
 	recalculateData(); // ie, insert a blank first page
 }
@@ -461,9 +461,9 @@ void TextPart::partRender(Surface *renderer, int xoffset, int yoffset, TextEntry
 	creaturesImage *sprite = textsprite; unsigned int currtint = 0;
 	for (unsigned int i = startline; i < endline; i++) {	
 		unsigned int currentx = 0, somex = xoff;
-		if (horz_align == right)
+		if (horz_align == rightalign)
 			somex = somex + (textwidth - lines[i].width);
-		else if (horz_align == center)
+		else if (horz_align == centeralign)
 			somex = somex + ((textwidth - lines[i].width) / 2);
 
 		for (unsigned int x = 0; x < lines[i].text.size(); x++) {

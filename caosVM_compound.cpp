@@ -311,9 +311,9 @@ void caosVM::c_FRMT() {
 	caos_assert(p);
 
 	horizontalalign h;
-	if ((justification & 3) == 1) h = right;
-	else if ((justification & 3) == 2) h = center;
-	else h = left;
+	if ((justification & 3) == 1) h = rightalign;
+	else if ((justification & 3) == 2) h = centeralign;
+	else h = leftalign;
 	
 	verticalalign v;
 	if ((justification & 12) == 4) v = bottom;
