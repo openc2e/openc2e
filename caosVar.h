@@ -25,7 +25,7 @@
 #include <string>
 #include <cassert>
 #include "AgentRef.h"
-#include "slaballoc.h"
+//#include "slaballoc.h"
 #include <typeinfo>
 #include "physics.h"
 

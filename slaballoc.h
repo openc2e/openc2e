@@ -247,7 +247,7 @@ class SlabAllocator {
 		 * be called before operator delete (and thus, o_del).
 		 */
 		static void *o_new(size_t sz, destructor_t dest, SlabAllocator &slab) {
-			return (void *)&slab._alloc(sz)->next;
+			return (void *)slab.alloc(sz, dest);
 		}
 
 		static void *o_new(size_t sz) {
