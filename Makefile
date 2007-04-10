@@ -153,6 +153,9 @@ include $(shell find .deps -name '*.d' -type f 2>/dev/null || true)
 Catalogue.o: catalogue.lex.h catalogue.tab.hpp
 lex.mng.o: mngparser.tab.hpp
 
+Creature_standalone.o: Creature.cpp Creature.o
+	$(CC) $(XCFLAGS) -D_CREATURE_STANDALONE -o $@ -c $<
+
 openc2e: $(OPENC2E)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 

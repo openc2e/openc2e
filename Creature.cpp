@@ -95,15 +95,19 @@ void Creature::setDreaming(bool d) {
 
 void Creature::born() {
 	// TODO: life event?
+#ifndef _CREATURE_STANDALONE
 	world.history.getMoniker(world.history.findMoniker(genome)).wasBorn();
 	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(3, "", ""); // born event, parents..
+#endif
 
 	tickage = true;
 }
 
 void Creature::die() {
 	// TODO: life event?
+#ifndef _CREATURE_STANDALONE
 	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(7, "", ""); // died event
+#endif
 	// TODO: disable brain/biochemistry updates, trigger die script?
 	// skeletalcreature eyes, also? see setAsleep comment
 	alive = false;
