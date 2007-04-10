@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef __CREATURE_H
+#define __CREATURE_H
+
 #include "Agent.h"
 #include "genome.h"
 #include <boost/shared_ptr.hpp>
@@ -250,5 +253,7 @@ public:
 
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 };
+
+#endif
 
 /* vim: set noet: */
