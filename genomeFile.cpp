@@ -116,34 +116,34 @@ gene *genomeFile::nextGene(istream &s) {
 			switch (subtype) {
 				case 0:
 					switch (cversion) {
-						case 1: g = new oldBrainLobe(cversion); break;
-						case 2: g = new oldBrainLobe(cversion); break;
-						case 3: g = new c2eBrainLobe(cversion); break;
+						case 1: g = new oldBrainLobeGene(cversion); break;
+						case 2: g = new oldBrainLobeGene(cversion); break;
+						case 3: g = new c2eBrainLobeGene(cversion); break;
 						default: g = 0; break;
 					} break;
 				case 1: g = new organGene(cversion, true); break;
-				case 2: g = new c2eBrainTract(cversion); break;
+				case 2: g = new c2eBrainTractGene(cversion); break;
 			} break;
 		case 1:
 			switch (subtype) {
-				case 0: g = new bioReceptor(cversion); break;
-				case 1: g = new bioEmitter(cversion); break;
-				case 2: g = new bioReaction(cversion); break;
-				case 3: g = new bioHalfLives(cversion); break;
-				case 4: g = new bioInitialConcentration(cversion); break;
-				case 5: g = new bioNeuroEmitter(cversion); break;
+				case 0: g = new bioReceptorGene(cversion); break;
+				case 1: g = new bioEmitterGene(cversion); break;
+				case 2: g = new bioReactionGene(cversion); break;
+				case 3: g = new bioHalfLivesGene(cversion); break;
+				case 4: g = new bioInitialConcentrationGene(cversion); break;
+				case 5: g = new bioNeuroEmitterGene(cversion); break;
 			} break;
 		case 2:
 			switch (subtype) {
-				case 0: g = new creatureStimulus(cversion); break;
-				case 1: g = new creatureGenus(cversion); break;
-				case 2: g = new creatureAppearance(cversion); break;
-				case 3: g = new creaturePose(cversion); break;
-				case 4: g = new creatureGait(cversion); break;
-				case 5: g = new creatureInstinct(cversion); break;
-				case 6: g = new creaturePigment(cversion); break;
-				case 7: g = new creaturePigmentBleed(cversion); break;
-				case 8: g = new creatureFacialExpression(cversion); break;
+				case 0: g = new creatureStimulusGene(cversion); break;
+				case 1: g = new creatureGenusGene(cversion); break;
+				case 2: g = new creatureAppearanceGene(cversion); break;
+				case 3: g = new creaturePoseGene(cversion); break;
+				case 4: g = new creatureGaitGene(cversion); break;
+				case 5: g = new creatureInstinctGene(cversion); break;
+				case 6: g = new creaturePigmentGene(cversion); break;
+				case 7: g = new creaturePigmentBleedGene(cversion); break;
+				case 8: g = new creatureFacialExpressionGene(cversion); break;
 			} break;
 		case 3:
 			switch (subtype) {
@@ -153,9 +153,9 @@ gene *genomeFile::nextGene(istream &s) {
 
 	if (g == 0) throw genomeException("genefactory failed");
 
-	if (((typeid(*g) == typeid(bioReaction))
-		|| (typeid(*g) == typeid(bioEmitter)))
-		|| (typeid(*g) == typeid(bioReceptor))) {
+	if (((typeid(*g) == typeid(bioReactionGene))
+		|| (typeid(*g) == typeid(bioEmitterGene)))
+		|| (typeid(*g) == typeid(bioReceptorGene))) {
 		if (currorgan == 0) {
 				if (cversion == 1) genes.push_back(g); // Creatures 1 doesn't have organs
 				else throw genomeException("reaction/emitter/receptor without an attached organ");
@@ -264,13 +264,13 @@ istream &operator >> (istream &s, gene &g) {
 	return s;
 }
 
-void bioEmitter::write(ostream &s) const {
+void bioEmitterGene::write(ostream &s) const {
 	s << organ << tissue << locus << chemical << threshold << rate << gain;
 	uint8 flags = (clear?1:0) + (digital?2:0) + (invert?4:0);
 	s << flags;
 }
 
-void bioEmitter::read(istream &s) {
+void bioEmitterGene::read(istream &s) {
 	s >> organ >> tissue >> locus >> chemical >> threshold >> rate >> gain;
 	uint8 flags;
 	s >> flags;
@@ -279,27 +279,27 @@ void bioEmitter::read(istream &s) {
 	invert = ((flags & 4) != 0);
 }
 
-void bioHalfLives::write(ostream &s) const {
+void bioHalfLivesGene::write(ostream &s) const {
 	for (int i = 0; i < 256; i++) {
 	s << halflives[i];
 	}
 }
 
-void bioHalfLives::read(istream &s) {
+void bioHalfLivesGene::read(istream &s) {
 	for (int i = 0; i < 256; i++) {
 		s >> halflives[i];
 	}
 }
 
-void bioInitialConcentration::write(ostream &s) const {
+void bioInitialConcentrationGene::write(ostream &s) const {
 	s << chemical << quantity;
 }
 
-void bioInitialConcentration::read(istream &s) {
+void bioInitialConcentrationGene::read(istream &s) {
 	s >> chemical >> quantity;
 }
 
-void bioNeuroEmitter::write(ostream &s) const {
+void bioNeuroEmitterGene::write(ostream &s) const {
 	for (int i = 0; i < 3; i++) {
 		s << lobes[i] << neurons[i];
 	}
@@ -309,7 +309,7 @@ void bioNeuroEmitter::write(ostream &s) const {
 	}
 }
 
-void bioNeuroEmitter::read(istream &s) {
+void bioNeuroEmitterGene::read(istream &s) {
 	for (int i = 0; i < 3; i++) {
 		s >> lobes[i] >> neurons[i];
 	}
@@ -319,7 +319,7 @@ void bioNeuroEmitter::read(istream &s) {
 	}
 }
 
-void bioReaction::write(ostream &s) const {
+void bioReactionGene::write(ostream &s) const {
 	for (int i = 0; i < 4; i++) {
 		s << quantity[i];
 		s << reactant[i];
@@ -328,7 +328,7 @@ void bioReaction::write(ostream &s) const {
 	s << rate;
 }
 
-void bioReaction::read(istream &s) {
+void bioReactionGene::read(istream &s) {
 	for (int i = 0; i < 4; i++) {
 		s >> quantity[i];
 		s >> reactant[i];
@@ -337,13 +337,13 @@ void bioReaction::read(istream &s) {
 	s >> rate;
 }
 
-void bioReceptor::write(ostream &s) const {
+void bioReceptorGene::write(ostream &s) const {
 	s << organ << tissue << locus << chemical << threshold << nominal << gain;
 	uint8 flags = (inverted?1:0) + (digital?2:0);
 	s << flags;
 }
 
-void bioReceptor::read(istream &s) {
+void bioReceptorGene::read(istream &s) {
 	s >> organ >> tissue >> locus >> chemical >> threshold >> nominal >> gain;
 	uint8 flags;
 	s >> flags;
@@ -351,7 +351,7 @@ void bioReceptor::read(istream &s) {
 	digital = ((flags & 2) != 0);
 }
 
-void c2eBrainLobe::write(ostream &s) const {
+void c2eBrainLobeGene::write(ostream &s) const {
 	for (int i = 0; i < 4; i++) s << id[i];
 
 	write16(s, updatetime);
@@ -360,14 +360,14 @@ void c2eBrainLobe::write(ostream &s) const {
 
 	s << width << height;
 	s << red << green << blue;
-	s << WTA << tissue;
+	s << WTA << tissue << initrulealways;
 
-	for (int i = 0; i < 8; i++) s << spare[i]; // first byte = flags?
+	for (int i = 0; i < 7; i++) s << spare[i];
 	for (int i = 0; i < 48; i++) s << initialiserule[i];
 	for (int i = 0; i < 48; i++) s << updaterule[i];
 }
 
-void c2eBrainLobe::read(istream &s) {
+void c2eBrainLobeGene::read(istream &s) {
 	for (int i = 0; i < 4; i++) s >> id[i];
 
 	updatetime = read16(s);
@@ -376,14 +376,14 @@ void c2eBrainLobe::read(istream &s) {
 
 	s >> width >> height;
 	s >> red >> green >> blue;
-	s >> WTA >> tissue;
+	s >> WTA >> tissue >> initrulealways;
 
-	for (int i = 0; i < 8; i++) s >> spare[i]; // first byte = flags?
+	for (int i = 0; i < 7; i++) s >> spare[i];
 	for (int i = 0; i < 48; i++) s >> initialiserule[i];
 	for (int i = 0; i < 48; i++) s >> updaterule[i];
 }
 
-void c2eBrainTract::write(ostream &s) const {
+void c2eBrainTractGene::write(ostream &s) const {
 	write16(s, updatetime);
 	for (int i = 0; i < 4; i++) s << srclobe[i];
 	write16(s, srclobe_lowerbound);
@@ -393,13 +393,13 @@ void c2eBrainTract::write(ostream &s) const {
 	write16(s, destlobe_lowerbound);
 	write16(s, destlobe_upperbound);
 	write16(s, dest_noconnections);
-	s << randomdendrites << norandomconnections << srcvar << destvar;
-	for (int i = 0; i < 6; i++) s << spare[i];
+	s << migrates << norandomconnections << srcvar << destvar << initrulealways;
+	for (int i = 0; i < 5; i++) s << spare[i];
 	for (int i = 0; i < 48; i++) s << initialiserule[i];
 	for (int i = 0; i < 48; i++) s << updaterule[i];
 }
 
-void c2eBrainTract::read(istream &s) {
+void c2eBrainTractGene::read(istream &s) {
 	updatetime = read16(s);
 	for (int i = 0; i < 4; i++) s >> srclobe[i];
 	srclobe_lowerbound = read16(s);
@@ -409,23 +409,23 @@ void c2eBrainTract::read(istream &s) {
 	destlobe_lowerbound = read16(s);
 	destlobe_upperbound = read16(s);
 	dest_noconnections = read16(s);
-	s >> randomdendrites >> norandomconnections >> srcvar >> destvar;
-	for (int i = 0; i < 6; i++) s >> spare[i];
+	s >> migrates >> norandomconnections >> srcvar >> destvar >> initrulealways;
+	for (int i = 0; i < 5; i++) s >> spare[i];
 	for (int i = 0; i < 48; i++) s >> initialiserule[i];
 	for (int i = 0; i < 48; i++) s >> updaterule[i];
 }
 
-void creatureAppearance::write(ostream &s) const {
+void creatureAppearanceGene::write(ostream &s) const {
 	s << part << variant;
 	if (cversion > 1) s << species;
 }
 
-void creatureAppearance::read(istream &s) {
+void creatureAppearanceGene::read(istream &s) {
 	s >> part >> variant;
 	if (cversion > 1) s >> species;
 }
 
-void creatureFacialExpression::write(ostream &s) const {
+void creatureFacialExpressionGene::write(ostream &s) const {
 	write16(s, expressionno);
 	s << weight;
 
@@ -434,7 +434,7 @@ void creatureFacialExpression::write(ostream &s) const {
 	}
 }
 
-void creatureFacialExpression::read(istream &s) {
+void creatureFacialExpressionGene::read(istream &s) {
 	expressionno = read16(s);
 	s >> weight;
 
@@ -443,7 +443,7 @@ void creatureFacialExpression::read(istream &s) {
 	}
 }
 
-void creatureGait::write(ostream &s) const {
+void creatureGaitGene::write(ostream &s) const {
 	s << drive;
 
 	for (int i = 0; i < gaitLength(); i++) {
@@ -451,7 +451,7 @@ void creatureGait::write(ostream &s) const {
 	}
 }
 
-void creatureGait::read(istream &s) {
+void creatureGaitGene::read(istream &s) {
 	s >> drive;
 
 	for (int i = 0; i < gaitLength(); i++) {
@@ -459,7 +459,7 @@ void creatureGait::read(istream &s) {
 	}
 }
 
-void creatureGenus::write(ostream &s) const {
+void creatureGenusGene::write(ostream &s) const {
 	s << genus;
 
 	const char *b;
@@ -471,7 +471,7 @@ void creatureGenus::write(ostream &s) const {
 	for (int i = 0; i < ((cversion == 3) ? 32 : 4); i++) s << b[i];
 }
 
-void creatureGenus::read(istream &s) {
+void creatureGenusGene::read(istream &s) {
 	s >> genus;
 
 	char buf[33];
@@ -486,7 +486,7 @@ void creatureGenus::read(istream &s) {
 	dad = (char *)buf;
 }
 
-void creatureInstinct::write(ostream &s) const {
+void creatureInstinctGene::write(ostream &s) const {
 	for (int i = 0; i < 3; i++) {
 		s << lobes[i] << neurons[i];
 	}
@@ -496,7 +496,7 @@ void creatureInstinct::write(ostream &s) const {
 	s << level;
 }
 
-void creatureInstinct::read(istream &s) {
+void creatureInstinctGene::read(istream &s) {
 	for (int i = 0; i < 3; i++) {
 		s >> lobes[i] >> neurons[i];
 	}
@@ -506,23 +506,23 @@ void creatureInstinct::read(istream &s) {
 	s >> level;
 }
 
-void creaturePigment::write(ostream &s) const {
+void creaturePigmentGene::write(ostream &s) const {
 	s << color << amount;
 }
 
-void creaturePigment::read(istream &s) {
+void creaturePigmentGene::read(istream &s) {
 	s >> color >> amount;
 }
 
-void creaturePigmentBleed::write(ostream &s) const {
+void creaturePigmentBleedGene::write(ostream &s) const {
 	s << rotation << swap;
 }
 
-void creaturePigmentBleed::read(istream &s) {
+void creaturePigmentBleedGene::read(istream &s) {
 	s >> rotation >> swap;
 }
 
-void creaturePose::write(ostream &s) const {
+void creaturePoseGene::write(ostream &s) const {
 	s << poseno;
 
 	for (int i = 0; i < poseLength(); i++) {
@@ -530,7 +530,7 @@ void creaturePose::write(ostream &s) const {
 	}
 }
 
-void creaturePose::read(istream &s) {
+void creaturePoseGene::read(istream &s) {
 	s >> poseno;
 
 	for (int i = 0; i < poseLength(); i++) {
@@ -538,7 +538,7 @@ void creaturePose::read(istream &s) {
 	}
 }
 
-void creatureStimulus::write(ostream &s) const {
+void creatureStimulusGene::write(ostream &s) const {
 	s << stim << significance << sensoryneuron << intensity << features;
 
 	for (int i = 0; i < 4; i++) {
@@ -546,7 +546,7 @@ void creatureStimulus::write(ostream &s) const {
 	}
 }
 
-void creatureStimulus::read(istream &s) {
+void creatureStimulusGene::read(istream &s) {
 	s >> stim >> significance >> sensoryneuron >> intensity >> features;
 
 	for (int i = 0; i < 4; i++) {
@@ -554,7 +554,7 @@ void creatureStimulus::read(istream &s) {
 	}
 }
 
-void oldBrainLobe::write(ostream &s) const {
+void oldBrainLobeGene::write(ostream &s) const {
 	s << x << y << width << height << perceptflag << nominalthreshold << leakagerate << reststate << inputgain;
 	s.write((char *)staterule, (cversion == 1) ? 8 : 12);
 	s << flags;
@@ -562,7 +562,7 @@ void oldBrainLobe::write(ostream &s) const {
 	s << dendrite1 << dendrite2;
 }
 
-void oldBrainLobe::read(istream &s) {
+void oldBrainLobeGene::read(istream &s) {
 	s >> x >> y >> width >> height >> perceptflag >> nominalthreshold >> leakagerate >> reststate >> inputgain;
 	s.read((char *)staterule, (cversion == 1) ? 8 : 12);
 	s >> flags;

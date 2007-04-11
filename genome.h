@@ -168,7 +168,7 @@ protected:
 };
 
 //! gene: c2e brain lobe
-class c2eBrainLobe : public brainGene {
+class c2eBrainLobeGene : public brainGene {
 protected:
   uint8 subtype() const { return 0; }
 
@@ -177,7 +177,7 @@ protected:
 
 public:
   uint8 id[4]; // todo: string
-  uint16 updatetime;
+  uint16 updatetime; // 0 for never
   uint16 x;
   uint16 y;
   uint8 width;
@@ -185,13 +185,14 @@ public:
   uint8 red;
   uint8 green;
   uint8 blue;
-  uint8 WTA;
+  uint8 WTA; // unused in final game?
   uint8 tissue;
-  uint8 spare[8];
+  uint8 initrulealways;
+  uint8 spare[7];
   uint8 initialiserule[48];
   uint8 updaterule[48];
 
-  c2eBrainLobe(uint8 v) : brainGene(v) { }
+  c2eBrainLobeGene(uint8 v) : brainGene(v) { }
   char *name() { return "Lobe"; }
 };
 
@@ -232,7 +233,7 @@ struct oldDendriteInfo {
 };
 
 //! gene: old-style (c1/c2) brain lobe
-class oldBrainLobe : public brainGene {
+class oldBrainLobeGene : public brainGene {
 protected:
   uint8 subtype() const { return 0; }
 
@@ -258,12 +259,12 @@ public:
   oldDendriteInfo dendrite1;
   oldDendriteInfo dendrite2;
 
-  oldBrainLobe(uint8 v) : brainGene(v), dendrite1(v), dendrite2(v) { }
+  oldBrainLobeGene(uint8 v) : brainGene(v), dendrite1(v), dendrite2(v) { }
   virtual char *name() { return "Lobe"; }
 };
 
 //! gene: c2e brain tract
-class c2eBrainTract : public brainGene {
+class c2eBrainTractGene : public brainGene {
 protected:
   uint8 subtype() const { return 2; }
 
@@ -280,15 +281,16 @@ public:
   uint16 destlobe_lowerbound;
   uint16 destlobe_upperbound;
   uint16 dest_noconnections;
-  uint8 randomdendrites; // flag
+  uint8 migrates; // flag
   uint8 norandomconnections; // flag
   uint8 srcvar;
   uint8 destvar;
-  uint8 spare[6];
+  uint8 initrulealways; // flag
+  uint8 spare[5];
   uint8 initialiserule[48];
   uint8 updaterule[48];
 
-  c2eBrainTract(uint8 v) : brainGene(v) { }
+  c2eBrainTractGene(uint8 v) : brainGene(v) { }
   char *name() { return "Tract"; }
 };
 
@@ -301,7 +303,7 @@ protected:
 };
 
 //! gene: receptor
-class bioReceptor : public bioGene {
+class bioReceptorGene : public bioGene {
 protected:
   uint8 subtype() const { return 0; }
 
@@ -319,12 +321,12 @@ public:
   bool inverted; // 1 in flags
   bool digital; // 2 in flags
 
-  bioReceptor(uint8 v) : bioGene(v) { }
+  bioReceptorGene(uint8 v) : bioGene(v) { }
   char *name() { return "Receptor"; }
 };
 
 //! gene: emitter
-class bioEmitter : public bioGene {
+class bioEmitterGene : public bioGene {
 protected:
   uint8 subtype() const { return 1; }
 
@@ -343,12 +345,12 @@ public:
   bool digital; // 2 in flags
   bool invert; // 4 in flags
 
-  bioEmitter(uint8 v) : bioGene(v) { }
+  bioEmitterGene(uint8 v) : bioGene(v) { }
   char *name() { return "Emitter"; }
 };
 
 //! gene: reaction
-class bioReaction : public bioGene {
+class bioReactionGene : public bioGene {
 protected:
   uint8 subtype() const { return 2; }
 
@@ -360,12 +362,12 @@ public:
   uint8 quantity[4];
   uint8 rate;
 
-  bioReaction(uint8 v) : bioGene(v) { }
+  bioReactionGene(uint8 v) : bioGene(v) { }
   char *name() { return "Reaction"; }
 };
 
 //! gene: half-lives
-class bioHalfLives : public bioGene {
+class bioHalfLivesGene : public bioGene {
 protected:
   uint8 subtype() const { return 3; }
 
@@ -375,12 +377,12 @@ protected:
 public:
   uint8 halflives[256];
 
-  bioHalfLives(uint8 v) : bioGene(v) { }
+  bioHalfLivesGene(uint8 v) : bioGene(v) { }
   char *name() { return "Half-Life"; }
 };
 
 //! gene: initial concentration
-class bioInitialConcentration : public bioGene {
+class bioInitialConcentrationGene : public bioGene {
 protected:
   uint8 subtype() const { return 4; }
 
@@ -391,12 +393,12 @@ public:
   uint8 chemical;
   uint8 quantity;
 
-  bioInitialConcentration(uint8 v) : bioGene(v) { }
+  bioInitialConcentrationGene(uint8 v) : bioGene(v) { }
   char *name() { return "Initial Concentration"; }
 };
 
 //! gene: neuroemitter
-class bioNeuroEmitter : public bioGene {
+class bioNeuroEmitterGene : public bioGene {
 protected:
   uint8 subtype() const { return 5; }
 
@@ -410,7 +412,7 @@ public:
   uint8 chemical[4];
   uint8 quantity[4];
 
-  bioNeuroEmitter(uint8 v) : bioGene(v) { }
+  bioNeuroEmitterGene(uint8 v) : bioGene(v) { }
   char *name() { return "Neuro Emitter"; }
 };
 
@@ -424,7 +426,7 @@ protected:
 };
 
 //! gene: stimulus
-class creatureStimulus : public creatureGene {
+class creatureStimulusGene : public creatureGene {
 protected:
   uint8 subtype() const { return 0; }
 
@@ -440,12 +442,12 @@ public:
   uint8 drives[4];
   uint8 amounts[4];
 
-  creatureStimulus(uint8 v) : creatureGene(v) { }
+  creatureStimulusGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Stimulus"; }
 };
 
 //! gene: genus (must be first gene in file, must only be one instance)
-class creatureGenus : public creatureGene {
+class creatureGenusGene : public creatureGene {
 protected:
   uint8 subtype() const { return 1; }
 
@@ -457,12 +459,12 @@ public:
   std::string mum; // length is: 4 for C1/C2, 32 for c2e
   std::string dad;
 
-  creatureGenus(uint8 v) : creatureGene(v) { }
+  creatureGenusGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Genus"; }
 };
 
 //! gene: appearance
-class creatureAppearance : public creatureGene {
+class creatureAppearanceGene : public creatureGene {
 protected:
   uint8 subtype() const { return 2; }
 
@@ -474,12 +476,12 @@ public:
   uint8 variant;
   uint8 species; // genusofdonor; not present in c1
 
-  creatureAppearance(uint8 v) : creatureGene(v) { }
+  creatureAppearanceGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Appearance"; }
 };
 
 //! gene: pose
-class creaturePose : public creatureGene {
+class creaturePoseGene : public creatureGene {
 protected:
   uint8 subtype() const { return 3; }
 
@@ -493,12 +495,12 @@ public:
   int poseLength() const { return (cversion == 3) ? 16 : 15; }
   std::string getPoseString() const { return std::string((char *)pose, poseLength()); }
   
-  creaturePose(uint8 v) : creatureGene(v) { }
+  creaturePoseGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Pose"; }
 };
 
 //! gene: gait
-class creatureGait : public creatureGene {
+class creatureGaitGene : public creatureGene {
 protected:
   uint8 subtype() const { return 4; }
 
@@ -511,12 +513,12 @@ public:
 
   int gaitLength() const { return 8; }
 
-  creatureGait(uint8 v) : creatureGene(v) { }
+  creatureGaitGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Gait"; }
 };
 
 //! gene: instinct
-class creatureInstinct : public creatureGene {
+class creatureInstinctGene : public creatureGene {
 protected:
   uint8 subtype() const { return 5; }
 
@@ -530,12 +532,12 @@ public:
   uint8 drive;
   uint8 level;
 
-  creatureInstinct(uint8 v) : creatureGene(v) { }
+  creatureInstinctGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Instinct"; }
 };
 
 //! gene: pigment
-class creaturePigment : public creatureGene {
+class creaturePigmentGene : public creatureGene {
 protected:
   uint8 subtype() const { return 6; }
 
@@ -546,12 +548,12 @@ public:
   uint8 color;
   uint8 amount;
 
-  creaturePigment(uint8 v) : creatureGene(v) { }
+  creaturePigmentGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Pigment"; }
 };
 
 //! gene: pigment bleed
-class creaturePigmentBleed : public creatureGene {
+class creaturePigmentBleedGene : public creatureGene {
 protected:
   uint8 subtype() const { return 7; }
 
@@ -562,12 +564,12 @@ public:
   uint8 rotation;
   uint8 swap;
 
-  creaturePigmentBleed(uint8 v) : creatureGene(v) { }
+  creaturePigmentBleedGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Pigment Bleed"; }
 };
 
 //! gene: facial expression
-class creatureFacialExpression : public creatureGene {
+class creatureFacialExpressionGene : public creatureGene {
 protected:
   uint8 subtype() const { return 8; }
   
@@ -580,7 +582,7 @@ public:
   uint8 drives[4];
   uint8 amounts[4];
 
-  creatureFacialExpression(uint8 v) : creatureGene(v) { }
+  creatureFacialExpressionGene(uint8 v) : creatureGene(v) { }
   char *name() { return "Facial Expression"; }
 };
 

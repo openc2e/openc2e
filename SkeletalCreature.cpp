@@ -100,10 +100,10 @@ SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : Creatur
 void SkeletalCreature::skeletonInit() {
 	//TODO: the exception throwing in here needs some more thought
 
-	creatureAppearance *appearance[5] = { 0, 0, 0, 0, 0 };
+	creatureAppearanceGene *appearance[5] = { 0, 0, 0, 0, 0 };
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creatureAppearance)) {
-			creatureAppearance *x = (creatureAppearance *)(*i);
+		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
+			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
 			if (x->part > 4)
 				throw creaturesException(boost::str(boost::format("SkeletalCreature didn't understand a gene with a part# of %d") % (int)x->part));
 			if (appearance[x->part])
@@ -122,7 +122,7 @@ void SkeletalCreature::skeletonInit() {
 		images[i] = 0;
 		char x = cee_bodyparts[i].letter;
 		int stage_to_try = creature->getStage();
-		creatureAppearance *partapp = 0;
+		creatureAppearanceGene *partapp = 0;
 		if (x == 'a' || x >= 'o') {
 			// head
 			partapp = appearance[0];
@@ -295,7 +295,7 @@ void SkeletalCreature::setPose(std::string s) {
 void SkeletalCreature::setPoseGene(unsigned int poseno) {
 	/* TODO: this sets by sequence, now, not the 'poseno' inside the gene.
 	 * this is what the POSE caos command does. is this right? - fuzzie */
-	creaturePose *g = (creaturePose *)creature->getGenome()->getGene(2, 3, poseno);
+	creaturePoseGene *g = (creaturePoseGene *)creature->getGenome()->getGene(2, 3, poseno);
 	assert(g); // TODO: -> caos_assert
 
 	gaitgene = 0;
@@ -303,8 +303,8 @@ void SkeletalCreature::setPoseGene(unsigned int poseno) {
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creatureGait)) {
-			creatureGait *g = (creatureGait *)(*i);
+		if (typeid(*(*i)) == typeid(creatureGaitGene)) {
+			creatureGaitGene *g = (creatureGaitGene *)(*i);
 			if (g->drive == gaitdrive) {
 				gaitgene = g;
 				gaiti = 0;
@@ -320,10 +320,10 @@ void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure i
 void SkeletalCreature::gaitTick() {
 	if (!gaitgene) return;
 	uint8 pose = gaitgene->pose[gaiti];
-	creaturePose *poseg = 0;
+	creaturePoseGene *poseg = 0;
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creaturePose)) {
-			creaturePose *g = (creaturePose *)(*i);
+		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
+			creaturePoseGene *g = (creaturePoseGene *)(*i);
 			if (g->poseno == pose)
 				poseg = g;
 			
@@ -361,8 +361,8 @@ void SkeletalCreature::creatureAged() {
 
 std::string SkeletalCreature::getFaceSpriteName() {
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creatureAppearance)) {
-			creatureAppearance *x = (creatureAppearance *)(*i);
+		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
+			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
 			if (x->part == 0) {
 				return std::string("a") + dataString(0, true, x->species, x->variant);
 			}

@@ -44,7 +44,7 @@ private:
 	std::string dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed);
 
 	unsigned int gaiti;
-	creatureGait *gaitgene;
+	creatureGaitGene *gaitgene;
 
 public:
 	SkeletalCreature(unsigned char _family, Creature *c);
