@@ -18,13 +18,22 @@
  */
 
 #include "c2eBrain.h"
+#include "Creature.h"
 #include <math.h>
 
 float dummyValues[8];
 
+bool c2ebraincomponentorder::operator()(const class c2eBrainComponent *b1, const class c2eBrainComponent *b2) const {
+	return b1->updatetime < b2->updatetime;
+}
+
 c2eTract::c2eTract(c2eBrainTractGene *g) {
 	assert(g);
 	ourGene = g;
+	updatetime = g->updatetime;
+
+	initrule.init(g->initialiserule);
+	updaterule.init(g->updaterule);
 
 	// TODO: find source/dest lobes, calculate neurons
 	// TODO: create/distribute dendrites as needed
@@ -65,6 +74,27 @@ void c2eTract::tick() {
 	}
 
 	// TODO: reward/punishment? anything else? scary brains!
+}
+
+c2eLobe::c2eLobe(c2eBrainLobeGene *g) {
+	assert(g);
+	ourGene = g;
+	updatetime = g->updatetime;
+
+	spare = 0;
+
+	int width = g->width, height = g->height;
+	if (width < 1) width = 1;
+	if (height < 1) height = 1;
+
+	neurons.reserve(width * height);
+
+	// TODO: create neurons!
+
+	initrule.init(g->initialiserule);
+	updaterule.init(g->updaterule);
+
+	// TODO: run init rule
 }
 
 /*
@@ -545,6 +575,33 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 done:
 	return is_spare;
+}
+
+c2eBrain::c2eBrain(c2eCreature *p) {
+	assert(p);
+	parent = p;
+
+	shared_ptr<genomeFile> genome = p->getGenome();
+	
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
+		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
+		// TODO: lifestage
+		if (typeid(**i) == typeid(c2eBrainLobeGene)) {
+			c2eLobe *l = new c2eLobe((c2eBrainLobeGene *)*i);
+			components.insert(l);
+		}
+	}
+
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
+		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
+		// TODO: lifestage
+		if (typeid(**i) == typeid(c2eBrainTractGene)) {
+			c2eTract *t = new c2eTract((c2eBrainTractGene *)*i);
+			components.insert(t);
+		}
+	}
 }
 
 /* vim: set noet: */

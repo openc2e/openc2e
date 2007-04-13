@@ -22,12 +22,21 @@
 
 #include "genome.h"
 #include <boost/shared_ptr.hpp>
+#include <set>
 
 using boost::shared_ptr;
 
 class Creature;
 
+struct c2ebraincomponentorder {
+	bool operator()(const class c2eBrainComponent *b1, const class c2eBrainComponent *b2) const;
+};
+
 class c2eBrainComponent {
+protected:
+	friend class c2ebraincomponentorder;
+
+	uint8 updatetime;
 };
 
 struct c2erule {
@@ -87,7 +96,7 @@ class c2eBrain {
 protected:
 	class c2eCreature *parent;
 
-	void addGene(gene *);
+	std::set<c2eBrainComponent *, c2ebraincomponentorder> components;
 
 public:
 	c2eBrain(c2eCreature *p);
