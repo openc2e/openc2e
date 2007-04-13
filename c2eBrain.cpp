@@ -37,7 +37,6 @@ c2eTract::c2eTract(c2eBrainTractGene *g) {
 
 	// TODO: find source/dest lobes, calculate neurons
 	// TODO: create/distribute dendrites as needed
-	// TODO: run init rule
 }
 
 /*
@@ -76,6 +75,14 @@ void c2eTract::tick() {
 	// TODO: reward/punishment? anything else? scary brains!
 }
 
+void c2eTract::init() {
+	// TODO: run init rule
+}
+
+void c2eTract::doMigration() {
+	// TODO
+}
+
 c2eLobe::c2eLobe(c2eBrainLobeGene *g) {
 	assert(g);
 	ourGene = g;
@@ -93,8 +100,6 @@ c2eLobe::c2eLobe(c2eBrainLobeGene *g) {
 
 	initrule.init(g->initialiserule);
 	updaterule.init(g->updaterule);
-
-	// TODO: run init rule
 }
 
 /*
@@ -117,6 +122,10 @@ void c2eLobe::tick() {
 			spare = i;
 		neurons[i].input = 0.0f;
 	}
+}
+
+void c2eLobe::init() {
+	// TODO: run init rule
 }
 
 /*
@@ -601,6 +610,18 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 			c2eTract *t = new c2eTract((c2eBrainTractGene *)*i);
 			components.insert(t);
 		}
+	}
+}
+
+void c2eBrain::init() {
+	for (std::set<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
+		(*i)->init();
+	}
+}
+
+void c2eBrain::tick() {
+	for (std::set<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
+		(*i)->tick();
 	}
 }
 

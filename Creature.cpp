@@ -21,6 +21,7 @@
 #include "CreatureAgent.h"
 #include "World.h"
 #include <cmath> // powf
+#include "c2eBrain.h"
 
 Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) {
 	parent = 0;
@@ -159,7 +160,9 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 
 	halflives = 0;
 
+	brain = new c2eBrain(this);
 	processGenes();
+	brain->init();
 }
 
 void c1Creature::tick() {
@@ -189,6 +192,8 @@ void c2eCreature::tick() {
 	senses[0] = 1.0f; // always-on
 	senses[9] = 1.0f; // air quality (TODO)
 	
+	brain->tick();
+
 	tickBiochemistry();
 
 	// lifestage checks

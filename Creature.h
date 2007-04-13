@@ -235,6 +235,8 @@ protected:
 
 	bioHalfLivesGene *halflives;
 
+	class c2eBrain *brain;
+
 	void tickBiochemistry();
 	void addGene(gene *);
 

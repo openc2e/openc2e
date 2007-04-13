@@ -37,6 +37,12 @@ protected:
 	friend class c2ebraincomponentorder;
 
 	uint8 updatetime;
+
+public:
+	virtual void init() = 0;
+	virtual void tick() = 0;
+
+	virtual ~c2eBrainComponent() { }
 };
 
 struct c2erule {
@@ -75,6 +81,7 @@ protected:
 public:
 	c2eLobe(c2eBrainLobeGene *g);
 	void tick();
+	void init();
 	unsigned int getSpareNeuron() { return spare; }
 };
 
@@ -90,6 +97,7 @@ protected:
 public:
 	c2eTract(c2eBrainTractGene *g);
 	void tick();	
+	void init();
 };
 
 class c2eBrain {
@@ -102,6 +110,7 @@ public:
 	c2eBrain(c2eCreature *p);
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 	void tick();
+	void init();
 };
 
 #endif

@@ -18,6 +18,7 @@ OPENC2E_CORE = \
 	blkImage.o \
 	bytecode.o \
 	c16Image.o \
+	c2eBrain.o \
 	CallButton.o \
 	Camera.o \
 	caosScript.o \
