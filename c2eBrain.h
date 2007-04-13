@@ -43,11 +43,12 @@ protected:
 
 public:
 	void init(uint8 ruledata[48]);
-	bool runRule(float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], float chemicals[256]);
+	bool runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], float chemicals[256]);
 };
 
 struct c2eNeuron {
 	float variables[8];
+	float input;
 };
 
 struct c2eDendrite {
@@ -60,10 +61,12 @@ protected:
 	c2eBrainLobeGene *ourGene;
 	c2eSVRule initrule, updaterule;
 	std::vector<c2eNeuron> neurons;
+	unsigned int spare;
 
 public:
 	c2eLobe(c2eBrainLobeGene *g);
 	void tick();
+	unsigned int getSpareNeuron() { return spare; }
 };
 
 class c2eTract : public c2eBrainComponent {

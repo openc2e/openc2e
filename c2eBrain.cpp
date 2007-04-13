@@ -61,10 +61,32 @@ void c2eTract::tick() {
 	// run that svrule against every dendrite
 	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
 		// TODO: last dummyValues should be biochemistry
-		rule.runRule(i->source->variables, i->dest->variables, dummyValues, i->variables, dummyValues);
+		rule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, dummyValues);
 	}
 
 	// TODO: reward/punishment? anything else? scary brains!
+}
+
+/*
+ *
+ * c2eLobe::tick
+ *
+ * Do a single update of the lobe.
+ *
+ */
+void c2eLobe::tick() {
+	// work out which svrule to use for updating
+	c2eSVRule &rule = updaterule;
+	if (ourGene->initrulealways)
+		rule = initrule;
+
+	// run that svrule against every neuron
+	for (unsigned int i = 0; i < neurons.size(); i++) {
+		// TODO: last dummyValues should be biochemistry
+		if (rule.runRule(neurons[i].input, dummyValues, neurons[i].variables, neurons[spare].variables, dummyValues, dummyValues))
+			spare = i;
+		neurons[i].input = 0.0f;
+	}
 }
 
 /*
@@ -137,8 +159,8 @@ void c2eSVRule::init(uint8 ruledata[48]) {
  * Returns whether the 'register as spare' opcode was executed or not.
  *
  */
-bool c2eSVRule::runRule(float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], float chemicals[256]) {
-	float accumulator; // TODO: initialise?
+bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], float chemicals[256]) {
+	float accumulator = acc;
 	float operandvalue;
 	float *operandpointer;
 	float dummy;
