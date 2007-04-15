@@ -252,6 +252,8 @@ public:
 
 	unsigned int noOrgans() { return organs.size(); }
 	shared_ptr<c2eOrgan> getOrgan(unsigned int i) { assert(i < organs.size()); return organs[i]; }
+	
+	class c2eBrain *getBrain() { return brain; }
 
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 };
