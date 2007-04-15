@@ -354,9 +354,9 @@ void bioReceptorGene::read(istream &s) {
 void c2eBrainLobeGene::write(ostream &s) const {
 	for (int i = 0; i < 4; i++) s << id[i];
 
-	write16(s, updatetime);
-	write16(s, x);
-	write16(s, y);
+	write16(s, updatetime, false);
+	write16(s, x, false);
+	write16(s, y, false);
 
 	s << width << height;
 	s << red << green << blue;
@@ -370,9 +370,9 @@ void c2eBrainLobeGene::write(ostream &s) const {
 void c2eBrainLobeGene::read(istream &s) {
 	for (int i = 0; i < 4; i++) s >> id[i];
 
-	updatetime = read16(s);
-	x = read16(s);
-	y = read16(s);
+	updatetime = read16(s, false);
+	x = read16(s, false);
+	y = read16(s, false);
 
 	s >> width >> height;
 	s >> red >> green >> blue;
@@ -384,15 +384,15 @@ void c2eBrainLobeGene::read(istream &s) {
 }
 
 void c2eBrainTractGene::write(ostream &s) const {
-	write16(s, updatetime);
+	write16(s, updatetime, false);
 	for (int i = 0; i < 4; i++) s << srclobe[i];
-	write16(s, srclobe_lowerbound);
-	write16(s, srclobe_upperbound);
-	write16(s, src_noconnections);
+	write16(s, srclobe_lowerbound, false);
+	write16(s, srclobe_upperbound, false);
+	write16(s, src_noconnections, false);
 	for (int i = 0; i < 4; i++) s << destlobe[i];
-	write16(s, destlobe_lowerbound);
-	write16(s, destlobe_upperbound);
-	write16(s, dest_noconnections);
+	write16(s, destlobe_lowerbound, false);
+	write16(s, destlobe_upperbound, false);
+	write16(s, dest_noconnections, false);
 	s << migrates << norandomconnections << srcvar << destvar << initrulealways;
 	for (int i = 0; i < 5; i++) s << spare[i];
 	for (int i = 0; i < 48; i++) s << initialiserule[i];
@@ -400,15 +400,15 @@ void c2eBrainTractGene::write(ostream &s) const {
 }
 
 void c2eBrainTractGene::read(istream &s) {
-	updatetime = read16(s);
+	updatetime = read16(s, false);
 	for (int i = 0; i < 4; i++) s >> srclobe[i];
-	srclobe_lowerbound = read16(s);
-	srclobe_upperbound = read16(s);
-	src_noconnections = read16(s);
+	srclobe_lowerbound = read16(s, false);
+	srclobe_upperbound = read16(s, false);
+	src_noconnections = read16(s, false);
 	for (int i = 0; i < 4; i++) s >> destlobe[i];
-	destlobe_lowerbound = read16(s);
-	destlobe_upperbound = read16(s);
-	dest_noconnections = read16(s);
+	destlobe_lowerbound = read16(s, false);
+	destlobe_upperbound = read16(s, false);
+	dest_noconnections = read16(s, false);
 	s >> migrates >> norandomconnections >> srcvar >> destvar >> initrulealways;
 	for (int i = 0; i < 5; i++) s >> spare[i];
 	for (int i = 0; i < 48; i++) s >> initialiserule[i];

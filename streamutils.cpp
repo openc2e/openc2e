@@ -19,14 +19,27 @@
 #include "endianlove.h"
 #include <fstream> // don't actually need this
 
-uint16 read16(std::istream &s) {
+#ifdef _MSC_VER
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
+
+uint16 read16(std::istream &s, bool littleend) {
 	uint16 t;
 	s.read((char *)&t, 2);
-	return swapEndianShort(t);
+	if (littleend)
+		return swapEndianShort(t);
+	else
+		return ntohs(t);
 }
 
-void write16(std::ostream &s, uint16 v) {
-	uint16 t = swapEndianShort(v);
+void write16(std::ostream &s, uint16 v, bool littleend) {
+	uint16 t;
+	if (littleend)
+		t = swapEndianShort(v);
+	else
+		t = htons(v);
 	s.write((char *)&t, 2);
 }
 

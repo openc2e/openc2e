@@ -20,8 +20,8 @@
 #include "endianlove.h"
 #include <fstream>
 
-uint16 read16(std::istream &s);
-void write16(std::ostream &s, uint16 v);
+uint16 read16(std::istream &s, bool littleend = true);
+void write16(std::ostream &s, uint16 v, bool littleend = true);
 uint32 read32(std::istream &s);
 void write32(std::ostream &s, uint32 v);
 
