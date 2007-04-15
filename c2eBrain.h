@@ -23,6 +23,7 @@
 #include "genome.h"
 #include <boost/shared_ptr.hpp>
 #include <set>
+#include <map>
 
 using boost::shared_ptr;
 
@@ -82,6 +83,9 @@ public:
 	c2eLobe(c2eBrainLobeGene *g);
 	void tick();
 	void init();
+	c2eBrainLobeGene *getGene() { return ourGene; }
+	unsigned int getNoNeurons() { return neurons.size(); }
+	c2eNeuron *getNeuron(unsigned int i) { return &neurons[i]; }
 	unsigned int getSpareNeuron() { return spare; }
 };
 
@@ -95,9 +99,12 @@ protected:
 	void doMigration();
 
 public:
-	c2eTract(c2eBrainTractGene *g);
+	c2eTract(class c2eBrain *b, c2eBrainTractGene *g);
 	void tick();	
 	void init();
+	c2eBrainTractGene *getGene() { return ourGene; }
+	unsigned int getNoDendrites() { return dendrites.size(); }
+	c2eDendrite *getDendrite(unsigned int i) { return &dendrites[i]; }
 };
 
 class c2eBrain {
@@ -107,10 +114,14 @@ protected:
 	std::set<c2eBrainComponent *, c2ebraincomponentorder> components;
 
 public:
+	std::map<std::string, c2eLobe *> lobes;
+	std::vector<c2eTract *> tracts;
+
 	c2eBrain(c2eCreature *p);
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 	void tick();
 	void init();
+	c2eLobe *getLobeById(std::string id);
 };
 
 #endif

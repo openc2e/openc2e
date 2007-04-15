@@ -23,11 +23,23 @@
 
 float dummyValues[8];
 
+/*
+ * c2ebraincomponentorder::operator()
+ *
+ * A functor to sort brain components by their update time.
+ *
+ */
 bool c2ebraincomponentorder::operator()(const class c2eBrainComponent *b1, const class c2eBrainComponent *b2) const {
 	return b1->updatetime < b2->updatetime;
 }
 
-c2eTract::c2eTract(c2eBrainTractGene *g) {
+/*
+ * c2eTract::c2eTract
+ *
+ * Constructor for a c2eTract. Pass it the relevant gene.
+ *
+ */
+c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
 	assert(g);
 	ourGene = g;
 	updatetime = g->updatetime;
@@ -35,8 +47,38 @@ c2eTract::c2eTract(c2eBrainTractGene *g) {
 	initrule.init(g->initialiserule);
 	updaterule.init(g->updaterule);
 
-	// TODO: find source/dest lobes, calculate neurons
+	std::string srclobename = std::string((char *)g->srclobe, 4);
+	std::string destlobename = std::string((char *)g->destlobe, 4);
+
+	if (b->lobes.find(srclobename) == b->lobes.end()) return;
+	c2eLobe *srclobe = b->lobes[srclobename];
+	if (b->lobes.find(destlobename) == b->lobes.end()) return;
+	c2eLobe *destlobe = b->lobes[destlobename];
+
+	std::vector<c2eNeuron *> src_neurons, dest_neurons;
+
+	// TODO: upperbound < or <=?
+	for (unsigned int i = g->srclobe_lowerbound; i <= g->srclobe_upperbound; i++) {
+		if (i >= srclobe->getNoNeurons()) break;
+		src_neurons.push_back(srclobe->getNeuron(i));
+	}
+
+	for (unsigned int i = g->destlobe_lowerbound; i <= g->destlobe_upperbound; i++) {
+		if (i >= destlobe->getNoNeurons()) break;
+		dest_neurons.push_back(destlobe->getNeuron(i));
+	}
+	
 	// TODO: create/distribute dendrites as needed
+	if (g->src_noconnections == 1 && g->dest_noconnections == 1 && !g->migrates) {
+		if (src_neurons.size() == dest_neurons.size()) {
+			for (unsigned int i = 0; i < src_neurons.size(); i++) {
+				c2eDendrite d;
+				d.source = src_neurons[i];
+				d.dest = dest_neurons[i];
+				dendrites.push_back(d);
+			}
+		}
+	}
 }
 
 /*
@@ -83,6 +125,12 @@ void c2eTract::doMigration() {
 	// TODO
 }
 
+/*
+ * c2eLobe::c2eLobe
+ *
+ * Constructor for a c2eLobe. Pass it the relevant gene.
+ *
+ */
 c2eLobe::c2eLobe(c2eBrainLobeGene *g) {
 	assert(g);
 	ourGene = g;
@@ -90,13 +138,17 @@ c2eLobe::c2eLobe(c2eBrainLobeGene *g) {
 
 	spare = 0;
 
-	int width = g->width, height = g->height;
+	unsigned int width = g->width, height = g->height;
 	if (width < 1) width = 1;
 	if (height < 1) height = 1;
 
 	neurons.reserve(width * height);
 
-	// TODO: create neurons!
+	c2eNeuron n;
+	for (unsigned int i = 0; i < width * height; i++) {
+		// TODO: create neurons!
+		neurons.push_back(n);
+	}
 
 	initrule.init(g->initialiserule);
 	updaterule.init(g->updaterule);
@@ -586,6 +638,12 @@ done:
 	return is_spare;
 }
 
+/*
+ * c2eBrain::c2eBrain
+ *
+ * Constructor for a c2eBrain. Pass it the creature it belongs to, and it will construct itself.
+ *
+ */
 c2eBrain::c2eBrain(c2eCreature *p) {
 	assert(p);
 	parent = p;
@@ -599,6 +657,7 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 		if (typeid(**i) == typeid(c2eBrainLobeGene)) {
 			c2eLobe *l = new c2eLobe((c2eBrainLobeGene *)*i);
 			components.insert(l);
+			lobes[std::string((char *)l->getGene()->id, 4)] = l;
 		}
 	}
 
@@ -607,8 +666,9 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
 		// TODO: lifestage
 		if (typeid(**i) == typeid(c2eBrainTractGene)) {
-			c2eTract *t = new c2eTract((c2eBrainTractGene *)*i);
+			c2eTract *t = new c2eTract(this, (c2eBrainTractGene *)*i);
 			components.insert(t);
+			tracts.push_back(t);
 		}
 	}
 }
@@ -623,6 +683,15 @@ void c2eBrain::tick() {
 	for (std::set<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
 		(*i)->tick();
 	}
+}
+
+c2eLobe *c2eBrain::getLobeById(std::string id) {
+	std::map<std::string, c2eLobe *>::iterator i = lobes.find(id);
+
+	if (i != lobes.end())
+		return i->second;
+	else
+		return 0;
 }
 
 /* vim: set noet: */
