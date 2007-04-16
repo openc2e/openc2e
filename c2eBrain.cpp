@@ -20,6 +20,7 @@
 #include "c2eBrain.h"
 #include "Creature.h"
 #include <math.h>
+#include <boost/format.hpp>
 
 float dummyValues[8];
 
@@ -57,7 +58,6 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
 
 	std::vector<c2eNeuron *> src_neurons, dest_neurons;
 
-	// TODO: upperbound < or <=?
 	for (unsigned int i = g->srclobe_lowerbound; i <= g->srclobe_upperbound; i++) {
 		if (i >= srclobe->getNoNeurons()) break;
 		src_neurons.push_back(srclobe->getNeuron(i));
@@ -68,17 +68,69 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
 		dest_neurons.push_back(destlobe->getNeuron(i));
 	}
 	
-	// TODO: create/distribute dendrites as needed
-	if (g->src_noconnections == 1 && g->dest_noconnections == 1 && !g->migrates) {
-		if (src_neurons.size() == dest_neurons.size()) {
-			for (unsigned int i = 0; i < src_neurons.size(); i++) {
-				c2eDendrite d;
-				d.source = src_neurons[i];
-				d.dest = dest_neurons[i];
-				dendrites.push_back(d);
+	// create/distribute dendrites as needed
+	if (!g->migrates) {
+		// if the genome tells us to make no connections, give up
+		if (g->src_noconnections == 0 || g->dest_noconnections == 0) return;
+	
+		// distribute neurons
+		// this seems identical to CL's brain-in-a-vat for the default brain and for some test cases fuzzie made up
+		// TODO: test the algorithm a bit more
+		// TODO: take notice of norandomconnections?
+		unsigned int srcneuron = 0, srcconns = 0;
+		unsigned int destneuron = 0, destconns = 0;
+		while (true) {
+			c2eNeuron *src = src_neurons[srcneuron];
+			c2eNeuron *dest = dest_neurons[destneuron];
+
+			// if there's already a dendrite like the one we're about to create, we're done
+			if (getDendriteFromTo(src, dest)) break;
+			
+			c2eDendrite d;
+			d.source = src;
+			d.dest = dest;
+			dendrites.push_back(d);
+
+			srcconns++;
+			if (srcconns >= g->src_noconnections) {
+				srcconns = 0;
+				destneuron++;
+				if (destneuron >= dest_neurons.size())
+					destneuron = 0;
+			}
+			destconns++;
+			if (destconns >= g->dest_noconnections) {
+				destconns = 0;
+				srcneuron++;
+				if (srcneuron >= src_neurons.size())
+					srcneuron = 0;
 			}
 		}
+	} else {
+		std::cout << "brain debug: failed to create dendrites for " << dump() << std::endl;
 	}
+}
+
+/*
+ * c2eTract::dump
+ *
+ * Returns a textual string describing the tract for use in debug messages.
+ *
+ */
+std::string c2eTract::dump() {
+	c2eBrainTractGene *g = ourGene;
+
+	std::string srclobename = std::string((char *)g->srclobe, 4);
+	std::string destlobename = std::string((char *)g->destlobe, 4);
+
+	std::string data = boost::str(boost::format("tract %s->%s, src neurons %d-%d #cons %d, dest neurons %d-%d #cons %d") % srclobename % destlobename
+		% (int)g->srclobe_lowerbound % (int)g->srclobe_upperbound % (int)g->src_noconnections
+		% (int)g->destlobe_lowerbound % (int)g->destlobe_upperbound % (int)g->dest_noconnections
+		);
+
+	if (g->migrates) data += ", migratory";
+
+	return data;
 }
 
 /*
@@ -88,7 +140,10 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
  *
  */
 c2eDendrite *c2eTract::getDendriteFromTo(c2eNeuron *from, c2eNeuron *to) {
-	// TODO
+	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
+		if (i->source == from && i->dest == to) return &(*i);
+	}
+	
 	return 0;
 }
 

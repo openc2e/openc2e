@@ -105,6 +105,8 @@ public:
 	c2eBrainTractGene *getGene() { return ourGene; }
 	unsigned int getNoDendrites() { return dendrites.size(); }
 	c2eDendrite *getDendrite(unsigned int i) { return &dendrites[i]; }
+	
+	std::string dump();
 };
 
 class c2eBrain {
