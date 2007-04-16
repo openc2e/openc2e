@@ -67,16 +67,63 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
 		if (i >= destlobe->getNoNeurons()) break;
 		dest_neurons.push_back(destlobe->getNeuron(i));
 	}
+
+	if (src_neurons.size() == 0 || dest_neurons.size() == 0) {
+		std::cout << "brain debug: failed to create dendrites for " << dump() << " (no neurons)" << std::endl;
+		return;
+	}
 	
 	// create/distribute dendrites as needed
-	if (!g->migrates) {
+	if (g->migrates) {
+		// You can't have *both* sides of the tract unconstrained, we'd have no idea how many dendrites to make!
+		if (g->src_noconnections == 0 && g->dest_noconnections == 0) {
+			std::cout << "brain debug: failed to create dendrites for " << dump() << " (both connections unconstrained)" << std::endl;
+		} else if (g->src_noconnections != 0 && g->dest_noconnections != 0) {
+			// TODO: correct behaviour? seems to be, given CL's brain-in-a-vat behaviour
+			std::cout << "brain debug: failed to create dendrites for " << dump() << " (no unconstrained connections)" << std::endl;
+			return;
+		}
+
+		// assume we're doing src->dest
+		unsigned int neuronsize = src_neurons.size();
+		unsigned int noconnections = g->src_noconnections;
+		// change things if we're doing dest->src :)
+		if (g->src_noconnections == 0) {
+			neuronsize = dest_neurons.size();
+			noconnections = g->dest_noconnections;
+		}
+
+		// distribute neurons
+		// TODO: work out if this algorithm works vaguely correctly
+		// TODO: low-order bit badness in the randomness?
+		for (unsigned int i = 0; i < neuronsize; i++) {
+			unsigned int noconns = noconnections;
+			if (g->norandomconnections)
+				noconns = 1 + (rand() % noconnections);
+
+			for (unsigned int j = 0; j < noconns; j++) {
+				c2eDendrite d;
+				if (g->src_noconnections == 0) {
+					d.source = src_neurons[rand() % src_neurons.size()];
+					d.dest = dest_neurons[i];
+				} else {
+					d.source = src_neurons[i];
+					d.dest = dest_neurons[rand() % dest_neurons.size()];
+				}
+				dendrites.push_back(d);
+			}
+		}
+	} else {
 		// if the genome tells us to make no connections, give up
-		if (g->src_noconnections == 0 || g->dest_noconnections == 0) return;
+		if (g->src_noconnections == 0 || g->dest_noconnections == 0) {
+			std::cout << "brain debug: failed to create dendrites for " << dump() << " (no connections)" << std::endl;
+			return;
+		}
 	
 		// distribute neurons
 		// this seems identical to CL's brain-in-a-vat for the default brain and for some test cases fuzzie made up
 		// TODO: test the algorithm a bit more
-		// TODO: take notice of norandomconnections?
+		// TODO: take notice of norandomconnections? (doesn't look like it)
 		unsigned int srcneuron = 0, srcconns = 0;
 		unsigned int destneuron = 0, destconns = 0;
 		while (true) {
@@ -84,7 +131,7 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
 			c2eNeuron *dest = dest_neurons[destneuron];
 
 			// if there's already a dendrite like the one we're about to create, we're done
-			if (getDendriteFromTo(src, dest)) break;
+			if (getDendriteFromTo(src, dest)) return;
 			
 			c2eDendrite d;
 			d.source = src;
@@ -106,8 +153,6 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
 					srcneuron = 0;
 			}
 		}
-	} else {
-		std::cout << "brain debug: failed to create dendrites for " << dump() << std::endl;
 	}
 }
 
