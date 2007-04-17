@@ -22,7 +22,7 @@
 #include <math.h>
 #include <boost/format.hpp>
 
-float dummyValues[8];
+float dummyValues[8] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
 /*
  * c2ebraincomponentorder::operator()
@@ -40,7 +40,7 @@ bool c2ebraincomponentorder::operator()(const class c2eBrainComponent *b1, const
  * Constructor for a c2eTract. Pass it the relevant gene.
  *
  */
-c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) {
+c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) : c2eBrainComponent(b) {
 	assert(g);
 	ourGene = g;
 	updatetime = g->updatetime;
@@ -210,15 +210,20 @@ void c2eTract::tick() {
 
 	// run that svrule against every dendrite
 	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
-		// TODO: last dummyValues should be biochemistry
-		rule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, dummyValues);
+		rule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
 	}
 
 	// TODO: reward/punishment? anything else? scary brains!
 }
 
 void c2eTract::init() {
-	// TODO: run init rule
+	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
+		for (unsigned int j = 0; j < 8; j++)
+			i->variables[j] = 0.0f;
+		// TODO: will i->source/i->dest data always be initialised here? i doubt it.
+		// TODO: good way to run rule?
+		initrule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
+	}
 }
 
 void c2eTract::doMigration() {
@@ -231,7 +236,7 @@ void c2eTract::doMigration() {
  * Constructor for a c2eLobe. Pass it the relevant gene.
  *
  */
-c2eLobe::c2eLobe(c2eBrainLobeGene *g) {
+c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
 	assert(g);
 	ourGene = g;
 	updatetime = g->updatetime;
@@ -269,15 +274,20 @@ void c2eLobe::tick() {
 
 	// run that svrule against every neuron
 	for (unsigned int i = 0; i < neurons.size(); i++) {
-		// TODO: last dummyValues should be biochemistry
-		if (rule.runRule(neurons[i].input, dummyValues, neurons[i].variables, neurons[spare].variables, dummyValues, dummyValues))
+		if (rule.runRule(neurons[i].input, dummyValues, neurons[i].variables, neurons[spare].variables, dummyValues, parent->getParent()))
 			spare = i;
 		neurons[i].input = 0.0f;
 	}
 }
 
 void c2eLobe::init() {
-	// TODO: run init rule
+	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
+		for (unsigned int j = 0; j < 8; j++)
+			i->variables[j] = 0.0f;
+		// TODO: good way to run rule?
+		initrule.runRule(0.0f, dummyValues, i->variables, dummyValues, dummyValues, parent->getParent());
+		i->input = 0.0f; // TODO: good to do that here?
+	}
 }
 
 /*
@@ -350,7 +360,7 @@ void c2eSVRule::init(uint8 ruledata[48]) {
  * Returns whether the 'register as spare' opcode was executed or not.
  *
  */
-bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], float chemicals[256]) {
+bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], c2eCreature *creature) {
 	float accumulator = acc;
 	float operandvalue;
 	float *operandpointer;
@@ -403,15 +413,17 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 6: // source chemical
 				// TODO: unused?
+				std::cout << "brain debug: something tried using source chemical!" << std::endl;
 				break;
 
 			case 7: // chemical
 				// Ratboy sez: "chemicals appear to be read-only; cannot write data to them"
-				operandvalue = chemicals[rule.operanddata];
+				operandvalue = creature->getChemical(rule.operanddata);
 				break;
 
 			case 8: // destination chemical
 				// TODO: unused?
+				std::cout << "brain debug: something tried using dest chemical!" << std::endl;
 				break;
 
 			case 9: // zero
@@ -423,6 +435,11 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 			case 15: // value integer
 				// precalculated constants
 				operandvalue = rule.operandvalue;
+				break;
+
+			default:
+				// TODO: what to do?
+				std::cout << "brain debug: something tried using unknown operand type " << (int)rule.operandtype << std::endl;
 				break;
 		}
 
@@ -437,7 +454,11 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 2: // store in
-				*operandpointer = accumulator;
+				// TODO: should we be bounding it like this?
+				{ float val = accumulator;
+				if (val < -1.0f) val = -1.0f;
+				if (val > 1.0f) val = 1.0f;
+				*operandpointer = val; }
 				break;
 
 			case 3: // load from
@@ -755,7 +776,7 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
 		// TODO: lifestage
 		if (typeid(**i) == typeid(c2eBrainLobeGene)) {
-			c2eLobe *l = new c2eLobe((c2eBrainLobeGene *)*i);
+			c2eLobe *l = new c2eLobe(this, (c2eBrainLobeGene *)*i);
 			components.insert(l);
 			lobes[std::string((char *)l->getGene()->id, 4)] = l;
 		}
@@ -774,14 +795,16 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 }
 
 void c2eBrain::init() {
-	for (std::set<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
+	for (std::multiset<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
 		(*i)->init();
 	}
 }
 
 void c2eBrain::tick() {
-	for (std::set<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
-		(*i)->tick();
+	for (std::multiset<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
+		// TODO: good check for this?
+		if ((*i)->getUpdateTime() != 0)
+			(*i)->tick();
 	}
 }
 

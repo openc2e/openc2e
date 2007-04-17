@@ -38,11 +38,14 @@ protected:
 	friend class c2ebraincomponentorder;
 
 	uint8 updatetime;
+	class c2eBrain *parent;
 
 public:
 	virtual void init() = 0;
 	virtual void tick() = 0;
+	uint8 getUpdateTime() { return updatetime; }
 
+	c2eBrainComponent(class c2eBrain *b) : parent(b) { assert(b); }
 	virtual ~c2eBrainComponent() { }
 };
 
@@ -59,7 +62,7 @@ protected:
 
 public:
 	void init(uint8 ruledata[48]);
-	bool runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], float chemicals[256]);
+	bool runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], class c2eCreature *creature);
 };
 
 struct c2eNeuron {
@@ -80,7 +83,7 @@ protected:
 	unsigned int spare;
 
 public:
-	c2eLobe(c2eBrainLobeGene *g);
+	c2eLobe(class c2eBrain *b, c2eBrainLobeGene *g);
 	void tick();
 	void init();
 	c2eBrainLobeGene *getGene() { return ourGene; }
@@ -113,7 +116,7 @@ class c2eBrain {
 protected:
 	class c2eCreature *parent;
 
-	std::set<c2eBrainComponent *, c2ebraincomponentorder> components;
+	std::multiset<c2eBrainComponent *, c2ebraincomponentorder> components;
 
 public:
 	std::map<std::string, c2eLobe *> lobes;
@@ -124,6 +127,7 @@ public:
 	void tick();
 	void init();
 	c2eLobe *getLobeById(std::string id);
+	c2eCreature *getParent() { return parent; }
 };
 
 #endif
