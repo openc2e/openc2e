@@ -63,20 +63,23 @@ void BrainView::paintEvent(QPaintEvent *) {
 			for (unsigned int x = 0; x < lobe->width; x++) {
 				c2eNeuron *neuron = i->second->getNeuron(x + (y * lobe->width));
 
-				float var = neuron->variables[neuron_var];
-				if (var <= threshold) continue;
-
-				float multiplier = 0.5 + (var < 0.0f ? 0.0f : (var / 2));
-				QColor color(lobe->red * multiplier, lobe->green * multiplier, lobe->blue * multiplier);
-				painter.setPen(color);
-		
-				QBrush brush(color);
-				painter.setBrush(brush);
-				painter.drawRect(lobex + (x * 20) + 6, lobey + (y * 20) + 6, 8, 8);
-				
 				// store the centre coordinate for drawing dendrites
 				assert(neuroncoords.find(neuron) == neuroncoords.end());
 				neuroncoords[neuron] = std::pair<unsigned int, unsigned int>(lobex + (x * 20) + 10, lobey + (y * 20) + 10);
+
+				// if below threshold, don't draw
+				float var = neuron->variables[neuron_var];
+				if (var <= threshold) continue;
+
+				// calculate appropriate colour
+				float multiplier = 0.5 + (var < 0.0f ? 0.0f : (var / 2));
+				QColor color(lobe->red * multiplier, lobe->green * multiplier, lobe->blue * multiplier);
+		
+				// draw lobe
+				painter.setPen(color);
+				QBrush brush(color);
+				painter.setBrush(brush);
+				painter.drawRect(lobex + (x * 20) + 6, lobey + (y * 20) + 6, 8, 8);	
 			}
 	}
 
