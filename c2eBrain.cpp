@@ -353,6 +353,13 @@ void c2eSVRule::init(uint8 ruledata[48]) {
 	}
 }
 
+// convenience function for c2eSVRule::runRule
+inline float bindFloatValue(float val, float min = -1.0f, float max = 1.0f) {
+	if (val > max) return max;
+	else if (val < min) return min;
+	else return val;
+}
+
 /*
  * c2eSVRule::runRule
  *
@@ -383,7 +390,8 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 		switch (rule.operandtype) {
 			case 0: // accumulator
 				operandvalue = accumulator;
-				// TODO: does this set operandpointer?
+				// accumulator does *not* set operandpointer
+				// (eg, 'blank accumulator' and 'add to and store in accumulator' do not change it)
 				break;
 
 			case 1: // input neuron
@@ -450,16 +458,10 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 1: // blank
 				*operandpointer = 0.0f;
-				// TODO: ratboy sez: "Blanking the accumulator seems to have no effect (accumulator value does not change), nor can chemical tokens be blanked."
-				// TODO: however, stim lobe in standard genome blanks the accumulator..
 				break;
 
 			case 2: // store in
-				// TODO: should we be bounding it like this?
-				{ float val = accumulator;
-				if (val < -1.0f) val = -1.0f;
-				if (val > 1.0f) val = 1.0f;
-				*operandpointer = val; }
+				*operandpointer = bindFloatValue(accumulator);
 				break;
 
 			case 3: // load from
@@ -596,24 +598,16 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 32: // bound in range [0, 1]
 				// TODO: make sure this is correct
-				accumulator = operandvalue;
-				if (accumulator < 0.0f) accumulator = 0.0f;
-				else if (accumulator > 1.0f) accumulator = 1.0f;
+				accumulator = bindFloatValue(operandvalue, 0.0f);
 				break;
 
 			case 33: // bound in range [-1, 1]
 				// TODO: make sure this is correct
-				accumulator = operandvalue;
-				if (accumulator < -1.0f) accumulator = -1.0f;
-				else if (accumulator > 1.0f) accumulator = 1.0f;
+				accumulator = bindFloatValue(operandvalue);
 				break;
 
 			case 34: // add and store in
-				// TODO: should we be bounding it like this?
-				{ float val = accumulator + operandvalue;
-				if (val < -1.0f) val = -1.0f;
-				if (val > 1.0f) val = 1.0f;
-				*operandpointer = val; }
+				*operandpointer = bindFloatValue(accumulator + operandvalue);
 				break;
 
 			case 35: // tend to and store in
