@@ -51,9 +51,11 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) : c2eBrainComponent(b) {
 	std::string srclobename = std::string((char *)g->srclobe, 4);
 	std::string destlobename = std::string((char *)g->destlobe, 4);
 
-	if (b->lobes.find(srclobename) == b->lobes.end()) return;
+	if (b->lobes.find(srclobename) == b->lobes.end() || b->lobes.find(destlobename) == b->lobes.end()) {
+		std::cout << "brain debug: failed to create dendrites for " << dump() << " (missing lobe)" << std::endl;
+		return;
+	}
 	c2eLobe *srclobe = b->lobes[srclobename];
-	if (b->lobes.find(destlobename) == b->lobes.end()) return;
 	c2eLobe *destlobe = b->lobes[destlobename];
 
 	std::vector<c2eNeuron *> src_neurons, dest_neurons;
@@ -251,7 +253,6 @@ c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
 
 	c2eNeuron n;
 	for (unsigned int i = 0; i < width * height; i++) {
-		// TODO: create neurons!
 		neurons.push_back(n);
 	}
 
@@ -306,7 +307,7 @@ void c2eSVRule::init(uint8 ruledata[48]) {
 		rule.operandtype = ruledata[(i * 3) + 1];
 		rule.operanddata = ruledata[(i * 3) + 2];
 
-		switch (rule.operanddata) {
+		switch (rule.operandtype) {
 			// for neuron/dendrite values, sanitise value (there are only 8 options)
 
 			case 1: // input neuron
@@ -362,7 +363,7 @@ void c2eSVRule::init(uint8 ruledata[48]) {
  */
 bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], c2eCreature *creature) {
 	float accumulator = acc;
-	float operandvalue;
+	float operandvalue = 0.0f; // valid rules should never use this
 	float *operandpointer;
 	float dummy;
 	bool is_spare = false;
@@ -608,7 +609,11 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 34: // add and store in
-				*operandpointer = accumulator + operandvalue;
+				// TODO: should we be bounding it like this?
+				{ float val = accumulator + operandvalue;
+				if (val < -1.0f) val = -1.0f;
+				if (val > 1.0f) val = 1.0f;
+				*operandpointer = val; }
 				break;
 
 			case 35: // tend to and store in
