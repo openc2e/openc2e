@@ -183,6 +183,11 @@ tools/memstats: tools/memstats.o $(OPENC2E_CORE) $(SERSTUB)
 tools/serialtest: tools/serialtest.o $(OPENC2E_CORE) $(SERIALIZATION)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
+tools/braininavat/braininavat: Creature_standalone.o c2eBrain.o streamutils.o genomeFile.o
+	cd tools/braininavat && \
+	qmake && \
+	make
+
 clean:
 	rm -f *.o openc2e openc2e_s filetests praydumper tools/*.o config.mk
 	rm -rf .deps
