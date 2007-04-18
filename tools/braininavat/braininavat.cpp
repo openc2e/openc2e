@@ -63,7 +63,64 @@ BrainInAVat::BrainInAVat() {
 
 	/* View menu */
 
+	neuronActGroup = new QActionGroup(this);
+	dendriteActGroup = new QActionGroup(this);
+	thresholdActGroup = new QActionGroup(this);
+
+	// neuron/dendrite variable selection
+	for (unsigned int i = 0; i < 8; i++) {
+		// TODO: friendly names for neuron/dendrite vars
+
+		neuronActs[i] = new QAction(tr("Neuron var %1").arg(i), this);
+		neuronActGroup->addAction(neuronActs[i]);
+		neuronActs[i]->setCheckable(true);
+		connect(neuronActs[i], SIGNAL(triggered()), this, SLOT(setSomeVar()));
+		dendriteActs[i] = new QAction(tr("Dendrite var %1").arg(i), this);
+		dendriteActGroup->addAction(dendriteActs[i]);
+		dendriteActs[i]->setCheckable(true);
+		connect(dendriteActs[i], SIGNAL(triggered()), this, SLOT(setSomeVar()));
+	}
+	neuronActs[0]->setChecked(true);
+	dendriteActs[0]->setChecked(true);
+
+	// threshold for element visibility
+	noThresholdAct = new QAction(tr("Show all elements"), this);
+	thresholdActGroup->addAction(noThresholdAct);
+	noThresholdAct->setCheckable(true);
+	noThresholdAct->setChecked(true);
+	connect(noThresholdAct, SIGNAL(triggered()), this, SLOT(setNoThreshold()));
+	nonZeroThresholdAct = new QAction(tr("Show elements with non-zero values only"), this);
+	thresholdActGroup->addAction(nonZeroThresholdAct);
+	nonZeroThresholdAct->setCheckable(true);
+	connect(nonZeroThresholdAct, SIGNAL(triggered()), this, SLOT(setNonZeroThreshold()));
+	showNoneAct = new QAction(tr("Show no elements"), this);
+	thresholdActGroup->addAction(showNoneAct);
+	showNoneAct->setCheckable(true);
+	connect(showNoneAct, SIGNAL(triggered()), this, SLOT(setShowNone()));
+
 	viewMenu = menuBar()->addMenu(tr("&View"));
+	for (unsigned int i = 0; i < 8; i++)
+		viewMenu->addAction(neuronActs[i]);
+	viewMenu->addSeparator();
+	for (unsigned int i = 0; i < 8; i++)
+		viewMenu->addAction(dendriteActs[i]);
+	viewMenu->addSeparator();
+	viewMenu->addAction(noThresholdAct);
+	viewMenu->addAction(nonZeroThresholdAct);
+	viewMenu->addAction(showNoneAct);
+
+	/* Control menu */
+
+	tickAct = new QAction(tr("&Tick"), this);
+	tickAct->setStatusTip(tr("Run the brain through one iteration"));
+	tickAct->setEnabled(false);
+	connect(tickAct, SIGNAL(triggered()), this, SLOT(tick()));
+
+	controlMenu = menuBar()->addMenu(tr("&Control"));
+	controlMenu->addAction(tickAct);
+
+	controlToolbar = addToolBar(tr("Control"));
+	controlToolbar->addAction(tickAct);
 
 	/* Help menu */
 
@@ -102,6 +159,39 @@ void BrainInAVat::about() {
 	QMessageBox::about(this, tr("openc2e's Brain in a Vat"), tr("An openc2e tool to monitor and experiment upon creature brains."));
 }
 
+void BrainInAVat::tick() {
+	ourCreature->tick();
+	ourView->update();
+}
+
+void BrainInAVat::setSomeVar() {
+	QAction *action = qobject_cast<QAction *>(sender());
+
+	for (unsigned int i = 0; i < 8; i++) {
+		if (action == neuronActs[i])
+			ourView->neuron_var = i;
+		else if (action == dendriteActs[i])
+			ourView->dendrite_var = i;
+	}
+
+	ourView->update();
+}
+
+void BrainInAVat::setNoThreshold() {
+	ourView->threshold = -1000.0f;
+	ourView->update();
+}
+
+void BrainInAVat::setNonZeroThreshold() {
+	ourView->threshold = 0.0f;
+	ourView->update();
+}
+
+void BrainInAVat::setShowNone() {
+	ourView->threshold = 1000.0f;
+	ourView->update();
+}
+
 // code to Do Things!
 
 void BrainInAVat::loadFile(const QString &fileName) {
@@ -111,6 +201,7 @@ void BrainInAVat::loadFile(const QString &fileName) {
 		delete ourCreature;
 		ourCreature = 0;
 	}
+	tickAct->setEnabled(false);
 	ourView->update();
 
 	ifstream f(fileName.toAscii());
@@ -140,6 +231,7 @@ void BrainInAVat::loadFile(const QString &fileName) {
 	QApplication::restoreOverrideCursor();
 
 	// we're done; update title/recent files, and display a temporary status message
+	tickAct->setEnabled(true);
 	ourView->resize(ourView->minimumSize());
 	ourView->update();
 	setCurrentFile(fileName);

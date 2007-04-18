@@ -38,6 +38,11 @@ private slots:
 	void open();
 	void openRecentFile();
 	void about();
+	void tick();
+	void setSomeVar();
+	void setNoThreshold();
+	void setNonZeroThreshold();
+	void setShowNone();
 
 private:
 	void loadFile(const QString &fileName);
@@ -47,8 +52,10 @@ private:
 
 	QString curFile;
 
-	QMenu *fileMenu, *recentFilesMenu, *viewMenu, *helpMenu;
-	QAction *openAct, *exitAct, *aboutAct, *separatorAct;
+	QMenu *fileMenu, *recentFilesMenu, *viewMenu, *helpMenu, *controlMenu;
+	QAction *openAct, *exitAct, *aboutAct, *separatorAct, *tickAct, *neuronActs[8], *dendriteActs[8], *noThresholdAct, *nonZeroThresholdAct, *showNoneAct;
+	QToolBar *controlToolbar;
+	class QActionGroup *neuronActGroup, *dendriteActGroup, *thresholdActGroup;
 
 	enum { MaxRecentFiles = 5 };
 	QAction *recentFileActs[MaxRecentFiles];

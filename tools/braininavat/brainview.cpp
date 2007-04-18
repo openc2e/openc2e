@@ -5,6 +5,10 @@
 BrainView::BrainView(BrainInAVat *p) {
 	parent = p;
 
+	neuron_var = 0;
+	dendrite_var = 0;
+	threshold = -1000.0f;
+
 	setAutoFillBackground(true);
 	QPalette pal(palette());
 	pal.setColor(QPalette::Background, QColor(0, 0, 0));
@@ -59,7 +63,11 @@ void BrainView::paintEvent(QPaintEvent *) {
 			for (unsigned int x = 0; x < lobe->width; x++) {
 				c2eNeuron *neuron = i->second->getNeuron(x + (y * lobe->width));
 
-				QColor color(lobe->red, lobe->green, lobe->blue);
+				float var = neuron->variables[neuron_var];
+				if (var <= threshold) continue;
+
+				float multiplier = 0.5 + (var < 0.0f ? 0.0f : (var / 2));
+				QColor color(lobe->red * multiplier, lobe->green * multiplier, lobe->blue * multiplier);
 				painter.setPen(color);
 		
 				QBrush brush(color);
@@ -83,7 +91,11 @@ void BrainView::paintEvent(QPaintEvent *) {
 		for (unsigned int j = 0; j < (*i)->getNoDendrites(); j++) {
 			c2eDendrite *dend = (*i)->getDendrite(j);
 
-			QColor color(destlobe->red, destlobe->green, destlobe->blue);
+			float var = dend->variables[dendrite_var];
+			if (var <= threshold) continue;
+
+			float multiplier = 0.5 + (var < 0.0f ? 0.0f : (var / 2));
+			QColor color(destlobe->red * multiplier, destlobe->green * multiplier, destlobe->blue * multiplier);
 			painter.setPen(color);
 
 			assert(neuroncoords.find(dend->source) != neuroncoords.end());
