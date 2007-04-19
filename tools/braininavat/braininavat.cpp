@@ -216,7 +216,13 @@ void BrainInAVat::loadFile(const QString &fileName) {
 	// read genome
 	f >> noskipws;
 	shared_ptr<genomeFile> gfile(new genomeFile());
-	f >> *gfile;
+	try {
+		f >> *gfile;
+	} catch (genomeException &e) {
+		QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), tr("Failed loading the genome due to error '%1'!").arg(e.what()));
+		QApplication::restoreOverrideCursor();
+		return;
+	}
 
 	// TODO: dialog to pick age, gender, variant?
 
