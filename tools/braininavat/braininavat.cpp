@@ -17,6 +17,7 @@
 #include "braininavat.h"
 #include <QtGui>
 #include "brainview.h"
+#include "c2eBrain.h"
 
 #include <fstream>
 using namespace std;

@@ -291,6 +291,15 @@ void c2eLobe::init() {
 	}
 }
 
+void c2eLobe::setNeuronInput(unsigned int i, float input) {
+	assert(i < neurons.size());
+	neurons[i].input = input; // TODO: always stomp over any existing input?
+}
+
+std::string c2eLobe::getId() {
+	return std::string((char *)ourGene->id, 4);
+}
+
 /*
  * c2eSVRule::init
  *
@@ -777,7 +786,7 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 		if (typeid(**i) == typeid(c2eBrainLobeGene)) {
 			c2eLobe *l = new c2eLobe(this, (c2eBrainLobeGene *)*i);
 			components.insert(l);
-			lobes[std::string((char *)l->getGene()->id, 4)] = l;
+			lobes[l->getId()] = l;
 		}
 	}
 

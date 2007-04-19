@@ -90,6 +90,8 @@ public:
 	unsigned int getNoNeurons() { return neurons.size(); }
 	c2eNeuron *getNeuron(unsigned int i) { return &neurons[i]; }
 	unsigned int getSpareNeuron() { return spare; }
+	void setNeuronInput(unsigned int i, float input);
+	std::string getId();
 };
 
 class c2eTract : public c2eBrainComponent {
