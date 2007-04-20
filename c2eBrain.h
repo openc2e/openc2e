@@ -125,10 +125,10 @@ public:
 	std::vector<c2eTract *> tracts;
 
 	c2eBrain(c2eCreature *p);
-	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 	void tick();
 	void init();
 	c2eLobe *getLobeById(std::string id);
+	c2eLobe *getLobeByTissue(unsigned int id);
 	c2eCreature *getParent() { return parent; }
 };
 

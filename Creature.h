@@ -45,7 +45,7 @@ protected:
 	unsigned int age; // in ticks
 	lifestage stage;
 
-	AgentRef attention, focus;
+	AgentRef attention;
 
 	// linguistic stuff
 
@@ -76,6 +76,8 @@ public:
 	bool isZombie() { return zombie; }
 	unsigned int getAge() { return age; }
 	shared_ptr<genomeFile> getGenome() { return genome; }
+
+	virtual unsigned int getGait() = 0;
 	
 	void born();
 	void die();
@@ -140,6 +142,8 @@ public:
 	unsigned char getDrive(unsigned int id) { assert(id < 16); return drives[id]; }
 	
 	unsigned char *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
+
+	unsigned int getGait();
 };
 
 // c2e
@@ -256,6 +260,8 @@ public:
 	class c2eBrain *getBrain() { return brain; }
 
 	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
+	
+	unsigned int getGait();
 };
 
 #endif

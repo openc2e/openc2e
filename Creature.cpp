@@ -165,6 +165,16 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 	brain->init();
 }
 
+unsigned int c1Creature::getGait() {
+	unsigned int gait = 0;
+
+	for (unsigned int i = 1; i < 8; i++)
+		if (gaitloci[i] > gaitloci[gait])
+			gait = i;
+
+	return gait;
+}
+
 void c1Creature::tick() {
 	// TODO: should we tick some things even if dead?
 	if (!alive) return;
@@ -183,6 +193,16 @@ void c1Creature::tick() {
 	if (dead != 0) die();
 
 	Creature::tick();
+}
+
+unsigned int c2eCreature::getGait() {
+	unsigned int gait = 0;
+
+	for (unsigned int i = 1; i < 16; i++)
+		if (gaitloci[i] > gaitloci[gait])
+			gait = i;
+
+	return gait;
 }
 
 void c2eCreature::tick() {
@@ -423,9 +443,12 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
 	switch (o) {
 		case 0: // brain
 			{
-			// t = lobe tissue id
+			c2eLobe *lobe = brain->getLobeByTissue(t);
+			if (!lobe) break;
+
 			unsigned int neuronid = o/3, stateno = o%3;
-			return 0; // TODO
+			if (neuronid >= lobe->getNoNeurons()) break;
+			return &lobe->getNeuron(neuronid)->variables[stateno];
 			}
 
 		case 1: // creature

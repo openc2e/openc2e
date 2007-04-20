@@ -816,6 +816,15 @@ void c2eBrain::tick() {
 	}
 }
 
+c2eLobe *c2eBrain::getLobeByTissue(unsigned int id) {
+	for (std::map<std::string, c2eLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
+		if (i->second->getGene()->tissue == id)
+			return i->second;
+	}
+
+	return 0;
+}
+
 c2eLobe *c2eBrain::getLobeById(std::string id) {
 	std::map<std::string, c2eLobe *>::iterator i = lobes.find(id);
 
