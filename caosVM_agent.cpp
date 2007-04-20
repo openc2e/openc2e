@@ -793,14 +793,12 @@ void caosVM::v_TOTL() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	// TODO: in c1, at least, TOTL allows use of wildcards
-
 	unsigned int x = 0;
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
-		if ((*i)->family == family)
-			if ((*i)->genus == genus)
-				if ((*i)->species == species)
+		if ((*i)->family == family || family == 0)
+			if ((*i)->genus == genus || genus == 0)
+				if ((*i)->species == species || species == 0)
 					x++;
 	}
 	result.setInt(x);
