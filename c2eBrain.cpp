@@ -380,6 +380,7 @@ inline float bindFloatValue(float val, float min = -1.0f, float max = 1.0f) {
 bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], c2eCreature *creature) {
 	float accumulator = acc;
 	float operandvalue = 0.0f; // valid rules should never use this
+	float tendrate = 0.0f;
 	float *operandpointer;
 	float dummy;
 	bool is_spare = false;
@@ -572,12 +573,12 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 24: // set tend rate
-				// TODO
-				//tendrate = operandvalue;
+				tendrate = operandvalue;
 				break;
 
 			case 25: // tend to
-				// TODO
+				// TODO: make sure this is correct
+				accumulator += tendrate * (operandvalue - accumulator);
 				break;
 
 			case 26: // load negation of
