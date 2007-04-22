@@ -621,7 +621,8 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 35: // tend to and store in
-				// TODO
+				// TODO: make sure this is correct
+				*operandpointer = accumulator + tendrate * (operandvalue - accumulator);
 				break;
 
 			case 36: // nominal threshold
@@ -663,7 +664,8 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 45: // store abs in
-				// TODO
+				// TODO: make sure this is correct
+				*operandpointer = fabsf(accumulator);
 				break;
 
 			case 46: // stop if zero
@@ -675,11 +677,13 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 48: // if zero goto
-				// TODO
+				// TODO: no-one's checked the goto opcode
+				if (accumulator == 0.0f) i = rule.operanddata;
 				break;
 
 			case 49: // if non-zero goto
-				// TODO
+				// TODO: no-one's checked the goto opcode
+				if (accumulator != 0.0f) i = rule.operanddata;
 				break;
 
 			case 50: // divide by, add to neuron input
@@ -691,7 +695,8 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 52: // goto line
-				// TODO
+				// TODO: no-one's checked the goto opcode
+				i = rule.operanddata;
 				break;
 
 			case 53: // stop if <
@@ -751,11 +756,15 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 67: // if negative goto
-				// TODO
+				// TODO: no-one's checked the goto opcode
+				// TODO: make sure this is correct
+				if (accumulator < 0.0f) i = rule.operanddata;
 				break;
 
 			case 68: // if positive goto
-				// TODO
+				// TODO: no-one's checked the goto opcode
+				// TODO: make sure this is correct
+				if (accumulator > 0.0f) i = rule.operanddata;
 				break;
 
 			default:
