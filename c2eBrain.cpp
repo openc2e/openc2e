@@ -205,14 +205,10 @@ void c2eTract::tick() {
 	if (ourGene->migrates)
 		doMigration();
 
-	// work out which svrule to use for updating
-	c2eSVRule &rule = updaterule;
-	if (ourGene->initrulealways)
-		rule = initrule;
-
-	// run that svrule against every dendrite
+	// run the svrule(s) against every neuron
 	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
-		rule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
+		if (ourGene->initrulealways) initrule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
+		updaterule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
 	}
 
 	// TODO: reward/punishment? anything else? scary brains!
@@ -268,14 +264,11 @@ c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
  *
  */
 void c2eLobe::tick() {
-	// work out which svrule to use for updating
-	c2eSVRule &rule = updaterule;
-	if (ourGene->initrulealways)
-		rule = initrule;
-
-	// run that svrule against every neuron
+	// run the svrule(s) against every neuron
 	for (unsigned int i = 0; i < neurons.size(); i++) {
-		if (rule.runRule(neurons[i].input, dummyValues, neurons[i].variables, neurons[spare].variables, dummyValues, parent->getParent()))
+		if (ourGene->initrulealways && initrule.runRule(neurons[i].input, dummyValues, neurons[i].variables, neurons[spare].variables, dummyValues, parent->getParent()))
+			spare = i;
+		if (updaterule.runRule(neurons[i].input, dummyValues, neurons[i].variables, neurons[spare].variables, dummyValues, parent->getParent()))
 			spare = i;
 		neurons[i].input = 0.0f;
 	}
