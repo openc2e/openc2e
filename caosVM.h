@@ -643,8 +643,6 @@ public:
 	void v_CAGE();
 	void v_BYIT();
 	void v_IT();
-	void v_DFTX();
-	void v_DFTY();
 	void c_NEWC();
 	void c_NEW_CREA();
 	void c_NEW_CREA_c1();
@@ -677,6 +675,30 @@ public:
 	void v_DRIV_c1();
 	void c_DREA_c1();
 	void c_FK();
+	void v_BRED();
+	void v_BVAR();
+	void c_EXPR();
+	void v_EXPR();
+	// (clothes)
+	void c_BODY();
+	void v_BODY();
+	void c_DYED();
+	void c_HAIR();
+	void c_NUDE();
+	void c_RSET();
+	void c_STRE();
+	void c_SWAP();
+	void c_WEAR();
+	void v_WEAR();
+	// (attachment locations)
+	void v_DFTX();
+	void v_DFTY();
+	void v_UFTX();
+	void v_UFTY();
+	void v_HEDX();
+	void v_HEDY();
+	void v_MTHX();
+	void v_MTHY();
 	
 	// sounds
 	void c_SNDE();

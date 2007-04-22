@@ -969,22 +969,6 @@ void caosVM::v_IT() {
 }
 
 /**
- DFTX (float)
- %status stub
-*/
-void caosVM::v_DFTX() {
-	result.setFloat(0); // TODO
-}
-
-/**
- DFTY (float)
- %status stub
-*/
-void caosVM::v_DFTY() {
-	result.setFloat(0); // TODO
-}
-
-/**
  NEWC (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer)
  %status maybe
 */
@@ -1415,5 +1399,213 @@ void caosVM::c_FK() {
 	caos_assert(c);
 
 	// TODO
+}
+
+/**
+ BRED (integer) part (integer)
+ %status stub
+*/
+void caosVM::v_BRED() {
+	VM_PARAM_INTEGER(part)
+
+	result.setInt(0); // TODO
+}
+
+/**
+ BVAR (integer)
+ %status stub
+*/
+void caosVM::v_BVAR() {
+	result.setInt(0); // TODO
+}
+
+/**
+ EXPR (command) index (integer) ticks (integer)
+ %status stub
+*/
+void caosVM::c_EXPR() {
+	VM_PARAM_INTEGER(ticks)
+	VM_PARAM_INTEGER(index)
+
+	// TODO
+}
+
+/**
+ EXPR (integer)
+ %status stub
+*/
+void caosVM::v_EXPR() {
+	result.setInt(0); // TODO
+}
+
+// clothes
+
+/**
+ BODY (command) set (integer) layer (integer)
+ %status stub
+*/
+void caosVM::c_BODY() {
+	VM_PARAM_INTEGER(layer)
+	VM_PARAM_INTEGER(set)
+
+	// TODO
+}
+
+/**
+ BODY (integer) part (integer)
+ %status stub
+*/
+void caosVM::v_BODY() {
+	VM_PARAM_INTEGER(part)
+
+	result.setInt(-1); // TODO
+}
+
+/**
+ DYED (command) part (integer) overlay (integer) set (integer) layer (integer)
+ %status stub
+*/
+void caosVM::c_DYED() {
+	VM_PARAM_INTEGER(layer)
+	VM_PARAM_INTEGER(set)
+	VM_PARAM_INTEGER(overlay)
+	VM_PARAM_INTEGER(part)
+
+	// TODO
+}
+
+/**
+ HAIR (command) ruffleness (integer)
+ %status stub
+*/
+void caosVM::c_HAIR() {
+	VM_PARAM_INTEGER(ruffleness)
+
+	// TODO
+}
+
+/**
+ NUDE (command)
+ %status stub
+*/
+void caosVM::c_NUDE() {
+	// TODO
+}
+
+/**
+ RSET (command)
+ %status stub
+*/
+void caosVM::c_RSET() {
+	// TODO
+}
+
+/**
+ STRE (command)
+ %status stub
+*/
+void caosVM::c_STRE() {
+	// TODO
+}
+
+/**
+ SWAP (command) variant (integer) part (integer) commit (integer)
+ %status stub
+*/
+void caosVM::c_SWAP() {
+	VM_PARAM_INTEGER(commit)
+	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER(variant)
+
+	// TODO
+}
+
+/**
+ WEAR (command) part (integer) set (integer) layer (integer)
+ %status stub
+*/
+void caosVM::c_WEAR() {
+	VM_PARAM_INTEGER(layer)
+	VM_PARAM_INTEGER(set)
+	VM_PARAM_INTEGER(part)
+
+	// TODO
+}
+
+/**
+ WEAR (integer) part (integer) layer (integer)
+ %status stub
+*/
+void caosVM::v_WEAR() {
+	VM_PARAM_INTEGER(layer)
+	VM_PARAM_INTEGER(part)
+
+	result.setInt(-1); // TODO
+}
+
+// attachment locations
+
+/**
+ DFTX (float)
+ %status stub
+*/
+void caosVM::v_DFTX() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ DFTY (float)
+ %status stub
+*/
+void caosVM::v_DFTY() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ UFTX (float)
+ %status stub
+*/
+void caosVM::v_UFTX() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ UFTY (float)
+ %status stub
+*/
+void caosVM::v_UFTY() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ HEDX (float)
+ %status stub
+*/
+void caosVM::v_HEDX() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ HEDY (float)
+ %status stub
+*/
+void caosVM::v_HEDY() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ MTHX (float)
+ %status stub
+*/
+void caosVM::v_MTHX() {
+	result.setFloat(0); // TODO
+}
+
+/**
+ MTHY (float)
+ %status stub
+*/
+void caosVM::v_MTHY() {
+	result.setFloat(0); // TODO
 }
 
