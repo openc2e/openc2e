@@ -1578,18 +1578,22 @@ void caosVM::v_UFTY() {
 }
 
 /**
- HEDX (float)
+ HEDX (float) index (integer)
  %status stub
 */
 void caosVM::v_HEDX() {
+	VM_PARAM_INTEGER(index)
+
 	result.setFloat(0); // TODO
 }
 
 /**
- HEDY (float)
+ HEDY (float) index (integer)
  %status stub
 */
 void caosVM::v_HEDY() {
+	VM_PARAM_INTEGER(index)
+
 	result.setFloat(0); // TODO
 }
 
