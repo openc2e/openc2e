@@ -71,7 +71,7 @@ void BrainView::paintEvent(QPaintEvent *) {
 				// always highlight spare neuron
 				if (i->second->getSpareNeuron() == neuronid) {
 					// TODO: don't hardcode these names?
-					if (i->second->getId() == "attn" || i->second->getId() == "decn") {
+					if (i->second->getId() == "attn" || i->second->getId() == "decn" || i->second->getId() == "comb") {
 						painter.setPen(color);
 						painter.setBrush(oldbrush);
 						painter.drawRect(lobex + (x * 20) + 5, lobey + (y * 20) + 5, 10, 10);
