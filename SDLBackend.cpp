@@ -296,7 +296,9 @@ SDL_Surface *MirrorSurface(SDL_Surface *surf) {
 
 //*** end mirror code
 
-void SDLSurface::render(creaturesImage *image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror, bool is_background) {
+void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror, bool is_background) {
+	assert(image);
+
 	// don't bother rendering off-screen stuff
 	if (x >= (int)width) return; if (y >= (int)height) return;
 	if ((x + image->width(frame)) <= 0) return;

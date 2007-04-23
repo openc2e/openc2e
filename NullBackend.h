@@ -24,7 +24,7 @@
 
 class NullSurface : public Surface {
 public:
-	virtual void render(creaturesImage *image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false) { }
+	virtual void render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false) { }
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) { }
 	virtual void blitSurface(Surface *src, int x, int y, int w, int h)  { }
 	virtual unsigned int getWidth() const { return 800; }

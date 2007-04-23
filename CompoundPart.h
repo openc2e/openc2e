@@ -70,7 +70,7 @@ public:
 
 class SpritePart : public CompoundPart {
 protected:
-	creaturesImage *origsprite, *sprite;
+	shared_ptr<creaturesImage> origsprite, sprite;
 	unsigned int firstimg, pose, frameno, base, spriteno;
 	SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
@@ -81,7 +81,7 @@ public:
 	bool draw_mirrored;
 	unsigned char framerate;
 	unsigned int framedelay;
-	creaturesImage *getSprite() { return sprite; }
+	shared_ptr<creaturesImage> getSprite() { return sprite; }
 	virtual void partRender(class Surface *renderer, int xoffset, int yoffset);
 	virtual void tick();
 	virtual void handleClick(float, float);
@@ -131,7 +131,7 @@ struct linedata {
 };
 
 struct texttintinfo {
-	creaturesImage *sprite;
+	shared_ptr<creaturesImage> sprite;
 	unsigned int offset;
 };
 
@@ -147,7 +147,7 @@ protected:
 	unsigned int currpage;
 	std::string text;
 	
-	creaturesImage *textsprite;
+	shared_ptr<creaturesImage> textsprite;
 	
 	int leftmargin, topmargin, rightmargin, bottommargin;
 	int linespacing, charspacing;
@@ -186,7 +186,7 @@ public:
 
 class TextEntryPart : public TextPart {
 private:
-	static creaturesImage *caretsprite;
+	static shared_ptr<creaturesImage> caretsprite;
 	unsigned int caretpose;
 	bool focused;
 	unsigned int caretpos;

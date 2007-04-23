@@ -58,20 +58,19 @@ void World::init() {
 	if (catalogue.hasTag("Pointer Information")) {
 		const std::vector<std::string> &pointerinfo = catalogue.getTag("Pointer Information");
 		if (pointerinfo.size() >= 3) {
-			creaturesImage *img = gallery.getImage(pointerinfo[2]);
+			shared_ptr<creaturesImage> img = gallery.getImage(pointerinfo[2]);
 			if (img) {
 				theHand = new PointerAgent(pointerinfo[2]);
 				theHand->finishInit();
 				// TODO: set family/genus/species based on the first entry (normally "2 1 1")
 				// TODO: work out what second entry is ("2 2" normally?! "7 7" in CV)
-				gallery.delImage(img);
 			}
 		}
 	}
 	
 	// If for some reason we failed to do that (missing/bad catalogue tag? missing file?), try falling back to a sane default.
 	if (!theHand) {
-		creaturesImage *img;
+		shared_ptr<creaturesImage> img;
 		if (gametype == "c3")
 			img = gallery.getImage("hand"); // as used in C3 and DS
 		else
@@ -80,7 +79,6 @@ void World::init() {
 			throw creaturesException("no valid \"Pointer Information\" catalogue tag, and fallback failed");
 		theHand = new PointerAgent(img->name);
 		theHand->finishInit();
-		gallery.delImage(img);
 		std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->name << "'." << std::endl;
 	}
 
@@ -288,7 +286,7 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 	}
 	int adjustx = cam->getX();
 	int adjusty = cam->getY();
-	creaturesImage *bkgd = m->getBackground(""); // TODO
+	shared_ptr<creaturesImage> bkgd = m->getBackground(""); // TODO
 
 	// TODO: work out what c2e does when it doesn't have a background..
 	if (!bkgd) return;

@@ -79,7 +79,7 @@ path cacheDirectory() {
 	return p;
 }
 
-bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype ft) {
+bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
 	path cachefile, realfile;
 	std::string cachename;
 	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
@@ -150,10 +150,10 @@ bool tryOpen(mmapifstream *in, creaturesImage *&img, std::string fname, filetype
 done:
 	if (in->is_open()) {
 		switch (ft) {
-			case blk: img = new blkImage(in); break;
-			case c16: img = new c16Image(in); break; // this should never happen, actually, once we're done
-			case s16: img = new s16Image(in); break;
-			case spr: img = new sprImage(in); break;
+			case blk: img = shared_ptr<creaturesImage>(new blkImage(in)); break;
+			case c16: img = shared_ptr<creaturesImage>(new c16Image(in)); break; // this should never happen, actually, once we're done
+			case s16: img = shared_ptr<creaturesImage>(new s16Image(in)); break;
+			case spr: img = shared_ptr<creaturesImage>(new sprImage(in)); break;
 		}
 		img->name = basename;
 	}
@@ -164,20 +164,18 @@ done:
  * Retrieve an image for rendering use. To retrieve a sprite, pass the name without
  * extension. To retrieve a background, pass the full filename (ie, with .blk).
  */
-creaturesImage *imageGallery::getImage(std::string name) {
-	if (name.empty()) return 0; // empty sprites definitely don't exist
+shared_ptr<creaturesImage> imageManager::getImage(std::string name) {
+	if (name.empty()) return shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
 
 	// step one: see if the image is already in the gallery
-	std::map<std::string, creaturesImage *>::iterator i = gallery.find(name);
-	if (i != gallery.end()) {
-		creaturesImage *img = i->second;
-		img->addRef();
-		return img;
+	std::map<std::string, boost::weak_ptr<creaturesImage> >::iterator i = images.find(name);
+	if (i != images.end() && i->second.lock()) {
+		return i->second.lock();
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
 	mmapifstream *in = new mmapifstream();
-	creaturesImage *img;
+	shared_ptr<creaturesImage> img;
 
 	if (!tryOpen(in, img, name + ".s16", s16)) {
 		if (!tryOpen(in, img, name + ".c16", c16)) {
@@ -185,34 +183,22 @@ creaturesImage *imageGallery::getImage(std::string name) {
 				bool lasttry = tryOpen(in, img, name, blk);
 				if (!lasttry) {
 					std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
-					return 0;
+					return shared_ptr<creaturesImage>();
 				}
-				gallery[name] = img;
+				images[name] = img;
 			} else {
-				gallery[name] = img;
+				images[name] = img;
 			}
 		} else {
-			gallery[name] = img;
+			images[name] = img;
 		}
 	} else {
-		gallery[name] = img;
+		images[name] = img;
 	}
 	
 	in->close(); // doesn't close the mmap, which we still need :)
 
-	gallery[name]->addRef();
-	return gallery[name];
-}
-
-void imageGallery::delImage(creaturesImage *in) {
-	in->delRef();
-	if (in->refCount() == 0) {
-		delete in;
-		for (std::map<std::string, creaturesImage *>::iterator i = gallery.begin(); i != gallery.end(); i++) {
-			if (i->second == in) { gallery.erase(i); return; }
-		}
-		std::cerr << "imageGallery warning: delImage got a newly unreferenced image but it isn't in the gallery\n";
-	}
+	return img;
 }
 
 /* vim: set noet: */

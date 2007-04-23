@@ -24,8 +24,8 @@
 #include <assert.h>
 #include "Backend.h"
 
-MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, creaturesImage *spr, bool wrap) {
-	xloc = _x; yloc = _y; wid = _width; hei = _height; firstback = 0; wraps = wrap;
+MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, shared_ptr<creaturesImage> spr, bool wrap) {
+	xloc = _x; yloc = _y; wid = _width; hei = _height; wraps = wrap;
 
 	// if we were provided with a background, add it
 	if (!back.empty()) {
@@ -37,8 +37,8 @@ MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &b
 	}
 }
 
-void MetaRoom::addBackground(std::string back, creaturesImage *spr) {
-	creaturesImage *backsprite;
+void MetaRoom::addBackground(std::string back, shared_ptr<creaturesImage> spr) {
+	shared_ptr<creaturesImage> backsprite;
 	unsigned int totalwidth, totalheight;
 
 	caos_assert(!back.empty());
@@ -50,7 +50,7 @@ void MetaRoom::addBackground(std::string back, creaturesImage *spr) {
 	if (!spr) {
 		// we weren't passed a sprite, so we need to load one
 		backsprite = world.gallery.getImage(back + ".blk");
-		blkImage *background = dynamic_cast<blkImage *>(backsprite);
+		blkImage *background = dynamic_cast<blkImage *>(backsprite.get());
 		caos_assert(background);
 
 		totalwidth = background->totalwidth;
@@ -80,19 +80,19 @@ std::vector<std::string> MetaRoom::backgroundList() {
 	// construct a temporary vector from our std::map
 
 	std::vector<std::string> b;
-	for (std::map<std::string, creaturesImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
+	for (std::map<std::string, shared_ptr<creaturesImage> >::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
 		b.push_back(i->first);
 	return b;
 }
 
-creaturesImage *MetaRoom::getBackground(std::string back) {
+shared_ptr<creaturesImage> MetaRoom::getBackground(std::string back) {
 	// return the first background by default
 	if (back.empty()) {
 		return firstback;
 	}
 	
 	// if this background name isn't found, return null
-	if (backgrounds.find(back) != backgrounds.end()) return 0;
+	if (backgrounds.find(back) != backgrounds.end()) return shared_ptr<creaturesImage>();
 	
 	// otherwise, return the relevant background
 	return backgrounds[back];
@@ -102,11 +102,6 @@ MetaRoom::~MetaRoom() {
 	// delete the rooms
 	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		delete *i;
-	}
-
-	// zap the background image references
-	for (std::map<std::string, creaturesImage *>::iterator i = backgrounds.begin(); i != backgrounds.end(); i++) {
-		world.gallery.delImage(i->second);
 	}
 }
 

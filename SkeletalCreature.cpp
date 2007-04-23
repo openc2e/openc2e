@@ -87,10 +87,6 @@ SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : Creatur
 	pregnancy = 0;
 	eyesclosed = false;
 
-	for (int i = 0; i < 14; i++) {
-		images[i] = 0;
-	}
-	
 	skeletonInit();
 
 	// needs to go last for now, so we can throw exceptions from skeletonInit
@@ -117,9 +113,7 @@ void SkeletalCreature::skeletonInit() {
 			if (i == 6 || i == 13) continue;
 
 		// try this stage and the stages below it to find data which worksforus
-		if (images[i])
-			world.gallery.delImage(images[i]);
-		images[i] = 0;
+		images[i].reset();
 		char x = cee_bodyparts[i].letter;
 		int stage_to_try = creature->getStage();
 		creatureAppearanceGene *partapp = 0;
@@ -144,11 +138,11 @@ void SkeletalCreature::skeletonInit() {
 			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % (unsigned char)x));
 	
 		if (engine.version == 1) partapp->species = 0; // TODO: don't stomp over the gene? :P
-		while (stage_to_try > -1 && images[i] == 0) {
+		while (stage_to_try > -1 && !images[i]) {
 			images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
-			if (images[i] == 0) stage_to_try--;
+			if (!images[i]) stage_to_try--;
 		}
-		if (images[i] == 0)
+		if (!images[i])
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % (int)creature->getStage()));
 
 		std::string attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att");

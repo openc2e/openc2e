@@ -30,11 +30,11 @@ class MetaRoom {
 protected:
 	FRIEND_SERIALIZE(MetaRoom);
 	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
-	std::map<std::string, creaturesImage *> backgrounds;
-	creaturesImage *firstback;
+	std::map<std::string, shared_ptr<creaturesImage> > backgrounds;
+	shared_ptr<creaturesImage> firstback;
 	bool wraps;
 	
-	MetaRoom() { firstback = 0; }
+	MetaRoom() { }
 
 public:
 	std::vector<class Room *> rooms;
@@ -48,13 +48,13 @@ public:
 	bool wraparound() { return wraps; }
 
 	unsigned int addRoom(class Room *);
-	void addBackground(std::string, creaturesImage * = 0);
-	creaturesImage *getBackground(std::string);
+	void addBackground(std::string, shared_ptr<creaturesImage> = shared_ptr<creaturesImage>());
+	shared_ptr<creaturesImage> getBackground(std::string);
 	std::vector<std::string> backgroundList();
 
 	unsigned int id;
 
-	MetaRoom(int _x, int _y, int width, int height, const std::string &back, creaturesImage * = 0, bool wrap = false);
+	MetaRoom(int _x, int _y, int width, int height, const std::string &back, shared_ptr<creaturesImage> = shared_ptr<creaturesImage>(), bool wrap = false);
 	~MetaRoom();
 };
 

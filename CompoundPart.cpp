@@ -39,7 +39,7 @@ bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) con
 	return s1->getParent()->getZOrder() > s2->getParent()->getZOrder();
 }
 
-creaturesImage *TextEntryPart::caretsprite = 0;
+shared_ptr<creaturesImage> TextEntryPart::caretsprite;
 
 void CompoundPart::render(Surface *renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
@@ -123,12 +123,10 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 }
 
 SpritePart::~SpritePart() {
-	world.gallery.delImage(origsprite);
-	if (origsprite != sprite) delete sprite;
 }
 
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
-	creaturesImage *spr = world.gallery.getImage(spritefile);
+	shared_ptr<creaturesImage> spr = world.gallery.getImage(spritefile);
 	caos_assert(spr);
 	caos_assert(spr->numframes() > fimg);
 	// TODO: should we preserve base/pose here, instead?
@@ -136,9 +134,7 @@ void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	base = 0;
 	firstimg = fimg;
 	spriteno = fimg;
-	world.gallery.delImage(origsprite);
 	// TODO: should we preserve tint?
-	if (origsprite != sprite) delete sprite;
 	origsprite = sprite = spr;
 }
 
@@ -157,11 +153,10 @@ void CompoundPart::addZOrder() {
 }
 
 void SpritePart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
-	assert(dynamic_cast<duppableImage *>(origsprite));
-	if (origsprite != sprite) delete sprite;
+	assert(dynamic_cast<duppableImage *>(origsprite.get()));
 	s16Image *newsprite = new s16Image();
-	sprite = newsprite;
-	((duppableImage *)origsprite)->duplicateTo(newsprite);
+	sprite = shared_ptr<creaturesImage>(newsprite);
+	((duppableImage *)origsprite.get())->duplicateTo(newsprite);
 	newsprite->tint(r, g, b, rotation, swap);
 }
 
@@ -196,10 +191,6 @@ TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned 
 }
 
 TextPart::~TextPart() {
-	for (std::vector<texttintinfo>::iterator i = tints.begin(); i != tints.end(); i++)
-		if (i->sprite != textsprite)
-			delete i->sprite;	
-	world.gallery.delImage(textsprite);
 }
 
 void TextPart::addTint(std::string tintinfo) {
@@ -231,11 +222,11 @@ void TextPart::addTint(std::string tintinfo) {
 	t.offset = text.size();
 
 	if (!(r == g == b == rot == swap == 128)) {
-		assert(dynamic_cast<duppableImage *>(textsprite));
+		assert(dynamic_cast<duppableImage *>(textsprite.get()));
 		s16Image *tintedsprite = new s16Image();
-		((duppableImage *)textsprite)->duplicateTo(tintedsprite);
+		((duppableImage *)textsprite.get())->duplicateTo(tintedsprite);
 		tintedsprite->tint(r, g, b, rot, swap);
-		t.sprite = tintedsprite;
+		t.sprite = shared_ptr<creaturesImage>(tintedsprite);
 	} else t.sprite = textsprite;
 
 	tints.push_back(t);
@@ -243,9 +234,6 @@ void TextPart::addTint(std::string tintinfo) {
 
 void TextPart::setText(std::string t) {
 	text.clear();
-	for (std::vector<texttintinfo>::iterator i = tints.begin(); i != tints.end(); i++)
-		if (i->sprite != textsprite)
-			delete i->sprite;
 	tints.clear();
 
 	// parse and remove the <tint> tagging
@@ -458,7 +446,7 @@ void TextPart::partRender(Surface *renderer, int xoffset, int yoffset, TextEntry
 		currenty = (textheight - pageheights[currpage]) / 2;
 	unsigned int startline = pages[currpage];
 	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
-	creaturesImage *sprite = textsprite; unsigned int currtint = 0;
+	shared_ptr<creaturesImage> sprite = textsprite; unsigned int currtint = 0;
 	for (unsigned int i = startline; i < endline; i++) {	
 		unsigned int currentx = 0, somex = xoff;
 		if (horz_align == rightalign)

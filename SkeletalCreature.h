@@ -35,7 +35,7 @@ private:
 	unsigned int pregnancy;
 	bool eyesclosed;
 
-	creaturesImage *images[14];
+	shared_ptr<creaturesImage> images[14];
 	attFile att[14];
 
 	int width, height, adjustx, adjusty;

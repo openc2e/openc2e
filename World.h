@@ -67,7 +67,7 @@ public:
 	Scriptorium scriptorium;
 	Catalogue catalogue;
 	prayManager praymanager;
-	imageGallery gallery;
+	imageManager gallery;
 	historyManager history;
 		
 	std::string gametype;

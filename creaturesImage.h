@@ -25,6 +25,10 @@
 #include <fstream>
 #include "endianlove.h"
 #include <cassert>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+
+using boost::shared_ptr;
 
 class creaturesImage {
 private:
@@ -59,13 +63,12 @@ public:
 	friend class c16Image; // so duplicateTo can create a s16Image as required
 };
 
-class imageGallery {
+class imageManager {
 protected:
-	std::map<std::string, creaturesImage *> gallery;
+	std::map<std::string, boost::weak_ptr<creaturesImage> > images;
 
 public:
-	creaturesImage *getImage(std::string name);
-	void delImage(creaturesImage *i);
+	shared_ptr<creaturesImage> getImage(std::string name);
 };
 
 #endif
