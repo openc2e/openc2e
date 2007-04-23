@@ -23,6 +23,7 @@
 #include "caosVar.h"
 #include "Backend.h"
 #include <map>
+#include <boost/filesystem/path.hpp>
 
 class Engine {
 protected:
@@ -65,6 +66,9 @@ public:
 	void shutdown();
 
 	bool noRun() { return cmdline_norun; }
+
+	boost::filesystem::path homeDirectory();
+	boost::filesystem::path storageDirectory();
 };
 
 extern Engine engine;

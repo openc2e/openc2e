@@ -23,6 +23,7 @@
 #include "blkImage.h"
 #include "openc2e.h"
 #include "World.h"
+#include "Engine.h"
 #include "fileSwapper.h"
 
 #ifndef _WIN32
@@ -37,47 +38,10 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#ifndef _WIN32
-#include <sys/types.h> // passwd*
-#include <pwd.h> // getpwuid
-#endif
 
 using namespace boost::filesystem;
 
 enum filetype { blk, s16, c16, spr };
-
-#ifndef _WIN32
-path homeDirectory() {
-	path p;
-	char *envhome = getenv("HOME");
-	if (envhome)
-		p = path(envhome, native);
-	if ((!envhome) || (!is_directory(p)))
-		p = path(getpwuid(getuid())->pw_dir, native);
-	if (!is_directory(p)) {
-		std::cerr << "Can't work out what your home directory is, giving up and using /tmp for now." << std::endl;
-		p = path("/tmp", native); // sigh
-	}
-	return p;
-}
-#else
-path homeDirectory() {
-	// TODO: fix this!
-	path p = path("./temp", native);
-	if (!exists(p))
-		create_directory(p);
-	return p;
-}
-#endif
-
-path cacheDirectory() {
-	path p = path(homeDirectory().native_directory_string() + "/.openc2e", native);
-	if (!exists(p))
-		create_directory(p);
-	else if (!is_directory(p))
-		throw creaturesException("Your .openc2e is a file, not a directory. That's bad.");
-	return p;
-}
 
 bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
 	path cachefile, realfile;
@@ -100,7 +64,7 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 	if (!exists(realfile)) return false;
 	
 	// work out where the cached file should be
-	cachename = cacheDirectory().native_directory_string() + "/" + fname;
+	cachename = engine.storageDirectory().native_directory_string() + "/" + fname;
 	if (ft == c16) { // TODO: we should really stop the caller from appending .s16/.c16
 		cachename.erase(cachename.end() - 4, cachename.end());
 		cachename.append(".s16");

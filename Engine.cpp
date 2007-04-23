@@ -25,11 +25,17 @@
 #include "dialect.h" // registerDelegates
 
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
+
+#ifndef _WIN32
+#include <sys/types.h> // passwd*
+#include <pwd.h> // getpwuid
+#endif
 
 Engine engine;
 
@@ -479,8 +485,6 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 	}
 }
 
-extern fs::path homeDirectory(); // creaturesImage.cpp
-extern fs::path cacheDirectory(); // creaturesImage.cpp
 static const char data_default[] = "./data";
 
 static void opt_version() {
@@ -569,7 +573,7 @@ bool Engine::initialSetup(Backend *b) {
 	}
 
 	// finally, add our cache directory to the end
-	world.data_directories.push_back(cacheDirectory());
+	world.data_directories.push_back(storageDirectory());
 	
 	// initial setup
 	registerDelegates();
@@ -647,5 +651,39 @@ void Engine::shutdown() {
 	engine.backend->shutdown();
 	freeDelegates(); // does nothing if there are none (ie, no call to initialSetup)
 }
+
+#ifndef _WIN32
+fs::path Engine::homeDirectory() {
+	fs::path p;
+	char *envhome = getenv("HOME");
+	if (envhome)
+		p = fs::path(envhome, fs::native);
+	if ((!envhome) || (!fs::is_directory(p)))
+		p = fs::path(getpwuid(getuid())->pw_dir, fs::native);
+	if (!fs::is_directory(p)) {
+		std::cerr << "Can't work out what your home directory is, giving up and using /tmp for now." << std::endl;
+		p = fs::path("/tmp", fs::native); // sigh
+	}
+	return p;
+}
+#else
+fs::path Engine::homeDirectory() {
+	// TODO: fix this!
+	fs::path p = fs::path("./temp", fs::native);
+	if (!fs::exists(p))
+		fs::create_directory(p);
+	return p;
+}
+#endif
+
+fs::path Engine::storageDirectory() {
+	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.openc2e", fs::native);
+	if (!fs::exists(p))
+		fs::create_directory(p);
+	else if (!fs::is_directory(p))
+		throw creaturesException("Your .openc2e is a file, not a directory. That's bad.");
+	return p;
+}
+
 
 /* vim: set noet: */
