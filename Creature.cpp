@@ -211,8 +211,10 @@ void c2eCreature::tick() {
 
 	senses[0] = 1.0f; // always-on
 	senses[9] = 1.0f; // air quality (TODO)
-	
-	brain->tick();
+
+	// TODO: correct timing?
+	if ((ticks % 4) == 0)
+		brain->tick();
 
 	tickBiochemistry();
 
