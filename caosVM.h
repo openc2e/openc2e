@@ -214,6 +214,7 @@ public:
 	void v_RTYP();
 	void v_RTYP_c2();
 	void c_DOOR();
+	void v_DOOR();
 	void c_RATE();
 	void v_ROOM();
 	void v_LEFT();
@@ -259,6 +260,7 @@ public:
 	void v_PSRC();
 	void v_WNDX();
 	void v_WNDY();
+	void c_DOCA();
 	
 	// camera
 	void v_VISI();
@@ -297,6 +299,7 @@ public:
 	void v_WNAM();
 	void v_WUID();
 	void c_WTNT();
+	void v_NWLD();
 
 	// core
 	void v_GAME();
@@ -449,6 +452,7 @@ public:
 	void c_MESG_WRT();
 	void v_TOTL();
 	void c_SHOW();
+	void v_SHOW();
 	void v_POSX();
 	void v_POSY();
 	void c_FRAT();
@@ -506,6 +510,10 @@ public:
 	void v_LIMB_c1();
 	void v_OBJP();
 	void v_XIST();
+	void c_SCLE();
+	void c_IMGE();
+	void c_TNTW();
+	void c_PRNT();
 	
 	// motion
 	void c_ELAS();
@@ -679,6 +687,7 @@ public:
 	void v_BVAR();
 	void c_EXPR();
 	void v_EXPR();
+	void c_TNTC();
 	// (clothes)
 	void c_BODY();
 	void v_BODY();
@@ -690,6 +699,7 @@ public:
 	void c_SWAP();
 	void c_WEAR();
 	void v_WEAR();
+	void c_TNTO();
 	// (attachment locations)
 	void v_DFTX();
 	void v_DFTY();
@@ -743,6 +753,8 @@ public:
 	void v_SEAV();
 	void c_ASEA();
 	void v_TMOD();
+	void v_DAYT();
+	void v_MONT();
 
 	// resources
 	void v_PRAY_AGTI();
@@ -780,6 +792,7 @@ public:
 	void v_CLAC();
 	void v_CLIK();
 	void c_SCRL();
+	void c_MOUS();
 
 	// vehicles
 	void c_CABN();

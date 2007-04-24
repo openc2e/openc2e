@@ -94,4 +94,12 @@ void caosVM::c_WTNT() {
 	// TODO
 }
 
+/**
+ NWLD (integer)
+ %status stub
+*/
+void caosVM::v_NWLD() {
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */

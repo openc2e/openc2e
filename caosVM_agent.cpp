@@ -819,6 +819,15 @@ void caosVM::c_SHOW() {
 }
 
 /**
+ SHOW (integer)
+ %status maybe
+*/
+void caosVM::v_SHOW() {
+	valid_agent(targ);
+	result.setInt(targ->visible ? 1 : 0);
+}
+
+/**
  POSX (float)
  %status maybe
  %pragma variants c2 cv c3
@@ -1747,6 +1756,45 @@ void caosVM::v_XIST() {
 		result.setInt(1);
 	else
 		result.setInt(0);
+}
+
+/**
+ SCLE (command) pose (integer) scaleby (integer)
+ %status stub
+*/
+void caosVM::c_SCLE() {
+	VM_PARAM_INTEGER(scaleby)
+	VM_PARAM_INTEGER(pose)
+
+	// TODO
+}
+
+/**
+ IMGE (command) filename (string)
+ %status stub
+*/
+void caosVM::c_IMGE() {
+	VM_PARAM_STRING(filename)
+
+	// TODO
+}
+
+/**
+ TNTW (command) index (integer)
+ %status stub
+*/
+void caosVM::c_TNTW() {
+	VM_PARAM_INTEGER(index)
+
+	// TODO
+}
+
+/**
+ PRNT (command) pose (integer)
+ %status stub
+*/
+void caosVM::c_PRNT() {
+	// TODO
 }
 
 /* vim: set noet: */

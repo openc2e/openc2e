@@ -279,4 +279,20 @@ void caosVM::v_SEAV() {
 	result.setInt(0); // TODO
 }
 
+/**
+ DAYT (integer)
+ %status stub
+*/
+void caosVM::v_DAYT() {
+	result.setInt(0); // TODO
+}
+
+/**
+ MONT (integer)
+ %status stub
+*/
+void caosVM::v_MONT() {
+	result.setInt(0); // TODO
+}
+
 /* vim: set noet: */

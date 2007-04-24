@@ -256,6 +256,17 @@ void caosVM::c_DOOR() {
 }
 
 /**
+ DOOR (integer) room1 (integer) room2 (integer)
+ %status stub
+*/
+void caosVM::v_DOOR() {
+	VM_PARAM_INTEGER(room2)
+	VM_PARAM_INTEGER(room1)
+
+	result.setInt(-1); // TODO
+}
+
+/**
  RATE (command) roomtype (integer) caindex (integer) gain (float) loss (float) diffusion (float)
  %status maybe
 
@@ -936,6 +947,16 @@ void caosVM::v_WNDY() {
 	Room *r = roomContainingAgent(targ);
 	caos_assert(r);
 	result.setInt(r->windy);
+}
+
+/**
+ DOCA (command) times (integer)
+ %status stub
+*/
+void caosVM::c_DOCA() {
+	VM_PARAM_INTEGER(times)
+
+	// TODO
 }
 
 /* vim: set noet: */

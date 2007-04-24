@@ -1438,6 +1438,18 @@ void caosVM::v_EXPR() {
 	result.setInt(0); // TODO
 }
 
+/**
+ TNTC (command) tintindex (integer) part (integer) commit (integer)
+ %status stub
+*/
+void caosVM::c_TNTC() {
+	VM_PARAM_INTEGER(commit)
+	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER(tintindex)
+
+	// TODO
+}
+
 // clothes
 
 /**
@@ -1541,6 +1553,19 @@ void caosVM::v_WEAR() {
 	VM_PARAM_INTEGER(part)
 
 	result.setInt(-1); // TODO
+}
+
+/**
+ TNTO (command) tintindex (integer) part (integer) set (integer) layer (integer)
+ %status stub
+*/
+void caosVM::c_TNTO() {
+	VM_PARAM_INTEGER(layer)
+	VM_PARAM_INTEGER(set)
+	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER(tintindex)
+
+	// TODO
 }
 
 // attachment locations

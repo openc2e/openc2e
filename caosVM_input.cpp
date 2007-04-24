@@ -249,4 +249,14 @@ void caosVM::c_SCRL() {
 	// TODO
 }
 
+/**
+ MOUS (command) behaviour (integer)
+ %status stub
+*/
+void caosVM::c_MOUS() {
+	VM_PARAM_INTEGER(behaviour)
+	
+	// TODO
+}
+
 /* vim: set noet: */
