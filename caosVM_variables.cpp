@@ -533,6 +533,8 @@ void caosVM::v_TAN_() {
 void caosVM::v_SQRT() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
+
+	caos_assert(x >= 0); // no imaginary numbers for you!
 	
 	result.setFloat(sqrt(x));
 }
