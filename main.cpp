@@ -25,13 +25,13 @@
 #include "SDLBackend.h"
 #include "NullBackend.h"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && defined(_DEBUG)
 #undef main // because SDL is stupid
 #endif
 
 extern "C" int main(int argc, char *argv[]) {
 	try {
-		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2006 Alyssa Milburn and others\n\n";
+		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2007 Alyssa Milburn and others\n\n";
 
 		// pass command-line flags to the engine, but do no other setup
 		if (!engine.parseCommandLine(argc, argv)) return 1;
