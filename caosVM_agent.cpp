@@ -1683,7 +1683,7 @@ void caosVM::c_SETV_CLAS() {
 void caosVM::v_LIML() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
 	if (r) result.setInt(r->x_left);
 	else result.setInt(0);
@@ -1697,7 +1697,7 @@ void caosVM::v_LIML() {
 void caosVM::v_LIMT() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
 	if (r) result.setInt(r->y_left_ceiling);
 	else result.setInt(0);
@@ -1711,7 +1711,7 @@ void caosVM::v_LIMT() {
 void caosVM::v_LIMR() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
 	if (r) result.setInt(r->x_right);
 	else result.setInt(8352); // TODO
@@ -1726,7 +1726,7 @@ void caosVM::v_LIMR() {
 void caosVM::v_LIMB_c1() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	Room *r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
 	if (r) result.setInt(r->y_left_floor);
 	else result.setInt(1200); // TODO

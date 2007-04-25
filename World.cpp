@@ -335,8 +335,8 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 	}
 
 	if (showrooms) {
-		Room *r = map.roomAt(hand()->x, hand()->y);
-		for (std::vector<Room *>::iterator i = cam->getMetaRoom()->rooms.begin();
+		shared_ptr<Room> r = map.roomAt(hand()->x, hand()->y);
+		for (std::vector<shared_ptr<Room> >::iterator i = cam->getMetaRoom()->rooms.begin();
 				 i != cam->getMetaRoom()->rooms.end(); i++) {
 			unsigned int col = 0xFFFF00CC;
 			if (*i == r) col = 0xFF00FFCC;

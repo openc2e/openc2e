@@ -20,7 +20,7 @@
 #ifndef AGENTHELPERS_H
 #define AGENTHELPERS_H
 
-bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, Room *ownerroom);
+bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, shared_ptr<Room> ownerroom);
 bool agentIsVisible(Agent *seeing, Agent *dest);
 std::vector<boost::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char family, unsigned char genus, unsigned short species);
 

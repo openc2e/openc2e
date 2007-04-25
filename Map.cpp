@@ -55,11 +55,11 @@ MetaRoom *Map::getMetaRoom(unsigned int room) {
 	return 0;
 }
 
-Room *Map::getRoom(unsigned int r) {
-	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++)
+shared_ptr<Room> Map::getRoom(unsigned int r) {
+	for (std::vector<shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++)
 		if ((*i)->id == r)
 			return *i;
-	return 0;
+	return shared_ptr<Room>();
 }
 
 unsigned int Map::getMetaRoomCount() {
@@ -73,13 +73,13 @@ unsigned int Map::getRoomCount() {
 void Map::tick() {
 	// Three passes..
 	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<Room *>::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+		for (std::vector<shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
 			(*i)->tick();
 	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<Room *>::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+		for (std::vector<shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
 			(*i)->postTick();
 	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<Room *>::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+		for (std::vector<shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
 			(*i)->resetTick();
 }
 
@@ -93,19 +93,19 @@ MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 	return 0;
 }
 
-Room *Map::roomAt(float _x, float _y) {
+shared_ptr<Room> Map::roomAt(float _x, float _y) {
 	MetaRoom *m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
-	if (!m) return 0;
-	for (std::vector<Room *>::iterator i = m->rooms.begin(); i != m->rooms.end(); i++) {
-		Room *r = *i;
+	if (!m) return shared_ptr<Room>();
+	for (std::vector<shared_ptr<Room> >::iterator i = m->rooms.begin(); i != m->rooms.end(); i++) {
+		shared_ptr<Room> r = *i;
 //		std::cerr << (void *)r << " -> contains " << _x << "," << _y << std::endl;
 		if (r->containsPoint(_x, _y)) return r;
 	}
-	return 0;
+	return shared_ptr<Room>();
 }
 
-bool Map::collideLineWithRoomSystem(Point src, Point dest, Room *&room, Point &where, Line &wall, unsigned int &walldir, int perm) {
-	Room *newRoom = 0;
+bool Map::collideLineWithRoomSystem(Point src, Point dest, shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm) {
+	shared_ptr<Room> newRoom;
 
 	where = src;
 	
@@ -126,13 +126,13 @@ bool Map::collideLineWithRoomSystem(Point src, Point dest, Room *&room, Point &w
 /*
  * poss. optimisation: skip checking the rest of the lines if our distance is 0?
  */
-bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room *&newroom, Point &where, Line &wall, unsigned int &walldir, int perm) {
+bool Map::collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> room, shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm) {
 	assert(room);
 	// TODO: this assert fails. why? 'where' is presumably outside the dest room sometimes.. mmh
 	//assert(room->containsPoint(src.x, src.y));
 	if (src == dest) return false;
 
-	newroom = 0;
+	newroom.reset();
 
 	/* if (room->containsPoint(dest.x, dest.y)) {
 		where = dest;
@@ -141,7 +141,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 
 	float distance = 100000000.0f; // TODO: lots.
 	bool foundsomething = false;
-	bool previousroom = (newroom != 0);
+	bool previousroom = (newroom);
 	Point oldpoint = where;
 	Line movement(src, dest);
 
@@ -193,18 +193,19 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 				continue; // continue, bad collision
 			}
 
-			Room *nextroom = 0;
+			shared_ptr<Room> nextroom;
 			bool foundroom = false;
 
-			for (std::map<Room *,RoomDoor *>::iterator r = room->doors.begin(); r != room->doors.end(); r++) {
-				assert(r->first);
+			for (std::map<boost::weak_ptr<Room>,RoomDoor *>::iterator r = room->doors.begin(); r != room->doors.end(); r++) {
+				shared_ptr<Room> otherroom = r->first.lock();
+				assert(otherroom);
 				assert(r->second);
-				if (r->first->containsPoint(newx, newy)) {
+				if (otherroom->containsPoint(newx, newy)) {
 					// this is our next room!
 					foundroom = true;
 					// if boundary perm is going to let us through..
 					if (perm <= r->second->perm) // TODO: right?
-						nextroom = r->first;
+						nextroom = otherroom;
 					break;
 				}
 			}
@@ -220,7 +221,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room 
 				}
 			}*/
 		
-			Room *z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
+			shared_ptr<Room> z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
 			if (!z) {
 				// TODO: commented out this error message for sake of fuzzie's sanity, but it's still an issue
 				/*std::cout << "physics bug: fell out of room system at (" << where.x << ", " << where.y << ")" << std::endl;

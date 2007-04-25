@@ -99,13 +99,10 @@ shared_ptr<creaturesImage> MetaRoom::getBackground(std::string back) {
 }
 	
 MetaRoom::~MetaRoom() {
-	// delete the rooms
-	for (std::vector<Room *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
-		delete *i;
-	}
+	// we hold the only strong reference to our contained rooms, so they'll be auto-deleted
 }
 
-unsigned int MetaRoom::addRoom(Room *r) {
+unsigned int MetaRoom::addRoom(shared_ptr<Room> r) {
 	// add to both our local list and the global list
 	rooms.push_back(r);
 	world.map.rooms.push_back(r);

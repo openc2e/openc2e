@@ -772,7 +772,7 @@ void MapData::copyToWorld() {
 		CRoom *src = *i;
 
 		// create a new room, set the type
-		Room *r = new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom);
+		shared_ptr<Room> r(new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom));
 		r->type.setInt(src->roomtype);
 
 		// add the room to the world, ensure it matches the id we retrieved
@@ -813,8 +813,8 @@ void MapData::copyToWorld() {
 		for (unsigned int j = 0; j < 4; j++) {
 			for (std::vector<CDoor *>::iterator k = src->doors[j].begin(); k < src->doors[j].end(); k++) {
 				CDoor *door = *k;
-				Room *r1 = world.map.getRoom(src->id);
-				Room *r2 = world.map.getRoom(door->otherroom);
+				shared_ptr<Room> r1 = world.map.getRoom(src->id);
+				shared_ptr<Room> r2 = world.map.getRoom(door->otherroom);
 		
 				if (r1->doors.find(r2) == r1->doors.end()) {
 					// create a new door between rooms!

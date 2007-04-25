@@ -37,7 +37,7 @@ protected:
 	MetaRoom() { }
 
 public:
-	std::vector<class Room *> rooms;
+	std::vector<shared_ptr<class Room> > rooms;
 
 	unsigned int x() { return xloc; }
 	unsigned int y() { return yloc; }
@@ -47,7 +47,7 @@ public:
 	unsigned int fullheight() { return fullhei; }
 	bool wraparound() { return wraps; }
 
-	unsigned int addRoom(class Room *);
+	unsigned int addRoom(shared_ptr<class Room>);
 	void addBackground(std::string, shared_ptr<creaturesImage> = shared_ptr<creaturesImage>());
 	shared_ptr<creaturesImage> getBackground(std::string);
 	std::vector<std::string> backgroundList();

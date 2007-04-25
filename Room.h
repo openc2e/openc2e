@@ -27,20 +27,20 @@
 #include "caosVar.h"
 #include <iostream>
 #include <algorithm>
+#include <boost/weak_ptr.hpp>
 
 using std::cerr;
 
 #define CA_COUNT 20
 
 struct RoomDoor {
-	class Room *first, *second;
+	boost::weak_ptr<class Room> first, second;
 	unsigned short perm;
 };
 
 class Room {
 public:
-	std::map<Room *,RoomDoor *> doors;
-	std::set<Room *> nearby;
+	std::map<boost::weak_ptr<Room>,RoomDoor *> doors;
 	unsigned int x_left, x_right, y_left_ceiling, y_right_ceiling;
 	unsigned int y_left_floor, y_right_floor;
 	

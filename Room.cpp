@@ -94,8 +94,8 @@ void Room::postTick() {
 
 		// adjust for diffusion to/from surrounding rooms
 		// TODO: absolutely no clue if this is correct
-		for (std::map<Room *,RoomDoor *>::iterator d = doors.begin(); d != doors.end(); d++) {
-			Room *dest = (d->second->first == this) ? d->second->second : d->second->first;
+		for (std::map<boost::weak_ptr<Room>,RoomDoor *>::iterator d = doors.begin(); d != doors.end(); d++) {
+			shared_ptr<Room> dest = (d->second->first.lock().get() == this) ? d->second->second.lock() : d->second->first.lock();
 			assert(dest);
 			float possiblediffusion = (dest->catemp[i] * info.diffusion * (d->second->perm / 100.0f));
 			if (possiblediffusion > 1.0f) possiblediffusion = 1.0f;

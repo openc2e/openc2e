@@ -32,7 +32,7 @@ protected:
 	FRIEND_SERIALIZE(Map);
 	unsigned int width, height;
 	std::vector<MetaRoom *> metarooms;
-	std::vector<Room *> rooms;
+	std::vector<shared_ptr<Room> > rooms;
 
 	friend class MetaRoom;
 
@@ -59,14 +59,14 @@ public:
 	MetaRoom *getArrayMetaRoom(unsigned int i) { return metarooms[i]; } // TODO: hack!
 	
 	unsigned int getMetaRoomCount();
-	Room *getRoom(unsigned int);
+	shared_ptr<Room> getRoom(unsigned int);
 	unsigned int getRoomCount();
 
 	MetaRoom *metaRoomAt(unsigned int, unsigned int);
-	Room *roomAt(float, float);
+	shared_ptr<Room> roomAt(float, float);
 
-	bool collideLineWithRoomSystem(Point src, Point dest, Room *&room, Point &where, Line &wall, unsigned int &walldir, int perm);
-	bool collideLineWithRoomBoundaries(Point src, Point dest, Room *room, Room *&newroom, Point &where, Line &wall, unsigned int &walldir, int perm);
+	bool collideLineWithRoomSystem(Point src, Point dest, shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm);
+	bool collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> room, shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm);
 
 	void tick();
 };

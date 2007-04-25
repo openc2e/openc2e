@@ -27,6 +27,9 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+
 #include "exceptions.h"
 
 typedef std::vector<unsigned char> bytestring_t;

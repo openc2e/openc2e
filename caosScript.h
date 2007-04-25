@@ -27,14 +27,11 @@
 #include <map>
 #include "caosVar.h"
 #include <cassert>
-#include <boost/shared_ptr.hpp>
 #include "openc2e.h"
 
 class Agent;
 class caosOp;
 class Variant;
-
-using boost::shared_ptr;
 
 struct script {
 	protected:

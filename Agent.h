@@ -26,13 +26,11 @@
 #include "CompoundPart.h"
 #include <set>
 #include <list>
-#include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "openc2e.h"
 #include "physics.h"
 
 class script;
-using boost::shared_ptr;
 
 struct agentzorder {
 	bool operator()(const class Agent *s1, const class Agent *s2) const;

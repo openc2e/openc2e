@@ -19,7 +19,7 @@
 
 #include "World.h"
 
-bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, Room *ownerroom) {
+bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, shared_ptr<Room> ownerroom) {
 	assert(ownermeta && ownerroom);
 
 	// verify we're in the same metaroom as owner, and in a room
@@ -27,7 +27,7 @@ bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoo
 	float thisy = a->y + (a->getHeight() / 2.0f);
 	MetaRoom *m = world.map.metaRoomAt(thisx, thisy);
 	if (m != ownermeta) return false;
-	Room *r = world.map.roomAt(thisx, thisy);
+	shared_ptr<Room> r = world.map.roomAt(thisx, thisy);
 	if (!r) return false;
 		
 	// compare squared distance with range
@@ -38,7 +38,7 @@ bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoo
 	// do the actual visibiltiy check using a line between centers
 	Point src(ownerx, ownery), dest(thisx, thisy);
 	Line dummywall; unsigned int dummydir;
-	Room *newroom = ownerroom;
+	shared_ptr<Room> newroom = ownerroom;
 	world.map.collideLineWithRoomSystem(src, dest, newroom, src, dummywall, dummydir, seeing->perm);
 	if (src != dest) return false;
 
@@ -49,7 +49,7 @@ bool agentIsVisible(Agent *seeing, Agent *dest) {
 	float ownerx = (seeing->x + (seeing->getWidth() / 2.0f));
 	float ownery = (seeing->y + (seeing->getHeight() / 2.0f));
 	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
-	Room *ownerroom = world.map.roomAt(ownerx, ownery);
+	shared_ptr<Room> ownerroom = world.map.roomAt(ownerx, ownery);
 	if (!ownermeta) return false; if (!ownerroom) return false;
 
 	return agentIsVisible(seeing, dest, ownerx, ownery, ownermeta, ownerroom);
@@ -61,7 +61,7 @@ std::vector<boost::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned ch
 	float ownerx = (seeing->x + (seeing->getWidth() / 2.0f));
 	float ownery = (seeing->y + (seeing->getHeight() / 2.0f));
 	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
-	Room *ownerroom = world.map.roomAt(ownerx, ownery);
+	shared_ptr<Room> ownerroom = world.map.roomAt(ownerx, ownery);
 	if (!ownermeta) return agents; if (!ownerroom) return agents;
 	
 	for (std::list<boost::shared_ptr<Agent> >::iterator i

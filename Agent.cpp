@@ -370,7 +370,7 @@ bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testp
 		}
 		float srcx = src.x, srcy = src.y;
 		
-		Room *ourRoom = world.map.roomAt(srcx, srcy);
+		shared_ptr<Room> ourRoom = world.map.roomAt(srcx, srcy);
 		if (!ourRoom) return false;
 
 		unsigned int dir; Line wall;
@@ -417,7 +417,7 @@ void Agent::physicsTick() {
 			// store values
 			float srcx = src.x, srcy = src.y;
 			
-			Room *ourRoom = world.map.roomAt(srcx, srcy);
+			shared_ptr<Room> ourRoom = world.map.roomAt(srcx, srcy);
 			if (!ourRoom) {
 				if (!displaycore)
 					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % srcx % srcy), false);
@@ -538,7 +538,7 @@ void Agent::tick() {
 	// CA updates
 	if (emitca_index != -1 && emitca_amount != 0.0f) {
 		assert(0 <= emitca_index && emitca_index <= 19);
-		Room *r = world.map.roomAt(x, y);
+		shared_ptr<Room> r = world.map.roomAt(x, y);
 		if (r) {
 			r->catemp[emitca_index] += emitca_amount;
 			/*if (r->catemp[emitca_index] <= 0.0f) r->catemp[emitca_index] = 0.0f;
