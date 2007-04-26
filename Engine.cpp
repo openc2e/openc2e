@@ -261,8 +261,8 @@ void Engine::handleMouseMove(SomeEvent &event) {
 	
 	// TODO: fix
 	// middle mouse button scrolling
-	//if (event.motion.state & SDL_BUTTON(2))
-	//	world.camera.moveTo(world.camera.getX() - event.xrel, world.camera.getY() - event.yrel, jump);
+	if (event.button & buttonmiddle)
+		world.camera.moveTo(world.camera.getX() - event.xrel, world.camera.getY() - event.yrel, jump);
 					
 	// notify agents
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {

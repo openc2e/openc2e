@@ -36,13 +36,13 @@ struct SoundSlot {
 };
 
 enum eventtype { eventquit, eventkeydown, eventspecialkeyup, eventspecialkeydown, eventmousebuttondown, eventmousebuttonup, eventmousemove, eventresizewindow };
-enum eventbuttons { buttonleft, buttonright, buttonmiddle, buttonwheeldown, buttonwheelup };
+enum eventbuttons { buttonleft=0x1, buttonright=0x2, buttonmiddle=0x4, buttonwheeldown=0x8, buttonwheelup=0x10 };
 
 struct SomeEvent {
 	eventtype type;
 	int x, y, xrel, yrel;
 	int key;
-	eventbuttons button;
+	unsigned int button;
 };
 
 class Surface {

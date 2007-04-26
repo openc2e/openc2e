@@ -164,7 +164,17 @@ retry:
 			e.y = event.motion.y;
 			e.xrel = event.motion.xrel;
 			e.yrel = event.motion.yrel;
-			// TODO: button state
+      e.button = 0;
+      if (event.motion.state & SDL_BUTTON(1))
+        e.button |= buttonleft;
+      if (event.motion.state & SDL_BUTTON(2))
+        e.button |= buttonmiddle;
+      if (event.motion.state & SDL_BUTTON(3))
+        e.button |= buttonright;
+      if (event.motion.state & SDL_BUTTON(4))
+        e.button |= buttonwheelup;
+      if (event.motion.state & SDL_BUTTON(5))
+        e.button |= buttonwheeldown;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
