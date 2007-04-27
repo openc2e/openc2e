@@ -34,8 +34,8 @@ void SDLSoundSlot::playLooped() {
 	soundchannel = Mix_PlayChannel(-1, sound, -1);
 }
 
-void SDLSoundSlot::adjustPanning(int angle, int distance) {
-	Mix_SetPosition(soundchannel, angle, distance);
+void SDLSoundSlot::adjustPanning(int left, int right) {
+	Mix_SetPanning(soundchannel, left, right);
 }
 
 void SDLSoundSlot::fadeOut() {

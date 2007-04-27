@@ -298,22 +298,33 @@ void Agent::handleClick(float clickx, float clicky) {
 void Agent::positionAudio(SoundSlot *slot) {
 	assert(slot);
 
-	// TODO: this is horribly, horribly broken
+	// TODO: No idea if this is at all similar to what c2e does, but it seems to sort of work okay.
+	float xoff = x + (getWidth() / 2) - world.camera.getXCentre(),
+				yoff = y + (getHeight() / 2) - world.camera.getYCentre();
+	double dist = sqrt(xoff*xoff + yoff*yoff) / 128;
+	int panconst = xoff/10;
+	if (panconst > 127) panconst = 127;
+	if (panconst < -127) panconst = -127;
 
-	float xoffset = x - world.camera.getXCentre();
-	float yoffset = y - world.camera.getYCentre();
-	int distance = (int)((sqrt(xoffset*xoffset + yoffset*yoffset) * 1000) / 255);
-	int angle;
-	if (xoffset == 0) {
-		if (yoffset > 0) angle = 90;
-		else angle = 270;
+	// panning proportional to xoff
+	// overall volume proportional to dist
+	slot->adjustPanning((127+panconst)/dist, (127-panconst)/dist);
+
+	/*double angle;
+	// TODO: this is horribly, horribly broken
+	if (xoff == 0) {
+		if (yoff > 0) angle = 180;
+		else angle = 0;
 	} else {
-		angle = (int)((atanf(fabs(yoffset) / fabs(xoffset)) / (2*M_PI)) * 360);
-		if (xoffset < 0) angle += 180;
-		if (yoffset < 0) angle += 90;
+		angle = (atanf(yoff / xoff) * (180 / M_PI));
+		if (xoff > 0) // 1st & 2nd quadrants
+			angle += 90;
+		else // 3rd & 4th quadrants
+			angle += 270;
 	}
 
-	slot->adjustPanning(angle, distance);
+	dist *= (double)(255 / 1000);
+	if (dist > 255) dist = 255;*/
 }
 
 Point Agent::boundingBoxPoint(unsigned int n) {

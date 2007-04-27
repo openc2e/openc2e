@@ -259,7 +259,6 @@ void Engine::handleMouseMove(SomeEvent &event) {
 	world.hand()->velx.setInt(event.xrel * 4);
 	world.hand()->vely.setInt(event.yrel * 4);
 	
-	// TODO: fix
 	// middle mouse button scrolling
 	if (event.button & buttonmiddle)
 		world.camera.moveTo(world.camera.getX() - event.xrel, world.camera.getY() - event.yrel, jump);
@@ -283,8 +282,9 @@ void Engine::handleMouseButton(SomeEvent &event) {
 			(event.type == eventmousebuttondown && (*i)->imsk_mouse_down)) {
 			// set the button value as necessary
 			caosVar button;
-			switch (event.button) {
-				// TODO: the values here make fuzzie suspicious that c2e combines these events
+			switch (event.button) { // Backend guarantees that only one button will be set on a mousebuttondown event.
+				// the values here make fuzzie suspicious that c2e combines these events
+				// nornagon seems to think c2e doesn't
 				case buttonleft: button.setInt(1); break;
 				case buttonright: button.setInt(2); break;
 				case buttonmiddle: button.setInt(4); break;
