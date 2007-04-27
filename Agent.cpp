@@ -308,7 +308,7 @@ void Agent::positionAudio(SoundSlot *slot) {
 
 	// panning proportional to xoff
 	// overall volume proportional to dist
-	slot->adjustPanning((127+panconst)/dist, (127-panconst)/dist);
+	slot->adjustPanning((127-panconst)/dist, (127+panconst)/dist);
 
 	/*double angle;
 	// TODO: this is horribly, horribly broken
