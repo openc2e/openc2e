@@ -257,7 +257,6 @@ c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
 }
 
 /*
- *
  * c2eLobe::tick
  *
  * Do a single update of the lobe.
@@ -274,6 +273,12 @@ void c2eLobe::tick() {
 	}
 }
 
+/*
+ * c2eLobe::init
+ *
+ * Initialise the lobe, resetting variables and running the initialisation rule.
+ *
+ */
 void c2eLobe::init() {
 	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
 		for (unsigned int j = 0; j < 8; j++)
@@ -284,11 +289,22 @@ void c2eLobe::init() {
 	}
 }
 
+/*
+ * c2eLobe::setNeuronInput
+ *
+ * Set the input value for the specified neuron.
+ */
 void c2eLobe::setNeuronInput(unsigned int i, float input) {
 	assert(i < neurons.size());
 	neurons[i].input = input; // TODO: always stomp over any existing input?
 }
 
+/*
+ * c2eLobe::getId
+ *
+ * Convenience function to return the Lobe ID of this lobe.
+ *
+ */
 std::string c2eLobe::getId() {
 	return std::string((char *)ourGene->id, 4);
 }
@@ -362,6 +378,16 @@ inline float bindFloatValue(float val, float min = -1.0f, float max = 1.0f) {
 	else return val;
 }
 
+// warn-once function for unimplemented svrule opcodes/operand types in c2eSVRule::runRule
+inline void warnUnimplementedSVRule(unsigned char data, bool opcode = true) {
+	static bool warnedalready = false;
+	if (warnedalready) return;
+	warnedalready = true;
+
+	std::cout << "brain debug: something tried using unimplemented " << (opcode ? "opcode" : "operand type" ) <<
+		(unsigned int)data << ", will not warn about unimplemented svrule bits again." << std::endl;
+}
+
 /*
  * c2eSVRule::runRule
  *
@@ -376,6 +402,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 	float tendrate = 0.0f;
 	float *operandpointer;
 	float dummy;
+	static float stw = 0.0f; // TODO: good default?
 	bool is_spare = false;
 	bool skip_next = false;
 
@@ -425,7 +452,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 6: // source chemical
 				// TODO: unused?
-				std::cout << "brain debug: something tried using source chemical!" << std::endl;
+				warnUnimplementedSVRule(rule.operandtype, false);
 				break;
 
 			case 7: // chemical
@@ -435,7 +462,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 8: // destination chemical
 				// TODO: unused?
-				std::cout << "brain debug: something tried using dest chemical!" << std::endl;
+				warnUnimplementedSVRule(rule.operandtype, false);
 				break;
 
 			case 9: // zero
@@ -450,8 +477,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			default:
-				// TODO: what to do?
-				std::cout << "brain debug: something tried using unknown operand type " << (int)rule.operandtype << std::endl;
+				warnUnimplementedSVRule(rule.operandtype, false);
 				break;
 		}
 
@@ -549,12 +575,14 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 20: // divide by
 				// TODO: make sure this is correct
-				accumulator /= operandvalue;
+				if (operandvalue != 0.0f)
+					accumulator /= operandvalue;
 				break;
 
 			case 21: // divide into
 				// TODO: make sure this is correct
-				accumulator = operandvalue / accumulator;
+				if (accumulator != 0.0f)
+					accumulator = operandvalue / accumulator;
 				break;
 
 			case 22: // minimum with
@@ -626,34 +654,50 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 37: // leakage rate
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 			
 			case 38: // rest state
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 39: // input gain hi-lo
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 40: // persistence
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 41: // signal noise
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 42: // winner takes all
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 43: // short-term relax rate
-				// TODO
+				// TODO: should this be stored in the parent object, maybe?
+				// TODO: make sure this is correct
+				stw = operandvalue;
 				break;
 
 			case 44: // long-term relax rate
-				// TODO
+				// TODO: make sure this is correct
+				// TODO: is this possible for neurons? (prbly not)
+				{
+					float weight = dendrite[0];
+					// push weight downwards towards steady state (short-term learning)
+					dendrite[0] = weight + (dendrite[1] - weight) * stw;
+					// pull steady state upwards towards weight (long-term learning)
+					dendrite[1] = dendrite[1] + (weight - dendrite[1]) * operandvalue;
+				}
 				break;
 
 			case 45: // store abs in
@@ -680,11 +724,12 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 50: // divide by, add to neuron input
-				// TODO
+				if (operandvalue != 0.0f)
+					neuron[1] += bindFloatValue(accumulator / operandvalue);
 				break;
 
 			case 51: // multiply by, add to neuron input
-				// TODO
+				neuron[1] += bindFloatValue(accumulator * operandvalue);
 				break;
 
 			case 52: // goto line
@@ -710,42 +755,60 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 57: // reward threshold
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 58: // reward rate
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 59: // use reward with
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 60: // punish threshold
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 61: // punish rate
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 62: // use punish with
 				// TODO
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 
 			case 63: // preserve neuron SV
-				// TODO
+				// TODO: this seems too crazy to be true :)
+				{ unsigned int index = (unsigned int)operandvalue;
+				if (index > 7) index = 7; // TODO: binding okay?
+				neuron[4] = neuron[index]; }
 				break;
 
 			case 64: // restore neuron SV
-				// TODO
+				// TODO: this seems too crazy to be true :)
+				{ unsigned int index = (unsigned int)operandvalue;
+				if (index > 7) index = 7; // TODO: binding okay?
+				neuron[index] = neuron[4]; }
 				break;
 
 			case 65: // preserve spare neuron
-				// TODO
+				// TODO: this seems too crazy to be true :)
+				{ unsigned int index = (unsigned int)operandvalue;
+				if (index > 7) index = 7; // TODO: binding okay?
+				spareneuron[4] = spareneuron[index]; }
 				break;
 
 			case 66: // restore spare neuron
-				// TODO
+				// TODO: this seems too crazy to be true :)
+				{ unsigned int index = (unsigned int)operandvalue;
+				if (index > 7) index = 7; // TODO: binding okay?
+				spareneuron[index] = spareneuron[4]; }
 				break;
 
 			case 67: // if negative goto
@@ -761,7 +824,8 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			default:
-				// do nothing!
+				// unknown opcode, so do nothing!
+				warnUnimplementedSVRule(rule.opcode);
 				break;
 		}
 	}
@@ -805,12 +869,24 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 	}
 }
 
+/*
+ * c2eBrain::init
+ *
+ * Initialises brain components in order.
+ *
+ */
 void c2eBrain::init() {
 	for (std::multiset<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
 		(*i)->init();
 	}
 }
 
+/*
+ * c2eBrain::tick
+ *
+ * Updates brain components as required, in order.
+ *
+ */
 void c2eBrain::tick() {
 	for (std::multiset<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
 		// TODO: good check for this?
@@ -819,6 +895,12 @@ void c2eBrain::tick() {
 	}
 }
 
+/*
+ * c2eBrain::getLobeByTissue
+ *
+ * Given a tissue ID as used internally in the genome, return the relevant c2eLobe object, if any, or null otherwise.
+ *
+ */
 c2eLobe *c2eBrain::getLobeByTissue(unsigned int id) {
 	for (std::map<std::string, c2eLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
 		if (i->second->getGene()->tissue == id)
@@ -828,6 +910,12 @@ c2eLobe *c2eBrain::getLobeByTissue(unsigned int id) {
 	return 0;
 }
 
+/*
+ * c2eBrain::getLobeById
+ *
+ * Given a lobe ID, return the relevant c2eLobe object, if any, or null otherwise.
+ *
+ */
 c2eLobe *c2eBrain::getLobeById(std::string id) {
 	std::map<std::string, c2eLobe *>::iterator i = lobes.find(id);
 
