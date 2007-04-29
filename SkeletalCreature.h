@@ -29,11 +29,18 @@ class SkeletalCreature : public CreatureAgent {
 private:
 	class SkeletonPart *skeleton;
 
+	unsigned int ticks; // TODO: unnecessary?
+
 	unsigned int direction;
 	unsigned int pose[14];
 	unsigned int facialexpression;
 	unsigned int pregnancy;
 	bool eyesclosed;
+
+	bool calculated;
+	int oldfootx, oldfooty;
+	bool downfoot_left;
+	shared_ptr<class Room> downfootroom;
 
 	shared_ptr<creaturesImage> images[14];
 	attFile att[14];
@@ -45,6 +52,8 @@ private:
 
 	unsigned int gaiti;
 	creatureGaitGene *gaitgene;
+
+	void snapDownFoot();
 
 public:
 	SkeletalCreature(unsigned char _family, Creature *c);
@@ -58,6 +67,7 @@ public:
 	void setPoseGene(unsigned int p);
 	void setGaitGene(unsigned int g);
 	void gaitTick();
+	void tick();
 	unsigned int getPregnancy() { return pregnancy; }
 	void setPregnancy(unsigned int p) { assert(p < 4); pregnancy = p; }
 	bool getEyesClosed() { return eyesclosed; }

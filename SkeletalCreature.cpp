@@ -22,6 +22,8 @@
    TODO:
 	* hair tidiness/untidiness (offset by 0 to 2 multiplied by 16)
 	* render hairs/ears .. at the moment we avoid them, we lack zorder sanity too
+	* support clothes parts
+	* interpolate between differing poses, since c2e seems to
 */
 
 #include "SkeletalCreature.h"
@@ -29,6 +31,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "Backend.h"
+#include "Room.h"
 
 #include <typeinfo> // TODO: remove when genome system is fixed
 #include <boost/format.hpp>
@@ -87,6 +90,10 @@ SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : Creatur
 	pregnancy = 0;
 	eyesclosed = false;
 
+	ticks = 0;
+	gaitgene = 0;
+	
+	calculated = false;
 	skeletonInit();
 
 	// needs to go last for now, so we can throw exceptions from skeletonInit
@@ -245,14 +252,72 @@ void SkeletalCreature::recalculateSkeleton() {
 
 	adjustx = -lowestx;
 	adjusty = -lowesty;
-	//width = highestx - lowestx;
-	width = 50;
-	//height = highesty - lowesty;
-	int leftfoot = party[11] + att[11].attachments[pose[11]][3];
-	int rightfoot = party[12] + att[12].attachments[pose[12]][3];
-	height = (leftfoot < rightfoot ? rightfoot : leftfoot) - lowesty;
-}
+
+	if (calculated) {
+		int orig_footpart = (downfoot_left ? 11 : 12);
+		// adjust location to match foot
+		x -= (attachmentX(orig_footpart, 0) - oldfootx);
+		y -= (attachmentY(orig_footpart, 0) - oldfooty);
+	}
+
+	// work out which foot is down
+	int leftfoot = attachmentY(11, 0);
+	int rightfoot = attachmentY(12, 0);
+	downfoot_left = (rightfoot < leftfoot);
+
+	calculated = true;
+	int orig_footpart = (downfoot_left ? 11 : 12);
+	oldfootx = attachmentX(orig_footpart, 0);
+	oldfooty = attachmentY(orig_footpart, 0);
 	
+	// recalculate width/height
+	height = downfoot_left ? leftfoot : rightfoot;
+	width = 50; // TODO: arbitary values bad
+
+	snapDownFoot();
+}
+
+void SkeletalCreature::snapDownFoot() {
+	// TODO: this isn't very well thought-out.
+
+	int orig_footpart = (downfoot_left ? 11 : 12);
+	float footx = x + attachmentX(orig_footpart, 0);
+	float footy = y + attachmentY(orig_footpart, 0);
+
+	shared_ptr<Room> newroom;
+
+	if (downfootroom) {
+		if (downfootroom->containsPoint(footx, footy)) {
+			newroom = downfootroom;
+		} else {
+			if (downfootroom->x_left <= footx && downfootroom->x_right >= footx) {
+				newroom = downfootroom; // TODO, we're just forcing for now
+			} else {
+				for (std::map<weak_ptr<Room>,RoomDoor *>::iterator i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
+					// TODO: check y location for vague sanity
+					if (i->first.lock()->x_left <= footx && i->first.lock()->x_right >= footx)
+						newroom = downfootroom;
+				}
+			}
+		}
+	}
+
+	if (!newroom) {
+		// TODO
+		newroom = world.map.roomAt(footx, footy);
+	}
+
+	downfootroom = newroom;
+	
+	if (!downfootroom /*|| !falling */) {
+		std::cout << "no down foot room! (" << footx << ", " << footy << ")" << std::endl;
+		return;
+	}
+
+	float newy = downfootroom->bot.pointAtX(footx).y;
+	y = newy - (footy - y);
+}
+
 void SkeletalCreature::setPose(unsigned int p) {
 	direction = 0;
 	for (int i = 0; i < 14; i++)
@@ -262,8 +327,8 @@ void SkeletalCreature::setPose(unsigned int p) {
 
 void SkeletalCreature::setPose(std::string s) {
 	switch (s[0]) {
-		case '?': direction = 0; break; // hack
-		case '!': direction = 1; break; // hack
+		case '?': direction = 0; break; // TODO: hack
+		case '!': direction = 1; break; // TODO: hack
 		case '0': direction = 3; break;
 		case '1': direction = 2; break;
 		case '2': direction = 0; break;
@@ -277,7 +342,8 @@ void SkeletalCreature::setPose(std::string s) {
 			case '1': pose[cee_lookup[i]] = 1 + (direction * 4); break;
 			case '2': pose[cee_lookup[i]] = 2 + (direction * 4); break;
 			case '3': pose[cee_lookup[i]] = 3 + (direction * 4); break;
-			case '?': assert(i == 0); pose[1] = 0 + (direction * 4); break; // hack
+			case '?': assert(i == 0); pose[1] = 0 + (direction * 4); break; // TODO: hack
+			// TODO: '!' also?
 			case 'X': break; // do nothing
 			default: assert(false); 
 		}
@@ -300,20 +366,45 @@ void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure i
 		if (typeid(*(*i)) == typeid(creatureGaitGene)) {
 			creatureGaitGene *g = (creatureGaitGene *)(*i);
 			if (g->drive == gaitdrive) {
-				gaitgene = g;
-				gaiti = 0;
+				if (g != gaitgene) {
+					gaitgene = g;
+					gaiti = 0;
+				}
+				return;
 			}
 		}
 	}
 
 	// explode!
 	gaitgene = 0;
+}
+
+void SkeletalCreature::tick() {
+	CreatureAgent::tick();
+
+	if (paused) return;
+
+	// TODO: every 2 ticks = correct? what about the engine var?
+	ticks++;
+	if (ticks % 2 == 0) return;
+
+	// TODO: we shouldn't bother with this unless it changed?
+	setGaitGene(creature->getGait());
+
+	// TODO: we should only do this if we're moving :-P
 	gaitTick();
 }
 
 void SkeletalCreature::gaitTick() {
 	if (!gaitgene) return;
 	uint8 pose = gaitgene->pose[gaiti];
+	if (pose == 0) {
+		if (gaiti == 0) return; // non-worky gait
+
+		gaiti = 0;
+		gaitTick();
+		return;
+	}
 	creaturePoseGene *poseg = 0;
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
@@ -350,6 +441,8 @@ void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset)
 }
 
 void SkeletalCreature::creatureAged() {
+	// TODO: adjust position to account for any changes..
+
 	skeletonInit();
 }
 
