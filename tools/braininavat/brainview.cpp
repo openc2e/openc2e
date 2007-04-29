@@ -86,7 +86,7 @@ void BrainView::paintEvent(QPaintEvent *) {
 				float multiplier = 0.5 + (var < 0.0f ? 0.0f : (var / 2));
 				QColor color(lobe->red * multiplier, lobe->green * multiplier, lobe->blue * multiplier);
 		
-				// draw lobe
+				// draw dendrite
 				painter.setPen(color);
 				QBrush brush(color);
 				painter.setBrush(brush);

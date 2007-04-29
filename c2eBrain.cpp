@@ -218,9 +218,8 @@ void c2eTract::init() {
 	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
 		for (unsigned int j = 0; j < 8; j++)
 			i->variables[j] = 0.0f;
-		// TODO: will i->source/i->dest data always be initialised here? i doubt it.
 		// TODO: good way to run rule?
-		initrule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
+		initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, i->variables, parent->getParent());
 	}
 }
 
@@ -387,6 +386,10 @@ inline void warnUnimplementedSVRule(unsigned char data, bool opcode = true) {
 	std::cout << "brain debug: something tried using unimplemented " << (opcode ? "opcode" : "operand type" ) <<
 		(unsigned int)data << ", will not warn about unimplemented svrule bits again." << std::endl;
 }
+
+// goto locations are one-based
+// we must never jump backwards, only forwards
+#define HANDLE_GOTO if ((unsigned int)operandvalue - 2 > i) i = (unsigned int)operandvalue - 2;
 
 /*
  * c2eSVRule::runRule
@@ -643,7 +646,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 35: // tend to and store in
 				// TODO: make sure this is correct
-				*operandpointer = accumulator + tendrate * (operandvalue - accumulator);
+				*operandpointer = bindFloatValue(accumulator + tendrate * (operandvalue - accumulator));
 				break;
 
 			case 36: // nominal threshold
@@ -714,13 +717,11 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 48: // if zero goto
-				// TODO: no-one's checked the goto opcode
-				if (accumulator == 0.0f) i = rule.operanddata;
+				if (accumulator == 0.0f) HANDLE_GOTO
 				break;
 
 			case 49: // if non-zero goto
-				// TODO: no-one's checked the goto opcode
-				if (accumulator != 0.0f) i = rule.operanddata;
+				if (accumulator != 0.0f) HANDLE_GOTO
 				break;
 
 			case 50: // divide by, add to neuron input
@@ -733,8 +734,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 52: // goto line
-				// TODO: no-one's checked the goto opcode
-				i = rule.operanddata;
+				HANDLE_GOTO
 				break;
 
 			case 53: // stop if <
@@ -812,15 +812,13 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 67: // if negative goto
-				// TODO: no-one's checked the goto opcode
 				// TODO: make sure this is correct
-				if (accumulator < 0.0f) i = rule.operanddata;
+				if (accumulator < 0.0f) HANDLE_GOTO
 				break;
 
 			case 68: // if positive goto
-				// TODO: no-one's checked the goto opcode
 				// TODO: make sure this is correct
-				if (accumulator > 0.0f) i = rule.operanddata;
+				if (accumulator > 0.0f) HANDLE_GOTO
 				break;
 
 			default:
