@@ -85,7 +85,9 @@ class caosJMP : public caosOp {
 class caosCJMP : public caosJMP {
 	FRIEND_SERIALIZE(caosCJMP);
 	public:
-		caosCJMP(int p_) : caosJMP(p_) {}
+		caosCJMP(int p_) : caosJMP(p_) {
+			setCost(1);
+		}
 		void execute(caosVM *vm) {
 			VM_PARAM_INTEGER(flag);
 
@@ -93,7 +95,7 @@ class caosCJMP : public caosJMP {
 				this->caosJMP::execute(vm);
 		}
 		std::string dump() {
-			return std::string("COND ") + this->caosJMP::dump();
+			return std::string("C") + this->caosJMP::dump();
 		}
 };
 
