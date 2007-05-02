@@ -93,6 +93,7 @@ class caosCJMP : public caosJMP {
 
 			if (flag)
 				this->caosJMP::execute(vm);
+			caosOp::execute(vm); // deduct TS cost
 		}
 		std::string dump() {
 			return std::string("C") + this->caosJMP::dump();

@@ -83,7 +83,7 @@ inline void caosVM::runOp() {
 	try {
 		if (trace) {
 			std::cerr
-				<< boost::str(boost::format("optrace: %p @%08d ") % (void *)this % cip)
+				<< boost::str(boost::format("optrace: INST=%d TS=%d %p @%08d ") % (int)inst % (int)timeslice % (void *)this % cip)
 				<< op->dump() << std::endl;
 		}
 		op->execute(this);
