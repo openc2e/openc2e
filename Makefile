@@ -194,6 +194,9 @@ clean:
 	rm -f commandinfo.yml lex.yy.cpp lex.yy.h lex.c2.cpp lex.c2.h lex.mng.cpp lex.mng.h mngparser.tab.cpp mngparser.tab.hpp cmddata.cpp
 	rm -f tools/filetests tools/memstats tools/mngtest tools/pathtest tools/praydumper tools/serialtest
 	rm -f headerdeps.dot headerdeps.png
+	rm -f .shake/dump.pl
+	rm -f tools/braininavat/Makefile tools/braininavat/*.o tools/braininavat/moc_*.cpp tools/braininavat/braininavat
+	rm -f catalogue.lex.cpp catalogue.lex.h catalogue.tab.cpp catalogue.tab.hpp docs.html
 
 test: openc2e 
 	perl runtests.pl
