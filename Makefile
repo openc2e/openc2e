@@ -185,7 +185,7 @@ tools/serialtest: tools/serialtest.o $(OPENC2E_CORE) $(SERIALIZATION)
 
 tools/braininavat/braininavat: Creature_standalone.o c2eBrain.o streamutils.o genomeFile.o
 	cd tools/braininavat && \
-	qmake && \
+	(qmake-qt4 || qmake) && \
 	make
 
 clean:

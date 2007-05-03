@@ -1,13 +1,33 @@
 Source: openc2e
-Section: unknown
+Section: contrib/games
 Priority: optional
 Maintainer: Bryan Donlan <bdonlan@gmail.com>
-Build-Depends: debhelper (>= 4.0.0), perl, libyaml-perl, libsdl1.2debian-all, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, libsdl-mixer1.2-dev, flex, bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev
+Build-Depends: debhelper (>= 4.0.0), perl, libyaml-perl, libsdl1.2debian-all, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, libsdl-mixer1.2-dev, flex, bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev, libsdl-gfx1.2-dev, libqt4-dev
 Standards-Version: 3.6.2
 
 Package: openc2e
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: openc2e-tools
 Description: Free creatures engine
  TODO: writeme
  <insert long description, indented with spaces>
+
+Package: openc2e-tools
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: openc2e
+Description: Free creatures engine (tools)
+ TODO: writeme
+ <insert long description, indented with spaces>
+
+Package: openc2e-debug
+Architecture: any
+Priority: extra
+Recommends: openc2e, openc2e-tools, gdb
+Description: Free creatures engine (debug symbols)
+ TODO: writeme
+ <insert long description, indented with spaces>
+ .
+ This package contains debugging symbols for programs in the openc2e and
+ openc2e-tools packages.

@@ -34,7 +34,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE)
+	$(MAKE) openc2e tools/braininavat/braininavat docs.html
 	#docbook-to-man debian/openc2e.sgml > openc2e.1
 
 	touch build-stamp
@@ -56,7 +56,8 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/openc2e.
-	dh_install openc2e /usr/bin
+	install -d debian/tmp/usr/bin
+	install openc2e tools/braininavat/braininavat debian/tmp/usr/bin
 
 
 # Build architecture-independent files here.
@@ -70,7 +71,7 @@ binary-arch: build install
 	dh_installchangelogs 
 	dh_installdocs
 	dh_installexamples
-#	dh_install
+	dh_install --fail-missing --sourcedir=debian/tmp
 #	dh_installmenu
 #	dh_installdebconf	
 #	dh_installlogrotate
@@ -82,7 +83,7 @@ binary-arch: build install
 #	dh_installinfo
 	dh_installman
 	dh_link
-	dh_strip
+	dh_strip --dbg-package=openc2e-dbg
 	dh_compress -X.css -X.html
 	dh_fixperms
 #	dh_perl
