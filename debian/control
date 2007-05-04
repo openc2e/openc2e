@@ -2,7 +2,7 @@ Source: openc2e
 Section: contrib/games
 Priority: optional
 Maintainer: Bryan Donlan <bdonlan@gmail.com>
-Build-Depends: debhelper (>= 4.0.0), perl, libyaml-perl, libsdl1.2debian-all, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, libsdl-mixer1.2-dev, flex (>= 2.5.31), bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev, libsdl-gfx1.2-dev, libqt4-dev
+Build-Depends: debhelper (>= 5.0.0), perl, libyaml-perl, libsdl1.2debian-all, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, libsdl-mixer1.2-dev, flex (>= 2.5.31), bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev, libsdl-gfx1.2-dev, libqt4-dev
 Standards-Version: 3.6.2
 
 Package: openc2e
