@@ -945,6 +945,18 @@ void caosVM::c_PUHL() {
 }
 
 /**
+ SETV PUHL (command) pose (integer) x (integer) y (integer)
+ %status maybe
+ %pragma variants c2
+
+ Sets relative x/y coordinates for TARG's pickup point.
+ Pose is -1 for all poses, or a pose relative to the first image specified in NEW: (not BASE).
+*/
+void caosVM::c_SETV_PUHL() {
+	c_PUHL();
+}
+
+/**
  PUHL (integer) pose (integer) x_or_y (integer)
  %status maybe
 
@@ -1241,6 +1253,15 @@ void caosVM::c_PUPT() {
 	} else {
 		targ->carry_points[pose] = std::pair<int, int>(x, y);
 	}
+}
+
+/**
+ SETV PUPT (command) pose (integer) x (integer) y (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::c_SETV_PUPT() {
+	c_PUPT();
 }
 
 /**
@@ -1795,6 +1816,17 @@ void caosVM::c_TNTW() {
 */
 void caosVM::c_PRNT() {
 	// TODO
+}
+
+/**
+ TCAR (agent)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_TCAR() {
+	valid_agent(targ);
+
+	result.setAgent(0);
 }
 
 /* vim: set noet: */

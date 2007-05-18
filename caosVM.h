@@ -261,6 +261,9 @@ public:
 	void v_WNDX();
 	void v_WNDY();
 	void c_DOCA();
+	void c_SETV_DOOR();
+	void v_FLOR();
+	void c_SYS_DMAP();
 	
 	// camera
 	void v_VISI();
@@ -291,6 +294,8 @@ public:
 	void c_BKGD();
 	void v_BKGD();
 	void c_FRSH();
+	void c_SYS_CMRP();
+	void c_SYS_CMRA();
 
 	// world
 	void c_LOAD();
@@ -317,6 +322,7 @@ public:
 	void v_WOLF();
 	void v_LANG();
 	void v_TOKN();
+	void v_GAME_c2();
 
 	// variables
 	void c_SETV();
@@ -458,6 +464,7 @@ public:
 	void c_FRAT();
 	void c_OVER();
 	void c_PUHL();
+	void c_SETV_PUHL();
 	void v_PUHL();
 	void v_POSL();
 	void v_POST();
@@ -478,6 +485,7 @@ public:
 	void v_TOUC();
 	void v_TICK();
 	void c_PUPT();
+	void c_SETV_PUPT();
 	void c_STPT();
 	void c_DCOR();
 	void c_MIRA();
@@ -514,6 +522,7 @@ public:
 	void c_IMGE();
 	void c_TNTW();
 	void c_PRNT();
+	void v_TCAR();
 	
 	// motion
 	void c_ELAS();
@@ -591,6 +600,9 @@ public:
 	void c_BBD_SHOW();
 	void c_BBD_EMIT();
 	void c_BBD_EDIT();
+	void c_BBD_VOCB();
+	void c_NEW_BBTX();
+	void c_BBTX();
 
 	// creatures
 	void c_STM_SHOU();
@@ -688,6 +700,7 @@ public:
 	void c_EXPR();
 	void v_EXPR();
 	void c_TNTC();
+	void c_INJR();
 	// (clothes)
 	void c_BODY();
 	void v_BODY();

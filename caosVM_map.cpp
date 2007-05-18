@@ -655,6 +655,15 @@ void caosVM::c_DMAP() {
 }
 
 /**
+ SYS: DMAP (command) mapon (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::c_SYS_DMAP() {
+	c_DMAP();
+}
+
+/**
  ERID (string) metaroom_id (integer)
  %status maybe
 
@@ -955,6 +964,33 @@ void caosVM::c_DOCA() {
 	VM_PARAM_INTEGER(times)
 
 	// TODO
+}
+
+/**
+ SETV DOOR (command) direction (integer) room1 (integer) room2 (integer) value (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_SETV_DOOR() {
+	VM_PARAM_INTEGER(value)
+	VM_PARAM_INTEGER(room2)
+	VM_PARAM_INTEGER(room1)
+	VM_PARAM_INTEGER(direction)
+
+	// TODO
+}
+
+/**
+ FLOR (integer)
+ %status stub
+ %pragma variants c2
+
+ Return y coordinate of floor below centre of target agent.
+*/
+void caosVM::v_FLOR() {
+	valid_agent(targ);
+
+	result.setInt(0); // TODO
 }
 
 /* vim: set noet: */

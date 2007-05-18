@@ -563,4 +563,50 @@ void caosVM::c_BBD_EDIT() {
 	// TODO
 }
 
+/**
+ BBD: VOCB (command) blackboardstart (integer) globalstart (integer) count (integer)
+ %status stub
+ %pragma variants c2
+
+ Copy count words into the blackboard word list from the global word list.
+*/
+void caosVM::c_BBD_VOCB() {
+	VM_PARAM_INTEGER(count)
+	VM_PARAM_INTEGER(globalstart)
+	VM_PARAM_INTEGER(blackboardstart)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ NEW: BBTX (command) part (integer) x (integer) y (integer) width (integer)
+ %status stub
+ %pragma variants c2
+
+ Create a new C2 text part for a compound bubble object. Text will wrap as required to fit width.
+*/
+void caosVM::c_NEW_BBTX() {
+	VM_PARAM_INTEGER(width)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(part)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ BBTX (command) part (integer) stringindex (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_BBTX() {
+	VM_PARAM_INTEGER(stringindex)
+	VM_PARAM_INTEGER(part)
+
+	valid_agent(targ);
+	// TODO
+}
+
 /* vim: set noet: */

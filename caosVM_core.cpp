@@ -263,4 +263,19 @@ void caosVM::v_TOKN() {
 	result.setInt(*data);
 }
 
+/**
+ GAME (variable) category (integer) variable (integer)
+ %status stub
+ %pragma variants c2
+ %pragma implementation caosVM::v_GAME_c2
+*/
+void caosVM::v_GAME_c2() {
+	VM_PARAM_INTEGER(variable)
+	VM_PARAM_INTEGER(category)
+
+	// TODO
+	static caosVar hack;
+	vm->valueStack.push_back(&hack);
+}
+
 /* vim: set noet: */

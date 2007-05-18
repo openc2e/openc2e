@@ -650,7 +650,7 @@ void caosVM::c_CHEM() {
 /**
  CHEM (command) chemical_id (integer) adjust (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_CHEM_c1
 */
 void caosVM::c_CHEM_c1() {
@@ -661,6 +661,7 @@ void caosVM::c_CHEM_c1() {
 
 	valid_agent(targ);
 	c1Creature *c = getc1Creature(targ.get());
+	// TODO: c2 support
 	if (!c) return; // ignored on non-creatures
 	
 	c->addChemical(chemical_id, adjust);
@@ -685,7 +686,7 @@ void caosVM::v_CHEM() {
 /**
  CHEM (integer) chemical_id (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::v_CHEM_c1
 */
 void caosVM::v_CHEM_c1() {
@@ -693,6 +694,7 @@ void caosVM::v_CHEM_c1() {
 	
 	valid_agent(targ);
 	c1Creature *c = getc1Creature(targ.get());
+	// TODO: c2 support
 	caos_assert(c);
 
 	result.setInt(c->getChemical(chemical_id));
@@ -1361,7 +1363,7 @@ void caosVM::c_SNEZ() {
 /**
  DRIV (integer) drive (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::v_DRIV_c1
 */
 void caosVM::v_DRIV_c1() {
@@ -1369,6 +1371,7 @@ void caosVM::v_DRIV_c1() {
 	caos_assert(drive < 16);
 
 	c1Creature *c = getc1Creature(targ.get());
+	// TODO: c2 support
 	caos_assert(c);
 
 	result.setInt(c->getDrive(drive));
@@ -1447,6 +1450,19 @@ void caosVM::c_TNTC() {
 	VM_PARAM_INTEGER(part)
 	VM_PARAM_INTEGER(tintindex)
 
+	// TODO
+}
+
+/**
+ INJR (command) organ (integer) amount (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_INJR() {
+	VM_PARAM_INTEGER(amount)
+	VM_PARAM_INTEGER(organ)
+
+	valid_agent(targ);
 	// TODO
 }
 
