@@ -45,8 +45,8 @@ CompoundPart *SimpleAgent::part(unsigned int id) {
 }
 
 void SimpleAgent::tick() {
-	Agent::tick();
 	if (!paused) dullpart->tick();
+	Agent::tick();
 }
 
 /* vim: set noet: */

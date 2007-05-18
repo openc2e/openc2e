@@ -85,12 +85,13 @@ void CompoundAgent::setZOrder(unsigned int plane) {
 }
 
 void CompoundAgent::tick() {
-	Agent::tick();
-	if (paused) return;
-
-	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-		(*x)->tick();
+	if (!paused) {
+		for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
+			(*x)->tick();
+		}
 	}
+	
+	Agent::tick();
 }
 
 void CompoundAgent::handleClick(float clickx, float clicky) {
