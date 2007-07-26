@@ -82,12 +82,12 @@ void prayManager::update() {
 				if (!x.empty()) x.erase(x.begin());
 				if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
 					// TODO: language checking!
-					//std::cout << "scanning PRAY file " << d->native_directory_string() << std::endl;
+					//std::cout << "scanning PRAY file " << d->path().native_directory_string() << std::endl;
 					try {
 						prayFile *p = new prayFile(*d);
 						addFile(p);
 					} catch (creaturesException &e) {
-						std::cerr << "PRAY file \"" << d->native_directory_string() << "\" failed to load: " << e.what() << std::endl;
+						std::cerr << "PRAY file \"" << d->path().native_directory_string() << "\" failed to load: " << e.what() << std::endl;
 					}
 				}
 			}

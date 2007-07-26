@@ -96,7 +96,7 @@ OPENC2E_S = $(OPENC2E_CORE) $(SERIALIZATION) main.o
 
 DEBUGFLAGS=-ggdb3 -O0
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE
-XLDFLAGS=$(LDFLAGS) -lboost_program_options -lboost_serialization -lboost_filesystem $(SDL_LFLAGS) -lz -lm -lSDL_net -lSDL_mixer -lSDL_gfx -lpthread
+XLDFLAGS=$(LDFLAGS) -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt $(SDL_LFLAGS) -lz -lm -lSDL_net -lSDL_mixer -lSDL_gfx -lpthread
 COREFLAGS=$(DEBUGFLAGS) $(SDL_CFLAGS) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
