@@ -148,14 +148,12 @@ while (<>) {
 			}
 			$cat = $l;
 		} elsif ($1 eq 'cost') {
-			print STDERR "ec l=$l\n";
 			if ($l =~ m{^\s*(-?\d+)\s*$}) {
 				$evalcost{default} = $1;
 			} elsif ($l =~ m{(\S+)\s+(-?\d+)\s*$}) {
 				my $cost = $2;
 				my @variants = split ',', $1;
 				for my $v (@variants) {
-					print STDERR "v=$v\n";
 					$evalcost{$v} = $cost;
 				}
 			} else {
