@@ -19,4 +19,30 @@
 
 #include "CallButton.h"
 
+// TODO: this code is a first attempt and is probably completely wrong
+
+void CallButton::tick() {
+	SimpleAgent::tick();
+	if (paused) return;
+
+	Lift *ourlift = dynamic_cast<Lift *>(lift.get());
+	assert(ourlift);
+
+	if (actv.getInt() == 1) {
+		// TODO: this is a broken hack: var[0].getInt() == 0 is the check in Lift itself, but that's impossible from here and also horrid
+		if (ourlift->yvec.getInt() == 0) { // not moving
+			if (ourlift->currentbutton == buttonid) { // has us as target
+				queueScript(0); // deactivate ourselves
+			} else {
+				ourlift->currentbutton = buttonid;
+				// TODO: mmh
+				if (ourlift->y + ourlift->cabinbottom < ourlift->callbuttony[buttonid])
+					ourlift->fireScript(1, this);
+				else
+					ourlift->fireScript(2, this);
+			}
+		}
+	}
+}
+
 /* vim: set noet: */

@@ -27,7 +27,6 @@ class Vehicle : public CompoundAgent {
 protected:
 	friend class SFCVehicle;
 
-	int cabinleft, cabintop, cabinright, cabinbottom;
 	unsigned int capacity;
 	unsigned int bump;
 
@@ -36,6 +35,7 @@ public:
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 
 	caosVar xvec, yvec;
+	int cabinleft, cabintop, cabinright, cabinbottom; // TODO: should be protected w/accessors?
 
 	void setCabinRect(int l, int t, int r, int b) { cabinleft = l; cabintop = t; cabinright = r; cabinbottom = b; }
 	void setCapacity(unsigned int c) { capacity = c; }

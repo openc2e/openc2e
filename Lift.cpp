@@ -24,12 +24,19 @@
  */
 
 bool Lift::fireScript(unsigned short event, Agent *from) {
-	if (event == 1) {
-		if (currentbutton + 1 == callbuttony.size()) return false;
-		if (var[0].getInt() == 0) currentbutton++; // TODO: hack
-	} else if (event == 2) {
-		if (currentbutton == 0) return false;
-		if (var[0].getInt() == 0) currentbutton--; // TODO: hack
+	if (event == 1 || event == 2) {
+		if (var[0].getInt() != 0) return false; // TODO: hack to make sure the lifts aren't activated when not ready
+	}
+
+	// if we need to select a new callbutton.. TODO: this is hacky
+	if (y + cabinbottom == callbuttony[currentbutton]) {
+		if (event == 1) {
+			if (currentbutton + 1 == callbuttony.size()) return false;
+			currentbutton++;
+		} else if (event == 2) {
+			if (currentbutton == 0) return false;
+			currentbutton--;
+		}
 	}
 
 	return Agent::fireScript(event, from);

@@ -31,6 +31,8 @@ public:
 	CallButton(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount)
 		: SimpleAgent(family, genus, species, plane, spritefile, firstimage, imagecount) { }
+
+	void tick();
 };
 
 #endif
