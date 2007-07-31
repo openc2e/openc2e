@@ -172,6 +172,8 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 	switch (event) {
 		case 0: // deactivate
 			if (c && !cr_can_stop) return false;
+			// TODO: not sure if this is the right place to do this.
+			actv.setInt(event);
 			break;
 		case 1: // activate 1
 			if (c && !cr_can_push) return false;
