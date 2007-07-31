@@ -30,6 +30,7 @@
  %pragma parser new DoifParser()
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
  otherwise continues executing the script.
@@ -39,6 +40,7 @@
  ELIF (command) condition (condition)
  %pragma parser new DoifParser()
  %status maybe
+ %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
  If found outside a DOIF block, it is equivalent to a DOIF. If you take advantage of this behavior, fuzzie is of the opinion that you should be shot.
@@ -50,6 +52,7 @@
  %pragma noparse
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
 */
@@ -58,10 +61,12 @@
  ENDI (command)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
 */
 void caosVM::c_ENDI() {
+	// TODO: cost in c2e?
 	throw caosException("Unmatched ENDI! wtf maet.");
 }
 

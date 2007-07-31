@@ -194,6 +194,7 @@ void caosVM::v_TYPE() {
  MODV (command) var (variable) mod (integer)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Divides the given variable by the given integer, and returns the remainder (var % mod).
 */
@@ -209,6 +210,7 @@ void caosVM::c_MODV() {
  ANDV (command) var (variable) and (integer)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
 */
@@ -224,6 +226,7 @@ void caosVM::c_ANDV() {
  ORRV (command) var (variable) or (integer)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
 */
@@ -239,6 +242,7 @@ void caosVM::c_ORRV() {
  ADDV (command) var (variable) add (integer)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Adds the given integer to the given variable and returns the result.
 */
@@ -258,6 +262,7 @@ void caosVM::c_ADDV() {
  SUBV (command) var (variable) sub (integer)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Subtracts the given integer from the given variable and returns the result.
 */
@@ -277,6 +282,7 @@ void caosVM::c_SUBV() {
  NEGV (command) var (variable)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
 */
@@ -295,6 +301,7 @@ void caosVM::c_NEGV() {
  DIVV (command) var (variable) div (decimal)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
  
  Divides the given variable by the given integer and returns the result.
 */
@@ -321,6 +328,7 @@ void caosVM::c_DIVV() {
  MULV (command) var (variable) mul (decimal)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Multiplies the given variable by the given integer and returns the result.
 */
@@ -1020,6 +1028,7 @@ void caosVM::c_POWV() {
  RNDV (command) var (variable) value1 (integer) value (integer)
  %status maybe
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_RNDV() {
 	VM_PARAM_INTEGER(value2)
