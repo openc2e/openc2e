@@ -175,9 +175,13 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 			break;
 		case 1: // activate 1
 			if (c && !cr_can_push) return false;
+			// TODO: not sure if this is the right place to do this.
+			actv.setInt(event);
 			break;
 		case 2: // activate 2
 			if (c && !cr_can_pull) return false;
+			// TODO: not sure if this is the right place to do this.
+			actv.setInt(event);
 			break;
 		case 3: // hit
 			if (c && !cr_can_hit) return false;
@@ -278,10 +282,6 @@ void Agent::handleClick(float clickx, float clicky) {
 
 		if (action != -1) {
 			queueScript(calculateScriptId(action), (Agent *)world.hand());
-			// TODO: not sure if this is the right place to do this.
-			// c1 docs say it's done in 'HandleActivate', which doesn't
-			// sound like here or queueScript.
-			actv.setInt(calculateScriptId(action));
 		}
 
 		return;
