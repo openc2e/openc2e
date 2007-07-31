@@ -19,4 +19,43 @@
 
 #include "Lift.h"
 
+/*
+ * TODO: this code is a first attempt and might be completely wrong
+ */
+
+bool Lift::fireScript(unsigned short event, Agent *from) {
+	if (event == 1) {
+		if (currentbutton + 1 == callbuttony.size()) return false;
+		if (var[0].getInt() == 0) currentbutton++; // TODO: hack
+	} else if (event == 2) {
+		if (currentbutton == 0) return false;
+		if (var[0].getInt() == 0) currentbutton--; // TODO: hack
+	}
+
+	return Agent::fireScript(event, from);
+}
+
+void Lift::tick() {
+	Vehicle::tick();
+	if (paused) return;
+
+	// if we're moving..
+	if (yvec.getInt() != 0) {
+		// TODO: we should align to agent bottom rather than cabin bottom if LACB is set to 0 (c2)
+		
+		// are we beyond the call button y point?
+		if (
+			(yvec.getInt() < 0 && y + cabinbottom <= callbuttony[currentbutton]) || // upwards
+			(yvec.getInt() > 0 && y + cabinbottom >= callbuttony[currentbutton]) // downwards 
+			) {
+			// stop movement (and make sure we're in the right spot)
+			yvec.setInt(0);
+			y = callbuttony[currentbutton] - cabinbottom;
+
+			// send deactivate event
+			queueScript(0);
+		}
+	}
+}
+
 /* vim: set noet: */
