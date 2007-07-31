@@ -1016,7 +1016,7 @@ void SFCLift::copyToWorld() {
 	Lift *a = new Lift(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
 	ourAgent = a;
 
-	SFCCompoundObject::copyToWorld();
+	SFCVehicle::copyToWorld();
 
 	// set current button
 	a->currentbutton = currentbutton;
