@@ -19,6 +19,7 @@
 
 #include "SFCFile.h"
 #include "World.h"
+#include "Engine.h"
 #include "MetaRoom.h"
 #include "Room.h"
 #include "exceptions.h"
@@ -983,7 +984,17 @@ void SFCSimpleObject::copyToWorld() {
 	
 	// TODO: bhvr
 	// TODO: pickup handles/points
-	// TODO: currentsound
+	
+	if (currentsound.size() != 0) {
+		// TODO: all this code should be in engine or something
+		SoundSlot *s = engine.backend->getAudioSlot(currentsound);
+		if (s) {
+			a->soundslot = s;
+			s->playLooped();
+			s->agent = a;
+			a->positionAudio(s);
+		}
+	}
 }
 
 void SFCPointerTool::copyToWorld() {

@@ -261,7 +261,11 @@ SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
 		if (fname.size() == 0) return 0;
 		//std::cout << "trying to load " << fname << std::endl;
 		sounddata[i].sound = Mix_LoadWAV(fname.c_str());
-		if (!sounddata[i].sound) return 0; // TODO: spout error
+		if (!sounddata[i].sound) {
+			soundcache[filename] = 0;
+			std::cout << "warning: failed to load sound '" << fname << "'" << std::endl;
+			return 0;
+		}
 		soundcache[filename] = sounddata[i].sound;
 	}
 

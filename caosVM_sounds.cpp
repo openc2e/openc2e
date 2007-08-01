@@ -28,6 +28,8 @@ using std::cerr;
 
 #include "Backend.h" // hack for now
 
+bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
+
 /**
  SNDE (command) filename (string)
  %status maybe
@@ -38,6 +40,7 @@ void caosVM::c_SNDE() {
 
 	valid_agent(targ);
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
+	if (!agentOnCamera(targ)) return;
 	SoundSlot *s = engine.backend->getAudioSlot(filename);
 	if (s) {
 		s->play();
@@ -69,6 +72,7 @@ void caosVM::c_SNDC() {
 	valid_agent(targ);
 	if (targ->soundslot)
 		targ->soundslot->stop();
+	// TODO: sound should play in theory anyway, even if it's out-of-metaroom and out-of-view
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
 	SoundSlot *s = engine.backend->getAudioSlot(filename);
 	if (s) {
@@ -96,6 +100,7 @@ void caosVM::c_SNDL() {
 	valid_agent(targ);
 	if (targ->soundslot)
 		targ->soundslot->stop();
+	// TODO: sound should play in theory anyway, even if it's out-of-metaroom and out-of-view
 	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
 	SoundSlot *s = engine.backend->getAudioSlot(filename);
 	if (s) {

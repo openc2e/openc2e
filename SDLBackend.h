@@ -58,8 +58,8 @@ public:
 class SDLBackend : public Backend {
 protected:
 	bool soundenabled, networkingup;
-	static const unsigned int nosounds = 12;
-	SDLSoundSlot sounddata[12];
+	static const unsigned int nosounds = 15;
+	SDLSoundSlot sounddata[15];
 
 	std::map<std::string, Mix_Chunk *> soundcache;
 
