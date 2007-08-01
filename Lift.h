@@ -32,6 +32,7 @@ public:
 		: Vehicle(family, genus, species, plane, spritefile, firstimage, imagecount) { }
 	void tick();
 	bool fireScript(unsigned short event, Agent *from);
+	bool liftAvailable() { return (var[0].getInt() == 0); }
 };
 
 #endif

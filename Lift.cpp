@@ -25,7 +25,7 @@
 
 bool Lift::fireScript(unsigned short event, Agent *from) {
 	if (event == 1 || event == 2) {
-		if (var[0].getInt() != 0) return false; // TODO: hack to make sure the lifts aren't activated when not ready
+		if (!liftAvailable()) return false; // TODO: hack to make sure the lifts aren't activated when not ready
 	}
 
 	// if we need to select a new callbutton.. TODO: this is hacky

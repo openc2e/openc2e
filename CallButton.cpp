@@ -29,17 +29,19 @@ void CallButton::tick() {
 	assert(ourlift);
 
 	if (actv.getInt() == 1) {
-		// TODO: this is a broken hack: var[0].getInt() == 0 is the check in Lift itself, but that's impossible from here and also horrid
-		if (ourlift->yvec.getInt() == 0) { // not moving
-			if (ourlift->currentbutton == buttonid) { // has us as target
-				queueScript(0); // deactivate ourselves
-			} else {
+		// TODO: hrm..
+		if (ourlift->y + ourlift->cabinbottom == ourlift->callbuttony[buttonid]) { // has arrived at us
+			queueScript(0); // deactivate ourselves
+		}
+		// TODO: this is a broken hack
+		if (ourlift->liftAvailable()) { // not moving
+			if (ourlift->currentbutton != buttonid) {
 				ourlift->currentbutton = buttonid;
 				// TODO: mmh
 				if (ourlift->y + ourlift->cabinbottom < ourlift->callbuttony[buttonid])
-					ourlift->fireScript(1, this);
+					ourlift->queueScript(1, this);
 				else
-					ourlift->fireScript(2, this);
+					ourlift->queueScript(2, this);
 			}
 		}
 	}
