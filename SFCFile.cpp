@@ -386,7 +386,9 @@ void CRoom::read() {
 
 	uint16 nopoints = read16();
 	for (unsigned int i = 0; i < nopoints; i++) {
-		floorpoints.push_back(std::pair<uint32, uint32>(read32(), read32()));
+		uint32 x = read32();
+		uint32 y = read32();
+		floorpoints.push_back(std::pair<uint32, uint32>(x, y));
 	}
 
 	// discard unknown bytes
