@@ -30,7 +30,7 @@ void CallButton::tick() {
 
 	if (actv.getInt() == 1) {
 		// TODO: hrm..
-		if (ourlift->y + ourlift->cabinbottom == ourlift->callbuttony[buttonid]) { // has arrived at us
+		if (ourlift->currentbutton == buttonid && ourlift->y + ourlift->cabinbottom == ourlift->callbuttony[buttonid]) { // has arrived at us
 			queueScript(0); // deactivate ourselves
 		}
 		// TODO: this is a broken hack
