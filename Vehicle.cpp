@@ -18,6 +18,9 @@
  */
 
 #include "Vehicle.h"
+#include "Engine.h"
+#include "World.h"
+#include "MetaRoom.h"
 
 Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
@@ -35,6 +38,25 @@ void Vehicle::tick() {
 	CompoundAgent::tick();
 	if (paused) return;
 
+	if (xvec.getInt() != 0 && engine.version == 1) {
+		// handle magical C1 vehicle world wrapping, if necessary
+		
+		MetaRoom *m = world.map.metaRoomAt(x, y);
+		if (!m) {
+			std::cout << "BUG: moving c1 vehicle " << identify() << " is out of room system at " << x << ", " << y << ", so killing it" << std::endl;
+			kill();
+			return;
+		}
+
+		if (x + (xvec.getInt() / 256.0) < m->x()) {
+			assert(xvec.getInt() < 0);
+			x += m->width();
+		} else if (x + (xvec.getInt() / 256.0) > m->x() + m->width()) {
+			assert(xvec.getInt() > 0);
+			x -= m->width();
+		}
+	}
+	
 	// move by xvec/yvec!
 	x += xvec.getInt() / 256.0;
 	y += yvec.getInt() / 256.0;
