@@ -52,15 +52,15 @@ typedef unsigned int uint32;
 
 #endif
 
-// you must define one, and only one, of the following two. otherwise things won't work.
-#ifdef __APPLE__
- #define __C2E_BIGENDIAN
+/* endianism checking - this will break on a bunch of platforms, someone else tidy it up, love fuzzie */
+
+#ifdef __GNU__
+ #include <endian.h>
+#endif
+#if __BYTE_ORDER == __LITTLE_ENDIAN || defined(_MSC_VER) || defined(__i386__)
+ #define __C2E_LITTLEENDIAN
 #else
- #ifdef __PPC__
-  #define __C2E_BIGENDIAN
- #else
-  #define __C2E_LITTLEENDIAN
- #endif
+ #define __C2E_BIGENDIAN
 #endif
 
 #ifdef __C2E_LITTLEENDIAN
@@ -79,6 +79,6 @@ typedef unsigned int uint32;
 
 #endif
 
-#endif
+#endif // _ENDIANLOVE_H
 
 /* vim: set noet: */
