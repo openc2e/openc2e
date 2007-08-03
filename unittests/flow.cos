@@ -2,7 +2,7 @@
 * fuzzie, 06/06/04
 
 DBG: OUTS "# Flow control"
-DBG: OUTS "1..7"
+DBG: OUTS "1..8"
 
 * test LOOP .. UNTL
 SETV VA00 0
@@ -15,28 +15,36 @@ ELSE
  DBG: OUTS "not ok 1 - LOOP .. UNTL"
 ENDI
 
+* test LOOP .. EVER
+SETS VA00 CAOS 1 0 0 0 "LOOP DBG: OUTS \"works\" STOP EVER" 0 0 VA01
+DOIF VA00 EQ "works"
+	DBG: OUTS "ok 2 - LOOP .. EVER"
+ELSE
+	DBG: OUTS "not ok 2 - LOOP .. EVER"
+ENDI
+
 * test REPS .. REPE
 SETV VA00 0
 REPS 4
  ADDV VA00 1
 REPE
 DOIF VA00 eq 4
- DBG: OUTS "ok 2 - REPS .. REPE"
+ DBG: OUTS "ok 3 - REPS .. REPE"
 ELSE
- DBG: OUTS "not ok 2 - REPS .. REPE"
+ DBG: OUTS "not ok 3 - REPS .. REPE"
 ENDI
 
 * test GSUB
 SETV VA00 0
 GSUB test
 DOIF VA00 eq 1
- DBG: OUTS "ok 3 - GSUB"
+ DBG: OUTS "ok 4 - GSUB"
 ELSE
- DBG: OUTS "not ok 3 - GSUB"
+ DBG: OUTS "not ok 4 - GSUB"
 ENDI
 
 * GSUB loops
-SETV VA00 4
+SETV VA00 5
 REPS 4
   GSUB t2
 REPE
