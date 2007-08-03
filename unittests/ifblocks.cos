@@ -2,7 +2,7 @@
 * fuzzie, 06/06/04
 
 DBG: OUTS "# TEST: ifblocks: 21 tests"
-DBG: OUTS "1..21"
+DBG: OUTS "1..22"
 
 * test equality
 DOIF 1 eq 1
@@ -159,3 +159,13 @@ ELSE
  DBG: OUTS "ok 21"
 ENDI
 
+*test chained elifs
+DOIF 1 eq 2
+	DBG: OUTS "not ok 22"
+ELIF 1 eq 3
+	DBG: OUTS "not ok 22"
+ELIF 2 eq 3
+	DBG: OUTS "not ok 22"
+ELSE
+	DBG: OUTS "ok 22"
+ENDI
