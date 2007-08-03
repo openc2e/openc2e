@@ -605,6 +605,8 @@ void Agent::vmTick() {
 
 	// Keep trying to run VMs while we don't run out of timeslice, end up with a blocked VM, or a VM stops.
 	while (vm && vm->timeslice && !vm->isBlocking() && !vm->stopped()) {
+		assert(vm->timeslice > 0);
+
 		// Tell the VM to tick (using all available timeslice), catching exceptions as necessary.
 		try {
 			vm->tick();
