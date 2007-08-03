@@ -13,7 +13,7 @@ ELSE
 ENDI
 
 * test NEW: SIMP
-NEW: SIMP 3 2 1 "bluebell" 1 0 0
+NEW: SIMP 3 2 1 "blnk" 1 0 0
 DOIF TARG eq NULL
  DBG: OUTS "not ok 2"
 ELSE
@@ -55,7 +55,7 @@ ENDI
 
 * test ENUM
 SETV VA00 0
-NEW: SIMP 3 2 1 "bluebell" 1 0 0
+NEW: SIMP 3 2 1 "blnk" 1 0 0
 SETV OV00 2
 ENUM 3 2 1
  ADDV VA00 OV00
