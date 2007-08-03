@@ -52,6 +52,7 @@ c2eCreature *getc2eCreature(Agent *a) {
  STM# SHOU (command) stimulusno (integer)
  %status stub
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STM_SHOU() {
 	VM_PARAM_INTEGER(stimulusno)
@@ -63,6 +64,7 @@ void caosVM::c_STM_SHOU() {
  STM# SIGN (command) stimulusno (integer)
  %status stub
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STM_SIGN() {
 	VM_PARAM_INTEGER(stimulusno)
@@ -74,6 +76,7 @@ void caosVM::c_STM_SIGN() {
  STM# TACT (command) stimulusno (integer)
  %status stub
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STM_TACT() {
 	VM_PARAM_INTEGER(stimulusno)
@@ -85,6 +88,7 @@ void caosVM::c_STM_TACT() {
  STM# WRIT (command) object (agent) stimulusno (integer)
  %status stub
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STM_WRIT() {
 	VM_PARAM_INTEGER(stimulusno)
@@ -158,6 +162,7 @@ void caosVM::c_STIM_WRIT() {
  %status stub
  %pragma implementation caosVM::c_STIM_SHOU_c2
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STIM_SHOU_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -181,6 +186,7 @@ void caosVM::c_STIM_SHOU_c2() {
  %status stub
  %pragma implementation caosVM::c_STIM_SIGN_c2
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STIM_SIGN_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -204,6 +210,7 @@ void caosVM::c_STIM_SIGN_c2() {
  %status stub
  %pragma implementation caosVM::c_STIM_TACT_c2
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STIM_TACT_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -227,6 +234,7 @@ void caosVM::c_STIM_TACT_c2() {
  %status stub
  %pragma implementation caosVM::c_STIM_WRIT_c2
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 void caosVM::c_STIM_WRIT_c2() {
 	VM_PARAM_INTEGER(amount3)
@@ -255,6 +263,7 @@ void caosVM::c_STIM_WRIT_c2() {
  %status stub
  %pragma implementation caosVM::c_STIM_FROM_c1
  %pragma variants c1
+ %cost c1,c2 0
 */
 void caosVM::c_STIM_FROM_c1() {
 	VM_PARAM_INTEGER(amount3)
@@ -652,6 +661,7 @@ void caosVM::c_CHEM() {
  %status maybe
  %pragma variants c1 c2
  %pragma implementation caosVM::c_CHEM_c1
+ %cost c1,c2 0
 */
 void caosVM::c_CHEM_c1() {
 	VM_PARAM_INTEGER(adjust)
@@ -719,6 +729,7 @@ void caosVM::c_ASLP() {
  ASLP (integer)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 
  Determines whether the target Creature is asleep.
 */

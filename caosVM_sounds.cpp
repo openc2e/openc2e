@@ -52,6 +52,7 @@ void caosVM::c_SNDE() {
  SNDE (command) filename (bareword)
  %status maybe
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 
 /**
@@ -59,6 +60,7 @@ void caosVM::c_SNDE() {
  %status maybe
  %pragma variants c1
  %pragma implementation caosVM::c_SNDE
+ %cost c1,c2 0
 */
 
 /**
@@ -87,6 +89,7 @@ void caosVM::c_SNDC() {
  SNDC (command) filename (bareword)
  %status maybe
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 
 /**
@@ -115,6 +118,7 @@ void caosVM::c_SNDL() {
  SNDL (command) filename (bareword)
  %status maybe
  %pragma variants c1 c2
+ %cost c1,c2 0
 */
 
 /**
@@ -169,6 +173,7 @@ void caosVM::v_RMSC() {
  FADE (command)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 */
 void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)
@@ -182,6 +187,7 @@ void caosVM::c_FADE() {
  STPC (command)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
 */
 void caosVM::c_STPC() {
 	valid_agent(targ);

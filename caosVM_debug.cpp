@@ -154,6 +154,7 @@ void caosVM::c_DBG_MALLOC() {
 /**
  DBG: TRACE (command) enable (integer)
  %status ok
+ %pragma variants c1 c2 c3 ca cv
 
  Enables/disables opcode tracing to cerr.
 */
