@@ -744,6 +744,24 @@ void SFCFile::copyToWorld() {
 
 	// move the camera to the correct position
 	world.camera.moveTo(scrollx, scrolly, jump);
+
+	// patch agents
+	// TODO: do we really need to do this, and if so, should it be done here?
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		boost::shared_ptr<Agent> a = (*i);
+
+		// C2's Pitz
+		if (version() == 1 && a->family == 2 && a->genus == 20 && a->species == 10) {
+			// patch ov10 to actually refer to an agent
+			for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
+				if ((*i)->unid == (uint32)a->var[10].getInt()) {
+					a->var[10].setAgent((*i)->copiedAgent());
+					break;
+				}
+			}
+			if (a->var[10].hasInt()) std::cout << "Warning: Couldn't patch Pitz!" << std::endl;
+		}
+	}
 }
 
 #include "sprImage.h"

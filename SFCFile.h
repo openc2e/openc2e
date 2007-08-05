@@ -215,6 +215,7 @@ public:
 	std::vector<SFCScript> scripts;
 	void read();
 	virtual void copyToWorld() = 0;
+	virtual class Agent *copiedAgent() = 0;
 };
 
 struct SFCHotspot {
@@ -236,6 +237,7 @@ public:
 	SFCCompoundObject(SFCFile *p) : SFCObject(p) { ourAgent = 0; }
 	void read();
 	void copyToWorld();
+	class Agent *copiedAgent() { return (Agent *)ourAgent; }
 };
 
 class SFCBlackboard : public SFCCompoundObject {
@@ -285,6 +287,7 @@ public:
 	SFCSimpleObject(SFCFile *p) : SFCObject(p) { ourAgent = 0; }
 	void read();
 	void copyToWorld();
+	class Agent *copiedAgent() { return (Agent *)ourAgent; }
 };
 
 class SFCPointerTool : public SFCSimpleObject {

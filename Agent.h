@@ -45,6 +45,7 @@ class Agent : public boost::enable_shared_from_this<Agent> {
 	friend class opOVxx;
 	friend class opMVxx;
 	friend class LifeAssert;
+	friend class SFCFile;
 	friend class SFCSimpleObject;
 	friend class SFCCompoundObject;
 
