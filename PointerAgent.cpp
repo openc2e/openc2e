@@ -21,6 +21,7 @@
 #include "c16Image.h"
 #include "openc2e.h"
 #include "World.h"
+#include "Engine.h"
 #include "caosVM.h"
 
 // TODO: change imagecount?
@@ -43,6 +44,9 @@ void PointerAgent::finishInit() {
 void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
 	assert(src); // TODO: I /think/ this should only be called by the engine..
 	shared_ptr<script> s = src->findScript(event);
+	if (!s && engine.version < 3) { // TODO: are we sure this doesn't apply to c2e?
+		s = findScript(event); // TODO: we should make sure this actually belongs to the pointer agent and isn't a fallback, maybe
+	}
 	if (!s) return;
 	if (!vm) vm = world.getVM(this);
 	if (vm->fireScript(s, false, src)) { // TODO: should FROM be src?

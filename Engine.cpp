@@ -324,8 +324,14 @@ void Engine::handleMouseButton(SomeEvent &event) {
 				a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
 
 			// TODO: not sure how to handle the following properly, needs research..
-			world.hand()->firePointerScript(101, a->getParent()); // Pointer Activate 1
-		} else
+			int eve;
+			if (engine.version < 3) {
+				eve = 50;
+			} else {
+				eve = 101;
+			}
+			world.hand()->firePointerScript(eve, a->getParent()); // Pointer Activate 1
+		} else if (engine.version > 2)
 			world.hand()->queueScript(116, 0); // Pointer Clicked Background
 	} else if (event.button == buttonright) {
 		if (world.paused) return; // TODO: wrong?
@@ -338,7 +344,9 @@ void Engine::handleMouseButton(SomeEvent &event) {
 			// TODO: c1 support - these attributes are invalid for c1
 			if (!world.hand()->carrying->suffercollisions() || (world.hand()->carrying->validInRoomSystem() || version == 1)) {
 				world.hand()->carrying->queueScript(5, world.hand()); // drop
-				world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
+				
+				int eve; if (engine.version < 3) eve = 54; else eve = 105;
+				world.hand()->firePointerScript(eve, world.hand()->carrying); // Pointer Drop
 
 				// TODO: is this the correct check?
 				if (world.hand()->carrying->sufferphysics() && world.hand()->carrying->suffercollisions()) {
@@ -353,7 +361,9 @@ void Engine::handleMouseButton(SomeEvent &event) {
 			Agent *a = world.agentAt(event.x + world.camera.getX(), event.y + world.camera.getY(), false, true);
 			if (a) {
 				a->queueScript(4, world.hand()); // pickup
-				world.hand()->firePointerScript(104, a); // Pointer Pickup
+				
+				int eve; if (engine.version < 3) eve = 53; else eve = 104;
+				world.hand()->firePointerScript(eve, a); // Pointer Pickup
 			}
 		}
 	} else if (event.button == buttonmiddle) {
