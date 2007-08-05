@@ -18,6 +18,7 @@
  */
 
 #include "Agent.h"
+#include "MetaRoom.h"
 #include "World.h"
 #include "Engine.h"
 #include <iostream>
@@ -742,13 +743,21 @@ void Agent::carry(AgentRef a) {
 void Agent::dropCarried() {
 	if (!carrying) return;
 	
-	carrying->carriedby = AgentRef(0);
+	if (engine.version == 1) {
+		MetaRoom* m = world.map.metaRoomAt(carrying->x,carrying->y);
+		if (!m) return;
+		shared_ptr<Room> r = m->nextFloorFromPoint(carrying->x,carrying->y);
+		if (!r) return; // TODO: hack to avoid black holes, is this correct?
+		carrying->carriedby = AgentRef(0);
+		carrying->moveTo(carrying->x,r->bot.pointAtX(carrying->x).y - carrying->getHeight());
+	} else
+		carrying->carriedby = AgentRef(0);
+
 	// TODO: this doesn't reorder children or anything..
 	carrying->setZOrder(carrying->zorder);
 
 	// fire 'Lost Carried Agent'
 	queueScript(125, carrying); // TODO: is this the correct param?
-	
 	carrying = AgentRef(0);
 }
 

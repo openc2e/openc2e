@@ -336,7 +336,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 		// need to manually set world.hand()->carrying to NULL and a here, respectively - fuzzie
 		if (world.hand()->carrying) {
 			// TODO: c1 support - these attributes are invalid for c1
-			if (!world.hand()->carrying->suffercollisions() || world.hand()->carrying->validInRoomSystem()) {
+			if (!world.hand()->carrying->suffercollisions() || (world.hand()->carrying->validInRoomSystem() || version == 1)) {
 				world.hand()->carrying->queueScript(5, world.hand()); // drop
 				world.hand()->firePointerScript(105, world.hand()->carrying); // Pointer Drop
 

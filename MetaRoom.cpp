@@ -102,6 +102,26 @@ MetaRoom::~MetaRoom() {
 	// we hold the only strong reference to our contained rooms, so they'll be auto-deleted
 }
 
+shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
+	shared_ptr<Room> closest_up, closest_down;
+	float dist_down = -1, dist_up = -1;
+	for (std::vector<shared_ptr<Room> >::iterator r = rooms.begin(); r != rooms.end(); r++) {
+		if (!(*r)->bot.containsX(x)) continue;
+		float dist = (*r)->bot.pointAtX(x).y - y; // down is positive
+		float absdist = fabs(dist);
+		if (dist >= 0 && (absdist < dist_down || dist_down < 0)) {
+			dist_down = absdist;
+			closest_down = *r;
+		} else if (dist < 0 && (absdist < dist_up || dist_up < 0)) {
+			dist_up = absdist;
+			closest_up = *r;
+		}
+	}
+	if (closest_down) return closest_down;
+	if (closest_up) return closest_up;
+	return shared_ptr<Room>();
+}
+
 unsigned int MetaRoom::addRoom(shared_ptr<Room> r) {
 	// add to both our local list and the global list
 	rooms.push_back(r);
