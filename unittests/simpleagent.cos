@@ -1,8 +1,8 @@
 * unit tests for the simple agent stuff 
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: simpleagent: 6 tests"
-DBG: OUTS "1..6"
+DBG: OUTS "# TEST: simpleagent: 7 tests"
+DBG: OUTS "1..7"
 
 * test NULL
 SETA VA00 NULL
@@ -66,3 +66,9 @@ ELSE
  DBG: OUTS "not ok 6"
 ENDI
 
+* make sure TARG is reset after ENUM
+DOIF TARG eq NULL
+ DBG: OUTS "ok 7"
+ELSE
+ DBG: OUTS "not ok 7"
+ENDI
