@@ -24,6 +24,7 @@
 #include <math.h> // abs()/fabs()
 #include "openc2e.h"
 #include "World.h"
+#include "Engine.h"
 #include <cctype> // toupper/tolower
 #include <algorithm> // transform
 #include <boost/format.hpp>
@@ -313,7 +314,7 @@ void caosVM::c_DIVV() {
 	caos_assert(div.hasDecimal());
 	if (div.getFloat() == 0.0f) throw caosException("attempt to divide by zero");
 	
-	if (v->hasInt() && div.hasInt()) {
+	if ((engine.version < 3 && v->hasDecimal() && div.hasDecimal()) || (v->hasInt() && div.hasInt())) {
 		// integer division
 		v->setInt(v->getInt() / div.getInt());
 	} else if (v->hasInt() || v->hasFloat()) {
