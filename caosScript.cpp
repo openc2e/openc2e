@@ -580,12 +580,14 @@ void caosScript::parseloop(int state, void *info) {
 		} else if (t->word() == "reps") {
 			const static ci_type types[] = { CI_NUMERIC, CI_END };
 			readExpr(types);
+			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd reps")));
 			int loop = current->getNextIndex();
 			parseloop(ST_REPS, (void *)&loop);
 		} else if (t->word() == "repe") {
 			if (state != ST_REPS)
 				throw parseException("Unexpected repe");
 			emitOp(CAOS_DECJNZ, *(int *)info);
+			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd repe")));
 			return;
 
 		} else if (t->word() == "doif") {
