@@ -259,7 +259,8 @@ void caosVM::stop() {
 }
 
 void caosVM::runEntirely(shared_ptr<script> s) {
-	resetScriptState();
+	// caller is responsible for resetting/setting *all* state!
+	cip = nip = runops = 0;
 	currentscript = s;
 	
 	while (true) {
