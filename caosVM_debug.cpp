@@ -198,23 +198,33 @@ void caosVM::c_DBG_TRACE() {
  MANN (command) cmd (string)
  %status stub
  
- Looks up documentation on the given command and spits it on the current output socket.
+ Looks up documentation on the given command and spits it on the current output stream.
 */
 void caosVM::c_MANN() {
 	VM_PARAM_STRING(cmd)
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
 	const cmdinfo *i = currentscript->dialect->cmdbase();
-	// This isn't performance critical, so just use a dumb loop
+	
+	bool found = false;
 	while (i->lookup_key) {
-		if (cmd == i->fullname)
-			break;
+		// TODO: this doesn't work for FACE at the moment due to hack elsewhere
+		if (cmd == i->fullname) {
+			found = true;
+			std::string d = i->docs;
+			// TODO: docs should always include name/parameters/etc, so should never be empty
+			if (d.size())
+				*outputstream << std::string(i->docs) << std::endl;
+			else
+				*outputstream << "no documentation for " << cmd << std::endl << std::endl;
+		}
+	
 		i++;
 	}
-	if (!i->lookup_key) {
-		result.setString("Not found");
+
+	if (!found) {
+		*outputstream << "didn't find " << cmd << std::endl;
 		return;
 	}
-	result.setString(std::string(i->docs));
 }
 
 /**
