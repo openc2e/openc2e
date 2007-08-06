@@ -152,7 +152,6 @@ void caosVM::c_DELG() {
 /**
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
  %status done
- %pragma noparse
  %pragma variants c1 c2 cv c3
 
  Marks the beginning of a normal script applying to the agent with the given classifier 
@@ -165,7 +164,6 @@ void caosVM::c_SCRP() {
 /**
  RSCR (command)
  %status done
- %pragma noparse
  %pragma variants c2 cv c3
 
  Marks the beginning of a removal script.

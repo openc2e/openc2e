@@ -35,7 +35,6 @@
 
 /**
  VAxx (variable)
- %pragma noparse
  %status maybe
  %pragma variants c2 cv c3
 
@@ -48,7 +47,6 @@ void caosVM::v_VAxx() {
 
 /*
  VARx (variable)
- %pragma noparse
  %status maybe
  %pragma variants c1 c2
 
@@ -57,7 +55,6 @@ void caosVM::v_VAxx() {
 
 /**
  MVxx (variable)
- %pragma noparse
  %status maybe
 
  Like OVxx, only for OWNR, not TARG.
@@ -142,7 +139,6 @@ void caosVM::c_SETA() {
 
 /**
  OVxx (variable)
- %pragma noparse
  %status maybe
  %pragma variants c2 cv c3
 
@@ -155,7 +151,6 @@ void caosVM::v_OVxx() {
 
 /*
  OBVx (variable)
- %pragma noparse
  %status maybe
  %pragma variants c1 c2
 

@@ -27,7 +27,6 @@
 
 /**
  DOIF (command) condition (condition)
- %pragma parser new DoifParser()
  %status maybe
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
@@ -41,7 +40,6 @@ void caosVM::c_DOIF() {
 
 /**
  ELIF (command) condition (condition)
- %pragma parser new DoifParser()
  %pragma variants all
  %status maybe
  %cost c1,c2 0
@@ -56,7 +54,6 @@ void caosVM::c_ELIF() {
 
 /**
  ELSE (command)
- %pragma noparse
  %status maybe
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
@@ -81,7 +78,6 @@ void caosVM::c_ENDI() {
 
 /**
  REPS (command) reps (integer)
- %pragma parser new parseREPS()
  %status maybe
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
@@ -94,7 +90,6 @@ void caosVM::c_REPS() {
 
 /**
  REPE (command)
- %pragma noparse
  %status maybe
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
@@ -107,7 +102,6 @@ void caosVM::c_REPE() {
 
 /**
  LOOP (command)
- %pragma parser new parseLOOP()
  %status maybe
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
@@ -120,7 +114,6 @@ void caosVM::c_LOOP() {
 
 /**
  EVER (command)
- %pragma noparse
  %status maybe
  %pragma variants c1 c2 cv c3
  
@@ -132,7 +125,6 @@ void caosVM::c_EVER() {
 
 /**
  UNTL (command) condition (condition)
- %pragma noparse
  %status maybe
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
@@ -145,7 +137,6 @@ void caosVM::c_UNTL() {
 
 /**
  GSUB (command) label (label)
- %pragma parser new parseGSUB()
  %pragma retc -1
  %status maybe
  %pragma variants c1 c2 cv c3
@@ -158,7 +149,6 @@ void caosVM::c_GSUB() {
 
 /**
  SUBR (command) label (label)
- %pragma parser new parseSUBR()
  %status maybe
  %pragma variants c1 c2 cv c3
  
@@ -201,7 +191,6 @@ void caosVM::c_NEXT() {
 /**
  ENUM (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma parserclass ENUMhelper
  %pragma retc -1
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
@@ -234,7 +223,6 @@ void caosVM::c_ENUM() {
 /**
  ESEE (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma parserclass ENUMhelper
  %pragma retc -1
  %pragma variants c2 cv c3
  
@@ -264,7 +252,6 @@ void caosVM::c_ESEE() {
 
 /**
  ETCH (command) family (integer) genus (integer) species (integer)
- %pragma parserclass ENUMhelper
  %pragma retc -1
  %status maybe
  %pragma variants c2 cv c3
@@ -311,7 +298,6 @@ void caosVM::c_ETCH() {
 
 /**
  EPAS (command) family (integer) genus (integer) species (integer)
- %pragma parserclass ENUMhelper
  %pragma retc -1
  %status stub
 
@@ -331,7 +317,6 @@ void caosVM::c_EPAS() {
 
 /**
  ECON (command) agent (agent)
- %pragma parserclass ENUMhelper
  %pragma retc -1
  %status stub
 
