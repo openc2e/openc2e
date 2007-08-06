@@ -136,7 +136,7 @@ lex.c2.cpp lex.c2.h: c2caos.l
 	flex -+ -d -o lex.c2.cpp --header-file=lex.c2.h --prefix=c2 c2caos.l
 
 ## lex.yy.h deps aren't detected evidently
-caosScript.o: lex.yy.h lex.yy.cpp
+caosScript.o: lex.yy.h lex.yy.cpp lex.c2.h lex.c2.cpp
 
 ## based on automake stuff
 %.o: %.cpp
