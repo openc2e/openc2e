@@ -85,7 +85,11 @@ void caosVM::c_ENDI() {
  The start of a REPS...REPE loop. The body of the loop will be executed (reps) times.
 */
 void caosVM::c_REPS() {
-	// handled elsewhere
+	// Our expression parameter might push on a value that's a pointer
+	// (or otherwise not an integer); deal with it
+	
+	VM_PARAM_INTEGER(n);
+	result.setInt(n+1); // we'll visit the DECJNZ first to handle 0 etc
 }
 
 /**

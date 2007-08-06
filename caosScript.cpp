@@ -150,6 +150,11 @@ struct doifinfo {
 	int donereloc;
 };
 
+struct repsinfo {
+	int jnzreloc;
+	int loopidx;
+};
+
 
 token *caosScript::tokenPeek() {
 	if ((size_t)curindex >= tokens->size())
@@ -580,14 +585,19 @@ void caosScript::parseloop(int state, void *info) {
 
 		} else if (t->word() == "reps") {
 			const static ci_type types[] = { CI_NUMERIC, CI_END };
+			struct repsinfo ri;
+			ri.jnzreloc = current->newRelocation();
 			readExpr(types);
 			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd reps")));
-			int loop = current->getNextIndex();
-			parseloop(ST_REPS, (void *)&loop);
+			emitOp(CAOS_JMP, ri.jnzreloc);
+			ri.loopidx = current->getNextIndex();
+			parseloop(ST_REPS, (void *)&ri);
 		} else if (t->word() == "repe") {
 			if (state != ST_REPS)
 				throw parseException("Unexpected repe");
-			emitOp(CAOS_DECJNZ, *(int *)info);
+			struct repsinfo *ri = (repsinfo *)info;
+			current->fixRelocation(ri->jnzreloc);
+			emitOp(CAOS_DECJNZ, ri->loopidx);
 			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd repe")));
 			return;
 
