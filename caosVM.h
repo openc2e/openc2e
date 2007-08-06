@@ -189,7 +189,7 @@ public:
 	
 	// script state...
 	shared_ptr<script> currentscript;
-	int nip, cip;
+	int nip, cip, runops;
 	
 	bool inst, lock, stop_loop;
 	int timeslice;

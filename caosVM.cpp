@@ -225,9 +225,14 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 inline void caosVM::runOp() {
 	cip = nip;
 	nip++;
+	
+	runops++;
+	if (runops > 1000000) throw creaturesException("script exceeded 1m ops");
+
 	shared_ptr<script> scr = currentscript;
 	caosOp op = currentscript->getOp(cip);
 	result.reset(); // xxx this belongs in opcode maybe
+	
 	try {
 		if (trace) {
 			std::cerr
@@ -243,19 +248,20 @@ inline void caosVM::runOp() {
 		stop();
 		throw;
 	}
+	
 	if (!result.isNull())
 		valueStack.push_back(result);
 }
 
 void caosVM::stop() {
-	cip = nip = 0;
 	lock = false;
 	currentscript.reset();
 }
 
 void caosVM::runEntirely(shared_ptr<script> s) {
+	resetScriptState();
 	currentscript = s;
-	cip = nip = 0;
+	
 	while (true) {
 		runOp();
 		if (!currentscript) break;
@@ -265,7 +271,6 @@ void caosVM::runEntirely(shared_ptr<script> s) {
 			throw creaturesException("blocking in an installation script");
 		}
 	}
-	stop(); // probably redundant, but eh
 }
 
 bool caosVM::fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm) {
@@ -276,7 +281,6 @@ bool caosVM::fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm) {
 
 	resetScriptState();
 	currentscript = s;
-	cip = nip = 0;
 	targ = owner;
 	from.set(frm);
 	timeslice = 1;
@@ -315,6 +319,7 @@ void caosVM::resetCore() {
 	camera.reset();
 
 	trace = false;
+	cip = nip = runops = 0;
 }
 
 void caosVM::tick() {
