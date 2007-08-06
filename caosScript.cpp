@@ -505,12 +505,13 @@ void caosScript::parseloop(int state, void *info) {
 				throw parseException("Unexpected RSCR");
 			current = installer;
 		} else if (t->word() == "endm") {
-			if (state == ST_BODY) {
+			emitOp(CAOS_STOP, 0);
+			
+			if (state == ST_INSTALLER || state == ST_BODY || state == ST_REMOVAL) {
 				state = ST_INSTALLER;
 				current = installer;
 			} else {
 				// I hate you. Die in a fire.
-				emitOp(CAOS_STOP, 0);
 				putBackToken(t);
 				return;
 			}
