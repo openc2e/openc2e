@@ -586,6 +586,7 @@ void Agent::unhandledException(std::string info, bool wasscript) {
 		else
 			std::cerr << identify() << " was autokilled due to: " << info << std::endl;
 	} else {
+		stopScript();
 		if (wasscript)
 			std::cerr << identify() << " caused an exception during script " << lastScript << ": " << info << std::endl;
 		else
@@ -615,6 +616,8 @@ void Agent::vmTick() {
 			// try letting the exception script handle it
 			if (!queueScript(255))
 				unhandledException(std::string("\n") + e.prettyPrint(), true);
+			else
+				stopScript(); // we still want current script to die
 		} catch (caosException &e) {
 			// XXX: prettyPrint() isn't being virtual, wtf?
 			unhandledException(std::string("\n") + e.prettyPrint(), true);
