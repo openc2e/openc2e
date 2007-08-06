@@ -31,12 +31,17 @@ enum ci_type {
 	CI_BYTESTR,
 	CI_VECTOR,
 	CI_BAREWORD,
+	CI_SUBCOMMAND,
 	CI_ANYVALUE
 };
 
 struct cmdinfo {
-//	void (caosVM::*handler)();
-	int disp_id;
+#ifndef VCPP_BROKENNESS
+	void (caosVM::*handler)();
+#else
+	int handler_idx;
+#endif
+	const char *lookup_key;
 	const char *key;
 	const char *name;
 	const char *fullname;
@@ -48,7 +53,9 @@ struct cmdinfo {
 };
 
 void registerAutoDelegates();
+#ifdef VCPP_BROKENNESS
 void dispatchCAOS(class caosVM *vm, int idx);
+#endif
 
 #endif
 

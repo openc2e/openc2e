@@ -17,6 +17,10 @@
  *
  */
 #include "bytecode.h"
+#include <boost/format.hpp>
+
+using boost::format;
+using boost::str;
 
 const char *cnams[] = {
     NULL,
@@ -27,4 +31,44 @@ const char *cnams[] = {
     "GE",
     "NE",
     NULL
+};
+
+std::string dumpOp(caosOp op) {
+    int arg = op.argument; // weird C++ issues
+    switch (op.opcode) {
+        case CAOS_NOP:
+            return std::string("NOP");
+        case CAOS_DIE:
+            return str(format("DIE %d") % arg);
+        case CAOS_STOP:
+            return std::string("STOP");
+        case CAOS_CMD:
+            return str(format("CMD %d") % arg);
+        case CAOS_COND:
+            return str(format("COND %s %s") % (arg & CAND ? "AND" : "OR") % cnams[arg & CMASK]);
+        case CAOS_CONST:
+            return str(format("CONST %d") % arg);
+        case CAOS_CONSTINT:
+            return str(format("CONSTINT %d") % arg);
+        case CAOS_BYTESTR:
+            return str(format("BYTESTR %d") % arg);
+        case CAOS_VAXX:
+            return str(format("VA%02d") % arg);
+        case CAOS_OVXX:
+            return str(format("OV%02d") % arg);
+        case CAOS_MVXX:
+            return str(format("MV%02d") % arg);
+        case CAOS_CJMP:
+            return str(format("CJMP %08d") % arg);
+        case CAOS_JMP:
+            return str(format("JMP %08d") % arg);
+        case CAOS_DECJNZ:
+            return str(format("DECJNZ %08d") % arg);
+        case CAOS_GSUB:
+            return str(format("GSUB %08d") % arg);
+        case CAOS_ENUMPOP:
+            return str(format("ENUMPOP %08d") % arg);
+        default:
+            return str(format("UNKNOWN %02x %06x") % arg);
+    }
 };

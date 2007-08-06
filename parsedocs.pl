@@ -212,6 +212,13 @@ while (<>) {
 	}
 
 	for my $v (@v) {
+		if ($v eq 'all') {
+			@v = qw(all);
+			last;
+		}
+	}
+
+	for my $v (@v) {
 		if (exists $data{$v}{$key}) {
 			print STDERR "Name collision for ($key) in variant $v\n";
 			exit 1;
@@ -224,6 +231,19 @@ if ($missing_status) {
 	print STDERR "$missing_status commands are missing \%status, fixit.\n";
 	exit 1;
 }
+
+for my $key (keys %{$data{all}}) {
+	for my $variant (keys %data) {
+		next if $variant eq 'all';
+		if (exists $data{$variant}{$key}) {
+			print STDERR "Name collision for ($key) in variant $variant\n";
+			exit 1;
+		}
+		$data{$variant}{$key} = $data{all}{$key};
+	}
+}
+
+delete $data{all};
 
 print Dump {
 	variants => \%data,

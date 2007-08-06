@@ -498,7 +498,7 @@ void caosVM::c_FLTO() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	valid_agent(targ)
+	valid_agent(targ);
 	targ->floatTo(x, y);
 }
 
@@ -512,7 +512,7 @@ void caosVM::c_FLTO() {
 void caosVM::c_FREL() {
 	VM_PARAM_AGENT(agent)
 
-	valid_agent(targ)
+	valid_agent(targ);
 	targ->floatTo(agent);
 }
 

@@ -1,289 +1,52 @@
-/*
- *  dialect.cpp
- *  openc2e
- *
- *  Created by Bryan Donlan on Thu 11 Aug 2005.
- *  Copyright (c) 2005-2006 Bryan Donlan. All rights reserved.
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2 of the License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- */
 #include "dialect.h"
-#include "lex.yy.h"
-#include "token.h"
-#include <string>
-#include <cctype>
-#include <cmath>
-#include "caosScript.h"
-#include "cmddata.h"
 #include "exceptions.h"
-#include "caosVar.h"
-#include "Agent.h"
-#include "bytecode.h"
+#include <stdlib.h>
+#include <string.h>
 
-#include <sstream>
-#include <boost/format.hpp>
+static int cmd_cmp(const void *pa, const void *pb) {
+    const cmdinfo *a = (const cmdinfo *)pa;
+    const cmdinfo *b = (const cmdinfo *)pb;
 
-using boost::str;
-
-std::map<std::string, Variant *> variants;
-
-/*
- * Since DOIFs don't short-circuit, just keep a flag indicating whether
- * the current condition is true or not on the stack...
- */
-void parseCondition(caosScript *s, int success, int failure) {
-	bool isAnd = true;
-	s->current->thread(new ConstOp(caosVar(1)));
-	while(1) {
-		int entry = s->current->getNextIndex();
-		s->v->exp_dialect->set_expect(CI_ANYVALUE);
-		s->v->exp_dialect->doParse(s);
-		
-		token *comparison = getToken(TOK_WORD);
-		std::string cword = comparison->word;
-		int compar;
-		if (cword == "eq")
-			compar = CEQ;
-		else if (cword == "gt")
-			compar = CGT;
-		else if (cword == "ge")
-			compar = CGE;
-		else if (cword == "lt")
-			compar = CLT;
-		else if (cword == "le")
-			compar = CLE;
-		else if (cword == "ne")
-			compar = CNE;
-		else if (cword == "bt")
-			compar = CBT;
-		else if (cword == "bf")
-			compar = CBF;
-		else
-			throw creaturesException("unexpected word during parseCondition: '" + comparison->word + "'"); // badness
-		s->v->exp_dialect->set_expect(CI_ANYVALUE);
-		s->v->exp_dialect->doParse(s);
-
-		bool nextIsAnd = false;
-		bool isLast = false;
-
-		struct token *peek = tokenPeek();
-		if (!peek)
-			isLast = true;
-		else if (peek->type == TOK_WORD) {
-			if (peek->word == "and") {
-				getToken();
-				nextIsAnd = true;
-			} else if (peek->word == "or")
-				getToken();
-			else isLast = true;
-		}
-		
-		s->current->thread(new caosCond(compar, isAnd));
-		isAnd = nextIsAnd;
-		
-		if (isLast) break;
-	}
-	s->current->thread(new caosCJMP(success));
-	s->current->thread(new caosJMP(failure));
+    return strcmp(a->lookup_key, b->lookup_key);
 }
 
-void DefaultParser::operator()(class caosScript *s, class Dialect *curD) {
-	int argc = cd->argc;
-	for (int i = 0; i < argc; i++) {
-		if (cd->argtypes)
-			s->v->exp_dialect->set_expect(cd->argtypes[i]);
-		s->v->exp_dialect->doParse(s);
-	}
-	s->current->thread(new simpleCaosOp(cd));
+static const cmdinfo *find_cmd(const struct cmdinfo *tbl, int cnt, const char *name) {
+    cmdinfo key;
+    key.lookup_key = name;
+    return (const cmdinfo *)bsearch((void *)&key, (void *)tbl, cnt, sizeof key, cmd_cmp);
 }
 
-
-bool Dialect::parseOne(caosScript *s) {
-	token *t;
-	t = getToken();
-	if (!t) {
-		eof();
-		return false;
-	}
-	handleToken(s, t);
-	return true;
+static int count_cmds(const struct cmdinfo *tbl) {
+    int i = 0;
+    while (tbl[i].lookup_key)
+        i++;
+    return i;
 }
 
-void Dialect::handleToken(caosScript *s, token *t) {
-	if (t->type != TOK_WORD)
-		throw parseFailure(std::string("unexpected non-word ") + t->dump());
-	std::string word = t->word;
-	if (delegates.find(word) == delegates.end())
-		throw parseException(std::string("no delegate for ") + t->dump());
-	parseDelegate &p = *delegates[word];
-	p(s, this, expect);
+Dialect::Dialect(const cmdinfo *cmds_, const std::string &n) : name(n) {
+    cmdcnt = count_cmds(cmds = cmds_);
 }
 
-void Dialect::zotDelegates() {
-	// not a destructor because it seems that we're not guaranteed ownership
-	for (std::map<std::string, parseDelegate *>::iterator i = delegates.begin(); i != delegates.end(); i++) {
-//		delete i->second;
-//		XXX: This is disabled for now due to static allocation of, uh, most of them. >_>
-	}
+const cmdinfo *Dialect::find_command(const char *name) const {
+    const cmdinfo *ci = find_cmd(cmds, cmdcnt, name);
+	if (!ci)
+		throw parseException(std::string("Command not found: ") + name);
+	return ci;
 }
 
-NamespaceDelegate::~NamespaceDelegate() {
-	// we *do* own everything in a namespacedelegate, though. hoorah!
-	dialect.zotDelegates();
+int Dialect::cmd_index(const cmdinfo *ci) const {
+    assert(ci >= cmds && ci < cmds + cmdcnt);
+    return (ci - cmds);
 }
 
-void ExprDialect::handleToken(caosScript *s, token *t) {
-	switch (t->type) {
-		case TOK_CONST:
-			s->current->thread(new ConstOp(t->constval));
-			break;
-		case TOK_WORD:
-			{
-				std::string word = t->word;
-				if (expect == CI_BAREWORD) {
-					s->current->thread(new ConstOp(caosVar(word)));
-					return;
-				}
-				if (word.size() == 4) {
-					if (word[0] == 'v' && word[1] == 'a') {
-						if (word[2] == 'r') {
-							if (!isdigit(word[3]))
-								throw parseException("non-digits found in VARx");
-							s->current->thread(new opVAxx(atoi(word.c_str() + 3)));
-						} else {
-							if (!(isdigit(word[2]) && isdigit(word[3])))
-								throw parseException("non-digits found in VAxx");
-							s->current->thread(new opVAxx(atoi(word.c_str() + 2)));
-						}
-						return;
-					} else if (word[0] == 'o' && word[1] == 'v') {
-						if(!(isdigit(word[2]) && isdigit(word[3])))
-							throw parseException("non-digits found in OVxx");
-						s->current->thread(new opOVxx(atoi(word.c_str() + 2)));
-						return;
-					} else if (word[0] == 'o' && word[1] == 'b' && word[2] == 'v') {
-						if (!isdigit(word[3]))
-							throw parseException("non-digits found in OBVx");
-						s->current->thread(new opOVxx(atoi(word.c_str() + 3)));
-						return;
-					} else if (word[0] == 'm' && word[1] == 'v') {
-						if(!(isdigit(word[2]) && isdigit(word[3])))
-							throw parseException("non-digits found in MVxx");
-						s->current->thread(new opMVxx(atoi(word.c_str() + 2)));
-						return;
-					}
-				}
-			}
-			Dialect::handleToken(s, t);
-			return;
-		case TOK_BYTESTR:
-			s->current->thread(new opBytestr(t->bytestr));
-			break;
-		default:
-			assert(false);
-	}
-}
-
-void DoifDialect::handleToken(class caosScript *s, token *t) {
-	if (t->type == TOK_WORD) {
-		if (t->word == "endi") {
-			if (failure) // we don't have an else clause
-				s->current->fixRelocation(failure);
-			stop = true;
-			return;
-		}
-		if (t->word == "else") {
-			if (!failure)
-				throw parseException("double else clause is forbidden");
-			s->current->thread(new caosJMP(exit));
-			s->current->fixRelocation(failure);
-			failure = 0;
-			return;
-		}
-		if (t->word == "elif") {
-			// emuluate an else-doif-endi block
-			if (!failure)
-				throw parseException("double else clause is forbidden");
-			s->current->thread(new caosJMP(exit));
-			s->current->fixRelocation(failure);
-			failure = 0;
-			DoifParser dip;
-			dip(s, this);
-			stop = true;
-			return;
-		}
-	}
-	Dialect::handleToken(s, t);
-}
-
-std::map<std::string, const cmdinfo *> op_key_map;
-
-class HackySETVforC2 : public parseDelegate {
-	public:
-		NamespaceDelegate *nd;
-		parseDelegate *pd;
-		void operator() (class caosScript *s, class Dialect *curD) {
-			assert(pd && nd);
-			token *t = tokenPeek();
-			if (t->type == TOK_WORD && nd->dialect.delegates.find(t->word) != nd->dialect.delegates.end()) {
-				(*nd)(s, curD);
-			} else {
-				(*pd)(s, curD);
-			}
-		}
-
-		HackySETVforC2() : nd(NULL), pd(NULL) {}
-};
+std::map<std::string, boost::shared_ptr<Dialect> > dialects;
 
 void registerDelegates() {
-	static HackySETVforC2 setvc1, setvc2;
-	registerAutoDelegates();
-
-
-	setvc1.nd = (NamespaceDelegate *)(variants[std::string("c1")]->cmd_dialect->delegates["setv"]);
-	setvc2.nd = (NamespaceDelegate *)(variants[std::string("c2")]->cmd_dialect->delegates["setv"]);
-
-	setvc1.pd = variants[std::string("c3")]->cmd_dialect->delegates["setv"];
-	setvc2.pd = variants[std::string("c3")]->cmd_dialect->delegates["setv"];
-
-	// apply our hacky SETV to the C1 and C2 dialects
-	variants[std::string("c1")]->cmd_dialect->delegates["setv"] = &setvc1;
-	variants[std::string("c2")]->cmd_dialect->delegates["setv"] = &setvc2;
-
-	std::map<std::string, Variant *>::iterator it = variants.begin();
-	while (it != variants.end()) {
-		Variant *v = (*it).second;
-		v->name = (*it).first;
-		const cmdinfo *cmd = v->cmds;
-
-		for (int i = 0; cmd[i].key; i++) {
-			op_key_map[std::string(cmd[i].key)] = &cmd[i];
-		}
-
-		it++;
-	}
+    registerAutoDelegates();
 }
 
 void freeDelegates() {
-	std::map<std::string, Variant *>::iterator it = variants.begin();
-	while (it != variants.end()) {
-		if (it->second->cmd_dialect)
-			it->second->cmd_dialect->zotDelegates();
-		if (it->second->exp_dialect)
-			it->second->exp_dialect->zotDelegates();
-		delete it->second;
-
-		it++;
-	}	
+    dialects.clear();
 }
 
 /* vim: set noet: */

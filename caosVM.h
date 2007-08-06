@@ -47,6 +47,25 @@ class badParamException : public caosException {
 
 class vmStackItem {
 	protected:
+		struct visit_dump : public boost::static_visitor<std::string> {
+			std::string operator()(const caosVar &i) const {
+				return i.dump();
+			}
+
+			std::string operator()(caosVar *i) const {
+				return std::string("ptr ") + i->dump();
+			}
+
+			std::string operator()(const bytestring_t &bs) const {
+				std::ostringstream oss;
+				oss << "[ ";
+				for (bytestring_t::const_iterator i = bs.begin(); i != bs.end(); i++) {
+					oss << (int)*i << " ";
+				}
+				oss << "]";
+				return oss.str();
+			}
+		};
 
 		struct visit_lval : public boost::static_visitor<const caosVar &> {
 			
@@ -124,18 +143,25 @@ class vmStackItem {
 			}
 		}
 
-		bytestring_t getByteStr() {
+		bytestring_t getByteStr() const {
 			try {
 				return boost::apply_visitor(visit_bs(), value);
 			} catch (boost::bad_visit &e) {
 				throw badParamException();
 			}
 		}
-		
+
+		std::string dump() const {
+			try {
+				return boost::apply_visitor(visit_dump(), value);
+			} catch (boost::bad_visit &e) {
+				return std::string("ERR::bad_visit");
+			}
+		}
 };
 
 struct callStackItem {
-	boost::shared_ptr<std::vector<vmStackItem> > valueStack;
+	std::vector<vmStackItem> valueStack;
 	int nip;
 };
 
@@ -202,6 +228,8 @@ public:
 
 	class Creature *getTargCreature();
 	class SpritePart *getCurrentSpritePart();
+
+	void dummy_cmd();
 
 	// map
 	void v_ADDM();
@@ -330,6 +358,7 @@ public:
 	void c_REAF();
 	void v_VAxx();
 	void v_OVxx();
+	void v_MVxx();
 	void c_MODV();
 	void c_SUBV();
 	void c_NEGV();
@@ -385,6 +414,7 @@ public:
 	void c_RNDV();
 
 	// flow
+	void c_DOIF();
 	void c_ENDI();
 	void c_REPS();
 	void c_REPE();
@@ -406,19 +436,24 @@ public:
 	void v_CAOS();
 	
 	// debug
+	void c_DBG_ASRT();
 	void c_DBG_OUTS();
 	void c_DBG_OUTV();
 	void c_DBUG();
 	void c_DBG_MALLOC();
+	void c_DBG_DUMP();
 	void c_DBG_TRACE();
 	void c_MANN();
 	void c_DBG_DISA();
 	void v_UNID();
+	void v_UNID_c2();
 	void v_AGNT();
 	void v_DBG_IDNT();
 	void c_DBG_PROF();
 	void c_DBG_CPRO();
 	void v_DBG_STOK();
+	void c_DBG_TSLC();
+	void v_DBG_TSLC();
 
 	// agent
 	void c_NEW_COMP();
@@ -649,8 +684,8 @@ public:
 	void c_APPR();
 	void c_UNCS();
 	void v_UNCS();
-	void v_FACE();
-	void s_FACE();
+	void v_FACE_STRING();
+	void v_FACE_INT();
 	void c_LIKE();
 	void v_LIMB();
 	void c_ORDR_SHOU();
@@ -947,6 +982,8 @@ public:
 	void c_SERS_SCRP();
 	void c_SERL_SCRP();
 
+	void safeJMP(int nip);
+	void runOpCore(script *s, caosOp op);
 	void runOp();
 	void runEntirely(shared_ptr<script> s);
 
@@ -971,8 +1008,8 @@ class notEnoughParamsException : public caosException {
 class invalidAgentException : public caosException {
 	public:
 		invalidAgentException() : caosException("Invalid agent handle") {}
-		invalidAgentException(const std::string &d, const char *file, int line)
-			: caosException(d, file, line) {}
+		invalidAgentException(const char *s) : caosException(s) {}
+		invalidAgentException(const std::string &s) : caosException(s) {}
 };
 
 #define VM_VERIFY_SIZE(n) // no-op, we assert in the pops. orig: if (params.size() != n) { throw notEnoughParamsException(); }
@@ -1006,7 +1043,8 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 
 #define STUB throw caosException("stub in " __FILE__)
 
-#define valid_agent(x) { if (!(x)) throw invalidAgentException("Invalid agent handle: " #x, __FILE__, __LINE__); }
+// FIXME: use do { ... } while (0)
+#define valid_agent(x) do { if (!(x)) throw invalidAgentException(boost::str(boost::format("Invalid agent handle: %s thrown from %s:%d") % #x % __FILE__ % __LINE__)); } while(0)
 
 #endif
 /* vim: set noet: */

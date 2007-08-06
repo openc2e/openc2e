@@ -11,6 +11,7 @@
 %option yylineno
 %x L_BYTESTR
 %x L_STRING
+%x L_BRSTRING
 %x L_COMMENT
 
 STRINGBIT   \\.|[^\\]
@@ -38,8 +39,13 @@ f\*\*k	lex_lineno = yylineno; return make_word("f**k");
 "&&"                     lex_lineno = yylineno;  return make_word("and");
 "||"                     lex_lineno = yylineno;  return make_word("or");
 
-"["          BEGIN(L_STRING);
-<L_STRING>"]"              BEGIN(INITIAL); lex_lineno = yylineno; return make_string();
+"["          BEGIN(L_BRSTRING);
+<L_BRSTRING>"]"              BEGIN(INITIAL); lex_lineno = yylineno; return make_string();
+<L_BRSTRING>.               push_string_lit(yytext[0]);
+
+\"          BEGIN(L_STRING);
+<L_STRING>\\.             push_string_escape(yytext[1]);
+<L_STRING>\"              BEGIN(INITIAL); lex_lineno = yylineno; return make_string();
 <L_STRING>.               push_string_lit(yytext[0]);
 
 [ ,\t\n\r]     // eat whitespace and commas (separating commands)

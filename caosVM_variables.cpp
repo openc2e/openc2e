@@ -41,6 +41,10 @@
 
  Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
  */
+void caosVM::v_VAxx() {
+	// handled elsewhere; not called
+	assert(0 && "unreachable");
+}	
 
 /*
  VARx (variable)
@@ -58,6 +62,10 @@
 
  Like OVxx, only for OWNR, not TARG.
  */
+void caosVM::v_MVxx() {
+	// handled elsewhere; not called
+	assert(0 && "unreachable");
+}	
 
 /**
  ADDS (command) var (variable) value (string)
@@ -91,7 +99,8 @@ void caosVM::c_SETS() {
 /**
  SETV (command) var (variable) value (decimal)
  %status maybe
- %pragma variants cv c3
+ %pragma variants c1 c2 cv c3
+ %cost c1,c2 0
  %% Don't enable c1 or c2 here; we activate them with horrible hacks later
 
  Sets the given variable to the given decimal value.
@@ -139,7 +148,10 @@ void caosVM::c_SETA() {
 
  Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
  */
-// TODO: OVxx parser
+void caosVM::v_OVxx() {
+	// handled elsewhere; not reached
+	assert(0 && "unreachable");
+}
 
 /*
  OBVx (variable)

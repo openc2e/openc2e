@@ -1085,6 +1085,8 @@ void SFCScript::install() {
 		script.parse(s);
 		script.installInstallScript(family, genus, species, eventno);
 		script.installScripts();
+	} catch (creaturesException &e) {
+		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	} catch (std::exception &e) {
 		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.what() << std::endl;
 	}

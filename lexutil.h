@@ -38,9 +38,7 @@ extern bytestring_t bytestr;
 extern std::string temp_str;
 
 static inline int make_int(int v) {
-	lasttok.type = TOK_CONST;
-	lasttok.constval.setInt(v);
-	lasttok.yyline = lex_lineno;
+	lasttok.payload = caosVar(v);
 	return 1;
 }
 
@@ -56,18 +54,14 @@ static inline int make_bin(const char *str) {
 }
 
 static inline int make_float(float f) {
-	lasttok.type = TOK_CONST;
-	lasttok.constval.setFloat(f);
-	lasttok.yyline = lex_lineno;
+	lasttok.payload = caosVar(f);
 	return 1;
 }
 
 static inline int make_word(const char *str) {
 	std::string result = str;
-	lasttok.type = TOK_WORD;
 	std::transform(result.begin(), result.end(), result.begin(), (int(*)(int))tolower);
-	lasttok.word = result;
-	lasttok.yyline = lex_lineno;
+	lasttok.payload = result;
 	return 1;
 }
 
@@ -93,10 +87,8 @@ static inline void push_string_lit(char c) {
 }
 
 static inline int make_string() {
-	lasttok.type = TOK_CONST;
-	lasttok.constval.setString(temp_str);
+	lasttok.payload = caosVar(temp_str);
 	temp_str = "";
-	lasttok.yyline = lex_lineno;
 	return 1;
 }
 
@@ -107,15 +99,12 @@ static inline int push_bytestr(unsigned int bs) {
 		throw parseException(oss.str());
 	}
 	bytestr.push_back(bs);
-	lasttok.yyline = lex_lineno;
 	return 1;
 }
 
 static inline int make_bytestr() {
-	lasttok.type = TOK_BYTESTR;
-	lasttok.bytestr = bytestr;
+	lasttok.payload = bytestr;
 	bytestr.clear();
-	lasttok.yyline = lex_lineno;
 	return 1;
 }
 

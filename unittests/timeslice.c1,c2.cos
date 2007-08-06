@@ -1,0 +1,130 @@
+* unit tests for time slicing
+* nornagon 04/08/07
+
+dbg: outs "# Time slicing and evalcosts"
+dbg: outs "1..9"
+
+* setv
+setv va00 100
+dbg: tslc va00
+setv va01 42
+subv va00 dbg: tslc
+doif va00 eq 0
+	dbg: outs "ok 1"
+else
+	dbg: outs "not ok 1"
+endi
+
+* doif
+setv va00 100
+dbg: tslc va00
+
+doif 1 eq 2
+	dbg: outs "not ok 2"
+elif 3 eq 4
+	dbg: outs "not ok 2"
+else
+	setv va01 2
+endi
+
+subv va00 dbg: tslc
+doif va00 eq 0
+	dbg: outs "ok 2"
+else
+	dbg: outs "not ok 2"
+endi
+
+* math
+setv va00 100
+dbg: tslc va00
+setv va01 0
+addv va01 17
+divv va01 3
+mulv va01 32
+modv va01 6
+rndv va01 -5 5
+andv va01 3
+orrv va01 8
+subv va01 9
+negv va01
+subv va00 dbg: tslc
+doif va00 eq 0
+	dbg: outs "ok 3"
+else
+	dbg: outs "not ok 3"
+endi
+
+* new: simp
+setv va00 100
+dbg: tslc va00
+new: simp eggs 1 0 1 0
+subv va00 dbg: tslc
+doif va00 eq 1
+	dbg: outs "ok 4"
+else
+	dbg: outs "not ok 4"
+endi
+kill targ
+
+* kill
+new: simp eggs 1 0 1 0
+setv va00 100
+dbg: tslc va00
+kill targ
+subv va00 dbg: tslc
+doif va00 eq 1
+	dbg: outs "ok 5"
+else
+	dbg: outs "not ok 5"
+endi
+
+* pose
+new: simp eggs 48 0 1 0
+setv va00 100
+dbg: tslc va00
+pose 2
+subv va00 dbg: tslc
+doif va00 eq 1
+	dbg: outs "ok 6"
+else
+	dbg: outs "not ok 6"
+endi
+kill targ
+
+* anim
+new: simp eggs 48 0 1 0
+setv va00 100
+dbg: tslc va00
+anim [0101]
+subv va00 dbg: tslc
+doif va00 eq 1
+	dbg: outs "ok 7"
+else
+	dbg: outs "not ok 7"
+endi
+kill targ
+
+* loop..untl
+setv va00 100
+dbg: tslc va00
+setv va01 0
+loop
+	addv va01 1
+untl va01 ge 3
+subv va00 dbg: tslc
+doif va00 eq 0
+	dbg: outs "ok 8"
+else
+	dbg: outs "not ok 8"
+endi
+
+* stim
+setv va00 100
+dbg: tslc va00
+stim shou 100 1 30 0 0 0 0 0 0 0 0 0
+subv va00 dbg: tslc
+doif va00 eq 0
+	dbg: outs "ok 9"
+else
+	dbg: outs "not ok 9"
+endi

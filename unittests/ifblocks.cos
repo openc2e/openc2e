@@ -1,8 +1,8 @@
 * unit tests for DOIF/ELIF/ELSE/ENDI blocks and comparison operators
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: ifblocks: 21 tests"
-DBG: OUTS "1..22"
+DBG: OUTS "# TEST: ifblocks: 24 tests"
+DBG: OUTS "1..24"
 
 * test equality
 DOIF 1 eq 1
@@ -168,4 +168,34 @@ ELIF 2 eq 3
 	DBG: OUTS "not ok 22"
 ELSE
 	DBG: OUTS "ok 22"
+ENDI
+
+* test more chained elifs, with nesting
+DOIF 1 eq 1
+	SETV VA00 0
+	DOIF 3 eq 1
+		DBG: OUTS "not ok 23"
+	ELIF 4 eq 4
+		SETV VA00 3
+	ENDI
+ELSE
+	DBG: OUTS "not ok 23"
+ENDI
+DOIF VA00 eq 3
+	DBG: OUTS "ok 23"
+ENDI
+
+* test that only one elif branch is evaluated
+SETV VA00 0
+DOIF 1 eq 2
+	DBG: OUTS "not ok 24"
+ELIF 1 eq 1
+	SETV VA00 1
+ELIF 2 eq 2
+	SETV VA00 2
+ENDI
+DOIF VA00 eq 2 or VA00 eq 0
+	DBG: OUTS "not ok 24"
+ELSE
+	DBG: OUTS "ok 24"
 ENDI

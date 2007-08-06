@@ -21,69 +21,132 @@
 
 #include "openc2e.h"
 #include "caosVar.h"
+#include "exceptions.h"
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <boost/variant.hpp>
+#include <boost/format.hpp>
 
 void yyrestart(std::istream *stream, bool use_c2);
 
 enum toktype { ANYTOKEN = 0, EOI = 0, TOK_CONST, TOK_WORD, TOK_BYTESTR };
 
+
 struct token {
-	int yyline;
+	struct token_eoi { };
+	struct type_visitor : public boost::static_visitor<toktype> {
+		toktype operator()(const token_eoi) const { return EOI; }
+		toktype operator()(const caosVar &) const { return TOK_CONST; }
+		toktype operator()(const std::string &) const { return TOK_WORD; }
+		toktype operator()(const bytestring_t &) const { return TOK_BYTESTR; }
+	};
+	struct dump_visitor : public boost::static_visitor<std::string> {
+		std::string operator()(const token_eoi) const { return std::string("EOI"); }
+		std::string operator()(const caosVar &v) const { return std::string(v.dump()); }
+		std::string operator()(const std::string &v) const { return v; }
+		std::string operator()(const bytestring_t &bs) const {
+			std::ostringstream oss;
+			oss << "[ ";
+			for (size_t i = 0; i < bs.size(); i++)
+				oss << bs[i] << " ";
+			oss << "]";
+			return oss.str();
+		}
+	};
+	struct fmt_visitor : boost::static_visitor<std::string> {
+		std::string operator()(const token_eoi) const { return std::string("<EOI>"); }
+		std::string operator()(const caosVar &v) const {
+			if (v.hasInt()) {
+				return boost::str(boost::format("%d") % v.getInt());
+			} else if (v.hasFloat()) {
+				return boost::str(boost::format("%f") % v.getInt());
+			} else if (v.hasString()) {
+				std::ostringstream outbuf;
+				std::string inbuf = v.getString();
+				outbuf << '"';
+				for (size_t i = 0; i < inbuf.size(); i++) {
+					switch (inbuf[i]) {
+						case '\n': outbuf << "\\\n"; break;
+						case '\r': outbuf << "\\\r"; break;
+						case '\t': outbuf << "\\\t"; break;
+						case '\"': outbuf << "\\\""; break;
+						default:   outbuf << inbuf[i]; break;
+					}
+				}
+				outbuf << '"';
+				return outbuf.str();
+			} else {
+				throw creaturesException(std::string("Impossible caosvar type in token: ") + v.dump());
+			}
+		}
+		std::string operator()(const std::string &word) const { return word; }
+		std::string operator()(const bytestring_t &bs) const {
+			std::ostringstream oss;
+			oss << "[ ";
+			for (size_t i = 0; i < bs.size(); i++)
+				oss << i << " ";
+			oss << "]";
+			return oss.str();
+		}
+	};
 
-	toktype type;
-	bytestring_t bytestr;
-	std::string word;
-	caosVar constval;
+				
 
-	token() {}
-	token(const token &cp) {
-		yyline = cp.yyline;
-		type = cp.type;
-		bytestr = cp.bytestr;
-		word = cp.word;
-		constval = cp.constval;
+
+	boost::variant<token_eoi, std::string, caosVar, bytestring_t> payload;
+
+	int index;
+	int lineno;
+
+	toktype type() const {
+		return boost::apply_visitor(type_visitor(), payload);
 	}
 
-	std::string dump() {
+	const bytestring_t &bytestr() const {
+		const bytestring_t *bs = boost::get<bytestring_t>(&payload);
+		if (!bs) unexpected();
+		return *bs;
+	}
+
+	const std::string &word() const {
+		const std::string *s = boost::get<std::string>(&payload);
+		if (!s) unexpected();
+		return *s;
+	}
+
+	const caosVar &constval() const {
+		const caosVar *s = boost::get<caosVar>(&payload);
+		if (!s) unexpected();
+		return *s;
+	}
+	token() {}
+	token(const token &cp) : payload(cp.payload), index(cp.index), lineno(cp.lineno) { }
+
+	std::string dump() const {
 		std::ostringstream oss;
-		switch(type) {
-			case TOK_CONST:
-				oss << "constval ";
-				if (constval.hasInt())
-					oss << "int " << constval.getInt();
-				else if (constval.hasFloat())
-					oss << "float " << constval.getFloat();
-				else if (constval.hasString())
-					oss << "string " << constval.getString();
-				else if (constval.hasAgent())
-					oss << "agent (BAD!)";
-				else
-					oss << "(BAD)";
-				break;
-			case TOK_WORD:
-				oss << "word " << word;
-				break;
-			case TOK_BYTESTR:
-				{
-					bytestring_t::iterator i = bytestr.begin();
-					oss << "bytestr ";
-					while (i != bytestr.end())
-						oss << (int)*i++ << " ";
-				}
-				break;
-			default:
-				oss << "BROKEN";
-				break;
-		}
-		oss << " (line " << yyline << ")";
+		oss << boost::apply_visitor(dump_visitor(), payload);
+		oss << " (line " << lineno << ")";
 		return oss.str();
 	}
-};
 
-token *getToken(toktype expected = ANYTOKEN);
-token *tokenPeek();
+	std::string format() const {
+		return boost::apply_visitor(fmt_visitor(), payload);
+	}
+
+	void unexpected() const {
+		const char *err;
+		switch (type()) {
+			case EOI: err = "EOI"; break;
+			case TOK_WORD: err = "word"; break;
+			case TOK_BYTESTR: err = "bytestring"; break;
+			case TOK_CONST: err = "constant value"; break;
+			default: throw creaturesException("Internal error: unable to classify token in token::unexpected()");
+		}
+
+		throw parseException(std::string("Unexpected ") + err);
+	}
+};
 
 extern token lasttok; // internal use only
 

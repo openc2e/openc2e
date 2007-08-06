@@ -28,10 +28,20 @@
 #include "caosVar.h"
 #include <cassert>
 #include "openc2e.h"
+#include "bytecode.h"
+#include "caosVar.h"
+#include "dialect.h"
+#include "token.h"
+
 
 class Agent;
-class caosOp;
-class Variant;
+
+struct toktrace {
+	unsigned short width;
+	unsigned short lineno;
+
+	toktrace(unsigned short w, unsigned short l) : width(w), lineno(l) { }
+};
 
 struct script {
 	protected:
@@ -40,30 +50,67 @@ struct script {
 		bool linked;
 
 		// position 0 is reserved in the below vector
+		// relocations[-relocid] is the target address for relocation relocid
+		// will be 0 if unresolved
 		std::vector<int> relocations;
-		// pos-0 needs to be initted to a caosNoop
-		std::vector<class caosOp *> allOps;
-
+		// map of name -> (address|relocation)
+		std::map<std::string, int> labels;
 		script() {}
 	public:
+		// ops[0] is initted to a nop, as address 0 is reserved for a flag value
+		// in the relocation vector
+		std::vector<caosOp> ops;
+		// table of all non-trivial constants in the script
+		// small immediates integers are done with CAOS_CONSTINT
+		// mostly for strings and floats
+		std::vector<caosVar> consts;
+		// because caosVar doesn't store bytestrings, we store them in a separate
+		// table
+		std::vector<bytestring_t> bytestrs;
+		// a normalized copy of the script source. this is used for error tracing
+		std::string code;
+		shared_ptr<std::vector<toktrace> > tokinfo;
+
+	public:
 		int fmly, gnus, spcs, scrp;
-		const Variant *variant;
-		const Variant *getVariant() const { return variant; };
+		const class Dialect *dialect;
+		const Dialect *getDialect() const { return dialect; };
 		
 		std::string filename;
 
-		caosOp *getOp(int idx) const {
+		caosOp getOp(int idx) const {
 			assert (idx >= 0);
-			return (unsigned int)idx >= allOps.size() ? NULL : allOps[idx];
+			return (size_t)idx >= ops.size() ? caosOp(CAOS_DIE, -1, -1) : ops[idx];
+		}
+
+		int scriptLength() const {
+			return ops.size();
+		}
+
+		caosVar getConstant(int idx) const {
+			if (idx < 0 || (size_t)idx >= consts.size()) {
+				throw caosException(boost::str(
+						boost::format("Internal error: const %d out of range") % idx
+				));
+			}
+			return consts[idx];
+		}
+
+		bytestring_t getBytestr(int idx) const {
+			if (idx < 0 || (size_t)idx >= bytestrs.size()) {
+				throw caosException(boost::str(
+						boost::format("Internal error: const %d out of range") % idx
+				));
+			}
+			return bytestrs[idx];
 		}
 		
 		std::map<std::string, int> gsub;
-		int getNextIndex() { return allOps.size(); }
+		int getNextIndex() { return ops.size(); }
 		// add op as the next opcode
-		void thread(caosOp *op);
-		script(const Variant *v, const std::string &fn,
+		script(const Dialect *v, const std::string &fn,
 				int fmly_, int gnus_, int spcs_, int scrp_);
-		script(const Variant *v, const std::string &fn);
+		script(const Dialect *v, const std::string &fn);
 		~script();
 		std::string dump();
 	//	std::string dumpLine(unsigned int);
@@ -77,10 +124,6 @@ struct script {
 			return -idx;
 		}
 
-		// fix relocation r to point to the next op to be emitted
-		// XXX: maybe make relocations lightweight classes, so we
-		// can identify leaks.
-
 		void fixRelocation(int r, int p) {
 			assert (!linked);
 			assert (r < 0);
@@ -89,35 +132,68 @@ struct script {
 			// check for a loop
 			int i = p;
 			while (i < 0) {
+				i = -i;
 				if (i == r)
 					throw creaturesException("relocation loop found");
-				i = relocations[-i];
+				i = relocations[i];
 			}
 			
 			relocations[r] = p;
 		}
-			
+
+		// fix relocation r to point to the next op to be emitted
 		void fixRelocation(int r) {
 			fixRelocation(r, getNextIndex());
 		}
 
+		// find the address of the given label, could be a relocation
+		int getLabel(const std::string &label) {
+			if (labels.find(label) == labels.end())
+				labels[label] = newRelocation();
+			return labels[label];
+		}
+
+		// fix a label to the end of the current op string
+		void affixLabel(const std::string &label) {
+			int reloc = getLabel(label);
+			if (reloc > 0)
+				throw caosException(std::string("Label ") + label + " redefined");
+			fixRelocation(reloc);
+			labels[label] = getNextIndex();
+		}
 		
 };
 
 class caosScript { //: Collectable {
 public:
-	const Variant *v;
+	const Dialect *d;
 	std::string filename;
 	shared_ptr<script> installer, removal;
 	std::vector<shared_ptr<script> > scripts;
 	shared_ptr<script> current;
 
-	caosScript(const std::string &variant, const std::string &fn);
-	caosScript() { v = NULL; }
+	caosScript(const std::string &dialect, const std::string &fn);
+	caosScript() { d = NULL; }
 	void parse(std::istream &in);
 	~caosScript();
 	void installScripts();
 	void installInstallScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short eventid);
+protected:
+	int readCond();
+	void parseCondition();
+	void emitOp(opcode_t op, int argument);
+	void readExpr(const enum ci_type *argp);
+	const cmdinfo *readCommand(class token *t, const std::string &prefix);
+	void parseloop(int state, void *info);
+
+	shared_ptr<std::vector<token> > tokens;
+	int curindex; // index to the next token to be read
+   	int errindex; // index to the token to report parse errors on
+	int traceindex; // index to the token to report runtime errors on
+	// deprecated support functions
+	token *tokenPeek();
+	void putBackToken(token *);
+	token *getToken(toktype expected = ANYTOKEN);
 };
 
 #endif

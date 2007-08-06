@@ -89,7 +89,7 @@ void caosVM::v_TOUC() {
 /**
  RTAR (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c1 c2 cv c3
  %cost c1,c2 0
 
  Sets TARG to a random agent with the given family/genus/species.
@@ -1107,7 +1107,7 @@ void caosVM::c_RNGE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(distance)
 
-	valid_agent(targ)
+	valid_agent(targ);
 	targ->range = distance;
 }
 
@@ -1282,7 +1282,7 @@ void caosVM::c_SETV_PUPT() {
  Stop the script running in TARG, if any.
 */
 void caosVM::c_STPT() {
-	valid_agent(targ)
+	valid_agent(targ);
 	targ->stopScript();
 }
 

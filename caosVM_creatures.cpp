@@ -791,13 +791,12 @@ void caosVM::c_FACE() {
 }
 
 /**
- FACE (integer)
+ FACE INT (integer)
  %status maybe
- %pragma parser new FACEhelper()
 
  Returns the front-facing pose for the current facial expression of the target creature.
 */
-void caosVM::v_FACE() {
+void caosVM::v_FACE_INT() {
 	caos_assert(targ);
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
 	caos_assert(c);
@@ -805,13 +804,13 @@ void caosVM::v_FACE() {
 	result.setInt(c->getFaceSpriteFrame());
 }
 
-/* // TODO: doc parser needs fixing so we can include this without a conflict
- FACE (string)
+/**
+ FACE STRING (string)
  %status maybe
 
  Returns the current sprite filename for the face of the target creature.
 */
-void caosVM::s_FACE() {
+void caosVM::v_FACE_STRING() {
 	caos_assert(targ);
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
 	caos_assert(c);

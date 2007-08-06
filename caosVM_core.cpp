@@ -60,6 +60,7 @@ void caosVM::c_OUTX() {
 /**
  OUTS (command) val (string)
  %status maybe
+ %pragma variants all
 
  Prints the given string to the output stream.  Does nothing when run inside a script.
 */
@@ -80,6 +81,7 @@ void caosVM::c_OUTS() {
 /**
  OUTV (command) val (decimal)
  %status maybe
+ %pragma variants all
 
  Prints the given decimal value to the ouput stream.  Does nothing when run inside a script.
 */
@@ -156,6 +158,9 @@ void caosVM::c_DELG() {
  Marks the beginning of a normal script applying to the agent with the given classifier 
  info.
 */
+void caosVM::c_SCRP() {
+	// handled elsewhere
+}	
 
 /**
  RSCR (command)
@@ -165,6 +170,9 @@ void caosVM::c_DELG() {
 
  Marks the beginning of a removal script.
 */
+void caosVM::c_RSCR() {
+	// handled elsewhere
+}	
 
 /**
  ISCR (command)

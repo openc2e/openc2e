@@ -37,12 +37,14 @@ using std::cout;
 /**
  DBG: OUTS (command) val (string)
  %status maybe
+ %pragma variants all
 
  Outputs a string to the debug log.
 */
 void caosVM::c_DBG_OUTS() {
-	c_OUTS();
-	cout << "\n";
+	VM_PARAM_STRING(val)
+	
+	cout << val << std::endl;
 }
 
 /**
@@ -55,6 +57,7 @@ void caosVM::c_DBG_OUTS() {
 /**
  DBG: OUTV (command) val (decimal)
  %status maybe
+ %pragma variants all
  
  Outputs a decimal value to the debug log.
 */
@@ -94,6 +97,7 @@ void caosVM::c_DBUG() {
 /**
  UNID (integer)
  %status maybe
+ %pragma variants c3 ca cv
 
  Returns the unique ID of the target agent.
  This is currently no good for persisting.
@@ -105,6 +109,21 @@ void caosVM::v_UNID() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(targ);
 	result.setInt(targ->getUNID());
+}
+
+/**
+ UNID (agent)
+ %status maybe
+ %pragma variants c2
+
+ Returns the unique ID of the target agent.
+ This is currently no good for persisting.
+ %pragma implementation caosVM::v_UNID_c2
+*/
+void caosVM::v_UNID_c2() {
+	VM_VERIFY_SIZE(0)
+	valid_agent(targ);
+	result.setAgent(targ);
 }
 
 /**
@@ -152,14 +171,24 @@ void caosVM::c_DBG_MALLOC() {
 }
 	
 /**
+ DBG: DUMP (command)
+ %status ok
+ %pragma variants all
+
+ Dumps the current script's bytecode to stderr.
+*/
+void caosVM::c_DBG_DUMP() {
+	std::cerr << vm->currentscript->dump();
+}	
+
+/**
  DBG: TRACE (command) enable (integer)
  %status ok
- %pragma variants c1 c2 c3 ca cv
+ %pragma variants all
 
  Enables/disables opcode tracing to cerr.
 */
 void caosVM::c_DBG_TRACE() {
-	VM_VERIFY_SIZE(0)
 	VM_PARAM_INTEGER(en)
 
 	vm->trace = en;
@@ -167,33 +196,30 @@ void caosVM::c_DBG_TRACE() {
 
 /**
  MANN (command) cmd (string)
- %status ok
+ %status stub
  
  Looks up documentation on the given command and spits it on the current output socket.
 */
 void caosVM::c_MANN() {
 	VM_PARAM_STRING(cmd)
-	transform(cmd.begin(), cmd.end(), cmd.begin(), (int(*)(int))toupper);
-
-	const cmdinfo *cmds = NULL;
-	if (currentscript) {
-		const Variant *v = currentscript->getVariant();
-		if (v)
-			cmds = v->cmds;
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
+	const cmdinfo *i = currentscript->dialect->cmdbase();
+	// This isn't performance critical, so just use a dumb loop
+	while (i->lookup_key) {
+		if (cmd == i->fullname)
+			break;
+		i++;
 	}
-	if (!cmds)
-		cmds = variants["c3"]->cmds;
-	// we're not too worried about the performance of this...
-	for (int i = 0; cmds[i].name; i++) {
-		if (strcmp(cmds[i].fullname, cmd.c_str()))
-			continue;
-		*outputstream << cmds[i].docs;
+	if (!i->lookup_key) {
+		result.setString("Not found");
 		return;
 	}
+	result.setString(std::string(i->docs));
 }
 
 /**
  DBG: DISA (command) family (integer) genus (integer) species (integer) event (integer)
+ %pragma variants all
  %status ok
 
  Dumps the "bytecode" of the indicated script to the current output channel.
@@ -217,14 +243,19 @@ void caosVM::c_DBG_DISA() {
 /**
  DBG: ASRT (command) condition (condition)
  %pragma parser new AssertParser()
+ %pragma variants all
  %status maybe
 
  Blows up unless the given condition is true.
 */
+void caosVM::c_DBG_ASRT() {
+	throw caosException("DBG: ASRT condition failed");
+}
 
 /**
  DBG: IDNT (string) agent (agent)
  %status ok
+ %pragma variants all
 
  (openc2e-only)
  Return a nicely-formatted string identifying the classifier of the agent,
@@ -262,6 +293,7 @@ void caosVM::c_DBG_CPRO() {
 /**
  DBG: STOK (string) bareword (bareword)
  %status ok
+ %pragma variants all
 
  Returns the bare token in 'bareword' as a string.
 */
@@ -270,5 +302,32 @@ void caosVM::v_DBG_STOK() {
 	
 	result.setString(bareword);
 }
+
+/**
+ DBG: TSLC (command) timeslice (integer)
+ %status ok
+ %pragma variants all
+ %cost 0
+
+ Sets the currently executing script's remaining timeslice value. This command
+ affects only the current timeslice; future slices use the normal amount for
+ the dialect in question.
+*/
+void caosVM::c_DBG_TSLC() {
+	VM_PARAM_INTEGER(tslc);
+	timeslice = tslc;
+}
+
+/**
+ DBG: TSLC (integer)
+ %status ok
+ %pragma variants all
+ 
+ Returns the number of ticks left in the current script's remaining timeslice.
+*/
+void caosVM::v_DBG_TSLC() {
+	result.setInt(timeslice);
+}
+
 
 /* vim: set noet: */
