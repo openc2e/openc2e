@@ -155,7 +155,7 @@ void caosVM::v_MTOC() {
 /**
  NEW: GENE (command) mum (integer) dad (integer) destination (variable)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_NEW_GENE() {
 	VM_PARAM_VARIABLE(destination)
