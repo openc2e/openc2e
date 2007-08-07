@@ -737,6 +737,7 @@ void caosVM::v_PNTR() {
 	result.setAgent(world.hand());
 }
 
+#include "Engine.h" // for engine.version check, sigh
 unsigned int calculateScriptId(unsigned int message_id) {
 	// aka, why oh why is this needed? Silly CL.
 
