@@ -743,6 +743,8 @@ unsigned int calculateScriptId(unsigned int message_id) {
 	switch (message_id) {
 		case 2: /* deactivate */
 			return 0;
+		case 8: /* hilarious special case to fix c2 airlock */
+			return 7;
 		case 0: /* activate 1 */
 		case 1: /* activate 2 */
 			return message_id + 1;
