@@ -245,9 +245,12 @@ void caosVM::c_DBG_DISA() {
 	VM_PARAM_INTEGER(family)
 
 	shared_ptr<script> s = world.scriptorium.getScript(family, genus, species, event);
-	if (s)
+	if (s) {
+		if (s->fmly != family || s->gnus != genus || s->spcs != species) {
+			*outputstream << "warning: search resulted in script from " << s->fmly << ", " << s->gnus << ", " << s->spcs << " script" << std::endl;
+		}
 		*outputstream << s->dump();
-	else
+	} else
 		*outputstream << "no such script" << std::endl;
 }
 
