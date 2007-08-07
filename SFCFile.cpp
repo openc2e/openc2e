@@ -945,7 +945,9 @@ void SFCCompoundObject::copyToWorld() {
 	for (unsigned int i = 0; i < 6; i++) {
 		a->setHotspotLoc(i, hotspots[i].left, hotspots[i].top, hotspots[i].right, hotspots[i].bottom);
 		a->setHotspotFunc(i, hotspots[i].function);
-		a->setHotspotFuncDetails(i, hotspots[i].message, hotspots[i].mask);
+		if (parent->version() == 1) {
+			a->setHotspotFuncDetails(i, hotspots[i].message, hotspots[i].mask);
+		}
 	}
 }
 
