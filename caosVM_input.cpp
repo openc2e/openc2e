@@ -151,8 +151,10 @@ void caosVM::v_KEYD() {
 /**
  HOTS (agent)
  %status maybe
+ %pragma variants all
 
  Returns the agent that is currently underneath the Hand.
+ NB: this command is not a real c1/c2 command, backported for convenience
 */
 void caosVM::v_HOTS() {
 	Agent *a = world.agentAt(world.hand()->x, world.hand()->y); // TODO: use hotspot
