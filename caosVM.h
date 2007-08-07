@@ -241,6 +241,7 @@ public:
 	void c_RTYP();
 	void v_RTYP();
 	void v_RTYP_c2();
+	void c_SETV_RTYP();
 	void c_DOOR();
 	void v_DOOR();
 	void c_RATE();

@@ -226,6 +226,26 @@ void caosVM::v_RTYP_c2() {
 }
 
 /**
+ SETV RTYP (command) roomtype (integer)
+ %status maybe
+ %pragma variants c2
+
+ Sets the type of the given room to roomtype.
+*/
+void caosVM::c_SETV_RTYP() {
+	VM_VERIFY_SIZE(1);
+	VM_PARAM_INTEGER(roomtype);
+
+	// TODO: this does actually work on targ, right?
+	// seems to work for the airlock, anyway  -nornagon
+	valid_agent(targ);
+	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+	if (!r) return; // TODO: correct behaviour?
+	else
+		r->type.setInt(roomtype);
+}
+
+/**
  DOOR (command) room1 (integer) room2 (integer) perm (integer)
  %status maybe
 
