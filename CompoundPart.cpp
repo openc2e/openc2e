@@ -91,7 +91,7 @@ bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 }
 
 void SpritePart::handleClick(float clickx, float clicky) {
-	parent->handleClick(clickx + parent->x, clicky + parent->y);
+	parent->handleClick(clickx + x + parent->x, clicky + y + parent->y);
 }
 
 CompoundPart::CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z) : parent(p), zorder(_z), id(_id) {
