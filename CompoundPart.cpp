@@ -61,6 +61,11 @@ bool CompoundPart::showOnRemoteCameras() {
 }
 
 void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
+	// TODO: we need a nicer way to handle such errors
+	if (getCurrentSprite() >= getSprite()->numframes()) {
+		std::cout << parent->identify() << " has bad firstimg/base/pose " << firstimg << "/" << base << "/" << pose << " for sprite '" << getSprite()->name << "'!" << std::endl;
+		return;
+	}
 	assert(getCurrentSprite() < getSprite()->numframes());
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha, draw_mirrored);
 }

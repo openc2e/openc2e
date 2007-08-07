@@ -860,8 +860,8 @@ void MapData::copyToWorld() {
 
 void copyEntityData(SFCEntity *entity, DullPart *p) {
 	// pose
-	p->setPose(entity->currframe);
 	p->setBase(entity->imgoffset);
+	p->setPose(entity->currframe - entity->imgoffset);
 	
 	// animation
 	if (entity->haveanim) {

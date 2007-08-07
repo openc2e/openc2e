@@ -602,6 +602,7 @@ void caosVM::c_BASE() {
 
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);
+	// Note that we don't check validity here because a lot of code changes BASE and then only afterwards POSE/ANIM.
 	p->setBase(index);
 }
 
