@@ -682,7 +682,10 @@ unsigned int Agent::getZOrder() const {
 	if (carriedby) {
 		// TODO: check for overflow
 		// TODO: is adding our own zorder here correct behaviour? someone should check
-		return carriedby->getZOrder() + zorder;
+		if (engine.version > 1)
+			return carriedby->getZOrder() - 100;
+		else
+			return carriedby->getZOrder();
 	} else {
 		return zorder;
 	}
@@ -784,6 +787,14 @@ void Agent::adjustCarried() {
 		theirpose = s->getBase() + s->getPose();
 
 	int xoffset = 0, yoffset = 0;
+	if (engine.version < 3 && world.hand() == this) {
+		// this appears to produce correct behaviour in the respective games, don't ask me  -nornagon
+		if (engine.version == 2) {
+			xoffset = world.hand()->getWidth() / 2;
+			yoffset = world.hand()->getHeight() / 2 - 2;
+		} else
+			yoffset = world.hand()->getHeight() / 2 - 3;
+	}
 	
 	std::map<unsigned int, std::pair<int, int> >::iterator i = carry_points.find(ourpose);
 	if (i != carry_points.end()) {
@@ -796,8 +807,8 @@ void Agent::adjustCarried() {
 		xoffset -= i->second.first;
 		yoffset -= i->second.second;
 	} else if (s) {
-		// c2e seems to default to (width / 2, 0)? don't know .. TODO look into this more
-		xoffset -= s->getSprite()->width(s->getCurrentSprite()) / 2;
+		if (engine.version > 1)
+			xoffset -= s->getSprite()->width(s->getCurrentSprite()) / 2;
 	}
 
 	carrying->moveTo(x + xoffset, y + yoffset, true);
