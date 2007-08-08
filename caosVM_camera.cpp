@@ -474,26 +474,26 @@ void caosVM::c_FRSH() {
 
 /**
  SYS: CMRP (command) x (integer) y (integer)
- %status stub
+ %status maybe
  %pragma variants c2
 */
 void caosVM::c_SYS_CMRP() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	// TODO
+	getCamera()->moveTo(x, y, smoothscrollifvisible);
 }
 
 /**
  SYS: CMRA (command) x (integer) y (integer)
- %status stub
- %pragma variants c2
+ %status maybe
+ %pragma variants c1 c2
 */
 void caosVM::c_SYS_CMRA() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	// TODO
+	getCamera()->moveTo(x, y);
 }
 
 /* vim: set noet: */
