@@ -1013,4 +1013,102 @@ void caosVM::v_FLOR() {
 	result.setInt(0); // TODO
 }
 
+/**
+ GNDW (integer)
+ %status stub
+ %pragma variants c1
+
+ Return the number of horizontal pixels per piece of ground level data.
+*/
+void caosVM::v_GNDW() {
+	result.setInt(4); // TODO: is it always 4? :)
+}
+
+/**
+ GRND (integer) index (integer)
+ %status stub
+ %pragma variants c1
+
+ Return the ground level data at the provided index. See GNDW to work out the index required.
+*/
+void caosVM::v_GRND() {
+	VM_PARAM_INTEGER(index)
+
+	result.setInt(0); // TODO
+}
+
+/**
+ ROOM (command) roomno (integer) left (integer) top (integer) right (integer) bottom (integer) type (integer)
+ %status maybe
+ %pragma variants c1
+
+ Create or modify a room.
+*/
+void caosVM::c_ROOM() {
+	VM_PARAM_INTEGER(type)
+	VM_PARAM_INTEGER(bottom)
+	VM_PARAM_INTEGER(right)
+	VM_PARAM_INTEGER(top)
+	VM_PARAM_INTEGER(left)
+	VM_PARAM_INTEGER(roomno)
+
+	shared_ptr<Room> r = world.map.getRoom(roomno);
+	if (!r) {
+		shared_ptr<Room> r2(new Room(left, right, top, top, bottom, bottom));
+		r = r2;
+
+		MetaRoom *m = world.map.getMetaRoom(0);
+		unsigned int roomid = m->addRoom(r);
+		assert(roomid == roomno); // TODO: this is fairly likely to fail, but is a major bug if it does, FIX ME!
+	} else {
+		r->x_left = left;
+		r->x_right = right;
+		r->y_left_ceiling = r->y_right_ceiling = top;
+		r->y_left_floor = r->y_right_floor = bottom;
+	}
+
+	r->type.setInt(type);
+}
+
+/**
+ ROOM (integer) roomno (integer) data (integer)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::v_ROOM_c1
+
+ Return some data for the specified room number. Data of 0 is left, 1 is right, 2 is top, 3 is bottom, 4 is room type. Returns 0 if no such room.
+*/
+void caosVM::v_ROOM_c1() {
+	VM_PARAM_INTEGER(data) caos_assert(data >= 0 && data <= 4);
+	VM_PARAM_INTEGER(roomno)
+
+	shared_ptr<Room> r = world.map.getRoom(data);
+	if (!r) {
+		result.setInt(0);
+		return;
+	}
+
+	switch (data) {
+		case 0:
+			result.setInt(r->x_left);
+			break;
+
+		case 1:
+			result.setInt(r->x_right);
+			break;
+
+		case 2:
+			result.setInt(r->y_left_ceiling);
+			break;
+
+		case 3:
+			result.setInt(r->y_left_floor);
+			break;
+
+		case 4:
+			result.setInt(r->type.getInt());
+			break;
+	}
+}
+
 /* vim: set noet: */

@@ -293,6 +293,10 @@ public:
 	void c_SETV_DOOR();
 	void v_FLOR();
 	void c_SYS_DMAP();
+	void v_GNDW();
+	void v_GRND();
+	void c_ROOM();
+	void v_ROOM_c1();
 	
 	// camera
 	void v_VISI();
