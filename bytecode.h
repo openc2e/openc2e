@@ -93,7 +93,7 @@ enum opcode_t {
 	CAOS_MVXX,
 	/* Pseudo-instruction; marks the beginning of relocated ops. */
 	CAOS_NONRELOC_END,
-	CAOS_RELOCATABLE_BEGIN = 0x80,
+	CAOS_RELOCATABLE_BEGIN = 0x40,
 	/* Pop an integer off the stack. Jump to the given location if it's nonzero.
 	 * Argument: A bytecode location (relocated).
 	 * Cost: 0
