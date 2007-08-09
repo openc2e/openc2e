@@ -25,6 +25,7 @@
 /**
  CABN (command) left (integer) top (integer) right (integer) bottom (integer)
  %status maybe
+ %pragma variants c1 c2 cv c3
 */
 void caosVM::c_CABN() {
 	VM_VERIFY_SIZE(4)

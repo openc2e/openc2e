@@ -301,6 +301,24 @@ void caosVM::c_NEW_VHCL() {
 }
 
 /**
+ NEW: VHCL (command) sprite_file (bareword) image_count (integer) first_image (integer)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::c_NEW_VHCL_c1
+*/
+void caosVM::c_NEW_VHCL_c1() {
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
+
+	Vehicle *a = new Vehicle(sprite_file, first_image, image_count);
+	a->finishInit();
+	setTarg(a);
+	// TODO: should part be set here?
+}
+
+
+/**
  TARG (agent)
  %status maybe
  %pragma variants c1 c2 cv c3

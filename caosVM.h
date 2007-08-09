@@ -470,6 +470,7 @@ public:
 	void c_NEW_SIMP();
 	void c_NEW_SIMP_c2();
 	void c_NEW_VHCL();
+	void c_NEW_VHCL_c1();
 	void v_NULL();
 	void c_POSE();
 	void c_RTAR();

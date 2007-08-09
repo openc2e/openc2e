@@ -34,6 +34,13 @@ Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, 
 	cabinbottom = (int)y + getHeight();
 }
 
+Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount) : CompoundAgent(spritefile, firstimage, imagecount) {
+	capacity = 0;
+	bump = 0;
+
+	// TODO: set cabin bounds?
+}
+
 void Vehicle::tick() {
 	CompoundAgent::tick();
 	if (paused) return;

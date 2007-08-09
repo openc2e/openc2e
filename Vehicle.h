@@ -33,6 +33,7 @@ protected:
 public:
 	Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
+	Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount); // C1/C2 constructor
 
 	caosVar xvec, yvec;
 	int cabinleft, cabintop, cabinright, cabinbottom; // TODO: should be protected w/accessors?
