@@ -466,6 +466,7 @@ public:
 
 	// agent
 	void c_NEW_COMP();
+	void c_NEW_COMP_c1();
 	void c_NEW_SIMP();
 	void c_NEW_SIMP_c2();
 	void c_NEW_VHCL();
@@ -622,6 +623,7 @@ public:
 	// compound
 	void c_PART();
 	void v_PART();
+	void c_NEW_PART();
 	void c_PAT_DULL();
 	void c_PAT_BUTT();
 	void c_PAT_FIXD();
@@ -647,6 +649,8 @@ public:
 	void c_BBD_VOCB();
 	void c_NEW_BBTX();
 	void c_BBTX();
+	void c_SPOT();
+	void c_KNOB();
 
 	// creatures
 	void c_STM_SHOU();

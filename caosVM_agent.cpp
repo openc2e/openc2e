@@ -259,6 +259,25 @@ void caosVM::c_NEW_COMP() {
 }
 
 /**
+ NEW: COMP (command) sprite_file (bareword) image_count (integer) first_image (integer) clone (integer)
+ %status maybe
+ %pragma variants c1
+ %pragma implementation caosVM::c_NEW_COMP_c1
+*/
+void caosVM::c_NEW_COMP_c1() {
+	VM_PARAM_INTEGER(clone)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
+
+	// TODO: what does clone do?
+	CompoundAgent *a = new CompoundAgent(sprite_file, first_image, image_count);
+	a->finishInit();
+	setTarg(a);
+	// TODO: should part be set here?
+}
+
+/**
  NEW: VHCL (command) family (integer) genus (integer) species (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
  %status maybe
 

@@ -39,12 +39,17 @@ struct HotspotFunction {
 class CompoundAgent : public Agent {
 protected:
 	std::vector<CompoundPart *> parts;
+	
+	// C1/C2 data
 	Hotspot hotspots[6];
 	HotspotFunction hotspotfunctions[6];
+	std::string spritefile;
+	unsigned int firstimage, imagecount;
 
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 								std::string spritefile, unsigned int firstimage, unsigned int imagecount);
+	CompoundAgent(std::string spritefile, unsigned int firstimage, unsigned int imagecount); // C1/C2 constructor
 	virtual ~CompoundAgent();
 		
 	unsigned int partCount() { return parts.size(); }
@@ -58,6 +63,11 @@ public:
 	void setHotspotLoc(unsigned int id, int l, int t, int r, int b);
 	void setHotspotFunc(unsigned int id, unsigned int h);
 	void setHotspotFuncDetails(unsigned int id, uint16 message, uint8 flags);
+
+	// accessor functions for NEW: PART and similar
+	std::string getSpriteFile() { return spritefile; }
+	unsigned int getFirstImage() { return firstimage; }
+	unsigned int getImageCount() { return imagecount; }
 
 	friend class caosVM;
 };

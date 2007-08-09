@@ -58,6 +58,27 @@ void caosVM::v_PART() {
 }	
 
 /**
+ NEW: PART (command) part (integer) x (integer) y (integer) first_image (integer) plane (integer)
+ %status maybe
+ %pragma variants c1
+*/
+void caosVM::c_NEW_PART() {
+	VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(part)
+	
+	caos_assert(part >= 0 && part <= 9);
+	valid_agent(targ);
+	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(a);
+
+	CompoundPart *p = new DullPart(a, part, a->getSpriteFile(), a->getFirstImage() + first_image, x, y, plane);
+	a->addPart(p);
+}
+
+/**
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer)
  %status maybe
 
@@ -607,6 +628,41 @@ void caosVM::c_BBTX() {
 
 	valid_agent(targ);
 	// TODO
+}
+
+/**
+ SPOT (command) spotno (integer) left (integer) top (integer) right (integer) bottom (integer)
+ %status maybe
+ %pragma variants c1
+*/
+void caosVM::c_SPOT() {
+	VM_PARAM_INTEGER(bottom)
+	VM_PARAM_INTEGER(right)
+	VM_PARAM_INTEGER(top)
+	VM_PARAM_INTEGER(left)
+	VM_PARAM_INTEGER(spotno)
+
+	valid_agent(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+
+	c->setHotspotLoc(spotno, left, top, right, bottom);
+}
+
+/**
+ KNOB (command) function (integer) spotno (integer)
+ %status maybe
+ %pragma variants c1
+*/
+void caosVM::c_KNOB() {
+	VM_PARAM_INTEGER(spotno)
+	VM_PARAM_INTEGER(function)
+
+	valid_agent(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+
+	c->setHotspotFunc(function, spotno);
 }
 
 /* vim: set noet: */

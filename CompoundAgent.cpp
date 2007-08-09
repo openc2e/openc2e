@@ -72,6 +72,20 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	}
 }
 
+CompoundAgent::CompoundAgent(std::string _spritefile, unsigned int _firstimage, unsigned int _imagecount) : Agent(0, 0, 0, 0) {
+	// TODO: think about plane
+
+	spritefile = _spritefile;
+	firstimage = _firstimage;
+	imagecount = _imagecount;
+
+	for (unsigned int i = 0; i < 6; i++) {
+		hotspots[i].left = -1; hotspots[i].right = -1; hotspots[i].top = -1;
+		hotspots[i].bottom = -1;
+		hotspotfunctions[i].hotspot = -1;
+	}
+}
+
 CompoundAgent::~CompoundAgent() {
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
 		delete *x;
