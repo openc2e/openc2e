@@ -480,7 +480,7 @@ void caosScript::parseloop(int state, void *info) {
 			throw parseException("Unexpected non-word token");
 		}
 		if (t->word() == "scrp") {
-			if (state != ST_INSTALLER)
+			if (state != ST_INSTALLER && state != ST_BODY && state != ST_REMOVAL)
 				throw parseException("Unexpected SCRP");
 			state = ST_BODY;
 			int bits[4];
