@@ -38,6 +38,10 @@ void SDLSoundSlot::adjustPanning(int left, int right) {
 	Mix_SetPanning(soundchannel, left, right);
 }
 
+void SDLSoundSlot::adjustVolume(int volume) {
+	Mix_Volume(soundchannel, volume);
+}
+
 void SDLSoundSlot::fadeOut() {
 	Mix_FadeOutChannel(soundchannel, 500); // TODO: is 500 a good value?
 }
@@ -45,6 +49,16 @@ void SDLSoundSlot::fadeOut() {
 void SDLSoundSlot::stop() {
 	Mix_HaltChannel(soundchannel);
 	sound = 0;
+}
+
+void SDLSoundSlot::reset() {
+	sound = 0;
+	if (agent) {
+		agent->soundslot = 0;
+		agent.clear();
+	}
+	Mix_UnregisterAllEffects(soundchannel);
+	Mix_Volume(soundchannel, 128); // default
 }
 
 void SDLBackend::resizeNotify(int _w, int _h) {
@@ -239,19 +253,19 @@ SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
 	unsigned int i = 0;
 
 	while (i < nosounds) {
-		if (sounddata[i].sound == 0) break;
+		// if this slot has never been used, use it!
+		if (!sounddata[i].sound) break;
+
+		// if the slot is not currently playing, reset it and use it
 		if (!Mix_Playing(sounddata[i].soundchannel)) {
-			sounddata[i].sound = 0;
-			if (sounddata[i].agent)
-				sounddata[i].agent->soundslot = 0;
+			sounddata[i].reset();
 			break;
 		}
+
 		i++;
 	}
 	
 	if (i == nosounds) return 0; // no free slots, so return
-
-	sounddata[i].agent = 0;
 
 	std::map<std::string, Mix_Chunk *>::iterator it = soundcache.find(filename);
 	if (it != soundcache.end()) {

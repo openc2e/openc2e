@@ -34,8 +34,10 @@ struct SDLSoundSlot : public SoundSlot {
 	void play();
 	void playLooped();
 	void adjustPanning(int angle, int distance);
+	void adjustVolume(int volume);
 	void fadeOut();
 	void stop();
+	void reset();
 };
 
 class SDLSurface : public Surface {

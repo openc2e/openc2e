@@ -23,13 +23,15 @@
 #include "creaturesImage.h"
 #include "endianlove.h"
 #include <map>
+#include "AgentRef.h"
 
 struct SoundSlot {
-	class Agent *agent;
+	AgentRef agent;
 
 	virtual void play() = 0;
 	virtual void playLooped() = 0;
 	virtual void adjustPanning(int angle, int distance) = 0;
+	virtual void adjustVolume(int volume) = 0;
 	virtual void fadeOut() = 0;
 	virtual void stop() = 0;
 	virtual ~SoundSlot() { }
