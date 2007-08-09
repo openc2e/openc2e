@@ -22,6 +22,7 @@
 #include "exceptions.h"
 #include "caosVM.h"
 #include "openc2e.h"
+#include "Engine.h"
 #include "World.h"
 #include "token.h"
 #include "dialect.h"
@@ -648,7 +649,10 @@ void caosScript::parseloop(int state, void *info) {
 			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd else")));
 		} else if (t->word() == "endi") {
 			if (state != ST_DOIF) {
-				emitOp(CAOS_DIE, -1);
+				if (engine.version >= 3)
+					throw parseException("Unexpected ENDI");
+				// you are a horrible person if you get here
+				// damn you CL coders.
 				continue;
 			}
 			return;
