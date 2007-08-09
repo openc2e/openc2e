@@ -329,6 +329,8 @@ public:
 	void c_FRSH();
 	void c_SYS_CMRP();
 	void c_SYS_CMRA();
+	void c_SYS_CAMT();
+	void c_SYS_WTOP();
 
 	// world
 	void c_LOAD();
@@ -356,6 +358,8 @@ public:
 	void v_LANG();
 	void v_TOKN();
 	void v_GAME_c2();
+	void c_VRSN();
+	void v_VRSN();
 
 	// variables
 	void c_SETV();

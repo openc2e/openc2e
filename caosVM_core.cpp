@@ -237,6 +237,39 @@ void caosVM::v_VMJR() {
 }
 
 /**
+ VRSN (command) required (integer)
+ %status maybe
+ %pragma variants c1 c2
+
+ Stop running this script unless VRSN is equal to or greater than the specified value.
+*/
+void caosVM::c_VRSN() {
+	VM_PARAM_INTEGER(required)
+
+	// TODO: is this good for c1? which version is c2?
+	int thisversion = (engine.version == 1) ? 2 : 0;
+
+	if (thisversion < required) {
+		std::cout << "Warning: stopping script due to version requirement of " << required << " (we are reporting a version of " << thisversion << ")" << std::endl;
+		stop();
+	}
+}
+
+/**
+ VRSN (integer)
+ %status maybe
+ %pragma variants c1 c2
+
+ Return the build version number of the engine.
+*/
+void caosVM::v_VRSN() {
+	// TODO: is this good for c1? which version is c2?
+	int thisversion = (engine.version == 1) ? 2 : 0;
+
+	result.setInt(thisversion);
+}
+
+/**
  WOLF (integer) andmask (integer) eormask (integer)
  %status stub
 */

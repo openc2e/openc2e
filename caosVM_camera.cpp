@@ -496,4 +496,27 @@ void caosVM::c_SYS_CMRA() {
 	getCamera()->moveTo(x, y);
 }
 
+/**
+ SYS: CAMT (command)
+ %status maybe
+ %pragma variants c1 c2
+*/
+void caosVM::c_SYS_CAMT() {
+	// TODO: does CAMT behave like this in c1/c2?
+	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) - (targ->getWidth() / 2.0f));
+	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) - (targ->getHeight() / 2.0f));
+	getCamera()->moveTo(xpos, ypos);
+}
+
+/**
+ SYS: WTOP (command)
+ %status stub
+ %pragma variants c1 c2
+
+ Move the main window to the front of the screen.
+*/
+void caosVM::c_SYS_WTOP() {
+	// TODO
+}
+
 /* vim: set noet: */

@@ -1780,8 +1780,9 @@ void caosVM::v_LIMB_c1() {
  %pragma variants c1 c2
 */
 void caosVM::v_OBJP() {
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->objp);
+	// TODO: c1 scripts seem to depend on this being from OWNR, but is that always the case?
+	valid_agent(owner);
+	vm->valueStack.push_back(&owner->objp);
 }
 
 /**
