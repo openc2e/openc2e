@@ -108,6 +108,20 @@ void Engine::update() {
 	// TODO: if (!backend->updateWorld())
 	world.drawWorld();
 
+	// play C1 music
+	// TODO: this doesn't seem to actually be every 7 seconds, but actually somewhat random
+	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
+	// TODO: is this the right place for this?
+	if (version == 1 && (world.tickcount % 70) == 0) {
+		int piece = 1 + (rand() % 28);
+		std::string filename = boost::str(boost::format("MU%02d") % piece);
+		SoundSlot *s = engine.backend->getAudioSlot(filename);
+		if (s) {
+			s->adjustVolume(48); // TODO: good volume?
+			s->play();
+		}
+	}
+
 	// update our data for things like pace, race, ticktime, etc
 	ticktimes[ticktimeptr] = backend->ticks() - tickdata;
 	ticktimeptr++;
