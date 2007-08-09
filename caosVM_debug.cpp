@@ -80,7 +80,7 @@ void caosVM::c_DBG_OUTV() {
 /**
  DBGV (command) val (integer)
  %status maybe
- %pragma variants c2
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_DBG_OUTV
 */
 
