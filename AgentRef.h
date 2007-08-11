@@ -49,9 +49,9 @@ public:
 
 	AgentRef &operator=(const AgentRef &r) { ref = r.ref; return *this; }
 	Agent *operator=(Agent *a) { set(a); return a; }
-	Agent &operator*() const { checkLife(); return *ref.lock().get(); }
-	Agent *operator->() const { checkLife(); return ref.lock().get(); }
-	bool operator!() const { return lock().get() == NULL; }
+	Agent &operator*() const { return *ref.lock().get(); }
+	Agent *operator->() const { return ref.lock().get(); }
+	bool operator!() const { checkLife(); return lock().get() == NULL; }
 	/* This next line breaks builds with MSVC, tossing errors about ambiguous operators.
 	operator bool() const { return ref; } */
 	operator Agent *() const { checkLife(); return ref.lock().get(); }
@@ -66,7 +66,7 @@ public:
 	void set(const boost::weak_ptr<Agent> &r) { ref = r; }
 
 	boost::shared_ptr<Agent> lock() const;
-	Agent *get() const { return lock().get(); }
+	Agent *get() const { checkLife(); return lock().get(); }
 };
 		
 
