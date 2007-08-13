@@ -41,6 +41,10 @@ caosVM::caosVM(const AgentRef &o)
 	trace = false;
 }
 
+caosVM::~caosVM() {
+	resetCore(); // delete blocking, close streams
+}
+
 bool caosVM::isBlocking() {
 	if (!blocking) return false;
 	bool bl = (*blocking)();

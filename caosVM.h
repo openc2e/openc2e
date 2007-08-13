@@ -1006,6 +1006,7 @@ public:
 	bool fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm = 0);
 
 	caosVM(const AgentRef &o);
+	~caosVM();
 
 	bool stopped() { return !currentscript; }
 

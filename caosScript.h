@@ -1,5 +1,5 @@
 /*
- *  caosVM.h
+ *  caosScript.h
  *  openc2e
  *
  *  Created by Alyssa Milburn on Tue May 25 2004.

@@ -116,8 +116,10 @@ int SDLBackend::networkInit() {
 }
 
 void SDLBackend::shutdown() {
-	SDL_Quit();
+	if (networkingup && listensocket)
+		SDLNet_TCP_Close(listensocket);
 	SDLNet_Quit();
+	SDL_Quit();
 }
 
 void SDLBackend::handleEvents() {

@@ -50,6 +50,8 @@ World::World() {
 
 World::~World() {
 	agents.clear();
+	for (std::vector<caosVM *>::iterator i = vmpool.begin(); i != vmpool.end(); i++)
+		delete *i;
 }
 
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
