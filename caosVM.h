@@ -789,6 +789,7 @@ public:
 	void c_SEZZ();
 	void c_VOIS();
 	void c_MIDI();
+	void c_PLDS();
 
 	// time
 	void v_PACE();

@@ -282,4 +282,20 @@ void caosVM::c_MIDI() {
 	// TODO
 }
 
+/**
+ PLDS (command) filename (bareword)
+ %status stub
+ %pragma variants c1 c2
+
+ Preload the specified sound file if TARG is visible or just offscreen.
+*/
+void caosVM::c_PLDS() {
+	VM_PARAM_STRING(filename)
+
+	valid_agent(targ);
+	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return; // TODO: needs better check ;)
+
+	// TODO
+}
+
 /* vim: set noet: */
