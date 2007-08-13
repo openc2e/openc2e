@@ -325,6 +325,7 @@ void caosVM::resetCore() {
 
 void caosVM::tick() {
 	stop_loop = false;
+	runops = 0;
 	while (currentscript && !stop_loop && (timeslice > 0 || inst)) {
 		if (isBlocking()) return;
 		runOp();
