@@ -161,7 +161,7 @@ shared_ptr<script> Agent::findScript(unsigned short event) {
 
 #include "PointerAgent.h"
 #include "CreatureAgent.h"
-bool Agent::fireScript(unsigned short event, Agent *from) {
+bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
 	// Start running the specified script on the VM of this agent, with FROM set to the provided agent.
 
 	if (dying) return false;
@@ -202,7 +202,6 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 		case 5: // drop
 			if (!from) return false;
 			if (from != carriedby) return false;
-			from->dropCarried(); // TODO: correct?
 			break;
 		case 12: // eat
 			if (c && !cr_can_eat) return false;
@@ -227,22 +226,32 @@ bool Agent::fireScript(unsigned short event, Agent *from) {
 			break;
 	}
 
+	bool ranscript = false;
+
 	shared_ptr<script> s = findScript(event);
-	if (!s) return false;
+	if (s) {
+		bool madevm = false;
+		if (!vm) { madevm = true; vm = world.getVM(this); }
 	
-	bool madevm = false;
-	if (!vm) { madevm = true; vm = world.getVM(this); }
-	
-	if (vm->fireScript(s, (event == 9), from)) {
-		lastScript = event;
-		zotstack();
-		return true;
-	} else if (madevm) {
-		world.freeVM(vm);
-		vm = 0;
+		if (vm->fireScript(s, (event == 9), from)) {
+			lastScript = event;
+			zotstack();
+			vm->setVariables(one, two);
+			vmTick();
+			ranscript = true;
+		} else if (madevm) {
+			world.freeVM(vm);
+			vm = 0;
+		}	
 	}
 
-	return false;
+	switch (event) {
+		case 5:
+			from->dropCarried(); // TODO: correct?
+			break;
+	}
+	
+	return ranscript;
 }
 
 bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {

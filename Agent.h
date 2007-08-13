@@ -86,7 +86,7 @@ protected:
 	
 	void unhandledException(std::string info, bool wasscript);
 	void vmTick();
-	virtual bool fireScript(unsigned short event, Agent *from = 0);
+	virtual bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
 
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 

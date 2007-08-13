@@ -23,7 +23,7 @@
  * TODO: this code is a first attempt and might be completely wrong
  */
 
-bool Lift::fireScript(unsigned short event, Agent *from) {
+bool Lift::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
 	if (event == 1 || event == 2) {
 		if (!liftAvailable()) return false; // TODO: hack to make sure the lifts aren't activated when not ready
 	}
@@ -39,7 +39,7 @@ bool Lift::fireScript(unsigned short event, Agent *from) {
 		}
 	}
 
-	return Agent::fireScript(event, from);
+	return Agent::fireScript(event, from, one, two);
 }
 
 void Lift::tick() {

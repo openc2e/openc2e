@@ -31,7 +31,7 @@ public:
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount)
 		: Vehicle(family, genus, species, plane, spritefile, firstimage, imagecount) { }
 	void tick();
-	bool fireScript(unsigned short event, Agent *from);
+	bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
 	bool liftAvailable() { return (var[0].getInt() == 0); }
 };
 
