@@ -72,6 +72,7 @@ OPENC2E_CORE = \
 	mmapifstream.o \
 	mngfile.o \
 	mngparser.tab.o \
+	oldBrain.o \
 	PathResolver.o \
 	physics.o \
 	PointerAgent.o \
