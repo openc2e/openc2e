@@ -1008,14 +1008,7 @@ void SFCSimpleObject::copyToWorld() {
 	// TODO: pickup handles/points
 	
 	if (currentsound.size() != 0) {
-		// TODO: all this code should be in engine or something
-		SoundSlot *s = engine.backend->getAudioSlot(currentsound);
-		if (s) {
-			a->soundslot = s;
-			s->playLooped();
-			s->agent = a;
-			a->positionAudio(s);
-		}
+		a->playAudio(currentsound, true, true);
 	}
 }
 

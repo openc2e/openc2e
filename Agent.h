@@ -81,7 +81,7 @@ protected:
 	std::list<caosVM *> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
 
-	void positionAudio(struct SoundSlot *);
+	void updateAudio(boost::shared_ptr<class AudioSource>);
 	bool dying : 1;
 	
 	void unhandledException(std::string info, bool wasscript);
@@ -91,7 +91,7 @@ protected:
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 
 public:
-	struct SoundSlot *soundslot;
+	boost::shared_ptr<class AudioSource> sound;
 
 	AgentRef carrying;
 	AgentRef carriedby;
@@ -211,6 +211,8 @@ public:
 
 	void setAttributes(unsigned int a) { attr.setInt(a); }
 	unsigned int getAttributes() const { return attr.getInt(); }
+
+	void playAudio(std::string filename, bool controlled, bool loop);
 };
 
 class LifeAssert {

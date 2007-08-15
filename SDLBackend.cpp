@@ -54,7 +54,7 @@ void SDLSoundSlot::stop() {
 void SDLSoundSlot::reset() {
 	sound = 0;
 	if (agent) {
-		agent->soundslot = 0;
+		//agent->soundslot = 0;
 		agent.clear();
 	}
 	Mix_UnregisterAllEffects(soundchannel);

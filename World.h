@@ -54,6 +54,7 @@ public:
 	
 	Map map;
 
+	std::list<boost::shared_ptr<class AudioSource> > uncontrolled_sounds;
 	std::multiset<CompoundPart *, partzorder> zorder; // sorted from top to bottom
 	std::multiset<renderable *, renderablezorder> renders; // sorted from bottom to top
 	std::list<boost::shared_ptr<Agent> > agents;
@@ -104,6 +105,8 @@ public:
 	std::string getUserDataDir();
 	std::string findFile(std::string path);
 	std::vector<std::string> findFiles(std::string dir, std::string wild);
+
+	void playAudio(std::string filename, AgentRef agent, bool controlled, bool loop);
 
 	void newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
 	shared_ptr<genomeFile> loadGenome(std::string &filename);

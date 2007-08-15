@@ -24,6 +24,7 @@
 #include "World.h"
 #include "SDLBackend.h"
 #include "NullBackend.h"
+#include "NullAudioBackend.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #undef main // because SDL is stupid
@@ -40,6 +41,9 @@ extern "C" int main(int argc, char *argv[]) {
 		Backend *b;
 		if (engine.noRun()) b = new NullBackend();
 		else b = new SDLBackend();
+	
+		engine.audio = shared_ptr<AudioBackend>(new NullAudioBackend());
+		engine.audio->init();
 		
 		// get the engine to do all the startup (read catalogue, loading world, etc)
 		if (!engine.initialSetup(b)) return 0;

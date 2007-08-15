@@ -42,6 +42,7 @@ public:
 	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	
 	Backend *backend;
+	boost::shared_ptr<class AudioBackend> audio;
 	bool done;
 	unsigned int version;
 

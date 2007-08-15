@@ -26,6 +26,7 @@
 #include "creaturesImage.h"
 #include "CreatureAgent.h"
 #include "Backend.h"
+#include "AudioBackend.h"
 #include "SFCFile.h"
 #include "Room.h"
 #include "MetaRoom.h"
@@ -182,6 +183,25 @@ void World::tick() {
 		exit(0);
 	}
 
+	// Notify the audio backend about our current viewpoint center.
+	engine.audio->setViewpointCenter(world.camera.getXCentre(), world.camera.getYCentre());
+	
+	std::list<boost::shared_ptr<AudioSource> >::iterator si = uncontrolled_sounds.begin();
+	while (si != uncontrolled_sounds.end()) {
+		std::list<boost::shared_ptr<AudioSource> >::iterator next = si; next++;
+		if ((*si)->getState() != SS_PLAY) {
+			// sound is stopped, so release our reference
+			uncontrolled_sounds.erase(si);
+		} else {
+			// mute/unmute off-screen uncontrolled audio if necessary
+			float x, y, z;
+			(*si)->getPos(x, y, z);
+			(*si)->setMute(world.camera.getMetaRoom() != world.map.metaRoomAt(x, y));
+		}
+
+		si = next;
+	}
+	
 	// Tick all agents, deleting as necessary.	
 	std::list<boost::shared_ptr<Agent> >::iterator i = agents.begin();
 	while (i != agents.end()) {
@@ -542,6 +562,42 @@ std::string World::generateMoniker(std::string basename) {
 	}
 	
 	return x;
+}
+
+void World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop) {
+	if (filename.size() == 0) return;
+
+	boost::shared_ptr<AudioSource> sound = engine.audio->newSource();
+	if (!sound) return;
+
+	AudioClip clip = engine.audio->loadClip(filename);
+	if (!clip) {
+		// note that more specific error messages can be thrown by implementations of loadClip
+		throw creaturesException("failed to load audio clip " + filename);
+	}
+
+	sound->setClip(clip);
+	
+	if (loop) {
+		assert(controlled);
+		sound->setLooping(true);
+	}
+
+	if (agent) {
+		agent->updateAudio(sound);
+		if (controlled)
+			agent->sound = sound;
+		else
+			uncontrolled_sounds.push_back(sound);
+	} else {
+		assert(!controlled);
+
+		std::cout << "failing to handle non-agent sound " << filename << std::endl;
+
+		// TODO: handle non-agent sounds
+	}
+	
+	sound->play();
 }
 
 /* vim: set noet: */

@@ -20,7 +20,7 @@
 #ifndef _SDLBACKEND_H
 #define _SDLBACKEND_H
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 #include <SDL_mixer.h>
 #include <SDL_net.h>
 #include "Backend.h"

@@ -115,11 +115,7 @@ void Engine::update() {
 	if (version == 1 && (world.tickcount % 70) == 0) {
 		int piece = 1 + (rand() % 28);
 		std::string filename = boost::str(boost::format("MU%02d") % piece);
-		SoundSlot *s = engine.backend->getAudioSlot(filename);
-		if (s) {
-			s->adjustVolume(48); // TODO: good volume?
-			s->play();
-		}
+		world.playAudio(filename, AgentRef(), false, false);
 	}
 
 	// update our data for things like pace, race, ticktime, etc

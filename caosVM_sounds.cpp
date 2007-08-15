@@ -22,6 +22,7 @@
 #include "Agent.h"
 #include "World.h"
 #include "Engine.h"
+#include "AudioBackend.h"
 #include <iostream>
 using std::cout;
 using std::cerr;
@@ -33,19 +34,16 @@ bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
 /**
  SNDE (command) filename (string)
  %status maybe
+
+ Play an uncontrolled sound at the target agent's current position.
 */
 void caosVM::c_SNDE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	if (!agentOnCamera(targ)) return;
-	SoundSlot *s = engine.backend->getAudioSlot(filename);
-	if (s) {
-		s->play();
-		targ->positionAudio(s);
-	}
+	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	targ->playAudio(filename, false, false);
 }
 
 /**
@@ -53,6 +51,8 @@ void caosVM::c_SNDE() {
  %status maybe
  %pragma variants c1 c2
  %cost c1,c2 0
+
+ Play an uncontrolled sound at the target agent's current position.
 */
 
 /**
@@ -61,28 +61,23 @@ void caosVM::c_SNDE() {
  %pragma variants c1
  %pragma implementation caosVM::c_SNDE
  %cost c1,c2 0
+
+ Play an uncontrolled sound at the target agent's current position.
 */
 
 /**
  SNDC (command) filename (string)
  %status maybe
+ 
+ Start playing a controlled sound with the target agent, which will follow the agent as it moves.
 */
 void caosVM::c_SNDC() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (targ->soundslot)
-		targ->soundslot->stop();
-	// TODO: sound should play in theory anyway, even if it's out-of-metaroom and out-of-view
-	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = engine.backend->getAudioSlot(filename);
-	if (s) {
-		targ->soundslot = s;
-		s->play();
-		s->agent = targ;
-		targ->positionAudio(s);
-	}
+	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	targ->playAudio(filename, true, false);
 }
 
 /**
@@ -90,28 +85,22 @@ void caosVM::c_SNDC() {
  %status maybe
  %pragma variants c1 c2
  %cost c1,c2 0
+
+ Start playing a controlled sound with the target agent, which will follow the agent as it moves.
 */
 
 /**
  SNDL (command) filename (string)
  %status maybe
+ 
+ Start playing a looping controlled sound with the target agent, which will follow the agent as it moves.
 */
 void caosVM::c_SNDL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (targ->soundslot)
-		targ->soundslot->stop();
-	// TODO: sound should play in theory anyway, even if it's out-of-metaroom and out-of-view
-	if (world.camera.getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return;
-	SoundSlot *s = engine.backend->getAudioSlot(filename);
-	if (s) {
-		targ->soundslot = s;
-		s->playLooped();
-		s->agent = targ;
-		targ->positionAudio(s);
-	}
+	targ->playAudio(filename, true, true);
 }
 
 /**
@@ -119,6 +108,8 @@ void caosVM::c_SNDL() {
  %status maybe
  %pragma variants c1 c2
  %cost c1,c2 0
+ 
+ Start playing a looping controlled sound with the target agent, which will follow the agent as it moves.
 */
 
 /**
@@ -179,8 +170,8 @@ void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)
 		
 	valid_agent(targ);
-	if (targ->soundslot)
-		targ->soundslot->fadeOut();
+	if (targ->sound)
+		targ->sound->fadeOut();
 }
 
 /**
@@ -191,8 +182,7 @@ void caosVM::c_FADE() {
 */
 void caosVM::c_STPC() {
 	valid_agent(targ);
-	if (targ->soundslot)
-		targ->soundslot->stop();
+	targ->sound.reset();
 }
 
 /**
