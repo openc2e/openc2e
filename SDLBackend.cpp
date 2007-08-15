@@ -26,41 +26,6 @@
 
 SDLBackend *g_backend;
 
-void SDLSoundSlot::play() {
-	soundchannel = Mix_PlayChannel(-1, sound, 0);
-}
-
-void SDLSoundSlot::playLooped() {
-	soundchannel = Mix_PlayChannel(-1, sound, -1);
-}
-
-void SDLSoundSlot::adjustPanning(int left, int right) {
-	Mix_SetPanning(soundchannel, left, right);
-}
-
-void SDLSoundSlot::adjustVolume(int volume) {
-	Mix_Volume(soundchannel, volume);
-}
-
-void SDLSoundSlot::fadeOut() {
-	Mix_FadeOutChannel(soundchannel, 500); // TODO: is 500 a good value?
-}
-
-void SDLSoundSlot::stop() {
-	Mix_HaltChannel(soundchannel);
-	sound = 0;
-}
-
-void SDLSoundSlot::reset() {
-	sound = 0;
-	if (agent) {
-		//agent->soundslot = 0;
-		agent.clear();
-	}
-	Mix_UnregisterAllEffects(soundchannel);
-	Mix_Volume(soundchannel, 128); // default
-}
-
 void SDLBackend::resizeNotify(int _w, int _h) {
 	mainsurface.width = _w;
 	mainsurface.height = _h;
@@ -69,7 +34,6 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 }
 
 void SDLBackend::init() {
-	soundenabled = false;
 	networkingup = false;
 
 	int init = SDL_INIT_VIDEO;
@@ -84,14 +48,6 @@ void SDLBackend::init() {
 	SDL_ShowCursor(false);
 	// bz2 and fuzzie both think this is the only way to get useful ascii out of SDL
 	SDL_EnableUNICODE(1);
-}
-
-void SDLBackend::soundInit() {
-	soundenabled = true;
-	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
-		throw creaturesException(std::string("SDL error during sound initialization: ") + SDL_GetError());
-	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
-		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
 }
 
 int SDLBackend::networkInit() {
@@ -247,45 +203,6 @@ retry:
 	}
 	
 	return true;
-}
-
-SoundSlot *SDLBackend::getAudioSlot(std::string filename) {
-	if (!soundenabled) return 0;
-
-	unsigned int i = 0;
-
-	while (i < nosounds) {
-		// if this slot has never been used, use it!
-		if (!sounddata[i].sound) break;
-
-		// if the slot is not currently playing, reset it and use it
-		if (!Mix_Playing(sounddata[i].soundchannel)) {
-			sounddata[i].reset();
-			break;
-		}
-
-		i++;
-	}
-	
-	if (i == nosounds) return 0; // no free slots, so return
-
-	std::map<std::string, Mix_Chunk *>::iterator it = soundcache.find(filename);
-	if (it != soundcache.end()) {
-		sounddata[i].sound = (*it).second;
-	} else {
-		std::string fname = world.findFile(std::string("/Sounds/") + filename + ".wav");
-		if (fname.size() == 0) return 0;
-		//std::cout << "trying to load " << fname << std::endl;
-		sounddata[i].sound = Mix_LoadWAV(fname.c_str());
-		if (!sounddata[i].sound) {
-			soundcache[filename] = 0;
-			std::cout << "warning: failed to load sound '" << fname << "'" << std::endl;
-			return 0;
-		}
-		soundcache[filename] = sounddata[i].sound;
-	}
-
-	return &sounddata[i];
 }
 
 void SDLSurface::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {

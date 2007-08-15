@@ -607,7 +607,6 @@ bool Engine::initialSetup(Backend *b) {
 	// TODO: ideally we shouldn't bother with the backend if norun is set (but we need one right now, for MainCamera/CAOS)
 	engine.setBackend(b);
 	engine.backend->init();
-	if (cmdline_enable_sound) engine.backend->soundInit();
 	world.camera.setBackend(engine.backend); // TODO: hrr
 	
 	int listenport = engine.backend->networkInit();

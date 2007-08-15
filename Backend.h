@@ -22,20 +22,6 @@
 
 #include "creaturesImage.h"
 #include "endianlove.h"
-#include <map>
-#include "AgentRef.h"
-
-struct SoundSlot {
-	AgentRef agent;
-
-	virtual void play() = 0;
-	virtual void playLooped() = 0;
-	virtual void adjustPanning(int angle, int distance) = 0;
-	virtual void adjustVolume(int volume) = 0;
-	virtual void fadeOut() = 0;
-	virtual void stop() = 0;
-	virtual ~SoundSlot() { }
-};
 
 enum eventtype { eventquit, eventkeydown, eventspecialkeyup, eventspecialkeydown, eventmousebuttondown, eventmousebuttonup, eventmousemove, eventresizewindow };
 enum eventbuttons { buttonleft=0x1, buttonright=0x2, buttonmiddle=0x4, buttonwheeldown=0x8, buttonwheelup=0x10 };
@@ -61,7 +47,6 @@ public:
 class Backend {
 public:
 	virtual void init() = 0;
-	virtual void soundInit() = 0;
 	virtual int networkInit() = 0;
 	virtual void shutdown() = 0;
 
@@ -75,7 +60,6 @@ public:
 	virtual void freeSurface(Surface *surf) = 0;
 			
 	virtual void setPalette(uint8 *data) = 0;
-	virtual SoundSlot *getAudioSlot(std::string filename) = 0;
 	virtual ~Backend() { }
 };
 

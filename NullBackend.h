@@ -38,7 +38,6 @@ protected:
 
 public:
 	virtual void init() { }
-	virtual void soundInit() { }
 	virtual int networkInit() { return -1; }
 	virtual void shutdown() { }
 
@@ -52,7 +51,6 @@ public:
 	virtual void freeSurface(Surface *surf) { }
 			
 	virtual void setPalette(uint8 *data) { }
-	virtual SoundSlot *getAudioSlot(std::string filename) { return 0; }
 };
 
 #endif

@@ -21,24 +21,8 @@
 #define _SDLBACKEND_H
 
 #include "SDL.h"
-#include <SDL_mixer.h>
 #include <SDL_net.h>
 #include "Backend.h"
-
-struct SDLSoundSlot : public SoundSlot {
-	int soundchannel;
-	Mix_Chunk *sound;
-
-	SDLSoundSlot() { sound = 0; }
-
-	void play();
-	void playLooped();
-	void adjustPanning(int angle, int distance);
-	void adjustVolume(int volume);
-	void fadeOut();
-	void stop();
-	void reset();
-};
 
 class SDLSurface : public Surface {
 	friend class SDLBackend;
@@ -59,11 +43,7 @@ public:
 
 class SDLBackend : public Backend {
 protected:
-	bool soundenabled, networkingup;
-	static const unsigned int nosounds = 15;
-	SDLSoundSlot sounddata[15];
-
-	std::map<std::string, Mix_Chunk *> soundcache;
+	bool networkingup;
 
 	SDLSurface mainsurface;
 	TCPsocket listensocket;
@@ -76,7 +56,6 @@ public:
 	SDLBackend() { }
 	
 	void init();
-	void soundInit();
 	int networkInit();
 	void shutdown();
 
@@ -92,7 +71,6 @@ public:
 		
 	bool keyDown(int key);
 	
-	SoundSlot *getAudioSlot(std::string filename);
 	void setPalette(uint8 *data);
 };
 
