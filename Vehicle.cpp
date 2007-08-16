@@ -28,17 +28,14 @@ Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, 
 	capacity = 0;
 	bump = 0;
 
-	cabinleft = (int)x;
-	cabinright = (int)x + getWidth();
-	cabintop = (int)y;
-	cabinbottom = (int)y + getHeight();
+	cabinleft = 0; cabintop = 0; cabinright = getWidth(); cabinbottom = getHeight();
 }
 
 Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount) : CompoundAgent(spritefile, firstimage, imagecount) {
 	capacity = 0;
 	bump = 0;
 
-	// TODO: set cabin bounds?
+	// TODO: set cabin bounds? we don't know width/height at this point..
 }
 
 void Vehicle::tick() {
