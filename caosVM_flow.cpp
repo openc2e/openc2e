@@ -254,6 +254,8 @@ void caosVM::c_ESEE() {
 	}
 }
 
+bool agentsTouching(Agent *first, Agent *second); // caosVM_agent.cpp
+
 /**
  ETCH (command) family (integer) genus (integer) species (integer)
  %pragma retc -1
@@ -282,21 +284,12 @@ void caosVM::c_ETCH() {
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
+		if (a.get() == touching) continue;
 
-		if (a->x < touching->x) {
-			if ((a->x + a->getWidth()) < touching->x) continue;
-		} else {
-			if ((touching->x + touching->getWidth()) < a->x) continue;
+		if (agentsTouching(a.get(), touching)) {
+			caosVar v; v.setAgent(a);
+			valueStack.push_back(v);
 		}
-		
-		if (a->y < touching->y) {
-			if ((a->y + a->getHeight()) < touching->y) continue;
-		} else {
-			if ((touching->y + touching->getHeight()) < a->y) continue;
-		}
-
-		caosVar v; v.setAgent(a);
-		valueStack.push_back(v);
 	}
 }
 
