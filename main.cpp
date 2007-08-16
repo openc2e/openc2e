@@ -24,7 +24,7 @@
 #include "World.h"
 #include "SDLBackend.h"
 #include "NullBackend.h"
-#include "NullAudioBackend.h"
+#include "OpenALBackend.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #undef main // because SDL is stupid
@@ -34,19 +34,16 @@ extern "C" int main(int argc, char *argv[]) {
 	try {
 		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2007 Alyssa Milburn and others\n\n";
 
+		engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
+#ifdef OPENAL_SUPPORT
+		engine.addPossibleAudioBackend("openal", shared_ptr<AudioBackend>(new OpenALBackend()));
+#endif
+
 		// pass command-line flags to the engine, but do no other setup
 		if (!engine.parseCommandLine(argc, argv)) return 1;
 		
-		// depending on engine configuration, create either a null (does nothing) backend or a normal SDL one
-		Backend *b;
-		if (engine.noRun()) b = new NullBackend();
-		else b = new SDLBackend();
-	
-		engine.audio = shared_ptr<AudioBackend>(new NullAudioBackend());
-		engine.audio->init();
-		
 		// get the engine to do all the startup (read catalogue, loading world, etc)
-		if (!engine.initialSetup(b)) return 0;
+		if (!engine.initialSetup()) return 0;
 	
 		// do a first-pass draw of the world. TODO: correct?
 		world.drawWorld();

@@ -73,6 +73,7 @@ OPENC2E_CORE = \
 	mngfile.o \
 	mngparser.tab.o \
 	oldBrain.o \
+	OpenALBackend.o \
 	PathResolver.o \
 	physics.o \
 	PointerAgent.o \
@@ -96,8 +97,8 @@ OPENC2E = $(OPENC2E_CORE) $(SERSTUB) main.o
 OPENC2E_S = $(OPENC2E_CORE) $(SERIALIZATION) main.o
 
 DEBUGFLAGS=-ggdb3 -O0
-CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE
-XLDFLAGS=$(LDFLAGS) -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt $(SDL_LFLAGS) -lz -lm -lSDL_net -lSDL_gfx -lpthread
+CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE -DOPENAL_SUPPORT
+XLDFLAGS=$(LDFLAGS) -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt -lboost_thread-mt $(SDL_LFLAGS) -lz -lm -lSDL_net -lSDL_gfx -lpthread -lopenal -lalut
 COREFLAGS=$(DEBUGFLAGS) $(SDL_CFLAGS) -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)

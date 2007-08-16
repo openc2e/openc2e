@@ -23,6 +23,8 @@
 #include "caosVM.h" // for setupCommandPointers()
 #include "PointerAgent.h"
 #include "dialect.h" // registerDelegates
+#include "NullBackend.h"
+#include "NullAudioBackend.h"
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -40,7 +42,6 @@ namespace po = boost::program_options;
 Engine engine;
 
 Engine::Engine() {
-	backend = 0;
 	done = false;
 	tickdata = 0;
 	for (unsigned int i = 0; i < 10; i++) ticktimes[i] = 0;
@@ -51,13 +52,27 @@ Engine::Engine() {
 	
 	cmdline_enable_sound = true;
 	cmdline_norun = false;
+
+	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
+	addPossibleAudioBackend("null", shared_ptr<AudioBackend>(new NullAudioBackend()));
 }
 
 Engine::~Engine() {
-	if (backend) delete backend;
 }
 
-void Engine::setBackend(Backend *b) {
+void Engine::addPossibleBackend(std::string s, boost::shared_ptr<Backend> b) {
+	assert(b);
+	preferred_backend = s;
+	possible_backends[s] = b;
+}
+
+void Engine::addPossibleAudioBackend(std::string s, boost::shared_ptr<AudioBackend> b) {
+	assert(b);
+	preferred_audiobackend = s;
+	possible_audiobackends[s] = b;
+}
+
+void Engine::setBackend(shared_ptr<Backend> b) {
 	backend = b;
 	lasttimestamp = backend->ticks();
 
@@ -387,7 +402,6 @@ void Engine::handleMouseButton(SomeEvent &event) {
 }
 
 void Engine::handleKeyDown(SomeEvent &event) {
-
 	switch (event.key) {
 		case 'w': w_down = true; break;
 		case 'a': a_down = true; break;
@@ -520,14 +534,31 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 	int optret;
 	std::vector<std::string> data_vec;
 
+	// generate help for backend options
+	std::string available_backends;
+	for (std::map<std::string, boost::shared_ptr<Backend> >::iterator i = possible_backends.begin(); i != possible_backends.end(); i++) {
+		if (available_backends.empty()) available_backends = i->first;
+		else available_backends += ", " + i->first;
+	}
+	available_backends = "Select the backend (options: " + available_backends + "), default is " + preferred_backend;
+	
+	std::string available_audiobackends;
+	for (std::map<std::string, boost::shared_ptr<AudioBackend> >::iterator i = possible_audiobackends.begin(); i != possible_audiobackends.end(); i++) {
+		if (available_audiobackends.empty()) available_audiobackends = i->first;
+		else available_audiobackends += ", " + i->first;
+	}
+	available_audiobackends = "Select the audio backend (options: " + available_audiobackends + "), default is " + preferred_audiobackend;
+	
 	// parse the command-line flags
 	po::options_description desc;
 	desc.add_options()
 		("help,h", "Display help on command-line options")
 		("version,V", "Display openc2e version")
 		("silent,s", "Disable all sounds")
+		("backend,k", po::value<std::string>(&preferred_backend)->composing(), available_backends.c_str())
+		("audiobackend,o", po::value<std::string>(&preferred_audiobackend)->composing(), available_audiobackends.c_str())
 		("data-path,d", po::value< std::vector<std::string> >(&data_vec)->composing(),
-		 "Set the path to the data directory")
+		 "Sets or adds a path to a data directory")
 		("bootstrap,b", po::value< std::vector<std::string> >(&cmdline_bootstrap)->composing(),
 		 "Sets or adds a path or COS file to bootstrap from")
 		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (c1, c2, cv or c3)")
@@ -572,7 +603,7 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 	return true;
 }
 
-bool Engine::initialSetup(Backend *b) {
+bool Engine::initialSetup() {
 	assert(world.data_directories.size() > 0);
 
 	// autodetect gametype if necessary
@@ -603,13 +634,24 @@ bool Engine::initialSetup(Backend *b) {
 	world.init(); // just reads mouse cursor (we want this after the catalogue reading so we don't play "guess the filename")
 	std::cout << "* Reading PRAY files..." << std::endl;
 	world.praymanager.update();
-	std::cout << "* Initialising backend..." << std::endl;
-	// TODO: ideally we shouldn't bother with the backend if norun is set (but we need one right now, for MainCamera/CAOS)
-	engine.setBackend(b);
-	engine.backend->init();
-	world.camera.setBackend(engine.backend); // TODO: hrr
+
+	if (cmdline_norun) preferred_backend = "null";
+	if (preferred_backend != "null") std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;	
+	shared_ptr<Backend> b = possible_backends[preferred_backend];
+	if (!b)	throw creaturesException("No such backend " + preferred_backend);
+	b->init(); setBackend(b);
+	possible_backends.clear();
+
+	if (cmdline_norun || !cmdline_enable_sound) preferred_audiobackend = "null";
+	if (preferred_audiobackend != "null") std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;	
+	shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
+	if (!a)	throw creaturesException("No such audio backend " + preferred_audiobackend);
+	a->init(); audio = a;
+	possible_audiobackends.clear();
+
+	world.camera.setBackend(backend); // TODO: hrr
 	
-	int listenport = engine.backend->networkInit();
+	int listenport = backend->networkInit();
 	if (listenport != -1) {
 		// inform the user of the port used, and store it in the relevant file
 		std::cout << "Listening for connections on port " << listenport << "." << std::endl;
@@ -626,7 +668,7 @@ bool Engine::initialSetup(Backend *b) {
 		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
 		caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
 		caosVar contents; contents.setInt(1);
-		engine.eame_variables[name] = contents;
+		eame_variables[name] = contents;
 	}
 
 	// execute the initial scripts!
@@ -667,7 +709,8 @@ bool Engine::initialSetup(Backend *b) {
 
 void Engine::shutdown() {
 	world.shutdown();
-	engine.backend->shutdown();
+	backend->shutdown();
+	audio->shutdown();
 	freeDelegates(); // does nothing if there are none (ie, no call to initialSetup)
 }
 

@@ -21,9 +21,12 @@
 #define _ENGINE_H
 
 #include "caosVar.h"
-#include "Backend.h"
 #include <map>
 #include <boost/filesystem/path.hpp>
+
+class Backend;
+class AudioBackend;
+struct SomeEvent;
 
 class Engine {
 protected:
@@ -38,17 +41,21 @@ protected:
 	bool cmdline_norun;
 	std::vector<std::string> cmdline_bootstrap;
 
+	std::map<std::string, boost::shared_ptr<Backend> > possible_backends;
+	std::map<std::string, boost::shared_ptr<class AudioBackend> > possible_audiobackends;
+	std::string preferred_backend, preferred_audiobackend;
+
 public:
 	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	
-	Backend *backend;
+	boost::shared_ptr<Backend> backend;
 	boost::shared_ptr<class AudioBackend> audio;
 	bool done;
 	unsigned int version;
 
 	Engine();
 	~Engine();
-	void setBackend(Backend *b);
+	void setBackend(boost::shared_ptr<Backend> b);
 	std::string executeNetwork(std::string in);
 	bool needsUpdate();
 	void update();
@@ -62,8 +69,11 @@ public:
 	void handleSpecialKeyDown(SomeEvent &event);
 	void handleSpecialKeyUp(SomeEvent &event);
 
+	void addPossibleBackend(std::string, boost::shared_ptr<Backend>);
+	void addPossibleAudioBackend(std::string, boost::shared_ptr<AudioBackend>);
+	
 	bool parseCommandLine(int argc, char *argv[]);
-	bool initialSetup(Backend *b);
+	bool initialSetup();
 	void shutdown();
 
 	bool noRun() { return cmdline_norun; }

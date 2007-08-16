@@ -27,6 +27,10 @@
 #include "exceptions.h"
 #include "World.h"
 
+#ifndef OPENAL_SUPPORT
+#error OPENAL_SUPPORT isn't set, so this file shouldn't be being compiled
+#endif
+
 const ALfloat zdist = -1.0;
 const ALfloat plnemul = 0.0;
 const ALfloat scale = 1.0/50;

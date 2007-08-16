@@ -75,14 +75,16 @@ public:
 	void setZoom(int pixels, int _x, int _y);
 };
 
+class Backend;
+
 class MainCamera : public Camera {
 protected:
-	class Backend *backend;
+	boost::shared_ptr<Backend> backend;
 	std::vector<AgentRef> floated;
 
 public:
-	MainCamera() { backend = 0; }
-	void setBackend(Backend *b) { backend = b; }
+	MainCamera() { }
+	void setBackend(boost::shared_ptr<Backend> b) { backend = b; }
 	unsigned int const getWidth();
 	unsigned int const getHeight();
 	void moveTo(int _x, int _y, panstyle pan = jump);
