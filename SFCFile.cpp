@@ -949,6 +949,10 @@ void SFCCompoundObject::copyToWorld() {
 			a->setHotspotFuncDetails(i, hotspots[i].message, hotspots[i].mask);
 		}
 	}
+
+	if (currentsound.size() != 0) {
+		a->playAudio(currentsound, true, true);
+	}
 }
 
 #include "SimpleAgent.h"
