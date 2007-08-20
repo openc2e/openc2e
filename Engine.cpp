@@ -61,12 +61,14 @@ Engine::~Engine() {
 }
 
 void Engine::addPossibleBackend(std::string s, boost::shared_ptr<Backend> b) {
+	assert(!backend);
 	assert(b);
 	preferred_backend = s;
 	possible_backends[s] = b;
 }
 
 void Engine::addPossibleAudioBackend(std::string s, boost::shared_ptr<AudioBackend> b) {
+	assert(!audio);
 	assert(b);
 	preferred_audiobackend = s;
 	possible_audiobackends[s] = b;

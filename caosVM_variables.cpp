@@ -411,12 +411,14 @@ void caosVM::v_UFOS() {
 /**
  MODU (string)
  %status stub
- 
- Returns the Docking Station engine string for now.  Should return modules loaded and display engine type.
+ %pragma variants all
+
+ Returns information about which modules are being used by the engine (for now, backend and audio backend names).
 */
 void caosVM::v_MODU() {
 	VM_VERIFY_SIZE(0)
-	result.setString("OriginalDisplay SDL (netbabel 148)"); // TODO
+	result.setString(engine.getBackendName() + ", " + engine.getAudioBackendName());
+	//result.setString("OriginalDisplay SDL (netbabel 148)"); // TODO
 }
 
 /**

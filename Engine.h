@@ -50,6 +50,9 @@ public:
 	
 	boost::shared_ptr<Backend> backend;
 	boost::shared_ptr<class AudioBackend> audio;
+	std::string getBackendName() { return preferred_backend; }
+	std::string getAudioBackendName() { return preferred_audiobackend; }
+
 	bool done;
 	unsigned int version;
 
