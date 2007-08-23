@@ -33,7 +33,7 @@ BrainInAVat::BrainInAVat() {
 
 	(void)statusBar();
 	setWindowTitle(tr("openc2e's Brain in a Vat"));
-	resize(400, 300);
+	resize(600, 400);
 
 	/* File menu */
 

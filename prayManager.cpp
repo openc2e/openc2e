@@ -87,7 +87,7 @@ void prayManager::update() {
 						prayFile *p = new prayFile(*d);
 						addFile(p);
 					} catch (creaturesException &e) {
-						std::cerr << "PRAY file \"" << d->path().native_directory_string() << "\" failed to load: " << e.what() << std::endl;
+						std::cerr << "PRAY file \"" << "\" failed to load: " << e.what() << std::endl;
 					}
 				}
 			}

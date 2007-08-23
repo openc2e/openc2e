@@ -521,7 +521,11 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 	}
 }
 
+#ifdef _DEBUG
+static const char data_default[] = "C:/Program Files/Docking Station";
+#else
 static const char data_default[] = "./data";
+#endif
 
 static void opt_version() {
 	// We already showed the primary version bit, just throw in some random legalese
