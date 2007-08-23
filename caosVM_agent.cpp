@@ -1435,9 +1435,18 @@ void caosVM::c_ALPH() {
 */
 void caosVM::v_HELD() {
 	valid_agent(targ);
-	
-	// TODO: how does 'more than one' occur?
-	result.setAgent(targ->carrying);
+
+	// TODO: this whole thing perhaps belongs in a virtual function
+	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	if (v) {
+		// TODO: it should be random .. ?
+		if (v->passengers.size())
+			result.setAgent(v->passengers[0]);
+		else
+			result.setAgent(0);
+	} else {
+		result.setAgent(targ->carrying);
+	}
 }
 
 /**
@@ -1762,10 +1771,16 @@ void caosVM::c_SETV_CLAS() {
 void caosVM::v_LIML() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
-	if (r) result.setInt(r->x_left);
-	else result.setInt(0);
+	if (targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
+		result.setInt((int)v->x + v->cabinleft);
+	} else {
+		shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+		if (r) result.setInt(r->x_left);
+		else result.setInt(0);
+	}
 }
 
 /**
@@ -1776,10 +1791,16 @@ void caosVM::v_LIML() {
 void caosVM::v_LIMT() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
-	if (r) result.setInt(r->y_left_ceiling);
-	else result.setInt(0);
+	if (targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
+		result.setInt((int)v->y + v->cabintop);
+	} else {
+		shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+		if (r) result.setInt(r->y_left_ceiling);
+		else result.setInt(0);
+	}
 }
 
 /**
@@ -1790,10 +1811,16 @@ void caosVM::v_LIMT() {
 void caosVM::v_LIMR() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
-	if (r) result.setInt(r->x_right);
-	else result.setInt(8352); // TODO
+	if (targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
+		result.setInt((int)v->x + v->cabinright);
+	} else {
+		shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+		if (r) result.setInt(r->x_right);
+		else result.setInt(8352); // TODO
+	}
 }
 
 /**
@@ -1805,10 +1832,16 @@ void caosVM::v_LIMR() {
 void caosVM::v_LIMB_c1() {
 	// TODO: is this remotely sane? if so, unstub.
 	valid_agent(targ);
-	shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 
-	if (r) result.setInt(r->y_left_floor);
-	else result.setInt(1200); // TODO
+	if (targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
+		result.setInt((int)v->y + v->cabinbottom);
+	} else {
+		shared_ptr<Room> r = world.map.roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+
+		if (r) result.setInt(r->y_left_floor);
+		else result.setInt(1200); // TODO
+	}
 }
 
 /**

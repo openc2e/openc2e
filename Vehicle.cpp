@@ -29,6 +29,7 @@ Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, 
 	bump = 0;
 
 	cabinleft = 0; cabintop = 0; cabinright = getWidth(); cabinbottom = getHeight();
+	cabinplane = 1; // TODO: is this sane? seems to be the default in c2e
 }
 
 Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount) : CompoundAgent(spritefile, firstimage, imagecount) {
@@ -36,6 +37,7 @@ Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int i
 	bump = 0;
 
 	// TODO: set cabin bounds? we don't know width/height at this point..
+	cabinplane = 95; // TODO: arbitarily-chosen value (see also SFCFile)
 }
 
 void Vehicle::tick() {
@@ -62,8 +64,67 @@ void Vehicle::tick() {
 	}
 	
 	// move by xvec/yvec!
-	x += xvec.getInt() / 256.0;
-	y += yvec.getInt() / 256.0;
+	moveTo(x + xvec.getInt() / 256.0, y + yvec.getInt() / 256.0);
+}
+
+void Vehicle::carry(AgentRef passenger) {
+	if (passenger->carriedby) return; // TODO: change to assert?
+	if (passenger->invehicle) return; // TODO: change to assert?
+
+	int cabinwidth = cabinright - cabinleft;
+	int cabinheight = cabinbottom - cabintop;
+
+	// reject if passenger is too big
+	if (passenger->getWidth() > cabinwidth) return;
+	// TODO: you can put too-high things into cabins in c1. can you in the other games?
+	//if (passenger->getHeight() > cabinheight) return;
+
+	// push into our cabin
+	// TODO: should we use moveTo here?
+	if (passenger->x < (x + cabinleft)) passenger->x = x + cabinleft;
+	if (passenger->x + passenger->getWidth() > (x + cabinright)) passenger->x = x + cabinright - passenger->getWidth();
+	if (engine.version > 1) {
+		// TODO: not sure if this is good for too-high agents, if it's possible for them to exist (see comment above)
+		if (passenger->y < (y + cabintop)) passenger->y = y + cabintop;
+		if (passenger->y + passenger->getHeight() > (y + cabinbottom)) passenger->y = y + cabinbottom - passenger->getHeight();
+	} else {
+		passenger->y = y + cabinbottom - passenger->getHeight();
+	}
+
+	passengers.push_back(passenger);
+	passenger->invehicle = this;
+	
+	if (engine.version >= 3)
+		passenger->queueScript(122, this); // Vehicle Drop, TODO: is this valid call?
+}
+
+void Vehicle::drop(AgentRef passenger) {
+	std::vector<AgentRef>::iterator i = std::find(passengers.begin(), passengers.end(), passenger);
+	assert(i != passengers.end());
+	passengers.erase(i);
+
+	passenger->beDropped();
+	passenger->invehicle.clear();
+
+	if (engine.version >= 3)
+		passenger->queueScript(122, this); // Vehicle Drop, TODO: is this valid call?
+}
+
+void Vehicle::adjustCarried(float xoffset, float yoffset) {
+	Agent::adjustCarried(xoffset, yoffset);
+
+	for (std::vector<AgentRef>::iterator i = passengers.begin(); i != passengers.end(); i++) {
+		if (!(*i)) continue; // TODO: muh
+		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
+	}
+}
+
+void Vehicle::kill() {
+	// TODO: sane?
+	while (passengers.size() > 0) {
+		if (passengers[0]) dropCarried(passengers[0]);
+		else passengers.erase(passengers.begin());
+	}
 }
 
 /* vim: set noet: */

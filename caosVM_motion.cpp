@@ -474,7 +474,7 @@ void caosVM::v_FALL() {
 
 /**
  MOVS (integer)
- %status stub
+ %status maybe
  %pragma variants c1 c2 cv c3
 
  Returns an integer representing the motion status of the TARG agent.  0 is autonomous, 1 is moving by mouse, 2 is 
@@ -485,7 +485,18 @@ void caosVM::v_MOVS() {
 
 	valid_agent(targ);
 
-	result.setInt(0); // TODO
+	// TODO: agents can possibly have multiple MOVS states right now, we should make sure to avoid that
+	if (targ->carriedby) {
+		if (targ->carriedby.get() == (Agent *)world.hand())
+			result.setInt(1);
+		else
+			result.setInt(4);
+	} else if (targ->invehicle)
+		result.setInt(3);
+	else if (targ->floatingagent)
+		result.setInt(2);
+	else
+		result.setInt(0);
 }
 
 /**

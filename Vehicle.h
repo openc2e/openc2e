@@ -37,12 +37,20 @@ public:
 
 	caosVar xvec, yvec;
 	int cabinleft, cabintop, cabinright, cabinbottom; // TODO: should be protected w/accessors?
+	int cabinplane;
 
 	void setCabinRect(int l, int t, int r, int b) { cabinleft = l; cabintop = t; cabinright = r; cabinbottom = b; }
 	void setCapacity(unsigned int c) { capacity = c; }
 	unsigned int getBump() { return bump; }
 
+	std::vector<AgentRef> passengers;
+	
+	virtual void carry(AgentRef);
+	virtual void drop(AgentRef);
+	virtual void adjustCarried(float xoffset, float yoffset);
+
 	virtual void tick();
+	virtual void kill();
 };
 
 #endif

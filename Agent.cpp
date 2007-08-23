@@ -28,6 +28,7 @@
 #include "AudioBackend.h"
 #include <boost/format.hpp>
 #include "Room.h"
+#include "Vehicle.h"
 
 void Agent::core_init() {
 	initialized = false;
@@ -107,7 +108,7 @@ void Agent::moveTo(float _x, float _y, bool force) {
 		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
 	}
 
-	adjustCarried();
+	adjustCarried(xoffset, yoffset);
 }
 
 void Agent::floatTo(AgentRef a) {
@@ -195,13 +196,15 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 			if (from == world.hand()) {
 				if (!mouseable()) return false;
 			} else if (!c) {
+				// TODO: valid check for vehicles?
 				if (!carryable()) return false;
 			}
-			from->carry(this); // TODO: correct behaviour?
+			from->addCarried(this); // TODO: correct behaviour?
 			break;
 		case 5: // drop
 			if (!from) return false;
-			if (from != carriedby) return false;
+			// TODO: this check isn't very good for vehicles ;p
+			// if (from != carriedby) return false;
 			break;
 		case 12: // eat
 			if (c && !cr_can_eat) return false;
@@ -247,7 +250,7 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 
 	switch (event) {
 		case 5:
-			from->dropCarried(); // TODO: correct?
+			from->dropCarried(this); // TODO: correct?
 			break;
 	}
 	
@@ -665,7 +668,7 @@ Agent::~Agent() {
 void Agent::kill() {
 	assert(!dying);
 	if (floatable()) floatRelease();
-	dropCarried();
+	if (carrying) dropCarried(carrying);
 	
 	dying = true; // what a world, what a world...
 
@@ -689,7 +692,12 @@ void Agent::zotrefs() {
 }
 
 unsigned int Agent::getZOrder() const {
-	if (carriedby) {
+	if (invehicle) {
+		// TODO: take notice of cabp in c2e, at least. also, stacking .. ?
+		Vehicle *v = dynamic_cast<Vehicle *>(invehicle.get());
+		assert(v);
+		return v->cabinplane;
+	} else if (carriedby) {
 		// TODO: check for overflow
 		// TODO: is adding our own zorder here correct behaviour? someone should check
 		if (engine.version > 1)
@@ -742,47 +750,98 @@ void Agent::stopScript() {
 		vm->stop();
 }
 
+void Agent::addCarried(AgentRef a) {
+	assert(a);
+
+	// TODO: muh, vehicle drop needs more thought
+	if (a->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(a->invehicle.get());
+		assert(v);
+		v->dropCarried(a);
+	}
+
+	carry(a);
+
+	// TODO: this doesn't reorder children or anything..
+	a->setZOrder(a->zorder);
+
+	// fire 'Got Carried Agent'
+	if (engine.version >= 3)
+		queueScript(124, a); // TODO: is this the correct param?
+}
+
 void Agent::carry(AgentRef a) {
+	assert(a);
+	
 	// TODO: check for infinite loops (eg, us carrying an agent which is carrying us) :)
 
 	if (carrying)
-		dropCarried();
+		dropCarried(carrying);
 
 	carrying = a;
-	if (!carrying) return;
 
 	a->carriedby = AgentRef(this);
 	// TODO: move carrying agent to the right position
-	// TODO: this doesn't reorder children or anything..
-	carrying->setZOrder(carrying->zorder);
-	adjustCarried();
-
-	// fire 'Got Carried Agent'
-	queueScript(124, carrying); // TODO: is this the correct param?
+	adjustCarried(0, 0);
 }
 
-void Agent::dropCarried() {
-	if (!carrying) return;
+bool agentsTouching(Agent *first, Agent *second); // caosVM_agents.cpp
+
+bool Agent::beDropped() {	
+	carriedby = AgentRef(0);
+	// TODO: this doesn't reorder children or anything..
+	setZOrder(zorder);
+
+	if (!invehicle) { // ie, we're not being dropped by a vehicle
+		// TODO: check for vehicles in a saner manner?
+		for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+			boost::shared_ptr<Agent> a = (*i);
+			if (!a) continue;
+			Vehicle *v = dynamic_cast<Vehicle *>(a.get());
+			if (!v) continue;
+
+			if (agentsTouching(this, v)) {
+				v->addCarried(this);
+				// TODO: how to handle not-invehicle case, where vehicle has failed to pick us up?
+				if (invehicle) return true;
+			}
+		}
+	}
 	
 	if (engine.version == 1) {
-		MetaRoom* m = world.map.metaRoomAt(carrying->x,carrying->y);
-		if (!m) return;
-		shared_ptr<Room> r = m->nextFloorFromPoint(carrying->x,carrying->y);
-		if (!r) return; // TODO: hack to avoid black holes, is this correct?
-		carrying->carriedby = AgentRef(0);
-		carrying->moveTo(carrying->x,r->bot.pointAtX(carrying->x).y - carrying->getHeight());
-	} else
-		carrying->carriedby = AgentRef(0);
+		MetaRoom* m = world.map.metaRoomAt(x, y);
+		if (!m) return false;
+		shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
+		if (!r) return false;
+		moveTo(x, r->bot.pointAtX(x).y - getHeight());
+	} else {
+		// TODO: move to safe position?
+	}
+
+	// TODO: return value is not used anywhere yet?
+	return true;
+}
+
+void Agent::dropCarried(AgentRef a) {
+	drop(a);
 
 	// TODO: this doesn't reorder children or anything..
-	carrying->setZOrder(carrying->zorder);
+	a->setZOrder(a->zorder);
 
 	// fire 'Lost Carried Agent'
-	queueScript(125, carrying); // TODO: is this the correct param?
+	if (engine.version >= 3)
+		queueScript(125, carrying); // TODO: is this the correct param?
+}
+
+void Agent::drop(AgentRef a) {
+	if (!carrying) return;
+	assert(carrying == a);
+
+	a->beDropped();
 	carrying = AgentRef(0);
 }
 
-void Agent::adjustCarried() {
+void Agent::adjustCarried(float unusedxoffset, float unusedyoffset) {
 	// Adjust the position of the agent we're carrying.
 	// TODO: this doesn't actually position the carried agent correctly, sigh
 

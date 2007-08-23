@@ -21,6 +21,7 @@
 #include <iostream>
 #include "openc2e.h"
 #include "Vehicle.h"
+#include "World.h"
 
 /**
  CABN (command) left (integer) top (integer) right (integer) bottom (integer)
@@ -66,9 +67,14 @@ void caosVM::c_SPAS() {
 	VM_PARAM_AGENT(passenger)
 	VM_PARAM_AGENT(vehicle)
 
+	valid_agent(vehicle);
+	valid_agent(passenger);
+	
 	// TODO: ensure passenger is a creature for c1/c2?
 
-	// TODO
+	Vehicle *v = dynamic_cast<Vehicle *>(vehicle.get());
+	caos_assert(v);
+	v->addCarried(passenger);
 }
 
 /**
@@ -93,6 +99,8 @@ void caosVM::c_GPAS() {
 	// TODO
 }
 
+bool agentsTouching(Agent *first, Agent *second); // caosVM_agents.cpp
+
 /**
  GPAS (command)
  %status stub
@@ -103,8 +111,19 @@ void caosVM::c_GPAS_c2() {
 	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
-	
-	// TODO
+
+	// TODO: are we sure c1/c2 grab passengers by agent rect?
+	// TODO: do we need to check greedycabin attr for anything?
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		boost::shared_ptr<Agent> a = (*i);
+		if (!a) continue;
+		if (a.get() == v) continue;
+		if (a->family != 4) continue; // only pickup creatures (TODO: good check?)
+
+		if (agentsTouching(a.get(), v)) {
+			v->addCarried(a);
+		}
+	}
 }
 
 /**
@@ -138,7 +157,11 @@ void caosVM::c_DPAS_c2() {
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 
-	// TODO
+	for (std::vector<AgentRef>::iterator i = v->passengers.begin(); i != v->passengers.end(); i++) {
+		if (!(*i)) continue; // TODO: muh
+		if ((*i)->family != 4) continue; // only drop creatures (TODO: good check?)
+		v->drop(*i);
+	}
 }
 
 /**
@@ -152,7 +175,7 @@ void caosVM::c_CABP() {
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 
-	// TODO
+	v->cabinplane = plane;
 }
 
 /**

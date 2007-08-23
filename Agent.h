@@ -90,11 +90,16 @@ protected:
 
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 
+	virtual void carry(AgentRef);
+	virtual void drop(AgentRef);
+	virtual void adjustCarried(float xoffset, float yoffset);
+
 public:
 	boost::shared_ptr<class AudioSource> sound;
 
 	AgentRef carrying;
 	AgentRef carriedby;
+	AgentRef invehicle;
 	
 	inline bool isDying() const {
 		return dying;
@@ -173,9 +178,10 @@ public:
 	void floatTo(AgentRef);
 	void floatTo(float x, float y);
 
-	void dropCarried();
-	void carry(AgentRef);
-	void adjustCarried();
+	bool beDropped();
+	
+	void addCarried(AgentRef);
+	void dropCarried(AgentRef);
 
 	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
 	void moveTo(float, float, bool force = false);
