@@ -277,7 +277,7 @@ void caosScript::parse(std::istream &in) {
 		for (int i = errindex - leftct; i < errindex + rightct; i++) {
 			e.context->push_back((*tokens)[i]);
 		}
-		if (errindex + rightct + 1 < tokens->size()) {
+		if (errindex + rightct + 1 < (int)tokens->size()) {
 			e.context->push_back(token());
 			e.context->back().payload = std::string("...");
 		}
