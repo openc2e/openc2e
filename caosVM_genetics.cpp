@@ -117,9 +117,12 @@ void caosVM::v_GTOS() {
 	VM_PARAM_INTEGER(slot)
 
 	valid_agent(targ);
-	caos_assert(targ->slots.find(slot) != targ->slots.end());
-	shared_ptr<class genomeFile> g = targ->slots[slot];
-	result.setString(world.history.findMoniker(g));
+	if (targ->slots.find(slot) == targ->slots.end()) {
+		result.setString(""); // CV needs this, at least
+	} else {
+		shared_ptr<class genomeFile> g = targ->slots[slot];
+		result.setString(world.history.findMoniker(g));
+	}
 }
 
 /**
