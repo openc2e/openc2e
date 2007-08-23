@@ -4,6 +4,9 @@
 #include <iostream>
 //#include "token.h"
 #include "lexutil.h"
+#include "exceptions.h"
+
+#define YY_FATAL_ERROR(str) throw parseException(str)
 %}
 
 %option noyywrap
