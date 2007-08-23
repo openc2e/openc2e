@@ -662,7 +662,6 @@ Agent::~Agent() {
 	if (vm)
 		world.freeVM(vm);
 	zotstack();
-	zotrefs();
 }
 
 void Agent::kill() {
@@ -679,16 +678,12 @@ void Agent::kill() {
 	}
 	
 	zotstack();
-	zotrefs();
 	agents_iter->reset();
 
 	if (sound) {
 		sound->stop();
 		sound.reset();
 	}
-}
-
-void Agent::zotrefs() {
 }
 
 unsigned int Agent::getZOrder() const {

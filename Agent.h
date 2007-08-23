@@ -66,7 +66,6 @@ protected:
 	std::map<unsigned int, shared_ptr<class genomeFile> > slots;
 	class caosVM *vm;
 
-	void zotrefs();
 	void zotstack();
 
 	mutable int unid;
