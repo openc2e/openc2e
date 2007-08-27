@@ -24,6 +24,7 @@
 #include <cmath>   // sqrt
 #include <sstream>
 #include "AgentHelpers.h"
+#include "Vehicle.h" // EPAS
 
 /**
  DOIF (command) condition (condition)
@@ -296,7 +297,7 @@ void caosVM::c_ETCH() {
 /**
  EPAS (command) family (integer) genus (integer) species (integer)
  %pragma retc -1
- %status stub
+ %status maybe
 
  Similar to ENUM, but iterates through the OWNR vehicle's passengers.
 */
@@ -306,10 +307,22 @@ void caosVM::c_EPAS() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	// TODO: should probably implement this (ESEE)
+	caos_assert(owner);
+	Vehicle *v = dynamic_cast<Vehicle *>(owner.get());
+	caos_assert(v);
 
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
+
+	for (std::vector<AgentRef>::iterator i = v->passengers.begin(); i != v->passengers.end(); i++) {
+		AgentRef a = *i;
+		if (!a) continue; // TODO: hrr
+		if (species && species != a->species) continue;
+		if (genus && genus != a->genus) continue;
+		if (family && family != a->family) continue;
+
+		caosVar v; v.setAgent(a); valueStack.push_back(v);
+	}
 }
 
 /**
@@ -323,7 +336,7 @@ void caosVM::c_ECON() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_VALIDAGENT(agent)
 
-	// TODO: should probably implement this (ESEE)
+	// TODO: should probably implement this (ECON)
 
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
