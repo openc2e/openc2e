@@ -106,7 +106,7 @@ public:
 	std::string findFile(std::string path);
 	std::vector<std::string> findFiles(std::string dir, std::string wild);
 
-	void playAudio(std::string filename, AgentRef agent, bool controlled, bool loop);
+	boost::shared_ptr<AudioSource> playAudio(std::string filename, AgentRef agent, bool controlled, bool loop);
 
 	void newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
 	shared_ptr<genomeFile> loadGenome(std::string &filename);

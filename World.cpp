@@ -564,11 +564,11 @@ std::string World::generateMoniker(std::string basename) {
 	return x;
 }
 
-void World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop) {
-	if (filename.size() == 0) return;
+boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop) {
+	if (filename.size() == 0) return boost::shared_ptr<AudioSource>();
 
 	boost::shared_ptr<AudioSource> sound = engine.audio->newSource();
-	if (!sound) return;
+	if (!sound) return boost::shared_ptr<AudioSource>();
 
 	AudioClip clip = engine.audio->loadClip(filename);
 	if (!clip) {
@@ -592,12 +592,14 @@ void World::playAudio(std::string filename, AgentRef agent, bool controlled, boo
 	} else {
 		assert(!controlled);
 
-		std::cout << "failing to handle non-agent sound " << filename << std::endl;
-
 		// TODO: handle non-agent sounds
+		sound->setPos(world.camera.getXCentre(), world.camera.getYCentre(), 0);
+		uncontrolled_sounds.push_back(sound);
 	}
 	
 	sound->play();
+
+	return sound;
 }
 
 /* vim: set noet: */

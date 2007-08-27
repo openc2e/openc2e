@@ -68,6 +68,8 @@ void Vehicle::tick() {
 }
 
 void Vehicle::carry(AgentRef passenger) {
+	// TODO: 'return' is not a good idea here, because the callung function already does stuff
+
 	if (passenger->carriedby) return; // TODO: change to assert?
 	if (passenger->invehicle) return; // TODO: change to assert?
 
