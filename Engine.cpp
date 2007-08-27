@@ -55,6 +55,8 @@ Engine::Engine() {
 
 	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
 	addPossibleAudioBackend("null", shared_ptr<AudioBackend>(new NullAudioBackend()));
+
+	gamename = "Unknown";
 }
 
 Engine::~Engine() {
@@ -565,6 +567,7 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 		("bootstrap,b", po::value< std::vector<std::string> >(&cmdline_bootstrap)->composing(),
 		 "Sets or adds a path or COS file to bootstrap from")
 		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (c1, c2, cv or c3)")
+		("gamename,m", po::value< std::string >(&gamename), "Set the game name")
 		("norun,n", "Don't run the game, just execute scripts")
 		("autokill,a", "Enable autokill")
 		;

@@ -41,6 +41,8 @@ protected:
 	bool cmdline_norun;
 	std::vector<std::string> cmdline_bootstrap;
 
+	std::string gamename;
+
 	std::map<std::string, boost::shared_ptr<Backend> > possible_backends;
 	std::map<std::string, boost::shared_ptr<class AudioBackend> > possible_audiobackends;
 	std::string preferred_backend, preferred_audiobackend;
@@ -52,6 +54,8 @@ public:
 	boost::shared_ptr<class AudioBackend> audio;
 	std::string getBackendName() { return preferred_backend; }
 	std::string getAudioBackendName() { return preferred_audiobackend; }
+
+	std::string getGameName() { return gamename; }
 
 	bool done;
 	unsigned int version;

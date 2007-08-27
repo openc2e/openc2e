@@ -423,13 +423,14 @@ void caosVM::v_MODU() {
 
 /**
  GNAM (string)
- %status stub
+ %status maybe
+ %pragma variants all
  
- Returns the currently-running game (like "Docking Station").
+ Returns the currently-running game (like "Creatures 1" or "Docking Station").
 */
 void caosVM::v_GNAM() {
 	VM_VERIFY_SIZE(0)
-	result.setString("Docking Station"); // TODO
+	result.setString(engine.getGameName());
 }
 
 /**
