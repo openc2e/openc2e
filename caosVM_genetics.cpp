@@ -94,7 +94,7 @@ void caosVM::c_GENE_LOAD() {
 
 /**
  GENE MOVE (command) dest_agent (agent) dest_slot (integer) src_agent (agent) src_slot (integer)
- %status stub
+ %status maybe
 
  Move a genome to another slot.
 */
@@ -104,7 +104,15 @@ void caosVM::c_GENE_MOVE() {
 	VM_PARAM_INTEGER(dest_slot)
 	VM_PARAM_VALIDAGENT(dest_agent)
 
-	// TODO
+	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = src_agent->slots.find(src_slot);
+	caos_assert(i != src_agent->slots.end());
+
+	std::string moniker = world.history.findMoniker(i->second);
+	assert(moniker != std::string("")); // internal consistency, i think..
+
+	dest_agent->slots[dest_slot] = src_agent->slots[src_slot];
+	src_agent->slots.erase(i);
+	world.history.getMoniker(moniker).moveToAgent(dest_agent);
 }
 
 /**
