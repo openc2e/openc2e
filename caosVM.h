@@ -867,7 +867,6 @@ public:
 	void c_DPAS_c2();
 	void c_CABP();
 	void c_RPAS();
-	void v_RPAS();
 	void c_CABV();
 	void v_CABV();
 	void v_XVEC();
