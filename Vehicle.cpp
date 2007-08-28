@@ -44,25 +44,6 @@ void Vehicle::tick() {
 	CompoundAgent::tick();
 	if (paused) return;
 
-	if (xvec.getInt() != 0 && engine.version == 1) {
-		// handle magical C1 vehicle world wrapping, if necessary
-		
-		MetaRoom *m = world.map.metaRoomAt(x, y);
-		if (!m) {
-			std::cout << "BUG: moving c1 vehicle " << identify() << " is out of room system at " << x << ", " << y << ", so killing it" << std::endl;
-			kill();
-			return;
-		}
-
-		if (x + (xvec.getInt() / 256.0) < m->x()) {
-			assert(xvec.getInt() < 0);
-			x += m->width();
-		} else if (x + (xvec.getInt() / 256.0) > m->x() + m->width()) {
-			assert(xvec.getInt() > 0);
-			x -= m->width();
-		}
-	}
-	
 	// move by xvec/yvec!
 	moveTo(x + xvec.getInt() / 256.0, y + yvec.getInt() / 256.0);
 }
@@ -77,7 +58,7 @@ void Vehicle::carry(AgentRef passenger) {
 	int cabinheight = cabinbottom - cabintop;
 
 	// reject if passenger is too big
-	if (passenger->getWidth() > cabinwidth) return;
+	if ((int)passenger->getWidth() > cabinwidth) return;
 	// TODO: you can put too-high things into cabins in c1. can you in the other games?
 	//if (passenger->getHeight() > cabinheight) return;
 

@@ -103,6 +103,20 @@ void Agent::moveTo(float _x, float _y, bool force) {
 
 	x = _x; y = _y;
 
+	// handle wraparound
+	// TODO: this is perhaps non-ideal
+	if (engine.version < 3 && xoffset != 0.0f) {
+		// TODO: it'd be nice to handle multiple metarooms
+		MetaRoom *m = world.map.getFallbackMetaroom();
+		assert(m);
+
+		if (x < m->x()) {
+			x += m->width();
+		} else if (x > m->x() + m->width()) {
+			x -= m->width();
+		}
+	}
+
 	for (std::vector<AgentRef>::iterator i = floated.begin(); i != floated.end(); i++) {
 		assert(*i);
 		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
