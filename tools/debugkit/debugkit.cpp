@@ -123,7 +123,7 @@ void DebugKit::tryConnect() {
 }
 
 void DebugKit::socketError() {
-	socket->connect(socket, SIGNAL(connected()), 0, 0);
+	socket->disconnect(socket, SIGNAL(connected()), 0, 0);
 	
 	//if (socket->error() == QAbstractSocket::RemoteHostClosedError)
 	//	return;
