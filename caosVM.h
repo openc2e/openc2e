@@ -360,6 +360,7 @@ public:
 	void v_GAME_c2();
 	void c_VRSN();
 	void v_VRSN();
+	void v_OC2E_DDIR();
 
 	// variables
 	void c_SETV();
