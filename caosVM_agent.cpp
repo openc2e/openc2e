@@ -83,7 +83,7 @@ void caosVM::v_TOUC() {
 	if (agentsTouching(first.get(), second.get()))
 		result.setInt(1);
 	else
-		result.setInt(1);
+		result.setInt(0);
 }
 
 /**
