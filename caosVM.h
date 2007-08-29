@@ -570,6 +570,7 @@ public:
 	void c_TNTW();
 	void c_PRNT();
 	void v_TCAR();
+	void c_EDIT();
 	
 	// motion
 	void c_ELAS();

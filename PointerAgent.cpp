@@ -59,4 +59,8 @@ void PointerAgent::physicsTick() {
 	// TODO: this is a hack, which does nothing, because we set a velocity in main() but also move the cursor manually
 }
 
+void PointerAgent::kill() {
+	// pointer agent isn't killable
+}
+
 /* vim: set noet: */

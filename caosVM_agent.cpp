@@ -517,9 +517,8 @@ void caosVM::c_KILL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALIDAGENT(a)
 
-	if (a.get() != world.hand()) {
-		a->kill();
-	}
+	// note that kill is a virtual function which doesn't work on PNTR
+	a->kill();
 }
 
 /**
@@ -1919,6 +1918,20 @@ void caosVM::v_TCAR() {
 	valid_agent(targ);
 
 	result.setAgent(0);
+}
+
+/**
+ EDIT (command)
+ %status stub
+ %pragma variants c1
+
+ Attach the target agent to the mouse cursor for positioning purposes.
+ Presently just causes the hand to pick it up.
+*/
+void caosVM::c_EDIT() {
+	valid_agent(targ);
+
+	world.hand()->addCarried(targ);
 }
 
 /* vim: set noet: */

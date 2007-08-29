@@ -31,6 +31,7 @@ public:
 	void finishInit();
 	void firePointerScript(unsigned short event, Agent *src);
 	void physicsTick();
+	void kill();
 };
 
 #endif
