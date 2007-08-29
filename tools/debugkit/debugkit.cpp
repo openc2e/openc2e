@@ -61,6 +61,7 @@ DebugKit::DebugKit() {
 	injectorpage = new QWidget();
 	injectorlayout = new QGridLayout(injectorpage);
 	agentlist = new QListWidget(injectorpage);
+	agentlist->setSortingEnabled(true);
 	agentlist->connect(agentlist, SIGNAL(currentRowChanged(int)), this, SLOT(selectedAgentChanged(int)));
 	injectorlayout->addWidget(agentlist, 0, 0);
 	inject_button = new QPushButton(tr("Inject"), injectorpage);
@@ -165,30 +166,6 @@ void DebugKit::connectAttempt() {
 	socket->close();
 }
 
-void DebugKit::readAgents() {
-	inject_button->setDisabled(true);
-	agentlist->clear();
-
-	for (unsigned int i = 0; i < gamedatadirs->count(); i++) {
-		QString dirname = gamedatadirs->item(i)->text();
-		QDir dir(dirname);
-		if (!dir.exists()) {
-			QMessageBox msgBox(QMessageBox::Warning, tr("Directory missing"), dirname, 0, this);
-			continue;
-		}
-		
-		QStringList filters;
-		filters << "*.cob";
-		dir.setNameFilters(filters);
-
-		QStringList cobfiles = dir.entryList();
-		for (unsigned int j = 0; j < cobfiles.size(); j++) {
-			QString file = cobfiles[j];
-			agentlist->addItem(dirname + "/" + file);
-		}
-	}
-}
-
 void DebugKit::selectedAgentChanged(int i) {
 	if (i != -1)
 		inject_button->setDisabled(false);
@@ -212,50 +189,102 @@ std::string readpascalstring(std::istream &s) {
 	return std::string(x, size);
 }
 
-void DebugKit::injectButton() {
-	QString filename = agentlist->currentItem()->text();
-	std::ifstream cobfile(filename.toAscii(), std::ios::binary);
-	cobfile >> std::noskipws;
+struct c1cobfile {
+	uint16 no_objects;
+	uint32 expire_month;
+	uint32 expire_day;
+	uint32 expire_year;
+	std::vector<std::string> scripts;
+	std::vector<std::string> imports;
+	uint16 no_objects_used;
+	std::string name;
 
-	if (cobfile.fail()) {
+	c1cobfile(std::ifstream &s) {
+		s >> std::noskipws;
+
+		uint16 version = read16(s);
+
+		// TODO: mph
+		if (version != 1) {
+			//QMessageBox::warning(this, tr("Failed to open"), tr("Version %1 is not supported").arg((int)version));
+			return;
+		}
+
+		no_objects = read16(s);
+		expire_month = read32(s);
+		expire_day = read32(s);
+		expire_year = read32(s);
+		uint16 noscripts = read16(s);
+		uint16 noimports = read16(s);
+		no_objects_used = read16(s);
+		uint16 reserved_zero = read16(s);
+		assert(reserved_zero == 0);
+
+		for (unsigned int i = 0; i < noscripts; i++)
+			scripts.push_back(readpascalstring(s));
+		for (unsigned int i = 0; i < noimports; i++)
+			imports.push_back(readpascalstring(s));
+
+		uint32 imagewidth = read32(s);
+		uint32 imageheight = read32(s);
+		uint16 secondimagewidth = read16(s);
+		assert(imagewidth == secondimagewidth);
+		char imagedata[imagewidth * imageheight];
+		s.read((char *)&imagedata, imagewidth * imageheight);
+		name = readpascalstring(s);
+	}
+};
+
+void DebugKit::readAgents() {
+	inject_button->setDisabled(true);
+	agentlist->clear();
+
+	for (unsigned int i = 0; i < gamedatadirs->count(); i++) {
+		QString dirname = gamedatadirs->item(i)->text();
+		QDir dir(dirname);
+		if (!dir.exists()) {
+			QMessageBox msgBox(QMessageBox::Warning, tr("Directory missing"), dirname, 0, this);
+			continue;
+		}
+		
+		QStringList filters;
+		filters << "*.cob";
+		dir.setNameFilters(filters);
+
+		QStringList cobfiles = dir.entryList();
+		for (unsigned int j = 0; j < cobfiles.size(); j++) {
+			QString file = dirname + '/' + cobfiles[j];
+			std::ifstream cobstream(file.toAscii(), std::ios::binary);
+			if (!cobstream.fail()) {
+				c1cobfile cobfile(cobstream);
+				QListWidgetItem *newItem = new QListWidgetItem(cobfile.name.c_str(), agentlist);
+				newItem->setToolTip(file);
+			}
+		}
+	}
+}
+
+void DebugKit::injectButton() {
+	QString filename = agentlist->currentItem()->toolTip();
+	std::ifstream cobstream(filename.toAscii(), std::ios::binary);
+	if (cobstream.fail()) {
 		QMessageBox::warning(this, tr("Failed to open"), filename);
 		return;
 	}
 
-	uint16 version = read16(cobfile);
-
-	if (version != 1) {
-		QMessageBox::warning(this, tr("Failed to open"), tr("Version %1 is not supported").arg((int)version));
-		return;
-	}
-
-	uint16 no_objects = read16(cobfile);
-	uint32 expire_month = read32(cobfile);
-	uint32 expire_day = read32(cobfile);
-	uint32 expire_year = read32(cobfile);
-	uint16 noscripts = read16(cobfile);
-	uint16 noimports = read16(cobfile);
-	uint16 no_objects_used = read16(cobfile);
-	uint16 reserved_zero = read16(cobfile);
+	c1cobfile cobfile(cobstream);
 
 	std::string idata;
 	// this works around a stupid qt issue where it drops the socket if there's no lines returned
 	// TODO: surely this is just fuzzie being dumb
 	idata += "outs \"\\n\"\n";
-	for (unsigned int i = 0; i < noscripts; i++) {
-		idata += readpascalstring(cobfile) + "\n";
+	for (unsigned int i = 0; i < cobfile.scripts.size(); i++) {
+		idata += cobfile.scripts[i] + "\n";
 	}
-	for (unsigned int i = 0; i < noimports; i++) {
-		idata += "iscr," + readpascalstring(cobfile) + "\n";
+	for (unsigned int i = 0; i < cobfile.imports.size(); i++) {
+		idata += "iscr," + cobfile.imports[i] + "\n";
 	}
 	idata += "rscr\n";
-	/*uint32 imagewidth = read32(cobfile);
-	uint32 imageheight = read32(cobfile);
-	uint16 secondimagewidth = read16(cobfile);
-	assert(imagewidth == secondimagewidth);
-	char imagedata[imagewidth * imageheight];
-	cobfile.read((char *)&imagedata, imagewidth * imageheight);
-	std::string name = readpascalstring(cobfile); */
 
 	injectdata = idata.c_str();
 	
