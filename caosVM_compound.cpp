@@ -67,15 +67,17 @@ void caosVM::c_NEW_PART() {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER(partno)
 	
-	caos_assert(part >= 0 && part <= 9);
+	caos_assert(partno >= 0 && partno <= 9);
 	valid_agent(targ);
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
-	CompoundPart *p = new DullPart(a, part, a->getSpriteFile(), a->getFirstImage() + first_image, x, y, plane);
+	CompoundPart *p = new DullPart(a, partno, a->getSpriteFile(), a->getFirstImage() + first_image, x, y, plane);
 	a->addPart(p);
+
+	part = partno;
 }
 
 /**
