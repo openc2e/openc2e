@@ -72,3 +72,13 @@ DOIF TARG eq NULL
 ELSE
  DBG: OUTS "not ok 7"
 ENDI
+
+* make sure TARG is reset after unsuccessful ENUM
+RTAR 3 2 1
+ENUM 20 25 65530
+NEXT
+DOIF TARG eq NULL
+ DBG: OUTS "ok 8"
+ELSE
+ DBG: OUTS "not ok 8"
+ENDI
