@@ -77,10 +77,10 @@ bool agentsTouching(Agent *first, Agent *second) {
 */
 void caosVM::v_TOUC() {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_VALIDAGENT(second)
-	VM_PARAM_VALIDAGENT(first)
+	VM_PARAM_AGENT(second)
+	VM_PARAM_AGENT(first)
 
-	if (agentsTouching(first.get(), second.get()))
+	if (first && second && agentsTouching(first.get(), second.get()))
 		result.setInt(1);
 	else
 		result.setInt(0);

@@ -112,39 +112,38 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				VM_PARAM_VALUE(v2);
 				VM_PARAM_VALUE(v1);
 				VM_PARAM_INTEGER(condaccum);
+				assert(!v1.isEmpty());
+				assert(!v2.isEmpty());
 				int condition = op.argument;
+				if (condition & CAND) condition -= CAND;
+				if (condition & COR) condition -= COR;
 				int result;
-#define COMPARE(type, get) do {\
-	type v1a, v2a; \
-	v1a = v1.get(); \
-	v2a = v2.get(); \
-	if (v1a > v2a) \
-		result = CGT; \
-	else if (v1a < v2a) \
-		result = CLT; \
-	else \
-		result = CEQ; \
-} while (0)
-				if (v1.getType() == INTEGER && v2.getType() == INTEGER) {
-					COMPARE(int, getInt);
-					if (v2.getInt() == (v1.getInt() & v2.getInt()))
-						result |= CBT;
-					if (0           == (v1.getInt() & v2.getInt()))
-						result |= CBF;
-				} else if (v1.hasNumber() && v2.hasNumber())
-					COMPARE(float, getFloat);
-				else if (v1.hasString() && v2.hasString())
-					COMPARE(std::string, getString);
-				else if (v1.hasAgent() && v2.hasAgent())
-					COMPARE(AgentRef, getAgentRef().get);
-				else if (v1.isEmpty() && v2.isEmpty())
-					result = CEQ;
+				if (condition == CEQ)
+					result = (v1 == v2);
+				if (condition == CNE)
+					result = !(v1 == v2);
+				
+				if (condition == CLT)
+					result = (v1 < v2);
+				if (condition == CGE)
+					result = !(v1 < v2);
+				if (condition == CGT)
+					result = (v1 > v2);
+				if (condition == CLE)
+					result = !(v1 > v2);
+
+				if (condition == CBT) {
+					caos_assert(v1.hasInt() && v2.hasInt());
+					result = (v2.getInt() == v1.getInt() & v2.getInt());
+				}
+				if (condition == CBF) {
+					caos_assert(v1.hasInt() && v2.hasInt());
+					result = (0           == v1.getInt() & v2.getInt());
+				}
+				if (op.argument & CAND)
+					this->result.setInt(condaccum && result);
 				else
-					result = 0; // XXX?
-				if (condition & CAND)
-					this->result.setInt(condaccum && !!(result & condition & CMASK));
-				else
-					this->result.setInt(condaccum || !!(result & condition & CMASK));
+					this->result.setInt(condaccum || result);
 				break;
 #undef COMPARE
 			}
