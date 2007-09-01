@@ -600,8 +600,9 @@ void caosVM::c_URGE_WRIT() {
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
 	VM_PARAM_INTEGER(noun_id)
-	VM_PARAM_VALIDAGENT(creature)
+	VM_PARAM_AGENT(creature)
 
+	if (!creature) return;
 	c2eCreature *c = getc2eCreature(creature.get());
 	if (!c) return; // ignored on non-creatures
 	
