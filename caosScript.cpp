@@ -541,12 +541,12 @@ void caosScript::parseloop(int state, void *info) {
 			int startp = current->getNextIndex();
 			parseloop(ST_ENUM, NULL);
 			current->fixRelocation(nextreloc);
+			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd next")));
 			emitOp(CAOS_ENUMPOP, startp);
 		} else if (t->word() == "next") {
 			if (state != ST_ENUM) {
 				throw parseException("Unexpected NEXT");
 			}
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd next")));
 			return;
 
 		} else if (t->word() == "subr") {
