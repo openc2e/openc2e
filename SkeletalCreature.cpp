@@ -330,10 +330,16 @@ void SkeletalCreature::snapDownFoot() {
 			if (downfootroom->x_left <= footx && downfootroom->x_right >= footx) {
 				newroom = downfootroom; // TODO, we're just forcing for now
 			} else {
+				float ydiff = 10000.0f; // TODO: big number
 				for (std::map<weak_ptr<Room>,RoomDoor *>::iterator i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
-					// TODO: check y location for vague sanity
-					if (i->first.lock()->x_left <= footx && i->first.lock()->x_right >= footx)
-						newroom = downfootroom;
+					shared_ptr<Room> thisroom = i->first.lock();
+					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
+						float thisydiff = fabs(footy - thisroom->bot.pointAtX(footx).y);
+						if (thisydiff < ydiff) {
+							newroom = thisroom;
+							ydiff = thisydiff;
+						}
+					}
 				}
 			}
 		}
@@ -342,6 +348,12 @@ void SkeletalCreature::snapDownFoot() {
 	if (!newroom) {
 		// TODO
 		newroom = world.map.roomAt(footx, footy);
+		// insane emergency handling
+		float newfooty = footy;
+		while (!newroom && newfooty > 0) {
+			newroom = world.map.roomAt(footx, newfooty);
+			newfooty--;
+		}
 	}
 
 	downfootroom = newroom;
@@ -392,9 +404,9 @@ void SkeletalCreature::setPose(std::string s) {
 					float attachmenty = attachmentY(1, 0) + y; // head attachment point, which we'll use to 'look' from atm
 				
 					// TODO: this is horrible, but i have no idea how the head angle is calculated
-					if (attention->y > (attachmenty + 20)) pose[1] = 0;
-					else if (attention->y < (attachmenty - 40)) pose[1] = 3;
-					else if (attention->y < (attachmenty - 20)) pose[1] = 2;
+					if (attention->y > (attachmenty + 30)) pose[1] = 0;
+					else if (attention->y < (attachmenty - 70)) pose[1] = 3;
+					else if (attention->y < (attachmenty - 30)) pose[1] = 2;
 					else pose[1] = 1;
 					pose[1] += (direction * 4);
 				}
@@ -449,6 +461,11 @@ void SkeletalCreature::tick() {
 
 	// TODO: we should only do this if we're moving :-P
 	gaitTick();
+}
+
+void SkeletalCreature::physicsTick() {
+	// TODO
+	// disable physics for now, it gets in the way
 }
 
 void SkeletalCreature::gaitTick() {

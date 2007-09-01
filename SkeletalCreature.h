@@ -53,6 +53,7 @@ private:
 	unsigned int gaiti;
 	creatureGaitGene *gaitgene;
 
+	void physicsTick();
 	void snapDownFoot();
 
 public:

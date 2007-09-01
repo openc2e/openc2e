@@ -87,6 +87,8 @@ protected:
 	void vmTick();
 	virtual bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
 
+	virtual void physicsTick();
+	
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 
 	virtual void carry(AgentRef);
@@ -199,7 +201,6 @@ public:
 	static Point boundingBoxPoint(unsigned int n, Point p, unsigned int w, unsigned int h);
 	
 	virtual void tick();
-	virtual void physicsTick();
 	virtual void kill();
 	void stopScript();
 
