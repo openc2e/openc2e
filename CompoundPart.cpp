@@ -116,7 +116,6 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	origsprite = sprite = world.gallery.getImage(spritefile);
 	firstimg = fimg;
 	caos_assert(sprite);
-	caos_assert(sprite->numframes() > firstimg);
 	
 	pose = 0;
 	base = 0;
@@ -125,6 +124,16 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	framerate = 1;
 	framedelay = 0;
 	draw_mirrored = false;
+	
+	if (sprite->numframes() <= firstimg) {
+		if (world.gametype == "cv") {
+			// Creatures Village allows you to create sprites with crazy invalid data, do the same as it does
+			// (obviously the firstimg data is invalid so all attempts to change the pose/etc will fail, same as in CV)
+			spriteno = 0;
+		} else {
+			throw caosException(boost::str(boost::format("Failed to create sprite part: first sprite %d is beyond %d sprite(s) in file") % firstimg % sprite->numframes()));
+		}
+	}
 }
 
 SpritePart::~SpritePart() {
