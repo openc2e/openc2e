@@ -77,6 +77,8 @@ void caosVM::c_SPAS() {
 	v->addCarried(passenger);
 }
 
+bool agentsTouching(Agent *first, Agent *second); // caosVM_agents.cpp
+
 /**
  GPAS (command) family (integer) genus (integer) species (integer) options (integer)
  %status stub
@@ -96,10 +98,22 @@ void caosVM::c_GPAS() {
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 	
-	// TODO
-}
+	// TODO: see other GPAS below
+	// TODO: are we sure c2e grabs passengers by agent rect?
+	// TODO: do we need to check greedycabin attr for anything?
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		boost::shared_ptr<Agent> a = (*i);
+		if (!a) continue;
+		if (a.get() == v) continue;
+		if (family && family != a->family) continue;
+		if (genus && genus != a->genus) continue;
+		if (species && species != a->species) continue;
 
-bool agentsTouching(Agent *first, Agent *second); // caosVM_agents.cpp
+		if (agentsTouching(a.get(), v)) {
+			v->addCarried(a);
+		}
+	}
+}
 
 /**
  GPAS (command)
@@ -142,8 +156,17 @@ void caosVM::c_DPAS() {
 	valid_agent(targ);
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
-	
-	// TODO
+
+	for (unsigned int i = 0; i < v->passengers.size(); i++) {
+		AgentRef a = v->passengers[i];
+		if (!a) continue;
+		if (a.get() == v) continue;
+		if (family && family != a->family) continue;
+		if (genus && genus != a->genus) continue;
+		if (species && species != a->species) continue;
+		v->drop(a);
+		i--; // since we dropped the last one out of the list
+	}
 }
 
 /**
@@ -157,10 +180,13 @@ void caosVM::c_DPAS_c2() {
 	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
 	caos_assert(v);
 
-	for (std::vector<AgentRef>::iterator i = v->passengers.begin(); i != v->passengers.end(); i++) {
-		if (!(*i)) continue; // TODO: muh
-		if ((*i)->family != 4) continue; // only drop creatures (TODO: good check?)
-		v->drop(*i);
+	for (unsigned int i = 0; i < v->passengers.size(); i++) {
+		AgentRef a = v->passengers[i];
+		if (!a) continue;
+		if (a.get() == v) continue;
+		if (a->family != 4) continue; // only drop creatures (TODO: good check?)
+		v->drop(a);
+		i--; // since we dropped the last one out of the list
 	}
 }
 
