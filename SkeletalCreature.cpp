@@ -288,7 +288,7 @@ void SkeletalCreature::recalculateSkeleton() {
 	adjusty = -lowesty;
 
 	// TODO: muh, we should cooperate with physics system etc
-	if (!carriedby && calculated) {
+	if (!carriedby && !invehicle && calculated) {
 		int orig_footpart = (downfoot_left ? 11 : 12);
 		// adjust location to match foot
 		x -= (attachmentX(orig_footpart, 0) - oldfootx);
@@ -310,7 +310,9 @@ void SkeletalCreature::recalculateSkeleton() {
 	width = 50; // TODO: arbitary values bad
 
 	// TODO: muh, we should cooperate with physics system etc
-	if (!carriedby)
+	if (carriedby || invehicle)
+		downfootroom.reset();
+	else
 		snapDownFoot();
 }
 
