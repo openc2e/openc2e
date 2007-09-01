@@ -79,6 +79,8 @@ public:
 	int attachmentX(unsigned int part, unsigned int id);
 	int attachmentY(unsigned int part, unsigned int id);
 
+	bool isLeftFootDown() { return downfoot_left; }
+
 	CompoundPart *part(unsigned int id);
 	void setZOrder(unsigned int plane);
 

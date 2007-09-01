@@ -451,7 +451,7 @@ void caosVM::v_HHLD() {
 
 /**
  MVFT (command) x (float) y (float)
- %status stub
+ %status maybe
 
  Move the target Creature's foot (along with the rest of the Creature, obviously) to the given 
  coordinates.  You should use this rather than MVTO for Creatures.
@@ -461,9 +461,15 @@ void caosVM::c_MVFT() {
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	Creature *c = getTargCreature();
+	caos_assert(targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
+	caos_assert(c);
 
-	// TODO: dynamic_cast to Creature *
+	// TODO: this should be nicer
+	float downfootxoffset = c->attachmentX(c->isLeftFootDown() ? 11 : 12, 0);
+	float downfootyoffset = c->attachmentY(c->isLeftFootDown() ? 11 : 12, 0);
+
+	targ->moveTo(x - downfootxoffset, y - downfootyoffset);
 }
 	
 /**
