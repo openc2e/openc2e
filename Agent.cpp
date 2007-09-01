@@ -543,6 +543,8 @@ void Agent::physicsTick() {
 	} else {
 		if (vely.hasDecimal() || velx.hasDecimal())
 			moveTo(destx, desty);
+		if (sufferphysics())
+			vely.setFloat(vely.getFloat() + accg.getFloat());
 	}
 
 	if (sufferphysics() && (aero != 0)) {
