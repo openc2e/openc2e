@@ -119,10 +119,11 @@ void SkeletalCreature::skeletonInit() {
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
 			if (i == 6 || i == 13) continue;
 
-		// try this stage and the stages below it to find data which worksforus
+		// reset the existing image reference
 		images[i].reset();
+
+		// find the relevant gene
 		char x = cee_bodyparts[i].letter;
-		int stage_to_try = creature->getStage();
 		creatureAppearanceGene *partapp = 0;
 		if (x == 'a' || x >= 'o') {
 			// head
@@ -143,18 +144,43 @@ void SkeletalCreature::skeletonInit() {
 		// TODO: this exception won't necessary be handled, neither will the one below
 		if (!partapp)
 			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % (unsigned char)x));
-	
-		if (engine.version == 1) partapp->species = 0; // TODO: don't stomp over the gene? :P
+
+		// find relevant sprite
+		int stage_to_try = creature->getStage();
 		while (stage_to_try > -1 && !images[i]) {
-			images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, partapp->species, partapp->variant));
+			int spe = (engine.version == 1) ? 0 : partapp->species;
+			while (spe > -1 && !images[i]) {
+				int var = partapp->variant;
+				while (var > -1 && !images[i]) {
+					images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, spe, var));
+					if (!images[i]) var--;
+				}
+				if (!images[i]) spe--;
+			}
 			if (!images[i]) stage_to_try--;
 		}
 		if (!images[i])
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % (int)creature->getStage()));
 
-		std::string attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, partapp->species, partapp->variant) + ".att");
+		// find relevant ATT data
+		stage_to_try = creature->getStage();
+		std::string attfilename;
+		while (stage_to_try > -1 && attfilename.empty()) {
+			int spe = (engine.version == 1) ? 0 : partapp->species;
+			while (spe > -1 && attfilename.empty()) {
+				int var = partapp->variant;
+				while (var > -1 && attfilename.empty()) {
+					attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, spe, var) + ".att");
+					if (attfilename.empty()) var--;
+				}
+				if (attfilename.empty()) spe--;
+			}
+			if (attfilename.empty()) stage_to_try--;
+		}
 		if (attfilename.empty())
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % stage_to_try));
+
+		// load ATT file
 		std::ifstream in(attfilename.c_str());
 		if (in.fail())
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't load body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % stage_to_try));
@@ -189,7 +215,7 @@ void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 
 		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, false, 0);
 
-		// if (displaycore) {
+		if (displaycore) {
 			// TODO: we draw a lot of points twice here :)
 			int atx = attachmentX(i, 0) + xoffset, aty = attachmentY(i, 0) + yoffset;
 			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF0000CC);
@@ -197,7 +223,7 @@ void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 			atx = attachmentX(i, 1) + xoffset; aty = attachmentY(i, 1) + yoffset;
 			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF0000CC);
 			renderer->renderLine(atx, aty - 1, atx, aty + 1, 0xFF0000CC);
-		// }
+		}
 	}
 }
 
@@ -253,7 +279,8 @@ void SkeletalCreature::recalculateSkeleton() {
 	adjustx = -lowestx;
 	adjusty = -lowesty;
 
-	if (calculated) {
+	// TODO: muh, we should cooperate with physics system etc
+	if (!carriedby && calculated) {
 		int orig_footpart = (downfoot_left ? 11 : 12);
 		// adjust location to match foot
 		x -= (attachmentX(orig_footpart, 0) - oldfootx);
@@ -274,7 +301,9 @@ void SkeletalCreature::recalculateSkeleton() {
 	height = downfoot_left ? leftfoot : rightfoot;
 	width = 50; // TODO: arbitary values bad
 
-	snapDownFoot();
+	// TODO: muh, we should cooperate with physics system etc
+	if (!carriedby)
+		snapDownFoot();
 }
 
 void SkeletalCreature::snapDownFoot() {

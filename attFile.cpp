@@ -26,6 +26,7 @@ std::istream &operator >> (std::istream &i, attFile &f) {
 	std::string s;
 	while (std::getline(i, s)) {
 		if (s.size() == 0) return i;
+		if (f.nolines >= 16) return i; // TODO: what the heck? wah
 		assert(f.nolines < 16);
 
 		f.noattachments[f.nolines] = 0;
