@@ -74,6 +74,8 @@ public:
 	unsigned int getAge() { return age; }
 	shared_ptr<genomeFile> getGenome() { return genome; }
 
+	AgentRef getAttentionFocus() { return attention; }
+
 	virtual unsigned int getGait() = 0;
 	
 	void born();
