@@ -203,17 +203,25 @@ void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 
 		bodypartinfo *part = &cee_bodyparts[i];
 
-		unsigned int ourpose;
+		unsigned int ourpose = pose[i];
+
+		bool mirror = false;
+		// TODO: ack, move this check out of the loop
+		if (world.variables["engine_mirror_creature_body_parts"] == 1 && ourpose >= 4 && ourpose <= 7) {
+			ourpose -= 4;
+			mirror = true;
+		}
+
+		// adjust for pregnancy/facial expressions/etc as necessary
+		// TODO: hair?
 		if (part->parent == -1) // body
-			ourpose = pose[i] + (pregnancy * 16);
+			ourpose += (pregnancy * 16);
 		else if (i == 1) // head
-			ourpose = pose[i] + (eyesclosed ? 16 : 0) + (facialexpression * 32);
-		else // everything else
-			ourpose = pose[i];
+			ourpose += (eyesclosed ? 16 : 0) + (facialexpression * 32);
 
 		assert(images[i]);
 
-		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, false, 0);
+		renderer->render(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, false, 0, mirror);
 
 		if (displaycore) {
 			// TODO: we draw a lot of points twice here :)
@@ -355,9 +363,17 @@ void SkeletalCreature::setPose(unsigned int p) {
 }
 
 void SkeletalCreature::setPose(std::string s) {
+	// TODO: assert on the right size?
+	//assert(s.size() >= 15);
+
+	AgentRef attention = creature->getAttentionFocus();
+	// TODO: hack
+	if (!attention) attention = (Agent *)world.hand();
+	bool itright = (attention->x > x);
+
 	switch (s[0]) {
-		case '?': direction = 0; break; // TODO: hack
-		case '!': direction = 1; break; // TODO: hack
+		case '?': direction = (itright ? 0 : 1); break;
+		case '!': direction = (itright ? 1 : 0); break;
 		case '0': direction = 3; break;
 		case '1': direction = 2; break;
 		case '2': direction = 0; break;
@@ -371,7 +387,18 @@ void SkeletalCreature::setPose(std::string s) {
 			case '1': pose[cee_lookup[i]] = 1 + (direction * 4); break;
 			case '2': pose[cee_lookup[i]] = 2 + (direction * 4); break;
 			case '3': pose[cee_lookup[i]] = 3 + (direction * 4); break;
-			case '?': assert(i == 0); pose[1] = 0 + (direction * 4); break; // TODO: hack
+			case '?': assert(i == 0); {
+					// make the head look in the direction of _IT_
+					float attachmenty = attachmentY(1, 0) + y; // head attachment point, which we'll use to 'look' from atm
+				
+					// TODO: this is horrible, but i have no idea how the head angle is calculated
+					if (attention->y > (attachmenty + 20)) pose[1] = 0;
+					else if (attention->y < (attachmenty - 40)) pose[1] = 3;
+					else if (attention->y < (attachmenty - 20)) pose[1] = 2;
+					else pose[1] = 1;
+					pose[1] += (direction * 4);
+				}
+				break;
 			// TODO: '!' also?
 			case 'X': break; // do nothing
 			default: assert(false); 
