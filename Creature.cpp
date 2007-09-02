@@ -38,7 +38,7 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 	tickage = false;
 	zombie = false;
 
-	ticks = 0;
+	age = ticks = 0;
 }
 
 Creature::~Creature() {
