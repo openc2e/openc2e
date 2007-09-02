@@ -513,7 +513,7 @@ void TextEntryPart::renderCaret(Surface *renderer, int xoffset, int yoffset) {
 }
 
 void TextEntryPart::tick() {
-	CompoundPart::tick();
+	SpritePart::tick();
 
 	if (focused) {
 		caretpose++;
@@ -568,6 +568,12 @@ void CameraPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
 	}
 	
 	SpritePart::partRender(renderer, xoffset, yoffset);
+}
+
+void CameraPart::tick() {
+	SpritePart::tick();
+
+	camera->tick();
 }
 
 GraphPart::GraphPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
