@@ -669,6 +669,8 @@ void caosVM::c_CHEM() {
  %pragma variants c1 c2
  %pragma implementation caosVM::c_CHEM_c1
  %cost c1,c2 0
+
+ Set the level of a chemical (0 to 255) in target creature's bloodstream.
 */
 void caosVM::c_CHEM_c1() {
 	VM_PARAM_INTEGER(adjust)
@@ -705,6 +707,8 @@ void caosVM::v_CHEM() {
  %status maybe
  %pragma variants c1 c2
  %pragma implementation caosVM::v_CHEM_c1
+ 
+ Returns the level of a chemical (0 to 255) in target creature's bloodstream.
 */
 void caosVM::v_CHEM_c1() {
 	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
@@ -990,6 +994,8 @@ void caosVM::v_IT() {
 /**
  NEWC (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer)
  %status maybe
+ 
+ Creates a new creature over the space of a few ticks, using the specified agent/slot for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
 void caosVM::c_NEWC() {
 	VM_PARAM_INTEGER(variant)
@@ -997,6 +1003,8 @@ void caosVM::c_NEWC() {
 	VM_PARAM_INTEGER(gene_slot)
 	VM_PARAM_VALIDAGENT(gene_agent)
 	VM_PARAM_INTEGER(family)
+
+	// TODO: creation should be blocking and multiple-tick!
 
 	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
 	caos_assert(i != gene_agent->slots.end());
@@ -1020,6 +1028,8 @@ void caosVM::c_NEWC() {
 /**
  NEW: CREA (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer)
  %status stub
+ 
+ Creates a new creature using the specified agent/slot for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
 void caosVM::c_NEW_CREA() {
 	/*VM_PARAM_INTEGER(variant)
@@ -1037,6 +1047,8 @@ void caosVM::c_NEW_CREA() {
  %status maybe
  %pragma variants c1
  %pragma implementation caosVM::c_NEW_CREA_c1
+
+ Creates a new creature using the specified moniker for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
 void caosVM::c_NEW_CREA_c1() {
 	VM_PARAM_INTEGER(sex)
@@ -1106,16 +1118,20 @@ void caosVM::v_DRV() {
 
 /**
  IITT (agent)
- %status stub
+ %status maybe
+
+ Return the agent which the target creature is currently focused on. Note that you should probably use _IT_ in creature scripts.
 */
 void caosVM::v_IITT() {
 	Creature *c = getTargCreature();
-	result.setAgent(0); // TODO
+	result.setAgent(c->getAttentionFocus());
 }
 
 /**
  AGES (command) times (integer)
  %status maybe
+
+ Age (ie, increase the life stage of) the target creature the specified number of times.
 */
 void caosVM::c_AGES() {
 	VM_PARAM_INTEGER(times)
@@ -1130,6 +1146,9 @@ void caosVM::c_AGES() {
 /**
  LOCI (command) type (integer) organ (integer) tissue (integer) id (integer) value (float)
  %status maybe
+
+ Set the value of the specified loci of the target creature. 'type' is 0 for receptor loci and 1 for emitter loci.
+ See genetics documentation for details of the parameters.
 */
 void caosVM::c_LOCI() {
 	VM_PARAM_FLOAT(value)
@@ -1148,6 +1167,9 @@ void caosVM::c_LOCI() {
 /**
  LOCI (float) type (integer) organ (integer) tissue (integer) id (integer)
  %status maybe
+ 
+ Return the current value of the specified loci of the target creature. 'type' is 0 for receptor loci and 1 for emitter loci.
+ See genetics documentation for details of thei parameters.
 */
 void caosVM::v_LOCI() {
 	VM_PARAM_INTEGER(id)
@@ -1176,6 +1198,8 @@ void caosVM::v_TAGE() {
 /**
  ORGN (integer)
  %status maybe
+
+ Return the number of organs the target creature has.
 */
 void caosVM::v_ORGN() {
 	c2eCreature *c = getc2eCreature(targ.get());
@@ -1185,6 +1209,20 @@ void caosVM::v_ORGN() {
 /**
  ORGF (float) organ (integer) value (integer)
  %status maybe
+
+ Return some data about the specified organ (numbered starting at zero) of the target creature.
+
+ value should be one of the following types of data:
+ 0: clock rate
+ 1: short term life force as a proportion of the initial life force
+ 2: repair rate
+ 3: injury to apply
+ 4: initial life force
+ 5: short term life force
+ 6: long term life force
+ 7: damage rate
+ 8: energy cost
+ 9: atp damage coefficient
 */
 void caosVM::v_ORGF() {
 	VM_PARAM_INTEGER(value)
@@ -1212,6 +1250,8 @@ void caosVM::v_ORGF() {
 /**
  ORGI (integer) organ (integer) value (integer)
  %status maybe
+
+ Returns a count of receptors (value 0), emitters (value 1) or reactions (value 2) in the specified organ (numbered starting at zero) of the target creature.
 */
 void caosVM::v_ORGI() {
 	VM_PARAM_INTEGER(value)
@@ -1382,6 +1422,8 @@ void caosVM::c_SNEZ() {
  %status maybe
  %pragma variants c1 c2
  %pragma implementation caosVM::v_DRIV_c1
+
+ Returns the value for the specified drive of the target creature.
 */
 void caosVM::v_DRIV_c1() {
 	VM_PARAM_INTEGER(drive)
