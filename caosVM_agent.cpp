@@ -691,8 +691,12 @@ void caosVM::v_BHVR() {
 void caosVM::v_CARR() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(targ);
-	
-	result.setAgent(targ->carriedby);
+
+	// TODO: muh, should totally be virtual
+	if (targ->invehicle)
+		result.setAgent(targ->invehicle);
+	else
+		result.setAgent(targ->carriedby);
 }
 
 /**
