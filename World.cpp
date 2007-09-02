@@ -521,9 +521,15 @@ void World::selectCreature(boost::shared_ptr<Agent> a) {
 		CreatureAgent *c = dynamic_cast<CreatureAgent *>(a.get());
 		caos_assert(c);
 	}
-	selectedcreature = a;
 
-	// TODO: send script 120 (selected creature changed) as needed
+	if (selectedcreature != a) {
+		for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+			if (!*i) continue;
+			(*i)->queueScript(120, 0, caosVar(a), caosVar(selectedcreature)); // selected creature changed
+		}
+
+		selectedcreature = a;
+	}
 }
 
 shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
