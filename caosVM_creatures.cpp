@@ -1331,8 +1331,9 @@ void caosVM::c_FORF() {
 	VM_PARAM_VALIDAGENT(creature)
 		
 	Creature *c = getTargCreature();
+	// TODO: do we handle pointer as well?
 	Creature *learn = dynamic_cast<Creature *>(creature.get());
-	caos_assert(learn);
+	if (!learn) return;
 
 	// TODO
 }
