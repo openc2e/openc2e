@@ -21,17 +21,20 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/xpressive/xpressive.hpp>
 #include <set>
 #include <map>
 #include <cctype>
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 using std::map;
 using std::set;
 using std::string;
 using namespace boost::filesystem;
+namespace x = boost::xpressive;
 
 static set<string> dircache;
 static map<string, string> cache;
@@ -154,30 +157,32 @@ bool doCacheDir(path &dir) {
 	return true;
 }
 
-static void constructSearchPattern(const std::string &wild, std::vector<std::string> &l) {
-	std::string::const_iterator i = wild.begin();
-	l.push_back(std::string());
-	while (i != wild.end()) {
-		if (*i != '*')
-			l.back().push_back(*i);
+static x::sregex constructSearchPattern(const std::string &wild) {
+	x::sregex scanner;
+	scanner = *(x::alnum | x::blank) | (x::s1= x::_);
+	std::ostringstream matchstr;
+	x::sregex_iterator cur(wild.begin(), wild.end(), scanner);
+	x::sregex_iterator end;
+	matchstr << "^";
+	for (; cur != end; cur++) {
+		x::smatch const &what_m = *cur;
+		const std::string what = what_m[0];
+		if (what == "*")
+			matchstr << ".*";
+		else if (what == "?")
+			matchstr << ".";
+		else if (what_m[1] != "")
+			matchstr << "[" << what_m[1] << "]";
 		else
-			l.push_back(std::string());
-		i++;
+			matchstr << what_m[0];
 	}
+	matchstr << "$";
+	std::cout << "matchstr " << matchstr.str() << std::endl;
+	return x::sregex::compile(matchstr.str());
 }
 
-static bool checkSearchPattern(const std::string &match, const std::vector<std::string> &l) {
-	size_t p = 0;
-	std::vector<std::string>::const_iterator it = l.begin();
-	while (it != l.end()) {
-		p = match.find(*it, p);
-		if (p == std::string::npos)
-			return false;
-		it++;
-	}
-	if (match.substr(match.length() - l.back().length()) != l.back())
-		return false;
-	return true;
+static bool checkSearchPattern(const std::string &match, const x::sregex &l) {
+	return x::regex_match(match, l);
 }
 
 std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
@@ -194,8 +199,8 @@ std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
 
 	if (!doCacheDir(dirp))
 		return std::vector<std::string>();
-	std::vector<std::string> l, results;
-	constructSearchPattern(wild, l);
+	std::vector<std::string> results;
+	x::sregex l = constructSearchPattern(wild);
 
 	std::string lcdir = toLowerCase(dir);
 	std::map<string, string>::iterator skey = cache.lower_bound(dir);
@@ -209,7 +214,7 @@ std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
 		if (skey->first.length() < lcdir.length() + 2)
 			continue;
 		filepart = toLowerCase(skey->first.substr(lcdir.length() + 1));
-		if (!checkSearchPattern(filepart, l))
+		if (!x::regex_match(filepart, l))
 			continue;
 		results.push_back(skey->second);
 	}
