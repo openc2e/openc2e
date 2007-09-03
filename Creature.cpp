@@ -79,6 +79,9 @@ void Creature::ageCreature() {
 
 	assert(parent);
 	parent->creatureAged();
+#ifndef _CREATURE_STANDALONE	
+	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(4, "", ""); // aged event
+#endif
 }
 
 void Creature::setAsleep(bool a) {
@@ -107,6 +110,7 @@ void Creature::born() {
 void Creature::die() {
 	// TODO: life event?
 #ifndef _CREATURE_STANDALONE
+	world.history.getMoniker(world.history.findMoniker(genome)).hasDied();
 	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(7, "", ""); // died event
 #endif
 	// TODO: disable brain/biochemistry updates, trigger die script?

@@ -67,6 +67,7 @@ public:
 	void moveToAgent(AgentRef a);
 	void moveToCreature(AgentRef c);
 	void wasBorn();
+	void hasDied();
 	monikerstatus getStatus();
 };
 
