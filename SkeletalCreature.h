@@ -32,7 +32,7 @@ private:
 	unsigned int ticks; // TODO: unnecessary?
 
 	unsigned int direction;
-	unsigned int pose[14];
+	unsigned int pose[17];
 	unsigned int facialexpression;
 	unsigned int pregnancy;
 	bool eyesclosed;
@@ -42,11 +42,11 @@ private:
 	bool downfoot_left;
 	shared_ptr<class Room> downfootroom;
 
-	shared_ptr<creaturesImage> images[14];
-	attFile att[14];
+	shared_ptr<creaturesImage> images[17];
+	attFile att[17];
 
 	int width, height, adjustx, adjusty;
-	int partx[14], party[14];
+	int partx[17], party[17];
 
 	std::string dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed);
 

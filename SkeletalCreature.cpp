@@ -58,16 +58,16 @@ bodypartinfo cee_bodyparts[17] = {
 	{ 'h', 8, 1 }, // right foot - attached to right shin
 	{ 'n', 6, 1 }, // tail tip - attached to tail root
 	// Creatures Village only:
-	{ 'o', 1, -1 }, // left ear - attached to head
-	{ 'p', 1, -1 }, // right ear - attached to head
-	{ 'q', 1, -1 } // hair - attached to head
+	{ 'o', 1, 2 }, // left ear - attached to head
+	{ 'p', 1, 3 }, // right ear - attached to head
+	{ 'q', 1, 4 } // hair - attached to head
 };
 
-unsigned int cee_zorder[4][14] = {
-	{ 6, 13, 2, 7, 11, 4, 9, 0, 1, 5, 3, 8, 10, 12 },
-	{ 6, 13, 3, 8, 12, 5, 10, 0, 1, 2, 7, 11, 4, 9 },
-	{ 6, 13, 2, 4, 9, 5, 3, 7, 8, 10, 0, 11, 12, 1 },
-	{ 2, 4, 9, 1, 5, 3, 7, 8, 10, 11, 12, 0, 6, 13 }
+unsigned int cee_zorder[4][17] = {
+	{ 6, 13, 2, 7, 11, 4, 9, 0, 14, 1, 16, 15, 5, 3, 8, 10, 12 },
+	{ 6, 13, 3, 8, 12, 5, 10, 0, 15, 1, 16, 14, 2, 7, 11, 4, 9 },
+	{ 6, 13, 2, 4, 9, 5, 3, 7, 8, 10, 0, 11, 12, 16, 14, 15, 1 },
+	{ 2, 4, 9, 1, 14, 15, 16, 5, 3, 7, 8, 10, 11, 12, 0, 6, 13 }
 };
 
 // needed for setPose(string) at least .. maybe cee_bodyparts should be indexed by letter
@@ -100,6 +100,13 @@ SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : Creatur
 	skeleton = new SkeletonPart(this);
 }
 
+int SkeletalPartCount() {
+	if (world.gametype == "cv")
+		return 17;
+	else
+		return 14;
+}
+
 void SkeletalCreature::skeletonInit() {
 	//TODO: the exception throwing in here needs some more thought
 
@@ -115,7 +122,7 @@ void SkeletalCreature::skeletonInit() {
 		}
 	}
 
-	for (int i = 0; i < 14; i++) {
+	for (int i = 0; i < SkeletalPartCount(); i++) { // CV hackery
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
 			if (i == 6 || i == 13) continue;
 
@@ -151,10 +158,10 @@ void SkeletalCreature::skeletonInit() {
 			int spe = (engine.version == 1) ? 0 : partapp->species;
 			while (spe > -1 && !images[i]) {
 				int var = partapp->variant;
-				while (var > -1 && !images[i]) {
+				/*while (var > -1 && !images[i]) {*/
 					images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, spe, var));
-					if (!images[i]) var--;
-				}
+					/*if (!images[i]) var--;
+				}*/
 				if (!images[i]) spe--;
 			}
 			if (!images[i]) stage_to_try--;
@@ -178,7 +185,7 @@ void SkeletalCreature::skeletonInit() {
 			if (attfilename.empty()) stage_to_try--;
 		}
 		if (attfilename.empty())
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % stage_to_try));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % creature->getStage()));
 
 		// load ATT file
 		std::ifstream in(attfilename.c_str());
@@ -195,8 +202,9 @@ SkeletalCreature::~SkeletalCreature() {
 }
 
 void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
-	for (int j = 0; j < 14; j++) {
+	for (int j = 0; j < 17; j++) {
 		int i = cee_zorder[direction][j];
+		if (i >= SkeletalPartCount()) continue; // CV hackery
 
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
 			if (i == 6 || i == 13) continue;
@@ -207,17 +215,18 @@ void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 
 		bool mirror = false;
 		// TODO: ack, move this check out of the loop
-		if (world.variables["engine_mirror_creature_body_parts"] == 1 && ourpose >= 4 && ourpose <= 7) {
+		if (i != 14 && i != 15 && world.variables["engine_mirror_creature_body_parts"] == 1 && ourpose >= 4 && ourpose <= 7) {
 			ourpose -= 4;
 			mirror = true;
 		}
 
 		// adjust for pregnancy/facial expressions/etc as necessary
-		// TODO: hair?
 		if (part->parent == -1) // body
 			ourpose += (pregnancy * 16);
 		else if (i == 1) // head
 			ourpose += (eyesclosed ? 16 : 0) + (facialexpression * 32);
+		else if (i == 16) // hair
+			ourpose += 0; // TODO: 16 * hair
 
 		assert(images[i]);
 
@@ -246,7 +255,7 @@ int SkeletalCreature::attachmentY(unsigned int part, unsigned int id) {
 void SkeletalCreature::recalculateSkeleton() {
 	int lowestx = 0, lowesty = 0, highestx = 0, highesty = 0;
 
-	for (int i = 0; i < 14; i++) {
+	for (int i = 0; i < SkeletalPartCount(); i++) {
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
 			if (i == 6 || i == 13) continue;
 
@@ -371,15 +380,12 @@ void SkeletalCreature::snapDownFoot() {
 
 void SkeletalCreature::setPose(unsigned int p) {
 	direction = 0;
-	for (int i = 0; i < 14; i++)
+	for (int i = 0; i < SkeletalPartCount(); i++)
 		pose[i] = p;
 	recalculateSkeleton();
 }
 
 void SkeletalCreature::setPose(std::string s) {
-	// TODO: assert on the right size?
-	//assert(s.size() >= 15);
-
 	AgentRef attention = creature->getAttentionFocus();
 	// TODO: hack
 	if (!attention) attention = (Agent *)world.hand();
@@ -396,26 +402,40 @@ void SkeletalCreature::setPose(std::string s) {
 	}
 
 	for (int i = 0; i < 14; i++) {
+		int newpose;
+
 		switch (s[i + 1]) {
-			case '0': pose[cee_lookup[i]] = 0 + (direction * 4); break;
-			case '1': pose[cee_lookup[i]] = 1 + (direction * 4); break;
-			case '2': pose[cee_lookup[i]] = 2 + (direction * 4); break;
-			case '3': pose[cee_lookup[i]] = 3 + (direction * 4); break;
+			case '0': newpose = 0 + (direction * 4); break;
+			case '1': newpose = 1 + (direction * 4); break;
+			case '2': newpose = 2 + (direction * 4); break;
+			case '3': newpose = 3 + (direction * 4); break;
 			case '?': assert(i == 0); {
 					// make the head look in the direction of _IT_
 					float attachmenty = attachmentY(1, 0) + y; // head attachment point, which we'll use to 'look' from atm
 				
 					// TODO: this is horrible, but i have no idea how the head angle is calculated
-					if (attention->y > (attachmenty + 30)) pose[1] = 0;
-					else if (attention->y < (attachmenty - 70)) pose[1] = 3;
-					else if (attention->y < (attachmenty - 30)) pose[1] = 2;
-					else pose[1] = 1;
-					pose[1] += (direction * 4);
+					if (attention->y > (attachmenty + 30)) newpose = 0;
+					else if (attention->y < (attachmenty - 70)) newpose = 3;
+					else if (attention->y < (attachmenty - 30)) newpose = 2;
+					else newpose = 1;
+					newpose += (direction * 4);
 				}
 				break;
 			// TODO: '!' also?
-			case 'X': break; // do nothing
+			case 'X': continue; // do nothing
 			default: assert(false); 
+		}
+
+		pose[cee_lookup[i]] = newpose;
+
+		// TODO: this is some hackery for CV, 
+		if (world.gametype != "cv") continue;
+		if (i == 0) { // head
+			pose[14] = newpose; pose[15] = newpose; // ears
+			pose[16] = newpose; // hair
+		} else if (i == 1) {
+			pose[6] = newpose; // tail root
+			pose[13] = newpose; // tail tip
 		}
 	}
 		
