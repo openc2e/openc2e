@@ -50,7 +50,6 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	perm = 50; // TODO: correct default?
 	range = 500;
 	falling = true;
-	x = 0.0f; y = 0.0f;
 
 	// TODO: is this the correct default?
 	clac[0] = 0; // message# for activate 1
@@ -74,6 +73,10 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 }
 
 void Agent::finishInit() {
+	// lc2e, at least, seems to position agents centered on (-9876,-9876) to begin with
+	// TODO: where should we place agents in other games? is this code right at all anyway?
+	x = -9876.0f + (getWidth() / 2.0f); y = -9876.0f + (getHeight() / 2.0f);
+	
 	// shared_from_this() can only be used if these is at least one extant
 	// shared_ptr which owns this
 	world.agents.push_front(boost::shared_ptr<Agent>(this));
