@@ -70,8 +70,9 @@ Catalogue *parsing_cat = NULL;
 void Catalogue::addVals(std::string &title, bool override, int count,
 		const std::list<std::string> &vals)
 {
-	if (data.find(title) != data.end() && !override)
-		return; // XXX: ?
+	// TODO: how the heck does override work? DS has an "Option Text" tag which has to overwrite the C3 one, so commenting this out for now..
+	/*if (data.find(title) != data.end() && !override)
+		return; // XXX: ?*/
 	data[title].clear();
 //	copy(vals.begin(), vals.end(), data[title].begin());
 	std::list<std::string>::const_iterator i = vals.begin();
