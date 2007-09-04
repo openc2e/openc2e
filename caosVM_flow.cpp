@@ -368,7 +368,7 @@ void caosVM::c_CALL() {
 	caosVM *newvm = world.getVM(owner);
 	newvm->trace = trace;
 
-	ensure(newvm->fireScript(s, false));
+	ensure_assert(newvm->fireScript(s, false));
 	newvm->inst = inst;
 	newvm->_p_[0] = p1;
 	newvm->_p_[1] = p2;
