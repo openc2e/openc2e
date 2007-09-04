@@ -177,7 +177,6 @@ static x::sregex constructSearchPattern(const std::string &wild) {
 			matchstr << (std::string)what_m[0];
 	}
 	matchstr << "$";
-	std::cout << "matchstr " << matchstr.str() << std::endl;
 	return x::sregex::compile(matchstr.str());
 }
 

@@ -535,12 +535,10 @@ void World::selectCreature(boost::shared_ptr<Agent> a) {
 shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
 	std::vector<std::string> possibles = findFiles("/Genetics/", genefile + ".gen");
 	if (possibles.empty()) return shared_ptr<genomeFile>();
-	std::string gfilename = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
-
-	// TODO: change genefile to be the file we selected
+	genefile = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
 
 	shared_ptr<genomeFile> p(new genomeFile());
-	std::ifstream gfile(gfilename.c_str(), std::ios::binary);
+	std::ifstream gfile(genefile.c_str(), std::ios::binary);
 	caos_assert(gfile.is_open());
 	gfile >> std::noskipws;
 	gfile >> *(p.get());
