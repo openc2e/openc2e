@@ -968,8 +968,10 @@ class blockUntilOver : public blockCond {
 */
 void caosVM::c_OVER() {
 	valid_agent(targ);
-	
-	startBlocking(new blockUntilOver(targ, part));
+
+	// TODO: The Burrows uses OVER in install script, so fuzzie's making this optional for now, but is this right?
+	if (owner)
+		startBlocking(new blockUntilOver(targ, part));
 }
 
 /**
