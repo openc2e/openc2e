@@ -62,10 +62,9 @@ OPENC2E_CORE = \
 	fileSwapper.o \
 	genomeFile.o \
 	historyManager.o \
-	lex.c2.o \
+	lexer.o \
 	lex.mng.o \
 	lexutil.o \
-	lex.yy.o \
 	Lift.o \
 	Map.o \
 	MetaRoom.o \
@@ -96,7 +95,7 @@ SERSTUB = caosVM_ser_stub.o
 OPENC2E = $(OPENC2E_CORE) $(SERSTUB) main.o
 OPENC2E_S = $(OPENC2E_CORE) $(SERIALIZATION) main.o
 
-DEBUGFLAGS=-ggdb3 -O2
+DEBUGFLAGS=-ggdb3 -O0
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE -DOPENAL_SUPPORT
 XLDFLAGS=$(LDFLAGS) -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt -lboost_thread-mt $(SDL_LFLAGS) -lz -lm -lSDL_net -lSDL_gfx -lpthread -lopenal -lalut
 COREFLAGS=$(DEBUGFLAGS) $(SDL_CFLAGS) -I.
@@ -130,15 +129,6 @@ mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
 
 catalogue.tab.cpp catalogue.tab.hpp: catalogue.ypp
 	bison -d --name-prefix=cata catalogue.ypp
-
-lex.yy.cpp lex.yy.h: caos.l
-	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h --prefix=c2e caos.l
-
-lex.c2.cpp lex.c2.h: c2caos.l
-	flex -+ -d -o lex.c2.cpp --header-file=lex.c2.h --prefix=c2 c2caos.l
-
-## lex.yy.h deps aren't detected evidently
-caosScript.o: lex.yy.h lex.yy.cpp lex.c2.h lex.c2.cpp
 
 ## based on automake stuff
 %.o: %.cpp
@@ -212,6 +202,6 @@ headerdeps.png: headerdeps.dot
 config.mk: config.mk.in
 	./configure.pl
 
-generated: catalogue.tab.hpp lex.yy.h lex.c2.h mngparser.tab.hpp catalogue.lex.h lex.mng.h docs.html cmddata.cpp
+generated: catalogue.tab.hpp mngparser.tab.hpp catalogue.lex.h lex.mng.h docs.html cmddata.cpp
 
 .PHONY: clean all dep docs test

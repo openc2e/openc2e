@@ -187,6 +187,7 @@ protected:
 	void parseloop(int state, void *info);
 
 	shared_ptr<std::vector<token> > tokens;
+	int lineno;
 	int curindex; // index to the next token to be read
    	int errindex; // index to the token to report parse errors on
 	int traceindex; // index to the token to report runtime errors on
