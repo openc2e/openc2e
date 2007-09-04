@@ -30,7 +30,6 @@
 #include "SFCFile.h"
 #include "Room.h"
 #include "MetaRoom.h"
-#include "lexer.h"
 
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -58,7 +57,6 @@ World::~World() {
 
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
 void World::init() {
-	init_caos_re();
 	// First, try initialising the mouse cursor from the catalogue tag.
 	if (catalogue.hasTag("Pointer Information")) {
 		const std::vector<std::string> &pointerinfo = catalogue.getTag("Pointer Information");

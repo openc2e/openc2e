@@ -30,22 +30,19 @@
 
 void yyrestart(std::istream *stream, bool use_c2);
 
-enum toktype { ANYTOKEN = 0, EOI = 0, TOK_WHITESPACE = 0, TOK_CONST, TOK_WORD, TOK_BYTESTR, TOK_NEWLINE };
+enum toktype { ANYTOKEN = 0, EOI = 0, TOK_CONST, TOK_WORD, TOK_BYTESTR };
 
 
 struct token {
 	struct token_eoi { };
-	struct token_nl { };
 	struct type_visitor : public boost::static_visitor<toktype> {
 		toktype operator()(const token_eoi) const { return EOI; }
-		toktype operator()(const token_nl) const { return TOK_NEWLINE; }
 		toktype operator()(const caosVar &) const { return TOK_CONST; }
 		toktype operator()(const std::string &) const { return TOK_WORD; }
 		toktype operator()(const bytestring_t &) const { return TOK_BYTESTR; }
 	};
 	struct dump_visitor : public boost::static_visitor<std::string> {
 		std::string operator()(const token_eoi) const { return std::string("EOI"); }
-		std::string operator()(const token_nl) const { return std::string("NL"); }
 		std::string operator()(const caosVar &v) const { return std::string(v.dump()); }
 		std::string operator()(const std::string &v) const { return v; }
 		std::string operator()(const bytestring_t &bs) const {
@@ -59,7 +56,6 @@ struct token {
 	};
 	struct fmt_visitor : boost::static_visitor<std::string> {
 		std::string operator()(const token_eoi) const { return std::string("<EOI>"); }
-		std::string operator()(const token_nl) const { return std::string("\n"); }
 		std::string operator()(const caosVar &v) const {
 			if (v.hasInt()) {
 				return boost::str(boost::format("%d") % v.getInt());
@@ -98,8 +94,7 @@ struct token {
 				
 
 
-	boost::variant<token_eoi, token_nl, std::string, caosVar, bytestring_t> payload;
-	template<class T> token(const T &copyFrom) { payload = copyFrom; }
+	boost::variant<token_eoi, std::string, caosVar, bytestring_t> payload;
 
 	int index;
 	int lineno;
@@ -152,6 +147,8 @@ struct token {
 		throw parseException(std::string("Unexpected ") + err);
 	}
 };
+
+extern token lasttok; // internal use only
 
 #endif
 

@@ -26,15 +26,16 @@
 #include "World.h"
 #include "token.h"
 #include "dialect.h"
+#include "lex.yy.h"
+#undef yyFlexLexer // flex/C++ is horrrrible I should use the C interface instead probably
+#include "lex.c2.h"
+#include "lexutil.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <cstring>
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
-#include "lexer.h"
-
-namespace x = boost::xpressive;
 
 using std::string;
 
@@ -187,48 +188,24 @@ void caosScript::parse(std::istream &in) {
 	assert(!tokens);
 	// run the token parser
 	{
-		std::string prebuf;
-		{ // slurp up the code before tokenizing
-			std::ostringstream prebuf_s;
-
-			while (!in.eof()) {
-				char buf[1024];
-				in.get(buf, sizeof buf, '\0');
-				prebuf_s << buf;
-			}
-			prebuf = prebuf_s.str();
-		}
-
-		x::sregex_iterator si(prebuf.begin(), prebuf.end(), (d->name == "c1" || d->name == "c2") ? c2caos_re : cecaos_re);
-		x::sregex_iterator si_end;
-		int lineno = 1;
-		int last_suffix_len = 0;
+		extern int lex_lineno;
+		extern bool using_c2;
+		using_c2 = (d->name == "c1" || d->name == "c2");
+		lexreset();
+		boost::scoped_ptr<FlexLexer> l(
+				using_c2 	? (FlexLexer *)new c2FlexLexer()
+							: (FlexLexer *)new c2eFlexLexer()
+		);
+		l->yyrestart(&in);
 
 		tokens = shared_ptr<std::vector<token> >(new std::vector<token>());
-		for (; si != si_end; si++) {
-			if (si->prefix().length() != 0) {
-				// the prefix returns unmatched data before this match group
-				// as such, if it exists, we have a parse error
-				throw tokeniseFailure(boost::str(boost::format("Parse error in %s on line %d") % filename % lineno));
-			}
-			token t = decodeToken(*si);
-			last_suffix_len = si->suffix().length();
-			if (t.type() == TOK_NEWLINE) {
-				lineno++;
-				continue;
-			}
-			if (t.type() == TOK_WHITESPACE)
-				continue;
-			assert(t.type() != EOI);
-			tokens->push_back(t);
-			tokens->back().lineno = lineno;
+		while (l->yylex()) {
+			tokens->push_back(lasttok);
+			tokens->back().lineno = lex_lineno;
 			tokens->back().index  = tokens->size() - 1;
 		}
-		if (last_suffix_len)
-			throw tokeniseFailure(boost::str(boost::format("Trailing garbage in %s on line %d") % filename % lineno));
-			
 		tokens->push_back(token()); // tokens default to being EOI tokens
-		tokens->back().lineno = lineno;
+		tokens->back().lineno = lex_lineno;
 		tokens->back().index  = tokens->size() - 1;
 	}
 	curindex = errindex = traceindex = 0;

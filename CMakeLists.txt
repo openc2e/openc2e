@@ -63,9 +63,10 @@ SET(OPENC2E_CORE
 	fileSwapper.cpp
 	genomeFile.cpp
 	historyManager.cpp
+	lex.c2.cpp
 	lex.mng.cpp
 	lexutil.cpp
-    lexer.cpp
+	lex.yy.cpp
 	Lift.cpp
 	Map.cpp
 	MetaRoom.cpp
@@ -179,9 +180,21 @@ ADD_CUSTOM_COMMAND(
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
+	OUTPUT ${BIN}/lex.c2.cpp ${BIN}/lex.c2.h
+	COMMAND flex -+ -d -o ${BIN}/lex.c2.cpp --header-file=${BIN}/lex.c2.h --prefix=c2 c2caos.l
+	DEPENDS c2caos.l
+	WORKING_DIRECTORY ${SRC})
+
+ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/lex.mng.cpp ${BIN}/lex.mng.h
 	COMMAND flex -+ --prefix=mng -d -o ${BIN}/lex.mng.cpp --header-file=${BIN}/lex.mng.h mng.l
 	DEPENDS mng.l
+	WORKING_DIRECTORY ${SRC})
+
+ADD_CUSTOM_COMMAND(
+	OUTPUT ${BIN}/lex.yy.cpp ${BIN}/lex.yy.h
+	COMMAND flex -+ -d -o ${BIN}/lex.yy.cpp --header-file=${BIN}/lex.yy.h --prefix=c2e caos.l
+	DEPENDS caos.l
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
