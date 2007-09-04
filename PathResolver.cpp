@@ -172,9 +172,9 @@ static x::sregex constructSearchPattern(const std::string &wild) {
 		else if (what == "?")
 			matchstr << ".";
 		else if (what_m[1] != "")
-			matchstr << "[" << what_m[1] << "]";
+			matchstr << "[" << (std::string)what_m[1] << "]";
 		else
-			matchstr << what_m[0];
+			matchstr << (std::string)what_m[0];
 	}
 	matchstr << "$";
 	std::cout << "matchstr " << matchstr.str() << std::endl;
