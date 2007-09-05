@@ -361,7 +361,7 @@ void SkeletalCreature::snapDownFoot() {
 		newroom = world.map.roomAt(footx, footy);
 		// insane emergency handling
 		float newfooty = footy;
-		while (!newroom && newfooty > 0) {
+		while (!newroom && newfooty > (footy - 500.0f)) {
 			newroom = world.map.roomAt(footx, newfooty);
 			newfooty--;
 		}
