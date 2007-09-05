@@ -227,13 +227,30 @@ void caosVM::v_VOLM() {
 
 /**
  MUTE (integer) andmask (integer) eormask (integer)
- %status stub
+ %status maybe
+
+ This returns/sets information about which types of in-game audio are muted.
+ Set andmask for the information you want returned, and eormask for the information you want changed.
+ 1 is for normal sound, and 2 is for music (so 3 is for both combined).
 */
 void caosVM::v_MUTE() {
 	VM_PARAM_INTEGER(eormask)
 	VM_PARAM_INTEGER(andmask)
 
-	result.setInt(0); // TODO
+	// TODO: we should maintain state despite having no audio engine, probably
+	// (UI scripting assumes changes were successful)
+	if (!engine.audio) {
+		result.setInt(0);
+		return;
+	}
+
+	// TODO: music
+
+	if (eormask & 1) engine.audio->setMute(!engine.audio->isMuted());
+
+	int r = 0;
+	if (andmask & 1 && engine.audio->isMuted()) r += 1;
+	result.setInt(r);
 }
 
 /**
