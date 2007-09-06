@@ -20,6 +20,12 @@
 #include "caosVM.h"
 #include "World.h"
 
+/*
+ * TODO:
+ *
+ * monikers are auto-created when referenced by name, so the hasMoniker() asserts should be removed
+ */
+
 /**
  HIST CAGE (integer) moniker (string) event (integer)
  %status maybe
