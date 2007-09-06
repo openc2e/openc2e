@@ -43,6 +43,7 @@ protected:
 	lifestage stage;
 
 	AgentRef attention;
+	int attn, decn;
 
 	// linguistic stuff
 
@@ -75,6 +76,8 @@ public:
 	shared_ptr<genomeFile> getGenome() { return genome; }
 
 	AgentRef getAttentionFocus() { return attention; }
+	int getAttentionId() { return attn; }
+	int getDecisionId() { return decn; }
 
 	virtual unsigned int getGait() = 0;
 	
@@ -176,7 +179,7 @@ class c2eOrgan {
 protected:
 	friend struct c2eReceptor;
 	friend struct c2eEmitter;
-	
+
 	class c2eCreature *parent;	
 	organGene *ourGene;
 
@@ -223,6 +226,9 @@ public:
 
 class c2eCreature : public Creature {
 protected:
+	// brain config: should possibly be global
+	std::vector<unsigned int> mappinginfo;
+	
 	// biochemistry
 	std::vector<shared_ptr<c2eOrgan> > organs;
 	float chemicals[256];
@@ -240,6 +246,7 @@ protected:
 
 	class c2eBrain *brain;
 
+	void tickBrain();
 	void tickBiochemistry();
 	void addGene(gene *);
 

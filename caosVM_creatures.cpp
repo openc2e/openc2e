@@ -1308,20 +1308,20 @@ void caosVM::v_SOUL() {
 
 /**
  DECN (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_DECN() {
 	Creature *c = getTargCreature();
-	result.setInt(0); // TODO
+	result.setInt(c->getDecisionId());
 }
 
 /**
  ATTN (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_ATTN() {
 	Creature *c = getTargCreature();
-	result.setInt(0); // TODO
+	result.setInt(c->getAttentionId());
 }
 
 /**

@@ -39,6 +39,8 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 	zombie = false;
 
 	age = ticks = 0;
+
+	attn = decn = -1;
 }
 
 Creature::~Creature() {
@@ -164,6 +166,14 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 
 	halflives = 0;
 
+#ifndef _CREATURE_STANDALONE	
+	if (!world.catalogue.hasTag("Action Script To Neuron Mappings"))
+		throw creaturesException("c2eCreature was unable to read the 'Action Script To Neuron Mappings' catalogue tag");
+	const std::vector<std::string> &mappinginfotag = world.catalogue.getTag("Action Script To Neuron Mappings");
+	for (std::vector<std::string>::const_iterator i = mappinginfotag.begin(); i != mappinginfotag.end(); i++)
+		mappinginfo.push_back(atoi(i->c_str()));
+#endif
+
 	brain = new c2eBrain(this);
 	processGenes();
 	brain->init();
@@ -216,10 +226,7 @@ void c2eCreature::tick() {
 	senses[0] = 1.0f; // always-on
 	senses[9] = 1.0f; // air quality (TODO)
 
-	// TODO: correct timing?
-	if ((ticks % 4) == 0)
-		brain->tick();
-
+	tickBrain();
 	tickBiochemistry();
 
 	// lifestage checks
@@ -231,6 +238,34 @@ void c2eCreature::tick() {
 	if (dead != 0.0f) die();
 	
 	Creature::tick();
+}
+
+void c2eCreature::tickBrain() {
+	// TODO: visn feed
+	
+	// TODO: shouldn't most of this function be protected by a tick time check?
+	// TODO: correct timing?
+	if ((ticks % 4) == 0)
+		brain->tick();
+
+	if (asleep) {
+		attn = -1;
+		decn = -1;
+		return;
+	}
+
+#ifndef _CREATURE_STANDALONE	
+	c2eLobe *attnlobe = brain->getLobeById("attn");
+	if (attnlobe) {
+		attn = attnlobe->getSpareNeuron();
+	}
+	
+	c2eLobe *decnlobe = brain->getLobeById("decn");
+	if (decnlobe) {
+		// TODO: check bounds of mappinginfo
+		decn = mappinginfo[decnlobe->getSpareNeuron()];
+	}
+#endif
 }
 
 void c1Creature::addGene(gene *g) {
