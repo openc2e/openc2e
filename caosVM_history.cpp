@@ -79,26 +79,48 @@ void caosVM::c_HIST_EVNT() {
 
 /**
  HIST FIND (integer) moniker (string) event (integer) from (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_HIST_FIND() {
 	VM_PARAM_INTEGER(from)
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
+	
+	caos_assert(world.history.hasMoniker(moniker));
+	monikerData &m = world.history.getMoniker(moniker);
 
-	result.setInt(-1); // TODO
+	for (int i = from + 1; i >= 0 && i < m.events.size(); i++) {
+		if (m.events[i].eventno == event) {
+			result.setInt(i);
+			return;
+		}
+	}
+
+	result.setInt(-1);
 }
 
 /**
  HIST FINR (integer) moniker (string) event (integer) from (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_HIST_FINR() {
 	VM_PARAM_INTEGER(from)
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
-	result.setInt(-1); // TODO
+	caos_assert(world.history.hasMoniker(moniker));
+	monikerData &m = world.history.getMoniker(moniker);
+
+	if (from == -1) from = m.events.size();
+
+	for (int i = from - 1; i >= 0 && i < m.events.size(); i--) {
+		if (m.events[i].eventno == event) {
+			result.setInt(i);
+			return;
+		}
+	}
+
+	result.setInt(-1);
 }
 
 /**
