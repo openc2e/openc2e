@@ -965,7 +965,7 @@ void caosVM::c_DELN() {
 
 	valid_agent(targ);
 	std::map<caosVar, caosVar, caosVarCompare>::iterator i = targ->name_variables.find(name);
-	caos_assert(i != targ->name_variables.end()); // TODO: correct behaviour, or should we just return?
+	if (i == targ->name_variables.end()) return;
 	targ->name_variables.erase(i);
 }
 
