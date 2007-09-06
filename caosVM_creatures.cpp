@@ -1223,13 +1223,19 @@ void caosVM::v_ORGN() {
  7: damage rate
  8: energy cost
  9: atp damage coefficient
+
+ Returns -1 if the specified organ or value is invalid.
 */
 void caosVM::v_ORGF() {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
-	caos_assert(organ >= 0 && (unsigned int)organ < c->noOrgans());
+	if (organ < 0 || organ >= c->noOrgans()) {
+		result.setFloat(-1.0f);
+		return;
+	}
+	
 	shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {
@@ -1243,7 +1249,7 @@ void caosVM::v_ORGF() {
 		case 7: result.setFloat(o->getDamageRate()); break;
 		case 8: result.setFloat(o->getEnergyCost()); break;
 		case 9: result.setFloat(o->getATPDamageCoefficient()); break;
-		default: throw creaturesException("Unknown value for ORGF");
+		default: result.setFloat(-1.0f); break;
 	}
 }
 
@@ -1252,20 +1258,26 @@ void caosVM::v_ORGF() {
  %status maybe
 
  Returns a count of receptors (value 0), emitters (value 1) or reactions (value 2) in the specified organ (numbered starting at zero) of the target creature.
+ 
+ Returns -1 if the specified organ or value is invalid.
 */
 void caosVM::v_ORGI() {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
-	caos_assert(organ >= 0 && (unsigned int)organ < c->noOrgans());
+	if (organ < 0 || organ >= c->noOrgans()) {
+		result.setFloat(-1.0f);
+		return;
+	}
+	
 	shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {
 		case 0: result.setInt(o->getReceptorCount()); break;
 		case 1: result.setInt(o->getEmitterCount()); break;
 		case 2: result.setInt(o->getReactionCount()); break;
-		default: throw creaturesException("Unknown value for ORGI");
+		default: result.setFloat(-1.0f); break;
 	}
 }
 
