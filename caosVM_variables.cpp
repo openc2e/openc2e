@@ -731,19 +731,6 @@ void caosVM::v_REAQ() {
 		result.setInt(0);
 }
 
-int findCategory(unsigned char family, unsigned char genus, unsigned short species) {
-	std::string buffer =  boost::str(boost::format("%i %i 0") % family % genus); // TODO: 0 is a hack so we don't have to do any real work here
-	
-	caos_assert(world.catalogue.hasTag("Agent Classifiers"));
-	const std::vector<std::string> &t = world.catalogue.getTag("Agent Classifiers");
-	for (unsigned int i = 0; i < t.size(); i++)
-		if (t[i] == buffer) {
-			return i;
-		}
-
-	return -1;
-}
-
 /**
  CATA (integer)
  %status maybe
@@ -753,7 +740,7 @@ int findCategory(unsigned char family, unsigned char genus, unsigned short speci
 void caosVM::v_CATA() {
 	valid_agent(targ);
 
-	result.setInt(findCategory(targ->family, targ->genus, targ->species));
+	result.setInt(world.findCategory(targ->family, targ->genus, targ->species));
 }
 
 /**
@@ -767,7 +754,7 @@ void caosVM::v_CATI() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family) // TODO: check values are in range
 
-	result.setInt(findCategory(family, genus, species));
+	result.setInt(world.findCategory(family, genus, species));
 }
 
 /**

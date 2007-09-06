@@ -606,4 +606,22 @@ boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef a
 	return sound;
 }
 
+int World::findCategory(unsigned char family, unsigned char genus, unsigned short species) {
+	caos_assert(catalogue.hasTag("Agent Classifiers"));
+
+	const std::vector<std::string> &t = catalogue.getTag("Agent Classifiers");
+
+	for (unsigned int i = 0; i < t.size(); i++) {
+		std::string buffer = boost::str(boost::format("%d %d %d") % (int)family % (int)genus % (int)species);
+		if (t[i] == buffer) return i;
+		buffer = boost::str(boost::format("%d %d 0") % (int)family % (int)genus);
+		if (t[i] == buffer) return i;
+		buffer = boost::str(boost::format("%d 0 0") % (int)family);
+		if (t[i] == buffer) return i;
+		// leave it here: 0 0 0 would be silly to have in Agent Classifiers.
+	}
+
+	return -1;
+}
+
 /* vim: set noet: */

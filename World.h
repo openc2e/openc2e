@@ -111,6 +111,8 @@ public:
 	void newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
 	shared_ptr<genomeFile> loadGenome(std::string &filename);
 	std::string generateMoniker(std::string basename);
+
+	int findCategory(unsigned char family, unsigned char genus, unsigned short species);
 	
 	void tick();
 	void drawWorld();
