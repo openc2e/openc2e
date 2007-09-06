@@ -627,6 +627,16 @@ bool Engine::initialSetup() {
 			world.gametype = "c3";
 		}
 		std::cout << ", see --help if you need to specify one." << std::endl;
+
+		// set engine version
+		if (world.gametype == "c1")
+			version = 1;
+		else if (world.gametype == "c2")
+			version = 2;
+		else if (world.gametype == "c3" || world.gametype == "cv")
+			version = 3;
+		else
+			throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % world.gametype));
 	}
 
 	// finally, add our cache directory to the end
