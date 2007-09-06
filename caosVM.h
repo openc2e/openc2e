@@ -340,6 +340,12 @@ public:
 	void v_WUID();
 	void c_WTNT();
 	void v_NWLD();
+	void c_WRLD();
+	void v_WRLD();
+	void c_PSWD();
+	void v_PSWD();
+	void v_WNTI();
+	void c_DELW();
 
 	// core
 	void v_GAME();

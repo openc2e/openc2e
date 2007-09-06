@@ -102,4 +102,74 @@ void caosVM::v_NWLD() {
 	result.setInt(0); // TODO
 }
 
+/**
+ WRLD (command) name (string)
+ %status stub
+
+ Create a new world directory to prepare for the creation of the specified world.
+*/
+void caosVM::c_WRLD() {
+	VM_PARAM_STRING(name)
+
+	// TODO
+}
+
+/**
+ WRLD (string) world (integer)
+ %status stub
+
+ Return the name of the specified world (zero-indexed, see NWLD).
+*/
+void caosVM::v_WRLD() {
+	VM_PARAM_INTEGER(world)
+
+	caos_assert(false); // TODO
+}
+
+/**
+ PSWD (command) password (string)
+ %status stub
+*/
+void caosVM::c_PSWD() {
+	VM_PARAM_STRING(password)
+
+	// TODO
+}
+
+/**
+ PSWD (stromg) world (integer)
+ %status stub
+
+ Return the password for the specified world (zero-indexed, see NWLD), or an empty string for no password.
+*/
+void caosVM::v_PSWD() {
+	VM_PARAM_INTEGER(world)
+
+	result.setString(""); // TODO
+}
+
+/**
+ WNTI (integer) name (string)
+ %status stub
+
+ Return the world identifier for the specified world name, or -1 if it doesn't exist.
+*/
+void caosVM::v_WNTI() {
+	VM_PARAM_STRING(name)
+
+	result.setInt(-1); // TODO
+}
+
+/**
+ DELW (command) name (string)
+ %status stub
+
+ Delete the specified world directory and all contents.
+*/
+void caosVM::c_DELW() {
+	VM_PARAM_STRING(name)
+
+	caos_assert(false); // TODO
+}
+
 /* vim: set noet: */
