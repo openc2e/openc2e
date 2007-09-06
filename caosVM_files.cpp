@@ -103,8 +103,8 @@ void caosVM::c_FILE_IOPE() {
 	inputstream = new std::ifstream(fullfilename.c_str());
 
 	if (inputstream->fail()) {
+		delete inputstream;
 		inputstream = 0;
-		throw caosException(boost::str(boost::format("FILE IOPE failed to open %s") % fullfilename));
 	}
 }
 
@@ -248,7 +248,6 @@ void caosVM::v_INNL() {
 void caosVM::v_INOK() {
 	if (!inputstream)
 		result.setInt(0);
-		//throw caosException("inputstream not valid in INOK");
 	else if (inputstream->fail())
 		result.setInt(0);
 	else
