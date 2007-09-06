@@ -740,7 +740,7 @@ void caosVM::v_REAQ() {
 void caosVM::v_CATA() {
 	valid_agent(targ);
 
-	result.setInt(world.findCategory(targ->family, targ->genus, targ->species));
+	result.setInt(targ->category);
 }
 
 /**
@@ -777,12 +777,13 @@ void caosVM::v_CATX() {
 
 /**
  CATO (command) category_id (integer)
- %status stub
+ %status maybe
 */
 void caosVM::c_CATO() {
 	VM_PARAM_INTEGER(category_id)
 
-	// TODO
+	valid_agent(targ);
+	targ->category = category_id;
 }
 
 /**

@@ -1702,9 +1702,7 @@ void caosVM::c_SETV_CLS2() {
 
 	valid_agent(targ);
 
-	targ->family = family;
-	targ->genus = genus;
-	targ->species = species;
+	targ->setClassifier(family, genus, species);
 }
 
 /**
@@ -1763,9 +1761,11 @@ void caosVM::c_SETV_CLAS() {
 
 	valid_agent(targ);
 
-	targ->species = (identifier >> 8) & 0xff;
-	targ->genus = (identifier >> 16) & 0xff;
-	targ->family = (identifier >> 24) & 0xff;
+	targ->setClassifier(
+		(identifier >> 24) & 0xff,
+		(identifier >> 16) & 0xff,
+		(identifier >> 8) & 0xff
+		);
 }
 
 /**

@@ -36,9 +36,10 @@ void Agent::core_init() {
 }
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  vm(0), zorder(p), timerrate(0), visible(true), family(f), genus(g), species(s)
-{
+  vm(0), zorder(p), timerrate(0), visible(true) {
 	core_init();
+
+	setClassifier(f, g, s);
 
 	lastScript = -1;
 	initialized = true;
@@ -899,6 +900,19 @@ void Agent::adjustCarried(float unusedxoffset, float unusedyoffset) {
 	}
 
 	carrying->moveTo(x + xoffset, y + yoffset, true);
+}
+
+void Agent::setClassifier(unsigned char f, unsigned char g, unsigned short s) {
+	family = f;
+	genus = g;
+	species = s;
+
+	if (engine.version < 3) {
+		// TODO: categories for other game versions
+		category = -1;
+	} else {
+		category = world.findCategory(family, genus, species);
+	}
 }
 
 /* vim: set noet: */

@@ -149,8 +149,11 @@ public:
 	bool displaycore : 1;
 
 	int clac[3]; int clik;
+
+	void setClassifier(unsigned char f, unsigned char g, unsigned short s);
 	unsigned char family, genus;
 	unsigned short species;
+	int category;
 
 	// motion
 	caosVar velx, vely;
