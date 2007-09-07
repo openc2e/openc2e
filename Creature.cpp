@@ -174,6 +174,9 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 		mappinginfo.push_back(atoi(i->c_str()));
 #endif
 
+	// TODO: should we really hard-code this?
+	chosenagents.resize(40);
+
 	brain = new c2eBrain(this);
 	processGenes();
 	brain->init();
@@ -241,19 +244,37 @@ void c2eCreature::tick() {
 }
 
 void c2eCreature::tickBrain() {
-	// TODO: visn feed
-	
-	// TODO: shouldn't most of this function be protected by a tick time check?
-	// TODO: correct timing?
-	if ((ticks % 4) == 0)
-		brain->tick();
-
 	if (asleep) {
 		attn = -1;
 		decn = -1;
-		return;
+		attention.clear(); // TODO: doesn't belong here
+		return; // TODO
 	}
 
+	// TODO: correct timing?
+	if ((ticks % 4) != 0)
+		return;
+
+	chooseAgents();
+
+	c2eLobe *visnlobe = brain->getLobeById("visn");
+	if (visnlobe) {
+		for (unsigned int i = 0; i < visnlobe->getNoNeurons() && i < chosenagents.size(); i++) {
+			AgentRef a = chosenagents[i];
+			if (!a) continue;
+
+			// TODO: use eye position? see Creature::agentInSight
+			float ourxpos = parent->x + (parent->getWidth() / 2.0f);
+			float theirxpos = a->x + (a->getWidth() / 2.0f);
+			float distance = theirxpos - ourxpos;
+
+			// TODO: squash result into appropriate range?
+			visnlobe->setNeuronInput(i, distance / parent->range.getFloat());
+		}
+	}
+	
+	brain->tick();
+	
 #ifndef _CREATURE_STANDALONE	
 	c2eLobe *attnlobe = brain->getLobeById("attn");
 	if (attnlobe) {
@@ -266,6 +287,10 @@ void c2eCreature::tickBrain() {
 		decn = mappinginfo[decnlobe->getSpareNeuron()];
 	}
 #endif
+
+	// TODO: doesn't belong here
+	if (attn >= 0 && attn < (int)chosenagents.size())
+		attention = chosenagents[attn];
 }
 
 void c1Creature::addGene(gene *g) {
@@ -921,6 +946,59 @@ void c2eEmitter::init(bioEmitterGene *g, c2eOrgan *parent) {
 	threshold = g->threshold / 255.0f;
 	gain = g->gain / 255.0f;
 	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus, 0);
+}
+
+#include "AgentHelpers.h"
+
+bool Creature::agentInSight(AgentRef a) {
+	if (a->invisible()) return false;
+
+	// TODO: specify x/y location for eyes
+	// TODO: check open cabin?
+	return agentIsVisible(parent, a);
+}
+
+void Creature::chooseAgents() {
+	// zot any chosen agents which went out of range, went invisible or changed category
+	for (unsigned int i = 0; i < chosenagents.size(); i++) {
+		AgentRef a = chosenagents[i];
+		if (a) {
+			if (a->category != (int)i || !agentInSight(a))
+				chosenagents[i].clear();
+		}
+	}
+
+	std::vector<AgentRef> possibles[chosenagents.size()];
+
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		boost::shared_ptr<Agent> a = *i;
+		if (!a) continue;
+
+		// if agent category is -1 or outside of our #categories, continue
+		if (a->category < 0) continue;
+		if (a->category >= (int)chosenagents.size()) continue;
+
+		// if we already chose an agent from this category, continue
+		if (chosenagents[a->category]) continue;
+
+		if (!agentInSight(a)) continue;
+
+		possibles[a->category].push_back(a);
+	}
+
+	for (unsigned int i = 0; i < chosenagents.size(); i++) {
+		if (!chosenagents[i])
+			chosenagents[i] = selectRepresentativeAgent(i, possibles[i]);
+	}
+}
+
+AgentRef c2eCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) {
+	// TODO: proper selection method
+
+	if (possibles.size() > 0)
+		return possibles[rand() % possibles.size()];
+	else
+		return AgentRef();
 }
 
 /* vim: set noet: */

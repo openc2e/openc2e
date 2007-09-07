@@ -44,6 +44,11 @@ protected:
 
 	AgentRef attention;
 	int attn, decn;
+	
+	std::vector<AgentRef> chosenagents;
+	bool agentInSight(AgentRef a);
+	void chooseAgents();
+	virtual AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) { return AgentRef(); } // TODO: make pure virtual?
 
 	// linguistic stuff
 
@@ -249,6 +254,8 @@ protected:
 	void tickBrain();
 	void tickBiochemistry();
 	void addGene(gene *);
+	
+	AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles);
 
 public:
 	c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
