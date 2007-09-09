@@ -968,7 +968,7 @@ void Creature::chooseAgents() {
 		}
 	}
 
-	std::vector<AgentRef> possibles[chosenagents.size()];
+	std::vector<std::vector<AgentRef> > possibles(chosenagents.size());
 
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		boost::shared_ptr<Agent> a = *i;
