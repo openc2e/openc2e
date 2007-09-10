@@ -474,6 +474,8 @@ void SkeletalCreature::tick() {
 
 	if (paused) return;
 
+	eyesclosed = creature->isAsleep() || !creature->isAlive();
+
 	// TODO: every 2 ticks = correct? what about the engine var?
 	ticks++;
 	if (ticks % 2 == 0) return;
