@@ -166,15 +166,15 @@ static x::sregex constructSearchPattern(const std::string &wild) {
 	matchstr << "^";
 	for (; cur != end; cur++) {
 		x::smatch const &what_m = *cur;
-		const std::string what = what_m[0];
+		const std::string what = what_m[0].str();
 		if (what == "*")
 			matchstr << ".*";
 		else if (what == "?")
 			matchstr << ".";
 		else if (what_m[1] != "")
-			matchstr << "[" << (std::string)what_m[1] << "]";
+			matchstr << "[" << what_m[1].str() << "]";
 		else
-			matchstr << (std::string)what_m[0];
+			matchstr << what;
 	}
 	matchstr << "$";
 	return x::sregex::compile(matchstr.str());
