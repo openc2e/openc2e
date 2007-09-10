@@ -688,6 +688,8 @@ void Agent::kill() {
 	assert(!dying);
 	if (floatable()) floatRelease();
 	if (carrying) dropCarried(carrying);
+	// TODO: should the carried agent really be responsible for dropping from vehicle?
+	if (invehicle) invehicle->drop(this);
 	
 	dying = true; // what a world, what a world...
 
