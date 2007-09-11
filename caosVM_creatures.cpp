@@ -1231,7 +1231,7 @@ void caosVM::v_ORGF() {
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
-	if (organ < 0 || organ >= c->noOrgans()) {
+	if (organ < 0 || (unsigned int)organ >= c->noOrgans()) {
 		result.setFloat(-1.0f);
 		return;
 	}
@@ -1266,7 +1266,7 @@ void caosVM::v_ORGI() {
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
-	if (organ < 0 || organ >= c->noOrgans()) {
+	if (organ < 0 || (unsigned int)organ >= c->noOrgans()) {
 		result.setFloat(-1.0f);
 		return;
 	}
