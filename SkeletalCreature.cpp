@@ -107,6 +107,9 @@ int SkeletalPartCount() {
 		return 14;
 }
 
+// required for tinting, for now, until we get a saner image system in place
+#include "c16Image.h"
+
 void SkeletalCreature::skeletonInit() {
 	//TODO: the exception throwing in here needs some more thought
 
@@ -147,17 +150,26 @@ void SkeletalCreature::skeletonInit() {
 		} else if (x == 'n') {
 			// tail
 			partapp = appearance[4];
-		}
-		// TODO: this exception won't necessary be handled, neither will the one below
-		if (!partapp)
+		} else
+			// TODO: this exception won't necessary be handled, neither will the one below
 			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % (unsigned char)x));
+
+		int partspecies, partvariant;
+		if (partapp) {
+			partspecies = partapp->species;
+			partvariant = partapp->variant;
+		} else {
+			// TODO: good defaults?
+			partspecies = creature->getGenus();
+			partvariant = creature->getVariant();
+		}
 
 		// find relevant sprite
 		int stage_to_try = creature->getStage();
 		while (stage_to_try > -1 && !images[i]) {
-			int spe = (engine.version == 1) ? 0 : partapp->species;
+			int spe = (engine.version == 1) ? 0 : partspecies;
 			while (spe > -1 && !images[i]) {
-				int var = partapp->variant;
+				int var = partvariant;
 				/*while (var > -1 && !images[i]) {*/
 					images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, spe, var));
 					/*if (!images[i]) var--;
@@ -167,15 +179,22 @@ void SkeletalCreature::skeletonInit() {
 			if (!images[i]) stage_to_try--;
 		}
 		if (!images[i])
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % (int)creature->getStage()));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % (int)creature->getStage()));
+		
+		// TODO: don't bother tinting if we don't need to
+		assert(dynamic_cast<duppableImage *>(images[i].get()));
+		s16Image *newimage = new s16Image();
+		((duppableImage *)images[i].get())->duplicateTo(newimage);
+		newimage->tint(creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
+		images[i] = shared_ptr<creaturesImage>(newimage);
 
 		// find relevant ATT data
 		stage_to_try = creature->getStage();
 		std::string attfilename;
 		while (stage_to_try > -1 && attfilename.empty()) {
-			int spe = (engine.version == 1) ? 0 : partapp->species;
+			int spe = (engine.version == 1) ? 0 : partspecies;
 			while (spe > -1 && attfilename.empty()) {
-				int var = partapp->variant;
+				int var = partvariant;
 				while (var > -1 && attfilename.empty()) {
 					attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, spe, var) + ".att");
 					if (attfilename.empty()) var--;
@@ -185,12 +204,12 @@ void SkeletalCreature::skeletonInit() {
 			if (attfilename.empty()) stage_to_try--;
 		}
 		if (attfilename.empty())
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % creature->getStage()));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % creature->getStage()));
 
 		// load ATT file
 		std::ifstream in(attfilename.c_str());
 		if (in.fail())
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't load body data for species %d, variant %d, stage %d") % (int)partapp->species % (int)partapp->variant % stage_to_try));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't load body data for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % stage_to_try));
 		in >> att[i];
 	}
 

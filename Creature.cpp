@@ -42,6 +42,9 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 	age = ticks = 0;
 
 	attn = decn = -1;
+
+	for (unsigned int i = 0; i < 5; i++)
+		tintinfo[i] = 128;
 }
 
 Creature::~Creature() {
@@ -80,6 +83,14 @@ void Creature::addGene(gene *g) {
 	} else if (typeid(*g) == typeid(creatureGenusGene)) {
 		// TODO: mmh, genus changes after setup shouldn't be valid [and won't be propogated to parent]
 		genus = ((creatureGenusGene *)g)->genus;
+	} else if (typeid(*g) == typeid(creaturePigmentGene)) {
+		creaturePigmentGene &p = *((creaturePigmentGene *)g);
+		// TODO: we don't sanity-check
+		tintinfo[p.color] = p.amount;
+	} else if (typeid(*g) == typeid(creaturePigmentGene)) {
+		creaturePigmentBleedGene &p = *((creaturePigmentBleedGene *)g);
+		tintinfo[3] = p.rotation;
+		tintinfo[4] = p.swap;
 	}
 }
 

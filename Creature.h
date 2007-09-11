@@ -59,6 +59,8 @@ protected:
 
 	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
 	
+	unsigned short tintinfo[5]; // red, green, blue, rotation, swap
+
 	void processGenes();
 	virtual void addGene(gene *);
 
@@ -71,7 +73,6 @@ public:
 	virtual void ageCreature();
 	lifestage getStage() { return stage; }
 
-	unsigned int getVariant() { return variant; }
 	void setAsleep(bool asleep);
 	bool isAsleep() { return asleep; }
 	void setDreaming(bool dreaming);
@@ -82,6 +83,10 @@ public:
 	bool isZombie() { return zombie; }
 	unsigned int getAge() { return age; }
 	shared_ptr<genomeFile> getGenome() { return genome; }
+
+	unsigned short getGenus() { return genus; }
+	unsigned int getVariant() { return variant; }
+	unsigned short getTint(unsigned int id) { return tintinfo[id]; }
 
 	AgentRef getAttentionFocus() { return attention; }
 	int getAttentionId() { return attn; }
