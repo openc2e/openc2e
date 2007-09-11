@@ -28,6 +28,7 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 	assert(g);
 	genome = g;
 	
+	genus = 0; // TODO: really, we shouldn't do this, and should instead later assert that a genus was set
 	female = is_female;
 	variant = _variant;
 	stage = baby;
@@ -48,8 +49,20 @@ Creature::~Creature() {
 
 void Creature::processGenes() {
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if ((*i)->header.flags.femaleonly && !female) continue;
-		if ((*i)->header.flags.maleonly && female) continue;
+		geneFlags &flags = (*i)->header.flags;
+
+		// non-expressed genes are to be ignored
+		if (flags.notexpressed) continue;
+
+		// geneder-specific genes are only to be processed if they are of this 
+		if (flags.femaleonly && !female) continue;
+		if (flags.maleonly && female) continue;
+
+		// obviously we only switch on at the stage in question
+		if ((*i)->header.switchontime != stage) continue;
+
+		// TODO: header.variant?
+
 		addGene(*i);
 	}
 }
@@ -58,26 +71,23 @@ void Creature::setAgent(CreatureAgent *a) {
 	parent = a;
 	assert(parent);
 
-	// TODO:
-	// so, doing this here seems sort of horrible, but we can't do it during initial setup
-	// because the only point is to set the genus of the parent agent..
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if ((*i)->header.flags.femaleonly && !female) continue;
-		if ((*i)->header.flags.maleonly && female) continue;
-			if (typeid(*(*i)) == typeid(creatureGenusGene)) {
-			// initialize genus
-			creatureGenusGene *g = (creatureGenusGene *)(*i);
-			parent->genus = g->genus + 1;
-		}
-	}
+	parent->genus = genus + 1;
 }
 
 void Creature::addGene(gene *g) {
+	if (typeid(*g) == typeid(creatureInstinctGene)) {
+		unprocessedinstincts.push_back((creatureInstinctGene *)g);
+	} else if (typeid(*g) == typeid(creatureGenusGene)) {
+		// TODO: mmh, genus changes after setup shouldn't be valid [and won't be propogated to parent]
+		genus = ((creatureGenusGene *)g)->genus;
+	}
 }
 
 void Creature::ageCreature() {
-	if (stage < senile) // TODO
-		stage = (lifestage)((int)stage + 1);
+	if (stage >= senile) return; // TODO
+	
+	stage = (lifestage)((int)stage + 1);
+	processGenes();
 
 	assert(parent);
 	parent->creatureAged();
@@ -597,8 +607,11 @@ c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 	
 	shared_ptr<c2eReaction> r; // we need to store the previous reaction for possible receptor use
 	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+		// TODO: muh, we need to check lifestage/etc, see Creature::processGenes
+		// TODO: besides, how the heck is this meant to cope with other-lifestage turnons?
 		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
 		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
+
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
 			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction()));
 			r = reactions.back();

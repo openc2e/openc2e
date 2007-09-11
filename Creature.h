@@ -32,9 +32,11 @@ protected:
 	shared_ptr<genomeFile> genome;
 	
 	// non-specific bits
+	unsigned short genus;
 	unsigned int variant;
 	bool female;
 	
+	// state
 	bool alive, asleep, dreaming, tickage;
 	bool zombie;
 
@@ -52,8 +54,9 @@ protected:
 
 	// linguistic stuff
 
-	// drives
 	// to-be-processed instincts
+	std::vector<creatureInstinctGene *> unprocessedinstincts;
+
 	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
 	
 	void processGenes();
