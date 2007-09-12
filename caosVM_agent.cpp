@@ -368,7 +368,11 @@ void caosVM::c_POSE() {
 	VM_PARAM_INTEGER(pose)
 
 	SkeletalCreature *s = dynamic_cast<SkeletalCreature *>(targ.get());
-	if (s) return; // TODO
+	if (s) { 
+		// TODO: this shouldn't really be a special case :(
+		s->setPoseGene(pose);
+		return;
+	}
 
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);

@@ -338,10 +338,10 @@ void SkeletalCreature::recalculateSkeleton() {
 	width = 50; // TODO: arbitary values bad
 
 	// TODO: muh, we should cooperate with physics system etc
-	if (carriedby || invehicle)
+	/*if (carriedby || invehicle)
 		downfootroom.reset();
 	else
-		snapDownFoot();
+		snapDownFoot();*/
 }
 
 void SkeletalCreature::snapDownFoot() {
@@ -464,10 +464,20 @@ void SkeletalCreature::setPose(std::string s) {
 void SkeletalCreature::setPoseGene(unsigned int poseno) {
 	/* TODO: this sets by sequence, now, not the 'poseno' inside the gene.
 	 * this is what the POSE caos command does. is this right? - fuzzie */
-	creaturePoseGene *g = (creaturePoseGene *)creature->getGenome()->getGene(2, 3, poseno);
-	assert(g); // TODO: -> caos_assert
-
-	gaitgene = 0;
+	//creaturePoseGene *g = (creaturePoseGene *)creature->getGenome()->getGene(2, 3, poseno);
+	
+	// TODO: upon second thought i think poseno is good - fuzzie
+	// TODO: this needs thought, darnit
+	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
+			creaturePoseGene *g = (creaturePoseGene *)(*i);
+			if (g->poseno == poseno) {
+				gaitgene = 0;
+				setPose(g->getPoseString());
+				return;
+			}
+		}
+	}
 }
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
@@ -499,11 +509,17 @@ void SkeletalCreature::tick() {
 	ticks++;
 	if (ticks % 2 == 0) return;
 
-	// TODO: we shouldn't bother with this unless it changed?
-	setGaitGene(creature->getGait());
+	// TODO: hack!
+	if (!eyesclosed && !creature->isZombie()) {
+		// TODO: we shouldn't bother with this unless it changed?
+		setGaitGene(creature->getGait());
 
-	// TODO: we should only do this if we're moving :-P
-	gaitTick();
+		// TODO: we should only do this if we're moving :-P
+		gaitTick();
+	}
+	
+	if (!carriedby && !invehicle)
+		snapDownFoot();
 }
 
 void SkeletalCreature::physicsTick() {
