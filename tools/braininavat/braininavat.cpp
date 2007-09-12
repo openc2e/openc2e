@@ -117,8 +117,15 @@ BrainInAVat::BrainInAVat() {
 	tickAct->setEnabled(false);
 	connect(tickAct, SIGNAL(triggered()), this, SLOT(tick()));
 
+	sleepToggleAct = new QAction(tr("&Sleep"), this);
+	sleepToggleAct->setStatusTip(tr("Set whether the brain is asleep (and dreaming) or not"));
+	sleepToggleAct->setCheckable(true);
+	sleepToggleAct->setEnabled(false);
+	connect(sleepToggleAct, SIGNAL(triggered()), this, SLOT(toggleSleep()));
+
 	controlMenu = menuBar()->addMenu(tr("&Control"));
 	controlMenu->addAction(tickAct);
+	controlMenu->addAction(sleepToggleAct);
 
 	controlToolbar = addToolBar(tr("Control"));
 	controlToolbar->addAction(tickAct);
@@ -193,6 +200,11 @@ void BrainInAVat::setShowNone() {
 	ourView->update();
 }
 
+void BrainInAVat::toggleSleep() {
+	ourCreature->setDreaming(!ourCreature->isDreaming());
+	sleepToggleAct->setChecked(ourCreature->isDreaming());
+}
+
 // code to Do Things!
 
 void BrainInAVat::loadFile(const QString &fileName) {
@@ -203,6 +215,8 @@ void BrainInAVat::loadFile(const QString &fileName) {
 		ourCreature = 0;
 	}
 	tickAct->setEnabled(false);
+	sleepToggleAct->setChecked(false);
+	sleepToggleAct->setEnabled(false);
 	ourView->update();
 
 	ifstream f(fileName.toAscii(), std::ios::binary);
@@ -239,6 +253,7 @@ void BrainInAVat::loadFile(const QString &fileName) {
 
 	// we're done; update title/recent files, and display a temporary status message
 	tickAct->setEnabled(true);
+	sleepToggleAct->setEnabled(true);
 	ourView->resize(ourView->minimumSize());
 	ourView->update();
 	setCurrentFile(fileName);
