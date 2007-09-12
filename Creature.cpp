@@ -284,6 +284,7 @@ void c2eCreature::tickBrain() {
 
 	chooseAgents();
 
+#ifndef _CREATURE_STANDALONE	
 	c2eLobe *visnlobe = brain->getLobeById("visn");
 	if (visnlobe) {
 		for (unsigned int i = 0; i < visnlobe->getNoNeurons() && i < chosenagents.size(); i++) {
@@ -299,7 +300,8 @@ void c2eCreature::tickBrain() {
 			visnlobe->setNeuronInput(i, distance / parent->range.getFloat());
 		}
 	}
-	
+#endif
+
 	brain->tick();
 	
 #ifndef _CREATURE_STANDALONE	
@@ -1062,14 +1064,19 @@ void c2eEmitter::init(bioEmitterGene *g, c2eOrgan *parent) {
 #include "AgentHelpers.h"
 
 bool Creature::agentInSight(AgentRef a) {
+#ifndef _CREATURE_STANDALONE	
 	if (a->invisible()) return false;
 
 	// TODO: specify x/y location for eyes
 	// TODO: check open cabin?
 	return agentIsVisible(parent, a);
+#else
+	return false;
+#endif
 }
 
 void Creature::chooseAgents() {
+#ifndef _CREATURE_STANDALONE	
 	// zot any chosen agents which went out of range, went invisible or changed category
 	for (unsigned int i = 0; i < chosenagents.size(); i++) {
 		AgentRef a = chosenagents[i];
@@ -1101,6 +1108,7 @@ void Creature::chooseAgents() {
 		if (!chosenagents[i])
 			chosenagents[i] = selectRepresentativeAgent(i, possibles[i]);
 	}
+#endif
 }
 
 AgentRef c2eCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) {
