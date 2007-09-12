@@ -493,7 +493,7 @@ void caosVM::v_MOVS() {
 			result.setInt(4);
 	} else if (targ->invehicle)
 		result.setInt(3);
-	else if (targ->floatingagent)
+	else if (targ->floatable()) // TODO: good?
 		result.setInt(2);
 	else
 		result.setInt(0);
