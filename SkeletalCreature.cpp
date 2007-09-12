@@ -509,6 +509,8 @@ void SkeletalCreature::tick() {
 	ticks++;
 	if (ticks % 2 == 0) return;
 
+	if (eyesclosed) return; // TODO: hack, this is wrong :)
+
 	// TODO: hack!
 	if (!eyesclosed && !creature->isZombie()) {
 		// TODO: we shouldn't bother with this unless it changed?
