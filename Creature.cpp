@@ -269,12 +269,18 @@ void c2eCreature::tickBrain() {
 		attn = -1;
 		decn = -1;
 		attention.clear(); // TODO: doesn't belong here
-		return; // TODO
+		if (!dreaming) return; // TODO
 	}
 
 	// TODO: correct timing?
 	if ((ticks % 4) != 0)
 		return;
+
+	if (dreaming) {
+		// TODO: this returns a bool (whether it did an instinct or not), shouldn't we do non-instinct dreaming or something if it's false?
+		// .. if not, make it a void ;p
+		processInstinct();
+	}
 
 	chooseAgents();
 
@@ -312,6 +318,87 @@ void c2eCreature::tickBrain() {
 	// TODO: doesn't belong here
 	if (attn >= 0 && attn < (int)chosenagents.size())
 		attention = chosenagents[attn];
+}
+
+bool c2eCreature::processInstinct() {
+	if (unprocessedinstincts.empty()) return false;
+
+	creatureInstinctGene *g = unprocessedinstincts.front();
+	unprocessedinstincts.pop_front();
+
+	std::cout << "*** processing instinct for verb #" << (int)g->action << std::endl;
+	std::cout << "reinforce using drive #" << (int)g->drive << " at level " << ((int)g->level - 128) / 128.0f << std::endl;
+	for (unsigned int i = 0; i < 3; i++) {
+		if (g->lobes[i] != 255) {
+			std::cout << "input: lobe tissue #" << (int)(g->lobes[i] - 1) << ", neuron #" << (int)g->neurons[i] << std::endl;
+		}
+	}
+	std::cout << std::endl;
+
+	/*
+	 * instinct processing! a production by fuzzie in conjunction with coffee
+	 *
+	 * this is mostly guesswork because instincts seem to take place in a single tick in the engine,
+	 * making them pretty difficult to observe
+	 *
+	 * we reset the brain by setting pre-REM chemical to full and ticking it once, then we set REM to full
+	 * and perform two ticks: one with just the inputs set, and once with a response in the 'resp' lobe
+	 */
+
+	// TODO: presumably we need to wipe the lobes in here somewhere
+
+	c2eLobe *resplobe = brain->getLobeById("resp");
+	c2eLobe *verblobe = brain->getLobeById("verb");
+	// no response/verb lobe? no instincts for you, then..
+	if (!resplobe || !verblobe) return false;
+
+	// if action/drive are beyond the size of the relevant lobe, can't process instinct
+	if (g->action >= verblobe->getNoNeurons()) return false;
+	if (g->drive >= resplobe->getNoNeurons()) return false;
+
+	c2eLobe *inputlobe[3] = { 0, 0, 0 };
+
+	for (unsigned int i = 0; i < 3; i++) {
+		// TODO: what about unused?
+		uint8 lobetissueid = g->lobes[i];
+		if (lobetissueid == 255) continue;
+		/* fuzzie would like to take this opportunity to quote from the pygenes source:
+		 * Apparently, someone decided that because the rows are 1 above the lobe IDs, they should write the ROW NUMBER into the file, instead. Someone, somewhere, needs SHOOTING. */
+		lobetissueid -= 1;
+		inputlobe[i] = brain->getLobeByTissue(lobetissueid);
+		// TODO: should we really barf out if this happens?
+		if (!inputlobe[i]) return false;
+		if (g->neurons[i] >= inputlobe[i]->getNoNeurons()) return false;
+	}
+	
+	// TODO: non-hardcode 212/213? they seem to be in "Brain Parameters" catalogue tag
+	// TODO: won't learning be sort of ruined by the repeated application of pre-REM?
+	chemicals[212] = 1.0f; // pre-REM to full
+	chemicals[213] = 0.0f; // REM to null
+	brain->tick();
+	chemicals[212] = 0.0f; // pre-REM to null
+	chemicals[213] = 1.0f; // REM to full
+
+	for (unsigned int i = 0; i < 3; i++) {
+		if (inputlobe[i])
+			inputlobe[i]->setNeuronInput(g->neurons[i], 1.0f);
+	}
+	// TODO: g->action probably doesn't map directly
+	verblobe->setNeuronInput(g->action, 1.0f);
+	brain->tick();
+
+	// TODO: shouldn't we make sure that decn/attn achieved the desired result?
+	// TODO: should we set the input neurons again here?
+	
+	// TODO: TODO: TODO: check division of g->level!!
+	// g->drive seems to be a direct mapping
+	resplobe->setNeuronInput(g->drive, ((int)g->level - 128) / 128.0f);
+	brain->tick();
+
+	// TODO: shouldn't REM be present throughout sleep?
+	chemicals[213] = 0.0f; // REM to null
+
+	return true;
 }
 
 void c1Creature::addGene(gene *g) {

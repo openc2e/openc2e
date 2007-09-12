@@ -23,6 +23,8 @@
 #include "Agent.h"
 #include "genome.h"
 
+#include <deque>
+
 class CreatureAgent;
 class Creature;
 
@@ -55,7 +57,7 @@ protected:
 	// linguistic stuff
 
 	// to-be-processed instincts
-	std::vector<creatureInstinctGene *> unprocessedinstincts;
+	std::deque<creatureInstinctGene *> unprocessedinstincts;
 
 	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
 	
@@ -260,6 +262,7 @@ protected:
 	class c2eBrain *brain;
 
 	void tickBrain();
+	bool processInstinct();
 	void tickBiochemistry();
 	void addGene(gene *);
 	
