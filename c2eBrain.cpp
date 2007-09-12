@@ -256,6 +256,19 @@ c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
 }
 
 /*
+ * c2eLobe::wipe
+ *
+ * Causes a c2eLobe to wipe its variables.
+ *
+ */
+void c2eLobe::wipe() {
+	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
+		for (unsigned int j = 0; j < 8; j++)
+			i->variables[j] = 0.0f;
+	}
+}
+
+/*
  * c2eLobe::tick
  *
  * Do a single update of the lobe.
@@ -279,9 +292,9 @@ void c2eLobe::tick() {
  *
  */
 void c2eLobe::init() {
+	wipe();
+
 	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
-		for (unsigned int j = 0; j < 8; j++)
-			i->variables[j] = 0.0f;
 		// TODO: good way to run rule?
 		initrule.runRule(0.0f, dummyValues, i->variables, dummyValues, dummyValues, parent->getParent());
 		i->input = 0.0f; // TODO: good to do that here?

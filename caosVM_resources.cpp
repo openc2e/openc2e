@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "World.h"
+#include "Catalogue.h"
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
 namespace fs = boost::filesystem;
@@ -70,7 +71,7 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	if (type == 7) {
 		output.flush(); output.close();
 		// TODO: verify it is a catalogue file first, perhaps?
-		world.catalogue.addFile(outputfile);
+		catalogue.addFile(outputfile);
 	}
 		
 	return true;

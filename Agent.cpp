@@ -741,10 +741,12 @@ int Agent::getUNID() const {
 	  return unid = world.getUNID(const_cast<Agent *>(this));
 }
 
+#include "Catalogue.h"
+
 std::string Agent::identify() const {
 	std::ostringstream o;
 	o << (int)family << " " << (int)genus << " " << species;
-	const std::string n = world.catalogue.getAgentName(family, genus, species);
+	const std::string n = catalogue.getAgentName(family, genus, species);
 	if (n.size())
 		o << " (" + n + ")";
 	/*if (unid != -1)

@@ -22,7 +22,6 @@
 
 #include "Map.h"
 #include "Scriptorium.h"
-#include "Catalogue.h"
 #include "Camera.h"
 #include "Agent.h"
 #include "CompoundPart.h"
@@ -66,7 +65,6 @@ public:
 
 	std::vector<boost::filesystem::path> data_directories;
 	Scriptorium scriptorium;
-	Catalogue catalogue;
 	prayManager praymanager;
 	imageManager gallery;
 	historyManager history;

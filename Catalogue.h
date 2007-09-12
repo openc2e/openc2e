@@ -57,6 +57,8 @@ public:
 	void addVals(std::string &title, bool override, int count, const std::list<std::string> &vals);
 };
 
+extern Catalogue catalogue;
+
 /* For lexer/parser, don't use for anything else. */
 
 char catalogue_descape(char c);

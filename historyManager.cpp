@@ -19,6 +19,7 @@
 
 #include "historyManager.h"
 #include "World.h"
+#include "Catalogue.h"
 #include "CreatureAgent.h"
 #include "Creature.h"
 
@@ -161,10 +162,10 @@ std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
 	const std::vector<std::string> *extensions = 0;
 	std::string tagname = boost::str(boost::format("Moniker Friendly Names %i") % genus);
 	
-	if (world.catalogue.hasTag(tagname)) {
-		extensions = &world.catalogue.getTag(tagname);
-	} else if (world.catalogue.hasTag("Moniker Friendly Names")) {
-		extensions = &world.catalogue.getTag("Moniker Friendly Names");
+	if (catalogue.hasTag(tagname)) {
+		extensions = &catalogue.getTag(tagname);
+	} else if (catalogue.hasTag("Moniker Friendly Names")) {
+		extensions = &catalogue.getTag("Moniker Friendly Names");
 	} else {
 		std::cout << "Warning: No \"Moniker Friendly Names\" in catalogue for genus " << genus <<
 			", defaulting to 'xxxx' for a moniker friendly name." << std::endl;

@@ -86,6 +86,7 @@ public:
 	c2eLobe(class c2eBrain *b, c2eBrainLobeGene *g);
 	void tick();
 	void init();
+	void wipe();
 	c2eBrainLobeGene *getGene() { return ourGene; }
 	unsigned int getNoNeurons() { return neurons.size(); }
 	c2eNeuron *getNeuron(unsigned int i) { return &neurons[i]; }

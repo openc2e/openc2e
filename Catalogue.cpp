@@ -35,6 +35,8 @@ using boost::str;
 
 namespace fs = boost::filesystem;
 
+Catalogue catalogue;
+
 struct quote_subst {
 	char escape;
 	char subst;

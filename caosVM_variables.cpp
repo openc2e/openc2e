@@ -25,6 +25,8 @@
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
+#include "Catalogue.h"
+
 #include <cctype> // toupper/tolower
 #include <algorithm> // transform
 #include <boost/format.hpp>
@@ -389,11 +391,11 @@ void caosVM::v_RAND() {
  %status maybe
 
  Re-reads all catalogue files.
- */
+*/
 void caosVM::c_REAF() {
 	VM_VERIFY_SIZE(0)
 
-	world.catalogue.reset();
+	catalogue.reset();
 	world.initCatalogue();
 }
 
@@ -709,8 +711,8 @@ void caosVM::v_READ() {
 	VM_PARAM_STRING(tag)
 
 	// TODO: i'm not sure if we're meant to throw errors here. - fuzzie
-	caos_assert(world.catalogue.hasTag(tag));
-	const std::vector<std::string> &t = world.catalogue.getTag(tag);
+	caos_assert(catalogue.hasTag(tag));
+	const std::vector<std::string> &t = catalogue.getTag(tag);
 	caos_assert(offset >= 0);
 	caos_assert((unsigned int)offset < t.size());
 	result.setString(t[offset]);
@@ -725,7 +727,7 @@ void caosVM::v_READ() {
 void caosVM::v_REAQ() {
 	VM_PARAM_STRING(tag)
 
-	if (world.catalogue.hasTag(tag))
+	if (catalogue.hasTag(tag))
 		result.setInt(1);
 	else
 		result.setInt(0);
@@ -766,8 +768,8 @@ void caosVM::v_CATI() {
 void caosVM::v_CATX() {
 	VM_PARAM_INTEGER(category_id)
 
-	caos_assert(world.catalogue.hasTag("Agent Categories"));
-	const std::vector<std::string> &t = world.catalogue.getTag("Agent Categories");
+	caos_assert(catalogue.hasTag("Agent Categories"));
+	const std::vector<std::string> &t = catalogue.getTag("Agent Categories");
 	if (category_id >= 0 && (unsigned int)category_id < t.size())
 		result.setString(t[category_id]);
 	else
@@ -804,10 +806,10 @@ void caosVM::v_WILD() {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 
-	std::string searchstring = world.catalogue.calculateWildcardTag(tag, family, genus, species); // calculate tag name
+	std::string searchstring = catalogue.calculateWildcardTag(tag, family, genus, species); // calculate tag name
 	caos_assert(searchstring.size()); // check we found a tag
 
-	const std::vector<std::string> &t = world.catalogue.getTag(searchstring); // retrieve tag
+	const std::vector<std::string> &t = catalogue.getTag(searchstring); // retrieve tag
 	caos_assert(offset >= 0);
 	caos_assert((unsigned int)offset < t.size()); // check the offset is useful for the tag we found
 
@@ -934,10 +936,10 @@ void caosVM::v_SINS() {
 void caosVM::v_REAN() {
 	VM_PARAM_STRING(tag)
 		
-	if (!world.catalogue.hasTag(tag))
+	if (!catalogue.hasTag(tag))
 		result.setInt(0);
 	else {
-		const std::vector<std::string> &t = world.catalogue.getTag(tag);
+		const std::vector<std::string> &t = catalogue.getTag(tag);
 		result.setInt(t.size());
 	}
 }

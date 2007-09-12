@@ -30,6 +30,7 @@
 #include "SFCFile.h"
 #include "Room.h"
 #include "MetaRoom.h"
+#include "Catalogue.h"
 
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>

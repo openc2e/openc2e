@@ -20,6 +20,7 @@
 #include "Creature.h"
 #include "CreatureAgent.h"
 #include "World.h"
+#include "Catalogue.h"
 #include <cmath> // powf
 #include "c2eBrain.h"
 
@@ -187,13 +188,11 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 
 	halflives = 0;
 
-#ifndef _CREATURE_STANDALONE	
-	if (!world.catalogue.hasTag("Action Script To Neuron Mappings"))
+	if (!catalogue.hasTag("Action Script To Neuron Mappings"))
 		throw creaturesException("c2eCreature was unable to read the 'Action Script To Neuron Mappings' catalogue tag");
-	const std::vector<std::string> &mappinginfotag = world.catalogue.getTag("Action Script To Neuron Mappings");
+	const std::vector<std::string> &mappinginfotag = catalogue.getTag("Action Script To Neuron Mappings");
 	for (std::vector<std::string>::const_iterator i = mappinginfotag.begin(); i != mappinginfotag.end(); i++)
 		mappinginfo.push_back(atoi(i->c_str()));
-#endif
 
 	// TODO: should we really hard-code this?
 	chosenagents.resize(40);
@@ -328,7 +327,20 @@ bool c2eCreature::processInstinct() {
 	creatureInstinctGene *g = unprocessedinstincts.front();
 	unprocessedinstincts.pop_front();
 
-	std::cout << "*** processing instinct for verb #" << (int)g->action << std::endl;
+	// *** work out which verb neuron to fire by reverse-mapping from the mapping table
+
+	// TODO: reverse-mapping like this seems utterly horrible, is it correct?
+	unsigned int actualverb = -1;
+	for (unsigned int i = 0; i < mappinginfo.size(); i++) {
+		if (mappinginfo[i] == g->action)
+			actualverb = i;
+	}
+	// we have no idea which verb neuron to use, so no instinct processing
+	if (actualverb == -1) return false;
+
+	// *** debug output
+
+	std::cout << "*** processing instinct for verb #" << actualverb << std::endl;
 	std::cout << "reinforce using drive #" << (int)g->drive << " at level " << ((int)g->level - 128) / 128.0f << std::endl;
 	for (unsigned int i = 0; i < 3; i++) {
 		if (g->lobes[i] != 255) {
@@ -347,7 +359,7 @@ bool c2eCreature::processInstinct() {
 	 * and perform two ticks: one with just the inputs set, and once with a response in the 'resp' lobe
 	 */
 
-	// TODO: presumably we need to wipe the lobes in here somewhere
+	// *** sanity checks/setup
 
 	c2eLobe *resplobe = brain->getLobeById("resp");
 	c2eLobe *verblobe = brain->getLobeById("verb");
@@ -355,7 +367,7 @@ bool c2eCreature::processInstinct() {
 	if (!resplobe || !verblobe) return false;
 
 	// if action/drive are beyond the size of the relevant lobe, can't process instinct
-	if (g->action >= verblobe->getNoNeurons()) return false;
+	if (actualverb >= verblobe->getNoNeurons()) return false;
 	if (g->drive >= resplobe->getNoNeurons()) return false;
 
 	c2eLobe *inputlobe[3] = { 0, 0, 0 };
@@ -372,7 +384,13 @@ bool c2eCreature::processInstinct() {
 		if (!inputlobe[i]) return false;
 		if (g->neurons[i] >= inputlobe[i]->getNoNeurons()) return false;
 	}
+
+	// *** reset brain
 	
+	// TODO: is this a sensible place to wipe the lobes?
+	for (std::map<std::string, c2eLobe *>::iterator i = brain->lobes.begin(); i != brain->lobes.end(); i++)
+		i->second->wipe();
+
 	// TODO: non-hardcode 212/213? they seem to be in "Brain Parameters" catalogue tag
 	// TODO: won't learning be sort of ruined by the repeated application of pre-REM?
 	chemicals[212] = 1.0f; // pre-REM to full
@@ -381,13 +399,16 @@ bool c2eCreature::processInstinct() {
 	chemicals[212] = 0.0f; // pre-REM to null
 	chemicals[213] = 1.0f; // REM to full
 
+	// *** set inputs and tick
+
 	for (unsigned int i = 0; i < 3; i++) {
 		if (inputlobe[i])
 			inputlobe[i]->setNeuronInput(g->neurons[i], 1.0f);
 	}
-	// TODO: g->action probably doesn't map directly
-	verblobe->setNeuronInput(g->action, 1.0f);
+	verblobe->setNeuronInput(actualverb, 1.0f);
 	brain->tick();
+
+	// *** set response and tick
 
 	// TODO: shouldn't we make sure that decn/attn achieved the desired result?
 	// TODO: should we set the input neurons again here?
@@ -396,6 +417,8 @@ bool c2eCreature::processInstinct() {
 	// g->drive seems to be a direct mapping
 	resplobe->setNeuronInput(g->drive, ((int)g->level - 128) / 128.0f);
 	brain->tick();
+
+	// *** finish off and return
 
 	// TODO: shouldn't REM be present throughout sleep?
 	chemicals[213] = 0.0f; // REM to null

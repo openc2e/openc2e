@@ -20,6 +20,7 @@
 #include "prayManager.h"
 #include "exceptions.h"
 #include "World.h" // data_directories
+#include "Catalogue.h"
 #include <boost/filesystem/convenience.hpp>
 
 prayManager::~prayManager() {
@@ -62,12 +63,12 @@ void prayManager::removeFile(prayFile *f) {
 void prayManager::update() {
 	if (files.size() != 0) return; // TODO: Handle actual update cases, rather than just the initial init.
 
-	if (!world.catalogue.hasTag("Pray System File Extensions")) {
+	if (!catalogue.hasTag("Pray System File Extensions")) {
 		std::cout << "Warning: Catalogue tag \"Pray System File Extensions\" wasn't found, so no PRAY files will be loaded." << std::endl;
 		return;
 	}
 
-	const std::vector<std::string> &extensions = world.catalogue.getTag("Pray System File Extensions");
+	const std::vector<std::string> &extensions = catalogue.getTag("Pray System File Extensions");
 
 	for (std::vector<fs::path>::iterator i = world.data_directories.begin(); i != world.data_directories.end(); i++) {
 		assert(fs::exists(*i));
