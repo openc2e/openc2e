@@ -55,15 +55,36 @@ std::string calculateFilename(int directory, std::string filename) {
 
 /**
  FILE GLOB (command) directory (integer) filespec (string)
- %status stub
+ %status maybe
 
- Globs the given directory (pass 1 for the world directory, or 0 for the main directory) for the 
- given filespec, and puts it on the input stream for use by INNI, INOK, or INNL.
+ Globs the given journal directory (pass 0 for the world directory, or 1 for the main directory) for the 
+ given filespec (you can use wildcards, and descend into subdirectories using '..').
+ 
+ The result is placed on the input stream for reading with standard input commands (eg, INNI and INNL);
+ this consists of the number of results on the first line, and then the full filename paths to the matched
+ files on the remaining lines.
 */
 void caosVM::c_FILE_GLOB() {
 	VM_PARAM_STRING(filespec)
-	VM_PARAM_STRING(directory)
-	// TODO
+	VM_PARAM_INTEGER(directory)
+
+	std::string::size_type n = filespec.find_last_of("/\\") + 1;
+	std::string dirportion; dirportion.assign(filespec, 0, n);
+	std::string specportion; specportion.assign(filespec, n, filespec.size() - n);
+
+	if (directory == 1)
+		dirportion = "Journal/" + dirportion;
+	else
+		throw creaturesException("whoops, openc2e doesn't support FILE GLOB in world journal directory yet, bug fuzzie");
+
+	std::vector<std::string> possiblefiles = world.findFiles(dirportion, specportion);
+
+	std::string str = boost::str(boost::format("%d\n") % possiblefiles.size());
+	for (std::vector<std::string>::iterator i = possiblefiles.begin(); i != possiblefiles.end(); i++) {
+		str += *i + "\n";
+	}
+
+	inputstream = new std::istringstream(str);
 }
 
 /**
@@ -74,14 +95,8 @@ void caosVM::c_FILE_GLOB() {
 */
 void caosVM::c_FILE_ICLO() {
 	if (inputstream) {
-		std::ifstream *iftest = dynamic_cast<std::ifstream *>(inputstream);
-		if (iftest) {
-			// goodbye...
-			iftest->close();
-			delete iftest;
-			inputstream = 0;
-		} else
-			std::cout << "don't know what's attached to inputstream at FILE ICLO.." << std::endl;
+		delete inputstream;
+		inputstream = 0;
 	}
 }
 
