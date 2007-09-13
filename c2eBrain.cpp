@@ -215,12 +215,20 @@ void c2eTract::tick() {
 	// TODO: reward/punishment? anything else? scary brains!
 }
 
-void c2eTract::init() {
+void c2eTract::wipe() {
 	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
 		for (unsigned int j = 0; j < 8; j++)
 			i->variables[j] = 0.0f;
+	}
+}
+
+void c2eTract::init() {
+	wipe();
+
+	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
 		// TODO: good way to run rule?
-		initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, i->variables, parent->getParent());
+		if (!ourGene->initrulealways)
+			initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, i->variables, parent->getParent());
 	}
 }
 
@@ -297,7 +305,8 @@ void c2eLobe::init() {
 
 	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
 		// TODO: good way to run rule?
-		initrule.runRule(0.0f, dummyValues, i->variables, dummyValues, dummyValues, parent->getParent());
+		if (!ourGene->initrulealways)
+			initrule.runRule(0.0f, dummyValues, i->variables, dummyValues, dummyValues, parent->getParent());
 		i->input = 0.0f; // TODO: good to do that here?
 	}
 }
