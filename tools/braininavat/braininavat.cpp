@@ -168,7 +168,11 @@ void BrainInAVat::about() {
 }
 
 void BrainInAVat::tick() {
-	ourCreature->tick();
+	// brain updates are every 4 ticks
+	// TODO: this is icky
+	for (unsigned int i = 0; i < 4; i++)
+		ourCreature->tick();
+
 	ourView->update();
 }
 

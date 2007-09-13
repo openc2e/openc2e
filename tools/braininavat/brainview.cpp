@@ -80,10 +80,15 @@ void BrainView::paintEvent(QPaintEvent *) {
 
 				// if below threshold, don't draw
 				float var = neuron->variables[neuron_var];
-				if (var <= threshold) continue;
+				// TODO: muh
+				if (threshold == 0.0f) {
+					if (var == threshold) continue;
+				} else {
+					if (var <= threshold) continue;
+				}
 
 				// calculate appropriate colour
-				float multiplier = 0.5 + (var < 0.0f ? 0.0f : (var / 2));
+				float multiplier = 0.5 + (var / 2.2);
 				QColor color(lobe->red * multiplier, lobe->green * multiplier, lobe->blue * multiplier);
 		
 				// draw dendrite
@@ -106,9 +111,13 @@ void BrainView::paintEvent(QPaintEvent *) {
 			c2eDendrite *dend = (*i)->getDendrite(j);
 
 			float var = dend->variables[dendrite_var];
-			if (var <= threshold) continue;
+			if (threshold == 0.0f) {
+				if (var == threshold) continue;
+			} else {
+				if (var <= threshold) continue;
+			}
 
-			float multiplier = 0.5 + (var < 0.0f ? 0.0f : (var / 2));
+			float multiplier = 0.5 + (var / 2.2);
 			QColor color(destlobe->red * multiplier, destlobe->green * multiplier, destlobe->blue * multiplier);
 			painter.setPen(color);
 
