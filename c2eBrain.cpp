@@ -80,6 +80,7 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) : c2eBrainComponent(b) {
 		// You can't have *both* sides of the tract unconstrained, we'd have no idea how many dendrites to make!
 		if (g->src_noconnections == 0 && g->dest_noconnections == 0) {
 			std::cout << "brain debug: failed to create dendrites for " << dump() << " (both connections unconstrained)" << std::endl;
+			return;
 		} else if (g->src_noconnections != 0 && g->dest_noconnections != 0) {
 			// TODO: correct behaviour? seems to be, given CL's brain-in-a-vat behaviour
 			std::cout << "brain debug: failed to create dendrites for " << dump() << " (no unconstrained connections)" << std::endl;
@@ -345,7 +346,10 @@ void c2eSVRule::init(uint8 ruledata[48]) {
 			case 3: // neuron
 			case 4: // spare neuron
 				// TODO: what should we do here?
-				if (rule.operanddata > 7) rule.operanddata = 7;
+				if (rule.operanddata > 7) {
+					std::cout << "brain debug: had a too-high variable number" << std::endl;
+					rule.operanddata = 7;
+				}
 				break;
 
 			// for constant values, precalculate data
@@ -544,32 +548,32 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 10: // if zero
-				if (!(accumulator == 0.0f))
+				if (!(operandvalue == 0.0f))
 					skip_next = true;
 				break;
 
 			case 11: // if non-zero
-				if (!(accumulator != 0.0f))
+				if (!(operandvalue != 0.0f))
 					skip_next = true;
 				break;
 
 			case 12: // if positive
-				if (!(accumulator > 0.0f)) // TODO: correct?
+				if (!(operandvalue > 0.0f)) // TODO: correct?
 					skip_next = true;
 				break;
 
 			case 13: // if negative
-				if (!(accumulator < 0.0f)) // TODO: correct?
+				if (!(operandvalue < 0.0f)) // TODO: correct?
 					skip_next = true;
 				break;
 
-			case 14: // if non-positive
-				if (!(accumulator <= 0.0f)) // TODO: correct?
+			case 14: // if non-positive // TODO: should be non-negative?
+				if (!(operandvalue <= 0.0f)) // TODO: correct?
 					skip_next = true;
 				break;
 
-			case 15: // if non-negative
-				if (!(accumulator >= 0.0f)) // TODO: correct?
+			case 15: // if non-negative // TODO: should be non-positive?
+				if (!(operandvalue >= 0.0f)) // TODO: correct?
 					skip_next = true;
 				break;
 
@@ -722,11 +726,11 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 46: // stop if zero
-				if (accumulator == 0.0f) goto done;
+				if (operandvalue == 0.0f) goto done;
 				break;
 
 			case 47: // stop if non-zero
-				if (accumulator != 0.0f) goto done;
+				if (operandvalue != 0.0f) goto done;
 				break;
 
 			case 48: // if zero goto
