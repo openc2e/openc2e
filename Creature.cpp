@@ -404,11 +404,14 @@ bool c2eCreature::processInstinct() {
 	for (unsigned int i = 0; i < 3; i++) {
 		// TODO: eeeevil hack - it looks like this is required, but is there no better way?
 		if (g->lobes[i] == 3) {
-			// TODO: is 0.5f a good value?
+			/*
+			 * the visn lobe subtracts input from 1.0 to get distance of object, so 1.0 is no good
+			 * we use 0.1, like c2e seems to feed it (the joys of hacked genetics and brain-in-a-vat!)
+			 */
 			// TODO: shouldn't we check lobe size?
 			c2eLobe *visnlobe = brain->getLobeById("visn");
 			if (visnlobe)
-				visnlobe->setNeuronInput(g->neurons[i], 0.5f);
+				visnlobe->setNeuronInput(g->neurons[i], 0.1f);
 		}
 
 		if (inputlobe[i])
