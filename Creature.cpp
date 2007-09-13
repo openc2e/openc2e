@@ -279,6 +279,7 @@ void c2eCreature::tickBrain() {
 		// TODO: this returns a bool (whether it did an instinct or not), shouldn't we do non-instinct dreaming or something if it's false?
 		// .. if not, make it a void ;p
 		processInstinct();
+		return;
 	}
 
 	chooseAgents();
@@ -330,7 +331,7 @@ bool c2eCreature::processInstinct() {
 	// *** work out which verb neuron to fire by reverse-mapping from the mapping table
 
 	// TODO: reverse-mapping like this seems utterly horrible, is it correct?
-	unsigned int actualverb = -1;
+	int actualverb = -1;
 	for (unsigned int i = 0; i < mappinginfo.size(); i++) {
 		if (mappinginfo[i] == g->action)
 			actualverb = i;
@@ -347,7 +348,6 @@ bool c2eCreature::processInstinct() {
 			std::cout << "input: lobe tissue #" << (int)(g->lobes[i] - 1) << ", neuron #" << (int)g->neurons[i] << std::endl;
 		}
 	}
-	std::cout << std::endl;
 
 	/*
 	 * instinct processing! a production by fuzzie in conjunction with coffee
@@ -367,7 +367,7 @@ bool c2eCreature::processInstinct() {
 	if (!resplobe || !verblobe) return false;
 
 	// if action/drive are beyond the size of the relevant lobe, can't process instinct
-	if (actualverb >= verblobe->getNoNeurons()) return false;
+	if ((unsigned int)actualverb >= verblobe->getNoNeurons()) return false;
 	if (g->drive >= resplobe->getNoNeurons()) return false;
 
 	c2eLobe *inputlobe[3] = { 0, 0, 0 };
@@ -402,6 +402,15 @@ bool c2eCreature::processInstinct() {
 	// *** set inputs and tick
 
 	for (unsigned int i = 0; i < 3; i++) {
+		// TODO: eeeevil hack - it looks like this is required, but is there no better way?
+		if (g->lobes[i] == 3) {
+			// TODO: is 0.5f a good value?
+			// TODO: shouldn't we check lobe size?
+			c2eLobe *visnlobe = brain->getLobeById("visn");
+			if (visnlobe)
+				visnlobe->setNeuronInput(g->neurons[i], 0.5f);
+		}
+
 		if (inputlobe[i])
 			inputlobe[i]->setNeuronInput(g->neurons[i], 1.0f);
 	}
@@ -411,8 +420,8 @@ bool c2eCreature::processInstinct() {
 	// *** set response and tick
 
 	// TODO: shouldn't we make sure that decn/attn achieved the desired result?
-	// TODO: should we set the input neurons again here?
-	
+	// TODO: should we set the input neurons again here? (it seems to work without - fuzzie)
+
 	// TODO: TODO: TODO: check division of g->level!!
 	// g->drive seems to be a direct mapping
 	resplobe->setNeuronInput(g->drive, ((int)g->level - 128) / 128.0f);
@@ -422,6 +431,9 @@ bool c2eCreature::processInstinct() {
 
 	// TODO: shouldn't REM be present throughout sleep?
 	chemicals[213] = 0.0f; // REM to null
+
+	std::cout << "*** instinct done" << std::endl;
+	std::cout << std::endl;
 
 	return true;
 }
