@@ -100,6 +100,7 @@ protected:
 	c2eBrainTractGene *ourGene;
 	c2eSVRule initrule, updaterule;
 	std::vector<c2eDendrite> dendrites;
+	std::vector<c2eNeuron *> src_neurons, dest_neurons;
 
 	c2eDendrite *getDendriteFromTo(c2eNeuron *, c2eNeuron *);
 	void doMigration();

@@ -58,8 +58,6 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) : c2eBrainComponent(b) {
 	c2eLobe *srclobe = b->lobes[srclobename];
 	c2eLobe *destlobe = b->lobes[destlobename];
 
-	std::vector<c2eNeuron *> src_neurons, dest_neurons;
-
 	for (unsigned int i = g->srclobe_lowerbound; i <= g->srclobe_upperbound; i++) {
 		if (i >= srclobe->getNoNeurons()) break;
 		src_neurons.push_back(srclobe->getNeuron(i));
@@ -233,7 +231,60 @@ void c2eTract::init() {
 }
 
 void c2eTract::doMigration() {
-	// TODO
+	/*
+	 * TODO: this is utter guesswork(tm)
+	 */
+	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
+		c2eDendrite &d = *i;
+
+		// 7 = strength
+		// TODO: prbly "Migration Parameters" catalogue tag thing
+		if (d.variables[7] == 0.0f) {
+			// this one is loose!
+		
+			// if we migrate to make limited connections to the *src*
+			if (ourGene->src_noconnections != 0) {
+				// srcvar, destvar
+				
+				// search for the highest NGF in d->source
+				c2eNeuron *highestsrc = 0;
+				for (std::vector<c2eNeuron *>::iterator i = src_neurons.begin(); i != src_neurons.end(); i++) {
+					c2eNeuron *n = *i;
+					if ((highestsrc && n->variables[ourGene->srcvar] > highestsrc->variables[ourGene->srcvar]) || n->variables[ourGene->srcvar] > 0.0f) {
+						highestsrc = n;
+					}
+				}
+				if (!highestsrc) continue;
+
+				// search for the highest NGF in d->dest which isn't already linked
+				c2eNeuron *highestdest = 0;
+				for (std::vector<c2eNeuron *>::iterator i = dest_neurons.begin(); i != dest_neurons.end(); i++) {
+					c2eNeuron *n = *i;
+					if ((highestdest && n->variables[ourGene->destvar] > highestdest->variables[ourGene->destvar]) || n->variables[ourGene->destvar] > 0.0f) {
+						if (!getDendriteFromTo(highestsrc, n))
+							highestdest = n;
+					}
+				}
+				if (!highestdest) continue;
+
+				// connect them!
+				d.source = highestsrc;
+				d.dest = highestdest;
+
+				if (ourGene->initrulealways) {
+					// wipe
+					for (unsigned int j = 0; j < 8; j++)
+						d.variables[j] = 0.0f;
+				} else {
+					// re-run init rule
+					initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, d.variables, parent->getParent());
+				}
+			// else if we migrate to make limited connections to the *dest*
+			} else {
+				std::cout << "wah, you used something which isn't in the standard brain model, meanie" << std::endl; // TODO
+			}
+		}
+	}
 }
 
 /*
