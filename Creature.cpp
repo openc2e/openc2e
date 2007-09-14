@@ -282,9 +282,18 @@ void c2eCreature::tickBrain() {
 		return;
 	}
 
-	chooseAgents();
+	c2eLobe *drivlobe = brain->getLobeById("driv");
+	if (drivlobe) {
+		for (unsigned int i = 0; i < 20; i++) {
+			drivlobe->setNeuronInput(i, drives[i]);
+		}
+	}
 
 #ifndef _CREATURE_STANDALONE	
+	// TODO: situ, detl
+	
+	chooseAgents();
+	
 	c2eLobe *visnlobe = brain->getLobeById("visn");
 	if (visnlobe) {
 		for (unsigned int i = 0; i < visnlobe->getNoNeurons() && i < chosenagents.size(); i++) {
@@ -299,6 +308,11 @@ void c2eCreature::tickBrain() {
 			// TODO: squash result into appropriate range?
 			visnlobe->setNeuronInput(i, distance / parent->range.getFloat());
 		}
+	}
+
+	c2eLobe *smellobe = brain->getLobeById("smel");
+	if (smellobe) {
+		// TODO
 	}
 #endif
 

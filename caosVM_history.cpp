@@ -158,8 +158,7 @@ void caosVM::c_HIST_FOTO() {
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
 	// TODO: handle magic (ie, atticing old photo)
-	m.events[event].photo = photo;
-	
+	m.events[event].photo = photo;	
 }
 
 /**
