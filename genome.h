@@ -438,7 +438,10 @@ public:
   uint8 significance;
   uint8 sensoryneuron;
   uint8 intensity;
-  uint8 features;
+  bool modulate; // 1 in flags
+  bool addoffset; // 2 in flags
+  bool whenasleep; // 4 in flags
+  bool silent[4]; // 16, 32, 64, 128 in flags
   uint8 drives[4];
   uint8 amounts[4];
 

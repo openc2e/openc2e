@@ -539,7 +539,13 @@ void creaturePoseGene::read(istream &s) {
 }
 
 void creatureStimulusGene::write(ostream &s) const {
-	s << stim << significance << sensoryneuron << intensity << features;
+	s << stim << significance << sensoryneuron << intensity;
+	uint8 flags = (modulate?1:0) + (addoffset?2:0) + (whenasleep?4:0);
+	if (silent[0]) flags += 16;
+	if (silent[1]) flags += 32;
+	if (silent[2]) flags += 64;
+	if (silent[3]) flags += 128;
+	s << flags;
 
 	for (int i = 0; i < 4; i++) {
 		s << drives[i] << amounts[i];
@@ -547,11 +553,21 @@ void creatureStimulusGene::write(ostream &s) const {
 }
 
 void creatureStimulusGene::read(istream &s) {
-	s >> stim >> significance >> sensoryneuron >> intensity >> features;
+	s >> stim >> significance >> sensoryneuron >> intensity;
+	uint8 flags;
+	s >> flags;
+	modulate = ((flags & 1) != 0);
+	addoffset = ((flags & 2) != 0);
+	whenasleep = ((flags & 4) != 0);
 
 	for (int i = 0; i < 4; i++) {
 		s >> drives[i] >> amounts[i];
 	}
+
+	silent[0] = ((flags & 16) != 0);
+	silent[1] = ((flags & 32) != 0);
+	silent[2] = ((flags & 64) != 0);
+	silent[3] = ((flags & 128) != 0);
 }
 
 void oldBrainLobeGene::write(ostream &s) const {
