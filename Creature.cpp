@@ -343,13 +343,7 @@ bool c2eCreature::processInstinct() {
 	unprocessedinstincts.pop_front();
 
 	// *** work out which verb neuron to fire by reverse-mapping from the mapping table
-
-	// TODO: reverse-mapping like this seems utterly horrible, is it correct?
-	int actualverb = -1;
-	for (unsigned int i = 0; i < mappinginfo.size(); i++) {
-		if (mappinginfo[i] == g->action)
-			actualverb = i;
-	}
+	int actualverb = reverseMapVerbToNeuron(g->action);
 	// we have no idea which verb neuron to use, so no instinct processing
 	if (actualverb == -1) return false;
 
@@ -1170,6 +1164,96 @@ AgentRef c2eCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> 
 		return possibles[rand() % possibles.size()];
 	else
 		return AgentRef();
+}
+
+int c2eCreature::reverseMapVerbToNeuron(unsigned int verb) {
+	// TODO: reverse-mapping like this seems utterly horrible, is it correct?
+	int actualverb = -1;
+	for (unsigned int i = 0; i < mappinginfo.size(); i++) {
+		if (mappinginfo[i] == verb)
+			actualverb = (int)i;
+	}
+	return actualverb;
+}
+
+void c2eCreature::handleStimulus(c2eStim &stim) {
+	// TODO: handle out-of-range verb_amount/noun_amount
+
+	if (stim.verb_id >= 0) {
+		c2eLobe *verblobe = brain->getLobeById("verb");
+		if (verblobe) {
+			if ((unsigned int)stim.verb_id < verblobe->getNoNeurons())
+				verblobe->setNeuronInput(stim.verb_id, stim.verb_amount);
+		}
+	}
+
+	if (stim.noun_id >= 0) {
+		c2eLobe *nounlobe = brain->getLobeById("verb");
+		if (nounlobe) {
+			if ((unsigned int)stim.noun_id < nounlobe->getNoNeurons())
+				nounlobe->setNeuronInput(stim.noun_id, stim.noun_amount);
+		}
+	}
+
+	for (unsigned int i = 0; i < 4; i++) {
+		if (stim.drive_id[i] >= 0) {
+			unsigned int chemno = stim.drive_id[i] + 148;
+			adjustChemical(chemno, stim.drive_amount[i]);
+			if (!stim.drive_silent[i]) {
+				c2eLobe *resplobe = brain->getLobeById("resp");
+				if (resplobe) {
+					if ((unsigned int)stim.drive_id[i] < resplobe->getNoNeurons())
+						resplobe->setNeuronInput(stim.drive_id[i], stim.drive_amount[i]);
+				}
+			}
+		}
+	}
+}
+
+// TODO: this needs to be passed noun details, it seems, judging by documentation
+void c2eCreature::handleStimulus(unsigned int id, float strength) {
+	// note that g->addoffset does not seem to exist in c2e
+	
+	c2eStim stim;
+	creatureStimulusGene *g = 0;
+	
+	// TODO: generate the damn c2eStims in addGene, thus zapping a whole bunch of bugs
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (typeid(*(*i)) == typeid(creatureStimulusGene)) {
+			creatureStimulusGene *x = (creatureStimulusGene *)(*i);
+			if (x->stim == id) {
+				g = x;
+				break;
+			}
+		}
+	}
+	if (!g) return;
+
+	// if we're asleep and the stimulus isn't to be processed when asleep, return
+	if (!g->whenasleep && isAsleep()) return;
+
+	// TODO: g->modulate
+	
+	// TODO: is multipler usage below okay?
+	float multiplier = (strength == 0.0f ? 1.0f : strength);
+
+	/*
+	 * TODO: what the heck does g->intensity do? it seems to almost entirely be 0
+	 * in the standard genomes (apart from a 255?) and it doesn't seem to change
+	 * anything - fuzzie
+	 */
+	stim.verb_id = reverseMapVerbToNeuron(g->sensoryneuron);
+	stim.verb_amount = g->significance * (1.0f / 124.0f); /* multiply by 0.5? */
+	for (unsigned int i = 0; i < 4; i++) {
+		// TODO: ack, amount should be bound to range
+		if (g->drives[i] != 255)
+			stim.setupDriveStim(i, g->drives[i], g->amounts[i] * (1.0f / 124.0f) * multiplier, g->silent[i]);
+		
+		if (strength == 0.0f)
+			stim.drive_silent[i] = true;
+	}
+
+	handleStimulus(stim);
 }
 
 /* vim: set noet: */

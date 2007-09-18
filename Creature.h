@@ -239,6 +239,20 @@ public:
 	void applyInjury(float);
 };
 
+struct c2eStim {
+	int noun_id;
+	float noun_amount;
+	int verb_id;
+	float verb_amount;
+
+	int drive_id[4];
+	float drive_amount[4];
+	bool drive_silent[4];
+	
+	c2eStim() { noun_id = -1; verb_id = -1; drive_id[0] = -1; drive_id[1] = -1; drive_id[2] = -1; drive_id[3] = -1; }
+	void setupDriveStim(unsigned int num, int id, float amt, bool si) { drive_id[num] = id; drive_amount[num] = amt; drive_silent[num] = si; }
+};
+
 class c2eCreature : public Creature {
 protected:
 	// brain config: should possibly be global
@@ -265,7 +279,8 @@ protected:
 	bool processInstinct();
 	void tickBiochemistry();
 	void addGene(gene *);
-	
+
+	int reverseMapVerbToNeuron(unsigned int verb);
 	AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles);
 
 public:
@@ -277,6 +292,9 @@ public:
 	float getChemical(unsigned char id) { return chemicals[id]; }
 	void adjustDrive(unsigned int id, float value);
 	float getDrive(unsigned int id) { assert(id < 20); return drives[id]; }
+
+	void handleStimulus(c2eStim &stim);
+	void handleStimulus(unsigned int id, float strength);
 
 	unsigned int noOrgans() { return organs.size(); }
 	shared_ptr<c2eOrgan> getOrgan(unsigned int i) { assert(i < organs.size()); return organs[i]; }
