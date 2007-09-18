@@ -237,8 +237,8 @@ void BrainInAVat::loadFile(const QString &fileName) {
 	try {
 		f >> *gfile;
 	} catch (genomeException &e) {
-		QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), tr("Failed loading the genome due to error '%1'!").arg(e.what()));
 		QApplication::restoreOverrideCursor();
+		QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), tr("Failed loading the genome due to error '%1'!").arg(e.what()));
 		return;
 	}
 
@@ -246,10 +246,16 @@ void BrainInAVat::loadFile(const QString &fileName) {
 
 	// create creature
 	if (gfile->getVersion() == 3) {
-		ourCreature = new c2eCreature(gfile, true, 0);
+		try {
+			ourCreature = new c2eCreature(gfile, true, 0);
+		} catch (creaturesException &e) {
+			QApplication::restoreOverrideCursor();
+			QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), e.what());
+			return;
+		}
 	} else {
-		QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), tr("This genome is of version %1, which is unsupported.").arg(gfile->getVersion()));
 		QApplication::restoreOverrideCursor();
+		QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), tr("This genome is of version %1, which is unsupported.").arg(gfile->getVersion()));
 		return;
 	}
 
