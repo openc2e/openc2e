@@ -43,6 +43,10 @@ Engine engine;
 
 Engine::Engine() {
 	done = false;
+	dorendering = true;
+	fastticks = false;
+	refreshdisplay = false;
+
 	tickdata = 0;
 	for (unsigned int i = 0; i < 10; i++) ticktimes[i] = 0;
 	ticktimeptr = 0;
@@ -114,7 +118,7 @@ std::string Engine::executeNetwork(std::string in) {
 }
 
 bool Engine::needsUpdate() {
-	return (!world.paused) && (backend->ticks() > (tickdata + world.ticktime));
+	return (!world.paused) && (fastticks || (backend->ticks() > (tickdata + world.ticktime)));
 }
 
 void Engine::update() {
@@ -125,7 +129,10 @@ void Engine::update() {
 
 	// draw the world
 	// TODO: if (!backend->updateWorld())
-	world.drawWorld();
+	if (dorendering || refreshdisplay) {
+		refreshdisplay = false;
+		world.drawWorld();
+	}
 
 	// play C1 music
 	// TODO: this doesn't seem to actually be every 7 seconds, but actually somewhat random
@@ -627,17 +634,18 @@ bool Engine::initialSetup() {
 			world.gametype = "c3";
 		}
 		std::cout << ", see --help if you need to specify one." << std::endl;
-
-		// set engine version
-		if (world.gametype == "c1")
-			version = 1;
-		else if (world.gametype == "c2")
-			version = 2;
-		else if (world.gametype == "c3" || world.gametype == "cv")
-			version = 3;
-		else
-			throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % world.gametype));
 	}
+
+	// set engine version
+	// TODO: set gamename
+	if (world.gametype == "c1")
+		version = 1;
+	else if (world.gametype == "c2")
+		version = 2;
+	else if (world.gametype == "c3" || world.gametype == "cv")
+		version = 3;
+	else
+		throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % world.gametype));
 
 	// finally, add our cache directory to the end
 	world.data_directories.push_back(storageDirectory());

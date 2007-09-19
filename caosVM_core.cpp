@@ -271,13 +271,32 @@ void caosVM::v_VRSN() {
 
 /**
  WOLF (integer) andmask (integer) eormask (integer)
- %status stub
+ %status maybe
+
+ This returns/sets some engine settings which are useful for 'wolfing runs', among other things.
+ Set andmask for the information you want returned, and eormask for the information you want changed.
+ 
+ 1 is for display rendering (turn it off to speed up the game)
+ 2 is for running ticks as fast as possible, rather than according to BUZZ
+ 4 is for refreshing the display (when display rendering is turned off, this will update the display at the end of the tick)
+ (note that 4 is unset by the engine when the display is refreshed)
+ 8 is autokill
 */
 void caosVM::v_WOLF() {
 	VM_PARAM_INTEGER(eormask)
 	VM_PARAM_INTEGER(andmask)
 
-	result.setInt(0); // TODO
+	if (eormask & 1) engine.dorendering = !engine.dorendering;
+	if (eormask & 2) engine.fastticks = !engine.fastticks;
+	if (eormask & 4) engine.refreshdisplay = !engine.refreshdisplay;
+	if (eormask & 8) world.autokill = !world.autokill;
+
+	int r = 0;
+	if (andmask & 1 && engine.dorendering) r += 1;
+	if (andmask & 2 && engine.fastticks) r += 2;
+	if (andmask & 4 && engine.refreshdisplay) r += 4;
+	if (andmask & 8 && world.autokill) r += 8;
+	result.setInt(r);
 }
 
 /**

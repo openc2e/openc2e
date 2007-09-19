@@ -58,6 +58,7 @@ public:
 	std::string getGameName() { return gamename; }
 
 	bool done;
+	bool dorendering, fastticks, refreshdisplay;
 	unsigned int version;
 
 	Engine();
