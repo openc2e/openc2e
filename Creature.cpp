@@ -1197,7 +1197,7 @@ void c2eCreature::handleStimulus(c2eStim &stim) {
 
 	for (unsigned int i = 0; i < 4; i++) {
 		if (stim.drive_id[i] >= 0) {
-			unsigned int chemno = stim.drive_id[i] + 148;
+			unsigned char chemno = stim.drive_id[i] + 148;
 			adjustChemical(chemno, stim.drive_amount[i]);
 			if (!stim.drive_silent[i]) {
 				c2eLobe *resplobe = brain->getLobeById("resp");

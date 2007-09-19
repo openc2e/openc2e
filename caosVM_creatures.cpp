@@ -141,7 +141,7 @@ void caosVM::c_STIM_TACT() {
 
 /**
  STIM WRIT (command) creature (agent) stimulus (integer) strength (float)
- %status stub
+ %status maybe
 
  Sends a stimulus of the given type to specific Creature.
 */
@@ -153,8 +153,9 @@ void caosVM::c_STIM_WRIT() {
 
 	c2eCreature *c = getc2eCreature(creature.get());
 	if (!c) return; // ignored on non-creatures
-	
-	// TODO
+
+	// TODO: ownr?
+	c->handleStimulus(stimulus, strength);
 }
 
 /**
