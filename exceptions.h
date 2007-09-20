@@ -36,8 +36,15 @@ protected:
 	bool malloced;
 	const char *r;
 
+
 public:
 	virtual std::string prettyPrint() const { return std::string(what()); }
+	creaturesException(const creaturesException &e) throw() : std::exception() {
+		// catch clause missing & etc, we'll try to patch over it but you should fix it really.
+		fprintf(stderr, "QA: creaturesException copy constructor called.\n");
+		r = strdup(e.r);
+		malloced = true;
+	}
 	creaturesException(const char *s) throw() { r = s; malloced = false; }
 	creaturesException(const std::string &s) throw() {
 		r = strdup(s.c_str());

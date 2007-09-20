@@ -670,7 +670,13 @@ bool Engine::initialSetup() {
 	if (preferred_audiobackend != "null") std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;	
 	shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
 	if (!a)	throw creaturesException("No such audio backend " + preferred_audiobackend);
-	a->init(); audio = a;
+	try{
+		a->init(); audio = a;
+	} catch (creaturesException &e) {
+		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << " - going without sound." << std::endl;
+		audio = shared_ptr<AudioBackend>(new NullAudioBackend());
+		audio->init();
+	}
 	possible_audiobackends.clear();
 
 	world.camera.setBackend(backend); // TODO: hrr
