@@ -27,6 +27,8 @@
 
 #include <assert.h>
 #include <fstream>
+#include <boost/scoped_array.hpp>
+
 using namespace std;
 
 // Constructor which creates the main window.
@@ -184,9 +186,10 @@ std::string readpascalstring(std::istream &s) {
 	else
 		size = a;
 
-	char x[size];
-	s.read((char *)&x, size);
-	return std::string(x, size);
+	boost::scoped_array<char> x(new char[size]);
+	//char x[size];
+	s.read(x.get(), size);
+	return std::string(x.get(), size);
 }
 
 struct c1cobfile {
@@ -229,8 +232,8 @@ struct c1cobfile {
 		uint32 imageheight = read32(s);
 		uint16 secondimagewidth = read16(s);
 		assert(imagewidth == secondimagewidth);
-		char imagedata[imagewidth * imageheight];
-		s.read((char *)&imagedata, imagewidth * imageheight);
+		boost::scoped_array<char> imagedata(new char[imagewidth * imageheight]);
+		s.read(imagedata.get(), imagewidth * imageheight);
 		name = readpascalstring(s);
 	}
 };
