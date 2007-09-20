@@ -673,7 +673,7 @@ bool Engine::initialSetup() {
 	try{
 		a->init(); audio = a;
 	} catch (creaturesException &e) {
-		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << " - going without sound." << std::endl;
+		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl << "* Continuing without sound." << std::endl;
 		audio = shared_ptr<AudioBackend>(new NullAudioBackend());
 		audio->init();
 	}
