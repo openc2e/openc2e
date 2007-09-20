@@ -50,7 +50,7 @@ public:
 	virtual void render(class Surface *renderer, int xoffset, int yoffset);
 	virtual void partRender(class Surface *renderer, int xoffset, int yoffset) = 0;
 	virtual void tick() { }
-	virtual void handleClick(float, float) { }
+	virtual void handleClick(float, float);
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
 
@@ -84,7 +84,6 @@ public:
 	shared_ptr<creaturesImage> getSprite() { return sprite; }
 	virtual void partRender(class Surface *renderer, int xoffset, int yoffset);
 	virtual void tick();
-	virtual void handleClick(float, float);
 	unsigned int getPose() { return pose; }
 	unsigned int getBase() { return base; }
 	unsigned int getCurrentSprite() { return spriteno; }

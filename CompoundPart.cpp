@@ -95,7 +95,7 @@ bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 	return getSprite()->transparentAt(getCurrentSprite(), x, y);
 }
 
-void SpritePart::handleClick(float clickx, float clicky) {
+void CompoundPart::handleClick(float clickx, float clicky) {
 	parent->handleClick(clickx + x + parent->x, clicky + y + parent->y);
 }
 

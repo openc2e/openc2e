@@ -59,16 +59,22 @@ private:
 public:
 	SkeletalCreature(unsigned char _family, Creature *c);
 	virtual ~SkeletalCreature();
+
 	void render(Surface *renderer, int xoffset, int yoffset);
+	virtual void handleClick(float, float);
+	
 	void skeletonInit();
-	void recalculateSkeleton();
+	void recalculateSkeleton();	
+	
 	unsigned int getPose(unsigned int i) { return pose[i]; }
 	void setPose(unsigned int p);
 	void setPose(std::string s);
 	void setPoseGene(unsigned int p);
 	void setGaitGene(unsigned int g);
 	void gaitTick();
+	
 	void tick();
+	
 	unsigned int getPregnancy() { return pregnancy; }
 	void setPregnancy(unsigned int p) { assert(p < 4); pregnancy = p; }
 	bool getEyesClosed() { return eyesclosed; }
@@ -77,9 +83,9 @@ public:
 	void setFacialExpression(unsigned int f) { assert (f < 6); facialexpression = f; }
 	unsigned int getSkelWidth() { return width; }
 	unsigned int getSkelHeight() { return height; }
+	
 	int attachmentX(unsigned int part, unsigned int id);
 	int attachmentY(unsigned int part, unsigned int id);
-
 	bool isLeftFootDown() { return downfoot_left; }
 
 	CompoundPart *part(unsigned int id);
