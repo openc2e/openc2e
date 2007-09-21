@@ -60,6 +60,7 @@ static path lcleaf(path &orig) {
 }
 
 bool resolveFile(path &p) {
+#ifndef _WIN32
 	string s = p.string();
 	if (!resolveFile(s)) {
 		// Maybe something changed underneath us; reset the cache and try again
@@ -70,6 +71,9 @@ bool resolveFile(path &p) {
 	}
 	p = path(s, native);
 	return true;
+#else
+	return exists(p);
+#endif
 }
 
 bool resolveFile_(string &srcPath) {
@@ -103,16 +107,12 @@ bool resolveFile_(string &srcPath) {
 
 bool resolveFile(std::string &path) {
 	std::string orig = path;
+#ifndef _WIN32
 	bool res = resolveFile_(path);
-#if 0
-	std::cerr << orig << " -> ";
-	if (!res)
-		std::cerr << "(nil)";
-	else
-		std::cerr << path;
-	std::cerr << std::endl;
-#endif
 	return res;
+#else
+	return exists(path);
+#endif
 }
 
 

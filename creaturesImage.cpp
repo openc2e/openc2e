@@ -26,11 +26,7 @@
 #include "Engine.h"
 #include "fileSwapper.h"
 
-#ifndef _WIN32
 #include "PathResolver.h"
-#else
-#define resolveFile exists
-#endif
 
 #include <iostream>
 #include <fstream>
