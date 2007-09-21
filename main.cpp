@@ -30,6 +30,10 @@
 #undef main // because SDL is stupid
 #endif
 
+#ifdef _WIN32
+#include <shlobj.h>
+#endif
+
 extern "C" int main(int argc, char *argv[]) {
 	try {
 		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2007 Alyssa Milburn and others\n\n";
@@ -56,7 +60,11 @@ extern "C" int main(int argc, char *argv[]) {
 		// we're done, be sure to shut stuff down
 		engine.shutdown();
 	} catch (std::exception &e) {
+#ifdef _WIN32
+		MessageBox(NULL, e.what(), "openc2e - Fatal exception encountered:", MB_ICONERROR);
+#else
 		std::cerr << "Fatal exception encountered: " << e.what() << "\n";
+#endif
 		return 1;
 	}
 	return 0;

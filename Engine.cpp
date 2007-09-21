@@ -39,6 +39,10 @@ namespace po = boost::program_options;
 #include <pwd.h> // getpwuid
 #endif
 
+#ifdef _WIN32
+#include <shlobj.h>
+#endif
+
 Engine engine;
 
 Engine::Engine() {
@@ -744,9 +748,10 @@ void Engine::shutdown() {
 	freeDelegates(); // does nothing if there are none (ie, no call to initialSetup)
 }
 
-#ifndef _WIN32
 fs::path Engine::homeDirectory() {
 	fs::path p;
+
+#ifndef _WIN32
 	char *envhome = getenv("HOME");
 	if (envhome)
 		p = fs::path(envhome, fs::native);
@@ -756,24 +761,29 @@ fs::path Engine::homeDirectory() {
 		std::cerr << "Can't work out what your home directory is, giving up and using /tmp for now." << std::endl;
 		p = fs::path("/tmp", fs::native); // sigh
 	}
-	return p;
-}
 #else
-fs::path Engine::homeDirectory() {
-	// TODO: fix this!
-	fs::path p = fs::path("./temp", fs::native);
-	if (!fs::exists(p))
-		fs::create_directory(p);
-	return p;
-}
+	TCHAR szPath[_MAX_PATH];
+	SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, TRUE);
+
+	p = fs::path(szPath, fs::native);
+	if (!fs::exists(p) || !fs::is_directory(p))
+		throw creaturesException("Windows reported that your My Documents folder is at '" + std::string(szPath) + "' but there's no directory there!");
 #endif
 
+	return p;
+}
+
 fs::path Engine::storageDirectory() {
-	fs::path p = fs::path(homeDirectory().native_directory_string() + "/.openc2e", fs::native);
+#ifndef _WIN32
+	std::string dirname = "/.openc2e";
+#else
+	std::string dirname = "/openc2e Data";
+#endif
+	fs::path p = fs::path(homeDirectory().native_directory_string() + dirname, fs::native);
 	if (!fs::exists(p))
 		fs::create_directory(p);
 	else if (!fs::is_directory(p))
-		throw creaturesException("Your .openc2e is a file, not a directory. That's bad.");
+		throw creaturesException("Your openc2e data directory " + p.native_directory_string() + " is a file, not a directory. That's bad.");
 	return p;
 }
 
