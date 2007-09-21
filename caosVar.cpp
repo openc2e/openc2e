@@ -40,19 +40,19 @@ static inline std::string stringify(double x) {
 
 std::string caosVar::dump() const {
 	switch(getType()) {
-		case STRING:
+		case CAOSSTR:
 			return str(boost::format("String \"%s\" ") % getString());
 			break;
-		case INTEGER:
+		case CAOSINT:
 			return str(boost::format("Int %d ") % getInt());
 			break;
-		case FLOAT:
+		case CAOSFLOAT:
 			return str(boost::format("Float %f ") % getFloat());
 			break;
-		case AGENT:
+		case CAOSAGENT:
 			return str(boost::format("Agent %p ") % (Agent *)getAgent().get());
 			break;
-		case VECTOR:
+		case CAOSVEC:
 			return str(boost::format("Vector (%f, %f)") % getVector().x % getVector().y);
 			break;
 		default:

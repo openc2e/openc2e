@@ -321,7 +321,7 @@ void caosScript::readExpr(const enum ci_type *argp) {
 					current->consts.push_back(t->word());
 					break;
 				case TOK_CONST:
-					if (t->constval().getType() != STRING)
+					if (t->constval().getType() != CAOSSTR)
 						t->unexpected();
 					current->consts.push_back(t->constval());
 					break;
@@ -338,7 +338,7 @@ void caosScript::readExpr(const enum ci_type *argp) {
 			case EOI: throw parseException("Unexpected end of input");
 			case TOK_CONST:
 				{
-					if (t->constval().getType() == INTEGER) {
+					if (t->constval().getType() == CAOSINT) {
 						int val = t->constval().getInt();
 						// small values can be immediates
 						if (val >= -(1 << 24) && val < (1 << 24)) {
@@ -486,7 +486,7 @@ void caosScript::parseloop(int state, void *info) {
 			int bits[4];
 			for (int i = 0; i < 4; i++) {
 				caosVar val = getToken(TOK_CONST)->constval();
-				if (!val.getType() == INTEGER)
+				if (!val.getType() == CAOSINT)
 					throw parseException("Expected integer constant");
 				bits[i] = val.getInt();
 			}

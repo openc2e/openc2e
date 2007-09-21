@@ -41,7 +41,7 @@ class wrongCaosVarTypeException : public caosException {
 struct nulltype_tag { };
 
 enum variableType {
-	NULLTYPE = 0, AGENT, INTEGER, FLOAT, STRING, VECTOR
+	CAOSNULL = 0, CAOSAGENT, CAOSINT, CAOSFLOAT, CAOSSTR, CAOSVEC
 };
 
 class caosVar {
@@ -49,12 +49,12 @@ class caosVar {
 		FRIEND_SERIALIZE(caosVar)
 	protected:
 		struct typeVisit : public boost::static_visitor<variableType> {
-			variableType operator()(int) const { return INTEGER; }
-			variableType operator()(float) const { return FLOAT; }
-			variableType operator()(const std::string &) const { return STRING; }
-			variableType operator()(const AgentRef &) const { return AGENT; }
-			variableType operator()(nulltype_tag) const { return NULLTYPE; }
-			variableType operator()(const Vector<float> &) const { return VECTOR; }
+			variableType operator()(int) const { return CAOSINT; }
+			variableType operator()(float) const { return CAOSFLOAT; }
+			variableType operator()(const std::string &) const { return CAOSSTR; }
+			variableType operator()(const AgentRef &) const { return CAOSAGENT; }
+			variableType operator()(nulltype_tag) const { return CAOSNULL; }
+			variableType operator()(const Vector<float> &) const { return CAOSVEC; }
 		};
 
 #define BAD_TYPE(et, gt) \
@@ -139,7 +139,7 @@ class caosVar {
 		}
 
 		bool isNull() {
-			return getType() == NULLTYPE;
+			return getType() == CAOSNULL;
 		}
 
 		caosVar() {
@@ -162,14 +162,14 @@ class caosVar {
 		caosVar(const std::string &v) { setString(v); } 
 		caosVar(const Vector<float> &v) { setVector(v); }
 		
-		bool isEmpty() const { return getType() == NULLTYPE; }
-		bool hasInt() const { return getType() == INTEGER; }
-		bool hasFloat() const { return getType() == FLOAT; }
-		bool hasAgent() const { return getType() == AGENT; }
-		bool hasString() const { return getType() == STRING; }
-		bool hasDecimal() const { return getType() == INTEGER || getType() == FLOAT || getType() == VECTOR; }
+		bool isEmpty() const { return getType() == CAOSNULL; }
+		bool hasInt() const { return getType() == CAOSINT; }
+		bool hasFloat() const { return getType() == CAOSFLOAT; }
+		bool hasAgent() const { return getType() == CAOSAGENT; }
+		bool hasString() const { return getType() == CAOSSTR; }
+		bool hasDecimal() const { return getType() == CAOSINT || getType() == CAOSFLOAT || getType() == CAOSVEC; }
 		bool hasNumber() const { return hasDecimal(); }
-		bool hasVector() const { return getType() == VECTOR; }
+		bool hasVector() const { return getType() == CAOSVEC; }
 		
 		void setInt(int i) { value = i; }
 		void setFloat(float i) { value = i; }
