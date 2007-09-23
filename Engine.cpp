@@ -63,8 +63,6 @@ Engine::Engine() {
 
 	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
 	addPossibleAudioBackend("null", shared_ptr<AudioBackend>(new NullAudioBackend()));
-
-	gamename = "Unknown";
 }
 
 Engine::~Engine() {
@@ -642,13 +640,22 @@ bool Engine::initialSetup() {
 
 	// set engine version
 	// TODO: set gamename
-	if (world.gametype == "c1")
+	if (world.gametype == "c1") {
+		if (gamename.empty()) gamename = "Creatures 1";
 		version = 1;
-	else if (world.gametype == "c2")
+	} else if (world.gametype == "c2") {
+		if (gamename.empty()) gamename = "Creatures 2";
 		version = 2;
-	else if (world.gametype == "c3" || world.gametype == "cv")
+	} else if (world.gametype == "c3") {
+		if (gamename.empty()) gamename = "Creatures 3";
 		version = 3;
-	else
+	} else if (world.gametype == "cv") {
+		if (gamename.empty()) gamename = "Creatures Village";
+		version = 3;
+	} else if (world.gametype == "sm") {
+		if (gamename.empty()) gamename = "Sea Monkeys";
+		version = 3;
+	} else
 		throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % world.gametype));
 
 	// finally, add our cache directory to the end
@@ -779,13 +786,22 @@ fs::path Engine::storageDirectory() {
 #else
 	std::string dirname = "/openc2e Data";
 #endif
+	
+	// main storage dir
 	fs::path p = fs::path(homeDirectory().native_directory_string() + dirname, fs::native);
 	if (!fs::exists(p))
 		fs::create_directory(p);
 	else if (!fs::is_directory(p))
 		throw creaturesException("Your openc2e data directory " + p.native_directory_string() + " is a file, not a directory. That's bad.");
+	
+	// game-specific storage dir
+	p = fs::path(p.native_directory_string() + std::string("/" + gamename), fs::native);
+	if (!fs::exists(p))
+		fs::create_directory(p);
+	else if (!fs::is_directory(p))
+		throw creaturesException("Your openc2e game data directory " + p.native_directory_string() + " is a file, not a directory. That's bad.");
+	
 	return p;
 }
-
 
 /* vim: set noet: */
