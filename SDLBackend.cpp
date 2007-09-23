@@ -29,7 +29,9 @@ SDLBackend *g_backend;
 void SDLBackend::resizeNotify(int _w, int _h) {
 	mainsurface.width = _w;
 	mainsurface.height = _h;
-	mainsurface.surface = SDL_SetVideoMode(_w, _h, 0, SDL_RESIZABLE);
+	// shadow surfaces seem to generally be faster (presumably due to overdraw), so get SDL to create one for us
+	int bpp = (engine.version == 1 ? 8 : 16);
+	mainsurface.surface = SDL_SetVideoMode(_w, _h, bpp, SDL_RESIZABLE);
 	assert(mainsurface.surface != 0);
 }
 
