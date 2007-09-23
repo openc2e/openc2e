@@ -447,7 +447,8 @@ void World::executeBootstrap(bool switcher) {
 			for (fs::directory_iterator d(b); d != fsend; ++d) {
 				if (fs::exists(*d) && fs::is_directory(*d)) {
 					std::string s = (*d).leaf();
-					if (s == "000 Switcher") {
+					// TODO: cvillage has switcher code in 'Startup', so i included it here too
+					if (s == "000 Switcher" || s == "Startup") {
 						if (!switcher) continue;
 					} else {
 						if (switcher) continue;
