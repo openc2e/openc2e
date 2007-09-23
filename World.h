@@ -75,7 +75,7 @@ public:
 	unsigned int ticktime, tickcount;
 	unsigned int worldtickcount;
 	MainCamera camera;
-	bool showrooms, autokill;
+	bool showrooms, autokill, autostop;
 
 	AgentRef selectedcreature;
 	void selectCreature(boost::shared_ptr<Agent> c);

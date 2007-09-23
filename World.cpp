@@ -48,6 +48,7 @@ World::World() {
 	theHand = 0;
 	showrooms = false;
 	autokill = false;
+	autostop = false;
 }
 
 World::~World() {

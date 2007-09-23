@@ -608,7 +608,10 @@ void Agent::tick() {
 
 void Agent::unhandledException(std::string info, bool wasscript) {
 	// TODO: do something with this? empty the stack?
-	if (world.autokill) {
+	if (world.autostop) {
+		// autostop is mostly for Creatures Village, which is full of buggy scripts
+		stopScript();
+	} else if (world.autokill) {
 		kill();
 		if (wasscript)
 			std::cerr << identify() << " was autokilled during script " << lastScript << " due to: " << info << std::endl;

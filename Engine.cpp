@@ -579,6 +579,7 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 		("gamename,m", po::value< std::string >(&gamename), "Set the game name")
 		("norun,n", "Don't run the game, just execute scripts")
 		("autokill,a", "Enable autokill")
+		("autostop", "Enable autostop (or disable it, for CV)")
 		;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -599,6 +600,10 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 
 	if (vm.count("autokill")) {
 		world.autokill = true;
+	}
+
+	if (vm.count("autostop")) {
+		world.autostop = true;
 	}
 
 	if (vm.count("data-path") == 0) {
@@ -652,6 +657,7 @@ bool Engine::initialSetup() {
 	} else if (world.gametype == "cv") {
 		if (gamename.empty()) gamename = "Creatures Village";
 		version = 3;
+		world.autostop = !world.autostop;
 	} else if (world.gametype == "sm") {
 		if (gamename.empty()) gamename = "Sea Monkeys";
 		version = 3;
