@@ -624,7 +624,7 @@ void caosVM::c_URGE_WRIT() {
 */
 void caosVM::c_DRIV() {
 	VM_PARAM_FLOAT(adjust)
-	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id < 20);
+	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id >= 0 && drive_id < 20);
 	
 	valid_agent(targ);
 	c2eCreature *c = getc2eCreature(targ.get());
@@ -640,9 +640,10 @@ void caosVM::c_DRIV() {
  Returns the level of a drive (0.0 to 1.0) in target Creature.
 */
 void caosVM::v_DRIV() {
-	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id < 20);
+	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id >= 0 && drive_id < 20);
 
 	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
 
 	result.setFloat(c->getDrive(drive_id));
 }
@@ -655,7 +656,7 @@ void caosVM::v_DRIV() {
 */
 void caosVM::c_CHEM() {
 	VM_PARAM_FLOAT(adjust)
-	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 
 	valid_agent(targ);
 	c2eCreature *c = getc2eCreature(targ.get());
@@ -675,7 +676,7 @@ void caosVM::c_CHEM() {
 */
 void caosVM::c_CHEM_c1() {
 	VM_PARAM_INTEGER(adjust)
-	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 
 	// TODO: can adjust be negative?
 
@@ -694,7 +695,7 @@ void caosVM::c_CHEM_c1() {
  Returns the level of a chemical (0.0 to 1.0) in target creature's bloodstream.
 */
 void caosVM::v_CHEM() {
-	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 	
 	valid_agent(targ);
 	c2eCreature *c = getc2eCreature(targ.get());
@@ -712,7 +713,7 @@ void caosVM::v_CHEM() {
  Returns the level of a chemical (0 to 255) in target creature's bloodstream.
 */
 void caosVM::v_CHEM_c1() {
-	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id < 256);
+	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 	
 	valid_agent(targ);
 	c1Creature *c = getc1Creature(targ.get());
