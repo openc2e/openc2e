@@ -284,7 +284,7 @@ void c2eCreature::tickBrain() {
 
 	c2eLobe *drivlobe = brain->getLobeById("driv");
 	if (drivlobe) {
-		for (unsigned int i = 0; i < 20; i++) {
+		for (unsigned int i = 0; i < 20 && i < drivlobe->getNoNeurons(); i++) {
 			drivlobe->setNeuronInput(i, drives[i]);
 		}
 	}
