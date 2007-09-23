@@ -280,7 +280,7 @@ void caosVM::c_STIM_FROM_c1() {
 	VM_PARAM_INTEGER(input)
 	VM_PARAM_INTEGER(significance)
 
-	valid_agent(from);
+	valid_agent(from.getAgent());
 	// TODO
 }
 

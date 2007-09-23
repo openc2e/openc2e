@@ -286,7 +286,7 @@ bool caosVM::fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm) {
 	resetScriptState();
 	currentscript = s;
 	targ = owner;
-	from.set(frm);
+	from.setAgent(frm);
 	timeslice = 1;
 	return true;
 }
@@ -313,7 +313,7 @@ void caosVM::resetCore() {
 	outputstream = &cout;
 
 	_it_ = NULL;
-	from = NULL;
+	from.setAgent(NULL);
 	setTarg(owner);
 	part = 0;
 

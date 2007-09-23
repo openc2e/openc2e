@@ -203,7 +203,8 @@ public:
 	// ...which includes variables accessible to script
 	caosVar var[100]; // might want to make this a map, for memory efficiency
 	caosVar _p_[2]; // might want to add this onto the end of above map, if done
-	AgentRef targ, owner, _it_, from;
+	AgentRef targ, owner, _it_;
+	caosVar from;
 	int part;
 	weak_ptr<class Camera> camera;
 	class Camera *getCamera();
@@ -489,6 +490,7 @@ public:
 	void c_BHVR();
 	void c_TARG();
 	void v_FROM();
+	void v_FROM_ds();
 	void v_POSE();
 	void c_KILL();
 	void c_SCRX();

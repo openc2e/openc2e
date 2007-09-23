@@ -481,12 +481,26 @@ void caosVM::c_TARG() {
 /**
  FROM (agent)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv
 
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
 void caosVM::v_FROM() {
-	result.setAgent(from);
+	result.setAgent(from.getAgent());
+}
+
+/**
+ FROM (variable)
+ %status maybe
+ %pragma variants c3
+ %pragma implementation caosVM::v_FROM_ds
+
+ Returns the agent that sent the message being processed, or NULL if no agent was involved.
+*/
+void caosVM::v_FROM_ds() {
+ 	// Returns a variable because DS is insane and uses this for network events too (and so, of course, scripts abuse it).
+
+	vm->valueStack.push_back(&from);
 }
 
 /**
