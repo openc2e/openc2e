@@ -11,11 +11,14 @@ using std::ifstream;
 using std::ofstream;
 using std::vector;
 
-#define NO_TAGBLOCKS 8
+#define NO_TAGBLOCKS 11
 char *tagblocks[NO_TAGBLOCKS] = {
 	"AGNT", // C3 agent
 	"DSAG", // DS agent
+	"MACH", // SM agent
+	"HAND", // SM agent
 	"LIVE", // SM agent
+	"MONK", // SM agent
 	"EXPC", // C3 creature info
 	"DSEX", // DS creature info
 	"SFAM", // C3 starter family
