@@ -57,8 +57,10 @@ SUBR test
 RETN
 
 SUBR t2
- OUTS "ok "
- OUTV VA00
- OUTS " - GSUB iteration\n"
+ SETS va01 "ok "
+ ADDS va01 VTOS va00
+ ADDS va01 " - GSUB iteration"
+ DBG: OUTS va01
+
  ADDV VA00 1
 RETN
