@@ -399,6 +399,7 @@ void caosVM::v_CAOS() {
 	
 	caosVM *sub = world.getVM(NULL);
 	sub->resetCore();
+	
 	if (inl) {
 		for (int i = 0; i < 100; i++)
 			sub->var[i] = var[i];
@@ -408,12 +409,15 @@ void caosVM::v_CAOS() {
 		sub->owner = owner;
 		// sub->from = from;
 	}
+	
 	if (state_trans) {
 		sub->owner = owner;
 		// sub->from = from;
 	}
+	
 	sub->_p_[0] = p1;
 	sub->_p_[1] = p2;
+
 	try {
 		std::istringstream iss(commands);
 		std::ostringstream oss;
@@ -422,10 +426,11 @@ void caosVM::v_CAOS() {
 		s.installScripts();
 		sub->outputstream = &oss;
 		sub->runEntirely(s.installer);
-		sub->outputstream = &std::cout;
 		result.setString(oss.str());
+		sub->outputstream = 0;
 	} catch (std::exception &e) {
-		sub->outputstream = &std::cout;
+		sub->outputstream = 0; // very important that this isn't pointing onto dead stack when the VM is freed
+		
 		if (!throws || catches) {
 			report->setString(e.what());
 			result.setString("###");
@@ -434,6 +439,7 @@ void caosVM::v_CAOS() {
 			throw;
 		}
 	}
+	
 	world.freeVM(sub);
 }
 

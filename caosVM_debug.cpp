@@ -71,7 +71,7 @@ void caosVM::c_DBG_OUTV() {
 		cout << val.getInt();
 	} else if (val.hasVector()) {
 		const Vector<float> &v = val.getVector();
-		*outputstream << boost::format("(%0.6f, %0.6f)") % v.x % v.y;
+		cout << boost::format("(%0.6f, %0.6f)") % v.x % v.y;
 	} else throw badParamException();
 
 	cout << std::endl;
@@ -202,6 +202,9 @@ void caosVM::c_DBG_TRACE() {
 */
 void caosVM::c_MANN() {
 	VM_PARAM_STRING(cmd)
+
+	caos_assert(outputstream);
+
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
 	const cmdinfo *i = currentscript->dialect->cmdbase();
 	
@@ -243,6 +246,8 @@ void caosVM::c_DBG_DISA() {
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
+	
+	caos_assert(outputstream);
 
 	shared_ptr<script> s = world.scriptorium.getScript(family, genus, species, event);
 	if (s) {

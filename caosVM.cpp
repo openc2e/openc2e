@@ -310,7 +310,7 @@ void caosVM::resetCore() {
 	c_FILE_ICLO(); // make sure input stream is freed
 	inputstream = 0; // .. possibly not strictly necessary, when all is bugfree
 	c_FILE_OCLO(); // make sure output stream is freed
-	outputstream = &cout;
+	outputstream = 0;
 
 	_it_ = NULL;
 	from.setAgent(NULL);

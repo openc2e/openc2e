@@ -146,16 +146,9 @@ void caosVM::c_FILE_JDEL() {
  Disconnects everything from the output stream.
 */
 void caosVM::c_FILE_OCLO() {
-	// TODO: right now, cout is hooked up to outputstream by default, someday when this
-	// changes, this function will need revising
-
 	if (outputstream) {
-		std::ofstream *oftest = dynamic_cast<std::ofstream *>(outputstream);
-		if (oftest) {
-			oftest->close();
-			delete oftest;
-		}
-		outputstream = &std::cout; // always restore to default.. TODO, should be null?
+		delete outputstream;
+		outputstream = 0;
 	}
 }
 
@@ -193,7 +186,7 @@ void caosVM::c_FILE_OOPE() {
 		outputstream = new std::ofstream(fullfilename.c_str(), std::ios::trunc);
 
 	if (outputstream->fail()) {
-		outputstream = &std::cout; // TODO: probably not the right fallback, should null?
+		outputstream = 0;
 		throw caosException(boost::str(boost::format("FILE OOPE failed to open %s") % fullfilename));
 	}
 }

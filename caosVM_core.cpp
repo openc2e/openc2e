@@ -39,7 +39,9 @@ using boost::format;
 */
 void caosVM::c_OUTX() {
 	VM_PARAM_STRING(val)
-	
+
+	if (!outputstream) return;
+
 	std::string oh = "\"";
 	
 	for (unsigned int i = 0; i < val.size(); i++) {
@@ -68,6 +70,8 @@ void caosVM::c_OUTS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(val)
 
+	if (!outputstream) return;
+	
 	*outputstream << val;
 }
 
@@ -89,6 +93,8 @@ void caosVM::c_OUTV() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALUE(val)
 
+	if (!outputstream) return;
+	
 	if (val.hasFloat()) {
 		*outputstream << boost::format("%0.06f") % val.getFloat();
 	} else if (val.hasInt()) {
