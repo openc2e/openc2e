@@ -1,5 +1,3 @@
-include config.mk
-
 CXXFILES = $(wildcard *.cpp) $(wildcard tools/*.cpp)
 CFILES = $(wildcard *.c) $(wildcard tools/*.c) 
 
@@ -98,8 +96,8 @@ OPENC2E_S = $(OPENC2E_CORE) $(SERIALIZATION) main.o
 
 DEBUGFLAGS=-ggdb3 -O0
 CFLAGS += -W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE -DOPENAL_SUPPORT
-XLDFLAGS=$(LDFLAGS) -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt -lboost_thread-mt $(SDL_LFLAGS) -lz -lm -lSDL_net -lSDL_gfx -lpthread -lopenal -lalut
-COREFLAGS=$(DEBUGFLAGS) $(SDL_CFLAGS) -I.
+XLDFLAGS=$(LDFLAGS) -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt -lboost_thread-mt -lSDL -lz -lm -lSDL_net -lSDL_gfx -lpthread -lopenal -lalut
+COREFLAGS=$(DEBUGFLAGS) -I/usr/include/SDL -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
@@ -191,7 +189,7 @@ tools/braininavat/braininavat: Creature_standalone.o c2eBrain.o streamutils.o ge
 	make
 
 clean:
-	rm -f *.o openc2e openc2e_s filetests praydumper tools/*.o config.mk
+	rm -f *.o openc2e openc2e_s filetests praydumper tools/*.o
 	rm -rf .deps
 	rm -f commandinfo.yml lex.yy.cpp lex.yy.h lex.c2.cpp lex.c2.h lex.mng.cpp lex.mng.h mngparser.tab.cpp mngparser.tab.hpp cmddata.cpp
 	rm -f tools/filetests tools/memstats tools/mngtest tools/pathtest tools/praydumper tools/serialtest
@@ -208,9 +206,6 @@ headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) $(wildcard ser/*.h) mngparser.
 
 headerdeps.png: headerdeps.dot
 	dot -Tpng -o $@ $^
-
-config.mk: config.mk.in
-	./configure.pl
 
 generated: catalogue.tab.hpp lex.yy.h lex.c2.h mngparser.tab.hpp catalogue.lex.h lex.mng.h docs.html cmddata.cpp
 
