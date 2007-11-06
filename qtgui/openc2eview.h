@@ -20,6 +20,7 @@
 #include <QWidget>
 #include "SDLBackend.h"
 #include <deque>
+#include <boost/shared_ptr.hpp>
 
 class openc2eView : public QWidget {
 	Q_OBJECT
@@ -45,11 +46,11 @@ protected:
 	void keyReleaseEvent(QKeyEvent *k);
 
 	// variables
-	class QtBackend *backend;
+	boost::shared_ptr<class QtBackend> backend;
 	int lastmousex, lastmousey;
 
 public:
-	class QtBackend *getBackend() { return backend; }
+	boost::shared_ptr<class Backend> getBackend();
 };
 
 class QtBackend : public SDLBackend {

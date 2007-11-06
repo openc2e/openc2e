@@ -18,6 +18,7 @@
 #include <QtGui>
 #include "openc2eview.h"
 #include "../Engine.h"
+#include "../OpenALBackend.h"
 
 // Constructor which creates the main window.
 
@@ -25,8 +26,11 @@ QtOpenc2e::QtOpenc2e() {
 	viewport = new openc2eView(this);
 	setCentralWidget(viewport);
 
+	engine.addPossibleBackend("qtgui", viewport->getBackend());
+	engine.addPossibleAudioBackend("openal", shared_ptr<AudioBackend>(new OpenALBackend()));
+
 	// TODO: handle this?
-	/*if (!*/ engine.initialSetup(viewport->getBackend()) /*) return 0 */ ;
+	/*if (!*/ engine.initialSetup() /*) return 0 */ ;
 
 	// idle timer
 	// TODO: should prbly have an every-X-seconds timer or a background thread to do this

@@ -10,7 +10,8 @@ INCLUDEPATH += . /usr/include/SDL ..
 # Input
 HEADERS += qtopenc2e.h openc2eview.h
 SOURCES += main.cpp qtopenc2e.cpp openc2eview.cpp
-LIBS += -lboost_program_options -lboost_serialization -lboost_filesystem -lz -lSDL -lSDL_net -lSDL_mixer -lSDL_gfx ../Agent.o \
+LIBS += -lboost_thread-mt -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt -lz -lSDL -lSDL_net -lSDL_mixer -lSDL_gfx -lopenal -lalut \
+	../Agent.o \
         ../AgentHelpers.o \
         ../AgentRef.o \
         ../attFile.o \
@@ -71,6 +72,7 @@ LIBS += -lboost_program_options -lboost_serialization -lboost_filesystem -lz -lS
         ../mmapifstream.o \
         ../mngfile.o \
         ../mngparser.tab.o \
+	../OpenALBackend.o \
         ../PathResolver.o \
         ../physics.o \
         ../PointerAgent.o \

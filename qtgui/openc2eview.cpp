@@ -30,7 +30,7 @@
  */
 
 openc2eView::openc2eView(QWidget *parent, Qt::WFlags flags) : QWidget(parent, flags) {
-	backend = new QtBackend();
+	backend = boost::shared_ptr<Backend>(new QtBackend());
 
 	setAttribute(Qt::WA_PaintOnScreen); // disable double-buffering
 	setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background
@@ -50,6 +50,10 @@ openc2eView::openc2eView(QWidget *parent, Qt::WFlags flags) : QWidget(parent, fl
 }
 
 openc2eView::~openc2eView() {
+}
+
+boost::shared_ptr<class Backend> openc2eView::getBackend() {
+	return boost::dynamic_pointer_cast<class Backend, class QtBackend>(backend);
 }
 
 void openc2eView::resizeEvent(QResizeEvent *) {
