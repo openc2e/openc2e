@@ -95,8 +95,8 @@ void caosVM::v_HIST_FIND() {
 	caos_assert(world.history.hasMoniker(moniker));
 	monikerData &m = world.history.getMoniker(moniker);
 
-	for (int i = from + 1; i >= 0 && i < m.events.size(); i++) {
-		if (m.events[i].eventno == event) {
+	for (int i = from + 1; i >= 0 && (unsigned int)i < m.events.size(); i++) {
+		if (m.events[i].eventno == (unsigned int)event) {
 			result.setInt(i);
 			return;
 		}
@@ -119,8 +119,8 @@ void caosVM::v_HIST_FINR() {
 
 	if (from == -1) from = m.events.size();
 
-	for (int i = from - 1; i >= 0 && i < m.events.size(); i--) {
-		if (m.events[i].eventno == event) {
+	for (int i = from - 1; i >= 0 && (unsigned int)i < m.events.size(); i--) {
+		if (m.events[i].eventno == (unsigned int)event) {
 			result.setInt(i);
 			return;
 		}

@@ -416,7 +416,7 @@ void caosScript::readExpr(const enum ci_type *argp) {
 
 int caosScript::readCond() {
 	token *t = getToken(TOK_WORD);
-	typedef struct { char *n; int cnd; } cond_entry;
+	typedef struct { const char *n; int cnd; } cond_entry;
 	const static cond_entry conds[] = {
 		{ "eq", CEQ },
 		{ "gt", CGT },

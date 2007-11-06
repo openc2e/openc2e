@@ -127,8 +127,8 @@ public:
   gene(uint8 v) : cversion(v) { }
   virtual ~gene() { }
 
-  virtual char *name() = 0;
-  virtual char *typeName() = 0;
+  virtual const char *name() = 0;
+  virtual const char *typeName() = 0;
 };
  
 //! gene: organ, either brain or normal
@@ -154,8 +154,8 @@ public:
   uint8 atpdamagecoefficient;
 
   organGene(uint8 v, bool b) : gene(v), brainorgan(b) { }
-  char *name() { return "Organ"; }
-  char *typeName() { if (brainorgan) return "Brain"; return "Biochemistry"; }
+  const char *name() { return "Organ"; }
+  const char *typeName() { if (brainorgan) return "Brain"; return "Biochemistry"; }
 };
 
 //! gene: brain-type base class (not including brain organ)
@@ -164,7 +164,7 @@ protected:
   uint8 type() const { return 0; }
 
   brainGene(uint8 v) : gene(v) { }
-  char *typeName() { return "Brain"; }
+  const char *typeName() { return "Brain"; }
 };
 
 //! gene: c2e brain lobe
@@ -193,7 +193,7 @@ public:
   uint8 updaterule[48];
 
   c2eBrainLobeGene(uint8 v) : brainGene(v) { }
-  char *name() { return "Lobe"; }
+  const char *name() { return "Lobe"; }
 };
 
 struct oldDendriteInfo {
@@ -260,7 +260,7 @@ public:
   oldDendriteInfo dendrite2;
 
   oldBrainLobeGene(uint8 v) : brainGene(v), dendrite1(v), dendrite2(v) { }
-  virtual char *name() { return "Lobe"; }
+  virtual const char *name() { return "Lobe"; }
 };
 
 //! gene: c2e brain tract
@@ -291,7 +291,7 @@ public:
   uint8 updaterule[48];
 
   c2eBrainTractGene(uint8 v) : brainGene(v) { }
-  char *name() { return "Tract"; }
+  const char *name() { return "Tract"; }
 };
 
 class bioGene : public gene {
@@ -299,7 +299,7 @@ protected:
   uint8 type() const { return 1; }
 
   bioGene(uint8 v) : gene(v) { }
-  char *typeName() { return "Biochemistry"; }
+  const char *typeName() { return "Biochemistry"; }
 };
 
 //! gene: receptor
@@ -322,7 +322,7 @@ public:
   bool digital; // 2 in flags
 
   bioReceptorGene(uint8 v) : bioGene(v) { }
-  char *name() { return "Receptor"; }
+  const char *name() { return "Receptor"; }
 };
 
 //! gene: emitter
@@ -346,7 +346,7 @@ public:
   bool invert; // 4 in flags
 
   bioEmitterGene(uint8 v) : bioGene(v) { }
-  char *name() { return "Emitter"; }
+  const char *name() { return "Emitter"; }
 };
 
 //! gene: reaction
@@ -363,7 +363,7 @@ public:
   uint8 rate;
 
   bioReactionGene(uint8 v) : bioGene(v) { }
-  char *name() { return "Reaction"; }
+  const char *name() { return "Reaction"; }
 };
 
 //! gene: half-lives
@@ -378,7 +378,7 @@ public:
   uint8 halflives[256];
 
   bioHalfLivesGene(uint8 v) : bioGene(v) { }
-  char *name() { return "Half-Life"; }
+  const char *name() { return "Half-Life"; }
 };
 
 //! gene: initial concentration
@@ -394,7 +394,7 @@ public:
   uint8 quantity;
 
   bioInitialConcentrationGene(uint8 v) : bioGene(v) { }
-  char *name() { return "Initial Concentration"; }
+  const char *name() { return "Initial Concentration"; }
 };
 
 //! gene: neuroemitter
@@ -413,7 +413,7 @@ public:
   uint8 quantity[4];
 
   bioNeuroEmitterGene(uint8 v) : bioGene(v) { }
-  char *name() { return "Neuro Emitter"; }
+  const char *name() { return "Neuro Emitter"; }
 };
 
 //! gene: creature-type base class
@@ -422,7 +422,7 @@ protected:
   uint8 type() const { return 2; }
 
   creatureGene(uint8 v) : gene(v) { }
-  char *typeName() { return "Creature"; }
+  const char *typeName() { return "Creature"; }
 };
 
 //! gene: stimulus
@@ -446,7 +446,7 @@ public:
   uint8 amounts[4];
 
   creatureStimulusGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Stimulus"; }
+  const char *name() { return "Stimulus"; }
 };
 
 //! gene: genus (must be first gene in file, must only be one instance)
@@ -463,7 +463,7 @@ public:
   std::string dad;
 
   creatureGenusGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Genus"; }
+  const char *name() { return "Genus"; }
 };
 
 //! gene: appearance
@@ -480,7 +480,7 @@ public:
   uint8 species; // genusofdonor; not present in c1
 
   creatureAppearanceGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Appearance"; }
+  const char *name() { return "Appearance"; }
 };
 
 //! gene: pose
@@ -499,7 +499,7 @@ public:
   std::string getPoseString() const { return std::string((char *)pose, poseLength()); }
   
   creaturePoseGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Pose"; }
+  const char *name() { return "Pose"; }
 };
 
 //! gene: gait
@@ -517,7 +517,7 @@ public:
   int gaitLength() const { return 8; }
 
   creatureGaitGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Gait"; }
+  const char *name() { return "Gait"; }
 };
 
 //! gene: instinct
@@ -536,7 +536,7 @@ public:
   uint8 level;
 
   creatureInstinctGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Instinct"; }
+  const char *name() { return "Instinct"; }
 };
 
 //! gene: pigment
@@ -552,7 +552,7 @@ public:
   uint8 amount;
 
   creaturePigmentGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Pigment"; }
+  const char *name() { return "Pigment"; }
 };
 
 //! gene: pigment bleed
@@ -568,7 +568,7 @@ public:
   uint8 swap;
 
   creaturePigmentBleedGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Pigment Bleed"; }
+  const char *name() { return "Pigment Bleed"; }
 };
 
 //! gene: facial expression
@@ -586,7 +586,7 @@ public:
   uint8 amounts[4];
 
   creatureFacialExpressionGene(uint8 v) : creatureGene(v) { }
-  char *name() { return "Facial Expression"; }
+  const char *name() { return "Facial Expression"; }
 };
 
 #endif
