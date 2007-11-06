@@ -20,7 +20,7 @@
 STRINGBIT   \\.|[^\\]
 DIGIT       [0-9]
 WORDINIT    [a-zA-Z_]
-WORDANY     [#a-zA-Z0-9:?!_+-]
+WORDANY     [$#a-zA-Z0-9:?!_+-]
 %%
 
 f\*\*k	lex_lineno = yylineno; return make_word("f**k");
