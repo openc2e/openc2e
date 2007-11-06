@@ -1540,6 +1540,18 @@ void caosVM::c_INJR() {
 	// TODO
 }
 
+/**
+ SAY$ (command) string (string)
+ %status stub
+ %pragma variants c1
+*/
+void caosVM::c_SAY() {
+	VM_PARAM_STRING(string)
+
+	valid_agent(targ);
+	// TODO
+}
+
 // clothes
 
 /**

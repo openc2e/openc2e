@@ -760,6 +760,7 @@ public:
 	void v_EXPR();
 	void c_TNTC();
 	void c_INJR();
+	void c_SAY();
 	// (clothes)
 	void c_BODY();
 	void v_BODY();
