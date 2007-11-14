@@ -901,7 +901,6 @@ void SFCCompoundObject::copyToWorld() {
 
 	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
-	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
 	a->setAttributes(attr);
 	
 	a->actv.setInt(actv);
@@ -973,7 +972,6 @@ void SFCSimpleObject::copyToWorld() {
 	
 	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
-	if (attr & 128) attr -= 128; // TODO: hack to disable physics, for now
 	a->setAttributes(attr);
 	
 	a->actv.setInt(actv);
