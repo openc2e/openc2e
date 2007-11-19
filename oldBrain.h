@@ -29,7 +29,29 @@ using boost::shared_ptr;
 
 class Creature;
 
+struct oldDendrite {
+	unsigned int *src, *dest;
+	unsigned int strength;
+};
+
 class oldLobe {
+protected:
+	class oldBrain *parent;
+	oldBrainLobeGene *ourGene;
+	std::vector<unsigned int> neurons;
+	std::vector<oldDendrite> dendrites[2];
+	oldLobe *sourceLobe[2];
+
+public:
+	oldLobe(class oldBrain *b, oldBrainLobeGene *g);
+	void tick();
+	void init();
+	void wipe();
+	oldBrainLobeGene *getGene() { return ourGene; }
+	unsigned int getNoNeurons() { return neurons.size(); }
+	unsigned int getNoDendrites(unsigned int t) { return dendrites[t].size(); }
+	unsigned int *getNeuron(unsigned int i) { return &neurons[i]; }
+	oldDendrite *getDendrite(unsigned int t, unsigned int i) { return &dendrites[t][i]; }
 };
 
 class oldBrain {

@@ -20,4 +20,18 @@
 #include "oldBrain.h"
 #include "Creature.h"
 
+void oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
+	parent = b;
+	ourGene = g;
+}
+
+void oldLobe::init() {
+}
+
+void oldLobe::wipe() {
+}
+
+void oldLobe::tick() {
+}
+
 /* vim: set noet: */
