@@ -20,7 +20,7 @@
 #include "oldBrain.h"
 #include "Creature.h"
 
-void oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
+oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	parent = b;
 	ourGene = g;
 }
