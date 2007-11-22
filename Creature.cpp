@@ -150,7 +150,12 @@ void Creature::tick() {
 	if (tickage) age++;
 }
 
-c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
+oldCreature::oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
+	biochemticks = 0;
+	halflives = 0;
+}
+
+c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : oldCreature(g, is_female, _variant) {
 	assert(g->getVersion() == 1);
 
 	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0;
@@ -164,9 +169,6 @@ c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 	for (unsigned int i = 0; i < 8; i++) gaitloci[i] = 0;
 	for (unsigned int i = 0; i < 16; i++) drives[i] = 0;
 	
-	biochemticks = 0;
-	halflives = 0;
-
 	processGenes();
 }
 
@@ -449,9 +451,8 @@ bool c2eCreature::processInstinct() {
 	return true;
 }
 
-void c1Creature::addGene(gene *g) {
+void oldCreature::addGene(gene *g) {
 	Creature::addGene(g);
-
 	if (typeid(*g) == typeid(bioInitialConcentrationGene)) {
 		// initialise chemical levels
 		bioInitialConcentrationGene *b = (bioInitialConcentrationGene *)(g);
@@ -460,7 +461,13 @@ void c1Creature::addGene(gene *g) {
 		bioHalfLivesGene *d = dynamic_cast<bioHalfLivesGene *>(g);
 		assert(d);
 		halflives = d;
-	} else if (typeid(*g) == typeid(bioReactionGene)) {
+	}	
+}
+
+void c1Creature::addGene(gene *g) {
+	oldCreature::addGene(g);
+
+	if (typeid(*g) == typeid(bioReactionGene)) {
 		reactions.push_back(shared_ptr<c1Reaction>(new c1Reaction()));
 		reactions.back()->init((bioReactionGene *)(g));
 	} else if (typeid(*g) == typeid(bioEmitterGene)) {
@@ -493,7 +500,7 @@ void c2eCreature::addGene(gene *g) {
 	}
 }
 
-void c1Creature::addChemical(unsigned char id, unsigned char val) {
+void oldCreature::addChemical(unsigned char id, unsigned char val) {
 	if (id == 0) return;
 
 	// clipping..
@@ -501,7 +508,7 @@ void c1Creature::addChemical(unsigned char id, unsigned char val) {
 	else chemicals[id] += val;
 }
 
-void c1Creature::subChemical(unsigned char id, unsigned char val) {
+void oldCreature::subChemical(unsigned char id, unsigned char val) {
 	if (id == 0) return;
 
 	// clipping..
@@ -536,11 +543,11 @@ unsigned int c1rates[32] = {
 	0xFFFF
 };
 
-inline unsigned int c1Creature::calculateMultiplier(unsigned char rate) {
+inline unsigned int oldCreature::calculateMultiplier(unsigned char rate) {
 	return c1rates[rate];
 }
 
-inline unsigned int c1Creature::calculateTickMask(unsigned char rate) {
+inline unsigned int oldCreature::calculateTickMask(unsigned char rate) {
 	if (rate < 7) return 0;
 	else return (1 << ((unsigned int)rate - 7)) - 1;
 }
@@ -565,6 +572,10 @@ void c1Creature::tickBiochemistry() {
 		processReaction(**i);
 	}
 
+	oldCreature::tickBiochemistry();
+}
+
+void oldCreature::tickBiochemistry() {
 	// process half-lives
 	if (!halflives) return; // TODO: correct?
 	for (unsigned int i = 0; i < 256; i++) {

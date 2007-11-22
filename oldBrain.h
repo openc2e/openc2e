@@ -27,8 +27,6 @@
 
 using boost::shared_ptr;
 
-class Creature;
-
 struct oldDendrite {
 	unsigned int *src, *dest;
 	unsigned int strength;
@@ -57,16 +55,16 @@ public:
 class oldBrain {
 protected:
 	// TODO: should be oldCreature?
-	class c1Creature *parent;
+	class oldCreature *parent;
 
 public:
 	std::map<unsigned int, oldLobe *> lobes;
 
-	oldBrain(c1Creature *p);
+	oldBrain(oldCreature *p);
 	void tick();
 	void init();
 	oldLobe *getLobeByTissue(unsigned int id);
-	c1Creature *getParent() { return parent; }
+	oldCreature *getParent() { return parent; }
 };
 
 #endif

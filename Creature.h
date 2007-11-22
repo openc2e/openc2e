@@ -65,9 +65,10 @@ protected:
 
 	void processGenes();
 	virtual void addGene(gene *);
+	
+	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
 
 public:
-	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
 	void setAgent(CreatureAgent *a);
 	virtual ~Creature();
 	virtual void tick();
@@ -119,10 +120,33 @@ struct c1Emitter {
 	void init(bioEmitterGene *, class c1Creature *);
 };
 
-class c1Creature : public Creature {
+class oldCreature : public Creature {
 protected:
 	// biochemistry
 	unsigned char chemicals[256];
+
+	class oldBrain *brain;
+	
+	unsigned int biochemticks;
+	bioHalfLivesGene *halflives;
+
+	void addGene(gene *);
+	void tickBrain();
+	virtual void tickBiochemistry();
+
+	inline unsigned int calculateTickMask(unsigned char);
+	inline unsigned int calculateMultiplier(unsigned char);
+
+	oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+
+public:
+	void addChemical(unsigned char id, unsigned char val);
+	void subChemical(unsigned char id, unsigned char val);
+	unsigned char getChemical(unsigned char id) { return chemicals[id]; }	
+};
+
+class c1Creature : public oldCreature {
+protected:
 	std::vector<shared_ptr<c1Reaction> > reactions;
 	std::vector<c1Receptor> receptors;
 	std::vector<c1Emitter> emitters;
@@ -136,26 +160,17 @@ protected:
 	unsigned char senses[6], involaction[8], gaitloci[8];
 	unsigned char drives[16];
 
-	unsigned int biochemticks;
-	bioHalfLivesGene *halflives;
-
 	void addGene(gene *);
 	void tickBiochemistry();
 	void processReaction(c1Reaction &);
 	void processEmitter(c1Emitter &);
 	void processReceptor(c1Receptor &);
-	inline unsigned int calculateTickMask(unsigned char);
-	inline unsigned int calculateMultiplier(unsigned char);
-
+	
 public:
 	c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
 
 	void tick();
 
-	void addChemical(unsigned char id, unsigned char val);
-	void subChemical(unsigned char id, unsigned char val);
-	unsigned char getChemical(unsigned char id) { return chemicals[id]; }
-	
 	unsigned char getDrive(unsigned int id) { assert(id < 16); return drives[id]; }
 	
 	unsigned char *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
