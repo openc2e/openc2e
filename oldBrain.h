@@ -27,16 +27,20 @@
 
 using boost::shared_ptr;
 
+struct oldNeuron {
+	unsigned char state, output;
+};
+
 struct oldDendrite {
-	unsigned int *src, *dest;
-	unsigned int strength;
+	oldNeuron *src, *dest;
+	unsigned char strength, stw, ltw, suscept;
 };
 
 class oldLobe {
 protected:
 	class oldBrain *parent;
 	oldBrainLobeGene *ourGene;
-	std::vector<unsigned int> neurons;
+	std::vector<oldNeuron> neurons;
 	std::vector<oldDendrite> dendrites[2];
 	oldLobe *sourceLobe[2];
 
@@ -48,7 +52,7 @@ public:
 	oldBrainLobeGene *getGene() { return ourGene; }
 	unsigned int getNoNeurons() { return neurons.size(); }
 	unsigned int getNoDendrites(unsigned int t) { return dendrites[t].size(); }
-	unsigned int *getNeuron(unsigned int i) { return &neurons[i]; }
+	oldNeuron *getNeuron(unsigned int i) { return &neurons[i]; }
 	oldDendrite *getDendrite(unsigned int t, unsigned int i) { return &dendrites[t][i]; }
 };
 

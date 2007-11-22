@@ -21,17 +21,78 @@
 #include "Creature.h"
 
 oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
+	assert(b);
 	parent = b;
+	assert(g);
 	ourGene = g;
+
+	unsigned int width = g->width, height = g->height;
+	// TODO: good?
+	if (width < 1) width = 1;
+	if (height < 1) height = 1;
+
+	neurons.reserve(width * height);
+	
+	oldNeuron n;
+	for (unsigned int i = 0; i < width * height; i++) {
+		neurons.push_back(n);
+	}
+
+	// TODO
 }
 
 void oldLobe::init() {
+	wipe();
+
+	// TODO
 }
 
 void oldLobe::wipe() {
+	// TODO
 }
 
 void oldLobe::tick() {
+	// TODO
+}
+
+oldBrain::oldBrain(oldCreature *p) {
+	assert(p);
+	parent = p;
+
+	shared_ptr<genomeFile> genome = p->getGenome();
+
+	unsigned int n = 0;
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
+		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
+		// TODO: lifestage
+		if (typeid(**i) == typeid(oldBrainLobeGene)) {
+			oldBrainLobeGene *g = (oldBrainLobeGene *)*i;
+			oldLobe *l = new oldLobe(this, g);
+			// TODO: good?
+			lobes[n] = l;
+			n++;
+		}
+	}
+}
+
+void oldBrain::init() {
+	for (std::map<unsigned int, oldLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
+		(*i).second->init();
+	}
+}
+
+void oldBrain::tick() {
+	for (std::map<unsigned int, oldLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
+		(*i).second->tick();
+	}
+}
+
+oldLobe *oldBrain::getLobeByTissue(unsigned int id) {
+	if (lobes.find(id) == lobes.end())
+		return 0;
+
+	return lobes[id];
 }
 
 /* vim: set noet: */

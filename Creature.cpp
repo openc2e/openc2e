@@ -23,6 +23,7 @@
 #include "Catalogue.h"
 #include <cmath> // powf
 #include "c2eBrain.h"
+#include "oldBrain.h"
 
 Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) {
 	parent = 0;
@@ -169,7 +170,9 @@ c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 	for (unsigned int i = 0; i < 8; i++) gaitloci[i] = 0;
 	for (unsigned int i = 0; i < 16; i++) drives[i] = 0;
 	
+	brain = new oldBrain(this);
 	processGenes();
+	brain->init();
 }
 
 c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
@@ -221,6 +224,7 @@ void c1Creature::tick() {
 	senses[0] = 255; // always-on
 	senses[1] = (asleep ? 255 : 0); // asleep
 
+	tickBrain();
 	tickBiochemistry();
 
 	// lifestage checks
@@ -232,6 +236,14 @@ void c1Creature::tick() {
 	if (dead != 0) die();
 
 	Creature::tick();
+}
+
+void oldCreature::tickBrain() {
+	// TODO
+
+	brain->tick();
+	
+	// TODO
 }
 
 unsigned int c2eCreature::getGait() {
