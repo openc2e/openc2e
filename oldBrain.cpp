@@ -20,6 +20,153 @@
 #include "oldBrain.h"
 #include "Creature.h"
 
+/*
+ * svrule examples:
+ *
+ * * creatures 1:
+ * output:TRUE:input
+ *
+ * * creatures 2:
+ * random:0:chem 5:PLUS:state
+ * state:PLUS:type 0:MINUS:type 1
+ * input:TRUE:output:TRUE:suscept:move twrds:255:64
+ * suscept:TRUE:chem 0:TRUE:STW
+ *
+ * * canny:
+ * state:PLUS:state:PLUS:state
+ * type 0:TRUE:type 0:PLUS:type 1
+ *
+ */
+
+unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, unsigned int len) {
+	unsigned char state;
+
+	for (unsigned int i = 0; i < len; i++) {
+		switch (svrule[i]) {
+			case 0: // <end>
+				return state;
+
+			case 1: // 0
+				state = 0;
+				break;
+
+			case 2: // 1
+				state = 1;
+				break;
+
+			case 3: // 64
+				state = 64;
+				break;
+
+			case 4: // 255
+				state = 255;
+				break;
+
+			case 5: // chem0
+				break;
+
+			case 6: // chem1
+				break;
+
+			case 7: // chem2
+				break;
+
+			case 8: // chem3
+				break;
+
+			case 9: // state
+				state = cell->state;
+				break;
+
+			case 10: // output
+				break;
+
+			case 11: // thres
+				break;
+
+			case 12: // type0
+				break;
+
+			case 13: // type1
+				break;
+
+			case 14: // anded0
+				break;
+
+			case 15: // anded1
+				break;
+
+			case 16: // input
+				break;
+
+			case 17: // conduct
+				break;
+
+			case 18: // suscept
+				break;
+
+			case 19: // STW
+				break;
+
+			case 20: // LTW
+				break;
+
+			case 21: // strength
+				break;
+
+			case 22: // TRUE
+				if (!state) return 0;
+				break;
+
+			case 23: // PLUS
+				break;
+
+			case 24: // MINUS
+				break;
+
+			case 25: // TIMES
+				break;
+
+			case 26: // INCR
+				state++;
+				break;
+
+			case 27: // DECR
+				state--;
+				break;
+
+			case 28: // <unused>
+			case 29: // <unused>
+			case 30: // <error>
+				break;
+			
+			/* creatures 2 is different, we should probably remap at load time:
+			case 22: // 32
+			case 23: // 128
+			case 24: // rnd const
+			case 25: // chem4
+			case 26: // chem5
+			case 27: // leak in
+			case 28: // leak out
+			case 29: // curr src leak in
+			case 30: // TRUE
+			case 31: // PLUS
+			case 32: // MINUS
+			case 33: // TIMES
+			case 34: // INCR
+			case 35: // DECR
+			case 36: // FALSE
+			case 37: // multiply
+			case 38: // average
+			case 39: // move twrds
+			case 40: // random
+			case 41: // <error>*/
+		}
+	}
+
+	return state;
+}
+
 oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	assert(b);
 	parent = b;
