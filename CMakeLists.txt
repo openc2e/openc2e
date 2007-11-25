@@ -73,6 +73,7 @@ SET(OPENC2E_CORE
 	mmapifstream.cpp
 	mngfile.cpp
 	mngparser.tab.cpp
+	oldBrain.cpp
 	PathResolver.cpp
 	physics.cpp
 	PointerAgent.cpp
