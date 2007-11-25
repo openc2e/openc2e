@@ -261,7 +261,7 @@ void caosVM::c_NEW_COMP() {
 /**
  NEW: COMP (command) sprite_file (bareword) image_count (integer) first_image (integer) clone (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_NEW_COMP_c1
 */
 void caosVM::c_NEW_COMP_c1() {
