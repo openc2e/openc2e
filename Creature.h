@@ -178,6 +178,13 @@ public:
 	unsigned int getGait();
 };
 
+class c2Creature : public oldCreature {
+public:
+	c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	
+	unsigned int getGait();
+};
+
 // c2e
 
 struct c2eReaction {

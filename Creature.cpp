@@ -175,6 +175,16 @@ c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 	brain->init();
 }
 
+c2Creature::c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : oldCreature(g, is_female, _variant) {
+	assert(g->getVersion() == 1);
+
+	throw creaturesException("You can't create Creatures 2 creatures yet. Bug fuzzie."); // TODO
+
+	brain = new oldBrain(this);
+	processGenes();
+	brain->init();
+}
+
 c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
 	assert(g->getVersion() == 3);
 
@@ -215,6 +225,10 @@ unsigned int c1Creature::getGait() {
 			gait = i;
 
 	return gait;
+}
+
+unsigned int c2Creature::getGait() {
+	return 0; // TODO
 }
 
 void c1Creature::tick() {

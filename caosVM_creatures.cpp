@@ -21,6 +21,7 @@
 #include <iostream>
 #include "openc2e.h"
 #include "World.h"
+#include "Engine.h"
 #include "SkeletalCreature.h"
 #include "Creature.h"
 using std::cerr;
@@ -1047,7 +1048,7 @@ void caosVM::c_NEW_CREA() {
 /**
  NEW: CREA (command) moniker (integer) sex (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_NEW_CREA_c1
 
  Creates a new creature using the specified moniker for genetic data. sex is 0 for random, 1 for male or 2 for female.
@@ -1063,14 +1064,18 @@ void caosVM::c_NEW_CREA_c1() {
 	if (!genome)
 		throw creaturesException("failed to find genome file '" + realmoniker + '"');
 
-	caos_assert(genome->getVersion() == 1);
+	caos_assert(genome->getVersion() == engine.version);
 
 	// randomise sex if necessary
 	if (sex == 0) sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
 	caos_assert(sex == 1 || sex == 2); // TODO: correct?
 
 	// TODO: why do we even need to pass a variant here?
-	c1Creature *c = new c1Creature(genome, (sex == 2), 0);
+	oldCreature *c;
+	
+	if (engine.version == 1) c = new c1Creature(genome, (sex == 2), 0);
+	else c = new c2Creature(genome, (sex == 2), 0);
+
 	SkeletalCreature *a = new SkeletalCreature(4, c);
 	a->finishInit();
 	c->setAgent(a);

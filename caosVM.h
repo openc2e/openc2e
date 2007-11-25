@@ -725,6 +725,7 @@ public:
 	void c_NEWC();
 	void c_NEW_CREA();
 	void c_NEW_CREA_c1();
+	void c_NEW_CREA_c2();
 	void c_LTCY();
 	void c_MATE();
 	void v_DRV();
