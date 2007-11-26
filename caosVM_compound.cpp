@@ -60,7 +60,7 @@ void caosVM::v_PART() {
 /**
  NEW: PART (command) part (integer) x (integer) y (integer) first_image (integer) plane (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_NEW_PART() {
 	VM_PARAM_INTEGER(plane)

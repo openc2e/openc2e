@@ -747,6 +747,7 @@ void SFCFile::copyToWorld() {
 
 	// patch agents
 	// TODO: do we really need to do this, and if so, should it be done here?
+	// I like this for now because it makes debugging suck a lot less - fuzzie
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		boost::shared_ptr<Agent> a = (*i);
 
@@ -760,6 +761,18 @@ void SFCFile::copyToWorld() {
 				}
 			}
 			if (a->var[10].hasInt()) std::cout << "Warning: Couldn't patch Pitz!" << std::endl;
+		}
+	
+		// C2's bees
+		if (version() == 1 && a->family == 2 && a->genus == 17 && a->species == 2) {
+			// patch ov01 to actually refer to an agent
+			for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
+				if ((*i)->unid == (uint32)a->var[1].getInt()) {
+					a->var[1].setAgent((*i)->copiedAgent());
+					break;
+				}
+			}
+			if (a->var[1].hasInt()) std::cout << "Warning: Couldn't patch bee!" << std::endl;
 		}
 	}
 }
