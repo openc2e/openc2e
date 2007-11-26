@@ -435,6 +435,12 @@ void Agent::physicsTick() {
 
 	if (x == 0 && y == 0) return; // TODO: is this correct behaviour? :P
 
+	if (engine.version == 2) {
+		// Creatures 2 physics is different.
+		physicsTickC2();
+		return;
+	}
+
 	// set destination point based on velocities
 	float destx = x + velx.getFloat();
 	float desty = y + vely.getFloat();
@@ -570,6 +576,10 @@ void Agent::physicsTick() {
 		velx.setFloat(velx.getFloat() - (velx.getFloat() * (aero.getFloat() / 100.0f)));
 		vely.setFloat(vely.getFloat() - (vely.getFloat() * (aero.getFloat() / 100.0f)));
 	}
+}
+
+void Agent::physicsTickC2() {
+	// TODO
 }
 
 void Agent::tick() {

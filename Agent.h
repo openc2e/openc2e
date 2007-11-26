@@ -88,6 +88,7 @@ protected:
 	virtual bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
 
 	virtual void physicsTick();
+	void physicsTickC2();
 	
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 

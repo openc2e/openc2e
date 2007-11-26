@@ -928,13 +928,13 @@ void SFCCompoundObject::copyToWorld() {
 		a->var[i].setInt(variables[i]);
 
 	if (parent->version() == 1) {
-		a->perm = size; // TODO
+		a->size.setInt(size);
 		a->thrt.setInt(threat);
 		a->range.setInt(range);
 		a->accg.setInt(accg);
 		a->velx.setInt(velx);
 		a->vely.setInt(vely);
-		a->elas = rest; // TODO
+		a->rest.setInt(rest);
 		a->aero.setInt(aero);
 		a->paused = frozen; // TODO
 	}
@@ -1004,13 +1004,13 @@ void SFCSimpleObject::copyToWorld() {
 		a->var[i].setInt(variables[i]);
 	
 	if (parent->version() == 1) {
-		a->perm = size; // TODO
+		a->size.setInt(size);
 		a->thrt.setInt(threat);
 		a->range.setInt(range);
 		a->accg.setInt(accg);
 		a->velx.setInt(velx);
 		a->vely.setInt(vely);
-		a->elas = rest; // TODO
+		a->rest.setInt(rest);
 		a->aero.setInt(aero);
 		a->paused = frozen; // TODO
 	}
