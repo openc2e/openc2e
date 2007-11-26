@@ -78,9 +78,9 @@ bool caosVar::operator == (const caosVar &v) const {
 		// TODO: do this for >/< too?
 
 		if (this->hasInt() && this->getInt() == 0 && v.hasAgent()) {
-			return v.getAgent();
+			return !(v.getAgent());
 		} else if (v.hasInt() && v.getInt() == 0 && this->hasAgent()) {
-			return this->getAgent();
+			return !(this->getAgent());
 		}
 	}
 
