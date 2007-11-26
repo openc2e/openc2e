@@ -45,12 +45,25 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	initialized = true;
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
-	accg = 0.3f;
-	aero = 0;
-	elas = 0;
-	perm = 50; // TODO: correct default?
+
+	if (engine.version == 2) {
+		accg = 10;
+		aero = 20;
+		rest = 40;
+		
+		size = 127; // TODO: correct default?
+		thrt = 0;
+		// grav?
+	} else if (engine.version > 2) {
+		accg = 0.3f;
+		aero = 0;
+		elas = 0;
+
+		perm = 50; // TODO: correct default?
+		falling = true;
+	}
+	
 	range = 500;
-	falling = true;
 
 	// TODO: is this the correct default?
 	clac[0] = 0; // message# for activate 1
