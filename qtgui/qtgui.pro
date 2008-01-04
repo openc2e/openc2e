@@ -72,6 +72,7 @@ LIBS += -lboost_thread-mt -lboost_program_options-mt -lboost_serialization-mt -l
         ../mmapifstream.o \
         ../mngfile.o \
         ../mngparser.tab.o \
+	../oldBrain.o \
 	../OpenALBackend.o \
         ../PathResolver.o \
         ../physics.o \

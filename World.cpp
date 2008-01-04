@@ -599,7 +599,7 @@ boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef a
 }
 
 int World::findCategory(unsigned char family, unsigned char genus, unsigned short species) {
-	caos_assert(catalogue.hasTag("Agent Classifiers"));
+	if (!catalogue.hasTag("Agent Classifiers")) return -1;
 
 	const std::vector<std::string> &t = catalogue.getTag("Agent Classifiers");
 
