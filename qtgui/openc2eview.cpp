@@ -59,6 +59,8 @@ boost::shared_ptr<class Backend> openc2eView::getBackend() {
 
 void openc2eView::resizeEvent(QResizeEvent *) {
 #ifdef Q_WS_X11
+	((QApplication *)QApplication::instance())->syncX();
+
 	std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport()->winId());
 	putenv((char *)windowidstr.c_str());
 
