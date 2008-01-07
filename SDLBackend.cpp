@@ -36,8 +36,6 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 }
 
 void SDLBackend::init() {
-	networkingup = false;
-
 	int init = SDL_INIT_VIDEO;
 
 	if (SDL_Init(init) < 0)

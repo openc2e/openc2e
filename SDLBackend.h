@@ -53,7 +53,7 @@ protected:
 	int translateKey(int key);
 
 public:
-	SDLBackend() { }
+	SDLBackend() { networkingup = false; }
 	
 	void init();
 	int networkInit();

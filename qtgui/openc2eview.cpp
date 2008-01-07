@@ -212,6 +212,8 @@ void openc2eView::keyReleaseEvent(QKeyEvent *k) {
 }
 
 void openc2eView::scrollContentsBy(int dx, int dy) {
+	(void)dx;
+	(void)dy;
 	world.camera.moveTo(horizontalScrollBar()->value(), verticalScrollBar()->value());
 }
 
