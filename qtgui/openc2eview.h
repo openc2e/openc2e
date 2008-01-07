@@ -22,11 +22,13 @@
 #include <deque>
 #include <boost/shared_ptr.hpp>
 
-class openc2eView : public QWidget {
+#include <QAbstractScrollArea>
+
+class openc2eView : public QAbstractScrollArea {
 	Q_OBJECT
 
 public:
-	openc2eView(QWidget *parent, Qt::WFlags flags = 0);
+	openc2eView(QWidget *parent);
 	~openc2eView();
 
 protected:
@@ -44,6 +46,8 @@ protected:
 	
 	void keyPressEvent(QKeyEvent *k);
 	void keyReleaseEvent(QKeyEvent *k);
+
+	void scrollContentsBy(int dx, int dy);
 
 	// variables
 	boost::shared_ptr<class QtBackend> backend;

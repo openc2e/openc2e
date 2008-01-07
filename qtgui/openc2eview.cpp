@@ -15,6 +15,7 @@
 */
 
 #include "../World.h"
+#include "../MetaRoom.h"
 #include "openc2eview.h"
 #include <QtGui>
 #include <boost/format.hpp>
@@ -29,11 +30,11 @@
  *
  */
 
-openc2eView::openc2eView(QWidget *parent, Qt::WFlags flags) : QWidget(parent, flags) {
+openc2eView::openc2eView(QWidget *parent) : QAbstractScrollArea(parent) {
 	backend = boost::shared_ptr<Backend>(new QtBackend());
 
-	setAttribute(Qt::WA_PaintOnScreen); // disable double-buffering
-	setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background
+	viewport()->setAttribute(Qt::WA_PaintOnScreen); // disable double-buffering
+	viewport()->setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background
 
 	// keyboard focus. needed? better way?
 	setFocusPolicy(Qt::StrongFocus);
@@ -58,7 +59,7 @@ boost::shared_ptr<class Backend> openc2eView::getBackend() {
 
 void openc2eView::resizeEvent(QResizeEvent *) {
 #ifdef Q_WS_X11
-	std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % winId());
+	std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport()->winId());
 	putenv((char *)windowidstr.c_str());
 
 	// TODO: make init() not resize itself?
@@ -76,6 +77,13 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 	e.x = width();
 	e.y = height();
 	backend->pushEvent(e);
+
+	if (world.map.getFallbackMetaroom()) {
+		horizontalScrollBar()->setRange(0,world.camera.getMetaRoom()->width());
+		verticalScrollBar()->setRange(0,world.camera.getMetaRoom()->height() - height());
+	}
+	horizontalScrollBar()->setPageStep(width());
+	verticalScrollBar()->setPageStep(height());
 }
 
 void openc2eView::paintEvent(QPaintEvent *) {
@@ -107,7 +115,7 @@ void openc2eView::mouseEvent(QMouseEvent *m, eventtype t) {
 	e.y = m->y();
 	switch (m->button()) {
 		case Qt::LeftButton: e.button = buttonleft; break;
-		case Qt::MidButton: e.button = buttonright; break;
+		case Qt::MidButton: e.button = buttonmiddle; break;
 		case Qt::RightButton: e.button = buttonright; break;
 		default: return;
 	}
@@ -201,6 +209,10 @@ void openc2eView::keyReleaseEvent(QKeyEvent *k) {
 	}
 }
 
+void openc2eView::scrollContentsBy(int dx, int dy) {
+	world.camera.moveTo(horizontalScrollBar()->value(), verticalScrollBar()->value());
+}
+
 bool QtBackend::pollEvent(SomeEvent &e) {
 	if (events.size() == 0)
 		return false;
@@ -217,4 +229,3 @@ void QtBackend::pushEvent(SomeEvent e) {
 bool QtBackend::keyDown(int key) {
 	return downkeys[key];
 }
-

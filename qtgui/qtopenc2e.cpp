@@ -14,11 +14,13 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "../World.h"
 #include "qtopenc2e.h"
 #include <QtGui>
 #include "openc2eview.h"
 #include "../Engine.h"
 #include "../OpenALBackend.h"
+#include "../MetaRoom.h"
 
 // Constructor which creates the main window.
 
@@ -31,6 +33,13 @@ QtOpenc2e::QtOpenc2e() {
 
 	// TODO: handle this?
 	/*if (!*/ engine.initialSetup() /*) return 0 */ ;
+
+	// this only works for C1 and C2
+	viewport->horizontalScrollBar()->setRange(0,world.camera.getMetaRoom()->width());
+	viewport->verticalScrollBar()->setRange(0,world.camera.getMetaRoom()->height());
+	int y = world.camera.getY();
+	viewport->horizontalScrollBar()->setValue(world.camera.getX());
+	viewport->verticalScrollBar()->setValue(y);
 
 	// idle timer
 	// TODO: should prbly have an every-X-seconds timer or a background thread to do this
@@ -88,6 +97,9 @@ QtOpenc2e::~QtOpenc2e() {
 
 void QtOpenc2e::tick() {
 	engine.tick();
+	int y = world.camera.getY();
+	viewport->horizontalScrollBar()->setValue(world.camera.getX());
+	viewport->verticalScrollBar()->setValue(y);
 	if (engine.done) close();
 }
 
