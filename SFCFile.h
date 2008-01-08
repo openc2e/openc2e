@@ -312,6 +312,7 @@ public:
 class SFCScenery : public SFCSimpleObject {
 public:
 	SFCScenery(SFCFile *p) : SFCSimpleObject(p) { }
+	void copyToWorld();
 };
 
 #endif

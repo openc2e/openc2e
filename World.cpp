@@ -247,7 +247,9 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 			if ((*i)->getParent() != theHand) {
 				SpritePart *s = dynamic_cast<SpritePart *>(*i);
 				if (s && s->isTransparent() && obey_all_transparency)
-					if (s->transparentAt(ax - s->x, ay - s->y))
+					// transparent parts in C1/C2 are scenery
+					// TODO: always true? you can't sekritly set parts to be transparent in C2?
+					if (engine.version < 3 || s->transparentAt(ax - s->x, ay - s->y))
 						continue;
 				if (needs_mouseable && !((*i)->getParent()->mouseable()))
 					continue;

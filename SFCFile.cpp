@@ -1085,6 +1085,13 @@ void SFCCallButton::copyToWorld() {
 	a->buttonid = liftid;
 }
 
+void SFCScenery::copyToWorld() {
+	SFCSimpleObject::copyToWorld();
+	SpritePart *p = dynamic_cast<SpritePart *>(ourAgent->part(0));
+	assert(p);
+	p->is_transparent = true;
+}
+
 #include <boost/format.hpp>
 #include <sstream>
 

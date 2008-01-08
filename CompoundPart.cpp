@@ -120,7 +120,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	pose = 0;
 	base = 0;
 	spriteno = firstimg;
-	is_transparent = true;
+	is_transparent = (engine.version > 2);
 	framerate = 1;
 	framedelay = 0;
 	draw_mirrored = false;
