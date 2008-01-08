@@ -64,6 +64,7 @@ public:
 
 	MetaRoom *metaRoomAt(unsigned int, unsigned int);
 	shared_ptr<Room> roomAt(float, float);
+	std::vector<shared_ptr<Room> > roomsAt(float, float);
 
 	bool collideLineWithRoomSystem(Point src, Point dest, shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm);
 	bool collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> room, shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm);

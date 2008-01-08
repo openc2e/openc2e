@@ -98,10 +98,21 @@ shared_ptr<Room> Map::roomAt(float _x, float _y) {
 	if (!m) return shared_ptr<Room>();
 	for (std::vector<shared_ptr<Room> >::iterator i = m->rooms.begin(); i != m->rooms.end(); i++) {
 		shared_ptr<Room> r = *i;
-//		std::cerr << (void *)r << " -> contains " << _x << "," << _y << std::endl;
 		if (r->containsPoint(_x, _y)) return r;
 	}
 	return shared_ptr<Room>();
+}
+
+std::vector<shared_ptr<Room> > Map::roomsAt(float _x, float _y) {
+	std::vector<shared_ptr<Room> > ourlist;
+	MetaRoom *m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
+	if (m) {
+		for (std::vector<shared_ptr<Room> >::iterator i = m->rooms.begin(); i != m->rooms.end(); i++) {
+			shared_ptr<Room> r = *i;
+			if (r->containsPoint(_x, _y)) ourlist.push_back(r);
+		}
+	}
+	return ourlist;
 }
 
 bool Map::collideLineWithRoomSystem(Point src, Point dest, shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm) {
