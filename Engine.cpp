@@ -104,18 +104,19 @@ void Engine::setBackend(shared_ptr<Backend> b) {
 
 std::string Engine::executeNetwork(std::string in) {
 	// now parse and execute the CAOS we obtained
+	caosVM vm(0); // needs to be outside 'try' so we can reset outputstream on exception
 	try {
 		std::istringstream s(in);
 		caosScript script(world.gametype, "<network>"); // XXX
 		script.parse(s);
 		script.installScripts();
-		caosVM vm(0);
 		std::ostringstream o;
 		vm.setOutputStream(o);
 		vm.runEntirely(script.installer);
 		vm.outputstream = 0; // otherwise would point to dead stack
 		return o.str();
 	} catch (std::exception &e) {
+		vm.outputstream = 0; // otherwise would point to dead stack
 		return std::string("### EXCEPTION: ") + e.what();
 	}
 }
