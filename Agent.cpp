@@ -841,6 +841,9 @@ bool Agent::beDropped() {
 	// TODO: this doesn't reorder children or anything..
 	setZOrder(zorder);
 
+	// TODO: no idea if this is right, it tries to re-enable gravity when dropping C2 agents
+	if (engine.version == 2) grav.setInt(1);
+
 	if (!invehicle) { // ie, we're not being dropped by a vehicle
 		// TODO: check for vehicles in a saner manner?
 		for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
@@ -879,7 +882,7 @@ void Agent::dropCarried(AgentRef a) {
 
 	// fire 'Lost Carried Agent'
 	if (engine.version >= 3)
-		queueScript(125, carrying); // TODO: is this the correct param?
+		queueScript(125, a); // TODO: is this the correct param?
 }
 
 void Agent::drop(AgentRef a) {
