@@ -579,7 +579,166 @@ void Agent::physicsTick() {
 }
 
 void Agent::physicsTickC2() {
-	// TODO
+	int dx = velx.getInt(), dy = vely.getInt();
+	int ourx = (int)x, oury = (int)y;
+
+	if (grav.getInt() != 0 && sufferphysics()) dy += accg.getInt();
+
+	grav.setInt(1);
+
+	if (dy == 0 && dx == 0) { // nothing to do
+		if (vely.getInt() == 0) {
+			// really no motion
+			grav.setInt(0);
+		} else {
+			// y motion cancelled by gravity
+			vely.setInt(vely.getInt() + accg.getInt());
+		}
+		return;
+	}
+
+	Point deltapt(0,0);
+	double delta = 1000000000;
+
+	bool collided = false;
+
+	/*if (family == 2 && genus == 13 && species == 4)
+		std::cout << "d:" << dx << "," << dy << std::endl;*/
+	if (suffercollisions()) {
+		for (unsigned int i = 0; i < 4; i++) {
+			Point src = boundingBoxPoint(i);
+
+			std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(src.x, src.y);
+
+			if (rooms.size() == 0) { // out of room system
+				if (!displaycore)
+					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
+				grav.setInt(0);
+				displaycore = true;
+				return;
+			}
+
+			shared_ptr<Room> room;
+
+			if (rooms.size() == 1) room = rooms[0];
+			else {
+				// TODO: pick the right metaroom
+				room = rooms[0];
+			}
+
+			bool steep = abs(dy) > abs(dx);
+
+			int signdx = dx < 0 ? -1 : 1;
+			int signdy = dy < 0 ? -1 : 1;
+
+			Line l(Point(0,0),Point(dx,dy));
+
+			Point lastpoint(0,0);
+
+			for (int loc = 0; loc <= abs(steep ? dy : dx); loc++) {
+				Point p = steep ? l.pointAtY(loc*signdy) : l.pointAtX(loc*signdx);
+				/*if (family == 2 && genus == 13 && species == 4)
+					std::cout << i << " p: " << p.x << "," << p.y << std::endl;*/
+				if (i == 0) { // left
+					if (src.x + p.x < room->x_left) {
+						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() == 0) { // out of room system
+							if (!displaycore)
+								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
+							grav.setInt(0);
+							displaycore = true;
+							return;
+						}
+						room = rooms[0];
+					}
+				} else if (i == 1) { // right
+					if (src.x + p.x > room->x_right) {
+						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() == 0) { // out of room system
+							if (!displaycore)
+								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
+							grav.setInt(0);
+							displaycore = true;
+							return;
+						}
+						room = rooms[0];
+					}
+				} else if (i == 2) { // up
+					if (src.y + p.y < room->y_left_ceiling) {
+						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() == 0) { // out of room system
+							if (!displaycore)
+								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
+							grav.setInt(0);
+							displaycore = true;
+							return;
+						}
+						room = rooms[0];
+					}
+				} else { // down
+					if (room->floorpoints.size() == 0 && src.y + p.y > room->y_left_floor) {
+						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() == 0) { // out of room system
+							if (!displaycore)
+								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
+							grav.setInt(0);
+							displaycore = true;
+							return;
+						}
+						room = rooms[0];
+					}
+					for (int j = 1; j < room->floorpoints.size(); j++) {
+						if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
+						if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
+						Point roomtl(room->x_left, room->y_left_ceiling);
+						unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
+						Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
+											 Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
+						// TODO: consider steep floors
+						/*if (family == 2 && genus == 13 && species == 4) {
+							std::cout << src.y + p.y - roomtl.y << " > " << floor.pointAtX(src.x + p.x - roomtl.x).y << std::endl;
+							std::cout << "floor: " << floor.getStart().x << "," << floor.getStart().y << " - " <<
+								floor.getEnd().x << "," << floor.getEnd().y << std::endl;
+							std::cout << "agent: " << src.x + p.x - roomtl.x << "," << src.y + p.y - roomtl.y << std::endl;
+						}*/
+						if (src.y + p.y - roomtl.y > floor.pointAtX(src.x + p.x - roomtl.x).y) {
+							collided = true;
+							goto finished;
+						}
+					}
+				}
+				lastpoint = p;
+			}
+finished:
+			double length2 = lastpoint.x * lastpoint.x + lastpoint.y * lastpoint.y;
+			if (length2 < delta) {
+				deltapt = lastpoint;
+				delta = length2;
+			}
+		}
+	} else {
+		deltapt.x = dx;
+		deltapt.y = dy;
+	}
+	/*if (family == 2 && genus == 13 && species == 4)
+		std::cout << "final delta: " << deltapt.x << "," << deltapt.y << std::endl;*/
+	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
+		grav.setInt(0);
+		velx.setInt(0);
+		vely.setInt(0);
+	} else {
+		if (collided) {
+			lastcollidedirection = 3;
+			queueScript(6,0);
+		}
+		x += (int)deltapt.x;
+		y += (int)deltapt.y;
+		if (sufferphysics()) {
+			vely.setInt(vely.getInt() + accg.getInt());
+			vely.setInt(vely.getInt() - (aero.getInt() * vely.getInt()) / 100);
+			velx.setInt(velx.getInt() - (aero.getInt() * velx.getInt()) / 100);
+		}
+	}
 }
 
 void Agent::tick() {
