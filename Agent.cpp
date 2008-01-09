@@ -578,6 +578,30 @@ void Agent::physicsTick() {
 	}
 }
 
+shared_ptr<Room> Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigned int direction) {
+	std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(tryx, tryy);
+
+	if (rooms.size() == 0) return shared_ptr<Room>();
+	if (rooms.size() == 1) return rooms[0];
+	else {
+		unsigned int j;
+		for (j = 0; j < rooms.size(); j++) {
+			if (direction == 0) { // left
+				if (rooms[j]->x_left == tryx) break;
+			} else if (direction == 1) { // right
+				if (rooms[j]->x_right == tryx) break;
+			} else if (direction == 2) { // top
+				if (rooms[j]->y_left_ceiling == tryy) break;
+			} else { // down
+				if (rooms[j]->y_left_floor == tryy) break;
+			}
+		}
+		if (j == rooms.size()) j = 0;
+		return rooms[j];
+	}
+
+}
+
 void Agent::physicsTickC2() {
 	int dx = velx.getInt(), dy = vely.getInt();
 	int ourx = (int)x, oury = (int)y;
@@ -607,37 +631,17 @@ void Agent::physicsTickC2() {
 	if (suffercollisions()) {
 		for (unsigned int i = 0; i < 4; i++) {
 			Point src = boundingBoxPoint(i);
+	
+			shared_ptr<Room> room = bestRoomAt(src.x, src.y, i);
 
-			std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(src.x, src.y);
-
-			if (rooms.size() == 0) { // out of room system
+			if (!room) { // out of room system
 				if (!displaycore)
 					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
 				grav.setInt(0);
 				displaycore = true;
 				return;
 			}
-
-			shared_ptr<Room> room;
-
-			if (rooms.size() == 1) room = rooms[0];
-			else {
-				int j;
-				for (j = 0; j < rooms.size(); j++) {
-					if (i == 0) { // left
-						if (rooms[j]->x_left == src.x) break;
-					} else if (i == 1) { // right
-						if (rooms[j]->x_right == src.x) break;
-					} else if (i == 2) { // top
-						if (rooms[j]->y_left_ceiling == src.y) break;
-					} else { // down
-						if (rooms[j]->y_left_floor == src.y) break;
-					}
-				}
-				if (j == rooms.size()) j = 0;
-				room = rooms[j];
-			}
-
+		
 			bool steep = abs(dy) > abs(dx);
 
 			int signdx = dx < 0 ? -1 : 1;
@@ -653,65 +657,61 @@ void Agent::physicsTickC2() {
 					std::cout << i << " p: " << p.x << "," << p.y << std::endl;*/
 				if (i == 0) { // left
 					if (src.x + p.x < room->x_left) {
-						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
-						if (rooms.size() > 1) std::cout << "hrm\n";
-						if (rooms.size() == 0) { // out of room system
+						shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
+						if (!newroom) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
 							grav.setInt(0);
 							displaycore = true;
 							return;
 						}
-						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
-						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
-						room = rooms[0];
+						if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
+						room = newroom;
 					}
 				} else if (i == 1) { // right
 					if (src.x + p.x > room->x_right) {
-						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
-						if (rooms.size() > 1) std::cout << "hrm\n";
-						if (rooms.size() == 0) { // out of room system
+						shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
+						if (!newroom) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
 							grav.setInt(0);
 							displaycore = true;
 							return;
 						}
-						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
-						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
-						room = rooms[0];
+						if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
+						room = newroom;
 					}
 				} else if (i == 2) { // up
 					if (src.y + p.y < room->y_left_ceiling) {
-						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
-						if (rooms.size() > 1) std::cout << "hrm\n";
-						if (rooms.size() == 0) { // out of room system
+						shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
+						if (!newroom) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
 							grav.setInt(0);
 							displaycore = true;
 							return;
 						}
-						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
-						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
-						room = rooms[0];
+						if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
+						room = newroom;
 					}
 				} else { // down
 					if (room->floorpoints.size() == 0 && src.y + p.y > room->y_left_floor) {
-						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
-						if (rooms.size() > 1) std::cout << "hrm\n";
-						if (rooms.size() == 0) { // out of room system
+						shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
+						if (!newroom) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
 							grav.setInt(0);
 							displaycore = true;
 							return;
 						}
-						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
-						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
-						room = rooms[0];
+						if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
+						room = newroom;
 					}
-					for (int j = 1; j < room->floorpoints.size(); j++) {
+					for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
 						if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
 						if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
 						Point roomtl(room->x_left, room->y_left_ceiling);
