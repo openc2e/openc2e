@@ -722,15 +722,15 @@ finished:
 	}
 	/*if (family == 2 && genus == 13 && species == 4)
 		std::cout << "final delta: " << deltapt.x << "," << deltapt.y << std::endl;*/
+	if (collided && (velx.getInt() != 0 || vely.getInt() != 0)) {
+		lastcollidedirection = 3;
+		queueScript(6,0);
+	}
 	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
 		grav.setInt(0);
 		velx.setInt(0);
 		vely.setInt(0);
 	} else {
-		if (collided) {
-			lastcollidedirection = 3;
-			queueScript(6,0);
-		}
 		x += (int)deltapt.x;
 		y += (int)deltapt.y;
 		if (sufferphysics()) {
