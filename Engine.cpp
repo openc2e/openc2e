@@ -17,6 +17,7 @@
  *
  */
 
+#include "Room.h"
 #include "Engine.h"
 #include "World.h"
 #include "MetaRoom.h"
@@ -408,6 +409,8 @@ void Engine::handleMouseButton(SomeEvent &event) {
 			}
 		}
 	} else if (event.button == buttonmiddle) {
+		std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(event.x + world.camera.getX(), event.y + world.camera.getY());
+		if (rooms.size() > 0) std::cout << "Room at cursor is " << rooms[0]->id << std::endl;
 		Agent *a = world.agentAt(event.x + world.camera.getX(), event.y + world.camera.getY(), true);
 		if (a)
 			std::cout << "Agent under mouse is " << a->identify();
