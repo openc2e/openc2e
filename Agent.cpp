@@ -622,8 +622,20 @@ void Agent::physicsTickC2() {
 
 			if (rooms.size() == 1) room = rooms[0];
 			else {
-				// TODO: pick the right metaroom
-				room = rooms[0];
+				int j;
+				for (j = 0; j < rooms.size(); j++) {
+					if (i == 0) { // left
+						if (rooms[j]->x_left == src.x) break;
+					} else if (i == 1) { // right
+						if (rooms[j]->x_right == src.x) break;
+					} else if (i == 2) { // top
+						if (rooms[j]->y_left_ceiling == src.y) break;
+					} else { // down
+						if (rooms[j]->y_left_floor == src.y) break;
+					}
+				}
+				if (j == rooms.size()) j = 0;
+				room = rooms[j];
 			}
 
 			bool steep = abs(dy) > abs(dx);
@@ -642,6 +654,7 @@ void Agent::physicsTickC2() {
 				if (i == 0) { // left
 					if (src.x + p.x < room->x_left) {
 						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() > 1) std::cout << "hrm\n";
 						if (rooms.size() == 0) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
@@ -649,11 +662,14 @@ void Agent::physicsTickC2() {
 							displaycore = true;
 							return;
 						}
+						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
 						room = rooms[0];
 					}
 				} else if (i == 1) { // right
 					if (src.x + p.x > room->x_right) {
 						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() > 1) std::cout << "hrm\n";
 						if (rooms.size() == 0) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
@@ -661,11 +677,14 @@ void Agent::physicsTickC2() {
 							displaycore = true;
 							return;
 						}
+						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
 						room = rooms[0];
 					}
 				} else if (i == 2) { // up
 					if (src.y + p.y < room->y_left_ceiling) {
 						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() > 1) std::cout << "hrm\n";
 						if (rooms.size() == 0) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
@@ -673,11 +692,14 @@ void Agent::physicsTickC2() {
 							displaycore = true;
 							return;
 						}
+						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
 						room = rooms[0];
 					}
 				} else { // down
 					if (room->floorpoints.size() == 0 && src.y + p.y > room->y_left_floor) {
 						rooms = world.map.roomsAt(src.x + p.x, src.y + p.y);
+						if (rooms.size() > 1) std::cout << "hrm\n";
 						if (rooms.size() == 0) { // out of room system
 							if (!displaycore)
 								unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
@@ -685,6 +707,8 @@ void Agent::physicsTickC2() {
 							displaycore = true;
 							return;
 						}
+						if (room->doors.find(rooms[0]) == room->doors.end()) { collided = true; break; }
+						if (size.getInt() > room->doors[rooms[0]]->perm) { collided = true; break; }
 						room = rooms[0];
 					}
 					for (int j = 1; j < room->floorpoints.size(); j++) {
@@ -712,6 +736,7 @@ void Agent::physicsTickC2() {
 finished:
 			double length2 = lastpoint.x * lastpoint.x + lastpoint.y * lastpoint.y;
 			if (length2 < delta) {
+				lastcollidedirection = i;
 				deltapt = lastpoint;
 				delta = length2;
 			}
@@ -723,7 +748,6 @@ finished:
 	/*if (family == 2 && genus == 13 && species == 4)
 		std::cout << "final delta: " << deltapt.x << "," << deltapt.y << std::endl;*/
 	if (collided && (velx.getInt() != 0 || vely.getInt() != 0)) {
-		lastcollidedirection = 3;
 		queueScript(6,0);
 	}
 	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
