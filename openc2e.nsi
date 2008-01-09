@@ -3,7 +3,7 @@
 !define APPNAMEANDVERSION "openc2e (development build)"
 
 ; Development build revision
-!define REVISION "1323"
+!define REVISION "1438"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
@@ -27,7 +27,7 @@ SetCompressor lzma
 !define MUI_DIRECTORYPAGE
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "lgpl.txt"
+!insertmacro MUI_PAGE_LICENSE "COPYING"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -135,17 +135,27 @@ Section "openc2e" Main
 	; Set Section Files and Shortcuts
 	SetOutPath "$INSTDIR\"
 	File "Release\openc2e.exe"
-	File "gamefinder.exe"
 	File "Release\SDL.dll"
 	File "Release\SDL_mixer.dll"
 	File "Release\SDL_net.dll"
 	File "Release\zlib1.dll"
-	File "tools\braininavat\Brain-in-a-vat\Release\Brain-in-a-vat.exe"
-	File "C:\qt\4.2.3\lib\QtCore4.dll"
-	File "C:\qt\4.2.3\lib\QtGui4.dll"
+	File "Release\QtCore4.dll"
+	File "Release\QtGui4.dll"
+	File "Release\QtNetwork4.dll"
 	File "Release\alut.dll"
+	
+	;OpenAL installer
+	File "Release\oalinst.exe"
+	
+	File "tools\braininavat\Brain-in-a-vat\Release\Brain-in-a-vat.exe"
+	File "tools\debugkit\DebugKit\release\DebugKit.exe"
+	File "gamefinder.exe"
+	
+	CreateDirectory "$SMPROGRAMS\openc2e\Tools"
+	CreateDirectory "$SMPROGRAMS\openc2e\Games"
 	CreateDirectory "$SMPROGRAMS\openc2e"
-	CreateShortCut "$SMPROGRAMS\openc2e\Brain-in-a-Vat Tool.lnk" "$INSTDIR\Brain-in-a-vat.exe" 
+	CreateShortCut "$SMPROGRAMS\openc2e\Tools\Brain-in-a-Vat.lnk" "$INSTDIR\Brain-in-a-vat.exe"
+	CreateShortCut "$SMPROGRAMS\openc2e\Tools\Debug Kit.lnk" "$INSTDIR\DebugKit.exe"
 	CreateShortCut "$SMPROGRAMS\openc2e\Update Game Shortcuts.lnk" "$INSTDIR\gamefinder.exe"
 	CreateShortCut "$SMPROGRAMS\openc2e\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 	
@@ -157,6 +167,11 @@ Section -FinishSection
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString" "$INSTDIR\uninstall.exe"
 	WriteUninstaller "$INSTDIR\uninstall.exe"
+	
+	;Run the OpenAL installer silently
+	DetailPrint "Installing OpenAL sound library..."
+	ExecWait '"$INSTDIR\oalinst.exe" /s'
+	Delete "$INSTDIR\oalinst.exe"
 	
 	;Run the shortcut-maker
 	MessageBox MB_YESNO 'Look for installed Creatures games now? $\rIf you choose to wait, you can run "Update Game Shortcuts" from the start menu later.' IDYES run
@@ -185,6 +200,8 @@ Section Uninstall
 	!insertmacro RemoveFilesAndSubDirs "$SMPROGRAMS\${APPNAME}\"
 
 	; Remove remaining directories
+	RMDir "$SMPROGRAMS\openc2e\Tools"
+	RMDir "$SMPROGRAMS\openc2e\Games"
 	RMDir "$SMPROGRAMS\openc2e"
 	RMDir "$INSTDIR\"
 

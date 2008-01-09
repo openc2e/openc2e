@@ -3,8 +3,8 @@
  *  openc2e
  *
  *  Created by Alyssa Milburn on Wed 02 Jun 2004.
- *  Copyright (c) 2004-2006 Alyssa Milburn. All rights reserved.
- *  Copyright (c) 2005-2006 Bryan Donlan. All rights reserved.
+ *  Copyright (c) 2004-2008 Alyssa Milburn. All rights reserved.
+ *  Copyright (c) 2005-2008 Bryan Donlan. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@
 
 extern "C" int main(int argc, char *argv[]) {
 	try {
-		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2007 Alyssa Milburn and others\n\n";
+		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n";
 
 		engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
 #ifdef OPENAL_SUPPORT

@@ -3,7 +3,7 @@
  *  openc2e
  *
  *  Created by Alyssa Milburn on Tue May 25 2004.
- *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
+ *  Copyright (c) 2004-2008 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
