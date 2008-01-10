@@ -767,8 +767,12 @@ void Agent::physicsTickC2() {
 		y += (int)deltapt.y;
 		if (sufferphysics()) {
 			vely.setInt(vely.getInt() + accg.getInt());
-			vely.setInt(vely.getInt() - (aero.getInt() * vely.getInt()) / 100);
-			velx.setInt(velx.getInt() - (aero.getInt() * velx.getInt()) / 100);
+			int fricx = (aero.getInt() * velx.getInt()) / 100;
+			int fricy = (aero.getInt() * vely.getInt()) / 100;
+			if (abs(velx.getInt()) > 0 && fricx == 0) fricx = (velx.getInt() < 0) ? -1 : 1;
+			if (abs(vely.getInt()) > 0 && fricy == 0) fricy = (vely.getInt() < 0) ? -1 : 1;
+			velx.setInt(velx.getInt() - fricx);
+			vely.setInt(vely.getInt() - fricy);
 		}
 	}
 }
