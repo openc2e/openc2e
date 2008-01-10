@@ -752,6 +752,10 @@ void Agent::physicsTickC2() {
 	}
 	
 	if (collided && (velx.getInt() != 0 || vely.getInt() != 0)) {
+		if (lastcollidedirection >= 2) // up and down
+			vely.setInt(-(vely.getInt() - (rest.getInt() * vely.getInt()) / 100));
+		else
+			velx.setInt(-(velx.getInt() - (rest.getInt() * velx.getInt()) / 100));
 		queueScript(6,0);
 	}
 	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
