@@ -66,12 +66,27 @@ void OpenALBackend::init() {
 	alGetError();
 	alutGetError();
 
-	if (!alutInit(NULL, NULL)) {
+	if (!alutInitWithoutContext(NULL, NULL)) {
 		ALenum err = alutGetError();
 		throw creaturesException(boost::str(
 			boost::format("Failed to init OpenAL/ALUT: %s") % alutGetErrorString(err)
 		));
 	}
+
+	// It seems that relying on hardware drivers is an awful idea - always use software if it's available.
+	// TODO: we should probably store this so we can (eventually) close stuff properly
+	ALCdevice *device = alcOpenDevice("Generic Software");
+	if (!device) {
+		device = alcOpenDevice(NULL);
+		if (!device) {
+			al_throw_maybe();
+		}
+	}
+	ALCcontext *context = alcCreateContext(device, NULL);
+	if (!context) {
+		al_throw_maybe();
+	}
+	alcMakeContextCurrent(context);
 
 	setMute(false);
 
