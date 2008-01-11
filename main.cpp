@@ -26,10 +26,6 @@
 #include "NullBackend.h"
 #include "OpenALBackend.h"
 
-#if defined(_MSC_VER) && defined(_DEBUG)
-#undef main // because SDL is stupid
-#endif
-
 #ifdef _WIN32
 #include <shlobj.h>
 #endif
