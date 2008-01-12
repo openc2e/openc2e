@@ -632,61 +632,74 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 		p.y = (int)p.y;
 
 		bool endofroom = false;
-		
-		if (i == 0) { // left
-			if (src.x + p.x < room->x_left) {
-				endofroom = true;
-			}
-		} else if (i == 1) { // right
-			if (src.x + p.x > room->x_right) {
-				endofroom = true;
-			}
-		} else if (i == 2) { // up
-			if (src.y + p.y < room->y_left_ceiling) {
-				endofroom = true;
-			}
-		} else { // down
-			if (room->floorpoints.size() == 0 && src.y + p.y > room->y_left_floor) {
-				endofroom = true;
-			} else {
-				for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
-					if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
-					if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
-					Point roomtl(room->x_left, room->y_left_ceiling);
-					unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
-					Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
-							Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
-					// TODO: consider steep floors
-					if (src.y + p.y - roomtl.y > (int)floor.pointAtX(src.x + p.x - roomtl.x).y) {
-						collided = true;
-						goto finished;
+	
+		switch (i) {
+			case 0: // left
+				if (src.x + p.x < room->x_left)
+					endofroom = true;
+				break;
+
+			case 1: // right
+				if (src.x + p.x > room->x_right)
+					endofroom = true;
+				break;
+
+			case 2: // up
+				if (src.y + p.y < room->y_left_ceiling)
+					endofroom = true;
+				break;
+
+			case 3: // down
+				if (src.y + p.y > room->y_left_floor) {
+					endofroom = true;
+				} else {
+					for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
+						// pick the floor point which is at our current x location
+						if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
+						if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
+
+						// top-left of room
+						Point roomtl(room->x_left, room->y_left_ceiling);
+						// height of room
+						unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
+						// construct a line to represent the floor at this point
+						Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
+								Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
+
+						// TODO: consider steep floors
+						if (src.y + p.y - roomtl.y > (int)floor.pointAtX(src.x + p.x - roomtl.x).y) {
+							collided = true;
+							goto finished;
+						}
 					}
 				}
-			}
+				break;
+
+			default:
+				assert(false);
 		}
 
 		// find the next room, if necessary, and work out whether we should move into it or break out
 		if (endofroom) {
 			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
 
-			if (!newroom) { // out of room system
-				if (!displaycore)
-					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
-				grav.setInt(0);
-				displaycore = true;
-				return;
-			}
+			// collide if we're out of the room system
+			if (!newroom) {	collided = true; break; }
+			// collide if there's no new room connected to this one
 			if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
+			// collide if the PERM between this room and the new room is smaller than or equal to our size
 			if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
+
+			// move to the new room and keep going!
 			room = newroom;
 		}
 
 		lastpoint = p;
 	}
 finished:
-	double length2 = lastpoint.x * lastpoint.x + lastpoint.y * lastpoint.y;
+	double length2 = (lastpoint.x * lastpoint.x) + (lastpoint.y * lastpoint.y);
 	if (length2 < delta) {
-		lastcollidedirection = i;
+		if (collided) lastcollidedirection = i;
 		deltapt = lastpoint;
 		delta = length2;
 	}
