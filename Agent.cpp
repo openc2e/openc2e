@@ -578,14 +578,18 @@ void Agent::physicsTick() {
 	}
 }
 
-shared_ptr<Room> Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigned int direction) {
+shared_ptr<Room> Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigned int direction, shared_ptr<Room> exclude) {
 	std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(tryx, tryy);
 
+	shared_ptr<Room> r;
+
 	if (rooms.size() == 0) return shared_ptr<Room>();
-	if (rooms.size() == 1) return rooms[0];
-	else {
+	if (rooms.size() == 1) r = rooms[0];
+	else if (rooms.size() > 1) {
 		unsigned int j;
 		for (j = 0; j < rooms.size(); j++) {
+			if (rooms[j] == exclude) continue;
+
 			if (direction == 0) { // left
 				if (rooms[j]->x_left == tryx) break;
 			} else if (direction == 1) { // right
@@ -597,9 +601,11 @@ shared_ptr<Room> Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigne
 			}
 		}
 		if (j == rooms.size()) j = 0;
-		return rooms[j];
+		r = rooms[j];
 	}
 
+	if (r == exclude) return shared_ptr<Room>();
+	else return r;
 }
 
 void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
@@ -607,7 +613,7 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 	src.x = (int)src.x;
 	src.y = (int)src.y;
 	
-	shared_ptr<Room> room = bestRoomAt(src.x, src.y, i);
+	shared_ptr<Room> room = bestRoomAt(src.x, src.y, i, shared_ptr<Room>());
 
 	if (!room) { // out of room system
 		if (!displaycore)
@@ -652,26 +658,6 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 			case 3: // down
 				if (src.y + p.y > room->y_left_floor) {
 					endofroom = true;
-				} else {
-					for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
-						// pick the floor point which is at our current x location
-						if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
-						if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
-
-						// top-left of room
-						Point roomtl(room->x_left, room->y_left_ceiling);
-						// height of room
-						unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
-						// construct a line to represent the floor at this point
-						Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
-								Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
-
-						// TODO: consider steep floors
-						if (src.y + p.y - roomtl.y > (int)floor.pointAtX(src.x + p.x - roomtl.x).y) {
-							collided = true;
-							goto finished;
-						}
-					}
 				}
 				break;
 
@@ -681,7 +667,7 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 
 		// find the next room, if necessary, and work out whether we should move into it or break out
 		if (endofroom) {
-			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
+			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i, room);
 
 			// collide if we're out of the room system
 			if (!newroom) {	collided = true; }
@@ -696,6 +682,28 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 
 			// move to the new room and keep going!
 			room = newroom;
+		}
+	
+		if (i == 3) {
+			for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
+				// pick the floor point which is at our current x location
+				if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
+				if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
+	
+				// top-left of room
+				Point roomtl(room->x_left, room->y_left_ceiling);
+				// height of room
+				unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
+				// construct a line to represent the floor at this point
+				Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
+					Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
+
+				// TODO: consider steep floors
+				if (src.y + p.y - roomtl.y > (int)floor.pointAtX(src.x + p.x - roomtl.x).y) {
+					collided = true;
+					goto finished;
+				}
+			}
 		}
 
 		lastpoint = p;

@@ -203,7 +203,7 @@ public:
 	unsigned int getHeight() { return part(0)->getHeight(); }
 	Point boundingBoxPoint(unsigned int n);
 	static Point boundingBoxPoint(unsigned int n, Point p, unsigned int w, unsigned int h);
-	shared_ptr<class Room> bestRoomAt(unsigned int x, unsigned int y, unsigned int direction);
+	shared_ptr<class Room> bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, shared_ptr<Room> exclude);
 	void findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
 
 	virtual void tick();
