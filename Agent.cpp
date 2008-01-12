@@ -630,83 +630,57 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 		Point p = steep ? l.pointAtY(loc*signdy) : l.pointAtX(loc*signdx);
 		p.x = (int)p.x;
 		p.y = (int)p.y;
+
+		bool endofroom = false;
 		
 		if (i == 0) { // left
 			if (src.x + p.x < room->x_left) {
-				shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
-				if (!newroom) { // out of room system
-					if (!displaycore)
-						unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
-					grav.setInt(0);
-					displaycore = true;
-					return;
-				}
-				if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
-				if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
-				room = newroom;
+				endofroom = true;
 			}
 		} else if (i == 1) { // right
 			if (src.x + p.x > room->x_right) {
-				shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
-				if (!newroom) { // out of room system
-					if (!displaycore)
-						unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
-					grav.setInt(0);
-					displaycore = true;
-					return;
-				}
-				if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
-				if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
-				room = newroom;
+				endofroom = true;
 			}
 		} else if (i == 2) { // up
 			if (src.y + p.y < room->y_left_ceiling) {
-				shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
-				if (!newroom) { // out of room system
-					if (!displaycore)
-						unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
-					grav.setInt(0);
-					displaycore = true;
-					return;
-				}
-				if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
-				if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
-				room = newroom;
+				endofroom = true;
 			}
 		} else { // down
 			if (room->floorpoints.size() == 0 && src.y + p.y > room->y_left_floor) {
-				shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
-				if (!newroom) { // out of room system
-					if (!displaycore)
-						unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
-					grav.setInt(0);
-					displaycore = true;
-					return;
-				}
-				if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
-				if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
-				room = newroom;
-			}
-			for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
-				if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
-				if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
-				Point roomtl(room->x_left, room->y_left_ceiling);
-				unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
-				Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
-						Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
-				// TODO: consider steep floors
-				/*if (family == 2 && genus == 13 && species == 4) {
-				  std::cout << src.y + p.y - roomtl.y << " > " << floor.pointAtX(src.x + p.x - roomtl.x).y << std::endl;
-				  std::cout << "floor: " << floor.getStart().x << "," << floor.getStart().y << " - " <<
-				  floor.getEnd().x << "," << floor.getEnd().y << std::endl;
-				  std::cout << "agent: " << src.x + p.x - roomtl.x << "," << src.y + p.y - roomtl.y << std::endl;
-				  }*/
-				if (src.y + p.y - roomtl.y > (int)floor.pointAtX(src.x + p.x - roomtl.x).y) {
-					collided = true;
-					goto finished;
+				endofroom = true;
+			} else {
+				for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
+					if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
+					if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
+					Point roomtl(room->x_left, room->y_left_ceiling);
+					unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
+					Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
+							Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
+					// TODO: consider steep floors
+					if (src.y + p.y - roomtl.y > (int)floor.pointAtX(src.x + p.x - roomtl.x).y) {
+						collided = true;
+						goto finished;
+					}
 				}
 			}
 		}
+
+		// find the next room, if necessary, and work out whether we should move into it or break out
+		if (endofroom) {
+			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
+
+			if (!newroom) { // out of room system
+				if (!displaycore)
+					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
+				grav.setInt(0);
+				displaycore = true;
+				return;
+			}
+			if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
+			if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
+			room = newroom;
+		}
+
 		lastpoint = p;
 	}
 finished:
