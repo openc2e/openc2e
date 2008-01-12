@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "openc2e.h"
 #include "Vehicle.h"
+#include "Blackboard.h"
 #include "PointerAgent.h"
 #include "SkeletalCreature.h"
 #include "World.h"
@@ -317,6 +318,27 @@ void caosVM::c_NEW_VHCL_c1() {
 	// TODO: should part be set here?
 }
 
+/**
+ NEW: BKBD (command) sprite_file (bareword) image_count (integer) first_image (integer) background_colour (integer) chalk_colour (integer) alias_colour (integer) textx (integer) texty (integer)
+ %status maybe
+ %pragma variants c1 c2
+*/
+void caosVM::c_NEW_BKBD() {
+	VM_PARAM_INTEGER(texty)
+	VM_PARAM_INTEGER(textx)
+	VM_PARAM_INTEGER(alias_colour)
+	VM_PARAM_INTEGER(chalk_colour)
+	VM_PARAM_INTEGER(background_colour)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
+
+	Blackboard *a = new Blackboard(sprite_file, first_image, image_count);
+	a->finishInit();
+	setTarg(a);
+
+	// TODO: actually initialise blackboard parameters
+}
 
 /**
  TARG (agent)

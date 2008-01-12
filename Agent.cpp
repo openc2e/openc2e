@@ -89,7 +89,10 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 void Agent::finishInit() {
 	// lc2e, at least, seems to position agents centered on (-9876,-9876) to begin with
 	// TODO: where should we place agents in other games? is this code right at all anyway?
-	x = -9876.0f + (getWidth() / 2.0f); y = -9876.0f + (getHeight() / 2.0f);
+	// (bear in mind that there are no parts present for some C1/C2 agents when finishInit is called, atm)
+	if (engine.version > 2) {
+		x = -9876.0f + (getWidth() / 2.0f); y = -9876.0f + (getHeight() / 2.0f);
+	}
 	
 	// shared_from_this() can only be used if these is at least one extant
 	// shared_ptr which owns this
