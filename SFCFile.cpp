@@ -922,6 +922,7 @@ void SFCCompoundObject::copyToWorld() {
 
 	// ticking
 	a->tickssincelasttimer = tickstate;
+	if (a->tickssincelasttimer == tickreset) a->tickssincelasttimer = 0;
 	a->timerrate = tickreset;
 	
 	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
@@ -998,6 +999,7 @@ void SFCSimpleObject::copyToWorld() {
 
 	// ticking
 	a->tickssincelasttimer = tickstate;
+	if (a->tickssincelasttimer == tickreset) a->tickssincelasttimer = 0;
 	a->timerrate = tickreset;
 	
 	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)

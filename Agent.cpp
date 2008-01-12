@@ -814,6 +814,7 @@ void Agent::tick() {
 			queueScript(9); // TODO: include this?
 			tickssincelasttimer = 0;
 		}
+		assert(timerrate > tickssincelasttimer);
 	}
 
 	// tick the agent VM
