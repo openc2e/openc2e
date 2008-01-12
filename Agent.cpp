@@ -687,7 +687,7 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 			room = newroom;
 		}
 	
-		if (i == 3) {
+		if (i == 3 && dy >= 0) { // TODO: Hack!
 			for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
 				// pick the floor point which is at our current x location
 				if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
@@ -701,8 +701,13 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 				Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
 					Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
 
+				// never collide when the top point of an object is below the floor.
+				Point top = boundingBoxPoint(2);
+
+				int floory = floor.pointAtX(src.x + p.x - roomtl.x).y + roomtl.y;
+
 				// TODO: consider steep floors
-				if (src.y + p.y - roomtl.y > (int)floor.pointAtX(src.x + p.x - roomtl.x).y) {
+				if (src.y + p.y > (int)floory && top.y < floory) {
 					collided = true;
 					goto finished;
 				}
