@@ -709,7 +709,11 @@ finished:
 void Agent::physicsTickC2() {
 	int dx = velx.getInt(), dy = vely.getInt();
 
-	if (grav.getInt() != 0 && sufferphysics()) dy += accg.getInt();
+	if (dx != 0 || dy != 0) grav.setInt(1);
+
+	if (grav.getInt() != 0 && sufferphysics()) {
+		dy += accg.getInt();
+	}
 
 	grav.setInt(1);
 
@@ -719,10 +723,11 @@ void Agent::physicsTickC2() {
 			grav.setInt(0);
 		} else {
 			// y motion cancelled by gravity
-			vely.setInt(vely.getInt() + accg.getInt());
+			vely.setInt(dy);
 		}
 		return;
 	}
+	vely.setInt(dy);
 
 	Point deltapt(0,0);
 	double delta = 1000000000;
@@ -753,7 +758,6 @@ void Agent::physicsTickC2() {
 		x += (int)deltapt.x;
 		y += (int)deltapt.y;
 		if (sufferphysics()) {
-			vely.setInt(vely.getInt() + accg.getInt());
 			int fricx = (aero.getInt() * velx.getInt()) / 100;
 			int fricy = (aero.getInt() * vely.getInt()) / 100;
 			if (abs(velx.getInt()) > 0 && fricx == 0) fricx = (velx.getInt() < 0) ? -1 : 1;
