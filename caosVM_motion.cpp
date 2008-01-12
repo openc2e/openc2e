@@ -115,7 +115,7 @@ void caosVM::v_VELY() {
 /**
  OBST (float) direction (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants cv c3
 
  Returns the distance from the TARG agent to the nearest wall that it might collide with in the given direction.
  (except right now it just gives the direction to the nearest wall at world edge - fuzzie)
@@ -162,6 +162,40 @@ void caosVM::v_OBST() {
 		case 2: result.setFloat(src.y - point.y); break;
 		case 3: result.setFloat(point.y - src.y); break;
 	}
+}
+
+/**
+ OBST (integer) direction (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::v_OBST_c2
+
+ Returns the distance from the TARG agent to the nearest wall that it might collide with in the given direction.
+*/
+void caosVM::v_OBST_c2() {
+	VM_PARAM_INTEGER(direction)
+	
+	valid_agent(targ);
+
+	int dx = 0, dy = 0;
+	switch (direction) {
+		case 0: dx = -10000; break; // left
+		case 1: dx = 10000; break; // right
+		case 2: dy = -10000; break; // up
+		case 3: dy = 10000; break; // down
+		default: caos_assert(false);
+	}
+
+	Point deltapt(0,0);
+	double delta = 1000000000;
+
+	bool collided = false;
+	targ->findCollisionInDirection(direction, dx, dy, deltapt, delta, collided, false);
+
+	if (!collided)
+		result.setInt(INT_MAX);
+	else
+		result.setInt(deltapt.x + deltapt.y); // only one will be set
 }
 
 /**

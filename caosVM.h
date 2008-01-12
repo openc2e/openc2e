@@ -587,6 +587,7 @@ public:
 	void v_VELX();
 	void v_VELY();
 	void v_OBST();
+	void v_OBST_c2();
 	void v_TMVB();
 	void v_TMVT();
 	void v_TMVF();

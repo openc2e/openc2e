@@ -602,7 +602,7 @@ shared_ptr<Room> Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigne
 
 }
 
-void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &deltapt, double &delta, bool &collided) {
+void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
 	Point src = boundingBoxPoint(i);
 	src.x = (int)src.x;
 	src.y = (int)src.y;
@@ -684,11 +684,15 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i);
 
 			// collide if we're out of the room system
-			if (!newroom) {	collided = true; break; }
+			if (!newroom) {	collided = true; }
 			// collide if there's no new room connected to this one
-			if (room->doors.find(newroom) == room->doors.end()) { collided = true; break; }
+			else if (room->doors.find(newroom) == room->doors.end()) { collided = true; }
 			// collide if the PERM between this room and the new room is smaller than or equal to our size
-			if (size.getInt() > room->doors[newroom]->perm) { collided = true; break; }
+			else if (size.getInt() > room->doors[newroom]->perm) { collided = true; }
+			
+			if (!followrooms) break;
+
+			if (collided) break;
 
 			// move to the new room and keep going!
 			room = newroom;
@@ -696,14 +700,15 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 
 		lastpoint = p;
 	}
+
 finished:
 	double length2 = (lastpoint.x * lastpoint.x) + (lastpoint.y * lastpoint.y);
 	if (length2 < delta) {
-		if (collided) lastcollidedirection = i;
+		// TODO: !followrooms is a horrible way to detect a non-physics call
+		if (collided && followrooms) lastcollidedirection = i;
 		deltapt = lastpoint;
 		delta = length2;
 	}
-
 }
 
 void Agent::physicsTickC2() {
@@ -736,7 +741,7 @@ void Agent::physicsTickC2() {
 
 	if (suffercollisions()) {
 		for (unsigned int i = 0; i < 4; i++) {
-			findCollisionInDirection(i, dx, dy, deltapt, delta, collided);
+			findCollisionInDirection(i, dx, dy, deltapt, delta, collided, true);
 		}
 	} else {
 		deltapt.x = dx;
