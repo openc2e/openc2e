@@ -13,6 +13,7 @@ OPENC2E_CORE = \
 	AgentHelpers.o \
 	AgentRef.o \
 	attFile.o \
+	Blackboard.o \
 	blkImage.o \
 	bytecode.o \
 	c16Image.o \

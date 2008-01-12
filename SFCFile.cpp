@@ -1033,6 +1033,17 @@ void SFCPointerTool::copyToWorld() {
 	// don't copy the cursor, for now at least :-)
 }
 
+#include "Blackboard.h"
+
+void SFCBlackboard::copyToWorld() {
+	ourAgent = new Blackboard(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	Blackboard *a = dynamic_cast<Blackboard *>(ourAgent);
+
+	SFCCompoundObject::copyToWorld();
+
+	// TODO: blackboard data
+}
+
 #include "Vehicle.h"
 
 void SFCVehicle::copyToWorld() {

@@ -248,6 +248,7 @@ public:
 
 	SFCBlackboard(SFCFile *p) : SFCCompoundObject(p) { }
 	void read();
+	void copyToWorld();
 };
 
 class SFCVehicle : public SFCCompoundObject {
