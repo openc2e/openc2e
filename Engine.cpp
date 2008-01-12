@@ -400,7 +400,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 				// TODO: some kind of "fail to drop" animation/sound?
 			}
 		} else {
-			Agent *a = world.agentAt(event.x + world.camera.getX(), event.y + world.camera.getY(), false, true);
+			Agent *a = world.agentAt(world.hand()->x, world.hand()->y, false, true);
 			if (a) {
 				a->queueScript(4, world.hand()); // pickup
 				
