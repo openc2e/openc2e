@@ -3,7 +3,7 @@
 !define APPNAMEANDVERSION "openc2e (development build)"
 
 ; Development build revision
-!define REVISION "1438"
+!define REVISION "1471"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
