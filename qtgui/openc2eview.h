@@ -18,7 +18,7 @@
 #define _OPENC2EVIEW_H
 
 #include <QWidget>
-#include "SDLBackend.h"
+#include "../SDLBackend.h"
 #include <deque>
 #include <boost/shared_ptr.hpp>
 
