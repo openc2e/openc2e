@@ -218,6 +218,9 @@ void openc2eView::scrollContentsBy(int dx, int dy) {
 }
 
 bool QtBackend::pollEvent(SomeEvent &e) {
+	// obtain events from backend
+	if (SDLBackend::pollEvent(e)) return true;
+
 	if (events.size() == 0)
 		return false;
 
