@@ -83,7 +83,6 @@ protected:
 	void updateAudio(boost::shared_ptr<class AudioSource>);
 	bool dying : 1;
 	
-	void unhandledException(std::string info, bool wasscript);
 	void vmTick();
 	virtual bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
 
@@ -209,6 +208,7 @@ public:
 	virtual void tick();
 	virtual void kill();
 	void stopScript();
+	void unhandledException(std::string info, bool wasscript);
 
 	bool validInRoomSystem();
 	static bool validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);

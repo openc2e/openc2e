@@ -63,7 +63,9 @@ bool CompoundPart::showOnRemoteCameras() {
 void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 	// TODO: we need a nicer way to handle such errors
 	if (getCurrentSprite() >= getSprite()->numframes()) {
-		std::cout << parent->identify() << " has bad firstimg/base/pose " << firstimg << "/" << base << "/" << pose << " for sprite '" << getSprite()->name << "'!" << std::endl;
+		std::string err = boost::str(boost::format("pose to be rendered %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
+			pose % firstimg % base % getSprite()->name % getSprite()->numframes());
+ 		parent->unhandledException(err, false);
 		return;
 	}
 	assert(getCurrentSprite() < getSprite()->numframes());
@@ -72,7 +74,13 @@ void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 
 void SpritePart::setFrameNo(unsigned int f) {
 	assert(f < animation.size());
-	assert(firstimg + base + animation[f] < getSprite()->numframes());
+	if (firstimg + base + animation[f] >= getSprite()->numframes()) {
+		std::string err = boost::str(boost::format("animation frame %d (firstimg %d, base %d, value %d) was past end of sprite file '%s' (%d sprites)") %
+			f % firstimg % base % (int)animation[f] % getSprite()->name % getSprite()->numframes());
+ 		parent->unhandledException(err, false);
+		animation.clear();
+		return;
+	}
 	
 	frameno = f;
 	pose = animation[f];
@@ -80,13 +88,18 @@ void SpritePart::setFrameNo(unsigned int f) {
 }
 
 void SpritePart::setPose(unsigned int p) {
-	assert(firstimg + base + p < getSprite()->numframes());
+	if (firstimg + base + p >= getSprite()->numframes()) {
+		std::string err = boost::str(boost::format("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
+			p % firstimg % base % getSprite()->name % getSprite()->numframes());
+ 		parent->unhandledException(err, false);
+		return;
+	}
 
 	animation.clear();
 	pose = p;
 	spriteno = firstimg + base + pose;
 }
-		
+
 void SpritePart::setBase(unsigned int b) {
 	base = b;
 }
