@@ -115,10 +115,10 @@ void caosVM::v_UNID() {
  UNID (agent)
  %status maybe
  %pragma variants c2
+ %pragma implementation caosVM::v_UNID_c2
 
  Returns the unique ID of the target agent.
  This is currently no good for persisting.
- %pragma implementation caosVM::v_UNID_c2
 */
 void caosVM::v_UNID_c2() {
 	VM_VERIFY_SIZE(0)
