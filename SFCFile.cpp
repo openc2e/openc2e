@@ -751,28 +751,28 @@ void SFCFile::copyToWorld() {
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		boost::shared_ptr<Agent> a = (*i);
 
-		// C2's Pitz
-		if (version() == 1 && a->family == 2 && a->genus == 20 && a->species == 10) {
-			// patch ov10 to actually refer to an agent
-			for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
-				if ((*i)->unid == (uint32)a->var[10].getInt()) {
-					a->var[10].setAgent((*i)->copiedAgent());
-					break;
+		/* version, family, genus, species, variable# */
+		unsigned int patchdata[4][5] = {
+		{ 1, 2, 20, 10, 10 }, // c2's Pitz
+		{ 1, 2, 17, 2, 1 }, // c2's bees
+		{ 1, 2, 1, 50, 0 }, // c2 flask thing
+		{ 1, 2, 25, 1, 1} // c2 tomatoes
+		};
+
+		for (unsigned int j = 0; j < 4; j++) {
+			if (version() == patchdata[j][0] && a->family == patchdata[j][1] && a->genus == patchdata[j][2] && a->species == patchdata[j][3]) {
+				// patch variable to actually refer to an agent
+				unsigned int varno = patchdata[j][4];
+				for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
+					if ((*i)->unid == (uint32)a->var[varno].getInt()) {
+						a->var[varno].setAgent((*i)->copiedAgent());
+						break;
+					}
 				}
+
+				// This is useful to enable when you're testing a new patch.
+				//if (a->var[varno].hasInt() && a->var[varno].getInt() != 0) std::cout << "Warning: Couldn't apply agent patch #" << j << "!" << std::endl;
 			}
-			if (a->var[10].hasInt()) std::cout << "Warning: Couldn't patch Pitz!" << std::endl;
-		}
-	
-		// C2's bees
-		if (version() == 1 && a->family == 2 && a->genus == 17 && a->species == 2) {
-			// patch ov01 to actually refer to an agent
-			for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
-				if ((*i)->unid == (uint32)a->var[1].getInt()) {
-					a->var[1].setAgent((*i)->copiedAgent());
-					break;
-				}
-			}
-			if (a->var[1].hasInt()) std::cout << "Warning: Couldn't patch bee!" << std::endl;
 		}
 	}
 }
