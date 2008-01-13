@@ -195,7 +195,7 @@ void caosVM::v_OBST_c2() {
 	if (!collided)
 		result.setInt(INT_MAX);
 	else
-		result.setInt(deltapt.x + deltapt.y); // only one will be set
+		result.setInt(abs(deltapt.x + deltapt.y)); // only one will be set
 }
 
 /**
