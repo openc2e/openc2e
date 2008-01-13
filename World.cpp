@@ -571,6 +571,7 @@ boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef a
 	AudioClip clip = engine.audio->loadClip(filename);
 	if (!clip) {
 		// note that more specific error messages can be thrown by implementations of loadClip
+		if (engine.version < 3) return boost::shared_ptr<AudioSource>(); // creatures 1 and 2 ignore non-existent audio clips
 		throw creaturesException("failed to load audio clip " + filename);
 	}
 
