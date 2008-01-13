@@ -988,16 +988,32 @@ void caosVM::c_DOCA() {
 
 /**
  SETV DOOR (command) direction (integer) room1 (integer) room2 (integer) value (integer)
- %status stub
+ %status maybe
  %pragma variants c2
 */
 void caosVM::c_SETV_DOOR() {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
-	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(perm)
 
-	// TODO
+	// TODO: what's direction for?
+
+	// code identical to c2e DOOR
+	shared_ptr<Room> r1 = world.map.getRoom(room1);
+	shared_ptr<Room> r2 = world.map.getRoom(room2);
+	caos_assert(r1); caos_assert(r2);
+	if (r1->doors.find(r2) == r1->doors.end()) {
+		RoomDoor *door = new RoomDoor;
+		door->first = r1;
+		door->second = r2;
+		door->perm = perm;
+		r1->doors[r2] = door;
+		r2->doors[r1] = door;
+	} else {
+		RoomDoor *door = r1->doors[r2];
+		door->perm = perm;
+	}
 }
 
 /**
@@ -1059,7 +1075,7 @@ void caosVM::c_ROOM() {
 
 		MetaRoom *m = world.map.getMetaRoom(0);
 		unsigned int roomid = m->addRoom(r);
-		assert(roomid == roomno); // TODO: this is fairly likely to fail, but is a major bug if it does, FIX ME!
+		assert(roomid == (unsigned int)roomno); // TODO: this is fairly likely to fail, but is a major bug if it does, FIX ME!
 	} else {
 		r->x_left = left;
 		r->x_right = right;
