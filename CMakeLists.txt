@@ -16,6 +16,7 @@ SET(OPENC2E_CORE
 	AgentHelpers.cpp
 	AgentRef.cpp
 	attFile.cpp
+	Blackboard.cpp
 	blkImage.cpp
 	bytecode.cpp
 	c16Image.cpp
