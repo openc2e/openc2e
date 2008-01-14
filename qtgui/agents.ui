@@ -1,0 +1,153 @@
+<ui version="4.0" >
+ <class>AgentInjectorForm</class>
+ <widget class="QDialog" name="AgentInjectorForm" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>718</width>
+    <height>883</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Dialog</string>
+  </property>
+  <layout class="QHBoxLayout" >
+   <property name="leftMargin" >
+    <number>3</number>
+   </property>
+   <property name="topMargin" >
+    <number>3</number>
+   </property>
+   <property name="rightMargin" >
+    <number>3</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>3</number>
+   </property>
+   <item>
+    <layout class="QVBoxLayout" >
+     <item>
+      <widget class="QTabWidget" name="tabs" >
+       <property name="currentIndex" >
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="agentsTab" >
+        <attribute name="title" >
+         <string>Agents</string>
+        </attribute>
+        <layout class="QVBoxLayout" >
+         <item>
+          <widget class="QFrame" name="frame" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>4</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="frameShape" >
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow" >
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" >
+            <item>
+             <widget class="QListWidget" name="agentList" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+                <horstretch>4</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" native="1" name="imagePreview" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+                <horstretch>3</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>20</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="Description" >
+           <property name="enabled" >
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+             <horstretch>0</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>16777215</width>
+             <height>200</height>
+            </size>
+           </property>
+           <property name="readOnly" >
+            <bool>true</bool>
+           </property>
+           <property name="html" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="removeButton" >
+             <property name="text" >
+              <string>Remove</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="injectButton" >
+             <property name="text" >
+              <string>Inject</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
