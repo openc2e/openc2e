@@ -58,16 +58,23 @@ boost::shared_ptr<class Backend> openc2eView::getBackend() {
 }
 
 void openc2eView::resizeEvent(QResizeEvent *) {
-#ifdef Q_WS_X11
-	((QApplication *)QApplication::instance())->syncX();
+#if defined(Q_WS_X11) || defined(Q_WS_WIN)
+	static bool firsttime = true;
 
-	std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport()->winId());
-	putenv((char *)windowidstr.c_str());
+	if (firsttime) {
+		((QApplication *)QApplication::instance())->syncX();
 
-	// TODO: make init() not resize itself?
-	SDL_QuitSubSystem(SDL_INIT_VIDEO);
-	backend->SDLinit();
-	backend->resized(width(), height());
+		std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport()->winId());
+		putenv((char *)windowidstr.c_str());
+
+		// TODO: make init() not resize itself?
+		//SDL_QuitSubSystem(SDL_INIT_VIDEO);
+		backend->SDLinit();
+
+		firsttime = false;
+	}
+	backend->resized(viewport()->width(), viewport()->height());
+
 #else
 #error No SDL rendering method for this platform yet.
 	// TODO: fallback to off-screen SDL RGBA buffer + QPainter::drawImage?
@@ -76,8 +83,8 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 	// add resize window event to backend queue
 	SomeEvent e;
 	e.type = eventresizewindow;
-	e.x = width();
-	e.y = height();
+	e.x = viewport()->width();
+	e.y = viewport()->height();
 	backend->pushEvent(e);
 
 	if (world.map.getFallbackMetaroom()) {
