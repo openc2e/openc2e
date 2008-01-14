@@ -48,6 +48,8 @@ openc2eView::openc2eView(QWidget *parent) : QAbstractScrollArea(parent) {
 	// TODO: sane? do we really need relx/rely, anyway?
 	lastmousex = mapFromGlobal(QCursor::pos()).x();
 	lastmousey = mapFromGlobal(QCursor::pos()).y();
+
+	lastMetaroom = NULL;
 }
 
 openc2eView::~openc2eView() {
@@ -55,6 +57,17 @@ openc2eView::~openc2eView() {
 
 boost::shared_ptr<class Backend> openc2eView::getBackend() {
 	return boost::dynamic_pointer_cast<class Backend, class QtBackend>(backend);
+}
+
+void openc2eView::resizescrollbars() {
+	if (world.camera.getMetaRoom()) {
+		if (world.camera.getMetaRoom()->wraparound()) {
+			horizontalScrollBar()->setRange(0,world.camera.getMetaRoom()->width());
+		} else {
+			horizontalScrollBar()->setRange(0,world.camera.getMetaRoom()->width() - viewport()->width());
+		}
+		verticalScrollBar()->setRange(0,world.camera.getMetaRoom()->height() - viewport()->height());
+	}
 }
 
 void openc2eView::resizeEvent(QResizeEvent *) {
@@ -87,10 +100,8 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 	e.y = viewport()->height();
 	backend->pushEvent(e);
 
-	if (world.map.getFallbackMetaroom()) {
-		horizontalScrollBar()->setRange(0,world.camera.getMetaRoom()->width());
-		verticalScrollBar()->setRange(0,world.camera.getMetaRoom()->height() - height());
-	}
+	resizescrollbars();
+
 	horizontalScrollBar()->setPageStep(width());
 	verticalScrollBar()->setPageStep(height());
 }
@@ -221,7 +232,15 @@ void openc2eView::keyReleaseEvent(QKeyEvent *k) {
 void openc2eView::scrollContentsBy(int dx, int dy) {
 	(void)dx;
 	(void)dy;
-	world.camera.moveTo(horizontalScrollBar()->value(), verticalScrollBar()->value());
+	if (lastMetaroom)
+		world.camera.moveTo(horizontalScrollBar()->value() + lastMetaroom->x(), verticalScrollBar()->value() + lastMetaroom->y());
+}
+
+void openc2eView::tick() {
+	if (lastMetaroom != world.camera.getMetaRoom()) {
+		lastMetaroom = world.camera.getMetaRoom();
+		resizescrollbars();
+	}
 }
 
 bool QtBackend::pollEvent(SomeEvent &e) {

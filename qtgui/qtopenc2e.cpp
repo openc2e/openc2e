@@ -36,13 +36,6 @@ QtOpenc2e::QtOpenc2e() {
 	// TODO: handle this?
 	/*if (!*/ engine.initialSetup() /*) return 0 */ ;
 
-	// this only works for C1 and C2
-	viewport->horizontalScrollBar()->setRange(0,world.camera.getMetaRoom()->width());
-	viewport->verticalScrollBar()->setRange(0,world.camera.getMetaRoom()->height());
-	int y = world.camera.getY();
-	viewport->horizontalScrollBar()->setValue(world.camera.getX());
-	viewport->verticalScrollBar()->setValue(y);
-
 	// idle timer
 	// TODO: should prbly have an every-X-seconds timer or a background thread to do this
 	QTimer *timer = new QTimer(this);
@@ -105,8 +98,10 @@ QtOpenc2e::~QtOpenc2e() {
 void QtOpenc2e::tick() {
 	engine.tick();
 	int y = world.camera.getY();
-	viewport->horizontalScrollBar()->setValue(world.camera.getX());
-	viewport->verticalScrollBar()->setValue(y);
+	int x = world.camera.getX();
+	viewport->tick();
+	viewport->horizontalScrollBar()->setValue(x - world.camera.getMetaRoom()->x());
+	viewport->verticalScrollBar()->setValue(y - world.camera.getMetaRoom()->y());
 	if (engine.done) close();
 }
 

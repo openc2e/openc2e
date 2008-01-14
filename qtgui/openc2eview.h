@@ -22,6 +22,8 @@
 #include <deque>
 #include <boost/shared_ptr.hpp>
 
+#include "../MetaRoom.h"
+
 #include <QAbstractScrollArea>
 
 class openc2eView : public QAbstractScrollArea {
@@ -52,9 +54,14 @@ protected:
 	// variables
 	boost::shared_ptr<class QtBackend> backend;
 	int lastmousex, lastmousey;
+	MetaRoom * lastMetaroom;
+
+	// helpers
+	void resizescrollbars();
 
 public:
 	boost::shared_ptr<class Backend> getBackend();
+	void tick();
 };
 
 class QtBackend : public SDLBackend {
