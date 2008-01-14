@@ -22,6 +22,8 @@
 #include "../OpenALBackend.h"
 #include "../MetaRoom.h"
 
+#include "ui_agents.h"
+
 // Constructor which creates the main window.
 
 QtOpenc2e::QtOpenc2e() {
@@ -75,6 +77,11 @@ QtOpenc2e::QtOpenc2e() {
 	/* Tools menu */
 
 	toolsMenu = menuBar()->addMenu(tr("&Tools"));
+	agentInjectorAct = new QAction(tr("&Agent Injector"), this);
+	connect(agentInjectorAct, SIGNAL(triggered()), this, SLOT(agents()));
+	toolsMenu->addAction(agentInjectorAct);
+
+	agentInjector = new AgentInjector();
 
 	/* Creatures menu */
 
@@ -107,5 +114,9 @@ void QtOpenc2e::tick() {
 
 void QtOpenc2e::about() {
 	QMessageBox::about(this, tr("openc2e"), tr("An open-source game engine to run the Creatures series of games."));
+}
+
+void QtOpenc2e::agents() {
+	agentInjector->show();
 }
 

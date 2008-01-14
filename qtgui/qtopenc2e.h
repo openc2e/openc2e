@@ -18,6 +18,7 @@
 #define _QTOPENC2E_H
 
 #include <QMainWindow>
+#include "AgentInjector.h"
 
 class QtOpenc2e : public QMainWindow {
 	Q_OBJECT
@@ -31,10 +32,14 @@ private slots:
 
 	void about();
 
+	void agents();
+
 private:
 	QToolBar *maintoolbar;
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
-	QAction *exitAct, *aboutAct;
+	QAction *exitAct, *aboutAct, *agentInjectorAct;
+
+	AgentInjector *agentInjector;
 	
 	class openc2eView *viewport;
 };
