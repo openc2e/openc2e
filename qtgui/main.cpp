@@ -4,16 +4,29 @@
 
 #include <QApplication>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 int main(int argc, char *argv[]) {
-	QApplication app(argc, argv);
+	try {
+		QApplication app(argc, argv);
 
-	if (!engine.parseCommandLine(argc, argv)) return 1;
+		if (!engine.parseCommandLine(argc, argv)) return 1;
 
-	QtOpenc2e myvat;	
-	myvat.show();
+		QtOpenc2e myvat;	
+		myvat.show();
 
-	world.drawWorld();
+		world.drawWorld();
 
-	return app.exec();
+		return app.exec();
+	} catch (std::exception &e) {
+#ifdef _WIN32
+		MessageBox(NULL, e.what(), "openc2e - Fatal exception encountered:", MB_ICONERROR);
+#else
+		std::cerr << "Fatal exception encountered: " << e.what() << "\n";
+#endif
+		return 1;
+	}
 }
 
