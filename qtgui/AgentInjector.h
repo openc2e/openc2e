@@ -12,7 +12,7 @@ class AgentInjector : public QDialog {
 	private slots:
 		void onInject();
 		/*void onRemove();*/
-		void onSelect(QListWidgetItem *cur);
+		/*void onSelect(QListWidgetItem *cur, QListWidgetItem *prev);*/
 
 	private:
 		Ui::AgentInjectorForm ui;
