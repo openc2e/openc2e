@@ -20,8 +20,6 @@
 #include "SDLBackend.h"
 #include "SDL_gfxPrimitives.h"
 #include "openc2e.h"
-#include "Agent.h"
-#include "World.h"
 #include "Engine.h"
 
 SDLBackend *g_backend;
