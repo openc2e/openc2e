@@ -62,6 +62,8 @@ Engine::Engine() {
 	cmdline_enable_sound = true;
 	cmdline_norun = false;
 
+	palette = 0;
+
 	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
 	addPossibleAudioBackend("null", shared_ptr<AudioBackend>(new NullAudioBackend()));
 }
@@ -92,12 +94,17 @@ void Engine::setBackend(shared_ptr<Backend> b) {
 		// TODO: case-sensitivity for the lose
 		fs::path palpath(world.data_directories[0] / "/Palettes/palette.dta");
 		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
-			uint8 *buf = new uint8[768];
+			palette = new unsigned char[768];
+			
 			std::ifstream f(palpath.native_directory_string().c_str(), std::ios::binary);
 			f >> std::noskipws;
-			f.read((char *)buf, 768);
-			backend->setPalette(buf);
-			delete[] buf;
+			f.read((char *)palette, 768);
+			
+			for (unsigned int i = 0; i < 768; i++) {
+				palette[i] = palette[i] * 4;
+			}
+
+			backend->setPalette((uint8 *)palette);
 		} else
 			throw creaturesException("Couldn't find C1 palette data!");
 	}

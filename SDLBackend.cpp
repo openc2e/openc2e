@@ -397,9 +397,9 @@ int SDLBackend::translateKey(int key) {
 void SDLBackend::setPalette(uint8 *data) {
 	// TODO: we only set the palette on our main surface, so will fail for any C1 cameras!
 	for (unsigned int i = 0; i < 256; i++) {
-		mainsurface.palette[i].r = data[i * 3] * 4;
-		mainsurface.palette[i].g = data[(i * 3) + 1] * 4;
-		mainsurface.palette[i].b = data[(i * 3) + 2] * 4;
+		mainsurface.palette[i].r = data[i * 3];
+		mainsurface.palette[i].g = data[(i * 3) + 1];
+		mainsurface.palette[i].b = data[(i * 3) + 2];
 	}
 }
 

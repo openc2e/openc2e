@@ -36,6 +36,7 @@ protected:
 	unsigned int lasttimestamp;
 
 	bool w_down, a_down, s_down, d_down;
+	unsigned char *palette;
 
 	bool cmdline_enable_sound;
 	bool cmdline_norun;
@@ -54,6 +55,8 @@ public:
 	boost::shared_ptr<class AudioBackend> audio;
 	std::string getBackendName() { return preferred_backend; }
 	std::string getAudioBackendName() { return preferred_audiobackend; }
+
+	unsigned char *getPalette() { return palette; }
 
 	std::string getGameName() { return gamename; }
 
