@@ -217,6 +217,7 @@ Uint16 *pixelPtr(SDL_Surface *surf, int x, int y) {
 
 SDL_Surface *MirrorSurface(SDL_Surface *surf) {
 	SDL_Surface* newsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, surf->w, surf->h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
+	assert(newsurf);
 	SDL_BlitSurface(surf, 0, newsurf, 0);
 
 	if (SDL_MUSTLOCK(newsurf))
@@ -259,6 +260,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 						8, // depth
 						image->width(frame), // pitch
 						0, 0, 0, 0);
+		assert(surf);
 		SDL_SetPalette(surf, SDL_LOGPAL, palette, 0, 256);
 	} else {
 		assert(image->bitdepth() == 16);
@@ -274,6 +276,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 						16, // depth
 						image->width(frame) * 2, // pitch
 						rmask, gmask, bmask, 0); // RGBA mask
+		assert(surf);
 	}
 
 	// try mirroring, if necessary
