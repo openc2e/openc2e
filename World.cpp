@@ -110,6 +110,8 @@ void World::init() {
 	// adjust to default tick rate for C1/C2 if necessary
 	if (engine.version < 3)
 		ticktime = 100;
+	
+	timeofday = dayofseason = season = year = 0;
 }
 
 void World::shutdown() {
@@ -219,6 +221,24 @@ void World::tick() {
 
 	tickcount++;
 	worldtickcount++;
+
+	if (engine.version == 2) {
+		if (worldtickcount % 3600 == 0) {
+			timeofday++;
+			if (timeofday == 5) { // 5 parts of the day
+				timeofday = 0;
+				dayofseason++;
+			}
+			if (dayofseason == 4) { // 4 days per season
+				dayofseason = 0;
+				season++;
+			}
+			if (season == 4) { // 4 seasons per year
+				season = 0;
+				year++;
+			}
+		}
+	}
 
 	world.map.tick();
 

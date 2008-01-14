@@ -74,6 +74,7 @@ public:
 	unsigned int race;
 	unsigned int ticktime, tickcount;
 	unsigned int worldtickcount;
+	unsigned int timeofday, dayofseason, season, year;
 	MainCamera camera;
 	bool showrooms, autokill, autostop;
 

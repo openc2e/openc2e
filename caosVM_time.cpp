@@ -57,12 +57,12 @@ void caosVM::v_BUZZ() {
 
 /**
  DATE (integer)
- %status stub
+ %status maybe
 
  Returns the day in the season of the current game world, starting at 0.
 */
 void caosVM::v_DATE() {
-	result.setInt(0); // TODO
+	result.setInt(world.dayofseason);
 }
 
 /**
@@ -79,13 +79,13 @@ void caosVM::v_HIST_DATE() {
 
 /**
  SEAN (integer)
- %status stub
+ %status maybe
  %pragma variants c2 cv c3
 
  Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter.
 */
 void caosVM::v_SEAN() {
-	result.setInt(0); // TODO
+	result.setInt(world.season);
 }
 
 /**
@@ -102,12 +102,12 @@ void caosVM::v_HIST_SEAN() {
 
 /**
  TIME (integer)
- %status stub
+ %status maybe
 
  Returns the time of day in the current game world. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night.
 */
 void caosVM::v_TIME() {
-	result.setInt(0); // TODO
+	result.setInt(world.timeofday);
 }
 
 /**
@@ -124,12 +124,13 @@ void caosVM::v_HIST_TIME() {
 
 /**
  YEAR (integer)
- %status stub
+ %status maybe
+ %pragma variants c2 cv c3
 
  Returns the number of game years elapsed in the current world.
 */
 void caosVM::v_YEAR() {
-	result.setInt(0); // TODO
+	result.setInt(world.year);
 }
 
 /**
@@ -263,20 +264,21 @@ void caosVM::c_ASEA() {
 
 /**
  TMOD (integer)
- %status stub
+ %status maybe
  %pragma variants c2
 */
 void caosVM::v_TMOD() {
-	result.setInt(0); // TODO
+	result.setInt(world.timeofday); // TODO
 }
 
 /**
  SEAV (integer)
- %status stub
+ %status maybe
  %pragma variants c2
 */
 void caosVM::v_SEAV() {
-	result.setInt(0); // TODO
+	// TODO: hardcoding bad?
+	result.setInt((world.dayofseason * 4) + world.timeofday);
 }
 
 /**
