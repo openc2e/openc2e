@@ -14,6 +14,8 @@
 
 int main(int argc, char *argv[]) {
 	try {
+		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n";
+
 		QApplication app(argc, argv);
 
 		if (!engine.parseCommandLine(argc, argv)) return 1;
