@@ -1,6 +1,10 @@
 #include "../World.h" // TODO: not needed?
 #include "qtopenc2e.h"
 #include "../Engine.h"
+#ifdef _WIN32
+#include "../SDLBackend.h"
+#include <windows.h>
+#endif
 
 #include <QApplication>
 
@@ -16,8 +20,6 @@ int main(int argc, char *argv[]) {
 
 		QtOpenc2e myvat;	
 		myvat.show();
-
-		world.drawWorld();
 
 		return app.exec();
 	} catch (std::exception &e) {

@@ -70,10 +70,11 @@ void openc2eView::resizescrollbars() {
 	}
 }
 
+bool firsttime = true;
+int currentwidth, currentheight;
+
 void openc2eView::resizeEvent(QResizeEvent *) {
 #if defined(Q_WS_X11) || defined(Q_WS_WIN)
-	static bool firsttime = true;
-
 	if (firsttime) {
 		((QApplication *)QApplication::instance())->syncX();
 
@@ -87,6 +88,8 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 		firsttime = false;
 	}
 	backend->resized(viewport()->width(), viewport()->height());
+	currentwidth = viewport()->width();
+	currentheight = viewport()->height();
 
 #else
 #error No SDL rendering method for this platform yet.
@@ -109,7 +112,11 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 void openc2eView::paintEvent(QPaintEvent *) {
 	((QApplication *)QApplication::instance())->syncX();
 
-	world.drawWorld();
+	if (!firsttime) {
+		// TODO: mad hax
+		if (currentwidth == viewport()->width() && currentheight == viewport()->height())
+			world.drawWorld();
+	}
 }
 
 void openc2eView::mouseMoveEvent(QMouseEvent *m) {
