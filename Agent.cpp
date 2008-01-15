@@ -776,8 +776,7 @@ void Agent::physicsTickC2() {
 		velx.setInt(0);
 		vely.setInt(0);
 	} else {
-		x += (int)deltapt.x;
-		y += (int)deltapt.y;
+		moveTo(x + (int)deltapt.x, y + (int)deltapt.y);
 		if (sufferphysics()) {
 			int fricx = (aero.getInt() * velx.getInt()) / 100;
 			int fricy = (aero.getInt() * vely.getInt()) / 100;
