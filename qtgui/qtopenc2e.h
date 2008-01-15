@@ -31,13 +31,17 @@ private slots:
 	void tick();
 
 	void about();
-
-	void agents();
+	void showAgentInjector();
+	void toggleShowMap();
+	void toggleShowScrollbars();
+	void toggleFastSpeed();
+	void toggleDisplayUpdates();
+	void toggleAutokill();
 
 private:
 	QToolBar *maintoolbar;
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
-	QAction *exitAct, *aboutAct, *agentInjectorAct;
+	QAction *exitAct, *aboutAct, *agentInjectorAct, *showMapAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
 
 	AgentInjector *agentInjector;
 	
