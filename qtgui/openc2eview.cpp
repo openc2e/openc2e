@@ -21,6 +21,10 @@
 #include <boost/format.hpp>
 #include "../SDLBackend.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /*
  * TODO:
  *
@@ -81,9 +85,20 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 		std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport()->winId());
 		putenv((char *)windowidstr.c_str());
 
+#ifdef _WIN32
+		// store Qt's window procedure
+		WNDPROC oldproc = (WNDPROC)GetWindowLongPtr(viewport()->winId(), GWLP_WNDPROC);
+#endif
+
 		// TODO: make init() not resize itself?
 		//SDL_QuitSubSystem(SDL_INIT_VIDEO);
 		backend->SDLinit();
+		viewport()->setCursor(Qt::BlankCursor);
+
+#ifdef _WIN32
+		// put Qt's window procedure back, so SDL doesn't steal messages
+		SetWindowLongPtr(viewport()->winId(), GWLP_WNDPROC, (LONG_PTR)oldproc);
+#endif
 
 		firsttime = false;
 	}
