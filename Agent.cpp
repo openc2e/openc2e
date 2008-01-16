@@ -626,6 +626,8 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 		return;
 	}
 
+	int lastdirection;
+
 	bool steep = abs(dy) > abs(dx);
 
 	int signdx = dx < 0 ? -1 : 1;
@@ -640,48 +642,44 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 		p.x = (int)p.x;
 		p.y = (int)p.y;
 
+		bool trycollisions = false;
+
 		bool endofroom = false;
 	
-		switch (i) {
-			case 0: // left
-				if (src.x + p.x < room->x_left)
-					endofroom = true;
-				break;
-
-			case 1: // right
-				if (src.x + p.x > room->x_right)
-					endofroom = true;
-				break;
-
-			case 2: // up
-				if (src.y + p.y < room->y_left_ceiling)
-					endofroom = true;
-				break;
-
-			case 3: // down
-				if (src.y + p.y > room->y_left_floor) {
-					endofroom = true;
-				}
-				break;
-
-			default:
-				assert(false);
+		if (src.x + p.x < room->x_left) {
+			if (i != 1 && dx < 0) { trycollisions = true; lastdirection = 0; }
+			endofroom = true;
+		}
+		if (src.x + p.x > room->x_right) {
+			if (i != 0 && dx > 0) { trycollisions = true; lastdirection = 1; }
+			endofroom = true;
+		}
+		if (src.y + p.y < room->y_left_ceiling) {
+			if (i != 3 && dy < 0) { trycollisions = true; lastdirection = 2; }
+			endofroom = true;
+		}
+		if (src.y + p.y > room->y_left_floor) {
+			if (i != 2 && dy > 0) { trycollisions = true; lastdirection = 3; }
+			endofroom = true;
 		}
 
 		// find the next room, if necessary, and work out whether we should move into it or break out
 		if (endofroom) {
 			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i, room);
 
-			// collide if we're out of the room system
-			if (!newroom) {	collided = true; }
-			// collide if there's no new room connected to this one
-			else if (room->doors.find(newroom) == room->doors.end()) { collided = true; }
-			// collide if the PERM between this room and the new room is smaller than or equal to our size
-			else if (size.getInt() > room->doors[newroom]->perm) { collided = true; }
-			
-			if (!followrooms) break;
+			bool collision = false;
 
-			if (collided) break;
+			// collide if we're out of the room system
+			if (!newroom) {	collision = true; }
+			// collide if there's no new room connected to this one
+			else if (room->doors.find(newroom) == room->doors.end()) { collision = true; }
+			// collide if the PERM between this room and the new room is smaller than or equal to our size
+			else if (size.getInt() > room->doors[newroom]->perm) { collision = true; }
+
+			if (collision && (trycollisions || (!newroom))) {
+				collided = true;
+				break;
+			}
 
 			// move to the new room and keep going!
 			room = newroom;
@@ -709,10 +707,13 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 				// TODO: consider steep floors
 				if (src.y + p.y > (int)floory && top.y < floory) {
 					collided = true;
+					lastdirection = 3;
 					goto finished;
 				}
 			}
 		}
+		
+		if ((!followrooms) && endofroom) break;
 
 		lastpoint = p;
 	}
@@ -721,7 +722,7 @@ finished:
 	double length2 = (lastpoint.x * lastpoint.x) + (lastpoint.y * lastpoint.y);
 	if (length2 < delta) {
 		// TODO: !followrooms is a horrible way to detect a non-physics call
-		if (collided && followrooms) lastcollidedirection = i;
+		if (collided && followrooms) lastcollidedirection = lastdirection;
 		deltapt = lastpoint;
 		delta = length2;
 	}
@@ -769,7 +770,7 @@ void Agent::physicsTickC2() {
 			vely.setInt(-(vely.getInt() - (rest.getInt() * vely.getInt()) / 100));
 		else
 			velx.setInt(-(velx.getInt() - (rest.getInt() * velx.getInt()) / 100));
-		queueScript(6,0);
+		queueScript(6, 0);	
 	}
 	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
 		grav.setInt(0);
