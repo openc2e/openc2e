@@ -3,7 +3,7 @@
 !define APPNAMEANDVERSION "openc2e (development build)"
 
 ; Development build revision
-!define REVISION "1471"
+!define REVISION "1511"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
@@ -20,6 +20,8 @@ SetCompressor lzma
 ; Icons
 !define MUI_ICON "instal.ico"
 !define MUI_UNICON "uninst.ico"
+
+!define MUI_TEXT "LOL WUT"
 
 !define MUI_ABORTWARNING
 
@@ -127,6 +129,23 @@ ${Index_RemoveFilesAndSubDirs}-done:
   !undef Index_RemoveFilesAndSubDirs
 !macroend
 
+Function CheckVCRedist
+   Push $R0
+   ClearErrors
+   ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7299052b-02a4-4627-81f2-1818da5d550d}" "Version"
+
+   ; if VS 2005+ redist SP1 not installed, install it
+   IfErrors 0 yay
+   StrCpy $R0 "-1"
+	 Goto done
+
+yay:
+	StrCpy $R0 "1"
+
+done:
+	Exch $R0
+FunctionEnd
+
 Section "openc2e" Main
 
 	; Set Section properties
@@ -134,6 +153,17 @@ Section "openc2e" Main
 
 	; Set Section Files and Shortcuts
 	SetOutPath "$INSTDIR\"
+	
+	IfFileExists "$INSTDIR\uninstall.exe" remold
+	Goto proceed
+	
+	remold:
+	MessageBox MB_YESNO 'An old version of openc2e is installed.  Do you wish to$\rremove it before proceeding (recommended)?' IDYES remold1
+	Goto proceed
+	remold1:
+	ExecWait '"$INSTDIR\uninstall.exe" _?=$INSTDIR /S'
+	
+	proceed:
 	File "Release\openc2e.exe"
 	File "Release\SDL.dll"
 	File "Release\SDL_mixer.dll"
@@ -173,10 +203,36 @@ Section -FinishSection
 	ExecWait '"$INSTDIR\oalinst.exe" /s'
 	Delete "$INSTDIR\oalinst.exe"
 	
+	DetailPrint "Checking for VC++ runtime libraries..."
+	Call CheckVCRedist
+	Pop $R0
+	StrCmp $R0 "1" foundvc
+	ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7299052b-02a4-4627-81f2-1818da5d550d}" "Version"
+	MessageBox MB_YESNO "Based on a cursory examination, you do not appear to have necessary VC++ runtime$\rlibraries installed.  However, if you have Visual Studio 2005 installed, I could$\rbe wrong.  Would you like to download and install these libraries? (2.5mb or so)$\rIf you do not know for sure, I'd go with 'Yes'." IDYES installvc
+	MessageBox MB_OK "Fair enough.  If openc2e fails to run, make sure to acquire the Visual C++ 2005$\rruntime libraries from http://openc2e.ccdevnet.org/files/win32/vcredist_x86.exe"
+	Goto finishup
+	
+	foundvc:
+	DetailPrint "VC++ runtime libraries found (probably.)"
+	Goto finishup
+	
+	installvc:
+	DetailPrint "Downloading VC++ runtime library redistributable..."
+	NSISdl::download http://openc2e.ccdevnet.org/files/win32/vcredist_x86.exe $INSTDIR\vcredist_x86.exe
+	Pop $R0
+	StrCmp $R0 "success" runvcinst
+	MessageBox MB_OK|MB_ICONSTOP "The download of the VC++ runtime library installer failed: $R0   $\rSorry, but I guess you'll have to download it yourself. :($\r (http://openc2e.ccdevnet.org/files/win32/vcredist_x86.exe)"
+	Goto finishup
+	runvcinst:
+	ExecWait "$INSTDIR\vcredist_x86.exe"
+	Delete "$INSTDIR\vcredist_x86.exe"
+	
+	finishup:
 	;Run the shortcut-maker
 	MessageBox MB_YESNO 'Look for installed Creatures games now? $\rIf you choose to wait, you can run "Update Game Shortcuts" from the start menu later.' IDYES run
 	Goto end
 	run:
+	DetailPrint "Searching for installed creatures games..."
 	ExecWait "$INSTDIR\gamefinder.exe"
 	end:
 SectionEnd
@@ -214,4 +270,4 @@ Function .onInit
 
 FunctionEnd
 
-BrandingText "Sine Creatures Collective"
+BrandingText "http://openc2e.ccdevnet.org"

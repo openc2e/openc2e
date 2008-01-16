@@ -29,16 +29,24 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 	mainsurface.height = _h;
 	// shadow surfaces seem to generally be faster (presumably due to overdraw), so get SDL to create one for us
 	int bpp = (engine.version == 1 ? 0 : 16);
-	mainsurface.surface = SDL_SetVideoMode(_w, _h, bpp, SDL_RESIZABLE);
+	mainsurface.surface = SDL_SetVideoMode(_w, _h, 0, SDL_RESIZABLE);
+
+	if (!mainsurface.surface)
+		std::cout << "Surface failure in SDL: " << SDL_GetError() << " (width: " << _w
+		<< " height: " << _h << ")\n";
+
 	assert(mainsurface.surface != 0);
 }
 
 void SDLBackend::init() {
 	int init = SDL_INIT_VIDEO;
 
+	std::cout << "SDL_WINDOWID: " << getenv("SDL_WINDOWID") << "\n";
+
+	/*SDL_Init(init);*/
+
 	if (SDL_Init(init) < 0)
 		throw creaturesException(std::string("SDL error during initialization: ") + SDL_GetError());
-
 	resizeNotify(800, 600);
 	
 	SDL_WM_SetCaption("openc2e (development build)", "openc2e");
