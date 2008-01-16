@@ -41,6 +41,8 @@ public:
 	virtual int networkInit() { return -1; }
 	virtual void shutdown() { }
 
+	virtual void resize(unsigned int width, unsigned int height) { }
+
 	virtual unsigned int ticks() { return 0; }
 	virtual bool pollEvent(SomeEvent &e) { return false; }
 	virtual void handleEvents() { }

@@ -39,8 +39,11 @@ void SDLBackend::init() {
 	if (SDL_Init(init) < 0)
 		throw creaturesException(std::string("SDL error during initialization: ") + SDL_GetError());
 
-	resizeNotify(800, 600);
-	
+	// reasonable defaults
+	mainsurface.width = 800;
+	mainsurface.height = 600;
+	mainsurface.surface = 0;
+
 	SDL_WM_SetCaption("openc2e (development build)", "openc2e");
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);

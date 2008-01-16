@@ -59,6 +59,8 @@ public:
 	int networkInit();
 	void shutdown();
 
+	void resize(unsigned int w, unsigned int h) { resizeNotify(w, h); }
+
 	bool pollEvent(SomeEvent &e);
 	
 	unsigned int ticks() { return SDL_GetTicks(); }

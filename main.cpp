@@ -45,6 +45,9 @@ extern "C" int main(int argc, char *argv[]) {
 		// get the engine to do all the startup (read catalogue, loading world, etc)
 		if (!engine.initialSetup()) return 0;
 	
+		// you *must* call this at least once before drawing, for initial creation of the window
+		engine.backend->resize(800, 600);
+		
 		// do a first-pass draw of the world. TODO: correct?
 		world.drawWorld();
 
