@@ -200,10 +200,10 @@ public:
 	
 	unsigned int getWidth() { return part(0)->getWidth(); }
 	unsigned int getHeight() { return part(0)->getHeight(); }
-	Point boundingBoxPoint(unsigned int n);
-	static Point boundingBoxPoint(unsigned int n, Point p, unsigned int w, unsigned int h);
-	shared_ptr<class Room> bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, shared_ptr<Room> exclude);
-	void findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
+	Point const boundingBoxPoint(unsigned int n);
+	Point const boundingBoxPoint(unsigned int n, Point p, unsigned int w, unsigned int h);
+	shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, shared_ptr<Room> exclude);
+	void const findCollisionInDirection(unsigned int i, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
 
 	virtual void tick();
 	virtual void kill();
@@ -211,7 +211,7 @@ public:
 	void unhandledException(std::string info, bool wasscript);
 
 	bool validInRoomSystem();
-	static bool validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);
+	bool const validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);
 
 	virtual void setZOrder(unsigned int plane); // should be overridden!
 	virtual unsigned int getZOrder() const;

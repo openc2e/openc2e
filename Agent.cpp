@@ -365,11 +365,11 @@ void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
 	// TODO: setVelocity?
 }
 
-Point Agent::boundingBoxPoint(unsigned int n) {
+Point const Agent::boundingBoxPoint(unsigned int n) {
 	return boundingBoxPoint(n, Point(x, y), getWidth(), getHeight());
 }
 
-Point Agent::boundingBoxPoint(unsigned int n, Point in, unsigned int w, unsigned int h) {
+Point const Agent::boundingBoxPoint(unsigned int n, Point in, unsigned int w, unsigned int h) {
 	Point p;
 	
 	switch (n) {
@@ -403,10 +403,13 @@ Point Agent::boundingBoxPoint(unsigned int n, Point in, unsigned int w, unsigned
 bool Agent::validInRoomSystem() {
 	// Return true if this agent is inside the world room system at present, or false if it isn't.
 
+	// TODO: c1
+	if (engine.version == 1) return true;
+
 	return validInRoomSystem(Point(x, y), getWidth(), getHeight(), perm);
 }
 
-bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
+bool const Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
 	// Return true if this agent is inside the world room system at the specified point, or false if it isn't.
 
 	for (unsigned int i = 0; i < 4; i++) {
@@ -417,15 +420,34 @@ bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testp
 			case 2: src = boundingBoxPoint(2, p, w, h); dest = boundingBoxPoint(0, p, w, h); break; // top to left
 			case 3: src = boundingBoxPoint(2, p, w, h); dest = boundingBoxPoint(1, p, w, h); break; // top to right
 		}
-		float srcx = src.x, srcy = src.y;
-		
-		shared_ptr<Room> ourRoom = world.map.roomAt(srcx, srcy);
-		if (!ourRoom) return false;
 
-		unsigned int dir; Line wall;
-		world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, testperm);
+		if (engine.version == 2) {
+			// Creatures 2 physics
+			
+			int dx = dest.x - src.x;
+			int dy = dest.y - src.y;
+			
+			Point deltapt(0,0);
+			double delta = 1000000000;
+			bool collided = false;
 
-		if (src != dest) return false;
+			// TODO: check suffercollisions?
+			
+			findCollisionInDirection(i, src, dx, dy, deltapt, delta, collided, true);
+			if (collided) return false;
+		} else {
+			// Creatures 3 physics
+
+			float srcx = src.x, srcy = src.y;
+
+			shared_ptr<Room> ourRoom = world.map.roomAt(srcx, srcy);
+			if (!ourRoom) return false;
+
+			unsigned int dir; Line wall;
+			world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, testperm);
+
+			if (src != dest) return false;
+		}
 	}
 
 	return true;
@@ -579,7 +601,7 @@ void Agent::physicsTick() {
 	}
 }
 
-shared_ptr<Room> Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigned int direction, shared_ptr<Room> exclude) {
+shared_ptr<Room> const Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigned int direction, shared_ptr<Room> exclude) {
 	std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(tryx, tryy);
 
 	shared_ptr<Room> r;
@@ -609,8 +631,8 @@ shared_ptr<Room> Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigne
 	else return r;
 }
 
-void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
-	Point src = boundingBoxPoint(i);
+// Creatures 2 collision finding
+void const Agent::findCollisionInDirection(unsigned int i, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
 	src.x = (int)src.x;
 	src.y = (int)src.y;
 	
@@ -756,7 +778,8 @@ void Agent::physicsTickC2() {
 
 	if (suffercollisions()) {
 		for (unsigned int i = 0; i < 4; i++) {
-			findCollisionInDirection(i, dx, dy, deltapt, delta, collided, true);
+			Point src = boundingBoxPoint(i);
+			findCollisionInDirection(i, src, dx, dy, deltapt, delta, collided, true);
 		}
 	} else {
 		deltapt.x = dx;

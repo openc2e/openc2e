@@ -186,11 +186,13 @@ void caosVM::v_OBST_c2() {
 		default: caos_assert(false);
 	}
 
+	Point src = targ->boundingBoxPoint(direction);
+
 	Point deltapt(0,0);
 	double delta = 1000000000;
-
 	bool collided = false;
-	targ->findCollisionInDirection(direction, dx, dy, deltapt, delta, collided, false);
+
+	targ->findCollisionInDirection(direction, src, dx, dy, deltapt, delta, collided, false);
 
 	if (!collided)
 		result.setInt(INT_MAX);
