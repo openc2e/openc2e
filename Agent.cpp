@@ -415,8 +415,8 @@ bool const Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int
 	for (unsigned int i = 0; i < 4; i++) {
 		Point src, dest;
 		switch (i) {
-			case 0: src = boundingBoxPoint(3, p, w, h); dest = boundingBoxPoint(0, p, w, h); break; // bottom to left
-			case 1: src = boundingBoxPoint(3, p, w, h); dest = boundingBoxPoint(1, p, w, h); break; // bottom to right
+			case 0: src = boundingBoxPoint(0, p, w, h); dest = boundingBoxPoint(3, p, w, h); break; // left to bottom
+			case 1: src = boundingBoxPoint(1, p, w, h); dest = boundingBoxPoint(3, p, w, h); break; // right to bottom
 			case 2: src = boundingBoxPoint(2, p, w, h); dest = boundingBoxPoint(0, p, w, h); break; // top to left
 			case 3: src = boundingBoxPoint(2, p, w, h); dest = boundingBoxPoint(1, p, w, h); break; // top to right
 		}
@@ -433,7 +433,8 @@ bool const Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int
 
 			// TODO: check suffercollisions?
 			
-			findCollisionInDirection(i, src, dx, dy, deltapt, delta, collided, true);
+			// TODO: muh, provided direction here is kinda a hack
+			findCollisionInDirection((i < 2) ? 3 : 2, src, dx, dy, deltapt, delta, collided, true);
 			if (collided) return false;
 		} else {
 			// Creatures 3 physics
