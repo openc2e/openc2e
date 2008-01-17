@@ -436,8 +436,6 @@ void Agent::physicsTick() {
 
 	if (carriedby) return; // We don't move when carried, so what's the point?
 
-	if (x == 0 && y == 0) return; // TODO: is this correct behaviour? :P
-
 	if (engine.version == 2) {
 		// Creatures 2 physics is different.
 		physicsTickC2();
@@ -685,7 +683,7 @@ void Agent::findCollisionInDirection(unsigned int i, int &dx, int &dy, Point &de
 			room = newroom;
 		}
 	
-		if (i == 3 && dy >= 0) { // TODO: Hack!
+		if (i == 3 && dy >= 0 && size.getInt() > room->floorvalue.getInt()) { // TODO: Hack!
 			for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
 				// pick the floor point which is at our current x location
 				if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
