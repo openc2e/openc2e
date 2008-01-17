@@ -840,8 +840,10 @@ void MapData::copyToWorld() {
 			r->windx = src->windx;
 			r->windy = src->windy;
 
-			// TODO: drop status, music
-			// TODO: floor value
+			r->dropstatus.setInt(src->dropstatus);
+			r->floorvalue.setInt(src->floorvalue);
+
+			r->music = src->music;
 		}
 	}
 

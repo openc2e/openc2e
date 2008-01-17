@@ -52,7 +52,10 @@ public:
 
 	// Creatures 2
 	caosVar temp, lite, radn, ontr, intr, pres, hsrc, lsrc, rsrc, psrc;
+	caosVar floorvalue, dropstatus;
 	int windx, windy;
+	
+	std::string music;
 
 	unsigned int id;
 	class MetaRoom *metaroom;
