@@ -9,6 +9,7 @@ class ImagePreview : public QWidget {
 
 	public:
 		ImagePreview(QWidget *parent = 0);
+		~ImagePreview();
 		void paintEvent(QPaintEvent *event);
 
 	public slots:
@@ -16,6 +17,7 @@ class ImagePreview : public QWidget {
 
 	private:
 		QImage previewimg; // TODO: change to a boost::scoped_ptr or similar?
+		unsigned int *imgdata;
 };
 
 #endif /* IMAGEPREVIEW_H */

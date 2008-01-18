@@ -8,16 +8,19 @@ class AgentInjector : public QDialog {
 	
 	public:
 		AgentInjector(QWidget *parent = 0);
+		~AgentInjector();
 
 	private slots:
 		void onInject();
-		/*void onRemove();*/
-		/*void onSelect(QListWidgetItem *cur, QListWidgetItem *prev);*/
+		void onSelect(QListWidgetItem *current, QListWidgetItem *prev);
+		void onRemove();
 
 	private:
 		Ui::AgentInjectorForm ui;
+		std::vector<class cobFile *> cobfiles;
 
 		void readAgents();
+		void resetAgents();
 };
 
 

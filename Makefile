@@ -50,6 +50,7 @@ OPENC2E_CORE = \
 	Catalogue.o \
 	catalogue.tab.o \
 	cmddata.o \
+	cobFile.o \
 	CompoundAgent.o \
 	CompoundPart.o \
 	Creature.o \

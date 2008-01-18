@@ -53,6 +53,7 @@ SET(OPENC2E_CORE
 	Catalogue.cpp
 	${BIN}/catalogue.tab.cpp
 	cmddata.cpp
+	cobFile.cpp
 	CompoundAgent.cpp
 	CompoundPart.cpp
 	Creature.cpp
