@@ -33,17 +33,25 @@ AgentInjector::~AgentInjector() {
 }
 
 void AgentInjector::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
+	assert(current);
+
+	ui.injectButton->setEnabled(true);
+
 	if (engine.version == 2) {
 		cobAgentBlock *b = (cobAgentBlock *)current->data(Qt::UserRole).value<void *>();
 		assert(b);
 		ui.Description->setText(b->description.c_str());
+		ui.removeButton->setEnabled(b->removescript.size() != 0);
 	} else {
+		ui.removeButton->setEnabled(false); // TODO: support remover files!
 		ui.Description->setText("");
 	}
 }
 
 void AgentInjector::resetAgents() {
 	ui.agentList->clear();
+	ui.injectButton->setEnabled(false);
+	ui.removeButton->setEnabled(false);
 
 	for (std::vector<class cobFile *>::iterator i = cobfiles.begin(); i != cobfiles.end(); i++) {
 		delete *i;
