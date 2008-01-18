@@ -100,13 +100,19 @@ public:
 };
 
 class cobFileBlock {
+protected:
+	cobBlock *parent;
+
 public:
 	cobFileBlock(cobBlock *p);
 	~cobFileBlock();
+	
+	cobBlock *getParent() { return parent; }
 
 	unsigned short filetype;
 	unsigned int filesize;
 	std::string filename;
+	unsigned char *getFileContents();
 };
 
 #endif

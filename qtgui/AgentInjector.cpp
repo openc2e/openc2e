@@ -122,6 +122,65 @@ void AgentInjector::onInject() {
 		cobAgentBlock *b = (cobAgentBlock *)ui.agentList->currentItem()->data(Qt::UserRole).value<void *>();
 		assert(b);
 
+		cobFile *cobfile = b->getParent()->getParent();
+		assert(cobfile);
+
+		// dependencies
+		assert(b->deptypes.size() == b->depnames.size());
+		for (unsigned int i = 0; i < b->deptypes.size(); i++) {
+			unsigned short type = b->deptypes[i];
+			std::string name = b->depnames[i];
+
+			unsigned int praytype;
+			switch (type) {
+				case 0: praytype = 2; break;
+				case 1: praytype = 1; break;
+				default: QMessageBox::warning(this, tr("Couldn't inject:"), tr("Unknown dependency type")); return;
+			}
+
+			std::string directory = world.praymanager.getResourceDir(praytype);
+			caos_assert(!directory.empty());
+		
+			fs::path possiblefile = fs::path(directory, fs::native) / fs::path(name, fs::native);
+			if (!world.findFile(possiblefile.native_directory_string()).empty()) continue; // TODO: update file if necessary?
+
+			std::vector<cobBlock *>::iterator j;
+
+			std::string encounteredfilenames;
+
+			// check all of the available file blocks in this COB
+			for (j = cobfile->blocks.begin(); j != cobfile->blocks.end(); j++) {
+				if ((*j)->type != "file") continue;
+				cobFileBlock *a = new cobFileBlock(*j);
+				if (a->filetype == type && a->filename == name) {
+					// Found dependency!
+					fs::path dir = fs::path(world.getUserDataDir(), fs::native) / fs::path(directory, fs::native);
+					if (!fs::exists(dir))
+						fs::create_directory(dir);
+					assert(fs::exists(dir) && fs::is_directory(dir)); // TODO: error handling
+
+					fs::path outputfile = dir / fs::path(name, fs::native);
+					assert(!fs::exists(outputfile));
+
+					std::ofstream output(outputfile.native_directory_string().c_str(), std::ios::binary);
+					output.write((char *)a->getFileContents(), a->filesize);
+
+					a->getParent()->free();
+
+					break;
+				}
+				encounteredfilenames += " '" + a->filename + "'";
+			}
+
+			if (j == cobfile->blocks.end()) {
+				// Couldn't find dependency!
+				std::string error = "Failed to find required dependency '" + name + "', possible choices were:" + encounteredfilenames;
+				QMessageBox::warning(this, tr("Couldn't inject:"), error.c_str());
+				return;
+			}
+		}
+
+		// script injection
 		for (unsigned int i = 0; i < b->scripts.size(); i++) {
 			idata += b->scripts[i] + "\n";
 		}

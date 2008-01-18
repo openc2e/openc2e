@@ -174,4 +174,29 @@ cobAgentBlock::~cobAgentBlock() {
 	delete[] thumbnail;
 }
 
+cobFileBlock::cobFileBlock(cobBlock *p) {
+	parent = p;
+	std::istream &file = p->getParent()->getStream();
+
+	file.clear();
+	file.seekg(p->getOffset());
+	if (!file.good())
+		throw creaturesException("Failed to seek to block offset.");
+
+	file.read((char *)&filetype, 2); filetype = swapEndianShort(filetype);
+	file.seekg(4, std::ios::cur); // unused
+	file.read((char *)&filesize, 4); filesize = swapEndianLong(filesize);
+	filename = readstring(file);
+}
+
+cobFileBlock::~cobFileBlock() {
+}
+
+unsigned char *cobFileBlock::getFileContents() {
+	if (!parent->isLoaded())
+		parent->load();
+
+	return parent->getBuffer() + 10 + filename.size() + 1;
+}
+
 /* vim: set noet: */
