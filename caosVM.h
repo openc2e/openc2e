@@ -430,6 +430,8 @@ public:
 	void v_GAMN();
 	void c_POWV();
 	void c_RNDV();
+	void v_EGGL();
+	void v_HATL();
 
 	// flow
 	void c_DOIF();

@@ -490,7 +490,7 @@ void caosVM::c_EVNT() {
 /**
  RMEV (command) object (agent)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_RMEV() {
 	VM_PARAM_VALIDAGENT(object)
@@ -510,17 +510,16 @@ void caosVM::c_DDE_NEGG() {
 /**
  DDE: DIED (command)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_DDE_DIED() {
 	// TODO
 }
 
-
 /**
  DDE: LIVE (command)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_DDE_LIVE() {
 	// TODO
