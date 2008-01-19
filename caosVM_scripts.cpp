@@ -103,8 +103,9 @@ void caosVM::c_WAIT() {
 
 	caos_assert(ticks >= 0); // TODO: is this right?
 	if (ticks == 0) return;
-	if (engine.version == 1 && !owner) {
-		// TODO: this message is here until someone works out what the heck ;) the cloud butterfly COB does this, at least
+	if (engine.version < 3 && !owner) {
+		// TODO: this message is here until someone works out what the heck ;)
+		// the C1 cloud butterfly COB and C2 nesting bluebirds COB do this, at least
 		std::cout << "unblockable script is trying to WAIT, ignoring" << std::endl;
 		return;
 	}
