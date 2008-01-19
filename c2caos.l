@@ -29,7 +29,7 @@ f\*\*k	lex_lineno = yylineno; return make_word("f**k");
 
 \'.\'       lex_lineno = yylineno; return make_int(yytext[1]);
 %[01]*                 lex_lineno = yylineno; return make_bin(yytext);
-{WORDINIT}{WORDANY}*                lex_lineno = yylineno; return make_word(yytext);
+{WORDANY}*{WORDINIT}{WORDANY}*                lex_lineno = yylineno; return make_word(yytext);
 [-+]?{DIGIT}+           lex_lineno = yylineno;  return make_int(atoi(yytext));
 
 "<>"                     lex_lineno = yylineno;  return make_word("ne");

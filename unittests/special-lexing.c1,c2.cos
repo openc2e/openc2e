@@ -1,0 +1,8 @@
+DBG: OUTS "1..2"
+GSUB 2bed
+DBG: OUTS "ok 2"
+
+SUBR 2bed
+  DBG: OUTS "ok 1"
+RETN
+
