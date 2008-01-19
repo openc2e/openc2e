@@ -992,9 +992,9 @@ void Agent::setZOrder(unsigned int z) {
 }
 
 int Agent::getUNID() const {
-	  if (unid != -1)
-			  return unid;
-	  return unid = world.getUNID(const_cast<Agent *>(this));
+	if (unid != -1)
+		return unid;
+	return unid = world.newUNID(const_cast<Agent *>(this));
 }
 
 #include "Catalogue.h"

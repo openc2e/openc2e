@@ -283,11 +283,17 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 	return 0;
 }
 
-int World::getUNID(Agent *whofor) {
+void World::setUNID(Agent *whofor, int unid) {
+	assert(whofor->shared_from_this() == unidmap[unid].lock() || unidmap[unid].expired());
+	whofor->unid = unid;
+	unidmap[unid] = whofor->shared_from_this();
+}
+
+int World::newUNID(Agent *whofor) {
 	do {
 		int unid = rand();
 		if (unid && unidmap[unid].expired()) {
-			unidmap[unid] = whofor->shared_from_this();
+			setUNID(whofor, unid);
 			return unid;
 		}
 	} while (1);
@@ -297,8 +303,9 @@ void World::freeUNID(int unid) {
 	unidmap.erase(unid);
 }
 
-Agent *World::lookupUNID(int unid) {
-	return unidmap[unid].lock().get();
+shared_ptr<Agent> World::lookupUNID(int unid) {
+	if (unid == 0) return shared_ptr<Agent>();
+	return unidmap[unid].lock();
 }
 
 void World::drawWorld() {

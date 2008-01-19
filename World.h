@@ -117,10 +117,11 @@ public:
 	void drawWorld();
 	void drawWorld(Camera *cam, Surface *surface);
 
-	int getUNID(Agent *whofor);
+	int newUNID(Agent *whofor);
+	void setUNID(Agent *whofor, int unid);
 	void freeUNID(int unid);
 
-	Agent *lookupUNID(int unid);
+	shared_ptr<Agent> lookupUNID(int unid);
 };
 
 extern World world;
