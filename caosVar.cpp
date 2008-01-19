@@ -21,6 +21,7 @@
 
 #include "caosVar.h"
 #include "Engine.h" // version
+#include "World.h" // unid
 
 #include <iostream>
 #include <sstream>
@@ -74,13 +75,13 @@ bool caosVar::operator == (const caosVar &v) const {
 	} else if (this->hasVector() && v.hasVector()) {
 		return this->getVector() == v.getVector();
 	} else if (engine.version < 3) {
-		// C1/C2 allow you to compare an agent to zero, since agents are integers..
+		// C1/C2 allow you to compare agents to an integer (unid), since agents are integers..
 		// TODO: do this for >/< too?
 
-		if (this->hasInt() && this->getInt() == 0 && v.hasAgent()) {
-			return !(v.getAgent());
-		} else if (v.hasInt() && v.getInt() == 0 && this->hasAgent()) {
-			return !(this->getAgent());
+		if (this->hasInt() && v.hasAgent()) {
+			return world.lookupUNID(this->getInt()) == v.getAgent();
+		} else if (v.hasInt() && this->hasAgent()) {
+			return world.lookupUNID(v.getInt()) == this->getAgent();
 		}
 	}
 
