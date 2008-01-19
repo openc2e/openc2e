@@ -368,6 +368,7 @@ public:
 	void c_VRSN();
 	void v_VRSN();
 	void v_OC2E_DDIR();
+	void c_SYS_CMND();
 
 	// variables
 	void c_SETV();
@@ -665,6 +666,7 @@ public:
 	void c_SPOT();
 	void c_KNOB();
 	void c_KMSG();
+	void c_BBLE();
 
 	// creatures
 	void c_STM_SHOU();
@@ -765,6 +767,7 @@ public:
 	void c_TNTC();
 	void c_INJR();
 	void c_SAY();
+	void c_TRIG();
 	// (clothes)
 	void c_BODY();
 	void v_BODY();

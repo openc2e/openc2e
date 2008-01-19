@@ -1459,8 +1459,10 @@ void caosVM::v_DRIV_c1() {
 /**
  DREA (command) max (integer)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_DREA_c1
+
+ Start dreaming and process (at most?) max instincts.
 */
 void caosVM::c_DREA_c1() {
 	VM_PARAM_INTEGER(max)
@@ -1552,6 +1554,20 @@ void caosVM::c_INJR() {
 */
 void caosVM::c_SAY() {
 	VM_PARAM_STRING(string)
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ TRIG (command) lobe (integer) cell (integer) amount (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_TRIG() {
+	VM_PARAM_INTEGER(amount)
+	VM_PARAM_INTEGER(cell)
+	VM_PARAM_INTEGER(lobe)
 
 	valid_agent(targ);
 	// TODO

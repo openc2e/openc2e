@@ -362,4 +362,17 @@ void caosVM::v_OC2E_DDIR() {
 	result.setString(d);
 }
 
+/**
+ SYS: CMND (command) menuid (integer)
+ %status stub
+ %pragma variants c1 c2
+
+ Do something by providing a menu ID from the original Creatures 1 or Creatures 2 engines. This is obviously limited to the IDs that openc2e is aware of.
+*/
+void caosVM::c_SYS_CMND() {
+	VM_PARAM_INTEGER(menuid)
+
+	// TODO
+}
+
 /* vim: set noet: */

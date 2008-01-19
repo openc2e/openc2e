@@ -684,4 +684,20 @@ void caosVM::c_KMSG() {
 	c->setHotspotFuncDetails(function, message, flags);
 }
 
+/**
+ BBLE (command) text (string) ticks (integer) type (integer) track (integer)
+ %status stub
+ %pragma variants c2
+
+ Display the given text for the given number of ticks, in a bubble (type is 0 for speech or 1 for thought).
+*/
+void caosVM::c_BBLE() {
+	VM_PARAM_INTEGER(track)
+	VM_PARAM_INTEGER(type)
+	VM_PARAM_INTEGER(ticks)
+	VM_PARAM_STRING(text)
+
+	// TODO
+}
+
 /* vim: set noet: */
