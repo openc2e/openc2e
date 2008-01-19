@@ -173,7 +173,7 @@ void caosVM::c_NEW_GENE() {
 	VM_PARAM_INTEGER(dad)
 	VM_PARAM_INTEGER(mum)
 
-	destination->setInt(0); // TODO
+	destination->setInt(mum); // TODO
 }
 
 /* vim: set noet: */

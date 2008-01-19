@@ -176,7 +176,7 @@ c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 }
 
 c2Creature::c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : oldCreature(g, is_female, _variant) {
-	assert(g->getVersion() == 1);
+	assert(g->getVersion() == 2);
 
 	throw creaturesException("You can't create Creatures 2 creatures yet. Bug fuzzie."); // TODO
 
