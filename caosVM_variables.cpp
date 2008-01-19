@@ -1039,4 +1039,26 @@ void caosVM::c_RNDV() {
 	var->setInt(calculateRand(value1, value2));
 }
 
+/**
+ EGGL (integer)
+ %status stub
+ %pragma variants c2
+
+ Returns the egg limit - when there are more than this many norns in the world, eggs should not hatch.
+*/
+void caosVM::v_EGGL() {
+	result.setInt(16); // TODO
+}
+
+/**
+ HATL (integer)
+ %status stub
+ %pragma variants c2
+ 
+ Returns the hatchery limit - when there are more than this many norns in the world, the hatchery should shut down.
+*/
+void caosVM::v_HATL() {
+	result.setInt(12); // TODO
+}
+
 /* vim: set noet: */
