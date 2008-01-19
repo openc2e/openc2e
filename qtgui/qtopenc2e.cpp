@@ -61,9 +61,12 @@ QtOpenc2e::QtOpenc2e() {
 
 	toggleScrollbarsAct = new QAction(tr("Show &Scrollbars"), this);
 	toggleScrollbarsAct->setCheckable(true);
-	toggleScrollbarsAct->setChecked(true);
 	connect(toggleScrollbarsAct, SIGNAL(triggered()), this, SLOT(toggleShowScrollbars()));
 	viewMenu->addAction(toggleScrollbarsAct);
+	
+	// only enable scrollbars for c1/c2, by default
+	toggleScrollbarsAct->setChecked(engine.version < 3);
+	toggleShowScrollbars();
 
 	/* Control menu */
 
