@@ -161,7 +161,11 @@ cobAgentBlock::cobAgentBlock(cobBlock *p) {
 		unsigned short deptype;
 		file.read((char *)&deptype, 2); deptype = swapEndianShort(deptype);
 		deptypes.push_back(deptype);
-		depnames.push_back(readstring(file));
+
+		// depnames should be read as lower-case to ease comparison
+		std::string depname = readstring(file);
+		std::transform(depname.begin(), depname.end(), depname.begin(), (int(*)(int))tolower);
+		depnames.push_back(depname);
 	}
 
 	file.read((char *)&thumbnailwidth, 2); thumbnailwidth = swapEndianShort(thumbnailwidth);
@@ -186,7 +190,10 @@ cobFileBlock::cobFileBlock(cobBlock *p) {
 	file.read((char *)&filetype, 2); filetype = swapEndianShort(filetype);
 	file.seekg(4, std::ios::cur); // unused
 	file.read((char *)&filesize, 4); filesize = swapEndianLong(filesize);
+		
+	// filenames should be read as lower-case to ease comparison
 	filename = readstring(file);
+	std::transform(filename.begin(), filename.end(), filename.begin(), (int(*)(int))tolower);
 }
 
 cobFileBlock::~cobFileBlock() {
