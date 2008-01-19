@@ -635,7 +635,7 @@ void caosVM::c_BBTX() {
 /**
  SPOT (command) spotno (integer) left (integer) top (integer) right (integer) bottom (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_SPOT() {
 	VM_PARAM_INTEGER(bottom)
@@ -654,7 +654,7 @@ void caosVM::c_SPOT() {
 /**
  KNOB (command) function (integer) spotno (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_KNOB() {
 	VM_PARAM_INTEGER(spotno)
@@ -665,6 +665,23 @@ void caosVM::c_KNOB() {
 	caos_assert(c);
 
 	c->setHotspotFunc(function, spotno);
+}
+
+/**
+ KMSG (command) function (integer) flags (integer) message (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::c_KMSG() {
+	VM_PARAM_INTEGER(message)
+	VM_PARAM_INTEGER(flags)
+	VM_PARAM_INTEGER(function)
+
+	valid_agent(targ);
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
+	caos_assert(c);
+
+	c->setHotspotFuncDetails(function, message, flags);
 }
 
 /* vim: set noet: */

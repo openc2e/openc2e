@@ -664,6 +664,7 @@ public:
 	void c_BBTX();
 	void c_SPOT();
 	void c_KNOB();
+	void c_KMSG();
 
 	// creatures
 	void c_STM_SHOU();
