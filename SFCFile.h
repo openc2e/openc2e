@@ -209,6 +209,7 @@ public:
 
 	uint8 size, threat;
 	uint32 range, accg, velx, vely, rest, aero;
+	uint32 gravdata;
 
 	bool frozen;
 

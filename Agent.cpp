@@ -53,7 +53,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 		
 		size = 127; // TODO: correct default?
 		thrt = 0;
-		// grav?
+		// TODO: it looks like grav should be 0, but make sure!
 	} else if (engine.version > 2) {
 		accg = 0.3f;
 		aero = 0;

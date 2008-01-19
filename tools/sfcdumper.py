@@ -438,9 +438,9 @@ class Object:
 			# misc physics-ish data
 			self.size = read8(f)
 			self.range = read32(f)
-			x = read32(f) # TODO: FFFF FFFF?
+			x = read32(f)
 			if x != 0xffffffff:
-				print "* mysterious physicsish value: " + str(x)
+				print "* mysterious physicsish value (probably GRAV related): " + str(x)
 			self.accg = read32(f)
 			self.velx = reads32(f)
 			self.vely = reads32(f)

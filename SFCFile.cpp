@@ -534,8 +534,8 @@ void SFCObject::read() {
 		size = read8();
 		range = read32();
 	
-		// discard unknown bytes
-		read32();
+		// TODO: this is mysterious and unknown
+		gravdata = read32();
 
 		// read physics values
 		accg = read32();
@@ -941,6 +941,7 @@ void SFCCompoundObject::copyToWorld() {
 		a->thrt.setInt(threat);
 		a->range.setInt(range);
 		a->accg.setInt(accg);
+		a->grav.setInt(gravdata == 0xFFFFFFFF ? 0 : 1); // TODO
 		a->velx.setInt(velx);
 		a->vely.setInt(vely);
 		a->rest.setInt(rest);
@@ -1018,6 +1019,7 @@ void SFCSimpleObject::copyToWorld() {
 		a->thrt.setInt(threat);
 		a->range.setInt(range);
 		a->accg.setInt(accg);
+		a->grav.setInt(gravdata == 0xFFFFFFFF ? 0 : 1); // TODO
 		a->velx.setInt(velx);
 		a->vely.setInt(vely);
 		a->rest.setInt(rest);
