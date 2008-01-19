@@ -920,7 +920,7 @@ void SFCCompoundObject::copyToWorld() {
 	a->moveTo(parts[0]->x, parts[0]->y);
 	a->queueScript(7); // enter scope
 	
-	world.setUNID(a, unid);
+	if (parent->version() == 1) world.setUNID(a, unid);
 
 	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
@@ -993,7 +993,7 @@ void SFCSimpleObject::copyToWorld() {
 	a->moveTo(entity->x, entity->y);
 	a->queueScript(7); // enter scope
 
-	world.setUNID(a, unid);
+	if (parent->version() == 1) world.setUNID(a, unid);
 	
 	// copy data from ourselves
 	
