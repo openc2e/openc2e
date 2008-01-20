@@ -43,7 +43,8 @@ QtOpenc2e::QtOpenc2e() {
 	timer->start();
 
 	(void)statusBar();
-	setWindowTitle(tr("openc2e"));
+	std::string titlebar = engine.getGameName() + " - openc2e (development build)";
+	setWindowTitle(titlebar.c_str());
 	resize(800, 600);
 
 	/* File menu */

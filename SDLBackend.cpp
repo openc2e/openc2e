@@ -44,7 +44,12 @@ void SDLBackend::init() {
 	mainsurface.height = 600;
 	mainsurface.surface = 0;
 
-	SDL_WM_SetCaption("openc2e (development build)", "openc2e");
+	std::string windowtitle;
+	if (engine.getGameName().size()) windowtitle = engine.getGameName() + " - ";
+	windowtitle += "openc2e";
+	std::string titlebar = windowtitle + " (development build)";
+	SDL_WM_SetCaption(titlebar.c_str(), windowtitle.c_str());
+
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_ShowCursor(false);
 	// bz2 and fuzzie both think this is the only way to get useful ascii out of SDL
