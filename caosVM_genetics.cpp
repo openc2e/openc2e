@@ -155,11 +155,12 @@ void caosVM::v_MTOA() {
 void caosVM::v_MTOC() {
 	VM_PARAM_STRING(moniker)
 
-	caos_assert(world.history.hasMoniker(moniker));
+	result.setAgent(0);
+	if (!world.history.hasMoniker(moniker)) return;
 	Agent *a = world.history.getMoniker(moniker).owner;
-	assert(a);
+	if (!a) return;
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(a);
-	assert(c);
+	assert(c); // TODO: is this assert valid? can history events have non-creature owners?
 	result.setAgent(c);
 }
 
