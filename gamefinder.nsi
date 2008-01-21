@@ -10,7 +10,7 @@ ShowInstDetails show
 
 SetCompressor lzma
 
-Icon "openc2e.ico"
+Icon "gamefind.ico"
 
 !include LogicLib.nsh
 
@@ -65,7 +65,7 @@ Section
 	
   ReadRegStr $dir HKLM "Software\openc2e" ""
 	
-	DetailPrint "Checking for Creatures games installed on your computer.  Ignore errors."
+	DetailPrint "Checking for Creatures games installed on your computer..."
 	DetailPrint ""
 
   ; Vanilla C3
@@ -80,10 +80,10 @@ Section
 		trim1:
 		StrCpy $plainc3 "$plainc3" -1
 		make1:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 3.lnk" "$dir\openc2e.exe" '-d "$plainc3" --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures 3.lnk" "$dir\openc2e.exe" '-d "$plainc3" --autokill'
 	${Else}
 	  DetailPrint "Could not find Creatures 3 (original)."
-		Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 3.lnk"
+		Delete "$SMPROGRAMS\openc2e\Games\Creatures 3.lnk"
 	${EndIf}
 
 	; Vanilla DS
@@ -98,10 +98,10 @@ Section
 		trim2:
 		StrCpy $plainds "$plainds" -1
 		make2:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Docking Station.lnk" "$dir\openc2e.exe" '-d "$plainds" --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Docking Station.lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$plainds" --autokill'
 	${Else}
 		DetailPrint "Could not find Docking Station (original)."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Docking Station.lnk"
+	  Delete "$SMPROGRAMS\openc2e\Docking Station.lnk"
 	${EndIf}
 
 	; Edynn
@@ -116,10 +116,10 @@ Section
 		trim3:
 		StrCpy $edynn "$edynn" -1
 		make3:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Edynn.lnk" "$dir\openc2e.exe" '-d "$edynn" --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Edynn.lnk" "$dir\openc2e.exe" '--gamename "Edynn" -d "$edynn" --autokill'
 	${Else}
 	  DetailPrint "Could not find Edynn."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Edynn.lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Edynn.lnk"
 	${EndIf}
 
 	;Exodus C3
@@ -134,10 +134,10 @@ Section
 		trim4:
 		StrCpy $exodc3 "$exodc3" -1
 		make4:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 3 (Exodus).lnk" "$dir\openc2e.exe" '-d "$exodc3" --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures 3 (Exodus).lnk" "$dir\openc2e.exe" '-d "$exodc3" --autokill'
 	${Else}
 	  DetailPrint "Could not find Creatures 3 (Exodus)."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 3 (Exodus).lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures 3 (Exodus).lnk"
 	${EndIf}
 
 	;Exodus DS
@@ -152,10 +152,10 @@ Section
 		trim5:
 		StrCpy $exodds "$exodds" -1
 		make5:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Docking Station (Exodus).lnk" "$dir\openc2e.exe" '-d "$exodds" --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Docking Station (Exodus).lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$exodds" --autokill'
 	${Else}
 	  DetailPrint "Could not find Docking Station (Exodus)."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Docking Station (Exodus).lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Docking Station (Exodus).lnk"
 	${EndIf}
 	
 	;Creatures Adventures
@@ -170,10 +170,10 @@ Section
 		trim6:
 		StrCpy $ca "$ca" -1
 		make6:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures Adventures.lnk" "$dir\openc2e.exe" '-d "$ca" -g cv'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures Adventures.lnk" "$dir\openc2e.exe" '--gamename "Creatures Adventures" -d "$ca" -g cv'
 	${Else}
 	  DetailPrint "Could not find Creatures Adventures."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures Adventures.lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures Adventures.lnk"
 	${EndIf}
 	
 	;Creatures Playground
@@ -188,10 +188,10 @@ Section
 		trim7:
 		StrCpy $cp "$cp" -1
 		make7:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures Playground.lnk" "$dir\openc2e.exe" '-d "$cp" -g cv'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures Playground.lnk" "$dir\openc2e.exe" '--gamename "Creatures Playground" -d "$cp" -g cv'
 	${Else}
 	  DetailPrint "Could not find Creatures Playground."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures Playground.lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures Playground.lnk"
 	${EndIf}
 	
 	;Creatures Village
@@ -206,10 +206,10 @@ Section
 		trim8:
 		StrCpy $cv "$cv" -1
 		make8:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures Village.lnk" "$dir\openc2e.exe" '-d "$cv" -g cv'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures Village.lnk" "$dir\openc2e.exe" '-d "$cv" -g cv'
 	${Else}
 	  DetailPrint "Could not find Creatures Village."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures Village.lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures Village.lnk"
 	${EndIf}
 	
 	;Original C2
@@ -224,10 +224,10 @@ Section
 		trim9:
 		StrCpy $plainc2 "$plainc2" -1
 		make9:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 2.lnk" "$dir\openc2e.exe" '-d "$plainc2" -g c2 --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures 2.lnk" "$dir\openc2e.exe" '-d "$plainc2" -g c2 --autokill'
 	${Else}
 	  DetailPrint "Could not find Creatures 2 (original)."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 2.lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures 2.lnk"
 	${EndIf}
 	
 		;Original C1
@@ -242,10 +242,10 @@ Section
 		trim10:
 		StrCpy $plainc1 "$plainc1" -1
 		make10:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 1.lnk" "$dir\openc2e.exe" '-d "$plainc1" -g c1 --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures 1.lnk" "$dir\openc2e.exe" '-d "$plainc1" -g c1 --autokill'
 	${Else}
 	  DetailPrint "Could not find Creatures 1 (original)."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 1.lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures 1.lnk"
 	${EndIf}
 	
 		;TAY C2
@@ -260,10 +260,10 @@ Section
 		trim11:
 		StrCpy $tayc2 "$tayc2" -1
 		make11:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 2 (TAY).lnk" "$dir\openc2e.exe" '-d "$tayc2" -g c2 --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures 2 (TAY).lnk" "$dir\openc2e.exe" '-d "$tayc2" -g c2 --autokill'
 	${Else}
 	  DetailPrint "Could not find Creatures 2 (The Albian Years)."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 2 (TAY).lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures 2 (TAY).lnk"
 	${EndIf}
 	
 		;TAY C1
@@ -278,11 +278,11 @@ Section
 		trim12:
 		StrCpy $tayc1 "$tayc1" -1
 		make12:
-		CreateShortCut "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 1 (TAY).lnk" "$dir\openc2e.exe" '-d "$tayc1" -g c1 --autokill'
+		CreateShortCut "$SMPROGRAMS\openc2e\Games\Creatures 1 (TAY).lnk" "$dir\openc2e.exe" '-d "$tayc1" -g c1 --autokill'
 	${Else}
 	  DetailPrint "Could not find Creatures 1 (The Albian Years)."
-	  Delete "$SMPROGRAMS\openc2e\Games\openc2e - Creatures 1 (TAY).lnk"
+	  Delete "$SMPROGRAMS\openc2e\Games\Creatures 1 (TAY).lnk"
 	${EndIf}
 SectionEnd
 
-BrandingText "Sine Creatures Collective"
+BrandingText "openc2e Gamefinder"
