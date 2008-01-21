@@ -710,6 +710,7 @@ void caosVM::v_ERID() {
 /**
  DELR (command) room_id (integer)
  %status stub
+ %pragma variants c2 cv c3
 
  Removes the given room from the map.
 */
