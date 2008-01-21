@@ -182,11 +182,13 @@ void SkeletalCreature::skeletonInit() {
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % (int)creature->getStage()));
 		
 		// TODO: don't bother tinting if we don't need to
-		assert(dynamic_cast<duppableImage *>(images[i].get()));
-		s16Image *newimage = new s16Image();
-		((duppableImage *)images[i].get())->duplicateTo(newimage);
-		newimage->tint(creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
-		images[i] = shared_ptr<creaturesImage>(newimage);
+		if (engine.version > 1) { // TODO: make this work for c1 :(
+			assert(dynamic_cast<duppableImage *>(images[i].get()));
+			s16Image *newimage = new s16Image();
+			((duppableImage *)images[i].get())->duplicateTo(newimage);
+			newimage->tint(creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
+			images[i] = shared_ptr<creaturesImage>(newimage);
+		}
 
 		// find relevant ATT data
 		stage_to_try = creature->getStage();
