@@ -471,6 +471,8 @@ void SkeletalCreature::setPoseGene(unsigned int poseno) {
 	// TODO: upon second thought i think poseno is good - fuzzie
 	// TODO: this needs thought, darnit
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+		if ((*i)->header.switchontime != creature->getStage()) continue;
+
 		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
 			creaturePoseGene *g = (creaturePoseGene *)(*i);
 			if (g->poseno == poseno) {
@@ -484,6 +486,8 @@ void SkeletalCreature::setPoseGene(unsigned int poseno) {
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+		if ((*i)->header.switchontime != creature->getStage()) continue;
+
 		if (typeid(*(*i)) == typeid(creatureGaitGene)) {
 			creatureGaitGene *g = (creatureGaitGene *)(*i);
 			if (g->drive == gaitdrive) {
@@ -543,6 +547,8 @@ void SkeletalCreature::gaitTick() {
 	}
 	creaturePoseGene *poseg = 0;
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+		if ((*i)->header.switchontime != creature->getStage()) continue;
+
 		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
 			creaturePoseGene *g = (creaturePoseGene *)(*i);
 			if (g->poseno == pose)
@@ -584,6 +590,8 @@ void SkeletalCreature::creatureAged() {
 
 std::string SkeletalCreature::getFaceSpriteName() {
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+		if ((*i)->header.switchontime != creature->getStage()) continue;
+
 		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
 			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
 			if (x->part == 0) {
