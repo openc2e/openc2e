@@ -217,10 +217,14 @@ void QtOpenc2e::newNorn() {
 
 	SkeletalCreature *a = new SkeletalCreature(4, c);
 	a->finishInit();
+	a->attr.setInt(1 + 2 + 128); // carryable, mouseable, roombound
+
 	c->setAgent(a);
 
 	a->slots[0] = genome;
 	world.newMoniker(genome, genomefile, a);
+
+	// TODO: set it dreaming
 
 	world.hand()->addCarried(a);
 }
