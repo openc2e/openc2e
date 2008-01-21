@@ -5,7 +5,7 @@
 TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
-INCLUDEPATH += . /usr/include/SDL ..
+INCLUDEPATH += . /usr/include/SDL /usr/include/AL ..
 FORMS = agents.ui
 
 # Input

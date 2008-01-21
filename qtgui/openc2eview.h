@@ -66,6 +66,7 @@ public:
 
 class QtBackend : public SDLBackend {
 public:
+	QtBackend();
 	void init() { }
 	void SDLinit() { SDLBackend::init(); }
 	void resized(int w, int h) { resizeNotify(w, h); }

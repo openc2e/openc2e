@@ -194,6 +194,7 @@ int translateQtKey(int qtkey) {
 		case Qt::Key_Tab: return 9;
 		case Qt::Key_Clear: return 12;
 		case Qt::Key_Return: return 13;
+		case Qt::Key_Enter: return 13;
 		case Qt::Key_Shift: return 16;
 		case Qt::Key_Control: return 17;
 		case Qt::Key_Pause: return 19;
@@ -216,6 +217,16 @@ int translateQtKey(int qtkey) {
 }
 
 void openc2eView::keyPressEvent(QKeyEvent *k) {
+	int key = translateQtKey(k->key());
+	if (key != -1) {
+		SomeEvent e;
+		e.type = eventspecialkeydown;
+		e.key = key;
+		backend->pushEvent(e);
+		backend->downkeys[key] = true;
+		return;
+	}
+
 	for (int i = 0; i < k->text().size(); i++) {
 		// TODO: openc2e probably doesn't like latin1
 		char x = k->text().at(i).toLatin1();
@@ -225,19 +236,19 @@ void openc2eView::keyPressEvent(QKeyEvent *k) {
 			e.type = eventkeydown;
 			e.key = x;
 			backend->pushEvent(e);
-			// TODO: change downkeys as necessary
-			continue;
+
+			// letters/numbers get magic
+			e.type = eventspecialkeydown;
+			if (x >= 97 && x <= 122) { // lowercase letters
+				e.key = x - 32; // capitalise
+			} else if (x >= 48 && x <= 57) { // numbers
+				e.key = x;
+			} else continue;
+
+			backend->pushEvent(e);
+			backend->downkeys[e.key] = true;
 		}
-	}
-	
-	int key = translateQtKey(k->key());
-	if (key != -1) {
-		SomeEvent e;
-		e.type = eventspecialkeydown;
-		e.key = key;
-		backend->pushEvent(e);
-		backend->downkeys[key] = true;
-	}
+	}	
 }
 
 void openc2eView::keyReleaseEvent(QKeyEvent *k) {
@@ -248,6 +259,30 @@ void openc2eView::keyReleaseEvent(QKeyEvent *k) {
 		e.key = key;
 		backend->pushEvent(e);
 		backend->downkeys[key] = false;
+		return;
+	}
+
+	for (int i = 0; i < k->text().size(); i++) {
+		// TODO: openc2e probably doesn't like latin1
+		char x = k->text().at(i).toLatin1();
+		if (x != 0) {
+			// We have a Latin-1 key which we can process.
+			SomeEvent e;
+			/*e.type = eventkeyup;
+			e.key = x;
+			backend->pushEvent(e);*/
+
+			// letters/numbers get magic
+			e.type = eventspecialkeyup;
+			if (x >= 97 && x <= 122) { // lowercase letters
+				e.key = x - 32; // capitalise
+			} else if (x >= 48 && x <= 57) { // numbers
+				e.key = x;
+			} else continue;
+
+			backend->pushEvent(e);
+			backend->downkeys[e.key] = false;
+		}
 	}
 }
 
@@ -262,6 +297,12 @@ void openc2eView::tick() {
 	if (lastMetaroom != world.camera.getMetaRoom()) {
 		lastMetaroom = world.camera.getMetaRoom();
 		resizescrollbars();
+	}
+}
+
+QtBackend::QtBackend() {
+	for (unsigned int i = 0; i < 256; i++) {
+		downkeys[i] = false;
 	}
 }
 
@@ -284,3 +325,4 @@ void QtBackend::pushEvent(SomeEvent e) {
 bool QtBackend::keyDown(int key) {
 	return downkeys[key];
 }
+
