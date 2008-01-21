@@ -99,6 +99,11 @@ QtOpenc2e::QtOpenc2e() {
 	connect(showMapAct, SIGNAL(triggered()), this, SLOT(toggleShowMap()));
 	debugMenu->addAction(showMapAct);
 
+	newNornAct = new QAction(tr("Create a new (debug) &Norn"), this);
+	if (engine.version > 2) newNornAct->setEnabled(false); // TODO
+	connect(newNornAct, SIGNAL(triggered()), this, SLOT(newNorn()));
+	debugMenu->addAction(newNornAct);
+
 	/* Tools menu */
 
 	toolsMenu = menuBar()->addMenu(tr("&Tools"));
@@ -188,5 +193,35 @@ void QtOpenc2e::toggleDisplayUpdates() {
 void QtOpenc2e::toggleAutokill() {
 	world.autokill = !world.autokill;
 	autokillAct->setChecked(world.autokill);
+}
+
+#include "../Creature.h"
+#include "../SkeletalCreature.h"
+#include "../PointerAgent.h"
+
+#undef slots
+void QtOpenc2e::newNorn() {
+	if (engine.version > 2) return; // TODO: fixme
+
+	std::string genomefile = "test";
+	shared_ptr<genomeFile> genome = world.loadGenome(genomefile);
+	if (!genome) {
+		//
+		return;
+	}
+
+	int sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
+	oldCreature *c;
+	if (engine.version == 1) c = new c1Creature(genome, (sex == 2), 0);
+	else c = new c2Creature(genome, (sex == 2), 0);
+
+	SkeletalCreature *a = new SkeletalCreature(4, c);
+	a->finishInit();
+	c->setAgent(a);
+
+	a->slots[0] = genome;
+	world.newMoniker(genome, genomefile, a);
+
+	world.hand()->addCarried(a);
 }
 

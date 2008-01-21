@@ -37,11 +37,14 @@ private slots:
 	void toggleFastSpeed();
 	void toggleDisplayUpdates();
 	void toggleAutokill();
+	void newNorn();
 
 private:
 	QToolBar *maintoolbar;
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
-	QAction *exitAct, *aboutAct, *agentInjectorAct, *showMapAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
+	QAction *exitAct, *aboutAct, *agentInjectorAct;
+	QAction *showMapAct, *newNornAct;
+	QAction *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
 
 	AgentInjector *agentInjector;
 	
