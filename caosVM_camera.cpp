@@ -132,8 +132,8 @@ void caosVM::c_CMRT() {
 	valid_agent(targ);
 	
 	MetaRoom *r = world.map.metaRoomAt(targ->x, targ->y);
-	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) - (targ->getWidth() / 2.0f));
-	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) - (targ->getHeight() / 2.0f));
+	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) + (targ->getWidth() / 2.0f));
+	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) + (targ->getHeight() / 2.0f));
 	if (r)
 		getCamera()->goToMetaRoom(r->id, xpos, ypos, (cameratransition)pan); // TODO: pan okay?
 }
@@ -476,12 +476,15 @@ void caosVM::c_FRSH() {
  SYS: CMRP (command) x (integer) y (integer)
  %status maybe
  %pragma variants c2
+
+ Smooth scroll the camera so that the specified coordinates are in the center of the window.
+ (Yes, this differs from what the incorrect C2 documentation says.)
 */
 void caosVM::c_SYS_CMRP() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	getCamera()->moveTo(x, y, smoothscrollifvisible);
+	getCamera()->moveTo(x - (getCamera()->getWidth() / 2), y - (getCamera()->getWidth() / 2), smoothscroll);
 }
 
 /**
@@ -503,8 +506,8 @@ void caosVM::c_SYS_CMRA() {
 */
 void caosVM::c_SYS_CAMT() {
 	// TODO: does CAMT behave like this in c1/c2?
-	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) - (targ->getWidth() / 2.0f));
-	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) - (targ->getHeight() / 2.0f));
+	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) + (targ->getWidth() / 2.0f));
+	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) + (targ->getHeight() / 2.0f));
 	getCamera()->moveTo(xpos, ypos);
 }
 

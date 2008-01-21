@@ -124,9 +124,9 @@ void Camera::updateTracking() {
 	if (!trackedagent) return;
 
 	// TODO: not very intelligent :) also, are int casts correct?
-	int x = (int)trackedagent->x - (getWidth() / 2);
-	int y = (int)trackedagent->y - (getHeight() / 2);
-	moveTo(x, y);
+	int trackx = (int)trackedagent->x + ((int)trackedagent->getWidth() / 2) - (int)(getWidth() / 2);
+	int tracky = (int)trackedagent->y + ((int)trackedagent->getHeight() / 2) - (int)(getHeight() / 2);
+	moveTo(trackx, tracky);
 }
 
 unsigned int const MainCamera::getWidth() {
