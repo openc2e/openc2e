@@ -151,25 +151,32 @@ void Creature::tick() {
 	if (tickage) age++;
 }
 
+/*
+ * oldCreature contains the shared elements of C1 of C2 (creatures are mostly identical in both games)
+ */
 oldCreature::oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
 	biochemticks = 0;
 	halflives = 0;
+	
+	for (unsigned int i = 0; i < 8; i++) floatingloci[i] = 0;
+	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0;
+	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0;
+	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0;
+	
+	muscleenergy = 0;
+	fertile = pregnant = receptive = 0;
+	dead = 0;	
 }
 
 c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : oldCreature(g, is_female, _variant) {
 	assert(g->getVersion() == 1);
 
-	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0;
-	for (unsigned int i = 0; i < 8; i++) floatingloci[i] = 0;
-	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0;
-	muscleenergy = 0;
-	fertile = pregnant = receptive = 0;
-	dead = 0;
 	for (unsigned int i = 0; i < 6; i++) senses[i] = 0;
-	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0;
 	for (unsigned int i = 0; i < 8; i++) gaitloci[i] = 0;
 	for (unsigned int i = 0; i < 16; i++) drives[i] = 0;
 	
+	// TODO: chosenagents size
+
 	brain = new oldBrain(this);
 	processGenes();
 	brain->init();
@@ -179,6 +186,14 @@ c2Creature::c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 	assert(g->getVersion() == 2);
 
 	throw creaturesException("You can't create Creatures 2 creatures yet. Bug fuzzie."); // TODO
+	
+	for (unsigned int i = 0; i < 14; i++) senses[i] = 0;
+	for (unsigned int i = 0; i < 16; i++) gaitloci[i] = 0;
+	for (unsigned int i = 0; i < 17; i++) drives[i] = 0;
+
+	mutationchance = 0; mutationdegree = 0;
+
+	// TODO: chosenagents size
 
 	brain = new oldBrain(this);
 	processGenes();

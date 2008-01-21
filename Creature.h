@@ -130,6 +130,14 @@ protected:
 	unsigned int biochemticks;
 	bioHalfLivesGene *halflives;
 
+	// loci
+	unsigned char floatingloci[8];
+	unsigned char muscleenergy;
+	unsigned char lifestageloci[7];
+	unsigned char fertile, receptive, pregnant;
+	unsigned char dead;
+	unsigned char involaction[8];
+	
 	void addGene(gene *);
 	void tickBrain();
 	virtual void tickBiochemistry();
@@ -152,12 +160,8 @@ protected:
 	std::vector<c1Emitter> emitters;
 	
 	// loci
-	unsigned char floatingloci[8];
-	unsigned char muscleenergy;
-	unsigned char lifestageloci[7];
-	unsigned char fertile, receptive, pregnant;
-	unsigned char dead;
-	unsigned char senses[6], involaction[8], gaitloci[8];
+	unsigned char senses[6];
+	unsigned char gaitloci[8];
 	unsigned char drives[16];
 
 	void addGene(gene *);
@@ -179,6 +183,13 @@ public:
 };
 
 class c2Creature : public oldCreature {
+protected:
+	// loci
+	unsigned char senses[6];
+	unsigned char gaitloci[8];
+	unsigned char drives[16];
+	unsigned char mutationchance, mutationdegree;
+
 public:
 	c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
 	
