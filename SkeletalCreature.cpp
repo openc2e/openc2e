@@ -528,6 +528,8 @@ void SkeletalCreature::tick() {
 	
 	if (!carriedby && !invehicle)
 		snapDownFoot();
+	else
+		downfootroom.reset();
 }
 
 void SkeletalCreature::physicsTick() {
