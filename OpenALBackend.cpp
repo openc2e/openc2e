@@ -18,7 +18,7 @@
  */
 
 #include "OpenALBackend.h"
-#include <AL/alut.h>
+#include <alut.h>
 #include <iostream>
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
