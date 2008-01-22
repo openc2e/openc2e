@@ -217,7 +217,7 @@ void QtOpenc2e::newNorn() {
 
 	SkeletalCreature *a = new SkeletalCreature(4, c);
 	a->finishInit();
-	a->attr.setInt(1 + 2 + 128); // carryable, mouseable, roombound
+	// if you make this work for c2e, you should probably set sane attributes here?
 
 	c->setAgent(a);
 

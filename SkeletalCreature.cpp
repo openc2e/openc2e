@@ -96,6 +96,17 @@ SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : Creatur
 	calculated = false;
 	skeletonInit();
 
+	if (engine.version == 1) {
+		setAttributes(64 + 4 + 2); // mouseable, activateable, groundbound(?!)
+	} else if (engine.version == 2) {
+		setAttributes(128 + 64 + 4 + 2); // mouseable, activateable, suffersphysics, sufferscollisions
+		// default values from original engine
+		size.setInt(224);
+		rest.setInt(70);
+		accg.setInt(15);
+		aero.setInt(10);
+	}
+
 	// needs to go last for now, so we can throw exceptions from skeletonInit
 	skeleton = new SkeletonPart(this);
 }
@@ -365,6 +376,7 @@ void SkeletalCreature::snapDownFoot() {
 				float ydiff = 10000.0f; // TODO: big number
 				for (std::map<weak_ptr<Room>,RoomDoor *>::iterator i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
 					shared_ptr<Room> thisroom = i->first.lock();
+					if (engine.version == 2 && size.getInt() > i->second->perm) continue;
 					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
 						float thisydiff = fabs(footy - thisroom->floorYatX(footx));
 						if (thisydiff < ydiff) {
@@ -379,7 +391,7 @@ void SkeletalCreature::snapDownFoot() {
 
 	if (!newroom) {
 		// TODO
-		newroom = world.map.roomAt(footx, footy);
+		newroom = bestRoomAt(footx, footy, 3, shared_ptr<Room>());
 		// insane emergency handling
 		float newfooty = footy;
 		while (!newroom && newfooty > (footy - 500.0f)) {
@@ -388,6 +400,8 @@ void SkeletalCreature::snapDownFoot() {
 		}
 	}
 
+	bool newroomchosen = (newroom != downfootroom) && downfootroom;
+	bool hadroom = (downfootroom);
 	downfootroom = newroom;
 	
 	if (!downfootroom /*|| !falling */) {
@@ -395,8 +409,40 @@ void SkeletalCreature::snapDownFoot() {
 		return;
 	}
 
+	bool belowfloor = false;
 	float newy = downfootroom->floorYatX(footx);
+	if (engine.version == 2 && hadroom && y > newy) {
+		// TODO: hilar hack: cope with walking below floors
+		belowfloor = true;
+		newy = downfootroom->bot.pointAtX(footx).y;
+	}
+
+	if (engine.version == 2) {
+		// TODO: hilar hack: enable gravity if we're snapping by much
+		if (newroomchosen && abs(y - (newy - (footy - y))) > 20) {
+			grav.setInt(1);
+			return;
+		}
+	}
 	y = newy - (footy - y);
+	if (engine.version == 2) {
+		if (!belowfloor && downfootroom->floorpoints.size()) {
+			// TODO: hilar hack: same as above for floorvalue
+			if (size.getInt() <= downfootroom->floorvalue.getInt()) {
+				grav.setInt(1);
+				return;
+			}
+		} else {
+			// TODO: hilar hack: same as above for perm
+			shared_ptr<Room> downroom = world.map.roomAt(footx, downfootroom->y_left_floor + 1);
+			if (downfootroom->doors.find(downroom) != downfootroom->doors.end()) {
+				if (size.getInt() <= downfootroom->doors[downroom]->perm) {
+					grav.setInt(1);
+					return;
+				}
+			}
+		}
+	}
 }
 
 void SkeletalCreature::setPose(unsigned int p) {
@@ -526,13 +572,19 @@ void SkeletalCreature::tick() {
 		gaitTick();
 	}
 	
-	if (!carriedby && !invehicle)
+	if ((engine.version != 2 || grav.getInt() == 0) && !carriedby && !invehicle)
 		snapDownFoot();
 	else
 		downfootroom.reset();
 }
 
 void SkeletalCreature::physicsTick() {
+	if (engine.version == 2) {
+		Agent::physicsTick();
+		if (grav.getInt() == 0 && !carriedby && !invehicle)
+			snapDownFoot();
+	}
+
 	// TODO
 	// disable physics for now, it gets in the way
 }
