@@ -596,8 +596,11 @@ void caosVM::c_ANIM() {
 void caosVM::c_ANIM_c2() {
 	VM_PARAM_STRING(animstring)
 
-	// TODO: support creatures for this (with format like "001002003R")
 	valid_agent(targ);
+	
+	// TODO: support creatures for this (with format like "001002003R")
+	if (dynamic_cast<SkeletalCreature *>(targ.get())) return;
+
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);
 
