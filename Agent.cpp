@@ -706,31 +706,18 @@ void const Agent::findCollisionInDirection(unsigned int i, Point src, int &dx, i
 			room = newroom;
 		}
 	
-		if (i == 3 && dy >= 0 && size.getInt() > room->floorvalue.getInt()) { // TODO: Hack!
-			for (unsigned int j = 1; j < room->floorpoints.size(); j++) {
-				// pick the floor point which is at our current x location
-				if (room->floorpoints[j].first + room->x_left < src.x + p.x) continue;
-				if (room->floorpoints[j-1].first + room->x_left > src.x + p.x) break;
-	
-				// top-left of room
-				Point roomtl(room->x_left, room->y_left_ceiling);
-				// height of room
-				unsigned int roomheight = room->y_left_floor - room->y_left_ceiling;
-				// construct a line to represent the floor at this point
-				Line floor(Point(room->floorpoints[j-1].first, roomheight - room->floorpoints[j-1].second),
-					Point(room->floorpoints[j].first,   roomheight - room->floorpoints[j].second));
+		if (room->floorpoints.size() && i == 3 && dy >= 0 && size.getInt() > room->floorvalue.getInt()) { // TODO: Hack!
+			// TODO: we don't check floorYatX isn't returning a 'real' room floor, but floorpoints should cover the whole floor anyway
+			int floory = room->floorYatX(src.x + p.x);
+			
+			// never collide when the top point of an object is below the floor.
+			Point top = boundingBoxPoint(2);
 
-				// never collide when the top point of an object is below the floor.
-				Point top = boundingBoxPoint(2);
-
-				int floory = floor.pointAtX(src.x + p.x - roomtl.x).y + roomtl.y;
-
-				// TODO: consider steep floors
-				if (src.y + p.y > (int)floory && top.y < floory) {
-					collided = true;
-					lastdirection = 3;
-					goto finished;
-				}
+			// TODO: consider steep floors
+			if (src.y + p.y > floory && top.y < floory) {
+				collided = true;
+				lastdirection = 3;
+				break;
 			}
 		}
 		
@@ -739,7 +726,6 @@ void const Agent::findCollisionInDirection(unsigned int i, Point src, int &dx, i
 		lastpoint = p;
 	}
 
-finished:
 	double length2 = (lastpoint.x * lastpoint.x) + (lastpoint.y * lastpoint.y);
 	if (length2 < delta) {
 		// TODO: !followrooms is a horrible way to detect a non-physics call

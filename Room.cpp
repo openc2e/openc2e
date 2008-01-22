@@ -136,4 +136,24 @@ void Room::renderBorders(class Surface *surface, int adjustx, int adjusty, unsig
 	}
 }
 
+float Room::floorYatX(float x) {
+	if (floorpoints.size()) {
+		unsigned int roomheight = y_left_floor - y_left_ceiling;
+
+		for (unsigned int i = 1; i < floorpoints.size(); i++) {
+			if (floorpoints[i].first + x_left < x) continue;
+			if (floorpoints[i - 1].first + x_left > x) break;
+
+			Point roomtl(x_left, y_left_ceiling);
+
+			Line floor(Point(floorpoints[i - 1].first, roomheight - floorpoints[i - 1].second),
+				Point(floorpoints[i].first, roomheight - floorpoints[i].second));
+
+			return floor.pointAtX(x - roomtl.x).y + roomtl.y;
+		}
+	}
+
+	return bot.pointAtX(x).y;
+}
+
 /* vim: set noet: */

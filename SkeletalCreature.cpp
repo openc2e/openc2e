@@ -321,19 +321,19 @@ void SkeletalCreature::recalculateSkeleton() {
 	if (!carriedby && !invehicle && calculated) {
 		int orig_footpart = (downfoot_left ? 11 : 12);
 		// adjust location to match foot
-		x -= (attachmentX(orig_footpart, 0) - oldfootx);
-		y -= (attachmentY(orig_footpart, 0) - oldfooty);
+		x -= (attachmentX(orig_footpart, 1) - oldfootx);
+		y -= (attachmentY(orig_footpart, 1) - oldfooty);
 	}
 
 	// work out which foot is down
-	int leftfoot = attachmentY(11, 0);
-	int rightfoot = attachmentY(12, 0);
+	int leftfoot = attachmentY(11, 1);
+	int rightfoot = attachmentY(12, 1);
 	downfoot_left = (rightfoot < leftfoot);
 
 	calculated = true;
 	int orig_footpart = (downfoot_left ? 11 : 12);
-	oldfootx = attachmentX(orig_footpart, 0);
-	oldfooty = attachmentY(orig_footpart, 0);
+	oldfootx = attachmentX(orig_footpart, 1);
+	oldfooty = attachmentY(orig_footpart, 1);
 	
 	// recalculate width/height
 	height = downfoot_left ? leftfoot : rightfoot;
@@ -350,8 +350,8 @@ void SkeletalCreature::snapDownFoot() {
 	// TODO: this isn't very well thought-out.
 
 	int orig_footpart = (downfoot_left ? 11 : 12);
-	float footx = x + attachmentX(orig_footpart, 0);
-	float footy = y + attachmentY(orig_footpart, 0);
+	float footx = x + attachmentX(orig_footpart, 1);
+	float footy = y + attachmentY(orig_footpart, 1);
 
 	shared_ptr<Room> newroom;
 
@@ -366,7 +366,7 @@ void SkeletalCreature::snapDownFoot() {
 				for (std::map<weak_ptr<Room>,RoomDoor *>::iterator i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
 					shared_ptr<Room> thisroom = i->first.lock();
 					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
-						float thisydiff = fabs(footy - thisroom->bot.pointAtX(footx).y);
+						float thisydiff = fabs(footy - thisroom->floorYatX(footx));
 						if (thisydiff < ydiff) {
 							newroom = thisroom;
 							ydiff = thisydiff;
@@ -395,7 +395,7 @@ void SkeletalCreature::snapDownFoot() {
 		return;
 	}
 
-	float newy = downfootroom->bot.pointAtX(footx).y;
+	float newy = downfootroom->floorYatX(footx);
 	y = newy - (footy - y);
 }
 

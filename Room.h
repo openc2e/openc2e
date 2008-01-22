@@ -70,6 +70,8 @@ public:
 	}
 
 	bool containsPoint(Point p) { return containsPoint(p.x, p.y); }
+
+	float floorYatX(float x);
 	
 	Room();
 	Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int y_r_t, unsigned int y_l_b, unsigned int y_r_b);
