@@ -109,7 +109,7 @@ class caosVar {
 			}
 			BAD_TYPE(AgentRef, std::string);
 			BAD_TYPE(AgentRef, nulltype_tag);
-			BAD_TYPE(AgentRef, int);
+			const AgentRef &operator()(int i) const;
 			BAD_TYPE(AgentRef, float);
 			BAD_TYPE(AgentRef, Vector<float>);
 		};

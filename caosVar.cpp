@@ -121,5 +121,19 @@ bool caosVar::operator < (const caosVar &v) const {
 	throw caosException(std::string("caosVar operator < couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
+AgentRef nullagentref;
+
+// TODO: muh
+const AgentRef &caosVar::agentVisit::operator()(int i) const {
+	if (engine.version == 2) {
+		if (i == 0) {
+			return nullagentref;
+		}
+
+		// TODO: unid magic?
+	}
+
+	throw wrongCaosVarTypeException("Wrong caosVar type: Expected agent, got int");
+}
 
 /* vim: set noet: */
