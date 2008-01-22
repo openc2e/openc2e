@@ -151,6 +151,9 @@ public:
 	void addChemical(unsigned char id, unsigned char val);
 	void subChemical(unsigned char id, unsigned char val);
 	unsigned char getChemical(unsigned char id) { return chemicals[id]; }	
+	
+	// TODO: is it really worth having drives outside oldCreature?
+	virtual unsigned char getDrive(unsigned int id) = 0;
 };
 
 class c1Creature : public oldCreature {
@@ -185,13 +188,15 @@ public:
 class c2Creature : public oldCreature {
 protected:
 	// loci
-	unsigned char senses[6];
-	unsigned char gaitloci[8];
-	unsigned char drives[16];
+	unsigned char senses[14];
+	unsigned char gaitloci[16];
+	unsigned char drives[17];
 	unsigned char mutationchance, mutationdegree;
 
 public:
 	c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	
+	unsigned char getDrive(unsigned int id) { assert(id < 17); return drives[id]; }
 	
 	unsigned int getGait();
 };

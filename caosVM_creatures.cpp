@@ -33,11 +33,11 @@ Creature *caosVM::getTargCreature() {
 	return c->getCreature();
 }
 
-c1Creature *getc1Creature(Agent *a) {
+oldCreature *getoldCreature(Agent *a) {
 	if (!a) return 0;
 	CreatureAgent *b = dynamic_cast<CreatureAgent *>(a);
 	if (!b) return 0;
-	c1Creature *c = dynamic_cast<c1Creature *>(b->getCreature());
+	oldCreature *c = dynamic_cast<oldCreature *>(b->getCreature());
 	return c;
 }
 
@@ -682,7 +682,7 @@ void caosVM::c_CHEM_c1() {
 	// TODO: can adjust be negative?
 
 	valid_agent(targ);
-	c1Creature *c = getc1Creature(targ.get());
+	oldCreature *c = getoldCreature(targ.get());
 	// TODO: c2 support
 	if (!c) return; // ignored on non-creatures
 	
@@ -717,7 +717,7 @@ void caosVM::v_CHEM_c1() {
 	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 	
 	valid_agent(targ);
-	c1Creature *c = getc1Creature(targ.get());
+	oldCreature *c = getoldCreature(targ.get());
 	// TODO: c2 support
 	caos_assert(c);
 
@@ -1449,7 +1449,7 @@ void caosVM::v_DRIV_c1() {
 	VM_PARAM_INTEGER(drive)
 	caos_assert(drive < 16);
 
-	c1Creature *c = getc1Creature(targ.get());
+	oldCreature *c = getoldCreature(targ.get());
 	// TODO: c2 support
 	caos_assert(c);
 
@@ -1467,7 +1467,7 @@ void caosVM::v_DRIV_c1() {
 void caosVM::c_DREA_c1() {
 	VM_PARAM_INTEGER(max)
 
-	c1Creature *c = getc1Creature(targ.get());
+	oldCreature *c = getoldCreature(targ.get());
 	caos_assert(c);
 
 	// TODO
@@ -1479,7 +1479,7 @@ void caosVM::c_DREA_c1() {
  %pragma variants c1
 */
 void caosVM::c_FK() {
-	c1Creature *c = getc1Creature(targ.get());
+	oldCreature *c = getoldCreature(targ.get());
 	caos_assert(c);
 
 	// TODO
