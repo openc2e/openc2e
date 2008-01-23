@@ -23,17 +23,19 @@
 class QtBackend : public SDLBackend {
 public:
 	QtBackend();
-	void init() { }
-	void SDLinit() { SDLBackend::init(); }
-	void resized(int w, int h) { resizeNotify(w, h); }
+	void init();
+	void setup(class QWidget *vp);
+	void resized(int w, int h);
 	bool pollEvent(SomeEvent &e);
 	void pushEvent(SomeEvent e);
 	bool keyDown(int key);
+	void keyEvent(class QKeyEvent *k, bool pressed);
 	
-	bool downkeys[256]; // TODO: public data bad
-
 protected:
 	std::deque<SomeEvent> events;
+	
+	bool downkeys[256]; // TODO: public data bad
+	class QWidget *viewport;
 };
 
 #endif

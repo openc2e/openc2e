@@ -18,7 +18,6 @@
 #include "../MetaRoom.h"
 #include "openc2eview.h"
 #include <QtGui>
-#include <boost/format.hpp>
 #include "QtBackend.h"
 
 #ifdef _WIN32
@@ -45,9 +44,6 @@ openc2eView::openc2eView(QWidget *parent) : QAbstractScrollArea(parent) {
 
 	// we need the mouse move events
 	setMouseTracking(true);
-
-	for (unsigned int i = 0; i < 256; i++)
-		backend->downkeys[i] = false;
 
 	// TODO: sane? do we really need relx/rely, anyway?
 	lastmousex = mapFromGlobal(QCursor::pos()).x();
@@ -78,45 +74,14 @@ bool firsttime = true;
 int currentwidth, currentheight;
 
 void openc2eView::resizeEvent(QResizeEvent *) {
-#if defined(Q_WS_X11) || defined(Q_WS_WIN)
 	if (firsttime) {
-		((QApplication *)QApplication::instance())->syncX();
-
-		std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport()->winId());
-		putenv((char *)windowidstr.c_str());
-
-#ifdef _WIN32
-		// store Qt's window procedure
-		WNDPROC oldproc = (WNDPROC)GetWindowLongPtr(viewport()->winId(), GWLP_WNDPROC);
-#endif
-
-		// TODO: make init() not resize itself?
-		//SDL_QuitSubSystem(SDL_INIT_VIDEO);
-		backend->SDLinit();
-		viewport()->setCursor(Qt::BlankCursor);
-
-#ifdef _WIN32
-		// put Qt's window procedure back, so SDL doesn't steal messages
-		SetWindowLongPtr(viewport()->winId(), GWLP_WNDPROC, (LONG_PTR)oldproc);
-#endif
-
+		backend->setup(viewport());
 		firsttime = false;
 	}
+
 	backend->resized(viewport()->width(), viewport()->height());
 	currentwidth = viewport()->width();
 	currentheight = viewport()->height();
-
-#else
-#error No SDL rendering method for this platform yet.
-	// TODO: fallback to off-screen SDL RGBA buffer + QPainter::drawImage?
-#endif
-
-	// add resize window event to backend queue
-	SomeEvent e;
-	e.type = eventresizewindow;
-	e.x = viewport()->width();
-	e.y = viewport()->height();
-	backend->pushEvent(e);
 
 	resizescrollbars();
 
@@ -185,105 +150,12 @@ void openc2eView::wheelEvent(QWheelEvent *w) {
 	backend->pushEvent(e);
 }
 
-// TODO: handle f keys (112-123 under windows, SDLK_F1 = 282 under sdl)
-// see SDLBackend
-
-int translateQtKey(int qtkey) {
-	switch (qtkey) {
-		case Qt::Key_Backspace: return 8;
-		case Qt::Key_Tab: return 9;
-		case Qt::Key_Clear: return 12;
-		case Qt::Key_Return: return 13;
-		case Qt::Key_Enter: return 13;
-		case Qt::Key_Shift: return 16;
-		case Qt::Key_Control: return 17;
-		case Qt::Key_Pause: return 19;
-		case Qt::Key_CapsLock: return 20;
-		case Qt::Key_Escape: return 27;
-		case Qt::Key_PageUp: return 33;
-		case Qt::Key_PageDown: return 34;
-		case Qt::Key_End: return 35;
-		case Qt::Key_Home: return 36;
-		case Qt::Key_Left: return 37;
-		case Qt::Key_Up: return 38;
-		case Qt::Key_Right: return 39;
-		case Qt::Key_Down: return 40;
-		case Qt::Key_Print: return 42;
-		case Qt::Key_Insert: return 45;
-		case Qt::Key_Delete: return 46;
-		case Qt::Key_NumLock: return 144;
-		default: return -1;
-	}
-}
-
 void openc2eView::keyPressEvent(QKeyEvent *k) {
-	int key = translateQtKey(k->key());
-	if (key != -1) {
-		SomeEvent e;
-		e.type = eventspecialkeydown;
-		e.key = key;
-		backend->pushEvent(e);
-		backend->downkeys[key] = true;
-		return;
-	}
-
-	for (int i = 0; i < k->text().size(); i++) {
-		// TODO: openc2e probably doesn't like latin1
-		char x = k->text().at(i).toLatin1();
-		if (x != 0) {
-			// We have a Latin-1 key which we can process.
-			SomeEvent e;
-			e.type = eventkeydown;
-			e.key = x;
-			backend->pushEvent(e);
-
-			// letters/numbers get magic
-			e.type = eventspecialkeydown;
-			if (x >= 97 && x <= 122) { // lowercase letters
-				e.key = x - 32; // capitalise
-			} else if (x >= 48 && x <= 57) { // numbers
-				e.key = x;
-			} else continue;
-
-			backend->pushEvent(e);
-			backend->downkeys[e.key] = true;
-		}
-	}	
+	backend->keyEvent(k, true);
 }
 
 void openc2eView::keyReleaseEvent(QKeyEvent *k) {
-	int key = translateQtKey(k->key());
-	if (key != -1) {
-		SomeEvent e;
-		e.type = eventspecialkeyup;
-		e.key = key;
-		backend->pushEvent(e);
-		backend->downkeys[key] = false;
-		return;
-	}
-
-	for (int i = 0; i < k->text().size(); i++) {
-		// TODO: openc2e probably doesn't like latin1
-		char x = k->text().at(i).toLatin1();
-		if (x != 0) {
-			// We have a Latin-1 key which we can process.
-			SomeEvent e;
-			/*e.type = eventkeyup;
-			e.key = x;
-			backend->pushEvent(e);*/
-
-			// letters/numbers get magic
-			e.type = eventspecialkeyup;
-			if (x >= 97 && x <= 122) { // lowercase letters
-				e.key = x - 32; // capitalise
-			} else if (x >= 48 && x <= 57) { // numbers
-				e.key = x;
-			} else continue;
-
-			backend->pushEvent(e);
-			backend->downkeys[e.key] = false;
-		}
-	}
+	backend->keyEvent(k, false);
 }
 
 void openc2eView::scrollContentsBy(int dx, int dy) {
