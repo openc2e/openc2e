@@ -19,7 +19,7 @@
 #include "openc2eview.h"
 #include <QtGui>
 #include <boost/format.hpp>
-#include "../SDLBackend.h"
+#include "QtBackend.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -298,31 +298,5 @@ void openc2eView::tick() {
 		lastMetaroom = world.camera.getMetaRoom();
 		resizescrollbars();
 	}
-}
-
-QtBackend::QtBackend() {
-	for (unsigned int i = 0; i < 256; i++) {
-		downkeys[i] = false;
-	}
-}
-
-bool QtBackend::pollEvent(SomeEvent &e) {
-	// obtain events from backend
-	if (SDLBackend::pollEvent(e)) return true;
-
-	if (events.size() == 0)
-		return false;
-
-	e = events.front();
-	events.pop_front();
-	return true;
-}
-
-void QtBackend::pushEvent(SomeEvent e) {
-	events.push_back(e);
-}
-
-bool QtBackend::keyDown(int key) {
-	return downkeys[key];
 }
 

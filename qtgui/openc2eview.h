@@ -17,14 +17,9 @@
 #ifndef _OPENC2EVIEW_H
 #define _OPENC2EVIEW_H
 
-#include <QWidget>
-#include "../SDLBackend.h"
-#include <deque>
-#include <boost/shared_ptr.hpp>
-
-#include "../MetaRoom.h"
-
 #include <QAbstractScrollArea>
+#include <boost/shared_ptr.hpp>
+#include "../Backend.h"
 
 class openc2eView : public QAbstractScrollArea {
 	Q_OBJECT
@@ -54,7 +49,7 @@ protected:
 	// variables
 	boost::shared_ptr<class QtBackend> backend;
 	int lastmousex, lastmousey;
-	MetaRoom * lastMetaroom;
+	class MetaRoom *lastMetaroom;
 
 	// helpers
 	void resizescrollbars();
@@ -62,22 +57,6 @@ protected:
 public:
 	boost::shared_ptr<class Backend> getBackend();
 	void tick();
-};
-
-class QtBackend : public SDLBackend {
-public:
-	QtBackend();
-	void init() { }
-	void SDLinit() { SDLBackend::init(); }
-	void resized(int w, int h) { resizeNotify(w, h); }
-	bool pollEvent(SomeEvent &e);
-	void pushEvent(SomeEvent e);
-	bool keyDown(int key);
-	
-	bool downkeys[256]; // TODO: public data bad
-
-protected:
-	std::deque<SomeEvent> events;
 };
 
 #endif
