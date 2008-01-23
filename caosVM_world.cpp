@@ -137,7 +137,7 @@ void caosVM::c_PSWD() {
 }
 
 /**
- PSWD (stromg) world (integer)
+ PSWD (string) world (integer)
  %status stub
 
  Return the password for the specified world (zero-indexed, see NWLD), or an empty string for no password.
