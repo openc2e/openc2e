@@ -24,13 +24,18 @@
 
 SDLBackend *g_backend;
 
+int SDLBackend::idealBpp() {
+	// shadow surfaces seem to generally be faster (presumably due to overdraw), so get SDL to create one for us
+	if (engine.version == 1) return 0;
+	else return 16;
+}
+
 void SDLBackend::resizeNotify(int _w, int _h) {
 	mainsurface.width = _w;
 	mainsurface.height = _h;
-	// shadow surfaces seem to generally be faster (presumably due to overdraw), so get SDL to create one for us
-	int bpp = (engine.version == 1 ? 0 : 16);
-	mainsurface.surface = SDL_SetVideoMode(_w, _h, bpp, SDL_RESIZABLE);
-	assert(mainsurface.surface != 0);
+	mainsurface.surface = SDL_SetVideoMode(_w, _h, idealBpp(), SDL_RESIZABLE);
+	if (!mainsurface.surface)
+		throw creaturesException(std::string("Failed to create SDL surface due to: ") + SDL_GetError());
 }
 
 void SDLBackend::init() {

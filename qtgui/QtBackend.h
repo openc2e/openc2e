@@ -34,7 +34,7 @@ public:
 	bool selfRender() { return true; }
 	void requestRender() { needsrender = true; }	
 	bool needsRender() { return needsrender; }
-	void renderDone() { needsrender = false; }
+	void renderDone();
 
 protected:
 	std::deque<SomeEvent> events;
@@ -42,6 +42,8 @@ protected:
 	bool downkeys[256]; // TODO: public data bad
 	class QWidget *viewport;
 	bool needsrender;
+
+	int idealBpp();
 };
 
 #endif

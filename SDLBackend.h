@@ -52,6 +52,10 @@ protected:
 	void resizeNotify(int _w, int _h);
 	int translateKey(int key);
 
+	SDL_Surface *getMainSDLSurface() { return mainsurface.surface; }
+
+	virtual int idealBpp();
+
 public:
 	SDLBackend() { networkingup = false; }
 	

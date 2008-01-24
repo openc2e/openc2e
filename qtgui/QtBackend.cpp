@@ -18,6 +18,7 @@
 #include <QKeyEvent>
 #include <QApplication>
 #include <QWidget>
+#include <QPainter>
 #include <boost/format.hpp>
 
 QtBackend::QtBackend() {
@@ -35,28 +36,42 @@ void QtBackend::init() {
 void QtBackend::setup(QWidget *vp) {
 	viewport = vp;
 
-#if defined(Q_WS_X11) || defined(Q_WS_WIN)
+#if defined(Q_WS_X11)
+	// on X11, using SDL_WINDOWID works, thank goodness.
 	((QApplication *)QApplication::instance())->syncX();
 
 	std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport->winId());
 	putenv((char *)windowidstr.c_str());
-
-#ifdef _WIN32
-	// store Qt's window procedure
-	WNDPROC oldproc = (WNDPROC)GetWindowLongPtr(viewport->winId(), GWLP_WNDPROC);
+#else
+	// alas, it sucks on Windows and OS X, so we use an offscreen buffer instead
+	putenv("SDL_VIDEODRIVER=dummy");
 #endif
-
+	
 	SDLBackend::init();
 	viewport->setCursor(Qt::BlankCursor);
+}
 
-#ifdef _WIN32
-	// put Qt's window procedure back, so SDL doesn't steal messages
-	SetWindowLongPtr(viewport->winId(), GWLP_WNDPROC, (LONG_PTR)oldproc);
+int QtBackend::idealBpp() {
+#if defined(Q_WS_X11)
+	return SDLBackend::idealBpp();
 #endif
 
-#else
-#error No SDL rendering method for this platform yet.
-	// TODO: fallback to off-screen SDL RGBA buffer + QPainter::drawImage?
+	// TODO: handle 8bpp for C1 and 16bpp for Windows
+	return 32;
+}
+
+void QtBackend::renderDone() {
+	needsrender = false;
+
+#if !defined(Q_WS_X11)
+	// We need to copy the contents of the offscreen buffer into the window.
+	// Note that we don't bother to lock because we know the dummy driver doesn't bother with locking.
+
+	// As a generic method, we use Qt's code.	
+	SDL_Surface *surf = getMainSDLSurface();
+	QImage img((uchar *)surf->pixels, surf->w, surf->h, QImage::Format_RGB32);
+	QPainter painter(viewport);
+	painter.drawImage(0, 0, img);
 #endif
 }
 
