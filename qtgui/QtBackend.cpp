@@ -20,6 +20,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <boost/format.hpp>
+#include <iostream>
 
 QtBackend::QtBackend() {
 	viewport = 0;
@@ -48,6 +49,12 @@ void QtBackend::setup(QWidget *vp) {
 #endif
 	
 	SDLBackend::init();
+
+	/*
+	char videodrivername[200];
+	std::cout << "SDL video driver: " << SDL_VideoDriverName(videodrivername, 200) << std::endl;
+	*/
+
 	viewport->setCursor(Qt::BlankCursor);
 }
 

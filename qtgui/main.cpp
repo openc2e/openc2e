@@ -1,11 +1,5 @@
-#include "../World.h" // TODO: not needed?
 #include "qtopenc2e.h"
 #include "../Engine.h"
-#ifdef _WIN32
-#include "../SDLBackend.h"
-#include <windows.h>
-#endif
-
 #include <QApplication>
 
 #ifdef _WIN32
