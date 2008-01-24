@@ -72,6 +72,7 @@ QtOpenc2e::QtOpenc2e() {
 	/* Control menu */
 
 	controlMenu = menuBar()->addMenu(tr("C&ontrol"));
+	connect(controlMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenus()));
 	
 	fastSpeedAct = new QAction(tr("&Fast speed"), this);
 	fastSpeedAct->setCheckable(true);
@@ -93,6 +94,7 @@ QtOpenc2e::QtOpenc2e() {
 	/* Debug menu */
 
 	debugMenu = menuBar()->addMenu(tr("&Debug"));
+	connect(debugMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenus()));
 	
 	showMapAct = new QAction(tr("Show &Map"), this);
 	showMapAct->setCheckable(true);
@@ -151,6 +153,13 @@ void QtOpenc2e::tick() {
 
 // action handlers
 
+void QtOpenc2e::updateMenus() {
+	showMapAct->setChecked(world.showrooms);
+	fastSpeedAct->setChecked(engine.fastticks);
+	displayUpdatesAct->setChecked(!engine.dorendering);
+	autokillAct->setChecked(world.autokill);
+}
+
 void QtOpenc2e::about() {
 	QMessageBox::about(this, tr("openc2e"), tr("An open-source game engine to run the Creatures series of games."));
 }
@@ -162,7 +171,6 @@ void QtOpenc2e::showAgentInjector() {
 
 void QtOpenc2e::toggleShowMap() {
 	world.showrooms = !world.showrooms;
-	showMapAct->setChecked(world.showrooms);
 }
 
 void QtOpenc2e::toggleShowScrollbars() {
@@ -177,7 +185,6 @@ void QtOpenc2e::toggleShowScrollbars() {
 
 void QtOpenc2e::toggleFastSpeed() {
 	engine.fastticks = !engine.fastticks;
-	fastSpeedAct->setChecked(engine.fastticks);
 	displayUpdatesAct->setEnabled(engine.fastticks);
 	if (!engine.fastticks) {
 		engine.dorendering = true;
@@ -187,12 +194,10 @@ void QtOpenc2e::toggleFastSpeed() {
 
 void QtOpenc2e::toggleDisplayUpdates() {
 	engine.dorendering = !engine.dorendering;
-	displayUpdatesAct->setChecked(!engine.dorendering);
 }
 
 void QtOpenc2e::toggleAutokill() {
 	world.autokill = !world.autokill;
-	autokillAct->setChecked(world.autokill);
 }
 
 #include "../Creature.h"

@@ -38,6 +38,7 @@ private slots:
 	void toggleDisplayUpdates();
 	void toggleAutokill();
 	void newNorn();
+	void updateMenus();
 
 private:
 	QToolBar *maintoolbar;
