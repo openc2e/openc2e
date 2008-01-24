@@ -73,6 +73,12 @@ QtOpenc2e::QtOpenc2e() {
 
 	controlMenu = menuBar()->addMenu(tr("C&ontrol"));
 	connect(controlMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenus()));
+
+	pauseAct = new QAction(tr("&Pause"), this);
+	connect(pauseAct, SIGNAL(triggered()), this, SLOT(togglePause()));
+	controlMenu->addAction(pauseAct);
+
+	controlMenu->addSeparator();
 	
 	fastSpeedAct = new QAction(tr("&Fast speed"), this);
 	fastSpeedAct->setCheckable(true);
@@ -158,6 +164,8 @@ void QtOpenc2e::updateMenus() {
 	fastSpeedAct->setChecked(engine.fastticks);
 	displayUpdatesAct->setChecked(!engine.dorendering);
 	autokillAct->setChecked(world.autokill);
+	if (world.paused) pauseAct->setText("&Play");
+	else pauseAct->setText("&Pause");
 }
 
 void QtOpenc2e::about() {
@@ -198,6 +206,10 @@ void QtOpenc2e::toggleDisplayUpdates() {
 
 void QtOpenc2e::toggleAutokill() {
 	world.autokill = !world.autokill;
+}
+
+void QtOpenc2e::togglePause() {
+	world.paused = !world.paused;
 }
 
 #include "../Creature.h"

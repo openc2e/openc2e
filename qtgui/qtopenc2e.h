@@ -30,22 +30,27 @@ public:
 private slots:
 	void tick();
 
+	void updateMenus();
+	
 	void about();
+	
 	void showAgentInjector();
+	
 	void toggleShowMap();
 	void toggleShowScrollbars();
 	void toggleFastSpeed();
 	void toggleDisplayUpdates();
 	void toggleAutokill();
+	void togglePause();
+	
 	void newNorn();
-	void updateMenus();
 
 private:
 	QToolBar *maintoolbar;
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
 	QAction *exitAct, *aboutAct, *agentInjectorAct;
 	QAction *showMapAct, *newNornAct;
-	QAction *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
+	QAction *pauseAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
 
 	AgentInjector *agentInjector;
 	
