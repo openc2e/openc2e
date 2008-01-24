@@ -56,6 +56,7 @@ protected:
 
 public:
 	boost::shared_ptr<class Backend> getBackend();
+	bool needsRender();
 	void tick();
 };
 

@@ -94,8 +94,10 @@ void openc2eView::paintEvent(QPaintEvent *) {
 
 	if (!firsttime) {
 		// TODO: mad hax
-		if (currentwidth == viewport()->width() && currentheight == viewport()->height())
+		if (currentwidth == viewport()->width() && currentheight == viewport()->height()) {
 			world.drawWorld();
+			backend->renderDone();
+		}
 	}
 }
 
@@ -170,5 +172,9 @@ void openc2eView::tick() {
 		lastMetaroom = world.camera.getMetaRoom();
 		resizescrollbars();
 	}
+}
+
+bool openc2eView::needsRender() {
+	return backend->needsRender();
 }
 

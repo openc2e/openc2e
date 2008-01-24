@@ -22,6 +22,7 @@
 
 QtBackend::QtBackend() {
 	viewport = 0;
+	needsrender = false;
 
 	for (unsigned int i = 0; i < 256; i++) {
 		downkeys[i] = false;

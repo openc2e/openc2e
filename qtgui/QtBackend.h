@@ -30,12 +30,18 @@ public:
 	void pushEvent(SomeEvent e);
 	bool keyDown(int key);
 	void keyEvent(class QKeyEvent *k, bool pressed);
-	
+
+	bool selfRender() { return true; }
+	void requestRender() { needsrender = true; }	
+	bool needsRender() { return needsrender; }
+	void renderDone() { needsrender = false; }
+
 protected:
 	std::deque<SomeEvent> events;
 	
 	bool downkeys[256]; // TODO: public data bad
 	class QWidget *viewport;
+	bool needsrender;
 };
 
 #endif

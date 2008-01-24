@@ -66,7 +66,10 @@ public:
 	unsigned int ticks() { return SDL_GetTicks(); }
 	
 	void handleEvents();
-	
+
+	bool selfRender() { return false; }
+	void requestRender() { }
+
 	Surface *getMainSurface() { return &mainsurface; }
 	Surface *newSurface(unsigned int width, unsigned int height);
 	void freeSurface(Surface *surf);

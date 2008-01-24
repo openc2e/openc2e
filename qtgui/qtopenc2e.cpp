@@ -155,6 +155,10 @@ void QtOpenc2e::tick() {
 	viewport->verticalScrollBar()->setValue(y - world.camera.getMetaRoom()->y());
 	
 	if (engine.done) close();
+
+	if (viewport->needsRender()) {
+		viewport->viewport()->repaint();
+	}
 }
 
 // action handlers

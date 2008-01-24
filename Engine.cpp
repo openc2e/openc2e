@@ -140,10 +140,14 @@ void Engine::update() {
 	world.tick();
 
 	// draw the world
-	// TODO: if (!backend->updateWorld())
 	if (dorendering || refreshdisplay) {
-		refreshdisplay = false;
-		world.drawWorld();
+		refreshdisplay = false;	
+
+		if (backend->selfRender()) {
+			backend->requestRender();
+		} else {
+			world.drawWorld();
+		}
 	}
 
 	// play C1 music

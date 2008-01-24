@@ -47,6 +47,9 @@ public:
 	virtual bool pollEvent(SomeEvent &e) { return false; }
 	virtual void handleEvents() { }
 	virtual bool keyDown(int key) { return false; }
+
+	virtual bool selfRender() { return false; }
+	virtual void requestRender() { }
 	
 	virtual Surface *getMainSurface() { return &surface; }
 	virtual Surface *newSurface(unsigned int width, unsigned int height) { return 0; }

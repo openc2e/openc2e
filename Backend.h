@@ -55,6 +55,9 @@ public:
 	virtual void handleEvents() = 0;
 	virtual bool keyDown(int key) = 0;
 
+	virtual bool selfRender() = 0;
+	virtual void requestRender() = 0;
+
 	virtual void resize(unsigned int width, unsigned int height) = 0;
 	
 	virtual Surface *getMainSurface() = 0;
