@@ -182,16 +182,19 @@ void caosVM::c_DBG_DUMP() {
 }	
 
 /**
- DBG: TRACE (command) enable (integer)
+ DBG: TRACE (command) level (integer)
  %status ok
  %pragma variants all
 
- Enables/disables opcode tracing to cerr.
+ Sets opcode trace level. Zero disables.
 */
 void caosVM::c_DBG_TRACE() {
 	VM_PARAM_INTEGER(en)
 
+	std::cerr << "trace: " << en << std::endl;
 	vm->trace = en;
+	if (vm->trace < 0)
+		vm->trace = 0;
 }
 
 /**

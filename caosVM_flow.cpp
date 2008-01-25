@@ -30,6 +30,7 @@
  DOIF (command) condition (condition)
  %status maybe
  %pragma variants c1 c2 cv c3
+ %pragma stackdelta 0
  %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
@@ -43,6 +44,7 @@ void caosVM::c_DOIF() {
  ELIF (command) condition (condition)
  %pragma variants all
  %status maybe
+ %pragma stackdelta 0
  %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
@@ -80,6 +82,7 @@ void caosVM::c_ENDI() {
 /**
  REPS (command) reps (integer)
  %status maybe
+ %pragma stackdelta 0
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
 
@@ -131,6 +134,7 @@ void caosVM::c_EVER() {
 /**
  UNTL (command) condition (condition)
  %status maybe
+ %pragma stackdelta 0
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
  
@@ -142,7 +146,7 @@ void caosVM::c_UNTL() {
 
 /**
  GSUB (command) label (label)
- %pragma retc -1
+ %pragma stackdelta 0
  %status maybe
  %pragma variants c1 c2 cv c3
  
@@ -155,6 +159,7 @@ void caosVM::c_GSUB() {
 /**
  SUBR (command) label (label)
  %status maybe
+ %pragma stackdelta 0
  %pragma variants c1 c2 cv c3
  
  Defines the start of a subroute to be called with GSUB, with label (label).
@@ -166,7 +171,7 @@ void caosVM::c_SUBR() {
 
 /**
  RETN (command)
- %pragma retc -1
+ %pragma stackdelta any
  %status maybe
  %pragma variants c1 c2 cv c3
  
@@ -196,7 +201,7 @@ void caosVM::c_NEXT() {
 /**
  ENUM (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma retc -1
+ %pragma stackdelta any
  %pragma variants c1 c2 cv c3
  %cost c1,c2 0
 
@@ -228,7 +233,7 @@ void caosVM::c_ENUM() {
 /**
  ESEE (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma retc -1
+ %pragma stackdelta any
  %pragma variants c2 cv c3
  
  Simular to ENUM, but iterates through agents visible to OWNR, or visible to TARG in an install script.
@@ -259,7 +264,7 @@ bool agentsTouching(Agent *first, Agent *second); // caosVM_agent.cpp
 
 /**
  ETCH (command) family (integer) genus (integer) species (integer)
- %pragma retc -1
+ %pragma stackdelta any
  %status maybe
  %pragma variants c2 cv c3
 
@@ -296,7 +301,7 @@ void caosVM::c_ETCH() {
 
 /**
  EPAS (command) family (integer) genus (integer) species (integer)
- %pragma retc -1
+ %pragma stackdelta any
  %status maybe
 
  Similar to ENUM, but iterates through the OWNR vehicle's passengers.
@@ -327,7 +332,7 @@ void caosVM::c_EPAS() {
 
 /**
  ECON (command) agent (agent)
- %pragma retc -1
+ %pragma stackdelta any
  %status stub
 
  Loops through all the agents in the connective system containing the given agent.

@@ -433,12 +433,7 @@ void caosVM::c_ATTR() {
 
  Attributes of the TARG agent.
 */
-void caosVM::v_ATTR() {
-	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-
-	vm->valueStack.push_back(&targ->attr);
-}
+CAOS_LVALUE_TARG_SIMPLE(ATTR, targ->attr);
 
 /**
  TICK (command) tickrate (integer)
@@ -519,11 +514,8 @@ void caosVM::v_FROM() {
 
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
-void caosVM::v_FROM_ds() {
  	// Returns a variable because DS is insane and uses this for network events too (and so, of course, scripts abuse it).
-
-	vm->valueStack.push_back(&from);
-}
+CAOS_LVALUE_SIMPLE(FROM_ds, from);
 
 /**
  POSE (integer)
@@ -1224,10 +1216,7 @@ void caosVM::v_RNGE() {
 
  Returns the TARG agent's range.
 */
-void caosVM::v_RNGE_c2() {
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->range);
-}
+CAOS_LVALUE_TARG_SIMPLE(RNGE_c2, targ->range);
 
 /**
  TRAN (integer) x (integer) y (integer)
@@ -1693,46 +1682,30 @@ void caosVM::v_TWIN() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::v_ACTV() {
-	valid_agent(targ);
-
-	vm->valueStack.push_back(&targ->actv);
-}
+CAOS_LVALUE_TARG_SIMPLE(ACTV, targ->actv);
 
 /**
  THRT (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_THRT() {
-	valid_agent(targ);
-
-	vm->valueStack.push_back(&targ->thrt);
-}
+CAOS_LVALUE_TARG_SIMPLE(THRT, targ->thrt);
 
 /**
  SIZE (variable)
  %status stub
  %pragma variants c2
 */
-void caosVM::v_SIZE() {
-	valid_agent(targ);
-
 	// TODO: stub because this likely == perm
-	vm->valueStack.push_back(&targ->size);
-}
+CAOS_LVALUE_TARG_SIMPLE(SIZE, targ->size);
 
 /**
  GRAV (variable)
  %status stub
  %pragma variants c2
 */
-void caosVM::v_GRAV() {
-	valid_agent(targ);
-
 	// TODO: stub because this likely == falling
-	vm->valueStack.push_back(&targ->grav);
-}
+CAOS_LVALUE_TARG_SIMPLE(GRAV, targ->grav);
 
 /**
  SETV CLS2 (command) family (integer) genus (integer) species (integer)
@@ -1900,11 +1873,8 @@ void caosVM::v_LIMB_c1() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::v_OBJP() {
 	// TODO: c1 scripts seem to depend on this being from OWNR, but is that always the case?
-	valid_agent(owner);
-	vm->valueStack.push_back(&owner->objp);
-}
+CAOS_LVALUE_WITH_SIMPLE(OBJP, owner, owner->objp);
 
 /**
  XIST (integer) agent (agent)

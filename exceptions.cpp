@@ -40,7 +40,7 @@ std::string parseFailure::prettyPrint() const {
         for (size_t i = 0; i < context->size(); i++) {
             std::string tokstr = (*context)[i].format();
             if (i == (size_t)ctxoffset) {
-                toklen = tokstr.size();
+                toklen = tokstr.size(); 
             } else if (toklen == -1) {
                 stlen += tokstr.size() + 1;
             }

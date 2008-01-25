@@ -17,6 +17,8 @@
  *
  */
 #include "bytecode.h"
+#include "dialect.h"
+#include "cmddata.h"
 #include <boost/format.hpp>
 
 using boost::format;
@@ -33,7 +35,13 @@ const char *cnams[] = {
     NULL
 };
 
-std::string dumpOp(caosOp op) {
+static std::string try_lookup(const Dialect *d, int idx) {
+	if (d)
+		return std::string(d->getcmd(idx)->fullname);
+	return str(format("%d") % idx);
+}
+
+std::string dumpOp(const Dialect *d, caosOp op) {
     int arg = op.argument; // weird C++ issues
     switch (op.opcode) {
         case CAOS_NOP:
@@ -43,7 +51,7 @@ std::string dumpOp(caosOp op) {
         case CAOS_STOP:
             return std::string("STOP");
         case CAOS_CMD:
-            return str(format("CMD %d") % arg);
+            return str(format("CMD %s") % try_lookup(d, arg));
         case CAOS_COND:
             return str(format("COND %s %s") % (arg & CAND ? "AND" : "OR") % cnams[arg & CMASK]);
         case CAOS_CONST:
@@ -52,12 +60,17 @@ std::string dumpOp(caosOp op) {
             return str(format("CONSTINT %d") % arg);
         case CAOS_BYTESTR:
             return str(format("BYTESTR %d") % arg);
-        case CAOS_VAXX:
-            return str(format("VA%02d") % arg);
-        case CAOS_OVXX:
-            return str(format("OV%02d") % arg);
-        case CAOS_MVXX:
-            return str(format("MV%02d") % arg);
+		case CAOS_PUSH_AUX:
+            return str(format("PUSH AUX %d") % arg);
+		case CAOS_RESTORE_AUX:
+            return str(format("RESTORE AUX %d") % arg);
+		case CAOS_SAVE_CMD:
+            return str(format("CMD SAVE %s") % try_lookup(d, arg));
+		case CAOS_YIELD:
+            return str(format("YIELD %d") % arg);
+		case CAOS_STACK_ROT:
+            return str(format("STACK ROT %d") % arg);
+
         case CAOS_CJMP:
             return str(format("CJMP %08d") % arg);
         case CAOS_JMP:

@@ -29,6 +29,18 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+void dumpStack(caosVM *vm) {
+	std::cerr << "\tvalueStack: ";
+	int i, c = 0;
+	for (i = vm->valueStack.size() - 1; i >= 0 && c++ < 5; i--)
+		std::cerr << vm->valueStack[i].dump() << " | ";
+	if (i >= 0)
+		std::cerr << "...";
+	else
+		std::cerr << "END";
+	std::cerr << std::endl;
+}
+
 caosVM::caosVM(const AgentRef &o)
 	: vm(this)
 {
@@ -78,6 +90,38 @@ inline void caosVM::safeJMP(int dest) {
 	nip = dest;
 }
 
+inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
+	const cmdinfo *ci = s->dialect->getcmd(opidx);
+	// We subtract two here to account for a) the missing return, and b)
+	// consuming the new value.
+	int stackdelta = ci->stackdelta - (is_saver ? 2 : 0);
+	int stackstart = valueStack.size();
+	assert(result.isNull());
+#ifndef VCPP_BROKENNESS
+	if (is_saver)
+		(this->*(ci->savehandler))();
+	else
+		(this->*(ci->handler))();
+#else
+	if (is_saver)
+		dispatchCAOS(this, ci->savehandler_idx);
+	else
+		dispatchCAOS(this, ci->handler_idx);
+#endif
+	if (!is_saver && !result.isNull()) {
+		valueStack.push_back(result);
+		result.reset();
+	} else {
+		assert(result.isNull());
+	}
+	if (stackdelta < INT_MAX - 1) {
+		if (stackstart + stackdelta != valueStack.size()) {
+			dumpStack(this);
+			throw caosException("Stack imbalance detected");
+		}
+	}
+}
+
 inline void caosVM::runOpCore(script *s, caosOp op) {
 	switch (op.opcode) {
 		case CAOS_NOP: break;
@@ -95,16 +139,28 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				stop();
 				break;
 			}
+		case CAOS_SAVE_CMD:
+			{
+				invoke_cmd(s, true, op.argument);
+				break;
+			}
 		case CAOS_CMD:
 			{
-				const cmdinfo *ci = s->dialect->getcmd(op.argument);
-				if (!inst)
-					timeslice -= ci->evalcost;
-#ifndef VCPP_BROKENNESS
-				(this->*(ci->handler))();
-#else
-				dispatchCAOS(this, ci->handler_idx);
+				invoke_cmd(s, false, op.argument);
+				break;
+			}
+		case CAOS_YIELD:
+			{
+#ifndef NDEBUG
+				// This condition can arise as a result of bad save data,
+				// so an assert is not appropriate... or is it?
+				//
+				// In any case, it is mostly harmless but should never occur,
+				// as it indicates a bug in the CAOS compiler.
+				caos_assert(auxStack.size() == 0);
 #endif
+				if (!inst)
+					timeslice -= op.argument;
 				break;
 			}
 		case CAOS_COND:
@@ -117,7 +173,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				int condition = op.argument;
 				if (condition & CAND) condition -= CAND;
 				if (condition & COR) condition -= COR;
-				int result;
+				int result = 0;
 				if (condition == CEQ)
 					result = (v1 == v2);
 				if (condition == CNE)
@@ -141,11 +197,11 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 					result = (0           == v1.getInt() & v2.getInt());
 				}
 				if (op.argument & CAND)
-					this->result.setInt(condaccum && result);
+					result = (condaccum && result);
 				else
-					this->result.setInt(condaccum || result);
+					result = (condaccum || result);
+				valueStack.push_back(caosVar(result));
 				break;
-#undef COMPARE
 			}
 		case CAOS_CONST:
 			{
@@ -162,21 +218,31 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				valueStack.push_back(vmStackItem(s->getBytestr(op.argument)));
 				break;
 			}
-		case CAOS_VAXX:
+		case CAOS_PUSH_AUX:
 			{
-				valueStack.push_back(vmStackItem(&var[op.argument]));
+				caos_assert(op.argument >= 0);
+				caos_assert(op.argument < valueStack.size());
+				auxStack.push_back(valueStack[valueStack.size() - op.argument - 1]);
 				break;
 			}
-		case CAOS_OVXX:
+		case CAOS_RESTORE_AUX:
 			{
-				valid_agent(targ);
-				valueStack.push_back(vmStackItem(&targ->var[op.argument]));
-				break;
+				caos_assert(op.argument >= 0);
+				caos_assert(op.argument <= auxStack.size());
+				for (int i = 0; i < op.argument; i++) {
+					valueStack.push_back(auxStack.back());
+					auxStack.pop_back();
+				}	
+				break;				
 			}
-		case CAOS_MVXX:
+		case CAOS_STACK_ROT:
 			{
-				valid_agent(owner);
-				valueStack.push_back(vmStackItem(&owner->var[op.argument]));
+				caos_assert(op.argument >= 0);
+				caos_assert(op.argument < valueStack.size());
+				for (int i = 0; i < op.argument; i++) {
+					int top = valueStack.size() - 1;
+					std::swap(valueStack[top - i], valueStack[top - i - 1]);
+				}
 				break;
 			}
 		case CAOS_CJMP:
@@ -197,7 +263,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				counter--;
 				if (counter) {
 					safeJMP(op.argument);
-					result.setInt(counter);
+					valueStack.push_back(caosVar(counter));
 				}
 				break;
 			}
@@ -214,8 +280,10 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				VM_PARAM_VALUE(v);
 				if (v.isEmpty())
 					break;
-				if (!v.hasAgent())
-					throw caosException("Stack item type mismatch");
+				if (!v.hasAgent()) {
+					dumpStack(this);
+					throw caosException(std::string("Stack item type mismatch: ") + v.dump());
+				}
 				targ = v.getAgentRef();
 				safeJMP(op.argument);
 				break;
@@ -234,13 +302,15 @@ inline void caosVM::runOp() {
 
 	shared_ptr<script> scr = currentscript;
 	caosOp op = currentscript->getOp(cip);
-	result.reset(); // xxx this belongs in opcode maybe
 	
 	try {
 		if (trace) {
 			std::cerr
-				<< boost::str(boost::format("optrace(%s): INST=%d TS=%d %p @%08d top=%s ") % scr->filename.c_str() % (int)inst % (int)timeslice % (void *)this % cip % (valueStack.empty() ? std::string("(empty)") : valueStack.back().dump()))
-				<< dumpOp(op) << std::endl;
+				<< boost::str(boost::format("optrace(%s): INST=%d TS=%d %p @%08d top=%s depth=%d ") % scr->filename.c_str() % (int)inst % (int)timeslice % (void *)this % cip % (valueStack.empty() ? std::string("(empty)") : valueStack.back().dump()) % valueStack.size())
+				<< dumpOp(currentscript->dialect, op) << std::endl;
+			if (trace >= 2) {
+				dumpStack(this);
+			}
 		}
 		runOpCore(scr.get(), op);
 	} catch (caosException &e) {
@@ -252,8 +322,6 @@ inline void caosVM::runOp() {
 		throw;
 	}
 	
-	if (!result.isNull())
-		valueStack.push_back(result);
 }
 
 void caosVM::stop() {
@@ -265,7 +333,7 @@ void caosVM::runEntirely(shared_ptr<script> s) {
 	// caller is responsible for resetting/setting *all* state!
 	cip = nip = runops = 0;
 	currentscript = s;
-	
+
 	while (true) {
 		runOp();
 		if (!currentscript) break;
@@ -300,8 +368,10 @@ void caosVM::resetCore() {
 	if (blocking)
 		delete blocking;
 	blocking = NULL;
+	result.reset();
 	
 	valueStack.clear();
+	auxStack.clear();
 	callStack.clear();
 
 	inst = lock = 0;
@@ -322,7 +392,7 @@ void caosVM::resetCore() {
 
 	camera.reset();
 
-	trace = false;
+	trace = 0;
 	cip = nip = runops = 0;
 }
 

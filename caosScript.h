@@ -161,7 +161,69 @@ struct script {
 			fixRelocation(reloc);
 			labels[label] = getNextIndex();
 		}
+
+		void emitOp(opcode_t op, int argument);
 		
+};
+
+// parser tree
+
+class caosScript;
+
+class CAOSExpression;
+
+struct CAOSCmd {
+	const cmdinfo *op;
+	std::vector<boost::shared_ptr<CAOSExpression> > arguments;
+	int traceidx;
+	CAOSCmd() { op = 0; traceidx = -1; }
+	CAOSCmd(const CAOSCmd &c) : op(c.op), arguments(c.arguments) { }
+};
+
+struct CAOSExpression {
+	boost::variant<CAOSCmd, caosVar, bytestring_t> value;
+	int traceidx;
+	void eval(caosScript *scr, bool save_here) const;
+	void save(caosScript *scr) const;
+	int cost() const;
+
+	CAOSExpression(const CAOSExpression &e) : value(e.value), traceidx(e.traceidx) { }
+	CAOSExpression(int idx, const CAOSCmd &c) : value(c), traceidx(idx) { boost::get<CAOSCmd>(value).traceidx = traceidx; }
+	CAOSExpression(int idx, const caosVar &c) : value(c), traceidx(idx) { }
+	CAOSExpression(int idx, const bytestring_t &c) : value(c), traceidx(idx) { }
+};
+
+class caosScript;
+
+struct costVisit : public boost::static_visitor<int> {
+	public:
+		costVisit() {}
+		int operator()(const CAOSCmd &cmd) const;
+
+		int operator()(const caosVar &v) const { return 0; }
+		int operator()(const bytestring_t &v) const { return 0; }
+};
+
+struct saveVisit : public boost::static_visitor<void> {
+	private:
+		caosScript *scr;
+	public:
+		saveVisit(class caosScript *s);
+		void operator()(const CAOSCmd &cmd) const;
+
+		void operator()(const caosVar &v) const { }
+		void operator()(const bytestring_t &v) const { }
+};
+
+struct evalVisit : public boost::static_visitor<void> {
+	private:
+		caosScript *scr;
+		bool save_here;
+	public:
+		evalVisit(caosScript *s, bool save_here);
+		void operator()(const CAOSCmd &cmd) const;
+		void operator()(const caosVar &v) const;
+		void operator()(const bytestring_t &bs) const;
 };
 
 class caosScript { //: Collectable {
@@ -182,7 +244,9 @@ protected:
 	int readCond();
 	void parseCondition();
 	void emitOp(opcode_t op, int argument);
-	void readExpr(const enum ci_type *argp);
+	void emitCmd(const char *name);
+	boost::shared_ptr<CAOSExpression> readExpr(const enum ci_type xtype);
+	void emitExpr(boost::shared_ptr<CAOSExpression> ce);
 	const cmdinfo *readCommand(class token *t, const std::string &prefix);
 	void parseloop(int state, void *info);
 
@@ -194,6 +258,9 @@ protected:
 	token *tokenPeek();
 	void putBackToken(token *);
 	token *getToken(toktype expected = ANYTOKEN);
+
+	friend struct saveVisit;
+	friend struct evalVisit;
 };
 
 #endif

@@ -118,28 +118,22 @@ void caosVM::c_OUTV() {
 
  Returns the game variable with the given name.
 */
-void caosVM::v_GAME() {
-	VM_VERIFY_SIZE(1)
-	VM_PARAM_STRING(name)
-
-	caosVar &i = world.variables[name];
-	valueStack.push_back(&i);
-}
+CAOS_LVALUE(GAME, VM_PARAM_STRING(name),
+		world.variables[name],
+		world.variables[name] = newvalue
+		)
 
 /**
  EAME (variable) name (anything)
  %status maybe
 
- Returns the temporary game variable with the given name.
+ Returns the non-persistent game variable with the given name.
 */
-void caosVM::v_EAME() {
-	VM_VERIFY_SIZE(1)
-	VM_PARAM_VALUE(name)
-
-	caosVar &i = engine.eame_variables[name];
-	valueStack.push_back(&i);
-}
-
+// XXX: should this be a string argument?
+CAOS_LVALUE(EAME, VM_PARAM_VALUE(name),
+		engine.eame_variables[name],
+		engine.eame_variables[name] = newvalue
+		)
 
 /**
  DELG (command) name (string)
@@ -333,14 +327,10 @@ void caosVM::v_TOKN() {
  %pragma variants c2
  %pragma implementation caosVM::v_GAME_c2
 */
-void caosVM::v_GAME_c2() {
-	VM_PARAM_INTEGER(variable)
-	VM_PARAM_INTEGER(category)
-
-	// TODO
-	static caosVar hack;
-	vm->valueStack.push_back(&hack);
-}
+CAOS_LVALUE(GAME_c2,
+	VM_PARAM_INTEGER(variable) VM_PARAM_INTEGER(category),
+	caosVar(),
+	(void)0) // TODO
 
 #include <boost/filesystem/operations.hpp>
 

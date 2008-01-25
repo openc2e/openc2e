@@ -26,6 +26,17 @@
 #include <boost/format.hpp>
 using std::cerr;
 
+#define CAOS_LVALUE_TARG_ROOM(name, check, get, set) \
+	CAOS_LVALUE_TARG(name, \
+			shared_ptr<Room> r = roomContainingAgent(targ); \
+			caos_assert(r); \
+			check, \
+			get, \
+			set)
+
+#define CAOS_LVALUE_ROOM_SIMPLE(name, expr) \
+	CAOS_LVALUE_TARG_ROOM(name, (void)0, expr, expr = newvalue)
+
 /**
  ADDM (integer) x (integer) y (integer) width (integer) height (integer) background (string)
  %status maybe
@@ -836,122 +847,70 @@ void caosVM::v_WIND() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::v_TEMP() {
-	// TODO: should this be a separate "return 0 always" stub for C1?
-
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->temp);
-}
+CAOS_LVALUE_ROOM_SIMPLE(TEMP, r->temp);
 
 /**
  LITE (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_LITE() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->lite);
-}
+CAOS_LVALUE_ROOM_SIMPLE(LITE, r->lite);
 
 /**
  RADN (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_RADN() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->radn);
-}
+CAOS_LVALUE_ROOM_SIMPLE(RADN, r->radn);
 
 /**
  ONTR (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_ONTR() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->ontr);
-}
+CAOS_LVALUE_ROOM_SIMPLE(ONTR, r->ontr);
 
 /**
  INTR (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_INTR() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->intr);
-}
+CAOS_LVALUE_ROOM_SIMPLE(INTR, r->intr);
 
 /**
  PRES (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_PRES() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->pres);
-}
+CAOS_LVALUE_ROOM_SIMPLE(PRES, r->pres);
 
 /**
  HSRC (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_HSRC() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->hsrc);
-}
+CAOS_LVALUE_ROOM_SIMPLE(HSRC, r->hsrc);
 
 /**
  LSRC (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_LSRC() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->lsrc);
-}
+CAOS_LVALUE_ROOM_SIMPLE(LSRC, r->lsrc);
 
 /**
  RSRC (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_RSRC() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->rsrc);
-}
+CAOS_LVALUE_ROOM_SIMPLE(RSRC, r->rsrc);
 
 /**
  PSRC (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_PSRC() {
-	valid_agent(targ);
-	shared_ptr<Room> r = roomContainingAgent(targ);
-	caos_assert(r);
-	vm->valueStack.push_back(&r->psrc);
-}
+CAOS_LVALUE_ROOM_SIMPLE(PSRC, r->psrc);
 
 /**
  WNDX (integer)

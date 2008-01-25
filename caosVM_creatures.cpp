@@ -543,13 +543,21 @@ void caosVM::c_NORN() {
 /**
  NORN (agent)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants cv c3
 
  Returns the target Creature.
 */
-void caosVM::v_NORN() {
-	result.setAgent(world.selectedcreature);
-}
+/**
+ NORN (variable)
+ %status maybe
+ %pragma variants c1 c2
+
+ Returns the target Creature.
+*/
+CAOS_LVALUE(NORN, (void)0,
+		caosVar(world.selectedcreature),
+		world.selectCreature(newvalue.getAgent())
+	)
 
 /**
  URGE SHOU (command) noun_stim (float) verb_id (integer) verb_stim (float)
@@ -1419,12 +1427,7 @@ void caosVM::c_AIM() {
  %status maybe
  %pragma variants c1
 */
-void caosVM::v_BABY() {
-	// TODO: check for creature targ?
-
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->babymoniker);
-}
+CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker);
 
 /**
  SNEZ (command)

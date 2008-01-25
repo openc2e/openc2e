@@ -96,7 +96,7 @@ std::string script::dump() {
 	oss << "Code:" << std::endl;
 	for (unsigned int i = 0; i < ops.size(); i++) {
 		oss << boost::format("%08d: ") % i;
-		oss << dumpOp(ops[i]);
+		oss << dumpOp(dialect, ops[i]);
 		oss << std::endl;
 	}
 	return oss.str();
@@ -132,6 +132,85 @@ void caosScript::installInstallScript(unsigned char family, unsigned char genus,
 	installer->scrp = eventid;
 	
 	world.scriptorium.addScript(installer->fmly, installer->gnus, installer->spcs, installer->scrp, installer);
+}
+
+
+saveVisit::saveVisit(caosScript *s)
+	: scr(s)
+{ }
+
+void saveVisit::operator()(const CAOSCmd &cmd) const {
+	scr->errindex = scr->traceindex = cmd.traceidx - 1;
+	if (cmd.op->rettype != CI_VARIABLE) {
+		throw parseException("RValue used where LValue expected");
+	}
+	scr->emitOp(CAOS_RESTORE_AUX, cmd.arguments.size());
+	scr->emitOp(CAOS_SAVE_CMD, scr->d->cmd_index(cmd.op));
+}
+
+evalVisit::evalVisit(caosScript *s, bool save_here_)
+	: scr(s), save_here(save_here_)
+{ }
+
+
+
+void evalVisit::operator()(const CAOSCmd &cmd) const {
+	for (size_t i = 0; i < cmd.arguments.size(); i++) {
+		bool save_there = (cmd.op->argtypes[i] == CI_VARIABLE);
+		cmd.arguments[i]->eval(scr, save_there);
+	}
+	scr->traceindex = cmd.traceidx - 1;
+	// If we're to be invoked to save our result later,
+	// stash our args for that time.
+	if (save_here) {
+		// Note: These indices refer to stack positions, with 0 being the top.
+		// We thus transfer the arguments in reverse order, as the order will again be
+		// reversed when the stack is restored.
+		for (size_t i = 0; i < cmd.arguments.size(); i++)
+			scr->emitOp(CAOS_PUSH_AUX, i);
+	}
+	scr->emitOp(CAOS_CMD, scr->d->cmd_index(cmd.op));
+	// If we emit variable-result arguments as well, we need to move our
+	// result down below them.
+	// This is theoretical at the moment - no expression-type commands also
+	// write back to their args.
+	
+	if (cmd.op->rettype != CI_COMMAND) {
+		int rotcount = 0;	
+		for (size_t i = 0; cmd.op->argtypes[i] != CI_END; i++) {
+			if (cmd.op->argtypes[i] == CI_VARIABLE)
+				rotcount++;		
+		}
+		if (rotcount)
+			scr->emitOp(CAOS_STACK_ROT, rotcount);
+	}
+	for (int i = cmd.arguments.size() - 1; i >= 0; i--) {
+		if (cmd.op->argtypes[i] == CI_VARIABLE)
+			cmd.arguments[i]->save(scr);
+	}
+}
+
+void evalVisit::operator()(const caosVar &v) const {
+	if (v.hasInt()) {
+		int val = v.getInt();
+		if (val >= -(1 << 24) && val < (1 << 24)) {
+			scr->emitOp(CAOS_CONSTINT, val);
+			return;
+		}
+	}
+	scr->current->consts.push_back(v);
+	scr->emitOp(CAOS_CONST, scr->current->consts.size() - 1);
+}
+void evalVisit::operator()(const bytestring_t &bs) const {
+	scr->current->bytestrs.push_back(bs);
+	scr->emitOp(CAOS_BYTESTR, scr->current->bytestrs.size() - 1);
+}
+
+int costVisit::operator()(const CAOSCmd &cmd) const {
+	int accum = cmd.op->evalcost;
+	for (size_t i = 0; i < cmd.arguments.size(); i++)
+		accum += cmd.arguments[i]->cost();
+	return accum;
 }
 
 // parser states
@@ -281,7 +360,7 @@ void caosScript::parse(std::istream &in) {
 			e.context->push_back(token());
 			e.context->back().payload = std::string("...");
 		}
-		e.ctxoffset = errindex;
+		e.ctxoffset = leftct;
 		throw;
 	}
 }
@@ -309,6 +388,91 @@ void caosScript::emitOp(opcode_t op, int argument) {
 	current->ops.push_back(caosOp(op, argument, traceindex));
 }
 
+void caosScript::emitExpr(boost::shared_ptr<CAOSExpression> ce) {
+	ce->eval(this, false);
+	int cost = ce->cost();
+	if (cost)
+		emitOp(CAOS_YIELD, cost);
+}
+
+boost::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
+	token *t = getToken();
+	traceindex = errindex = curindex;
+	if (xtype == CI_BAREWORD) {
+		if (t->type() == TOK_WORD) {
+			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, caosVar(t->word())));
+		} else if (t->type() == TOK_CONST) {
+			if (t->constval().getType() != CAOSSTR)
+				t->unexpected();
+			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
+		} else {
+			t->unexpected();
+		}
+		assert(!"UNREACHABLE");
+		return boost::shared_ptr<CAOSExpression>();
+	}
+	switch (t->type()) {
+		case TOK_CONST:
+			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
+		case TOK_BYTESTR:
+			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->bytestr()));
+		case TOK_WORD: break; // fall through to remainder of function
+		default: t->unexpected();
+	}
+
+	std::string oldpayload = t->word();
+	if (t->word() == "face" && xtype != CI_COMMAND) {
+		// horrible hack, yay
+		if (xtype == CI_NUMERIC)
+			t->payload = std::string("face int");
+		else
+			t->payload = std::string("face string");
+	}
+
+	boost::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
+	CAOSCmd *cmd = boost::get<CAOSCmd>(&ce->value);
+
+	if (t->word().size() == 4 && isdigit(t->word()[2]) && isdigit(t->word()[3])) {
+		if (	!strncmp(t->word().c_str(), "va", 2)
+			||	!strncmp(t->word().c_str(), "ov", 2)
+			||	!strncmp(t->word().c_str(), "mv", 2)) {
+			int idx = atoi(t->word().c_str() + 2);
+			t->payload = t->word().substr(0, 2) + "xx";
+			const cmdinfo *op = readCommand(t, std::string("expr "));
+			t->payload = oldpayload;
+			
+			boost::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
+			cmd->op = op;
+			cmd->arguments.push_back(arg);
+			return ce;
+		}
+	}
+
+	if (t->word().size() == 4 && isdigit(t->word()[3]) && engine.version < 3) {
+		// OBVx VARx hacks
+		if (	!strncmp(t->word().c_str(), "obv", 3)
+			||	!strncmp(t->word().c_str(), "var", 3)) {
+			int idx = atoi(t->word().c_str() + 3);
+			t->payload = t->word().substr(0, 3) + "x";
+			const cmdinfo *op = readCommand(t, std::string("expr "));
+			t->payload = oldpayload;
+			
+			boost::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
+			cmd->op = op;
+			cmd->arguments.push_back(arg);
+			return ce;
+		}
+	}
+	
+	const cmdinfo *ci = readCommand(t, std::string(xtype == CI_COMMAND ? "cmd " : "expr "));
+	t->payload = oldpayload;
+	cmd->op = ci;
+	for (int i = 0; ci->argtypes[i] != CI_END; i++) {
+		cmd->arguments.push_back(readExpr(ci->argtypes[i]));
+	}
+	return ce;
+}
+#if 0
 void caosScript::readExpr(const enum ci_type *argp) {
 	// TODO: typecheck
 	int saved_trace = traceindex;
@@ -413,6 +577,7 @@ void caosScript::readExpr(const enum ci_type *argp) {
 	}
 	traceindex = saved_trace;
 }
+#endif
 
 int caosScript::readCond() {
 	token *t = getToken(TOK_WORD);
@@ -439,14 +604,16 @@ int caosScript::readCond() {
 }
 
 void caosScript::parseCondition() {
-	const static ci_type onearg[] = { CI_ANYVALUE, CI_END };
 	emitOp(CAOS_CONSTINT, 1);
 
 	bool nextIsAnd = true;
 	while (1) {
-		readExpr(onearg);
+		boost::shared_ptr<CAOSExpression> a1, a2;
+		a1 = readExpr(CI_ANYVALUE);
 		int cond = readCond();
-		readExpr(onearg);
+		a2 = readExpr(CI_ANYVALUE);
+		emitExpr(a1);
+		emitExpr(a2);
 		emitOp(CAOS_COND, cond | (nextIsAnd ? CAND : COR));
 
 		token *peek = tokenPeek();
@@ -529,19 +696,15 @@ void caosScript::parseloop(int state, void *info) {
 				|| t->word() == "epas"
 				|| t->word() == "econ") {
 			int nextreloc = current->newRelocation();
-			// XXX: copypasta
-			const cmdinfo *ci = readCommand(t, std::string("cmd "));
-			if (ci->argc) {
-				if (!ci->argtypes)
-					std::cerr << "Missing argtypes for command " << t->word() << "; probably unimplemented." << std::endl;
-				readExpr(ci->argtypes);
-			}
-			emitOp(CAOS_CMD, d->cmd_index(ci));
+			putBackToken(t);
+
+			emitExpr(readExpr(CI_COMMAND));
 			emitOp(CAOS_JMP, nextreloc);
 			int startp = current->getNextIndex();
 			parseloop(ST_ENUM, NULL);
 			current->fixRelocation(nextreloc);
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd next")));
+
+			emitCmd("cmd next");
 			emitOp(CAOS_ENUMPOP, startp);
 		} else if (t->word() == "next") {
 			if (state != ST_ENUM) {
@@ -563,7 +726,7 @@ void caosScript::parseloop(int state, void *info) {
 
 		} else if (t->word() == "loop") {
 			int loop = current->getNextIndex();
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd loop")));
+			emitCmd("cmd loop");
 			parseloop(ST_LOOP, (void *)&loop);			
 		} else if (t->word() == "untl") {
 			if (state != ST_LOOP)
@@ -572,7 +735,7 @@ void caosScript::parseloop(int state, void *info) {
 			int loop = *(int *)info;
 			int out  = current->newRelocation();
 			parseCondition();
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd untl")));
+			emitCmd("cmd untl");
 			emitOp(CAOS_CJMP, out);
 			emitOp(CAOS_JMP, loop);
 			current->fixRelocation(out);
@@ -585,11 +748,10 @@ void caosScript::parseloop(int state, void *info) {
 			return;
 
 		} else if (t->word() == "reps") {
-			const static ci_type types[] = { CI_NUMERIC, CI_END };
 			struct repsinfo ri;
 			ri.jnzreloc = current->newRelocation();
-			readExpr(types);
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd reps")));
+			putBackToken(t);
+			emitExpr(readExpr(CI_COMMAND));
 			emitOp(CAOS_JMP, ri.jnzreloc);
 			ri.loopidx = current->getNextIndex();
 			parseloop(ST_REPS, (void *)&ri);
@@ -599,7 +761,7 @@ void caosScript::parseloop(int state, void *info) {
 			struct repsinfo *ri = (repsinfo *)info;
 			current->fixRelocation(ri->jnzreloc);
 			emitOp(CAOS_DECJNZ, ri->loopidx);
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd repe")));
+			emitCmd("cmd repe");
 			return;
 
 		} else if (t->word() == "doif") {
@@ -609,7 +771,7 @@ void caosScript::parseloop(int state, void *info) {
 			int okreloc = current->newRelocation();
 
 			parseCondition();
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd doif")));
+			emitCmd("cmd doif");
 			emitOp(CAOS_CJMP, okreloc);
 			emitOp(CAOS_JMP, di.failreloc);
 			current->fixRelocation(okreloc);
@@ -617,7 +779,7 @@ void caosScript::parseloop(int state, void *info) {
 			if (di.failreloc)
 				current->fixRelocation(di.failreloc);
 			current->fixRelocation(di.donereloc);
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd endi")));
+			emitCmd("cmd endi");
 		} else if (t->word() == "elif") {
 			if (state != ST_DOIF) {
 				// XXX this is horrible
@@ -631,7 +793,7 @@ void caosScript::parseloop(int state, void *info) {
 			current->fixRelocation(di->failreloc);
 			di->failreloc = current->newRelocation();
 			parseCondition();
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd elif")));
+			emitCmd("cmd elif");
 			emitOp(CAOS_CJMP, okreloc);
 			emitOp(CAOS_JMP, di->failreloc);
 			current->fixRelocation(okreloc);
@@ -646,7 +808,7 @@ void caosScript::parseloop(int state, void *info) {
 			emitOp(CAOS_JMP, di->donereloc);
 			current->fixRelocation(di->failreloc);
 			di->failreloc = 0;
-			emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd else")));
+			emitCmd("cmd else");
 		} else if (t->word() == "endi") {
 			if (state != ST_DOIF) {
 				if (engine.version >= 3)
@@ -665,22 +827,33 @@ void caosScript::parseloop(int state, void *info) {
 					parseCondition();
 					int endreloc = current->newRelocation();
 					emitOp(CAOS_CJMP, endreloc);
-					emitOp(CAOS_CMD, d->cmd_index(d->find_command("cmd dbg: asrt")));
+					emitCmd("cmd dbg: asrt");
 					current->fixRelocation(endreloc);
 					continue;
 				}
 			}
-				
-			const cmdinfo *ci = readCommand(t, std::string("cmd "));
-			if (ci->argc) {
-				if (!ci->argtypes)
-					std::cerr << "Missing argtypes for command " << t->word() << "; probably unimplemented." << std::endl;
-				readExpr(ci->argtypes);
-			}
-			emitOp(CAOS_CMD, d->cmd_index(ci));
+			putBackToken(t);
+			emitExpr(readExpr(CI_COMMAND));
 		}
 	}
 }
 			
+void caosScript::emitCmd(const char *name) {
+	const cmdinfo *ci = d->find_command(name);
+	emitOp(CAOS_CMD, d->cmd_index(ci));
+	if (ci->evalcost)
+		emitOp(CAOS_YIELD, ci->evalcost);
+}
 
+void CAOSExpression::eval(caosScript *scr, bool save_here) const {
+	boost::apply_visitor(evalVisit(scr, save_here), value);
+}
+
+void CAOSExpression::save(caosScript *scr) const {
+	boost::apply_visitor(saveVisit(scr), value);
+}
+
+int CAOSExpression::cost() const {
+	return boost::apply_visitor(costVisit(), value);
+}
 /* vim: set noet: */

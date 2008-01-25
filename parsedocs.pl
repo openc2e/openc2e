@@ -78,10 +78,11 @@ while (<>) {
 	my $fullname = ($cns ? "$cns " : "") . $cname;
 
 	my $impl;
+	my $saveimpl;
 	if ($ctype eq 'command') {
-		$impl .= 'c_';
+		$impl = 'c_';
 	} else {
-		$impl .= 'v_';
+		$impl = 'v_';
 	}
 	if ($cns && $cns ne '') {
 		$_ = $cns . "_";
@@ -93,6 +94,9 @@ while (<>) {
 	$impl .= $_;
 	my $key = $impl;
 	$impl = "caosVM::$impl";
+	my $stackdelta = ($ctype eq 'command' ? 0 : 1);
+
+
 
 	my @args;
 	while ($argdata =~ s/.*?(\w+)\s*\(([^)]+)\)\s*//) {
@@ -101,6 +105,7 @@ while (<>) {
 			name => $argname,
 			type => $argtype,
 		};
+		$stackdelta-- unless $argtype =~ /variable/;
 	}
 
 	my @lines;
@@ -173,11 +178,24 @@ while (<>) {
 		$cat = lc $fnmap{$file} || 'unknown';
 	}
 
+	$stackdelta = $pragma{stackdelta} if defined $pragma{stackdelta};
+	$stackdelta = "INT_MAX" if lc $pragma{stackdelta} eq "any";
+	die "Deprecated use of pragma retc for $fullname" if defined $pragma{retc};
+
 
 	if ($pragma{implementation}) {
 		$impl = $pragma{implementation};
 	}
-
+	if ($pragma{saveimpl}) {
+		$saveimpl = $pragma{saveimpl};
+	} else {
+		if ($ctype eq 'variable') {
+			$saveimpl = $impl;
+			$saveimpl =~ s/caosVM::v/caosVM::s/;
+		} else {
+			$saveimpl = "caosVM::dummy_cmd";
+		}
+	}
 	$firstline =~ s/^\s*//;
 	my $desc = join("\n", @lines);
 	$desc .= "\n";
@@ -191,9 +209,11 @@ while (<>) {
 		description => @lines ? $desc : undef,
 		filename => $file,
 		implementation => $impl,
+		saveimpl => $saveimpl,
 		status => $status,
 		category => $cat,
 		evalcost => \%evalcost,
+		stackdelta => $stackdelta,
 	};
 	if (%pragma) {
 		$cd->{pragma} = \%pragma;

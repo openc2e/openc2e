@@ -83,18 +83,6 @@ class vmStackItem {
 				
 		};
 
-		struct visit_rval : public boost::static_visitor<caosVar *> {
-			caosVar *operator()(caosVar *i) const {
-				return i;
-			}
-			caosVar *operator()(const caosVar &i) const {
-				throw badParamException();
-			}
-			caosVar *operator()(const bytestring_t &) const {
-				throw badParamException();
-			}
-		};
-
 		struct visit_bs : public boost::static_visitor<bytestring_t> {
 			bytestring_t operator()(const bytestring_t &i) const {
 				return i;
@@ -107,16 +95,12 @@ class vmStackItem {
 			}
 		};
 				
-		boost::variant<caosVar, caosVar *, bytestring_t> value;
+		boost::variant<caosVar, bytestring_t> value;
 
 	public:
 
 		vmStackItem(const caosVar &v) {
 			value = v;
-		}
-
-		vmStackItem(caosVar *p) {
-			value = p;
 		}
 
 		vmStackItem(bytestring_t bs) {
@@ -127,17 +111,9 @@ class vmStackItem {
 			value = orig.value;
 		}
 
-		const caosVar &getLVal() const {
+		const caosVar &getRVal() const {
 			try {
 				return boost::apply_visitor(visit_lval(), value);
-			} catch (boost::bad_visit &e) {
-				throw badParamException();
-			}
-		}
-
-		caosVar *getRVal() const {
-			try {
-				return boost::apply_visitor(visit_rval(), value);
 			} catch (boost::bad_visit &e) {
 				throw badParamException();
 			}
@@ -176,7 +152,7 @@ class blockCond {
 
 class caosVM {
 public:	
-	bool trace;
+	int trace;
 
 	blockCond *blocking;
 
@@ -195,6 +171,7 @@ public:
 	int timeslice;
 
 	std::vector<vmStackItem> valueStack;
+	std::vector<vmStackItem> auxStack;
 	std::vector<callStackItem> callStack;
 	
 	std::istream *inputstream;
@@ -211,10 +188,6 @@ public:
 	
 	void resetScriptState(); // resets everything except OWNR
 
-protected:
-	inline void returnVariable(caosVar &cv) {
-		valueStack.push_back(&cv);
-	}
 private:
 	void resetCore();
 public:
@@ -279,15 +252,25 @@ public:
 	void c_CACL();
 	void v_WIND();
 	void v_TEMP();
+	void s_TEMP();
 	void v_LITE();
+	void s_LITE();
 	void v_RADN();
+	void s_RADN();
 	void v_ONTR();
+	void s_ONTR();
 	void v_INTR();
+	void s_INTR();
 	void v_PRES();
+	void s_PRES();
 	void v_HSRC();
+	void s_HSRC();
 	void v_LSRC();
+	void s_LSRC();
 	void v_RSRC();
+	void s_RSRC();
 	void v_PSRC();
+	void s_PSRC();
 	void v_WNDX();
 	void v_WNDY();
 	void c_DOCA();
@@ -350,7 +333,9 @@ public:
 
 	// core
 	void v_GAME();
+	void s_GAME();
 	void v_EAME();
+	void s_EAME();
 	void c_DELG();
 	void c_OUTX();
 	void c_OUTS();
@@ -365,6 +350,7 @@ public:
 	void v_LANG();
 	void v_TOKN();
 	void v_GAME_c2();
+	void s_GAME_c2();
 	void c_VRSN();
 	void v_VRSN();
 	void v_OC2E_DDIR();
@@ -377,6 +363,9 @@ public:
 	void v_VAxx();
 	void v_OVxx();
 	void v_MVxx();
+	void s_VAxx();
+	void s_OVxx();
+	void s_MVxx();
 	void c_MODV();
 	void c_SUBV();
 	void c_NEGV();
@@ -397,12 +386,15 @@ public:
 	void v_TAN_();
 	void v_SQRT();
 	void v_P1();
+	void s_P1();
 	void v_P2();
+	void s_P2();
 	void c_ANDV();
 	void c_ORRV();
 	void c_ADDS();
 	void v_VTOS();
 	void v_AVAR();
+	void s_AVAR();
 	void v_CHAR();
 	void c_CHAR();
 	void v_TYPE();
@@ -416,7 +408,9 @@ public:
 	void c_CATO();
 	void v_WILD();
 	void v_NAME();
+	void s_NAME();
 	void v_MAME();
+	void s_MAME();
 	void v_SUBS();
 	void v_STOI();
 	void v_STOF();
@@ -495,6 +489,8 @@ public:
 	void c_TARG();
 	void v_FROM();
 	void v_FROM_ds();
+	void s_FROM();
+	void s_FROM_ds();
 	void v_POSE();
 	void c_KILL();
 	void c_SCRX();
@@ -502,6 +498,7 @@ public:
 	void c_ANIM_c2();
 	void c_ANMS();
 	void v_ATTR();
+	void s_ATTR();
 	void v_ABBA();
 	void c_BASE();
 	void v_BASE();
@@ -536,6 +533,8 @@ public:
 	void c_RNGE();
 	void v_RNGE();
 	void v_RNGE_c2();
+	void s_RNGE();
+	void s_RNGE_c2();
 	void v_TRAN();
 	void c_TRAN();
 	void v_HGHT();
@@ -564,9 +563,13 @@ public:
 	void c_CORE();
 	void v_TWIN();
 	void v_ACTV();
+	void s_ACTV();
 	void v_THRT();
+	void s_THRT();
 	void v_SIZE();
+	void s_SIZE();
 	void v_GRAV();
+	void s_GRAV();
 	void c_SETV_CLS2();
 	void c_SETV_CLAS();
 	void c_SLIM();
@@ -576,6 +579,7 @@ public:
 	void v_LIMR();
 	void v_LIMB_c1();
 	void v_OBJP();
+	void s_OBJP();
 	void v_XIST();
 	void c_SCLE();
 	void c_IMGE();
@@ -590,6 +594,8 @@ public:
 	void c_MVTO();
 	void v_VELX();
 	void v_VELY();
+	void s_VELX();
+	void s_VELY();
 	void v_OBST();
 	void v_OBST_c2();
 	void v_TMVB();
@@ -602,10 +608,14 @@ public:
 	void c_VELO();
 	void c_ACCG();
 	void v_ACCG();
+	void s_ACCG();
 	void v_ACCG_c2();
+	void s_ACCG_c2();
 	void c_AERO();
 	void v_AERO();
 	void v_AERO_c2();
+	void s_AERO();
+	void s_AERO_c2();
 	void c_MVSF();
 	void c_FRIC();
 	void v_FRIC();
@@ -618,6 +628,7 @@ public:
 	void v_FLTY();
 	void c_MCRT();
 	void v_REST();
+	void s_REST();
 	
 	// scripts
 	void c_INST();
@@ -698,6 +709,7 @@ public:
 	void c_DEAD();
 	void c_NORN();
 	void v_NORN();
+	void s_NORN();
 	void v_ZOMB();
 	void v_DEAD();
 	void c_URGE_SHOU();
@@ -758,6 +770,7 @@ public:
 	void c_IMPT();
 	void c_AIM();
 	void v_BABY();
+	void s_BABY();
 	void c_SNEZ();
 	void v_DRIV_c1();
 	void c_DREA_c1();
@@ -890,7 +903,9 @@ public:
 	void c_CABV();
 	void v_CABV();
 	void v_XVEC();
+	void s_XVEC();
 	void v_YVEC();
+	void s_YVEC();
 	void v_BUMP();
 	void c_TELE();
 	void c_DPS2();
@@ -1017,6 +1032,7 @@ public:
 	void c_SERL_SCRP();
 
 	void safeJMP(int nip);
+	void invoke_cmd(script *s, bool is_saver, int opidx);
 	void runOpCore(script *s, caosOp op);
 	void runOp();
 	void runEntirely(shared_ptr<script> s);
@@ -1052,30 +1068,70 @@ static inline void VM_STACK_CHECK(const caosVM *vm) {
 	if (!vm->valueStack.size())
 		throw notEnoughParamsException();
 }
+
+class caosVM__lval {
+	protected:
+		caosVM *owner;
+	public:
+		caosVar value;
+		caosVM__lval(caosVM *vm) : owner(vm) {
+			VM_STACK_CHECK(vm);
+			value = owner->valueStack.back().getRVal();
+			owner->valueStack.pop_back();
+		}
+		~caosVM__lval() {
+			owner->valueStack.push_back(value);
+		}
+};
+
 #define VM_PARAM_VALUE(name) caosVar name; { VM_STACK_CHECK(vm); \
 	vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getLVal(); } vm->valueStack.pop_back();
+	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_STRING(name) std::string name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getLVal().getString(); } vm->valueStack.pop_back();
+	name = __x.getRVal().getString(); } vm->valueStack.pop_back();
 #define VM_PARAM_INTEGER(name) int name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getLVal().getInt(); } vm->valueStack.pop_back();
+	name = __x.getRVal().getInt(); } vm->valueStack.pop_back();
 #define VM_PARAM_FLOAT(name) float name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getLVal().getFloat(); } vm->valueStack.pop_back();
+	name = __x.getRVal().getFloat(); } vm->valueStack.pop_back();
 #define VM_PARAM_VECTOR(name) Vector<float> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getLVal().getVector(); } vm->valueStack.pop_back();
+	name = __x.getRVal().getVector(); } vm->valueStack.pop_back();
 #define VM_PARAM_AGENT(name) boost::shared_ptr<Agent> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getLVal().getAgent(); } vm->valueStack.pop_back();
+	name = __x.getRVal().getAgent(); } vm->valueStack.pop_back();
 // TODO: is usage of valid_agent correct here, or should we be caos_asserting?
 #define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) valid_agent(name);
-#define VM_PARAM_VARIABLE(name) caosVar *name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal(); } vm->valueStack.pop_back();
+#define VM_PARAM_VARIABLE(name) caosVM__lval vm__lval_##name(this); caosVar * const name = &vm__lval_##name.value;
 #define VM_PARAM_DECIMAL(name) caosVar name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getLVal(); } vm->valueStack.pop_back();
+	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_BYTESTR(name) bytestring_t name; { \
 	VM_STACK_CHECK(vm); \
 	vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getByteStr(); } vm->valueStack.pop_back();
 
+#define CAOS_LVALUE(name, check, get, set) \
+	void caosVM::v_##name() { \
+		check; \
+		valueStack.push_back((get)); \
+	} \
+	void caosVM::s_##name() { \
+		check; \
+		VM_PARAM_VALUE(newvalue) \
+		set; \
+	}
+
+#define CAOS_LVALUE_WITH(name, agent, check, get, set) \
+	CAOS_LVALUE(name, valid_agent(agent); check, get, set)
+
+#define CAOS_LVALUE_TARG(name, check, get, set) \
+	CAOS_LVALUE_WITH(name, targ, check, get, set)
+
+#define CAOS_LVALUE_WITH_SIMPLE(name, agent, exp) \
+	CAOS_LVALUE(name, valid_agent(agent), exp, exp = newvalue)
+
+#define CAOS_LVALUE_SIMPLE(name, exp) \
+	CAOS_LVALUE(name, (void)0, exp, exp = newvalue)
+
+#define CAOS_LVALUE_TARG_SIMPLE(name, exp) \
+	CAOS_LVALUE_TARG(name, (void)0, exp, exp = newvalue)
 #define STUB throw caosException("stub in " __FILE__)
 
 // FIXME: use do { ... } while (0)

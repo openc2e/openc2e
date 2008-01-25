@@ -7,6 +7,7 @@ use YAML;
 use POSIX qw(strftime);
 
 my %tdisp = (
+	'any' => 'CI_ANYVALUE',
 	'float' => 'CI_NUMERIC',
 	'integer' => 'CI_NUMERIC',
 	'string' => 'CI_STRING',
@@ -25,6 +26,7 @@ my %tdisp = (
 	'bareword' => 'CI_BAREWORD',
 	'token' => 'CI_BAREWORD',
 	'subcommand' => 'CI_SUBCOMMAND',
+	'command' => 'CI_COMMAND',
 );
 
 # zero-tolerance policy
@@ -41,7 +43,8 @@ print qq{// DO NOT EDIT\n};
 print qq{// Generated at }, strftime("%c", localtime(time)), qq{\n};
 print qq{\n\n};
 print qq{#include <string>\n};
-print qq{#include <stdio.h>\n};
+print qq{#include <cstdio>\n};
+print qq{#include <climits>\n};
 print qq{#include "cmddata.h"\n};
 print qq{#include "caosVM.h"\n};
 print qq{#include "openc2e.h"\n};
@@ -160,12 +163,14 @@ sub printarr {
 		unless (defined($cmd->{implementation})) {
 			$cmd->{implementation} = 'caosVM::dummy_cmd';
 		}
-		$buf .= "\t\t&$cmd->{implementation}, // handler\n";
-		$buf .= "#else\n";
-		unless (defined($disp_tbl{$cmd->{implementation}})) {
-			$disp_tbl{$cmd->{implementation}} = $disp_id++;
+		unless (defined($cmd->{saveimpl})) {
+			$cmd->{saveimpl} = 'caosVM::dummy_cmd';
 		}
-		$buf .= sprintf "\t\t%d, // handler_idx\n", $disp_tbl{$cmd->{implementation}};
+		$buf .= "\t\t&$cmd->{implementation}, // handler\n";
+		$buf .= "\t\t&$cmd->{saveimpl}, // savehandler\n";
+		$buf .= "#else\n";
+		$buf .= sprintf "\t\t%d, // handler_idx\n", handler_idx($cmd->{implementation});
+		$buf .= sprintf "\t\t%d, // savehandler_idx\n", handler_idx($cmd->{saveimpl});
 		$buf .= "#endif\n";
 
 		$buf .= qq{\t\t"$cmd->{lookup_key}", // lookup_key\n};
@@ -174,15 +179,20 @@ sub printarr {
 		$buf .= qq{\t\t"$cmd->{name}", // fullname\n};
 		$buf .= qq{\t\t"}. cescape($cmd->{description}). qq{", // docs\n};
 		$buf .= "\t\t". scalar(@{$cmd->{arguments}}). ", // argc\n";
-		$buf .= "\t\t". ($cmd->{type} eq 'command' ? 0 : 1). ", // retc\n";
+		$buf .= "\t\t$cmd->{stackdelta}, // stackdelta\n";
 		$buf .= "\t\t$argp, // argtypes\n";
 		
+		my $rettype = $tdisp{$cmd->{type}};
+		if (!defined $rettype) {
+			die "Unknown return type $cmd->{type} in $cmd->{name}: ".YAML::Dump($cmd);
+		}
+		$buf .= "\t\t$rettype, // rettype\n";
 		my $cost = $cmd->{evalcost}{$variant};
 		$buf .= "\t\t$cost // evalcost\n";
 		$buf .= "\t},\n";
 
 	}
-	$buf .= "\t{ NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, 0 }\n";
+	$buf .= "\t{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, CI_END, 0 }\n";
 
 	$buf .= "};\n";
 	print $buf;
@@ -197,7 +207,7 @@ sub inject_ns {
 	my %ns;
 	my %names;
 	for my $cmd (@$cmds) {
-		my $type = ($cmd->{type} eq 'command') ? 'command' : 'expression';
+		my $type = ($cmd->{type} eq 'command') ? 'command' : 'any';
 		$ns{$cmd->{namespace}}{$type}++ if defined $cmd->{namespace};
 		$names{lc "$type $cmd->{name}"}++;
 	}
@@ -224,6 +234,7 @@ sub inject_ns {
 				key => $key,
 				type => $type,
 				syntaxstring => (uc $ns) . " (command/expr) subcommand (subcommand)\n",
+				stackdelta => "INT_MAX",
 			};
 		}
 	}
@@ -265,5 +276,13 @@ sub cescape {
 	my $ces = join "", keys %cescapes;
 	$str =~ s/([\Q$ces\E])/$cescapes{$1}/ge;
 	return $str;
+}
+
+sub handler_idx {
+	my $impl = $_[0];
+	unless (defined($disp_tbl{$impl})) {
+		$disp_tbl{$impl} = $disp_id++;
+	}
+	return $disp_tbl{$impl};
 }
 # vim: set noet: 

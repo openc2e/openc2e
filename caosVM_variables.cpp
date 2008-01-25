@@ -38,33 +38,39 @@
 /**
  VAxx (variable)
  %status maybe
+ %pragma stackdelta 0
  %pragma variants c2 cv c3
 
  Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
  */
-void caosVM::v_VAxx() {
-	// handled elsewhere; not called
-	assert(0 && "unreachable");
-}	
+CAOS_LVALUE(VAxx,
+		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
+		var[index],
+		var[index] = newvalue)
 
-/*
+
+/**
  VARx (variable)
  %status maybe
  %pragma variants c1 c2
+ %pragma stackdelta 0
+ %pragma implementation caosVM::v_VAxx
+ %pragma saveimpl caosVM::s_VAxx
 
  Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
 */
 
 /**
  MVxx (variable)
+ %pragma stackdelta 0
  %status maybe
 
  Like OVxx, only for OWNR, not TARG.
  */
-void caosVM::v_MVxx() {
-	// handled elsewhere; not called
-	assert(0 && "unreachable");
-}	
+CAOS_LVALUE_WITH(MVxx, owner,
+		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
+		owner->var[index],
+		owner->var[index] = newvalue)
 
 /**
  ADDS (command) var (variable) value (string)
@@ -142,19 +148,23 @@ void caosVM::c_SETA() {
 /**
  OVxx (variable)
  %status maybe
+ %pragma stackdelta 0
  %pragma variants c2 cv c3
 
  Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
  */
-void caosVM::v_OVxx() {
-	// handled elsewhere; not reached
-	assert(0 && "unreachable");
-}
+CAOS_LVALUE_TARG(OVxx, 
+		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
+		targ->var[index],
+		targ->var[index] = newvalue)
 
-/*
+/**
  OBVx (variable)
  %status maybe
+ %pragma stackdelta 0
  %pragma variants c1 c2
+ %pragma implementation caosVM::v_OVxx
+ %pragma saveimpl caosVM::s_OVxx
 
  Like OVxx, but restricted to 0-2 in C1, or 0-9 in C2. Legacy from Creatures 1.
 */
@@ -436,7 +446,7 @@ void caosVM::v_GNAM() {
 }
 
 /**
- ABSV (command) var (decimal variable)
+ ABSV (command) var (variable)
  %status maybe
  
  Modifies the given variable, if negative, so that its value is positive (absolute value).
@@ -563,30 +573,24 @@ void caosVM::v_SQRT() {
 /**
  _P1_ (variable)
  %pragma implementation caosVM::v_P1
+ %pragma saveimpl caosVM::s_P1
  %status maybe
  %pragma variants c2 cv c3
 
  The first argument given to the current script.
 */
-void caosVM::v_P1() {
-	VM_VERIFY_SIZE(0)
-
-	vm->valueStack.push_back(&_p_[0]);
-}
 
 /**
  _P2_ (variable)
  %pragma implementation caosVM::v_P2
+ %pragma saveimpl caosVM::s_P2
  %status maybe
  %pragma variants c2 cv c3
 
  The second argument given to the current script.
 */
-void caosVM::v_P2() {
-	VM_VERIFY_SIZE(0)
-		
-	vm->valueStack.push_back(&_p_[1]);
-}
+CAOS_LVALUE_SIMPLE(P1, _p_[0])
+CAOS_LVALUE_SIMPLE(P2, _p_[1])
 
 /**
  AVAR (variable) agent (agent) index (integer)
@@ -594,15 +598,17 @@ void caosVM::v_P2() {
 
  Returns the value of OVxx for the given agent, where xx is equal to 'index'.
 */
-void caosVM::v_AVAR() {
-	VM_VERIFY_SIZE(2)
-	VM_PARAM_INTEGER(index)
-	VM_PARAM_AGENT(agent)
-
-	caos_assert(index >= 0 && index < 100);
-	caos_assert(agent);
-	returnVariable(agent->var[index]);
-}
+CAOS_LVALUE(AVAR,
+		VM_VERIFY_SIZE(2)
+		VM_PARAM_INTEGER(index)
+		VM_PARAM_AGENT(agent)
+		caos_assert(index >= 0 && index < 100);
+		valid_agent(agent)
+	,
+		agent->var[index]
+	,
+		agent->var[index] = newvalue
+)
 
 /**
  VTOS (string) value (decimal)
@@ -822,12 +828,10 @@ void caosVM::v_WILD() {
 
  Named, agent-local variables (like OVxx) in the TARG agent.
 */
-void caosVM::v_NAME() {
-	VM_PARAM_VALUE(name)
-		
-	valid_agent(targ);
-	valueStack.push_back(&targ->name_variables[name]);
-}
+CAOS_LVALUE_TARG(NAME, VM_PARAM_VALUE(name),
+		targ->name_variables[name],
+		targ->name_variables[name] = newvalue
+	)
 
 /**
  MAME (variable) name (anything)
@@ -835,12 +839,11 @@ void caosVM::v_NAME() {
 
  Like NAME variables, except for OWNR rather than TARG.
 */
-void caosVM::v_MAME() {
-	VM_PARAM_VALUE(name)
-
-	valid_agent(owner);
-	valueStack.push_back(&owner->name_variables[name]);
-}
+CAOS_LVALUE_WITH(MAME, owner,
+		VM_PARAM_VALUE(name),
+		owner->name_variables[name],
+		owner->name_variables[name] = newvalue
+	)
 
 /**
  SUBS (string) value (string) start (integer) count (integer)

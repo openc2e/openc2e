@@ -92,11 +92,7 @@ void caosVM::c_MVBY() {
 
  Returns the current horizontal velocity, in pixels/tick, of the TARG agent.
 */
-void caosVM::v_VELX() {
-	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->velx);
-}
+CAOS_LVALUE_TARG_SIMPLE(VELX, targ->velx)
 
 /**
  VELY (variable)
@@ -105,12 +101,7 @@ void caosVM::v_VELX() {
 
  Returns the current vertical velocity, in pixels/tick, of the TARG agent.
 */
-void caosVM::v_VELY() {
-	VM_VERIFY_SIZE(0)
-
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->vely);
-}
+CAOS_LVALUE_TARG_SIMPLE(VELY, targ->vely)
 
 /**
  OBST (float) direction (integer)
@@ -284,13 +275,11 @@ void caosVM::v_ACCG() {
  %status maybe
  %pragma variants c2
  %pragma implementation caosVM::v_ACCG_c2
+ %pragma saveimpl caosVM::s_ACCG_c2
  
  Returns the TARG agent's free-fall acceleration, in pixels/tick squared.
 */
-void caosVM::v_ACCG_c2() {
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->accg);
-}
+CAOS_LVALUE_TARG_SIMPLE(ACCG_c2, targ->accg)
 
 /**
  AERO (command) aero (float)
@@ -324,13 +313,11 @@ void caosVM::v_AERO() {
  %status maybe
  %pragma variants c2
  %pragma implementation caosVM::v_AERO_c2
+ %pragma saveimpl caosVM::s_AERO_c2
 
  Returns the aerodynamics of the TARG agent.
 */
-void caosVM::v_AERO_c2() {
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->aero);
-}
+CAOS_LVALUE_TARG_SIMPLE(AERO_c2, targ->aero)
 
 /**
  RELX (float) first (agent) second (agent)
@@ -609,10 +596,7 @@ void caosVM::c_MCRT() {
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_REST() {
-	valid_agent(targ);
-	vm->valueStack.push_back(&targ->rest);
-}
+CAOS_LVALUE_TARG_SIMPLE(REST, targ->rest)
 
 
 /* vim: set noet: */

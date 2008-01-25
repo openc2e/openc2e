@@ -34,64 +34,65 @@ enum opcode_t {
 	 */
 	/* Do nothing.
 	 * Argument: (ignored)
-	 * Cost: 0
 	 */
 	CAOS_NOP = 0,
 	/* Abort the script.
 	 * Argument: An index into the constants table, with a description of the
 	 *           error.
-	 * Cost: 0
 	 */
 	CAOS_DIE,
 	/* End the script gracefully.
 	 * Argument: ignored
-	 * Cost: 0
 	 */
 	CAOS_STOP,
 	/* Invoke a caos command.
 	 * Argument: An index into the commands table.
-	 * Cost: variable
 	 */
 	CAOS_CMD,
 	/* Pop two values A and B off the stack, as well as an integer flag C.
 	 * Compare A and B with the given comparison mask, then push back C AND/OR
 	 * the result, in accordance with the flag.
 	 * Argument: A comparison flag
-	 * Cost: 0
 	 */
 	CAOS_COND,
 	/* Push a constant onto the stack.
 	 * Argument: An index into the constants table
-	 * Cost: 0
 	 */
 	CAOS_CONST,
 	/* Push a constant integer in the range of a 24-bit int onto the stack.
 	 * (ie, -2^24 <= x <= 2^24 - 1)
 	 * Argument: An integer
-	 * Cost: 0
 	 */
 	CAOS_CONSTINT,
 	/* Push a bytestring onto the stack.
 	 * Argument: An index into the bytestrings table.
-	 * Cost: 0
 	 */
 	CAOS_BYTESTR,
-	/* Push a reference to a VAxx register onto the stack.
-	 * Argument: The index of the register to access
-	 * Cost: 0
+	/* Copies the element (argument) elements from the top of the 
+	 * argument stack into the top of the aux stack. The values remain on
+	 * the argument stack.
+	 * Argument: A zero-based index into the argument stack
 	 */
-	CAOS_VAXX,
-	/* Push a reference to a OVxx register onto the stack.
-	 * Argument: The index of the register to access
-	 * Cost: 0
+	CAOS_PUSH_AUX,
+	/* Moves the top (argument) elements from the top of the aux
+	 * stack into the top of the argument stack. This effectively reverses
+	 * their order. The values are removed from the aux stack.
+	 * Argument: The number of elements to move
 	 */
-	CAOS_OVXX,
-	/* Push a reference to a MVxx register onto the stack.
-	 * Argument: The index of the register to access
-	 * Cost: 0
+	CAOS_RESTORE_AUX,
+	/* Invokes the writeback handler for the given CAOS command.
+	 * Argument: An index into the commands table.
 	 */
-	CAOS_MVXX,
-	/* Pseudo-instruction; marks the beginning of relocated ops. */
+	CAOS_SAVE_CMD,
+	/* Exhausts the specified number of time slices.
+	 * Argument: A number of time slices to spend. Can be negative or zero.
+	 */
+	CAOS_YIELD,
+	/* Moves the top element on the value stack down (argument) places.
+	 * Argument: How many places to move it down
+	 */
+	CAOS_STACK_ROT,
+	/* Pseudo-instructions; marks the beginning of relocated ops. */
 	CAOS_NONRELOC_END,
 	CAOS_RELOCATABLE_BEGIN = 0x40,
 	/* Pop an integer off the stack. Jump to the given location if it's nonzero.
@@ -150,7 +151,7 @@ struct caosOp {
 	}
 };
 
-std::string dumpOp(caosOp op);
+std::string dumpOp(const class Dialect *d, caosOp op);
 
 // Condition classes
 #define CEQ 1
