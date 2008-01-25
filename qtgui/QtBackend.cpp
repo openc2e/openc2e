@@ -74,6 +74,7 @@ void QtBackend::setup(QWidget *vp) {
 	/*
 	char videodrivername[200];
 	std::cout << "SDL video driver: " << SDL_VideoDriverName(videodrivername, 200) << std::endl;
+	std::cout << "SDL requested colour depth: " << idealBpp() << std::endl;
 	*/
 
 	viewport->setCursor(Qt::BlankCursor);
@@ -88,8 +89,8 @@ int QtBackend::idealBpp() {
 
 #ifdef _WIN32
 	// TODO: how to pick up real depth on windows?
-	/*if (viewport->depth() == 16)*/ return 16;
-	/*return 24;*/
+	if (viewport->depth() == 16) return 16;
+	return 24;
 #endif
 
 	return 32;
@@ -97,12 +98,6 @@ int QtBackend::idealBpp() {
 
 
 void QtBackend::resized(int w, int h) {
-#ifdef _WIN32
-	// avoid hideous resizing bugs which we don't understand
-	// TODO: try to understand
-	if (w % 2 == 1) w += 1;
-#endif
-
 	resizeNotify(w, h);
 
 #ifdef _WIN32
@@ -123,14 +118,11 @@ void QtBackend::resized(int w, int h) {
 
 	SDL_Surface *surf = getMainSDLSurface();
 	assert(idealBpp() == surf->format->BitsPerPixel);
-	assert(w == surf->w);
-	assert(h == surf->h);
 
 	// Set the relevant entries of the structure.
 	binfo->bmiHeader.biWidth = w;
 	binfo->bmiHeader.biHeight = -h;
 	binfo->bmiHeader.biSizeImage = w * h * (idealBpp() / 8);
-	assert(binfo->bmiHeader.biSizeImage == h * surf->pitch);
 	binfo->bmiHeader.biBitCount = idealBpp();
 
 	// Describe the format of the data and any additional information needed (eg masks/palette)
@@ -148,20 +140,34 @@ void QtBackend::resized(int w, int h) {
 	}
 
 	// Create the actual DIB.
-	// TODO: Observe how this helpfully stomps over surf->pixels. :-/
+	void *pixels = 0;
 	HDC hdc = GetDC(viewport->winId());
-	oldPixels = surf->pixels; // store so we can restore before SDL shutdown
-	screen_bmp = CreateDIBSection(hdc, binfo, DIB_RGB_COLORS, (void **)(&surf->pixels), NULL, 0);
+	screen_bmp = CreateDIBSection(hdc, binfo, DIB_RGB_COLORS, (void **)(&pixels), NULL, 0);
 	ReleaseDC(viewport->winId(), hdc);
 
 	// Free the BITMAPINFO structure now we're done with it.
 	free(binfo);
 
 	// TODO: fall back to Qt?
-	if (!screen_bmp) {
+	if (!screen_bmp || !pixels) {
 		// Windows helpfully provides no useful error information :(
 		throw creaturesException("Internal error: failed to create DIB");
 	}
+	
+	// TODO: Observe how this helpfully stomps over surf->pixels. :-/
+	oldPixels = surf->pixels; // store so we can restore before SDL shutdown
+	surf->pixels = pixels;
+
+	// So, CreateDIBSection doesn't pay a lot of attention to what we ask for.
+	// Let's snaffle the information back from the DIB object.
+	// TODO: Observe how this helpfully stomps over surf->w/h/pitch. :-/
+	BITMAP dibsection;
+	GetObject(screen_bmp, sizeof(BITMAP), &dibsection);
+	surf->w = dibsection.bmWidth;
+	surf->h = dibsection.bmHeight;
+	surf->pitch = dibsection.bmWidthBytes;
+	assert(dibsection.bmBitsPixel == surf->format->BitsPerPixel);
+
 #endif
 
 	// add resize window event to backend queue
