@@ -200,8 +200,8 @@ struct costVisit : public boost::static_visitor<int> {
 		costVisit() {}
 		int operator()(const CAOSCmd &cmd) const;
 
-		int operator()(const caosVar &v) const { return 0; }
-		int operator()(const bytestring_t &v) const { return 0; }
+		int operator()(const caosVar &v) const { (void)v; return 0; }
+		int operator()(const bytestring_t &v) const { (void)v;return 0; }
 };
 
 struct saveVisit : public boost::static_visitor<void> {
@@ -211,8 +211,8 @@ struct saveVisit : public boost::static_visitor<void> {
 		saveVisit(class caosScript *s);
 		void operator()(const CAOSCmd &cmd) const;
 
-		void operator()(const caosVar &v) const { }
-		void operator()(const bytestring_t &v) const { }
+		void operator()(const caosVar &v) const { (void)v; }
+		void operator()(const bytestring_t &v) const { (void)v; }
 };
 
 struct evalVisit : public boost::static_visitor<void> {

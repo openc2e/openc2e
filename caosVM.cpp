@@ -95,7 +95,7 @@ inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
 	// We subtract two here to account for a) the missing return, and b)
 	// consuming the new value.
 	int stackdelta = ci->stackdelta - (is_saver ? 2 : 0);
-	int stackstart = valueStack.size();
+	unsigned int stackstart = valueStack.size();
 	assert(result.isNull());
 #ifndef VCPP_BROKENNESS
 	if (is_saver)
@@ -115,7 +115,7 @@ inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
 		assert(result.isNull());
 	}
 	if (stackdelta < INT_MAX - 1) {
-		if (stackstart + stackdelta != valueStack.size()) {
+		if ((int)stackstart + stackdelta != (int)valueStack.size()) {
 			dumpStack(this);
 			throw caosException("Stack imbalance detected");
 		}
@@ -221,14 +221,14 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 		case CAOS_PUSH_AUX:
 			{
 				caos_assert(op.argument >= 0);
-				caos_assert(op.argument < valueStack.size());
+				caos_assert(op.argument < (int)valueStack.size());
 				auxStack.push_back(valueStack[valueStack.size() - op.argument - 1]);
 				break;
 			}
 		case CAOS_RESTORE_AUX:
 			{
 				caos_assert(op.argument >= 0);
-				caos_assert(op.argument <= auxStack.size());
+				caos_assert(op.argument <= (int)auxStack.size());
 				for (int i = 0; i < op.argument; i++) {
 					valueStack.push_back(auxStack.back());
 					auxStack.pop_back();
@@ -238,7 +238,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 		case CAOS_STACK_ROT:
 			{
 				caos_assert(op.argument >= 0);
-				caos_assert(op.argument < valueStack.size());
+				caos_assert(op.argument < (int)valueStack.size());
 				for (int i = 0; i < op.argument; i++) {
 					int top = valueStack.size() - 1;
 					std::swap(valueStack[top - i], valueStack[top - i - 1]);
