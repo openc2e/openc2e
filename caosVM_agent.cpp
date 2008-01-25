@@ -1956,4 +1956,22 @@ void caosVM::c_EDIT() {
 	world.hand()->addCarried(targ);
 }
 
+/**
+ FRZN (variable)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_FRZN() {
+	valid_agent(targ);
+	caosVar r = targ->frozen ? 1 : 0;
+	valueStack.push_back(r);
+}
+void caosVM::s_FRZN() {
+	VM_PARAM_VALUE(newvalue)
+	caos_assert(newvalue.hasInt());
+	
+	valid_agent(targ);
+	targ->frozen = newvalue.getInt();
+}
+
 /* vim: set noet: */

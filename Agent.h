@@ -146,6 +146,7 @@ public:
 	bool imsk_translated_char : 1;
 	
 	bool paused : 1;
+	bool frozen : 1;
 	bool visible : 1;
 	bool displaycore : 1;
 

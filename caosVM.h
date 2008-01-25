@@ -587,6 +587,8 @@ public:
 	void c_PRNT();
 	void v_TCAR();
 	void c_EDIT();
+	void v_FRZN();
+	void s_FRZN();
 	
 	// motion
 	void c_ELAS();
