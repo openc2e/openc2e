@@ -21,6 +21,16 @@
 #include <QPainter>
 #include <boost/format.hpp>
 #include <iostream>
+#include "../exceptions.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#ifdef _WIN32
+HBITMAP screen_bmp = 0;
+void *oldPixels = 0;
+#endif
 
 QtBackend::QtBackend() {
 	viewport = 0;
@@ -29,6 +39,17 @@ QtBackend::QtBackend() {
 	for (unsigned int i = 0; i < 256; i++) {
 		downkeys[i] = false;
 	}
+}
+
+void QtBackend::shutdown() {
+#ifdef _WIN32
+	if (screen_bmp) DeleteObject(screen_bmp);
+	
+	SDL_Surface *surf = getMainSDLSurface();
+	surf->pixels = oldPixels;
+#endif
+
+	SDLBackend::shutdown();
 }
 
 void QtBackend::init() {
@@ -63,27 +84,85 @@ int QtBackend::idealBpp() {
 	return SDLBackend::idealBpp();
 #endif
 
-	// TODO: handle 8bpp for C1 and 16bpp for Windows
+	// TODO: handle 8bpp for C1
+
+#ifdef _WIN32
+	// TODO: how to pick up real depth on windows?
+	/*if (viewport->depth() == 16)*/ return 16;
+	/*return 24;*/
+#endif
+
 	return 32;
 }
 
-void QtBackend::renderDone() {
-	needsrender = false;
-
-#if !defined(Q_WS_X11)
-	// We need to copy the contents of the offscreen buffer into the window.
-	// Note that we don't bother to lock because we know the dummy driver doesn't bother with locking.
-
-	// As a generic method, we use Qt's code.	
-	SDL_Surface *surf = getMainSDLSurface();
-	QImage img((uchar *)surf->pixels, surf->w, surf->h, QImage::Format_RGB32);
-	QPainter painter(viewport);
-	painter.drawImage(0, 0, img);
-#endif
-}
 
 void QtBackend::resized(int w, int h) {
+#ifdef _WIN32
+	// avoid hideous resizing bugs which we don't understand
+	// TODO: try to understand
+	if (w % 2 == 1) w += 1;
+#endif
+
 	resizeNotify(w, h);
+
+#ifdef _WIN32
+	// We need to construct a DIB for blitting, based on the surface data.
+	
+	// Delete the old one if needed.
+	if (screen_bmp) DeleteObject(screen_bmp);
+
+	// Setup a BITMAPINFO structure for this.
+	BITMAPINFO *binfo = (BITMAPINFO *)malloc(sizeof(BITMAPINFO) + 12); // TODO: wrong wrong wrong
+	binfo->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	binfo->bmiHeader.biPlanes = 1;
+	binfo->bmiHeader.biClrUsed = 0;
+	binfo->bmiHeader.biClrImportant = 0;
+
+	binfo->bmiHeader.biXPelsPerMeter = 0;
+	binfo->bmiHeader.biYPelsPerMeter = 0;	
+
+	SDL_Surface *surf = getMainSDLSurface();
+	assert(idealBpp() == surf->format->BitsPerPixel);
+	assert(w == surf->w);
+	assert(h == surf->h);
+
+	// Set the relevant entries of the structure.
+	binfo->bmiHeader.biWidth = w;
+	binfo->bmiHeader.biHeight = -h;
+	binfo->bmiHeader.biSizeImage = w * h * (idealBpp() / 8);
+	assert(binfo->bmiHeader.biSizeImage == h * surf->pitch);
+	binfo->bmiHeader.biBitCount = idealBpp();
+
+	// Describe the format of the data and any additional information needed (eg masks/palette)
+	if (idealBpp() == 16) {
+		binfo->bmiHeader.biCompression = BI_BITFIELDS;
+		unsigned int *masks = (unsigned int *)binfo->bmiColors;
+		masks[0] = surf->format->Rmask;
+		masks[1] = surf->format->Gmask;
+		masks[2] = surf->format->Bmask;
+	} else {
+		binfo->bmiHeader.biCompression = BI_RGB;
+		if (idealBpp() == 8) {
+			// TODO: set binfo.bmiColors
+		}
+	}
+
+	// Create the actual DIB.
+	// TODO: Observe how this helpfully stomps over surf->pixels. :-/
+	HDC hdc = GetDC(viewport->winId());
+	oldPixels = surf->pixels; // store so we can restore before SDL shutdown
+	screen_bmp = CreateDIBSection(hdc, binfo, DIB_RGB_COLORS, (void **)(&surf->pixels), NULL, 0);
+	ReleaseDC(viewport->winId(), hdc);
+
+	// Free the BITMAPINFO structure now we're done with it.
+	free(binfo);
+
+	// TODO: fall back to Qt?
+	if (!screen_bmp) {
+		// Windows helpfully provides no useful error information :(
+		throw creaturesException("Internal error: failed to create DIB");
+	}
+#endif
 
 	// add resize window event to backend queue
 	SomeEvent e;
@@ -91,6 +170,41 @@ void QtBackend::resized(int w, int h) {
 	e.x = w;
 	e.y = h;
 	pushEvent(e);
+}
+
+void QtBackend::renderDone() {
+	needsrender = false;
+
+	// If we're not on X11, we need to copy the contents of the offscreen buffer into the window.
+
+#if defined(_WIN32)
+	// We need to blit from the DIB we made earlier. Easy!
+	HDC hdc, mdc;
+	SDL_Surface *surf = getMainSDLSurface(); // for width/height
+
+	// Obtain the DC for our viewport and create a compatible one, then select the DIB into it.
+	hdc = GetDC(viewport->winId());
+	mdc = CreateCompatibleDC(hdc);
+	SelectObject(mdc, screen_bmp);
+
+	// Blit!
+	BitBlt(hdc, 0, 0, surf->w, surf->h, mdc, 0, 0, SRCCOPY);
+
+	// Tidy up by deleting our temporary one and releasing the viewport DC.
+	DeleteDC(mdc);
+	ReleaseDC(viewport->winId(), hdc);
+
+	// TODO: call GdiFlush? SDL doesn't seem to bother.
+	
+#elif !defined(Q_WS_X11)
+	// As a generic method, we use Qt's code.	
+	// Note that we don't bother to lock because we know the dummy driver doesn't bother with locking.
+
+	SDL_Surface *surf = getMainSDLSurface();
+	QImage img((uchar *)surf->pixels, surf->w, surf->h, QImage::Format_RGB32);
+	QPainter painter(viewport);
+	painter.drawImage(0, 0, img);
+#endif
 }
 	
 bool QtBackend::pollEvent(SomeEvent &e) {

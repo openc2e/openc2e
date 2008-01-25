@@ -23,6 +23,7 @@
 class QtBackend : public SDLBackend {
 public:
 	QtBackend();
+	void shutdown();
 	void init();
 	void setup(class QWidget *vp);
 	void resized(int w, int h);
