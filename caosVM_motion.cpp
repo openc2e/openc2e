@@ -520,7 +520,7 @@ void caosVM::v_FALL() {
 }
 
 /**
- MOVS (integer)
+ MOVS (variable)
  %status maybe
  %pragma variants c1 c2 cv c3
 
@@ -532,18 +532,29 @@ void caosVM::v_MOVS() {
 
 	valid_agent(targ);
 
+	caosVar r;
+
 	// TODO: agents can possibly have multiple MOVS states right now, we should make sure to avoid that
 	if (targ->carriedby) {
 		if (targ->carriedby.get() == (Agent *)world.hand())
-			result.setInt(1);
+			r = 1;
 		else
-			result.setInt(4);
+			r = 4;
 	} else if (targ->invehicle)
-		result.setInt(3);
+		r = 3;
 	else if (targ->floatable()) // TODO: good?
-		result.setInt(2);
+		r = 2;
 	else
-		result.setInt(0);
+		r = 0;
+	
+	valueStack.push_back(r);
+}
+void caosVM::s_MOVS() {
+	VM_PARAM_VALUE(newvalue)
+	caos_assert(newvalue.hasInt());
+	valid_agent(targ);
+	
+	// TODO: implement MOVS setting
 }
 
 /**

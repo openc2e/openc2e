@@ -142,7 +142,7 @@ saveVisit::saveVisit(caosScript *s)
 void saveVisit::operator()(const CAOSCmd &cmd) const {
 	scr->errindex = scr->traceindex = cmd.traceidx - 1;
 	if (cmd.op->rettype != CI_VARIABLE) {
-		throw parseException("RValue used where LValue expected");
+		throw parseException(std::string("RValue ") + cmd.op->fullname + " used where LValue expected");
 	}
 	scr->emitOp(CAOS_RESTORE_AUX, cmd.arguments.size());
 	scr->emitOp(CAOS_SAVE_CMD, scr->d->cmd_index(cmd.op));

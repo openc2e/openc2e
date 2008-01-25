@@ -621,6 +621,7 @@ public:
 	void v_FRIC();
 	void v_FALL();
 	void v_MOVS();
+	void s_MOVS();
 	void c_MVBY();
 	void c_FLTO();
 	void c_FREL();
