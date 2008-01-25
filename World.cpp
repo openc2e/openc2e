@@ -60,7 +60,7 @@ World::~World() {
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
 void World::init() {
 	// First, try initialising the mouse cursor from the catalogue tag.
-	if (catalogue.hasTag("Pointer Information")) {
+	if (engine.version > 2 && catalogue.hasTag("Pointer Information")) {
 		const std::vector<std::string> &pointerinfo = catalogue.getTag("Pointer Information");
 		if (pointerinfo.size() >= 3) {
 			shared_ptr<creaturesImage> img = gallery.getImage(pointerinfo[2]);
@@ -84,7 +84,8 @@ void World::init() {
 			throw creaturesException("no valid \"Pointer Information\" catalogue tag, and fallback failed");
 		theHand = new PointerAgent(img->name);
 		theHand->finishInit();
-		std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->name << "'." << std::endl;
+		if (engine.version > 2)
+			std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->name << "'." << std::endl;
 	}
 
 	// *** set defaults for non-zero GAME engine variables

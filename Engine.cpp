@@ -689,8 +689,10 @@ bool Engine::initialSetup() {
 	world.initCatalogue();
 	std::cout << "* Initial setup..." << std::endl;
 	world.init(); // just reads mouse cursor (we want this after the catalogue reading so we don't play "guess the filename")
-	std::cout << "* Reading PRAY files..." << std::endl;
-	world.praymanager.update();
+	if (engine.version > 2) {
+		std::cout << "* Reading PRAY files..." << std::endl;
+		world.praymanager.update();
+	}
 
 	if (cmdline_norun) preferred_backend = "null";
 	if (preferred_backend != "null") std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;	
