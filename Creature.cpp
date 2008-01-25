@@ -392,13 +392,13 @@ bool c2eCreature::processInstinct() {
 
 	// *** debug output
 
-	std::cout << "*** processing instinct for verb #" << actualverb << std::endl;
+	/*std::cout << "*** processing instinct for verb #" << actualverb << std::endl;
 	std::cout << "reinforce using drive #" << (int)g->drive << " at level " << ((int)g->level - 128) / 128.0f << std::endl;
 	for (unsigned int i = 0; i < 3; i++) {
 		if (g->lobes[i] != 255) {
 			std::cout << "input: lobe tissue #" << (int)(g->lobes[i] - 1) << ", neuron #" << (int)g->neurons[i] << std::endl;
 		}
-	}
+	}*/
 
 	/*
 	 * instinct processing! a production by fuzzie in conjunction with coffee
