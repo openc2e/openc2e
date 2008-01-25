@@ -22,6 +22,7 @@
 #include "Agent.h"
 #include "AgentRef.h"
 #include "World.h"
+#include "Engine.h" // version
 #include <iostream>
 #include <boost/format.hpp>
 using std::cerr;
@@ -92,7 +93,17 @@ void caosVM::c_MVBY() {
 
  Returns the current horizontal velocity, in pixels/tick, of the TARG agent.
 */
-CAOS_LVALUE_TARG_SIMPLE(VELX, targ->velx)
+void caosVM::v_VELX() {
+	valid_agent(targ);
+	valueStack.push_back(targ->velx);
+}
+void caosVM::s_VELX() {
+	VM_PARAM_VALUE(newvalue)
+	caos_assert(newvalue.hasDecimal());
+	
+	valid_agent(targ);	
+	targ->velx = newvalue;
+}
 
 /**
  VELY (variable)
@@ -101,7 +112,20 @@ CAOS_LVALUE_TARG_SIMPLE(VELX, targ->velx)
 
  Returns the current vertical velocity, in pixels/tick, of the TARG agent.
 */
-CAOS_LVALUE_TARG_SIMPLE(VELY, targ->vely)
+void caosVM::v_VELY() {
+	valid_agent(targ);
+	valueStack.push_back(targ->vely);
+}
+void caosVM::s_VELY() {
+	VM_PARAM_VALUE(newvalue)
+	caos_assert(newvalue.hasDecimal());
+	
+	valid_agent(targ);	
+	targ->vely = newvalue;
+
+	// a whole bunch of Creatures 2 scripts/COBs depend on this ('setv vely 0' to activate gravity)
+	if (engine.version == 2) targ->grav.setInt(1);
+}
 
 /**
  OBST (float) direction (integer)
@@ -597,6 +621,5 @@ void caosVM::c_MCRT() {
  %pragma variants c2
 */
 CAOS_LVALUE_TARG_SIMPLE(REST, targ->rest)
-
 
 /* vim: set noet: */
