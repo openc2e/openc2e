@@ -786,6 +786,7 @@ public:
 	void c_INJR();
 	void c_SAY();
 	void c_TRIG();
+	void v_MONK();
 	// (clothes)
 	void c_BODY();
 	void v_BODY();

@@ -1109,7 +1109,15 @@ void caosVM::c_LTCY() {
 }
 
 /**
+ F**K (command)
+ %status stub
+ %pragma variants c1
+ %pragma implementation caosVM::c_MATE
+*/
+
+/**
  MATE (command)
+ %pragma variants c2 cv c3
  %status stub
 */
 void caosVM::c_MATE() {
@@ -1117,6 +1125,7 @@ void caosVM::c_MATE() {
 	caos_assert(_it_);
 	Creature *t = dynamic_cast<Creature *>(_it_.get());
 	caos_assert(t);
+
 	// TODO
 }
 
@@ -1425,9 +1434,9 @@ void caosVM::c_AIM() {
 /**
  BABY (variable)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 */
-CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker);
+CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker); // TODO
 
 /**
  SNEZ (command)
@@ -1470,18 +1479,6 @@ void caosVM::v_DRIV_c1() {
 void caosVM::c_DREA_c1() {
 	VM_PARAM_INTEGER(max)
 
-	oldCreature *c = getoldCreature(targ.get());
-	caos_assert(c);
-
-	// TODO
-}
-
-/**
- F**K (command)
- %status stub
- %pragma variants c1
-*/
-void caosVM::c_FK() {
 	oldCreature *c = getoldCreature(targ.get());
 	caos_assert(c);
 
@@ -1574,6 +1571,18 @@ void caosVM::c_TRIG() {
 
 	valid_agent(targ);
 	// TODO
+}
+
+/**
+ MONK (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_MONK() {
+	oldCreature *c = getoldCreature(targ.get());
+	caos_assert(c);
+
+	result.setInt(0); // TODO
 }
 
 // clothes
