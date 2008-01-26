@@ -304,7 +304,7 @@ void caosVM::c_NEW_VHCL() {
 /**
  NEW: VHCL (command) sprite_file (bareword) image_count (integer) first_image (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::c_NEW_VHCL_c1
 */
 void caosVM::c_NEW_VHCL_c1() {
@@ -338,6 +338,20 @@ void caosVM::c_NEW_BKBD() {
 	setTarg(a);
 
 	// TODO: actually initialise blackboard parameters
+}
+
+/**
+ NEW: CBUB (command) sprite_file (bareword) image_count (integer) first_image (integer) stringid (integer)
+ %status maybe
+ %pragma variants c2
+*/
+void caosVM::c_NEW_CBUB() {
+	VM_PARAM_INTEGER(stringid)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
+
+	throw creaturesException("compound bubble objects are not supported yet"); // TODO
 }
 
 /**

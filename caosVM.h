@@ -477,6 +477,7 @@ public:
 	void c_NEW_VHCL();
 	void c_NEW_VHCL_c1();
 	void c_NEW_BKBD();
+	void c_NEW_CBUB();
 	void v_NULL();
 	void c_POSE();
 	void c_RTAR();
@@ -683,6 +684,7 @@ public:
 	void c_KNOB();
 	void c_KMSG();
 	void c_BBLE();
+	void c_BBFD();
 
 	// creatures
 	void c_STM_SHOU();

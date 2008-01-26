@@ -700,4 +700,19 @@ void caosVM::c_BBLE() {
 	// TODO
 }
 
+/**
+ BBFD (command) part (integer) red (integer) green (integer) blue (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::c_BBFD() {
+	VM_PARAM_INTEGER(blue)
+	VM_PARAM_INTEGER(green)
+	VM_PARAM_INTEGER(red)
+	VM_PARAM_INTEGER(part)
+
+	valid_agent(targ);
+	// TODO
+}
+
 /* vim: set noet: */
