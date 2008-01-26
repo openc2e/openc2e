@@ -24,6 +24,15 @@
 
 SDLBackend *g_backend;
 
+SDLBackend::SDLBackend() {
+	networkingup = false;
+
+	// reasonable defaults
+	mainsurface.width = 800;
+	mainsurface.height = 600;
+	mainsurface.surface = 0;
+}
+
 int SDLBackend::idealBpp() {
 	// shadow surfaces seem to generally be faster (presumably due to overdraw), so get SDL to create one for us
 	if (engine.version == 1) return 0;
@@ -43,11 +52,6 @@ void SDLBackend::init() {
 
 	if (SDL_Init(init) < 0)
 		throw creaturesException(std::string("SDL error during initialization: ") + SDL_GetError());
-
-	// reasonable defaults
-	mainsurface.width = 800;
-	mainsurface.height = 600;
-	mainsurface.surface = 0;
 
 	std::string windowtitle;
 	if (engine.getGameName().size()) windowtitle = engine.getGameName() + " - ";

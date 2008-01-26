@@ -42,11 +42,13 @@ QtBackend::QtBackend() {
 }
 
 void QtBackend::shutdown() {
+	if (!viewport) return;
+
 #ifdef _WIN32
 	if (screen_bmp) DeleteObject(screen_bmp);
 	
 	SDL_Surface *surf = getMainSDLSurface();
-	surf->pixels = oldPixels;
+	if (surf) surf->pixels = oldPixels;
 #endif
 
 	SDLBackend::shutdown();

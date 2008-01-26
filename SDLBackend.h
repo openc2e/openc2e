@@ -57,8 +57,7 @@ protected:
 	virtual int idealBpp();
 
 public:
-	SDLBackend() { networkingup = false; }
-	
+	SDLBackend();	
 	void init();
 	int networkInit();
 	void shutdown();
