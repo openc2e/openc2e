@@ -261,7 +261,15 @@ int translateQtKey(int qtkey) {
 }
 
 void QtBackend::keyEvent(QKeyEvent *k, bool pressed) {
-	int key = translateQtKey(k->key());
+	int translatedkey = translateQtKey(k->key());
+	int key = translatedkey;
+	if (key == -1) {
+		if (k->key() >= Qt::Key_0 && k->key() <= Qt::Key_9) {
+			key = k->key();
+		} else if (k->key() >= Qt::Key_A && k->key() <= Qt::Key_Z) {
+			key = k->key();
+		}
+	}
 	if (key != -1) {
 		SomeEvent e;
 		if (pressed)
@@ -271,13 +279,13 @@ void QtBackend::keyEvent(QKeyEvent *k, bool pressed) {
 		e.key = key;
 		pushEvent(e);
 		downkeys[key] = pressed;
-		return;
+		if (translatedkey != -1) return;
 	}
 
 	for (int i = 0; i < k->text().size(); i++) {
 		// TODO: openc2e probably doesn't like latin1
-		char x = k->text().at(i).toLatin1();
-		if (x != 0) {
+		unsigned char x = k->text().at(i).toLatin1();
+		if (x > 31) { // Qt helpfully hands us non-text chars for some crazy reason
 			// We have a Latin-1 key which we can process.
 			SomeEvent e;
 			
@@ -287,21 +295,6 @@ void QtBackend::keyEvent(QKeyEvent *k, bool pressed) {
 				e.key = x;
 				pushEvent(e);
 			}
-
-			// letters/numbers get magic
-			if (x >= 97 && x <= 122) { // lowercase letters
-				e.key = x - 32; // capitalise
-			} else if (x >= 48 && x <= 57) { // numbers
-				e.key = x;
-			} else continue;
-			
-			if (pressed)
-				e.type = eventspecialkeydown;
-			else
-				e.type = eventspecialkeyup;
-
-			pushEvent(e);
-			downkeys[e.key] = pressed;
 		}
 	}
 }
