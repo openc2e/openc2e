@@ -12,7 +12,7 @@ using std::ofstream;
 using std::vector;
 
 #define NO_TAGBLOCKS 11
-char *tagblocks[NO_TAGBLOCKS] = {
+const char *tagblocks[NO_TAGBLOCKS] = {
 	"AGNT", // C3 agent
 	"DSAG", // DS agent
 	"MACH", // SM agent
