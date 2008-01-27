@@ -320,6 +320,7 @@ void caosVM::c_RATE() {
 
 shared_ptr<Room> roomContainingAgent(AgentRef agent) {
 	MetaRoom *m = world.map.metaRoomAt(agent->x, agent->y);
+	if (!m) return shared_ptr<Room>();
 	return m->roomAt(agent->x + (agent->getWidth() / 2.0f), agent->y + (agent->getHeight() / 2.0f));
 }
 
