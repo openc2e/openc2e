@@ -415,9 +415,6 @@ void World::executeInitScript(fs::path p) {
 		caosVM vm(0);
 		script.installScripts();
 		vm.runEntirely(script.installer);
-	} catch (caosException &e) {
-		// XXX: prettyPrint() isn't virtual for some reason, wtf?
-		std::cerr << "exec of \"" << p.leaf() << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	} catch (creaturesException &e) {
 		std::cerr << "exec of \"" << p.leaf() << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	} catch (std::exception &e) {

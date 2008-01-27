@@ -76,7 +76,7 @@ class caosException : public creaturesException {
 
 		void trace(boost::shared_ptr<class script> scr, int traceindex = -1) throw();
 
-		virtual std::string prettyPrint();
+		virtual std::string prettyPrint() const;
 };
 		
 		

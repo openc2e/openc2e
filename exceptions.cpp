@@ -63,7 +63,7 @@ void caosException::trace(boost::shared_ptr<class script> scr, int traceindex) t
     this->traceindex = traceindex;
 }
 
-std::string caosException::prettyPrint() {
+std::string caosException::prettyPrint() const {
     std::ostringstream oss;
     oss << what() << std::endl;
     if (!script) return oss.str() + "Source information unavailable.\n";
