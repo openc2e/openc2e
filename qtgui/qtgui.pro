@@ -11,7 +11,7 @@ FORMS = agents.ui
 # Input
 HEADERS += qtopenc2e.h openc2eview.h AgentInjector.h imagepreview.h c1cobfile.h QtBackend.h
 SOURCES += main.cpp qtopenc2e.cpp openc2eview.cpp AgentInjector.cpp imagepreview.cpp c1cobfile.cpp QtBackend.cpp
-LIBS += -lboost_thread-mt -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt -lz -lSDL -lSDL_net -lSDL_mixer -lSDL_gfx -lopenal -lalut \
+LIBS += -lboost_thread-mt -lboost_program_options-mt -lboost_serialization-mt -lboost_filesystem-mt -lboost_regex-mt -lz -lSDL -lSDL_net -lSDL_mixer -lSDL_gfx -lopenal -lalut \
 	../Agent.o \
         ../AgentHelpers.o \
         ../AgentRef.o \
