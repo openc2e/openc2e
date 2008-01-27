@@ -132,4 +132,34 @@ unsigned int MetaRoom::addRoom(shared_ptr<Room> r) {
 	return r->id;
 }
 
+shared_ptr<Room> MetaRoom::roomAt(float _x, float _y) {
+	if (wraps) {
+		if (_x > (int)xloc + (int)wid) _x -= wid;
+		else if (_x < (int)xloc) _x += wid;
+	}
+
+	for (std::vector<shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		shared_ptr<Room> r = *i;
+		if (r->containsPoint(_x, _y)) return r;
+	}
+
+	return shared_ptr<Room>();
+}
+
+std::vector<shared_ptr<Room> > MetaRoom::roomsAt(float _x, float _y) {
+	if (wraps) {
+		if (_x > (int)xloc + (int)wid) _x -= wid;
+		else if (_x < (int)xloc) _x += wid;
+	}
+
+	std::vector<shared_ptr<Room> > ourlist;
+
+	for (std::vector<shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		shared_ptr<Room> r = *i;
+		if (r->containsPoint(_x, _y)) ourlist.push_back(r);
+	}
+
+	return ourlist;
+}
+
 /* vim: set noet: */

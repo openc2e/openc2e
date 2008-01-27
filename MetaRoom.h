@@ -54,6 +54,9 @@ public:
 
 	shared_ptr<Room> nextFloorFromPoint(float x, float y);
 
+	shared_ptr<Room> roomAt(float x, float y);
+	std::vector<shared_ptr<Room> > roomsAt(float x, float y);
+
 	unsigned int id;
 
 	MetaRoom(int _x, int _y, int width, int height, const std::string &back, shared_ptr<creaturesImage> = shared_ptr<creaturesImage>(), bool wrap = false);
