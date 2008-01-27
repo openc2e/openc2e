@@ -142,6 +142,7 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	boost_serialization-mt
 	boost_filesystem-mt
 	boost_thread-mt
+	boost_regex-mt
 	)
 
 INCLUDE_DIRECTORIES(BEFORE
