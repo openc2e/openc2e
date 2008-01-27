@@ -886,14 +886,11 @@ void Agent::vmTick() {
 		} catch (invalidAgentException &e) {
 			// try letting the exception script handle it
 			if (!queueScript(255))
-				unhandledException(std::string("\n") + e.prettyPrint(), true);
+				unhandledException(e.prettyPrint(), true);
 			else
 				stopScript(); // we still want current script to die
-		} catch (caosException &e) {
-			// XXX: prettyPrint() isn't being virtual, wtf?
-			unhandledException(std::string("\n") + e.prettyPrint(), true);
 		} catch (creaturesException &e) {
-			unhandledException(std::string("\n") + e.prettyPrint(), true);
+			unhandledException(e.prettyPrint(), true);
 		} catch (std::exception &e) {
 			unhandledException(e.what(), true);
 		}
