@@ -33,7 +33,7 @@
 
 const ALfloat zdist = -1.0;
 const ALfloat plnemul = 0.0;
-const ALfloat scale = 1.0/50;
+const ALfloat scale = 1.0/100;
 
 static const ALfloat null_vec[] = { 0.0, 0.0, 0.0 };
 

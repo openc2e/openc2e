@@ -358,10 +358,13 @@ void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
 	assert(s);
 
 	s->setPos(x + getWidth() / 2, y + getHeight() / 2, zorder);
+	// TODO: we could do with a nicer 'inrange' check
+	bool inrange = (x + 500 > world.camera.getX()) && (x + getWidth() - 500 < world.camera.getX() + world.camera.getWidth()) &&
+		(y + 500 > world.camera.getY()) && (y + getHeight() - 500 < world.camera.getY() + world.camera.getHeight());
 	s->setMute(
 		world.camera.getMetaRoom() != world.map.metaRoomAt(x, y)
 		&&
-		!agentOnCamera(this)
+		!inrange
 		);
 	// TODO: setVelocity?
 }
