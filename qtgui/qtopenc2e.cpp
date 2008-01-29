@@ -225,7 +225,14 @@ void QtOpenc2e::newNorn() {
 	if (engine.version > 2) return; // TODO: fixme
 
 	std::string genomefile = "test";
-	shared_ptr<genomeFile> genome = world.loadGenome(genomefile);
+	shared_ptr<genomeFile> genome;
+	try {
+		genome = world.loadGenome(genomefile);
+	} catch (creaturesException &e) {
+		QMessageBox::warning(this, tr("Couldn't load genome file:"), e.prettyPrint().c_str());
+		return;
+	}
+
 	if (!genome) {
 		//
 		return;
@@ -233,11 +240,24 @@ void QtOpenc2e::newNorn() {
 
 	int sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
 	oldCreature *c;
-	if (engine.version == 1) c = new c1Creature(genome, (sex == 2), 0);
-	else c = new c2Creature(genome, (sex == 2), 0);
+	try {
+		if (engine.version == 1) c = new c1Creature(genome, (sex == 2), 0);
+		else c = new c2Creature(genome, (sex == 2), 0);	
+	} catch (creaturesException &e) {
+		QMessageBox::warning(this, tr("Couldn't create creature:"), e.prettyPrint().c_str());
+		return;
+	}
 
-	SkeletalCreature *a = new SkeletalCreature(4, c);
+	SkeletalCreature *a;
+	try {
+		a = new SkeletalCreature(4, c);
+	} catch (creaturesException &e) {
+		delete c;
+		QMessageBox::warning(this, tr("Couldn't create creature agent:"), e.prettyPrint().c_str());
+		return;
+	}
 	a->finishInit();
+	
 	// if you make this work for c2e, you should probably set sane attributes here?
 
 	c->setAgent(a);
