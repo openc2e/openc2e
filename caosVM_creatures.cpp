@@ -1127,8 +1127,9 @@ void caosVM::c_LTCY() {
 void caosVM::c_MATE() {
 	Creature *c = getTargCreature();
 	caos_assert(_it_);
-	Creature *t = dynamic_cast<Creature *>(_it_.get());
+	CreatureAgent *t = dynamic_cast<CreatureAgent *>(_it_.get());
 	caos_assert(t);
+	Creature *d = t->getCreature();
 
 	// TODO
 }
