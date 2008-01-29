@@ -78,6 +78,11 @@ QtOpenc2e::QtOpenc2e() {
 	connect(pauseAct, SIGNAL(triggered()), this, SLOT(togglePause()));
 	controlMenu->addAction(pauseAct);
 
+	muteAct = new QAction(tr("&Mute"), this);
+	muteAct->setCheckable(true);
+	connect(muteAct, SIGNAL(triggered()), this, SLOT(toggleMute()));
+	controlMenu->addAction(muteAct);
+
 	controlMenu->addSeparator();
 	
 	fastSpeedAct = new QAction(tr("&Fast speed"), this);
@@ -168,6 +173,7 @@ void QtOpenc2e::updateMenus() {
 	fastSpeedAct->setChecked(engine.fastticks);
 	displayUpdatesAct->setChecked(!engine.dorendering);
 	autokillAct->setChecked(world.autokill);
+	muteAct->setChecked(engine.audio->isMuted());
 	if (world.paused) pauseAct->setText("&Play");
 	else pauseAct->setText("&Pause");
 }
@@ -214,6 +220,10 @@ void QtOpenc2e::toggleAutokill() {
 
 void QtOpenc2e::togglePause() {
 	world.paused = !world.paused;
+}
+
+void QtOpenc2e::toggleMute() {
+	engine.audio->setMute(!engine.audio->isMuted());
 }
 
 #include "../Creature.h"

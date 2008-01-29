@@ -42,6 +42,7 @@ private slots:
 	void toggleDisplayUpdates();
 	void toggleAutokill();
 	void togglePause();
+	void toggleMute();
 	
 	void newNorn();
 
@@ -50,7 +51,7 @@ private:
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
 	QAction *exitAct, *aboutAct, *agentInjectorAct;
 	QAction *showMapAct, *newNornAct;
-	QAction *pauseAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
+	QAction *pauseAct, *muteAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
 
 	AgentInjector *agentInjector;
 	
