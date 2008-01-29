@@ -25,7 +25,11 @@ CreatureAgent::CreatureAgent(unsigned char _family, Creature *c) : Agent(_family
 	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
 	zorder = 1500;
 	slots[0] = creature->getGenome();
-	species = (creature->isFemale() ? 2 : 1);	
+	species = (creature->isFemale() ? 2 : 1);
+
+	walking = false;
+	approaching = false;
+	direction = 0;
 }
 
 CreatureAgent::~CreatureAgent() {
@@ -37,6 +41,16 @@ void CreatureAgent::tick() {
 
 	if (!paused)
 		creature->tick();
+}
+
+void CreatureAgent::startWalking() {
+	walking = true;
+	approaching = false;
+}
+
+void CreatureAgent::startApproaching() {
+	walking = false;
+	approaching = true;
 }
 
 /* vim: set noet: */

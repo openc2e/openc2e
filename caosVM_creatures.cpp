@@ -26,11 +26,15 @@
 #include "Creature.h"
 using std::cerr;
 
-Creature *caosVM::getTargCreature() {
+CreatureAgent *caosVM::getTargCreatureAgent() {
 	valid_agent(targ);
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(targ.get());
 	caos_assert(c);
-	return c->getCreature();
+	return c;
+}
+
+Creature *caosVM::getTargCreature() {
+	return getTargCreatureAgent()->getCreature();
 }
 
 oldCreature *getoldCreature(Agent *a) {
@@ -414,29 +418,31 @@ void caosVM::v_ZOMB() {
 
 /**
  DIRN (command) direction (integer)
- %status stub
+ %status maybe
 
  Changes the target Creature to face a different direction.
 */
 void caosVM::c_DIRN() {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_INTEGER(zombie)
+	VM_PARAM_INTEGER(direction)
 
-	Creature *c = getTargCreature();
-	// TODO
+	caos_assert(direction >= 0 && direction <= 3);
+
+	CreatureAgent *c = getTargCreatureAgent();
+	c->setDirection(direction);
 }
 
 /**
  DIRN (integer)
- %status stub
+ %status maybe
  %pragma variants c2 cv c3
 
  Returns the direction the target Creatures is facing.
 */
 void caosVM::v_DIRN() {
-	Creature *c = getTargCreature();
+	CreatureAgent *c = getTargCreatureAgent();
 	
-	result.setInt(-1); // TODO
+	result.setInt(c->getDirection());
 }
 	
 /**
@@ -691,7 +697,6 @@ void caosVM::c_CHEM_c1() {
 
 	valid_agent(targ);
 	oldCreature *c = getoldCreature(targ.get());
-	// TODO: c2 support
 	if (!c) return; // ignored on non-creatures
 	
 	c->addChemical(chemical_id, adjust);
@@ -726,7 +731,6 @@ void caosVM::v_CHEM_c1() {
 	
 	valid_agent(targ);
 	oldCreature *c = getoldCreature(targ.get());
-	// TODO: c2 support
 	caos_assert(c);
 
 	result.setInt(c->getChemical(chemical_id));
@@ -1376,13 +1380,13 @@ void caosVM::c_FORF() {
 
 /**
  WALK (command)
- %status stub
+ %status maybe
  %pragma variants c1 c2 cv c3
 */
 void caosVM::c_WALK() {
-	Creature *c = getTargCreature();
-
-	// TODO
+	CreatureAgent *c = getTargCreatureAgent();
+	
+	c->startWalking();
 }
 
 /**

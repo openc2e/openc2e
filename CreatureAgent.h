@@ -27,6 +27,9 @@ protected:
 	Creature *creature;
 	friend class Creature;
 
+	unsigned int direction;
+	bool walking, approaching;
+
 	virtual void creatureAged() { }
 
 public:
@@ -35,6 +38,11 @@ public:
 	void tick();
 
 	Creature *getCreature() { return creature; }
+	
+	void setDirection(unsigned int d) { assert(d < 4); direction = d; }
+	unsigned int getDirection() { return direction; }
+	void startWalking();
+	void startApproaching();
 };
 
 /* vim: set noet: */

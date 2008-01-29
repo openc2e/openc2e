@@ -235,7 +235,7 @@ SkeletalCreature::~SkeletalCreature() {
 
 void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 	for (int j = 0; j < 17; j++) {
-		int i = cee_zorder[direction][j];
+		int i = cee_zorder[posedirection][j];
 		if (i >= SkeletalPartCount()) continue; // CV hackery
 
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
@@ -446,25 +446,36 @@ void SkeletalCreature::snapDownFoot() {
 }
 
 void SkeletalCreature::setPose(unsigned int p) {
-	direction = 0;
+	posedirection = 0;
 	for (int i = 0; i < SkeletalPartCount(); i++)
 		pose[i] = p;
 	recalculateSkeleton();
 }
 
 void SkeletalCreature::setPose(std::string s) {
-	AgentRef attention = creature->getAttentionFocus();
-	// TODO: hack
-	if (!attention) attention = (Agent *)world.hand();
-	bool itright = (attention->x > x);
-
 	switch (s[0]) {
-		case '?': direction = (itright ? 0 : 1); break;
-		case '!': direction = (itright ? 1 : 0); break;
-		case '0': direction = 3; break;
-		case '1': direction = 2; break;
-		case '2': direction = 0; break;
-		case '3': direction = 1; break;
+		case '?':
+			switch (direction) {
+				case 0: break; // north, TODO
+				case 1: break; // south, TODO
+				case 2: posedirection = 0; break; // right
+				case 3: posedirection = 1; break; // left
+				default: assert(false);
+			}
+			break;
+		case '!':
+			switch (direction) {
+				case 0: break; // north, TODO
+				case 1: break; // south, TODO
+				case 2: posedirection = 1; break; // right
+				case 3: posedirection = 0; break; // left
+				default: assert(false);
+			}
+			break;
+		case '0': posedirection = 3; break;
+		case '1': posedirection = 2; break;
+		case '2': posedirection = 0; break;
+		case '3': posedirection = 1; break;
 		default: assert(false);
 	}
 
@@ -472,20 +483,21 @@ void SkeletalCreature::setPose(std::string s) {
 		int newpose;
 
 		switch (s[i + 1]) {
-			case '0': newpose = 0 + (direction * 4); break;
-			case '1': newpose = 1 + (direction * 4); break;
-			case '2': newpose = 2 + (direction * 4); break;
-			case '3': newpose = 3 + (direction * 4); break;
+			case '0': newpose = 0 + (posedirection * 4); break;
+			case '1': newpose = 1 + (posedirection * 4); break;
+			case '2': newpose = 2 + (posedirection * 4); break;
+			case '3': newpose = 3 + (posedirection * 4); break;
 			case '?': assert(i == 0); {
-					// make the head look in the direction of _IT_
+					// make the head look in the posedirection of _IT_
 					float attachmenty = attachmentY(1, 0) + y; // head attachment point, which we'll use to 'look' from atm
-				
+					
 					// TODO: this is horrible, but i have no idea how the head angle is calculated
-					if (attention->y > (attachmenty + 30)) newpose = 0;
-					else if (attention->y < (attachmenty - 70)) newpose = 3;
-					else if (attention->y < (attachmenty - 30)) newpose = 2;
+					AgentRef attention = creature->getAttentionFocus();
+					if (attention && attention->y > (attachmenty + 30)) newpose = 0;
+					else if (attention && attention->y < (attachmenty - 70)) newpose = 3;
+					else if (attention && attention->y < (attachmenty - 30)) newpose = 2;
 					else newpose = 1;
-					newpose += (direction * 4);
+					newpose += (posedirection * 4);
 				}
 				break;
 			// TODO: '!' also?
@@ -565,11 +577,26 @@ void SkeletalCreature::tick() {
 
 	// TODO: hack!
 	if (!eyesclosed && !creature->isZombie()) {
-		// TODO: we shouldn't bother with this unless it changed?
-		setGaitGene(creature->getGait());
+		if (approaching) {
+			AgentRef attention = creature->getAttentionFocus();
+			if (attention) {
+				// TODO: more sane approaching skillz
+				if (attention->x > x)
+					direction = 3;
+				else
+					direction = 2;
+			} else {
+				approaching = false;
+			}
+		}
 
-		// TODO: we should only do this if we're moving :-P
-		gaitTick();
+		if (walking || approaching) {
+			// TODO: we shouldn't bother with this unless it changed?
+			setGaitGene(creature->getGait());
+
+			// TODO: we should only do this if we're moving :-P
+			gaitTick();
+		}
 	}
 	
 	if ((engine.version != 2 || grav.getInt() == 0) && !carriedby && !invehicle)

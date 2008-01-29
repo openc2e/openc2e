@@ -200,6 +200,7 @@ public:
 	void setOwner(Agent *a) { owner = a; }
 	void setOutputStream(std::ostream &o) { outputstream = &o; }
 
+	class CreatureAgent *getTargCreatureAgent();
 	class Creature *getTargCreature();
 	class SpritePart *getCurrentSpritePart();
 

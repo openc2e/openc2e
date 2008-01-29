@@ -31,7 +31,7 @@ private:
 
 	unsigned int ticks; // TODO: unnecessary?
 
-	unsigned int direction;
+	unsigned int posedirection;
 	unsigned int pose[17];
 	unsigned int facialexpression;
 	unsigned int pregnancy;
