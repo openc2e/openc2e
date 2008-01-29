@@ -486,8 +486,8 @@ bool c2eCreature::processInstinct() {
 	// TODO: shouldn't REM be present throughout sleep?
 	chemicals[213] = 0.0f; // REM to null
 
-	std::cout << "*** instinct done" << std::endl;
-	std::cout << std::endl;
+	//std::cout << "*** instinct done" << std::endl;
+	//std::cout << std::endl;
 
 	return true;
 }
