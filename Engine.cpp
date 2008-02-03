@@ -720,6 +720,7 @@ bool Engine::initialSetup() {
 	if (listenport != -1) {
 		// inform the user of the port used, and store it in the relevant file
 		std::cout << "Listening for connections on port " << listenport << "." << std::endl;
+#ifndef _WIN32
 		fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
 		if (!fs::exists(p))
 			fs::create_directory(p);
@@ -727,6 +728,7 @@ bool Engine::initialSetup() {
 			std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
 			f << boost::str(boost::format("%d") % listenport);
 		}
+#endif
 	}
 
 	if (world.data_directories.size() < 3) {
@@ -808,7 +810,7 @@ fs::path Engine::storageDirectory() {
 #ifndef _WIN32
 	std::string dirname = "/.openc2e";
 #else
-	std::string dirname = "/openc2e Data";
+	std::string dirname = "/My Games";
 #endif
 	
 	// main storage dir
