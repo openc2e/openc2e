@@ -254,6 +254,7 @@ protected:
 	int curindex; // index to the next token to be read
    	int errindex; // index to the token to report parse errors on
 	int traceindex; // index to the token to report runtime errors on
+	int enumdepth;
 	// deprecated support functions
 	token *tokenPeek();
 	void putBackToken(token *);

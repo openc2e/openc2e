@@ -103,6 +103,7 @@ std::string script::dump() {
 }
 
 caosScript::caosScript(const std::string &dialect, const std::string &fn) {
+	enumdepth = 0;
 	d = dialects[dialect].get();
 	if (!d)
 		throw parseException(std::string("Unknown dialect ") + dialect);
@@ -386,6 +387,8 @@ const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix) {
 }
 
 void caosScript::emitOp(opcode_t op, int argument) {
+	if (op == CAOS_YIELD && engine.version < 3 && enumdepth > 0)
+		return;
 	current->ops.push_back(caosOp(op, argument, traceindex));
 }
 
@@ -542,6 +545,7 @@ void caosScript::parseloop(int state, void *info) {
 			throw parseException("Unexpected non-word token");
 		}
 		if (t->word() == "scrp") {
+			assert(!enumdepth);
 			if (state != ST_INSTALLER && state != ST_BODY && state != ST_REMOVAL)
 				throw parseException("Unexpected SCRP");
 			state = ST_BODY;
@@ -571,11 +575,13 @@ void caosScript::parseloop(int state, void *info) {
 				state = ST_INSTALLER;
 			else
 				throw parseException("Unexpected RSCR");
+			assert(!enumdepth);
 			current = installer;
 		} else if (t->word() == "endm") {
 			emitOp(CAOS_STOP, 0);
 			
 			if (state == ST_INSTALLER || state == ST_BODY || state == ST_REMOVAL) {
+				assert(!enumdepth);
 				state = ST_INSTALLER;
 				current = installer;
 			} else {
@@ -596,7 +602,9 @@ void caosScript::parseloop(int state, void *info) {
 			emitExpr(readExpr(CI_COMMAND));
 			emitOp(CAOS_JMP, nextreloc);
 			int startp = current->getNextIndex();
+			enumdepth++;
 			parseloop(ST_ENUM, NULL);
+			enumdepth--;
 			current->fixRelocation(nextreloc);
 
 			emitCmd("cmd next");
