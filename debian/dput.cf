@@ -1,0 +1,6 @@
+[ccdevnet-ppa]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~ccdevnet/ubuntu/
+login = anonymous
+allow_unsigned_uploads = 0
