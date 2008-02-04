@@ -56,8 +56,8 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/openc2e.
-	install -d debian/tmp/usr/bin
-	install build/openc2e debian/tmp/usr/bin
+	install -d debian/tmp/usr/games
+	install build/openc2e debian/tmp/usr/games
 
 
 # Build architecture-independent files here.
