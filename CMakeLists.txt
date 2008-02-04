@@ -190,6 +190,18 @@ ADD_CUSTOM_COMMAND(
 	DEPENDS parsedocs.pl ${CAOSVM_FILES}
 	WORKING_DIRECTORY ${SRC})
 
+ADD_CUSTOM_COMMAND(
+	OUTPUT ${BIN}/docs.html
+	COMMAND perl writehtml.pl ${BIN}/commandinfo.yml > ${BIN}/docs.html
+	DEPENDS writehtml.pl ${BIN}/commandinfo.yml
+	WORKING_DIRECTORY ${SRC})
+ADD_CUSTOM_COMMAND(
+	OUTPUT ${BIN}/docs.css
+	COMMAND cp docs.css ${BIN}/docs.css -f
+	DEPENDS docs.css
+	WORKING_DIRECTORY ${SRC})
+ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/docs.html ${BIN}/docs.css)
+
 # it seems these ADD_CUSTOM_COMMANDS for flex and bison could be made
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
 ADD_CUSTOM_COMMAND(

@@ -112,7 +112,7 @@ commandinfo.yml: $(wildcard caosVM_*.cpp) parsedocs.pl
 	perl parsedocs.pl $(wildcard caosVM_*.cpp) > commandinfo.yml
 
 docs.html: writehtml.pl commandinfo.yml
-	perl writehtml.pl > docs.html
+	perl writehtml.pl commandinfo.yml > docs.html
 
 cmddata.cpp: commandinfo.yml writecmds.pl
 	perl writecmds.pl commandinfo.yml > cmddata.cpp

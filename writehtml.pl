@@ -34,7 +34,7 @@ sub esc ($) {
 	return $t;
 }
 
-my $data = YAML::LoadFile('commandinfo.yml');
+my $data = YAML::LoadFile($ARGV[0]);
 
 # XXX
 $data = { ops => $data->{variants}{c3} };
