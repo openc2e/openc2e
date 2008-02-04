@@ -20,6 +20,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "caosVM.h" // for setupCommandPointers()
+#include "caosScript.h"
 #include "PointerAgent.h"
 #include "CompoundAgent.h" // for setFocus
 #include <limits.h> // for MAXINT

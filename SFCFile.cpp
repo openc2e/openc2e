@@ -1122,6 +1122,8 @@ void SFCScenery::copyToWorld() {
 #include <boost/format.hpp>
 #include <sstream>
 
+#include "caosScript.h"
+
 void SFCScript::install() {
 	std::string scriptinfo = boost::str(boost::format("<SFC script %d, %d, %d: %d>") % (int)family % (int)genus % species % eventno);
 	caosScript script(world.gametype, scriptinfo);

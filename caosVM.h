@@ -21,14 +21,17 @@
 #define _CAOSVM_H
 
 #include "openc2e.h"
-#include "caosScript.h"
 #include <map>
 #include <istream>
 #include <ostream>
 #include "AgentRef.h"
+#include "caosVar.h"
 
+#include <boost/variant.hpp>
 #include <boost/weak_ptr.hpp>
 using boost::weak_ptr;
+
+class script;
 
 //#define CAOSDEBUG
 //#define CAOSDEBUGDETAIL
@@ -1040,7 +1043,7 @@ public:
 
 	void safeJMP(int nip);
 	void invoke_cmd(script *s, bool is_saver, int opidx);
-	void runOpCore(script *s, caosOp op);
+	void runOpCore(script *s, struct caosOp op);
 	void runOp();
 	void runEntirely(shared_ptr<script> s);
 

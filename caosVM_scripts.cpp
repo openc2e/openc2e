@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "caosScript.h"
 #include "World.h"
 #include "Engine.h"
 #include <iostream>

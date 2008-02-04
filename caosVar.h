@@ -20,12 +20,11 @@
 #ifndef CAOSVAR_H
 #define CAOSVAR_H 1
 
-#include "boost/variant.hpp"
+#include <boost/variant.hpp>
 #include "openc2e.h"
 #include <string>
 #include <cassert>
 #include "AgentRef.h"
-//#include "slaballoc.h"
 #include <typeinfo>
 #include "physics.h"
 

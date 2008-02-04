@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "caosScript.h" // PRAY INJT
 #include "World.h"
 #include "Catalogue.h"
 #include <boost/format.hpp>

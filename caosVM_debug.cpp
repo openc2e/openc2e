@@ -26,6 +26,7 @@
 #include <cctype>
 #include "dialect.h"
 #include <algorithm>
+#include "caosScript.h"
 
 // #include "malloc.h" <- unportable horror!
 #include <sstream>

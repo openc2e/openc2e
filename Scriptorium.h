@@ -21,9 +21,12 @@
 #ifndef _SCRIPTORIUM_H
 #define _SCRIPTORIUM_H
 
-#include "caosScript.h"
 #include "openc2e.h"
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
 #include <map>
+
+class script;
 
 class Scriptorium {
 protected:

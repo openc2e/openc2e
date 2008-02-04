@@ -20,6 +20,7 @@
 #include "bytecode.h"
 #include "cmddata.h"
 #include "exceptions.h"
+#include "caosScript.h"
 #include "caosVM.h"
 #include "openc2e.h"
 #include "Engine.h"

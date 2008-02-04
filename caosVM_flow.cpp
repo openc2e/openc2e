@@ -25,6 +25,7 @@
 #include <sstream>
 #include "AgentHelpers.h"
 #include "Vehicle.h" // EPAS
+#include "caosScript.h" // CAOS
 
 /**
  DOIF (command) condition (condition)

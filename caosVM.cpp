@@ -21,6 +21,7 @@
 #include "openc2e.h"
 #include "World.h"
 #include "bytecode.h"
+#include "caosScript.h"
 #include <iostream>
 
 #include <boost/format.hpp>

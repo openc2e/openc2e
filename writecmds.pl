@@ -47,6 +47,7 @@ print qq{#include <cstdio>\n};
 print qq{#include <climits>\n};
 print qq{#include "cmddata.h"\n};
 print qq{#include "caosVM.h"\n};
+print qq{#include "dialect.h"\n};
 print qq{#include "openc2e.h"\n};
 print qq{\n\n};
 

@@ -22,6 +22,7 @@
 #include "World.h"
 #include "MetaRoom.h"
 #include "caosVM.h" // for setupCommandPointers()
+#include "caosScript.h" // for executeNetwork()
 #include "PointerAgent.h"
 #include "dialect.h" // registerDelegates
 #include "NullBackend.h"
