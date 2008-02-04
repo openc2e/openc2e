@@ -5,6 +5,10 @@ SET(BIN "${OPENC2E_BINARY_DIR}")
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS 1)
 SET(CMAKE_MODULE_PATH "${SRC}/cmake")
 
+SET(CMAKE_BUILD_TYPE "optdebug")
+SET(CMAKE_CXX_FLAGS_OPTDEBUG "-ggdb3 -O2" CACHE STRING "CFLAGS" FORCE)
+SET(CMAKE_C_FLAGS_OPTDEBUG "-ggdb3 -O2" CACHE STRING "CFLAGS" FORCE)
+
 #SET(CMAKE_BUILD_TYPE "debug")
 #:SET(CMAKE_C_FLAGS_DEBUG "-ggdb3 -O0")
 SET(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O0" CACHE STRING "CFLAGS" FORCE)
@@ -93,10 +97,27 @@ SET(OPENC2E_CORE
 	Vehicle.cpp
 	World.cpp)
 
+SET(OPENC2E_QT
+	qtgui/qtopenc2e.cpp
+	qtgui/openc2eview.cpp
+	qtgui/AgentInjector.cpp
+	qtgui/imagepreview.cpp
+	qtgui/c1cobfile.cpp
+	qtgui/QtBackend.cpp
+	qtgui/main.cpp)
+
+SET(OPENC2E_QT_MOC_HDRS
+	qtgui/qtopenc2e.h
+	qtgui/openc2eview.h
+	qtgui/AgentInjector.h
+	qtgui/imagepreview.h)
+
+SET(OPENC2E_QT_UIS
+	qtgui/agents.ui)
 # 
 
 
-
+cmake_minimum_required(VERSION 2.4.0)
 
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_mixer REQUIRED)
@@ -104,7 +125,8 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(SDL_gfx REQUIRED)
 FIND_PACKAGE(OpenAL)
 FIND_PACKAGE(ALUT)
-FIND_PACKAGE(Boost)
+FIND_PACKAGE(Boost REQUIRED)
+find_package(Qt4 REQUIRED)
 
 SET(USE_OPENAL "NO")
 
@@ -126,10 +148,14 @@ ELSE(${OPENAL_SRC} STREQUAL "")
     SET(OPENAL_DEF "-DOPENAL_SUPPORT")
 ENDIF(${OPENAL_SRC} STREQUAL "")
 
+include(${QT_USE_FILE})
+QT4_WRAP_UI(OPENC2E_QT_UIS_H ${OPENC2E_QT_UIS})
+QT4_WRAP_CPP(OPENC2E_QT_MOC_SRCS ${OPENC2E_QT_MOC_HDRS})
+
 # Pass flags to the compiler
 ADD_DEFINITIONS("-W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE ${OPENAL_DEF}")
 
-ADD_EXECUTABLE(openc2e ${OPENC2E_CORE} ${OPENAL_SRC} caosVM_ser_stub.cpp main.cpp)
+ADD_EXECUTABLE(openc2e ${OPENC2E_CORE} ${OPENC2E_QT} ${OPENAL_SRC} ${OPENC2E_QT_UIS_H} ${OPENC2E_QT_MOC_SRCS} caosVM_ser_stub.cpp)
 
 TARGET_LINK_LIBRARIES(openc2e z m pthread 
 	${SDL_LIBRARY}
@@ -138,6 +164,7 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	${SDLGFX_LIBRARY}
 	${OPENAL_LIBRARY}
 	${ALUT_LIBRARY}
+	${QT_LIBRARIES}
 	boost_program_options-mt
 	boost_serialization-mt
 	boost_filesystem-mt
