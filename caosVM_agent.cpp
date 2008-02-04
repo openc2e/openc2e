@@ -40,34 +40,6 @@ SpritePart *caosVM::getCurrentSpritePart() {
 	return s;
 }
 
-// TODO: move this elsewhere?
-bool agentsTouching(Agent *first, Agent *second) {
-	assert(first && second);
-
-	// TODO: c2e docs say it only checks if bounding lines overlap, implement it like that?
-	
-	// this check should probably be integrated into line overlap check?
-	if (first == second) return false;
-
-	if (first->x < second->x) {
-		if ((first->x + first->getWidth()) < second->x)
-			return false;
-	} else {
-		if ((second->x + second->getWidth()) < first->x)
-			return false;
-	}
-
-	if (first->y < second->y) {
-		if ((first->y + first->getHeight()) < second->y)
-			return false;
-	} else {
-		if ((second->y + second->getHeight()) < first->y)
-			return false;
-	}
-
-	return true;
-}
-
 /**
  TOUC (integer) first (agent) second (agent)
  %status maybe

@@ -261,8 +261,6 @@ void caosVM::c_ESEE() {
 	}
 }
 
-bool agentsTouching(Agent *first, Agent *second); // caosVM_agent.cpp
-
 /**
  ETCH (command) family (integer) genus (integer) species (integer)
  %pragma stackdelta any

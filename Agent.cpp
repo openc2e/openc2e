@@ -29,6 +29,7 @@
 #include <boost/format.hpp>
 #include "Room.h"
 #include "Vehicle.h"
+#include "AgentHelpers.h"
 
 void Agent::core_init() {
 	initialized = false;
@@ -1050,8 +1051,6 @@ void Agent::carry(AgentRef a) {
 	// TODO: move carrying agent to the right position
 	adjustCarried(0, 0);
 }
-
-bool agentsTouching(Agent *first, Agent *second); // caosVM_agents.cpp
 
 bool Agent::beDropped() {	
 	carriedby = AgentRef(0);

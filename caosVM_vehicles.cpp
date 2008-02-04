@@ -22,6 +22,7 @@
 #include "openc2e.h"
 #include "Vehicle.h"
 #include "World.h"
+#include "AgentHelpers.h" // agentsTouching
 
 /**
  CABN (command) left (integer) top (integer) right (integer) bottom (integer)
@@ -76,8 +77,6 @@ void caosVM::c_SPAS() {
 	caos_assert(v);
 	v->addCarried(passenger);
 }
-
-bool agentsTouching(Agent *first, Agent *second); // caosVM_agents.cpp
 
 /**
  GPAS (command) family (integer) genus (integer) species (integer) options (integer)
