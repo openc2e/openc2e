@@ -24,6 +24,8 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
+	mkdir $(CURDIR)/build
+	cd $(CURDIR)/build; cmake ..
 
 	touch configure-stamp
 
@@ -33,8 +35,7 @@ build: build-stamp
 build-stamp: configure-stamp 
 	dh_testdir
 
-	# Add here commands to compile the package.
-	$(MAKE) openc2e tools/braininavat/braininavat docs.html
+	cd $(CURDIR)/build; make
 	#docbook-to-man debian/openc2e.sgml > openc2e.1
 
 	touch build-stamp
@@ -44,8 +45,7 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 
-	# Add here commands to clean up after the build process.
-	-$(MAKE) clean
+	rm -rf build
 
 	dh_clean 
 
@@ -57,7 +57,7 @@ install: build
 
 	# Add here commands to install the package into debian/openc2e.
 	install -d debian/tmp/usr/bin
-	install openc2e tools/braininavat/braininavat debian/tmp/usr/bin
+	install build/openc2e debian/tmp/usr/bin
 
 
 # Build architecture-independent files here.
