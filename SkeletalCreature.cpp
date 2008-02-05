@@ -476,7 +476,9 @@ void SkeletalCreature::setPose(std::string s) {
 		case '1': posedirection = 2; break;
 		case '2': posedirection = 0; break;
 		case '3': posedirection = 1; break;
-		default: assert(false);
+		default: 
+			std::cout << "internal warning: SkeletalCreature::setPose didn't understand direction " << s[0] << " in pose '" << s << "'." << std::endl;
+			break;
 	}
 
 	for (int i = 0; i < 14; i++) {
@@ -502,7 +504,9 @@ void SkeletalCreature::setPose(std::string s) {
 				break;
 			// TODO: '!' also?
 			case 'X': continue; // do nothing
-			default: assert(false); 
+			default:
+				  std::cout << "internal warning: SkeletalCreature::setPose didn't understand " << s[i + 1] << " in pose '" << s << "'." << std::endl;
+				  continue;
 		}
 
 		pose[cee_lookup[i]] = newpose;
@@ -549,7 +553,10 @@ void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure i
 		if (typeid(*(*i)) == typeid(creatureGaitGene)) {
 			creatureGaitGene *g = (creatureGaitGene *)(*i);
 			if (g->drive == gaitdrive) {
+				// If we're picking a new gait..
 				if (g != gaitgene) {
+					// .. reset our gait details to default.
+					// TODO: shouldn't we set an animation or something here, to simplify the way things work?
 					gaitgene = g;
 					gaiti = 0;
 				}
@@ -579,7 +586,7 @@ void SkeletalCreature::tick() {
 	if (!eyesclosed && !creature->isZombie()) {
 		if (approaching && approachtarget) {
 			// TODO: more sane approaching skillz
-			if (approachtarget->x > x)
+			if (approachtarget->x < x)
 				direction = 3;
 			else
 				direction = 2;

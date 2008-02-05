@@ -787,7 +787,7 @@ class blockUntilApproached : public blockCond {
 			// parentcreature is guaranteed to be valid if parent is
 			
 			// TODO: cope with this problem (eg: another APPR, creature paused, non-skeletal creature, etc)
-			if (parentcreature->isApproaching()) return false;
+			//if (parentcreature->isApproaching()) return false;
 
 			// note that this merely sets up the approach to be done on the next tick of the creature
 			parentcreature->approach(it);
@@ -1013,14 +1013,18 @@ void caosVM::v_CAGE() {
 
 /**
  BYIT (integer)
- %status stub
+ %status maybe
 
  Determines whether or not the target Creature can reach the IT agent (0 
  or 1).
 */
 void caosVM::v_BYIT() {
 	Creature *c = getTargCreature();
-	result.setInt(0); // TODO
+
+	if (_it_ && agentsTouching(targ, _it_)) // TODO
+		result.setInt(1);
+	else
+		result.setInt(0);
 }
 
 /**

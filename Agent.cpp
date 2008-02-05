@@ -197,6 +197,7 @@ shared_ptr<script> Agent::findScript(unsigned short event) {
 
 #include "PointerAgent.h"
 #include "CreatureAgent.h"
+#include "Creature.h"
 bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
 	// Start running the specified script on the VM of this agent, with FROM set to the provided agent.
 
@@ -276,6 +277,15 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 			lastScript = event;
 			zotstack();
 			vm->setVariables(one, two);
+
+			// TODO: we should set _it_ in a more sensible way
+			CreatureAgent *a = dynamic_cast<CreatureAgent *>(this);
+			if (a) {
+				Creature *c = a->getCreature();
+				assert(c);
+				vm->_it_ = c->getAttentionFocus();
+			}
+			
 			vmTick();
 			ranscript = true;
 		} else if (madevm) {
