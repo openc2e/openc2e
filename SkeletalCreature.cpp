@@ -539,6 +539,7 @@ void SkeletalCreature::setPoseGene(unsigned int poseno) {
 			creaturePoseGene *g = (creaturePoseGene *)(*i);
 			if (g->poseno == poseno) {
 				gaitgene = 0;
+				walking = false; // TODO: doesn't belong here, does it? really the idea of a 'walking' bool is horrid
 				setPose(g->getPoseString());
 				return;
 			}
