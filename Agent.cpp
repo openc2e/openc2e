@@ -1021,6 +1021,10 @@ void Agent::pushVM(caosVM *newvm) {
 	vm = newvm;
 }
 
+bool Agent::vmStopped() {
+	return (!vm || vm->stopped());
+}
+
 void Agent::stopScript() {
 	zotstack();
 	if (vm)

@@ -177,6 +177,9 @@ public:
 	// TODO: size/grav likely duplicates of perm/falling
 	caosVar actv, thrt, size, grav;
 
+	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
+	virtual ~Agent();
+
 	void floatSetup();
 	void floatRelease();
 	void addFloated(AgentRef);
@@ -190,14 +193,15 @@ public:
 	void dropCarried(AgentRef);
 
 	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
+	void stopScript();
+	void pushVM(caosVM *newvm);
+	bool vmStopped();
+
 	void moveTo(float, float, bool force = false);
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
-	void pushVM(caosVM *newvm);
+	
 	virtual void handleClick(float, float);
 	
-	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
-	virtual ~Agent();
-
 	virtual CompoundPart *part(unsigned int id) = 0;
 	
 	unsigned int getWidth() { return part(0)->getWidth(); }
@@ -207,13 +211,12 @@ public:
 	shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, shared_ptr<Room> exclude);
 	void const findCollisionInDirection(unsigned int i, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
 
-	virtual void tick();
-	virtual void kill();
-	void stopScript();
-	void unhandledException(std::string info, bool wasscript);
-
 	bool validInRoomSystem();
 	bool const validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);
+
+	virtual void tick();
+	virtual void kill();
+	void unhandledException(std::string info, bool wasscript);
 
 	virtual void setZOrder(unsigned int plane); // should be overridden!
 	virtual unsigned int getZOrder() const;
