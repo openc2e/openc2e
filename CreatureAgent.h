@@ -29,6 +29,7 @@ protected:
 
 	unsigned int direction;
 	bool walking, approaching;
+	AgentRef approachtarget;
 
 	virtual void creatureAged() { }
 
@@ -42,7 +43,9 @@ public:
 	void setDirection(unsigned int d) { assert(d < 4); direction = d; }
 	unsigned int getDirection() { return direction; }
 	void startWalking();
-	void startApproaching();
+	void stopWalking();
+	void approach(AgentRef it);
+	bool isApproaching() { return approaching; }
 };
 
 /* vim: set noet: */

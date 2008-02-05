@@ -765,18 +765,50 @@ void caosVM::v_ASLP() {
 	result.setInt(c->isAsleep());
 }
 
+#include "AgentHelpers.h"
+
+class blockUntilApproached : public blockCond {
+	protected:
+		AgentRef parent, it;
+		CreatureAgent *parentcreature;
+
+	public:
+		blockUntilApproached(AgentRef p, AgentRef i) : parent(p), it(i) {
+			assert(parent);
+			parentcreature = dynamic_cast<CreatureAgent *>(parent.get());
+			assert(parentcreature);
+		}
+		virtual bool operator()() {
+			if (!parent) return false;
+			if (!it) return false; // TODO: CAs
+
+			if (agentsTouching(parent, it)) return false;
+
+			// parentcreature is guaranteed to be valid if parent is
+			
+			// TODO: cope with this problem (eg: another APPR, creature paused, non-skeletal creature, etc)
+			if (parentcreature->isApproaching()) return false;
+
+			// note that this merely sets up the approach to be done on the next tick of the creature
+			parentcreature->approach(it);
+
+			return true;
+		}
+};
+
 /**
  APPR (command)
- %status stub
+ %status maybe
  %pragma variants c1 c2 cv c3
 
  Makes the target Creature approach the IT agent (or if none, an agent of that category using CAs), 
  blocking until it makes it there or gives up.
 */
 void caosVM::c_APPR() {
-	Creature *c = getTargCreature();
-
-	// TODO
+	CreatureAgent *a = getTargCreatureAgent();
+	caos_assert(a);
+	
+	startBlocking(new blockUntilApproached(targ, _it_));
 }
 
 /**

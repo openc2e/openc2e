@@ -577,17 +577,12 @@ void SkeletalCreature::tick() {
 
 	// TODO: hack!
 	if (!eyesclosed && !creature->isZombie()) {
-		if (approaching) {
-			AgentRef attention = creature->getAttentionFocus();
-			if (attention) {
-				// TODO: more sane approaching skillz
-				if (attention->x > x)
-					direction = 3;
-				else
-					direction = 2;
-			} else {
-				approaching = false;
-			}
+		if (approaching && approachtarget) {
+			// TODO: more sane approaching skillz
+			if (approachtarget->x > x)
+				direction = 3;
+			else
+				direction = 2;
 		}
 
 		if (walking || approaching) {
@@ -597,6 +592,8 @@ void SkeletalCreature::tick() {
 			// TODO: we should only do this if we're moving :-P
 			gaitTick();
 		}
+		
+		approaching = false;
 	}
 	
 	if ((engine.version != 2 || grav.getInt() == 0) && !carriedby && !invehicle)

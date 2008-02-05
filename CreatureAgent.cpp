@@ -48,9 +48,16 @@ void CreatureAgent::startWalking() {
 	approaching = false;
 }
 
-void CreatureAgent::startApproaching() {
+void CreatureAgent::stopWalking() {
+	walking = false;
+}
+
+void CreatureAgent::approach(AgentRef it) {
+	assert(it);
+
 	walking = false;
 	approaching = true;
+	approachtarget = it;
 }
 
 /* vim: set noet: */
