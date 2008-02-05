@@ -1,9 +1,11 @@
-#include "brainview.h"
-#include <QtGui>
-#include "c2eBrain.h"
+#include "../../Creature.h"
+#include "../../c2eBrain.h"
 
-BrainView::BrainView(BrainInAVat *p) {
-	parent = p;
+#include <QtGui>
+#include "brainview.h"
+
+BrainView::BrainView() {
+	creature = 0;
 
 	neuron_var = 0;
 	dendrite_var = 0;
@@ -15,10 +17,13 @@ BrainView::BrainView(BrainInAVat *p) {
 	setPalette(pal);
 }
 
+void BrainView::setCreature(c2eCreature *c) {
+	creature = c;
+}
+
 QSize BrainView::minimumSize() {
-	c2eCreature *c = parent->getCreature();
-	if (!c) return QSize(0, 0);
-	c2eBrain *b = c->getBrain();
+	if (!creature) return QSize(0, 0);
+	c2eBrain *b = creature->getBrain();
 	assert(b);
 
 	int neededwidth = 2, neededheight = 2;
@@ -36,11 +41,10 @@ QSize BrainView::minimumSize() {
 }
 
 void BrainView::paintEvent(QPaintEvent *) {
-	c2eCreature *c = parent->getCreature();
-	if (!c) return;
-	c2eBrain *b = c->getBrain();
+	if (!creature) return;
+	c2eBrain *b = creature->getBrain();
 	assert(b);
-
+	
 	QPainter painter(this);
 	//painter.setRenderHint(QPainter::Antialiasing, true); <- atrociously slow
 

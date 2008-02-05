@@ -18,7 +18,6 @@
 #define _QTOPENC2E_H
 
 #include <QMainWindow>
-#include "AgentInjector.h"
 
 class QtOpenc2e : public QMainWindow {
 	Q_OBJECT
@@ -26,6 +25,9 @@ class QtOpenc2e : public QMainWindow {
 public:
 	QtOpenc2e();
 	~QtOpenc2e();
+
+signals:
+	void ticked();
 
 private slots:
 	void tick();
@@ -35,6 +37,7 @@ private slots:
 	void about();
 	
 	void showAgentInjector();
+	void showBrainViewer();
 	
 	void toggleShowMap();
 	void toggleShowScrollbars();
@@ -49,11 +52,12 @@ private slots:
 private:
 	QToolBar *maintoolbar;
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
-	QAction *exitAct, *aboutAct, *agentInjectorAct;
+	QAction *exitAct, *aboutAct, *agentInjectorAct, *brainViewerAct;
 	QAction *showMapAct, *newNornAct;
 	QAction *pauseAct, *muteAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
 
-	AgentInjector *agentInjector;
+	class AgentInjector *agentInjector;
+	class BrainViewer *brainViewer;
 	
 	class openc2eView *viewport;
 };

@@ -27,7 +27,7 @@ using namespace std;
 BrainInAVat::BrainInAVat() {
 	ourCreature = 0;
 	scrollArea = new QScrollArea(this);
-	ourView = new BrainView(this);
+	ourView = new BrainView();
 	scrollArea->setWidget(ourView);
 	setCentralWidget(scrollArea);
 
@@ -217,6 +217,7 @@ void BrainInAVat::loadFile(const QString &fileName) {
 	if (ourCreature) {
 		delete ourCreature;
 		ourCreature = 0;
+		ourView->setCreature(ourCreature);
 	}
 	tickAct->setEnabled(false);
 	sleepToggleAct->setChecked(false);
@@ -261,6 +262,8 @@ void BrainInAVat::loadFile(const QString &fileName) {
 
 	QApplication::restoreOverrideCursor();
 
+	ourView->setCreature(ourCreature);
+	
 	// we're done; update title/recent files, and display a temporary status message
 	tickAct->setEnabled(true);
 	sleepToggleAct->setEnabled(true);

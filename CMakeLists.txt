@@ -101,16 +101,20 @@ SET(OPENC2E_QT
 	qtgui/qtopenc2e.cpp
 	qtgui/openc2eview.cpp
 	qtgui/AgentInjector.cpp
+	qtgui/BrainViewer.cpp
 	qtgui/imagepreview.cpp
 	qtgui/c1cobfile.cpp
 	qtgui/QtBackend.cpp
-	qtgui/main.cpp)
+	qtgui/main.cpp
+	tools/braininavat/brainview.cpp)
 
 SET(OPENC2E_QT_MOC_HDRS
 	qtgui/qtopenc2e.h
 	qtgui/openc2eview.h
 	qtgui/AgentInjector.h
-	qtgui/imagepreview.h)
+	qtgui/BrainViewer.h
+	qtgui/imagepreview.h
+	tools/braininavat/brainview.h)
 
 SET(OPENC2E_QT_UIS
 	qtgui/agents.ui)

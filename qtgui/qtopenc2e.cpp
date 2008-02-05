@@ -22,7 +22,8 @@
 #include "../OpenALBackend.h"
 #include "../MetaRoom.h"
 
-#include "ui_agents.h"
+#include "AgentInjector.h"
+#include "BrainViewer.h"
 
 // Constructor which creates the main window.
 
@@ -125,7 +126,13 @@ QtOpenc2e::QtOpenc2e() {
 	connect(agentInjectorAct, SIGNAL(triggered()), this, SLOT(showAgentInjector()));
 	toolsMenu->addAction(agentInjectorAct);
 
+	brainViewerAct = new QAction(tr("&Brain Viewer"), this);
+	connect(brainViewerAct, SIGNAL(triggered()), this, SLOT(showBrainViewer()));
+	toolsMenu->addAction(brainViewerAct);
+
 	agentInjector = new AgentInjector();
+	brainViewer = new BrainViewer();
+	connect(this, SIGNAL(ticked()), brainViewer, SLOT(onTick()));
 
 	/* Creatures menu */
 
@@ -161,6 +168,9 @@ void QtOpenc2e::tick() {
 	
 	if (engine.done) close();
 
+	// TODO: only on engine.tick() success?
+	emit ticked();
+
 	if (viewport->needsRender()) {
 		viewport->viewport()->repaint();
 	}
@@ -185,6 +195,11 @@ void QtOpenc2e::about() {
 void QtOpenc2e::showAgentInjector() {
 	agentInjector->show();
 	agentInjector->activateWindow();
+}
+
+void QtOpenc2e::showBrainViewer() {
+	brainViewer->show();
+	brainViewer->activateWindow();
 }
 
 void QtOpenc2e::toggleShowMap() {
