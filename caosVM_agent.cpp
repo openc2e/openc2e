@@ -554,6 +554,9 @@ void caosVM::c_ANIM() {
 
 	valid_agent(targ);
 
+	// TODO: support creatures for this
+	if (dynamic_cast<SkeletalCreature *>(targ.get())) return;
+	
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);
 	p->animation = bs;
