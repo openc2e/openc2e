@@ -362,21 +362,33 @@ void c2eCreature::tickBrain() {
 	brain->tick();
 	
 #ifndef _CREATURE_STANDALONE	
+	AgentRef oldattn = attention;
+	int olddecn = decn;
+
 	c2eLobe *attnlobe = brain->getLobeById("attn");
 	if (attnlobe) {
 		attn = attnlobe->getSpareNeuron();
 	}
-	
+
 	c2eLobe *decnlobe = brain->getLobeById("decn");
 	if (decnlobe) {
 		// TODO: check bounds of mappinginfo
 		decn = mappinginfo[decnlobe->getSpareNeuron()];
 	}
-#endif
 
 	// TODO: doesn't belong here
 	if (attn >= 0 && attn < (int)chosenagents.size())
 		attention = chosenagents[attn];
+
+	// fire scripts as needed
+	// TODO: doesn't belong here
+	// TODO: deal with decisions which don't have agents attached
+	// TODO: deal with moving between ATTNs which don't have a choseagent right now (eg, nothing in sight)
+	if (parent->vmStopped() || oldattn != attention || olddecn != decn) {
+		// TODO: this is always 'on agents', not 'on creatures'
+		parent->queueScript(decn + 16);
+	}
+#endif
 }
 
 bool c2eCreature::processInstinct() {
