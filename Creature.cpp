@@ -1307,11 +1307,13 @@ void c2eCreature::handleStimulus(unsigned int id, float strength) {
 	 * anything - fuzzie
 	 */
 	stim.verb_id = reverseMapVerbToNeuron(g->sensoryneuron);
+	// TODO: huh? gene kit has it in 255-ish steps
 	stim.verb_amount = g->significance * (1.0f / 124.0f); /* multiply by 0.5? */
 	for (unsigned int i = 0; i < 4; i++) {
 		// TODO: ack, amount should be bound to range
+		// TODO: fuzzie is suspicious about multiply/dividing on g->amounts here
 		if (g->drives[i] != 255)
-			stim.setupDriveStim(i, g->drives[i], g->amounts[i] * (1.0f / 124.0f) * multiplier, g->silent[i]);
+			stim.setupDriveStim(i, g->drives[i], ((g->amounts[i] * (1.0f / 248.0f)) - 124.0f) * multiplier, g->silent[i]);
 		
 		if (strength == 0.0f)
 			stim.drive_silent[i] = true;
