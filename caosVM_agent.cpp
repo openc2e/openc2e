@@ -1917,6 +1917,8 @@ void caosVM::c_TNTW() {
  %status stub
 */
 void caosVM::c_PRNT() {
+	VM_PARAM_INTEGER(pose)
+
 	// TODO
 }
 

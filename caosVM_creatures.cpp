@@ -818,6 +818,8 @@ void caosVM::c_APPR() {
  Makes the target Creature conscious if 0, or unconscious if 1.
 */
 void caosVM::c_UNCS() {
+	VM_PARAM_INTEGER(unconscious)
+
 	Creature *c = getTargCreature();
 
 	// TODO
@@ -841,6 +843,8 @@ void caosVM::v_UNCS() {
  %status stub
 */
 void caosVM::c_FACE() {
+	VM_PARAM_INTEGER(number)
+
 	caos_assert(targ);
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
 	caos_assert(c);
