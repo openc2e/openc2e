@@ -332,6 +332,20 @@ void c2eCreature::tickBrain() {
 		}
 	}
 
+	/*c2eLobe *verblobe = brain->getLobeById("verb");
+	if (verblobe) {
+		for (unsigned int i = 0; i < verblobe->getNoNeurons(); i++) {
+			verblobe->setNeuronInput(i, 0.0f); // TODO
+		}
+	}
+	
+	c2eLobe *nounlobe = brain->getLobeById("noun");
+	if (nounlobe) {
+		for (unsigned int i = 0; i < nounlobe->getNoNeurons(); i++) {
+			nounlobe->setNeuronInput(i, 0.0f); // TODO
+		}	
+	}*/
+
 #ifndef _CREATURE_STANDALONE	
 	// TODO: situ, detl
 	
@@ -497,6 +511,11 @@ bool c2eCreature::processInstinct() {
 
 	// TODO: shouldn't REM be present throughout sleep?
 	chemicals[213] = 0.0f; // REM to null
+
+	// wipe the lobes again, to stop any issues with neurons being set which shouldn't be at the end of an instinct run
+	// TODO: is wiping the lobes here truly what we should do?
+	for (std::map<std::string, c2eLobe *>::iterator i = brain->lobes.begin(); i != brain->lobes.end(); i++)
+		i->second->wipe();
 
 	//std::cout << "*** instinct done" << std::endl;
 	//std::cout << std::endl;
@@ -1306,7 +1325,8 @@ void c2eCreature::handleStimulus(unsigned int id, float strength) {
 	 * in the standard genomes (apart from a 255?) and it doesn't seem to change
 	 * anything - fuzzie
 	 */
-	stim.verb_id = reverseMapVerbToNeuron(g->sensoryneuron);
+	if (stim.verb_id != 0) // TODO: this is a guess to stop stuff from resting seemingly forever
+		stim.verb_id = reverseMapVerbToNeuron(g->sensoryneuron);
 	// TODO: huh? gene kit has it in 255-ish steps
 	stim.verb_amount = g->significance * (1.0f / 124.0f); /* multiply by 0.5? */
 	for (unsigned int i = 0; i < 4; i++) {
