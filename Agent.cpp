@@ -865,7 +865,7 @@ void Agent::unhandledException(std::string info, bool wasscript) {
 	if (world.autostop) {
 		// autostop is mostly for Creatures Village, which is full of buggy scripts
 		stopScript();
-	} else if (world.autokill) {
+	} else if (world.autokill && !dynamic_cast<CreatureAgent *>(this)) { // don't autokill creatures! TODO: someday we probably should :)
 		kill();
 		if (wasscript)
 			std::cerr << identify() << " was autokilled during script " << lastScript << " due to: " << info << std::endl;
@@ -1073,6 +1073,7 @@ bool Agent::beDropped() {
 
 	// TODO: no idea if this is right, it tries to re-enable gravity when dropping C2 agents
 	if (engine.version == 2) grav.setInt(1);
+	if (engine.version == 3) falling = true;
 
 	if (!invehicle) { // ie, we're not being dropped by a vehicle
 		// TODO: check for vehicles in a saner manner?

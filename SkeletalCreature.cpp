@@ -417,10 +417,11 @@ void SkeletalCreature::snapDownFoot() {
 		newy = downfootroom->bot.pointAtX(footx).y;
 	}
 
-	if (engine.version == 2) {
+	if (engine.version > 1) {
 		// TODO: hilar hack: enable gravity if we're snapping by much
 		if (newroomchosen && abs(y - (newy - (footy - y))) > 20) {
-			grav.setInt(1);
+			if (engine.version == 2) grav.setInt(1);
+			else falling = true;
 			return;
 		}
 	}
@@ -603,18 +604,20 @@ void SkeletalCreature::tick() {
 		
 		approaching = false;
 	}
-	
-	if ((engine.version != 2 || grav.getInt() == 0) && !carriedby && !invehicle)
+
+	if ((engine.version == 1 || (engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling)) && !carriedby && !invehicle)
 		snapDownFoot();
 	else
 		downfootroom.reset();
 }
 
 void SkeletalCreature::physicsTick() {
-	if (engine.version == 2) {
-		Agent::physicsTick();
-		if (grav.getInt() == 0 && !carriedby && !invehicle)
-			snapDownFoot();
+	if (engine.version > 1) {
+		if (falling && (engine.version == 2 || validInRoomSystem())) Agent::physicsTick();
+		if (!carriedby && !invehicle) {
+			if ((engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling))
+				snapDownFoot();
+		}
 	}
 
 	// TODO
