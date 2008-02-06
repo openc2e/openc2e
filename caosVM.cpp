@@ -118,7 +118,7 @@ inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
 	if (stackdelta < INT_MAX - 1) {
 		if ((int)stackstart + stackdelta != (int)valueStack.size()) {
 			dumpStack(this);
-			throw caosException("Stack imbalance detected");
+			throw caosException(boost::str(boost::format("Internal error: Stack imbalance detected: expected to be %d after start of %d, but stack size is now %d") % stackdelta % (int)stackstart % (int)valueStack.size()));
 		}
 	}
 }
