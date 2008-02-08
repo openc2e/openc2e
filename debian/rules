@@ -23,7 +23,6 @@ endif
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	# Add here commands to configure the package.
 	mkdir $(CURDIR)/build
 	cd $(CURDIR)/build; cmake ..
 
@@ -36,7 +35,6 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	cd $(CURDIR)/build; make
-	#docbook-to-man debian/openc2e.sgml > openc2e.1
 
 	touch build-stamp
 
@@ -55,16 +53,12 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	# Add here commands to install the package into debian/openc2e.
 	install -d debian/tmp/usr/games
 	install build/openc2e debian/tmp/usr/games
 
 
-# Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
@@ -72,23 +66,11 @@ binary-arch: build install
 	dh_installdocs
 	dh_installexamples
 	dh_install --fail-missing --sourcedir=debian/tmp
-#	dh_installmenu
-#	dh_installdebconf	
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-#	dh_installinit
-#	dh_installcron
-#	dh_installinfo
 	dh_installman
 	dh_link
 	dh_strip --dbg-package=openc2e-dbg
 	dh_compress -X.css -X.html
 	dh_fixperms
-#	dh_perl
-#	dh_python
-#	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
