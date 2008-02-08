@@ -8,18 +8,17 @@ Standards-Version: 3.6.2
 Package: openc2e
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Suggests: openc2e-tools
-Description: Free creatures engine
- An open-source clone of the game engine used in the Creatures series of
- artificial life games.
+Description: Creatures-style game engine
+ openc2e is a cross-platform open-source game engine designed to be compatible
+ with the various game engines of the Creatures artificial-life game series,
 
 Package: openc2e-dbg
 Architecture: any
 Priority: extra
-Recommends: openc2e, openc2e-tools, gdb
-Description: Free creatures engine (debug symbols)
- An open-source clone of the game engine used in the Creatures series of
- artificial life games.
+Recommends: openc2e, gdb
+Description: Creatures-style game engine (debug symbols)
+ openc2e is a cross-platform open-source game engine designed to be compatible
+ with the various game engines of the Creatures artificial-life game series.
  .
  This package contains debugging symbols for programs in the openc2e and
  openc2e-tools packages.
