@@ -138,7 +138,11 @@ void Creature::die() {
 	world.history.getMoniker(world.history.findMoniker(genome)).hasDied();
 	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(7, "", ""); // died event
 #endif
-	// TODO: disable brain/biochemistry updates, trigger die script?
+	// TODO: disable brain/biochemistry updates
+	// force die script
+	// TODO: TODO: TODO: this is c2e-specific
+	parent->stopScript();
+	parent->queueScript(72);
 	// skeletalcreature eyes, also? see setAsleep comment
 	alive = false;
 }
