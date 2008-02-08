@@ -477,6 +477,7 @@ void SkeletalCreature::setPose(std::string s) {
 		case '1': posedirection = 2; break;
 		case '2': posedirection = 0; break;
 		case '3': posedirection = 1; break;
+		case 'X': break; // do nothing
 		default: 
 			std::cout << "internal warning: SkeletalCreature::setPose didn't understand direction " << s[0] << " in pose '" << s << "'." << std::endl;
 			break;
