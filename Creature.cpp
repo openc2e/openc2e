@@ -1325,8 +1325,10 @@ void c2eCreature::handleStimulus(unsigned int id, float strength) {
 	 * in the standard genomes (apart from a 255?) and it doesn't seem to change
 	 * anything - fuzzie
 	 */
-	if (stim.verb_id != 0) // TODO: this is a guess to stop stuff from resting seemingly forever
-		stim.verb_id = reverseMapVerbToNeuron(g->sensoryneuron);
+	// TODO: grmph, g->sensoryneuron and g->significance make no sense to me right now
+	// either, so commenting the verb_id setting out until someone works it out - fuzzie
+	/*if (stim.verb_id != 0) // TODO: this is a guess to stop stuff from resting seemingly forever
+		stim.verb_id = reverseMapVerbToNeuron(g->sensoryneuron); */
 	// TODO: huh? gene kit has it in 255-ish steps
 	stim.verb_amount = g->significance * (1.0f / 124.0f); /* multiply by 0.5? */
 	for (unsigned int i = 0; i < 4; i++) {
