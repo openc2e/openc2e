@@ -3,7 +3,10 @@ Section: contrib/games
 Priority: optional
 Maintainer: Bryan Donlan <bdonlan@gmail.com>
 Build-Depends: debhelper (>= 5.0.0), perl, libyaml-perl, libsdl1.2debian, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, libsdl-mixer1.2-dev, flex (>= 2.5.31), bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev, libsdl-gfx1.2-dev, libqt4-dev, libboost-regex-dev, cmake, libopenal-dev, libalut-dev
-Standards-Version: 3.6.2
+Standards-Version: 3.7.3.0
+Homepage: http://openc2e.ccdevnet.org
+Vcs-Svn: svn://openc2e.ccdevnet.org/openc2e/trunk
+Vcs-Browser: http://ccdevnet.org/viewcvs.cgi/trunk/
 
 Package: openc2e
 Architecture: any
@@ -15,10 +18,10 @@ Description: Creatures-style game engine
 Package: openc2e-dbg
 Architecture: any
 Priority: extra
-Recommends: openc2e, gdb
+Recommends: gdb
+Depends: openc2e (= ${binary:Version})
 Description: Creatures-style game engine (debug symbols)
  openc2e is a cross-platform open-source game engine designed to be compatible
  with the various game engines of the Creatures artificial-life game series.
  .
- This package contains debugging symbols for programs in the openc2e and
- openc2e-tools packages.
+ This package contains debugging symbols for programs in the openc2e package.
