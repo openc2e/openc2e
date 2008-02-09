@@ -1124,19 +1124,50 @@ void Agent::drop(AgentRef a) {
 	carrying = AgentRef(0);
 }
 
+std::pair<int, int> Agent::getCarryPoint() {
+	unsigned int ourpose = 0;
+
+	SpritePart *s;
+	if ((s = dynamic_cast<SpritePart *>(part(0))))
+		ourpose = s->getBase() + s->getPose();
+
+	std::pair<int, int> pos(0, 0);
+	
+	std::map<unsigned int, std::pair<int, int> >::iterator i = carry_points.find(ourpose);
+	if (i != carry_points.end())
+		pos = i->second;
+
+	return pos;
+}
+
+std::pair<int, int> Agent::getCarriedPoint() {
+	unsigned int theirpose = 0;
+
+	SpritePart *s;
+	if ((s = dynamic_cast<SpritePart *>(part(0))))
+		theirpose = s->getBase() + s->getPose();
+
+	std::pair<int, int> pos(0, 0);
+
+	std::map<unsigned int, std::pair<int, int> >::iterator i = carried_points.find(theirpose);
+	if (i != carried_points.end()) {
+		pos = i->second;
+	} else if (s && engine.version > 1) {
+		// TODO: why fudge pickup location here and not in default carried points or something?
+		// (this is nornagon's code which i moved - fuzzie)
+		pos.first = s->getSprite()->width(s->getCurrentSprite()) / 2;
+	}
+
+	return pos;
+}
+
 void Agent::adjustCarried(float unusedxoffset, float unusedyoffset) {
 	// Adjust the position of the agent we're carrying.
 	// TODO: this doesn't actually position the carried agent correctly, sigh
 
 	if (!carrying) return;
 
-	unsigned int ourpose = 0, theirpose = 0;
-
-	SpritePart *s;
-	if ((s = dynamic_cast<SpritePart *>(part(0))))
-		ourpose = s->getBase() + s->getPose();
-	if ((s = dynamic_cast<SpritePart *>(carrying->part(0))))
-		theirpose = s->getBase() + s->getPose();
+	unsigned int ourpose = 0;
 
 	int xoffset = 0, yoffset = 0;
 	if (engine.version < 3 && world.hand() == this) {
@@ -1147,23 +1178,17 @@ void Agent::adjustCarried(float unusedxoffset, float unusedyoffset) {
 		} else
 			yoffset = world.hand()->getHeight() / 2 - 3;
 	}
-	
-	std::map<unsigned int, std::pair<int, int> >::iterator i = carry_points.find(ourpose);
-	if (i != carry_points.end()) {
-		xoffset += i->second.first;
-		yoffset += i->second.second;
-	}
 
-	i = carrying->carried_points.find(theirpose);
-	if (i != carrying->carried_points.end()) {
-		xoffset -= i->second.first;
-		yoffset -= i->second.second;
-	} else if (s) {
-		if (engine.version > 1)
-			xoffset -= s->getSprite()->width(s->getCurrentSprite()) / 2;
-	}
+	std::pair<int, int> carrypoint = getCarryPoint();
+	xoffset += carrypoint.first;
+	yoffset += carrypoint.second;
 
-	carrying->moveTo(x + xoffset, y + yoffset, true);
+	std::pair<int, int> carriedpoint = carrying->getCarriedPoint();
+	xoffset -= carriedpoint.first;
+	yoffset -= carriedpoint.second;
+
+	if (xoffset != 0 || yoffset != 0)
+		carrying->moveTo(x + xoffset, y + yoffset, true);
 }
 
 void Agent::setClassifier(unsigned char f, unsigned char g, unsigned short s) {

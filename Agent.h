@@ -94,6 +94,9 @@ protected:
 
 	virtual void carry(AgentRef);
 	virtual void drop(AgentRef);
+
+	virtual std::pair<int, int> getCarryPoint();
+	virtual std::pair<int, int> getCarriedPoint();
 	virtual void adjustCarried(float xoffset, float yoffset);
 
 public:
