@@ -536,7 +536,7 @@ void SkeletalCreature::setPoseGene(unsigned int poseno) {
 	// TODO: upon second thought i think poseno is good - fuzzie
 	// TODO: this needs thought, darnit
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if ((*i)->header.switchontime != creature->getStage()) continue;
+		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
 		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
 			creaturePoseGene *g = (creaturePoseGene *)(*i);
@@ -552,7 +552,7 @@ void SkeletalCreature::setPoseGene(unsigned int poseno) {
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if ((*i)->header.switchontime != creature->getStage()) continue;
+		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
 		if (typeid(*(*i)) == typeid(creatureGaitGene)) {
 			creatureGaitGene *g = (creatureGaitGene *)(*i);
@@ -638,7 +638,7 @@ void SkeletalCreature::gaitTick() {
 	}
 	creaturePoseGene *poseg = 0;
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if ((*i)->header.switchontime != creature->getStage()) continue;
+		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
 		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
 			creaturePoseGene *g = (creaturePoseGene *)(*i);
@@ -680,8 +680,10 @@ void SkeletalCreature::creatureAged() {
 }
 
 std::string SkeletalCreature::getFaceSpriteName() {
+	// TODO: we should store the face sprite when we first search for sprites (since it
+	// has to be the baby sprite), rather than this horrible hackery
 	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if ((*i)->header.switchontime != creature->getStage()) continue;
+		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
 		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
 			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
