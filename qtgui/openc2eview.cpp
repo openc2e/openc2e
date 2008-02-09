@@ -33,8 +33,8 @@
  *
  */
 
-openc2eView::openc2eView(QWidget *parent) : QAbstractScrollArea(parent) {
-	backend = boost::shared_ptr<QtBackend>(new QtBackend());
+openc2eView::openc2eView(QWidget *parent, boost::shared_ptr<QtBackend> b) : QAbstractScrollArea(parent) {
+	backend = b;
 
 	viewport()->setAttribute(Qt::WA_PaintOnScreen); // disable double-buffering
 	viewport()->setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background

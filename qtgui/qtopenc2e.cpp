@@ -27,15 +27,9 @@
 
 // Constructor which creates the main window.
 
-QtOpenc2e::QtOpenc2e() {
-	viewport = new openc2eView(this);
+QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
+	viewport = new openc2eView(this, backend);
 	setCentralWidget(viewport);
-
-	engine.addPossibleBackend("qtgui", viewport->getBackend());
-	engine.addPossibleAudioBackend("openal", shared_ptr<AudioBackend>(new OpenALBackend()));
-
-	// TODO: handle this?
-	/*if (!*/ engine.initialSetup() /*) return 0 */ ;
 
 	// idle timer
 	// TODO: should prbly have an every-X-seconds timer or a background thread to do this

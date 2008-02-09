@@ -25,7 +25,7 @@ class openc2eView : public QAbstractScrollArea {
 	Q_OBJECT
 
 public:
-	openc2eView(QWidget *parent);
+	openc2eView(QWidget *parent, boost::shared_ptr<class QtBackend>);
 	~openc2eView();
 
 protected:
