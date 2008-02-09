@@ -61,7 +61,7 @@ protected:
 	void gaitTick();
 
 public:
-	SkeletalCreature(unsigned char _family, Creature *c);
+	SkeletalCreature(unsigned char _family);
 	virtual ~SkeletalCreature();
 
 	void render(Surface *renderer, int xoffset, int yoffset);
@@ -94,6 +94,7 @@ public:
 	CompoundPart *part(unsigned int id);
 	void setZOrder(unsigned int plane);
 
+	void creatureInit();
 	void creatureAged();
 
 	std::string getFaceSpriteName();

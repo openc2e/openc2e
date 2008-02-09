@@ -20,12 +20,11 @@
 #include "CreatureAgent.h"
 #include "Creature.h"
 
-CreatureAgent::CreatureAgent(unsigned char _family, Creature *c) : Agent(_family, 0, 0, 0) {
-	creature = c;
+CreatureAgent::CreatureAgent(unsigned char _family) : Agent(_family, 0, 0, 0) {
+	creature = 0;
+
 	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
 	zorder = 1500;
-	slots[0] = creature->getGenome();
-	species = (creature->isFemale() ? 2 : 1);
 
 	walking = false;
 	approaching = false;
@@ -33,7 +32,16 @@ CreatureAgent::CreatureAgent(unsigned char _family, Creature *c) : Agent(_family
 }
 
 CreatureAgent::~CreatureAgent() {
-	delete creature;
+	if (creature)
+		delete creature;
+}
+
+void CreatureAgent::setCreature(Creature *c) {
+	assert(c);
+	creature = c;
+
+	slots[0] = creature->getGenome();
+	species = (creature->isFemale() ? 2 : 1);
 }
 
 void CreatureAgent::tick() {

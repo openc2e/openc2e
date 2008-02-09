@@ -257,29 +257,21 @@ void QtOpenc2e::newNorn() {
 		return;
 	}
 
+	SkeletalCreature *a = new SkeletalCreature(4);
+	a->finishInit();
+
 	int sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
 	oldCreature *c;
 	try {
-		if (engine.version == 1) c = new c1Creature(genome, (sex == 2), 0);
-		else c = new c2Creature(genome, (sex == 2), 0);	
+		if (engine.version == 1) c = new c1Creature(genome, (sex == 2), 0, a);
+		else c = new c2Creature(genome, (sex == 2), 0, a);
 	} catch (creaturesException &e) {
+		delete a;
 		QMessageBox::warning(this, tr("Couldn't create creature:"), e.prettyPrint().c_str());
 		return;
 	}
-
-	SkeletalCreature *a;
-	try {
-		a = new SkeletalCreature(4, c);
-	} catch (creaturesException &e) {
-		delete c;
-		QMessageBox::warning(this, tr("Couldn't create creature agent:"), e.prettyPrint().c_str());
-		return;
-	}
-	a->finishInit();
 	
 	// if you make this work for c2e, you should probably set sane attributes here?
-
-	c->setAgent(a);
 
 	a->slots[0] = genome;
 	world.newMoniker(genome, genomefile, a);

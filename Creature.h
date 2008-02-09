@@ -66,10 +66,10 @@ protected:
 	void processGenes();
 	virtual void addGene(gene *);
 	
-	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	void finishInit();
 
 public:
-	void setAgent(CreatureAgent *a);
 	virtual ~Creature();
 	virtual void tick();
 
@@ -145,7 +145,7 @@ protected:
 	inline unsigned int calculateTickMask(unsigned char);
 	inline unsigned int calculateMultiplier(unsigned char);
 
-	oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 public:
 	void addChemical(unsigned char id, unsigned char val);
@@ -174,7 +174,7 @@ protected:
 	void processReceptor(c1Receptor &);
 	
 public:
-	c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void tick();
 
@@ -194,7 +194,7 @@ protected:
 	unsigned char mutationchance, mutationdegree;
 
 public:
-	c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 	
 	unsigned char getDrive(unsigned int id) { assert(id < 17); return drives[id]; }
 	
@@ -322,7 +322,7 @@ protected:
 	AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles);
 
 public:
-	c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant);
+	c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void tick();
 

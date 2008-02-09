@@ -85,7 +85,7 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsig
 	return _postfix;
 }
 
-SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : CreatureAgent(_family, c) {
+SkeletalCreature::SkeletalCreature(unsigned char _family) : CreatureAgent(_family) {
 	facialexpression = 0;
 	pregnancy = 0;
 	eyesclosed = false;
@@ -94,7 +94,6 @@ SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : Creatur
 	gaitgene = 0;
 	
 	calculated = false;
-	skeletonInit();
 
 	if (engine.version == 1) {
 		setAttributes(64 + 4 + 2); // mouseable, activateable, groundbound(?!)
@@ -107,7 +106,6 @@ SkeletalCreature::SkeletalCreature(unsigned char _family, Creature *c) : Creatur
 		aero.setInt(10);
 	}
 
-	// needs to go last for now, so we can throw exceptions from skeletonInit
 	skeleton = new SkeletonPart(this);
 }
 
@@ -671,6 +669,10 @@ void SkeletonPart::tick() {
 void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(parent);
 	c->render(renderer, xoffset, yoffset);	
+}
+
+void SkeletalCreature::creatureInit() {
+	skeletonInit();
 }
 
 void SkeletalCreature::creatureAged() {

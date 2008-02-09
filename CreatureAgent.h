@@ -31,10 +31,14 @@ protected:
 	bool walking, approaching;
 	AgentRef approachtarget;
 
+	virtual void creatureBorn() { }
 	virtual void creatureAged() { }
+	virtual void creatureDied() { }
+	virtual void creatureInit() { }
+	void setCreature(Creature *c);
 
 public:
-	CreatureAgent(unsigned char _family, Creature *c);
+	CreatureAgent(unsigned char _family);
 	virtual ~CreatureAgent();
 	void tick();
 
@@ -45,7 +49,7 @@ public:
 	void startWalking();
 	void stopWalking();
 	void approach(AgentRef it);
-	bool isApproaching() { return approaching; }
+	bool isApproaching() { return approaching; }	
 };
 
 /* vim: set noet: */

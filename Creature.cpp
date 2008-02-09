@@ -25,16 +25,19 @@
 #include "c2eBrain.h"
 #include "oldBrain.h"
 
-Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) {
-	parent = 0;
+Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) {
 	assert(g);
 	genome = g;
-	
-	genus = 0; // TODO: really, we shouldn't do this, and should instead later assert that a genus was set
+
 	female = is_female;
+	genus = 0; // TODO: really, we shouldn't do this, and should instead later assert that a genus was set
 	variant = _variant;
 	stage = baby;
 
+	assert(a);
+	parent = a;
+	parent->setCreature(this);
+	
 	alive = true; // ?
 	asleep = false; // ?
 	dreaming = false; // ?
@@ -52,6 +55,11 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 Creature::~Creature() {
 }
 
+void Creature::finishInit() {
+	processGenes();
+	parent->creatureInit();
+}
+
 void Creature::processGenes() {
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		geneFlags &flags = (*i)->header.flags;
@@ -59,7 +67,7 @@ void Creature::processGenes() {
 		// non-expressed genes are to be ignored
 		if (flags.notexpressed) continue;
 
-		// geneder-specific genes are only to be processed if they are of this 
+		// gender-specific genes are only to be processed if they are of this 
 		if (flags.femaleonly && !female) continue;
 		if (flags.maleonly && female) continue;
 
@@ -72,19 +80,13 @@ void Creature::processGenes() {
 	}
 }
 
-void Creature::setAgent(CreatureAgent *a) {
-	parent = a;
-	assert(parent);
-
-	parent->genus = genus + 1;
-}
-
 void Creature::addGene(gene *g) {
 	if (typeid(*g) == typeid(creatureInstinctGene)) {
 		unprocessedinstincts.push_back((creatureInstinctGene *)g);
 	} else if (typeid(*g) == typeid(creatureGenusGene)) {
-		// TODO: mmh, genus changes after setup shouldn't be valid [and won't be propogated to parent]
+		// TODO: mmh, genus changes after setup shouldn't be valid
 		genus = ((creatureGenusGene *)g)->genus;
+		parent->genus = genus + 1;
 	} else if (typeid(*g) == typeid(creaturePigmentGene)) {
 		creaturePigmentGene &p = *((creaturePigmentGene *)g);
 		// TODO: we don't sanity-check
@@ -123,6 +125,8 @@ void Creature::setDreaming(bool d) {
 }
 
 void Creature::born() {
+	parent->creatureBorn();
+
 	// TODO: life event?
 #ifndef _CREATURE_STANDALONE
 	world.history.getMoniker(world.history.findMoniker(genome)).wasBorn();
@@ -133,6 +137,8 @@ void Creature::born() {
 }
 
 void Creature::die() {
+	parent->creatureDied();
+
 	// TODO: life event?
 #ifndef _CREATURE_STANDALONE
 	world.history.getMoniker(world.history.findMoniker(genome)).hasDied();
@@ -158,7 +164,7 @@ void Creature::tick() {
 /*
  * oldCreature contains the shared elements of C1 of C2 (creatures are mostly identical in both games)
  */
-oldCreature::oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
+oldCreature::oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : Creature(g, is_female, _variant, a) {
 	biochemticks = 0;
 	halflives = 0;
 	
@@ -172,7 +178,7 @@ oldCreature::oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 	dead = 0;	
 }
 
-c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : oldCreature(g, is_female, _variant) {
+c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 1);
 
 	for (unsigned int i = 0; i < 6; i++) senses[i] = 0;
@@ -182,11 +188,11 @@ c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 	// TODO: chosenagents size
 
 	brain = new oldBrain(this);
-	processGenes();
+	finishInit();
 	brain->init();
 }
 
-c2Creature::c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : oldCreature(g, is_female, _variant) {
+c2Creature::c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 2);
 
 	throw creaturesException("You can't create Creatures 2 creatures yet. Bug fuzzie."); // TODO
@@ -200,11 +206,11 @@ c2Creature::c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 	// TODO: chosenagents size
 
 	brain = new oldBrain(this);
-	processGenes();
-	brain->init();
+	finishInit();
+	brain->init();	
 }
 
-c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant) : Creature(g, is_female, _variant) {
+c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : Creature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 3);
 
 	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
@@ -232,8 +238,8 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 	chosenagents.resize(40);
 
 	brain = new c2eBrain(this);
-	processGenes();
-	brain->init();
+	finishInit();
+	brain->init();	
 }
 
 unsigned int c1Creature::getGait() {
