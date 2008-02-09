@@ -26,7 +26,7 @@
 #include "CreatureAgent.h"
 
 class SkeletalCreature : public CreatureAgent {
-private:
+protected:
 	class SkeletonPart *skeleton;
 
 	unsigned int ticks; // TODO: unnecessary?
@@ -53,8 +53,12 @@ private:
 	unsigned int gaiti;
 	creatureGaitGene *gaitgene;
 
+	std::pair<int, int> getCarryPoint();
+	
 	void physicsTick();
 	void snapDownFoot();
+	
+	void gaitTick();
 
 public:
 	SkeletalCreature(unsigned char _family, Creature *c);
@@ -71,7 +75,6 @@ public:
 	void setPose(std::string s);
 	void setPoseGene(unsigned int p);
 	void setGaitGene(unsigned int g);
-	void gaitTick();
 	
 	void tick();
 	

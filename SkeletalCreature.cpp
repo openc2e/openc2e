@@ -711,4 +711,14 @@ void SkeletalCreature::handleClick(float clickx, float clicky) {
 	}
 }
 
+std::pair<int, int> SkeletalCreature::getCarryPoint() {
+	std::pair<int, int> carrypoint;
+
+	// TODO: 9 is left hand, how do we work out which hand a norn is carrying with?
+	carrypoint.first = attachmentX(9, 1);
+	carrypoint.second = attachmentY(9, 1);
+
+	return carrypoint;
+}
+
 /* vim: set noet: */
