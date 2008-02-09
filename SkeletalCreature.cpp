@@ -332,8 +332,7 @@ void SkeletalCreature::recalculateSkeleton() {
 	if (!carriedby && !invehicle && calculated) {
 		int orig_footpart = (downfoot_left ? 11 : 12);
 		// adjust location to match foot
-		x -= (attachmentX(orig_footpart, 1) - oldfootx);
-		y -= (attachmentY(orig_footpart, 1) - oldfooty);
+		moveTo(x - (attachmentX(orig_footpart, 1) - oldfootx), y - (attachmentY(orig_footpart, 1) - oldfooty));
 	}
 
 	// work out which foot is down
@@ -425,7 +424,9 @@ void SkeletalCreature::snapDownFoot() {
 			return;
 		}
 	}
-	y = newy - (footy - y);
+
+	moveTo(x, newy - (footy - y));
+	
 	if (engine.version == 2) {
 		if (!belowfloor && downfootroom->floorpoints.size()) {
 			// TODO: hilar hack: same as above for floorvalue
