@@ -13,7 +13,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Creatures-style game engine
  openc2e is a cross-platform open-source game engine designed to be compatible
- with the various game engines of the Creatures artificial-life game series,
+ with the various game engines of the Creatures artificial-life game series.
 
 Package: openc2e-dbg
 Architecture: any
