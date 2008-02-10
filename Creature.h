@@ -63,7 +63,7 @@ protected:
 	
 	unsigned short tintinfo[5]; // red, green, blue, rotation, swap
 
-	void processGenes();
+	virtual void processGenes();
 	virtual void addGene(gene *);
 	
 	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
@@ -99,6 +99,8 @@ public:
 	
 	void born();
 	void die();
+	
+	bool shouldProcessGene(gene *);
 };
 
 // c1
@@ -260,6 +262,8 @@ public:
 	c2eOrgan(c2eCreature *p, organGene *g);
 	void tick();
 
+	void processGenes();
+
 	float getClockRate() { return clockrate; }
 	float getRepairRate() { return repairrate; }
 	float getDamageRate() { return damagerate; }
@@ -316,6 +320,7 @@ protected:
 	void tickBrain();
 	bool processInstinct();
 	void tickBiochemistry();
+	void processGenes();
 	void addGene(gene *);
 
 	int reverseMapVerbToNeuron(unsigned int verb);

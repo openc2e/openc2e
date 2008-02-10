@@ -39,13 +39,15 @@ protected:
 
 	uint8 updatetime;
 	class c2eBrain *parent;
+	bool inited;
 
 public:
 	virtual void init() = 0;
 	virtual void tick() = 0;
 	uint8 getUpdateTime() { return updatetime; }
+	bool wasInited() { return inited; }
 
-	c2eBrainComponent(class c2eBrain *b) : parent(b) { assert(b); }
+	c2eBrainComponent(class c2eBrain *b) : parent(b) { assert(b); inited = false; }
 	virtual ~c2eBrainComponent() { }
 };
 
@@ -102,6 +104,7 @@ protected:
 	std::vector<c2eDendrite> dendrites;
 	std::vector<c2eNeuron *> src_neurons, dest_neurons;
 
+	void setupTract();
 	c2eDendrite *getDendriteFromTo(c2eNeuron *, c2eNeuron *);
 	void doMigration();
 
@@ -128,6 +131,7 @@ public:
 	std::vector<c2eTract *> tracts;
 
 	c2eBrain(c2eCreature *p);
+	void processGenes();
 	void tick();
 	void init();
 	c2eLobe *getLobeById(std::string id);

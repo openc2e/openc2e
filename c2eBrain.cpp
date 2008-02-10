@@ -47,6 +47,18 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) : c2eBrainComponent(b) {
 
 	initrule.init(g->initialiserule);
 	updaterule.init(g->updaterule);
+}
+
+/*
+ * c2eTract::setupTract
+ *
+ * Internal function which sets up the details of a tract (which needs to wait until
+ * after the lobes are constructed).
+ *
+ */
+void c2eTract::setupTract() {
+	c2eBrainTractGene *g = ourGene;
+	c2eBrain *b = parent;
 
 	std::string srclobename = std::string((char *)g->srclobe, 4);
 	std::string destlobename = std::string((char *)g->destlobe, 4);
@@ -221,6 +233,9 @@ void c2eTract::wipe() {
 }
 
 void c2eTract::init() {
+	inited = true;
+
+	setupTract();
 	wipe();
 
 	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
@@ -352,6 +367,8 @@ void c2eLobe::tick() {
  *
  */
 void c2eLobe::init() {
+	inited = true;
+
 	wipe();
 
 	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
@@ -917,27 +934,27 @@ done:
  */
 c2eBrain::c2eBrain(c2eCreature *p) {
 	assert(p);
-	parent = p;
+	parent = p;		
+}
 
-	shared_ptr<genomeFile> genome = p->getGenome();
+/*
+ * c2eBrain::processGenes
+ *
+ * Called by the parent creature when new genes should be loaded (eg, during creation or lifestage change).
+ *
+ */
+void c2eBrain::processGenes() {
+	for (vector<gene *>::iterator i = parent->getGenome()->genes.begin(); i != parent->getGenome()->genes.end(); i++) {
+		gene *g = *i;
+
+		if (!parent->shouldProcessGene(g)) continue;
 	
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
-		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
-		// TODO: lifestage
-		if (typeid(**i) == typeid(c2eBrainLobeGene)) {
-			c2eLobe *l = new c2eLobe(this, (c2eBrainLobeGene *)*i);
+		if (typeid(*g) == typeid(c2eBrainLobeGene)) {
+			c2eLobe *l = new c2eLobe(this, (c2eBrainLobeGene *)g);
 			components.insert(l);
 			lobes[l->getId()] = l;
-		}
-	}
-
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
-		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
-		// TODO: lifestage
-		if (typeid(**i) == typeid(c2eBrainTractGene)) {
-			c2eTract *t = new c2eTract(this, (c2eBrainTractGene *)*i);
+		} else if (typeid(*g) == typeid(c2eBrainTractGene)) {
+			c2eTract *t = new c2eTract(this, (c2eBrainTractGene *)g);
 			components.insert(t);
 			tracts.push_back(t);
 		}
@@ -947,12 +964,13 @@ c2eBrain::c2eBrain(c2eCreature *p) {
 /*
  * c2eBrain::init
  *
- * Initialises brain components in order.
+ * Initialises new brain components in order.
  *
  */
 void c2eBrain::init() {
 	for (std::multiset<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
-		(*i)->init();
+		if (!(*i)->wasInited())
+			(*i)->init();
 	}
 }
 

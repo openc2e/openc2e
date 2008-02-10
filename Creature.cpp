@@ -60,23 +60,38 @@ void Creature::finishInit() {
 	parent->creatureInit();
 }
 
+bool Creature::shouldProcessGene(gene *g) {
+	geneFlags &flags = g->header.flags;
+
+	// non-expressed genes are to be ignored
+	if (flags.notexpressed) return false;
+
+	// gender-specific genes are only to be processed if they are of this 
+	if (flags.femaleonly && !female) return false;
+	if (flags.maleonly && female) return false;
+
+	// obviously we only switch on at the stage in question
+	if (g->header.switchontime != stage) return false;
+
+	// TODO: header.variant?
+	
+	return true;
+}
+
 void Creature::processGenes() {
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		geneFlags &flags = (*i)->header.flags;
+		if (shouldProcessGene(*i)) addGene(*i);
+	}
+}
 
-		// non-expressed genes are to be ignored
-		if (flags.notexpressed) continue;
+void c2eCreature::processGenes() {
+	// brain must be processed first (to create loci etc)
+	// organs should be processed last, because new ones will be created by normal processGenes()
 
-		// gender-specific genes are only to be processed if they are of this 
-		if (flags.femaleonly && !female) continue;
-		if (flags.maleonly && female) continue;
-
-		// obviously we only switch on at the stage in question
-		if ((*i)->header.switchontime != stage) continue;
-
-		// TODO: header.variant?
-
-		addGene(*i);
+	brain->processGenes();
+	Creature::processGenes();
+	for (std::vector<shared_ptr<c2eOrgan> >::iterator x = organs.begin(); x != organs.end(); x++) {
+		(*x)->processGenes();
 	}
 }
 
@@ -843,13 +858,14 @@ c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 
 	// TODO: is genes.size() always the size we want?
 	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
-	
+}
+
+void c2eOrgan::processGenes() {
 	shared_ptr<c2eReaction> r; // we need to store the previous reaction for possible receptor use
+	// TODO: should this cope with receptors created at other lifestages? i doubt it.. - fuzzie
+
 	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
-		// TODO: muh, we need to check lifestage/etc, see Creature::processGenes
-		// TODO: besides, how the heck is this meant to cope with other-lifestage turnons?
-		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
-		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
+		if (!parent->shouldProcessGene(*i)) continue;
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
 			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction()));
