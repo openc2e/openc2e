@@ -43,7 +43,6 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	setClassifier(f, g, s);
 
 	lastScript = -1;
-	initialized = true;
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
 
@@ -102,6 +101,8 @@ void Agent::finishInit() {
 
 	if (findScript(10))
 		queueScript(10); // constructor
+	
+	initialized = true;
 }
 
 void Agent::zotstack() {
@@ -932,10 +933,7 @@ Agent::~Agent() {
 	assert(lifecount == 0);
 
 	if (!initialized) return;
-	
-	if (vm)
-		world.freeVM(vm);
-	zotstack();
+	if (!dying) kill();
 }
 
 void Agent::kill() {
