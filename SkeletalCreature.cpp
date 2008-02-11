@@ -671,7 +671,9 @@ void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset)
 	c->render(renderer, xoffset, yoffset);	
 }
 
-void SkeletalCreature::creatureInit() {
+void SkeletalCreature::finishInit() {
+	Agent::finishInit();
+
 	skeletonInit();
 }
 

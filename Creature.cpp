@@ -56,7 +56,6 @@ Creature::~Creature() {
 
 void Creature::finishInit() {
 	processGenes();
-	parent->creatureInit();
 }
 
 bool Creature::shouldProcessGene(gene *g) {

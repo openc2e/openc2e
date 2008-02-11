@@ -94,7 +94,7 @@ public:
 	CompoundPart *part(unsigned int id);
 	void setZOrder(unsigned int plane);
 
-	void creatureInit();
+	void finishInit();
 	void creatureAged();
 
 	std::string getFaceSpriteName();

@@ -34,7 +34,6 @@ protected:
 	virtual void creatureBorn() { }
 	virtual void creatureAged() { }
 	virtual void creatureDied() { }
-	virtual void creatureInit() { }
 
 public:
 	CreatureAgent(unsigned char _family);
