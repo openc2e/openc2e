@@ -204,7 +204,13 @@ ADD_CUSTOM_COMMAND(
 	COMMAND cp docs.css ${BIN}/docs.css -f
 	DEPENDS docs.css
 	WORKING_DIRECTORY ${SRC})
-ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/docs.html ${BIN}/docs.css)
+ADD_CUSTOM_COMMAND(
+	OUTPUT ${BIN}/openc2e.6
+	COMMAND pod2man --center="Openc2e Documentation" --section=6 ${SRC}/openc2e.pod ${BIN}/openc2e.6
+	DEPENDS openc2e.pod
+	)
+
+ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/docs.html ${BIN}/docs.css ${BIN}/openc2e.6)
 
 # it seems these ADD_CUSTOM_COMMANDS for flex and bison could be made
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
