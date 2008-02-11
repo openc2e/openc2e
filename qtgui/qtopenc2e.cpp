@@ -258,7 +258,6 @@ void QtOpenc2e::newNorn() {
 	}
 
 	SkeletalCreature *a = new SkeletalCreature(4);
-	a->finishInit();
 
 	int sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
 	oldCreature *c;
@@ -271,6 +270,9 @@ void QtOpenc2e::newNorn() {
 		return;
 	}
 	
+	a->finishInit();
+	a->setCreature(c);
+
 	// if you make this work for c2e, you should probably set sane attributes here?
 
 	a->slots[0] = genome;

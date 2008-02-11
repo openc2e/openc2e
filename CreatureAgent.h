@@ -35,13 +35,13 @@ protected:
 	virtual void creatureAged() { }
 	virtual void creatureDied() { }
 	virtual void creatureInit() { }
-	void setCreature(Creature *c);
 
 public:
 	CreatureAgent(unsigned char _family);
 	virtual ~CreatureAgent();
 	void tick();
 
+	void setCreature(Creature *c);
 	Creature *getCreature() { return creature; }
 	
 	void setDirection(unsigned int d) { assert(d < 4); direction = d; }

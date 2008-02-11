@@ -1070,13 +1070,15 @@ void caosVM::c_NEWC() {
 
 	// TODO: if variant is 0, randomise between 1 and 8
 	SkeletalCreature *a = new SkeletalCreature(family);
-	a->finishInit();
 	try {
 		c2eCreature *c = new c2eCreature(i->second, (sex == 2), variant, a);
+		a->setCreature(c);
 	} catch (...) {
 		delete a;
 		throw;
 	}
+	
+	a->finishInit();
 
 	world.history.getMoniker(world.history.findMoniker(i->second)).moveToCreature(a);
 	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
@@ -1127,7 +1129,6 @@ void caosVM::c_NEW_CREA_c1() {
 	caos_assert(sex == 1 || sex == 2); // TODO: correct?
 
 	SkeletalCreature *a = new SkeletalCreature(4);
-	a->finishInit();
 	
 	// TODO: why do we even need to pass a variant here?
 	oldCreature *c;
@@ -1140,6 +1141,8 @@ void caosVM::c_NEW_CREA_c1() {
 		throw;
 	}
 
+	a->finishInit();
+	a->setCreature(c);
 	a->slots[0] = genome;
 	world.newMoniker(genome, realmoniker, a);
 

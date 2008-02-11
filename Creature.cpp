@@ -36,7 +36,6 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 
 	assert(a);
 	parent = a;
-	parent->setCreature(this);
 	
 	alive = true; // ?
 	asleep = false; // ?
