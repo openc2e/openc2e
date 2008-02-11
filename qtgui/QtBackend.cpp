@@ -66,7 +66,7 @@ void QtBackend::setup(QWidget *vp) {
 	((QApplication *)QApplication::instance())->syncX();
 
 	if (sizeof windowid_str <=
-			snprintf(windowid_str, sizeof windowid_str, "SDL_WINDOWID=0x%lx", viewport->winId())) {
+			(size_t)snprintf(windowid_str, sizeof windowid_str, "SDL_WINDOWID=0x%lx", viewport->winId())) {
 		std::cerr << "windowid_str buffer was too small - how big are your longs, anyway? Panicing..." << std::endl;
 		abort();
 	}
