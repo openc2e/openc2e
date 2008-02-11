@@ -62,10 +62,17 @@ void QtBackend::setup(QWidget *vp) {
 
 #if defined(Q_WS_X11)
 	// on X11, using SDL_WINDOWID works, thank goodness.
+	static char windowid_str[64]; // possibly big, but who cares
 	((QApplication *)QApplication::instance())->syncX();
 
-	std::string windowidstr = boost::str(boost::format("SDL_WINDOWID=0x%lx") % viewport->winId());
-	putenv((char *)windowidstr.c_str());
+	if (sizeof windowid_str <=
+			snprintf(windowid_str, sizeof windowid_str, "SDL_WINDOWID=0x%lx", viewport->winId())) {
+		std::cerr << "windowid_str buffer was too small - how big are your longs, anyway? Panicing..." << std::endl;
+		abort();
+	}
+	// ->winId() may have created the window for us
+	((QApplication *)QApplication::instance())->syncX();
+	putenv(windowid_str);
 #else
 	// alas, it sucks on Windows and OS X, so we use an offscreen buffer instead
 	putenv("SDL_VIDEODRIVER=dummy");
