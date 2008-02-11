@@ -933,7 +933,23 @@ Agent::~Agent() {
 	assert(lifecount == 0);
 
 	if (!initialized) return;
-	if (!dying) kill();
+	if (!dying) {
+		// we can't do kill() here because we can't do anything which might try using our shared_ptr
+		// (since this could be during world destruction)
+
+		if (vm) {
+			vm->stop();
+			world.freeVM(vm);
+			vm = 0;
+		}
+
+		zotstack();
+
+		if (sound) {
+			sound->stop();
+			sound.reset();
+		}
+	}
 }
 
 void Agent::kill() {
