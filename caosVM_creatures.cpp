@@ -1146,9 +1146,11 @@ void caosVM::c_NEW_CREA_c1() {
 	setTarg(a);
 }
 
+int calculateRand(int value1, int value2); // caosVM_variables.cpp
+
 /**
  LTCY (command) action (integer) min (integer) max (integer)
- %status stub
+ %status maybe
  %pragma variants c1 c2 cv c3
 */
 void caosVM::c_LTCY() {
@@ -1156,8 +1158,16 @@ void caosVM::c_LTCY() {
 	VM_PARAM_INTEGER(min); caos_assert(min >= 0 && min <= 255);
 	VM_PARAM_INTEGER(action);
 
+	int n = calculateRand(min, max);
+
 	Creature *c = getTargCreature();
-	// TODO
+	
+	c2eCreature *c2ec = dynamic_cast<c2eCreature *>(c);
+	if (c2ec) {
+		c2ec->setInvolActionLatency(action, n);
+	}
+
+	// TODO: ltcy support for c1/c2
 }
 
 /**

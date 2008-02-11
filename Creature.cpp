@@ -241,6 +241,8 @@ c2eCreature::c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 	for (unsigned int i = 0; i < 14; i++) senses[i] = 0.0f;
 	for (unsigned int i = 0; i < 20; i++) drives[i] = 0.0f;
 
+	for (unsigned int i = 0; i < 8; i++) involactionlatency[i] = 0;
+
 	halflives = 0;
 
 	if (!catalogue.hasTag("Action Script To Neuron Mappings"))
@@ -428,6 +430,18 @@ void c2eCreature::tickBrain() {
 		parent->queueScript(decn + 16);
 	}
 #endif
+
+	// involuntary actions
+	for (unsigned int i = 0; i < 8; i++) {
+		if (involactionlatency[i] > 0) {
+			involactionlatency[i]--;
+			continue;
+		}
+
+		if (involaction[i] > 0.0f) {
+			parent->queueScript(i + 64);
+		}
+	}
 }
 
 bool c2eCreature::processInstinct() {

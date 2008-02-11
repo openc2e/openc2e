@@ -313,6 +313,8 @@ protected:
 	float senses[14], involaction[8], gaitloci[16];
 	float drives[20];
 
+	unsigned int involactionlatency[8];
+
 	bioHalfLivesGene *halflives;
 
 	class c2eBrain *brain;
@@ -335,6 +337,8 @@ public:
 	float getChemical(unsigned char id) { return chemicals[id]; }
 	void adjustDrive(unsigned int id, float value);
 	float getDrive(unsigned int id) { assert(id < 20); return drives[id]; }
+
+	void setInvolActionLatency(unsigned int id, unsigned int n) { assert(id < 8); involactionlatency[id] = n; }
 
 	void handleStimulus(c2eStim &stim);
 	void handleStimulus(unsigned int id, float strength);
