@@ -39,6 +39,7 @@ protected:
 
 	bool calculated;
 	int oldfootx, oldfooty;
+	int lastgoodfootx, lastgoodfooty; // TODO: sucky code
 	bool downfoot_left;
 	shared_ptr<class Room> downfootroom;
 

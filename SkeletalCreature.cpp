@@ -384,17 +384,19 @@ void SkeletalCreature::snapDownFoot() {
 				}
 			}
 		}
-	}
-
-	if (!newroom) {
-		// TODO
+	} else {	
 		newroom = bestRoomAt(footx, footy, 3, shared_ptr<Room>());
+
 		// insane emergency handling
 		float newfooty = footy;
 		while (!newroom && newfooty > (footy - 500.0f)) {
 			newroom = world.map.roomAt(footx, newfooty);
 			newfooty--;
 		}
+
+		// TODO: give up here
+
+		footy = newfooty;
 	}
 
 	bool newroomchosen = (newroom != downfootroom) && downfootroom;
@@ -402,8 +404,34 @@ void SkeletalCreature::snapDownFoot() {
 	downfootroom = newroom;
 	
 	if (!downfootroom /*|| !falling */) {
-		std::cout << "no down foot room! (" << footx << ", " << footy << ")" << std::endl;
-		return;
+		// TODO: hackery to cope with scripts moving us, this needs handling correctly somewhere
+		if (fabs(lastgoodfootx - attachmentX(orig_footpart, 1) - x) > 50.0f || fabs(lastgoodfooty - attachmentY(orig_footpart, 1) - y) > 50.0f) {
+			downfootroom = bestRoomAt(footx, footy, 3, shared_ptr<Room>());
+			if (downfootroom) {
+				snapDownFoot();
+				return;
+			} else {
+				std::cout << "Creature out of room system at (" << footx << ", " << footy << ")!" << std::endl;
+				// TODO: exceptiony death?
+				return;
+			}
+		}
+
+		// We fell out of the room system! How did that happen? Push ourselves back in, run collision script.
+		std::cout << "Creature out of room system at (" << footx << ", " << footy << "), pushing it back in." << std::endl;
+
+		// TODO: sucky code
+		x = lastgoodfootx - attachmentX(orig_footpart, 1);
+		footx = lastgoodfootx;
+		footy = lastgoodfooty;
+		downfootroom = world.map.roomAt(footx, footy);
+		queueScript(6);
+
+		if (!downfootroom) {
+			std::cout << "no down foot room! (" << footx << ", " << footy << ")" << std::endl;
+			// TODO: exceptiony death
+			return;
+		}
 	}
 
 	bool belowfloor = false;
@@ -424,7 +452,10 @@ void SkeletalCreature::snapDownFoot() {
 	}
 
 	moveTo(x, newy - (footy - y));
-	
+
+	lastgoodfootx = footx;
+	lastgoodfooty = footy;
+
 	if (engine.version == 2) {
 		if (!belowfloor && downfootroom->floorpoints.size()) {
 			// TODO: hilar hack: same as above for floorvalue
@@ -582,7 +613,7 @@ void SkeletalCreature::tick() {
 	ticks++;
 	if (ticks % 2 == 0) return;
 
-	if (eyesclosed) return; // TODO: hack, this is wrong :)
+	//if (eyesclosed) return; // TODO: hack, this is wrong :)
 
 	// TODO: hack!
 	if (!eyesclosed && !creature->isZombie()) {
@@ -605,6 +636,7 @@ void SkeletalCreature::tick() {
 		approaching = false;
 	}
 
+	// TODO: this kinda duplicates what physicsTick is doing below
 	if ((engine.version == 1 || (engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling)) && !carriedby && !invehicle)
 		snapDownFoot();
 	else
@@ -612,16 +644,14 @@ void SkeletalCreature::tick() {
 }
 
 void SkeletalCreature::physicsTick() {
-	if (engine.version > 1) {
-		if (falling && (engine.version == 2 || validInRoomSystem())) Agent::physicsTick();
-		if (!carriedby && !invehicle) {
-			if ((engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling))
-				snapDownFoot();
-		}
-	}
+	// TODO: mmh
 
-	// TODO
-	// disable physics for now, it gets in the way
+	if (engine.version > 1 && falling && (engine.version == 2 || validInRoomSystem())) Agent::physicsTick();
+	if (!carriedby && !invehicle) {
+		if (engine.version == 1 || (engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling))
+			snapDownFoot();
+		else downfootroom.reset();
+	} else downfootroom.reset();	
 }
 
 void SkeletalCreature::gaitTick() {
