@@ -60,7 +60,7 @@ struct token {
 			if (v.hasInt()) {
 				return boost::str(boost::format("%d") % v.getInt());
 			} else if (v.hasFloat()) {
-				return boost::str(boost::format("%f") % v.getInt());
+				return boost::str(boost::format("%f") % v.getFloat());
 			} else if (v.hasString()) {
 				std::ostringstream outbuf;
 				std::string inbuf = v.getString();
@@ -122,6 +122,9 @@ struct token {
 	}
 	token() {}
 	token(const token &cp) : payload(cp.payload), index(cp.index), lineno(cp.lineno) { }
+	token(const caosVar &cv, int lineno_) : payload(cv), index(-1), lineno(lineno_) {}
+	token(const std::string &word, int lineno_) : payload(word), index(-1), lineno(lineno_) {}
+	token(const bytestring_t &bs, int lineno_) : payload(bs), index(-1), lineno(lineno_) {}
 
 	std::string dump() const {
 		std::ostringstream oss;
