@@ -11,20 +11,35 @@
 
 
 
+CMAKE_FLAGS += -DCMAKE_EXE_LINKER_FLAGS:STRING=-Wl,--as-needed
 
-CFLAGS = -Wall -g
+## Since debian does not support plain 386 anymore, try to get a bit of an edge here
+ifeq (i386,$(DEB_BUILD_ARCH))
+	CMAKE_FLAGS += -DCMAKE_CXX_FLAGS:STRING='-g -march=i486 -O2'
+	CMAKE_FLAGS += -DCMAKE_C_FLAGS:STRING='-g -march=i486 -O2'
+endif
+
+CMAKE_FLAGS += -DCMAKE_CXX_FLAGS_RELEASE:STRING='-O2 -NDEBUG'
+CMAKE_FLAGS += -DCMAKE_C_FLAGS_RELEASE:STRING='-O2 -NDEBUG'
+
+CMAKE_FLAGS += -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING='-O2 -ggdb3'
+CMAKE_FLAGS += -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING='-O2 -ggdb3'
+
+CMAKE_FLAGS += -DCMAKE_CXX_FLAGS_DEBUG:STRING='-O2 -ggdb3'
+CMAKE_FLAGS += -DCMAKE_C_FLAGS_DEBUG:STRING='-O2 -ggdb3'
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
+	BUILD_TYPE = Debug
 else
-	CFLAGS += -O2
+	BUILD_TYPE = RelWithDebInfo
 endif
+CMAKE_FLAGS += -DCMAKE_BUILD_TYPE:STRING=$(BUILD_TYPE)
 
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	mkdir $(CURDIR)/build
-	cd $(CURDIR)/build; cmake ..
+	cd $(CURDIR)/build; cmake $(CMAKE_FLAGS) ..
 
 	touch configure-stamp
 
