@@ -4,7 +4,7 @@ class BrainView : public QWidget {
 	Q_OBJECT
 
 private:
-	class c2eCreature *creature;
+	class Creature *creature;
 
 public:
 	unsigned int neuron_var;
@@ -14,6 +14,6 @@ public:
 	BrainView();
 	QSize minimumSize();
 	void paintEvent(QPaintEvent *event);
-	void setCreature(class c2eCreature *);
+	void setCreature(class Creature *);
 };
 

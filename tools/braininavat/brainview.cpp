@@ -17,13 +17,15 @@ BrainView::BrainView() {
 	setPalette(pal);
 }
 
-void BrainView::setCreature(c2eCreature *c) {
+void BrainView::setCreature(Creature *c) {
 	creature = c;
 }
 
 QSize BrainView::minimumSize() {
 	if (!creature) return QSize(0, 0);
-	c2eBrain *b = creature->getBrain();
+	c2eCreature *c = dynamic_cast<c2eCreature *>(creature);
+	if (!c) return QSize(0, 0);
+	c2eBrain *b = c->getBrain();
 	assert(b);
 
 	int neededwidth = 2, neededheight = 2;
@@ -42,7 +44,9 @@ QSize BrainView::minimumSize() {
 
 void BrainView::paintEvent(QPaintEvent *) {
 	if (!creature) return;
-	c2eBrain *b = creature->getBrain();
+	c2eCreature *c = dynamic_cast<c2eCreature *>(creature);
+	if (!c) return;
+	c2eBrain *b = c->getBrain();
 	assert(b);
 	
 	QPainter painter(this);

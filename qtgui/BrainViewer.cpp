@@ -31,10 +31,7 @@ void BrainViewer::onTick() {
 	if (world.selectedcreature) {
 		CreatureAgent *a = dynamic_cast<CreatureAgent *>(world.selectedcreature.get());
 		if (a) {
-			c2eCreature *c = dynamic_cast<c2eCreature *>(a->getCreature());
-			if (c) {
-				brainview->setCreature(c);
-			}
+			brainview->setCreature(a->getCreature());
 		}
 	}
 
