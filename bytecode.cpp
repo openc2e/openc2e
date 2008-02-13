@@ -25,63 +25,63 @@ using boost::format;
 using boost::str;
 
 const char *cnams[] = {
-    NULL,
-    "EQ",
-    "LT",
-    "LE",
-    "GT",
-    "GE",
-    "NE",
-    NULL
+	NULL,
+	"EQ",
+	"LT",
+	"LE",
+	"GT",
+	"GE",
+	"NE",
+	NULL
 };
 
-static std::string try_lookup(const Dialect *d, int idx) {
-	if (d)
-		return std::string(d->getcmd(idx)->fullname);
-	return str(format("%d") % idx);
-}
+	static std::string try_lookup(const Dialect *d, int idx) {
+		if (d)
+			return std::string(d->getcmd(idx)->fullname);
+		return str(format("%d") % idx);
+	}
 
 std::string dumpOp(const Dialect *d, caosOp op) {
-    int arg = op.argument; // weird C++ issues
-    switch (op.opcode) {
-        case CAOS_NOP:
-            return std::string("NOP");
-        case CAOS_DIE:
-            return str(format("DIE %d") % arg);
-        case CAOS_STOP:
-            return std::string("STOP");
-        case CAOS_CMD:
-            return str(format("CMD %s") % try_lookup(d, arg));
-        case CAOS_COND:
-            return str(format("COND %s %s") % (arg & CAND ? "AND" : "OR") % cnams[arg & CMASK]);
-        case CAOS_CONST:
-            return str(format("CONST %d") % arg);
-        case CAOS_CONSTINT:
-            return str(format("CONSTINT %d") % arg);
-        case CAOS_BYTESTR:
-            return str(format("BYTESTR %d") % arg);
+	int arg = op.argument; // weird C++ issues
+	switch (op.opcode) {
+		case CAOS_NOP:
+			return std::string("NOP");
+		case CAOS_DIE:
+			return str(format("DIE %d") % arg);
+		case CAOS_STOP:
+			return std::string("STOP");
+		case CAOS_CMD:
+			return str(format("CMD %s") % try_lookup(d, arg));
+		case CAOS_COND:
+			return str(format("COND %s %s") % (arg & CAND ? "AND" : "OR") % cnams[arg & CMASK]);
+		case CAOS_CONST:
+			return str(format("CONST %d") % arg);
+		case CAOS_CONSTINT:
+			return str(format("CONSTINT %d") % arg);
+		case CAOS_BYTESTR:
+			return str(format("BYTESTR %d") % arg);
 		case CAOS_PUSH_AUX:
-            return str(format("PUSH AUX %d") % arg);
+			return str(format("PUSH AUX %d") % arg);
 		case CAOS_RESTORE_AUX:
-            return str(format("RESTORE AUX %d") % arg);
+			return str(format("RESTORE AUX %d") % arg);
 		case CAOS_SAVE_CMD:
-            return str(format("CMD SAVE %s") % try_lookup(d, arg));
+			return str(format("CMD SAVE %s") % try_lookup(d, arg));
 		case CAOS_YIELD:
-            return str(format("YIELD %d") % arg);
+			return str(format("YIELD %d") % arg);
 		case CAOS_STACK_ROT:
-            return str(format("STACK ROT %d") % arg);
+			return str(format("STACK ROT %d") % arg);
 
-        case CAOS_CJMP:
-            return str(format("CJMP %08d") % arg);
-        case CAOS_JMP:
-            return str(format("JMP %08d") % arg);
-        case CAOS_DECJNZ:
-            return str(format("DECJNZ %08d") % arg);
-        case CAOS_GSUB:
-            return str(format("GSUB %08d") % arg);
-        case CAOS_ENUMPOP:
-            return str(format("ENUMPOP %08d") % arg);
-        default:
-            return str(format("UNKNOWN %02x %06x") % arg);
-    }
+		case CAOS_CJMP:
+			return str(format("CJMP %08d") % arg);
+		case CAOS_JMP:
+			return str(format("JMP %08d") % arg);
+		case CAOS_DECJNZ:
+			return str(format("DECJNZ %08d") % arg);
+		case CAOS_GSUB:
+			return str(format("GSUB %08d") % arg);
+		case CAOS_ENUMPOP:
+			return str(format("ENUMPOP %08d") % arg);
+		default:
+			return str(format("UNKNOWN %02x %06x") % arg);
+	}
 };

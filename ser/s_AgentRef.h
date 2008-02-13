@@ -6,14 +6,14 @@
 #include "AgentRef.h"
 
 LOAD(AgentRef) {
-    Agent *agent;
-    ar & agent;
-    obj.set(agent);
+	Agent *agent;
+	ar & agent;
+	obj.set(agent);
 }
 
 SAVE(AgentRef) {
-    Agent *a = obj.get();
-    ar & a;
+	Agent *a = obj.get();
+	ar & a;
 }
 
 #endif

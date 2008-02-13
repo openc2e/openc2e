@@ -7,23 +7,23 @@
 #include <boost/shared_ptr.hpp>
 
 class Dialect {
-    private:
-        const int cmdcnt;
-        const struct cmdinfo *cmds;
-    public:
-        const std::string name;
-        const struct cmdinfo *cmdbase() const { return cmds; }
-        const struct cmdinfo *getcmd(int idx) const {
-            assert(idx >= 0 && idx < cmdcnt);
-            return cmdbase() + idx;
-        }
+	private:
+		const int cmdcnt;
+		const struct cmdinfo *cmds;
+	public:
+		const std::string name;
+		const struct cmdinfo *cmdbase() const { return cmds; }
+		const struct cmdinfo *getcmd(int idx) const {
+			assert(idx >= 0 && idx < cmdcnt);
+			return cmdbase() + idx;
+		}
 		int cmdcount() const { return cmdcnt; }
 
-        const cmdinfo *find_command(const char *name) const;
+		const cmdinfo *find_command(const char *name) const;
 
-        Dialect(const cmdinfo *cmds, const std::string &n);
+		Dialect(const cmdinfo *cmds, const std::string &n);
 
-        int cmd_index(const cmdinfo *) const;
+		int cmd_index(const cmdinfo *) const;
 };
 
 extern std::map<std::string, boost::shared_ptr<Dialect> > dialects;

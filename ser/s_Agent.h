@@ -7,28 +7,28 @@
 #include "Agent.h"
 
 SERIALIZE(Agent) {
-    assert(!obj.dying);
-    
-    ar & obj.var;
-    ar & obj.name_variables;
+	assert(!obj.dying);
+
+	ar & obj.var;
+	ar & obj.name_variables;
 #if 0
-    if (1 <= version)
-        ar & slots;
+	if (1 <= version)
+		ar & slots;
 #endif
-    
-    ar & obj.vm;
 
-    ar & obj.unid & obj.zorder & obj.tickssincelasttimer & obj.timerrate;
-    ar & obj.vmStack;
-    ar & obj.floated;
+	ar & obj.vm;
+
+	ar & obj.unid & obj.zorder & obj.tickssincelasttimer & obj.timerrate;
+	ar & obj.vmStack;
+	ar & obj.floated;
 
 
-    // XXX: sound?
-    
-    ar & obj.carry_points & obj.carried_points;
-    ar & obj.carrying & obj.carriedby;
+	// XXX: sound?
 
-    // attr
+	ar & obj.carry_points & obj.carried_points;
+	ar & obj.carrying & obj.carriedby;
+
+	// attr
 	ar & obj.carryable;
 	ar & obj.mouseable;
 	ar & obj.activateable;
@@ -56,23 +56,23 @@ SERIALIZE(Agent) {
 	ar & obj.imsk_mouse_up;
 	ar & obj.imsk_mouse_wheel;
 	ar & obj.imsk_translated_char;
-	
+
 	ar & obj.paused;
 	ar & obj.visible;
 	ar & obj.displaycore;
 
-    ar & obj.clac & obj.clik;
-    ar & obj.family & obj.genus;
-    ar & obj.species;
+	ar & obj.clac & obj.clik;
+	ar & obj.family & obj.genus;
+	ar & obj.species;
 
-    ar & obj.velx & obj.vely;
-    ar & obj.accg & obj.aero;
-    ar & obj.friction & obj.perm & obj.elas;
-    ar & obj.x & obj.y & obj.falling;
+	ar & obj.velx & obj.vely;
+	ar & obj.accg & obj.aero;
+	ar & obj.friction & obj.perm & obj.elas;
+	ar & obj.x & obj.y & obj.falling;
 
-    ar & obj.range;
-    ar & obj.floatingagent;
-    
+	ar & obj.range;
+	ar & obj.floatingagent;
+
 }
 
 #endif

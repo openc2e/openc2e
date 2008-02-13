@@ -24,19 +24,19 @@
 #include "serialization.h"
 
 SERIALIZE(Point) {
-    ar & obj.x & obj.y;
+	ar & obj.x & obj.y;
 }
 
 BOOST_CLASS_IMPLEMENTATION(Point, boost::serialization::object_serializable);
 BOOST_CLASS_TRACKING(Point, boost::serialization::track_never);
 SAVE(Line) {
-    ar & obj.start & obj.end;
+	ar & obj.start & obj.end;
 }
 
 LOAD(Line) {
-    Point start, end;
-    ar & start & end;
-    obj = Line(start, end);
+	Point start, end;
+	ar & start & end;
+	obj = Line(start, end);
 }
 BOOST_CLASS_IMPLEMENTATION(Line, boost::serialization::object_serializable);
 BOOST_CLASS_TRACKING(Line, boost::serialization::track_never);

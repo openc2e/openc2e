@@ -437,10 +437,10 @@ class MNGFile {
 			std::map<std::string, class MNGEffectDecNode *>::iterator ei;
 			std::map<std::string, class MNGTrackDecNode *>::iterator ti;
 
-            		for (ei = effects.begin(); ei != effects.end(); ei++)
+			for (ei = effects.begin(); ei != effects.end(); ei++)
 				oss << ei->first << " " << ei->second->dump() << std::endl;
-                
-            		for (ti = tracks.begin(); ti != tracks.end(); ti++)
+
+			for (ti = tracks.begin(); ti != tracks.end(); ti++)
 				oss << ti->first << " " << ti->second->dump() << std::endl;
 
 			return oss.str();

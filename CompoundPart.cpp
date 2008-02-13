@@ -537,7 +537,7 @@ void TextEntryPart::tick() {
 
 void SpritePart::tick() {
 	if (!animation.empty()) {
-                if (framerate > 1) {
+		if (framerate > 1) {
 			framedelay++;
 			if (framedelay == (unsigned int)framerate + 1)
 				framedelay = 0;

@@ -49,27 +49,27 @@ template<class Archive, class Object>
 void post_load(Archive &ar, Object & obj, const unsigned int version) { }
 
 #define WRAP_SPLIT(c) \
-    BOOST_SERIALIZATION_SPLIT_FREE(c); \
-    BOOST_CLASS_EXPORT(c); \
-    namespace boost { namespace serialization { \
-        SER_PROTO(inline, load, c,) { \
+	BOOST_SERIALIZATION_SPLIT_FREE(c); \
+	BOOST_CLASS_EXPORT(c); \
+	namespace boost { namespace serialization { \
+		SER_PROTO(inline, load, c,) { \
 			pre_load(ar, obj, version); \
-            o_load(ar, obj, version); \
+			o_load(ar, obj, version); \
 			post_load(ar, obj, version); \
-        } \
-        SER_PROTO(inline, save, c, const) { \
+		} \
+		SER_PROTO(inline, save, c, const) { \
 			pre_save(ar, obj, version); \
-            o_save(ar, obj, version); \
+			o_save(ar, obj, version); \
 			post_save(ar, obj, version); \
-        } \
-    } }
+		} \
+	} }
 
 #define WRAP_SERIALIZE(c) \
 	SAVE(c) { o_serialize(ar, *const_cast<c *>(&obj), version); } \
 	LOAD(c) { o_serialize(ar, obj, version); }
-    
+
 #define SER_BASE(ar,bc) \
-    do { ar & boost::serialization::base_object<bc>(obj); } while (0)
+	do { ar & boost::serialization::base_object<bc>(obj); } while (0)
 
 #define SAVE(c) WRAP_SPLIT(c); SER_PROTO(, o_save, c, const)
 #define LOAD(c) SER_PROTO(, o_load, c,)
@@ -80,14 +80,14 @@ void post_load(Archive &ar, Object & obj, const unsigned int version) { }
 #define SERIALIZE(c) WRAP_SERIALIZE(c); SER_PROTO(, o_serialize, c,)
 
 inline static void STUB_DIE(const std::string &msg, const char *f, unsigned int l) {
-    std::cerr << "A trickery! SER_STUB'd: " << msg << "@" << f << ":" << l << std::endl;
-    abort();
+	std::cerr << "A trickery! SER_STUB'd: " << msg << "@" << f << ":" << l << std::endl;
+	abort();
 }
 
 #define SER_STUB_BASE(c, type) \
-    type(c) { \
-        STUB_DIE(std::string(#type " stubbed for " #c), __FILE__, __LINE__); \
-    }
+	type(c) { \
+		STUB_DIE(std::string(#type " stubbed for " #c), __FILE__, __LINE__); \
+	}
 
 #define SAVE_STUB(c) SER_STUB_BASE(c, SAVE)
 #define LOAD_STUB(c) SER_STUB_BASE(c, LOAD)

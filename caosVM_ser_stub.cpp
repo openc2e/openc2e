@@ -26,10 +26,10 @@
  * Saves the map to the specified file.
  */
 
-void caosVM::c_SERS_MAPP() {
-    VM_PARAM_STRING(filename)
-    STUB;
-}
+	void caosVM::c_SERS_MAPP() {
+		VM_PARAM_STRING(filename)
+		STUB;
+	}
 
 /**
  * SERL MAPP (command) filename (string)
@@ -39,10 +39,10 @@ void caosVM::c_SERS_MAPP() {
  *
  * May explode if anything at all exists.
  */
-void caosVM::c_SERL_MAPP() {
-    VM_PARAM_STRING(filename)
-    STUB;
-}
+	void caosVM::c_SERL_MAPP() {
+		VM_PARAM_STRING(filename)
+		STUB;
+	}
 
 /**
  * SERS SCRP (command) filename (string)
@@ -50,10 +50,10 @@ void caosVM::c_SERL_MAPP() {
  *
  * Saves the scriptorium to the specified file
  */
-void caosVM::c_SERS_SCRP() {
-    VM_PARAM_STRING(filename)
-    STUB;
-}
+	void caosVM::c_SERS_SCRP() {
+		VM_PARAM_STRING(filename)
+		STUB;
+	}
 
 /**
  * SERL SCRP (command) filename (string)
@@ -61,7 +61,7 @@ void caosVM::c_SERS_SCRP() {
  *
  * Loads the scriptorium from the specified file
  */
-void caosVM::c_SERL_SCRP() {
-    VM_PARAM_STRING(filename)
-    STUB;
-}
+	void caosVM::c_SERL_SCRP() {
+		VM_PARAM_STRING(filename)
+		STUB;
+	}

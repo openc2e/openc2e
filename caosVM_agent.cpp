@@ -148,7 +148,7 @@ void caosVM::c_STAR() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	valid_agent(targ);
-        
+
 	Agent *seeing;
 	if (owner) seeing = owner; else seeing = targ;
 	valid_agent(seeing);

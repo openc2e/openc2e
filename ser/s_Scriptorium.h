@@ -7,7 +7,7 @@
 #include <boost/serialization/map.hpp>
 
 SERIALIZE(Scriptorium) {
-    ar & obj.scripts;
+	ar & obj.scripts;
 }
 
 #endif
