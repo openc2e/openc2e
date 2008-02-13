@@ -27,6 +27,10 @@
 #ifdef OPENAL_SUPPORT
 #include "OpenALBackend.h"
 #endif
+#ifdef QT_SUPPORT
+#include "qtgui/qtopenc2e.h"
+#include "qtgui/QtBackend.h"
+#endif
 
 #ifdef _WIN32
 #include <shlobj.h>
@@ -37,6 +41,11 @@ extern "C" int main(int argc, char *argv[]) {
 		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n";
 
 		engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
+#ifdef QT_SUPPORT
+		boost::shared_ptr<QtBackend> qtbackend = boost::shared_ptr<QtBackend>(new QtBackend());
+		boost::shared_ptr<Backend> qtbackend_generic = boost::dynamic_pointer_cast<class Backend, class QtBackend>(qtbackend);
+		engine.addPossibleBackend("qt", qtbackend_generic); // last-added backend is default
+#endif
 #ifdef OPENAL_SUPPORT
 		engine.addPossibleAudioBackend("openal", shared_ptr<AudioBackend>(new OpenALBackend()));
 #endif
@@ -47,19 +56,12 @@ extern "C" int main(int argc, char *argv[]) {
 		// get the engine to do all the startup (read catalogue, loading world, etc)
 		if (!engine.initialSetup()) return 0;
 	
-		// you *must* call this at least once before drawing, for initial creation of the window
-		engine.backend->resize(800, 600);
+		int ret = engine.backend->main(argc, argv);
 		
-		// do a first-pass draw of the world. TODO: correct?
-		world.drawWorld();
-
-		while (!engine.done) {
-			if (!engine.tick()) // if the engine didn't need an update..
-				SDL_Delay(10); // .. delay for a short while
-		} // main loop
-
 		// we're done, be sure to shut stuff down
 		engine.shutdown();
+
+		return ret;
 	} catch (std::exception &e) {
 #ifdef _WIN32
 		MessageBox(NULL, e.what(), "openc2e - Fatal exception encountered:", MB_ICONERROR);
@@ -68,7 +70,6 @@ extern "C" int main(int argc, char *argv[]) {
 #endif
 		return 1;
 	}
-	return 0;
 }
 
 /* vim: set noet: */

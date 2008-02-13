@@ -420,3 +420,6 @@ void SDLBackend::setPalette(uint8 *data) {
 	}
 }
 
+void SDLBackend::delay(int msec) {
+	SDL_Delay(msec);
+}

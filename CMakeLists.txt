@@ -17,13 +17,12 @@ ELSE (OPENC2E_USE_OPENAL MATCHES "^(YES|NO|AUTO)$")
 	MESSAGE(SEND_ERROR "The value of OPENC2E_USE_OPENAL must be YES, NO, or AUTO.")
 ENDIF (OPENC2E_USE_OPENAL MATCHES "^(YES|NO|AUTO)$")
 
-
-
 SET(OPENC2E_CORE
 	Agent.cpp
 	AgentHelpers.cpp
 	AgentRef.cpp
 	attFile.cpp
+	Backend.cpp
 	Blackboard.cpp
 	blkImage.cpp
 	bytecode.cpp
@@ -99,10 +98,13 @@ SET(OPENC2E_CORE
 	sprImage.cpp
 	streamutils.cpp
 	Vehicle.cpp
-	World.cpp)
+	World.cpp
+	main.cpp
+)
 
 SET(OPENC2E_SDL
-	main.cpp
+	# all in the main openc2e listing
+	# XXX: non-sdl-based backends?
 )
 
 SET(OPENC2E_QT
@@ -113,7 +115,6 @@ SET(OPENC2E_QT
 	qtgui/imagepreview.cpp
 	qtgui/c1cobfile.cpp
 	qtgui/QtBackend.cpp
-	qtgui/main.cpp
 	tools/braininavat/brainview.cpp)
 
 SET(OPENC2E_QT_MOC_HDRS
@@ -142,9 +143,9 @@ ELSE(${OPENC2E_USE_OPENAL} MATCHES "^(YES|AUTO)$")
 ENDIF(${OPENC2E_USE_OPENAL} MATCHES "^(YES|AUTO)$")
 FIND_PACKAGE(ALUT)
 FIND_PACKAGE(Boost REQUIRED)
-IF(${OPENC2E_USE_QT})
+IF(OPENC2E_USE_QT)
 	find_package(Qt4 REQUIRED)
-ENDIF(${OPENC2E_USE_QT})
+ENDIF(OPENC2E_USE_QT)
 
 SET(USE_OPENAL "NO")
 
@@ -170,22 +171,23 @@ ELSE(${OPENAL_SRC} STREQUAL "")
     SET(OPENAL_DEF "-DOPENAL_SUPPORT")
 ENDIF(${OPENAL_SRC} STREQUAL "")
 
-IF(${OPENC2E_USE_QT})
+IF(OPENC2E_USE_QT)
 	include(${QT_USE_FILE})
 	QT4_WRAP_UI(OPENC2E_QT_UIS_H ${OPENC2E_QT_UIS})
 	QT4_WRAP_CPP(OPENC2E_QT_MOC_SRCS ${OPENC2E_QT_MOC_HDRS})
-ENDIF(${OPENC2E_USE_QT})
+	SET(QT_DEF "-DQT_SUPPORT")
+ENDIF(OPENC2E_USE_QT)
 
 # Pass flags to the compiler
-ADD_DEFINITIONS("-W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE ${OPENAL_DEF}")
+ADD_DEFINITIONS("-W -Wall -Wno-conversion -Wno-unused -pthread -D_REENTRANT -DYYERROR_VERBOSE ${OPENAL_DEF} ${QT_DEF}")
 
-IF(${OPENC2E_USE_QT})
+IF(OPENC2E_USE_QT)
 	SET(FRONTEND_SRCS ${OPENC2E_QT} ${OPENC2E_QT_UIS_H} ${OPENC2E_QT_MOC_SRCS})
 	SET(FRONTEND_LIBS ${QT_LIBRARIES})
-ELSE(${OPENC2E_USE_QT})
+ELSE(OPENC2E_USE_QT)
 	SET(FRONTEND_SRCS ${OPENC2E_SDL})
 	SET(FRONTEND_LIBS)
-ENDIF(${OPENC2E_USE_QT})
+ENDIF(OPENC2E_USE_QT)
 ADD_EXECUTABLE(openc2e ${OPENC2E_CORE} ${FRONTEND_SRCS} ${OPENAL_SRC} caosVM_ser_stub.cpp)
 
 TARGET_LINK_LIBRARIES(openc2e z m pthread 

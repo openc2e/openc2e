@@ -56,6 +56,7 @@ public:
 	virtual void freeSurface(Surface *surf) { }
 			
 	virtual void setPalette(uint8 *data) { }
+	virtual void delay(int msec) { }
 };
 
 #endif

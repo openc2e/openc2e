@@ -17,7 +17,7 @@
 #ifndef _QTBACKEND_H
 #define _QTBACKEND_H
 
-#include "../SDLBackend.h"
+#include "SDLBackend.h"
 #include <deque>
 
 class QtBackend : public SDLBackend {
@@ -36,6 +36,8 @@ public:
 	void requestRender() { needsrender = true; }	
 	bool needsRender() { return needsrender; }
 	void renderDone();
+
+	int main(int argc, char **argv);
 
 protected:
 	std::deque<SomeEvent> events;
