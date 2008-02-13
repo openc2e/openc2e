@@ -21,9 +21,7 @@
 #include "openc2e.h"
 #include <iostream>
 #include "Engine.h"
-#include "World.h"
 #include "SDLBackend.h"
-#include "NullBackend.h"
 #ifdef OPENAL_SUPPORT
 #include "OpenALBackend.h"
 #endif
@@ -33,7 +31,8 @@
 #endif
 
 #ifdef _WIN32
-#include <shlobj.h>
+#include <windows.h>
+#undef main
 #endif
 
 extern "C" int main(int argc, char *argv[]) {
