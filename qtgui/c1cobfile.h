@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <string>
-#include "../endianlove.h"
-#include "../streamutils.h"
+#include "endianlove.h"
+#include "streamutils.h"
 #include <boost/scoped_array.hpp>
 #include <vector>
 

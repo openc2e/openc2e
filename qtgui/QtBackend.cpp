@@ -14,8 +14,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "qtgui/QtBackend.h"
-#include "qtgui/qtopenc2e.h"
+#include "QtBackend.h"
+#include "qtopenc2e.h"
 #include "Engine.h"
 #include <QKeyEvent>
 #include <QApplication>
@@ -23,7 +23,7 @@
 #include <QPainter>
 #include <boost/format.hpp>
 #include <iostream>
-#include "../exceptions.h"
+#include "exceptions.h"
 
 #ifdef _WIN32
 #include <windows.h>

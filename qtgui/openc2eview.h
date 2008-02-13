@@ -19,7 +19,7 @@
 
 #include <QAbstractScrollArea>
 #include <boost/shared_ptr.hpp>
-#include "../Backend.h"
+#include "Backend.h"
 
 class openc2eView : public QAbstractScrollArea {
 	Q_OBJECT

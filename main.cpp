@@ -28,8 +28,8 @@
 #include "OpenALBackend.h"
 #endif
 #ifdef QT_SUPPORT
-#include "qtgui/qtopenc2e.h"
-#include "qtgui/QtBackend.h"
+#include "qtopenc2e.h"
+#include "QtBackend.h"
 #endif
 
 #ifdef _WIN32

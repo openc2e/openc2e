@@ -2,6 +2,9 @@ PROJECT (OPENC2E CXX C)
 
 SET(SRC "${OPENC2E_SOURCE_DIR}")
 SET(BIN "${OPENC2E_BINARY_DIR}")
+SET(GEN "${BIN}/generated")
+EXECUTE_PROCESS(COMMAND mkdir "${GEN}" -p)
+
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS 1)
 SET(CMAKE_MODULE_PATH "${SRC}/cmake")
 
@@ -56,10 +59,10 @@ SET(OPENC2E_CORE
 	caosVM_vectors.cpp
 	caosVM_vehicles.cpp
 	caosVM_world.cpp
-	${BIN}/catalogue.lex.cpp
+	${GEN}/catalogue.lex.cpp
 	Catalogue.cpp
-	${BIN}/catalogue.tab.cpp
-	cmddata.cpp
+	${GEN}/catalogue.tab.cpp
+	${GEN}/cmddata.cpp
 	cobFile.cpp
 	CompoundAgent.cpp
 	CompoundPart.cpp
@@ -72,16 +75,16 @@ SET(OPENC2E_CORE
 	fileSwapper.cpp
 	genomeFile.cpp
 	historyManager.cpp
-	lex.c2.cpp
-	lex.mng.cpp
+	${GEN}/lex.c2.cpp
+	${GEN}/lex.mng.cpp
 	lexutil.cpp
-	lex.yy.cpp
+	${GEN}/lex.yy.cpp
 	Lift.cpp
 	Map.cpp
 	MetaRoom.cpp
 	mmapifstream.cpp
 	mngfile.cpp
-	mngparser.tab.cpp
+	${GEN}/mngparser.tab.cpp
 	oldBrain.cpp
 	PathResolver.cpp
 	physics.cpp
@@ -173,8 +176,11 @@ ENDIF(OPENAL_SRC STREQUAL "")
 
 IF(OPENC2E_USE_QT)
 	include(${QT_USE_FILE})
+	SET(SAVED_CMAKE_CURRENT_BINARY_DIR CMAKE_CURRENT_BINARY_DIR)
+	SET(CMAKE_CURRENT_BINARY_DIR ${GEN})
 	QT4_WRAP_UI(OPENC2E_QT_UIS_H ${OPENC2E_QT_UIS})
 	QT4_WRAP_CPP(OPENC2E_QT_MOC_SRCS ${OPENC2E_QT_MOC_HDRS})
+	SET(CMAKE_CURRENT_BINARY_DIR SAVED_CMAKE_CURRENT_BINARY_DIR)
 	SET(QT_DEF "-DQT_SUPPORT")
 ENDIF(OPENC2E_USE_QT)
 
@@ -206,8 +212,9 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	)
 
 INCLUDE_DIRECTORIES(BEFORE
-	${BIN}
+	${GEN}
 	${SRC}
+	${SRC}/qtgui
 	${SDL_INCLUDE_DIR}
 	${SDLMIXER_INCLUDE_DIR}
 	${SDLNET_INCLUDE_DIR}
@@ -218,15 +225,15 @@ INCLUDE_DIRECTORIES(BEFORE
 
 FILE(GLOB CAOSVM_FILES ${SRC}/caosVM_*.cpp)
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/commandinfo.yml
-	COMMAND perl parsedocs.pl ${CAOSVM_FILES} > ${BIN}/commandinfo.yml
+	OUTPUT ${GEN}/commandinfo.yml
+	COMMAND perl parsedocs.pl ${CAOSVM_FILES} > ${GEN}/commandinfo.yml
 	DEPENDS parsedocs.pl ${CAOSVM_FILES}
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/caosdocs.html
-	COMMAND perl writehtml.pl ${BIN}/commandinfo.yml > ${BIN}/caosdocs.html
-	DEPENDS writehtml.pl ${BIN}/commandinfo.yml
+	COMMAND perl writehtml.pl ${GEN}/commandinfo.yml > ${BIN}/caosdocs.html
+	DEPENDS writehtml.pl ${GEN}/commandinfo.yml
 	WORKING_DIRECTORY ${SRC})
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/docs.css
@@ -238,50 +245,58 @@ ADD_CUSTOM_COMMAND(
 	COMMAND pod2man --center="Openc2e Documentation" --section=6 ${SRC}/openc2e.pod ${BIN}/openc2e.6
 	DEPENDS openc2e.pod
 	)
-
-ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
-
 # it seems these ADD_CUSTOM_COMMANDS for flex and bison could be made
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/catalogue.lex.cpp ${BIN}/catalogue.lex.h
-	COMMAND flex -+ --prefix=catalogue -d -o ${BIN}/catalogue.lex.cpp --header-file=${BIN}/catalogue.lex.h catalogue.l 
-	DEPENDS catalogue.l ${BIN}/catalogue.tab.hpp
+	OUTPUT ${GEN}/catalogue.lex.cpp ${GEN}/catalogue.lex.h
+	COMMAND flex -+ --prefix=catalogue -d -o ${GEN}/catalogue.lex.cpp --header-file=${GEN}/catalogue.lex.h catalogue.l 
+	DEPENDS catalogue.l ${GEN}/catalogue.tab.hpp
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/catalogue.tab.cpp ${BIN}/catalogue.tab.hpp
-	COMMAND bison -d --name-prefix=cata --file-prefix="${BIN}/catalogue" catalogue.ypp
+	OUTPUT ${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
+	COMMAND bison -d --name-prefix=cata --file-prefix="${GEN}/catalogue" catalogue.ypp
 	DEPENDS catalogue.ypp
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/cmddata.cpp
-	COMMAND perl writecmds.pl ${BIN}/commandinfo.yml > ${BIN}/cmddata.cpp
-	DEPENDS ${BIN}/commandinfo.yml writecmds.pl
+	OUTPUT ${GEN}/cmddata.cpp
+	COMMAND perl writecmds.pl ${GEN}/commandinfo.yml > ${GEN}/cmddata.cpp
+	DEPENDS ${GEN}/commandinfo.yml writecmds.pl
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/lex.c2.cpp ${BIN}/lex.c2.h
-	COMMAND flex -+ -d -o ${BIN}/lex.c2.cpp --header-file=${BIN}/lex.c2.h --prefix=c2 c2caos.l
+	OUTPUT ${GEN}/lex.c2.cpp ${GEN}/lex.c2.h
+	COMMAND flex -+ -d -o ${GEN}/lex.c2.cpp --header-file=${GEN}/lex.c2.h --prefix=c2 c2caos.l
 	DEPENDS c2caos.l
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/lex.mng.cpp ${BIN}/lex.mng.h
-	COMMAND flex -+ --prefix=mng -d -o ${BIN}/lex.mng.cpp --header-file=${BIN}/lex.mng.h mng.l
+	OUTPUT ${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
+	COMMAND flex -+ --prefix=mng -d -o ${GEN}/lex.mng.cpp --header-file=${GEN}/lex.mng.h mng.l
 	DEPENDS mng.l
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/lex.yy.cpp ${BIN}/lex.yy.h
-	COMMAND flex -+ -d -o ${BIN}/lex.yy.cpp --header-file=${BIN}/lex.yy.h --prefix=c2e caos.l
+	OUTPUT ${GEN}/lex.yy.cpp ${GEN}/lex.yy.h
+	COMMAND flex -+ -d -o ${GEN}/lex.yy.cpp --header-file=${GEN}/lex.yy.h --prefix=c2e caos.l
 	DEPENDS caos.l
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${BIN}/mngparser.tab.cpp ${BIN}/mngparser.tab.hpp
-	COMMAND bison -d --name-prefix=mng --file-prefix="${BIN}/mngparser" mngparser.ypp
+	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" mngparser.ypp
 	DEPENDS mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
+
+ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
+ADD_CUSTOM_TARGET(generated DEPENDS
+	${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
+	${GEN}/catalogue.lex.cpp ${GEN}/catalogue.lex.h
+	${GEN}/cmddata.cpp
+	${GEN}/lex.c2.cpp ${GEN}/lex.c2.h
+	${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
+	${GEN}/lex.yy.cpp ${GEN}/lex.yy.h
+	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+)
 

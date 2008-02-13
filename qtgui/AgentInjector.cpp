@@ -1,9 +1,9 @@
-#include "../World.h"
-#include "../Engine.h"
+#include "World.h"
+#include "Engine.h"
 
 #include "AgentInjector.h"
 #include "c1cobfile.h"
-#include "../cobFile.h"
+#include "cobFile.h"
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>

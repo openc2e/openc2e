@@ -14,13 +14,13 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "../World.h"
+#include "World.h"
 #include "qtopenc2e.h"
 #include <QtGui>
 #include "openc2eview.h"
-#include "../Engine.h"
-#include "../OpenALBackend.h"
-#include "../MetaRoom.h"
+#include "Engine.h"
+#include "OpenALBackend.h"
+#include "MetaRoom.h"
 
 #include "AgentInjector.h"
 #include "BrainViewer.h"
@@ -235,9 +235,9 @@ void QtOpenc2e::toggleMute() {
 	engine.audio->setMute(!engine.audio->isMuted());
 }
 
-#include "../Creature.h"
-#include "../SkeletalCreature.h"
-#include "../PointerAgent.h"
+#include "Creature.h"
+#include "SkeletalCreature.h"
+#include "PointerAgent.h"
 
 #undef slots
 void QtOpenc2e::newNorn() {

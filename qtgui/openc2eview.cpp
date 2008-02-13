@@ -14,8 +14,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "../World.h"
-#include "../MetaRoom.h"
+#include "World.h"
+#include "MetaRoom.h"
 #include "openc2eview.h"
 #include <QtGui>
 #include "QtBackend.h"

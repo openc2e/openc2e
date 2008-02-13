@@ -1,9 +1,9 @@
-#include "../World.h"
-#include "../CreatureAgent.h"
-#include "../Creature.h"
+#include "World.h"
+#include "CreatureAgent.h"
+#include "Creature.h"
 
 #include "BrainViewer.h"
-#include "../tools/braininavat/brainview.h"
+#include "tools/braininavat/brainview.h"
 
 BrainViewer::BrainViewer(QWidget *parent) : QDialog(parent) {
 	scrollArea = new QScrollArea(this);

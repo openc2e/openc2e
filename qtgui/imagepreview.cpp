@@ -1,8 +1,8 @@
 #include "imagepreview.h"
 #include "c1cobfile.h"
 
-#include "../Engine.h"
-#include "../cobFile.h"
+#include "Engine.h"
+#include "cobFile.h"
 
 #include <QPainter>
 
