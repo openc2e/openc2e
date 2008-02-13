@@ -25,6 +25,7 @@ OPENC2E_CORE = \
 	AgentHelpers.o \
 	AgentRef.o \
 	attFile.o \
+	Backend.o \
 	Blackboard.o \
 	blkImage.o \
 	bytecode.o \
@@ -115,7 +116,7 @@ COREFLAGS=$(DEBUGFLAGS) -I/usr/include/SDL -I/usr/include/AL -I.
 XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
-default: openc2e tools/praydumper docs
+default: user-is-insane openc2e tools/praydumper docs
 all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/memstats tools/wildtest
 
 docs: docs.html
@@ -153,12 +154,12 @@ lex.c2.cpp lex.c2.h: c2caos.l
 caosScript.o: lex.yy.h lex.yy.cpp lex.c2.h lex.c2.cpp
 
 ## based on automake stuff
-%.o: user-is-insane %.cpp
+%.o: %.cpp
 	mkdir -p .deps/`dirname $<` && \
 	$(CXX) $(XCPPFLAGS) -MP -MD -MF .deps/$<.Td -o $@ -c $< && \
 	mv .deps/$<.Td .deps/$<.d
 
-%.o: user-is-insane %.c
+%.o: %.c
 	mkdir -p .deps/`dirname $<` && \
 	$(CC) $(XCFLAGS) -MP -MD -MF .deps/$<.Td -o $@ -c $< && \
 	mv .deps/$<.Td .deps/$<.d
