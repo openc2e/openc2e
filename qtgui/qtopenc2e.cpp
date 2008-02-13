@@ -270,8 +270,8 @@ void QtOpenc2e::newNorn() {
 		return;
 	}
 	
-	a->finishInit();
 	a->setCreature(c);
+	a->finishInit();
 
 	// if you make this work for c2e, you should probably set sane attributes here?
 
