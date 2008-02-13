@@ -456,8 +456,8 @@ void SkeletalCreature::snapDownFoot() {
 	lastgoodfootx = footx;
 	lastgoodfooty = footy;
 
-	if (engine.version == 2) {
-		if (!belowfloor && downfootroom->floorpoints.size()) {
+	if (engine.version > 2) {
+		if (engine.version == 2 && !belowfloor && downfootroom->floorpoints.size()) {
 			// TODO: hilar hack: same as above for floorvalue
 			if (size.getInt() <= downfootroom->floorvalue.getInt()) {
 				grav.setInt(1);
@@ -467,8 +467,10 @@ void SkeletalCreature::snapDownFoot() {
 			// TODO: hilar hack: same as above for perm
 			shared_ptr<Room> downroom = world.map.roomAt(footx, downfootroom->y_left_floor + 1);
 			if (downfootroom->doors.find(downroom) != downfootroom->doors.end()) {
-				if (size.getInt() <= downfootroom->doors[downroom]->perm) {
-					grav.setInt(1);
+				int permsize = (engine.version == 2 ? size.getInt() : perm);
+				if (permsize <= downfootroom->doors[downroom]->perm) {
+					if (engine.version == 2) grav.setInt(1);
+					else falling = true;
 					return;
 				}
 			}
