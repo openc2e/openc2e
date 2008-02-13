@@ -39,31 +39,44 @@
 
 #include "openc2e.h"
 
+template<class Archive, class Object>
+void pre_save(Archive &ar, const Object & obj, const unsigned int version) { }
+template<class Archive, class Object>
+void post_save(Archive &ar, const Object & obj, const unsigned int version) { }
+template<class Archive, class Object>
+void pre_load(Archive &ar, Object & obj, const unsigned int version) { }
+template<class Archive, class Object>
+void post_load(Archive &ar, Object & obj, const unsigned int version) { }
+
 #define WRAP_SPLIT(c) \
     BOOST_SERIALIZATION_SPLIT_FREE(c); \
     BOOST_CLASS_EXPORT(c); \
     namespace boost { namespace serialization { \
         SER_PROTO(inline, load, c,) { \
+			pre_load(ar, obj, version); \
             o_load(ar, obj, version); \
+			post_load(ar, obj, version); \
         } \
         SER_PROTO(inline, save, c, const) { \
+			pre_save(ar, obj, version); \
             o_save(ar, obj, version); \
+			post_save(ar, obj, version); \
         } \
     } }
 
 #define WRAP_SERIALIZE(c) \
-    BOOST_CLASS_EXPORT(c); \
-    namespace boost { namespace serialization { \
-        SER_PROTO(inline, serialize, c,) { \
-            o_serialize(ar, obj, version); \
-        } \
-    } }
+	SAVE(c) { o_serialize(ar, *const_cast<c *>(&obj), version); } \
+	LOAD(c) { o_serialize(ar, obj, version); }
     
 #define SER_BASE(ar,bc) \
     do { ar & boost::serialization::base_object<bc>(obj); } while (0)
 
 #define SAVE(c) WRAP_SPLIT(c); SER_PROTO(, o_save, c, const)
 #define LOAD(c) SER_PROTO(, o_load, c,)
+#define PRE_SAVE(c) SER_PROTO(, pre_save, c, const)
+#define POST_SAVE(c) SER_PROTO(, post_save, c, const)
+#define PRE_LOAD(c) SER_PROTO(, pre_load, c, )
+#define POST_LOAD(c) SER_PROTO(, post_load, c, )
 #define SERIALIZE(c) WRAP_SERIALIZE(c); SER_PROTO(, o_serialize, c,)
 
 inline static void STUB_DIE(const std::string &msg, const char *f, unsigned int l) {

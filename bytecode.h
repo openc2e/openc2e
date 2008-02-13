@@ -20,6 +20,8 @@
 #ifndef BYTECODE_H
 #define BYTECODE_H 1
 
+#include "openc2e.h"
+
 #include <stdlib.h> // for NULL
 #include <assert.h>
 #include <string>
@@ -149,6 +151,9 @@ struct caosOp {
 		argument = arg;
 		traceindex = ti;
 	}
+private:
+	FRIEND_SERIALIZE(caosOp);
+	caosOp() { }
 };
 
 std::string dumpOp(const class Dialect *d, caosOp op);

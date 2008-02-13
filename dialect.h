@@ -8,7 +8,7 @@
 
 class Dialect {
     private:
-        int cmdcnt;
+        const int cmdcnt;
         const struct cmdinfo *cmds;
     public:
         const std::string name;
@@ -17,6 +17,7 @@ class Dialect {
             assert(idx >= 0 && idx < cmdcnt);
             return cmdbase() + idx;
         }
+		int cmdcount() const { return cmdcnt; }
 
         const cmdinfo *find_command(const char *name) const;
 

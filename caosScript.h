@@ -32,6 +32,7 @@
 #include "caosVar.h"
 #include "dialect.h"
 #include "token.h"
+#include "shared_str.h"
 
 
 class Agent;
@@ -41,6 +42,9 @@ struct toktrace {
 	unsigned short lineno;
 
 	toktrace(unsigned short w, unsigned short l) : width(w), lineno(l) { }
+	private:
+	FRIEND_SERIALIZE(toktrace);
+	toktrace() { }
 };
 
 struct script {
@@ -68,7 +72,7 @@ struct script {
 		// table
 		std::vector<bytestring_t> bytestrs;
 		// a normalized copy of the script source. this is used for error tracing
-		std::string code;
+		shared_str code;
 		shared_ptr<std::vector<toktrace> > tokinfo;
 
 	public:

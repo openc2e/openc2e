@@ -23,8 +23,7 @@ static int count_cmds(const struct cmdinfo *tbl) {
     return i;
 }
 
-Dialect::Dialect(const cmdinfo *cmds_, const std::string &n) : name(n) {
-    cmdcnt = count_cmds(cmds = cmds_);
+Dialect::Dialect(const cmdinfo *cmds_, const std::string &n) : cmdcnt(count_cmds(cmds_)), cmds(cmds_), name(n) {
 }
 
 const cmdinfo *Dialect::find_command(const char *name) const {

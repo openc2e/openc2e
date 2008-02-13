@@ -5,67 +5,82 @@
 #include "ser/s_caosVar.h"
 #include "caosScript.h"
 #include "ser/s_bytecode.h"
+#include "ser/s_shared_str.h"
 
-typedef Variant *v_type;
-static inline Variant *findVariant(const std::string &name) {
-    if (name == "  (NULL)  ")
-        return NULL;
-    if (variants.find(name) == variants.end())
-        throw new creaturesException(std::string("Variant ") + name + " not available in this build of openc2e.");
-    return variants[name];
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/map.hpp>
+
+BOOST_CLASS_IMPLEMENTATION(toktrace, boost::serialization::object_serializable);
+BOOST_CLASS_TRACKING(toktrace, boost::serialization::track_never);
+SERIALIZE(toktrace) {
+	ar & obj.width & obj.lineno;
 }
 
-LOAD(script) {
-    ar & obj.linked;
-    ar & obj.relocations;
-    ar & obj.allOps;
-    ar & obj.fmly & obj.gnus & obj.spcs & obj.scrp;
+SERIALIZE(script) {
+//	ar & obj.linked;
+//	ar & obj.relocations;
+//	ar & obj.labels;
 
-    std::string variant;
-    ar & variant;
-    obj.variant = findVariant(variant);
+	ar & obj.ops;
+	ar & obj.consts;
+	ar & obj.bytestrs;
+	ar & obj.code;
+	ar & obj.tokinfo;
 
-    ar & obj.filename;
-    ar & obj.gsub;
+//	ar & obj.fmly & obj.gnus & obj.spcs & obj.scrp;
+	// dialect handled in post-serialization code
+	ar & obj.filename;
+//	ar & obj.gsub; // XXX duplicate with labels
 }
 
-SAVE(script) {
-    ar & obj.linked;
-    ar & obj.relocations;
-    ar & obj.allOps;
-    ar & obj.fmly & obj.gnus & obj.spcs & obj.scrp;
+static std::map<const Dialect *, boost::shared_ptr<std::vector<std::string> > >
+	dialect_trans_map;
 
-    std::string variant = "  (NULL)  ";
-    if (obj.variant != NULL)
-        variant = obj.variant->name;
-    ar & variant;
-    ar & obj.filename;
-    ar & obj.gsub;
+static void make_trans_map(const Dialect *d) {
+	if (dialect_trans_map[d])
+		return;
+	std::vector<std::string> *p = new std::vector<std::string>(d->cmdcount());
+	dialect_trans_map[d] = boost::shared_ptr<std::vector<std::string> >(p);
+	const struct cmdinfo *ci;
+	for (int i = 0; i < d->cmdcount(); i++) {
+		(*p)[i] = std::string(d->getcmd(i)->lookup_key);
+	}
 }
 
-
-SAVE(caosScript) {
-    if (obj.v)
-        ar & obj.v->name;
-    else {
-        std::string v = "  (NULL)  ";
-        ar & v;
-    }
-    ar & obj.filename;
-    ar & obj.installer & obj.removal;
-    ar & obj.scripts;
-    ar & obj.current;
+POST_SAVE(script) {
+	ar & obj.dialect->name;
+	make_trans_map(obj.dialect);
+	ar & dialect_trans_map[obj.dialect];
 }
 
-LOAD(caosScript) {
-    std::string v;
-    ar & v;
-    obj.v = findVariant(v);
+POST_LOAD(script) {
+	std::string name;
+	boost::shared_ptr<std::vector<std::string> > trans_map;
+	ar & name;
+	ar & trans_map;
 
-    ar & obj.filename;
-    ar & obj.installer & obj.removal;
-    ar & obj.scripts;
-    ar & obj.current;
+	const Dialect *d = obj.dialect = dialects[name].get();
+	if (!d) {
+		throw creaturesException(
+				boost::str(
+					boost::format("Deserialization error: Unknown dialect '%s'") % name
+				)
+			);
+	}
+
+	for (size_t i = 0; i < obj.ops.size(); i++) {
+		if (obj.ops[i].opcode == CAOS_CMD || obj.ops[i].opcode == CAOS_SAVE_CMD) {
+			std::string cmdname = (*trans_map)[obj.ops[i].argument];
+			const cmdinfo *ci = d->find_command(cmdname.c_str());
+			if (!ci) {
+				throw creaturesException(
+						boost::str(boost::format("Deserialization error: Unknown key '%s' in dialect '%s'") % cmdname % name));
+			}
+			obj.ops[i].argument = d->cmd_index(ci);
+		}
+	}
 }
+
 #endif
-

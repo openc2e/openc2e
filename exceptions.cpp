@@ -80,7 +80,7 @@ std::string caosException::prettyPrint() const {
         start += (*script->tokinfo)[i].width + 1;
     }
     int end = start + tr.width;
-    if ((size_t)start >= script->code.size() || (size_t)end >= script->code.size()) {
+    if ((size_t)start >= script->code->size() || (size_t)end >= script->code->size()) {
         oss << std::endl;
         return oss.str();
     }
@@ -101,8 +101,8 @@ std::string caosException::prettyPrint() const {
         contextl = start;
     }
 
-    if ((size_t)(end + contextr) >= script->code.size()) {
-        int overflow = end + contextr - script->code.size();
+    if ((size_t)(end + contextr) >= script->code->size()) {
+        int overflow = end + contextr - script->code->size();
         contextr -= overflow;
         contextl += overflow;
         if (contextl > start)
@@ -121,7 +121,7 @@ std::string caosException::prettyPrint() const {
             contextr = 0;
     }
 
-    if ((size_t)(end + contextr) < script->code.size()) {
+    if ((size_t)(end + contextr) < script->code->size()) {
         marginr = 3;
         contextr -= 3;
         if (contextr < 0) {
@@ -133,7 +133,7 @@ std::string caosException::prettyPrint() const {
     }
 
     for (int i = start - contextl; i < end + contextr; i++)
-        oss << script->code[i];
+        oss << (*script->code)[i];
     if (marginr)
         oss << "...";
     oss << std::endl;

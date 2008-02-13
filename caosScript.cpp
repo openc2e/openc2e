@@ -306,7 +306,7 @@ void caosScript::parse(std::istream &in) {
 			oss << tok << " ";
 			tokinfo->push_back(toktrace(len, (*tokens)[p].lineno));
 		}
-		std::string code = oss.str();
+		shared_str code(oss.str());
 		installer->code = code;
 		installer->tokinfo = tokinfo;
 		installer->link();

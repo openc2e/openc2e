@@ -21,7 +21,7 @@
 #include <boost/archive/text_iarchive.hpp>
 
 #include "caosVM.h"
-#include "ser/s_map.h"
+//#include "ser/s_map.h"
 #include "ser/s_Scriptorium.h"
 #include "serialization.h"
 #include "World.h"
@@ -33,6 +33,7 @@
 
 void caosVM::c_SERS_MAPP() {
     VM_PARAM_STRING(filename)
+#if 0
     std::ofstream outf(filename.c_str(), std::ios::binary);
     {
         boost::archive::text_oarchive oa(outf);
@@ -41,10 +42,12 @@ void caosVM::c_SERS_MAPP() {
         oa << (const std::string &) test;
     }
     outf.close();
+#endif
 }
 
 void caosVM::c_SERL_MAPP() {
     VM_PARAM_STRING(filename);
+#if 0
     std::ifstream inf(filename.c_str(), std::ios::binary);
     {
         boost::archive::text_iarchive ia(inf);
@@ -58,6 +61,7 @@ void caosVM::c_SERL_MAPP() {
             abort();
         }
     }
+#endif
 }
 
 void caosVM::c_SERS_SCRP() {
