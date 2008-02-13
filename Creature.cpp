@@ -193,7 +193,9 @@ oldCreature::oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 	
 	muscleenergy = 0;
 	fertile = pregnant = receptive = 0;
-	dead = 0;	
+	dead = 0;
+
+	brain = 0; // just in case
 }
 
 c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {

@@ -158,6 +158,8 @@ public:
 	
 	// TODO: is it really worth having drives outside oldCreature?
 	virtual unsigned char getDrive(unsigned int id) = 0;
+
+	oldBrain *getBrain() { return brain; }
 };
 
 class c1Creature : public oldCreature {
