@@ -4,5 +4,5 @@ Abstract: Documentation of the CAOS commands supported by openc2e.
 Section: Apps/Programming
 
 Format: HTML
-Files: /usr/share/doc/openc2e/docs.html
-Index: /usr/share/doc/openc2e/docs.html
+Files: /usr/share/doc/openc2e/caosdocs.html
+Index: /usr/share/doc/openc2e/caosdocs.html
