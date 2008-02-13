@@ -43,9 +43,11 @@ protected:
 	std::vector<oldNeuron> neurons;
 	std::vector<oldDendrite> dendrites[2];
 	oldLobe *sourceLobe[2];
+	bool inited;
 
 public:
 	oldLobe(class oldBrain *b, oldBrainLobeGene *g);
+	bool wasInited() { return inited; }
 	void tick();
 	void init();
 	void wipe();
@@ -66,6 +68,7 @@ public:
 
 	oldBrain(oldCreature *p);
 	void tick();
+	void processGenes();
 	void init();
 	oldLobe *getLobeByTissue(unsigned int id);
 	oldCreature *getParent() { return parent; }

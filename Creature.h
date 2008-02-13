@@ -148,6 +148,8 @@ protected:
 	inline unsigned int calculateMultiplier(unsigned char);
 
 	oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	
+	void processGenes();
 
 public:
 	void addChemical(unsigned char id, unsigned char val);

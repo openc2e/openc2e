@@ -173,6 +173,8 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	assert(g);
 	ourGene = g;
 
+	inited = false;
+
 	unsigned int width = g->width, height = g->height;
 	// TODO: good?
 	if (width < 1) width = 1;
@@ -189,6 +191,7 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 }
 
 void oldLobe::init() {
+	inited = true;
 	wipe();
 
 	// TODO
@@ -205,27 +208,25 @@ void oldLobe::tick() {
 oldBrain::oldBrain(oldCreature *p) {
 	assert(p);
 	parent = p;
+}
 
-	shared_ptr<genomeFile> genome = p->getGenome();
-
-	unsigned int n = 0;
+void oldBrain::processGenes() {
+	shared_ptr<genomeFile> genome = parent->getGenome();
+	
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if ((*i)->header.flags.femaleonly && !p->isFemale()) continue;
-		if ((*i)->header.flags.maleonly && p->isFemale()) continue;
-		// TODO: lifestage
+		if (!parent->shouldProcessGene(*i)) continue;
+		
 		if (typeid(**i) == typeid(oldBrainLobeGene)) {
 			oldBrainLobeGene *g = (oldBrainLobeGene *)*i;
 			oldLobe *l = new oldLobe(this, g);
-			// TODO: good?
-			lobes[n] = l;
-			n++;
+			lobes[lobes.size()] = l; // TODO: muh
 		}
 	}
 }
 
 void oldBrain::init() {
 	for (std::map<unsigned int, oldLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
-		(*i).second->init();
+		if (!(*i).second->wasInited()) (*i).second->init();
 	}
 }
 

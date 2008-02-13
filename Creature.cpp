@@ -82,6 +82,11 @@ void Creature::processGenes() {
 	}
 }
 
+void oldCreature::processGenes() {
+	brain->processGenes();
+	Creature::processGenes();
+}
+
 void c2eCreature::processGenes() {
 	// brain must be processed first (to create loci etc)
 	// organs should be processed last, because new ones will be created by normal processGenes()
