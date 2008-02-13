@@ -24,7 +24,9 @@
 #include "World.h"
 #include "SDLBackend.h"
 #include "NullBackend.h"
+#ifdef OPENAL_SUPPORT
 #include "OpenALBackend.h"
+#endif
 
 #ifdef _WIN32
 #include <shlobj.h>
