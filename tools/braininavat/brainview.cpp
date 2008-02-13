@@ -1,5 +1,6 @@
 #include "../../Creature.h"
 #include "../../c2eBrain.h"
+#include "../../oldBrain.h"
 
 #include <QtGui>
 #include "brainview.h"
@@ -23,21 +24,38 @@ void BrainView::setCreature(Creature *c) {
 
 QSize BrainView::minimumSize() {
 	if (!creature) return QSize(0, 0);
-	c2eCreature *c = dynamic_cast<c2eCreature *>(creature);
-	if (!c) return QSize(0, 0);
-	c2eBrain *b = c->getBrain();
-	assert(b);
-
+	
 	int neededwidth = 2, neededheight = 2;
-	for (std::map<std::string, c2eLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-		c2eBrainLobeGene *lobe = i->second->getGene();
-		int this_x = lobe->x + lobe->width;
-		int this_y = lobe->y + lobe->height;
-		if (this_x > neededwidth)
-			neededwidth = this_x;
-		if (this_y > neededheight)
-			neededheight = this_y;
-	}
+	
+	c2eCreature *c = dynamic_cast<c2eCreature *>(creature);
+	oldCreature *oc = dynamic_cast<oldCreature *>(creature);
+	if (c) {
+		c2eBrain *b = c->getBrain();
+		assert(b);
+
+		for (std::map<std::string, c2eLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
+			c2eBrainLobeGene *lobe = i->second->getGene();
+			int this_x = lobe->x + lobe->width;
+			int this_y = lobe->y + lobe->height;
+			if (this_x > neededwidth)
+				neededwidth = this_x;
+			if (this_y > neededheight)
+				neededheight = this_y;
+		}
+	} else if (oc) {
+		oldBrain *b = oc->getBrain();
+		assert(b);
+		
+		for (std::map<unsigned int, oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
+			oldBrainLobeGene *lobe = i->second->getGene();
+			int this_x = lobe->x + lobe->width;
+			int this_y = lobe->y + lobe->height;
+			if (this_x > neededwidth)
+				neededwidth = this_x;
+			if (this_y > neededheight)
+				neededheight = this_y;
+		}
+	} else return QSize(0, 0);
 
 	return QSize((neededwidth + 6) * 20, (neededheight + 5) * 20);
 }
