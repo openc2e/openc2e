@@ -99,7 +99,7 @@ void prayBlock::load() {
 			delete[] buffer;
 			throw creaturesException("Failed to read all of compressed block.");
 		}
-		unsigned int usize = size;
+		uLongf usize = size;
 		int r = uncompress((Bytef *)buffer, (uLongf *)&usize, (Bytef *)src, compressedsize);
 		if (r != Z_OK) {
 			delete[] buffer; delete[] src;
