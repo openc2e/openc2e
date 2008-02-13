@@ -1,3 +1,15 @@
+.SILENT: user-is-insane
+
+user-is-insane:
+	( \
+		echo "The Makefile build method is deprecated and intended for use only in"; \
+		echo "unusual circumstances. To build openc2e:"; \
+		echo; \
+		echo "mkdir build; cd build; cmake ..; make"; \
+		echo; \
+		exit 1; \
+	) >&2
+
 CXXFILES = $(wildcard *.cpp) $(wildcard tools/*.cpp)
 CFILES = $(wildcard *.c) $(wildcard tools/*.c) 
 
@@ -141,12 +153,12 @@ lex.c2.cpp lex.c2.h: c2caos.l
 caosScript.o: lex.yy.h lex.yy.cpp lex.c2.h lex.c2.cpp
 
 ## based on automake stuff
-%.o: %.cpp
+%.o: user-is-insane %.cpp
 	mkdir -p .deps/`dirname $<` && \
 	$(CXX) $(XCPPFLAGS) -MP -MD -MF .deps/$<.Td -o $@ -c $< && \
 	mv .deps/$<.Td .deps/$<.d
 
-%.o: %.c
+%.o: user-is-insane %.c
 	mkdir -p .deps/`dirname $<` && \
 	$(CC) $(XCFLAGS) -MP -MD -MF .deps/$<.Td -o $@ -c $< && \
 	mv .deps/$<.Td .deps/$<.d
