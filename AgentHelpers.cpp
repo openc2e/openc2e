@@ -22,6 +22,8 @@
 bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, shared_ptr<Room> ownerroom) {
 	assert(ownermeta && ownerroom);
 
+	if (seeing == a) return false;
+
 	// verify we're in the same metaroom as owner, and in a room
 	float thisx = a->x + (a->getWidth() / 2.0f);
 	float thisy = a->y + (a->getHeight() / 2.0f);
