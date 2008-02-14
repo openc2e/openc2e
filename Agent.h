@@ -201,6 +201,8 @@ public:
 	bool vmStopped();
 
 	void moveTo(float, float, bool force = false);
+	bool tryMoveToPlaceAround(float x, float y);
+
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	
 	virtual void handleClick(float, float);

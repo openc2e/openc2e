@@ -439,39 +439,8 @@ void caosVM::c_MVSF() {
 	VM_PARAM_FLOAT(x)
 	valid_agent(targ);
 
-	// TODO: various agents do "mvsf 0 0" without suffercollisions set, so
-	// presumably we shouldn't check room boundaries then. someone verify this.
-	if (!targ->suffercollisions()) {
-		targ->moveTo(x, y);
-		return;
-	}
-
-	// TODO: this is a silly hack, to cater for simplest case (where we just need to nudge the agent up a bit)
-	/*unsigned int tries = 0;
-	while (tries < 150) {
-		if (targ->validInRoomSystem(Point(x, y - tries), targ->getWidth(), targ->getHeight(), targ->perm)) {
-			targ->moveTo(x, y - tries);
-			return;
-		}
-		tries++;
-	}*/
-
-	// second hacky attempt, move from side to side (+/- width) and up (- height) a little
-	unsigned int trywidth = targ->getWidth() * 2; if (trywidth < 100) trywidth = 100;
-	unsigned int tryheight = targ->getHeight() * 2; if (tryheight < 100) tryheight = 100;
-	for (unsigned int xadjust = 0; xadjust < trywidth; xadjust++) {
-		for (unsigned int yadjust = 0; yadjust < tryheight; yadjust++) {
-			if (targ->validInRoomSystem(Point(x - xadjust, y - yadjust), targ->getWidth(), targ->getHeight(), targ->perm))
-				targ->moveTo(x - xadjust, y - yadjust);
-			else if ((xadjust != 0) && targ->validInRoomSystem(Point(x + xadjust, y - yadjust), targ->getWidth(), targ->getHeight(), targ->perm))
-				targ->moveTo(x + xadjust, y - yadjust);
-			else
-				continue;
-			return;
-		}
-	}
-
-	throw creaturesException(boost::str(boost::format("MVSF failed to find a safe place around (%d, %d)") % x % y));
+	if (!targ->tryMoveToPlaceAround(x, y))
+		throw creaturesException(boost::str(boost::format("MVSF failed to find a safe place around (%d, %d)") % x % y));	
 }
 
 /**

@@ -1112,7 +1112,8 @@ bool Agent::beDropped() {
 		if (!r) return false;
 		moveTo(x, r->bot.pointAtX(x).y - getHeight());
 	} else {
-		// TODO: move to safe position?
+		// TODO: maybe think about this some more
+		tryMoveToPlaceAround(x, y);
 	}
 
 	// TODO: return value is not used anywhere yet?
@@ -1216,6 +1217,30 @@ void Agent::setClassifier(unsigned char f, unsigned char g, unsigned short s) {
 	} else {
 		category = world.findCategory(family, genus, species);
 	}
+}
+
+bool Agent::tryMoveToPlaceAround(float x, float y) {
+	if (!suffercollisions()) {
+		moveTo(x, y);
+		return true;
+	}
+
+	// second hacky attempt, move from side to side (+/- width) and up (- height) a little
+	unsigned int trywidth = getWidth() * 2; if (trywidth < 100) trywidth = 100;
+	unsigned int tryheight = getHeight() * 2; if (tryheight < 100) tryheight = 100;
+	for (unsigned int xadjust = 0; xadjust < trywidth; xadjust++) {
+		for (unsigned int yadjust = 0; yadjust < tryheight; yadjust++) {
+			if (validInRoomSystem(Point(x - xadjust, y - yadjust), getWidth(), getHeight(), perm))
+				moveTo(x - xadjust, y - yadjust);
+			else if ((xadjust != 0) && validInRoomSystem(Point(x + xadjust, y - yadjust), getWidth(), getHeight(), perm))
+				moveTo(x + xadjust, y - yadjust);
+			else
+				continue;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /* vim: set noet: */
