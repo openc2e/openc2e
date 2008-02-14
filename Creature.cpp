@@ -1318,7 +1318,7 @@ void c2eCreature::handleStimulus(c2eStim &stim) {
 	}
 
 	if (stim.noun_id >= 0) {
-		c2eLobe *nounlobe = brain->getLobeById("verb");
+		c2eLobe *nounlobe = brain->getLobeById("noun");
 		if (nounlobe) {
 			if ((unsigned int)stim.noun_id < nounlobe->getNoNeurons())
 				nounlobe->setNeuronInput(stim.noun_id, stim.noun_amount);
