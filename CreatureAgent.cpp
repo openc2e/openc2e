@@ -42,6 +42,9 @@ void CreatureAgent::setCreature(Creature *c) {
 
 	slots[0] = creature->getGenome();
 	species = (creature->isFemale() ? 2 : 1);
+
+	// category needs to be set, so call setClassifier now
+	setClassifier(family, genus, species);
 }
 
 void CreatureAgent::tick() {
