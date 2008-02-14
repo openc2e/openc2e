@@ -426,6 +426,8 @@ void c2eCreature::tickBrain() {
 	if (attn >= 0 && attn < (int)chosenagents.size())
 		attention = chosenagents[attn];
 
+	if (zombie) return; // TODO: docs say zombies "don't process decision scripts", correct?
+
 	// fire scripts as needed
 	// TODO: doesn't belong here
 	// TODO: deal with decisions which don't have agents attached
@@ -434,7 +436,6 @@ void c2eCreature::tickBrain() {
 		// TODO: this is always 'on agents', not 'on creatures'
 		parent->queueScript(decn + 16);
 	}
-#endif
 
 	// involuntary actions
 	for (unsigned int i = 0; i < 8; i++) {
@@ -447,6 +448,7 @@ void c2eCreature::tickBrain() {
 			parent->queueScript(i + 64);
 		}
 	}
+#endif
 }
 
 bool c2eCreature::processInstinct() {
