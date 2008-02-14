@@ -565,6 +565,8 @@ CAOS_LVALUE(NORN, (void)0,
 		world.selectCreature(newvalue.getAgent())
 	)
 
+#include "AgentHelpers.h"
+
 /**
  URGE SHOU (command) noun_stim (float) verb_id (integer) verb_stim (float)
  %status stub
@@ -577,12 +579,14 @@ void caosVM::c_URGE_SHOU() {
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
 
+	valid_agent(owner);
+
 	// TODO
 }
 
 /**
  URGE SIGN (command) noun_stim (float) verb_id (integer) verb_stim (float)
- %status stub
+ %status maybe
 
  Urges all Creatures who can see OWNR to perform the given action on OWNR.
  The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
@@ -592,7 +596,27 @@ void caosVM::c_URGE_SIGN() {
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
 
-	// TODO
+	valid_agent(owner);
+
+	// TODO: sanitise stim params (bind to -1.0/1.0)
+	c2eStim stim;
+	stim.noun_id = owner->category;
+	if (stim.noun_id == -1) return; // TODO: correct?
+	stim.noun_amount = noun_stim;
+	stim.verb_id = verb_id;
+	stim.verb_amount = verb_stim;
+
+	std::vector<boost::shared_ptr<Agent> > agents = getVisibleList(owner, 0, 0, 0);
+	for (std::vector<boost::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
+		boost::shared_ptr<Agent> a = *i; // guaranteed to be valid from getVisibleList
+
+		CreatureAgent *ca = dynamic_cast<CreatureAgent *>(a.get());
+		if (!ca) continue;
+		c2eCreature *c = dynamic_cast<c2eCreature *>(ca->getCreature());
+		if (!c) continue;
+
+		c->handleStimulus(stim);
+	}
 }
 
 /**
@@ -607,6 +631,8 @@ void caosVM::c_URGE_TACT() {
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
 
+	valid_agent(owner);
+	
 	// TODO
 }
 
