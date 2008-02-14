@@ -84,10 +84,10 @@ void Vehicle::carry(AgentRef passenger) {
 void Vehicle::drop(AgentRef passenger) {
 	std::vector<AgentRef>::iterator i = std::find(passengers.begin(), passengers.end(), passenger);
 	assert(i != passengers.end());
+	assert(passenger->invehicle == AgentRef(this));
 	passengers.erase(i);
 
 	passenger->beDropped();
-	passenger->invehicle.clear();
 
 	if (engine.version >= 3)
 		passenger->queueScript(122, this); // Vehicle Drop, TODO: is this valid call?

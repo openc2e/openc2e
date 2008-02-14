@@ -1082,6 +1082,9 @@ void Agent::carry(AgentRef a) {
 
 bool Agent::beDropped() {	
 	carriedby = AgentRef(0);
+	bool wasinvehicle = invehicle;
+	invehicle = AgentRef(0);
+
 	// TODO: this doesn't reorder children or anything..
 	setZOrder(zorder);
 
@@ -1089,7 +1092,7 @@ bool Agent::beDropped() {
 	if (engine.version == 2) grav.setInt(1);
 	if (engine.version == 3) falling = true;
 
-	if (!invehicle) { // ie, we're not being dropped by a vehicle
+	if (!wasinvehicle) { // ie, we're not being dropped by a vehicle
 		// TODO: check for vehicles in a saner manner?
 		for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 			boost::shared_ptr<Agent> a = (*i);
