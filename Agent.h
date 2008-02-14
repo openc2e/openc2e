@@ -73,6 +73,8 @@ protected:
 	unsigned int zorder;
 	unsigned int tickssincelasttimer, timerrate;
 
+	bool wasmoved;
+
 	int emitca_index; float emitca_amount;
 	int lastcollidedirection;
 

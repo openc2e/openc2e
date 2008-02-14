@@ -43,8 +43,11 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	setClassifier(f, g, s);
 
 	lastScript = -1;
+	
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
+
+	wasmoved = false;
 
 	if (engine.version == 2) {
 		accg = 10;
@@ -115,6 +118,7 @@ void Agent::zotstack() {
 
 void Agent::moveTo(float _x, float _y, bool force) {
 	// Move ourselves to the specified location.
+	wasmoved = true;
 
 	// if we're being carried and aren't being forced to move (prbly by our carrier), forget it
 	if (carriedby && !force) return;
@@ -480,6 +484,8 @@ void Agent::physicsTick() {
 		physicsTickC2();
 		return;
 	}
+
+	if (!wasmoved) return; // some agents are created outside INST and get autokilled if we try physics on them before they move
 
 	// set destination point based on velocities
 	float destx = x + velx.getFloat();
