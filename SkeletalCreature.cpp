@@ -594,6 +594,7 @@ void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure i
 					// TODO: shouldn't we set an animation or something here, to simplify the way things work?
 					gaitgene = g;
 					gaiti = 0;
+					skeleton->animation.clear();
 				}
 				return;
 			}
@@ -692,10 +693,31 @@ void SkeletalCreature::setZOrder(unsigned int plane) {
 	skeleton->addZOrder();
 }
 
-SkeletonPart::SkeletonPart(SkeletalCreature *p) : CompoundPart(p, 0, 0, 0, 0) {
+SkeletonPart::SkeletonPart(SkeletalCreature *p) : AnimatablePart(p, 0, 0, 0, 0) {
 }
 
 void SkeletonPart::tick() {
+	if (animation.empty()) return;
+
+	unsigned int f = frameno + 1;
+	if (f == animation.size()) return;
+	if (animation[f] == 255) {
+		if (f == (animation.size() - 1)) f = 0;
+		else f = animation[f + 1];
+
+		// TODO: check f is valid..
+		setFrameNo(f);
+	}
+}
+
+void SkeletonPart::setPose(unsigned int p) {
+	((SkeletalCreature *)parent)->setPoseGene(p);
+}
+
+void SkeletonPart::setFrameNo(unsigned int p) {
+	assert(p < animation.size());
+	frameno = p;
+	setPose(animation[p]);
 }
 
 void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset) {

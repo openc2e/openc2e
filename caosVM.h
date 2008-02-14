@@ -206,6 +206,7 @@ public:
 	class CreatureAgent *getTargCreatureAgent();
 	class Creature *getTargCreature();
 	class SpritePart *getCurrentSpritePart();
+	class AnimatablePart *getCurrentAnimatablePart();
 
 	void dummy_cmd();
 

@@ -68,15 +68,26 @@ public:
 	virtual ~CompoundPart();
 };
 
-class SpritePart : public CompoundPart {
+class AnimatablePart : public CompoundPart {
+protected:
+	unsigned int frameno;
+	AnimatablePart(Agent *p, unsigned int _id, int _x, int _y, int _z) : CompoundPart(p, _id, _x, _y, _z) { frameno = 0; }
+
+public:
+	bytestring_t animation;
+	virtual void setPose(unsigned int p) = 0;
+	virtual void setFrameNo(unsigned int f) = 0;
+	unsigned int getFrameNo() { return frameno; }
+};
+
+class SpritePart : public AnimatablePart {
 protected:
 	shared_ptr<creaturesImage> origsprite, sprite;
-	unsigned int firstimg, pose, frameno, base, spriteno;
+	unsigned int firstimg, pose, base, spriteno;
 	SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
 
 public:
-	bytestring_t animation;
 	bool is_transparent;
 	bool draw_mirrored;
 	unsigned char framerate;
@@ -87,7 +98,6 @@ public:
 	unsigned int getPose() { return pose; }
 	unsigned int getBase() { return base; }
 	unsigned int getCurrentSprite() { return spriteno; }
-	unsigned int getFrameNo() { return frameno; }
 	unsigned int getFirstImg() { return firstimg; }
 	unsigned int getWidth() { return sprite->width(getCurrentSprite()); }
 	unsigned int getHeight() { return sprite->height(getCurrentSprite()); }

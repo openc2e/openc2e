@@ -32,6 +32,14 @@
 
 using std::cerr;
 
+AnimatablePart *caosVM::getCurrentAnimatablePart() {
+	valid_agent(targ);
+	CompoundPart *p = targ->part(part);
+	if (!p) return 0;
+	AnimatablePart *s = dynamic_cast<AnimatablePart *>(p);
+	return s;
+}
+
 SpritePart *caosVM::getCurrentSpritePart() {
 	valid_agent(targ);
 	CompoundPart *p = targ->part(part);
@@ -375,16 +383,13 @@ void caosVM::c_POSE() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
 
-	SkeletalCreature *s = dynamic_cast<SkeletalCreature *>(targ.get());
-	if (s) { 
-		// TODO: this shouldn't really be a special case :(
-		s->setPoseGene(pose);
-		return;
-	}
-
-	SpritePart *p = getCurrentSpritePart();
+	AnimatablePart *p = getCurrentAnimatablePart();
 	caos_assert(p);
-	caos_assert(p->getFirstImg() + p->getBase() + pose < p->getSprite()->numframes());
+
+	SpritePart *s = dynamic_cast<SpritePart *>(p);
+	if (s)
+		caos_assert(s->getFirstImg() + s->getBase() + pose < s->getSprite()->numframes());
+	
 	p->setPose(pose);
 }
 
@@ -554,10 +559,7 @@ void caosVM::c_ANIM() {
 
 	valid_agent(targ);
 
-	// TODO: support creatures for this
-	if (dynamic_cast<SkeletalCreature *>(targ.get())) return;
-	
-	SpritePart *p = getCurrentSpritePart();
+	AnimatablePart *p = getCurrentAnimatablePart();
 	caos_assert(p);
 	p->animation = bs;
 	
@@ -579,7 +581,7 @@ void caosVM::c_ANIM_c2() {
 
 	valid_agent(targ);
 	
-	// TODO: support creatures for this (with format like "001002003R")
+	// TODO: support creatures (using AnimatablePart, see c2e ANIM) for this (with format like "001002003R")
 	if (dynamic_cast<SkeletalCreature *>(targ.get())) return;
 
 	SpritePart *p = getCurrentSpritePart();
@@ -623,7 +625,7 @@ void caosVM::c_ANMS() {
 			t = t + poselist[i];
 	}
 
-	SpritePart *p = getCurrentSpritePart();
+	AnimatablePart *p = getCurrentAnimatablePart();
 	caos_assert(p);
 	p->animation = animation;
 	
@@ -970,7 +972,7 @@ class blockUntilOver : public blockCond {
 
 			CompoundPart *s = targ->part(part);
 			caos_assert(s);
-			SpritePart *p = dynamic_cast<SpritePart *>(s);
+			AnimatablePart *p = dynamic_cast<AnimatablePart *>(s);
 			caos_assert(p);
 			
 			fno = p->getFrameNo();

@@ -125,7 +125,7 @@ CompoundPart::~CompoundPart() {
 }
 
 SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
-						int _x, int _y, unsigned int _z) : CompoundPart(p, _id, _x, _y, _z) {
+						int _x, int _y, unsigned int _z) : AnimatablePart(p, _id, _x, _y, _z) {
 	origsprite = sprite = world.gallery.getImage(spritefile);
 	firstimg = fimg;
 	caos_assert(sprite);

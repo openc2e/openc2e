@@ -102,13 +102,19 @@ public:
 	unsigned int getFaceSpriteFrame();
 };
 
-class SkeletonPart : public CompoundPart {
-public:
+class SkeletonPart : public AnimatablePart {
+	friend class SkeletalCreature;
+
+protected:
 	SkeletonPart(SkeletalCreature *p);
+
+public:
 	void tick();
 	void partRender(class Surface *renderer, int xoffset, int yoffset);
 	unsigned int getWidth() { return ((SkeletalCreature *)parent)->getSkelWidth(); }
 	unsigned int getHeight() { return ((SkeletalCreature *)parent)->getSkelHeight(); }
+	void setPose(unsigned int p);
+	void setFrameNo(unsigned int f);
 };
 
 /* vim: set noet: */
