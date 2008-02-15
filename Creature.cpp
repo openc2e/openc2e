@@ -433,8 +433,11 @@ void c2eCreature::tickBrain() {
 	// TODO: deal with decisions which don't have agents attached
 	// TODO: deal with moving between ATTNs which don't have a choseagent right now (eg, nothing in sight)
 	if (parent->vmStopped() || oldattn != attention || olddecn != decn) {
-		// TODO: this is always 'on agents', not 'on creatures'
-		parent->queueScript(decn + 16);
+		if (attention && dynamic_cast<CreatureAgent *>(attention.get())) {
+			parent->queueScript(decn + 32); // 'on creatures'
+		} else {
+			parent->queueScript(decn + 16); // 'on agents'
+		}
 	}
 
 	// involuntary actions
