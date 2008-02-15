@@ -314,7 +314,7 @@ bool QtBackend::keyDown(int key) {
 	return downkeys[key];
 }
 
-int QtBackend::main(int argc, char **argv) {
+int QtBackend::run(int argc, char **argv) {
 	QApplication app(argc, argv);
 	boost::shared_ptr<QtBackend> qtbackend = boost::dynamic_pointer_cast<class QtBackend, class Backend>(engine.backend);
 	assert(qtbackend.get() == this);

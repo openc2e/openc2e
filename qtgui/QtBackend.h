@@ -37,7 +37,7 @@ public:
 	bool needsRender() { return needsrender; }
 	void renderDone();
 
-	int main(int argc, char **argv);
+	int run(int argc, char **argv);
 
 protected:
 	std::deque<SomeEvent> events;

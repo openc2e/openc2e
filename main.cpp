@@ -26,8 +26,8 @@
 #include "OpenALBackend.h"
 #endif
 #ifdef QT_SUPPORT
-#include "qtopenc2e.h"
-#include "QtBackend.h"
+#include "qtgui/qtopenc2e.h"
+#include "qtgui/QtBackend.h"
 #endif
 
 #ifdef _WIN32
@@ -55,7 +55,7 @@ extern "C" int main(int argc, char *argv[]) {
 		// get the engine to do all the startup (read catalogue, loading world, etc)
 		if (!engine.initialSetup()) return 0;
 	
-		int ret = engine.backend->main(argc, argv);
+		int ret = engine.backend->run(argc, argv);
 		
 		// we're done, be sure to shut stuff down
 		engine.shutdown();

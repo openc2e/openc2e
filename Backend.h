@@ -66,7 +66,7 @@ public:
 			
 	virtual void setPalette(uint8 *data) = 0;
 	
-	virtual int main(int argc, char **argv);
+	virtual int run(int argc, char **argv);
 	virtual void delay(int msec) = 0;
 	virtual ~Backend() { }
 };

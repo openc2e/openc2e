@@ -2,7 +2,7 @@
 #include "World.h"
 #include "Backend.h"
 
-int Backend::main(int argc, char **argv) {
+int Backend::run(int argc, char **argv) {
 	resize(800, 600);
 	
 	// do a first-pass draw of the world. TODO: correct?
