@@ -26,7 +26,6 @@
 #include "OpenALBackend.h"
 #endif
 #ifdef QT_SUPPORT
-#include "qtgui/qtopenc2e.h"
 #include "qtgui/QtBackend.h"
 #endif
 
