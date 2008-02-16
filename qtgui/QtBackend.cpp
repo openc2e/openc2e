@@ -240,10 +240,11 @@ void QtBackend::pushEvent(SomeEvent e) {
 	events.push_back(e);
 }
 
-// TODO: handle f keys (112-123 under windows, SDLK_F1 = 282 under sdl)
-// see SDLBackend
-
 int translateQtKey(int qtkey) {
+	if (qtkey >= Qt::Key_F1 && qtkey <= Qt::Key_F12) {
+		return 112 + (qtkey - Qt::Key_F1);
+	}
+
 	switch (qtkey) {
 		case Qt::Key_Backspace: return 8;
 		case Qt::Key_Tab: return 9;
