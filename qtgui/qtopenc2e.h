@@ -27,8 +27,12 @@ public:
 	QtOpenc2e(boost::shared_ptr<class QtBackend>);
 	~QtOpenc2e();
 
+	class Creature *getSelectedCreature();
+
 signals:
 	void ticked();
+	void creatureTicked();
+	void creatureChanged();
 
 private slots:
 	void tick();
@@ -59,6 +63,8 @@ private:
 
 	class AgentInjector *agentInjector;
 	class BrainViewer *brainViewer;
+	class CreatureGrapher *creatureGrapher;
+	class QDockWidget *creatureGrapherDock;
 	
 	class openc2eView *viewport;
 };

@@ -127,6 +127,8 @@ SET(OPENC2E_QT
 	qtgui/imagepreview.cpp
 	qtgui/c1cobfile.cpp
 	qtgui/QtBackend.cpp
+	qtgui/GraphWidget.cpp
+	qtgui/CreatureGrapher.cpp
 	tools/braininavat/brainview.cpp)
 
 SET(OPENC2E_QT_MOC_HDRS
@@ -135,6 +137,8 @@ SET(OPENC2E_QT_MOC_HDRS
 	qtgui/AgentInjector.h
 	qtgui/BrainViewer.h
 	qtgui/imagepreview.h
+	qtgui/GraphWidget.h
+	qtgui/CreatureGrapher.h
 	tools/braininavat/brainview.h)
 
 SET(OPENC2E_QT_UIS

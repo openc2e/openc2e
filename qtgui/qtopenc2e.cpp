@@ -24,6 +24,7 @@
 
 #include "AgentInjector.h"
 #include "BrainViewer.h"
+#include "CreatureGrapher.h"
 
 // Constructor which creates the main window.
 
@@ -127,6 +128,14 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	agentInjector = new AgentInjector();
 	brainViewer = new BrainViewer();
 	connect(this, SIGNAL(ticked()), brainViewer, SLOT(onTick()));
+
+	creatureGrapher = new CreatureGrapher(this);
+	connect(this, SIGNAL(ticked()), creatureGrapher, SLOT(onCreatureTick())); // TODO
+	creatureGrapherDock = new QDockWidget(this);
+	creatureGrapherDock->hide();
+	creatureGrapherDock->setWidget(creatureGrapher);
+	creatureGrapherDock->setWindowTitle(tr("Creature Grapher"));
+	toolsMenu->addAction(creatureGrapherDock->toggleViewAction());
 
 	/* Creatures menu */
 
@@ -281,5 +290,16 @@ void QtOpenc2e::newNorn() {
 	// TODO: set it dreaming
 
 	world.hand()->addCarried(a);
+}
+
+Creature *QtOpenc2e::getSelectedCreature() {
+	if (world.selectedcreature) {
+		CreatureAgent *a = dynamic_cast<CreatureAgent *>(world.selectedcreature.get());
+		if (a) {
+			return a->getCreature();
+		}
+	}
+
+	return 0;
 }
 
