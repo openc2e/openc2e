@@ -43,6 +43,10 @@ protected:
 	bool downfoot_left;
 	shared_ptr<class Room> downfootroom;
 
+	creatureAppearanceGene *appearancegenes[6];
+	std::map<unsigned int, creaturePoseGene *> posegenes;
+	std::map<unsigned int, creatureGaitGene *> gaitgenes;
+
 	shared_ptr<creaturesImage> images[17];
 	attFile att[17];
 
@@ -60,6 +64,11 @@ protected:
 	void snapDownFoot();
 	
 	void gaitTick();
+
+	void processGenes();
+
+	creatureAppearanceGene *appearanceGeneForPart(char p);
+	shared_ptr<creaturesImage> tintBodySprite(shared_ptr<creaturesImage>);
 
 public:
 	SkeletalCreature(unsigned char _family);

@@ -73,16 +73,11 @@ unsigned int cee_zorder[4][17] = {
 // needed for setPose(string) at least .. maybe cee_bodyparts should be indexed by letter
 unsigned int cee_lookup[17] = { 1, 0, 2, 7, 11, 3, 8, 12, 4, 9, 5, 10, 6, 13, 14, 15, 16 };
 
-std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed) {
-	// TODO: dataspecies is nonsense in c1
-	char _postfix[4] = "XXX";
-	_postfix[0] = '0' + dataspecies + ((sprite && creature->isFemale()) ? 4 : 0);
-	_postfix[1] = '0' + _stage;
-	if (engine.version == 1)
-		_postfix[2] = '0' + databreed;
+int SkeletalPartCount() {
+	if (world.gametype == "cv")
+		return 17;
 	else
-		_postfix[2] = 'a' + databreed;
-	return _postfix;
+		return 14;
 }
 
 SkeletalCreature::SkeletalCreature(unsigned char _family) : CreatureAgent(_family) {
@@ -109,11 +104,63 @@ SkeletalCreature::SkeletalCreature(unsigned char _family) : CreatureAgent(_famil
 	skeleton = new SkeletonPart(this);
 }
 
-int SkeletalPartCount() {
-	if (world.gametype == "cv")
-		return 17;
+SkeletalCreature::~SkeletalCreature() {
+	delete skeleton;
+}
+
+std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed) {
+	// TODO: dataspecies is nonsense in c1
+	char _postfix[4] = "XXX";
+	_postfix[0] = '0' + dataspecies + ((sprite && creature->isFemale()) ? 4 : 0);
+	_postfix[1] = '0' + _stage;
+	if (engine.version == 1)
+		_postfix[2] = '0' + databreed;
 	else
-		return 14;
+		_postfix[2] = 'a' + databreed;
+	return _postfix;
+}
+
+void SkeletalCreature::processGenes() {
+	shared_ptr<genomeFile> genome = creature->getGenome();
+
+	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (!creature->shouldProcessGene(*i)) continue;
+
+		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
+			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
+			if (x->part > 5) continue;
+			appearancegenes[x->part] = x;
+		} else if (typeid(*(*i)) == typeid(creaturePoseGene)) {
+			creaturePoseGene *x = (creaturePoseGene *)(*i);
+			posegenes[x->poseno] = x;
+		} else if (typeid(*(*i)) == typeid(creatureGaitGene)) {
+			creatureGaitGene *x = (creatureGaitGene *)(*i);
+			gaitgenes[x->drive] = x;
+		}
+	}
+}
+
+creatureAppearanceGene *SkeletalCreature::appearanceGeneForPart(char x) {
+	// TODO: tail madness?
+
+	if (x == 'a' || x >= 'o') {
+		// head
+		return appearancegenes[0];
+	} else if (x == 'b') {
+		// body
+		return appearancegenes[1];
+	} else if (x >= 'c' && x <= 'h') {
+		// legs
+		return appearancegenes[2];
+	} else if (x >= 'i' && x <= 'l') {
+		// arms
+		return appearancegenes[3];
+	} else if (x == 'm' || x == 'n') {
+		// tail
+		return appearancegenes[4];
+	}
+	
+	return 0;
 }
 
 // required for tinting, for now, until we get a saner image system in place
@@ -121,18 +168,6 @@ int SkeletalPartCount() {
 
 void SkeletalCreature::skeletonInit() {
 	//TODO: the exception throwing in here needs some more thought
-
-	creatureAppearanceGene *appearance[5] = { 0, 0, 0, 0, 0 };
-	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
-			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
-			if (x->part > 4)
-				throw creaturesException(boost::str(boost::format("SkeletalCreature didn't understand a gene with a part# of %d") % (int)x->part));
-			if (appearance[x->part])
-				throw creaturesException(boost::str(boost::format("SkeletalCreature got a duplicated gene for part# %d") % (int)x->part));
-			appearance[x->part] = x;
-		}
-	}
 
 	for (int i = 0; i < SkeletalPartCount(); i++) { // CV hackery
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
@@ -143,40 +178,21 @@ void SkeletalCreature::skeletonInit() {
 
 		// find the relevant gene
 		char x = cee_bodyparts[i].letter;
-		creatureAppearanceGene *partapp = 0;
-		if (x == 'a' || x >= 'o') {
-			// head
-			partapp = appearance[0];
-		} else if (x == 'b') {
-			// body
-			partapp = appearance[1];
-		} else if (x >= 'c' && x <= 'h') {
-			// legs
-			partapp = appearance[2];
-		} else if (x >= 'i' && x <= 'm') {
-			// arms
-			partapp = appearance[3];
-		} else if (x == 'n') {
-			// tail
-			partapp = appearance[4];
-		} else
-			// TODO: this exception won't necessary be handled, neither will the one below
-			throw creaturesException(boost::str(boost::format("SkeletalCreature doesn't understand appearance id '%c'") % (unsigned char)x));
+		creatureAppearanceGene *partapp = appearanceGeneForPart(x);
 
 		int partspecies, partvariant;
+		partspecies = creature->getGenus();
 		if (partapp) {
-			partspecies = partapp->species;
+			if (engine.version > 1) partspecies = partapp->species;
 			partvariant = partapp->variant;
 		} else {
-			// TODO: good defaults?
-			partspecies = creature->getGenus();
 			partvariant = creature->getVariant();
 		}
 
 		// find relevant sprite
 		int stage_to_try = creature->getStage();
 		while (stage_to_try > -1 && !images[i]) {
-			int spe = (engine.version == 1) ? 0 : partspecies;
+			int spe = partspecies;
 			while (spe > -1 && !images[i]) {
 				int var = partvariant;
 				/*while (var > -1 && !images[i]) {*/
@@ -190,15 +206,6 @@ void SkeletalCreature::skeletonInit() {
 		if (!images[i])
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % (int)creature->getStage()));
 		
-		// TODO: don't bother tinting if we don't need to
-		if (engine.version > 1) { // TODO: make this work for c1 :(
-			assert(dynamic_cast<duppableImage *>(images[i].get()));
-			s16Image *newimage = new s16Image();
-			((duppableImage *)images[i].get())->duplicateTo(newimage);
-			newimage->tint(creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
-			images[i] = shared_ptr<creaturesImage>(newimage);
-		}
-
 		// find relevant ATT data
 		stage_to_try = creature->getStage();
 		std::string attfilename;
@@ -222,13 +229,25 @@ void SkeletalCreature::skeletonInit() {
 		if (in.fail())
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't load body data for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % stage_to_try));
 		in >> att[i];
+		
+		images[i] = tintBodySprite(images[i]);
 	}
 
 	setPose(0);
 }
 
-SkeletalCreature::~SkeletalCreature() {
-	delete skeleton;
+shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(shared_ptr<creaturesImage> s) {
+	// TODO: don't bother tinting if we don't need to
+	
+	if (engine.version > 1) { // TODO: make this work for c1 :(
+		assert(dynamic_cast<duppableImage *>(s.get()));
+		s16Image *newimage = new s16Image();
+		((duppableImage *)s.get())->duplicateTo(newimage);
+		newimage->tint(creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
+		return shared_ptr<creaturesImage>(newimage);
+	}
+
+	return s;
 }
 
 void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
@@ -560,49 +579,29 @@ void SkeletalCreature::setPose(std::string s) {
 }
 
 void SkeletalCreature::setPoseGene(unsigned int poseno) {
-	/* TODO: this sets by sequence, now, not the 'poseno' inside the gene.
-	 * this is what the POSE caos command does. is this right? - fuzzie */
-	//creaturePoseGene *g = (creaturePoseGene *)creature->getGenome()->getGene(2, 3, poseno);
-	
-	// TODO: upon second thought i think poseno is good - fuzzie
-	// TODO: this needs thought, darnit
-	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		//if ((*i)->header.switchontime != creature->getStage()) continue;
+	std::map<unsigned int, creaturePoseGene *>::iterator i = posegenes.find(poseno);
+	if (i == posegenes.end()) return; // TODO: is there a better behaviour here?
 
-		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
-			creaturePoseGene *g = (creaturePoseGene *)(*i);
-			if (g->poseno == poseno) {
-				gaitgene = 0;
-				walking = false; // TODO: doesn't belong here, does it? really the idea of a 'walking' bool is horrid
-				setPose(g->getPoseString());
-				return;
-			}
-		}
-	}
+	creaturePoseGene *g = i->second;
+	assert(g->poseno == poseno);
+	gaitgene = 0;
+	walking = false; // TODO: doesn't belong here, does it? really the idea of a 'walking' bool is horrid
+	setPose(g->getPoseString());
 }
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
-	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		//if ((*i)->header.switchontime != creature->getStage()) continue;
+	std::map<unsigned int, creatureGaitGene *>::iterator i = gaitgenes.find(gaitdrive);
+	if (i == gaitgenes.end()) return; // TODO: is there a better behaviour here?
 
-		if (typeid(*(*i)) == typeid(creatureGaitGene)) {
-			creatureGaitGene *g = (creatureGaitGene *)(*i);
-			if (g->drive == gaitdrive) {
-				// If we're picking a new gait..
-				if (g != gaitgene) {
-					// .. reset our gait details to default.
-					// TODO: shouldn't we set an animation or something here, to simplify the way things work?
-					gaitgene = g;
-					gaiti = 0;
-					skeleton->animation.clear();
-				}
-				return;
-			}
-		}
-	}
+	creatureGaitGene *g = i->second;
+	assert(g->drive == gaitdrive);
 
-	// explode!
-	gaitgene = 0;
+	if (g == gaitgene) return;
+
+	// reset our gait details to default
+	gaitgene = g;
+	gaiti = 0;
+	skeleton->animation.clear();
 }
 
 void SkeletalCreature::tick() {
@@ -667,19 +666,14 @@ void SkeletalCreature::gaitTick() {
 		gaitTick();
 		return;
 	}
-	creaturePoseGene *poseg = 0;
-	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
-		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
-		if (typeid(*(*i)) == typeid(creaturePoseGene)) {
-			creaturePoseGene *g = (creaturePoseGene *)(*i);
-			if (g->poseno == pose)
-				poseg = g;
-			
-		}
+	std::map<unsigned int, creaturePoseGene *>::iterator i = posegenes.find(pose);
+	if (i != posegenes.end()) {
+		creaturePoseGene *poseg = i->second;
+		assert(poseg->poseno == pose);
+		setPose(poseg->getPoseString());
 	}
-	assert(poseg); // TODO: don't assert. caos_assert? but this means a bad genome file, always.
-	setPose(poseg->getPoseString());
+
 	gaiti++; if (gaiti > 7) gaiti = 0;
 }
 
@@ -728,12 +722,14 @@ void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset)
 void SkeletalCreature::finishInit() {
 	Agent::finishInit();
 
+	processGenes();
 	skeletonInit();
 }
 
 void SkeletalCreature::creatureAged() {
 	// TODO: adjust position to account for any changes..
 
+	processGenes();
 	skeletonInit();
 }
 
