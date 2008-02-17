@@ -321,8 +321,17 @@ void c2eCreature::tick() {
 	// TODO: should we tick some things even if dead?
 	if (!alive) return;
 
+	// TODO: update muscleenergy
+
 	senses[0] = 1.0f; // always-on
+	senses[1] = (asleep ? 1.0f : 0.0f); // asleep
+	// space for old C2 senses: hotness, coldness, light level
+	senses[5] = 0.0f; // crowedness (TODO)
+	// space for old C2 senses: radiation, time of day, season
 	senses[9] = 1.0f; // air quality (TODO)
+	senses[10] = 0.0f; // steepness of upcoming slope (up) (TODO)
+	senses[11] = 0.0f; // steepness of upcoming slope (down) (TODO)
+	// space for old C2 senses: oncoming wind, wind from behind
 
 	tickBrain();
 	tickBiochemistry();
