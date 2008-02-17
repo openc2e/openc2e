@@ -134,6 +134,8 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	creatureGrapherDock = new QDockWidget(this);
 	creatureGrapherDock->hide();
 	creatureGrapherDock->setWidget(creatureGrapher);
+	creatureGrapherDock->setFloating(true);
+	creatureGrapherDock->resize(QSize(300, 300));
 	creatureGrapherDock->setWindowTitle(tr("Creature Grapher"));
 	toolsMenu->addAction(creatureGrapherDock->toggleViewAction());
 
