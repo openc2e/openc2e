@@ -108,10 +108,9 @@ SkeletalCreature::~SkeletalCreature() {
 	delete skeleton;
 }
 
-std::string SkeletalCreature::dataString(unsigned int _stage, bool sprite, unsigned int dataspecies, unsigned int databreed) {
-	// TODO: dataspecies is nonsense in c1
+std::string SkeletalCreature::dataString(unsigned int _stage, bool tryfemale, unsigned int dataspecies, unsigned int databreed) {
 	char _postfix[4] = "XXX";
-	_postfix[0] = '0' + dataspecies + ((sprite && creature->isFemale()) ? 4 : 0);
+	_postfix[0] = '0' + dataspecies + (tryfemale ? 4 : 0);
 	_postfix[1] = '0' + _stage;
 	if (engine.version == 1)
 		_postfix[2] = '0' + databreed;
@@ -167,7 +166,8 @@ creatureAppearanceGene *SkeletalCreature::appearanceGeneForPart(char x) {
 #include "c16Image.h"
 
 void SkeletalCreature::skeletonInit() {
-	//TODO: the exception throwing in here needs some more thought
+	// TODO: the exception throwing in here needs some more thought
+	// TODO: if we throw an exception when we need to kill the creature off, else segfault :/
 
 	for (int i = 0; i < SkeletalPartCount(); i++) { // CV hackery
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
@@ -189,45 +189,50 @@ void SkeletalCreature::skeletonInit() {
 			partvariant = creature->getVariant();
 		}
 
+		int spe = partspecies;
+
+		/*
+		 * In order to find a sprite, we try our current stage first, then the stages below us,
+		 * and then we try again with all lower variants, and if that fails for female sprites
+		 * then we try the whole thing again but trying to find a male sprite.
+		 */
+
 		// find relevant sprite
-		int stage_to_try = creature->getStage();
-		while (stage_to_try > -1 && !images[i]) {
-			int spe = partspecies;
-			while (spe > -1 && !images[i]) {
-				int var = partvariant;
-				/*while (var > -1 && !images[i]) {*/
-					images[i] = world.gallery.getImage(x + dataString(stage_to_try, true, spe, var));
-					/*if (!images[i]) var--;
-				}*/
-				if (!images[i]) spe--;
+		bool tryfemale = creature->isFemale();
+		while (!images[i]) {
+			int var = partvariant;
+			while (var > -1 && !images[i]) {
+				int stage_to_try = creature->getStage();
+				while (stage_to_try > -1 && !images[i]) {
+					images[i] = world.gallery.getImage(x + dataString(stage_to_try, tryfemale, spe, var));
+					stage_to_try--;
+				}
+				var--;
 			}
-			if (!images[i]) stage_to_try--;
+			if (!tryfemale) break;
+			tryfemale = false;
 		}
 		if (!images[i])
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % (int)creature->getStage()));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for part %c of species %d, variant %d, stage %d") % x % (int)partspecies % (int)partvariant % (int)creature->getStage()));
 		
 		// find relevant ATT data
-		stage_to_try = creature->getStage();
 		std::string attfilename;
-		while (stage_to_try > -1 && attfilename.empty()) {
-			int spe = (engine.version == 1) ? 0 : partspecies;
-			while (spe > -1 && attfilename.empty()) {
-				int var = partvariant;
-				while (var > -1 && attfilename.empty()) {
-					attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, spe, var) + ".att");
-					if (attfilename.empty()) var--;
-				}
-				if (attfilename.empty()) spe--;
+		int var = partvariant;
+		while (var > -1 && attfilename.empty()) {
+			int stage_to_try = creature->getStage();
+			while (stage_to_try > -1 && attfilename.empty()) {
+				attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, spe, var) + ".att");
+				stage_to_try--;
 			}
-			if (attfilename.empty()) stage_to_try--;
+			var--;
 		}
 		if (attfilename.empty())
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % creature->getStage()));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find body data for part %c of species %d, variant %d, stage %d") % x % (int)partspecies % (int)partvariant % creature->getStage()));
 
 		// load ATT file
 		std::ifstream in(attfilename.c_str());
 		if (in.fail())
-			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't load body data for species %d, variant %d, stage %d") % (int)partspecies % (int)partvariant % stage_to_try));
+			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't load body data for part %c of species %d, variant %d, stage %d (tried file %s)") % x % (int)partspecies % (int)partvariant % creature->getStage() % attfilename));
 		in >> att[i];
 		
 		images[i] = tintBodySprite(images[i]);
@@ -742,7 +747,7 @@ std::string SkeletalCreature::getFaceSpriteName() {
 		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
 			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
 			if (x->part == 0) {
-				return std::string("a") + dataString(0, true, x->species, x->variant);
+				return std::string("a") + dataString(0, creature->isFemale(), x->species, x->variant);
 			}
 		}
 	}
