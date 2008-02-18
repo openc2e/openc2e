@@ -26,11 +26,17 @@
 #include "BrainViewer.h"
 #include "CreatureGrapher.h"
 
+#include "Creature.h"
+#include "SkeletalCreature.h"
+#include "PointerAgent.h"
+
 // Constructor which creates the main window.
 
 QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	viewport = new openc2eView(this, backend);
 	setCentralWidget(viewport);
+
+	connect(this, SIGNAL(creatureChanged()), this, SLOT(onCreatureChange()));
 
 	// idle timer
 	// TODO: should prbly have an every-X-seconds timer or a background thread to do this
@@ -142,6 +148,7 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	/* Creatures menu */
 
 	creaturesMenu = menuBar()->addMenu(tr("&Creatures"));
+	connect(creaturesMenu, SIGNAL(aboutToShow()), this, SLOT(updateCreaturesMenu()));
 
 	/* Help menu */
 
@@ -158,12 +165,94 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 QtOpenc2e::~QtOpenc2e() {
 }
 
+monikerData &monikerDataFor(AgentRef a) {
+	shared_ptr<class genomeFile> g = a->getSlot(0);
+	assert(g);
+	std::string moniker = world.history.findMoniker(g);
+	return world.history.getMoniker(moniker);
+}
+
+std::string creatureNameFor(AgentRef a) {
+	return monikerDataFor(a).name;
+}
+
+void QtOpenc2e::selectCreature() {
+	QObject *src = sender();
+	QAction *srcaction = dynamic_cast<QAction *>(src);
+	assert(srcaction);
+
+	Agent *a = (Agent *)srcaction->data().value<void *>();
+
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		boost::shared_ptr<Agent> p = *i;
+		if (!p) continue; // grr, but needed
+
+		if (a == p.get()) {
+			world.selectCreature(p);
+			return;
+		}
+	}
+
+	// looks like the creature disappeared from under us..
+}
+
+void QtOpenc2e::updateCreaturesMenu() {
+	creaturesMenu->clear();
+
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		boost::shared_ptr<Agent> p = *i;
+		if (!p) continue; // grr, but needed
+
+		CreatureAgent *a = dynamic_cast<CreatureAgent *>(p.get());
+		if (a) {
+			// TODO: add breed?
+			std::string creaturename = creatureNameFor(a);
+			if (creaturename.empty()) creaturename = "<Unnamed>";
+			creaturename += std::string(" (") + (a->getCreature()->isFemale() ? "Female" : "Male") + ")";
+
+			// create a new action with menu as parent, so it'll be destroyed on clear()
+			QAction *creatureSelectAct = new QAction(creaturename.c_str(), creaturesMenu);
+			creatureSelectAct->setData(QVariant::fromValue((void *)a));
+
+			creatureSelectAct->setCheckable(true);
+			if (world.selectedcreature == p) creatureSelectAct->setChecked(true);
+			connect(creatureSelectAct, SIGNAL(triggered()), this, SLOT(selectCreature()));
+			
+			if (monikerDataFor(a).getStatus() != borncreature)
+				creatureSelectAct->setDisabled(true);
+
+			creaturesMenu->addAction(creatureSelectAct);
+		}
+	}
+
+	if (creaturesMenu->isEmpty()) {
+		QAction *dummyAct = new QAction("<none available>", creaturesMenu);
+		dummyAct->setEnabled(false);
+		creaturesMenu->addAction(dummyAct);
+	}
+}
+
+void QtOpenc2e::onCreatureChange() {
+	std::string titlebar = engine.getGameName() + " - openc2e (development build)";
+
+	if (world.selectedcreature) {
+		oldcreaturename = creatureNameFor(world.selectedcreature);
+
+		if (oldcreaturename.empty())
+			titlebar += " - <Unnamed>";
+		else
+			titlebar += " - " + oldcreaturename;
+	}
+
+	setWindowTitle(titlebar.c_str());	
+}
+
 void QtOpenc2e::tick() {
 	// set refreshdisplay occasionally, for updates when dorendering is false
 	if (world.worldtickcount % world.ticktime == 0) // every 10 in-world seconds, with default times
 		engine.refreshdisplay = true;
 
-	engine.tick();
+	bool didtick = engine.tick();
 
 	int y = world.camera.getY();
 	int x = world.camera.getX();
@@ -173,8 +262,20 @@ void QtOpenc2e::tick() {
 	
 	if (engine.done) close();
 
-	// TODO: only on engine.tick() success?
-	emit ticked();
+	if (didtick) {
+		if (world.selectedcreature != selectedcreature) {
+			selectedcreature = world.selectedcreature;
+			emit creatureChanged();
+		} else if (world.selectedcreature) {
+			// pick up name changes
+			if (creatureNameFor(world.selectedcreature) != oldcreaturename)
+				onCreatureChange();
+		}
+		
+		// TODO: emit creatureTicked() if necessary
+
+		emit ticked();
+	}
 
 	if (viewport->needsRender()) {
 		viewport->viewport()->repaint();
@@ -245,10 +346,6 @@ void QtOpenc2e::togglePause() {
 void QtOpenc2e::toggleMute() {
 	engine.audio->setMute(!engine.audio->isMuted());
 }
-
-#include "Creature.h"
-#include "SkeletalCreature.h"
-#include "PointerAgent.h"
 
 #undef slots
 void QtOpenc2e::newNorn() {

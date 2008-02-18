@@ -19,6 +19,7 @@
 
 #include <QMainWindow>
 #include <boost/shared_ptr.hpp>
+#include "AgentRef.h"
 
 class QtOpenc2e : public QMainWindow {
 	Q_OBJECT
@@ -37,6 +38,9 @@ signals:
 private slots:
 	void tick();
 
+	void onCreatureChange();
+	void updateCreaturesMenu();
+	void selectCreature();
 	void updateMenus();
 	
 	void about();
@@ -67,6 +71,9 @@ private:
 	class QDockWidget *creatureGrapherDock;
 	
 	class openc2eView *viewport;
+
+	AgentRef selectedcreature;
+	std::string oldcreaturename;
 };
 
 #endif
