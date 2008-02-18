@@ -637,6 +637,14 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 		world.data_directories.push_back(datadir);
 	}
 
+	// make a vague attempt at blacklisting some characters inside the gamename
+	// (it's used in directory names, registry keys, etc)
+	std::string invalidchars = "\\/:*?\"<>|";
+	for (unsigned int i = 0; i < invalidchars.size(); i++) {
+		if (gamename.find(invalidchars[i]) != gamename.npos)
+			throw creaturesException(std::string("The character ") + invalidchars[i] + " is not valid in a gamename.");
+	}
+
 	return true;
 }
 
