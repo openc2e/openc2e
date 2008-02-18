@@ -237,6 +237,8 @@ public:
 	unsigned int getAttributes() const { return attr.getInt(); }
 
 	void playAudio(std::string filename, bool controlled, bool loop);
+
+	shared_ptr<class genomeFile> getSlot(unsigned int s) { return slots[s]; }
 };
 
 class LifeAssert {
