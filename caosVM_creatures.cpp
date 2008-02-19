@@ -1169,8 +1169,10 @@ void caosVM::c_NEW_CREA_c1() {
 
 	a->setCreature(c);
 	a->finishInit();
+
 	a->slots[0] = genome;
 	world.newMoniker(genome, realmoniker, a);
+	world.history.getMoniker(world.history.findMoniker(genome)).moveToCreature(a);
 
 	setTarg(a);
 }

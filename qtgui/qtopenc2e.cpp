@@ -385,8 +385,11 @@ void QtOpenc2e::newNorn() {
 
 	a->slots[0] = genome;
 	world.newMoniker(genome, genomefile, a);
+	world.history.getMoniker(world.history.findMoniker(genome)).moveToCreature(a);
 
 	// TODO: set it dreaming
+	
+	c->born();
 
 	world.hand()->addCarried(a);
 }
