@@ -18,7 +18,6 @@
  */
 
 #include "PointerAgent.h"
-#include "c16Image.h"
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"

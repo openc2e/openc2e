@@ -18,11 +18,6 @@
  */
 
 #include "SimpleAgent.h"
-#include <string>
-#include <fstream>
-#include <iostream>
-#include "c16Image.h"
-#include "openc2e.h"
 
 SimpleAgent::SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 			 std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
