@@ -590,11 +590,16 @@ void caosVM::c_ANIM_c2() {
 	p->animation.clear();
 
 	for (unsigned int i = 0; i < animstring.size(); i++) {
-		if (animstring[i] == 'R')
+		if (animstring[i] == 'R') {
 			p->animation.push_back(255);
-		else {
-			caos_assert(animstring[i] >= 48 && animstring[i] <= 57);
+		} else if (animstring[i] >= 48 && animstring[i] <= 57) {
 			p->animation.push_back(animstring[i] - 48);
+		} else if (animstring[i] >= 97 && animstring[i] <= 122) {
+			// TODO: c1 grendel eggs have 'a' at the end of their animation strings, this is an untested attempt to handle that
+			p->animation.push_back(animstring[i] - 97);
+		} else {
+			p->animation.clear();
+			throw creaturesException(std::string("old-style animation string contained '") + animstring[i] + "', which we didn't understand");
 		}
 	}
 
