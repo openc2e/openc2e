@@ -21,10 +21,10 @@
 #define _COMPOUNDAGENT_H
 
 #include "Agent.h"
-#include "creaturesImage.h"
 #include <map>
 #include <string>
 #include "CompoundPart.h"
+#include "endianlove.h"
 
 struct Hotspot {
 	int left, top, right, bottom;

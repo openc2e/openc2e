@@ -75,6 +75,7 @@ OPENC2E_CORE = \
 	fileSwapper.o \
 	genomeFile.o \
 	historyManager.o \
+	imageManager.o \
 	lex.c2.o \
 	lex.mng.o \
 	lexutil.o \

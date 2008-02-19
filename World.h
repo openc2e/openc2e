@@ -27,6 +27,7 @@
 #include "CompoundPart.h"
 #include "prayManager.h"
 #include "historyManager.h"
+#include "imageManager.h"
 #include <set>
 #include <map>
 #include <boost/filesystem/path.hpp>

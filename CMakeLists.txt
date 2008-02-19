@@ -84,6 +84,7 @@ SET(OPENC2E_CORE
 	fileSwapper.cpp
 	genomeFile.cpp
 	historyManager.cpp
+	imageManager.cpp
 	${GEN}/lex.c2.cpp
 	${GEN}/lex.mng.cpp
 	lexutil.cpp

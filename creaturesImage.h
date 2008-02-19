@@ -3,7 +3,7 @@
  *  openc2e
  *
  *  Created by Alyssa Milburn on Sat May 22 2004.
- *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
+ *  Copyright (c) 2004-2008 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,8 @@
 #define _CREATURESIMAGE_H
 
 #include <string>
-#include <map>
 #include <fstream>
-#include "endianlove.h"
 #include <cassert>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-
-using boost::shared_ptr;
 
 class creaturesImage {
 private:
@@ -61,14 +55,6 @@ public:
 	
 	friend class fileSwapper;
 	friend class c16Image; // so duplicateTo can create a s16Image as required
-};
-
-class imageManager {
-protected:
-	std::map<std::string, boost::weak_ptr<creaturesImage> > images;
-
-public:
-	shared_ptr<creaturesImage> getImage(std::string name);
 };
 
 #endif

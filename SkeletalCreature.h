@@ -16,7 +16,6 @@
  *  Lesser General Public License for more details.
  *
  */
-#include "creaturesImage.h"
 #include "attFile.h"
 
 // for enum lifestage (0 to 6)
@@ -24,6 +23,8 @@
 
 #include "openc2e.h"
 #include "CreatureAgent.h"
+
+class creaturesImage;
 
 class SkeletalCreature : public CreatureAgent {
 protected:

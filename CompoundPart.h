@@ -21,13 +21,13 @@
 #define _COMPOUNDPART_H
 
 #include "openc2e.h"
-#include "creaturesImage.h"
 #include "renderable.h"
 #include <map>
 #include <string>
 #include <vector>
 
 class Agent;
+class creaturesImage;
 
 struct partzorder {
 	bool operator()(const class CompoundPart *s1, const class CompoundPart *s2) const;
@@ -99,8 +99,8 @@ public:
 	unsigned int getBase() { return base; }
 	unsigned int getCurrentSprite() { return spriteno; }
 	unsigned int getFirstImg() { return firstimg; }
-	unsigned int getWidth() { return sprite->width(getCurrentSprite()); }
-	unsigned int getHeight() { return sprite->height(getCurrentSprite()); }
+	unsigned int getWidth();
+	unsigned int getHeight();
 	void setFrameNo(unsigned int f);
 	void setPose(unsigned int p);
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }

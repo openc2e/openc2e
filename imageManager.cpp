@@ -1,0 +1,164 @@
+/*
+ *  imageManager.cpp
+ *  openc2e
+ *
+ *  Created by Alyssa Milburn on Sun Jun 06 2004.
+ *  Copyright (c) 2004-2008 Alyssa Milburn. All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ */
+
+#include "imageManager.h"
+#include "c16Image.h"
+#include "sprImage.h"
+#include "blkImage.h"
+#include "openc2e.h"
+#include "World.h"
+#include "Engine.h"
+#include "fileSwapper.h"
+
+#include "PathResolver.h"
+
+#include <iostream>
+#include <fstream>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+
+using namespace boost::filesystem;
+
+enum filetype { blk, s16, c16, spr };
+
+bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
+	path cachefile, realfile;
+	std::string cachename;
+	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
+	std::string basename = fname; basename.erase(basename.end() - 4, basename.end()); 
+
+	// work out where the real file should be
+	switch (ft) {
+		case blk:
+			realfile = path(world.findFile(std::string("/Backgrounds/") + fname), native); break;
+
+		case spr:
+		case c16:
+		case s16:
+			realfile = path(world.findFile(std::string("/Images/") + fname), native); break;
+	}
+
+	// if it doesn't exist, too bad, give up.
+	if (!exists(realfile)) return false;
+	
+	// work out where the cached file should be
+	cachename = engine.storageDirectory().native_directory_string() + "/" + fname;
+	if (ft == c16) { // TODO: we should really stop the caller from appending .s16/.c16
+		cachename.erase(cachename.end() - 4, cachename.end());
+		cachename.append(".s16");
+	}
+
+#ifdef __C2E_BIGENDIAN
+	if (ft != spr)
+		cachename = cachename + ".big";
+#endif
+	cachefile = path(cachename, native);
+
+	if (resolveFile(cachefile)) {
+		// TODO: check for up-to-date-ness
+		in->clear();
+		in->mmapopen(cachefile.native_file_string());
+		if (ft == c16) ft = s16;
+		goto done;
+	}
+	//std::cout << "couldn't find cached version: " << cachefile.native_file_string() << std::endl;
+
+	in->clear();
+	in->mmapopen(realfile.native_file_string());
+#ifdef __C2E_BIGENDIAN
+	if (in->is_open() && (ft != spr)) {
+		fileSwapper f;
+		switch (ft) {
+			case blk:
+				f.convertblk(realfile.native_file_string(), cachefile.native_file_string());
+				break;
+			case s16:
+				f.converts16(realfile.native_file_string(), cachefile.native_file_string());
+				break;
+			case c16:
+				//cachefile = change_extension(cachefile, "");
+				//cachefile = change_extension(cachefile, ".s16.big");
+				f.convertc16(realfile.native_file_string(), cachefile.native_file_string());
+				ft = s16;
+				break;
+			default:
+				return true; // TODO: exception?
+		}
+		in->close(); // TODO: close the mmap too! how?
+		if (!exists(cachefile)) return false; // TODO: exception?
+		in->mmapopen(cachefile.native_file_string());
+	}
+#endif
+done:
+	if (in->is_open()) {
+		switch (ft) {
+			case blk: img = shared_ptr<creaturesImage>(new blkImage(in)); break;
+			case c16: img = shared_ptr<creaturesImage>(new c16Image(in)); break; // this should never happen, actually, once we're done
+			case s16: img = shared_ptr<creaturesImage>(new s16Image(in)); break;
+			case spr: img = shared_ptr<creaturesImage>(new sprImage(in)); break;
+		}
+		img->name = basename;
+	}
+	return in->is_open();
+}
+
+/*
+ * Retrieve an image for rendering use. To retrieve a sprite, pass the name without
+ * extension. To retrieve a background, pass the full filename (ie, with .blk).
+ */
+shared_ptr<creaturesImage> imageManager::getImage(std::string name) {
+	if (name.empty()) return shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
+
+	// step one: see if the image is already in the gallery
+	std::map<std::string, boost::weak_ptr<creaturesImage> >::iterator i = images.find(name);
+	if (i != images.end() && i->second.lock()) {
+		return i->second.lock();
+	}
+
+	// step two: try opening it in .c16 form first, then try .s16 form
+	mmapifstream *in = new mmapifstream();
+	shared_ptr<creaturesImage> img;
+
+	if (!tryOpen(in, img, name + ".s16", s16)) {
+		if (!tryOpen(in, img, name + ".c16", c16)) {
+			if (!tryOpen(in, img, name + ".spr", spr)) {
+				bool lasttry = tryOpen(in, img, name, blk);
+				if (!lasttry) {
+					std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
+					return shared_ptr<creaturesImage>();
+				}
+				images[name] = img;
+			} else {
+				images[name] = img;
+			}
+		} else {
+			images[name] = img;
+		}
+	} else {
+		images[name] = img;
+	}
+	
+	in->close(); // doesn't close the mmap, which we still need :)
+
+	return img;
+}
+
+/* vim: set noet: */

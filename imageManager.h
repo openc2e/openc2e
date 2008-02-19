@@ -1,8 +1,8 @@
 /*
- *  creaturesImage.cpp
+ *  imageManager.h
  *  openc2e
  *
- *  Created by Alyssa Milburn on Sun Jun 06 2004.
+ *  Created by Alyssa Milburn on Sat May 22 2004.
  *  Copyright (c) 2004-2008 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -17,4 +17,22 @@
  *
  */
 
+#ifndef _IMAGEMANAGER_H
+#define _IMAGEMANAGER_H
+
+#include <map>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+
+class creaturesImage;
+
+class imageManager {
+protected:
+	std::map<std::string, boost::weak_ptr<creaturesImage> > images;
+
+public:
+	boost::shared_ptr<creaturesImage> getImage(std::string name);
+};
+
+#endif
 /* vim: set noet: */

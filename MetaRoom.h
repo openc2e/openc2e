@@ -20,11 +20,12 @@
 #ifndef _C2E_METAROOM_H
 #define _C2E_METAROOM_H
 
-#include "blkImage.h"
 #include "openc2e.h"
 #include <string>
 #include <vector>
 #include <map>
+
+class creaturesImage;
 
 class MetaRoom {
 protected:

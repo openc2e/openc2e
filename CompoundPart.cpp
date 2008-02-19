@@ -165,6 +165,14 @@ void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	origsprite = sprite = spr;
 }
 
+unsigned int SpritePart::getWidth() {
+	return sprite->width(getCurrentSprite());
+}
+
+unsigned int SpritePart::getHeight() {
+	return sprite->height(getCurrentSprite());
+}
+
 unsigned int CompoundPart::getZOrder() const {
 	return parent->getZOrder() + zorder;
 }

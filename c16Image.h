@@ -20,6 +20,7 @@
 #include "creaturesImage.h"
 #include <istream>
 #include "mmapifstream.h"
+#include "endianlove.h"
 
 class duppableImage : public creaturesImage {
 public:

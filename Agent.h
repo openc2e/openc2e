@@ -20,7 +20,6 @@
 #ifndef __AGENT_H
 #define __AGENT_H
 
-#include "creaturesImage.h"
 #include "caosVar.h"
 #include "AgentRef.h"
 #include "CompoundPart.h"

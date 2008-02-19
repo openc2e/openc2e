@@ -22,6 +22,7 @@
 
 #include "creaturesImage.h"
 #include "mmapifstream.h"
+#include "endianlove.h"
 
 class blkImage : public creaturesImage {
 private:

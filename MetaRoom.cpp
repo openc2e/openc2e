@@ -20,7 +20,7 @@
 #include "MetaRoom.h"
 #include "Room.h"
 #include "World.h"
-#include "creaturesImage.h"
+#include "blkImage.h"
 #include <assert.h>
 #include "Backend.h"
 

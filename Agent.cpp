@@ -22,14 +22,13 @@
 #include "World.h"
 #include "Engine.h"
 #include <iostream>
-#include <sstream>
 #include "caosVM.h"
-#include "Backend.h"
 #include "AudioBackend.h"
 #include <boost/format.hpp>
 #include "Room.h"
 #include "Vehicle.h"
 #include "AgentHelpers.h"
+#include "creaturesImage.h"
 
 void Agent::core_init() {
 	initialized = false;

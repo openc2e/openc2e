@@ -21,6 +21,7 @@
 #include "SDL_gfxPrimitives.h"
 #include "openc2e.h"
 #include "Engine.h"
+#include "creaturesImage.h"
 
 SDLBackend *g_backend;
 
