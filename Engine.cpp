@@ -145,6 +145,7 @@ void Engine::update() {
 		refreshdisplay = false;	
 
 		if (backend->selfRender()) {
+			// TODO: this makes race/pace hilariously inaccurate, since render time isn't included
 			backend->requestRender();
 		} else {
 			world.drawWorld();
@@ -654,13 +655,19 @@ bool Engine::initialSetup() {
 	// autodetect gametype if necessary
 	if (world.gametype.empty()) {
 		std::cout << "Warning: No gametype specified, ";
-		// TODO: is this sane? what about CV?
+		// TODO: is this sane? especially unsure about about.exe
 		if (!world.findFile("Creatures.exe").empty()) {
 			std::cout << "found Creatures.exe, assuming C1 (c1)";
 			world.gametype = "c1";
 		} else if (!world.findFile("Creatures2.exe").empty()) {
 			std::cout << "found Creatures2.exe, assuming C2 (c2)";
 			world.gametype = "c2";
+		} else if (!world.findFile("Sea-Monkeys.ico").empty()) {
+			std::cout << "found Sea-Monkeys.ico, assuming Sea-Monkeys (sm)";
+			world.gametype = "sm";
+		} else if (!world.findFile("about.exe").empty()) {
+			std::cout << "found about.exe, assuming CA, CP or CV (cv)";
+			world.gametype = "cv";
 		} else {
 			std::cout << "assuming C3/DS (c3)";
 			world.gametype = "c3";
@@ -684,7 +691,7 @@ bool Engine::initialSetup() {
 		version = 3;
 		world.autostop = !world.autostop;
 	} else if (world.gametype == "sm") {
-		if (gamename.empty()) gamename = "Sea Monkeys";
+		if (gamename.empty()) gamename = "Sea-Monkeys";
 		version = 3;
 	} else
 		throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % world.gametype));

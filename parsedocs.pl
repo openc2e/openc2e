@@ -5,7 +5,7 @@ use warnings;
 
 use YAML;
 
-my @variants = qw(c3 cv);
+my @variants = qw(c3 cv sm);
 
 $SIG{__WARN__} = sub { die $_[0] };
 
