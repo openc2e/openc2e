@@ -16,9 +16,11 @@ Icon "gamefind.ico"
 
 Var dir
 Var plainc3
+Var plainc3exist
 Var plainds
 Var edynn
 Var exodc3
+Var exodc3exist
 Var exodds
 Var ca
 Var cp
@@ -75,6 +77,7 @@ Section
 	  DetailPrint "Found Creatures 3 (original)."
 		ReadRegStr $plainc3 HKEY_LOCAL_MACHINE "Software\CyberLife Technology\Creatures 3" "Main Directory"
 		StrCpy $R1 "$plainc3" 1 -1
+		StrCpy $plainc3exist "1"
 		StrCmp "$R1" "\" trim1
 		Goto make1
 		trim1:
@@ -99,6 +102,12 @@ Section
 		StrCpy $plainds "$plainds" -1
 		make2:
 		CreateShortCut "$SMPROGRAMS\openc2e\Games\Docking Station.lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$plainds" --autokill'
+		${If} $plainc3exist == "1"
+			DetailPrint "Creating Docked shortcut for C3/DS (original)."
+		  CreateShortCut "$SMPROGRAMS\openc2e\Games\C3 + DS (Docked).lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$plainc3" -d "$plainds" --autokill'
+		${Else}
+		  Delete "$SMPROGRAMS\openc2e\Games\C3 + DS (Docked).lnk"
+		${EndIf}
 	${Else}
 		DetailPrint "Could not find Docking Station (original)."
 	  Delete "$SMPROGRAMS\openc2e\Docking Station.lnk"
@@ -129,6 +138,7 @@ Section
 	  DetailPrint "Found Creatures 3 (Exodus)."
 		ReadRegStr $exodc3 HKEY_LOCAL_MACHINE "Software\Gameware Development\Creatures 3" "Main Directory"
 		StrCpy $R1 "$exodc3" 1 -1
+		StrCpy $exodc3exist "1"
 		StrCmp "$R1" "\" trim4
 		Goto make4
 		trim4:
@@ -153,6 +163,12 @@ Section
 		StrCpy $exodds "$exodds" -1
 		make5:
 		CreateShortCut "$SMPROGRAMS\openc2e\Games\Docking Station (Exodus).lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$exodds" --autokill'
+		${If} $exodc3exist == "1"
+			DetailPrint "Creating Docked shortcut for C3/DS (Exodus)."
+		  CreateShortCut "$SMPROGRAMS\openc2e\Games\C3 + DS Exodus (Docked).lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$plainc3" -d "$plainds" --autokill'
+		${Else}
+		  Delete "$SMPROGRAMS\openc2e\Games\C3 + DS Exodus (Docked).lnk"
+		${EndIf}
 	${Else}
 	  DetailPrint "Could not find Docking Station (Exodus)."
 	  Delete "$SMPROGRAMS\openc2e\Games\Docking Station (Exodus).lnk"

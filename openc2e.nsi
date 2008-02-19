@@ -3,7 +3,7 @@
 !define APPNAMEANDVERSION "openc2e (development build)"
 
 ; Development build revision
-!define REVISION "1511"
+!define REVISION "1707"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
@@ -20,8 +20,6 @@ SetCompressor lzma
 ; Icons
 !define MUI_ICON "instal.ico"
 !define MUI_UNICON "uninst.ico"
-
-!define MUI_TEXT "LOL WUT"
 
 !define MUI_ABORTWARNING
 
