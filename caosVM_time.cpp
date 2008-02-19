@@ -29,9 +29,9 @@
 
  return speed factor of last ten ticks.
  
- < 1.0 = engine is ticking slower than BUZZ rating. > 1.0 = engine is ticking faster.
+ < 1.0 = engine is ticking faster than BUZZ rating. > 1.0 = engine is ticking slower.
 
- You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is below 1.0.
+ You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is above 1.0.
 */
 void caosVM::v_PACE() {
 	result.setFloat(world.pace);
