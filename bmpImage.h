@@ -25,9 +25,17 @@
 #include "endianlove.h"
 
 class bmpImage : public creaturesImage {
+protected:
+	uint32 biWidth, biHeight;
+	void *bmpdata;
+
+	void freeData();
+
 public:
 	bmpImage(mmapifstream *, std::string n);
 	~bmpImage();
+
+	void setBlockSize(unsigned int blockwidth, unsigned int blockheight);
 };
 
 #endif
