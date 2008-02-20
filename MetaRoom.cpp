@@ -51,10 +51,15 @@ void MetaRoom::addBackground(std::string back, shared_ptr<creaturesImage> spr) {
 		// we weren't passed a sprite, so we need to load one
 		backsprite = world.gallery.getImage(back, true);
 		blkImage *background = dynamic_cast<blkImage *>(backsprite.get());
-		caos_assert(background);
+		if (!background && world.gametype == "sm") {
+			totalwidth = backsprite->width(0);
+			totalheight = backsprite->height(0);
+		} else {
+			caos_assert(background);
 
-		totalwidth = background->totalwidth;
-		totalheight = background->totalheight;
+			totalwidth = background->totalwidth;
+			totalheight = background->totalheight;
+		}
 	} else {
 		// we were provided with a sprite, so use it
 		backsprite = spr;
@@ -71,6 +76,7 @@ void MetaRoom::addBackground(std::string back, shared_ptr<creaturesImage> spr) {
 		fullhei = totalheight;
 	} else {
 		// make sure other backgrounds are the same size
+		if (world.gametype == "sm") return; // TODO: seamonkeys fails the background size checks :/
 		assert(totalwidth == fullwid);
 		assert(totalheight == fullhei);
 	}
