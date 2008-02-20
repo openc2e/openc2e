@@ -30,7 +30,7 @@
 /**
  DOIF (command) condition (condition)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %pragma stackdelta 0
  %cost c1,c2 0
  
@@ -59,7 +59,7 @@ void caosVM::c_ELIF() {
 /**
  ELSE (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
@@ -71,7 +71,7 @@ void caosVM::c_ELSE() {
 /**
  ENDI (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
@@ -84,7 +84,7 @@ void caosVM::c_ENDI() {
  REPS (command) reps (integer)
  %status maybe
  %pragma stackdelta 0
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  The start of a REPS...REPE loop. The body of the loop will be executed (reps) times.
@@ -100,7 +100,7 @@ void caosVM::c_REPS() {
 /**
  REPE (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  The end of a REPS...REPE loop.
@@ -112,7 +112,7 @@ void caosVM::c_REPE() {
 /**
  LOOP (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
  The start of a LOOP...EVER or LOOP...UNTL loop.
@@ -124,7 +124,7 @@ void caosVM::c_LOOP() {
 /**
  EVER (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  
  Jumps back to the matching LOOP, no matter what.
 */
@@ -136,7 +136,7 @@ void caosVM::c_EVER() {
  UNTL (command) condition (condition)
  %status maybe
  %pragma stackdelta 0
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
  Jumps back to the matching LOOP unless the condition evaluates to true.
@@ -149,7 +149,7 @@ void caosVM::c_UNTL() {
  GSUB (command) label (label)
  %pragma stackdelta 0
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  
  Jumps to a subroutine defined by SUBR with label (label).
 */
@@ -161,7 +161,7 @@ void caosVM::c_GSUB() {
  SUBR (command) label (label)
  %status maybe
  %pragma stackdelta 0
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  
  Defines the start of a subroute to be called with GSUB, with label (label).
  If the command is encountered during execution, it acts like a STOP.
@@ -174,7 +174,7 @@ void caosVM::c_SUBR() {
  RETN (command)
  %pragma stackdelta any
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  
  Returns from a subroutine called with GSUB.
 */
@@ -203,7 +203,7 @@ void caosVM::c_NEXT() {
  ENUM (command) family (integer) genus (integer) species (integer)
  %status maybe
  %pragma stackdelta any
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Loops through all agents with the given classifier.  0 on any field is a
@@ -235,7 +235,7 @@ void caosVM::c_ENUM() {
  ESEE (command) family (integer) genus (integer) species (integer)
  %status maybe
  %pragma stackdelta any
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
  
  Simular to ENUM, but iterates through agents visible to OWNR, or visible to TARG in an install script.
  An agent can be seen if it is within the range set by RNGE, and is visible (this includes the PERM value
@@ -265,7 +265,7 @@ void caosVM::c_ESEE() {
  ETCH (command) family (integer) genus (integer) species (integer)
  %pragma stackdelta any
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Similar to ENUM, but iterates through the agents OWNR is touching, or TARG is touching in an install script.
 */
@@ -349,7 +349,7 @@ void caosVM::c_ECON() {
 /**
  CALL (command) script_no (integer) p1 (any) p2 (any)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Calls script_no on OWNR, then waits for it to return. The invoked script
  will inherit the caller's INST setting, but any changes it makes to it will

@@ -152,7 +152,7 @@ void caosVM::c_DELG() {
 /**
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
  %status done
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
 
  Marks the beginning of a normal script applying to the agent with the given classifier 
  info.
@@ -164,7 +164,7 @@ void caosVM::c_SCRP() {
 /**
  RSCR (command)
  %status done
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Marks the beginning of a removal script.
 */
@@ -175,7 +175,7 @@ void caosVM::c_RSCR() {
 /**
  ISCR (command)
  %status stub
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Marks the beginning of an installer script.
 */
@@ -187,7 +187,7 @@ void caosVM::c_ISCR() {
 /**
  ENDM (command)
  %status done
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
 
  Marks the end of a script.
 */

@@ -27,7 +27,7 @@
 /**
  PART (command) part_id (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  
  Sets the part number of the TARGeted compound agent or vehicle to work on (ANIM/POSE use this, 
  amongst other commands).
@@ -83,6 +83,7 @@ void caosVM::c_NEW_PART() {
 /**
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer)
  %status maybe
+ %pragma variants cv c3
 
  Adds a new 'dull' part to the TARGed compound agent/vehicle which does nothing but display an image.
  Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.

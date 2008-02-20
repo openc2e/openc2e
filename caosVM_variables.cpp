@@ -39,7 +39,7 @@
  VAxx (variable)
  %status maybe
  %pragma stackdelta 0
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
  */
@@ -104,7 +104,7 @@ void caosVM::c_SETS() {
 /**
  SETV (command) var (variable) value (decimal)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
  %% Don't enable c1 or c2 here; we activate them with horrible hacks later
 
@@ -149,7 +149,7 @@ void caosVM::c_SETA() {
  OVxx (variable)
  %status maybe
  %pragma stackdelta 0
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
  */
@@ -213,7 +213,7 @@ void caosVM::v_TYPE() {
 /**
  MODV (command) var (variable) mod (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Divides the given variable by the given integer, and returns the remainder (var % mod).
@@ -229,7 +229,7 @@ void caosVM::c_MODV() {
 /**
  ANDV (command) var (variable) and (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
@@ -245,7 +245,7 @@ void caosVM::c_ANDV() {
 /**
  ORRV (command) var (variable) or (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
@@ -261,7 +261,7 @@ void caosVM::c_ORRV() {
 /**
  ADDV (command) var (variable) add (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Adds the given integer to the given variable and returns the result.
@@ -281,7 +281,7 @@ void caosVM::c_ADDV() {
 /**
  SUBV (command) var (variable) sub (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Subtracts the given integer from the given variable and returns the result.
@@ -301,7 +301,7 @@ void caosVM::c_SUBV() {
 /**
  NEGV (command) var (variable)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
@@ -320,7 +320,7 @@ void caosVM::c_NEGV() {
 /**
  DIVV (command) var (variable) div (decimal)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
  Divides the given variable by the given integer and returns the result.
@@ -347,7 +347,7 @@ void caosVM::c_DIVV() {
 /**
  MULV (command) var (variable) mul (decimal)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Multiplies the given variable by the given integer and returns the result.
@@ -575,7 +575,7 @@ void caosVM::v_SQRT() {
  %pragma implementation caosVM::v_P1
  %pragma saveimpl caosVM::s_P1
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  The first argument given to the current script.
 */
@@ -585,7 +585,7 @@ void caosVM::v_SQRT() {
  %pragma implementation caosVM::v_P2
  %pragma saveimpl caosVM::s_P2
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  The second argument given to the current script.
 */

@@ -27,7 +27,7 @@ using std::cerr;
 /**
  INST (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
 
  Forces the following commands to be executed in one tick, rather than scheduling them, until SLOW or the end 
  of the script is encountered.
@@ -42,7 +42,7 @@ void caosVM::c_INST() {
 /**
  SLOW (command)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Reverses the effects of INST.
  */
@@ -55,7 +55,7 @@ void caosVM::c_SLOW() {
 /**
  LOCK (command)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Prevent the script from being interrupted by another until UNLK or the end of the script is encountered.
  */
@@ -67,7 +67,7 @@ void caosVM::c_LOCK() {
 /**
  UNLK (command)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Reverses the effects of LOCK.
  */
@@ -93,7 +93,7 @@ class blockUntilTime : public blockCond {
 /**
  WAIT (command) ticks (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Stops the script from running for the given number of ticks.
@@ -117,7 +117,7 @@ void caosVM::c_WAIT() {
  STOP (command)
  %status maybe
  %pragma stackdelta any
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
 
  Aborts the script.
 */
@@ -129,7 +129,7 @@ void caosVM::c_STOP() {
 /**
  SCRX (command) family (integer) genus (integer) species (integer) event (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
 
  Deletes the event script in question from the scriptoruium.
 */

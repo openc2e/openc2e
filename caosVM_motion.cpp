@@ -57,7 +57,7 @@ void caosVM::v_ELAS() {
 /**
  MVTO (command) x (float) y (float)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 1
 
  Places the TARG agent at the given x/y position in the world (using the upper left hand corner of the agent).
@@ -73,7 +73,7 @@ void caosVM::c_MVTO() {
 /**
  MVBY (command) x (float) y (float)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 1
 
  Changes the TARG agent's position by the given relative distances.
@@ -89,7 +89,7 @@ void caosVM::c_MVBY() {
 /**
  VELX (variable)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Returns the current horizontal velocity, in pixels/tick, of the TARG agent.
 */
@@ -108,7 +108,7 @@ void caosVM::s_VELX() {
 /**
  VELY (variable)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Returns the current vertical velocity, in pixels/tick, of the TARG agent.
 */
@@ -130,7 +130,7 @@ void caosVM::s_VELY() {
 /**
  OBST (float) direction (integer)
  %status maybe
- %pragma variants cv c3
+ %pragma variants cv c3 sm
 
  Returns the distance from the TARG agent to the nearest wall that it might collide with in the given direction.
  (except right now it just gives the direction to the nearest wall at world edge - fuzzie)
@@ -491,7 +491,7 @@ void caosVM::v_FALL() {
 /**
  MOVS (variable)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
 
  Returns an integer representing the motion status of the TARG agent.  0 is autonomous, 1 is moving by mouse, 2 is 
  floating, 3 is inside a vehicle, and 4 is being carried.
