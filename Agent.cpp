@@ -92,7 +92,7 @@ void Agent::finishInit() {
 	// lc2e, at least, seems to position agents centered on (-9876,-9876) to begin with
 	// TODO: where should we place agents in other games? is this code right at all anyway?
 	// (bear in mind that there are no parts present for some C1/C2 agents when finishInit is called, atm)
-	if (engine.version > 2) {
+	if (engine.version > 2 && world.gametype != "sm") { // TODO: need to think about sm-specific code some more
 		x = -9876.0f + (getWidth() / 2.0f); y = -9876.0f + (getHeight() / 2.0f);
 	}
 	

@@ -21,6 +21,7 @@
 #include "c16Image.h"
 #include "sprImage.h"
 #include "blkImage.h"
+#include "bmpImage.h"
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
@@ -37,7 +38,7 @@
 
 using namespace boost::filesystem;
 
-enum filetype { blk, s16, c16, spr };
+enum filetype { blk, s16, c16, spr, bmp };
 
 bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft, bool is_background = false) {
 	path cachefile, realfile;
@@ -109,6 +110,7 @@ done:
 			case c16: img = shared_ptr<creaturesImage>(new c16Image(in, basename)); break; // this should never happen, actually, once we're done
 			case s16: img = shared_ptr<creaturesImage>(new s16Image(in, basename)); break;
 			case spr: img = shared_ptr<creaturesImage>(new sprImage(in, basename)); break;
+			case bmp: img = shared_ptr<creaturesImage>(new bmpImage(in, basename)); break; // TODO: don't commit this ;p
 		}
 	}
 	return in->is_open();
@@ -132,21 +134,26 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	shared_ptr<creaturesImage> img;
 
 	bool successful = true;
-	if (is_background) {
-		successful = tryOpen(in, img, name + ".blk", blk, true);
+	if (world.gametype == "sm") {
+		// Sea-Monkeys only uses bmp files
+		successful = tryOpen(in, img, name + ".bmp", bmp, is_background);
 	} else {
-		if (!tryOpen(in, img, name + ".s16", s16)) {
-			if (!tryOpen(in, img, name + ".c16", c16)) {
-				if (!tryOpen(in, img, name + ".spr", spr)) {
-					successful = false;
-				} else {	
+		if (is_background) {
+			successful = tryOpen(in, img, name + ".blk", blk, true);
+		} else {
+			if (!tryOpen(in, img, name + ".s16", s16)) {
+				if (!tryOpen(in, img, name + ".c16", c16)) {
+					if (!tryOpen(in, img, name + ".spr", spr)) {
+						successful = false;
+					} else {	
+						images[name] = img;
+					}
+				} else {
 					images[name] = img;
 				}
 			} else {
 				images[name] = img;
 			}
-		} else {
-			images[name] = img;
 		}
 	}
 

@@ -28,6 +28,7 @@ OPENC2E_CORE = \
 	Backend.o \
 	Blackboard.o \
 	blkImage.o \
+	bmpImage.o \
 	bytecode.o \
 	c16Image.o \
 	c2eBrain.o \

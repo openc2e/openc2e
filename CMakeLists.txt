@@ -37,6 +37,7 @@ SET(OPENC2E_CORE
 	Backend.cpp
 	Blackboard.cpp
 	blkImage.cpp
+	bmpImage.cpp
 	bytecode.cpp
 	c16Image.cpp
 	c2eBrain.cpp
