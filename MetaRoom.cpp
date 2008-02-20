@@ -49,7 +49,7 @@ void MetaRoom::addBackground(std::string back, shared_ptr<creaturesImage> spr) {
 	
 	if (!spr) {
 		// we weren't passed a sprite, so we need to load one
-		backsprite = world.gallery.getImage(back + ".blk");
+		backsprite = world.gallery.getImage(back, true);
 		blkImage *background = dynamic_cast<blkImage *>(backsprite.get());
 		caos_assert(background);
 

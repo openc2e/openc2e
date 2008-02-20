@@ -31,7 +31,7 @@ protected:
 	std::map<std::string, boost::weak_ptr<creaturesImage> > images;
 
 public:
-	boost::shared_ptr<creaturesImage> getImage(std::string name);
+	boost::shared_ptr<creaturesImage> getImage(std::string name, bool is_background = false);
 };
 
 #endif

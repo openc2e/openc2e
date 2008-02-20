@@ -39,21 +39,16 @@ using namespace boost::filesystem;
 
 enum filetype { blk, s16, c16, spr };
 
-bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
+bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft, bool is_background = false) {
 	path cachefile, realfile;
 	std::string cachename;
 	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
 	std::string basename = fname; basename.erase(basename.end() - 4, basename.end()); 
 
-	// work out where the real file should be
-	switch (ft) {
-		case blk:
-			realfile = path(world.findFile(std::string("/Backgrounds/") + fname), native); break;
-
-		case spr:
-		case c16:
-		case s16:
-			realfile = path(world.findFile(std::string("/Images/") + fname), native); break;
+	if (is_background) {
+		realfile = path(world.findFile(std::string("/Backgrounds/") + fname), native);
+	} else {
+		realfile = path(world.findFile(std::string("/Images/") + fname), native);
 	}
 
 	// if it doesn't exist, too bad, give up.
@@ -123,7 +118,7 @@ done:
  * Retrieve an image for rendering use. To retrieve a sprite, pass the name without
  * extension. To retrieve a background, pass the full filename (ie, with .blk).
  */
-shared_ptr<creaturesImage> imageManager::getImage(std::string name) {
+shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_background) {
 	if (name.empty()) return shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
 
 	// step one: see if the image is already in the gallery
@@ -136,25 +131,30 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name) {
 	mmapifstream *in = new mmapifstream();
 	shared_ptr<creaturesImage> img;
 
-	if (!tryOpen(in, img, name + ".s16", s16)) {
-		if (!tryOpen(in, img, name + ".c16", c16)) {
-			if (!tryOpen(in, img, name + ".spr", spr)) {
-				bool lasttry = tryOpen(in, img, name, blk);
-				if (!lasttry) {
-					std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
-					return shared_ptr<creaturesImage>();
+	bool successful = true;
+	if (is_background) {
+		successful = tryOpen(in, img, name + ".blk", blk, true);
+	} else {
+		if (!tryOpen(in, img, name + ".s16", s16)) {
+			if (!tryOpen(in, img, name + ".c16", c16)) {
+				if (!tryOpen(in, img, name + ".spr", spr)) {
+					successful = false;
+				} else {	
+					images[name] = img;
 				}
-				images[name] = img;
 			} else {
 				images[name] = img;
 			}
 		} else {
 			images[name] = img;
 		}
-	} else {
-		images[name] = img;
 	}
-	
+
+	if (!successful) {
+		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
+		return shared_ptr<creaturesImage>();
+	}
+
 	in->close(); // doesn't close the mmap, which we still need :)
 
 	return img;
