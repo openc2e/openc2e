@@ -278,9 +278,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 						0, 0, 0, 0);
 		assert(surf);
 		SDL_SetPalette(surf, SDL_LOGPAL, palette, 0, 256);
-	} else {
-		assert(image->format() == if_16bit);
-
+	} else if (image->format() == if_16bit) {
 		unsigned int rmask, gmask, bmask;
 		if (image->is565()) {
 			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
@@ -293,6 +291,16 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 						image->width(frame) * 2, // pitch
 						rmask, gmask, bmask, 0); // RGBA mask
 		assert(surf);
+	} else {
+		assert(image->format() == if_24bit);
+
+		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
+						image->width(frame), image->height(frame),
+						24, // depth
+						image->width(frame) * 3, // pitch
+						0x00FF0000, 0x0000FF00, 0x000000FF, 0); // RGBA mask
+		assert(surf);
+
 	}
 
 	// try mirroring, if necessary

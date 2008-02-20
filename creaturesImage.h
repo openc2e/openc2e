@@ -25,7 +25,7 @@
 #include <cassert>
 #include <boost/shared_ptr.hpp>
 
-enum imageformat { if_paletted, if_16bit, if_16bitcompressed, if_32bit };
+enum imageformat { if_paletted, if_16bit, if_16bitcompressed, if_24bit };
 
 unsigned int bitDepthOf(imageformat f);
 
