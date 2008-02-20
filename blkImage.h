@@ -32,7 +32,7 @@ public:
 	unsigned int totalwidth, totalheight;
 
 	blkImage() { }
-	blkImage(mmapifstream *);
+	blkImage(mmapifstream *, std::string n);
 	~blkImage();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &s);

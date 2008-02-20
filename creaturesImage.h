@@ -23,38 +23,40 @@
 #include <string>
 #include <fstream>
 #include <cassert>
+#include <boost/shared_ptr.hpp>
+
+enum imageformat { if_paletted, if_16bit, if_16bitcompressed, if_32bit };
+
+unsigned int bitDepthOf(imageformat f);
 
 class creaturesImage {
-private:
-	unsigned int refcount;
+	friend class fileSwapper;
 
 protected:
 	unsigned int m_numframes;
 	unsigned short *widths, *heights;
 	void **buffers;
 	bool is_565;
+	imageformat imgformat;
+	bool is_mutable;
 	
 	std::ifstream *stream;
+	std::string name;
   
 public:
-	std::string name;
-
-	creaturesImage() { refcount = 0; stream = 0; }
-	virtual ~creaturesImage() { assert(!refcount); if (stream) delete stream; }
+	creaturesImage(std::string n = std::string()) { stream = 0; name = n; }
+	virtual ~creaturesImage() { if (stream) delete stream; }
 	bool is565() { return is_565; }
+	imageformat format() { return imgformat; }
 	unsigned int numframes() { return m_numframes; }
-	virtual unsigned int width(unsigned int frame) { return widths[frame]; }
-	virtual unsigned int height(unsigned int frame) { return heights[frame]; }
-	virtual unsigned int bitdepth() { return 16; }
-	virtual void *data(unsigned int frame) { return buffers[frame]; }
-	void addRef() { refcount++; }
-	void delRef() { refcount--; }
-	unsigned int refCount() { return refcount; }
-	virtual std::string serializedName() { return name; }
-	virtual bool transparentAt(unsigned int frame, unsigned int x, unsigned int y) = 0;
+	unsigned int width(unsigned int frame) { return widths[frame]; }
+	unsigned int height(unsigned int frame) { return heights[frame]; }
+	void *data(unsigned int frame) { return buffers[frame]; }
+	std::string getName() { return name; }
 	
-	friend class fileSwapper;
-	friend class c16Image; // so duplicateTo can create a s16Image as required
+	virtual bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
+	virtual boost::shared_ptr<creaturesImage> mutableCopy();
+	virtual void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 };
 
 #endif

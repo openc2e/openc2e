@@ -270,7 +270,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 
 	// create surface
 	SDL_Surface *surf;
-	if (image->bitdepth() == 8) {
+	if (image->format() == if_paletted) {
 		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
 						image->width(frame), image->height(frame),
 						8, // depth
@@ -279,7 +279,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 		assert(surf);
 		SDL_SetPalette(surf, SDL_LOGPAL, palette, 0, 256);
 	} else {
-		assert(image->bitdepth() == 16);
+		assert(image->format() == if_16bit);
 
 		unsigned int rmask, gmask, bmask;
 		if (image->is565()) {

@@ -45,7 +45,10 @@ void c16Image::readHeader(std::istream &in) {
 	}
 }
 
-void c16Image::duplicateTo(s16Image *img) {
+shared_ptr<creaturesImage> c16Image::mutableCopy() {
+	s16Image *img = new s16Image();
+
+	img->imgformat = if_16bit;
 	img->is_565 = is_565;
 	img->m_numframes = m_numframes;
 	img->offsets = 0;
@@ -58,9 +61,14 @@ void c16Image::duplicateTo(s16Image *img) {
 		img->buffers[i] = new char[widths[i] * heights[i] * 2];
 		memcpy(img->buffers[i], buffers[i], widths[i] * heights[i] * 2);
 	}
+
+	return shared_ptr<creaturesImage>(img);
 }
 
-void s16Image::duplicateTo(s16Image *img) {
+shared_ptr<creaturesImage> s16Image::mutableCopy() {
+	s16Image *img = new s16Image();
+
+	img->imgformat = if_16bit;
 	img->is_565 = is_565;
 	img->m_numframes = m_numframes;
 	img->offsets = 0;
@@ -73,10 +81,13 @@ void s16Image::duplicateTo(s16Image *img) {
 		img->buffers[i] = new char[widths[i] * heights[i] * 2];
 		memcpy(img->buffers[i], buffers[i], widths[i] * heights[i] * 2);
 	}
+	
+	return shared_ptr<creaturesImage>(img);
 }
 
-c16Image::c16Image(mmapifstream *in) {
+c16Image::c16Image(mmapifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
+	imgformat = if_16bit;
 
 	readHeader(*in);
 	
@@ -146,14 +157,21 @@ void s16Image::writeHeader(std::ostream &s) {
 	}
 }
 
-bool duppableImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+bool s16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
 	unsigned int offset = (y * widths[frame]) + x;
 	unsigned short *buffer = (unsigned short *)buffers[frame];
 	return (buffer[offset] == 0);
 }
 
-s16Image::s16Image(mmapifstream *in) {
+bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+	unsigned int offset = (y * widths[frame]) + x;
+	unsigned short *buffer = (unsigned short *)buffers[frame];
+	return (buffer[offset] == 0);
+}
+
+s16Image::s16Image(mmapifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
+	imgformat = if_16bit;
 
 	readHeader(*in);
 	

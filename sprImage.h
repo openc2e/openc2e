@@ -30,7 +30,7 @@ private:
 
 public:
 	sprImage() { }
-	sprImage(mmapifstream *);
+	sprImage(mmapifstream *, std::string n);
 	~sprImage();
 	virtual unsigned int bitdepth() { return 8; }
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);

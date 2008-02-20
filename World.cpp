@@ -83,10 +83,10 @@ void World::init() {
 			img = gallery.getImage("syst"); // as used in C1, C2 and CV
 		if (!img)
 			throw creaturesException("no valid \"Pointer Information\" catalogue tag, and fallback failed");
-		theHand = new PointerAgent(img->name);
+		theHand = new PointerAgent(img->getName());
 		theHand->finishInit();
 		if (engine.version > 2)
-			std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->name << "'." << std::endl;
+			std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->getName() << "'." << std::endl;
 	}
 
 	// *** set defaults for non-zero GAME engine variables

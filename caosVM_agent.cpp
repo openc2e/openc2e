@@ -1509,7 +1509,7 @@ void caosVM::c_GALL() {
 void caosVM::v_GALL() {
 	SpritePart *p = getCurrentSpritePart();
 	if (p)
-		result.setString(p->getSprite()->name);
+		result.setString(p->getSprite()->getName());
 	else
 		result.setString("");
 }

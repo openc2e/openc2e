@@ -32,6 +32,7 @@
 #include "Engine.h"
 #include "Backend.h"
 #include "Room.h"
+#include "creaturesImage.h"
 
 #include <typeinfo> // TODO: remove when genome system is fixed
 #include <boost/format.hpp>
@@ -162,9 +163,6 @@ creatureAppearanceGene *SkeletalCreature::appearanceGeneForPart(char x) {
 	return 0;
 }
 
-// required for tinting, for now, until we get a saner image system in place
-#include "c16Image.h"
-
 void SkeletalCreature::skeletonInit() {
 	// TODO: the exception throwing in here needs some more thought
 	// TODO: if we throw an exception when we need to kill the creature off, else segfault :/
@@ -244,12 +242,11 @@ void SkeletalCreature::skeletonInit() {
 shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(shared_ptr<creaturesImage> s) {
 	// TODO: don't bother tinting if we don't need to
 	
-	if (engine.version > 1) { // TODO: make this work for c1 :(
-		assert(dynamic_cast<duppableImage *>(s.get()));
-		s16Image *newimage = new s16Image();
-		((duppableImage *)s.get())->duplicateTo(newimage);
+	// TODO: work out tinting for other engine versions
+	if (engine.version > 2) {
+		shared_ptr<creaturesImage> newimage = s->mutableCopy();
 		newimage->tint(creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
-		return shared_ptr<creaturesImage>(newimage);
+		return newimage;
 	}
 
 	return s;

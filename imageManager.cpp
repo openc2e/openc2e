@@ -110,12 +110,11 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 done:
 	if (in->is_open()) {
 		switch (ft) {
-			case blk: img = shared_ptr<creaturesImage>(new blkImage(in)); break;
-			case c16: img = shared_ptr<creaturesImage>(new c16Image(in)); break; // this should never happen, actually, once we're done
-			case s16: img = shared_ptr<creaturesImage>(new s16Image(in)); break;
-			case spr: img = shared_ptr<creaturesImage>(new sprImage(in)); break;
+			case blk: img = shared_ptr<creaturesImage>(new blkImage(in, basename)); break;
+			case c16: img = shared_ptr<creaturesImage>(new c16Image(in, basename)); break; // this should never happen, actually, once we're done
+			case s16: img = shared_ptr<creaturesImage>(new s16Image(in, basename)); break;
+			case spr: img = shared_ptr<creaturesImage>(new sprImage(in, basename)); break;
 		}
-		img->name = basename;
 	}
 	return in->is_open();
 }

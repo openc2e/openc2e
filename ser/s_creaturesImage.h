@@ -14,7 +14,7 @@ namespace boost {
 				bool isNull = (obj == NULL);
 				ar & isNull;
 				if (!isNull) {
-					std::string name = obj->serializedName();
+					std::string name = obj->getName();
 					ar & name;
 				}
 			}

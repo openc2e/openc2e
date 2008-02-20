@@ -51,10 +51,13 @@ void fileSwapper::convertc16(std::string src, std::string dest) {
 	if (!in->is_open()) { delete in; return; }
 	
 	// okay. read the damn file.
-	c16Image img(in);
-	s16Image i;
-	img.duplicateTo(&i);
-	convertsprite(i, dest);
+	c16Image img(in, src);
+
+	shared_ptr<creaturesImage> imgcopy = img.mutableCopy();
+	s16Image *i = dynamic_cast<s16Image *>(imgcopy.get());
+	assert(i);
+	
+	convertsprite(*i, dest);
 }
 
 void fileSwapper::converts16(std::string src, std::string dest) {

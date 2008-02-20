@@ -22,7 +22,7 @@
 #include "Camera.h"
 #include "World.h"
 #include "Engine.h"
-#include "c16Image.h"
+#include "creaturesImage.h"
 #include "Backend.h"
 #include "Agent.h"
 
@@ -64,7 +64,7 @@ void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 	// TODO: we need a nicer way to handle such errors
 	if (getCurrentSprite() >= getSprite()->numframes()) {
 		std::string err = boost::str(boost::format("pose to be rendered %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
-			pose % firstimg % base % getSprite()->name % getSprite()->numframes());
+			pose % firstimg % base % getSprite()->getName() % getSprite()->numframes());
  		parent->unhandledException(err, false);
 		return;
 	}
@@ -76,7 +76,7 @@ void SpritePart::setFrameNo(unsigned int f) {
 	assert(f < animation.size());
 	if (firstimg + base + animation[f] >= getSprite()->numframes()) {
 		std::string err = boost::str(boost::format("animation frame %d (firstimg %d, base %d, value %d) was past end of sprite file '%s' (%d sprites)") %
-			f % firstimg % base % (int)animation[f] % getSprite()->name % getSprite()->numframes());
+			f % firstimg % base % (int)animation[f] % getSprite()->getName() % getSprite()->numframes());
  		parent->unhandledException(err, false);
 		animation.clear();
 		return;
@@ -90,7 +90,7 @@ void SpritePart::setFrameNo(unsigned int f) {
 void SpritePart::setPose(unsigned int p) {
 	if (firstimg + base + p >= getSprite()->numframes()) {
 		std::string err = boost::str(boost::format("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
-			p % firstimg % base % getSprite()->name % getSprite()->numframes());
+			p % firstimg % base % getSprite()->getName() % getSprite()->numframes());
  		parent->unhandledException(err, false);
 		return;
 	}
@@ -188,11 +188,8 @@ void CompoundPart::addZOrder() {
 }
 
 void SpritePart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
-	assert(dynamic_cast<duppableImage *>(origsprite.get()));
-	s16Image *newsprite = new s16Image();
-	sprite = shared_ptr<creaturesImage>(newsprite);
-	((duppableImage *)origsprite.get())->duplicateTo(newsprite);
-	newsprite->tint(r, g, b, rotation, swap);
+	sprite = origsprite->mutableCopy();
+	sprite->tint(r, g, b, rotation, swap);
 }
 
 DullPart::DullPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
@@ -257,11 +254,8 @@ void TextPart::addTint(std::string tintinfo) {
 	t.offset = text.size();
 
 	if (!(r == g == b == rot == swap == 128)) {
-		assert(dynamic_cast<duppableImage *>(textsprite.get()));
-		s16Image *tintedsprite = new s16Image();
-		((duppableImage *)textsprite.get())->duplicateTo(tintedsprite);
-		tintedsprite->tint(r, g, b, rot, swap);
-		t.sprite = shared_ptr<creaturesImage>(tintedsprite);
+		t.sprite = textsprite->mutableCopy();
+		t.sprite->tint(r, g, b, rot, swap);
 	} else t.sprite = textsprite;
 
 	tints.push_back(t);

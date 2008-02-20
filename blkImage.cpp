@@ -65,8 +65,9 @@ void blkImage::writeHeader(std::ostream &s) {
 	}
 }
 
-blkImage::blkImage(mmapifstream *in) {
+blkImage::blkImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
+	imgformat = if_16bit;
 
 	readHeader(*in);
 	

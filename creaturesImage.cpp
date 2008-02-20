@@ -17,4 +17,19 @@
  *
  */
 
+#include "creaturesImage.h"
+#include "exceptions.h"
+
+bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+	return false;
+}
+
+boost::shared_ptr<creaturesImage> creaturesImage::mutableCopy() {
+	throw creaturesException("Internal error: Tried to make a mutable copy of a sprite which doesn't support that.");
+}
+
+void creaturesImage::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
+	throw creaturesException("Internal error: Tried to tint a sprite which doesn't support that.");
+}
+
 /* vim: set noet: */

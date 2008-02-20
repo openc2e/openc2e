@@ -22,36 +22,32 @@
 #include "mmapifstream.h"
 #include "endianlove.h"
 
-class duppableImage : public creaturesImage {
-public:
-	virtual void duplicateTo(class s16Image *) = 0;
-	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
-};
-
-class c16Image : public duppableImage {
+class c16Image : public creaturesImage {
 private:
 	unsigned int **lineoffsets;
 
 public:
 	c16Image() { }
-	c16Image(mmapifstream *);
+	c16Image(mmapifstream *, std::string n);
 	~c16Image();
 	void readHeader(std::istream &in);
-	void duplicateTo(class s16Image *);
+	boost::shared_ptr<creaturesImage> mutableCopy();
+	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 };
 
-class s16Image : public duppableImage {
+class s16Image : public creaturesImage {
 private:
 	uint32 *offsets;
 
 public:
 	s16Image() { }
-	s16Image(mmapifstream *);
+	s16Image(mmapifstream *, std::string n);
 	~s16Image();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &out);
-	void duplicateTo(class s16Image *);
+	boost::shared_ptr<creaturesImage> mutableCopy();
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
+	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 
 	friend class c16Image;
 	friend class fileSwapper;

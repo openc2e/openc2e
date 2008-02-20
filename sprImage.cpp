@@ -21,8 +21,9 @@
 #include "sprImage.h"
 #include <iostream>
 
-sprImage::sprImage(mmapifstream *in) {
+sprImage::sprImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
+	imgformat = if_paletted;
 
 	uint16 spritecount;
 	in->read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
