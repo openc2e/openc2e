@@ -227,11 +227,11 @@ Section -FinishSection
 	
 	finishup:
 	;Run the shortcut-maker
-	MessageBox MB_YESNO 'Look for installed Creatures games now? $\rIf you choose to wait, you can run "Update Game Shortcuts" from the start menu later.' IDYES run
-	Goto end
-	run:
+	;MessageBox MB_YESNO 'Look for installed Creatures games now? $\rIf you choose to wait, you can run "Update Game Shortcuts" from the start menu later.' IDYES run
+	;Goto end
+	;run:
 	DetailPrint "Searching for installed creatures games..."
-	ExecWait "$INSTDIR\gamefinder.exe"
+	ExecWait '"$INSTDIR\gamefinder.exe" /S'
 	end:
 SectionEnd
 
