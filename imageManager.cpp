@@ -126,7 +126,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	// step one: see if the image is already in the gallery
 	std::map<std::string, boost::weak_ptr<creaturesImage> >::iterator i = images.find(name);
 	if (i != images.end() && i->second.lock()) {
-		return i->second.lock();
+		if (!is_background) return i->second.lock(); // TODO: handle backgrounds
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
@@ -145,19 +145,16 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 				if (!tryOpen(in, img, name + ".c16", c16)) {
 					if (!tryOpen(in, img, name + ".spr", spr)) {
 						successful = false;
-					} else {	
-						images[name] = img;
 					}
-				} else {
-					images[name] = img;
 				}
-			} else {
-				images[name] = img;
 			}
 		}
 	}
 
-	if (!successful) {
+	if (successful) {
+		if (!is_background) // TODO: handle backgrounds
+			images[name] = img;
+	} else {
 		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
 		return shared_ptr<creaturesImage>();
 	}
