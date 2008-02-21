@@ -165,7 +165,7 @@ Section
 		CreateShortCut "$SMPROGRAMS\openc2e\Games\Docking Station (Exodus).lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$exodds" --autokill'
 		${If} $exodc3exist == "1"
 			DetailPrint "Creating Docked shortcut for C3/DS (Exodus)."
-		  CreateShortCut "$SMPROGRAMS\openc2e\Games\C3 + DS Exodus (Docked).lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$plainc3" -d "$plainds" --autokill'
+		  CreateShortCut "$SMPROGRAMS\openc2e\Games\C3 + DS Exodus (Docked).lnk" "$dir\openc2e.exe" '--gamename "Docking Station" -d "$exodc3" -d "$exodds" --autokill'
 		${Else}
 		  Delete "$SMPROGRAMS\openc2e\Games\C3 + DS Exodus (Docked).lnk"
 		${EndIf}
