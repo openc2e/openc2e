@@ -595,6 +595,7 @@ public:
 	void c_EDIT();
 	void v_FRZN();
 	void s_FRZN();
+	void c_BLCK();
 	
 	// motion
 	void c_ELAS();

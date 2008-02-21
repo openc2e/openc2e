@@ -1972,4 +1972,24 @@ void caosVM::s_FRZN() {
 	targ->frozen = newvalue.getInt();
 }
 
+#include "bmpImage.h"
+
+/**
+ BLCK (command) width (integer) height (integer)
+ %status maybe
+ %pragma variants sm
+*/
+void caosVM::c_BLCK() {
+	VM_PARAM_INTEGER(height)
+	VM_PARAM_INTEGER(width)
+
+	SpritePart *p = getCurrentSpritePart();
+	caos_assert(p);
+	shared_ptr<creaturesImage> i = p->getSprite();
+	bmpImage *img = dynamic_cast<bmpImage *>(i.get());
+	caos_assert(img);
+
+	img->setBlockSize(width, height);
+}
+
 /* vim: set noet: */
