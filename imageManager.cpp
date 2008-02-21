@@ -134,8 +134,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	shared_ptr<creaturesImage> img;
 
 	bool successful = true;
-	if (world.gametype == "sm") {
-		// Sea-Monkeys only uses bmp files
+	if (engine.bmprenderer) {
 		successful = tryOpen(in, img, name + ".bmp", bmp, is_background);
 	} else {
 		if (is_background) {

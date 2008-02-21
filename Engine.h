@@ -63,6 +63,7 @@ public:
 	bool done;
 	bool dorendering, fastticks, refreshdisplay;
 	unsigned int version;
+	bool bmprenderer;
 
 	Engine();
 	~Engine();

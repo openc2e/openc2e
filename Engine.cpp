@@ -53,6 +53,8 @@ Engine::Engine() {
 	fastticks = false;
 	refreshdisplay = false;
 
+	bmprenderer = false;
+
 	tickdata = 0;
 	for (unsigned int i = 0; i < 10; i++) ticktimes[i] = 0;
 	ticktimeptr = 0;
@@ -693,6 +695,7 @@ bool Engine::initialSetup() {
 	} else if (world.gametype == "sm") {
 		if (gamename.empty()) gamename = "Sea-Monkeys";
 		version = 3;
+		bmprenderer = true;
 	} else
 		throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % world.gametype));
 
