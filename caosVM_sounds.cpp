@@ -163,7 +163,7 @@ void caosVM::v_RMSC() {
 /**
  FADE (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 */
 void caosVM::c_FADE() {
@@ -177,7 +177,7 @@ void caosVM::c_FADE() {
 /**
  STPC (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 */
 void caosVM::c_STPC() {

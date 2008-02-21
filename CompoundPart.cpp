@@ -143,6 +143,8 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 			// Creatures Village allows you to create sprites with crazy invalid data, do the same as it does
 			// (obviously the firstimg data is invalid so all attempts to change the pose/etc will fail, same as in CV)
 			spriteno = 0;
+		} else if (engine.bmprenderer) {
+			// BLCK hasn't been called yet, so we can't check validity yet
 		} else {
 			throw caosException(boost::str(boost::format("Failed to create sprite part: first sprite %d is beyond %d sprite(s) in file") % firstimg % sprite->numframes()));
 		}

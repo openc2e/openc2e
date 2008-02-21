@@ -605,7 +605,7 @@ void caosVM::c_EMIT() {
 /**
  WALL (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Returns the direction of the last wall the TARG agent collided with.
 */
@@ -723,7 +723,7 @@ void caosVM::v_ERID() {
 /**
  DELR (command) room_id (integer)
  %status stub
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Removes the given room from the map.
 */
