@@ -49,7 +49,7 @@ SIGN       = [-+];
 	"*" [^\r\n\000]* { goto std; }
 	"'" noneoi "'"  { v.push_back(token(caosVar((int)p[1]), yylineno)); goto std; }
 	[fF] "**" [kK] { make_word("f**k"); goto std; }
-	WORDINIT WORDANY* {
+	WORDANY* WORDINIT WORDANY* {
 		std::string word(basep, p - basep);
 		std::transform(word.begin(), word.end(), word.begin(), tolower);
 		make_word(word);
