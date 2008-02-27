@@ -86,10 +86,8 @@ SET(OPENC2E_CORE
 	genomeFile.cpp
 	historyManager.cpp
 	imageManager.cpp
-	${GEN}/lex.c2.cpp
 	${GEN}/lex.mng.cpp
-	lexutil.cpp
-	${GEN}/lex.yy.cpp
+	${GEN}/caoslexer.cpp
 	Lift.cpp
 	Map.cpp
 	MetaRoom.cpp
@@ -280,21 +278,15 @@ ADD_CUSTOM_COMMAND(
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${GEN}/lex.c2.cpp ${GEN}/lex.c2.h
-	COMMAND flex -+ -d -o ${GEN}/lex.c2.cpp --header-file=${GEN}/lex.c2.h --prefix=c2 c2caos.l
-	DEPENDS c2caos.l
+	OUTPUT ${GEN}/caoslexer.cpp
+	COMMAND re2c -o ${GEN}/caoslexer.cpp ${SRC}/caoslexer.re2c
+	DEPENDS ${SRC}/caoslexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
 	COMMAND flex -+ --prefix=mng -d -o ${GEN}/lex.mng.cpp --header-file=${GEN}/lex.mng.h mng.l
 	DEPENDS mng.l
-	WORKING_DIRECTORY ${SRC})
-
-ADD_CUSTOM_COMMAND(
-	OUTPUT ${GEN}/lex.yy.cpp ${GEN}/lex.yy.h
-	COMMAND flex -+ -d -o ${GEN}/lex.yy.cpp --header-file=${GEN}/lex.yy.h --prefix=c2e caos.l
-	DEPENDS caos.l
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
@@ -307,10 +299,9 @@ ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/o
 ADD_CUSTOM_TARGET(generated DEPENDS
 	${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
 	${GEN}/catalogue.lex.cpp ${GEN}/catalogue.lex.h
+	${GEN}/caoslexer.cpp
 	${GEN}/cmddata.cpp
-	${GEN}/lex.c2.cpp ${GEN}/lex.c2.h
 	${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
-	${GEN}/lex.yy.cpp ${GEN}/lex.yy.h
 	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
 )
 

@@ -21,16 +21,13 @@
 #include "cmddata.h"
 #include "exceptions.h"
 #include "caosScript.h"
+#include "caoslexer.h"
 #include "caosVM.h"
 #include "openc2e.h"
 #include "Engine.h"
 #include "World.h"
 #include "token.h"
 #include "dialect.h"
-#include "lex.yy.h"
-#undef yyFlexLexer // flex/C++ is horrrrible I should use the C interface instead probably
-#include "lex.c2.h"
-#include "lexutil.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -267,27 +264,26 @@ void caosScript::putBackToken(token *) {
 
 void caosScript::parse(std::istream &in) {
 	assert(!tokens);
+	// slurp our input stream
+	std::string caostext;
+	{
+		while (in.good()) {
+			char tempbuf[512];
+			in.get(tempbuf, sizeof tempbuf, '\0');
+			caostext += tempbuf;
+			if (!in.good())
+				break;
+			if (in.bad())
+				throw creaturesException("IO error");
+		}
+	}
 	// run the token parser
 	{
-		extern int lex_lineno;
-		extern bool using_c2;
+		bool using_c2;
 		using_c2 = (d->name == "c1" || d->name == "c2");
-		lexreset();
-		boost::scoped_ptr<FlexLexer> l(
-				using_c2 	? (FlexLexer *)new c2FlexLexer()
-							: (FlexLexer *)new c2eFlexLexer()
-		);
-		l->yyrestart(&in);
 
 		tokens = shared_ptr<std::vector<token> >(new std::vector<token>());
-		while (l->yylex()) {
-			tokens->push_back(lasttok);
-			tokens->back().lineno = lex_lineno;
-			tokens->back().index  = tokens->size() - 1;
-		}
-		tokens->push_back(token()); // tokens default to being EOI tokens
-		tokens->back().lineno = lex_lineno;
-		tokens->back().index  = tokens->size() - 1;
+		lexcaos(*tokens, caostext.c_str(), using_c2);
 	}
 	curindex = errindex = traceindex = 0;
 

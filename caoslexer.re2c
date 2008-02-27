@@ -1,0 +1,119 @@
+/* vim: set ft=cpp : */
+#include "token.h"
+#include "caoslexer.h"
+
+static void parse_error(const char *p, int lineno) {
+	std::ostringstream oss;
+	oss << "Parse error at line " << lineno;
+	throw parseException(oss.str());
+}
+
+static char string_escape(char c) {
+	switch (c) {
+	case 'n': return '\n';
+	case 'r': return '\r';
+	case 't': return '\t';
+	default : return c;
+	}
+}
+
+
+void lexcaos(std::vector<token> &v, const char *p, bool c2) {
+#define make_word(str) \
+	v.push_back(token(std::string(str), yylineno))
+	int yylineno = 1;
+	int tokidx   = 0;
+	std::string tempstr;
+	bytestring_t tempbs;
+	const char *basep, *YYMARKER;
+std:
+	basep = p;
+/*!re2c
+	re2c:define:YYCTYPE = "unsigned char";
+	re2c:define:YYCURSOR = p;
+	re2c:yyfill:enable = 0;
+	re2c:yych:conversion = 1;
+	re2c:indent:top = 1;
+
+any        = [\000-\377];
+eoi        = [\000];
+DIGIT      = [0-9];
+WORDINIT   = [a-zA-Z_];
+WORDANY    = [$#a-zA-Z0-9:?!_+-];
+SIGN       = [-+];
+
+
+	[\r\n] { ++yylineno; goto std; }
+	[ \t,] { goto std; }
+	"*" [^\r\n]* { goto std; }
+	"'" any "'"  { v.push_back(token(caosVar((int)p[1]), yylineno)); goto std; }
+	[fF] "**" [kK] { make_word("f**k"); goto std; }
+	WORDINIT WORDANY* {
+		std::string word(basep, p - basep);
+		std::transform(word.begin(), word.end(), word.begin(), tolower);
+		make_word(word);
+		goto std;
+	}
+	"%" [01]* {
+		int accum = 0;
+		for (const char *i = basep + 1; i <= p; i++) {
+			accum <<= 1;
+			accum += (*i == '1');
+		}
+		v.push_back(token(caosVar(accum), yylineno));
+		goto std;
+	}
+	SIGN? DIGIT* "." DIGIT* {
+		v.push_back(token(caosVar((float)atof(basep)), yylineno));
+		goto std;
+	}
+	SIGN? DIGIT+  {
+		v.push_back(token(caosVar(atoi(basep)), yylineno));
+		goto std;
+	}
+"<>"                     { make_word("ne"); goto std; }
+"<="                     { make_word("le"); goto std; }
+">="                     { make_word("ge"); goto std; }
+"<"                      { make_word("lt"); goto std; }
+">"                      { make_word("gt"); goto std; }
+"=="                     { make_word("eq"); goto std; }
+"="                      { make_word("eq"); goto std; }
+"&&"                     { make_word("and"); goto std; }
+"||"                     { make_word("or"); goto std; }
+
+"["  { if (c2) goto brstr; else goto bytestr; }
+"\"" { goto str; }
+eoi { goto out; }
+
+any { parse_error(p, yylineno); }
+*/
+bytestr:
+	basep = p;
+	/*!re2c
+[0-9]+  { tempbs.push_back(atoi(basep)); goto bytestr; }
+[\n\r] { yylineno++; goto bytestr; }
+[ \t] { goto bytestr; }
+"]" { v.push_back(token(tempbs, yylineno)); tempbs.clear(); goto std; }
+any { parse_error(p, yylineno); }
+*/
+brstr:
+	basep = p;
+	/*!re2c
+[\000\r\n] { parse_error(basep, yylineno); }
+"]" { v.push_back(token(caosVar(tempstr), yylineno)); tempstr.clear(); goto std;  }
+any { tempstr.push_back(*basep); goto brstr; }
+*/
+
+str:
+	basep = p;
+	/*!re2c
+[\000\r\n] { parse_error(p, yylineno); }
+"\\" . { tempstr.push_back(string_escape(basep[1])); goto str; }
+"\"" { v.push_back(token(caosVar(tempstr), yylineno)); tempstr.clear(); goto std;  }
+any      { tempstr.push_back(*basep); goto str; }
+*/
+out:
+	v.push_back(token()); // EOI
+	for (size_t i = 0; i < v.size(); i++)
+		v[i].index = i;
+}
