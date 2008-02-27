@@ -1,12 +1,14 @@
 %{
     #include "Catalogue.h"
-    #include "catalogue.lex.h"
-    extern catalogueFlexLexer *catalexer;
-    extern Catalogue *parsing_cat;
-    static int catalex(void) { return catalexer->yylex(); }
+    #include "exceptions.h"
     #include <list>
+    #include <string>
 
-    extern void cataerror(char const *);
+    extern Catalogue *parsing_cat;
+    int catalex(void) { return Catalogue::catalex(); }
+	void cataerror(const char *err) {
+		Catalogue::catalogueParseError(err);
+	}
 %}
 
 %union {

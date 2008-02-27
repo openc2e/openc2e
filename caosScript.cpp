@@ -28,6 +28,7 @@
 #include "World.h"
 #include "token.h"
 #include "dialect.h"
+#include "util.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -265,18 +266,7 @@ void caosScript::putBackToken(token *) {
 void caosScript::parse(std::istream &in) {
 	assert(!tokens);
 	// slurp our input stream
-	std::string caostext;
-	{
-		while (in.good()) {
-			char tempbuf[512];
-			in.get(tempbuf, sizeof tempbuf, '\0');
-			caostext += tempbuf;
-			if (!in.good())
-				break;
-			if (in.bad())
-				throw creaturesException("IO error");
-		}
-	}
+	std::string caostext = readfile(in);
 	// run the token parser
 	{
 		bool using_c2;

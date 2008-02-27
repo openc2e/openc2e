@@ -69,7 +69,7 @@ SET(OPENC2E_CORE
 	caosVM_vectors.cpp
 	caosVM_vehicles.cpp
 	caosVM_world.cpp
-	${GEN}/catalogue.lex.cpp
+	${GEN}/cataloglexer.cpp
 	Catalogue.cpp
 	${GEN}/catalogue.tab.cpp
 	${GEN}/cmddata.cpp
@@ -112,6 +112,7 @@ SET(OPENC2E_CORE
 	Vehicle.cpp
 	World.cpp
 	main.cpp
+	util.cpp
 )
 
 SET(OPENC2E_SDL
@@ -260,9 +261,9 @@ ADD_CUSTOM_COMMAND(
 # it seems these ADD_CUSTOM_COMMANDS for flex and bison could be made
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${GEN}/catalogue.lex.cpp ${GEN}/catalogue.lex.h
-	COMMAND flex -+ --prefix=catalogue -d -o ${GEN}/catalogue.lex.cpp --header-file=${GEN}/catalogue.lex.h catalogue.l 
-	DEPENDS catalogue.l ${GEN}/catalogue.tab.hpp
+	OUTPUT ${GEN}/cataloglexer.cpp
+	COMMAND re2c -o ${GEN}/cataloglexer.cpp ${SRC}/cataloglexer.re2c
+	DEPENDS ${SRC}/cataloglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
@@ -298,8 +299,8 @@ ADD_CUSTOM_COMMAND(
 ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
 ADD_CUSTOM_TARGET(generated DEPENDS
 	${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
-	${GEN}/catalogue.lex.cpp ${GEN}/catalogue.lex.h
 	${GEN}/caoslexer.cpp
+	${GEN}/cataloglexer.cpp
 	${GEN}/cmddata.cpp
 	${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
 	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp

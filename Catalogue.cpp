@@ -18,7 +18,12 @@
  *
  */
 #include "Catalogue.h"
-#include "catalogue.lex.h"
+
+// make sure we have the header imports that bison's horrible .h file needs
+#include <string>
+#include <list>
+
+#include "catalogue.tab.hpp"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -30,6 +35,7 @@
 #include <cctype>
 
 #include "openc2e.h"
+#include "util.h"
 
 using boost::str;
 
@@ -66,7 +72,6 @@ static const char *tok_str[] = { "EOF", "word", "string", "integer" };
 std::string cat_str;
 int cat_int = -1;
 
-catalogueFlexLexer *catalexer = NULL;
 Catalogue *parsing_cat = NULL;
 
 void Catalogue::addVals(std::string &title, bool override, int count,
@@ -86,26 +91,21 @@ void Catalogue::addVals(std::string &title, bool override, int count,
 
 extern int cataparse();
 
-void cataerror(const char *err) {
-	// XXX: we may leak here - memory pools?
-	throw catalogueException(err);
-}
-void catalogueParseError(int lineno) {
+void Catalogue::catalogueParseError(const char *err) {
 	std::ostringstream oss;
-	oss << "Catalogue parse error at line " << lineno << std::endl;
+	oss << "Catalogue parse error at line " << yylineno;
+	if (err)
+		oss << ": " << err;
 	
 	throw catalogueException(oss.str());
 }
 
 std::istream &operator >> (std::istream &s, Catalogue &c) {
-	catalogueFlexLexer lex(&s);
-	catalexer = &lex;
+	std::string buf = readfile(s);
+	Catalogue::yyinit(buf.c_str());
 	parsing_cat = &c;
 			
 	cataparse();
-
-	catalexer = NULL;
-	parsing_cat = NULL;
 
 	return s;
 }

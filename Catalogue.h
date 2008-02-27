@@ -38,7 +38,14 @@ class catalogueException : public creaturesException {
 };	
 
 class Catalogue {
-//protected:
+protected:
+	static int yylineno;
+	static const char *catalogue_parse_p;
+	static void yyinit(const char *buf);
+	static int catalex();
+	friend int catalex();
+	friend void cataerror(const char *);
+	static void catalogueParseError(const char *err = NULL);
 public:
 	std::map<std::string, std::vector<std::string> > data;
 
