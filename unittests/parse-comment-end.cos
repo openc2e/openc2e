@@ -1,0 +1,3 @@
+DBG: OUTS "1..1"
+DBG: OUTS "ok 1 - provided we don't crash"
+** Make sure we can handle a file ending with a comment

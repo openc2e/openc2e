@@ -35,8 +35,9 @@ std:
 	re2c:yych:conversion = 1;
 	re2c:indent:top = 1;
 
-any        = [\000-\377];
+noneoi     = [\001-\377];
 eoi        = [\000];
+any        = noneoi | eoi;	
 DIGIT      = [0-9];
 WORDINIT   = [a-zA-Z_];
 WORDANY    = [$#a-zA-Z0-9:?!_+-];
@@ -45,8 +46,8 @@ SIGN       = [-+];
 
 	[\r\n] { ++yylineno; goto std; }
 	[ \t,] { goto std; }
-	"*" [^\r\n]* { goto std; }
-	"'" any "'"  { v.push_back(token(caosVar((int)p[1]), yylineno)); goto std; }
+	"*" [^\r\n\000]* { goto std; }
+	"'" noneoi "'"  { v.push_back(token(caosVar((int)p[1]), yylineno)); goto std; }
 	[fF] "**" [kK] { make_word("f**k"); goto std; }
 	WORDINIT WORDANY* {
 		std::string word(basep, p - basep);
@@ -101,7 +102,7 @@ brstr:
 	/*!re2c
 [\000\r\n] { parse_error(basep, yylineno); }
 "]" { v.push_back(token(caosVar(tempstr), yylineno)); tempstr.clear(); goto std;  }
-any { tempstr.push_back(*basep); goto brstr; }
+noneoi { tempstr.push_back(*basep); goto brstr; }
 */
 
 str:
@@ -110,7 +111,7 @@ str:
 [\000\r\n] { parse_error(p, yylineno); }
 "\\" . { tempstr.push_back(string_escape(basep[1])); goto str; }
 "\"" { v.push_back(token(caosVar(tempstr), yylineno)); tempstr.clear(); goto std;  }
-any      { tempstr.push_back(*basep); goto str; }
+noneoi      { tempstr.push_back(*basep); goto str; }
 */
 out:
 	v.push_back(token()); // EOI
