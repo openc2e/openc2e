@@ -86,14 +86,14 @@ SET(OPENC2E_CORE
 	genomeFile.cpp
 	historyManager.cpp
 	imageManager.cpp
-	${GEN}/lex.mng.cpp
+	#	${GEN}/lex.mng.cpp
 	${GEN}/caoslexer.cpp
 	Lift.cpp
 	Map.cpp
 	MetaRoom.cpp
 	mmapifstream.cpp
-	mngfile.cpp
-	${GEN}/mngparser.tab.cpp
+	#	mngfile.cpp
+	#	${GEN}/mngparser.tab.cpp
 	oldBrain.cpp
 	PathResolver.cpp
 	physics.cpp
@@ -284,17 +284,17 @@ ADD_CUSTOM_COMMAND(
 	DEPENDS ${SRC}/caoslexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
-ADD_CUSTOM_COMMAND(
-	OUTPUT ${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
-	COMMAND flex -+ --prefix=mng -d -o ${GEN}/lex.mng.cpp --header-file=${GEN}/lex.mng.h mng.l
-	DEPENDS mng.l
-	WORKING_DIRECTORY ${SRC})
-
-ADD_CUSTOM_COMMAND(
-	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
-	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" mngparser.ypp
-	DEPENDS mngparser.ypp
-	WORKING_DIRECTORY ${SRC})
+#ADD_CUSTOM_COMMAND(
+#	OUTPUT ${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
+#	COMMAND flex -+ --prefix=mng -d -o ${GEN}/lex.mng.cpp --header-file=${GEN}/lex.mng.h mng.l
+#	DEPENDS mng.l
+#	WORKING_DIRECTORY ${SRC})
+#
+#ADD_CUSTOM_COMMAND(
+#	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+#	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" mngparser.ypp
+#	DEPENDS mngparser.ypp
+#	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
 ADD_CUSTOM_TARGET(generated DEPENDS
@@ -302,7 +302,7 @@ ADD_CUSTOM_TARGET(generated DEPENDS
 	${GEN}/caoslexer.cpp
 	${GEN}/cataloglexer.cpp
 	${GEN}/cmddata.cpp
-	${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
-	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+	#	${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
+	#	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
 )
 
