@@ -60,7 +60,7 @@ OPENC2E_CORE = \
 	caosVM_vectors.o \
 	caosVM_vehicles.o \
 	caosVM_world.o \
-	catalogue.lex.o \
+	cataloglexer.o \
 	Catalogue.o \
 	catalogue.tab.o \
 	cmddata.o \
@@ -77,16 +77,11 @@ OPENC2E_CORE = \
 	genomeFile.o \
 	historyManager.o \
 	imageManager.o \
-	lex.c2.o \
-	lex.mng.o \
-	lexutil.o \
-	lex.yy.o \
+	caoslexer.cpp \
 	Lift.o \
 	Map.o \
 	MetaRoom.o \
 	mmapifstream.o \
-	mngfile.o \
-	mngparser.tab.o \
 	oldBrain.o \
 	OpenALBackend.o \
 	PathResolver.o \
@@ -104,7 +99,8 @@ OPENC2E_CORE = \
 	sprImage.o \
 	streamutils.o \
 	Vehicle.o \
-	World.o
+	World.o \
+	util.o
 
 SERIALIZATION = caosVM_ser_real.o
 SERSTUB = caosVM_ser_stub.o
@@ -119,7 +115,7 @@ XCFLAGS=$(CFLAGS) $(COREFLAGS)
 XCPPFLAGS=$(COREFLAGS) $(CPPFLAGS) $(CFLAGS)
 
 default: user-is-insane openc2e tools/praydumper docs
-all: openc2e tools/mngtest tools/filetests tools/praydumper docs tools/pathtest tools/memstats tools/wildtest
+all: openc2e tools/filetests tools/praydumper docs tools/pathtest tools/memstats tools/wildtest
 
 docs: docs.html
 
@@ -132,28 +128,22 @@ docs.html: writehtml.pl commandinfo.yml
 cmddata.cpp: commandinfo.yml writecmds.pl
 	perl writecmds.pl commandinfo.yml > cmddata.cpp
 
-lex.mng.cpp lex.mng.h: mng.l
-	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
+#lex.mng.cpp lex.mng.h: mng.l
+#	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
 
-catalogue.lex.cpp catalogue.lex.h: catalogue.l catalogue.tab.hpp
-	flex -+ --prefix=catalogue -d -o catalogue.lex.cpp --header-file=catalogue.lex.h catalogue.l 
-	
+cataloglexer.cpp: cataloglexer.re2c
+	re2c -o cataloglexer.cpp cataloglexer.re2c
+
+caoslexer.cpp: caoslexer.re2c
+	re2c -o caoslexer.cpp caoslexer.re2c
+
 mngfile.o: lex.mng.cpp
 
-mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
-	bison -d --name-prefix=mng mngparser.ypp
+#mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
+#	bison -d --name-prefix=mng mngparser.ypp
 
 catalogue.tab.cpp catalogue.tab.hpp: catalogue.ypp
 	bison -d --name-prefix=cata catalogue.ypp
-
-lex.yy.cpp lex.yy.h: caos.l
-	flex -+ -d -o lex.yy.cpp --header-file=lex.yy.h --prefix=c2e caos.l
-
-lex.c2.cpp lex.c2.h: c2caos.l
-	flex -+ -d -o lex.c2.cpp --header-file=lex.c2.h --prefix=c2 c2caos.l
-
-## lex.yy.h deps aren't detected evidently
-caosScript.o: lex.yy.h lex.yy.cpp lex.c2.h lex.c2.cpp
 
 ## based on automake stuff
 %.o: %.cpp
@@ -167,7 +157,7 @@ caosScript.o: lex.yy.h lex.yy.cpp lex.c2.h lex.c2.cpp
 	mv .deps/$<.Td .deps/$<.d
 
 include $(shell find .deps -name '*.d' -type f 2>/dev/null || true)
-Catalogue.o: catalogue.lex.h catalogue.tab.hpp
+Catalogue.o: catalogue.tab.hpp
 lex.mng.o: mngparser.tab.hpp
 
 Creature_standalone.o: Creature.cpp Creature.o
@@ -179,14 +169,14 @@ openc2e: $(OPENC2E)
 openc2e_s: $(OPENC2E_S)
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o catalogue.lex.o catalogue.tab.o
+tools/filetests: tools/filetests.o genomeFile.o streamutils.o Catalogue.o catalogue.tab.o util.o cataloglexer.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/praydumper: tools/praydumper.o pray.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
-tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
-	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
+#tools/mngtest: tools/mngtest.o mngfile.o mngparser.tab.o lex.mng.o
+#	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
 
 tools/pathtest: tools/pathtest.o PathResolver.o
 	$(CXX) -o $@ $^ $(XLDFLAGS) $(XCXXFLAGS)
@@ -213,7 +203,7 @@ clean:
 	rm -f headerdeps.dot headerdeps.png
 	rm -f .shake/dump.pl
 	rm -f tools/braininavat/Makefile tools/braininavat/*.o tools/braininavat/moc_*.cpp tools/braininavat/braininavat
-	rm -f catalogue.lex.cpp catalogue.lex.h catalogue.tab.cpp catalogue.tab.hpp docs.html
+	rm -f cataloglexer.cpp caoslexer.cpp catalogue.lex.h catalogue.tab.cpp catalogue.tab.hpp docs.html
 
 test: openc2e 
 	perl runtests.pl
@@ -224,6 +214,6 @@ headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) $(wildcard ser/*.h) mngparser.
 headerdeps.png: headerdeps.dot
 	dot -Tpng -o $@ $^
 
-generated: catalogue.tab.hpp lex.yy.h lex.c2.h mngparser.tab.hpp catalogue.lex.h lex.mng.h docs.html cmddata.cpp
+generated: catalogue.tab.hpp cataloglexer.cpp docs.html cmddata.cpp caoslexer.cpp
 
 .PHONY: clean all dep docs test
