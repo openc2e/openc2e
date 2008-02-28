@@ -47,6 +47,7 @@ public:
 	unsigned int fullwidth() { return fullwid; }
 	unsigned int fullheight() { return fullhei; }
 	bool wraparound() { return wraps; }
+	void setWraparound(bool w) { wraps = !!w; }
 
 	unsigned int addRoom(shared_ptr<class Room>);
 	void addBackground(std::string, shared_ptr<creaturesImage> = shared_ptr<creaturesImage>());

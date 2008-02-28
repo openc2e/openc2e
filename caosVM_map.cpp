@@ -1089,4 +1089,19 @@ void caosVM::v_ROOM_c1() {
 	}
 }
 
+/**
+ WRAP (variable) metaroom_id (integer)
+ %status broken
+ %pragma variants all
+
+ The world-wrapping flag for the specified metaroom. 1 to enable wrapping, 0 to disable.
+*/
+CAOS_LVALUE(WRAP,
+		VM_PARAM_INTEGER(metaroom_id);
+		MetaRoom *mr = world.map.getMetaRoom(metaroom_id);
+		caos_assert(mr),
+		caosVar((int)mr->wraparound()),
+		mr->setWraparound(newvalue.getInt())
+		)
+
 /* vim: set noet: */

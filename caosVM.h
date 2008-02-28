@@ -286,6 +286,8 @@ public:
 	void v_GRND();
 	void c_ROOM();
 	void v_ROOM_c1();
+	void v_WRAP();
+	void s_WRAP();
 	
 	// camera
 	void v_VISI();
