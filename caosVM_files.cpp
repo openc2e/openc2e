@@ -26,30 +26,44 @@
 #include <boost/filesystem/convenience.hpp>
 namespace fs = boost::filesystem;
 
-std::string calculateFilename(int directory, std::string filename) {
-	std::string fullfilename;
-	switch (directory) {
-		// TODO: point at the correct journal directories
-		case 0: fullfilename = world.getUserDataDir() + "/Journal/"; break;
-		case 1: fullfilename = world.getUserDataDir() + "/Journal/"; break;
-		case 2: fullfilename = world.getUserDataDir() + "/Journal/"; break;
-		default: throw caosException("unknown directory in FILE OOPE");
-	}
-
-	fs::path dir = fs::path(fullfilename, fs::native);
-	if (!fs::exists(dir))
-		fs::create_directory(dir);
-	caos_assert(fs::exists(dir) && fs::is_directory(dir));
-
+std::string calculateJournalFilename(int directory, std::string filename, bool writable) {
 	// sanitise string: remove leading dots, replace slashes with underscores
 	// todo: check DS behaviour for backslashes (a problem on Windows)
 	std::string::size_type r;
 	while ((r = filename.find("/", 0)) != std::string::npos)
 		filename.replace(r, 1, "_");
-	for (unsigned int i = 0; i < filename.size(); i++)
-		if (filename[i] == '.') { filename.erase(i, 1); i--; }
-		else break;
+	for (unsigned int i = 0; i < filename.size(); i++) {
+		if (filename[i] == '.') {
+			filename.erase(i, 1);
+			i--;
+		} else break;
+	}
 	
+	std::string fullfilename;
+	
+	// TODO: point at the correct journal directories!
+	
+	if (!writable) {
+		// search all directories for a readable file
+		fullfilename = world.findFile("/Journal/" + filename);
+
+		// if we found one, return that
+		if (fullfilename.size()) return fullfilename;
+	}
+
+	// otherwise, we should always write to the journal directory
+	switch (directory) {
+		case 0: fullfilename = world.getUserDataDir() + "/Journal/"; break;
+		case 1: fullfilename = world.getUserDataDir() + "/Journal/"; break;
+		case 2: fullfilename = world.getUserDataDir() + "/Journal/"; break;
+		default: throw caosException("unknown Journal directory");
+	}
+	
+	fs::path dir = fs::path(fullfilename, fs::native);
+	if (!fs::exists(dir))
+		fs::create_directory(dir);
+	caos_assert(fs::exists(dir) && fs::is_directory(dir));
+
 	return fullfilename + filename;
 }
 
@@ -114,7 +128,7 @@ void caosVM::c_FILE_IOPE() {
 
 	c_FILE_ICLO();
 	
-	std::string fullfilename = calculateFilename(directory, filename);
+	std::string fullfilename = calculateJournalFilename(directory, filename, false);
 	inputstream = new std::ifstream(fullfilename.c_str());
 
 	if (inputstream->fail()) {
@@ -134,7 +148,7 @@ void caosVM::c_FILE_JDEL() {
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
 	
-	std::string fullfilename = calculateFilename(directory, filename);
+	std::string fullfilename = calculateJournalFilename(directory, filename, true);
 
 	// TODO
 }
@@ -178,7 +192,7 @@ void caosVM::c_FILE_OOPE() {
 
 	c_FILE_OCLO();
 
-	std::string fullfilename = calculateFilename(directory, filename);
+	std::string fullfilename = calculateJournalFilename(directory, filename, true);
 
 	if (append)
 		outputstream = new std::ofstream(fullfilename.c_str(), std::ios::app);
