@@ -70,6 +70,8 @@ void World::init() {
 				theHand->finishInit();
 				// TODO: set family/genus/species based on the first entry (normally "2 1 1")
 				// TODO: work out what second entry is ("2 2" normally?! "7 7" in CV)
+			} else {
+				std::cout << "There was a seemingly-useful \"Pointer Information\" catalogue tag provided, but sprite file '" << pointerinfo[2] << " ' doesn't exist!" << std::endl;
 			}
 		}
 	}
@@ -81,12 +83,18 @@ void World::init() {
 			img = gallery.getImage("hand"); // as used in C3 and DS
 		else
 			img = gallery.getImage("syst"); // as used in C1, C2 and CV
-		if (!img)
-			throw creaturesException("no valid \"Pointer Information\" catalogue tag, and fallback failed");
-		theHand = new PointerAgent(img->getName());
-		theHand->finishInit();
-		if (engine.version > 2)
-			std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->getName() << "'." << std::endl;
+		if (img) {
+			theHand = new PointerAgent(img->getName());
+			theHand->finishInit();
+			if (engine.version > 2)
+				std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->getName() << "'." << std::endl;
+		} else {
+			if (engine.version > 2)
+				std::cout << "Couldn't find a valid \"Pointer Information\" catalogue tag, and c";
+			else
+				std::cout << "C";
+			std::cout << "ouldn't find a pointer sprite, so not creating the pointer agent." << std::endl;
+		}
 	}
 
 	// *** set defaults for non-zero GAME engine variables
