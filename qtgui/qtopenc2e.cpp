@@ -19,7 +19,7 @@
 #include <QtGui>
 #include "openc2eview.h"
 #include "Engine.h"
-#include "OpenALBackend.h"
+#include "AudioBackend.h"
 #include "MetaRoom.h"
 
 #include "AgentInjector.h"
