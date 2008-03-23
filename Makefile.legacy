@@ -1,5 +1,7 @@
 .SILENT: user-is-insane
 
+default: all
+
 user-is-insane:
 	( \
 		echo "The Makefile build method is deprecated and intended for use only in"; \
@@ -216,4 +218,4 @@ headerdeps.png: headerdeps.dot
 
 generated: catalogue.tab.hpp cataloglexer.cpp docs.html cmddata.cpp caoslexer.cpp
 
-.PHONY: clean all dep docs test
+.PHONY: clean all dep docs test default
