@@ -23,7 +23,7 @@ class AgentInjector : public QDialog {
 	Q_OBJECT
 	
 	public:
-		AgentInjector(QWidget *parent = 0);
+		AgentInjector(QWidget *parent);
 		~AgentInjector();
 
 	private slots:

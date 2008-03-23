@@ -23,7 +23,7 @@ class BrainViewer : public QDialog {
 	Q_OBJECT
 
 	public:
-		BrainViewer(QWidget *parent = 0);
+		BrainViewer(QWidget *parent);
 		~BrainViewer();
 
 	private slots:

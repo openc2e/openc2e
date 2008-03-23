@@ -33,6 +33,11 @@ ImagePreview::~ImagePreview() {
 void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 	previewimg = QImage();
 
+	if (!current) {
+		update();
+		return;
+	}
+
 	if (engine.version == 1) {
 		QString filename = current->toolTip();
 		std::ifstream cobstream(filename.toAscii(), std::ios::binary);
@@ -61,7 +66,7 @@ void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 			if (imgdata) delete imgdata;
 			imgdata = new unsigned int[b->thumbnailwidth * b->thumbnailheight];
 
-			for (unsigned int i = 0; i < b->thumbnailwidth * b->thumbnailheight; i++) {
+			for (unsigned int i = 0; i < (unsigned int)b->thumbnailwidth * (unsigned int)b->thumbnailheight; i++) {
 				unsigned int v = oldimgdata[i];
 				unsigned int red = ((v & 0xf800) >> 8) & 0xFF;
 				unsigned int green = ((v & 0x07e0) >> 3) & 0xFF;

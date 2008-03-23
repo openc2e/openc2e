@@ -131,8 +131,8 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	connect(brainViewerAct, SIGNAL(triggered()), this, SLOT(showBrainViewer()));
 	toolsMenu->addAction(brainViewerAct);
 
-	agentInjector = new AgentInjector();
-	brainViewer = new BrainViewer();
+	agentInjector = new AgentInjector(this);
+	brainViewer = new BrainViewer(this);
 	connect(this, SIGNAL(ticked()), brainViewer, SLOT(onTick()));
 
 	creatureGrapher = new CreatureGrapher(this);

@@ -49,7 +49,7 @@ AgentInjector::~AgentInjector() {
 }
 
 void AgentInjector::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
-	assert(current);
+	if (!current) return;
 
 	ui.injectButton->setEnabled(true);
 
