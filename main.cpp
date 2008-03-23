@@ -31,8 +31,10 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#undef main
 #endif
+
+// SDL tries stealing main on some platforms, which we don't want.
+#undef main
 
 extern "C" int main(int argc, char *argv[]) {
 	try {

@@ -25,6 +25,10 @@
 #include <algorithm> // swap
 #include "openc2e.h" // FRIEND_SERIALIZE
 
+// OS X header files use Point and Line, so..
+#define Point MyPoint
+#define Line MyLine
+
 struct Point {
 	float x, y;
 	Point() { x = y = 0; }
