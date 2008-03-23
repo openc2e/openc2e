@@ -22,21 +22,7 @@
 
 #include <stdlib.h> // load the standard libraries for these defines
 
-#ifndef HAVE_STDINT
-
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-# define HAVE_STDINT 1
-#else
-# if defined(__GNUC_PREREQ) && __GNUC_PREREQ(4,0)
-#  define HAVE_STDINT 1
-# else
-#  define HAVE_STDINT 0
-# endif
-#endif
-
-#endif
-
-#if HAVE_STDINT
+#if HAVE_STDINT_H
 
 #include <stdint.h>
 
@@ -52,30 +38,55 @@ typedef unsigned int uint32;
 
 #endif
 
-/* endianism checking - this will break on a bunch of platforms, someone else tidy it up, love fuzzie */
-
-#ifdef __GNU__
- #include <endian.h>
+#ifndef OC2E_BIG_ENDIAN
+#	ifdef __GNU__
+#		include <endian.h>
+#	endif
+#	if __BYTE_ORDER == __LITTLE_ENDIAN || defined(_MSC_VER) || defined(__i386__)
+#		define OC2E_BIG_ENDIAN 0
+#	else
+#		define OC2E_BIG_ENDIAN 1
+#	endif
 #endif
-#if __BYTE_ORDER == __LITTLE_ENDIAN || defined(_MSC_VER) || defined(__i386__)
- #define __C2E_LITTLEENDIAN
-#else
- #define __C2E_BIGENDIAN
-#endif
 
-#ifdef __C2E_LITTLEENDIAN
+#if OC2E_BIG_ENDIAN
 
-#define swapEndianShort(A) A 
-#define swapEndianLong(A) A
+# if HAVE_BYTESWAP_H
 
-#else
+#include <byteswap.h>
+static inline uint16_t swapEndianShort(uint16_t a) {
+	return bswap_16(a);
+}
 
-#define swapEndianShort(A)  ((((uint16)(A) & 0xff00) >> 8) | \
-				   (((uint16)(A) & 0x00ff) << 8))
-#define swapEndianLong(A)  ((((uint32)(A) & 0xff000000) >> 24) | \
-				   (((uint32)(A) & 0x00ff0000) >> 8)  | \
-				   (((uint32)(A) & 0x0000ff00) << 8)  | \
-				   (((uint32)(A) & 0x000000ff) << 24))
+static inline uint32_t swapEndianLong(uint32_t a) {
+	return bswap_32(a);
+}
+
+# else // HAVE_BYTESWAP_H
+
+static inline uint16_t swapEndianShort(uint16_t a) {
+	return ((((uint16)(A) & 0xff00) >> 8) |
+				   (((uint16)(A) & 0x00ff) << 8));
+}
+
+static inline uint32_t swapEndianLong(uint32_t a) {
+	return ((((uint32)(A) & 0xff000000) >> 24) |
+				   (((uint32)(A) & 0x00ff0000) >> 8)  |
+				   (((uint32)(A) & 0x0000ff00) << 8)  |
+				   (((uint32)(A) & 0x000000ff) << 24));
+}
+
+# endif
+
+#else // OC2E_BIG_ENDIAN
+
+static inline uint16_t swapEndianShort(uint16_t a) {
+	return a;
+}
+
+static inline uint32_t swapEndianLong(uint32_t a) {
+	return a;
+}
 
 #endif
 
