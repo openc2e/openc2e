@@ -41,11 +41,17 @@ typedef unsigned int uint32;
 #ifndef OC2E_BIG_ENDIAN
 #	ifdef __GNU__
 #		include <endian.h>
-#	endif
-#	if __BYTE_ORDER == __LITTLE_ENDIAN || defined(_MSC_VER) || defined(__i386__)
-#		define OC2E_BIG_ENDIAN 0
+#		if __BYTE_ORDER == __LITTLE_ENDIAN
+#			define OC2E_BIG_ENDIAN 0
+#		else
+#			define OC2E_BIG_ENDIAN 1
+#		endif
 #	else
-#		define OC2E_BIG_ENDIAN 1
+#		if defined(_MSC_VER) || defined(__i386__)
+#			define OC2E_BIG_ENDIAN 0
+#		else
+#			define OC2E_BIG_ENDIAN 1
+#		endif
 #	endif
 #endif
 
