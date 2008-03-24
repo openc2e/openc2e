@@ -68,6 +68,7 @@ void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 
 			for (unsigned int i = 0; i < (unsigned int)b->thumbnailwidth * (unsigned int)b->thumbnailheight; i++) {
 				unsigned int v = oldimgdata[i];
+				v = swapEndianShort(v);
 				unsigned int red = ((v & 0xf800) >> 8) & 0xFF;
 				unsigned int green = ((v & 0x07e0) >> 3) & 0xFF;
 				unsigned int blue = ((v & 0x001f) << 3) & 0xFF;
