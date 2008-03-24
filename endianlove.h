@@ -54,22 +54,22 @@ typedef unsigned int uint32;
 # if HAVE_BYTESWAP_H
 
 #include <byteswap.h>
-static inline uint16_t swapEndianShort(uint16_t a) {
+static inline uint16 swapEndianShort(uint16 a) {
 	return bswap_16(a);
 }
 
-static inline uint32_t swapEndianLong(uint32_t a) {
+static inline uint32 swapEndianLong(uint32 a) {
 	return bswap_32(a);
 }
 
 # else // HAVE_BYTESWAP_H
 
-static inline uint16_t swapEndianShort(uint16_t a) {
+static inline uint16 swapEndianShort(uint16 a) {
 	return ((((uint16)(a) & 0xff00) >> 8) |
 				   (((uint16)(a) & 0x00ff) << 8));
 }
 
-static inline uint32_t swapEndianLong(uint32_t a) {
+static inline uint32 swapEndianLong(uint32 a) {
 	return ((((uint32)(a) & 0xff000000) >> 24) |
 				   (((uint32)(a) & 0x00ff0000) >> 8)  |
 				   (((uint32)(a) & 0x0000ff00) << 8)  |
@@ -80,11 +80,11 @@ static inline uint32_t swapEndianLong(uint32_t a) {
 
 #else // OC2E_BIG_ENDIAN
 
-static inline uint16_t swapEndianShort(uint16_t a) {
+static inline uint16 swapEndianShort(uint16 a) {
 	return a;
 }
 
-static inline uint32_t swapEndianLong(uint32_t a) {
+static inline uint32 swapEndianLong(uint32 a) {
 	return a;
 }
 
