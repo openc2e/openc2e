@@ -532,9 +532,9 @@ void caosScript::parseloop(int state, void *info) {
 			throw parseException("Unexpected non-word token");
 		}
 		if (t->word() == "scrp") {
-			assert(!enumdepth);
 			if (state != ST_INSTALLER && state != ST_BODY && state != ST_REMOVAL)
 				throw parseException("Unexpected SCRP");
+			assert(!enumdepth);
 			state = ST_BODY;
 			int bits[4];
 			for (int i = 0; i < 4; i++) {
@@ -586,10 +586,10 @@ void caosScript::parseloop(int state, void *info) {
 			int nextreloc = current->newRelocation();
 			putBackToken(t);
 
+			enumdepth++;
 			emitExpr(readExpr(CI_COMMAND));
 			emitOp(CAOS_JMP, nextreloc);
 			int startp = current->getNextIndex();
-			enumdepth++;
 			parseloop(ST_ENUM, NULL);
 			enumdepth--;
 			current->fixRelocation(nextreloc);
