@@ -102,6 +102,8 @@ SkeletalCreature::SkeletalCreature(unsigned char _family) : CreatureAgent(_famil
 		aero.setInt(10);
 	}
 
+	for (unsigned int i = 0; i < 6; i++) appearancegenes[i] = 0;
+
 	skeleton = new SkeletonPart(this);
 }
 
