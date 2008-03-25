@@ -62,7 +62,7 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 		cachename.append(".s16");
 	}
 
-#ifdef OC2E_BIG_ENDIAN
+#if OC2E_BIG_ENDIAN
 	if (ft != spr)
 		cachename = cachename + ".big";
 #endif
@@ -79,7 +79,7 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 
 	in->clear();
 	in->mmapopen(realfile.native_file_string());
-#ifdef OC2E_BIG_ENDIAN
+#if OC2E_BIG_ENDIAN
 	if (in->is_open() && (ft != spr)) {
 		fileSwapper f;
 		switch (ft) {
