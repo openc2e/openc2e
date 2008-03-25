@@ -87,6 +87,14 @@ void oldCreature::processGenes() {
 	Creature::processGenes();
 }
 
+void c2Creature::processGenes() {
+	oldCreature::processGenes();
+
+	for (std::vector<shared_ptr<c2Organ> >::iterator x = organs.begin(); x != organs.end(); x++) {
+		(*x)->processGenes();
+	}
+}
+
 void c2eCreature::processGenes() {
 	// brain must be processed first (to create loci etc)
 	// organs should be processed last, because new ones will be created by normal processGenes()
@@ -273,7 +281,23 @@ unsigned int c1Creature::getGait() {
 }
 
 unsigned int c2Creature::getGait() {
-	return 0; // TODO
+	unsigned int gait = 0;
+
+	for (unsigned int i = 1; i < 16; i++)
+		if (gaitloci[i] > gaitloci[gait])
+			gait = i;
+
+	return gait;
+}
+
+unsigned int c2eCreature::getGait() {
+	unsigned int gait = 0;
+
+	for (unsigned int i = 1; i < 16; i++)
+		if (gaitloci[i] > gaitloci[gait])
+			gait = i;
+
+	return gait;
 }
 
 void c1Creature::tick() {
@@ -297,22 +321,33 @@ void c1Creature::tick() {
 	Creature::tick();
 }
 
+void c2Creature::tick() {
+	// TODO: should we tick some things even if dead?
+	if (!alive) return;
+
+	senses[0] = 255; // always-on
+	senses[1] = (asleep ? 255 : 0); // asleep
+
+	tickBrain();
+	tickBiochemistry();
+	
+	// lifestage checks
+	for (unsigned int i = 0; i < 7; i++) {
+		if ((lifestageloci[i] != 0) && (stage == (lifestage)i))
+			ageCreature();
+	}
+
+	if (dead != 0) die();
+
+	Creature::tick();
+}
+
 void oldCreature::tickBrain() {
 	// TODO
 
 	brain->tick();
 	
 	// TODO
-}
-
-unsigned int c2eCreature::getGait() {
-	unsigned int gait = 0;
-
-	for (unsigned int i = 1; i < 16; i++)
-		if (gaitloci[i] > gaitloci[gait])
-			gait = i;
-
-	return gait;
 }
 
 void c2eCreature::tick() {
@@ -607,6 +642,19 @@ void c1Creature::addGene(gene *g) {
 	}
 }
 
+void c2Creature::addGene(gene *g) {
+	Creature::addGene(g);
+
+	if (typeid(*g) == typeid(organGene)) {
+		// create organ
+		organGene *o = dynamic_cast<organGene *>(g);
+		assert(o);
+		if (!o->isBrain()) { // TODO: handle brain organ
+			organs.push_back(shared_ptr<c2Organ>(new c2Organ(this, o)));
+		}
+	}
+}
+
 void c2eCreature::addGene(gene *g) {
 	Creature::addGene(g);
 
@@ -699,6 +747,12 @@ void c1Creature::tickBiochemistry() {
 	for (std::vector<shared_ptr<c1Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) {
 		processReaction(**i);
 	}
+
+	oldCreature::tickBiochemistry();
+}
+
+void c2Creature::tickBiochemistry() {
+	// TODO
 
 	oldCreature::tickBiochemistry();
 }
@@ -874,6 +928,13 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
  
 /*****************************************************************************/
 
+c2Organ::c2Organ(c2Creature *p, organGene *g) {
+	parent = p; assert(parent);
+	ourGene = g; assert(ourGene);
+
+	// TODO
+}
+
 c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 	parent = p; assert(parent);
 	ourGene = g; assert(ourGene);
@@ -889,6 +950,14 @@ c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 
 	// TODO: is genes.size() always the size we want?
 	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
+}
+
+void c2Organ::processGenes() {
+	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+		if (!parent->shouldProcessGene(*i)) continue;
+
+		// TODO
+	}
 }
 
 void c2eOrgan::processGenes() {

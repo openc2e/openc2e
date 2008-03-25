@@ -103,24 +103,7 @@ public:
 	bool shouldProcessGene(gene *);
 };
 
-// c1
-
-struct c1Reaction {
-	bioReactionGene *data;
-	void init(bioReactionGene *);
-};
-
-struct c1Receptor {
-	bioReceptorGene *data;
-	unsigned char *locus;
-	void init(bioReceptorGene *, class c1Creature *);
-};
-
-struct c1Emitter {
-	bioEmitterGene *data;
-	unsigned char *locus;
-	void init(bioEmitterGene *, class c1Creature *);
-};
+// c1/c2
 
 class oldCreature : public Creature {
 protected:
@@ -162,6 +145,25 @@ public:
 	oldBrain *getBrain() { return brain; }
 };
 
+// c1
+
+struct c1Reaction {
+	bioReactionGene *data;
+	void init(bioReactionGene *);
+};
+
+struct c1Receptor {
+	bioReceptorGene *data;
+	unsigned char *locus;
+	void init(bioReceptorGene *, class c1Creature *);
+};
+
+struct c1Emitter {
+	bioEmitterGene *data;
+	unsigned char *locus;
+	void init(bioEmitterGene *, class c1Creature *);
+};
+
 class c1Creature : public oldCreature {
 protected:
 	std::vector<shared_ptr<c1Reaction> > reactions;
@@ -191,18 +193,106 @@ public:
 	unsigned int getGait();
 };
 
+// c2
+
+struct c2Reaction {
+	bioReactionGene *data;
+	float rate;
+	unsigned int receptors;
+	void init(bioReactionGene *);
+};
+
+struct c2Receptor {
+	bioReceptorGene *data;
+	bool processed;
+	float lastvalue;
+	float *locus;
+	unsigned int *receptors;
+	float nominal, threshold, gain;
+	void init(bioReceptorGene *, class c2Organ *, shared_ptr<c2Reaction>);
+};
+
+struct c2Emitter {
+	bioEmitterGene *data;
+	unsigned char sampletick;
+	float *locus;
+	float threshold, gain;
+	void init(bioEmitterGene *, class c2Organ *);
+};
+
+
+class c2Organ {
+protected:
+	class c2Creature *parent;
+	organGene *ourGene;
+
+	std::vector<shared_ptr<c2Reaction> > reactions;
+	std::vector<c2Receptor> receptors;
+	std::vector<c2Emitter> emitters;
+
+	// data
+	float energycost, atpdamagecoefficient;
+
+	// variables
+	float lifeforce, shorttermlifeforce, longtermlifeforce;
+	
+	// locuses
+	float biotick, damagerate, repairrate, clockrate, injurytoapply;
+	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
+
+	void processReaction(c2Reaction &);
+	void processEmitter(c2Emitter &);
+	void processReceptor(c2Receptor &, bool checkchem);
+	
+	unsigned char *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int **receptors);
+
+public:
+	c2Organ(c2Creature *p, organGene *g);
+	void tick();
+
+	void processGenes();
+
+	float getClockRate() { return clockrate; }
+	float getRepairRate() { return repairrate; }
+	float getDamageRate() { return damagerate; }
+	float getEnergyCost() { return energycost; }
+	float getInjuryToApply() { return injurytoapply; }
+	float getInitialLifeforce() { return lifeforce; }
+	float getShortTermLifeforce() { return shorttermlifeforce; }
+	float getLongTermLifeforce() { return longtermlifeforce; }
+	float getATPDamageCoefficient() { return atpdamagecoefficient; }
+	
+	unsigned int getReceptorCount() { return receptors.size(); }
+	unsigned int getEmitterCount() { return emitters.size(); }
+	unsigned int getReactionCount() { return reactions.size(); }
+	
+	void applyInjury(float);
+
+};
+
 class c2Creature : public oldCreature {
 protected:
+	// biochemistry
+	std::vector<shared_ptr<c2Organ> > organs;
+
 	// loci
 	unsigned char senses[14];
 	unsigned char gaitloci[16];
 	unsigned char drives[17];
 	unsigned char mutationchance, mutationdegree;
+	
+	void addGene(gene *);
+	void tickBiochemistry();
+	void processGenes();
 
 public:
 	c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+
+	void tick();
 	
 	unsigned char getDrive(unsigned int id) { assert(id < 17); return drives[id]; }
+	
+	unsigned char *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 	
 	unsigned int getGait();
 };
