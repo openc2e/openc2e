@@ -215,8 +215,6 @@ c1Creature::c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _
 c2Creature::c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 2);
 
-	throw creaturesException("You can't create Creatures 2 creatures yet. Bug fuzzie."); // TODO
-	
 	for (unsigned int i = 0; i < 14; i++) senses[i] = 0;
 	for (unsigned int i = 0; i < 16; i++) gaitloci[i] = 0;
 	for (unsigned int i = 0; i < 17; i++) drives[i] = 0;
