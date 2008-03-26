@@ -492,7 +492,8 @@ class PointerTool(SimpleObject):
 
 		# TODO: data from C2 eden is shown below
 		# 02 00 00 00 02 00 00 00
-		# 00 00 00 00 00 00
+		# 00 00 <- bubble
+		# 00 00 00 00
 		# 67 65 74 00
 		# 63 72 69 74
 		# 74 65 72 00
@@ -502,9 +503,39 @@ class PointerTool(SimpleObject):
 		# bear in mind CD CD CD CD is prbly unallocated memory from microsoft's CRT
 		if version == 0:
 			x = f.read(35)
+			print "pointer bytes: ",
+			for z in x: print "%02X" % ord(z),
+			print
 		else:
-			x = f.read(8 + 6 + 16 + 9 + 12)
-		print "pointer bytes: ",
+			x = f.read(8)
+			print "pointer bytes: ",
+			for z in x: print "%02X" % ord(z),
+			print
+			
+			self.bubble = slurpMFC(f, Bubble)
+			
+			x = f.read(4 + 16 + 9 + 12)
+			print "pointer bytes: ",
+			for z in x: print "%02X" % ord(z),
+			print
+
+class Bubble(SimpleObject):
+	def read(self, f):
+		SimpleObject.read(self, f)
+
+		x = f.read(5)
+		print "bubble bytes: ",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.bubblestring = f.read(36)
+		x = self.bubblestring.find("\0")
+		if x != -1:
+			self.bubblestring = self.bubblestring[:x]
+		print "bubble string: " + self.bubblestring
+		
+		x = f.read(11)
+		print "more bubble bytes: ",
 		for z in x: print "%02X" % ord(z),
 		print
 
