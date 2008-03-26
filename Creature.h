@@ -231,13 +231,13 @@ protected:
 	std::vector<c2Emitter> emitters;
 
 	// data
-	float energycost, atpdamagecoefficient;
+	unsigned char energycost, atpdamagecoefficient;
 
 	// variables
 	float lifeforce, shorttermlifeforce, longtermlifeforce;
 	
 	// locuses
-	float biotick, damagerate, repairrate, clockrate, injurytoapply;
+	unsigned char biotick, damagerate, repairrate, clockrate, injurytoapply;
 	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
 
 	void processReaction(c2Reaction &);
@@ -252,15 +252,15 @@ public:
 
 	void processGenes();
 
-	float getClockRate() { return clockrate; }
-	float getRepairRate() { return repairrate; }
-	float getDamageRate() { return damagerate; }
-	float getEnergyCost() { return energycost; }
-	float getInjuryToApply() { return injurytoapply; }
+	unsigned char getClockRate() { return clockrate; }
+	unsigned char getRepairRate() { return repairrate; }
+	unsigned char getDamageRate() { return damagerate; }
+	unsigned char getEnergyCost() { return energycost; }
+	unsigned char getInjuryToApply() { return injurytoapply; }
 	float getInitialLifeforce() { return lifeforce; }
 	float getShortTermLifeforce() { return shorttermlifeforce; }
 	float getLongTermLifeforce() { return longtermlifeforce; }
-	float getATPDamageCoefficient() { return atpdamagecoefficient; }
+	unsigned char getATPDamageCoefficient() { return atpdamagecoefficient; }
 	
 	unsigned int getReceptorCount() { return receptors.size(); }
 	unsigned int getEmitterCount() { return emitters.size(); }

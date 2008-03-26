@@ -752,7 +752,14 @@ void c1Creature::tickBiochemistry() {
 }
 
 void c2Creature::tickBiochemistry() {
-	// TODO
+	// TODO: untested
+	
+	if ((ticks % 5) != 0) return;
+
+	// tick organs
+	for (std::vector<shared_ptr<c2Organ> >::iterator x = organs.begin(); x != organs.end(); x++) {
+		(*x)->tick();
+	}
 
 	oldCreature::tickBiochemistry();
 }
@@ -854,6 +861,16 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 	return 0;
 }
 
+unsigned char *c2Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
+	// TODO
+
+	std::cout << "c2Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
+		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
+		<< std::endl;
+
+	return 0;
+}
+
 float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
 	switch (o) {
 		case 0: // brain
@@ -931,8 +948,17 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
 c2Organ::c2Organ(c2Creature *p, organGene *g) {
 	parent = p; assert(parent);
 	ourGene = g; assert(ourGene);
+	lifeforce = ourGene->lifeforce * (1000000.0f / 255.0f);
+	longtermlifeforce = shorttermlifeforce = lifeforce;
 
 	// TODO
+	repairrate = 0;
+	clockrate = 0;
+	injurytoapply = 0;
+	damagerate = 0;
+	biotick = 0;
+	atpdamagecoefficient = 0;
+	energycost = 0;
 }
 
 c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
@@ -979,6 +1005,10 @@ void c2eOrgan::processGenes() {
 			receptors.back().init((bioReceptorGene *)(*i), this, r);
 		}
 	}
+}
+
+void c2Organ::tick() {
+	// TODO
 }
 
 void c2eOrgan::tick() {
