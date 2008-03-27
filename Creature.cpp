@@ -951,14 +951,15 @@ c2Organ::c2Organ(c2Creature *p, organGene *g) {
 	lifeforce = ourGene->lifeforce * (1000000.0f / 255.0f);
 	longtermlifeforce = shorttermlifeforce = lifeforce;
 
-	// TODO
-	repairrate = 0;
-	clockrate = 0;
+	repairrate = 0; // TODO
+	clockrate = ourGene->clockrate;
 	injurytoapply = 0;
-	damagerate = 0;
-	biotick = 0;
-	atpdamagecoefficient = 0;
-	energycost = 0;
+	damagerate = ourGene->damagerate; // TODO
+	biotick = 0; // TODO
+	atpdamagecoefficient = ourGene->atpdamagecoefficient * (lifeforce / (255.0f * 255.0f));
+	
+	// TODO: is genes.size() always the size we want?
+	energycost = 2 + (ourGene->genes.size() / 10);
 }
 
 c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
@@ -1008,7 +1009,24 @@ void c2eOrgan::processGenes() {
 }
 
 void c2Organ::tick() {
+	if (longtermlifeforce <= 0.5f) return; // We're dead!
+
+	biotick += clockrate;
+
+	bool ticked = false;
+
+	if (biotick >= 255) {
+		ticked = true;
+		biotick -= 255;
+
+		// TODO
+	}
+
 	// TODO
+
+	// *** decay life force
+	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
+	longtermlifeforce -= longtermlifeforce * (1.0f / 1000000.0f);
 }
 
 void c2eOrgan::tick() {
