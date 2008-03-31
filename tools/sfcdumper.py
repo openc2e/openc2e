@@ -420,8 +420,8 @@ class Object:
 		assert self.tickreset >= self.tickstate
 		print "* tick time: " + str(self.tickreset) + ", state: " + str(self.tickstate)
 
-		x = read16(f)
-		assert x == 0
+		self.objp = slurpMFC(f)
+
 		self.currentsound = f.read(4)
 		if self.currentsound[0] != chr(0):
 			print "current sound: " + self.currentsound
