@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # sfcdumper
-# a utility to extract information from Creatures 1/2 SFC (world save) files
+# a utility to extract information from Creatures 1/2 SFC (world save)/EXP (creature export) files
 # reverse-engineered by fuzzie and nornagon
 
 # TODO: a lot of reads probably need to be changed to signed reads
@@ -742,18 +742,37 @@ class Creature:
 		self.body = slurpMFC(f, Body)
 
 		if version == 1:
-			x = f.read(33)
+			x = f.read(32)
 			print "creature bytes:",
 			for z in x: print "%02X" % ord(z),
 			print
 
 		print "vocab:",
-		for i in range(80):
+		if version == 0:
+			vocabsize = 80
+		else:
+			vocabsize = 82
+		for i in range(vocabsize):
 			print readstring(f) + " " + readstring(f),
 			f.read(4)
-	
-		# TODO: read brain (CBrain) here
-		# TODO: read biochem (CBiochemistry) here, w/COrgan and Receptor
+		print
+
+		if version == 0:
+			x = f.read(752)
+		else:
+			x = f.read(896)
+		print "creature bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.brain = slurpMFC(f, CBrain)
+
+		x = f.read(68)
+		print "creature (brain?) bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.biochem = slurpMFC(f, CBiochemistry)
 
 		# TODO: read instincts (CInstinct) here
 		# TODO: read random data [voice files, birth data, history?] here
@@ -804,7 +823,7 @@ class Body:
 		if version == 0:
 			noanims = 8
 		else:
-			noanims = 14
+			noanims = 15
 		for i in range(noanims):
 			print readstring(f),
 		print
@@ -813,6 +832,127 @@ class Limb:
 	def read(self, f):
 		x = f.read(65)
 		print "limb bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+class CBiochemistry:
+	def read(self, f):
+		pass
+
+class CBrain:
+	# thanks to Chris Double for working out some of this structure, years ago
+	# http://www.double.co.nz/creatures/creatures2/expbrain.htm
+
+	def read(self, f):
+		if version == 0:
+			x = f.read(29)
+		else:
+			x = f.read(54)
+		print "brain bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		if version == 0:
+			nolobes = read8(f)
+		else:
+			nolobes = read32(f)
+		print str(nolobes) + " lobes:"
+
+		self.lobes = []
+		for i in range(nolobes):
+			l = Lobe()
+			l.read(f)
+			self.lobes.append(l)
+
+		for i in self.lobes:
+			i.readNeurons(f)
+
+# not an MFC class
+class Neuron:
+	def read(self, f):
+		self.x = read8(f)
+		self.y = read8(f)
+		self.output = read8(f)
+		self.state = read8(f)
+
+		x = f.read(4)
+		#print "neuron bytes:",
+		#for z in x: print "%02X" % ord(z),
+		#print
+
+		for i in range(2):
+			nodendrites = read8(f)
+			dendritetype = read8(f)
+			x = f.read(3)
+			#print "neuron bytes:",
+			#for z in x: print "%02X" % ord(z),
+			#print
+
+			for j in range(nodendrites):
+				id = read32(f)
+				x = read8(f)
+				y = read8(f)
+				read8(f)
+				stw = read8(f)
+				ltw = read8(f)
+				strength = read8(f)
+
+# not an MFC class
+class Lobe:
+	def read(self, f):
+		self.x = read32(f)
+		self.y = read32(f)
+		self.width = read32(f)
+		self.height = read32(f)
+		print "reading lobe at (" + str(self.x) + ", " + str(self.y) + "), size " + str(self.width) + "x" + str(self.height)
+
+		x = f.read(12)
+		print "lobe bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.leakagerate = read8(f)
+		self.reststate = read8(f)
+		self.inputgain = read8(f)
+
+		print "lobe has leakage rate " + str(self.leakagerate) + ", rest state " + str(self.reststate) + " and input gain " + str(self.inputgain)
+
+		x = f.read(16)
+		print "lobe bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.dendrite0details = DendriteDetails()
+		self.dendrite0details.read(f)
+		self.dendrite1details = DendriteDetails()
+		self.dendrite1details.read(f)
+
+		self.nocells = read32(f)
+		assert self.nocells == self.width * self.height
+		self.nodendrites = read32(f)
+	
+	def readNeurons(self, f):
+		self.neurons = []
+		for i in range(self.nocells):
+			n = Neuron()
+			n.read(f)
+			self.neurons.append(f)
+
+# not an MFC class
+class DendriteDetails:
+	def read(self, f):
+		self.sourcelobe = read32(f)
+		self.minimum = read8(f)
+		self.maximum = read8(f)
+		self.spread = read8(f)
+		self.fanout = read8(f)
+		self.minltw = read8(f)
+		self.maxltw = read8(f)
+		self.minstr = read8(f)
+		self.maxstr = read8(f)
+
+		x = f.read(96)
+		print "dendrite bytes:",
 		for z in x: print "%02X" % ord(z),
 		print
 
