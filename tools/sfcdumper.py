@@ -220,7 +220,7 @@ class MapData:
 		elif version == 1:
 			print "this is a Creatures 2 SFC file"
 		else:
-			assert false, "didn't understand version " + str(version)
+			assert False, "didn't understand version " + str(version)
 		self.savecount = read16(f) # TODO: prbly not actually savecount
 		x = read16(f) # <- this is prbly uint32 bit
 		assert x == 0, "third bytes of MapData were not zero but " + str(x)
@@ -698,6 +698,124 @@ class Scenery(SimpleObject):
 		SimpleObject.read(self, f)
 		readingscenery = False
 
+class Creature:
+	def read(self, f):
+		global version
+		x = read8(f)
+		if x == 0:
+			print "probably a C1 creature?"
+			version = 0
+		elif x == 1 or x == 2:
+			print "probably a C2 creature?"
+			version = 1
+		else:
+			assert False, "didn't understand Creature first byte " + str(x)
+			
+		if version == 0:
+			x = f.read(24)
+		else:
+			x = f.read(33)
+		print "creature bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.gallery = slurpMFC(f, CGallery)
+	
+		if version == 0:
+			x = f.read(30)
+		else:
+			x = f.read(455) # 255 + 200?
+		print "creature bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.moniker = f.read(4)
+		self.mommoniker = f.read(4)
+		self.dadmoniker = f.read(4)
+
+		print "reading creature with moniker " + self.moniker
+
+		if version == 1:
+			self.text1 = readstring(f)
+			self.text2 = readstring(f)
+
+		self.body = slurpMFC(f, Body)
+
+		if version == 1:
+			x = f.read(33)
+			print "creature bytes:",
+			for z in x: print "%02X" % ord(z),
+			print
+
+		print "vocab:",
+		for i in range(80):
+			print readstring(f) + " " + readstring(f),
+			f.read(4)
+	
+		# TODO: read brain (CBrain) here
+		# TODO: read biochem (CBiochemistry) here, w/COrgan and Receptor
+
+		# TODO: read instincts (CInstinct) here
+		# TODO: read random data [voice files, birth data, history?] here
+		# TODO: read genome (CGenome) here
+
+class Body:
+	def read(self, f):
+		x = f.read(145)
+		print "body bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		self.limbs = []
+		for i in range(18):
+			print "trying to read limb.."
+			limb = slurpMFC(f, Limb)
+			self.limbs.append(limb)
+	
+		if version == 0:
+			x = f.read(12)
+		else:
+			x = f.read(16)
+		print "body bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
+		somepose = readstring(f)
+		print "maaaaybe current pose: " + somepose
+
+		if version == 0:
+			x = f.read(3)
+		else:
+			x = f.read(7)
+		print "body bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+		
+		print "poses:",
+		if version == 0:
+			noposestrings = 100
+		else:
+			noposestrings = 256
+		for i in range(noposestrings):
+			print readstring(f),
+		print
+
+		print "animations:",
+		if version == 0:
+			noanims = 8
+		else:
+			noanims = 14
+		for i in range(noanims):
+			print readstring(f),
+		print
+
+class Limb:
+	def read(self, f):
+		x = f.read(65)
+		print "limb bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+
 # -------------------------------------------------------------------
 
 import sys
@@ -705,10 +823,14 @@ import sys
 assert len(sys.argv) == 2
 f = open(sys.argv[1], "r")
 
-print "reading map data.."
+data = slurpMFC(f)
 
-# slurp up the map data
-data = slurpMFC(f, MapData)
+# first thing in an EXP file is Creature
+if isinstance(data, Creature):
+	sys.exit(0)
+
+# first thing in an SFC file is MapData
+assert isinstance(data, MapData)
 
 print "successfully read " + str(len(data.rooms)) + " rooms"
 
