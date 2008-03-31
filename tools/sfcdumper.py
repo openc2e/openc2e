@@ -767,10 +767,11 @@ class Creature:
 
 		self.brain = slurpMFC(f, CBrain)
 
-		x = f.read(68)
-		print "creature (brain?) bytes:",
-		for z in x: print "%02X" % ord(z),
-		print
+		if version == 1:
+			x = f.read(68)
+			print "creature (brain?) bytes:",
+			for z in x: print "%02X" % ord(z),
+			print
 
 		self.biochem = slurpMFC(f, CBiochemistry)
 
@@ -785,14 +786,20 @@ class Body:
 		for z in x: print "%02X" % ord(z),
 		print
 
+		# fuzzie has little idea what's going on here, so this is probably wrong
+		# (but limb #18 is present in some C2 files, and there's no null there in some C1 files)
 		self.limbs = []
-		for i in range(18):
+		if version == 0:
+			nolimbs = 17
+		else:
+			nolimbs = 18
+		for i in range(nolimbs):
 			print "trying to read limb.."
 			limb = slurpMFC(f, Limb)
 			self.limbs.append(limb)
 	
 		if version == 0:
-			x = f.read(12)
+			x = f.read(14)
 		else:
 			x = f.read(16)
 		print "body bytes:",
@@ -837,25 +844,20 @@ class Limb:
 
 class CBiochemistry:
 	def read(self, f):
-		pass
+		print "reading biochem"
 
 class CBrain:
 	# thanks to Chris Double for working out some of this structure, years ago
 	# http://www.double.co.nz/creatures/creatures2/expbrain.htm
 
 	def read(self, f):
-		if version == 0:
-			x = f.read(29)
-		else:
+		if version == 1:
 			x = f.read(54)
-		print "brain bytes:",
-		for z in x: print "%02X" % ord(z),
-		print
+			print "brain bytes:",
+			for z in x: print "%02X" % ord(z),
+			print
 
-		if version == 0:
-			nolobes = read8(f)
-		else:
-			nolobes = read32(f)
+		nolobes = read32(f)
 		print str(nolobes) + " lobes:"
 
 		self.lobes = []
@@ -875,7 +877,10 @@ class Neuron:
 		self.output = read8(f)
 		self.state = read8(f)
 
-		x = f.read(4)
+		if version == 0:
+			x = f.read(2)
+		else:
+			x = f.read(4)
 		#print "neuron bytes:",
 		#for z in x: print "%02X" % ord(z),
 		#print
@@ -906,18 +911,23 @@ class Lobe:
 		self.height = read32(f)
 		print "reading lobe at (" + str(self.x) + ", " + str(self.y) + "), size " + str(self.width) + "x" + str(self.height)
 
-		x = f.read(12)
+		x = f.read(9)
 		print "lobe bytes:",
 		for z in x: print "%02X" % ord(z),
 		print
 
+		self.nominalthreshold = read8(f)
+		read16(f) # TODO
 		self.leakagerate = read8(f)
 		self.reststate = read8(f)
 		self.inputgain = read8(f)
 
-		print "lobe has leakage rate " + str(self.leakagerate) + ", rest state " + str(self.reststate) + " and input gain " + str(self.inputgain)
+		print "lobe has nominal threshold " + str(self.nominalthreshold) + ", leakage rate " + str(self.leakagerate) + ", rest state " + str(self.reststate) + " and input gain " + str(self.inputgain)
 
-		x = f.read(16)
+		if version == 0:
+			x = f.read(9)
+		else:
+			x = f.read(16)
 		print "lobe bytes:",
 		for z in x: print "%02X" % ord(z),
 		print
@@ -951,7 +961,20 @@ class DendriteDetails:
 		self.minstr = read8(f)
 		self.maxstr = read8(f)
 
-		x = f.read(96)
+		print "src lobe %d, min %d, max %d, spread %d, fanout %d, minltw %d, maxltw %d, minstr %d, maxstr %d" % (self.sourcelobe, self.minimum, self.maximum, self.spread, self.fanout, self.minltw, self.maxltw, self.minstr, self.maxstr)
+
+		self.migrationrule = read8(f)
+		self.relaxsuscept = read8(f)
+		self.relaxstw = read8(f)
+		self.ltwgainrate = read8(f)
+
+		print "migration rule %d, relax suscept %d, relax STW %d, LTW gain rate %d" % (self.migrationrule, self.relaxsuscept, self.relaxstw, self.ltwgainrate)
+
+		# the first bit of this, at least, seems to still be meaningful (ie: not all zeros)
+		if version == 0:
+			x = f.read(42)
+		else:
+			x = f.read(92)
 		print "dendrite bytes:",
 		for z in x: print "%02X" % ord(z),
 		print
