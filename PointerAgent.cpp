@@ -113,9 +113,13 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 							if (abs(i->second->x + parent->x - x) < 4 && abs(i->second->y + parent->y - y) < 4) {
 								foundport = true;
 								if (holdingWire == 1) {
-									wireOriginAgent->join(wireOriginID, parent, i->first);
-									holdingWire = 0;
-									eve = 111;
+									if (i->second->source) {
+										eve = 114;
+									} else {
+										wireOriginAgent->join(wireOriginID, parent, i->first);
+										holdingWire = 0;
+										eve = 111;
+									}
 								} else if (holdingWire == 0) {
 									if (i->second->source) {
 										eve = 112;
@@ -123,6 +127,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 										wireOriginAgent = i->second->source;
 										wireOriginID = i->second->sourceid;
 										i->second->source->outports[i->second->sourceid]->dests.remove(std::pair<AgentRef, unsigned int>(parent, i->first));
+										i->second->source.clear();
 									} else {
 										eve = 110;
 										holdingWire = 2;
