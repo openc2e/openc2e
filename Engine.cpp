@@ -312,14 +312,8 @@ void Engine::handleResizedWindow(SomeEvent &event) {
 
 void Engine::handleMouseMove(SomeEvent &event) {
 	// move the cursor
-	world.hand()->moveTo(event.x + world.camera.getX(), event.y + world.camera.getY());
-	world.hand()->velx.setInt(event.xrel * 4);
-	world.hand()->vely.setInt(event.yrel * 4);
-	
-	// middle mouse button scrolling
-	if (event.button & buttonmiddle)
-		world.camera.moveTo(world.camera.getX() - event.xrel, world.camera.getY() - event.yrel, jump);
-					
+	world.hand()->handleEvent(event);
+
 	// notify agents
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
@@ -369,70 +363,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 		}
 	}
 
-	if (!world.hand()->handle_events) return;
-	if (event.type != eventmousebuttondown) return;
-
-	// do our custom handling
-	if (event.button == buttonleft) {
-		CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y);
-		if (a /* && a->canActivate() */) { // TODO
-			// if the agent isn't paused, tell it to handle a click
-			if (!a->getParent()->paused)
-				a->handleClick(world.hand()->x - a->x - a->getParent()->x, world.hand()->y - a->y - a->getParent()->y);
-
-			// TODO: not sure how to handle the following properly, needs research..
-			int eve;
-			if (engine.version < 3) {
-				eve = 50;
-			} else {
-				eve = 101;
-			}
-			world.hand()->firePointerScript(eve, a->getParent()); // Pointer Activate 1
-		} else if (engine.version > 2)
-			world.hand()->queueScript(116, 0); // Pointer Clicked Background
-	} else if (event.button == buttonright) {
-		if (world.paused) return; // TODO: wrong?
-						
-		// picking up and dropping are implictly handled by the scripts (well, messages) 4 and 5	
-		// TODO: check if this is correct behaviour, one issue is that this isn't instant, another
-		// is the messages might only be fired in c2e when you use MESG WRIT, in which case we'll
-		// need to manually set world.hand()->carrying to NULL and a here, respectively - fuzzie
-		if (world.hand()->carrying) {
-			// TODO: c1 support - these attributes are invalid for c1
-			if (!world.hand()->carrying->suffercollisions() || (world.hand()->carrying->validInRoomSystem() || version == 1)) {
-				world.hand()->carrying->queueScript(5, world.hand()); // drop
-				
-				int eve; if (engine.version < 3) eve = 54; else eve = 105;
-				world.hand()->firePointerScript(eve, world.hand()->carrying); // Pointer Drop
-
-				// TODO: is this the correct check?
-				if (world.hand()->carrying->sufferphysics() && world.hand()->carrying->suffercollisions()) {
-					// TODO: do this in the pointer agent?
-					world.hand()->carrying->velx.setFloat(world.hand()->velx.getFloat());
-					world.hand()->carrying->vely.setFloat(world.hand()->vely.getFloat());
-				}
-			} else {
-				// TODO: some kind of "fail to drop" animation/sound?
-			}
-		} else {
-			Agent *a = world.agentAt(world.hand()->x, world.hand()->y, false, true);
-			if (a) {
-				a->queueScript(4, world.hand()); // pickup
-				
-				int eve; if (engine.version < 3) eve = 53; else eve = 104;
-				world.hand()->firePointerScript(eve, a); // Pointer Pickup
-			}
-		}
-	} else if (event.button == buttonmiddle) {
-		std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(event.x + world.camera.getX(), event.y + world.camera.getY());
-		if (rooms.size() > 0) std::cout << "Room at cursor is " << rooms[0]->id << std::endl;
-		Agent *a = world.agentAt(event.x + world.camera.getX(), event.y + world.camera.getY(), true);
-		if (a)
-			std::cout << "Agent under mouse is " << a->identify();
-		else
-			std::cout << "No agent under cursor";
-		std::cout << std::endl;
-	}
+	world.hand()->handleEvent(event);
 }
 
 void Engine::handleKeyDown(SomeEvent &event) {

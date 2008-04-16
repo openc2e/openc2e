@@ -18,6 +18,7 @@
  */
 
 #include "SimpleAgent.h"
+#include "Backend.h"
 
 #ifndef _C2E_POINTERAGENT_H
 #define _C2E_POINTERAGENT_H
@@ -32,7 +33,7 @@ public:
 	void firePointerScript(unsigned short event, Agent *src);
 	void physicsTick();
 	void kill();
-	void click(float x, float y);
+	void handleEvent(SomeEvent &event);
 };
 
 #endif
