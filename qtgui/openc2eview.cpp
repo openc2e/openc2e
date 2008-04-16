@@ -110,9 +110,9 @@ void openc2eView::mouseMoveEvent(QMouseEvent *m) {
 	lastmousex = e.x = m->x();
 	lastmousey = e.y = m->y();
 	e.button = 0;
-	if (m->buttons() && Qt::LeftButton) e.button |= buttonleft;
-	if (m->buttons() && Qt::MidButton) e.button |= buttonmiddle;
-	if (m->buttons() && Qt::RightButton) e.button |= buttonright;
+	if (m->buttons() & Qt::LeftButton) e.button |= buttonleft;
+	if (m->buttons() & Qt::MidButton) e.button |= buttonmiddle;
+	if (m->buttons() & Qt::RightButton) e.button |= buttonright;
 	backend->pushEvent(e);
 }
 
