@@ -117,10 +117,18 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 									holdingWire = 0;
 									eve = 111;
 								} else if (holdingWire == 0) {
-									eve = 110;
-									holdingWire = 2;
-									wireOriginAgent = parent;
-									wireOriginID = i->first;
+									if (i->second->source) {
+										eve = 112;
+										holdingWire = 1;
+										wireOriginAgent = i->second->source;
+										wireOriginID = i->second->sourceid;
+										i->second->source->outports[i->second->sourceid]->dests.remove(std::pair<AgentRef, unsigned int>(parent, i->first));
+									} else {
+										eve = 110;
+										holdingWire = 2;
+										wireOriginAgent = parent;
+										wireOriginID = i->first;
+									}
 								}
 								break;
 							}
