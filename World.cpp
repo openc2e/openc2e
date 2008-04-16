@@ -226,11 +226,9 @@ void World::tick() {
 		boost::shared_ptr<Agent> agent = i->agent.lock();
 		if (agent) {
 			if (engine.version < 3) {
-				// only try running a script if the agent doesn't have a running script
+				// only try running a collision script if the agent doesn't have a running script
 				// TODO: we don't really understand how script interruption in c1/c2 works
-				if (agent->vm && !agent->vm->stopped()) {
-					// TODO: is this sensible? (avoiding re-queueing c1/c2 script 9 and only script 9)
-					if (i->scriptno != 9) newqueue.push_back(*i);
+				if (agent->vm && !agent->vm->stopped() && i->scriptno == 6) {
 					continue;
 				}
 			}
