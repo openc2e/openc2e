@@ -47,7 +47,7 @@ SIGN       = [-+];
 	[\r\n] { ++yylineno; goto std; }
 	[ \t,] { goto std; }
 	"*" [^\r\n\000]* { goto std; }
-	"'" noneoi "'"  { v.push_back(token(caosVar((int)p[1]), yylineno)); goto std; }
+	"'" noneoi "'"  { v.push_back(token(caosVar((int)basep[1]), yylineno)); goto std; }
 	[fF] "**" [kK] { make_word("f**k"); goto std; }
 	WORDANY* WORDINIT WORDANY* {
 		std::string word(basep, p - basep);
