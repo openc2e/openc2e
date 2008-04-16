@@ -28,6 +28,8 @@
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = true;
+	holdingWire = 0;
+	wireOriginID = 0;
 	// TODO: verify attributes on the pointer in c2e
 	attr.setInt(256); // camera shy
 }
@@ -78,20 +80,79 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 		if (event.button == buttonleft) {
 			CompoundPart *a = world.partAt(x, y);
 			if (a /* && a->canActivate() */) { // TODO
-				// if the agent isn't paused, tell it to handle a click
-				if (!a->getParent()->paused)
-					a->handleClick(x - a->x - a->getParent()->x, y - a->y - a->getParent()->y);
+				Agent* parent = a->getParent();
 
 				// TODO: not sure how to handle the following properly, needs research..
 				int eve;
 				if (engine.version < 3) {
 					eve = 50;
 				} else {
-					eve = 101;
+					eve = 101; // Pointer Activate 1
 				}
-				firePointerScript(eve, a->getParent()); // Pointer Activate 1
-			} else if (engine.version > 2)
-				queueScript(116, 0); // Pointer Clicked Background
+
+				bool foundport = false;
+				if (engine.version > 2) {
+					for (std::map<unsigned int, boost::shared_ptr<OutputPort> >::iterator i = parent->outports.begin();
+							 i != parent->outports.end(); i++) {
+						// TODO: 4 is a magic number i pulled out of nooooowhere
+						if (abs(i->second->x + parent->x - x) < 4 && abs(i->second->y + parent->y - y) < 4) {
+							foundport = true;
+							if (holdingWire == 2) {
+								parent->join(i->first, wireOriginAgent, wireOriginID);
+								holdingWire = 0;
+								eve = 111;
+							} else if (holdingWire == 0) {
+								eve = 110;
+								holdingWire = 1;
+								wireOriginAgent = parent;
+								wireOriginID = i->first;
+							}
+							break;
+						}
+					}
+					if (!foundport) {
+						for (std::map<unsigned int, boost::shared_ptr<InputPort> >::iterator i = parent->inports.begin();
+								 i != parent->inports.end(); i++) {
+							// TODO: 4 is a magic number i pulled out of nooooowhere
+							if (abs(i->second->x + parent->x - x) < 4 && abs(i->second->y + parent->y - y) < 4) {
+								foundport = true;
+								if (holdingWire == 1) {
+									wireOriginAgent->join(wireOriginID, parent, i->first);
+									holdingWire = 0;
+									eve = 111;
+								} else if (holdingWire == 0) {
+									eve = 110;
+									holdingWire = 2;
+									wireOriginAgent = parent;
+									wireOriginID = i->first;
+								}
+								break;
+							}
+						}
+					}
+				}
+
+				if (!foundport) {
+					if (holdingWire) {
+						holdingWire = 0;
+						eve = 113;
+					} else if (!parent->paused) {
+						// if the agent isn't paused, tell it to handle a click
+						a->handleClick(x - a->x - parent->x, y - a->y - parent->y);
+					}
+				}
+
+				printf("%d\n", eve);
+
+				firePointerScript(eve, a->getParent());
+			} else if (engine.version > 2) {
+				if (holdingWire) {
+					holdingWire = 0;
+					queueScript(113, 0);
+				} else {
+					queueScript(116, 0); // Pointer Clicked Background
+				}
+			}
 		} else if (event.button == buttonright) {
 			if (world.paused) return; // TODO: wrong?
 							

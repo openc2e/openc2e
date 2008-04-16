@@ -1265,4 +1265,13 @@ bool Agent::tryMoveToPlaceAround(float x, float y) {
 	return false;
 }
 
+void Agent::join(unsigned int outid, AgentRef dest, unsigned int inid) {
+	assert(dest);
+	assert(outports.find(outid) != outports.end());
+	assert(dest->inports.find(inid) != dest->inports.end());
+	outports[outid]->dests.push_back(std::pair<AgentRef, unsigned int>(dest, inid));
+	dest->inports[inid]->source = this;
+	dest->inports[inid]->sourceid = outid;
+}
+
 /* vim: set noet: */

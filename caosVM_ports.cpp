@@ -120,9 +120,7 @@ void caosVM::c_PRT_JOIN() {
 	caos_assert(source->outports.find(outputport) != source->outports.end());
 	caos_assert(dest->inports.find(inputport) != dest->inports.end());
 
-	source->outports[outputport]->dests.push_back(std::pair<AgentRef, unsigned int>(dest, inputport));
-	dest->inports[inputport]->source = targ;
-	dest->inports[inputport]->sourceid = outputport;
+	source->join(outputport, dest, inputport);
 }
 
 /**

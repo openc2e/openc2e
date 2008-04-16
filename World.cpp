@@ -395,6 +395,22 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 		}
 	}
 
+	// render port connection lines. TODO: these should be rendered as some kind
+	// of renderable, not directly like this.
+	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		boost::shared_ptr<Agent> a = *i;
+		if (!a) continue;
+		for (std::map<unsigned int, boost::shared_ptr<OutputPort> >::iterator p = a->outports.begin();
+		     p != a->outports.end(); p++) {
+			for (PortConnectionList::iterator c = p->second->dests.begin(); c != p->second->dests.end(); c++) {
+				if (!c->first) continue;
+				InputPort *target = c->first->inports[c->second].get();
+				surface->renderLine(a->x + p->second->x - adjustx, a->y + p->second->y - adjusty,
+						c->first->x + target->x - adjustx, c->first->y + target->y - adjusty, 0x00ff00ff);
+			}
+		}
+	}
+
 	if (showrooms) {
 		shared_ptr<Room> r = map.roomAt(hand()->x, hand()->y);
 		for (std::vector<shared_ptr<Room> >::iterator i = cam->getMetaRoom()->rooms.begin();
@@ -414,6 +430,25 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 
 				(*i)->renderBorders(surface, newx, adjusty, col);
 			}
+		}
+	}
+
+	if (hand()->holdingWire) {
+		if (!hand()->wireOriginAgent) {
+			hand()->holdingWire = 0;
+		} else {
+			int x, y;
+			if (hand()->holdingWire == 1) {
+				// holding from outport
+				OutputPort *out = hand()->wireOriginAgent->outports[hand()->wireOriginID].get();
+				x = out->x; y = out->y;
+			} else {
+				// holding from inport
+				InputPort *in = hand()->wireOriginAgent->inports[hand()->wireOriginID].get();
+				x = in->x; y = in->y;
+			}
+			surface->renderLine(x + hand()->wireOriginAgent->x - adjustx,
+					y + hand()->wireOriginAgent->y - adjusty, hand()->x - adjustx, hand()->y - adjusty, 0x00ff00ff);
 		}
 	}
 

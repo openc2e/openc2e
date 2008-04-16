@@ -84,10 +84,6 @@ protected:
 	std::list<caosVM *> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
 
-	// these are maps rather than vectors because ports can be destroyed
-	std::map<unsigned int, boost::shared_ptr<InputPort> > inports; // XXX: do these need to be shared_ptr?
-	std::map<unsigned int, boost::shared_ptr<OutputPort> > outports;
-
 	void updateAudio(boost::shared_ptr<class AudioSource>);
 	bool dying : 1;
 	
@@ -108,6 +104,12 @@ protected:
 
 public:
 	boost::shared_ptr<class AudioSource> sound;
+
+	// these are maps rather than vectors because ports can be destroyed
+	std::map<unsigned int, boost::shared_ptr<InputPort> > inports; // XXX: do these need to be shared_ptr?
+	std::map<unsigned int, boost::shared_ptr<OutputPort> > outports;
+
+	void join(unsigned int outid, AgentRef dest, unsigned int inid);
 
 	AgentRef carrying;
 	AgentRef carriedby;

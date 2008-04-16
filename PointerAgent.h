@@ -28,6 +28,10 @@ public:
 	std::string name;
 	bool handle_events;
 
+	int holdingWire; // 0 for no, 1 for from output port, 2 for from input port
+	AgentRef wireOriginAgent;
+	unsigned int wireOriginID;
+
 	PointerAgent(std::string spritefile);
 	void finishInit();
 	void firePointerScript(unsigned short event, Agent *src);
