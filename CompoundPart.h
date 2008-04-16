@@ -50,7 +50,7 @@ public:
 	virtual void render(class Surface *renderer, int xoffset, int yoffset);
 	virtual void partRender(class Surface *renderer, int xoffset, int yoffset) = 0;
 	virtual void tick() { }
-	virtual void handleClick(float, float);
+	virtual int handleClick(float, float);
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
 
@@ -122,7 +122,7 @@ protected:
 public:
 	ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, const bytestring_t &animhover, int msgid, int option);
-	void handleClick(float, float);
+	int handleClick(float, float);
 	bool isTransparent() { return hitopaquepixelsonly; }
 };
 
@@ -210,7 +210,7 @@ public:
 	void setText(std::string t);
 	void gainFocus() { focused = true; caretpose = 0; }
 	void loseFocus() { focused = false; }
-	void handleClick(float, float);
+	int handleClick(float, float);
 	void handleKey(char c);
 	void handleSpecialKey(char c);
 	void tick();

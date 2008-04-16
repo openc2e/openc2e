@@ -214,7 +214,7 @@ public:
 
 	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
 	
-	virtual void handleClick(float, float);
+	virtual int handleClick(float, float);
 	
 	virtual CompoundPart *part(unsigned int id) = 0;
 	

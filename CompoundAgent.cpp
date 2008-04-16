@@ -107,10 +107,9 @@ void CompoundAgent::tick() {
 	Agent::tick();
 }
 
-void CompoundAgent::handleClick(float clickx, float clicky) {
+int CompoundAgent::handleClick(float clickx, float clicky) {
 	if (engine.version > 2) {
-		Agent::handleClick(clickx, clicky);
-		return;
+		return Agent::handleClick(clickx, clicky);
 	}
 
 	// the hotspots are relative to us
@@ -139,10 +138,11 @@ void CompoundAgent::handleClick(float clickx, float clicky) {
 	
 		if ((clickx >= hotspots[j].left && clickx <= hotspots[j].right) &&
 			(clicky >= hotspots[j].top && clicky <= hotspots[j].bottom)) {
-			queueScript(func, (Agent *)world.hand());
-			return;
+			return func;
 		}
 	}
+
+	return -1;
 }
 
 void CompoundAgent::setHotspotLoc(unsigned int id, int l, int t, int r, int b) {

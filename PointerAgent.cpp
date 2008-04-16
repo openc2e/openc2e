@@ -84,14 +84,8 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 			if (a /* && a->canActivate() */) { // TODO
 				Agent* parent = a->getParent();
 
-				// TODO: not sure how to handle the following properly, needs research..
-				int eve;
-				if (engine.version < 3) {
-					eve = 50;
-				} else {
-					eve = 101; // Pointer Activate 1
-				}
-
+				int eve = -1;
+			
 				bool foundport = false;
 				if (engine.version > 2) {
 					for (std::map<unsigned int, boost::shared_ptr<OutputPort> >::iterator i = parent->outports.begin();
@@ -138,15 +132,37 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 					if (holdingWire) {
 						holdingWire = 0;
 						eve = 113;
-					} else if (!parent->paused) {
+					} else {
 						// if the agent isn't paused, tell it to handle a click
-						a->handleClick(x - a->x - parent->x, y - a->y - parent->y);
+						int scriptid = a->handleClick(x - a->x - parent->x, y - a->y - parent->y);
+						if (scriptid != -1) {
+							// fire the script
+							// _p1_ is id of part for button clicks, according to Edynn code
+							// TODO: should _p1_ always be set? :)
+							if (!parent->paused) parent->queueScript(scriptid, world.hand(), (int)a->id);
+
+							// annoyingly queueScript doesn't reliably tell us if it did anything useful.
+							// TODO: work out the mess which is queueScript's return values etc
+							if (!parent->findScript(scriptid)) return;
+
+							// fire the associated pointer script too, if necessary
+							// TODO: fuzzie has no idea if this code is remotely correct
+							if (engine.version < 3) {
+								eve = 50;
+							} else {
+								eve = 101; // Pointer Activate 1
+							}
+							switch (scriptid) {
+								case 0: eve += 2; break; // deactivate
+								case 1: break; // activate 1
+								case 2: eve += 1; break; // activate 2
+								default: return;
+							}
+						}
 					}
 				}
 
-				printf("%d\n", eve);
-
-				firePointerScript(eve, a->getParent());
+				if (eve != -1) firePointerScript(eve, a->getParent());
 			} else if (engine.version > 2) {
 				if (holdingWire) {
 					holdingWire = 0;

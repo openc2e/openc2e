@@ -76,7 +76,7 @@ public:
 	virtual ~SkeletalCreature();
 
 	void render(Surface *renderer, int xoffset, int yoffset);
-	virtual void handleClick(float, float);
+	virtual int handleClick(float, float);
 	
 	void skeletonInit();
 	void recalculateSkeleton();	

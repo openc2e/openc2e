@@ -758,16 +758,14 @@ unsigned int SkeletalCreature::getFaceSpriteFrame() {
 	return 9 + (eyesclosed ? 16 : 0) + (facialexpression * 32);
 }
 
-void SkeletalCreature::handleClick(float clickx, float clicky) {
+int SkeletalCreature::handleClick(float clickx, float clicky) {
 	// TODO: muh, horror
 
 	clicky -= y;
 	if (clicky >= getSkelHeight() / 2.0) {
-		// slap
-		queueScript(0, (Agent *)world.hand());
+		return 0; // slap
 	} else {
-		// tickle
-		queueScript(1, (Agent *)world.hand());
+		return 1; // tickle
 	}
 }
 

@@ -334,7 +334,7 @@ bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar
 	return true;
 }
 
-void Agent::handleClick(float clickx, float clicky) {
+int Agent::handleClick(float clickx, float clicky) {
 	// Handle a mouse click.
 
 	// old-style click handling (c1/c2)
@@ -346,18 +346,20 @@ void Agent::handleClick(float clickx, float clicky) {
 			action = clac[actv.getInt()];
 
 		if (action != -1) {
-			queueScript(calculateScriptId(action), (Agent *)world.hand());
+			return calculateScriptId(action);
 		}
 
-		return;
+		return -1;
 	}
 
 	// new-style click handling (c2e)
 	if (clik != -1) {
-		// TODO: handle CLIK
+		return -1; // TODO: handle CLIK
 	} else if (clac[0] != -1) {
-		queueScript(calculateScriptId(clac[0]), (Agent *)world.hand());
+		return calculateScriptId(clac[0]);
 	}
+
+	return -1;
 }
 
 void Agent::playAudio(std::string filename, bool controlled, bool loop) {

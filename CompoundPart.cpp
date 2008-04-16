@@ -108,8 +108,8 @@ bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 	return getSprite()->transparentAt(getCurrentSprite(), x, y);
 }
 
-void CompoundPart::handleClick(float clickx, float clicky) {
-	parent->handleClick(clickx + x + parent->x, clicky + y + parent->y);
+int CompoundPart::handleClick(float clickx, float clicky) {
+	return parent->handleClick(clickx + x + parent->x, clicky + y + parent->y);
 }
 
 CompoundPart::CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z) : parent(p), zorder(_z), id(_id) {
@@ -207,9 +207,8 @@ ButtonPart::ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
 
-void ButtonPart::handleClick(float x, float y) {
-	caosVar v; v.setInt(id); // _p1_ is id of part, according to Edynn code
-	parent->queueScript(calculateScriptId(messageid), (Agent *)world.hand(), v);
+int ButtonPart::handleClick(float x, float y) {
+	return calculateScriptId(messageid);
 }
 
 TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
@@ -297,8 +296,10 @@ void TextEntryPart::setText(std::string t) {
 
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
 
-void TextEntryPart::handleClick(float clickx, float clicky) {
+int TextEntryPart::handleClick(float clickx, float clicky) {
 	world.setFocus(this);
+
+	return -1; // TODO: this shouldn't be passed onto the parent agent?
 }
 
 void TextEntryPart::handleKey(char c) {

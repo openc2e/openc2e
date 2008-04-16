@@ -59,7 +59,7 @@ public:
 	virtual void tick();
 	void setZOrder(unsigned int plane);
 
-	void handleClick(float, float);
+	int handleClick(float, float);
 	void setHotspotLoc(unsigned int id, int l, int t, int r, int b);
 	void setHotspotFunc(unsigned int id, unsigned int h);
 	void setHotspotFuncDetails(unsigned int id, uint16 message, uint8 flags);
