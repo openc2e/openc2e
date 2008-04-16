@@ -32,6 +32,7 @@ public:
 	void firePointerScript(unsigned short event, Agent *src);
 	void physicsTick();
 	void kill();
+	void click(float x, float y);
 };
 
 #endif

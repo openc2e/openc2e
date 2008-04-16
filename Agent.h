@@ -23,8 +23,10 @@
 #include "caosVar.h"
 #include "AgentRef.h"
 #include "CompoundPart.h"
+#include "Port.h"
 #include <set>
 #include <list>
+#include <map>
 #include <boost/enable_shared_from_this.hpp>
 #include "openc2e.h"
 #include "physics.h"
@@ -81,6 +83,10 @@ protected:
 	std::list<boost::shared_ptr<Agent> >::iterator agents_iter;
 	std::list<caosVM *> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
+
+	// these are maps rather than vectors because ports can be destroyed
+	std::map<unsigned int, boost::shared_ptr<InputPort> > inports; // XXX: do these need to be shared_ptr?
+	std::map<unsigned int, boost::shared_ptr<OutputPort> > outports;
 
 	void updateAudio(boost::shared_ptr<class AudioSource>);
 	bool dying : 1;

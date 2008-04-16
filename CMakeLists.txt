@@ -98,6 +98,7 @@ SET(OPENC2E_CORE
 	PathResolver.cpp
 	physics.cpp
 	PointerAgent.cpp
+	Port.cpp
 	pray.cpp
 	prayManager.cpp
 	renderable.cpp

@@ -20,6 +20,8 @@
 #include "caosVM.h"
 #include <iostream>
 #include "openc2e.h"
+#include "Agent.h"
+#include "Port.h"
 
 /**
  PRT: BANG (command) strength (integer)
@@ -60,6 +62,10 @@ void caosVM::c_PRT_INEW() {
 	VM_PARAM_STRING(desc)
 	VM_PARAM_STRING(name)
 	VM_PARAM_INTEGER(id)
+
+	valid_agent(targ);
+	caos_assert(targ->inports.find(id) == targ->inports.end()); // TODO: multiple PRT: INEWs with the same id allowed?
+	targ->inports[id] = boost::shared_ptr<InputPort>(new InputPort(x, y, name, desc, msgnum));
 }
 
 /**
@@ -68,6 +74,11 @@ void caosVM::c_PRT_INEW() {
 */
 void caosVM::v_PRT_ITOT() {
 	VM_VERIFY_SIZE(0)
+
+	valid_agent(targ);
+
+	// TODO: not strictly correct, I think; the CAOS docs are vague (surprise!)
+	result.setInt(targ->inports.size());
 }
 
 /**
@@ -77,6 +88,22 @@ void caosVM::v_PRT_ITOT() {
 void caosVM::c_PRT_IZAP() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(id)
+
+	valid_agent(targ);
+	caos_assert(targ->inports.find(id) != targ->inports.end());
+	AgentRef src = targ->inports[id]->source;
+	if (src) {
+		PortConnectionList &dests = src->outports[targ->inports[id]->sourceid]->dests;
+		PortConnectionList::iterator i = dests.begin();
+		while (i != dests.end()) {
+			if (i->first == targ && i->second == id) {
+				dests.erase(i);
+				break;
+			}
+			i++;
+		}
+	}
+	targ->inports.erase(id);
 }
 
 /**
@@ -86,9 +113,16 @@ void caosVM::c_PRT_IZAP() {
 void caosVM::c_PRT_JOIN() {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(inputport)
-	VM_PARAM_AGENT(dest)
+	VM_PARAM_VALIDAGENT(dest)
 	VM_PARAM_INTEGER(outputport)
-	VM_PARAM_AGENT(source)
+	VM_PARAM_VALIDAGENT(source)
+
+	caos_assert(source->outports.find(outputport) != source->outports.end());
+	caos_assert(dest->inports.find(inputport) != dest->inports.end());
+
+	source->outports[outputport]->dests.push_back(std::pair<AgentRef, unsigned int>(dest, inputport));
+	dest->inports[inputport]->source = targ;
+	dest->inports[inputport]->sourceid = outputport;
 }
 
 /**
@@ -124,6 +158,10 @@ void caosVM::c_PRT_ONEW() {
 	VM_PARAM_STRING(desc)
 	VM_PARAM_STRING(name)
 	VM_PARAM_INTEGER(id)
+
+	valid_agent(targ);
+	caos_assert(targ->outports.find(id) == targ->outports.end());
+	targ->outports[id] = boost::shared_ptr<OutputPort>(new OutputPort(x, y, name, desc));
 }
 
 /**
@@ -132,6 +170,9 @@ void caosVM::c_PRT_ONEW() {
 */
 void caosVM::v_PRT_OTOT() {
 	VM_VERIFY_SIZE(0)
+
+	valid_agent(targ);
+	result.setInt(targ->outports.size());
 }
 
 /**
