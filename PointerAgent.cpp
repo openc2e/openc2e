@@ -66,7 +66,6 @@ void PointerAgent::kill() {
 }
 
 void PointerAgent::handleEvent(SomeEvent &event) {
-	if (!handle_events) return;
 	if (event.type == eventmousemove) {
 		moveTo(event.x + world.camera.getX(), event.y + world.camera.getY());
 		velx.setInt(event.xrel * 4);
@@ -75,6 +74,9 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 		// middle mouse button scrolling
 		if (event.button & buttonmiddle)
 			world.camera.moveTo(world.camera.getX() - event.xrel, world.camera.getY() - event.yrel, jump);
+	} else if (!handle_events) {
+		/* mouse move events are (apparently - see eg C3 agent help) still handled with handle_events disabled, but nothing else */
+		return;
 	} else if (event.type == eventmousebuttondown) {
 		// do our custom handling
 		if (event.button == buttonleft) {
