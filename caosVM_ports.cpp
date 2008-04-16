@@ -34,25 +34,48 @@ void caosVM::c_PRT_BANG() {
 
 /**
  PRT: FRMA (agent) inputport (integer)
- %status stub
+ %status maybe
+
+ Returns agent to which the specified input port is connected, NULL if not
+ connected or the port doesn't exist.
 */
 void caosVM::v_PRT_FRMA() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(inputport)
+
+	valid_agent(targ);
+	if (targ->inports.find(inputport) != targ->inports.end())
+		result.setAgent(targ->inports[inputport]->source);
+	else
+		result.setAgent(0);
 }
 
 /**
  PRT: FROM (integer) inputport (integer)
- %status stub
+ %status maybe
+
+ Returns the output port id on the source agent connected to the specified
+ input port. Returns a negative value if the port is not connected or if the
+ source agent does not exist.
 */
 void caosVM::v_PRT_FROM() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(inputport)
+
+	valid_agent(targ);
+	if (targ->inports.find(inputport) != targ->inports.end() && targ->inports[inputport]->source)
+		result.setInt(targ->inports[inputport]->sourceid);
+	else
+		result.setInt(-1);
 }
 
 /**
  PRT: INEW (command) id (integer) name (string) desc (string) x (integer) y (integer) msgnum (integer)
- %status stub
+ %status maybe
+
+ Creates a new input port on targ. The message msgnum will be sent to the agent
+ when a signal arrives through the port. _P1_ of that message will be the data
+ of the signal.
 */
 void caosVM::c_PRT_INEW() {
 	VM_VERIFY_SIZE(6)
@@ -70,7 +93,9 @@ void caosVM::c_PRT_INEW() {
 
 /**
  PRT: ITOT (integer)
- %status stub
+ %status maybe
+
+ Returns the total number of input ports.
 */
 void caosVM::v_PRT_ITOT() {
 	VM_VERIFY_SIZE(0)
@@ -83,7 +108,9 @@ void caosVM::v_PRT_ITOT() {
 
 /**
  PRT: IZAP (command) id (integer)
- %status stub
+ %status maybe
+
+ Removes the input port with given id.
 */
 void caosVM::c_PRT_IZAP() {
 	VM_VERIFY_SIZE(1)
@@ -108,7 +135,9 @@ void caosVM::c_PRT_IZAP() {
 
 /**
  PRT: JOIN (command) source (agent) outputport (integer) dest (agent) inputport (integer)
- %status stub
+ %status maybe
+
+ Joins the output port from source to the input port of dest.
 */
 void caosVM::c_PRT_JOIN() {
 	VM_VERIFY_SIZE(4)
@@ -124,30 +153,66 @@ void caosVM::c_PRT_JOIN() {
 }
 
 /**
- PRT: KRAK (command) agent (agent) in_or_out (integer) port (integer)
- %status stub
+ PRT: KRAK (command) agent (agent) is_outport (integer) port (integer)
+ %status maybe
+
+ Breaks a connection on agent. If is_outport, kill all connections connected to
+ the port. Else, kill the connection to the inport.
 */
 void caosVM::c_PRT_KRAK() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(port)
-	VM_PARAM_INTEGER(in_or_out)
-	VM_PARAM_AGENT(agent)
+	VM_PARAM_INTEGER(is_outport)
+	VM_PARAM_VALIDAGENT(agent)
+
+	if (is_outport) {
+		if (agent->outports.find(port) == agent->outports.end()) return;
+		PortConnectionList::iterator i = agent->outports[port]->dests.begin();
+		while (i != agent->outports[port]->dests.end()) {
+			PortConnectionList::iterator next = i; next++;
+			if (i->first && i->first->inports.find(i->second) != i->first->inports.end()) {
+				i->first->inports[i->second]->source.clear();
+			}
+			agent->outports[port]->dests.erase(i);
+			i = next;
+		}
+	} else {
+		if (agent->inports.find(port) == agent->inports.end()) return;
+		AgentRef src = agent->inports[port]->source;
+		if (src && src->outports.find(agent->inports[port]->sourceid) != src->outports.end()) {
+			src->outports[agent->inports[port]->sourceid]->dests.remove(std::pair<AgentRef, unsigned int>(agent, port));
+		}
+		agent->inports[port]->source.clear();
+	}
 }
 
 /**
- PRT: NAME (string) agent (agent) in_or_out (integer) port (integer)
- %status stub
+ PRT: NAME (string) agent (agent) is_outport (integer) port (integer)
+ %status maybe
+
+ Returns the name of the specified port. Returns "" if the port doesn't exist.
 */
 void caosVM::v_PRT_NAME() {
 	VM_VERIFY_SIZE(0)
 	VM_PARAM_INTEGER(port)
-	VM_PARAM_INTEGER(in_or_out)
-	VM_PARAM_AGENT(agent)
+	VM_PARAM_INTEGER(is_outport)
+	VM_PARAM_VALIDAGENT(agent)
+
+	result.setString("");
+	if (is_outport) {
+		if (agent->outports.find(port) != agent->outports.end())
+			result.setString(agent->outports[port]->name);
+	} else {
+		if (agent->inports.find(port) != agent->inports.end())
+			result.setString(agent->inports[port]->name);
+	}
 }
 
 /**
  PRT: ONEW (command) id (integer) name (string) desc (string) x (integer) y (integer)
- %status stub
+ %status maybe
+
+ Creates a new output port on targ.
 */
 void caosVM::c_PRT_ONEW() {
 	VM_VERIFY_SIZE(5)
@@ -164,7 +229,9 @@ void caosVM::c_PRT_ONEW() {
 
 /**
  PRT: OTOT (integer)
- %status stub
+ %status maybe
+
+ Returns the total number of output ports.
 */
 void caosVM::v_PRT_OTOT() {
 	VM_VERIFY_SIZE(0)
@@ -175,21 +242,50 @@ void caosVM::v_PRT_OTOT() {
 
 /**
  PRT: OZAP (command) id (integer)
- %status stub
+ %status maybe
+
+ Destroys output port with given id.
 */
 void caosVM::c_PRT_OZAP() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(id)
+
+	valid_agent(targ);
+	caos_assert(targ->outports.find(id) != targ->outports.end());
+	for (PortConnectionList::iterator i = targ->outports[id]->dests.begin(); i != targ->outports[id]->dests.end(); i++) {
+		if (!i->first) continue;
+		if (i->first->inports.find(i->second) == i->first->inports.end()) continue;
+		i->first->inports[i->second]->source.clear();
+	}
+	targ->outports.erase(id);
 }
 
 /**
  PRT: SEND (command) id (integer) data (anything)
- %status stub
+ %status maybe
+ 
+ Sends information over targ's output port.
 */
-void caosVM::c_PRT_SEND() { // TODO
+void caosVM::c_PRT_SEND() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_VALUE(data)
 	VM_PARAM_INTEGER(id)
+
+	valid_agent(targ);
+
+	caos_assert(targ->outports.find(id) != targ->outports.end());
+
+	PortConnectionList::iterator i = targ->outports[id]->dests.begin();
+	while (i != targ->outports[id]->dests.end()) {
+		PortConnectionList::iterator next = i; next++;
+		if (!i->first || i->first->inports.find(i->second) == i->first->inports.end()) {
+			targ->outports[id]->dests.erase(i);
+			i = next;
+			continue;
+		}
+		i->first->queueScript(i->first->inports[i->second]->messageno, targ, data);
+		i = next;
+	}
 }
 
 /* vim: set noet: */
