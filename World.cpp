@@ -625,6 +625,17 @@ void World::newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef 
 }
 
 std::string World::generateMoniker(std::string basename) {
+	if (engine.version < 3) {
+		/* old-style monikers are four characters in a format like 9GVC */
+		unsigned int n = 1 + (unsigned int)(9.0 * (rand() / (RAND_MAX + 1.0)));
+		std::string moniker = boost::str(boost::format("%d") % n);
+		for (unsigned int i = 0; i < 3; i++) {
+			unsigned int n = (unsigned int)(26.0 * (rand() / (RAND_MAX + 1.0)));
+			moniker += boost::str(boost::format("%c") % (char)('A' + n));
+		}
+		return moniker;
+	}
+
 	// TODO: is there a better way to handle this? incoming basename is from catalogue files..
 	if (basename.size() != 4) {
 		std::cout << "World::generateMoniker got passed '" << basename << "' as a basename which isn't 4 characters, so ignoring it" << std::endl;

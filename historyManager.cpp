@@ -22,6 +22,7 @@
 #include "Catalogue.h"
 #include "CreatureAgent.h"
 #include "Creature.h"
+#include "Engine.h" // version
 
 #include <boost/format.hpp>
 
@@ -159,21 +160,23 @@ std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
 	
 	std::string basename = "xxxx";
 
-	const std::vector<std::string> *extensions = 0;
-	std::string tagname = boost::str(boost::format("Moniker Friendly Names %i") % genus);
+	if (engine.version > 2) {
+		const std::vector<std::string> *extensions = 0;
+		std::string tagname = boost::str(boost::format("Moniker Friendly Names %i") % genus);
 	
-	if (catalogue.hasTag(tagname)) {
-		extensions = &catalogue.getTag(tagname);
-	} else if (catalogue.hasTag("Moniker Friendly Names")) {
-		extensions = &catalogue.getTag("Moniker Friendly Names");
-	} else {
-		std::cout << "Warning: No \"Moniker Friendly Names\" in catalogue for genus " << genus <<
-			", defaulting to 'xxxx' for a moniker friendly name." << std::endl;
-	}
+		if (catalogue.hasTag(tagname)) {
+			extensions = &catalogue.getTag(tagname);
+		} else if (catalogue.hasTag("Moniker Friendly Names")) {
+			extensions = &catalogue.getTag("Moniker Friendly Names");
+		} else {
+			std::cout << "Warning: No \"Moniker Friendly Names\" in catalogue for genus " << genus <<
+				", defaulting to 'xxxx' for a moniker friendly name." << std::endl;
+		}
 
-	if (extensions) {
-		unsigned int i = (int) (extensions->size() * (rand() / (RAND_MAX + 1.0)));
-		basename = (*extensions)[i];
+		if (extensions) {
+			unsigned int i = (int) (extensions->size() * (rand() / (RAND_MAX + 1.0)));
+			basename = (*extensions)[i];
+		}
 	}
 	
 	std::string newmoniker = world.generateMoniker(basename);
@@ -185,7 +188,8 @@ std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
 			throw creaturesException("Couldn't generate a moniker we don't already have!");
 	}
 
-	newmoniker = "001-" + newmoniker; // TODO: bad hack we should use the generation number here!
+	if (engine.version > 2)
+		newmoniker = "001-" + newmoniker; // TODO: bad hack we should use the generation number here!
 
 	monikers[newmoniker].init(newmoniker, genome);
 	return newmoniker;
