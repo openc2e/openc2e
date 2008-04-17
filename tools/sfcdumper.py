@@ -663,17 +663,17 @@ class Blackboard(CompoundObject):
 
 		# TODO: none of this is verified
 		if version == 0:
-			self.textx = read8(f)
-			self.texty = read8(f)
 			self.backgroundcolour = read8(f)
 			self.chalkcolour = read8(f)
 			self.aliascolour = read8(f)
+			self.textx = read8(f)
+			self.texty = read8(f)
 		else:
-			self.textx = read32(f)
-			self.texty = read32(f)
-			self.backgroundcolour = read16(f)
-			self.chalkcolour = read16(f)
-			self.aliascolour = read16(f)
+			self.backgroundcolour = read32(f)
+			self.chalkcolour = read32(f)
+			self.aliascolour = read32(f)
+			self.textx = read8(f)
+			self.texty = read8(f)
 		print "text at (" + str(self.textx) + ", " + str(self.texty) + ")"
 		print "colours: " + str(self.backgroundcolour) + ", " + str(self.chalkcolour) + ", " + str(self.aliascolour)
 

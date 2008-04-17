@@ -613,17 +613,17 @@ void SFCBlackboard::read() {
 
 	// read text x/y position and colours
 	if (parent->version() == 0) {
-		textx = read8();
-		texty = read8();
 		backgroundcolour = read8();
 		chalkcolour = read8();
 		aliascolour = read8();
+		textx = read8();
+		texty = read8();
 	} else {
-		textx = read32();
-		texty = read32();
-		backgroundcolour = read16();
-		chalkcolour = read16();
-		aliascolour = read16();
+		backgroundcolour = read32();
+		chalkcolour = read32();
+		aliascolour = read32();
+		textx = read8();
+		texty = read8();
 	}
 
 	// read blackboard strings

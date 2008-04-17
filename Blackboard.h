@@ -23,6 +23,8 @@
 #define _C2E_BLACKBOARD_H
 
 class Blackboard : public CompoundAgent {
+	friend class BlackboardPart;
+
 protected:
 	// configuration
 	unsigned int textx, texty;
@@ -30,6 +32,8 @@ protected:
 
 	// state
 	std::vector<std::pair<unsigned int, std::string> > strings;
+
+	void renderText(class Surface *renderer, int xoffset, int yoffset);
 
 public:
 	Blackboard(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
@@ -40,6 +44,18 @@ public:
 		unsigned int alcolour);
 
 	void addBlackboardString(unsigned int n, unsigned int id, std::string text);
+};
+
+class BlackboardPart : public CompoundPart {
+	friend class Blackboard;
+
+protected:
+	BlackboardPart(Blackboard *p, unsigned int _id);
+
+public:
+	void partRender(class Surface *renderer, int xoffset, int yoffset);
+	unsigned int getWidth() { return 0; }
+	unsigned int getHeight() { return 0; }
 };
 
 #endif
