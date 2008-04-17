@@ -189,17 +189,22 @@ void World::tick() {
 	// Notify the audio backend about our current viewpoint center.
 	engine.audio->setViewpointCenter(world.camera.getXCentre(), world.camera.getYCentre());
 	
-	std::list<boost::shared_ptr<AudioSource> >::iterator si = uncontrolled_sounds.begin();
+	std::list<std::pair<boost::shared_ptr<AudioSource>, bool> >::iterator si = uncontrolled_sounds.begin();
 	while (si != uncontrolled_sounds.end()) {
-		std::list<boost::shared_ptr<AudioSource> >::iterator next = si; next++;
-		if ((*si)->getState() != SS_PLAY) {
+		std::list<std::pair<boost::shared_ptr<AudioSource>, bool> >::iterator next = si; next++;
+		if (si->first->getState() != SS_PLAY) {
 			// sound is stopped, so release our reference
 			uncontrolled_sounds.erase(si);
 		} else {
-			// mute/unmute off-screen uncontrolled audio if necessary
-			float x, y, z;
-			(*si)->getPos(x, y, z);
-			(*si)->setMute(world.camera.getMetaRoom() != world.map.metaRoomAt(x, y));
+			if (si->second) {
+				// follow viewport
+				si->first->setPos(world.camera.getXCentre(), world.camera.getYCentre(), 0);
+			} else {
+				// mute/unmute off-screen uncontrolled audio if necessary
+				float x, y, z;
+				si->first->getPos(x, y, z);
+				si->first->setMute(world.camera.getMetaRoom() != world.map.metaRoomAt(x, y));
+			}
 		}
 
 		si = next;
@@ -651,7 +656,7 @@ std::string World::generateMoniker(std::string basename) {
 	return x;
 }
 
-boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop) {
+boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport) {
 	if (filename.size() == 0) return boost::shared_ptr<AudioSource>();
 
 	boost::shared_ptr<AudioSource> sound = engine.audio->newSource();
@@ -672,17 +677,19 @@ boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef a
 	}
 
 	if (agent) {
+		assert(!followviewport);
+
 		agent->updateAudio(sound);
 		if (controlled)
 			agent->sound = sound;
 		else
-			uncontrolled_sounds.push_back(sound);
+			uncontrolled_sounds.push_back(std::pair<boost::shared_ptr<class AudioSource>, bool>(sound, false));
 	} else {
 		assert(!controlled);
 
 		// TODO: handle non-agent sounds
 		sound->setPos(world.camera.getXCentre(), world.camera.getYCentre(), 0);
-		uncontrolled_sounds.push_back(sound);
+		uncontrolled_sounds.push_back(std::pair<boost::shared_ptr<class AudioSource>, bool>(sound, followviewport));
 	}
 	
 	sound->play();

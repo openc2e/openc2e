@@ -48,21 +48,23 @@ class World {
 protected:
 	class PointerAgent *theHand;
 	std::list<scriptevent> scriptqueue;
+	
+	std::list<std::pair<boost::shared_ptr<class AudioSource>, bool> > uncontrolled_sounds; // audio, followingviewport
+	
+	std::map<int, boost::weak_ptr<Agent> > unidmap;
+	std::vector<caosVM *> vmpool;
 
 public:
 	bool quitting, saving, paused;
 	
 	Map map;
 
-	std::list<boost::shared_ptr<class AudioSource> > uncontrolled_sounds;
 	std::multiset<CompoundPart *, partzorder> zorder; // sorted from top to bottom
 	std::multiset<renderable *, renderablezorder> renders; // sorted from bottom to top
 	std::list<boost::shared_ptr<Agent> > agents;
 	
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
-	std::vector<caosVM *> vmpool;
-	std::map<int, boost::weak_ptr<Agent> > unidmap;
 
 	std::vector<boost::filesystem::path> data_directories;
 	Scriptorium scriptorium;
@@ -106,7 +108,7 @@ public:
 	std::string findFile(std::string path);
 	std::vector<std::string> findFiles(std::string dir, std::string wild);
 
-	boost::shared_ptr<AudioSource> playAudio(std::string filename, AgentRef agent, bool controlled, bool loop);
+	boost::shared_ptr<AudioSource> playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport = false);
 
 	void newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
 	shared_ptr<genomeFile> loadGenome(std::string &filename);
