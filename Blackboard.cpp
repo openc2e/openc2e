@@ -18,5 +18,30 @@
  */
 
 #include "Blackboard.h"
+#include "Engine.h"
+
+Blackboard::Blackboard(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount, unsigned int tx,
+		unsigned int ty, unsigned int bgcolour, unsigned int ckcolour, unsigned int alcolour) :
+		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
+	textx = tx; texty = ty;
+	backgroundcolour = bgcolour; chalkcolour = ckcolour; aliascolour = alcolour;
+
+	if (engine.version == 1)
+		strings.resize(16, std::pair<unsigned int, std::string>(0, std::string()));
+	else
+		strings.resize(48, std::pair<unsigned int, std::string>(0, std::string()));
+}
+
+Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
+		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,
+		unsigned int alcolour) : CompoundAgent(spritefile, firstimage, imagecount) {
+	textx = tx; texty = ty;
+	backgroundcolour = bgcolour; chalkcolour = ckcolour; aliascolour = alcolour;
+}
+
+void Blackboard::addBlackboardString(unsigned int n, unsigned int id, std::string text) {
+	strings[n] = std::pair<unsigned int, std::string>(id, text);
+}
 
 /* vim: set noet: */

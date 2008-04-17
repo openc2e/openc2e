@@ -313,11 +313,9 @@ void caosVM::c_NEW_BKBD() {
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
 
-	Blackboard *a = new Blackboard(sprite_file, first_image, image_count);
+	Blackboard *a = new Blackboard(sprite_file, first_image, image_count, textx, texty, background_colour, chalk_colour, alias_colour);
 	a->finishInit();
 	setTarg(a);
-
-	// TODO: actually initialise blackboard parameters
 }
 
 /**

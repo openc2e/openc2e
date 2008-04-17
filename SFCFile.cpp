@@ -632,8 +632,7 @@ void SFCBlackboard::read() {
 		std::string str = readBytes(11);
 		// chop off non-null-terminated bits
 		str = std::string(str.c_str());
-		// TODO: are value keys unique?
-		strings[value] = str;
+		strings.push_back(std::pair<uint32, std::string>(value, str));
 	}
 }
 
@@ -1050,12 +1049,14 @@ void SFCPointerTool::copyToWorld() {
 #include "Blackboard.h"
 
 void SFCBlackboard::copyToWorld() {
-	ourAgent = new Blackboard(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	ourAgent = new Blackboard(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes, textx, texty, backgroundcolour, chalkcolour, aliascolour);
 	Blackboard *a = dynamic_cast<Blackboard *>(ourAgent);
 
 	SFCCompoundObject::copyToWorld();
 
-	// TODO: blackboard data
+	for (unsigned int i = 0; i < strings.size(); i++) {
+		a->addBlackboardString(i, strings[i].first, strings[i].second);
+	}
 }
 
 #include "Vehicle.h"

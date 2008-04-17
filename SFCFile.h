@@ -245,7 +245,7 @@ class SFCBlackboard : public SFCCompoundObject {
 public:
 	uint32 textx, texty;
 	uint16 backgroundcolour, chalkcolour, aliascolour;
-	std::map<uint32, std::string> strings;
+	std::vector<std::pair<uint32, std::string> > strings;
 
 	SFCBlackboard(SFCFile *p) : SFCCompoundObject(p) { }
 	void read();

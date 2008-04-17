@@ -23,14 +23,23 @@
 #define _C2E_BLACKBOARD_H
 
 class Blackboard : public CompoundAgent {
+protected:
+	// configuration
+	unsigned int textx, texty;
+	unsigned int backgroundcolour, chalkcolour, aliascolour;
+
+	// state
+	std::vector<std::pair<unsigned int, std::string> > strings;
+
 public:
 	Blackboard(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-		std::string spritefile, unsigned int firstimage, unsigned int imagecount)
-		: CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) { }
-	Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount)
-		: CompoundAgent(spritefile, firstimage, imagecount) { }
-	
-	// TODO: blackboard data
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount, unsigned int tx,
+		unsigned int ty, unsigned int bgcolour, unsigned int ckcolour, unsigned int alcolour);
+	Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
+		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,
+		unsigned int alcolour);
+
+	void addBlackboardString(unsigned int n, unsigned int id, std::string text);
 };
 
 #endif
