@@ -41,6 +41,7 @@ class Surface {
 public:
 	virtual void render(boost::shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false) = 0;
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) = 0;
+	virtual void renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) = 0;
 	virtual void blitSurface(Surface *src, int x, int y, int w, int h) = 0;
 	virtual unsigned int getWidth() const = 0;
 	virtual unsigned int getHeight() const = 0;

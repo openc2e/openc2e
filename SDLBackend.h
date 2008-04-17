@@ -28,13 +28,17 @@ class SDLSurface : public Surface {
 	friend class SDLBackend;
 
 protected:
+	class SDLBackend *parent;
 	SDL_Surface *surface;
 	unsigned int width, height;
 	SDL_Color palette[256];
+	
+	SDLSurface(SDLBackend *p) { parent = p; }
 
 public:
 	void render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
+	void renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour);
 	void blitSurface(Surface *src, int x, int y, int w, int h);
 	unsigned int getWidth() const { return width; }
 	unsigned int getHeight() const { return height; }
@@ -42,11 +46,15 @@ public:
 };
 
 class SDLBackend : public Backend {
+	friend class SDLSurface;
+
 protected:
 	bool networkingup;
 
 	SDLSurface mainsurface;
 	TCPsocket listensocket;
+
+	struct _TTF_Font *basicfont;
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);

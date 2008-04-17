@@ -19,14 +19,16 @@
 
 #include "SDLBackend.h"
 #include "SDL_gfxPrimitives.h"
+#include "SDL_ttf.h"
 #include "openc2e.h"
 #include "Engine.h"
 #include "creaturesImage.h"
 
 SDLBackend *g_backend;
 
-SDLBackend::SDLBackend() {
+SDLBackend::SDLBackend() : mainsurface(this) {
 	networkingup = false;
+	basicfont = 0;
 
 	// reasonable defaults
 	mainsurface.width = 800;
@@ -64,6 +66,13 @@ void SDLBackend::init() {
 	SDL_ShowCursor(false);
 	// bz2 and fuzzie both think this is the only way to get useful ascii out of SDL
 	SDL_EnableUNICODE(1);
+
+	if (TTF_Init() == 0) {
+		// TODO: think about font sizing
+		basicfont = TTF_OpenFont("VeraSe.ttf", 9);
+		if (!basicfont) // TODO: think about font fallbacks/etc
+			basicfont = TTF_OpenFont("/usr/share/fonts/truetype/ttf-bitstream-vera/VeraSe.ttf", 9);
+	}
 }
 
 int SDLBackend::networkInit() {
@@ -88,6 +97,8 @@ int SDLBackend::networkInit() {
 }
 
 void SDLBackend::shutdown() {
+	if (TTF_WasInit())
+		TTF_Quit();
 	if (networkingup && listensocket)
 		SDLNet_TCP_Close(listensocket);
 	SDLNet_Quit();
@@ -225,6 +236,42 @@ void SDLSurface::renderLine(int x1, int y1, int x2, int y2, unsigned int colour)
 	aalineColor(surface, x1, y1, x2, y2, colour);
 }
 
+SDL_Color getColourFromRGBA(unsigned int c) {
+	// SDL's functions seem to want a pixelformat, which is more effort to fake than just doing this
+	SDL_Color sdlc;
+	sdlc.b = c & 0xff;
+	sdlc.g = (c >> 8) & 0xff;
+	sdlc.r = (c >> 16) & 0xff;
+	assert(c >> 24 == 0);
+	return sdlc;
+}
+
+void SDLSurface::renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) {
+	if (!parent->basicfont) return;
+
+	SDL_Color sdlcolour;
+	if (engine.version == 1) sdlcolour = palette[colour];
+	else sdlcolour = getColourFromRGBA(colour);
+	
+	SDL_Surface *textsurf;
+
+	if (bgcolour == 0) { // transparent
+		textsurf = TTF_RenderText_Solid(parent->basicfont, text.c_str(), sdlcolour);
+	} else {
+		SDL_Color sdlbgcolour;
+		if (engine.version == 1) sdlbgcolour = palette[bgcolour];
+		else sdlbgcolour = getColourFromRGBA(bgcolour);
+		textsurf = TTF_RenderText_Shaded(parent->basicfont, text.c_str(), sdlcolour, sdlbgcolour);
+	}
+
+	assert(textsurf);
+
+	SDL_Rect destrect;
+	destrect.x = x; destrect.y = y;	
+	SDL_BlitSurface(textsurf, NULL, surface, &destrect);
+	SDL_FreeSurface(textsurf);
+}
+
 //*** code to mirror 16bpp surface - slow, we should cache this!
 
 Uint16 *pixelPtr(SDL_Surface *surf, int x, int y) {
@@ -345,7 +392,7 @@ Surface *SDLBackend::newSurface(unsigned int w, unsigned int h) {
 	SDL_Surface *surf = mainsurface.surface;
 	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
 	assert(underlyingsurf);
-	SDLSurface *newsurf = new SDLSurface();
+	SDLSurface *newsurf = new SDLSurface(this);
 	newsurf->surface = underlyingsurf;
 	newsurf->width = w;
 	newsurf->height = h;
