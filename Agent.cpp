@@ -276,8 +276,7 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 		bool madevm = false;
 		if (!vm) { madevm = true; vm = world.getVM(this); }
 	
-		// TODO: 'engine.version < 3' check for nointerrupt param is a guess and untested - fuzzie
-		if (vm->fireScript(s, (event == 9 || engine.version < 3), from)) {
+		if (vm->fireScript(s, event == 9, from)) {
 			lastScript = event;
 			zotstack();
 			vm->setVariables(one, two);
