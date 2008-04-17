@@ -335,6 +335,7 @@ bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar
 
 int Agent::handleClick(float clickx, float clicky) {
 	// Handle a mouse click.
+	if (!activateable()) return -1;
 
 	// old-style click handling (c1/c2)
 	if (engine.version < 3) {

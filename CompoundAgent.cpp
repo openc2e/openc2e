@@ -108,6 +108,8 @@ void CompoundAgent::tick() {
 }
 
 int CompoundAgent::handleClick(float clickx, float clicky) {
+	if (!activateable()) return -1;
+	
 	if (engine.version > 2) {
 		return Agent::handleClick(clickx, clicky);
 	}
