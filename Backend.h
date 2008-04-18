@@ -22,6 +22,7 @@
 
 #include "endianlove.h"
 #include <boost/shared_ptr.hpp>
+#include <string>
 
 using boost::shared_ptr;
 
