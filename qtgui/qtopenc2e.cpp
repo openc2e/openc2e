@@ -118,6 +118,11 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	if (engine.version > 2) newNornAct->setEnabled(false); // TODO
 	connect(newNornAct, SIGNAL(triggered()), this, SLOT(newNorn()));
 	debugMenu->addAction(newNornAct);
+	
+	newEggAct = new QAction(tr("Create a random &egg"), this);
+	if (engine.version > 1) newEggAct->setEnabled(false); // TODO
+	connect(newEggAct, SIGNAL(triggered()), this, SLOT(newEgg()));
+	debugMenu->addAction(newEggAct);
 
 	/* Tools menu */
 
@@ -392,6 +397,26 @@ void QtOpenc2e::newNorn() {
 	c->born();
 
 	world.hand()->addCarried(a);
+}
+
+void QtOpenc2e::newEgg() {
+	std::string eggscript;
+	/* create the egg obj */
+	eggscript = boost::str(boost::format("new: simp eggs 8 %d 2000 0\n") % ((rand() % 6) * 8));
+	/* set the pose and the correct class/attributes */
+	eggscript += "pose 3\nsetv clas 33882624\nsetv attr 67\n";
+	/* create the genome */
+	eggscript += boost::str(boost::format("new: gene tokn dad%d tokn mum%d obv0\n") % (1 + rand() % 6) % (1 + rand() % 6));
+	/* set the gender */
+	eggscript += "setv obv1 0\n";
+	/* start the clock */
+	eggscript += "tick 2400\n";
+	/* move it into place */
+	eggscript += boost::str(boost::format("mvto %d 870\n") % (2600 + rand() % 200));
+
+	std::string err = engine.executeNetwork(eggscript);
+	if (err.size())
+		QMessageBox::warning(this, tr("Couldn't create egg:"), err.c_str());
 }
 
 Creature *QtOpenc2e::getSelectedCreature() {

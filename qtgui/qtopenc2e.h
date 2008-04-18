@@ -55,14 +55,15 @@ private slots:
 	void toggleAutokill();
 	void togglePause();
 	void toggleMute();
-	
+
+	void newEgg();
 	void newNorn();
 
 private:
 	QToolBar *maintoolbar;
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
 	QAction *exitAct, *aboutAct, *agentInjectorAct, *brainViewerAct;
-	QAction *showMapAct, *newNornAct;
+	QAction *showMapAct, *newNornAct, *newEggAct;
 	QAction *pauseAct, *muteAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
 
 	class AgentInjector *agentInjector;
