@@ -248,6 +248,7 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 
 void SDLSurface::renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) {
 	if (!parent->basicfont) return;
+	if (text.empty()) return;
 
 	SDL_Color sdlcolour;
 	if (engine.version == 1) sdlcolour = palette[colour];
@@ -264,7 +265,7 @@ void SDLSurface::renderText(int x, int y, std::string text, unsigned int colour,
 		textsurf = TTF_RenderText_Shaded(parent->basicfont, text.c_str(), sdlcolour, sdlbgcolour);
 	}
 
-	assert(textsurf);
+	if (!textsurf) return; // thanks, SDL_ttf, we love you too
 
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;	
