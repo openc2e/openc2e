@@ -43,6 +43,7 @@ namespace po = boost::program_options;
 
 #ifdef _WIN32
 #include <shlobj.h>
+#include <windows.h>
 #endif
 
 Engine engine;
@@ -643,6 +644,21 @@ bool Engine::initialSetup() {
 		std::cout << "* Reading PRAY files..." << std::endl;
 		world.praymanager.update();
 	}
+
+#ifdef _WIN32
+	// Here we need to set the working directory since apparently windows != clever
+	char exepath[MAX_PATH] = "";
+	GetModuleFileName(0, exepath, sizeof(exepath) - 1);
+	char *exedir = strrchr(exepath, '\\');
+	if(exedir) {
+		// null terminate the string
+        *exedir = 0;
+		// Set working directory
+		SetCurrentDirectory(exepath);
+	}
+	else // err, oops
+		std::cerr << "Warning: Setting working directory to " << exepath << " failed.";
+#endif
 
 	if (cmdline_norun) preferred_backend = "null";
 	if (preferred_backend != "null") std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;	
