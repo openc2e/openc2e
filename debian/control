@@ -2,7 +2,7 @@ Source: openc2e
 Section: contrib/games
 Priority: optional
 Maintainer: Bryan Donlan <bdonlan@gmail.com>
-Build-Depends: debhelper (>= 5.0.0), perl, libyaml-perl, libsdl1.2debian, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev, libsdl-gfx1.2-dev, libqt4-dev, libboost-regex-dev, cmake, libopenal-dev, libalut-dev, re2c
+Build-Depends: debhelper (>= 5.0.0), perl, libyaml-perl, libsdl1.2debian, libsdl1.2-dev, libboost-filesystem-dev, libsdl-net1.2-dev, bison, zlib1g-dev, libboost-iostreams-dev, libboost-thread-dev, libboost-serialization-dev, libboost-program-options-dev, libsdl-gfx1.2-dev, libqt4-dev, libboost-regex-dev, cmake, libopenal-dev, libalut-dev, re2c, libsdl-ttf2.0-dev
 Standards-Version: 3.7.3.0
 Homepage: http://openc2e.ccdevnet.org
 Vcs-Svn: svn://openc2e.ccdevnet.org/openc2e/trunk
@@ -11,6 +11,7 @@ Vcs-Browser: http://ccdevnet.org/viewcvs.cgi/trunk/
 Package: openc2e
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: ttf-bitstream-vera
 Description: Creatures-style game engine
  openc2e is a cross-platform open-source game engine designed to be compatible
  with the various game engines of the Creatures artificial-life game series.
