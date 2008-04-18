@@ -3,7 +3,7 @@
 !define APPNAMEANDVERSION "openc2e (development build)"
 
 ; Development build revision
-!define REVISION "1707"
+!define REVISION "1784"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
@@ -164,13 +164,17 @@ Section "openc2e" Main
 	proceed:
 	File "Release\openc2e.exe"
 	File "Release\SDL.dll"
-	File "Release\SDL_mixer.dll"
+	;File "Release\SDL_mixer.dll"
 	File "Release\SDL_net.dll"
+  File "Release\SDL_ttf.dll"
 	File "Release\zlib1.dll"
+	File "Release\libfreetype-6.dll"
 	File "Release\QtCore4.dll"
 	File "Release\QtGui4.dll"
 	File "Release\QtNetwork4.dll"
 	File "Release\alut.dll"
+	
+	File "VeraSe.ttf"
 	
 	;OpenAL installer
 	File "Release\oalinst.exe"
