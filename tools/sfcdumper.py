@@ -501,19 +501,19 @@ class PointerTool(SimpleObject):
 		# 00 00 00 00 00 00 00 00 00
 		# CD CD CD CD CD CD CD CD CD CD CD CD
 		# bear in mind CD CD CD CD is prbly unallocated memory from microsoft's CRT
+		x = f.read(8)
+		print "pointer bytes: ",
+		for z in x: print "%02X" % ord(z),
+		print
+			
+		self.bubble = slurpMFC(f, Bubble)
+
 		if version == 0:
-			x = f.read(35)
+			x = f.read(25)
 			print "pointer bytes: ",
 			for z in x: print "%02X" % ord(z),
 			print
 		else:
-			x = f.read(8)
-			print "pointer bytes: ",
-			for z in x: print "%02X" % ord(z),
-			print
-			
-			self.bubble = slurpMFC(f, Bubble)
-			
 			x = f.read(4 + 16 + 9 + 12)
 			print "pointer bytes: ",
 			for z in x: print "%02X" % ord(z),
@@ -523,18 +523,29 @@ class Bubble(SimpleObject):
 	def read(self, f):
 		SimpleObject.read(self, f)
 
-		x = f.read(5)
+		if version == 0:
+			x = f.read(1)
+		else:
+			x = f.read(5)
 		print "bubble bytes: ",
 		for z in x: print "%02X" % ord(z),
 		print
 
-		self.bubblestring = f.read(36)
+		if version == 0:
+			bubblelen = read8(f)
+			assert read8(f) == 0
+			self.bubblestring = f.read(bubblelen)
+		else:
+			self.bubblestring = f.read(36)
 		x = self.bubblestring.find("\0")
 		if x != -1:
 			self.bubblestring = self.bubblestring[:x]
 		print "bubble string: " + self.bubblestring
-		
-		x = f.read(11)
+	
+		if version == 0:
+			x = f.read(11 + 8) # this is probably terribly wrong
+		else:
+			x = f.read(11)
 		print "more bubble bytes: ",
 		for z in x: print "%02X" % ord(z),
 		print
