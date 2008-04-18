@@ -927,7 +927,7 @@ void SFCCompoundObject::copyToWorld() {
 	
 	a->actv.setInt(actv);
 	// TODO: this is to activate mover scripts in c1, does it apply to c2 too? is it correct at all?
-	if ((parent->version() == 0) && actv) a->queueScript(actv);
+	if ((parent->version() == 0) && actv) { a->actv.setInt(0); a->queueScript(actv); }
 
 	// ticking
 	a->tickssincelasttimer = tickstate;

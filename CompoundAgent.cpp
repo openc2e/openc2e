@@ -147,6 +147,13 @@ int CompoundAgent::handleClick(float clickx, float clicky) {
 	return -1;
 }
 
+bool CompoundAgent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
+	// TODO: this is a hack to deal with ACTV on compound agents in c1/c2
+	if (engine.version < 3 && actv.getInt() == event) return false;
+
+	return Agent::fireScript(event, from, one, two);
+}
+
 void CompoundAgent::setHotspotLoc(unsigned int id, int l, int t, int r, int b) {
 	assert(id < 6);
 
