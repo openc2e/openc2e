@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "CompoundAgent.h"
 #include "CameraPart.h"
+#include "Blackboard.h"
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
@@ -544,7 +545,7 @@ void caosVM::c_BBD_WORD() {
 
 /**
  BBD: SHOW (command) show (integer)
- %status stub
+ %status maybe
  %pragma variants c1 c2
 
  If show is 1, draw the current text onto part 0 of the target blackboard. If 0,
@@ -554,7 +555,10 @@ void caosVM::c_BBD_SHOW() {
 	VM_PARAM_INTEGER(show)
 
 	valid_agent(targ);
-	// TODO
+	Blackboard *b = dynamic_cast<Blackboard *>(targ.get());
+	caos_assert(b);
+
+	b->showText(show);
 }
 
 /**

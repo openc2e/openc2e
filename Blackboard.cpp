@@ -53,15 +53,21 @@ Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned
 	addPart(p);
 }
 
+void Blackboard::showText(bool show) {
+	if (show && var[0].hasInt() && var[0].getInt() < strings.size()) {
+		currenttext = strings[var[0].getInt()].second;
+	} else {
+		currenttext.clear();
+	}
+}
+
 void Blackboard::addBlackboardString(unsigned int n, unsigned int id, std::string text) {
 	strings[n] = std::pair<unsigned int, std::string>(id, text);
 }
 
 void Blackboard::renderText(class Surface *renderer, int xoffset, int yoffset) {
-	// TODO: check var[0] is valid
-
 	// TODO: is +1 really the right fix here?
-	renderer->renderText(xoffset + textx + 1, yoffset + texty + 1, strings[var[0].getInt()].second, chalkcolour, backgroundcolour);
+	renderer->renderText(xoffset + textx + 1, yoffset + texty + 1, currenttext, chalkcolour, backgroundcolour);
 }
 
 BlackboardPart::BlackboardPart(Blackboard *p, unsigned int _id) : CompoundPart(p, _id, 0, 0, 1) {

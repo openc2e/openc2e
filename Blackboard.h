@@ -32,6 +32,7 @@ protected:
 
 	// state
 	std::vector<std::pair<unsigned int, std::string> > strings;
+	std::string currenttext;
 
 	void renderText(class Surface *renderer, int xoffset, int yoffset);
 
@@ -44,6 +45,7 @@ public:
 		unsigned int alcolour);
 
 	void addBlackboardString(unsigned int n, unsigned int id, std::string text);
+	void showText(bool show);
 };
 
 class BlackboardPart : public CompoundPart {
