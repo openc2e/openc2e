@@ -742,7 +742,10 @@ void caosVM::v_CARR_c1() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(owner);
 	
-	result.setAgent(owner->carriedby);
+	if (owner->invehicle)
+		result.setAgent(owner->invehicle);
+	else
+		result.setAgent(owner->carriedby);
 }
 
 /**
