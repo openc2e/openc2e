@@ -677,9 +677,10 @@ void SFCLift::read() {
 		sfccheck(read16() == 0);
 	}
 
-	// discard unknown bytes
-	if (parent->version() == 1)
-		read32();
+	if (parent->version() == 1) {
+		int somedata = read32();
+		alignwithcabin = (somedata != 0); // TODO: is this right?
+	}
 }
 
 void SFCSimpleObject::read() {
@@ -1094,6 +1095,10 @@ void SFCLift::copyToWorld() {
 	// set call button y locations
 	for (unsigned int i = 0; i < nobuttons; i++) {
 		a->callbuttony.push_back(callbuttony[i]);
+	}
+
+	if (parent->version() == 1) {
+		a->alignwithcabin = alignwithcabin;
 	}
 }
 

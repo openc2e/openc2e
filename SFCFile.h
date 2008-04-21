@@ -272,6 +272,7 @@ public:
 	uint32 nobuttons;
 	uint32 currentbutton;
 	uint32 callbuttony[8];
+	bool alignwithcabin;
 	// TODO: misc data
 
 	SFCLift(SFCFile *p) : SFCVehicle(p) { }

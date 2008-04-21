@@ -24,15 +24,16 @@
 
 class Lift : public Vehicle {
 public:
+	bool alignwithcabin;
 	unsigned int currentbutton;
 	std::vector<int> callbuttony;
 
 	Lift(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-		std::string spritefile, unsigned int firstimage, unsigned int imagecount)
-		: Vehicle(family, genus, species, plane, spritefile, firstimage, imagecount) { }
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	void tick();
 	bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
 	bool liftAvailable() { return (var[0].getInt() == 0); }
+	float liftBottom();
 };
 
 #endif

@@ -30,7 +30,7 @@ void CallButton::tick() {
 
 	if (actv.getInt() == 1) {
 		// TODO: hrm..
-		if (ourlift->currentbutton == buttonid && ourlift->y + ourlift->cabinbottom == ourlift->callbuttony[buttonid]) { // has arrived at us
+		if (ourlift->currentbutton == buttonid && ourlift->liftBottom() == ourlift->callbuttony[buttonid]) { // has arrived at us
 			queueScript(0); // deactivate ourselves
 		}
 		// TODO: this is a broken hack
@@ -38,7 +38,7 @@ void CallButton::tick() {
 			if (ourlift->currentbutton != buttonid) {
 				ourlift->currentbutton = buttonid;
 				// TODO: mmh
-				if (ourlift->y + ourlift->cabinbottom < ourlift->callbuttony[buttonid])
+				if (ourlift->liftBottom() < ourlift->callbuttony[buttonid])
 					ourlift->queueScript(1, this);
 				else
 					ourlift->queueScript(2, this);
@@ -53,8 +53,7 @@ bool CallButton::fireScript(unsigned short event, Agent *from, caosVar one, caos
 
 	switch (event) {
 		case 1:
-			// TODO: hrm..
-			if (ourlift->currentbutton == buttonid && ourlift->y + ourlift->cabinbottom == ourlift->callbuttony[buttonid]) { // has arrived at us
+			if (ourlift->currentbutton == buttonid) {
 				return false; // nuh-uh
 			}
 	}
