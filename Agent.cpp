@@ -245,6 +245,7 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 			if (!from) return false;
 			// TODO: this check isn't very good for vehicles ;p
 			// if (from != carriedby) return false;
+			from->dropCarried(this); // TODO: correct?
 			break;
 		case 12: // eat
 			if (c && !cr_can_eat) return false;
@@ -299,7 +300,18 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 
 	switch (event) {
 		case 5:
-			from->dropCarried(this); // TODO: correct?
+			if (invehicle) break;
+			if (engine.version > 1) break;
+
+			// Creatures 1 drop snapping
+			// TODO: this probably doesn't belong here, but it has to be run after the
+			// drop script starts (see for instance C1 carrots, which change pose)
+			MetaRoom* m = world.map.metaRoomAt(x, y);
+			if (!m) break;
+			shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
+			if (!r) break;
+			moveTo(x, r->bot.pointAtX(x).y - getHeight());
+			
 			break;
 	}
 	
@@ -1129,14 +1141,8 @@ bool Agent::beDropped() {
 		}
 	}
 	
-	if (engine.version == 1) {
-		MetaRoom* m = world.map.metaRoomAt(x, y);
-		if (!m) return false;
-		shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
-		if (!r) return false;
-		moveTo(x, r->bot.pointAtX(x).y - getHeight());
-	} else {
-		// TODO: maybe think about this some more
+	if (engine.version > 1) {
+		// TODO: maybe think about this some more - does this belong here?
 		tryMoveToPlaceAround(x, y);
 	}
 
