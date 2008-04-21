@@ -57,19 +57,20 @@ void Vehicle::carry(AgentRef passenger) {
 	int cabinwidth = cabinright - cabinleft;
 	int cabinheight = cabinbottom - cabintop;
 
-	// reject if passenger is too big
-	if ((int)passenger->getWidth() > cabinwidth) return;
-	// TODO: you can put too-high things into cabins in c1. can you in the other games?
-	//if (passenger->getHeight() > cabinheight) return;
+	if (engine.version > 2) {
+		// reject if passenger is too big
+		if ((int)passenger->getWidth() > cabinwidth) return;
+		if ((int)passenger->getHeight() > cabinheight) return;
+	}
 
 	// push into our cabin
 	// TODO: should we use moveTo here?
-	if (passenger->x < (x + cabinleft)) passenger->x = x + cabinleft;
 	if (passenger->x + passenger->getWidth() > (x + cabinright)) passenger->x = x + cabinright - passenger->getWidth();
+	if (passenger->x < (x + cabinleft)) passenger->x = x + cabinleft;
 	if (engine.version > 1) {
 		// TODO: not sure if this is good for too-high agents, if it's possible for them to exist (see comment above)
-		if (passenger->y < (y + cabintop)) passenger->y = y + cabintop;
 		if (passenger->y + passenger->getHeight() > (y + cabinbottom)) passenger->y = y + cabinbottom - passenger->getHeight();
+		if (passenger->y < (y + cabintop)) passenger->y = y + cabintop;
 	} else {
 		passenger->y = y + cabinbottom - passenger->getHeight();
 	}
@@ -78,7 +79,7 @@ void Vehicle::carry(AgentRef passenger) {
 	passenger->invehicle = this;
 	
 	if (engine.version >= 3)
-		passenger->queueScript(122, this); // Vehicle Drop, TODO: is this valid call?
+		passenger->queueScript(121, this); // Vehicle Pickup, TODO: is this valid call?
 }
 
 void Vehicle::drop(AgentRef passenger) {
