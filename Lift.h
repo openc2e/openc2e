@@ -26,6 +26,7 @@ class Lift : public Vehicle {
 public:
 	bool alignwithcabin;
 	unsigned int currentbutton;
+	unsigned int newbutton;
 	std::vector<int> callbuttony;
 
 	Lift(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,

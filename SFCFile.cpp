@@ -1090,7 +1090,7 @@ void SFCLift::copyToWorld() {
 	SFCVehicle::copyToWorld();
 
 	// set current button
-	a->currentbutton = currentbutton;
+	a->currentbutton = a->newbutton = currentbutton;
 	
 	// set call button y locations
 	for (unsigned int i = 0; i < nobuttons; i++) {

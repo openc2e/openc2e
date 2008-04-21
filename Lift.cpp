@@ -59,20 +59,27 @@ void Lift::tick() {
 
 	// if we're moving..
 	if (yvec.getInt() != 0) {
-		// TODO: we should align to agent bottom rather than cabin bottom if LACB is set to 0 (c2)
-		
 		// are we beyond the call button y point?
 		if (
-			(yvec.getInt() < 0 && y + cabinbottom <= callbuttony[currentbutton]) || // upwards
-			(yvec.getInt() > 0 && y + cabinbottom >= callbuttony[currentbutton]) // downwards 
+			(yvec.getInt() < 0 && liftBottom() <= callbuttony[currentbutton]) || // upwards
+			(yvec.getInt() > 0 && liftBottom() >= callbuttony[currentbutton]) // downwards 
 			) {
 			// stop movement (and make sure we're in the right spot)
 			yvec.setInt(0);
-			y = callbuttony[currentbutton] - cabinbottom;
+			y = callbuttony[currentbutton] - (alignwithcabin ? cabinbottom : getHeight());
 
 			// send deactivate event
 			queueScript(0);
 		}
+	}
+
+	if (liftAvailable() && newbutton != currentbutton) {
+		currentbutton = newbutton;
+
+		if (liftBottom() < callbuttony[currentbutton])
+			queueScript(1, this);
+		else
+			queueScript(2, this);
 	}
 }
 

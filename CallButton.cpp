@@ -33,15 +33,20 @@ void CallButton::tick() {
 		if (ourlift->currentbutton == buttonid && ourlift->liftBottom() == ourlift->callbuttony[buttonid]) { // has arrived at us
 			queueScript(0); // deactivate ourselves
 		}
-		// TODO: this is a broken hack
+		
 		if (ourlift->liftAvailable()) { // not moving
 			if (ourlift->currentbutton != buttonid) {
-				ourlift->currentbutton = buttonid;
-				// TODO: mmh
-				if (ourlift->liftBottom() < ourlift->callbuttony[buttonid])
-					ourlift->queueScript(1, this);
-				else
-					ourlift->queueScript(2, this);
+				/*
+				 * all active call buttons need to fight it out to work out who gets to be
+				 * 'newbutton' on the lift (which should be the closest button)
+				 */
+				int buttondist = abs(ourlift->currentbutton - buttonid);
+				int currbuttondist = abs(ourlift->currentbutton - ourlift->newbutton);
+
+				// if there's no change to newbutton yet, or if we're 'nearer' than the last newbutton..
+				if (currbuttondist == 0 || currbuttondist > buttondist)
+					// .. then set newbutton to point to us instead
+					ourlift->newbutton = buttonid;
 			}
 		}
 	}
