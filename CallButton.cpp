@@ -47,4 +47,19 @@ void CallButton::tick() {
 	}
 }
 
+bool CallButton::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
+	Lift *ourlift = dynamic_cast<Lift *>(lift.get());
+	assert(ourlift);
+
+	switch (event) {
+		case 1:
+			// TODO: hrm..
+			if (ourlift->currentbutton == buttonid && ourlift->y + ourlift->cabinbottom == ourlift->callbuttony[buttonid]) { // has arrived at us
+				return false; // nuh-uh
+			}
+	}
+
+	return Agent::fireScript(event, from, one, two);
+}
+
 /* vim: set noet: */
