@@ -27,6 +27,7 @@
 #include "dialect.h" // registerDelegates
 #include "NullBackend.h"
 #include "NullAudioBackend.h"
+#include "SFCFile.h"
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -710,14 +711,32 @@ bool Engine::initialSetup() {
 		world.executeBootstrap(false);
 	} else {
 		std::vector<std::string> scripts;
-	
+
+		if (engine.version < 3 && cmdline_bootstrap.size() != 1)
+			throw creaturesException("multiple bootstrap files provided in C1/C2 mode");
+
 		for (std::vector< std::string >::iterator bsi = cmdline_bootstrap.begin(); bsi != cmdline_bootstrap.end(); bsi++) {
 			fs::path scriptdir(*bsi, fs::native);
-			if (!fs::exists(scriptdir)) {
-				std::cerr << "Warning: Couldn't find a specified script directory (trying " << *bsi << ")!\n";
-				continue;
+			if (engine.version > 2 || fs::extension(scriptdir) == ".cos") {
+				// pass it to the world to execute (it handles both files and directories)
+
+				if (!fs::exists(scriptdir)) {
+					std::cerr << "Warning: Couldn't find a specified script directory (trying " << *bsi << ")!\n";
+					continue;
+				}
+
+				world.executeBootstrap(scriptdir);
+			} else {
+				// in c1/c2 mode, if not a cos file, assume it's an SFC file
+				if (!fs::exists(scriptdir) || fs::is_directory(scriptdir))
+					throw creaturesException("non-existant bootstrap file provided in C1/C2 mode");
+				// TODO: the default SFCFile loading code is in World, maybe this should be too..
+				SFCFile sfc;
+				std::ifstream f(scriptdir.native_directory_string().c_str(), std::ios::binary);
+				f >> std::noskipws;
+				sfc.read(&f);
+				sfc.copyToWorld();
 			}
-			world.executeBootstrap(scriptdir);
 		}
 	}
 
