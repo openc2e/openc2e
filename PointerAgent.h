@@ -24,6 +24,9 @@
 #define _C2E_POINTERAGENT_H
 
 class PointerAgent : public SimpleAgent {
+protected:
+	int hotspotx, hotspoty;
+
 public:
 	std::string name;
 	bool handle_events;
@@ -38,6 +41,7 @@ public:
 	void physicsTick();
 	void kill();
 	void handleEvent(SomeEvent &event);
+	void setHotspot(int, int);
 };
 
 #endif

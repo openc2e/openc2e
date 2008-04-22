@@ -65,6 +65,11 @@ void PointerAgent::kill() {
 	// pointer agent isn't killable
 }
 
+void PointerAgent::setHotspot(int x, int y) {
+	hotspotx = x;
+	hotspoty = y;
+}
+
 void PointerAgent::handleEvent(SomeEvent &event) {
 	if (event.type == eventmousemove) {
 		moveTo(event.x + world.camera.getX(), event.y + world.camera.getY());

@@ -67,9 +67,14 @@ void World::init() {
 			shared_ptr<creaturesImage> img = gallery.getImage(pointerinfo[2]);
 			if (img) {
 				theHand = new PointerAgent(pointerinfo[2]);
+				int family, genus, species;
+				if (sscanf(pointerinfo[0].c_str(), "%d %d %d", &family, &genus, &species) == 3)
+					theHand->setClassifier(family, genus, species);
+				int hotspotx, hotspoty;
+				if (sscanf(pointerinfo[1].c_str(), "%d %d", &hotspotx, &hotspoty) == 2)
+					theHand->setHotspot(hotspotx, hotspoty);
+				// TODO: seamonkeys has 'numImages baseImage' 'blockwidth blockheight' on the end of this tag
 				theHand->finishInit();
-				// TODO: set family/genus/species based on the first entry (normally "2 1 1")
-				// TODO: work out what second entry is ("2 2" normally?! "7 7" in CV)
 			} else {
 				std::cout << "There was a seemingly-useful \"Pointer Information\" catalogue tag provided, but sprite file '" << pointerinfo[2] << " ' doesn't exist!" << std::endl;
 			}
