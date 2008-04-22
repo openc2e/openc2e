@@ -43,10 +43,10 @@ bool Lift::fireScript(unsigned short event, Agent *from, caosVar one, caosVar tw
 	if (y + cabinbottom == callbuttony[currentbutton]) {
 		if (event == 1) {
 			if (currentbutton + 1 == callbuttony.size()) return false;
-			currentbutton++;
+			currentbutton++; newbutton = currentbutton;
 		} else if (event == 2) {
 			if (currentbutton == 0) return false;
-			currentbutton--;
+			currentbutton--; newbutton = currentbutton;
 		}
 	}
 
