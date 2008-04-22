@@ -90,9 +90,10 @@ void World::init() {
 			img = gallery.getImage("syst"); // as used in C1, C2 and CV
 		if (img) {
 			theHand = new PointerAgent(img->getName());
-			theHand->finishInit();
-			if (engine.version > 2)
+			if (engine.version > 2) {
+				theHand->finishInit(); // SFCFile handles this for c1/c2
 				std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->getName() << "'." << std::endl;
+			}
 		} else {
 			if (engine.version > 2)
 				std::cout << "Couldn't find a valid \"Pointer Information\" catalogue tag, and c";

@@ -1049,8 +1049,14 @@ void SFCSimpleObject::copyToWorld() {
 	}
 }
 
+#include "PointerAgent.h"
 void SFCPointerTool::copyToWorld() {
-	// don't copy the cursor, for now at least :-)
+	world.hand()->setClassifier(family, genus, species);
+	world.hand()->setZOrder(entity->zorder);
+	world.hand()->setHotspot(2, 2); // TODO: we should really copy this out of the SFC file (the first two numbers in the unknown data?)
+
+	ourAgent = world.hand();
+	SFCSimpleObject::copyToWorld(); // TODO: think about this call some more, is it appropriate for an already-finished agent?
 }
 
 #include "Blackboard.h"
