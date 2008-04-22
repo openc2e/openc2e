@@ -999,12 +999,12 @@ void caosVM::v_FLOR() {
  Return the number of horizontal pixels per piece of ground level data.
 */
 void caosVM::v_GNDW() {
-	result.setInt(4); // TODO: is it always 4? :)
+	result.setInt(32); // TODO: is it always 32? :) it said 4 here before! help! - fuzzie
 }
 
 /**
  GRND (integer) index (integer)
- %status stub
+ %status maybe
  %pragma variants c1
 
  Return the ground level data at the provided index. See GNDW to work out the index required.
@@ -1012,7 +1012,9 @@ void caosVM::v_GNDW() {
 void caosVM::v_GRND() {
 	VM_PARAM_INTEGER(index)
 
-	result.setInt(0); // TODO
+	caos_assert(index >= 0 && index < world.groundlevels.size());
+
+	result.setInt(world.groundlevels[index]);
 }
 
 /**

@@ -81,6 +81,8 @@ public:
 	MainCamera camera;
 	bool showrooms, autokill, autostop;
 
+	std::vector<unsigned int> groundlevels;
+
 	AgentRef selectedcreature;
 	void selectCreature(boost::shared_ptr<Agent> c);
 	AgentRef focusagent; unsigned int focuspart;

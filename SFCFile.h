@@ -152,6 +152,7 @@ class MapData : public SFCClass {
 public:
 	CGallery *background;
 	std::vector<CRoom *> rooms;
+	unsigned int groundlevels[261];
 
 	// TODO: misc data
 	

@@ -301,7 +301,7 @@ void MapData::read() {
 	// read groundlevel data
 	if (parent->version() == 0) {
 		for (unsigned int i = 0; i < 261; i++) {
-			read32(); // TODO
+			groundlevels[i] = read32();
 		}
 
 		readBytes(800); // TODO
@@ -847,7 +847,13 @@ void MapData::copyToWorld() {
 		}
 	}
 
-	if (parent->version() == 0) return;
+	if (parent->version() == 0) {
+		for (unsigned int i = 0; i < 261; i++) {
+			world.groundlevels.push_back(groundlevels[i]);
+		}
+
+		return;
+	}
 
 	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
 		CRoom *src = *i;
