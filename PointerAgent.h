@@ -42,6 +42,9 @@ public:
 	void kill();
 	void handleEvent(SomeEvent &event);
 	void setHotspot(int, int);
+
+	int pointerX() { return x + hotspotx; }
+	int pointerY() { return y + hotspoty; }
 };
 
 #endif

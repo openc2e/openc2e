@@ -157,7 +157,7 @@ void caosVM::v_KEYD() {
  NB: this command is not a real c1/c2 command, backported for convenience
 */
 void caosVM::v_HOTS() {
-	Agent *a = world.agentAt(world.hand()->x, world.hand()->y); // TODO: use hotspot
+	Agent *a = world.agentAt(world.hand()->pointerX(), world.hand()->pointerY()); // TODO: use hotspot
 	
 	result.setAgent(a);
 }
@@ -171,7 +171,7 @@ void caosVM::v_HOTS() {
  Transparency of the parts themselves is ignored.
 */
 void caosVM::v_HOTP() {
-	CompoundPart *a = world.partAt(world.hand()->x, world.hand()->y, false);
+	CompoundPart *a = world.partAt(world.hand()->pointerX(), world.hand()->pointerY(), false);
 	if (a)
 		result.setInt(a->id);
 	else
@@ -213,7 +213,7 @@ void caosVM::v_PURE() {
  Returns the current X coordinate of the Hand in the world.
 */
 void caosVM::v_MOPX() {
-	result.setInt((int)world.hand()->x);
+	result.setInt((int)world.hand()->pointerX());
 }
 
 /**
@@ -223,7 +223,7 @@ void caosVM::v_MOPX() {
  Returns the current Y coordinate of the Hand in the world.
 */
 void caosVM::v_MOPY() {
-	result.setInt((int)world.hand()->y);
+	result.setInt((int)world.hand()->pointerY());
 }
 
 /**

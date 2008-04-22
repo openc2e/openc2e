@@ -71,8 +71,10 @@ void PointerAgent::setHotspot(int x, int y) {
 }
 
 void PointerAgent::handleEvent(SomeEvent &event) {
+	int x = pointerX(), y = pointerY();
+		
 	if (event.type == eventmousemove) {
-		moveTo(event.x + world.camera.getX(), event.y + world.camera.getY());
+		moveTo(event.x + world.camera.getX() - hotspotx, event.y + world.camera.getY() - hotspoty);
 		velx.setInt(event.xrel * 4);
 		vely.setInt(event.yrel * 4);
 
@@ -224,9 +226,9 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 				}
 			}
 		} else if (event.button == buttonmiddle) {
-			std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(event.x + world.camera.getX(), event.y + world.camera.getY());
+			std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(x, y);
 			if (rooms.size() > 0) std::cout << "Room at cursor is " << rooms[0]->id << std::endl;
-			Agent *a = world.agentAt(event.x + world.camera.getX(), event.y + world.camera.getY(), true);
+			Agent *a = world.agentAt(x, y, true);
 			if (a)
 				std::cout << "Agent under mouse is " << a->identify();
 			else

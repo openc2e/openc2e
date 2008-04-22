@@ -319,8 +319,8 @@ void Engine::handleMouseMove(SomeEvent &event) {
 	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((*i)->imsk_mouse_move) {
-			caosVar x; x.setFloat(world.hand()->x);
-			caosVar y; y.setFloat(world.hand()->y);
+			caosVar x; x.setFloat(world.hand()->pointerX());
+			caosVar y; y.setFloat(world.hand()->pointerY());
 			(*i)->queueScript(75, 0, x, y); // Raw Mouse Move
 		}
 	}
