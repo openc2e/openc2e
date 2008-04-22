@@ -40,8 +40,8 @@ void CallButton::tick() {
 				 * all active call buttons need to fight it out to work out who gets to be
 				 * 'newbutton' on the lift (which should be the closest button)
 				 */
-				int buttondist = abs(ourlift->currentbutton - buttonid);
-				int currbuttondist = abs(ourlift->currentbutton - ourlift->newbutton);
+				int buttondist = abs((int)(ourlift->currentbutton - buttonid));
+				int currbuttondist = abs((int)(ourlift->currentbutton - ourlift->newbutton));
 
 				// if there's no change to newbutton yet, or if we're 'nearer' than the last newbutton..
 				if (currbuttondist == 0 || currbuttondist > buttondist)
