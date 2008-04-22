@@ -523,7 +523,7 @@ void caosVM::c_GRPL() {
 
 /**
  BBD: WORD (command) index (integer) id (integer) text (string)
- %status stub
+ %status maybe
  %pragma variants c1 c2
 
  Change the word at index to target blackboard, setting to the provided id and text.
@@ -540,7 +540,10 @@ void caosVM::c_BBD_WORD() {
 	}
 
 	valid_agent(targ);
-	// TODO
+	Blackboard *b = dynamic_cast<Blackboard *>(targ.get());
+	caos_assert(b);
+
+	b->addBlackboardString(index, id, text);
 }
 
 /**
