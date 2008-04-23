@@ -138,6 +138,14 @@ bool Engine::needsUpdate() {
 	return (!world.paused) && (fastticks || (backend->ticks() > (tickdata + world.ticktime)));
 }
 
+unsigned int Engine::msUntilTick() {
+	if (fastticks) return 0;
+	if (world.paused) return world.ticktime; // TODO: correct?
+
+	int ival = (tickdata + world.ticktime) - backend->ticks();
+	return (ival < 0) ? 0 : ival;
+}
+
 void Engine::update() {
 	tickdata = backend->ticks();
 	

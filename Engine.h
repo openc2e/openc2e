@@ -70,6 +70,7 @@ public:
 	void setBackend(boost::shared_ptr<Backend> b);
 	std::string executeNetwork(std::string in);
 	bool needsUpdate();
+	unsigned int msUntilTick();
 	void update();
 	bool tick();
 	void handleKeyboardScrolling();

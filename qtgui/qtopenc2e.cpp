@@ -39,10 +39,10 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	connect(this, SIGNAL(creatureChanged()), this, SLOT(onCreatureChange()));
 
 	// idle timer
-	// TODO: should prbly have an every-X-seconds timer or a background thread to do this
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
-	timer->start();
+	// TODO: should prbly have a background thread to do this?
+	ourTimer = new QTimer(this);
+	connect(ourTimer, SIGNAL(timeout()), this, SLOT(tick()));
+	ourTimer->start();
 
 	(void)statusBar();
 	std::string titlebar = engine.getGameName() + " - openc2e (development build)";
@@ -285,6 +285,10 @@ void QtOpenc2e::tick() {
 	if (viewport->needsRender()) {
 		viewport->viewport()->repaint();
 	}
+
+	unsigned int i = engine.msUntilTick();
+	if (i != 0 || ourTimer->interval() != 0) // TODO: things get a bit annoyingly unresponsive without this
+		ourTimer->setInterval(i);
 }
 
 // action handlers

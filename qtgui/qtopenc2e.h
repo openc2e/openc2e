@@ -75,6 +75,8 @@ private:
 
 	AgentRef selectedcreature;
 	std::string oldcreaturename;
+
+	class QTimer *ourTimer;
 };
 
 #endif
