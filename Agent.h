@@ -93,8 +93,6 @@ protected:
 	virtual void physicsTick();
 	void physicsTickC2();
 	
-	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
-
 	virtual void carry(AgentRef);
 	virtual void drop(AgentRef);
 
@@ -103,6 +101,8 @@ protected:
 	virtual void adjustCarried(float xoffset, float yoffset);
 
 public:
+	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
+	
 	boost::shared_ptr<class AudioSource> sound;
 
 	// these are maps rather than vectors because ports can be destroyed

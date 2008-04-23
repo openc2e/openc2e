@@ -453,11 +453,13 @@ void SFCEntity::read() {
 	// read pickup handles/points
 	uint16 num_pickup_handles = read16();
 	for (unsigned int i = 0; i < num_pickup_handles; i++) {
-		pickup_handles.push_back(std::pair<uint32, uint32>(read32(), read32()));
+		int x = reads32(); int y = reads32();
+		pickup_handles.push_back(std::pair<int, int>(x, y));
 	}
 	uint16 num_pickup_points = read16();
 	for (unsigned int i = 0; i < num_pickup_points; i++) {
-		pickup_points.push_back(std::pair<uint32, uint32>(read32(), read32()));
+		int x = reads32(); int y = reads32();
+		pickup_points.push_back(std::pair<int, int>(x, y));
 	}
 }
 
@@ -908,6 +910,25 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 			else
 				p->setFrameNo(entity->animframe);
 		} else p->animation.clear();
+	}
+
+	if (entity->getParent()->version() == 0) return;
+
+	// TODO: pickup/carry points are per-agent in openc2e but apparently per-part in the SFC file?
+	if (p->id != 0) return;
+
+	Agent *parent = p->getParent();
+
+	for (unsigned int i = 0; i < entity->pickup_handles.size(); i++) {
+		int x = entity->pickup_handles[i].first, y = entity->pickup_handles[i].second;
+		if (x != -1 || y != -1)
+			parent->carried_points[i] = entity->pickup_handles[i];
+	}
+
+	for (unsigned int i = 0; i < entity->pickup_points.size(); i++) {
+		int x = entity->pickup_points[i].first, y = entity->pickup_points[i].second;
+		if (x != -1 || y != -1)
+			parent->carry_points[i] = entity->pickup_points[i];
 	}
 }
 

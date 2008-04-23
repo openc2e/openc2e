@@ -105,6 +105,9 @@ protected:
 	std::string readstring() { return parent->readstring(); }
 
 	virtual void read() = 0;
+
+public:
+	SFCFile *getParent() { return parent; }
 };
 
 class CGallery : public SFCClass {
@@ -179,8 +182,8 @@ public:
 	int bhvrclick[3];
 	uint8 bhvrtouch;
 
-	std::vector<std::pair<uint32, uint32> > pickup_handles;
-	std::vector<std::pair<uint32, uint32> > pickup_points;
+	std::vector<std::pair<int, int> > pickup_handles;
+	std::vector<std::pair<int, int> > pickup_points;
 
 	// TODO: misc data/flags
 	SFCEntity(SFCFile *p) : SFCClass(p) { }

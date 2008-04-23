@@ -1198,7 +1198,7 @@ std::pair<int, int> Agent::getCarriedPoint() {
 	std::map<unsigned int, std::pair<int, int> >::iterator i = carried_points.find(theirpose);
 	if (i != carried_points.end()) {
 		pos = i->second;
-	} else if (s && engine.version > 1) {
+	} else if (s && engine.version > 2) {
 		// TODO: why fudge pickup location here and not in default carried points or something?
 		// (this is nornagon's code which i moved - fuzzie)
 		pos.first = s->getSprite()->width(s->getCurrentSprite()) / 2;
@@ -1218,10 +1218,9 @@ void Agent::adjustCarried(float unusedxoffset, float unusedyoffset) {
 	int xoffset = 0, yoffset = 0;
 	if (engine.version < 3 && world.hand() == this) {
 		// this appears to produce correct behaviour in the respective games, don't ask me  -nornagon
-		if (engine.version == 2) {
-			xoffset = world.hand()->getWidth() / 2;
+		if (engine.version == 2)
 			yoffset = world.hand()->getHeight() / 2 - 2;
-		} else
+		else
 			yoffset = world.hand()->getHeight() / 2 - 3;
 	}
 
