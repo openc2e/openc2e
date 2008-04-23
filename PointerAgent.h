@@ -27,6 +27,9 @@ class PointerAgent : public SimpleAgent {
 protected:
 	int hotspotx, hotspoty;
 
+	void carry(AgentRef);
+	void drop(AgentRef);
+
 public:
 	std::string name;
 	bool handle_events;

@@ -42,6 +42,20 @@ void PointerAgent::finishInit() {
 	floatSetup();
 }
 
+void PointerAgent::carry(AgentRef a) {
+	Agent::carry(a);
+
+	int eve; if (engine.version < 3) eve = 53; else eve = 104;
+	firePointerScript(eve, a); // Pointer Pickup
+}
+
+void PointerAgent::drop(AgentRef a) {
+	Agent::drop(a);
+
+	int eve; if (engine.version < 3) eve = 54; else eve = 105;
+	firePointerScript(eve, a); // Pointer Drop
+}
+
 // TODO: this should have a queueScript equiv too
 void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
 	assert(src); // TODO: I /think/ this should only be called by the engine..
@@ -204,9 +218,6 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 				if (!carrying->suffercollisions() || (carrying->validInRoomSystem() || engine.version == 1)) {
 					carrying->queueScript(5, this); // drop
 
-					int eve; if (engine.version < 3) eve = 54; else eve = 105;
-					firePointerScript(eve, carrying); // Pointer Drop
-
 					// TODO: is this the correct check?
 					if (carrying->sufferphysics() && carrying->suffercollisions()) {
 						// TODO: do this in the pointer agent?
@@ -220,9 +231,6 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 				Agent *a = world.agentAt(x, y, false, true);
 				if (a) {
 					a->queueScript(4, this); // pickup
-
-					int eve; if (engine.version < 3) eve = 53; else eve = 104;
-					firePointerScript(eve, a); // Pointer Pickup
 				}
 			}
 		} else if (event.button == buttonmiddle) {
