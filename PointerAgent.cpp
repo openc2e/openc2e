@@ -93,6 +93,9 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 		velx.setInt(event.xrel * 4);
 		vely.setInt(event.yrel * 4);
 
+		if (editAgent)
+			editAgent->moveTo(pointerX(), pointerY());
+
 		// middle mouse button scrolling
 		if (event.button & buttonmiddle)
 			world.camera.moveTo(world.camera.getX() - event.xrel, world.camera.getY() - event.yrel, jump);
@@ -207,6 +210,11 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 				}
 			}
 		} else if (event.button == buttonright) {
+			if (editAgent) { 
+				editAgent.clear();
+				return;
+			}
+
 			if (world.paused) return; // TODO: wrong?
 							
 			// picking up and dropping are implictly handled by the scripts (well,

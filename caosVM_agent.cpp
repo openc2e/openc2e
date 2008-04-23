@@ -1950,12 +1950,11 @@ void caosVM::v_TCAR() {
  %pragma variants c1 c2
 
  Attach the target agent to the mouse cursor for positioning purposes.
- Presently just causes the hand to pick it up.
 */
 void caosVM::c_EDIT() {
 	valid_agent(targ);
 
-	world.hand()->addCarried(targ);
+	world.hand()->editAgent = targ;
 }
 
 /**

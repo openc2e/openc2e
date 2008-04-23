@@ -38,6 +38,8 @@ public:
 	AgentRef wireOriginAgent;
 	unsigned int wireOriginID;
 
+	AgentRef editAgent;
+
 	PointerAgent(std::string spritefile);
 	void finishInit();
 	void firePointerScript(unsigned short event, Agent *src);
