@@ -21,23 +21,6 @@
 #include "Engine.h"
 #include "Backend.h"
 
-Blackboard::Blackboard(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-		std::string spritefile, unsigned int firstimage, unsigned int imagecount, unsigned int tx,
-		unsigned int ty, unsigned int bgcolour, unsigned int ckcolour, unsigned int alcolour) :
-		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
-	textx = tx; texty = ty;
-	backgroundcolour = bgcolour; chalkcolour = ckcolour; aliascolour = alcolour;
-
-	if (engine.version == 1)
-		strings.resize(16, std::pair<unsigned int, std::string>(0, std::string()));
-	else
-		strings.resize(48, std::pair<unsigned int, std::string>(0, std::string()));
-
-	// add the part responsible for text; id #10 keeps it safely out of the way
-	BlackboardPart *p = new BlackboardPart(this, 10);
-	addPart(p);
-}
-
 Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
 		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,
 		unsigned int alcolour) : CompoundAgent(spritefile, firstimage, imagecount) {
@@ -48,13 +31,21 @@ Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned
 		strings.resize(16, std::pair<unsigned int, std::string>(0, std::string()));
 	else
 		strings.resize(48, std::pair<unsigned int, std::string>(0, std::string()));
+}
 
-	BlackboardPart *p = new BlackboardPart(this, 10);
-	addPart(p);
+void Blackboard::addPart(CompoundPart *p) {
+	CompoundAgent::addPart(p);
+
+	// if we're adding the first part..
+	if (parts.size() == 1) {
+		// add the part responsible for text; id #10 keeps it safely out of the way
+		BlackboardPart *p = new BlackboardPart(this, 10);
+		addPart(p);
+	}
 }
 
 void Blackboard::showText(bool show) {
-	if (show && var[0].hasInt() && var[0].getInt() < strings.size()) {
+	if (show && var[0].hasInt() && var[0].getInt() >= 0 && (unsigned int)var[0].getInt() < strings.size()) {
 		currenttext = strings[var[0].getInt()].second;
 	} else {
 		currenttext.clear();

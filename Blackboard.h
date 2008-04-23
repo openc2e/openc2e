@@ -37,15 +37,14 @@ protected:
 	void renderText(class Surface *renderer, int xoffset, int yoffset);
 
 public:
-	Blackboard(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-		std::string spritefile, unsigned int firstimage, unsigned int imagecount, unsigned int tx,
-		unsigned int ty, unsigned int bgcolour, unsigned int ckcolour, unsigned int alcolour);
 	Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
 		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,
 		unsigned int alcolour);
 
 	void addBlackboardString(unsigned int n, unsigned int id, std::string text);
 	void showText(bool show);
+
+	void addPart(CompoundPart *); // override
 };
 
 class BlackboardPart : public CompoundPart {
