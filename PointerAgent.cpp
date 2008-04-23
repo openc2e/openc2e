@@ -23,6 +23,7 @@
 #include "Engine.h"
 #include "caosVM.h"
 #include "Room.h"
+#include "MetaRoom.h"
 
 // TODO: change imagecount?
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {
@@ -214,8 +215,17 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 			// fired in c2e when you use MESG WRIT, in which case we'll need to
 			// manually set carrying to NULL and a here, respectively - fuzzie
 			if (carrying) {
-				// TODO: c1 support - these attributes are invalid for c1
-				if (!carrying->suffercollisions() || (carrying->validInRoomSystem() || engine.version == 1)) {
+				if (engine.version == 1) {
+					// ensure there's a room to drop into, in C1
+					MetaRoom* m = world.map.metaRoomAt(x, y);
+					if (!m) return;
+					shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
+					if (!r) return;
+
+					carrying->queueScript(5, this); // drop
+
+					return;
+				} else if (!carrying->suffercollisions() || carrying->validInRoomSystem()) {
 					carrying->queueScript(5, this); // drop
 
 					// TODO: is this the correct check?
@@ -224,9 +234,11 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 						carrying->velx.setFloat(velx.getFloat());
 						carrying->vely.setFloat(vely.getFloat());
 					}
-				} else {
-					// TODO: some kind of "fail to drop" animation/sound?
+
+					return;
 				}
+
+				// TODO: some kind of "fail to drop" animation/sound?
 			} else {
 				Agent *a = world.agentAt(x, y, false, true);
 				if (a) {
