@@ -45,6 +45,7 @@ private slots:
 	
 	void about();
 	
+	void showHatchery();
 	void showAgentInjector();
 	void showBrainViewer();
 	
@@ -62,7 +63,7 @@ private slots:
 private:
 	QToolBar *maintoolbar;
 	QMenu *fileMenu, *viewMenu, *controlMenu, *debugMenu, *toolsMenu, *creaturesMenu, *helpMenu;
-	QAction *exitAct, *aboutAct, *agentInjectorAct, *brainViewerAct;
+	QAction *exitAct, *aboutAct, *agentInjectorAct, *brainViewerAct, *hatcheryAct;
 	QAction *showMapAct, *newNornAct, *newEggAct;
 	QAction *pauseAct, *muteAct, *fastSpeedAct, *displayUpdatesAct, *autokillAct, *toggleScrollbarsAct;
 
@@ -70,6 +71,7 @@ private:
 	class BrainViewer *brainViewer;
 	class CreatureGrapher *creatureGrapher;
 	class QDockWidget *creatureGrapherDock;
+	class Hatchery *hatchery;
 	
 	class openc2eView *viewport;
 

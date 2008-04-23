@@ -22,6 +22,7 @@
 #include "AudioBackend.h"
 #include "MetaRoom.h"
 
+#include "Hatchery.h"
 #include "AgentInjector.h"
 #include "BrainViewer.h"
 #include "CreatureGrapher.h"
@@ -127,7 +128,12 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	/* Tools menu */
 
 	toolsMenu = menuBar()->addMenu(tr("&Tools"));
-	
+
+	hatcheryAct = new QAction(tr("&Hatchery"), this);
+	connect(hatcheryAct, SIGNAL(triggered()), this, SLOT(showHatchery()));
+	toolsMenu->addAction(hatcheryAct);
+	if (engine.version > 1) hatcheryAct->setEnabled(false);
+
 	agentInjectorAct = new QAction(tr("&Agent Injector"), this);
 	connect(agentInjectorAct, SIGNAL(triggered()), this, SLOT(showAgentInjector()));
 	toolsMenu->addAction(agentInjectorAct);
@@ -136,6 +142,8 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	connect(brainViewerAct, SIGNAL(triggered()), this, SLOT(showBrainViewer()));
 	toolsMenu->addAction(brainViewerAct);
 
+	if (engine.version == 1)
+		hatchery = new Hatchery(this);
 	agentInjector = new AgentInjector(this);
 	brainViewer = new BrainViewer(this);
 	connect(this, SIGNAL(ticked()), brainViewer, SLOT(onTick()));
@@ -305,6 +313,11 @@ void QtOpenc2e::updateMenus() {
 
 void QtOpenc2e::about() {
 	QMessageBox::about(this, tr("openc2e"), tr("An open-source game engine to run the Creatures series of games."));
+}
+
+void QtOpenc2e::showHatchery() {
+	hatchery->show();
+	hatchery->activateWindow();
 }
 
 void QtOpenc2e::showAgentInjector() {
