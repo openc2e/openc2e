@@ -58,7 +58,7 @@ bool CallButton::fireScript(unsigned short event, Agent *from, caosVar one, caos
 
 	switch (event) {
 		case 1:
-			if (ourlift->currentbutton == buttonid) {
+			if (ourlift->currentbutton == buttonid && ourlift->liftAvailable()) {
 				return false; // nuh-uh
 			}
 	}

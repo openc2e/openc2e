@@ -33,13 +33,14 @@ Lift::Lift(std::string spritefile, unsigned int firstimage, unsigned int imageco
  * TODO: this code is a first attempt and might be completely wrong
  */
 
+#include "World.h"
 bool Lift::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
 	if (event == 1 || event == 2) {
 		if (!liftAvailable()) return false; // TODO: hack to make sure the lifts aren't activated when not ready
 	}
 
 	// if we need to select a new callbutton.. TODO: this is hacky
-	if (y + cabinbottom == callbuttony[currentbutton]) {
+	if (from == (Agent *)world.hand()) {
 		if (event == 1) {
 			if (currentbutton + 1 == callbuttony.size()) return false;
 			currentbutton++; newbutton = currentbutton;
