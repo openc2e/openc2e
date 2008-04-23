@@ -383,18 +383,39 @@ void Agent::playAudio(std::string filename, bool controlled, bool loop) {
 
 bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
 
+static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int width, unsigned int height) {
+	const static unsigned int buffer = 500;
+
+	if (world.camera.getMetaRoom() != room)
+		return false;
+	if (x + buffer < world.camera.getX() || x + width - buffer > world.camera.getX() + world.camera.getWidth())
+		return false;
+	if (y + buffer < world.camera.getY() || y + height - buffer > world.camera.getY() + world.camera.getHeight())
+		return false;
+	return true;
+}
+
 void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
 	assert(s);
+	MetaRoom *room = world.map.metaRoomAt(x, y);
+	float xc, yc = y;
 
-	s->setPos(x + getWidth() / 2, y + getHeight() / 2, zorder);
-	// TODO: we could do with a nicer 'inrange' check
-	bool inrange = (x + 500 > world.camera.getX()) && (x + getWidth() - 500 < world.camera.getX() + world.camera.getWidth()) &&
-		(y + 500 > world.camera.getY()) && (y + getHeight() - 500 < world.camera.getY() + world.camera.getHeight());
-	s->setMute(
-		world.camera.getMetaRoom() != world.map.metaRoomAt(x, y)
-		&&
-		!inrange
-		);
+	bool inrange = false;
+	if (inrange_at(room, x, y, getWidth(), getHeight())) {
+		xc = x;
+		inrange = true;
+	} else if (room->wraparound()) {
+		if (inrange_at(room, x - room->width(), y, getWidth(), getHeight())) {
+			xc = x - room->width();
+			inrange = true;
+		} else if (inrange_at(room, x + room->width(), y, getWidth(), getHeight())) {
+			xc = x + room->width();
+			inrange = true;
+		}
+	}
+	s->setMute(!inrange);
+	if (inrange)
+		s->setPos(xc + getWidth() / 2, yc + getHeight() / 2, zorder);
 	// TODO: setVelocity?
 }
 

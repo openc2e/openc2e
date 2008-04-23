@@ -209,7 +209,8 @@ void World::tick() {
 				// mute/unmute off-screen uncontrolled audio if necessary
 				float x, y, z;
 				si->first->getPos(x, y, z);
-				si->first->setMute(world.camera.getMetaRoom() != world.map.metaRoomAt(x, y));
+				if (engine.version > 2) // TODO: this is because of wrap issues, but we need a better fix
+					si->first->setMute(world.camera.getMetaRoom() != world.map.metaRoomAt(x, y));
 			}
 		}
 
