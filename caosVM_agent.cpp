@@ -1932,13 +1932,16 @@ void caosVM::c_PRNT() {
 
 /**
  TCAR (agent)
- %status stub
+ %status maybe
  %pragma variants c2
 */
 void caosVM::v_TCAR() {
 	valid_agent(targ);
 
-	result.setAgent(0);
+	if (targ->invehicle)
+		result.setAgent(targ->invehicle);
+	else
+		result.setAgent(targ->carriedby);
 }
 
 /**
