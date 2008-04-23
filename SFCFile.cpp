@@ -918,7 +918,8 @@ void SFCCompoundObject::copyToWorld() {
 
 	// construct our equivalent object, if necessary
 	if (!ourAgent)
-		ourAgent = new CompoundAgent(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+		ourAgent = new CompoundAgent(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	ourAgent->setClassifier(family, genus, species);
 
 	// initialise the agent, move it into position
 	CompoundAgent *a = ourAgent;
@@ -961,12 +962,11 @@ void SFCCompoundObject::copyToWorld() {
 		SFCEntity *e = parts[i];
 		if (!e) continue;
 		DullPart *p;
-		if (i == 0) {
-			p = (DullPart *)a->part(0);
-		} else {
+		if (i == 0)
+			p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder);
+		else
 			p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder - parts[0]->zorder);
-			a->addPart(p);
-		}
+		a->addPart(p);
 
 		copyEntityData(e, p);
 	}
@@ -1062,7 +1062,7 @@ void SFCPointerTool::copyToWorld() {
 #include "Blackboard.h"
 
 void SFCBlackboard::copyToWorld() {
-	ourAgent = new Blackboard(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes, textx, texty, backgroundcolour, chalkcolour, aliascolour);
+	ourAgent = new Blackboard(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes, textx, texty, backgroundcolour, chalkcolour, aliascolour);
 	Blackboard *a = dynamic_cast<Blackboard *>(ourAgent);
 
 	SFCCompoundObject::copyToWorld();
@@ -1076,7 +1076,7 @@ void SFCBlackboard::copyToWorld() {
 
 void SFCVehicle::copyToWorld() {
 	if (!ourAgent) {
-		ourAgent = new Vehicle(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+		ourAgent = new Vehicle(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
 	}
 	Vehicle *a = dynamic_cast<Vehicle *>(ourAgent);
 	assert(a);
@@ -1096,7 +1096,7 @@ void SFCVehicle::copyToWorld() {
 #include "Lift.h"
 
 void SFCLift::copyToWorld() {
-	Lift *a = new Lift(family, genus, species, parts[0]->zorder, parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	Lift *a = new Lift(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
 	ourAgent = a;
 
 	SFCVehicle::copyToWorld();

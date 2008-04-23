@@ -54,7 +54,7 @@ public:
 		
 	unsigned int partCount() { return parts.size(); }
 	CompoundPart *part(unsigned int id);
-	void addPart(CompoundPart *);
+	virtual void addPart(CompoundPart *);
 	void delPart(unsigned int);
 	virtual void tick();
 	void setZOrder(unsigned int plane);

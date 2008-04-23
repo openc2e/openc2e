@@ -34,9 +34,16 @@ void CompoundAgent::addPart(CompoundPart *p) {
 	assert(p);
 	assert(!part(p->id)); // todo: handle better
 
-	// todo: we should prbly insert at the right place, not call sort
+	// TODO: we should prbly insert at the right place, not call sort
 	parts.push_back(p);
 	std::sort(parts.begin(), parts.end(), less_part());
+
+	if (engine.version < 3 && parts.size() == 1) { // adding the first part in c1/c2
+		// TODO: this is zorder hackery - probably the right thing to do, but needs thinking about more
+		unsigned int z = p->zorder;
+		p->zorder = 0;
+		setZOrder(z);
+	}
 }
 
 void CompoundAgent::delPart(unsigned int id) {
