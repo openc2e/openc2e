@@ -30,11 +30,22 @@ Camera *caosVM::getCamera() {
 }
 
 bool agentOnCamera(Agent *targ, bool checkall) {
-	// TODO: check non-main cameras
+	MetaRoom *m = world.map.metaRoomAt(targ->x, targ->y);
+	if (!m || m != world.camera.getMetaRoom()) return false;
+
+	// TODO: check non-main cameras?
 	// TODO: do compound parts stick out of the agent?
 
-	if ((targ->x > (world.camera.getX() + world.camera.getWidth())) || ((targ->x + targ->getWidth()) < world.camera.getX()) ||
-		(targ->y > (world.camera.getY() + world.camera.getHeight())) || ((targ->y + targ->getHeight()) < world.camera.getY())) {
+	// y coordinates don't wrap
+	if (targ->y + targ->getHeight() < world.camera.getY()) return false;
+	if (targ->y > world.camera.getX() + world.camera.getHeight()) return false;
+	
+	// if an agent is off-camera to the right, it's not visible
+	if (targ->x > world.camera.getX() + world.camera.getHeight()) return false;
+
+	if (targ->x + targ->getHeight() < world.camera.getX()) {
+		// if an agent is off-camera to the left, it might be wrapping
+		if (!m->wraparound() || (targ->x + targ->getHeight() + m->width() < world.camera.getX()))
 			return false;
 	}
 
