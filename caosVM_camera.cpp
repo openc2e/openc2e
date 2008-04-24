@@ -38,14 +38,14 @@ bool agentOnCamera(Agent *targ, bool checkall) {
 
 	// y coordinates don't wrap
 	if (targ->y + targ->getHeight() < world.camera.getY()) return false;
-	if (targ->y > world.camera.getX() + world.camera.getHeight()) return false;
+	if (targ->y > world.camera.getY() + world.camera.getHeight()) return false;
 	
 	// if an agent is off-camera to the right, it's not visible
-	if (targ->x > world.camera.getX() + world.camera.getHeight()) return false;
+	if (targ->x > world.camera.getX() + world.camera.getWidth()) return false;
 
-	if (targ->x + targ->getHeight() < world.camera.getX()) {
+	if (targ->x + targ->getWidth() < world.camera.getX()) {
 		// if an agent is off-camera to the left, it might be wrapping
-		if (!m->wraparound() || (targ->x + targ->getHeight() + m->width() < world.camera.getX()))
+		if (!m->wraparound() || (targ->x + targ->getWidth() + m->width() < world.camera.getX()))
 			return false;
 	}
 
