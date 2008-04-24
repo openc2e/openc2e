@@ -31,6 +31,8 @@
 #include "SkeletalCreature.h"
 #include "PointerAgent.h"
 
+#include "version.h"
+
 // Constructor which creates the main window.
 
 QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
@@ -46,7 +48,12 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	ourTimer->start();
 
 	(void)statusBar();
-	std::string titlebar = engine.getGameName() + " - openc2e (development build)";
+	std::string titlebar = engine.getGameName() + " - openc2e ";
+#ifdef DEV_BUILD
+	titlebar += "(development build)";
+#else
+	titlebar += "(" RELEASE_VERSION ")";
+#endif
 	setWindowTitle(titlebar.c_str());
 	resize(800, 600);
 
@@ -246,8 +253,12 @@ void QtOpenc2e::updateCreaturesMenu() {
 }
 
 void QtOpenc2e::onCreatureChange() {
-	std::string titlebar = engine.getGameName() + " - openc2e (development build)";
-
+	std::string titlebar = engine.getGameName() + " - openc2e ";
+#ifdef DEV_BUILD
+	titlebar += "(development build)";
+#else
+	titlebar += "(" RELEASE_VERSION ")";
+#endif
 	if (world.selectedcreature) {
 		oldcreaturename = creatureNameFor(world.selectedcreature);
 
@@ -312,7 +323,15 @@ void QtOpenc2e::updateMenus() {
 }
 
 void QtOpenc2e::about() {
-	QMessageBox::about(this, tr("openc2e"), tr("An open-source game engine to run the Creatures series of games."));
+	std::string abouttxt = "An open-source game engine to run the Creatures "
+		"series of games.\nVersion: ";
+#ifdef DEV_BUILD
+	abouttxt += "development build";
+#else
+	abouttxt += RELEASE_VERSION;
+#endif
+	abouttxt += " (built " __DATE__ " " __TIME__ ")";
+	QMessageBox::about(this, tr("openc2e"), abouttxt.c_str());
 }
 
 void QtOpenc2e::showHatchery() {

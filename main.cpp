@@ -19,6 +19,7 @@
  */
 
 #include "openc2e.h"
+#include "version.h"
 #include <iostream>
 #include "Engine.h"
 #include "SDLBackend.h"
@@ -38,7 +39,14 @@
 
 extern "C" int main(int argc, char *argv[]) {
 	try {
-		std::cout << "openc2e (development build), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n";
+		std::string version;
+#ifdef DEV_BUILD
+		version = "development build";
+#else
+		version = RELEASE_VERSION;
+#endif
+		std::cout << "openc2e (" << version << "), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 "
+			"Alyssa Milburn and others\n\n";
 
 		engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
 #ifdef QT_SUPPORT
