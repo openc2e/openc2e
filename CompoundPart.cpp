@@ -108,6 +108,22 @@ bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 	return getSprite()->transparentAt(getCurrentSprite(), x, y);
 }
 
+void CompoundPart::gainFocus() {
+	assert(false);
+}
+
+void CompoundPart::loseFocus() {
+	throw creaturesException("impossible loseFocus() call");
+}
+
+void CompoundPart::handleKey(char c) {
+	throw creaturesException("impossible handleKey() call");
+}
+
+void CompoundPart::handleSpecialKey(char c) {
+	throw creaturesException("impossible handleSpecialKey() call");
+}
+
 int CompoundPart::handleClick(float clickx, float clicky) {
 	return parent->handleClick(clickx + x + parent->x, clicky + y + parent->y);
 }

@@ -386,8 +386,8 @@ void Engine::handleKeyDown(SomeEvent &event) {
 
 	// tell the agent with keyboard focus
 	if (world.focusagent) {
-		TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-		if (t)
+		CompoundPart *t = world.focusagent.get()->part(world.focuspart);
+		if (t && t->canGainFocus())
 			t->handleKey(event.key);
 	}
 
@@ -479,8 +479,8 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 
 	// tell the agent with keyboard focus
 	if (world.focusagent) {
-		TextEntryPart *t = (TextEntryPart *)((CompoundAgent *)world.focusagent.get())->part(world.focuspart);
-		if (t)
+		CompoundPart *t = world.focusagent.get()->part(world.focuspart);
+		if (t && t->canGainFocus())
 			t->handleSpecialKey(event.key);
 	}
 

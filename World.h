@@ -86,7 +86,7 @@ public:
 	AgentRef selectedcreature;
 	void selectCreature(boost::shared_ptr<Agent> c);
 	AgentRef focusagent; unsigned int focuspart;
-	void setFocus(class TextEntryPart *p);
+	void setFocus(class CompoundPart *p);
 
 	Agent *agentAt(unsigned int x, unsigned int y, bool obey_all_transparency = true, bool needs_mouseable = false);
 	CompoundPart *partAt(unsigned int x, unsigned int y, bool obey_all_transparency = true, bool needs_mouseable = false);

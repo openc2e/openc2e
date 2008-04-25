@@ -50,7 +50,14 @@ public:
 	virtual void render(class Surface *renderer, int xoffset, int yoffset);
 	virtual void partRender(class Surface *renderer, int xoffset, int yoffset) = 0;
 	virtual void tick() { }
+	
+	virtual bool canGainFocus() { return false; }
+	virtual void gainFocus();
+	virtual void loseFocus();
 	virtual int handleClick(float, float);
+	virtual void handleKey(char c);
+	virtual void handleSpecialKey(char c);
+
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
 
@@ -208,6 +215,7 @@ public:
 	TextEntryPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				  unsigned int _z, unsigned int msgid, std::string fontsprite);
 	void setText(std::string t);
+	bool canGainFocus() { return true; }
 	void gainFocus() { focused = true; caretpose = 0; }
 	void loseFocus() { focused = false; }
 	int handleClick(float, float);

@@ -165,13 +165,15 @@ void World::queueScript(unsigned short event, AgentRef agent, AgentRef from, cao
 }
 
 // TODO: eventually, the part should be referenced via a weak_ptr, maaaaybe?
-void World::setFocus(TextEntryPart *p) {
+void World::setFocus(CompoundPart *p) {
+	assert(!p || p->canGainFocus());
+
 	// Unfocus the current agent. Not sure if c2e always does this (what if the agent/part is bad?).
 	if (focusagent) {
 		CompoundAgent *c = dynamic_cast<CompoundAgent *>(focusagent.get());
 		assert(c);
-		TextEntryPart *p = dynamic_cast<TextEntryPart *>(c->part(focuspart));
-		if (p)
+		CompoundPart *p = c->part(focuspart);
+		if (p && p->canGainFocus())
 			p->loseFocus();
 	}
 
