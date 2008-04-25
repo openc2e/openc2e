@@ -1253,6 +1253,8 @@ void SFCMacro::activate() {
 		ourAgent->queueScript(s.eventno);
 		return;
 	}
+
+	std::cout << "Warning: SFCFile failed to find the real script for an SFCMacro owned by " << ourAgent->identify() << std::endl;
 }
 
 /* vim: set noet: */
