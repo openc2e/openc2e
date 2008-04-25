@@ -42,6 +42,7 @@
 #define TYPE_POINTERTOOL 11
 #define TYPE_CALLBUTTON 12
 #define TYPE_SCENERY 13
+#define TYPE_MACRO 14
 #define TYPE_OBJECT 100
 
 #include <boost/format.hpp>
@@ -89,8 +90,28 @@ void SFCFile::read(std::istream *i) {
 
 	scrollx = read32();
 	scrolly = read32();
-	
-	// TODO
+
+	sfccheck(read16() == 0); // TODO
+	favplacename = readstring();
+	favplacex = read16();
+	favplacey = read16();
+
+	if (version() == 0)
+		readBytes(25); // TODO
+	else
+		readBytes(29); // TODO
+
+	uint16 numspeech = read16();
+	for (unsigned int i = 0; i < numspeech; i++) {
+		speech_history.push_back(readstring());
+	}
+
+	uint32 nomacros = read32();
+	for (unsigned int i = 0; i < nomacros; i++) {
+		SFCMacro *o = (SFCMacro *)slurpMFC(TYPE_MACRO);
+		if (o) // TODO: ugh
+			macros.push_back(o);
+	}
 }
 
 bool validSFCType(unsigned int type, unsigned int reqtype) {
@@ -152,6 +173,8 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 			types[pid] = TYPE_CALLBUTTON;
 		else if (classname == "Scenery")
 			types[pid] = TYPE_SCENERY;
+		else if (classname == "Macro")
+			types[pid] = TYPE_MACRO;
 		else
 			throw creaturesException(std::string("SFCFile doesn't understand class name '") + classname + "'!");
 	} else if ((pid & 0x8000) != 0x8000) {
@@ -189,6 +212,7 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		case TYPE_POINTERTOOL: newobj = new SFCPointerTool(this); break;
 		case TYPE_CALLBUTTON: newobj = new SFCCallButton(this); break;
 		case TYPE_SCENERY: newobj = new SFCScenery(this); break;
+		case TYPE_MACRO: newobj = new SFCMacro(this); break;
 		default:
 			throw creaturesException("SFCFile didn't find a valid type in internal variable, argh!");
 	}
@@ -396,6 +420,29 @@ void CRoom::read() {
 
 	music = readstring();
 	dropstatus = read32(); sfccheck(dropstatus < 3);
+}
+
+void SFCMacro::read() {
+	readBytes(12); // TODO
+
+	script = readstring();
+
+	read32(); read32();
+	if (parent->version() == 0)
+		readBytes(120);
+	else
+		readBytes(480);
+
+	owner = (SFCObject *)slurpMFC(TYPE_OBJECT);
+	sfccheck(owner);
+	from = (SFCObject *)slurpMFC(TYPE_OBJECT);
+	sfccheck(read16() == 0);
+	targ = (SFCObject *)slurpMFC(TYPE_OBJECT);
+
+	readBytes(18);
+
+	if (parent->version() == 1)
+		readBytes(16);
 }
 
 void SFCEntity::read() {
@@ -744,6 +791,11 @@ void SFCFile::copyToWorld() {
 		(*i)->copyToWorld();
 	}
 
+	// activate old scripts
+	for (std::vector<SFCMacro *>::iterator i = macros.begin(); i != macros.end(); i++) {
+		(*i)->activate();
+	}
+
 	// move the camera to the correct position
 	world.camera.moveTo(scrollx, scrolly, jump);
 
@@ -955,8 +1007,6 @@ void SFCCompoundObject::copyToWorld() {
 	a->setAttributes(attr);
 	
 	a->actv.setInt(actv);
-	// TODO: this is to activate mover scripts in c1, does it apply to c2 too? is it correct at all?
-	if ((parent->version() == 0) && actv) { a->actv.setInt(0); a->queueScript(actv); }
 
 	// ticking
 	a->tickssincelasttimer = tickstate;
@@ -1029,8 +1079,6 @@ void SFCSimpleObject::copyToWorld() {
 	a->setAttributes(attr);
 	
 	a->actv.setInt(actv);
-	// TODO: this is to activate mover scripts in c1, does it apply to c2 too? is it correct at all?
-	if ((parent->version() == 0) && actv) a->queueScript(actv);
 
 	// copy bhvrclick data
 	a->clac[0] = entity->bhvrclick[0];
@@ -1175,6 +1223,35 @@ void SFCScript::install() {
 		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	} catch (std::exception &e) {
 		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.what() << std::endl;
+	}
+}
+
+void SFCMacro::activate() {
+	assert(owner);
+	Agent *ourAgent = owner->copiedAgent();
+	assert(ourAgent);
+
+	/*
+	 * TODO:
+	 *
+	 * At the moment, this just starts scripts from the beginning, anew.
+	 */
+
+	for (std::vector<SFCScript>::iterator i = parent->scripts.begin(); i != parent->scripts.end(); i++) {
+		SFCScript &s = *i;
+
+		if (s.genus != ourAgent->genus) continue;
+		if (s.family != ourAgent->family) continue;
+		if (s.species != ourAgent->species) continue;
+		
+		if (s.data != script) continue; // TODO: no better way?
+
+		// TODO: this is a horrible hack to get around the fact that fireScript enforces actv
+		if (s.eventno != 0) ourAgent->actv = 0;
+		else ourAgent->actv = 1;
+
+		ourAgent->queueScript(s.eventno);
+		return;
 	}
 }
 

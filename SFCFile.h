@@ -38,6 +38,7 @@ class SFCClass;
 class MapData;
 class SFCObject;
 class SFCScenery;
+class SFCMacro;
 
 struct SFCScript {
 	uint8 genus, family;
@@ -64,9 +65,12 @@ public:
 	std::vector<SFCObject *> objects;
 	std::vector<SFCScenery *> scenery;
 	std::vector<SFCScript> scripts;
+	std::vector<SFCMacro *> macros;
 
 	uint32 scrollx, scrolly;
-	// TODO: favourite places
+	std::string favplacename;
+	uint32 favplacex, favplacey;
+	std::vector<std::string> speech_history;
 
 	SFCFile() : reading_compound(false), reading_scenery(false) { }
 	~SFCFile();
@@ -320,6 +324,17 @@ class SFCScenery : public SFCSimpleObject {
 public:
 	SFCScenery(SFCFile *p) : SFCSimpleObject(p) { }
 	void copyToWorld();
+};
+
+class SFCMacro : public SFCClass {
+protected:
+	SFCObject *owner, *from, *targ;
+	std::string script;
+
+public:
+	SFCMacro(SFCFile *p) : SFCClass(p) { }
+	void read();
+	void activate();
 };
 
 #endif
