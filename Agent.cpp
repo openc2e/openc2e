@@ -398,7 +398,7 @@ static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int widt
 void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
 	assert(s);
 	MetaRoom *room = world.map.metaRoomAt(x, y);
-	float xc, yc = y;
+	float xc = x;
 
 	bool inrange = false;
 	if (inrange_at(room, x, y, getWidth(), getHeight())) {
@@ -415,7 +415,7 @@ void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
 	}
 	s->setMute(!inrange);
 	if (inrange)
-		s->setPos(xc + getWidth() / 2, yc + getHeight() / 2, zorder);
+		s->setPos(xc + getWidth() / 2, y + getHeight() / 2, zorder);
 	// TODO: setVelocity?
 }
 
