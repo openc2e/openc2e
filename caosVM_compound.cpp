@@ -581,7 +581,7 @@ void caosVM::c_BBD_EMIT() {
 
 /**
  BBD: EDIT (command) allow (integer)
- %status stub
+ %status maybe
  %pragma variants c1
 
  If allow is 1, switch target blackboard into editing mode, give it focus. If it
@@ -591,7 +591,17 @@ void caosVM::c_BBD_EDIT() {
 	VM_PARAM_INTEGER(allow)
 
 	valid_agent(targ);
-	// TODO
+
+	Blackboard *b = dynamic_cast<Blackboard *>(targ.get());
+	BlackboardPart *p = b->getBlackboardPart();
+	caos_assert(p);
+	
+	if (allow) {
+		world.setFocus(p);
+	} else {
+		if (world.focusagent == targ) // TODO: should this be caos_assert?
+			world.setFocus(0);
+	}
 }
 
 /**

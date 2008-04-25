@@ -26,6 +26,8 @@ class Blackboard : public CompoundAgent {
 	friend class BlackboardPart;
 
 protected:
+	class BlackboardPart *ourPart;
+	
 	// configuration
 	unsigned int textx, texty;
 	unsigned int backgroundcolour, chalkcolour, aliascolour;
@@ -33,8 +35,13 @@ protected:
 	// state
 	std::vector<std::pair<unsigned int, std::string> > strings;
 	std::string currenttext;
+	bool editing;
+	unsigned int editingindex;
 
 	void renderText(class Surface *renderer, int xoffset, int yoffset);
+
+	void startEditing();
+	void stopEditing(bool losingfocus);
 
 public:
 	Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
@@ -45,6 +52,7 @@ public:
 	void showText(bool show);
 
 	void addPart(CompoundPart *); // override
+	class BlackboardPart *getBlackboardPart() { return ourPart; }
 };
 
 class BlackboardPart : public CompoundPart {
@@ -57,6 +65,12 @@ public:
 	void partRender(class Surface *renderer, int xoffset, int yoffset);
 	unsigned int getWidth() { return 0; }
 	unsigned int getHeight() { return 0; }
+
+	bool canGainFocus() { return true; }
+	void gainFocus();
+	void loseFocus();
+	void handleKey(char c);
+	void handleSpecialKey(char c);
 };
 
 #endif
