@@ -82,7 +82,7 @@ def slurpMFC(f, reqclass = None):
 		newclass = existingobjects[x - 1]
 
 	if reqclass:
-		assert newclass == reqclass, "slurpMFC wanted " + reqclass.__name__ + " but got " + newclass.__name__
+		assert newclass == reqclass, "slurpMFC wanted " + reqclass.__name__ + " but got " + newclass.__class__.__name__
 	#print "* creating: " + newclass.__name__
 	n = newclass()
 	existingobjects.append(n)
@@ -339,6 +339,14 @@ class Entity: # like a compound part?
 		print "read " + str(len(self.pickup_handles)) + " pickup handles and " + str(len(self.pickup_points)) + " pickup points"
 
 class Object:
+	def identify(self):
+		identifier = getidentifier(self.family, self.genus, self.species)
+		if not identifier:
+			identifier = ""
+		else:
+			identifier = " - '" + identifier + "'"	
+		return "agent " + self.__class__.__name__ + ": (" + str(self.family) + ", " + str(self.genus) + ", " + str(self.species) + ")" + identifier + ","
+
 	def partialread(self, f):
 		if version == 0:
 			# TODO
@@ -360,12 +368,7 @@ class Object:
 			self.species = read16(f)
 
 		# print nice stuff!
-		identifier = getidentifier(self.family, self.genus, self.species)
-		if not identifier:
-			identifier = ""
-		else:
-			identifier = " - '" + identifier + "'"
-		print "agent " + self.__class__.__name__ + ": (" + str(self.family) + ", " + str(self.genus) + ", " + str(self.species) + ")" + identifier + ","
+		print self.identify()
 
 		if version == 0:
 			x = read8(f)
@@ -990,6 +993,41 @@ class DendriteDetails:
 		for z in x: print "%02X" % ord(z),
 		print
 
+class Macro:
+	def read(self, f):
+		x = f.read(12)
+		print "macro bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+		macro = readstring(f)
+		print "script: " + macro
+		a = read32(f)
+		b = read32(f)
+		print "macro numbers: %d %d" % (a, b)
+		if version == 0:
+			x = f.read(120)
+		else:
+			x = f.read(480)
+		print "macro bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+		a = slurpMFC(f)
+		b = slurpMFC(f)
+		c = slurpMFC(f)
+		d = slurpMFC(f)
+		print "OWNR: " + a.identify()
+		print "FROM: " + b.identify()
+		print "TARG: " + d.identify()
+		assert c == None
+		if version == 0:
+			x = f.read(18)
+		else:
+			x = f.read(18 + 16)
+		print "macro bytes:",
+		for z in x: print "%02X" % ord(z),
+		print
+		print
+		
 # -------------------------------------------------------------------
 
 import sys
@@ -1074,7 +1112,19 @@ print "scrolled to " + str(scrollx) + ", " + str(scrolly)
 zeros = read16(f)
 assert zeros == 0
 favplacename = readstring(f)
-print "aaaand, to finish off, our favourite place is: " + favplacename
+favplacex = read16(f)
+favplacey = read16(f)
+print "our favourite place is '" + favplacename + "', at (" + str(favplacex) + ", " + str(favplacey) + ")"
+
+if version == 0:
+	x = f.read(27) # TODO
+else:
+	x = f.read(45) # TODO
+
+nomacros = read32(f)
+print "reading " + str(nomacros) + " macro objects.."
+for i in range(nomacros):
+	m = slurpMFC(f, Macro)
 
 if version == 0:
 	sys.exit(0)
