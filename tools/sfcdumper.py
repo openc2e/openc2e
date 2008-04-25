@@ -1117,9 +1117,13 @@ favplacey = read16(f)
 print "our favourite place is '" + favplacename + "', at (" + str(favplacex) + ", " + str(favplacey) + ")"
 
 if version == 0:
-	x = f.read(27) # TODO
+	x = f.read(25) # TODO
 else:
-	x = f.read(45) # TODO
+	x = f.read(29) # TODO
+
+numspeech = read16(f)
+for i in range(numspeech):
+	print readstring(f)
 
 nomacros = read32(f)
 print "reading " + str(nomacros) + " macro objects.."
