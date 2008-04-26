@@ -38,6 +38,7 @@ SET(OPENC2E_CORE
 	Blackboard.cpp
 	blkImage.cpp
 	bmpImage.cpp
+	Bubble.cpp
 	bytecode.cpp
 	c16Image.cpp
 	c2eBrain.cpp

@@ -70,6 +70,8 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	CompoundPart *p = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
 	caos_assert(p);
 	addPart(p);
+
+	setZOrder(plane); // because addPart zots zorder for c1/c2, TODO: make saner?
 	
 	for (unsigned int i = 0; i < 6; i++) {
 		hotspots[i].left = -1; hotspots[i].right = -1; hotspots[i].top = -1;

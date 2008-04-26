@@ -384,6 +384,10 @@ void Engine::handleKeyDown(SomeEvent &event) {
 		case 'd': d_down = true; break;
 	}
 
+	if (version < 3 && !world.focusagent) {
+		world.hand()->makeNewSpeechBubble();
+	}
+
 	// tell the agent with keyboard focus
 	if (world.focusagent) {
 		CompoundPart *t = world.focusagent.get()->part(world.focuspart);
