@@ -55,7 +55,6 @@ class Agent : public boost::enable_shared_from_this<Agent> {
 	
 protected:
 	bool initialized;
-	virtual void finishInit();
 	int lifecount;
 private:
 	void core_init();
@@ -191,6 +190,8 @@ public:
 
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
+	
+	virtual void finishInit();
 
 	void floatSetup();
 	void floatRelease();
