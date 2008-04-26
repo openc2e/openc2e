@@ -480,3 +480,16 @@ void SDLBackend::setPalette(uint8 *data) {
 void SDLBackend::delay(int msec) {
 	SDL_Delay(msec);
 }
+
+unsigned int SDLBackend::textWidth(std::string text) {
+	if (!basicfont) return 0;
+	if (text.size() == 0) return 0;
+
+	int w, h;
+
+	if (TTF_SizeText(basicfont, text.c_str(), &w, &h))
+		return 0; // error
+	else
+		return w;
+}
+

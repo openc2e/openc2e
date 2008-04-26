@@ -84,6 +84,7 @@ public:
 	Surface *getMainSurface() { return &mainsurface; }
 	Surface *newSurface(unsigned int width, unsigned int height);
 	void freeSurface(Surface *surf);
+	unsigned int textWidth(std::string text);
 		
 	bool keyDown(int key);
 	

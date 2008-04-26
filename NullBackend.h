@@ -57,6 +57,7 @@ public:
 	virtual void freeSurface(Surface *surf) { }
 			
 	virtual void setPalette(uint8 *data) { }
+	virtual unsigned int textWidth(std::string text) { return 0; }
 	virtual void delay(int msec) { }
 };
 
