@@ -79,12 +79,14 @@ void OpenALBackend::init() {
 	if (!device) {
 		device = alcOpenDevice(NULL);
 		if (!device) {
-			al_throw_maybe();
+			ALenum err = alGetError();
+			throw creaturesException(boost::str(boost::format("OpenAL error (%d): %s") % err % al_error_str(err)));
 		}
 	}
 	ALCcontext *context = alcCreateContext(device, NULL);
 	if (!context) {
-		al_throw_maybe();
+		ALenum err = alGetError();
+		throw creaturesException(boost::str(boost::format("OpenAL error (%d): %s") % err % al_error_str(err)));
 	}
 	alcMakeContextCurrent(context);
 
