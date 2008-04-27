@@ -17,6 +17,8 @@
 #include "World.h"
 #include "Hatchery.h"
 
+#include <QtGui>
+
 /*
   C1 hatchery resources:
   hatchery.bmp and htchmask.bmp used for the background/foreground

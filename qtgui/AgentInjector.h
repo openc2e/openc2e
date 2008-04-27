@@ -39,5 +39,4 @@ class AgentInjector : public QDialog {
 		void resetAgents();
 };
 
-
 #endif /* AGENTINJECTOR_H */

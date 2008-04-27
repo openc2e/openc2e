@@ -17,7 +17,7 @@
 #ifndef HATCHERY_H
 #define HATCHERY_H 1
 
-#include <QtGui>
+#include <QDialog>
 
 class Hatchery : public QDialog {
 	Q_OBJECT
