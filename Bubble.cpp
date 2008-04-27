@@ -78,8 +78,7 @@ void Bubble::turnIntoSpeech() {
 }
 
 Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
-	// TODO: C2 support
-	if (engine.version > 1) return 0;
+	assert(engine.version < 3);
 
 	assert(parent);
 
@@ -88,12 +87,37 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	if (parent->x - world.camera.getX() < world.camera.getWidth() / 2) leftside = true;
 
 	int pose;
-	if (speech)
-		pose = leftside ? 10 : 9;
-	else
-		pose = leftside ? 12 : 11;
+	if (engine.version == 1) {
+		// C1 poses
+		if (speech)
+			pose = leftside ? 10 : 9;
+		else
+			pose = leftside ? 12 : 11;
+	} else {
+		// C2 poses
+		// TODO: extend to fit text
+		if (speech)
+			pose = leftside ? 21 : 18;
+		else
+			pose = leftside ? 27 : 24;
+	}
 
-	Bubble *ourBubble = new Bubble(2, 1, speech ? 2 : 1, 9000, "syst", pose, 1, 6, 3, 144, 12, 0, 0);
+	int plane;
+	if (engine.version == 1) {
+		plane = 9000;
+	} else {
+		// C2
+		if (parent == (Agent *)world.hand())
+			plane = 9999;
+		else
+			plane = 9995;
+	}
+
+	int xoffset = (engine.version == 1) ? 6 : 8;
+	int yoffset = (engine.version == 1) ? 3 : 8;
+	int twidth = (engine.version == 1) ? 144 : 95; // TODO: extend to fit text
+
+	Bubble *ourBubble = new Bubble(2, 1, speech ? 2 : 1, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, 0, 0);
 	ourBubble->finishInit();
 
 	ourBubble->attr = 32; // floating
