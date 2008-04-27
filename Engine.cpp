@@ -376,6 +376,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 	world.hand()->handleEvent(event);
 }
 
+#include "Bubble.h"
 void Engine::handleKeyDown(SomeEvent &event) {
 	switch (event.key) {
 		case 'w': w_down = true; break;
@@ -385,7 +386,7 @@ void Engine::handleKeyDown(SomeEvent &event) {
 	}
 
 	if (version < 3 && !world.focusagent) {
-		world.hand()->makeNewSpeechBubble();
+		Bubble::newBubble(world.hand(), false, std::string());	
 	}
 
 	// tell the agent with keyboard focus

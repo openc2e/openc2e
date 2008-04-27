@@ -48,8 +48,6 @@ public:
 	void handleEvent(SomeEvent &event);
 	void setHotspot(int, int);
 
-	void makeNewSpeechBubble();
-
 	int pointerX() { return x + hotspotx; }
 	int pointerY() { return y + hotspoty; }
 };

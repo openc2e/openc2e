@@ -44,6 +44,8 @@ public:
 
 	void setTimeout(unsigned int i);
 	void tick();
+
+	static Bubble *newBubble(Agent *parent, bool speech, std::string text);
 };
 
 class BubblePart : public CompoundPart {

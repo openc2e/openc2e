@@ -68,37 +68,51 @@ void Bubble::tick() {
 	}
 }
 
-#include "PointerAgent.h"
 void Bubble::turnIntoSpeech() {
-	// TODO: this should really really really be handled elsewhere, not in Bubble!!!!
+	newBubble((Agent *)world.hand(), true, getText());
 
-	// TODO: C2 support
-	assert(engine.version == 1);
-
-	bool leftside = false;
-	// TODO: cope with wrap
-	if (world.hand()->x - world.camera.getX() < world.camera.getWidth() / 2) leftside = true;
-
-	// TODO: are 1/0 good colours?
-	Bubble *ourSpeechBubble = new Bubble(2, 1, 2, 9000, "syst", leftside ? 10 : 9, 1, 6, 3, 144, 12, 1, 0);
-	ourSpeechBubble->finishInit();
-
-	ourSpeechBubble->attr = 32; // floating
-	ourSpeechBubble->floatTo(world.hand());
-
-	// TODO: fix positioning
-	if (leftside)
-		ourSpeechBubble->moveTo(world.hand()->x + world.hand()->getWidth() - 2, world.hand()->y - getHeight());
-	else
-		ourSpeechBubble->moveTo(world.hand()->x - getWidth() + 2, world.hand()->y - getHeight());
-
-	ourSpeechBubble->setText(getText());
-	
-	ourSpeechBubble->setTimeout(2 * 10); // TODO: 2s is probably not right
 	// TODO: announce via shou
 	// TODO: add to speech history
 
 	kill();
+}
+
+Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
+	// TODO: C2 support
+	if (engine.version > 1) return 0;
+
+	assert(parent);
+
+	bool leftside = false;
+	// TODO: cope with wrap
+	if (parent->x - world.camera.getX() < world.camera.getWidth() / 2) leftside = true;
+
+	int pose;
+	if (speech)
+		pose = leftside ? 10 : 9;
+	else
+		pose = leftside ? 12 : 11;
+
+	Bubble *ourBubble = new Bubble(2, 1, speech ? 2 : 1, 9000, "syst", pose, 1, 6, 3, 144, 12, 0, 0);
+	ourBubble->finishInit();
+
+	ourBubble->attr = 32; // floating
+	ourBubble->floatTo(parent);
+
+	// TODO: fix positioning
+	if (leftside)
+		ourBubble->moveTo(parent->x + parent->getWidth() - 2, parent->y - ourBubble->getHeight());
+	else
+		ourBubble->moveTo(parent->x - ourBubble->getWidth() + 2, parent->y - ourBubble->getHeight());
+
+	ourBubble->setText(text);
+
+	if (speech)
+		ourBubble->setTimeout(2 * 10); // TODO: 2s is probably not right
+	else
+		ourBubble->setEditing(true);
+
+	return ourBubble;
 }
 
 /*

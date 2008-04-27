@@ -266,29 +266,4 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 	}
 }
 
-#include "Bubble.h"
-
-void PointerAgent::makeNewSpeechBubble() {
-	if (engine.version != 1) return; // TODO: C2 support
-	
-	bool leftside = false;
-	// TODO: cope with wrap
-	if (x - world.camera.getX() < world.camera.getWidth() / 2) leftside = true;
-
-	// TODO: are 1/0 good colours?
-	Bubble *ourSpeechBubble = new Bubble(2, 1, 1, 9000, "syst", leftside ? 12 : 11, 1, 6, 3, 144, 12, 1, 0);
-	ourSpeechBubble->finishInit();
-
-	ourSpeechBubble->attr = 32; // floating
-	ourSpeechBubble->floatTo(this);
-
-	// TODO: fix positioning
-	if (leftside)
-		ourSpeechBubble->moveTo(x + getWidth() - 2, y - ourSpeechBubble->getHeight());
-	else
-		ourSpeechBubble->moveTo(x - ourSpeechBubble->getWidth() + 2, y - ourSpeechBubble->getHeight());
-
-	ourSpeechBubble->setEditing(true);
-}
-
 /* vim: set noet: */
