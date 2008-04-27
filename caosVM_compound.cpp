@@ -566,7 +566,7 @@ void caosVM::c_BBD_SHOW() {
 
 /**
  BBD: EMIT (command) audible (integer)
- %status stub
+ %status maybe
  %pragma variants c1 c2
 
  Broadcast the current word of the target blackboard. If audible is 1, broadcast
@@ -576,7 +576,10 @@ void caosVM::c_BBD_EMIT() {
 	VM_PARAM_INTEGER(audible)
 
 	valid_agent(targ);
-	// TODO
+	Blackboard *b = dynamic_cast<Blackboard *>(targ.get());
+	caos_assert(b);
+
+	b->broadcast(audible);
 }
 
 /**

@@ -47,11 +47,18 @@ void Blackboard::addPart(CompoundPart *p) {
 	}
 }
 
+std::string Blackboard::getText() {
+	if (var[0].hasInt() && var[0].getInt() >= 0 && (unsigned int)var[0].getInt() < strings.size())
+		return strings[var[0].getInt()].second;
+	else
+		return std::string();
+}
+
 void Blackboard::showText(bool show) {
 	if (editing) stopEditing(false);
 
-	if (show && var[0].hasInt() && var[0].getInt() >= 0 && (unsigned int)var[0].getInt() < strings.size()) {
-		currenttext = strings[var[0].getInt()].second;
+	if (show) {
+		currenttext = getText();
 	} else {
 		currenttext.clear();
 	}
@@ -91,6 +98,15 @@ void Blackboard::stopEditing(bool losingfocus) {
 	}
 
 	editing = false;
+}
+
+#include "Bubble.h"
+void Blackboard::broadcast(bool audible) {
+	// TODO: blackboard broadcasts
+	
+	if (audible) {
+		Bubble::newBubble(this, true, currenttext);
+	}
 }
 
 BlackboardPart::BlackboardPart(Blackboard *p, unsigned int _id) : CompoundPart(p, _id, 0, 0, 1) {

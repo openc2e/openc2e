@@ -39,6 +39,7 @@ protected:
 	unsigned int editingindex;
 
 	void renderText(class Surface *renderer, int xoffset, int yoffset);
+	std::string getText();
 
 	void startEditing();
 	void stopEditing(bool losingfocus);
@@ -53,6 +54,8 @@ public:
 
 	void addPart(CompoundPart *); // override
 	class BlackboardPart *getBlackboardPart() { return ourPart; }
+
+	void broadcast(bool audible);
 };
 
 class BlackboardPart : public CompoundPart {
