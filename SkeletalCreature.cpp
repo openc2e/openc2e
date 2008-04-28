@@ -31,6 +31,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "Backend.h"
+#include "MetaRoom.h"
 #include "Room.h"
 #include "creaturesImage.h"
 
@@ -384,6 +385,9 @@ void SkeletalCreature::snapDownFoot() {
 	float footx = x + attachmentX(orig_footpart, 1);
 	float footy = y + attachmentY(orig_footpart, 1);
 
+	MetaRoom *m = world.map.metaRoomAt(x, y);
+	if (!m) return; // TODO: exceptiony death
+
 	shared_ptr<Room> newroom;
 
 	if (downfootroom) {
@@ -408,12 +412,12 @@ void SkeletalCreature::snapDownFoot() {
 			}
 		}
 	} else {	
-		newroom = bestRoomAt(footx, footy, 3, shared_ptr<Room>());
+		newroom = bestRoomAt(footx, footy, 3, m, shared_ptr<Room>());
 
 		// insane emergency handling
 		float newfooty = footy;
 		while (!newroom && newfooty > (footy - 500.0f)) {
-			newroom = world.map.roomAt(footx, newfooty);
+			newroom = m->roomAt(footx, newfooty);
 			newfooty--;
 		}
 
@@ -429,7 +433,7 @@ void SkeletalCreature::snapDownFoot() {
 	if (!downfootroom /*|| !falling */) {
 		// TODO: hackery to cope with scripts moving us, this needs handling correctly somewhere
 		if (fabs(lastgoodfootx - attachmentX(orig_footpart, 1) - x) > 50.0f || fabs(lastgoodfooty - attachmentY(orig_footpart, 1) - y) > 50.0f) {
-			downfootroom = bestRoomAt(footx, footy, 3, shared_ptr<Room>());
+			downfootroom = bestRoomAt(footx, footy, 3, m, shared_ptr<Room>());
 			if (downfootroom) {
 				snapDownFoot();
 				return;
@@ -447,7 +451,7 @@ void SkeletalCreature::snapDownFoot() {
 		x = lastgoodfootx - attachmentX(orig_footpart, 1);
 		footx = lastgoodfootx;
 		footy = lastgoodfooty;
-		downfootroom = world.map.roomAt(footx, footy);
+		downfootroom = m->roomAt(footx, footy);
 		queueScript(6);
 
 		if (!downfootroom) {

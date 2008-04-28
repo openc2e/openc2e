@@ -465,6 +465,8 @@ bool Agent::validInRoomSystem() {
 
 bool const Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
 	// Return true if this agent is inside the world room system at the specified point, or false if it isn't.
+	MetaRoom *m = world.map.metaRoomAt(x, y);
+	if (!m) return false;
 
 	for (unsigned int i = 0; i < 4; i++) {
 		Point src, dest;
@@ -488,14 +490,14 @@ bool const Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int
 			// TODO: check suffercollisions?
 			
 			// TODO: muh, provided direction here is kinda a hack
-			findCollisionInDirection((i < 2) ? 3 : 2, src, dx, dy, deltapt, delta, collided, true);
+			findCollisionInDirection((i < 2) ? 3 : 2, m, src, dx, dy, deltapt, delta, collided, true);
 			if (collided) return false;
 		} else {
 			// Creatures 3 physics
 
 			float srcx = src.x, srcy = src.y;
 
-			shared_ptr<Room> ourRoom = world.map.roomAt(srcx, srcy);
+			shared_ptr<Room> ourRoom = m->roomAt(srcx, srcy);
 			if (!ourRoom) return false;
 
 			unsigned int dir; Line wall;
@@ -672,8 +674,8 @@ void Agent::physicsTick() {
 	}
 }
 
-shared_ptr<Room> const Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigned int direction, shared_ptr<Room> exclude) {
-	std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(tryx, tryy);
+shared_ptr<Room> const Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, unsigned int direction, MetaRoom *m, shared_ptr<Room> exclude) {
+	std::vector<shared_ptr<Room> > rooms = m->roomsAt(tryx, tryy);
 
 	shared_ptr<Room> r;
 
@@ -703,11 +705,16 @@ shared_ptr<Room> const Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, u
 }
 
 // Creatures 2 collision finding
-void const Agent::findCollisionInDirection(unsigned int i, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
+void const Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
 	src.x = (int)src.x;
 	src.y = (int)src.y;
-	
-	shared_ptr<Room> room = bestRoomAt(src.x, src.y, i, shared_ptr<Room>());
+
+	if (m->wraparound()) {
+		if (src.x > m->x() + m->width() || (dx > 0 && src.x == m->x() + m->width())) src.x -= m->width();
+		else if (src.x < m->x() || (dx < 0 && src.x == m->x())) src.x += m->width();
+	}
+
+	shared_ptr<Room> room = bestRoomAt(src.x, src.y, i, m, shared_ptr<Room>());
 
 	if (!room) { // out of room system
 		if (!displaycore)
@@ -756,7 +763,12 @@ void const Agent::findCollisionInDirection(unsigned int i, Point src, int &dx, i
 
 		// find the next room, if necessary, and work out whether we should move into it or break out
 		if (endofroom) {
-			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i, room);
+			if (m->wraparound()) {
+				if (dx > 0 && src.x + p.x >= m->x() + m->width()) src.x -= m->width();
+				else if (dx < 0 && src.x + p.x <= m->x()) src.x += m->width();
+			}
+
+			shared_ptr<Room> newroom = bestRoomAt(src.x + p.x, src.y + p.y, i, m, room);
 
 			bool collision = false;
 
@@ -834,9 +846,18 @@ void Agent::physicsTickC2() {
 	bool collided = false;
 
 	if (suffercollisions()) {
+		MetaRoom *m = world.map.metaRoomAt(x, y);
+		if (!m) {
+			if (!displaycore)
+				unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % x % y), false);
+			grav.setInt(0);
+			displaycore = true;
+			return;
+		}
+
 		for (unsigned int i = 0; i < 4; i++) {
 			Point src = boundingBoxPoint(i);
-			findCollisionInDirection(i, src, dx, dy, deltapt, delta, collided, true);
+			findCollisionInDirection(i, m, src, dx, dy, deltapt, delta, collided, true);
 		}
 	} else {
 		deltapt.x = dx;

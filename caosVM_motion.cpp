@@ -207,7 +207,10 @@ void caosVM::v_OBST_c2() {
 	double delta = 1000000000;
 	bool collided = false;
 
-	targ->findCollisionInDirection(direction, src, dx, dy, deltapt, delta, collided, false);
+	MetaRoom *m = world.map.metaRoomAt(targ->x, targ->y);
+	caos_assert(m);
+
+	targ->findCollisionInDirection(direction, m, src, dx, dy, deltapt, delta, collided, false);
 
 	if (!collided)
 		result.setInt(INT_MAX);
