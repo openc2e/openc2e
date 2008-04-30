@@ -805,10 +805,14 @@ fs::path Engine::homeDirectory() {
 }
 
 fs::path Engine::storageDirectory() {
-#ifndef _WIN32
-	std::string dirname = "/.openc2e";
-#else
+#ifdef _WIN32
 	std::string dirname = "/My Games";
+#else
+#ifdef __APPLE__
+	std::string dirname = "/Documents/openc2e Data";
+#else
+	std::string dirname = "/.openc2e";
+#endif
 #endif
 	
 	// main storage dir
