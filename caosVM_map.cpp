@@ -980,7 +980,7 @@ void caosVM::c_SETV_DOOR() {
 
 /**
  FLOR (integer)
- %status stub
+ %status maybe
  %pragma variants c2
 
  Return y coordinate of floor below centre of target agent.
@@ -988,7 +988,11 @@ void caosVM::c_SETV_DOOR() {
 void caosVM::v_FLOR() {
 	valid_agent(targ);
 
-	result.setInt(0); // TODO
+	shared_ptr<Room> r = roomContainingAgent(targ);
+	if (!r)
+		result.setInt(0); // TODO
+	else
+		result.setInt(r->floorYatX(targ->x + (targ->getWidth() / 2.0f)));
 }
 
 /**
@@ -1012,7 +1016,7 @@ void caosVM::v_GNDW() {
 void caosVM::v_GRND() {
 	VM_PARAM_INTEGER(index)
 
-	caos_assert(index >= 0 && index < world.groundlevels.size());
+	caos_assert(index >= 0 && (unsigned int)index < world.groundlevels.size());
 
 	result.setInt(world.groundlevels[index]);
 }
