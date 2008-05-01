@@ -465,7 +465,7 @@ bool Agent::validInRoomSystem() {
 
 bool const Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
 	// Return true if this agent is inside the world room system at the specified point, or false if it isn't.
-	MetaRoom *m = world.map.metaRoomAt(x, y);
+	MetaRoom *m = world.map.metaRoomAt(p.x, p.y);
 	if (!m) return false;
 
 	for (unsigned int i = 0; i < 4; i++) {
@@ -522,6 +522,8 @@ void Agent::physicsTick() {
 	}
 
 	if (!wasmoved) return; // some agents are created outside INST and get autokilled if we try physics on them before they move
+
+	if (invehicle) return; // TODO: c2e verhicle physics
 
 	// set destination point based on velocities
 	float destx = x + velx.getFloat();
@@ -1156,7 +1158,8 @@ void Agent::carry(AgentRef a) {
 	adjustCarried(0, 0);
 }
 
-bool Agent::beDropped() {	
+bool Agent::beDropped() {
+	AgentRef wascarriedby = carriedby;
 	carriedby = AgentRef(0);
 	bool wasinvehicle = invehicle;
 	invehicle = AgentRef(0);
@@ -1167,6 +1170,13 @@ bool Agent::beDropped() {
 	// TODO: no idea if this is right, it tries to re-enable gravity when dropping C2 agents
 	if (engine.version == 2) grav.setInt(1);
 	if (engine.version == 3) falling = true;
+
+	/* if our carrying agent was in a vehicle, we stay in the vehicle */
+	if (wascarriedby && wascarriedby->invehicle) {
+		wascarriedby->invehicle->addCarried(this);
+		// TODO: how to handle not-invehicle case, where vehicle has failed to pick us up?
+		if (invehicle) return true;
+	}
 
 	if (!wasinvehicle) { // ie, we're not being dropped by a vehicle
 		// TODO: check for vehicles in a saner manner?
