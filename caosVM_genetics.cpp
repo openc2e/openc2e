@@ -84,7 +84,7 @@ void caosVM::c_GENE_LOAD() {
 
 	shared_ptr<genomeFile> p = world.loadGenome(genefile);
 	if (!p)
-		throw creaturesException("failed to find genome file '" + genefile + '"');
+		throw creaturesException("failed to find genome file '" + genefile + "'");
 	
 	caos_assert(p->getVersion() == 3);
 

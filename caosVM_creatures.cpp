@@ -1146,7 +1146,7 @@ void caosVM::c_NEW_CREA_c1() {
 	std::string realmoniker = std::string((char *)&moniker, 4);
 	shared_ptr<genomeFile> genome = world.loadGenome(realmoniker);
 	if (!genome)
-		throw creaturesException("failed to find genome file '" + realmoniker + '"');
+		throw creaturesException("failed to find genome file '" + realmoniker + "'");
 
 	caos_assert(genome->getVersion() == engine.version);
 
