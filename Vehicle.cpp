@@ -109,6 +109,8 @@ void Vehicle::kill() {
 		if (passengers[0]) dropCarried(passengers[0]);
 		else passengers.erase(passengers.begin());
 	}
+	
+	Agent::kill();
 }
 
 /* vim: set noet: */
