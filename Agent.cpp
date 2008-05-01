@@ -1186,10 +1186,15 @@ bool Agent::beDropped() {
 			Vehicle *v = dynamic_cast<Vehicle *>(a.get());
 			if (!v) continue;
 
-			if (agentsTouching(this, v)) {
-				v->addCarried(this);
-				// TODO: how to handle not-invehicle case, where vehicle has failed to pick us up?
-				if (invehicle) return true;
+			/* check whether our *centre* lies inside the vehicle cabin */
+			int xpt = x + getWidth() / 2;
+			if (xpt >= v->x + v->cabinleft && xpt <= v->x + v->cabinright) {
+				int ypt = y + getHeight() / 2;
+				if (ypt >= v->y + v->cabintop && ypt <= v->y + v->cabinbottom) {
+					v->addCarried(this);
+					// TODO: how to handle not-invehicle case, where vehicle has failed to pick us up?
+					if (invehicle) return true;
+				}
 			}
 		}
 	}
