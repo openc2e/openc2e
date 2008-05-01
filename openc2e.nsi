@@ -1,15 +1,19 @@
 ; Define your application name
 !define APPNAME "openc2e"
-!define APPNAMEANDVERSION "openc2e (development build)"
 
-; Development build revision
-!define REVISION "1784"
+; Development build version
+; Should usually be something like "dev1830"
+!define VERSION "alpha-0.1"
+
+!define APPNAMEANDVERSION "openc2e ${VERSION}"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES\openc2e"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "installers\openc2e-dev${REVISION}-win32.exe"
+
+OutFile "installers\openc2e-${VERSION}-win32.exe"
+
 
 ; Use compression
 SetCompressor lzma
@@ -27,7 +31,12 @@ SetCompressor lzma
 !define MUI_DIRECTORYPAGE
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "COPYING"
+
+!define MUI_LICENSEPAGE_TEXT_TOP "Distribution and modification of openc2e are governed by the following terms."
+!define MUI_LICENSEPAGE_TEXT_BOTTOM "You do NOT have to agree to these terms in order to use the openc2e engine; they only apply if you wish to modify or distribute it."
+!define MUI_LICENSEPAGE_BUTTON "Next >"
+!insertmacro MUI_PAGE_LICENSE "windows-license.txt"
+
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -152,6 +161,7 @@ Section "openc2e" Main
 	; Set Section Files and Shortcuts
 	SetOutPath "$INSTDIR\"
 	
+	;This is a bad way to detect a previous install
 	IfFileExists "$INSTDIR\uninstall.exe" remold
 	Goto proceed
 	
@@ -272,4 +282,4 @@ Function .onInit
 
 FunctionEnd
 
-BrandingText "http://openc2e.ccdevnet.org"
+BrandingText "http://openc2e.org"
