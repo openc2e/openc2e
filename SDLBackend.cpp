@@ -71,7 +71,11 @@ void SDLBackend::init() {
 		// TODO: think about font sizing
 		basicfont = TTF_OpenFont("VeraSe.ttf", 9);
 		if (!basicfont) // TODO: think about font fallbacks/etc
+		#ifdef __APPLE__
+			basicfont = TTF_OpenFont("/Library/Fonts/Arial.ttf", 9);
+		#else
 			basicfont = TTF_OpenFont("/usr/share/fonts/truetype/ttf-bitstream-vera/VeraSe.ttf", 9);
+		#endif
 	}
 }
 
