@@ -285,6 +285,7 @@ public:
 	void v_GNDW();
 	void v_GRND();
 	void c_ROOM();
+	void c_ROOM_c2();
 	void v_ROOM_c1();
 	void v_WRAP();
 	void s_WRAP();

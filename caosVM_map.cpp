@@ -1055,14 +1055,71 @@ void caosVM::c_ROOM() {
 }
 
 /**
+ ROOM (command) roomno (integer) left (integer) top (integer) right (integer) bottom (integer) type (integer) floorvalue (integer) organic (integer) inorganic (integer) temperature (integer) pressure (integer) light (integer) radiation (integer) heatsource (integer) pressuresource (integer) lightsource (integer) radiationsource (integer) dropstatus (integer)
+ %status maybe
+ %pragma variants c2
+ %pragma implementation caosVM::c_ROOM_c2
+*/
+void caosVM::c_ROOM_c2() {
+	VM_PARAM_INTEGER(dropstatus)
+	VM_PARAM_INTEGER(radiationsource)
+	VM_PARAM_INTEGER(lightsource)
+	VM_PARAM_INTEGER(pressuresource)
+	VM_PARAM_INTEGER(heatsource)
+	VM_PARAM_INTEGER(radiation)
+	VM_PARAM_INTEGER(light)
+	VM_PARAM_INTEGER(pressure)
+	VM_PARAM_INTEGER(temperature)
+	VM_PARAM_INTEGER(inorganic)
+	VM_PARAM_INTEGER(organic)
+	VM_PARAM_INTEGER(floorvalue)
+	VM_PARAM_INTEGER(type)
+	VM_PARAM_INTEGER(bottom)
+	VM_PARAM_INTEGER(right)
+	VM_PARAM_INTEGER(top)
+	VM_PARAM_INTEGER(left)
+	VM_PARAM_INTEGER(roomno)
+	
+	shared_ptr<Room> r = world.map.getRoom(roomno);
+	if (!r) {
+		r = shared_ptr<Room>(new Room(left, right, top, top, bottom, bottom));
+		r->id = roomno;
+	} else {
+		r->x_left = left;
+		r->x_right = right;
+		r->y_left_ceiling = r->y_right_ceiling = top;
+		r->y_left_floor = r->y_right_floor = bottom;	
+	}
+
+	r->type = type;
+	r->floorvalue = floorvalue;
+	r->ontr = organic;
+	r->intr = inorganic;
+	r->temp = temperature;
+	r->pres = pressure;
+	r->lite = light;
+	r->radn = radiation;
+	r->hsrc = heatsource;
+	r->psrc = pressuresource;
+	r->lsrc = lightsource;
+	r->rsrc = radiationsource;
+	r->dropstatus = dropstatus;
+}
+
+/**
  ROOM (integer) roomno (integer) data (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
  %pragma implementation caosVM::v_ROOM_c1
 
- Return some data for the specified room number. Data of 0 is left, 1 is right, 2 is top, 3 is bottom, 4 is room type. Returns 0 if no such room.
+ Return some data for the specified room number.
+ Returns 0 if no such room.
+
+ data: 0 is left, 1 is top, 2 is right, 3 is bottom, 4 is room type.
 */
 void caosVM::v_ROOM_c1() {
+	// TODO: the original docs here (for C1) said 1 is right and 2 is top, check?
+
 	VM_PARAM_INTEGER(data) caos_assert(data >= 0 && data <= 4);
 	VM_PARAM_INTEGER(roomno)
 
@@ -1078,11 +1135,11 @@ void caosVM::v_ROOM_c1() {
 			break;
 
 		case 1:
-			result.setInt(r->x_right);
+			result.setInt(r->y_left_ceiling);
 			break;
 
 		case 2:
-			result.setInt(r->y_left_ceiling);
+			result.setInt(r->x_right);
 			break;
 
 		case 3:
@@ -1091,6 +1148,10 @@ void caosVM::v_ROOM_c1() {
 
 		case 4:
 			result.setInt(r->type.getInt());
+			break;
+
+		default:
+			// TODO: c2 has a whole bunch of other data possibilities (fix check on data above too!)
 			break;
 	}
 }
