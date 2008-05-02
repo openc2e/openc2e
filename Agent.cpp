@@ -398,6 +398,12 @@ static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int widt
 void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
 	assert(s);
 	MetaRoom *room = world.map.metaRoomAt(x, y);
+	if (!room) {
+		// TODO: think about inrange when positioning outside-metaroom agents
+		s->setPos(x + getWidth() / 2, y + getHeight() / 2, zorder);
+		return;
+	}
+
 	float xc = x;
 
 	bool inrange = false;
