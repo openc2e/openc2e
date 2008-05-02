@@ -233,7 +233,39 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 					carrying->queueScript(5, this); // drop
 
 					return;
-				} else if (!carrying->suffercollisions() || carrying->validInRoomSystem()) {
+				}
+			
+				bool allowdrop = true;
+
+				if (engine.version == 2) {
+					/* check dropstatus for the room we're dropping into */
+					MetaRoom* m = world.map.metaRoomAt(carrying->x, carrying->y);
+					if (m) {
+						shared_ptr<Room> r = m->roomAt(carrying->x, carrying->y);
+						if (r) {
+							if (r->dropstatus == 0) allowdrop = false; // Never
+							else if (r->dropstatus == 1) { // Above-Floor
+								float floory = r->floorYatX(carrying->x);
+								if (floory < (carrying->y + carrying->getHeight())) {
+									// snap to above the floor
+									// TODO: snapping to above the floor isn't very well thought-out (eg, this will drop into vehicles)
+									carrying->y = floory - carrying->getHeight();
+									// try pushing upwards for a while if we're not validly in the room system
+									while (!carrying->validInRoomSystem() && carrying->y - floory + carrying->getHeight() < 50) {
+										carrying->y--;
+									}
+								}
+							}
+						} else allowdrop = false;
+					} else allowdrop = false;
+				}
+
+				/* deny drops which result in agents lying outside the room system */
+				if (allowdrop && carrying->suffercollisions()) {
+					allowdrop = carrying->validInRoomSystem();
+				}
+
+				if (allowdrop) {
 					carrying->queueScript(5, this); // drop
 
 					// TODO: is this the correct check?
@@ -242,11 +274,16 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 						carrying->velx.setFloat(velx.getFloat());
 						carrying->vely.setFloat(vely.getFloat());
 					}
+				} else {
+					if (engine.version == 2) {
+						// TODO: overlay with frame 17 [red cross]
 
-					return;
+						// play 'deny drop' sound
+						playAudio("excl", true, false); // TODO: should this be controlled?
+					} else {
+						// TODO: drop deny animation/etc for c2e
+					}
 				}
-
-				// TODO: some kind of "fail to drop" animation/sound?
 			} else {
 				Agent *a = world.agentAt(x, y, false, true);
 				if (a) {
