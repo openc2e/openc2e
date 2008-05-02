@@ -293,24 +293,43 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 	if (!obey_all_transparency)
 		transagent = agentAt(x, y, true, needs_mouseable);
 
+	MetaRoom *m = world.map.metaRoomAt(x, y); // for wraparound checking
+
 	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
-		int ax = (int)(x - (*i)->getParent()->x);
-		int ay = (int)(y - (*i)->getParent()->y);
-		if ((*i)->x <= ax) if ((*i)->y <= ay) if (((*i) -> x + (int)(*i)->getWidth()) >= ax) if (((*i) -> y + (int)(*i)->getHeight()) >= ay)
-			if ((*i)->getParent() != theHand) {
-				SpritePart *s = dynamic_cast<SpritePart *>(*i);
-				if (s && s->isTransparent() && obey_all_transparency)
-					// transparent parts in C1/C2 are scenery
-					// TODO: always true? you can't sekritly set parts to be transparent in C2?
-					if (engine.version < 3 || s->transparentAt(ax - s->x, ay - s->y))
-						continue;
-				if (needs_mouseable && !((*i)->getParent()->mouseable()))
-					continue;
-				if (!obey_all_transparency)
-					if ((*i)->getParent() != transagent)
-						continue;
-				return *i;
-			}
+		CompoundPart *p = *i;
+		if (p->getParent() == theHand) continue;
+
+		int ax = (int)(x - p->getParent()->x);
+		int ay = (int)(y - p->getParent()->y);
+
+		// we check the wrap too..
+		if (!m || !m->wraparound() || p->x > ax + (int)m->width() || p->x + (int)p->getWidth() < ax + (int)m->width()) {
+			if (p->x > ax) continue;
+			if (p->x + (int)p->getWidth() < ax) continue;
+		} else {
+			// wrapped!
+			ax += m->width();
+		}
+
+		if (p->y > ay) continue;
+		if (p->y + (int)p->getHeight() < ay) continue;
+
+		SpritePart *s = dynamic_cast<SpritePart *>(p);
+		if (s && s->isTransparent() && obey_all_transparency) {
+			// transparent parts in C1/C2 are scenery
+			// TODO: always true? you can't sekritly set parts to be transparent in C2?
+			if (engine.version < 3 || s->transparentAt(ax - s->x, ay - s->y))
+				continue;
+		}
+
+		if (needs_mouseable && !(p->getParent()->mouseable()))
+			continue;
+
+		if (!obey_all_transparency)
+			if (p->getParent() != transagent)
+				continue;
+
+		return p;
 	}
 	
 	return 0;
