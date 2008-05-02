@@ -656,7 +656,7 @@ void SkeletalCreature::tick() {
 void SkeletalCreature::physicsTick() {
 	// TODO: mmh
 
-	if (engine.version > 1 && falling && (engine.version == 2 || validInRoomSystem())) Agent::physicsTick();
+	if (engine.version > 1 && ((engine.version == 3 && falling) || (engine.version == 2 && grav.getInt() == 1)) && (engine.version == 2 || validInRoomSystem())) Agent::physicsTick();
 	if (!carriedby && !invehicle) {
 		if (engine.version == 1 || (engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling))
 			snapDownFoot();
