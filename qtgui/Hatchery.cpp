@@ -45,7 +45,7 @@ Hatchery::Hatchery(QWidget *parent) : QDialog(parent) {
 	graphicsView = new QGraphicsView(graphicsScene, this);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->addWidget(graphicsView);
-	layout->setContentsMargins(0, 0, 0, 0);
+	//layout->setContentsMargins(0, 0, 0, 0);
 	
 	graphicsScene->addPixmap(hatcherybg);
 
