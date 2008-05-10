@@ -3,7 +3,9 @@ use strict;
 use warnings;
 use Test::Harness qw(&runtests $verbose);
 
-my @tests = glob("unittests/*.cos");
+my $testpath = $ARGV[0] || "tests";
+
+my @tests = glob("$testpath/*.cos");
 my @testfiles = ();
 
 for my $test (@tests) {

@@ -325,6 +325,8 @@ ADD_CUSTOM_COMMAND(
 #	DEPENDS mngparser.ypp
 #	WORKING_DIRECTORY ${SRC})
 
+ADD_CUSTOM_TARGET(test DEPENDS openc2e
+	COMMAND perl ${SRC}/runtests.pl ${SRC}/tests)
 ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
 ADD_CUSTOM_TARGET(generated DEPENDS
 	${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
