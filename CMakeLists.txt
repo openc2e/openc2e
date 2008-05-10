@@ -23,98 +23,98 @@ ENDIF (OPENC2E_USE_OPENAL MATCHES "^(YES|NO|AUTO)$")
 SET(OPENC2E_USE_SERIALIZATION "FALSE" CACHE BOOL "Build the experimental serialization code")
 MARK_AS_ADVANCED(FORCE OPENC2E_USE_SERIALIZATION)
 IF (OPENC2E_USE_SERIALIZATION)
-	SET(SER_SRCS caosVM_ser_real.cpp)
+	SET(SER_SRCS src/caosVM_ser_real.cpp)
 ELSE (OPENC2E_USE_SERIALIZATION)
-	SET(SER_SRCS caosVM_ser_stub.cpp)
+	SET(SER_SRCS src/caosVM_ser_stub.cpp)
 ENDIF (OPENC2E_USE_SERIALIZATION)
 
 
 SET(OPENC2E_CORE
-	Agent.cpp
-	AgentHelpers.cpp
-	AgentRef.cpp
-	attFile.cpp
-	Backend.cpp
-	Blackboard.cpp
-	blkImage.cpp
-	bmpImage.cpp
-	Bubble.cpp
-	bytecode.cpp
-	c16Image.cpp
-	c2eBrain.cpp
-	CallButton.cpp
-	Camera.cpp
-	caosScript.cpp
-	caosVar.cpp
-	caosVM_agent.cpp
-	caosVM_camera.cpp
-	caosVM_compound.cpp
-	caosVM_core.cpp
-	caosVM_creatures.cpp
-	caosVM_debug.cpp
-	caosVM_files.cpp
-	caosVM_flow.cpp
-	caosVM_genetics.cpp
-	caosVM_history.cpp
-	caosVM_input.cpp
-	caosVM_map.cpp
-	caosVM_motion.cpp
-	caosVM_net.cpp
-	caosVM.cpp
-	caosVM_ports.cpp
-	caosVM_resources.cpp
-	caosVM_scripts.cpp
-	caosVM_sounds.cpp
-	caosVM_time.cpp
-	caosVM_variables.cpp
-	caosVM_vectors.cpp
-	caosVM_vehicles.cpp
-	caosVM_world.cpp
+	src/Agent.cpp
+	src/AgentHelpers.cpp
+	src/AgentRef.cpp
+	src/attFile.cpp
+	src/Backend.cpp
+	src/Blackboard.cpp
+	src/blkImage.cpp
+	src/bmpImage.cpp
+	src/Bubble.cpp
+	src/bytecode.cpp
+	src/c16Image.cpp
+	src/c2eBrain.cpp
+	src/CallButton.cpp
+	src/Camera.cpp
+	src/caosScript.cpp
+	src/caosVar.cpp
+	src/caosVM_agent.cpp
+	src/caosVM_camera.cpp
+	src/caosVM_compound.cpp
+	src/caosVM_core.cpp
+	src/caosVM_creatures.cpp
+	src/caosVM_debug.cpp
+	src/caosVM_files.cpp
+	src/caosVM_flow.cpp
+	src/caosVM_genetics.cpp
+	src/caosVM_history.cpp
+	src/caosVM_input.cpp
+	src/caosVM_map.cpp
+	src/caosVM_motion.cpp
+	src/caosVM_net.cpp
+	src/caosVM.cpp
+	src/caosVM_ports.cpp
+	src/caosVM_resources.cpp
+	src/caosVM_scripts.cpp
+	src/caosVM_sounds.cpp
+	src/caosVM_time.cpp
+	src/caosVM_variables.cpp
+	src/caosVM_vectors.cpp
+	src/caosVM_vehicles.cpp
+	src/caosVM_world.cpp
 	${GEN}/cataloglexer.cpp
-	Catalogue.cpp
+	src/Catalogue.cpp
 	${GEN}/catalogue.tab.cpp
 	${GEN}/cmddata.cpp
-	cobFile.cpp
-	CompoundAgent.cpp
-	CompoundPart.cpp
-	Creature.cpp
-	CreatureAgent.cpp
-	creaturesImage.cpp
-	dialect.cpp
-	Engine.cpp
-	exceptions.cpp
-	fileSwapper.cpp
-	genomeFile.cpp
-	historyManager.cpp
-	imageManager.cpp
+	src/cobFile.cpp
+	src/CompoundAgent.cpp
+	src/CompoundPart.cpp
+	src/Creature.cpp
+	src/CreatureAgent.cpp
+	src/creaturesImage.cpp
+	src/dialect.cpp
+	src/Engine.cpp
+	src/exceptions.cpp
+	src/fileSwapper.cpp
+	src/genomeFile.cpp
+	src/historyManager.cpp
+	src/imageManager.cpp
 	#	${GEN}/lex.mng.cpp
 	${GEN}/caoslexer.cpp
-	Lift.cpp
-	Map.cpp
-	MetaRoom.cpp
-	mmapifstream.cpp
-	#	mngfile.cpp
+	src/Lift.cpp
+	src/Map.cpp
+	src/MetaRoom.cpp
+	src/mmapifstream.cpp
+	#	src/mngfile.cpp
 	#	${GEN}/mngparser.tab.cpp
-	oldBrain.cpp
-	PathResolver.cpp
-	physics.cpp
-	PointerAgent.cpp
-	Port.cpp
-	pray.cpp
-	prayManager.cpp
-	renderable.cpp
-	Room.cpp
-	Scriptorium.cpp
-	SDLBackend.cpp
-	SFCFile.cpp
-	SimpleAgent.cpp
-	SkeletalCreature.cpp
-	sprImage.cpp
-	streamutils.cpp
-	Vehicle.cpp
-	World.cpp
-	main.cpp
-	util.cpp
+	src/oldBrain.cpp
+	src/PathResolver.cpp
+	src/physics.cpp
+	src/PointerAgent.cpp
+	src/Port.cpp
+	src/pray.cpp
+	src/prayManager.cpp
+	src/renderable.cpp
+	src/Room.cpp
+	src/Scriptorium.cpp
+	src/SDLBackend.cpp
+	src/SFCFile.cpp
+	src/SimpleAgent.cpp
+	src/SkeletalCreature.cpp
+	src/sprImage.cpp
+	src/streamutils.cpp
+	src/Vehicle.cpp
+	src/World.cpp
+	src/main.cpp
+	src/util.cpp
 )
 
 SET(OPENC2E_SDL
@@ -123,31 +123,31 @@ SET(OPENC2E_SDL
 )
 
 SET(OPENC2E_QT
-	qtgui/qtopenc2e.cpp
-	qtgui/openc2eview.cpp
-	qtgui/AgentInjector.cpp
-	qtgui/BrainViewer.cpp
-	qtgui/imagepreview.cpp
-	qtgui/c1cobfile.cpp
-	qtgui/QtBackend.cpp
-	qtgui/GraphWidget.cpp
-	qtgui/CreatureGrapher.cpp
-	qtgui/Hatchery.cpp
-	tools/braininavat/brainview.cpp)
+	src/qtgui/qtopenc2e.cpp
+	src/qtgui/openc2eview.cpp
+	src/qtgui/AgentInjector.cpp
+	src/qtgui/BrainViewer.cpp
+	src/qtgui/imagepreview.cpp
+	src/qtgui/c1cobfile.cpp
+	src/qtgui/QtBackend.cpp
+	src/qtgui/GraphWidget.cpp
+	src/qtgui/CreatureGrapher.cpp
+	src/qtgui/Hatchery.cpp
+	src/tools/braininavat/brainview.cpp)
 
 SET(OPENC2E_QT_MOC_HDRS
-	qtgui/qtopenc2e.h
-	qtgui/openc2eview.h
-	qtgui/AgentInjector.h
-	qtgui/BrainViewer.h
-	qtgui/imagepreview.h
-	qtgui/GraphWidget.h
-	qtgui/CreatureGrapher.h
-	qtgui/Hatchery.h
-	tools/braininavat/brainview.h)
+	src/qtgui/qtopenc2e.h
+	src/qtgui/openc2eview.h
+	src/qtgui/AgentInjector.h
+	src/qtgui/BrainViewer.h
+	src/qtgui/imagepreview.h
+	src/qtgui/GraphWidget.h
+	src/qtgui/CreatureGrapher.h
+	src/qtgui/Hatchery.h
+	src/tools/braininavat/brainview.h)
 
 SET(OPENC2E_QT_UIS
-	qtgui/agents.ui)
+	src/qtgui/agents.ui)
 # 
 
 
@@ -208,7 +208,7 @@ IF(USE_OPENAL STREQUAL "NO")
     SET(OPENAL_SRC "")
     SET(OPENAL_DEF "")
 ELSE(OPENAL_SRC STREQUAL "")
-    SET(OPENAL_SRC "OpenALBackend.cpp")
+    SET(OPENAL_SRC "src/OpenALBackend.cpp")
     SET(OPENAL_DEF "-DOPENAL_SUPPORT")
 ENDIF(OPENAL_SRC STREQUAL "")
 
@@ -254,7 +254,7 @@ LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(BEFORE
 	${GEN}
-	${SRC}
+	${SRC}/src
 	${SDL_INCLUDE_DIR}
 #	${SDLMIXER_INCLUDE_DIR}
 	${SDLNET_INCLUDE_DIR}
@@ -265,7 +265,7 @@ INCLUDE_DIRECTORIES(BEFORE
 	${Boost_INCLUDE_DIR}
 	)
 
-FILE(GLOB CAOSVM_FILES ${SRC}/caosVM_*.cpp)
+FILE(GLOB CAOSVM_FILES ${SRC}/src/caosVM_*.cpp)
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/commandinfo.yml
 	COMMAND perl parsedocs.pl ${CAOSVM_FILES} > ${GEN}/commandinfo.yml
@@ -291,14 +291,14 @@ ADD_CUSTOM_COMMAND(
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/cataloglexer.cpp
-	COMMAND re2c -o ${GEN}/cataloglexer.cpp ${SRC}/cataloglexer.re2c
-	DEPENDS ${SRC}/cataloglexer.re2c
+	COMMAND re2c -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c
+	DEPENDS ${SRC}/src/cataloglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
-	COMMAND bison -d --name-prefix=cata --file-prefix="${GEN}/catalogue" catalogue.ypp
-	DEPENDS catalogue.ypp
+	COMMAND bison -d --name-prefix=cata --file-prefix="${GEN}/catalogue" src/catalogue.ypp
+	DEPENDS src/catalogue.ypp
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
@@ -309,8 +309,8 @@ ADD_CUSTOM_COMMAND(
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/caoslexer.cpp
-	COMMAND re2c -o ${GEN}/caoslexer.cpp ${SRC}/caoslexer.re2c
-	DEPENDS ${SRC}/caoslexer.re2c
+	COMMAND re2c -o ${GEN}/caoslexer.cpp ${SRC}/src/caoslexer.re2c
+	DEPENDS ${SRC}/src/caoslexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 #ADD_CUSTOM_COMMAND(
