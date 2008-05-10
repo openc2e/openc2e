@@ -274,18 +274,18 @@ ADD_CUSTOM_COMMAND(
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/caosdocs.html
-	COMMAND perl writehtml.pl ${GEN}/commandinfo.yml > ${BIN}/caosdocs.html
-	DEPENDS writehtml.pl ${GEN}/commandinfo.yml
+	COMMAND perl docs/writehtml.pl ${GEN}/commandinfo.yml > ${BIN}/caosdocs.html
+	DEPENDS docs/writehtml.pl ${GEN}/commandinfo.yml
 	WORKING_DIRECTORY ${SRC})
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/docs.css
-	COMMAND cp docs.css ${BIN}/docs.css
-	DEPENDS docs.css
+	COMMAND cp docs/docs.css ${BIN}/docs.css
+	DEPENDS docs/docs.css
 	WORKING_DIRECTORY ${SRC})
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/openc2e.6
-	COMMAND pod2man --center="Openc2e Documentation" --section=6 ${SRC}/openc2e.pod ${BIN}/openc2e.6
-	DEPENDS openc2e.pod
+	COMMAND pod2man --center="Openc2e Documentation" --section=6 ${SRC}/docs/openc2e.pod ${BIN}/openc2e.6
+	DEPENDS docs/openc2e.pod
 	)
 # it seems these ADD_CUSTOM_COMMANDS for flex and bison could be made
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
