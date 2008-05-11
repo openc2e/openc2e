@@ -17,7 +17,7 @@
 #ifndef _QTBACKEND_H
 #define _QTBACKEND_H
 
-#include "SDLBackend.h"
+#include "backends/SDLBackend.h"
 #include <deque>
 
 class QtBackend : public SDLBackend {

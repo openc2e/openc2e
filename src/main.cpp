@@ -22,12 +22,12 @@
 #include "version.h"
 #include <iostream>
 #include "Engine.h"
-#include "SDLBackend.h"
+#include "backends/SDLBackend.h"
 #ifdef OPENAL_SUPPORT
-#include "OpenALBackend.h"
+#include "backends/OpenALBackend.h"
 #endif
 #ifdef QT_SUPPORT
-#include "qtgui/QtBackend.h"
+#include "backends/qtgui/QtBackend.h"
 #endif
 
 #ifdef _WIN32

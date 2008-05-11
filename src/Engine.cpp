@@ -25,8 +25,8 @@
 #include "caosScript.h" // for executeNetwork()
 #include "PointerAgent.h"
 #include "dialect.h" // registerDelegates
-#include "NullBackend.h"
-#include "NullAudioBackend.h"
+#include "backends/NullBackend.h"
+#include "backends/NullAudioBackend.h"
 #include "SFCFile.h"
 
 #include <boost/filesystem/path.hpp>

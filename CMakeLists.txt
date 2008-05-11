@@ -105,7 +105,7 @@ SET(OPENC2E_CORE
 	src/renderable.cpp
 	src/Room.cpp
 	src/Scriptorium.cpp
-	src/SDLBackend.cpp
+	src/backends/SDLBackend.cpp
 	src/SFCFile.cpp
 	src/SimpleAgent.cpp
 	src/SkeletalCreature.cpp
@@ -123,31 +123,31 @@ SET(OPENC2E_SDL
 )
 
 SET(OPENC2E_QT
-	src/qtgui/qtopenc2e.cpp
-	src/qtgui/openc2eview.cpp
-	src/qtgui/AgentInjector.cpp
-	src/qtgui/BrainViewer.cpp
-	src/qtgui/imagepreview.cpp
-	src/qtgui/c1cobfile.cpp
-	src/qtgui/QtBackend.cpp
-	src/qtgui/GraphWidget.cpp
-	src/qtgui/CreatureGrapher.cpp
-	src/qtgui/Hatchery.cpp
+	src/backends/qtgui/qtopenc2e.cpp
+	src/backends/qtgui/openc2eview.cpp
+	src/backends/qtgui/AgentInjector.cpp
+	src/backends/qtgui/BrainViewer.cpp
+	src/backends/qtgui/imagepreview.cpp
+	src/backends/qtgui/c1cobfile.cpp
+	src/backends/qtgui/QtBackend.cpp
+	src/backends/qtgui/GraphWidget.cpp
+	src/backends/qtgui/CreatureGrapher.cpp
+	src/backends/qtgui/Hatchery.cpp
 	src/tools/braininavat/brainview.cpp)
 
 SET(OPENC2E_QT_MOC_HDRS
-	src/qtgui/qtopenc2e.h
-	src/qtgui/openc2eview.h
-	src/qtgui/AgentInjector.h
-	src/qtgui/BrainViewer.h
-	src/qtgui/imagepreview.h
-	src/qtgui/GraphWidget.h
-	src/qtgui/CreatureGrapher.h
-	src/qtgui/Hatchery.h
+	src/backends/qtgui/qtopenc2e.h
+	src/backends/qtgui/openc2eview.h
+	src/backends/qtgui/AgentInjector.h
+	src/backends/qtgui/BrainViewer.h
+	src/backends/qtgui/imagepreview.h
+	src/backends/qtgui/GraphWidget.h
+	src/backends/qtgui/CreatureGrapher.h
+	src/backends/qtgui/Hatchery.h
 	src/tools/braininavat/brainview.h)
 
 SET(OPENC2E_QT_UIS
-	src/qtgui/agents.ui)
+	src/backends/qtgui/agents.ui)
 # 
 
 
@@ -208,7 +208,7 @@ IF(USE_OPENAL STREQUAL "NO")
     SET(OPENAL_SRC "")
     SET(OPENAL_DEF "")
 ELSE(OPENAL_SRC STREQUAL "")
-    SET(OPENAL_SRC "src/OpenALBackend.cpp")
+    SET(OPENAL_SRC "src/backends/OpenALBackend.cpp")
     SET(OPENAL_DEF "-DOPENAL_SUPPORT")
 ENDIF(OPENAL_SRC STREQUAL "")
 
