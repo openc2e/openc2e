@@ -1975,7 +1975,7 @@ void caosVM::s_FRZN() {
 	targ->frozen = newvalue.getInt();
 }
 
-#include "bmpImage.h"
+#include "images/bmpImage.h"
 
 /**
  BLCK (command) width (integer) height (integer)

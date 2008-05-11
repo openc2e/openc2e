@@ -36,11 +36,11 @@ SET(OPENC2E_CORE
 	src/attFile.cpp
 	src/Backend.cpp
 	src/Blackboard.cpp
-	src/blkImage.cpp
-	src/bmpImage.cpp
+	src/images/blkImage.cpp
+	src/images/bmpImage.cpp
 	src/Bubble.cpp
 	src/bytecode.cpp
-	src/c16Image.cpp
+	src/images/c16Image.cpp
 	src/c2eBrain.cpp
 	src/CallButton.cpp
 	src/Camera.cpp
@@ -109,7 +109,7 @@ SET(OPENC2E_CORE
 	src/SFCFile.cpp
 	src/SimpleAgent.cpp
 	src/SkeletalCreature.cpp
-	src/sprImage.cpp
+	src/images/sprImage.cpp
 	src/streamutils.cpp
 	src/Vehicle.cpp
 	src/World.cpp

@@ -21,7 +21,7 @@
 #include "Room.h"
 #include "World.h"
 #include "Engine.h"
-#include "blkImage.h"
+#include "images/blkImage.h"
 #include <assert.h>
 #include "Backend.h"
 

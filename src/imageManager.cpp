@@ -18,10 +18,10 @@
  */
 
 #include "imageManager.h"
-#include "c16Image.h"
-#include "sprImage.h"
-#include "blkImage.h"
-#include "bmpImage.h"
+#include "images/c16Image.h"
+#include "images/sprImage.h"
+#include "images/blkImage.h"
+#include "images/bmpImage.h"
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"

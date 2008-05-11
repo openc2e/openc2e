@@ -19,8 +19,8 @@
 
 #include "fileSwapper.h"
 #include <fstream>
-#include "blkImage.h"
-#include "c16Image.h"
+#include "images/blkImage.h"
+#include "images/c16Image.h"
 #include "openc2e.h"
 
 void fileSwapper::convertsprite(s16Image &img, std::string dest) {
