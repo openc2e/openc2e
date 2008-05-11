@@ -23,9 +23,9 @@ ENDIF (OPENC2E_USE_OPENAL MATCHES "^(YES|NO|AUTO)$")
 SET(OPENC2E_USE_SERIALIZATION "FALSE" CACHE BOOL "Build the experimental serialization code")
 MARK_AS_ADVANCED(FORCE OPENC2E_USE_SERIALIZATION)
 IF (OPENC2E_USE_SERIALIZATION)
-	SET(SER_SRCS src/caosVM_ser_real.cpp)
+	SET(SER_SRCS src/caos/caosVM_ser_real.cpp)
 ELSE (OPENC2E_USE_SERIALIZATION)
-	SET(SER_SRCS src/caosVM_ser_stub.cpp)
+	SET(SER_SRCS src/caos/caosVM_ser_stub.cpp)
 ENDIF (OPENC2E_USE_SERIALIZATION)
 
 
@@ -46,30 +46,30 @@ SET(OPENC2E_CORE
 	src/Camera.cpp
 	src/caosScript.cpp
 	src/caosVar.cpp
-	src/caosVM_agent.cpp
-	src/caosVM_camera.cpp
-	src/caosVM_compound.cpp
-	src/caosVM_core.cpp
-	src/caosVM_creatures.cpp
-	src/caosVM_debug.cpp
-	src/caosVM_files.cpp
-	src/caosVM_flow.cpp
-	src/caosVM_genetics.cpp
-	src/caosVM_history.cpp
-	src/caosVM_input.cpp
-	src/caosVM_map.cpp
-	src/caosVM_motion.cpp
-	src/caosVM_net.cpp
+	src/caos/caosVM_agent.cpp
+	src/caos/caosVM_camera.cpp
+	src/caos/caosVM_compound.cpp
+	src/caos/caosVM_core.cpp
+	src/caos/caosVM_creatures.cpp
+	src/caos/caosVM_debug.cpp
+	src/caos/caosVM_files.cpp
+	src/caos/caosVM_flow.cpp
+	src/caos/caosVM_genetics.cpp
+	src/caos/caosVM_history.cpp
+	src/caos/caosVM_input.cpp
+	src/caos/caosVM_map.cpp
+	src/caos/caosVM_motion.cpp
+	src/caos/caosVM_net.cpp
 	src/caosVM.cpp
-	src/caosVM_ports.cpp
-	src/caosVM_resources.cpp
-	src/caosVM_scripts.cpp
-	src/caosVM_sounds.cpp
-	src/caosVM_time.cpp
-	src/caosVM_variables.cpp
-	src/caosVM_vectors.cpp
-	src/caosVM_vehicles.cpp
-	src/caosVM_world.cpp
+	src/caos/caosVM_ports.cpp
+	src/caos/caosVM_resources.cpp
+	src/caos/caosVM_scripts.cpp
+	src/caos/caosVM_sounds.cpp
+	src/caos/caosVM_time.cpp
+	src/caos/caosVM_variables.cpp
+	src/caos/caosVM_vectors.cpp
+	src/caos/caosVM_vehicles.cpp
+	src/caos/caosVM_world.cpp
 	${GEN}/cataloglexer.cpp
 	src/Catalogue.cpp
 	${GEN}/catalogue.tab.cpp
