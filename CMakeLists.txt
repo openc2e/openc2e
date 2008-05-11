@@ -265,7 +265,7 @@ INCLUDE_DIRECTORIES(BEFORE
 	${Boost_INCLUDE_DIR}
 	)
 
-FILE(GLOB CAOSVM_FILES ${SRC}/src/caosVM_*.cpp)
+FILE(GLOB CAOSVM_FILES ${SRC}/src/caos/caosVM_*.cpp)
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/commandinfo.yml
 	COMMAND perl parsedocs.pl ${CAOSVM_FILES} > ${GEN}/commandinfo.yml

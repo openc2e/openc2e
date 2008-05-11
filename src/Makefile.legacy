@@ -121,14 +121,14 @@ all: openc2e tools/filetests tools/praydumper docs tools/pathtest tools/memstats
 
 docs: docs.html
 
-commandinfo.yml: $(wildcard caosVM_*.cpp) parsedocs.pl
-	perl parsedocs.pl $(wildcard caosVM_*.cpp) > commandinfo.yml
+commandinfo.yml: $(wildcard caos/caosVM_*.cpp) ../parsedocs.pl
+	perl ../parsedocs.pl $(wildcard caos/caosVM_*.cpp) > commandinfo.yml
 
-docs.html: writehtml.pl commandinfo.yml
-	perl writehtml.pl commandinfo.yml > docs.html
+docs.html: ../docs/writehtml.pl commandinfo.yml
+	perl ../docs/writehtml.pl commandinfo.yml > docs.html
 
-cmddata.cpp: commandinfo.yml writecmds.pl
-	perl writecmds.pl commandinfo.yml > cmddata.cpp
+cmddata.cpp: commandinfo.yml ../writecmds.pl
+	perl ../writecmds.pl commandinfo.yml > cmddata.cpp
 
 #lex.mng.cpp lex.mng.h: mng.l
 #	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
