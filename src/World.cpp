@@ -389,10 +389,12 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 	int sprheight = bkgd->height(0);
 
 	// draw the blk
-	for (unsigned int i = 0; i < (m->fullheight() / sprheight); i++) {
-		for (unsigned int j = 0; j < (m->fullwidth() / sprwidth); j++) {
+	unsigned int heightinsprites = m->fullheight() / sprheight;
+	unsigned int widthinsprites = m->fullwidth() / sprwidth;
+	for (unsigned int i = 0; i < heightinsprites; i++) {
+		for (int j = widthinsprites - 1; j >= 0; j--) { // reverse order, so wrapping always works
 			// figure out which block number to use
-			unsigned int whereweare = j * (m->fullheight() / sprheight) + i;
+			unsigned int whereweare = j * heightinsprites + i;
 			
 			// make one pass for non-wraparound rooms, or two passes for wraparound ones
 			// TODO: implement this in a more sensible way, or at least optimise it
