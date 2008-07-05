@@ -58,6 +58,8 @@ World::~World() {
 		delete *i;
 }
 
+#include "images/bmpImage.h"
+
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
 void World::init() {
 	// First, try initialising the mouse cursor from the catalogue tag.
@@ -73,7 +75,14 @@ void World::init() {
 				int hotspotx, hotspoty;
 				if (sscanf(pointerinfo[1].c_str(), "%d %d", &hotspotx, &hotspoty) == 2)
 					theHand->setHotspot(hotspotx, hotspoty);
-				// TODO: seamonkeys has 'numImages baseImage' 'blockwidth blockheight' on the end of this tag
+				if (gametype == "sm" && pointerinfo.size() >= 5) {
+					// TODO: seamonkeys has 'numImages baseImage' too
+					int blockwidth, blockheight;
+					if (sscanf(pointerinfo[4].c_str(), "%d %d", &blockwidth, &blockheight) == 2) {
+						bmpImage *bmpimg = dynamic_cast<bmpImage *>(img.get());
+						if (bmpimg) bmpimg->setBlockSize(blockwidth, blockheight);
+					}
+				}
 				theHand->finishInit();
 			} else {
 				std::cout << "There was a seemingly-useful \"Pointer Information\" catalogue tag provided, but sprite file '" << pointerinfo[2] << " ' doesn't exist!" << std::endl;
