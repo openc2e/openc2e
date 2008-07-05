@@ -66,7 +66,7 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 			break;
 
 		case BI_RLE8:
-			std::cout << "Warning: sprite " << n << " is compressed." << std::endl;
+			if (biBitCount != 8) throw creaturesException(n + " contains BMP data compressed in a way which isn't possible.");
 			break;
 
 		default:
@@ -90,11 +90,62 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 
 	bmpdata = in->map + dataoffset;
 	buffers = 0;
+
+	if (biCompression == BI_RLE8) {
+		std::cout << "decoding " << n << std::endl;
+
+		// decode an RLE-compressed 8-bit image
+		// TODO: sanity checking
+		char *srcdata = (char *)bmpdata;
+		char *dstdata = new char[biWidth * biHeight];
+		for (unsigned int i = 0; i < biWidth * biHeight; i++) dstdata[i] = 0; // TODO
+		bmpdata = dstdata;
+		
+		unsigned int x = 0, y = 0;
+		for (unsigned int i = 0; i < biSizeImage;) {
+			unsigned char nopixels = srcdata[i]; i++;
+			unsigned char val = srcdata[i]; i++;
+			if (nopixels == 0) { // special
+				if (val == 0) { // end of line
+					x = 0;
+					y += 1;
+				} else if (val == 1) { // end of bitmap
+					break;
+				} else if (val == 2) { // delta
+					unsigned char horz = srcdata[i]; i++;
+					unsigned char vert = srcdata[i]; i++;
+					x += horz;
+					y += vert;
+				} else { // absolute mode
+					for (unsigned int j = 0; j < val; j++) {
+						if (x + (y * biWidth) >= biHeight * biWidth) break;
+						dstdata[x + (y * biWidth)] = srcdata[i];
+						i++; x++;
+					}
+					if (val % 2 == 1) i++; // skip padding byte
+				}
+			} else { // run of pixels
+				for (unsigned int j = 0; j < nopixels; j++) {
+					if (x + (y * biWidth) >= biHeight * biWidth) break;
+					dstdata[x + (y * biWidth)] = val;
+					x++;
+				}
+			}
+			
+			while (x > biWidth) {
+				x -= biWidth; y++;
+			}
+
+			if (x + (y * biWidth) >= biHeight * biWidth) break;
+		}
+	}
+
 	setBlockSize(biWidth, biHeight);
 }
 
 bmpImage::~bmpImage() {
 	freeData();
+	// TODO: free bmpdata for RLE8 images
 }
 
 void bmpImage::freeData() {
