@@ -20,6 +20,10 @@
 #include "creaturesImage.h"
 #include "exceptions.h"
 
+uint8 *creaturesImage::getCustomPalette() {
+	throw creaturesException("Internal error: Tried to get a custom palette of a sprite which doesn't support that.");
+}
+	
 bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
 	return false;
 }

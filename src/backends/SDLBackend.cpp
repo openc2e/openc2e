@@ -329,7 +329,10 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 						image->width(frame), // pitch
 						0, 0, 0, 0);
 		assert(surf);
-		SDL_SetPalette(surf, SDL_LOGPAL, palette, 0, 256);
+		if (image->hasCustomPalette())
+			SDL_SetPalette(surf, SDL_LOGPAL, (SDL_Color *)image->getCustomPalette(), 0, 256);
+		else
+			SDL_SetPalette(surf, SDL_LOGPAL, palette, 0, 256);
 	} else if (image->format() == if_16bit) {
 		unsigned int rmask, gmask, bmask;
 		if (image->is565()) {

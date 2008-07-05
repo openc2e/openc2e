@@ -30,6 +30,8 @@
 #define BI_BITFIELDS 3
 
 bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
+	was_rle = false;
+
 	char magic[2];
 	in->read(magic, 2);
 	if (std::string(magic, 2) != "BM")
@@ -76,6 +78,7 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	switch (biBitCount)  {
 		case 8:
 			imgformat = if_paletted;
+			palette = (uint8 *)(in->map + (unsigned int)in->tellg());
 			break;
 			
 		case 24:
@@ -100,6 +103,7 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 		char *dstdata = new char[biWidth * biHeight];
 		for (unsigned int i = 0; i < biWidth * biHeight; i++) dstdata[i] = 0; // TODO
 		bmpdata = dstdata;
+		was_rle = true;
 		
 		unsigned int x = 0, y = 0;
 		for (unsigned int i = 0; i < biSizeImage;) {
@@ -145,7 +149,8 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 
 bmpImage::~bmpImage() {
 	freeData();
-	// TODO: free bmpdata for RLE8 images
+
+	if (was_rle) delete[] (char *)bmpdata;
 }
 
 void bmpImage::freeData() {

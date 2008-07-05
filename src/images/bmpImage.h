@@ -28,6 +28,8 @@ class bmpImage : public creaturesImage {
 protected:
 	uint32 biWidth, biHeight;
 	void *bmpdata;
+	bool was_rle;
+	uint8 *palette;
 
 	void freeData();
 
@@ -36,6 +38,9 @@ public:
 	~bmpImage();
 
 	void setBlockSize(unsigned int blockwidth, unsigned int blockheight);
+
+	bool hasCustomPalette() { return imgformat == if_paletted; }
+	uint8 *getCustomPalette() { return palette; }
 };
 
 #endif
