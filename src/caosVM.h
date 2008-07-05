@@ -599,6 +599,7 @@ public:
 	void v_FRZN();
 	void s_FRZN();
 	void c_BLCK();
+	void c_SHAD();
 	
 	// motion
 	void c_ELAS();
@@ -665,6 +666,7 @@ public:
 	void v_PART();
 	void c_NEW_PART();
 	void c_PAT_DULL();
+	void c_PAT_DULL_sm();
 	void c_PAT_BUTT();
 	void c_PAT_FIXD();
 	void c_PAT_TEXT();

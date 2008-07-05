@@ -1995,4 +1995,22 @@ void caosVM::c_BLCK() {
 	img->setBlockSize(width, height);
 }
 
+/**
+ SHAD (command) intensity (integer) x (integer) y (integer) enable (integer)
+ %status stub
+ %pragma variants sm
+
+ Enable/disable drawing of a shadow on the target agent with the specified intensity at the given x/y offset.
+*/
+void caosVM::c_SHAD() {
+	VM_PARAM_INTEGER(enable)
+	VM_PARAM_INTEGER(y)
+	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER(intensity)
+
+	valid_agent(targ);
+
+	// TODO
+}
+
 /* vim: set noet: */
