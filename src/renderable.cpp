@@ -19,6 +19,7 @@
 
 #include "renderable.h"
 #include "World.h"
+#include "Engine.h"
 
 //#include "CompoundPart.h"
 bool renderablezorder::operator ()(const renderable *s1, const renderable *s2) const {
@@ -29,8 +30,12 @@ bool renderablezorder::operator ()(const renderable *s1, const renderable *s2) c
 		if (p1 && p2)
 			return p1->id < p2->id;
 	}
-	
-	return s1->getZOrder() < s2->getZOrder();
+
+	// TODO: we shouldn't be checking engine.bmprenderer for this, but it's a cheap/easy way to check for seamonkeys
+	if (engine.bmprenderer)
+		return (int)s1->getZOrder() < (int)s2->getZOrder();
+	else
+		return s1->getZOrder() < s2->getZOrder();
 }
 
 void renderable::zapZOrder() {
