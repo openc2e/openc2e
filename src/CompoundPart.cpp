@@ -275,7 +275,7 @@ void TextPart::addTint(std::string tintinfo) {
 	texttintinfo t;
 	t.offset = text.size();
 
-	if (!(r == g == b == rot == swap == 128)) {
+	if (!(r == 128 && g == 128 &&  b == 128 && rot == 128 && swap == 128)) {
 		t.sprite = textsprite->mutableCopy();
 		t.sprite->tint(r, g, b, rot, swap);
 	} else t.sprite = textsprite;
