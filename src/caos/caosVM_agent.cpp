@@ -619,13 +619,13 @@ void caosVM::c_ANMS() {
 
 	std::string t;
 	for (unsigned int i = 0; i < poselist.size(); i++) {
-		if (poselist[i] == ' ')
+		if (poselist[i] == ' ') {
 			if (!t.empty()) {
 				int n = atoi(t.c_str());
 				caos_assert(n >= 0 && n < 256);
 				animation.push_back(n);
 			}
-		else
+		} else
 			t = t + poselist[i];
 	}
 
