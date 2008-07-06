@@ -186,6 +186,7 @@ void bmpImage::freeData() {
 
 void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 	if (buffers) freeData();
+	m_numframes = 0;
 
 	unsigned int widthinblocks = biWidth / blockwidth;
 	caos_assert(widthinblocks * blockwidth == biWidth);
