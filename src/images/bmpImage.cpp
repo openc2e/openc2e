@@ -47,13 +47,14 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 
 	biWidth = read32(*in);
 	biHeight = read32(*in);
+	caos_assert((int)biHeight > 0);
 	
 	uint16 biPlanes = read16(*in);
 	if (biPlanes != 1) // single image plane
 		throw creaturesException(n + " contains BMP data we don't understand.");
 	
 	uint16 biBitCount = read16(*in);
-	uint32 biCompression = read32(*in);
+	biCompression = read32(*in);
 
 	// and now for some stuff we really don't care about
 	uint32 biSizeImage = read32(*in);
@@ -64,13 +65,13 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 
 	switch (biCompression) {
 		case BI_RGB:
-		case BI_BITFIELDS:
 			break;
 
 		case BI_RLE8:
 			if (biBitCount != 8) throw creaturesException(n + " contains BMP data compressed in a way which isn't possible.");
 			break;
 
+		case BI_BITFIELDS:
 		default:
 			throw creaturesException(n + " contains BMP data compressed in a way we don't understand.");
 	}
@@ -196,6 +197,10 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 	heights = new unsigned short[m_numframes];
 	buffers = new void *[m_numframes];
 
+	unsigned int pitch = biWidth;
+	if (imgformat == if_24bit) pitch = (((biWidth * 3) + 3) / 4) * 4;
+	else if (biCompression == BI_RGB) pitch = ((biWidth + 3) / 4) * 4;
+
 	unsigned int curr_row = 0, curr_col = 0;
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		widths[i] = blockwidth;
@@ -207,11 +212,11 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 		buffers[i] = new char *[buffersize];
 
 		for (unsigned int j = 0; j < blockheight; j++) {
-			unsigned int srcoffset = ((biHeight - 1) * biWidth) - (biWidth * blockheight * curr_row) - (biWidth * j) + (curr_col * blockwidth);
+			unsigned int srcoffset = (curr_col * blockwidth);
 			unsigned int destoffset = blockwidth * j;
 			unsigned int datasize = blockwidth;
-
 			if (imgformat == if_24bit) { srcoffset *= 3; destoffset *= 3; datasize *= 3; }
+			srcoffset += ((biHeight - 1) - (blockheight * curr_row) - j) * pitch;
 			
 			memcpy((char *)buffers[i] + destoffset, (char *)bmpdata + srcoffset, datasize);
 		}
