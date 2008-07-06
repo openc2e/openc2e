@@ -30,7 +30,7 @@
 #define BI_BITFIELDS 3
 
 bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
-	was_rle = false;
+	copied_data = false;
 
 	char magic[2];
 	in->read(magic, 2);
@@ -76,6 +76,7 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	}
 
 	switch (biBitCount)  {
+		case 4:
 		case 8:
 			imgformat = if_paletted;
 			palette = (uint8 *)(in->map + (unsigned int)in->tellg());
@@ -94,6 +95,25 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	bmpdata = in->map + dataoffset;
 	buffers = 0;
 
+	if (biBitCount == 4) {
+		char *srcdata = (char *)bmpdata;
+		char *dstdata = new char[biWidth * biHeight];
+		bmpdata = dstdata;
+		copied_data = true;
+
+		for (char *dest = dstdata; dest < dstdata + biWidth * biHeight; dest += biWidth) {
+			uint8 pixel = 0;
+			for (unsigned int i = 0; i < biWidth; i++) {
+				if (i % 2 == 0) {
+					pixel = *srcdata;
+					srcdata++;
+				}
+				*(dest + i) = (pixel >> 4);
+				pixel <<= 4;
+			}
+		}
+	}
+
 	if (biCompression == BI_RLE8) {
 		std::cout << "decoding " << n << std::endl;
 
@@ -103,7 +123,7 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 		char *dstdata = new char[biWidth * biHeight];
 		for (unsigned int i = 0; i < biWidth * biHeight; i++) dstdata[i] = 0; // TODO
 		bmpdata = dstdata;
-		was_rle = true;
+		copied_data = true;
 		
 		unsigned int x = 0, y = 0;
 		for (unsigned int i = 0; i < biSizeImage;) {
@@ -150,7 +170,7 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 bmpImage::~bmpImage() {
 	freeData();
 
-	if (was_rle) delete[] (char *)bmpdata;
+	if (copied_data) delete[] (char *)bmpdata;
 }
 
 void bmpImage::freeData() {

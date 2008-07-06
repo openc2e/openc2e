@@ -28,7 +28,7 @@ class bmpImage : public creaturesImage {
 protected:
 	uint32 biWidth, biHeight;
 	void *bmpdata;
-	bool was_rle;
+	bool copied_data;
 	uint8 *palette;
 
 	void freeData();
