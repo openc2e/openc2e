@@ -39,7 +39,7 @@
  */
 
 unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, unsigned int len) {
-	unsigned char state;
+	unsigned char state = 0;
 
 	for (unsigned int i = 0; i < len; i++) {
 		switch (svrule[i]) {
