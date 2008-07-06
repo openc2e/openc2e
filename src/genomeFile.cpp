@@ -190,7 +190,7 @@ istream &operator >> (istream &s, genomeFile &f) {
 
 	//std::cout << "creaturesGenomeFile: reading genome of version " << (unsigned int)f.cversion << ".\n";
 	f.currorgan = 0;
-	while (f.nextGene(s) != 0);
+	while (f.nextGene(s) != 0) { }
 	f.currorgan = 0;
 	//std::cout << "creaturesGenomeFile: read " << (unsigned int)f.genes.size() << " top-level genes.\n";
 
