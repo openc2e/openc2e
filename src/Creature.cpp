@@ -34,8 +34,10 @@ Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _vari
 	variant = _variant;
 	stage = baby;
 
-	assert(a);
 	parent = a;
+	assert(parent);
+	parentagent = dynamic_cast<Agent *>(parent);
+	assert(parentagent);
 	
 	alive = true; // ?
 	asleep = false; // ?
@@ -112,7 +114,7 @@ void Creature::addGene(gene *g) {
 	} else if (typeid(*g) == typeid(creatureGenusGene)) {
 		// TODO: mmh, genus changes after setup shouldn't be valid
 		genus = ((creatureGenusGene *)g)->genus;
-		parent->genus = genus + 1;
+		parentagent->genus = genus + 1;
 	} else if (typeid(*g) == typeid(creaturePigmentGene)) {
 		creaturePigmentGene &p = *((creaturePigmentGene *)g);
 		// TODO: we don't sanity-check
@@ -173,8 +175,8 @@ void Creature::die() {
 	// TODO: disable brain/biochemistry updates
 	// force die script
 	// TODO: TODO: TODO: this is c2e-specific
-	parent->stopScript();
-	parent->queueScript(72);
+	parentagent->stopScript();
+	parentagent->queueScript(72);
 	// skeletalcreature eyes, also? see setAsleep comment
 	alive = false;
 }
@@ -432,12 +434,12 @@ void c2eCreature::tickBrain() {
 			if (!a) continue;
 
 			// TODO: use eye position? see Creature::agentInSight
-			float ourxpos = parent->x + (parent->getWidth() / 2.0f);
+			float ourxpos = parentagent->x + (parentagent->getWidth() / 2.0f);
 			float theirxpos = a->x + (a->getWidth() / 2.0f);
 			float distance = theirxpos - ourxpos;
 
 			// TODO: squash result into appropriate range?
-			visnlobe->setNeuronInput(i, distance / parent->range.getFloat());
+			visnlobe->setNeuronInput(i, distance / parentagent->range.getFloat());
 		}
 	}
 
@@ -474,11 +476,11 @@ void c2eCreature::tickBrain() {
 	// TODO: doesn't belong here
 	// TODO: deal with decisions which don't have agents attached
 	// TODO: deal with moving between ATTNs which don't have a choseagent right now (eg, nothing in sight)
-	if (parent->vmStopped() || oldattn != attention || olddecn != decn) {
+	if (parentagent->vmStopped() || oldattn != attention || olddecn != decn) {
 		if (attention && dynamic_cast<CreatureAgent *>(attention.get())) {
-			parent->queueScript(decn + 32); // 'on creatures'
+			parentagent->queueScript(decn + 32); // 'on creatures'
 		} else {
-			parent->queueScript(decn + 16); // 'on agents'
+			parentagent->queueScript(decn + 16); // 'on agents'
 		}
 	}
 
@@ -490,7 +492,7 @@ void c2eCreature::tickBrain() {
 		}
 
 		if (involaction[i] > 0.0f) {
-			parent->queueScript(i + 64);
+			parentagent->queueScript(i + 64);
 		}
 	}
 #endif
@@ -1372,7 +1374,7 @@ bool Creature::agentInSight(AgentRef a) {
 
 	// TODO: specify x/y location for eyes
 	// TODO: check open cabin?
-	return agentIsVisible(parent, a);
+	return agentIsVisible(parentagent, a);
 #else
 	return false;
 #endif

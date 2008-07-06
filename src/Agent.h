@@ -49,6 +49,7 @@ class Agent : public boost::enable_shared_from_this<Agent> {
 	friend class SFCFile;
 	friend class SFCSimpleObject;
 	friend class SFCCompoundObject;
+	friend class CreatureAgent;
 	friend class QtOpenc2e; // i despise c++ - fuzzie
 
 	FRIEND_SERIALIZE(Agent);

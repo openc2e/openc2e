@@ -22,7 +22,7 @@
 
 class Creature;
 
-class CreatureAgent : public Agent {
+class CreatureAgent {
 protected:
 	Creature *creature;
 	friend class Creature;
@@ -34,9 +34,11 @@ protected:
 	virtual void creatureBorn() { }
 	virtual void creatureAged() { }
 	virtual void creatureDied() { }
+	
+	virtual Agent *getAgent() = 0;
 
 public:
-	CreatureAgent(unsigned char _family);
+	CreatureAgent();
 	virtual ~CreatureAgent();
 	void tick();
 

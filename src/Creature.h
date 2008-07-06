@@ -31,6 +31,7 @@ class Creature;
 class Creature {
 protected:
 	CreatureAgent *parent;
+	Agent *parentagent;
 	shared_ptr<genomeFile> genome;
 	
 	// non-specific bits

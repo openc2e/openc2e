@@ -224,7 +224,7 @@ void QtOpenc2e::updateCreaturesMenu() {
 		CreatureAgent *a = dynamic_cast<CreatureAgent *>(p.get());
 		if (a) {
 			// TODO: add breed?
-			std::string creaturename = creatureNameFor(a);
+			std::string creaturename = creatureNameFor(p);
 			if (creaturename.empty()) creaturename = "<Unnamed>";
 			creaturename += std::string(" (") + (a->getCreature()->isFemale() ? "Female" : "Male") + ")";
 
@@ -236,7 +236,7 @@ void QtOpenc2e::updateCreaturesMenu() {
 			if (world.selectedcreature == p) creatureSelectAct->setChecked(true);
 			connect(creatureSelectAct, SIGNAL(triggered()), this, SLOT(selectCreature()));
 			
-			if (monikerDataFor(a).getStatus() != borncreature)
+			if (monikerDataFor(p).getStatus() != borncreature)
 				creatureSelectAct->setDisabled(true);
 
 			creaturesMenu->addAction(creatureSelectAct);

@@ -82,10 +82,13 @@ int SkeletalPartCount() {
 		return 14;
 }
 
-SkeletalCreature::SkeletalCreature(unsigned char _family) : CreatureAgent(_family) {
+SkeletalCreature::SkeletalCreature(unsigned char _family) : Agent(_family, 0, 0, 0) {
 	facialexpression = 0;
 	pregnancy = 0;
 	eyesclosed = false;
+
+	// TODO: set zorder randomly :) should be somewhere between 1000-2700, at a /guess/
+	zorder = 1500;
 
 	ticks = 0;
 	gaitgene = 0;
@@ -613,9 +616,11 @@ void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure i
 }
 
 void SkeletalCreature::tick() {
-	CreatureAgent::tick();
+	Agent::tick();
 
 	if (paused) return;
+	
+	CreatureAgent::tick();
 
 	eyesclosed = creature->isAsleep() || !creature->isAlive();
 
@@ -656,7 +661,14 @@ void SkeletalCreature::tick() {
 void SkeletalCreature::physicsTick() {
 	// TODO: mmh
 
-	if (engine.version > 1 && ((engine.version == 3 && falling) || (engine.version == 2 && grav.getInt() == 1)) && (engine.version == 2 || validInRoomSystem())) Agent::physicsTick();
+	if (engine.version > 1) {
+		if ((engine.version == 3 && falling) || (engine.version == 2 && grav.getInt() == 1)) {
+			if (engine.version == 2 || validInRoomSystem()) {
+				Agent::physicsTick();
+			}
+		}
+	}
+
 	if (!carriedby && !invehicle) {
 		if (engine.version == 1 || (engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling))
 			snapDownFoot();

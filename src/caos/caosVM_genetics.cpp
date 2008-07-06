@@ -161,7 +161,7 @@ void caosVM::v_MTOC() {
 	if (!a) return;
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(a);
 	assert(c); // TODO: is this assert valid? can history events have non-creature owners?
-	result.setAgent(c);
+	result.setAgent(a);
 }
 
 /**
