@@ -41,15 +41,15 @@ protected:
 	
 public:
 	Camera();
-	virtual unsigned int const getWidth() = 0;
-	virtual unsigned int const getHeight() = 0;
+	virtual unsigned int getWidth() const = 0;
+	virtual unsigned int getHeight() const = 0;
 
-	unsigned int const getX() { return x; }
-	unsigned int const getY() { return y; }
-	unsigned int const getXCentre() { return x + (getWidth() / 2); }
-	unsigned int const getYCentre() { return y + (getHeight() / 2); }
+	unsigned int getX() const { return x; }
+	unsigned int getY() const { return y; }
+	unsigned int getXCentre() const { return x + (getWidth() / 2); }
+	unsigned int getYCentre() const { return y + (getHeight() / 2); }
 	
-	class MetaRoom * const getMetaRoom();
+	class MetaRoom * getMetaRoom() const;
 	void goToMetaRoom(unsigned int m);
 	void goToMetaRoom(unsigned int m, int x, int y, cameratransition transition);
 	virtual void moveTo(int _x, int _y, panstyle pan = jump);
@@ -69,8 +69,8 @@ protected:
 
 public:
 	PartCamera(class CameraPart *p) { part = p; }
-	unsigned int const getWidth();
-	unsigned int const getHeight();
+	unsigned int getWidth() const;
+	unsigned int getHeight() const;
 
 	void setZoom(int pixels, int _x, int _y);
 };
@@ -85,8 +85,8 @@ protected:
 public:
 	MainCamera() { }
 	void setBackend(boost::shared_ptr<Backend> b) { backend = b; }
-	unsigned int const getWidth();
-	unsigned int const getHeight();
+	unsigned int getWidth() const;
+	unsigned int getHeight() const;
 	void moveTo(int _x, int _y, panstyle pan = jump);
 	
 	void addFloated(AgentRef);

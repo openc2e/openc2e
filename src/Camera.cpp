@@ -28,7 +28,7 @@ Camera::Camera() {
 	panning = false;
 }
 
-MetaRoom * const Camera::getMetaRoom() {
+MetaRoom * Camera::getMetaRoom() const {
 	return world.map.getMetaRoom(metaroom);
 }
 
@@ -129,26 +129,26 @@ void Camera::updateTracking() {
 	moveTo(trackx, tracky);
 }
 
-unsigned int const MainCamera::getWidth() {
+unsigned int MainCamera::getWidth() const {
 	if ((!getMetaRoom()) || (backend->getMainSurface()->getWidth() < getMetaRoom()->width()))
 		return backend->getMainSurface()->getWidth();
 	else
 		return getMetaRoom()->width();
 }
 
-unsigned int const MainCamera::getHeight() {
+unsigned int MainCamera::getHeight() const {
 	if ((!getMetaRoom()) || (backend->getMainSurface()->getHeight() < getMetaRoom()->height()))
 		return backend->getMainSurface()->getHeight();
 	else
 		return getMetaRoom()->height();
 }
 
-unsigned int const PartCamera::getWidth() {
+unsigned int PartCamera::getWidth() const {
 	// TODO: update from ZOOM values
 	return part->cameraWidth();
 }
 
-unsigned int const PartCamera::getHeight() {
+unsigned int PartCamera::getHeight() const {
 	// TODO: update from ZOOM values
 	return part->cameraHeight();
 }

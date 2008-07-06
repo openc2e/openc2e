@@ -34,8 +34,8 @@ public:
 			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
 			   unsigned int camerawidth, unsigned int cameraheight);
 
-	unsigned int const cameraWidth() { return viewwidth; }
-	unsigned int const cameraHeight() { return viewheight; }
+	unsigned int cameraWidth() const { return viewwidth; }
+	unsigned int cameraHeight() const { return viewheight; }
 	shared_ptr<Camera> &getCamera() { return camera; }
 	void partRender(class Surface *renderer, int xoffset, int yoffset);
 	void tick();

@@ -469,7 +469,7 @@ bool Agent::validInRoomSystem() {
 	return validInRoomSystem(Point(x, y), getWidth(), getHeight(), perm);
 }
 
-bool const Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
+bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
 	// Return true if this agent is inside the world room system at the specified point, or false if it isn't.
 	MetaRoom *m = world.map.metaRoomAt(p.x, p.y);
 	if (!m) return false;
@@ -713,7 +713,7 @@ shared_ptr<Room> const Agent::bestRoomAt(unsigned int tryx, unsigned int tryy, u
 }
 
 // Creatures 2 collision finding
-void const Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
+void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms) {
 	src.x = (int)src.x;
 	src.y = (int)src.y;
 

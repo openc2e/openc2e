@@ -224,10 +224,10 @@ public:
 	Point const boundingBoxPoint(unsigned int n);
 	Point const boundingBoxPoint(unsigned int n, Point p, unsigned int w, unsigned int h);
 	shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, class MetaRoom *m, shared_ptr<Room> exclude);
-	void const findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
+	void findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
 
 	bool validInRoomSystem();
-	bool const validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);
+	bool validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);
 
 	virtual void tick();
 	virtual void kill();
