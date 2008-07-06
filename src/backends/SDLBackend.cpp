@@ -279,8 +279,8 @@ void SDLSurface::renderText(int x, int y, std::string text, unsigned int colour,
 
 //*** code to mirror 16bpp surface - slow, we should cache this!
 
-Uint16 *pixelPtr(SDL_Surface *surf, int x, int y) {
-	return (Uint16 *)((Uint8 *)surf->pixels + (y * surf->pitch) + (x * 2));
+Uint8 *pixelPtr(SDL_Surface *surf, int x, int y, int bytesperpixel) {
+	return (Uint8 *)surf->pixels + (y * surf->pitch) + (x * bytesperpixel);
 }
 
 SDL_Surface *MirrorSurface(SDL_Surface *surf) {
@@ -296,11 +296,44 @@ SDL_Surface *MirrorSurface(SDL_Surface *surf) {
 
 	for (int y = 0; y < newsurf->h; y++) {
 		for (int x = 0; x < (newsurf->w / 2); x++) {
-			Uint16 *one = pixelPtr(newsurf, x, y);
-			Uint16 *two = pixelPtr(newsurf, (newsurf->w - 1) - x, y);
-			Uint16 temp = *one;
-			*one = *two;
-			*two = temp;
+			switch (surf->format->BitsPerPixel) {
+				case 8:
+					{
+					Uint8 *one = pixelPtr(newsurf, x, y, 1);
+					Uint8 *two = pixelPtr(newsurf, (newsurf->w - 1) - x, y, 1);
+					Uint8 temp = *one;
+					*one = *two;
+					*two = temp;
+					}
+					break;
+
+				case 16:
+					{
+					Uint16 *one = (Uint16 *)pixelPtr(newsurf, x, y, 2);
+					Uint16 *two = (Uint16 *)pixelPtr(newsurf, (newsurf->w - 1) - x, y, 2);
+					Uint16 temp = *one;
+					*one = *two;
+					*two = temp;
+					}
+					break;
+
+				case 24:
+					{
+						Uint8 *one = pixelPtr(newsurf, x, y, 3);
+						Uint8 *two = pixelPtr(newsurf, (newsurf->w - 1) - x, y, 3);
+						Uint8 temp[3];
+						temp[0] = *one; temp[1] = *(one + 1); temp[2] = *(one + 2);
+						*one = *two; *(one + 1) = *(two + 1); *(one + 2) = *(two + 2);
+						*two = temp[0]; *(two + 1) = temp[1]; *(two + 2) = temp[2];
+					
+					}
+					break;
+
+				default:
+					if (SDL_MUSTLOCK(newsurf)) SDL_UnlockSurface(newsurf);
+					SDL_FreeSurface(newsurf);
+					throw creaturesException("SDLBackend failed to mirror surface");
+			}
 		}
 	}
 	
