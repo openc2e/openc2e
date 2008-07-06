@@ -192,11 +192,11 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 
 				if (condition == CBT) {
 					caos_assert(v1.hasInt() && v2.hasInt());
-					result = (v2.getInt() == v1.getInt() & v2.getInt());
+					result = (v2.getInt() == (v1.getInt() & v2.getInt()));
 				}
 				if (condition == CBF) {
 					caos_assert(v1.hasInt() && v2.hasInt());
-					result = (0           == v1.getInt() & v2.getInt());
+					result = ((0           == (v1.getInt()) & v2.getInt()));
 				}
 				if (op.argument & CAND)
 					result = (condaccum && result);
