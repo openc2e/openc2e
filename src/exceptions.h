@@ -23,6 +23,7 @@
 #include <exception>
 #include <cstdlib>
 #include <string>
+#include <string.h>
 #include <vector>
 #include <sstream>
 #include <assert.h>
