@@ -732,7 +732,7 @@ void const Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Po
 		return;
 	}
 
-	int lastdirection;
+	int lastdirection = 0;
 
 	bool steep = abs(dy) > abs(dx);
 
