@@ -36,7 +36,12 @@ bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) con
 		} else
 			return s1->getZOrder() > s2->getZOrder();
 	}
-	return s1->getParent()->getZOrder() > s2->getParent()->getZOrder();
+
+	// TODO: we shouldn't be checking engine.bmprenderer for this, but it's a cheap/easy way to check for seamonkeys
+	if (engine.bmprenderer)
+		return (int)s1->getParent()->getZOrder() > (int)s2->getParent()->getZOrder();
+	else
+		return s1->getParent()->getZOrder() > s2->getParent()->getZOrder();
 }
 
 shared_ptr<creaturesImage> TextEntryPart::caretsprite;
