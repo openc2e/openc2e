@@ -24,6 +24,7 @@
 #include "caosVM.h"
 #include "Room.h"
 #include "MetaRoom.h"
+#include <climits>
 
 // TODO: change imagecount?
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {

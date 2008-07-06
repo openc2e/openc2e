@@ -29,6 +29,7 @@
 #include <boost/format.hpp>
 #include "AgentHelpers.h"
 #include "Room.h" // LIML/LIMT etc
+#include <climits>
 
 using std::cerr;
 

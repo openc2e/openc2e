@@ -25,6 +25,7 @@
 #include "Engine.h" // version
 #include <iostream>
 #include <boost/format.hpp>
+#include <climits>
 using std::cerr;
 
 /**

@@ -23,6 +23,7 @@
 #include "bytecode.h"
 #include "caosScript.h"
 #include <iostream>
+#include <climits>
 
 #include <boost/format.hpp>
 
