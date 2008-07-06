@@ -274,8 +274,10 @@ void caosVM::c_ADDV() {
 		v->setFloat(v->getFloat() + (add.hasFloat() ? add.getFloat() : add.getInt()));
 	else if (v->hasInt())
 		v->setInt((int)(v->getInt() + (add.hasFloat() ? add.getFloat() : add.getInt())));
+	else if (add.hasFloat())
+		v->setFloat(add.getFloat()); // default back to zero
 	else
-		throw badParamException();
+		v->setInt(add.getInt()); // default back to zero
 }
 
 /**
