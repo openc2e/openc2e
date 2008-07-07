@@ -188,7 +188,7 @@ void caosVM::c_CMRP() {
 /**
  CMRX (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Returns the X position at the center of the current camera's view.
 */
@@ -201,7 +201,7 @@ void caosVM::v_CMRX() {
 /**
  CMRY (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %pragma variants c2 cv c3 sm
 
  Returns the Y position at the center of the current camera's view.
 */
