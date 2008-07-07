@@ -55,10 +55,12 @@ shared_ptr<script> Scriptorium::getScript(unsigned char family, unsigned char ge
 		std::map<unsigned short, shared_ptr<script> > &x = getScripts(calculateValue(family, genus, 0));
 		if (x.find(event) == x.end()) {
 			std::map<unsigned short, shared_ptr<script> > &x = getScripts(calculateValue(family, 0, 0));
-			if (x.find(event) == x.end())
-				return shared_ptr<script>();
-			else
-				return x[event];
+			if (x.find(event) == x.end()) {
+				std::map<unsigned short, shared_ptr<script> > &x = getScripts(calculateValue(0, 0, 0));
+				if (x.find(event) == x.end()) {
+					return shared_ptr<script>();
+				} else return x[event];
+			} else return x[event];
 		} else return x[event];
 	} else return x[event];
 }
