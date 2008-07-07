@@ -283,9 +283,10 @@ Uint8 *pixelPtr(SDL_Surface *surf, int x, int y, int bytesperpixel) {
 	return (Uint8 *)surf->pixels + (y * surf->pitch) + (x * bytesperpixel);
 }
 
-SDL_Surface *MirrorSurface(SDL_Surface *surf) {
-	SDL_Surface* newsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, surf->w, surf->h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
+SDL_Surface *MirrorSurface(SDL_Surface *surf, SDL_Color *surfpalette) {
+	SDL_Surface* newsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
 	assert(newsurf);
+	if (surfpalette) SDL_SetPalette(newsurf, SDL_LOGPAL, surfpalette, 0, 256);
 	SDL_BlitSurface(surf, 0, newsurf, 0);
 
 	if (SDL_MUSTLOCK(newsurf))
@@ -356,6 +357,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 
 	// create surface
 	SDL_Surface *surf;
+	SDL_Color *surfpalette = 0;
 	if (image->format() == if_paletted) {
 		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
 						image->width(frame), image->height(frame),
@@ -364,9 +366,10 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 						0, 0, 0, 0);
 		assert(surf);
 		if (image->hasCustomPalette())
-			SDL_SetPalette(surf, SDL_LOGPAL, (SDL_Color *)image->getCustomPalette(), 0, 256);
+			surfpalette = (SDL_Color *)image->getCustomPalette();
 		else
-			SDL_SetPalette(surf, SDL_LOGPAL, palette, 0, 256);
+			surfpalette = palette;
+		SDL_SetPalette(surf, SDL_LOGPAL, surfpalette, 0, 256);
 	} else if (image->format() == if_16bit) {
 		unsigned int rmask, gmask, bmask;
 		if (image->is565()) {
@@ -395,7 +398,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 	// try mirroring, if necessary
 	try {
 		if (mirror) {
-			SDL_Surface *newsurf = MirrorSurface(surf);
+			SDL_Surface *newsurf = MirrorSurface(surf, surfpalette);
 			SDL_FreeSurface(surf);
 			surf = newsurf;
 		}
