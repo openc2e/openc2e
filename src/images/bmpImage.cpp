@@ -79,8 +79,17 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	switch (biBitCount)  {
 		case 4:
 		case 8:
+			{
 			imgformat = if_paletted;
-			palette = (uint8 *)(in->map + (unsigned int)in->tellg());
+			uint8 *filepalette = (uint8 *)(in->map + (unsigned int)in->tellg());
+			palette = new uint8[256 * 4];
+			for (unsigned int i = 0; i < (biBitCount == 4 ? 16 : 256); i++) {
+				palette[i * 4] = filepalette[(i * 4) + 2];
+				palette[(i * 4) + 1] = filepalette[(i * 4) + 1];
+				palette[(i * 4) + 2] = filepalette[i * 4];
+				palette[(i * 4) + 3] = 0;
+			}
+			}
 			break;
 			
 		case 24:
