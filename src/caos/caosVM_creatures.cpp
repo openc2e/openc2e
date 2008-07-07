@@ -1727,6 +1727,54 @@ void caosVM::v_MONK() {
 	result.setInt(0); // TODO
 }
 
+/**
+ MOTR (command) enable (integer)
+ %status stub
+*/
+void caosVM::c_MOTR() {
+	VM_PARAM_INTEGER(enable)
+
+	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ MOTR (integer)
+ %status stub
+*/
+void caosVM::v_MOTR() {
+	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
+
+	result.setInt(1); // TODO
+}
+
+/**
+ MIND (command) enable (integer)
+ %status stub
+*/
+void caosVM::c_MIND() {
+	VM_PARAM_INTEGER(enable)
+
+	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ MIND (integer)
+ %status stub
+*/
+void caosVM::v_MIND() {
+	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
+
+	result.setInt(1); // TODO
+}
+
 // clothes
 
 /**

@@ -801,6 +801,10 @@ public:
 	void c_SAY();
 	void c_TRIG();
 	void v_MONK();
+	void c_MOTR();
+	void v_MOTR();
+	void c_MIND();
+	void v_MIND();
 	// (clothes)
 	void c_BODY();
 	void v_BODY();
