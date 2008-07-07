@@ -1184,17 +1184,17 @@ void caosVM::c_NEW_CREA_c1() {
  %pragma variants c3 sm
 */
 void caosVM::c_NEW_CRAG() {
+	VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
 	VM_PARAM_INTEGER(variant)
 	VM_PARAM_INTEGER(sex)
 	VM_PARAM_INTEGER(gene_slot)
 	VM_PARAM_VALIDAGENT(gene_agent)
 	VM_PARAM_INTEGER(family)
-        VM_PARAM_INTEGER(plane)
-	VM_PARAM_INTEGER(first_image)
-	VM_PARAM_INTEGER(image_count)
-	VM_PARAM_STRING(sprite_file)
 
-	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
+       	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
 	caos_assert(i != gene_agent->slots.end());
 
 	// randomise sex if necessary
