@@ -643,6 +643,23 @@ public:
 	void c_MCRT();
 	void v_REST();
 	void s_REST();
+	// (rotation)
+	void c_AVEL();
+	void v_AVEL();
+	void c_FVEL();
+	void v_FVEL();
+	void c_SVEL();
+	void v_SVEL();
+	void c_ADMP();
+	void v_ADMP();
+	void c_FDMP();
+	void v_FDMP();
+	void c_SDMP();
+	void v_SDMP();
+	void c_SPIN();
+	void v_SPIN();
+	void v_ANGL();
+	void c_ROTN();
 	
 	// scripts
 	void c_INST();

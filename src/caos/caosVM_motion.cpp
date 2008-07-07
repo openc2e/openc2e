@@ -606,4 +606,183 @@ void caosVM::c_MCRT() {
 */
 CAOS_LVALUE_TARG_SIMPLE(REST, targ->rest)
 
+/**
+ AVEL (command) angularvelocity (float)
+ %status stub
+*/
+void caosVM::c_AVEL() {
+	VM_PARAM_FLOAT(angularvelocity)
+	caos_assert(angularvelocity >= 0.0f); caos_assert(angularvelocity <= 1.0f);
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ AVEL (float)
+ %status stub
+*/
+void caosVM::v_AVEL() {
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ FVEL (command) forwardvelocity (float)
+ %status stub
+*/
+void caosVM::c_FVEL() {
+	VM_PARAM_FLOAT(forwardvelocity)
+	caos_assert(forwardvelocity >= 0.0f); caos_assert(forwardvelocity <= 1.0f);
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ FVEL (float)
+ %status stub
+*/
+void caosVM::v_FVEL() {
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ SVEL (command) sidewaysvelocity (float)
+ %status stub
+*/
+void caosVM::c_SVEL() {
+	VM_PARAM_FLOAT(sidewaysvelocity)
+	caos_assert(sidewaysvelocity >= 0.0f); caos_assert(sidewaysvelocity <= 1.0f);
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ SVEL (float)
+ %status stub
+*/
+void caosVM::v_SVEL() {
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ ADMP (command) angulardamping (float)
+ %status stub
+*/
+void caosVM::c_ADMP() {
+	VM_PARAM_FLOAT(angulardamping)
+	caos_assert(angulardamping >= 0.0f); caos_assert(angulardamping <= 1.0f);
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ ADMP (float)
+ %status stub
+*/
+void caosVM::v_ADMP() {
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ FDMP (command) forwarddamping (float)
+ %status stub
+*/
+void caosVM::c_FDMP() {
+	VM_PARAM_FLOAT(forwarddamping)
+	caos_assert(forwarddamping >= 0.0f); caos_assert(forwarddamping <= 1.0f);
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ FDMP (float)
+ %status stub
+*/
+void caosVM::v_FDMP() {
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ SDMP (command) sidewaysdamping (float)
+ %status stub
+*/
+void caosVM::c_SDMP() {
+	VM_PARAM_FLOAT(sidewaysdamping)
+	caos_assert(sidewaysdamping >= 0.0f); caos_assert(sidewaysdamping <= 1.0f);
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ SDMP (float)
+ %status stub
+*/
+void caosVM::v_SDMP() {
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ SPIN (command) angle (float)
+ %status stub
+*/
+void caosVM::c_SPIN() {
+	VM_PARAM_FLOAT(angle)
+	caos_assert(angle >= 0.0f); caos_assert(angle <= 1.0f);
+
+	valid_agent(targ);
+	// TODO
+}
+
+/**
+ SPIN (float)
+ %status stub
+*/
+void caosVM::v_SPIN() {
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ ANGL (float) x (float) y (float)
+ %status stub
+*/
+void caosVM::v_ANGL() {
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
+
+	valid_agent(targ);
+
+	result.setFloat(0.0f); // TODO
+}
+
+/**
+ ROTN (command) sprites (integer) rotations (integer)
+ %status stub
+*/
+void caosVM::c_ROTN() {
+	VM_PARAM_INTEGER(rotations)
+	VM_PARAM_INTEGER(sprites)
+
+	valid_agent(targ);
+	// TODO
+}
+
 /* vim: set noet: */
