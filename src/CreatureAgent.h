@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef __CREATUREAGENT_H
+#define __CREATUREAGENT_H
+
 #include "Agent.h"
 #include "genome.h"
 
@@ -53,4 +56,5 @@ public:
 	bool isApproaching() { return approaching; }	
 };
 
+#endif
 /* vim: set noet: */
