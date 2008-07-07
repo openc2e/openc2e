@@ -76,6 +76,7 @@ SET(OPENC2E_CORE
 	${GEN}/cmddata.cpp
 	src/cobFile.cpp
 	src/CompoundAgent.cpp
+	src/CompoundCreature.cpp
 	src/CompoundPart.cpp
 	src/Creature.cpp
 	src/CreatureAgent.cpp
