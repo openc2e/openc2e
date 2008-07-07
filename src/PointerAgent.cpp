@@ -34,6 +34,9 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MA
 	wireOriginID = 0;
 	// TODO: verify attributes on the pointer in c2e
 	attr.setInt(256); // camera shy
+
+	hotspotx = 0;
+	hotspoty = 0;
 }
 
 void PointerAgent::finishInit() {
