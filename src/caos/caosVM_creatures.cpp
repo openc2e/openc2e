@@ -23,6 +23,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "SkeletalCreature.h"
+#include "CompoundCreature.h"
 #include "Creature.h"
 using std::cerr;
 
@@ -1175,6 +1176,48 @@ void caosVM::c_NEW_CREA_c1() {
 	world.history.getMoniker(world.history.findMoniker(genome)).moveToCreature(a);
 
 	setTarg(a);
+}
+
+/**
+ NEW: CRAG (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
+ %status maybe
+ %pragma variants c3 sm
+*/
+void caosVM::c_NEW_CRAG() {
+	VM_PARAM_INTEGER(variant)
+	VM_PARAM_INTEGER(sex)
+	VM_PARAM_INTEGER(gene_slot)
+	VM_PARAM_VALIDAGENT(gene_agent)
+	VM_PARAM_INTEGER(family)
+        VM_PARAM_INTEGER(plane)
+	VM_PARAM_INTEGER(first_image)
+	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_STRING(sprite_file)
+
+	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
+	caos_assert(i != gene_agent->slots.end());
+
+	// randomise sex if necessary
+	if (sex == 0) sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
+	caos_assert(sex == 1 || sex == 2); // TODO: correct?
+
+	// TODO: if variant is 0, randomise between 1 and 8
+	CompoundCreature *a = new CompoundCreature(family, plane, sprite_file, first_image, image_count);
+	try {
+		c2eCreature *c = new c2eCreature(i->second, (sex == 2), variant, a);
+		a->setCreature(c);
+	} catch (...) {
+		delete a;
+		throw;
+	}
+	
+	a->finishInit();
+
+	world.history.getMoniker(world.history.findMoniker(i->second)).moveToCreature(a);
+	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
+
+	setTarg(a);
+
 }
 
 int calculateRand(int value1, int value2); // caosVM_variables.cpp
