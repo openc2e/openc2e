@@ -1319,6 +1319,7 @@ void caosVM::c_LOCI() {
 	VM_PARAM_INTEGER(type)
 
 	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
 
 	float *f = c->getLocusPointer(!type, organ, tissue, id);
 	caos_assert(f);
@@ -1339,6 +1340,7 @@ void caosVM::v_LOCI() {
 	VM_PARAM_INTEGER(type)
 
 	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
 
 	float *f = c->getLocusPointer(!type, organ, tissue, id);
 	caos_assert(f);
@@ -1364,6 +1366,7 @@ void caosVM::v_TAGE() {
 */
 void caosVM::v_ORGN() {
 	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
 	result.setInt(c->noOrgans());
 }
 
@@ -1392,6 +1395,7 @@ void caosVM::v_ORGF() {
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
 	if (organ < 0 || (unsigned int)organ >= c->noOrgans()) {
 		result.setFloat(-1.0f);
 		return;
@@ -1427,6 +1431,7 @@ void caosVM::v_ORGI() {
 	VM_PARAM_INTEGER(organ)
 	
 	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
 	if (organ < 0 || (unsigned int)organ >= c->noOrgans()) {
 		result.setFloat(-1.0f);
 		return;
