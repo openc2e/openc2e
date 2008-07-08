@@ -156,6 +156,7 @@ caosVM *World::getVM(Agent *a) {
 
 void World::freeVM(caosVM *v) {
 	v->setOwner(0);
+	v->resetScriptState();	
 	vmpool.push_back(v);
 }
 
