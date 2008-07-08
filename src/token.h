@@ -120,7 +120,7 @@ struct token {
 		if (!s) unexpected();
 		return *s;
 	}
-	token() {}
+	token() : lineno(-1) {}
 	token(const token &cp) : payload(cp.payload), index(cp.index), lineno(cp.lineno) { }
 	token(const caosVar &cv, int lineno_) : payload(cv), index(-1), lineno(lineno_) {}
 	token(const std::string &word, int lineno_) : payload(word), index(-1), lineno(lineno_) {}
