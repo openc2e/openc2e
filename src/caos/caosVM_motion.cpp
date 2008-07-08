@@ -612,7 +612,6 @@ CAOS_LVALUE_TARG_SIMPLE(REST, targ->rest)
 */
 void caosVM::c_AVEL() {
 	VM_PARAM_FLOAT(angularvelocity)
-	caos_assert(angularvelocity >= 0.0f); caos_assert(angularvelocity <= 1.0f);
 
 	valid_agent(targ);
 	// TODO
@@ -634,7 +633,6 @@ void caosVM::v_AVEL() {
 */
 void caosVM::c_FVEL() {
 	VM_PARAM_FLOAT(forwardvelocity)
-	caos_assert(forwardvelocity >= 0.0f); caos_assert(forwardvelocity <= 1.0f);
 
 	valid_agent(targ);
 	// TODO
@@ -656,7 +654,6 @@ void caosVM::v_FVEL() {
 */
 void caosVM::c_SVEL() {
 	VM_PARAM_FLOAT(sidewaysvelocity)
-	caos_assert(sidewaysvelocity >= 0.0f); caos_assert(sidewaysvelocity <= 1.0f);
 
 	valid_agent(targ);
 	// TODO
