@@ -44,7 +44,8 @@ WORDANY    = [$#a-zA-Z0-9:?!_+-];
 SIGN       = [-+];
 
 
-	[\r\n] { ++yylineno; goto std; }
+	[\n] { ++yylineno; goto std; }
+	[\r] { goto std; }
 	[ \t,] { goto std; }
 	"*" [^\r\n\000]* { goto std; }
 	"'" noneoi "'"  { v.push_back(token(caosVar((int)basep[1]), yylineno)); goto std; }
