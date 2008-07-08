@@ -321,6 +321,7 @@ void caosScript::parse(std::istream &in) {
 		int contextlen = 5;
 		int leftct = contextlen;
 		int rightct = contextlen;
+		int prefix = 0;
 
 		if (errindex < leftct) {
 			rightct += leftct - errindex;
@@ -339,6 +340,7 @@ void caosScript::parse(std::istream &in) {
 		if (errindex - leftct != 0) {
 			e.context->push_back(token());
 			e.context->back().payload = std::string("...");
+			prefix = 1;
 		}
 
 		for (int i = errindex - leftct; i < errindex + rightct; i++) {
@@ -348,7 +350,7 @@ void caosScript::parse(std::istream &in) {
 			e.context->push_back(token());
 			e.context->back().payload = std::string("...");
 		}
-		e.ctxoffset = leftct;
+		e.ctxoffset = leftct + prefix;
 		throw;
 	}
 }
@@ -357,7 +359,7 @@ const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix) {
 	std::string fullname = prefix + t->word();
 	errindex = t->index;
 	const cmdinfo *ci = d->find_command(fullname.c_str());
-	// See if there'{s a subcommand namespace
+	// See if there's a subcommand namespace
 	token *t2 = NULL;
 	try {
 		t2 = getToken(TOK_WORD);
