@@ -1775,6 +1775,32 @@ void caosVM::v_MIND() {
 	result.setInt(1); // TODO
 }
 
+/**
+ STEP (command) faculty (integer)
+ %status stub
+*/
+void caosVM::c_STEP() {
+	VM_PARAM_INTEGER(faculty)
+
+	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ SEEN (agent) category (integer)
+ %status stub
+*/
+void caosVM::v_SEEN() {
+	VM_PARAM_INTEGER(category)
+
+	c2eCreature *c = getc2eCreature(targ.get());
+	caos_assert(c);
+
+	result.setAgent(0); // TODO
+}
+
 // clothes
 
 /**

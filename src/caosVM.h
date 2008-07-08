@@ -822,6 +822,8 @@ public:
 	void v_MOTR();
 	void c_MIND();
 	void v_MIND();
+	void c_STEP();
+	void v_SEEN();
 	// (clothes)
 	void c_BODY();
 	void v_BODY();
