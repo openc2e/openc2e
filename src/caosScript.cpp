@@ -355,7 +355,7 @@ void caosScript::parse(std::istream &in) {
 
 const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix) {
 	std::string fullname = prefix + t->word();
-	errindex = t->index + 1;
+	errindex = t->index;
 	const cmdinfo *ci = d->find_command(fullname.c_str());
 	// See if there'{s a subcommand namespace
 	token *t2 = NULL;
