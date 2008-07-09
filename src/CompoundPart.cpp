@@ -188,6 +188,16 @@ void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	origsprite = sprite = spr;
 }
 
+void SpritePart::changeSprite(shared_ptr<creaturesImage> spr) {
+	caos_assert(spr);
+	// TODO: should we preserve base/pose here, instead?
+	pose = 0;
+	base = 0;
+	spriteno = firstimg;
+	// TODO: should we preserve tint?
+	origsprite = sprite = spr;
+}
+
 unsigned int SpritePart::getWidth() {
 	return sprite->width(getCurrentSprite());
 }
