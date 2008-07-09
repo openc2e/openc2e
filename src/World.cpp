@@ -150,13 +150,14 @@ caosVM *World::getVM(Agent *a) {
 		caosVM *x = vmpool.back();
 		vmpool.pop_back();
 		x->setOwner(a);
+		x->resetScriptState();
 		return x;
 	}
 }
 
 void World::freeVM(caosVM *v) {
+	// we don't reset the script state here because caosVM might be in our call stack and we don't want to reset the VM from under itself
 	v->setOwner(0);
-	v->resetScriptState();	
 	vmpool.push_back(v);
 }
 
