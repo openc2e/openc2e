@@ -23,16 +23,14 @@
 #include "exceptions.h"
 #include "openc2e.h"
 
-#include <iostream> // TODO: remove me
-
 #define BI_RGB 0
 #define BI_RLE8 1
 #define BI_BITFIELDS 3
 
-bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
-	buffers = 0;
+bmpData::bmpData(mmapifstream *in, std::string n) {
 	palette = 0;
 	copied_data = false;
+	stream = in;
 
 	char magic[2];
 	in->read(magic, 2);
@@ -124,8 +122,6 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	}
 
 	if (biCompression == BI_RLE8) {
-		std::cout << "decoding " << n << std::endl;
-
 		// decode an RLE-compressed 8-bit image
 		// TODO: sanity checking
 		char *srcdata = (char *)bmpdata;
@@ -173,14 +169,24 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 		}
 	}
 
-	setBlockSize(biWidth, biHeight);
+}
+
+bmpData::~bmpData() {
+	if (copied_data) delete[] (char *)bmpdata;
+	if (palette) delete[] palette;
+	delete stream;
+}
+
+bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
+	buffers = 0;
+
+	bmpdata = shared_ptr<bmpData>(new bmpData(in, n));
+	imgformat = bmpdata->imgformat;
+	setBlockSize(bmpdata->biWidth, bmpdata->biHeight);
 }
 
 bmpImage::~bmpImage() {
 	if (buffers) freeData();
-
-	if (copied_data) delete[] (char *)bmpdata;
-	if (palette) delete[] palette;
 }
 
 void bmpImage::freeData() {
@@ -199,19 +205,19 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 	if (buffers) freeData();
 	m_numframes = 0;
 
-	unsigned int widthinblocks = biWidth / blockwidth;
-	caos_assert(widthinblocks * blockwidth == biWidth);
-	unsigned int heightinblocks = biHeight / blockheight;
-	caos_assert(heightinblocks * blockheight == biHeight);
+	unsigned int widthinblocks = bmpdata->biWidth / blockwidth;
+	caos_assert(widthinblocks * blockwidth == bmpdata->biWidth);
+	unsigned int heightinblocks = bmpdata->biHeight / blockheight;
+	caos_assert(heightinblocks * blockheight == bmpdata->biHeight);
 
 	m_numframes = widthinblocks * heightinblocks;
 	widths = new unsigned short[m_numframes];
 	heights = new unsigned short[m_numframes];
 	buffers = new void *[m_numframes];
 
-	unsigned int pitch = biWidth;
-	if (imgformat == if_24bit) pitch = (((biWidth * 3) + 3) / 4) * 4;
-	else if (biCompression == BI_RGB) pitch = ((biWidth + 3) / 4) * 4;
+	unsigned int pitch = bmpdata->biWidth;
+	if (imgformat == if_24bit) pitch = (((pitch * 3) + 3) / 4) * 4;
+	else if (bmpdata->biCompression == BI_RGB) pitch = ((pitch + 3) / 4) * 4;
 
 	unsigned int curr_row = 0, curr_col = 0;
 	for (unsigned int i = 0; i < m_numframes; i++) {
@@ -228,9 +234,9 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 			unsigned int destoffset = blockwidth * j;
 			unsigned int datasize = blockwidth;
 			if (imgformat == if_24bit) { srcoffset *= 3; destoffset *= 3; datasize *= 3; }
-			srcoffset += ((biHeight - 1) - (blockheight * curr_row) - j) * pitch;
+			srcoffset += ((bmpdata->biHeight - 1) - (blockheight * curr_row) - j) * pitch;
 			
-			memcpy((char *)buffers[i] + destoffset, (char *)bmpdata + srcoffset, datasize);
+			memcpy((char *)buffers[i] + destoffset, (char *)bmpdata->bmpdata + srcoffset, datasize);
 		}
 
 		curr_col++;
