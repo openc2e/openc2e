@@ -608,7 +608,7 @@ CAOS_LVALUE_TARG_SIMPLE(REST, targ->rest)
 
 /**
  AVEL (command) angularvelocity (float)
- %status stub
+ %status maybe
 
  Set the angular velocity for the target agent.
 */
@@ -616,24 +616,25 @@ void caosVM::c_AVEL() {
 	VM_PARAM_FLOAT(angularvelocity)
 
 	valid_agent(targ);
-	// TODO
+
+	targ->avel = angularvelocity;
 }
 
 /**
  AVEL (float)
- %status stub
+ %status maybe
 
  Returns the angular velocity for the target agent.
 */
 void caosVM::v_AVEL() {
 	valid_agent(targ);
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(targ->avel);
 }
 
 /**
  FVEL (command) forwardvelocity (float)
- %status stub
+ %status maybe
 
  Set the forward velocity for the target agent.
 */
@@ -641,24 +642,24 @@ void caosVM::c_FVEL() {
 	VM_PARAM_FLOAT(forwardvelocity)
 
 	valid_agent(targ);
-	// TODO
+	targ->fvel = forwardvelocity;
 }
 
 /**
  FVEL (float)
- %status stub
+ %status maybe
 
  Returns the forward velocity for the target agent.
 */
 void caosVM::v_FVEL() {
 	valid_agent(targ);
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(targ->fvel);
 }
 
 /**
  SVEL (command) sidewaysvelocity (float)
- %status stub
+ %status maybe
 
  Set the sideways velocity for the target agent.
 */
@@ -666,24 +667,24 @@ void caosVM::c_SVEL() {
 	VM_PARAM_FLOAT(sidewaysvelocity)
 
 	valid_agent(targ);
-	// TODO
+	targ->svel = sidewaysvelocity;
 }
 
 /**
  SVEL (float)
- %status stub
+ %status maybe
 
  Returns the sideways velocity for the target agent.
 */
 void caosVM::v_SVEL() {
 	valid_agent(targ);
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(targ->svel);
 }
 
 /**
  ADMP (command) angulardamping (float)
- %status stub
+ %status maybe
 
  Set the angular damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
@@ -692,24 +693,24 @@ void caosVM::c_ADMP() {
 	caos_assert(angulardamping >= 0.0f); caos_assert(angulardamping <= 1.0f);
 
 	valid_agent(targ);
-	// TODO
+	targ->admp = angulardamping;
 }
 
 /**
  ADMP (float)
- %status stub
+ %status maybe
 
  Returns the angular damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::v_ADMP() {
 	valid_agent(targ);
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(targ->admp);
 }
 
 /**
  FDMP (command) forwarddamping (float)
- %status stub
+ %status maybe
 
  Set the forward damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
@@ -718,24 +719,24 @@ void caosVM::c_FDMP() {
 	caos_assert(forwarddamping >= 0.0f); caos_assert(forwarddamping <= 1.0f);
 
 	valid_agent(targ);
-	// TODO
+	targ->fdmp = forwarddamping;
 }
 
 /**
  FDMP (float)
- %status stub
+ %status maybe
 
  Returns the forward damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::v_FDMP() {
 	valid_agent(targ);
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(targ->fdmp);
 }
 
 /**
  SDMP (command) sidewaysdamping (float)
- %status stub
+ %status maybe
 
  Set the sideways damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
@@ -744,34 +745,34 @@ void caosVM::c_SDMP() {
 	caos_assert(sidewaysdamping >= 0.0f); caos_assert(sidewaysdamping <= 1.0f);
 
 	valid_agent(targ);
-	// TODO
+	targ->sdmp = sidewaysdamping;
 }
 
 /**
  SDMP (float)
- %status stub
+ %status maybe
 
  Returns the sideways damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::v_SDMP() {
 	valid_agent(targ);
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(targ->sdmp);
 }
 
 /**
  SPIN (command) angle (float)
- %status stub
+ %status maybe
 
  Set the angle (from 0.0 to 1.0) the target agent is facing.
  TODO: This seems to not affect velocity in original c2e, sometimes. Needs more investigation.
 */
 void caosVM::c_SPIN() {
 	VM_PARAM_FLOAT(angle)
-	caos_assert(angle >= 0.0f); caos_assert(angle <= 1.0f);
+	//caos_assert(angle >= 0.0f); caos_assert(angle <= 1.0f);
 
 	valid_agent(targ);
-	// TODO
+	targ->spin = angle;
 }
 
 /**
@@ -783,12 +784,12 @@ void caosVM::c_SPIN() {
 void caosVM::v_SPIN() {
 	valid_agent(targ);
 
-	result.setFloat(0.0f); // TODO
+	result.setFloat(targ->spin);
 }
 
 /**
  ANGL (float) x (float) y (float)
- %status stub
+ %status maybe
 
  Calculates the angle (from 0.0 to 1.0) between the target agent and the specified coordinates.
  TODO: This seems not to work in original c2e unless there's been an angular calculation on the target agent. Needs more investigation.
@@ -798,13 +799,35 @@ void caosVM::v_ANGL() {
 	VM_PARAM_FLOAT(x)
 
 	valid_agent(targ);
+	float srcx = targ->x + (targ->getWidth() / 2.0f);
+	float srcy = targ->y + (targ->getHeight() / 2.0f);
 
-	result.setFloat(0.0f); // TODO
+	float distx = x - srcx;
+	float disty = y - srcy;
+
+	if (disty == 0) {
+		if (distx > 0) result.setFloat(0.25f);
+		else if (distx < 0) result.setFloat(0.75f);
+		else result.setFloat(0.0f);
+		return;
+	}
+
+	if (disty < 0) {
+		if (distx < 0)
+			result.setFloat(0.75f + atanf(distx / disty) * 0.25f / (M_PI / 2.0f));
+		else
+			result.setFloat(atanf(distx / -disty) * 0.25f / (M_PI / 2.0f));
+	} else {
+		if (distx > 0)
+			result.setFloat(0.25f + atanf(distx / disty) * 0.25f / (M_PI / 2.0f));
+		else
+			result.setFloat(0.5f + atanf(-distx / disty) * 0.25f / (M_PI / 2.0f));
+	}
 }
 
 /**
  ROTN (command) sprites (integer) rotations (integer)
- %status stub
+ %status maybe
 
  Enable automatic sprite adjustments for the current agent, based on the current rotation (SPIN).
  'sprites' specifies the number of sprites for each rotation.
@@ -812,11 +835,13 @@ void caosVM::v_ANGL() {
  The total number of sprites used will be sprites * rotations.
 */
 void caosVM::c_ROTN() {
-	VM_PARAM_INTEGER(rotations)
-	VM_PARAM_INTEGER(sprites)
+	VM_PARAM_INTEGER(rotations) caos_assert(rotations > 0);
+	VM_PARAM_INTEGER(sprites) caos_assert(sprites > 0);
 
 	valid_agent(targ);
-	// TODO
+	// TODO: sanity checking
+	targ->spritesperrotation = sprites;
+	targ->numberrotations = rotations;
 }
 
 /* vim: set noet: */

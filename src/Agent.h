@@ -171,11 +171,19 @@ public:
 
 	// motion
 	caosVar velx, vely;
+
+	float avel, fvel, svel;
+	float admp, fdmp, sdmp;
+	float spin;
+	unsigned int spritesperrotation, numberrotations;
+
 	caosVar accg, aero;
 	unsigned int friction;
 	int perm, elas;
 	caosVar rest;
+
 	float x, y;
+
 	bool falling : 1; // TODO: icky hack, possibly
 
 	caosVar range;
