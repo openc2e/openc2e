@@ -609,6 +609,8 @@ CAOS_LVALUE_TARG_SIMPLE(REST, targ->rest)
 /**
  AVEL (command) angularvelocity (float)
  %status stub
+
+ Set the angular velocity for the target agent.
 */
 void caosVM::c_AVEL() {
 	VM_PARAM_FLOAT(angularvelocity)
@@ -620,6 +622,8 @@ void caosVM::c_AVEL() {
 /**
  AVEL (float)
  %status stub
+
+ Returns the angular velocity for the target agent.
 */
 void caosVM::v_AVEL() {
 	valid_agent(targ);
@@ -630,6 +634,8 @@ void caosVM::v_AVEL() {
 /**
  FVEL (command) forwardvelocity (float)
  %status stub
+
+ Set the forward velocity for the target agent.
 */
 void caosVM::c_FVEL() {
 	VM_PARAM_FLOAT(forwardvelocity)
@@ -641,6 +647,8 @@ void caosVM::c_FVEL() {
 /**
  FVEL (float)
  %status stub
+
+ Returns the forward velocity for the target agent.
 */
 void caosVM::v_FVEL() {
 	valid_agent(targ);
@@ -651,6 +659,8 @@ void caosVM::v_FVEL() {
 /**
  SVEL (command) sidewaysvelocity (float)
  %status stub
+
+ Set the sideways velocity for the target agent.
 */
 void caosVM::c_SVEL() {
 	VM_PARAM_FLOAT(sidewaysvelocity)
@@ -662,6 +672,8 @@ void caosVM::c_SVEL() {
 /**
  SVEL (float)
  %status stub
+
+ Returns the sideways velocity for the target agent.
 */
 void caosVM::v_SVEL() {
 	valid_agent(targ);
@@ -672,6 +684,8 @@ void caosVM::v_SVEL() {
 /**
  ADMP (command) angulardamping (float)
  %status stub
+
+ Set the angular damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::c_ADMP() {
 	VM_PARAM_FLOAT(angulardamping)
@@ -684,6 +698,8 @@ void caosVM::c_ADMP() {
 /**
  ADMP (float)
  %status stub
+
+ Returns the angular damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::v_ADMP() {
 	valid_agent(targ);
@@ -694,6 +710,8 @@ void caosVM::v_ADMP() {
 /**
  FDMP (command) forwarddamping (float)
  %status stub
+
+ Set the forward damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::c_FDMP() {
 	VM_PARAM_FLOAT(forwarddamping)
@@ -706,6 +724,8 @@ void caosVM::c_FDMP() {
 /**
  FDMP (float)
  %status stub
+
+ Returns the forward damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::v_FDMP() {
 	valid_agent(targ);
@@ -716,6 +736,8 @@ void caosVM::v_FDMP() {
 /**
  SDMP (command) sidewaysdamping (float)
  %status stub
+
+ Set the sideways damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::c_SDMP() {
 	VM_PARAM_FLOAT(sidewaysdamping)
@@ -728,6 +750,8 @@ void caosVM::c_SDMP() {
 /**
  SDMP (float)
  %status stub
+
+ Returns the sideways damping (0.0 to 1.0, fraction to damp per tick) for the target agent.
 */
 void caosVM::v_SDMP() {
 	valid_agent(targ);
@@ -738,6 +762,9 @@ void caosVM::v_SDMP() {
 /**
  SPIN (command) angle (float)
  %status stub
+
+ Set the angle (from 0.0 to 1.0) the target agent is facing.
+ TODO: This seems to not affect velocity in original c2e, sometimes. Needs more investigation.
 */
 void caosVM::c_SPIN() {
 	VM_PARAM_FLOAT(angle)
@@ -750,6 +777,8 @@ void caosVM::c_SPIN() {
 /**
  SPIN (float)
  %status stub
+
+ Returns the angle (from 0.0 to 1.0) the target agent is facing.
 */
 void caosVM::v_SPIN() {
 	valid_agent(targ);
@@ -760,6 +789,9 @@ void caosVM::v_SPIN() {
 /**
  ANGL (float) x (float) y (float)
  %status stub
+
+ Calculates the angle (from 0.0 to 1.0) between the target agent and the specified coordinates.
+ TODO: This seems not to work in original c2e unless there's been an angular calculation on the target agent. Needs more investigation.
 */
 void caosVM::v_ANGL() {
 	VM_PARAM_FLOAT(y)
@@ -773,6 +805,11 @@ void caosVM::v_ANGL() {
 /**
  ROTN (command) sprites (integer) rotations (integer)
  %status stub
+
+ Enable automatic sprite adjustments for the current agent, based on the current rotation (SPIN).
+ 'sprites' specifies the number of sprites for each rotation.
+ 'rotations' specifies the number of different angles provided in the sprite file. They should begin facing north and continue clockwise.
+ The total number of sprites used will be sprites * rotations.
 */
 void caosVM::c_ROTN() {
 	VM_PARAM_INTEGER(rotations)
