@@ -30,6 +30,8 @@
 #define BI_BITFIELDS 3
 
 bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
+	buffers = 0;
+	palette = 0;
 	copied_data = false;
 
 	char magic[2];
@@ -103,7 +105,6 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	is_mutable = false;
 
 	bmpdata = in->map + dataoffset;
-	buffers = 0;
 
 	if (biBitCount == 4) {
 		char *srcdata = (char *)bmpdata;
@@ -178,9 +179,10 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 }
 
 bmpImage::~bmpImage() {
-	freeData();
+	if (buffers) freeData();
 
 	if (copied_data) delete[] (char *)bmpdata;
+	if (palette) delete[] palette;
 }
 
 void bmpImage::freeData() {
@@ -191,6 +193,8 @@ void bmpImage::freeData() {
 	delete[] widths;
 	delete[] heights;
 	delete[] buffers;
+
+	buffers = 0;
 }
 
 void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
