@@ -102,8 +102,6 @@ bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 			throw creaturesException(n + " contains BMP data of an unsupported bit depth.");
 	}
 
-	is_mutable = false;
-
 	bmpdata = in->map + dataoffset;
 
 	if (biBitCount == 4) {

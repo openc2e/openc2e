@@ -40,7 +40,6 @@ protected:
 	void **buffers;
 	bool is_565;
 	imageformat imgformat;
-	bool is_mutable;
 	
 	std::ifstream *stream;
 	std::string name;
