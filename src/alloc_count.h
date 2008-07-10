@@ -11,10 +11,15 @@
 // thread-safe, either with a mutex or with atomic operations where supported.
 // If it is not defined, then counts may be inaccurate if objects of a given
 // type are manipulated from multiple threads.
+//
+// Note(2): Your class must not have a custom operator new(), as this code hooks
+// it for heap usage reporting.
 
 #ifndef PROFILE_ALLOCATION_COUNT
 
-#define COUNT_ALLOC(classname)
+// to prevent bugs from occuring only with alloc profiling on, make sure the
+// visibility change still occurs even if we don't do anything else
+#define COUNT_ALLOC(classname) private:
 
 #else
 
