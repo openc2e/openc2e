@@ -6,6 +6,7 @@
 	#define atomic_increment(v) (++(v))
 	#define atomic_decrement(v) (--(v))
 	#define set_if_eq(var, checkval, newval) ( ((var) == (checkval)) ? (var) = (newval), true : false )
+	#define update_max(out, in) do { if ( (out) < (in) ) (out) = (in); } while(0)
 #else
 	#ifdef _WIN32
 
@@ -21,16 +22,18 @@
 		#define set_if_eq(v, checkval, newval) __sync_bool_compare_and_swap(&(v), (checkval), (newval))
 	#endif
 
+	#define update_max(out, in) do { \
+		long _old; \
+		do { \
+			_old = (out); \
+		} while ( _old < (in) && !set_if_eq((out), _old, (in))); \
+	} while (0)
+
 #endif // PROFILE_ALLOCATION_THREAD_SAFE
 
 void AllocationCounter::increment() {
 	long newCount = atomic_increment(curCount);
-
-	long oldMax;
-	do {
-		oldMax = maxCount;
-	} while (oldMax < newCount && !set_if_eq(maxCount, oldMax, newCount));
-
+	update_max(maxCount, newCount);
 	atomic_increment(totalAllocs);
 }
 

@@ -20,6 +20,8 @@
 
 #include <iostream>
 #include <boost/detail/atomic_count.hpp>
+#include <cstdlib>
+#include <string>
 
 class AllocationCounter {
 	protected:
@@ -30,12 +32,10 @@ class AllocationCounter {
 		long curCount, maxCount, totalAllocs;
 		AllocationCounter *next;
 
-		void increment();
-		void decrement();
 		void walk_one(std::ostream &);
 
 	public:
-		virtual const char *getName() const = 0;
+		virtual std::string getName() const = 0;
 		long getCount() const { return curCount; }
 		long getMaxCount() const { return maxCount; }
 		long getTotalAllocs() const { return totalAllocs; }
@@ -49,28 +49,60 @@ class AllocationCounter {
 			curCount = maxCount = totalAllocs = 0;
 		}
 		~AllocationCounter() { }
-		template <class T>
-			friend class AllocationToken;
+		void increment();
+		void decrement();
 };
 
 template<class T>
-class AllocationCounterExt : public AllocationCounter {
+class AllocationCounterMain : public AllocationCounter {
 	protected:
-		const char *getName() const { return T::at__getname(); }
+		std::string getName() const { return std::string(T::at__getname()); }
+};
+
+template<class T>
+class AllocationCounterHeap : public AllocationCounter {
+	protected:
+		std::string getName() const { return std::string(T::at__getname()) + " (heap)"; }
+	public:
+		static AllocationCounterHeap counter;
 };
 
 template<class T>
 class AllocationToken {
 	private:
-		static AllocationCounterExt<T> counter;
+		static AllocationCounterMain<T> counter;
 	public:
 		AllocationToken() { counter.increment(); }
 		~AllocationToken() { counter.decrement(); }
 };
 template <class T>
-AllocationCounterExt<T> AllocationToken<T>::counter;
+AllocationCounterMain<T> AllocationToken<T>::counter;
+template <class T>
+AllocationCounterHeap<T> AllocationCounterHeap<T>::counter;
 
-#define COUNT_ALLOC(classname) AllocationToken<classname> at__; friend class AllocationCounterExt<classname>; static const char *at__getname() { return #classname; }
+#define COUNT_ALLOC(classname) \
+	private: \
+		AllocationToken<classname> at__; \
+		friend class AllocationCounterMain<classname>; \
+		friend class AllocationCounterHeap<classname>; \
+		static const char *at__getname() { return #classname; } \
+	public: \
+		static void *operator new(size_t len) throw (std::bad_alloc) { \
+			void *p = malloc(len); \
+			if (!p) throw std::bad_alloc(); \
+			AllocationCounterHeap<classname>::counter.increment(); \
+			return p; \
+		} \
+		static void operator delete(void *p) throw() { \
+			free(p); \
+			AllocationCounterHeap<classname>::counter.decrement(); \
+		} \
+/* These next two are needed for boost::variant; since we override operator new, we must \
+ * also provide the declarations from <new> below.										 \
+ */																						 \
+		static void *operator new(size_t, void *p) throw() { return p; } \
+		static void operator delete(void *, void *) throw() { } \
+	private:
 
 #endif // PROFILE_ALLOCATION_COUNT
 
