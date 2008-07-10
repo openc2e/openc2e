@@ -46,6 +46,13 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
 
+	avel = 0.0f; fvel = 0.0f; svel = 0.0f;
+	admp = 0.0f; fdmp = 0.0f; sdmp = 0.0f;
+	spin = 0.0f;
+
+	spritesperrotation = 0;
+	numberrotations = 0;
+
 	wasmoved = false;
 
 	if (engine.version == 2) {
@@ -535,6 +542,30 @@ void Agent::physicsTick() {
 	float destx = x + velx.getFloat();
 	float desty = y + vely.getFloat();
 
+	if (rotatable()) {
+		// TODO: the real engine seems to reset velx/vely, so i do that here, but why?
+		velx.setFloat(0.0f); vely.setFloat(0.0f);
+
+		// TODO: which order should these be in?
+
+		// calculate forwards velocity
+		float forward_x = fvel * sinf(spin * (M_PI * 2));
+		float forward_y = fvel * -cosf(spin * (M_PI * 2));
+
+		// calculate sideways velocity
+		// TODO: this sideways velocity code is untested
+		float sideways_x = svel * cosf(spin * (M_PI * 2));
+		float sideways_y = svel * -sinf(spin * (M_PI * 2));
+
+		// set destination based on forward/sideways velocity
+		destx = x + forward_x + sideways_x;
+		desty = y + forward_y + sideways_y;
+
+		// modify spin based on angular velocity
+		spin = fmodf(spin + avel, 1.0f);
+		if (spin < 0.0f) spin += 1.0f;
+	}
+
 	if (sufferphysics()) {
 		// TODO: falling behaviour needs looking at more closely..
 		// .. but it shouldn't be 'false' by default on non-physics agents, so..
@@ -679,6 +710,12 @@ void Agent::physicsTick() {
 		// TODO: aero should be an integer!
 		velx.setFloat(velx.getFloat() - (velx.getFloat() * (aero.getFloat() / 100.0f)));
 		vely.setFloat(vely.getFloat() - (vely.getFloat() * (aero.getFloat() / 100.0f)));
+	}
+
+	if (rotatable()) {
+		avel -= avel * admp;
+		fvel -= fvel * fdmp;
+		svel -= svel * sdmp;
 	}
 }
 
@@ -923,6 +960,17 @@ void Agent::tick() {
 			r->catemp[emitca_index] += emitca_amount;
 			/*if (r->catemp[emitca_index] <= 0.0f) r->catemp[emitca_index] = 0.0f;
 			else if (r->catemp[emitca_index] >= 1.0f) r->catemp[emitca_index] = 1.0f;*/
+		}
+	}
+
+	// TODO: this might be in the wrong place - note that parts are ticked *before* Agent::tick is called
+	if (rotatable() && spritesperrotation != 0 && numberrotations > 1) {
+		SpritePart *p = dynamic_cast<SpritePart *>(part(0));
+		if (p) {
+			// change base according to our SPIN and the ROTN settings
+			unsigned int rotation = 0;
+			rotation = (spin - (0.5f / numberrotations)) * numberrotations; // TODO: verify correctness
+			p->setBase(spritesperrotation * rotation);
 		}
 	}
 
