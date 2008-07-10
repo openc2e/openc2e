@@ -55,6 +55,7 @@ protected:
 	std::vector<caosVM *> vmpool;
 
 public:
+	int vmpool_size() const { return vmpool.size(); }
 	bool quitting, saving, paused;
 	
 	Map map;

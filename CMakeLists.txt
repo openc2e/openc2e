@@ -33,6 +33,7 @@ SET(OPENC2E_CORE
 	src/Agent.cpp
 	src/AgentHelpers.cpp
 	src/AgentRef.cpp
+	src/alloc_count.cpp
 	src/attFile.cpp
 	src/Backend.cpp
 	src/Blackboard.cpp

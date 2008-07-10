@@ -26,6 +26,7 @@
 #include <ostream>
 #include "AgentRef.h"
 #include "caosVar.h"
+#include "alloc_count.h"
 
 #include <boost/variant.hpp>
 #include <boost/weak_ptr.hpp>
@@ -49,6 +50,7 @@ class badParamException : public caosException {
 };
 
 class vmStackItem {
+	COUNT_ALLOC(vmStackItem)
 	protected:
 		struct visit_dump : public boost::static_visitor<std::string> {
 			std::string operator()(const caosVar &i) const {
@@ -154,6 +156,7 @@ class blockCond {
 };
 
 class caosVM {
+	COUNT_ALLOC(caosVM)
 public:	
 	int trace;
 
@@ -476,6 +479,7 @@ public:
 	void v_DBG_STOK();
 	void c_DBG_TSLC();
 	void v_DBG_TSLC();
+	void v_DBG_SIZO();
 
 	// agent
 	void c_NEW_COMP();

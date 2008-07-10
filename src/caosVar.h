@@ -27,6 +27,7 @@
 #include "AgentRef.h"
 #include <typeinfo>
 #include "physics.h"
+#include "alloc_count.h"
 
 class Agent;
 
@@ -45,6 +46,7 @@ enum variableType {
 
 class caosVar {
 	private:
+		COUNT_ALLOC(caosVar)
 		FRIEND_SERIALIZE(caosVar)
 	protected:
 		struct typeVisit : public boost::static_visitor<variableType> {

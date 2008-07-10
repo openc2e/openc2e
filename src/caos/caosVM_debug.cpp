@@ -352,5 +352,28 @@ void caosVM::v_DBG_TSLC() {
 	result.setInt(timeslice);
 }
 
+/**
+DBG: SIZO (string)
+ %status ok
+ %pragma variants all
+
+ Returns a human-readable description of the sizes of various internal data structures
+ */
+void caosVM::v_DBG_SIZO() {
+	std::ostringstream oss;
+#define SIZEOF_OUT(t) do { oss << "sizeof(" #t ") = " << sizeof(t) << std::endl; } while(0)
+	SIZEOF_OUT(caosVM);
+	SIZEOF_OUT(caosVar);
+	SIZEOF_OUT(Agent);
+#undef SIZEOF_OUT
+#ifdef PROFILE_ALLOCATION_COUNT
+	AllocationCounter::walk(oss);
+#else
+	oss << "This build of openc2e does not have allocation profiling enabled." << std::endl;
+#endif
+	oss << "Free caosVMs: " << world.vmpool_size() << std::endl;
+
+	result.setString(oss.str());
+}
 
 /* vim: set noet: */
