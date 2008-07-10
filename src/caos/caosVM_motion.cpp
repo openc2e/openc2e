@@ -778,7 +778,7 @@ void caosVM::c_SPIN() {
 
 /**
  SPIN (float)
- %status stub
+ %status maybe
 
  Returns the angle (from 0.0 to 1.0) the target agent is facing.
 */
