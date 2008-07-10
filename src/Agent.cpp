@@ -42,7 +42,9 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 	setClassifier(f, g, s);
 
 	lastScript = -1;
-	
+
+	x = 0; y = 0; // note that c2e agents are moved in finishInit
+
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
 
