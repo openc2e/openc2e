@@ -357,7 +357,8 @@ DBG: SIZO (string)
  %status ok
  %pragma variants all
 
- Returns a human-readable description of the sizes of various internal data structures
+ Returns a human-readable profile of the sizes and allocation counts of
+ various internal data structures
  */
 void caosVM::v_DBG_SIZO() {
 	std::ostringstream oss;
