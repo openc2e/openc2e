@@ -44,6 +44,7 @@ my $missing_status = 0;
 
 while (<>) {
 	my $file = $ARGV;
+	$file =~ s{.*/}{};
 	
 	unless (m{/\*\*}) {
 		if (m/STUB|TODO/ && defined $prev && !defined $prev->{status}) {
