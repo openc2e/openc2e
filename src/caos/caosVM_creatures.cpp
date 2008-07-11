@@ -1804,6 +1804,34 @@ void caosVM::v_SEEN() {
 	result.setAgent(c->getChosenAgentForCategory(category));
 }
 
+/**
+ DOIN (command) noinstincts (integer)
+ %status stub
+
+ Make the target creature process the specified number of instincts.
+*/
+void caosVM::c_DOIN() {
+	VM_PARAM_INTEGER(noinstincts)
+
+	Creature *c = getTargCreature();
+	caos_assert(c);
+
+	// TODO
+}
+
+/**
+ INS# (integer)
+ %status maybe
+
+ Return the number of unprocessed instincts left in the instinct queue for the target creature.
+*/
+void caosVM::v_INS() {
+	Creature *c = getTargCreature();
+	caos_assert(c);
+
+	result.setInt(c->getNoUnprocessedInstincts());
+}
+
 // clothes
 
 /**
