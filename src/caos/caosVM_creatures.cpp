@@ -1790,15 +1790,18 @@ void caosVM::c_STEP() {
 
 /**
  SEEN (agent) category (integer)
- %status stub
+ %status maybe
 */
 void caosVM::v_SEEN() {
 	VM_PARAM_INTEGER(category)
 
-	c2eCreature *c = getc2eCreature(targ.get());
+	Creature *c = getTargCreature();
 	caos_assert(c);
 
-	result.setAgent(0); // TODO
+	caos_assert(category >= 0);
+	caos_assert((unsigned int)category < c->getNoCategories());
+
+	result.setAgent(c->getChosenAgentForCategory(category));
 }
 
 // clothes
