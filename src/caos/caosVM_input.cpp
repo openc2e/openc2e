@@ -49,7 +49,7 @@ void caosVM::c_CLAC() {
 void caosVM::v_CLAC() {
 	valid_agent(targ);
 
-	if (targ->clik != -1)
+	if (targ->clik == -1)
 		result.setInt(targ->clac[0]);
 	else
 		result.setInt(-2);
