@@ -769,15 +769,16 @@ void caosVM::v_SDMP() {
 */
 void caosVM::c_SPIN() {
 	VM_PARAM_FLOAT(angle)
-	//caos_assert(angle >= 0.0f); caos_assert(angle <= 1.0f);
 
 	valid_agent(targ);
+	angle = fmodf(angle, 1.0f);
+	if (angle < 0.0f) angle += 0.0f;
 	targ->spin = angle;
 }
 
 /**
  SPIN (float)
- %status stub
+ %status maybe
 
  Returns the angle (from 0.0 to 1.0) the target agent is facing.
 */
@@ -829,7 +830,7 @@ void caosVM::v_ANGL() {
  ROTN (command) sprites (integer) rotations (integer)
  %status maybe
 
- Enable automatic sprite adjustments for the current agent, based on the current rotation (SPIN).
+ Enable automatic sprite adjustments for the current agent (by changing the BASE of part 0), based on the current rotation (SPIN).
  'sprites' specifies the number of sprites for each rotation.
  'rotations' specifies the number of different angles provided in the sprite file. They should begin facing north and continue clockwise.
  The total number of sprites used will be sprites * rotations.
