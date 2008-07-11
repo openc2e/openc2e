@@ -175,27 +175,37 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 SpritePart::~SpritePart() {
 }
 
+#include "images/bmpImage.h"
+
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	shared_ptr<creaturesImage> spr = world.gallery.getImage(spritefile);
 	caos_assert(spr);
+	base = 0; // TODO: should we preserve base?
+
+	// TODO: this is a hack for the bmprenderer, is it really a good idea?
+	if (engine.bmprenderer) {
+		bmpImage *origimg = dynamic_cast<bmpImage *>(sprite.get());
+		bmpImage *newimg = dynamic_cast<bmpImage *>(spr.get());
+		if (origimg && newimg && origimg->numframes() > 0) newimg->setBlockSize(origimg->width(0), origimg->height(0));
+	}
+
 	caos_assert(spr->numframes() > fimg);
-	// TODO: should we preserve base/pose here, instead?
-	pose = 0;
-	base = 0;
 	firstimg = fimg;
-	spriteno = fimg;
 	// TODO: should we preserve tint?
+
 	origsprite = sprite = spr;
+
+	setPose(pose); // TODO: we need to preserve pose, but shouldn't we do some sanity checking?
 }
 
 void SpritePart::changeSprite(shared_ptr<creaturesImage> spr) {
 	caos_assert(spr);
-	// TODO: should we preserve base/pose here, instead?
-	pose = 0;
-	base = 0;
-	spriteno = firstimg;
 	// TODO: should we preserve tint?
+	base = 0; // TODO: should we preserve base?
+
 	origsprite = sprite = spr;
+
+	setPose(pose); // TODO: we need to preserve pose, but shouldn't we do some sanity checking?
 }
 
 unsigned int SpritePart::getWidth() {
