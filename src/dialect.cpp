@@ -27,10 +27,7 @@ Dialect::Dialect(const cmdinfo *cmds_, const std::string &n) : cmdcnt(count_cmds
 }
 
 const cmdinfo *Dialect::find_command(const char *name) const {
-	const cmdinfo *ci = find_cmd(cmds, cmdcnt, name);
-	if (!ci)
-		throw parseException(std::string("Command not found: ") + name);
-	return ci;
+	return find_cmd(cmds, cmdcnt, name);
 }
 
 int Dialect::cmd_index(const cmdinfo *ci) const {

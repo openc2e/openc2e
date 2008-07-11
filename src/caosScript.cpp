@@ -355,24 +355,42 @@ void caosScript::parse(std::istream &in) {
 	}
 }
 
-const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix) {
+const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix, bool except) {
+	if (!except && t->type() != TOK_WORD)
+		return NULL;
+
 	std::string fullname = prefix + t->word();
 	errindex = t->index;
 	const cmdinfo *ci = d->find_command(fullname.c_str());
-	// See if there's a subcommand namespace
-	token *t2 = NULL;
-	try {
-		t2 = getToken(TOK_WORD);
-		if (!t2 || t2->type() != TOK_WORD)
-			throw parseException("dummy");
-		return readCommand(t2, fullname + " ");
-	} catch (parseException &e) {
-		if (ci->argtypes && ci->argtypes[0] == CI_SUBCOMMAND)
-			throw;
-		if (t2)
-			putBackToken(t2);
-		return ci;
+
+	if (!ci) {
+		if (!except)
+			return NULL;
+		throw parseException(std::string("Command not found: ") + fullname);
 	}
+
+	// See if there's a subcommand
+	token *t2 = NULL;
+	const cmdinfo *subci = NULL;
+	bool need_subcmd = (ci->argtypes && ci->argtypes[0] == CI_SUBCOMMAND);
+
+	t2 = getToken(ANYTOKEN);
+	if (t2)
+		subci = readCommand(t2, fullname + " ", except && need_subcmd);
+
+	if (subci)
+		return subci;
+
+	// speculative readahead failed, toss back what we have now
+	if (t2)
+		putBackToken(t2);
+
+	if (need_subcmd) {
+		assert(!except); // we should've exceptioned out already if we were going to
+		return NULL;
+	}
+
+	return ci;
 }
 
 void caosScript::emitOp(opcode_t op, int argument) {
