@@ -595,6 +595,7 @@ public:
 	void s_OBJP();
 	void v_XIST();
 	void c_SCLE();
+	void c_STRC();
 	void c_IMGE();
 	void c_TNTW();
 	void c_PRNT();

@@ -1899,6 +1899,24 @@ void caosVM::c_SCLE() {
 	VM_PARAM_INTEGER(scaleby)
 	VM_PARAM_INTEGER(pose)
 
+	valid_agent(targ);
+
+	// TODO
+}
+
+/**
+ STRC (command) width (integer) height (integer) enable (integer)
+ %status stub
+
+ Draw the current agent (or part? don't know) with the given width/height (ie, stretch the sprite). Set enable to 1 to enable, or 0 to disable.
+*/
+void caosVM::c_STRC() {
+	VM_PARAM_INTEGER(enable)
+	VM_PARAM_INTEGER(height)
+	VM_PARAM_INTEGER(width)
+
+	valid_agent(targ);
+
 	// TODO
 }
 
@@ -1948,7 +1966,7 @@ void caosVM::v_TCAR() {
 
 /**
  EDIT (command)
- %status stub
+ %status maybe
  %pragma variants c1 c2
 
  Attach the target agent to the mouse cursor for positioning purposes.
@@ -1961,7 +1979,7 @@ void caosVM::c_EDIT() {
 
 /**
  FRZN (variable)
- %status stub
+ %status maybe
  %pragma variants c2
 */
 void caosVM::v_FRZN() {
