@@ -205,12 +205,13 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 	if (buffers) freeData();
 	m_numframes = 0;
 
+	// Note that the blockwidth/height isn't always a multiple of the image width/height, there can be useless pixels.
 	unsigned int widthinblocks = bmpdata->biWidth / blockwidth;
-	caos_assert(widthinblocks * blockwidth == bmpdata->biWidth);
 	unsigned int heightinblocks = bmpdata->biHeight / blockheight;
-	caos_assert(heightinblocks * blockheight == bmpdata->biHeight);
 
 	m_numframes = widthinblocks * heightinblocks;
+	caos_assert(m_numframes > 0);
+
 	widths = new unsigned short[m_numframes];
 	heights = new unsigned short[m_numframes];
 	buffers = new void *[m_numframes];
