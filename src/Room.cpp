@@ -86,18 +86,22 @@ void Room::postTick() {
 	if (world.carates.find(type.getInt()) == world.carates.end()) return;
 	std::map<unsigned int, cainfo> &rates = world.carates[type.getInt()];
 
+	float diffusion[CA_COUNT];
 	for (unsigned int i = 0; i < CA_COUNT; i++) {
-		if (rates.find(i) == rates.end()) continue;
-		cainfo &info = rates[i];
-
 		ca[i] = catemp[i];
+		if (rates.find(i) == rates.end()) diffusion[i] = 0.0f;
+		else diffusion[i] = rates[i].diffusion;
+	}
 
-		// adjust for diffusion to/from surrounding rooms
-		// TODO: absolutely no clue if this is correct
-		for (std::map<boost::weak_ptr<Room>,RoomDoor *>::iterator d = doors.begin(); d != doors.end(); d++) {
-			shared_ptr<Room> dest = (d->second->first.lock().get() == this) ? d->second->second.lock() : d->second->first.lock();
-			assert(dest);
-			float possiblediffusion = (dest->catemp[i] * info.diffusion * (d->second->perm / 100.0f));
+	// adjust for diffusion to/from surrounding rooms
+	// TODO: absolutely no clue if this is correct
+	for (std::map<boost::weak_ptr<Room>,RoomDoor *>::iterator d = doors.begin(); d != doors.end(); d++) {
+		shared_ptr<Room> dest = d->second->first.lock();
+		if (dest.get() == this) dest = d->second->second.lock();
+		assert(dest);
+
+		for (unsigned int i = 0; i < CA_COUNT; i++) {
+			float possiblediffusion = dest->catemp[i] * diffusion[i] * (d->second->perm / 100.0f);
 			if (possiblediffusion > 1.0f) possiblediffusion = 1.0f;
 			if (possiblediffusion > ca[i])
 				ca[i] = possiblediffusion;

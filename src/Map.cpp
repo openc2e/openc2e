@@ -22,6 +22,7 @@
 #include "Room.h"
 #include "MetaRoom.h"
 #include <iostream>
+#include "Engine.h"
 
 void Map::Reset() {
 	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
@@ -71,6 +72,8 @@ unsigned int Map::getRoomCount() {
 }
 
 void Map::tick() {
+	if (engine.version < 3) return; // TODO: tick rooms in C2
+
 	// Three passes..
 	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
 		for (std::vector<shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
