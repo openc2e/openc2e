@@ -624,6 +624,7 @@ void caosVM::c_ANMS() {
 				int n = atoi(t.c_str());
 				caos_assert(n >= 0 && n < 256);
 				animation.push_back(n);
+				t.clear();
 			}
 		} else
 			t = t + poselist[i];
