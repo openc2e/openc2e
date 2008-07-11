@@ -788,12 +788,17 @@ void caosVM::v_CATX() {
 /**
  CATO (command) category_id (integer)
  %status maybe
+
+ Sets the agent category of the TARG agent. If the specified category is -1, sets the category based on the family/genus/species of the agent (see CATI).
 */
 void caosVM::c_CATO() {
 	VM_PARAM_INTEGER(category_id)
 
 	valid_agent(targ);
-	targ->category = category_id;
+	if (category_id == -1)
+		targ->category = world.findCategory(targ->family, targ->genus, targ->species);
+	else
+		targ->category = category_id;
 }
 
 /**
