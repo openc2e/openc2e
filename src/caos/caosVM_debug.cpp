@@ -366,13 +366,16 @@ void caosVM::v_DBG_SIZO() {
 	SIZEOF_OUT(caosVM);
 	SIZEOF_OUT(caosVar);
 	SIZEOF_OUT(Agent);
-#undef SIZEOF_OUT
+	SIZEOF_OUT(std::string);
+	SIZEOF_OUT(AgentRef);
+	SIZEOF_OUT(Vector<float>);
 #ifdef PROFILE_ALLOCATION_COUNT
 	AllocationCounter::walk(oss);
 #else
 	oss << "This build of openc2e does not have allocation profiling enabled." << std::endl;
 #endif
-	oss << "Free caosVMs: " << world.vmpool_size() << std::endl;
+	oss << "caosVMs in pool: " << world.vmpool_size() << std::endl;
+#undef SIZEOF_OUT
 
 	result.setString(oss.str());
 }
