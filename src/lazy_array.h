@@ -27,7 +27,7 @@
 #include "boost/type_traits/alignment_of.hpp"
 
 template<class T>
-class null_init_helper
+struct null_init_helper
 {
 	static inline void init(T &) { }
 };
@@ -47,7 +47,7 @@ class lazy_array
 			init_helper::init(*p);
 		}
 		inline void destruct(T *p) {
-			operator delete((void *)p, p);
+			p->~T();
 		}
 	public:
 		void ensure(int sz) {
