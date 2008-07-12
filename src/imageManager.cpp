@@ -133,6 +133,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	mmapifstream *in = new mmapifstream();
 	shared_ptr<creaturesImage> img;
 
+	// TODO: try/catch to free the mmapifstream
 	bool successful = true;
 	if (engine.bmprenderer) {
 		successful = tryOpen(in, img, name + ".bmp", bmp, is_background);
@@ -155,6 +156,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 			images[name] = img;
 	} else {
 		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
+		delete in;
 		return shared_ptr<creaturesImage>();
 	}
 
