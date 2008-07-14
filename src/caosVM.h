@@ -27,6 +27,7 @@
 #include "AgentRef.h"
 #include "caosVar.h"
 #include "alloc_count.h"
+#include "lazy_array.h"
 
 #include <boost/variant.hpp>
 #include <boost/weak_ptr.hpp>
@@ -155,6 +156,11 @@ class blockCond {
 		virtual ~blockCond() {}
 };
 
+// for lazy_array init
+struct caosVM_var_init {
+	static inline void init(caosVar &v) { v = 0; }
+};
+
 class caosVM {
 	COUNT_ALLOC(caosVM)
 public:	
@@ -184,7 +190,7 @@ public:
 	std::ostream *outputstream;
 
 	// ...which includes variables accessible to script
-	caosVar var[100]; // might want to make this a map, for memory efficiency
+	lazy_array<caosVar, 100, caosVM_var_init> var;
 	caosVar _p_[2]; // might want to add this onto the end of above map, if done
 	AgentRef targ, owner, _it_;
 	caosVar from;

@@ -72,6 +72,8 @@ script::script(const Dialect *v, const std::string &fn)
 	// advance past reserved index 0
 	ops.push_back(caosOp(CAOS_NOP, 0, -1));
 	relocations.push_back(0);
+	memset(varRemap, 0xFF, 100);
+	varUsed = 0;
 	linked = false;
 }
 	
@@ -82,6 +84,8 @@ script::script(const Dialect *v, const std::string &fn,
 {
 	ops.push_back(caosOp(CAOS_NOP, 0, -1));
 	relocations.push_back(0);
+	memset(varRemap, 0xFF, 100);
+	varUsed = 0;
 	linked = false;
 }
 
@@ -448,6 +452,8 @@ boost::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype)
 			||	!strncmp(t->word().c_str(), "ov", 2)
 			||	!strncmp(t->word().c_str(), "mv", 2)) {
 			int idx = atoi(t->word().c_str() + 2);
+			if (!strncmp(t->word().c_str(), "va", 2))
+				idx = current->mapVAxx(idx);
 			t->payload = t->word().substr(0, 2) + "xx";
 			const cmdinfo *op = readCommand(t, std::string("expr "));
 			t->payload = oldpayload;
@@ -464,6 +470,8 @@ boost::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype)
 		if (	!strncmp(t->word().c_str(), "obv", 3)
 			||	!strncmp(t->word().c_str(), "var", 3)) {
 			int idx = atoi(t->word().c_str() + 3);
+			if (!strncmp(t->word().c_str(), "var", 3))
+				idx = current->mapVAxx(idx);
 			t->payload = t->word().substr(0, 3) + "x";
 			const cmdinfo *op = readCommand(t, std::string("expr "));
 			t->payload = oldpayload;
@@ -766,4 +774,14 @@ void CAOSExpression::save(caosScript *scr) const {
 int CAOSExpression::cost() const {
 	return boost::apply_visitor(costVisit(), value);
 }
+
+int script::mapVAxx(int index) {
+	assert(index >= 0 && index < 100);
+	if (varRemap[index] != 0xFF) {
+		assert(varRemap[index] < 100);
+		return varRemap[index];
+	}
+	return (varRemap[index] = varUsed++);
+}
+
 /* vim: set noet: */

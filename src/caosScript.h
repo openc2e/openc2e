@@ -59,7 +59,13 @@ struct script {
 		std::vector<int> relocations;
 		// map of name -> (address|relocation)
 		std::map<std::string, int> labels;
-		script() {}
+		script() {
+			memset(varRemap, 0xFF, 100);
+			varUsed = 0;
+			linked = false;
+		}
+		// remapping array for VAxx
+		unsigned char varRemap[100], varUsed;
 	public:
 		// ops[0] is initted to a nop, as address 0 is reserved for a flag value
 		// in the relocation vector
@@ -74,7 +80,6 @@ struct script {
 		// a normalized copy of the script source. this is used for error tracing
 		shared_str code;
 		shared_ptr<std::vector<toktrace> > tokinfo;
-
 	public:
 		int fmly, gnus, spcs, scrp;
 		const class Dialect *dialect;
@@ -168,6 +173,8 @@ struct script {
 
 		void emitOp(opcode_t op, int argument);
 		
+		int mapVAxx(int index);	
+		int varsNeeded() const { return varUsed; }
 };
 
 // parser tree

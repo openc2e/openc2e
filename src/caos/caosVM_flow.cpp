@@ -401,12 +401,19 @@ void caosVM::v_CAOS() {
 	VM_PARAM_INTEGER(state_trans)
 	VM_PARAM_INTEGER(inl)
 	
+	std::istringstream iss(commands);
+	caosScript s("c3", "CAOS command"); // XXX: variant
+	s.parse(iss);
+
 	caosVM *sub = world.getVM(NULL);
 	sub->resetCore();
 	
 	if (inl) {
+		var.ensure(100);
+		sub->var.ensure(100);
+		// Inline CAOS calls are expensive, mmmkay?
 		for (int i = 0; i < 100; i++)
-			sub->var[i] = var[i];
+			sub->var[s.installer->mapVAxx(i)] = var[currentscript->mapVAxx(i)];
 		sub->targ = targ;
 		sub->_it_ = _it_;
 		sub->part = part;
@@ -423,10 +430,7 @@ void caosVM::v_CAOS() {
 	sub->_p_[1] = p2;
 
 	try {
-		std::istringstream iss(commands);
 		std::ostringstream oss;
-		caosScript s("c3", "CAOS command"); // XXX: variant
-		s.parse(iss);
 		s.installScripts();
 		sub->outputstream = &oss;
 		sub->runEntirely(s.installer);
