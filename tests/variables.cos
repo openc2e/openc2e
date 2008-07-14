@@ -1,8 +1,8 @@
 * unit tests for variables
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: variables: 8 tests"
-DBG: OUTS "1..8"
+DBG: OUTS "# TEST: variables: 9 tests"
+DBG: OUTS "1..9"
 
 * test setv
 SETV VA00 1
@@ -75,3 +75,11 @@ DOIF VA00 eq VA01
 ELSE
  DBG: OUTS "not ok 8"
 ENDI
+
+* test if variables are zero by default
+DOIF VA99 eq 0
+ DBG: OUTS "ok 9"
+ELSE
+ DBG: OUTS "not ok 9"
+ENDI
+
