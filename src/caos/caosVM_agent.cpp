@@ -1564,7 +1564,7 @@ void caosVM::c_TINO() {
 
 /**
  DROP (command)
- %status stub
+ %status maybe
  %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
@@ -1573,7 +1573,10 @@ void caosVM::c_TINO() {
 void caosVM::c_DROP() {
 	valid_agent(targ);
 
-	// TODO
+	// TODO: what exactly are we meant to do here? firing the script directly is perhaps not right, but drops must be instant
+	if (targ->carrying) // TODO: valid?
+		targ->carrying->fireScript(5, targ, caosVar(), caosVar());
+
 	// TODO: only creatures in c1 (and c2?)
 }
 
