@@ -202,7 +202,7 @@ void World::tick() {
 	if (quitting) {
 		// due to destruction ordering we must explicitly destroy all agents here
 		agents.clear();
-		exit(0);
+		engine.done = true;
 	}
 
 	// Notify the audio backend about our current viewpoint center.
