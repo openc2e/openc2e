@@ -45,6 +45,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 
 	x = 0; y = 0; // note that c2e agents are moved in finishInit
 
+	has_custom_core_size = false;
+
 	velx.setFloat(0.0f);
 	vely.setFloat(0.0f);
 
@@ -435,10 +437,13 @@ void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
 }
 
 Point const Agent::boundingBoxPoint(unsigned int n) {
-	return boundingBoxPoint(n, Point(x, y), getWidth(), getHeight());
+	if (has_custom_core_size)
+		return boundingBoxPoint(n, Point(x + custom_core_xleft, y + custom_core_ytop), custom_core_xright - custom_core_xleft, custom_core_ybottom - custom_core_ytop);
+	else
+		return boundingBoxPoint(n, Point(x, y), getWidth(), getHeight());
 }
 
-Point const Agent::boundingBoxPoint(unsigned int n, Point in, unsigned int w, unsigned int h) {
+Point const Agent::boundingBoxPoint(unsigned int n, Point in, float w, float h) {
 	Point p;
 	
 	switch (n) {
@@ -475,10 +480,13 @@ bool Agent::validInRoomSystem() {
 	// TODO: c1
 	if (engine.version == 1) return true;
 
-	return validInRoomSystem(Point(x, y), getWidth(), getHeight(), perm);
+	if (has_custom_core_size)
+		return validInRoomSystem(Point(x + custom_core_xleft, y + custom_core_ytop), custom_core_xright - custom_core_xleft, custom_core_ybottom - custom_core_ytop, perm);
+	else
+		return validInRoomSystem(Point(x, y), getWidth(), getHeight(), perm);
 }
 
-bool Agent::validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm) {
+bool Agent::validInRoomSystem(Point p, float w, float h, int testperm) {
 	// Return true if this agent is inside the world room system at the specified point, or false if it isn't.
 	MetaRoom *m = world.map.metaRoomAt(p.x, p.y);
 	if (!m) return false;
@@ -1367,6 +1375,8 @@ bool Agent::tryMoveToPlaceAround(float x, float y) {
 		moveTo(x, y);
 		return true;
 	}
+
+	// TODO: fix for has_custom_core_size case
 
 	// second hacky attempt, move from side to side (+/- width) and up (- height) a little
 	unsigned int trywidth = getWidth() * 2; if (trywidth < 100) trywidth = 100;

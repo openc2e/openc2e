@@ -184,6 +184,10 @@ public:
 
 	float x, y;
 
+	bool has_custom_core_size;
+	float custom_core_xleft, custom_core_xright;
+	float custom_core_ytop, custom_core_ybottom;
+
 	bool falling : 1; // TODO: icky hack, possibly
 
 	caosVar range;
@@ -231,12 +235,12 @@ public:
 	unsigned int getWidth() { return part(0)->getWidth(); }
 	unsigned int getHeight() { return part(0)->getHeight(); }
 	Point const boundingBoxPoint(unsigned int n);
-	Point const boundingBoxPoint(unsigned int n, Point p, unsigned int w, unsigned int h);
+	Point const boundingBoxPoint(unsigned int n, Point p, float w, float h);
 	shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, class MetaRoom *m, shared_ptr<Room> exclude);
 	void findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
 
 	bool validInRoomSystem();
-	bool validInRoomSystem(Point p, unsigned int w, unsigned int h, int testperm);
+	bool validInRoomSystem(Point p, float w, float h, int testperm);
 
 	virtual void tick();
 	virtual void kill();
