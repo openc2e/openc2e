@@ -89,6 +89,7 @@ void Vehicle::drop(AgentRef passenger) {
 	passengers.erase(i);
 
 	passenger->beDropped();
+	assert(passenger->invehicle != AgentRef(this));
 
 	if (engine.version >= 3)
 		passenger->queueScript(122, this); // Vehicle Drop, TODO: is this valid call?
