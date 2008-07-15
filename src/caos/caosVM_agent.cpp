@@ -423,7 +423,17 @@ void caosVM::c_ATTR() {
 
  Attributes of the TARG agent.
 */
-CAOS_LVALUE_TARG_SIMPLE(ATTR, targ->attr);
+void caosVM::v_ATTR() {
+	valid_agent(targ);
+	result.setInt(targ->getAttributes());
+}
+void caosVM::s_ATTR() {
+	VM_PARAM_VALUE(newvalue)
+	caos_assert(newvalue.hasInt());
+
+	valid_agent(targ);
+	targ->setAttributes(newvalue.getInt());
+}
 
 /**
  TICK (command) tickrate (integer)

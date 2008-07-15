@@ -36,7 +36,7 @@ void Agent::core_init() {
 }
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  vm(0), zorder(p), timerrate(0), visible(true) {
+  vm(0), zorder(p), timerrate(0), attr(0), visible(true) {
 	core_init();
 
 	setClassifier(f, g, s);

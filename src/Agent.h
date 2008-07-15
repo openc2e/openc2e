@@ -120,26 +120,26 @@ public:
 	}
 	
 	// attr
-	caosVar attr;
+	unsigned int attr;
 	// values which are always the same
-	bool carryable() { return attr.getInt() & 1; }
-	bool mouseable() { return attr.getInt() & 2; }
-	bool activateable() { return attr.getInt() & 4; }
-	bool greedycabin() { return attr.getInt() & 8; }
-	bool invisible() { return attr.getInt() & 16; }
-	bool floatable() { return attr.getInt() & 32; }
+	bool carryable() { return attr & 1; }
+	bool mouseable() { return attr & 2; }
+	bool activateable() { return attr & 4; }
+	bool greedycabin() { return attr & 8; }
+	bool invisible() { return attr & 16; }
+	bool floatable() { return attr & 32; }
 	// version-specific values
 	// C1
-	bool groundbound() { return attr.getInt() & 64; }
-	bool roombound() { return attr.getInt() & 128; }
+	bool groundbound() { return attr & 64; }
+	bool roombound() { return attr & 128; }
 	// C2 and c2e
-	bool suffercollisions() { return attr.getInt() & 64; }
-	bool sufferphysics() { return attr.getInt() & 128; }
+	bool suffercollisions() { return attr & 64; }
+	bool sufferphysics() { return attr & 128; }
 	// c2e
-	bool camerashy() { return attr.getInt() & 256; }
-	bool openaircabin() { return attr.getInt() & 512; }
-	bool rotatable() { return attr.getInt() & 1024; }
-	bool presence() { return attr.getInt() & 2048; }
+	bool camerashy() { return attr & 256; }
+	bool openaircabin() { return attr & 512; }
+	bool rotatable() { return attr & 1024; }
+	bool presence() { return attr & 2048; }
 
 	// bhvr
 	bool cr_can_push : 1;
@@ -254,8 +254,8 @@ public:
 	int getUNID() const;
 	std::string identify() const;
 
-	void setAttributes(unsigned int a) { attr.setInt(a); }
-	unsigned int getAttributes() const { return attr.getInt(); }
+	void setAttributes(unsigned int a) { attr = a; }
+	unsigned int getAttributes() const { return attr; }
 
 	void playAudio(std::string filename, bool controlled, bool loop);
 

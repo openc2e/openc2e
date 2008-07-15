@@ -32,8 +32,6 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MA
 	handle_events = true;
 	holdingWire = 0;
 	wireOriginID = 0;
-	// TODO: verify attributes on the pointer in c2e
-	attr.setInt(256); // camera shy
 
 	hotspotx = 0;
 	hotspoty = 0;
@@ -43,7 +41,8 @@ void PointerAgent::finishInit() {
 	Agent::finishInit();
 
 	// float relative to main camera
-	attr.setInt(attr.getInt() & 32);
+	// TODO: this seems hard-coded in DS (pointer attr is 0)
+	attr = attr & 32;
 	floatSetup();
 }
 
