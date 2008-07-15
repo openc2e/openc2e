@@ -26,6 +26,8 @@
 Camera::Camera() {
 	metaroom = 0;
 	panning = false;
+	x = 0;
+	y = 0;
 }
 
 MetaRoom * Camera::getMetaRoom() const {

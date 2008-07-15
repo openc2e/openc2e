@@ -75,6 +75,7 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
+	if (palette) delete[] palette;
 }
 
 void Engine::addPossibleBackend(std::string s, boost::shared_ptr<Backend> b) {
