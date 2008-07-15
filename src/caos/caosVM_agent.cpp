@@ -1657,7 +1657,7 @@ void caosVM::v_TCOR() {
 
 /**
  CORE (command) topy (float) bottomy (float) leftx (float) rightx (float)
- %status stub
+ %status maybe
 */
 void caosVM::c_CORE() {
 	VM_PARAM_FLOAT(rightx)
@@ -1665,7 +1665,13 @@ void caosVM::c_CORE() {
 	VM_PARAM_FLOAT(bottomy)
 	VM_PARAM_FLOAT(topy)
 
-	// TODO
+	valid_agent(targ);
+
+	targ->has_custom_core_size = true;
+	targ->custom_core_xleft = leftx;
+	targ->custom_core_xright = rightx;
+	targ->custom_core_ytop = topy;
+	targ->custom_core_ybottom = bottomy;
 }
 
 /**
