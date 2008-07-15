@@ -1022,7 +1022,7 @@ void SFCCompoundObject::copyToWorld() {
 		a->thrt.setInt(threat);
 		a->range.setInt(range);
 		a->accg.setInt(accg);
-		a->grav.setInt(gravdata == 0xFFFFFFFF ? 0 : 1); // TODO
+		a->falling = (gravdata == 0xFFFFFFFF ? false : true); // TODO
 		a->velx.setInt(velx);
 		a->vely.setInt(vely);
 		a->rest.setInt(rest);
@@ -1099,7 +1099,7 @@ void SFCSimpleObject::copyToWorld() {
 		a->thrt.setInt(threat);
 		a->range.setInt(range);
 		a->accg.setInt(accg);
-		a->grav.setInt(gravdata == 0xFFFFFFFF ? 0 : 1); // TODO
+		a->falling = (gravdata == 0xFFFFFFFF ? false : true); // TODO
 		a->velx.setInt(velx);
 		a->vely.setInt(vely);
 		a->rest.setInt(rest);

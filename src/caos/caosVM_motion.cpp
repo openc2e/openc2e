@@ -102,9 +102,11 @@ void caosVM::v_VELX() {
 void caosVM::s_VELX() {
 	VM_PARAM_VALUE(newvalue)
 	caos_assert(newvalue.hasDecimal());
-	
+
 	valid_agent(targ);	
 	targ->velx = newvalue;
+
+	targ->falling = true;
 }
 
 /**
@@ -125,8 +127,7 @@ void caosVM::s_VELY() {
 	valid_agent(targ);	
 	targ->vely = newvalue;
 
-	// a whole bunch of Creatures 2 scripts/COBs depend on this ('setv vely 0' to activate gravity)
-	if (engine.version == 2) targ->grav.setInt(1);
+	targ->falling = true;
 }
 
 /**
@@ -284,6 +285,8 @@ void caosVM::c_ACCG() {
 
 	valid_agent(targ);
 	targ->accg = accel;
+
+	targ->falling = true;
 }
 
 /**
@@ -430,6 +433,8 @@ void caosVM::c_VELO() {
 	targ->velx.setFloat(velx);
 	targ->vely.reset();
 	targ->vely.setFloat(vely);
+
+	targ->falling = true;
 }
 
 /**

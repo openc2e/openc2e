@@ -545,6 +545,8 @@ void Agent::physicsTick() {
 		return;
 	}
 
+	if (!falling) return; // TODO: there are probably all sorts of issues here, untested
+
 	if (!wasmoved) return; // some agents are created outside INST and get autokilled if we try physics on them before they move
 
 	if (invehicle) return; // TODO: c2e verhicle physics
@@ -580,7 +582,7 @@ void Agent::physicsTick() {
 	if (sufferphysics()) {
 		// TODO: falling behaviour needs looking at more closely..
 		// .. but it shouldn't be 'false' by default on non-physics agents, so..
-		falling = false;
+		//falling = false;
 		// increase speed according to accg
 		// TODO: should we be changing vely first, instead of after a successful move (below)?
 		desty += accg.getFloat();
@@ -620,6 +622,7 @@ void Agent::physicsTick() {
 					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % srcx % srcy), false);
 				}
 				displaycore = true;
+				falling = false;
 				return; // out of room system
 			}
 			
@@ -705,10 +708,14 @@ void Agent::physicsTick() {
 				} else				
 					vely.setFloat(0);
 			} else if (sufferphysics() && accg != 0) {
-				falling = true; // TODO: icky
 				vely.setFloat(vely.getFloat() + accg.getFloat());
 			}
-		} else { velx.setFloat(0); vely.setFloat(0); } // TODO: correct?
+		} else {
+			// TODO: correct?
+			if (sufferphysics()) falling = false;
+			velx.setFloat(0);
+			vely.setFloat(0);
+		}
 	} else {
 		if (vely.hasDecimal() || velx.hasDecimal())
 			moveTo(destx, desty);
@@ -775,7 +782,7 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 	if (!room) { // out of room system
 		if (!displaycore)
 			unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
-		grav.setInt(0);
+		falling = false;
 		displaycore = true;
 		return;
 	}
@@ -876,18 +883,18 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 void Agent::physicsTickC2() {
 	int dx = velx.getInt(), dy = vely.getInt();
 
-	if (dx != 0 || dy != 0) grav.setInt(1);
+	if (dx != 0 || dy != 0) falling = true;
 
-	if (grav.getInt() != 0 && sufferphysics()) {
+	if (falling && sufferphysics()) {
 		dy += accg.getInt();
 	}
 
-	grav.setInt(1);
+	falling = true;
 
 	if (dy == 0 && dx == 0) { // nothing to do
 		if (vely.getInt() == 0) {
 			// really no motion
-			grav.setInt(0);
+			falling = false;
 		} else {
 			// y motion cancelled by gravity
 			vely.setInt(dy);
@@ -906,7 +913,7 @@ void Agent::physicsTickC2() {
 		if (!m) {
 			if (!displaycore)
 				unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % x % y), false);
-			grav.setInt(0);
+			falling = false;
 			displaycore = true;
 			return;
 		}
@@ -928,7 +935,7 @@ void Agent::physicsTickC2() {
 		queueScript(6, 0);	
 	}
 	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
-		grav.setInt(0);
+		falling = false;
 		velx.setInt(0);
 		vely.setInt(0);
 	} else {
@@ -1232,9 +1239,8 @@ bool Agent::beDropped() {
 	// TODO: this doesn't reorder children or anything..
 	setZOrder(zorder);
 
-	// TODO: no idea if this is right, it tries to re-enable gravity when dropping C2 agents
-	if (engine.version == 2) grav.setInt(1);
-	if (engine.version == 3) falling = true;
+	// TODO: no idea if this is right, it tries to re-enable gravity when dropping agents
+	falling = true;
 
 	/* if our carrying agent was in a vehicle, we stay in the vehicle */
 	if (wascarriedby && wascarriedby->invehicle) {

@@ -475,8 +475,7 @@ void SkeletalCreature::snapDownFoot() {
 	if (engine.version > 1) {
 		// TODO: hilar hack: enable gravity if we're snapping by much
 		if (newroomchosen && abs(y - (newy - (footy - y))) > 20) {
-			if (engine.version == 2) grav.setInt(1);
-			else falling = true;
+			falling = true;
 			return;
 		}
 	}
@@ -490,7 +489,7 @@ void SkeletalCreature::snapDownFoot() {
 		if (engine.version == 2 && !belowfloor && downfootroom->floorpoints.size()) {
 			// TODO: hilar hack: same as above for floorvalue
 			if (size.getInt() <= downfootroom->floorvalue.getInt()) {
-				grav.setInt(1);
+				falling = true;
 				return;
 			}
 		} else {
@@ -499,8 +498,7 @@ void SkeletalCreature::snapDownFoot() {
 			if (downfootroom->doors.find(downroom) != downfootroom->doors.end()) {
 				int permsize = (engine.version == 2 ? size.getInt() : perm);
 				if (permsize <= downfootroom->doors[downroom]->perm) {
-					if (engine.version == 2) grav.setInt(1);
-					else falling = true;
+					falling = true;
 					return;
 				}
 			}
@@ -652,7 +650,7 @@ void SkeletalCreature::tick() {
 	}
 
 	// TODO: this kinda duplicates what physicsTick is doing below
-	if ((engine.version == 1 || (engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling)) && !carriedby && !invehicle)
+	if ((engine.version == 1 || !falling) && !carriedby && !invehicle)
 		snapDownFoot();
 	else
 		downfootroom.reset();
@@ -662,7 +660,7 @@ void SkeletalCreature::physicsTick() {
 	// TODO: mmh
 
 	if (engine.version > 1) {
-		if ((engine.version == 3 && falling) || (engine.version == 2 && grav.getInt() == 1)) {
+		if (falling) {
 			if (engine.version == 2 || validInRoomSystem()) {
 				Agent::physicsTick();
 			}
@@ -670,7 +668,7 @@ void SkeletalCreature::physicsTick() {
 	}
 
 	if (!carriedby && !invehicle) {
-		if (engine.version == 1 || (engine.version == 2 && grav.getInt() == 0) || (engine.version == 3 && !falling))
+		if (engine.version == 1 || (!falling))
 			snapDownFoot();
 		else downfootroom.reset();
 	} else downfootroom.reset();	

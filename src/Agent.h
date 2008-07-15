@@ -198,8 +198,8 @@ public:
 	caosVar objp, babymoniker;
 
 	// Creatures 2
-	// TODO: size/grav likely duplicates of perm/falling
-	caosVar actv, thrt, size, grav;
+	// TODO: size likely duplicate of perm
+	caosVar actv, thrt, size;
 
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();

@@ -1719,11 +1719,20 @@ CAOS_LVALUE_TARG_SIMPLE(SIZE, targ->size);
 
 /**
  GRAV (variable)
- %status stub
+ %status maybe
  %pragma variants c2
 */
-	// TODO: stub because this likely == falling
-CAOS_LVALUE_TARG_SIMPLE(GRAV, targ->grav);
+void caosVM::v_GRAV() {
+	valid_agent(targ);
+	result.setInt(targ->falling);
+}
+void caosVM::s_GRAV() {
+	VM_PARAM_VALUE(newvalue)
+	caos_assert(newvalue.hasInt());
+
+	valid_agent(targ);
+	targ->falling = newvalue.getInt();
+}
 
 /**
  SETV CLS2 (command) family (integer) genus (integer) species (integer)
