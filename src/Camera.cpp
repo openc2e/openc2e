@@ -50,13 +50,19 @@ void Camera::moveTo(int _x, int _y, panstyle pan) {
 	x = _x;
 	y = _y;
 
-	MetaRoom *m = world.map.metaRoomAt(x, y);
-	if (m)
-		metaroom = m->id;
-	
 	// TODO: panning
 	
 	checkBounds();
+}
+
+void Camera::moveToGlobal(int _x, int _y, panstyle pan) {
+	MetaRoom *m = world.map.metaRoomAt(x, y);
+	if (m) {
+		if (m->id != metaroom) pan = jump; // inter-metaroom panning is always jump
+		metaroom = m->id;
+	}
+
+	moveTo(_x, _y, pan);
 }
 
 void MainCamera::moveTo(int _x, int _y, panstyle pan) {

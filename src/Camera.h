@@ -53,6 +53,7 @@ public:
 	void goToMetaRoom(unsigned int m);
 	void goToMetaRoom(unsigned int m, int x, int y, cameratransition transition);
 	virtual void moveTo(int _x, int _y, panstyle pan = jump);
+	void moveToGlobal(int _x, int _y, panstyle pan = jump);
 	void trackAgent(AgentRef a, int xp, int yp, trackstyle s, cameratransition transition);
 	AgentRef trackedAgent() { return trackedagent; }
 	void checkBounds();

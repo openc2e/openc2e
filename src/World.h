@@ -22,7 +22,6 @@
 
 #include "Map.h"
 #include "Scriptorium.h"
-#include "Camera.h"
 #include "Agent.h"
 #include "CompoundPart.h"
 #include "prayManager.h"
@@ -79,7 +78,7 @@ public:
 	unsigned int ticktime, tickcount;
 	unsigned int worldtickcount;
 	unsigned int timeofday, dayofseason, season, year;
-	MainCamera camera;
+	class MainCamera *camera;
 	bool showrooms, autokill, autostop;
 
 	std::vector<unsigned int> groundlevels;
@@ -121,7 +120,7 @@ public:
 	
 	void tick();
 	void drawWorld();
-	void drawWorld(Camera *cam, Surface *surface);
+	void drawWorld(class Camera *cam, Surface *surface);
 
 	int newUNID(Agent *whofor);
 	void setUNID(Agent *whofor, int unid);

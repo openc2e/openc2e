@@ -22,30 +22,31 @@
 #include "CompoundAgent.h"
 #include "CameraPart.h"
 #include "MetaRoom.h"
+#include "Camera.h"
 
 Camera *caosVM::getCamera() {
 	Camera *c = camera.lock().get();
-	if (!c) c = &world.camera;
+	if (!c) c = world.camera;
 	return c;
 }
 
 bool agentOnCamera(Agent *targ, bool checkall) {
 	MetaRoom *m = world.map.metaRoomAt(targ->x, targ->y);
-	if (!m || m != world.camera.getMetaRoom()) return false;
+	if (!m || m != world.camera->getMetaRoom()) return false;
 
 	// TODO: check non-main cameras?
 	// TODO: do compound parts stick out of the agent?
 
 	// y coordinates don't wrap
-	if (targ->y + targ->getHeight() < world.camera.getY()) return false;
-	if (targ->y > world.camera.getY() + world.camera.getHeight()) return false;
+	if (targ->y + targ->getHeight() < world.camera->getY()) return false;
+	if (targ->y > world.camera->getY() + world.camera->getHeight()) return false;
 	
 	// if an agent is off-camera to the right, it's not visible
-	if (targ->x > world.camera.getX() + world.camera.getWidth()) return false;
+	if (targ->x > world.camera->getX() + world.camera->getWidth()) return false;
 
-	if (targ->x + targ->getWidth() < world.camera.getX()) {
+	if (targ->x + targ->getWidth() < world.camera->getX()) {
 		// if an agent is off-camera to the left, it might be wrapping
-		if (!m->wraparound() || (targ->x + targ->getWidth() + m->width() < world.camera.getX()))
+		if (!m->wraparound() || (targ->x + targ->getWidth() + m->width() < world.camera->getX()))
 			return false;
 	}
 
@@ -164,7 +165,7 @@ void caosVM::c_CMRA() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	
-	getCamera()->moveTo(x, y, (panstyle)pan);
+	getCamera()->moveToGlobal(x, y, (panstyle)pan);
 }
 
 /**
@@ -182,7 +183,7 @@ void caosVM::c_CMRP() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	
-	getCamera()->moveTo(x - (getCamera()->getWidth() / 2), y - (getCamera()->getHeight() / 2), (panstyle)pan);
+	getCamera()->moveToGlobal(x - (getCamera()->getWidth() / 2), y - (getCamera()->getHeight() / 2), (panstyle)pan);
 }
 
 /**

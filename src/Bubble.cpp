@@ -21,6 +21,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "Backend.h"
+#include "Camera.h"
 
 // class BubblePart *ourPart;
 
@@ -84,7 +85,7 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 
 	bool leftside = false;
 	// TODO: cope with wrap
-	if (parent->x - world.camera.getX() < world.camera.getWidth() / 2) leftside = true;
+	if (parent->x - world.camera->getX() < world.camera->getWidth() / 2) leftside = true;
 
 	int pose;
 	if (engine.version == 1) {

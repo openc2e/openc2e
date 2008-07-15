@@ -22,6 +22,7 @@
 #include "Engine.h"
 #include "MetaRoom.h"
 #include "Room.h"
+#include "Camera.h"
 #include "exceptions.h"
 
 /*
@@ -797,7 +798,7 @@ void SFCFile::copyToWorld() {
 	}
 
 	// move the camera to the correct position
-	world.camera.moveTo(scrollx, scrolly, jump);
+	world.camera->moveTo(scrollx, scrolly, jump);
 
 	// patch agents
 	// TODO: do we really need to do this, and if so, should it be done here?

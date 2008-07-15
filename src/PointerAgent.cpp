@@ -24,6 +24,7 @@
 #include "caosVM.h"
 #include "Room.h"
 #include "MetaRoom.h"
+#include "Camera.h"
 #include <climits>
 
 // TODO: change imagecount?
@@ -92,7 +93,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 	int x = pointerX(), y = pointerY();
 		
 	if (event.type == eventmousemove) {
-		moveTo(event.x + world.camera.getX() - hotspotx, event.y + world.camera.getY() - hotspoty);
+		moveTo(event.x + world.camera->getX() - hotspotx, event.y + world.camera->getY() - hotspoty);
 		velx.setInt(event.xrel * 4);
 		vely.setInt(event.yrel * 4);
 
@@ -101,7 +102,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 
 		// middle mouse button scrolling
 		if (event.button & buttonmiddle)
-			world.camera.moveTo(world.camera.getX() - event.xrel, world.camera.getY() - event.yrel, jump);
+			world.camera->moveTo(world.camera->getX() - event.xrel, world.camera->getY() - event.yrel, jump);
 	} else if (!handle_events) {
 		/* mouse move events are (apparently - see eg C3 agent help) still handled with handle_events disabled, but nothing else */
 		return;

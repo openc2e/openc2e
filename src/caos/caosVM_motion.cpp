@@ -23,6 +23,7 @@
 #include "AgentRef.h"
 #include "World.h"
 #include "Engine.h" // version
+#include "Camera.h" // FLTX/FLTY
 #include <iostream>
 #include <boost/format.hpp>
 #include <climits>
@@ -570,7 +571,7 @@ void caosVM::v_FLTX() {
 	if (targ->floatingagent)
 		result.setFloat(targ->floatingagent->x - targ->x);
 	else
-		result.setFloat(world.camera.getX() - targ->x);
+		result.setFloat(world.camera->getX() - targ->x);
 }
 
 /**
@@ -585,7 +586,7 @@ void caosVM::v_FLTY() {
 	if (targ->floatingagent)
 		result.setFloat(targ->floatingagent->x - targ->x);
 	else
-		result.setFloat(world.camera.getX() - targ->x);
+		result.setFloat(world.camera->getX() - targ->x);
 }
 
 /**

@@ -21,6 +21,7 @@
 #include "Engine.h"
 #include "AudioBackend.h"
 #include "MetaRoom.h"
+#include "Camera.h"
 
 #include "Hatchery.h"
 #include "AgentInjector.h"
@@ -274,11 +275,11 @@ void QtOpenc2e::tick() {
 
 	bool didtick = engine.tick();
 
-	int y = world.camera.getY();
-	int x = world.camera.getX();
+	int y = world.camera->getY();
+	int x = world.camera->getX();
 	viewport->tick();
-	viewport->horizontalScrollBar()->setValue(x - world.camera.getMetaRoom()->x());
-	viewport->verticalScrollBar()->setValue(y - world.camera.getMetaRoom()->y());
+	viewport->horizontalScrollBar()->setValue(x - world.camera->getMetaRoom()->x());
+	viewport->verticalScrollBar()->setValue(y - world.camera->getMetaRoom()->y());
 	
 	if (engine.done) close();
 

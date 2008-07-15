@@ -32,6 +32,7 @@
 #include "Room.h"
 #include "MetaRoom.h"
 #include "Catalogue.h"
+#include "Camera.h"
 
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -50,10 +51,13 @@ World::World() {
 	showrooms = false;
 	autokill = false;
 	autostop = false;
+
+	camera = new MainCamera();
 }
 
 World::~World() {
 	agents.clear();
+	delete camera;
 	for (std::vector<caosVM *>::iterator i = vmpool.begin(); i != vmpool.end(); i++)
 		delete *i;
 }
@@ -206,7 +210,7 @@ void World::tick() {
 	}
 
 	// Notify the audio backend about our current viewpoint center.
-	engine.audio->setViewpointCenter(world.camera.getXCentre(), world.camera.getYCentre());
+	engine.audio->setViewpointCenter(camera->getXCentre(), camera->getYCentre());
 	
 	std::list<std::pair<boost::shared_ptr<AudioSource>, bool> >::iterator si = uncontrolled_sounds.begin();
 	while (si != uncontrolled_sounds.end()) {
@@ -217,13 +221,13 @@ void World::tick() {
 		} else {
 			if (si->second) {
 				// follow viewport
-				si->first->setPos(world.camera.getXCentre(), world.camera.getYCentre(), 0);
+				si->first->setPos(camera->getXCentre(), camera->getYCentre(), 0);
 			} else {
 				// mute/unmute off-screen uncontrolled audio if necessary
 				float x, y, z;
 				si->first->getPos(x, y, z);
 				if (engine.version > 2) // TODO: this is because of wrap issues, but we need a better fix
-					si->first->setMute(world.camera.getMetaRoom() != world.map.metaRoomAt(x, y));
+					si->first->setMute(camera->getMetaRoom() != world.map.metaRoomAt(x, y));
 			}
 		}
 
@@ -372,7 +376,7 @@ shared_ptr<Agent> World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
-	drawWorld(&camera, engine.backend->getMainSurface());
+	drawWorld(camera, engine.backend->getMainSurface());
 }
 
 void World::drawWorld(Camera *cam, Surface *surface) {
@@ -427,7 +431,7 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 
 	// render all the agents
 	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
-		if ((*i)->showOnRemoteCameras() || cam == &camera) {
+		if ((*i)->showOnRemoteCameras() || cam == camera) {
 			// three-pass for wraparound rooms, the third since agents often straddle the boundary
 			// TODO: same as above with background rendering
 			for (unsigned int z = 0; z < (m->wraparound() ? 3 : 1); z++) {
@@ -729,7 +733,7 @@ boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef a
 		assert(!controlled);
 
 		// TODO: handle non-agent sounds
-		sound->setPos(world.camera.getXCentre(), world.camera.getYCentre(), 0);
+		sound->setPos(camera->getXCentre(), camera->getYCentre(), 0);
 		uncontrolled_sounds.push_back(std::pair<boost::shared_ptr<class AudioSource>, bool>(sound, followviewport));
 	}
 	

@@ -28,6 +28,7 @@
 #include "backends/NullBackend.h"
 #include "backends/NullAudioBackend.h"
 #include "SFCFile.h"
+#include "Camera.h"
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -266,10 +267,10 @@ void Engine::handleKeyboardScrolling() {
 
 	// do the actual movement
 	if (velx || vely) {
-		int adjustx = world.camera.getX(), adjusty = world.camera.getY();
+		int adjustx = world.camera->getX(), adjusty = world.camera->getY();
 		int adjustbyx = (int)velx, adjustbyy = (int) vely;
 			
-		world.camera.moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
+		world.camera->moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
 	}
 }
 
@@ -461,20 +462,20 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 
 				case 33: // pageup
 					// TODO: previous metaroom
-					if ((world.map.getMetaRoomCount() - 1) == world.camera.getMetaRoom()->id)
+					if ((world.map.getMetaRoomCount() - 1) == world.camera->getMetaRoom()->id)
 						break;
-					n = world.map.getMetaRoom(world.camera.getMetaRoom()->id + 1);
+					n = world.map.getMetaRoom(world.camera->getMetaRoom()->id + 1);
 					if (n)
-						world.camera.goToMetaRoom(n->id);
+						world.camera->goToMetaRoom(n->id);
 					break;
 
 				case 34: // pagedown
 					// TODO: next metaroom
-					if (world.camera.getMetaRoom()->id == 0)
+					if (world.camera->getMetaRoom()->id == 0)
 						break;
-					n = world.map.getMetaRoom(world.camera.getMetaRoom()->id - 1);
+					n = world.map.getMetaRoom(world.camera->getMetaRoom()->id - 1);
 					if (n)
-						world.camera.goToMetaRoom(n->id);
+						world.camera->goToMetaRoom(n->id);
 					break;
 
 				default: break; // to shut up warnings
@@ -694,7 +695,7 @@ bool Engine::initialSetup() {
 	}
 	possible_audiobackends.clear();
 
-	world.camera.setBackend(backend); // TODO: hrr
+	world.camera->setBackend(backend); // TODO: hrr
 	
 	int listenport = backend->networkInit();
 	if (listenport != -1) {
