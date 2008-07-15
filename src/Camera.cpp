@@ -58,7 +58,7 @@ void Camera::moveTo(int _x, int _y, panstyle pan) {
 }
 
 void Camera::moveToGlobal(int _x, int _y, panstyle pan) {
-	MetaRoom *m = world.map.metaRoomAt(x, y);
+	MetaRoom *m = world.map.metaRoomAt(_x, _y);
 	if (m) {
 		if (m->id != metaroom) pan = jump; // inter-metaroom panning is always jump
 		metaroom = m->id;
@@ -134,7 +134,7 @@ void Camera::updateTracking() {
 	// TODO: not very intelligent :) also, are int casts correct?
 	int trackx = (int)trackedagent->x + ((int)trackedagent->getWidth() / 2) - (int)(getWidth() / 2);
 	int tracky = (int)trackedagent->y + ((int)trackedagent->getHeight() / 2) - (int)(getHeight() / 2);
-	moveTo(trackx, tracky);
+	moveToGlobal(trackx, tracky);
 }
 
 unsigned int MainCamera::getWidth() const {
