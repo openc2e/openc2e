@@ -58,7 +58,7 @@ void caosVM::c_CABW() {
 
 /**
  SPAS (command) vehicle (agent) passenger (agent)
- %status stub
+ %status maybe
  %pragma variants c1 c2 cv c3
 
  make specified vehicle agent pick up specified passenger
@@ -80,7 +80,7 @@ void caosVM::c_SPAS() {
 
 /**
  GPAS (command) family (integer) genus (integer) species (integer) options (integer)
- %status stub
+ %status maybe
 
  pick up all nearby agents matching classifier, as passengers to target vehicle
  options = 0 to pick up based on agent bounding rect, or 1 to pick up based on cabin rect
@@ -116,7 +116,7 @@ void caosVM::c_GPAS() {
 
 /**
  GPAS (command)
- %status stub
+ %status maybe
  %pragma variants c1 c2
  %pragma implementation caosVM::c_GPAS_c2
 */
@@ -141,7 +141,7 @@ void caosVM::c_GPAS_c2() {
 
 /**
  DPAS (command) family (integer) genus (integer) species (integer)
- %status stub
+ %status maybe
 
  drop all agents matching classifier from target vehicle
 */
@@ -170,7 +170,7 @@ void caosVM::c_DPAS() {
 
 /**
  DPAS (command)
- %status stub
+ %status maybe
  %pragma variants c1 c2
  %pragma implementation caosVM::c_DPAS_c2
 */
@@ -191,7 +191,7 @@ void caosVM::c_DPAS_c2() {
 
 /**
  CABP (command) plane (integer)
- %status stub
+ %status maybe
 */
 void caosVM::c_CABP() {
 	VM_PARAM_INTEGER(plane)
@@ -231,13 +231,23 @@ void caosVM::v_CABV() {
 
 /**
  RPAS (command) vehicle (agent) passenger (agent)
- %status stub
+ %status maybe
 */
 void caosVM::c_RPAS() {
 	VM_PARAM_AGENT(passenger)
 	VM_PARAM_AGENT(vehicle)
 
-	// TODO
+	Vehicle *v = dynamic_cast<Vehicle *>(vehicle.get());
+	caos_assert(v);
+
+	for (unsigned int i = 0; i < v->passengers.size(); i++) {
+		AgentRef a = v->passengers[i];
+		if (!a) continue;
+		if (a == passenger) {
+			v->drop(a);
+			return;
+		}
+	}
 }
 
 /**
