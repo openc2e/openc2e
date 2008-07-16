@@ -80,11 +80,19 @@ void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 void SpritePart::setFrameNo(unsigned int f) {
 	assert(f < animation.size());
 	if (firstimg + base + animation[f] >= getSprite()->numframes()) {
-		std::string err = boost::str(boost::format("animation frame %d (firstimg %d, base %d, value %d) was past end of sprite file '%s' (%d sprites)") %
-			f % firstimg % base % (int)animation[f] % getSprite()->getName() % getSprite()->numframes());
- 		parent->unhandledException(err, false);
-		animation.clear();
-		return;
+		if (engine.version == 2) {
+			// hack for invalid animation poses - use the last sprite in the file (as real C2 does)
+			frameno = f;
+			pose = animation[f];
+			spriteno = getSprite()->numframes() - 1;
+			return;
+		} else {
+			std::string err = boost::str(boost::format("animation frame %d (firstimg %d, base %d, value %d) was past end of sprite file '%s' (%d sprites)") %
+				f % firstimg % base % (int)animation[f] % getSprite()->getName() % getSprite()->numframes());
+			parent->unhandledException(err, false);
+			animation.clear();
+			return;
+		}
 	}
 	
 	frameno = f;
