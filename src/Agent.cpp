@@ -67,7 +67,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 		
 		size = 127; // TODO: correct default?
 		thrt = 0;
-		// TODO: it looks like grav should be 0, but make sure!
+		falling = false; // TODO: it looks like grav should be 0, but make sure!
 	} else if (engine.version > 2) {
 		accg = 0.3f;
 		aero = 0;
@@ -712,7 +712,10 @@ void Agent::physicsTick() {
 			}
 		} else {
 			// TODO: correct?
-			if (sufferphysics()) falling = false;
+			if (sufferphysics()) {
+				if (velx.getFloat() == 0.0f && vely.getFloat() == 0.0f)
+					falling = false;
+			}
 			velx.setFloat(0);
 			vely.setFloat(0);
 		}
