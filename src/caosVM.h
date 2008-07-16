@@ -298,6 +298,7 @@ public:
 	void v_ROOM_c1();
 	void v_WRAP();
 	void s_WRAP();
+	void c_SSFC();
 	
 	// camera
 	void v_VISI();

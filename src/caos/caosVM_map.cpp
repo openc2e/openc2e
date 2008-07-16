@@ -1171,4 +1171,31 @@ CAOS_LVALUE(WRAP,
 		mr->setWraparound(newvalue.getInt())
 		)
 
+/**
+ SSFC (command) roomno (integer) coordcount (integer) x1 (integer) y1 (integer)
+ %status stub
+ %pragma variants all
+ %pragma stackdelta any
+
+ (document me; note that there must be exactly coordcount pairs of x, y)
+*/
+void caosVM::c_SSFC() {
+	// Note: due to parser hacks, our arguments are passed in a different order than normal
+	VM_PARAM_INTEGER(roomno);
+	VM_PARAM_INTEGER(coordcount);
+
+	caos_assert(coordcount >= 0); // this should never happen unless the parser breaks or we load a bad savefile
+
+	std::vector<std::pair<int, int> > coords;
+	for (int i = 0; i < coordcount; i++) {
+		VM_PARAM_INTEGER(x);
+		VM_PARAM_INTEGER(y);
+		coords.push_back(std::pair<int, int>(x, y));
+	}
+
+	std::cerr << "SSFC STUB; roomno " << roomno << " coordcount " << coordcount << std::endl;
+	for (int i = 0; i < coordcount; i++)
+		std::cerr << "Coord #" << i << ": (" << coords[i].first << ", " << coords[i].second << ")" << std::endl;
+}
+
 /* vim: set noet: */

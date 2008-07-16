@@ -256,6 +256,7 @@ protected:
 	void parseCondition();
 	void emitOp(opcode_t op, int argument);
 	void emitCmd(const char *name);
+	void emitConst(const caosVar &);
 	boost::shared_ptr<CAOSExpression> readExpr(const enum ci_type xtype);
 	void emitExpr(boost::shared_ptr<CAOSExpression> ce);
 	const cmdinfo *readCommand(class token *t, const std::string &prefix, bool except = true);

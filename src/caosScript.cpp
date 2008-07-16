@@ -195,16 +195,21 @@ void evalVisit::operator()(const CAOSCmd &cmd) const {
 }
 
 void evalVisit::operator()(const caosVar &v) const {
+	scr->emitConst(v);
+}
+
+void caosScript::emitConst(const caosVar &v) {
 	if (v.hasInt()) {
 		int val = v.getInt();
 		if (val >= -(1 << 24) && val < (1 << 24)) {
-			scr->emitOp(CAOS_CONSTINT, val);
+			emitOp(CAOS_CONSTINT, val);
 			return;
 		}
 	}
-	scr->current->consts.push_back(v);
-	scr->emitOp(CAOS_CONST, scr->current->consts.size() - 1);
+	current->consts.push_back(v);
+	emitOp(CAOS_CONST, current->consts.size() - 1);
 }
+
 void evalVisit::operator()(const bytestring_t &bs) const {
 	scr->current->bytestrs.push_back(bs);
 	scr->emitOp(CAOS_BYTESTR, scr->current->bytestrs.size() - 1);
@@ -736,6 +741,35 @@ void caosScript::parseloop(int state, void *info) {
 				continue;
 			}
 			return;
+		} else if (t->word() == "ssfc") {
+			boost::shared_ptr<CAOSExpression> roomno_e = readExpr(CI_NUMERIC);
+
+			caosVar coordcount = getToken(TOK_CONST)->constval();
+			if (!coordcount.hasInt())
+				throw parseException("Literal integer expected");
+			int count = coordcount.getInt();
+
+			std::vector<std::pair<int, int> > points(count);
+			for (int i = 0; i < count; i++) {
+				caosVar cvx = getToken(TOK_CONST)->constval();
+				if (!cvx.hasInt())
+					throw parseException("Literal integer expected");
+				caosVar cvy = getToken(TOK_CONST)->constval();
+				if (!cvy.hasInt())
+					throw parseException("Literal integer expected");
+				points[i].first = cvx.getInt();
+				points[i].second = cvy.getInt();
+			}
+
+			// emit the values in backwards order
+			for (int i = points.size() - 1; i >= 0; i--) {
+				// y first
+				emitConst(caosVar(points[i].second));
+				emitConst(caosVar(points[i].first));
+			}
+			emitConst(coordcount);
+			emitExpr(roomno_e);
+			emitCmd("cmd ssfc");
 		} else {
 			if (t->word() == "dbg:") {
 				token *t2 = tokenPeek();
