@@ -29,6 +29,7 @@
 #include <boost/format.hpp>
 #include "AgentHelpers.h"
 #include "Room.h" // LIML/LIMT etc
+#include "Engine.h" // C2 hack in POSE
 #include <climits>
 
 using std::cerr;
@@ -386,7 +387,7 @@ void caosVM::c_POSE() {
 	caos_assert(p);
 
 	SpritePart *s = dynamic_cast<SpritePart *>(p);
-	if (s)
+	if (s && engine.version != 2) // C2 has special handling for invalid poses, see SpritePart::setPose
 		caos_assert(s->getFirstImg() + s->getBase() + pose < s->getSprite()->numframes());
 	
 	p->setPose(pose);

@@ -68,10 +68,15 @@ bool CompoundPart::showOnRemoteCameras() {
 void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 	// TODO: we need a nicer way to handle such errors
 	if (getCurrentSprite() >= getSprite()->numframes()) {
-		std::string err = boost::str(boost::format("pose to be rendered %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
-			pose % firstimg % base % getSprite()->getName() % getSprite()->numframes());
- 		parent->unhandledException(err, false);
-		return;
+		if (engine.version == 2) {
+			// hack for invalid poses - use the last sprite in the file (as real C2 does)
+			spriteno = getSprite()->numframes() - 1;
+		} else {
+			std::string err = boost::str(boost::format("pose to be rendered %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
+				pose % firstimg % base % getSprite()->getName() % getSprite()->numframes());
+			parent->unhandledException(err, false);
+			return;
+		}
 	}
 	assert(getCurrentSprite() < getSprite()->numframes());
 	renderer->render(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha, alpha, draw_mirrored);
@@ -81,11 +86,8 @@ void SpritePart::setFrameNo(unsigned int f) {
 	assert(f < animation.size());
 	if (firstimg + base + animation[f] >= getSprite()->numframes()) {
 		if (engine.version == 2) {
-			// hack for invalid animation poses - use the last sprite in the file (as real C2 does)
-			frameno = f;
-			pose = animation[f];
+			// hack for invalid poses - use the last sprite in the file (as real C2 does)
 			spriteno = getSprite()->numframes() - 1;
-			return;
 		} else {
 			std::string err = boost::str(boost::format("animation frame %d (firstimg %d, base %d, value %d) was past end of sprite file '%s' (%d sprites)") %
 				f % firstimg % base % (int)animation[f] % getSprite()->getName() % getSprite()->numframes());
@@ -93,24 +95,31 @@ void SpritePart::setFrameNo(unsigned int f) {
 			animation.clear();
 			return;
 		}
+	} else {
+		spriteno = firstimg + base + animation[f];
 	}
 	
 	frameno = f;
 	pose = animation[f];
-	spriteno = firstimg + base + pose;
 }
 
 void SpritePart::setPose(unsigned int p) {
 	if (firstimg + base + p >= getSprite()->numframes()) {
-		std::string err = boost::str(boost::format("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
-			p % firstimg % base % getSprite()->getName() % getSprite()->numframes());
- 		parent->unhandledException(err, false);
-		return;
+		if (engine.version == 2) {
+			// hack for invalid poses - use the last sprite in the file (as real C2 does)
+			spriteno = getSprite()->numframes() - 1;
+		} else {
+			std::string err = boost::str(boost::format("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
+				p % firstimg % base % getSprite()->getName() % getSprite()->numframes());
+			parent->unhandledException(err, false);
+			return;
+		}
+	} else {
+		spriteno = firstimg + base + p;
 	}
 
 	animation.clear();
 	pose = p;
-	spriteno = firstimg + base + pose;
 }
 
 void SpritePart::setBase(unsigned int b) {
