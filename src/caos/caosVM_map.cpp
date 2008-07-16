@@ -1172,12 +1172,15 @@ CAOS_LVALUE(WRAP,
 		)
 
 /**
- SSFC (command) roomno (integer) coordcount (integer) x1 (integer) y1 (integer)
- %status stub
- %pragma variants all
+ SSFC (command) roomno (integer) count (integer) x1 (integer) y1 (integer)
+ %status maybe
+ %pragma variants c2
  %pragma stackdelta any
 
- (document me; note that there must be exactly coordcount pairs of x, y)
+ Set floor points of the specified rooms.
+ You must provide 'count' pairs of (x, y) coordinates as parameters, relative to the room, and with the y coordinates inverted (ie, 0 is the bottom of the room).
+ The coordinates must start at the left side of the room, and end on the right side.
+ Count can be zero, which removes any existing floor points.
 */
 void caosVM::c_SSFC() {
 	// Note: due to parser hacks, our arguments are passed in a different order than normal
@@ -1186,16 +1189,30 @@ void caosVM::c_SSFC() {
 
 	caos_assert(coordcount >= 0); // this should never happen unless the parser breaks or we load a bad savefile
 
-	std::vector<std::pair<int, int> > coords;
+	shared_ptr<Room> r = world.map.getRoom(roomno);
+	caos_assert(r);
+
+	r->floorpoints.clear();
+
+	int lastx = -1;
 	for (int i = 0; i < coordcount; i++) {
 		VM_PARAM_INTEGER(x);
 		VM_PARAM_INTEGER(y);
-		coords.push_back(std::pair<int, int>(x, y));
-	}
 
-	std::cerr << "SSFC STUB; roomno " << roomno << " coordcount " << coordcount << std::endl;
-	for (int i = 0; i < coordcount; i++)
-		std::cerr << "Coord #" << i << ": (" << coords[i].first << ", " << coords[i].second << ")" << std::endl;
+		// check that coordinates are positive
+		caos_assert(x >= 0);
+		caos_assert(y >= 0);
+
+		// check that coordinates go from left to right
+		caos_assert(x > lastx);
+		lastx = x;
+
+		// check that coordinates lie within room
+		caos_assert((unsigned int)x <= (r->x_right - r->x_left));
+		caos_assert((unsigned int)y <= (r->y_left_floor - r->y_left_ceiling));
+
+		r->floorpoints.push_back(std::pair<unsigned int, unsigned int>(x, y));
+	}
 }
 
 /* vim: set noet: */
