@@ -417,7 +417,14 @@ class MNGFile {
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;
 		unsigned int sampleno;
-	
+
+		static int yylineno;
+		static const char *mngfile_parse_p;
+		static void yyinit(const char *buf);
+		static int mnglex();
+		friend int mnglex();
+		friend void mngerror(const char*);
+
 	public:
 		std::map<std::string, class MNGVariableDecNode *> variables; // TODO: should be private?
 		MNGFile(std::string);

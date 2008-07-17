@@ -1,12 +1,9 @@
 %{
-	extern char *mngtext;
-	extern void mngerror(char const *);
-	#include "lex.mng.h"
-	extern mngFlexLexer *mnglexer;
-	int mnglex(void) { return mnglexer->yylex(); }
-	#include <stdio.h>
 	#include "mngfile.h"
 	#include <list>
+
+	int mnglex(void) { return MNGFile::mnglex(); }
+	extern void mngerror(const char *err);
 %}
 
 %union

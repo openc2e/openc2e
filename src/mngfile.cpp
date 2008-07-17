@@ -25,9 +25,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <errno.h>
-#include "lex.mng.h"
 
-mngFlexLexer *mnglexer = NULL;
 MNGFile *g_mngfile = NULL;
 extern int mngparse(); // parser
 
@@ -88,8 +86,7 @@ MNGFile::MNGFile(std::string n) {
 	memcpy(script, map + scriptoffset, scriptlength);
 	decryptbuf(script, scriptlength);
 
-	std::istringstream tehscript(script);
-	mngrestart(&tehscript);
+	yyinit(script);
 	g_mngfile = this;
 	mngparse();
 	g_mngfile = 0;
@@ -111,22 +108,14 @@ void MNGFile::enumerateSamples() {
 	}
 }
 
-
 MNGFile::~MNGFile() {
 	free(script);
 	munmap(map, filesize);
 	fclose(f);
 }	
 
-void mngrestart(std::istream *is) {
-	if (mnglexer)
-		delete mnglexer;
-	mnglexer = new mngFlexLexer();
-	mnglexer->yyrestart(is);
-}
-
 void mngerror(char const *s) {
-	throw creaturesException(s);
+	throw MNGFileException(s, g_mngfile->yylineno);
 }
 
 /* vim: set noet: */

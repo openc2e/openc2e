@@ -94,14 +94,14 @@ SET(OPENC2E_CORE
 	src/genomeFile.cpp
 	src/historyManager.cpp
 	src/imageManager.cpp
-	#	${GEN}/lex.mng.cpp
+	${GEN}/mnglexer.cpp
 	${GEN}/caoslexer.cpp
 	src/Lift.cpp
 	src/Map.cpp
 	src/MetaRoom.cpp
 	src/mmapifstream.cpp
-	#	src/mngfile.cpp
-	#	${GEN}/mngparser.tab.cpp
+	src/mngfile.cpp
+	${GEN}/mngparser.tab.cpp
 	src/oldBrain.cpp
 	src/PathResolver.cpp
 	src/physics.cpp
@@ -320,6 +320,18 @@ ADD_CUSTOM_COMMAND(
 	DEPENDS ${SRC}/src/caoslexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
+ADD_CUSTOM_COMMAND(
+	OUTPUT ${GEN}/mnglexer.cpp
+	COMMAND re2c -o ${GEN}/mnglexer.cpp ${SRC}/src/mnglexer.re2c
+	DEPENDS ${SRC}/src/mnglexer.re2c
+	WORKING_DIRECTORY ${SRC})
+
+ADD_CUSTOM_COMMAND(
+	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" src/mngparser.ypp
+	DEPENDS src/mngparser.ypp
+	WORKING_DIRECTORY ${SRC})
+
 #ADD_CUSTOM_COMMAND(
 #	OUTPUT ${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
 #	COMMAND flex -+ --prefix=mng -d -o ${GEN}/lex.mng.cpp --header-file=${GEN}/lex.mng.h mng.l
@@ -338,6 +350,8 @@ ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/o
 ADD_CUSTOM_TARGET(generated DEPENDS
 	${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
 	${GEN}/caoslexer.cpp
+	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+	${GEN}/mnglexer.cpp
 	${GEN}/cataloglexer.cpp
 	${GEN}/cmddata.cpp
 	#	${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
