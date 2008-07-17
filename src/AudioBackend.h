@@ -82,6 +82,10 @@ public:
 	float getEffectiveVolume() const { return isMuted() ? 0 : getVolume(); }
 	virtual bool isMuted() const = 0;
 	virtual void setMute(bool) = 0;
+
+	// Set true to lock the location of this source to the viewpoint
+	virtual bool isFollowingView() const = 0;
+	virtual void setFollowingView(bool) = 0;
 };
 
 class AudioBackend : public boost::enable_shared_from_this<AudioBackend> {

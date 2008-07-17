@@ -41,9 +41,9 @@ protected:
 	/* we don't track state here because, well, the clips don't support
 	 * length values yet.
 	 */
-	bool looping, muted;
+	bool looping, muted, followview;
 	float x, y, z, volume;
-	SkeletonAudioSource() { looping = false; muted = false; volume = 1.0f; }
+	SkeletonAudioSource() { looping = false; muted = false; volume = 1.0f; followview = false; }
 
 public:
 	AudioClip getClip() { return clip; }
@@ -67,6 +67,9 @@ public:
 	float getVolume() const { return volume; }
 	bool isMuted() const { return muted; }
 	void setMute(bool m) { muted = m; }
+	bool isFollowingView() const { return followview; }
+	void setFollowingView(bool v) { followview = v; }
+
 };
 
 #endif

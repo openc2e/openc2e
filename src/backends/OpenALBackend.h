@@ -25,6 +25,7 @@
 #include <al.h>
 #include <alc.h>
 #include <string>
+#include <map>
 
 class OpenALBuffer;
 
@@ -86,6 +87,7 @@ public:
 	virtual void setLooping(bool);
 	virtual void setVolume(float v);
 	virtual void setMute(bool);
+	virtual void setFollowingView(bool);
 };
 
 class OpenALBackend : public AudioBackend {
@@ -94,6 +96,9 @@ protected:
 	ALfloat ListenerVel[3];
 	ALfloat ListenerPos[3];
 	bool muted;
+
+	std::map<OpenALSource *, boost::shared_ptr<AudioSource> > followingSrcs;
+	friend class OpenALSource;
 
 public:
 	boost::shared_ptr<OpenALBackend> shared_from_this() {

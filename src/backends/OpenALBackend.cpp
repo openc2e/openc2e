@@ -22,6 +22,7 @@
 #include <iostream>
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
+#include <boost/foreach.hpp>
 #include <boost/lambda/bind.hpp>
 #include "SDL.h"
 #include "exceptions.h"
@@ -120,6 +121,15 @@ void OpenALBackend::setViewpointCenter(float x, float y) {
 	ListenerPos[0] = x * scale;
 	ListenerPos[1] = y * scale;
 	updateListener();
+	for (
+			std::map<OpenALSource *, boost::shared_ptr<AudioSource> >::iterator it = followingSrcs.begin();
+			it != followingSrcs.end();
+			it++
+		) {
+		OpenALSource *src_p = it->first;
+		assert(src_p->getState() != SS_STOP && src_p->isFollowingView());
+		src_p->setPos(ListenerPos[0], ListenerPos[1], ListenerPos[2]);
+	}
 }
 
 void OpenALBackend::shutdown() {
@@ -132,6 +142,16 @@ void OpenALBackend::setMute(bool m) {
 	else
 		alListenerf(AL_GAIN, 1.0f);
 	muted = m;
+}
+
+void OpenALSource::setFollowingView(bool f) {
+	if (f) {
+		backend->followingSrcs[this] = shared_from_this();
+		setPos(backend->ListenerPos[0], backend->ListenerPos[1], backend->ListenerPos[2]);
+	} else {
+		backend->followingSrcs.erase(this);
+	}
+	followview = f;
 }
 
 boost::shared_ptr<AudioSource> OpenALBackend::newSource() {
@@ -230,10 +250,15 @@ SourceState OpenALSource::getState() const {
 void OpenALSource::play() {
 	assert(clip);
 	alSourcePlay(source);
+	setFollowingView(followview); // re-register in the backend if needed
 }
 
 void OpenALSource::stop() {
 	alSourceStop(source);
+
+	bool oldfollow = followview;
+	setFollowingView(false);	  // unregister in backend
+	followview = oldfollow;
 }
 
 void OpenALSource::pause() {
