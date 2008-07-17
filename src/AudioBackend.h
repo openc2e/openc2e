@@ -43,8 +43,8 @@ protected:
 
 public:
 	virtual ~AudioBuffer() { }
-	virtual unsigned int length_ms() = 0; /* milliseconds */
-	virtual unsigned int length_samples() = 0;
+	virtual unsigned int length_ms() const = 0; /* milliseconds */
+	virtual unsigned int length_samples() const = 0;
 };
 
 typedef boost::intrusive_ptr<AudioBuffer> AudioClip;
@@ -67,20 +67,20 @@ public:
 	virtual ~AudioSource() { }
 	virtual AudioClip getClip() = 0;
 	virtual void setClip(AudioClip &) = 0; /* Valid only in STOP state */
-	virtual SourceState getState() = 0;
+	virtual SourceState getState() const = 0;
 	virtual void play() = 0; /* requires that getClip() not be a null ref */
 	virtual void stop() = 0;
 	virtual void pause() = 0;
 	virtual void fadeOut() = 0;
 	virtual void setPos(float x, float y, float plane) = 0;
-	virtual void getPos(float &x, float &y, float &plane) = 0;
+	virtual void getPos(float &x, float &y, float &plane) const = 0;
 	virtual void setVelocity(float x, float y) = 0;
-	virtual bool isLooping() = 0;
+	virtual bool isLooping() const = 0;
 	virtual void setLooping(bool) = 0;
 	virtual void setVolume(float vol) = 0;
-	virtual float getVolume() = 0;
-	float getEffectiveVolume() { return isMuted() ? 0 : getVolume(); }
-	virtual bool isMuted() = 0;
+	virtual float getVolume() const = 0;
+	float getEffectiveVolume() const { return isMuted() ? 0 : getVolume(); }
+	virtual bool isMuted() const = 0;
 	virtual void setMute(bool) = 0;
 };
 
@@ -94,7 +94,7 @@ public:
 	virtual ~AudioBackend() { }
 	virtual void setViewpointCenter(float x, float y) = 0;
 	virtual void setMute(bool) = 0;
-	virtual bool isMuted() = 0;
+	virtual bool isMuted() const = 0;
 
 	/* TODO: global vol controls */
 	virtual boost::shared_ptr<AudioSource> newSource() = 0;

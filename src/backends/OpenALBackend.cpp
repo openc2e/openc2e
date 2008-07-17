@@ -180,7 +180,7 @@ OpenALBuffer::OpenALBuffer(boost::shared_ptr<class OpenALBackend> backend, ALuin
 	buffer = handle;
 }
 
-unsigned int OpenALBuffer::length_samples() {
+unsigned int OpenALBuffer::length_samples() const {
 	ALint bits;
 	ALint channels;
 	ALint size;
@@ -190,18 +190,18 @@ unsigned int OpenALBuffer::length_samples() {
 	return size / (bits / 8 * channels);
 }
 
-unsigned int OpenALBuffer::length_ms() {
+unsigned int OpenALBuffer::length_ms() const {
 	ALint freq;
 	alGetBufferi(buffer, AL_FREQUENCY, &freq);
 	return length_samples() * 1000 / freq;
 }
 
-AudioClip OpenALSource::getClip() {
+AudioClip OpenALSource::getClip() const {
 	AudioClip clip(static_cast<AudioBuffer *>(this->clip.get()));
 	return clip;
 }
 
-void OpenALSource::setClip(AudioClip &clip_) {
+void OpenALSource::setClip(const AudioClip &clip_) {
 	OpenALBuffer *obp = dynamic_cast<OpenALBuffer *>(clip_.get());
 	assert(obp);
 	stop();
@@ -211,7 +211,7 @@ void OpenALSource::setClip(AudioClip &clip_) {
 	}
 }
 
-SourceState OpenALSource::getState() {
+SourceState OpenALSource::getState() const {
 	int state;
 	alGetSourcei(source, AL_SOURCE_STATE, &state);
 	switch (state) {
@@ -221,7 +221,7 @@ SourceState OpenALSource::getState() {
 		default:
 		{
 			std::cerr << "Unknown openal state, stopping stream: " << state << std::endl;
-			stop();
+			const_cast<OpenALSource *>(this)->stop();
 			return SS_STOP;
 		}
 	}
@@ -274,7 +274,7 @@ void OpenALSource::setVelocity(float x, float y) {
 	alSource3f(source, AL_VELOCITY, x * scale, y * scale, 0);
 }
 
-bool OpenALSource::isLooping() {
+bool OpenALSource::isLooping() const {
 	int l;
 	alGetSourcei(source, AL_LOOPING, &l);
 	return l == AL_TRUE;
