@@ -46,8 +46,9 @@ public:
 
 class MNGFileException : public creaturesException {
 	public:
-		int error;
-		MNGFileException(const char * m, int e) throw() : creaturesException(m) { error = e; }
+		int lineno;
+		MNGFileException(const char * m) throw() : creaturesException(m) { lineno = 0; }
+		MNGFileException(const char * m, int l) throw() : creaturesException(m) { lineno = l; }
 };
 
 class MNGNamedNode : public MNGNode {
@@ -410,9 +411,7 @@ public:
 
 class MNGFile {
 	private:
-		FILE * f;
-		long filesize;
-		char * map;
+		class mmapifstream *stream;
 		std::string name;
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;

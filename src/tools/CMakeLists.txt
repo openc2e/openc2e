@@ -5,14 +5,13 @@
 
 PROJECT (OPENC2E_TOOLS CXX)
 
-ADD_EXECUTABLE(praydumper praydumper.cpp ${SRC}/pray.cpp)
+#ADD_EXECUTABLE(praydumper praydumper.cpp ${SRC}/pray.cpp)
 
-TARGET_LINK_LIBRARIES(praydumper z m pthread 
+# This is buggy because of generated files. mng needs to be a library!
+ADD_DEFINITIONS("-I..")
+ADD_EXECUTABLE(mngtest mngtest.cpp ../mngfile.cpp ../../build/generated/mngparser.tab.cpp ../../build/generated/mnglexer.cpp ../mmapifstream.cpp)
+TARGET_LINK_LIBRARIES(mngtest z m pthread
 	boost_program_options-mt
 	boost_serialization-mt
 	boost_filesystem-mt)
-
-
-# This is buggy because of generated files. mng needs to be a library!
-# ADD_EXECUTABLE(mngtest mngtest.cpp ${SRC}/mngfile.cpp ${BIN}/mngparser.tab.cpp ${BIN}/lex.mng.cpp)
 

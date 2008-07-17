@@ -15,7 +15,6 @@ int MNGFile::yylineno = -1;
 
 void MNGFile::yyinit(const char *buf) {
 	mngfile_parse_p = buf;
-	std::cout << buf << "\n***end***\n";
 	yylineno = 1;
 }
 

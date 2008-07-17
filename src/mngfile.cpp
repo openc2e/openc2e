@@ -19,12 +19,8 @@
 #include <assert.h>
 #include "endianlove.h"
 #include "exceptions.h"
-#include <stdio.h>
 #include "mngfile.h"
-#include <sys/mman.h>
-#include <math.h>
-#include <unistd.h>
-#include <errno.h>
+#include "mmapifstream.h"
 
 MNGFile *g_mngfile = NULL;
 extern int mngparse(); // parser
@@ -40,55 +36,48 @@ void decryptbuf(char * buf, int len) {
 
 MNGFile::MNGFile(std::string n) {
 	sampleno = 0;
-
 	name = n;
 	
-	f = fopen(name.c_str(), "r");
-	if(!f) {
-		throw MNGFileException("Can't open file", errno);
-	}
-	
-	// Hack to obtain the filesize
-	fseek(f, 0, SEEK_END);
-	filesize = ftell(f);
-	
-	// mmap the data file
-	map = (char *) mmap(0, filesize, PROT_READ, MAP_PRIVATE, fileno(f), 0);
-	if(map == (void *) -1) {
-		throw MNGFileException("Can't mmap", errno);
-	}
-	
+	stream = new mmapifstream(n);
+	if (!stream->live) { delete stream; throw MNGFileException("open failed"); }
+
 	// Read metavariables from beginning of file
-	numsamples = swapEndianLong(*((int *) map));
-	scriptoffset = swapEndianLong(*(((int *) map) + 1));
-	scriptend = swapEndianLong(*(((int *) map) + 3));
+	numsamples = swapEndianLong(*((int *) stream->map));
+	scriptoffset = swapEndianLong(*(((int *) stream->map) + 1));
+	scriptend = swapEndianLong(*(((int *) stream->map) + 3));
 	scriptlength = scriptend - scriptoffset;
 
 	// read the samples
 	for(int i = 0; i < numsamples; i++) {
 		// Sample offsets and lengths are stored in pairs after the initial 16 bytes
-		int position = swapEndianLong(*((int *) map + 3 + (2 * i)));
+		int position = swapEndianLong(*((int *) stream->map + 3 + (2 * i)));
 
 		// skip four bytes of the WAVE header, four of the FMT header, 
 		// the FMT chunk and four of the DATA header
-		position += swapEndianLong(*(int *)(map + position)) + 8;
+		position += swapEndianLong(*(int *)(stream->map + position)) + 8;
 
-		int size = swapEndianLong(*((int *) (map + position)));
+		int size = swapEndianLong(*((int *) (stream->map + position)));
 		position += 4; // Skip the size field
 		
-		samples.push_back(std::make_pair(map + position, size));
+		samples.push_back(std::make_pair(stream->map + position, size));
 	}
 
 	// now we have the samples, read and decode the MNG script
 	script = (char *) malloc(scriptlength + 1);
 	script[scriptlength] = 0;
-	if(! script) throw MNGFileException("malloc failed", errno);
-	memcpy(script, map + scriptoffset, scriptlength);
+	if(! script) { delete stream; throw MNGFileException("malloc failed"); }
+	memcpy(script, stream->map + scriptoffset, scriptlength);
 	decryptbuf(script, scriptlength);
 
 	yyinit(script);
 	g_mngfile = this;
-	mngparse();
+	try {
+		mngparse();
+	} catch (...) {
+		delete stream;
+		g_mngfile = 0;
+		throw;
+	}
 	g_mngfile = 0;
 
 	processState *p = new processState(this);
@@ -110,8 +99,7 @@ void MNGFile::enumerateSamples() {
 
 MNGFile::~MNGFile() {
 	free(script);
-	munmap(map, filesize);
-	fclose(f);
+	delete stream;
 }	
 
 void mngerror(char const *s) {
