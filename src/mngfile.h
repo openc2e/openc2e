@@ -22,7 +22,7 @@
 #include <map>
 #include <istream>
 #include <cmath>
-#include "exceptions.h"
+#include "openc2e.h"
 #include <boost/format.hpp>
 
 void mngrestart(std::istream *is);

@@ -214,6 +214,6 @@ headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) $(wildcard ser/*.h) mngparser.
 headerdeps.png: headerdeps.dot
 	dot -Tpng -o $@ $^
 
-generated: catalogue.tab.hpp cataloglexer.cpp docs.html cmddata.cpp caoslexer.cpp mnglexer.cpp
+generated: catalogue.tab.hpp mngparser.tab.hpp cataloglexer.cpp docs.html cmddata.cpp caoslexer.cpp mnglexer.cpp
 
 .PHONY: clean all dep docs test default
