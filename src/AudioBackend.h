@@ -66,7 +66,7 @@ protected:
 public:
 	virtual ~AudioSource() { }
 	virtual AudioClip getClip() = 0;
-	virtual void setClip(AudioClip &) = 0; /* Valid only in STOP state */
+	virtual void setClip(const AudioClip &) = 0; /* Valid only in STOP state */
 	virtual SourceState getState() const = 0;
 	virtual void play() = 0; /* requires that getClip() not be a null ref */
 	virtual void stop() = 0;
