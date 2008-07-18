@@ -128,7 +128,7 @@ void OpenALBackend::setViewpointCenter(float x, float y) {
 		) {
 		OpenALSource *src_p = it->first;
 		assert(src_p->getState() != SS_STOP && src_p->isFollowingView());
-		src_p->setPos(ListenerPos[0], ListenerPos[1], ListenerPos[2]);
+		src_p->setPos(x, y, plnemul < 0.01 ? 0 : (ListenerPos[2] / plnemul));
 	}
 }
 
