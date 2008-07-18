@@ -35,12 +35,25 @@ struct peSection {
 	uint32 size;
 };
 
+class resourceInfo {
+	friend class peFile;
+
+	uint32 offset;
+	uint32 size;
+	char *data;
+
+public:
+	uint32 getSize() { return size; }
+	char *getData() { return data; }
+};
+
 class peFile {
 protected:
 	fs::path path;
 	std::ifstream file;
 
 	std::map<std::string, peSection> sections;
+	std::map<std::pair<uint32, uint32>, std::map<uint32, resourceInfo> > resources;
 
 	void parseResources();
 	void parseResourcesLevel(peSection &s, unsigned int off, unsigned int level);
@@ -48,6 +61,8 @@ protected:
 public:
 	peFile(fs::path filepath);
 	~peFile();
+
+	resourceInfo *getResource(uint32 type, uint32 lang, uint32 name);
 };
 
 #endif

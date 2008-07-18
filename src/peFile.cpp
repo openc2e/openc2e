@@ -148,20 +148,14 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 			offset += s.offset;
 			offset -= s.vaddr;
 			uint32 size = read32(file);
-			
-			/*if ((currlang & 0xff) == 0x09) { // LANG_ENGLISH
-				file.seekg(offset, std::ios::beg);
 				
-				char *data = (char*)malloc(size);
-				file.read(data, size);
-	
-				char buf[500];
-				sprintf(buf, "/tmp/oh/%s_%d_%d_%d", nameForType(currtype).c_str(), currname, currlang, offset);
-				std::ofstream f(buf);
-				f.write(data, size);
+			resourceInfo info;
+			info.offset = offset;
+			info.size = size;
+			info.data = 0;
 
-				free(data);
-			}*/
+			//if ((currlang & 0xff) == 0x09) // LANG_ENGLISH
+			resources[std::pair<uint32, uint32>(currtype, currlang)][currname] = info;
 		}
 		
 		file.seekg(here, std::ios::beg);
@@ -169,6 +163,26 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 }
 
 peFile::~peFile() {
+	for (std::map<std::pair<uint32, uint32>, std::map<uint32, resourceInfo> >::iterator i = resources.begin(); i != resources.end(); i++) {
+		for (std::map<uint32, resourceInfo>::iterator j = i->second.begin(); j != i->second.end(); j++) {
+			if (j->second.data) {
+				delete[] j->second.data;
+			}
+		}
+	}
+}
+
+resourceInfo *peFile::getResource(uint32 type, uint32 lang, uint32 name) {
+	if (resources.find(std::pair<uint32, uint32>(type, lang)) == resources.end()) return 0;
+	if (resources[std::pair<uint32, uint32>(type, lang)].find(name) == resources[std::pair<uint32, uint32>(type, lang)].end()) return 0;
+
+	resourceInfo *r = &resources[std::pair<uint32, uint32>(type, lang)][name];
+	if (!r->data) {
+		file.seekg(r->offset, std::ios::beg);
+		r->data = new char[r->size];
+		file.read(r->data, r->size);
+	}
+	return r;
 }
 
 /* vim: set noet: */
