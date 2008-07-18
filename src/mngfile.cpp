@@ -98,6 +98,12 @@ void MNGFile::enumerateSamples() {
 }
 
 MNGFile::~MNGFile() {
+	for (std::map<std::string, MNGEffectDecNode *>::iterator i = effects.begin(); i != effects.end(); i++)
+		delete i->second;
+	for (std::map<std::string, MNGTrackDecNode *>::iterator i = tracks.begin(); i != tracks.end(); i++)
+		delete i->second;
+	for (std::map<std::string, MNGVariableDecNode *>::iterator i = variables.begin(); i != variables.end(); i++)
+		delete i->second;
 	free(script);
 	delete stream;
 }	

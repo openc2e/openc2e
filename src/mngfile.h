@@ -131,6 +131,7 @@ protected:
 public:
 	MNGExpressionContainer(MNGExpression *n) { subnode = n; }
 	virtual void postProcess(processState *s) { subnode->postProcess(s); }
+	virtual ~MNGExpressionContainer() { delete subnode; }
 };
 
 class MNGPanNode : public MNGExpressionContainer { // pan
