@@ -131,19 +131,17 @@ docs.html: ../docs/writehtml.pl commandinfo.yml
 cmddata.cpp: commandinfo.yml ../writecmds.pl
 	perl ../writecmds.pl commandinfo.yml > cmddata.cpp
 
-#lex.mng.cpp lex.mng.h: mng.l
-#	flex -+ --prefix=mng -d -o lex.mng.cpp --header-file=lex.mng.h mng.l
-
 cataloglexer.cpp: cataloglexer.re2c
 	re2c -o cataloglexer.cpp cataloglexer.re2c
 
 caoslexer.cpp: caoslexer.re2c
 	re2c -o caoslexer.cpp caoslexer.re2c
 
-mngfile.o: lex.mng.cpp
+mnglexer.cpp: mnglexer.re2c
+	re2c -o mnglexer.cpp mnglexer.re2c
 
-#mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
-#	bison -d --name-prefix=mng mngparser.ypp
+mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
+	bison -d --name-prefix=mng mngparser.ypp
 
 catalogue.tab.cpp catalogue.tab.hpp: catalogue.ypp
 	bison -d --name-prefix=cata catalogue.ypp
@@ -215,9 +213,6 @@ headerdeps.dot: $(wildcard *.h) $(wildcard *.hpp) $(wildcard ser/*.h) mngparser.
 
 headerdeps.png: headerdeps.dot
 	dot -Tpng -o $@ $^
-
-mnglexer.cpp: mnglexer.re2c
-	re2c -o mnglexer.cpp mnglexer.re2c
 
 generated: catalogue.tab.hpp cataloglexer.cpp docs.html cmddata.cpp caoslexer.cpp mnglexer.cpp
 
