@@ -65,7 +65,7 @@ eoi { goto eoi; }
 "BeatSynch" 	{ return MNG_BeatSynch; }
 "UpdateRate" 	{ return MNG_UpdateRate; }
 "Wave" 		{ return MNG_Wave; }
-[A-Za-z]([A-Za-z0-9])*	{ mnglval.string = strndup(basep, mngfile_parse_p - basep); return MNG_name; }
+[A-Za-z]([A-Za-z0-9])*	{ mnglval.string = new std::string(basep, mngfile_parse_p - basep); return MNG_name; }
 [-]?[0-9]+[.][0-9]+	{ mnglval.number = atof(basep); return MNG_number; }
 [-]?[0-9]+		{ mnglval.number = atof(basep); return MNG_number; }
 [(){},=] { return basep[0]; }

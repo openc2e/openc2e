@@ -9,7 +9,7 @@
 %union
 {
 	float number;
-	char *string;
+	std::string *string;
 	class MNGNode *node;
 	class MNGExpression *expr;
 	class MNGExpressionContainer *container;
@@ -81,10 +81,10 @@ statement: effectdec { g_mngfile->add($1); }
 	| MNG_comment { }
 ;
 
-variabledec: MNG_Variable '(' MNG_name ',' expression ')' { $$ = new MNGVariableDecNode($3, $5); }
+variabledec: MNG_Variable '(' MNG_name ',' expression ')' { $$ = new MNGVariableDecNode(*$3, $5); delete $3; }
 ;
 
-effectdec: MNG_Effect '(' MNG_name ')' '{' stagelist '}' { $$ = new MNGEffectDecNode($3); ((MNGEffectDecNode *)$$)->children = $6; }
+effectdec: MNG_Effect '(' MNG_name ')' '{' stagelist '}' { $$ = new MNGEffectDecNode(*$3); delete $3; ((MNGEffectDecNode *)$$)->children = $6; }
 ;
 
 stagelist: stage { $$ = new std::list<MNGStageNode *>; if ($1) $$->push_back($1); }
@@ -124,7 +124,7 @@ tempodelay: MNG_TempoDelay '(' expression ')' { $$ = new MNGTempoDelayNode($3); 
 random: MNG_Random '(' expression ',' expression ')' { $$ = new MNGRandomNode($3, $5); }
 ;
 
-trackdec: MNG_Track '(' MNG_name ')' '{' track '}' { $$ = new MNGTrackDecNode($3); ((MNGTrackDecNode *)$$)->children = $6; }
+trackdec: MNG_Track '(' MNG_name ')' '{' track '}' { $$ = new MNGTrackDecNode(*$3); delete $3; ((MNGTrackDecNode *)$$)->children = $6; }
 ;
 
 track: tracksetting { $$ = new std::list<MNGNode *>; if ($1) $$->push_back($1); }
@@ -149,10 +149,10 @@ fadeout: MNG_FadeOut '(' expression ')' { $$ = new MNGFadeOutNode($3); }
 beatlength: MNG_BeatLength '(' expression ')' { $$ = new MNGBeatLengthNode($3); }
 ;
 
-aleotoriclayerdec: MNG_AleotoricLayer '(' MNG_name ')' '{' aleotoriclayer '}' { $$ = new MNGAleotoricLayerNode($3); ((MNGAleotoricLayerNode *)$$)->children = $6; }
+aleotoriclayerdec: MNG_AleotoricLayer '(' MNG_name ')' '{' aleotoriclayer '}' { $$ = new MNGAleotoricLayerNode(*$3); delete $3; ((MNGAleotoricLayerNode *)$$)->children = $6; }
 ;
 
-looplayerdec: MNG_LoopLayer '(' MNG_name ')' '{' looplayer '}' { $$ = new MNGLoopLayerNode($3); ((MNGLoopLayerNode *)$$)->children = $6; }
+looplayerdec: MNG_LoopLayer '(' MNG_name ')' '{' looplayer '}' { $$ = new MNGLoopLayerNode(*$3); delete $3; ((MNGLoopLayerNode *)$$)->children = $6; }
 ;
 
 aleotoriclayer: aleotoriclayercommand { $$ = new std::list<MNGNode *>; if ($1) $$->push_back($1); }
@@ -184,7 +184,7 @@ looplayercommand: MNG_comment { $$ = 0; }
 	| updaterate { $$ = $1; }
 ;
 
-effect: MNG_Effect '(' MNG_name ')' { $$ = new MNGEffectNode($3); }
+effect: MNG_Effect '(' MNG_name ')' { $$ = new MNGEffectNode(*$3); delete $3; }
 ;
 
 updateblock: MNG_Update '{' assignmentlist '}' { $$ = new MNGUpdateNode(); ((MNGUpdateNode *)$$)->children = $3; }
@@ -198,7 +198,7 @@ assignment: variable '=' expression { $$ = new MNGAssignmentNode($1, $3); }
 	| MNG_comment { $$ = 0; }
 ;
 
-variable: MNG_name { $$ = new MNGVariableNode($1); }
+variable: MNG_name { $$ = new MNGVariableNode(*$1); delete $1; }
 	| MNG_Interval { $$ = new MNGVariableNode(INTERVAL); }
 	| MNG_Volume { $$ = new MNGVariableNode(VOLUME); }
 	| MNG_Pan { $$ = new MNGVariableNode(PAN); }
@@ -259,6 +259,6 @@ beatsynch: MNG_BeatSynch '(' expression ')' { $$ = new MNGUpdateRateNode($3); }
 updaterate: MNG_UpdateRate '(' expression ')' { $$ = new MNGUpdateRateNode($3); }
 ;
 
-wave: MNG_Wave '(' MNG_name ')' { $$ = new MNGWaveNode($3); }
+wave: MNG_Wave '(' MNG_name ')' { $$ = new MNGWaveNode(*$3); delete $3; }
 ;
 
