@@ -24,11 +24,11 @@
 #include "Engine.h"
 #include "AudioBackend.h"
 #include "Camera.h"
+#include "MetaRoom.h"
+#include "Room.h"
 #include <iostream>
 using std::cout;
 using std::cerr;
-
-#include "Backend.h" // hack for now
 
 bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
 
@@ -115,50 +115,72 @@ void caosVM::c_SNDL() {
 
 /**
  MMSC (command) x (integer) y (integer) track_name (string)
- %status stub
+ %status maybe
+
+ Set the music track to be played in the metaroom containing the given coordinates.
 */
 void caosVM::c_MMSC() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_STRING(track_name)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	// TODO
+
+	MetaRoom *r = world.map.metaRoomAt(x, y);
+	caos_assert(r); // note that real c2e doesn't check
+
+	r->music = track_name;
 }
 
 /**
  MMSC (string) x (integer) y (integer)
- %status stub
+ %status maybe
+
+ Returns the music track to be played in the metaroom containing the given coordinates.
 */
 void caosVM::v_MMSC() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	// TODO
-	result.setString("");
+
+	MetaRoom *r = world.map.metaRoomAt(x, y);
+	caos_assert(r); // note that real c2e doesn't check
+
+	result.setString(r->music);
 }
 
 /**
  RMSC (command) x (integer) y (integer) track_name (string)
- %status stub
+ %status maybe
+
+ Set the music track to be played in the room containing the given coordinates.
 */
 void caosVM::c_RMSC() {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_STRING(track_name)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	// TODO
+
+	shared_ptr<Room> r = world.map.roomAt(x, y);
+	caos_assert(r);
+
+	r->music = track_name;
 }
 
 /**
  RMSC (string) x (integer) y (integer)
- %status stub
+ %status maybe
+
+ Returns the music track to be played in the room containing the given coordinates.
 */
 void caosVM::v_RMSC() {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	// TODO
-	result.setString("");
+
+	shared_ptr<Room> r = world.map.roomAt(x, y);
+	caos_assert(r);
+
+	result.setString(r->music);
 }
 
 /**
