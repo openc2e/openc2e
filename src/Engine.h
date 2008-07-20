@@ -56,6 +56,7 @@ protected:
 	void handleSpecialKeyDown(SomeEvent &event);
 	void handleSpecialKeyUp(SomeEvent &event);
 
+	class peFile *exefile;
 	void loadGameData();
 
 public:
@@ -67,6 +68,7 @@ public:
 	std::string getAudioBackendName() { return preferred_audiobackend; }
 
 	std::vector<std::string> wordlist;
+	class peFile *getExeFile() { return exefile; }
 	unsigned char *getPalette() { return palette; }
 
 	std::string getGameName() { return gamename; }

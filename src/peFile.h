@@ -36,7 +36,7 @@ namespace fs = boost::filesystem;
 
 // these are not actually a sensible way to do this, hence HORRID
 #define HORRID_LANG_GERMAN 0x407
-#define HORRID_LANG_ENGLISH 0x409 // also 0x411 (and 0x809 etc)
+#define HORRID_LANG_ENGLISH 0x809 // also 0x409, 0x411
 #define HORRID_LANG_FRENCH 0x40c
 #define HORRID_LANG_ITALIAN 0x410
 #define HORRID_LANG_DUTCH 0x413

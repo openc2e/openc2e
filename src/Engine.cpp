@@ -70,6 +70,7 @@ Engine::Engine() {
 	cmdline_norun = false;
 
 	palette = 0;
+	exefile = 0;
 
 	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
 	addPossibleAudioBackend("null", shared_ptr<AudioBackend>(new NullAudioBackend()));
@@ -124,31 +125,30 @@ void Engine::loadGameData() {
 		fs::path exepath(world.data_directories[0] / "/Creatures2.exe");
 		if (fs::exists(exepath) && !fs::is_directory(exepath)) {
 			try {
-				peFile exefile(exepath);
-
-				// TODO: support multiple languages
-				resourceInfo *r = exefile.getResource(PE_RESOURCETYPE_STRING, HORRID_LANG_ENGLISH, 14);
-				if (r) {
-					std::vector<std::string> strings = r->parseStrings();
-					if (strings.size() > 5) {
-						std::string wordlistdata = strings[5];
-
-						std::string s;
-						for (unsigned int i = 0; i < wordlistdata.size(); i++) {
-							if (wordlistdata[i] == '|') {
-								wordlist.push_back(s);
-								s.clear();
-							} else s += wordlistdata[i];
-						}
-					} else
-						std::cout << "Warning: Couldn't load word list (string table too small)!" << std::endl;
-				} else
-					std::cout << "Warning: Couldn't load word list (couldn't find resource)!" << std::endl;
+				exefile = new peFile(exepath);
 			} catch (creaturesException &e) {
 				std::cout << "Warning: Couldn't load word list (" << e.what() << ")!" << std::endl;
 			}
-		} else
-			std::cout << "Warning: Couldn't load word list (couldn't find Creatures2.exe)!" << std::endl;
+		} else std::cout << "Warning: Couldn't load word list (couldn't find Creatures2.exe)!" << std::endl;
+
+		if (exefile) {
+			// TODO: support multiple languages
+			resourceInfo *r = exefile->getResource(PE_RESOURCETYPE_STRING, HORRID_LANG_ENGLISH, 14);
+			if (r) {
+				std::vector<std::string> strings = r->parseStrings();
+				if (strings.size() > 5) {
+					std::string wordlistdata = strings[5];
+
+					std::string s;
+					for (unsigned int i = 0; i < wordlistdata.size(); i++) {
+						if (wordlistdata[i] == '|') {
+							wordlist.push_back(s);
+							s.clear();
+						} else s += wordlistdata[i];
+					}
+				} else std::cout << "Warning: Couldn't load word list (string table too small)!" << std::endl;
+			} else std::cout << "Warning: Couldn't load word list (couldn't find resource)!" << std::endl;
+		}
 	}
 }
 
