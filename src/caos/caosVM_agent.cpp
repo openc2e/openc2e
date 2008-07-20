@@ -865,6 +865,7 @@ void caosVM::c_MESG_WRIT() {
  MESG WRT+ (command) agent (agent) message_id (integer) param_1 (anything) param_2 (anything) delay (integer)
  %status maybe
  %pragma variants c2 cv c3 sm
+ %cost c1,c2 0
 
  Sends a message of type message_id to the given agent, much like MESG WRIT, but with the 
  addition of parameters.  The message will be sent after waiting the number of ticks set 

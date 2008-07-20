@@ -150,10 +150,12 @@ void caosVM::c_UNTL() {
  %pragma stackdelta 0
  %status maybe
  %pragma variants c1 c2 cv c3 sm
+ %cost c1,c2 0
  
  Jumps to a subroutine defined by SUBR with label (label).
 */
 void caosVM::c_GSUB() {
+	// TODO: is cost correct?
 	// handled elsewhere
 }
 
@@ -175,10 +177,12 @@ void caosVM::c_SUBR() {
  %pragma stackdelta any
  %status maybe
  %pragma variants c1 c2 cv c3 sm
+ %cost c1,c2 0
  
  Returns from a subroutine called with GSUB.
 */
 void caosVM::c_RETN() {
+	// TODO: is cost correct?
 	if (callStack.empty())
 		throw creaturesException("RETN with an empty callstack");
 	nip = callStack.back().nip;
