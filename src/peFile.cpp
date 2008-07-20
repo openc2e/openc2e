@@ -138,7 +138,7 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 		if (level < 2) {
 			/* another level, more horror */
 
-			parseResourcesLevel(s, s.offset + offset & 0x7fffffff, level + 1);
+			parseResourcesLevel(s, s.offset + (offset & 0x7fffffff), level + 1);
 		} else {
 			/* bottom level, file data is here */
 

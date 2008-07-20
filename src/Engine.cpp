@@ -28,6 +28,7 @@
 #include "backends/NullBackend.h"
 #include "backends/NullAudioBackend.h"
 #include "SFCFile.h"
+#include "peFile.h"
 #include "Camera.h"
 
 #include <boost/filesystem/path.hpp>
@@ -95,7 +96,9 @@ void Engine::addPossibleAudioBackend(std::string s, boost::shared_ptr<AudioBacke
 void Engine::setBackend(shared_ptr<Backend> b) {
 	backend = b;
 	lasttimestamp = backend->ticks();
+}
 
+void Engine::loadGameData() {
 	// load palette for C1
 	if (world.gametype == "c1") {
 		// TODO: case-sensitivity for the lose
@@ -114,6 +117,38 @@ void Engine::setBackend(shared_ptr<Backend> b) {
 			backend->setPalette((uint8 *)palette);
 		} else
 			throw creaturesException("Couldn't find C1 palette data!");
+	}
+
+	// load word list for C2
+	if (world.gametype == "c2") {
+		fs::path exepath(world.data_directories[0] / "/Creatures2.exe");
+		if (fs::exists(exepath) && !fs::is_directory(exepath)) {
+			try {
+				peFile exefile(exepath);
+
+				// TODO: support multiple languages
+				resourceInfo *r = exefile.getResource(PE_RESOURCETYPE_STRING, HORRID_LANG_ENGLISH, 14);
+				if (r) {
+					std::vector<std::string> strings = r->parseStrings();
+					if (strings.size() > 5) {
+						std::string wordlistdata = strings[5];
+
+						std::string s;
+						for (unsigned int i = 0; i < wordlistdata.size(); i++) {
+							if (wordlistdata[i] == '|') {
+								wordlist.push_back(s);
+								s.clear();
+							} else s += wordlistdata[i];
+						}
+					} else
+						std::cout << "Warning: Couldn't load word list (string table too small)!" << std::endl;
+				} else
+					std::cout << "Warning: Couldn't load word list (couldn't find resource)!" << std::endl;
+			} catch (creaturesException &e) {
+				std::cout << "Warning: Couldn't load word list (" << e.what() << ")!" << std::endl;
+			}
+		} else
+			std::cout << "Warning: Couldn't load word list (couldn't find Creatures2.exe)!" << std::endl;
 	}
 }
 
@@ -719,6 +754,8 @@ bool Engine::initialSetup() {
 		caosVar contents; contents.setInt(1);
 		eame_variables[name] = contents;
 	}
+
+	loadGameData();
 
 	// execute the initial scripts!
 	std::cout << "* Executing initial scripts..." << std::endl;

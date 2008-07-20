@@ -48,6 +48,16 @@ protected:
 	std::map<std::string, boost::shared_ptr<class AudioBackend> > possible_audiobackends;
 	std::string preferred_backend, preferred_audiobackend;
 
+	void handleKeyboardScrolling();
+	void handleResizedWindow(SomeEvent &event);
+	void handleMouseMove(SomeEvent &event);
+	void handleMouseButton(SomeEvent &event);
+	void handleKeyDown(SomeEvent &event);
+	void handleSpecialKeyDown(SomeEvent &event);
+	void handleSpecialKeyUp(SomeEvent &event);
+
+	void loadGameData();
+
 public:
 	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	
@@ -56,6 +66,7 @@ public:
 	std::string getBackendName() { return preferred_backend; }
 	std::string getAudioBackendName() { return preferred_audiobackend; }
 
+	std::vector<std::string> wordlist;
 	unsigned char *getPalette() { return palette; }
 
 	std::string getGameName() { return gamename; }
@@ -73,14 +84,7 @@ public:
 	unsigned int msUntilTick();
 	void update();
 	bool tick();
-	void handleKeyboardScrolling();
 	void processEvents();
-	void handleResizedWindow(SomeEvent &event);
-	void handleMouseMove(SomeEvent &event);
-	void handleMouseButton(SomeEvent &event);
-	void handleKeyDown(SomeEvent &event);
-	void handleSpecialKeyDown(SomeEvent &event);
-	void handleSpecialKeyUp(SomeEvent &event);
 
 	void addPossibleBackend(std::string, boost::shared_ptr<Backend>);
 	void addPossibleAudioBackend(std::string, boost::shared_ptr<AudioBackend>);

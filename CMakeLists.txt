@@ -104,6 +104,7 @@ SET(OPENC2E_CORE
 	${GEN}/mngparser.tab.cpp
 	src/oldBrain.cpp
 	src/PathResolver.cpp
+	src/peFile.cpp
 	src/physics.cpp
 	src/PointerAgent.cpp
 	src/Port.cpp
