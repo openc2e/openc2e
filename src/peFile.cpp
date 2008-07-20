@@ -185,4 +185,25 @@ resourceInfo *peFile::getResource(uint32 type, uint32 lang, uint32 name) {
 	return r;
 }
 
+std::vector<std::string> resourceInfo::parseStrings() {
+	std::vector<std::string> strings;
+	uint16 *udata = (uint16 *)data;
+
+	for (unsigned int i = 0; i < size / 2;) {
+		uint16 strsize = *udata;
+		strsize = swapEndianShort(strsize);
+		udata++; i++;
+
+		std::string s;
+		for (unsigned int j = 0; (j < strsize) && (i < size / 2); j++) {
+			uint16 d = *udata; d = swapEndianShort(d);
+			s += (uint8)d; // TODO: convert properly from utf16, somehow
+			i++; udata++;
+		}
+		strings.push_back(s);
+	}
+
+	return strings;
+}
+
 /* vim: set noet: */
