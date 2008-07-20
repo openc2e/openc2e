@@ -609,6 +609,7 @@ void caosVM::c_BBD_EDIT() {
 	valid_agent(targ);
 
 	Blackboard *b = dynamic_cast<Blackboard *>(targ.get());
+	caos_assert(b);
 	BlackboardPart *p = b->getBlackboardPart();
 	caos_assert(p);
 	
@@ -622,7 +623,7 @@ void caosVM::c_BBD_EDIT() {
 
 /**
  BBD: VOCB (command) blackboardstart (integer) globalstart (integer) count (integer)
- %status stub
+ %status maybe
  %pragma variants c2
 
  Copy count words into the blackboard word list from the global word list.
@@ -632,8 +633,20 @@ void caosVM::c_BBD_VOCB() {
 	VM_PARAM_INTEGER(globalstart)
 	VM_PARAM_INTEGER(blackboardstart)
 
+	caos_assert(count >= 0);
+	caos_assert(globalstart >= 0);
+	caos_assert(blackboardstart >= 0);
+
 	valid_agent(targ);
-	// TODO
+	Blackboard *b = dynamic_cast<Blackboard *>(targ.get());
+	caos_assert(b);
+
+	if (engine.wordlist.size() == 0) return; // no word list!
+	caos_assert(globalstart < engine.wordlist.size());
+
+	for (unsigned int i = 0; (i < (unsigned int)count) && ((unsigned int)globalstart + i < engine.wordlist.size()); i++) {
+		b->addBlackboardString(blackboardstart + i, globalstart + i, engine.wordlist[globalstart + i]);
+	}
 }
 
 /**

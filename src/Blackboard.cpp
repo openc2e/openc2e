@@ -105,7 +105,7 @@ void Blackboard::broadcast(bool audible) {
 	// TODO: blackboard broadcasts
 	
 	if (audible) {
-		Bubble::newBubble(this, true, currenttext);
+		Bubble::newBubble(this, true, getText());
 	}
 }
 
