@@ -34,8 +34,41 @@
 
 #include "version.h"
 
-// Constructor which creates the main window.
+#include "peFile.h"
 
+QPixmap imageFromExeResource(unsigned int resourceid) {
+	assert(engine.getExeFile());
+
+	resourceInfo *r = engine.getExeFile()->getResource(PE_RESOURCETYPE_BITMAP, HORRID_LANG_ENGLISH, resourceid);
+	if (!r) r = engine.getExeFile()->getResource(PE_RESOURCETYPE_BITMAP, 0x400, resourceid);
+	if (!r) return QPixmap();
+
+	unsigned int size = r->getSize() + 14;
+	char *bmpdata = (char *)malloc(size);
+
+	// fake a BITMAPFILEHEADER
+	bmpdata[0] = 'B'; bmpdata[1] = 'M';
+	memcpy(bmpdata + 2, &size, 4);
+	memset(bmpdata + 6, 0, 8);
+
+	memcpy(bmpdata + 14, r->getData(), r->getSize());
+
+	QPixmap i;
+	i.loadFromData((const uchar *)bmpdata, (int)size);
+	i.setMask(i.createHeuristicMask());
+
+	free(bmpdata);
+
+	return i;
+}
+
+QIcon iconFromImageList(QPixmap l, unsigned int n) {
+	unsigned int x = n * (l.height() + 1);
+	QPixmap img = l.copy(x, 0, l.height() + 1, l.height());
+	return img;
+}
+
+// Constructor which creates the main window.
 QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 	viewport = new openc2eView(this, backend);
 	setCentralWidget(viewport);
