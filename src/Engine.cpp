@@ -103,7 +103,7 @@ void Engine::loadGameData() {
 	// load palette for C1
 	if (world.gametype == "c1") {
 		// TODO: case-sensitivity for the lose
-		fs::path palpath(world.data_directories[0] / "/Palettes/palette.dta");
+		fs::path palpath(world.findFile("Palettes/palette.dta"));
 		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
 			palette = new unsigned char[768];
 			
@@ -122,7 +122,7 @@ void Engine::loadGameData() {
 
 	// load word list for C2
 	if (world.gametype == "c2") {
-		fs::path exepath(world.data_directories[0] / "/Creatures2.exe");
+		fs::path exepath(world.findFile("Creatures2.exe"));
 		if (fs::exists(exepath) && !fs::is_directory(exepath)) {
 			try {
 				exefile = new peFile(exepath);
