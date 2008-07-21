@@ -212,6 +212,168 @@ QtOpenc2e::QtOpenc2e(boost::shared_ptr<QtBackend> backend) {
 
 	helpMenu = menuBar()->addMenu(tr("&Help"));
 	helpMenu->addAction(aboutAct);
+
+	if (engine.version == 2 && engine.getExeFile()) {
+		loadC2Images();
+		createC2Toolbars();
+		setupC2Statusbar();
+	}
+}
+
+/*
+ * We obviously can't distribute the Creatures 2 icons with openc2e,
+ * so we just use the ones in the Creatures2.exe file.
+ */
+void QtOpenc2e::loadC2Images() {
+	// we always use the 21x21 icon set
+	standardicons = imageFromExeResource(0xe3);
+	handicons = imageFromExeResource(0xe4);
+	favtoolbaricons = imageFromExeResource(0xe5);
+	appleticons = imageFromExeResource(0xe6);
+
+	for (unsigned int i = 0; i < 4; i++)
+		seasonicon[i] = imageFromExeResource(0x98 + i);
+
+	timeofdayicon[0] = imageFromExeResource(0xa3);
+	timeofdayicon[1] = imageFromExeResource(0xc4);
+	timeofdayicon[2] = imageFromExeResource(0xc2);
+	timeofdayicon[3] = imageFromExeResource(0xc3);
+	timeofdayicon[4] = imageFromExeResource(0xc5);
+
+	for (unsigned int i = 0; i < 5; i++)
+		temperatureicon[i] = imageFromExeResource(0xa4 + i);
+
+	healthicon[0] = imageFromExeResource(0xe8); // dead (gray)
+	healthicon[1] = imageFromExeResource(0xc7); // 0/4
+	healthicon[2] = imageFromExeResource(0xac); // 1/4
+	healthicon[3] = imageFromExeResource(0xad); // 2/4
+	healthicon[4] = imageFromExeResource(0xab); // 3/4
+	healthicon[5] = imageFromExeResource(0xaa); // 4/4
+
+	hearticon[0] = imageFromExeResource(0xe9); // dead (gray)
+	hearticon[1] = imageFromExeResource(0xae); // large
+	hearticon[2] = imageFromExeResource(0xaf); // medium
+	hearticon[3] = imageFromExeResource(0xb0); // small
+}
+
+void QtOpenc2e::createC2Toolbars() {
+	QToolBar *stdtoolbar = new QToolBar("Standard", this);
+
+	toolbarnextaction = stdtoolbar->addAction(iconFromImageList(standardicons, 0), "Next");
+	toolbareyeviewaction = stdtoolbar->addAction(iconFromImageList(standardicons, 1), "Eye View");
+	toolbareyeviewaction->setCheckable(true);
+	toolbartrackaction = stdtoolbar->addAction(iconFromImageList(standardicons, 2), "Track");
+	toolbartrackaction->setCheckable(true);
+	toolbarhaloaction = stdtoolbar->addAction(iconFromImageList(standardicons, 3), "Halo");
+	toolbarhaloaction->setCheckable(true);
+
+	toolbarplayaction = stdtoolbar->addAction(iconFromImageList(standardicons, 4), "Play");
+	stdtoolbar->insertSeparator(toolbarplayaction);
+	toolbarpauseaction = stdtoolbar->addAction(iconFromImageList(standardicons, 5), "Pause");
+	QActionGroup *playpausegroup = new QActionGroup(this);
+	playpausegroup->addAction(toolbarplayaction);
+	playpausegroup->addAction(toolbarpauseaction);
+	toolbarplayaction->setCheckable(true);
+	toolbarpauseaction->setCheckable(true);
+	toolbarplayaction->setChecked(true);
+
+	toolbarhelpaction = stdtoolbar->addAction(iconFromImageList(standardicons, 6), "Help");
+	stdtoolbar->insertSeparator(toolbarhelpaction);
+	toolbarwebaction = stdtoolbar->addAction(iconFromImageList(standardicons, 7), "Web");
+
+	addToolBar(stdtoolbar);
+
+	QToolBar *handtoolbar = new QToolBar("Pointer", this);
+	toolbarinvisibleaction = handtoolbar->addAction(iconFromImageList(handicons, 0), "Invisible");
+	toolbarinvisibleaction->setCheckable(true);
+	toolbarteachaction = handtoolbar->addAction(iconFromImageList(handicons, 1), "Teach");
+	handtoolbar->insertSeparator(toolbarteachaction);
+	toolbarpushaction = handtoolbar->addAction(iconFromImageList(handicons, 2), "Push");
+	QActionGroup *teachpushgroup = new QActionGroup(this);
+	teachpushgroup->addAction(toolbarteachaction);
+	teachpushgroup->addAction(toolbarpushaction);
+	toolbarteachaction->setCheckable(true);
+	toolbarpushaction->setCheckable(true);
+	toolbarteachaction->setChecked(true);
+	addToolBar(handtoolbar);
+
+	QToolBar *applettoolbar = new QToolBar("Applets", this);
+	for (unsigned int i = 0; i < 13; i++) {
+		if (i != 0 && (i % 4 == 0))
+			applettoolbar->insertSeparator(applettoolbar->addAction(iconFromImageList(appleticons, i), "Unknown Applet"));
+		else
+			applettoolbar->addAction(iconFromImageList(appleticons, i), "Unknown Applet");
+	}
+	addToolBar(applettoolbar);
+
+	addToolBarBreak();
+
+	QToolBar *favtoolbar = new QToolBar("Favourites", this);
+
+	QLabel *speechlabel = new QLabel("Speech History:", this);
+	favtoolbar->addWidget(speechlabel);
+	speechcombo = new QComboBox(this);
+	speechcombo->setMinimumContentsLength(15);
+	speechcombo->setEditable(true);
+	favtoolbar->addWidget(speechcombo);
+	favtoolbar->addAction(iconFromImageList(favtoolbaricons, 0), "");
+
+	QLabel *placelabel = new QLabel("Places:", this);
+	favtoolbar->insertSeparator(favtoolbar->addWidget(placelabel));
+	placecombo = new QComboBox(this);
+	placecombo->setMinimumContentsLength(15);
+	favtoolbar->addWidget(placecombo);
+	favtoolbar->addAction(iconFromImageList(favtoolbaricons, 1), "");
+
+	addToolBar(favtoolbar);
+
+	QMenu *toolbarsMenu = viewMenu->addMenu(tr("&Toolbars"));
+	toolbarsMenu->addAction(stdtoolbar->toggleViewAction());
+	toolbarsMenu->addAction(handtoolbar->toggleViewAction());
+	toolbarsMenu->addAction(applettoolbar->toggleViewAction());
+	toolbarsMenu->addAction(favtoolbar->toggleViewAction());
+}
+
+void QtOpenc2e::setupC2Statusbar() {
+	QLabel *w;
+
+	seasontext = new QLabel(this);
+	seasontext->setText("Spring");
+	statusBar()->addWidget(seasontext);
+
+	seasonimage = new QLabel(this);
+	seasonimage->setPixmap(seasonicon[0]);
+	statusBar()->addWidget(seasonimage);
+
+	yeartext = new QLabel(this);
+	yeartext->setText("Year: 000");
+	statusBar()->addWidget(yeartext);
+
+	timeofdayimage = new QLabel(this);
+	timeofdayimage->setPixmap(timeofdayicon[0]);
+	statusBar()->addWidget(timeofdayimage);
+
+	// TODO: textual temperature
+	temperatureimage = new QLabel(this);
+	temperatureimage->setPixmap(temperatureicon[0]);
+	statusBar()->addWidget(temperatureimage);
+
+	w = new QLabel(this);
+	w->setText("Health:");
+	statusBar()->addPermanentWidget(w);
+
+	healthimage = new QLabel(this);
+	healthimage->setPixmap(healthicon[0]);
+	statusBar()->addPermanentWidget(healthimage);
+
+	heartimage = new QLabel(this);
+	heartimage->setPixmap(hearticon[0]);
+	statusBar()->addPermanentWidget(heartimage);
+
+	QPixmap blank = imageFromExeResource(0xc6);
+	iconimage = new QLabel(this);
+	iconimage->setPixmap(blank);
+	statusBar()->addPermanentWidget(iconimage);
 }
 
 QtOpenc2e::~QtOpenc2e() {
