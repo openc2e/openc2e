@@ -42,11 +42,14 @@ private slots:
 	void updateCreaturesMenu();
 	void selectCreature();
 	void updateMenus();
+	void updateAppletStatus();
 	
 	void about();
 	
 	void showHatchery();
+	void toggleHatchery();
 	void showAgentInjector();
+	void toggleAgentInjector();
 	void showBrainViewer();
 	
 	void toggleShowMap();
@@ -79,6 +82,8 @@ private:
 
 	class QTimer *ourTimer;
 
+	void constructMenus();
+
 	/*** C2 ***/
 
 	QPixmap standardicons, handicons, favtoolbaricons, appleticons;
@@ -97,6 +102,9 @@ private:
 
 	// Pointer
 	QAction *toolbarinvisibleaction, *toolbarteachaction, *toolbarpushaction;
+
+	// Applets
+	QAction *toolbarhatcheryaction, *toolbaragentaction;
 
 	void loadC2Images();
 	void createC2Toolbars();
