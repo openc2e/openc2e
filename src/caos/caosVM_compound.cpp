@@ -642,7 +642,7 @@ void caosVM::c_BBD_VOCB() {
 	caos_assert(b);
 
 	if (engine.wordlist.size() == 0) return; // no word list!
-	caos_assert(globalstart < engine.wordlist.size());
+	caos_assert((unsigned int)globalstart < engine.wordlist.size());
 
 	for (unsigned int i = 0; (i < (unsigned int)count) && ((unsigned int)globalstart + i < engine.wordlist.size()); i++) {
 		b->addBlackboardString(blackboardstart + i, globalstart + i, engine.wordlist[globalstart + i]);
