@@ -389,7 +389,8 @@ void caosVM::c_POSE() {
 	SpritePart *s = dynamic_cast<SpritePart *>(p);
 	if (s && engine.version != 2) // C2 has special handling for invalid poses, see SpritePart::setPose
 		caos_assert(s->getFirstImg() + s->getBase() + pose < s->getSprite()->numframes());
-	
+
+	p->animation.clear();
 	p->setPose(pose);
 }
 
@@ -998,7 +999,7 @@ class blockUntilOver : public blockCond {
 			fno = p->getFrameNo();
 			animsize = p->animation.size();
 
-			if (fno + 1 == animsize) blocking = false;
+			if (fno == animsize) blocking = false;
 			else if (animsize == 0) blocking = false;
 			else blocking = true; 
 			return blocking;

@@ -84,23 +84,7 @@ void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 
 void SpritePart::setFrameNo(unsigned int f) {
 	assert(f < animation.size());
-	if (firstimg + base + animation[f] >= getSprite()->numframes()) {
-		if (engine.version == 2) {
-			// hack for invalid poses - use the last sprite in the file (as real C2 does)
-			spriteno = getSprite()->numframes() - 1;
-		} else {
-			std::string err = boost::str(boost::format("animation frame %d (firstimg %d, base %d, value %d) was past end of sprite file '%s' (%d sprites)") %
-				f % firstimg % base % (int)animation[f] % getSprite()->getName() % getSprite()->numframes());
-			parent->unhandledException(err, false);
-			animation.clear();
-			return;
-		}
-	} else {
-		spriteno = firstimg + base + animation[f];
-	}
-	
 	frameno = f;
-	pose = animation[f];
 }
 
 void SpritePart::setPose(unsigned int p) {
@@ -109,6 +93,7 @@ void SpritePart::setPose(unsigned int p) {
 			// hack for invalid poses - use the last sprite in the file (as real C2 does)
 			spriteno = getSprite()->numframes() - 1;
 		} else {
+			// TODO: mention anim frame if animation is non-empty
 			std::string err = boost::str(boost::format("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
 				p % firstimg % base % getSprite()->getName() % getSprite()->numframes());
 			parent->unhandledException(err, false);
@@ -118,7 +103,6 @@ void SpritePart::setPose(unsigned int p) {
 		spriteno = firstimg + base + p;
 	}
 
-	animation.clear();
 	pose = p;
 }
 
@@ -605,18 +589,41 @@ void SpritePart::tick() {
 			if (framedelay == (unsigned int)framerate + 1)
 				framedelay = 0;
 		}
+	}
 		
-		if (framedelay == 0) {
-			unsigned int f = frameno + 1;
-			if (f == animation.size()) return;
-			if (animation[f] == 255) {
-				if (f == (animation.size() - 1)) f = 0;
-				else f = animation[f + 1];
+	if (framedelay == 0)
+		updateAnimation();
+}
+
+void AnimatablePart::updateAnimation() {
+	if (animation.empty()) return;
+
+	if (frameno == animation.size()) return;
+	assert(frameno < animation.size());
+
+	if (animation[frameno] == 255) {
+		if (frameno == (animation.size() - 1)) {
+			frameno = 0;
+		} else {
+			// if we're not at the end, we ought to have at least one more item
+			assert(frameno + 1 < animation.size());
+
+			frameno = animation[frameno + 1];
+
+			if (frameno >= animation.size()) {
+				// this is an internal error because it should have been validated at pose-setting time
+				std::string err = boost::str(boost::format("internal animation error: tried looping back to frame %d but that is beyond animation size %d") %
+					(int)frameno % (int)animation.size());
+				parent->unhandledException(err, false);
+				animation.clear();
+				return;
 			}
-			// TODO: check f is valid..
-			setFrameNo(f);
+
 		}
 	}
+
+	setPose(animation[frameno]);
+	frameno++;
 }
 
 CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,

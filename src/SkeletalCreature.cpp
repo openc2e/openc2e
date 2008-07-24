@@ -709,17 +709,7 @@ SkeletonPart::SkeletonPart(SkeletalCreature *p) : AnimatablePart(p, 0, 0, 0, 0) 
 }
 
 void SkeletonPart::tick() {
-	if (animation.empty()) return;
-
-	unsigned int f = frameno + 1;
-	if (f == animation.size()) return;
-	if (animation[f] == 255) {
-		if (f == (animation.size() - 1)) f = 0;
-		else f = animation[f + 1];
-
-		// TODO: check f is valid..
-		setFrameNo(f);
-	}
+	updateAnimation();
 }
 
 void SkeletonPart::setPose(unsigned int p) {
@@ -729,7 +719,6 @@ void SkeletonPart::setPose(unsigned int p) {
 void SkeletonPart::setFrameNo(unsigned int p) {
 	assert(p < animation.size());
 	frameno = p;
-	setPose(animation[p]);
 }
 
 void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
