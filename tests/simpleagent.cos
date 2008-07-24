@@ -1,8 +1,8 @@
 * unit tests for the simple agent stuff 
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: simpleagent: 9 tests"
-DBG: OUTS "1..9"
+DBG: OUTS "# TEST: simpleagent: 11 tests"
+DBG: OUTS "1..11"
 
 * test NULL
 SETA VA00 NULL
@@ -13,7 +13,7 @@ ELSE
 ENDI
 
 * test NEW: SIMP
-NEW: SIMP 3 2 1 "blnk" 1 0 0
+NEW: SIMP 3 2 1 "blnk" 2 0 0
 DOIF TARG eq NULL
  DBG: OUTS "not ok 2"
 ELSE
@@ -55,7 +55,7 @@ ENDI
 
 * test ENUM
 SETV VA00 0
-NEW: SIMP 3 2 1 "blnk" 1 0 0
+NEW: SIMP 3 2 1 "blnk" 2 0 0
 SETV OV00 2
 ENUM 3 2 1
  ADDV VA00 OV00
@@ -91,3 +91,22 @@ DOIF TARG eq NULL
 ELSE
  DBG: OUTS "not ok 9"
 ENDI
+
+RTAR 3 2 1
+
+* test POSE setting
+POSE 1
+DOIF POSE eq 1
+ DBG: OUTS "ok 10"
+ELSE
+ DBG: OUTS "not ok 10"
+ENDI
+
+* make sure ANIM doesn't immediately change current POSE
+ANIM [0]
+DOIF POSE eq 1
+ DBG: OUTS "ok 11"
+ELSE
+ DBG: OUTS "not ok 11"
+ENDI
+
