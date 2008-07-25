@@ -264,6 +264,7 @@ void QtOpenc2e::loadC2Images() {
 
 void QtOpenc2e::createC2Toolbars() {
 	QToolBar *stdtoolbar = new QToolBar("Standard", this);
+	stdtoolbar->setIconSize(QSize(22, 21));
 
 	toolbarnextaction = stdtoolbar->addAction(iconFromImageList(standardicons, 0), "Next");
 	toolbareyeviewaction = stdtoolbar->addAction(iconFromImageList(standardicons, 1), "Eye View");
@@ -290,6 +291,8 @@ void QtOpenc2e::createC2Toolbars() {
 	addToolBar(stdtoolbar);
 
 	QToolBar *handtoolbar = new QToolBar("Pointer", this);
+	handtoolbar->setIconSize(QSize(22, 21));
+
 	toolbarinvisibleaction = handtoolbar->addAction(iconFromImageList(handicons, 0), "Invisible");
 	toolbarinvisibleaction->setCheckable(true);
 	toolbarteachaction = handtoolbar->addAction(iconFromImageList(handicons, 1), "Teach");
@@ -304,6 +307,7 @@ void QtOpenc2e::createC2Toolbars() {
 	addToolBar(handtoolbar);
 
 	QToolBar *applettoolbar = new QToolBar("Applets", this);
+	applettoolbar->setIconSize(QSize(22, 21));
 
 	toolbarhatcheryaction = applettoolbar->addAction(iconFromImageList(appleticons, 0), "Hatchery");
 	toolbarhatcheryaction->setCheckable(true);
@@ -354,6 +358,7 @@ void QtOpenc2e::createC2Toolbars() {
 	addToolBarBreak();
 
 	QToolBar *favtoolbar = new QToolBar("Favourites", this);
+	favtoolbar->setIconSize(QSize(22, 21));
 
 	QLabel *speechlabel = new QLabel("Speech History:", this);
 	favtoolbar->addWidget(speechlabel);
