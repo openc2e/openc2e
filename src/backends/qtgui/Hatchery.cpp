@@ -16,6 +16,7 @@
 
 #include "World.h"
 #include "Hatchery.h"
+#include "Engine.h"
 
 #include <QtGui>
 
@@ -34,10 +35,12 @@ Hatchery::Hatchery(QWidget *parent) : QDialog(parent) {
 	setAttribute(Qt::WA_QuitOnClose, false);
 
 	/* hatchery background */
-	std::string hatcherybgfile = world.findFile("hatchery/hatchery.bmp");
+	std::string hatcherybgfile;
+	if (engine.version == 1) hatcherybgfile = world.findFile("hatchery/hatchery.bmp");
+	else if (engine.version == 2) hatcherybgfile = world.findFile("Applet Data/Hatchery.bmp");
 	if (hatcherybgfile.empty()) return;
-	QPixmap hatcherybg(QString(hatcherybgfile.c_str()));
 
+	QPixmap hatcherybg(QString(hatcherybgfile.c_str()));
 	resize(hatcherybg.width() + 6, hatcherybg.height() + 6);
 	
 	/* create the widgets/layout */
@@ -49,30 +52,32 @@ Hatchery::Hatchery(QWidget *parent) : QDialog(parent) {
 	
 	graphicsScene->addPixmap(hatcherybg);
 
-	/* mask which goes over the eggs */
-	std::string hatcherymaskfile = world.findFile("hatchery/htchmask.bmp");
-	if (hatcherymaskfile.size()) {
-		QPixmap hatcherymask(QString(hatcherymaskfile.c_str()));
-		QColor maskcolour(0xff, 0x00, 0x80);
-		hatcherymask.setMask(hatcherymask.createMaskFromColor(maskcolour));
+	if (engine.version == 1) {
+		/* mask which goes over the eggs */
+		std::string hatcherymaskfile = world.findFile("hatchery/htchmask.bmp");
+		if (hatcherymaskfile.size()) {
+			QPixmap hatcherymask(QString(hatcherymaskfile.c_str()));
+			QColor maskcolour(0xff, 0x00, 0x80);
+			hatcherymask.setMask(hatcherymask.createMaskFromColor(maskcolour));
 	
-		QGraphicsPixmapItem *maskitem = graphicsScene->addPixmap(hatcherymask);
-		maskitem->setPos(0, 168);
-	}
+			QGraphicsPixmapItem *maskitem = graphicsScene->addPixmap(hatcherymask);
+			maskitem->setPos(0, 168);
+		}
 
-	/* fan animation */
-	for (unsigned int i = 0; i < 4; i++) {
+		/* fan animation */
+		for (unsigned int i = 0; i < 4; i++) {
+			// TODO
+		}
+	
+		/* 'off' state for the light */
+		// TODO
+	
+		/* eggs */
+		// TODO
+	
+		/* gender marker animation */
 		// TODO
 	}
-	
-	/* 'off' state for the light */
-	// TODO
-	
-	/* eggs */
-	// TODO
-	
-	/* gender marker animation */
-	// TODO
 }
 
 Hatchery::~Hatchery() {
