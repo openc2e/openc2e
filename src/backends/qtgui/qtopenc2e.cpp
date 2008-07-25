@@ -463,25 +463,27 @@ void QtOpenc2e::updateCreaturesMenu() {
 		if (!p) continue; // grr, but needed
 
 		CreatureAgent *a = dynamic_cast<CreatureAgent *>(p.get());
-		if (a) {
-			// TODO: add breed?
-			std::string creaturename = creatureNameFor(p);
-			if (creaturename.empty()) creaturename = "<Unnamed>";
-			creaturename += std::string(" (") + (a->getCreature()->isFemale() ? "Female" : "Male") + ")";
-
-			// create a new action with menu as parent, so it'll be destroyed on clear()
-			QAction *creatureSelectAct = new QAction(creaturename.c_str(), creaturesMenu);
-			creatureSelectAct->setData(QVariant::fromValue((void *)p.get()));
-
-			creatureSelectAct->setCheckable(true);
-			if (world.selectedcreature == p) creatureSelectAct->setChecked(true);
-			connect(creatureSelectAct, SIGNAL(triggered()), this, SLOT(selectCreature()));
+		if (!a) continue;
 			
-			if (monikerDataFor(p).getStatus() != borncreature)
-				creatureSelectAct->setDisabled(true);
+		if (p->genus != 1) continue; // TODO: check ettin/grendel status
 
-			creaturesMenu->addAction(creatureSelectAct);
-		}
+		// TODO: add breed?
+		std::string creaturename = creatureNameFor(p);
+		if (creaturename.empty()) creaturename = "<Unnamed>";
+		creaturename += std::string(" (") + (a->getCreature()->isFemale() ? "Female" : "Male") + ")";
+
+		// create a new action with menu as parent, so it'll be destroyed on clear()
+		QAction *creatureSelectAct = new QAction(creaturename.c_str(), creaturesMenu);
+		creatureSelectAct->setData(QVariant::fromValue((void *)p.get()));
+
+		creatureSelectAct->setCheckable(true);
+		if (world.selectedcreature == p) creatureSelectAct->setChecked(true);
+		connect(creatureSelectAct, SIGNAL(triggered()), this, SLOT(selectCreature()));
+
+		if (monikerDataFor(p).getStatus() != borncreature)
+			creatureSelectAct->setDisabled(true);
+
+		creaturesMenu->addAction(creatureSelectAct);
 	}
 
 	if (creaturesMenu->isEmpty()) {
@@ -510,7 +512,6 @@ void QtOpenc2e::onCreatureChange() {
 	if (engine.version == 2 && engine.getExeFile()) {
 		bool hc = world.selectedcreature;
 
-		toolbarnextaction->setEnabled(hc);
 		toolbareyeviewaction->setEnabled(hc);
 		toolbartrackaction->setEnabled(hc);
 		toolbarhaloaction->setEnabled(hc);
@@ -574,15 +575,43 @@ void QtOpenc2e::updateMenus() {
 
 void QtOpenc2e::updateAppletStatus() {
 	if (engine.version == 2 && engine.getExeFile()) {
-		toolbarhatcheryaction->setChecked(hatchery->isVisible());
-		toolbaragentaction->setChecked(agentInjector->isVisible());
-
 		// TODO: this really doesn't belong here
 		if (world.paused) {
 			if (toolbarplayaction->isChecked()) world.paused = false;
 		} else {
 			if (toolbarpauseaction->isChecked()) world.paused = true;
 		}
+
+		// disable/enable buttons if we moved between paused and unpaused
+		if (world.paused && toolbarinvisibleaction->isEnabled()) {
+			toolbarinvisibleaction->setEnabled(false);
+			toolbarteachaction->setEnabled(false);
+			toolbarpushaction->setEnabled(false);
+		} else if (!world.paused && !toolbarinvisibleaction->isEnabled()) {
+			toolbarinvisibleaction->setEnabled(true);
+			toolbarteachaction->setEnabled(true);
+			toolbarpushaction->setEnabled(true);
+		}
+
+		// update applet buttons based on whether the applet is visible
+		toolbarhatcheryaction->setChecked(hatchery->isVisible());
+		toolbaragentaction->setChecked(agentInjector->isVisible());
+
+		// update 'next creature' button depending on whether there's any creatures we can select
+		bool are_there_creatures_present = false;
+		for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+			boost::shared_ptr<Agent> p = *i;
+			if (!p) continue; // grr, but needed
+
+			CreatureAgent *a = dynamic_cast<CreatureAgent *>(p.get());
+			if (!a) continue;
+
+			if (p->genus != 1) continue; // TODO: check ettin/grendel status
+
+			are_there_creatures_present = true;
+			break;
+		}
+		toolbarnextaction->setEnabled(are_there_creatures_present);
 	}
 }
 
