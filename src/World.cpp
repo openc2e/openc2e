@@ -89,7 +89,7 @@ void World::init() {
 				}
 				theHand->finishInit();
 			} else {
-				std::cout << "There was a seemingly-useful \"Pointer Information\" catalogue tag provided, but sprite file '" << pointerinfo[2] << " ' doesn't exist!" << std::endl;
+				std::cout << "There was a seemingly-useful \"Pointer Information\" catalogue tag provided, but sprite file '" << pointerinfo[2] << "' doesn't exist!" << std::endl;
 			}
 		}
 	}
