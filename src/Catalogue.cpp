@@ -148,7 +148,7 @@ void Catalogue::initFrom(fs::path path) {
 			}
 		}
 		catch (const std::exception &ex) {
-			std::cerr << "directory_iterator died on '" << i->leaf() << "' with " << ex.what() << std::endl;
+			std::cerr << "directory_iterator died on '" << i->path().leaf() << "' with " << ex.what() << std::endl;
 		}
 	}	
 }
