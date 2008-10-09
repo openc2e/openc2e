@@ -813,8 +813,8 @@ bool Engine::initialSetup() {
 
 void Engine::shutdown() {
 	world.shutdown();
-	backend->shutdown();
 	audio->shutdown();
+	backend->shutdown();
 	freeDelegates(); // does nothing if there are none (ie, no call to initialSetup)
 }
 
