@@ -30,6 +30,8 @@ void SDLMixerBackend::init() {
 
 	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
 		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
+
+	Mix_AllocateChannels(50); // TODO
 }
 
 void SDLMixerBackend::shutdown() {
@@ -84,14 +86,16 @@ SourceState SDLMixerSource::getState() const {
 	if (channel == -1) return SS_STOP;
 	if (!Mix_Playing(channel)) return SS_STOP;
 
-	return SS_PLAY; // TODO: SS_PAUSE
+	if (Mix_Paused(channel)) return SS_PAUSE;
+	
+	return SS_PLAY;
 }
 
 void SDLMixerSource::play() {
 	assert(clip);
 	setFollowingView(followview); // re-register in the backend if needed
 
-	channel = Mix_PlayChannel(-1, clip->buffer, 0);
+	channel = Mix_PlayChannel(-1, clip->buffer, (looping ? -1 : 0));
 
 	Mix_UnregisterAllEffects(channel); // TODO: needed?
 	Mix_Volume(channel, 128); // default, TODO: needed?
@@ -121,10 +125,12 @@ void SDLMixerSource::setPos(float x, float y, float plane) {
 }
 
 bool SDLMixerSource::isLooping() const {
-	return false; // TODO
+	return this->SkeletonAudioSource::isLooping();
 }
 
 void SDLMixerSource::setLooping(bool l) {
+	this->SkeletonAudioSource::setLooping(l);
+
 	// TODO
 }
 
