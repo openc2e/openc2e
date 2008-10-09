@@ -75,8 +75,7 @@ void OpenALBackend::init() {
 	}
 
 	// It seems that relying on hardware drivers is an awful idea - always use software if it's available.
-	// TODO: we should probably store this so we can (eventually) close stuff properly
-	ALCdevice *device = alcOpenDevice("Generic Software");
+	device = alcOpenDevice("Generic Software");
 	if (!device) {
 		device = alcOpenDevice(NULL);
 		if (!device) {
@@ -84,7 +83,7 @@ void OpenALBackend::init() {
 			throw creaturesException(boost::str(boost::format("OpenAL error (%d): %s") % err % al_error_str(err)));
 		}
 	}
-	ALCcontext *context = alcCreateContext(device, NULL);
+	context = alcCreateContext(device, NULL);
 	if (!context) {
 		ALenum err = alGetError();
 		throw creaturesException(boost::str(boost::format("OpenAL error (%d): %s") % err % al_error_str(err)));
@@ -133,6 +132,10 @@ void OpenALBackend::setViewpointCenter(float x, float y) {
 }
 
 void OpenALBackend::shutdown() {
+	alcMakeContextCurrent(NULL);
+	alcDestroyContext(context);
+	alcCloseDevice(device);
+
 	alutExit();
 }
 

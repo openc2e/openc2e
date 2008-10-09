@@ -100,6 +100,9 @@ protected:
 	std::map<OpenALSource *, boost::shared_ptr<AudioSource> > followingSrcs;
 	friend class OpenALSource;
 
+	ALCdevice *device;
+	ALCcontext *context;
+
 public:
 	boost::shared_ptr<OpenALBackend> shared_from_this() {
 		return boost::static_pointer_cast<OpenALBackend, AudioBackend>(this->AudioBackend::shared_from_this());
