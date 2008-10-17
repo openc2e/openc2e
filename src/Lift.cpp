@@ -66,7 +66,7 @@ void Lift::tick() {
 			) {
 			// stop movement (and make sure we're in the right spot)
 			yvec.setInt(0);
-			y = callbuttony[currentbutton] - (alignwithcabin ? cabinbottom : getHeight());
+			moveTo(x, callbuttony[currentbutton] - (alignwithcabin ? cabinbottom : getHeight()));
 
 			// send deactivate event
 			queueScript(0);
