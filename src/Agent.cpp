@@ -801,10 +801,40 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 
 	Point lastpoint(0,0);
 
+	Vehicle *vehicle = 0;
+	if (invehicle) vehicle = dynamic_cast<Vehicle *>(invehicle.get());
+
 	for (int loc = 0; loc <= abs(steep ? dy : dx); loc++) {
 		Point p = steep ? l.pointAtY(loc*signdy) : l.pointAtX(loc*signdx);
 		p.x = (int)p.x;
 		p.y = (int)p.y;
+
+		if (vehicle) {
+			if (src.x + p.x < vehicle->x + vehicle->cabinleft) {
+				lastdirection = 0;
+				collided = true;
+				break;
+			}
+			if (src.x + p.x > vehicle->x + vehicle->cabinright) {
+				lastdirection = 1;
+				collided = true;
+				break;
+			}
+			if (src.y + p.y < vehicle->y + vehicle->cabintop) {
+				lastdirection = 2;
+				collided = true;
+				break;
+			}
+			if (src.y + p.y > vehicle->y + vehicle->cabinbottom) {
+				lastdirection = 3;
+				collided = true;
+				break;
+			}
+
+			lastpoint = p;
+
+			continue;
+		}
 
 		bool trycollisions = false;
 
