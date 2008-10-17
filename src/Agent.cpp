@@ -76,6 +76,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 		perm = 50; // TODO: correct default?
 		falling = true;
 	}
+
+	moved_last_tick = false;
 	
 	range = 500;
 
@@ -960,7 +962,7 @@ void Agent::physicsTickC2() {
 		deltapt.y = dy;
 	}
 	
-	if (collided && (velx.getInt() != 0 || vely.getInt() != 0)) {
+	if (collided && (velx.getInt() != 0 || vely.getInt() != 0) && moved_last_tick) {
 		if (lastcollidedirection >= 2) // up and down
 			vely.setInt(-(vely.getInt() - (rest.getInt() * vely.getInt()) / 100));
 		else
@@ -968,10 +970,14 @@ void Agent::physicsTickC2() {
 		queueScript(6, 0);	
 	}
 	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
-		falling = false;
-		velx.setInt(0);
-		vely.setInt(0);
+		if (!moved_last_tick) {
+			falling = false;
+			velx.setInt(0);
+			vely.setInt(0);
+		}
+		moved_last_tick = false;
 	} else {
+		moved_last_tick = true;
 		moveTo(x + (int)deltapt.x, y + (int)deltapt.y);
 		if (sufferphysics()) {
 			int fricx = (aero.getInt() * velx.getInt()) / 100;

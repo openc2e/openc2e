@@ -189,6 +189,7 @@ public:
 	float custom_core_ytop, custom_core_ybottom;
 
 	bool falling : 1; // TODO: icky hack, possibly
+	bool moved_last_tick : 1; // TODO: icky hack
 
 	caosVar range;
 
