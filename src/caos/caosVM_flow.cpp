@@ -407,7 +407,6 @@ void caosVM::v_CAOS() {
 	
 	std::istringstream iss(commands);
 	caosScript s("c3", "CAOS command"); // XXX: variant
-	s.parse(iss);
 
 	caosVM *sub = world.getVM(NULL);
 	sub->resetCore();
@@ -415,9 +414,6 @@ void caosVM::v_CAOS() {
 	if (inl) {
 		var.ensure(100);
 		sub->var.ensure(100);
-		// Inline CAOS calls are expensive, mmmkay?
-		for (int i = 0; i < 100; i++)
-			sub->var[s.installer->mapVAxx(i)] = var[currentscript->mapVAxx(i)];
 		sub->targ = targ;
 		sub->_it_ = _it_;
 		sub->part = part;
@@ -434,15 +430,27 @@ void caosVM::v_CAOS() {
 	sub->_p_[1] = p2;
 
 	try {
-		std::ostringstream oss;
+		s.parse(iss);
+		if (inl) {
+			// Inline CAOS calls are expensive, mmmkay?
+			for (int i = 0; i < 100; i++)
+				sub->var[s.installer->mapVAxx(i)] = var[currentscript->mapVAxx(i)];
+		}
+
 		s.installScripts();
+		
+		std::ostringstream oss;
 		sub->outputstream = &oss;
+		
 		sub->runEntirely(s.installer);
+		
 		result.setString(oss.str());
 		sub->outputstream = 0;
 	} catch (std::exception &e) {
 		sub->outputstream = 0; // very important that this isn't pointing onto dead stack when the VM is freed
 		
+		// TODO: 'catches' should be handled seperately and set report to the error# and string to ***
+		// but we have no idea what error# to provide right now (see errors in CAOS.catalogue)
 		if (!throws || catches) {
 			report->setString(e.what());
 			result.setString("###");
