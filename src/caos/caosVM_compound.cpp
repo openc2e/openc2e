@@ -75,6 +75,7 @@ void caosVM::c_NEW_PART() {
 	CompoundAgent *a = dynamic_cast<CompoundAgent *>(targ.get());
 	caos_assert(a);
 
+	// TODO: fix zordering
 	CompoundPart *p = new DullPart(a, partno, a->getSpriteFile(), a->getFirstImage() + first_image, x, y, plane - a->zorder);
 	a->addPart(p);
 

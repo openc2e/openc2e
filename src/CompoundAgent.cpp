@@ -37,13 +37,6 @@ void CompoundAgent::addPart(CompoundPart *p) {
 	// TODO: we should prbly insert at the right place, not call sort
 	parts.push_back(p);
 	std::sort(parts.begin(), parts.end(), less_part());
-
-	if (engine.version < 3 && parts.size() == 1) { // adding the first part in c1/c2
-		// TODO: this is zorder hackery - probably the right thing to do, but needs thinking about more
-		unsigned int z = p->zorder;
-		p->zorder = 0;
-		setZOrder(z);
-	}
 }
 
 void CompoundAgent::delPart(unsigned int id) {
@@ -71,8 +64,6 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 	caos_assert(p);
 	addPart(p);
 
-	setZOrder(plane); // because addPart zots zorder for c1/c2, TODO: make saner?
-	
 	for (unsigned int i = 0; i < 6; i++) {
 		hotspots[i].left = -1; hotspots[i].right = -1; hotspots[i].top = -1;
 		hotspots[i].bottom = -1;

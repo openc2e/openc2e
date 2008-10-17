@@ -987,6 +987,7 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 
 #include "CompoundAgent.h"
 
+#include <limits.h>
 void SFCCompoundObject::copyToWorld() {
 	sfccheck(parts.size() > 0);
 
@@ -1030,14 +1031,20 @@ void SFCCompoundObject::copyToWorld() {
 		a->paused = frozen; // TODO
 	}
 
+	// make sure the zorder of the first part is 0..
+	unsigned int basezorder = INT_MAX; // TODO: unsigned or signed?
+	for (unsigned int i = 0; i < parts.size(); i++) {
+		SFCEntity *e = parts[i];
+		if (!e) continue;
+		if (e->zorder < basezorder)
+			basezorder = e->zorder;
+	}
+
 	for (unsigned int i = 0; i < parts.size(); i++) {
 		SFCEntity *e = parts[i];
 		if (!e) continue;
 		DullPart *p;
-		if (i == 0)
-			p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder);
-		else
-			p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder - parts[0]->zorder);
+		p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder - basezorder);
 		a->addPart(p);
 
 		copyEntityData(e, p);
