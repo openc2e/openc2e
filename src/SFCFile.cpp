@@ -1155,7 +1155,6 @@ void SFCVehicle::copyToWorld() {
 
 	// set cabin rectangle and plane
 	a->setCabinRect(cabinleft, cabintop, cabinright, cabinbottom);
-	a->cabinplane = 95; // TODO: arbitarily-chosen value (see also Vehicle constructor)
 
 	// set bump, xvec and yvec
 	a->bump = bump;

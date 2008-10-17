@@ -37,7 +37,7 @@ Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int i
 	bump = 0;
 
 	// TODO: set cabin bounds? we don't know width/height at this point..
-	cabinplane = 95; // TODO: arbitarily-chosen value (see also SFCFile)
+	cabinplane = 1;
 }
 
 void Vehicle::tick() {

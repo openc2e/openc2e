@@ -1164,10 +1164,7 @@ unsigned int Agent::getZOrder() const {
 		// TODO: take notice of cabp in c2e, at least. also, stacking .. ?
 		Vehicle *v = dynamic_cast<Vehicle *>(invehicle.get());
 		assert(v);
-		if (engine.version < 3)
-			return v->cabinplane; // TODO: correct?
-		else
-			return v->getZOrder() + v->cabinplane;
+		return v->getZOrder() + v->cabinplane;
 		// TODO: Vehicle should probably rearrange zorder of passengers if ever moved
 	} else if (carriedby) {
 		// TODO: check for overflow
