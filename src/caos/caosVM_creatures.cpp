@@ -269,7 +269,7 @@ void caosVM::c_STIM_WRIT_c2() {
  STIM FROM (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %pragma implementation caosVM::c_STIM_FROM_c1
- %pragma variants c1
+ %pragma variants c1 c2
  %cost c1,c2 0
 */
 void caosVM::c_STIM_FROM_c1() {
@@ -1692,7 +1692,7 @@ void caosVM::c_INJR() {
 /**
  SAY$ (command) string (string)
  %status stub
- %pragma variants c1
+ %pragma variants c1 c2
 */
 void caosVM::c_SAY() {
 	VM_PARAM_STRING(string)

@@ -599,7 +599,7 @@ void caosVM::c_BBD_EMIT() {
 /**
  BBD: EDIT (command) allow (integer)
  %status maybe
- %pragma variants c1
+ %pragma variants c1 c2
 
  If allow is 1, switch target blackboard into editing mode, give it focus. If it
  is 0, remove focus from target blackboard.
