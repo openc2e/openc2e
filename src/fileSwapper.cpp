@@ -25,7 +25,8 @@
 
 void fileSwapper::convertsprite(s16Image &img, std::string dest) {
 	std::ofstream out(dest.c_str());
-	assert(out.is_open());
+	if (!out.is_open())
+		throw creaturesException("fileSwapper failed to open '" + dest + "' for writing");
 
 	img.offsets = new unsigned int[img.m_numframes];
 

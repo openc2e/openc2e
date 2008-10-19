@@ -40,20 +40,16 @@ using namespace boost::filesystem;
 
 enum filetype { blk, s16, c16, spr, bmp };
 
-bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft, bool is_background = false) {
+bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
 	path cachefile, realfile;
 	std::string cachename;
 	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
-	std::string basename = fname; basename.erase(basename.end() - 4, basename.end()); 
 
-	if (is_background) {
-		realfile = path(world.findFile(std::string("/Backgrounds/") + fname), native);
-	} else {
-		realfile = path(world.findFile(std::string("/Images/") + fname), native);
-	}
-
+	realfile = path(world.findFile(fname), native);
 	// if it doesn't exist, too bad, give up.
 	if (!exists(realfile)) return false;
+	
+	std::string basename = realfile.leaf(); basename.erase(basename.end() - 4, basename.end()); 
 	
 	// work out where the cached file should be
 	cachename = engine.storageDirectory().native_directory_string() + "/" + fname;
@@ -81,6 +77,12 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 	in->mmapopen(realfile.native_file_string());
 #if OC2E_BIG_ENDIAN
 	if (in->is_open() && (ft != spr)) {
+		path p = cachefile.branch_path();
+		if (!exists(p))
+			create_directory(p);
+		if (!is_directory(p))
+			throw creaturesException("imageManager couldn't create cache directory '" + p.native_directory_string() + "'");
+
 		fileSwapper f;
 		switch (ft) {
 			case blk:
@@ -133,17 +135,24 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	mmapifstream *in = new mmapifstream();
 	shared_ptr<creaturesImage> img;
 
+	std::string fname;
+	if (is_background) {
+		fname = std::string("/Backgrounds/") + name;
+	} else {
+		fname = std::string("/Images/") + name;
+	}
+
 	// TODO: try/catch to free the mmapifstream
 	bool successful = true;
 	if (engine.bmprenderer) {
-		successful = tryOpen(in, img, name + ".bmp", bmp, is_background);
+		successful = tryOpen(in, img, fname + ".bmp", bmp);
 	} else {
 		if (is_background) {
-			successful = tryOpen(in, img, name + ".blk", blk, true);
+			successful = tryOpen(in, img, fname + ".blk", blk);
 		} else {
-			if (!tryOpen(in, img, name + ".s16", s16)) {
-				if (!tryOpen(in, img, name + ".c16", c16)) {
-					if (!tryOpen(in, img, name + ".spr", spr)) {
+			if (!tryOpen(in, img, fname + ".s16", s16)) {
+				if (!tryOpen(in, img, fname + ".c16", c16)) {
+					if (!tryOpen(in, img, fname + ".spr", spr)) {
 						successful = false;
 					}
 				}
