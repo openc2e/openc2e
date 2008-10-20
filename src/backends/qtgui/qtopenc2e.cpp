@@ -374,6 +374,8 @@ void QtOpenc2e::createC2Toolbars() {
 	placecombo->setMinimumContentsLength(15);
 	favtoolbar->addWidget(placecombo);
 	QAction *goaction = favtoolbar->addAction(iconFromImageList(favtoolbaricons, 1), "Go");
+	
+	placecombo->addItem("The Incubator"); // TODO
 
 	addToolBar(favtoolbar);
 

@@ -18,6 +18,7 @@
 #define HATCHERY_H 1
 
 #include <QDialog>
+#include <boost/shared_ptr.hpp>
 
 class Hatchery : public QDialog {
 	Q_OBJECT
@@ -29,6 +30,8 @@ class Hatchery : public QDialog {
 	private:
 		class QGraphicsScene *graphicsScene;
 		class QGraphicsView *graphicsView;
+
+		boost::shared_ptr<class creaturesImage> omelettedata;
 };
 
 #endif /* HATCHERY_H */
