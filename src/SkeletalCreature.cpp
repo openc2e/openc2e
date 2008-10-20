@@ -241,8 +241,6 @@ void SkeletalCreature::skeletonInit() {
 		
 		images[i] = tintBodySprite(images[i]);
 	}
-
-	setPose(0);
 }
 
 shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(shared_ptr<creaturesImage> s) {
@@ -731,6 +729,7 @@ void SkeletalCreature::finishInit() {
 
 	processGenes();
 	skeletonInit();
+	setPose(0);
 }
 
 void SkeletalCreature::creatureAged() {
@@ -738,6 +737,7 @@ void SkeletalCreature::creatureAged() {
 
 	processGenes();
 	skeletonInit();
+	recalculateSkeleton();
 }
 
 std::string SkeletalCreature::getFaceSpriteName() {
