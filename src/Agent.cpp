@@ -115,7 +115,7 @@ void Agent::finishInit() {
 	world.agents.push_front(boost::shared_ptr<Agent>(this));
 	agents_iter = world.agents.begin();
 
-	if (findScript(10))
+	if (engine.version > 2 && findScript(10))
 		queueScript(10); // constructor
 	
 	initialized = true;
