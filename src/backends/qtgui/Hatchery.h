@@ -18,18 +18,25 @@
 #define HATCHERY_H 1
 
 #include <QDialog>
+#include <QPixmap>
 #include <boost/shared_ptr.hpp>
 
 class Hatchery : public QDialog {
 	Q_OBJECT
 
 	public:
-		Hatchery(QWidget *parent);
+		Hatchery(class QtOpenc2e *parent);
 		~Hatchery();
 
 	private:
+		friend class EggItem;
+
+		class QtOpenc2e *qtopenc2e;
 		class QGraphicsScene *graphicsScene;
 		class QGraphicsView *graphicsView;
+
+		// unknown, male, female
+		QPixmap genderanim[3][16];
 
 		boost::shared_ptr<class creaturesImage> omelettedata;
 };

@@ -755,6 +755,10 @@ void QtOpenc2e::newNorn() {
 }
 
 void QtOpenc2e::newEgg() {
+	makeNewEgg();
+}
+
+void QtOpenc2e::makeNewEgg() {
 	std::string eggscript;
 	/* create the egg obj */
 	eggscript = boost::str(boost::format("new: simp eggs 8 %d 2000 0\n") % ((rand() % 6) * 8));

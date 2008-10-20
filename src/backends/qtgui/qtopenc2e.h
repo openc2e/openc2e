@@ -30,6 +30,8 @@ public:
 
 	class Creature *getSelectedCreature();
 
+	void makeNewEgg();
+
 signals:
 	void ticked();
 	void creatureTicked();
