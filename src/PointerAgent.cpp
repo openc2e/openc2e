@@ -25,6 +25,7 @@
 #include "Room.h"
 #include "MetaRoom.h"
 #include "Camera.h"
+#include "SkeletalCreature.h"
 #include <climits>
 
 // TODO: change imagecount?
@@ -85,11 +86,43 @@ void PointerAgent::physicsTick() {
 
 void PointerAgent::tick() {
 	if (!paused) {
-		if (overlayTimer > 0) {
-			overlayTimer--;
-		} else if (overlay) {
-			delete overlay;
-			overlay = NULL;
+		int x = pointerX(), y = pointerY();
+		CompoundPart *a = world.partAt(x, y);
+		Agent *parent;
+		if (engine.version == 2 && a &&
+		    (parent = a->getParent()) && dynamic_cast<SkeletalCreature*>(parent)) {
+			// the part under the cursor belongs to a SkeletalCreature
+			int scriptid = a->handleClick(x - a->x - parent->x, y - a->y - parent->y);
+			if (scriptid == 0) {
+				// devil
+				if (overlayTimer != -1) { // dodgy hax. -1 is devil, -2 is angel.
+					overlayTimer = -1;
+					if (overlay) delete overlay;
+					overlay = new DullPart(this, 0, "syst", 16, 32, 32, 1);
+				}
+			} else if (scriptid == 1) {
+				// angel
+				if (overlayTimer != -2) {
+					overlayTimer = -2;
+					if (overlay) delete overlay;
+					overlay = new DullPart(this, 0, "syst", 15, 32, 32, 1);
+				}
+			} else {
+				// if we're over a creature and not angel/devil, and we had one before,
+				// destroy the overlay. Not sure if this case ever gets hit.
+				if (overlayTimer < 0 && overlay) {
+					delete overlay;
+					overlayTimer = 0;
+				}
+			}
+		} else {
+			if (overlayTimer > 0) {
+				overlayTimer--;
+			} else if (overlay) {
+				delete overlay;
+				overlay = NULL;
+				overlayTimer = 0;
+			}
 		}
 	}
 	SimpleAgent::tick();
