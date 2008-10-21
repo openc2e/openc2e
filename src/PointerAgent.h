@@ -24,6 +24,10 @@
 #define _C2E_POINTERAGENT_H
 
 class PointerAgent : public SimpleAgent {
+private:
+	DullPart *overlay;
+	int overlayTimer;
+
 protected:
 	int hotspotx, hotspoty;
 
@@ -44,6 +48,7 @@ public:
 	void finishInit();
 	void firePointerScript(unsigned short event, Agent *src);
 	void physicsTick();
+	void tick();
 	void kill();
 	void handleEvent(SomeEvent &event);
 	void setHotspot(int, int);

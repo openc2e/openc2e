@@ -34,6 +34,9 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MA
 	holdingWire = 0;
 	wireOriginID = 0;
 
+	overlay = NULL;
+	overlayTimer = 0;
+
 	hotspotx = 0;
 	hotspoty = 0;
 }
@@ -78,6 +81,18 @@ void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
 
 void PointerAgent::physicsTick() {
 	// TODO: this is a hack, which does nothing, because we set a velocity in main() but also move the cursor manually
+}
+
+void PointerAgent::tick() {
+	if (!paused) {
+		if (overlayTimer > 0) {
+			overlayTimer--;
+		} else if (overlay) {
+			delete overlay;
+			overlay = NULL;
+		}
+	}
+	SimpleAgent::tick();
 }
 
 void PointerAgent::kill() {
@@ -280,7 +295,9 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 					}
 				} else {
 					if (engine.version == 2) {
-						// TODO: overlay with frame 17 [red cross]
+						if (overlay) delete overlay;
+						overlay = new DullPart(this, 0, "syst", 17, 0, 0, 1);
+						overlayTimer = 8;
 
 						// play 'deny drop' sound
 						playAudio("excl", true, false); // TODO: should this be controlled?
