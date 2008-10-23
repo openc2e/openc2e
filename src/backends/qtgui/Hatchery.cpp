@@ -107,7 +107,11 @@ protected:
 
 public:
 	EggItem(Hatchery *h, QPixmap i, int x, int y) : QGraphicsPixmapItem(i) {
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
 		setAcceptHoverEvents(true);
+#else
+		setAcceptsHoverEvents(true);
+#endif
 		setPos(x, y);
 		setZValue(y);
 		
