@@ -645,7 +645,7 @@ void c1Creature::addGene(gene *g) {
 }
 
 void c2Creature::addGene(gene *g) {
-	Creature::addGene(g);
+	oldCreature::addGene(g);
 
 	if (typeid(*g) == typeid(organGene)) {
 		// create organ
@@ -768,18 +768,19 @@ void c2Creature::tickBiochemistry() {
 
 void oldCreature::tickBiochemistry() {
 	// process half-lives
-	if (!halflives) return; // TODO: correct?
-	for (unsigned int i = 0; i < 256; i++) {
-		// TODO: this code hasn't been tested thoroughly, but seems to agree with basic testing
+	if (halflives) { // TODO: correct?
+		for (unsigned int i = 0; i < 256; i++) {
+			// TODO: this code hasn't been tested thoroughly, but seems to agree with basic testing
 
-		// work out which rate we're dealing with
-		unsigned char rate = halflives->halflives[i] / 8;
+			// work out which rate we're dealing with
+			unsigned char rate = halflives->halflives[i] / 8;
 	
-		// if the tickmask doesn't want us to change things this tick, don't!
-		if ((biochemticks & calculateTickMask(rate)) != 0) continue;
+			// if the tickmask doesn't want us to change things this tick, don't!
+			if ((biochemticks & calculateTickMask(rate)) != 0) continue;
 
-		// do the actual adjustment
-		chemicals[i] = (chemicals[i] * calculateMultiplier(rate)) / 65536;
+			// do the actual adjustment
+			chemicals[i] = (chemicals[i] * calculateMultiplier(rate)) / 65536;
+		}
 	}
 	
 	biochemticks++;
@@ -988,10 +989,12 @@ c2Organ::c2Organ(c2Creature *p, organGene *g) {
 	lifeforce = ourGene->lifeforce * (1000000.0f / 255.0f);
 	longtermlifeforce = shorttermlifeforce = lifeforce;
 
-	repairrate = 0; // TODO
+	biochemticks = 0;
+
+	repairrate = 0;
 	clockrate = ourGene->clockrate;
 	injurytoapply = 0;
-	damagerate = ourGene->damagerate; // TODO
+	damagerate = ourGene->damagerate;
 	biotick = 0; // TODO
 	atpdamagecoefficient = ourGene->atpdamagecoefficient * (lifeforce / (255.0f * 255.0f));
 	
@@ -1065,10 +1068,39 @@ void c2Organ::tick() {
 		ticked = true;
 		biotick -= 255;
 
-		// TODO
+		biochemticks++;
+
+		// TODO: energy consumption/checks
+
+		// *** tick emitters
+		for (vector<c2Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
+			processEmitter(*i);
+			
+		// *** tick reactions
+		for (vector<shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
+			processReaction(**i);
+
+		// *** long-term damage
+		float diff = longtermlifeforce - shorttermlifeforce;
+		longtermlifeforce = longtermlifeforce - (diff * (damagerate / 255.0)); // TODO: correct?
+	
+		// *** repair injuries
+		float repair = diff * (repairrate / 255.0); // TODO: correct?
+		shorttermlifeforce += repair;
+
+		// TODO: adjust injury chem, apply injury
 	}
 
-	// TODO
+	// *** tick receptors	
+	for (vector<shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
+	clockratereceptors = 0; repairratereceptors = 0; injuryreceptors = 0;
+		
+	for (vector<c2Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
+		processReceptor(*i, ticked);
+	
+	if (clockratereceptors > 0) clockrate /= clockratereceptors;
+	if (repairratereceptors > 0) repairrate /= repairratereceptors;
+	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;
 
 	// *** decay life force
 	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
@@ -1185,6 +1217,43 @@ void c1Creature::processReaction(c1Reaction &d) {
 	addChemical(g.reactant[3], ratio * g.quantity[3]);
 }
 
+void c2Organ::processReaction(c2Reaction &d) {
+	// TODO: untested
+
+	bioReactionGene &g = *d.data;
+
+	// TODO: this might not all be correct
+
+	// work out which rate we're dealing with
+	unsigned char rate = g.rate / 8;
+	
+	// if the tickmask doesn't want us to change things this tick, don't!
+	if ((biochemticks & parent->calculateTickMask(rate)) != 0) return;
+
+	unsigned char ratio = 255, ratio2 = 255;
+	if (g.reactant[0] != 0) {
+		assert(g.quantity[0] != 0); // TODO
+		ratio = parent->getChemical(g.reactant[0]) / g.quantity[0];
+	}
+	if (g.reactant[1] != 0) {
+		assert(g.quantity[1] != 0); // TODO
+		ratio2 = parent->getChemical(g.reactant[1]) / g.quantity[1];
+	}
+
+	// pick lowest ratio, if zero then return
+	if (ratio2 < ratio) ratio = ratio2;
+	if (ratio == 0) return;
+	
+	// calculate the actual adjustment (can't go out of bounds)
+	ratio = ratio - ((ratio * parent->calculateMultiplier(rate)) / 65536);
+
+	// change chemical levels
+	parent->subChemical(g.reactant[0], ratio * g.quantity[0]);
+	parent->subChemical(g.reactant[1], ratio * g.quantity[1]);
+	parent->addChemical(g.reactant[2], ratio * g.quantity[2]);
+	parent->addChemical(g.reactant[3], ratio * g.quantity[3]);
+}
+
 void c2eOrgan::processReaction(c2eReaction &d) {
 	bioReactionGene &g = *d.data;
 	
@@ -1241,6 +1310,32 @@ void c1Creature::processEmitter(c1Emitter &d) {
 	}
 }
 
+void c2Organ::processEmitter(c2Emitter &d) {
+	// TODO: untested
+
+	bioEmitterGene &g = *d.data;
+
+	if ((biochemticks % g.rate) != 0) return;
+
+	if (!d.locus) return;
+	unsigned char f = *d.locus;
+	if (g.clear) *d.locus = 0;
+	if (g.invert) f = 255 - f;
+
+	if (g.digital) {
+		if (f < g.threshold) return;
+		parent->addChemical(g.chemical, g.gain);
+	} else {
+		int r = (((int)f - g.threshold) * g.gain) / 255;
+		
+		// clip the result of the calculation to unsigned char, and reassign it
+		if (r < 0) r = 0; else if (r > 255) r = 255;
+		f = r;
+
+		parent->addChemical(g.chemical, f);
+	}
+}
+
 void c2eOrgan::processEmitter(c2eEmitter &d) {
 	bioEmitterGene &g = *d.data;
 	
@@ -1276,7 +1371,7 @@ void c1Creature::processReceptor(c1Receptor &d) {
 
 	if (!d.locus) return;
 
-	unsigned char f = chemicals[g.chemical];
+	unsigned char f = getChemical(g.chemical);
 	int r;
 	if (g.digital)
 		r = f > g.threshold ? g.gain : 0;
@@ -1296,6 +1391,47 @@ void c1Creature::processReceptor(c1Receptor &d) {
 	else
 		*d.locus = f;
 }
+
+void c2Organ::processReceptor(c2Receptor &d, bool checkchem) {
+	// TODO: untested
+
+	bioReceptorGene &g = *d.data;
+
+	// TODO: same issues as c2eOrgan::processReceptor below, probably
+
+	if (checkchem) {
+		d.processed = true;
+		d.lastvalue = parent->getChemical(g.chemical);
+	}
+
+	if (!d.processed) return;
+	if (!d.locus) return;
+
+	unsigned char f = d.lastvalue;
+	int r;
+	if (g.digital)
+		r = f > g.threshold ? g.gain : 0;
+	else
+		// TODO: int promotion correct to makke this work out?
+		r = (((int)f - g.threshold) * g.gain) / 255;
+	
+	if (g.inverted) r = g.nominal - r;
+	else r += g.nominal;
+	
+	// clip the result of the calculation to unsigned char, and reassign it
+	if (r < 0) r = 0; else if (r > 255) r = 255;
+	f = r;
+
+	if (f == 0 && g.organ == 1 && g.tissue == 3 && g.locus == 0) // evil check for "Die if non-zero!" locus
+		return;
+	else if (d.receptors) {
+		if (*d.receptors == 0) *d.locus = 0;
+		(*d.receptors)++;
+		*d.locus += f;
+	} else
+		*d.locus = f;
+}
+
 
 void c2eOrgan::processReceptor(c2eReceptor &d, bool checkchem) {
 	bioReceptorGene &g = *d.data;
@@ -1437,7 +1573,6 @@ void c1Emitter::init(bioEmitterGene *g, c1Creature *parent) {
 
 void c2Emitter::init(bioEmitterGene *g, c2Organ *parent) {
 	data = g;
-	sampletick = 0;
 	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus, 0);
 }
 

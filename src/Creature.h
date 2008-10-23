@@ -132,14 +132,14 @@ protected:
 	void tickBrain();
 	virtual void tickBiochemistry();
 
-	inline unsigned int calculateTickMask(unsigned char);
-	inline unsigned int calculateMultiplier(unsigned char);
-
 	oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 	
 	void processGenes();
 
 public:
+	inline unsigned int calculateTickMask(unsigned char);
+	inline unsigned int calculateMultiplier(unsigned char);
+
 	void addChemical(unsigned char id, unsigned char val);
 	void subChemical(unsigned char id, unsigned char val);
 	unsigned char getChemical(unsigned char id) { return chemicals[id]; }	
@@ -219,7 +219,6 @@ struct c2Receptor {
 
 struct c2Emitter {
 	bioEmitterGene *data;
-	unsigned char sampletick;
 	unsigned char *locus;
 	void init(bioEmitterGene *, class c2Organ *);
 };
@@ -245,6 +244,8 @@ protected:
 	// locuses
 	unsigned char biotick, damagerate, repairrate, clockrate, injurytoapply;
 	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
+
+	unsigned int biochemticks;
 
 	void processReaction(c2Reaction &);
 	void processEmitter(c2Emitter &);
