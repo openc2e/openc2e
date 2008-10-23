@@ -2064,4 +2064,17 @@ void caosVM::c_SHAD() {
 	// TODO
 }
 
+/**
+ SYS: CONV (command) filename (bareword) show_progress (integer)
+ %status stub
+ %pragma variants c2
+
+ This is supposed to convert the provided image name to the display depth, displaying a progress dialog if show_progress is non-zero.
+ However, it does nothing under openc2e.
+*/
+void caosVM::c_SYS_CONV() {
+	VM_PARAM_INTEGER(show_progress)
+	VM_PARAM_STRING(filename)
+}
+
 /* vim: set noet: */

@@ -612,6 +612,7 @@ public:
 	void s_FRZN();
 	void c_BLCK();
 	void c_SHAD();
+	void c_SYS_CONV();
 	
 	// motion
 	void c_ELAS();
