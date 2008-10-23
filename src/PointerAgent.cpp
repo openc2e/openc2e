@@ -40,8 +40,6 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MA
 
 	hotspotx = 0;
 	hotspoty = 0;
-
-	part_under_pointer = 0;
 }
 
 void PointerAgent::finishInit() {
