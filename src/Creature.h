@@ -148,6 +148,8 @@ public:
 	virtual unsigned char getDrive(unsigned int id) = 0;
 
 	oldBrain *getBrain() { return brain; }
+	
+	unsigned char *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
 };
 
 // c1
@@ -202,7 +204,6 @@ public:
 
 struct c2Reaction {
 	bioReactionGene *data;
-	float rate;
 	unsigned int receptors;
 	void init(bioReactionGene *);
 };
@@ -210,24 +211,24 @@ struct c2Reaction {
 struct c2Receptor {
 	bioReceptorGene *data;
 	bool processed;
-	float lastvalue;
-	float *locus;
+	unsigned char lastvalue;
+	unsigned char *locus;
 	unsigned int *receptors;
-	float nominal, threshold, gain;
-	void init(bioReceptorGene *, class c2Organ *, shared_ptr<c2Reaction>);
+	void init(bioReceptorGene *, class c2Organ *);
 };
 
 struct c2Emitter {
 	bioEmitterGene *data;
 	unsigned char sampletick;
-	float *locus;
-	float threshold, gain;
+	unsigned char *locus;
 	void init(bioEmitterGene *, class c2Organ *);
 };
 
-
 class c2Organ {
 protected:
+	friend struct c2Receptor;
+	friend struct c2Emitter;
+
 	class c2Creature *parent;
 	organGene *ourGene;
 

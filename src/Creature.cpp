@@ -810,7 +810,7 @@ void c2eCreature::tickBiochemistry() {
 	}
 }
 
-unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
+unsigned char *oldCreature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
 	switch (o) {
 		case 0: // brain
 			return 0; // TODO
@@ -819,7 +819,7 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 			switch (t) {
 				case 0: // somantic
 					if (receptor) {
-						if (l > 7) break;
+						if (l > 6) break;
 						return &lifestageloci[l];
 					} else if (l == 0) return &muscleenergy;
 					break;
@@ -827,7 +827,7 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 				case 1: // circulatory
 					if (l > 8) break;
 					return &floatingloci[l];
-				
+			
 				case 2: // reproductive
 					if (receptor) {
 						if (l == 0) return &fertile;
@@ -837,11 +837,23 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 						else if (l == 1) return &pregnant;
 					}
 					break;
-
+			
 				case 3: // immune
 					if (l == 0) return &dead;
 					break;
+			}
+	}
+	
+	return 0;
+}
 
+unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
+	unsigned char *oldlocus = oldCreature::getLocusPointer(receptor, o, t, l);
+	if (oldlocus) return oldlocus;
+
+	switch (o) {
+		case 1: // creature
+			switch (t) {
 				case 4: // sensorimotor
 					if (receptor) {
 						if (l < 8) return &involaction[l];
@@ -849,11 +861,12 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 					} else {
 						if (l < 6) return &senses[l];
 					}
-					break; // TODO: should this break be here? added it, but can't check, no internet
+					break;
 
 				case 5: // drive levels
 					if (l < 16) return &drives[l];
 			}
+			break;
 	}
 
 	std::cout << "c1Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
@@ -864,7 +877,29 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 }
 
 unsigned char *c2Creature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
-	// TODO
+	unsigned char *oldlocus = oldCreature::getLocusPointer(receptor, o, t, l);
+	if (oldlocus) return oldlocus;
+
+	switch (o) {
+		case 1: // creature
+			switch (t) {
+				case 4: // sensorimotor
+					if (receptor) {
+						if (l < 8) return &involaction[l];
+						else if (l < 24) return &gaitloci[l - 8];
+					} else {
+						if (l < 14) return &senses[l];
+					}
+					break;
+
+				case 5: // drive levels
+					if (l < 17) return &drives[l];
+			}
+			break;
+
+		case 2: // organ
+			break; // TODO
+	}
 
 	std::cout << "c2Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
 		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
@@ -985,7 +1020,16 @@ void c2Organ::processGenes() {
 	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
 		if (!parent->shouldProcessGene(*i)) continue;
 
-		// TODO
+		if (typeid(*(*i)) == typeid(bioReactionGene)) {
+			reactions.push_back(shared_ptr<c2Reaction>(new c2Reaction()));
+			reactions.back()->init((bioReactionGene *)(*i));
+		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
+			emitters.push_back(c2Emitter());
+			emitters.back().init((bioEmitterGene *)(*i), this);
+		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
+			receptors.push_back(c2Receptor());
+			receptors.back().init((bioReceptorGene *)(*i), this);
+		}
 	}
 }
 
@@ -1293,6 +1337,29 @@ void c2eOrgan::processReceptor(c2eReceptor &d, bool checkchem) {
 		*d.locus = f;
 }
 
+unsigned char *c2Organ::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int**receptors) {
+	if (receptors) *receptors = 0;
+
+	switch (o) {
+		case 2: // organ
+			if (t == 0)
+				switch (l) {
+					case 0: // clock rate
+						if (receptors) *receptors = &clockratereceptors;
+						return &clockrate;
+					case 1: // repair rate
+						if (receptors) *receptors = &repairratereceptors;
+						return &repairrate;
+					case 2: // injury to apply
+						if (receptors) *receptors = &injuryreceptors;
+						return &injurytoapply;
+				}
+			break;
+	}
+
+	return parent->getLocusPointer(receptor, o, t, l);
+}
+
 float *c2eOrgan::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int**receptors) {
 	if (receptors) *receptors = 0;
 
@@ -1331,6 +1398,10 @@ void c1Reaction::init(bioReactionGene *g) {
 	data = g;
 }
 
+void c2Reaction::init(bioReactionGene *g) {
+	data = g;
+}
+
 void c2eReaction::init(bioReactionGene *g) {
 	data = g;
 
@@ -1342,6 +1413,12 @@ void c2eReaction::init(bioReactionGene *g) {
 void c1Receptor::init(bioReceptorGene *g, c1Creature *parent) {
 	data = g;
 	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus);
+}
+
+void c2Receptor::init(bioReceptorGene *g, c2Organ *parent) {
+	data = g;
+	processed = false;
+	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus, &receptors);
 }
 	
 void c2eReceptor::init(bioReceptorGene *g, c2eOrgan *parent, shared_ptr<c2eReaction> r) {
@@ -1356,6 +1433,12 @@ void c2eReceptor::init(bioReceptorGene *g, c2eOrgan *parent, shared_ptr<c2eReact
 void c1Emitter::init(bioEmitterGene *g, c1Creature *parent) {
 	data = g;
 	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus);
+}
+
+void c2Emitter::init(bioEmitterGene *g, c2Organ *parent) {
+	data = g;
+	sampletick = 0;
+	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus, 0);
 }
 
 void c2eEmitter::init(bioEmitterGene *g, c2eOrgan *parent) {
