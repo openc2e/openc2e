@@ -53,10 +53,31 @@ QImage imageFromSpriteFrame(shared_ptr<creaturesImage> img, unsigned int frame, 
 
 	// img->data is not 32-bit-aligned so we have to make a copy here.
 	QImage ourimg = QImage(img->width(frame), img->height(frame),
-			img->is565() ? QImage::Format_RGB16 : QImage::Format_RGB555);
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+			img->is565() ? QImage::Format_RGB16 : QImage::Format_RGB555
+#else
+			// versions of Qt before 4.4 don't support 16-bit images
+			QImage::Format_ARGB32
+#endif
+			);
 
 	for (unsigned int i = 0; i < img->height(frame); i++) {
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
 		memcpy(ourimg.scanLine(i), (uint16 *)img->data(frame) + (i * img->width(frame)), img->width(frame) * 2);
+#else
+		// versions of Qt before 4.4 -> manually convert to 32-bit
+		// TODO: less horrible method for converting 16-bit to 32-bit?
+		uint32 *outbuf = (uint32 *)ourimg.scanLine(i);
+		uint16 *inbuf = (uint16 *)img->data(frame) + (i * img->width(frame));
+		for (unsigned int j = 0; j < img->width(frame); j++) {
+			uint16 v = inbuf[j];
+			if (img->is565()) {
+				outbuf[j] = 0xff000000 + (((v & 0xf800) >> 8) << 16) + (((v & 0x07e0) >> 3) << 8) + ((v & 0x001f) << 3);
+			} else {
+				outbuf[j] = 0xff000000 + (((v & 0x7c00) >> 7) << 16) + (((v & 0x03e0) >> 2) << 8) + ((v & 0x001f) << 3);
+			}
+		}
+#endif
 	}
 
 	QImage mask = ourimg.createMaskFromColor(ourimg.pixel(0, 0), Qt::MaskOutColor);
