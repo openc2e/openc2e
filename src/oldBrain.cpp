@@ -43,6 +43,11 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 
 	for (unsigned int i = 0; i < len; i++) {
 		switch (svrule[i]) {
+			/*
+			 * these numbers are the C2 svrules
+			 *
+			 * TODO: remap the C1 svrule numbers at load so they match these
+			 */
 			case 0: // <end>
 				return state;
 
@@ -114,53 +119,68 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 			case 21: // strength
 				break;
 
-			case 22: // TRUE
+			case 22: // 32
+				break;
+
+			case 23: // 128
+				break;
+
+			case 24: // rnd const
+				break;
+
+			case 25: // chem4
+				break;
+
+			case 26: // chem5
+				break;
+
+			case 27: // leak in
+				break;
+
+			case 28: // leak out
+				break;
+
+			case 29: // curr src leak in
+				break;
+
+			case 30: // TRUE
 				if (!state) return 0;
 				break;
 
-			case 23: // PLUS
+			case 31: // PLUS
 				break;
 
-			case 24: // MINUS
+			case 32: // MINUS
 				break;
 
-			case 25: // TIMES
+			case 33: // TIMES
 				break;
 
-			case 26: // INCR
+			case 34: // INCR
 				state++;
 				break;
 
-			case 27: // DECR
+			case 35: // DECR
 				state--;
 				break;
 
-			case 28: // <unused>
-			case 29: // <unused>
-			case 30: // <error>
-				break;
-			
-			/* creatures 2 is different, we should probably remap at load time:
-			case 22: // 32
-			case 23: // 128
-			case 24: // rnd const
-			case 25: // chem4
-			case 26: // chem5
-			case 27: // leak in
-			case 28: // leak out
-			case 29: // curr src leak in
-			case 30: // TRUE
-			case 31: // PLUS
-			case 32: // MINUS
-			case 33: // TIMES
-			case 34: // INCR
-			case 35: // DECR
 			case 36: // FALSE
+				break;
+
 			case 37: // multiply
+				break;
+
 			case 38: // average
+				break;
+
 			case 39: // move twrds
+				break;
+
 			case 40: // random
-			case 41: // <error>*/
+				break;
+
+			case 41: // <error>
+				break;
 		}
 	}
 
