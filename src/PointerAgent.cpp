@@ -40,6 +40,8 @@ PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MA
 
 	hotspotx = 0;
 	hotspoty = 0;
+
+	part_under_pointer = 0;
 }
 
 void PointerAgent::finishInit() {
@@ -88,8 +90,28 @@ void PointerAgent::tick() {
 	if (!paused) {
 		int x = pointerX(), y = pointerY();
 		CompoundPart *a = world.partAt(x, y);
-		Agent *parent;
-		if (a && (parent = a->getParent()) && dynamic_cast<SkeletalCreature*>(parent)) {
+		Agent *parent = 0;
+	
+		// work out what the old part was, if it hasn't disappeared from under us
+		// TODO: what if the old part was replaced by a new part with identical id? :(
+		CompoundPart *oldpart = 0;
+		if (agent_under_pointer) oldpart = agent_under_pointer->part(part_under_pointer);
+
+		// handle mouse in/out events
+		if (oldpart != a) {
+			if (oldpart) oldpart->mouseOut();
+			if (a) a->mouseIn();
+		}
+		
+		// update our memory of what part we're over
+		if (a) {
+			part_under_pointer = a->id;
+			parent = a->getParent();
+		}
+		agent_under_pointer = parent;
+
+		// overlay magic for c1/c2 - angel, devil, generic overlay
+		if (a && parent && dynamic_cast<SkeletalCreature*>(parent)) {
 			// the part under the cursor belongs to a SkeletalCreature
 			int scriptid = a->handleClick(x - a->x - parent->x, y - a->y - parent->y);
 			if (scriptid == 0) {

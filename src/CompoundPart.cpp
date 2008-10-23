@@ -253,6 +253,24 @@ int ButtonPart::handleClick(float x, float y) {
 	return calculateScriptId(messageid);
 }
 
+void ButtonPart::mouseIn() {
+	// TODO: what if ANIM is called during mouse hover?
+	if (hoveranimation.size()) {
+		oldanim = animation;
+		animation = hoveranimation;
+		setFrameNo(0);
+	}
+}
+
+void ButtonPart::mouseOut() {
+	// TODO: what if ANIM is called during mouse hover?
+	if (hoveranimation.size()) {
+		animation = oldanim;
+		if (animation.size())
+			setFrameNo(0);
+	}
+}
+
 TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
 	                : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = world.gallery.getImage(fontsprite);

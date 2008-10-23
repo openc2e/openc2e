@@ -30,6 +30,9 @@ private:
 
 protected:
 	int hotspotx, hotspoty;
+	
+	AgentRef agent_under_pointer;
+	unsigned int part_under_pointer;
 
 	void carry(AgentRef);
 	void drop(AgentRef);

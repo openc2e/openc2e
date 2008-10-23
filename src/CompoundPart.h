@@ -50,6 +50,9 @@ public:
 	virtual void render(class Surface *renderer, int xoffset, int yoffset);
 	virtual void partRender(class Surface *renderer, int xoffset, int yoffset) = 0;
 	virtual void tick() { }
+
+	virtual void mouseIn() { }
+	virtual void mouseOut() { }
 	
 	virtual bool canGainFocus() { return false; }
 	virtual void gainFocus();
@@ -128,12 +131,15 @@ protected:
 	bool hitopaquepixelsonly;
 	int messageid;
 	bytestring_t hoveranimation;
+	bytestring_t oldanim;
 
 public:
 	ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 			   unsigned int _z, const bytestring_t &animhover, int msgid, int option);
 	int handleClick(float, float);
 	bool isTransparent() { return hitopaquepixelsonly; }
+	void mouseIn();
+	void mouseOut();
 };
 
 class DullPart : public SpritePart {
