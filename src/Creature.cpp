@@ -733,7 +733,7 @@ inline unsigned int oldCreature::calculateTickMask(unsigned char rate) {
 void c1Creature::tickBiochemistry() {
 	// TODO: untested
 
-	if ((ticks % 5) != 0) return;
+	if ((ticks % 5) != 0) return; // TODO: what is the correct tick rate?
 
 	// process emitters
 	for (std::vector<c1Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++) {
@@ -756,7 +756,7 @@ void c1Creature::tickBiochemistry() {
 void c2Creature::tickBiochemistry() {
 	// TODO: untested
 	
-	if ((ticks % 5) != 0) return;
+	if ((ticks % 2) != 0) return; // every 2 ticks (0.2s)
 
 	// tick organs
 	for (std::vector<shared_ptr<c2Organ> >::iterator x = organs.begin(); x != organs.end(); x++) {
