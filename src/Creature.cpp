@@ -348,11 +348,39 @@ void c2Creature::tick() {
 }
 
 void oldCreature::tickBrain() {
+	if (asleep) {
+		attn = -1;
+		decn = -1;
+		attention.clear(); // TODO: doesn't belong here
+		if (!dreaming) return; // TODO
+	}
+
+	// TODO: correct timing?
+	if ((ticks % 4) != 0)
+		return;
+
+	if (dreaming) {
+		// TODO
+	}
+
+	// TODO
+	
+	chooseAgents();
+
 	// TODO
 
 	brain->tick();
 
 	// TODO
+
+	AgentRef oldattn = attention;
+	int olddecn = decn;
+
+	// TODO: doesn't belong here
+	if (attn >= 0 && attn < (int)chosenagents.size())
+		attention = chosenagents[attn];
+
+	if (zombie) return; // TODO: docs say zombies "don't process decision scripts", correct?
 
 	// involuntary actions
 	for (unsigned int i = 0; i < 8; i++) {
@@ -361,9 +389,16 @@ void oldCreature::tickBrain() {
 			continue;
 		}
 
-		if (involaction[i] > 0) {
+		// TODO
+		if (parentagent->vmStopped() && involaction[i] > 0) {
 			parentagent->queueScript(i + 64);
 		}
+	}
+
+	// TODO
+	if (parentagent->vmStopped() || oldattn != attention || olddecn != decn) {
+		// TODO
+		parentagent->queueScript(decn + 16); // Extra scripts
 	}
 }
 
