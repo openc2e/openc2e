@@ -204,7 +204,6 @@ public:
 
 struct c2Reaction {
 	bioReactionGene *data;
-	unsigned int receptors;
 	void init(bioReactionGene *);
 };
 

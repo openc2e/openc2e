@@ -1092,12 +1092,12 @@ void c2Organ::tick() {
 	}
 
 	// *** tick receptors	
-	for (vector<shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
 	clockratereceptors = 0; repairratereceptors = 0; injuryreceptors = 0;
 		
 	for (vector<c2Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
 		processReceptor(*i, ticked);
-	
+
+	// TODO: there is a problem here with overflow..
 	if (clockratereceptors > 0) clockrate /= clockratereceptors;
 	if (repairratereceptors > 0) repairrate /= repairratereceptors;
 	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;
