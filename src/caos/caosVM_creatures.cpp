@@ -1240,8 +1240,10 @@ void caosVM::c_LTCY() {
 	if (c2ec) {
 		c2ec->setInvolActionLatency(action, n);
 	}
-
-	// TODO: ltcy support for c1/c2
+	oldCreature *oldc = dynamic_cast<oldCreature *>(c);
+	if (oldc) {
+		oldc->setInvolActionLatency(action, n);
+	}
 }
 
 /**

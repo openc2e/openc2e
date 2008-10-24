@@ -127,6 +127,7 @@ protected:
 	unsigned char fertile, receptive, pregnant;
 	unsigned char dead;
 	unsigned char involaction[8];
+	unsigned int involactionlatency[8];
 	
 	void addGene(gene *);
 	void tickBrain();
@@ -150,6 +151,8 @@ public:
 	oldBrain *getBrain() { return brain; }
 	
 	unsigned char *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
+	
+	void setInvolActionLatency(unsigned int id, unsigned int n) { assert(id < 8); involactionlatency[id] = n; }
 };
 
 // c1

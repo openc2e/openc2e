@@ -173,10 +173,11 @@ void Creature::die() {
 	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(7, "", ""); // died event
 #endif
 	// TODO: disable brain/biochemistry updates
+	
 	// force die script
-	// TODO: TODO: TODO: this is c2e-specific
 	parentagent->stopScript();
-	parentagent->queueScript(72);
+	parentagent->queueScript(72); // Death script in c1, c2 and c2e
+	
 	// skeletalcreature eyes, also? see setAsleep comment
 	alive = false;
 }
@@ -200,6 +201,8 @@ oldCreature::oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char
 	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0;
 	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0;
 	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0;
+	
+	for (unsigned int i = 0; i < 8; i++) involactionlatency[i] = 0;
 	
 	muscleenergy = 0;
 	fertile = pregnant = receptive = 0;
@@ -348,8 +351,20 @@ void oldCreature::tickBrain() {
 	// TODO
 
 	brain->tick();
-	
+
 	// TODO
+
+	// involuntary actions
+	for (unsigned int i = 0; i < 8; i++) {
+		if (involactionlatency[i] > 0) {
+			involactionlatency[i]--;
+			continue;
+		}
+
+		if (involaction[i] > 0) {
+			parentagent->queueScript(i + 64);
+		}
+	}
 }
 
 void c2eCreature::tick() {
