@@ -586,15 +586,24 @@ void QtOpenc2e::tick() {
 			} else {
 				CreatureAgent *ca = dynamic_cast<CreatureAgent *>(world.selectedcreature.get());
 				if (ca) {
-					Creature *c = ca->getCreature();
+					oldCreature *c = dynamic_cast<oldCreature *>(ca->getCreature());
+					assert(c); // this is c2, after all..
 					if (c->isAlive()) {
-						healthimage->setPixmap(healthicon[4]); // 1-5 = health bar
+						// this life force indicator shows the level of Glycogen
+						// TODO: this does not update instantly w/Glycogen in real
+						// c2, so perhaps it's actually another (related) data point?
+						unsigned int x = c->getChemical(72) / 64;
+						healthimage->setPixmap(healthicon[x + 2]); // 2-5 (1-4 bars)
+						// TODO: flash indicator when norn is dying
+
+						// TODO: heartbeat animation
 						heartimage->setPixmap(hearticon[1]); // 1-3 = beating heart, large to small
 					} else {
 						// dead
 						healthimage->setPixmap(healthicon[1]);
 						heartimage->setPixmap(hearticon[4]); // blue heart
 					}
+					// TODO: drive
 				}
 			}
 		}
