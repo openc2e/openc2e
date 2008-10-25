@@ -25,6 +25,7 @@ bool agentIsVisible(Agent *seeing, Agent *dest);
 std::vector<boost::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char family, unsigned char genus, unsigned short species);
 
 bool agentsTouching(Agent *first, Agent *second);
+shared_ptr<Room> roomContainingAgent(AgentRef agent);
 
 #endif
 

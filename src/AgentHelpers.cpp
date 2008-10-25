@@ -18,6 +18,8 @@
  */
 
 #include "World.h"
+#include "MetaRoom.h"
+#include "Room.h"
 
 bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, shared_ptr<Room> ownerroom) {
 	assert(ownermeta && ownerroom);
@@ -110,5 +112,11 @@ bool agentsTouching(Agent *first, Agent *second) {
 	}
 
 	return true;
+}
+
+shared_ptr<Room> roomContainingAgent(AgentRef agent) {
+	MetaRoom *m = world.map.metaRoomAt(agent->x, agent->y);
+	if (!m) return shared_ptr<Room>();
+	return m->roomAt(agent->x + (agent->getWidth() / 2.0f), agent->y + (agent->getHeight() / 2.0f));
 }
 
