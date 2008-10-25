@@ -281,7 +281,7 @@ void bioEmitterGene::read(istream &s) {
 
 void bioHalfLivesGene::write(ostream &s) const {
 	for (int i = 0; i < 256; i++) {
-	s << halflives[i];
+		s << halflives[i];
 	}
 }
 
