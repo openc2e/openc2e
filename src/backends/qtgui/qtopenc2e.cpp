@@ -21,7 +21,9 @@
 #include "Engine.h"
 #include "AudioBackend.h"
 #include "MetaRoom.h"
+#include "Room.h"
 #include "Camera.h"
+#include "AgentHelpers.h"
 
 #include "Hatchery.h"
 #include "AgentInjector.h"
@@ -36,7 +38,7 @@
 
 #include "peFile.h"
 
-QPixmap imageFromExeResource(unsigned int resourceid) {
+QPixmap imageFromExeResource(unsigned int resourceid, bool mask = true) {
 	assert(engine.getExeFile());
 
 	resourceInfo *r = engine.getExeFile()->getResource(PE_RESOURCETYPE_BITMAP, HORRID_LANG_ENGLISH, resourceid);
@@ -55,7 +57,7 @@ QPixmap imageFromExeResource(unsigned int resourceid) {
 
 	QPixmap i;
 	i.loadFromData((const uchar *)bmpdata, (int)size);
-	i.setMask(i.createHeuristicMask());
+	if (mask) i.setMask(i.createHeuristicMask());
 
 	free(bmpdata);
 
@@ -238,28 +240,29 @@ void QtOpenc2e::loadC2Images() {
 	appleticons = imageFromExeResource(0xe6);
 
 	for (unsigned int i = 0; i < 4; i++)
-		seasonicon[i] = imageFromExeResource(0x98 + i);
+		seasonicon[i] = imageFromExeResource(0x98 + i, false);
 
-	timeofdayicon[0] = imageFromExeResource(0xa3);
-	timeofdayicon[1] = imageFromExeResource(0xc4);
-	timeofdayicon[2] = imageFromExeResource(0xc2);
-	timeofdayicon[3] = imageFromExeResource(0xc3);
-	timeofdayicon[4] = imageFromExeResource(0xc5);
+	timeofdayicon[0] = imageFromExeResource(0xa3, false);
+	timeofdayicon[1] = imageFromExeResource(0xc4, false);
+	timeofdayicon[2] = imageFromExeResource(0xc2, false);
+	timeofdayicon[3] = imageFromExeResource(0xc3, false);
+	timeofdayicon[4] = imageFromExeResource(0xc5, false);
 
 	for (unsigned int i = 0; i < 5; i++)
-		temperatureicon[i] = imageFromExeResource(0xa4 + i);
+		temperatureicon[i] = imageFromExeResource(0xa4 + i, false);
 
-	healthicon[0] = imageFromExeResource(0xe8); // dead (gray)
+	healthicon[0] = imageFromExeResource(0xe8); // disabled (gray)
 	healthicon[1] = imageFromExeResource(0xc7); // 0/4
 	healthicon[2] = imageFromExeResource(0xac); // 1/4
 	healthicon[3] = imageFromExeResource(0xad); // 2/4
 	healthicon[4] = imageFromExeResource(0xab); // 3/4
 	healthicon[5] = imageFromExeResource(0xaa); // 4/4
 
-	hearticon[0] = imageFromExeResource(0xe9); // dead (gray)
+	hearticon[0] = imageFromExeResource(0xe9); // disabled (gray)
 	hearticon[1] = imageFromExeResource(0xae); // large
 	hearticon[2] = imageFromExeResource(0xaf); // medium
 	hearticon[3] = imageFromExeResource(0xb0); // small
+	hearticon[4] = imageFromExeResource(0xe7); // dead (blue)
 }
 
 void QtOpenc2e::createC2Toolbars() {
@@ -543,6 +546,59 @@ void QtOpenc2e::tick() {
 	if (engine.done) close();
 
 	if (didtick) {
+		if (engine.version == 2 && engine.getExeFile()) {
+			// TODO: using cacheKey here is not so nice
+			if (world.season < 4 && seasonimage->pixmap()->cacheKey() != seasonicon[world.season].cacheKey()) {
+				seasonimage->setPixmap(seasonicon[world.season]);
+				switch (world.season) {
+					case 0: seasontext->setText(tr("Spring")); break;
+					case 1: seasontext->setText(tr("Summer")); break;
+					case 2: seasontext->setText(tr("Autumn")); break;
+					case 3: seasontext->setText(tr("Winter")); break;
+				}
+			}
+			if (world.timeofday < 5 && timeofdayimage->pixmap()->cacheKey() != timeofdayicon[world.timeofday].cacheKey()) {
+				timeofdayimage->setPixmap(timeofdayicon[world.timeofday]);
+			}
+			yeartext->setText(boost::str(boost::format("Year: %03i") % (int)world.year).c_str());
+		
+			shared_ptr<Room> room_for_tempcheck;
+			if (world.selectedcreature) { // prefer the room the selected creature is in
+				room_for_tempcheck = roomContainingAgent(world.selectedcreature);
+			}
+			if (!room_for_tempcheck) // then try the room at the centre of the camera
+				room_for_tempcheck = world.camera->getMetaRoom()->roomAt(world.camera->getXCentre(), world.camera->getYCentre());
+			// TODO: c2 seems to try closest room as a last resort?
+			if (room_for_tempcheck) {
+				unsigned char temp = room_for_tempcheck->temp.getInt();
+				unsigned int tempiconid = 4;
+				if (temp < 255) tempiconid = temp / 64; // boundaries at 64, 128, 192 and 255
+				if (temperatureimage->pixmap()->cacheKey() != temperatureicon[tempiconid].cacheKey()) {
+					temperatureimage->setPixmap(temperatureicon[tempiconid]);
+				}
+				// TODO: textual version of temperature (0 = -15C = 5F, 48 = 0C = 32F, 255 = 65C = 149F)
+			}
+
+			// TODO: norn health/drive/heartbeat, the below is a hack which changes the pixmap on every tick(!)
+			if (!world.selectedcreature) {
+				healthimage->setPixmap(healthicon[0]);
+				heartimage->setPixmap(hearticon[0]);
+			} else {
+				CreatureAgent *ca = dynamic_cast<CreatureAgent *>(world.selectedcreature.get());
+				if (ca) {
+					Creature *c = ca->getCreature();
+					if (c->isAlive()) {
+						healthimage->setPixmap(healthicon[4]); // 1-5 = health bar
+						heartimage->setPixmap(hearticon[1]); // 1-3 = beating heart, large to small
+					} else {
+						// dead
+						healthimage->setPixmap(healthicon[1]);
+						heartimage->setPixmap(hearticon[4]); // blue heart
+					}
+				}
+			}
+		}
+
 		if (world.selectedcreature != selectedcreature) {
 			selectedcreature = world.selectedcreature;
 			emit creatureChanged();

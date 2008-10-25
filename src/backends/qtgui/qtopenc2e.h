@@ -90,7 +90,7 @@ private:
 
 	QPixmap standardicons, handicons, favtoolbaricons, appleticons;
 	QPixmap seasonicon[4], timeofdayicon[5], temperatureicon[5];
-	QPixmap healthicon[6], hearticon[4];
+	QPixmap healthicon[6], hearticon[5];
 
 	// statusbar
 	class QLabel *seasontext, *seasonimage, *yeartext, *timeofdayimage, *temperatureimage;
