@@ -334,6 +334,7 @@ void c2Creature::tick() {
 	senses[1] = (asleep ? 255 : 0); // asleep
 
 	tickBrain();
+	// TODO: update brain organ every 0.4ms (ie: when brain is processed)!
 	tickBiochemistry();
 	
 	// lifestage checks
@@ -947,9 +948,6 @@ unsigned char *c2Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 					if (l < 17) return &drives[l];
 			}
 			break;
-
-		case 2: // organ
-			break; // TODO
 	}
 
 	std::cout << "c2Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
@@ -1045,7 +1043,7 @@ c2Organ::c2Organ(c2Creature *p, organGene *g) {
 	clockrate = ourGene->clockrate;
 	injurytoapply = 0;
 	damagerate = ourGene->damagerate;
-	biotick = 0; // TODO
+	biotick = ourGene->biotickstart;
 	atpdamagecoefficient = ourGene->atpdamagecoefficient * (lifeforce / (255.0f * 255.0f));
 	
 	// TODO: is genes.size() always the size we want?
@@ -1114,21 +1112,40 @@ void c2Organ::tick() {
 
 	bool ticked = false;
 
+	/*
+	 * the variable we call 'biotick' here is actually 'clock' in c2 - biochemticks is actual biotick
+	 * TODO: rename biotick to clock
+	 */
+	/*
+	 * This seems to be the correct 'algorithm' for working out when the organ should be
+	 * processed, despite the c2 Science Kit showing a different result. beware, the
+	 * Brain Organ is only processed when the brain is (ie: half the speed of biochem)
+	 */
 	if (biotick >= 255) {
 		ticked = true;
 		biotick -= 255;
 
 		biochemticks++;
 
-		// TODO: energy consumption/checks
-
-		// *** tick emitters
-		for (vector<c2Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
-			processEmitter(*i);
+		// chem 99 = ATP, chem 100 = ADP (hardcoded)
+		unsigned char atplevel = parent->getChemical(99);
+		if (atplevel >= energycost) {
+			// energy consumption
+			parent->subChemical(99, energycost);
+			parent->addChemical(100, energycost);	
 			
-		// *** tick reactions
-		for (vector<shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
-			processReaction(**i);
+			// *** tick emitters
+			for (vector<c2Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
+				processEmitter(*i);
+			
+			// *** tick reactions
+			for (vector<shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
+				processReaction(**i);
+		} else {
+			// not enough energy!
+			// TODO: apply atpdamagecoefficient
+		}
+
 
 		// *** long-term damage
 		float diff = longtermlifeforce - shorttermlifeforce;
@@ -1153,8 +1170,10 @@ void c2Organ::tick() {
 	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;
 
 	// *** decay life force
-	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
-	longtermlifeforce -= longtermlifeforce * (1.0f / 1000000.0f);
+	if (ticked) {
+		shorttermlifeforce -= shorttermlifeforce * (1.0f / 100000.0f);
+		longtermlifeforce -= longtermlifeforce * (1.0f / 100000.0f);
+	}
 }
 
 void c2eOrgan::tick() {
@@ -1218,6 +1237,8 @@ void c2eOrgan::tick() {
 	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;
 	
 	// *** decay life force
+	// TODO: is this correct, or should these be equal to c2 values above?
+	// TODO: do we damage on every tick, or only when processed (like c2)?
 	shorttermlifeforce -= shorttermlifeforce * (1.0f / 1000000.0f);
 	longtermlifeforce -= longtermlifeforce * (1.0f / 1000000.0f);
 }
