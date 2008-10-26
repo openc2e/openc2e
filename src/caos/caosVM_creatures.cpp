@@ -531,12 +531,15 @@ void caosVM::c_DEAD() {
  %status maybe
  %pragma variants c1 c2 cv c3
 
- Determines whether the target Creature is dead (0 or 1).
+ Determines whether the target Creature is alive (0) or dead (255 in c1/c2, 1 otherwise).
 */
 void caosVM::v_DEAD() {
 	Creature *c = getTargCreature();
 
-	result.setInt(!c->isAlive());
+	if (engine.version < 3 && !c->isAlive())
+		result.setInt(255);
+	else
+		result.setInt(!c->isAlive());
 }
 
 /**
