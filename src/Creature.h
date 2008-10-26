@@ -147,6 +147,8 @@ public:
 	
 	// TODO: is it really worth having drives outside oldCreature?
 	virtual unsigned char getDrive(unsigned int id) = 0;
+	
+	void handleStimulus(unsigned int id);
 
 	oldBrain *getBrain() { return brain; }
 	

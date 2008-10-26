@@ -1724,6 +1724,10 @@ int c2eCreature::reverseMapVerbToNeuron(unsigned int verb) {
 	return actualverb;
 }
 
+void oldCreature::handleStimulus(unsigned int id) {
+	// TODO
+}
+
 void c2eCreature::handleStimulus(c2eStim &stim) {
 	// TODO: handle out-of-range verb_amount/noun_amount
 

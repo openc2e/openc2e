@@ -100,7 +100,11 @@ void caosVM::c_STM_WRIT() {
 	VM_PARAM_INTEGER(stimulusno)
 	VM_PARAM_VALIDAGENT(object)
 
-	// TODO
+	oldCreature *c = getoldCreature(object.get());
+	if (!c) return; // ignored on non-creatures
+
+	// TODO: ownr?
+	c->handleStimulus(stimulusno);
 }
 
 /**
