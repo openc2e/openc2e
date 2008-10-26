@@ -134,8 +134,10 @@ protected:
 	virtual void tickBiochemistry();
 
 	oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
-	
+
 	void processGenes();
+
+	AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles);
 
 public:
 	inline unsigned int calculateTickMask(unsigned char);

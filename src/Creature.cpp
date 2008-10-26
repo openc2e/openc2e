@@ -1705,6 +1705,15 @@ void Creature::chooseAgents() {
 #endif
 }
 
+AgentRef oldCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) {
+	// TODO: proper selection method
+
+	if (possibles.size() > 0)
+		return possibles[rand() % possibles.size()];
+	else
+		return AgentRef();
+}
+
 AgentRef c2eCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) {
 	// TODO: proper selection method
 
