@@ -881,7 +881,88 @@ void c2eCreature::tickBiochemistry() {
 unsigned char *oldCreature::getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l) {
 	switch (o) {
 		case 0: // brain
-			return 0; // TODO
+		{
+			oldLobe *lobe = brain->getLobeByTissue(t);
+			if (!lobe) return 0;
+
+			if (receptor) {
+				// receptor
+				switch (l) {
+					case 0: // threshold
+						return 0; // TODO
+
+					case 1: // leakage
+						return 0; // TODO
+
+					case 2: // gain
+						return 0; // TODO
+
+					default:
+						if (l < 13) {
+							l = l - 3;
+							unsigned char dendriteset = l / 5;
+							if (dendriteset == 1) l -= 5;
+
+							switch (l) {
+								case 0: // relax suscept
+									return 0; // TODO
+
+								case 1: // relax STW
+									return 0; // TODO
+
+								case 2: // relax LTW
+									return 0; // TODO
+
+								case 3: // strength gain rate
+									return 0; // TODO
+
+								case 4: // strength loss rate
+									return 0; // TODO
+							}
+
+							return 0;
+						}
+
+						bool c2 = (dynamic_cast<c2Creature *>(this)); // TODO: evil
+						unsigned char nochems = c2 ? 6 : 4;
+
+						if (l - 13 < nochems) {
+							unsigned char chemid = l - 13;
+
+							return 0; // TODO
+						}
+
+						// The Genetics Kit limits to 0-15 in c1 and 0-39 in c2. We don't bother..
+						unsigned int cellid = l - 13 - nochems;
+						if (c2) {
+							// TODO: this is because c2 has 16-212 *after* 0-39 in the genetics kit, is it needed?!
+							if (cellid >= 40) cellid -= 24;
+						}
+						if (cellid >= lobe->getNoNeurons()) return 0;
+						return &lobe->getNeuron(cellid)->state;
+				}
+			} else {
+				// emitter
+				switch (l) {
+					case 0: // lobe activity
+						return 0; // TODO
+
+					case 1: // #loose dens/cells type 0
+						return 0; // TODO
+
+					case 2: // #loose dens/cells type 1
+						return 0; // TODO
+
+					default: // cell output
+					{
+						unsigned char cellid = l - 3;
+						// The Genetics Kit limits to 0-15 in c1 and 0-39 in c2. We don't bother..
+						if (cellid >= lobe->getNoNeurons()) return 0;
+						return &lobe->getNeuron(cellid)->output;
+					}
+				}
+			}
+		}
 
 		case 1: // creature
 			switch (t) {
