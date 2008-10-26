@@ -248,10 +248,10 @@ protected:
 	float lifeforce, shorttermlifeforce, longtermlifeforce;
 	
 	// locuses
-	unsigned char biotick, damagerate, repairrate, clockrate, injurytoapply;
+	unsigned char damagerate, repairrate, clockrate, injurytoapply;
 	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
 
-	unsigned int biochemticks;
+	unsigned int biotick, biochemticks;
 
 	void processReaction(c2Reaction &);
 	void processEmitter(c2Emitter &);

@@ -311,6 +311,10 @@ void c1Creature::tick() {
 
 	senses[0] = 255; // always-on
 	senses[1] = (asleep ? 255 : 0); // asleep
+	senses[2] = 0; // air coldness (TODO)
+	senses[3] = 0; // air hotness (TODO)
+	senses[4] = 0; // light level (TODO)
+	senses[5] = 0; // crowdedness (TODO)	
 
 	tickBrain();
 	tickBiochemistry();
@@ -332,6 +336,18 @@ void c2Creature::tick() {
 
 	senses[0] = 255; // always-on
 	senses[1] = (asleep ? 255 : 0); // asleep
+	senses[2] = 0; // air coldness (TODO)
+	senses[3] = 0; // air hotness (TODO)
+	senses[4] = 0; // light level (TODO)
+	senses[5] = 0; // crowdedness (TODO)
+	senses[6] = 0; // radiation (TODO)
+	senses[7] = 0; // time of day (TODO)
+	senses[8] = 0; // season (TODO)
+	senses[9] = 255; // air quality (TODO)
+	senses[10] = 0; // slope up (TODO)
+	senses[11] = 0; // slope down (TODO)
+	senses[12] = 0; // wind towards (TODO)
+	senses[13] = 0; // wind behind (TODO)
 
 	tickBrain();
 	// TODO: update brain organ every 0.4ms (ie: when brain is processed)!
@@ -1043,11 +1059,13 @@ c2Organ::c2Organ(c2Creature *p, organGene *g) {
 	clockrate = ourGene->clockrate;
 	injurytoapply = 0;
 	damagerate = ourGene->damagerate;
-	biotick = ourGene->biotickstart;
+	biotick = 0;
 	atpdamagecoefficient = ourGene->atpdamagecoefficient * (lifeforce / (255.0f * 255.0f));
 	
 	// TODO: is genes.size() always the size we want?
 	energycost = 2 + (ourGene->genes.size() / 10);
+
+	clockratereceptors = repairratereceptors = injuryreceptors = 0;
 }
 
 c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
@@ -1122,10 +1140,13 @@ void c2Organ::tick() {
 	 * Brain Organ is only processed when the brain is (ie: half the speed of biochem)
 	 */
 	if (biotick >= 255) {
-		ticked = true;
 		biotick -= 255;
-
 		biochemticks++;
+
+		// TODO: is this the correct way to handle biotickstart?
+		//if (biochemticks < ourGene->biotickstart) return;
+		
+		ticked = true;
 
 		// chem 99 = ATP, chem 100 = ADP (hardcoded)
 		unsigned char atplevel = parent->getChemical(99);
@@ -1152,22 +1173,24 @@ void c2Organ::tick() {
 		longtermlifeforce = longtermlifeforce - (diff * (damagerate / 255.0)); // TODO: correct?
 	
 		// *** repair injuries
+		// TODO: doesn't this mean STLF could go above LTLF?
 		float repair = diff * (repairrate / 255.0); // TODO: correct?
 		shorttermlifeforce += repair;
 
 		// TODO: adjust injury chem, apply injury
 	}
 
-	// *** tick receptors	
-	clockratereceptors = 0; repairratereceptors = 0; injuryreceptors = 0;
+	// TODO: ensure we've ticked at least once
+	//if (biochemticks < ourGene->biotickstart) return;
+	if (biochemticks == 0) return;
+
+	// *** tick receptors
+	if (clockratereceptors != 0) clockrate = 0;
+	if (repairratereceptors != 0) repairrate = 0;
+	if (injuryreceptors != 0) injurytoapply = 0;
 		
 	for (vector<c2Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
 		processReceptor(*i, ticked);
-
-	// TODO: there is a problem here with overflow..
-	if (clockratereceptors > 0) clockrate /= clockratereceptors;
-	if (repairratereceptors > 0) repairrate /= repairratereceptors;
-	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;
 
 	// *** decay life force
 	if (ticked) {
@@ -1215,6 +1238,7 @@ void c2eOrgan::tick() {
 		longtermlifeforce = longtermlifeforce - (diff * damagerate); // damagerate always <= 1.0
 
 		// *** repair injuries
+		// TODO: doesn't this mean STLF could go above LTLF?
 		float repair = diff * repairrate; // repairrate always <= 1.00
 		shorttermlifeforce += repair;
 		// adjust Injury chemical (TODO: de-hardcode)
@@ -1495,11 +1519,9 @@ void c2Organ::processReceptor(c2Receptor &d, bool checkchem) {
 
 	if (f == 0 && g.organ == 1 && g.tissue == 3 && g.locus == 0) // evil check for "Die if non-zero!" locus
 		return;
-	else if (d.receptors) {
-		if (*d.receptors == 0) *d.locus = 0;
-		(*d.receptors)++;
-		*d.locus += f;
-	} else
+	else if (d.receptors)
+		*d.locus += (f / *d.receptors);
+	else
 		*d.locus = f;
 }
 
@@ -1552,13 +1574,22 @@ unsigned char *c2Organ::getLocusPointer(bool receptor, unsigned char o, unsigned
 			if (t == 0)
 				switch (l) {
 					case 0: // clock rate
-						if (receptors) *receptors = &clockratereceptors;
+						if (receptors) {
+							*receptors = &clockratereceptors;
+							clockratereceptors++;
+						}
 						return &clockrate;
 					case 1: // repair rate
-						if (receptors) *receptors = &repairratereceptors;
+						if (receptors) {
+							*receptors = &repairratereceptors;
+							repairratereceptors++;
+						}
 						return &repairrate;
 					case 2: // injury to apply
-						if (receptors) *receptors = &injuryreceptors;
+						if (receptors) {
+							*receptors = &injuryreceptors;
+							injuryreceptors++;
+						}
 						return &injurytoapply;
 				}
 			break;
