@@ -9,6 +9,10 @@
 #include <boost/format.hpp>
 
 ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
+	for (unsigned int i = 0; i < 255; i++) {
+		chemselected[i] = false;
+	}
+
 	// read in interesting chemical info from game files
 	if (engine.version < 3) {
 		// c1/c2 are easy; c2e wants scary catalogue stuff.
@@ -99,6 +103,7 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 	if (chemgroups.size() == 0) grouplist->hide();
 	connect(grouplist, SIGNAL(itemSelectionChanged()), this, SLOT(onGroupChange()));
 	chemlist = new QListWidget(this);
+	connect(chemlist, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(onChemChange(QListWidgetItem*)));
 	
 	// add the implicit "All" group.
 	for (std::map<unsigned int, std::string>::iterator i = chemnames.begin(); i != chemnames.end(); i++) {
@@ -125,6 +130,21 @@ void ChemicalSelector::onGroupChange() {
 	     i != chemgroups[groupname].end(); i++) {
 	  QListWidgetItem *item = new QListWidgetItem(chemnames[*i].c_str(), chemlist);
 	  item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-	  item->setCheckState(Qt::Unchecked);
+	  item->setCheckState(chemselected[*i] ? Qt::Checked : Qt::Unchecked);
+	  item->setData(Qt::UserRole, *i);
 	}
 }
+
+void ChemicalSelector::onChemChange(QListWidgetItem *item) {
+	if (!item) return;
+
+	unsigned int i = item->data(Qt::UserRole).toUInt();
+	if (i == 0) return;
+	
+	bool newstate = (item->checkState() == Qt::Checked);
+	if (chemselected[i] == newstate) return;
+	
+	chemselected[i] = newstate;
+	emit onSelectionChange(i);
+}
+
