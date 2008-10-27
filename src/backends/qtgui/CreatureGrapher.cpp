@@ -34,9 +34,9 @@ CreatureGrapher::CreatureGrapher(QtOpenc2e *p) : QWidget(p), parent(p) {
 	layout->addWidget(selector, 1);
 	setLayout(layout);
 
-	graph->setDataSetColour(2, QColor(255, 0, 0)); // Pyruvate in red
-	graph->setDataSetColour(3, QColor(0, 255, 0)); // Glucose in blue
-	graph->setDataSetColour(4, QColor(0, 0, 255)); // Glycogen in green
+	for (unsigned int i = 1; i < 255; i++) {
+		graph->addDataSet(i);
+	}
 }
 
 CreatureGrapher::~CreatureGrapher() {
@@ -50,16 +50,23 @@ void CreatureGrapher::onCreatureTick() {
 	Creature *c = parent->getSelectedCreature();
 	if (!c) return; // TODO: assert
 
-	// TODO: oldCreature support
-	c2eCreature *cc = dynamic_cast<c2eCreature *>(c);
-	if (!cc) return;
+	// TODO: we should only update on biochem ticks..
 
-	graph->addDataPoint(2, cc->getChemical(2));
-	graph->addDataPoint(3, cc->getChemical(3));
-	graph->addDataPoint(4, cc->getChemical(4));
+	c2eCreature *cc = dynamic_cast<c2eCreature *>(c);
+	if (cc) {
+		for (unsigned int i = 1; i < 255; i++)
+			graph->addDataPoint(i, cc->getChemical(i));
+	}
+	oldCreature *oc = dynamic_cast<oldCreature *>(c);
+	if (oc) {
+		for (unsigned int i = 1; i < 255; i++)
+			graph->addDataPoint(i, oc->getChemical(i));
+	}
+
+	graph->update();
 }
 
 QSize CreatureGrapher::minimumSizeHint() const {
-	return QSize(100, 50);
+	return QSize(350, 400);
 }
 

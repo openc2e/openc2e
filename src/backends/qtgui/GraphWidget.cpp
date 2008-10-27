@@ -44,18 +44,15 @@ void GraphWidget::wipeGraph() {
 void GraphWidget::setVerticalScale(float min, float max) {
 	minvertical = min;
 	maxvertical = max;
-
-	update();
 }
 
 void GraphWidget::setHorizontalSize(unsigned int size) {
 	sizehorizontal = size;
-
-	update();
 }
 
 void GraphWidget::addDataSet(unsigned int dataset) {
 	datasets[dataset].colour = QColor(255, 255, 255);
+	datasets[dataset].visible = false;
 	datapoints[dataset].reserve(sizehorizontal);
 }
 
@@ -65,26 +62,24 @@ void GraphWidget::removeDataSet(unsigned int dataset) {
 	
 	std::map<unsigned int, std::vector<float> >::iterator di = datapoints.find(dataset);
 	if (di != datapoints.end()) datapoints.erase(di);
-	
-	update();
 }
 
 void GraphWidget::setDataSetColour(unsigned int dataset, QColor colour) {
 	datasets[dataset].colour = colour;
-	
-	update();
 }
 
 void GraphWidget::setDataSetName(unsigned int dataset, QString name) {
 	datasets[dataset].name = name;
 }
 
+void GraphWidget::setDataSetVisible(unsigned int dataset, bool vis) {
+	datasets[dataset].visible = vis;
+}
+
 void GraphWidget::addDataPoint(unsigned int dataset, float data) {
 	datapoints[dataset].push_back(data);
 	if (datapoints[dataset].size() > sizehorizontal)
 		datapoints[dataset].erase(datapoints[dataset].begin());
-
-	update();
 }
 
 void GraphWidget::paintEvent(QPaintEvent *) {
@@ -94,6 +89,8 @@ void GraphWidget::paintEvent(QPaintEvent *) {
 	float ymultiplier = (float)height() / (maxvertical - minvertical);
 
 	for (std::map<unsigned int, std::vector<float> >::iterator i = datapoints.begin(); i != datapoints.end(); i++) {
+		if (!datasets[i->first].visible) continue;
+
 		std::vector<float> &points = i->second;
 		if (points.size() == 0) continue;
 

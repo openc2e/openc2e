@@ -20,6 +20,7 @@
 #include <QtGui>
 
 struct DataSetDetails {
+	bool visible;
 	QColor colour;
 	QString name;
 };
@@ -50,6 +51,7 @@ public:
 	void removeDataSet(unsigned int dataset);
 	void setDataSetColour(unsigned int dataset, QColor colour);
 	void setDataSetName(unsigned int dataset, QString name);
+	void setDataSetVisible(unsigned int dataset, bool vis);
 
 	void addDataPoint(unsigned int dataset, float data);
 };
