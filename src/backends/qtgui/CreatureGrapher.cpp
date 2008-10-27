@@ -17,19 +17,21 @@
 #include "Creature.h"
 #include "CreatureGrapher.h"
 #include "qtopenc2e.h"
+#include "Engine.h"
 
 CreatureGrapher::CreatureGrapher(QtOpenc2e *p) : QWidget(p), parent(p) {
 	graph = new GraphWidget(this);
-	
-	QPalette pal(palette());
-	pal.setColor(QPalette::Background, QColor(0, 0, 0));
-	graph->setPalette(pal);
-	graph->setAutoFillBackground(true);
+	if (engine.version < 3) {
+		graph->setVerticalScale(0,255);
+	}
+
+	selector = new ChemicalSelector(this);
 	
 	resize(minimumSizeHint());
 
-	QHBoxLayout *layout = new QHBoxLayout(this);
-	layout->addWidget(graph);
+	QVBoxLayout *layout = new QVBoxLayout(this);
+	layout->addWidget(graph, 2);
+	layout->addWidget(selector, 1);
 	setLayout(layout);
 
 	graph->setDataSetColour(2, QColor(255, 0, 0)); // Pyruvate in red

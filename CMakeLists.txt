@@ -138,6 +138,7 @@ SET(OPENC2E_QT
 	src/backends/qtgui/QtBackend.cpp
 	src/backends/qtgui/GraphWidget.cpp
 	src/backends/qtgui/CreatureGrapher.cpp
+	src/backends/qtgui/ChemicalSelector.cpp
 	src/backends/qtgui/Hatchery.cpp
 	src/tools/braininavat/brainview.cpp)
 
@@ -149,6 +150,7 @@ SET(OPENC2E_QT_MOC_HDRS
 	src/backends/qtgui/imagepreview.h
 	src/backends/qtgui/GraphWidget.h
 	src/backends/qtgui/CreatureGrapher.h
+	src/backends/qtgui/ChemicalSelector.h
 	src/backends/qtgui/Hatchery.h
 	src/tools/braininavat/brainview.h)
 

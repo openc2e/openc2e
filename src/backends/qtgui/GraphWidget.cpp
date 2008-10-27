@@ -20,6 +20,11 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
 	minvertical = -1.0f;
 	maxvertical = 1.0f;
 	sizehorizontal = 100;
+
+	QPalette pal(palette());
+	pal.setColor(QPalette::Background, QColor(0, 0, 0));
+	setPalette(pal);
+	setAutoFillBackground(true);
 }
 
 GraphWidget::~GraphWidget() {

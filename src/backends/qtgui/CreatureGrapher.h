@@ -15,12 +15,14 @@
 */
 
 #include "GraphWidget.h"
+#include "ChemicalSelector.h"
 
 class CreatureGrapher : public QWidget {
 	Q_OBJECT
 
 protected:
 	GraphWidget *graph;
+	ChemicalSelector *selector;
 	class QtOpenc2e *parent;
 
 private slots:
