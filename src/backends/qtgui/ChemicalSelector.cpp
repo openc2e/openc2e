@@ -4,7 +4,9 @@
 #include <cstring>
 #include <fstream>
 #include "Engine.h"
+#include "Catalogue.h"
 #include <QtGui>
+#include <boost/format.hpp>
 
 ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 	// read in interesting chemical info from game files
@@ -15,16 +17,41 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 			ifs.close();
 			throw creaturesException("Couldn't find allchemicals.str");
 		}
+		
+		char n = ifs.get();
+		char o = ifs.get();
+		if (n != 0 || o != 1) {
+			throw creaturesException("allchemicals.str is corrupt");
+		}
+
 		for (int i = 0; ifs.good(); i++) {
 			int len = ifs.get();
-			char *name = new char[len+1];
-			memset(name, 0, len+1);
-			ifs.read(name, len);
-			name[len] = 0;
-			chemnames[i] = name;
+			// file is only !good once you tried reading past the end
+			if (!ifs.good()) break;
+		
+			if (len) {
+				char name[len + 1];
+				memset(name, 0, len+1);
+				ifs.read(name, len);
+				name[len] = 0;
+				chemnames[i] = name;
+			} else {
+				chemnames[i] = boost::str(boost::format("<%d>") % i);
+			}
 		}
 		ifs.close();
+	} else {
+		if (catalogue.hasTag("chemical_names")) {
+			// c2e has chemical names in a catalogue file
+			// TODO: there's some really dumb issues here, like chem 90 being '90' instead of 'Wounded' in c3/ds
+			// TODO: one possibility is that C3 has a short_chemical_names tag without this kind of stupidity..
+			const std::vector<std::string> &t = catalogue.getTag("chemical_names");
+			for (unsigned int i = 0; i < t.size(); i++) {
+				chemnames[i] = t[i];
+			}
+		}
 	}
+
 	if (engine.version == 2) {
 		// c2 has a ChemGroups file with useful data.
 		std::ifstream ifs(world.findFile("Applet Data/ChemGroups").c_str());
@@ -50,23 +77,42 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 			}
 		}
 		ifs.close();
+	} else if (catalogue.hasTag("chemical graphing groups")) {
+		// Creatures 3 has groups in the catalogue file
+		const std::vector<std::string> &t = catalogue.getTag("chemical graphing groups");
+		for (unsigned int i = 0; i < t.size(); i++) {
+			std::string groupname = t[i];
+
+			std::string tagname = boost::str(boost::format("chemical graphing group %d") % (int)(i + 1));
+			if (catalogue.hasTag(tagname)) {
+				const std::vector<std::string> &t = catalogue.getTag(tagname);
+				for (unsigned int i = 0; i < t.size(); i++) {
+					int chem = atoi(t[i].c_str());
+					if (chem != 0)
+						chemgroups[groupname].push_back(chem);
+				}
+			}
+		}
 	}
 
+	grouplist = new QListWidget(this);
+	if (chemgroups.size() == 0) grouplist->hide();
+	connect(grouplist, SIGNAL(itemSelectionChanged()), this, SLOT(onGroupChange()));
+	chemlist = new QListWidget(this);
+	
 	// add the implicit "All" group.
 	for (std::map<unsigned int, std::string>::iterator i = chemnames.begin(); i != chemnames.end(); i++) {
-		chemgroups["All"].push_back(i->first);
+		if (i->first != 0)
+			chemgroups["All"].push_back(i->first);
 	}
 
-	QHBoxLayout *layout = new QHBoxLayout(this);
-	grouplist = new QListWidget(this);
-	connect(grouplist, SIGNAL(itemSelectionChanged()), this, SLOT(onGroupChange()));
 	for (std::map<std::string, std::vector<unsigned int> >::iterator i = chemgroups.begin();
 	     i != chemgroups.end(); i++) { // i hate c++
 	  new QListWidgetItem(i->first.c_str(), grouplist);
 	}
+	grouplist->setCurrentRow(0);
 
-	chemlist = new QListWidget(this);
-
+	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->addWidget(grouplist, 1);
 	layout->addWidget(chemlist, 1);
 	setLayout(layout);
