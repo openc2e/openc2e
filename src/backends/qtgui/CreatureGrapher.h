@@ -28,6 +28,7 @@ protected:
 private slots:
 	void onCreatureChange();
 	void onCreatureTick();
+	void onChemSelectionChange(unsigned int i);
 
 public:
 	CreatureGrapher(class QtOpenc2e *p);

@@ -26,6 +26,7 @@ CreatureGrapher::CreatureGrapher(QtOpenc2e *p) : QWidget(p), parent(p) {
 	}
 
 	selector = new ChemicalSelector(this);
+	connect(selector, SIGNAL(onSelectionChange(unsigned int)), this, SLOT(onChemSelectionChange(unsigned int)));
 	
 	resize(minimumSizeHint());
 
@@ -62,6 +63,12 @@ void CreatureGrapher::onCreatureTick() {
 		for (unsigned int i = 1; i < 255; i++)
 			graph->addDataPoint(i, oc->getChemical(i));
 	}
+
+	graph->update();
+}
+
+void CreatureGrapher::onChemSelectionChange(unsigned int i) {
+	graph->setDataSetVisible(i, selector->chemSelected(i));
 
 	graph->update();
 }
