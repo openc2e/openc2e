@@ -34,11 +34,9 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 			if (!ifs.good()) break;
 		
 			if (len) {
-				char name[len + 1];
-				memset(name, 0, len+1);
-				ifs.read(name, len);
-				name[len] = 0;
-				chemnames[i] = name;
+				std::vector<char> name(len+1, '\0');
+				ifs.read(&name[0], len);
+				chemnames[i] = std::string(&name[0]);
 			} else {
 				chemnames[i] = boost::str(boost::format("<%d>") % i);
 			}
