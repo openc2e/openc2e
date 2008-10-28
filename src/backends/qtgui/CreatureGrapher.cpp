@@ -35,7 +35,7 @@ CreatureGrapher::CreatureGrapher(QtOpenc2e *p) : QWidget(p), parent(p) {
 	layout->addWidget(selector, 1);
 	setLayout(layout);
 
-	for (unsigned int i = 1; i < 255; i++) {
+	for (unsigned int i = 1; i < 256; i++) {
 		graph->addDataSet(i);
 	}
 }
@@ -55,12 +55,12 @@ void CreatureGrapher::onCreatureTick() {
 
 	c2eCreature *cc = dynamic_cast<c2eCreature *>(c);
 	if (cc) {
-		for (unsigned int i = 1; i < 255; i++)
+		for (unsigned int i = 1; i < 256; i++)
 			graph->addDataPoint(i, cc->getChemical(i));
 	}
 	oldCreature *oc = dynamic_cast<oldCreature *>(c);
 	if (oc) {
-		for (unsigned int i = 1; i < 255; i++)
+		for (unsigned int i = 1; i < 256; i++)
 			graph->addDataPoint(i, oc->getChemical(i));
 	}
 

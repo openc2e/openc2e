@@ -18,7 +18,7 @@ class ChemicalSelector : public QWidget {
 		QListWidget *grouplist;
 		QListWidget *chemlist;
 		
-		bool chemselected[255];
+		bool chemselected[256];
 
 	signals:
 		void onSelectionChange(unsigned int chemno);

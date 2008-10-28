@@ -9,7 +9,7 @@
 #include <boost/format.hpp>
 
 ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
-	for (unsigned int i = 0; i < 255; i++) {
+	for (unsigned int i = 0; i < 256; i++) {
 		chemselected[i] = false;
 	}
 
