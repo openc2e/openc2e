@@ -45,23 +45,32 @@ protected:
 	oldLobe *sourceLobe[2];
 	bool inited;
 
+	unsigned int width, height;
+
+	unsigned char threshold, leakagerate, inputgain;
+	unsigned char chems[6];
+
 public:
 	oldLobe(class oldBrain *b, oldBrainLobeGene *g);
 	bool wasInited() { return inited; }
 	void tick();
 	void init();
 	void wipe();
+
 	oldBrainLobeGene *getGene() { return ourGene; }
+
 	unsigned int getNoNeurons() { return neurons.size(); }
 	unsigned int getNoDendrites(unsigned int t) { return dendrites[t].size(); }
 	oldNeuron *getNeuron(unsigned int i) { return &neurons[i]; }
 	oldDendrite *getDendrite(unsigned int t, unsigned int i) { return &dendrites[t][i]; }
+
+	unsigned char *getChemPointer(unsigned int chemid) { return &chems[chemid]; }
 };
 
 class oldBrain {
 protected:
-	// TODO: should be oldCreature?
 	class oldCreature *parent;
+	unsigned int ticks;
 
 public:
 	std::map<unsigned int, oldLobe *> lobes;
@@ -70,8 +79,10 @@ public:
 	void tick();
 	void processGenes();
 	void init();
+
 	oldLobe *getLobeByTissue(unsigned int id);
 	oldCreature *getParent() { return parent; }
+	unsigned int getTicks() { return ticks; }
 };
 
 #endif

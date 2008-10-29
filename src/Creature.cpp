@@ -929,7 +929,7 @@ unsigned char *oldCreature::getLocusPointer(bool receptor, unsigned char o, unsi
 						if (l - 13 < nochems) {
 							unsigned char chemid = l - 13;
 
-							return 0; // TODO
+							return lobe->getChemPointer(chemid);
 						}
 
 						// The Genetics Kit limits to 0-15 in c1 and 0-39 in c2. We don't bother..

@@ -195,26 +195,35 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 
 	inited = false;
 
-	unsigned int width = g->width, height = g->height;
+	threshold = g->nominalthreshold;
+	leakagerate = g->leakagerate;
+	inputgain = g->inputgain;
+
+	width = g->width;
+	height = g->height;
 	// TODO: good?
 	if (width < 1) width = 1;
 	if (height < 1) height = 1;
 
 	neurons.reserve(width * height);
-	
+
 	oldNeuron n;
 	for (unsigned int i = 0; i < width * height; i++) {
 		neurons.push_back(n);
 	}
 
 	// TODO
+
+	for (unsigned int i = 0; i < 6; i++) {
+		chems[i] = 0;
+	}
 }
 
 void oldLobe::init() {
 	inited = true;
 	wipe();
 
-	// TODO
+	// TODO: is this it?
 }
 
 void oldLobe::wipe() {
@@ -228,6 +237,8 @@ void oldLobe::tick() {
 oldBrain::oldBrain(oldCreature *p) {
 	assert(p);
 	parent = p;
+
+	ticks = 0;
 }
 
 void oldBrain::processGenes() {
@@ -254,6 +265,8 @@ void oldBrain::tick() {
 	for (std::map<unsigned int, oldLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
 		(*i).second->tick();
 	}
+
+	ticks++;
 }
 
 oldLobe *oldBrain::getLobeByTissue(unsigned int id) {
