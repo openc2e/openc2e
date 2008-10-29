@@ -788,11 +788,11 @@ unsigned int c1rates[32] = {
 	0xFFFF
 };
 
-inline unsigned int oldCreature::calculateMultiplier(unsigned char rate) {
+unsigned int oldCreature::calculateMultiplier(unsigned char rate) {
 	return c1rates[rate];
 }
 
-inline unsigned int oldCreature::calculateTickMask(unsigned char rate) {
+unsigned int oldCreature::calculateTickMask(unsigned char rate) {
 	if (rate < 7) return 0;
 	else return (1 << ((unsigned int)rate - 7)) - 1;
 }

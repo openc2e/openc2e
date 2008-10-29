@@ -140,8 +140,9 @@ protected:
 	AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles);
 
 public:
-	inline unsigned int calculateTickMask(unsigned char);
-	inline unsigned int calculateMultiplier(unsigned char);
+	// TODO: inline?
+	unsigned int calculateTickMask(unsigned char);
+	unsigned int calculateMultiplier(unsigned char);
 
 	void addChemical(unsigned char id, unsigned char val);
 	void subChemical(unsigned char id, unsigned char val);
