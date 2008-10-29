@@ -190,6 +190,7 @@ public:
 
 	bool falling : 1; // TODO: icky hack, possibly
 	bool moved_last_tick : 1; // TODO: icky hack
+	boost::weak_ptr<class Room> roomcache[5];
 
 	caosVar range;
 

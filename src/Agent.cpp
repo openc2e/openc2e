@@ -782,7 +782,12 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 		else if (src.x < m->x() || (dx < 0 && src.x == m->x())) src.x += m->width();
 	}
 
-	shared_ptr<Room> room = bestRoomAt(src.x, src.y, i, m, shared_ptr<Room>());
+	// TODO: caching rooms affects behaviour - work out if that's a problem
+	shared_ptr<Room> room = roomcache[i].lock();
+	if (!room || !room->containsPoint(src.x, src.y)) {
+		room = bestRoomAt(src.x, src.y, i, m, shared_ptr<Room>());
+		roomcache[i] = room;
+	}
 
 	if (!room) { // out of room system
 		if (!displaycore)
