@@ -227,11 +227,38 @@ void oldLobe::init() {
 }
 
 void oldLobe::wipe() {
-	// TODO
+	for (unsigned int i = 0; i < neurons.size(); i++) {
+		neurons[i].state = neurons[i].output = ourGene->reststate; // TODO: good?
+	}
 }
 
 void oldLobe::tick() {
-	// TODO
+	// TODO: do something with inputgain? presumably applied to 'input', so something to do with decision lobe..
+
+	for (unsigned int i = 0; i < neurons.size(); i++) {
+		unsigned char out = neurons[i].state; // TODO: svrule (ourGene->staterule)..
+
+		// apply leakage rate in order to settle at rest state
+		if ((parent->getTicks() & parent->getParent()->calculateTickMask(leakagerate)) == 0) {
+			// TODO: untested
+			// TODO: what happens if out < ourGene->reststate? test!
+			out = ourGene->reststate + ((out - ourGene->reststate) * parent->getParent()->calculateMultiplier(leakagerate)) / 65536;
+		}
+
+		neurons[i].state = out;
+
+		if (out < threshold)
+			out = 0;
+		else
+			out -= threshold;
+
+		neurons[i].output = out;
+	}
+
+	// TODO: dendrites (ourGene->dendrite1, ourGene->dendrite2)
+
+	// TODO: data copied to perception lobe (ourGene->perceptflag - not just true/false!)
+	// TODO: winner takes all (ourGene->flags)
 }
 
 oldBrain::oldBrain(oldCreature *p) {
