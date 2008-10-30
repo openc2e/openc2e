@@ -743,6 +743,15 @@ boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef a
 }
 
 int World::findCategory(unsigned char family, unsigned char genus, unsigned short species) {
+	if (engine.version < 3) {
+		if (family == 2 && genus == 1 && species == 1) return genus; // 2 1 1 (hand) -> 1
+		if (family == 2 && genus > 1 && genus < 26) return genus; // 2 2 0 to 2 25 0 -> 2 to 25
+		if (family == 3 && genus < 10) return genus + 25; // 3 1 0 to 3 9 0 -> 26 to 35
+		if (family == 4 && genus < 5) return genus + 35; // 4 1 0 to 4 4 0 -> 36 to 39
+
+		return -1;
+	}
+
 	if (!catalogue.hasTag("Agent Classifiers")) return -1;
 
 	const std::vector<std::string> &t = catalogue.getTag("Agent Classifiers");

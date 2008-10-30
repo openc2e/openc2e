@@ -1410,12 +1410,7 @@ void Agent::setClassifier(unsigned char f, unsigned char g, unsigned short s) {
 	genus = g;
 	species = s;
 
-	if (engine.version < 3) {
-		// TODO: categories for other game versions
-		category = -1;
-	} else {
-		category = world.findCategory(family, genus, species);
-	}
+	category = world.findCategory(family, genus, species);
 }
 
 bool Agent::tryMoveToPlaceAround(float x, float y) {
