@@ -24,6 +24,7 @@
 	* render hairs/ears .. at the moment we avoid them, we lack zorder sanity too
 	* support clothes parts
 	* interpolate between differing poses, since c2e seems to
+	* sanity checks: eg check that sprites have enough frames at load time
 */
 
 #include "SkeletalCreature.h"
@@ -257,6 +258,8 @@ shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(shared_ptr<creatures
 }
 
 void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
+	bool mirror_body_parts = (world.variables["engine_mirror_creature_body_parts"] == 1);
+
 	for (int j = 0; j < 17; j++) {
 		int i = cee_zorder[posedirection][j];
 		if (i >= SkeletalPartCount()) continue; // CV hackery
@@ -269,19 +272,20 @@ void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
 		unsigned int ourpose = pose[i];
 
 		bool mirror = false;
-		// TODO: ack, move this check out of the loop
-		if (i != 14 && i != 15 && world.variables["engine_mirror_creature_body_parts"] == 1 && ourpose >= 4 && ourpose <= 7) {
+		if (i != 14 && i != 15 && mirror_body_parts && ourpose >= 4 && ourpose <= 7) {
 			ourpose -= 4;
 			mirror = true;
 		}
 
 		// adjust for pregnancy/facial expressions/etc as necessary
-		if (part->parent == -1) // body
-			ourpose += (pregnancy * 16);
-		else if (i == 1) // head
-			ourpose += (eyesclosed ? 16 : 0) + (facialexpression * 32);
-		else if (i == 16) // hair
+		if (part->parent == -1) { // body
+			ourpose += (pregnancy * (engine.version < 3 ? 10 : 16));
+		} else if (i == 1) { // head
+			ourpose += (eyesclosed ? (engine.version < 3 ? 10 : 16) : 0)
+				+ (facialexpression * (engine.version < 3 ? 20 : 32));
+		} else if (i == 16) { // hair
 			ourpose += 0; // TODO: 16 * hair
+		}
 
 		assert(images[i]);
 
@@ -513,19 +517,19 @@ void SkeletalCreature::setPose(unsigned int p) {
 
 void SkeletalCreature::setPose(std::string s) {
 	switch (s[0]) {
-		case '?':
+		case '?': // towards object of attention
 			switch (direction) {
-				case 0: break; // north, TODO
-				case 1: break; // south, TODO
+				case 0: posedirection = 3; break; // north, TODO
+				case 1: posedirection = 2; break; // south, TODO
 				case 2: posedirection = 0; break; // right
 				case 3: posedirection = 1; break; // left
 				default: assert(false);
 			}
 			break;
-		case '!':
+		case '!': // away from object of attention
 			switch (direction) {
-				case 0: break; // north, TODO
-				case 1: break; // south, TODO
+				case 0: posedirection = 2; break; // north, TODO
+				case 1: posedirection = 3; break; // south, TODO
 				case 2: posedirection = 1; break; // right
 				case 3: posedirection = 0; break; // left
 				default: assert(false);
@@ -542,14 +546,15 @@ void SkeletalCreature::setPose(std::string s) {
 	}
 
 	for (int i = 0; i < 14; i++) {
-		int newpose;
+		int newpose = -1;
 
 		switch (s[i + 1]) {
-			case '0': newpose = 0 + (posedirection * 4); break;
-			case '1': newpose = 1 + (posedirection * 4); break;
-			case '2': newpose = 2 + (posedirection * 4); break;
-			case '3': newpose = 3 + (posedirection * 4); break;
-			case '?': assert(i == 0); {
+			case '0': newpose = 0; break;
+			case '1': newpose = 1; break;
+			case '2': newpose = 2; break;
+			case '3': newpose = 3; break;
+			case '4': newpose = (engine.version < 3) ? 8 : 10; break; // 'to camera'
+			case '?': assert(i == 0); { // TODO
 					// make the head look in the posedirection of _IT_
 					float attachmenty = attachmentY(1, 0) + y; // head attachment point, which we'll use to 'look' from atm
 					
@@ -559,7 +564,6 @@ void SkeletalCreature::setPose(std::string s) {
 					else if (attention && attention->y < (attachmenty - 70)) newpose = 3;
 					else if (attention && attention->y < (attachmenty - 30)) newpose = 2;
 					else newpose = 1;
-					newpose += (posedirection * 4);
 				}
 				break;
 			// TODO: '!' also?
@@ -567,6 +571,17 @@ void SkeletalCreature::setPose(std::string s) {
 			default:
 				  std::cout << "internal warning: SkeletalCreature::setPose didn't understand " << s[i + 1] << " in pose '" << s << "'." << std::endl;
 				  continue;
+		}
+
+		assert(newpose != -1);
+
+		if (newpose < 4) {
+			// newpose gives the angle, now we need to add the offset for left/right/forward/back.
+
+			if (engine.version < 3 && posedirection > 1)
+				newpose = 6 + posedirection; // only one forward/back pose in c1/c2
+			else
+				newpose += (posedirection * 4);
 		}
 
 		pose[cee_lookup[i]] = newpose;
