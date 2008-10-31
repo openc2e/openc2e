@@ -102,6 +102,7 @@ SET(OPENC2E_CORE
 	src/mmapifstream.cpp
 	src/mngfile.cpp
 	${GEN}/mngparser.tab.cpp
+	src/MusicManager.cpp
 	src/oldBrain.cpp
 	src/PathResolver.cpp
 	src/peFile.cpp
