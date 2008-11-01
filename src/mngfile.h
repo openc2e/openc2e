@@ -398,6 +398,7 @@ class MNGFile {
 		std::string name;
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		char * script;
+		std::map<std::string, unsigned int> samplemappings;
 		unsigned int sampleno;
 
 		static int yylineno;
@@ -415,7 +416,7 @@ class MNGFile {
 		void add(class MNGEffectDecNode *n) { effects[n->getName()] = n; }
 		void add(class MNGTrackDecNode *n) { tracks[n->getName()] = n; }
 		void add(class MNGVariableDecNode *n) { variables[n->getName()] = n; }
-		std::pair<char *, int> *getNextSample() { sampleno++; return &samples[sampleno - 1]; }
+		unsigned int getSampleForName(std::string name);
 		std::vector< std::pair< char *, int > > samples;
 		std::map<std::string, class MNGEffectDecNode *> effects;
 		std::map<std::string, class MNGTrackDecNode *> tracks;
@@ -440,10 +441,11 @@ extern MNGFile *g_mngfile;
 
 class MNGWaveNode : public MNGNamedNode { // wave
 protected:
-	std::pair<char *, int> *sample;
+	unsigned int sampleno;
 
 public:
-	MNGWaveNode(std::string n) : MNGNamedNode(n) { sample = g_mngfile->getNextSample(); }
+	MNGWaveNode(std::string n) : MNGNamedNode(n) { sampleno = g_mngfile->getSampleForName(n); }
 	std::string dump() { return std::string("Wave(") + name + ")"; }
+	unsigned int getSampleNumber() { return sampleno; }
 };
 

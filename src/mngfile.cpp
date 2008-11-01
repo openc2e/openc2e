@@ -97,6 +97,22 @@ void MNGFile::enumerateSamples() {
 	}
 }
 
+unsigned int MNGFile::getSampleForName(std::string name) {
+	unsigned int n = -1;
+
+	if (samplemappings.find(name) != samplemappings.end()) {
+		n = samplemappings[name];
+	} else {
+		n = sampleno;
+		if (n >= samples.size())
+			throw MNGFileException("ran out of samples"); // TODO: more info
+		samplemappings[name] = n;
+		sampleno++;
+	}
+
+	return n;
+}
+
 MNGFile::~MNGFile() {
 	for (std::map<std::string, MNGEffectDecNode *>::iterator i = effects.begin(); i != effects.end(); i++)
 		delete i->second;
