@@ -113,6 +113,8 @@ void AgentInjector::readAgents() {
 			}
 		}
 	}
+
+	ui.agentList->sortItems();
 }
 
 void AgentInjector::onInject() {
