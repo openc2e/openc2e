@@ -48,7 +48,9 @@ class MNGFileException : public creaturesException {
 	public:
 		int lineno;
 		MNGFileException(const char * m) throw() : creaturesException(m) { lineno = 0; }
+		MNGFileException(const std::string &m) throw() : creaturesException(m) { lineno = 0; }
 		MNGFileException(const char * m, int l) throw() : creaturesException(m) { lineno = l; }
+		MNGFileException(const std::string &m, int l) throw() : creaturesException(m) { lineno = l; }
 };
 
 class MNGNamedNode : public MNGNode {
@@ -117,6 +119,8 @@ public:
 	MNGBinaryExpression(MNGExpression *o, MNGExpression *t) { one = o; two = t; }
 	virtual void postProcess(processState *s) { one->postProcess(s); two->postProcess(s); }
 	virtual ~MNGBinaryExpression() { delete one; delete two; }
+	MNGExpression *first() { return one; }
+	MNGExpression *second() { return two; }
 };
 
 class MNGConstantNode : public MNGExpression { // MNG_number
@@ -126,6 +130,7 @@ protected:
 public:
 	MNGConstantNode(float n) { value = n; }
 	std::string dump() { return boost::str(boost::format("%f") % value); }
+	float getValue() { return value; }
 };
 
 class MNGExpressionContainer : public MNGNode {
@@ -136,6 +141,7 @@ public:
 	MNGExpressionContainer(MNGExpression *n) { subnode = n; }
 	virtual void postProcess(processState *s) { subnode->postProcess(s); }
 	virtual ~MNGExpressionContainer() { delete subnode; }
+	MNGExpression *getExpression() { return subnode; }
 };
 
 class MNGPanNode : public MNGExpressionContainer { // pan
@@ -197,7 +203,6 @@ public:
 	MNGLayer(std::string n) : MNGNamedNode(n) { }
 	std::list<MNGNode *> *children;
 	std::map<std::string, class MNGVariableDecNode *> variables;
-	void setChildren(std::list<MNGNode *> *);
 	virtual void postProcess(processState *s) {
 		s->layer = this;
 		for (std::list<MNGNode *>::iterator i = children->begin(); i != children->end(); i++)

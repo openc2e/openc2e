@@ -39,6 +39,22 @@ public:
 
 extern MusicManager musicmanager;
 
+class MusicEffect {
+protected:
+	MNGEffectDecNode *node;
+
+public:
+	MusicEffect(MNGEffectDecNode *n);
+};
+
+class MusicVoice {
+protected:
+	MNGVoiceNode *node;
+
+public:
+	MusicVoice(MNGVoiceNode *n);
+};
+
 class MusicLayer {
 protected:
 	MNGUpdateNode *updatenode;
@@ -47,11 +63,20 @@ protected:
 
 	std::map<std::string, float> variables;
 	float updaterate, volume, interval, beatsynch;
+
+	MusicLayer(MusicTrack *p);
 };
 
 class MusicAleotoricLayer : public MusicLayer {
 protected:
-	// TODO: Effect, Voice
+	MNGAleotoricLayerNode *node;
+
+	MusicEffect *effect;
+	std::vector<MusicVoice *> voices;
+	unsigned int currvoice;
+
+public:
+	MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p);
 };
 
 class MusicLoopLayer : public MusicLayer {
@@ -67,15 +92,17 @@ public:
 class MusicTrack {
 protected:
 	MNGTrackDecNode *node;
+	MNGFile *parent;
 
-	MusicLayer *currentlayer;
 	std::vector<MusicLayer *> layers;
 
 	float fadein, fadeout, beatlength, volume;
 
 public:
-	MusicTrack(MNGTrackDecNode *n);
+	MusicTrack(MNGFile *p, MNGTrackDecNode *n);
 	virtual ~MusicTrack();
+
+	MNGFile *getParent() { return parent; }
 };
 
 #endif
