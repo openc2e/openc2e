@@ -3,6 +3,7 @@
 #include "CreatureGrapher.h"
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include "Engine.h"
 #include "Catalogue.h"
 #include <QtGui>
@@ -18,27 +19,24 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 		// c1/c2 are easy; c2e wants scary catalogue stuff.
 		std::ifstream ifs(world.findFile("allchemicals.str").c_str());
 		if (!ifs.good()) {
-			ifs.close();
-			throw creaturesException("Couldn't find allchemicals.str");
-		}
-		
-		char n = ifs.get();
-		char o = ifs.get();
-		if (n != 0 || o != 1) {
-			throw creaturesException("allchemicals.str is corrupt");
-		}
-
-		for (int i = 0; ifs.good(); i++) {
-			int len = ifs.get();
-			// file is only !good once you tried reading past the end
-			if (!ifs.good()) break;
-		
-			if (len) {
-				std::vector<char> name(len+1, '\0');
-				ifs.read(&name[0], len);
-				chemnames[i] = std::string(&name[0]);
+			std::cout << "Couldn't find allchemicals.str" << std::endl;
+		} else {
+			char n = ifs.get();
+			char o = ifs.get();
+			if (n != 0 || o != 1) {
+				std::cout << "allchemicals.str is corrupt (bad magic)" << std::endl;
 			} else {
-				chemnames[i] = boost::str(boost::format("<%d>") % i);
+				for (int i = 0; ifs.good(); i++) {
+					int len = ifs.get();
+					// file is only !good once you tried reading past the end
+					if (!ifs.good()) break;
+				
+					if (len) {
+						std::vector<char> name(len+1, '\0');
+						ifs.read(&name[0], len);
+						chemnames[i] = std::string(&name[0]);
+					}
+				}
 			}
 		}
 		ifs.close();
@@ -59,26 +57,27 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 		std::ifstream ifs(world.findFile("Applet Data/ChemGroups").c_str());
 		if (!ifs.good()) {
 			ifs.close();
-			throw creaturesException("Couldn't find ChemGroups");
-		}
-		while (ifs.good()) {
-			std::string line;
-			getline(ifs, line);
-			if (line[0] == '#') {
-				continue;
+			std::cout << "Couldn't find ChemGroups" << std::endl;
+		} else {
+			while (ifs.good()) {
+				std::string line;
+				getline(ifs, line);
+				if (line[0] == '#') {
+					continue;
+				}
+				size_t firstbar = line.find('|');
+				if (firstbar == std::string::npos) break;
+				std::string groupname = line.substr(0, firstbar);
+				const char *cline = strchr(line.c_str(), '|');
+				int chemid;
+				while (sscanf(cline, "|%d", &chemid)) {
+					chemgroups[groupname].push_back(chemid);
+					cline = strchr(cline+1, '|');
+					if (!cline) break;
+				}
 			}
-			size_t firstbar = line.find('|');
-			if (firstbar == std::string::npos) break;
-			std::string groupname = line.substr(0, firstbar);
-			const char *cline = strchr(line.c_str(), '|');
-			int chemid;
-			while (sscanf(cline, "|%d", &chemid)) {
-				chemgroups[groupname].push_back(chemid);
-				cline = strchr(cline+1, '|');
-				if (!cline) break;
-			}
+			ifs.close();
 		}
-		ifs.close();
 	} else if (catalogue.hasTag("chemical graphing groups")) {
 		// Creatures 3 has groups in the catalogue file
 		const std::vector<std::string> &t = catalogue.getTag("chemical graphing groups");
@@ -95,6 +94,11 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 				}
 			}
 		}
+	}
+
+	for (int i = 1; i < 255; i++) {
+		if (chemnames.find(i) == chemnames.end())
+			chemnames[i] = boost::str(boost::format("<%d>") % i);
 	}
 
 	grouplist = new QListWidget(this);
