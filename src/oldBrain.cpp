@@ -99,12 +99,15 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 				break;
 
 			case 15: // anded1
+				// unused?
 				break;
 
 			case 16: // input
+				// This comes from IMPT for the decision lobe.
 				break;
 
 			case 17: // conduct
+				// unused?
 				break;
 
 			case 18: // suscept
@@ -114,18 +117,23 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 				break;
 
 			case 20: // LTW
+				// unused?
 				break;
 
 			case 21: // strength
+				// unused?
 				break;
 
 			case 22: // 32
+				// unused?
 				break;
 
 			case 23: // 128
+				// unused?
 				break;
 
 			case 24: // rnd const
+				// unused?
 				break;
 
 			case 25: // chem4
@@ -135,12 +143,15 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 				break;
 
 			case 27: // leak in
+				// unused: back/forward prop
 				break;
 
 			case 28: // leak out
+				// unused: back/forward prop
 				break;
 
 			case 29: // curr src leak in
+				// unused: back/forward prop
 				break;
 
 			case 30: // TRUE
@@ -154,23 +165,29 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 				break;
 
 			case 33: // TIMES
+				// unused?
 				break;
 
 			case 34: // INCR
+				// unused?
 				state++;
 				break;
 
 			case 35: // DECR
+				// unused?
 				state--;
 				break;
 
 			case 36: // FALSE
+				// unused?
 				break;
 
 			case 37: // multiply
+				// unused?
 				break;
 
 			case 38: // average
+				// unused?
 				break;
 
 			case 39: // move twrds
