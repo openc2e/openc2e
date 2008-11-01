@@ -24,6 +24,7 @@
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 #include "SDL.h"
 #include "exceptions.h"
 #include "World.h"
@@ -34,6 +35,12 @@
 
 // seconds
 #define BUFFER_LEN 0.25
+
+#ifndef NDEBUG
+#define CHECK_BACKEND_LIFE do { this->backend(); } while(0)
+#else
+#define CHECK_BACKEND_LIFE do { } while(0)
+#endif
 
 const ALfloat zdist = -1.0;
 const ALfloat plnemul = 0.0;
@@ -144,6 +151,14 @@ void OpenALBackend::setViewpointCenter(float x, float y) {
 }
 
 void OpenALBackend::shutdown() {
+	using namespace boost::lambda;
+
+	OpenALSource::SourceList sl = activeSources;
+	OpenALBuffer::BufferList bl = activeBuffers;
+
+	std::for_each(sl.begin(), sl.end(), bind(&OpenALSource::forceCleanup, *_1));
+	std::for_each(bl.begin(), bl.end(), bind(&OpenALBuffer::destroy, *_1));
+	
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(context);
 	alcCloseDevice(device);
@@ -160,11 +175,12 @@ void OpenALBackend::setMute(bool m) {
 }
 
 void OpenALSource::setFollowingView(bool f) {
+	boost::shared_ptr<OpenALBackend> bp = backend();
 	if (f) {
-		backend->followingSrcs[this] = shared_from_this();
-		setPos(backend->ListenerPos[0], backend->ListenerPos[1], backend->ListenerPos[2]);
+		bp->followingSrcs[this] = shared_from_this();
+		setPos(bp->ListenerPos[0], bp->ListenerPos[1], bp->ListenerPos[2]);
 	} else {
-		backend->followingSrcs.erase(this);
+		bp->followingSrcs.erase(this);
 	}
 	followview = f;
 }
@@ -198,8 +214,28 @@ void OpenALBackend::commit() {
 	alcProcessContext(alcGetCurrentContext());
 }
 
+void OpenALSource::forceCleanup() {
+	boost::shared_ptr<OpenALBackend> bp = backend_weak.lock();
+	if (!bp)
+		return;
+	bp->activeSources.erase(slit);
+	stop();
+	alDeleteSources(1, &source);
+	bp.reset();
+	clip = NULL;
+	stream.reset();
+}
+
+boost::shared_ptr<class OpenALBackend> OpenALSource::backend() const {
+	boost::shared_ptr<OpenALBackend> bp = backend_weak.lock();
+	if (!bp)
+		throw creaturesException("Attempted to manipulate a source on a destroyed backend");
+	return bp;
+}
+
 OpenALSource::OpenALSource(boost::shared_ptr<class OpenALBackend> backend) {
-	this->backend = backend;
+	assert(backend);
+	this->backend_weak = backend;
 	alGetError();
 	alGenSources(1, &source);
 	alSourcef(source, AL_PITCH, 1.0f);
@@ -208,17 +244,43 @@ OpenALSource::OpenALSource(boost::shared_ptr<class OpenALBackend> backend) {
 	alSourcefv(source, AL_VELOCITY, null_vec);
 	alSourcei(source, AL_LOOPING, 0);
 	al_throw_maybe();
+	slit = backend->activeSources.insert(backend->activeSources.end(), this);
 }
 
-OpenALBuffer::OpenALBuffer(boost::shared_ptr<class OpenALBackend> backend, ALuint handle) {
-	this->backend = backend;
+OpenALBuffer::OpenALBuffer(boost::shared_ptr<class OpenALBackend> bp, ALuint handle) {
+	assert(bp);
+	backend = bp;
 	buffer = handle;
+
+	blit = bp->activeBuffers.insert(bp->activeBuffers.end(), this);
+}
+
+void OpenALBuffer::destroy() {
+	boost::shared_ptr<OpenALBackend> bp = backend.lock();
+	if (bp) {
+		alDeleteBuffers(1, &buffer);
+		bp->activeBuffers.erase(blit);
+		bp.reset();
+	}
+}
+
+void OpenALBuffer::checkLife() const {
+#ifndef NDEBUG
+	if (!backend.lock()) {
+		throw creaturesException("Attempted to manipulate a buffer on a destroyed backend");
+	}
+#endif
+}
+
+OpenALBuffer::~OpenALBuffer() {
+	destroy();
 }
 
 unsigned int OpenALBuffer::length_samples() const {
 	ALint bits;
 	ALint channels;
 	ALint size;
+	checkLife();
 	alGetBufferi(buffer, AL_BITS, &bits);
 	alGetBufferi(buffer, AL_CHANNELS, &channels);
 	alGetBufferi(buffer, AL_SIZE, &size);
@@ -227,6 +289,7 @@ unsigned int OpenALBuffer::length_samples() const {
 
 unsigned int OpenALBuffer::length_ms() const {
 	ALint freq;
+	checkLife();
 	alGetBufferi(buffer, AL_FREQUENCY, &freq);
 	return length_samples() * 1000 / freq;
 }
@@ -237,6 +300,7 @@ AudioClip OpenALSource::getClip() const {
 }
 
 void OpenALSource::setClip(const AudioClip &clip_) {
+	CHECK_BACKEND_LIFE; // make sure we're alive
 	OpenALBuffer *obp = dynamic_cast<OpenALBuffer *>(clip_.get());
 	assert(obp);
 	stop();
@@ -250,6 +314,7 @@ AudioStream OpenALSource::getStream() const {
 }
 
 void OpenALSource::setStream(const AudioStream &stream) {
+	CHECK_BACKEND_LIFE; // make sure we're alive
 	assert(stream);
 	assert(stream->bitDepth() == 8 || stream->bitDepth() == 16);
 	stop();
@@ -259,6 +324,7 @@ void OpenALSource::setStream(const AudioStream &stream) {
 
 SourceState OpenALSource::getState() const {
 	int state;
+	CHECK_BACKEND_LIFE; // make sure we're alive
 	alGetSourcei(source, AL_SOURCE_STATE, &state);
 	switch (state) {
 		case AL_INITIAL: case AL_STOPPED: return SS_STOP;
@@ -275,13 +341,14 @@ SourceState OpenALSource::getState() const {
 
 void OpenALSource::play() {
 	assert( (!!clip) != (!!stream) ); // clip OR stream, not both, not neither
+	CHECK_BACKEND_LIFE; // make sure we're alive
 	setFollowingView(followview); // re-register in the backend if needed
 	if (stream) {
 		streambuffers.clear();
 		unusedbuffers.clear();
 		buf_est_ms = 0;
 		drain = false;
-		backend->startPolling(this);
+		backend()->startPolling(this);
 		bufferdata();
 	}
 	alSourcePlay(source);
@@ -382,6 +449,7 @@ bool OpenALSource::bufferdata() {
 }
 
 void OpenALSource::stop() {
+	CHECK_BACKEND_LIFE;
 	alSourceStop(source);
 	alSourcei(source, AL_BUFFER, NULL); // remove all queued buffers
 
@@ -395,6 +463,7 @@ void OpenALSource::stop() {
 }
 
 void OpenALSource::pause() {
+	CHECK_BACKEND_LIFE;
 	alSourcePause(source);
 }
 
@@ -417,22 +486,26 @@ static void fadeSource(boost::weak_ptr<AudioSource> s) {
 }
 
 void OpenALSource::fadeOut() {
+	CHECK_BACKEND_LIFE;
 	boost::thread th(boost::lambda::bind<void>(fadeSource, shared_from_this()));
 }
 
 void OpenALSource::realSetPos(float x, float y, float plane) {
+	CHECK_BACKEND_LIFE;
 	if (this->x == x && this->y == y && this->z == plane) return;
 	this->SkeletonAudioSource::setPos(x, y, plane);
 	alSource3f(source, AL_POSITION, x * scale, y * scale, plane * plnemul);
 }
 
 void OpenALSource::setPos(float x, float y, float plane) {
+	CHECK_BACKEND_LIFE;
 	if (isFollowingView())
 		return;
 	realSetPos(x, y, plane);
 }
 
 void OpenALSource::setVelocity(float x, float y) {
+	CHECK_BACKEND_LIFE;
 	// experiment with this later
 	x = y = 0;
 	alSource3f(source, AL_VELOCITY, x * scale, y * scale, 0);
@@ -440,21 +513,25 @@ void OpenALSource::setVelocity(float x, float y) {
 
 bool OpenALSource::isLooping() const {
 	int l;
+	CHECK_BACKEND_LIFE;
 	alGetSourcei(source, AL_LOOPING, &l);
 	return l == AL_TRUE;
 }
 
 void OpenALSource::setLooping(bool l) {
+	CHECK_BACKEND_LIFE;
 	alSourcei(source, AL_LOOPING, l ? AL_TRUE : AL_FALSE);
 }
 
 void OpenALSource::setVolume(float v) {
+	CHECK_BACKEND_LIFE;
 	if (v == this->volume) return;
 	this->SkeletonAudioSource::setVolume(v);
 	alSourcef(source, AL_GAIN, getEffectiveVolume());
 }
 
 void OpenALSource::setMute(bool m) {
+	CHECK_BACKEND_LIFE;
 	if (m == muted) return;
 	this->SkeletonAudioSource::setMute(m);
 	alSourcef(source, AL_GAIN, getEffectiveVolume());

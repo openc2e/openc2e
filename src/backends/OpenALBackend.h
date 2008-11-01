@@ -41,15 +41,22 @@ class OpenALBuffer : public SkeletonAudioBuffer {
 	friend void boost::intrusive_ptr_release(OpenALBuffer *p);
 
 protected:
-	boost::shared_ptr<class OpenALBackend> backend;
+	typedef std::list<OpenALBuffer *> BufferList;
+
+	BufferList::iterator blit;
+
+	boost::weak_ptr<class OpenALBackend> backend;
 	OpenALBuffer(boost::shared_ptr<class OpenALBackend>, ALuint);
 	friend class OpenALBackend;
 	friend class OpenALSource;
 
 	ALuint buffer;
 
+	void destroy();
+	void checkLife() const;
+
 public:
-	~OpenALBuffer() { alDeleteBuffers(1, &buffer); }
+	~OpenALBuffer();
 	virtual unsigned int length_ms() const; /* milliseconds */
 	virtual unsigned int length_samples() const;
 };
@@ -81,7 +88,12 @@ public:
 
 class OpenALSource : public SkeletonAudioSource {
 protected:
-	boost::shared_ptr<class OpenALBackend> backend;
+	typedef std::list<OpenALSource *> SourceList;
+
+	SourceList::iterator slit;
+
+	boost::weak_ptr<class OpenALBackend> backend_weak;
+	boost::shared_ptr<class OpenALBackend> backend() const;
 	OpenALSource(boost::shared_ptr<class OpenALBackend>);
 	friend class OpenALBackend;
 
@@ -97,8 +109,10 @@ protected:
 	int buf_est_ms;
 	bool drain;
 	void realSetPos(float x, float y, float plane);
+
+	void forceCleanup();
 public:
-	~OpenALSource() { stop(); alDeleteSources(1, &source); }
+	~OpenALSource() { forceCleanup(); stop(); alDeleteSources(1, &source); }
 
 	virtual AudioClip getClip() const;
 	virtual void setClip(const AudioClip &); /* Valid only in STOP state */
@@ -131,6 +145,10 @@ protected:
 	std::map<OpenALSource *, boost::weak_ptr<AudioSource> > followingSrcs;
 	std::map<OpenALSource *, boost::weak_ptr<AudioSource> > pollingSrcs;
 	friend class OpenALSource;
+	friend class OpenALBuffer;
+
+	OpenALSource::SourceList activeSources;
+	OpenALBuffer::BufferList activeBuffers;
 
 	ALCdevice *device;
 	ALCcontext *context;
