@@ -135,6 +135,8 @@ void OpenALBackend::setViewpointCenter(float x, float y) {
 void OpenALBackend::shutdown() {
 	using namespace boost::lambda;
 
+	bgmSource.reset();
+
 	OpenALSource::SourceList sl = activeSources;
 	OpenALBuffer::BufferList bl = activeBuffers;
 
@@ -542,5 +544,48 @@ void OpenALBackend::startPolling(OpenALSource *src_p) {
 
 void OpenALBackend::stopPolling(OpenALSource *src_p) {
 	pollingSrcs.erase(src_p);
+}
+
+class OpenALBGMSource : public OpenALSource {
+	protected:
+		bool init;
+		friend class OpenALBackend;
+		OpenALBGMSource(boost::shared_ptr<OpenALBackend> b)
+			: OpenALSource(b)
+		{
+			init = true;
+			OpenALSource::setFollowingView(true);
+			init = false;
+		}
+
+		void illegalOp() {
+			if (!init)
+				throw creaturesException("Attempted illegal operation on BGM source");
+		}
+	public:
+		virtual void setPos(float x, float y, float z) {
+			illegalOp();
+			OpenALSource::setPos(x,y,z);
+		}
+		virtual void setFollowingView(bool f) {
+			if (!f)
+				illegalOp();
+			OpenALSource::setFollowingView(f);
+		}
+		virtual void setVelocity(float xv, float yv) {
+			illegalOp();
+			OpenALSource::setVelocity(xv, yv);
+		}
+};
+
+boost::shared_ptr<AudioSource> OpenALBackend::getBGMSource() {
+	if (!bgmSource) {
+		bgmSource = boost::shared_ptr<AudioSource>(
+				new OpenALBGMSource(
+					shared_from_this()
+				)
+			);
+	}
+	return bgmSource;
 }
 /* vim: set noet: */

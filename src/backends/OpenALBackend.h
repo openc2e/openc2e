@@ -155,6 +155,9 @@ protected:
 
 	void startPolling(OpenALSource *);
 	void stopPolling(OpenALSource *);
+
+	boost::shared_ptr<AudioSource> bgmSource;
+
 public:
 	boost::shared_ptr<OpenALBackend> shared_from_this() {
 		return boost::static_pointer_cast<OpenALBackend, AudioBackend>(this->AudioBackend::shared_from_this());
@@ -172,10 +175,7 @@ public:
 	bool isMuted() const { return muted; }
 
 	boost::shared_ptr<AudioSource> newSource();
-	boost::shared_ptr<AudioSource> getBGMSource() {
-		// STUB
-		return boost::shared_ptr<AudioSource>();
-	}
+	boost::shared_ptr<AudioSource> getBGMSource();
 	AudioClip loadClip(const std::string &filename);
 
 	void begin();
