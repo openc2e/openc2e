@@ -576,7 +576,9 @@ void QtOpenc2e::tick() {
 				if (temperatureimage->pixmap()->cacheKey() != temperatureicon[tempiconid].cacheKey()) {
 					temperatureimage->setPixmap(temperatureicon[tempiconid]);
 				}
-				// TODO: textual version of temperature (0 = -15C = 5F, 48 = 0C = 32F, 255 = 65C = 149F)
+				unsigned int temp_celsius = ((temp * 80) / 255) - 15;
+				// TODO: fahrenheit calculation + textual version of temperature
+				// (0 = -15C = 5F, 48 = 0C = 32F, 255 = 65C = 149F)
 			}
 
 			// TODO: norn health/drive/heartbeat, the below is a hack which changes the pixmap on every tick(!)
