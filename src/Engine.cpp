@@ -201,6 +201,9 @@ void Engine::update() {
 		}
 	}
 
+	// poll audio streams
+	audio->poll();
+
 	// play C1 music
 	// TODO: this doesn't seem to actually be every 7 seconds, but actually somewhat random
 	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified

@@ -32,6 +32,9 @@
 #error OPENAL_SUPPORT isn't set, so this file shouldn't be being compiled
 #endif
 
+// seconds
+#define BUFFER_LEN 0.25
+
 const ALfloat zdist = -1.0;
 const ALfloat plnemul = 0.0;
 const ALfloat scale = 1.0/100;
@@ -121,13 +124,22 @@ void OpenALBackend::setViewpointCenter(float x, float y) {
 	ListenerPos[1] = y * scale;
 	updateListener();
 	for (
-			std::map<OpenALSource *, boost::shared_ptr<AudioSource> >::iterator it = followingSrcs.begin();
+			typeof(followingSrcs.begin()) next, it = followingSrcs.begin();
 			it != followingSrcs.end();
-			it++
+			it = next
 		) {
+		next = it; next++;
+
+		boost::shared_ptr<AudioSource> p = it->second.lock();
+		if (!p) {
+			followingSrcs.erase(it);
+			continue;
+		}
+
 		OpenALSource *src_p = it->first;
+		assert(dynamic_cast<OpenALSource *>(p.get()) == src_p);
 		assert(src_p->getState() != SS_STOP && src_p->isFollowingView());
-		src_p->setPos(x, y, plnemul < 0.01 ? 0 : (ListenerPos[2] / plnemul));
+		src_p->realSetPos(x, y, plnemul < 0.01 ? 0 : (ListenerPos[2] / plnemul));
 	}
 }
 
@@ -228,10 +240,21 @@ void OpenALSource::setClip(const AudioClip &clip_) {
 	OpenALBuffer *obp = dynamic_cast<OpenALBuffer *>(clip_.get());
 	assert(obp);
 	stop();
+	this->stream = AudioStream();
 	this->clip = OpenALClip(obp);
-	if (clip) {
-		alSourcei(source, AL_BUFFER, clip->buffer);
-	}
+	alSourcei(source, AL_BUFFER, clip->buffer);
+}
+
+AudioStream OpenALSource::getStream() const {
+	return stream;
+}
+
+void OpenALSource::setStream(const AudioStream &stream) {
+	assert(stream);
+	assert(stream->bitDepth() == 8 || stream->bitDepth() == 16);
+	stop();
+	this->clip = OpenALClip();
+	this->stream = stream;
 }
 
 SourceState OpenALSource::getState() const {
@@ -251,17 +274,124 @@ SourceState OpenALSource::getState() const {
 }
 
 void OpenALSource::play() {
-	assert(clip);
-	alSourcePlay(source);
+	assert( (!!clip) != (!!stream) ); // clip OR stream, not both, not neither
 	setFollowingView(followview); // re-register in the backend if needed
+	if (stream) {
+		streambuffers.clear();
+		unusedbuffers.clear();
+		buf_est_ms = 0;
+		drain = false;
+		backend->startPolling(this);
+		bufferdata();
+	}
+	alSourcePlay(source);
+}
+
+bool OpenALSource::poll() {
+	if (!stream || getState() != SS_PLAY)
+		return false;
+	return bufferdata();
+}
+
+static ALuint audioFormat(bool stereo, int bitdepth) {
+	switch (bitdepth | !!stereo) {
+		case 8: return AL_FORMAT_MONO8;
+		case 16: return AL_FORMAT_MONO16;
+		case 9: return AL_FORMAT_STEREO8;
+		case 17: return AL_FORMAT_STEREO16;
+		default: assert(!"Impossible");
+	}
+	abort();
+}
+
+OpenALStreamBuf::OpenALStreamBuf(int freq, int bitDepth, bool stereo) {
+	this->freq = freq;
+	this->stereo = stereo;
+	this->bitDepth = bitDepth;
+	this->format = audioFormat(stereo, bitDepth);
+	alGenBuffers(1, &bufferID);
+}
+
+OpenALStreamBuf::~OpenALStreamBuf() {
+	alDeleteBuffers(1, &bufferID);
+}
+
+static size_t bytesPerSample(bool stereo, int bitdepth) {
+	return (bitdepth / 8) << !!stereo;
+}
+
+void OpenALStreamBuf::writeAudioData(const void *data, size_t len) {
+	alBufferData(bufferID, format, data, len, freq);
+	approx_ms = (1000*len/(stereo ? 2 : 1))/freq;
+}
+
+bool OpenALSource::bufferdata() {
+	static unsigned char *tempbuf[8192];
+	int bufferlen = 0;
+	int donebuffers;
+
+	alGetSourcei(source, AL_BUFFERS_PROCESSED, &donebuffers);
+
+	assert(streambuffers.size() >= donebuffers);
+
+	ALuint *bufferNames = new ALuint[donebuffers];
+	alSourceUnqueueBuffers(source, donebuffers, bufferNames);
+
+	for (int i = 0; i < donebuffers && !streambuffers.empty(); i++) {
+		OpenALStreamBufP p = streambuffers.front();
+		assert(p->bufferID == bufferNames[i]);
+		buf_est_ms -= p->approxLen();
+		unusedbuffers.push_back(streambuffers.front());
+		streambuffers.pop_front();
+	}
+
+	delete [] bufferNames;
+
+
+	int buf_goal = stream->latency();
+	std::vector<ALuint> newbuffers;
+	while (!drain && (buf_est_ms < buf_goal || streambuffers.empty())) {
+		size_t result = stream->produce(tempbuf, sizeof tempbuf);
+		if (result) {
+			OpenALStreamBufP buf;
+			if (unusedbuffers.empty())
+				buf = boost::shared_ptr<OpenALStreamBuf>(new OpenALStreamBuf(stream->sampleRate(), stream->bitDepth(), stream->isStereo()));
+			else {
+				buf = unusedbuffers.back();
+				unusedbuffers.pop_back();
+			}
+			buf->writeAudioData(tempbuf, sizeof tempbuf);
+			buf_est_ms += buf->approxLen();
+			streambuffers.push_back(buf);
+			newbuffers.push_back(buf->bufferID);
+		}
+		if (result < sizeof tempbuf) {
+			if (!isLooping() || !stream->reset()) {
+				// shut down
+				drain = true;
+			}
+		}
+	}
+	alSourceQueueBuffers(source, newbuffers.size(), &newbuffers[0]);
+
+	if (streambuffers.empty() && drain) {
+		stop();
+		return false;
+	}
+	return true;
 }
 
 void OpenALSource::stop() {
 	alSourceStop(source);
+	alSourcei(source, AL_BUFFER, NULL); // remove all queued buffers
 
 	bool oldfollow = followview;
 	setFollowingView(false);	  // unregister in backend
 	followview = oldfollow;
+	if (stream) {
+		streambuffers.clear();
+		unusedbuffers.clear();
+	}
 }
 
 void OpenALSource::pause() {
@@ -290,10 +420,16 @@ void OpenALSource::fadeOut() {
 	boost::thread th(boost::lambda::bind<void>(fadeSource, shared_from_this()));
 }
 
-void OpenALSource::setPos(float x, float y, float plane) {
+void OpenALSource::realSetPos(float x, float y, float plane) {
 	if (this->x == x && this->y == y && this->z == plane) return;
 	this->SkeletonAudioSource::setPos(x, y, plane);
 	alSource3f(source, AL_POSITION, x * scale, y * scale, plane * plnemul);
+}
+
+void OpenALSource::setPos(float x, float y, float plane) {
+	if (isFollowingView())
+		return;
+	realSetPos(x, y, plane);
 }
 
 void OpenALSource::setVelocity(float x, float y) {
@@ -324,4 +460,29 @@ void OpenALSource::setMute(bool m) {
 	alSourcef(source, AL_GAIN, getEffectiveVolume());
 }
 
+void OpenALBackend::poll() {
+	typeof(pollingSrcs.begin()) it, next;
+	it = pollingSrcs.begin();
+
+	for (; it != pollingSrcs.end(); it = next) {
+		next = it; next++;
+		boost::shared_ptr<AudioSource> p = it->second.lock();
+		if (!p) {
+			pollingSrcs.erase(it);
+			continue;
+		}
+		OpenALSource *src_p = it->first;
+		assert(src_p == dynamic_cast<OpenALSource *>(p.get()));
+		if (!src_p->poll())
+			pollingSrcs.erase(it);
+	}
+}
+
+void OpenALBackend::startPolling(OpenALSource *src_p) {
+	pollingSrcs[src_p] = boost::weak_ptr<AudioSource>(src_p->shared_from_this());
+}
+
+void OpenALBackend::stopPolling(OpenALSource *src_p) {
+	pollingSrcs.erase(src_p);
+}
 /* vim: set noet: */
