@@ -130,24 +130,6 @@ void OpenALBackend::setViewpointCenter(float x, float y) {
 	ListenerPos[0] = x * scale;
 	ListenerPos[1] = y * scale;
 	updateListener();
-	for (
-			typeof(followingSrcs.begin()) next, it = followingSrcs.begin();
-			it != followingSrcs.end();
-			it = next
-		) {
-		next = it; next++;
-
-		boost::shared_ptr<AudioSource> p = it->second.lock();
-		if (!p) {
-			followingSrcs.erase(it);
-			continue;
-		}
-
-		OpenALSource *src_p = it->first;
-		assert(dynamic_cast<OpenALSource *>(p.get()) == src_p);
-		assert(src_p->getState() != SS_STOP && src_p->isFollowingView());
-		src_p->realSetPos(x, y, plnemul < 0.01 ? 0 : (ListenerPos[2] / plnemul));
-	}
 }
 
 void OpenALBackend::shutdown() {
@@ -176,11 +158,14 @@ void OpenALBackend::setMute(bool m) {
 
 void OpenALSource::setFollowingView(bool f) {
 	boost::shared_ptr<OpenALBackend> bp = backend();
+	if (f == followview)
+		return; // nothing to do
 	if (f) {
-		bp->followingSrcs[this] = shared_from_this();
-		setPos(bp->ListenerPos[0], bp->ListenerPos[1], bp->ListenerPos[2]);
+		setPos(0, 0, 0);
+		alSourcei(source, AL_SOURCE_RELATIVE, 1);
 	} else {
-		bp->followingSrcs.erase(this);
+		setPos(bp->ListenerPos[0], bp->ListenerPos[1], bp->ListenerPos[2]);
+		alSourcei(source, AL_SOURCE_RELATIVE, 0);
 	}
 	followview = f;
 }
@@ -342,7 +327,6 @@ SourceState OpenALSource::getState() const {
 void OpenALSource::play() {
 	assert( (!!clip) != (!!stream) ); // clip OR stream, not both, not neither
 	CHECK_BACKEND_LIFE; // make sure we're alive
-	setFollowingView(followview); // re-register in the backend if needed
 	if (stream) {
 		streambuffers.clear();
 		unusedbuffers.clear();
@@ -453,9 +437,6 @@ void OpenALSource::stop() {
 	alSourceStop(source);
 	alSourcei(source, AL_BUFFER, NULL); // remove all queued buffers
 
-	bool oldfollow = followview;
-	setFollowingView(false);	  // unregister in backend
-	followview = oldfollow;
 	if (stream) {
 		streambuffers.clear();
 		unusedbuffers.clear();
