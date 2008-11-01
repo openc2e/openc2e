@@ -880,6 +880,7 @@ public:
 	void c_MIDI();
 	void c_PLDS();
 	void c_DBG_SINE();
+	void c_DBG_SBGM();
 
 	// time
 	void v_PACE();

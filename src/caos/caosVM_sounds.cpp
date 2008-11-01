@@ -366,22 +366,46 @@ struct SineStream : AudioStreamBase {
  %status maybe
 
  Plays a sine wave coming from TARG
+
+ track = 0 to fix the source at TARG's current location; track = 1 to follow
+ view, track = 2 to inject it into the BGM source
  */
 void caosVM::c_DBG_SINE() {
 	VM_PARAM_INTEGER(ampl);
 	VM_PARAM_INTEGER(track);
 	VM_PARAM_INTEGER(stereo);
 	VM_PARAM_INTEGER(rate);
-	valid_agent(targ);
+	if (track != 2) {
+		valid_agent(targ);
 
-	if (targ->sound)
-		targ->sound->stop();
-	targ->sound = engine.audio->newSource();
-	if (!targ->sound)
+		if (targ->sound)
+			targ->sound->stop();
+	}
+	boost::shared_ptr<AudioSource> src;
+	if (track == 2)
+		src = engine.audio->getBGMSource();
+	else
+		src = targ->sound = engine.audio->newSource();
+	if (!src)
 		throw creaturesException("Audio is unavailable");
-	targ->sound->setStream(AudioStream(new SineStream(rate, stereo, ampl)));
-	targ->sound->setFollowingView(!track);
-	targ->sound->play();
+	src->setStream(AudioStream(new SineStream(rate, stereo, ampl)));
+	if (track != 2) {
+		src->setFollowingView(!track);
+	}
+	src->play();
+}
+
+/**
+ DBG: SBGM (command)
+ %status maybe
+
+ Stops the BGM source. This probably doesn't do what you want it to do.
+ Don't touch.
+ */
+void caosVM::c_DBG_SBGM() {
+	boost::shared_ptr<AudioSource> src = engine.audio->getBGMSource();
+	if (src)
+		src->stop();
 }
 
 
