@@ -145,9 +145,9 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p
 		// TODO: beatsynch
 		// TODO: updaterate
 
-		MNGIntervalNode *i = dynamic_cast<MNGIntervalNode *>(n);
-		if (i) {
-			interval = evaluateExpression(i->getExpression());
+		MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n);
+		if (in) {
+			interval = evaluateExpression(in->getExpression());
 			continue;
 		}
 
