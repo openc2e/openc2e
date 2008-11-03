@@ -100,7 +100,7 @@ SET(OPENC2E_CORE
 	src/Map.cpp
 	src/MetaRoom.cpp
 	src/mmapifstream.cpp
-	src/mngfile.cpp
+	src/music/mngfile.cpp
 	${GEN}/mngparser.tab.cpp
 	src/MusicManager.cpp
 	src/oldBrain.cpp
@@ -339,27 +339,15 @@ ADD_CUSTOM_COMMAND(
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/mnglexer.cpp
-	COMMAND re2c -o ${GEN}/mnglexer.cpp ${SRC}/src/mnglexer.re2c
-	DEPENDS ${SRC}/src/mnglexer.re2c
+	COMMAND re2c -o ${GEN}/mnglexer.cpp ${SRC}/src/music/mnglexer.re2c
+	DEPENDS ${SRC}/src/music/mnglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
-	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" src/mngparser.ypp
-	DEPENDS src/mngparser.ypp
+	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" src/music/mngparser.ypp
+	DEPENDS src/music/mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
-
-#ADD_CUSTOM_COMMAND(
-#	OUTPUT ${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
-#	COMMAND flex -+ --prefix=mng -d -o ${GEN}/lex.mng.cpp --header-file=${GEN}/lex.mng.h mng.l
-#	DEPENDS mng.l
-#	WORKING_DIRECTORY ${SRC})
-#
-#ADD_CUSTOM_COMMAND(
-#	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
-#	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" mngparser.ypp
-#	DEPENDS mngparser.ypp
-#	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_TARGET(test DEPENDS openc2e
 	COMMAND perl ${SRC}/runtests.pl ${SRC}/tests)
@@ -371,7 +359,5 @@ ADD_CUSTOM_TARGET(generated DEPENDS
 	${GEN}/mnglexer.cpp
 	${GEN}/cataloglexer.cpp
 	${GEN}/cmddata.cpp
-	#	${GEN}/lex.mng.cpp ${GEN}/lex.mng.h
-	#	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
 )
 

@@ -5,7 +5,7 @@
 #include <list>
 
 #include "mngparser.tab.hpp"
-#include "mngfile.h"
+#include "music/mngfile.h"
 #include <cassert>
 
 #include <iostream> // TODO

@@ -20,7 +20,7 @@
 #ifndef _MUSICMANAGER_H
 #define _MUSICMANAGER_H
 
-#include "mngfile.h"
+#include "music/mngfile.h"
 
 class MusicManager {
 private:
