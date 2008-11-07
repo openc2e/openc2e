@@ -109,9 +109,12 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 		plane = 9000;
 	} else {
 		// C2
-		if (parent == (Agent *)world.hand())
-			plane = 9999;
-		else
+		if (parent == (Agent *)world.hand()) {
+			if (speech)
+				plane = 9996;
+			else
+				plane = 9999;
+		} else
 			plane = 9995;
 	}
 
@@ -119,7 +122,7 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	int yoffset = (engine.version == 1) ? 3 : 8;
 	int twidth = (engine.version == 1) ? 144 : 95; // extended to fit text upon setText()
 
-	Bubble *ourBubble = new Bubble(2, 1, speech ? 2 : 1, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, 0, 0);
+	Bubble *ourBubble = new Bubble(2, 1, 2, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, 0, 0);
 	ourBubble->finishInit();
 	ourBubble->leftside = leftside;
 
@@ -150,7 +153,7 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	unsigned int backgroundcolour, textcolour;
 */
 
-BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y) : CompoundPart(p, _id, x, y, 1) {
+BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y) : CompoundPart(p, _id, x, y, 0) {
 	editable = false;
 	textwidth = 0;
 	textheight = 0;
