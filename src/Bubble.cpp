@@ -22,6 +22,7 @@
 #include "Engine.h"
 #include "Backend.h"
 #include "Camera.h"
+#include "creaturesImage.h"
 
 // class BubblePart *ourPart;
 
@@ -96,7 +97,7 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 			pose = leftside ? 12 : 11;
 	} else {
 		// C2 poses
-		// TODO: extend to fit text
+		// pose adjusted on setText() if necessary
 		if (speech)
 			pose = leftside ? 21 : 18;
 		else
@@ -116,10 +117,11 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 
 	int xoffset = (engine.version == 1) ? 6 : 8;
 	int yoffset = (engine.version == 1) ? 3 : 8;
-	int twidth = (engine.version == 1) ? 144 : 95; // TODO: extend to fit text
+	int twidth = (engine.version == 1) ? 144 : 95; // extended to fit text upon setText()
 
 	Bubble *ourBubble = new Bubble(2, 1, speech ? 2 : 1, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, 0, 0);
 	ourBubble->finishInit();
+	ourBubble->leftside = leftside;
 
 	ourBubble->attr = 32; // floating
 	ourBubble->floatTo(parent);
@@ -189,11 +191,32 @@ void BubblePart::handleSpecialKey(char c) {
 	}
 }
 
-void BubblePart::setText(std::string s) {
-	unsigned int twidth = engine.backend->textWidth(s);
+unsigned int BubblePart::poseForWidth(unsigned int width) {
+	if (engine.version == 1) return 0;
+	SpritePart *s;
+	if (!(s = dynamic_cast<SpritePart *>(parent->part(0)))) return 0;
+	unsigned int sprite = s->getFirstImg();
+	while (sprite < s->getFirstImg()+2 && width > s->getSprite()->width(sprite) - 17)
+		sprite++;
+	return sprite - s->getFirstImg();
+}
+
+void BubblePart::setText(std::string str) {
+	unsigned int twidth = engine.backend->textWidth(str);
+	unsigned int pose = poseForWidth(twidth);
+	SpritePart *s;
+	if ((s = dynamic_cast<SpritePart *>(parent->part(0)))) {
+		if (pose != s->getPose()) {
+			s->setPose(pose);
+			textwidth = s->getWidth() - 17;
+			Bubble* p = (Bubble*)parent; // TODO: omg hax
+			if (!p->leftside)
+				p->moveTo(p->floatingagent->x - p->getWidth() + 2, p->floatingagent->y - p->getHeight());
+		}
+	}
 	if (twidth > textwidth) return;
 
-	text = s;
+	text = str;
 	textoffset = (textwidth - twidth) / 2;
 }
 

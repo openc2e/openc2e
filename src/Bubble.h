@@ -28,6 +28,7 @@ class Bubble : public CompoundAgent {
 protected:
 	class BubblePart *ourPart;
 	unsigned int timeout;
+	bool leftside;
 
 	void turnIntoSpeech();
 
@@ -61,6 +62,7 @@ protected:
 	unsigned int backgroundcolour, textcolour;
 
 	void setText(std::string s);
+	unsigned int poseForWidth(unsigned int width);
 
 public:
 	void partRender(class Surface *renderer, int xoffset, int yoffset);
