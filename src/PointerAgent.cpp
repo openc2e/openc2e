@@ -204,8 +204,8 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 	} else if (event.type == eventmousebuttondown) {
 		// do our custom handling
 		if (event.button == buttonleft) {
-			CompoundPart *a = world.partAt(x, y);
-			if (a /* && a->canActivate() */) { // TODO
+			CompoundPart *a = world.partAt(x, y, true, false, true);
+			if (a) {
 				Agent* parent = a->getParent();
 
 				int eve = -1;

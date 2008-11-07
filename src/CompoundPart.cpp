@@ -65,6 +65,10 @@ bool CompoundPart::showOnRemoteCameras() {
 	return !parent->camerashy();
 }
 
+bool CompoundPart::canClick() {
+	return parent->activateable();
+}
+
 void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 	// TODO: we need a nicer way to handle such errors
 	if (getCurrentSprite() >= getSprite()->numframes()) {

@@ -65,6 +65,8 @@ public:
 	virtual unsigned int getHeight() = 0;
 
 	virtual bool showOnRemoteCameras();
+
+	virtual bool canClick();
 	
 	Agent *getParent() const { return parent; }
 	unsigned int getZOrder() const;
@@ -140,6 +142,8 @@ public:
 	bool isTransparent() { return hitopaquepixelsonly; }
 	void mouseIn();
 	void mouseOut();
+
+	bool canClick() { return true; }
 };
 
 class DullPart : public SpritePart {

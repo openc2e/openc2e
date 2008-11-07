@@ -303,7 +303,7 @@ Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency
 		return 0;
 }
 
-CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {
+CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable, bool needs_clickable) {
 	Agent *transagent = 0;
 	if (!obey_all_transparency)
 		transagent = agentAt(x, y, true, needs_mouseable);
@@ -338,6 +338,9 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 		}
 
 		if (needs_mouseable && !(p->getParent()->mouseable()))
+			continue;
+
+		if (needs_clickable && !(p->canClick()))
 			continue;
 
 		if (!obey_all_transparency)
