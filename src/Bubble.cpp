@@ -203,15 +203,18 @@ unsigned int BubblePart::poseForWidth(unsigned int width) {
 
 void BubblePart::setText(std::string str) {
 	unsigned int twidth = engine.backend->textWidth(str);
-	unsigned int pose = poseForWidth(twidth);
-	SpritePart *s;
-	if ((s = dynamic_cast<SpritePart *>(parent->part(0)))) {
-		if (pose != s->getPose()) {
-			s->setPose(pose);
-			textwidth = s->getWidth() - 17;
-			Bubble* p = (Bubble*)parent; // TODO: omg hax
-			if (!p->leftside)
-				p->moveTo(p->floatingagent->x - p->getWidth() + 2, p->floatingagent->y - p->getHeight());
+
+	if (engine.version == 2) {
+		unsigned int pose = poseForWidth(twidth);
+		SpritePart *s;
+		if ((s = dynamic_cast<SpritePart *>(parent->part(0)))) {
+			if (pose != s->getPose()) {
+				s->setPose(pose);
+				textwidth = s->getWidth() - 17;
+				Bubble* p = (Bubble*)parent; // TODO: omg hax
+				if (!p->leftside)
+					p->moveTo(p->floatingagent->x - p->getWidth() + 2, p->floatingagent->y - p->getHeight());
+			}
 		}
 	}
 	if (twidth > textwidth) return;
