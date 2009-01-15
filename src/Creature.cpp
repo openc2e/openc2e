@@ -119,7 +119,7 @@ void Creature::addGene(gene *g) {
 		creaturePigmentGene &p = *((creaturePigmentGene *)g);
 		// TODO: we don't sanity-check
 		tintinfo[p.color] = p.amount;
-	} else if (typeid(*g) == typeid(creaturePigmentGene)) {
+	} else if (typeid(*g) == typeid(creaturePigmentBleedGene)) {
 		creaturePigmentBleedGene &p = *((creaturePigmentBleedGene *)g);
 		tintinfo[3] = p.rotation;
 		tintinfo[4] = p.swap;
