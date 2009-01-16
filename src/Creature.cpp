@@ -127,7 +127,10 @@ void Creature::addGene(gene *g) {
 }
 
 void Creature::ageCreature() {
-	if (stage >= senile) return; // TODO
+	if (stage >= senile) {
+		die();
+		return;
+	} //previously we just returned
 	
 	stage = (lifestage)((int)stage + 1);
 	processGenes();
