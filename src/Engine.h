@@ -84,6 +84,7 @@ public:
 	std::string executeNetwork(std::string in);
 	bool needsUpdate();
 	unsigned int msUntilTick();
+	void drawWorld();
 	void update();
 	bool tick();
 	void processEvents();
