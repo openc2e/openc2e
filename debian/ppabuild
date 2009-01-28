@@ -9,7 +9,7 @@ git_root="$(D="$(git rev-parse --git-dir)"; test -n "$D" && cd "$D" && echo "$PW
 default_git_base="git://github.com/ccdevnet/openc2e.git"
 ppasuffix="ppa0"
 #set -A suites hardy gutsy
-set -A suites gutsy
+set -A suites gutsy intrepid
 
 echo "=== Preparing git checkout ==="
 tempdir=`mktemp -d`
