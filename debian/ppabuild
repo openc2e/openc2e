@@ -7,9 +7,11 @@ set -u
 git_root="$(D="$(git rev-parse --git-dir)"; test -n "$D" && cd "$D" && echo "$PWD")"
 
 default_git_base="git://github.com/ccdevnet/openc2e.git"
-ppasuffix="ppa0"
+if [ -z "$ppasuffix" ]; then
+	ppasuffix="ppa0"
+fi
 #set -A suites hardy gutsy
-set -A suites gutsy intrepid
+set -A suites gutsy hardy intrepid jaunty
 
 echo "=== Preparing git checkout ==="
 tempdir=`mktemp -d`
@@ -49,16 +51,19 @@ rm "$checkout/.git" -rf
 
 cp $checkout/debian/changelog $tempdir/changelog.orig
 
-pushd $checkout/debian
-cp -f $tempdir/changelog.orig changelog
-debversion="$describe_ver""-1~${ppasuffix}"
-debchange -v $debversion -D UNRELEASED -b "Automatic checkout of commit $raw_ver"
-cd ..
-dpkg-buildpackage -sa -rfakeroot -S -us -uc
-popd
-debsign openc2e_${debversion}_source.changes
 
+suiteidx=0
 for suite in $suites; do
+	suiteidx=$(($suiteidx + 1))
+	pushd $checkout/debian
+	cp -f $tempdir/changelog.orig changelog
+	debversion="$describe_ver""-1~${ppasuffix}+$suiteidx$suite"
+	debchange -v $debversion -D UNRELEASED -b "Automatic checkout of commit $raw_ver"
+	cd ..
+	dpkg-buildpackage -sa -rfakeroot -S -us -uc
+	popd
+	debsign openc2e_${debversion}_source.changes
+
 	sed "s/SUITE/$suite/" < $tempdir/$checkout/debian/dput.cf > $tempdir/dput.cf
 	dput -c $tempdir/dput.cf ccdevnet-ppa openc2e_${debversion}_source.changes
 done
