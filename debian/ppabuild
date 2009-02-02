@@ -54,8 +54,9 @@ cp -f $tempdir/changelog.orig changelog
 debversion="$describe_ver""-1~${ppasuffix}"
 debchange -v $debversion -D UNRELEASED -b "Automatic checkout of commit $raw_ver"
 cd ..
-dpkg-buildpackage -sa -rfakeroot -S
+dpkg-buildpackage -sa -rfakeroot -S -us -uc
 popd
+debsign openc2e_${debversion}_source.changes
 
 for suite in $suites; do
 	sed "s/SUITE/$suite/" < $tempdir/$checkout/debian/dput.cf > $tempdir/dput.cf
