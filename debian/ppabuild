@@ -36,7 +36,7 @@ git remote add src $default_git_base
 git fetch src
 git checkout -q refs/remotes/src/master
 
-describe_ver="$(git-describe --tags)"
+describe_ver="$(git-describe --tags)-$ppasuffix"
 raw_ver="$(git-log -1 --pretty=format:\%H)"
 echo "=== Checked out version $describe_ver ==="
 
@@ -57,7 +57,7 @@ for suite in $suites; do
 	suiteidx=$(($suiteidx + 1))
 	pushd $checkout/debian
 	cp -f $tempdir/changelog.orig changelog
-	debversion="$describe_ver""-1~${ppasuffix}+$suiteidx$suite"
+	debversion="$describe_ver""-1~$suiteidx$suite"
 	debchange -v $debversion -D UNRELEASED -b "Automatic checkout of commit $raw_ver"
 	cd ..
 	dpkg-buildpackage -sa -rfakeroot -S -us -uc
