@@ -7,9 +7,7 @@ set -u
 git_root="$(D="$(git rev-parse --git-dir)"; test -n "$D" && cd "$D" && echo "$PWD")"
 
 default_git_base="git://github.com/ccdevnet/openc2e.git"
-if [ -z "$ppasuffix" ]; then
-	ppasuffix="ppa0"
-fi
+ppasuffix=${ppasuffix:-ppa0}
 #set -A suites hardy gutsy
 set -A suites gutsy hardy intrepid jaunty
 
