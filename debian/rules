@@ -83,7 +83,7 @@ binary-arch: build install
 	dh_install --fail-missing --sourcedir=debian/tmp
 	dh_installman build/openc2e.6
 	dh_link
-	dh_strip --dbg-package=openc2e-dbg
+	dh_strip
 	dh_compress -X.css -X.html
 	dh_fixperms
 	dh_installdeb
