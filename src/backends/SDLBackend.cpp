@@ -247,6 +247,7 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 	sdlc.g = (c >> 8) & 0xff;
 	sdlc.r = (c >> 16) & 0xff;
 	assert(c >> 24 == 0);
+	sdlc.unused = 0; // T_T "may be used uninitialized in this function"
 	return sdlc;
 }
 
