@@ -43,13 +43,13 @@ struct toktrace {
 
 	toktrace(unsigned short w, unsigned short l) : width(w), lineno(l) { }
 	private:
-	FRIEND_SERIALIZE(toktrace);
+	FRIEND_SERIALIZE(toktrace)
 	toktrace() { }
 };
 
 struct script {
 	protected:
-		FRIEND_SERIALIZE(script);
+		FRIEND_SERIALIZE(script)
 		
 		bool linked;
 

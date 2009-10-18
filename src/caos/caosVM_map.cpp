@@ -846,70 +846,70 @@ void caosVM::v_WIND() {
  %status maybe
  %pragma variants c1 c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(TEMP, r->temp);
+CAOS_LVALUE_ROOM_SIMPLE(TEMP, r->temp)
 
 /**
  LITE (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(LITE, r->lite);
+CAOS_LVALUE_ROOM_SIMPLE(LITE, r->lite)
 
 /**
  RADN (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(RADN, r->radn);
+CAOS_LVALUE_ROOM_SIMPLE(RADN, r->radn)
 
 /**
  ONTR (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(ONTR, r->ontr);
+CAOS_LVALUE_ROOM_SIMPLE(ONTR, r->ontr)
 
 /**
  INTR (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(INTR, r->intr);
+CAOS_LVALUE_ROOM_SIMPLE(INTR, r->intr)
 
 /**
  PRES (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(PRES, r->pres);
+CAOS_LVALUE_ROOM_SIMPLE(PRES, r->pres)
 
 /**
  HSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(HSRC, r->hsrc);
+CAOS_LVALUE_ROOM_SIMPLE(HSRC, r->hsrc)
 
 /**
  LSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(LSRC, r->lsrc);
+CAOS_LVALUE_ROOM_SIMPLE(LSRC, r->lsrc)
 
 /**
  RSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(RSRC, r->rsrc);
+CAOS_LVALUE_ROOM_SIMPLE(RSRC, r->rsrc)
 
 /**
  PSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(PSRC, r->psrc);
+CAOS_LVALUE_ROOM_SIMPLE(PSRC, r->psrc)
 
 /**
  WNDX (integer)

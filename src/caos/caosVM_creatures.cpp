@@ -1587,7 +1587,7 @@ void caosVM::c_AIM() {
  %status maybe
  %pragma variants c1 c2
 */
-CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker); // TODO
+CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker) // TODO
 
 /**
  SNEZ (command)

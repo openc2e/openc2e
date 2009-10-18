@@ -29,7 +29,7 @@ class creaturesImage;
 
 class MetaRoom {
 protected:
-	FRIEND_SERIALIZE(MetaRoom);
+	FRIEND_SERIALIZE(MetaRoom)
 	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
 	std::map<std::string, shared_ptr<creaturesImage> > backgrounds;
 	shared_ptr<creaturesImage> firstback;

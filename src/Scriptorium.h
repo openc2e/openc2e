@@ -30,7 +30,7 @@ class script;
 
 class Scriptorium {
 protected:
-	FRIEND_SERIALIZE(Scriptorium);
+	FRIEND_SERIALIZE(Scriptorium)
 	// unsigned int = combined family/genus/species
 	// unsigned short = event id
 	std::map<unsigned int, std::map<unsigned short, shared_ptr<script> > > scripts;
