@@ -20,7 +20,7 @@ void MNGFile::yyinit(const char *buf) {
 
 int MNGFile::mnglex() {
 	const char *basep;
-	const char *YYMARKER;
+	const char *YYMARKER = NULL;
 	assert(mngfile_parse_p);
 
 start:
