@@ -69,7 +69,7 @@ namespace boost {
 	static inline void intrusive_ptr_release(OpenALBuffer *p) {
 		p->del_ref();
 	}
-};
+}
 
 typedef boost::shared_ptr<class OpenALStreamBuf> OpenALStreamBufP;
 class OpenALStreamBuf {

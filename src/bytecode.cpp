@@ -35,11 +35,11 @@ const char *cnams[] = {
 	NULL
 };
 
-	static std::string try_lookup(const Dialect *d, int idx) {
-		if (d)
-			return std::string(d->getcmd(idx)->fullname);
-		return str(format("%d") % idx);
-	}
+static std::string try_lookup(const Dialect *d, int idx) {
+	if (d)
+		return std::string(d->getcmd(idx)->fullname);
+	return str(format("%d") % idx);
+}
 
 std::string dumpOp(const Dialect *d, caosOp op) {
 	int arg = op.argument; // weird C++ issues
@@ -84,4 +84,4 @@ std::string dumpOp(const Dialect *d, caosOp op) {
 		default:
 			return str(format("UNKNOWN %02x %06x") % arg);
 	}
-};
+}
