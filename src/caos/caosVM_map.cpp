@@ -1275,5 +1275,81 @@ void caosVM::c_SSFC() {
 		r->floorpoints.push_back(std::pair<unsigned int, unsigned int>(x, y));
 	}
 }
+/**
+ RMNO (integer)
+ %status stub
+ %pragma variants c2
+*/ 
+void caosVM::v_RMNO() {
+	result.setInt(0); // TODO
+}
 
+/**
+ RMN# (integer) room (integer) direction (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_RMN() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+
+	result.setInt(0); // TODO
+}
+
+/**
+ RMNR (variable) room (integer) direction (integer) door (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_RMNR() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	result.setInt(0); // TODO
+}
+void caosVM::s_RMNR() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	VM_PARAM_INTEGER(newvalue)
+
+	// TODO
+}
+
+/**
+ RMND (variable) room (integer) direction (integer) door (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_RMND() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	result.setInt(0); // TODO
+}
+void caosVM::s_RMND() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	VM_PARAM_INTEGER(newvalue)
+
+	// TODO
+}
+/**
+ DELN (command) room (integer) direction (integer)
+ %status stub
+ %pragma variants c2
+ %pragma implementation caosVM::c_DELN_c2
+*/
+void caosVM::c_DELN_c2() {
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	// TODO
+}
+	
 /* vim: set noet: */

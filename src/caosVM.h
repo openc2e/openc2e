@@ -299,6 +299,13 @@ public:
 	void v_WRAP();
 	void s_WRAP();
 	void c_SSFC();
+	void v_RMNO();
+	void v_RMN();
+	void v_RMNR();
+	void s_RMNR();
+	void v_RMND();
+	void s_RMND();
+	void c_DELN_c2();
 	
 	// camera
 	void v_VISI();
