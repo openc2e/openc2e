@@ -328,4 +328,85 @@ void caosVM::c_PLDS() {
 	// TODO
 }
 
+struct SineStream : AudioStreamBase {
+	double period;
+	double phase;
+	bool stereo;
+	int amplitude;
+	SineStream(int freq, bool stereo_, int ampl)
+		: period((double)44100/(double)freq), phase(0), stereo(stereo_), amplitude(ampl) { }
+
+	// avoid panning?
+	virtual bool isStereo() const { return stereo; }
+	virtual int sampleRate() const { return 44100; }
+	virtual int latency() const { return 1000; }
+	virtual bool reset() { return true; }
+	virtual int bitDepth() const { return 16; }
+	virtual size_t produce(void *data, size_t len) {
+		int sampleCount = len / (stereo ? 4 : 2);
+		int p = 0;
+		double pi = atan(1)*4;
+		unsigned short *buf = (unsigned short *)data;
+
+		for (int i = 0; i < sampleCount; i++) {
+			phase += (1/period);
+			if (phase > 1)
+				phase = phase - 1;
+			double wave = sin( phase * pi * 2) * amplitude;
+			buf[p++] = (signed short)wave;
+			if (stereo)
+				buf[p++] = (signed short)wave;
+		}
+		return len;
+	}
+};
+
+/**
+ DBG: SINE (command) rate (integer) stereo (integer) track (integer) amplitude (integer)
+ %status maybe
+
+ Plays a sine wave coming from TARG
+
+ track = 0 to fix the source at TARG's current location; track = 1 to follow
+ view, track = 2 to inject it into the BGM source
+ */
+void caosVM::c_DBG_SINE() {
+	VM_PARAM_INTEGER(ampl);
+	VM_PARAM_INTEGER(track);
+	VM_PARAM_INTEGER(stereo);
+	VM_PARAM_INTEGER(rate);
+	if (track != 2) {
+		valid_agent(targ);
+
+		if (targ->sound)
+			targ->sound->stop();
+	}
+	boost::shared_ptr<AudioSource> src;
+	if (track == 2)
+		src = engine.audio->getBGMSource();
+	else
+		src = targ->sound = engine.audio->newSource();
+	if (!src)
+		throw creaturesException("Audio is unavailable");
+	src->setStream(AudioStream(new SineStream(rate, stereo, ampl)));
+	if (track != 2) {
+		src->setFollowingView(!track);
+	}
+	src->play();
+}
+
+/**
+ DBG: SBGM (command)
+ %status maybe
+
+ Stops the BGM source. This probably doesn't do what you want it to do.
+ Don't touch.
+ */
+void caosVM::c_DBG_SBGM() {
+	boost::shared_ptr<AudioSource> src = engine.audio->getBGMSource();
+	if (src)
+		src->stop();
+}
+
+
 /* vim: set noet: */

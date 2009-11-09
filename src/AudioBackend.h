@@ -57,6 +57,38 @@ namespace boost {
 	}
 };
 
+/* Base class for sources of streaming data (eg, MNG music)
+ *
+ * The values of isStereo, bitDepth, and preBufferSize MUST remain the same for
+ * the life of an instance.
+ *
+ * produce() shall produce up to len bytes of data (to be stored in the buffer pointed to by 'data'),
+ * and return however many it actually produced. If less than len bytes are produced, playback will cease
+ * (and loop if applicable) once the current buffer of data is exhausted.
+ *
+ * The implementation should not make any assumptions about how often any of these functions
+ * will be called, if at all.
+ */
+typedef boost::shared_ptr<class AudioStreamBase> AudioStream;
+struct AudioStreamBase {
+	virtual ~AudioStreamBase() { }
+
+	// Stereo sources will be played without spatial features
+	// left then right format
+	virtual bool isStereo() const = 0;
+	// Must be 8 or 16
+	virtual int bitDepth() const = 0;
+	virtual int sampleRate() const = 0;
+	// The backend will attempt to maintain an internal buffer of approximately
+	// this many milliseconds of audio data.
+	virtual int latency() const = 0;
+
+	virtual size_t produce(void *data, size_t len) = 0;
+
+	// Called on a loop; return true on success or false to halt playback anyway
+	virtual bool reset() = 0;
+};
+
 enum SourceState { SS_STOP, SS_PLAY, SS_PAUSE };
 
 class AudioSource : public boost::enable_shared_from_this<AudioSource> {
@@ -68,6 +100,17 @@ public:
 	virtual AudioClip getClip() = 0;
 	virtual void setClip(const AudioClip &) = 0; /* Valid only in STOP state */
 	virtual SourceState getState() const = 0;
+
+	// The effect of calling this function on a AudioSource initialized with setClip
+	// is undefined
+	virtual AudioStream getStream() const = 0;
+	virtual void setStream(const AudioStream &) = 0;
+	// Convenience function for setting to a new AudioStream.
+	// Ownership passes to AudioSource (or rather, AudioStream's reference counting)
+	virtual void setStream(AudioStreamBase *p) {
+		setStream(AudioStream(p));
+	}
+
 	virtual void play() = 0; /* requires that getClip() not be a null ref */
 	virtual void stop() = 0;
 	virtual void pause() = 0;
@@ -102,10 +145,16 @@ public:
 
 	/* TODO: global vol controls */
 	virtual boost::shared_ptr<AudioSource> newSource() = 0;
+	/* Returns an AudioSource with a fixed position relative to the viewpoint.
+	 *
+	 * The effect of invoking setPos on this source is undefined.
+	 */
+	virtual boost::shared_ptr<AudioSource> getBGMSource() = 0;
 	virtual AudioClip loadClip(const std::string &filename) = 0;
 
 	virtual void begin() { }
 	virtual void commit() { }
+	virtual void poll() { }
 };
 
 #endif
