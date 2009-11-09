@@ -228,6 +228,7 @@ OpenALSource::OpenALSource(boost::shared_ptr<class OpenALBackend> backend) {
 	alSourcef(source, AL_PITCH, 1.0f);
 	alSourcef(source, AL_GAIN, 1.0f);
 	alSourcefv(source, AL_POSITION, null_vec);
+	x = y = z = 0;
 	alSourcefv(source, AL_VELOCITY, null_vec);
 	alSourcei(source, AL_LOOPING, 0);
 	al_throw_maybe();
@@ -380,17 +381,16 @@ void OpenALStreamBuf::writeAudioData(const void *data, size_t len) {
 
 bool OpenALSource::bufferdata() {
 	static unsigned char *tempbuf[8192];
-	int bufferlen = 0;
-	int donebuffers;
+	unsigned int donebuffers;
 
-	alGetSourcei(source, AL_BUFFERS_PROCESSED, &donebuffers);
+	alGetSourcei(source, AL_BUFFERS_PROCESSED, (ALint *)&donebuffers);
 
 	assert(streambuffers.size() >= donebuffers);
 
 	ALuint *bufferNames = new ALuint[donebuffers];
 	alSourceUnqueueBuffers(source, donebuffers, bufferNames);
 
-	for (int i = 0; i < donebuffers && !streambuffers.empty(); i++) {
+	for (unsigned int i = 0; i < donebuffers && !streambuffers.empty(); i++) {
 		OpenALStreamBufP p = streambuffers.front();
 		assert(p->bufferID == bufferNames[i]);
 		buf_est_ms -= p->approxLen();
