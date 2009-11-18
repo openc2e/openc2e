@@ -138,11 +138,11 @@ void OpenALBackend::shutdown() {
 	bgmSource.reset();
 
 	OpenALSource::SourceList sl = activeSources;
-	std::for_each(sl.begin(), sl.end(), bind(&OpenALSource::forceCleanup, *_1));
+	std::for_each(sl.begin(), sl.end(), boost::lambda::bind(&OpenALSource::forceCleanup, *boost::lambda::_1));
 
 	// beware, forceCleanup will release most(/all?) buffers
 	OpenALBuffer::BufferList bl = activeBuffers;
-	std::for_each(bl.begin(), bl.end(), bind(&OpenALBuffer::destroy, *_1));
+	std::for_each(bl.begin(), bl.end(), boost::lambda::bind(&OpenALBuffer::destroy, *boost::lambda::_1));
 	
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(context);
