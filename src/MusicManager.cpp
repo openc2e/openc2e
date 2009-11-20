@@ -19,19 +19,29 @@
 
 #include "MusicManager.h"
 #include "World.h"
+#include "AudioBackend.h"
+#include "Engine.h"
 #include <iostream> // for debug messages
+using namespace boost;
 
 MusicManager musicmanager;
 
+struct MusicStream : public AudioStreamBase {
+	virtual bool isStereo() const { return true; }
+	virtual int sampleRate() const { return 44100; }
+	virtual int latency() const { return 1000; }
+	virtual bool reset() { return true; }
+	virtual int bitDepth() const { return 16; }
+
+	virtual size_t produce(void *data, size_t len) {
+		return musicmanager.render((uint16 *)data, len);
+	}
+};
+
 MusicManager::MusicManager() {
-	currenttrack = 0;
 }
 
 MusicManager::~MusicManager() {
-	if (currenttrack) {
-		delete currenttrack;
-	}
-
 	for (std::map<std::string, MNGFile *>::iterator i = files.begin(); i != files.end(); i++) {
 		delete i->second;
 	}
@@ -71,8 +81,31 @@ void MusicManager::playTrack(std::string track, unsigned int latency) {
 		return; // TODO: exception?
 	}
 
-	MusicTrack *tracknode = new MusicTrack(file, file->tracks[trackname]);
-	// TODO: play track :)
+	shared_ptr<MusicTrack> tracknode(new MusicTrack(file, file->tracks[trackname]));
+	playTrack(tracknode);
+}
+
+void MusicManager::playTrack(shared_ptr<MusicTrack> track) {
+	currenttrack = track;
+
+	startPlayback();
+}
+
+void MusicManager::startPlayback() {
+	shared_ptr<AudioSource> src = engine.audio->getBGMSource();
+	if (!src) return;
+
+	if (!stream) {
+		// we assume no-one else ever steals the BGM stream from
+		// under us, but what are we meant to do then anyway?
+		stream = shared_ptr<MusicStream>(new MusicStream);
+		src->setStream(stream);
+		src->play();
+	}
+}
+
+size_t MusicManager::render(uint16 *data, size_t len) {
+	return len;
 }
 
 float evaluateExpression(MNGExpression *e) {
@@ -96,7 +129,7 @@ MusicVoice::MusicVoice(MNGVoiceNode *n) {
 	// TODO
 }
 
-MusicLayer::MusicLayer(MusicTrack *p) {
+MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
 	parent = p;
 
 	updaterate = 1.0f;
@@ -105,10 +138,9 @@ MusicLayer::MusicLayer(MusicTrack *p) {
 	beatsynch = 0.0f;
 }
 
-MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p) : MusicLayer(p) {
+MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
 	node = n;
 	currvoice = 0;
-	effect = NULL;
 
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
@@ -123,13 +155,13 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p
 				throw MNGFileException("couldn't find effect '" + e->getName() + "'");
 
 			MNGEffectDecNode *n = effects[e->getName()];
-			effect = new MusicEffect(n);
+			effect = shared_ptr<MusicEffect>(new MusicEffect(n));
 			continue;
 		}
 
 		MNGVoiceNode *v = dynamic_cast<MNGVoiceNode *>(n);
 		if (v) {
-			MusicVoice *voice = new MusicVoice(v);
+			shared_ptr<MusicVoice> voice(new MusicVoice(v));
 			voices.push_back(voice);
 			continue;
 		}
@@ -155,7 +187,7 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p
 	}
 }
 
-MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, MusicTrack *p) : MusicLayer(p) {
+MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
 	node = n;
 
 	// TODO
@@ -164,20 +196,23 @@ MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, MusicTrack *p) : MusicLayer(
 MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 	node = n;
 	parent = p;
+}
 
+// shared_from_this
+void MusicTrack::init() {
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
 
 		MNGAleotoricLayerNode *al = dynamic_cast<MNGAleotoricLayerNode *>(n);
 		if (al) {
-			MusicAleotoricLayer *mal = new MusicAleotoricLayer(al, this);
+			shared_ptr<MusicLayer> mal(new MusicAleotoricLayer(al, shared_from_this()));
 			layers.push_back(mal);
 			continue;
 		}
 
 		MNGLoopLayerNode *ll = dynamic_cast<MNGLoopLayerNode *>(n);
 		if (ll) {
-			MusicLoopLayer *mll = new MusicLoopLayer(ll, this);
+			shared_ptr<MusicLayer> mll(new MusicLoopLayer(ll, shared_from_this()));
 			layers.push_back(mll);
 			continue;
 		}
@@ -211,9 +246,6 @@ MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 }
 
 MusicTrack::~MusicTrack() {
-	for (std::vector<MusicLayer *>::iterator i = layers.begin(); i != layers.end(); i++) {
-		delete *i;
-	}
 }
 
 /* vim: set noet: */

@@ -21,20 +21,30 @@
 #define _MUSICMANAGER_H
 
 #include "music/mngfile.h"
+#include "endianlove.h"
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+#include <boost/enable_shared_from_this.hpp>
 
 class MusicManager {
 private:
 	std::map<std::string, MNGFile *> files;
+	shared_ptr<class MusicTrack> currenttrack;
 
-	class MusicTrack *currenttrack;
+	shared_ptr<class MusicStream> stream;
+
+	void startPlayback();
+
+	void playTrack(shared_ptr<class MusicTrack> track);
 
 public:
 	MusicManager();
 	~MusicManager();
 
 	void tick();
-
 	void playTrack(std::string track, unsigned int latency);
+
+	size_t render(uint16 *data, size_t len);
 };
 
 extern MusicManager musicmanager;
@@ -59,24 +69,24 @@ class MusicLayer {
 protected:
 	MNGUpdateNode *updatenode;
 
-	MusicTrack *parent;
+	shared_ptr<MusicTrack> parent;
 
 	std::map<std::string, float> variables;
 	float updaterate, volume, interval, beatsynch;
 
-	MusicLayer(MusicTrack *p);
+	MusicLayer(shared_ptr<MusicTrack> p);
 };
 
 class MusicAleotoricLayer : public MusicLayer {
 protected:
 	MNGAleotoricLayerNode *node;
 
-	MusicEffect *effect;
-	std::vector<MusicVoice *> voices;
+	shared_ptr<MusicEffect> effect;
+	std::vector<shared_ptr<MusicVoice> > voices;
 	unsigned int currvoice;
 
 public:
-	MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p);
+	MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p);
 };
 
 class MusicLoopLayer : public MusicLayer {
@@ -86,20 +96,21 @@ protected:
 	std::pair<char *, int> wave;
 
 public:
-	MusicLoopLayer(MNGLoopLayerNode *n, MusicTrack *p);
+	MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p);
 };
 
-class MusicTrack {
+class MusicTrack : public boost::enable_shared_from_this<class MusicTrack> {
 protected:
 	MNGTrackDecNode *node;
 	MNGFile *parent;
 
-	std::vector<MusicLayer *> layers;
+	std::vector<shared_ptr<MusicLayer> > layers;
 
 	float fadein, fadeout, beatlength, volume;
 
 public:
 	MusicTrack(MNGFile *p, MNGTrackDecNode *n);
+	void init();
 	virtual ~MusicTrack();
 
 	MNGFile *getParent() { return parent; }
