@@ -23,6 +23,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "AudioBackend.h"
+#include "MusicManager.h"
 #include "Camera.h"
 #include "MetaRoom.h"
 #include "Room.h"
@@ -210,7 +211,7 @@ void caosVM::c_STPC() {
 
 /**
  STRK (command) latency (integer) track (string)
- %status stub
+ %status maybe
 
  Play the specified music track. It will play for at least latency seconds.
 */
@@ -218,7 +219,7 @@ void caosVM::c_STRK() {
 	VM_PARAM_STRING(track)
 	VM_PARAM_INTEGER(latency)
 
-	// TODO
+	musicmanager.playTrack(track, latency);
 }
 
 /**
