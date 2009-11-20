@@ -377,11 +377,11 @@ static size_t bytesPerSample(bool stereo, int bitdepth) {
 
 void OpenALStreamBuf::writeAudioData(const void *data, size_t len) {
 	alBufferData(bufferID, format, data, len, freq);
-	approx_ms = (1000*len/(stereo ? 2 : 1))/freq;
+	approx_ms = ((1000 * len) / bytesPerSample(stereo, bitDepth)) / freq;
 }
 
 bool OpenALSource::bufferdata() {
-	static unsigned char *tempbuf[8192];
+	static unsigned char tempbuf[8192];
 	unsigned int donebuffers;
 
 	alGetSourcei(source, AL_BUFFERS_PROCESSED, (ALint *)&donebuffers);
