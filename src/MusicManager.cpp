@@ -123,6 +123,13 @@ float evaluateExpression(MNGExpression *e) {
 		return c->getValue();
 	}
 
+	MNGRandomNode *r = dynamic_cast<MNGRandomNode *>(e);
+	if (r) {
+		float first = evaluateExpression(r->first());
+		float second = evaluateExpression(r->second());
+		return (rand() / RAND_MAX) * (second - first) + first;
+	}
+
 	throw MNGFileException("couldn't evaluate expression " + e->dump());
 }
 
@@ -147,25 +154,25 @@ MusicStage::MusicStage(MNGStageNode *n) {
 
 		MNGPanNode *p = dynamic_cast<MNGPanNode *>(n);
 		if (p) {
-			pan = p;
+			pan = p->getExpression();
 			continue;
 		}
 
 		MNGEffectVolumeNode *v = dynamic_cast<MNGEffectVolumeNode *>(n);
 		if (v) {
-			volume = v;
+			volume = v->getExpression();
 			continue;
 		}
 
 		MNGDelayNode *d = dynamic_cast<MNGDelayNode *>(n);
 		if (d) {
-			delay = d;
+			delay = d->getExpression();
 			continue;
 		}
 
 		MNGTempoDelayNode *td = dynamic_cast<MNGTempoDelayNode *>(n);
 		if (td) {
-			tempodelay = td;
+			tempodelay = td->getExpression();
 			continue;
 		}
 
@@ -177,15 +184,15 @@ FloatAudioBuffer MusicStage::applyStage(FloatAudioBuffer src) {
 	float pan_value = 0.0f, volume_value = 1.0f, delay_value = 0.0f;
 
 	if (pan) {
-		pan_value = evaluateExpression(pan->getExpression());
+		pan_value = evaluateExpression(pan);
 	}
 
 	if (volume) {
-		volume_value = evaluateExpression(volume->getExpression());
+		volume_value = evaluateExpression(volume);
 	}
 
 	if (delay) {
-		delay_value = evaluateExpression(delay->getExpression());
+		delay_value = evaluateExpression(delay);
 	}
 
 	if (tempodelay) {
@@ -224,28 +231,46 @@ void MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer s
 	}
 }
 
-MusicVoice::MusicVoice(MNGFile *p, MNGVoiceNode *n) {
+MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 	node = n;
+	parent = p;
 
-	interval = 0.0f;
+	interval = NULL;
 
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
 
 		MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n);
 		if (e) {
-			wave = shared_ptr<MusicWave>(new MusicWave(p, e));
+			wave = shared_ptr<MusicWave>(new MusicWave(p->getParent()->getParent(), e));
 			continue;
 		}
 
 		MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n);
 		if (in) {
-			interval = evaluateExpression(in->getExpression());
+			interval = in->getExpression();
+			continue;
+		}
+
+		MNGConditionNode *c = dynamic_cast<MNGConditionNode *>(n);
+		if (c) {
+			conditions.push_back(c);
 			continue;
 		}
 
 		throw MNGFileException("unexpected node in Voice: " + n->dump());
 	}
+}
+
+bool MusicVoice::shouldPlay() {
+	// TODO: check conditions
+	return true;
+}
+
+float MusicVoice::getInterval() {
+	if (!interval) return 0.0f;
+
+	return evaluateExpression(interval);
 }
 
 MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
@@ -259,9 +284,15 @@ MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
 	next_offset = 0;
 }
 
+void MusicLayer::runUpdateBlock() {
+	// TODO
+}
+
 MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
 	node = n;
+}
 
+void MusicAleotoricLayer::init() {
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
 
@@ -281,7 +312,7 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<Mu
 
 		MNGVoiceNode *v = dynamic_cast<MNGVoiceNode *>(n);
 		if (v) {
-			shared_ptr<MusicVoice> voice(new MusicVoice(parent->getParent(), v));
+			shared_ptr<MusicVoice> voice(new MusicVoice(shared_from_this(), v));
 			voices.push_back(voice);
 			continue;
 		}
@@ -369,19 +400,23 @@ void MusicAleotoricLayer::update() {
 		delete[] buffer.data;
 	}
 
-	// runUpdateBlock();
+	runUpdateBlock();
 
 	next_offset = parent_offset + offset;
 }
 
 MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
 	node = n;
+}
 
+void MusicLoopLayer::init() {
 	// TODO
 }
 
 void MusicLoopLayer::update() {
 	// TODO
+
+	//runUpdateBlock();
 }
 
 MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
@@ -401,14 +436,18 @@ void MusicTrack::init() {
 
 		MNGAleotoricLayerNode *al = dynamic_cast<MNGAleotoricLayerNode *>(n);
 		if (al) {
-			shared_ptr<MusicLayer> mal(new MusicAleotoricLayer(al, shared_from_this()));
+			MusicAleotoricLayer *ptr = new MusicAleotoricLayer(al, shared_from_this());
+			shared_ptr<MusicLayer> mal(ptr);
+			ptr->init();
 			layers.push_back(mal);
 			continue;
 		}
 
 		MNGLoopLayerNode *ll = dynamic_cast<MNGLoopLayerNode *>(n);
 		if (ll) {
-			shared_ptr<MusicLayer> mll(new MusicLoopLayer(ll, shared_from_this()));
+			MusicLoopLayer *ptr = new MusicLoopLayer(ll, shared_from_this());
+			shared_ptr<MusicLayer> mll(ptr);
+			ptr->init();
 			layers.push_back(mll);
 			continue;
 		}

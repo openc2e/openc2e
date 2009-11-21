@@ -72,10 +72,7 @@ class MusicStage {
 protected:
 	MNGStageNode *node;
 
-	MNGPanNode *pan;
-	MNGEffectVolumeNode *volume;
-	MNGDelayNode *delay;
-	MNGTempoDelayNode *tempodelay;
+	MNGExpression *pan, *volume, *delay, *tempodelay;
 
 public:
 	MusicStage(MNGStageNode *n);
@@ -95,17 +92,21 @@ public:
 class MusicVoice {
 protected:
 	MNGVoiceNode *node;
+	shared_ptr<class MusicLayer> parent;
 	shared_ptr<MusicWave> wave;
 
-	float interval;
+	std::vector<MNGConditionNode *> conditions;
+
+	MNGExpression *interval;
 
 public:
-	MusicVoice(MNGFile *p, MNGVoiceNode *n);
+	MusicVoice(shared_ptr<class MusicLayer> p, MNGVoiceNode *n);
 	shared_ptr<MusicWave> getWave() { return wave; }
-	float getInterval() { return interval; }
+	float getInterval();
+	bool shouldPlay();
 };
 
-class MusicLayer {
+class MusicLayer : public boost::enable_shared_from_this<class MusicLayer> {
 protected:
 	MNGUpdateNode *updatenode;
 
@@ -119,6 +120,7 @@ protected:
 	void runUpdateBlock();
 
 public:
+	shared_ptr<MusicTrack> getParent() { return parent; }
 	virtual void update() = 0;
 };
 
@@ -131,6 +133,7 @@ protected:
 
 public:
 	MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p);
+	void init();
 	void update();
 };
 
@@ -142,6 +145,7 @@ protected:
 
 public:
 	MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p);
+	void init();
 	void update();
 };
 
