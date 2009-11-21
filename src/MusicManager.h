@@ -49,6 +49,14 @@ public:
 
 extern MusicManager musicmanager;
 
+struct FloatAudioBuffer {
+	unsigned int start_offset;
+	size_t len, position;
+	float *data;
+
+	FloatAudioBuffer(float *d, size_t l, unsigned int o) { position = 0; len = l; data = d; start_offset = o; }
+};
+
 class MusicWave {
 protected:
 	unsigned char *data;
@@ -60,12 +68,28 @@ public:
 	unsigned int getLength() { return length; }
 };
 
+class MusicStage {
+protected:
+	MNGStageNode *node;
+
+	MNGPanNode *pan;
+	MNGEffectVolumeNode *volume;
+	MNGDelayNode *delay;
+	MNGTempoDelayNode *tempodelay;
+
+public:
+	MusicStage(MNGStageNode *n);
+	FloatAudioBuffer applyStage(FloatAudioBuffer src);
+};
+
 class MusicEffect {
 protected:
 	MNGEffectDecNode *node;
+	std::vector<shared_ptr<MusicStage> > stages;
 
 public:
 	MusicEffect(MNGEffectDecNode *n);
+	void applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src);
 };
 
 class MusicVoice {
@@ -121,14 +145,6 @@ public:
 	void update();
 };
 
-struct FloatAudioBuffer {
-	unsigned int start_offset;
-	size_t len, position;
-	float *data;
-
-	FloatAudioBuffer(float *d, size_t l, unsigned int o) { position = 0; len = l; data = d; start_offset = o; }
-};
-
 class MusicTrack : public boost::enable_shared_from_this<class MusicTrack> {
 protected:
 	MNGTrackDecNode *node;
@@ -149,6 +165,8 @@ public:
 	void addBuffer(FloatAudioBuffer buf) { buffers.push_back(buf); }
 	unsigned int getCurrentOffset() { return current_offset; }
 	void update();
+	float getVolume() { return volume; }
+	float getBeatLength() { return beatlength; }
 
 	MNGFile *getParent() { return parent; }
 };

@@ -135,10 +135,93 @@ MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
 	length = (unsigned int)p->samples[sampleno].second;
 }
 
+MusicStage::MusicStage(MNGStageNode *n) {
+	node = n;
+	pan = NULL;
+	volume = NULL;
+	delay = NULL;
+	tempodelay = NULL;
+
+	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
+		MNGNode *n = *i;
+
+		MNGPanNode *p = dynamic_cast<MNGPanNode *>(n);
+		if (p) {
+			pan = p;
+			continue;
+		}
+
+		MNGEffectVolumeNode *v = dynamic_cast<MNGEffectVolumeNode *>(n);
+		if (v) {
+			volume = v;
+			continue;
+		}
+
+		MNGDelayNode *d = dynamic_cast<MNGDelayNode *>(n);
+		if (d) {
+			delay = d;
+			continue;
+		}
+
+		MNGTempoDelayNode *td = dynamic_cast<MNGTempoDelayNode *>(n);
+		if (td) {
+			tempodelay = td;
+			continue;
+		}
+
+		throw MNGFileException("unexpected node in Stage: " + n->dump());
+	}
+}
+
+FloatAudioBuffer MusicStage::applyStage(FloatAudioBuffer src) {
+	float pan_value = 0.0f, volume_value = 1.0f, delay_value = 0.0f;
+
+	if (pan) {
+		pan_value = evaluateExpression(pan->getExpression());
+	}
+
+	if (volume) {
+		volume_value = evaluateExpression(volume->getExpression());
+	}
+
+	if (delay) {
+		delay_value = evaluateExpression(delay->getExpression());
+	}
+
+	if (tempodelay) {
+		delay_value += 0.0f; // TODO
+	}
+
+	float left_pan = 1.0f - pan_value;
+	float right_pan = 1.0f + pan_value;
+
+	float *data = new float[src.len];
+	for (unsigned int i = 0; i < src.len / 2; i++) {
+		data[i*2] = src.data[i*2] * left_pan * volume_value;
+		data[(i*2)+1] = src.data[(i*2)+1] * right_pan * volume_value;
+	}
+
+	FloatAudioBuffer buffer(data, src.len, src.start_offset + (22050 * 2 * delay_value));
+	return buffer;
+}
+
 MusicEffect::MusicEffect(MNGEffectDecNode *n) {
 	node = n;
 
-	// TODO
+	for (std::list<MNGStageNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
+		shared_ptr<MusicStage> stage(new MusicStage(*i));
+		stages.push_back(stage);
+	}
+}
+
+void MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src) {
+	for (std::vector<shared_ptr<MusicStage> >::iterator i = stages.begin(); i != stages.end(); i++) {
+		FloatAudioBuffer buffer = (*i)->applyStage(src);
+		t->addBuffer(buffer);
+
+		// stagger delays
+		src.start_offset = buffer.start_offset;
+	}
 }
 
 MusicVoice::MusicVoice(MNGFile *p, MNGVoiceNode *n) {
@@ -154,9 +237,15 @@ MusicVoice::MusicVoice(MNGFile *p, MNGVoiceNode *n) {
 			wave = shared_ptr<MusicWave>(new MusicWave(p, e));
 			continue;
 		}
-	}
 
-	// TODO
+		MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n);
+		if (in) {
+			interval = evaluateExpression(in->getExpression());
+			continue;
+		}
+
+		throw MNGFileException("unexpected node in Voice: " + n->dump());
+	}
 }
 
 MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
@@ -203,10 +292,25 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<Mu
 			continue;
 		}
 
-		// TODO: LayerVolume
+		MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n);
+		if (lv) {
+			volume = evaluateExpression(lv->getExpression());
+			continue;
+		}
+
+		MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n);
+		if (ur) {
+			updaterate = evaluateExpression(ur->getExpression());
+			continue;
+		}
+
 		// TODO: variable
-		// TODO: beatsynch
-		// TODO: updaterate
+
+		MNGBeatSynchNode *bs = dynamic_cast<MNGBeatSynchNode *>(n);
+		if (bs) {
+			beatsynch = evaluateExpression(bs->getExpression());
+			continue;
+		}
 
 		MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n);
 		if (in) {
@@ -243,19 +347,27 @@ void MusicAleotoricLayer::update() {
 	FloatAudioBuffer buffer(new float[max_time * 2], max_time * 2, parent_offset);
 	memset(buffer.data, 0, buffer.len * 2);
 	unsigned int offset = 0;
+	float our_volume = volume * parent->getVolume();
 	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
 		if ((*i)->getWave()) {
 			signed short *data = (signed short *)(*i)->getWave()->getData();
 			unsigned int len = (*i)->getWave()->getLength();
 			for (unsigned int j = 0; j < len / 2; j++) {
-				// TODO: mix properly
-				buffer.data[offset + j*2] += (float)data[j];
-				buffer.data[offset + (j*2)+1] += (float)data[j];
+				// TODO: mix properly (panning, etc)
+				buffer.data[offset + j*2] += (float)data[j] * our_volume;
+				buffer.data[offset + (j*2)+1] += (float)data[j] * our_volume;
 			}
 		}
 		offset += 22050 * 2 * (interval + (*i)->getInterval());
+		assert(offset <= max_time * 2);
 	}
-	parent->addBuffer(buffer);
+
+	if (!effect) {
+		parent->addBuffer(buffer);
+	} else {
+		effect->applyEffect(parent, buffer);
+		delete[] buffer.data;
+	}
 
 	// runUpdateBlock();
 
@@ -276,6 +388,10 @@ MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 	node = n;
 	parent = p;
 	current_offset = 0;
+
+	volume = 1.0f;
+	fadein = fadeout = 0.0f;
+	beatlength = 0.0f;
 }
 
 // shared_from_this
@@ -299,25 +415,25 @@ void MusicTrack::init() {
 
 		MNGFadeInNode *fi = dynamic_cast<MNGFadeInNode *>(n);
 		if (fi) {
-			// TODO
+			fadein = evaluateExpression(fi->getExpression());
 			continue;
 		}
 
 		MNGFadeOutNode *fo = dynamic_cast<MNGFadeOutNode *>(n);
 		if (fo) {
-			// TODO
+			fadeout = evaluateExpression(fo->getExpression());
 			continue;
 		}
 
 		MNGBeatLengthNode *bl = dynamic_cast<MNGBeatLengthNode *>(n);
 		if (bl) {
-			// TODO
+			beatlength = evaluateExpression(bl->getExpression());
 			continue;
 		}
 
 		MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n);
 		if (lv) {
-			// TODO
+			volume = evaluateExpression(lv->getExpression());
 			continue;
 		}
 
@@ -343,13 +459,13 @@ void MusicTrack::render(signed short *data, size_t len) {
 	for (int i = 0; i < (int)buffers.size(); i++) {
 		FloatAudioBuffer &buffer = buffers[i];
 		unsigned int j = 0;
+		numbuffers++; // we include queued buffers for now..
 		if (buffer.start_offset > current_offset) {
 			// buffer hasn't started (quite) yet
 			if (buffer.start_offset + len > current_offset)
 				continue;
 			j = (buffer.start_offset - current_offset) * 2;
 		}
-		numbuffers++;
 		for (; j < len && buffer.position < buffer.len; j++) {
 			output[j] += buffer.data[buffer.position];
 			buffer.position++;
@@ -360,9 +476,9 @@ void MusicTrack::render(signed short *data, size_t len) {
 			i--;
 		}
 	}
-	// TODO: apply volume
+	float mul = (1.0f/numbuffers) * 0.8f; // TODO: this is a hack to try and avoid clipping
 	for (unsigned int i = 0; i < len; i++) {
-		output[i] /= numbuffers;
+		output[i] *= mul;
 	}
 	for (unsigned int i = 0; i < len; i++) {
 		data[i] = (signed short)output[i];
