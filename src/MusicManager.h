@@ -148,7 +148,8 @@ class MusicLoopLayer : public MusicLayer {
 protected:
 	MNGLoopLayerNode *node;
 
-	std::pair<char *, int> wave;
+	unsigned int update_period;
+	shared_ptr<MusicWave> wave;
 
 public:
 	MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p);

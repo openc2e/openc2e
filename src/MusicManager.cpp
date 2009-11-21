@@ -565,18 +565,73 @@ void MusicAleotoricLayer::update() {
 
 MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
 	node = n;
+	update_period = 0;
 }
 
 void MusicLoopLayer::init() {
-	// TODO
+	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
+		MNGNode *n = *i;
+
+		MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n);
+		if (e) {
+			wave = shared_ptr<MusicWave>(new MusicWave(parent->getParent(), e));
+			continue;
+		}
+
+		MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n);
+		if (ur) {
+			updaterate = evaluateExpression(ur->getExpression());
+			continue;
+		}
+
+		MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n);
+		if (vd) {
+			std::string name = vd->getName();
+			float value = evaluateExpression(vd->getExpression());
+			variables[name] = value;
+			continue;
+		}
+
+		MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n);
+		if (u) {
+			updatenode = u;
+			continue;
+		}
+
+		throw MNGFileException("unexpected node in LoopLayer: " + n->dump());
+	}
 
 	runUpdateBlock();
 }
 
 void MusicLoopLayer::update() {
-	// TODO
+	if (!wave) return;
 
-	//runUpdateBlock();
+	unsigned int parent_offset = parent->getCurrentOffset();
+
+	// TODO: adjust for buffering
+	if (next_offset > parent_offset) return;
+
+	float our_volume = volume * parent->getVolume();
+	float left_pan = (1.0f - pan) * our_volume;
+	float right_pan = (1.0f + pan) * our_volume;
+
+	unsigned int len = wave->getLength();
+	signed short *data = (signed short *)wave->getData();
+	FloatAudioBuffer buffer(new float[len], len, parent_offset);
+	for (unsigned int j = 0; j < len / 2; j++) {
+		buffer.data[j*2] += (float)data[j] * left_pan;
+		buffer.data[(j*2)+1] += (float)data[j] * right_pan;
+	}
+	parent->addBuffer(buffer);
+
+	next_offset = parent_offset + len;
+
+	update_period += updaterate;
+	if (update_period > 1.0f) {
+		runUpdateBlock();
+		update_period -= 1.0f;
+	}
 }
 
 MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
