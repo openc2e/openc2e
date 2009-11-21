@@ -253,7 +253,7 @@ interval: MNG_Interval '(' expression ')' { $$ = new MNGIntervalNode($3); }
 condition: MNG_Condition '(' variable ',' MNG_number ',' MNG_number ')' { $$ = new MNGConditionNode($3, $5, $7); }
 ;
 
-beatsynch: MNG_BeatSynch '(' expression ')' { $$ = new MNGUpdateRateNode($3); }
+beatsynch: MNG_BeatSynch '(' expression ')' { $$ = new MNGBeatSynchNode($3); }
 ;
 
 updaterate: MNG_UpdateRate '(' expression ')' { $$ = new MNGUpdateRateNode($3); }
