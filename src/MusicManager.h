@@ -76,7 +76,7 @@ protected:
 
 public:
 	MusicStage(MNGStageNode *n);
-	FloatAudioBuffer applyStage(FloatAudioBuffer src);
+	FloatAudioBuffer applyStage(FloatAudioBuffer src, float beatlength);
 };
 
 class MusicEffect {
@@ -86,7 +86,7 @@ protected:
 
 public:
 	MusicEffect(MNGEffectDecNode *n);
-	void applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src);
+	void applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src, float beatlength);
 };
 
 class MusicVoice {

@@ -255,7 +255,7 @@ MusicStage::MusicStage(MNGStageNode *n) {
 	}
 }
 
-FloatAudioBuffer MusicStage::applyStage(FloatAudioBuffer src) {
+FloatAudioBuffer MusicStage::applyStage(FloatAudioBuffer src, float beatlength) {
 	float pan_value = 0.0f, volume_value = 1.0f, delay_value = 0.0f;
 
 	if (pan) {
@@ -271,7 +271,7 @@ FloatAudioBuffer MusicStage::applyStage(FloatAudioBuffer src) {
 	}
 
 	if (tempodelay) {
-		delay_value += 0.0f; // TODO
+		delay_value += evaluateExpression(tempodelay, this) * beatlength;
 	}
 
 	float left_pan = 1.0f - pan_value;
@@ -296,9 +296,9 @@ MusicEffect::MusicEffect(MNGEffectDecNode *n) {
 	}
 }
 
-void MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src) {
+void MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src, float beatlength) {
 	for (std::vector<shared_ptr<MusicStage> >::iterator i = stages.begin(); i != stages.end(); i++) {
-		FloatAudioBuffer buffer = (*i)->applyStage(src);
+		FloatAudioBuffer buffer = (*i)->applyStage(src, beatlength);
 		t->addBuffer(buffer);
 
 		// stagger delays
@@ -508,7 +508,8 @@ void MusicAleotoricLayer::update() {
 
 	unsigned int min_time = 0, max_time = 0;
 	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
-		unsigned int voice_interval = 22050 * 2 * (interval + (*i)->getInterval());
+		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
+		unsigned int voice_interval = 22050 * 2 * our_interval;
 		unsigned int wave_len = 0;
 		if ((*i)->getWave()) wave_len = (*i)->getWave()->getLength();
 
@@ -540,7 +541,8 @@ void MusicAleotoricLayer::update() {
 				buffer.data[offset + (j*2)+1] += (float)data[j] * right_pan;
 			}
 		}
-		offset += 22050 * 2 * (interval + (*i)->getInterval());
+		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
+		offset += 22050 * 2 * our_interval;
 		assert(offset <= max_time * 2);
 
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
@@ -552,7 +554,7 @@ void MusicAleotoricLayer::update() {
 	if (!effect) {
 		parent->addBuffer(buffer);
 	} else {
-		effect->applyEffect(parent, buffer);
+		effect->applyEffect(parent, buffer, parent->getBeatLength());
 		delete[] buffer.data;
 	}
 
