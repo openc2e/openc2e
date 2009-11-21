@@ -127,10 +127,64 @@ float evaluateExpression(MNGExpression *e) {
 	if (r) {
 		float first = evaluateExpression(r->first());
 		float second = evaluateExpression(r->second());
-		return (rand() / RAND_MAX) * (second - first) + first;
+		return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
 	}
 
 	throw MNGFileException("couldn't evaluate expression " + e->dump());
+}
+
+float evaluateExpression(MNGExpression *e, MusicStage *stage) {
+	MNGVariableNode *v = dynamic_cast<MNGVariableNode *>(e);
+	if (v) {
+		switch (v->getType()) {
+			case NAMED:
+			case INTERVAL:
+				throw MNGFileException("expression " + e->dump() + " invalid in Stage");
+
+			case VOLUME:
+			case PAN:
+				throw MNGFileException(e->dump() + "not evaluatable in Stage yet"); // TODO
+		}
+	}
+
+	return evaluateExpression(e);
+}
+
+float evaluateExpression(MNGExpression *e, MusicVoice *voice) {
+	MNGVariableNode *v = dynamic_cast<MNGVariableNode *>(e);
+	if (v) {
+		switch (v->getType()) {
+			case NAMED:
+				return voice->getParent()->getVariable(v->getName());
+				break;
+
+			case PAN:
+				throw MNGFileException("expression " + e->dump() + " invalid in Voice");
+
+			case INTERVAL:
+			case VOLUME:
+				throw MNGFileException(e->dump() + "not evaluatable in Voice yet"); // TODO
+		}
+	}
+
+	return evaluateExpression(e);
+}
+
+float evaluateExpression(MNGExpression *e, MusicLayer *layer) {
+	MNGVariableNode *v = dynamic_cast<MNGVariableNode *>(e);
+	if (v) {
+		switch (v->getType()) {
+			case NAMED:
+				return layer->getVariable(v->getName());
+
+			case INTERVAL:
+			case PAN:
+			case VOLUME:
+				throw MNGFileException(e->dump() + "not evaluatable in Layer yet"); // TODO
+		}
+	}
+
+	return evaluateExpression(e);
 }
 
 MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
@@ -258,12 +312,24 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 			continue;
 		}
 
+		MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n);
+		if (u) {
+			updatenode = u;
+			continue;
+		}
+
 		throw MNGFileException("unexpected node in Voice: " + n->dump());
 	}
 }
 
 bool MusicVoice::shouldPlay() {
-	// TODO: check conditions
+	for (std::vector<MNGConditionNode *>::iterator i = conditions.begin(); i != conditions.end(); i++) {
+		MNGConditionNode *n = *i;
+
+		float value = evaluateExpression(n->getVariable(), this);
+		if (value < n->minimum() || value > n->maximum())
+			return false;
+	}
 	return true;
 }
 
@@ -280,12 +346,65 @@ MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
 	volume = 1.0f;
 	interval = 0.0f;
 	beatsynch = 0.0f;
+	pan = 0.0f;
 
 	next_offset = 0;
+
+	updatenode = NULL;
+
+	// TODO: hack
+	variables["Mood"] = 1.0f;
+	variables["Threat"] = 0.0f;
 }
 
 void MusicLayer::runUpdateBlock() {
-	// TODO
+	if (!updatenode) return;
+
+	for (std::list<MNGAssignmentNode *>::iterator i = updatenode->children->begin(); i != updatenode->children->end(); i++) {
+		MNGAssignmentNode *n = *i;
+
+		float value = evaluateExpression(n->getExpression(), this);
+		MNGVariableNode *var = n->getVariable();
+		switch (var->getType()) {
+			case NAMED:
+				variables[var->getName()] = value;
+				break;
+
+			case INTERVAL:
+				interval = value;
+				break;
+
+			case VOLUME:
+				volume = value;
+				break;
+
+			case PAN:
+				pan = value;
+				break;
+		}
+	}
+}
+
+void MusicVoice::runUpdateBlock() {
+	if (!updatenode) return;
+
+	for (std::list<MNGAssignmentNode *>::iterator i = updatenode->children->begin(); i != updatenode->children->end(); i++) {
+		MNGAssignmentNode *n = *i;
+
+		float value = evaluateExpression(n->getExpression(), this);
+		MNGVariableNode *var = n->getVariable();
+		switch (var->getType()) {
+			case NAMED:
+				parent->getVariable(var->getName()) = value;
+				std::cout << "set " << var->getName() << " to " << value << std::endl;
+				break;
+
+			case INTERVAL:
+			case VOLUME:
+			case PAN:
+				throw MNGFileException("panic");
+		}
+	}
 }
 
 MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
@@ -319,7 +438,7 @@ void MusicAleotoricLayer::init() {
 
 		MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n);
 		if (u) {
-			// TODO
+			updatenode = u;
 			continue;
 		}
 
@@ -335,7 +454,13 @@ void MusicAleotoricLayer::init() {
 			continue;
 		}
 
-		// TODO: variable
+		MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n);
+		if (vd) {
+			std::string name = vd->getName();
+			float value = evaluateExpression(vd->getExpression());
+			variables[name] = value;
+			continue;
+		}
 
 		MNGBeatSynchNode *bs = dynamic_cast<MNGBeatSynchNode *>(n);
 		if (bs) {
@@ -379,18 +504,27 @@ void MusicAleotoricLayer::update() {
 	memset(buffer.data, 0, buffer.len * 2);
 	unsigned int offset = 0;
 	float our_volume = volume * parent->getVolume();
+	// TODO: perhaps we shouldn't be applying pan on top of effects?
+	float left_pan = (1.0f - pan) * our_volume;
+	float right_pan = (1.0f + pan) * our_volume;
 	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
+		if (!(*i)->shouldPlay()) continue;
+
 		if ((*i)->getWave()) {
 			signed short *data = (signed short *)(*i)->getWave()->getData();
 			unsigned int len = (*i)->getWave()->getLength();
 			for (unsigned int j = 0; j < len / 2; j++) {
-				// TODO: mix properly (panning, etc)
-				buffer.data[offset + j*2] += (float)data[j] * our_volume;
-				buffer.data[offset + (j*2)+1] += (float)data[j] * our_volume;
+				buffer.data[offset + j*2] += (float)data[j] * left_pan;
+				buffer.data[offset + (j*2)+1] += (float)data[j] * right_pan;
 			}
 		}
 		offset += 22050 * 2 * (interval + (*i)->getInterval());
 		assert(offset <= max_time * 2);
+
+		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
+		 * GR's source says "These take effect after playback of the voice has begun"
+		 * so I try to run it in the same place that code does, for now */
+		(*i)->runUpdateBlock();
 	}
 
 	if (!effect) {

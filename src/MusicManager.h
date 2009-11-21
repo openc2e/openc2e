@@ -92,6 +92,7 @@ public:
 class MusicVoice {
 protected:
 	MNGVoiceNode *node;
+	MNGUpdateNode *updatenode;
 	shared_ptr<class MusicLayer> parent;
 	shared_ptr<MusicWave> wave;
 
@@ -104,6 +105,8 @@ public:
 	shared_ptr<MusicWave> getWave() { return wave; }
 	float getInterval();
 	bool shouldPlay();
+	void runUpdateBlock();
+	shared_ptr<MusicLayer> getParent() { return parent; }
 };
 
 class MusicLayer : public boost::enable_shared_from_this<class MusicLayer> {
@@ -114,13 +117,14 @@ protected:
 	unsigned int next_offset;
 
 	std::map<std::string, float> variables;
-	float updaterate, volume, interval, beatsynch;
+	float updaterate, volume, interval, beatsynch, pan;
 
 	MusicLayer(shared_ptr<MusicTrack> p);
 	void runUpdateBlock();
 
 public:
 	shared_ptr<MusicTrack> getParent() { return parent; }
+	float &getVariable(std::string name) { return variables[name]; }
 	virtual void update() = 0;
 };
 
