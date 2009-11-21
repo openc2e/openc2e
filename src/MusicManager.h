@@ -44,10 +44,21 @@ public:
 	void tick();
 	void playTrack(std::string track, unsigned int latency);
 
-	size_t render(uint16 *data, size_t len);
+	void render(signed short *data, size_t len);
 };
 
 extern MusicManager musicmanager;
+
+class MusicWave {
+protected:
+	unsigned char *data;
+	unsigned int length;
+
+public:
+	MusicWave(MNGFile *p, MNGWaveNode *w);
+	unsigned char *getData() { return data; }
+	unsigned int getLength() { return length; }
+};
 
 class MusicEffect {
 protected:
@@ -60,9 +71,14 @@ public:
 class MusicVoice {
 protected:
 	MNGVoiceNode *node;
+	shared_ptr<MusicWave> wave;
+
+	float interval;
 
 public:
-	MusicVoice(MNGVoiceNode *n);
+	MusicVoice(MNGFile *p, MNGVoiceNode *n);
+	shared_ptr<MusicWave> getWave() { return wave; }
+	float getInterval() { return interval; }
 };
 
 class MusicLayer {
@@ -70,11 +86,16 @@ protected:
 	MNGUpdateNode *updatenode;
 
 	shared_ptr<MusicTrack> parent;
+	unsigned int next_offset;
 
 	std::map<std::string, float> variables;
 	float updaterate, volume, interval, beatsynch;
 
 	MusicLayer(shared_ptr<MusicTrack> p);
+	void runUpdateBlock();
+
+public:
+	virtual void update() = 0;
 };
 
 class MusicAleotoricLayer : public MusicLayer {
@@ -83,10 +104,10 @@ protected:
 
 	shared_ptr<MusicEffect> effect;
 	std::vector<shared_ptr<MusicVoice> > voices;
-	unsigned int currvoice;
 
 public:
 	MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p);
+	void update();
 };
 
 class MusicLoopLayer : public MusicLayer {
@@ -97,6 +118,15 @@ protected:
 
 public:
 	MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p);
+	void update();
+};
+
+struct FloatAudioBuffer {
+	unsigned int start_offset;
+	size_t len, position;
+	float *data;
+
+	FloatAudioBuffer(float *d, size_t l, unsigned int o) { position = 0; len = l; data = d; start_offset = o; }
 };
 
 class MusicTrack : public boost::enable_shared_from_this<class MusicTrack> {
@@ -108,10 +138,17 @@ protected:
 
 	float fadein, fadeout, beatlength, volume;
 
+	unsigned int current_offset;
+	std::vector<FloatAudioBuffer> buffers;
+
 public:
 	MusicTrack(MNGFile *p, MNGTrackDecNode *n);
 	void init();
 	virtual ~MusicTrack();
+	void render(signed short *data, size_t len);
+	void addBuffer(FloatAudioBuffer buf) { buffers.push_back(buf); }
+	unsigned int getCurrentOffset() { return current_offset; }
+	void update();
 
 	MNGFile *getParent() { return parent; }
 };

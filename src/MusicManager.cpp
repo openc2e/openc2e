@@ -28,13 +28,14 @@ MusicManager musicmanager;
 
 struct MusicStream : public AudioStreamBase {
 	virtual bool isStereo() const { return true; }
-	virtual int sampleRate() const { return 44100; }
+	virtual int sampleRate() const { return 22050; }
 	virtual int latency() const { return 1000; }
 	virtual bool reset() { return true; }
 	virtual int bitDepth() const { return 16; }
 
 	virtual size_t produce(void *data, size_t len) {
-		return musicmanager.render((uint16 *)data, len);
+		musicmanager.render((signed short *)data, len / 2);
+		return len;
 	}
 };
 
@@ -82,6 +83,7 @@ void MusicManager::playTrack(std::string track, unsigned int latency) {
 	}
 
 	shared_ptr<MusicTrack> tracknode(new MusicTrack(file, file->tracks[trackname]));
+	tracknode->init();
 	playTrack(tracknode);
 }
 
@@ -104,8 +106,15 @@ void MusicManager::startPlayback() {
 	}
 }
 
-size_t MusicManager::render(uint16 *data, size_t len) {
-	return len;
+void MusicManager::render(signed short *data, size_t len) {
+	if (!currenttrack) {
+		// silence
+		memset((void *)data, 0, len * 2);
+		return;
+	}
+
+	currenttrack->update();
+	currenttrack->render(data, len);
 }
 
 float evaluateExpression(MNGExpression *e) {
@@ -117,14 +126,35 @@ float evaluateExpression(MNGExpression *e) {
 	throw MNGFileException("couldn't evaluate expression " + e->dump());
 }
 
+MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
+	unsigned int sampleno = n->getSampleNumber();
+	if (sampleno >= p->samples.size())
+		throw MNGFileException("sample not present");
+	// TODO: someday, fix these casts at their source
+	data = (unsigned char *)p->samples[sampleno].first;
+	length = (unsigned int)p->samples[sampleno].second;
+}
+
 MusicEffect::MusicEffect(MNGEffectDecNode *n) {
 	node = n;
 
 	// TODO
 }
 
-MusicVoice::MusicVoice(MNGVoiceNode *n) {
+MusicVoice::MusicVoice(MNGFile *p, MNGVoiceNode *n) {
 	node = n;
+
+	interval = 0.0f;
+
+	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
+		MNGNode *n = *i;
+
+		MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n);
+		if (e) {
+			wave = shared_ptr<MusicWave>(new MusicWave(p, e));
+			continue;
+		}
+	}
 
 	// TODO
 }
@@ -136,11 +166,12 @@ MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
 	volume = 1.0f;
 	interval = 0.0f;
 	beatsynch = 0.0f;
+
+	next_offset = 0;
 }
 
 MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
 	node = n;
-	currvoice = 0;
 
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
@@ -161,7 +192,7 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<Mu
 
 		MNGVoiceNode *v = dynamic_cast<MNGVoiceNode *>(n);
 		if (v) {
-			shared_ptr<MusicVoice> voice(new MusicVoice(v));
+			shared_ptr<MusicVoice> voice(new MusicVoice(parent->getParent(), v));
 			voices.push_back(voice);
 			continue;
 		}
@@ -187,15 +218,64 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<Mu
 	}
 }
 
+void MusicAleotoricLayer::update() {
+	unsigned int parent_offset = parent->getCurrentOffset();
+
+	// TODO: adjust for buffering
+	if (next_offset > parent_offset) return;
+
+	unsigned int min_time = 0, max_time = 0;
+	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
+		unsigned int voice_interval = 22050 * 2 * (interval + (*i)->getInterval());
+		unsigned int wave_len = 0;
+		if ((*i)->getWave()) wave_len = (*i)->getWave()->getLength();
+
+		if (wave_len > voice_interval) {
+			if (max_time < min_time + wave_len)
+				max_time = min_time + wave_len;
+		} else {
+			if (max_time < min_time + voice_interval)
+				max_time = min_time + voice_interval;
+		}
+		min_time += voice_interval;
+	}
+
+	FloatAudioBuffer buffer(new float[max_time * 2], max_time * 2, parent_offset);
+	memset(buffer.data, 0, buffer.len * 2);
+	unsigned int offset = 0;
+	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
+		if ((*i)->getWave()) {
+			signed short *data = (signed short *)(*i)->getWave()->getData();
+			unsigned int len = (*i)->getWave()->getLength();
+			for (unsigned int j = 0; j < len / 2; j++) {
+				// TODO: mix properly
+				buffer.data[offset + j*2] += (float)data[j];
+				buffer.data[offset + (j*2)+1] += (float)data[j];
+			}
+		}
+		offset += 22050 * 2 * (interval + (*i)->getInterval());
+	}
+	parent->addBuffer(buffer);
+
+	// runUpdateBlock();
+
+	next_offset = parent_offset + offset;
+}
+
 MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
 	node = n;
 
 	// TODO
 }
 
+void MusicLoopLayer::update() {
+	// TODO
+}
+
 MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 	node = n;
 	parent = p;
+	current_offset = 0;
 }
 
 // shared_from_this
@@ -246,6 +326,49 @@ void MusicTrack::init() {
 }
 
 MusicTrack::~MusicTrack() {
+}
+
+void MusicTrack::update() {
+	for (std::vector<shared_ptr<MusicLayer> >::iterator i = layers.begin(); i != layers.end(); i++) {
+		(*i)->update();
+	}
+}
+
+void MusicTrack::render(signed short *data, size_t len) {
+	float output[len];
+	for (unsigned int i = 0; i < len; i++) output[i] = 0.0f;
+
+	// mix pending buffers, render
+	unsigned int numbuffers = 0;
+	for (int i = 0; i < (int)buffers.size(); i++) {
+		FloatAudioBuffer &buffer = buffers[i];
+		unsigned int j = 0;
+		if (buffer.start_offset > current_offset) {
+			// buffer hasn't started (quite) yet
+			if (buffer.start_offset + len > current_offset)
+				continue;
+			j = (buffer.start_offset - current_offset) * 2;
+		}
+		numbuffers++;
+		for (; j < len && buffer.position < buffer.len; j++) {
+			output[j] += buffer.data[buffer.position];
+			buffer.position++;
+		}
+		if (buffer.position == buffer.len) {
+			delete[] buffer.data;
+			buffers.erase(buffers.begin() + i);
+			i--;
+		}
+	}
+	// TODO: apply volume
+	for (unsigned int i = 0; i < len; i++) {
+		output[i] /= numbuffers;
+	}
+	for (unsigned int i = 0; i < len; i++) {
+		data[i] = (signed short)output[i];
+	}
+
+	current_offset += len; // measuring offset in terms of samples*2 is horrid!
 }
 
 /* vim: set noet: */
