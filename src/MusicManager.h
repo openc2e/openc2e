@@ -126,6 +126,9 @@ public:
 	shared_ptr<MusicTrack> getParent() { return parent; }
 	float &getVariable(std::string name) { return variables[name]; }
 	virtual void update() = 0;
+	float getVolume() { return volume; }
+	float getInterval() { return interval; }
+	float getPan() { return pan; }
 };
 
 class MusicAleotoricLayer : public MusicLayer {
