@@ -125,7 +125,7 @@ protected:
 public:
 	shared_ptr<MusicTrack> getParent() { return parent; }
 	float &getVariable(std::string name) { return variables[name]; }
-	virtual void update() = 0;
+	virtual void update(unsigned int latency) = 0;
 	float getVolume() { return volume; }
 	float getInterval() { return interval; }
 	float getPan() { return pan; }
@@ -141,7 +141,7 @@ protected:
 public:
 	MusicAleotoricLayer(MNGAleotoricLayerNode *n, shared_ptr<MusicTrack> p);
 	void init();
-	void update();
+	void update(unsigned int latency);
 };
 
 class MusicLoopLayer : public MusicLayer {
@@ -154,7 +154,7 @@ protected:
 public:
 	MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p);
 	void init();
-	void update();
+	void update(unsigned int latency);
 };
 
 class MusicTrack : public boost::enable_shared_from_this<class MusicTrack> {
@@ -176,7 +176,7 @@ public:
 	void render(signed short *data, size_t len);
 	void addBuffer(FloatAudioBuffer buf) { buffers.push_back(buf); }
 	unsigned int getCurrentOffset() { return current_offset; }
-	void update();
+	void update(unsigned int latency);
 	float getVolume() { return volume; }
 	float getBeatLength() { return beatlength; }
 

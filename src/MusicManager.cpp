@@ -115,7 +115,7 @@ void MusicManager::render(signed short *data, size_t len) {
 		return;
 	}
 
-	currenttrack->update();
+	currenttrack->update(len);
 	currenttrack->render(data, len);
 }
 
@@ -339,6 +339,13 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 			continue;
 		}
 
+		MNGEffectNode *eff = dynamic_cast<MNGEffectNode *>(n);
+		if (eff) {
+			// TODO: we don't know how to handle this, GR's player simply doesn't bother
+			std::cout << "Warning: ignoring " << eff->dump() << " in MNG voice." << std::endl;
+			continue;
+		}
+
 		throw MNGFileException("unexpected node in Voice: " + n->dump());
 	}
 }
@@ -500,18 +507,22 @@ void MusicAleotoricLayer::init() {
 	runUpdateBlock();
 }
 
-void MusicAleotoricLayer::update() {
+void MusicAleotoricLayer::update(unsigned int latency) {
 	unsigned int parent_offset = parent->getCurrentOffset();
 
-	// TODO: adjust for buffering
-	if (next_offset > parent_offset) return;
+	if (next_offset > parent_offset + latency) return;
+	unsigned int calc_latency = next_offset - parent_offset;
 
 	unsigned int min_time = 0, max_time = 0;
 	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
+		// the problem is: this can change as we go :( so we hugely overestimate here instead for now.
+		//if (!(*i)->shouldPlay()) continue;
+
 		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
-		unsigned int voice_interval = 22050 * 2 * our_interval;
+		unsigned int voice_interval = 22050 * our_interval;
+		voice_interval *= 2; // TODO: ok, interval can change as we go too. meh. so this is a hack.
 		unsigned int wave_len = 0;
-		if ((*i)->getWave()) wave_len = (*i)->getWave()->getLength();
+		if ((*i)->getWave()) wave_len = (*i)->getWave()->getLength() / 2;
 
 		if (wave_len > voice_interval) {
 			if (max_time < min_time + wave_len)
@@ -523,7 +534,7 @@ void MusicAleotoricLayer::update() {
 		min_time += voice_interval;
 	}
 
-	FloatAudioBuffer buffer(new float[max_time * 2], max_time * 2, parent_offset);
+	FloatAudioBuffer buffer(new float[max_time * 2], max_time * 2, parent_offset + calc_latency);
 	memset(buffer.data, 0, buffer.len * 2);
 	unsigned int offset = 0;
 	float our_volume = volume * parent->getVolume();
@@ -550,6 +561,9 @@ void MusicAleotoricLayer::update() {
 		 * so I try to run it in the same place that code does, for now */
 		(*i)->runUpdateBlock();
 	}
+
+	// TODO: find better solution
+	buffer.len = offset;
 
 	if (!effect) {
 		parent->addBuffer(buffer);
@@ -604,13 +618,13 @@ void MusicLoopLayer::init() {
 	runUpdateBlock();
 }
 
-void MusicLoopLayer::update() {
+void MusicLoopLayer::update(unsigned int latency) {
 	if (!wave) return;
 
 	unsigned int parent_offset = parent->getCurrentOffset();
 
-	// TODO: adjust for buffering
-	if (next_offset > parent_offset) return;
+	if (next_offset > parent_offset + latency) return;
+	unsigned int calc_latency = next_offset - parent_offset;
 
 	float our_volume = volume * parent->getVolume();
 	float left_pan = (1.0f - pan) * our_volume;
@@ -618,7 +632,7 @@ void MusicLoopLayer::update() {
 
 	unsigned int len = wave->getLength();
 	signed short *data = (signed short *)wave->getData();
-	FloatAudioBuffer buffer(new float[len], len, parent_offset);
+	FloatAudioBuffer buffer(new float[len], len, parent_offset + calc_latency);
 	for (unsigned int j = 0; j < len / 2; j++) {
 		buffer.data[j*2] += (float)data[j] * left_pan;
 		buffer.data[(j*2)+1] += (float)data[j] * right_pan;
@@ -696,11 +710,14 @@ void MusicTrack::init() {
 }
 
 MusicTrack::~MusicTrack() {
+	for (int i = 0; i < (int)buffers.size(); i++) {
+		delete[] buffers[i].data;
+	}
 }
 
-void MusicTrack::update() {
+void MusicTrack::update(unsigned int latency) {
 	for (std::vector<shared_ptr<MusicLayer> >::iterator i = layers.begin(); i != layers.end(); i++) {
-		(*i)->update();
+		(*i)->update(latency);
 	}
 }
 
@@ -718,7 +735,7 @@ void MusicTrack::render(signed short *data, size_t len) {
 			// buffer hasn't started (quite) yet
 			if (buffer.start_offset + len > current_offset)
 				continue;
-			j = (buffer.start_offset - current_offset) * 2;
+			j = buffer.start_offset - current_offset;
 		}
 		for (; j < len && buffer.position < buffer.len; j++) {
 			output[j] += buffer.data[buffer.position];
