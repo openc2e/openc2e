@@ -99,12 +99,13 @@ protected:
 	std::vector<MNGConditionNode *> conditions;
 
 	MNGExpression *interval_expression;
-	float interval;
+	float interval, volume;
 
 public:
 	MusicVoice(shared_ptr<class MusicLayer> p, MNGVoiceNode *n);
 	shared_ptr<MusicWave> getWave() { return wave; }
 	float getInterval() { return interval; }
+	float getVolume() { return volume; }
 	bool shouldPlay();
 	void runUpdateBlock();
 	shared_ptr<MusicLayer> getParent() { return parent; }

@@ -312,6 +312,7 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 
 	interval = 0.0f;
 	interval_expression = NULL;
+	volume = 1.0f;
 
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
@@ -428,8 +429,11 @@ void MusicVoice::runUpdateBlock() {
 				break;
 
 			case VOLUME:
+				volume = value;
+				break;
+
 			case PAN:
-				throw MNGFileException("panic"); // TODO?
+				throw MNGFileException("panic: attempt to set Pan inside Voice update"); // TODO?
 		}
 	}
 }
@@ -548,8 +552,8 @@ void MusicAleotoricLayer::update(unsigned int latency) {
 			signed short *data = (signed short *)(*i)->getWave()->getData();
 			unsigned int len = (*i)->getWave()->getLength();
 			for (unsigned int j = 0; j < len / 2; j++) {
-				buffer.data[offset + j*2] += (float)data[j] * left_pan;
-				buffer.data[offset + (j*2)+1] += (float)data[j] * right_pan;
+				buffer.data[offset + j*2] += (float)data[j] * left_pan * (*i)->getVolume();
+				buffer.data[offset + (j*2)+1] += (float)data[j] * right_pan * (*i)->getVolume();
 			}
 		}
 		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
