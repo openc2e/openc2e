@@ -310,7 +310,8 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 	node = n;
 	parent = p;
 
-	interval = NULL;
+	interval = 0.0f;
+	interval_expression = NULL;
 
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
@@ -323,7 +324,7 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 
 		MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n);
 		if (in) {
-			interval = in->getExpression();
+			interval_expression = in->getExpression();
 			continue;
 		}
 
@@ -359,12 +360,6 @@ bool MusicVoice::shouldPlay() {
 			return false;
 	}
 	return true;
-}
-
-float MusicVoice::getInterval() {
-	if (!interval) return 0.0f;
-
-	return evaluateExpression(interval, NULL, this);
 }
 
 MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
@@ -416,6 +411,8 @@ void MusicLayer::runUpdateBlock() {
 void MusicVoice::runUpdateBlock() {
 	if (!updatenode) return;
 
+	if (interval_expression) interval = evaluateExpression(interval_expression, NULL, this);
+
 	for (std::list<MNGAssignmentNode *>::iterator i = updatenode->children->begin(); i != updatenode->children->end(); i++) {
 		MNGAssignmentNode *n = *i;
 
@@ -427,6 +424,9 @@ void MusicVoice::runUpdateBlock() {
 				break;
 
 			case INTERVAL:
+				interval = value;
+				break;
+
 			case VOLUME:
 			case PAN:
 				throw MNGFileException("panic"); // TODO?
