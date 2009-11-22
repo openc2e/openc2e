@@ -343,7 +343,7 @@ void OpenALSource::play() {
 }
 
 bool OpenALSource::poll() {
-	if (!stream || getState() != SS_PLAY)
+	if (!stream)
 		return false;
 	return bufferdata();
 }
@@ -432,6 +432,7 @@ bool OpenALSource::bufferdata() {
 		stop();
 		return false;
 	}
+	if (getState() != SS_PLAY) alSourcePlay(source); // make sure we kick-start a drained stream
 	return true;
 }
 
@@ -443,6 +444,7 @@ void OpenALSource::stop() {
 	if (stream) {
 		streambuffers.clear();
 		unusedbuffers.clear();
+		backend()->stopPolling(this);
 	}
 }
 
