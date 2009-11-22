@@ -810,7 +810,7 @@ void QtOpenc2e::newNorn() {
 
 	// if you make this work for c2e, you should probably set sane attributes here?
 
-	a->slots[0] = genome;
+	a->genome_slots[0] = genome;
 	world.newMoniker(genome, genomefile, a);
 	world.history.getMoniker(world.history.findMoniker(genome)).moveToCreature(a);
 

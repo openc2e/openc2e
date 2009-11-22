@@ -88,7 +88,7 @@ void caosVM::c_GENE_LOAD() {
 	
 	caos_assert(p->getVersion() == 3);
 
-	agent->slots[slot] = p;
+	agent->genome_slots[slot] = p;
 	world.newMoniker(p, genefile, agent);
 }
 
@@ -104,14 +104,14 @@ void caosVM::c_GENE_MOVE() {
 	VM_PARAM_INTEGER(dest_slot)
 	VM_PARAM_VALIDAGENT(dest_agent)
 
-	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = src_agent->slots.find(src_slot);
-	caos_assert(i != src_agent->slots.end());
+	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = src_agent->genome_slots.find(src_slot);
+	caos_assert(i != src_agent->genome_slots.end());
 
 	std::string moniker = world.history.findMoniker(i->second);
 	assert(moniker != std::string("")); // internal consistency, i think..
 
-	dest_agent->slots[dest_slot] = src_agent->slots[src_slot];
-	src_agent->slots.erase(i);
+	dest_agent->genome_slots[dest_slot] = src_agent->genome_slots[src_slot];
+	src_agent->genome_slots.erase(i);
 	world.history.getMoniker(moniker).moveToAgent(dest_agent);
 }
 
@@ -125,10 +125,10 @@ void caosVM::v_GTOS() {
 	VM_PARAM_INTEGER(slot)
 
 	valid_agent(targ);
-	if (targ->slots.find(slot) == targ->slots.end()) {
+	if (targ->genome_slots.find(slot) == targ->genome_slots.end()) {
 		result.setString(""); // CV needs this, at least
 	} else {
-		shared_ptr<class genomeFile> g = targ->slots[slot];
+		shared_ptr<class genomeFile> g = targ->genome_slots[slot];
 		result.setString(world.history.findMoniker(g));
 	}
 }

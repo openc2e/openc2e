@@ -37,7 +37,7 @@ void CreatureAgent::setCreature(Creature *c) {
 	assert(c);
 	creature = c;
 
-	getAgent()->slots[0] = creature->getGenome();
+	getAgent()->genome_slots[0] = creature->getGenome();
 
 	unsigned short species = (creature->isFemale() ? 2 : 1);
 	// category needs to be set, so call setClassifier now
