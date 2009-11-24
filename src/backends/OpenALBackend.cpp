@@ -524,7 +524,7 @@ void OpenALSource::setMute(bool m) {
 }
 
 void OpenALBackend::poll() {
-	typeof(pollingSrcs.begin()) it, next;
+	std::map<OpenALSource *, boost::weak_ptr<AudioSource> >::iterator it, next;
 	it = pollingSrcs.begin();
 
 	for (; it != pollingSrcs.end(); it = next) {
