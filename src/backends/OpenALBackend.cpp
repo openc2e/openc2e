@@ -426,7 +426,7 @@ bool OpenALSource::bufferdata() {
 			}
 		}
 	}
-	alSourceQueueBuffers(source, newbuffers.size(), &newbuffers[0]);
+	if (newbuffers.size()) alSourceQueueBuffers(source, newbuffers.size(), &newbuffers[0]);
 
 	if (streambuffers.empty() && drain) {
 		stop();
