@@ -728,7 +728,7 @@ void MusicTrack::update(unsigned int latency) {
 }
 
 void MusicTrack::render(signed short *data, size_t len) {
-	float output[len];
+	float *output = (float *)alloca(len * sizeof(float));
 	for (unsigned int i = 0; i < len; i++) output[i] = 0.0f;
 
 	// mix pending buffers, render
