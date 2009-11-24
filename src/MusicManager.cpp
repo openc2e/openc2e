@@ -314,6 +314,8 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 	interval_expression = NULL;
 	volume = 1.0f;
 
+	updatenode = NULL;
+
 	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
 		MNGNode *n = *i;
 
