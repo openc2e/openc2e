@@ -346,14 +346,13 @@ struct SineStream : AudioStreamBase {
 	virtual size_t produce(void *data, size_t len) {
 		int sampleCount = len / (stereo ? 4 : 2);
 		int p = 0;
-		double pi = atan(1)*4;
 		unsigned short *buf = (unsigned short *)data;
 
 		for (int i = 0; i < sampleCount; i++) {
 			phase += (1/period);
 			if (phase > 1)
 				phase = phase - 1;
-			double wave = sin( phase * pi * 2) * amplitude;
+			double wave = sin( phase * M_PI * 2) * amplitude;
 			buf[p++] = (signed short)wave;
 			if (stereo)
 				buf[p++] = (signed short)wave;
