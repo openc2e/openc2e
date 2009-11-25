@@ -184,7 +184,7 @@ AudioClip OpenALBackend::loadClip(const std::string &filename) {
 	alGetError();
 	ALuint buf = alutCreateBufferFromFile(fname.c_str());
 	if (!buf) {
-		ALenum err = alGetError();
+		ALenum err = alutGetError();
 		throw creaturesException(boost::str(
 					boost::format("Failed to load %s: %s") % fname % alutGetErrorString(err)
 					));
