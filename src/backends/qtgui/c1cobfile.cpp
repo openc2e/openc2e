@@ -59,7 +59,9 @@ c1cobfile::c1cobfile(std::ifstream &s) {
 	imagewidth = read32(s);
 	imageheight = read32(s);
 	uint16 secondimagewidth = read16(s);
-	assert(imagewidth == secondimagewidth);
+	if (imagewidth != secondimagewidth && secondimagewidth) // ABK- Egg Gender.cob has it zeroed
+		std::cout << "ignoring COB secondimage width " << (int)secondimagewidth <<
+			", using width " << imagewidth << std::endl;
 	imagedata.reset(new char[imagewidth * imageheight]);
 	s.read(imagedata.get(), imagewidth * imageheight);
 	name = readpascalstring(s);
