@@ -20,19 +20,24 @@
 #ifndef __CREATURE_H
 #define __CREATURE_H
 
-#include "Agent.h"
+#include "AgentRef.h"
 #include "genome.h"
 
 #include <deque>
 
+class Agent;
 class CreatureAgent;
 class Creature;
+
+namespace boost {
+	template <typename T> class shared_ptr;
+}
 
 class Creature {
 protected:
 	CreatureAgent *parent;
 	Agent *parentagent;
-	shared_ptr<genomeFile> genome;
+	boost::shared_ptr<genomeFile> genome;
 	
 	// non-specific bits
 	unsigned short genus;
@@ -67,7 +72,7 @@ protected:
 	virtual void processGenes();
 	virtual void addGene(gene *);
 	
-	Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	Creature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 	void finishInit();
 
 public:
@@ -86,7 +91,7 @@ public:
 	void setZombie(bool z) { zombie = z; }
 	bool isZombie() { return zombie; }
 	unsigned int getAge() { return age; }
-	shared_ptr<genomeFile> getGenome() { return genome; }
+	boost::shared_ptr<genomeFile> getGenome() { return genome; }
 
 	unsigned short getGenus() { return genus; }
 	unsigned int getVariant() { return variant; }
@@ -133,7 +138,7 @@ protected:
 	void tickBrain();
 	virtual void tickBiochemistry();
 
-	oldCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	oldCreature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void processGenes();
 
@@ -181,7 +186,7 @@ struct c1Emitter {
 
 class c1Creature : public oldCreature {
 protected:
-	std::vector<shared_ptr<c1Reaction> > reactions;
+	std::vector<boost::shared_ptr<c1Reaction> > reactions;
 	std::vector<c1Receptor> receptors;
 	std::vector<c1Emitter> emitters;
 	
@@ -197,7 +202,7 @@ protected:
 	void processReceptor(c1Receptor &);
 	
 public:
-	c1Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	c1Creature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void tick();
 
@@ -238,7 +243,7 @@ protected:
 	class c2Creature *parent;
 	organGene *ourGene;
 
-	std::vector<shared_ptr<c2Reaction> > reactions;
+	std::vector<boost::shared_ptr<c2Reaction> > reactions;
 	std::vector<c2Receptor> receptors;
 	std::vector<c2Emitter> emitters;
 
@@ -287,7 +292,7 @@ public:
 class c2Creature : public oldCreature {
 protected:
 	// biochemistry
-	std::vector<shared_ptr<c2Organ> > organs;
+	std::vector<boost::shared_ptr<c2Organ> > organs;
 
 	// loci
 	unsigned char senses[14];
@@ -300,7 +305,7 @@ protected:
 	void processGenes();
 
 public:
-	c2Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	c2Creature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void tick();
 	
@@ -327,7 +332,7 @@ struct c2eReceptor {
 	float *locus;
 	unsigned int *receptors;
 	float nominal, threshold, gain;
-	void init(bioReceptorGene *, class c2eOrgan *, shared_ptr<c2eReaction>);
+	void init(bioReceptorGene *, class c2eOrgan *, boost::shared_ptr<c2eReaction>);
 };
 
 struct c2eEmitter {
@@ -346,7 +351,7 @@ protected:
 	class c2eCreature *parent;	
 	organGene *ourGene;
 
-	std::vector<shared_ptr<c2eReaction> > reactions;
+	std::vector<boost::shared_ptr<c2eReaction> > reactions;
 	std::vector<c2eReceptor> receptors;
 	std::vector<c2eEmitter> emitters;
 
@@ -409,7 +414,7 @@ protected:
 	std::vector<unsigned int> mappinginfo;
 	
 	// biochemistry
-	std::vector<shared_ptr<c2eOrgan> > organs;
+	std::vector<boost::shared_ptr<c2eOrgan> > organs;
 	float chemicals[256];
 
 	// loci
@@ -437,7 +442,7 @@ protected:
 	AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles);
 
 public:
-	c2eCreature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	c2eCreature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void tick();
 
@@ -452,7 +457,7 @@ public:
 	void handleStimulus(unsigned int id, float strength);
 
 	unsigned int noOrgans() { return organs.size(); }
-	shared_ptr<c2eOrgan> getOrgan(unsigned int i) { assert(i < organs.size()); return organs[i]; }
+	boost::shared_ptr<c2eOrgan> getOrgan(unsigned int i) { assert(i < organs.size()); return organs[i]; }
 	
 	class c2eBrain *getBrain() { return brain; }
 

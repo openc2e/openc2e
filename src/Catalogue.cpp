@@ -171,12 +171,9 @@ const std::string Catalogue::getAgentName(unsigned char family, unsigned char ge
 std::string Catalogue::calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const {
 	std::string searchstring = tag + " " + stringFromInt(family) + " " + stringFromInt(genus) + " " + stringFromInt(species);
 	if (hasTag(searchstring)) return searchstring;
-	searchstring = tag + " " + stringFromInt(family) + " " + stringFromInt(genus) + " 0";
-	if (hasTag(searchstring)) return searchstring;
-	searchstring = tag + " " + stringFromInt(family) + " 0 0";
-	if (hasTag(searchstring)) return searchstring;
-	searchstring = tag + " 0 0 0";
-	if (hasTag(searchstring)) return searchstring;
+	if (species != 0) return calculateWildcardTag (tag, family, genus, 0);
+	if (genus != 0) return calculateWildcardTag (tag, family, 0, 0);
+	if (family != 0) return calculateWildcardTag (tag, 0, 0, 0);
 	return "";
 }
 

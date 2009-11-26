@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <iostream> // for stupid copy constructor debug below
 
 class script;
 
@@ -42,7 +43,7 @@ public:
 	virtual std::string prettyPrint() const { return std::string(what()); }
 	creaturesException(const creaturesException &e) throw() : std::exception() {
 		// catch clause missing & etc, we'll try to patch over it but you should fix it really.
-		fprintf(stderr, "QA: creaturesException copy constructor called.\n");
+		std::cerr << "QA: creaturesException copy constructor called." << std::endl;
 		r = strdup(e.r);
 		malloced = true;
 	}

@@ -48,7 +48,7 @@ enum linetype { NORMAL, HORIZONTAL, VERTICAL };
 
 class Line {
 	protected:
-		FRIEND_SERIALIZE(Line);
+		FRIEND_SERIALIZE(Line)
 		Point start, end;
 		double x_icept, y_icept, slope;
 		linetype type;

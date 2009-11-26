@@ -83,6 +83,14 @@ public:
 	virtual void setVolume(float v);
 	virtual void setMute(bool);
 	virtual void setFollowingView(bool);
+
+	virtual AudioStream getStream() const {
+		// STUB
+		return AudioStream();
+	}
+	virtual void setStream(const AudioStream &) {
+		// STUB
+	}
 };
 
 class SDLMixerBackend : public AudioBackend {
@@ -99,6 +107,11 @@ public:
 	bool isMuted() const { return muted; }
 	boost::shared_ptr<AudioSource> newSource();
 	AudioClip loadClip(const std::string &);
+
+	boost::shared_ptr<AudioSource> getBGMSource() {
+		// STUB
+		return boost::shared_ptr<AudioSource>();
+	}
 };
 
 #endif

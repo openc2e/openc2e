@@ -123,7 +123,8 @@ void caosVM::c_PRT_IZAP() {
 		PortConnectionList &dests = src->outports[targ->inports[id]->sourceid]->dests;
 		PortConnectionList::iterator i = dests.begin();
 		while (i != dests.end()) {
-			if (i->first == targ && i->second == id) {
+			if (id < 0) throw caosException ("Comparison of signed negative integer to unsigned integer");
+			if (i->first == targ && i->second == (unsigned)id) {
 				dests.erase(i);
 				break;
 			}

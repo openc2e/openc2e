@@ -152,7 +152,7 @@ struct caosOp {
 		traceindex = ti;
 	}
 private:
-	FRIEND_SERIALIZE(caosOp);
+	FRIEND_SERIALIZE(caosOp)
 	caosOp() { }
 };
 

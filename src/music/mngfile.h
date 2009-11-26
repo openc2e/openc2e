@@ -288,6 +288,7 @@ public:
 	virtual ~MNGVariableDecNode() { delete value; }
 	std::string dump() { return std::string("Variable(") + name + ", " + value->dump() + ")"; }
 	virtual void postProcess(processState *s) { s->layer->variables[name] = this; }
+	MNGExpression *getExpression() { return value; }
 };
 
 enum variabletypes { NAMED, INTERVAL, VOLUME, PAN };
@@ -349,6 +350,8 @@ public:
 		
 		return "MNGVariableNodeIsConfused"; // TODO: exception? :P
 	}
+	variabletypes getType() { return variabletype; }
+	std::string getName() { return name; }
 };
 
 class MNGAssignmentNode : public MNGNode { // assignment
@@ -361,6 +364,8 @@ public:
 	std::string dump() { return variable->dump() + " = " + expression->dump(); }
 	virtual ~MNGAssignmentNode() { delete variable; delete expression; }
 	virtual void postProcess(processState *s) { variable->postProcess(s); expression->postProcess(s); }
+	MNGVariableNode *getVariable() { return variable; }
+	MNGExpression *getExpression() { return expression; }
 };
 
 inline std::string dumpAssignmentChildren(std::list<MNGAssignmentNode *> *c) {
@@ -379,6 +384,9 @@ public:
 	std::string dump() { return "Condition(" + variable->dump() + ", " + MNGConstantNode(one).dump() + ", " + MNGConstantNode(two).dump() + ")"; } // hacky..
 	virtual void postProcess(processState *s) { variable->postProcess(s); }
 	virtual ~MNGConditionNode() { delete variable; }
+	float minimum() { return one; }
+	float maximum() { return two; }
+	MNGVariableNode *getVariable() { return variable; }
 };
 
 class MNGUpdateNode : public MNGNode { // update

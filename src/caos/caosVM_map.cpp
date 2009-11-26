@@ -846,70 +846,70 @@ void caosVM::v_WIND() {
  %status maybe
  %pragma variants c1 c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(TEMP, r->temp);
+CAOS_LVALUE_ROOM_SIMPLE(TEMP, r->temp)
 
 /**
  LITE (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(LITE, r->lite);
+CAOS_LVALUE_ROOM_SIMPLE(LITE, r->lite)
 
 /**
  RADN (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(RADN, r->radn);
+CAOS_LVALUE_ROOM_SIMPLE(RADN, r->radn)
 
 /**
  ONTR (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(ONTR, r->ontr);
+CAOS_LVALUE_ROOM_SIMPLE(ONTR, r->ontr)
 
 /**
  INTR (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(INTR, r->intr);
+CAOS_LVALUE_ROOM_SIMPLE(INTR, r->intr)
 
 /**
  PRES (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(PRES, r->pres);
+CAOS_LVALUE_ROOM_SIMPLE(PRES, r->pres)
 
 /**
  HSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(HSRC, r->hsrc);
+CAOS_LVALUE_ROOM_SIMPLE(HSRC, r->hsrc)
 
 /**
  LSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(LSRC, r->lsrc);
+CAOS_LVALUE_ROOM_SIMPLE(LSRC, r->lsrc)
 
 /**
  RSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(RSRC, r->rsrc);
+CAOS_LVALUE_ROOM_SIMPLE(RSRC, r->rsrc)
 
 /**
  PSRC (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_ROOM_SIMPLE(PSRC, r->psrc);
+CAOS_LVALUE_ROOM_SIMPLE(PSRC, r->psrc)
 
 /**
  WNDX (integer)
@@ -1275,5 +1275,81 @@ void caosVM::c_SSFC() {
 		r->floorpoints.push_back(std::pair<unsigned int, unsigned int>(x, y));
 	}
 }
+/**
+ RMNO (integer)
+ %status stub
+ %pragma variants c2
+*/ 
+void caosVM::v_RMNO() {
+	result.setInt(0); // TODO
+}
 
+/**
+ RMN# (integer) room (integer) direction (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_RMN() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+
+	result.setInt(0); // TODO
+}
+
+/**
+ RMNR (variable) room (integer) direction (integer) door (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_RMNR() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	result.setInt(0); // TODO
+}
+void caosVM::s_RMNR() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	VM_PARAM_INTEGER(newvalue)
+
+	// TODO
+}
+
+/**
+ RMND (variable) room (integer) direction (integer) door (integer)
+ %status stub
+ %pragma variants c2
+*/
+void caosVM::v_RMND() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	result.setInt(0); // TODO
+}
+void caosVM::s_RMND() {
+	VM_PARAM_INTEGER(door)
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	VM_PARAM_INTEGER(newvalue)
+
+	// TODO
+}
+/**
+ DELN (command) room (integer) direction (integer)
+ %status stub
+ %pragma variants c2
+ %pragma implementation caosVM::c_DELN_c2
+*/
+void caosVM::c_DELN_c2() {
+	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER(room)
+
+	// TODO
+}
+	
 /* vim: set noet: */

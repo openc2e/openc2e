@@ -26,6 +26,8 @@
 #include <alc.h>
 #include <string>
 #include <map>
+#include <list>
+#include <vector>
 
 class OpenALBuffer;
 
@@ -39,15 +41,22 @@ class OpenALBuffer : public SkeletonAudioBuffer {
 	friend void boost::intrusive_ptr_release(OpenALBuffer *p);
 
 protected:
-	boost::shared_ptr<class OpenALBackend> backend;
+	typedef std::list<OpenALBuffer *> BufferList;
+
+	BufferList::iterator blit;
+
+	boost::weak_ptr<class OpenALBackend> backend;
 	OpenALBuffer(boost::shared_ptr<class OpenALBackend>, ALuint);
 	friend class OpenALBackend;
 	friend class OpenALSource;
 
 	ALuint buffer;
 
+	void destroy();
+	void checkLife() const;
+
 public:
-	~OpenALBuffer() { alDeleteBuffers(1, &buffer); }
+	~OpenALBuffer();
 	virtual unsigned int length_ms() const; /* milliseconds */
 	virtual unsigned int length_samples() const;
 };
@@ -60,23 +69,58 @@ namespace boost {
 	static inline void intrusive_ptr_release(OpenALBuffer *p) {
 		p->del_ref();
 	}
+}
+
+typedef boost::shared_ptr<class OpenALStreamBuf> OpenALStreamBufP;
+class OpenALStreamBuf {
+	ALuint bufferID, format;
+	int freq, bitDepth, approx_ms;
+	bool stereo;
+	OpenALStreamBuf(int freq, int bitDepth, bool stereo);
+
+	int approxLen() const { return approx_ms; }
+	friend class OpenALSource;
+public:
+	~OpenALStreamBuf();
+
+	void writeAudioData(const void *data, size_t len);
 };
 
 class OpenALSource : public SkeletonAudioSource {
 protected:
-	boost::shared_ptr<class OpenALBackend> backend;
+	typedef std::list<OpenALSource *> SourceList;
+
+	SourceList::iterator slit;
+
+	boost::weak_ptr<class OpenALBackend> backend_weak;
+	boost::shared_ptr<class OpenALBackend> backend() const;
 	OpenALSource(boost::shared_ptr<class OpenALBackend>);
 	friend class OpenALBackend;
 
 	OpenALClip clip;
+	AudioStream stream;
 	ALuint source;
 
+	bool poll();
+	bool bufferdata();
+
+	std::list<OpenALStreamBufP> streambuffers;
+	std::vector<OpenALStreamBufP> unusedbuffers;
+	int buf_est_ms;
+	bool drain;
+	void realSetPos(float x, float y, float plane);
+
+	void forceCleanup();
 public:
-	~OpenALSource() { stop(); alDeleteSources(1, &source); }
+	~OpenALSource() { forceCleanup(); stop(); alDeleteSources(1, &source); }
 
 	virtual AudioClip getClip() const;
 	virtual void setClip(const AudioClip &); /* Valid only in STOP state */
 	virtual SourceState getState() const;
+
+	AudioStream getStream() const;
+	void setStream(const AudioStream &);
+
 	virtual void play(); /* requires that getClip() not be a null ref */
 	virtual void stop();
 	virtual void pause();
@@ -97,11 +141,22 @@ protected:
 	ALfloat ListenerPos[3];
 	bool muted;
 
-	std::map<OpenALSource *, boost::shared_ptr<AudioSource> > followingSrcs;
+	// these are weak to avoid a reference loop
+	std::map<OpenALSource *, boost::weak_ptr<AudioSource> > followingSrcs;
+	std::map<OpenALSource *, boost::weak_ptr<AudioSource> > pollingSrcs;
 	friend class OpenALSource;
+	friend class OpenALBuffer;
+
+	OpenALSource::SourceList activeSources;
+	OpenALBuffer::BufferList activeBuffers;
 
 	ALCdevice *device;
 	ALCcontext *context;
+
+	void startPolling(OpenALSource *);
+	void stopPolling(OpenALSource *);
+
+	boost::shared_ptr<AudioSource> bgmSource;
 
 public:
 	boost::shared_ptr<OpenALBackend> shared_from_this() {
@@ -120,10 +175,12 @@ public:
 	bool isMuted() const { return muted; }
 
 	boost::shared_ptr<AudioSource> newSource();
+	boost::shared_ptr<AudioSource> getBGMSource();
 	AudioClip loadClip(const std::string &filename);
 
 	void begin();
 	void commit();
+	void poll();
 };
 
 #endif

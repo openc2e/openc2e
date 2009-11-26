@@ -1095,8 +1095,8 @@ void caosVM::c_NEWC() {
 
 	// TODO: creation should be blocking and multiple-tick!
 
-	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
-	caos_assert(i != gene_agent->slots.end());
+	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->genome_slots.find(gene_slot);
+	caos_assert(i != gene_agent->genome_slots.end());
 
 	// randomise sex if necessary
 	if (sex == 0) sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
@@ -1178,7 +1178,7 @@ void caosVM::c_NEW_CREA_c1() {
 	a->setCreature(c);
 	a->finishInit();
 
-	a->slots[0] = genome;
+	a->genome_slots[0] = genome;
 	world.newMoniker(genome, realmoniker, a);
 	world.history.getMoniker(world.history.findMoniker(genome)).moveToCreature(a);
 
@@ -1201,8 +1201,8 @@ void caosVM::c_NEW_CRAG() {
 	VM_PARAM_VALIDAGENT(gene_agent)
 	VM_PARAM_INTEGER(family)
 
-       	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->slots.find(gene_slot);
-	caos_assert(i != gene_agent->slots.end());
+       	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = gene_agent->genome_slots.find(gene_slot);
+	caos_assert(i != gene_agent->genome_slots.end());
 
 	// randomise sex if necessary
 	if (sex == 0) sex = 1 + (int) (2.0 * (rand() / (RAND_MAX + 1.0)));
@@ -1587,7 +1587,7 @@ void caosVM::c_AIM() {
  %status maybe
  %pragma variants c1 c2
 */
-CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker); // TODO
+CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker) // TODO
 
 /**
  SNEZ (command)

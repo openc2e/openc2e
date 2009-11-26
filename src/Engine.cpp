@@ -172,7 +172,7 @@ std::string Engine::executeNetwork(std::string in) {
 }
 
 bool Engine::needsUpdate() {
-	return (!world.paused) && (fastticks || (backend->ticks() > (tickdata + world.ticktime)));
+	return (!world.paused) && (fastticks || !backend->ticks() || (backend->ticks() > (tickdata + world.ticktime)));
 }
 
 unsigned int Engine::msUntilTick() {
@@ -183,12 +183,7 @@ unsigned int Engine::msUntilTick() {
 	return (ival < 0) ? 0 : ival;
 }
 
-void Engine::update() {
-	tickdata = backend->ticks();
-	
-	// tick the world
-	world.tick();
-
+void Engine::drawWorld() {
 	// draw the world
 	if (dorendering || refreshdisplay) {
 		refreshdisplay = false;	
@@ -200,6 +195,16 @@ void Engine::update() {
 			world.drawWorld();
 		}
 	}
+}
+
+void Engine::update() {
+	tickdata = backend->ticks();
+	
+	// tick the world
+	world.tick();
+
+	// poll audio streams
+	audio->poll();
 
 	// play C1 music
 	// TODO: this doesn't seem to actually be every 7 seconds, but actually somewhat random
@@ -232,6 +237,7 @@ bool Engine::tick() {
 	bool needupdate = needsUpdate();
 	if (needupdate)
 		update();
+	drawWorld();
 
 	processEvents();
 	if (needupdate)
@@ -766,7 +772,7 @@ bool Engine::initialSetup() {
 
 		if (engine.version < 3 && cmdline_bootstrap.size() != 1)
 			throw creaturesException("multiple bootstrap files provided in C1/C2 mode");
-
+		
 		for (std::vector< std::string >::iterator bsi = cmdline_bootstrap.begin(); bsi != cmdline_bootstrap.end(); bsi++) {
 			fs::path scriptdir(*bsi, fs::native);
 			if (engine.version > 2 || fs::extension(scriptdir) == ".cos") {

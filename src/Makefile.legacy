@@ -137,11 +137,11 @@ cataloglexer.cpp: cataloglexer.re2c
 caoslexer.cpp: caoslexer.re2c
 	re2c -o caoslexer.cpp caoslexer.re2c
 
-mnglexer.cpp: mnglexer.re2c
-	re2c -o mnglexer.cpp mnglexer.re2c
+mnglexer.cpp: music/mnglexer.re2c
+	re2c -o mnglexer.cpp music/mnglexer.re2c
 
-mngparser.tab.cpp mngparser.tab.hpp: mngparser.ypp
-	bison -d --name-prefix=mng mngparser.ypp
+mngparser.tab.cpp mngparser.tab.hpp: music/mngparser.ypp
+	bison -d --name-prefix=mng music/mngparser.ypp
 
 catalogue.tab.cpp catalogue.tab.hpp: catalogue.ypp
 	bison -d --name-prefix=cata catalogue.ypp

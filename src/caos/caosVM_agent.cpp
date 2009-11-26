@@ -517,7 +517,7 @@ void caosVM::v_FROM() {
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
  	// Returns a variable because DS is insane and uses this for network events too (and so, of course, scripts abuse it).
-CAOS_LVALUE_SIMPLE(FROM_ds, from);
+CAOS_LVALUE_SIMPLE(FROM_ds, from)
 
 /**
  POSE (integer)
@@ -1228,7 +1228,7 @@ void caosVM::v_RNGE() {
 
  Returns the TARG agent's range.
 */
-CAOS_LVALUE_TARG_SIMPLE(RNGE_c2, targ->range);
+CAOS_LVALUE_TARG_SIMPLE(RNGE_c2, targ->range)
 
 /**
  TRAN (integer) x (integer) y (integer)
@@ -1703,14 +1703,14 @@ void caosVM::v_TWIN() {
  %status maybe
  %pragma variants c1 c2
 */
-CAOS_LVALUE_TARG_SIMPLE(ACTV, targ->actv);
+CAOS_LVALUE_TARG_SIMPLE(ACTV, targ->actv)
 
 /**
  THRT (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_TARG_SIMPLE(THRT, targ->thrt);
+CAOS_LVALUE_TARG_SIMPLE(THRT, targ->thrt)
 
 /**
  SIZE (variable)
@@ -1718,7 +1718,7 @@ CAOS_LVALUE_TARG_SIMPLE(THRT, targ->thrt);
  %pragma variants c2
 */
 	// TODO: stub because this likely == perm
-CAOS_LVALUE_TARG_SIMPLE(SIZE, targ->size);
+CAOS_LVALUE_TARG_SIMPLE(SIZE, targ->size)
 
 /**
  GRAV (variable)
@@ -1904,7 +1904,7 @@ void caosVM::v_LIMB_c1() {
  %pragma variants c1 c2
 */
 	// TODO: c1 scripts seem to depend on this being from OWNR, but is that always the case?
-CAOS_LVALUE_WITH_SIMPLE(OBJP, owner, owner->objp);
+CAOS_LVALUE_WITH_SIMPLE(OBJP, owner, owner->objp)
 
 /**
  XIST (integer) agent (agent)

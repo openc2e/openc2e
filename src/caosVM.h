@@ -299,6 +299,13 @@ public:
 	void v_WRAP();
 	void s_WRAP();
 	void c_SSFC();
+	void v_RMNO();
+	void v_RMN();
+	void v_RMNR();
+	void s_RMNR();
+	void v_RMND();
+	void s_RMND();
+	void c_DELN_c2();
 	
 	// camera
 	void v_VISI();
@@ -879,6 +886,8 @@ public:
 	void c_VOIS();
 	void c_MIDI();
 	void c_PLDS();
+	void c_DBG_SINE();
+	void c_DBG_SBGM();
 
 	// time
 	void v_PACE();

@@ -20,18 +20,20 @@
 #ifndef __AGENT_H
 #define __AGENT_H
 
-#include "caosVar.h"
 #include "AgentRef.h"
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
+#include "caosVar.h"
 #include "CompoundPart.h"
-#include "Port.h"
-#include <set>
 #include <list>
 #include <map>
-#include <boost/enable_shared_from_this.hpp>
 #include "openc2e.h"
+#include "Port.h"
 #include "physics.h"
+#include <set>
 
 class script;
+class genomeFile;
 
 struct agentzorder {
 	bool operator()(const class Agent *s1, const class Agent *s2) const;
@@ -52,7 +54,7 @@ class Agent : public boost::enable_shared_from_this<Agent> {
 	friend class CreatureAgent;
 	friend class QtOpenc2e; // i despise c++ - fuzzie
 
-	FRIEND_SERIALIZE(Agent);
+	FRIEND_SERIALIZE(Agent)
 	
 protected:
 	bool initialized;
@@ -65,7 +67,11 @@ protected:
 
 	caosVar var[100]; // OVxx
 	std::map<caosVar, caosVar, caosVarCompare> name_variables;
-	std::map<unsigned int, shared_ptr<class genomeFile> > slots;
+	
+	int unused_cint;
+	
+	std::map<unsigned int, boost::shared_ptr<genomeFile> > genome_slots;
+	
 	class caosVM *vm;
 
 	void zotstack();
@@ -261,7 +267,7 @@ public:
 
 	void playAudio(std::string filename, bool controlled, bool loop);
 
-	shared_ptr<class genomeFile> getSlot(unsigned int s) { return slots[s]; }
+	boost::shared_ptr<genomeFile> getSlot(unsigned int s) { return genome_slots[s]; }
 };
 
 class LifeAssert {

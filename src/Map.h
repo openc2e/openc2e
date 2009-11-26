@@ -29,7 +29,7 @@ class MetaRoom;
 
 class Map {
 protected:
-	FRIEND_SERIALIZE(Map);
+	FRIEND_SERIALIZE(Map)
 	unsigned int width, height;
 	std::vector<MetaRoom *> metarooms;
 	std::vector<shared_ptr<Room> > rooms;

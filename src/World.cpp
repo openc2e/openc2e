@@ -144,6 +144,8 @@ void World::init() {
 }
 
 void World::shutdown() {
+	agents.clear();
+	uncontrolled_sounds.clear();
 	map.Reset();
 }
 
