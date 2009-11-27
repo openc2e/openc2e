@@ -53,19 +53,27 @@ struct FloatAudioBuffer {
 	unsigned int start_offset;
 	size_t len, position;
 	float *data;
+	float volume, pan;
 
-	FloatAudioBuffer(float *d, size_t l, unsigned int o) { position = 0; len = l; data = d; start_offset = o; }
+	FloatAudioBuffer() { data = NULL; len = 0; position = 0; start_offset = 0; volume = 1.0f; pan = 0.0f; }
+	FloatAudioBuffer(float *d, size_t l, unsigned int o = 0, float v = 1.0f, float p = 0.0f) {
+		position = 0;
+		len = l;
+		data = d;
+		start_offset = o;
+		volume = v;
+		pan = p;
+	}
 };
 
 class MusicWave {
 protected:
-	unsigned char *data;
-	unsigned int length;
+	FloatAudioBuffer buffer;
 
 public:
 	MusicWave(MNGFile *p, MNGWaveNode *w);
-	unsigned char *getData() { return data; }
-	unsigned int getLength() { return length; }
+	~MusicWave();
+	FloatAudioBuffer &getData() { return buffer; }
 };
 
 class MusicStage {
@@ -76,7 +84,7 @@ protected:
 
 public:
 	MusicStage(MNGStageNode *n);
-	FloatAudioBuffer applyStage(FloatAudioBuffer src, float beatlength);
+	std::vector<FloatAudioBuffer> applyStage(std::vector<FloatAudioBuffer> &sources, float beatlength);
 };
 
 class MusicEffect {
@@ -86,7 +94,7 @@ protected:
 
 public:
 	MusicEffect(MNGEffectDecNode *n);
-	void applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src, float beatlength);
+	void applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength);
 };
 
 class MusicVoice {

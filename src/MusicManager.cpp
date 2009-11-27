@@ -213,8 +213,17 @@ MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
 	if (sampleno >= p->samples.size())
 		throw MNGFileException("sample not present");
 	// TODO: someday, fix these casts at their source
-	data = (unsigned char *)p->samples[sampleno].first;
-	length = (unsigned int)p->samples[sampleno].second;
+	signed short *data = (signed short *)p->samples[sampleno].first;
+	unsigned int length = (unsigned int)p->samples[sampleno].second;
+	buffer = FloatAudioBuffer(new float[length], length);
+	for (unsigned int i = 0; i < length / 2; i++) {
+		buffer.data[i*2] = data[i];
+		buffer.data[(i*2) + 1] = data[i];
+	}
+}
+
+MusicWave::~MusicWave() {
+	delete[] buffer.data;
 }
 
 MusicStage::MusicStage(MNGStageNode *n) {
@@ -255,7 +264,7 @@ MusicStage::MusicStage(MNGStageNode *n) {
 	}
 }
 
-FloatAudioBuffer MusicStage::applyStage(FloatAudioBuffer src, float beatlength) {
+std::vector<FloatAudioBuffer> MusicStage::applyStage(std::vector<FloatAudioBuffer> &sources, float beatlength) {
 	float pan_value = 0.0f, volume_value = 1.0f, delay_value = 0.0f;
 
 	if (pan) {
@@ -274,17 +283,17 @@ FloatAudioBuffer MusicStage::applyStage(FloatAudioBuffer src, float beatlength) 
 		delay_value += evaluateExpression(tempodelay, this) * beatlength;
 	}
 
-	float left_pan = 1.0f - pan_value;
-	float right_pan = 1.0f + pan_value;
-
-	float *data = new float[src.len];
-	for (unsigned int i = 0; i < src.len / 2; i++) {
-		data[i*2] = src.data[i*2] * left_pan * volume_value;
-		data[(i*2)+1] = src.data[(i*2)+1] * right_pan * volume_value;
+	unsigned int offset_amt = 22050 * 2 * delay_value;
+	std::vector<FloatAudioBuffer> buffers;
+	for (std::vector<FloatAudioBuffer>::iterator i = sources.begin(); i != sources.end(); i++) {
+		FloatAudioBuffer &src = *i;
+		src.start_offset += offset_amt;
+		volume_value *= src.volume;
+		// TODO: pan_value calculation
+		buffers.push_back(FloatAudioBuffer(src.data, src.len, src.start_offset, volume_value, pan_value));
 	}
 
-	FloatAudioBuffer buffer(data, src.len, src.start_offset + (22050 * 2 * delay_value));
-	return buffer;
+	return buffers;
 }
 
 MusicEffect::MusicEffect(MNGEffectDecNode *n) {
@@ -296,13 +305,12 @@ MusicEffect::MusicEffect(MNGEffectDecNode *n) {
 	}
 }
 
-void MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, FloatAudioBuffer src, float beatlength) {
+void MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength) {
 	for (std::vector<shared_ptr<MusicStage> >::iterator i = stages.begin(); i != stages.end(); i++) {
-		FloatAudioBuffer buffer = (*i)->applyStage(src, beatlength);
-		t->addBuffer(buffer);
-
-		// stagger delays
-		src.start_offset = buffer.start_offset;
+		std::vector<FloatAudioBuffer> buffers = (*i)->applyStage(src, beatlength);
+		for (std::vector<FloatAudioBuffer>::iterator j = buffers.begin(); j != buffers.end(); j++) {
+			t->addBuffer(*j);
+		}
 	}
 }
 
@@ -321,6 +329,7 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 
 		MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n);
 		if (e) {
+			// TODO: share duplicate MusicWaves
 			wave = shared_ptr<MusicWave>(new MusicWave(p->getParent()->getParent(), e));
 			continue;
 		}
@@ -412,9 +421,9 @@ void MusicLayer::runUpdateBlock() {
 }
 
 void MusicVoice::runUpdateBlock() {
-	if (!updatenode) return;
-
 	if (interval_expression) interval = evaluateExpression(interval_expression, NULL, this);
+
+	if (!updatenode) return;
 
 	for (std::list<MNGAssignmentNode *>::iterator i = updatenode->children->begin(); i != updatenode->children->end(); i++) {
 		MNGAssignmentNode *n = *i;
@@ -517,70 +526,39 @@ void MusicAleotoricLayer::update(unsigned int latency) {
 	unsigned int parent_offset = parent->getCurrentOffset();
 
 	if (next_offset > parent_offset + latency) return;
-	unsigned int calc_latency = next_offset - parent_offset;
+	unsigned int offset = next_offset;
 
-	unsigned int min_time = 0, max_time = 0;
-	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
-		// the problem is: this can change as we go :( so we hugely overestimate here instead for now.
-		//if (!(*i)->shouldPlay()) continue;
+	std::vector<FloatAudioBuffer> buffers;
 
-		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
-		unsigned int voice_interval = 22050 * our_interval;
-		voice_interval *= 2; // TODO: ok, interval can change as we go too. meh. so this is a hack.
-		unsigned int wave_len = 0;
-		if ((*i)->getWave()) wave_len = (*i)->getWave()->getLength() / 2;
-
-		if (wave_len > voice_interval) {
-			if (max_time < min_time + wave_len)
-				max_time = min_time + wave_len;
-		} else {
-			if (max_time < min_time + voice_interval)
-				max_time = min_time + voice_interval;
-		}
-		min_time += voice_interval;
-	}
-
-	FloatAudioBuffer buffer(new float[max_time * 2], max_time * 2, parent_offset + calc_latency);
-	memset(buffer.data, 0, buffer.len * 2);
-	unsigned int offset = 0;
 	float our_volume = volume * parent->getVolume();
-	// TODO: perhaps we shouldn't be applying pan on top of effects?
-	float left_pan = (1.0f - pan) * our_volume;
-	float right_pan = (1.0f + pan) * our_volume;
 	for (std::vector<shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
 		if (!(*i)->shouldPlay()) continue;
 
 		if ((*i)->getWave()) {
-			signed short *data = (signed short *)(*i)->getWave()->getData();
-			unsigned int len = (*i)->getWave()->getLength();
-			for (unsigned int j = 0; j < len / 2; j++) {
-				buffer.data[offset + j*2] += (float)data[j] * left_pan * (*i)->getVolume();
-				buffer.data[offset + (j*2)+1] += (float)data[j] * right_pan * (*i)->getVolume();
-			}
+			FloatAudioBuffer &data = (*i)->getWave()->getData();
+			buffers.push_back(FloatAudioBuffer(data.data, data.len, offset, our_volume, pan));
 		}
-		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
-		offset += 22050 * 2 * our_interval;
-		assert(offset <= max_time * 2);
 
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
 		 * GR's source says "These take effect after playback of the voice has begun"
 		 * so I try to run it in the same place that code does, for now */
 		(*i)->runUpdateBlock();
+
+		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
+		offset += 22050 * 2 * our_interval;
 	}
 
-	// TODO: find better solution
-	buffer.len = offset;
-
 	if (!effect) {
-		parent->addBuffer(buffer);
+		for (std::vector<FloatAudioBuffer>::iterator i = buffers.begin(); i != buffers.end(); i++) {
+			parent->addBuffer(*i);
+		}
 	} else {
-		effect->applyEffect(parent, buffer, parent->getBeatLength());
-		delete[] buffer.data;
+		effect->applyEffect(parent, buffers, parent->getBeatLength());
 	}
 
 	runUpdateBlock();
 
-	next_offset = parent_offset + offset;
+	next_offset = offset;
 }
 
 MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, shared_ptr<MusicTrack> p) : MusicLayer(p) {
@@ -594,6 +572,7 @@ void MusicLoopLayer::init() {
 
 		MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n);
 		if (e) {
+			// TODO: share duplicate MusicWaves
 			wave = shared_ptr<MusicWave>(new MusicWave(parent->getParent(), e));
 			continue;
 		}
@@ -630,22 +609,13 @@ void MusicLoopLayer::update(unsigned int latency) {
 	unsigned int parent_offset = parent->getCurrentOffset();
 
 	if (next_offset > parent_offset + latency) return;
-	unsigned int calc_latency = next_offset - parent_offset;
 
 	float our_volume = volume * parent->getVolume();
-	float left_pan = (1.0f - pan) * our_volume;
-	float right_pan = (1.0f + pan) * our_volume;
 
-	unsigned int len = wave->getLength();
-	signed short *data = (signed short *)wave->getData();
-	FloatAudioBuffer buffer(new float[len], len, parent_offset + calc_latency);
-	for (unsigned int j = 0; j < len / 2; j++) {
-		buffer.data[j*2] += (float)data[j] * left_pan;
-		buffer.data[(j*2)+1] += (float)data[j] * right_pan;
-	}
-	parent->addBuffer(buffer);
+	FloatAudioBuffer &data = wave->getData();
+	parent->addBuffer(FloatAudioBuffer(data.data, data.len, next_offset, our_volume, pan));
 
-	next_offset = parent_offset + len;
+	next_offset += data.len;
 
 	update_period += updaterate;
 	if (update_period > 1.0f) {
@@ -732,28 +702,33 @@ void MusicTrack::render(signed short *data, size_t len) {
 	for (unsigned int i = 0; i < len; i++) output[i] = 0.0f;
 
 	// mix pending buffers, render
-	unsigned int numbuffers = 0;
+	//unsigned int numbuffers = 0;
 	for (int i = 0; i < (int)buffers.size(); i++) {
 		FloatAudioBuffer &buffer = buffers[i];
 		unsigned int j = 0;
-		numbuffers++; // we include queued buffers for now..
 		if (buffer.start_offset > current_offset) {
 			// buffer hasn't started (quite) yet
 			if (buffer.start_offset + len > current_offset)
 				continue;
 			j = buffer.start_offset - current_offset;
 		}
+		//numbuffers++;
+		float left_pan = 1.0f - buffer.pan;
+		float right_pan = 1.0f + buffer.pan;
 		for (; j < len && buffer.position < buffer.len; j++) {
-			output[j] += buffer.data[buffer.position];
+			output[j] += buffer.data[buffer.position] * buffer.volume * left_pan;
+			buffer.position++;
+			j++;
+			output[j] += buffer.data[buffer.position] * buffer.volume * right_pan;
 			buffer.position++;
 		}
 		if (buffer.position == buffer.len) {
-			delete[] buffer.data;
 			buffers.erase(buffers.begin() + i);
 			i--;
 		}
 	}
-	float mul = (1.0f/numbuffers) * 0.8f; // TODO: this is a hack to try and avoid clipping
+	//float mul = (1.0f/numbuffers) * 0.8f; // TODO: this is a hack to try and avoid clipping
+	float mul = 0.3f;
 	for (unsigned int i = 0; i < len; i++) {
 		output[i] *= mul;
 	}
