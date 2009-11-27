@@ -289,7 +289,11 @@ std::vector<FloatAudioBuffer> MusicStage::applyStage(std::vector<FloatAudioBuffe
 		FloatAudioBuffer &src = *i;
 		src.start_offset += offset_amt;
 		volume_value *= src.volume;
-		// TODO: pan_value calculation
+		// TODO: better pan_value calculation
+		if (src.pan != 0.0f) {
+			if (pan_value) pan_value = (src.pan + pan_value) / 2.0f;
+			else pan_value = src.pan;
+		}
 		buffers.push_back(FloatAudioBuffer(src.data, src.len, src.start_offset, volume_value, pan_value));
 	}
 
@@ -305,13 +309,17 @@ MusicEffect::MusicEffect(MNGEffectDecNode *n) {
 	}
 }
 
-void MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength) {
+std::vector<FloatAudioBuffer> MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength) {
+	std::vector<FloatAudioBuffer> buffers;
+
 	for (std::vector<shared_ptr<MusicStage> >::iterator i = stages.begin(); i != stages.end(); i++) {
-		std::vector<FloatAudioBuffer> buffers = (*i)->applyStage(src, beatlength);
-		for (std::vector<FloatAudioBuffer>::iterator j = buffers.begin(); j != buffers.end(); j++) {
-			t->addBuffer(*j);
+		std::vector<FloatAudioBuffer> newbuffers = (*i)->applyStage(src, beatlength);
+		for (std::vector<FloatAudioBuffer>::iterator j = newbuffers.begin(); j != newbuffers.end(); j++) {
+			buffers.push_back(*j);
 		}
 	}
+
+	return buffers;
 }
 
 MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
@@ -354,8 +362,16 @@ MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 
 		MNGEffectNode *eff = dynamic_cast<MNGEffectNode *>(n);
 		if (eff) {
-			// TODO: we don't know how to handle this, GR's player simply doesn't bother
-			std::cout << "Warning: ignoring " << eff->dump() << " in MNG voice." << std::endl;
+			if (effect)
+				throw MNGFileException("got effect '" + eff->getName() + "' but we already have one!");
+
+			// TODO: share effects
+			std::map<std::string, class MNGEffectDecNode *> &effects = parent->getParent()->getParent()->effects;
+			if (effects.find(eff->getName()) == effects.end())
+				throw MNGFileException("couldn't find effect '" + eff->getName() + "'");
+
+			MNGEffectDecNode *n = effects[eff->getName()];
+			effect = shared_ptr<MusicEffect>(new MusicEffect(n));
 			continue;
 		}
 
@@ -462,6 +478,7 @@ void MusicAleotoricLayer::init() {
 			if (effect)
 				throw MNGFileException("got effect '" + e->getName() + "' but we already have one!");
 
+			// TODO: share effects
 			std::map<std::string, class MNGEffectDecNode *> &effects = parent->getParent()->effects;
 			if (effects.find(e->getName()) == effects.end())
 				throw MNGFileException("couldn't find effect '" + e->getName() + "'");
@@ -536,7 +553,18 @@ void MusicAleotoricLayer::update(unsigned int latency) {
 
 		if ((*i)->getWave()) {
 			FloatAudioBuffer &data = (*i)->getWave()->getData();
-			buffers.push_back(FloatAudioBuffer(data.data, data.len, offset, our_volume, pan));
+			FloatAudioBuffer voicebuffer = FloatAudioBuffer(data.data, data.len, offset, our_volume, pan);
+			shared_ptr<MusicEffect> voice_effect = (*i)->getEffect();
+			if (voice_effect) {
+				std::vector<FloatAudioBuffer> newbuffers;
+				newbuffers.push_back(voicebuffer);
+				newbuffers = voice_effect->applyEffect(parent, newbuffers, parent->getBeatLength());
+				for (std::vector<FloatAudioBuffer>::iterator i = newbuffers.begin(); i != newbuffers.end(); i++) {
+					buffers.push_back(*i);
+				}
+			} else {
+				buffers.push_back(voicebuffer);
+			}
 		}
 
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
@@ -548,12 +576,11 @@ void MusicAleotoricLayer::update(unsigned int latency) {
 		offset += 22050 * 2 * our_interval;
 	}
 
-	if (!effect) {
-		for (std::vector<FloatAudioBuffer>::iterator i = buffers.begin(); i != buffers.end(); i++) {
-			parent->addBuffer(*i);
-		}
-	} else {
-		effect->applyEffect(parent, buffers, parent->getBeatLength());
+	if (effect) {
+		buffers = effect->applyEffect(parent, buffers, parent->getBeatLength());
+	}
+	for (std::vector<FloatAudioBuffer>::iterator i = buffers.begin(); i != buffers.end(); i++) {
+		parent->addBuffer(*i);
 	}
 
 	runUpdateBlock();

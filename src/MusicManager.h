@@ -94,7 +94,7 @@ protected:
 
 public:
 	MusicEffect(MNGEffectDecNode *n);
-	void applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength);
+	std::vector<FloatAudioBuffer> applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength);
 };
 
 class MusicVoice {
@@ -103,6 +103,7 @@ protected:
 	MNGUpdateNode *updatenode;
 	shared_ptr<class MusicLayer> parent;
 	shared_ptr<MusicWave> wave;
+	shared_ptr<MusicEffect> effect;
 
 	std::vector<MNGConditionNode *> conditions;
 
@@ -114,6 +115,7 @@ public:
 	shared_ptr<MusicWave> getWave() { return wave; }
 	float getInterval() { return interval; }
 	float getVolume() { return volume; }
+	shared_ptr<MusicEffect> getEffect() { return effect; }
 	bool shouldPlay();
 	void runUpdateBlock();
 	shared_ptr<MusicLayer> getParent() { return parent; }
