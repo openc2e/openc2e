@@ -318,8 +318,10 @@ void MapData::read() {
 			rooms.push_back(temp);
 		} else {
 			CRoom *temp = (CRoom*)slurpMFC(TYPE_CROOM);
-			sfccheck(temp);
-			rooms.push_back(temp);
+			if (temp)
+				rooms.push_back(temp);
+			else
+				norooms++; // room got deleted
 		}
 	}
 
@@ -871,8 +873,8 @@ void MapData::copyToWorld() {
 		r->type.setInt(src->roomtype);
 
 		// add the room to the world, ensure it matches the id we retrieved
+		while (src->id > world.map.room_base) world.map.room_base++; // skip any gaps (deleted rooms)
 		unsigned int roomid = m->addRoom(r);
-		// TODO: correct check?
 		sfccheck(roomid == src->id);
 
 		if (parent->version() == 1) {

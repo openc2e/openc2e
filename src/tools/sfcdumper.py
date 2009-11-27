@@ -110,7 +110,9 @@ class CRoom:
 
 		# check rooms are in order, as they should be, maybe?
 		global nextroom
-		assert nextroom == self.roomid
+		print self.roomid
+		if nextroom != self.roomid:
+			print "missing room " + str(nextroom) + " skipping to " + str(self.roomid)
 		nextroom = self.roomid + 1
 
 		# read magic constant
@@ -237,7 +239,9 @@ class MapData:
 		self.roomcount = read32(f)
 		print "trying to read " + str(self.roomcount) + " rooms"
 		self.rooms = []
-		for i in xrange(self.roomcount):
+		i = 0
+		while i < self.roomcount:
+			i += 1
 			if version == 0:
 				left = reads32(f)
 				top = read32(f)
@@ -252,6 +256,7 @@ class MapData:
 			else:
 				assert version == 1
 				self.rooms.append(slurpMFC(f, CRoom))
+				if not self.rooms[-1]: self.roomcount += 1
 
 		if version == 0:
 			# ground level data
@@ -1142,6 +1147,7 @@ dropstatuses = ["Never", "Above-floor", "Always"]
 doordirs = ["Left", "Right", "Up", "Down"]
 
 for i in data.rooms:
+	if not i: continue
 	print "room # " + str(i.roomid) + " at (" + str(i.left) + ", " + str(i.top) + "), to (" + str(i.right) + ", " + str(i.bottom) + ")"
 	for j in range(4):
 		print "doors in direction " + doordirs[j] + ":",
