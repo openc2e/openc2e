@@ -426,28 +426,15 @@ class MNGFile {
 		MNGFile(std::string);
 		void enumerateSamples();
 		~MNGFile();
-		void add(class MNGEffectDecNode *n) { effects[n->getName()] = n; }
-		void add(class MNGTrackDecNode *n) { tracks[n->getName()] = n; }
-		void add(class MNGVariableDecNode *n) { variables[n->getName()] = n; }
+		void add(class MNGEffectDecNode *n);
+		void add(class MNGTrackDecNode *n);
+		void add(class MNGVariableDecNode *n);
 		unsigned int getSampleForName(std::string name);
 		std::vector< std::pair< char *, int > > samples;
 		std::map<std::string, class MNGEffectDecNode *> effects;
 		std::map<std::string, class MNGTrackDecNode *> tracks;
 
-		std::string dump() {	
-			std::ostringstream oss;
-
-			std::map<std::string, class MNGEffectDecNode *>::iterator ei;
-			std::map<std::string, class MNGTrackDecNode *>::iterator ti;
-
-			for (ei = effects.begin(); ei != effects.end(); ei++)
-				oss << ei->first << " " << ei->second->dump() << std::endl;
-
-			for (ti = tracks.begin(); ti != tracks.end(); ti++)
-				oss << ti->first << " " << ti->second->dump() << std::endl;
-
-			return oss.str();
-		}
+		std::string dump();
 };
 
 extern MNGFile *g_mngfile;

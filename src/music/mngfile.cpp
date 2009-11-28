@@ -124,6 +124,35 @@ MNGFile::~MNGFile() {
 	delete stream;
 }	
 
+void MNGFile::add(class MNGEffectDecNode *n) {
+	effects[n->getName()] = n;
+}
+
+void MNGFile::add(class MNGTrackDecNode *n) {
+	std::string trackname = n->getName();
+	std::transform(trackname.begin(), trackname.end(), trackname.begin(), (int(*)(int))tolower);
+	tracks[trackname] = n;
+}
+
+void MNGFile::add(class MNGVariableDecNode *n) {
+	variables[n->getName()] = n;
+}
+
+std::string MNGFile::dump() {
+	std::ostringstream oss;
+
+	std::map<std::string, class MNGEffectDecNode *>::iterator ei;
+	std::map<std::string, class MNGTrackDecNode *>::iterator ti;
+
+	for (ei = effects.begin(); ei != effects.end(); ei++)
+		oss << ei->first << " " << ei->second->dump() << std::endl;
+
+	for (ti = tracks.begin(); ti != tracks.end(); ti++)
+		oss << ti->first << " " << ti->second->dump() << std::endl;
+
+	return oss.str();
+}
+
 void mngerror(char const *s) {
 	throw MNGFileException(s, g_mngfile->yylineno);
 }
