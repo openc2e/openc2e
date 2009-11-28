@@ -26,6 +26,12 @@ using namespace boost;
 #include <cmath> // for cos/sin
 using namespace std;
 
+// this is all for MusicManager::tick
+#include "World.h"
+#include "Camera.h"
+#include "Room.h"
+#include "MetaRoom.h"
+
 MusicManager musicmanager;
 
 struct MusicStream : public AudioStreamBase {
@@ -42,6 +48,7 @@ struct MusicStream : public AudioStreamBase {
 };
 
 MusicManager::MusicManager() {
+	current_latency = 0;
 }
 
 MusicManager::~MusicManager() {
@@ -51,10 +58,41 @@ MusicManager::~MusicManager() {
 }
 
 void MusicManager::tick() {
+	if (current_latency) {
+		current_latency--;
+	}
+	if (!current_latency) {
+		// TODO: this behaviour is different in C2, and should probably be cleverer
+		MetaRoom *m = world.camera->getMetaRoom();
+		if (m) {
+			shared_ptr<Room> r = m->roomAt(world.camera->getXCentre(), world.camera->getYCentre());
+			if (r && r->music.size()) {
+				playTrack(r->music, 0);
+			} else if (m->music.size()) {
+				playTrack(m->music, 0);
+			}
+		}
+	}
+
+	if (nexttrack && currenttrack->fadedOut()) {
+		currenttrack = nexttrack;
+		nexttrack.reset();
+	}
 }
 
 void MusicManager::playTrack(std::string track, unsigned int latency) {
 	std::string filename, trackname;
+
+	// seconds -> world ticks
+	latency = (latency * 1000) / world.ticktime;
+
+	if (track == "Silence") {
+		playing_silence = true;
+		current_latency = latency;
+		currenttrack->startFadeOut();
+		nexttrack.reset();
+		return;
+	}
 
 	std::string::size_type n = track.find("\\");
 	if (n == std::string::npos) {
@@ -72,11 +110,35 @@ void MusicManager::playTrack(std::string track, unsigned int latency) {
 	}
 
 	MNGFile *file;
-	if (files.find(realfilename) == files.end()) {
+	std::transform(filename.begin(), filename.end(), filename.begin(), (int(*)(int))tolower);
+	if (files.find(filename) == files.end()) {
 		file = new MNGFile(realfilename);
 		files[filename] = file;
 	} else {
-		file = files[realfilename];
+		file = files[filename];
+	}
+
+	std::transform(trackname.begin(), trackname.end(), trackname.begin(), (int(*)(int))tolower);
+
+	// TODO: these lowercase transformations are ridiculous, we should store inside MusicTrack
+	if (nexttrack && nexttrack->getParent() == file) {
+		std::string nextname = nexttrack->getName();
+		std::transform(nextname.begin(), nextname.end(), nextname.begin(), (int(*)(int))tolower);
+		if (nextname == trackname) {
+			// already moving to this track
+			return;
+		}
+	}
+	if (currenttrack && currenttrack->getParent() == file) {
+		std::string thisname = currenttrack->getName();
+		std::transform(thisname.begin(), thisname.end(), thisname.begin(), (int(*)(int))tolower);
+		if (thisname == trackname) {
+			// already playing this track!
+			if (!playing_silence && !nexttrack) return;
+			nexttrack.reset();
+			currenttrack->startFadeIn();
+			return;
+		}
 	}
 
 	if (file->tracks.find(trackname) == file->tracks.end()) {
@@ -87,10 +149,18 @@ void MusicManager::playTrack(std::string track, unsigned int latency) {
 	shared_ptr<MusicTrack> tracknode(new MusicTrack(file, file->tracks[trackname]));
 	tracknode->init();
 	playTrack(tracknode);
+	current_latency = latency;
 }
 
 void MusicManager::playTrack(shared_ptr<MusicTrack> track) {
-	currenttrack = track;
+	playing_silence = false;
+	track->startFadeIn();
+	if (!currenttrack) {
+		currenttrack = track;
+	} else {
+		nexttrack = track;
+		currenttrack->startFadeOut();
+	}
 
 	startPlayback();
 }
@@ -657,8 +727,12 @@ MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 	current_offset = 0;
 
 	volume = 1.0f;
-	fadein = fadeout = 0.0f;
+	// TODO: what's the default fadein/fadeout?
+	// for now, changed this from 0.0f to 1.0f because otherwise c3 sounds silly
+	fadein = fadeout = 1.0f;
 	beatlength = 0.0f;
+
+	fadein_count = fadeout_count = 0;
 }
 
 // shared_from_this
@@ -724,6 +798,27 @@ void MusicTrack::update(unsigned int latency) {
 	}
 }
 
+void MusicTrack::startFadeIn() {
+	if (fadein_count) return;
+	if (fadeout_count) {
+		fadein_count = (fadein * 22050 * 2) * (1.0 - (float)(fadeout_count / (fadeout * 22050 * 2)));
+		fadeout_count = 0;
+	} else fadein_count = fadein * 22050 * 2;
+}
+
+void MusicTrack::startFadeOut() {
+	if (fadeout_count) return;
+	if (fadein_count) {
+		fadeout_count = (fadeout * 22050 * 2) * (1.0 - (float)(fadein_count / (fadein * 22050 * 2)));
+		fadein_count = 0;
+	} else fadeout_count = fadeout * 22050 * 2;
+	if (!fadeout_count) fadeout_count = 1;
+}
+
+bool MusicTrack::fadedOut() {
+	return fadeout_count == 1;
+}
+
 void MusicTrack::render(signed short *data, size_t len) {
 	float *output = (float *)alloca(len * sizeof(float));
 	for (unsigned int i = 0; i < len; i++) output[i] = 0.0f;
@@ -756,6 +851,13 @@ void MusicTrack::render(signed short *data, size_t len) {
 	}
 	//float mul = (1.0f/numbuffers) * 0.8f; // TODO: this is a hack to try and avoid clipping
 	float mul = 0.3f;
+	if (fadein_count) {
+		mul *= 1.0 - (fadein_count / (fadein * 22050 * 2));
+		if (fadein_count >= len) fadein_count -= len; else fadein_count = 0;
+	} else if (fadeout_count) {
+		mul *= (fadeout_count / (fadeout * 22050 * 2));
+		if (fadeout_count > len) fadeout_count -= len; else fadeout_count = 1;
+	}
 	for (unsigned int i = 0; i < len; i++) {
 		output[i] *= mul;
 	}

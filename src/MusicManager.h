@@ -29,7 +29,10 @@ using boost::shared_ptr;
 class MusicManager {
 private:
 	std::map<std::string, MNGFile *> files;
-	shared_ptr<class MusicTrack> currenttrack;
+
+	shared_ptr<class MusicTrack> currenttrack, nexttrack;
+	bool playing_silence;
+	unsigned int current_latency;
 
 	shared_ptr<class MusicStream> stream;
 
@@ -178,6 +181,8 @@ protected:
 
 	float fadein, fadeout, beatlength, volume;
 
+	unsigned int fadein_count, fadeout_count;
+
 	unsigned int current_offset;
 	std::vector<FloatAudioBuffer> buffers;
 
@@ -192,7 +197,12 @@ public:
 	float getVolume() { return volume; }
 	float getBeatLength() { return beatlength; }
 
+	void startFadeIn();
+	void startFadeOut();
+	bool fadedOut();
+
 	MNGFile *getParent() { return parent; }
+	std::string getName() { return node->getName(); }
 };
 
 #endif
