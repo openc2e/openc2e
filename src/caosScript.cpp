@@ -604,6 +604,13 @@ void caosScript::parseloop(int state, void *info) {
 				assert(!enumdepth);
 				state = ST_INSTALLER;
 				current = installer;
+			} else if (state == ST_ENUM) {
+				// fuzzie added this case because she can't remember why the DIAF is here,
+				// if you work it out please add a comment and make it engine-specific!
+				throw parseException("Unexpected ENDM");
+			} else if (state == ST_DOIF) {
+				// this case too
+				throw parseException("Unexpected ENDM");
 			} else {
 				// I hate you. Die in a fire.
 				putBackToken(t);
