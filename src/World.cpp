@@ -33,6 +33,7 @@
 #include "MetaRoom.h"
 #include "Catalogue.h"
 #include "Camera.h"
+#include "MusicManager.h"
 
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -235,6 +236,8 @@ void World::tick() {
 
 		si = next;
 	}
+
+	musicmanager.tick();
 	
 	// Tick all agents, deleting as necessary.	
 	std::list<boost::shared_ptr<Agent> >::iterator i = agents.begin();
