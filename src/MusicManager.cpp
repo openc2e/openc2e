@@ -830,7 +830,7 @@ void MusicTrack::render(signed short *data, size_t len) {
 		unsigned int j = 0;
 		if (buffer.start_offset > current_offset) {
 			// buffer hasn't started (quite) yet
-			if (buffer.start_offset + len > current_offset)
+			if (buffer.start_offset > current_offset + len)
 				continue;
 			j = buffer.start_offset - current_offset;
 		}
