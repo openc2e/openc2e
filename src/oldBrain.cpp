@@ -256,10 +256,10 @@ void oldLobe::tick() {
 		unsigned char out = neurons[i].state; // TODO: svrule (ourGene->staterule)..
 
 		// apply leakage rate in order to settle at rest state
-		if ((parent->getTicks() & parent->getParent()->calculateTickMask(leakagerate)) == 0) {
+		if ((parent->getTicks() & parent->getParent()->calculateTickMask(leakagerate / 8)) == 0) {
 			// TODO: untested
 			// TODO: what happens if out < ourGene->reststate? test!
-			out = ourGene->reststate + ((out - ourGene->reststate) * parent->getParent()->calculateMultiplier(leakagerate)) / 65536;
+			out = ourGene->reststate + ((out - ourGene->reststate) * parent->getParent()->calculateMultiplier(leakagerate / 8)) / 65536;
 		}
 
 		neurons[i].state = out;
