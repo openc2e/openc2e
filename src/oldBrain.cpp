@@ -299,17 +299,16 @@ void oldLobe::wipe() {
 }
 
 void oldLobe::tick() {
-	// TODO: do something with inputgain? presumably applied to 'input', so something to do with decision lobe..
-
 	for (unsigned int i = 0; i < neurons.size(); i++) {
 		// TODO: c1 rules are not 12
 		unsigned char out = processSVRule(&neurons[i], NULL, ourGene->staterule, 12, rndconst_staterule);
 
 		// apply leakage rate in order to settle at rest state
 		if ((parent->getTicks() & parent->getParent()->calculateTickMask(leakagerate / 8)) == 0) {
-			// TODO: untested
-			// TODO: what happens if out < ourGene->reststate? test!
-			out = ourGene->reststate + ((out - ourGene->reststate) * parent->getParent()->calculateMultiplier(leakagerate / 8)) / 65536;
+			if (out > ourGene->reststate)
+				out = ourGene->reststate + ((out - ourGene->reststate) * parent->getParent()->calculateMultiplier(leakagerate / 8)) / 65536;
+			else
+				out = ourGene->reststate;
 		}
 
 		neurons[i].state = out;
@@ -325,7 +324,23 @@ void oldLobe::tick() {
 	// TODO: dendrites (ourGene->dendrite1, ourGene->dendrite2)
 
 	// TODO: data copied to perception lobe (ourGene->perceptflag - not just true/false!)
-	// TODO: winner takes all (ourGene->flags)
+
+	if (ourGene->flags & 1) {
+		// winner takes all
+		unsigned char bestvalue = 0;
+		unsigned char *bestoutput = NULL;
+		for (unsigned int i = 0; i < neurons.size(); i++) {
+			if (neurons[i].output > bestvalue) {
+				bestvalue = neurons[i].output;
+				bestoutput = &neurons[i].output;
+			}
+			neurons[i].output = 0;
+		}
+		if (bestoutput)
+			*bestoutput = bestvalue;
+	}
+
+	// TODO: migration
 }
 
 oldBrain::oldBrain(oldCreature *p) {
