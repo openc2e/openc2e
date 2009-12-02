@@ -38,120 +38,136 @@
  *
  */
 
-unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, unsigned int len) {
+unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, unsigned char rndconst) {
+	switch (id) {
+		/*
+		 * these numbers are the C2 svrules
+		 *
+		 * TODO: remap the C1 svrule numbers at load so they match these
+		 */
+		case 1: // 0
+			return 0;
+
+		case 2: // 1
+			return 1;
+
+		case 3: // 64
+			return 64;
+
+		case 4: // 255
+			return 255;
+
+		case 5: // chem0
+			return chems[0];
+
+		case 6: // chem1
+			return chems[1];
+
+		case 7: // chem2
+			return chems[2];
+
+		case 8: // chem3
+			return chems[3];
+
+		case 9: // state
+			return cell->state;
+
+		case 10: // output
+			return cell->output;
+
+		case 11: // thres
+			return threshold;
+
+		case 12: // type0
+			return dendrite_sum(0, false);
+
+		case 13: // type1
+			return dendrite_sum(1, false);
+
+		case 14: // anded0
+			return dendrite_sum(0, true);
+
+		case 15: // anded1
+			// unused?
+			return dendrite_sum(1, true);
+
+		case 16: // input
+			// This comes from IMPT for the decision lobe.
+			if (!dend) return 0;
+			return dend->src->output;
+
+		case 17: // conduct
+			// unused?
+			if (!dend) return 0;
+			return 0; // TODO: what's this?
+
+		case 18: // suscept
+			if (!dend) return 0;
+			return dend->suscept;
+
+		case 19: // STW
+			if (!dend) return 0;
+			return dend->stw;
+
+		case 20: // LTW
+			// unused?
+			if (!dend) return 0;
+			return dend->ltw;
+
+		case 21: // strength
+			// unused?
+			if (!dend) return 0;
+			return dend->strength;
+
+		case 22: // 32
+			// unused?
+			return 32;
+
+		case 23: // 128
+			// unused?
+			return 128;
+
+		case 24: // rnd const
+			// unused?
+			return rndconst;
+
+		case 25: // chem4
+			return chems[4];
+
+		case 26: // chem5
+			return chems[5];
+
+		case 27: // leak in
+			// unused: back/forward prop
+			return cell->leakin;
+
+		case 28: // leak out
+			// unused: back/forward prop
+			return cell->leakout;
+
+		case 29: // curr src leak in
+			// unused: back/forward prop
+			if (!dend) return 0;
+			return dend->src->leakin;
+
+		default:
+			return 0;
+	}
+}
+
+unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, unsigned int len, unsigned char rndconst) {
 	unsigned char state = 0;
+
+	// original engine seems to simply happily walk off the end of the svrule array for constants!
+	// so our behaviour for the 'if (i == len)' lines is NOT the same
 
 	for (unsigned int i = 0; i < len; i++) {
 		switch (svrule[i]) {
-			/*
-			 * these numbers are the C2 svrules
-			 *
-			 * TODO: remap the C1 svrule numbers at load so they match these
-			 */
 			case 0: // <end>
 				return state;
 
-			case 1: // 0
-				state = 0;
-				break;
-
-			case 2: // 1
-				state = 1;
-				break;
-
-			case 3: // 64
-				state = 64;
-				break;
-
-			case 4: // 255
-				state = 255;
-				break;
-
-			case 5: // chem0
-				break;
-
-			case 6: // chem1
-				break;
-
-			case 7: // chem2
-				break;
-
-			case 8: // chem3
-				break;
-
-			case 9: // state
-				state = cell->state;
-				break;
-
-			case 10: // output
-				break;
-
-			case 11: // thres
-				break;
-
-			case 12: // type0
-				break;
-
-			case 13: // type1
-				break;
-
-			case 14: // anded0
-				break;
-
-			case 15: // anded1
-				// unused?
-				break;
-
-			case 16: // input
-				// This comes from IMPT for the decision lobe.
-				break;
-
-			case 17: // conduct
-				// unused?
-				break;
-
-			case 18: // suscept
-				break;
-
-			case 19: // STW
-				break;
-
-			case 20: // LTW
-				// unused?
-				break;
-
-			case 21: // strength
-				// unused?
-				break;
-
-			case 22: // 32
-				// unused?
-				break;
-
-			case 23: // 128
-				// unused?
-				break;
-
-			case 24: // rnd const
-				// unused?
-				break;
-
-			case 25: // chem4
-				break;
-
-			case 26: // chem5
-				break;
-
-			case 27: // leak in
-				// unused: back/forward prop
-				break;
-
-			case 28: // leak out
-				// unused: back/forward prop
-				break;
-
-			case 29: // curr src leak in
-				// unused: back/forward prop
+			default:
+				state = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
 				break;
 
 			case 30: // TRUE
@@ -159,13 +175,22 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 				break;
 
 			case 31: // PLUS
+				i++;
+				if (i == len) return state;
+				state = state + evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
 				break;
 
 			case 32: // MINUS
+				i++;
+				if (i == len) return state;
+				state = state - evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
 				break;
 
 			case 33: // TIMES
 				// unused?
+				i++;
+				if (i == len) return state;
+				state = (state * evaluateSVRuleConstant(cell, dend, svrule[i], rndconst)) / 256;
 				break;
 
 			case 34: // INCR
@@ -179,29 +204,53 @@ unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, u
 				break;
 
 			case 36: // FALSE
-				// unused?
+				if (state) return 0;
 				break;
 
 			case 37: // multiply
 				// unused?
+				i++;
+				if (i == len) return state;
+				state = state * evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
 				break;
 
 			case 38: // average
 				// unused?
+				i++;
+				if (i == len) return state;
+				state = (state + evaluateSVRuleConstant(cell, dend, svrule[i], rndconst)) / 2;
 				break;
 
-			case 39: // move twrds
-				break;
+			case 39: { // move twrds
+				i++;
+				if (i == len) return state;
+				unsigned char towards = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				i++;
+				if (i == len) return state;
+				unsigned char multiplier = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				state = ((towards - state) * multiplier) / 256;
+				} break;
 
-			case 40: // random
-				break;
-
-			case 41: // <error>
-				break;
+			case 40: { // random
+				i++;
+				if (i == len) return state;
+				unsigned char min = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				i++;
+				if (i == len) return state;
+				unsigned char max = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				state = (rand() % (max - min + 1)) + min;
+				} break;
 		}
 	}
 
 	return state;
+}
+
+unsigned char oldLobe::dendrite_sum(unsigned int type, bool only_if_firing) {
+	// TODO: cache this result, since it will be used every time the svrule runs
+	// (and remember you can calculate both only_if_firing and not only_if_firing in one go!)
+	unsigned int sum = 0; // TODO: sum((src output * strength) / 255)
+	return (sum * inputgain) / 255;
 }
 
 oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
@@ -240,7 +289,7 @@ void oldLobe::init() {
 	inited = true;
 	wipe();
 
-	// TODO: is this it?
+	rndconst_staterule = 0; // TODO
 }
 
 void oldLobe::wipe() {
@@ -253,7 +302,8 @@ void oldLobe::tick() {
 	// TODO: do something with inputgain? presumably applied to 'input', so something to do with decision lobe..
 
 	for (unsigned int i = 0; i < neurons.size(); i++) {
-		unsigned char out = neurons[i].state; // TODO: svrule (ourGene->staterule)..
+		// TODO: c1 rules are not 12
+		unsigned char out = processSVRule(&neurons[i], NULL, ourGene->staterule, 12, rndconst_staterule);
 
 		// apply leakage rate in order to settle at rest state
 		if ((parent->getTicks() & parent->getParent()->calculateTickMask(leakagerate / 8)) == 0) {

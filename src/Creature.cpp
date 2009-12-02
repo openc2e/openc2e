@@ -892,13 +892,13 @@ unsigned char *oldCreature::getLocusPointer(bool receptor, unsigned char o, unsi
 				// receptor
 				switch (l) {
 					case 0: // threshold
-						return 0; // TODO
+						return lobe->getThresholdPointer();
 
 					case 1: // leakage
-						return 0; // TODO
+						return lobe->getLeakageRatePointer();
 
 					case 2: // gain
-						return 0; // TODO
+						return lobe->getInputGainPointer();
 
 					default:
 						if (l < 13) {

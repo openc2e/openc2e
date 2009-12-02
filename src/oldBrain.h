@@ -27,13 +27,14 @@
 
 using boost::shared_ptr;
 
-struct oldNeuron {
-	unsigned char state, output;
+struct oldDendrite {
+	struct oldNeuron *src;
+	unsigned char strength, stw, ltw, suscept;
 };
 
-struct oldDendrite {
-	oldNeuron *src, *dest;
-	unsigned char strength, stw, ltw, suscept;
+struct oldNeuron {
+	unsigned char state, output, leakin, leakout;
+	std::vector<oldDendrite> dendrites[2];
 };
 
 class oldLobe {
@@ -41,7 +42,6 @@ protected:
 	class oldBrain *parent;
 	oldBrainLobeGene *ourGene;
 	std::vector<oldNeuron> neurons;
-	std::vector<oldDendrite> dendrites[2];
 	oldLobe *sourceLobe[2];
 	bool inited;
 
@@ -49,6 +49,13 @@ protected:
 
 	unsigned char threshold, leakagerate, inputgain;
 	unsigned char chems[6];
+
+	unsigned char rndconst_staterule;
+
+	unsigned char evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, unsigned char rndconst);
+	unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, unsigned int len, unsigned char rndconst);
+
+	unsigned char dendrite_sum(unsigned int type, bool only_if_all_firing);
 
 public:
 	oldLobe(class oldBrain *b, oldBrainLobeGene *g);
@@ -60,11 +67,12 @@ public:
 	oldBrainLobeGene *getGene() { return ourGene; }
 
 	unsigned int getNoNeurons() { return neurons.size(); }
-	unsigned int getNoDendrites(unsigned int t) { return dendrites[t].size(); }
 	oldNeuron *getNeuron(unsigned int i) { return &neurons[i]; }
-	oldDendrite *getDendrite(unsigned int t, unsigned int i) { return &dendrites[t][i]; }
 
 	unsigned char *getChemPointer(unsigned int chemid) { return &chems[chemid]; }
+	unsigned char *getThresholdPointer() { return &threshold; }
+	unsigned char *getLeakageRatePointer() { return &leakagerate; }
+	unsigned char *getInputGainPointer() { return &inputgain; }
 };
 
 class oldBrain {
