@@ -17,6 +17,7 @@
  *
  */
 
+#include "genome.h"
 #include "historyManager.h"
 #include "World.h"
 #include "Catalogue.h"
