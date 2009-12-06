@@ -21,7 +21,7 @@
 #define _HISTORYMANAGER_H
 
 #include "AgentRef.h"
-#include "genome.h"
+#include "lifestage.h"
 #include <vector>
 #include <map>
 #include <boost/weak_ptr.hpp>

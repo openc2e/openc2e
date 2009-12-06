@@ -21,6 +21,7 @@
 
 #include "endianlove.h"
 #include "exceptions.h"
+#include "lifestage.h"
 
 #include <vector>
 #include <string>
@@ -28,12 +29,6 @@
 using std::ostream;
 using std::istream;
 using std::vector;
-
-/*
-  not 100% sure about this enum ... is 'baby' equal to 'embryo', or is 'embryo'
-  zero and the rest shifted?
-*/
-enum lifestage { baby = 0, child = 1, adolescent = 2, youth = 3, adult = 4, old = 5, senile = 6 };
 
 class gene;
 struct geneNote;
