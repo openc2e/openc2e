@@ -261,6 +261,16 @@ unsigned char oldLobe::dendrite_sum(unsigned int type, bool only_if_firing) {
 	return (sum * inputgain) / 255;
 }
 
+// TODO: precalculate this if we end up using it much?
+unsigned int oldLobe::getDendriteCount() {
+	unsigned int count = 0;
+	for (unsigned int i = 0; i < neurons.size(); i++) {
+		count += neurons[i].dendrites[0].size();
+		count += neurons[i].dendrites[1].size();
+	}
+	return count;
+}
+
 oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	assert(b);
 	parent = b;
@@ -295,16 +305,6 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 
 	width = g->width;
 	height = g->height;
-	// TODO: good?
-	if (width < 1) width = 1;
-	if (height < 1) height = 1;
-
-	neurons.reserve(width * height);
-
-	oldNeuron n;
-	for (unsigned int i = 0; i < width * height; i++) {
-		neurons.push_back(n);
-	}
 
 	// TODO
 
@@ -313,9 +313,35 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	}
 }
 
+void oldLobe::ensure_minimum_size(unsigned int size) {
+	assert(!inited);
+
+	if (!height) height = 3;
+
+	while ((width * height) < size)
+		width += 1;
+
+	// sanity check
+	if (width * height > 1024) { width = 256; height = 256; }
+}
+
 void oldLobe::init() {
-	inited = true;
+	neurons.reserve(width * height);
+
+	oldNeuron n;
+	for (unsigned int i = 0; i < width * height; i++) {
+		neurons.push_back(n);
+	}
+
 	wipe();
+
+	// (don't set inited here, wait until connect() call)
+}
+
+void oldLobe::connect() {
+	// TODO
+
+	inited = true;
 }
 
 void oldLobe::wipe() {
@@ -434,7 +460,23 @@ oldBrain::oldBrain(oldCreature *p) {
 	ticks = 0;
 }
 
+// helper function for below
+unsigned int minimumLobeSize(unsigned int version, unsigned int lobeid) {
+	switch (lobeid) {
+		case 1: return (version == 0 ? 15 : 17); // drive
+		case 2: return 40; // stim source
+		case 3: return 16; // verb
+		case 4: return 40; // noun
+		case 5: return 32; // general sensory
+		case 6: return 16; // decision
+		case 7: return 40; // attention
+		default: return 0;
+	}
+}
+
 void oldBrain::processGenes() {
+	// TODO: this likely doesn't work at all well in the presence of later-turn-on lobes
+
 	shared_ptr<genomeFile> genome = parent->getGenome();
 	
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
@@ -443,27 +485,81 @@ void oldBrain::processGenes() {
 		if (typeid(**i) == typeid(oldBrainLobeGene)) {
 			oldBrainLobeGene *g = (oldBrainLobeGene *)*i;
 			oldLobe *l = new oldLobe(this, g);
-			lobes[lobes.size()] = l; // TODO: muh
+			lobes.push_back(l);
 		}
+	}
+
+	// TODO: this is a problem right now because oldLobe wants a copy of the genome objects
+	/*while (lobes.size() < 8) {
+		oldLobe *l = new oldLobe(this);
+		l->ensure_minimum_size(minimumLobeSize(genome->getVersion(), lobes.size()));
+		if (lobes.size() == 1) { } // TODO: force perceptible on drive lobe (lobe 1)
+		lobes.push_back(l);
+	}*/
+
+	// TODO: fix srclobe for all dendrites to be within range (srclobe = srclobe % lobes.size())
+
+	for (unsigned int i = 1; i < lobes.size(); i++) {
+		if (!lobes[i]->wasInited())
+			lobes[i]->ensure_minimum_size(minimumLobeSize(genome->getVersion(), i));
+	}
+
+	// ensure the perception lobe (lobe 0) is large enough for all perceptible neurons
+	// (we should be able to guarantee lobes[0] exists once the above is fixed)
+	unsigned int size = 0;
+	for (unsigned int i = 1; i < lobes.size(); i++) {
+		if (lobes[i]->getGene()->perceptflag)
+			size += lobes[i]->getWidth() * lobes[i]->getHeight();
+	}
+	if (!lobes[0]->wasInited()) // TODO: we should really fix this even if it already got inited :-(
+		lobes[0]->ensure_minimum_size(size);
+
+	// we have to create the neurons here, so that they can be attached to by receptors/emitters
+	for (unsigned int i = 0; i < lobes.size(); i++) {
+		if (!lobes[i]->wasInited()) lobes[i]->init();
 	}
 }
 
 void oldBrain::init() {
-	for (std::map<unsigned int, oldLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
-		if (!(*i).second->wasInited()) (*i).second->init();
+	for (unsigned int i = 0; i < lobes.size(); i++) {
+		if (!lobes[i]->wasInited()) lobes[i]->connect();
 	}
+
+	// construct processing order list
+	lobe_process_order.clear();
+	for (unsigned int i = 0; i < lobes.size(); i++) {
+		// first: lobes with no incoming dendrites
+		if (lobes[i]->getDendriteCount() == 0)
+			lobe_process_order.push_back(i);
+	}
+	for (unsigned int i = 0; i < lobes.size(); i++) {
+		// then: lobes copied to perception lobe
+		if (lobes[i]->getDendriteCount() == 0)
+			continue;
+		if (lobes[i]->getGene()->perceptflag)
+			lobe_process_order.push_back(i);
+	}
+	for (unsigned int i = 0; i < lobes.size(); i++) {
+		// then: every other lobe
+		if (lobes[i]->getDendriteCount() == 0)
+			continue;
+		if (lobes[i]->getGene()->perceptflag)
+			continue;
+		lobe_process_order.push_back(i);
+	}
+	assert(lobe_process_order.size() == lobes.size());
 }
 
 void oldBrain::tick() {
-	for (std::map<unsigned int, oldLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
-		(*i).second->tick();
+	for (unsigned int i = 0; i < lobes.size(); i++) {
+		lobes[lobe_process_order[i]]->tick();
 	}
 
 	ticks++;
 }
 
 oldLobe *oldBrain::getLobeByTissue(unsigned int id) {
-	if (lobes.find(id) == lobes.end())
+	if (id >= lobes.size())
 		return 0;
 
 	return lobes[id];

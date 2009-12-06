@@ -4,6 +4,7 @@
 
 #include <QtGui>
 #include "brainview.h"
+#include <boost/format.hpp>
 
 BrainView::BrainView() {
 	creature = 0;
@@ -46,10 +47,10 @@ QSize BrainView::minimumSize() {
 		oldBrain *b = oc->getBrain();
 		assert(b);
 		
-		for (std::map<unsigned int, oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-			oldBrainLobeGene *lobe = i->second->getGene();
-			int this_x = lobe->x + lobe->width;
-			int this_y = lobe->y + lobe->height;
+		for (std::vector<oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
+			oldBrainLobeGene *lobe = (*i)->getGene();
+			int this_x = lobe->x + (*i)->getWidth();
+			int this_y = lobe->y + (*i)->getHeight();
 			if (this_x > neededwidth)
 				neededwidth = this_x;
 			if (this_y > neededheight)
@@ -79,6 +80,21 @@ void BrainView::paintEvent(QPaintEvent *) {
 	}
 }
 
+std::string niceNameForOldLobe(unsigned int id) {
+	switch (id) {
+		case 0: return "percept";
+		case 1: return "drive";
+		case 2: return "stim source";
+		case 3: return "verb";
+		case 4: return "noun";
+		case 5: return "sensory";
+		case 6: return "decision";
+		case 7: return "attention";
+		case 8: return "concept";
+	}
+	return boost::str(boost::format("lobe %d") % (int)id);
+}
+
 void BrainView::drawOldBrain(oldBrain *b) {
 	assert(b);
 	
@@ -90,14 +106,16 @@ void BrainView::drawOldBrain(oldBrain *b) {
 	
 	std::map<oldNeuron *, std::pair<unsigned int, unsigned int> > neuroncoords;
 
-	for (std::map<unsigned int, oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-		oldBrainLobeGene *lobe = i->second->getGene();
-		drawLobeBoundaries(painter, lobe->x, lobe->y, lobe->width, lobe->height, "lobe");
+	unsigned int id = 0;
+	for (std::vector< oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
+		oldBrainLobeGene *lobe = (*i)->getGene();
+		drawLobeBoundaries(painter, lobe->x, lobe->y, (*i)->getWidth(), (*i)->getHeight(), niceNameForOldLobe(id));
+		id++;
 
-		for (unsigned int y = 0; y < lobe->height; y++) {
-			for (unsigned int x = 0; x < lobe->width; x++) {
-				unsigned int neuronid = x + (y * lobe->width);
-				oldNeuron *neuron = i->second->getNeuron(neuronid);
+		for (unsigned int y = 0; y < (*i)->getHeight(); y++) {
+			for (unsigned int x = 0; x < (*i)->getWidth(); x++) {
+				unsigned int neuronid = x + (y * (*i)->getWidth());
+				oldNeuron *neuron = (*i)->getNeuron(neuronid);
 				
 				int lobex = (lobe->x + 4) * 20;
 				int lobey = (lobe->y + 4) * 20;

@@ -73,14 +73,19 @@ protected:
 public:
 	oldLobe(class oldBrain *b, oldBrainLobeGene *g);
 	bool wasInited() { return inited; }
+	void ensure_minimum_size(unsigned int size);
 	void tick();
 	void init();
+	void connect();
 	void wipe();
 
 	oldBrainLobeGene *getGene() { return ourGene; }
 
 	unsigned int getNoNeurons() { return neurons.size(); }
 	oldNeuron *getNeuron(unsigned int i) { return &neurons[i]; }
+	unsigned int getDendriteCount();
+	unsigned int getWidth() { return width; }
+	unsigned int getHeight() { return height; }
 
 	unsigned char *getChemPointer(unsigned int chemid) { return &chems[chemid]; }
 	unsigned char *getThresholdPointer() { return &threshold; }
@@ -92,9 +97,10 @@ class oldBrain {
 protected:
 	class oldCreature *parent;
 	unsigned int ticks;
+	std::vector<unsigned int> lobe_process_order;
 
 public:
-	std::map<unsigned int, oldLobe *> lobes;
+	std::vector<oldLobe *> lobes;
 
 	oldBrain(oldCreature *p);
 	void tick();
