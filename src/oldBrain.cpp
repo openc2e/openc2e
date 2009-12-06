@@ -335,6 +335,38 @@ void oldLobe::init() {
 
 	wipe();
 
+	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+
+	for (unsigned int i = 0; i < neurons.size(); i++) {
+		for (unsigned int type = 0; type < 2; type++) {
+			int our_min = dend_info[type]->min;
+			int our_range = dend_info[type]->max - our_min;
+
+			int value = 0;
+			switch (dend_info[type]->spread) {
+				case 0: // flat
+					value = rand() % (our_range + 1);
+					break;
+				case 1: // normal
+					value = rand() % (our_range + 1);
+					value *= 2;
+					break;
+				case 2: // Saw
+					value = rand() % (our_range + 1);
+					value *= 2;
+					value = abs(value - our_range);
+					break;
+				case 3: // waS
+					value = rand() % (our_range + 1);
+					value *= 2;
+					value = abs(value - our_range);
+					value = our_range - value; // invert
+					break;
+			}
+			value += our_min;
+		}
+	}
+
 	// (don't set inited here, wait until connect() call)
 }
 
