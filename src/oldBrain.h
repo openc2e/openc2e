@@ -27,6 +27,13 @@
 
 using boost::shared_ptr;
 
+struct oldSVRule {
+	unsigned int length;
+	uint8 rndconst;
+	uint8 rules[12];
+	void init(uint8 version, uint8 *src);
+};
+
 struct oldDendrite {
 	struct oldNeuron *src;
 	unsigned char strength, stw, ltw, suscept;
@@ -50,12 +57,18 @@ protected:
 	unsigned char threshold, leakagerate, inputgain;
 	unsigned char chems[6];
 
-	unsigned char rndconst_staterule;
+	oldSVRule staterule;
+	oldSVRule strgainrule[2], strlossrule[2];
+	oldSVRule susceptrule[2];
+	oldSVRule relaxrule[2];
+	oldSVRule backproprule[2], forproprule[2];
 
-	unsigned char evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, unsigned char rndconst);
-	unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, unsigned int len, unsigned char rndconst);
+	unsigned char evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, oldSVRule &rule);
+	unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRule &rule);
 
 	unsigned char dendrite_sum(unsigned int type, bool only_if_all_firing);
+
+	void tickDendrites(unsigned int id, unsigned int type);
 
 public:
 	oldLobe(class oldBrain *b, oldBrainLobeGene *g);

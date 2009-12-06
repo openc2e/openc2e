@@ -122,6 +122,8 @@ public:
   gene(uint8 v) : cversion(v) { }
   virtual ~gene() { }
 
+  uint8 version() { return cversion; }
+
   virtual const char *name() = 0;
   virtual const char *typeName() = 0;
 };

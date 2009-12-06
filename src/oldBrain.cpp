@@ -38,12 +38,20 @@
  *
  */
 
-unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, unsigned char rndconst) {
+void oldSVRule::init(uint8 version, uint8 *src) {
+	length = (version == 0) ? 8 : 12;
+	for (unsigned int i = 0; i < length; i++) {
+		rules[i] = src[i];
+		if (version == 0 && rules[i] > 21) // if rule is above the strength id
+			rules[i] += 8; // then skip the 8 new C2 svrules (to map to C2 svrules)
+	}
+	rndconst = 0; // TODO: correct?
+}
+
+unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, oldSVRule &rule) {
 	switch (id) {
 		/*
-		 * these numbers are the C2 svrules
-		 *
-		 * TODO: remap the C1 svrule numbers at load so they match these
+		 * these numbers are the C2 svrules (see rewrite in oldSVRule constructor)
 		 */
 		case 1: // 0
 			return 0;
@@ -129,7 +137,7 @@ unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend
 
 		case 24: // rnd const
 			// unused?
-			return rndconst;
+			return rule.rndconst;
 
 		case 25: // chem4
 			return chems[4];
@@ -155,19 +163,19 @@ unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend
 	}
 }
 
-unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *svrule, unsigned int len, unsigned char rndconst) {
+unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRule &rule) {
 	unsigned char state = 0;
 
 	// original engine seems to simply happily walk off the end of the svrule array for constants!
 	// so our behaviour for the 'if (i == len)' lines is NOT the same
 
-	for (unsigned int i = 0; i < len; i++) {
-		switch (svrule[i]) {
+	for (unsigned int i = 0; i < rule.length; i++) {
+		switch (rule.rules[i]) {
 			case 0: // <end>
 				return state;
 
 			default:
-				state = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				state = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				break;
 
 			case 30: // TRUE
@@ -176,21 +184,21 @@ unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *
 
 			case 31: // PLUS
 				i++;
-				if (i == len) return state;
-				state = state + evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				if (i == rule.length) return state;
+				state = state + evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				break;
 
 			case 32: // MINUS
 				i++;
-				if (i == len) return state;
-				state = state - evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				if (i == rule.length) return state;
+				state = state - evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				break;
 
 			case 33: // TIMES
 				// unused?
 				i++;
-				if (i == len) return state;
-				state = (state * evaluateSVRuleConstant(cell, dend, svrule[i], rndconst)) / 256;
+				if (i == rule.length) return state;
+				state = (state * evaluateSVRuleConstant(cell, dend, rule.rules[i], rule)) / 256;
 				break;
 
 			case 34: // INCR
@@ -210,34 +218,34 @@ unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, uint8 *
 			case 37: // multiply
 				// unused?
 				i++;
-				if (i == len) return state;
-				state = state * evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				if (i == rule.length) return state;
+				state = state * evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				break;
 
 			case 38: // average
 				// unused?
 				i++;
-				if (i == len) return state;
-				state = (state + evaluateSVRuleConstant(cell, dend, svrule[i], rndconst)) / 2;
+				if (i == rule.length) return state;
+				state = (state + evaluateSVRuleConstant(cell, dend, rule.rules[i], rule)) / 2;
 				break;
 
 			case 39: { // move twrds
 				i++;
-				if (i == len) return state;
-				unsigned char towards = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				if (i == rule.length) return state;
+				unsigned char towards = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				i++;
-				if (i == len) return state;
-				unsigned char multiplier = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				if (i == rule.length) return state;
+				unsigned char multiplier = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				state = ((towards - state) * multiplier) / 256;
 				} break;
 
 			case 40: { // random
 				i++;
-				if (i == len) return state;
-				unsigned char min = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				if (i == rule.length) return state;
+				unsigned char min = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				i++;
-				if (i == len) return state;
-				unsigned char max = evaluateSVRuleConstant(cell, dend, svrule[i], rndconst);
+				if (i == rule.length) return state;
+				unsigned char max = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				state = (rand() % (max - min + 1)) + min;
 				} break;
 		}
@@ -260,6 +268,26 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	ourGene = g;
 
 	inited = false;
+
+	staterule.init(g->version(), (uint8 *)g->staterule);
+
+	for (unsigned int i = 0; i < 2; i++) {
+		oldDendriteInfo *dend_info = &g->dendrite1;
+		if (i == 1) dend_info = &g->dendrite2;
+
+		strgainrule[i].init(g->version(), (uint8 *)dend_info->strgainrule);
+		strlossrule[i].init(g->version(), (uint8 *)dend_info->strlossrule);
+		susceptrule[i].init(g->version(), (uint8 *)dend_info->susceptrule);
+		relaxrule[i].init(g->version(), (uint8 *)dend_info->relaxrule);
+
+		if (g->version() == 1) { // back/forward propogation is C2 only
+			backproprule[i].init(g->version(), (uint8 *)dend_info->backproprule);
+			forproprule[i].init(g->version(), (uint8 *)dend_info->forproprule);
+		} else {
+			backproprule[i].length = 0;
+			forproprule[i].length = 0;
+		}
+	}
 
 	threshold = g->nominalthreshold;
 	leakagerate = g->leakagerate;
@@ -288,8 +316,6 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 void oldLobe::init() {
 	inited = true;
 	wipe();
-
-	rndconst_staterule = 0; // TODO
 }
 
 void oldLobe::wipe() {
@@ -300,8 +326,7 @@ void oldLobe::wipe() {
 
 void oldLobe::tick() {
 	for (unsigned int i = 0; i < neurons.size(); i++) {
-		// TODO: c1 rules are not 12
-		unsigned char out = processSVRule(&neurons[i], NULL, ourGene->staterule, 12, rndconst_staterule);
+		unsigned char out = processSVRule(&neurons[i], NULL, staterule);
 
 		// apply leakage rate in order to settle at rest state
 		if ((parent->getTicks() & parent->getParent()->calculateTickMask(leakagerate / 8)) == 0) {
@@ -319,9 +344,10 @@ void oldLobe::tick() {
 			out -= threshold;
 
 		neurons[i].output = out;
-	}
 
-	// TODO: dendrites (ourGene->dendrite1, ourGene->dendrite2)
+		tickDendrites(i, 0);
+		tickDendrites(i, 1);
+	}
 
 	// TODO: data copied to perception lobe (ourGene->perceptflag - not just true/false!)
 
@@ -341,6 +367,64 @@ void oldLobe::tick() {
 	}
 
 	// TODO: migration
+}
+
+void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
+	oldDendriteInfo *dend_info = &ourGene->dendrite1;
+	if (type == 1) dend_info = &ourGene->dendrite2;
+
+	oldNeuron &dest = neurons[id];
+
+	for (unsigned int i = 0; i < dest.dendrites[type].size(); i++) {
+		unsigned char out;
+
+		oldDendrite &dend = dest.dendrites[type][i];
+
+		// recalculate suscept
+		out = processSVRule(&dest, &dend, susceptrule[type]);
+		if (out > dend.suscept) {
+			dend.suscept = out;
+		} else {
+			// decay old suscept
+			if ((parent->getTicks() & parent->getParent()->calculateTickMask(dend_info->relaxsuscept / 8)) == 0) {
+				dend.suscept = (dend.suscept * parent->getParent()->calculateMultiplier(dend_info->relaxsuscept / 8)) / 65536;
+			}
+		}
+
+		// recalculate reinforce (TODO: why do we call this relaxrule?)
+		out = processSVRule(&dest, &dend, relaxrule[type]);
+		unsigned char x = ((int)dend.suscept * (int)out) / 255;
+		if (x && x < dend.stw - dend.ltw)
+			dend.stw = dend.ltw + x;
+
+		// STW relax
+		if ((parent->getTicks() & parent->getParent()->calculateTickMask(dend_info->relaxSTW / 8)) == 0) {
+			out = dend.ltw + ((out - dend.ltw) * parent->getParent()->calculateMultiplier(dend_info->relaxSTW / 8)) / 65536;
+		}
+
+		// LTW gain
+		if (dend_info->LTWgainrate && (parent->getTicks() % dend_info->LTWgainrate) == 0) {
+			dend.ltw++;
+		}
+
+		// strength gain (TODO: don't run if maxed?)
+		if (dend_info->strgain && (parent->getTicks() % dend_info->strgain) == 0) {
+			out = processSVRule(&dest, &dend, strgainrule[type]);
+			// TODO: overflow?
+			dend.strength += out;
+		}
+
+		// strength loss (TODO: don't run if zero?)
+		if (dend_info->strloss && (parent->getTicks() % dend_info->strloss) == 0) {
+			out = processSVRule(&dest, &dend, strlossrule[type]);
+			// TODO: underflow?
+			dend.strength -= out;
+			// TODO: when strength is lost: also reset STW, LTW, +0/output/state on dest neuron
+		}
+
+		// TODO: back propogation (set leak in)
+		// TODO: front propogation (set leak out)
+	}
 }
 
 oldBrain::oldBrain(oldCreature *p) {
