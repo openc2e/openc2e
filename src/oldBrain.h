@@ -42,6 +42,8 @@ struct oldDendrite {
 struct oldNeuron {
 	unsigned char state, output, leakin, leakout;
 	std::vector<oldDendrite> dendrites[2];
+	unsigned char percept_src;
+	oldNeuron() { state = 0; output = 0; leakin = 0; leakout = 0; percept_src = 0; }
 };
 
 class oldLobe {
@@ -67,6 +69,8 @@ protected:
 	unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRule &rule);
 
 	unsigned char dendrite_sum(unsigned int type, bool only_if_all_firing);
+
+	void connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *dest);
 
 	void tickDendrites(unsigned int id, unsigned int type);
 

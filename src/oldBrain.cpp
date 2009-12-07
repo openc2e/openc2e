@@ -367,6 +367,9 @@ void oldLobe::init() {
 					break;
 			}
 			value += our_min;
+			for (unsigned int j = 0; j < (unsigned int)value; j++) {
+				neurons[i].dendrites[type].push_back(oldDendrite());
+			}
 		}
 	}
 
@@ -374,9 +377,94 @@ void oldLobe::init() {
 }
 
 void oldLobe::connect() {
-	// TODO
+	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+
+	for (unsigned int type = 0; type < 2; type++) {
+		oldLobe *src = parent->getLobeByTissue(dend_info[type]->srclobe);
+		// TODO: fix srclobe for all dendrites to be within range (srclobe = srclobe % lobes.size())
+		assert(src);
+
+		// TODO: handle src->neurons.size() being empty? or rather, maybe should never let that happen
+
+		uint8 &fanout = dend_info[type]->fanout;
+
+		unsigned int destsize = width * height, srcsize = src->width * src->height;
+
+		unsigned int offset = 0;
+		for (unsigned int i = 0; i < neurons.size(); i++) {
+			oldNeuron &destneu = neurons[i];
+			std::vector<oldDendrite> &dendrites = destneu.dendrites[type];
+			if (dendrites.size() == 0) continue;
+
+			unsigned int srcneu_id = offset / destsize;
+			unsigned int divwidth = srcneu_id / src->width;
+			unsigned int divwidth_r = srcneu_id % src->width;
+
+			// connect src.neurons[srcneu] with destneu.dendrites[type][0]
+			connectDendrite(type, dendrites[0], &src->neurons[srcneu_id]);
+
+			for (unsigned int dend_id = 1; dend_id < dendrites.size(); dend_id++) {
+				unsigned int attempts = 0;
+repeat_this_dend:
+				// for the other dendrites, find a source neuron to connect to using fanout
+				int src_x = (rand() % ((2 * fanout) + 1)) + divwidth_r - fanout;
+				int src_y = (rand() % ((2 * fanout) + 1)) + divwidth_r + divwidth;
+				src_x = src_x % src->width;
+				if (src_x < 0) src_x += src->width;
+				src_y = src_y % src->height;
+				if (src_y < 0) src_y += src->height;
+				unsigned int src_neuid = (src_y * src->width) + src_x;
+
+				// don't loop forever trying the impossible
+				if (attempts >= dendrites.size() * 2) {
+					// pick an appropriate src neuron methodically instead
+					for (unsigned int n = 0; n < src->neurons.size(); n++) {
+						unsigned int d;
+						for (d = 0; d < dend_id; d++) {
+							if (dendrites[d].src != &src->neurons[n] &&
+								dendrites[d].src->percept_src != src->neurons[n].percept_src) {
+								src_neuid = n;
+								break;
+							}
+						}
+						if (d < dend_id) break; // continue from above break
+					}
+					// (if we didn't find anything acceptable, fine, go on and connect to src_neuid..)
+				}
+
+				oldNeuron &srcneu = src->neurons[src_neuid];
+
+				// percept_src is set on neurons in the perception lobe which are copied
+				// from 'mutually exclusive' lobes, so we may only connect *one* dendrite
+				// to each source neuron of a given percept_src
+				if (attempts < dendrites.size() * 2 && srcneu.percept_src) {
+					for (unsigned int d = 0; d < dend_id; d++) {
+						if (dendrites[d].src != &srcneu &&
+							dendrites[d].src->percept_src != srcneu.percept_src) {
+							continue;
+						}
+						attempts++;
+						goto repeat_this_dend;
+					}
+				}
+
+				// connect srcneu with dendrites[type][dend_id]
+				connectDendrite(type, dendrites[dend_id], &srcneu);
+			}
+			offset += srcsize;
+		}
+	}
 
 	inited = true;
+}
+
+void oldLobe::connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *dest) {
+	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+
+	dend.src = dest;
+	dend.suscept = 0;
+	dend.stw = dend.ltw = rand() % (dend_info[type]->maxLTW - dend_info[type]->minLTW + 1) + dend_info[type]->minLTW;
+	dend.strength = rand() % (dend_info[type]->maxstr - dend_info[type]->minstr + 1) + dend_info[type]->minstr;
 }
 
 void oldLobe::wipe() {
@@ -533,8 +621,6 @@ void oldBrain::processGenes() {
 		if (lobes.size() == 1) { } // TODO: force perceptible on drive lobe (lobe 1)
 		lobes.push_back(l);
 	}*/
-
-	// TODO: fix srclobe for all dendrites to be within range (srclobe = srclobe % lobes.size())
 
 	for (unsigned int i = 1; i < lobes.size(); i++) {
 		if (!lobes[i]->wasInited())
