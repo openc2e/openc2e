@@ -147,7 +147,32 @@ void BrainView::drawOldBrain(oldBrain *b) {
 		}	
 	}
 
-	// TODO: dendrites
+	for (std::vector< oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
+		for (unsigned int j = 0; j < (*i)->getNoNeurons(); j++) {
+			oldNeuron *dest = (*i)->getNeuron(j);
+			for (unsigned int type = 0; type < 2; type++) {
+				for (std::vector<oldDendrite>::iterator d = dest->dendrites[type].begin();
+					d != dest->dendrites[type].end(); d++) {
+					oldNeuron *src = d->src;
+
+					float var = d->strength / 255.0;
+					if (threshold == 0.0f) {
+						if (var == threshold) continue;
+					} else {
+						if (var <= threshold) continue;
+					}
+
+					float multiplier = 0.5 + (var / 2.2);
+					QColor color(multiplier * 255, multiplier * 255, multiplier * 255);
+					painter.setPen(color);
+
+					assert(neuroncoords.find(src) != neuroncoords.end());
+					assert(neuroncoords.find(dest) != neuroncoords.end());
+					painter.drawLine(neuroncoords[src].first, neuroncoords[src].second, neuroncoords[dest].first, neuroncoords[dest].second);
+				}
+			}
+		}
+	}
 }
 
 void BrainView::drawC2eBrain(c2eBrain *b) {
