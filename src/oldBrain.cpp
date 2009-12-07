@@ -304,7 +304,9 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	inputgain = g->inputgain;
 
 	width = g->width;
+	if (width < 1) width = 1;
 	height = g->height;
+	if (height < 1) height = 1;
 
 	// TODO
 
@@ -335,6 +337,7 @@ void oldLobe::init() {
 
 	wipe();
 
+	// TODO: when reading from gene, we should enforce max >= min
 	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
 
 	for (unsigned int i = 0; i < neurons.size(); i++) {
@@ -411,6 +414,7 @@ void oldLobe::tick() {
 
 	if (ourGene->flags & 1) {
 		// winner takes all
+		// TODO: some kind of magic ignoring for attn lobe?
 		unsigned char bestvalue = 0;
 		unsigned char *bestoutput = NULL;
 		for (unsigned int i = 0; i < neurons.size(); i++) {
@@ -469,14 +473,15 @@ void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
 		if (dend_info->strgain && (parent->getTicks() % dend_info->strgain) == 0) {
 			out = processSVRule(&dest, &dend, strgainrule[type]);
 			// TODO: overflow?
-			dend.strength += out;
+			if ((int)dend.strength + (int)out > 255) dend.strength = 255;
+			else dend.strength += out;
 		}
 
 		// strength loss (TODO: don't run if zero?)
 		if (dend_info->strloss && (parent->getTicks() % dend_info->strloss) == 0) {
 			out = processSVRule(&dest, &dend, strlossrule[type]);
-			// TODO: underflow?
-			dend.strength -= out;
+			if ((int)dend.strength - (int)out < 0) dend.strength = 0;
+			else dend.strength -= out;
 			// TODO: when strength is lost: also reset STW, LTW, +0/output/state on dest neuron
 		}
 
