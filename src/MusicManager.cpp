@@ -287,8 +287,8 @@ MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
 	unsigned int length = (unsigned int)p->samples[sampleno].second;
 	buffer = FloatAudioBuffer(new float[length], length);
 	for (unsigned int i = 0; i < length / 2; i++) {
-		buffer.data[i*2] = data[i];
-		buffer.data[(i*2) + 1] = data[i];
+		buffer.data[i*2] = (signed short)swapEndianShort((unsigned short)data[i]);
+		buffer.data[(i*2) + 1] = (signed short)swapEndianShort((unsigned short)data[i]);
 	}
 }
 
