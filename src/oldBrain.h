@@ -73,6 +73,7 @@ protected:
 
 	unsigned char dendrite_sum(oldNeuron &cell, unsigned int type, bool only_if_all_firing);
 
+	void neuronTryMigration(unsigned int type, oldNeuron &neu, oldLobe *src);
 	void connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *dest);
 
 	void tickDendrites(unsigned int id, unsigned int type);

@@ -535,7 +535,54 @@ void oldLobe::tick() {
 			*bestoutput = bestvalue;
 	}
 
-	// TODO: migration
+	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+	for (unsigned int type = 0; type < 2; type++) {
+		if (dend_info[type]->migrateflag == 1) {
+			oldLobe *src = parent->getLobeByTissue(dend_info[type]->srclobe);
+			// TODO: see fix srclobe comment above (in oldLobe::connect)
+			assert(src);
+
+			for (unsigned int i = 0; i < neurons.size(); i++) {
+				if (!neurons[i].output) continue;
+
+				neuronTryMigration(type, neurons[i], src);
+			}
+		}
+	}
+
+	for (unsigned int type = 0; type < 2; type++) {
+		if (dend_info[type]->migrateflag == 2) {
+			// TODO: try (single) migration
+		}
+		dend_info[0] = &ourGene->dendrite2;
+		dend_info[1] = &ourGene->dendrite1;
+	}
+}
+
+void oldLobe::neuronTryMigration(unsigned int type, oldNeuron &neu, oldLobe *src) {
+	if (!src->active_neurons.size()) return;
+
+	// find a dendrite with strength zero
+	unsigned int d;
+	for (d = 0; d < neu.dendrites[type].size(); d++) {
+		if (!neu.dendrites[type][d].strength) break;
+	}
+	if (d == neu.dendrites[type].size()) return;
+	oldDendrite &dend = neu.dendrites[type][d];
+
+	// pick a random firing neuron in the source lobe
+	unsigned int n = rand() % src->active_neurons.size();
+	oldNeuron *srcneu = &src->neurons[src->active_neurons[n]];
+
+	for (d = 0; d < neu.dendrites[type].size(); d++) {
+		// give up if we're already connected to chosen source neuron
+		if (neu.dendrites[type][d].src == srcneu) break;
+	}
+	if (d != neu.dendrites[type].size()) return;
+
+	connectDendrite(type, dend, &neu);
+
+	if (loose_dendrites[type]) loose_dendrites[type]--;
 }
 
 void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
