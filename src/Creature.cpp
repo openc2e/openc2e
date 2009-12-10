@@ -948,13 +948,13 @@ unsigned char *oldCreature::getLocusPointer(bool receptor, unsigned char o, unsi
 				// emitter
 				switch (l) {
 					case 0: // lobe activity
-						return 0; // TODO
+						return lobe->getLobeActivityPointer();
 
 					case 1: // #loose dens/cells type 0
-						return 0; // TODO
+						return lobe->getLooseDendsPointer(0);
 
 					case 2: // #loose dens/cells type 1
-						return 0; // TODO
+						return lobe->getLooseDendsPointer(1);
 
 					default: // cell output
 					{

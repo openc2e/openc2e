@@ -87,17 +87,17 @@ unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend
 			return threshold;
 
 		case 12: // type0
-			return dendrite_sum(0, false);
+			return dendrite_sum(*cell, 0, false);
 
 		case 13: // type1
-			return dendrite_sum(1, false);
+			return dendrite_sum(*cell, 1, false);
 
 		case 14: // anded0
-			return dendrite_sum(0, true);
+			return dendrite_sum(*cell, 0, true);
 
 		case 15: // anded1
 			// unused?
-			return dendrite_sum(1, true);
+			return dendrite_sum(*cell, 1, true);
 
 		case 16: // input
 			// This comes from IMPT for the decision lobe.
@@ -254,10 +254,18 @@ unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRu
 	return state;
 }
 
-unsigned char oldLobe::dendrite_sum(unsigned int type, bool only_if_firing) {
+unsigned char oldLobe::dendrite_sum(oldNeuron &neu, unsigned int type, bool only_if_firing) {
 	// TODO: cache this result, since it will be used every time the svrule runs
 	// (and remember you can calculate both only_if_firing and not only_if_firing in one go!)
-	unsigned int sum = 0; // TODO: sum((src output * strength) / 255)
+	bool all_firing = true;
+	unsigned int sum = 0; // sum((src output * strength) / 255)
+	for (unsigned int j = 0; j < neu.dendrites[type].size(); j++) {
+		if (neu.dendrites[type][j].src->output == 0) all_firing = false;
+		else sum += (neu.dendrites[type][j].src->output * neu.dendrites[type][j].strength) / 255;
+	}
+	if (!neu.dendrites[type].size()) sum = 255;
+
+	if (only_if_firing && !all_firing) return 0;
 	return (sum * inputgain) / 255;
 }
 
@@ -474,6 +482,12 @@ void oldLobe::wipe() {
 }
 
 void oldLobe::tick() {
+	if (ourGene->dendrite1.migrateflag == 1) loose_dendrites[0] = 255;
+	else loose_dendrites[0] = 0;
+	if (ourGene->dendrite2.migrateflag == 1) loose_dendrites[1] = 255;
+	else loose_dendrites[1] = 0;
+	active_neurons.clear();
+
 	for (unsigned int i = 0; i < neurons.size(); i++) {
 		unsigned char out = processSVRule(&neurons[i], NULL, staterule);
 
@@ -487,16 +501,21 @@ void oldLobe::tick() {
 
 		neurons[i].state = out;
 
-		if (out < threshold)
+		if (out < threshold) {
 			out = 0;
-		else
+		} else {
+			active_neurons.push_back(i);
 			out -= threshold;
+		}
 
 		neurons[i].output = out;
 
 		tickDendrites(i, 0);
 		tickDendrites(i, 1);
+
+		neurons[i].leakin = 0;
 	}
+	lobe_activity = (unsigned char)((active_neurons.size() * 255) / neurons.size());
 
 	// TODO: data copied to perception lobe (ourGene->perceptflag - not just true/false!)
 
@@ -525,10 +544,13 @@ void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
 
 	oldNeuron &dest = neurons[id];
 
+	unsigned int loose_dends = 0;
 	for (unsigned int i = 0; i < dest.dendrites[type].size(); i++) {
 		unsigned char out;
 
 		oldDendrite &dend = dest.dendrites[type][i];
+
+		if (!dend.strength) loose_dends++;
 
 		// recalculate suscept
 		out = processSVRule(&dest, &dend, susceptrule[type]);
@@ -541,7 +563,7 @@ void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
 			}
 		}
 
-		// recalculate reinforce (TODO: why do we call this relaxrule?)
+		// recalculate reinforce (TODO: why do we call this relaxrule?) (TODO: don't run if suscept is zero?)
 		out = processSVRule(&dest, &dend, relaxrule[type]);
 		unsigned char x = ((int)dend.suscept * (int)out) / 255;
 		if (x && x < dend.stw - dend.ltw)
@@ -554,27 +576,56 @@ void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
 
 		// LTW gain
 		if (dend_info->LTWgainrate && (parent->getTicks() % dend_info->LTWgainrate) == 0) {
-			dend.ltw++;
+			if (dend.ltw < dend.stw)
+				dend.ltw++;
+			else if (dend.ltw > dend.stw)
+				dend.ltw--; // does this case really happen?
 		}
 
-		// strength gain (TODO: don't run if maxed?)
-		if (dend_info->strgain && (parent->getTicks() % dend_info->strgain) == 0) {
+		// strength gain
+		if (dend.strength < 255 && dend_info->strgain && (parent->getTicks() % dend_info->strgain) == 0) {
 			out = processSVRule(&dest, &dend, strgainrule[type]);
-			// TODO: overflow?
 			if ((int)dend.strength + (int)out > 255) dend.strength = 255;
 			else dend.strength += out;
 		}
 
-		// strength loss (TODO: don't run if zero?)
-		if (dend_info->strloss && (parent->getTicks() % dend_info->strloss) == 0) {
+		// strength loss
+		if (dend.strength && dend_info->strloss && (parent->getTicks() % dend_info->strloss) == 0) {
 			out = processSVRule(&dest, &dend, strlossrule[type]);
 			if ((int)dend.strength - (int)out < 0) dend.strength = 0;
 			else dend.strength -= out;
-			// TODO: when strength is lost: also reset STW, LTW, +0/output/state on dest neuron
+			if (!dend.strength) {
+				loose_dends++;
+				// also reset STW, LTW, suscept, output/state on dest neuron
+				dend.stw = 0;
+				dend.ltw = 0;
+				dend.suscept = 0;
+				dest.output = 0;
+				dest.state = 0;
+			}
 		}
 
-		// TODO: back propogation (set leak in)
-		// TODO: front propogation (set leak out)
+		// back propogation (set leak in of src neuron)
+		out = processSVRule(&dest, &dend, backproprule[type]);
+		dend.src->leakin = out;
+
+		// front propogation (set leak out of dest neuron)
+		out = processSVRule(&dest, &dend, forproprule[type]);
+		dest.leakout = out;
+	}
+
+	if (dend_info->migrateflag == 1) {
+		// data useful for migrateflag == 1 (migrate if ANY loose)
+		if (loose_dends < loose_dendrites[type])
+			loose_dendrites[type] = (unsigned char)loose_dends;
+	} else if (loose_dends) {
+		// data useful for migrateflag == 2 (migrate if ALL loose)
+		if (loose_dendrites[type] < 255)
+			loose_dendrites[type]++;
+		// TODO
+		// this is used later by migration code, see there
+		//if (i < loose_neuron_upperbound[type])
+		//	last_loose_neuron[type] = i;
 	}
 }
 
@@ -671,6 +722,9 @@ void oldBrain::init() {
 		lobe_process_order.push_back(i);
 	}
 	assert(lobe_process_order.size() == lobes.size());
+
+	// TODO: should we force a brain tick here? locis need to be initialised, maybe..
+	tick();
 }
 
 void oldBrain::tick() {

@@ -58,6 +58,9 @@ protected:
 
 	unsigned char threshold, leakagerate, inputgain;
 	unsigned char chems[6];
+	unsigned char loose_dendrites[2];
+	unsigned char lobe_activity;
+	std::vector<unsigned int> active_neurons;
 
 	oldSVRule staterule;
 	oldSVRule strgainrule[2], strlossrule[2];
@@ -68,7 +71,7 @@ protected:
 	unsigned char evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, oldSVRule &rule);
 	unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRule &rule);
 
-	unsigned char dendrite_sum(unsigned int type, bool only_if_all_firing);
+	unsigned char dendrite_sum(oldNeuron &cell, unsigned int type, bool only_if_all_firing);
 
 	void connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *dest);
 
@@ -95,6 +98,8 @@ public:
 	unsigned char *getThresholdPointer() { return &threshold; }
 	unsigned char *getLeakageRatePointer() { return &leakagerate; }
 	unsigned char *getInputGainPointer() { return &inputgain; }
+	unsigned char *getLooseDendsPointer(unsigned int type) { return &loose_dendrites[type]; }
+	unsigned char *getLobeActivityPointer() { return &lobe_activity; }
 };
 
 class oldBrain {
