@@ -44,6 +44,7 @@ struct oldNeuron {
 	std::vector<oldDendrite> dendrites[2];
 	unsigned char percept_src;
 	oldNeuron() { state = 0; output = 0; leakin = 0; leakout = 0; percept_src = 0; }
+	unsigned int magicalHash(unsigned int type);
 };
 
 class oldLobe {
@@ -62,6 +63,10 @@ protected:
 	unsigned char lobe_activity;
 	std::vector<unsigned int> active_neurons;
 
+	// data for "all dendrites loose" migration
+	unsigned int loose_neuron_upperbound[2];
+	unsigned int last_loose_neuron[2];
+
 	oldSVRule staterule;
 	oldSVRule strgainrule[2], strlossrule[2];
 	oldSVRule susceptrule[2];
@@ -73,6 +78,8 @@ protected:
 
 	unsigned char dendrite_sum(oldNeuron &cell, unsigned int type, bool only_if_all_firing);
 
+	bool migrationTryCandidateSlice(unsigned int type, oldLobe *src, std::vector<oldDendrite> &dendrites, unsigned int i);
+	void neuronTryAllLooseMigration(unsigned int type, oldNeuron &neu);
 	void neuronTryMigration(unsigned int type, oldNeuron &neu, oldLobe *src);
 	void connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *dest);
 

@@ -321,6 +321,10 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	for (unsigned int i = 0; i < 6; i++) {
 		chems[i] = 0;
 	}
+
+	// TODO: good starting values?
+	loose_neuron_upperbound[0] = 9999;
+	loose_neuron_upperbound[1] = 9999;
 }
 
 void oldLobe::ensure_minimum_size(unsigned int size) {
@@ -488,6 +492,9 @@ void oldLobe::tick() {
 	else loose_dendrites[1] = 0;
 	active_neurons.clear();
 
+	last_loose_neuron[0] = 0xFFFFFFFF;
+	last_loose_neuron[1] = 0xFFFFFFFF;
+
 	for (unsigned int i = 0; i < neurons.size(); i++) {
 		unsigned char out = processSVRule(&neurons[i], NULL, staterule);
 
@@ -552,10 +559,152 @@ void oldLobe::tick() {
 
 	for (unsigned int type = 0; type < 2; type++) {
 		if (dend_info[type]->migrateflag == 2) {
-			// TODO: try (single) migration
+			if (last_loose_neuron[type] == 0xFFFFFFFF) {
+				loose_neuron_upperbound[type] = 9999;
+				continue;
+			}
+			assert(last_loose_neuron[type] < neurons.size());
+			oldNeuron &neu = neurons[last_loose_neuron[type]];
+			if (dend_info[1 - type]->migrateflag == 2) {
+				// try (single) combined migration
+				neuronTryAllLooseMigration(2, neu);
+			} else {
+				// try (single) migration for this type
+				neuronTryAllLooseMigration(type, neu);
+			}
+			loose_neuron_upperbound[type] = last_loose_neuron[type];
 		}
 		dend_info[0] = &ourGene->dendrite2;
 		dend_info[1] = &ourGene->dendrite1;
+
+		// TODO: should we stop here if both migrateflags were 2?
+	}
+}
+
+// helper function for neuronTryAllLooseMigration (below)
+unsigned int oldNeuron::magicalHash(unsigned int type) {
+	unsigned int type_limit = type;
+	if (type == 2) { type = 0; type_limit--; }
+
+	// this is just a silly hash of the connected source neurons, so we can check
+	// if we're connected to the same sources as another neuron (type==2 for both)
+	// TODO: make this less stupid
+	unsigned int out = 1, outsum = 0;
+	for (unsigned int t = type; t <= type_limit; t++) {
+		for (unsigned int d = 0; d < dendrites[t].size(); d++) {
+			// it is a haaaaash, so hopefully nothing will explode about the cast
+			unsigned int v = (unsigned long)dendrites[t][d].src;
+			outsum += v;
+			out *= v;
+		}
+	}
+	return (out & 0xFFFF) | (outsum << 16);
+}
+
+// helper function for neuronTryAllLooseMigration (below)
+bool oldLobe::migrationTryCandidateSlice(unsigned int type, oldLobe *src, std::vector<oldDendrite> &dendrites, unsigned int i) {
+	// we examine a 'slice' of candidate active neurons, one for each dendrite, starting at i
+	for (unsigned int j = 0; j < dendrites.size(); j++) {
+		// if the neuron is perceptible..
+		if (src->neurons[src->active_neurons[i + j]].percept_src && j < dendrites.size() - 1) {
+			// check all previous neurons to make sure they don't collide
+			for (unsigned int k = i + j + 1; k < dendrites.size(); k++) {
+				if (src->neurons[src->active_neurons[i + j]].percept_src == src->neurons[k].percept_src) {
+					return false;
+				}
+			}
+		}
+	}
+
+	for (unsigned int j = 0; j < dendrites.size(); j++) {
+		connectDendrite(type, dendrites[j], &src->neurons[i + j]);
+	}
+
+	return true;
+}
+
+/*
+ * neuron migration which migrates *all* dendrites at once.
+ *
+ * dendrites only connect to a unique set of appropriate firing source neurons, so migration
+ * only succeeds if there are sufficient such source neurons available (otherwise the
+ * dendrites are reset to point back to where they were, ready for another migration attempt)
+ *
+ * pass type == 2 to migrate both types at once, otherwise it migrates the specified type only.
+ */
+void oldLobe::neuronTryAllLooseMigration(unsigned int type, oldNeuron &neu) {
+	unsigned int original_type = type;
+	unsigned int type_limit = type;
+	if (type == 2) { type = 0; type_limit--; }
+
+	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+
+	oldLobe *src[2] = { NULL, NULL };
+	for (unsigned int t = type; t <= type_limit; t++) {
+		src[t] = parent->getLobeByTissue(dend_info[t]->srclobe);
+		// TODO: see fix srclobe comment above (in oldLobe::connect)
+		assert(src[t]);
+
+		// not enough active source dendrites at present?
+		if (src[t]->active_neurons.size() < neu.dendrites[t].size()) return;
+	}
+
+	// store old source neurons (in case we can't find a valid connection)
+	std::vector<oldNeuron *> srcneus[2];
+	for (unsigned int t = type; t <= type_limit; t++) {
+		for (unsigned int i = 0; i < neu.dendrites[t].size(); i++) {
+			srcneus[t].push_back(neu.dendrites[t][i].src);
+		}
+	}
+
+	// shuffle source active neurons
+	for (unsigned int t = type; t <= type_limit; t++) {
+		for (unsigned int i = 0; i < src[t]->active_neurons[i]; i++) {
+			unsigned int j = rand() % src[t]->active_neurons.size();
+			unsigned int old = src[t]->active_neurons[j];
+			src[t]->active_neurons[j] = src[t]->active_neurons[i];
+			src[t]->active_neurons[i] = old;
+		}
+	}
+
+	for (unsigned int i = 0; i <= src[type]->active_neurons.size() - neu.dendrites[type].size(); i++) {
+		if (!migrationTryCandidateSlice(type, src[type], neu.dendrites[type], i)) continue;
+
+		// repeat inner loop *once* for one type, or a bunch of times for two types
+		unsigned int count = 0;
+		if (original_type == 2) count = src[1]->active_neurons.size() - neu.dendrites[1].size();
+
+		for (unsigned int k = 0; k <= count; k++) {
+			if (original_type == 2)
+				if (!migrationTryCandidateSlice(1, src[1], neu.dendrites[1], k)) continue;
+
+			// are there any other active neurons attached to the same source neurons as us?
+			unsigned int hash = neu.magicalHash(original_type);
+			unsigned int t;
+			for (t = type; t <= type_limit; t++) {
+				unsigned int j;
+				for (j = 0; j < active_neurons.size(); j++) {
+					if (neurons[active_neurons[j]].dendrites[t].size() != neu.dendrites[t].size()) break;
+					if (neurons[active_neurons[j]].magicalHash(original_type) == hash) break;
+				}
+				if (j == active_neurons.size()) break;
+			}
+			if (t == type_limit + 1) {
+				// success!
+				loose_dendrites[type]--;
+				return;
+			}
+		}
+	}
+
+	// failed; reset all dendrites back
+	for (unsigned int t = type; t <= type_limit; t++) {
+		for (unsigned int i = 0; i < neu.dendrites[t].size(); i++) {
+			neu.dendrites[t][i].src = srcneus[t][i];
+			neu.dendrites[t][i].stw = 0;
+			neu.dendrites[t][i].ltw = 0;
+			neu.dendrites[t][i].strength = 0;
+		}
 	}
 }
 
@@ -669,10 +818,9 @@ void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
 		// data useful for migrateflag == 2 (migrate if ALL loose)
 		if (loose_dendrites[type] < 255)
 			loose_dendrites[type]++;
-		// TODO
 		// this is used later by migration code, see there
-		//if (i < loose_neuron_upperbound[type])
-		//	last_loose_neuron[type] = i;
+		if (id < loose_neuron_upperbound[type])
+			last_loose_neuron[type] = id;
 	}
 }
 
