@@ -878,7 +878,7 @@ void oldBrain::processGenes() {
 	unsigned int size = 0;
 	for (unsigned int i = 1; i < lobes.size(); i++) {
 		if (lobes[i]->getGene()->perceptflag)
-			size += lobes[i]->getWidth() * lobes[i]->getHeight();
+			size += lobes[i]->getNoNeurons();
 	}
 	if (!lobes[0]->wasInited()) // TODO: we should really fix this even if it already got inited :-(
 		lobes[0]->ensure_minimum_size(size);
@@ -917,6 +917,20 @@ void oldBrain::init() {
 		lobe_process_order.push_back(i);
 	}
 	assert(lobe_process_order.size() == lobes.size());
+
+	// precalculate mutually exclusive (percept src) data for neurons
+	unsigned int offset = 0;
+	for (unsigned int i = 1; i < lobes.size(); i++) {
+		if (!lobes[i]->getGene()->perceptflag) continue;
+		if (lobes[i]->getGene()->perceptflag == 2) { // mutually exclusive
+			for (unsigned int j = 0; j < lobes[i]->getNoNeurons(); j++) {
+				// (we should be able to guarantee lobes[0] exists
+				// and is of sufficient size thanks to processGenes())
+				lobes[0]->getNeuron(offset + j)->percept_src = i;
+			}
+		}
+		offset += lobes[i]->getNoNeurons();
+	}
 
 	// TODO: should we force a brain tick here? locis need to be initialised, maybe..
 	tick();
