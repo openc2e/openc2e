@@ -896,27 +896,27 @@ class Neuron:
 		self.output = read8(f)
 		self.state = read8(f)
 
+		print "neuron at (" + str(self.x) + ", " + str(self.y) + ")"
+
 		if version == 0:
-			x = f.read(2)
+			x = f.read(2) # likely wta (decn)/percept_src data
 		else:
-			x = f.read(4)
+			x = f.read(4) # extra two bytes are presumably leakin/leakout?
 		#print "neuron bytes:",
 		#for z in x: print "%02X" % ord(z),
 		#print
 
 		for i in range(2):
 			nodendrites = read8(f)
-			dendritetype = read8(f)
-			x = f.read(3)
-			#print "neuron bytes:",
-			#for z in x: print "%02X" % ord(z),
-			#print
+			print "  has " + str(nodendrites) + " dendrites of type " + str(i)
+
+			first_dend_offset = read32(f) # offset within parent lobe
 
 			for j in range(nodendrites):
 				id = read32(f)
 				x = read8(f)
 				y = read8(f)
-				read8(f)
+				suscept = read8(f)
 				stw = read8(f)
 				ltw = read8(f)
 				strength = read8(f)
@@ -936,13 +936,14 @@ class Lobe:
 		print
 
 		self.nominalthreshold = read8(f)
-		read16(f) # TODO
+		read16(f) # TODO: rnd const or flags?
 		self.leakagerate = read8(f)
 		self.reststate = read8(f)
 		self.inputgain = read8(f)
 
 		print "lobe has nominal threshold " + str(self.nominalthreshold) + ", leakage rate " + str(self.leakagerate) + ", rest state " + str(self.reststate) + " and input gain " + str(self.inputgain)
 
+		# TODO: percept flag, loose dends, last loose neuron, #active neus, chems?
 		if version == 0:
 			x = f.read(9)
 		else:
@@ -961,6 +962,7 @@ class Lobe:
 		self.nodendrites = read32(f)
 	
 	def readNeurons(self, f):
+		print "--- next lobe ---"
 		self.neurons = []
 		for i in range(self.nocells):
 			n = Neuron()
@@ -990,6 +992,8 @@ class DendriteDetails:
 		print "migration rule %d, relax suscept %d, relax STW %d, LTW gain rate %d" % (self.migrationrule, self.relaxsuscept, self.relaxstw, self.ltwgainrate)
 
 		# the first bit of this, at least, seems to still be meaningful (ie: not all zeros)
+		# TODO: some of this is surely svrules+rndconst,
+		# with strgainrate before the first rule and strlossrate before second
 		if version == 0:
 			x = f.read(42)
 		else:
