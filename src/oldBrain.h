@@ -124,6 +124,8 @@ public:
 	void processGenes();
 	void init();
 
+	void processInstinct(creatureInstinctGene &instinct);
+
 	oldLobe *getLobeByTissue(unsigned int id);
 	oldCreature *getParent() { return parent; }
 	unsigned int getTicks() { return ticks; }

@@ -616,6 +616,7 @@ bool oldLobe::migrationTryCandidateSlice(unsigned int type, oldLobe *src, std::v
 		}
 	}
 
+	// slice is an acceptable candidate, wire it up
 	for (unsigned int j = 0; j < dendrites.size(); j++) {
 		connectDendrite(type, dendrites[j], &src->neurons[i + j]);
 	}
@@ -949,6 +950,129 @@ oldLobe *oldBrain::getLobeByTissue(unsigned int id) {
 		return 0;
 
 	return lobes[id];
+}
+
+void oldBrain::processInstinct(creatureInstinctGene &instinct) {
+	// work out *true* source lobe
+	unsigned int srclobe[3] = { 0, 0, 0 } ;
+	for (unsigned int i = 0; i < 3; i++) {
+		// no lobe in the instinct?
+		if (!instinct.lobes[i]) continue;
+
+		// TODO: instincts should be sanitised somewhere?
+		if (instinct.lobes[i] >= lobes.size()) continue;
+
+		if (lobes[instinct.lobes[i]]->getGene()->perceptflag) {
+			// perceptible! we can use this
+			srclobe[i] = instinct.lobes[i];
+		} else {
+			// lobe is not perceptible; try finding a lobe which
+			// feeds from it which *is* perceptible
+			for (unsigned int j = 1; j < lobes.size(); j++) {
+				if (lobes[j]->getGene()->dendrite1.srclobe == instinct.lobes[i] ||
+					lobes[j]->getGene()->dendrite2.srclobe == instinct.lobes[i]) {
+					srclobe[i] = j;
+					break;
+				}
+			}
+		}
+	}
+
+	// find the offsets into the perceptible lobe
+	std::vector<unsigned int> percept_neu_offsets;
+	for (unsigned int i = 0; i < 3; i++) {
+		if (!srclobe[i]) continue;
+
+		unsigned int offset = 0;
+		for (unsigned int j = 1; j < srclobe[i]; j++) offset += lobes[j]->getNoNeurons();
+		offset += instinct.neurons[i];
+		percept_neu_offsets.push_back(offset);
+	}
+
+	// were there no valid lobes? then we're done
+	if (!percept_neu_offsets.size()) {
+		std::cout << "instinct failed: no valid lobes" << std::endl;
+		return;
+	}
+
+	// we need a concept lobe (lobe 8) for instincts to work
+	if (lobes.size() < 9) {
+		std::cout << "instinct failed: no concept lobe" << std::endl;
+		return;
+	}
+	// TODO: verify the concept lobe does actually have type 0 dendrites pointing at the perceptible lobe?
+
+	// find a candidate neuron in the concept lobe with the necessary number
+	// of type 0 dendrites and minimal strength
+	unsigned int candidateneuron = 0xFFFFFFFF;
+	for (unsigned int maxstr = 0; maxstr < 256; maxstr++) {
+		for (unsigned int i = 0; i < lobes[8]->getNoNeurons(); i++) {
+			oldNeuron *neu = lobes[8]->getNeuron(i);
+
+			if (neu->dendrites[0].size() != percept_neu_offsets.size()) continue;
+
+			unsigned int j;
+			for (j = 0; j < neu->dendrites[0].size(); j++) {
+				if (neu->dendrites[0][j].strength > maxstr) break;
+			}
+			if (j == neu->dendrites[0].size()) {
+				candidateneuron = i;
+				break;
+			}
+		}
+		if (candidateneuron != 0xFFFFFFFF) break;
+	}
+
+	if (candidateneuron == 0xFFFFFFFF) {
+		std::cout << "instinct failed: no candidate concept neuron with " <<
+			(int)percept_neu_offsets.size() << " type 0 dendrites" << std::endl;
+		return;
+	}
+
+	// connect the discovered concept neuron to the relevant perceptible neurons
+	oldNeuron *conceptneu = lobes[8]->getNeuron(candidateneuron);
+	for (unsigned int i = 0; i < percept_neu_offsets.size(); i++) {
+		oldDendrite &dend = conceptneu->dendrites[0][i];
+		dend.ltw = dend.stw = dend.strength = instinct.level;
+		// in theory thanks to earlier sanity checks, all percept_neu_offsets should be in range
+		dend.src = lobes[0]->getNeuron(percept_neu_offsets[i]);
+	}
+
+	// find relevant decision neuron
+	// TODO: again, instincts should be sanitised somewhere
+	oldNeuron *decnneu = lobes[6]->getNeuron(instinct.action);
+
+	// work out relevant dendrite type
+	// type 1 for punishment chem, type 0 otherwise (reward)
+	// this is kind of horrible hardcoding (but then, so is the rest)
+	unsigned int type = (instinct.drive == 53 ? 1 : 0);
+
+	// find a minimal-strength dendrite..
+	unsigned int candidatedendrite = 0xFFFFFFFF;
+	for (unsigned int maxstr = 0; maxstr < 256; maxstr++) {
+		unsigned int i;
+		for (i = 0; i < decnneu->dendrites[type].size(); i++) {
+			if (decnneu->dendrites[type][i].strength <= maxstr) {
+				candidatedendrite = i;
+				break;
+			}
+		}
+		if (candidatedendrite != 0xFFFFFFFF) break;
+	}
+
+	if (candidatedendrite == 0xFFFFFFFF) {
+		// brain can't learn this!
+		std::cout << "instinct failed: no candidate decision dendrite (!) " << std::endl;
+		return;
+	}
+
+	// finally, wire the concept neuron up to the relevant decision
+	oldDendrite &dend = decnneu->dendrites[type][candidatedendrite];
+	dend.ltw = dend.stw = dend.strength = instinct.level;
+	dend.src = conceptneu;
+
+	// TODO: remove this someday :-)
+	std::cout << "instinct success" << std::endl;
 }
 
 /* vim: set noet: */
