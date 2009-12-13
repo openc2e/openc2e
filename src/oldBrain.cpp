@@ -363,8 +363,8 @@ void oldLobe::init() {
 					value = rand() % (our_range + 1);
 					break;
 				case 1: // normal
+					// TODO: really not sure how this is different from above
 					value = rand() % (our_range + 1);
-					value *= 2;
 					break;
 				case 2: // Saw
 					value = rand() % (our_range + 1);
@@ -879,7 +879,7 @@ void oldBrain::processGenes() {
 	unsigned int size = 0;
 	for (unsigned int i = 1; i < lobes.size(); i++) {
 		if (lobes[i]->getGene()->perceptflag)
-			size += lobes[i]->getNoNeurons();
+			size += lobes[i]->getWidth() * lobes[i]->getHeight(); // can't use getNoNeurons before init()!
 	}
 	if (!lobes[0]->wasInited()) // TODO: we should really fix this even if it already got inited :-(
 		lobes[0]->ensure_minimum_size(size);
@@ -939,6 +939,20 @@ void oldBrain::init() {
 
 void oldBrain::tick() {
 	for (unsigned int i = 0; i < lobes.size(); i++) {
+		if (lobe_process_order[i] == 0) {
+			// perception lobe copy
+			unsigned int offset = 0;
+			for (unsigned int n = 1; n < lobes.size(); n++) {
+				if (!lobes[n]->getGene()->perceptflag) continue;
+				for (unsigned int j = 0; j < lobes[n]->getNoNeurons(); j++) {
+					unsigned char output = lobes[n]->getNeuron(j)->output;
+					oldNeuron *destneu = lobes[0]->getNeuron(offset);
+					if (destneu->state < output)
+						destneu->state = output;
+					offset++;
+				}
+			}
+		}
 		lobes[lobe_process_order[i]]->tick();
 	}
 
@@ -969,12 +983,19 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 			// lobe is not perceptible; try finding a lobe which
 			// feeds from it which *is* perceptible
 			for (unsigned int j = 1; j < lobes.size(); j++) {
+				if (!lobes[j]->getGene()->perceptflag) continue;
+				// TODO: check max connections too?
 				if (lobes[j]->getGene()->dendrite1.srclobe == instinct.lobes[i] ||
 					lobes[j]->getGene()->dendrite2.srclobe == instinct.lobes[i]) {
 					srclobe[i] = j;
 					break;
 				}
 			}
+		}
+
+		if (!srclobe[i]) {
+			std::cout << "instinct: ignoring source lobe " << (int)instinct.lobes[i] <<
+				" because it's not perceptible" << std::endl;
 		}
 	}
 
@@ -984,8 +1005,21 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 		if (!srclobe[i]) continue;
 
 		unsigned int offset = 0;
-		for (unsigned int j = 1; j < srclobe[i]; j++) offset += lobes[j]->getNoNeurons();
+		for (unsigned int j = 1; j < srclobe[i]; j++) {
+			if (!lobes[j]->getGene()->perceptflag) continue;
+			offset += lobes[j]->getNoNeurons();
+		}
 		offset += instinct.neurons[i];
+
+		// original engine will happily go off the end of the lobe here!
+		// (see cdouble's posts about Canny norns causing crashes with instincts using non-perceptible lobes)
+		// TODO: sanity-check this at source (ie, above, when finding feed lobe) also?
+		if (offset >= lobes[0]->getNoNeurons()) {
+			std::cout << "instinct: ignoring offset " << (int)offset << " (was lobe " <<
+				(int)instinct.lobes[i] << ", now lobe " << (int)srclobe[i] <<
+				", neu offset " << (int)instinct.neurons[i] << ")" << std::endl;
+			continue;
+		}
 		percept_neu_offsets.push_back(offset);
 	}
 
