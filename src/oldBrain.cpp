@@ -1104,9 +1104,6 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 	oldDendrite &dend = decnneu->dendrites[type][candidatedendrite];
 	dend.ltw = dend.stw = dend.strength = instinct.level;
 	dend.src = conceptneu;
-
-	// TODO: remove this someday :-)
-	std::cout << "instinct success" << std::endl;
 }
 
 /* vim: set noet: */
