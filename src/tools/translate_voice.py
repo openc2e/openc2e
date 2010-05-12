@@ -83,7 +83,7 @@ class VoiceProcessor:
 			elif ourchars[0] == 26:
 				transformed = (transformed % 7) + 4
 			elif ourchars[2] == 26:
-				transformed = (transformed % 7) + 11 # originally 10?
+				transformed = (transformed % 7) + 10 # originally 10?
 			else:
 				transformed = (transformed % 14) + 18
 

@@ -156,7 +156,7 @@ bool VoiceData::NextSyllableFor(std::vector<unsigned int> &sentence, unsigned in
 		} else if (chars[0] == 26) {
 			sum = (sum % 7) + 4; // 4-10
 		} else if (chars[2] == 26) {
-			sum = (sum % 7) + 11; // 11-17
+			sum = (sum % 7) + 10; // 10-16 (not 11-17?!, but matches original)
 		} else {
 			sum = (sum % 14) + 18; // 18-31
 		}
