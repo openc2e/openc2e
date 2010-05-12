@@ -45,13 +45,13 @@ class VoiceProcessor:
 		# magic lookup table transform!
 		data = VoiceLookup[chars[0]] & (VoiceLookup[chars[1] + 27] & VoiceLookup[chars[2] + 27 + 27])
 		if chars[1] == 26:
-			data = data & 0xf
+			data = data & 0xf # bits 0-3
 		if chars[0] == 26:
-			data = data & 0x7f0
+			data = data & 0x7f0 # bits 4-10
 		if chars[2] == 26:
-			data = data & 0x3f800
+			data = data & 0x3f800 # bits 11-17
 		if chars[0] < 26 and chars[1] < 26 and chars[2] < 26:
-			data = data & 0xfffc0000
+			data = data & 0xfffc0000 # bits 18-31
 		if data == 0:
 			# eep! caller will handle it
 			return 32
@@ -77,13 +77,13 @@ class VoiceProcessor:
 		# out of range (insufficient data for a syllable?)
 		if transformed >= 32 or transformed == 0:
 			transformed = ourchars[0] + ourchars[1] + ourchars[2]
-			# not entirely sure about all of these
+			# transform into 0-3, 4-10, 11-17 or 18-31 ranges, as with the lookup table version
 			if ourchars[1] == 26:
 				transformed = (transformed % 4)
 			elif ourchars[0] == 26:
 				transformed = (transformed % 7) + 4
 			elif ourchars[2] == 26:
-				transformed = (transformed % 7) + 10
+				transformed = (transformed % 7) + 11 # originally 10?
 			else:
 				transformed = (transformed % 14) + 18
 
