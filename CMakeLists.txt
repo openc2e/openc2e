@@ -120,6 +120,7 @@ SET(OPENC2E_CORE
 	src/images/sprImage.cpp
 	src/streamutils.cpp
 	src/Vehicle.cpp
+	src/VoiceData.cpp
 	src/World.cpp
 	src/main.cpp
 	src/util.cpp
