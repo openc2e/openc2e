@@ -279,26 +279,31 @@ void caosVM::v_MUTE() {
 
 /**
  SEZZ (command) text (string)
- %status stub
+ %status maybe
+
+ Tells the target agent to speak the specified text.
 */
 void caosVM::c_SEZZ() {
 	VM_PARAM_STRING(text)
 
 	valid_agent(targ);
 
-	// TODO
+	targ->speak(text);
 }
 
 /**
  VOIS (command) voice (string)
- %status stub
+ %status maybe
+
+ Set the voice of the target agent to the specified voice (a catalogue tag).
 */
 void caosVM::c_VOIS() {
 	VM_PARAM_STRING(voice)
 	
 	valid_agent(targ);
 
-	// TODO
+	targ->setVoice(voice);
+	// TODO: reload DefaultVoice on failure?
 }
 
 /**
