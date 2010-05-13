@@ -103,15 +103,15 @@ void MusicManager::playTrack(std::string track, unsigned int latency) {
 		trackname = track.substr(n + 1, std::string::npos);
 	}
 
-	std::string realfilename = world.findFile("Sounds/" + filename);
-	if (!realfilename.size()) {
-		std::cout << "Couldn't find MNG file '" << filename << "'!" << std::endl;
-		return; // TODO: exception?
-	}
-
 	MNGFile *file;
 	std::transform(filename.begin(), filename.end(), filename.begin(), (int(*)(int))tolower);
 	if (files.find(filename) == files.end()) {
+		std::string realfilename = world.findFile("Sounds/" + filename);
+		if (!realfilename.size()) {
+			std::cout << "Couldn't find MNG file '" << filename << "'!" << std::endl;
+			return; // TODO: exception?
+		}
+
 		file = new MNGFile(realfilename);
 		files[filename] = file;
 	} else {
