@@ -22,14 +22,17 @@
 
 #include "Map.h"
 #include "Scriptorium.h"
-#include "Agent.h"
 #include "CompoundPart.h"
 #include "prayManager.h"
+#include "caosVar.h"
 #include "historyManager.h"
 #include "imageManager.h"
 #include <set>
 #include <map>
+#include <list>
 #include <boost/filesystem/path.hpp>
+
+class caosVM;
 
 struct cainfo {
 	float gain;

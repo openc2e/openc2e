@@ -21,6 +21,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "Backend.h"
+#include "Agent.h"
 #include <time.h> // gmtime and strftime
 
 /**

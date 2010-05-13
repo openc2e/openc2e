@@ -22,6 +22,7 @@
 #include "World.h"
 #include "Backend.h"
 #include "MetaRoom.h"
+#include "Agent.h"
 
 Camera::Camera() {
 	metaroom = 0;

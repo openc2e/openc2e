@@ -29,6 +29,8 @@
 using boost::shared_ptr;
 using boost::weak_ptr;
 
+class genomeFile;
+
 struct historyevent {
 	unsigned int eventno;
 	lifestage stage;

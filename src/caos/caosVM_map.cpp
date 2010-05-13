@@ -23,6 +23,7 @@
 #include "MetaRoom.h"
 #include "Room.h"
 #include "AgentHelpers.h"
+#include "Agent.h"
 
 #include <assert.h>
 #include <iostream>

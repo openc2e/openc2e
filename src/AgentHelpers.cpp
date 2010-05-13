@@ -18,6 +18,7 @@
  */
 
 #include "World.h"
+#include "Agent.h"
 #include "MetaRoom.h"
 #include "Room.h"
 

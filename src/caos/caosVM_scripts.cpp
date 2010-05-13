@@ -21,6 +21,7 @@
 #include "caosScript.h"
 #include "World.h"
 #include "Engine.h"
+#include "Agent.h"
 #include <iostream>
 using std::cerr;
 

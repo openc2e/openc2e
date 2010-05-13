@@ -24,6 +24,7 @@
 #include "Room.h"
 #include "Camera.h"
 #include "exceptions.h"
+#include "Agent.h"
 
 /*
  * sfcdumper.py has better commentary on this format - use it for debugging
