@@ -30,6 +30,7 @@
 #include "AgentHelpers.h"
 #include "creaturesImage.h"
 #include "Camera.h"
+#include "VoiceData.h"
 
 void Agent::core_init() {
 	initialized = false;
@@ -118,6 +119,10 @@ void Agent::finishInit() {
 	if (engine.version > 2 && findScript(10))
 		queueScript(10); // constructor
 	
+	if (!voice && engine.version == 3) {
+		setVoice("DefaultVoice");
+	}
+
 	initialized = true;
 }
 
@@ -1052,6 +1057,9 @@ void Agent::tick() {
 
 	// tick the agent VM
 	if (vm) vmTick();
+
+	// some silly hack to handle delayed voices
+	tickVoices();
 }
 
 void Agent::unhandledException(std::string info, bool wasscript) {
@@ -1446,6 +1454,48 @@ void Agent::join(unsigned int outid, AgentRef dest, unsigned int inid) {
 	outports[outid]->dests.push_back(std::pair<AgentRef, unsigned int>(dest, inid));
 	dest->inports[inid]->source = this;
 	dest->inports[inid]->sourceid = outid;
+}
+
+void Agent::setVoice(std::string name) {
+	if (engine.version < 3) {
+		std::string path = world.findFile(name + ".vce");
+		if (!path.size()) throw creaturesException(boost::str(boost::format("can't find %s.vce") % name));
+		std::ifstream f(path.c_str());
+		if (!f.is_open()) throw creaturesException(boost::str(boost::format("can't open %s.vce") % name));
+		voice = shared_ptr<VoiceData>(new VoiceData(f));
+	} else {
+		voice = shared_ptr<VoiceData>(new VoiceData(name));
+	}
+}
+
+void Agent::speak(std::string sentence) {
+	if (!voice) throw creaturesException("can't speak without voice");
+	std::vector<unsigned int> data = voice->GetSentenceFor(sentence);
+	unsigned int pos = 1;
+	VoiceEntry entry;
+	unsigned int delay = 0;
+	while (voice->NextSyllableFor(data, pos, entry)) {
+		// this might be completely the wrong idea, i don't know quite how this is meant to work
+		pending_voices.push_back(std::pair<std::string, unsigned int>(entry.name, delay));
+
+		// TODO: base this on tickrate?
+		if (engine.version == 3) entry.delay *= 2;
+		delay += entry.delay;
+	}
+}
+
+void Agent::tickVoices() {
+	for (int i = 0; i < (int)pending_voices.size(); i++) {
+		std::pair<std::string, unsigned int> &entry = pending_voices[i];
+		if (entry.second == 0) {
+			// uncontrolled audio is easier, we shall hope no-one notices
+			playAudio(entry.first, false, false);
+			pending_voices.erase(pending_voices.begin() + i);
+			i--;
+		} else {
+			entry.second--;
+		}
+	}
 }
 
 /* vim: set noet: */

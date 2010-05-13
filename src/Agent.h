@@ -108,6 +108,12 @@ protected:
 
 public:
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
+
+	boost::shared_ptr<class VoiceData> voice;
+	std::vector<std::pair<std::string, unsigned int> > pending_voices;
+	void setVoice(std::string name);
+	void speak(std::string sentence);
+	void tickVoices();
 	
 	boost::shared_ptr<class AudioSource> sound;
 
