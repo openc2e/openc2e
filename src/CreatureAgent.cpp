@@ -19,6 +19,8 @@
 
 #include "CreatureAgent.h"
 #include "Creature.h"
+#include "Catalogue.h"
+#include "Engine.h"
 
 CreatureAgent::CreatureAgent() {
 	creature = 0;
@@ -42,6 +44,41 @@ void CreatureAgent::setCreature(Creature *c) {
 	unsigned short species = (creature->isFemale() ? 2 : 1);
 	// category needs to be set, so call setClassifier now
 	getAgent()->setClassifier(getAgent()->family, getAgent()->genus, species);
+
+	// TODO: this should be in a seperate function
+	if (engine.version < 3) {
+		switch (getAgent()->genus) {
+			case 1:
+				if (creature->isFemale())
+					getAgent()->setVoice("female");
+				else
+					getAgent()->setVoice("male");
+				break;
+			case 2:
+				getAgent()->setVoice("grendel");
+				break;
+			case 3:
+				getAgent()->setVoice("ettin");
+				break;
+		}
+	} else {
+		std::string tagname;
+		switch (getAgent()->genus) {
+			case 1: tagname = "Norn"; break;
+			case 2: tagname = "Grendel"; break;
+			case 3: tagname = "Ettin"; break;
+			case 4: tagname = "Geat"; break;
+			default: tagname = "Unknown"; break;
+		}
+		if (creature->isFemale())
+			tagname += " Female";
+		else
+			tagname += " Male";
+		// TODO: actually pay attention to age
+		tagname += " Embryo";
+		if (catalogue.hasTag(tagname))
+			getAgent()->setVoice(tagname);
+	}
 }
 
 void CreatureAgent::tick() {
