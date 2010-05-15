@@ -379,7 +379,7 @@ MusicEffect::MusicEffect(MNGEffectDecNode *n) {
 	}
 }
 
-std::vector<FloatAudioBuffer> MusicEffect::applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength) {
+std::vector<FloatAudioBuffer> MusicEffect::applyEffect(class MusicTrack *t, std::vector<FloatAudioBuffer> src, float beatlength) {
 	std::vector<FloatAudioBuffer> buffers;
 
 	for (std::vector<shared_ptr<MusicStage> >::iterator i = stages.begin(); i != stages.end(); i++) {
@@ -394,7 +394,7 @@ std::vector<FloatAudioBuffer> MusicEffect::applyEffect(shared_ptr<class MusicTra
 
 MusicVoice::MusicVoice(shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 	node = n;
-	parent = p;
+	parent = p.get();
 
 	interval = 0.0f;
 	interval_expression = NULL;
@@ -461,7 +461,7 @@ bool MusicVoice::shouldPlay() {
 }
 
 MusicLayer::MusicLayer(shared_ptr<MusicTrack> p) {
-	parent = p;
+	parent = p.get();
 
 	updaterate = 1.0f;
 	volume = 1.0f;

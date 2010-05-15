@@ -97,14 +97,14 @@ protected:
 
 public:
 	MusicEffect(MNGEffectDecNode *n);
-	std::vector<FloatAudioBuffer> applyEffect(shared_ptr<class MusicTrack> t, std::vector<FloatAudioBuffer> src, float beatlength);
+	std::vector<FloatAudioBuffer> applyEffect(class MusicTrack *t, std::vector<FloatAudioBuffer> src, float beatlength);
 };
 
 class MusicVoice {
 protected:
 	MNGVoiceNode *node;
 	MNGUpdateNode *updatenode;
-	shared_ptr<class MusicLayer> parent;
+	class MusicLayer *parent;
 	shared_ptr<MusicWave> wave;
 	shared_ptr<MusicEffect> effect;
 
@@ -121,14 +121,14 @@ public:
 	shared_ptr<MusicEffect> getEffect() { return effect; }
 	bool shouldPlay();
 	void runUpdateBlock();
-	shared_ptr<MusicLayer> getParent() { return parent; }
+	MusicLayer *getParent() { return parent; }
 };
 
 class MusicLayer : public boost::enable_shared_from_this<class MusicLayer> {
 protected:
 	MNGUpdateNode *updatenode;
 
-	shared_ptr<MusicTrack> parent;
+	MusicTrack *parent;
 	unsigned int next_offset;
 
 	std::map<std::string, float> variables;
@@ -138,7 +138,7 @@ protected:
 	void runUpdateBlock();
 
 public:
-	shared_ptr<MusicTrack> getParent() { return parent; }
+	MusicTrack *getParent() { return parent; }
 	float &getVariable(std::string name) { return variables[name]; }
 	virtual void update(unsigned int latency) = 0;
 	float getVolume() { return volume; }
