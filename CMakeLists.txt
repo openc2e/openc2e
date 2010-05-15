@@ -41,6 +41,7 @@ SET(OPENC2E_CORE
 	src/alloc_count.cpp
 	src/creatures/attFile.cpp
 	src/Backend.cpp
+	src/creatures/Biochemistry.cpp
 	src/Blackboard.cpp
 	src/images/blkImage.cpp
 	src/images/bmpImage.cpp
