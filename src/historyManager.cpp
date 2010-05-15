@@ -17,12 +17,12 @@
  *
  */
 
-#include "genome.h"
+#include "creatures/genome.h"
 #include "historyManager.h"
 #include "World.h"
 #include "Catalogue.h"
-#include "CreatureAgent.h"
-#include "Creature.h"
+#include "creatures/CreatureAgent.h"
+#include "creatures/Creature.h"
 #include "Engine.h" // version
 
 #include <boost/format.hpp>

@@ -39,7 +39,7 @@ SET(OPENC2E_CORE
 	src/AgentHelpers.cpp
 	src/AgentRef.cpp
 	src/alloc_count.cpp
-	src/attFile.cpp
+	src/creatures/attFile.cpp
 	src/Backend.cpp
 	src/Blackboard.cpp
 	src/images/blkImage.cpp
@@ -47,7 +47,7 @@ SET(OPENC2E_CORE
 	src/Bubble.cpp
 	src/bytecode.cpp
 	src/images/c16Image.cpp
-	src/c2eBrain.cpp
+	src/creatures/c2eBrain.cpp
 	src/CallButton.cpp
 	src/Camera.cpp
 	src/caosScript.cpp
@@ -82,16 +82,16 @@ SET(OPENC2E_CORE
 	${GEN}/cmddata.cpp
 	src/cobFile.cpp
 	src/CompoundAgent.cpp
-	src/CompoundCreature.cpp
+	src/creatures/CompoundCreature.cpp
 	src/CompoundPart.cpp
-	src/Creature.cpp
-	src/CreatureAgent.cpp
+	src/creatures/Creature.cpp
+	src/creatures/CreatureAgent.cpp
 	src/creaturesImage.cpp
 	src/dialect.cpp
 	src/Engine.cpp
 	src/exceptions.cpp
 	src/fileSwapper.cpp
-	src/genomeFile.cpp
+	src/creatures/genomeFile.cpp
 	src/historyManager.cpp
 	src/imageManager.cpp
 	${GEN}/mnglexer.cpp
@@ -103,7 +103,7 @@ SET(OPENC2E_CORE
 	src/music/mngfile.cpp
 	${GEN}/mngparser.tab.cpp
 	src/MusicManager.cpp
-	src/oldBrain.cpp
+	src/creatures/oldBrain.cpp
 	src/PathResolver.cpp
 	src/peFile.cpp
 	src/physics.cpp
@@ -116,7 +116,7 @@ SET(OPENC2E_CORE
 	src/Scriptorium.cpp
 	src/SFCFile.cpp
 	src/SimpleAgent.cpp
-	src/SkeletalCreature.cpp
+	src/creatures/SkeletalCreature.cpp
 	src/images/sprImage.cpp
 	src/streamutils.cpp
 	src/Vehicle.cpp

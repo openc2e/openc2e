@@ -30,8 +30,8 @@
 #include "BrainViewer.h"
 #include "CreatureGrapher.h"
 
-#include "Creature.h"
-#include "SkeletalCreature.h"
+#include "creatures/Creature.h"
+#include "creatures/SkeletalCreature.h"
 #include "PointerAgent.h"
 
 #include "version.h"

@@ -1,6 +1,6 @@
-#include "../../Creature.h"
-#include "../../c2eBrain.h"
-#include "../../oldBrain.h"
+#include "../../creatures/Creature.h"
+#include "../../creatures/c2eBrain.h"
+#include "../../creatures/oldBrain.h"
 
 #include <QtGui>
 #include "brainview.h"

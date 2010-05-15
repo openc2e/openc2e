@@ -14,7 +14,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "Creature.h"
+#include "creatures/Creature.h"
 #include "CreatureGrapher.h"
 #include "qtopenc2e.h"
 #include "Engine.h"

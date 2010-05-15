@@ -25,7 +25,7 @@
 #include "Room.h"
 #include "MetaRoom.h"
 #include "Camera.h"
-#include "SkeletalCreature.h"
+#include "creatures/SkeletalCreature.h"
 #include <climits>
 
 // TODO: change imagecount?

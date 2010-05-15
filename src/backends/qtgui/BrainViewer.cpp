@@ -15,8 +15,8 @@
 */
 
 #include "World.h"
-#include "CreatureAgent.h"
-#include "Creature.h"
+#include "creatures/CreatureAgent.h"
+#include "creatures/Creature.h"
 
 #include "BrainViewer.h"
 #include "tools/braininavat/brainview.h"

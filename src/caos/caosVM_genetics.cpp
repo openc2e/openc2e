@@ -19,7 +19,7 @@
 
 #include "caosVM.h"
 #include "World.h"
-#include "CreatureAgent.h"
+#include "creatures/CreatureAgent.h"
 #include <fstream>
 
 /**

@@ -22,9 +22,9 @@
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
-#include "SkeletalCreature.h"
-#include "CompoundCreature.h"
-#include "Creature.h"
+#include "creatures/SkeletalCreature.h"
+#include "creatures/CompoundCreature.h"
+#include "creatures/Creature.h"
 using std::cerr;
 
 CreatureAgent *caosVM::getTargCreatureAgent() {

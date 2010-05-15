@@ -22,7 +22,7 @@
 #include "Vehicle.h"
 #include "Blackboard.h"
 #include "PointerAgent.h"
-#include "SkeletalCreature.h"
+#include "creatures/SkeletalCreature.h"
 #include "World.h"
 #include "creaturesImage.h"
 #include <iostream>

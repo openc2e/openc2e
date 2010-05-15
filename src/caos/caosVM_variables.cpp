@@ -33,7 +33,7 @@
 
 #include "Vehicle.h"
 #include "PointerAgent.h"
-#include "CreatureAgent.h"
+#include "creatures/CreatureAgent.h"
 
 /**
  VAxx (variable)

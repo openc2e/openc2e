@@ -25,7 +25,7 @@
 #include "CompoundAgent.h" // for setFocus
 #include <limits.h> // for MAXINT
 #include "creaturesImage.h"
-#include "CreatureAgent.h"
+#include "creatures/CreatureAgent.h"
 #include "Backend.h"
 #include "AudioBackend.h"
 #include "SFCFile.h"
