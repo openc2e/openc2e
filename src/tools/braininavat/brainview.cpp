@@ -1,4 +1,5 @@
-#include "../../creatures/Creature.h"
+#include "../../creatures/c2eCreature.h"
+#include "../../creatures/oldCreature.h"
 #include "../../creatures/c2eBrain.h"
 #include "../../creatures/oldBrain.h"
 

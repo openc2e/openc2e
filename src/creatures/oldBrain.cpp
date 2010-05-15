@@ -18,7 +18,7 @@
  */
 
 #include "oldBrain.h"
-#include "Creature.h"
+#include "oldCreature.h"
 
 /*
  * svrule examples:

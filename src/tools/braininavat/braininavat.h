@@ -17,7 +17,7 @@
 #ifndef _BRAININAVAT_H
 #define _BRAININAVAT_H
 
-#include "creatures/Creature.h"
+#include "creatures/c2eCreature.h"
 
 #include <QMainWindow>
 

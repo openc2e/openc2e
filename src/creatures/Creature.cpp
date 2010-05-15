@@ -18,6 +18,8 @@
  */
 
 #include "Creature.h"
+#include "oldCreature.h"
+#include "c2eCreature.h"
 #include "CreatureAgent.h"
 #include "World.h"
 #include "Catalogue.h"

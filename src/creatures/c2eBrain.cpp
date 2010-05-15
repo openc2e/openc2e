@@ -18,7 +18,7 @@
  */
 
 #include "c2eBrain.h"
-#include "Creature.h"
+#include "c2eCreature.h"
 #include <math.h>
 #include <boost/format.hpp>
 

@@ -24,7 +24,8 @@
 #include "Engine.h"
 #include "creatures/SkeletalCreature.h"
 #include "creatures/CompoundCreature.h"
-#include "creatures/Creature.h"
+#include "creatures/oldCreature.h"
+#include "creatures/c2eCreature.h"
 using std::cerr;
 
 CreatureAgent *caosVM::getTargCreatureAgent() {
