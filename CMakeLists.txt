@@ -87,6 +87,7 @@ SET(OPENC2E_CORE
 	src/CompoundPart.cpp
 	src/creatures/Creature.cpp
 	src/creatures/CreatureAgent.cpp
+	src/creatures/CreatureAI.cpp
 	src/creaturesImage.cpp
 	src/dialect.cpp
 	src/Engine.cpp
