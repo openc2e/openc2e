@@ -787,9 +787,6 @@ void MusicTrack::init() {
 }
 
 MusicTrack::~MusicTrack() {
-	for (int i = 0; i < (int)buffers.size(); i++) {
-		delete[] buffers[i].data;
-	}
 }
 
 void MusicTrack::update(unsigned int latency) {
