@@ -101,8 +101,12 @@ int SDLBackend::networkInit() {
 }
 
 void SDLBackend::shutdown() {
-	if (TTF_WasInit())
+	if (TTF_WasInit()) {
+		if (basicfont) {
+			TTF_CloseFont(basicfont);
+		}
 		TTF_Quit();
+	}
 	if (networkingup && listensocket)
 		SDLNet_TCP_Close(listensocket);
 	SDLNet_Quit();
