@@ -182,7 +182,7 @@ Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 	resize(hatcherybg.width() + 6, hatcherybg.height() + 6);
 	
 	/* create the widgets/layout */
-	graphicsScene = new QGraphicsScene();
+	graphicsScene = new QGraphicsScene(this);
 	graphicsView = new QGraphicsView(graphicsScene, this);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->addWidget(graphicsView);

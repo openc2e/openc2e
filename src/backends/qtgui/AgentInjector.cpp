@@ -65,6 +65,13 @@ void AgentInjector::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 }
 
 void AgentInjector::resetAgents() {
+	if (engine.version == 2) {
+		for (int i = 0; i < ui.agentList->count(); i++) {
+			QListWidgetItem *item = ui.agentList->item(i);
+			cobAgentBlock *b = (cobAgentBlock *)item->data(Qt::UserRole).value<void *>();
+			delete b;
+		}
+	}
 	ui.agentList->clear();
 	ui.injectButton->setEnabled(false);
 	ui.removeButton->setEnabled(false);
