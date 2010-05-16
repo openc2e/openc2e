@@ -172,7 +172,7 @@ std::string Engine::executeNetwork(std::string in) {
 }
 
 bool Engine::needsUpdate() {
-	return (!world.paused) && (fastticks || !backend->ticks() || (backend->ticks() > (tickdata + world.ticktime)));
+	return fastticks || !backend->ticks() || (backend->ticks() > (tickdata + world.ticktime));
 }
 
 unsigned int Engine::msUntilTick() {
@@ -235,9 +235,11 @@ bool Engine::tick() {
 
 	// tick+draw the world, if necessary
 	bool needupdate = needsUpdate();
-	if (needupdate)
-		update();
-	drawWorld();
+	if (needupdate) {
+		if (!world.paused)
+			update();
+		drawWorld();
+	}
 
 	processEvents();
 	if (needupdate)
