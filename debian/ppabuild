@@ -6,7 +6,7 @@ set -u
 
 default_git_base="git://github.com/ccdevnet/openc2e.git"
 default_ppasuffix=ppa0
-set -A suites intrepid jaunty karmic
+set -A suites jaunty karmic
 
 ### You shouldn't need to modify anything below here
 
@@ -38,12 +38,12 @@ git remote add src $git_base
 git fetch src
 git checkout -q refs/remotes/src/master
 
-describe_ver="$(git-describe --tags)-$ppasuffix"
-raw_ver="$(git-log -1 --pretty=format:\%H)"
+describe_ver="$(git describe --tags)-$ppasuffix"
+raw_ver="$(git log -1 --pretty=format:\%H)"
 echo "=== Checked out version $describe_ver ==="
 
 echo "=== Building orig.tar.gz ==="
-git-archive --format=tar --prefix="openc2e-$describe_ver/" HEAD | gzip -9c > "$tempdir/openc2e_$describe_ver.orig.tar.gz"
+git archive --format=tar --prefix="openc2e-$describe_ver/" HEAD | gzip -9c > "$tempdir/openc2e_$describe_ver.orig.tar.gz"
 popd
 
 echo "=== Building package ==="
