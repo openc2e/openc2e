@@ -6,7 +6,7 @@ set -u
 
 default_git_base="git://github.com/ccdevnet/openc2e.git"
 default_ppasuffix=ppa0
-set -A suites jaunty karmic
+set -A suites jaunty karmic lucid
 
 ### You shouldn't need to modify anything below here
 
