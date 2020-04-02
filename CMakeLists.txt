@@ -184,6 +184,8 @@ IF(HAVE_STDINT_H)
 ELSE(HAVE_STDINT_H)
 ENDIF(HAVE_STDINT_H)
 
+find_package(Python REQUIRED)
+
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_mixer)
 FIND_PACKAGE(SDL_net REQUIRED)
@@ -294,15 +296,15 @@ INCLUDE_DIRECTORIES(BEFORE
 
 FILE(GLOB CAOSVM_FILES ${SRC}/src/caos/caosVM_*.cpp)
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${GEN}/commandinfo.yml
-	COMMAND perl parsedocs.pl ${CAOSVM_FILES} > ${GEN}/commandinfo.yml
-	DEPENDS parsedocs.pl ${CAOSVM_FILES}
+	OUTPUT ${GEN}/commandinfo.json
+	COMMAND ${Python_EXECUTABLE} parsedocs.py ${CAOSVM_FILES} > ${GEN}/commandinfo.json
+	DEPENDS parsedocs.py ${CAOSVM_FILES}
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/caosdocs.html
-	COMMAND perl docs/writehtml.pl ${GEN}/commandinfo.yml > ${BIN}/caosdocs.html
-	DEPENDS docs/writehtml.pl ${GEN}/commandinfo.yml
+	COMMAND ${Python_EXECUTABLE} docs/writehtml.py ${GEN}/commandinfo.json > ${BIN}/caosdocs.html
+	DEPENDS docs/writehtml.py ${GEN}/commandinfo.json
 	WORKING_DIRECTORY ${SRC})
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${BIN}/docs.css
@@ -330,8 +332,8 @@ ADD_CUSTOM_COMMAND(
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/cmddata.cpp
-	COMMAND perl writecmds.pl ${GEN}/commandinfo.yml > ${GEN}/cmddata.cpp
-	DEPENDS ${GEN}/commandinfo.yml writecmds.pl
+	COMMAND ${Python_EXECUTABLE} writecmds.py ${GEN}/commandinfo.json > ${GEN}/cmddata.cpp
+	DEPENDS ${GEN}/commandinfo.json writecmds.py
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
