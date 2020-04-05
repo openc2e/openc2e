@@ -43,7 +43,7 @@ protected:
 	static const char *catalogue_parse_p;
 	static void yyinit(const char *buf);
 	static int catalex();
-	friend int catalex();
+	friend int cataparse();
 	friend void cataerror(const char *);
 	static void catalogueParseError(const char *err = NULL);
 public:

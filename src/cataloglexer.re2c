@@ -4,8 +4,8 @@
 #include <string>
 #include <list>
 
-#include "catalogue.tab.hpp"
 #include "Catalogue.h"
+#include "catalogparser.h"
 #include <cctype>
 #include <sstream>
 #include <cassert>
@@ -62,7 +62,7 @@ strloop:
 
 /*!re2c
 	backslash any { temp << catalogue_descape(basep[1]); goto strloop; }
-	quote { catalval.string = new std::string(temp.str()); return CTOK_STR; }
+	quote { catalval.string = std::string(temp.str()); return CTOK_STR; }
 	backslash ? eoi { catalogueParseError("premature end of input"); }
 	newline { temp << basep[0]; yylineno++; goto strloop; }
 	any { temp << basep[0]; goto strloop; }

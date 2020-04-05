@@ -73,8 +73,8 @@ SET(OPENC2E_CORE
 	src/caos/caosVM_vehicles.cpp
 	src/caos/caosVM_world.cpp
 	${GEN}/cataloglexer.cpp
+	src/catalogparser.cpp
 	src/Catalogue.cpp
-	${GEN}/catalogue.tab.cpp
 	${GEN}/cmddata.cpp
 	src/cobFile.cpp
 	src/CompoundAgent.cpp
@@ -280,12 +280,6 @@ ADD_CUSTOM_COMMAND(
 	WORKING_DIRECTORY ${SRC})
 
 ADD_CUSTOM_COMMAND(
-	OUTPUT ${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
-	COMMAND bison -d --name-prefix=cata --file-prefix="${GEN}/catalogue" src/catalogue.ypp
-	DEPENDS src/catalogue.ypp
-	WORKING_DIRECTORY ${SRC})
-
-ADD_CUSTOM_COMMAND(
 	OUTPUT ${GEN}/cmddata.cpp
 	COMMAND ${Python_EXECUTABLE} writecmds.py ${GEN}/commandinfo.json > ${GEN}/cmddata.cpp
 	DEPENDS ${GEN}/commandinfo.json writecmds.py
@@ -313,7 +307,6 @@ ADD_CUSTOM_TARGET(test DEPENDS openc2e
 	COMMAND perl ${SRC}/runtests.pl ${SRC}/tests)
 ADD_CUSTOM_TARGET(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
 ADD_CUSTOM_TARGET(generated DEPENDS
-	${GEN}/catalogue.tab.cpp ${GEN}/catalogue.tab.hpp
 	${GEN}/caoslexer.cpp
 	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
 	${GEN}/mnglexer.cpp

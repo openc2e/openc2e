@@ -23,7 +23,7 @@
 #include <string>
 #include <list>
 
-#include "catalogue.tab.hpp"
+#include "catalogparser.h"
 #include <ghc/filesystem.hpp>
 #include <boost/format.hpp>
 #include <iostream>
