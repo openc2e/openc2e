@@ -220,8 +220,16 @@ if (OPENC2E_USE_SERIALIZATION)
 	target_link_libraries(openc2e Boost::serialization)
 endif()
 
-add_library(prayfile src/prayfile/pray.cpp src/prayfile/PrayFileWriter.cpp)
-target_link_libraries(prayfile PUBLIC ghc_filesystem z)
+add_library(prayfile
+	src/prayfile/pray.cpp
+	src/prayfile/PrayFileWriter.cpp
+	${GEN}/prayfile/PraySourceParser.cpp
+)
+target_link_libraries(prayfile PUBLIC
+	ghc_filesystem
+	mpark_variant
+	z
+)
 target_link_libraries(openc2e prayfile)
 
 add_executable(praydumper src/tools/praydumper.cpp)
@@ -278,6 +286,12 @@ add_custom_command(
 	OUTPUT ${GEN}/mnglexer.cpp
 	COMMAND re2c -o ${GEN}/mnglexer.cpp ${SRC}/src/music/mnglexer.re2c
 	DEPENDS ${SRC}/src/music/mnglexer.re2c
+	WORKING_DIRECTORY ${SRC})
+
+add_custom_command(
+	OUTPUT ${GEN}/prayfile/PraySourceParser.cpp
+	COMMAND re2c -o ${GEN}/prayfile/PraySourceParser.cpp ${SRC}/src/prayfile/PraySourceParser.re2c
+	DEPENDS ${SRC}/src/prayfile/PraySourceParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
