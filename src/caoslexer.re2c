@@ -2,12 +2,6 @@
 #include "token.h"
 #include "caoslexer.h"
 
-static void parse_error(const char *p, int lineno) {
-	std::ostringstream oss;
-	oss << "Parse error at line " << lineno;
-	throw parseException(oss.str());
-}
-
 static char string_escape(char c) {
 	switch (c) {
 	case 'n': return '\n';
@@ -20,11 +14,11 @@ static char string_escape(char c) {
 
 void lexcaos(std::vector<token> &v, const char *p, bool c2) {
 #define make_word(str) \
-	v.push_back(token(std::string(str), yylineno))
+	v.push_back(token(token::TOK_WORD, str, yylineno))
 	int yylineno = 1;
 	int tokidx   = 0;
 	std::string tempstr;
-	bytestring_t tempbs;
+	std::vector<unsigned char> tempbs;
 	const char *basep, *YYMARKER;
 std:
 	basep = p;
@@ -47,8 +41,8 @@ SIGN       = [-+];
 	[\n] { ++yylineno; goto std; }
 	[\r] { goto std; }
 	[ \t,] { goto std; }
-	"*" [^\r\n\000]* { goto std; }
-	"'" noneoi "'"  { v.push_back(token(caosVar((int)basep[1]), yylineno)); goto std; }
+	"*" [^\r\n\000]* { v.push_back(token(token::TOK_COMMENT, std::string(basep, p - basep), yylineno)); goto std; }
+	"'" noneoi "'"  { v.push_back(token(token::TOK_CHAR, (int)basep[1], yylineno)); goto std; }
 	[fF] "**" [kK] { make_word("f**k"); goto std; }
 	WORDANY* WORDINIT WORDANY* {
 		std::string word(basep, p - basep);
@@ -62,15 +56,15 @@ SIGN       = [-+];
 			accum <<= 1;
 			accum += (*i == '1');
 		}
-		v.push_back(token(caosVar(accum), yylineno));
+		v.push_back(token(token::TOK_BINARY, accum, yylineno));
 		goto std;
 	}
 	SIGN? DIGIT* "." DIGIT* {
-		v.push_back(token(caosVar((float)atof(basep)), yylineno));
+		v.push_back(token(token::TOK_FLOAT, (float)atof(basep), yylineno));
 		goto std;
 	}
 	SIGN? DIGIT+  {
-		v.push_back(token(caosVar(atoi(basep)), yylineno));
+		v.push_back(token(token::TOK_INT, atoi(basep), yylineno));
 		goto std;
 	}
 "<>"                     { make_word("ne"); goto std; }
@@ -87,7 +81,7 @@ SIGN       = [-+];
 "\"" { goto str; }
 eoi { goto out; }
 
-any { parse_error(p, yylineno); }
+any { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
 */
 bytestr:
 	basep = p;
@@ -95,27 +89,27 @@ bytestr:
 [0-9]+  { tempbs.push_back(atoi(basep)); goto bytestr; }
 [\n\r] { yylineno++; goto bytestr; }
 [ \t] { goto bytestr; }
-"]" { v.push_back(token(tempbs, yylineno)); tempbs.clear(); goto std; }
-any { parse_error(p, yylineno); }
+"]" { v.push_back(token(token::TOK_BYTESTR, tempbs, yylineno)); tempbs.clear(); goto std; }
+any { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
 */
 brstr:
 	basep = p;
 	/*!re2c
-[\000\r\n] { parse_error(basep, yylineno); }
-"]" { v.push_back(token(caosVar(tempstr), yylineno)); tempstr.clear(); goto std;  }
+[\000\r\n] { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
+"]" { v.push_back(token(token::TOK_STRING, tempstr, yylineno)); tempstr.clear(); goto std;  }
 noneoi { tempstr.push_back(*basep); goto brstr; }
 */
 
 str:
 	basep = p;
 	/*!re2c
-[\000\r\n] { parse_error(p, yylineno); }
+[\000\r\n] { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
 "\\" . { tempstr.push_back(string_escape(basep[1])); goto str; }
-"\"" { v.push_back(token(caosVar(tempstr), yylineno)); tempstr.clear(); goto std;  }
+"\"" { v.push_back(token(token::TOK_STRING, tempstr, yylineno)); tempstr.clear(); goto std;  }
 noneoi      { tempstr.push_back(*basep); goto str; }
 */
 out:
-	v.push_back(token()); // EOI
+	v.push_back(token(token::TOK_EOI, yylineno)); // EOI
 	for (size_t i = 0; i < v.size(); i++)
 		v[i].index = i;
 }

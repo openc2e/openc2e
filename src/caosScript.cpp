@@ -245,20 +245,57 @@ struct repsinfo {
 
 
 token *caosScript::tokenPeek() {
-	if ((size_t)curindex >= tokens->size())
-		return NULL;
-	return &(*tokens)[curindex];
+	while (true) {
+		if ((size_t)curindex >= tokens->size()) {
+			return NULL;
+		}
+		if ((*tokens)[curindex].type == token::TOK_COMMENT) {
+			curindex++;
+			continue;
+		}
+		return &(*tokens)[curindex];
+	}
 }
 
-token *caosScript::getToken(toktype expected) {
+caosScript::logicaltokentype caosScript::logicalType(const token * const t ) {
+	return logicalType(*t);
+}
+
+caosScript::logicaltokentype caosScript::logicalType(const token& t) {
+	switch (t.type) {
+		case token::TOK_WORD:
+			return TOK_WORD;
+		case token::TOK_BYTESTR:
+			return TOK_BYTESTR;
+		case token::TOK_STRING:
+		case token::TOK_CHAR:
+		case token::TOK_BINARY:
+		case token::TOK_INT:
+		case token::TOK_FLOAT:
+			return TOK_CONST;
+		case token::TOK_EOI:
+			return EOI;
+		case token::TOK_ERROR:
+			throw parseException("no logical type for a lexer error token");
+		case token::TOK_COMMENT:
+			throw parseException("no logical type for a comment token");
+	}
+}
+
+token *caosScript::getToken(logicaltokentype expected) {
 	token *t = tokenPeek();
+	while (t && t->type == token::TOK_COMMENT) {
+		curindex++;
+		t = tokenPeek();
+	}
+
 	token dummy;
 	token &r = (t ? *t : dummy);
-
 	errindex = curindex;
 
-	if (expected != ANYTOKEN && r.type() != expected)
-		r.unexpected();
+	if (expected != ANYTOKEN && logicalType(r) != expected) {
+		unexpectedToken(r);
+	}
 
 	curindex++;
 
@@ -347,7 +384,7 @@ void caosScript::parse(std::istream &in) {
 
 		if (errindex - leftct != 0) {
 			e.context->push_back(token());
-			e.context->back().payload = std::string("...");
+			e.context->back().setWord("...");
 			prefix = 1;
 		}
 
@@ -356,15 +393,35 @@ void caosScript::parse(std::istream &in) {
 		}
 		if (errindex + rightct + 1 < (int)tokens->size()) {
 			e.context->push_back(token());
-			e.context->back().payload = std::string("...");
+			e.context->back().setWord("...");
 		}
 		e.ctxoffset = leftct + prefix;
 		throw;
 	}
 }
 
+caosVar caosScript::asConst(const token& token) {
+	if (token.type == token::TOK_STRING) {
+		return caosVar(token.strval);
+	}
+	if (token.type == token::TOK_CHAR || token.type == token::TOK_BINARY
+		|| token.type == token::TOK_INT)
+	{
+		return caosVar(token.intval);
+	}
+	if (token.type == token::TOK_FLOAT)
+	{
+		return caosVar(token.floatval);
+	}
+	unexpectedToken(token);
+}
+
+void caosScript::unexpectedToken(const token& token) {
+	throw parseException("Unexpected " + token.typeAsString());
+}
+
 const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix, bool except) {
-	if (!except && t->type() != TOK_WORD)
+	if (!except && logicalType(t) != TOK_WORD)
 		return NULL;
 
 	std::string fullname = prefix + t->word();
@@ -418,34 +475,34 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 	token *t = getToken();
 	traceindex = errindex = curindex;
 	if (xtype == CI_BAREWORD) {
-		if (t->type() == TOK_WORD) {
+		if (logicalType(t) == TOK_WORD) {
 			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, caosVar(t->word())));
-		} else if (t->type() == TOK_CONST) {
-			if (t->constval().getType() != CAOSSTR)
-				t->unexpected();
-			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
+		} else if (logicalType(t) == TOK_CONST) {
+			if (asConst(*t).getType() != CAOSSTR)
+				unexpectedToken(*t);
+			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, asConst(*t)));
 		} else {
-			t->unexpected();
+			unexpectedToken(*t);
 		}
 		assert(!"UNREACHABLE");
 		return std::shared_ptr<CAOSExpression>();
 	}
-	switch (t->type()) {
+	switch (logicalType(t)) {
 		case TOK_CONST:
-			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
+			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, asConst(*t)));
 		case TOK_BYTESTR:
 			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->bytestr()));
 		case TOK_WORD: break; // fall through to remainder of function
-		default: t->unexpected();
+		default: unexpectedToken(*t);
 	}
 
 	std::string oldpayload = t->word();
 	if (t->word() == "face" && xtype != CI_COMMAND) {
 		// horrible hack, yay
 		if (xtype == CI_NUMERIC)
-			t->payload = std::string("face int");
+			t->setWord("face int");
 		else
-			t->payload = std::string("face string");
+			t->setWord("face string");
 	}
 
 	std::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
@@ -458,9 +515,9 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 			int idx = atoi(t->word().c_str() + 2);
 			if (!strncmp(t->word().c_str(), "va", 2))
 				idx = current->mapVAxx(idx);
-			t->payload = t->word().substr(0, 2) + "xx";
+			t->setWord(t->word().substr(0, 2) + "xx");
 			const cmdinfo *op = readCommand(t, std::string("expr "));
-			t->payload = oldpayload;
+			t->setWord(oldpayload);
 
 			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
 			cmd->op = op;
@@ -476,9 +533,9 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 			int idx = atoi(t->word().c_str() + 3);
 			if (!strncmp(t->word().c_str(), "var", 3))
 				idx = current->mapVAxx(idx);
-			t->payload = t->word().substr(0, 3) + "x";
+			t->setWord(t->word().substr(0, 3) + "x");
 			const cmdinfo *op = readCommand(t, std::string("expr "));
-			t->payload = oldpayload;
+			t->setWord(oldpayload);
 
 			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
 			cmd->op = op;
@@ -488,7 +545,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 	}
 	
 	const cmdinfo *ci = readCommand(t, std::string(xtype == CI_COMMAND ? "cmd " : "expr "));
-	t->payload = oldpayload;
+	t->setWord(oldpayload);
 	cmd->op = ci;
 	for (int i = 0; ci->argtypes[i] != CI_END; i++) {
 		cmd->arguments.push_back(readExpr(ci->argtypes[i]));
@@ -535,7 +592,7 @@ void caosScript::parseCondition() {
 
 		token *peek = tokenPeek();
 		if (!peek) break;
-		if (peek->type() != TOK_WORD) break;
+		if (logicalType(peek) != TOK_WORD) break;
 		if (peek->word() == "and") {
 			getToken();
 			nextIsAnd = true;
@@ -545,12 +602,12 @@ void caosScript::parseCondition() {
 		} else break;
 	}
 }
-	
+
 void caosScript::parseloop(int state, void *info) {
 	token *t;
 	while ((t = getToken(ANYTOKEN))) {
 		traceindex = errindex;
-		if (t->type() == EOI) {
+		if (logicalType(t) == EOI) {
 			switch (state) {
 				case ST_INSTALLER:
 				case ST_BODY:
@@ -560,7 +617,7 @@ void caosScript::parseloop(int state, void *info) {
 					throw parseException("Unexpected end of input");
 			}
 		}
-		if (t->type() != TOK_WORD) {
+		if (logicalType(t) != TOK_WORD) {
 			throw parseException("Unexpected non-word token");
 		}
 		if (t->word() == "scrp") {
@@ -570,7 +627,7 @@ void caosScript::parseloop(int state, void *info) {
 			state = ST_BODY;
 			int bits[4];
 			for (int i = 0; i < 4; i++) {
-				caosVar val = getToken(TOK_CONST)->constval();
+				caosVar val = asConst(*getToken(TOK_CONST));
 				if (val.getType() != CAOSINT)
 					throw parseException("Expected integer constant");
 				bits[i] = val.getInt();
@@ -712,7 +769,7 @@ void caosScript::parseloop(int state, void *info) {
 		} else if (t->word() == "elif") {
 			if (state != ST_DOIF) {
 				// XXX this is horrible
-				t->payload = std::string("doif");
+				t->setWord(std::string("doif"));
 				continue;
 			}
 			struct doifinfo *di = (struct doifinfo *)info;
@@ -750,17 +807,17 @@ void caosScript::parseloop(int state, void *info) {
 		} else if (t->word() == "ssfc") {
 			std::shared_ptr<CAOSExpression> roomno_e = readExpr(CI_NUMERIC);
 
-			caosVar coordcount = getToken(TOK_CONST)->constval();
+			caosVar coordcount = asConst(*getToken(TOK_CONST));
 			if (!coordcount.hasInt())
 				throw parseException("Literal integer expected");
 			int count = coordcount.getInt();
 
 			std::vector<std::pair<int, int> > points(count);
 			for (int i = 0; i < count; i++) {
-				caosVar cvx = getToken(TOK_CONST)->constval();
+				caosVar cvx = asConst(*getToken(TOK_CONST));
 				if (!cvx.hasInt())
 					throw parseException("Literal integer expected");
-				caosVar cvy = getToken(TOK_CONST)->constval();
+				caosVar cvy = asConst(*getToken(TOK_CONST));
 				if (!cvy.hasInt())
 					throw parseException("Literal integer expected");
 				points[i].first = cvx.getInt();
@@ -779,7 +836,7 @@ void caosScript::parseloop(int state, void *info) {
 		} else {
 			if (t->word() == "dbg:") {
 				token *t2 = tokenPeek();
-				if (t2 && t2->type() == TOK_WORD && t2->word() == "asrt") {
+				if (t2 && logicalType(t2) == TOK_WORD && t2->word() == "asrt") {
 					getToken(TOK_WORD);
 					emitOp(CAOS_CONSTINT, 1);
 					parseCondition();

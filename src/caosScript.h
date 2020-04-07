@@ -262,6 +262,20 @@ protected:
 	const cmdinfo *readCommand(token *t, const std::string &prefix, bool except = true);
 	void parseloop(int state, void *info);
 
+	caosVar asConst(const token& token);
+	void unexpectedToken(const token& token);
+
+	enum logicaltokentype {
+		ANYTOKEN = 0,
+		EOI = 0,
+		TOK_WORD,
+		TOK_BYTESTR,
+		TOK_CONST,
+	};
+
+	logicaltokentype logicalType(const token *const);
+	logicaltokentype logicalType(const token&);
+
 	shared_ptr<std::vector<token> > tokens;
 	int curindex; // index to the next token to be read
    	int errindex; // index to the token to report parse errors on
@@ -270,7 +284,7 @@ protected:
 	// deprecated support functions
 	token *tokenPeek();
 	void putBackToken(token *);
-	token *getToken(toktype expected = ANYTOKEN);
+	token *getToken(logicaltokentype expected = ANYTOKEN);
 
 	friend struct saveVisit;
 	friend struct evalVisit;
