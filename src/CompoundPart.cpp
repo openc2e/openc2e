@@ -25,6 +25,7 @@
 #include "creaturesImage.h"
 #include "Backend.h"
 #include "Agent.h"
+#include "imageManager.h"
 
 bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
 	// TODO: unsure about all of this, needs a check (but seems to work)
@@ -152,7 +153,7 @@ CompoundPart::~CompoundPart() {
 
 SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
 						int _x, int _y, unsigned int _z) : AnimatablePart(p, _id, _x, _y, _z) {
-	origsprite = sprite = world.gallery.getImage(spritefile);
+	origsprite = sprite = world.gallery->getImage(spritefile);
 	firstimg = fimg;
 	caos_assert(sprite);
 	
@@ -183,7 +184,7 @@ SpritePart::~SpritePart() {
 #include "images/bmpImage.h"
 
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
-	shared_ptr<creaturesImage> spr = world.gallery.getImage(spritefile);
+	shared_ptr<creaturesImage> spr = world.gallery->getImage(spritefile);
 	caos_assert(spr);
 	base = 0; // TODO: should we preserve base?
 
@@ -277,7 +278,7 @@ void ButtonPart::mouseOut() {
 
 TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
 	                : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
-	textsprite = world.gallery.getImage(fontsprite);
+	textsprite = world.gallery->getImage(fontsprite);
 	caos_assert(textsprite);
 	caos_assert(textsprite->numframes() == 224);
 	leftmargin = 8; topmargin = 8; rightmargin = 8; bottommargin = 8;
@@ -577,7 +578,7 @@ FixedTextPart::FixedTextPart(Agent *p, unsigned int _id, std::string spritefile,
 TextEntryPart::TextEntryPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
 	// TODO: hm, this never gets freed..
-	if (!caretsprite) { caretsprite = world.gallery.getImage("cursor"); caos_assert(caretsprite); }
+	if (!caretsprite) { caretsprite = world.gallery->getImage("cursor"); caos_assert(caretsprite); }
 
 	caretpose = 0;
 	caretpos = 0;

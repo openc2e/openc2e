@@ -16,6 +16,7 @@
 
 #include "World.h"
 #include "Engine.h"
+#include "prayManager.h"
 
 #include "AgentInjector.h"
 #include "c1cobfile.h"
@@ -162,7 +163,7 @@ void AgentInjector::onInject() {
 				default: QMessageBox::warning(this, tr("Couldn't inject:"), tr("Unknown dependency type")); return;
 			}
 
-			std::string directory = world.praymanager.getResourceDir(praytype);
+			std::string directory = world.praymanager->getResourceDir(praytype);
 			caos_assert(!directory.empty());
 
 			fs::path possiblefile = fs::path(directory) / fs::path(name);

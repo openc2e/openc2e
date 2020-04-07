@@ -20,6 +20,7 @@
 #include "Room.h"
 #include "Engine.h"
 #include "World.h"
+#include "Map.h"
 #include "MetaRoom.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "caosScript.h" // for executeNetwork()
@@ -30,6 +31,7 @@
 #include "SFCFile.h"
 #include "peFile.h"
 #include "Camera.h"
+#include "prayManager.h"
 
 #include <ghc/filesystem.hpp>
 #include <cxxopts.hpp>
@@ -503,9 +505,9 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 
 				case 33: // pageup
 					// TODO: previous metaroom
-					if ((world.map.getMetaRoomCount() - 1) == world.camera->getMetaRoom()->id)
+					if ((world.map->getMetaRoomCount() - 1) == world.camera->getMetaRoom()->id)
 						break;
-					n = world.map.getMetaRoom(world.camera->getMetaRoom()->id + 1);
+					n = world.map->getMetaRoom(world.camera->getMetaRoom()->id + 1);
 					if (n)
 						world.camera->goToMetaRoom(n->id);
 					break;
@@ -514,7 +516,7 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 					// TODO: next metaroom
 					if (world.camera->getMetaRoom()->id == 0)
 						break;
-					n = world.map.getMetaRoom(world.camera->getMetaRoom()->id - 1);
+					n = world.map->getMetaRoom(world.camera->getMetaRoom()->id - 1);
 					if (n)
 						world.camera->goToMetaRoom(n->id);
 					break;
@@ -695,7 +697,7 @@ bool Engine::initialSetup() {
 	world.init(); // just reads mouse cursor (we want this after the catalogue reading so we don't play "guess the filename")
 	if (engine.version > 2) {
 		std::cout << "* Reading PRAY files..." << std::endl;
-		world.praymanager.update();
+		world.praymanager->update();
 	}
 
 #ifdef _WIN32
@@ -796,7 +798,7 @@ bool Engine::initialSetup() {
 
 	// if there aren't any metarooms, we can't run a useful game, the user probably
 	// wanted to execute a CAOS script or something went badly wrong.
-	if (!cmdline_norun && world.map.getMetaRoomCount() == 0) {
+	if (!cmdline_norun && world.map->getMetaRoomCount() == 0) {
 		shutdown();
 		throw creaturesException("No metarooms found in given bootstrap directories or files");
 	}

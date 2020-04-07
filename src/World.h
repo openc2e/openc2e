@@ -20,19 +20,22 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
-#include "Map.h"
-#include "Scriptorium.h"
 #include "CompoundPart.h"
-#include "prayManager.h"
 #include "caosVar.h"
-#include "historyManager.h"
-#include "imageManager.h"
 #include <set>
 #include <map>
 #include <list>
 #include <ghc/filesystem.hpp>
 
 class caosVM;
+class genomeFile;
+class MainCamera;
+class Map;
+class historyManager;
+class imageManager;
+class MusicManager;
+class prayManager;
+class Scriptorium;
 
 struct cainfo {
 	float gain;
@@ -59,8 +62,8 @@ protected:
 public:
 	int vmpool_size() const { return vmpool.size(); }
 	bool quitting, saving, paused;
-	
-	Map map;
+
+	std::unique_ptr<Map> map;
 
 	std::multiset<CompoundPart *, partzorder> zorder; // sorted from top to bottom
 	std::multiset<renderable *, renderablezorder> renders; // sorted from bottom to top
@@ -70,18 +73,18 @@ public:
 	std::map<std::string, caosVar> variables;
 
 	std::vector<ghc::filesystem::path> data_directories;
-	Scriptorium scriptorium;
-	prayManager praymanager;
-	imageManager gallery;
-	historyManager history;
-		
+	std::unique_ptr<Scriptorium> scriptorium;
+	std::unique_ptr<prayManager> praymanager;
+	std::unique_ptr<imageManager> gallery;
+	std::unique_ptr<historyManager> history;
+
 	std::string gametype;
 	float pace;
 	unsigned int race;
 	unsigned int ticktime, tickcount;
 	unsigned int worldtickcount;
 	unsigned int timeofday, dayofseason, season, year;
-	class MainCamera *camera;
+	std::unique_ptr<MainCamera> camera;
 	bool showrooms, autokill, autostop;
 
 	std::vector<unsigned int> groundlevels;

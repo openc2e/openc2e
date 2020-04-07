@@ -23,6 +23,7 @@
 #include "Engine.h"
 #include "caosVM.h"
 #include "Room.h"
+#include "Map.h"
 #include "MetaRoom.h"
 #include "Camera.h"
 #include "creatures/SkeletalCreature.h"
@@ -324,7 +325,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 			if (carrying) {
 				if (engine.version == 1) {
 					// ensure there's a room to drop into, in C1
-					MetaRoom* m = world.map.metaRoomAt(x, y);
+					MetaRoom* m = world.map->metaRoomAt(x, y);
 					if (!m) return;
 					shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
 					if (!r) return;
@@ -333,12 +334,12 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 
 					return;
 				}
-			
+
 				bool allowdrop = true;
 
 				if (engine.version == 2) {
 					/* check dropstatus for the room we're dropping into */
-					MetaRoom* m = world.map.metaRoomAt(carrying->x, carrying->y);
+					MetaRoom* m = world.map->metaRoomAt(carrying->x, carrying->y);
 					if (m) {
 						shared_ptr<Room> r = m->roomAt(carrying->x, carrying->y);
 						if (r) {
@@ -392,7 +393,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 				}
 			}
 		} else if (event.button == buttonmiddle) {
-			std::vector<shared_ptr<Room> > rooms = world.map.roomsAt(x, y);
+			std::vector<shared_ptr<Room> > rooms = world.map->roomsAt(x, y);
 			if (rooms.size() > 0) std::cout << "Room at cursor is " << rooms[0]->id << std::endl;
 			Agent *a = world.agentAt(x, y, true);
 			if (a)

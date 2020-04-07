@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "World.h"
 #include "creatures/CreatureAgent.h"
+#include "historyManager.h"
 #include <fstream>
 
 /**
@@ -107,12 +108,12 @@ void caosVM::c_GENE_MOVE() {
 	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = src_agent->genome_slots.find(src_slot);
 	caos_assert(i != src_agent->genome_slots.end());
 
-	std::string moniker = world.history.findMoniker(i->second);
+	std::string moniker = world.history->findMoniker(i->second);
 	assert(moniker != std::string("")); // internal consistency, i think..
 
 	dest_agent->genome_slots[dest_slot] = src_agent->genome_slots[src_slot];
 	src_agent->genome_slots.erase(i);
-	world.history.getMoniker(moniker).moveToAgent(dest_agent);
+	world.history->getMoniker(moniker).moveToAgent(dest_agent);
 }
 
 /**
@@ -129,7 +130,7 @@ void caosVM::v_GTOS() {
 		result.setString(""); // CV needs this, at least
 	} else {
 		shared_ptr<class genomeFile> g = targ->genome_slots[slot];
-		result.setString(world.history.findMoniker(g));
+		result.setString(world.history->findMoniker(g));
 	}
 }
 
@@ -142,8 +143,8 @@ void caosVM::v_GTOS() {
 void caosVM::v_MTOA() {
 	VM_PARAM_STRING(moniker)
 
-	caos_assert(world.history.hasMoniker(moniker));
-	result.setAgent(world.history.getMoniker(moniker).owner);
+	caos_assert(world.history->hasMoniker(moniker));
+	result.setAgent(world.history->getMoniker(moniker).owner);
 }
 
 /**
@@ -156,8 +157,8 @@ void caosVM::v_MTOC() {
 	VM_PARAM_STRING(moniker)
 
 	result.setAgent(0);
-	if (!world.history.hasMoniker(moniker)) return;
-	Agent *a = world.history.getMoniker(moniker).owner;
+	if (!world.history->hasMoniker(moniker)) return;
+	Agent *a = world.history->getMoniker(moniker).owner;
 	if (!a) return;
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(a);
 	assert(c); // TODO: is this assert valid? can history events have non-creature owners?

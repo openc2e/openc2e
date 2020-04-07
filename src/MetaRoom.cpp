@@ -21,7 +21,9 @@
 #include "Room.h"
 #include "World.h"
 #include "Engine.h"
+#include "imageManager.h"
 #include "images/blkImage.h"
+#include "Map.h"
 #include <assert.h>
 #include "Backend.h"
 
@@ -47,10 +49,10 @@ void MetaRoom::addBackground(std::string back, shared_ptr<creaturesImage> spr) {
 	// should we preserve the default once extra backgrounds have been added and change this to
 	// a caos_assert?
 	if (backgrounds.find(back) != backgrounds.end()) return;
-	
+
 	if (!spr) {
 		// we weren't passed a sprite, so we need to load one
-		backsprite = world.gallery.getImage(back, true);
+		backsprite = world.gallery->getImage(back, true);
 		blkImage *background = dynamic_cast<blkImage *>(backsprite.get());
 		if (!background && engine.bmprenderer) {
 			totalwidth = backsprite->width(0);
@@ -132,10 +134,10 @@ shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
 unsigned int MetaRoom::addRoom(shared_ptr<Room> r) {
 	// add to both our local list and the global list
 	rooms.push_back(r);
-	world.map.rooms.push_back(r);
+	world.map->rooms.push_back(r);
 
 	// set the id and return
-	r->id = world.map.room_base++;
+	r->id = world.map->room_base++;
 	return r->id;
 }
 

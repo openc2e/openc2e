@@ -24,6 +24,7 @@
 #include "World.h"
 #include "Catalogue.h"
 #include "c2eBrain.h"
+#include "historyManager.h"
 #include "oldBrain.h"
 
 Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) {
@@ -132,14 +133,14 @@ void Creature::ageCreature() {
 		die();
 		return;
 	} //previously we just returned
-	
+
 	stage = (lifestage)((int)stage + 1);
 	processGenes();
 
 	assert(parent);
 	parent->creatureAged();
-#ifndef _CREATURE_STANDALONE	
-	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(4, "", ""); // aged event
+#ifndef _CREATURE_STANDALONE
+	world.history->getMoniker(world.history->findMoniker(genome)).addEvent(4, "", ""); // aged event
 #endif
 }
 
@@ -161,8 +162,8 @@ void Creature::born() {
 
 	// TODO: life event?
 #ifndef _CREATURE_STANDALONE
-	world.history.getMoniker(world.history.findMoniker(genome)).wasBorn();
-	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(3, "", ""); // born event, parents..
+	world.history->getMoniker(world.history->findMoniker(genome)).wasBorn();
+	world.history->getMoniker(world.history->findMoniker(genome)).addEvent(3, "", ""); // born event, parents..
 #endif
 
 	tickage = true;
@@ -173,8 +174,8 @@ void Creature::die() {
 
 	// TODO: life event?
 #ifndef _CREATURE_STANDALONE
-	world.history.getMoniker(world.history.findMoniker(genome)).hasDied();
-	world.history.getMoniker(world.history.findMoniker(genome)).addEvent(7, "", ""); // died event
+	world.history->getMoniker(world.history->findMoniker(genome)).hasDied();
+	world.history->getMoniker(world.history->findMoniker(genome)).addEvent(7, "", ""); // died event
 #endif
 	// TODO: disable brain/biochemistry updates
 	

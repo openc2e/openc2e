@@ -35,6 +35,8 @@
 #include "MetaRoom.h"
 #include "Room.h"
 #include "creaturesImage.h"
+#include "imageManager.h"
+#include "Map.h"
 
 #include <typeinfo> // TODO: remove when genome system is fixed
 #include <fmt/printf.h>
@@ -209,7 +211,7 @@ void SkeletalCreature::skeletonInit() {
 			while (var > -1 && !images[i]) {
 				int stage_to_try = creature->getStage();
 				while (stage_to_try > -1 && !images[i]) {
-					images[i] = world.gallery.getImage(x + dataString(stage_to_try, tryfemale, spe, var));
+					images[i] = world.gallery->getImage(x + dataString(stage_to_try, tryfemale, spe, var));
 					stage_to_try--;
 				}
 				var--;
@@ -390,7 +392,7 @@ void SkeletalCreature::snapDownFoot() {
 	float footx = x + attachmentX(orig_footpart, 1);
 	float footy = y + attachmentY(orig_footpart, 1);
 
-	MetaRoom *m = world.map.metaRoomAt(x, y);
+	MetaRoom *m = world.map->metaRoomAt(x, y);
 	if (!m) return; // TODO: exceptiony death
 
 	shared_ptr<Room> newroom;
@@ -403,7 +405,7 @@ void SkeletalCreature::snapDownFoot() {
 				newroom = downfootroom; // TODO, we're just forcing for now
 			} else {
 				float ydiff = 10000.0f; // TODO: big number
-				for (std::map<weak_ptr<Room>,RoomDoor *>::iterator i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
+				for (auto i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
 					shared_ptr<Room> thisroom = i->first.lock();
 					if (engine.version == 2 && size.getInt() > i->second->perm) continue;
 					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
@@ -496,7 +498,7 @@ void SkeletalCreature::snapDownFoot() {
 			}
 		} else {
 			// TODO: hilar hack: same as above for perm
-			shared_ptr<Room> downroom = world.map.roomAt(footx, downfootroom->y_left_floor + 1);
+			shared_ptr<Room> downroom = world.map->roomAt(footx, downfootroom->y_left_floor + 1);
 			if (downfootroom->doors.find(downroom) != downfootroom->doors.end()) {
 				int permsize = (engine.version == 2 ? size.getInt() : perm);
 				if (permsize <= downfootroom->doors[downroom]->perm) {

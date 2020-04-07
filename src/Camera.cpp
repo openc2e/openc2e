@@ -21,6 +21,7 @@
 #include "CameraPart.h"
 #include "World.h"
 #include "Backend.h"
+#include "Map.h"
 #include "MetaRoom.h"
 #include "Agent.h"
 
@@ -32,7 +33,7 @@ Camera::Camera() {
 }
 
 MetaRoom * Camera::getMetaRoom() const {
-	return world.map.getMetaRoom(metaroom);
+	return world.map->getMetaRoom(metaroom);
 }
 
 void Camera::goToMetaRoom(unsigned int m) {
@@ -59,7 +60,7 @@ void Camera::moveTo(int _x, int _y, panstyle pan) {
 }
 
 void Camera::moveToGlobal(int _x, int _y, panstyle pan) {
-	MetaRoom *m = world.map.metaRoomAt(_x, _y);
+	MetaRoom *m = world.map->metaRoomAt(_x, _y);
 	if (m) {
 		if (m->id != metaroom) pan = jump; // inter-metaroom panning is always jump
 		metaroom = m->id;

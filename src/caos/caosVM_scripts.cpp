@@ -22,6 +22,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "Agent.h"
+#include "Scriptorium.h"
 #include <iostream>
 using std::cerr;
 
@@ -147,7 +148,7 @@ void caosVM::c_SCRX() {
 	VM_PARAM_INTEGER(family) 
 	caos_assert(family >= 0); 
 	caos_assert(family <= 255);
-	world.scriptorium.delScript(family, genus, species, event);
+	world.scriptorium->delScript(family, genus, species, event);
 }
 
 /**
@@ -246,7 +247,7 @@ void caosVM::v_SORQ() {
 	VM_PARAM_INTEGER(genus) caos_assert(event >= 0 && event <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(event >= 0 && event <= 255);
 
-	shared_ptr<script> s = world.scriptorium.getScript(family, genus, species, event);
+	shared_ptr<script> s = world.scriptorium->getScript(family, genus, species, event);
 	if (s) result.setInt(1);
 	else result.setInt(0);
 }

@@ -29,6 +29,7 @@
 #include "token.h"
 #include "dialect.h"
 #include "util.h"
+#include "Scriptorium.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -120,7 +121,7 @@ void caosScript::installScripts() {
 	std::vector<shared_ptr<script> >::iterator i = scripts.begin();
 	while (i != scripts.end()) {
 		shared_ptr<script> s = *i;
-		world.scriptorium.addScript(s->fmly, s->gnus, s->spcs, s->scrp, s);
+		world.scriptorium->addScript(s->fmly, s->gnus, s->spcs, s->scrp, s);
 		i++;
 	}
 }
@@ -132,8 +133,8 @@ void caosScript::installInstallScript(unsigned char family, unsigned char genus,
 	installer->gnus = genus;
 	installer->spcs = species;
 	installer->scrp = eventid;
-	
-	world.scriptorium.addScript(installer->fmly, installer->gnus, installer->spcs, installer->scrp, installer);
+
+	world.scriptorium->addScript(installer->fmly, installer->gnus, installer->spcs, installer->scrp, installer);
 }
 
 

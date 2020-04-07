@@ -30,6 +30,8 @@
 #include "AgentHelpers.h"
 #include "creaturesImage.h"
 #include "Camera.h"
+#include "Map.h"
+#include "Scriptorium.h"
 #include "VoiceData.h"
 
 void Agent::core_init() {
@@ -151,7 +153,7 @@ void Agent::moveTo(float _x, float _y, bool force) {
 	// TODO: this is perhaps non-ideal
 	if (engine.version < 3 && xoffset != 0.0f) {
 		// TODO: it'd be nice to handle multiple metarooms
-		MetaRoom *m = world.map.getFallbackMetaroom();
+		MetaRoom *m = world.map->getFallbackMetaroom();
 		assert(m);
 
 		if (x < m->x()) {
@@ -215,7 +217,7 @@ void Agent::delFloated(AgentRef a) {
 }
 
 shared_ptr<script> Agent::findScript(unsigned short event) {
-	return world.scriptorium.getScript(family, genus, species, event);
+	return world.scriptorium->getScript(family, genus, species, event);
 }
 
 #include "PointerAgent.h"
@@ -325,7 +327,7 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 			// Creatures 1 drop snapping
 			// TODO: this probably doesn't belong here, but it has to be run after the
 			// drop script starts (see for instance C1 carrots, which change pose)
-			MetaRoom* m = world.map.metaRoomAt(x, y);
+			MetaRoom* m = world.map->metaRoomAt(x, y);
 			if (!m) break;
 			shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
 			if (!r) break;
@@ -416,7 +418,7 @@ static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int widt
 
 void Agent::updateAudio(std::shared_ptr<AudioSource> s) {
 	assert(s);
-	MetaRoom *room = world.map.metaRoomAt(x, y);
+	MetaRoom *room = world.map->metaRoomAt(x, y);
 	if (!room) {
 		// TODO: think about inrange when positioning outside-metaroom agents
 		s->setPos(x + getWidth() / 2, y + getHeight() / 2, zorder);
@@ -496,7 +498,7 @@ bool Agent::validInRoomSystem() {
 
 bool Agent::validInRoomSystem(Point p, float w, float h, int testperm) {
 	// Return true if this agent is inside the world room system at the specified point, or false if it isn't.
-	MetaRoom *m = world.map.metaRoomAt(p.x, p.y);
+	MetaRoom *m = world.map->metaRoomAt(p.x, p.y);
 	if (!m) return false;
 
 	for (unsigned int i = 0; i < 4; i++) {
@@ -532,7 +534,7 @@ bool Agent::validInRoomSystem(Point p, float w, float h, int testperm) {
 			if (!ourRoom) return false;
 
 			unsigned int dir; Line wall;
-			world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, testperm);
+			world.map->collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, testperm);
 
 			if (src != dest) return false;
 		}
@@ -609,10 +611,10 @@ void Agent::physicsTick() {
 
 			// store values
 			float srcx = src.x, srcy = src.y;
-			
-			shared_ptr<Room> ourRoom = world.map.roomAt(srcx, srcy);
+
+			shared_ptr<Room> ourRoom = world.map->roomAt(srcx, srcy);
 			if (!ourRoom) {
-				ourRoom = world.map.roomAt(srcx, srcy);
+				ourRoom = world.map->roomAt(srcx, srcy);
 			}
 			if (!ourRoom) {
 				if (!displaycore) { // TODO: ugh, displaycore is a horrible thing to use for this
@@ -638,7 +640,7 @@ void Agent::physicsTick() {
 			Line local_wall;
 		
 			// this changes src to the point at which we end up
-			bool local_collided = world.map.collideLineWithRoomSystem(src, dest, ourRoom, src, local_wall, local_collidedirection, perm);
+			bool local_collided = world.map->collideLineWithRoomSystem(src, dest, ourRoom, src, local_wall, local_collidedirection, perm);
 
 			float dist;
 			if (src.x == srcx && src.y == srcy)
@@ -954,7 +956,7 @@ void Agent::physicsTickC2() {
 	bool collided = false;
 
 	if (suffercollisions()) {
-		MetaRoom *m = world.map.metaRoomAt(x, y);
+		MetaRoom *m = world.map->metaRoomAt(x, y);
 		if (!m) {
 			if (!displaycore)
 				unhandledException(fmt::sprintf("out of room system at (%f, %f)", x, y), false);
@@ -1022,7 +1024,7 @@ void Agent::tick() {
 	// CA updates
 	if (emitca_index != -1 && emitca_amount != 0.0f) {
 		assert(0 <= emitca_index && emitca_index <= 19);
-		shared_ptr<Room> r = world.map.roomAt(x, y);
+		shared_ptr<Room> r = world.map->roomAt(x, y);
 		if (r) {
 			r->catemp[emitca_index] += emitca_amount;
 			/*if (r->catemp[emitca_index] <= 0.0f) r->catemp[emitca_index] = 0.0f;

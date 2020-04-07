@@ -24,6 +24,7 @@
 #include "World.h"
 #include "Engine.h" // version
 #include "Camera.h" // FLTX/FLTY
+#include "Map.h"
 #include <iostream>
 #include <fmt/printf.h>
 #include <climits>
@@ -164,7 +165,7 @@ void caosVM::v_OBST() {
 			dest.y += targ->range.getFloat(); break;
 	}
 
-	shared_ptr<Room> ourRoom = world.map.roomAt(src.x, src.y);
+	shared_ptr<Room> ourRoom = world.map->roomAt(src.x, src.y);
 	if (!ourRoom) {
 		// TODO: is this correct behaviour?
 		result.setFloat(0.0f);
@@ -172,7 +173,7 @@ void caosVM::v_OBST() {
 	}
 
 	unsigned int dummy1; Line dummy2; Point point;
-	bool collided = world.map.collideLineWithRoomSystem(src, dest, ourRoom, point, dummy2, dummy1, targ->perm);
+	bool collided = world.map->collideLineWithRoomSystem(src, dest, ourRoom, point, dummy2, dummy1, targ->perm);
 
 	switch (direction) {
 		case 0: result.setFloat(src.x - point.x); break;
@@ -210,7 +211,7 @@ void caosVM::v_OBST_c2() {
 	double delta = 1000000000;
 	bool collided = false;
 
-	MetaRoom *m = world.map.metaRoomAt(targ->x, targ->y);
+	MetaRoom *m = world.map->metaRoomAt(targ->x, targ->y);
 	caos_assert(m);
 
 	targ->findCollisionInDirection(direction, m, src, dx, dy, deltapt, delta, collided, false);

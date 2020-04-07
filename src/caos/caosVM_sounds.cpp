@@ -27,6 +27,7 @@
 #include "Camera.h"
 #include "MetaRoom.h"
 #include "Room.h"
+#include "Map.h"
 #include <iostream>
 using std::cout;
 using std::cerr;
@@ -44,7 +45,7 @@ void caosVM::c_SNDE() {
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (world.camera->getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	if (world.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
 	targ->playAudio(filename, false, false);
 }
 
@@ -78,7 +79,7 @@ void caosVM::c_SNDC() {
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (world.camera->getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	if (world.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
 	targ->playAudio(filename, true, false);
 }
 
@@ -126,7 +127,7 @@ void caosVM::c_MMSC() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	MetaRoom *r = world.map.metaRoomAt(x, y);
+	MetaRoom *r = world.map->metaRoomAt(x, y);
 	caos_assert(r); // note that real c2e doesn't check
 
 	r->music = track_name;
@@ -143,7 +144,7 @@ void caosVM::v_MMSC() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	MetaRoom *r = world.map.metaRoomAt(x, y);
+	MetaRoom *r = world.map->metaRoomAt(x, y);
 	caos_assert(r); // note that real c2e doesn't check
 
 	result.setString(r->music);
@@ -161,7 +162,7 @@ void caosVM::c_RMSC() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	shared_ptr<Room> r = world.map.roomAt(x, y);
+	shared_ptr<Room> r = world.map->roomAt(x, y);
 	caos_assert(r);
 
 	r->music = track_name;
@@ -178,7 +179,7 @@ void caosVM::v_RMSC() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	shared_ptr<Room> r = world.map.roomAt(x, y);
+	shared_ptr<Room> r = world.map->roomAt(x, y);
 	caos_assert(r);
 
 	result.setString(r->music);
@@ -329,7 +330,7 @@ void caosVM::c_PLDS() {
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (world.camera->getMetaRoom() != world.map.metaRoomAt(targ->x, targ->y)) return; // TODO: needs better check ;)
+	if (world.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y)) return; // TODO: needs better check ;)
 
 	// TODO
 }

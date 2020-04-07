@@ -21,17 +21,18 @@
 #include "World.h"
 #include "CompoundAgent.h"
 #include "CameraPart.h"
+#include "Map.h"
 #include "MetaRoom.h"
 #include "Camera.h"
 
 Camera *caosVM::getCamera() {
 	Camera *c = camera.lock().get();
-	if (!c) c = world.camera;
+	if (!c) c = world.camera.get();
 	return c;
 }
 
 bool agentOnCamera(Agent *targ, bool checkall) {
-	MetaRoom *m = world.map.metaRoomAt(targ->x, targ->y);
+	MetaRoom *m = world.map->metaRoomAt(targ->x, targ->y);
 	if (!m || m != world.camera->getMetaRoom()) return false;
 
 	// TODO: check non-main cameras?
@@ -105,7 +106,7 @@ void caosVM::c_META() {
 	VM_PARAM_INTEGER(metaroom_id)
 
 	caos_assert(metaroom_id >= 0);
-	MetaRoom *m = world.map.getMetaRoom(metaroom_id);
+	MetaRoom *m = world.map->getMetaRoom(metaroom_id);
 	if (!m) return; // DS does 'meta 0 -1 -1 0' in !map.cos for some stupid reason
 	
 	int camerax = camera_x; if (camerax == -1) camerax = m->x();
@@ -142,8 +143,8 @@ void caosVM::c_CMRT() {
 	VM_PARAM_INTEGER(pan)
 
 	valid_agent(targ);
-	
-	MetaRoom *r = world.map.metaRoomAt(targ->x, targ->y);
+
+	MetaRoom *r = world.map->metaRoomAt(targ->x, targ->y);
 	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) + (targ->getWidth() / 2.0f));
 	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) + (targ->getHeight() / 2.0f));
 	if (r)
@@ -457,7 +458,7 @@ void caosVM::c_BKGD() {
 	VM_PARAM_STRING(background)
 	VM_PARAM_INTEGER(metaroomid)
 
-	MetaRoom *metaroom = world.map.getMetaRoom(metaroomid);
+	MetaRoom *metaroom = world.map->getMetaRoom(metaroomid);
 	caos_assert(metaroom);
 
 	// TODO
@@ -470,7 +471,7 @@ void caosVM::c_BKGD() {
 void caosVM::v_BKGD() {
 	VM_PARAM_INTEGER(metaroomid)
 
-	MetaRoom *metaroom = world.map.getMetaRoom(metaroomid);
+	MetaRoom *metaroom = world.map->getMetaRoom(metaroomid);
 	caos_assert(metaroom);
 
 	result.setString(""); // TODO

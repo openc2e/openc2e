@@ -52,7 +52,7 @@ void caosVM::c_SERL_MAPP() {
 	{
 		boost::archive::text_iarchive ia(inf);
 		try {
-			world.map.Reset();
+			world.map->Reset();
 			ia >> world.map; // if this fails the game will explode
 		} catch (std::exception &e) {
 			std::cerr << "Deserialization failed; game is in an unknown state!" << std::endl;

@@ -36,6 +36,7 @@
 #include "Room.h"
 #include "Camera.h"
 #include "AgentHelpers.h"
+#include "historyManager.h"
 
 #include "Hatchery.h"
 #include "AgentInjector.h"
@@ -450,8 +451,8 @@ QtOpenc2e::~QtOpenc2e() {
 monikerData &monikerDataFor(AgentRef a) {
 	shared_ptr<class genomeFile> g = a->getSlot(0);
 	assert(g);
-	std::string moniker = world.history.findMoniker(g);
-	return world.history.getMoniker(moniker);
+	std::string moniker = world.history->findMoniker(g);
+	return world.history->getMoniker(moniker);
 }
 
 std::string creatureNameFor(AgentRef a) {
@@ -825,7 +826,7 @@ void QtOpenc2e::newNorn() {
 
 	a->genome_slots[0] = genome;
 	world.newMoniker(genome, genomefile, a);
-	world.history.getMoniker(world.history.findMoniker(genome)).moveToCreature(a);
+	world.history->getMoniker(world.history->findMoniker(genome)).moveToCreature(a);
 
 	// TODO: set it dreaming
 	

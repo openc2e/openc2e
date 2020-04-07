@@ -33,7 +33,12 @@
 #include "MetaRoom.h"
 #include "Catalogue.h"
 #include "Camera.h"
+#include "historyManager.h"
+#include "imageManager.h"
+#include "Map.h"
 #include "MusicManager.h"
+#include "prayManager.h"
+#include "Scriptorium.h"
 
 #include <fmt/printf.h>
 #include <ghc/filesystem.hpp>
@@ -53,12 +58,16 @@ World::World() {
 	autokill = false;
 	autostop = false;
 
-	camera = new MainCamera();
+	camera.reset(new MainCamera());
+	gallery.reset(new imageManager());
+	history.reset(new historyManager());
+	map.reset(new Map());
+	praymanager.reset(new prayManager());
+	scriptorium.reset(new Scriptorium());
 }
 
 World::~World() {
 	agents.clear();
-	delete camera;
 	for (std::vector<caosVM *>::iterator i = vmpool.begin(); i != vmpool.end(); i++)
 		delete *i;
 }
@@ -71,7 +80,7 @@ void World::init() {
 	if (engine.version > 2 && catalogue.hasTag("Pointer Information")) {
 		const std::vector<std::string> &pointerinfo = catalogue.getTag("Pointer Information");
 		if (pointerinfo.size() >= 3) {
-			shared_ptr<creaturesImage> img = gallery.getImage(pointerinfo[2]);
+			shared_ptr<creaturesImage> img = gallery->getImage(pointerinfo[2]);
 			if (img) {
 				theHand = new PointerAgent(pointerinfo[2]);
 				int family, genus, species;
@@ -99,9 +108,9 @@ void World::init() {
 	if (!theHand) {
 		shared_ptr<creaturesImage> img;
 		if (gametype == "c3")
-			img = gallery.getImage("hand"); // as used in C3 and DS
+			img = gallery->getImage("hand"); // as used in C3 and DS
 		else
-			img = gallery.getImage("syst"); // as used in C1, C2 and CV
+			img = gallery->getImage("syst"); // as used in C1, C2 and CV
 		if (img) {
 			theHand = new PointerAgent(img->getName());
 			if (engine.version > 2) {
@@ -147,7 +156,7 @@ void World::init() {
 void World::shutdown() {
 	agents.clear();
 	uncontrolled_sounds.clear();
-	map.Reset();
+	map->Reset();
 }
 
 caosVM *World::getVM(Agent *a) {
@@ -230,7 +239,7 @@ void World::tick() {
 				float x, y, z;
 				si->first->getPos(x, y, z);
 				if (engine.version > 2) // TODO: this is because of wrap issues, but we need a better fix
-					si->first->setMute(camera->getMetaRoom() != world.map.metaRoomAt(x, y));
+					si->first->setMute(camera->getMetaRoom() != world.map->metaRoomAt(x, y));
 			}
 		}
 
@@ -293,7 +302,7 @@ void World::tick() {
 		}
 	}
 
-	world.map.tick();
+	world.map->tick();
 
 	// TODO: correct behaviour? hrm :/
 	world.hand()->velx.setFloat(world.hand()->velx.getFloat() / 2.0f);
@@ -313,7 +322,7 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 	if (!obey_all_transparency)
 		transagent = agentAt(x, y, true, needs_mouseable);
 
-	MetaRoom *m = world.map.metaRoomAt(x, y); // for wraparound checking
+	MetaRoom *m = world.map->metaRoomAt(x, y); // for wraparound checking
 
 	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
 		CompoundPart *p = *i;
@@ -384,7 +393,7 @@ shared_ptr<Agent> World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
-	drawWorld(camera, engine.backend->getMainSurface());
+	drawWorld(camera.get(), engine.backend->getMainSurface());
 }
 
 void World::drawWorld(Camera *cam, Surface *surface) {
@@ -394,7 +403,7 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 	if (!m) {
 		// Whoops - the room we're in vanished, or maybe we were never in one?
 		// Try to get a new one ...
-		m = map.getFallbackMetaroom();
+		m = map->getFallbackMetaroom();
 		if (!m)
 			throw creaturesException("drawWorld() couldn't find any metarooms");
 		cam->goToMetaRoom(m->id);
@@ -439,7 +448,7 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 
 	// render all the agents
 	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
-		if ((*i)->showOnRemoteCameras() || cam == camera) {
+		if ((*i)->showOnRemoteCameras() || cam == camera.get()) {
 			// three-pass for wraparound rooms, the third since agents often straddle the boundary
 			// TODO: same as above with background rendering
 			for (unsigned int z = 0; z < (m->wraparound() ? 3 : 1); z++) {
@@ -468,7 +477,7 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 	}
 
 	if (showrooms) {
-		shared_ptr<Room> r = map.roomAt(hand()->x, hand()->y);
+		shared_ptr<Room> r = map->roomAt(hand()->x, hand()->y);
 		for (std::vector<shared_ptr<Room> >::iterator i = cam->getMetaRoom()->rooms.begin();
 				 i != cam->getMetaRoom()->rooms.end(); i++) {
 			unsigned int col = 0xFFFF00CC;
@@ -677,9 +686,9 @@ shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
 }
 
 void World::newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent) {
-	std::string d = history.newMoniker(g);
-	world.history.getMoniker(d).addEvent(2, "", genefile);
-	world.history.getMoniker(d).moveToAgent(agent);
+	std::string d = history->newMoniker(g);
+	world.history->getMoniker(d).addEvent(2, "", genefile);
+	world.history->getMoniker(d).moveToAgent(agent);
 }
 
 std::string World::generateMoniker(std::string basename) {

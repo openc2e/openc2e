@@ -28,7 +28,7 @@ namespace boost {
 				else {
 					std::string name;
 					ar & name;
-					obj = world.gallery.getImage(name);
+					obj = world.gallery->getImage(name);
 				}
 			}
 	}
