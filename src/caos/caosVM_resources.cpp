@@ -24,6 +24,7 @@
 
 #include "prayManager.h"
 #include <fmt/printf.h>
+#include <fstream>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
@@ -48,13 +49,13 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 		return true;
 	}
 
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
 	if (i == world.praymanager->blocks.end()) {
 		std::cout << "PRAY FILE: couldn't find block " << name << std::endl;
 		return false;
 	}
-	
-	prayBlock *p = i->second;
+
+	PrayBlock* p = i->second.get();
 	if (p->type != "FILE") {
 		std::cout << "PRAY FILE: block " << name << " is " << p->type << " not FILE" << std::endl;
 		// TODO: correct behaviour? possibly not..
@@ -81,10 +82,10 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 }
 
 int prayInstallDeps(std::string name, bool actually_install) {
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
 	caos_assert(i != world.praymanager->blocks.end());
 
-	prayBlock *p = i->second;
+	PrayBlock *p = i->second.get();
 	p->parseTags();
 
 	std::map<std::string, int>::iterator j = p->integerValues.find("Agent Type");
@@ -125,13 +126,13 @@ int prayInstallDeps(std::string name, bool actually_install) {
 
 //used by PRAY BACK, PRAY FORE, PRAY NEXT and PRAY PREV to implement their functionality
 std::string findBlock(std::string type, std::string last, bool forward, bool loop) {
-	prayBlock *firstblock = 0, *currblock = 0;
+	PrayBlock *firstblock = 0, *currblock = 0;
 	bool foundblock = false;
 
 	if (world.praymanager->blocks.size() == 0) return ""; // We definitely can't find anything in that case!
 
 	// Where do we start?
-	std::map<std::string, prayBlock *>::iterator i;
+	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i;
 	if (forward)
 		i = world.praymanager->blocks.begin();
 	else {
@@ -142,8 +143,8 @@ std::string findBlock(std::string type, std::string last, bool forward, bool loo
 	// Loop through all the blocks.
 	while (true) {
 		if (i->second->type == type) {
-			currblock = i->second;
-			
+			currblock = i->second.get();
+
 			// Store the first block if we didn't already find one, for possible use later.
 			if (!firstblock)
 				firstblock = currblock;
@@ -181,10 +182,10 @@ void caosVM::v_PRAY_AGTI() {
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
 
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager->blocks.find(resource);
+	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(resource);
 	caos_assert(i != world.praymanager->blocks.end());
 
-	prayBlock *p = i->second;
+	PrayBlock *p = i->second.get();
 	p->parseTags();
 	if (p->integerValues.find(tag) == p->integerValues.end())
 		result.setInt(_default);
@@ -204,10 +205,10 @@ void caosVM::v_PRAY_AGTS() {
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
 
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager->blocks.find(resource);
+	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(resource);
 	caos_assert(i != world.praymanager->blocks.end());
 
-	prayBlock *p = i->second;
+	PrayBlock *p = i->second.get();
 	p->parseTags();
 	if (p->stringValues.find(tag) == p->stringValues.end())
 		result.setString(_default);
@@ -239,7 +240,7 @@ void caosVM::v_PRAY_COUN() {
 	VM_PARAM_STRING(type)
 
 	unsigned int count = 0;
-	for (std::map<std::string, prayBlock *>::iterator i = world.praymanager->blocks.begin(); i != world.praymanager->blocks.end(); i++)
+	for (std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.begin(); i != world.praymanager->blocks.end(); i++)
 		if (i->second->type == type)
 			count++;
 	
@@ -345,9 +346,9 @@ void caosVM::v_PRAY_INJT() {
 	}
 	
 	// Now grab the relevant block..
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
 	caos_assert(i != world.praymanager->blocks.end());
-	prayBlock *p = i->second;
+	PrayBlock *p = i->second.get();
 	p->parseTags();
 	
 	// .. grab the script count ..
@@ -484,11 +485,11 @@ void caosVM::c_PRAY_REFR() {
 void caosVM::v_PRAY_TEST() {
 	VM_PARAM_STRING(name)
 
-	std::map<std::string, prayBlock *>::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
 	if (i == world.praymanager->blocks.end())
 		result.setInt(0);
 	else {
-		prayBlock *p = i->second;
+		PrayBlock *p = i->second.get();
 		if (p->isLoaded())
 			result.setInt(1);
 		else if (p->isCompressed())

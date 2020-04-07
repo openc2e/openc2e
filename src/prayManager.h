@@ -20,20 +20,52 @@
 #ifndef PRAYMANAGER_H
 #define PRAYMANAGER_H
 
-#include "pray.h"
+#include <ghc/filesystem.hpp>
+
+#include <map>
+#include <string>
 
 namespace fs = ghc::filesystem;
 
-class prayManager {
+class PrayBlock {
 protected:
-	std::vector<prayFile *> files;
+	bool loaded;
+	bool tagsloaded;
+	std::vector<unsigned char> buffer;
+
+	std::streampos offset;
+	bool compressed;
+	unsigned int size, compressedsize;
+
+	std::string filename;
 
 public:
-	std::map<std::string, prayBlock *> blocks;
+	PrayBlock();
+	PrayBlock(const std::string& filename, const std::string& type, const std::string& name, bool is_compressed);
+	~PrayBlock();
+	void load();
+	void parseTags();
+
+	std::string type;
+	std::string name;
+	std::map<std::string, std::string> stringValues;
+	std::map<std::string, int> integerValues;
+
+	bool isCompressed() { return compressed; }
+	bool isLoaded() { return loaded; }
+	unsigned char *getBuffer() { assert(loaded); return buffer.data(); }
+	unsigned int getSize() { assert(loaded); return size; }
+};
+
+class prayManager {
+protected:
+	void addFile(const fs::path&);
+
+public:
+	std::map<std::string, std::unique_ptr<PrayBlock> > blocks;
 
 	~prayManager();
-	void addFile(prayFile *);
-	void removeFile(prayFile *);
+
 	void update();
 
 	static std::string getResourceDir(unsigned int id);

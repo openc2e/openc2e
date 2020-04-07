@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 	cout << endl << "\"en-GB\"" << endl;
 	prayFile file(inputfile);
 
-	for (vector<prayBlock *>::iterator x = file.blocks.begin(); x != file.blocks.end(); x++) {
+	for (vector<prayFileBlock *>::iterator x = file.blocks.begin(); x != file.blocks.end(); x++) {
 		// TODO: s/"/\\"/ in the data (use find/replace methods of string)
 		
 		(*x)->load();

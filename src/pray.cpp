@@ -35,7 +35,7 @@ prayFile::prayFile(fs::path filepath) {
 
 	while (!file.eof()) {
 		// TODO: catch exceptions, and free all blocks before passing it up the stack
-		prayBlock *b = new prayBlock(this);
+		prayFileBlock *b = new prayFileBlock(this);
 		blocks.push_back(b);
 		
 		file.peek(); // make sure eof() gets set
@@ -43,12 +43,12 @@ prayFile::prayFile(fs::path filepath) {
 }
 
 prayFile::~prayFile() {
-	for (std::vector<prayBlock *>::iterator i = blocks.begin(); i != blocks.end(); i++) {
+	for (std::vector<prayFileBlock *>::iterator i = blocks.begin(); i != blocks.end(); i++) {
 		delete *i;
 	}
 }
 
-prayBlock::prayBlock(prayFile *p) {
+prayFileBlock::prayFileBlock(prayFile *p) {
 	std::istream &file = p->getStream();
 
 	char stringid[5]; stringid[4] = 0;
@@ -77,12 +77,12 @@ prayBlock::prayBlock(prayFile *p) {
 	parent = p;
 }
 
-prayBlock::~prayBlock() {
+prayFileBlock::~prayFileBlock() {
 	if (loaded)
 		delete[] buffer;
 }
 
-void prayBlock::load() {
+void prayFileBlock::load() {
 	std::istream &file = parent->getStream();
 
 	file.clear();
@@ -137,8 +137,8 @@ std::string tagStringRead(unsigned char *&ptr) {
 
 	return std::string((char *)data, len);
 }
-	
-void prayBlock::parseTags() {
+
+void prayFileBlock::parseTags() {
 	if (tagsloaded) return;
 
 	if (!loaded)

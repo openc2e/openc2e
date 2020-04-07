@@ -28,7 +28,7 @@
 
 namespace fs = ghc::filesystem;
 
-class prayBlock;
+class prayFileBlock;
 
 class prayFile {
 protected:
@@ -36,15 +36,15 @@ protected:
 	std::ifstream file;
 
 public:
-	std::vector<prayBlock *> blocks;
-	
+	std::vector<prayFileBlock *> blocks;
+
 	prayFile(fs::path filepath);
 	~prayFile();
 	fs::path getPath() { return path; }
 	std::istream &getStream() { return file; }
 };
 
-class prayBlock {
+class prayFileBlock {
 protected:
 	bool loaded;
 	bool tagsloaded;
@@ -56,8 +56,8 @@ protected:
 	unsigned int size, compressedsize;
 	
 public:
-	prayBlock(prayFile *p);
-	~prayBlock();
+	prayFileBlock(prayFile *p);
+	~prayFileBlock();
 	void load();
 	void parseTags();
 	
@@ -68,9 +68,6 @@ public:
 
 	bool isCompressed() { return compressed; }
 	bool isLoaded() { return loaded; }
-	prayFile *getParent() { return parent; }
-	std::string getType() { return type; }
-	std::string getName() { return name; }
 	unsigned char *getBuffer() { assert(loaded); return buffer; }
 	unsigned int getSize() { return size; }
 };

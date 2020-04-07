@@ -17,51 +17,81 @@
  *
  */
 
+#include "pray.h"
+
 #include "prayManager.h"
 #include "exceptions.h"
 #include "World.h" // data_directories
 #include "Catalogue.h"
 #include <ghc/filesystem.hpp>
 
-prayManager::~prayManager() {
-	while (files.size() != 0) {
-		prayFile *f = files[0];
-		removeFile(f);
-		delete f;
+PrayBlock::PrayBlock() {}
+
+PrayBlock::PrayBlock(const std::string& filename_, const std::string& type_, const std::string& name_, bool compressed_)
+	: loaded(false), tagsloaded(false), buffer(), compressed(compressed_),
+	  size(0), compressedsize(0), filename(filename_), type(type_), name(name_)  {}
+
+PrayBlock::~PrayBlock() {}
+
+void PrayBlock::load() {
+	if (loaded) {
+		return;
+	}
+	prayFile file((fs::path(filename)));
+	for (size_t i = 0; i < file.blocks.size(); i++) {
+		prayFileBlock* block = file.blocks[i];
+		if (!(block->type == type && block->name == name)) {
+			continue;
+		}
+		block->load();
+		loaded = true;
+		buffer = std::vector<unsigned char>(block->getBuffer(), block->getBuffer() + block->getSize());
+		size = block->getSize();
+		return;
 	}
 
-	assert(blocks.size() == 0);
+	throw creaturesException("Couldn't load " + type + " block '" + name + "' from file '" + filename + "'");
 }
 
-void prayManager::addFile(prayFile *f) {
-	std::vector<prayFile *>::iterator p = std::find(files.begin(), files.end(), f);
-	assert(p == files.end());
-	files.push_back(f);
+void PrayBlock::parseTags() {
+	load(); // TODO: don't double read
 
-	for (std::vector<prayBlock *>::iterator i = f->blocks.begin(); i != f->blocks.end(); i++) {
+	if (tagsloaded) {
+		return;
+	}
+	prayFile file((fs::path(filename)));
+	for (size_t i = 0; i < file.blocks.size(); i++) {
+		prayFileBlock* block = file.blocks[i];
+		if (!(block->type == type && block->name == name)) {
+			continue;
+		}
+		block->parseTags();
+		tagsloaded = true;
+		stringValues = block->stringValues;
+		integerValues = block->integerValues;
+		return;
+	}
+
+	throw creaturesException("Couldn't load " + type + " block '" + name + "' from file '" + filename + "'");
+}
+
+
+prayManager::~prayManager() {
+}
+
+void prayManager::addFile(const fs::path& filename) {
+	prayFile f(filename);
+
+	for (std::vector<prayFileBlock *>::iterator i = f.blocks.begin(); i != f.blocks.end(); i++) {
 		if (blocks.find((*i)->name) != blocks.end()) // garr, block conflict
 			continue;
 		//assert(blocks.find((*i)->name) == blocks.end());
-		blocks[(*i)->name] = *i;
-	}
-}
-
-void prayManager::removeFile(prayFile *f) {
-	std::vector<prayFile *>::iterator p = std::find(files.begin(), files.end(), f);
-	assert(p != files.end());
-	files.erase(p);
-	
-	for (std::vector<prayBlock *>::iterator i = f->blocks.begin(); i != f->blocks.end(); i++) {
-		if (blocks.find((*i)->name) == blocks.end()) // garr, block conflict
-			continue;
-		/*assert(blocks.find((*i)->name) != blocks.end());
-		assert(blocks[(*i)->name] == *i); */
-		blocks.erase(blocks.find((*i)->name));
+		blocks[(*i)->name] = std::unique_ptr<PrayBlock>(new PrayBlock(filename.string(), (*i)->type, (*i)->name, (*i)->isCompressed()));
 	}
 }
 
 void prayManager::update() {
-	if (files.size() != 0) return; // TODO: Handle actual update cases, rather than just the initial init.
+	blocks.clear();
 
 	if (!catalogue.hasTag("Pray System File Extensions")) {
 		std::cout << "Warning: Catalogue tag \"Pray System File Extensions\" wasn't found, so no PRAY files will be loaded." << std::endl;
@@ -85,8 +115,7 @@ void prayManager::update() {
 					// TODO: language checking!
 					//std::cout << "scanning PRAY file " << d->path().string() << std::endl;
 					try {
-						prayFile *p = new prayFile(*d);
-						addFile(p);
+						addFile(*d);
 					} catch (creaturesException &e) {
 						std::cerr << "PRAY file \"" << d->path().string() << "\" failed to load: " << e.what() << std::endl;
 					}
