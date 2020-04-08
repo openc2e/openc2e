@@ -199,7 +199,6 @@ ENDIF(OPENC2E_USE_OPENAL MATCHES "^(YES|AUTO)$")
 FIND_PACKAGE(ALUT)
 
 FIND_PACKAGE(Boost 1.34.0 COMPONENTS program_options filesystem thread regex serialization REQUIRED)
-FIND_LIBRARY(BOOST_SYSTEM_LIBRARY NAMES boost_system-mt)
 IF(OPENC2E_USE_QT)
 	find_package(Qt4 REQUIRED)
 ENDIF(OPENC2E_USE_QT)
@@ -269,17 +268,12 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	${OPENAL_LIBRARY}
 	${ALUT_LIBRARY}
 	${FRONTEND_LIBS}
-	boost_program_options-mt
-	boost_serialization-mt
-	boost_filesystem-mt
-	boost_thread-mt
-	boost_regex-mt
+	Boost::program_options
+	Boost::serialization
+	Boost::filesystem
+	Boost::thread
+	Boost::regex
 	)
-IF(BOOST_SYSTEM_LIBRARY)
-TARGET_LINK_LIBRARIES(openc2e boost_system-mt)
-ENDIF(BOOST_SYSTEM_LIBRARY)
-
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(BEFORE
 	${GEN}
@@ -291,7 +285,6 @@ INCLUDE_DIRECTORIES(BEFORE
 	${SDLMIXER_INCLUDE_DIR}
 	${OPENAL_INCLUDE_DIR}
 	${ALUT_INCLUDE_DIR}
-	${Boost_INCLUDE_DIR}
 	)
 
 FILE(GLOB CAOSVM_FILES ${SRC}/src/caos/caosVM_*.cpp)
