@@ -26,9 +26,6 @@
 #ifdef SDLMIXER_SUPPORT
 #include "backends/SDLMixerBackend.h"
 #endif
-#ifdef OPENAL_SUPPORT
-#include "backends/OpenALBackend.h"
-#endif
 #ifdef QT_SUPPORT
 #include "backends/qtgui/QtBackend.h"
 #endif
@@ -59,9 +56,6 @@ extern "C" int main(int argc, char *argv[]) {
 #endif
 #ifdef SDLMIXER_SUPPORT
 		engine.addPossibleAudioBackend("sdlmixer", shared_ptr<AudioBackend>(new SDLMixerBackend()));
-#endif
-#ifdef OPENAL_SUPPORT
-		engine.addPossibleAudioBackend("openal", shared_ptr<AudioBackend>(new OpenALBackend()));
 #endif
 
 		// pass command-line flags to the engine, but do no other setup
