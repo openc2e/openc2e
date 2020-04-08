@@ -187,7 +187,7 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(SDL_gfx REQUIRED)
 FIND_PACKAGE(SDL_ttf REQUIRED)
 
-FIND_PACKAGE(Boost 1.34.0 COMPONENTS program_options regex serialization REQUIRED)
+FIND_PACKAGE(Boost 1.34.0 COMPONENTS program_options serialization REQUIRED)
 IF(OPENC2E_USE_QT)
 	find_package(Qt4 REQUIRED)
 ENDIF(OPENC2E_USE_QT)
@@ -236,7 +236,6 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	${FRONTEND_LIBS}
 	Boost::program_options
 	Boost::serialization
-	Boost::regex
 	ghc_filesystem
 	)
 
