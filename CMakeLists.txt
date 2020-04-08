@@ -220,6 +220,7 @@ endif()
 add_library(prayfile
 	src/prayfile/pray.cpp
 	src/prayfile/PrayFileWriter.cpp
+	${GEN}/prayfile/Caos2PrayParser.cpp
 	${GEN}/prayfile/PraySourceParser.cpp
 )
 target_link_libraries(prayfile PUBLIC
@@ -232,7 +233,7 @@ target_link_libraries(openc2e prayfile)
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper prayfile)
 
-add_executable(praybuilder src/tools/praybuilder.cpp)
+add_executable(praybuilder src/tools/praybuilder.cpp ${GEN}/caoslexer.cpp)
 target_link_libraries(praybuilder prayfile)
 
 include_directories(BEFORE
@@ -291,6 +292,13 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND re2c -o ${GEN}/mnglexer.cpp ${SRC}/src/music/mnglexer.re2c
 	DEPENDS ${SRC}/src/music/mnglexer.re2c
+	WORKING_DIRECTORY ${SRC})
+
+add_custom_command(
+	OUTPUT ${GEN}/prayfile/Caos2PrayParser.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/prayfile"
+	COMMAND re2c -o ${GEN}/prayfile/Caos2PrayParser.cpp ${SRC}/src/prayfile/Caos2PrayParser.re2c
+	DEPENDS ${SRC}/src/prayfile/Caos2PrayParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(

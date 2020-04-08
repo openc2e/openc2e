@@ -1,90 +1,10 @@
+#include "prayfile/Caos2PrayParser.h"
 #include "prayfile/PraySourceParser.h"
 #include "prayfile/PrayFileWriter.h"
 
 #include <iostream>
 #include <map>
 #include <string>
-
-const std::string EXAMPLE1 = R"(
-
-"en-GB"
-
-group EGGS "Fire Norn"
-"Agent Type" 0
-"Script Count" 0
-
-"Genetics File" "norn.fire*"
-"Egg Glyph File" "firemale.c16"
-"Egg Glyph File 2" "firefemale.c16"
-"Egg Gallery male" "firemale"
-"Egg Gallery female" "firefemale"
-"Egg Animation String" "0"
-
-"Dependency Count" 4
-"Dependency 1" "firefemale.c16"
-"Dependency Category 1" 2
-"Dependency 2" "firemale.c16"
-"Dependency Category 2" 2
-"Dependency 3" "norn.fire.gen"
-"Dependency Category 3" 3
-"Dependency 4" "norn.fire.gno"
-"Dependency Category 4" 3
-
-inline FILE "firefemale.c16" "firefemale.c16"
-inline FILE "firemale.c16" "firemale.c16"
-inline FILE "norn.fire.gen" "norn.fire.gen"
-inline FILE "norn.fire.gno" "norn.fire.gno"
-
-)";
-
-const std::string EXAMPLE2 = R"(
-
-    (- comment -)
-
-    "en-GB"
-
-    group AGNT "Bubble Blower <C3>"
-    "Agent Type" 0
-    "Agent Description" "Let your norns blow bubbles all over!"
-
-    "Agent Animation File" "bubble blower.c16"
-    "Agent Animation Gallery" "bubble blower"
-    "Agent Animation String" "1 2 3 4 3 2 255"
-
-    "Remove script" "enum 2 21 999 kill targ next enum 2 21 1000 kill targ next"
-
-    "Script Count" 1
-    "Script 1" @ "bubble blower.cos"
-
-    "Dependency Count" 2
-    "Dependency 1" "bubble blower.c16"
-    "Dependency Category 1" 2
-    "Dependency 2" "bubble blower.catalogue"
-    "Dependency Category 2" 7
-
-    group DSAG "Bubble Blower <DS>"
-    "Agent Type" 0
-    "Agent Description" "Let your norns blow bubbles all over!"
-
-    "Agent Animation File" "bubble blower.c16"
-    "Agent Animation Gallery" "bubble blower"
-    "Agent Animation String" "1 2 3 4 3 2 255"
-    "Agent Sprite First Image" 0
-
-    "Remove script" "enum 2 21 999 kill targ next enum 2 21 1000 kill targ next"
-
-    "Script Count" 1
-    "Script 1" @ "bubble blower.cos"
-
-    "Dependency Count" 2
-    "Dependency 1" "bubble blower.c16"
-    "Dependency Category 1" 2
-    "Dependency 2" "bubble blower.catalogue"
-    "Dependency Category 2" 7
-
-    inline FILE "bubble blower.c16" "bubble blower.c16"
-    inline FILE "bubble blower.catalogue" "bubble blower.catalogue"
-)";
 
 template <class... Fs> struct overloaded;
 
@@ -116,66 +36,73 @@ namespace fs = ghc::filesystem;
 
 int main(int argc, char**argv) {
   {
-      if (argc != 3) {
-          printf("USAGE: %s INPUT OUTPUT\n", argv[0]);
+      if (!(argc == 2 || argc == 3)) {
+          printf("USAGE: %s INPUT [OUTPUT]\n", argv[0]);
           return 1;
       }
       
     std::ifstream f(argv[1]);
     std::string str((std::istreambuf_iterator<char>(f)),
                     std::istreambuf_iterator<char>());
-      
-    PraySourceParser parser(str.c_str());
 
     fs::path parent_path = fs::path(argv[1]).parent_path();
 
+    std::string output_filename;
+    if (argc == 3) {
+        output_filename = argv[2];
+    }
+    std::vector<PraySourceParser::Event> events;
+    if (fs::path(argv[1]).extension() == ".txt") {
+        events = PraySourceParser::parse(str);
+    } else if (fs::path(argv[1]).extension() == ".cos") {
+        events = Caos2PrayParser::parse(str, output_filename.size() ? nullptr : &output_filename);
+    } else {
+        std::cout << "Don't know how to handle input file \"" << argv[1] << "\"" << std::endl;
+        exit(1);
+    }
+    if (!output_filename.size()) {
+        output_filename = fs::path(argv[1]).stem().string() + ".agents";
+    }
+    
+    if (mpark::holds_alternative<PraySourceParser::Error>(events[0])) {
+        std::cout << "Error: "
+                  << mpark::get<PraySourceParser::Error>(events[0]).message << "\n";
+        return 1;
+    }
+
+    std::cout << "Writing output to \"" << output_filename << "\"" << std::endl;
+    PrayFileWriter writer(output_filename);
+
     std::map<std::string, std::string> string_tags;
     std::map<std::string, int> int_tags;
-
-    PrayFileWriter writer((std::string(argv[2])));
-
-    while (true) {
-      auto res = parser.next();
-
-      if (mpark::holds_alternative<PraySourceParser::Error>(res)) {
-        std::cout << "Error: "
-                  << mpark::get<PraySourceParser::Error>(res).message << "\n";
-        return 1;
-      }
-
-      if (mpark::holds_alternative<PraySourceParser::EndOfInput>(res)) {
-        break;
-      }
-
+    
+    for (auto res : events) {
       visit_overloads(
-          res, [](PraySourceParser::Error) {},
-          [](PraySourceParser::EndOfInput) {},
-          [&](PraySourceParser::GroupBlockStart) {
+          res, [](PraySourceParser::Error) {
+              /* handled already */
+          },
+          [&](PraySourceParser::ClearAccumulatedTags) {
             string_tags = {};
             int_tags = {};
           },
-          [&](PraySourceParser::GroupBlockEnd event) {
-              writer.writeBlockTags(event.type, event.name, int_tags, string_tags);
-            std::cout << "Group of type " << event.type << ", name \""
+          [&](PraySourceParser::GroupBlock event) {
+            writer.writeBlockTags(event.type, event.name, int_tags, string_tags);
+            std::cout << "Tag block " << event.type << " \""
                       << event.name << "\"\n";
-            for (auto kv : int_tags) {
-              std::cout << "  Integer tag \"" << kv.first << "\" -> "
-                        << kv.second << "\n";
-            }
-            for (auto kv : string_tags) {
-              std::cout << "  String tag \"" << kv.first << "\" -> "
-                        << kv.second << "\n";
-            }
           },
           [&](PraySourceParser::InlineBlock event) {
-            std::cout << "Inlining file data into block " << event.type << " \""
+              std::cout << "Inline block " << event.type << " \""
                       << event.name << "\" from file \"" << event.filename
                       << "\"\n";
             
             // TODO: check in same directory
           std::ifstream in((parent_path / event.filename).string());
-          printf("open \"%s\"\n", (parent_path / event.filename).string().c_str());
-          if (!in) abort();
+          if (!in) {
+              std::cout << "Couldn't open file \""
+                        << (parent_path / event.filename).string() << "\""
+                        << std::endl;
+              exit(1);
+          }
           std::vector<char> data((std::istreambuf_iterator<char>(in)),
                           std::istreambuf_iterator<char>());
                           
@@ -186,10 +113,14 @@ int main(int argc, char**argv) {
             string_tags[event.key] = event.value;
           },
           [&](PraySourceParser::StringTagFromFile event) {
-            
             // TODO: check in same directory
             std::ifstream in((parent_path / event.filename).string());
-            if (!in) abort();
+            if (!in) {
+                std::cout << "Couldn't open file \""
+                          << (parent_path / event.filename).string() << "\""
+                          << std::endl;
+                exit(1);
+            }
             std::string val((std::istreambuf_iterator<char>(in)),
                             std::istreambuf_iterator<char>());
                             
@@ -199,5 +130,7 @@ int main(int argc, char**argv) {
             int_tags[event.key] = event.value;
           });
     }
+
+    std::cout << "Done!" << std::endl;
   }
 }

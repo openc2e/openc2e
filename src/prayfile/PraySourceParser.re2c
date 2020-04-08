@@ -5,7 +5,49 @@
 
 #include "prayfile/PraySourceParser.h"
 
-void PraySourceParser::next_token() {
+using namespace PraySourceParser;
+
+class PraySourceParserImpl {
+public:
+  PraySourceParserImpl(const char *buf);
+  std::vector<PraySourceParser::Event> run();
+  std::vector<PraySourceParser::Event> next();
+
+private:
+  enum TokenType {
+    PS_EOI,
+    PS_ERROR,
+    PS_NEWLINE,
+    PS_WS,
+    PS_BAREWORD,
+    PS_STRING,
+    PS_INTEGER,
+    PS_AT,
+    PS_COMMENT,
+    PS_EN_GB,
+  };
+
+  struct Token {
+    TokenType type;
+    std::string stringval;
+    int intval;
+  };
+
+  static std::string TokenToString(Token &token);
+  void next_token();
+  PraySourceParser::Event parse_line();
+  bool parse_some_ws();
+
+  const char *pray_source_parse_p = nullptr;
+  int yylineno = -1;
+  Token token;
+  bool in_group_block = false;
+  std::string last_group_type;
+  std::string last_group_name;
+  bool seen_en_gb = false;
+};
+
+void PraySourceParserImpl::next_token() {
   const char *basep;
   const char *YYMARKER;
   assert(pray_source_parse_p);
@@ -79,7 +121,7 @@ comment:
   */
 }
 
-std::string PraySourceParser::TokenToString(PraySourceParser::Token &token) {
+std::string PraySourceParserImpl::TokenToString(PraySourceParserImpl::Token &token) {
   switch (token.type) {
   case PS_EOI:
     return "PS_EOI";
@@ -104,12 +146,28 @@ std::string PraySourceParser::TokenToString(PraySourceParser::Token &token) {
   }
 }
 
-PraySourceParser::PraySourceParser(const char *buf)
+PraySourceParserImpl::PraySourceParserImpl(const char *buf)
     : pray_source_parse_p(buf), yylineno(1) {
   next_token();
 }
 
-PraySourceParser::Event PraySourceParser::next() {
+std::vector<PraySourceParser::Event> PraySourceParserImpl::run() {
+    std::vector<PraySourceParser::Event> events;
+    while (true) {
+        std::vector<PraySourceParser::Event> newevents = next();
+        for (auto e : newevents) {
+            if (mpark::holds_alternative<Error>(e)) {
+                return {e};
+            }
+        }
+        if (newevents.size() == 0) {
+            return events;
+        }
+        events.insert(events.end(), newevents.begin(), newevents.end());
+    }
+}
+
+std::vector<PraySourceParser::Event> PraySourceParserImpl::next() {
   // parse the following grammar:
   // -> (ws* line ws* (newline|eoi))*
   // line ->
@@ -134,45 +192,38 @@ PraySourceParser::Event PraySourceParser::next() {
     }
   }
   if (!seen_en_gb) {
-    return Error{"Expected \"en-GB\", got " + TokenToString(token)};
+    return {Error{"Expected \"en-GB\", got " + TokenToString(token)}};
   }
 
-  // generate synthetic "GroupBlockEnd" lines
+  // generate synthetic "GroupBlock" lines
   if (in_group_block && (token.type == PS_BAREWORD || token.type == PS_EOI)) {
     in_group_block = false;
-    return GroupBlockEnd{last_group_type, last_group_name};
+    return {GroupBlock{last_group_type, last_group_name}};
   }
 
   // parse the actual line
-  Event result = parse_line();
-  if (mpark::holds_alternative<Error>(result)) {
-    return result;
+  if (token.type == PS_EOI) {
+    return {};
   }
-
-  // bookkeeping for generating "GroupBlockEnd"
-  if (mpark::holds_alternative<GroupBlockStart>(result)) {
-    in_group_block = true;
-    last_group_type = mpark::get<GroupBlockStart>(result).type;
-    last_group_name = mpark::get<GroupBlockStart>(result).name;
+  PraySourceParser::Event result = parse_line();
+  if (mpark::holds_alternative<Error>(result)) {
+    return {result};
   }
 
   // parse ending whitespace/newline
   parse_some_ws();
   if (token.type == PS_EOI) {
-    return result;
+    return {result};
   }
   if (token.type != PS_NEWLINE) {
-    return Error{"Expected newline, got " + TokenToString(token)};
+    return {Error{"Expected newline, got " + TokenToString(token)}};
   }
   next_token();
 
-  return result;
+  return {result};
 }
 
-PraySourceParser::Event PraySourceParser::parse_line() {
-  if (token.type == PS_EOI) {
-    return EndOfInput{};
-  }
+PraySourceParser::Event PraySourceParserImpl::parse_line() {
   if (token.type == PS_ERROR) {
     return Error{TokenToString(token)};
   }
@@ -241,7 +292,11 @@ PraySourceParser::Event PraySourceParser::parse_line() {
       }
       std::string name = token.stringval;
       next_token();
-      return GroupBlockStart{type, name};
+      // bookkeeping for generating "GroupBlockEnd"
+      in_group_block = true;
+      last_group_type = type;
+      last_group_name = name;
+      return ClearAccumulatedTags{};
 
     } else if (directive == "inline") {
       if (token.type != PS_STRING) {
@@ -266,7 +321,7 @@ PraySourceParser::Event PraySourceParser::parse_line() {
   return Error{"Expected string or bareword, got: " + TokenToString(token)};
 }
 
-bool PraySourceParser::parse_some_ws() {
+bool PraySourceParserImpl::parse_some_ws() {
   bool parsed_ws = false;
   while (token.type == PS_WS || token.type == PS_COMMENT) {
     if (token.type == PS_WS) {
@@ -275,4 +330,9 @@ bool PraySourceParser::parse_some_ws() {
     next_token();
   }
   return parsed_ws;
+}
+
+std::vector<PraySourceParser::Event> PraySourceParser::parse(const std::string& str) {
+    PraySourceParserImpl parser(str.c_str());
+    return parser.run();
 }
