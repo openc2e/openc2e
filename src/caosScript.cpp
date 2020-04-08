@@ -572,7 +572,7 @@ void caosScript::parseloop(int state, void *info) {
 			int bits[4];
 			for (int i = 0; i < 4; i++) {
 				caosVar val = getToken(TOK_CONST)->constval();
-				if (!val.getType() == CAOSINT)
+				if (val.getType() != CAOSINT)
 					throw parseException("Expected integer constant");
 				bits[i] = val.getInt();
 			}
