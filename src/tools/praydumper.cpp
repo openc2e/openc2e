@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	fs::path inputfile = fs::path(argv[0], fs::native);
+	fs::path inputfile = fs::path(argv[0]);
 	if (!fs::exists(inputfile)) {
 		cerr << "input file doesn't exist!" << endl;
 		return 1;

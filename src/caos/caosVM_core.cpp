@@ -346,7 +346,7 @@ void caosVM::v_OC2E_DDIR() {
 
 	for (std::vector<boost::filesystem::path>::iterator i = world.data_directories.begin(); i != world.data_directories.end(); i++) {
 		boost::filesystem::path &p = *i;
-		d = d + boost::filesystem::system_complete(p).native_file_string() + "\n";
+		d = d + boost::filesystem::system_complete(p).string() + "\n";
 	}
 	
 	result.setString(d);

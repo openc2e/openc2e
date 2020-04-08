@@ -29,19 +29,19 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	std::string directory = world.praymanager.getResourceDir(type);
 	caos_assert(!directory.empty());
 
-	fs::path dir = fs::path(world.getUserDataDir(), fs::native) / fs::path(directory, fs::native);
+	fs::path dir = fs::path(world.getUserDataDir()) / fs::path(directory);
 	if (!fs::exists(dir))
 		fs::create_directory(dir);
 	caos_assert(fs::exists(dir) && fs::is_directory(dir));
 
-	fs::path outputfile = dir / fs::path(name, fs::native);
+	fs::path outputfile = dir / fs::path(name);
 	if (fs::exists(outputfile)) {
 		// TODO: update file if necessary? check it's not a directory :P
 		return true;
 	}
 
-	fs::path possiblefile = fs::path(directory, fs::native) / fs::path(name, fs::native);
-	if (!world.findFile(possiblefile.native_directory_string()).empty()) {
+	fs::path possiblefile = fs::path(directory) / fs::path(name);
+	if (!world.findFile(possiblefile.string()).empty()) {
 		// TODO: we need to return 'okay' if the file exists anywhere, but someone needs to work out update behaviour (see other comment above, also)
 		return true;
 	}
@@ -65,7 +65,7 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	}
 
 	p->load();
-	std::ofstream output(outputfile.native_directory_string().c_str(), std::ios::binary);
+	std::ofstream output(outputfile.string().c_str(), std::ios::binary);
 	output.write((char *)p->getBuffer(), p->getSize());
 	// p->unload();
 	

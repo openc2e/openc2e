@@ -74,8 +74,8 @@ void prayManager::update() {
 		assert(fs::exists(*i));
 		assert(fs::is_directory(*i));
 
-		fs::path praydir(*i / fs::path("/My Agents/", fs::native));
-		
+		fs::path praydir(*i / fs::path("/My Agents/"));
+
 		if (fs::exists(praydir) && fs::is_directory(praydir)) {
 			fs::directory_iterator fsend;
 			for (fs::directory_iterator d(praydir); d != fsend; ++d) {
@@ -83,12 +83,12 @@ void prayManager::update() {
 				if (!x.empty()) x.erase(x.begin());
 				if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
 					// TODO: language checking!
-					//std::cout << "scanning PRAY file " << d->path().native_directory_string() << std::endl;
+					//std::cout << "scanning PRAY file " << d->path().string() << std::endl;
 					try {
 						prayFile *p = new prayFile(*d);
 						addFile(p);
 					} catch (creaturesException &e) {
-						std::cerr << "PRAY file \"" << d->path().native_directory_string() << "\" failed to load: " << e.what() << std::endl;
+						std::cerr << "PRAY file \"" << d->path().string() << "\" failed to load: " << e.what() << std::endl;
 					}
 				}
 			}

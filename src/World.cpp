@@ -515,7 +515,7 @@ void World::executeInitScript(fs::path p) {
 	assert(fs::exists(p));
 	assert(!fs::is_directory(p));
 
-	std::string x = p.native_file_string();
+	std::string x = p.string();
 	std::ifstream s(x.c_str());
 	assert(s.is_open());
 	//std::cout << "executing script " << x << "...\n";
@@ -564,7 +564,7 @@ void World::executeBootstrap(bool switcher) {
 		fs::path edenpath(data_directories[0] / "/Eden.sfc");
 		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
 			SFCFile sfc;
-			std::ifstream f(edenpath.native_directory_string().c_str(), std::ios::binary);
+			std::ifstream f(edenpath.string().c_str(), std::ios::binary);
 			f >> std::noskipws;
 			sfc.read(&f);
 			sfc.copyToWorld();
@@ -585,7 +585,7 @@ void World::executeBootstrap(bool switcher) {
 			// iterate through each bootstrap directory
 			for (fs::directory_iterator d(b); d != fsend; ++d) {
 				if (fs::exists(*d) && fs::is_directory(*d)) {
-					std::string s = d->path().leaf();
+					std::string s = d->path().leaf().string();
 					// TODO: cvillage has switcher code in 'Startup', so i included it here too
 					if (s == "000 Switcher" || s == "Startup") {
 						if (!switcher) continue;
@@ -620,7 +620,7 @@ std::string World::findFile(std::string name) {
 	// Go backwards, so we find files in more 'modern' directories first..
 	for (int i = data_directories.size() - 1; i != -1; i--) {
 		fs::path p = data_directories[i];
-		std::string r = (p / fs::path(name, fs::native)).native_directory_string();
+		std::string r = (p / fs::path(name)).string();
 		if (resolveFile(r))
 			return r;
 	}
@@ -634,7 +634,7 @@ std::vector<std::string> World::findFiles(std::string dir, std::string wild) {
 	// Go backwards, so we find files in more 'modern' directories first..
 	for (int i = data_directories.size() - 1; i != -1; i--) {
 		fs::path p = data_directories[i];
-		std::string r = (p / fs::path(dir, fs::native)).native_directory_string();
+		std::string r = (p / fs::path(dir)).string();
 		std::vector<std::string> results = findByWildcard(r, wild);
 		possibles.insert(possibles.end(), results.begin(), results.end()); // merge results
 	}
@@ -643,7 +643,7 @@ std::vector<std::string> World::findFiles(std::string dir, std::string wild) {
 }
 
 std::string World::getUserDataDir() {
-	return (data_directories.end() - 1)->native_directory_string();
+	return (data_directories.end() - 1)->string();
 }
 
 void World::selectCreature(boost::shared_ptr<Agent> a) {

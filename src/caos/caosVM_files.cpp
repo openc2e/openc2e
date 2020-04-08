@@ -59,7 +59,7 @@ std::string calculateJournalFilename(int directory, std::string filename, bool w
 		default: throw caosException("unknown Journal directory");
 	}
 	
-	fs::path dir = fs::path(fullfilename, fs::native);
+	fs::path dir = fs::path(fullfilename);
 	if (!fs::exists(dir))
 		fs::create_directory(dir);
 	caos_assert(fs::exists(dir) && fs::is_directory(dir));

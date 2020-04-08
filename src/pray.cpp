@@ -24,14 +24,14 @@
 
 prayFile::prayFile(fs::path filepath) {
 	path = filepath;
-	file.open(path.native_directory_string().c_str(), std::ios::binary);
+	file.open(path.string().c_str(), std::ios::binary);
 	if (!file.is_open())
-		throw creaturesException(std::string("couldn't open PRAY file \"") + path.native_directory_string() + "\"");
+		throw creaturesException(std::string("couldn't open PRAY file \"") + path.string() + "\"");
 	
 	char majic[4];
 	file.read(majic, 4);
 	if (strncmp(majic, "PRAY", 4) != 0)
-		throw creaturesException(std::string("bad magic of PRAY file \"") + path.native_directory_string() + "\"");
+		throw creaturesException(std::string("bad magic of PRAY file \"") + path.string() + "\"");
 
 	while (!file.eof()) {
 		// TODO: catch exceptions, and free all blocks before passing it up the stack

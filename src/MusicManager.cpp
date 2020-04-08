@@ -22,15 +22,15 @@
 #include "AudioBackend.h"
 #include "Engine.h"
 #include <iostream> // for debug messages
-using namespace boost;
 #include <cmath> // for cos/sin
-using namespace std;
 
 // this is all for MusicManager::tick
 #include "World.h"
 #include "Camera.h"
 #include "Room.h"
 #include "MetaRoom.h"
+
+using namespace boost;
 
 MusicManager musicmanager;
 

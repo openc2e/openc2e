@@ -96,9 +96,9 @@ void AgentInjector::readAgents() {
 			std::string cobext = fs::extension(itr->path());
 			std::transform(cobext.begin(), cobext.end(), cobext.begin(), (int(*)(int))tolower); // downcase
 			if (cobext != ".cob") continue;
-			
-			std::string cob = itr->path().native_file_string();
-			
+
+			std::string cob = itr->path().string();
+
 			if (engine.version == 1) {
 				std::ifstream cobstream(cob.c_str(), std::ios::binary);
 				if (!cobstream.fail()) {
@@ -165,9 +165,9 @@ void AgentInjector::onInject() {
 
 			std::string directory = world.praymanager.getResourceDir(praytype);
 			caos_assert(!directory.empty());
-		
-			fs::path possiblefile = fs::path(directory, fs::native) / fs::path(name, fs::native);
-			if (!world.findFile(possiblefile.native_directory_string()).empty()) continue; // TODO: update file if necessary?
+
+			fs::path possiblefile = fs::path(directory) / fs::path(name);
+			if (!world.findFile(possiblefile.string()).empty()) continue; // TODO: update file if necessary?
 
 			std::vector<cobBlock *>::iterator j;
 
@@ -179,15 +179,15 @@ void AgentInjector::onInject() {
 				cobFileBlock *a = new cobFileBlock(*j);
 				if (a->filetype == type && a->filename == name) {
 					// Found dependency!
-					fs::path dir = fs::path(world.getUserDataDir(), fs::native) / fs::path(directory, fs::native);
+					fs::path dir = fs::path(world.getUserDataDir()) / fs::path(directory);
 					if (!fs::exists(dir))
 						fs::create_directory(dir);
 					assert(fs::exists(dir) && fs::is_directory(dir)); // TODO: error handling
 
-					fs::path outputfile = dir / fs::path(name, fs::native);
+					fs::path outputfile = dir / fs::path(name);
 					assert(!fs::exists(outputfile));
 
-					std::ofstream output(outputfile.native_directory_string().c_str(), std::ios::binary);
+					std::ofstream output(outputfile.string().c_str(), std::ios::binary);
 					output.write((char *)a->getFileContents(), a->filesize);
 
 					a->getParent()->free();

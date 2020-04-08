@@ -45,14 +45,14 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 	std::string cachename;
 	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
 
-	realfile = path(world.findFile(fname), native);
+	realfile = path(world.findFile(fname));
 	// if it doesn't exist, too bad, give up.
 	if (!exists(realfile)) return false;
-	
-	std::string basename = realfile.leaf(); basename.erase(basename.end() - 4, basename.end()); 
-	
+
+	std::string basename = realfile.leaf().string(); basename.erase(basename.end() - 4, basename.end());
+
 	// work out where the cached file should be
-	cachename = engine.storageDirectory().native_directory_string() + "/" + fname;
+	cachename = engine.storageDirectory().string() + "/" + fname;
 	if (ft == c16) { // TODO: we should really stop the caller from appending .s16/.c16
 		cachename.erase(cachename.end() - 4, cachename.end());
 		cachename.append(".s16");
@@ -62,39 +62,39 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 	if (ft != spr)
 		cachename = cachename + ".big";
 #endif
-	cachefile = path(cachename, native);
+	cachefile = path(cachename);
 
 	if (resolveFile(cachefile)) {
 		// TODO: check for up-to-date-ness
 		in->clear();
-		in->mmapopen(cachefile.native_file_string());
+		in->mmapopen(cachefile.string());
 		if (ft == c16) ft = s16;
 		goto done;
 	}
-	//std::cout << "couldn't find cached version: " << cachefile.native_file_string() << std::endl;
+	//std::cout << "couldn't find cached version: " << cachefile.string() << std::endl;
 
 	in->clear();
-	in->mmapopen(realfile.native_file_string());
+	in->mmapopen(realfile.string());
 #if OC2E_BIG_ENDIAN
 	if (in->is_open() && (ft != spr)) {
 		path p = cachefile.branch_path();
 		if (!exists(p))
 			create_directory(p);
 		if (!is_directory(p))
-			throw creaturesException("imageManager couldn't create cache directory '" + p.native_directory_string() + "'");
+			throw creaturesException("imageManager couldn't create cache directory '" + p.string() + "'");
 
 		fileSwapper f;
 		switch (ft) {
 			case blk:
-				f.convertblk(realfile.native_file_string(), cachefile.native_file_string());
+				f.convertblk(realfile.string(), cachefile.string());
 				break;
 			case s16:
-				f.converts16(realfile.native_file_string(), cachefile.native_file_string());
+				f.converts16(realfile.string(), cachefile.string());
 				break;
 			case c16:
 				//cachefile = change_extension(cachefile, "");
 				//cachefile = change_extension(cachefile, ".s16.big");
-				f.convertc16(realfile.native_file_string(), cachefile.native_file_string());
+				f.convertc16(realfile.string(), cachefile.string());
 				ft = s16;
 				break;
 			default:
@@ -102,7 +102,7 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 		}
 		in->close(); // TODO: close the mmap too! how?
 		if (!exists(cachefile)) return false; // TODO: exception?
-		in->mmapopen(cachefile.native_file_string());
+		in->mmapopen(cachefile.string());
 	}
 #endif
 done:

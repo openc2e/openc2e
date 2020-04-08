@@ -106,8 +106,8 @@ void Engine::loadGameData() {
 		fs::path palpath(world.findFile("Palettes/palette.dta"));
 		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
 			palette = new unsigned char[768];
-			
-			std::ifstream f(palpath.native_directory_string().c_str(), std::ios::binary);
+
+			std::ifstream f(palpath.string().c_str(), std::ios::binary);
 			f >> std::noskipws;
 			f.read((char *)palette, 768);
 			
@@ -624,7 +624,7 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 
 	// add all the data directories to the list
 	for (std::vector<std::string>::iterator i = data_vec.begin(); i != data_vec.end(); i++) {
-		fs::path datadir(*i, fs::native);
+		fs::path datadir(*i);
 		if (!fs::exists(datadir)) {
 			throw creaturesException("data path '" + *i + "' doesn't exist");
 		}
@@ -746,11 +746,11 @@ bool Engine::initialSetup() {
 		// inform the user of the port used, and store it in the relevant file
 		std::cout << "Listening for connections on port " << listenport << "." << std::endl;
 #ifndef _WIN32
-		fs::path p = fs::path(homeDirectory().native_directory_string() + "/.creaturesengine", fs::native);
+		fs::path p = fs::path(homeDirectory().string() + "/.creaturesengine");
 		if (!fs::exists(p))
 			fs::create_directory(p);
 		if (fs::is_directory(p)) {
-			std::ofstream f((p.native_directory_string() + "/port").c_str(), std::ios::trunc);
+			std::ofstream f((p.string() + "/port").c_str(), std::ios::trunc);
 			f << boost::str(boost::format("%d") % listenport);
 		}
 #endif
@@ -776,7 +776,7 @@ bool Engine::initialSetup() {
 			throw creaturesException("multiple bootstrap files provided in C1/C2 mode");
 		
 		for (std::vector< std::string >::iterator bsi = cmdline_bootstrap.begin(); bsi != cmdline_bootstrap.end(); bsi++) {
-			fs::path scriptdir(*bsi, fs::native);
+			fs::path scriptdir(*bsi);
 			if (engine.version > 2 || fs::extension(scriptdir) == ".cos") {
 				// pass it to the world to execute (it handles both files and directories)
 
@@ -792,7 +792,7 @@ bool Engine::initialSetup() {
 					throw creaturesException("non-existant bootstrap file provided in C1/C2 mode");
 				// TODO: the default SFCFile loading code is in World, maybe this should be too..
 				SFCFile sfc;
-				std::ifstream f(scriptdir.native_directory_string().c_str(), std::ios::binary);
+				std::ifstream f(scriptdir.string().c_str(), std::ios::binary);
 				f >> std::noskipws;
 				sfc.read(&f);
 				sfc.copyToWorld();
@@ -832,18 +832,18 @@ fs::path Engine::homeDirectory() {
 #ifndef _WIN32
 	char *envhome = getenv("HOME");
 	if (envhome)
-		p = fs::path(envhome, fs::native);
+		p = fs::path(envhome);
 	if ((!envhome) || (!fs::is_directory(p)))
-		p = fs::path(getpwuid(getuid())->pw_dir, fs::native);
+		p = fs::path(getpwuid(getuid())->pw_dir);
 	if (!fs::is_directory(p)) {
 		std::cerr << "Can't work out what your home directory is, giving up and using /tmp for now." << std::endl;
-		p = fs::path("/tmp", fs::native); // sigh
+		p = fs::path("/tmp"); // sigh
 	}
 #else
 	TCHAR szPath[_MAX_PATH];
 	SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, TRUE);
 
-	p = fs::path(szPath, fs::native);
+	p = fs::path(szPath);
 	if (!fs::exists(p) || !fs::is_directory(p))
 		throw creaturesException("Windows reported that your My Documents folder is at '" + std::string(szPath) + "' but there's no directory there!");
 #endif
@@ -863,19 +863,19 @@ fs::path Engine::storageDirectory() {
 #endif
 	
 	// main storage dir
-	fs::path p = fs::path(homeDirectory().native_directory_string() + dirname, fs::native);
+	fs::path p = fs::path(homeDirectory().string() + dirname);
 	if (!fs::exists(p))
 		fs::create_directory(p);
 	else if (!fs::is_directory(p))
-		throw creaturesException("Your openc2e data directory " + p.native_directory_string() + " is a file, not a directory. That's bad.");
-	
+		throw creaturesException("Your openc2e data directory " + p.string() + " is a file, not a directory. That's bad.");
+
 	// game-specific storage dir
-	p = fs::path(p.native_directory_string() + std::string("/" + gamename), fs::native);
+	p = fs::path(p.string() + std::string("/" + gamename));
 	if (!fs::exists(p))
 		fs::create_directory(p);
 	else if (!fs::is_directory(p))
-		throw creaturesException("Your openc2e game data directory " + p.native_directory_string() + " is a file, not a directory. That's bad.");
-	
+		throw creaturesException("Your openc2e game data directory " + p.string() + " is a file, not a directory. That's bad.");
+
 	return p;
 }
 

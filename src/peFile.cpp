@@ -48,16 +48,16 @@ std::string nameForType(uint32 t) {
 
 peFile::peFile(fs::path filepath) {
 	path = filepath;
-	file.open(path.native_directory_string().c_str(), std::ios::binary);
+	file.open(path.string().c_str(), std::ios::binary);
 
 	if (!file.is_open())
-		throw creaturesException(std::string("couldn't open PE file \"") + path.native_directory_string() + "\"");
+		throw creaturesException(std::string("couldn't open PE file \"") + path.string() + "\"");
 
 	// check the signature of the file
 	char majic[2];
 	file.read(majic, 2);
 	if (strncmp(majic, "MZ", 2) != 0)
-		throw creaturesException(std::string("couldn't understand PE file \"") + path.native_directory_string() + "\" (not a PE file?)");
+		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (not a PE file?)");
 
 	// skip the rest of the DOS header
 	file.seekg(58, std::ios::cur);
@@ -65,14 +65,14 @@ peFile::peFile(fs::path filepath) {
 	// read the location of the PE header
 	uint32 e_lfanew = read32(file);
 	if (e_lfanew == 0)
-		throw creaturesException(std::string("couldn't understand PE file \"") + path.native_directory_string() + "\" (DOS program?)");
+		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (DOS program?)");
 
 	// seek to the PE header and check the signature
 	file.seekg(e_lfanew, std::ios::beg);
 	char pemajic[4];
 	file.read(pemajic, 4);
 	if (memcmp(pemajic, "PE\0\0", 4) != 0)
-		throw creaturesException(std::string("couldn't understand PE file \"") + path.native_directory_string() + "\" (corrupt?)");
+		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (corrupt?)");
 
 	// read the necessary data from the PE file header
 	file.seekg(2, std::ios::cur);
