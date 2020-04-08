@@ -136,6 +136,7 @@ protected:
 	void runUpdateBlock();
 
 public:
+	virtual ~MusicLayer() = default;
 	MusicTrack *getParent() { return parent; }
 	float &getVariable(std::string name) { return variables[name]; }
 	virtual void update(unsigned int latency) = 0;
