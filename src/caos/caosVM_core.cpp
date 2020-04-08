@@ -332,7 +332,7 @@ CAOS_LVALUE(GAME_c2,
 	caosVar(),
 	(void)0) // TODO
 
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
 /**
  OC2E DDIR (string)
@@ -344,9 +344,9 @@ CAOS_LVALUE(GAME_c2,
 void caosVM::v_OC2E_DDIR() {
 	std::string d;
 
-	for (std::vector<boost::filesystem::path>::iterator i = world.data_directories.begin(); i != world.data_directories.end(); i++) {
-		boost::filesystem::path &p = *i;
-		d = d + boost::filesystem::system_complete(p).string() + "\n";
+	for (std::vector<ghc::filesystem::path>::iterator i = world.data_directories.begin(); i != world.data_directories.end(); i++) {
+		ghc::filesystem::path &p = *i;
+		d = d + ghc::filesystem::absolute(p).string() + "\n";
 	}
 	
 	result.setString(d);

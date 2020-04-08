@@ -21,12 +21,12 @@
 #include "c1cobfile.h"
 #include "cobFile.h"
 
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
 #include <QMessageBox>
 #include <QPainter>
 
-namespace fs = boost::filesystem;
+namespace fs = ghc::filesystem;
 
 AgentInjector::AgentInjector(QWidget *parent) : QDialog(parent) {
 	ui.setupUi(this);

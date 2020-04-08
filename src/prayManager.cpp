@@ -21,7 +21,7 @@
 #include "exceptions.h"
 #include "World.h" // data_directories
 #include "Catalogue.h"
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
 prayManager::~prayManager() {
 	while (files.size() != 0) {

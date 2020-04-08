@@ -36,8 +36,8 @@
 #include "MusicManager.h"
 
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
+#include <ghc/filesystem.hpp>
+namespace fs = ghc::filesystem;
 
 World world;
 

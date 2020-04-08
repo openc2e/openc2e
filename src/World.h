@@ -30,7 +30,7 @@
 #include <set>
 #include <map>
 #include <list>
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
 class caosVM;
 
@@ -69,7 +69,7 @@ public:
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
 
-	std::vector<boost::filesystem::path> data_directories;
+	std::vector<ghc::filesystem::path> data_directories;
 	Scriptorium scriptorium;
 	prayManager praymanager;
 	imageManager gallery;
@@ -104,9 +104,9 @@ public:
 	void init();
 	void initCatalogue();
 	void shutdown();
-	
-	void executeInitScript(boost::filesystem::path p);
-	void executeBootstrap(boost::filesystem::path p);
+
+	void executeInitScript(ghc::filesystem::path p);
+	void executeBootstrap(ghc::filesystem::path p);
 	void executeBootstrap(bool switcher);
 
 	std::string getUserDataDir();

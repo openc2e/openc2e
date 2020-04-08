@@ -19,7 +19,7 @@
 
 #include "PathResolver.h"
 
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <set>
 #include <map>
@@ -32,7 +32,7 @@
 using std::map;
 using std::set;
 using std::string;
-using namespace boost::filesystem;
+using namespace ghc::filesystem;
 
 static set<string> dircache;
 static map<string, string> cache;

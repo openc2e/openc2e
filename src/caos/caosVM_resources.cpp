@@ -22,8 +22,8 @@
 #include "World.h"
 #include "Catalogue.h"
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
+#include <ghc/filesystem.hpp>
+namespace fs = ghc::filesystem;
 
 bool prayInstall(std::string name, unsigned int type, bool actually_install) {	
 	std::string directory = world.praymanager.getResourceDir(type);

@@ -24,7 +24,7 @@
 #include <list>
 
 #include "catalogue.tab.hpp"
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
 #include <iostream>
@@ -36,7 +36,7 @@
 
 using boost::str;
 
-namespace fs = boost::filesystem;
+namespace fs = ghc::filesystem;
 
 Catalogue catalogue;
 

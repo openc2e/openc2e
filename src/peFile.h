@@ -24,9 +24,9 @@
 #include <vector>
 #include <fstream>
 #include <map>
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
-namespace fs = boost::filesystem;
+namespace fs = ghc::filesystem;
 
 #include "endianlove.h"
 

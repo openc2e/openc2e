@@ -3,7 +3,7 @@
 #include <QApplication>
 
 #include "../../Catalogue.h"
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
 #include <stdlib.h>
 
@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 
 	srand(time(NULL));
 
-	boost::filesystem::path p(".");
+	ghc::filesystem::path p(".");
 	catalogue.initFrom(p);
 
 	BrainInAVat myvat;

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
 using std::cout;
 using std::cerr;

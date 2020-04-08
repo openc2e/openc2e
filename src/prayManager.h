@@ -22,7 +22,7 @@
 
 #include "pray.h"
 
-namespace fs = boost::filesystem;
+namespace fs = ghc::filesystem;
 
 class prayManager {
 protected:

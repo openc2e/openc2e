@@ -32,9 +32,9 @@
 #include <iostream>
 #include <fstream>
 
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
-using namespace boost::filesystem;
+using namespace ghc::filesystem;
 
 enum filetype { blk, s16, c16, spr, bmp };
 

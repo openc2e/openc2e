@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 #include <istream>
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 #include <list>
 #include "exceptions.h"
 
@@ -58,8 +58,8 @@ public:
 	std::string calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const;
   
 	void reset();
-	void addFile(boost::filesystem::path path);
-	void initFrom(boost::filesystem::path path);
+	void addFile(ghc::filesystem::path path);
+	void initFrom(ghc::filesystem::path path);
 
 	void addVals(std::string &title, bool override, int count, const std::list<std::string> &vals);
 };

@@ -23,9 +23,9 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
-namespace fs = boost::filesystem;
+namespace fs = ghc::filesystem;
 
 class cobBlock;
 

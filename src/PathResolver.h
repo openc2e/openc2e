@@ -22,7 +22,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 
 /* resolveFile
  *
@@ -30,7 +30,7 @@
  */
 bool resolveFile(std::string &srcPath);
 
-bool resolveFile(boost::filesystem::path &path);
+bool resolveFile(ghc::filesystem::path &path);
 
 std::vector<std::string> findByWildcard(std::string dir, std::string wild);
 

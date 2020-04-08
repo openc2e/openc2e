@@ -31,10 +31,10 @@
 #include "peFile.h"
 #include "Camera.h"
 
-#include <boost/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
-namespace fs = boost::filesystem;
+namespace fs = ghc::filesystem;
 namespace po = boost::program_options;
 
 #ifndef _WIN32

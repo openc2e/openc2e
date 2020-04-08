@@ -198,10 +198,12 @@ ELSE(OPENC2E_USE_OPENAL MATCHES "^(YES|AUTO)$")
 ENDIF(OPENC2E_USE_OPENAL MATCHES "^(YES|AUTO)$")
 FIND_PACKAGE(ALUT)
 
-FIND_PACKAGE(Boost 1.34.0 COMPONENTS program_options filesystem thread regex serialization REQUIRED)
+FIND_PACKAGE(Boost 1.34.0 COMPONENTS program_options thread regex serialization REQUIRED)
 IF(OPENC2E_USE_QT)
 	find_package(Qt4 REQUIRED)
 ENDIF(OPENC2E_USE_QT)
+
+add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 
 SET(USE_OPENAL "NO")
 
@@ -271,11 +273,10 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	${FRONTEND_LIBS}
 	Boost::program_options
 	Boost::serialization
-	Boost::filesystem
 	Boost::thread
 	Boost::regex
+	ghc_filesystem
 	)
-target_compile_definitions(openc2e PUBLIC BOOST_FILESYSTEM_NO_DEPRECATED=1)
 
 INCLUDE_DIRECTORIES(BEFORE
 	${GEN}
