@@ -17,8 +17,7 @@
  *
  */
 #include "attFile.h"
-#include <boost/tokenizer.hpp>
-using namespace boost;
+#include <regex>
 
 std::istream &operator >> (std::istream &i, attFile &f) {
 	f.nolines = 0;
@@ -33,9 +32,13 @@ std::istream &operator >> (std::istream &i, attFile &f) {
 		
 		bool havefirst = false;
 		unsigned int x = 0;
-		tokenizer<> tok(s);
-		for (tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); beg++) {
-			unsigned int val = atoi(beg->c_str());
+		const std::regex ws_re("\\s+");
+		for (
+			auto beg = std::sregex_token_iterator(s.begin(), s.end(), ws_re, -1);
+			beg != std::sregex_token_iterator();
+			beg++
+		) {
+			unsigned int val = atoi(beg->str().c_str());
 			if (havefirst) {
 				f.attachments[f.nolines][f.noattachments[f.nolines] * 2] = x;
 				f.attachments[f.nolines][(f.noattachments[f.nolines] * 2) + 1] = val;

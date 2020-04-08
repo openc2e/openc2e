@@ -16,7 +16,7 @@
  *  Lesser General Public License for more details.
  *
  */
-#include <fstream>
+#include <iostream>
 
 class attFile {
 public:
