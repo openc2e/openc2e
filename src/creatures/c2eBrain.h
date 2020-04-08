@@ -35,7 +35,7 @@ struct c2ebraincomponentorder {
 
 class c2eBrainComponent {
 protected:
-	friend class c2ebraincomponentorder;
+	friend struct c2ebraincomponentorder;
 
 	uint8 updatetime;
 	class c2eBrain *parent;

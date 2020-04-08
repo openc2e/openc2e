@@ -47,7 +47,7 @@ struct toktrace {
 	toktrace() { }
 };
 
-struct script {
+class script {
 	protected:
 		FRIEND_SERIALIZE(script)
 		
@@ -181,7 +181,7 @@ struct script {
 
 class caosScript;
 
-class CAOSExpression;
+struct CAOSExpression;
 
 struct CAOSCmd {
 	const cmdinfo *op;
@@ -259,7 +259,7 @@ protected:
 	void emitConst(const caosVar &);
 	boost::shared_ptr<CAOSExpression> readExpr(const enum ci_type xtype);
 	void emitExpr(boost::shared_ptr<CAOSExpression> ce);
-	const cmdinfo *readCommand(class token *t, const std::string &prefix, bool except = true);
+	const cmdinfo *readCommand(token *t, const std::string &prefix, bool except = true);
 	void parseloop(int state, void *info);
 
 	shared_ptr<std::vector<token> > tokens;

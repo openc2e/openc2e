@@ -110,7 +110,7 @@ public:
 		: creaturesException(s), lineno(-1) { }
 	~parseFailure() throw() { }
 
-	boost::shared_ptr<std::vector<class token> > context;
+	boost::shared_ptr<std::vector<struct token> > context;
 	int ctxoffset;
 	std::string filename;
 	int lineno;
