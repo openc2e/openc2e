@@ -712,18 +712,13 @@ std::string World::generateMoniker(std::string basename) {
 boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport) {
 	if (filename.size() == 0) return boost::shared_ptr<AudioSource>();
 
-	boost::shared_ptr<AudioSource> sound = engine.audio->newSource();
-	if (!sound) return boost::shared_ptr<AudioSource>();
-
-	AudioClip clip = engine.audio->loadClip(filename);
-	if (!clip) {
+	boost::shared_ptr<AudioSource> sound = engine.audio->loadClip(filename);
+	if (!sound) {
 		// note that more specific error messages can be thrown by implementations of loadClip
 		if (engine.version < 3) return boost::shared_ptr<AudioSource>(); // creatures 1 and 2 ignore non-existent audio clips
 		throw creaturesException("failed to load audio clip " + filename);
 	}
 
-	sound->setClip(clip);
-	
 	if (loop) {
 		assert(controlled);
 		sound->setLooping(true);

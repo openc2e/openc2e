@@ -52,15 +52,19 @@ boost::shared_ptr<AudioSource> SDLMixerBackend::newSource() {
 	return boost::shared_ptr<AudioSource>(new SDLMixerSource());
 }
 
-AudioClip SDLMixerBackend::loadClip(const std::string &filename) {
+boost::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filename) {
 	std::string fname = world.findFile(std::string("Sounds/") + filename + ".wav");
-	if (fname.size() == 0) return AudioClip();
+	if (fname.size() == 0) return boost::shared_ptr<AudioSource>();
 
 	Mix_Chunk *buffer = Mix_LoadWAV(fname.c_str());
-	if (!buffer) return AudioClip();
+	if (!buffer) return boost::shared_ptr<AudioSource>();
 
-	AudioClip clip(new SDLMixerBuffer(buffer));
-	return clip;
+
+
+	SDLMixerSource* source = new SDLMixerSource();
+	source->clip = SDLMixerClip(new SDLMixerBuffer(buffer));
+
+	return boost::shared_ptr<AudioSource>(source);
 }
 
 SDLMixerSource::SDLMixerSource() {
@@ -68,18 +72,6 @@ SDLMixerSource::SDLMixerSource() {
 }
 
 SDLMixerSource::~SDLMixerSource() {
-}
-
-AudioClip SDLMixerSource::getClip() const {
-	AudioClip clip(static_cast<AudioBuffer *>(this->clip.get()));
-	return clip;
-}
-
-void SDLMixerSource::setClip(const AudioClip &clip_) {
-	SDLMixerBuffer *obp = dynamic_cast<SDLMixerBuffer *>(clip_.get());
-	assert(obp);
-	stop();
-	this->clip = SDLMixerClip(obp);
 }
 
 SourceState SDLMixerSource::getState() const {

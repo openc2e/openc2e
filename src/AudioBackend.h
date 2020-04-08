@@ -20,31 +20,10 @@
 #ifndef SOUNDBACKEND_H
 #define SOUNDBACKEND_H 1
 
-#include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <string>
-
-class AudioBuffer {
-	friend void intrusive_ptr_add_ref(AudioBuffer *p) {
-		p->add_ref();
-	}
-	friend void intrusive_ptr_release(AudioBuffer *p) {
-		p->del_ref();
-	}
-
-protected:
-	virtual void add_ref() = 0;
-	virtual void del_ref() = 0;
-
-public:
-	virtual ~AudioBuffer() { }
-	virtual unsigned int length_ms() const = 0; /* milliseconds */
-	virtual unsigned int length_samples() const = 0;
-};
-
-typedef boost::intrusive_ptr<AudioBuffer> AudioClip;
 
 /* Base class for sources of streaming data (eg, MNG music)
  *
@@ -86,11 +65,9 @@ protected:
 
 public:
 	virtual ~AudioSource() { }
-	virtual AudioClip getClip() = 0;
-	virtual void setClip(const AudioClip &) = 0; /* Valid only in STOP state */
 	virtual SourceState getState() const = 0;
 
-	// The effect of calling this function on a AudioSource initialized with setClip
+	// The effect of calling this function on a AudioSource initialized with loadClip
 	// is undefined
 	virtual AudioStream getStream() const = 0;
 	virtual void setStream(const AudioStream &) = 0;
@@ -100,7 +77,7 @@ public:
 		setStream(AudioStream(p));
 	}
 
-	virtual void play() = 0; /* requires that getClip() not be a null ref */
+	virtual void play() = 0; /* requires that clip not be a null ref */
 	virtual void stop() = 0;
 	virtual void pause() = 0;
 	virtual void fadeOut() = 0;
@@ -139,7 +116,7 @@ public:
 	 * The effect of invoking setPos on this source is undefined.
 	 */
 	virtual boost::shared_ptr<AudioSource> getBGMSource() = 0;
-	virtual AudioClip loadClip(const std::string &filename) = 0;
+	virtual boost::shared_ptr<AudioSource> loadClip(const std::string &filename) = 0;
 
 	virtual void begin() { }
 	virtual void commit() { }

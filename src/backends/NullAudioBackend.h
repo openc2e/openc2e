@@ -21,11 +21,13 @@
 #define _NULLAUDIOBACKEND_H
 
 #include "AudioBackend.h"
+#include "backends/SkeletonAudioBackend.h"
+
+class NullAudioSource : public SkeletonAudioSource {};
 
 class NullAudioBackend : public AudioBackend {
 protected:
 	bool muted;
-	AudioClip clip;
 
 public:
 	NullAudioBackend() { }
@@ -35,7 +37,11 @@ public:
 	void setMute(bool b) { muted = b; }
 	bool isMuted() const { return muted; }
 	boost::shared_ptr<AudioSource> newSource() { return boost::shared_ptr<AudioSource>(); }
-	AudioClip loadClip(const std::string &) { return AudioClip(); }
+	boost::shared_ptr<AudioSource> loadClip(const boost::string &filename) {
+		boost::string fname = world.findFile(boost::string("Sounds/") + filename + ".wav");
+		if (fname.size() == 0) return boost::shared_ptr<AudioSource>();
+		return boost::shared_ptr<AudioSource>(new NullAudioSource());
+	}
 
 	boost::shared_ptr<AudioSource> getBGMSource() {
 		return boost::shared_ptr<AudioSource>();

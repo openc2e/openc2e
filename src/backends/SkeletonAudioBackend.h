@@ -26,35 +26,21 @@
  * audio backends. Normally client code should not include it.
  */
 
-class SkeletonAudioBuffer : public AudioBuffer {
-protected:
-	int refcnt;
-	SkeletonAudioBuffer() { refcnt = 0; }
-	friend class NullBackend;
-	void add_ref() { refcnt++; }
-	void del_ref() { assert(refcnt); refcnt--; if (!refcnt) delete this; }
-};
-
 class SkeletonAudioSource : public AudioSource {
 protected:
-	AudioClip clip;
 	/* we don't track state here because, well, the clips don't support
 	 * length values yet.
 	 */
 	bool looping, muted, followview;
 	float x, y, z, volume;
+	AudioStream stream;
 	SkeletonAudioSource() { looping = false; muted = false; volume = 1.0f; followview = false; }
 
 public:
-	AudioClip getClip() { return clip; }
-	void setClip(AudioClip &ac) {
-		assert(getState() == SS_STOP);
-		clip = ac;
-	}
 	SourceState getState() const {
 		return SS_STOP;
 	}
-	void play() { assert(clip); }
+	void play() { }
 	void stop() { }
 	void pause() { }
 	void fadeOut() { }
@@ -69,6 +55,8 @@ public:
 	void setMute(bool m) { muted = m; }
 	bool isFollowingView() const { return followview; }
 	void setFollowingView(bool v) { followview = v; }
+	void setStream(const AudioStream &s) { stream = s; }
+	AudioStream getStream() const { return stream; }
 
 };
 
