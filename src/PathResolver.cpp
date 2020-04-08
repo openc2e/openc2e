@@ -201,7 +201,7 @@ std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
 			break;
 		if (skey->first.length() < lcdir.length() + 2)
 			continue;
-		filepart = toLowerCase(skey->first.substr(lcdir.length() + 1));
+		filepart = toLowerCase(path(skey->first).lexically_relative(dirp).string());
 		if (!boost::regex_match(filepart, l))
 			continue;
 		results.push_back(skey->second);
