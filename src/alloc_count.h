@@ -24,7 +24,6 @@
 #else
 
 #include <iostream>
-#include <boost/detail/atomic_count.hpp>
 #include <cstdlib>
 #include <string>
 
