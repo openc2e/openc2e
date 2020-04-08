@@ -432,7 +432,7 @@ void SkeletalCreature::snapDownFoot() {
 	}
 
 	bool newroomchosen = (newroom != downfootroom) && downfootroom;
-	bool hadroom = (downfootroom);
+	bool hadroom = downfootroom != nullptr;
 	downfootroom = newroom;
 	
 	if (!downfootroom /*|| !falling */) {
