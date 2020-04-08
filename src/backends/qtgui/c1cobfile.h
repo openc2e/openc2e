@@ -21,7 +21,6 @@
 #include <string>
 #include "endianlove.h"
 #include "streamutils.h"
-#include <boost/scoped_array.hpp>
 #include <vector>
 
 std::string readpascalstring(std::istream &s);
@@ -38,7 +37,7 @@ struct c1cobfile {
 
 	uint32 imagewidth, imageheight;
 
-	boost::scoped_array<char> imagedata;
+	std::vector<char> imagedata;
 
 	c1cobfile(std::ifstream &s);
 };

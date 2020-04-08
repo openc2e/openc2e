@@ -24,10 +24,10 @@ std::string readpascalstring(std::istream &s) {
 	else
 		size = a;
 
-	boost::scoped_array<char> x(new char[size]);
+	std::vector<char> x(size);
 	//char x[size];
-	s.read(x.get(), size);
-	return std::string(x.get(), size);
+	s.read(x.data(), size);
+	return std::string(x.data(), size);
 }
 
 c1cobfile::c1cobfile(std::ifstream &s) {
@@ -62,7 +62,8 @@ c1cobfile::c1cobfile(std::ifstream &s) {
 	if (imagewidth != secondimagewidth && secondimagewidth) // ABK- Egg Gender.cob has it zeroed
 		std::cout << "ignoring COB secondimage width " << (int)secondimagewidth <<
 			", using width " << imagewidth << std::endl;
-	imagedata.reset(new char[imagewidth * imageheight]);
-	s.read(imagedata.get(), imagewidth * imageheight);
+	imagedata.clear();
+	imagedata.resize(imagewidth * imageheight);
+	s.read(imagedata.data(), imagewidth * imageheight);
 	name = readpascalstring(s);
 }

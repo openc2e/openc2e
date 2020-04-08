@@ -48,23 +48,23 @@ void SDLMixerBackend::setMute(bool m) {
 	muted = m;
 }
 
-boost::shared_ptr<AudioSource> SDLMixerBackend::newSource() {
-	return boost::shared_ptr<AudioSource>(new SDLMixerSource());
+std::shared_ptr<AudioSource> SDLMixerBackend::newSource() {
+	return std::shared_ptr<AudioSource>(new SDLMixerSource());
 }
 
-boost::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filename) {
+std::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filename) {
 	std::string fname = world.findFile(std::string("Sounds/") + filename + ".wav");
-	if (fname.size() == 0) return boost::shared_ptr<AudioSource>();
+	if (fname.size() == 0) return std::shared_ptr<AudioSource>();
 
 	Mix_Chunk *buffer = Mix_LoadWAV(fname.c_str());
-	if (!buffer) return boost::shared_ptr<AudioSource>();
+	if (!buffer) return std::shared_ptr<AudioSource>();
 
 
 
 	SDLMixerSource* source = new SDLMixerSource();
 	source->clip = SDLMixerClip(new SDLMixerBuffer(buffer));
 
-	return boost::shared_ptr<AudioSource>(source);
+	return std::shared_ptr<AudioSource>(source);
 }
 
 SDLMixerSource::SDLMixerSource() {

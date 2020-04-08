@@ -27,16 +27,12 @@ class AgentRef;
 class MetaRoom;
 class Room;
 
-namespace boost {
-	template <typename T> class shared_ptr;
-}
-
-bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, boost::shared_ptr<Room> ownerroom);
+bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, std::shared_ptr<Room> ownerroom);
 bool agentIsVisible(Agent *seeing, Agent *dest);
-std::vector<boost::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char family, unsigned char genus, unsigned short species);
+std::vector<std::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char family, unsigned char genus, unsigned short species);
 
 bool agentsTouching(Agent *first, Agent *second);
-boost::shared_ptr<Room> roomContainingAgent(AgentRef agent);
+std::shared_ptr<Room> roomContainingAgent(AgentRef agent);
 
 #endif
 

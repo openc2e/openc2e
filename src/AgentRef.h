@@ -22,8 +22,6 @@
 
 #include <cstdlib> // for NULL
 #include <iostream>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 class Agent;
 
@@ -31,15 +29,15 @@ class AgentRef {
 	friend class Agent;
 	
 protected:
-	boost::weak_ptr<Agent> ref;
+	std::weak_ptr<Agent> ref;
 	void checkLife() const;
 
 public:
 	void dump() const;
 	
 	AgentRef() { }
-	AgentRef(boost::shared_ptr<Agent> a) { ref = a; }
-	AgentRef(boost::weak_ptr<Agent> a) { ref = a; }
+	AgentRef(std::shared_ptr<Agent> a) { ref = a; }
+	AgentRef(std::weak_ptr<Agent> a) { ref = a; }
 	AgentRef(Agent *a) { set(a); }
 	AgentRef(const AgentRef &r) : ref(r.ref) {}
 
@@ -62,10 +60,10 @@ public:
 
 	void set(Agent *a);
 	void set(const AgentRef &r) { ref = r.ref; }
-	void set(const boost::shared_ptr<Agent> &r) { ref = r; }
-	void set(const boost::weak_ptr<Agent> &r) { ref = r; }
+	void set(const std::shared_ptr<Agent> &r) { ref = r; }
+	void set(const std::weak_ptr<Agent> &r) { ref = r; }
 
-	boost::shared_ptr<Agent> lock() const;
+	std::shared_ptr<Agent> lock() const;
 	Agent *get() const { return lock().get(); }
 };
 		

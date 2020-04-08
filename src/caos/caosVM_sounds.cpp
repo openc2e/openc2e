@@ -386,7 +386,7 @@ void caosVM::c_DBG_SINE() {
 		if (targ->sound)
 			targ->sound->stop();
 	}
-	boost::shared_ptr<AudioSource> src;
+	std::shared_ptr<AudioSource> src;
 	if (track == 2)
 		src = engine.audio->getBGMSource();
 	else
@@ -408,7 +408,7 @@ void caosVM::c_DBG_SINE() {
  Don't touch.
  */
 void caosVM::c_DBG_SBGM() {
-	boost::shared_ptr<AudioSource> src = engine.audio->getBGMSource();
+	std::shared_ptr<AudioSource> src = engine.audio->getBGMSource();
 	if (src)
 		src->stop();
 }

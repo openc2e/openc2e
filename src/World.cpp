@@ -214,10 +214,10 @@ void World::tick() {
 
 	// Notify the audio backend about our current viewpoint center.
 	engine.audio->setViewpointCenter(camera->getXCentre(), camera->getYCentre());
-	
-	std::list<std::pair<boost::shared_ptr<AudioSource>, bool> >::iterator si = uncontrolled_sounds.begin();
+
+	std::list<std::pair<std::shared_ptr<AudioSource>, bool> >::iterator si = uncontrolled_sounds.begin();
 	while (si != uncontrolled_sounds.end()) {
-		std::list<std::pair<boost::shared_ptr<AudioSource>, bool> >::iterator next = si; next++;
+		std::list<std::pair<std::shared_ptr<AudioSource>, bool> >::iterator next = si; next++;
 		if (si->first->getState() != SS_PLAY) {
 			// sound is stopped, so release our reference
 			uncontrolled_sounds.erase(si);
@@ -238,13 +238,13 @@ void World::tick() {
 	}
 
 	musicmanager.tick();
-	
-	// Tick all agents, deleting as necessary.	
-	std::list<boost::shared_ptr<Agent> >::iterator i = agents.begin();
+
+	// Tick all agents, deleting as necessary.
+	std::list<std::shared_ptr<Agent> >::iterator i = agents.begin();
 	while (i != agents.end()) {
-		boost::shared_ptr<Agent> a = *i;
+		std::shared_ptr<Agent> a = *i;
 		if (!a) {
-			std::list<boost::shared_ptr<Agent> >::iterator i2 = i;
+			std::list<std::shared_ptr<Agent> >::iterator i2 = i;
 			i2++;
 			agents.erase(i);
 			i = i2;
@@ -257,7 +257,7 @@ void World::tick() {
 	// Process the script queue.
 	std::list<scriptevent> newqueue;
 	for (std::list<scriptevent>::iterator i = scriptqueue.begin(); i != scriptqueue.end(); i++) {
-		boost::shared_ptr<Agent> agent = i->agent.lock();
+		std::shared_ptr<Agent> agent = i->agent.lock();
 		if (agent) {
 			if (engine.version < 3) {
 				// only try running a collision script if the agent doesn't have a running script
@@ -453,10 +453,10 @@ void World::drawWorld(Camera *cam, Surface *surface) {
 
 	// render port connection lines. TODO: these should be rendered as some kind
 	// of renderable, not directly like this.
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = *i;
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		std::shared_ptr<Agent> a = *i;
 		if (!a) continue;
-		for (std::map<unsigned int, boost::shared_ptr<OutputPort> >::iterator p = a->outports.begin();
+		for (std::map<unsigned int, std::shared_ptr<OutputPort> >::iterator p = a->outports.begin();
 		     p != a->outports.end(); p++) {
 			for (PortConnectionList::iterator c = p->second->dests.begin(); c != p->second->dests.end(); c++) {
 				if (!c->first) continue;
@@ -646,14 +646,14 @@ std::string World::getUserDataDir() {
 	return (data_directories.end() - 1)->string();
 }
 
-void World::selectCreature(boost::shared_ptr<Agent> a) {
+void World::selectCreature(std::shared_ptr<Agent> a) {
 	if (a) {
 		CreatureAgent *c = dynamic_cast<CreatureAgent *>(a.get());
 		caos_assert(c);
 	}
 
 	if (selectedcreature != a) {
-		for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 			if (!*i) continue;
 			(*i)->queueScript(120, 0, caosVar(a), caosVar(selectedcreature)); // selected creature changed
 		}
@@ -709,13 +709,13 @@ std::string World::generateMoniker(std::string basename) {
 	return x;
 }
 
-boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport) {
-	if (filename.size() == 0) return boost::shared_ptr<AudioSource>();
+std::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport) {
+	if (filename.size() == 0) return std::shared_ptr<AudioSource>();
 
-	boost::shared_ptr<AudioSource> sound = engine.audio->loadClip(filename);
+	std::shared_ptr<AudioSource> sound = engine.audio->loadClip(filename);
 	if (!sound) {
 		// note that more specific error messages can be thrown by implementations of loadClip
-		if (engine.version < 3) return boost::shared_ptr<AudioSource>(); // creatures 1 and 2 ignore non-existent audio clips
+		if (engine.version < 3) return std::shared_ptr<AudioSource>(); // creatures 1 and 2 ignore non-existent audio clips
 		throw creaturesException("failed to load audio clip " + filename);
 	}
 
@@ -731,13 +731,13 @@ boost::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef a
 		if (controlled)
 			agent->sound = sound;
 		else
-			uncontrolled_sounds.push_back(std::pair<boost::shared_ptr<class AudioSource>, bool>(sound, false));
+			uncontrolled_sounds.push_back(std::pair<std::shared_ptr<class AudioSource>, bool>(sound, false));
 	} else {
 		assert(!controlled);
 
 		// TODO: handle non-agent sounds
 		sound->setPos(camera->getXCentre(), camera->getYCentre(), 0);
-		uncontrolled_sounds.push_back(std::pair<boost::shared_ptr<class AudioSource>, bool>(sound, followviewport));
+		uncontrolled_sounds.push_back(std::pair<std::shared_ptr<class AudioSource>, bool>(sound, followviewport));
 	}
 	
 	sound->play();

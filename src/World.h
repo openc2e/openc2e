@@ -50,10 +50,10 @@ class World {
 protected:
 	class PointerAgent *theHand;
 	std::list<scriptevent> scriptqueue;
-	
-	std::list<std::pair<boost::shared_ptr<class AudioSource>, bool> > uncontrolled_sounds; // audio, followingviewport
-	
-	std::map<int, boost::weak_ptr<Agent> > unidmap;
+
+	std::list<std::pair<std::shared_ptr<class AudioSource>, bool> > uncontrolled_sounds; // audio, followingviewport
+
+	std::map<int, std::weak_ptr<Agent> > unidmap;
 	std::vector<caosVM *> vmpool;
 
 public:
@@ -64,8 +64,8 @@ public:
 
 	std::multiset<CompoundPart *, partzorder> zorder; // sorted from top to bottom
 	std::multiset<renderable *, renderablezorder> renders; // sorted from bottom to top
-	std::list<boost::shared_ptr<Agent> > agents;
-	
+	std::list<std::shared_ptr<Agent> > agents;
+
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosVar> variables;
 
@@ -87,7 +87,7 @@ public:
 	std::vector<unsigned int> groundlevels;
 
 	AgentRef selectedcreature;
-	void selectCreature(boost::shared_ptr<Agent> c);
+	void selectCreature(std::shared_ptr<Agent> c);
 	AgentRef focusagent; unsigned int focuspart;
 	void setFocus(class CompoundPart *p);
 
@@ -113,7 +113,7 @@ public:
 	std::string findFile(std::string path);
 	std::vector<std::string> findFiles(std::string dir, std::string wild);
 
-	boost::shared_ptr<AudioSource> playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport = false);
+	std::shared_ptr<AudioSource> playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport = false);
 
 	void newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
 	shared_ptr<genomeFile> loadGenome(std::string &filename);

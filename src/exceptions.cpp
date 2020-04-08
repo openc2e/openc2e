@@ -58,7 +58,7 @@ std::string parseFailure::prettyPrint() const {
 	return oss.str();
 }
 
-void caosException::trace(boost::shared_ptr<class script> scr, int traceindex) throw() {
+void caosException::trace(std::shared_ptr<class script> scr, int traceindex) throw() {
 	this->script = scr;
 	this->traceindex = traceindex;
 }

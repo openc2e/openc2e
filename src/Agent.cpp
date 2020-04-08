@@ -113,7 +113,7 @@ void Agent::finishInit() {
 	
 	// shared_from_this() can only be used if these is at least one extant
 	// shared_ptr which owns this
-	world.agents.push_front(boost::shared_ptr<Agent>(this));
+	world.agents.push_front(std::shared_ptr<Agent>(this));
 	agents_iter = world.agents.begin();
 
 	if (engine.version > 2 && findScript(10))
@@ -414,7 +414,7 @@ static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int widt
 	return true;
 }
 
-void Agent::updateAudio(boost::shared_ptr<AudioSource> s) {
+void Agent::updateAudio(std::shared_ptr<AudioSource> s) {
 	assert(s);
 	MetaRoom *room = world.map.metaRoomAt(x, y);
 	if (!room) {
@@ -1300,8 +1300,8 @@ bool Agent::beDropped() {
 
 	if (!wasinvehicle) { // ie, we're not being dropped by a vehicle
 		// TODO: check for vehicles in a saner manner?
-		for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-			boost::shared_ptr<Agent> a = (*i);
+		for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+			std::shared_ptr<Agent> a = (*i);
 			if (!a) continue;
 			Vehicle *v = dynamic_cast<Vehicle *>(a.get());
 			if (!v) continue;

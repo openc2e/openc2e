@@ -222,9 +222,9 @@ void caosVM::c_ENUM() {
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
-	for (std::list<boost::shared_ptr<Agent> >::iterator i
+	for (std::list<std::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = (*i);
+		std::shared_ptr<Agent> a = (*i);
 		if (!a) continue;
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
@@ -258,8 +258,8 @@ void caosVM::c_ESEE() {
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 
-	std::vector<boost::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
-	for (std::vector<boost::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
+	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
+	for (std::vector<std::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
 		caosVar v; v.setAgent(*i);
 		valueStack.push_back(v);
 	}
@@ -286,9 +286,9 @@ void caosVM::c_ETCH() {
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
-	for (std::list<boost::shared_ptr<Agent> >::iterator i
+	for (std::list<std::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = (*i);
+		std::shared_ptr<Agent> a = (*i);
 		if (!a) continue;
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;

@@ -340,8 +340,8 @@ void Creature::chooseAgents() {
 
 	std::vector<std::vector<AgentRef> > possibles(chosenagents.size());
 
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = *i;
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		std::shared_ptr<Agent> a = *i;
 		if (!a) continue;
 
 		// if agent category is -1 or outside of our #categories, continue

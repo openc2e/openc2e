@@ -37,8 +37,8 @@ void AgentRef::dump() const {
 	std::cerr << "AgentRef " << (void *)this << " pointing to " << (void *)ref.lock().get() << std::endl;
 }
 
-boost::shared_ptr<Agent> AgentRef::lock() const {
-	boost::shared_ptr<Agent> p = ref.lock();
+std::shared_ptr<Agent> AgentRef::lock() const {
+	std::shared_ptr<Agent> p = ref.lock();
 	if (p && p->isDying())
 		p.reset();
 	return p;

@@ -88,7 +88,7 @@ void caosVM::c_PRT_INEW() {
 
 	valid_agent(targ);
 	caos_assert(targ->inports.find(id) == targ->inports.end()); // TODO: multiple PRT: INEWs with the same id allowed?
-	targ->inports[id] = boost::shared_ptr<InputPort>(new InputPort(x, y, name, desc, msgnum));
+	targ->inports[id] = std::shared_ptr<InputPort>(new InputPort(x, y, name, desc, msgnum));
 }
 
 /**
@@ -225,7 +225,7 @@ void caosVM::c_PRT_ONEW() {
 
 	valid_agent(targ);
 	caos_assert(targ->outports.find(id) == targ->outports.end());
-	targ->outports[id] = boost::shared_ptr<OutputPort>(new OutputPort(x, y, name, desc));
+	targ->outports[id] = std::shared_ptr<OutputPort>(new OutputPort(x, y, name, desc));
 }
 
 /**

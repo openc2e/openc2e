@@ -30,8 +30,6 @@
 #include "Room.h"
 #include "MetaRoom.h"
 
-using namespace boost;
-
 MusicManager musicmanager;
 
 struct MusicStream : public AudioStreamBase {

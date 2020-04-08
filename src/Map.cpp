@@ -200,7 +200,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> 
 			shared_ptr<Room> nextroom;
 			bool foundroom = false;
 
-			for (std::map<boost::weak_ptr<Room>,RoomDoor *>::iterator r = room->doors.begin(); r != room->doors.end(); r++) {
+			for (auto r = room->doors.begin(); r != room->doors.end(); r++) {
 				shared_ptr<Room> otherroom = r->first.lock();
 				assert(otherroom);
 				assert(r->second);

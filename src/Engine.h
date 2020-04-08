@@ -44,8 +44,8 @@ protected:
 
 	std::string gamename;
 
-	std::map<std::string, boost::shared_ptr<Backend> > possible_backends;
-	std::map<std::string, boost::shared_ptr<class AudioBackend> > possible_audiobackends;
+	std::map<std::string, std::shared_ptr<Backend> > possible_backends;
+	std::map<std::string, std::shared_ptr<class AudioBackend> > possible_audiobackends;
 	std::string preferred_backend, preferred_audiobackend;
 
 	void handleKeyboardScrolling();
@@ -62,8 +62,8 @@ protected:
 public:
 	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
 	
-	boost::shared_ptr<Backend> backend;
-	boost::shared_ptr<class AudioBackend> audio;
+	std::shared_ptr<Backend> backend;
+	std::shared_ptr<class AudioBackend> audio;
 	std::string getBackendName() { return preferred_backend; }
 	std::string getAudioBackendName() { return preferred_audiobackend; }
 
@@ -80,7 +80,7 @@ public:
 
 	Engine();
 	~Engine();
-	void setBackend(boost::shared_ptr<Backend> b);
+	void setBackend(std::shared_ptr<Backend> b);
 	std::string executeNetwork(std::string in);
 	bool needsUpdate();
 	unsigned int msUntilTick();
@@ -89,8 +89,8 @@ public:
 	bool tick();
 	void processEvents();
 
-	void addPossibleBackend(std::string, boost::shared_ptr<Backend>);
-	void addPossibleAudioBackend(std::string, boost::shared_ptr<AudioBackend>);
+	void addPossibleBackend(std::string, std::shared_ptr<Backend>);
+	void addPossibleAudioBackend(std::string, std::shared_ptr<AudioBackend>);
 	
 	bool parseCommandLine(int argc, char *argv[]);
 	bool initialSetup();

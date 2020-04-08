@@ -78,14 +78,14 @@ Engine::~Engine() {
 	if (palette) delete[] palette;
 }
 
-void Engine::addPossibleBackend(std::string s, boost::shared_ptr<Backend> b) {
+void Engine::addPossibleBackend(std::string s, std::shared_ptr<Backend> b) {
 	assert(!backend);
 	assert(b);
 	preferred_backend = s;
 	possible_backends[s] = b;
 }
 
-void Engine::addPossibleAudioBackend(std::string s, boost::shared_ptr<AudioBackend> b) {
+void Engine::addPossibleAudioBackend(std::string s, std::shared_ptr<AudioBackend> b) {
 	assert(!audio);
 	assert(b);
 	preferred_audiobackend = s;
@@ -211,7 +211,7 @@ void Engine::update() {
 	if (version == 1 && (world.tickcount % 70) == 0) {
 		int piece = 1 + (rand() % 28);
 		std::string filename = boost::str(boost::format("MU%02d") % piece);
-		boost::shared_ptr<AudioSource> s = world.playAudio(filename, AgentRef(), false, false, true);
+		std::shared_ptr<AudioSource> s = world.playAudio(filename, AgentRef(), false, false, true);
 		if (s) s->setVolume(0.4f);
 	}
 
@@ -357,7 +357,7 @@ void Engine::processEvents() {
 
 void Engine::handleResizedWindow(SomeEvent &event) {
 	// notify agents
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		(*i)->queueScript(123, 0); // window resized script
 	}
@@ -368,7 +368,7 @@ void Engine::handleMouseMove(SomeEvent &event) {
 	world.hand()->handleEvent(event);
 
 	// notify agents
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((*i)->imsk_mouse_move) {
 			caosVar x; x.setFloat(world.hand()->pointerX());
@@ -380,7 +380,7 @@ void Engine::handleMouseMove(SomeEvent &event) {
 
 void Engine::handleMouseButton(SomeEvent &event) {
 	// notify agents
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((event.type == eventmousebuttonup && (*i)->imsk_mouse_up) ||
 			(event.type == eventmousebuttondown && (*i)->imsk_mouse_down)) {
@@ -442,7 +442,7 @@ void Engine::handleKeyDown(SomeEvent &event) {
 	// notify agents
 	caosVar k;
 	k.setInt(event.key);
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((*i)->imsk_translated_char)
 			(*i)->queueScript(79, 0, k); // translated char script
@@ -535,7 +535,7 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 	// notify agents
 	caosVar k;
 	k.setInt(event.key);
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((*i)->imsk_key_down)
 			(*i)->queueScript(73, 0, k); // key down script
@@ -559,14 +559,14 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 
 	// generate help for backend options
 	std::string available_backends;
-	for (std::map<std::string, boost::shared_ptr<Backend> >::iterator i = possible_backends.begin(); i != possible_backends.end(); i++) {
+	for (std::map<std::string, std::shared_ptr<Backend> >::iterator i = possible_backends.begin(); i != possible_backends.end(); i++) {
 		if (available_backends.empty()) available_backends = i->first;
 		else available_backends += ", " + i->first;
 	}
 	available_backends = "Select the backend (options: " + available_backends + "), default is " + preferred_backend;
 	
 	std::string available_audiobackends;
-	for (std::map<std::string, boost::shared_ptr<AudioBackend> >::iterator i = possible_audiobackends.begin(); i != possible_audiobackends.end(); i++) {
+	for (std::map<std::string, std::shared_ptr<AudioBackend> >::iterator i = possible_audiobackends.begin(); i != possible_audiobackends.end(); i++) {
 		if (available_audiobackends.empty()) available_audiobackends = i->first;
 		else available_audiobackends += ", " + i->first;
 	}

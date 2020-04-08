@@ -203,7 +203,7 @@ class caosVar {
 			return boost::apply_visitor(stringVisit(), value);
 		}
 
-		boost::shared_ptr<Agent> getAgent() const {
+		std::shared_ptr<Agent> getAgent() const {
 			return getAgentRef().lock();
 		}
 

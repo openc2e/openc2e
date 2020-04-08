@@ -15,7 +15,7 @@ class shared_str_b {
 class shared_str {
 	FRIEND_SERIALIZE(shared_str)
 	protected:
-		boost::shared_ptr<shared_str_b> p;
+		std::shared_ptr<shared_str_b> p;
 	public:
 		shared_str() : p(new shared_str_b()) { }
 		shared_str(const shared_str &v) : p(v.p) { }

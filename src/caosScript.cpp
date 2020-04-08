@@ -34,7 +34,6 @@
 #include <algorithm>
 #include <cstring>
 #include <boost/format.hpp>
-#include <boost/scoped_ptr.hpp>
 
 using std::string;
 
@@ -323,7 +322,7 @@ void caosScript::parse(std::istream &in) {
 		if (errindex < 0 || (size_t)errindex >= tokens->size())
 			throw;
 		e.lineno = (*tokens)[errindex].lineno;
-		e.context = boost::shared_ptr<std::vector<token> >(new std::vector<token>());
+		e.context = std::shared_ptr<std::vector<token> >(new std::vector<token>());
 		/* We'd like to capture N tokens on each side of the target, but
 		 * if we can't get all those from one side, get it from the other.
 		 */
@@ -408,34 +407,34 @@ void caosScript::emitOp(opcode_t op, int argument) {
 	current->ops.push_back(caosOp(op, argument, traceindex));
 }
 
-void caosScript::emitExpr(boost::shared_ptr<CAOSExpression> ce) {
+void caosScript::emitExpr(std::shared_ptr<CAOSExpression> ce) {
 	ce->eval(this, false);
 	int cost = ce->cost();
 	if (cost)
 		emitOp(CAOS_YIELD, cost);
 }
 
-boost::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
+std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 	token *t = getToken();
 	traceindex = errindex = curindex;
 	if (xtype == CI_BAREWORD) {
 		if (t->type() == TOK_WORD) {
-			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, caosVar(t->word())));
+			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, caosVar(t->word())));
 		} else if (t->type() == TOK_CONST) {
 			if (t->constval().getType() != CAOSSTR)
 				t->unexpected();
-			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
+			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
 		} else {
 			t->unexpected();
 		}
 		assert(!"UNREACHABLE");
-		return boost::shared_ptr<CAOSExpression>();
+		return std::shared_ptr<CAOSExpression>();
 	}
 	switch (t->type()) {
 		case TOK_CONST:
-			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
+			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->constval()));
 		case TOK_BYTESTR:
-			return boost::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->bytestr()));
+			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, t->bytestr()));
 		case TOK_WORD: break; // fall through to remainder of function
 		default: t->unexpected();
 	}
@@ -449,7 +448,7 @@ boost::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype)
 			t->payload = std::string("face string");
 	}
 
-	boost::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
+	std::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
 	CAOSCmd *cmd = boost::get<CAOSCmd>(&ce->value);
 
 	if (t->word().size() == 4 && isdigit(t->word()[2]) && isdigit(t->word()[3])) {
@@ -462,8 +461,8 @@ boost::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype)
 			t->payload = t->word().substr(0, 2) + "xx";
 			const cmdinfo *op = readCommand(t, std::string("expr "));
 			t->payload = oldpayload;
-			
-			boost::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
+
+			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
 			cmd->op = op;
 			cmd->arguments.push_back(arg);
 			return ce;
@@ -480,8 +479,8 @@ boost::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype)
 			t->payload = t->word().substr(0, 3) + "x";
 			const cmdinfo *op = readCommand(t, std::string("expr "));
 			t->payload = oldpayload;
-			
-			boost::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
+
+			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
 			cmd->op = op;
 			cmd->arguments.push_back(arg);
 			return ce;
@@ -526,7 +525,7 @@ void caosScript::parseCondition() {
 
 	bool nextIsAnd = true;
 	while (1) {
-		boost::shared_ptr<CAOSExpression> a1, a2;
+		std::shared_ptr<CAOSExpression> a1, a2;
 		a1 = readExpr(CI_ANYVALUE);
 		int cond = readCond();
 		a2 = readExpr(CI_ANYVALUE);
@@ -749,7 +748,7 @@ void caosScript::parseloop(int state, void *info) {
 			}
 			return;
 		} else if (t->word() == "ssfc") {
-			boost::shared_ptr<CAOSExpression> roomno_e = readExpr(CI_NUMERIC);
+			std::shared_ptr<CAOSExpression> roomno_e = readExpr(CI_NUMERIC);
 
 			caosVar coordcount = getToken(TOK_CONST)->constval();
 			if (!coordcount.hasInt())

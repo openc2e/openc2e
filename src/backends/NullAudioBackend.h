@@ -36,15 +36,15 @@ public:
 	void setViewpointCenter(float, float) { }
 	void setMute(bool b) { muted = b; }
 	bool isMuted() const { return muted; }
-	boost::shared_ptr<AudioSource> newSource() { return boost::shared_ptr<AudioSource>(); }
-	boost::shared_ptr<AudioSource> loadClip(const boost::string &filename) {
-		boost::string fname = world.findFile(boost::string("Sounds/") + filename + ".wav");
-		if (fname.size() == 0) return boost::shared_ptr<AudioSource>();
-		return boost::shared_ptr<AudioSource>(new NullAudioSource());
+	std::shared_ptr<AudioSource> newSource() { return std::shared_ptr<AudioSource>(); }
+	std::shared_ptr<AudioSource> loadClip(const std::string &filename) {
+		std::string fname = world.findFile(std::string("Sounds/") + filename + ".wav");
+		if (fname.size() == 0) return std::shared_ptr<AudioSource>();
+		return std::shared_ptr<AudioSource>(new NullAudioSource());
 	}
 
-	boost::shared_ptr<AudioSource> getBGMSource() {
-		return boost::shared_ptr<AudioSource>();
+	std::shared_ptr<AudioSource> getBGMSource() {
+		return std::shared_ptr<AudioSource>();
 	}
 };
  

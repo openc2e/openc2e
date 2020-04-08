@@ -46,7 +46,7 @@ public:
 
 class bmpImage : public creaturesImage {
 protected:
-	boost::shared_ptr<bmpData> bmpdata;
+	std::shared_ptr<bmpData> bmpdata;
 	void freeData();
 
 public:

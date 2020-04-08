@@ -188,7 +188,7 @@ void caosVM::v_TYPE() {
 	else if (value.hasString())
 		result.setInt(2);
 	else if (value.hasAgent()) {
-		boost::shared_ptr<Agent> a = value.getAgent();
+		std::shared_ptr<Agent> a = value.getAgent();
 		if (a == 0)
 			result.setInt(-1);
 		else if (typeid(*a) == typeid(SimpleAgent))

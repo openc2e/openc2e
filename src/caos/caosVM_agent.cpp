@@ -86,8 +86,8 @@ void caosVM::c_RTAR() {
 	setTarg(0);
 
 	/* XXX: maybe use a map of classifier -> agents? */
-	std::vector<boost::shared_ptr<Agent> > temp;
-	for (std::list<boost::shared_ptr<Agent> >::iterator i
+	std::vector<std::shared_ptr<Agent> > temp;
+	for (std::list<std::shared_ptr<Agent> >::iterator i
 		= world.agents.begin(); i != world.agents.end(); i++) {
 		
 		Agent *a = i->get();
@@ -123,8 +123,8 @@ void caosVM::c_TTAR() {
 	setTarg(0);
 
 	/* XXX: maybe use a map of classifier -> agents? */
-	std::vector<boost::shared_ptr<Agent> > temp;
-	for (std::list<boost::shared_ptr<Agent> >::iterator i
+	std::vector<std::shared_ptr<Agent> > temp;
+	for (std::list<std::shared_ptr<Agent> >::iterator i
 		= world.agents.begin(); i != world.agents.end(); i++) {
 		
 		Agent *a = i->get();
@@ -163,7 +163,7 @@ void caosVM::c_STAR() {
 	if (owner) seeing = owner; else seeing = targ;
 	valid_agent(seeing);
 
-	std::vector<boost::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
+	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
 	if (agents.size() == 0) {
 		setTarg(0);
 	} else {
@@ -900,7 +900,7 @@ void caosVM::v_TOTL() {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	unsigned int x = 0;
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((*i)->family == family || family == 0)
 			if ((*i)->genus == genus || genus == 0)
@@ -1595,11 +1595,11 @@ void caosVM::c_DROP() {
 
 AgentRef findNextAgent(AgentRef previous, unsigned char family, unsigned char genus, unsigned short species, bool forward) {
 	if (world.agents.size() == 0) return AgentRef(); // shouldn't happen..
-	
+
 	AgentRef firstagent;
 	bool foundagent = false;
 
-	std::list<boost::shared_ptr<Agent> >::iterator i;
+	std::list<std::shared_ptr<Agent> >::iterator i;
 	if (forward)
 		i = world.agents.begin();
 	else {

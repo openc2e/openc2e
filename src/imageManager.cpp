@@ -124,7 +124,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	if (name.empty()) return shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
 
 	// step one: see if the image is already in the gallery
-	std::map<std::string, boost::weak_ptr<creaturesImage> >::iterator i = images.find(name);
+	std::map<std::string, std::weak_ptr<creaturesImage> >::iterator i = images.find(name);
 	if (i != images.end() && i->second.lock()) {
 		if (!is_background) return i->second.lock(); // TODO: handle backgrounds
 	}

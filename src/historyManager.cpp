@@ -74,7 +74,7 @@ historyevent &monikerData::addEvent(unsigned int event, std::string moniker1, st
 	events.back().monikers[0] = moniker1;
 	events.back().monikers[1] = moniker2;
 
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 
 		(*i)->queueScript(127, 0, moniker, (int)(events.size() - 1)); // new life event

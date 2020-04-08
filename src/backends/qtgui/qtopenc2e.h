@@ -18,14 +18,13 @@
 #define _QTOPENC2E_H
 
 #include <QMainWindow>
-#include <boost/shared_ptr.hpp>
 #include "AgentRef.h"
 
 class QtOpenc2e : public QMainWindow {
 	Q_OBJECT
 
 public:
-	QtOpenc2e(boost::shared_ptr<class QtBackend>);
+	QtOpenc2e(std::shared_ptr<class QtBackend>);
 	~QtOpenc2e();
 
 	class Creature *getSelectedCreature();

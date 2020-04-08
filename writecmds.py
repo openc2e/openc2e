@@ -47,7 +47,7 @@ INIT_FUNCS = []
 def printinit(variant, cmdarr):
     print("static void init_{}() {{".format(variant))
     print(
-        '\tdialects["{}"] = boost::shared_ptr<Dialect>(new Dialect({}, std::string("{}")));'.format(
+        '\tdialects["{}"] = std::shared_ptr<Dialect>(new Dialect({}, std::string("{}")));'.format(
             variant, cmdarr, variant
         )
     )

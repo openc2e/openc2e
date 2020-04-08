@@ -806,8 +806,8 @@ void SFCFile::copyToWorld() {
 	// patch agents
 	// TODO: do we really need to do this, and if so, should it be done here?
 	// I like this for now because it makes debugging suck a lot less - fuzzie
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = (*i);
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		std::shared_ptr<Agent> a = (*i);
 
 		#define NUM_SFC_PATCHES 5
 

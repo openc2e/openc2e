@@ -48,7 +48,7 @@ void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 		c1cobfile cobfile(cobstream);
 
 		if (cobfile.imagewidth > 0 && cobfile.imageheight > 0) {
-			previewimg = QImage((uchar*)cobfile.imagedata.get(), cobfile.imagewidth, cobfile.imageheight, QImage::Format_Indexed8).mirrored();
+			previewimg = QImage((uchar*)cobfile.imagedata.data(), cobfile.imagewidth, cobfile.imageheight, QImage::Format_Indexed8).mirrored();
 			previewimg.setNumColors(256);
 			unsigned char *palette = engine.getPalette();
 			if (palette) {

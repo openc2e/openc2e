@@ -100,8 +100,8 @@ void caosVM::c_GPAS() {
 	// TODO: see other GPAS below
 	// TODO: are we sure c2e grabs passengers by agent rect?
 	// TODO: do we need to check greedycabin attr for anything?
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = (*i);
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		std::shared_ptr<Agent> a = (*i);
 		if (!a) continue;
 		if (a.get() == v) continue;
 		if (family && family != a->family) continue;
@@ -127,8 +127,8 @@ void caosVM::c_GPAS_c2() {
 
 	// TODO: are we sure c1/c2 grab passengers by agent rect?
 	// TODO: do we need to check greedycabin attr for anything?
-	for (std::list<boost::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = (*i);
+	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
+		std::shared_ptr<Agent> a = (*i);
 		if (!a) continue;
 		if (a.get() == v) continue;
 		if (a->family != 4) continue; // only pickup creatures (TODO: good check?)

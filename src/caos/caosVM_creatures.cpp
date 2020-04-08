@@ -615,9 +615,9 @@ void caosVM::c_URGE_SIGN() {
 	stim.verb_id = verb_id;
 	stim.verb_amount = verb_stim;
 
-	std::vector<boost::shared_ptr<Agent> > agents = getVisibleList(owner, 0, 0, 0);
-	for (std::vector<boost::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
-		boost::shared_ptr<Agent> a = *i; // guaranteed to be valid from getVisibleList
+	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(owner, 0, 0, 0);
+	for (std::vector<std::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
+		std::shared_ptr<Agent> a = *i; // guaranteed to be valid from getVisibleList
 
 		CreatureAgent *ca = dynamic_cast<CreatureAgent *>(a.get());
 		if (!ca) continue;

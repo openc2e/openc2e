@@ -35,7 +35,7 @@ int Dialect::cmd_index(const cmdinfo *ci) const {
 	return (ci - cmds);
 }
 
-std::map<std::string, boost::shared_ptr<Dialect> > dialects;
+std::map<std::string, std::shared_ptr<Dialect> > dialects;
 
 void registerDelegates() {
 	registerAutoDelegates();

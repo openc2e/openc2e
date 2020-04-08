@@ -31,7 +31,7 @@ public:
 	c16Image(mmapifstream *, std::string n);
 	~c16Image();
 	void readHeader(std::istream &in);
-	boost::shared_ptr<creaturesImage> mutableCopy();
+	std::shared_ptr<creaturesImage> mutableCopy();
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 };
 
@@ -45,7 +45,7 @@ public:
 	~s16Image();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &out);
-	boost::shared_ptr<creaturesImage> mutableCopy();
+	std::shared_ptr<creaturesImage> mutableCopy();
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 

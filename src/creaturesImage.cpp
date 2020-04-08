@@ -28,7 +28,7 @@ bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned 
 	return false;
 }
 
-boost::shared_ptr<creaturesImage> creaturesImage::mutableCopy() {
+std::shared_ptr<creaturesImage> creaturesImage::mutableCopy() {
 	throw creaturesException("Internal error: Tried to make a mutable copy of a sprite which doesn't support that.");
 }
 

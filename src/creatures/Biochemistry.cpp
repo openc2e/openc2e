@@ -23,7 +23,7 @@
 #include "c2eBrain.h"
 #include "oldBrain.h"
 
-using boost::shared_ptr;
+using std::shared_ptr;
 
 void oldCreature::addChemical(unsigned char id, unsigned char val) {
 	if (id == 0) return;

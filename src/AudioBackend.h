@@ -20,8 +20,6 @@
 #ifndef SOUNDBACKEND_H
 #define SOUNDBACKEND_H 1
 
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include <string>
 
@@ -37,7 +35,7 @@
  * The implementation should not make any assumptions about how often any of these functions
  * will be called, if at all.
  */
-typedef boost::shared_ptr<struct AudioStreamBase> AudioStream;
+typedef std::shared_ptr<struct AudioStreamBase> AudioStream;
 struct AudioStreamBase {
 	virtual ~AudioStreamBase() { }
 
@@ -59,7 +57,7 @@ struct AudioStreamBase {
 
 enum SourceState { SS_STOP, SS_PLAY, SS_PAUSE };
 
-class AudioSource : public boost::enable_shared_from_this<AudioSource> {
+class AudioSource : public std::enable_shared_from_this<AudioSource> {
 protected:
 	AudioSource() { }
 
@@ -97,7 +95,7 @@ public:
 	virtual void setFollowingView(bool) = 0;
 };
 
-class AudioBackend : public boost::enable_shared_from_this<AudioBackend> {
+class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
 protected:
 	AudioBackend() { }
 
@@ -110,13 +108,13 @@ public:
 	virtual bool isMuted() const = 0;
 
 	/* TODO: global vol controls */
-	virtual boost::shared_ptr<AudioSource> newSource() = 0;
+	virtual std::shared_ptr<AudioSource> newSource() = 0;
 	/* Returns an AudioSource with a fixed position relative to the viewpoint.
 	 *
 	 * The effect of invoking setPos on this source is undefined.
 	 */
-	virtual boost::shared_ptr<AudioSource> getBGMSource() = 0;
-	virtual boost::shared_ptr<AudioSource> loadClip(const std::string &filename) = 0;
+	virtual std::shared_ptr<AudioSource> getBGMSource() = 0;
+	virtual std::shared_ptr<AudioSource> loadClip(const std::string &filename) = 0;
 
 	virtual void begin() { }
 	virtual void commit() { }

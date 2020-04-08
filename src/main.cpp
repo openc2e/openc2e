@@ -50,8 +50,8 @@ extern "C" int main(int argc, char *argv[]) {
 
 		engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
 #ifdef QT_SUPPORT
-		boost::shared_ptr<QtBackend> qtbackend = boost::shared_ptr<QtBackend>(new QtBackend());
-		boost::shared_ptr<Backend> qtbackend_generic = boost::dynamic_pointer_cast<class Backend, class QtBackend>(qtbackend);
+		std::shared_ptr<QtBackend> qtbackend = std::shared_ptr<QtBackend>(new QtBackend());
+		std::shared_ptr<Backend> qtbackend_generic = std::dynamic_pointer_cast<class Backend, class QtBackend>(qtbackend);
 		engine.addPossibleBackend("qt", qtbackend_generic); // last-added backend is default
 #endif
 #ifdef SDLMIXER_SUPPORT

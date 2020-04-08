@@ -209,10 +209,10 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 				Agent* parent = a->getParent();
 
 				int eve = -1;
-			
+
 				bool foundport = false;
 				if (engine.version > 2) {
-					for (std::map<unsigned int, boost::shared_ptr<OutputPort> >::iterator i = parent->outports.begin();
+					for (std::map<unsigned int, std::shared_ptr<OutputPort> >::iterator i = parent->outports.begin();
 							 i != parent->outports.end(); i++) {
 						// TODO: 4 is a magic number i pulled out of nooooowhere
 						if (abs(i->second->x + parent->x - x) < 4 && abs(i->second->y + parent->y - y) < 4) {
@@ -231,7 +231,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 						}
 					}
 					if (!foundport) {
-						for (std::map<unsigned int, boost::shared_ptr<InputPort> >::iterator i = parent->inports.begin();
+						for (std::map<unsigned int, std::shared_ptr<InputPort> >::iterator i = parent->inports.begin();
 								 i != parent->inports.end(); i++) {
 							// TODO: 4 is a magic number i pulled out of nooooowhere
 							if (abs(i->second->x + parent->x - x) < 4 && abs(i->second->y + parent->y - y) < 4) {

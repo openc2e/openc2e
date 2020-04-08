@@ -47,7 +47,7 @@ protected:
 	void tickBrain();
 	virtual void tickBiochemistry();
 
-	oldCreature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	oldCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void processGenes();
 
@@ -95,7 +95,7 @@ struct c1Emitter {
 
 class c1Creature : public oldCreature {
 protected:
-	std::vector<boost::shared_ptr<c1Reaction> > reactions;
+	std::vector<std::shared_ptr<c1Reaction> > reactions;
 	std::vector<c1Receptor> receptors;
 	std::vector<c1Emitter> emitters;
 	
@@ -111,7 +111,7 @@ protected:
 	void processReceptor(c1Receptor &);
 	
 public:
-	c1Creature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	c1Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void tick();
 
@@ -152,7 +152,7 @@ protected:
 	class c2Creature *parent;
 	organGene *ourGene;
 
-	std::vector<boost::shared_ptr<c2Reaction> > reactions;
+	std::vector<std::shared_ptr<c2Reaction> > reactions;
 	std::vector<c2Receptor> receptors;
 	std::vector<c2Emitter> emitters;
 
@@ -201,7 +201,7 @@ public:
 class c2Creature : public oldCreature {
 protected:
 	// biochemistry
-	std::vector<boost::shared_ptr<c2Organ> > organs;
+	std::vector<std::shared_ptr<c2Organ> > organs;
 
 	// loci
 	unsigned char senses[14];
@@ -214,7 +214,7 @@ protected:
 	void processGenes();
 
 public:
-	c2Creature(boost::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	c2Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
 
 	void tick();
 	

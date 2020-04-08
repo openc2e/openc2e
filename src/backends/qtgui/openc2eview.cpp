@@ -35,7 +35,7 @@
  *
  */
 
-openc2eView::openc2eView(QWidget *parent, boost::shared_ptr<QtBackend> b) : QAbstractScrollArea(parent) {
+openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstractScrollArea(parent) {
 	backend = b;
 
 	viewport()->setAttribute(Qt::WA_PaintOnScreen); // disable double-buffering
@@ -57,8 +57,8 @@ openc2eView::openc2eView(QWidget *parent, boost::shared_ptr<QtBackend> b) : QAbs
 openc2eView::~openc2eView() {
 }
 
-boost::shared_ptr<class Backend> openc2eView::getBackend() {
-	return boost::dynamic_pointer_cast<class Backend, class QtBackend>(backend);
+std::shared_ptr<class Backend> openc2eView::getBackend() {
+	return std::dynamic_pointer_cast<class Backend, class QtBackend>(backend);
 }
 
 void openc2eView::resizescrollbars() {

@@ -27,9 +27,8 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
-#include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
-using boost::shared_ptr;
+using std::shared_ptr;
 
 #include "exceptions.h"
 

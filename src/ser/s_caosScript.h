@@ -35,14 +35,14 @@ SERIALIZE(script) {
 //	ar & obj.gsub; // XXX duplicate with labels
 }
 
-static std::map<const Dialect *, boost::shared_ptr<std::vector<std::string> > >
+static std::map<const Dialect *, std::shared_ptr<std::vector<std::string> > >
 	dialect_trans_map;
 
 static void make_trans_map(const Dialect *d) {
 	if (dialect_trans_map[d])
 		return;
 	std::vector<std::string> *p = new std::vector<std::string>(d->cmdcount());
-	dialect_trans_map[d] = boost::shared_ptr<std::vector<std::string> >(p);
+	dialect_trans_map[d] = std::shared_ptr<std::vector<std::string> >(p);
 	const struct cmdinfo *ci;
 	for (int i = 0; i < d->cmdcount(); i++) {
 		(*p)[i] = std::string(d->getcmd(i)->lookup_key);
@@ -57,7 +57,7 @@ POST_SAVE(script) {
 
 POST_LOAD(script) {
 	std::string name;
-	boost::shared_ptr<std::vector<std::string> > trans_map;
+	std::shared_ptr<std::vector<std::string> > trans_map;
 	ar & name;
 	ar & trans_map;
 

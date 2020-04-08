@@ -21,11 +21,10 @@
 #define __C2EBRAIN_H
 
 #include "genome.h"
-#include <boost/shared_ptr.hpp>
 #include <set>
 #include <map>
 
-using boost::shared_ptr;
+using std::shared_ptr;
 
 class Creature;
 

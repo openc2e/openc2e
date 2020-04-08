@@ -22,8 +22,7 @@
 #define _SCRIPTORIUM_H
 
 #include "openc2e.h"
-#include <boost/shared_ptr.hpp>
-using boost::shared_ptr;
+using std::shared_ptr;
 #include <map>
 
 class script;

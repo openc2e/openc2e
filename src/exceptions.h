@@ -27,8 +27,6 @@
 #include <vector>
 #include <sstream>
 #include <assert.h>
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <iostream> // for stupid copy constructor debug below
 
 class script;
@@ -63,7 +61,7 @@ public:
 
 class caosException : public creaturesException {
 	protected:
-		boost::shared_ptr<class script> script;
+		std::shared_ptr<class script> script;
 		int traceindex;
 
 	public:
@@ -76,7 +74,7 @@ class caosException : public creaturesException {
 
 		caosException(const char *d) throw() : creaturesException(d), traceindex(-1) { }
 
-		void trace(boost::shared_ptr<class script> scr, int traceindex = -1) throw();
+		void trace(std::shared_ptr<class script> scr, int traceindex = -1) throw();
 
 		virtual std::string prettyPrint() const;
 };
@@ -110,7 +108,7 @@ public:
 		: creaturesException(s), lineno(-1) { }
 	~parseFailure() throw() { }
 
-	boost::shared_ptr<std::vector<struct token> > context;
+	std::shared_ptr<std::vector<struct token> > context;
 	int ctxoffset;
 	std::string filename;
 	int lineno;

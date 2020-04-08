@@ -27,7 +27,6 @@
 
 #include <assert.h>
 #include <fstream>
-#include <boost/scoped_array.hpp>
 
 using namespace std;
 
@@ -186,7 +185,7 @@ std::string readpascalstring(std::istream &s) {
 	else
 		size = a;
 
-	boost::scoped_array<char> x(new char[size]);
+	std::vector<char> x(size);
 	//char x[size];
 	s.read(x.get(), size);
 	return std::string(x.get(), size);
@@ -232,8 +231,8 @@ struct c1cobfile {
 		uint32 imageheight = read32(s);
 		uint16 secondimagewidth = read16(s);
 		assert(imagewidth == secondimagewidth);
-		boost::scoped_array<char> imagedata(new char[imagewidth * imageheight]);
-		s.read(imagedata.get(), imagewidth * imageheight);
+		std::vector<char> imagedata(imagewidth * imageheight);
+		s.read(imagedata.data(), imagewidth * imageheight);
 		name = readpascalstring(s);
 	}
 };

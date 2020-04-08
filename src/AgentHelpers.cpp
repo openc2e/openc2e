@@ -60,18 +60,18 @@ bool agentIsVisible(Agent *seeing, Agent *dest) {
 	return agentIsVisible(seeing, dest, ownerx, ownery, ownermeta, ownerroom);
 }
 
-std::vector<boost::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char family, unsigned char genus, unsigned short species) {
-	std::vector<boost::shared_ptr<Agent> > agents;
+std::vector<std::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char family, unsigned char genus, unsigned short species) {
+	std::vector<std::shared_ptr<Agent> > agents;
 
 	float ownerx = (seeing->x + (seeing->getWidth() / 2.0f));
 	float ownery = (seeing->y + (seeing->getHeight() / 2.0f));
 	MetaRoom *ownermeta = world.map.metaRoomAt(ownerx, ownery);
 	shared_ptr<Room> ownerroom = world.map.roomAt(ownerx, ownery);
 	if (!ownermeta) return agents; if (!ownerroom) return agents;
-	
-	for (std::list<boost::shared_ptr<Agent> >::iterator i
+
+	for (std::list<std::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
-		boost::shared_ptr<Agent> a = (*i);
+		std::shared_ptr<Agent> a = (*i);
 		if (!a) continue;
 		
 		// TODO: if owner is a creature, skip stuff with invisible attribute
