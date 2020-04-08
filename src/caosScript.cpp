@@ -506,7 +506,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 	}
 
 	std::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
-	CAOSCmd *cmd = boost::get<CAOSCmd>(&ce->value);
+	CAOSCmd *cmd = mpark::get_if<CAOSCmd>(&ce->value);
 
 	if (t->word().size() == 4 && isdigit(t->word()[2]) && isdigit(t->word()[3])) {
 		if (	!strncmp(t->word().c_str(), "va", 2)
@@ -861,15 +861,15 @@ void caosScript::emitCmd(const char *name) {
 }
 
 void CAOSExpression::eval(caosScript *scr, bool save_here) const {
-	boost::apply_visitor(evalVisit(scr, save_here), value);
+	mpark::visit(evalVisit(scr, save_here), value);
 }
 
 void CAOSExpression::save(caosScript *scr) const {
-	boost::apply_visitor(saveVisit(scr), value);
+	mpark::visit(saveVisit(scr), value);
 }
 
 int CAOSExpression::cost() const {
-	return boost::apply_visitor(costVisit(), value);
+	return mpark::visit(costVisit(), value);
 }
 
 int script::mapVAxx(int index) {

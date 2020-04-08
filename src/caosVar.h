@@ -20,7 +20,7 @@
 #ifndef CAOSVAR_H
 #define CAOSVAR_H 1
 
-#include <boost/variant.hpp>
+#include <mpark/variant.hpp>
 #include "openc2e.h"
 #include <string>
 #include <cassert>
@@ -49,7 +49,7 @@ class caosVar {
 		COUNT_ALLOC(caosVar)
 		FRIEND_SERIALIZE(caosVar)
 	protected:
-		struct typeVisit : public boost::static_visitor<variableType> {
+		struct typeVisit {
 			variableType operator()(int) const { return CAOSINT; }
 			variableType operator()(float) const { return CAOSFLOAT; }
 			variableType operator()(const std::string &) const { return CAOSSTR; }
@@ -59,13 +59,14 @@ class caosVar {
 		};
 
 #define BAD_TYPE(et, gt) \
-		const et &operator()(const gt &) const { \
+		std::conditional<std::is_fundamental<et>::value, et, std::add_lvalue_reference<std::add_const<et>::type>::type>::type \
+		operator()(const gt &) const { \
 			throw wrongCaosVarTypeException( \
 					"Wrong caosVar type: Expected " #et ", got " #gt \
 					); \
 		}
 		
-		struct intVisit : public boost::static_visitor<int> {
+		struct intVisit {
 			int operator()(int i) const { return i; }
 			int operator()(float f) const {
 				// horror necessary for rounding without C99
@@ -84,7 +85,7 @@ class caosVar {
 			BAD_TYPE(int, nulltype_tag);
 		};
 
-		struct floatVisit : public boost::static_visitor<float> {
+		struct floatVisit {
 			float operator()(int i) const { return (float)i; }
 			float operator()(float f) const { return f; }
 			float operator()(const Vector<float> &v) const { return v.getMagnitude(); }
@@ -93,7 +94,7 @@ class caosVar {
 			BAD_TYPE(float, nulltype_tag);
 		};
 
-		struct stringVisit : public boost::static_visitor<const std::string &> {
+		struct stringVisit {
 			const std::string &operator()(const std::string &s) const {
 				return s;
 			}
@@ -104,7 +105,7 @@ class caosVar {
 			BAD_TYPE(std::string, Vector<float>);
 		};
 		
-		struct agentVisit : public boost::static_visitor<const AgentRef &> {
+		struct agentVisit {
 			const AgentRef &operator()(const AgentRef &a) const {
 				return a;
 			}
@@ -115,7 +116,7 @@ class caosVar {
 			BAD_TYPE(AgentRef, Vector<float>);
 		};
 
-		struct vectorVisit : public boost::static_visitor<const Vector<float> &> {
+		struct vectorVisit {
 			const Vector<float> &operator()(const Vector<float> &v) const {
 				return v;
 			}
@@ -128,11 +129,11 @@ class caosVar {
 
 			
 #undef BAD_TYPE
-		boost::variant<int, float, AgentRef, std::string, nulltype_tag, Vector<float> > value;
+		mpark::variant<int, float, AgentRef, std::string, nulltype_tag, Vector<float> > value;
 
 	public:
 		variableType getType() const {
-			return boost::apply_visitor(typeVisit(), value);
+			return mpark::visit(typeVisit(), value);
 		}
 		
 		void reset() {
@@ -188,11 +189,11 @@ class caosVar {
 		}
 
 		int getInt() const {
-			return boost::apply_visitor(intVisit(), value);
+			return mpark::visit(intVisit(), value);
 		}
 
 		float getFloat() const {
-			return boost::apply_visitor(floatVisit(), value);
+			return mpark::visit(floatVisit(), value);
 		}
 
 		void getString(std::string &s) const {
@@ -200,7 +201,7 @@ class caosVar {
 		}
 
 		const std::string &getString() const {
-			return boost::apply_visitor(stringVisit(), value);
+			return mpark::visit(stringVisit(), value);
 		}
 
 		std::shared_ptr<Agent> getAgent() const {
@@ -208,11 +209,11 @@ class caosVar {
 		}
 
 		const AgentRef &getAgentRef() const {
-			return boost::apply_visitor(agentVisit(), value);
+			return mpark::visit(agentVisit(), value);
 		}
 
 		const Vector<float> &getVector() const {
-			return boost::apply_visitor(vectorVisit(), value);
+			return mpark::visit(vectorVisit(), value);
 		}
 
 		bool operator == (const caosVar &v) const;

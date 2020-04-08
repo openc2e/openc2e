@@ -193,6 +193,7 @@ IF(OPENC2E_USE_QT)
 ENDIF(OPENC2E_USE_QT)
 
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
+add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 
 IF(SDLMIXER_FOUND)
     SET(SDLMIXER_SRC "src/backends/SDLMixerBackend.cpp")
@@ -237,6 +238,7 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	Boost::program_options
 	Boost::serialization
 	ghc_filesystem
+	mpark_variant
 	)
 
 INCLUDE_DIRECTORIES(BEFORE

@@ -29,7 +29,7 @@
 #include "alloc_count.h"
 #include "lazy_array.h"
 
-#include <boost/variant.hpp>
+#include <mpark/variant.hpp>
 using std::weak_ptr;
 
 class script;
@@ -52,7 +52,7 @@ class badParamException : public caosException {
 class vmStackItem {
 	COUNT_ALLOC(vmStackItem)
 	protected:
-		struct visit_dump : public boost::static_visitor<std::string> {
+		struct visit_dump {
 			std::string operator()(const caosVar &i) const {
 				return i.dump();
 			}
@@ -72,7 +72,7 @@ class vmStackItem {
 			}
 		};
 
-		struct visit_lval : public boost::static_visitor<const caosVar &> {
+		struct visit_lval {
 			
 			const caosVar &operator()(const caosVar &i) const {
 				return i;
@@ -88,7 +88,7 @@ class vmStackItem {
 				
 		};
 
-		struct visit_bs : public boost::static_visitor<bytestring_t> {
+		struct visit_bs {
 			bytestring_t operator()(const bytestring_t &i) const {
 				return i;
 			}
@@ -100,7 +100,7 @@ class vmStackItem {
 			}
 		};
 				
-		boost::variant<caosVar, bytestring_t> value;
+		mpark::variant<caosVar, bytestring_t> value;
 
 	public:
 
@@ -118,24 +118,24 @@ class vmStackItem {
 
 		const caosVar &getRVal() const {
 			try {
-				return boost::apply_visitor(visit_lval(), value);
-			} catch (boost::bad_visit &e) {
+				return mpark::visit(visit_lval(), value);
+			} catch (mpark::bad_variant_access &e) {
 				throw badParamException();
 			}
 		}
 
 		bytestring_t getByteStr() const {
 			try {
-				return boost::apply_visitor(visit_bs(), value);
-			} catch (boost::bad_visit &e) {
+				return mpark::visit(visit_bs(), value);
+			} catch (mpark::bad_variant_access &e) {
 				throw badParamException();
 			}
 		}
 
 		std::string dump() const {
 			try {
-				return boost::apply_visitor(visit_dump(), value);
-			} catch (boost::bad_visit &e) {
+				return mpark::visit(visit_dump(), value);
+			} catch (mpark::bad_variant_access &e) {
 				return std::string("ERR::bad_visit");
 			}
 		}

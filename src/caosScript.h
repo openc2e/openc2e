@@ -192,21 +192,21 @@ struct CAOSCmd {
 };
 
 struct CAOSExpression {
-	boost::variant<CAOSCmd, caosVar, bytestring_t> value;
+	mpark::variant<CAOSCmd, caosVar, bytestring_t> value;
 	int traceidx;
 	void eval(caosScript *scr, bool save_here) const;
 	void save(caosScript *scr) const;
 	int cost() const;
 
 	CAOSExpression(const CAOSExpression &e) : value(e.value), traceidx(e.traceidx) { }
-	CAOSExpression(int idx, const CAOSCmd &c) : value(c), traceidx(idx) { boost::get<CAOSCmd>(value).traceidx = traceidx; }
+	CAOSExpression(int idx, const CAOSCmd &c) : value(c), traceidx(idx) { mpark::get<CAOSCmd>(value).traceidx = traceidx; }
 	CAOSExpression(int idx, const caosVar &c) : value(c), traceidx(idx) { }
 	CAOSExpression(int idx, const bytestring_t &c) : value(c), traceidx(idx) { }
 };
 
 class caosScript;
 
-struct costVisit : public boost::static_visitor<int> {
+struct costVisit {
 	public:
 		costVisit() {}
 		int operator()(const CAOSCmd &cmd) const;
@@ -215,7 +215,7 @@ struct costVisit : public boost::static_visitor<int> {
 		int operator()(const bytestring_t &v) const { (void)v;return 0; }
 };
 
-struct saveVisit : public boost::static_visitor<void> {
+struct saveVisit {
 	private:
 		caosScript *scr;
 	public:
@@ -226,7 +226,7 @@ struct saveVisit : public boost::static_visitor<void> {
 		void operator()(const bytestring_t &v) const { (void)v; }
 };
 
-struct evalVisit : public boost::static_visitor<void> {
+struct evalVisit {
 	private:
 		caosScript *scr;
 		bool save_here;
