@@ -85,7 +85,7 @@ void AgentInjector::readAgents() {
 
 	for (unsigned int i = 0; i < world.data_directories.size(); i++) {
 		fs::path p = world.data_directories[i];
-		if (engine.version == 2) p = p / "/Objects/";
+		if (engine.version == 2) p = p / "Objects/";
 		if (!fs::exists(p) || !fs::is_directory(p)) {
 			continue;
 		}

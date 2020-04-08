@@ -45,7 +45,7 @@ std::string calculateJournalFilename(int directory, std::string filename, bool w
 	
 	if (!writable) {
 		// search all directories for a readable file
-		fullfilename = world.findFile("/Journal/" + filename);
+		fullfilename = world.findFile("Journal/" + filename);
 
 		// if we found one, return that
 		if (fullfilename.size()) return fullfilename;

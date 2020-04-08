@@ -178,7 +178,7 @@ boost::shared_ptr<AudioSource> OpenALBackend::newSource() {
 }
 
 AudioClip OpenALBackend::loadClip(const std::string &filename) {
-	std::string fname = world.findFile(std::string("/Sounds/") + filename + ".wav");
+	std::string fname = world.findFile(std::string("Sounds/") + filename + ".wav");
 	if (fname.size() == 0) return AudioClip();
 
 	alGetError();

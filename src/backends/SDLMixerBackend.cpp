@@ -53,7 +53,7 @@ boost::shared_ptr<AudioSource> SDLMixerBackend::newSource() {
 }
 
 AudioClip SDLMixerBackend::loadClip(const std::string &filename) {
-	std::string fname = world.findFile(std::string("/Sounds/") + filename + ".wav");
+	std::string fname = world.findFile(std::string("Sounds/") + filename + ".wav");
 	if (fname.size() == 0) return AudioClip();
 
 	Mix_Chunk *buffer = Mix_LoadWAV(fname.c_str());

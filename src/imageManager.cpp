@@ -135,9 +135,9 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 
 	std::string fname;
 	if (is_background) {
-		fname = std::string("/Backgrounds/") + name;
+		fname = std::string("Backgrounds/") + name;
 	} else {
-		fname = std::string("/Images/") + name;
+		fname = std::string("Images/") + name;
 	}
 
 	// TODO: try/catch to free the mmapifstream

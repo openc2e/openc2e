@@ -561,7 +561,7 @@ void World::executeBootstrap(bool switcher) {
 			throw creaturesException("C1/2 can't run without data directories!");
 
 		// TODO: case-sensitivity for the lose
-		fs::path edenpath(data_directories[0] / "/Eden.sfc");
+		fs::path edenpath(data_directories[0] / "Eden.sfc");
 		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
 			SFCFile sfc;
 			std::ifstream f(edenpath.string().c_str(), std::ios::binary);
@@ -579,7 +579,7 @@ void World::executeBootstrap(bool switcher) {
 	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
 		assert(fs::exists(*i));
 		assert(fs::is_directory(*i));
-		fs::path b(*i / "/Bootstrap/");
+		fs::path b(*i / "Bootstrap/");
 		if (fs::exists(b) && fs::is_directory(b)) {
 			fs::directory_iterator fsend;
 			// iterate through each bootstrap directory
@@ -609,7 +609,7 @@ void World::initCatalogue() {
 		assert(fs::exists(*i));
 		assert(fs::is_directory(*i));
 
-		fs::path c(*i / "/Catalogue/");
+		fs::path c(*i / "Catalogue/");
 		if (fs::exists(c) && fs::is_directory(c))
 			catalogue.initFrom(c);
 	}
@@ -663,7 +663,7 @@ void World::selectCreature(boost::shared_ptr<Agent> a) {
 }
 
 shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
-	std::vector<std::string> possibles = findFiles("/Genetics/", genefile + ".gen");
+	std::vector<std::string> possibles = findFiles("Genetics/", genefile + ".gen");
 	if (possibles.empty()) return shared_ptr<genomeFile>();
 	genefile = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
 

@@ -373,9 +373,9 @@ void caosVM::v_SNAX() {
 	VM_PARAM_STRING(filename)
 	
 	result.setInt(0);
-	if (!world.findFile(std::string("/Images/") + filename + ".s16").empty())
+	if (!world.findFile(std::string("Images/") + filename + ".s16").empty())
 		result.setInt(1);
-	else if (!world.findFile(std::string("/Images/") + filename + ".c16").empty())
+	else if (!world.findFile(std::string("Images/") + filename + ".c16").empty())
 		result.setInt(1);
 }
 

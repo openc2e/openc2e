@@ -219,14 +219,14 @@ void SkeletalCreature::skeletonInit() {
 		}
 		if (!images[i])
 			throw creaturesException(boost::str(boost::format("SkeletalCreature couldn't find an image for part %c of species %d, variant %d, stage %d") % x % (int)partspecies % (int)partvariant % (int)creature->getStage()));
-		
+
 		// find relevant ATT data
 		std::string attfilename;
 		int var = partvariant;
 		while (var > -1 && attfilename.empty()) {
 			int stage_to_try = creature->getStage();
 			while (stage_to_try > -1 && attfilename.empty()) {
-				attfilename = world.findFile(std::string("/Body Data/") + x + dataString(stage_to_try, false, spe, var) + ".att");
+				attfilename = world.findFile(std::string("Body Data/") + x + dataString(stage_to_try, false, spe, var) + ".att");
 				stage_to_try--;
 			}
 			var--;
