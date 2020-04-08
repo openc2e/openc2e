@@ -22,7 +22,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 /* resolveFile
  *

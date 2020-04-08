@@ -30,7 +30,7 @@
 #include <set>
 #include <map>
 #include <list>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 class caosVM;
 

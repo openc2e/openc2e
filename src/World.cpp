@@ -36,7 +36,7 @@
 #include "MusicManager.h"
 
 #include <boost/format.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
 World world;
@@ -527,9 +527,9 @@ void World::executeInitScript(fs::path p) {
 		script.installScripts();
 		vm.runEntirely(script.installer);
 	} catch (creaturesException &e) {
-		std::cerr << "exec of \"" << p.leaf() << "\" failed due to exception " << e.prettyPrint() << std::endl;
+		std::cerr << "exec of \"" << p.filename() << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	} catch (std::exception &e) {
-		std::cerr << "exec of \"" << p.leaf() << "\" failed due to exception " << e.what() << std::endl;
+		std::cerr << "exec of \"" << p.filename() << "\" failed due to exception " << e.what() << std::endl;
 	}
 	std::cout.flush(); std::cerr.flush();
 }
@@ -544,7 +544,7 @@ void World::executeBootstrap(fs::path p) {
 	
 	fs::directory_iterator fsend;
 	for (fs::directory_iterator d(p); d != fsend; ++d) {
-		if ((!fs::is_directory(*d)) && (fs::extension(*d) == ".cos"))
+		if ((!fs::is_directory(*d)) && (d->path().extension().string() == ".cos"))
 			scripts.push_back(*d);
 	}
 
@@ -585,7 +585,7 @@ void World::executeBootstrap(bool switcher) {
 			// iterate through each bootstrap directory
 			for (fs::directory_iterator d(b); d != fsend; ++d) {
 				if (fs::exists(*d) && fs::is_directory(*d)) {
-					std::string s = d->path().leaf().string();
+					std::string s = d->path().filename().string();
 					// TODO: cvillage has switcher code in 'Startup', so i included it here too
 					if (s == "000 Switcher" || s == "Startup") {
 						if (!switcher) continue;

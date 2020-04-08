@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 #include <istream>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <list>
 #include "exceptions.h"
 

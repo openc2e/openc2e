@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 
 using std::cout;
 using std::cerr;

@@ -21,7 +21,7 @@
 #include "exceptions.h"
 #include "World.h" // data_directories
 #include "Catalogue.h"
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 
 prayManager::~prayManager() {
 	while (files.size() != 0) {
@@ -79,7 +79,7 @@ void prayManager::update() {
 		if (fs::exists(praydir) && fs::is_directory(praydir)) {
 			fs::directory_iterator fsend;
 			for (fs::directory_iterator d(praydir); d != fsend; ++d) {
-				std::string x = fs::extension(*d);
+				std::string x = d->path().extension().string();
 				if (!x.empty()) x.erase(x.begin());
 				if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
 					// TODO: language checking!

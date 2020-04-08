@@ -332,7 +332,7 @@ CAOS_LVALUE(GAME_c2,
 	caosVar(),
 	(void)0) // TODO
 
-#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
 
 /**
  OC2E DDIR (string)

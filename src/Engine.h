@@ -22,7 +22,7 @@
 
 #include "caosVar.h"
 #include <map>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 class Backend;
 class AudioBackend;

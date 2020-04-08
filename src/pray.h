@@ -24,7 +24,7 @@
 #include <map>
 #include <string>
 #include <fstream>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 namespace fs = boost::filesystem;
 

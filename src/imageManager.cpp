@@ -32,9 +32,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace boost::filesystem;
 
@@ -49,7 +47,7 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 	// if it doesn't exist, too bad, give up.
 	if (!exists(realfile)) return false;
 
-	std::string basename = realfile.leaf().string(); basename.erase(basename.end() - 4, basename.end());
+	std::string basename = realfile.filename().string(); basename.erase(basename.end() - 4, basename.end());
 
 	// work out where the cached file should be
 	cachename = engine.storageDirectory().string() + "/" + fname;
@@ -77,7 +75,7 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 	in->mmapopen(realfile.string());
 #if OC2E_BIG_ENDIAN
 	if (in->is_open() && (ft != spr)) {
-		path p = cachefile.branch_path();
+		path p = cachefile.parent_path();
 		if (!exists(p))
 			create_directory(p);
 		if (!is_directory(p))

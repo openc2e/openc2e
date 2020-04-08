@@ -22,7 +22,7 @@
 #include "World.h"
 #include "Catalogue.h"
 #include <boost/format.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
 bool prayInstall(std::string name, unsigned int type, bool actually_install) {	

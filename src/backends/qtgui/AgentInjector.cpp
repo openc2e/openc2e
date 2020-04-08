@@ -21,8 +21,7 @@
 #include "c1cobfile.h"
 #include "cobFile.h"
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 
 #include <QMessageBox>
 #include <QPainter>
@@ -93,7 +92,7 @@ void AgentInjector::readAgents() {
 
 		fs::directory_iterator end_itr; // default constructor is the end
 		for (fs::directory_iterator itr(p); itr != end_itr; itr++) {
-			std::string cobext = fs::extension(itr->path());
+			std::string cobext = itr->path().extension().string();
 			std::transform(cobext.begin(), cobext.end(), cobext.begin(), (int(*)(int))tolower); // downcase
 			if (cobext != ".cob") continue;
 

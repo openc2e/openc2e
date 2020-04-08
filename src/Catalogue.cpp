@@ -24,10 +24,7 @@
 #include <list>
 
 #include "catalogue.tab.hpp"
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
 #include <iostream>
@@ -136,8 +133,8 @@ void Catalogue::initFrom(fs::path path) {
 	std::string file;
 	for (fs::directory_iterator i(path); i != end; ++i) {
 		try {
-			if ((!fs::is_directory(*i)) && (fs::extension(*i) == ".catalogue")) {
-				std::string x = fs::basename(*i);
+			if ((!fs::is_directory(*i)) && (i->path().extension().string() == ".catalogue")) {
+				std::string x = i->path().	stem().string();
 				// TODO: '-en-GB' exists too, this doesn't work for that
 				if ((x.size() > 3) && (x[x.size() - 3] == '-')) {
 					// TODO: this is NOT how we should do it
@@ -148,7 +145,7 @@ void Catalogue::initFrom(fs::path path) {
 			}
 		}
 		catch (const std::exception &ex) {
-			std::cerr << "directory_iterator died on '" << i->path().leaf() << "' with " << ex.what() << std::endl;
+			std::cerr << "directory_iterator died on '" << i->path().filename() << "' with " << ex.what() << std::endl;
 		}
 	}	
 }

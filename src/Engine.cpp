@@ -31,9 +31,7 @@
 #include "peFile.h"
 #include "Camera.h"
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 namespace fs = boost::filesystem;
@@ -777,7 +775,7 @@ bool Engine::initialSetup() {
 		
 		for (std::vector< std::string >::iterator bsi = cmdline_bootstrap.begin(); bsi != cmdline_bootstrap.end(); bsi++) {
 			fs::path scriptdir(*bsi);
-			if (engine.version > 2 || fs::extension(scriptdir) == ".cos") {
+			if (engine.version > 2 || scriptdir.extension().string() == ".cos") {
 				// pass it to the world to execute (it handles both files and directories)
 
 				if (!fs::exists(scriptdir)) {

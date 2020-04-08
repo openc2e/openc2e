@@ -19,8 +19,7 @@
 
 #include "PathResolver.h"
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <set>
 #include <map>
@@ -53,8 +52,8 @@ static path lcpath(path &orig) {
 
 static path lcleaf(path &orig) {
 	path br, leaf;
-	br = orig.branch_path();
-	leaf = path(toLowerCase(orig.leaf().string()));
+	br = orig.parent_path();
+	leaf = path(toLowerCase(orig.filename().string()));
 	return br / leaf;
 }
 
@@ -79,10 +78,10 @@ bool resolveFile_(string &srcPath) {
 	path orig(srcPath);
 	if (exists(orig))
 		return true;
-	
-	orig.normalize();
-	path dir = orig.branch_path();
-	path leaf = path(orig.leaf());
+
+	orig = orig.lexically_normal();
+	path dir = orig.parent_path();
+	path leaf = path(orig.filename());
 
 	if (!checkDirCache(dir))
 		return false;
@@ -181,7 +180,7 @@ std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
 	wild = toLowerCase(wild);
 
 	path dirp(dir);
-	dirp.normalize();
+	dirp = dirp.lexically_normal();
 	if (!resolveFile(dirp))
 		return std::vector<std::string>();
 	dir = dirp.string();

@@ -274,6 +274,7 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	Boost::thread
 	Boost::regex
 	)
+target_compile_definitions(openc2e PUBLIC BOOST_FILESYSTEM_NO_DEPRECATED=1)
 
 INCLUDE_DIRECTORIES(BEFORE
 	${GEN}

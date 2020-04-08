@@ -23,7 +23,7 @@
 #include <fstream>
 #include <iostream>
 #include <boost/format.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
 std::string calculateJournalFilename(int directory, std::string filename, bool writable) {
