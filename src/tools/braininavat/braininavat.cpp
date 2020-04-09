@@ -16,6 +16,7 @@
 
 #include "braininavat.h"
 #include <QtGui>
+#include <memory>
 #include "brainview.h"
 #include "c2eBrain.h"
 

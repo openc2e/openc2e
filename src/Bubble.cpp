@@ -23,6 +23,7 @@
 #include "Backend.h"
 #include "Camera.h"
 #include "creaturesImage.h"
+#include <cassert>
 
 // class BubblePart *ourPart;
 

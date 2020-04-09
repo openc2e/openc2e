@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <iostream>
 #include <fmt/printf.h>
+#include <memory>
 using std::cerr;
 
 #define CAOS_LVALUE_TARG_ROOM(name, check, get, set) \

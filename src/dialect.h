@@ -2,6 +2,8 @@
 #define DIALECT_H 1
 
 #include "cmddata.h"
+#include <cassert>
+#include <memory>
 #include <string>
 #include <map>
 

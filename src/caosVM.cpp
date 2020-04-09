@@ -22,8 +22,10 @@
 #include "World.h"
 #include "bytecode.h"
 #include "caosScript.h"
+#include <cassert>
 #include <iostream>
 #include <climits>
+#include <memory>
 
 #include <fmt/printf.h>
 

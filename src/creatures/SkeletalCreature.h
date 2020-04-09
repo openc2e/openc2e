@@ -17,6 +17,8 @@
  *
  */
 #include "attFile.h"
+#include <cassert>
+#include <memory>
 
 // for enum lifestage (0 to 6)
 #include "genome.h"

@@ -11,6 +11,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/map.hpp>
+#include <memory>
 
 BOOST_CLASS_IMPLEMENTATION(toktrace, boost::serialization::object_serializable);
 BOOST_CLASS_TRACKING(toktrace, boost::serialization::track_never);

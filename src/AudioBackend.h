@@ -21,6 +21,7 @@
 #define SOUNDBACKEND_H 1
 
 
+#include <memory>
 #include <string>
 
 /* Base class for sources of streaming data (eg, MNG music)

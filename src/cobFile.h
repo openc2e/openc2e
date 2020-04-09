@@ -20,6 +20,7 @@
 #ifndef COBFILE_H
 #define COBFILE_H
 
+#include <cassert>
 #include <vector>
 #include <string>
 #include <fstream>

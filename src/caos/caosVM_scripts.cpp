@@ -24,6 +24,7 @@
 #include "Agent.h"
 #include "Scriptorium.h"
 #include <iostream>
+#include <memory>
 using std::cerr;
 
 /**

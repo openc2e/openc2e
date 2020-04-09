@@ -20,6 +20,7 @@
 #include "renderable.h"
 #include "World.h"
 #include "Engine.h"
+#include <cassert>
 
 //#include "CompoundPart.h"
 bool renderablezorder::operator ()(const renderable *s1, const renderable *s2) const {

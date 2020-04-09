@@ -21,6 +21,7 @@
 #define _C2E_ROOM_H
 
 #include <map>
+#include <memory>
 #include <set>
 #include <utility>
 #include "physics.h"

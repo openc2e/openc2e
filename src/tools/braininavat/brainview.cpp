@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QPainter>
 #include <QPalette>
+#include <cassert>
 #include "brainview.h"
 #include <fmt/printf.h>
 

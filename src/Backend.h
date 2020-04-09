@@ -21,6 +21,7 @@
 #define _BACKEND_H
 
 #include "endianlove.h"
+#include <memory>
 #include <string>
 
 using std::shared_ptr;

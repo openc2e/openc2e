@@ -19,6 +19,7 @@
 
 #include "Vehicle.h"
 #include "Engine.h"
+#include <cassert>
 
 Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount) :

@@ -20,6 +20,7 @@
 #ifndef AGENTHELPERS_H
 #define AGENTHELPERS_H
 
+#include <memory>
 #include <vector>
 
 class Agent;

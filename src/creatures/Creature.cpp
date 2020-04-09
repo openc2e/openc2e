@@ -26,6 +26,8 @@
 #include "c2eBrain.h"
 #include "historyManager.h"
 #include "oldBrain.h"
+#include <cassert>
+#include <memory>
 
 Creature::Creature(shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) {
 	assert(g);

@@ -20,6 +20,7 @@
 #include "bytecode.h"
 #include "token.h"
 #include "caosScript.h"
+#include <memory>
 
 std::string parseFailure::prettyPrint() const {
 	std::ostringstream oss;

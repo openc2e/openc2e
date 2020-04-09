@@ -23,7 +23,9 @@
 #include "caosScript.h"
 #include "PointerAgent.h"
 #include "CompoundAgent.h" // for setFocus
+#include <cassert>
 #include <limits.h> // for MAXINT
+#include <memory>
 #include "creaturesImage.h"
 #include "creatures/CreatureAgent.h"
 #include "Backend.h"

@@ -18,6 +18,7 @@
  *
  */
 #include "physics.h"
+#include <cassert>
 
 void Line::dump() const {
 	std::cout << "pst = (" << start.x << "," << start.y << ") end=(" << end.x << "," << end.y << ")" << std::endl;

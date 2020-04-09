@@ -23,6 +23,7 @@
 #include "Engine.h"
 #include <iostream> // for debug messages
 #include <cmath> // for cos/sin
+#include <memory>
 
 // this is all for MusicManager::tick
 #include "World.h"

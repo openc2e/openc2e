@@ -22,6 +22,8 @@
 #include "Map.h"
 #include "MetaRoom.h"
 #include "Room.h"
+#include <cassert>
+#include <memory>
 
 bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, shared_ptr<Room> ownerroom) {
 	assert(ownermeta && ownerroom);

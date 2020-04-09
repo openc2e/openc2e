@@ -19,7 +19,9 @@
 
 #include "oldCreature.h"
 #include "c2eCreature.h"
+#include <cassert>
 #include <cmath> // powf
+#include <memory>
 #include "c2eBrain.h"
 #include "oldBrain.h"
 

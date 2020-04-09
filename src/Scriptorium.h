@@ -24,6 +24,7 @@
 #include "openc2e.h"
 using std::shared_ptr;
 #include <map>
+#include <memory>
 
 class script;
 

@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <ghc/filesystem.hpp>
 

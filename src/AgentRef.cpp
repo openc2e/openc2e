@@ -21,6 +21,7 @@
 #include "Agent.h"
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 void AgentRef::checkLife() const {
 	assert(ref.expired() || !(ref.lock()->isDying()));

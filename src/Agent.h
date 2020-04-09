@@ -23,8 +23,10 @@
 #include "AgentRef.h"
 #include "caosVar.h"
 #include "CompoundPart.h"
+#include <cassert>
 #include <list>
 #include <map>
+#include <memory>
 #include "openc2e.h"
 #include "Port.h"
 #include "physics.h"

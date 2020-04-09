@@ -21,6 +21,7 @@
 #include "Engine.h"
 #include "World.h" // setFocus
 #include "Backend.h"
+#include <cassert>
 
 Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
 		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,

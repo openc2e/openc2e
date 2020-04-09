@@ -1,5 +1,6 @@
 #include "genome.h"
 #include "Catalogue.h"
+#include <cassert>
 #include <fstream>
 #include <typeinfo>
 

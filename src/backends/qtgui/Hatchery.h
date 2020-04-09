@@ -19,6 +19,7 @@
 
 #include <QDialog>
 #include <QPixmap>
+#include <memory>
 
 class Hatchery : public QDialog {
 	Q_OBJECT

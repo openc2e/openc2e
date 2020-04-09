@@ -23,6 +23,7 @@
 #include "openc2e.h"
 #include "renderable.h"
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 

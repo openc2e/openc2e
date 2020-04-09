@@ -20,6 +20,7 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H 1
 
+#include <cassert>
 #include <iostream> // XXX debug
 #include <cmath>   // sqrt
 #include <algorithm> // swap

@@ -21,7 +21,9 @@
 #include "openc2e.h"
 #include "Room.h"
 #include "MetaRoom.h"
+#include <cassert>
 #include <iostream>
+#include <memory>
 #include "Engine.h"
 
 void Map::Reset() {

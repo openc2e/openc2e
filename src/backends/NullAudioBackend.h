@@ -22,6 +22,7 @@
 
 #include "AudioBackend.h"
 #include "backends/SkeletonAudioBackend.h"
+#include <memory>
 
 class NullAudioSource : public SkeletonAudioSource {};
 

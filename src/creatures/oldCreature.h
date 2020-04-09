@@ -21,6 +21,8 @@
 #define __OLDCREATURE_H
 
 #include "Creature.h"
+#include <cassert>
+#include <memory>
 
 // c1/c2
 

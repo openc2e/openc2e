@@ -22,6 +22,7 @@
 
 #include "CompoundPart.h"
 #include "caosVar.h"
+#include <memory>
 #include <set>
 #include <map>
 #include <list>

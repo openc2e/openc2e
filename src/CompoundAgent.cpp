@@ -22,6 +22,7 @@
 #include "World.h"
 #include "Engine.h" // version
 #include <algorithm> // sort
+#include <cassert>
 #include <functional> // binary_function
 #include "caosVM.h" // calculateScriptId
 

@@ -19,6 +19,8 @@
 
 #include "oldBrain.h"
 #include "oldCreature.h"
+#include <cassert>
+#include <memory>
 
 /*
  * svrule examples:

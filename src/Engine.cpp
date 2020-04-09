@@ -33,9 +33,11 @@
 #include "Camera.h"
 #include "prayManager.h"
 
+#include <cassert>
 #include <ghc/filesystem.hpp>
 #include <cxxopts.hpp>
 #include <fmt/printf.h>
+#include <memory>
 namespace fs = ghc::filesystem;
 
 #ifndef _WIN32

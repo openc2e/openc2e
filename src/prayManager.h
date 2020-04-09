@@ -20,6 +20,7 @@
 #ifndef PRAYMANAGER_H
 #define PRAYMANAGER_H
 
+#include <cassert>
 #include <ghc/filesystem.hpp>
 
 #include <map>

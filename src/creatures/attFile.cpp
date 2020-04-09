@@ -17,6 +17,7 @@
  *
  */
 #include "attFile.h"
+#include <cassert>
 #include <regex>
 
 std::istream &operator >> (std::istream &i, attFile &f) {

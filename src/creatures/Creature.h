@@ -23,7 +23,9 @@
 #include "AgentRef.h"
 #include "genome.h"
 
+#include <cassert>
 #include <deque>
+#include <memory>
 
 class Agent;
 class CreatureAgent;

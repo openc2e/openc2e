@@ -20,6 +20,7 @@
 #include "cobFile.h"
 #include "exceptions.h"
 #include "endianlove.h"
+#include <cassert>
 
 cobFile::cobFile(fs::path filepath) {
 	path = filepath;

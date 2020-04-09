@@ -22,6 +22,7 @@
 #include "Agent.h"
 #include "World.h"
 #include <iostream>
+#include <memory>
 #include "cmddata.h"
 #include <cctype>
 #include "dialect.h"

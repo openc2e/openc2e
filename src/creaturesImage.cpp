@@ -19,6 +19,7 @@
 
 #include "creaturesImage.h"
 #include "exceptions.h"
+#include <memory>
 
 uint8 *creaturesImage::getCustomPalette() {
 	throw creaturesException("Internal error: Tried to get a custom palette of a sprite which doesn't support that.");

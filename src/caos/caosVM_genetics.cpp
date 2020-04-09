@@ -21,7 +21,9 @@
 #include "World.h"
 #include "creatures/CreatureAgent.h"
 #include "historyManager.h"
+#include <cassert>
 #include <fstream>
+#include <memory>
 
 /**
  GENE CLON (command) dest_agent (agent) dest_slot (integer) src_agent (agent) src_slot (integer)

@@ -19,6 +19,7 @@
 
 #include "PathResolver.h"
 
+#include <cassert>
 #include <ghc/filesystem.hpp>
 #include <regex>
 #include <set>

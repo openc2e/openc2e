@@ -26,6 +26,8 @@
 #include <QStatusBar>
 #include <QTimer>
 #include <QToolBar>
+#include <cassert>
+#include <memory>
 
 #include "World.h"
 #include "qtopenc2e.h"

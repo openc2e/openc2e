@@ -21,6 +21,7 @@
 #include "cobFile.h"
 
 #include <QPainter>
+#include <cassert>
 
 ImagePreview::ImagePreview(QWidget *parent): QWidget(parent) {
 	imgdata = 0;

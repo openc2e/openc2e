@@ -21,6 +21,7 @@
 #include "Creature.h"
 #include "Catalogue.h"
 #include "Engine.h"
+#include <cassert>
 
 CreatureAgent::CreatureAgent() {
 	creature = 0;

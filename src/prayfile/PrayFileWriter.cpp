@@ -1,6 +1,7 @@
 #include "prayfile/PrayFileWriter.h"
 #include "endianlove.h"
 
+#include <cassert>
 #include <sstream>
 #include <vector>
 #include <zlib.h>

@@ -21,6 +21,7 @@
 #define _IMAGEMANAGER_H
 
 #include <map>
+#include <memory>
 
 class creaturesImage;
 

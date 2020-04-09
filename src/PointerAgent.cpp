@@ -27,7 +27,9 @@
 #include "MetaRoom.h"
 #include "Camera.h"
 #include "creatures/SkeletalCreature.h"
+#include <cassert>
 #include <climits>
+#include <memory>
 
 // TODO: change imagecount?
 PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {

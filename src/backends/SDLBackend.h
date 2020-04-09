@@ -22,6 +22,7 @@
 
 #include "SDL.h"
 #include <SDL_net.h>
+#include <memory>
 #include "Backend.h"
 
 class SDLSurface : public Surface {

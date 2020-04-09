@@ -19,6 +19,8 @@
 
 #include "c16Image.h"
 #include "openc2e.h"
+#include <cassert>
+#include <memory>
 
 void c16Image::readHeader(std::istream &in) {
 	uint32 flags; uint16 spritecount;

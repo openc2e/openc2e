@@ -19,6 +19,7 @@
 
 #include "creaturesImage.h"
 #include <istream>
+#include <memory>
 #include "mmapifstream.h"
 #include "endianlove.h"
 

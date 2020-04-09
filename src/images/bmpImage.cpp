@@ -22,6 +22,7 @@
 #include "streamutils.h"
 #include "exceptions.h"
 #include "openc2e.h"
+#include <memory>
 
 #define BI_RGB 0
 #define BI_RLE8 1

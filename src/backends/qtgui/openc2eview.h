@@ -18,6 +18,7 @@
 #define _OPENC2EVIEW_H
 
 #include <QAbstractScrollArea>
+#include <memory>
 #include "Backend.h"
 
 class openc2eView : public QAbstractScrollArea {

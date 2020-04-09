@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include <iostream>
+#include <memory>
 #include "openc2e.h"
 #include "World.h" // enum
 #include <cmath>   // sqrt

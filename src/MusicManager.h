@@ -22,6 +22,7 @@
 
 #include "music/mngfile.h"
 #include "endianlove.h"
+#include <memory>
 using std::shared_ptr;
 
 class MusicManager {

@@ -21,6 +21,7 @@
 #define _SDLMIXERBACKEND_H
 
 #include "SkeletonAudioBackend.h"
+#include <memory>
 
 #include "SDL_mixer.h"
 

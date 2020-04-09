@@ -22,6 +22,7 @@
 
 #include <exception>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <string.h>
 #include <vector>

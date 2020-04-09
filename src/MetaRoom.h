@@ -21,6 +21,7 @@
 #define _C2E_METAROOM_H
 
 #include "openc2e.h"
+#include <memory>
 #include <string>
 #include <vector>
 #include <map>

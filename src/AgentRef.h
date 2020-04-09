@@ -22,6 +22,7 @@
 
 #include <cstdlib> // for NULL
 #include <iostream>
+#include <memory>
 
 class Agent;
 

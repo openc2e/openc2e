@@ -21,6 +21,8 @@
 #define __C2ECREATURE_H
 
 #include "Creature.h"
+#include <cassert>
+#include <memory>
 
 // c2e
 

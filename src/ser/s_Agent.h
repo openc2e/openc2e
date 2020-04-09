@@ -5,6 +5,7 @@
 #include "ser/s_caosVar.h"
 #include "serialization.h"
 #include "Agent.h"
+#include <cassert>
 
 SERIALIZE(Agent) {
 	assert(!obj.dying);

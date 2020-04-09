@@ -18,6 +18,8 @@
  */
 
 #include <array>
+#include <cassert>
+#include <memory>
 
 #include "SDLBackend.h"
 #include "SDL2_gfxPrimitives.h"

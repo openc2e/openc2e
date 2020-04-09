@@ -21,7 +21,9 @@
 #include "MetaRoom.h"
 #include "World.h"
 #include "Engine.h"
+#include <cassert>
 #include <iostream>
+#include <memory>
 #include "caosVM.h"
 #include "AudioBackend.h"
 #include <fmt/printf.h>

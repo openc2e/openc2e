@@ -26,6 +26,8 @@
 #include "Backend.h"
 #include "Agent.h"
 #include "imageManager.h"
+#include <cassert>
+#include <memory>
 
 bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
 	// TODO: unsure about all of this, needs a check (but seems to work)

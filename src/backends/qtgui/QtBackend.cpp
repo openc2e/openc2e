@@ -21,8 +21,10 @@
 #include <QApplication>
 #include <QWidget>
 #include <QPainter>
+#include <cassert>
 #include <fmt/printf.h>
 #include <iostream>
+#include <memory>
 #include "exceptions.h"
 
 #ifdef _WIN32

@@ -38,6 +38,8 @@
 #include "imageManager.h"
 #include "Map.h"
 
+#include <cassert>
+#include <memory>
 #include <typeinfo> // TODO: remove when genome system is fixed
 #include <fmt/printf.h>
 

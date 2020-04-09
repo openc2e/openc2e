@@ -24,6 +24,7 @@
 #include "Map.h"
 #include "MetaRoom.h"
 #include "Agent.h"
+#include <cassert>
 
 Camera::Camera() {
 	metaroom = 0;

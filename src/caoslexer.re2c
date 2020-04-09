@@ -1,6 +1,7 @@
 /* vim: set ft=cpp : */
 #include "token.h"
 #include "caoslexer.h"
+#include <algorithm>
 
 static char string_escape(char c) {
 	switch (c) {

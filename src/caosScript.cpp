@@ -30,7 +30,9 @@
 #include "dialect.h"
 #include "util.h"
 #include "Scriptorium.h"
+#include <cassert>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <algorithm>
 #include <cstring>

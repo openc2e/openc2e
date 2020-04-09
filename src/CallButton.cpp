@@ -18,6 +18,7 @@
  */
 
 #include "CallButton.h"
+#include <cassert>
 
 // TODO: this code is a first attempt and is probably completely wrong
 

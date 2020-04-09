@@ -18,7 +18,9 @@
  */
 
 #include "caosVM.h"
+#include <cassert>
 #include <iostream>
+#include <memory>
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"

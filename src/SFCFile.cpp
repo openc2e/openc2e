@@ -49,7 +49,9 @@
 #define TYPE_MACRO 14
 #define TYPE_OBJECT 100
 
+#include <cassert>
 #include <fmt/printf.h>
+#include <memory>
 #define sfccheck(x) if (!(x)) throw creaturesException(std::string("failure while reading SFC file: '" #x "' in " __FILE__ " at line ") + fmt::sprintf("%d", __LINE__));
 
 SFCFile::~SFCFile() {

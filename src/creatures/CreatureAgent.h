@@ -22,6 +22,7 @@
 
 #include "Agent.h"
 #include "genome.h"
+#include <cassert>
 
 class Creature;
 

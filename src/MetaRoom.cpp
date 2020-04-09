@@ -25,6 +25,7 @@
 #include "images/blkImage.h"
 #include "Map.h"
 #include <assert.h>
+#include <memory>
 #include "Backend.h"
 
 MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, shared_ptr<creaturesImage> spr, bool wrap) {

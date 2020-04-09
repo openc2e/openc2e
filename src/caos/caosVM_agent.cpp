@@ -25,8 +25,10 @@
 #include "creatures/SkeletalCreature.h"
 #include "World.h"
 #include "creaturesImage.h"
+#include <cassert>
 #include <iostream>
 #include <fmt/printf.h>
+#include <memory>
 #include "AgentHelpers.h"
 #include "Room.h" // LIML/LIMT etc
 #include "Engine.h" // C2 hack in POSE

@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include <iostream>
+#include <memory>
 #include "openc2e.h"
 #include "Agent.h"
 #include "Port.h"

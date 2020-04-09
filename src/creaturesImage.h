@@ -20,6 +20,7 @@
 #ifndef _CREATURESIMAGE_H
 #define _CREATURESIMAGE_H
 
+#include <memory>
 #include <string>
 #include <fstream>
 #include <cassert>

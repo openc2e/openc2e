@@ -29,6 +29,7 @@
 #include "Room.h"
 #include "Map.h"
 #include <iostream>
+#include <memory>
 using std::cout;
 using std::cerr;
 

@@ -25,7 +25,9 @@
 #include "creatures/Creature.h"
 #include "Engine.h" // version
 
+#include <cassert>
 #include <fmt/printf.h>
+#include <memory>
 
 historyevent::historyevent(unsigned int eno, CreatureAgent *c) {
 	timestamp = time(NULL);

@@ -22,6 +22,7 @@
 #include "QtBackend.h"
 
 #ifdef _WIN32
+#include <memory>
 #include <windows.h>
 #endif
 

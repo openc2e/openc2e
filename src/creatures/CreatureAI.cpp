@@ -23,6 +23,7 @@
 #include "World.h"
 #include "c2eBrain.h"
 #include "oldBrain.h"
+#include <memory>
 
 void oldCreature::tickBrain() {
 	if (asleep) {

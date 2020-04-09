@@ -6,6 +6,7 @@
 #include "SimpleAgent.h"
 #include "caosVM.h"
 
+#include <memory>
 #include <string>
 std::string datapath; // because some files link to it
 

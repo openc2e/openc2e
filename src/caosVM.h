@@ -24,6 +24,7 @@
 #include <array>
 #include <map>
 #include <istream>
+#include <memory>
 #include <ostream>
 #include "AgentRef.h"
 #include "caosVar.h"

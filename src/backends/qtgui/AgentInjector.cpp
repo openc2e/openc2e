@@ -22,6 +22,7 @@
 #include "c1cobfile.h"
 #include "cobFile.h"
 
+#include <cassert>
 #include <ghc/filesystem.hpp>
 
 #include <QMessageBox>

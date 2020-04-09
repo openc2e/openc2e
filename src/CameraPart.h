@@ -21,6 +21,7 @@
 #define _CAMERAPART_H
 
 #include "CompoundPart.h"
+#include <memory>
 
 class Camera;
 

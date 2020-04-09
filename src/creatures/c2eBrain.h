@@ -21,6 +21,7 @@
 #define __C2EBRAIN_H
 
 #include "genome.h"
+#include <cassert>
 #include <set>
 #include <map>
 

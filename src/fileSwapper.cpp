@@ -18,7 +18,9 @@
  */
 
 #include "fileSwapper.h"
+#include <cassert>
 #include <fstream>
+#include <memory>
 #include "images/blkImage.h"
 #include "images/c16Image.h"
 #include "openc2e.h"

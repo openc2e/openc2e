@@ -20,6 +20,7 @@
 #include "VoiceData.h"
 #include "streamutils.h"
 #include "Catalogue.h"
+#include <cassert>
 #include <fmt/printf.h>
 
 #define NUM_VOICE_FILES 32

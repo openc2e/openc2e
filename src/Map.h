@@ -22,6 +22,7 @@
 
 #include "physics.h"
 #include "openc2e.h"
+#include <memory>
 #include <vector>
 
 class Room;

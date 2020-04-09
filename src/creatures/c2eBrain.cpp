@@ -19,6 +19,7 @@
 
 #include "c2eBrain.h"
 #include "c2eCreature.h"
+#include <cassert>
 #include <math.h>
 #include <fmt/printf.h>
 

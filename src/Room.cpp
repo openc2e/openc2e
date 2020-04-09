@@ -20,6 +20,8 @@
 #include "Room.h"
 #include "World.h"
 #include "Backend.h"
+#include <cassert>
+#include <memory>
 
 Room::Room() {
 	for (unsigned int i = 0; i < CA_COUNT; i++)

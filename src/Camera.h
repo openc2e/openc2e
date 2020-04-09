@@ -20,6 +20,7 @@
 #ifndef _OPENC2E_CAMERA_H
 #define _OPENC2E_CAMERA_H
 
+#include <memory>
 #include <vector>
 #include "AgentRef.h"
 

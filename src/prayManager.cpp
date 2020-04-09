@@ -23,6 +23,7 @@
 #include "exceptions.h"
 #include "World.h" // data_directories
 #include "Catalogue.h"
+#include <cassert>
 #include <ghc/filesystem.hpp>
 
 PrayBlock::PrayBlock() {}

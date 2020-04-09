@@ -19,6 +19,7 @@
 
 #include "mmapifstream.h"
 #include "openc2e.h"
+#include <cassert>
 #ifdef _WIN32
 #include <windows.h>
 #else // assume POSIX

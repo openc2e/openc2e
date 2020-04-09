@@ -19,6 +19,7 @@
 
 #include "openc2e.h"
 #include "blkImage.h"
+#include <cassert>
 #include <iostream>
 
 void blkImage::readHeader(std::istream &in) {

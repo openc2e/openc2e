@@ -1,5 +1,7 @@
 #include "dialect.h"
 #include "exceptions.h"
+#include <cassert>
+#include <memory>
 #include <stdlib.h>
 #include <string.h>
 

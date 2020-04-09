@@ -23,6 +23,7 @@
 #include "creaturesImage.h"
 #include "mmapifstream.h"
 #include "endianlove.h"
+#include <memory>
 
 class bmpImage;
 

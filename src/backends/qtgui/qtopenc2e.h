@@ -18,6 +18,7 @@
 #define _QTOPENC2E_H
 
 #include <QMainWindow>
+#include <memory>
 #include "AgentRef.h"
 
 class QtOpenc2e : public QMainWindow {

@@ -20,6 +20,7 @@
 #ifndef PRAY_H
 #define PRAY_H
 
+#include <cassert>
 #include <vector>
 #include <map>
 #include <string>

@@ -21,6 +21,8 @@
 #include "SDL.h"
 #include "exceptions.h"
 #include "World.h"
+#include <cassert>
+#include <memory>
 
 void SDLMixerBackend::init() {
 	// TODO: ensure SDLBackend is in use?

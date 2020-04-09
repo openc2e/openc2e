@@ -23,6 +23,7 @@
 #include "caosVar.h"
 #include <map>
 #include <ghc/filesystem.hpp>
+#include <memory>
 
 class Backend;
 class AudioBackend;

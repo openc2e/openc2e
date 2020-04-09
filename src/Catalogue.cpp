@@ -20,6 +20,7 @@
 #include "Catalogue.h"
 
 // make sure we have the header imports that bison's horrible .h file needs
+#include <cassert>
 #include <string>
 #include <list>
 

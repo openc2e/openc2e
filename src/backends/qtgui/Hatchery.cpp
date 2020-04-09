@@ -28,6 +28,8 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsView>
 #include <QHBoxLayout>
+#include <cassert>
+#include <memory>
 
 /*
   C1 hatchery resources:

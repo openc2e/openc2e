@@ -28,6 +28,7 @@
 #include <iostream>
 #include <fmt/printf.h>
 #include <climits>
+#include <memory>
 using std::cerr;
 
 /**

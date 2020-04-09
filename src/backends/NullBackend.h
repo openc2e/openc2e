@@ -21,6 +21,7 @@
 #define _NULLBACKEND_H
 
 #include "Backend.h"
+#include <memory>
 
 class NullSurface : public Surface {
 public:

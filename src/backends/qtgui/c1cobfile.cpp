@@ -15,6 +15,7 @@
 */
 
 #include "c1cobfile.h"
+#include <cassert>
 
 std::string readpascalstring(std::istream &s) {
 	uint16 size;

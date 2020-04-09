@@ -21,6 +21,7 @@
 #include "openc2e.h"
 #include "version.h"
 #include <iostream>
+#include <memory>
 #include "Engine.h"
 #include "backends/SDLBackend.h"
 #ifdef SDLMIXER_SUPPORT

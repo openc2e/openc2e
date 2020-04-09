@@ -20,6 +20,7 @@
 #ifndef CAOSSCRIPT_H
 #define CAOSSCRIPT_H
 
+#include <memory>
 #include <vector>
 #include <list>
 #include <string>

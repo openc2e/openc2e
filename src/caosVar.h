@@ -20,6 +20,7 @@
 #ifndef CAOSVAR_H
 #define CAOSVAR_H 1
 
+#include <memory>
 #include <mpark/variant.hpp>
 #include "openc2e.h"
 #include <string>
