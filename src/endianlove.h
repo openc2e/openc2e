@@ -22,21 +22,11 @@
 
 #include <stdlib.h> // load the standard libraries for these defines
 
-#if HAVE_STDINT_H
-
 #include <stdint.h>
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;
-
-#else
-
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned int uint32;
-
-#endif
 
 #ifndef OC2E_BIG_ENDIAN
 #	ifdef __GNU__

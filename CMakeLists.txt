@@ -155,10 +155,6 @@ if (BIG_ENDIAN)
 else()
 	add_definitions("-DOC2E_BIG_ENDIAN=0")
 endif()
-check_include_file(stdint.h HAVE_STDINT_H)
-if (HAVE_STDINT_H)
-	add_definitions("-DHAVE_STDINT_H=1")
-endif()
 
 find_package(Python REQUIRED)
 
