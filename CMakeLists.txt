@@ -220,7 +220,7 @@ if (OPENC2E_USE_SERIALIZATION)
 	target_link_libraries(openc2e Boost::serialization)
 endif()
 
-add_library(prayfile src/prayfile/pray.cpp)
+add_library(prayfile src/prayfile/pray.cpp src/prayfile/PrayFileWriter.cpp)
 target_link_libraries(prayfile PUBLIC ghc_filesystem z)
 target_link_libraries(openc2e prayfile)
 
