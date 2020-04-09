@@ -17,8 +17,10 @@
  *
  */
 
+#include <array>
+
 #include "SDLBackend.h"
-#include "SDL_gfxPrimitives.h"
+#include "SDL2_gfxPrimitives.h"
 #include "SDL_ttf.h"
 #include "openc2e.h"
 #include "Engine.h"
@@ -43,9 +45,10 @@ int SDLBackend::idealBpp() {
 }
 
 void SDLBackend::resizeNotify(int _w, int _h) {
+	SDL_SetWindowSize(window, _w, _h);
 	mainsurface.width = _w;
 	mainsurface.height = _h;
-	mainsurface.surface = SDL_SetVideoMode(_w, _h, idealBpp(), SDL_RESIZABLE);
+	mainsurface.surface = SDL_GetWindowSurface(window);
 	if (!mainsurface.surface)
 		throw creaturesException(std::string("Failed to create SDL surface due to: ") + SDL_GetError());
 }
@@ -60,12 +63,16 @@ void SDLBackend::init() {
 	if (engine.getGameName().size()) windowtitle = engine.getGameName() + " - ";
 	windowtitle += "openc2e";
 	std::string titlebar = windowtitle + " (development build)";
-	SDL_WM_SetCaption(titlebar.c_str(), windowtitle.c_str());
 
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	window = SDL_CreateWindow(titlebar.c_str(),
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		mainsurface.width, mainsurface.height,
+		SDL_WINDOW_RESIZABLE
+	);
+	assert(window);
 	SDL_ShowCursor(false);
-	// bz2 and fuzzie both think this is the only way to get useful ascii out of SDL
-	SDL_EnableUNICODE(1);
+	SDL_StartTextInput();
 
 	if (TTF_Init() == 0) {
 		// TODO: think about font sizing
@@ -158,12 +165,17 @@ retry:
 	if (!SDL_PollEvent(&event)) return false;
 
 	switch (event.type) {
-		case SDL_VIDEORESIZE:
-			resizeNotify(event.resize.w, event.resize.h);
-			e.type = eventresizewindow;
-			e.x = event.resize.w;
-			e.y = event.resize.h;
-			break;
+		case SDL_WINDOWEVENT:
+			switch (event.window.event) {
+				case SDL_WINDOWEVENT_RESIZED:
+					resizeNotify(event.window.data1, event.window.data2);
+					e.type = eventresizewindow;
+					e.x = event.window.data1;
+					e.y = event.window.data2;
+					return true;
+				default:
+					goto retry;
+			}
 
 		case SDL_MOUSEMOTION:
 			e.type = eventmousemove;
@@ -171,17 +183,13 @@ retry:
 			e.y = event.motion.y;
 			e.xrel = event.motion.xrel;
 			e.yrel = event.motion.yrel;
-      e.button = 0;
-      if (event.motion.state & SDL_BUTTON(1))
-        e.button |= buttonleft;
-      if (event.motion.state & SDL_BUTTON(2))
-        e.button |= buttonmiddle;
-      if (event.motion.state & SDL_BUTTON(3))
-        e.button |= buttonright;
-      if (event.motion.state & SDL_BUTTON(4))
-        e.button |= buttonwheelup;
-      if (event.motion.state & SDL_BUTTON(5))
-        e.button |= buttonwheeldown;
+			e.button = 0;
+			if (event.motion.state & SDL_BUTTON(1))
+				e.button |= buttonleft;
+			if (event.motion.state & SDL_BUTTON(2))
+				e.button |= buttonmiddle;
+			if (event.motion.state & SDL_BUTTON(3))
+				e.button |= buttonright;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -194,17 +202,34 @@ retry:
 				case SDL_BUTTON_LEFT: e.button = buttonleft; break;
 				case SDL_BUTTON_RIGHT: e.button = buttonright; break;
 				case SDL_BUTTON_MIDDLE: e.button = buttonmiddle; break;
-				case SDL_BUTTON_WHEELDOWN: e.button = buttonwheeldown; break;
-				case SDL_BUTTON_WHEELUP: e.button = buttonwheelup; break;
 				default: goto retry;
 			}
 			e.x = event.button.x;
 			e.y = event.button.y;
 			break;
 
+		case SDL_MOUSEWHEEL:
+			e.type = eventmousebuttondown;
+			if (event.wheel.y > 0) {
+				e.button = buttonwheeldown; break;
+			} else if (event.wheel.y < 0) {
+				e.button = buttonwheelup; break;
+			} else {
+				goto retry;
+			}
+			break;
+
+		case SDL_TEXTINPUT:
+			if (((event.text.text[0] & 0xFF80) == 0) && (event.text.text[0] >= 32)) {
+				e.type = eventkeydown;
+				e.key = event.text.text[0] & 0x7F;
+				break;
+			}
+			goto retry;
+
         case SDL_KEYUP:
             {
-                int key = translateKey(event.key.keysym.sym);
+                int key = translateKey(event.key.keysym.scancode);
                 if (key != -1) {
                     e.type = eventspecialkeyup;
                     e.key = key;
@@ -214,20 +239,15 @@ retry:
             }
 
 		case SDL_KEYDOWN:
-			if ((event.key.keysym.unicode) && ((event.key.keysym.unicode & 0xFF80) == 0) && (event.key.keysym.unicode >= 32)) {
-				e.type = eventkeydown;
-				e.key = event.key.keysym.unicode & 0x7F;
-				return true;
-			} else { // TODO: should this be 'else'?
-				int key = translateKey(event.key.keysym.sym);
+			{
+				int key = translateKey(event.key.keysym.scancode);
 				if (key != -1) {
 					e.type = eventspecialkeydown;
 					e.key = key;
 					return true;
 				}
+				goto retry;
 			}
-			goto retry;
-            break;
 
 		case SDL_QUIT:
 			e.type = eventquit;
@@ -241,7 +261,10 @@ retry:
 }
 
 void SDLSurface::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
-	aalineColor(surface, x1, y1, x2, y2, colour);
+	SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(surface);
+	assert(renderer);
+	aalineColor(renderer, x1, y1, x2, y2, colour);
+	SDL_DestroyRenderer(renderer);
 }
 
 SDL_Color getColourFromRGBA(unsigned int c) {
@@ -251,7 +274,7 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 	sdlc.g = (c >> 8) & 0xff;
 	sdlc.r = (c >> 16) & 0xff;
 	assert(c >> 24 == 0);
-	sdlc.unused = 0; // T_T "may be used uninitialized in this function"
+	sdlc.a = 255;
 	return sdlc;
 }
 
@@ -289,9 +312,9 @@ Uint8 *pixelPtr(SDL_Surface *surf, int x, int y, int bytesperpixel) {
 }
 
 SDL_Surface *MirrorSurface(SDL_Surface *surf, SDL_Color *surfpalette) {
-	SDL_Surface* newsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
+	SDL_Surface* newsurf = SDL_CreateRGBSurface(0, surf->w, surf->h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
 	assert(newsurf);
-	if (surfpalette) SDL_SetPalette(newsurf, SDL_LOGPAL, surfpalette, 0, 256);
+	if (surfpalette) SDL_SetPaletteColors(newsurf->format->palette, surfpalette, 0, 256);
 	SDL_BlitSurface(surf, 0, newsurf, 0);
 
 	if (SDL_MUSTLOCK(newsurf))
@@ -374,7 +397,7 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 			surfpalette = (SDL_Color *)image->getCustomPalette();
 		else
 			surfpalette = palette;
-		SDL_SetPalette(surf, SDL_LOGPAL, surfpalette, 0, 256);
+		SDL_SetPaletteColors(surf->format->palette, surfpalette, 0, 256);
 	} else if (image->format() == if_16bit) {
 		unsigned int rmask, gmask, bmask;
 		if (image->is565()) {
@@ -413,12 +436,13 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 	}
 	
 	// set colour-keying/alpha
-	if (!is_background) SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
-	if (trans) SDL_SetAlpha(surf, SDL_SRCALPHA, 255 - transparency);
+	if (!is_background) SDL_SetColorKey(surf, SDL_TRUE, 0);
+	if (trans) SDL_SetSurfaceAlphaMod(surf, 255 - transparency);
 	
 	// do actual blit
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;
+	destrect.w = surf->w; destrect.h = surf->h;
 	SDL_BlitSurface(surf, 0, surface, &destrect);
 
 	// free surface
@@ -426,7 +450,9 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 }
 
 void SDLSurface::renderDone() {
-	SDL_Flip(surface);
+	if (surface == SDL_GetWindowSurface(parent->window)) {
+		SDL_UpdateWindowSurface(parent->window);
+	}
 }
 
 void SDLSurface::blitSurface(Surface *s, int x, int y, int w, int h) {
@@ -440,7 +466,7 @@ void SDLSurface::blitSurface(Surface *s, int x, int y, int w, int h) {
 
 Surface *SDLBackend::newSurface(unsigned int w, unsigned int h) {
 	SDL_Surface *surf = mainsurface.surface;
-	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
+	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(0, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
 	assert(underlyingsurf);
 	SDLSurface *newsurf = new SDLSurface(this);
 	newsurf->surface = underlyingsurf;
@@ -458,41 +484,41 @@ void SDLBackend::freeSurface(Surface *s) {
 }
 
 // left out: menu, select, execute, snapshot, numeric keypad, f keys
-#define keytrans_size 25
-struct _keytrans { int sdl, windows; } keytrans[keytrans_size] = {
-	{ SDLK_BACKSPACE, 8 },
-	{ SDLK_TAB, 9 },
-	{ SDLK_CLEAR, 12 },
-	{ SDLK_RETURN, 13 },
-	{ SDLK_RSHIFT, 16 },
-	{ SDLK_LSHIFT, 16 },
-	{ SDLK_RCTRL, 17 },
-	{ SDLK_LCTRL, 17 },
-	{ SDLK_PAUSE, 19 },
-	{ SDLK_CAPSLOCK, 20 },
-	{ SDLK_ESCAPE, 27 },
-	{ SDLK_SPACE, 32 },
-	{ SDLK_PAGEUP, 33 },
-	{ SDLK_PAGEDOWN, 34 },
-	{ SDLK_END, 35 },
-	{ SDLK_HOME, 36 },
-	{ SDLK_LEFT, 37 },
-	{ SDLK_UP, 38 },
-	{ SDLK_RIGHT, 39 },
-	{ SDLK_DOWN, 40 },
-	{ SDLK_PRINT, 42 },
-	{ SDLK_INSERT, 45 },
-	{ SDLK_DELETE, 46 },
-	{ SDLK_NUMLOCK, 144 }
-};
+struct _keytrans { int sdl, windows; };
+std::array<_keytrans, 25> keytrans = {{
+	{ SDL_SCANCODE_BACKSPACE, 8 },
+	{ SDL_SCANCODE_TAB, 9 },
+	{ SDL_SCANCODE_CLEAR, 12 },
+	{ SDL_SCANCODE_RETURN, 13 },
+	{ SDL_SCANCODE_RSHIFT, 16 },
+	{ SDL_SCANCODE_LSHIFT, 16 },
+	{ SDL_SCANCODE_RCTRL, 17 },
+	{ SDL_SCANCODE_LCTRL, 17 },
+	{ SDL_SCANCODE_PAUSE, 19 },
+	{ SDL_SCANCODE_CAPSLOCK, 20 },
+	{ SDL_SCANCODE_ESCAPE, 27 },
+	{ SDL_SCANCODE_SPACE, 32 },
+	{ SDL_SCANCODE_PAGEUP, 33 },
+	{ SDL_SCANCODE_PAGEDOWN, 34 },
+	{ SDL_SCANCODE_END, 35 },
+	{ SDL_SCANCODE_HOME, 36 },
+	{ SDL_SCANCODE_LEFT, 37 },
+	{ SDL_SCANCODE_UP, 38 },
+	{ SDL_SCANCODE_RIGHT, 39 },
+	{ SDL_SCANCODE_DOWN, 40 },
+	{ SDL_SCANCODE_PRINTSCREEN, 42 },
+	{ SDL_SCANCODE_INSERT, 45 },
+	{ SDL_SCANCODE_DELETE, 46 },
+	{ SDL_SCANCODE_NUMLOCKCLEAR, 144 }
+}};
 
 // TODO: handle f keys (112-123 under windows, SDLK_F1 = 282 under sdl)
  
 // TODO: this is possibly not a great idea, we should maybe maintain our own state table
 bool SDLBackend::keyDown(int key) {
-	Uint8 *keystate = SDL_GetKeyState(NULL);
+	const Uint8 *keystate = SDL_GetKeyboardState(nullptr);
 	
-	for (unsigned int i = 0; i < keytrans_size; i++) {
+	for (unsigned int i = 0; i < keytrans.size(); i++) {
 		if (keytrans[i].windows == key)
 			if (keystate[keytrans[i].sdl])
 				return true;
@@ -509,7 +535,7 @@ int SDLBackend::translateKey(int key) {
 		return key;
 	}
 
-	for (unsigned int i = 0; i < keytrans_size; i++) {
+	for (unsigned int i = 0; i < keytrans.size(); i++) {
 		if (keytrans[i].sdl == key)
 			return keytrans[i].windows;
 	}

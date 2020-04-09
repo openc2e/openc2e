@@ -51,6 +51,7 @@ class SDLBackend : public Backend {
 protected:
 	bool networkingup;
 
+	SDL_Window *window = nullptr;
 	SDLSurface mainsurface;
 	TCPsocket listensocket;
 
