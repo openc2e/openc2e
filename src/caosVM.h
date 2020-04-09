@@ -92,10 +92,10 @@ class vmStackItem {
 			bytestring_t operator()(const bytestring_t &i) const {
 				return i;
 			}
-			bytestring_t operator()(caosVar *i) const {
+			bytestring_t operator()(caosVar *) const {
 				throw badParamException();
 			}
-			bytestring_t operator()(const caosVar &i) const {
+			bytestring_t operator()(const caosVar &) const {
 				throw badParamException();
 			}
 		};
