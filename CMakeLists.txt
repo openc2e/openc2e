@@ -160,7 +160,6 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer)
 find_package(SDL2_net REQUIRED)
 find_package(SDL2_gfx REQUIRED)
-find_package(SDL2_ttf REQUIRED)
 
 if (OPENC2E_USE_SERIALIZATION)
 	find_package(Boost 1.34.0 COMPONENTS serialization REQUIRED)
@@ -205,7 +204,6 @@ add_executable(openc2e ${OPENC2E_CORE} ${FRONTEND_SRCS} ${SDLMIXER_SRC} ${SER_SR
 target_link_libraries(openc2e m pthread
 	SDL2::Core
 	SDL2::Net
-	SDL2::TTF
 	SDL2::GFX
 	SDL2::Mixer
 	${FRONTEND_LIBS}

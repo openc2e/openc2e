@@ -55,8 +55,6 @@ protected:
 	SDLSurface mainsurface;
 	TCPsocket listensocket;
 
-	struct _TTF_Font *basicfont;
-
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
 	int translateKey(int key);

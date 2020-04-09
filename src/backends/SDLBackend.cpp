@@ -21,7 +21,6 @@
 
 #include "SDLBackend.h"
 #include "SDL2_gfxPrimitives.h"
-#include "SDL_ttf.h"
 #include "openc2e.h"
 #include "Engine.h"
 #include "creaturesImage.h"
@@ -30,7 +29,6 @@ SDLBackend *g_backend;
 
 SDLBackend::SDLBackend() : mainsurface(this) {
 	networkingup = false;
-	basicfont = 0;
 
 	// reasonable defaults
 	mainsurface.width = 800;
@@ -73,17 +71,6 @@ void SDLBackend::init() {
 	assert(window);
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
-
-	if (TTF_Init() == 0) {
-		// TODO: think about font sizing
-		basicfont = TTF_OpenFont("VeraSe.ttf", 9);
-		if (!basicfont) // TODO: think about font fallbacks/etc
-		#ifdef __APPLE__
-			basicfont = TTF_OpenFont("/Library/Fonts/Arial.ttf", 9);
-		#else
-			basicfont = TTF_OpenFont("/usr/share/fonts/truetype/ttf-bitstream-vera/VeraSe.ttf", 9);
-		#endif
-	}
 }
 
 int SDLBackend::networkInit() {
@@ -108,12 +95,6 @@ int SDLBackend::networkInit() {
 }
 
 void SDLBackend::shutdown() {
-	if (TTF_WasInit()) {
-		if (basicfont) {
-			TTF_CloseFont(basicfont);
-		}
-		TTF_Quit();
-	}
 	if (networkingup && listensocket)
 		SDLNet_TCP_Close(listensocket);
 	SDLNet_Quit();
@@ -279,29 +260,35 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 }
 
 void SDLSurface::renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) {
-	if (!parent->basicfont) return;
 	if (text.empty()) return;
 
 	SDL_Color sdlcolour;
 	if (engine.version == 1) sdlcolour = palette[colour];
 	else sdlcolour = getColourFromRGBA(colour);
-	
-	SDL_Surface *textsurf;
 
+	SDL_Surface *textsurf = SDL_CreateRGBSurface(0, surface->w, surface->h, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	assert(textsurf);
+	
+	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(textsurf);
+	assert(renderer);
+
+	gfxPrimitivesSetFont(nullptr, 0, 0);
 	if (bgcolour == 0) { // transparent
-		textsurf = TTF_RenderText_Solid(parent->basicfont, text.c_str(), sdlcolour);
+		stringRGBA(renderer, 0, 0, text.c_str(), sdlcolour.r, sdlcolour.g, sdlcolour.b, sdlcolour.a);
 	} else {
 		SDL_Color sdlbgcolour;
 		if (engine.version == 1) sdlbgcolour = palette[bgcolour];
 		else sdlbgcolour = getColourFromRGBA(bgcolour);
-		textsurf = TTF_RenderText_Shaded(parent->basicfont, text.c_str(), sdlcolour, sdlbgcolour);
+		stringRGBA(renderer, 0, 0, text.c_str(), sdlcolour.r, sdlcolour.g, sdlcolour.b, sdlcolour.a);
+		// TODO: background?
 	}
 
-	if (!textsurf) return; // thanks, SDL_ttf, we love you too
+	SDL_Rect dest;
+	dest.x = x; dest.y = y;
+	dest.w = textsurf->w * 0.6; dest.h = textsurf->h;
+	SDL_BlitScaled(textsurf, nullptr, surface, &dest);
 
-	SDL_Rect destrect;
-	destrect.x = x; destrect.y = y;	
-	SDL_BlitSurface(textsurf, NULL, surface, &destrect);
+	SDL_DestroyRenderer(renderer);
 	SDL_FreeSurface(textsurf);
 }
 
@@ -557,14 +544,10 @@ void SDLBackend::delay(int msec) {
 }
 
 unsigned int SDLBackend::textWidth(std::string text) {
-	if (!basicfont) return 0;
 	if (text.size() == 0) return 0;
 
-	int w, h;
-
-	if (TTF_SizeText(basicfont, text.c_str(), &w, &h))
-		return 0; // error
-	else
-		return w;
+	// 8x8 font, 2 pixels padding, scaled by 0.6
+	// TODO: how to actually calculate this?
+	return text.size() * (8 + 2) * 0.6;
 }
 
