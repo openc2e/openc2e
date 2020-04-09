@@ -20,6 +20,8 @@
 #include "qtopenc2e.h"
 #include "Engine.h"
 
+#include <QVBoxLayout>
+
 CreatureGrapher::CreatureGrapher(QtOpenc2e *p) : QWidget(p), parent(p) {
 	graph = new GraphWidget(this);
 	if (engine.version < 3) {

@@ -17,6 +17,8 @@
 #include "GraphWidget.h"
 #include "ChemicalSelector.h"
 
+#include <QWidget>
+
 class CreatureGrapher : public QWidget {
 	Q_OBJECT
 

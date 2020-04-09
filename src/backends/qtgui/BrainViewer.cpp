@@ -21,6 +21,10 @@
 #include "BrainViewer.h"
 #include "tools/braininavat/brainview.h"
 
+#include <QDialog>
+#include <QHBoxLayout>
+#include <QScrollArea>
+
 BrainViewer::BrainViewer(QWidget *parent) : QDialog(parent) {
 	scrollArea = new QScrollArea(this);
 	brainview = new BrainView();

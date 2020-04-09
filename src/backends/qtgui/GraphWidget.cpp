@@ -16,6 +16,9 @@
 
 #include "GraphWidget.h"
 
+#include <QPainter>
+#include <QPalette>
+
 GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
 	minvertical = -1.0f;
 	maxvertical = 1.0f;

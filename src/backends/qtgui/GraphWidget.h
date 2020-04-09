@@ -17,7 +17,7 @@
 #ifndef GRAPHWIDGET_H
 #define GRAPHWIDGET_H 1
 
-#include <QtGui>
+#include <QWidget>
 
 struct DataSetDetails {
 	bool visible;

@@ -17,7 +17,7 @@
 #ifndef BRAINVIEWER_H
 #define BRAINVIEWER_H 1
 
-#include <QtGui>
+#include <QDialog>
 
 class BrainViewer : public QDialog {
 	Q_OBJECT

@@ -14,9 +14,21 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <QAction>
+#include <QBitmap>
+#include <QComboBox>
+#include <QDockWidget>
+#include <QLabel>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QScrollBar>
+#include <QStatusBar>
+#include <QTimer>
+#include <QToolBar>
+
 #include "World.h"
 #include "qtopenc2e.h"
-#include <QtGui>
 #include "openc2eview.h"
 #include "Engine.h"
 #include "AudioBackend.h"
@@ -626,7 +638,7 @@ void QtOpenc2e::tick() {
 	}
 
 	if (viewport->needsRender()) {
-		viewport->viewport()->repaint();
+		viewport->viewport()->update();
 	}
 
 	unsigned int i = engine.msUntilTick();

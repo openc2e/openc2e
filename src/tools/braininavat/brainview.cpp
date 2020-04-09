@@ -3,7 +3,9 @@
 #include "../../creatures/c2eBrain.h"
 #include "../../creatures/oldBrain.h"
 
-#include <QtGui>
+#include <QHBoxLayout>
+#include <QPainter>
+#include <QPalette>
 #include "brainview.h"
 #include <fmt/printf.h>
 

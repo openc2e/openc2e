@@ -19,12 +19,16 @@
 #include "Camera.h"
 
 #include "openc2eview.h"
-#include <QtGui>
 #include "QtBackend.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+#include <QApplication>
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <QScrollBar>
 
 /*
  * TODO:
@@ -38,7 +42,6 @@
 openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstractScrollArea(parent) {
 	backend = b;
 
-	viewport()->setAttribute(Qt::WA_PaintOnScreen); // disable double-buffering
 	viewport()->setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background
 
 	// keyboard focus. needed? better way?
@@ -92,8 +95,6 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 }
 
 void openc2eView::paintEvent(QPaintEvent *) {
-	((QApplication *)QApplication::instance())->syncX();
-
 	if (!firsttime) {
 		// TODO: mad hax
 		if (currentwidth == viewport()->width() && currentheight == viewport()->height()) {

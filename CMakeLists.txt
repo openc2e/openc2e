@@ -139,24 +139,9 @@ SET(OPENC2E_QT
 	src/backends/qtgui/CreatureGrapher.cpp
 	src/backends/qtgui/ChemicalSelector.cpp
 	src/backends/qtgui/Hatchery.cpp
-	src/tools/braininavat/brainview.cpp)
-
-SET(OPENC2E_QT_MOC_HDRS
-	src/backends/qtgui/qtopenc2e.h
-	src/backends/qtgui/openc2eview.h
-	src/backends/qtgui/AgentInjector.h
-	src/backends/qtgui/BrainViewer.h
-	src/backends/qtgui/imagepreview.h
-	src/backends/qtgui/GraphWidget.h
-	src/backends/qtgui/CreatureGrapher.h
-	src/backends/qtgui/ChemicalSelector.h
-	src/backends/qtgui/Hatchery.h
-	src/tools/braininavat/brainview.h)
-
-SET(OPENC2E_QT_UIS
-	src/backends/qtgui/agents.ui)
-# 
-
+	src/tools/braininavat/brainview.cpp
+	src/backends/qtgui/agents.ui
+)
 
 cmake_minimum_required(VERSION 2.4.0)
 INCLUDE(TestBigEndian)
@@ -191,7 +176,10 @@ if(OPENC2E_USE_SERIALIZATION)
 	find_package(Boost 1.34.0 COMPONENTS serialization REQUIRED)
 endif()
 IF(OPENC2E_USE_QT)
-	find_package(Qt4 REQUIRED)
+	set(CMAKE_AUTOMOC ON)
+	set(CMAKE_AUTORCC ON)
+	set(CMAKE_AUTOUIC ON)
+	find_package(Qt5 COMPONENTS Widgets REQUIRED)
 ENDIF(OPENC2E_USE_QT)
 
 add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
@@ -210,12 +198,6 @@ ELSE()
 ENDIF()
 
 IF(OPENC2E_USE_QT)
-	include(${QT_USE_FILE})
-	SET(SAVED_CMAKE_CURRENT_BINARY_DIR CMAKE_CURRENT_BINARY_DIR)
-	SET(CMAKE_CURRENT_BINARY_DIR ${GEN})
-	QT4_WRAP_UI(OPENC2E_QT_UIS_H ${OPENC2E_QT_UIS})
-	QT4_WRAP_CPP(OPENC2E_QT_MOC_SRCS ${OPENC2E_QT_MOC_HDRS})
-	SET(CMAKE_CURRENT_BINARY_DIR SAVED_CMAKE_CURRENT_BINARY_DIR)
 	SET(QT_DEF "-DQT_SUPPORT")
 ENDIF(OPENC2E_USE_QT)
 
@@ -224,8 +206,8 @@ ADD_DEFINITIONS("-W -Wall -Wno-conversion -Wno-unused -D_REENTRANT -DYYERROR_VER
 set(CMAKE_CXX_STANDARD 11)
 
 IF(OPENC2E_USE_QT)
-	SET(FRONTEND_SRCS ${OPENC2E_SDL} ${OPENC2E_QT} ${OPENC2E_QT_UIS_H} ${OPENC2E_QT_MOC_SRCS})
-	SET(FRONTEND_LIBS ${QT_LIBRARIES})
+	SET(FRONTEND_SRCS ${OPENC2E_SDL} ${OPENC2E_QT})
+	SET(FRONTEND_LIBS Qt5::Widgets)
 ELSE(OPENC2E_USE_QT)
 	SET(FRONTEND_SRCS ${OPENC2E_SDL})
 	SET(FRONTEND_LIBS)

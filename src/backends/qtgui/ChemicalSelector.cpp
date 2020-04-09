@@ -6,7 +6,7 @@
 #include <iostream>
 #include "Engine.h"
 #include "Catalogue.h"
-#include <QtGui>
+#include <QHBoxLayout>
 #include <fmt/printf.h>
 
 ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {

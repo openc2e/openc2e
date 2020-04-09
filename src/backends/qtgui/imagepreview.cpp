@@ -40,7 +40,7 @@ void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 
 	if (engine.version == 1) {
 		QString filename = current->toolTip();
-		std::ifstream cobstream(filename.toAscii(), std::ios::binary);
+		std::ifstream cobstream(filename.toLatin1(), std::ios::binary);
 		if (cobstream.fail()) {
 			return; // TODO: throw some kind of warning or something
 		}
@@ -49,7 +49,7 @@ void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 
 		if (cobfile.imagewidth > 0 && cobfile.imageheight > 0) {
 			previewimg = QImage((uchar*)cobfile.imagedata.data(), cobfile.imagewidth, cobfile.imageheight, QImage::Format_Indexed8).mirrored();
-			previewimg.setNumColors(256);
+			previewimg.setColorCount(256);
 			unsigned char *palette = engine.getPalette();
 			if (palette) {
 				for (unsigned int i = 0; i < 256; i++) {

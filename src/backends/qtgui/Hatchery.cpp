@@ -21,7 +21,13 @@
 #include "mmapifstream.h"
 #include "qtopenc2e.h"
 
-#include <QtGui>
+#include <QBitmap>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsTextItem>
+#include <QGraphicsView>
+#include <QHBoxLayout>
 
 /*
   C1 hatchery resources:

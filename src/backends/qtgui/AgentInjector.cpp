@@ -130,7 +130,7 @@ void AgentInjector::onInject() {
 
 	if (engine.version == 1) {
 		QString filename = ui.agentList->currentItem()->toolTip();
-		std::ifstream cobstream(filename.toAscii(), std::ios::binary);
+		std::ifstream cobstream(filename.toLatin1(), std::ios::binary);
 		if (cobstream.fail()) {
 			return; // TODO: throw some kind of warning or something
 		}
