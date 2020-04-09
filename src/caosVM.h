@@ -21,13 +21,13 @@
 #define _CAOSVM_H
 
 #include "openc2e.h"
+#include <array>
 #include <map>
 #include <istream>
 #include <ostream>
 #include "AgentRef.h"
 #include "caosVar.h"
 #include "alloc_count.h"
-#include "lazy_array.h"
 
 #include <mpark/variant.hpp>
 using std::weak_ptr;
@@ -189,7 +189,7 @@ public:
 	std::ostream *outputstream;
 
 	// ...which includes variables accessible to script
-	lazy_array<caosVar, 100, caosVM_var_init> var;
+	std::array<caosVar, 100> var;
 	caosVar _p_[2]; // might want to add this onto the end of above map, if done
 	AgentRef targ, owner, _it_;
 	caosVar from;

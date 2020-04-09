@@ -48,7 +48,7 @@ caosVM::caosVM(const AgentRef &o)
 {
 	owner = o;
 	currentscript.reset();
-	var.reduce(0);
+	std::fill(var.begin(), var.end(), 0);
 	cip = nip = 0;
 	blocking = NULL;
 	inputstream = 0; outputstream = 0;
@@ -340,14 +340,13 @@ inline void caosVM::runOp() {
 void caosVM::stop() {
 	lock = false;
 	currentscript.reset();
-	var.reduce(0);
+	std::fill(var.begin(), var.end(), 0);
 }
 
 void caosVM::runEntirely(shared_ptr<script> s) {
 	// caller is responsible for resetting/setting *all* state!
 	cip = nip = runops = 0;
 	currentscript = s;
-	var.ensure(currentscript->varsNeeded());
 
 	while (true) {
 		runOp();
@@ -368,7 +367,6 @@ bool caosVM::fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm) {
 
 	resetScriptState();
 	currentscript = s;
-	var.ensure(currentscript->varsNeeded());
 	targ = owner;
 	from.setAgent(frm);
 	timeslice = 1;
@@ -404,7 +402,7 @@ void caosVM::resetCore() {
 	part = 0;
 
 	_p_[0].reset(); _p_[0].setInt(0); _p_[1].reset(); _p_[1].setInt(0);
-	var.reduce(0);
+	std::fill(var.begin(), var.end(), 0);
 
 	camera.reset();
 

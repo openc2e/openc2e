@@ -412,8 +412,6 @@ void caosVM::v_CAOS() {
 	sub->resetCore();
 	
 	if (inl) {
-		var.ensure(100);
-		sub->var.ensure(100);
 		sub->targ = targ;
 		sub->_it_ = _it_;
 		sub->part = part;
