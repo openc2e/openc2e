@@ -219,7 +219,62 @@ Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 		// TODO
 	
 		/* eggs */
-		// TODO
+		QColor maskcolour2(0x00, 0xff, 0x00);
+		std::string egg1 = world.findFile("hatchery/EGG0.bmp");
+		if (egg1.size())
+		  {
+		    QPixmap eggbmp1(QString(egg1.c_str()));
+		    eggbmp1.setMask(eggbmp1.createMaskFromColor(maskcolour2));
+				    
+		    QGraphicsPixmapItem *eggpm1 = graphicsScene->addPixmap(eggbmp1);
+		    eggpm1->setPos(50, 150);
+		    
+		  }
+		std::string egg2 = world.findFile("hatchery/EGG1.bmp");
+		if (egg2.size())
+		  {
+		    QPixmap eggbmp2(QString(egg2.c_str()));
+		    eggbmp2.setMask(eggbmp2.createMaskFromColor(maskcolour2));
+
+		    QGraphicsPixmapItem *eggpm2 = graphicsScene->addPixmap(eggbmp2);
+		    eggpm2->setPos(80, 145);
+		  }
+		std::string egg3 = world.findFile("hatchery/EGG2.bmp");
+		if (egg3.size())
+		  {
+		    QPixmap eggbmp3(QString(egg3.c_str()));
+		    eggbmp3.setMask(eggbmp3.createMaskFromColor(maskcolour2));
+
+		    QGraphicsPixmapItem *eggpm3 = graphicsScene->addPixmap(eggbmp3);
+		    eggpm3->setPos(110, 150);
+		  }
+		std::string egg4 = world.findFile("hatchery/EGG3.bmp");
+		if (egg4.size())
+		  {
+		    QPixmap eggbmp4(QString(egg4.c_str()));
+		    eggbmp4.setMask(eggbmp4.createMaskFromColor(maskcolour2));
+
+		    QGraphicsPixmapItem *eggpm4 = graphicsScene->addPixmap(eggbmp4);
+		    eggpm4->setPos(140, 140);
+		  }
+		std::string egg5 = world.findFile("hatchery/EGG4.bmp");
+		if (egg5.size())
+		  {
+		    QPixmap eggbmp5(QString(egg5.c_str()));
+		    eggbmp5.setMask(eggbmp5.createMaskFromColor(maskcolour2));
+
+		    QGraphicsPixmapItem *eggpm5 = graphicsScene->addPixmap(eggbmp5);
+		    eggpm5->setPos(170, 155);
+		  }
+		std::string egg6 = world.findFile("hatchery/EGG5.bmp");
+		if (egg6.size())
+		  {
+		    QPixmap eggbmp6(QString(egg6.c_str()));
+		    eggbmp6.setMask(eggbmp6.createMaskFromColor(maskcolour2));
+
+		    QGraphicsPixmapItem *eggpm6 = graphicsScene->addPixmap(eggbmp6);
+		    eggpm6->setPos(200, 150);
+		  }
 	
 		/* gender marker animation */
 		// TODO
