@@ -32,10 +32,9 @@
 #include "Camera.h"
 
 #include <ghc/filesystem.hpp>
-#include <boost/program_options.hpp>
+#include <cxxopts.hpp>
 #include <fmt/printf.h>
 namespace fs = ghc::filesystem;
-namespace po = boost::program_options;
 
 #ifndef _WIN32
 #include <sys/types.h> // passwd*
@@ -573,32 +572,29 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 	available_audiobackends = "Select the audio backend (options: " + available_audiobackends + "), default is " + preferred_audiobackend;
 	
 	// parse the command-line flags
-	po::options_description desc;
+	cxxopts::Options desc("openc2e", "");
 	desc.add_options()
-		("help,h", "Display help on command-line options")
-		("version,V", "Display openc2e version")
-		("silent,s", "Disable all sounds")
-		("backend,k", po::value<std::string>(&preferred_backend)->composing(), available_backends.c_str())
-		("audiobackend,o", po::value<std::string>(&preferred_audiobackend)->composing(), available_audiobackends.c_str())
-		("data-path,d", po::value< std::vector<std::string> >(&data_vec)->composing(),
-		 "Sets or adds a path to a data directory")
-		("bootstrap,b", po::value< std::vector<std::string> >(&cmdline_bootstrap)->composing(),
-		 "Sets or adds a path or COS file to bootstrap from")
-		("gametype,g", po::value< std::string >(&world.gametype), "Set the game type (c1, c2, cv or c3)")
-		("gamename,m", po::value< std::string >(&gamename), "Set the game name")
-		("norun,n", "Don't run the game, just execute scripts")
-		("autokill,a", "Enable autokill")
+		("h,help", "Display help on command-line options")
+		("V,version", "Display openc2e version")
+		("s,silent", "Disable all sounds")
+		("k,backend", available_backends, cxxopts::value<std::string>(preferred_backend))
+		("o,audiobackend", available_audiobackends, cxxopts::value<std::string>(preferred_audiobackend))
+		("d,data-path", "Sets or adds a path to a data directory",
+		 cxxopts::value<std::vector<std::string>>(data_vec))
+		("b,bootstrap", "Sets or adds a path or COS file to bootstrap from",
+		 cxxopts::value<std::vector<std::string>>(cmdline_bootstrap))
+		("g,gametype", "Set the game type (c1, c2, cv or c3)", cxxopts::value<std::string>(world.gametype))
+		("m,gamename", "Set the game name", cxxopts::value<std::string>(gamename))
+		("n,norun", "Don't run the game, just execute scripts")
+		("a,autokill", "Enable autokill")
 		("autostop", "Enable autostop (or disable it, for CV)")
 		;
-	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
-	po::notify(vm);
-
+	auto vm = desc.parse(argc, argv);
 	cmdline_enable_sound = !vm.count("silent");
 	cmdline_norun = vm.count("norun");
 	
 	if (vm.count("help")) {
-		std::cout << desc << std::endl;
+		std::cout << desc.help() << std::endl;
 		return false;
 	}
 

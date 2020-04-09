@@ -187,11 +187,12 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(SDL_gfx REQUIRED)
 FIND_PACKAGE(SDL_ttf REQUIRED)
 
-FIND_PACKAGE(Boost 1.34.0 COMPONENTS program_options serialization REQUIRED)
+FIND_PACKAGE(Boost 1.34.0 COMPONENTS serialization REQUIRED)
 IF(OPENC2E_USE_QT)
 	find_package(Qt4 REQUIRED)
 ENDIF(OPENC2E_USE_QT)
 
+add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
 add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
@@ -236,8 +237,8 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	${SDLGFX_LIBRARY}
 	${SDLMIXER_LIBRARY}
 	${FRONTEND_LIBS}
-	Boost::program_options
 	Boost::serialization
+	cxxopts
 	fmt
 	ghc_filesystem
 	mpark_variant
