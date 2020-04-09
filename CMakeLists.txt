@@ -4,7 +4,6 @@ project(openc2e)
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 set(BIN "${CMAKE_CURRENT_BINARY_DIR}")
 set(GEN "${BIN}/generated")
-execute_process(COMMAND mkdir -p "${GEN}")
 
 set(CMAKE_MODULE_PATH "${SRC}/cmake" "${SRC}/externals/aminosbh-sdl2-cmake-modules")
 
@@ -246,6 +245,7 @@ include_directories(BEFORE
 file(GLOB CAOSVM_FILES ${SRC}/src/caos/caosVM_*.cpp)
 add_custom_command(
 	OUTPUT ${GEN}/commandinfo.json
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND ${Python_EXECUTABLE} parsedocs.py ${CAOSVM_FILES} > ${GEN}/commandinfo.json
 	DEPENDS parsedocs.py ${CAOSVM_FILES}
 	WORKING_DIRECTORY ${SRC})
@@ -269,36 +269,42 @@ add_custom_command(
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
 add_custom_command(
 	OUTPUT ${GEN}/cataloglexer.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND re2c -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c
 	DEPENDS ${SRC}/src/cataloglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/cmddata.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND ${Python_EXECUTABLE} writecmds.py ${GEN}/commandinfo.json > ${GEN}/cmddata.cpp
 	DEPENDS ${GEN}/commandinfo.json writecmds.py
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/caoslexer.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND re2c -o ${GEN}/caoslexer.cpp ${SRC}/src/caoslexer.re2c
 	DEPENDS ${SRC}/src/caoslexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/mnglexer.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND re2c -o ${GEN}/mnglexer.cpp ${SRC}/src/music/mnglexer.re2c
 	DEPENDS ${SRC}/src/music/mnglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/prayfile/PraySourceParser.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/prayfile"
 	COMMAND re2c -o ${GEN}/prayfile/PraySourceParser.cpp ${SRC}/src/prayfile/PraySourceParser.re2c
 	DEPENDS ${SRC}/src/prayfile/PraySourceParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" src/music/mngparser.ypp
 	DEPENDS src/music/mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
