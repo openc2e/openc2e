@@ -17,7 +17,7 @@
  *
  */
 
-#include "pray.h"
+#include "prayfile/pray.h"
 
 #include "prayManager.h"
 #include "exceptions.h"

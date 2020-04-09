@@ -1,4 +1,4 @@
-#include "pray.h"
+#include "prayfile/pray.h"
 #include <iostream>
 #include <fstream>
 #include <unistd.h>

@@ -17,7 +17,7 @@
  *
  */
 
-#include "pray.h"
+#include "prayfile/pray.h"
 #include "exceptions.h"
 #include "endianlove.h"
 #include "zlib.h"

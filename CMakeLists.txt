@@ -104,7 +104,6 @@ set(OPENC2E_CORE
 	src/physics.cpp
 	src/PointerAgent.cpp
 	src/Port.cpp
-	src/pray.cpp
 	src/prayManager.cpp
 	src/renderable.cpp
 	src/Room.cpp
@@ -204,7 +203,7 @@ else()
 endif()
 add_executable(openc2e ${OPENC2E_CORE} ${FRONTEND_SRCS} ${SDLMIXER_SRC} ${SER_SRCS})
 
-target_link_libraries(openc2e z m pthread
+target_link_libraries(openc2e m pthread
 	SDL2::Core
 	SDL2::Net
 	SDL2::TTF
@@ -220,6 +219,13 @@ target_link_libraries(openc2e z m pthread
 if (OPENC2E_USE_SERIALIZATION)
 	target_link_libraries(openc2e Boost::serialization)
 endif()
+
+add_library(prayfile src/prayfile/pray.cpp)
+target_link_libraries(prayfile PUBLIC ghc_filesystem z)
+target_link_libraries(openc2e prayfile)
+
+add_executable(praydumper src/tools/praydumper.cpp)
+target_link_libraries(praydumper prayfile)
 
 include_directories(BEFORE
 	${GEN}
