@@ -21,7 +21,7 @@
 #include <QApplication>
 #include <QWidget>
 #include <QPainter>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 #include <iostream>
 #include "exceptions.h"
 

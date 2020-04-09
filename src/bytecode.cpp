@@ -19,10 +19,7 @@
 #include "bytecode.h"
 #include "dialect.h"
 #include "cmddata.h"
-#include <boost/format.hpp>
-
-using boost::format;
-using boost::str;
+#include <fmt/printf.h>
 
 const char *cnams[] = {
 	NULL,
@@ -38,7 +35,7 @@ const char *cnams[] = {
 static std::string try_lookup(const Dialect *d, int idx) {
 	if (d)
 		return std::string(d->getcmd(idx)->fullname);
-	return str(format("%d") % idx);
+	return fmt::sprintf("%d", idx);
 }
 
 std::string dumpOp(const Dialect *d, caosOp op) {
@@ -47,41 +44,41 @@ std::string dumpOp(const Dialect *d, caosOp op) {
 		case CAOS_NOP:
 			return std::string("NOP");
 		case CAOS_DIE:
-			return str(format("DIE %d") % arg);
+			return fmt::sprintf("DIE %d", arg);
 		case CAOS_STOP:
 			return std::string("STOP");
 		case CAOS_CMD:
-			return str(format("CMD %s") % try_lookup(d, arg));
+			return fmt::sprintf("CMD %s", try_lookup(d, arg));
 		case CAOS_COND:
-			return str(format("COND %s %s") % (arg & CAND ? "AND" : "OR") % cnams[arg & CMASK]);
+			return fmt::sprintf("COND %s %s", (arg & CAND ? "AND" : "OR"), cnams[arg & CMASK]);
 		case CAOS_CONST:
-			return str(format("CONST %d") % arg);
+			return fmt::sprintf("CONST %d", arg);
 		case CAOS_CONSTINT:
-			return str(format("CONSTINT %d") % arg);
+			return fmt::sprintf("CONSTINT %d", arg);
 		case CAOS_BYTESTR:
-			return str(format("BYTESTR %d") % arg);
+			return fmt::sprintf("BYTESTR %d", arg);
 		case CAOS_PUSH_AUX:
-			return str(format("PUSH AUX %d") % arg);
+			return fmt::sprintf("PUSH AUX %d", arg);
 		case CAOS_RESTORE_AUX:
-			return str(format("RESTORE AUX %d") % arg);
+			return fmt::sprintf("RESTORE AUX %d", arg);
 		case CAOS_SAVE_CMD:
-			return str(format("CMD SAVE %s") % try_lookup(d, arg));
+			return fmt::sprintf("CMD SAVE %s", try_lookup(d, arg));
 		case CAOS_YIELD:
-			return str(format("YIELD %d") % arg);
+			return fmt::sprintf("YIELD %d", arg);
 		case CAOS_STACK_ROT:
-			return str(format("STACK ROT %d") % arg);
+			return fmt::sprintf("STACK ROT %d", arg);
 
 		case CAOS_CJMP:
-			return str(format("CJMP %08d") % arg);
+			return fmt::sprintf("CJMP %08d", arg);
 		case CAOS_JMP:
-			return str(format("JMP %08d") % arg);
+			return fmt::sprintf("JMP %08d", arg);
 		case CAOS_DECJNZ:
-			return str(format("DECJNZ %08d") % arg);
+			return fmt::sprintf("DECJNZ %08d", arg);
 		case CAOS_GSUB:
-			return str(format("GSUB %08d") % arg);
+			return fmt::sprintf("GSUB %08d", arg);
 		case CAOS_ENUMPOP:
-			return str(format("ENUMPOP %08d") % arg);
+			return fmt::sprintf("ENUMPOP %08d", arg);
 		default:
-			return str(format("UNKNOWN %02x %06x") % arg);
+			return fmt::sprintf("UNKNOWN %02x %06x", arg);
 	}
 }

@@ -29,7 +29,7 @@
 
 #include <cctype> // toupper/tolower
 #include <algorithm> // transform
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 #include "Vehicle.h"
 #include "PointerAgent.h"
@@ -623,10 +623,10 @@ void caosVM::v_VTOS() {
 	VM_PARAM_DECIMAL(value)
 
 	if (value.hasInt()) {
-		result.setString(boost::str(boost::format("%i") % value.getInt()));
+		result.setString(fmt::sprintf("%i", value.getInt()));
 	} else {
 		// TODO: this format isn't right (see OUTS also)
-		result.setString(boost::str(boost::format("%f") % value.getFloat()));
+		result.setString(fmt::sprintf("%f", value.getFloat()));
 	}
 }
 

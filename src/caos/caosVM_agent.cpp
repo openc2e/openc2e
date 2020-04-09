@@ -26,7 +26,7 @@
 #include "World.h"
 #include "creaturesImage.h"
 #include <iostream>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 #include "AgentHelpers.h"
 #include "Room.h" // LIML/LIMT etc
 #include "Engine.h" // C2 hack in POSE
@@ -1792,7 +1792,7 @@ void caosVM::c_BHVR_c2() {
 		default:
 			// C2, at least, seems to produce random garbage (going off the end of a
 			// lookup table?) in this situation .. let's not
-			throw creaturesException(boost::str(boost::format("silly BHVR click value: %d") % click));
+			throw creaturesException(fmt::sprintf("silly BHVR click value: %d", click));
 	}
 
 	// TODO

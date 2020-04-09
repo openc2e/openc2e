@@ -1199,7 +1199,7 @@ class caosVM__lval {
 #define STUB throw caosException("stub in " __FILE__)
 
 // FIXME: use do { ... } while (0)
-#define valid_agent(x) do { if (!(x)) throw invalidAgentException(boost::str(boost::format("Invalid agent handle: %s thrown from %s:%d") % #x % __FILE__ % __LINE__)); } while(0)
+#define valid_agent(x) do { if (!(x)) throw invalidAgentException(fmt::sprintf("Invalid agent handle: %s thrown from %s:%d", #x, __FILE__, __LINE__)); } while(0)
 
 #endif
 /* vim: set noet: */

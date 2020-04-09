@@ -22,7 +22,7 @@
 #include "World.h"
 #include <fstream>
 #include <iostream>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
@@ -93,7 +93,7 @@ void caosVM::c_FILE_GLOB() {
 
 	std::vector<std::string> possiblefiles = world.findFiles(dirportion, specportion);
 
-	std::string str = boost::str(boost::format("%d\n") % possiblefiles.size());
+	std::string str = fmt::sprintf("%d\n", possiblefiles.size());
 	for (std::vector<std::string>::iterator i = possiblefiles.begin(); i != possiblefiles.end(); i++) {
 		str += *i + "\n";
 	}
@@ -201,7 +201,7 @@ void caosVM::c_FILE_OOPE() {
 
 	if (outputstream->fail()) {
 		outputstream = 0;
-		throw caosException(boost::str(boost::format("FILE OOPE failed to open %s") % fullfilename));
+		throw caosException(fmt::sprintf("FILE OOPE failed to open %s", fullfilename));
 	}
 }
 

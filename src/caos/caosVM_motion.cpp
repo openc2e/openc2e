@@ -25,7 +25,7 @@
 #include "Engine.h" // version
 #include "Camera.h" // FLTX/FLTY
 #include <iostream>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 #include <climits>
 using std::cerr;
 
@@ -450,7 +450,7 @@ void caosVM::c_MVSF() {
 	valid_agent(targ);
 
 	if (!targ->tryMoveToPlaceAround(x, y))
-		throw creaturesException(boost::str(boost::format("MVSF failed to find a safe place around (%d, %d)") % x % y));	
+		throw creaturesException(fmt::sprintf("MVSF failed to find a safe place around (%d, %d)", x, y));
 }
 
 /**

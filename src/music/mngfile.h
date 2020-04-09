@@ -23,7 +23,7 @@
 #include <istream>
 #include <cmath>
 #include "openc2e.h"
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 void mngrestart(std::istream *is);
 
@@ -129,7 +129,7 @@ protected:
 
 public:
 	MNGConstantNode(float n) { value = n; }
-	std::string dump() { return boost::str(boost::format("%f") % value); }
+	std::string dump() { return fmt::sprintf("%f", value); }
 	float getValue() { return value; }
 };
 

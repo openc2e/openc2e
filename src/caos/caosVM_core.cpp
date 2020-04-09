@@ -23,12 +23,10 @@
 #include "Engine.h"
 #include <iostream>
 
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 using std::cout;
 using std::cerr;
-
-using boost::format;
 
 /**
  OUTX (command) val (string)
@@ -96,12 +94,12 @@ void caosVM::c_OUTV() {
 	if (!outputstream) return;
 	
 	if (val.hasFloat()) {
-		*outputstream << boost::format("%0.06f") % val.getFloat();
+		*outputstream << fmt::sprintf("%0.06f", val.getFloat());
 	} else if (val.hasInt()) {
 		*outputstream << val.getInt();
 	} else if (val.hasVector()) {
 		const Vector<float> &v = val.getVector();
-		*outputstream << boost::format("(%0.6f, %0.6f)") % v.x % v.y;
+		*outputstream << fmt::sprintf("(%0.6f, %0.6f)", v.x, v.y);
 	} else throw badParamException();
 }
 

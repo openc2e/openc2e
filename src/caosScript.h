@@ -98,18 +98,18 @@ class script {
 
 		caosVar getConstant(int idx) const {
 			if (idx < 0 || (size_t)idx >= consts.size()) {
-				throw caosException(boost::str(
-						boost::format("Internal error: const %d out of range") % idx
-				));
+				throw caosException(
+						fmt::sprintf("Internal error: const %d out of range", idx)
+				);
 			}
 			return consts[idx];
 		}
 
 		bytestring_t getBytestr(int idx) const {
 			if (idx < 0 || (size_t)idx >= bytestrs.size()) {
-				throw caosException(boost::str(
-						boost::format("Internal error: const %d out of range") % idx
-				));
+				throw caosException(
+						fmt::sprintf("Internal error: const %d out of range", idx)
+				);
 			}
 			return bytestrs[idx];
 		}

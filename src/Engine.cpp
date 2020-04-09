@@ -33,7 +33,7 @@
 
 #include <ghc/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 namespace fs = ghc::filesystem;
 namespace po = boost::program_options;
 
@@ -210,7 +210,7 @@ void Engine::update() {
 	// TODO: is this the right place for this?
 	if (version == 1 && (world.tickcount % 70) == 0) {
 		int piece = 1 + (rand() % 28);
-		std::string filename = boost::str(boost::format("MU%02d") % piece);
+		std::string filename = fmt::sprintf("MU%02d", piece);
 		std::shared_ptr<AudioSource> s = world.playAudio(filename, AgentRef(), false, false, true);
 		if (s) s->setVolume(0.4f);
 	}
@@ -686,7 +686,7 @@ bool Engine::initialSetup() {
 		version = 3;
 		bmprenderer = true;
 	} else
-		throw creaturesException(boost::str(boost::format("unknown gametype '%s'!") % world.gametype));
+		throw creaturesException(fmt::sprintf("unknown gametype '%s'!", world.gametype));
 
 	// finally, add our cache directory to the end
 	world.data_directories.push_back(storageDirectory());
@@ -749,7 +749,7 @@ bool Engine::initialSetup() {
 			fs::create_directory(p);
 		if (fs::is_directory(p)) {
 			std::ofstream f((p.string() + "/port").c_str(), std::ios::trunc);
-			f << boost::str(boost::format("%d") % listenport);
+			f << fmt::sprintf("%d", listenport);
 		}
 #endif
 	}

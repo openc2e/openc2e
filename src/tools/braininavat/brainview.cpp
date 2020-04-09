@@ -5,7 +5,7 @@
 
 #include <QtGui>
 #include "brainview.h"
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 BrainView::BrainView() {
 	creature = 0;
@@ -93,7 +93,7 @@ std::string niceNameForOldLobe(unsigned int id) {
 		case 7: return "attention";
 		case 8: return "concept";
 	}
-	return boost::str(boost::format("lobe %d") % (int)id);
+	return fmt::sprintf("lobe %d", (int)id);
 }
 
 void BrainView::drawOldBrain(oldBrain *b) {

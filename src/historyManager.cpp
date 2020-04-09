@@ -25,7 +25,7 @@
 #include "creatures/Creature.h"
 #include "Engine.h" // version
 
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 historyevent::historyevent(unsigned int eno, CreatureAgent *c) {
 	timestamp = time(NULL);
@@ -163,7 +163,7 @@ std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
 
 	if (engine.version > 2) {
 		const std::vector<std::string> *extensions = 0;
-		std::string tagname = boost::str(boost::format("Moniker Friendly Names %i") % genus);
+		std::string tagname = fmt::sprintf("Moniker Friendly Names %i", genus);
 	
 		if (catalogue.hasTag(tagname)) {
 			extensions = &catalogue.getTag(tagname);

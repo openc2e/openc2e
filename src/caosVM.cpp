@@ -25,7 +25,7 @@
 #include <iostream>
 #include <climits>
 
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 using std::cout;
 using std::cerr;
@@ -84,11 +84,11 @@ inline void caosVM::safeJMP(int dest) {
 //	std::cerr << "jmp from " << cip << " to " << dest << "(old nip = " << nip << ") in script of length " << currentscript->scriptLength() << std::endl;
 	if (dest < 0) {
 		std::cerr << currentscript->dump();
-		throw caosException(boost::str(boost::format("Internal error: Unrelocated jump at %08x") % cip));
+		throw caosException(fmt::sprintf("Internal error: Unrelocated jump at %08x", cip));
 	}
 	if (dest >= currentscript->scriptLength()) {
 		std::cerr << currentscript->dump();
-		throw creaturesException(boost::str(boost::format("Internal error: Jump out of bounds at %08x") % cip));
+		throw creaturesException(fmt::sprintf("Internal error: Jump out of bounds at %08x", cip));
 	}
 	nip = dest;
 }
@@ -120,7 +120,10 @@ inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
 	if (stackdelta < INT_MAX - 1) {
 		if ((int)stackstart + stackdelta != (int)valueStack.size()) {
 			dumpStack(this);
-			throw caosException(boost::str(boost::format("Internal error: Stack imbalance detected: expected to be %d after start of %d, but stack size is now %d") % stackdelta % (int)stackstart % (int)valueStack.size()));
+			throw caosException(fmt::sprintf(
+				"Internal error: Stack imbalance detected: expected to be %d after start of %d, but stack size is now %d",
+				stackdelta, (int)stackstart, (int)valueStack.size()
+			));
 		}
 	}
 }
@@ -292,7 +295,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				break;
 			}
 		default:
-			throw creaturesException(boost::str(boost::format("Illegal opcode %d") % (int)op.opcode));
+			throw creaturesException(fmt::sprintf("Illegal opcode %d", (int)op.opcode));
 	}
 }
 
@@ -309,8 +312,15 @@ inline void caosVM::runOp() {
 	try {
 		if (trace) {
 			std::cerr
-				<< boost::str(boost::format("optrace(%s): INST=%d TS=%d %p @%08d top=%s depth=%d ") % scr->filename.c_str() % (int)inst % (int)timeslice % (void *)this % cip % (valueStack.empty() ? std::string("(empty)") : valueStack.back().dump()) % valueStack.size())
-				<< dumpOp(currentscript->dialect, op) << std::endl;
+				<< fmt::sprintf(
+					"optrace(%s): INST=%d TS=%d %p @%08d top=%s depth=%d ",
+					scr->filename.c_str(), (int)inst, (int)timeslice,
+					(void *)this, cip,
+					(valueStack.empty() ? std::string("(empty)") : valueStack.back().dump()),
+					valueStack.size()
+				)
+				<< dumpOp(currentscript->dialect, op)
+				<< std::endl;
 			if (trace >= 2) {
 				dumpStack(this);
 			}

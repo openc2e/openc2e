@@ -25,7 +25,7 @@
 
 #include "catalogparser.h"
 #include <ghc/filesystem.hpp>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 #include <iostream>
 
 #include <cctype>
@@ -33,7 +33,6 @@
 #include "openc2e.h"
 #include "util.h"
 
-using boost::str;
 
 namespace fs = ghc::filesystem;
 
@@ -151,12 +150,12 @@ void Catalogue::initFrom(fs::path path) {
 
 std::string stringFromInt(int i) {
 	// TODO: hacky? also, put somewhere more appropriate
-	return boost::str(boost::format("%d") % i);
+	return fmt::sprintf("%d", i);
 }
 
 const std::string Catalogue::getAgentName(unsigned char family, unsigned char genus, unsigned short species) const {
 	std::string buf;
-	buf = str(boost::format("Agent Help %d %d %d") % (int)family % (int)genus % species);
+	buf = fmt::sprintf("Agent Help %d %d %d", (int)family, (int)genus, species);
 	if (hasTag(buf)) {
 		return getTag(buf)[0];
 	} else {

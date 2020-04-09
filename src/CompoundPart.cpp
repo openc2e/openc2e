@@ -76,8 +76,8 @@ void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
 			// hack for invalid poses - use the last sprite in the file (as real C2 does)
 			spriteno = getSprite()->numframes() - 1;
 		} else {
-			std::string err = boost::str(boost::format("pose to be rendered %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
-				pose % firstimg % base % getSprite()->getName() % getSprite()->numframes());
+			std::string err = fmt::sprintf("pose to be rendered %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)",
+			        pose, firstimg, base, getSprite()->getName(), getSprite()->numframes());
 			parent->unhandledException(err, false);
 			return;
 		}
@@ -98,8 +98,8 @@ void SpritePart::setPose(unsigned int p) {
 			spriteno = getSprite()->numframes() - 1;
 		} else {
 			// TODO: mention anim frame if animation is non-empty
-			std::string err = boost::str(boost::format("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)") %
-				p % firstimg % base % getSprite()->getName() % getSprite()->numframes());
+			std::string err = fmt::sprintf("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)",
+			        p, firstimg, base, getSprite()->getName(), getSprite()->numframes());
 			parent->unhandledException(err, false);
 			return;
 		}
@@ -172,7 +172,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 		} else if (engine.bmprenderer) {
 			// BLCK hasn't been called yet, so we can't check validity yet
 		} else {
-			throw caosException(boost::str(boost::format("Failed to create sprite part: first sprite %d is beyond %d sprite(s) in file") % firstimg % sprite->numframes()));
+			throw caosException(fmt::sprintf("Failed to create sprite part: first sprite %d is beyond %d sprite(s) in file", firstimg, sprite->numframes()));
 		}
 	}
 }
@@ -634,8 +634,8 @@ void AnimatablePart::updateAnimation() {
 
 			if (frameno >= animation.size()) {
 				// this is an internal error because it should have been validated at pose-setting time
-				std::string err = boost::str(boost::format("internal animation error: tried looping back to frame %d but that is beyond animation size %d") %
-					(int)frameno % (int)animation.size());
+				std::string err = fmt::sprintf("internal animation error: tried looping back to frame %d but that is beyond animation size %d",
+				        (int)frameno, (int)animation.size());
 				parent->unhandledException(err, false);
 				animation.clear();
 				return;

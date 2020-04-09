@@ -20,7 +20,7 @@
 #include "c2eBrain.h"
 #include "c2eCreature.h"
 #include <math.h>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 float dummyValues[8] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -181,9 +181,12 @@ std::string c2eTract::dump() {
 	std::string srclobename = std::string((char *)g->srclobe, 4);
 	std::string destlobename = std::string((char *)g->destlobe, 4);
 
-	std::string data = boost::str(boost::format("tract %s->%s, src neurons %d-%d #cons %d, dest neurons %d-%d #cons %d") % srclobename % destlobename
-		% (int)g->srclobe_lowerbound % (int)g->srclobe_upperbound % (int)g->src_noconnections
-		% (int)g->destlobe_lowerbound % (int)g->destlobe_upperbound % (int)g->dest_noconnections
+	std::string data = fmt::sprintf(
+		"tract %s->%s, src neurons %d-%d #cons %d, dest neurons %d-%d #cons %d",
+		srclobename, destlobename, (int)g->srclobe_lowerbound,
+		(int)g->srclobe_upperbound, (int)g->src_noconnections,
+		(int)g->destlobe_lowerbound, (int)g->destlobe_upperbound,
+		(int)g->dest_noconnections
 		);
 
 	if (g->migrates) data += ", migratory";

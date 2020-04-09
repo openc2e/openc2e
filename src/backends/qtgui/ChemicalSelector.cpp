@@ -7,7 +7,7 @@
 #include "Engine.h"
 #include "Catalogue.h"
 #include <QtGui>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 	for (unsigned int i = 0; i < 256; i++) {
@@ -84,7 +84,7 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 		for (unsigned int i = 0; i < t.size(); i++) {
 			std::string groupname = t[i];
 
-			std::string tagname = boost::str(boost::format("chemical graphing group %d") % (int)(i + 1));
+			std::string tagname = fmt::sprintf("chemical graphing group %d", (int)(i + 1));
 			if (catalogue.hasTag(tagname)) {
 				const std::vector<std::string> &t = catalogue.getTag(tagname);
 				for (unsigned int i = 0; i < t.size(); i++) {
@@ -98,7 +98,7 @@ ChemicalSelector::ChemicalSelector(CreatureGrapher *p): QWidget(p), parent(p) {
 
 	for (int i = 1; i < 255; i++) {
 		if (chemnames.find(i) == chemnames.end())
-			chemnames[i] = boost::str(boost::format("<%d>") % i);
+			chemnames[i] = fmt::sprintf("<%d>", i);
 	}
 
 	grouplist = new QListWidget(this);

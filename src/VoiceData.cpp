@@ -20,7 +20,7 @@
 #include "VoiceData.h"
 #include "streamutils.h"
 #include "Catalogue.h"
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 #define NUM_VOICE_FILES 32
 
@@ -63,8 +63,8 @@ VoiceData::VoiceData(std::string tagname) {
 		LookupTable.push_back(data);
 	}
 	if (LookupTable.size() != 3 * 27) throw creaturesException(
-		boost::str(boost::format("invalid lookup table size %d reading language tag '%s'")
-		% LookupTable.size() % languagetag));
+		fmt::sprintf("invalid lookup table size %d reading language tag '%s'",
+		        LookupTable.size(), languagetag));
 
 	// the remaining entries are pairs of (name, delay)
 	for (unsigned int i = 1; i < tagdata.size() - 1; i+=2) {
@@ -75,8 +75,8 @@ VoiceData::VoiceData(std::string tagname) {
 	}
 
 	if (Voices.size() != 32) throw creaturesException(
-		boost::str(boost::format("invalid voice table size %d reading voice tag '%s'")
-		% Voices.size() % tagname));
+		fmt::sprintf("invalid voice table size %d reading voice tag '%s'",
+		        Voices.size(), tagname));
 }
 
 std::vector<unsigned int> VoiceData::GetSentenceFor(std::string in) {

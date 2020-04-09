@@ -25,13 +25,11 @@
 
 #include <iostream>
 #include <sstream>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 
 #ifdef DONT_INLINE_CAOSVAR_ACCESSORS
 #error meh, copy the stuff out of caosVar.h and drop it here
 #endif
-
-using boost::str;
 
 static inline std::string stringify(double x) {
 	std::ostringstream o;
@@ -42,19 +40,19 @@ static inline std::string stringify(double x) {
 std::string caosVar::dump() const {
 	switch(getType()) {
 		case CAOSSTR:
-			return str(boost::format("String \"%s\" ") % getString());
+			return fmt::sprintf("String \"%s\" ", getString());
 			break;
 		case CAOSINT:
-			return str(boost::format("Int %d ") % getInt());
+			return fmt::sprintf("Int %d ", getInt());
 			break;
 		case CAOSFLOAT:
-			return str(boost::format("Float %f ") % getFloat());
+			return fmt::sprintf("Float %f ", getFloat());
 			break;
 		case CAOSAGENT:
-			return str(boost::format("Agent %p ") % (Agent *)getAgent().get());
+			return fmt::sprintf("Agent %p ", (void *)getAgent().get());
 			break;
 		case CAOSVEC:
-			return str(boost::format("Vector (%f, %f)") % getVector().x % getVector().y);
+			return fmt::sprintf("Vector (%f, %f)", getVector().x, getVector().y);
 			break;
 		default:
 			return "[bad caosVar!] ";

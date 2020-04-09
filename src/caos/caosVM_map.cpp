@@ -27,7 +27,7 @@
 
 #include <assert.h>
 #include <iostream>
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 using std::cerr;
 
 #define CAOS_LVALUE_TARG_ROOM(name, check, get, set) \
@@ -655,7 +655,7 @@ void caosVM::v_RLOC() {
 	shared_ptr<Room> r = world.map.getRoom(roomid);
 	caos_assert(r);
 
-	result.setString(boost::str(boost::format("%d %d %d %d %d %d") % r->x_left % r->x_right % r->y_left_ceiling % r->y_right_ceiling % r->y_left_floor % r->y_right_floor));
+	result.setString(fmt::sprintf("%d %d %d %d %d %d", r->x_left, r->x_right, r->y_left_ceiling, r->y_right_ceiling, r->y_left_floor, r->y_right_floor));
 }
 
 /**
@@ -670,7 +670,7 @@ void caosVM::v_MLOC() {
 	MetaRoom *r = world.map.getMetaRoom(metaroomid);
 	caos_assert(r);
 
-	result.setString(boost::str(boost::format("%d %d %d %d") % r->x() % r->y() % r->width() % r->height()));
+	result.setString(fmt::sprintf("%d %d %d %d", r->x(), r->y(), r->width(), r->height()));
 }
 
 /**
@@ -711,7 +711,7 @@ void caosVM::v_ERID() {
 		MetaRoom *r = world.map.getMetaRoom(metaroom_id);
 		for (std::vector<shared_ptr<Room> >::iterator i = r->rooms.begin(); i != r->rooms.end(); i++) {
 			if (out.size() > 0) out = out + " ";
-			out = out + boost::str(boost::format("%d") % (*i)->id);
+			out = out + fmt::sprintf("%d", (*i)->id);
 		}
 	}
 

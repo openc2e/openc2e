@@ -561,7 +561,7 @@ void QtOpenc2e::tick() {
 			if (world.timeofday < 5 && timeofdayimage->pixmap()->cacheKey() != timeofdayicon[world.timeofday].cacheKey()) {
 				timeofdayimage->setPixmap(timeofdayicon[world.timeofday]);
 			}
-			yeartext->setText(boost::str(boost::format("Year: %03i") % (int)world.year).c_str());
+			yeartext->setText(fmt::sprintf("Year: %03i", (int)world.year).c_str());
 		
 			shared_ptr<Room> room_for_tempcheck;
 			if (world.selectedcreature) { // prefer the room the selected creature is in
@@ -829,7 +829,7 @@ void QtOpenc2e::newEgg() {
 void QtOpenc2e::makeNewEgg() {
 	std::string eggscript;
 	/* create the egg obj */
-	eggscript = boost::str(boost::format("new: simp eggs 8 %d 2000 0\n") % ((rand() % 6) * 8));
+	eggscript = fmt::sprintf("new: simp eggs 8 %d 2000 0\n", ((rand() % 6) * 8));
 	/* set the pose */
 	eggscript += "pose 3\n";	
 	/* set the correct class/attributes */
@@ -839,7 +839,7 @@ void QtOpenc2e::makeNewEgg() {
 		eggscript += "setv cls2 2 5 2\nsetv attr 195\n";
 	/* create the genome */
 	if (engine.version == 1)
-		eggscript += boost::str(boost::format("new: gene tokn dad%d tokn mum%d obv0\n") % (1 + rand() % 6) % (1 + rand() % 6));
+		eggscript += fmt::sprintf("new: gene tokn dad%d tokn mum%d obv0\n", (1 + rand() % 6), (1 + rand() % 6));
 	else if (engine.version == 2)
 		eggscript += "new: gene tokn norn tokn norn obv0\n";
 	/* set the gender */
@@ -850,9 +850,9 @@ void QtOpenc2e::makeNewEgg() {
 	/* move it into place */
 	/* TODO: good positions? */
 	if (engine.version == 1)
-		eggscript += boost::str(boost::format("mvto %d 870\n") % (2600 + rand() % 200));
+		eggscript += fmt::sprintf("mvto %d 870\n", (2600 + rand() % 200));
 	else if (engine.version == 2)
-		eggscript += boost::str(boost::format("mvto %d 750\n") % (4900 + rand() % 350));
+		eggscript += fmt::sprintf("mvto %d 750\n", (4900 + rand() % 350));
 
 	/* c2: enable gravity */
 	if (engine.version == 2)

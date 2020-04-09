@@ -192,6 +192,7 @@ IF(OPENC2E_USE_QT)
 	find_package(Qt4 REQUIRED)
 ENDIF(OPENC2E_USE_QT)
 
+add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 
@@ -237,6 +238,7 @@ TARGET_LINK_LIBRARIES(openc2e z m pthread
 	${FRONTEND_LIBS}
 	Boost::program_options
 	Boost::serialization
+	fmt
 	ghc_filesystem
 	mpark_variant
 	)

@@ -24,7 +24,7 @@
 #include <iostream>
 #include "caosVM.h"
 #include "AudioBackend.h"
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 #include "Room.h"
 #include "Vehicle.h"
 #include "AgentHelpers.h"
@@ -626,7 +626,7 @@ void Agent::physicsTick() {
 					}
 					
 					// didn't work!
-					unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % srcx % srcy), false);
+					unhandledException(fmt::sprintf("out of room system at (%f, %f)", srcx, srcy), false);
 				}
 				displaycore = true;
 				falling = false;
@@ -796,7 +796,7 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 
 	if (!room) { // out of room system
 		if (!displaycore)
-			unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % src.x % src.y), false);
+			unhandledException(fmt::sprintf("out of room system at (%f, %f)", src.x, src.y), false);
 		falling = false;
 		displaycore = true;
 		return;
@@ -957,7 +957,7 @@ void Agent::physicsTickC2() {
 		MetaRoom *m = world.map.metaRoomAt(x, y);
 		if (!m) {
 			if (!displaycore)
-				unhandledException(boost::str(boost::format("out of room system at (%f, %f)") % x % y), false);
+				unhandledException(fmt::sprintf("out of room system at (%f, %f)", x, y), false);
 			falling = false;
 			displaycore = true;
 			return;
@@ -1459,9 +1459,9 @@ void Agent::join(unsigned int outid, AgentRef dest, unsigned int inid) {
 void Agent::setVoice(std::string name) {
 	if (engine.version < 3) {
 		std::string path = world.findFile(name + ".vce");
-		if (!path.size()) throw creaturesException(boost::str(boost::format("can't find %s.vce") % name));
+		if (!path.size()) throw creaturesException(fmt::sprintf("can't find %s.vce", name));
 		std::ifstream f(path.c_str());
-		if (!f.is_open()) throw creaturesException(boost::str(boost::format("can't open %s.vce") % name));
+		if (!f.is_open()) throw creaturesException(fmt::sprintf("can't open %s.vce", name));
 		voice = shared_ptr<VoiceData>(new VoiceData(f));
 	} else {
 		voice = shared_ptr<VoiceData>(new VoiceData(name));
