@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(openc2e)
 
-set(SRC "${OPENC2E_SOURCE_DIR}")
-set(BIN "${OPENC2E_BINARY_DIR}")
+set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
+set(BIN "${CMAKE_CURRENT_BINARY_DIR}")
 set(GEN "${BIN}/generated")
 execute_process(COMMAND mkdir -p "${GEN}")
 
