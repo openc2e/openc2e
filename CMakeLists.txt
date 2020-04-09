@@ -235,6 +235,9 @@ target_link_libraries(openc2e prayfile)
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper prayfile)
 
+add_executable(praybuilder src/tools/praybuilder.cpp)
+target_link_libraries(praybuilder prayfile)
+
 include_directories(BEFORE
 	${GEN}
 	${SRC}/src
