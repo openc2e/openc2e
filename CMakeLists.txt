@@ -155,6 +155,7 @@ else()
 endif()
 
 find_package(Python REQUIRED)
+add_subdirectory(externals/re2c EXCLUDE_FROM_ALL)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer)
