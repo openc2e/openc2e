@@ -1,0 +1,164 @@
+++++
+re2c
+++++
+
+=========================================
+convert regular expressions to C/C++ code
+=========================================
+
+:Manual section: 1
+
+SYNOPSIS
+========
+
+``re2c [OPTIONS] INPUT_FILE [-o OUTPUT_FILE]``
+
+DESCRIPTION
+===========
+
+Re2c is a lexer generator for C/C++. It finds regular expression specifications
+inside of C/C++ comments and compiles them to a deterministic finite state
+machine. The user should write some `interface code`_ in order to bind the
+generated lexer to the program environment.
+Sections `EOF handling`_ and `buffer refilling`_ explain how the generated lexer
+checks for the end of input and (if necessary) asks for more input.
+Various re2c features are described in sections `include files`_,
+`header files`_, `submatch extraction`_, `storable state`_, `reusable blocks`_,
+`encoding support`_, `start conditions`_, `skeleton programs`_ and
+`visualization and debug`_.
+Re2c provides a lot of `options`_, `configurations`_ and `directives`_ that
+allow one to customize the generated code.
+
+Options
+=======
+.. include:: @top_srcdir@/doc/manual/options/options.rst_
+.. include:: @top_srcdir@/doc/manual/options/debug.rst_
+.. include:: @top_srcdir@/doc/manual/options/internal.rst_
+
+Warnings
+========
+.. include:: @top_srcdir@/doc/manual/warnings/warnings_general.rst_
+.. include:: @top_srcdir@/doc/manual/warnings/warnings_list.rst_
+
+Syntax
+======
+.. include:: @top_srcdir@/doc/manual/syntax/syntax.rst_
+
+Regular expressions
+===================
+.. include:: @top_srcdir@/doc/manual/regexps/regular_expressions.rst_
+
+Interface code
+==============
+.. include:: @top_srcdir@/doc/manual/api/interface.rst_
+.. include:: @top_srcdir@/doc/manual/api/api.rst_
+
+Directives
+==============
+.. include:: @top_srcdir@/doc/manual/directives/directives.rst_
+
+Configurations
+==============
+.. include:: @top_srcdir@/doc/manual/configurations/configurations.rst_
+
+EOF handling
+============
+.. include:: @top_srcdir@/doc/manual/eof/eof.rst_
+.. include:: @top_srcdir@/doc/manual/eof/01_sentinel.rst_
+.. include:: @top_srcdir@/doc/manual/eof/01_sentinel.re
+    :literal:
+    :code: c
+.. include:: @top_srcdir@/doc/manual/eof/02_bounds_checking.rst_
+.. include:: @top_srcdir@/doc/manual/eof/02_bounds_checking.re
+    :literal:
+    :code: c
+.. include:: @top_srcdir@/doc/manual/eof/03_eof_rule.rst_
+.. include:: @top_srcdir@/doc/manual/eof/03_eof_rule.re
+    :literal:
+    :code: c
+.. include:: @top_srcdir@/doc/manual/eof/04_generic_api.rst_
+.. include:: @top_srcdir@/doc/manual/eof/04_generic_api.re
+    :literal:
+    :code: c
+
+Buffer refilling
+================
+.. include:: @top_srcdir@/doc/manual/fill/fill.rst_
+.. include:: @top_srcdir@/doc/manual/fill/01_fill.rst_
+.. include:: @top_srcdir@/doc/manual/fill/01_fill.re
+    :literal:
+    :code: c
+.. include:: @top_srcdir@/doc/manual/fill/02_fill.rst_
+.. include:: @top_srcdir@/doc/manual/fill/02_fill.re
+    :literal:
+    :code: c
+
+Include files
+=============
+.. include:: @top_srcdir@/doc/manual/includes/includes.rst_
+
+Header files
+============
+.. include:: @top_srcdir@/doc/manual/headers/headers.rst_
+
+Submatch extraction
+===================
+.. include:: @top_srcdir@/doc/manual/submatch/submatch.rst_
+.. include:: @top_srcdir@/doc/manual/submatch/submatch_example_stags.rst_
+.. include:: @top_srcdir@/doc/manual/submatch/stags.re
+    :literal:
+    :code: c
+.. include:: @top_srcdir@/doc/manual/submatch/submatch_example_posix.rst_
+.. include:: @top_srcdir@/doc/manual/submatch/posix.re
+    :literal:
+    :code: c
+.. include:: @top_srcdir@/doc/manual/submatch/submatch_example_mtags.rst_
+.. include:: @top_srcdir@/doc/manual/submatch/mtags.re
+    :literal:
+    :code: c
+
+Storable state
+==============
+.. include:: @top_srcdir@/doc/manual/state/state.rst_
+.. include:: @top_srcdir@/doc/manual/state/push.re
+    :literal:
+    :code: c
+
+Reusable blocks
+===============
+.. include:: @top_srcdir@/doc/manual/reuse/reuse.rst_
+.. include:: @top_srcdir@/doc/manual/reuse/reuse.re
+    :literal:
+    :code: c
+
+Encoding support
+================
+.. include:: @top_srcdir@/doc/manual/encodings/encodings.rst_
+
+Start conditions
+================
+.. include:: @top_srcdir@/doc/manual/conditions/conditions.rst_
+
+Skeleton programs
+=================
+.. include:: @top_srcdir@/doc/manual/skeleton/skeleton.rst_
+
+Visualization and debug
+=======================
+.. include:: @top_srcdir@/doc/manual/dot/dot.rst_
+
+SEE ALSO
+========
+You can find more information about re2c at the official website: http://re2c.org.
+Similar programs are flex(1), lex(1), quex(http://quex.sourceforge.net).
+
+AUTHORS
+=======
+Re2c was originaly written by Peter Bumbulis in 1993.
+Since then it has been developed and maintained by multiple volunteers;
+mots notably, Brain Young, Marcus Boerger, Dan Nuffer and Ulya Trofimovich.
+
+VERSION INFORMATION
+===================
+This manpage describes re2c version @PACKAGE_VERSION@.
+
