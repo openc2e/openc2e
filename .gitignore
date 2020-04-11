@@ -1,13 +1,13 @@
-build
+build/
 out/
 .vs/
 
 # Game data dirs
-data
-c3data
-c2data
-c1data
-cadata
+./data
+./c3data
+./c2data
+./c1data
+./cadata
 
 # Misc debris
 .*.sw?
