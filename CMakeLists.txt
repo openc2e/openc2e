@@ -174,6 +174,7 @@ endif()
 add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
 add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
+add_subdirectory(externals/miniz EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 
 if (SDL2_MIXER_FOUND)
@@ -226,7 +227,7 @@ add_library(prayfile
 target_link_libraries(prayfile PUBLIC
 	ghc_filesystem
 	mpark_variant
-	z
+	PRIVATE miniz
 )
 target_link_libraries(openc2e prayfile)
 

@@ -4,7 +4,7 @@
 #include <cassert>
 #include <sstream>
 #include <vector>
-#include <zlib.h>
+#include <miniz.h>
 
 static void writeUInt32LE(std::ostream &stream, uint32_t value) {
   uint32_t swapped = swapEndianLong(value);

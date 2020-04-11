@@ -20,7 +20,7 @@
 #include "prayfile/pray.h"
 #include "exceptions.h"
 #include "endianlove.h"
-#include "zlib.h"
+#include <miniz.h>
 
 prayFile::prayFile(fs::path filepath) {
 	path = filepath;
