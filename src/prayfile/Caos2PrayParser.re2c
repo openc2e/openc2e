@@ -2,6 +2,7 @@
 #include "caoslexer.h"
 #include "token.h"
 
+#include <cassert>
 #include <regex>
 
 struct c2ptoken {
