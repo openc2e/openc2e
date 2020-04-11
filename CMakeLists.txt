@@ -298,8 +298,8 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 add_custom_command(
 	OUTPUT ${BIN}/openc2e.6
-	COMMAND pod2man --center="Openc2e Documentation" --section=6 ${SRC}/docs/openc2e.pod ${BIN}/openc2e.6
-	DEPENDS docs/openc2e.pod
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SRC}/docs/openc2e.6 ${BIN}/openc2e.6
+	DEPENDS docs/openc2e.6
 	)
 # it seems these add_custom_command for flex and bison could be made
 # into a macro... e.g. FLEX(file1) FLEX(file2) etc...
