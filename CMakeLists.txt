@@ -4,6 +4,7 @@ project(openc2e)
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 set(BIN "${CMAKE_CURRENT_BINARY_DIR}")
 set(GEN "${BIN}/generated")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "") # so openc2e can find the DLLs
 
 set(CMAKE_MODULE_PATH "${SRC}/cmake" "${SRC}/externals/aminosbh-sdl2-cmake-modules")
 
@@ -157,10 +158,27 @@ endif()
 find_package(Python REQUIRED)
 add_subdirectory(externals/re2c EXCLUDE_FROM_ALL)
 
-find_package(SDL2 REQUIRED)
-find_package(SDL2_mixer)
-find_package(SDL2_net REQUIRED)
-find_package(SDL2_gfx REQUIRED)
+if(WIN32)
+	add_subdirectory(externals/winflexbison EXCLUDE_FROM_ALL)
+	set(BISON_EXECUTABLE "win_bison")
+
+	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
+	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
+	add_subdirectory(externals/SDL2_net EXCLUDE_FROM_ALL)
+	add_subdirectory(externals/SDL2_gfx EXCLUDE_FROM_ALL)
+	add_library(SDL2::Core ALIAS SDL2)
+	add_library(SDL2::Mixer ALIAS SDL2_mixer)
+	add_library(SDL2::Net ALIAS SDL2_net)
+	add_library(SDL2::GFX ALIAS SDL2_gfx)
+else()
+	find_package(BISON REQUIRED)
+
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_mixer)
+	find_package(SDL2_net REQUIRED)
+	find_package(SDL2_gfx REQUIRED)
+endif()
+
 
 if (OPENC2E_USE_SERIALIZATION)
 	find_package(Boost 1.34.0 COMPONENTS serialization REQUIRED)
@@ -169,6 +187,10 @@ if (OPENC2E_USE_QT)
 	set(CMAKE_AUTOMOC ON)
 	set(CMAKE_AUTORCC ON)
 	set(CMAKE_AUTOUIC ON)
+	if(WIN32)
+		file(GLOB qt_directories "C:/Qt/Qt5.*/5.*/msvc*")
+		list(APPEND CMAKE_PREFIX_PATH ${qt_directories})
+	endif()
 	find_package(Qt5 COMPONENTS Widgets REQUIRED)
 endif()
 
@@ -178,7 +200,7 @@ add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 add_subdirectory(externals/miniz EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 
-if (SDL2_MIXER_FOUND)
+if (TARGET SDL2::Mixer)
     set(SDLMIXER_SRC "src/backends/SDLMixerBackend.cpp")
     set(SDLMIXER_DEF "-DSDLMIXER_SUPPORT")
 else()
@@ -191,7 +213,13 @@ if (OPENC2E_USE_QT)
 endif()
 
 # Pass flags to the compiler
-add_definitions("-W -Wall -Wno-conversion -Wno-unused -D_REENTRANT -DYYERROR_VERBOSE ${QT_DEF} ${SDLMIXER_DEF}")
+add_definitions("-D_REENTRANT -DYYERROR_VERBOSE ${QT_DEF} ${SDLMIXER_DEF}")
+if(WIN32)
+	add_compile_definitions("VCPP_BROKENNESS")
+endif()
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	add_compile_options("-Wextra -Wall -Wno-conversion -Wno-unused")
+endif()
 set(CMAKE_CXX_STANDARD 11)
 
 if (OPENC2E_USE_QT)
@@ -202,8 +230,15 @@ else()
 	set(FRONTEND_LIBS)
 endif()
 add_executable(openc2e ${OPENC2E_CORE} ${FRONTEND_SRCS} ${SDLMIXER_SRC} ${SER_SRCS})
+if(WIN32)
+	find_program(WINDEPLOYQT_EXECUTABLE windeployqt)
+	add_custom_command(
+		TARGET openc2e POST_BUILD
+		COMMAND ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE_DIR:openc2e>
+	)
+endif()
 
-target_link_libraries(openc2e m pthread
+target_link_libraries(openc2e
 	SDL2::Core
 	SDL2::Net
 	SDL2::GFX
@@ -313,7 +348,7 @@ add_custom_command(
 add_custom_command(
 	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND bison -d --name-prefix=mng --file-prefix="${GEN}/mngparser" src/music/mngparser.ypp
+	COMMAND ${BISON_EXECUTABLE} -d --name-prefix=mng --file-prefix="${GEN}/mngparser" src/music/mngparser.ypp
 	DEPENDS src/music/mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
 

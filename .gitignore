@@ -1,4 +1,6 @@
 build
+out/
+.vs/
 
 # Game data dirs
 data
