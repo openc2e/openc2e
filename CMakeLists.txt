@@ -293,7 +293,7 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 add_custom_command(
 	OUTPUT ${BIN}/docs.css
-	COMMAND cp docs/docs.css ${BIN}/docs.css
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different docs/docs.css ${BIN}/docs.css
 	DEPENDS docs/docs.css
 	WORKING_DIRECTORY ${SRC})
 add_custom_command(
