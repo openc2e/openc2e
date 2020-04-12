@@ -1,8 +1,8 @@
 #include "prayfile/pray.h"
 #include <iostream>
 #include <fstream>
-#include <unistd.h>
 #include <ghc/filesystem.hpp>
+#include <array>
 
 using std::cout;
 using std::cerr;
@@ -11,8 +11,7 @@ using std::ifstream;
 using std::ofstream;
 using std::vector;
 
-#define NO_TAGBLOCKS 11
-const char *tagblocks[NO_TAGBLOCKS] = {
+const std::array<std::string, 11> tagblocks = {
 	"AGNT", // C3 agent
 	"DSAG", // DS agent
 	"MACH", // SM agent
@@ -27,30 +26,33 @@ const char *tagblocks[NO_TAGBLOCKS] = {
 };
 
 int main(int argc, char **argv) {
-	bool outputfiles = true, notags = false, usageerror = false;
-	int ch;
-	while ((ch = getopt(argc, argv, "on")) != -1) {
-		switch (ch) {
-			case 'o': outputfiles = false; break;
-			case 'n': notags = true; break;
-			default: usageerror = true; break;
-		}
-	}
-	argc -= optind;
-	argv += optind;
-	if ((argc != 1) || usageerror) {
-		cerr << "syntax: praydumper -o -n filename\n-o don't output non-tag blocks as files\n-n do not interpret tag blocks" << endl;
+	if (argc != 2) {
+		cerr << "syntax: praydumper filename" << endl;
 		return 1;
 	}
 
-	fs::path inputfile = fs::path(argv[0]);
+	fs::path inputfile = fs::path(argv[1]);
 	if (!fs::exists(inputfile)) {
 		cerr << "input file doesn't exist!" << endl;
 		return 1;
 	}
 
-	cout << "(- praydumper-generated PRAY file from '" << argv[0] << "' -)" << endl;
-	cout << endl << "\"en-GB\"" << endl;
+	fs::path output_directory = inputfile.stem();
+	if (fs::exists(output_directory)) {
+		cerr << "Output directory " << output_directory << " already exists" << endl;
+		exit(1);
+	}
+	if (!fs::create_directory(output_directory)) {
+		cerr << "Couldn't create output directory " << output_directory << endl;
+		exit(1);
+	}
+
+	std::string pray_source_filename = (output_directory / inputfile.stem()).string() + ".txt";
+	std::ofstream pray_source(pray_source_filename);
+	cout << "Writing \"" << pray_source_filename << "\"" << endl;
+	pray_source << "(- praydumper-generated PRAY file from '" << argv[0] << "' -)" << endl;
+	pray_source << endl << "\"en-GB\"" << endl;
+
 	prayFile file(inputfile);
 
 	for (vector<prayFileBlock *>::iterator x = file.blocks.begin(); x != file.blocks.end(); x++) {
@@ -59,38 +61,37 @@ int main(int argc, char **argv) {
 		(*x)->load();
 		
 		bool handled = false;
-		for (unsigned int i = 0; i < NO_TAGBLOCKS; i++) {
-			if ((*x)->type == tagblocks[i]) {
+		for (auto tagblock : tagblocks) {
+			if ((*x)->type == tagblock) {
 				handled = true;
-				cout << endl << "group " << (*x)->type << " \"" << (*x)->name << "\"" << endl;
+				pray_source << endl << "group " << (*x)->type << " \"" << (*x)->name << "\"" << endl;
 
 				(*x)->parseTags();
 				
 				for (std::map<std::string, int>::iterator y = (*x)->integerValues.begin(); y != (*x)->integerValues.end(); y++) {
-					cout << "\"" << y->first << "\" " << y->second << endl;
+					pray_source << "\"" << y->first << "\" " << y->second << endl;
 				}
 				
 				for (std::map<std::string, std::string>::iterator y = (*x)->stringValues.begin(); y != (*x)->stringValues.end(); y++) {
 					std::string name = y->first;
 					if ((name.substr(0, 7) ==  "Script ") || (name.substr(0, 13) == "Remove script")) {
 						name = (*x)->name + " - " + name + ".cos";
-						ofstream output(name.c_str());
+						cout << "Writing " << (output_directory / name) << endl;
+						ofstream output(output_directory / name);
 						output.write(y->second.c_str(), y->second.size());
-						cout << "\"" << y->first << "\" @ \"" << name << "\"" << endl;
+						pray_source << "\"" << y->first << "\" @ \"" << name << "\"" << endl;
 					} else {
-						cout << "\"" << y->first << "\" \"" << y->second << "\"" << endl;
+						pray_source << "\"" << y->first << "\" \"" << y->second << "\"" << endl;
 					}
 				}
 			}
 		}
 		
 		if (!handled) {
-			cout << endl << "inline " << (*x)->type << " \"" << (*x)->name << "\" \"" << (*x)->name << "\"" << endl;	
-
-			if (outputfiles) {
-				ofstream output((*x)->name.c_str());
-				output.write((char *)(*x)->getBuffer(), (*x)->getSize());	
-			}
+			pray_source << endl << "inline " << (*x)->type << " \"" << (*x)->name << "\" \"" << (*x)->name << "\"" << endl;
+			cout << "Writing " << (output_directory / (*x)->name) << endl;
+			ofstream output(output_directory / (*x)->name);
+			output.write((char *)(*x)->getBuffer(), (*x)->getSize());
 		}
 	}
 }
