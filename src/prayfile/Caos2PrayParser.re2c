@@ -462,34 +462,27 @@ class Caos2PrayParserImpl {
         events.push_back(IntegerTag{"Dependency Count", dependency_count});
         events.push_back(IntegerTag{"Script Count", script_count});
 
-        std::sort(
+        std::stable_sort(
             events.begin(), events.end(),
             [](const Event &left, const Event &right) {
-                if (mpark::holds_alternative<InlineBlock>(left))
+                if (mpark::holds_alternative<InlineBlock>(left) && !mpark::holds_alternative<InlineBlock>(right))
                     return true;
                 if (mpark::holds_alternative<InlineBlock>(right))
                     return false;
-                if (mpark::holds_alternative<IntegerTag>(left)) {
-                    if (mpark::holds_alternative<IntegerTag>(right))
-                        return getEventTagKey(left) < getEventTagKey(right);
 
+                if (mpark::holds_alternative<IntegerTag>(left) && !mpark::holds_alternative<IntegerTag>(right))
                     return true;
-                }
                 if (mpark::holds_alternative<IntegerTag>(right))
                     return false;
 
-                if (mpark::holds_alternative<StringTag>(left) ||
-                    mpark::holds_alternative<StringTagFromFile>(left)) {
-                    if (mpark::holds_alternative<StringTag>(right) ||
-                        mpark::holds_alternative<StringTagFromFile>(right))
-                        return getEventTagKey(left) < getEventTagKey(right);
-
+                if ((mpark::holds_alternative<StringTag>(left) || mpark::holds_alternative<StringTagFromFile>(left))
+                    && !((mpark::holds_alternative<StringTag>(right) || mpark::holds_alternative<StringTagFromFile>(right)))) {
                     return true;
                 }
-                if (mpark::holds_alternative<StringTag>(right))
+                if (mpark::holds_alternative<StringTag>(right) || mpark::holds_alternative<StringTagFromFile>(right))
                     return false;
 
-                if (mpark::holds_alternative<GroupBlock>(left))
+                if (mpark::holds_alternative<GroupBlock>(left) && !mpark::holds_alternative<GroupBlock>(right))
                     return true;
 
                 if (mpark::holds_alternative<GroupBlock>(right))
