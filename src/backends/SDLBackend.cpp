@@ -538,6 +538,7 @@ void SDLBackend::setPalette(uint8 *data) {
 		mainsurface.palette[i].r = data[i * 3];
 		mainsurface.palette[i].g = data[(i * 3) + 1];
 		mainsurface.palette[i].b = data[(i * 3) + 2];
+		mainsurface.palette[i].a = 255;
 	}
 }
 
