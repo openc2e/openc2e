@@ -211,6 +211,27 @@ class Caos2PrayParserImpl {
     std::string output_filename;
     std::string remove_script;
 
+    void add_dependency_tags(std::vector<Event>* events,
+                            const std::string& a) {
+        dependency_count++;
+        events->push_back(StringTag{
+            "Dependency " + std::to_string(dependency_count), a});
+        std::string categorykey =
+            "Dependency Category " + std::to_string(dependency_count);
+        if (imatch(a, "\\.(mng|wav)$")) {
+            events->push_back(IntegerTag{categorykey, 1});
+        } else if (imatch(a, "\\.(c16|s16|blk)$")) {
+            events->push_back(IntegerTag{categorykey, 2});
+            // events->push_back(StringTag{categorykey, "2"});
+        } else if (imatch(a, "\\.(gen|gno)$")) {
+            events->push_back(IntegerTag{categorykey, 3});
+        } else if (imatch(a, "\\.(catalogue)$")) {
+            events->push_back(IntegerTag{categorykey, 7});
+        } else {
+            *events = {Error{"Unknown dependency category for '" + a}};
+        }
+    }
+
     std::vector<Event>
     handle_caos2pray_command(c2ptoken::commandtype type,
                              const std::string &command,
@@ -250,31 +271,20 @@ class Caos2PrayParserImpl {
                               std::to_string(args.size())}};
             }
             return {GroupBlock{command.substr(0, 4), args[0]}};
-        case c2ptoken::CMD_DEPEND:
-            // TODO
-            return {Error{"Command 'depend' not implemented\n"}};
+        case c2ptoken::CMD_DEPEND: {
+            std::vector<Event> events;
+            for (auto a : args) {
+                add_dependency_tags(&events, a);
+            }
+            return events;
+        }
         case c2ptoken::CMD_INLINE:
             // TODO
             return {Error{"Command 'inline' not implemented\n"}};
         case c2ptoken::CMD_ATTACH: {
             std::vector<Event> events;
             for (auto a : args) {
-                dependency_count++;
-                events.push_back(StringTag{
-                    "Dependency " + std::to_string(dependency_count), a});
-                std::string categorykey =
-                    "Dependency Category " + std::to_string(dependency_count);
-                if (imatch(a, "\\.(mng|wav)$")) {
-                    events.push_back(IntegerTag{categorykey, 1});
-                } else if (imatch(a, "\\.(c16|s16|blk)$")) {
-                    events.push_back(IntegerTag{categorykey, 2});
-                } else if (imatch(a, "\\.(gen|gno)$")) {
-                    events.push_back(IntegerTag{categorykey, 3});
-                } else if (imatch(a, "\\.(catalogue)$")) {
-                    events.push_back(IntegerTag{categorykey, 7});
-                } else {
-                    return {Error{"Unknown dependency category for '" + a}};
-                }
+                add_dependency_tags(&events, a);
                 events.push_back(InlineBlock{"FILE", a, a});
             }
             return events;
