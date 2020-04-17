@@ -279,7 +279,7 @@ include_directories(BEFORE
 	${SRC}/src
 	)
 
-file(GLOB CAOSVM_FILES ${SRC}/src/caos/caosVM_*.cpp)
+file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/caos/caosVM_*.cpp)
 add_custom_command(
 	OUTPUT ${GEN}/commandinfo.json
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
