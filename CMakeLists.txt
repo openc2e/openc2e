@@ -364,7 +364,9 @@ add_custom_target(generated DEPENDS
 	${GEN}/cmddata.cpp
 )
 
-set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/dist")
+include(Openc2eReadGitRev)
+
+set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/openc2e-${git_short_rev}")
 set(dist_args)
 list(APPEND dist_args
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/"
