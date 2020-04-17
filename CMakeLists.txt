@@ -404,3 +404,9 @@ if(OPENC2E_USE_QT)
 	endif()
 endif()
 add_custom_target(dist ${dist_args})
+
+add_custom_target(dist-xz COMMAND ${CMAKE_COMMAND} -E tar cfvJ "openc2e-${git_short_rev}.tar.xz" "${dist_dir}")
+add_dependencies(dist-xz dist)
+
+add_custom_target(dist-zip COMMAND ${CMAKE_COMMAND} -E tar cfv "openc2e-${git_short_rev}.zip" --format=zip "${dist_dir}")
+add_dependencies(dist-zip dist)
