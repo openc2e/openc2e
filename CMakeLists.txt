@@ -5,6 +5,7 @@ set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 set(BIN "${CMAKE_CURRENT_BINARY_DIR}")
 set(GEN "${BIN}/generated")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "") # so openc2e can find the DLLs
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "") # so dist can find the shared libraries
 
 set(CMAKE_MODULE_PATH "${SRC}/cmake" "${SRC}/externals/aminosbh-sdl2-cmake-modules")
 
@@ -363,3 +364,41 @@ add_custom_target(generated DEPENDS
 	${GEN}/cmddata.cpp
 )
 
+set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/dist")
+set(dist_args)
+list(APPEND dist_args
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/"
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		"${CMAKE_CURRENT_SOURCE_DIR}/AUTHORS"
+		"${CMAKE_CURRENT_SOURCE_DIR}/COPYING"
+		"${CMAKE_CURRENT_SOURCE_DIR}/README.md"
+		"${CMAKE_CURRENT_SOURCE_DIR}/docs/openc2e.6"
+		"${BIN}/caosdocs.html"
+		"${BIN}/docs.css"
+		"$<TARGET_FILE:openc2e>"
+		"$<TARGET_FILE:praybuilder>"
+		"$<TARGET_FILE:praydumper>"
+		"${dist_dir}/"
+	DEPENDS "${BIN}/caosdocs.html" "${BIN}/docs.css"
+	COMMAND ${CMAKE_COMMAND}
+		-D "DIST_DIR=${dist_dir}"
+		-P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Openc2eBundle.cmake
+)
+if(OPENC2E_USE_QT)
+	if(WIN32)
+		list(APPEND dist_args
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/platforms/"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>"
+			"${dist_dir}/platforms/"
+		)
+	elseif(APPLE)
+		list(APPEND dist_args
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/platforms/"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"$<TARGET_FILE:Qt5::QCocoaIntegrationPlugin>"
+			"${dist_dir}/platforms/"
+		)
+	endif()
+endif()
+add_custom_target(dist ${dist_args})
