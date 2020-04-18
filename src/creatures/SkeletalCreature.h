@@ -79,7 +79,7 @@ public:
 	SkeletalCreature(unsigned char _family);
 	virtual ~SkeletalCreature();
 
-	void render(Surface *renderer, int xoffset, int yoffset);
+	void render(RenderTarget *renderer, int xoffset, int yoffset);
 	virtual int handleClick(float, float);
 	
 	void skeletonInit();
@@ -124,7 +124,7 @@ protected:
 
 public:
 	void tick();
-	void partRender(class Surface *renderer, int xoffset, int yoffset);
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
 	unsigned int getWidth() { return ((SkeletalCreature *)parent)->getSkelWidth(); }
 	unsigned int getHeight() { return ((SkeletalCreature *)parent)->getSkelHeight(); }
 	void setPose(unsigned int p);

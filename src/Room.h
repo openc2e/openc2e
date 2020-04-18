@@ -79,7 +79,7 @@ public:
 	void postTick();
 	void resetTick();
 
-	void renderBorders(class Surface *surf, int xoffset, int yoffset, unsigned int col);
+	void renderBorders(class RenderTarget *surf, int xoffset, int yoffset, unsigned int col);
 };
 
 #endif

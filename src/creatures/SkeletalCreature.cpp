@@ -261,7 +261,7 @@ shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(shared_ptr<creatures
 	return s;
 }
 
-void SkeletalCreature::render(Surface *renderer, int xoffset, int yoffset) {
+void SkeletalCreature::render(RenderTarget *renderer, int xoffset, int yoffset) {
 	bool mirror_body_parts = (world.variables["engine_mirror_creature_body_parts"] == 1);
 
 	for (int j = 0; j < 17; j++) {
@@ -738,7 +738,7 @@ void SkeletonPart::setFrameNo(unsigned int p) {
 	frameno = p;
 }
 
-void SkeletonPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
+void SkeletonPart::partRender(class RenderTarget *renderer, int xoffset, int yoffset) {
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(parent);
 	c->render(renderer, xoffset, yoffset);	
 }

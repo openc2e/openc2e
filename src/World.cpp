@@ -395,10 +395,10 @@ shared_ptr<Agent> World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
-	drawWorld(camera.get(), engine.backend->getMainSurface());
+	drawWorld(camera.get(), engine.backend->getMainRenderTarget());
 }
 
-void World::drawWorld(Camera *cam, Surface *surface) {
+void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	assert(surface);
 
 	MetaRoom *m = cam->getMetaRoom();

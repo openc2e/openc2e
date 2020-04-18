@@ -141,15 +141,15 @@ void Camera::updateTracking() {
 }
 
 unsigned int MainCamera::getWidth() const {
-	if ((!getMetaRoom()) || (backend->getMainSurface()->getWidth() < getMetaRoom()->width()))
-		return backend->getMainSurface()->getWidth();
+	if ((!getMetaRoom()) || (backend->getMainRenderTarget()->getWidth() < getMetaRoom()->width()))
+		return backend->getMainRenderTarget()->getWidth();
 	else
 		return getMetaRoom()->width();
 }
 
 unsigned int MainCamera::getHeight() const {
-	if ((!getMetaRoom()) || (backend->getMainSurface()->getHeight() < getMetaRoom()->height()))
-		return backend->getMainSurface()->getHeight();
+	if ((!getMetaRoom()) || (backend->getMainRenderTarget()->getHeight() < getMetaRoom()->height()))
+		return backend->getMainRenderTarget()->getHeight();
 	else
 		return getMetaRoom()->height();
 }

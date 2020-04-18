@@ -127,7 +127,7 @@ public:
 	
 	void tick();
 	void drawWorld();
-	void drawWorld(class Camera *cam, Surface *surface);
+	void drawWorld(class Camera *cam, RenderTarget *surface);
 
 	int newUNID(Agent *whofor);
 	void setUNID(Agent *whofor, int unid);

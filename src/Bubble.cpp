@@ -161,7 +161,7 @@ BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y) : CompoundPart
 	textoffset = 0; // doesn't matter when text is empty
 }
 
-void BubblePart::partRender(class Surface *renderer, int xoffset, int yoffset) {
+void BubblePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	renderer->renderText(xoffset + x + textoffset, yoffset + y, text, textcolour, backgroundcolour);
 }
 

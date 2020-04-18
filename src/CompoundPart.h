@@ -48,8 +48,8 @@ public:
 	bool has_alpha;
 	unsigned char alpha;
 
-	virtual void render(class Surface *renderer, int xoffset, int yoffset);
-	virtual void partRender(class Surface *renderer, int xoffset, int yoffset) = 0;
+	virtual void render(class RenderTarget *renderer, int xoffset, int yoffset);
+	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset) = 0;
 	virtual void tick() { }
 
 	virtual void mouseIn() { }
@@ -108,7 +108,7 @@ public:
 	unsigned char framerate;
 	unsigned int framedelay;
 	shared_ptr<creaturesImage> getSprite() { return sprite; }
-	virtual void partRender(class Surface *renderer, int xoffset, int yoffset);
+	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
 	virtual void tick();
 	unsigned int getPose() { return pose; }
 	unsigned int getBase() { return base; }
@@ -197,8 +197,8 @@ public:
 	unsigned int noPages() { return pages.size(); }
 	void setPage(unsigned int p) { currpage = p; }
 	unsigned int getPage() { return currpage; }
-	void partRender(class Surface *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
-	void partRender(class Surface *renderer, int xoffset, int yoffset) { partRender(renderer, xoffset, yoffset, 0); }
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset, class TextEntryPart *caretdata);
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset) { partRender(renderer, xoffset, yoffset, 0); }
 	void setFormat(int left, int top, int right, int bottom, int line, int _char, horizontalalign horza, verticalalign verta, bool lastpagescroll);
 };
 
@@ -221,7 +221,7 @@ private:
 	bool focused;
 	unsigned int caretpos;
 	unsigned int messageid;
-	void renderCaret(class Surface *renderer, int xoffset, int yoffset);
+	void renderCaret(class RenderTarget *renderer, int xoffset, int yoffset);
 
 	friend class TextPart;
 
@@ -236,7 +236,7 @@ public:
 	void handleKey(char c);
 	void handleSpecialKey(char c);
 	void tick();
-	virtual void partRender(class Surface *renderer, int xoffset, int yoffset);
+	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
 	bool isTransparent() { return false; }
 };
 

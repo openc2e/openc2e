@@ -65,7 +65,7 @@ protected:
 	unsigned int poseForWidth(unsigned int width);
 
 public:
-	void partRender(class Surface *renderer, int xoffset, int yoffset);
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
 	unsigned int getWidth() { return textwidth; }
 	unsigned int getHeight() { return textheight; }
 

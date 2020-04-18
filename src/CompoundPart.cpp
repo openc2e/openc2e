@@ -49,7 +49,7 @@ bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) con
 
 shared_ptr<creaturesImage> TextEntryPart::caretsprite;
 
-void CompoundPart::render(Surface *renderer, int xoffset, int yoffset) {
+void CompoundPart::render(RenderTarget *renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
 		partRender(renderer, xoffset + (int)parent->x, yoffset + (int)parent->y);
 		if (parent->displaycore /*&& (id == 0)*/) {
@@ -72,7 +72,7 @@ bool CompoundPart::canClick() {
 	return parent->activateable();
 }
 
-void SpritePart::partRender(Surface *renderer, int xoffset, int yoffset) {
+void SpritePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	// TODO: we need a nicer way to handle such errors
 	if (getCurrentSprite() >= getSprite()->numframes()) {
 		if (engine.version == 2) {
@@ -530,7 +530,7 @@ void TextPart::recalculateData() {
 	pageheights.push_back(currenty);
 }
 
-void TextPart::partRender(Surface *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
+void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
 	SpritePart::partRender(renderer, xoffset, yoffset);
 	
 	unsigned int xoff = xoffset + x + leftmargin;
@@ -588,11 +588,11 @@ TextEntryPart::TextEntryPart(Agent *p, unsigned int _id, std::string spritefile,
 	messageid = msgid;
 }
 
-void TextEntryPart::partRender(Surface *renderer, int xoffset, int yoffset) {
+void TextEntryPart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	TextPart::partRender(renderer, xoffset, yoffset, (focused ? this : 0));
 }
 
-void TextEntryPart::renderCaret(Surface *renderer, int xoffset, int yoffset) {
+void TextEntryPart::renderCaret(RenderTarget *renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
 	renderer->render(caretsprite, caretpose, xoffset, yoffset, has_alpha, alpha);
 }
@@ -661,17 +661,17 @@ CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	camera = shared_ptr<Camera>(new PartCamera(this));
 }
 
-void CameraPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
+void CameraPart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	// TODO: hack to stop us rendering cameras inside cameras. better way?
-	if (renderer == engine.backend->getMainSurface()) {
+	if (renderer == engine.backend->getMainRenderTarget()) {
 		// make sure we're onscreen before bothering to do any work..
 		if (xoffset + x + (int)camerawidth >= 0 && yoffset + y + (int)cameraheight >= 0 &&
 			xoffset + x < (int)renderer->getWidth() && yoffset + y < (int)renderer->getHeight()) {
-			Surface *surface = engine.backend->newSurface(viewwidth, viewheight);
+			RenderTarget *surface = engine.backend->newRenderTarget(viewwidth, viewheight);
 			assert(surface); // TODO: good behaviour?
 			world.drawWorld(camera.get(), surface);
-			renderer->blitSurface(surface, xoffset + x, yoffset + y, camerawidth, cameraheight);
-			engine.backend->freeSurface(surface);
+			renderer->blitRenderTarget(surface, xoffset + x, yoffset + y, camerawidth, cameraheight);
+			engine.backend->freeRenderTarget(surface);
 		}
 	}
 	

@@ -25,7 +25,7 @@
 #include <memory>
 #include "Backend.h"
 
-class SDLSurface : public Surface {
+class SDLRenderTarget : public RenderTarget {
 	friend class SDLBackend;
 
 protected:
@@ -34,33 +34,33 @@ protected:
 	unsigned int width, height;
 	SDL_Color palette[256];
 	
-	SDLSurface(SDLBackend *p) { parent = p; }
+	SDLRenderTarget(SDLBackend *p) { parent = p; }
 
 public:
 	void render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour);
-	void blitSurface(Surface *src, int x, int y, int w, int h);
+	void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h);
 	unsigned int getWidth() const { return width; }
 	unsigned int getHeight() const { return height; }
 	void renderDone();
 };
 
 class SDLBackend : public Backend {
-	friend class SDLSurface;
+	friend class SDLRenderTarget;
 
 protected:
 	bool networkingup;
 
 	SDL_Window *window = nullptr;
-	SDLSurface mainsurface;
+	SDLRenderTarget mainsurface;
 	TCPsocket listensocket;
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
 	int translateKey(int key);
 
-	SDL_Surface *getMainSDLSurface() { return mainsurface.surface; }
+	SDL_Surface *getMainSDLRenderTarget() { return mainsurface.surface; }
 
 	virtual int idealBpp();
 
@@ -81,9 +81,9 @@ public:
 	bool selfRender() { return false; }
 	void requestRender() { }
 
-	Surface *getMainSurface() { return &mainsurface; }
-	Surface *newSurface(unsigned int width, unsigned int height);
-	void freeSurface(Surface *surf);
+	RenderTarget *getMainRenderTarget() { return &mainsurface; }
+	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);
+	void freeRenderTarget(RenderTarget *surf);
 	unsigned int textWidth(std::string text);
 		
 	bool keyDown(int key);

@@ -69,7 +69,7 @@ void Blackboard::addBlackboardString(unsigned int n, unsigned int id, std::strin
 	strings[n] = std::pair<unsigned int, std::string>(id, text);
 }
 
-void Blackboard::renderText(class Surface *renderer, int xoffset, int yoffset) {
+void Blackboard::renderText(RenderTarget *renderer, int xoffset, int yoffset) {
 	std::string ourtext = currenttext;
 	if (editing) ourtext += "_"; // TODO: should this be rendered in aliascolour?
 
@@ -114,7 +114,7 @@ BlackboardPart::BlackboardPart(Blackboard *p, unsigned int _id) : CompoundPart(p
 	// TODO: think about plane
 }
 
-void BlackboardPart::partRender(class Surface *renderer, int xoffset, int yoffset) {
+void BlackboardPart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
 	bbd->renderText(renderer, xoffset, yoffset);
 }

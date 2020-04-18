@@ -23,12 +23,12 @@
 #include "Backend.h"
 #include <memory>
 
-class NullSurface : public Surface {
+class NullRenderTarget : public RenderTarget {
 public:
 	virtual void render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false) { }
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) { }
 	virtual void renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) { }
-	virtual void blitSurface(Surface *src, int x, int y, int w, int h)  { }
+	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h)  { }
 	virtual unsigned int getWidth() const { return 800; }
 	virtual unsigned int getHeight() const { return 600; }
 	virtual void renderDone() { }
@@ -36,7 +36,7 @@ public:
 
 class NullBackend : public Backend {
 protected:
-	NullSurface surface;
+	NullRenderTarget surface;
 
 public:
 	virtual void init() { }
@@ -53,9 +53,9 @@ public:
 	virtual bool selfRender() { return false; }
 	virtual void requestRender() { }
 	
-	virtual Surface *getMainSurface() { return &surface; }
-	virtual Surface *newSurface(unsigned int width, unsigned int height) { return 0; }
-	virtual void freeSurface(Surface *surf) { }
+	virtual RenderTarget *getMainRenderTarget() { return &surface; }
+	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) { return 0; }
+	virtual void freeRenderTarget(RenderTarget *surf) { }
 			
 	virtual void setPalette(uint8_t *data) { }
 	virtual unsigned int textWidth(std::string text) { return 0; }

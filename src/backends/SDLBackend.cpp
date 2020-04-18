@@ -243,7 +243,7 @@ retry:
 	return true;
 }
 
-void SDLSurface::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
+void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
 	SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(surface);
 	assert(renderer);
 	aalineColor(renderer, x1, y1, x2, y2, colour);
@@ -261,7 +261,7 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 	return sdlc;
 }
 
-void SDLSurface::renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) {
+void SDLRenderTarget::renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) {
 	if (text.empty()) return;
 
 	SDL_Color sdlcolour;
@@ -363,7 +363,7 @@ SDL_Surface *MirrorSurface(SDL_Surface *surf, SDL_Color *surfpalette) {
 
 //*** end mirror code
 
-void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror, bool is_background) {
+void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror, bool is_background) {
 	assert(image);
 	assert(image->numframes() > frame);
 
@@ -438,14 +438,14 @@ void SDLSurface::render(shared_ptr<creaturesImage> image, unsigned int frame, in
 	SDL_FreeSurface(surf);
 }
 
-void SDLSurface::renderDone() {
+void SDLRenderTarget::renderDone() {
 	if (surface == SDL_GetWindowSurface(parent->window)) {
 		SDL_UpdateWindowSurface(parent->window);
 	}
 }
 
-void SDLSurface::blitSurface(Surface *s, int x, int y, int w, int h) {
-	SDLSurface *src = dynamic_cast<SDLSurface *>(s);
+void SDLRenderTarget::blitRenderTarget(RenderTarget *s, int x, int y, int w, int h) {
+	SDLRenderTarget *src = dynamic_cast<SDLRenderTarget *>(s);
 	assert(src);
 
 	// TODO: evil use of internal SDL api
@@ -453,19 +453,19 @@ void SDLSurface::blitSurface(Surface *s, int x, int y, int w, int h) {
 	SDL_SoftStretch(src->surface, 0, surface, &r);
 }
 
-Surface *SDLBackend::newSurface(unsigned int w, unsigned int h) {
+RenderTarget *SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
 	SDL_Surface *surf = mainsurface.surface;
 	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(0, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
 	assert(underlyingsurf);
-	SDLSurface *newsurf = new SDLSurface(this);
+	SDLRenderTarget *newsurf = new SDLRenderTarget(this);
 	newsurf->surface = underlyingsurf;
 	newsurf->width = w;
 	newsurf->height = h;
 	return newsurf;
 }
 
-void SDLBackend::freeSurface(Surface *s) {
-	SDLSurface *surf = dynamic_cast<SDLSurface *>(s);
+void SDLBackend::freeRenderTarget(RenderTarget *s) {
+	SDLRenderTarget *surf = dynamic_cast<SDLRenderTarget *>(s);
 	assert(surf);
 
 	SDL_FreeSurface(surf->surface);

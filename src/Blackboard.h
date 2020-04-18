@@ -38,7 +38,7 @@ protected:
 	bool editing;
 	unsigned int editingindex;
 
-	void renderText(class Surface *renderer, int xoffset, int yoffset);
+	void renderText(class RenderTarget *renderer, int xoffset, int yoffset);
 	std::string getText();
 
 	void startEditing();
@@ -65,7 +65,7 @@ protected:
 	BlackboardPart(Blackboard *p, unsigned int _id);
 
 public:
-	void partRender(class Surface *renderer, int xoffset, int yoffset);
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
 	unsigned int getWidth() { return 0; }
 	unsigned int getHeight() { return 0; }
 
