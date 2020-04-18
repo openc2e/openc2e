@@ -366,7 +366,8 @@ add_custom_target(generated DEPENDS
 
 include(Openc2eReadGitRev)
 
-set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/openc2e-${git_short_rev}")
+set(dist_name "openc2e-${git_short_rev}-${CMAKE_SYSTEM_NAME}")
+set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/${dist_name}")
 set(dist_args)
 list(APPEND dist_args
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/"
@@ -405,8 +406,8 @@ if(OPENC2E_USE_QT)
 endif()
 add_custom_target(dist ${dist_args})
 
-add_custom_target(dist-xz COMMAND ${CMAKE_COMMAND} -E tar cfvJ "openc2e-${git_short_rev}.tar.xz" "${dist_dir}")
+add_custom_target(dist-xz COMMAND ${CMAKE_COMMAND} -E tar cfvJ "${dist_name}.tar.xz" "${dist_dir}")
 add_dependencies(dist-xz dist)
 
-add_custom_target(dist-zip COMMAND ${CMAKE_COMMAND} -E tar cfv "openc2e-${git_short_rev}.zip" --format=zip "${dist_dir}")
+add_custom_target(dist-zip COMMAND ${CMAKE_COMMAND} -E tar cfv "${dist_name}.zip" --format=zip "${dist_dir}")
 add_dependencies(dist-zip dist)
