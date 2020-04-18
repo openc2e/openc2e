@@ -46,7 +46,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - run: brew install ccache ninja qt sdl2 sdl2_gfx sdl2_mixer sdl2_net
+    - run: brew install ccache ninja qt
     - uses: actions/cache@v1.1.0
       with:
         path: .ccache
