@@ -388,6 +388,12 @@ list(APPEND dist_args
 		-D "DIST_DIR=${dist_dir}"
 		-P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Openc2eBundle.cmake
 )
+if(APPLE)
+	list(APPEND dist_args
+		COMMAND echo "sudo xattr -r -d com.apple.quarantine ." > "${dist_dir}/fix_unidentified_developer.sh"
+		COMMAND chmod +x "${dist_dir}/fix_unidentified_developer.sh"
+	)
+endif()
 if(OPENC2E_USE_QT)
 	if(WIN32)
 		list(APPEND dist_args
