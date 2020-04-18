@@ -198,7 +198,7 @@ std::vector<PraySourceParser::Event> PraySourceParserImpl::next() {
   // generate synthetic "GroupBlock" lines
   if (in_group_block && (token.type == PS_BAREWORD || token.type == PS_EOI)) {
     in_group_block = false;
-    return {GroupBlock{last_group_type, last_group_name}};
+    return {GroupBlockEnd{last_group_type, last_group_name}};
   }
 
   // parse the actual line
@@ -296,7 +296,7 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
       in_group_block = true;
       last_group_type = type;
       last_group_name = name;
-      return ClearAccumulatedTags{};
+      return GroupBlockStart{type, name};
 
     } else if (directive == "inline") {
       if (token.type != PS_STRING) {

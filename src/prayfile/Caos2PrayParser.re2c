@@ -1,6 +1,7 @@
 #include "prayfile/Caos2PrayParser.h"
 #include "caoslexer.h"
 #include "token.h"
+#include "visit_overloads.h"
 
 #include <cassert>
 #include <regex>
@@ -55,8 +56,6 @@ struct c2ptoken {
             return "TOK_COMMAND: " + stringval;
         case TOK_INTEGER:
             return "TOK_INTEGER: " + stringval;
-            // case TOK_ASSIGNMENT_KEY:
-            // return "TOK_ASSIGNMENT_KEY: " + stringval;
         }
     }
 
@@ -72,7 +71,6 @@ class Caos2PrayLexer {
     c2ptoken next_token() {
         assert(p);
         const char *basep = p;
-        // const char *YYLIMIT = p + strlen(p);
         const char *YYMARKER, *YYCTXMARKER;
 
         /*!re2c
@@ -162,47 +160,6 @@ using namespace PraySourceParser;
 
 class Caos2PrayParserImpl {
   public:
-    // struct Error {
-    //     std::string message;
-    // };
-    // struct GroupBlock {
-    //     std::string type;
-    //     std::string name;
-    // };
-    // struct InlineBlock {
-    //     std::string type;
-    //     std::string name;
-    //     std::string filename;
-    // };
-    // struct StringTag {
-    //     std::string key;
-    //     std::string value;
-    // };
-    // struct StringTagFromFile {
-    //     std::string key;
-    //     std::string filename;
-    // };
-    // struct IntegerTag {
-    //     std::string key;
-    //     int value;
-    // };
-    //
-    // using Event = mpark::variant<Error, GroupBlock, InlineBlock, StringTag,
-    //                              StringTagFromFile, IntegerTag>;
-
-    static const std::string &getEventTagKey(const Event &e) {
-        if (mpark::holds_alternative<IntegerTag>(e)) {
-            return mpark::get<IntegerTag>(e).key;
-        }
-        if (mpark::holds_alternative<StringTag>(e)) {
-            return mpark::get<StringTag>(e).key;
-        }
-        if (mpark::holds_alternative<StringTagFromFile>(e)) {
-            return mpark::get<StringTagFromFile>(e).key;
-        }
-        abort();
-    }
-
     Caos2PrayParserImpl() {}
 
     int dependency_count = 0;
@@ -253,14 +210,14 @@ class Caos2PrayParserImpl {
                 return {Error{"Command 'DS-Name' takes 1 argument, got " +
                               std::to_string(args.size())}};
             }
-            return {GroupBlock{"DSAG", args[0]}};
+            return {GroupBlockStart{"DSAG", args[0]}};
         case c2ptoken::CMD_C3_NAME:
             if (args.size() > 1) {
                 return {Error{"Command 'C3-Name' takes 0 or 1 arguments, got " +
                               std::to_string(args.size())}};
             }
             if (args.size() == 1) {
-                return {GroupBlock{"AGNT", args[0]}};
+                return {GroupBlockStart{"AGNT", args[0]}};
             }
             // TODO
             return {Error{"c3-name no name not implemented\n"}};
@@ -270,7 +227,7 @@ class Caos2PrayParserImpl {
                               "' takes 1 argument, got " +
                               std::to_string(args.size())}};
             }
-            return {GroupBlock{command.substr(0, 4), args[0]}};
+            return {GroupBlockStart{command.substr(0, 4), args[0]}};
         case c2ptoken::CMD_DEPEND: {
             std::vector<Event> events;
             for (auto a : args) {
@@ -389,31 +346,6 @@ class Caos2PrayParserImpl {
         }
     }
 
-    // struct event_dump_visitor {
-    //     void operator()(const Error &e) {
-    //         std::cout << "Error: " << e.message << std::endl;
-    //     }
-    //     void operator()(const GroupBlock &e) {
-    //         std::cout << "group block: " << e.type << " \"" << e.name << "\"\n";
-    //     };
-    //     void operator()(const InlineBlock &e) {
-    //         std::cout << "inline block: " << e.type << " \"" << e.name
-    //                   << "\" from \"" << e.filename << "\"\n";
-    //     };
-    //     void operator()(const StringTag &e) {
-    //         std::cout << "string tag: \"" << e.key << "\" -> \"" << e.value
-    //                   << "\"\n";
-    //     };
-    //     void operator()(const StringTagFromFile &e) {
-    //         std::cout << "string tag: \"" << e.key << "\" from file \""
-    //                   << e.filename << "\"\n";
-    //     };
-    //     void operator()(const IntegerTag &e) {
-    //         std::cout << "integer tag: \"" << e.key << "\" -> " << e.value
-    //                   << "\n";
-    //     };
-    // };
-
     std::vector<Event> run(std::string script, std::string *output_filename_) {
         std::vector<token> tokens;
         size_t p = 0;
@@ -459,57 +391,44 @@ class Caos2PrayParserImpl {
             p++;
         }
 
-        events.push_back(IntegerTag{"Dependency Count", dependency_count});
-        events.push_back(IntegerTag{"Script Count", script_count});
+        std::vector<GroupBlockStart> group_blocks;
+        std::vector<Event> inline_blocks;
+        std::vector<Event> tags;
 
-        std::stable_sort(
-            events.begin(), events.end(),
-            [](const Event &left, const Event &right) {
-                if (mpark::holds_alternative<InlineBlock>(left) && !mpark::holds_alternative<InlineBlock>(right))
-                    return true;
-                if (mpark::holds_alternative<InlineBlock>(right))
-                    return false;
+        tags.push_back(IntegerTag{"Dependency Count", dependency_count});
+        tags.push_back(IntegerTag{"Script Count", script_count});
 
-                if (mpark::holds_alternative<IntegerTag>(left) && !mpark::holds_alternative<IntegerTag>(right))
-                    return true;
-                if (mpark::holds_alternative<IntegerTag>(right))
-                    return false;
+        for (auto &e : events) {
+            visit_overloads(
+                e, [&](const GroupBlockStart &g) { group_blocks.push_back(g); },
+                [&](const InlineBlock &) { inline_blocks.push_back(e); },
+                [&](const StringTag &) { tags.push_back(e); },
+                [&](const StringTagFromFile &) { tags.push_back(e); },
+                [&](const IntegerTag &) { tags.push_back(e); },
+                [](const GroupBlockEnd &) { abort(); }, // not created yet
+                [](const Error &) { abort(); }          // handled already
+            );
+        }
 
-                if ((mpark::holds_alternative<StringTag>(left) || mpark::holds_alternative<StringTagFromFile>(left))
-                    && !((mpark::holds_alternative<StringTag>(right) || mpark::holds_alternative<StringTagFromFile>(right)))) {
-                    return true;
-                }
-                if (mpark::holds_alternative<StringTag>(right) || mpark::holds_alternative<StringTagFromFile>(right))
-                    return false;
+        if (group_blocks.size() == 0 && inline_blocks.size() == 0) {
+            return {Error{"No PRAY blocks defined"}};
+        }
 
-                if (mpark::holds_alternative<GroupBlock>(left) && !mpark::holds_alternative<GroupBlock>(right))
-                    return true;
-
-                if (mpark::holds_alternative<GroupBlock>(right))
-                    return false;
-
-                return false;
-            });
+        events = {};
+        for (auto &g : group_blocks) {
+            events.push_back(g);
+            for (auto &t : tags) {
+                events.push_back(t);
+            }
+            events.push_back(GroupBlockEnd{g.type, g.name});
+        }
+        events.insert(events.end(), inline_blocks.begin(), inline_blocks.end());
 
         if (output_filename.size() > 0 && output_filename_)
             *output_filename_ = output_filename;
 
-        bool has_blocks = false;
-        for (auto e : events) {
-            if (mpark::holds_alternative<GroupBlock>(e) || mpark::holds_alternative<InlineBlock>(e)) {
-                has_blocks = true;
-                break;
-            }
-        }
-        if (!has_blocks) {
-            return {Error{"No PRAY blocks defined"}};
-        }
-
         return events;
     }
-
-    // size_t p = 0;
-    // std::vector<token> tokens;
 };
 
 std::vector<Event> Caos2PrayParser::parse(const std::string& script, std::string *output_filename) {
