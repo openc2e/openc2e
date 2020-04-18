@@ -157,7 +157,12 @@ else()
 endif()
 
 find_package(Python REQUIRED)
-add_subdirectory(externals/re2c EXCLUDE_FROM_ALL)
+
+find_program(RE2C_EXECUTABLE re2c)
+if(NOT RE2C_EXECUTABLE)
+	add_subdirectory(externals/re2c EXCLUDE_FROM_ALL)
+	set(RE2C_EXECUTABLE re2c)
+endif()
 
 if(WIN32)
 	add_subdirectory(externals/winflexbison EXCLUDE_FROM_ALL)
@@ -307,7 +312,7 @@ add_custom_command(
 add_custom_command(
 	OUTPUT ${GEN}/cataloglexer.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND re2c -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c
 	DEPENDS ${SRC}/src/cataloglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
@@ -321,28 +326,28 @@ add_custom_command(
 add_custom_command(
 	OUTPUT ${GEN}/caoslexer.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND re2c -o ${GEN}/caoslexer.cpp ${SRC}/src/caoslexer.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/caoslexer.cpp ${SRC}/src/caoslexer.re2c
 	DEPENDS ${SRC}/src/caoslexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/mnglexer.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND re2c -o ${GEN}/mnglexer.cpp ${SRC}/src/music/mnglexer.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/mnglexer.cpp ${SRC}/src/music/mnglexer.re2c
 	DEPENDS ${SRC}/src/music/mnglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/prayfile/Caos2PrayParser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/prayfile"
-	COMMAND re2c -o ${GEN}/prayfile/Caos2PrayParser.cpp ${SRC}/src/prayfile/Caos2PrayParser.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/prayfile/Caos2PrayParser.cpp ${SRC}/src/prayfile/Caos2PrayParser.re2c
 	DEPENDS ${SRC}/src/prayfile/Caos2PrayParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/prayfile/PraySourceParser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/prayfile"
-	COMMAND re2c -o ${GEN}/prayfile/PraySourceParser.cpp ${SRC}/src/prayfile/PraySourceParser.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/prayfile/PraySourceParser.cpp ${SRC}/src/prayfile/PraySourceParser.re2c
 	DEPENDS ${SRC}/src/prayfile/PraySourceParser.re2c
 	WORKING_DIRECTORY ${SRC})
 

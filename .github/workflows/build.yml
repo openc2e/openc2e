@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - run: sudo apt-get update && sudo apt-get install bison ccache ninja-build re2c libsdl2-dev libsdl2-gfx-dev libsdl2-mixer-dev libsdl2-net-dev qtbase5-dev
+    - run: sudo apt-get update && sudo apt-get install bison ccache ninja-build libsdl2-dev libsdl2-gfx-dev libsdl2-mixer-dev libsdl2-net-dev qtbase5-dev
     - uses: actions/cache@v1.1.0
       with:
         path: .ccache
@@ -46,7 +46,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - run: brew install ccache ninja qt re2c sdl2 sdl2_gfx sdl2_mixer sdl2_net
+    - run: brew install ccache ninja qt sdl2 sdl2_gfx sdl2_mixer sdl2_net
     - uses: actions/cache@v1.1.0
       with:
         path: .ccache
