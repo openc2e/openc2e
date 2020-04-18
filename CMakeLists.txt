@@ -370,6 +370,7 @@ set(dist_name "openc2e-${git_short_rev}-${CMAKE_SYSTEM_NAME}")
 set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/${dist_name}")
 set(dist_args)
 list(APPEND dist_args
+	COMMAND ${CMAKE_COMMAND} -E echo "::set-env name=DIST_NAME::${dist_name}"
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/"
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different
 		"${CMAKE_CURRENT_SOURCE_DIR}/AUTHORS"

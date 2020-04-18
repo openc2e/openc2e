@@ -1,0 +1,65 @@
+name: build
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: sudo apt-get update && sudo apt-get install bison ccache ninja-build re2c libsdl2-dev libsdl2-gfx-dev libsdl2-mixer-dev libsdl2-net-dev qtbase5-dev
+    - uses: actions/cache@v1.1.0
+      with:
+        path: .ccache
+        key: ccache-ubuntu-latest
+    - run: mkdir build && cd build && cmake .. -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja && cmake --build . --parallel
+      env:
+        CCACHE_BASEDIR: ${{ github.workspace }}
+        CCACHE_DIR: ${{ github.workspace }}/.ccache
+        CCACHE_COMPRESS: true
+        CCACHE_COMPRESSLEVEL: 6
+        CCACHE_MAXSIZE: 500M
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: seanmiddleditch/gha-setup-ninja@v1
+    - uses: jurplel/install-qt-action@v2
+    - shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe
+        cmake --build build --parallel
+    - run: cd build && cmake --build . -t dist
+    - uses: actions/upload-artifact@v1
+      with:
+        name: ${{ env.DIST_NAME }}.zip
+        path: build/${{ env.DIST_NAME }}
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: brew install ccache ninja qt re2c sdl2 sdl2_gfx sdl2_mixer sdl2_net
+    - uses: actions/cache@v1.1.0
+      with:
+        path: .ccache
+        key: ccache-macos-latest
+    - run: mkdir build && cd build && cmake .. -G Ninja -DCMAKE_PREFIX_PATH=/usr/local/opt/qt -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel
+      env:
+        CCACHE_BASEDIR: ${{ github.workspace }}
+        CCACHE_DIR: ${{ github.workspace }}/.ccache
+        CCACHE_COMPRESS: true
+        CCACHE_COMPRESSLEVEL: 6
+        CCACHE_MAXSIZE: 500M
+    - run: cd build && cmake --build . -t dist
+    - uses: actions/upload-artifact@v1
+      with:
+        name: ${{ env.DIST_NAME }}.zip
+        path: build/${{ env.DIST_NAME }}
