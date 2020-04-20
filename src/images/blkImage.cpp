@@ -66,7 +66,7 @@ void blkImage::writeHeader(std::ostream &s) {
 	}
 }
 
-blkImage::blkImage(mmapifstream *in, std::string n) : creaturesImage(n) {
+blkImage::blkImage(std::ifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
 	imgformat = if_16bit;
 
@@ -74,13 +74,19 @@ blkImage::blkImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 	
 	buffers = new void *[m_numframes];
 	
-	for (unsigned int i = 0; i < m_numframes; i++)
-		buffers[i] = in->map + offsets[i];
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		buffers[i] = new char[2 * widths[i] * heights[i]];
+		in->seekg(offsets[i]);
+		in->read((char*)buffers[i], 2 * widths[i] * heights[i]);
+	}
 }
 
 blkImage::~blkImage() {
 	delete[] widths;
 	delete[] heights;
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		delete[] (char*)buffers[i];
+	}
 	delete[] buffers;
 	delete[] offsets;
 }

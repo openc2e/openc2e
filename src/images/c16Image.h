@@ -20,7 +20,6 @@
 #include "creaturesImage.h"
 #include <istream>
 #include <memory>
-#include "mmapifstream.h"
 #include "endianlove.h"
 
 class c16Image : public creaturesImage {
@@ -29,7 +28,7 @@ private:
 
 public:
 	c16Image() { }
-	c16Image(mmapifstream *, std::string n);
+	c16Image(std::ifstream *, std::string n);
 	~c16Image();
 	void readHeader(std::istream &in);
 	std::shared_ptr<creaturesImage> mutableCopy();
@@ -42,7 +41,7 @@ private:
 
 public:
 	s16Image() { }
-	s16Image(mmapifstream *, std::string n);
+	s16Image(std::ifstream *, std::string n);
 	~s16Image();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &out);

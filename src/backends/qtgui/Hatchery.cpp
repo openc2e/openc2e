@@ -18,7 +18,6 @@
 #include "Hatchery.h"
 #include "Engine.h"
 #include "creaturesImage.h"
-#include "mmapifstream.h"
 #include "qtopenc2e.h"
 
 #include <QBitmap>
@@ -172,7 +171,7 @@ public:
 // TODO: these are from imageManager.cpp, it'd be nice to have a non-hacky interface,
 // but we probably need to fix the image object model first due to endianism issues
 enum filetype { blk, s16, c16, spr, bmp };
-bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft);
+bool tryOpen(std::ifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft);
 
 Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 	qtopenc2e = parent;
@@ -279,7 +278,7 @@ Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 		/* gender marker animation */
 		// TODO
 	} else { // C2
-		mmapifstream *s = new mmapifstream();
+		std::ifstream *s = new std::ifstream();
 		if (!tryOpen(s, omelettedata, "Applet Data/Omelette.s16", s16)) {
 			return;
 		}

@@ -21,7 +21,6 @@
 #define _BLKIMAGE_H
 
 #include "creaturesImage.h"
-#include "mmapifstream.h"
 #include "endianlove.h"
 
 class blkImage : public creaturesImage {
@@ -32,7 +31,7 @@ public:
 	unsigned int totalwidth, totalheight;
 
 	blkImage() { }
-	blkImage(mmapifstream *, std::string n);
+	blkImage(std::ifstream *, std::string n);
 	~blkImage();
 	void readHeader(std::istream &in);
 	void writeHeader(std::ostream &s);

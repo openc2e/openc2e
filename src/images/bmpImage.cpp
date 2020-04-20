@@ -28,9 +28,8 @@
 #define BI_RLE8 1
 #define BI_BITFIELDS 3
 
-bmpData::bmpData(mmapifstream *in, std::string n) {
+bmpData::bmpData(std::ifstream *in, std::string n) {
 	palette = 0;
-	copied_data = false;
 	stream = in;
 
 	char magic[2];
@@ -82,9 +81,11 @@ bmpData::bmpData(mmapifstream *in, std::string n) {
 		case 8:
 			{
 			imgformat = if_paletted;
-			uint8 *filepalette = (uint8 *)(in->map + (unsigned int)in->tellg());
+			unsigned int num_palette_entries = (biBitCount == 4 ? 16 : 256);
+			std::vector<uint8_t> filepalette(num_palette_entries * 4);
+			in->read((char*)filepalette.data(), filepalette.size());
 			palette = new uint8[256 * 4];
-			for (unsigned int i = 0; i < (biBitCount == 4 ? 16 : 256); i++) {
+			for (unsigned int i = 0; i < num_palette_entries; i++) {
 				palette[i * 4] = filepalette[(i * 4) + 2];
 				palette[(i * 4) + 1] = filepalette[(i * 4) + 1];
 				palette[(i * 4) + 2] = filepalette[i * 4];
@@ -101,13 +102,18 @@ bmpData::bmpData(mmapifstream *in, std::string n) {
 			throw creaturesException(n + " contains BMP data of an unsupported bit depth.");
 	}
 
-	bmpdata = in->map + dataoffset;
+	if (biSizeImage == 0) {
+		biSizeImage = biWidth * biHeight * biBitCount / 8;
+	}
+
+	in->seekg(dataoffset);
+	bmpdata = new char[biSizeImage];
+	in->read((char*)bmpdata, biSizeImage);
 
 	if (biBitCount == 4) {
 		char *srcdata = (char *)bmpdata;
 		char *dstdata = new char[biWidth * biHeight];
 		bmpdata = dstdata;
-		copied_data = true;
 
 		for (char *dest = dstdata; dest < dstdata + biWidth * biHeight; dest += biWidth) {
 			uint8 pixel = 0;
@@ -120,6 +126,7 @@ bmpData::bmpData(mmapifstream *in, std::string n) {
 				pixel <<= 4;
 			}
 		}
+		delete srcdata;
 	}
 
 	if (biCompression == BI_RLE8) {
@@ -129,7 +136,6 @@ bmpData::bmpData(mmapifstream *in, std::string n) {
 		char *dstdata = new char[biWidth * biHeight];
 		for (unsigned int i = 0; i < biWidth * biHeight; i++) dstdata[i] = 0; // TODO
 		bmpdata = dstdata;
-		copied_data = true;
 		
 		unsigned int x = 0, y = 0;
 		for (unsigned int i = 0; i < biSizeImage;) {
@@ -168,17 +174,18 @@ bmpData::bmpData(mmapifstream *in, std::string n) {
 
 			if (x + (y * biWidth) >= biHeight * biWidth) break;
 		}
+		delete srcdata;
 	}
 
 }
 
 bmpData::~bmpData() {
-	if (copied_data) delete[] (char *)bmpdata;
+	delete[] (char *)bmpdata;
 	if (palette) delete[] palette;
 	delete stream;
 }
 
-bmpImage::bmpImage(mmapifstream *in, std::string n) : creaturesImage(n) {
+bmpImage::bmpImage(std::ifstream *in, std::string n) : creaturesImage(n) {
 	buffers = 0;
 
 	bmpdata = shared_ptr<bmpData>(new bmpData(in, n));

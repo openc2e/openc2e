@@ -21,7 +21,6 @@
 #define _BMPIMAGE_H
 
 #include "creaturesImage.h"
-#include "mmapifstream.h"
 #include "endianlove.h"
 #include <memory>
 
@@ -31,15 +30,14 @@ class bmpData {
 private:
 	friend class bmpImage;
 
-	bmpData(mmapifstream *, std::string n);
+	bmpData(std::ifstream *, std::string n);
 
 	uint32 biWidth, biHeight;
 	uint32 biCompression;
 	void *bmpdata;
-	bool copied_data;
 	uint8 *palette;
 	imageformat imgformat;
-	mmapifstream *stream;
+	std::ifstream *stream;
 
 public:
 	~bmpData(); // shared_ptr needs to be able to call the destructor
@@ -51,7 +49,7 @@ protected:
 	void freeData();
 
 public:
-	bmpImage(mmapifstream *, std::string n);
+	bmpImage(std::ifstream *, std::string n);
 	~bmpImage();
 
 	void setBlockSize(unsigned int blockwidth, unsigned int blockheight);

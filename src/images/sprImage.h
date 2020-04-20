@@ -21,7 +21,6 @@
 #define _SPRIMAGE_H
 
 #include "creaturesImage.h"
-#include "mmapifstream.h"
 #include "endianlove.h"
 
 class sprImage : public creaturesImage {
@@ -30,7 +29,7 @@ private:
 
 public:
 	sprImage() { }
-	sprImage(mmapifstream *, std::string n);
+	sprImage(std::ifstream *, std::string n);
 	~sprImage();
 	virtual unsigned int bitdepth() { return 8; }
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);

@@ -39,7 +39,7 @@ using namespace ghc::filesystem;
 
 enum filetype { blk, s16, c16, spr, bmp };
 
-bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
+bool tryOpen(std::ifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
 	path cachefile, realfile;
 	std::string cachename;
 	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
@@ -66,14 +66,14 @@ bool tryOpen(mmapifstream *in, shared_ptr<creaturesImage> &img, std::string fnam
 	if (resolveFile(cachefile)) {
 		// TODO: check for up-to-date-ness
 		in->clear();
-		in->mmapopen(cachefile.string());
+		in->open(cachefile.string());
 		if (ft == c16) ft = s16;
 		goto done;
 	}
 	//std::cout << "couldn't find cached version: " << cachefile.string() << std::endl;
 
 	in->clear();
-	in->mmapopen(realfile.string());
+	in->open(realfile.string());
 #if OC2E_BIG_ENDIAN
 	if (in->is_open() && (ft != spr)) {
 		path p = cachefile.parent_path();
@@ -131,7 +131,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
-	mmapifstream *in = new mmapifstream();
+	std::ifstream *in = new std::ifstream();
 	shared_ptr<creaturesImage> img;
 
 	std::string fname;
@@ -141,7 +141,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 		fname = std::string("Images/") + name;
 	}
 
-	// TODO: try/catch to free the mmapifstream
+	// TODO: try/catch to free the std::ifstream
 	bool successful = true;
 	if (engine.bmprenderer) {
 		successful = tryOpen(in, img, fname + ".bmp", bmp);

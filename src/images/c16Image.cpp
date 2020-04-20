@@ -87,7 +87,7 @@ shared_ptr<creaturesImage> s16Image::mutableCopy() {
 	return shared_ptr<creaturesImage>(img);
 }
 
-c16Image::c16Image(mmapifstream *in, std::string n) : creaturesImage(n) {
+c16Image::c16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
 	imgformat = if_16bit;
 
@@ -171,7 +171,7 @@ bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y)
 	return (buffer[offset] == 0);
 }
 
-s16Image::s16Image(mmapifstream *in, std::string n) : creaturesImage(n) {
+s16Image::s16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
 	imgformat = if_16bit;
 
@@ -179,8 +179,10 @@ s16Image::s16Image(mmapifstream *in, std::string n) : creaturesImage(n) {
 	
 	buffers = new void *[m_numframes];
 
-	for (unsigned int i = 0; i < m_numframes; i++)
-		buffers[i] = in->map + offsets[i];
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		buffers[i] = new char[2 * widths[i] * heights[i]];
+		in->read((char*)buffers[i], 2 * widths[i] * heights[i]);
+	}
 
 	delete[] offsets;
 }
@@ -188,9 +190,8 @@ s16Image::s16Image(mmapifstream *in, std::string n) : creaturesImage(n) {
 s16Image::~s16Image() {
 	delete[] widths;
 	delete[] heights;
-	if (!stream) { // make sure this isn't a damn mmapifstream..
-		for (unsigned int i = 0; i < m_numframes; i++)
-			delete[] (uint16 *)buffers[i];
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		delete[] (uint16 *)buffers[i];
 	}
 	delete[] buffers;
 	// TODO: we should never have 'offsets' left over here, but .. we should check

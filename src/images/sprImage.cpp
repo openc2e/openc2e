@@ -21,7 +21,7 @@
 #include "sprImage.h"
 #include <iostream>
 
-sprImage::sprImage(mmapifstream *in, std::string n) : creaturesImage(n) {
+sprImage::sprImage(std::ifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
 	imgformat = if_paletted;
 
@@ -30,14 +30,13 @@ sprImage::sprImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 
 	widths = new uint16[m_numframes];
 	heights = new uint16[m_numframes];
-	offsets = new uint32[m_numframes];
+	std::vector<uint32_t> offsets(m_numframes);
 	buffers = new void *[m_numframes];
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		in->read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]);
 		in->read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
 		in->read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
-		buffers[i] = in->map + offsets[i];
 	}
 
 	// check for Terra Nornia's corrupt background sprite
@@ -49,17 +48,25 @@ sprImage::sprImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 		std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
 		unsigned int currpos = 2 + (8 * m_numframes);
 		for (unsigned int i = 0; i < m_numframes; i++) {
-			buffers[i] = in->map + currpos;
+			offsets[i] = currpos;
 			currpos += widths[i] * heights[i];
 		}
+	}
+
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		in->seekg(offsets[i]);
+		buffers[i] = new char[widths[i] * heights[i]];
+		in->read(static_cast<char*>(buffers[i]), widths[i] * heights[i]);
 	}
 }
 
 sprImage::~sprImage() {
 	delete[] widths;
 	delete[] heights;
+	for (unsigned int i = 0; i < m_numframes; i++) {
+		delete[] (char*)buffers[i];
+	}
 	delete[] buffers;
-	delete[] offsets;
 }
 
 bool sprImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
