@@ -853,16 +853,6 @@ void MapData::copyToWorld() {
 	shared_ptr<creaturesImage> spr = world.gallery->getImage(background->filename);
 	sfccheck(spr);
 
-	// check for Terra Nornia's corrupt background sprite
-	if (background->filename == "buro") {
-		// apply stupid hack
-		// TODO: can't we have a better check, eg checking if offsets are identical?
-		std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
-		sprImage *buro = dynamic_cast<sprImage *>(spr.get());
-		if (buro)
-			buro->fixBufferOffsets();
-	}
-
 	// create the global metaroom
 	// TODO: hardcoded size bad?
 	unsigned int w = parent->version() == 0 ? 1200 : 2400;

@@ -39,21 +39,19 @@ sprImage::sprImage(mmapifstream *in, std::string n) : creaturesImage(n) {
 		in->read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
 		buffers[i] = in->map + offsets[i];
 	}
-}
 
-/*
- * Hacky fix for corrupt offset tables in SPR files.
- * Only works if the file has 'normal' offsets we can predict, but this will only be called
- * on known files anyway.
- */
-void sprImage::fixBufferOffsets() {
-	// we can do this safely because we only have an mmapifstream constructor
-	mmapifstream *in = (mmapifstream *)stream;
-
-	unsigned int currpos = 2 + (8 * m_numframes);
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i] = in->map + currpos;
-		currpos += widths[i] * heights[i];
+	// check for Terra Nornia's corrupt background sprite
+	if (n == "buro") {
+		// apply stupid hack for corrupt offset tables in SPR files
+		// Only works if the file has 'normal' offsets we can predict, but this will only be called
+		// on known files anyway.
+		// TODO: can't we have a better check, eg checking if offsets are identical?
+		std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
+		unsigned int currpos = 2 + (8 * m_numframes);
+		for (unsigned int i = 0; i < m_numframes; i++) {
+			buffers[i] = in->map + currpos;
+			currpos += widths[i] * heights[i];
+		}
 	}
 }
 
