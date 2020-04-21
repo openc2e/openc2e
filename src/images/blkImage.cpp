@@ -78,7 +78,7 @@ blkImage::blkImage(std::ifstream *in, std::string n) : creaturesImage(n) {
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		buffers[i] = new char[2 * widths[i] * heights[i]];
 		in->seekg(offsets[i]);
-		in->read((char*)buffers[i], 2 * widths[i] * heights[i]);
+		readmany16le(*in, (uint16_t*)buffers[i], widths[i] * heights[i]);
 	}
 }
 

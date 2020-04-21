@@ -111,10 +111,7 @@ c16Image::c16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
 				if (transparentrun)
 					memset((char *)bufferpos, 0, (runlength * 2));
 				else {
-					in->read((char *)bufferpos, (runlength * 2));
-					for (unsigned int k = 0; k < runlength; k++) {
-						bufferpos[k] = swapEndianShort(bufferpos[k]);
-					}
+					readmany16le(*in, bufferpos, runlength);
 				}
 				bufferpos += runlength;
 			}
@@ -182,7 +179,7 @@ s16Image::s16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		buffers[i] = new char[2 * widths[i] * heights[i]];
-		in->read((char*)buffers[i], 2 * widths[i] * heights[i]);
+		readmany16le(*in, (uint16_t*)buffers[i], widths[i] * heights[i]);
 	}
 
 	delete[] offsets;

@@ -100,6 +100,12 @@ static inline uint16_t read16be(std::istream &s) {
 	return ntohs(t);
 }
 
+static inline void readmany16le(std::istream &s, uint16_t* out, size_t n) {
+	for (size_t i = 0; i < n; ++i) {
+		out[i] = read16le(s);
+	}
+}
+
 static inline void write16le(std::ostream &s, uint16_t v) {
 	uint16_t t = swapEndianShort(v);
 	s.write((char *)&t, 2);
