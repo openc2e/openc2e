@@ -45,18 +45,17 @@ void blkImage::readHeader(std::istream &in) {
 	}
 }
 
-blkImage::blkImage(std::ifstream *in, std::string n) : creaturesImage(n) {
-	stream = in;
+blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_16bit;
 
-	readHeader(*in);
+	readHeader(in);
 	
 	buffers = new void *[m_numframes];
 	
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		buffers[i] = new char[2 * widths[i] * heights[i]];
-		in->seekg(offsets[i]);
-		readmany16le(*in, (uint16_t*)buffers[i], widths[i] * heights[i]);
+		in.seekg(offsets[i]);
+		readmany16le(in, (uint16_t*)buffers[i], widths[i] * heights[i]);
 	}
 }
 

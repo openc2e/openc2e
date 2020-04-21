@@ -171,7 +171,7 @@ public:
 // TODO: these are from imageManager.cpp, it'd be nice to have a non-hacky interface,
 // but we probably need to fix the image object model first due to endianism issues
 enum filetype { blk, s16, c16, spr, bmp };
-bool tryOpen(std::ifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft);
+shared_ptr<creaturesImage> tryOpen(std::string fname, filetype ft);
 
 Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 	qtopenc2e = parent;
@@ -278,8 +278,8 @@ Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 		/* gender marker animation */
 		// TODO
 	} else { // C2
-		std::ifstream *s = new std::ifstream();
-		if (!tryOpen(s, omelettedata, "Applet Data/Omelette.s16", s16)) {
+		omelettedata = tryOpen("Applet Data/Omelette.s16", s16);
+		if (!omelettedata) {
 			return;
 		}
 

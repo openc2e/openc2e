@@ -27,40 +27,39 @@
 #define BI_RLE8 1
 #define BI_BITFIELDS 3
 
-bmpData::bmpData(std::ifstream *in, std::string n) {
+bmpData::bmpData(std::ifstream &in, std::string n) {
 	palette = 0;
-	stream = in;
 
 	char magic[2];
-	in->read(magic, 2);
+	in.read(magic, 2);
 	if (std::string(magic, 2) != "BM")
 		throw creaturesException(n + " doesn't seem to be a BMP file.");
 
-	in->seekg(8, std::ios::cur); // skip filesize and reserved bytes
+	in.seekg(8, std::ios::cur); // skip filesize and reserved bytes
 
-	uint32_t dataoffset = read32le(*in);
+	uint32_t dataoffset = read32le(in);
 
-	uint32_t biSize = read32le(*in);
+	uint32_t biSize = read32le(in);
 	if (biSize != 40) // win3.x format, which the seamonkeys files are in
 		throw creaturesException(n + " is a BMP format we don't understand.");
 
-	biWidth = read32le(*in);
-	biHeight = read32le(*in);
+	biWidth = read32le(in);
+	biHeight = read32le(in);
 	caos_assert((int)biHeight > 0);
 	
-	uint16_t biPlanes = read16le(*in);
+	uint16_t biPlanes = read16le(in);
 	if (biPlanes != 1) // single image plane
 		throw creaturesException(n + " contains BMP data we don't understand.");
 	
-	uint16_t biBitCount = read16le(*in);
-	biCompression = read32le(*in);
+	uint16_t biBitCount = read16le(in);
+	biCompression = read32le(in);
 
 	// and now for some stuff we really don't care about
-	uint32_t biSizeImage = read32le(*in);
-	uint32_t biXPelsPerMeter = read32le(*in);
-	uint32_t biYPelsPerMeter = read32le(*in);
-	uint32_t biClrUsed = read32le(*in);
-	uint32_t biClrImportant = read32le(*in);
+	uint32_t biSizeImage = read32le(in);
+	uint32_t biXPelsPerMeter = read32le(in);
+	uint32_t biYPelsPerMeter = read32le(in);
+	uint32_t biClrUsed = read32le(in);
+	uint32_t biClrImportant = read32le(in);
 
 	switch (biCompression) {
 		case BI_RGB:
@@ -82,7 +81,7 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 			imgformat = if_paletted;
 			unsigned int num_palette_entries = (biBitCount == 4 ? 16 : 256);
 			std::vector<uint8_t> filepalette(num_palette_entries * 4);
-			in->read((char*)filepalette.data(), filepalette.size());
+			in.read((char*)filepalette.data(), filepalette.size());
 			palette = new uint8_t[256 * 4];
 			for (unsigned int i = 0; i < num_palette_entries; i++) {
 				palette[i * 4] = filepalette[(i * 4) + 2];
@@ -105,9 +104,9 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 		biSizeImage = biWidth * biHeight * biBitCount / 8;
 	}
 
-	in->seekg(dataoffset);
+	in.seekg(dataoffset);
 	bmpdata = new char[biSizeImage];
-	in->read((char*)bmpdata, biSizeImage);
+	in.read((char*)bmpdata, biSizeImage);
 
 	if (biBitCount == 4) {
 		char *srcdata = (char *)bmpdata;
@@ -181,10 +180,9 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 bmpData::~bmpData() {
 	delete[] (char *)bmpdata;
 	if (palette) delete[] palette;
-	delete stream;
 }
 
-bmpImage::bmpImage(std::ifstream *in, std::string n) : creaturesImage(n) {
+bmpImage::bmpImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	buffers = 0;
 
 	bmpdata = shared_ptr<bmpData>(new bmpData(in, n));

@@ -27,7 +27,7 @@ private:
 
 public:
 	c16Image() { }
-	c16Image(std::ifstream *, std::string n);
+	c16Image(std::ifstream &in, std::string n);
 	~c16Image();
 	void readHeader(std::istream &in);
 	std::shared_ptr<creaturesImage> mutableCopy();
@@ -40,7 +40,7 @@ private:
 
 public:
 	s16Image() { }
-	s16Image(std::ifstream *, std::string n);
+	s16Image(std::ifstream &in, std::string n);
 	~s16Image();
 	void readHeader(std::istream &in);
 	std::shared_ptr<creaturesImage> mutableCopy();

@@ -37,12 +37,11 @@ protected:
 	bool is_565;
 	imageformat imgformat;
 	
-	std::ifstream *stream;
 	std::string name;
   
 public:
-	creaturesImage(std::string n = std::string()) { stream = 0; name = n; }
-	virtual ~creaturesImage() { if (stream) delete stream; }
+	creaturesImage(std::string n = std::string()) { name = n; }
+	virtual ~creaturesImage() { }
 	bool is565() { return is_565; }
 	imageformat format() { return imgformat; }
 	unsigned int numframes() { return m_numframes; }

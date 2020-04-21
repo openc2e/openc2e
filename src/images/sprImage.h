@@ -28,7 +28,7 @@ private:
 
 public:
 	sprImage() { }
-	sprImage(std::ifstream *, std::string n);
+	sprImage(std::ifstream &in, std::string n);
 	~sprImage();
 	virtual unsigned int bitdepth() { return 8; }
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);

@@ -29,14 +29,13 @@ class bmpData {
 private:
 	friend class bmpImage;
 
-	bmpData(std::ifstream *, std::string n);
+	bmpData(std::ifstream &in, std::string n);
 
 	uint32_t biWidth, biHeight;
 	uint32_t biCompression;
 	void *bmpdata;
 	uint8_t *palette;
 	imageformat imgformat;
-	std::ifstream *stream;
 
 public:
 	~bmpData(); // shared_ptr needs to be able to call the destructor
@@ -48,7 +47,7 @@ protected:
 	void freeData();
 
 public:
-	bmpImage(std::ifstream *, std::string n);
+	bmpImage(std::ifstream &in, std::string n);
 	~bmpImage();
 
 	void setBlockSize(unsigned int blockwidth, unsigned int blockheight);

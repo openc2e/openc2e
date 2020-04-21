@@ -88,11 +88,10 @@ shared_ptr<creaturesImage> s16Image::mutableCopy() {
 	return shared_ptr<creaturesImage>(img);
 }
 
-c16Image::c16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
-	stream = in;
+c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_16bit;
 
-	readHeader(*in);
+	readHeader(in);
 	
 	buffers = new void *[m_numframes];
 	
@@ -102,16 +101,16 @@ c16Image::c16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
 		buffers[i] = new char[widths[i] * heights[i] * 2];
 		uint16_t *bufferpos = (uint16_t *)buffers[i];
 		for (unsigned int j = 0; j < heights[i]; j++) {
-			in->seekg(lineoffsets[i][j], std::ios::beg);
+			in.seekg(lineoffsets[i][j], std::ios::beg);
 			while (true) {
-				uint16_t tag; in->read((char *)&tag, 2); tag = swapEndianShort(tag);
+				uint16_t tag; in.read((char *)&tag, 2); tag = swapEndianShort(tag);
 				if (tag == 0) break;
 				bool transparentrun = ((tag & 0x0001) == 0);
 				uint16_t runlength = (tag & 0xFFFE) >> 1;
 				if (transparentrun)
 					memset((char *)bufferpos, 0, (runlength * 2));
 				else {
-					readmany16le(*in, bufferpos, runlength);
+					readmany16le(in, bufferpos, runlength);
 				}
 				bufferpos += runlength;
 			}
@@ -151,17 +150,16 @@ bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y)
 	return (buffer[offset] == 0);
 }
 
-s16Image::s16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
-	stream = in;
+s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_16bit;
 
-	readHeader(*in);
+	readHeader(in);
 	
 	buffers = new void *[m_numframes];
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		buffers[i] = new char[2 * widths[i] * heights[i]];
-		readmany16le(*in, (uint16_t*)buffers[i], widths[i] * heights[i]);
+		readmany16le(in, (uint16_t*)buffers[i], widths[i] * heights[i]);
 	}
 
 	delete[] offsets;
@@ -187,8 +185,6 @@ c16Image::~c16Image() {
 }
 
 void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
-	assert(!stream); // this only works on duplicated images
-
 	if (128 == r && 128 == g && 128  == b && 128  == rotation && 128 == swap) return; // duh
 
 	/*

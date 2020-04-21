@@ -38,29 +38,21 @@ using namespace ghc::filesystem;
 
 enum filetype { blk, s16, c16, spr, bmp };
 
-bool tryOpen(std::ifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
-	path realfile;
-	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
-
+shared_ptr<creaturesImage> tryOpen(std::string fname, filetype ft) {
 	path realfile(world.findFile(fname));
-	// if it doesn't exist, too bad, give up.
-	if (!exists(realfile)) return false;
+	std::string basename = realfile.filename().stem();
+	std::ifstream in(realfile.string());
 
-	std::string basename = realfile.filename().string(); basename.erase(basename.end() - 4, basename.end());
-
-	in->clear();
-	in->open(realfile.string());
-
-	if (in->is_open()) {
+	if (in.is_open()) {
 		switch (ft) {
-			case blk: img = shared_ptr<creaturesImage>(new blkImage(in, basename)); break;
-			case c16: img = shared_ptr<creaturesImage>(new c16Image(in, basename)); break;
-			case s16: img = shared_ptr<creaturesImage>(new s16Image(in, basename)); break;
-			case spr: img = shared_ptr<creaturesImage>(new sprImage(in, basename)); break;
-			case bmp: img = shared_ptr<creaturesImage>(new bmpImage(in, basename)); break; // TODO: don't commit this ;p
+			case blk: return shared_ptr<creaturesImage>(new blkImage(in, basename));
+			case c16: return shared_ptr<creaturesImage>(new c16Image(in, basename));
+			case s16: return shared_ptr<creaturesImage>(new s16Image(in, basename));
+			case spr: return shared_ptr<creaturesImage>(new sprImage(in, basename));
+			case bmp: return shared_ptr<creaturesImage>(new bmpImage(in, basename)); // TODO: don't commit this ;p
 		}
 	}
-	return in->is_open();
+	return {};
 }
 
 /*
@@ -77,9 +69,6 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
-	std::ifstream *in = new std::ifstream();
-	shared_ptr<creaturesImage> img;
-
 	std::string fname;
 	if (is_background) {
 		fname = std::string("Backgrounds/") + name;
@@ -87,34 +76,26 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 		fname = std::string("Images/") + name;
 	}
 
-	// TODO: try/catch to free the std::ifstream
-	bool successful = true;
+	shared_ptr<creaturesImage> img;
 	if (engine.bmprenderer) {
-		successful = tryOpen(in, img, fname + ".bmp", bmp);
+		img = tryOpen(fname + ".bmp", bmp);
 	} else {
 		if (is_background) {
-			successful = tryOpen(in, img, fname + ".blk", blk);
+			img = tryOpen(fname + ".blk", blk);
 		} else {
-			if (!tryOpen(in, img, fname + ".s16", s16)) {
-				if (!tryOpen(in, img, fname + ".c16", c16)) {
-					if (!tryOpen(in, img, fname + ".spr", spr)) {
-						successful = false;
-					}
-				}
-			}
+			img = tryOpen(fname + ".s16", s16);
+			if (!img) img = tryOpen(fname + ".c16", c16);
+			if (!img) img = tryOpen(fname + ".spr", spr);
 		}
 	}
 
-	if (successful) {
+	if (img) {
 		if (!is_background) // TODO: handle backgrounds
 			images[name] = img;
 	} else {
 		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
-		delete in;
 		return shared_ptr<creaturesImage>();
 	}
-
-	in->close(); // doesn't close the mmap, which we still need :)
 
 	return img;
 }

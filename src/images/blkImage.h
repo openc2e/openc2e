@@ -30,7 +30,7 @@ public:
 	unsigned int totalwidth, totalheight;
 
 	blkImage() { }
-	blkImage(std::ifstream *, std::string n);
+	blkImage(std::ifstream &in, std::string n);
 	~blkImage();
 	void readHeader(std::istream &in);
 	virtual std::string serializedName() { return name + ".blk"; }
