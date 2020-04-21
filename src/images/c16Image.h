@@ -43,13 +43,11 @@ public:
 	s16Image(std::ifstream *, std::string n);
 	~s16Image();
 	void readHeader(std::istream &in);
-	void writeHeader(std::ostream &out);
 	std::shared_ptr<creaturesImage> mutableCopy();
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 
 	friend class c16Image;
-	friend class fileSwapper;
 };
 
 /* vim: set noet: */

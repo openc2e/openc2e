@@ -86,7 +86,6 @@ set(OPENC2E_CORE
 	src/dialect.cpp
 	src/Engine.cpp
 	src/exceptions.cpp
-	src/fileSwapper.cpp
 	src/creatures/genomeFile.cpp
 	src/historyManager.cpp
 	src/imageManager.cpp

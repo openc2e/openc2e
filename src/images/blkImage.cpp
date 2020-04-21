@@ -45,28 +45,6 @@ void blkImage::readHeader(std::istream &in) {
 	}
 }
 
-void blkImage::writeHeader(std::ostream &s) {
-	unsigned int dw; unsigned short w;
-	
-	dw = (is_565 ? 1 : 0);
-	dw = swapEndianLong(dw); s.write((char *)&dw, 4);
-	w = totalwidth / 128; assert((unsigned int)(w * 128) == totalwidth);
-	w = swapEndianShort(w); s.write((char *)&w, 2);
-	w = totalheight / 128; assert((unsigned int)(w * 128) == totalheight);
-	w = swapEndianShort(w); s.write((char *)&w, 2);
-	w = m_numframes; assert(m_numframes == (unsigned int) ((totalwidth / 128) * (totalheight / 128)));
-	w = swapEndianShort(w); s.write((char *)&w, 2);
-
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		dw = offsets[i] - 4;
-		dw = swapEndianLong(dw); s.write((char *)&dw, 4);
-		w = widths[i]; assert(w == 128);
-		w = swapEndianShort(w); s.write((char *)&w, 2);
-		w = heights[i]; assert(w == 128);
-		w = swapEndianShort(w); s.write((char *)&w, 2);
-	}
-}
-
 blkImage::blkImage(std::ifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
 	imgformat = if_16bit;

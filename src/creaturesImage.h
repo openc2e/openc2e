@@ -30,8 +30,6 @@ enum imageformat { if_paletted, if_16bit, if_16bitcompressed, if_24bit };
 unsigned int bitDepthOf(imageformat f);
 
 class creaturesImage {
-	friend class fileSwapper;
-
 protected:
 	unsigned int m_numframes;
 	unsigned short *widths, *heights;

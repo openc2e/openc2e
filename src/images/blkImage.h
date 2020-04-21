@@ -33,11 +33,8 @@ public:
 	blkImage(std::ifstream *, std::string n);
 	~blkImage();
 	void readHeader(std::istream &in);
-	void writeHeader(std::ostream &s);
 	virtual std::string serializedName() { return name + ".blk"; }
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y) { (void)frame; (void)x; (void)y; return false; }
-
-	friend class fileSwapper;
 };
 
 #endif

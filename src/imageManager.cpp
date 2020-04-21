@@ -25,7 +25,6 @@
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
-#include "fileSwapper.h"
 
 #include "PathResolver.h"
 
@@ -40,75 +39,22 @@ using namespace ghc::filesystem;
 enum filetype { blk, s16, c16, spr, bmp };
 
 bool tryOpen(std::ifstream *in, shared_ptr<creaturesImage> &img, std::string fname, filetype ft) {
-	path cachefile, realfile;
-	std::string cachename;
+	path realfile;
 	if (fname.size() < 5) return false; // not enough chars for an extension and filename..
 
-	realfile = path(world.findFile(fname));
+	path realfile(world.findFile(fname));
 	// if it doesn't exist, too bad, give up.
 	if (!exists(realfile)) return false;
 
 	std::string basename = realfile.filename().string(); basename.erase(basename.end() - 4, basename.end());
 
-	// work out where the cached file should be
-	cachename = engine.storageDirectory().string() + "/" + fname;
-	if (ft == c16) { // TODO: we should really stop the caller from appending .s16/.c16
-		cachename.erase(cachename.end() - 4, cachename.end());
-		cachename.append(".s16");
-	}
-
-#if OC2E_BIG_ENDIAN
-	if (ft != spr)
-		cachename = cachename + ".big";
-#endif
-	cachefile = path(cachename);
-
-	if (resolveFile(cachefile)) {
-		// TODO: check for up-to-date-ness
-		in->clear();
-		in->open(cachefile.string());
-		if (ft == c16) ft = s16;
-		goto done;
-	}
-	//std::cout << "couldn't find cached version: " << cachefile.string() << std::endl;
-
 	in->clear();
 	in->open(realfile.string());
-#if OC2E_BIG_ENDIAN
-	if (in->is_open() && (ft != spr)) {
-		path p = cachefile.parent_path();
-		if (!exists(p))
-			create_directory(p);
-		if (!is_directory(p))
-			throw creaturesException("imageManager couldn't create cache directory '" + p.string() + "'");
 
-		fileSwapper f;
-		switch (ft) {
-			case blk:
-				f.convertblk(realfile.string(), cachefile.string());
-				break;
-			case s16:
-				f.converts16(realfile.string(), cachefile.string());
-				break;
-			case c16:
-				//cachefile = change_extension(cachefile, "");
-				//cachefile = change_extension(cachefile, ".s16.big");
-				f.convertc16(realfile.string(), cachefile.string());
-				ft = s16;
-				break;
-			default:
-				return true; // TODO: exception?
-		}
-		in->close(); // TODO: close the mmap too! how?
-		if (!exists(cachefile)) return false; // TODO: exception?
-		in->mmapopen(cachefile.string());
-	}
-#endif
-done:
 	if (in->is_open()) {
 		switch (ft) {
 			case blk: img = shared_ptr<creaturesImage>(new blkImage(in, basename)); break;
-			case c16: img = shared_ptr<creaturesImage>(new c16Image(in, basename)); break; // this should never happen, actually, once we're done
+			case c16: img = shared_ptr<creaturesImage>(new c16Image(in, basename)); break;
 			case s16: img = shared_ptr<creaturesImage>(new s16Image(in, basename)); break;
 			case spr: img = shared_ptr<creaturesImage>(new sprImage(in, basename)); break;
 			case bmp: img = shared_ptr<creaturesImage>(new bmpImage(in, basename)); break; // TODO: don't commit this ;p
