@@ -31,6 +31,7 @@ unsigned int bitDepthOf(imageformat f);
 
 class creaturesImage {
 protected:
+	friend class imageManager;
 	unsigned int m_numframes;
 	unsigned short *widths, *heights;
 	void **buffers;
@@ -38,7 +39,7 @@ protected:
 	imageformat imgformat;
 	
 	std::string name;
-  
+
 public:
 	creaturesImage(std::string n = std::string()) { name = n; }
 	virtual ~creaturesImage() { }
@@ -54,8 +55,6 @@ public:
 	virtual uint8_t *getCustomPalette();
 	
 	virtual bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
-	virtual std::shared_ptr<creaturesImage> mutableCopy();
-	virtual void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 };
 
 #endif

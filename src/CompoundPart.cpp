@@ -239,8 +239,7 @@ void CompoundPart::addZOrder() {
 }
 
 void SpritePart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
-	sprite = origsprite->mutableCopy();
-	sprite->tint(r, g, b, rotation, swap);
+	sprite = world.gallery->tint(origsprite, r, g, b, rotation, swap);
 }
 
 DullPart::DullPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
@@ -322,8 +321,7 @@ void TextPart::addTint(std::string tintinfo) {
 	t.offset = text.size();
 
 	if (!(r == 128 && g == 128 &&  b == 128 && rot == 128 && swap == 128)) {
-		t.sprite = textsprite->mutableCopy();
-		t.sprite->tint(r, g, b, rot, swap);
+		t.sprite = world.gallery->tint(textsprite, r, g, b, rot, swap);
 	} else t.sprite = textsprite;
 
 	tints.push_back(t);

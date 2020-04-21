@@ -253,8 +253,7 @@ shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(shared_ptr<creatures
 	
 	// TODO: work out tinting for other engine versions
 	if (engine.version > 2) {
-		shared_ptr<creaturesImage> newimage = s->mutableCopy();
-		newimage->tint(creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
+		shared_ptr<creaturesImage> newimage = world.gallery->tint(s, creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
 		return newimage;
 	}
 

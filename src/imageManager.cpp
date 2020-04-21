@@ -29,6 +29,7 @@
 #include "PathResolver.h"
 
 #include <iostream>
+#include <fmt/format.h>
 #include <fstream>
 #include <memory>
 
@@ -95,6 +96,140 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	} else {
 		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
 		return shared_ptr<creaturesImage>();
+	}
+
+	return img;
+}
+
+std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creaturesImage>& oldimage,
+                                                   unsigned char r, unsigned char g, unsigned char b,
+                                                   unsigned char rotation, unsigned char swap) {
+	if (oldimage->format() != if_16bit) {
+		throw creaturesException(fmt::format(
+			"Internal error: Tried to tint a sprite \"{}\" which doesn't support that.",
+			oldimage->getName()
+		));
+	}
+
+	if (128 == r && 128 == g && 128  == b && 128  == rotation && 128 == swap) return oldimage; // duh
+
+	std::shared_ptr<creaturesImage> img(new creaturesImage(oldimage->getName()));
+
+	img->imgformat = if_16bit;
+	img->is_565 = oldimage->is_565;
+	img->m_numframes = oldimage->m_numframes;
+	img->widths = new uint16_t[img->m_numframes];
+	memcpy(img->widths, oldimage->widths, img->m_numframes * sizeof(uint16_t));
+	img->heights = new uint16_t[img->m_numframes];
+	memcpy(img->heights, oldimage->heights, img->m_numframes * sizeof(uint16_t));
+	img->buffers = new void *[img->m_numframes];
+	for (size_t i = 0; i < img->m_numframes; i++) {
+		img->buffers[i] = new char[img->widths[i] * img->heights[i] * 2];
+		memcpy(img->buffers[i], oldimage->buffers[i], img->widths[i] * img->heights[i] * 2);
+	}
+
+	/*
+	 * CDN:
+	 * if rotation >= 128
+	 * absRot = rotation-128
+	 * else
+	 * absRot = 128 - rotation
+	 * endif
+	 * invRot = 127-absRot
+	 */
+	int absRot;
+	if (rotation >= 128)
+		absRot = (int)rotation - 128;
+	else
+		absRot = 128 - (int)rotation;
+	int invRot = 127 - absRot;
+
+	/*
+	 * CDN:
+	 * if swap >= 128
+	 * absSwap = swap - 128
+	 * else
+	 * absSwap = 128 - swap
+	 * endif
+	 * invSwap = 127-absSwap
+	 */
+	int absSwap;
+	if (swap >= 128)
+		absSwap = (int)swap - 128;
+	else
+		absSwap = 128 - (int)swap;
+	int invSwap = 127 - absSwap;
+
+	/*
+	 * CDN:
+	 * redTint = red-128
+	 * greenTint = green-128
+	 * blueTint = blue-128
+	 */
+
+	int redTint = (int)r - 128;
+	int greenTint = (int)g - 128;
+	int blueTint = (int)b - 128;
+
+	for (unsigned int i = 0; i < img->m_numframes; i++) {
+		for (unsigned int j = 0; j < img->heights[i]; j++) {
+			for (unsigned int k = 0; k < img->widths[i]; k++) {
+				unsigned short v = ((unsigned short *)img->buffers[i])[(j * img->widths[i]) + k];
+				if (v == 0) continue;
+
+				/*
+				 * CDN:
+				 * tempRed = RedValue + redTint;
+				 * tempGreen = GreenValue + greenTint;
+				 * tempBlue = BlueValue + blueTint;
+				 */
+				int red = (((uint32_t)(v) & 0xf800) >> 8) + redTint;
+				if (red < 0) red = 0; else if (red > 255) red = 255;
+				int green = (((uint32_t)(v) & 0x07e0) >> 3) + greenTint;
+				if (green < 0) green = 0; else if (green > 255) green = 255;
+				int blue = (((uint32_t)(v) & 0x001f) << 3) + blueTint;
+				if (blue < 0) blue = 0; else if (blue > 255) blue = 255;
+
+				/*
+				 * CDN:
+				 * if (rotation < 128)
+				 * rotRed = ((absRot * tempBlue) + (invRot * tempRed)) / 256
+				 * rotGreen = ((absRot * tempRed) + (invRot * tempGreen)) / 256
+				 * rotBlue = ((absRot * tempGreen) + (invRot * tempBlue)) / 256
+				 * endif
+				 */
+
+				int rotRed, rotGreen, rotBlue;
+				rotRed = ((blue * absRot) + (red * invRot)) / 128;
+				rotGreen = ((red * absRot) + (green * invRot)) / 128;
+				rotBlue = ((green * absRot) + (blue * invRot)) / 128;
+
+
+				/*
+				 * CDN:
+				 * swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed))/256
+				 * swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue))/256
+				 *
+				 * fuzzie notes that this doesn't seem to be a no-op for swap=128..
+				 */
+				int swappedRed = ((absSwap * blue) + (invSwap * red)) / 128;
+				int swappedBlue = ((absSwap * red) + (invSwap * blue)) / 128;
+
+				/*
+				 * SetColour(definedcolour to (swappedRed,rotGreen,swappedBlue))
+				 */
+				swappedRed = (swappedRed << 8) & 0xf800;
+				rotGreen = (rotGreen << 3) & 0x7e0;
+				swappedBlue = (swappedBlue >> 3) & 0x1f;
+				v = (swappedRed | rotGreen | swappedBlue);
+				/*
+				 * if definedcolour ==0 SetColour(definedcolour to (1,1,1))
+				 */
+				if (v == 0)
+					v = (1 << 11 | 1 << 5 | 1);
+				((unsigned short *)img->buffers[i])[(j * img->widths[i]) + k] = v;
+			}
+		}
 	}
 
 	return img;

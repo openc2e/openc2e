@@ -30,7 +30,6 @@ public:
 	c16Image(std::ifstream &in, std::string n);
 	~c16Image();
 	void readHeader(std::istream &in);
-	std::shared_ptr<creaturesImage> mutableCopy();
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 };
 
@@ -43,11 +42,7 @@ public:
 	s16Image(std::ifstream &in, std::string n);
 	~s16Image();
 	void readHeader(std::istream &in);
-	std::shared_ptr<creaturesImage> mutableCopy();
-	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
-
-	friend class c16Image;
 };
 
 /* vim: set noet: */

@@ -32,6 +32,9 @@ protected:
 
 public:
 	std::shared_ptr<creaturesImage> getImage(std::string name, bool is_background = false);
+	std::shared_ptr<creaturesImage> tint(const std::shared_ptr<creaturesImage>& image,
+	                                     unsigned char r, unsigned char g, unsigned char b,
+	                                     unsigned char rotation, unsigned char swap);
 };
 
 #endif
