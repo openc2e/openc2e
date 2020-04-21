@@ -20,6 +20,7 @@
 #include "prayfile/pray.h"
 #include "exceptions.h"
 #include "endianlove.h"
+#include "spanstream.h"
 #include <miniz.h>
 
 prayFile::prayFile(fs::path filepath) {
@@ -59,10 +60,9 @@ prayFileBlock::prayFileBlock(prayFile *p) {
 	file.read(nameid, 128);
 	name = nameid;
 
-	file.read((char *)&compressedsize, 4); compressedsize = swapEndianLong(compressedsize);
-	file.read((char *)&size, 4); size = swapEndianLong(size);
-	unsigned int flags;
-	file.read((char *)&flags, 4); flags = swapEndianLong(flags);
+	compressedsize = read32le(file);
+	size = read32le(file);
+	unsigned int flags = read32le(file);
 	compressed = ((flags & 1) == 1);
 	if (!compressed && size != compressedsize)
 		throw creaturesException("Size doesn't match compressed size for uncompressed block.");
@@ -127,15 +127,13 @@ void prayFileBlock::load() {
 	loaded = true;
 }
 
-std::string tagStringRead(unsigned char *&ptr) {
-	unsigned int len = *(unsigned int *)ptr;
-	len = swapEndianLong(len);
-	ptr += 4;
+std::string tagStringRead(std::istream& in) {
+	unsigned int len = read32le(in);
 
-	unsigned char *data = ptr;
-	ptr += len;
+	std::string data(len, '0');
+	in.read(&data[0], len);
 
-	return std::string((char *)data, len);
+	return data;
 }
 
 void prayFileBlock::parseTags() {
@@ -146,24 +144,22 @@ void prayFileBlock::parseTags() {
 
 	tagsloaded = true;
 
-	unsigned char *ptr = buffer;
+	spanstream s(buffer, size);
 
-	unsigned int nointvalues = swapEndianLong(*(unsigned int *)ptr); ptr += 4;
-
+	unsigned int nointvalues = read32le(s);
 	for (unsigned int i = 0; i < nointvalues; i++) {
-		std::string n = tagStringRead(ptr);
-		unsigned int v = swapEndianLong(*(unsigned int *)ptr); ptr += 4;
+		std::string n = tagStringRead(s);
+		unsigned int v = read32le(s);
 
 		if (integerValues.find(n) != integerValues.end())
 			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
 		integerValues[n] = v;
 	}
 
-	unsigned int nostrvalues = swapEndianLong(*(unsigned int *)ptr); ptr += 4;
-
+	unsigned int nostrvalues = read32le(s);
 	for (unsigned int i = 0; i < nostrvalues; i++) {
-		std::string n = tagStringRead(ptr);
-		std::string v = tagStringRead(ptr);
+		std::string n = tagStringRead(s);
+		std::string v = tagStringRead(s);
 		if (stringValues.find(n) != stringValues.end()) // TODO: check integers too?
 			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
 		stringValues[n] = v;

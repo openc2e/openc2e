@@ -6,11 +6,6 @@
 #include <vector>
 #include <miniz.h>
 
-static void writeUInt32LE(std::ostream &stream, uint32_t value) {
-  uint32_t swapped = swapEndianLong(value);
-  stream.write((char *)&swapped, 4);
-}
-
 PrayFileWriter::PrayFileWriter(const std::string &filename,
                                bool enable_compression_)
     : stream(filename), enable_compression(enable_compression_) {
@@ -37,15 +32,15 @@ void PrayFileWriter::writeBlockRawData(const std::string &type,
     if (status != Z_OK) {
       abort(); // TODO
     }
-    writeUInt32LE(stream, compressed_size);
-    writeUInt32LE(stream, data_size);
-    writeUInt32LE(stream, 0x1);
+    write32le(stream, compressed_size);
+    write32le(stream, data_size);
+    write32le(stream, 0x1);
 
     stream.write(compressed_data.data(), compressed_size);
   } else {
-    writeUInt32LE(stream, data_size);
-    writeUInt32LE(stream, data_size);
-    writeUInt32LE(stream, 0);
+    write32le(stream, data_size);
+    write32le(stream, data_size);
+    write32le(stream, 0);
 
     stream.write(data, data_size);
   }
@@ -57,18 +52,18 @@ void PrayFileWriter::writeBlockTags(
     const std::map<std::string, std::string> &string_tags) {
   std::ostringstream os;
 
-  writeUInt32LE(os, integer_tags.size());
+  write32le(os, integer_tags.size());
   for (auto kv : integer_tags) {
-    writeUInt32LE(os, kv.first.size());
+    write32le(os, kv.first.size());
     os.write(kv.first.c_str(), kv.first.size());
-    writeUInt32LE(os, kv.second);
+    write32le(os, kv.second);
   }
 
-  writeUInt32LE(os, string_tags.size());
+  write32le(os, string_tags.size());
   for (auto kv : string_tags) {
-    writeUInt32LE(os, kv.first.size());
+    write32le(os, kv.first.size());
     os.write(kv.first.c_str(), kv.first.size());
-    writeUInt32LE(os, kv.second.size());
+    write32le(os, kv.second.size());
     os.write(kv.second.c_str(), kv.second.size());
   }
 
