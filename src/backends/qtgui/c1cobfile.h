@@ -19,23 +19,22 @@
 
 #include <iostream>
 #include <string>
-#include "endianlove.h"
 #include "streamutils.h"
 #include <vector>
 
 std::string readpascalstring(std::istream &s);
 
 struct c1cobfile {
-	uint16 no_objects;
-	uint32 expire_month;
-	uint32 expire_day;
-	uint32 expire_year;
+	uint16_t no_objects;
+	uint32_t expire_month;
+	uint32_t expire_day;
+	uint32_t expire_year;
 	std::vector<std::string> scripts;
 	std::vector<std::string> imports;
-	uint16 no_objects_used;
+	uint16_t no_objects_used;
 	std::string name;
 
-	uint32 imagewidth, imageheight;
+	uint32_t imagewidth, imageheight;
 
 	std::vector<char> imagedata;
 

@@ -20,7 +20,6 @@
 #ifndef _VOICEDATA_H
 #define _VOICEDATA_H
 
-#include "endianlove.h"
 #include <vector>
 #include <string>
 #include <istream>
@@ -33,7 +32,7 @@ struct VoiceEntry {
 class VoiceData {
 protected:
 	std::vector<VoiceEntry> Voices;
-	std::vector<uint32> LookupTable;
+	std::vector<uint32_t> LookupTable;
 
 public:
 	VoiceData(std::ifstream &file);

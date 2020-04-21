@@ -20,7 +20,6 @@
 #ifndef _SFCFILE_H
 #define _SFCFILE_H
 
-#include "endianlove.h"
 #include <map>
 #include <vector>
 #include <string>
@@ -41,8 +40,8 @@ class SFCScenery;
 class SFCMacro;
 
 struct SFCScript {
-	uint8 genus, family;
-	uint16 species, eventno;
+	uint8_t genus, family;
+	uint16_t species, eventno;
 	std::string data;
 
 	void read(class SFCFile *);
@@ -67,9 +66,9 @@ public:
 	std::vector<SFCScript> scripts;
 	std::vector<SFCMacro *> macros;
 
-	uint32 scrollx, scrolly;
+	uint32_t scrollx, scrolly;
 	std::string favplacename;
-	uint32 favplacex, favplacey;
+	uint32_t favplacex, favplacey;
 	std::vector<std::string> speech_history;
 
 	SFCFile() : reading_compound(false), reading_scenery(false) { }
@@ -77,9 +76,9 @@ public:
 	void read(std::istream *i);
 	SFCClass *slurpMFC(unsigned int reqtype = 0);
 
-	uint8 read8();
-	uint16 read16();
-	uint32 read32();
+	uint8_t read8();
+	uint16_t read16();
+	uint32_t read32();
 	signed int reads32() { return (signed int)read32(); }
 	std::string readBytes(unsigned int n);
 	std::string readstring();
@@ -101,9 +100,9 @@ protected:
 	virtual ~SFCClass() { }
 
 	SFCClass *slurpMFC(unsigned int reqtype = 0) { return parent->slurpMFC(reqtype); }
-	uint8 read8() { return parent->read8(); }
-	uint16 read16() { return parent->read16(); }
-	uint32 read32() { return parent->read32(); }
+	uint8_t read8() { return parent->read8(); }
+	uint16_t read16() { return parent->read16(); }
+	uint32_t read32() { return parent->read32(); }
 	signed int reads32() { return parent->reads32(); }
 	std::string readBytes(unsigned int n) { return parent->readBytes(n); }
 	std::string readstring() { return parent->readstring(); }
@@ -116,8 +115,8 @@ public:
 
 class CGallery : public SFCClass {
 public:
-	uint32 noframes;
-	uint32 firstimg;
+	uint32_t noframes;
+	uint32_t firstimg;
 	std::string filename;
 
 	// no real need for sizes/offsets/etc..
@@ -128,8 +127,8 @@ public:
 
 class CDoor : public SFCClass {
 public:
-	uint8 openness;
-	uint16 otherroom;
+	uint8_t openness;
+	uint16_t otherroom;
 	
 	CDoor(SFCFile *p) : SFCClass(p) { }
 	void read();
@@ -137,17 +136,17 @@ public:
 
 class CRoom : public SFCClass {
 public:
-	uint32 id;
-	uint32 left, top, right, bottom;
+	uint32_t id;
+	uint32_t left, top, right, bottom;
 	std::vector<CDoor *> doors[4];
-	uint32 roomtype;
-	uint8 floorvalue;
-	uint8 inorganicnutrients, organicnutrients, temperature, pressure, lightlevel, radiation;
+	uint32_t roomtype;
+	uint8_t floorvalue;
+	uint8_t inorganicnutrients, organicnutrients, temperature, pressure, lightlevel, radiation;
 	signed char heatsource, pressuresource, lightsource, radiationsource;
-	uint32 windx, windy;
-	std::vector<std::pair<uint32, uint32> > floorpoints;
+	uint32_t windx, windy;
+	std::vector<std::pair<uint32_t, uint32_t> > floorpoints;
 	std::string music;
-	uint32 dropstatus;
+	uint32_t dropstatus;
 
 	// TODO: misc data
 	
@@ -173,18 +172,18 @@ class SFCEntity : public SFCClass {
 public:
 	CGallery *sprite;
 
-	uint8 currframe, imgoffset;
-	uint32 zorder;
-	uint32 x, y;
+	uint8_t currframe, imgoffset;
+	uint32_t zorder;
+	uint32_t x, y;
 	bool haveanim;
-	uint8 animframe;
+	uint8_t animframe;
 	std::string animstring;
 
-	uint32 relx, rely;
+	uint32_t relx, rely;
 
-	uint32 partzorder;
+	uint32_t partzorder;
 	int bhvrclick[3];
-	uint8 bhvrtouch;
+	uint8_t bhvrtouch;
 
 	std::vector<std::pair<int, int> > pickup_handles;
 	std::vector<std::pair<int, int> > pickup_points;
@@ -199,25 +198,25 @@ protected:
 	SFCObject(SFCFile *p) : SFCClass(p) { }
 
 public:
-	uint8 genus, family;
-	uint16 species;
+	uint8_t genus, family;
+	uint16_t species;
 
-	uint32 unid; // needed?
-	uint16 attr;
-	uint32 left, top, right, bottom; // what is this?
-	uint8 actv;
+	uint32_t unid; // needed?
+	uint16_t attr;
+	uint32_t left, top, right, bottom; // what is this?
+	uint8_t actv;
 
 	std::string currentsound;
 
 	CGallery *sprite;
 
-	uint32 tickreset, tickstate;
+	uint32_t tickreset, tickstate;
 
-	uint32 variables[100];
+	uint32_t variables[100];
 
-	uint8 size, threat;
-	uint32 range, accg, velx, vely, rest, aero;
-	uint32 gravdata;
+	uint8_t size, threat;
+	uint32_t range, accg, velx, vely, rest, aero;
+	uint32_t gravdata;
 
 	bool frozen;
 
@@ -230,8 +229,8 @@ public:
 struct SFCHotspot {
 	int left, top, right, bottom;
 	int function;
-	uint16 message;
-	uint8 mask;
+	uint16_t message;
+	uint8_t mask;
 };
 
 class SFCCompoundObject : public SFCObject {
@@ -251,9 +250,9 @@ public:
 
 class SFCBlackboard : public SFCCompoundObject {
 public:
-	uint32 textx, texty;
-	uint32 backgroundcolour, chalkcolour, aliascolour;
-	std::vector<std::pair<uint32, std::string> > strings;
+	uint32_t textx, texty;
+	uint32_t backgroundcolour, chalkcolour, aliascolour;
+	std::vector<std::pair<uint32_t, std::string> > strings;
 
 	SFCBlackboard(SFCFile *p) : SFCCompoundObject(p) { }
 	void read();
@@ -262,9 +261,9 @@ public:
 
 class SFCVehicle : public SFCCompoundObject {
 public:
-	uint32 cabinleft, cabintop, cabinright, cabinbottom;
+	uint32_t cabinleft, cabintop, cabinright, cabinbottom;
 	int xvec, yvec;
-	uint8 bump;
+	uint8_t bump;
 
 	// TODO: misc data
 
@@ -277,9 +276,9 @@ class SFCLift : public SFCVehicle {
 	friend class SFCCallButton;
 
 public:
-	uint32 nobuttons;
-	uint32 currentbutton;
-	uint32 callbuttony[8];
+	uint32_t nobuttons;
+	uint32_t currentbutton;
+	uint32_t callbuttony[8];
 	bool alignwithcabin;
 	// TODO: misc data
 
@@ -313,7 +312,7 @@ public:
 class SFCCallButton : public SFCSimpleObject {
 public:
 	SFCLift *ourLift;
-	uint8 liftid;
+	uint8_t liftid;
 
 	SFCCallButton(SFCFile *p) : SFCSimpleObject(p) { }
 	void read();

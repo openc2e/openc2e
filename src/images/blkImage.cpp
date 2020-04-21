@@ -19,11 +19,12 @@
 
 #include "openc2e.h"
 #include "blkImage.h"
+#include "endianlove.h"
 #include <cassert>
 #include <iostream>
 
 void blkImage::readHeader(std::istream &in) {
-	uint32 flags; uint16 width, height, spritecount;
+	uint32_t flags; uint16_t width, height, spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	in.read((char *)&width, 2); width = swapEndianShort(width);
@@ -33,9 +34,9 @@ void blkImage::readHeader(std::istream &in) {
 	
 	assert(m_numframes == (unsigned int) (width * height));	
 
-	widths = new uint16[m_numframes];
-	heights = new uint16[m_numframes];
-	offsets = new uint32[m_numframes];
+	widths = new uint16_t[m_numframes];
+	heights = new uint16_t[m_numframes];
+	offsets = new uint32_t[m_numframes];
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]) + 4;

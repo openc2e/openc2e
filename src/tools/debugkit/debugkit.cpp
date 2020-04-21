@@ -174,12 +174,11 @@ void DebugKit::selectedAgentChanged(int i) {
 
 #include <iostream>
 #include <string>
-#include "../../endianlove.h"
 #include "../../streamutils.h"
 
 std::string readpascalstring(std::istream &s) {
-	uint16 size;
-	uint8 a; s.read((char *)&a, 1);
+	uint16_t size;
+	uint8_t a; s.read((char *)&a, 1);
 	if (a == 255)
 		size = read16(s);
 	else
@@ -192,19 +191,19 @@ std::string readpascalstring(std::istream &s) {
 }
 
 struct c1cobfile {
-	uint16 no_objects;
-	uint32 expire_month;
-	uint32 expire_day;
-	uint32 expire_year;
+	uint16_t no_objects;
+	uint32_t expire_month;
+	uint32_t expire_day;
+	uint32_t expire_year;
 	std::vector<std::string> scripts;
 	std::vector<std::string> imports;
-	uint16 no_objects_used;
+	uint16_t no_objects_used;
 	std::string name;
 
 	c1cobfile(std::ifstream &s) {
 		s >> std::noskipws;
 
-		uint16 version = read16(s);
+		uint16_t version = read16(s);
 
 		// TODO: mph
 		if (version != 1) {
@@ -216,10 +215,10 @@ struct c1cobfile {
 		expire_month = read32(s);
 		expire_day = read32(s);
 		expire_year = read32(s);
-		uint16 noscripts = read16(s);
-		uint16 noimports = read16(s);
+		uint16_t noscripts = read16(s);
+		uint16_t noimports = read16(s);
 		no_objects_used = read16(s);
-		uint16 reserved_zero = read16(s);
+		uint16_t reserved_zero = read16(s);
 		assert(reserved_zero == 0);
 
 		for (unsigned int i = 0; i < noscripts; i++)
@@ -227,9 +226,9 @@ struct c1cobfile {
 		for (unsigned int i = 0; i < noimports; i++)
 			imports.push_back(readpascalstring(s));
 
-		uint32 imagewidth = read32(s);
-		uint32 imageheight = read32(s);
-		uint16 secondimagewidth = read16(s);
+		uint32_t imagewidth = read32(s);
+		uint32_t imageheight = read32(s);
+		uint16_t secondimagewidth = read16(s);
 		assert(imagewidth == secondimagewidth);
 		std::vector<char> imagedata(imagewidth * imageheight);
 		s.read(imagedata.data(), imagewidth * imageheight);

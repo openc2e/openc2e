@@ -17,12 +17,11 @@
  *
  */
 
-#include "endianlove.h"
 #include <fstream>
 
-uint16 read16(std::istream &s, bool littleend = true);
-void write16(std::ostream &s, uint16 v, bool littleend = true);
-uint32 read32(std::istream &s);
-void write32(std::ostream &s, uint32 v);
+uint16_t read16(std::istream &s, bool littleend = true);
+void write16(std::ostream &s, uint16_t v, bool littleend = true);
+uint32_t read32(std::istream &s);
+void write32(std::ostream &s, uint32_t v);
 
 /* vim: set noet: */

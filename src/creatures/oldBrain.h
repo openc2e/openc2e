@@ -28,9 +28,9 @@ using std::shared_ptr;
 
 struct oldSVRule {
 	unsigned int length;
-	uint8 rndconst;
-	uint8 rules[12];
-	void init(uint8 version, uint8 *src);
+	uint8_t rndconst;
+	uint8_t rules[12];
+	void init(uint8_t version, uint8_t *src);
 };
 
 struct oldDendrite {
@@ -72,7 +72,7 @@ protected:
 	oldSVRule relaxrule[2];
 	oldSVRule backproprule[2], forproprule[2];
 
-	unsigned char evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, oldSVRule &rule);
+	unsigned char evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8_t id, oldSVRule &rule);
 	unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRule &rule);
 
 	unsigned char dendrite_sum(oldNeuron &cell, unsigned int type, bool only_if_all_firing);

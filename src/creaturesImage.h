@@ -25,8 +25,6 @@
 #include <fstream>
 #include <cassert>
 
-#include "endianlove.h"
-
 enum imageformat { if_paletted, if_16bit, if_16bitcompressed, if_24bit };
 
 unsigned int bitDepthOf(imageformat f);
@@ -56,7 +54,7 @@ public:
 	std::string getName() { return name; }
 
 	virtual bool hasCustomPalette() { return false; }
-	virtual uint8 *getCustomPalette();
+	virtual uint8_t *getCustomPalette();
 	
 	virtual bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 	virtual std::shared_ptr<creaturesImage> mutableCopy();

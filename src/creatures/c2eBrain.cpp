@@ -409,7 +409,7 @@ std::string c2eLobe::getId() {
  * Initialises an SVRule from the provided data, precalculating any constant data.
  *
  */
-void c2eSVRule::init(uint8 ruledata[48]) {
+void c2eSVRule::init(uint8_t ruledata[48]) {
 	rules.reserve(16);
 
 	for (unsigned int i = 0; i < 16; i++) {

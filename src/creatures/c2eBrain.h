@@ -37,14 +37,14 @@ class c2eBrainComponent {
 protected:
 	friend struct c2ebraincomponentorder;
 
-	uint8 updatetime;
+	uint8_t updatetime;
 	class c2eBrain *parent;
 	bool inited;
 
 public:
 	virtual void init() = 0;
 	virtual void tick() = 0;
-	uint8 getUpdateTime() { return updatetime; }
+	uint8_t getUpdateTime() { return updatetime; }
 	bool wasInited() { return inited; }
 
 	c2eBrainComponent(class c2eBrain *b) : parent(b) { assert(b); inited = false; }
@@ -52,9 +52,9 @@ public:
 };
 
 struct c2erule {
-	uint8 opcode;
-	uint8 operandtype;
-	uint8 operanddata;
+	uint8_t opcode;
+	uint8_t operandtype;
+	uint8_t operanddata;
 	float operandvalue;
 };
 
@@ -63,7 +63,7 @@ protected:
 	std::vector<c2erule> rules;
 
 public:
-	void init(uint8 ruledata[48]);
+	void init(uint8_t ruledata[48]);
 	bool runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], class c2eCreature *creature);
 };
 

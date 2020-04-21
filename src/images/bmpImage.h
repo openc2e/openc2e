@@ -21,7 +21,6 @@
 #define _BMPIMAGE_H
 
 #include "creaturesImage.h"
-#include "endianlove.h"
 #include <memory>
 
 class bmpImage;
@@ -32,10 +31,10 @@ private:
 
 	bmpData(std::ifstream *, std::string n);
 
-	uint32 biWidth, biHeight;
-	uint32 biCompression;
+	uint32_t biWidth, biHeight;
+	uint32_t biCompression;
 	void *bmpdata;
-	uint8 *palette;
+	uint8_t *palette;
 	imageformat imgformat;
 	std::ifstream *stream;
 
@@ -55,7 +54,7 @@ public:
 	void setBlockSize(unsigned int blockwidth, unsigned int blockheight);
 
 	bool hasCustomPalette() { return imgformat == if_paletted; }
-	uint8 *getCustomPalette() { return bmpdata->palette; }
+	uint8_t *getCustomPalette() { return bmpdata->palette; }
 };
 
 #endif

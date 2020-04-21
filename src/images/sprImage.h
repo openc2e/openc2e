@@ -21,11 +21,10 @@
 #define _SPRIMAGE_H
 
 #include "creaturesImage.h"
-#include "endianlove.h"
 
 class sprImage : public creaturesImage {
 private:
-	uint32 *offsets;
+	uint32_t *offsets;
 
 public:
 	sprImage() { }

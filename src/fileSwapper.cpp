@@ -21,6 +21,7 @@
 #include <cassert>
 #include <fstream>
 #include <memory>
+#include "endianlove.h"
 #include "images/blkImage.h"
 #include "images/c16Image.h"
 #include "openc2e.h"
@@ -100,7 +101,7 @@ void fileSwapper::convertblk(std::string src, std::string dest) {
 	
 	for (unsigned int i = 0; i < img.m_numframes; i++) {
 		in.seekg(img.offsets[i], std::ios::beg);
-		img.buffers[i] = new uint16[128 * 128];
+		img.buffers[i] = new uint16_t[128 * 128];
 		in.read((char *)img.buffers[i], 128 * 128 * 2);
 		for (unsigned int k = 0; k < 128 * 128; k++) {
 			((unsigned short *)img.buffers[i])[k] = swapEndianShort(((unsigned short *)img.buffers[i])[k]);
@@ -122,7 +123,7 @@ void fileSwapper::convertblk(std::string src, std::string dest) {
 	}
 
 	for (unsigned int i = 0; i < img.m_numframes; i++) {
-		delete[] (uint16 *)img.buffers[i];
+		delete[] (uint16_t *)img.buffers[i];
 	}
 }
 /* vim: set noet: */

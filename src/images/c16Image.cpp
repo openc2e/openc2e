@@ -18,12 +18,13 @@
  */
 
 #include "c16Image.h"
+#include "endianlove.h"
 #include "openc2e.h"
 #include <cassert>
 #include <memory>
 
 void c16Image::readHeader(std::istream &in) {
-	uint32 flags; uint16 spritecount;
+	uint32_t flags; uint16_t spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	assert(flags & 0x02);
@@ -35,7 +36,7 @@ void c16Image::readHeader(std::istream &in) {
 
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		uint32 offset;
+		uint32_t offset;
 		in.read((char *)&offset, 4); offset = swapEndianLong(offset);
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
@@ -99,14 +100,14 @@ c16Image::c16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
 	// todo: we assume the file format is valid here. we shouldn't.
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		buffers[i] = new char[widths[i] * heights[i] * 2];
-		uint16 *bufferpos = (uint16 *)buffers[i];
+		uint16_t *bufferpos = (uint16_t *)buffers[i];
 		for (unsigned int j = 0; j < heights[i]; j++) {
 			in->seekg(lineoffsets[i][j], std::ios::beg);
 			while (true) {
-				uint16 tag; in->read((char *)&tag, 2); tag = swapEndianShort(tag);
+				uint16_t tag; in->read((char *)&tag, 2); tag = swapEndianShort(tag);
 				if (tag == 0) break;
 				bool transparentrun = ((tag & 0x0001) == 0);
-				uint16 runlength = (tag & 0xFFFE) >> 1;
+				uint16_t runlength = (tag & 0xFFFE) >> 1;
 				if (transparentrun)
 					memset((char *)bufferpos, 0, (runlength * 2));
 				else {
@@ -124,7 +125,7 @@ c16Image::c16Image(std::ifstream *in, std::string n) : creaturesImage(n) {
 }
 
 void s16Image::readHeader(std::istream &in) {
-	uint32 flags; uint16 spritecount;
+	uint32_t flags; uint16_t spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
@@ -191,7 +192,7 @@ s16Image::~s16Image() {
 	delete[] widths;
 	delete[] heights;
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		delete[] (uint16 *)buffers[i];
+		delete[] (uint16_t *)buffers[i];
 	}
 	delete[] buffers;
 	// TODO: we should never have 'offsets' left over here, but .. we should check
@@ -201,7 +202,7 @@ c16Image::~c16Image() {
 	delete[] widths;
 	delete[] heights;
 	for (unsigned int i = 0; i < m_numframes; i++)
-		delete[] (uint16 *)buffers[i];
+		delete[] (uint16_t *)buffers[i];
 	delete[] buffers;
 	// TODO: we should never have 'offsets' left over here, but .. we should check
 }
@@ -266,11 +267,11 @@ void s16Image::tint(unsigned char r, unsigned char g, unsigned char b, unsigned 
 				 * tempGreen = GreenValue + greenTint;
 				 * tempBlue = BlueValue + blueTint;
 				 */
-				int red = (((uint32)(v) & 0xf800) >> 8) + redTint;
+				int red = (((uint32_t)(v) & 0xf800) >> 8) + redTint;
 				if (red < 0) red = 0; else if (red > 255) red = 255;
-				int green = (((uint32)(v) & 0x07e0) >> 3) + greenTint;
+				int green = (((uint32_t)(v) & 0x07e0) >> 3) + greenTint;
 				if (green < 0) green = 0; else if (green > 255) green = 255;
-				int blue = (((uint32)(v) & 0x001f) << 3) + blueTint;
+				int blue = (((uint32_t)(v) & 0x001f) << 3) + blueTint;
 				if (blue < 0) blue = 0; else if (blue > 255) blue = 255;
 
 				/*

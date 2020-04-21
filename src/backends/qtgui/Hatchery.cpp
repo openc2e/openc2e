@@ -70,14 +70,14 @@ QImage imageFromSpriteFrame(shared_ptr<creaturesImage> img, unsigned int frame, 
 
 	for (unsigned int i = 0; i < img->height(frame); i++) {
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
-		memcpy(ourimg.scanLine(i), (uint16 *)img->data(frame) + (i * img->width(frame)), img->width(frame) * 2);
+		memcpy(ourimg.scanLine(i), (uint16_t *)img->data(frame) + (i * img->width(frame)), img->width(frame) * 2);
 #else
 		// versions of Qt before 4.4 -> manually convert to 32-bit
 		// TODO: less horrible method for converting 16-bit to 32-bit?
-		uint32 *outbuf = (uint32 *)ourimg.scanLine(i);
-		uint16 *inbuf = (uint16 *)img->data(frame) + (i * img->width(frame));
+		uint32_t *outbuf = (uint32_t *)ourimg.scanLine(i);
+		uint16_t *inbuf = (uint16_t *)img->data(frame) + (i * img->width(frame));
 		for (unsigned int j = 0; j < img->width(frame); j++) {
-			uint16 v = inbuf[j];
+			uint16_t v = inbuf[j];
 			if (img->is565()) {
 				outbuf[j] = 0xff000000 + (((v & 0xf800) >> 8) << 16) + (((v & 0x07e0) >> 3) << 8) + ((v & 0x001f) << 3);
 			} else {

@@ -39,9 +39,9 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 
 	in->seekg(8, std::ios::cur); // skip filesize and reserved bytes
 
-	uint32 dataoffset = read32(*in);
+	uint32_t dataoffset = read32(*in);
 
-	uint32 biSize = read32(*in);
+	uint32_t biSize = read32(*in);
 	if (biSize != 40) // win3.x format, which the seamonkeys files are in
 		throw creaturesException(n + " is a BMP format we don't understand.");
 
@@ -49,19 +49,19 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 	biHeight = read32(*in);
 	caos_assert((int)biHeight > 0);
 	
-	uint16 biPlanes = read16(*in);
+	uint16_t biPlanes = read16(*in);
 	if (biPlanes != 1) // single image plane
 		throw creaturesException(n + " contains BMP data we don't understand.");
 	
-	uint16 biBitCount = read16(*in);
+	uint16_t biBitCount = read16(*in);
 	biCompression = read32(*in);
 
 	// and now for some stuff we really don't care about
-	uint32 biSizeImage = read32(*in);
-	uint32 biXPelsPerMeter = read32(*in);
-	uint32 biYPelsPerMeter = read32(*in);
-	uint32 biClrUsed = read32(*in);
-	uint32 biClrImportant = read32(*in);
+	uint32_t biSizeImage = read32(*in);
+	uint32_t biXPelsPerMeter = read32(*in);
+	uint32_t biYPelsPerMeter = read32(*in);
+	uint32_t biClrUsed = read32(*in);
+	uint32_t biClrImportant = read32(*in);
 
 	switch (biCompression) {
 		case BI_RGB:
@@ -84,7 +84,7 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 			unsigned int num_palette_entries = (biBitCount == 4 ? 16 : 256);
 			std::vector<uint8_t> filepalette(num_palette_entries * 4);
 			in->read((char*)filepalette.data(), filepalette.size());
-			palette = new uint8[256 * 4];
+			palette = new uint8_t[256 * 4];
 			for (unsigned int i = 0; i < num_palette_entries; i++) {
 				palette[i * 4] = filepalette[(i * 4) + 2];
 				palette[(i * 4) + 1] = filepalette[(i * 4) + 1];
@@ -116,7 +116,7 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 		bmpdata = dstdata;
 
 		for (char *dest = dstdata; dest < dstdata + biWidth * biHeight; dest += biWidth) {
-			uint8 pixel = 0;
+			uint8_t pixel = 0;
 			for (unsigned int i = 0; i < biWidth; i++) {
 				if (i % 2 == 0) {
 					pixel = *srcdata;

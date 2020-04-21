@@ -25,8 +25,8 @@
 #include <arpa/inet.h>
 #endif
 
-uint16 read16(std::istream &s, bool littleend) {
-	uint16 t;
+uint16_t read16(std::istream &s, bool littleend) {
+	uint16_t t;
 	s.read((char *)&t, 2);
 	if (littleend)
 		return swapEndianShort(t);
@@ -34,8 +34,8 @@ uint16 read16(std::istream &s, bool littleend) {
 		return ntohs(t);
 }
 
-void write16(std::ostream &s, uint16 v, bool littleend) {
-	uint16 t;
+void write16(std::ostream &s, uint16_t v, bool littleend) {
+	uint16_t t;
 	if (littleend)
 		t = swapEndianShort(v);
 	else
@@ -43,14 +43,14 @@ void write16(std::ostream &s, uint16 v, bool littleend) {
 	s.write((char *)&t, 2);
 }
 
-uint32 read32(std::istream &s) {
-	uint32 t;
+uint32_t read32(std::istream &s) {
+	uint32_t t;
 	s.read((char *)&t, 4);
 	return swapEndianLong(t);
 }
 
-void write32(std::ostream &s, uint32 v) {
-	uint32 t = swapEndianLong(v);
+void write32(std::ostream &s, uint32_t v) {
+	uint32_t t = swapEndianLong(v);
 	s.write((char *)&t, 4);
 }
 

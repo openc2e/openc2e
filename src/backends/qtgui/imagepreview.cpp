@@ -16,7 +16,7 @@
 
 #include "imagepreview.h"
 #include "c1cobfile.h"
-
+#include "endianlove.h"
 #include "Engine.h"
 #include "cobFile.h"
 

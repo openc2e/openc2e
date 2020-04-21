@@ -22,20 +22,20 @@
 #include <exception>
 #include <iostream>
 
-geneNote *genomeFile::findNote(uint8 type, uint8 subtype, uint8 which) {
+geneNote *genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
 	for (vector<gene *>::iterator x = genes.begin(); x != genes.end(); x++) {
 		gene *t = *x;
-			if ((uint8)t->type() == type)
-				if ((uint8)t->subtype() == subtype)
-					if ((uint8)t->note.which == which)
+			if ((uint8_t)t->type() == type)
+				if ((uint8_t)t->subtype() == subtype)
+					if ((uint8_t)t->note.which == which)
 						return &t->note;
 
 	if (typeid(*t) == typeid(organGene))
 		for (vector<gene *>::iterator y = ((organGene *)t)->genes.begin(); y != ((organGene *)t)->genes.end(); y++) {
 			gene *s = *y;
-				if ((uint8)s->type() == type)
-				if ((uint8)s->subtype() == subtype)
-					if ((uint8)s->note.which == which)
+				if ((uint8_t)s->type() == type)
+				if ((uint8_t)s->subtype() == subtype)
+					if ((uint8_t)s->note.which == which)
 						return &s->note;
 		}
 	}
@@ -45,24 +45,24 @@ geneNote *genomeFile::findNote(uint8 type, uint8 subtype, uint8 which) {
 
 void genomeFile::readNotes(istream &s) {
 	if (cversion == 3) {
-		uint16 gnover = read16(s);
-		uint16 nosvnotes = read16(s);
+		uint16_t gnover = read16(s);
+		uint16_t nosvnotes = read16(s);
 		std::cout << "we have " << nosvnotes << " notes" << std::endl;
 
 		for (int i = 0; i < nosvnotes; i++) {
-			uint16 type = read16(s);
-			uint16 subtype = read16(s);
-			uint16 which = read16(s);
-			uint16 rule = read16(s);
+			uint16_t type = read16(s);
+			uint16_t subtype = read16(s);
+			uint16_t which = read16(s);
+			uint16_t rule = read16(s);
 
 			// TODO: we currently skip all the notes (note that there are 18 and then 1!)
 			for (int i = 0; i < 19; i++) {
-				uint16 skip = read16(s);
-				uint8 *dummy = new uint8[skip]; s.read((char *)dummy, skip); delete[] dummy;
+				uint16_t skip = read16(s);
+				uint8_t *dummy = new uint8_t[skip]; s.read((char *)dummy, skip); delete[] dummy;
 			}
 			}
 
-		uint16 ver = 0;
+		uint16_t ver = 0;
 
 		while (ver != 0x02) {
 			if (s.fail() || s.eof()) throw genomeException("c3 gno loading broke ... second magic not present");
@@ -70,16 +70,16 @@ void genomeFile::readNotes(istream &s) {
 		}
 	}
 
-	uint16 noentries = read16(s);
+	uint16_t noentries = read16(s);
 
 	for (int i = 0; i < noentries; i++) {
-		uint16 type = read16(s);
-		uint16 subtype = read16(s);
-		uint32 which = read32(s);
+		uint16_t type = read16(s);
+		uint16_t subtype = read16(s);
+		uint32_t which = read32(s);
 
 		geneNote *n = findNote(type, subtype, which);
 
-		uint16 buflen = read16(s);
+		uint16_t buflen = read16(s);
 		char *buffer = new char[buflen + 1];
 		s.read(buffer, buflen); buffer[buflen] = 0;
 		if (n != 0) n->description = buffer;
@@ -96,7 +96,7 @@ void genomeFile::writeNotes(ostream &s) const {
 }
 
 gene *genomeFile::nextGene(istream &s) {
-	uint8 majic[3];
+	uint8_t majic[3];
 	s.read((char *)majic, 3);
 	if (strncmp((char *)majic, "gen", 3) != 0) throw genomeException("bad majic for a gene");
 
@@ -105,7 +105,7 @@ gene *genomeFile::nextGene(istream &s) {
 	if (majic[0] != 'e')
 		throw genomeException("bad majic at stage2 for a gene");
 
-	uint8 type, subtype;
+	uint8_t type, subtype;
 	s >> type >> subtype;
 
 	gene *g = 0;
@@ -209,7 +209,7 @@ ostream &operator << (ostream &s, const genomeFile &f) {
 	return s;
 }
 
-gene *genomeFile::getGene(uint8 type, uint8 subtype, unsigned int seq) {
+gene *genomeFile::getGene(uint8_t type, uint8_t subtype, unsigned int seq) {
 	unsigned int c = 0;
 	for (vector<gene *>::iterator i = genes.begin(); i != genes.end(); i++) {
 		if ((*i)->type() == type)
@@ -222,12 +222,12 @@ gene *genomeFile::getGene(uint8 type, uint8 subtype, unsigned int seq) {
 	return 0;
 }
 
-uint8 geneFlags::operator () () const {
+uint8_t geneFlags::operator () () const {
 	return ((_mutable?1:0) + (dupable?2:0) + (delable?4:0) + (maleonly?8:0) +
 		(femaleonly?16:0) + (notexpressed?32:0) + (reserved1?64:0) + (reserved2?128:0));
 }
 
-void geneFlags::operator () (uint8 f) {
+void geneFlags::operator () (uint8_t f) {
 	_mutable = ((f & 1) != 0);
 	dupable = ((f & 2) != 0);
 	delable = ((f & 4) != 0);
@@ -241,7 +241,7 @@ void geneFlags::operator () (uint8 f) {
 ostream &operator << (ostream &s, const gene &g) {
 	s << "gene" << g.type() << g.subtype();
 
-	s << g.note.which << g.header.generation << uint8(g.header.switchontime) << g.header.flags();
+	s << g.note.which << g.header.generation << uint8_t(g.header.switchontime) << g.header.flags();
 	if (g.cversion > 1) s << g.header.mutweighting;
 	if (g.cversion == 3) s << g.header.variant;
 
@@ -251,7 +251,7 @@ ostream &operator << (ostream &s, const gene &g) {
 }
 
 istream &operator >> (istream &s, gene &g) {
-	uint8 b;
+	uint8_t b;
 	s >> g.note.which >> g.header.generation >> b;
 	g.header.switchontime = (lifestage)b;
 	s >> b;
@@ -266,13 +266,13 @@ istream &operator >> (istream &s, gene &g) {
 
 void bioEmitterGene::write(ostream &s) const {
 	s << organ << tissue << locus << chemical << threshold << rate << gain;
-	uint8 flags = (clear?1:0) + (digital?2:0) + (invert?4:0);
+	uint8_t flags = (clear?1:0) + (digital?2:0) + (invert?4:0);
 	s << flags;
 }
 
 void bioEmitterGene::read(istream &s) {
 	s >> organ >> tissue >> locus >> chemical >> threshold >> rate >> gain;
-	uint8 flags;
+	uint8_t flags;
 	s >> flags;
 	clear = ((flags & 1) != 0);
 	digital = ((flags & 2) != 0);
@@ -339,13 +339,13 @@ void bioReactionGene::read(istream &s) {
 
 void bioReceptorGene::write(ostream &s) const {
 	s << organ << tissue << locus << chemical << threshold << nominal << gain;
-	uint8 flags = (inverted?1:0) + (digital?2:0);
+	uint8_t flags = (inverted?1:0) + (digital?2:0);
 	s << flags;
 }
 
 void bioReceptorGene::read(istream &s) {
 	s >> organ >> tissue >> locus >> chemical >> threshold >> nominal >> gain;
-	uint8 flags;
+	uint8_t flags;
 	s >> flags;
 	inverted = ((flags & 1) != 0);
 	digital = ((flags & 2) != 0);
@@ -540,7 +540,7 @@ void creaturePoseGene::read(istream &s) {
 
 void creatureStimulusGene::write(ostream &s) const {
 	s << stim << significance << sensoryneuron << intensity;
-	uint8 flags = (modulate?1:0) + (addoffset?2:0) + (whenasleep?4:0);
+	uint8_t flags = (modulate?1:0) + (addoffset?2:0) + (whenasleep?4:0);
 	if (silent[0]) flags += 16;
 	if (silent[1]) flags += 32;
 	if (silent[2]) flags += 64;
@@ -554,7 +554,7 @@ void creatureStimulusGene::write(ostream &s) const {
 
 void creatureStimulusGene::read(istream &s) {
 	s >> stim >> significance >> sensoryneuron >> intensity;
-	uint8 flags;
+	uint8_t flags;
 	s >> flags;
 	modulate = ((flags & 1) != 0);
 	addoffset = ((flags & 2) != 0);

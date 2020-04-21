@@ -88,7 +88,7 @@ public:
 		
 	bool keyDown(int key);
 	
-	void setPalette(uint8 *data);
+	void setPalette(uint8_t *data);
 	void delay(int msec);
 };
 

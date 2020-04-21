@@ -18,11 +18,12 @@
  */
 
 #include "peFile.h"
+#include "endianlove.h"
 #include "exceptions.h"
 #include "streamutils.h"
 
 // debug helper
-std::string nameForType(uint32 t) {
+std::string nameForType(uint32_t t) {
 	switch (t) {
 		case 1: return "Cursor";
 		case 2: return "Bitmap";
@@ -63,7 +64,7 @@ peFile::peFile(fs::path filepath) {
 	file.seekg(58, std::ios::cur);
 
 	// read the location of the PE header
-	uint32 e_lfanew = read32(file);
+	uint32_t e_lfanew = read32(file);
 	if (e_lfanew == 0)
 		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (DOS program?)");
 
@@ -76,9 +77,9 @@ peFile::peFile(fs::path filepath) {
 
 	// read the necessary data from the PE file header
 	file.seekg(2, std::ios::cur);
-	uint16 nosections = read16(file);
+	uint16_t nosections = read16(file);
 	file.seekg(12, std::ios::cur);
-	uint16 optionalheadersize = read16(file);
+	uint16_t optionalheadersize = read16(file);
 	file.seekg(2, std::ios::cur);
 
 	// skip the optional header
@@ -117,12 +118,12 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 
 	file.seekg(12, std::ios::cur);
 	
-	uint16 nonamedentries = read16(file);
-	uint16 noidentries = read16(file);
+	uint16_t nonamedentries = read16(file);
+	uint16_t noidentries = read16(file);
 
 	for (unsigned int i = 0; i < nonamedentries + noidentries; i++) {
-		uint32 name = read32(file);
-		uint32 offset = read32(file);
+		uint32_t name = read32(file);
+		uint32_t offset = read32(file);
 
 		unsigned int here = file.tellg();
 	
@@ -144,10 +145,10 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 
 			file.seekg(s.offset + offset, std::ios::beg);
 			
-			uint32 offset = read32(file);
+			uint32_t offset = read32(file);
 			offset += s.offset;
 			offset -= s.vaddr;
-			uint32 size = read32(file);
+			uint32_t size = read32(file);
 				
 			resourceInfo info;
 			info.offset = offset;
@@ -155,7 +156,7 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 			info.data = 0;
 
 			//if ((currlang & 0xff) == 0x09) // LANG_ENGLISH
-			resources[std::pair<uint32, uint32>(currtype, currlang)][currname] = info;
+			resources[std::pair<uint32_t, uint32_t>(currtype, currlang)][currname] = info;
 		}
 		
 		file.seekg(here, std::ios::beg);
@@ -163,8 +164,8 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 }
 
 peFile::~peFile() {
-	for (std::map<std::pair<uint32, uint32>, std::map<uint32, resourceInfo> >::iterator i = resources.begin(); i != resources.end(); i++) {
-		for (std::map<uint32, resourceInfo>::iterator j = i->second.begin(); j != i->second.end(); j++) {
+	for (std::map<std::pair<uint32_t, uint32_t>, std::map<uint32_t, resourceInfo> >::iterator i = resources.begin(); i != resources.end(); i++) {
+		for (std::map<uint32_t, resourceInfo>::iterator j = i->second.begin(); j != i->second.end(); j++) {
 			if (j->second.data) {
 				delete[] j->second.data;
 			}
@@ -172,11 +173,11 @@ peFile::~peFile() {
 	}
 }
 
-resourceInfo *peFile::getResource(uint32 type, uint32 lang, uint32 name) {
-	if (resources.find(std::pair<uint32, uint32>(type, lang)) == resources.end()) return 0;
-	if (resources[std::pair<uint32, uint32>(type, lang)].find(name) == resources[std::pair<uint32, uint32>(type, lang)].end()) return 0;
+resourceInfo *peFile::getResource(uint32_t type, uint32_t lang, uint32_t name) {
+	if (resources.find(std::pair<uint32_t, uint32_t>(type, lang)) == resources.end()) return 0;
+	if (resources[std::pair<uint32_t, uint32_t>(type, lang)].find(name) == resources[std::pair<uint32_t, uint32_t>(type, lang)].end()) return 0;
 
-	resourceInfo *r = &resources[std::pair<uint32, uint32>(type, lang)][name];
+	resourceInfo *r = &resources[std::pair<uint32_t, uint32_t>(type, lang)][name];
 	if (!r->data) {
 		file.seekg(r->offset, std::ios::beg);
 		r->data = new char[r->size];
@@ -187,17 +188,17 @@ resourceInfo *peFile::getResource(uint32 type, uint32 lang, uint32 name) {
 
 std::vector<std::string> resourceInfo::parseStrings() {
 	std::vector<std::string> strings;
-	uint16 *udata = (uint16 *)data;
+	uint16_t *udata = (uint16_t *)data;
 
 	for (unsigned int i = 0; i < size / 2;) {
-		uint16 strsize = *udata;
+		uint16_t strsize = *udata;
 		strsize = swapEndianShort(strsize);
 		udata++; i++;
 
 		std::string s;
 		for (unsigned int j = 0; (j < strsize) && (i < size / 2); j++) {
-			uint16 d = *udata; d = swapEndianShort(d);
-			s += (uint8)d; // TODO: convert properly from utf16, somehow
+			uint16_t d = *udata; d = swapEndianShort(d);
+			s += (uint8_t)d; // TODO: convert properly from utf16, somehow
 			i++; udata++;
 		}
 		strings.push_back(s);

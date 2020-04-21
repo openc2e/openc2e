@@ -24,7 +24,6 @@
 #include <map>
 #include <string>
 #include "CompoundPart.h"
-#include "endianlove.h"
 
 struct Hotspot {
 	int left, top, right, bottom;
@@ -32,8 +31,8 @@ struct Hotspot {
 
 struct HotspotFunction {
 	int hotspot;
-	uint16 message;
-	uint8 mask;
+	uint16_t message;
+	uint8_t mask;
 };
 
 class CompoundAgent : public Agent {
@@ -63,7 +62,7 @@ public:
 	bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
 	void setHotspotLoc(unsigned int id, int l, int t, int r, int b);
 	void setHotspotFunc(unsigned int id, unsigned int h);
-	void setHotspotFuncDetails(unsigned int id, uint16 message, uint8 flags);
+	void setHotspotFuncDetails(unsigned int id, uint16_t message, uint8_t flags);
 
 	// accessor functions for NEW: PART and similar
 	std::string getSpriteFile() { return spritefile; }

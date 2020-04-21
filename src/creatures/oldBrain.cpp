@@ -40,7 +40,7 @@
  *
  */
 
-void oldSVRule::init(uint8 version, uint8 *src) {
+void oldSVRule::init(uint8_t version, uint8_t *src) {
 	length = (version == 0) ? 8 : 12;
 	for (unsigned int i = 0; i < length; i++) {
 		rules[i] = src[i];
@@ -50,7 +50,7 @@ void oldSVRule::init(uint8 version, uint8 *src) {
 	rndconst = 0; // TODO: correct?
 }
 
-unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8 id, oldSVRule &rule) {
+unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8_t id, oldSVRule &rule) {
 	switch (id) {
 		/*
 		 * these numbers are the C2 svrules (see rewrite in oldSVRule constructor)
@@ -289,20 +289,20 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 
 	inited = false;
 
-	staterule.init(g->version(), (uint8 *)g->staterule);
+	staterule.init(g->version(), (uint8_t *)g->staterule);
 
 	for (unsigned int i = 0; i < 2; i++) {
 		oldDendriteInfo *dend_info = &g->dendrite1;
 		if (i == 1) dend_info = &g->dendrite2;
 
-		strgainrule[i].init(g->version(), (uint8 *)dend_info->strgainrule);
-		strlossrule[i].init(g->version(), (uint8 *)dend_info->strlossrule);
-		susceptrule[i].init(g->version(), (uint8 *)dend_info->susceptrule);
-		relaxrule[i].init(g->version(), (uint8 *)dend_info->relaxrule);
+		strgainrule[i].init(g->version(), (uint8_t *)dend_info->strgainrule);
+		strlossrule[i].init(g->version(), (uint8_t *)dend_info->strlossrule);
+		susceptrule[i].init(g->version(), (uint8_t *)dend_info->susceptrule);
+		relaxrule[i].init(g->version(), (uint8_t *)dend_info->relaxrule);
 
 		if (g->version() == 1) { // back/forward propogation is C2 only
-			backproprule[i].init(g->version(), (uint8 *)dend_info->backproprule);
-			forproprule[i].init(g->version(), (uint8 *)dend_info->forproprule);
+			backproprule[i].init(g->version(), (uint8_t *)dend_info->backproprule);
+			forproprule[i].init(g->version(), (uint8_t *)dend_info->forproprule);
 		} else {
 			backproprule[i].length = 0;
 			forproprule[i].length = 0;
@@ -400,7 +400,7 @@ void oldLobe::connect() {
 
 		// TODO: handle src->neurons.size() being empty? or rather, maybe should never let that happen
 
-		uint8 &fanout = dend_info[type]->fanout;
+		uint8_t &fanout = dend_info[type]->fanout;
 
 		unsigned int destsize = width * height, srcsize = src->width * src->height;
 

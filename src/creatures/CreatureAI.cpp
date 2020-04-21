@@ -242,7 +242,7 @@ bool c2eCreature::processInstinct() {
 
 	for (unsigned int i = 0; i < 3; i++) {
 		// TODO: what about unused?
-		uint8 lobetissueid = g->lobes[i];
+		uint8_t lobetissueid = g->lobes[i];
 		if (lobetissueid == 255) continue;
 		/* fuzzie would like to take this opportunity to quote from the pygenes source:
 		 * Apparently, someone decided that because the rows are 1 above the lobe IDs, they should write the ROW NUMBER into the file, instead. Someone, somewhere, needs SHOOTING. */

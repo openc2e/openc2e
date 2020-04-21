@@ -116,7 +116,7 @@ void Engine::loadGameData() {
 				palette[i] = palette[i] * 4;
 			}
 
-			backend->setPalette((uint8 *)palette);
+			backend->setPalette((uint8_t *)palette);
 		} else
 			throw creaturesException("Couldn't find C1 palette data!");
 	}

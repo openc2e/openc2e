@@ -20,6 +20,7 @@
 #include "MusicManager.h"
 #include "World.h"
 #include "AudioBackend.h"
+#include "endianlove.h"
 #include "Engine.h"
 #include <iostream> // for debug messages
 #include <cmath> // for cos/sin

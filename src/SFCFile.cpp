@@ -23,6 +23,7 @@
 #include "MetaRoom.h"
 #include "Room.h"
 #include "Camera.h"
+#include "endianlove.h"
 #include "exceptions.h"
 #include "imageManager.h"
 #include "Map.h"
@@ -69,25 +70,25 @@ void SFCFile::read(std::istream *i) {
 	sfccheck(mapdata);
 
 	// TODO: hackery to seek to the next bit
-	uint8 x = 0;
+	uint8_t x = 0;
 	while (x == 0) x = read8();
 	ourStream->seekg(-1, std::ios::cur);
 
-	uint32 numobjects = read32();
+	uint32_t numobjects = read32();
 	for (unsigned int i = 0; i < numobjects; i++) {
 		SFCObject *o = (SFCObject *)slurpMFC(TYPE_OBJECT);
 		sfccheck(o);
 		objects.push_back(o);
 	}
 
-	uint32 numscenery = read32();
+	uint32_t numscenery = read32();
 	for (unsigned int i = 0; i < numscenery; i++) {
 		SFCScenery *o = (SFCScenery *)slurpMFC(TYPE_SCENERY);
 		sfccheck(o);
 		scenery.push_back(o);
 	}
 
-	uint32 numscripts = read32();
+	uint32_t numscripts = read32();
 	for (unsigned int i = 0; i < numscripts; i++) {
 		SFCScript x;
 		x.read(this);
@@ -107,12 +108,12 @@ void SFCFile::read(std::istream *i) {
 	else
 		readBytes(29); // TODO
 
-	uint16 numspeech = read16();
+	uint16_t numspeech = read16();
 	for (unsigned int i = 0; i < numspeech; i++) {
 		speech_history.push_back(readstring());
 	}
 
-	uint32 nomacros = read32();
+	uint32_t nomacros = read32();
 	for (unsigned int i = 0; i < nomacros; i++) {
 		SFCMacro *o = (SFCMacro *)slurpMFC(TYPE_MACRO);
 		if (o) // TODO: ugh
@@ -133,15 +134,15 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 	sfccheck(!ourStream->fail());
 
 	// read the pid (this only works up to 0x7ffe, but we'll cope)
-	uint16 pid = read16();
+	uint16_t pid = read16();
 
 	if (pid == 0) {
 		// null object
 		return 0;
 	} else if (pid == 0xffff) {
 		// completely new class, read details
-		uint16 schemaid = read16();
-		uint16 strlen = read16();
+		uint16_t schemaid = read16();
+		uint16_t strlen = read16();
 		char *temp = new char[strlen];
 		ourStream->read(temp, strlen);
 		std::string classname(temp, strlen);
@@ -192,7 +193,7 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		sfccheck(temp);
 		return temp;
 	} else {
-		uint16 oldpid = pid;
+		uint16_t oldpid = pid;
 		// create a new object of an existing class
 		pid ^= 0x8000;
 		pid -= 1;
@@ -238,28 +239,28 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 	return newobj;
 }
 
-uint8 SFCFile::read8() {
+uint8_t SFCFile::read8() {
 	char temp[1];
 	ourStream->read(temp, 1);
 	return temp[0];
 }
 
-uint16 SFCFile::read16() {
+uint16_t SFCFile::read16() {
 	char temp[2];
 	ourStream->read(temp, 2);
-	uint16 *i = (uint16 *)&temp;
+	uint16_t *i = (uint16_t *)&temp;
 	return swapEndianShort(*i);
 }
 
-uint32 SFCFile::read32() {
+uint32_t SFCFile::read32() {
 	char temp[4];
 	ourStream->read(temp, 4);
-	uint32 *i = (uint32 *)&temp;
+	uint32_t *i = (uint32_t *)&temp;
 	return swapEndianLong(*i);
 }
 
 std::string SFCFile::readstring() {
-	uint32 strlen = read8();
+	uint32_t strlen = read8();
 	if (strlen == 0xff) {
 		strlen = read16();
 		if (strlen == 0xffff)
@@ -309,7 +310,7 @@ void MapData::read() {
 	sfccheck(background);
 
 	// room data
-	uint32 norooms = read32();
+	uint32_t norooms = read32();
 	for (unsigned int i = 0; i < norooms; i++) {
 		if (parent->version() == 0) {
 			CRoom *temp = new CRoom(parent);
@@ -385,7 +386,7 @@ void CRoom::read() {
 	bottom = read32();
 
 	for (unsigned int i = 0; i < 4; i++) {
-		uint16 nodoors = read16();
+		uint16_t nodoors = read16();
 		for (unsigned int j = 0; j < nodoors; j++) {
 			CDoor *temp = (CDoor*)slurpMFC(TYPE_CDOOR);
 			sfccheck(temp);
@@ -416,11 +417,11 @@ void CRoom::read() {
 	// discard unknown bytes
 	readBytes(800);
 
-	uint16 nopoints = read16();
+	uint16_t nopoints = read16();
 	for (unsigned int i = 0; i < nopoints; i++) {
-		uint32 x = read32();
-		uint32 y = read32();
-		floorpoints.push_back(std::pair<uint32, uint32>(x, y));
+		uint32_t x = read32();
+		uint32_t y = read32();
+		floorpoints.push_back(std::pair<uint32_t, uint32_t>(x, y));
 	}
 
 	// discard unknown bytes
@@ -468,7 +469,7 @@ void SFCEntity::read() {
 	y = read32();
 
 	// check if this agent is animated at present
-	uint8 animbyte = read8();
+	uint8_t animbyte = read8();
 	if (animbyte) {
 		sfccheck(animbyte == 1);
 		haveanim = true;
@@ -506,12 +507,12 @@ void SFCEntity::read() {
 	if (parent->version() == 0) return;
 
 	// read pickup handles/points
-	uint16 num_pickup_handles = read16();
+	uint16_t num_pickup_handles = read16();
 	for (unsigned int i = 0; i < num_pickup_handles; i++) {
 		int x = reads32(); int y = reads32();
 		pickup_handles.push_back(std::pair<int, int>(x, y));
 	}
-	uint16 num_pickup_points = read16();
+	uint16_t num_pickup_points = read16();
 	for (unsigned int i = 0; i < num_pickup_points; i++) {
 		int x = reads32(); int y = reads32();
 		pickup_points.push_back(std::pair<int, int>(x, y));
@@ -608,12 +609,12 @@ void SFCObject::read() {
 		threat = read8();
 
 		// read flags
-		uint8 flags = read8();
+		uint8_t flags = read8();
 		frozen = (flags & 0x02);
 	}
 
 	// read scripts
-	uint32 numscripts = read32();
+	uint32_t numscripts = read32();
 	for (unsigned int i = 0; i < numscripts; i++) {
 		SFCScript x;
 		x.read(parent);
@@ -624,7 +625,7 @@ void SFCObject::read() {
 void SFCCompoundObject::read() {
 	SFCObject::read();
 
-	uint32 numparts = read32();
+	uint32_t numparts = read32();
 
 	for (unsigned int i = 0; i < numparts; i++) {
 		SFCEntity *e = (SFCEntity *)slurpMFC(TYPE_ENTITY);
@@ -685,11 +686,11 @@ void SFCBlackboard::read() {
 
 	// read blackboard strings
 	for (unsigned int i = 0; i < (parent->version() == 0 ? 16 : 48); i++) {
-		uint32 value = read32();
+		uint32_t value = read32();
 		std::string str = readBytes(11);
 		// chop off non-null-terminated bits
 		str = std::string(str.c_str());
-		strings.push_back(std::pair<uint32, std::string>(value, str));
+		strings.push_back(std::pair<uint32_t, std::string>(value, str));
 	}
 }
 
@@ -829,7 +830,7 @@ void SFCFile::copyToWorld() {
 				// patch variable to actually refer to an agent
 				unsigned int varno = patchdata[j][4];
 				for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
-					if ((*i)->unid == (uint32)a->var[varno].getInt()) {
+					if ((*i)->unid == (uint32_t)a->var[varno].getInt()) {
 						a->var[varno].setAgent((*i)->copiedAgent());
 						break;
 					}

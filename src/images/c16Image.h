@@ -20,7 +20,6 @@
 #include "creaturesImage.h"
 #include <istream>
 #include <memory>
-#include "endianlove.h"
 
 class c16Image : public creaturesImage {
 private:
@@ -37,7 +36,7 @@ public:
 
 class s16Image : public creaturesImage {
 private:
-	uint32 *offsets;
+	uint32_t *offsets;
 
 public:
 	s16Image() { }

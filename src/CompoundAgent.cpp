@@ -177,7 +177,7 @@ void CompoundAgent::setHotspotFunc(unsigned int id, unsigned int f) {
 		hotspotfunctions[id].message = calculateScriptId(id - 3);
 }
 
-void CompoundAgent::setHotspotFuncDetails(unsigned int id, uint16 m, uint8 f) {
+void CompoundAgent::setHotspotFuncDetails(unsigned int id, uint16_t m, uint8_t f) {
 	assert(id < 6);
 
 	hotspotfunctions[id].message = m;

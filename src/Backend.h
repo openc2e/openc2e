@@ -20,7 +20,6 @@
 #ifndef _BACKEND_H
 #define _BACKEND_H
 
-#include "endianlove.h"
 #include <memory>
 #include <string>
 
@@ -70,7 +69,7 @@ public:
 	virtual Surface *newSurface(unsigned int width, unsigned int height) = 0;
 	virtual void freeSurface(Surface *surf) = 0;
 			
-	virtual void setPalette(uint8 *data) = 0;
+	virtual void setPalette(uint8_t *data) = 0;
 	virtual unsigned int textWidth(std::string text) = 0;
 	
 	virtual int run(int argc, char **argv);

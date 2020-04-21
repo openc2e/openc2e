@@ -60,7 +60,7 @@ VoiceData::VoiceData(std::string tagname) {
 	if (!catalogue.hasTag(languagetag)) return;
 	const std::vector<std::string> &lookupdata = catalogue.getTag(languagetag);
 	for (unsigned int i = 0; i < lookupdata.size(); i++) {
-		uint32 data = strtoul(lookupdata[i].c_str(), NULL, 16);
+		uint32_t data = strtoul(lookupdata[i].c_str(), NULL, 16);
 		LookupTable.push_back(data);
 	}
 	if (LookupTable.size() != 3 * 27) throw creaturesException(
@@ -127,9 +127,9 @@ bool VoiceData::NextSyllableFor(std::vector<unsigned int> &sentence, unsigned in
 	if (pos + 1 >= sentence.size()) return false;
 
 	unsigned int chars[3] = { sentence[pos - 1], sentence[pos], sentence[pos + 1] };
-	uint32 sum = chars[0] + chars[1] + chars[2];
+	uint32_t sum = chars[0] + chars[1] + chars[2];
 
-	uint32 lookup = LookupTable[chars[0]] & LookupTable[chars[1] + 27] & LookupTable[chars[2] + 27 + 27];
+	uint32_t lookup = LookupTable[chars[0]] & LookupTable[chars[1] + 27] & LookupTable[chars[2] + 27 + 27];
 	if (chars[1] == 26)
 		lookup &= 0xf; // bits 0-3 (between words)
 	if (chars[0] == 26)

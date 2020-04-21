@@ -693,7 +693,7 @@ void SkeletalCreature::physicsTick() {
 
 void SkeletalCreature::gaitTick() {
 	if (!gaitgene) return;
-	uint8 pose = gaitgene->pose[gaiti];
+	uint8_t pose = gaitgene->pose[gaiti];
 	if (pose == 0) {
 		if (gaiti == 0) return; // non-worky gait
 

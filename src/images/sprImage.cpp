@@ -18,6 +18,7 @@
  */
 
 #include "openc2e.h"
+#include "endianlove.h"
 #include "sprImage.h"
 #include <iostream>
 
@@ -25,11 +26,11 @@ sprImage::sprImage(std::ifstream *in, std::string n) : creaturesImage(n) {
 	stream = in;
 	imgformat = if_paletted;
 
-	uint16 spritecount;
+	uint16_t spritecount;
 	in->read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 
-	widths = new uint16[m_numframes];
-	heights = new uint16[m_numframes];
+	widths = new uint16_t[m_numframes];
+	heights = new uint16_t[m_numframes];
 	std::vector<uint32_t> offsets(m_numframes);
 	buffers = new void *[m_numframes];
 

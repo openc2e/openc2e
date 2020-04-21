@@ -18,8 +18,8 @@
 #include <cassert>
 
 std::string readpascalstring(std::istream &s) {
-	uint16 size;
-	uint8 a; s.read((char *)&a, 1);
+	uint16_t size;
+	uint8_t a; s.read((char *)&a, 1);
 	if (a == 255)
 		size = read16(s);
 	else
@@ -34,7 +34,7 @@ std::string readpascalstring(std::istream &s) {
 c1cobfile::c1cobfile(std::ifstream &s) {
 	s >> std::noskipws;
 
-	uint16 version = read16(s);
+	uint16_t version = read16(s);
 
 	// TODO: mph
 	if (version != 1) {
@@ -46,10 +46,10 @@ c1cobfile::c1cobfile(std::ifstream &s) {
 	expire_month = read32(s);
 	expire_day = read32(s);
 	expire_year = read32(s);
-	uint16 noscripts = read16(s);
-	uint16 noimports = read16(s);
+	uint16_t noscripts = read16(s);
+	uint16_t noimports = read16(s);
 	no_objects_used = read16(s);
-	uint16 reserved_zero = read16(s);
+	uint16_t reserved_zero = read16(s);
 	assert(reserved_zero == 0);
 
 	for (unsigned int i = 0; i < noscripts; i++)
@@ -59,7 +59,7 @@ c1cobfile::c1cobfile(std::ifstream &s) {
 
 	imagewidth = read32(s);
 	imageheight = read32(s);
-	uint16 secondimagewidth = read16(s);
+	uint16_t secondimagewidth = read16(s);
 	if (imagewidth != secondimagewidth && secondimagewidth) // ABK- Egg Gender.cob has it zeroed
 		std::cout << "ignoring COB secondimage width " << (int)secondimagewidth <<
 			", using width " << imagewidth << std::endl;
