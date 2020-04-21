@@ -19,7 +19,6 @@
 
 #include "bmpImage.h"
 #include "endianlove.h"
-#include "streamutils.h"
 #include "exceptions.h"
 #include "openc2e.h"
 #include <memory>
@@ -39,29 +38,29 @@ bmpData::bmpData(std::ifstream *in, std::string n) {
 
 	in->seekg(8, std::ios::cur); // skip filesize and reserved bytes
 
-	uint32_t dataoffset = read32(*in);
+	uint32_t dataoffset = read32le(*in);
 
-	uint32_t biSize = read32(*in);
+	uint32_t biSize = read32le(*in);
 	if (biSize != 40) // win3.x format, which the seamonkeys files are in
 		throw creaturesException(n + " is a BMP format we don't understand.");
 
-	biWidth = read32(*in);
-	biHeight = read32(*in);
+	biWidth = read32le(*in);
+	biHeight = read32le(*in);
 	caos_assert((int)biHeight > 0);
 	
-	uint16_t biPlanes = read16(*in);
+	uint16_t biPlanes = read16le(*in);
 	if (biPlanes != 1) // single image plane
 		throw creaturesException(n + " contains BMP data we don't understand.");
 	
-	uint16_t biBitCount = read16(*in);
-	biCompression = read32(*in);
+	uint16_t biBitCount = read16le(*in);
+	biCompression = read32le(*in);
 
 	// and now for some stuff we really don't care about
-	uint32_t biSizeImage = read32(*in);
-	uint32_t biXPelsPerMeter = read32(*in);
-	uint32_t biYPelsPerMeter = read32(*in);
-	uint32_t biClrUsed = read32(*in);
-	uint32_t biClrImportant = read32(*in);
+	uint32_t biSizeImage = read32le(*in);
+	uint32_t biXPelsPerMeter = read32le(*in);
+	uint32_t biYPelsPerMeter = read32le(*in);
+	uint32_t biClrUsed = read32le(*in);
+	uint32_t biClrImportant = read32le(*in);
 
 	switch (biCompression) {
 		case BI_RGB:

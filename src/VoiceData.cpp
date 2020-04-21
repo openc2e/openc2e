@@ -18,7 +18,7 @@
  */
 
 #include "VoiceData.h"
-#include "streamutils.h"
+#include "endianlove.h"
 #include "Catalogue.h"
 #include <cassert>
 #include <fmt/printf.h>
@@ -34,7 +34,7 @@ VoiceData::VoiceData(std::ifstream &file) {
 		VoiceEntry entry;
 		if (temp[0])
 			entry.name = std::string(temp, 4);
-		entry.delay = read32(file);
+		entry.delay = read32le(file);
 		Voices.push_back(entry);
 	}
 
@@ -42,7 +42,7 @@ VoiceData::VoiceData(std::ifstream &file) {
 	for (unsigned int i = 0; i < 3; i++) {
 		// 26 possible letters + blank
 		for (unsigned int j = 0; j < 27; j++) {
-			LookupTable.push_back(read32(file));
+			LookupTable.push_back(read32le(file));
 		}
 	}
 }

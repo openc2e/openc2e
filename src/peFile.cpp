@@ -20,7 +20,6 @@
 #include "peFile.h"
 #include "endianlove.h"
 #include "exceptions.h"
-#include "streamutils.h"
 
 // debug helper
 std::string nameForType(uint32_t t) {
@@ -64,7 +63,7 @@ peFile::peFile(fs::path filepath) {
 	file.seekg(58, std::ios::cur);
 
 	// read the location of the PE header
-	uint32_t e_lfanew = read32(file);
+	uint32_t e_lfanew = read32le(file);
 	if (e_lfanew == 0)
 		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (DOS program?)");
 
@@ -77,9 +76,9 @@ peFile::peFile(fs::path filepath) {
 
 	// read the necessary data from the PE file header
 	file.seekg(2, std::ios::cur);
-	uint16_t nosections = read16(file);
+	uint16_t nosections = read16le(file);
 	file.seekg(12, std::ios::cur);
-	uint16_t optionalheadersize = read16(file);
+	uint16_t optionalheadersize = read16le(file);
 	file.seekg(2, std::ios::cur);
 
 	// skip the optional header
@@ -92,9 +91,9 @@ peFile::peFile(fs::path filepath) {
 		file.seekg(4, std::ios::cur);
 
 		peSection section;
-		section.vaddr = read32(file);
-		section.size = read32(file);
-		section.offset = read32(file);
+		section.vaddr = read32le(file);
+		section.size = read32le(file);
+		section.offset = read32le(file);
 		sections[std::string(section_name)] = section;
 		
 		file.seekg(16, std::ios::cur);
@@ -118,12 +117,12 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 
 	file.seekg(12, std::ios::cur);
 	
-	uint16_t nonamedentries = read16(file);
-	uint16_t noidentries = read16(file);
+	uint16_t nonamedentries = read16le(file);
+	uint16_t noidentries = read16le(file);
 
 	for (unsigned int i = 0; i < nonamedentries + noidentries; i++) {
-		uint32_t name = read32(file);
-		uint32_t offset = read32(file);
+		uint32_t name = read32le(file);
+		uint32_t offset = read32le(file);
 
 		unsigned int here = file.tellg();
 	
@@ -145,10 +144,10 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 
 			file.seekg(s.offset + offset, std::ios::beg);
 			
-			uint32_t offset = read32(file);
+			uint32_t offset = read32le(file);
 			offset += s.offset;
 			offset -= s.vaddr;
-			uint32_t size = read32(file);
+			uint32_t size = read32le(file);
 				
 			resourceInfo info;
 			info.offset = offset;

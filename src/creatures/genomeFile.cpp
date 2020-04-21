@@ -17,7 +17,7 @@
  *
  */
 #include "genome.h"
-#include "streamutils.h"
+#include "endianlove.h"
 #include <typeinfo>
 #include <exception>
 #include <iostream>
@@ -45,19 +45,19 @@ geneNote *genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
 
 void genomeFile::readNotes(istream &s) {
 	if (cversion == 3) {
-		uint16_t gnover = read16(s);
-		uint16_t nosvnotes = read16(s);
+		uint16_t gnover = read16le(s);
+		uint16_t nosvnotes = read16le(s);
 		std::cout << "we have " << nosvnotes << " notes" << std::endl;
 
 		for (int i = 0; i < nosvnotes; i++) {
-			uint16_t type = read16(s);
-			uint16_t subtype = read16(s);
-			uint16_t which = read16(s);
-			uint16_t rule = read16(s);
+			uint16_t type = read16le(s);
+			uint16_t subtype = read16le(s);
+			uint16_t which = read16le(s);
+			uint16_t rule = read16le(s);
 
 			// TODO: we currently skip all the notes (note that there are 18 and then 1!)
 			for (int i = 0; i < 19; i++) {
-				uint16_t skip = read16(s);
+				uint16_t skip = read16le(s);
 				uint8_t *dummy = new uint8_t[skip]; s.read((char *)dummy, skip); delete[] dummy;
 			}
 			}
@@ -66,24 +66,24 @@ void genomeFile::readNotes(istream &s) {
 
 		while (ver != 0x02) {
 			if (s.fail() || s.eof()) throw genomeException("c3 gno loading broke ... second magic not present");
-			ver = read16(s);
+			ver = read16le(s);
 		}
 	}
 
-	uint16_t noentries = read16(s);
+	uint16_t noentries = read16le(s);
 
 	for (int i = 0; i < noentries; i++) {
-		uint16_t type = read16(s);
-		uint16_t subtype = read16(s);
-		uint32_t which = read32(s);
+		uint16_t type = read16le(s);
+		uint16_t subtype = read16le(s);
+		uint32_t which = read32le(s);
 
 		geneNote *n = findNote(type, subtype, which);
 
-		uint16_t buflen = read16(s);
+		uint16_t buflen = read16le(s);
 		char *buffer = new char[buflen + 1];
 		s.read(buffer, buflen); buffer[buflen] = 0;
 		if (n != 0) n->description = buffer;
-		buflen = read16(s);
+		buflen = read16le(s);
 		delete[] buffer; buffer = new char[buflen + 1];
 		s.read(buffer, buflen); buffer[buflen] = 0;
 		if (n != 0) n->comments = buffer;
@@ -354,9 +354,9 @@ void bioReceptorGene::read(istream &s) {
 void c2eBrainLobeGene::write(ostream &s) const {
 	for (int i = 0; i < 4; i++) s << id[i];
 
-	write16(s, updatetime, false);
-	write16(s, x, false);
-	write16(s, y, false);
+	write16be(s, updatetime);
+	write16be(s, x);
+	write16be(s, y);
 
 	s << width << height;
 	s << red << green << blue;
@@ -370,9 +370,9 @@ void c2eBrainLobeGene::write(ostream &s) const {
 void c2eBrainLobeGene::read(istream &s) {
 	for (int i = 0; i < 4; i++) s >> id[i];
 
-	updatetime = read16(s, false);
-	x = read16(s, false);
-	y = read16(s, false);
+	updatetime = read16be(s);
+	x = read16be(s);
+	y = read16be(s);
 
 	s >> width >> height;
 	s >> red >> green >> blue;
@@ -384,15 +384,15 @@ void c2eBrainLobeGene::read(istream &s) {
 }
 
 void c2eBrainTractGene::write(ostream &s) const {
-	write16(s, updatetime, false);
+	write16be(s, updatetime);
 	for (int i = 0; i < 4; i++) s << srclobe[i];
-	write16(s, srclobe_lowerbound, false);
-	write16(s, srclobe_upperbound, false);
-	write16(s, src_noconnections, false);
+	write16be(s, srclobe_lowerbound);
+	write16be(s, srclobe_upperbound);
+	write16be(s, src_noconnections);
 	for (int i = 0; i < 4; i++) s << destlobe[i];
-	write16(s, destlobe_lowerbound, false);
-	write16(s, destlobe_upperbound, false);
-	write16(s, dest_noconnections, false);
+	write16be(s, destlobe_lowerbound);
+	write16be(s, destlobe_upperbound);
+	write16be(s, dest_noconnections);
 	s << migrates << norandomconnections << srcvar << destvar << initrulealways;
 	for (int i = 0; i < 5; i++) s << spare[i];
 	for (int i = 0; i < 48; i++) s << initialiserule[i];
@@ -400,15 +400,15 @@ void c2eBrainTractGene::write(ostream &s) const {
 }
 
 void c2eBrainTractGene::read(istream &s) {
-	updatetime = read16(s, false);
+	updatetime = read16be(s);
 	for (int i = 0; i < 4; i++) s >> srclobe[i];
-	srclobe_lowerbound = read16(s, false);
-	srclobe_upperbound = read16(s, false);
-	src_noconnections = read16(s, false);
+	srclobe_lowerbound = read16be(s);
+	srclobe_upperbound = read16be(s);
+	src_noconnections = read16be(s);
 	for (int i = 0; i < 4; i++) s >> destlobe[i];
-	destlobe_lowerbound = read16(s, false);
-	destlobe_upperbound = read16(s, false);
-	dest_noconnections = read16(s, false);
+	destlobe_lowerbound = read16be(s);
+	destlobe_upperbound = read16be(s);
+	dest_noconnections = read16be(s);
 	s >> migrates >> norandomconnections >> srcvar >> destvar >> initrulealways;
 	for (int i = 0; i < 5; i++) s >> spare[i];
 	for (int i = 0; i < 48; i++) s >> initialiserule[i];
@@ -426,7 +426,7 @@ void creatureAppearanceGene::read(istream &s) {
 }
 
 void creatureFacialExpressionGene::write(ostream &s) const {
-	write16(s, expressionno);
+	write16le(s, expressionno);
 	s << weight;
 
 	for (int i = 0; i < 4; i++) {
@@ -435,7 +435,7 @@ void creatureFacialExpressionGene::write(ostream &s) const {
 }
 
 void creatureFacialExpressionGene::read(istream &s) {
-	expressionno = read16(s);
+	expressionno = read16le(s);
 	s >> weight;
 
 	for (int i = 0; i < 4; i++) {

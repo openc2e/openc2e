@@ -113,7 +113,6 @@ set(OPENC2E_CORE
 	src/SimpleAgent.cpp
 	src/creatures/SkeletalCreature.cpp
 	src/images/sprImage.cpp
-	src/streamutils.cpp
 	src/Vehicle.cpp
 	src/VoiceData.cpp
 	src/World.cpp

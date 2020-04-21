@@ -15,13 +15,15 @@
 */
 
 #include "c1cobfile.h"
+#include "endianlove.h"
 #include <cassert>
+#include <fstream>
 
 std::string readpascalstring(std::istream &s) {
 	uint16_t size;
 	uint8_t a; s.read((char *)&a, 1);
 	if (a == 255)
-		size = read16(s);
+		size = read16le(s);
 	else
 		size = a;
 
@@ -34,7 +36,7 @@ std::string readpascalstring(std::istream &s) {
 c1cobfile::c1cobfile(std::ifstream &s) {
 	s >> std::noskipws;
 
-	uint16_t version = read16(s);
+	uint16_t version = read16le(s);
 
 	// TODO: mph
 	if (version != 1) {
@@ -42,14 +44,14 @@ c1cobfile::c1cobfile(std::ifstream &s) {
 		return;
 	}
 
-	no_objects = read16(s);
-	expire_month = read32(s);
-	expire_day = read32(s);
-	expire_year = read32(s);
-	uint16_t noscripts = read16(s);
-	uint16_t noimports = read16(s);
-	no_objects_used = read16(s);
-	uint16_t reserved_zero = read16(s);
+	no_objects = read16le(s);
+	expire_month = read32le(s);
+	expire_day = read32le(s);
+	expire_year = read32le(s);
+	uint16_t noscripts = read16le(s);
+	uint16_t noimports = read16le(s);
+	no_objects_used = read16le(s);
+	uint16_t reserved_zero = read16le(s);
 	assert(reserved_zero == 0);
 
 	for (unsigned int i = 0; i < noscripts; i++)
@@ -57,9 +59,9 @@ c1cobfile::c1cobfile(std::ifstream &s) {
 	for (unsigned int i = 0; i < noimports; i++)
 		imports.push_back(readpascalstring(s));
 
-	imagewidth = read32(s);
-	imageheight = read32(s);
-	uint16_t secondimagewidth = read16(s);
+	imagewidth = read32le(s);
+	imageheight = read32le(s);
+	uint16_t secondimagewidth = read16le(s);
 	if (imagewidth != secondimagewidth && secondimagewidth) // ABK- Egg Gender.cob has it zeroed
 		std::cout << "ignoring COB secondimage width " << (int)secondimagewidth <<
 			", using width " << imagewidth << std::endl;

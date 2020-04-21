@@ -19,7 +19,6 @@
 
 #include <iostream>
 #include <string>
-#include "streamutils.h"
 #include <vector>
 
 std::string readpascalstring(std::istream &s);

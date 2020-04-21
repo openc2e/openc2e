@@ -20,9 +20,15 @@
 #ifndef _ENDIANLOVE_H
 #define _ENDIANLOVE_H
 
+#include <iostream>
 #include <stdlib.h> // load the standard libraries for these defines
-
 #include <stdint.h>
+
+#ifdef _MSC_VER
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
 
 #ifndef OC2E_BIG_ENDIAN
 #	ifdef __GNU__
@@ -81,6 +87,39 @@ static inline uint32_t swapEndianLong(uint32_t a) {
 }
 
 #endif
+
+static inline uint16_t read16le(std::istream &s) {
+	uint16_t t;
+	s.read((char *)&t, 2);
+	return swapEndianShort(t);
+}
+
+static inline uint16_t read16be(std::istream &s) {
+	uint16_t t;
+	s.read((char *)&t, 2);
+	return ntohs(t);
+}
+
+static inline void write16le(std::ostream &s, uint16_t v) {
+	uint16_t t = swapEndianShort(v);
+	s.write((char *)&t, 2);
+}
+
+static inline void write16be(std::ostream &s, uint16_t v) {
+	uint16_t t = htons(v);
+	s.write((char *)&t, 2);
+}
+
+static inline uint32_t read32le(std::istream &s) {
+	uint32_t t;
+	s.read((char *)&t, 4);
+	return swapEndianLong(t);
+}
+
+static inline void write32le(std::ostream &s, uint32_t v) {
+	uint32_t t = swapEndianLong(v);
+	s.write((char *)&t, 4);
+}
 
 #endif // _ENDIANLOVE_H
 

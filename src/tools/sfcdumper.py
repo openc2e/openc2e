@@ -224,7 +224,7 @@ class MapData:
 		else:
 			assert False, "didn't understand version " + str(version)
 		self.savecount = read16(f) # TODO: prbly not actually savecount
-		x = read16(f) # <- this is prbly uint32_t bit
+		x = read16(f) # <- this is prbly uint32 bit
 		assert x == 0, "third bytes of MapData were not zero but " + str(x)
 		if version == 1:
 			x = read32(f) # TODO who knows? 0 (common) or 4, so far
