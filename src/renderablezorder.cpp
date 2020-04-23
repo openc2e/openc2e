@@ -9,7 +9,7 @@ bool renderablezorder::operator ()(const renderable *s1, const renderable *s2) c
 		const CompoundPart *p1 = dynamic_cast<const CompoundPart *>(s1);
 		const CompoundPart *p2 = dynamic_cast<const CompoundPart *>(s2);
 		if (p1 && p2)
-			return p1->id < p2->id;
+			return partzorder()(p2, p1);
 	}
 	// TODO: we shouldn't be checking engine.bmprenderer for this, but it's a cheap/easy way to check for seamonkeys
 	if (engine.bmprenderer)

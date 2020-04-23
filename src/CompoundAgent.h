@@ -44,6 +44,7 @@ protected:
 	HotspotFunction hotspotfunctions[6];
 	std::string spritefile;
 	unsigned int firstimage, imagecount;
+	unsigned int next_part_sequence_number = 0;
 
 public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
@@ -55,6 +56,7 @@ public:
 	CompoundPart *part(unsigned int id);
 	virtual void addPart(CompoundPart *);
 	void delPart(unsigned int);
+	unsigned int nextPartSequenceNumber();
 	virtual void tick();
 	void setZOrder(unsigned int plane);
 

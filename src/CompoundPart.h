@@ -41,6 +41,7 @@ protected:
 public:
 	int x, y;
 	unsigned int zorder, id;
+	unsigned int part_sequence_number;
 
 	bool has_alpha;
 	unsigned char alpha;

@@ -50,6 +50,10 @@ void CompoundAgent::delPart(unsigned int id) {
 	throw caosException("delPart got a bad id"); // TODO: handle this exception properly
 }
 
+unsigned int CompoundAgent::nextPartSequenceNumber() {
+	return next_part_sequence_number++;
+}
+
 CompoundPart *CompoundAgent::part(unsigned int id) {
 	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
 		if ((*x)->id == id) return *x;

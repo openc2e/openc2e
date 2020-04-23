@@ -20,6 +20,7 @@
 #include "CompoundPart.h"
 #include "CameraPart.h"
 #include "Camera.h"
+#include "CompoundAgent.h"
 #include "World.h"
 #include "Engine.h"
 #include "creaturesImage.h"
@@ -124,6 +125,9 @@ int CompoundPart::handleClick(float clickx, float clicky) {
 }
 
 CompoundPart::CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z) : parent(p), zorder(_z), id(_id) {
+	auto compound_parent = dynamic_cast<CompoundAgent*>(parent);
+	part_sequence_number = compound_parent ? compound_parent->nextPartSequenceNumber() : 0;
+
 	addZOrder();	
 	x = _x;
 	y = _y;
