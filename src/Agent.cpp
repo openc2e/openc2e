@@ -1227,10 +1227,6 @@ std::string Agent::identify() const {
 	return o.str();
 }
 
-bool agentzorder::operator ()(const Agent *s1, const Agent *s2) const {
-	return s1->getZOrder() < s2->getZOrder();
-}
-
 void Agent::pushVM(caosVM *newvm) {
 	assert(newvm);
 	if (vm)

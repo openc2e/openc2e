@@ -35,13 +35,8 @@
 class script;
 class genomeFile;
 
-struct agentzorder {
-	bool operator()(const class Agent *s1, const class Agent *s2) const;
-};
-
 class Agent : public std::enable_shared_from_this<Agent> {
 	
-	friend struct agentzorder;
 	friend class caosVM;
 	friend class AgentRef;
 	friend class World;
@@ -85,7 +80,6 @@ protected:
 	int emitca_index; float emitca_amount;
 	int lastcollidedirection;
 
-	std::multiset<Agent *, agentzorder>::iterator zorder_iter;
 	std::list<std::shared_ptr<Agent> >::iterator agents_iter;
 	std::list<caosVM *> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
