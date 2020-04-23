@@ -20,11 +20,9 @@
 #ifndef _RENDERABLE_H
 #define _RENDERABLE_H
 
+#include "renderablezorder.h"
 #include <set>
 
-struct renderablezorder {
-	bool operator()(const class renderable *s1, const class renderable *s2) const;
-};
 
 class renderable {
 protected:

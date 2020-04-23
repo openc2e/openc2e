@@ -21,6 +21,7 @@
 #define _COMPOUNDPART_H
 
 #include "openc2e.h"
+#include "partzorder.h"
 #include "renderable.h"
 #include <map>
 #include <memory>
@@ -29,10 +30,6 @@
 
 class Agent;
 class creaturesImage;
-
-struct partzorder {
-	bool operator()(const class CompoundPart *s1, const class CompoundPart *s2) const;
-};
 
 class CompoundPart : public renderable {
 protected:

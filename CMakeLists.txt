@@ -99,6 +99,7 @@ set(OPENC2E_CORE
 	${GEN}/mngparser.tab.cpp
 	src/MusicManager.cpp
 	src/creatures/oldBrain.cpp
+	src/partzorder.cpp
 	src/PathResolver.cpp
 	src/peFile.cpp
 	src/physics.cpp
@@ -106,6 +107,7 @@ set(OPENC2E_CORE
 	src/Port.cpp
 	src/prayManager.cpp
 	src/renderable.cpp
+	src/renderablezorder.cpp
 	src/Room.cpp
 	src/Scriptorium.cpp
 	src/SFCFile.cpp

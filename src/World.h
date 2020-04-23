@@ -20,8 +20,9 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
-#include "CompoundPart.h"
 #include "caosVar.h"
+#include "partzorder.h"
+#include "renderablezorder.h"
 #include <memory>
 #include <set>
 #include <map>
@@ -29,6 +30,7 @@
 #include <ghc/filesystem.hpp>
 
 class caosVM;
+class CompoundPart;
 class genomeFile;
 class MainCamera;
 class Map;
@@ -36,6 +38,8 @@ class historyManager;
 class imageManager;
 class MusicManager;
 class prayManager;
+class renderable;
+class RenderTarget;
 class Scriptorium;
 
 struct cainfo {
