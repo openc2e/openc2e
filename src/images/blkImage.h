@@ -26,7 +26,6 @@ class blkImage : public creaturesImage {
 public:
 	unsigned int totalwidth, totalheight;
 
-	blkImage() { }
 	blkImage(std::ifstream &in, std::string n);
 	~blkImage();
 	virtual std::string serializedName() { return name + ".blk"; }

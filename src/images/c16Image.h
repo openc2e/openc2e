@@ -23,7 +23,6 @@
 
 class c16Image : public creaturesImage {
 public:
-	c16Image() { }
 	c16Image(std::ifstream &in, std::string n);
 	~c16Image();
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
@@ -31,7 +30,6 @@ public:
 
 class s16Image : public creaturesImage {
 public:
-	s16Image() { }
 	s16Image(std::ifstream &in, std::string n);
 	~s16Image();
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
