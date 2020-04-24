@@ -24,12 +24,6 @@
 #include <stdlib.h> // load the standard libraries for these defines
 #include <stdint.h>
 
-#ifdef _MSC_VER
-#include <winsock2.h>
-#else
-#include <arpa/inet.h>
-#endif
-
 #ifndef OC2E_BIG_ENDIAN
 #	ifdef __GNU__
 #		include <endian.h>
@@ -47,27 +41,25 @@
 #	endif
 #endif
 
-#if OC2E_BIG_ENDIAN
-
 # if HAVE_BYTESWAP_H
 
 #include <byteswap.h>
-static inline uint16_t swapEndianShort(uint16_t a) {
+static inline uint16_t openc2e_bswap_16(uint16_t a) {
 	return bswap_16(a);
 }
 
-static inline uint32_t swapEndianLong(uint32_t a) {
+static inline uint32_t openc2e_bswap_32(uint32_t a) {
 	return bswap_32(a);
 }
 
 # else // HAVE_BYTESWAP_H
 
-static inline uint16_t swapEndianShort(uint16_t a) {
+static inline uint16_t openc2e_bswap_16(uint16_t a) {
 	return ((((uint16_t)(a) & 0xff00) >> 8) |
 				   (((uint16_t)(a) & 0x00ff) << 8));
 }
 
-static inline uint32_t swapEndianLong(uint32_t a) {
+static inline uint32_t openc2e_bswap_32(uint32_t a) {
 	return ((((uint32_t)(a) & 0xff000000) >> 24) |
 				   (((uint32_t)(a) & 0x00ff0000) >> 8)  |
 				   (((uint32_t)(a) & 0x0000ff00) << 8)  |
@@ -75,6 +67,15 @@ static inline uint32_t swapEndianLong(uint32_t a) {
 }
 
 # endif
+
+#if OC2E_BIG_ENDIAN
+
+static inline uint16_t swapEndianShort(uint16_t a) {
+	return openc2e_bswap_16(a);
+}
+static inline uint32_t swapEndianLong(uint32_t a) {
+	return openc2e_bswap_32(a);
+}
 
 #else // OC2E_BIG_ENDIAN
 
@@ -97,7 +98,11 @@ static inline uint16_t read16le(std::istream &s) {
 static inline uint16_t read16be(std::istream &s) {
 	uint16_t t;
 	s.read((char *)&t, 2);
-	return ntohs(t);
+	#if OC2E_BIG_ENDIAN
+		return t;
+	#else
+		return openc2e_bswap_16(t);
+	#endif
 }
 
 static inline void readmany16le(std::istream &s, uint16_t* out, size_t n) {
@@ -112,7 +117,11 @@ static inline void write16le(std::ostream &s, uint16_t v) {
 }
 
 static inline void write16be(std::ostream &s, uint16_t v) {
-	uint16_t t = htons(v);
+	#if OC2E_BIG_ENDIAN
+		uint16_t t = v;
+	#else
+		uint16_t t = openc2e_bswap_16(v);
+	#endif
 	s.write((char *)&t, 2);
 }
 
