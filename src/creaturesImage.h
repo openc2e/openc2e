@@ -26,7 +26,7 @@
 #include <cassert>
 #include <vector>
 
-enum imageformat { if_paletted, if_16bit, if_16bitcompressed, if_24bit };
+enum imageformat { if_paletted, if_16bit, if_24bit };
 
 unsigned int bitDepthOf(imageformat f);
 
