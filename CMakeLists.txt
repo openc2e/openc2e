@@ -15,20 +15,101 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(OPENC2E_USE_QT "Build the qt GUI" ON)
-
 option(OPENC2E_USE_SERIALIZATION "Build the experimental serialization code" OFF)
-if (OPENC2E_USE_SERIALIZATION)
-	set(SER_SRCS src/caos/caosVM_ser_real.cpp)
-else()
-	set(SER_SRCS src/caos/caosVM_ser_stub.cpp)
-endif()
-
 option(OPENC2E_PROFILE_ALLOCATION "Collect allocation profile stats for DBG: SIZO" OFF)
 if (OPENC2E_PROFILE_ALLOCATION)
 	add_definitions("-DPROFILE_ALLOCATION_COUNT -DPROFILE_ALLOCATION_THREAD_SAFE")
 endif()
 
-set(OPENC2E_CORE
+include(TestBigEndian)
+include(CheckIncludeFile)
+test_big_endian(BIG_ENDIAN)
+if (BIG_ENDIAN)
+	add_definitions("-DOC2E_BIG_ENDIAN=1")
+	check_include_file(byteswap.h HAVE_BYTESWAP_H)
+	if(HAVE_BYTESWAP_H)
+		add_definitions("-DHAVE_BYTESWAP_H=1")
+	else()
+		add_definitions("-DHAVE_BYTESWAP_H=0")
+	endif()
+else()
+	add_definitions("-DOC2E_BIG_ENDIAN=0")
+endif()
+
+# Find / include dependencies
+find_package(Python REQUIRED)
+
+find_program(RE2C_EXECUTABLE re2c)
+if(NOT RE2C_EXECUTABLE)
+	add_subdirectory(externals/re2c EXCLUDE_FROM_ALL)
+	set(RE2C_EXECUTABLE re2c)
+endif()
+
+if(WIN32)
+	add_subdirectory(externals/winflexbison EXCLUDE_FROM_ALL)
+	set(BISON_EXECUTABLE "win_bison")
+else()
+	find_package(BISON REQUIRED)
+endif()
+
+if(WIN32 OR APPLE)
+	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
+	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
+	add_subdirectory(externals/SDL2_net EXCLUDE_FROM_ALL)
+	add_subdirectory(externals/SDL2_gfx EXCLUDE_FROM_ALL)
+	add_library(SDL2::Core ALIAS SDL2)
+	add_library(SDL2::Mixer ALIAS SDL2_mixer)
+	add_library(SDL2::Net ALIAS SDL2_net)
+	add_library(SDL2::GFX ALIAS SDL2_gfx)
+else()
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_mixer REQUIRED)
+	find_package(SDL2_net REQUIRED)
+	find_package(SDL2_gfx REQUIRED)
+endif()
+
+if (OPENC2E_USE_SERIALIZATION)
+	find_package(Boost 1.34.0 COMPONENTS serialization REQUIRED)
+endif()
+if (OPENC2E_USE_QT)
+	if(WIN32)
+		file(GLOB qt_directories "C:/Qt/Qt5.*/5.*/msvc*")
+		list(APPEND CMAKE_PREFIX_PATH ${qt_directories})
+	endif()
+	find_package(Qt5 COMPONENTS Widgets REQUIRED)
+endif()
+
+add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
+add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
+add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
+add_subdirectory(externals/miniz EXCLUDE_FROM_ALL)
+add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
+
+# Pass flags to the compiler
+add_compile_definitions("_REENTRANT" "YYERROR_VERBOSE")
+if(WIN32)
+	add_compile_definitions("VCPP_BROKENNESS")
+endif()
+if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
+	add_compile_options(-Wextra -Wall -Wno-conversion -Wno-unused)
+endif()
+set(CMAKE_CXX_STANDARD 11)
+
+include_directories(BEFORE
+	${GEN}
+	${SRC}/src
+)
+
+# Targets
+add_library(prayfile
+	src/prayfile/pray.cpp
+	src/prayfile/PrayFileWriter.cpp
+	${GEN}/prayfile/Caos2PrayParser.cpp
+	${GEN}/prayfile/PraySourceParser.cpp
+)
+target_link_libraries(prayfile PUBLIC ghc_filesystem mpark_variant PRIVATE miniz)
+
+add_library(openc2e-core STATIC
 	src/Agent.cpp
 	src/AgentHelpers.cpp
 	src/AgentRef.cpp
@@ -117,162 +198,67 @@ set(OPENC2E_CORE
 	src/Vehicle.cpp
 	src/VoiceData.cpp
 	src/World.cpp
-	src/main.cpp
 	src/util.cpp
 )
-
-set(OPENC2E_SDL
-	src/backends/SDLBackend.cpp
-)
-
-set(OPENC2E_QT
-	src/backends/qtgui/qtopenc2e.cpp
-	src/backends/qtgui/openc2eview.cpp
-	src/backends/qtgui/AgentInjector.cpp
-	src/backends/qtgui/BrainViewer.cpp
-	src/backends/qtgui/imagepreview.cpp
-	src/backends/qtgui/c1cobfile.cpp
-	src/backends/qtgui/QtBackend.cpp
-	src/backends/qtgui/GraphWidget.cpp
-	src/backends/qtgui/CreatureGrapher.cpp
-	src/backends/qtgui/ChemicalSelector.cpp
-	src/backends/qtgui/Hatchery.cpp
-	src/tools/braininavat/brainview.cpp
-	src/backends/qtgui/agents.ui
-)
-
-include(TestBigEndian)
-include(CheckIncludeFile)
-test_big_endian(BIG_ENDIAN)
-if (BIG_ENDIAN)
-	add_definitions("-DOC2E_BIG_ENDIAN=1")
-	check_include_file(byteswap.h HAVE_BYTESWAP_H)
-	if(HAVE_BYTESWAP_H)
-		add_definitions("-DHAVE_BYTESWAP_H=1")
-	else()
-		add_definitions("-DHAVE_BYTESWAP_H=0")
-	endif()
-else()
-	add_definitions("-DOC2E_BIG_ENDIAN=0")
-endif()
-
-find_package(Python REQUIRED)
-
-find_program(RE2C_EXECUTABLE re2c)
-if(NOT RE2C_EXECUTABLE)
-	add_subdirectory(externals/re2c EXCLUDE_FROM_ALL)
-	set(RE2C_EXECUTABLE re2c)
-endif()
-
-if(WIN32)
-	add_subdirectory(externals/winflexbison EXCLUDE_FROM_ALL)
-	set(BISON_EXECUTABLE "win_bison")
-else()
-	find_package(BISON REQUIRED)
-endif()
-
-if(WIN32 OR APPLE)
-	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
-	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
-	add_subdirectory(externals/SDL2_net EXCLUDE_FROM_ALL)
-	add_subdirectory(externals/SDL2_gfx EXCLUDE_FROM_ALL)
-	add_library(SDL2::Core ALIAS SDL2)
-	add_library(SDL2::Mixer ALIAS SDL2_mixer)
-	add_library(SDL2::Net ALIAS SDL2_net)
-	add_library(SDL2::GFX ALIAS SDL2_gfx)
-else()
-	find_package(SDL2 REQUIRED)
-	find_package(SDL2_mixer)
-	find_package(SDL2_net REQUIRED)
-	find_package(SDL2_gfx REQUIRED)
-endif()
-
-if (OPENC2E_USE_SERIALIZATION)
-	find_package(Boost 1.34.0 COMPONENTS serialization REQUIRED)
-endif()
-if (OPENC2E_USE_QT)
-	set(CMAKE_AUTOMOC ON)
-	set(CMAKE_AUTORCC ON)
-	set(CMAKE_AUTOUIC ON)
-	if(WIN32)
-		file(GLOB qt_directories "C:/Qt/Qt5.*/5.*/msvc*")
-		list(APPEND CMAKE_PREFIX_PATH ${qt_directories})
-	endif()
-	find_package(Qt5 COMPONENTS Widgets REQUIRED)
-endif()
-
-add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
-add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
-add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
-add_subdirectory(externals/miniz EXCLUDE_FROM_ALL)
-add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
-
-if (TARGET SDL2::Mixer)
-    set(SDLMIXER_SRC "src/backends/SDLMixerBackend.cpp")
-    set(SDLMIXER_DEF "-DSDLMIXER_SUPPORT")
-else()
-    set(SDLMIXER_SRC "")
-    set(SDLMIXER_DEF "")
-endif()
-
-if (OPENC2E_USE_QT)
-	set(QT_DEF "-DQT_SUPPORT")
-endif()
-
-# Pass flags to the compiler
-add_definitions("-D_REENTRANT -DYYERROR_VERBOSE ${QT_DEF} ${SDLMIXER_DEF}")
-if(WIN32)
-	add_compile_definitions("VCPP_BROKENNESS")
-endif()
-if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
-	add_compile_options(-Wextra -Wall -Wno-conversion -Wno-unused)
-endif()
-set(CMAKE_CXX_STANDARD 11)
-
-if (OPENC2E_USE_QT)
-	set(FRONTEND_SRCS ${OPENC2E_SDL} ${OPENC2E_QT})
-	set(FRONTEND_LIBS Qt5::Widgets)
-else()
-	set(FRONTEND_SRCS ${OPENC2E_SDL})
-	set(FRONTEND_LIBS)
-endif()
-add_executable(openc2e ${OPENC2E_CORE} ${FRONTEND_SRCS} ${SDLMIXER_SRC} ${SER_SRCS})
-if(WIN32)
-	find_program(WINDEPLOYQT_EXECUTABLE windeployqt)
-	add_custom_command(
-		TARGET openc2e POST_BUILD
-		COMMAND ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE_DIR:openc2e>
-	)
-endif()
-
-target_link_libraries(openc2e
-	SDL2::Core
-	SDL2::Net
-	SDL2::GFX
-	SDL2::Mixer
-	${FRONTEND_LIBS}
+target_link_libraries(openc2e-core PUBLIC
 	cxxopts
 	fmt
 	ghc_filesystem
 	mpark_variant
-	)
-
+	prayfile
+)
 if (OPENC2E_USE_SERIALIZATION)
-	target_link_libraries(openc2e Boost::serialization)
+	target_sources(openc2e-core PRIVATE src/caos/caosVM_ser_real.cpp)
+	target_link_libraries(openc2e-core PUBLIC Boost::serialization)
+else()
+	target_sources(openc2e-core PRIVATE src/caos/caosVM_ser_stub.cpp)
 endif()
 
-add_library(prayfile
-	src/prayfile/pray.cpp
-	src/prayfile/PrayFileWriter.cpp
-	${GEN}/prayfile/Caos2PrayParser.cpp
-	${GEN}/prayfile/PraySourceParser.cpp
+add_executable(openc2e
+	src/main.cpp
+	src/backends/SDLBackend.cpp
+	src/backends/SDLMixerBackend.cpp
 )
-target_link_libraries(prayfile PUBLIC
-	ghc_filesystem
-	mpark_variant
-	PRIVATE miniz
+target_compile_definitions(openc2e PRIVATE "SDLMIXER_SUPPORT")
+target_link_libraries(openc2e
+	openc2e-core
+	SDL2::Core
+	SDL2::GFX
+	SDL2::Mixer
+	SDL2::Net
 )
-target_link_libraries(openc2e prayfile)
+if (OPENC2E_USE_QT)
+	target_sources(openc2e PRIVATE
+		src/backends/qtgui/qtopenc2e.cpp
+		src/backends/qtgui/openc2eview.cpp
+		src/backends/qtgui/AgentInjector.cpp
+		src/backends/qtgui/BrainViewer.cpp
+		src/backends/qtgui/imagepreview.cpp
+		src/backends/qtgui/c1cobfile.cpp
+		src/backends/qtgui/QtBackend.cpp
+		src/backends/qtgui/GraphWidget.cpp
+		src/backends/qtgui/CreatureGrapher.cpp
+		src/backends/qtgui/ChemicalSelector.cpp
+		src/backends/qtgui/Hatchery.cpp
+		src/tools/braininavat/brainview.cpp
+		src/backends/qtgui/agents.ui
+	)
+	target_link_libraries(openc2e Qt5::Widgets)
+	target_compile_definitions(openc2e PUBLIC "QT_SUPPORT")
+	set_target_properties(openc2e PROPERTIES
+		AUTOMOC ON
+		AUTORCC ON
+		AUTOUIC ON
+	)
+	
+	if (WIN32)
+		find_program(WINDEPLOYQT_EXECUTABLE windeployqt)
+		add_custom_command(
+			TARGET openc2e POST_BUILD
+			COMMAND ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE_DIR:openc2e>
+		)
+	endif()
+endif()
 
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper prayfile)
@@ -280,11 +266,7 @@ target_link_libraries(praydumper prayfile)
 add_executable(praybuilder src/tools/praybuilder.cpp ${GEN}/caoslexer.cpp)
 target_link_libraries(praybuilder prayfile)
 
-include_directories(BEFORE
-	${GEN}
-	${SRC}/src
-	)
-
+# Generated files
 file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/caos/caosVM_*.cpp)
 add_custom_command(
 	OUTPUT ${GEN}/commandinfo.json
@@ -370,8 +352,8 @@ add_custom_target(generated DEPENDS
 	${GEN}/cmddata.cpp
 )
 
+# Creating folder for distribution
 include(Openc2eReadGitRev)
-
 set(dist_name "openc2e-${git_short_rev}-${CMAKE_SYSTEM_NAME}")
 set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/${dist_name}")
 set(dist_args)
