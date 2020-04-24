@@ -34,7 +34,7 @@ openc2e is intended to support:
 * Serialization (world saving, creature exporting, ...)
 * Music
 
-There are lots of [open issues on the old Google Code issue tracker](https://code.google.com/archive/p/openc2e/issues) that still need solving.
+There are lots of [open issues](https://github.com/openc2e/openc2e/issues) that still need solving.
 
 # Building
 
