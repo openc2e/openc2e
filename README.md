@@ -80,7 +80,9 @@ brew install sdl2 sdl2_gfx sdl2_mixer sdl2_net sdl2_ttf re2c cmake qt
 
 ### Windows
 
-Good luck! Open a PR if you get a good process for building on Windows.
+Install [Qt](https://www.qt.io/download), [Python](https://www.microsoft.com/en-us/p/python-38/9mssztt1n39l#activetab=pivot:overviewtab), and Visual Studio's [C++ CMake Tools for Windows](https://docs.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=vs-2019#installation).
+
+Open the folder in Visual Studio and it will automatically run CMake and set up the build system.
 
 ## Compiling
 
