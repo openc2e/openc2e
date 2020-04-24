@@ -35,6 +35,7 @@
 
 #include <cassert>
 #include <ghc/filesystem.hpp>
+#define CXXOPTS_VECTOR_DELIMITER '\0'
 #include <cxxopts.hpp>
 #include <fmt/printf.h>
 #include <memory>
