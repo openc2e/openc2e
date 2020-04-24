@@ -75,7 +75,7 @@ sudo apt-get install \
 Install dependencies using [Homebrew](https://brew.sh):
 
 ```bash
-brew install sdl2 sdl2_gfx sdl2_mixer sdl2_net sdl2_ttf re2c cmake qt
+brew install cmake qt
 ```
 
 ### Windows
