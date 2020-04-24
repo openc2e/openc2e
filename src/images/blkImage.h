@@ -23,16 +23,12 @@
 #include "creaturesImage.h"
 
 class blkImage : public creaturesImage {
-private:
-	uint32_t *offsets;
-
 public:
 	unsigned int totalwidth, totalheight;
 
 	blkImage() { }
 	blkImage(std::ifstream &in, std::string n);
 	~blkImage();
-	void readHeader(std::istream &in);
 	virtual std::string serializedName() { return name + ".blk"; }
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y) { (void)frame; (void)x; (void)y; return false; }
 };

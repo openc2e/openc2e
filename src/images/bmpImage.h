@@ -44,7 +44,6 @@ public:
 class bmpImage : public creaturesImage {
 protected:
 	std::shared_ptr<bmpData> bmpdata;
-	void freeData();
 
 public:
 	bmpImage(std::ifstream &in, std::string n);

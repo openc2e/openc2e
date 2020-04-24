@@ -22,26 +22,18 @@
 #include <memory>
 
 class c16Image : public creaturesImage {
-private:
-	unsigned int **lineoffsets;
-
 public:
 	c16Image() { }
 	c16Image(std::ifstream &in, std::string n);
 	~c16Image();
-	void readHeader(std::istream &in);
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 };
 
 class s16Image : public creaturesImage {
-private:
-	uint32_t *offsets;
-
 public:
 	s16Image() { }
 	s16Image(std::ifstream &in, std::string n);
 	~s16Image();
-	void readHeader(std::istream &in);
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 };
 

@@ -23,9 +23,6 @@
 #include "creaturesImage.h"
 
 class sprImage : public creaturesImage {
-private:
-	uint32_t *offsets;
-
 public:
 	sprImage() { }
 	sprImage(std::ifstream &in, std::string n);

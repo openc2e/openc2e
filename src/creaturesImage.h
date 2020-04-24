@@ -24,6 +24,7 @@
 #include <string>
 #include <fstream>
 #include <cassert>
+#include <vector>
 
 enum imageformat { if_paletted, if_16bit, if_16bitcompressed, if_24bit };
 
@@ -33,8 +34,8 @@ class creaturesImage {
 protected:
 	friend class imageManager;
 	unsigned int m_numframes;
-	unsigned short *widths, *heights;
-	void **buffers;
+	std::vector<uint16_t> widths, heights;
+	std::vector<std::vector<unsigned char>> buffers;
 	bool is_565;
 	imageformat imgformat;
 	
@@ -48,7 +49,7 @@ public:
 	unsigned int numframes() { return m_numframes; }
 	unsigned int width(unsigned int frame) { return widths[frame]; }
 	unsigned int height(unsigned int frame) { return heights[frame]; }
-	void *data(unsigned int frame) { return buffers[frame]; }
+	void *data(unsigned int frame) { return buffers[frame].data(); }
 	std::string getName() { return name; }
 
 	virtual bool hasCustomPalette() { return false; }

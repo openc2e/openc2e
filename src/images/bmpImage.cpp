@@ -183,31 +183,15 @@ bmpData::~bmpData() {
 }
 
 bmpImage::bmpImage(std::ifstream &in, std::string n) : creaturesImage(n) {
-	buffers = 0;
-
 	bmpdata = shared_ptr<bmpData>(new bmpData(in, n));
 	imgformat = bmpdata->imgformat;
 	setBlockSize(bmpdata->biWidth, bmpdata->biHeight);
 }
 
-bmpImage::~bmpImage() {
-	if (buffers) freeData();
-}
-
-void bmpImage::freeData() {
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		delete[] (char *)buffers[i];
-	}
-
-	delete[] widths;
-	delete[] heights;
-	delete[] buffers;
-
-	buffers = 0;
-}
+bmpImage::~bmpImage() {}
 
 void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
-	if (buffers) freeData();
+	buffers.resize(0);
 	m_numframes = 0;
 
 	// Note that the blockwidth/height isn't always a multiple of the image width/height, there can be useless pixels.
@@ -217,9 +201,9 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 	m_numframes = widthinblocks * heightinblocks;
 	caos_assert(m_numframes > 0);
 
-	widths = new unsigned short[m_numframes];
-	heights = new unsigned short[m_numframes];
-	buffers = new void *[m_numframes];
+	widths.resize(m_numframes);
+	heights.resize(m_numframes);
+	buffers.resize(m_numframes);
 
 	unsigned int pitch = bmpdata->biWidth;
 	if (imgformat == if_24bit) pitch = (((pitch * 3) + 3) / 4) * 4;
@@ -233,7 +217,7 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 		unsigned int buffersize = blockwidth * blockheight;
 		if (imgformat == if_24bit) { buffersize *= 3; }
 		
-		buffers[i] = new char *[buffersize];
+		buffers[i].resize(buffersize);
 
 		for (unsigned int j = 0; j < blockheight; j++) {
 			unsigned int srcoffset = (curr_col * blockwidth);
@@ -242,7 +226,7 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 			if (imgformat == if_24bit) { srcoffset *= 3; destoffset *= 3; datasize *= 3; }
 			srcoffset += ((bmpdata->biHeight - 1) - (blockheight * curr_row) - j) * pitch;
 			
-			memcpy((char *)buffers[i] + destoffset, (char *)bmpdata->bmpdata + srcoffset, datasize);
+			memcpy((char *)buffers[i].data() + destoffset, (char *)bmpdata->bmpdata + srcoffset, datasize);
 		}
 
 		curr_col++;

@@ -23,7 +23,9 @@
 #include <cassert>
 #include <iostream>
 
-void blkImage::readHeader(std::istream &in) {
+blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
+	imgformat = if_16bit;
+
 	uint32_t flags; uint16_t width, height, spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
@@ -34,39 +36,25 @@ void blkImage::readHeader(std::istream &in) {
 	
 	assert(m_numframes == (unsigned int) (width * height));	
 
-	widths = new uint16_t[m_numframes];
-	heights = new uint16_t[m_numframes];
-	offsets = new uint32_t[m_numframes];
+	widths.resize(m_numframes);
+	heights.resize(m_numframes);
+	std::vector<uint32_t> offsets(m_numframes);
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]) + 4;
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]); assert(widths[i] == 128);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]); assert(heights[i] == 128);
 	}
-}
-
-blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
-	imgformat = if_16bit;
-
-	readHeader(in);
 	
-	buffers = new void *[m_numframes];
+	buffers.resize(m_numframes);
 	
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i] = new char[2 * widths[i] * heights[i]];
+		buffers[i].resize(2 * widths[i] * heights[i]);
 		in.seekg(offsets[i]);
-		readmany16le(in, (uint16_t*)buffers[i], widths[i] * heights[i]);
+		readmany16le(in, (uint16_t*)buffers[i].data(), widths[i] * heights[i]);
 	}
 }
 
-blkImage::~blkImage() {
-	delete[] widths;
-	delete[] heights;
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		delete[] (char*)buffers[i];
-	}
-	delete[] buffers;
-	delete[] offsets;
-}
+blkImage::~blkImage() {}
 
 /* vim: set noet: */

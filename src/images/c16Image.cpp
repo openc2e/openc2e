@@ -23,16 +23,18 @@
 #include <cassert>
 #include <memory>
 
-void c16Image::readHeader(std::istream &in) {
+c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
+	imgformat = if_16bit;
+
 	uint32_t flags; uint16_t spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	assert(flags & 0x02);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 
-	widths = new unsigned short[m_numframes];
-	heights = new unsigned short[m_numframes];
-	lineoffsets = new unsigned int *[m_numframes];
+	widths.resize(m_numframes);
+	heights.resize(m_numframes);
+	std::vector<std::vector<uint32_t>> lineoffsets(m_numframes);
 
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
@@ -40,26 +42,20 @@ void c16Image::readHeader(std::istream &in) {
 		in.read((char *)&offset, 4); offset = swapEndianLong(offset);
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
-		lineoffsets[i] = new unsigned int[heights[i]];
+		lineoffsets[i].resize(heights[i]);
 		lineoffsets[i][0] = offset;
 		for (unsigned int j = 1; j < heights[i]; j++) {
 			in.read((char *)&lineoffsets[i][j], 4); lineoffsets[i][j] = swapEndianLong(lineoffsets[i][j]);
 		}
 	}
-}
-
-c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
-	imgformat = if_16bit;
-
-	readHeader(in);
 	
-	buffers = new void *[m_numframes];
+	buffers.resize(m_numframes);
 	
 	// then, read the files. this involves seeking around, and is hence immensely ghey
 	// todo: we assume the file format is valid here. we shouldn't.
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i] = new char[widths[i] * heights[i] * 2];
-		uint16_t *bufferpos = (uint16_t *)buffers[i];
+		buffers[i].resize(widths[i] * heights[i] * 2);
+		uint16_t *bufferpos = (uint16_t *)buffers[i].data();
 		for (unsigned int j = 0; j < heights[i]; j++) {
 			in.seekg(lineoffsets[i][j], std::ios::beg);
 			while (true) {
@@ -75,20 +71,32 @@ c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 				bufferpos += runlength;
 			}
 		}
-		delete[] lineoffsets[i];
 	}
-	delete[] lineoffsets;
 }
 
-void s16Image::readHeader(std::istream &in) {
+bool s16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+	unsigned int offset = (y * widths[frame]) + x;
+	unsigned short *buffer = (unsigned short *)buffers[frame].data();
+	return (buffer[offset] == 0);
+}
+
+bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+	unsigned int offset = (y * widths[frame]) + x;
+	unsigned short *buffer = (unsigned short *)buffers[frame].data();
+	return (buffer[offset] == 0);
+}
+
+s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
+	imgformat = if_16bit;
+
 	uint32_t flags; uint16_t spritecount;
 	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
 	is_565 = (flags & 0x01);
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
-	
-	widths = new unsigned short[m_numframes];
-	heights = new unsigned short[m_numframes];
-	offsets = new unsigned int[m_numframes];
+
+	widths.resize(m_numframes);
+	heights.resize(m_numframes);
+	std::vector<uint32_t> offsets(m_numframes);
 
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
@@ -96,52 +104,17 @@ void s16Image::readHeader(std::istream &in) {
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
 	}
-}
-
-bool s16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
-	unsigned int offset = (y * widths[frame]) + x;
-	unsigned short *buffer = (unsigned short *)buffers[frame];
-	return (buffer[offset] == 0);
-}
-
-bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
-	unsigned int offset = (y * widths[frame]) + x;
-	unsigned short *buffer = (unsigned short *)buffers[frame];
-	return (buffer[offset] == 0);
-}
-
-s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
-	imgformat = if_16bit;
-
-	readHeader(in);
 	
-	buffers = new void *[m_numframes];
+	buffers.resize(m_numframes);
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i] = new char[2 * widths[i] * heights[i]];
-		readmany16le(in, (uint16_t*)buffers[i], widths[i] * heights[i]);
+		buffers[i].resize(2 * widths[i] * heights[i]);
+		readmany16le(in, (uint16_t*)buffers[i].data(), widths[i] * heights[i]);
 	}
-
-	delete[] offsets;
 }
 
-s16Image::~s16Image() {
-	delete[] widths;
-	delete[] heights;
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		delete[] (uint16_t *)buffers[i];
-	}
-	delete[] buffers;
-	// TODO: we should never have 'offsets' left over here, but .. we should check
-}
+s16Image::~s16Image() {}
 
-c16Image::~c16Image() {
-	delete[] widths;
-	delete[] heights;
-	for (unsigned int i = 0; i < m_numframes; i++)
-		delete[] (uint16_t *)buffers[i];
-	delete[] buffers;
-	// TODO: we should never have 'offsets' left over here, but .. we should check
-}
+c16Image::~c16Image() {}
 
 /* vim: set noet: */

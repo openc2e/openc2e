@@ -28,10 +28,10 @@ sprImage::sprImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	uint16_t spritecount;
 	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
 
-	widths = new uint16_t[m_numframes];
-	heights = new uint16_t[m_numframes];
+	widths.resize(m_numframes);
+	heights.resize(m_numframes);
 	std::vector<uint32_t> offsets(m_numframes);
-	buffers = new void *[m_numframes];
+	buffers.resize(m_numframes);
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]);
@@ -55,23 +55,16 @@ sprImage::sprImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
 		in.seekg(offsets[i]);
-		buffers[i] = new char[widths[i] * heights[i]];
-		in.read(static_cast<char*>(buffers[i]), widths[i] * heights[i]);
+		buffers[i].resize(widths[i] * heights[i]);
+		in.read(reinterpret_cast<char*>(buffers[i].data()), widths[i] * heights[i]);
 	}
 }
 
-sprImage::~sprImage() {
-	delete[] widths;
-	delete[] heights;
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		delete[] (char*)buffers[i];
-	}
-	delete[] buffers;
-}
+sprImage::~sprImage() {}
 
 bool sprImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
 	unsigned int offset = (y * widths[frame]) + x;
-	unsigned char *buffer = (unsigned char *)buffers[frame];
+	unsigned char *buffer = (unsigned char *)buffers[frame].data();
 	return (buffer[offset] == 0);
 }
 

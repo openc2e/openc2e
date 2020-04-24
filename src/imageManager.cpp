@@ -118,15 +118,9 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 	img->imgformat = if_16bit;
 	img->is_565 = oldimage->is_565;
 	img->m_numframes = oldimage->m_numframes;
-	img->widths = new uint16_t[img->m_numframes];
-	memcpy(img->widths, oldimage->widths, img->m_numframes * sizeof(uint16_t));
-	img->heights = new uint16_t[img->m_numframes];
-	memcpy(img->heights, oldimage->heights, img->m_numframes * sizeof(uint16_t));
-	img->buffers = new void *[img->m_numframes];
-	for (size_t i = 0; i < img->m_numframes; i++) {
-		img->buffers[i] = new char[img->widths[i] * img->heights[i] * 2];
-		memcpy(img->buffers[i], oldimage->buffers[i], img->widths[i] * img->heights[i] * 2);
-	}
+	img->widths = oldimage->widths;
+	img->heights = oldimage->heights;
+	img->buffers = oldimage->buffers;
 
 	/*
 	 * CDN:
@@ -174,7 +168,7 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 	for (unsigned int i = 0; i < img->m_numframes; i++) {
 		for (unsigned int j = 0; j < img->heights[i]; j++) {
 			for (unsigned int k = 0; k < img->widths[i]; k++) {
-				unsigned short v = ((unsigned short *)img->buffers[i])[(j * img->widths[i]) + k];
+				unsigned short v = ((unsigned short *)img->buffers[i].data())[(j * img->widths[i]) + k];
 				if (v == 0) continue;
 
 				/*
@@ -227,7 +221,7 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 				 */
 				if (v == 0)
 					v = (1 << 11 | 1 << 5 | 1);
-				((unsigned short *)img->buffers[i])[(j * img->widths[i]) + k] = v;
+				((unsigned short *)img->buffers[i].data())[(j * img->widths[i]) + k] = v;
 			}
 		}
 	}
