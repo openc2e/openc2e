@@ -476,6 +476,7 @@ public:
 	
 	// debug
 	void c_DBG_ASRT();
+	void c_DBG_ASRF();
 	void c_DBG_OUTS();
 	void c_DBG_OUTV();
 	void c_DBUG();

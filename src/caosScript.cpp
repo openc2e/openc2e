@@ -848,6 +848,19 @@ void caosScript::parseloop(int state, void *info) {
 					current->fixRelocation(endreloc);
 					continue;
 				}
+				if (t2 && logicalType(t2) == TOK_WORD && t2->word() == "asrf") {
+					getToken(TOK_WORD);
+					emitOp(CAOS_CONSTINT, 1);
+					parseCondition();
+					int okreloc = current->newRelocation();
+					int failreloc = current->newRelocation();
+					emitOp(CAOS_CJMP, okreloc);
+					emitOp(CAOS_JMP, failreloc);
+					current->fixRelocation(okreloc);
+					emitCmd("cmd dbg: asrf");
+					current->fixRelocation(failreloc);
+					continue;
+				}
 			}
 			putBackToken(t);
 			emitExpr(readExpr(CI_COMMAND));

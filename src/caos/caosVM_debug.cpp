@@ -278,6 +278,18 @@ void caosVM::c_DBG_ASRT() {
 }
 
 /**
+ DBG: ASRF (command) condition (condition)
+ %pragma variants all
+ %status maybe
+
+ (openc2e-only)
+ Blows up unless the given condition is false.
+*/
+void caosVM::c_DBG_ASRF() {
+	throw caosException("DBG ASRF condition succeeded");
+}
+
+/**
  DBG: IDNT (string) agent (agent)
  %status ok
  %pragma variants all
