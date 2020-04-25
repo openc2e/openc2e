@@ -7,6 +7,15 @@
 
 using namespace PraySourceParser;
 
+static char unescape(char c) {
+	switch (c) {
+	case 'n': return '\n';
+	case 'r': return '\r';
+	case 't': return '\t';
+	default : return c;
+	}
+}
+
 class PraySourceParserImpl {
 public:
   PraySourceParserImpl(const char *buf);
@@ -38,7 +47,7 @@ private:
   PraySourceParser::Event parse_line();
   bool parse_some_ws();
 
-  const char *pray_source_parse_p = nullptr;
+  const char *p = nullptr;
   int yylineno = -1;
   Token token;
   bool in_group_block = false;
@@ -50,22 +59,23 @@ private:
 void PraySourceParserImpl::next_token() {
   const char *basep;
   const char *YYMARKER;
-  assert(pray_source_parse_p);
-  basep = pray_source_parse_p;
+  assert(p);
+  basep = p;
+  token.stringval = "";
 
   /*!re2c
   re2c:define:YYCTYPE = "unsigned char";
-  re2c:define:YYCURSOR = pray_source_parse_p;
+  re2c:define:YYCURSOR = p;
   re2c:yyfill:enable = 0;
   re2c:yych:conversion = 1;
   re2c:indent:top = 1;
 
-  [\000] { pray_source_parse_p = nullptr; token.type = PS_EOI; return; }
+  [\000] { p = nullptr; token.type = PS_EOI; return; }
   [\n] { yylineno++; token.type = PS_NEWLINE; return; }
   [ \t\r]+ { token.type = PS_WS; return; }
   [A-Za-z]+ {
     token.type = PS_BAREWORD;
-    token.stringval = std::string(basep, pray_source_parse_p - basep);
+    token.stringval = std::string(basep, p - basep);
     return;
   }
   [0-9]+ {
@@ -84,8 +94,6 @@ void PraySourceParserImpl::next_token() {
   }
   */
 
-  printf("here\n");
-
 str:
   /*!re2c
   [\\] ? [\000] {
@@ -93,15 +101,13 @@ str:
     token.stringval = "Unexpected end of input inside string";
     return;
   }
-  [\\] . { goto str; }
+  [\\] . { token.stringval.push_back(unescape(p[-1])); goto str; }
   ["] {
     token.type = PS_STRING;
-    // TODO: unescape?
-    token.stringval = std::string(basep + 1, pray_source_parse_p - basep - 2);
     return;
   }
-  [\n] { yylineno++; goto str; }
-  . { goto str; }
+  [\n] { yylineno++; token.stringval.push_back(p[-1]); goto str; }
+  . { token.stringval.push_back(p[-1]); goto str; }
   */
 
 comment:
@@ -113,7 +119,7 @@ comment:
   }
   "-)" {
     token.type = PS_COMMENT;
-    token.stringval = std::string(basep, pray_source_parse_p - basep);
+    token.stringval = std::string(basep, p - basep);
     return;
   }
   [\n] { yylineno++; goto comment; }
@@ -147,7 +153,7 @@ std::string PraySourceParserImpl::TokenToString(PraySourceParserImpl::Token &tok
 }
 
 PraySourceParserImpl::PraySourceParserImpl(const char *buf)
-    : pray_source_parse_p(buf), yylineno(1) {
+    : p(buf), yylineno(1) {
   next_token();
 }
 

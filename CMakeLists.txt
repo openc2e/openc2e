@@ -274,7 +274,10 @@ include(GoogleTest)
 include(Openc2eBuildBeforeTests)
 include(Openc2eOutputOnTestFailure)
 
-add_executable(test_openc2e tests/test_caos.cpp)
+add_executable(test_openc2e
+	tests/test_caos.cpp
+	tests/test_pray.cpp
+)
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
 gtest_discover_tests(test_openc2e)
 
