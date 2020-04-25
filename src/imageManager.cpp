@@ -57,6 +57,24 @@ shared_ptr<creaturesImage> tryOpen(std::string fname, filetype ft) {
 }
 
 /*
+ * Add an image to the gallery. Useful mainly for testing situations.
+ */
+void imageManager::addImage(shared_ptr<creaturesImage> image) {
+	if (!image) {
+		throw creaturesException("Can't add null image");
+	}
+	if (image->getName() == "") {
+		throw creaturesException("Can't add image with no name");
+	}
+	std::map<std::string, std::weak_ptr<creaturesImage> >::iterator i = images.find(image->getName());
+	if (i != images.end() && i->second.lock()) {
+		throw creaturesException(fmt::format("Can't add image '{}' which already exists", image->getName()));
+	}
+
+	images[image->getName()] = image;
+}
+
+/*
  * Retrieve an image for rendering use. To retrieve a sprite, pass the name without
  * extension. To retrieve a background, pass the full filename (ie, with .blk).
  */

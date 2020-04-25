@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <map>
+#include <vector>
 
 class Dialect {
 	private:

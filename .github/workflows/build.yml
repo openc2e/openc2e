@@ -24,6 +24,7 @@ jobs:
         CCACHE_COMPRESS: true
         CCACHE_COMPRESSLEVEL: 6
         CCACHE_MAXSIZE: 500M
+    - run: cd build && cmake --build . -t test
 
   build-windows:
     runs-on: windows-latest
@@ -34,8 +35,11 @@ jobs:
     - shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        IF %ERRORLEVEL% NEQ 0 ( exit %ERRORLEVEL% )
         cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe
+        IF %ERRORLEVEL% NEQ 0 ( exit %ERRORLEVEL% )
         cmake --build build --parallel
+    - run: cd build && cmake --build . -t test
     - run: cd build && cmake --build . -t dist
     - uses: actions/upload-artifact@v1
       with:
@@ -58,6 +62,7 @@ jobs:
         CCACHE_COMPRESS: true
         CCACHE_COMPRESSLEVEL: 6
         CCACHE_MAXSIZE: 500M
+    - run: cd build && cmake --build . -t test
     - run: cd build && cmake --build . -t dist
     - uses: actions/upload-artifact@v1
       with:

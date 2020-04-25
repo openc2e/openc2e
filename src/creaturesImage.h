@@ -32,6 +32,7 @@ unsigned int bitDepthOf(imageformat f);
 
 class creaturesImage {
 protected:
+	friend class Openc2eTestHelper;
 	friend class imageManager;
 	unsigned int m_numframes;
 	std::vector<uint16_t> widths, heights;

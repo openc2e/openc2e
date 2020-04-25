@@ -82,6 +82,7 @@ endif()
 add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
 add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/miniz EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
@@ -267,6 +268,16 @@ target_link_libraries(praydumper prayfile)
 add_executable(praybuilder src/tools/praybuilder.cpp ${GEN}/caoslexer.cpp)
 target_link_libraries(praybuilder prayfile)
 
+# tests
+enable_testing()
+include(GoogleTest)
+include(Openc2eBuildBeforeTests)
+include(Openc2eOutputOnTestFailure)
+
+add_executable(test_openc2e tests/test_caos.cpp)
+target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
+gtest_discover_tests(test_openc2e)
+
 # Generated files
 file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/caos/caosVM_*.cpp)
 add_custom_command(
@@ -342,8 +353,6 @@ add_custom_command(
 	DEPENDS src/music/mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
 
-add_custom_target(test DEPENDS openc2e
-	COMMAND perl ${SRC}/runtests.pl ${SRC}/tests)
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
 add_custom_target(generated DEPENDS
 	${GEN}/caoslexer.cpp
