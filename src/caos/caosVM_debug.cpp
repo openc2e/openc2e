@@ -290,6 +290,18 @@ void caosVM::c_DBG_ASRF() {
 }
 
 /**
+ DBG: FAIL (command)
+ %pragma variants all
+ %status maybe
+
+ (openc2e-only)
+ Blows up.
+*/
+void caosVM::c_DBG_FAIL() {
+	throw caosException("DBG: FAIL reached");
+}
+
+/**
  DBG: IDNT (string) agent (agent)
  %status ok
  %pragma variants all
