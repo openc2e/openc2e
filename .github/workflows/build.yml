@@ -16,7 +16,8 @@ jobs:
     - uses: actions/cache@v1.1.0
       with:
         path: .ccache
-        key: ccache-ubuntu-latest
+        key: ccache-ubuntu-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+        restore-keys: ccache-ubuntu-
     - run: mkdir build && cd build && cmake .. -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja && cmake --build . --parallel
       env:
         CCACHE_BASEDIR: ${{ github.workspace }}
@@ -54,7 +55,8 @@ jobs:
     - uses: actions/cache@v1.1.0
       with:
         path: .ccache
-        key: ccache-macos-latest
+        key: ccache-macos-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+        restore-keys: ccache-macos-
     - run: mkdir build && cd build && cmake .. -G Ninja -DCMAKE_PREFIX_PATH=/usr/local/opt/qt -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel
       env:
         CCACHE_BASEDIR: ${{ github.workspace }}
