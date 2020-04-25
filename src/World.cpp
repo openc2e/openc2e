@@ -654,7 +654,10 @@ std::vector<std::string> World::findFiles(std::string dir, std::string wild) {
 }
 
 std::string World::getUserDataDir() {
-	return (data_directories.end() - 1)->string();
+	if (data_directories.size() ==  0) {
+		throw creaturesException("Can't get user data directory when there are no data directories");
+	}
+	return data_directories.back().string();
 }
 
 void World::selectCreature(std::shared_ptr<Agent> a) {
