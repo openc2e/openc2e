@@ -1,27 +1,16 @@
 * unit tests for the non-ifblock flow stuff 
 * fuzzie, 06/06/04
 
-DBG: OUTS "# Flow control"
-DBG: OUTS "1..8"
-
 * test LOOP .. UNTL
 SETV VA00 0
 LOOP
  ADDV VA00 1
 UNTL VA00 eq 3
-DOIF VA00 eq 3
- DBG: OUTS "ok 1 - LOOP .. UNTL"
-ELSE
- DBG: OUTS "not ok 1 - LOOP .. UNTL"
-ENDI
+DBG: ASRT VA00 eq 3
 
 * test LOOP .. EVER
 SETS VA00 CAOS 1 0 0 0 "SETV VA00 3 LOOP DOIF VA00 EQ 0 STOP ENDI OUTV VA00 SUBV VA00 1 EVER" 0 0 VA01
-DOIF VA00 EQ "321"
-	DBG: OUTS "ok 2 - LOOP .. EVER"
-ELSE
-	DBG: OUTS "not ok 2 - LOOP .. EVER"
-ENDI
+DBG: ASRT VA00 EQ "321"
 
 * test REPS .. REPE
 SETV VA00 0
@@ -30,26 +19,19 @@ REPS VA01
  SETV VA01 0
  ADDV VA00 1
 REPE
-DOIF VA00 eq 4
- DBG: OUTS "ok 3 - REPS .. REPE"
-ELSE
- DBG: OUTS "not ok 3 - REPS .. REPE"
-ENDI
+DBG: ASRT VA00 eq 4
 
 * test GSUB
 SETV VA00 0
 GSUB test
-DOIF VA00 eq 1
- DBG: OUTS "ok 4 - GSUB"
-ELSE
- DBG: OUTS "not ok 4 - GSUB"
-ENDI
+DBG: ASRT VA00 eq 1
 
 * GSUB loops
 SETV VA00 5
 REPS 4
   GSUB t2
 REPE
+DBG: ASRT VA00 eq 9
 
 * for GSUB test
 SUBR test
@@ -57,10 +39,5 @@ SUBR test
 RETN
 
 SUBR t2
- SETS va01 "ok "
- ADDS va01 VTOS va00
- ADDS va01 " - GSUB iteration"
- DBG: OUTS va01
-
  ADDV VA00 1
 RETN

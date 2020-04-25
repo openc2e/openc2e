@@ -1,201 +1,113 @@
 * unit tests for DOIF/ELIF/ELSE/ENDI blocks and comparison operators
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: ifblocks: 24 tests"
-DBG: OUTS "1..24"
-
 * test equality
-DOIF 1 eq 1
- DBG: OUTS "ok 1"
-ELSE
- DBG: OUTS "not ok 1"
-ENDI
-DOIF 0.5 eq 0.5
- DBG: OUTS "ok 2"
-ELSE
- DBG: OUTS "not ok 2"
-ENDI
+DBG: ASRT 1 eq 1
+DBG: ASRT 0.5 eq 0.5
 
 * test non-equality
-DOIF 1 ne 2
- DBG: OUTS "ok 3"
-ELSE
- DBG: OUTS "not ok 3"
-ENDI
-DOIF 0.5 ne 0.7
- DBG: OUTS "ok 4"
-ELSE
- DBG: OUTS "not ok 4"
-ENDI
+DBG: ASRT 1 ne 2
+DBG: ASRT 0.5 ne 0.7
 
 * test greater than
-DOIF 1 > 2
- DBG: OUTS "not ok 5"
-ELSE
- DBG: OUTS "ok 5"
-ENDI
+DBG: ASRF 1 > 2
 
 * test less than
-DOIF 1 < 2
- DBG: OUTS "ok 6"
-ELSE
- DBG: OUTS "not ok 6"
-ENDI
+DBG: ASRT 1 < 2
 
 * test le #1
-DOIF 1 <= 1
- DBG: OUTS "ok 7"
-ELSE
- DBG: OUTS "not ok 7"
-ENDI
+DBG: ASRT 1 <= 1
 
 * test le #2
-DOIF 1 <= 2
- DBG: OUTS "ok 8"
-ELSE
- DBG: OUTS "not ok 8"
-ENDI
+DBG: ASRT 1 <= 2
 
 * test le #3
-DOIF 2 <= 1
- DBG: OUTS "not ok 9"
-ELSE
- DBG: OUTS "ok 9"
-ENDI
+DBG: ASRF 2 <= 1
 
 * test ge #1
-DOIF 1 >= 1
- DBG: OUTS "ok 10"
-ELSE
- DBG: OUTS "not ok 10"
-ENDI
+DBG: ASRT 1 >= 1
 
 * test ge #2
-DOIF 1 >= 2
- DBG: OUTS "not ok 11"
-ELSE
- DBG: OUTS "ok 11"
-ENDI
+DBG: ASRF 1 >= 2
 
 * test ge #3
-DOIF 2 >= 1
- DBG: OUTS "ok 12"
-ELSE
- DBG: OUTS "not ok 12"
-ENDI
+DBG: ASRT 2 >= 1
 
 * test AND
-DOIF 1 eq 1 AND 2 eq 2
- DBG: OUTS "ok 13"
-ELSE
- DBG: OUTS "not ok 13"
-ENDI
+DBG: ASRT 1 eq 1 AND 2 eq 2
 
 * test OR #1
-DOIF 1 eq 1 OR 1 eq 2
- DBG: OUTS "ok 14"
-ELSE
- DBG: OUTS "not ok 14"
-ENDI
+DBG: ASRT 1 eq 1 OR 1 eq 2
 
 * test OR #2
-DOIF 1 eq 2 OR 2 eq 3
- DBG: OUTS "not ok 15"
-ELSE
- DBG: OUTS "ok 15"
-ENDI
+DBG: ASRF 1 eq 2 OR 2 eq 3
 
 * test embedded if blocks
 DOIF 1 eq 2
  DOIF 1 eq 1
-  DBG: OUTS "not ok 16"
+  DBG: FAIL
  ELSE
-  DBG: OUTS "not ok 16"
+  DBG: FAIL
  ENDI
 ELSE
  DOIF 1 eq 1
-  DBG: OUTS "ok 16"
  ELSE
-  DBG: OUTS "not ok 16"
+  DBG: FAIL
  ENDI
 ENDI
 
 * test ELIF
 DOIF 1 eq 2
- DBG: OUTS "not ok 17"
+ DBG: FAIL
 ELIF 1 eq 1
- DBG: OUTS "ok 17"
 ELSE
- DBG: OUTS "not ok 17"
+ DBG: FAIL
 ENDI
 
 * test associativity
 * (1 == 2 && 2 == 1) || 1 == 1
-DOIF 1 gt 2 and 2 lt 1 or 1 eq 1
- DBG: OUTS "ok 18"
-ELSE
- DBG: OUTS "not ok 18"
-ENDI
+DBG: ASRT 1 gt 2 and 2 lt 1 or 1 eq 1
 
 * test AND and OR, ie, ordering
-DOIF 1 ne 1 and 2 eq 3 and 4 eq 5 or 1 eq 1
- DBG: OUTS "ok 19"
-ELSE
- DBG: OUTS "not ok 19"
-ENDI
+DBG: ASRT 1 ne 1 and 2 eq 3 and 4 eq 5 or 1 eq 1
 
-DOIF "a" lt "b"
- DBG: OUTS "ok 20"
-ELSE
- DBG: OUTS "not ok 20"
-ENDI
+DBG: ASRT "a" lt "b"
 
 SETV VA00 MOWS
 
 * test AND #2
-DOIF 1 eq 2 AND 2 eq 2
- DBG: OUTS "not ok 21"
-ELSE
- DBG: OUTS "ok 21"
-ENDI
+DBG: ASRF 1 eq 2 AND 2 eq 2
 
 *test chained elifs
 DOIF 1 eq 2
-	DBG: OUTS "not ok 22"
+	DBG: FAIL
 ELIF 1 eq 3
-	DBG: OUTS "not ok 22"
+	DBG: FAIL
 ELIF 2 eq 3
-	DBG: OUTS "not ok 22"
+	DBG: FAIL
 ELSE
-	DBG: OUTS "ok 22"
 ENDI
 
 * test more chained elifs, with nesting
 DOIF 1 eq 1
 	SETV VA00 0
 	DOIF 3 eq 1
-		DBG: OUTS "not ok 23"
+		DBG: FAIL
 	ELIF 4 eq 4
 		SETV VA00 3
 	ENDI
 ELSE
-	DBG: OUTS "not ok 23"
+	DBG: FAIL
 ENDI
-DOIF VA00 eq 3
-	DBG: OUTS "ok 23"
-ENDI
+DBG: ASRT VA00 eq 3
 
 * test that only one elif branch is evaluated
 SETV VA00 0
 DOIF 1 eq 2
-	DBG: OUTS "not ok 24"
+	DBG: FAIL
 ELIF 1 eq 1
 	SETV VA00 1
 ELIF 2 eq 2
 	SETV VA00 2
 ENDI
-DOIF VA00 eq 2 or VA00 eq 0
-	DBG: OUTS "not ok 24"
-ELSE
-	DBG: OUTS "ok 24"
-ENDI
+DBG: ASRF VA00 eq 2 or VA00 eq 0

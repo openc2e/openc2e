@@ -1,85 +1,46 @@
 * unit tests for variables
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: variables: 9 tests"
-DBG: OUTS "1..9"
-
 * test setv
 SETV VA00 1
-DOIF VA00 eq 1
- DBG: OUTS "ok 1"
-ELSE
- DBG: OUTS "not ok 1"
-ENDI
+DBG: ASRT VA00 eq 1
 
 * test subv
 SETV VA00 4
 SUBV VA00 2
-DOIF VA00 eq 2
- DBG: OUTS "ok 2"
-ELSE
- DBG: OUTS "not ok 2"
-ENDI
+DBG: ASRT VA00 eq 2
 
 * test addv
 SETV VA00 4
 ADDV VA00 2
-DOIF VA00 eq 6
- DBG: OUTS "ok 3"
-ELSE
- DBG: OUTS "not ok 3"
-ENDI
+DBG: ASRT VA00 eq 6
 
 * test mulv
 SETV VA00 4
 MULV VA00 2
-DOIF VA00 eq 8
- DBG: OUTS "ok 4"
-ELSE
- DBG: OUTS "not ok 4"
-ENDI
+DBG: ASRT VA00 eq 8
 
 * test negv
 SETV VA00 4
 NEGV VA00
-DOIF VA00 eq -4
- DBG: OUTS "ok 5"
-ELSE
- DBG: OUTS "not ok 5"
-ENDI
+DBG: ASRT VA00 eq -4
 
 * test modv
 SETV VA00 7
 MODV VA00 2
-DOIF VA00 eq 1
- DBG: OUTS "ok 6"
-ELSE
- DBG: OUTS "not ok 6"
-ENDI
+DBG: ASRT VA00 eq 1
 
 * test that you can have independent va00/va01
 SETV VA01 8
 SETV VA00 7
-DOIF VA01 eq 8 AND VA00 eq 7
- DBG: OUTS "ok 7"
-ELSE
- DBG: OUTS "not ok 7"
-ENDI
+DBG: ASRT VA01 eq 8 AND VA00 eq 7
 
 * test setv with va00/va01, from nornagon
 SETV VA00 1
 SETV VA01 0
 SETV VA00 VA01
-DOIF VA00 eq VA01
- DBG: OUTS "ok 8"
-ELSE
- DBG: OUTS "not ok 8"
-ENDI
+DBG: ASRT VA00 eq VA01
 
 * test if variables are zero by default
-DOIF VA99 eq 0
- DBG: OUTS "ok 9"
-ELSE
- DBG: OUTS "not ok 9"
-ENDI
+DBG: ASRT VA99 eq 0
 

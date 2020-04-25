@@ -1,32 +1,17 @@
 * unit tests for the simple agent stuff 
 * fuzzie, 06/06/04
 
-DBG: OUTS "# TEST: simpleagent: 11 tests"
-DBG: OUTS "1..11"
-
 * test NULL
 SETA VA00 NULL
-DOIF VA00 eq NULL
- DBG: OUTS "ok 1"
-ELSE
- DBG: OUTS "not ok 1"
-ENDI
+DBG: ASRT VA00 eq NULL
 
 * test NEW: SIMP
 NEW: SIMP 3 2 1 "blnk" 2 0 0
-DOIF TARG eq NULL
- DBG: OUTS "not ok 2"
-ELSE
- DBG: OUTS "ok 2"
-ENDI
+DBG: ASRF TARG eq NULL
 
 * test ATTR
 ATTR 3575 * all attributes relevant to agents
-DOIF ATTR eq 3575
- DBG: OUTS "ok 3"
-ELSE
- DBG: OUTS "not ok 3"
-ENDI
+DBG: ASRT ATTR eq 3575
 
 * test FMLY/SPCS/GNUS
 SETV VA00 0
@@ -39,19 +24,11 @@ ENDI
 DOIF FMLY eq 3
  ADDV VA00 1
 ENDI
-DOIF VA00 eq 3
- DBG: OUTS "ok 4"
-ELSE
- DBG: OUTS "not ok 4"
-ENDI
+DBG: ASRT VA00 eq 3
 
 * test OV00
 SETV OV00 1
-DOIF OV00 eq 1
- DBG: OUTS "ok 5"
-ELSE
- DBG: OUTS "not ok 5"
-ENDI
+DBG: ASRT OV00 eq 1
 
 * test ENUM
 SETV VA00 0
@@ -60,18 +37,10 @@ SETV OV00 2
 ENUM 3 2 1
  ADDV VA00 OV00
 NEXT
-DOIF VA00 eq 3
- DBG: OUTS "ok 6"
-ELSE
- DBG: OUTS "not ok 6"
-ENDI
+DBG: ASRT VA00 eq 3
 
 * make sure TARG is reset after ENUM
-DOIF TARG eq NULL
- DBG: OUTS "ok 7"
-ELSE
- DBG: OUTS "not ok 7"
-ENDI
+DBG: ASRT TARG eq NULL
 
 * make sure ENUM doesn't happen if there are no agents
 RTAR 3 2 1
@@ -79,34 +48,17 @@ SETV VA00 0
 ENUM 20 25 65530
  SETV VA00 1
 NEXT
-DOIF VA00 eq 0
- DBG: OUTS "ok 8"
-ELSE
- DBG: OUTS "not ok 8"
-ENDI
+DBG: ASRT VA00 eq 0
 
 * make sure TARG is reset after unsuccessful ENUM
-DOIF TARG eq NULL
- DBG: OUTS "ok 9"
-ELSE
- DBG: OUTS "not ok 9"
-ENDI
+DBG: ASRT TARG eq NULL
 
 RTAR 3 2 1
 
 * test POSE setting
 POSE 1
-DOIF POSE eq 1
- DBG: OUTS "ok 10"
-ELSE
- DBG: OUTS "not ok 10"
-ENDI
+DBG: ASRT POSE eq 1
 
 * make sure ANIM doesn't immediately change current POSE
 ANIM [0]
-DOIF POSE eq 1
- DBG: OUTS "ok 11"
-ELSE
- DBG: OUTS "not ok 11"
-ENDI
-
+DBG: ASRT POSE eq 1

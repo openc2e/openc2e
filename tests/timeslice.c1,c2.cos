@@ -1,38 +1,27 @@
 * unit tests for time slicing
 * nornagon 04/08/07
 
-dbg: outs "# Time slicing and evalcosts"
-dbg: outs "1..9"
-
 * setv
 setv var0 100
 dbg: tslc var0
 setv var1 42
 subv var0 dbg: tslc
-doif var0 eq 0
-	dbg: outs "ok 1"
-else
-	dbg: outs "not ok 1"
-endi
+dbg: asrt var0 eq 0
 
 * doif
 setv var0 100
 dbg: tslc var0
 
 doif 1 eq 2
-	dbg: outs "not ok 2"
+	dbg: fail
 elif 3 eq 4
-	dbg: outs "not ok 2"
+	dbg: fail
 else
 	setv var1 2
 endi
 
 subv var0 dbg: tslc
-doif var0 eq 0
-	dbg: outs "ok 2"
-else
-	dbg: outs "not ok 2"
-endi
+dbg: asrt var0 eq 0
 
 * math
 setv var0 100
@@ -48,60 +37,40 @@ orrv var1 8
 subv var1 9
 negv var1
 subv var0 dbg: tslc
-doif var0 eq 0
-	dbg: outs "ok 3"
-else
-	dbg: outs "not ok 3"
-endi
+dbg: asrt var0 eq 0
 
 * new: simp
 setv var0 100
 dbg: tslc var0
-new: simp eggs 1 0 1 0
+new: simp blnk 1 0 1 0
 subv var0 dbg: tslc
-doif var0 eq 1
-	dbg: outs "ok 4"
-else
-	dbg: outs "not ok 4"
-endi
+dbg: asrt var0 eq 1
 kill targ
 
 * kill
-new: simp eggs 1 0 1 0
+new: simp blnk 1 0 1 0
 setv var0 100
 dbg: tslc var0
 kill targ
 subv var0 dbg: tslc
-doif var0 eq 1
-	dbg: outs "ok 5"
-else
-	dbg: outs "not ok 5"
-endi
+dbg: asrt var0 eq 1
 
 * pose
-new: simp eggs 48 0 1 0
+new: simp blnk 48 0 1 0
 setv var0 100
 dbg: tslc var0
-pose 2
+pose 0
 subv var0 dbg: tslc
-doif var0 eq 1
-	dbg: outs "ok 6"
-else
-	dbg: outs "not ok 6"
-endi
+dbg: asrt var0 eq 1
 kill targ
 
 * anim
-new: simp eggs 48 0 1 0
+new: simp blnk 48 0 1 0
 setv var0 100
 dbg: tslc var0
 anim [0101]
 subv var0 dbg: tslc
-doif var0 eq 1
-	dbg: outs "ok 7"
-else
-	dbg: outs "not ok 7"
-endi
+dbg: asrt var0 eq 1
 kill targ
 
 * loop..untl
@@ -112,19 +81,11 @@ loop
 	addv var1 1
 untl var1 ge 3
 subv var0 dbg: tslc
-doif var0 eq 0
-	dbg: outs "ok 8"
-else
-	dbg: outs "not ok 8"
-endi
+dbg: asrt var0 eq 0
 
 * stim
 setv var0 100
 dbg: tslc var0
 stim shou 100 1 30 0 0 0 0 0 0 0 0 0
 subv var0 dbg: tslc
-doif var0 eq 0
-	dbg: outs "ok 9"
-else
-	dbg: outs "not ok 9"
-endi
+dbg: asrt var0 eq 0

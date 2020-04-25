@@ -1,8 +1,2 @@
-DBG: OUTS "1..1"
-
 * ensure that single-quoted characters are parsed correctly
-doif 'C' = 67
-	DBG: OUTS "ok 1"
-else
-	DBG: OUTS "not ok 1"
-endi
+dbg: asrt 'C' = 67

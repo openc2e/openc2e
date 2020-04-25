@@ -1,121 +1,53 @@
 * tests for strings
 * fuzzie, 14/07/08
 
-DBG: OUTS "# TEST: strings: 16 tests"
-DBG: OUTS "1..16"
-
 * test string concaternation
 SETS VA00 "he"
 ADDS VA00 "llo"
-DOIF VA00 eq "hello"
- DBG: OUTS "ok 1"
-ELSE
- DBG: OUTS "not ok 1"
-ENDI
+DBG: ASRT VA00 eq "hello"
 
 * test strings don't always match
-DOIF "meep" eq "moop"
- DBG: OUTS "not ok 2"
-ELSE
- DBG: OUTS "ok 2"
-ENDI
+DBG: ASRF "meep" eq "moop"
 
 * test LOWA
-DOIF LOWA "HELLO" eq "hello"
- DBG: OUTS "ok 3"
-ELSE
- DBG: OUTS "not ok 3"
-ENDI
+DBG: ASRT LOWA "HELLO" eq "hello"
 
 * test UPPA
-DOIF UPPA "hello" eq "HELLO"
- DBG: OUTS "ok 4"
-ELSE
- DBG: OUTS "not ok 4"
-ENDI
+DBG: ASRT UPPA "hello" eq "HELLO"
 
 * test STRL (string length)
-DOIF STRL "hello" eq 5
- DBG: OUTS "ok 5"
-ELSE
- DBG: OUTS "not ok 5"
-ENDI
+DBG: ASRT STRL "hello" eq 5
 
 * test SUBS (substring)
-DOIF SUBS "moohello" 4 5 eq "hello"
- DBG: OUTS "ok 6"
-ELSE
- DBG: OUTS "not ok 6"
-ENDI
+DBG: ASRT SUBS "moohello" 4 5 eq "hello"
 
 * test integer-to-string
-DOIF VTOS 1 eq "1"
- DBG: OUTS "ok 7"
-ELSE
- DBG: OUTS "not ok 7"
-ENDI
+DBG: ASRT VTOS 1 eq "1"
 
 * test float-to-string
-DOIF VTOS 1.0 eq "1.000000"
- DBG: OUTS "ok 8"
-ELSE
- DBG: OUTS "not ok 8"
-ENDI
+DBG: ASRT VTOS 1.0 eq "1.000000"
 
 * test string-to-integer
-DOIF STOI "54.6" eq 54
- DBG: OUTS "ok 9"
-ELSE
- DBG: OUTS "not ok 9"
-ENDI
+DBG: ASRT STOI "54.6" eq 54
 
 * test string-to-float
-DOIF STOF "54.6" eq 54.6
- DBG: OUTS "ok 10"
-ELSE
- DBG: OUTS "not ok 10"
-ENDI
+DBG: ASRT STOF "54.6" eq 54.6
 
 * search for string
-DOIF SINS "moohellomoo" 1 "hello" eq 4
- DBG: OUTS "ok 11"
-ELSE
- DBG: OUTS "not ok 11"
-ENDI
+DBG: ASRT SINS "moohellomoo" 1 "hello" eq 4
 
-DOIF SINS "moohellomoo" 2 "moo" eq 9
- DBG: OUTS "ok 12"
-ELSE
- DBG: OUTS "not ok 12"
-ENDI
+DBG: ASRT SINS "moohellomoo" 2 "moo" eq 9
 
 * failed search for string #1
-DOIF SINS "moohellomoo" 5 "hello" eq -1
- DBG: OUTS "ok 13"
-ELSE
- DBG: OUTS "not ok 13"
-ENDI
+DBG: ASRT SINS "moohellomoo" 5 "hello" eq -1
 
 * failed search for string #2
-DOIF SINS "moohellomoo" 1 "moop" eq -1
- DBG: OUTS "ok 14"
-ELSE
- DBG: OUTS "not ok 14"
-ENDI
+DBG: ASRT SINS "moohellomoo" 1 "moop" eq -1
 
 * read char at index
-DOIF CHAR "hello" 2 eq 'e'
- DBG: OUTS "ok 15"
-ELSE
- DBG: OUTS "not ok 15"
-ENDI
+DBG: ASRT CHAR "hello" 2 eq 'e'
 
 * set char at index
 SETS VA00 "moop"
 CHAR VA00 3 'e'
-DOIF VA00 eq "moep"
- DBG: OUTS "ok 16"
-ELSE
- DBG: OUTS "not ok 16"
-ENDI
-
+DBG: ASRT VA00 eq "moep"
