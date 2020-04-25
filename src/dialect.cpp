@@ -37,14 +37,4 @@ int Dialect::cmd_index(const cmdinfo *ci) const {
 	return (ci - cmds);
 }
 
-std::map<std::string, std::shared_ptr<Dialect> > dialects;
-
-void registerDelegates() {
-	registerAutoDelegates();
-}
-
-void freeDelegates() {
-	dialects.clear();
-}
-
 /* vim: set noet: */

@@ -41,18 +41,8 @@ def miscprep(variant, cmds):
             )
 
 
-INIT_FUNCS = []
-
-
 def printinit(variant, cmdarr):
-    print("static void init_{}() {{".format(variant))
-    print(
-        '\tdialects["{}"] = std::shared_ptr<Dialect>(new Dialect({}, std::string("{}")));'.format(
-            variant, cmdarr, variant
-        )
-    )
-    print("}")
-    INIT_FUNCS.append("init_{}".format(variant))
+    print("static Dialect dialect_{}({}, std::string(\"{}\"));".format(variant, cmdarr, variant))
 
 
 def printdispatch():
@@ -276,7 +266,12 @@ for variant_name in sorted(data["variants"]):
 
 printdispatch()
 
-print("void registerAutoDelegates() {")
-for f in INIT_FUNCS:
-    print("\t{}();".format(f))
+print("Dialect* getDialectByName(const std::string& name) {")
+for variant_name in sorted(data["variants"]):
+    print("\tif (name == \"{}\") {{ return &dialect_{}; }}".format(variant_name, variant_name))
+print("\treturn nullptr;")
+print("}")
+
+print("std::vector<std::string> getDialectNames() {")
+print("\treturn { " + ", ".join('"{}"'.format(name) for name in sorted(data["variants"])) + "};")
 print("}")

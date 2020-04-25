@@ -27,12 +27,8 @@ class Dialect {
 		int cmd_index(const cmdinfo *) const;
 };
 
-extern std::map<std::string, std::shared_ptr<Dialect> > dialects;
-
-void registerDelegates();
-void freeDelegates();
-
-/* vim: set noet: */
+std::vector<std::string> getDialectNames(); // defined in generated cmddata.cpp
+Dialect* getDialectByName(const std::string&); // defined in generated cmddata.cpp
 
 #endif
 

@@ -25,7 +25,6 @@
 #include "caosVM.h" // for setupCommandPointers()
 #include "caosScript.h" // for executeNetwork()
 #include "PointerAgent.h"
-#include "dialect.h" // registerDelegates
 #include "backends/NullBackend.h"
 #include "backends/NullAudioBackend.h"
 #include "SFCFile.h"
@@ -693,7 +692,6 @@ bool Engine::initialSetup() {
 	world.data_directories.push_back(storageDirectory());
 	
 	// initial setup
-	registerDelegates();
 	std::cout << "* Reading catalogue files..." << std::endl;
 	world.initCatalogue();
 	std::cout << "* Initial setup..." << std::endl;
@@ -822,7 +820,6 @@ void Engine::shutdown() {
 	world.shutdown();
 	audio->shutdown();
 	backend->shutdown();
-	freeDelegates(); // does nothing if there are none (ie, no call to initialSetup)
 }
 
 fs::path Engine::homeDirectory() {

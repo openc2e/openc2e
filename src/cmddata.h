@@ -56,7 +56,6 @@ struct cmdinfo {
 	int evalcost;
 };
 
-void registerAutoDelegates();
 #ifdef VCPP_BROKENNESS
 void dispatchCAOS(class caosVM *vm, int idx);
 #endif

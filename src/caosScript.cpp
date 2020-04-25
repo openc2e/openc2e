@@ -108,7 +108,7 @@ std::string script::dump() {
 
 caosScript::caosScript(const std::string &dialect, const std::string &fn) {
 	enumdepth = 0;
-	d = dialects[dialect].get();
+	d = getDialectByName(dialect);
 	if (!d)
 		throw parseException(std::string("Unknown dialect ") + dialect);
 	current = installer = shared_ptr<script> (new script(d, fn));
