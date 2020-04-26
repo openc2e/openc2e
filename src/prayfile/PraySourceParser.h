@@ -38,4 +38,5 @@ namespace PraySourceParser {
                         InlineBlock, StringTag, StringTagFromFile, IntegerTag>;
 
     std::vector<Event> parse(const std::string&);
+    std::string eventToString(const Event&);
 }

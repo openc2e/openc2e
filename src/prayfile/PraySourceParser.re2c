@@ -1,9 +1,11 @@
 #include <cassert>
+#include <fmt/format.h>
 #include <iostream>
 #include <map>
 #include <string>
 
 #include "prayfile/PraySourceParser.h"
+#include "visit_overloads.h"
 
 using namespace PraySourceParser;
 
@@ -341,4 +343,16 @@ bool PraySourceParserImpl::parse_some_ws() {
 std::vector<PraySourceParser::Event> PraySourceParser::parse(const std::string& str) {
     PraySourceParserImpl parser(str.c_str());
     return parser.run();
+}
+
+std::string PraySourceParser::eventToString(const Event& event) {
+    return visit(make_overloaded_function(
+        [](Error e) { return fmt::format("Error({})", e.message); },
+        [&](GroupBlockStart e) { return fmt::format("GroupBlockStart({}, {})", e.type, e.name); },
+        [&](GroupBlockEnd e) { return fmt::format("GroupBlockEnd({}, {})", e.type, e.name); },
+        [&](InlineBlock e) { return fmt::format("InlineBlock({}, {}, {})", e.type, e.name, e.filename); },
+        [&](StringTag e) { return fmt::format("StringTag({}, {})", e.key, e.value); },
+        [&](StringTagFromFile e) { return fmt::format("StringTagFromFile({}, {})", e.key, e.filename); },
+        [&](IntegerTag e) { return fmt::format("IntegerTag({}, {})", e.key, e.value); }
+    ), event);
 }

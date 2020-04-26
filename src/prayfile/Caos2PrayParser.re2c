@@ -6,6 +6,19 @@
 #include <cassert>
 #include <regex>
 
+static char unescape(char c) {
+	switch (c) {
+	case 'n': return '\n';
+	case 'r': return '\r';
+	case 't': return '\t';
+	default : return c;
+	}
+}
+
+static bool imatch(const std::string &s, std::string regex) {
+    return std::regex_search(s, std::regex(regex, std::regex::icase));
+}
+
 struct c2ptoken {
     enum commandtype {
         CMD_PRAY_FILE,
@@ -72,6 +85,7 @@ class Caos2PrayLexer {
         assert(p);
         const char *basep = p;
         const char *YYMARKER, *YYCTXMARKER;
+        std::string tempstr;
 
         /*!re2c
         re2c:define:YYCTYPE = "unsigned char";
@@ -134,27 +148,17 @@ class Caos2PrayLexer {
         */
     str:
         /*!re2c
-        [\\] . { goto str; }
-        ["] {
-            return c2ptoken(c2ptoken::TOK_STRING, std::string(basep + 1, p -
-        basep - 2));
-        }
-        [\n] { yylineno++; goto str; }
-        [^\\] { goto str; }
+        [\\] . { tempstr.push_back(unescape(p[-1])); goto str; }
+        ["] { return c2ptoken(c2ptoken::TOK_STRING, tempstr); }
+        [\n] { yylineno++; tempstr.push_back(p[-1]); goto str; }
         [\000] { return c2ptoken(c2ptoken::TOK_ERROR);  }
-        * { return c2ptoken(c2ptoken::TOK_ERROR); }
+        . { tempstr.push_back(p[-1]); goto str; }
         */
     }
 
     const char *p;
     int yylineno = 1;
 };
-
-namespace {
-bool imatch(const std::string &s, std::string regex) {
-    return std::regex_search(s, std::regex(regex, std::regex::icase));
-}
-} // namespace
 
 using namespace PraySourceParser;
 
