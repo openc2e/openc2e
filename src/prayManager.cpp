@@ -38,7 +38,12 @@ void PrayBlock::load() {
 	if (loaded) {
 		return;
 	}
-	prayFile file((fs::path(filename)));
+
+	std::ifstream in(filename, std::ios::binary);
+	if (!in)
+		throw creaturesException(std::string("couldn't open PRAY file \"") + filename + "\"");
+	prayFile file(in);
+
 	for (size_t i = 0; i < file.blocks.size(); i++) {
 		prayFileBlock* block = file.blocks[i];
 		if (!(block->type == type && block->name == name)) {
@@ -60,7 +65,12 @@ void PrayBlock::parseTags() {
 	if (tagsloaded) {
 		return;
 	}
-	prayFile file((fs::path(filename)));
+
+	std::ifstream in(filename, std::ios::binary);
+	if (!in)
+		throw creaturesException(std::string("couldn't open PRAY file \"") + filename + "\"");
+	prayFile file(in);
+
 	for (size_t i = 0; i < file.blocks.size(); i++) {
 		prayFileBlock* block = file.blocks[i];
 		if (!(block->type == type && block->name == name)) {
@@ -81,7 +91,10 @@ prayManager::~prayManager() {
 }
 
 void prayManager::addFile(const fs::path& filename) {
-	prayFile f(filename);
+	std::ifstream in(filename.string(), std::ios::binary);
+	if (!in)
+		throw creaturesException(std::string("couldn't open PRAY file \"") + filename.string() + "\"");
+	prayFile f(in);
 
 	for (std::vector<prayFileBlock *>::iterator i = f.blocks.begin(); i != f.blocks.end(); i++) {
 		if (blocks.find((*i)->name) != blocks.end()) // garr, block conflict

@@ -4,6 +4,8 @@
 #include <ghc/filesystem.hpp>
 #include <array>
 
+namespace fs = ghc::filesystem;
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -53,7 +55,13 @@ int main(int argc, char **argv) {
 	pray_source << "(- praydumper-generated PRAY file from '" << argv[0] << "' -)" << endl;
 	pray_source << endl << "\"en-GB\"" << endl;
 
-	prayFile file(inputfile);
+	std::ifstream in(inputfile.string(), std::ios::binary);
+	if (!in) {
+		cerr << "Error opening file " << inputfile << endl;
+		exit(1);
+	}
+
+	prayFile file(in);
 
 	for (vector<prayFileBlock *>::iterator x = file.blocks.begin(); x != file.blocks.end(); x++) {
 		// TODO: s/"/\\"/ in the data (use find/replace methods of string)

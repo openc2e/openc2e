@@ -25,24 +25,19 @@
 #include <map>
 #include <string>
 #include <fstream>
-#include <ghc/filesystem.hpp>
-
-namespace fs = ghc::filesystem;
 
 class prayFileBlock;
 
 class prayFile {
 protected:
-	fs::path path;
-	std::ifstream file;
+	std::istream& stream;
 
 public:
 	std::vector<prayFileBlock *> blocks;
 
-	prayFile(fs::path filepath);
+	prayFile(std::istream& stream);
 	~prayFile();
-	fs::path getPath() { return path; }
-	std::istream &getStream() { return file; }
+	std::istream &getStream() { return stream; }
 };
 
 class prayFileBlock {

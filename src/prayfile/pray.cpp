@@ -23,23 +23,18 @@
 #include "spanstream.h"
 #include <miniz.h>
 
-prayFile::prayFile(fs::path filepath) {
-	path = filepath;
-	file.open(path.string().c_str(), std::ios::binary);
-	if (!file.is_open())
-		throw creaturesException(std::string("couldn't open PRAY file \"") + path.string() + "\"");
-	
+prayFile::prayFile(std::istream& stream_) : stream(stream_) {
 	char majic[4];
-	file.read(majic, 4);
+	stream.read(majic, 4);
 	if (strncmp(majic, "PRAY", 4) != 0)
-		throw creaturesException(std::string("bad magic of PRAY file \"") + path.string() + "\"");
+		throw creaturesException("bad magic of PRAY file");
 
-	while (!file.eof()) {
+	while (!stream.eof()) {
 		// TODO: catch exceptions, and free all blocks before passing it up the stack
 		prayFileBlock *b = new prayFileBlock(this);
 		blocks.push_back(b);
 		
-		file.peek(); // make sure eof() gets set
+		stream.peek(); // make sure eof() gets set
 	}
 }
 
