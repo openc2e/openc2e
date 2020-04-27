@@ -32,18 +32,23 @@ void PrayFileWriter::writeBlockRawData(const std::string &type,
     if (status != Z_OK) {
       abort(); // TODO
     }
-    write32le(stream, compressed_size);
-    write32le(stream, data_size);
-    write32le(stream, 0x1);
 
-    stream.write(compressed_data.data(), compressed_size);
-  } else {
-    write32le(stream, data_size);
-    write32le(stream, data_size);
-    write32le(stream, 0);
+    if (compressed_size < data_size) {
+        write32le(stream, compressed_size);
+        write32le(stream, data_size);
+        write32le(stream, 0x1);
 
-    stream.write(data, data_size);
+        stream.write(compressed_data.data(), compressed_size);
+
+        return;
+    }
   }
+
+  write32le(stream, data_size);
+  write32le(stream, data_size);
+  write32le(stream, 0);
+
+  stream.write(data, data_size);
 }
 
 void PrayFileWriter::writeBlockTags(

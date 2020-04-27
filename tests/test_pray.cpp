@@ -1,5 +1,7 @@
 #include "prayfile/Caos2PrayParser.h"
+#include "prayfile/PrayFileWriter.h"
 #include "prayfile/PraySourceParser.h"
+#include "vectorstream.h"
 #include <gtest/gtest.h>
 #include <fmt/format.h>
 
@@ -39,7 +41,6 @@ TEST(praysourceparser, character_escapes) {
     ASSERT_EQ(string_tag->value, "A \"really cool\" agent\nThis is a backslash\\");
 }
 
-
 TEST(caos2prayparser, character_escapes) {
     auto events = Caos2PrayParser::parse(R"(
         *# DS-Name "My Agent"
@@ -50,4 +51,14 @@ TEST(caos2prayparser, character_escapes) {
     });
     if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
     ASSERT_EQ(string_tag->value, "A \"really cool\" agent\nThis is a backslash\\");
+}
+
+TEST(praywriter, doesnt_compress_if_would_be_bigger) {
+    vectorstream v;
+    PrayFileWriter writer(v, true);
+    std::map<std::string, std::string> string_tags{{"Description", "Mon agent est tr\xc3\xa8s cool"}};
+    std::map<std::string, int> int_tags;
+    writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags);
+
+    ASSERT_EQ(v.vector().size(), 197);
 }
