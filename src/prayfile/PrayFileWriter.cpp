@@ -6,9 +6,9 @@
 #include <vector>
 #include <miniz.h>
 
-PrayFileWriter::PrayFileWriter(const std::string &filename,
+PrayFileWriter::PrayFileWriter(std::ostream &stream_,
                                bool enable_compression_)
-    : stream(filename), enable_compression(enable_compression_) {
+    : stream(stream_), enable_compression(enable_compression_) {
   stream.write("PRAY", 4);
 }
 

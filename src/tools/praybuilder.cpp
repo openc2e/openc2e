@@ -49,7 +49,12 @@ int main(int argc, char**argv) {
     }
 
     std::cout << "Writing output to \"" << output_filename << "\"" << std::endl;
-    PrayFileWriter writer(output_filename);
+    std::ofstream out(output_filename, std::ios::binary);
+    if (!out) {
+        std::cerr << "Couldn't open \"" << output_filename << "\"" << std::endl;
+        exit(1);
+    }
+    PrayFileWriter writer(out);
 
     std::map<std::string, std::string> string_tags;
     std::map<std::string, int> int_tags;
