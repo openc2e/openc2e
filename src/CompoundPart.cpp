@@ -421,8 +421,8 @@ unsigned int TextPart::calculateWordWidth(std::string word) {
 
 	unsigned int x = 0;
 	for (unsigned int i = 0; i < word.size(); i++) {
-		if (word[i] < 32) continue; // TODO: replace with space or similar?
-		int spriteid = word[i] - 32;	
+		if (((unsigned char)word[i]) < 32) continue; // TODO: replace with space or similar?
+		int spriteid = ((unsigned char)word[i]) - 32;
 
 		x += textsprite->width(spriteid);
 		if (i != 0) x += charspacing;
@@ -547,8 +547,8 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 				currtint++;
 			}
 		
-			if (lines[i].text[x] < 32) continue; // TODO: replace with space or similar?
-			int spriteid = lines[i].text[x] - 32;
+			if (((unsigned char)lines[i].text[x]) < 32) continue; // TODO: replace with space or similar?
+			int spriteid = ((unsigned char)lines[i].text[x]) - 32;
 			renderer->render(sprite, spriteid, somex + currentx, yoff + currenty, has_alpha, alpha);
 			if ((caretdata) && (caretdata->caretpos == lines[i].offset + x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
