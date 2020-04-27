@@ -86,6 +86,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for 
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/miniz EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
+add_subdirectory(externals/utf8proc EXCLUDE_FROM_ALL)
 
 # Pass flags to the compiler
 add_compile_definitions("_REENTRANT" "YYERROR_VERBOSE")
