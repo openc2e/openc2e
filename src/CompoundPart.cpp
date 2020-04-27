@@ -21,6 +21,7 @@
 #include "CameraPart.h"
 #include "Camera.h"
 #include "CompoundAgent.h"
+#include "encoding.h"
 #include "World.h"
 #include "Engine.h"
 #include "creaturesImage.h"
@@ -314,6 +315,7 @@ void TextPart::addTint(std::string tintinfo) {
 }
 
 void TextPart::setText(std::string t) {
+	t = ensure_cp1252(t);
 	text.clear();
 	tints.clear();
 
@@ -415,6 +417,8 @@ void TextPart::setFormat(int left, int top, int right, int bottom, int line, int
 }
 
 unsigned int TextPart::calculateWordWidth(std::string word) {
+	word = ensure_cp1252(word);
+
 	unsigned int x = 0;
 	for (unsigned int i = 0; i < word.size(); i++) {
 		if (word[i] < 32) continue; // TODO: replace with space or similar?
