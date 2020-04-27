@@ -18,6 +18,7 @@
  */
 
 #include "prayfile/pray.h"
+#include "encoding.h"
 #include "exceptions.h"
 #include "endianlove.h"
 #include "spanstream.h"
@@ -53,7 +54,7 @@ prayFileBlock::prayFileBlock(prayFile *p) {
 
 	char nameid[129]; nameid[128] = 0;
 	file.read(nameid, 128);
-	name = nameid;
+	name = ensure_utf8(nameid);
 
 	compressedsize = read32le(file);
 	size = read32le(file);
@@ -127,6 +128,7 @@ std::string tagStringRead(std::istream& in) {
 
 	std::string data(len, '0');
 	in.read(&data[0], len);
+	data = ensure_utf8(data);
 
 	return data;
 }

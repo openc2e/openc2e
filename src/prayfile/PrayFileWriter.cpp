@@ -1,5 +1,6 @@
 #include "prayfile/PrayFileWriter.h"
 #include "endianlove.h"
+#include "encoding.h"
 
 #include <cassert>
 #include <sstream>
@@ -18,9 +19,10 @@ void PrayFileWriter::writeBlockRawData(const std::string &type,
   assert(type.size() == 4);
   stream.write(type.c_str(), 4);
 
-  assert(name.size() < 128);
-  stream.write(name.c_str(), name.size());
-  for (size_t i = 0; i < 128 - name.size(); ++i) {
+  std::string cp1252_name = ensure_cp1252(name);
+  assert(cp1252_name.size() < 128);
+  stream.write(cp1252_name.c_str(), cp1252_name.size());
+  for (size_t i = 0; i < 128 - cp1252_name.size(); ++i) {
     stream.write("\0", 1);
   }
 
@@ -59,17 +61,20 @@ void PrayFileWriter::writeBlockTags(
 
   write32le(os, integer_tags.size());
   for (auto kv : integer_tags) {
-    write32le(os, kv.first.size());
-    os.write(kv.first.c_str(), kv.first.size());
+    std::string cp1252_key = ensure_cp1252(kv.first);
+    write32le(os, cp1252_key.size());
+    os.write(cp1252_key.c_str(), cp1252_key.size());
     write32le(os, kv.second);
   }
 
   write32le(os, string_tags.size());
   for (auto kv : string_tags) {
-    write32le(os, kv.first.size());
-    os.write(kv.first.c_str(), kv.first.size());
-    write32le(os, kv.second.size());
-    os.write(kv.second.c_str(), kv.second.size());
+    std::string cp1252_key = ensure_cp1252(kv.first);
+    write32le(os, cp1252_key.size());
+    os.write(cp1252_key.c_str(), cp1252_key.size());
+    std::string cp1252_value = ensure_cp1252(kv.second);
+    write32le(os, cp1252_value.size());
+    os.write(cp1252_value.c_str(), cp1252_value.size());
   }
 
   writeBlockRawData(type, name, os.str().c_str(), os.str().size());

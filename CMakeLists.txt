@@ -115,7 +115,10 @@ add_library(prayfile
 	${GEN}/prayfile/Caos2PrayParser.cpp
 	${GEN}/prayfile/PraySourceParser.cpp
 )
-target_link_libraries(prayfile PUBLIC fmt ghc_filesystem mpark_variant PRIVATE miniz)
+target_link_libraries(prayfile
+	PUBLIC fmt ghc_filesystem mpark_variant openc2e-common
+	PRIVATE miniz
+)
 
 add_library(openc2e-core STATIC
 	src/Agent.cpp

@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 
+#include "encoding.h"
 #include "prayfile/PraySourceParser.h"
 #include "visit_overloads.h"
 
@@ -341,8 +342,8 @@ bool PraySourceParserImpl::parse_some_ws() {
 }
 
 std::vector<PraySourceParser::Event> PraySourceParser::parse(const std::string& str) {
-    PraySourceParserImpl parser(str.c_str());
-    return parser.run();
+	std::string s = ensure_utf8(str);
+	return PraySourceParserImpl(s.c_str()).run();
 }
 
 std::string PraySourceParser::eventToString(const Event& event) {

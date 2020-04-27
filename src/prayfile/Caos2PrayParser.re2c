@@ -1,5 +1,6 @@
 #include "prayfile/Caos2PrayParser.h"
 #include "caoslexer.h"
+#include "encoding.h"
 #include "token.h"
 #include "visit_overloads.h"
 
@@ -436,6 +437,5 @@ class Caos2PrayParserImpl {
 };
 
 std::vector<Event> Caos2PrayParser::parse(const std::string& script, std::string *output_filename) {
-    Caos2PrayParserImpl parser;
-    return parser.run(script, output_filename);
+	return Caos2PrayParserImpl().run(ensure_utf8(script).c_str(), output_filename);
 }

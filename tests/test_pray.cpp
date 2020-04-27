@@ -1,6 +1,8 @@
 #include "prayfile/Caos2PrayParser.h"
+#include "prayfile/pray.h"
 #include "prayfile/PrayFileWriter.h"
 #include "prayfile/PraySourceParser.h"
+#include "spanstream.h"
 #include "vectorstream.h"
 #include <gtest/gtest.h>
 #include <fmt/format.h>
@@ -61,4 +63,117 @@ TEST(praywriter, doesnt_compress_if_would_be_bigger) {
     writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags);
 
     ASSERT_EQ(v.vector().size(), 197);
+}
+
+TEST(praysourceparser, bom) {
+    std::string good = "\"en-GB\"";
+    {
+        auto events = PraySourceParser::parse(good);
+        EXPECT_TRUE(!matchEvent<PraySourceParser::Error>(events));
+    }
+    {
+        auto events = PraySourceParser::parse("\xef\xbb\xbf" + good);
+        EXPECT_TRUE(!matchEvent<PraySourceParser::Error>(events));
+    }
+    {
+        auto events = PraySourceParser::parse("\xfe\xff" + good);
+        EXPECT_TRUE(matchEvent<PraySourceParser::Error>(events));
+    }
+    {
+        auto events = PraySourceParser::parse("\xff\xfe" + good);
+        EXPECT_TRUE(matchEvent<PraySourceParser::Error>(events));
+    }
+}
+
+TEST(praysourceparser, windows1252_to_utf8) {
+    auto events = PraySourceParser::parse(std::string(R"(
+        "en-GB"
+        group AGNT "My Agent"
+        "Agent Description-fr" )") + "\"Mon agent est tr\xe8s cool\""
+    );
+    auto string_tag = matchEvent<PraySourceParser::StringTag>(events);
+    if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
+    ASSERT_EQ(string_tag->value, "Mon agent est tr\xc3\xa8s cool");
+}
+
+TEST(praysourceparser, utf8_to_utf8) {
+    auto events = PraySourceParser::parse(std::string(R"(
+        "en-GB"
+        group AGNT "My Agent"
+        "Agent Description-fr" )") + "\"Mon agent est tr\xc3\xa8s cool\""
+    );
+    auto string_tag = matchEvent<PraySourceParser::StringTag>(events);
+    if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
+    ASSERT_EQ(string_tag->value, "Mon agent est tr\xc3\xa8s cool");
+}
+
+TEST(caos2prayparser, cp1252_to_utf8) {
+    auto events = Caos2PrayParser::parse(std::string(R"(
+        *# DS-Name "My Agent"
+        *# Agent Description-fr = )") + "\"Un tr\xe8s cool agent\"",
+    nullptr);
+    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](PraySourceParser::StringTag &e) {
+        return e.key == "Agent Description-fr";
+    });
+    if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
+    ASSERT_EQ(string_tag->value, "Un tr\xc3\xa8s cool agent");
+}
+
+TEST(caos2prayparser, utf8_to_utf8) {
+    auto events = Caos2PrayParser::parse(std::string(R"(
+        *# DS-Name "My Agent"
+        *# Agent Description-fr = )") + "\"Un tr\xc3\xa8s cool agent\"",
+    nullptr);
+    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](PraySourceParser::StringTag &e) {
+        return e.key == "Agent Description-fr";
+    });
+    if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
+    ASSERT_EQ(string_tag->value, "Un tr\xc3\xa8s cool agent");
+}
+
+TEST(praywriter, utf8_to_cp1252) {
+    vectorstream v;
+    PrayFileWriter writer(v, true);
+    std::map<std::string, std::string> string_tags{{"Repr\xc3\xa8sentation", "Mon agent est tr\xc3\xa8s cool"}};
+    std::map<std::string, int> int_tags;
+    writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags);
+
+    EXPECT_EQ(v.vector().size(), 200);
+
+    EXPECT_EQ(v.vector()[16], 0xe8);
+    EXPECT_EQ(v.vector()[163], 0xe8);
+    EXPECT_EQ(v.vector()[193], 0xe8);
+}
+
+
+TEST(prayreader, windows1252_to_utf8) {
+    std::vector<unsigned char> praybytes{
+        'P', 'R', 'A', 'Y', 'A', 'G', 'N', 'T', 'A', 'g', 'e', 'n', 't', ' ',
+        't', 'r', 0xe8, 's', ' ', 'c', 'o', 'o', 'l', 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x35, 0x0, 0x0, 0x0,
+        0x35, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0,
+        0x0, 0x0, 0xe, 0x0, 0x0, 0x0, 'R', 'e', 'p', 'r', 0xe8, 's', 'e', 'n',
+        't', 'a', 't', 'i', 'o', 'n', 0x17, 0x0, 0x0, 0x0, 'M', 'o', 'n', ' ',
+        'a', 'g', 'e', 'n', 't', ' ', 'e', 's', 't', ' ', 't', 'r', 0xe8, 's',
+        ' ', 'c', 'o', 'o', 'l'
+    };
+
+    spanstream s(praybytes.data(), praybytes.size());
+
+    prayFile reader(s);
+    ASSERT_EQ(reader.blocks.size(), 1);
+
+    reader.blocks[0]->load();
+    reader.blocks[0]->parseTags();
+
+    ASSERT_EQ(reader.blocks[0]->stringValues.size(), 1);
+    EXPECT_EQ(reader.blocks[0]->name, "Agent tr\xc3\xa8s cool");
+    EXPECT_EQ(reader.blocks[0]->stringValues["Repr\xc3\xa8sentation"], "Mon agent est tr\xc3\xa8s cool");
 }
