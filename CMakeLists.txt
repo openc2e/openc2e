@@ -104,6 +104,11 @@ include_directories(BEFORE
 )
 
 # Targets
+add_library(openc2e-common STATIC
+	src/encoding.cpp
+)
+target_link_libraries(openc2e-common PRIVATE utf8proc)
+
 add_library(prayfile
 	src/prayfile/pray.cpp
 	src/prayfile/PrayFileWriter.cpp
@@ -208,6 +213,7 @@ target_link_libraries(openc2e-core PUBLIC
 	fmt
 	ghc_filesystem
 	mpark_variant
+	openc2e-common
 	prayfile
 )
 if (OPENC2E_USE_SERIALIZATION)
@@ -277,6 +283,7 @@ include(Openc2eOutputOnTestFailure)
 
 add_executable(test_openc2e
 	tests/test_caos.cpp
+	tests/test_encoding.cpp
 	tests/test_pray.cpp
 )
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
