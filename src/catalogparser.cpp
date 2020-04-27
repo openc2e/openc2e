@@ -45,13 +45,6 @@ int cataparse() {
         }
 
         std::list<std::string> strings;
-
-        if (token != CTOK_STR) {
-            Catalogue::catalogueParseError("Expected string");
-        }
-        strings.push_back(catalval.string);
-        token = Catalogue::catalex();
-
         while (true) {
             if (token != CTOK_STR) {
                 break;
