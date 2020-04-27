@@ -33,7 +33,7 @@ private:
 
 	uint32_t biWidth, biHeight;
 	uint32_t biCompression;
-	void *bmpdata;
+	std::vector<char> bmpdata;
 	uint8_t *palette;
 	imageformat imgformat;
 

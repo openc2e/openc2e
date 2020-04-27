@@ -105,35 +105,34 @@ bmpData::bmpData(std::ifstream &in, std::string n) {
 	}
 
 	in.seekg(dataoffset);
-	bmpdata = new char[biSizeImage];
-	in.read((char*)bmpdata, biSizeImage);
+	bmpdata.resize(biSizeImage);
+	in.read(bmpdata.data(), biSizeImage);
 
 	if (biBitCount == 4) {
-		char *srcdata = (char *)bmpdata;
-		char *dstdata = new char[biWidth * biHeight];
-		bmpdata = dstdata;
+		auto srcdata = bmpdata;
+		char* srcdatap = srcdata.data();
+		bmpdata.clear();
+		bmpdata.resize(biWidth * biHeight);
 
-		for (char *dest = dstdata; dest < dstdata + biWidth * biHeight; dest += biWidth) {
+		for (char *dest = bmpdata.data(); dest < bmpdata.data() + biWidth * biHeight; dest += biWidth) {
 			uint8_t pixel = 0;
 			for (unsigned int i = 0; i < biWidth; i++) {
 				if (i % 2 == 0) {
-					pixel = *srcdata;
-					srcdata++;
+					pixel = *srcdatap;
+					srcdatap++;
 				}
 				*(dest + i) = (pixel >> 4);
 				pixel <<= 4;
 			}
 		}
-		delete srcdata;
 	}
 
 	if (biCompression == BI_RLE8) {
 		// decode an RLE-compressed 8-bit image
 		// TODO: sanity checking
-		char *srcdata = (char *)bmpdata;
-		char *dstdata = new char[biWidth * biHeight];
-		for (unsigned int i = 0; i < biWidth * biHeight; i++) dstdata[i] = 0; // TODO
-		bmpdata = dstdata;
+		auto srcdata = bmpdata;
+		bmpdata.clear();
+		bmpdata.resize(biWidth * biHeight, 0); // TODO
 		
 		unsigned int x = 0, y = 0;
 		for (unsigned int i = 0; i < biSizeImage;) {
@@ -153,7 +152,7 @@ bmpData::bmpData(std::ifstream &in, std::string n) {
 				} else { // absolute mode
 					for (unsigned int j = 0; j < val; j++) {
 						if (x + (y * biWidth) >= biHeight * biWidth) break;
-						dstdata[x + (y * biWidth)] = srcdata[i];
+						bmpdata[x + (y * biWidth)] = srcdata[i];
 						i++; x++;
 					}
 					if (val % 2 == 1) i++; // skip padding byte
@@ -161,7 +160,7 @@ bmpData::bmpData(std::ifstream &in, std::string n) {
 			} else { // run of pixels
 				for (unsigned int j = 0; j < nopixels; j++) {
 					if (x + (y * biWidth) >= biHeight * biWidth) break;
-					dstdata[x + (y * biWidth)] = val;
+					bmpdata[x + (y * biWidth)] = val;
 					x++;
 				}
 			}
@@ -172,13 +171,11 @@ bmpData::bmpData(std::ifstream &in, std::string n) {
 
 			if (x + (y * biWidth) >= biHeight * biWidth) break;
 		}
-		delete srcdata;
 	}
 
 }
 
 bmpData::~bmpData() {
-	delete[] (char *)bmpdata;
 	if (palette) delete[] palette;
 }
 
@@ -226,7 +223,7 @@ void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
 			if (imgformat == if_24bit) { srcoffset *= 3; destoffset *= 3; datasize *= 3; }
 			srcoffset += ((bmpdata->biHeight - 1) - (blockheight * curr_row) - j) * pitch;
 			
-			memcpy((char *)buffers[i].data() + destoffset, (char *)bmpdata->bmpdata + srcoffset, datasize);
+			memcpy((char *)buffers[i].data() + destoffset, (char *)bmpdata->bmpdata.data() + srcoffset, datasize);
 		}
 
 		curr_col++;
