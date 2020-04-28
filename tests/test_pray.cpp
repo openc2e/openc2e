@@ -57,10 +57,10 @@ TEST(caos2prayparser, character_escapes) {
 
 TEST(praywriter, doesnt_compress_if_would_be_bigger) {
     vectorstream v;
-    PrayFileWriter writer(v, true);
+    PrayFileWriter writer(v);
     std::map<std::string, std::string> string_tags{{"Description", "Mon agent est tr\xc3\xa8s cool"}};
     std::map<std::string, int> int_tags;
-    writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags);
+    writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags, PrayFileWriter::PRAY_COMPRESS_ON);
 
     ASSERT_EQ(v.vector().size(), 198);
 }
@@ -133,7 +133,7 @@ TEST(caos2prayparser, utf8_to_utf8) {
 
 TEST(praywriter, utf8_to_cp1252) {
     vectorstream v;
-    PrayFileWriter writer(v, true);
+    PrayFileWriter writer(v);
     std::map<std::string, std::string> string_tags{{"Repr\xc3\xa8sentation", "Mon agent est tr\xc3\xa8s cool"}};
     std::map<std::string, int> int_tags;
     writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags);

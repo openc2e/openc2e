@@ -7,15 +7,14 @@
 #include <vector>
 #include <miniz.h>
 
-PrayFileWriter::PrayFileWriter(std::ostream &stream_,
-                               bool enable_compression_)
-    : stream(stream_), enable_compression(enable_compression_) {
+PrayFileWriter::PrayFileWriter(std::ostream &stream_) : stream(stream_) {
   stream.write("PRAY", 4);
 }
 
 void PrayFileWriter::writeBlockRawData(const std::string &type,
                                        const std::string &name,
-                                       const char *data, size_t data_size) {
+                                       const char *data, size_t data_size,
+                                       PrayFileWriter::Compression compression) {
   assert(type.size() == 4);
   stream.write(type.c_str(), 4);
 
@@ -26,7 +25,7 @@ void PrayFileWriter::writeBlockRawData(const std::string &type,
     stream.write("\0", 1);
   }
 
-  if (enable_compression) {
+  if (compression == PRAY_COMPRESS_ON) {
     uLongf compressed_size = compressBound(data_size);
     std::vector<char> compressed_data(compressed_size);
     int status = compress((Bytef *)compressed_data.data(), &compressed_size,
@@ -56,7 +55,8 @@ void PrayFileWriter::writeBlockRawData(const std::string &type,
 void PrayFileWriter::writeBlockTags(
     const std::string &type, const std::string &name,
     const std::map<std::string, int> &integer_tags,
-    const std::map<std::string, std::string> &string_tags) {
+    const std::map<std::string, std::string> &string_tags,
+    PrayFileWriter::Compression compression) {
   std::ostringstream os;
 
   write32le(os, integer_tags.size());
@@ -77,5 +77,5 @@ void PrayFileWriter::writeBlockTags(
     os.write(cp1252_value.c_str(), cp1252_value.size());
   }
 
-  writeBlockRawData(type, name, os.str().c_str(), os.str().size());
+  writeBlockRawData(type, name, os.str().c_str(), os.str().size(), compression);
 }
