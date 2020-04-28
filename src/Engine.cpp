@@ -108,6 +108,33 @@ void Engine::setBackend(shared_ptr<Backend> b) {
 	lasttimestamp = backend->ticks();
 }
 
+static std::vector<std::string> read_wordlist(peFile* exefile, uint32_t lang) {
+	resourceInfo *r = exefile->getResource(PE_RESOURCETYPE_STRING, lang, 14);
+	if (!r) {
+		std::cout << "Warning: Couldn't load word list (couldn't find resource)!" << std::endl;
+		return {};
+	}
+
+	std::vector<std::string> strings = r->parseStrings();
+	if (strings.size() < 6) {
+		std::cout << "Warning: Couldn't load word list (string table too small)!" << std::endl;
+		return {};
+	}
+
+	std::vector<std::string> wordlist;
+	std::string wordlistdata = strings[5];
+
+	std::string s;
+	for (unsigned int i = 0; i < wordlistdata.size(); i++) {
+		if (wordlistdata[i] == '|') {
+			wordlist.push_back(s);
+			s.clear();
+		} else s += wordlistdata[i];
+	}
+
+	return wordlist;
+}
+
 void Engine::loadGameData() {
 	// load palette for C1
 	if (world.gametype == "c1") {
@@ -141,23 +168,40 @@ void Engine::loadGameData() {
 		} else std::cout << "Warning: Couldn't load word list (couldn't find Creatures2.exe)!" << std::endl;
 
 		if (exefile) {
-			// TODO: support multiple languages
-			resourceInfo *r = exefile->getResource(PE_RESOURCETYPE_STRING, HORRID_LANG_ENGLISH, 14);
-			if (r) {
-				std::vector<std::string> strings = r->parseStrings();
-				if (strings.size() > 5) {
-					std::string wordlistdata = strings[5];
+			auto english_wordlist = read_wordlist(exefile, HORRID_LANG_ENGLISH);
 
-					std::string s;
-					for (unsigned int i = 0; i < wordlistdata.size(); i++) {
-						if (wordlistdata[i] == '|') {
-							wordlist.push_back(s);
-							s.clear();
-						} else s += wordlistdata[i];
-					}
-				} else std::cout << "Warning: Couldn't load word list (string table too small)!" << std::endl;
-			} else std::cout << "Warning: Couldn't load word list (couldn't find resource)!" << std::endl;
+			wordlist.clear();
+			wordlist_translations.clear();
+			if (language == "de") {
+				wordlist = read_wordlist(exefile, HORRID_LANG_GERMAN);
+			} else if (language == "fr") {
+				wordlist = read_wordlist(exefile, HORRID_LANG_FRENCH);
+			} else if (language == "it") {
+				wordlist = read_wordlist(exefile, HORRID_LANG_ITALIAN);
+			} else if (language == "nl") {
+				wordlist = read_wordlist(exefile, HORRID_LANG_DUTCH);
+			} else if (language == "es") {
+				wordlist = read_wordlist(exefile, HORRID_LANG_SPANISH);
+			}
+
+			if (wordlist.empty()) {
+				wordlist = english_wordlist;
+			} else {
+				for (size_t i = 0; i < english_wordlist.size() && i < wordlist.size(); ++i) {
+					wordlist_translations[english_wordlist[i]] = wordlist[i];
+				}
+			}
+
 		}
+	}
+}
+
+std::string Engine::translateWordlistWord(const std::string& s) {
+	auto it = wordlist_translations.find(s);
+	if (it == wordlist_translations.end()) {
+		return s;
+	} else {
+		return it->second;
 	}
 }
 

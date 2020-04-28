@@ -38,6 +38,7 @@ protected:
 
 	bool w_down, a_down, s_down, d_down;
 	unsigned char *palette;
+	std::map<std::string, std::string> wordlist_translations;
 
 	bool cmdline_enable_sound;
 	bool cmdline_norun;
@@ -69,6 +70,7 @@ public:
 	std::string getAudioBackendName() { return preferred_audiobackend; }
 
 	std::vector<std::string> wordlist;
+	std::string translateWordlistWord(const std::string& s);
 	class peFile *getExeFile() { return exefile; }
 	unsigned char *getPalette() { return palette; }
 

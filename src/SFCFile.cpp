@@ -1143,7 +1143,7 @@ void SFCBlackboard::copyToWorld() {
 	SFCCompoundObject::copyToWorld();
 
 	for (unsigned int i = 0; i < strings.size(); i++) {
-		a->addBlackboardString(i, strings[i].first, strings[i].second);
+		a->addBlackboardString(i, strings[i].first, engine.translateWordlistWord(strings[i].second));
 	}
 }
 
