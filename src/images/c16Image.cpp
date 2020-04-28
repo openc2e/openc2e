@@ -43,7 +43,9 @@ c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
 		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
 		lineoffsets[i].resize(heights[i]);
-		lineoffsets[i][0] = offset;
+		if (heights[i] > 0) {
+			lineoffsets[i][0] = offset;
+		}
 		for (unsigned int j = 1; j < heights[i]; j++) {
 			in.read((char *)&lineoffsets[i][j], 4); lineoffsets[i][j] = swapEndianLong(lineoffsets[i][j]);
 		}
