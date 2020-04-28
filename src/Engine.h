@@ -78,6 +78,7 @@ public:
 	bool dorendering, fastticks, refreshdisplay;
 	unsigned int version;
 	bool bmprenderer;
+	std::string language;
 
 	Engine();
 	~Engine();

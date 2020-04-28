@@ -622,7 +622,7 @@ void World::initCatalogue() {
 
 		fs::path c(*i / "Catalogue/");
 		if (fs::exists(c) && fs::is_directory(c))
-			catalogue.initFrom(c, "en");
+			catalogue.initFrom(c, engine.language);
 	}
 }
 

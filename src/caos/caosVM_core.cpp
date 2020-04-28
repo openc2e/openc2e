@@ -299,10 +299,10 @@ void caosVM::v_WOLF() {
 
 /**
  LANG (string)
- %status stub
+ %status done
 */
 void caosVM::v_LANG() {
-	result.setString("en");
+	result.setString(engine.language);
 }
 
 /**

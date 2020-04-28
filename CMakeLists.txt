@@ -210,6 +210,7 @@ add_library(openc2e-core STATIC
 	src/Vehicle.cpp
 	src/VoiceData.cpp
 	src/World.cpp
+	src/userlocale.cpp
 	src/util.cpp
 )
 target_link_libraries(openc2e-core PUBLIC
@@ -220,6 +221,9 @@ target_link_libraries(openc2e-core PUBLIC
 	openc2e-common
 	prayfile
 )
+if(APPLE)
+	target_link_libraries(openc2e-core PUBLIC "-framework CoreFoundation")
+endif()
 if (OPENC2E_USE_SERIALIZATION)
 	target_sources(openc2e-core PRIVATE src/caos/caosVM_ser_real.cpp)
 	target_link_libraries(openc2e-core PUBLIC Boost::serialization)

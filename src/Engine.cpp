@@ -31,6 +31,7 @@
 #include "peFile.h"
 #include "Camera.h"
 #include "prayManager.h"
+#include "userlocale.h"
 
 #include <cassert>
 #include <ghc/filesystem.hpp>
@@ -59,6 +60,13 @@ Engine::Engine() {
 	refreshdisplay = false;
 
 	bmprenderer = false;
+
+	std::vector<std::string> languages = get_preferred_languages();
+	if (!languages.empty()) {
+		language = languages.front();
+	} else {
+		language = "en";
+	}
 
 	tickdata = 0;
 	for (unsigned int i = 0; i < 10; i++) ticktimes[i] = 0;
@@ -581,6 +589,7 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 		("h,help", "Display help on command-line options")
 		("V,version", "Display openc2e version")
 		("s,silent", "Disable all sounds")
+		("l,language", "Select the language, default is '" + language + "'", cxxopts::value<std::string>(language))
 		("k,backend", available_backends, cxxopts::value<std::string>(preferred_backend))
 		("o,audiobackend", available_audiobackends, cxxopts::value<std::string>(preferred_audiobackend))
 		("d,data-path", "Sets or adds a path to a data directory",
