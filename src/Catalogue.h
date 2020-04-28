@@ -59,7 +59,7 @@ public:
   
 	void reset();
 	void addFile(ghc::filesystem::path path);
-	void initFrom(ghc::filesystem::path path);
+	void initFrom(ghc::filesystem::path path, std::string language);
 
 	void addVals(std::string &title, bool override, int count, const std::list<std::string> &vals);
 };

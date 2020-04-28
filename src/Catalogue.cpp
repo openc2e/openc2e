@@ -122,7 +122,7 @@ void Catalogue::addFile(fs::path path) {
 	}
 }
 
-void Catalogue::initFrom(fs::path path) {
+void Catalogue::initFrom(fs::path path, std::string language) {
 	assert(fs::exists(path));
 	assert(fs::is_directory(path));
 	
@@ -133,14 +133,22 @@ void Catalogue::initFrom(fs::path path) {
 	for (fs::directory_iterator i(path); i != end; ++i) {
 		try {
 			if ((!fs::is_directory(*i)) && (i->path().extension().string() == ".catalogue")) {
-				std::string x = i->path().	stem().string();
-				// TODO: '-en-GB' exists too, this doesn't work for that
-				if ((x.size() > 3) && (x[x.size() - 3] == '-')) {
-					// TODO: this is NOT how we should do it
-					if (x[x.size() - 2] != 'e' || x[x.size() - 1] != 'n') continue; // skip all non-english localised files
-				}
 
-				addFile(*i);
+				std::string x = i->path().stem().string();
+				bool has_language_suffix = x.size() > 3 && x[x.size() - 3] == '-';
+
+				if (has_language_suffix) {
+					std::string language_suffix = x.substr(x.size() - 2);
+					// TODO: case sensitive?
+					if (language_suffix == language) {
+						addFile(*i);
+					}
+				} else {
+					auto suffixed_version = i->path().parent_path() / (i->path().stem().string() + "-" + language + ".catalogue");
+					if (!fs::exists(suffixed_version)) {
+						addFile(*i);
+					}
+				}
 			}
 		}
 		catch (const std::exception &ex) {
