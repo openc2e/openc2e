@@ -62,7 +62,7 @@ TEST(praywriter, doesnt_compress_if_would_be_bigger) {
     std::map<std::string, int> int_tags;
     writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags);
 
-    ASSERT_EQ(v.vector().size(), 197);
+    ASSERT_EQ(v.vector().size(), 198);
 }
 
 TEST(praysourceparser, bom) {
@@ -138,11 +138,11 @@ TEST(praywriter, utf8_to_cp1252) {
     std::map<std::string, int> int_tags;
     writer.writeBlockTags("AGNT", "Agent tr\xc3\xa8s cool", int_tags, string_tags);
 
-    EXPECT_EQ(v.vector().size(), 200);
+    EXPECT_EQ(v.vector().size(), 201);
 
     EXPECT_EQ(v.vector()[16], 0xe8);
-    EXPECT_EQ(v.vector()[163], 0xe8);
-    EXPECT_EQ(v.vector()[193], 0xe8);
+    EXPECT_EQ(v.vector()[164], 0xe8);
+    EXPECT_EQ(v.vector()[194], 0xe8);
 }
 
 

@@ -106,6 +106,7 @@ include_directories(BEFORE
 # Targets
 add_library(openc2e-common STATIC
 	src/encoding.cpp
+	src/encoding_cp1252_codepoints.cpp
 )
 target_link_libraries(openc2e-common PRIVATE utf8proc)
 
