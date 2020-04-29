@@ -9,7 +9,7 @@
 
 class Openc2eTestHelper {
 public:
-    static std::shared_ptr<creaturesImage> createBlnkSprite() {
+    static std::shared_ptr<creaturesImage> addBlnkSprite() {
         shared_ptr<creaturesImage> img(new creaturesImage);
         img->name = "blnk";
         img->imgformat = if_16bit;
@@ -20,6 +20,8 @@ public:
         pureblack.resize(2 * 41 * 18, 0);
         img->buffers.push_back(pureblack);
         img->buffers.push_back(pureblack);
+
+        world.gallery->addImage(img);
         return img;
     }
 };
@@ -73,8 +75,7 @@ TEST(caos, parsing) {
     run_script("c3", readfile("../tests/parsing.cos"));
 }
 TEST(caos, simpleagent) {
-    auto sprite = Openc2eTestHelper::createBlnkSprite();
-    world.gallery->addImage(sprite);
+    auto sprite = Openc2eTestHelper::addBlnkSprite();
     run_script("c3", readfile("../tests/simpleagent.cos"));
 }
 TEST(caos, special_lexing) {

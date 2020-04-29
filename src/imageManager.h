@@ -28,10 +28,11 @@ class creaturesImage;
 
 class imageManager {
 protected:
+	friend class Openc2eTestHelper;
 	std::map<std::string, std::weak_ptr<creaturesImage> > images;
+	void addImage(std::shared_ptr<creaturesImage>);
 
 public:
-	void addImage(std::shared_ptr<creaturesImage>);
 	std::shared_ptr<creaturesImage> getImage(std::string name, bool is_background = false);
 	std::shared_ptr<creaturesImage> tint(const std::shared_ptr<creaturesImage>& image,
 	                                     unsigned char r, unsigned char g, unsigned char b,
