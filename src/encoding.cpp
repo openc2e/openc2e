@@ -14,7 +14,7 @@ static std::string codepoint_to_utf8(char32_t c) {
 static char32_t utf8_to_codepoint(const std::string& s, size_t& pos)
 {
     int32_t codepoint;
-    ssize_t bytes_read = utf8proc_iterate((unsigned char*)s.c_str() + pos, s.size() - pos, &codepoint);
+    utf8proc_ssize_t bytes_read = utf8proc_iterate((unsigned char*)s.c_str() + pos, s.size() - pos, &codepoint);
     if (bytes_read < 0 || codepoint == -1) {
         throw std::domain_error("Invalid UTF-8 codepoint starting with " + std::to_string(s[pos]));
     }
@@ -26,7 +26,7 @@ static bool is_valid_utf8(const std::string& str) {
     size_t pos = 0;
     while (pos < str.size()) {
         int32_t codepoint;
-        ssize_t bytes_read = utf8proc_iterate((unsigned char*)str.c_str() + pos, str.size() - pos, &codepoint);
+        utf8proc_ssize_t bytes_read = utf8proc_iterate((unsigned char*)str.c_str() + pos, str.size() - pos, &codepoint);
         if (bytes_read < 0 || codepoint == -1) {
             return false;
         }
@@ -47,7 +47,7 @@ std::string utf8_to_cp1252(const std::string& utf8_str) {
     uint8_t *nfc_char_p = utf8proc_NFC(reinterpret_cast<const unsigned char*>(utf8_str.c_str()));
     std::string nfc_str;
     if (nfc_char_p) {
-        nfc_str = std::string(reinterpret_cast<char*>(nfc_char_p), strlen(reinterpret_cast<char*>(nfc_char_p)));
+        nfc_str = std::string(reinterpret_cast<char*>(nfc_char_p));
         free(nfc_char_p);
     } else {
         // TODO: error?

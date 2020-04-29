@@ -1,4 +1,5 @@
 #include "encoding_cp1252_codepoints.h"
+#include <stdexcept>
 
 /*
 https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/bestfit1252.txt
