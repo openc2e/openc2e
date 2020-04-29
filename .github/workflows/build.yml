@@ -19,7 +19,7 @@ jobs:
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
         message("::set-output name=timestamp::${current_date}")
-    - uses: actions/cache@v1.1.0
+    - uses: pat-s/always-upload-cache@v1.1.4
       with:
         path: .ccache
         key: ccache-ubuntu-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
@@ -68,7 +68,7 @@ jobs:
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
         message("::set-output name=timestamp::${current_date}")
-    - uses: actions/cache@v1.1.0
+    - uses: pat-s/always-upload-cache@v1.1.4
       with:
         path: .ccache
         key: ccache-macos-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
