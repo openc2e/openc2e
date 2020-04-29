@@ -44,6 +44,15 @@ private:
 			}
 		}
 
+		std::streamsize xsgetn(char *s, std::streamsize n) override {
+			if (position + n <= buffer_size) {
+				std::copy(buffer + position, buffer + position + n, s);
+				position += n;
+				return n;
+			}
+			return 0;
+		}
+
 		int_type underflow() override {
 			return (position < buffer_size) ? buffer[position] : traits_type::eof();
 		}
