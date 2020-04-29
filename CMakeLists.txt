@@ -111,7 +111,7 @@ add_library(openc2e-common STATIC
 target_link_libraries(openc2e-common PRIVATE utf8proc)
 
 add_library(prayfile
-	src/prayfile/pray.cpp
+	src/prayfile/PrayFileReader.cpp
 	src/prayfile/PrayFileWriter.cpp
 	${GEN}/prayfile/Caos2PrayParser.cpp
 	${GEN}/prayfile/PraySourceParser.cpp

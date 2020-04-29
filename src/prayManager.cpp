@@ -17,7 +17,7 @@
  *
  */
 
-#include "prayfile/pray.h"
+#include "prayfile/PrayFileReader.h"
 
 #include "prayManager.h"
 #include "exceptions.h"
@@ -42,17 +42,15 @@ void PrayBlock::load() {
 	std::ifstream in(filename, std::ios::binary);
 	if (!in)
 		throw creaturesException(std::string("couldn't open PRAY file \"") + filename + "\"");
-	prayFile file(in);
+	PrayFileReader file(in);
 
-	for (size_t i = 0; i < file.blocks.size(); i++) {
-		prayFileBlock* block = file.blocks[i];
-		if (!(block->type == type && block->name == name)) {
+	for (size_t i = 0; i < file.getNumBlocks(); i++) {
+		if (!(file.getBlockType(i) == type && file.getBlockName(i) == name)) {
 			continue;
 		}
-		block->load();
 		loaded = true;
-		buffer = std::vector<unsigned char>(block->getBuffer(), block->getBuffer() + block->getSize());
-		size = block->getSize();
+		buffer = file.getBlockRawData(i);
+		size = buffer.size();
 		return;
 	}
 
@@ -69,17 +67,16 @@ void PrayBlock::parseTags() {
 	std::ifstream in(filename, std::ios::binary);
 	if (!in)
 		throw creaturesException(std::string("couldn't open PRAY file \"") + filename + "\"");
-	prayFile file(in);
+	PrayFileReader file(in);
 
-	for (size_t i = 0; i < file.blocks.size(); i++) {
-		prayFileBlock* block = file.blocks[i];
-		if (!(block->type == type && block->name == name)) {
+	for (size_t i = 0; i < file.getNumBlocks(); i++) {
+		if (!(file.getBlockType(i) == type && file.getBlockName(i) == name)) {
 			continue;
 		}
-		block->parseTags();
 		tagsloaded = true;
-		stringValues = block->stringValues;
-		integerValues = block->integerValues;
+		auto tags = file.getBlockTags(i);
+		integerValues = tags.first;
+		stringValues = tags.second;
 		return;
 	}
 
@@ -94,13 +91,13 @@ void prayManager::addFile(const fs::path& filename) {
 	std::ifstream in(filename.string(), std::ios::binary);
 	if (!in)
 		throw creaturesException(std::string("couldn't open PRAY file \"") + filename.string() + "\"");
-	prayFile f(in);
+	PrayFileReader f(in);
 
-	for (std::vector<prayFileBlock *>::iterator i = f.blocks.begin(); i != f.blocks.end(); i++) {
-		if (blocks.find((*i)->name) != blocks.end()) // garr, block conflict
+	for (size_t i = 0; i < f.getNumBlocks(); i++) {
+		if (blocks.find(f.getBlockName(i)) != blocks.end()) // garr, block conflict
 			continue;
-		//assert(blocks.find((*i)->name) == blocks.end());
-		blocks[(*i)->name] = std::unique_ptr<PrayBlock>(new PrayBlock(filename.string(), (*i)->type, (*i)->name, (*i)->isCompressed()));
+		//assert(blocks.find(f.getBlockName(i)) == blocks.end());
+		blocks[f.getBlockName(i)] = std::unique_ptr<PrayBlock>(new PrayBlock(filename.string(), f.getBlockType(i), f.getBlockName(i), f.getBlockIsCompressed(i)));
 	}
 }
 

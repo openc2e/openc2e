@@ -88,7 +88,7 @@ int prayInstallDeps(std::string name, bool actually_install) {
 	PrayBlock *p = i->second.get();
 	p->parseTags();
 
-	std::map<std::string, int>::iterator j = p->integerValues.find("Agent Type");
+	std::map<std::string, uint32_t>::iterator j = p->integerValues.find("Agent Type");
 	if (j == p->integerValues.end()) {
 		return -1;
 	}
@@ -352,7 +352,7 @@ void caosVM::v_PRAY_INJT() {
 	p->parseTags();
 	
 	// .. grab the script count ..
-	std::map<std::string, int>::iterator j = p->integerValues.find("Script Count");
+	std::map<std::string, uint32_t>::iterator j = p->integerValues.find("Script Count");
 	if (j == p->integerValues.end()) {
 		result.setInt(-3); // TODO: this isn't really a dependency fail, what do I do here?
 		return;

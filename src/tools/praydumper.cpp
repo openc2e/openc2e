@@ -1,4 +1,4 @@
-#include "prayfile/pray.h"
+#include "prayfile/PrayFileReader.h"
 #include <iostream>
 #include <fstream>
 #include <ghc/filesystem.hpp>
@@ -61,45 +61,46 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	prayFile file(in);
+	PrayFileReader file(in);
 
-	for (vector<prayFileBlock *>::iterator x = file.blocks.begin(); x != file.blocks.end(); x++) {
+	for (size_t i = 0; i < file.getNumBlocks(); i++) {
 		// TODO: s/"/\\"/ in the data (use find/replace methods of string)
-		
-		(*x)->load();
 		
 		bool handled = false;
 		for (auto tagblock : tagblocks) {
-			if ((*x)->type == tagblock) {
+			if (file.getBlockType(i) == tagblock) {
 				handled = true;
-				pray_source << endl << "group " << (*x)->type << " \"" << (*x)->name << "\"" << endl;
+				pray_source << endl << "group " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\"" << endl;
 
-				(*x)->parseTags();
-				
-				for (std::map<std::string, int>::iterator y = (*x)->integerValues.begin(); y != (*x)->integerValues.end(); y++) {
-					pray_source << "\"" << y->first << "\" " << y->second << endl;
+				auto tags = file.getBlockTags(i);
+				auto int_tags = tags.first;
+				auto string_tags = tags.second;
+
+				for (auto y : int_tags) {
+					pray_source << "\"" << y.first << "\" " << y.second << endl;
 				}
 				
-				for (std::map<std::string, std::string>::iterator y = (*x)->stringValues.begin(); y != (*x)->stringValues.end(); y++) {
-					std::string name = y->first;
+				for (auto y : string_tags) {
+					std::string name = y.first;
 					if ((name.substr(0, 7) ==  "Script ") || (name.substr(0, 13) == "Remove script")) {
-						name = (*x)->name + " - " + name + ".cos";
+						name = file.getBlockName(i) + " - " + name + ".cos";
 						cout << "Writing " << (output_directory / name) << endl;
 						ofstream output(output_directory / name);
-						output.write(y->second.c_str(), y->second.size());
-						pray_source << "\"" << y->first << "\" @ \"" << name << "\"" << endl;
+						output.write(y.second.c_str(), y.second.size());
+						pray_source << "\"" << y.first << "\" @ \"" << name << "\"" << endl;
 					} else {
-						pray_source << "\"" << y->first << "\" \"" << y->second << "\"" << endl;
+						pray_source << "\"" << y.first << "\" \"" << y.second << "\"" << endl;
 					}
 				}
 			}
 		}
 		
 		if (!handled) {
-			pray_source << endl << "inline " << (*x)->type << " \"" << (*x)->name << "\" \"" << (*x)->name << "\"" << endl;
-			cout << "Writing " << (output_directory / (*x)->name) << endl;
-			ofstream output(output_directory / (*x)->name);
-			output.write((char *)(*x)->getBuffer(), (*x)->getSize());
+			pray_source << endl << "inline " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\" \"" << file.getBlockName(i) << "\"" << endl;
+			cout << "Writing " << (output_directory / file.getBlockName(i)) << endl;
+			ofstream output(output_directory / file.getBlockName(i));
+			auto buf = file.getBlockRawData(i);
+			output.write((char *)buf.data(), buf.size());
 		}
 	}
 }

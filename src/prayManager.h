@@ -50,7 +50,7 @@ public:
 	std::string type;
 	std::string name;
 	std::map<std::string, std::string> stringValues;
-	std::map<std::string, int> integerValues;
+	std::map<std::string, uint32_t> integerValues;
 
 	bool isCompressed() { return compressed; }
 	bool isLoaded() { return loaded; }

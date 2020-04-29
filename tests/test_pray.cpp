@@ -1,5 +1,5 @@
 #include "prayfile/Caos2PrayParser.h"
-#include "prayfile/pray.h"
+#include "prayfile/PrayFileReader.h"
 #include "prayfile/PrayFileWriter.h"
 #include "prayfile/PraySourceParser.h"
 #include "spanstream.h"
@@ -167,13 +167,13 @@ TEST(prayreader, windows1252_to_utf8) {
 
     spanstream s(praybytes.data(), praybytes.size());
 
-    prayFile reader(s);
-    ASSERT_EQ(reader.blocks.size(), 1);
+    PrayFileReader reader(s);
+    ASSERT_EQ(reader.getNumBlocks(), 1);
 
-    reader.blocks[0]->load();
-    reader.blocks[0]->parseTags();
+    auto tags = reader.getBlockTags(0);
+    auto stringValues = tags.second;
 
-    ASSERT_EQ(reader.blocks[0]->stringValues.size(), 1);
-    EXPECT_EQ(reader.blocks[0]->name, "Agent tr\xc3\xa8s cool");
-    EXPECT_EQ(reader.blocks[0]->stringValues["Repr\xc3\xa8sentation"], "Mon agent est tr\xc3\xa8s cool");
+    EXPECT_EQ(reader.getBlockName(0), "Agent tr\xc3\xa8s cool");
+    ASSERT_EQ(stringValues.size(), 1);
+    EXPECT_EQ(stringValues["Repr\xc3\xa8sentation"], "Mon agent est tr\xc3\xa8s cool");
 }
