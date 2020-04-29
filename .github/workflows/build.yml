@@ -26,6 +26,8 @@ jobs:
         CCACHE_COMPRESSLEVEL: 6
         CCACHE_MAXSIZE: 500M
     - run: cd build && cmake --build . -t test
+      env:
+        CTEST_OUTPUT_ON_FAILURE: TRUE
 
   build-windows:
     runs-on: windows-latest
@@ -41,6 +43,8 @@ jobs:
         IF %ERRORLEVEL% NEQ 0 ( exit %ERRORLEVEL% )
         cmake --build build --parallel
     - run: cd build && cmake --build . -t test
+      env:
+        CTEST_OUTPUT_ON_FAILURE: TRUE
     - run: cd build && cmake --build . -t dist
     - uses: actions/upload-artifact@v1
       with:
@@ -65,6 +69,8 @@ jobs:
         CCACHE_COMPRESSLEVEL: 6
         CCACHE_MAXSIZE: 500M
     - run: cd build && cmake --build . -t test
+      env:
+        CTEST_OUTPUT_ON_FAILURE: TRUE
     - run: cd build && cmake --build . -t dist
     - uses: actions/upload-artifact@v1
       with:
