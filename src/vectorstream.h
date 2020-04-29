@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 class vectorstream : public std::iostream
 {
@@ -8,23 +9,21 @@ public:
 	vectorstream()
 		: std::iostream(&buf), buf(vector_) {}
 
-    const std::vector<unsigned char>& vector() { return vector_; }
+	const std::vector<unsigned char>& vector() { return vector_; }
 
 private:
 	class vectorstreambuf : public std::streambuf
 	{
 	public:
-		std::vector<unsigned char> &vector;
-
 		vectorstreambuf(std::vector<unsigned char> &vector_)
 			: vector(vector_) {}
-            
-        pos_type seekpos(pos_type pos, std::ios_base::openmode which) {
+
+		pos_type seekpos(pos_type pos, std::ios_base::openmode which) override {
 			return seekoff(pos, std::ios_base::beg, which);
-        }
-		
-		pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which)
-  		{
+		}
+
+		pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) override
+		{
 			if (which == std::ios_base::out) {
 				return pos_type(off_type(-1)); // can't change output position
 			}
@@ -41,21 +40,26 @@ private:
 			}
 		}
 
-        int_type overflow(int_type c) {
-            vector.push_back(c);
+		int_type overflow(int_type c) override {
+			vector.push_back(c);
 			return c;
-        }
-		
-		// int_type underflow() {
-		// 	return traits_type::eof();
-		// }
+		}
 
-		int_type uflow() {
-			return (position < vector.size()) ? vector[position++] : traits_type::eof();
+		int_type underflow() override {
+			return (position < vector.size()) ? vector[position] : traits_type::eof();
+		}
+
+		int_type uflow() override {
+			int_type ret = underflow();
+			if (ret != traits_type::eof()) {
+				position++;
+			}
+			return ret;
 		}
 	private:
+		std::vector<unsigned char> &vector;
 		size_t position = 0;
 	};
-    std::vector<unsigned char> vector_;
+	std::vector<unsigned char> vector_;
 	vectorstreambuf buf;
 };

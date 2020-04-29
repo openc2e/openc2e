@@ -5,17 +5,21 @@
 class spanstream : public std::istream
 {
 public:
-	spanstream(unsigned char* buffer, size_t buffer_size)
+	spanstream(const unsigned char* buffer, size_t buffer_size)
 		: std::istream(&buf), buf(buffer, buffer_size) {}
 
-	spanstream(char* buffer, size_t buffer_size)
-		: spanstream(reinterpret_cast<unsigned char*>(buffer), buffer_size) {}
+	spanstream(const char* buffer, size_t buffer_size)
+		: spanstream(reinterpret_cast<const unsigned char*>(buffer), buffer_size) {}
+
+	template <typename T>
+	spanstream(const T& t)
+		: spanstream(t.data(), t.size()) {}
 
 private:
 	class spanstreambuf : public std::streambuf
 	{
 	public:
-		spanstreambuf(unsigned char* buffer_, size_t buffer_size_)
+		spanstreambuf(const unsigned char* buffer_, size_t buffer_size_)
 			: buffer(buffer_), buffer_size(buffer_size_) {}
 
 	protected:
@@ -40,11 +44,19 @@ private:
 			}
 		}
 
+		int_type underflow() override {
+			return (position < buffer_size) ? buffer[position] : traits_type::eof();
+		}
+
 		int_type uflow() override {
-			return (position < buffer_size) ? buffer[position++] : traits_type::eof();
+			int_type ret = underflow();
+			if (ret != traits_type::eof()) {
+				position++;
+			}
+			return ret;
 		}
 	private:
-		unsigned char *buffer;
+		const unsigned char *buffer;
 		size_t buffer_size;
 		size_t position = 0;
 	};
