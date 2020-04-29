@@ -17,8 +17,8 @@ static std::string eventsToString(const std::vector<PraySourceParser::Event>& ev
 }
 
 template <typename T, typename F>
-T* matchEvent(const std::vector<PraySourceParser::Event>& events, F f) {
-    for (auto e : events) {
+const T* matchEvent(const std::vector<PraySourceParser::Event>& events, F f) {
+    for (auto& e : events) {
         auto matched = mpark::get_if<T>(&e);
         if (matched && f(*matched)) {
             return matched;
@@ -28,8 +28,8 @@ T* matchEvent(const std::vector<PraySourceParser::Event>& events, F f) {
 }
 
 template <typename T>
-T* matchEvent(const std::vector<PraySourceParser::Event>& events) {
-    return matchEvent<T>(events, [](T&) { return true; });
+const T* matchEvent(const std::vector<PraySourceParser::Event>& events) {
+    return matchEvent<T>(events, [](const T&) { return true; });
 }
 
 TEST(praysourceparser, character_escapes) {
@@ -48,7 +48,7 @@ TEST(caos2prayparser, character_escapes) {
         *# DS-Name "My Agent"
         *# Agent Description = "A \"really cool\" agent\nThis is a backslash\\"
     )", nullptr);
-    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](PraySourceParser::StringTag &e) {
+    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](const PraySourceParser::StringTag &e) {
         return e.key == "Agent Description";
     });
     if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
@@ -112,7 +112,7 @@ TEST(caos2prayparser, cp1252_to_utf8) {
         *# DS-Name "My Agent"
         *# Agent Description-fr = )") + "\"Un tr\xe8s cool agent\"",
     nullptr);
-    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](PraySourceParser::StringTag &e) {
+    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](const PraySourceParser::StringTag &e) {
         return e.key == "Agent Description-fr";
     });
     if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
@@ -124,7 +124,7 @@ TEST(caos2prayparser, utf8_to_utf8) {
         *# DS-Name "My Agent"
         *# Agent Description-fr = )") + "\"Un tr\xc3\xa8s cool agent\"",
     nullptr);
-    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](PraySourceParser::StringTag &e) {
+    auto string_tag = matchEvent<PraySourceParser::StringTag>(events, [](const PraySourceParser::StringTag &e) {
         return e.key == "Agent Description-fr";
     });
     if (!string_tag) FAIL() << "No such event in:\n" + eventsToString(events);
