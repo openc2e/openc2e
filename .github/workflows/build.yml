@@ -13,6 +13,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: sudo apt-get update && sudo apt-get install bison ccache ninja-build libsdl2-dev libsdl2-gfx-dev libsdl2-mixer-dev libsdl2-net-dev qtbase5-dev
+    - name: Prepare ccache timestamp
+      id: ccache_cache_timestamp
+      shell: cmake -P {0}
+      run: |
+        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+        message("::set-output name=timestamp::${current_date}")
     - uses: actions/cache@v1.1.0
       with:
         path: .ccache
@@ -56,6 +62,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: brew install ccache ninja qt
+    - name: Prepare ccache timestamp
+      id: ccache_cache_timestamp
+      shell: cmake -P {0}
+      run: |
+        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+        message("::set-output name=timestamp::${current_date}")
     - uses: actions/cache@v1.1.0
       with:
         path: .ccache
