@@ -587,6 +587,22 @@ void World::executeBootstrap(bool switcher) {
 	// TODO: this code is possibly wrong with multiple bootstrap directories
 	std::multimap<std::string, fs::path> bootstraps;
 
+	if (switcher) {
+		for (auto p : data_directories) {
+			// TODO: cvillage has switcher code in 'Startup', so i included it here too
+			if (fs::exists(p / "Bootstrap" / "000 Switcher")) {
+				printf("%s\n", p.string().c_str());
+				executeBootstrap(p / "Bootstrap" / "000 Switcher");
+				return;
+			}
+			if (fs::exists(p / "Bootstrap" / "Startup")) {
+				executeBootstrap(p / "Bootstrap" / "Startup");
+				return;
+			}
+		}
+		throw creaturesException("couldn't find '000 Switcher' or 'Startup' bootstrap directory");
+	}
+
 	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
 		assert(fs::exists(*i));
 		assert(fs::is_directory(*i));
@@ -597,11 +613,8 @@ void World::executeBootstrap(bool switcher) {
 			for (fs::directory_iterator d(b); d != fsend; ++d) {
 				if (fs::exists(*d) && fs::is_directory(*d)) {
 					std::string s = d->path().filename().string();
-					// TODO: cvillage has switcher code in 'Startup', so i included it here too
 					if (s == "000 Switcher" || s == "Startup") {
-						if (!switcher) continue;
-					} else {
-						if (switcher) continue;
+						continue;
 					}
 					
 					bootstraps.insert(std::pair<std::string, fs::path>(s, *d));
