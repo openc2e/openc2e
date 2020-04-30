@@ -553,11 +553,11 @@ void QtOpenc2e::tick() {
 
 	bool didtick = engine.tick();
 
-	int y = world.camera->getY();
-	int x = world.camera->getX();
+	int y = engine.camera->getY();
+	int x = engine.camera->getX();
 	viewport->tick();
-	viewport->horizontalScrollBar()->setValue(x - world.camera->getMetaRoom()->x());
-	viewport->verticalScrollBar()->setValue(y - world.camera->getMetaRoom()->y());
+	viewport->horizontalScrollBar()->setValue(x - engine.camera->getMetaRoom()->x());
+	viewport->verticalScrollBar()->setValue(y - engine.camera->getMetaRoom()->y());
 	
 	if (engine.done) close();
 
@@ -583,7 +583,7 @@ void QtOpenc2e::tick() {
 				room_for_tempcheck = roomContainingAgent(world.selectedcreature);
 			}
 			if (!room_for_tempcheck) // then try the room at the centre of the camera
-				room_for_tempcheck = world.camera->getMetaRoom()->roomAt(world.camera->getXCentre(), world.camera->getYCentre());
+				room_for_tempcheck = engine.camera->getMetaRoom()->roomAt(engine.camera->getXCentre(), engine.camera->getYCentre());
 			// TODO: c2 seems to try closest room as a last resort?
 			if (room_for_tempcheck) {
 				unsigned char temp = room_for_tempcheck->temp.getInt();

@@ -191,7 +191,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 	int x = pointerX(), y = pointerY();
 		
 	if (event.type == eventmousemove) {
-		moveTo(event.x + world.camera->getX() - hotspotx, event.y + world.camera->getY() - hotspoty);
+		moveTo(event.x + engine.camera->getX() - hotspotx, event.y + engine.camera->getY() - hotspoty);
 		velx.setInt(event.xrel * 4);
 		vely.setInt(event.yrel * 4);
 
@@ -200,7 +200,7 @@ void PointerAgent::handleEvent(SomeEvent &event) {
 
 		// middle mouse button scrolling
 		if (event.button & buttonmiddle)
-			world.camera->moveTo(world.camera->getX() - event.xrel, world.camera->getY() - event.yrel, jump);
+			engine.camera->moveTo(engine.camera->getX() - event.xrel, engine.camera->getY() - event.yrel, jump);
 	} else if (!handle_events) {
 		/* mouse move events are (apparently - see eg C3 agent help) still handled with handle_events disabled, but nothing else */
 		return;

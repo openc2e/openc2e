@@ -83,6 +83,8 @@ Engine::Engine() {
 
 	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
 	addPossibleAudioBackend("null", shared_ptr<AudioBackend>(new NullAudioBackend()));
+
+	camera.reset(new MainCamera);
 }
 
 Engine::~Engine() {
@@ -364,10 +366,10 @@ void Engine::handleKeyboardScrolling() {
 
 	// do the actual movement
 	if (velx || vely) {
-		int adjustx = world.camera->getX(), adjusty = world.camera->getY();
+		int adjustx = engine.camera->getX(), adjusty = engine.camera->getY();
 		int adjustbyx = (int)velx, adjustbyy = (int) vely;
 			
-		world.camera->moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
+		engine.camera->moveTo(adjustx + adjustbyx, adjusty + adjustbyy, jump);
 	}
 }
 
@@ -559,20 +561,20 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 
 				case 33: // pageup
 					// TODO: previous metaroom
-					if ((world.map->getMetaRoomCount() - 1) == world.camera->getMetaRoom()->id)
+					if ((world.map->getMetaRoomCount() - 1) == engine.camera->getMetaRoom()->id)
 						break;
-					n = world.map->getMetaRoom(world.camera->getMetaRoom()->id + 1);
+					n = world.map->getMetaRoom(engine.camera->getMetaRoom()->id + 1);
 					if (n)
-						world.camera->goToMetaRoom(n->id);
+						engine.camera->goToMetaRoom(n->id);
 					break;
 
 				case 34: // pagedown
 					// TODO: next metaroom
-					if (world.camera->getMetaRoom()->id == 0)
+					if (engine.camera->getMetaRoom()->id == 0)
 						break;
-					n = world.map->getMetaRoom(world.camera->getMetaRoom()->id - 1);
+					n = world.map->getMetaRoom(engine.camera->getMetaRoom()->id - 1);
 					if (n)
-						world.camera->goToMetaRoom(n->id);
+						engine.camera->goToMetaRoom(n->id);
 					break;
 
 				default: break; // to shut up warnings
@@ -789,8 +791,6 @@ bool Engine::initialSetup() {
 	}
 	possible_audiobackends.clear();
 
-	world.camera->setBackend(backend); // TODO: hrr
-	
 	int listenport = backend->networkInit();
 	if (listenport != -1) {
 		// inform the user of the port used, and store it in the relevant file

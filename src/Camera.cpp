@@ -19,6 +19,7 @@
 
 #include "Camera.h"
 #include "CameraPart.h"
+#include "Engine.h"
 #include "World.h"
 #include "Backend.h"
 #include "Map.h"
@@ -141,15 +142,15 @@ void Camera::updateTracking() {
 }
 
 unsigned int MainCamera::getWidth() const {
-	if ((!getMetaRoom()) || (backend->getMainRenderTarget()->getWidth() < getMetaRoom()->width()))
-		return backend->getMainRenderTarget()->getWidth();
+	if ((!getMetaRoom()) || (engine.backend->getMainRenderTarget()->getWidth() < getMetaRoom()->width()))
+		return engine.backend->getMainRenderTarget()->getWidth();
 	else
 		return getMetaRoom()->width();
 }
 
 unsigned int MainCamera::getHeight() const {
-	if ((!getMetaRoom()) || (backend->getMainRenderTarget()->getHeight() < getMetaRoom()->height()))
-		return backend->getMainRenderTarget()->getHeight();
+	if ((!getMetaRoom()) || (engine.backend->getMainRenderTarget()->getHeight() < getMetaRoom()->height()))
+		return engine.backend->getMainRenderTarget()->getHeight();
 	else
 		return getMetaRoom()->height();
 }

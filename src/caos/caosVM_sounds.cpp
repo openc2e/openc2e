@@ -46,7 +46,7 @@ void caosVM::c_SNDE() {
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (world.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	if (engine.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
 	targ->playAudio(filename, false, false);
 }
 
@@ -80,7 +80,7 @@ void caosVM::c_SNDC() {
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (world.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	if (engine.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
 	targ->playAudio(filename, true, false);
 }
 
@@ -331,7 +331,7 @@ void caosVM::c_PLDS() {
 	VM_PARAM_STRING(filename)
 
 	valid_agent(targ);
-	if (world.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y)) return; // TODO: needs better check ;)
+	if (engine.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y)) return; // TODO: needs better check ;)
 
 	// TODO
 }

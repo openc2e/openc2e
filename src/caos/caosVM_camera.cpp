@@ -18,6 +18,7 @@
  */
 
 #include "caosVM.h"
+#include "Engine.h"
 #include "World.h"
 #include "CompoundAgent.h"
 #include "CameraPart.h"
@@ -27,27 +28,27 @@
 
 Camera *caosVM::getCamera() {
 	Camera *c = camera.lock().get();
-	if (!c) c = world.camera.get();
+	if (!c) c = engine.camera.get();
 	return c;
 }
 
 bool agentOnCamera(Agent *targ, bool checkall) {
 	MetaRoom *m = world.map->metaRoomAt(targ->x, targ->y);
-	if (!m || m != world.camera->getMetaRoom()) return false;
+	if (!m || m != engine.camera->getMetaRoom()) return false;
 
 	// TODO: check non-main cameras?
 	// TODO: do compound parts stick out of the agent?
 
 	// y coordinates don't wrap
-	if (targ->y + targ->getHeight() < world.camera->getY()) return false;
-	if (targ->y > world.camera->getY() + world.camera->getHeight()) return false;
+	if (targ->y + targ->getHeight() < engine.camera->getY()) return false;
+	if (targ->y > engine.camera->getY() + engine.camera->getHeight()) return false;
 	
 	// if an agent is off-camera to the right, it's not visible
-	if (targ->x > world.camera->getX() + world.camera->getWidth()) return false;
+	if (targ->x > engine.camera->getX() + engine.camera->getWidth()) return false;
 
-	if (targ->x + targ->getWidth() < world.camera->getX()) {
+	if (targ->x + targ->getWidth() < engine.camera->getX()) {
 		// if an agent is off-camera to the left, it might be wrapping
-		if (!m->wraparound() || (targ->x + targ->getWidth() + m->width() < world.camera->getX()))
+		if (!m->wraparound() || (targ->x + targ->getWidth() + m->width() < engine.camera->getX()))
 			return false;
 	}
 

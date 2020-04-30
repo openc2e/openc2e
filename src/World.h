@@ -89,7 +89,6 @@ public:
 	unsigned int ticktime, tickcount;
 	unsigned int worldtickcount;
 	unsigned int timeofday, dayofseason, season, year;
-	std::unique_ptr<MainCamera> camera;
 	bool showrooms, autokill, autostop;
 
 	std::vector<unsigned int> groundlevels;

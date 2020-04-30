@@ -186,7 +186,7 @@ void Agent::floatTo(float x, float y) {
 	if (floatingagent) {
 		moveTo(floatingagent->x + x, floatingagent->y + y);
 	} else {
-		moveTo(world.camera->getX() + x, world.camera->getY() + y);
+		moveTo(engine.camera->getX() + x, engine.camera->getY() + y);
 	}
 }
 
@@ -194,14 +194,14 @@ void Agent::floatSetup() {
 	if (floatingagent)
 		floatingagent->addFloated(this);
 	else
-		world.camera->addFloated(this);
+		engine.camera->addFloated(this);
 }
 
 void Agent::floatRelease() {
 	if (floatingagent) {
 		floatingagent->delFloated(this);
 	} else
-		world.camera->delFloated(this);
+		engine.camera->delFloated(this);
 }
 
 void Agent::addFloated(AgentRef a) {
@@ -409,11 +409,11 @@ bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
 static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int width, unsigned int height) {
 	const static unsigned int buffer = 500;
 
-	if (world.camera->getMetaRoom() != room)
+	if (engine.camera->getMetaRoom() != room)
 		return false;
-	if (x + buffer < world.camera->getX() || x + width - buffer > world.camera->getX() + world.camera->getWidth())
+	if (x + buffer < engine.camera->getX() || x + width - buffer > engine.camera->getX() + engine.camera->getWidth())
 		return false;
-	if (y + buffer < world.camera->getY() || y + height - buffer > world.camera->getY() + world.camera->getHeight())
+	if (y + buffer < engine.camera->getY() || y + height - buffer > engine.camera->getY() + engine.camera->getHeight())
 		return false;
 	return true;
 }

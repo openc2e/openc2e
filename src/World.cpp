@@ -60,7 +60,6 @@ World::World() {
 	autokill = false;
 	autostop = false;
 
-	camera.reset(new MainCamera());
 	gallery.reset(new imageManager());
 	history.reset(new historyManager());
 	map.reset(new Map());
@@ -224,7 +223,7 @@ void World::tick() {
 	}
 
 	// Notify the audio backend about our current viewpoint center.
-	engine.audio->setViewpointCenter(camera->getXCentre(), camera->getYCentre());
+	engine.audio->setViewpointCenter(engine.camera->getXCentre(), engine.camera->getYCentre());
 
 	std::list<std::pair<std::shared_ptr<AudioSource>, bool> >::iterator si = uncontrolled_sounds.begin();
 	while (si != uncontrolled_sounds.end()) {
@@ -235,13 +234,13 @@ void World::tick() {
 		} else {
 			if (si->second) {
 				// follow viewport
-				si->first->setPos(camera->getXCentre(), camera->getYCentre(), 0);
+				si->first->setPos(engine.camera->getXCentre(), engine.camera->getYCentre(), 0);
 			} else {
 				// mute/unmute off-screen uncontrolled audio if necessary
 				float x, y, z;
 				si->first->getPos(x, y, z);
 				if (engine.version > 2) // TODO: this is because of wrap issues, but we need a better fix
-					si->first->setMute(camera->getMetaRoom() != world.map->metaRoomAt(x, y));
+					si->first->setMute(engine.camera->getMetaRoom() != world.map->metaRoomAt(x, y));
 			}
 		}
 
@@ -395,7 +394,7 @@ shared_ptr<Agent> World::lookupUNID(int unid) {
 }
 
 void World::drawWorld() {
-	drawWorld(camera.get(), engine.backend->getMainRenderTarget());
+	drawWorld(engine.camera.get(), engine.backend->getMainRenderTarget());
 }
 
 void World::drawWorld(Camera *cam, RenderTarget *surface) {
@@ -450,7 +449,7 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 
 	// render all the agents
 	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
-		if ((*i)->showOnRemoteCameras() || cam == camera.get()) {
+		if ((*i)->showOnRemoteCameras() || cam == engine.camera.get()) {
 			// three-pass for wraparound rooms, the third since agents often straddle the boundary
 			// TODO: same as above with background rendering
 			for (unsigned int z = 0; z < (m->wraparound() ? 3 : 1); z++) {
@@ -763,7 +762,7 @@ std::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef age
 		assert(!controlled);
 
 		// TODO: handle non-agent sounds
-		sound->setPos(camera->getXCentre(), camera->getYCentre(), 0);
+		sound->setPos(engine.camera->getXCentre(), engine.camera->getYCentre(), 0);
 		uncontrolled_sounds.push_back(std::pair<std::shared_ptr<class AudioSource>, bool>(sound, followviewport));
 	}
 	

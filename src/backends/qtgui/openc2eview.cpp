@@ -17,6 +17,7 @@
 #include "World.h"
 #include "MetaRoom.h"
 #include "Camera.h"
+#include "Engine.h"
 
 #include "openc2eview.h"
 #include "QtBackend.h"
@@ -66,13 +67,13 @@ std::shared_ptr<class Backend> openc2eView::getBackend() {
 }
 
 void openc2eView::resizescrollbars() {
-	if (world.camera->getMetaRoom()) {
-		if (world.camera->getMetaRoom()->wraparound()) {
-			horizontalScrollBar()->setRange(0,world.camera->getMetaRoom()->width());
+	if (engine.camera->getMetaRoom()) {
+		if (engine.camera->getMetaRoom()->wraparound()) {
+			horizontalScrollBar()->setRange(0,engine.camera->getMetaRoom()->width());
 		} else {
-			horizontalScrollBar()->setRange(0,world.camera->getMetaRoom()->width() - viewport()->width());
+			horizontalScrollBar()->setRange(0,engine.camera->getMetaRoom()->width() - viewport()->width());
 		}
-		verticalScrollBar()->setRange(0,world.camera->getMetaRoom()->height() - viewport()->height());
+		verticalScrollBar()->setRange(0,engine.camera->getMetaRoom()->height() - viewport()->height());
 	}
 }
 
@@ -168,12 +169,12 @@ void openc2eView::scrollContentsBy(int dx, int dy) {
 	(void)dx;
 	(void)dy;
 	if (lastMetaroom)
-		world.camera->moveTo(horizontalScrollBar()->value() + lastMetaroom->x(), verticalScrollBar()->value() + lastMetaroom->y());
+		engine.camera->moveTo(horizontalScrollBar()->value() + lastMetaroom->x(), verticalScrollBar()->value() + lastMetaroom->y());
 }
 
 void openc2eView::tick() {
-	if (lastMetaroom != world.camera->getMetaRoom()) {
-		lastMetaroom = world.camera->getMetaRoom();
+	if (lastMetaroom != engine.camera->getMetaRoom()) {
+		lastMetaroom = engine.camera->getMetaRoom();
 		resizescrollbars();
 	}
 }

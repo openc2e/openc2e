@@ -578,7 +578,7 @@ void caosVM::v_FLTX() {
 	if (targ->floatingagent)
 		result.setFloat(targ->floatingagent->x - targ->x);
 	else
-		result.setFloat(world.camera->getX() - targ->x);
+		result.setFloat(engine.camera->getX() - targ->x);
 }
 
 /**
@@ -593,7 +593,7 @@ void caosVM::v_FLTY() {
 	if (targ->floatingagent)
 		result.setFloat(targ->floatingagent->x - targ->x);
 	else
-		result.setFloat(world.camera->getX() - targ->x);
+		result.setFloat(engine.camera->getX() - targ->x);
 }
 
 /**

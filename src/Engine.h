@@ -27,6 +27,7 @@
 
 class Backend;
 class AudioBackend;
+class MainCamera;
 struct SomeEvent;
 
 class Engine {
@@ -68,6 +69,8 @@ public:
 	std::shared_ptr<class AudioBackend> audio;
 	std::string getBackendName() { return preferred_backend; }
 	std::string getAudioBackendName() { return preferred_audiobackend; }
+
+	std::unique_ptr<MainCamera> camera;
 
 	std::vector<std::string> wordlist;
 	std::string translateWordlistWord(const std::string& s);

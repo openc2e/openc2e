@@ -81,12 +81,10 @@ class Backend;
 
 class MainCamera : public Camera {
 protected:
-	std::shared_ptr<Backend> backend;
 	std::vector<AgentRef> floated;
 
 public:
 	MainCamera() { }
-	void setBackend(std::shared_ptr<Backend> b) { backend = b; }
 	unsigned int getWidth() const;
 	unsigned int getHeight() const;
 	void moveTo(int _x, int _y, panstyle pan = jump);

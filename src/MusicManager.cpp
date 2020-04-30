@@ -63,9 +63,9 @@ void MusicManager::tick() {
 	}
 	if (!current_latency) {
 		// TODO: this behaviour is different in C2, and should probably be cleverer
-		MetaRoom *m = world.camera->getMetaRoom();
+		MetaRoom *m = engine.camera->getMetaRoom();
 		if (m) {
-			shared_ptr<Room> r = m->roomAt(world.camera->getXCentre(), world.camera->getYCentre());
+			shared_ptr<Room> r = m->roomAt(engine.camera->getXCentre(), engine.camera->getYCentre());
 			if (r && r->music.size()) {
 				playTrack(r->music, 0);
 			} else if (m->music.size()) {
