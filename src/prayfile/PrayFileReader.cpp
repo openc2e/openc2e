@@ -129,6 +129,8 @@ static std::string tagStringRead(std::istream& in) {
 }
 
 std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> PrayFileReader::getBlockTags(size_t i) {
+	std::string name = getBlockName(i);
+
 	std::map<std::string, uint32_t> integerValues;
 	std::map<std::string, std::string> stringValues;
 	
@@ -154,5 +156,13 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 		stringValues[n] = v;
 	}
 	
+	if (!s) {
+		throw creaturesException("Stream failure reading tags from PRAY block \"" + name + "\"");
+	}
+	s.peek();
+	if (!s.eof()) {
+		throw creaturesException("Didn't read whole block while reading tags from PRAY block \"" + name + "\"");
+	}
+
 	return {integerValues, stringValues};
 }
