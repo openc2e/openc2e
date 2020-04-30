@@ -155,7 +155,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	draw_mirrored = false;
 	
 	if (sprite->numframes() <= firstimg) {
-		if (world.gametype == "cv") {
+		if (engine.gametype == "cv") {
 			// Creatures Village allows you to create sprites with crazy invalid data, do the same as it does
 			// (obviously the firstimg data is invalid so all attempts to change the pose/etc will fail, same as in CV)
 			spriteno = 0;

@@ -83,7 +83,6 @@ public:
 	std::unique_ptr<imageManager> gallery;
 	std::unique_ptr<historyManager> history;
 
-	std::string gametype;
 	float pace;
 	unsigned int race;
 	unsigned int ticktime, tickcount;

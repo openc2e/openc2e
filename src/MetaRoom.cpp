@@ -80,7 +80,7 @@ void MetaRoom::addBackground(std::string back, shared_ptr<creaturesImage> spr) {
 		fullhei = totalheight;
 	} else {
 		// make sure other backgrounds are the same size
-		if (world.gametype == "sm") return; // TODO: seamonkeys fails the background size checks :/
+		if (engine.gametype == "sm") return; // TODO: seamonkeys fails the background size checks :/
 		assert(totalwidth == fullwid);
 		assert(totalheight == fullhei);
 	}

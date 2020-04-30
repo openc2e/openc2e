@@ -82,6 +82,7 @@ public:
 	bool done;
 	bool dorendering, fastticks, refreshdisplay;
 	unsigned int version;
+	std::string gametype;
 	bool bmprenderer;
 	std::string language;
 

@@ -19,6 +19,7 @@
 
 #include "caosVM.h"
 #include "caosScript.h" // PRAY INJT
+#include "Engine.h"
 #include "World.h"
 #include "Catalogue.h"
 
@@ -377,7 +378,7 @@ void caosVM::v_PRAY_INJT() {
 		caosVM *vm = world.getVM(NULL);
 		try {
 			std::istringstream iss(script);
-			caosScript script(world.gametype, name + " - PRAY " + scriptname);
+			caosScript script(engine.gametype, name + " - PRAY " + scriptname);
 			script.parse(iss);
 			script.installScripts();
 			vm->resetCore();

@@ -90,7 +90,7 @@ void World::init() {
 				int hotspotx, hotspoty;
 				if (sscanf(pointerinfo[1].c_str(), "%d %d", &hotspotx, &hotspoty) == 2)
 					theHand->setHotspot(hotspotx, hotspoty);
-				if (gametype == "sm" && pointerinfo.size() >= 5) {
+				if (engine.gametype == "sm" && pointerinfo.size() >= 5) {
 					// TODO: seamonkeys has 'numImages baseImage' too
 					int blockwidth, blockheight;
 					if (sscanf(pointerinfo[4].c_str(), "%d %d", &blockwidth, &blockheight) == 2) {
@@ -108,7 +108,7 @@ void World::init() {
 	// If for some reason we failed to do that (missing/bad catalogue tag? missing file?), try falling back to a sane default.
 	if (!theHand) {
 		shared_ptr<creaturesImage> img;
-		if (gametype == "c3")
+		if (engine.gametype == "c3")
 			img = gallery->getImage("hand"); // as used in C3 and DS
 		else
 			img = gallery->getImage("syst"); // as used in C1, C2 and CV
@@ -531,7 +531,7 @@ void World::executeInitScript(fs::path p) {
 	//std::cout << "executing script " << x << "...\n";
 	//std::cout.flush(); std::cerr.flush();
 	try {
-		caosScript script(gametype, x);
+		caosScript script(engine.gametype, x);
 		script.parse(s);
 		caosVM vm(0);
 		script.installScripts();

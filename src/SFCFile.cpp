@@ -280,9 +280,9 @@ std::string SFCFile::readBytes(unsigned int n) {
 
 void SFCFile::setVersion(unsigned int v) {
 	if (v == 0) {
-		sfccheck(world.gametype == "c1");
+		sfccheck(engine.gametype == "c1");
 	} else if (v == 1) {
-		sfccheck(world.gametype == "c2");
+		sfccheck(engine.gametype == "c2");
 	} else {
 		throw creaturesException(fmt::sprintf("unknown version# %d", v));
 	}
@@ -1218,7 +1218,7 @@ void SFCScenery::copyToWorld() {
 
 void SFCScript::install() {
 	std::string scriptinfo = fmt::sprintf("<SFC script %d, %d, %d: %d>", (int)family, (int)genus, species, eventno);
-	caosScript script(world.gametype, scriptinfo);
+	caosScript script(engine.gametype, scriptinfo);
 	std::istringstream s(data);
 	try {
 		script.parse(s);

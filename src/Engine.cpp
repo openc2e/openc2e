@@ -139,7 +139,7 @@ static std::vector<std::string> read_wordlist(peFile* exefile, uint32_t lang) {
 
 void Engine::loadGameData() {
 	// load palette for C1
-	if (world.gametype == "c1") {
+	if (gametype == "c1") {
 		// TODO: case-sensitivity for the lose
 		fs::path palpath(world.findFile("Palettes/palette.dta"));
 		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
@@ -159,7 +159,7 @@ void Engine::loadGameData() {
 	}
 
 	// load word list for C2
-	if (world.gametype == "c2") {
+	if (gametype == "c2") {
 		fs::path exepath(world.findFile("Creatures2.exe"));
 		if (fs::exists(exepath) && !fs::is_directory(exepath)) {
 			try {
@@ -212,7 +212,7 @@ std::string Engine::executeNetwork(std::string in) {
 	caosVM vm(0); // needs to be outside 'try' so we can reset outputstream on exception
 	try {
 		std::istringstream s(in);
-		caosScript script(world.gametype, "<network>"); // XXX
+		caosScript script(gametype, "<network>"); // XXX
 		script.parse(s);
 		script.installScripts();
 		std::ostringstream o;
@@ -642,7 +642,7 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 		 cxxopts::value<std::vector<std::string>>(data_vec))
 		("b,bootstrap", "Sets or adds a path or COS file to bootstrap from",
 		 cxxopts::value<std::vector<std::string>>(cmdline_bootstrap))
-		("g,gametype", "Set the game type (c1, c2, cv or c3)", cxxopts::value<std::string>(world.gametype))
+		("g,gametype", "Set the game type (c1, c2, cv or c3)", cxxopts::value<std::string>(gametype))
 		("m,gamename", "Set the game name", cxxopts::value<std::string>(gamename))
 		("n,norun", "Don't run the game, just execute scripts")
 		("a,autokill", "Enable autokill")
@@ -699,49 +699,49 @@ bool Engine::initialSetup() {
 	assert(world.data_directories.size() > 0);
 
 	// autodetect gametype if necessary
-	if (world.gametype.empty()) {
+	if (gametype.empty()) {
 		std::cout << "Warning: No gametype specified, ";
 		// TODO: is this sane? especially unsure about about.exe
 		if (!world.findFile("Creatures.exe").empty()) {
 			std::cout << "found Creatures.exe, assuming C1 (c1)";
-			world.gametype = "c1";
+			gametype = "c1";
 		} else if (!world.findFile("Creatures2.exe").empty()) {
 			std::cout << "found Creatures2.exe, assuming C2 (c2)";
-			world.gametype = "c2";
+			gametype = "c2";
 		} else if (!world.findFile("Sea-Monkeys.ico").empty()) {
 			std::cout << "found Sea-Monkeys.ico, assuming Sea-Monkeys (sm)";
-			world.gametype = "sm";
+			gametype = "sm";
 		} else if (!world.findFile("about.exe").empty()) {
 			std::cout << "found about.exe, assuming CA, CP or CV (cv)";
-			world.gametype = "cv";
+			gametype = "cv";
 		} else {
 			std::cout << "assuming C3/DS (c3)";
-			world.gametype = "c3";
+			gametype = "c3";
 		}
 		std::cout << ", see --help if you need to specify one." << std::endl;
 	}
 
 	// set engine version
 	// TODO: set gamename
-	if (world.gametype == "c1") {
+	if (gametype == "c1") {
 		if (gamename.empty()) gamename = "Creatures 1";
 		version = 1;
-	} else if (world.gametype == "c2") {
+	} else if (gametype == "c2") {
 		if (gamename.empty()) gamename = "Creatures 2";
 		version = 2;
-	} else if (world.gametype == "c3") {
+	} else if (gametype == "c3") {
 		if (gamename.empty()) gamename = "Creatures 3";
 		version = 3;
-	} else if (world.gametype == "cv") {
+	} else if (gametype == "cv") {
 		if (gamename.empty()) gamename = "Creatures Village";
 		version = 3;
 		world.autostop = !world.autostop;
-	} else if (world.gametype == "sm") {
+	} else if (gametype == "sm") {
 		if (gamename.empty()) gamename = "Sea-Monkeys";
 		version = 3;
 		bmprenderer = true;
 	} else
-		throw creaturesException(fmt::sprintf("unknown gametype '%s'!", world.gametype));
+		throw creaturesException(fmt::sprintf("unknown gametype '%s'!", gametype));
 
 	// finally, add our cache directory to the end
 	world.data_directories.push_back(storageDirectory());

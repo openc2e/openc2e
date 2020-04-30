@@ -81,7 +81,7 @@ unsigned int cee_zorder[4][17] = {
 unsigned int cee_lookup[17] = { 1, 0, 2, 7, 11, 3, 8, 12, 4, 9, 5, 10, 6, 13, 14, 15, 16 };
 
 int SkeletalPartCount() {
-	if (world.gametype == "cv")
+	if (engine.gametype == "cv")
 		return 17;
 	else
 		return 14;
@@ -590,7 +590,7 @@ void SkeletalCreature::setPose(std::string s) {
 		pose[cee_lookup[i]] = newpose;
 
 		// TODO: this is some hackery for CV, 
-		if (world.gametype != "cv") continue;
+		if (engine.gametype != "cv") continue;
 		if (i == 0) { // head
 			pose[14] = newpose; pose[15] = newpose; // ears
 			pose[16] = newpose; // hair
