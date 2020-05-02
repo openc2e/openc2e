@@ -267,13 +267,27 @@ if (OPENC2E_USE_QT)
 		AUTORCC ON
 		AUTOUIC ON
 	)
-	
+
 	if (WIN32)
 		find_program(WINDEPLOYQT_EXECUTABLE windeployqt)
+		get_target_property(qt_core_location Qt5::Core LOCATION)
+		get_filename_component(qt_runtime_dir "${qt_core_location}" DIRECTORY)
 		add_custom_command(
 			TARGET openc2e POST_BUILD
-			COMMAND ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE_DIR:openc2e>
+			COMMAND ${CMAKE_COMMAND}
+			-D "DIST_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+			-D "EXTRA_LIB_DIRS=${qt_runtime_dir}"
+			-P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Openc2eBundle.cmake
 		)
+		if(OPENC2E_USE_QT)
+				add_custom_command(
+				  TARGET openc2e POST_BUILD
+					COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/platforms/"
+					COMMAND ${CMAKE_COMMAND} -E copy_if_different
+					"$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>"
+					"${CMAKE_CURRENT_BINARY_DIR}/platforms/"
+				)
+		endif()
 	endif()
 endif()
 
