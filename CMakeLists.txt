@@ -21,21 +21,6 @@ if (OPENC2E_PROFILE_ALLOCATION)
 	add_definitions("-DPROFILE_ALLOCATION_COUNT -DPROFILE_ALLOCATION_THREAD_SAFE")
 endif()
 
-include(TestBigEndian)
-include(CheckIncludeFile)
-test_big_endian(BIG_ENDIAN)
-if (BIG_ENDIAN)
-	add_definitions("-DOC2E_BIG_ENDIAN=1")
-	check_include_file(byteswap.h HAVE_BYTESWAP_H)
-	if(HAVE_BYTESWAP_H)
-		add_definitions("-DHAVE_BYTESWAP_H=1")
-	else()
-		add_definitions("-DHAVE_BYTESWAP_H=0")
-	endif()
-else()
-	add_definitions("-DOC2E_BIG_ENDIAN=0")
-endif()
-
 # Find / include dependencies
 find_package(Python REQUIRED)
 

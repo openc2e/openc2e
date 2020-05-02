@@ -25,8 +25,7 @@
 sprImage::sprImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_paletted;
 
-	uint16_t spritecount;
-	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
+	m_numframes = read16le(in);
 
 	widths.resize(m_numframes);
 	heights.resize(m_numframes);
@@ -34,9 +33,9 @@ sprImage::sprImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	buffers.resize(m_numframes);
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]);
-		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
-		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
+		offsets[i] = read32le(in);
+		widths[i] = read16le(in);
+		heights[i] = read16le(in);
 	}
 
 	// check for Terra Nornia's corrupt background sprite

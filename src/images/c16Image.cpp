@@ -26,11 +26,10 @@
 c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_16bit;
 
-	uint32_t flags; uint16_t spritecount;
-	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
+	uint32_t flags = read32le(in);
 	is_565 = (flags & 0x01);
 	assert(flags & 0x02);
-	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
+	m_numframes = read16le(in);
 
 	widths.resize(m_numframes);
 	heights.resize(m_numframes);
@@ -38,16 +37,15 @@ c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		uint32_t offset;
-		in.read((char *)&offset, 4); offset = swapEndianLong(offset);
-		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
-		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
+		uint32_t offset = read32le(in);
+		widths[i] = read16le(in);
+		heights[i] = read16le(in);
 		lineoffsets[i].resize(heights[i]);
 		if (heights[i] > 0) {
 			lineoffsets[i][0] = offset;
 		}
 		for (unsigned int j = 1; j < heights[i]; j++) {
-			in.read((char *)&lineoffsets[i][j], 4); lineoffsets[i][j] = swapEndianLong(lineoffsets[i][j]);
+			lineoffsets[i][j] = read32le(in);
 		}
 	}
 	
@@ -61,7 +59,7 @@ c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 		for (unsigned int j = 0; j < heights[i]; j++) {
 			in.seekg(lineoffsets[i][j], std::ios::beg);
 			while (true) {
-				uint16_t tag; in.read((char *)&tag, 2); tag = swapEndianShort(tag);
+				uint16_t tag = read16le(in);
 				if (tag == 0) break;
 				bool transparentrun = ((tag & 0x0001) == 0);
 				uint16_t runlength = (tag & 0xFFFE) >> 1;
@@ -91,10 +89,9 @@ bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y)
 s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_16bit;
 
-	uint32_t flags; uint16_t spritecount;
-	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
+	uint32_t flags = read32le(in);
 	is_565 = (flags & 0x01);
-	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
+	m_numframes = read16le(in);
 
 	widths.resize(m_numframes);
 	heights.resize(m_numframes);
@@ -102,9 +99,9 @@ s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 
 	// first, read the headers.
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]);
-		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]);
-		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]);
+		offsets[i] = read32le(in);
+		widths[i] = read16le(in);
+		heights[i] = read16le(in);
 	}
 	
 	buffers.resize(m_numframes);

@@ -26,13 +26,12 @@
 blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_16bit;
 
-	uint32_t flags; uint16_t width, height, spritecount;
-	in.read((char *)&flags, 4); flags = swapEndianLong(flags);
+	uint32_t flags = read32le(in);
 	is_565 = (flags & 0x01);
-	in.read((char *)&width, 2); width = swapEndianShort(width);
-	in.read((char *)&height, 2); height = swapEndianShort(height);
+	uint16_t width = read16le(in);
+	uint16_t height = read16le(in);
 	totalwidth = width * 128; totalheight = height * 128;
-	in.read((char *)&spritecount, 2); m_numframes = swapEndianShort(spritecount);
+	m_numframes = read16le(in);
 	
 	assert(m_numframes == (unsigned int) (width * height));	
 
@@ -41,9 +40,9 @@ blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	std::vector<uint32_t> offsets(m_numframes);
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		in.read((char *)&offsets[i], 4); offsets[i] = swapEndianLong(offsets[i]) + 4;
-		in.read((char *)&widths[i], 2); widths[i] = swapEndianShort(widths[i]); assert(widths[i] == 128);
-		in.read((char *)&heights[i], 2); heights[i] = swapEndianShort(heights[i]); assert(heights[i] == 128);
+		offsets[i] = read32le(in);
+		widths[i] = read16le(in); assert(widths[i] == 128);
+		heights[i] = read16le(in); assert(heights[i] == 128);
 	}
 	
 	buffers.resize(m_numframes);

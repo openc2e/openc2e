@@ -240,23 +240,15 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 }
 
 uint8_t SFCFile::read8() {
-	char temp[1];
-	ourStream->read(temp, 1);
-	return temp[0];
+	return ::read8(*ourStream);
 }
 
 uint16_t SFCFile::read16() {
-	char temp[2];
-	ourStream->read(temp, 2);
-	uint16_t *i = (uint16_t *)&temp;
-	return swapEndianShort(*i);
+	return ::read16le(*ourStream);
 }
 
 uint32_t SFCFile::read32() {
-	char temp[4];
-	ourStream->read(temp, 4);
-	uint32_t *i = (uint32_t *)&temp;
-	return swapEndianLong(*i);
+	return ::read32le(*ourStream);
 }
 
 std::string SFCFile::readstring() {

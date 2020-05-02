@@ -57,7 +57,7 @@ cobBlock::cobBlock(cobFile *p) {
 	file.read(cobtype, 4);
 	type = std::string(cobtype, 4);
 
-	file.read((char *)&size, 4); size = swapEndianLong(size);
+	size = read32le(file);
 
 	offset = file.tellg();
 	file.seekg(size, std::ios::cur);
@@ -136,12 +136,12 @@ cobAgentBlock::cobAgentBlock(cobBlock *p) {
 	if (!file.good())
 		throw creaturesException("Failed to seek to block offset.");
 
-	file.read((char *)&quantityremaining, 2); quantityremaining = swapEndianShort(quantityremaining);
-	file.read((char *)&lastusage, 4); lastusage = swapEndianLong(lastusage);
-	file.read((char *)&reuseinterval, 4); reuseinterval = swapEndianLong(reuseinterval);
-	file.read((char *)&usebyday, 1);
-	file.read((char *)&usebymonth, 1);
-	file.read((char *)&usebyyear, 2); usebyyear = swapEndianShort(usebyyear);
+	quantityremaining = read16le(file);
+	lastusage = read32le(file);
+	reuseinterval = read32le(file);
+	usebyday = read8(file);
+	usebymonth = read8(file);
+	usebyyear = read32le(file);
 
 	file.seekg(12, std::ios::cur); // unused
 
@@ -150,17 +150,14 @@ cobAgentBlock::cobAgentBlock(cobBlock *p) {
 	installscript = readstring(file);
 	removescript = readstring(file);
 
-	unsigned short noevents;
-	file.read((char *)&noevents, 2); noevents = swapEndianShort(noevents);
+	unsigned short noevents = read16le(file);
 	for (unsigned int i = 0; i < noevents; i++) {
 		scripts.push_back(readstring(file));
 	}
 
-	unsigned short nodeps;
-	file.read((char *)&nodeps, 2); nodeps = swapEndianShort(nodeps);
+	unsigned short nodeps = read16le(file);
 	for (unsigned int i = 0; i < nodeps; i++) {
-		unsigned short deptype;
-		file.read((char *)&deptype, 2); deptype = swapEndianShort(deptype);
+		unsigned short deptype = read16le(file);
 		deptypes.push_back(deptype);
 
 		// depnames should be read as lower-case to ease comparison
@@ -169,8 +166,8 @@ cobAgentBlock::cobAgentBlock(cobBlock *p) {
 		depnames.push_back(depname);
 	}
 
-	file.read((char *)&thumbnailwidth, 2); thumbnailwidth = swapEndianShort(thumbnailwidth);
-	file.read((char *)&thumbnailheight, 2); thumbnailheight = swapEndianShort(thumbnailheight);
+	thumbnailwidth = read16le(file);
+	thumbnailheight = read16le(file);
 	thumbnail = new unsigned short[thumbnailwidth * thumbnailheight];
 	file.read((char *)thumbnail, 2 * thumbnailwidth * thumbnailheight);
 }
@@ -188,9 +185,9 @@ cobFileBlock::cobFileBlock(cobBlock *p) {
 	if (!file.good())
 		throw creaturesException("Failed to seek to block offset.");
 
-	file.read((char *)&filetype, 2); filetype = swapEndianShort(filetype);
+	filetype = read16le(file);
 	file.seekg(4, std::ios::cur); // unused
-	file.read((char *)&filesize, 4); filesize = swapEndianLong(filesize);
+	filesize = read32le(file);
 		
 	// filenames should be read as lower-case to ease comparison
 	filename = readstring(file);
