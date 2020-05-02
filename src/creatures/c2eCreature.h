@@ -95,10 +95,10 @@ public:
 	float getLongTermLifeforce() { return longtermlifeforce; }
 	float getATPDamageCoefficient() { return atpdamagecoefficient; }
 	
-	unsigned int getReceptorCount() { return receptors.size(); }
-	unsigned int getEmitterCount() { return emitters.size(); }
-	unsigned int getReactionCount() { return reactions.size(); }
 	
+	size_t getReceptorCount() { return receptors.size(); }
+	size_t getEmitterCount() { return emitters.size(); }
+	size_t getReactionCount() { return reactions.size(); }
 	void applyInjury(float);
 };
 

@@ -62,7 +62,7 @@ public:
 
 	void addChemical(unsigned char id, unsigned char val);
 	void subChemical(unsigned char id, unsigned char val);
-	unsigned char getChemical(unsigned char id) { return chemicals[id]; }	
+	unsigned char getChemical(unsigned char id) { return chemicals[id]; }
 	
 	// TODO: is it really worth having drives outside oldCreature?
 	virtual unsigned char getDrive(unsigned int id) = 0;
@@ -192,9 +192,9 @@ public:
 	float getLongTermLifeforce() { return longtermlifeforce; }
 	unsigned char getATPDamageCoefficient() { return atpdamagecoefficient; }
 	
-	unsigned int getReceptorCount() { return receptors.size(); }
-	unsigned int getEmitterCount() { return emitters.size(); }
-	unsigned int getReactionCount() { return reactions.size(); }
+	size_t getReceptorCount() { return receptors.size(); }
+	size_t getEmitterCount() { return emitters.size(); }
+	size_t getReactionCount() { return reactions.size(); }
 	
 	void applyInjury(float);
 
