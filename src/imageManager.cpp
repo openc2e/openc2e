@@ -42,7 +42,7 @@ enum filetype { blk, s16, c16, spr, bmp };
 shared_ptr<creaturesImage> tryOpen(std::string fname, filetype ft) {
 	path realfile(world.findFile(fname));
 	std::string basename = realfile.filename().stem();
-	std::ifstream in(realfile.string());
+	std::ifstream in(realfile.string(), std::ios_base::binary);
 
 	if (in.is_open()) {
 		switch (ft) {
