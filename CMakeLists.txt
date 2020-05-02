@@ -286,7 +286,6 @@ target_link_libraries(praybuilder prayfile)
 # tests
 enable_testing()
 include(GoogleTest)
-include(Openc2eBuildBeforeTests)
 include(Openc2eOutputOnTestFailure)
 
 add_executable(test_openc2e
@@ -295,7 +294,11 @@ add_executable(test_openc2e
 	tests/test_pray.cpp
 )
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
-gtest_discover_tests(test_openc2e)
+if(COMMAND gtest_discover_testsp)
+	gtest_discover_tests(test_openc2e)
+else()
+    gtest_add_tests(test_openc2e "" "")
+endif()
 
 # Generated files
 file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/caos/caosVM_*.cpp)
