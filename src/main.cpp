@@ -22,6 +22,7 @@
 #include "version.h"
 #include <iostream>
 #include <memory>
+#include <ShlObj.h>
 #include "Engine.h"
 #include "backends/SDLBackend.h"
 #ifdef SDLMIXER_SUPPORT
@@ -60,6 +61,8 @@ extern "C" int main(int argc, char *argv[]) {
 #endif
 
 		// pass command-line flags to the engine, but do no other setup
+
+
 		if (!engine.parseCommandLine(argc, argv)) return 1;
 		
 		// get the engine to do all the startup (read catalogue, loading world, etc)
