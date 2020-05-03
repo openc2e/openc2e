@@ -22,7 +22,7 @@
 #include "version.h"
 #include <iostream>
 #include <memory>
-#include <ShlObj.h>
+
 #include "Engine.h"
 #include "backends/SDLBackend.h"
 #ifdef SDLMIXER_SUPPORT
@@ -34,6 +34,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <ShlObj.h>
 #endif
 
 // SDL tries stealing main on some platforms, which we don't want.

@@ -24,9 +24,11 @@
 #include <map>
 #include <ghc/filesystem.hpp>
 #include <memory>
-#include <ShlObj.h>
-#include <ShObjIdl.h>
 
+#ifdef _WIN32
+	#include <ShlObj.h>
+	#include <ShObjIdl.h>
+#endif
 
 
 
