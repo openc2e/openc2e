@@ -1,6 +1,7 @@
 build/
 out/
 .vs/
+CmakeSettings.json
 
 # Game data dirs
 ./data
