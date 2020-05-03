@@ -10,7 +10,13 @@
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
+      "variables": [
+        {
+          "name": "Qt5_DIR",
+          "value": "C:/Qt/5.14.2/msvc2017_64/lib/cmake",
+          "type": "PATH"
+        }
+      ]
     }
   ]
 }

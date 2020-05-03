@@ -24,6 +24,11 @@
 #include <map>
 #include <ghc/filesystem.hpp>
 #include <memory>
+#include <ShlObj.h>
+#include <ShObjIdl.h>
+
+
+
 
 class Backend;
 class AudioBackend;
@@ -38,12 +43,15 @@ protected:
 	unsigned int lasttimestamp;
 
 	bool w_down, a_down, s_down, d_down;
-	unsigned char *palette;
+	unsigned char* palette;
 	std::map<std::string, std::string> wordlist_translations;
 
 	bool cmdline_enable_sound;
 	bool cmdline_norun;
 	std::vector<std::string> cmdline_bootstrap;
+
+	
+	 
 
 	std::string gamename;
 
@@ -108,8 +116,11 @@ public:
 
 	ghc::filesystem::path homeDirectory();
 	ghc::filesystem::path storageDirectory();
+
+
+
 };
 
 extern Engine engine;
 #endif
-/* vim: set noet: */
+
