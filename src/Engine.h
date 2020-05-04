@@ -25,11 +25,6 @@
 #include <ghc/filesystem.hpp>
 #include <memory>
 
-#ifdef _WIN32
-	#include <ShlObj.h>
-	#include <ShObjIdl.h>
-#endif
-
 
 
 class Backend;

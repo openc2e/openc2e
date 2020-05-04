@@ -607,61 +607,11 @@ static void opt_version() {
 		"...please don't sue us." << std::endl;
 }
 
-bool Engine::parseCommandLine(int argc, char* argv[])
-{
+bool Engine::parseCommandLine(int argc, char* argv[]) {
 
 	// variables for command-line flags
 	int optret;
 	std::vector<std::string> data_vec;
-
-
-
-#ifdef _WIN32
-
-	char path[MAX_PATH];
-
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-		COINIT_DISABLE_OLE1DDE);
-	IFileOpenDialog* fo;
-
-	hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
-		IID_IFileOpenDialog, reinterpret_cast<void**>(&fo));
-
-	fo->SetOptions(FOS_PICKFOLDERS);
-
-	if (SUCCEEDED(hr))
-	{
-		// Show the Open dialog box.
-		hr = fo->Show(NULL);
-
-		// Get the file name from the dialog box.
-		if (SUCCEEDED(hr))
-		{
-			IShellItem* pItem;
-			hr = fo->GetResult(&pItem);
-			if (SUCCEEDED(hr))
-			{
-				PWSTR pszFilePath;
-				hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-				wcstombs(path, pszFilePath, MAX_PATH);
-				data_vec.push_back(path);
-			}
-		}
-		else
-		{
-			std::cout << "Couldn't show File Open Dialog" << std::endl;
-		}
-		fo->Release();
-
-		CoUninitialize();
-	}
-	else
-	{
-		std::cout << "Couldn't open File Dialog" << std::endl;
-	}
-
-
-#endif
 
 	// generate help for backend options
 	std::string available_backends;
@@ -700,6 +650,53 @@ bool Engine::parseCommandLine(int argc, char* argv[])
 	auto vm = desc.parse(argc, argv);
 	cmdline_enable_sound = !vm.count("silent");
 	cmdline_norun = vm.count("norun");
+
+#ifdef _WIN32
+
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+		COINIT_DISABLE_OLE1DDE);
+
+	if (SUCCEEDED(hr)) {
+		struct coinit_scope {
+			~coinit_scope() { CoUninitialize(); }
+		} coinit_scope_instance;
+
+		IFileOpenDialog* fo;
+		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+			IID_IFileOpenDialog, reinterpret_cast<void**>(&fo));
+
+		if (SUCCEEDED(hr)) {
+			fo->SetOptions(FOS_PICKFOLDERS);
+			// Show the Open dialog box.
+			hr = fo->Show(NULL);
+
+			// Get the file name from the dialog box.
+			if (SUCCEEDED(hr)) {
+				IShellItem* pItem;
+				hr = fo->GetResult(&pItem);
+				if (SUCCEEDED(hr)) {
+					PWSTR pszFilePath;
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+					if (SUCCEEDED(hr)) {
+						std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> wtos;
+						std::string path = wtos.to_bytes(pszFilePath);
+						data_vec.push_back(path);
+						CoTaskMemFree(pszFilePath);
+					}
+					pItem->Release();
+				}
+			}
+			else {
+				std::cout << "Couldn't show File Open Dialog" << std::endl;
+			}
+			fo->Release();
+		}
+		else {
+			std::cout << "Couldn't open File Dialog" << std::endl;
+		}
+	}
+
+#endif
 	
 	if (vm.count("help")) {
 		std::cout << desc.help() << std::endl;
