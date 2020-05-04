@@ -651,52 +651,7 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 	cmdline_enable_sound = !vm.count("silent");
 	cmdline_norun = vm.count("norun");
 
-#ifdef _WIN32
 
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-		COINIT_DISABLE_OLE1DDE);
-
-	if (SUCCEEDED(hr)) {
-		struct coinit_scope {
-			~coinit_scope() { CoUninitialize(); }
-		} coinit_scope_instance;
-
-		IFileOpenDialog* fo;
-		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
-			IID_IFileOpenDialog, reinterpret_cast<void**>(&fo));
-
-		if (SUCCEEDED(hr)) {
-			fo->SetOptions(FOS_PICKFOLDERS);
-			// Show the Open dialog box.
-			hr = fo->Show(NULL);
-
-			// Get the file name from the dialog box.
-			if (SUCCEEDED(hr)) {
-				IShellItem* pItem;
-				hr = fo->GetResult(&pItem);
-				if (SUCCEEDED(hr)) {
-					PWSTR pszFilePath;
-					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-					if (SUCCEEDED(hr)) {
-						std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> wtos;
-						std::string path = wtos.to_bytes(pszFilePath);
-						data_vec.push_back(path);
-						CoTaskMemFree(pszFilePath);
-					}
-					pItem->Release();
-				}
-			}
-			else {
-				std::cout << "Couldn't show File Open Dialog" << std::endl;
-			}
-			fo->Release();
-		}
-		else {
-			std::cout << "Couldn't open File Dialog" << std::endl;
-		}
-	}
-
-#endif
 	
 	if (vm.count("help")) {
 		std::cout << desc.help() << std::endl;
@@ -717,8 +672,58 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 	}
 
 	if (vm.count("data-path") == 0) {
-		std::cout << "Warning: No data path specified, trying default of '" << data_default << "', see --help if you need to specify one." << std::endl;
-		data_vec.push_back(data_default);
+#ifdef _WIN32
+
+		HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+			COINIT_DISABLE_OLE1DDE);
+
+		if (SUCCEEDED(hr)) {
+			struct coinit_scope {
+				~coinit_scope() { CoUninitialize(); }
+			} coinit_scope_instance;
+
+			IFileOpenDialog* fo;
+			hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+				IID_IFileOpenDialog, reinterpret_cast<void**>(&fo));
+
+			if (SUCCEEDED(hr)) {
+				fo->SetOptions(FOS_PICKFOLDERS);
+				// Show the Open dialog box.
+				hr = fo->Show(NULL);
+
+				// Get the file name from the dialog box.
+				if (SUCCEEDED(hr)) {
+					IShellItem* pItem;
+					hr = fo->GetResult(&pItem);
+					if (SUCCEEDED(hr)) {
+						PWSTR pszFilePath;
+						hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+						if (SUCCEEDED(hr)) {
+							std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> wtos;
+							std::string path = wtos.to_bytes(pszFilePath);
+							data_vec.push_back(path);
+							CoTaskMemFree(pszFilePath);
+						}
+						pItem->Release();
+					}
+				}
+				else {
+					std::cout << "Couldn't show File Open Dialog" << std::endl;
+				}
+				fo->Release();
+			}
+			else {
+				std::cout << "Couldn't open File Dialog" << std::endl;
+			}
+		}
+
+		
+#endif
+		if (data_vec.empty()) {
+			std::cout << "Warning: No data path specified, trying default of '" << data_default << "', see --help if you need to specify one." << std::endl;
+			data_vec.push_back(data_default);
+		}
+		
 	}
 
 	// add all the data directories to the list
