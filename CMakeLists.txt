@@ -280,6 +280,9 @@ if (OPENC2E_USE_QT)
 	endif()
 endif()
 
+add_executable(mngdumper src/tools/mngdumper.cpp)
+target_link_libraries(mngdumper fmt ghc_filesystem mngfile)
+
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper prayfile)
 
@@ -403,6 +406,7 @@ list(APPEND dist_args
 		"${BIN}/caosdocs.html"
 		"${BIN}/docs.css"
 		"$<TARGET_FILE:openc2e>"
+		"$<TARGET_FILE:mngdumper>"
 		"$<TARGET_FILE:praybuilder>"
 		"$<TARGET_FILE:praydumper>"
 		"${dist_dir}/"
