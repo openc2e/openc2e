@@ -1,5 +1,5 @@
 %{
-	#include "music/mngfile.h"
+	#include "mngfile/mngfile.h"
 	#include <list>
 
 	int mnglex(void) { return MNGFile::mnglex(); }

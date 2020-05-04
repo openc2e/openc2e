@@ -94,6 +94,14 @@ add_library(openc2e-common STATIC
 )
 target_link_libraries(openc2e-common PRIVATE utf8proc)
 
+add_library(mngfile
+	src/mngfile/mngfile.cpp
+	src/mmapifstream.cpp
+	${GEN}/mngfile/mnglexer.cpp
+	${GEN}/mngfile/mngparser.tab.cpp
+)
+target_link_libraries(mngfile PRIVATE fmt)
+
 add_library(prayfile
 	src/prayfile/PrayFileReader.cpp
 	src/prayfile/PrayFileWriter.cpp
@@ -166,14 +174,10 @@ add_library(openc2e-core STATIC
 	src/creatures/genomeFile.cpp
 	src/historyManager.cpp
 	src/imageManager.cpp
-	${GEN}/mnglexer.cpp
 	${GEN}/caoslexer.cpp
 	src/Lift.cpp
 	src/Map.cpp
 	src/MetaRoom.cpp
-	src/mmapifstream.cpp
-	src/music/mngfile.cpp
-	${GEN}/mngparser.tab.cpp
 	src/MusicManager.cpp
 	src/creatures/oldBrain.cpp
 	src/partzorder.cpp
@@ -203,6 +207,7 @@ target_link_libraries(openc2e-core PUBLIC
 	ghc_filesystem
 	mpark_variant
 	openc2e-common
+	mngfile
 	prayfile
 )
 if(APPLE)
@@ -346,10 +351,10 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/mnglexer.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/mnglexer.cpp ${SRC}/src/music/mnglexer.re2c
-	DEPENDS ${SRC}/src/music/mnglexer.re2c
+	OUTPUT ${GEN}/mngfile/mnglexer.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/mngfile"
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/mngfile/mnglexer.cpp ${SRC}/src/mngfile/mnglexer.re2c
+	DEPENDS ${SRC}/src/mngfile/mnglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
@@ -367,10 +372,10 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
+	OUTPUT ${GEN}/mngfile/mngparser.tab.cpp ${GEN}/mngfile/mngparser.tab.hpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND ${BISON_EXECUTABLE} -d --name-prefix=mng --file-prefix="${GEN}/mngparser" src/music/mngparser.ypp
-	DEPENDS src/music/mngparser.ypp
+	COMMAND ${BISON_EXECUTABLE} -d --name-prefix=mng --file-prefix="${GEN}/mngfile/mngparser" src/mngfile/mngparser.ypp
+	DEPENDS src/mngfile/mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)

@@ -4,8 +4,8 @@
 #include <string>
 #include <list>
 
-#include "mngparser.tab.hpp"
-#include "music/mngfile.h"
+#include "mngfile/mngparser.tab.hpp"
+#include "mngfile/mngfile.h"
 #include <cassert>
 
 #include <iostream> // TODO

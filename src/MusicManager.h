@@ -20,7 +20,7 @@
 #ifndef _MUSICMANAGER_H
 #define _MUSICMANAGER_H
 
-#include "music/mngfile.h"
+#include "mngfile/mngfile.h"
 #include <memory>
 using std::shared_ptr;
 

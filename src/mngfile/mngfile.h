@@ -410,8 +410,6 @@ class MNGFile {
 		class mmapifstream *stream;
 		std::string name;
 		int numsamples, scriptoffset, scriptlength, scriptend;
-		char * script;
-		std::map<std::string, unsigned int> samplemappings;
 		unsigned int sampleno;
 
 		static int yylineno;
@@ -430,6 +428,8 @@ class MNGFile {
 		void add(class MNGTrackDecNode *n);
 		void add(class MNGVariableDecNode *n);
 		unsigned int getSampleForName(std::string name);
+		char * script;
+		std::map<std::string, unsigned int> samplemappings;
 		std::vector< std::pair< char *, int > > samples;
 		std::map<std::string, class MNGEffectDecNode *> effects;
 		std::map<std::string, class MNGTrackDecNode *> tracks;
