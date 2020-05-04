@@ -40,7 +40,7 @@ blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	std::vector<uint32_t> offsets(m_numframes);
 
 	for (unsigned int i = 0; i < m_numframes; i++) {
-		offsets[i] = read32le(in);
+		offsets[i] = read32le(in) + 4;
 		widths[i] = read16le(in); assert(widths[i] == 128);
 		heights[i] = read16le(in); assert(heights[i] == 128);
 	}
