@@ -38,6 +38,15 @@ uint8_t *creaturesImage::getCustomPalette() {
 }
 	
 bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
+	if (imgformat == if_16bit_565 || imgformat == if_16bit_555) {
+		size_t offset = (y * widths[frame]) + x;
+		uint16_t *buffer = (uint16_t *)buffers[frame].data();
+		return buffer[offset] == 0;
+	} else if (imgformat == if_paletted && !hasCustomPalette()) {
+		size_t offset = (y * widths[frame]) + x;
+		uint8_t *buffer = (uint8_t *)buffers[frame].data();
+		return buffer[offset] == 0;
+	}
 	return false;
 }
 

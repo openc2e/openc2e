@@ -73,18 +73,6 @@ c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 	}
 }
 
-bool s16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
-	unsigned int offset = (y * widths[frame]) + x;
-	unsigned short *buffer = (unsigned short *)buffers[frame].data();
-	return (buffer[offset] == 0);
-}
-
-bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
-	unsigned int offset = (y * widths[frame]) + x;
-	unsigned short *buffer = (unsigned short *)buffers[frame].data();
-	return (buffer[offset] == 0);
-}
-
 s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);

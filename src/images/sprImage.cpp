@@ -61,10 +61,4 @@ sprImage::sprImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 
 sprImage::~sprImage() {}
 
-bool sprImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) {
-	unsigned int offset = (y * widths[frame]) + x;
-	unsigned char *buffer = (unsigned char *)buffers[frame].data();
-	return (buffer[offset] == 0);
-}
-
 /* vim: set noet: */
