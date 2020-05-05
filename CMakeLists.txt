@@ -101,6 +101,10 @@ add_library(openc2e-common STATIC
 )
 target_link_libraries(openc2e-common PRIVATE utf8proc)
 
+add_library(cobfile
+	src/cobfile/c1cobfile.cpp
+)
+
 add_library(mngfile
 	src/mngfile/mngfile.cpp
 	src/mmapifstream.cpp
@@ -214,6 +218,7 @@ target_link_libraries(openc2e-core PUBLIC
 	ghc_filesystem
 	mpark_variant
 	openc2e-common
+	cobfile
 	mngfile
 	prayfile
 )
@@ -247,7 +252,6 @@ if (OPENC2E_USE_QT)
 		src/backends/qtgui/AgentInjector.cpp
 		src/backends/qtgui/BrainViewer.cpp
 		src/backends/qtgui/imagepreview.cpp
-		src/backends/qtgui/c1cobfile.cpp
 		src/backends/qtgui/QtBackend.cpp
 		src/backends/qtgui/GraphWidget.cpp
 		src/backends/qtgui/CreatureGrapher.cpp

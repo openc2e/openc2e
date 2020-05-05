@@ -19,7 +19,7 @@
 #include "prayManager.h"
 
 #include "AgentInjector.h"
-#include "c1cobfile.h"
+#include "cobfile/c1cobfile.h"
 #include "cobFile.h"
 
 #include <cassert>
@@ -103,7 +103,7 @@ void AgentInjector::readAgents() {
 			if (engine.version == 1) {
 				std::ifstream cobstream(cob.c_str(), std::ios::binary);
 				if (!cobstream.fail()) {
-					c1cobfile cobfile(cobstream);
+					c1cobfile cobfile = read_c1cobfile(cobstream);
 					QListWidgetItem *newItem = new QListWidgetItem(cobfile.name.c_str(), ui.agentList);
 					newItem->setToolTip(cob.c_str());
 				}
@@ -137,12 +137,12 @@ void AgentInjector::onInject() {
 			return; // TODO: throw some kind of warning or something
 		}
 
-		c1cobfile cobfile(cobstream);
-		for (unsigned int i = 0; i < cobfile.scripts.size(); i++) {
-			idata += cobfile.scripts[i] + "\n";
+		c1cobfile cobfile = read_c1cobfile(cobstream);
+		for (unsigned int i = 0; i < cobfile.object_scripts.size(); i++) {
+			idata += cobfile.object_scripts[i] + "\n";
 		}
-		for (unsigned int i = 0; i < cobfile.imports.size(); i++) {
-			idata += "iscr," + cobfile.imports[i] + "\n";
+		for (unsigned int i = 0; i < cobfile.install_scripts.size(); i++) {
+			idata += "iscr," + cobfile.install_scripts[i] + "\n";
 		}
 	} else if (engine.version == 2) {
 		cobAgentBlock *b = (cobAgentBlock *)ui.agentList->currentItem()->data(Qt::UserRole).value<void *>();

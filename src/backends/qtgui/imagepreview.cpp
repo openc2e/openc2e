@@ -15,7 +15,7 @@
 */
 
 #include "imagepreview.h"
-#include "c1cobfile.h"
+#include "cobfile/c1cobfile.h"
 #include "endianlove.h"
 #include "Engine.h"
 #include "cobFile.h"
@@ -46,10 +46,10 @@ void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 			return; // TODO: throw some kind of warning or something
 		}
 
-		c1cobfile cobfile(cobstream);
+		c1cobfile cobfile = read_c1cobfile(cobstream);
 
-		if (cobfile.imagewidth > 0 && cobfile.imageheight > 0) {
-			previewimg = QImage((uchar*)cobfile.imagedata.data(), cobfile.imagewidth, cobfile.imageheight, QImage::Format_Indexed8).mirrored();
+		if (cobfile.picture_width > 0 && cobfile.picture_height > 0) {
+			previewimg = QImage((uchar*)cobfile.picture_data.data(), cobfile.picture_width, cobfile.picture_height, QImage::Format_Indexed8).mirrored();
 			previewimg.setColorCount(256);
 			unsigned char *palette = engine.getPalette();
 			if (palette) {
