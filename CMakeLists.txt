@@ -291,6 +291,9 @@ if (OPENC2E_USE_QT)
 	endif()
 endif()
 
+add_executable(cobdumper src/tools/cobdumper.cpp)
+target_link_libraries(cobdumper cobfile fmt ghc_filesystem)
+
 add_executable(mngdumper src/tools/mngdumper.cpp)
 target_link_libraries(mngdumper fmt ghc_filesystem mngfile)
 
