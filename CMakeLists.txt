@@ -42,6 +42,8 @@ else()
 endif()
 
 if(WIN32 OR APPLE)
+	add_subdirectory(externals/libpng EXCLUDE_FROM_ALL)
+
 	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_net EXCLUDE_FROM_ALL)
@@ -51,6 +53,8 @@ if(WIN32 OR APPLE)
 	add_library(SDL2::Net ALIAS SDL2_net)
 	add_library(SDL2::GFX ALIAS SDL2_gfx)
 else()
+	find_package(PNG REQUIRED)
+
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
 	find_package(SDL2_net REQUIRED)
