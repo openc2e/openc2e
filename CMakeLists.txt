@@ -296,6 +296,15 @@ target_link_libraries(praydumper prayfile)
 add_executable(praybuilder src/tools/praybuilder.cpp ${GEN}/caoslexer.cpp)
 target_link_libraries(praybuilder prayfile)
 
+add_executable(spritedumper
+	src/tools/spritedumper.cpp
+	src/images/blkImage.cpp
+	src/images/c16Image.cpp
+	src/images/sprImage.cpp
+	src/creaturesImage.cpp
+)
+target_link_libraries(spritedumper fmt ghc_filesystem PNG::PNG)
+
 # tests
 enable_testing()
 include(GoogleTest)
@@ -416,6 +425,7 @@ list(APPEND dist_args
 		"$<TARGET_FILE:mngdumper>"
 		"$<TARGET_FILE:praybuilder>"
 		"$<TARGET_FILE:praydumper>"
+		"$<TARGET_FILE:spritedumper>"
 		"${dist_dir}/"
 	DEPENDS "${BIN}/caosdocs.html" "${BIN}/docs.css"
 	COMMAND ${CMAKE_COMMAND}
