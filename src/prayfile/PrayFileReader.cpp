@@ -22,7 +22,7 @@
 #include "exceptions.h"
 #include "endianlove.h"
 #include "spanstream.h"
-#include <miniz.h>
+#include <zlib.h>
 
 PrayFileReader::PrayFileReader(std::istream& stream_) : stream(stream_) {
 	char majic[4];

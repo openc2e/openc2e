@@ -33,8 +33,12 @@ endif()
 if(WIN32)
 	add_subdirectory(externals/winflexbison EXCLUDE_FROM_ALL)
 	set(BISON_EXECUTABLE "win_bison")
+
+	add_subdirectory(externals/zlib EXCLUDE_FROM_ALL)
 else()
 	find_package(BISON REQUIRED)
+
+	find_package(ZLIB REQUIRED)
 endif()
 
 if(WIN32 OR APPLE)
@@ -69,7 +73,6 @@ add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
-add_subdirectory(externals/miniz EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 add_subdirectory(externals/utf8proc EXCLUDE_FROM_ALL)
 
@@ -110,7 +113,7 @@ add_library(prayfile
 )
 target_link_libraries(prayfile
 	PUBLIC fmt ghc_filesystem mpark_variant openc2e-common
-	PRIVATE miniz
+	PRIVATE ZLIB::ZLIB
 )
 
 add_library(openc2e-core STATIC

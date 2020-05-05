@@ -5,7 +5,7 @@
 #include <cassert>
 #include <sstream>
 #include <vector>
-#include <miniz.h>
+#include <zlib.h>
 
 PrayFileWriter::PrayFileWriter(std::ostream &stream_) : stream(stream_) {
   stream.write("PRAY", 4);
