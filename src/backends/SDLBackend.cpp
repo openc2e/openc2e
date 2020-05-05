@@ -387,9 +387,9 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 		else
 			surfpalette = palette;
 		SDL_SetPaletteColors(surf->format->palette, surfpalette, 0, 256);
-	} else if (image->format() == if_16bit) {
+	} else if (image->format() == if_16bit_565 || image->format() == if_16bit_555) {
 		unsigned int rmask, gmask, bmask;
-		if (image->is565()) {
+		if (image->format() == if_16bit_565) {
 			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
 		} else {
 			rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;

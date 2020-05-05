@@ -12,7 +12,7 @@ public:
     static std::shared_ptr<creaturesImage> addBlnkSprite() {
         shared_ptr<creaturesImage> img(new creaturesImage);
         img->name = "blnk";
-        img->imgformat = if_16bit;
+        img->imgformat = if_16bit_565;
         img->m_numframes = 2;
         img->widths = {41, 41};
         img->heights = {18, 18};

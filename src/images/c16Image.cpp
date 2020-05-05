@@ -24,11 +24,10 @@
 #include <memory>
 
 c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
-	imgformat = if_16bit;
-
 	uint32_t flags = read32le(in);
-	is_565 = (flags & 0x01);
+	bool is_565 = (flags & 0x01);
 	assert(flags & 0x02);
+	imgformat = is_565 ? if_16bit_565 : if_16bit_555;
 	m_numframes = read16le(in);
 
 	widths.resize(m_numframes);
@@ -87,10 +86,9 @@ bool c16Image::transparentAt(unsigned int frame, unsigned int x, unsigned int y)
 }
 
 s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
-	imgformat = if_16bit;
-
 	uint32_t flags = read32le(in);
-	is_565 = (flags & 0x01);
+	bool is_565 = (flags & 0x01);
+	imgformat = is_565 ? if_16bit_565 : if_16bit_555;
 	m_numframes = read16le(in);
 
 	widths.resize(m_numframes);

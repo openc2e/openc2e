@@ -56,12 +56,12 @@
  * alpha transparency to the rest of the image.
  */
 QImage imageFromSpriteFrame(shared_ptr<creaturesImage> img, unsigned int frame, bool makealpha = false) {
-	assert(img->format() == if_16bit);
+	assert(img->format() == if_16bit_565 || img->format() == if_16bit_555);
 
 	// img->data is not 32-bit-aligned so we have to make a copy here.
 	QImage ourimg = QImage(img->width(frame), img->height(frame),
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
-			img->is565() ? QImage::Format_RGB16 : QImage::Format_RGB555
+			img->format() == if_16bit_565 ? QImage::Format_RGB16 : QImage::Format_RGB555
 #else
 			// versions of Qt before 4.4 don't support 16-bit images
 			QImage::Format_ARGB32

@@ -26,7 +26,7 @@
 #include <cassert>
 #include <vector>
 
-enum imageformat { if_paletted, if_16bit, if_24bit };
+enum imageformat { if_paletted, if_16bit_555, if_16bit_565, if_24bit };
 
 unsigned int bitDepthOf(imageformat f);
 
@@ -37,7 +37,6 @@ protected:
 	unsigned int m_numframes;
 	std::vector<uint16_t> widths, heights;
 	std::vector<std::vector<unsigned char>> buffers;
-	bool is_565;
 	imageformat imgformat;
 	
 	std::string name;
@@ -45,7 +44,6 @@ protected:
 public:
 	creaturesImage(std::string n = std::string()) { name = n; }
 	virtual ~creaturesImage() { }
-	bool is565() { return is_565; }
 	imageformat format() { return imgformat; }
 	unsigned int numframes() { return m_numframes; }
 	unsigned int width(unsigned int frame) { return widths[frame]; }

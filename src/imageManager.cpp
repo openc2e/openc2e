@@ -122,7 +122,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creaturesImage>& oldimage,
                                                    unsigned char r, unsigned char g, unsigned char b,
                                                    unsigned char rotation, unsigned char swap) {
-	if (oldimage->format() != if_16bit) {
+	if (!(oldimage->format() == if_16bit_565 || oldimage->format() == if_16bit_555)) {
 		throw creaturesException(fmt::format(
 			"Internal error: Tried to tint a sprite \"{}\" which doesn't support that.",
 			oldimage->getName()
@@ -133,8 +133,7 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 
 	std::shared_ptr<creaturesImage> img(new creaturesImage(oldimage->getName()));
 
-	img->imgformat = if_16bit;
-	img->is_565 = oldimage->is_565;
+	img->imgformat = oldimage->imgformat;
 	img->m_numframes = oldimage->m_numframes;
 	img->widths = oldimage->widths;
 	img->heights = oldimage->heights;
@@ -195,6 +194,7 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 				 * tempGreen = GreenValue + greenTint;
 				 * tempBlue = BlueValue + blueTint;
 				 */
+				// TODO: should this work differently for 565 vs 555 color?
 				int red = (((uint32_t)(v) & 0xf800) >> 8) + redTint;
 				if (red < 0) red = 0; else if (red > 255) red = 255;
 				int green = (((uint32_t)(v) & 0x07e0) >> 3) + greenTint;

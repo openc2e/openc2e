@@ -24,10 +24,10 @@
 #include <iostream>
 
 blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
-	imgformat = if_16bit;
-
 	uint32_t flags = read32le(in);
-	is_565 = (flags & 0x01);
+	bool is_565 = (flags & 0x01);
+	imgformat = is_565 ? if_16bit_565 : if_16bit_555;
+
 	uint16_t width = read16le(in);
 	uint16_t height = read16le(in);
 	totalwidth = width * 128; totalheight = height * 128;
