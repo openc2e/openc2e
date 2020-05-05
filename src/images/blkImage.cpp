@@ -31,26 +31,38 @@ blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 	uint16_t width = read16le(in);
 	uint16_t height = read16le(in);
 	totalwidth = width * 128; totalheight = height * 128;
-	m_numframes = read16le(in);
 	
-	assert(m_numframes == (unsigned int) (width * height));	
+	uint16_t numsprites = read16le(in);
+	assert(numsprites == (unsigned int) (width * height));
 
-	widths.resize(m_numframes);
-	heights.resize(m_numframes);
-	std::vector<uint32_t> offsets(m_numframes);
-
-	for (unsigned int i = 0; i < m_numframes; i++) {
+	std::vector<uint32_t> offsets(numsprites);
+	for (unsigned int i = 0; i < numsprites; i++) {
 		offsets[i] = read32le(in) + 4;
-		widths[i] = read16le(in); assert(widths[i] == 128);
-		heights[i] = read16le(in); assert(heights[i] == 128);
+		uint16_t framewidth = read16le(in); assert(framewidth == 128);
+		uint16_t frameheight = read16le(in); assert(frameheight == 128);
 	}
+
+	m_numframes = 1;
+	widths = { totalwidth };
+	heights = { totalheight };
 	
-	buffers.resize(m_numframes);
-	
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i].resize(2 * widths[i] * heights[i]);
-		in.seekg(offsets[i]);
-		readmany16le(in, (uint16_t*)buffers[i].data(), widths[i] * heights[i]);
+	buffers.resize(1);
+	buffers[0].resize(totalwidth * totalheight * 2);
+	const size_t sprheight = 128, sprwidth = 128;
+	const size_t heightinsprites = totalheight / sprheight;
+	const size_t widthinsprites = totalwidth / sprwidth;
+	const size_t stride = totalwidth * 2;
+
+	for (size_t i = 0; i < heightinsprites; i++) {
+		for (size_t j = 0; j < widthinsprites; j++) {
+			const unsigned int whereweare = j * heightinsprites + i;
+			const int destx = (j * sprwidth);
+			const int desty = (i * sprheight);
+			in.seekg(offsets[whereweare]);
+			for (int blocky = 0; blocky < 128; blocky++) {
+				readmany16le(in, (uint16_t*)&(buffers[0][(i * 128 + blocky) * totalwidth * 2 + j * 128 * 2]), 128);
+			}
+		}
 	}
 }
 

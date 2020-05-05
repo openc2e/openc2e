@@ -24,7 +24,7 @@
 
 class blkImage : public creaturesImage {
 public:
-	unsigned int totalwidth, totalheight;
+	uint16_t totalwidth, totalheight;
 
 	blkImage(std::ifstream &in, std::string n);
 	~blkImage();
