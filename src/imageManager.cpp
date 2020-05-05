@@ -131,13 +131,7 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 
 	if (128 == r && 128 == g && 128  == b && 128  == rotation && 128 == swap) return oldimage; // duh
 
-	std::shared_ptr<creaturesImage> img(new creaturesImage(oldimage->getName()));
-
-	img->imgformat = oldimage->imgformat;
-	img->m_numframes = oldimage->m_numframes;
-	img->widths = oldimage->widths;
-	img->heights = oldimage->heights;
-	img->buffers = oldimage->buffers;
+	auto buffers = oldimage->buffers;
 
 	/*
 	 * CDN:
@@ -182,10 +176,10 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 	int greenTint = (int)g - 128;
 	int blueTint = (int)b - 128;
 
-	for (unsigned int i = 0; i < img->m_numframes; i++) {
-		for (unsigned int j = 0; j < img->heights[i]; j++) {
-			for (unsigned int k = 0; k < img->widths[i]; k++) {
-				unsigned short v = ((unsigned short *)img->buffers[i].data())[(j * img->widths[i]) + k];
+	for (unsigned int i = 0; i < oldimage->m_numframes; i++) {
+		for (unsigned int j = 0; j < oldimage->heights[i]; j++) {
+			for (unsigned int k = 0; k < oldimage->widths[i]; k++) {
+				unsigned short v = ((unsigned short *)buffers[i].data())[(j * oldimage->widths[i]) + k];
 				if (v == 0) continue;
 
 				/*
@@ -239,11 +233,18 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 				 */
 				if (v == 0)
 					v = (1 << 11 | 1 << 5 | 1);
-				((unsigned short *)img->buffers[i].data())[(j * img->widths[i]) + k] = v;
+				((unsigned short *)buffers[i].data())[(j * oldimage->widths[i]) + k] = v;
 			}
 		}
 	}
 
+	std::shared_ptr<creaturesImage> img(new creaturesImage(
+		oldimage->getName(),
+		oldimage->imgformat,
+		buffers,
+		oldimage->widths,
+		oldimage->heights
+	));
 	return img;
 }
 

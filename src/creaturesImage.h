@@ -32,17 +32,19 @@ unsigned int bitDepthOf(imageformat f);
 
 class creaturesImage {
 protected:
-	friend class Openc2eTestHelper;
 	friend class imageManager;
 	unsigned int m_numframes;
 	std::vector<uint16_t> widths, heights;
 	std::vector<std::vector<unsigned char>> buffers;
 	imageformat imgformat;
-	
 	std::string name;
 
-public:
 	creaturesImage(std::string n = std::string()) { name = n; }
+
+public:
+	creaturesImage(std::string name, imageformat format,
+	               std::vector<std::vector<unsigned char>> buffers,
+				   std::vector<uint16_t> widths, std::vector<uint16_t> heights);
 	virtual ~creaturesImage() { }
 	imageformat format() { return imgformat; }
 	unsigned int numframes() { return m_numframes; }

@@ -10,16 +10,19 @@
 class Openc2eTestHelper {
 public:
     static std::shared_ptr<creaturesImage> addBlnkSprite() {
-        shared_ptr<creaturesImage> img(new creaturesImage);
-        img->name = "blnk";
-        img->imgformat = if_16bit_565;
-        img->m_numframes = 2;
-        img->widths = {41, 41};
-        img->heights = {18, 18};
+        std::vector<std::vector<unsigned char>> buffers;
         std::vector<unsigned char> pureblack;
         pureblack.resize(2 * 41 * 18, 0);
-        img->buffers.push_back(pureblack);
-        img->buffers.push_back(pureblack);
+        buffers.push_back(pureblack);
+        buffers.push_back(pureblack);
+
+        shared_ptr<creaturesImage> img(new creaturesImage(
+            "blnk",
+            if_16bit_565,
+            buffers,
+            { 41, 41 },
+            { 18, 18 }
+        ));
 
         world.gallery->addImage(img);
         return img;

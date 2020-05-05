@@ -21,6 +21,18 @@
 #include "exceptions.h"
 #include <memory>
 
+creaturesImage::creaturesImage(std::string name_, imageformat imgformat_,
+                               std::vector<std::vector<unsigned char>> buffers_,
+                               std::vector<uint16_t> widths_,
+                               std::vector<uint16_t> heights_)
+: m_numframes(buffers_.size()), widths(widths_), heights(heights_),
+  buffers(buffers_), imgformat(imgformat_), name(name_)
+{
+	if (buffers.size() != widths.size() || buffers.size() != heights.size()) {
+		throw creaturesException("Internal error: Tried to construct a creaturesImage but number of frames doesn't match");
+	}
+}
+
 uint8_t *creaturesImage::getCustomPalette() {
 	throw creaturesException("Internal error: Tried to get a custom palette of a sprite which doesn't support that.");
 }
