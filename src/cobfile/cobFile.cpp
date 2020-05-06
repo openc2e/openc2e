@@ -141,7 +141,7 @@ cobAgentBlock::cobAgentBlock(cobBlock *p) {
 	reuseinterval = read32le(file);
 	usebyday = read8(file);
 	usebymonth = read8(file);
-	usebyyear = read32le(file);
+	usebyyear = read16le(file);
 
 	file.seekg(12, std::ios::cur); // unused
 
