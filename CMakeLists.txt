@@ -295,6 +295,9 @@ endif()
 add_executable(cobdumper src/tools/cobdumper.cpp)
 target_link_libraries(cobdumper cobfile fmt ghc_filesystem)
 
+add_executable(creaturesarchivedumper src/tools/creaturesarchivedumper.cpp)
+target_link_libraries(creaturesarchivedumper fmt ghc_filesystem z)
+
 add_executable(mngdumper src/tools/mngdumper.cpp)
 target_link_libraries(mngdumper fmt ghc_filesystem mngfile)
 
