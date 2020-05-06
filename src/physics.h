@@ -31,9 +31,9 @@
 #define Line MyLine
 
 struct Point {
-	double x, y;
+	float x, y;
 	Point() { x = y = 0; }
-	Point(double _x, double _y) : x(_x), y(_y) {}
+	Point(float _x, float _y) : x(_x), y(_y) {}
 	Point(const Point &p) : x(p.x), y(p.y) { }
 
 	bool operator==(const Point &p) { return x == p.x && y == p.y; }
