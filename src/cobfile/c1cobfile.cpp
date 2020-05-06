@@ -1,6 +1,8 @@
 #include "cobfile/c1cobfile.h"
 #include "endianlove.h"
 
+#include <cassert>
+
 static std::string read_string(std::istream &in) {
     uint16_t length = read8(in);
     if (length == 255) {
