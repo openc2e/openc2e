@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     std::unique_ptr<creaturesImage> image;
     if (imatch(input_path.extension(), "\\.spr$")) {
         image.reset(new sprImage(in, stem));
-    } else if (imatch(input_path.extension(), "\\.s16$")) {
+    } else if (imatch(input_path.extension(), "\\.(s16|photo)$")) {
         image.reset(new s16Image(in, stem));
     } else if (imatch(input_path.extension(), "\\.c16$")) {
         image.reset(new c16Image(in, stem));
