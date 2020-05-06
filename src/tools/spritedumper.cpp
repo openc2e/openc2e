@@ -12,7 +12,7 @@
 
 namespace fs = ghc::filesystem;
 
-static const uint8_t DEFAULT_PALETTE[] = {
+static const uint8_t CREATURES_PALETTE[] = {
     0x00,0x00,0x00, 0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F,
     0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F, 0x3F,0x3F,0x3F, 0x04,0x02,0x02,
     0x05,0x06,0x0A, 0x06,0x0A,0x04, 0x06,0x09,0x0C, 0x0B,0x04,0x02, 0x0A,0x06,0x09, 0x0D,0x0A,0x04,
@@ -190,12 +190,14 @@ int main(int argc, char **argv) {
           8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
           PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT
         );
-        
-        if (image->format() == if_16bit_565) {
-            png_color_8 sbit = { .red = 5, .green = 6, .blue = 5, .gray = 0, .alpha = 0 };
-            png_set_sBIT(png, info, &sbit);
-        } else if (image->format() == if_16bit_555) {
-            png_color_8 sbit = { .red = 5, .green = 5, .blue = 5, .gray = 0, .alpha = 0 };
+
+        if (image->format() == if_16bit_565 || image->format() == if_16bit_555) {
+            png_color_8 sbit;
+            sbit.red = 5;
+            sbit.green = image->format() == if_16bit_565 ? 6 : 5;
+            sbit.blue = 5;
+            sbit.gray = 0;
+            sbit.alpha = 0;
             png_set_sBIT(png, info, &sbit);
         }
         
@@ -233,9 +235,9 @@ int main(int argc, char **argv) {
                 }
             
                 uint8_t pixel = *(((uint8_t*)image->data(i)) + j);
-                uint8_t r = DEFAULT_PALETTE[pixel * 3] * 255 / 63;
-                uint8_t g = DEFAULT_PALETTE[pixel * 3 + 1] * 255 / 63;
-                uint8_t b = DEFAULT_PALETTE[pixel * 3 + 2] * 255 / 63;
+                uint8_t r = CREATURES_PALETTE[pixel * 3] * 255 / 63;
+                uint8_t g = CREATURES_PALETTE[pixel * 3 + 1] * 255 / 63;
+                uint8_t b = CREATURES_PALETTE[pixel * 3 + 2] * 255 / 63;
                 rgb_buffer[j * 3] = r;
                 rgb_buffer[j * 3 + 1] = g;
                 rgb_buffer[j * 3 + 2] = b;
