@@ -17,7 +17,7 @@
  *
  */
 
-#include "cobFile.h"
+#include "cobfile/cobFile.h"
 #include "exceptions.h"
 #include "endianlove.h"
 #include <cassert>

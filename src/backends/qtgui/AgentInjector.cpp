@@ -20,7 +20,7 @@
 
 #include "AgentInjector.h"
 #include "cobfile/c1cobfile.h"
-#include "cobFile.h"
+#include "cobfile/cobFile.h"
 
 #include <cassert>
 #include <ghc/filesystem.hpp>

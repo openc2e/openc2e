@@ -1,4 +1,5 @@
 #include "cobfile/c1cobfile.h"
+#include "cobfile/cobFile.h"
 
 #include <fmt/format.h>
 #include <fstream>

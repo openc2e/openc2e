@@ -16,9 +16,9 @@
 
 #include "imagepreview.h"
 #include "cobfile/c1cobfile.h"
+#include "cobfile/cobFile.h"
 #include "endianlove.h"
 #include "Engine.h"
-#include "cobFile.h"
 
 #include <QPainter>
 #include <cassert>

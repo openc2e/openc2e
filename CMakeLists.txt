@@ -103,7 +103,9 @@ target_link_libraries(openc2e-common PRIVATE utf8proc)
 
 add_library(cobfile
 	src/cobfile/c1cobfile.cpp
+	src/cobfile/cobFile.cpp
 )
+target_link_libraries(cobfile PRIVATE ghc_filesystem)
 
 add_library(mngfile
 	src/mngfile/mngfile.cpp
@@ -171,7 +173,6 @@ add_library(openc2e-core STATIC
 	src/catalogparser.cpp
 	src/Catalogue.cpp
 	${GEN}/cmddata.cpp
-	src/cobFile.cpp
 	src/CompoundAgent.cpp
 	src/creatures/CompoundCreature.cpp
 	src/CompoundPart.cpp
