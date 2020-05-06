@@ -116,5 +116,24 @@ public:
 	unsigned char *getFileContents();
 };
 
+class cobAuthBlock {
+protected:
+	cobBlock *parent;
+
+public:
+	cobAuthBlock(cobBlock *p);
+	~cobAuthBlock();
+
+	uint8_t daycreated;
+	uint8_t monthcreated;
+	uint16_t yearcreated;
+	uint8_t version;
+	uint8_t revision;
+	std::string authorname;
+	std::string authoremail;
+	std::string authorurl;
+	std::string authorcomments;
+};
+
 #endif
 /* vim: set noet: */

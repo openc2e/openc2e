@@ -204,4 +204,26 @@ unsigned char *cobFileBlock::getFileContents() {
 	return parent->getBuffer() + 10 + filename.size() + 1;
 }
 
+cobAuthBlock::cobAuthBlock(cobBlock *p) {
+	parent = p;
+	std::istream &file = p->getParent()->getStream();
+
+	file.clear();
+	file.seekg(p->getOffset());
+	if (!file.good())
+		throw creaturesException("Failed to seek to block offset.");
+
+	daycreated = read8(file);
+	monthcreated = read8(file);
+	yearcreated = read16le(file);
+	version = read8(file);
+	revision = read8(file);
+	authorname = readstring(file);
+	authoremail = readstring(file);
+	authorurl = readstring(file);
+	authorcomments = readstring(file);
+}
+
+cobAuthBlock::~cobAuthBlock() {}
+
 /* vim: set noet: */
