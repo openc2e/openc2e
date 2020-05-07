@@ -30,7 +30,8 @@ blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
 
 	uint16_t width = read16le(in);
 	uint16_t height = read16le(in);
-	totalwidth = width * 128; totalheight = height * 128;
+	uint16_t totalwidth = width * 128;
+	uint16_t totalheight = height * 128;
 	
 	uint16_t numsprites = read16le(in);
 	assert(numsprites == (unsigned int) (width * height));
