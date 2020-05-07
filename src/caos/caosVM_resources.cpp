@@ -89,12 +89,14 @@ int prayInstallDeps(std::string name, bool actually_install) {
 	PrayBlock *p = i->second.get();
 	p->parseTags();
 
-	std::map<std::string, uint32_t>::iterator j = p->integerValues.find("Agent Type");
-	if (j == p->integerValues.end()) {
-		return -1;
+	std::map<std::string, uint32_t>::iterator j;
+	j = p->integerValues.find("Agent Type");
+	// previously errored when this didn't exist, but some community-created
+	// agent files don't have it
+	if (j != p->integerValues.end()) {
+		// I have no idea what this is, so let's just error out when it's not zero, pending fix. - fuzzie
+		caos_assert(j->second == 0);
 	}
-	// I have no idea what this is, so let's just error out when it's not zero, pending fix. - fuzzie
-	caos_assert(j->second == 0);
 
 	j = p->integerValues.find("Dependency Count");
 	if (j == p->integerValues.end()) {
