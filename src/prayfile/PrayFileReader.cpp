@@ -141,19 +141,22 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 	for (unsigned int i = 0; i < nointvalues; i++) {
 		std::string n = ensure_utf8(tagStringRead(s));
 		unsigned int v = read32le(s);
-
-		if (integerValues.find(n) != integerValues.end())
+		if (integerValues.find(n) == integerValues.end()) {
+			integerValues[n] = v;
+		} else if (integerValues[n] != v) {
 			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
-		integerValues[n] = v;
+		}
 	}
 
 	unsigned int nostrvalues = read32le(s);
 	for (unsigned int i = 0; i < nostrvalues; i++) {
 		std::string n = ensure_utf8(tagStringRead(s));
 		std::string v = ensure_utf8(tagStringRead(s));
-		if (stringValues.find(n) != stringValues.end()) // TODO: check integers too?
+		if (stringValues.find(n) == stringValues.end()) {
+			stringValues[n] = v;
+		} else if (stringValues[n] != v) {
 			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
-		stringValues[n] = v;
+		}
 	}
 	
 	if (!s) {
