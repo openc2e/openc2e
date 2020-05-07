@@ -446,14 +446,14 @@ void SkeletalCreature::snapDownFoot() {
 				snapDownFoot();
 				return;
 			} else {
-				std::cout << "Creature out of room system at (" << footx << ", " << footy << ")!" << std::endl;
+				std::cerr << "Creature out of room system at (" << footx << ", " << footy << ")!" << std::endl;
 				// TODO: exceptiony death?
 				return;
 			}
 		}
 
 		// We fell out of the room system! How did that happen? Push ourselves back in, run collision script.
-		std::cout << "Creature out of room system at (" << footx << ", " << footy << "), pushing it back in." << std::endl;
+		// std::cout << "Creature out of room system at (" << footx << ", " << footy << "), pushing it back in." << std::endl;
 
 		// TODO: sucky code
 		x = lastgoodfootx - attachmentX(orig_footpart, 1);
@@ -463,7 +463,7 @@ void SkeletalCreature::snapDownFoot() {
 		queueScript(6);
 
 		if (!downfootroom) {
-			std::cout << "no down foot room! (" << footx << ", " << footy << ")" << std::endl;
+			std::cerr << "no down foot room! (" << footx << ", " << footy << ")" << std::endl;
 			// TODO: exceptiony death
 			return;
 		}
@@ -675,11 +675,11 @@ void SkeletalCreature::tick() {
 void SkeletalCreature::physicsTick() {
 	// TODO: mmh
 
-	if (engine.version > 1) {
-		if (falling) {
-			if (engine.version == 2 || validInRoomSystem()) {
-				Agent::physicsTick();
-			}
+	if (engine.version > 1 && falling) {
+		if (validInRoomSystem() || engine.version == 2) {
+			Agent::physicsTick();
+		} else if (!validInRoomSystem()) {
+			falling = false;
 		}
 	}
 
