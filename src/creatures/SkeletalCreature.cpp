@@ -683,11 +683,10 @@ void SkeletalCreature::physicsTick() {
 		}
 	}
 
-	if (!carriedby && !invehicle) {
-		if (engine.version == 1 || (!falling))
-			snapDownFoot();
-		else downfootroom.reset();
-	} else downfootroom.reset();	
+	if ((engine.version == 1 || !falling) && !carriedby && !invehicle)
+		snapDownFoot();
+	else
+		downfootroom.reset();
 }
 
 void SkeletalCreature::gaitTick() {

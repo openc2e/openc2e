@@ -616,9 +616,6 @@ void Agent::physicsTick() {
 
 			shared_ptr<Room> ourRoom = world.map->roomAt(srcx, srcy);
 			if (!ourRoom) {
-				ourRoom = world.map->roomAt(srcx, srcy);
-			}
-			if (!ourRoom) {
 				if (!displaycore) { // TODO: ugh, displaycore is a horrible thing to use for this
 					// we're out of the room system, physics bug, but let's try MVSFing back in to cover for fuzzie's poor programming skills
 					static bool tryingmove; tryingmove = false; // avoid infinite loop
