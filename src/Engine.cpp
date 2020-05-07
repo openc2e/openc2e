@@ -780,7 +780,13 @@ bool Engine::initialSetup() {
 		if (gamename.empty()) gamename = "Creatures 2";
 		version = 2;
 	} else if (gametype == "c3") {
-		if (gamename.empty()) gamename = "Creatures 3";
+		if (gamename.empty()) {
+			if (!world.findFile("Docking Station.ico").empty()) {
+				gamename = "Docking Station";
+			} else {
+				gamename = "Creatures 3";
+			}
+		}
 		version = 3;
 	} else if (gametype == "cv") {
 		if (gamename.empty()) gamename = "Creatures Village";
