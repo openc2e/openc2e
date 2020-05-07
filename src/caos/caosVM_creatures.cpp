@@ -1119,7 +1119,7 @@ void caosVM::c_NEWC() {
 	a->finishInit();
 
 	world.history->getMoniker(world.history->findMoniker(i->second)).moveToCreature(a);
-	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
+	gene_agent->genome_slots.erase(i);
 
 	setTarg(a);
 }
