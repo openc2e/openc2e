@@ -34,7 +34,8 @@
 
 MusicManager musicmanager;
 
-struct MusicStream : public AudioStreamBase {
+class MusicStream : public AudioStreamBase {
+public:
 	virtual bool isStereo() const { return true; }
 	virtual int sampleRate() const { return 22050; }
 	virtual int latency() const { return 1000; }
@@ -185,7 +186,7 @@ void MusicManager::render(signed short *data, size_t len) {
 		return;
 	}
 
-	currenttrack->update(len);
+	currenttrack->update(len / 2);
 	currenttrack->render(data, len);
 }
 
@@ -353,7 +354,7 @@ std::vector<FloatAudioBuffer> MusicStage::applyStage(std::vector<FloatAudioBuffe
 		delay_value += evaluateExpression(tempodelay, this) * beatlength;
 	}
 
-	unsigned int offset_amt = 22050 * 2 * delay_value;
+	unsigned int offset_amt = 22050 * delay_value;
 	std::vector<FloatAudioBuffer> buffers;
 	for (std::vector<FloatAudioBuffer>::iterator i = sources.begin(); i != sources.end(); i++) {
 		FloatAudioBuffer &src = *i;
@@ -609,10 +610,10 @@ void MusicAleotoricLayer::init() {
 	runUpdateBlock();
 }
 
-void MusicAleotoricLayer::update(unsigned int latency) {
+void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 	unsigned int parent_offset = parent->getCurrentOffset();
 
-	if (next_offset > parent_offset + latency) return;
+	if (next_offset > parent_offset + latency_in_frames) return;
 	unsigned int offset = next_offset;
 
 	std::vector<FloatAudioBuffer> buffers;
@@ -643,7 +644,7 @@ void MusicAleotoricLayer::update(unsigned int latency) {
 		(*i)->runUpdateBlock();
 
 		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
-		offset += 22050 * 2 * our_interval;
+		offset += 22050 * our_interval;
 	}
 
 	if (effect) {
@@ -700,12 +701,12 @@ void MusicLoopLayer::init() {
 	runUpdateBlock();
 }
 
-void MusicLoopLayer::update(unsigned int latency) {
+void MusicLoopLayer::update(unsigned int latency_in_frames) {
 	if (!wave) return;
 
 	unsigned int parent_offset = parent->getCurrentOffset();
 
-	if (next_offset > parent_offset + latency) return;
+	if (next_offset > parent_offset + latency_in_frames) return;
 
 	float our_volume = volume * parent->getVolume();
 
@@ -789,9 +790,9 @@ void MusicTrack::init() {
 MusicTrack::~MusicTrack() {
 }
 
-void MusicTrack::update(unsigned int latency) {
+void MusicTrack::update(unsigned int latency_in_frames) {
 	for (std::vector<shared_ptr<MusicLayer> >::iterator i = layers.begin(); i != layers.end(); i++) {
-		(*i)->update(latency);
+		(*i)->update(latency_in_frames);
 	}
 }
 
@@ -829,7 +830,7 @@ void MusicTrack::render(signed short *data, size_t len) {
 			// buffer hasn't started (quite) yet
 			if (buffer.start_offset > current_offset + len)
 				continue;
-			j = buffer.start_offset - current_offset;
+			j = 2 * (buffer.start_offset - current_offset);
 		}
 		//numbuffers++;
 		float left_pan = 1.0f - buffer.pan;
@@ -862,7 +863,7 @@ void MusicTrack::render(signed short *data, size_t len) {
 		data[i] = (signed short)output[i];
 	}
 
-	current_offset += len; // measuring offset in terms of samples*2 is horrid!
+	current_offset += len / 2;
 }
 
 /* vim: set noet: */
