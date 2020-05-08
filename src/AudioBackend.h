@@ -50,7 +50,7 @@ struct AudioStreamBase {
 	// this many milliseconds of audio data.
 	virtual int latency() const = 0;
 
-	virtual size_t produce(void *data, size_t len) = 0;
+	virtual size_t produce(void *data, size_t len_in_bytes) = 0;
 
 	// Called on a loop; return true on success or false to halt playback anyway
 	virtual bool reset() = 0;

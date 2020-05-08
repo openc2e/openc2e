@@ -22,6 +22,7 @@
 
 #include "SkeletonAudioBackend.h"
 #include <memory>
+#include <vector>
 
 #include "SDL_mixer.h"
 
@@ -49,6 +50,7 @@ protected:
 	friend class SDLMixerBackend;
 	
 	SDLMixerClip clip;
+	AudioStream stream;
 	int channel;
 
 public:
@@ -66,11 +68,10 @@ public:
 	virtual void setFollowingView(bool);
 
 	virtual AudioStream getStream() const {
-		// STUB
-		return AudioStream();
+		return stream;
 	}
-	virtual void setStream(const AudioStream &) {
-		// STUB
+	virtual void setStream(const AudioStream &stream_) {
+		stream = stream_;
 	}
 };
 
@@ -78,8 +79,12 @@ class SDLMixerBackend : public AudioBackend {
 protected:
 	bool muted;
 
+	std::shared_ptr<AudioSource> bgm_source;
+	std::vector<int16_t> bgm_render_buffer;
+	static void mixer_callback(void *userdata, uint8_t *buffer, int num_bytes);
+
 public:
-	SDLMixerBackend() { }
+	SDLMixerBackend();
 	void init();
 	void shutdown();
 
@@ -89,10 +94,7 @@ public:
 	std::shared_ptr<AudioSource> newSource();
 	std::shared_ptr<AudioSource> loadClip(const std::string &);
 
-	std::shared_ptr<AudioSource> getBGMSource() {
-		// STUB
-		return std::shared_ptr<AudioSource>();
-	}
+	std::shared_ptr<AudioSource> getBGMSource();
 };
 
 #endif

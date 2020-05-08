@@ -42,9 +42,9 @@ public:
 	virtual bool reset() { return true; }
 	virtual int bitDepth() const { return 16; }
 
-	virtual size_t produce(void *data, size_t len) {
-		musicmanager.render((signed short *)data, len / 2);
-		return len;
+	virtual size_t produce(void *data, size_t len_in_bytes) {
+		musicmanager.render((signed short *)data, len_in_bytes / 2);
+		return len_in_bytes;
 	}
 };
 

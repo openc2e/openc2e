@@ -24,6 +24,28 @@
 #include <cassert>
 #include <memory>
 
+SDLMixerBackend::SDLMixerBackend() {
+	bgm_source.reset(new SDLMixerSource);
+}
+
+void SDLMixerBackend::mixer_callback(void *userdata, uint8_t *buffer, int num_bytes) {	
+	SDLMixerBackend *backend = (SDLMixerBackend*)userdata;
+	AudioStream stream = ((SDLMixerSource*)backend->bgm_source.get())->stream;
+	if (!stream) {
+		return;
+	}
+
+	size_t num_samples = num_bytes / 2;
+	auto& bgm_render_buffer = backend->bgm_render_buffer;
+	bgm_render_buffer.resize(num_samples);
+	stream->produce(bgm_render_buffer.data(), bgm_render_buffer.size() * 2);
+
+	int16_t *buf = (int16_t*)buffer;
+	for (size_t i = 0; i < num_samples; ++i) {
+		buf[i] = std::max(SHRT_MIN, std::min(buf[i] + bgm_render_buffer[i], SHRT_MAX));
+	}
+}
+
 void SDLMixerBackend::init() {
 	// TODO: ensure SDLBackend is in use?
 
@@ -32,6 +54,8 @@ void SDLMixerBackend::init() {
 
 	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
 		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
+
+	Mix_HookMusic(SDLMixerBackend::mixer_callback, this);
 
 	Mix_AllocateChannels(50); // TODO
 }
@@ -69,6 +93,10 @@ std::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filena
 	return std::shared_ptr<AudioSource>(source);
 }
 
+std::shared_ptr<AudioSource> SDLMixerBackend::getBGMSource() {
+	return bgm_source;
+}
+
 SDLMixerSource::SDLMixerSource() {
 	channel = -1;
 }
@@ -86,7 +114,7 @@ SourceState SDLMixerSource::getState() const {
 }
 
 void SDLMixerSource::play() {
-	assert(clip);
+	if (!clip) return;
 	setFollowingView(followview); // re-register in the backend if needed
 
 	channel = Mix_PlayChannel(-1, clip->buffer, (looping ? -1 : 0));
