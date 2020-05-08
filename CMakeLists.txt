@@ -432,6 +432,7 @@ list(APPEND dist_args
 		"${CMAKE_CURRENT_SOURCE_DIR}/docs/openc2e.6"
 		"${BIN}/caosdocs.html"
 		"${BIN}/docs.css"
+		"${GEN}/commandinfo.json"
 		"$<TARGET_FILE:openc2e>"
 		"$<TARGET_FILE:mngdumper>"
 		"$<TARGET_FILE:praybuilder>"
