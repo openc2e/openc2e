@@ -31,6 +31,7 @@ public:
 	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h)  { }
 	virtual unsigned int getWidth() const { return 800; }
 	virtual unsigned int getHeight() const { return 600; }
+	virtual void renderClear() {}
 	virtual void renderDone() { }
 };
 

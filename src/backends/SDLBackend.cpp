@@ -438,6 +438,10 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 	SDL_FreeSurface(surf);
 }
 
+void SDLRenderTarget::renderClear() {
+	SDL_FillRect(surface, nullptr, 0x00000000);
+}
+
 void SDLRenderTarget::renderDone() {
 	if (surface == SDL_GetWindowSurface(parent->window)) {
 		SDL_UpdateWindowSurface(parent->window);

@@ -399,6 +399,7 @@ void World::drawWorld() {
 
 void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	assert(surface);
+	surface->renderClear();
 
 	MetaRoom *m = cam->getMetaRoom();
 	if (!m) {

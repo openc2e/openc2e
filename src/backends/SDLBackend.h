@@ -43,6 +43,7 @@ public:
 	void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h);
 	unsigned int getWidth() const { return width; }
 	unsigned int getHeight() const { return height; }
+	void renderClear();
 	void renderDone();
 };
 
