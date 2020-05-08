@@ -403,7 +403,7 @@ add_custom_command(
 
 add_custom_command(
 	OUTPUT ${GEN}/mngfile/mngparser.tab.cpp ${GEN}/mngfile/mngparser.tab.hpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/mngfile"
 	COMMAND ${BISON_EXECUTABLE} -d --name-prefix=mng --file-prefix="${GEN}/mngfile/mngparser" src/mngfile/mngparser.ypp
 	DEPENDS src/mngfile/mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
