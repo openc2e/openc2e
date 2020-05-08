@@ -85,8 +85,6 @@ std::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filena
 	Mix_Chunk *buffer = Mix_LoadWAV(fname.c_str());
 	if (!buffer) return std::shared_ptr<AudioSource>();
 
-
-
 	SDLMixerSource* source = new SDLMixerSource();
 	source->clip = SDLMixerClip(new SDLMixerBuffer(buffer));
 
@@ -120,7 +118,6 @@ void SDLMixerSource::play() {
 	channel = Mix_PlayChannel(-1, clip->buffer, (looping ? -1 : 0));
 
 	Mix_UnregisterAllEffects(channel); // TODO: needed?
-	Mix_Volume(channel, 128); // default, TODO: needed?
 }
 
 void SDLMixerSource::stop() {
@@ -137,7 +134,6 @@ void SDLMixerSource::stop() {
 
 void SDLMixerSource::fadeOut() {
 	Mix_FadeOutChannel(channel, 500); // TODO: is 500 a good value?
-	// TODO
 }
 
 void SDLMixerSource::setPos(float x, float y, float plane) {
@@ -152,19 +148,16 @@ bool SDLMixerSource::isLooping() const {
 
 void SDLMixerSource::setLooping(bool l) {
 	this->SkeletonAudioSource::setLooping(l);
-
-	// TODO
+	// handled in play()
 }
 
 void SDLMixerSource::setVolume(float v) {
-	this->SkeletonAudioSource::setVolume(v);
-	// TODO
-	// Mix_Volume(soundchannel, volume);
+	volume = v;
+	Mix_VolumeChunk(clip->buffer, v * MIX_MAX_VOLUME);
 }
 
 void SDLMixerSource::setMute(bool m) {
-	this->SkeletonAudioSource::setMute(m);
-	// TODO
+	Mix_VolumeChunk(clip->buffer, m ? 0 : volume * MIX_MAX_VOLUME);
 }
 
 void SDLMixerSource::setFollowingView(bool f) {
