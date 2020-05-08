@@ -485,7 +485,9 @@ void TextPart::recalculateData() {
 				pageheights.push_back(currenty);
 				pages.push_back(lines.size());
 				currenty = 0;
-			} else currenty += usedheight + linespacing + 1;
+			} else {
+				currenty += usedheight + linespacing;
+			}
 			currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 			lines.push_back(currentdata);
 			currentdata.reset(startoffset);
@@ -503,7 +505,9 @@ void TextPart::recalculateData() {
 				pageheights.push_back(currenty);
 				pages.push_back(lines.size());
 				currenty = 0;
-			} else currenty += usedheight + linespacing + 1;
+			} else {
+				currenty += usedheight + linespacing;
+			}
 			lines.push_back(currentdata);
 			currentdata.reset(i);
 		}
@@ -521,21 +525,29 @@ void TextPart::recalculateData() {
 void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
 	SpritePart::partRender(renderer, xoffset, yoffset);
 	
-	unsigned int xoff = xoffset + x + leftmargin;
-	unsigned int yoff = yoffset + y + topmargin;
+	int xoff = xoffset + x + leftmargin;
+	int yoff = yoffset + y + topmargin;
 	unsigned int textwidth = getWidth() - leftmargin - rightmargin;
 	unsigned int textheight = getHeight() - topmargin - bottommargin;
 
-	unsigned int currenty = 0, usedheight = 0;
-	if (vert_align == bottom)
+	int currenty = 0, usedheight = 0;
+	if (vert_align == bottom) {
 		currenty = textheight - pageheights[currpage];
-	else if (vert_align == middle)
+	} else if (vert_align == middle) {
 		currenty = (textheight - pageheights[currpage]) / 2;
+	} else if (vert_align == top) {
+		// TODO: this sort of makes sense— when height of the part is smaller
+		// than height of the layed-out page, we need to shift the text up so we
+		// see the bottom of the page. But is this correct? And is this the best
+		// place to do it?
+		currenty = std::min(0, (int)textheight - (int)pageheights[currpage]);
+	}
+
 	unsigned int startline = pages[currpage];
 	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
 	shared_ptr<creaturesImage> sprite = textsprite; unsigned int currtint = 0;
 	for (unsigned int i = startline; i < endline; i++) {	
-		unsigned int currentx = 0, somex = xoff;
+		int currentx = 0, somex = xoff;
 		if (horz_align == rightalign)
 			somex = somex + (textwidth - lines[i].width);
 		else if (horz_align == centeralign)
@@ -556,7 +568,7 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 		}
 		if ((caretdata) && (caretdata->caretpos == lines[i].offset + lines[i].text.size()))
 			caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);		
-		currenty += textsprite->height(0) + linespacing + 1;
+		currenty += textsprite->height(0) + linespacing;
 	}
 }
 
