@@ -20,6 +20,8 @@
 #include "backends/SDLBackend.h"
 #include <deque>
 
+class QInputMethodEvent;
+
 class QtBackend : public SDLBackend {
 public:
 	QtBackend();
@@ -30,6 +32,7 @@ public:
 	bool pollEvent(SomeEvent &e);
 	void pushEvent(SomeEvent e);
 	bool keyDown(int key);
+	void inputMethodEvent(QInputMethodEvent*);
 	void keyEvent(class QKeyEvent *k, bool pressed);
 
 	bool selfRender() { return true; }

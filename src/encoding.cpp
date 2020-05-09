@@ -163,3 +163,19 @@ unsigned char unicode_to_cp1252(char32_t codepoint)
     }
     throw std::domain_error("Code point " + std::to_string(codepoint) + " doesn't exist in CP-1252");
 }
+
+bool cp1252_isprint(unsigned char c) {
+    // ASCII control characters
+    if (c < 0x20) {
+        return false;
+    }
+    // DEL
+    if (c == 0x7f) {
+        return false;
+    }
+    // characters that don't exist in CP-1252
+    if (c == 0x81 || c == 0x8d || c == 0x8f || c == 0x90 || c == 0x9d) {
+        return false;
+    }
+    return true;
+}

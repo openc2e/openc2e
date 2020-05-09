@@ -21,11 +21,13 @@
 #include <cassert>
 #include <memory>
 
-#include "SDLBackend.h"
-#include "SDL2_gfxPrimitives.h"
-#include "openc2e.h"
-#include "Engine.h"
+#include <SDL2_gfxPrimitives.h>
+
 #include "creaturesImage.h"
+#include "keycodes.h"
+#include "Engine.h"
+#include "openc2e.h"
+#include "SDLBackend.h"
 
 SDLBackend *g_backend;
 
@@ -203,18 +205,15 @@ retry:
 			break;
 
 		case SDL_TEXTINPUT:
-			if (((event.text.text[0] & 0xFF80) == 0) && (event.text.text[0] >= 32)) {
-				e.type = eventkeydown;
-				e.key = event.text.text[0] & 0x7F;
-				break;
-			}
-			goto retry;
+			e.type = eventtextinput;
+			e.text = event.text.text;
+			break;
 
         case SDL_KEYUP:
             {
-                int key = translateKey(event.key.keysym.scancode);
+                int key = translateScancode(event.key.keysym.scancode);
                 if (key != -1) {
-                    e.type = eventspecialkeyup;
+                    e.type = eventrawkeyup;
                     e.key = key;
                     return true;
                 }
@@ -223,9 +222,9 @@ retry:
 
 		case SDL_KEYDOWN:
 			{
-				int key = translateKey(event.key.keysym.scancode);
+				int key = translateScancode(event.key.keysym.scancode);
 				if (key != -1) {
-					e.type = eventspecialkeydown;
+					e.type = eventrawkeydown;
 					e.key = key;
 					return true;
 				}
@@ -476,64 +475,103 @@ void SDLBackend::freeRenderTarget(RenderTarget *s) {
 	delete surf;
 }
 
-// left out: menu, select, execute, snapshot, numeric keypad, f keys
-struct _keytrans { int sdl, windows; };
-std::array<_keytrans, 25> keytrans = {{
-	{ SDL_SCANCODE_BACKSPACE, 8 },
-	{ SDL_SCANCODE_TAB, 9 },
-	{ SDL_SCANCODE_CLEAR, 12 },
-	{ SDL_SCANCODE_RETURN, 13 },
-	{ SDL_SCANCODE_RSHIFT, 16 },
-	{ SDL_SCANCODE_LSHIFT, 16 },
-	{ SDL_SCANCODE_RCTRL, 17 },
-	{ SDL_SCANCODE_LCTRL, 17 },
-	{ SDL_SCANCODE_PAUSE, 19 },
-	{ SDL_SCANCODE_CAPSLOCK, 20 },
-	{ SDL_SCANCODE_ESCAPE, 27 },
-	{ SDL_SCANCODE_SPACE, 32 },
-	{ SDL_SCANCODE_PAGEUP, 33 },
-	{ SDL_SCANCODE_PAGEDOWN, 34 },
-	{ SDL_SCANCODE_END, 35 },
-	{ SDL_SCANCODE_HOME, 36 },
-	{ SDL_SCANCODE_LEFT, 37 },
-	{ SDL_SCANCODE_UP, 38 },
-	{ SDL_SCANCODE_RIGHT, 39 },
-	{ SDL_SCANCODE_DOWN, 40 },
-	{ SDL_SCANCODE_PRINTSCREEN, 42 },
-	{ SDL_SCANCODE_INSERT, 45 },
-	{ SDL_SCANCODE_DELETE, 46 },
-	{ SDL_SCANCODE_NUMLOCKCLEAR, 144 }
+// left out: menu, select, execute, snapshot, numeric keypad
+struct _keytrans { int sdl, openc2e; };
+static const std::array<_keytrans, 72> keytrans = {{
+	{ SDL_SCANCODE_BACKSPACE, OPENC2E_KEY_BACKSPACE },
+	{ SDL_SCANCODE_TAB, OPENC2E_KEY_TAB },
+	{ SDL_SCANCODE_CLEAR, OPENC2E_KEY_CLEAR },
+	{ SDL_SCANCODE_RETURN, OPENC2E_KEY_RETURN },
+	{ SDL_SCANCODE_RSHIFT, OPENC2E_KEY_SHIFT },
+	{ SDL_SCANCODE_LSHIFT, OPENC2E_KEY_SHIFT },
+	{ SDL_SCANCODE_RCTRL, OPENC2E_KEY_CONTROL },
+	{ SDL_SCANCODE_LCTRL, OPENC2E_KEY_CONTROL },
+	{ SDL_SCANCODE_PAUSE, OPENC2E_KEY_PAUSE },
+	{ SDL_SCANCODE_CAPSLOCK, OPENC2E_KEY_CAPSLOCK },
+	{ SDL_SCANCODE_ESCAPE, OPENC2E_KEY_ESCAPE },
+	{ SDL_SCANCODE_SPACE, OPENC2E_KEY_SPACE },
+	{ SDL_SCANCODE_PAGEUP, OPENC2E_KEY_PAGEUP },
+	{ SDL_SCANCODE_PAGEDOWN, OPENC2E_KEY_PAGEDOWN },
+	{ SDL_SCANCODE_END, OPENC2E_KEY_END },
+	{ SDL_SCANCODE_HOME, OPENC2E_KEY_HOME },
+	{ SDL_SCANCODE_LEFT, OPENC2E_KEY_LEFT },
+	{ SDL_SCANCODE_UP, OPENC2E_KEY_UP },
+	{ SDL_SCANCODE_RIGHT, OPENC2E_KEY_RIGHT },
+	{ SDL_SCANCODE_DOWN, OPENC2E_KEY_DOWN },
+	{ SDL_SCANCODE_PRINTSCREEN, OPENC2E_KEY_PRINTSCREEN },
+	{ SDL_SCANCODE_INSERT, OPENC2E_KEY_INSERT },
+	{ SDL_SCANCODE_DELETE, OPENC2E_KEY_DELETE },
+	{ SDL_SCANCODE_0, OPENC2E_KEY_0 },
+	{ SDL_SCANCODE_1, OPENC2E_KEY_1 },
+	{ SDL_SCANCODE_2, OPENC2E_KEY_2 },
+	{ SDL_SCANCODE_3, OPENC2E_KEY_3 },
+	{ SDL_SCANCODE_4, OPENC2E_KEY_4 },
+	{ SDL_SCANCODE_5, OPENC2E_KEY_5 },
+	{ SDL_SCANCODE_6, OPENC2E_KEY_6 },
+	{ SDL_SCANCODE_7, OPENC2E_KEY_7 },
+	{ SDL_SCANCODE_8, OPENC2E_KEY_8 },
+	{ SDL_SCANCODE_9, OPENC2E_KEY_9 },
+	{ SDL_SCANCODE_A, OPENC2E_KEY_A },
+	{ SDL_SCANCODE_B, OPENC2E_KEY_B },
+	{ SDL_SCANCODE_C, OPENC2E_KEY_C },
+	{ SDL_SCANCODE_D, OPENC2E_KEY_D },
+	{ SDL_SCANCODE_E, OPENC2E_KEY_E },
+	{ SDL_SCANCODE_F, OPENC2E_KEY_F },
+	{ SDL_SCANCODE_G, OPENC2E_KEY_G },
+	{ SDL_SCANCODE_H, OPENC2E_KEY_H },
+	{ SDL_SCANCODE_I, OPENC2E_KEY_I },
+	{ SDL_SCANCODE_J, OPENC2E_KEY_J },
+	{ SDL_SCANCODE_K, OPENC2E_KEY_K },
+	{ SDL_SCANCODE_L, OPENC2E_KEY_L },
+	{ SDL_SCANCODE_M, OPENC2E_KEY_M },
+	{ SDL_SCANCODE_N, OPENC2E_KEY_N },
+	{ SDL_SCANCODE_O, OPENC2E_KEY_O },
+	{ SDL_SCANCODE_P, OPENC2E_KEY_P },
+	{ SDL_SCANCODE_Q, OPENC2E_KEY_Q },
+	{ SDL_SCANCODE_R, OPENC2E_KEY_R },
+	{ SDL_SCANCODE_S, OPENC2E_KEY_S },
+	{ SDL_SCANCODE_T, OPENC2E_KEY_T },
+	{ SDL_SCANCODE_U, OPENC2E_KEY_U },
+	{ SDL_SCANCODE_V, OPENC2E_KEY_V },
+	{ SDL_SCANCODE_W, OPENC2E_KEY_W },
+	{ SDL_SCANCODE_X, OPENC2E_KEY_X },
+	{ SDL_SCANCODE_Y, OPENC2E_KEY_Y },
+	{ SDL_SCANCODE_Z, OPENC2E_KEY_Z },
+	{ SDL_SCANCODE_F1, OPENC2E_KEY_F1 },
+	{ SDL_SCANCODE_F2, OPENC2E_KEY_F2 },
+	{ SDL_SCANCODE_F3, OPENC2E_KEY_F3 },
+	{ SDL_SCANCODE_F4, OPENC2E_KEY_F4 },
+	{ SDL_SCANCODE_F5, OPENC2E_KEY_F5 },
+	{ SDL_SCANCODE_F6, OPENC2E_KEY_F6 },
+	{ SDL_SCANCODE_F7, OPENC2E_KEY_F7 },
+	{ SDL_SCANCODE_F8, OPENC2E_KEY_F8 },
+	{ SDL_SCANCODE_F9, OPENC2E_KEY_F9 },
+	{ SDL_SCANCODE_F10, OPENC2E_KEY_F10 },
+	{ SDL_SCANCODE_F11, OPENC2E_KEY_F11 },
+	{ SDL_SCANCODE_F12, OPENC2E_KEY_F12 },
+	{ SDL_SCANCODE_NUMLOCKCLEAR, OPENC2E_KEY_NUMLOCK },
 }};
 
-// TODO: handle f keys (112-123 under windows, SDLK_F1 = 282 under sdl)
- 
+int SDLBackend::translateScancode(int key) {
+	for (unsigned int i = 0; i < keytrans.size(); i++) {
+		if (keytrans[i].sdl == key)
+			return keytrans[i].openc2e;
+	}
+
+	return -1;
+}
+
 // TODO: this is possibly not a great idea, we should maybe maintain our own state table
 bool SDLBackend::keyDown(int key) {
 	const Uint8 *keystate = SDL_GetKeyboardState(nullptr);
 	
 	for (unsigned int i = 0; i < keytrans.size(); i++) {
-		if (keytrans[i].windows == key)
+		if (keytrans[i].openc2e == key)
 			if (keystate[keytrans[i].sdl])
 				return true;
 	}
 
 	return false;
-}
-
-int SDLBackend::translateKey(int key) {
-	if (key >= 97 && key <= 122) { // lowercase letters
-		return key - 32; // capitalise
-	}
-	if (key >= 48 && key <= 57) { // numbers
-		return key;
-	}
-
-	for (unsigned int i = 0; i < keytrans.size(); i++) {
-		if (keytrans[i].sdl == key)
-			return keytrans[i].windows;
-	}
-
-	return -1;
 }
 
 void SDLBackend::setPalette(uint8_t *data) {

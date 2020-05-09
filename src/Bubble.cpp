@@ -17,13 +17,15 @@
  *
  */
 
-#include "Bubble.h"
-#include "World.h"
-#include "Engine.h"
+#include <cassert>
+
 #include "Backend.h"
+#include "Bubble.h"
 #include "Camera.h"
 #include "creaturesImage.h"
-#include <cassert>
+#include "Engine.h"
+#include "keycodes.h"
+#include "World.h"
 
 // class BubblePart *ourPart;
 
@@ -173,23 +175,26 @@ void BubblePart::loseFocus() {
 	parent->kill();
 }
 
-void BubblePart::handleKey(char c) {
+void BubblePart::handleTranslatedChar(unsigned char c) {
 	// TODO: reject invalid chars
-
-	setText(text + c);
+	// TODO: handle non-ASCII characters correctly
+	if (c >= 0x7f) return;
+	setText(text + (char)c);
 }
 
-void BubblePart::handleSpecialKey(char c) {
-	switch (c) {
-		case 8: // backspace
+void BubblePart::handleRawKey(uint8_t key) {
+	switch (key) {
+		case OPENC2E_KEY_BACKSPACE:
 			if (text.size() == 0) { loseFocus(); return; }
-			{ std::string s = text;
-			s.erase(s.begin() + (s.size() - 1));
-			setText(s); }
+			{
+				std::string s = text;
+				s.erase(s.begin() + (s.size() - 1));
+				setText(s);
+			}
 			if (text.size() == 0) { loseFocus(); return; }
 			break;
 
-		case 13: // return
+		case OPENC2E_KEY_RETURN:
 			((Bubble *)parent)->turnIntoSpeech(); // TODO: omg hax
 			break;
 	}

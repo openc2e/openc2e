@@ -41,6 +41,7 @@ protected:
 
 	void wheelEvent(QWheelEvent *w);
 	
+	void inputMethodEvent(QInputMethodEvent*);
 	void keyPressEvent(QKeyEvent *k);
 	void keyReleaseEvent(QKeyEvent *k);
 

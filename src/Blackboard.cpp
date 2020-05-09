@@ -17,11 +17,13 @@
  *
  */
 
+#include <cassert>
+
+#include "Backend.h"
 #include "Blackboard.h"
 #include "Engine.h"
+#include "keycodes.h"
 #include "World.h" // setFocus
-#include "Backend.h"
-#include <cassert>
 
 Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
 		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,
@@ -129,7 +131,7 @@ void BlackboardPart::loseFocus() {
 	bbd->stopEditing(true);
 }
 
-void BlackboardPart::handleKey(char c) {
+void BlackboardPart::handleTranslatedChar(unsigned char c) {
 	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
 
 	// strip non-alpha chars
@@ -138,23 +140,25 @@ void BlackboardPart::handleKey(char c) {
 
 	std::string &s = bbd->strings[bbd->editingindex].second;
 	if (s.size() < 10) {
-		s += c;
+		s += (char)c;
 		bbd->currenttext = s;
 	}
 }
 
-void BlackboardPart::handleSpecialKey(char c) {
+void BlackboardPart::handleRawKey(uint8_t c) {
 	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
 
 	switch (c) {
-		case 8: // backspace
+		case OPENC2E_KEY_BACKSPACE:
 			if (bbd->currenttext.size() == 0) return;
-			{ std::string &s = bbd->strings[bbd->editingindex].second;
-			s.erase(s.begin() + (s.size() - 1));
-			bbd->currenttext = s; }
+			{
+				std::string &s = bbd->strings[bbd->editingindex].second;
+				s.erase(s.begin() + (s.size() - 1));
+				bbd->currenttext = s;
+			}
 			break;
 
-		case 13: // return
+		case OPENC2E_KEY_RETURN:
 			bbd->stopEditing(false);
 			break;
 	}

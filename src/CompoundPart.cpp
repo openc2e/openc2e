@@ -17,19 +17,21 @@
  *
  */
 
+#include <cassert>
+#include <memory>
+
+#include "Agent.h"
+#include "Backend.h"
 #include "CompoundPart.h"
 #include "CameraPart.h"
 #include "Camera.h"
 #include "CompoundAgent.h"
-#include "encoding.h"
-#include "World.h"
-#include "Engine.h"
 #include "creaturesImage.h"
-#include "Backend.h"
-#include "Agent.h"
+#include "encoding.h"
+#include "Engine.h"
 #include "imageManager.h"
-#include <cassert>
-#include <memory>
+#include "keycodes.h"
+#include "World.h"
 
 shared_ptr<creaturesImage> TextEntryPart::caretsprite;
 
@@ -113,12 +115,12 @@ void CompoundPart::loseFocus() {
 	throw creaturesException("impossible loseFocus() call");
 }
 
-void CompoundPart::handleKey(char c) {
-	throw creaturesException("impossible handleKey() call");
+void CompoundPart::handleTranslatedChar(unsigned char c) {
+	throw creaturesException("impossible handleTranslatedChar() call");
 }
 
-void CompoundPart::handleSpecialKey(char c) {
-	throw creaturesException("impossible handleSpecialKey() call");
+void CompoundPart::handleRawKey(uint8_t c) {
+	throw creaturesException("impossible handleRawKey() call");
 }
 
 int CompoundPart::handleClick(float clickx, float clicky) {
@@ -355,40 +357,40 @@ int TextEntryPart::handleClick(float clickx, float clicky) {
 	return -1; // TODO: this shouldn't be passed onto the parent agent?
 }
 
-void TextEntryPart::handleKey(char c) {
+void TextEntryPart::handleTranslatedChar(unsigned char c) {
 	text.insert(caretpos, 1, c);
 	caretpos++;
 	recalculateData();
 }
 
-void TextEntryPart::handleSpecialKey(char c) {
+void TextEntryPart::handleRawKey(uint8_t c) {
 	switch (c) {
-		case 8: // backspace
+		case OPENC2E_KEY_BACKSPACE:
 			if (caretpos == 0) return;
 			text.erase(text.begin() + (caretpos - 1));
 			caretpos--;
 			break;
 
-		case 13: // return
+		case OPENC2E_KEY_RETURN:
 			// TODO: check if we should do this or a newline
 			parent->queueScript(calculateScriptId(messageid), 0); // TODO: is a null FROM correct?
 			return;
 
-		case 37: // left
+		case OPENC2E_KEY_LEFT:
 			if (caretpos == 0) return;
 			caretpos--;
 			return;
 
-		case 39: // right
+		case OPENC2E_KEY_RIGHT:
 			if (caretpos == text.size()) return;
 			caretpos++;
 			return;
 
-		case 38: // up
-		case 40: // down
+		case OPENC2E_KEY_UP:
+		case OPENC2E_KEY_DOWN:
 			return;
 
-		case 46: // delete
+		case OPENC2E_KEY_DELETE:
 			if ((text.size() == 0) || (caretpos >= text.size()))
 				return;
 			text.erase(text.begin() + caretpos);

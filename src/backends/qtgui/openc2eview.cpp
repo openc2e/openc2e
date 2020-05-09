@@ -46,6 +46,8 @@ openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstr
 
 	viewport()->setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background
 
+	setAttribute(Qt::WA_InputMethodEnabled);
+
 	// keyboard focus. needed? better way?
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -155,6 +157,10 @@ void openc2eView::wheelEvent(QWheelEvent *w) {
 	else
 		e.button = buttonwheeldown;
 	backend->pushEvent(e);
+}
+
+void openc2eView::inputMethodEvent(QInputMethodEvent *e) {
+	backend->inputMethodEvent(e);
 }
 
 void openc2eView::keyPressEvent(QKeyEvent *k) {

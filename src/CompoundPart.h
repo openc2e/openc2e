@@ -57,8 +57,8 @@ public:
 	virtual void gainFocus();
 	virtual void loseFocus();
 	virtual int handleClick(float, float);
-	virtual void handleKey(char c);
-	virtual void handleSpecialKey(char c);
+	virtual void handleTranslatedChar(unsigned char c);
+	virtual void handleRawKey(uint8_t c);
 
 	virtual unsigned int getWidth() = 0;
 	virtual unsigned int getHeight() = 0;
@@ -231,8 +231,8 @@ public:
 	void gainFocus() { focused = true; caretpose = 0; }
 	void loseFocus() { focused = false; }
 	int handleClick(float, float);
-	void handleKey(char c);
-	void handleSpecialKey(char c);
+	void handleTranslatedChar(unsigned char c) override;
+	void handleRawKey(uint8_t c) override;
 	void tick();
 	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
 	bool isTransparent() { return false; }

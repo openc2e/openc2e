@@ -26,6 +26,7 @@
 #include <iostream>
 #include <memory>
 #include "exceptions.h"
+#include "keycodes.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -122,75 +123,115 @@ void QtBackend::pushEvent(SomeEvent e) {
 	events.push_back(e);
 }
 
-int translateQtKey(int qtkey) {
-	if (qtkey >= Qt::Key_F1 && qtkey <= Qt::Key_F12) {
-		return 112 + (qtkey - Qt::Key_F1);
-	}
-
+static int translateQtKey(int qtkey) {
 	switch (qtkey) {
-		case Qt::Key_Backspace: return 8;
-		case Qt::Key_Tab: return 9;
-		case Qt::Key_Clear: return 12;
-		case Qt::Key_Return: return 13;
-		case Qt::Key_Enter: return 13;
-		case Qt::Key_Shift: return 16;
-		case Qt::Key_Control: return 17;
-		case Qt::Key_Pause: return 19;
-		case Qt::Key_CapsLock: return 20;
-		case Qt::Key_Escape: return 27;
-		case Qt::Key_PageUp: return 33;
-		case Qt::Key_PageDown: return 34;
-		case Qt::Key_End: return 35;
-		case Qt::Key_Home: return 36;
-		case Qt::Key_Left: return 37;
-		case Qt::Key_Up: return 38;
-		case Qt::Key_Right: return 39;
-		case Qt::Key_Down: return 40;
-		case Qt::Key_Print: return 42;
-		case Qt::Key_Insert: return 45;
-		case Qt::Key_Delete: return 46;
-		case Qt::Key_NumLock: return 144;
+		case Qt::Key_Backspace: return OPENC2E_KEY_BACKSPACE;
+		case Qt::Key_Tab: return OPENC2E_KEY_TAB;
+		case Qt::Key_Clear: return OPENC2E_KEY_CLEAR;
+		case Qt::Key_Return: return OPENC2E_KEY_RETURN;
+		case Qt::Key_Enter: return OPENC2E_KEY_RETURN;
+		case Qt::Key_Shift: return OPENC2E_KEY_SHIFT;
+		case Qt::Key_Control: return OPENC2E_KEY_CONTROL;
+		case Qt::Key_Pause: return OPENC2E_KEY_PAUSE;
+		case Qt::Key_CapsLock: return OPENC2E_KEY_CAPSLOCK;
+		case Qt::Key_Escape: return OPENC2E_KEY_ESCAPE;
+		case Qt::Key_PageUp: return OPENC2E_KEY_PAGEUP;
+		case Qt::Key_PageDown: return OPENC2E_KEY_PAGEDOWN;
+		case Qt::Key_End: return OPENC2E_KEY_END;
+		case Qt::Key_Home: return OPENC2E_KEY_HOME;
+		case Qt::Key_Left: return OPENC2E_KEY_LEFT;
+		case Qt::Key_Up: return OPENC2E_KEY_UP;
+		case Qt::Key_Right: return OPENC2E_KEY_RIGHT;
+		case Qt::Key_Down: return OPENC2E_KEY_DOWN;
+		case Qt::Key_Print: return OPENC2E_KEY_PRINTSCREEN;
+		case Qt::Key_Insert: return OPENC2E_KEY_INSERT;
+		case Qt::Key_Delete: return OPENC2E_KEY_DELETE;
+		case Qt::Key_0: return OPENC2E_KEY_0;
+		case Qt::Key_1: return OPENC2E_KEY_1;
+		case Qt::Key_2: return OPENC2E_KEY_2;
+		case Qt::Key_3: return OPENC2E_KEY_3;
+		case Qt::Key_4: return OPENC2E_KEY_4;
+		case Qt::Key_5: return OPENC2E_KEY_5;
+		case Qt::Key_6: return OPENC2E_KEY_6;
+		case Qt::Key_7: return OPENC2E_KEY_7;
+		case Qt::Key_8: return OPENC2E_KEY_8;
+		case Qt::Key_9: return OPENC2E_KEY_9;
+		case Qt::Key_A: return OPENC2E_KEY_A;
+		case Qt::Key_B: return OPENC2E_KEY_B;
+		case Qt::Key_C: return OPENC2E_KEY_C;
+		case Qt::Key_D: return OPENC2E_KEY_D;
+		case Qt::Key_E: return OPENC2E_KEY_E;
+		case Qt::Key_F: return OPENC2E_KEY_F;
+		case Qt::Key_G: return OPENC2E_KEY_G;
+		case Qt::Key_H: return OPENC2E_KEY_H;
+		case Qt::Key_I: return OPENC2E_KEY_I;
+		case Qt::Key_J: return OPENC2E_KEY_J;
+		case Qt::Key_K: return OPENC2E_KEY_K;
+		case Qt::Key_L: return OPENC2E_KEY_L;
+		case Qt::Key_M: return OPENC2E_KEY_M;
+		case Qt::Key_N: return OPENC2E_KEY_N;
+		case Qt::Key_O: return OPENC2E_KEY_O;
+		case Qt::Key_P: return OPENC2E_KEY_P;
+		case Qt::Key_Q: return OPENC2E_KEY_Q;
+		case Qt::Key_R: return OPENC2E_KEY_R;
+		case Qt::Key_S: return OPENC2E_KEY_S;
+		case Qt::Key_T: return OPENC2E_KEY_T;
+		case Qt::Key_U: return OPENC2E_KEY_U;
+		case Qt::Key_V: return OPENC2E_KEY_V;
+		case Qt::Key_W: return OPENC2E_KEY_W;
+		case Qt::Key_X: return OPENC2E_KEY_X;
+		case Qt::Key_Y: return OPENC2E_KEY_Y;
+		case Qt::Key_Z: return OPENC2E_KEY_Z;
+		case Qt::Key_F1: return OPENC2E_KEY_F1;
+		case Qt::Key_F2: return OPENC2E_KEY_F2;
+		case Qt::Key_F3: return OPENC2E_KEY_F3;
+		case Qt::Key_F4: return OPENC2E_KEY_F4;
+		case Qt::Key_F5: return OPENC2E_KEY_F5;
+		case Qt::Key_F6: return OPENC2E_KEY_F6;
+		case Qt::Key_F7: return OPENC2E_KEY_F7;
+		case Qt::Key_F8: return OPENC2E_KEY_F8;
+		case Qt::Key_F9: return OPENC2E_KEY_F9;
+		case Qt::Key_F10: return OPENC2E_KEY_F10;
+		case Qt::Key_F11: return OPENC2E_KEY_F11;
+		case Qt::Key_F12: return OPENC2E_KEY_F12;
+		case Qt::Key_NumLock: return OPENC2E_KEY_NUMLOCK;
 		default: return -1;
 	}
 }
 
+void QtBackend::inputMethodEvent(QInputMethodEvent *event) {
+	auto utf8 = event->commitString().toUtf8();
+	if (utf8.length() == 0) {
+		return;
+	}
+	SomeEvent e;
+	e.type = eventtextinput;
+	e.text = std::string(utf8.data(), utf8.data() + utf8.length());
+	pushEvent(e);
+}
+
 void QtBackend::keyEvent(QKeyEvent *k, bool pressed) {
 	int translatedkey = translateQtKey(k->key());
-	int key = translatedkey;
-	if (key == -1) {
-		if (k->key() >= Qt::Key_0 && k->key() <= Qt::Key_9) {
-			key = k->key();
-		} else if (k->key() >= Qt::Key_A && k->key() <= Qt::Key_Z) {
-			key = k->key();
-		}
-	}
-	if (key != -1) {
+	if (translatedkey != -1) {
+		downkeys[translatedkey] = pressed;
+
 		SomeEvent e;
-		if (pressed)
-			e.type = eventspecialkeydown;
-		else
-			e.type = eventspecialkeyup;
-		e.key = key;
+		e.type = pressed ? eventrawkeydown : eventrawkeyup;
+		e.key = translatedkey;
 		pushEvent(e);
-		downkeys[key] = pressed;
-		if (translatedkey != -1) return;
 	}
 
-	for (int i = 0; i < k->text().size(); i++) {
-		// TODO: openc2e probably doesn't like latin1
-		unsigned char x = k->text().at(i).toLatin1();
-		if (x > 31) { // Qt helpfully hands us non-text chars for some crazy reason
-			// We have a Latin-1 key which we can process.
-			SomeEvent e;
-			
-			// the engine only handles eventkeydown at present
-			if (pressed) {
-				e.type = eventkeydown;
-				e.key = x;
-				pushEvent(e);
-			}
-		}
+	if (!pressed) {
+		return;
 	}
+	auto utf8 = k->text().toUtf8();
+	if (utf8.length() == 0) {
+		return;
+	}
+	SomeEvent e;
+	e.type = eventtextinput;
+	e.text = std::string(utf8.data(), utf8.data() + utf8.length());
+	pushEvent(e);
 }
 
 bool QtBackend::keyDown(int key) {

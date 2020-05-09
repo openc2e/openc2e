@@ -72,8 +72,8 @@ public:
 	bool canGainFocus() { return editable; }
 	void gainFocus();
 	void loseFocus();
-	void handleKey(char c);
-	void handleSpecialKey(char c);
+	void handleTranslatedChar(unsigned char c) override;
+	void handleRawKey(uint8_t key) override;
 };
 
 #endif

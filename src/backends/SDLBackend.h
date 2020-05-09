@@ -59,7 +59,6 @@ protected:
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
-	int translateKey(int key);
 
 	SDL_Surface *getMainSDLRenderTarget() { return mainsurface.surface; }
 
@@ -88,6 +87,7 @@ public:
 	unsigned int textWidth(std::string text);
 		
 	bool keyDown(int key);
+	int translateScancode(int key);
 	
 	void setPalette(uint8_t *data);
 	void delay(int msec);

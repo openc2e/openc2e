@@ -17,6 +17,7 @@
  *
  */
 
+#include "Bubble.h"
 #include "Room.h"
 #include "Engine.h"
 #include "World.h"
@@ -27,6 +28,8 @@
 #include "PointerAgent.h"
 #include "backends/NullBackend.h"
 #include "backends/NullAudioBackend.h"
+#include "encoding.h"
+#include "keycodes.h"
 #include "SFCFile.h"
 #include "peFile.h"
 #include "Camera.h"
@@ -390,18 +393,18 @@ void Engine::processEvents() {
 				handleMouseButton(event);
 				break;
 
-			case eventkeydown:
-				handleKeyDown(event);
+			case eventtextinput:
+				handleTextInput(event);
 				break;
 
-			case eventspecialkeydown:
-				handleSpecialKeyDown(event);
+			case eventrawkeydown:
+				handleRawKeyDown(event);
 				break;
 
-			case eventspecialkeyup:
-				handleSpecialKeyUp(event);
+			case eventrawkeyup:
+				handleRawKeyUp(event);
 				break;
-				
+
 			case eventquit:
 				done = true;
 				break;
@@ -476,13 +479,21 @@ void Engine::handleMouseButton(SomeEvent &event) {
 	world.hand()->handleEvent(event);
 }
 
-#include "Bubble.h"
-void Engine::handleKeyDown(SomeEvent &event) {
-	switch (event.key) {
-		case 'w': w_down = true; break;
-		case 'a': a_down = true; break;
-		case 's': s_down = true; break;
-		case 'd': d_down = true; break;
+void Engine::handleTextInput(SomeEvent &event) {
+	auto cp1252_text = utf8_to_cp1252(event.text);
+	if (cp1252_text.size() != 1) {
+		fmt::print(stderr, "bad text input: ");
+		for (unsigned char c : cp1252_text) {
+			fmt::print(stderr, "0x{:02x} ", c);
+		}
+		fmt::print(stderr, "\n");
+	}
+
+	int translated_char = cp1252_text[0];
+
+	// some backends (*cough*Qt*cough* think DEL is text)
+	if (!cp1252_isprint(translated_char)) {
+		return;
 	}
 
 	if (version < 3 && !world.focusagent) {
@@ -493,12 +504,12 @@ void Engine::handleKeyDown(SomeEvent &event) {
 	if (world.focusagent) {
 		CompoundPart *t = world.focusagent.get()->part(world.focuspart);
 		if (t && t->canGainFocus())
-			t->handleKey(event.key);
+			t->handleTranslatedChar(translated_char);
 	}
 
 	// notify agents
 	caosVar k;
-	k.setInt(event.key);
+	k.setInt(translated_char);
 	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((*i)->imsk_translated_char)
@@ -506,60 +517,63 @@ void Engine::handleKeyDown(SomeEvent &event) {
 	}
 }
 
-void Engine::handleSpecialKeyUp(SomeEvent &event) {
+void Engine::handleRawKeyUp(SomeEvent &event) {
 	switch (event.key) {
-		case 0x57:
+		case OPENC2E_KEY_W:
 			w_down = false;
 			break;
-		case 0x41:
+		case OPENC2E_KEY_A:
 			a_down = false;
 			break;
-		case 0x53:
+		case OPENC2E_KEY_S:
 			s_down = false;
 			break;
-		case 0x44:
+		case OPENC2E_KEY_D:
 			d_down = false;
+			break;
+		default:
 			break;
 	}
 }
 
-void Engine::handleSpecialKeyDown(SomeEvent &event) {
+void Engine::handleRawKeyDown(SomeEvent &event) {
 	switch (event.key) {
-		case 0x57:
+		case OPENC2E_KEY_W:
 			w_down = true;
 			break;
-		case 0x41:
+		case OPENC2E_KEY_A:
 			a_down = true;
 			break;
-		case 0x53:
+		case OPENC2E_KEY_S:
 			s_down = true;
 			break;
-		case 0x44:
+		case OPENC2E_KEY_D:
 			d_down = true;
 			break;
+		default:
+			break;
 	}
-
 
 	// handle debug keys, if they're enabled
 	caosVar v = world.variables["engine_debug_keys"];
 	if (v.hasInt() && v.getInt() == 1) {
-		if (backend->keyDown(16)) { // shift down
+		if (backend->keyDown(OPENC2E_KEY_SHIFT)) {
 			MetaRoom *n; // for pageup/pagedown
 
 			switch (event.key) {
-				case 45: // insert
+				case OPENC2E_KEY_INSERT:
 					world.showrooms = !world.showrooms;
 					break;
 
-				case 19: // pause
+				case OPENC2E_KEY_PAUSE:
 					// TODO: debug pause game
 					break;
 
-				case 32: // space
+				case OPENC2E_KEY_SPACE:
 					// TODO: force tick
 					break;
 
-				case 33: // pageup
+				case OPENC2E_KEY_PAGEUP:
 					// TODO: previous metaroom
 					if ((world.map->getMetaRoomCount() - 1) == engine.camera->getMetaRoom()->id)
 						break;
@@ -568,7 +582,7 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 						engine.camera->goToMetaRoom(n->id);
 					break;
 
-				case 34: // pagedown
+				case OPENC2E_KEY_PAGEDOWN:
 					// TODO: next metaroom
 					if (engine.camera->getMetaRoom()->id == 0)
 						break;
@@ -586,7 +600,7 @@ void Engine::handleSpecialKeyDown(SomeEvent &event) {
 	if (world.focusagent) {
 		CompoundPart *t = world.focusagent.get()->part(world.focuspart);
 		if (t && t->canGainFocus())
-			t->handleSpecialKey(event.key);
+			t->handleRawKey(event.key);
 	}
 
 	// notify agents

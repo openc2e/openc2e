@@ -55,9 +55,9 @@ protected:
 	void handleResizedWindow(SomeEvent &event);
 	void handleMouseMove(SomeEvent &event);
 	void handleMouseButton(SomeEvent &event);
-	void handleKeyDown(SomeEvent &event);
-	void handleSpecialKeyDown(SomeEvent &event);
-	void handleSpecialKeyUp(SomeEvent &event);
+	void handleTextInput(SomeEvent &event);
+	void handleRawKeyDown(SomeEvent &event);
+	void handleRawKeyUp(SomeEvent &event);
 
 	class peFile *exefile;
 	void loadGameData();

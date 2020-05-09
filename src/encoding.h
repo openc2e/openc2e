@@ -16,3 +16,6 @@ std::string utf8_to_cp1252(const std::string& utf8_str);
 // translate characters, throwing if it's not possible
 char32_t cp1252_to_codepoint(unsigned char cp1252_char);
 unsigned char unicode_to_cp1252(char32_t codepoint);
+
+// helper functions
+bool cp1252_isprint(unsigned char cp1252_char);
