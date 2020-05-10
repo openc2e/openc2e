@@ -37,6 +37,7 @@ protected:
 	std::string currenttext;
 	bool editing;
 	unsigned int editingindex;
+	std::shared_ptr<creaturesImage> charsetsprite;
 
 	void renderText(class RenderTarget *renderer, int xoffset, int yoffset);
 	std::string getText();

@@ -140,6 +140,7 @@ add_library(openc2e-core STATIC
 	src/Bubble.cpp
 	src/bytecode.cpp
 	src/images/c16Image.cpp
+	src/images/charsetdta.cpp
 	src/creatures/c2eBrain.cpp
 	src/CallButton.cpp
 	src/Camera.cpp

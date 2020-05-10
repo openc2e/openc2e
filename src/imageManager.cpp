@@ -22,10 +22,10 @@
 #include "images/sprImage.h"
 #include "images/blkImage.h"
 #include "images/bmpImage.h"
+#include "images/charsetdta.h"
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
-
 #include "PathResolver.h"
 
 #include <iostream>
@@ -117,6 +117,63 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	}
 
 	return img;
+}
+
+std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format, unsigned int textcolor, unsigned int bgcolor) {
+	// TODO: cache this?
+
+	std::string filename = world.findFile("Images/EuroCharset.dta");
+	if (filename.empty()) {
+		filename = world.findFile("Images/CHARSET.DTA");
+	}
+	if (filename.empty()) {
+		return {};
+	}
+
+	std::ifstream in(filename, std::ios::binary);
+	if (!in) {
+		return {};
+	}
+
+	std::vector<uint8_t> filedata{std::istreambuf_iterator<char>(in), {}};
+	CharsetDtaReader reader(filedata);
+
+	std::vector<std::vector<uint8_t>> buffers(reader.getNumCharacters());
+	std::vector<uint16_t> widths(reader.getNumCharacters());
+	std::vector<uint16_t> heights(reader.getNumCharacters());
+	for (size_t i = 0; i < reader.getNumCharacters(); ++i) {
+		std::vector<uint8_t> chardata = reader.getCharData(i);
+		widths[i] = reader.getCharWidth(i);
+		heights[i] = reader.getCharHeight(i);
+
+		// TODO: how do the values in the CHARSET.DTA map to actual color values?
+		// just setting them all to the textcolor right now, but the real engines
+		// do some shading/aliasing
+		switch (format) {
+			case if_paletted:
+				for (size_t j = 0; j < reader.getCharWidth(i) * reader.getCharHeight(i); ++j) {
+					if (chardata[j] != 0) {
+						chardata[j] = textcolor;
+					}
+				}
+				buffers[i] = std::move(chardata);
+				break;
+			case if_16bit_565:
+				buffers[i].resize(chardata.size() * 2, 0);
+				for (size_t j = 0; j < reader.getCharWidth(i) * reader.getCharHeight(i); ++j) {
+					if (chardata[j] != 0) {
+						((uint16_t*)buffers[i].data())[j] = textcolor;
+					}
+				}
+				break;
+			case if_16bit_555: // TODO: how to tell what format the color is in?
+				throw creaturesException("Unimplemented format if_16bit_555 when loading charset.dta");
+			case if_24bit:
+				throw creaturesException("Unimplemented format if_24bit when loading charset.dta");
+		}
+	}
+
+	return std::make_shared<creaturesImage>(path(filename).stem(), format, buffers, widths, heights);
 }
 
 std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creaturesImage>& oldimage,

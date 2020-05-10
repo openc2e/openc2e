@@ -24,22 +24,19 @@
 #include "Camera.h"
 #include "creaturesImage.h"
 #include "Engine.h"
+#include "imageManager.h"
 #include "keycodes.h"
 #include "World.h"
-
-// class BubblePart *ourPart;
 
 Bubble::Bubble(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
 		unsigned int tx, unsigned int ty, unsigned int twidth, unsigned int theight,
-		unsigned int bgcolour, unsigned int tcolour)
+		unsigned int tcolour, unsigned int bgcolour)
 		: CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
-	ourPart = new BubblePart(this, 1, tx, ty);
+	ourPart = new BubblePart(this, 1, tx, ty, tcolour, bgcolour);
 	addPart(ourPart);
 	ourPart->textwidth = twidth;
 	ourPart->textheight = theight;
-	ourPart->backgroundcolour = bgcolour;
-	ourPart->textcolour = tcolour;
 
 	ourPart->editable = false;
 }
@@ -125,7 +122,10 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	int yoffset = (engine.version == 1) ? 3 : 8;
 	int twidth = (engine.version == 1) ? 144 : 95; // extended to fit text upon setText()
 
-	Bubble *ourBubble = new Bubble(2, 1, 2, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, 0, 0);
+	unsigned int textcolor = (engine.version == 1) ? 0xb : 0x0821; // TODO
+	unsigned int bgcolor = (engine.version == 1) ? 0x1 : 0xFFFF; // TODO
+
+	Bubble *ourBubble = new Bubble(2, 1, 2, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, textcolor, bgcolor);
 	ourBubble->finishInit();
 	ourBubble->leftside = leftside;
 
@@ -148,23 +148,29 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	return ourBubble;
 }
 
-/*
-  class BubblePart : public CompoundPart {
-	bool editable;
-	std::string text;
-	unsigned int textwidth, textheight;
-	unsigned int backgroundcolour, textcolour;
-*/
-
-BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y) : CompoundPart(p, _id, x, y, 0) {
+BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int tcolour, unsigned int bgcolour)
+	: CompoundPart(p, _id, x, y, 0)
+{
 	editable = false;
 	textwidth = 0;
 	textheight = 0;
 	textoffset = 0; // doesn't matter when text is empty
+	textcolour = tcolour;
+	backgroundcolour = bgcolour;
+
+	if (engine.version == 1) {
+		charsetsprite = world.gallery->getCharsetDta(if_paletted, tcolour, bgcolour);
+	} else {
+		charsetsprite = world.gallery->getCharsetDta(if_16bit_565, tcolour, bgcolour);
+	}
 }
 
 void BubblePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
-	renderer->renderText(xoffset + x + textoffset, yoffset + y, text, textcolour, backgroundcolour);
+	unsigned int charpos = 0;
+	for (auto c : text) {
+		renderer->render(charsetsprite, c, xoffset + x + textoffset + charpos, yoffset + y);
+		charpos += charsetsprite->width(c) + 1;
+	}
 }
 
 void BubblePart::gainFocus() {
@@ -211,7 +217,11 @@ unsigned int BubblePart::poseForWidth(unsigned int width) {
 }
 
 void BubblePart::setText(std::string str) {
-	unsigned int twidth = engine.backend->textWidth(str);
+	unsigned int twidth = 0;
+	for (auto c : str) {
+		twidth += charsetsprite->width(c) + 1;
+	}
+	twidth -= 1;
 
 	if (engine.version == 2) {
 		unsigned int pose = poseForWidth(twidth);

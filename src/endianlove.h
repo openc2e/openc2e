@@ -40,6 +40,10 @@ static inline uint8_t read8(std::istream &s) {
 	return t[0];
 }
 
+static inline uint16_t read16le(const uint8_t* buf) {
+	return (buf[0] << 0) | (buf[1] << 8);
+}
+
 static inline uint16_t read16le(std::istream &s) {
 	uint8_t t[2];
 	s.read(reinterpret_cast<char*>(t), 2);

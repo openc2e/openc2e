@@ -39,7 +39,6 @@ protected:
 public:
 	void render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
-	void renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour);
 	void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h);
 	unsigned int getWidth() const { return width; }
 	unsigned int getHeight() const { return height; }
@@ -84,7 +83,6 @@ public:
 	RenderTarget *getMainRenderTarget() { return &mainsurface; }
 	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);
 	void freeRenderTarget(RenderTarget *surf);
-	unsigned int textWidth(std::string text);
 		
 	bool keyDown(int key);
 	int translateScancode(int key);

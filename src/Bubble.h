@@ -36,7 +36,7 @@ public:
 	Bubble(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
 		unsigned int tx, unsigned int ty, unsigned int twidth, unsigned int theight,
-		unsigned int bgcolour, unsigned int tcolour);
+		unsigned int tcolour, unsigned int bgcolour);
 
 	void setText(std::string s);
 	std::string getText();
@@ -53,13 +53,14 @@ class BubblePart : public CompoundPart {
 	friend class Bubble;
 
 protected:
-	BubblePart(Bubble *p, unsigned int _id, int x, int y);
+	BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int tcolor, unsigned int bgcolor);
 
 	bool editable;
 	std::string text;
 	unsigned int textwidth, textheight;
 	unsigned int textoffset;
 	unsigned int backgroundcolour, textcolour;
+	std::shared_ptr<creaturesImage> charsetsprite;
 
 	void setText(std::string s);
 	unsigned int poseForWidth(unsigned int width);

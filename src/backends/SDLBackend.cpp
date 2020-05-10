@@ -260,39 +260,6 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 	return sdlc;
 }
 
-void SDLRenderTarget::renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) {
-	if (text.empty()) return;
-
-	SDL_Color sdlcolour;
-	if (engine.version == 1) sdlcolour = palette[colour];
-	else sdlcolour = getColourFromRGBA(colour);
-
-	SDL_Surface *textsurf = SDL_CreateRGBSurface(0, surface->w, surface->h, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-	assert(textsurf);
-	
-	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(textsurf);
-	assert(renderer);
-
-	gfxPrimitivesSetFont(nullptr, 0, 0);
-	if (bgcolour == 0) { // transparent
-		stringRGBA(renderer, 0, 0, text.c_str(), sdlcolour.r, sdlcolour.g, sdlcolour.b, sdlcolour.a);
-	} else {
-		SDL_Color sdlbgcolour;
-		if (engine.version == 1) sdlbgcolour = palette[bgcolour];
-		else sdlbgcolour = getColourFromRGBA(bgcolour);
-		stringRGBA(renderer, 0, 0, text.c_str(), sdlcolour.r, sdlcolour.g, sdlcolour.b, sdlcolour.a);
-		// TODO: background?
-	}
-
-	SDL_Rect dest;
-	dest.x = x; dest.y = y;
-	dest.w = textsurf->w * 0.6; dest.h = textsurf->h;
-	SDL_BlitScaled(textsurf, nullptr, surface, &dest);
-
-	SDL_DestroyRenderer(renderer);
-	SDL_FreeSurface(textsurf);
-}
-
 //*** code to mirror 16bpp surface - slow, we should cache this!
 
 Uint8 *pixelPtr(SDL_Surface *surf, int x, int y, int bytesperpixel) {
@@ -587,12 +554,3 @@ void SDLBackend::setPalette(uint8_t *data) {
 void SDLBackend::delay(int msec) {
 	SDL_Delay(msec);
 }
-
-unsigned int SDLBackend::textWidth(std::string text) {
-	if (text.size() == 0) return 0;
-
-	// 8x8 font, 2 pixels padding, scaled by 0.6
-	// TODO: how to actually calculate this?
-	return text.size() * (8 + 2) * 0.6;
-}
-

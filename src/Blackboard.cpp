@@ -22,6 +22,7 @@
 #include "Backend.h"
 #include "Blackboard.h"
 #include "Engine.h"
+#include "imageManager.h"
 #include "keycodes.h"
 #include "World.h" // setFocus
 
@@ -33,10 +34,13 @@ Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned
 	ourPart = 0;
 	editing = false;
 
-	if (engine.version == 1)
+	if (engine.version == 1) {
 		strings.resize(16, std::pair<unsigned int, std::string>(0, std::string()));
-	else
+		charsetsprite = world.gallery->getCharsetDta(if_paletted, chalkcolour, backgroundcolour);
+	} else {
 		strings.resize(48, std::pair<unsigned int, std::string>(0, std::string()));
+		charsetsprite = world.gallery->getCharsetDta(if_16bit_565, chalkcolour, backgroundcolour);
+	}
 }
 
 void Blackboard::addPart(CompoundPart *p) {
@@ -75,8 +79,12 @@ void Blackboard::renderText(RenderTarget *renderer, int xoffset, int yoffset) {
 	std::string ourtext = currenttext;
 	if (editing) ourtext += "_"; // TODO: should this be rendered in aliascolour?
 
-	// TODO: is +1 really the right fix here?
-	renderer->renderText(xoffset + textx + 1, yoffset + texty + 1, ourtext, chalkcolour, backgroundcolour);
+	unsigned int charpos = 0;
+	for (auto c : ourtext) {
+		// TODO: is +1 really the right fix here?
+		renderer->render(charsetsprite, c, xoffset + textx + 1 + charpos, yoffset + texty + 1);
+		charpos += charsetsprite->width(c) + 1;
+	}
 }
 
 void Blackboard::startEditing() {
