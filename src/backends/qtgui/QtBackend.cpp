@@ -108,8 +108,8 @@ void QtBackend::renderDone() {
 }
 	
 bool QtBackend::pollEvent(SomeEvent &e) {
-	// obtain events from backend
-	if (SDLBackend::pollEvent(e)) return true;
+	// skip events from SDL
+	while (SDLBackend::pollEvent(e)) {};
 
 	if (events.size() == 0)
 		return false;
