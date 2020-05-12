@@ -48,6 +48,8 @@ openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstr
 
 	setAttribute(Qt::WA_InputMethodEnabled);
 
+	backend->setup(viewport());
+
 	// keyboard focus. needed? better way?
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -79,15 +81,9 @@ void openc2eView::resizescrollbars() {
 	}
 }
 
-bool firsttime = true;
 int currentwidth, currentheight;
 
 void openc2eView::resizeEvent(QResizeEvent *) {
-	if (firsttime) {
-		backend->setup(viewport());
-		firsttime = false;
-	}
-
 	backend->resized(viewport()->width(), viewport()->height());
 	currentwidth = viewport()->width();
 	currentheight = viewport()->height();
@@ -99,12 +95,10 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 }
 
 void openc2eView::paintEvent(QPaintEvent *) {
-	if (!firsttime) {
-		// TODO: mad hax
-		if (currentwidth == viewport()->width() && currentheight == viewport()->height()) {
-			world.drawWorld();
-			backend->renderDone();
-		}
+	// TODO: mad hax
+	if (currentwidth == viewport()->width() && currentheight == viewport()->height()) {
+		world.drawWorld();
+		backend->renderDone();
 	}
 }
 
