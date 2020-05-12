@@ -226,7 +226,9 @@ void BubblePart::setText(std::string str) {
 		twidth += charsetsprite->width(c) + 1;
 		newtext.push_back(c);
 	}
-	twidth -= 1;
+	if (twidth > 0) {
+		twidth -= 1;
+	}
 
 	if (engine.version == 2) {
 		unsigned int pose = poseForWidth(twidth);
