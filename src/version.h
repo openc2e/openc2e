@@ -20,6 +20,8 @@
 /* Something else may go here eventually, but for now this is a good
    place to store a version define */
 
+#pragma once
+
 #define DEV_BUILD 1
 #define RELEASE_VERSION "alpha 0.1"
 
