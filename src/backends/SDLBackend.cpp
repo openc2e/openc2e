@@ -37,7 +37,8 @@ SDLBackend::SDLBackend() : mainrendertarget(this) {
 	// reasonable defaults
 	mainrendertarget.width = 800;
 	mainrendertarget.height = 600;
-	mainrendertarget.surface = 0;
+
+	mainrendertarget.texture = nullptr;
 }
 
 int SDLBackend::idealBpp() {
@@ -50,9 +51,6 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 	SDL_SetWindowSize(window, _w, _h);
 	mainrendertarget.width = _w;
 	mainrendertarget.height = _h;
-	mainrendertarget.surface = SDL_GetWindowSurface(window);
-	if (!mainrendertarget.surface)
-		throw creaturesException(std::string("Failed to create SDL surface due to: ") + SDL_GetError());
 }
 
 void SDLBackend::init() {
@@ -73,6 +71,10 @@ void SDLBackend::init() {
 		SDL_WINDOW_RESIZABLE
 	);
 	assert(window);
+
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE | SDL_RENDERER_TARGETTEXTURE);
+	assert(renderer);
+
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
 }
@@ -243,10 +245,9 @@ retry:
 }
 
 void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
-	SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(surface);
-	assert(renderer);
-	aalineColor(renderer, x1, y1, x2, y2, colour);
-	SDL_DestroyRenderer(renderer);
+	SDL_SetRenderTarget(parent->renderer, texture);
+	aalineColor(parent->renderer, x1, y1, x2, y2, colour);
+	SDL_SetRenderTarget(parent->renderer, nullptr);
 }
 
 SDL_Color getColourFromRGBA(unsigned int c) {
@@ -309,39 +310,44 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 
 	}
 	
-	// set colour-keying/alpha
-	if (!is_background) SDL_SetColorKey(surf, SDL_TRUE, 0);
-	
-	// do actual render
-	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(surface);
-	assert(renderer);
+	// set colour-keying
+	if (!is_background) {
+		SDL_SetColorKey(surf, SDL_TRUE, 0);
+	}
 
-	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
+	// create texture
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(parent->renderer, surf);
 	assert(tex);
+	SDL_FreeSurface(surf);
 
+	// do actual render
 	if (trans) {
 		SDL_SetTextureAlphaMod(tex, 255 - transparency);
 	}
 	SDL_RendererFlip flip = mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 	SDL_Rect destrect;
-	destrect.x = x; destrect.y = y;
-	destrect.w = surf->w; destrect.h = surf->h;
-	SDL_RenderCopyEx(renderer, tex, nullptr, &destrect, 0, nullptr, flip);
+	destrect.x = x;
+	destrect.y = y;
+	destrect.w = image->width(frame);
+	destrect.h = image->height(frame);
+	SDL_SetRenderTarget(parent->renderer, texture);
+	SDL_RenderCopyEx(parent->renderer, tex, nullptr, &destrect, 0, nullptr, flip);
+	SDL_SetRenderTarget(parent->renderer, nullptr);
 
+	// free texture
 	SDL_DestroyTexture(tex);
-	SDL_DestroyRenderer(renderer);
-
-	// free surface
-	SDL_FreeSurface(surf);
 }
 
 void SDLRenderTarget::renderClear() {
-	SDL_FillRect(surface, nullptr, 0x00000000);
+	SDL_SetRenderDrawColor(parent->renderer, 0, 0, 0, 255);
+	SDL_SetRenderTarget(parent->renderer, texture);
+	SDL_RenderClear(parent->renderer);
+	SDL_SetRenderTarget(parent->renderer, nullptr);
 }
 
 void SDLRenderTarget::renderDone() {
-	if (surface == SDL_GetWindowSurface(parent->window)) {
-		SDL_UpdateWindowSurface(parent->window);
+	if (this == &parent->mainrendertarget) {
+		SDL_RenderPresent(parent->renderer);
 	}
 }
 
@@ -349,35 +355,29 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget *s, int x, int y, int w, int
 	SDLRenderTarget *src = dynamic_cast<SDLRenderTarget *>(s);
 	assert(src);
 
-	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(surface);
-	assert(renderer);
-	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, src->surface);
-	assert(tex);
-
 	SDL_Rect r; r.x = x; r.y = y; r.w = w; r.h = h;
-	SDL_RenderCopy(renderer, tex, nullptr, &r);
-
-	SDL_DestroyTexture(tex);
-	SDL_DestroyRenderer(renderer);
+	SDL_SetRenderTarget(parent->renderer, texture);
+	SDL_RenderCopy(parent->renderer, src->texture, nullptr, &r);
+	SDL_SetRenderTarget(parent->renderer, nullptr);
 }
 
 RenderTarget *SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
-	SDL_Surface *surf = mainrendertarget.surface;
-	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(0, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
-	assert(underlyingsurf);
-	SDLRenderTarget *newsurf = new SDLRenderTarget(this);
-	newsurf->surface = underlyingsurf;
-	newsurf->width = w;
-	newsurf->height = h;
-	return newsurf;
+	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB32, SDL_TEXTUREACCESS_TARGET, w, h);
+	assert(texture);
+
+	SDLRenderTarget *newtarget = new SDLRenderTarget(this);
+	newtarget->texture = texture;
+	newtarget->width = w;
+	newtarget->height = h;
+	return newtarget;
 }
 
 void SDLBackend::freeRenderTarget(RenderTarget *s) {
-	SDLRenderTarget *surf = dynamic_cast<SDLRenderTarget *>(s);
-	assert(surf);
+	SDLRenderTarget *target = dynamic_cast<SDLRenderTarget *>(s);
+	assert(target);
 
-	SDL_FreeSurface(surf->surface);
-	delete surf;
+	SDL_DestroyTexture(target->texture);
+	delete target;
 }
 
 // left out: menu, select, execute, snapshot, numeric keypad

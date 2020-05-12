@@ -30,7 +30,7 @@ class SDLRenderTarget : public RenderTarget {
 
 protected:
 	class SDLBackend *parent;
-	SDL_Surface *surface;
+	SDL_Texture *texture;
 	unsigned int width, height;
 	SDL_Color palette[256];
 	
@@ -53,13 +53,14 @@ protected:
 	bool networkingup;
 
 	SDL_Window *window = nullptr;
+	SDL_Renderer *renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
 	TCPsocket listensocket;
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
 
-	SDL_Surface *getMainSDLSurface() { return mainrendertarget.surface; }
+	SDL_Surface *getMainSDLSurface() { return SDL_GetWindowSurface(window); }
 
 	virtual int idealBpp();
 
