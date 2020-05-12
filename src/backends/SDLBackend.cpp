@@ -349,9 +349,16 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget *s, int x, int y, int w, int
 	SDLRenderTarget *src = dynamic_cast<SDLRenderTarget *>(s);
 	assert(src);
 
-	// TODO: evil use of internal SDL api
+	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(surface);
+	assert(renderer);
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, src->surface);
+	assert(tex);
+
 	SDL_Rect r; r.x = x; r.y = y; r.w = w; r.h = h;
-	SDL_SoftStretch(src->surface, 0, surface, &r);
+	SDL_RenderCopy(renderer, tex, nullptr, &r);
+
+	SDL_DestroyTexture(tex);
+	SDL_DestroyRenderer(renderer);
 }
 
 RenderTarget *SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
