@@ -122,8 +122,8 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	int yoffset = (engine.version == 1) ? 3 : 8;
 	int twidth = (engine.version == 1) ? 144 : 95; // extended to fit text upon setText()
 
-	unsigned int textcolor = (engine.version == 1) ? 0xb : 0x0821; // TODO
-	unsigned int bgcolor = (engine.version == 1) ? 0x1 : 0xFFFF; // TODO
+	unsigned int textcolor = (engine.version == 1) ? 0xb : 0x080808; // TODO
+	unsigned int bgcolor = (engine.version == 1) ? 0x1 : 0xFFFFFF; // TODO
 
 	Bubble *ourBubble = new Bubble(2, 1, 2, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, textcolor, bgcolor);
 	ourBubble->finishInit();
@@ -159,9 +159,9 @@ BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int t
 	backgroundcolour = bgcolour;
 
 	if (engine.version == 1) {
-		charsetsprite = world.gallery->getCharsetDta(if_paletted, tcolour, bgcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_paletted, bgcolour, tcolour, tcolour);
 	} else {
-		charsetsprite = world.gallery->getCharsetDta(if_16bit_565, tcolour, bgcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_24bit, bgcolour, tcolour, tcolour);
 	}
 }
 

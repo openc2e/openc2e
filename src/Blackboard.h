@@ -30,7 +30,6 @@ protected:
 	
 	// configuration
 	unsigned int textx, texty;
-	unsigned int backgroundcolour, chalkcolour, aliascolour;
 
 	// state
 	std::vector<std::pair<unsigned int, std::string> > strings;
@@ -47,8 +46,8 @@ protected:
 
 public:
 	Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
-		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,
-		unsigned int alcolour);
+		unsigned int tx, unsigned int ty, uint32_t bgcolour, uint32_t ckcolour,
+		uint32_t alcolour);
 
 	void addBlackboardString(unsigned int n, unsigned int id, std::string text);
 	void showText(bool show);

@@ -119,8 +119,15 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	return img;
 }
 
-std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format, unsigned int textcolor, unsigned int bgcolor) {
+std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
+                                                            uint32_t bgcolor,
+                                                            uint32_t textcolor,
+                                                            uint32_t aliascolor) {
 	// TODO: cache this?
+
+	// TODO: use bgcolor and aliascolor
+	(void)bgcolor;
+	(void)aliascolor;
 
 	std::string filename = world.findFile("Images/EuroCharset.dta");
 	if (filename.empty()) {
@@ -158,18 +165,20 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format, 
 				}
 				buffers[i] = std::move(chardata);
 				break;
-			case if_16bit_565:
-				buffers[i].resize(chardata.size() * 2, 0);
+			case if_24bit:
+				buffers[i].resize(chardata.size() * 3, 0);
 				for (size_t j = 0; j < reader.getCharWidth(i) * reader.getCharHeight(i); ++j) {
 					if (chardata[j] != 0) {
-						((uint16_t*)buffers[i].data())[j] = textcolor;
+						buffers[i][j*3] = (textcolor >> 16) & 0xff;
+						buffers[i][j*3 + 1] = (textcolor >> 8) & 0xff;
+						buffers[i][j*3 + 2] = textcolor & 0xff;
 					}
 				}
 				break;
-			case if_16bit_555: // TODO: how to tell what format the color is in?
+			case if_16bit_555:
 				throw creaturesException("Unimplemented format if_16bit_555 when loading charset.dta");
-			case if_24bit:
-				throw creaturesException("Unimplemented format if_24bit when loading charset.dta");
+			case if_16bit_565:
+				throw creaturesException("Unimplemented format if_16bit_565 when loading charset.dta");
 		}
 	}
 

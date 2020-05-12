@@ -27,19 +27,18 @@
 #include "World.h" // setFocus
 
 Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
-		unsigned int tx, unsigned int ty, unsigned int bgcolour, unsigned int ckcolour,
-		unsigned int alcolour) : CompoundAgent(spritefile, firstimage, imagecount) {
+		unsigned int tx, unsigned int ty, uint32_t bgcolour, uint32_t ckcolour,
+		uint32_t alcolour) : CompoundAgent(spritefile, firstimage, imagecount) {
 	textx = tx; texty = ty;
-	backgroundcolour = bgcolour; chalkcolour = ckcolour; aliascolour = alcolour;
 	ourPart = 0;
 	editing = false;
 
 	if (engine.version == 1) {
 		strings.resize(16, std::pair<unsigned int, std::string>(0, std::string()));
-		charsetsprite = world.gallery->getCharsetDta(if_paletted, chalkcolour, backgroundcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_paletted, bgcolour, ckcolour, alcolour);
 	} else {
 		strings.resize(48, std::pair<unsigned int, std::string>(0, std::string()));
-		charsetsprite = world.gallery->getCharsetDta(if_16bit_565, chalkcolour, backgroundcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_24bit, bgcolour, ckcolour, alcolour);
 	}
 }
 
