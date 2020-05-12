@@ -53,13 +53,13 @@ protected:
 	bool networkingup;
 
 	SDL_Window *window = nullptr;
-	SDLRenderTarget mainsurface;
+	SDLRenderTarget mainrendertarget;
 	TCPsocket listensocket;
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
 
-	SDL_Surface *getMainSDLRenderTarget() { return mainsurface.surface; }
+	SDL_Surface *getMainSDLSurface() { return mainrendertarget.surface; }
 
 	virtual int idealBpp();
 
@@ -80,7 +80,7 @@ public:
 	bool selfRender() { return false; }
 	void requestRender() { }
 
-	RenderTarget *getMainRenderTarget() { return &mainsurface; }
+	RenderTarget *getMainRenderTarget() { return &mainrendertarget; }
 	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);
 	void freeRenderTarget(RenderTarget *surf);
 		

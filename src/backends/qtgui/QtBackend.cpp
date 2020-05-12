@@ -88,7 +88,7 @@ void QtBackend::renderDone() {
 	needsrender = false;
 
 	// We need to copy the contents of the offscreen buffer into the window.
-	SDL_Surface *surf = getMainSDLRenderTarget();
+	SDL_Surface *surf = getMainSDLSurface();
 	assert(SDL_LockSurface(surf) == 0);
 
 	// Qt reads the alpha channel even though we tell it not to, and SDL seems

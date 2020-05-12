@@ -31,13 +31,13 @@
 
 SDLBackend *g_backend;
 
-SDLBackend::SDLBackend() : mainsurface(this) {
+SDLBackend::SDLBackend() : mainrendertarget(this) {
 	networkingup = false;
 
 	// reasonable defaults
-	mainsurface.width = 800;
-	mainsurface.height = 600;
-	mainsurface.surface = 0;
+	mainrendertarget.width = 800;
+	mainrendertarget.height = 600;
+	mainrendertarget.surface = 0;
 }
 
 int SDLBackend::idealBpp() {
@@ -48,10 +48,10 @@ int SDLBackend::idealBpp() {
 
 void SDLBackend::resizeNotify(int _w, int _h) {
 	SDL_SetWindowSize(window, _w, _h);
-	mainsurface.width = _w;
-	mainsurface.height = _h;
-	mainsurface.surface = SDL_GetWindowSurface(window);
-	if (!mainsurface.surface)
+	mainrendertarget.width = _w;
+	mainrendertarget.height = _h;
+	mainrendertarget.surface = SDL_GetWindowSurface(window);
+	if (!mainrendertarget.surface)
 		throw creaturesException(std::string("Failed to create SDL surface due to: ") + SDL_GetError());
 }
 
@@ -69,7 +69,7 @@ void SDLBackend::init() {
 	window = SDL_CreateWindow(titlebar.c_str(),
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		mainsurface.width, mainsurface.height,
+		mainrendertarget.width, mainrendertarget.height,
 		SDL_WINDOW_RESIZABLE
 	);
 	assert(window);
@@ -362,7 +362,7 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget *s, int x, int y, int w, int
 }
 
 RenderTarget *SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
-	SDL_Surface *surf = mainsurface.surface;
+	SDL_Surface *surf = mainrendertarget.surface;
 	SDL_Surface* underlyingsurf = SDL_CreateRGBSurface(0, w, h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
 	assert(underlyingsurf);
 	SDLRenderTarget *newsurf = new SDLRenderTarget(this);
@@ -482,10 +482,10 @@ bool SDLBackend::keyDown(int key) {
 void SDLBackend::setPalette(uint8_t *data) {
 	// TODO: we only set the palette on our main surface, so will fail for any C1 cameras!
 	for (unsigned int i = 0; i < 256; i++) {
-		mainsurface.palette[i].r = data[i * 3];
-		mainsurface.palette[i].g = data[(i * 3) + 1];
-		mainsurface.palette[i].b = data[(i * 3) + 2];
-		mainsurface.palette[i].a = 255;
+		mainrendertarget.palette[i].r = data[i * 3];
+		mainrendertarget.palette[i].g = data[(i * 3) + 1];
+		mainrendertarget.palette[i].b = data[(i * 3) + 2];
+		mainrendertarget.palette[i].a = 255;
 	}
 }
 
