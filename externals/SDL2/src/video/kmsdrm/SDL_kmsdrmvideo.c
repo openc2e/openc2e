@@ -26,7 +26,6 @@
 /* SDL internals */
 #include "../SDL_sysvideo.h"
 #include "SDL_syswm.h"
-#include "SDL_log.h"
 #include "SDL_hints.h"
 #include "../../events/SDL_events_c.h"
 #include "../../events/SDL_mouse_c.h"
@@ -391,7 +390,9 @@ KMSDRM_CreateSurfaces(_THIS, SDL_Window * window)
     Uint32 height = dispdata->mode.vdisplay;
     Uint32 surface_fmt = GBM_FORMAT_XRGB8888;
     Uint32 surface_flags = GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING;
+#if SDL_VIDEO_OPENGL_EGL
     EGLContext egl_context;
+#endif
 
     if (!KMSDRM_gbm_device_is_format_supported(viddata->gbm, surface_fmt, surface_flags)) {
         SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO, "GBM surface format not supported. Trying anyway.");
