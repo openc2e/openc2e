@@ -80,7 +80,12 @@ void Blackboard::renderText(RenderTarget *renderer, int xoffset, int yoffset) {
 	if (editing) ourtext += "_"; // TODO: should this be rendered in aliascolour?
 
 	unsigned int charpos = 0;
-	for (auto c : ourtext) {
+	for (unsigned char c : ourtext) {
+		if (c >= charsetsprite->numframes()) {
+			// skip accented characters when we only have CHARSET.DTA
+			// TODO: convert to non-accented characters (CP1252->ASCII)
+			continue;
+		}
 		// TODO: is +1 really the right fix here?
 		renderer->render(charsetsprite, c, xoffset + textx + 1 + charpos, yoffset + texty + 1);
 		charpos += charsetsprite->width(c) + 1;
@@ -142,9 +147,11 @@ void BlackboardPart::loseFocus() {
 void BlackboardPart::handleTranslatedChar(unsigned char c) {
 	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
 
-	// strip non-alpha chars
-	// TODO: internationalisation?
-	if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) return;
+	if (c >= bbd->charsetsprite->numframes()) {
+		// skip accented characters when we only have CHARSET.DTA
+		// TODO: convert to non-accented characters (CP1252->ASCII)
+		return;
+	}
 
 	std::string &s = bbd->strings[bbd->editingindex].second;
 	if (s.size() < 10) {

@@ -167,7 +167,8 @@ BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int t
 
 void BubblePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	unsigned int charpos = 0;
-	for (auto c : text) {
+	for (unsigned char c : text) {
+		assert(c < charsetsprite->numframes()); // handled in setText
 		renderer->render(charsetsprite, c, xoffset + x + textoffset + charpos, yoffset + y);
 		charpos += charsetsprite->width(c) + 1;
 	}
@@ -182,9 +183,6 @@ void BubblePart::loseFocus() {
 }
 
 void BubblePart::handleTranslatedChar(unsigned char c) {
-	// TODO: reject invalid chars
-	// TODO: handle non-ASCII characters correctly
-	if (c >= 0x7f) return;
 	setText(text + (char)c);
 }
 
@@ -218,8 +216,15 @@ unsigned int BubblePart::poseForWidth(unsigned int width) {
 
 void BubblePart::setText(std::string str) {
 	unsigned int twidth = 0;
-	for (auto c : str) {
+	std::string newtext;
+	for (unsigned char c : str) {
+		if (c >= charsetsprite->numframes()) {
+			// skip accented characters when we only have CHARSET.DTA
+			// TODO: convert to non-accented characters (CP1252->ASCII)
+			continue;
+		}
 		twidth += charsetsprite->width(c) + 1;
+		newtext.push_back(c);
 	}
 	twidth -= 1;
 
@@ -238,7 +243,7 @@ void BubblePart::setText(std::string str) {
 	}
 	if (twidth > textwidth) return;
 
-	text = str;
+	text = newtext;
 	textoffset = (textwidth - twidth) / 2;
 }
 
