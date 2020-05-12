@@ -308,6 +308,14 @@ target_link_libraries(praydumper prayfile)
 add_executable(praybuilder src/tools/praybuilder.cpp ${GEN}/caoslexer.cpp)
 target_link_libraries(praybuilder prayfile)
 
+add_executable(praytoolqt src/tools/praytoolqt.cpp ${GEN}/caoslexer.cpp)
+target_link_libraries(praytoolqt prayfile Qt5::Widgets)
+set_target_properties(praytoolqt PROPERTIES
+	AUTOMOC ON
+	AUTORCC ON
+	AUTOUIC ON
+)
+
 add_executable(spritedumper
 	src/tools/spritedumper.cpp
 	src/images/blkImage.cpp
