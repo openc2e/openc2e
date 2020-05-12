@@ -161,6 +161,97 @@ void Engine::loadGameData() {
 			throw creaturesException("Couldn't find C1 palette data!");
 	}
 
+	// load word list translations for C1
+	// C1 does not keep translations for all languages, so we embed them
+	if (gametype == "c1") {
+		if (language == "de") {
+			wordlist_translations = std::map<std::string, std::string>{
+				{ "come", "komm" },
+				{ "drop", "lass" },
+				{ "get", "hol" },
+				{ "left", "links" },
+				{ "look", "guck" },
+				{ "no", "nein" },
+				{ "pull", "zieh" },
+				{ "push", "druck" },
+				{ "right", "rechts" },
+				{ "run", "lauf" },
+				{ "sleep", "raste" },
+				{ "stop", "halt" },
+				{ "what", "was" },
+				{ "yes", "ja" }
+			};
+		} else if (language == "fr") {
+			wordlist_translations = std::map<std::string, std::string>{
+				{ "come", "venir" },
+				{ "drop", "lacher" },
+				{ "get", "prendre" },
+				{ "left", "gauche" },
+				{ "look", "regarder" },
+				{ "no", "non" },
+				{ "pull", "tirer" },
+				{ "push", "pousser" },
+				{ "right", "droite" },
+				{ "run", "courir" },
+				{ "sleep", "se-reposer" },
+				{ "stop", "arreter" },
+				{ "what", "quoi" },
+				{ "yes", "oui" }
+			};
+		} else if (language == "it") {
+			wordlist_translations = std::map<std::string, std::string>{
+				{ "come", "vieni" },
+				{ "drop", "molla" },
+				{ "get", "prendi" },
+				{ "left", "sinistra" },
+				{ "look", "guarda" },
+				{ "no", "no" },
+				{ "pull", "tira" },
+				{ "push", "premi" },
+				{ "right", "destra" },
+				{ "run", "corri" },
+				{ "sleep", "riposa" },
+				{ "stop", "stop" },
+				{ "what", "cosa" },
+				{ "yes", "si" }
+			};
+		} else if (language == "nl") {
+			wordlist_translations = std::map<std::string, std::string>{
+				{ "come", "komen" },
+				{ "drop", "latenvallen" },
+				{ "get", "pakken" },
+				{ "left", "links" },
+				{ "look", "kijken" },
+				{ "no", "nee" },
+				{ "pull", "trekken" },
+				{ "push", "duwen" },
+				{ "right", "rechts" },
+				{ "run", "rennen" },
+				{ "sleep", "rusten" },
+				{ "stop", "stoppen" },
+				{ "what", "wat" },
+				{ "yes", "ja" }
+			};
+		} else if (language == "es") {
+			wordlist_translations = std::map<std::string, std::string>{
+				{ "come", "venir" },
+				{ "drop", "soltar" },
+				{ "get", "coger" },
+				{ "left", "izquierda" },
+				{ "look", "mirar" },
+				{ "no", "no" },
+				{ "pull", "tirar" },
+				{ "push", "empujar" },
+				{ "right", "derecha" },
+				{ "run", "correr" },
+				{ "sleep", "descansar" },
+				{ "stop", "parar" },
+				{ "what", "que" },
+				{ "yes", "si" }
+			};
+		}
+	}
+
 	// load word list for C2
 	if (gametype == "c2") {
 		fs::path exepath(world.findFile("Creatures2.exe"));
