@@ -392,13 +392,24 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 	
 	// set colour-keying/alpha
 	if (!is_background) SDL_SetColorKey(surf, SDL_TRUE, 0);
-	if (trans) SDL_SetSurfaceAlphaMod(surf, 255 - transparency);
 	
-	// do actual blit
+	// do actual render
+	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(surface);
+	assert(renderer);
+
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
+	assert(tex);
+
+	if (trans) {
+		SDL_SetTextureAlphaMod(tex, 255 - transparency);
+	}
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;
 	destrect.w = surf->w; destrect.h = surf->h;
-	SDL_BlitSurface(surf, 0, surface, &destrect);
+	SDL_RenderCopy(renderer, tex, nullptr, &destrect);
+
+	SDL_DestroyTexture(tex);
+	SDL_DestroyRenderer(renderer);
 
 	// free surface
 	SDL_FreeSurface(surf);
