@@ -260,75 +260,6 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 	return sdlc;
 }
 
-//*** code to mirror 16bpp surface - slow, we should cache this!
-
-Uint8 *pixelPtr(SDL_Surface *surf, int x, int y, int bytesperpixel) {
-	return (Uint8 *)surf->pixels + (y * surf->pitch) + (x * bytesperpixel);
-}
-
-SDL_Surface *MirrorSurface(SDL_Surface *surf, SDL_Color *surfpalette) {
-	SDL_Surface* newsurf = SDL_CreateRGBSurface(0, surf->w, surf->h, surf->format->BitsPerPixel, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
-	assert(newsurf);
-	if (surfpalette) SDL_SetPaletteColors(newsurf->format->palette, surfpalette, 0, 256);
-	SDL_BlitSurface(surf, 0, newsurf, 0);
-
-	if (SDL_MUSTLOCK(newsurf))
-		if (SDL_LockSurface(newsurf) == -1) {
-			SDL_FreeSurface(newsurf);
-			throw creaturesException("SDLBackend failed to lock surface for mirroring");
-		}
-
-	for (int y = 0; y < newsurf->h; y++) {
-		for (int x = 0; x < (newsurf->w / 2); x++) {
-			switch (surf->format->BitsPerPixel) {
-				case 8:
-					{
-					Uint8 *one = pixelPtr(newsurf, x, y, 1);
-					Uint8 *two = pixelPtr(newsurf, (newsurf->w - 1) - x, y, 1);
-					Uint8 temp = *one;
-					*one = *two;
-					*two = temp;
-					}
-					break;
-
-				case 16:
-					{
-					Uint16 *one = (Uint16 *)pixelPtr(newsurf, x, y, 2);
-					Uint16 *two = (Uint16 *)pixelPtr(newsurf, (newsurf->w - 1) - x, y, 2);
-					Uint16 temp = *one;
-					*one = *two;
-					*two = temp;
-					}
-					break;
-
-				case 24:
-					{
-						Uint8 *one = pixelPtr(newsurf, x, y, 3);
-						Uint8 *two = pixelPtr(newsurf, (newsurf->w - 1) - x, y, 3);
-						Uint8 temp[3];
-						temp[0] = *one; temp[1] = *(one + 1); temp[2] = *(one + 2);
-						*one = *two; *(one + 1) = *(two + 1); *(one + 2) = *(two + 2);
-						*two = temp[0]; *(two + 1) = temp[1]; *(two + 2) = temp[2];
-					
-					}
-					break;
-
-				default:
-					if (SDL_MUSTLOCK(newsurf)) SDL_UnlockSurface(newsurf);
-					SDL_FreeSurface(newsurf);
-					throw creaturesException("SDLBackend failed to mirror surface");
-			}
-		}
-	}
-	
-	if (SDL_MUSTLOCK(newsurf))
-		SDL_UnlockSurface(newsurf);
-
-	return newsurf;
-}
-
-//*** end mirror code
-
 void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror, bool is_background) {
 	assert(image);
 	assert(image->numframes() > frame);
@@ -377,18 +308,6 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 		assert(surf);
 
 	}
-
-	// try mirroring, if necessary
-	try {
-		if (mirror) {
-			SDL_Surface *newsurf = MirrorSurface(surf, surfpalette);
-			SDL_FreeSurface(surf);
-			surf = newsurf;
-		}
-	} catch (std::exception &e) {
-		SDL_FreeSurface(surf);
-		throw;
-	}
 	
 	// set colour-keying/alpha
 	if (!is_background) SDL_SetColorKey(surf, SDL_TRUE, 0);
@@ -403,10 +322,11 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 	if (trans) {
 		SDL_SetTextureAlphaMod(tex, 255 - transparency);
 	}
+	SDL_RendererFlip flip = mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 	SDL_Rect destrect;
 	destrect.x = x; destrect.y = y;
 	destrect.w = surf->w; destrect.h = surf->h;
-	SDL_RenderCopy(renderer, tex, nullptr, &destrect);
+	SDL_RenderCopyEx(renderer, tex, nullptr, &destrect, 0, nullptr, flip);
 
 	SDL_DestroyTexture(tex);
 	SDL_DestroyRenderer(renderer);
