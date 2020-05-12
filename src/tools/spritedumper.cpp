@@ -183,15 +183,18 @@ int main(int argc, char **argv) {
             printf("error during png creation\n");
             abort();
         }
-        
+
         png_init_io(png, fp);
-        
-        png_set_IHDR(png, info, image->width(i), image->height(i),
-          8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
-          PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT
-        );
+
+        std::vector<uint8_t> out_buffer;
+        std::vector<png_bytep> row_pointers(image->height(i));
 
         if (image->format() == if_16bit_565 || image->format() == if_16bit_555) {
+            png_set_IHDR(png, info, image->width(i), image->height(i),
+              8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
+              PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT
+            );
+
             png_color_8 sbit;
             sbit.red = 5;
             sbit.green = image->format() == if_16bit_565 ? 6 : 5;
@@ -199,13 +202,13 @@ int main(int argc, char **argv) {
             sbit.gray = 0;
             sbit.alpha = 0;
             png_set_sBIT(png, info, &sbit);
-        }
-        
-        png_write_info(png, info);
-        
-        std::vector<uint8_t> rgb_buffer(image->width(i) * image->height(i) * 3);
-        for (size_t j = 0; j < image->width(i) * image->height(i); ++j) {
-            if (image->format() == if_16bit_565 || image->format() == if_16bit_555) {
+            png_write_info(png, info);
+
+            out_buffer.resize(image->width(i) * image->height(i) * 3);
+            for (size_t y = 0; y < image->height(i); ++y) {
+                row_pointers[y] = out_buffer.data() + y * image->width(i) * 3;
+            }
+            for (size_t j = 0; j < image->width(i) * image->height(i); ++j) {
                 uint16_t pixel = *(((uint16_t*)image->data(i)) + j);
                 if (image->format() == if_16bit_565) {
                     uint16_t r = (pixel & 0xF800) >> 11;
@@ -214,9 +217,9 @@ int main(int argc, char **argv) {
                     r = r * 255 / 31;
                     g = g * 255 / 63;
                     b = b * 255 / 31;
-                    rgb_buffer[j * 3] = r;
-                    rgb_buffer[j * 3 + 1] = g;
-                    rgb_buffer[j * 3 + 2] = b;
+                    out_buffer[j * 3] = r;
+                    out_buffer[j * 3 + 1] = g;
+                    out_buffer[j * 3 + 2] = b;
                 } else {
                     uint16_t r = (pixel & 0x7C00) >> 10;
                     uint16_t g = (pixel & 0x03E0) >> 5;
@@ -224,34 +227,38 @@ int main(int argc, char **argv) {
                     r = r * 255 / 31;
                     g = g * 255 / 31;
                     b = b * 255 / 31;
-                    rgb_buffer[j * 3] = r;
-                    rgb_buffer[j * 3 + 1] = g;
-                    rgb_buffer[j * 3 + 2] = b;
+                    out_buffer[j * 3] = r;
+                    out_buffer[j * 3 + 1] = g;
+                    out_buffer[j * 3 + 2] = b;
                 }
-            } else if (image->format() == if_paletted) {
-                if (image->hasCustomPalette()) {
-                    std::cerr << "creaturesImage: didn't expect custom palette" << std::endl;
-                    exit(1);
-                }
-            
-                uint8_t pixel = *(((uint8_t*)image->data(i)) + j);
-                uint8_t r = CREATURES_PALETTE[pixel * 3] * 255 / 63;
-                uint8_t g = CREATURES_PALETTE[pixel * 3 + 1] * 255 / 63;
-                uint8_t b = CREATURES_PALETTE[pixel * 3 + 2] * 255 / 63;
-                rgb_buffer[j * 3] = r;
-                rgb_buffer[j * 3 + 1] = g;
-                rgb_buffer[j * 3 + 2] = b;
-                
-            } else {
-                std::cerr << "creaturesImage: expected 8-bit or 16-bit" << std::endl;
-                exit(1);
             }
+        } else if (image->format() == if_paletted) {
+            png_set_IHDR(png, info, image->width(i), image->height(i),
+              8, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE,
+              PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT
+            );
+
+            std::vector<png_color_struct> palette(256);
+            for (size_t i = 0; i < palette.size(); ++i) {
+                png_color_struct color;
+                color.red = CREATURES_PALETTE[i * 3] << 2;
+                color.green = CREATURES_PALETTE[i * 3 + 1] << 2;
+                color.blue = CREATURES_PALETTE[i * 3 + 2] << 2;
+                palette[i] = color;
+            }
+
+            png_set_PLTE(png, info, palette.data(), palette.size());
+            png_write_info(png, info);
+
+            out_buffer = std::vector<uint8_t>((uint8_t*)image->data(i), ((uint8_t*)image->data(i)) + image->height(i) * image->width(i));
+            for (size_t y = 0; y < image->height(i); ++y) {
+                row_pointers[y] = out_buffer.data() + y * image->width(i);
+            }
+        } else {
+            std::cerr << "creaturesImage: expected 8-bit or 16-bit" << std::endl;
+            exit(1);
         }
-        
-        std::vector<png_bytep> row_pointers(image->height(i));
-        for (size_t y = 0; y < image->height(i); ++y) {
-            row_pointers[y] = rgb_buffer.data() + y * image->width(i) * 3;
-        }
+
         png_write_image(png, row_pointers.data());
         png_write_end(png, info);
     }
