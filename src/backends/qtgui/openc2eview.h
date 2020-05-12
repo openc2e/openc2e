@@ -21,6 +21,12 @@
 #include <memory>
 #include "Backend.h"
 
+class openc2eviewport : public QWidget {
+	Q_OBJECT
+public:
+	QPaintEngine* paintEngine() const override { return nullptr; }
+};
+
 class openc2eView : public QAbstractScrollArea {
 	Q_OBJECT
 

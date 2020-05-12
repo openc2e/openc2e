@@ -65,8 +65,9 @@ protected:
 	virtual int idealBpp();
 
 public:
-	SDLBackend();	
+	SDLBackend();
 	void init();
+	void initFrom(void *window_id);
 	int networkInit();
 	void shutdown();
 

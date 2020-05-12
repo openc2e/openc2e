@@ -44,7 +44,10 @@
 openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstractScrollArea(parent) {
 	backend = b;
 
-	viewport()->setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background
+	setViewport(new openc2eviewport());
+	viewport()->setAttribute(Qt::WA_NativeWindow);
+	viewport()->setAttribute(Qt::WA_NoSystemBackground); // no need for Qt to draw a background
+	viewport()->setAttribute(Qt::WA_PaintOnScreen);
 
 	setAttribute(Qt::WA_InputMethodEnabled);
 

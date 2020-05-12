@@ -53,9 +53,7 @@ void QtBackend::init() {
 void QtBackend::setup(QWidget *vp) {
 	viewport = vp;
 
-	putenv("SDL_VIDEODRIVER=dummy");
-	
-	SDLBackend::init();
+	SDLBackend::initFrom((void*)vp->winId());
 
 	viewport->setCursor(Qt::BlankCursor);
 }
@@ -86,25 +84,6 @@ void QtBackend::resized(int w, int h) {
 
 void QtBackend::renderDone() {
 	needsrender = false;
-
-	// We need to copy the contents of the offscreen buffer into the window.
-	SDL_Surface *surf = getMainSDLSurface();
-	assert(SDL_LockSurface(surf) == 0);
-
-	// Qt reads the alpha channel even though we tell it not to, and SDL seems
-	// to write an alpha channel even when we don't use it. So, make sure it's
-	// set to fully opaque before copying to the Qt window.
-	for (int row = 0; row < surf->h; row++) {
-		for (int col = 0; col < surf->w; col++) {
-			((uint8_t*)surf->pixels)[surf->pitch * row + col * 4 + 3] = 255;
-		}
-	}
-
-	QImage img((uchar *)surf->pixels, surf->w, surf->h, QImage::Format_RGB32);
-	QPainter painter(viewport);
-	painter.drawImage(0, 0, img);
-
-	SDL_UnlockSurface(surf);
 }
 	
 bool QtBackend::pollEvent(SomeEvent &e) {
