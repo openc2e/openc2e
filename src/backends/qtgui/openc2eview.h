@@ -37,7 +37,6 @@ public:
 protected:
 	// event handlers
 	void resizeEvent(QResizeEvent *);
-	void paintEvent(QPaintEvent *);
 
 	void mouseMoveEvent(QMouseEvent *m);
 	
@@ -63,7 +62,6 @@ protected:
 
 public:
 	std::shared_ptr<class Backend> getBackend();
-	bool needsRender();
 	void tick();
 };
 

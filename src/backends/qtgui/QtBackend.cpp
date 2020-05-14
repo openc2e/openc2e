@@ -34,7 +34,6 @@
 
 QtBackend::QtBackend() {
 	viewport = 0;
-	needsrender = false;
 
 	for (unsigned int i = 0; i < 256; i++) {
 		downkeys[i] = false;
@@ -82,10 +81,6 @@ void QtBackend::resized(int w, int h) {
 	pushEvent(e);
 }
 
-void QtBackend::renderDone() {
-	needsrender = false;
-}
-	
 bool QtBackend::pollEvent(SomeEvent &e) {
 	// skip events from SDL
 	while (SDLBackend::pollEvent(e)) {};

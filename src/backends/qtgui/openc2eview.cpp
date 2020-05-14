@@ -97,14 +97,6 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 	verticalScrollBar()->setPageStep(height());
 }
 
-void openc2eView::paintEvent(QPaintEvent *) {
-	// TODO: mad hax
-	if (currentwidth == viewport()->width() && currentheight == viewport()->height()) {
-		world.drawWorld();
-		backend->renderDone();
-	}
-}
-
 void openc2eView::mouseMoveEvent(QMouseEvent *m) {
 	// add mouse move event to backend queue
 	SomeEvent e;
@@ -180,9 +172,5 @@ void openc2eView::tick() {
 		lastMetaroom = engine.camera->getMetaRoom();
 		resizescrollbars();
 	}
-}
-
-bool openc2eView::needsRender() {
-	return backend->needsRender();
 }
 

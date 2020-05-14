@@ -79,9 +79,6 @@ public:
 	
 	void handleEvents();
 
-	bool selfRender() { return false; }
-	void requestRender() { }
-
 	RenderTarget *getMainRenderTarget() { return &mainrendertarget; }
 	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);
 	void freeRenderTarget(RenderTarget *surf);
