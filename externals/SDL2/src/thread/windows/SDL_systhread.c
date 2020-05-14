@@ -74,16 +74,23 @@ typedef void (__cdecl * pfnSDL_CurrentEndThread) (unsigned code);
 #endif /* !SDL_PASSED_BEGINTHREAD_ENDTHREAD */
 
 
+typedef struct ThreadStartParms
+{
+    void *args;
+    pfnSDL_CurrentEndThread pfnCurrentEndThread;
+} tThreadStartParms, *pThreadStartParms;
+
 static DWORD
 RunThread(void *data)
 {
-    SDL_Thread *thread = (SDL_Thread *) data;
-    pfnSDL_CurrentEndThread pfnEndThread = (pfnSDL_CurrentEndThread) thread->endfunc;
-    SDL_RunThread(thread);
-    if (pfnEndThread != NULL) {
+    pThreadStartParms pThreadParms = (pThreadStartParms) data;
+    pfnSDL_CurrentEndThread pfnEndThread = pThreadParms->pfnCurrentEndThread;
+    void *args = pThreadParms->args;
+    SDL_free(pThreadParms);
+    SDL_RunThread(args);
+    if (pfnEndThread != NULL)
         pfnEndThread(0);
-    }
-    return 0;
+    return (0);
 }
 
 static DWORD WINAPI
@@ -100,27 +107,33 @@ RunThreadViaBeginThreadEx(void *data)
 
 #ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
 int
-SDL_SYS_CreateThread(SDL_Thread * thread,
+SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
                      pfnSDL_CurrentBeginThread pfnBeginThread,
                      pfnSDL_CurrentEndThread pfnEndThread)
 {
 #elif defined(__CYGWIN__) || defined(__WINRT__)
 int
-SDL_SYS_CreateThread(SDL_Thread * thread)
+SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 {
     pfnSDL_CurrentBeginThread pfnBeginThread = NULL;
     pfnSDL_CurrentEndThread pfnEndThread = NULL;
 #else
 int
-SDL_SYS_CreateThread(SDL_Thread * thread)
+SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 {
     pfnSDL_CurrentBeginThread pfnBeginThread = (pfnSDL_CurrentBeginThread)_beginthreadex;
     pfnSDL_CurrentEndThread pfnEndThread = (pfnSDL_CurrentEndThread)_endthreadex;
 #endif /* SDL_PASSED_BEGINTHREAD_ENDTHREAD */
+    pThreadStartParms pThreadParms =
+        (pThreadStartParms) SDL_malloc(sizeof(tThreadStartParms));
     const DWORD flags = thread->stacksize ? STACK_SIZE_PARAM_IS_A_RESERVATION : 0;
-
+    if (!pThreadParms) {
+        return SDL_OutOfMemory();
+    }
     /* Save the function which we will have to call to clear the RTL of calling app! */
-    thread->endfunc = pfnEndThread;
+    pThreadParms->pfnCurrentEndThread = pfnEndThread;
+    /* Also save the real parameters we have to pass to thread function */
+    pThreadParms->args = args;
 
     /* thread->stacksize == 0 means "system default", same as win32 expects */
     if (pfnBeginThread) {
@@ -128,12 +141,12 @@ SDL_SYS_CreateThread(SDL_Thread * thread)
         thread->handle = (SYS_ThreadHandle)
             ((size_t) pfnBeginThread(NULL, (unsigned int) thread->stacksize,
                                      RunThreadViaBeginThreadEx,
-                                     thread, flags, &threadid));
+                                     pThreadParms, flags, &threadid));
     } else {
         DWORD threadid = 0;
         thread->handle = CreateThread(NULL, thread->stacksize,
                                       RunThreadViaCreateThread,
-                                      thread, flags, &threadid);
+                                      pThreadParms, flags, &threadid);
     }
     if (thread->handle == NULL) {
         return SDL_SetError("Not enough resources to create thread");

@@ -23,6 +23,7 @@
 extern "C" {
 #include "SDL_thread.h"
 #include "SDL_systhread_c.h"
+#include "SDL_log.h"
 }
 
 #include <system_error>

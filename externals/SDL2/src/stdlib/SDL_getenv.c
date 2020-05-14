@@ -110,7 +110,7 @@ int
 SDL_setenv(const char *name, const char *value, int overwrite)
 {
     int added;
-    size_t len, i;
+    int len, i;
     char **new_env;
     char *new_variable;
 
@@ -218,7 +218,7 @@ SDL_getenv(const char *name)
 char *
 SDL_getenv(const char *name)
 {
-    size_t len, i;
+    int len, i;
     char *value;
 
     /* Input validation */

@@ -21,12 +21,6 @@
 #include <memory>
 #include "Backend.h"
 
-class openc2eviewport : public QWidget {
-	Q_OBJECT
-public:
-	QPaintEngine* paintEngine() const override { return nullptr; }
-};
-
 class openc2eView : public QAbstractScrollArea {
 	Q_OBJECT
 
@@ -37,6 +31,7 @@ public:
 protected:
 	// event handlers
 	void resizeEvent(QResizeEvent *);
+	void paintEvent(QPaintEvent *);
 
 	void mouseMoveEvent(QMouseEvent *m);
 	
@@ -62,6 +57,7 @@ protected:
 
 public:
 	std::shared_ptr<class Backend> getBackend();
+	bool needsRender();
 	void tick();
 };
 

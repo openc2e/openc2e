@@ -23,6 +23,8 @@
 
 #if SDL_VIDEO_DRIVER_KMSDRM && SDL_VIDEO_OPENGL_EGL
 
+#include "SDL_log.h"
+
 #include "SDL_kmsdrmvideo.h"
 #include "SDL_kmsdrmopengles.h"
 #include "SDL_kmsdrmdyn.h"

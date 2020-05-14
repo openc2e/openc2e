@@ -23,6 +23,7 @@
 #ifdef SDL_JOYSTICK_HIDAPI
 
 #include "SDL_hints.h"
+#include "SDL_log.h"
 #include "SDL_events.h"
 #include "SDL_timer.h"
 #include "SDL_haptic.h"
@@ -175,11 +176,11 @@ HIDAPI_DriverGameCube_InitDevice(SDL_HIDAPI_Device *device)
             if (curSlot[0] & 0x30) { /* 0x10 - Wired, 0x20 - Wireless */
                 if (ctx->joysticks[i] == -1) {
                     ResetAxisRange(ctx, i);
-                    HIDAPI_JoystickConnected(device, &ctx->joysticks[i], SDL_FALSE);
+                    HIDAPI_JoystickConnected(device, &ctx->joysticks[i]);
                 }
             } else {
                 if (ctx->joysticks[i] != -1) {
-                    HIDAPI_JoystickDisconnected(device, ctx->joysticks[i], SDL_FALSE);
+                    HIDAPI_JoystickDisconnected(device, ctx->joysticks[i]);
                     ctx->joysticks[i] = -1;
                 }
                 continue;
@@ -251,7 +252,7 @@ HIDAPI_DriverGameCube_UpdateDevice(SDL_HIDAPI_Device *device)
             if (curSlot[0] & 0x30) { /* 0x10 - Wired, 0x20 - Wireless */
                 if (ctx->joysticks[i] == -1) {
                     ResetAxisRange(ctx, i);
-                    HIDAPI_JoystickConnected(device, &ctx->joysticks[i], SDL_FALSE);
+                    HIDAPI_JoystickConnected(device, &ctx->joysticks[i]);
                 }
                 joystick = SDL_JoystickFromInstanceID(ctx->joysticks[i]);
 
@@ -261,7 +262,7 @@ HIDAPI_DriverGameCube_UpdateDevice(SDL_HIDAPI_Device *device)
                 }
             } else {
                 if (ctx->joysticks[i] != -1) {
-                    HIDAPI_JoystickDisconnected(device, ctx->joysticks[i], SDL_FALSE);
+                    HIDAPI_JoystickDisconnected(device, ctx->joysticks[i]);
                     ctx->joysticks[i] = -1;
                 }
                 continue;
@@ -403,8 +404,7 @@ SDL_HIDAPI_DeviceDriver SDL_HIDAPI_DriverGameCube =
     HIDAPI_DriverGameCube_OpenJoystick,
     HIDAPI_DriverGameCube_RumbleJoystick,
     HIDAPI_DriverGameCube_CloseJoystick,
-    HIDAPI_DriverGameCube_FreeDevice,
-    NULL,
+    HIDAPI_DriverGameCube_FreeDevice
 };
 
 #endif /* SDL_JOYSTICK_HIDAPI_GAMECUBE */

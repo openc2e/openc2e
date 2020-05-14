@@ -48,6 +48,7 @@ int SDLBackend::idealBpp() {
 }
 
 void SDLBackend::resizeNotify(int _w, int _h) {
+	SDL_SetWindowSize(window, _w, _h);
 	mainrendertarget.width = _w;
 	mainrendertarget.height = _h;
 }
@@ -71,22 +72,7 @@ void SDLBackend::init() {
 	);
 	assert(window);
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-	assert(renderer);
-
-	SDL_ShowCursor(false);
-	SDL_StartTextInput();
-}
-
-void SDLBackend::initFrom(void *window_id) {
-	int init = SDL_INIT_VIDEO;
-
-	if (SDL_Init(init) < 0)
-		throw creaturesException(std::string("SDL error during initialization: ") + SDL_GetError());
-
-	window = SDL_CreateWindowFrom(window_id);
-	assert(window);
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE | SDL_RENDERER_TARGETTEXTURE);
 	assert(renderer);
 
 	SDL_ShowCursor(false);

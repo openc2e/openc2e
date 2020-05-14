@@ -75,7 +75,7 @@ extern "C"
                     BString stick_name;
                       joystick.GetControllerName(&stick_name);
                       SDL_joyport[numjoysticks] = SDL_strdup(name);
-                      SDL_joyname[numjoysticks] = SDL_CreateJoystickName(0, 0, NULL, stick_name.String());
+                      SDL_joyname[numjoysticks] = SDL_strdup(stick_name.String());
                       numjoysticks++;
                       joystick.Close();
                 }
@@ -104,7 +104,7 @@ extern "C"
         return -1;
     }
 
-    static void HAIKU_JoystickSetDevicePlayerIndex(int device_index, int player_index)
+    static void HAIKU_JoystickGetDevicePlayerIndex(int device_index, int player_index)
     {
     }
 

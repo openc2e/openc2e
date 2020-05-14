@@ -27,6 +27,9 @@
 
 #include "SDL_kmsdrmdyn.h"
 
+#if DEBUG_DYNAMIC_KMSDRM
+#include "SDL_log.h"
+#endif
 
 #ifdef SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC
 

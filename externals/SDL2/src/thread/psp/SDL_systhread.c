@@ -37,11 +37,11 @@
 
 static int ThreadEntry(SceSize args, void *argp)
 {
-    SDL_RunThread(*(SDL_Thread **) argp);
+    SDL_RunThread(*(void **) argp);
     return 0;
 }
 
-int SDL_SYS_CreateThread(SDL_Thread *thread)
+int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
 {
     SceKernelThreadInfo status;
     int priority = 32;
@@ -59,7 +59,7 @@ int SDL_SYS_CreateThread(SDL_Thread *thread)
         return SDL_SetError("sceKernelCreateThread() failed");
     }
 
-    sceKernelStartThread(thread->handle, 4, &thread);
+    sceKernelStartThread(thread->handle, 4, &args);
     return 0;
 }
 

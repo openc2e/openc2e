@@ -24,10 +24,10 @@
 
 #include "SDL_assert.h"
 #include "SDL_hints.h"
+#include "SDL_log.h"
 #include "SDL_render.h"
 #include "SDL_sysrender.h"
 #include "software/SDL_render_sw_c.h"
-#include "../video/SDL_pixels_c.h"
 
 #if defined(__ANDROID__)
 #  include "../core/android/SDL_android.h"
@@ -660,17 +660,15 @@ SDL_RendererEventWatch(void *userdata, SDL_Event *event)
                 event->motion.y -= (int)(viewport.y * renderer->dpi_scale.y);
                 event->motion.x = (int)(event->motion.x / (scale.x * renderer->dpi_scale.x));
                 event->motion.y = (int)(event->motion.y / (scale.y * renderer->dpi_scale.y));
-                if (event->motion.xrel != 0 && renderer->relative_scaling) {
-                    float rel = renderer->xrel + event->motion.xrel / (scale.x * renderer->dpi_scale.x);
-                    float trunc = SDL_truncf(rel);
-                    renderer->xrel = rel - trunc;
-                    event->motion.xrel = (Sint32) trunc;
+                if (event->motion.xrel > 0) {
+                    event->motion.xrel = SDL_max(1, (int)(event->motion.xrel / (scale.x * renderer->dpi_scale.x)));
+                } else if (event->motion.xrel < 0) {
+                    event->motion.xrel = SDL_min(-1, (int)(event->motion.xrel / (scale.x * renderer->dpi_scale.x)));
                 }
-                if (event->motion.yrel != 0 && renderer->relative_scaling) {
-                    float rel = renderer->yrel + event->motion.yrel / (scale.y * renderer->dpi_scale.y);
-                    float trunc = SDL_truncf(rel);
-                    renderer->yrel = rel - trunc;
-                    event->motion.yrel = (Sint32) trunc;
+                if (event->motion.yrel > 0) {
+                    event->motion.yrel = SDL_max(1, (int)(event->motion.yrel / (scale.y * renderer->dpi_scale.y)));
+                } else if (event->motion.yrel < 0) {
+                    event->motion.yrel = SDL_min(-1, (int)(event->motion.yrel / (scale.y * renderer->dpi_scale.y)));
                 }
             }
         }
@@ -874,8 +872,6 @@ SDL_CreateRenderer(SDL_Window * window, int index, Uint32 flags)
             renderer->dpi_scale.y = (float)window_h / output_h;
         }
     }
-
-    renderer->relative_scaling = SDL_GetHintBoolean(SDL_HINT_MOUSE_RELATIVE_SCALING, SDL_TRUE);
 
     if (SDL_GetWindowFlags(window) & (SDL_WINDOW_HIDDEN|SDL_WINDOW_MINIMIZED)) {
         renderer->hidden = SDL_TRUE;
@@ -1169,10 +1165,12 @@ SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface)
 
     /* If Palette contains alpha values, promotes to alpha format */
     if (fmt->palette) {
-        SDL_bool is_opaque, has_alpha_channel;
-        SDL_DetectPalette(fmt->palette, &is_opaque, &has_alpha_channel);
-        if (!is_opaque) {
-            needAlpha = SDL_TRUE;
+        for (i = 0; i < fmt->palette->ncolors; i++) {
+            Uint8 alpha_value = fmt->palette->colors[i].a;
+            if (alpha_value != 0 && alpha_value != SDL_ALPHA_OPAQUE) {
+                needAlpha = SDL_TRUE;
+                break;
+            }
         }
     }
 

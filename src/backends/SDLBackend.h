@@ -65,9 +65,8 @@ protected:
 	virtual int idealBpp();
 
 public:
-	SDLBackend();
+	SDLBackend();	
 	void init();
-	void initFrom(void *window_id);
 	int networkInit();
 	void shutdown();
 
@@ -78,6 +77,9 @@ public:
 	unsigned int ticks() { return SDL_GetTicks(); }
 	
 	void handleEvents();
+
+	bool selfRender() { return false; }
+	void requestRender() { }
 
 	RenderTarget *getMainRenderTarget() { return &mainrendertarget; }
 	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);

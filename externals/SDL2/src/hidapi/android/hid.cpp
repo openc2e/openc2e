@@ -436,12 +436,6 @@ public:
 		g_JVM->AttachCurrentThread( &env, NULL );
 		pthread_setspecific( g_ThreadKey, (void*)env );
 
-		if ( !g_HIDDeviceManagerCallbackHandler )
-		{
-			LOGV( "Device open without callback handler" );
-			return false;
-		}
-
 		m_bIsWaitingForOpen = false;
 		m_bOpenResult = env->CallBooleanMethod( g_HIDDeviceManagerCallbackHandler, g_midHIDDeviceManagerOpen, m_nId );
 		ExceptionCheck( env, "BOpen" );
@@ -551,18 +545,11 @@ public:
 		g_JVM->AttachCurrentThread( &env, NULL );
 		pthread_setspecific( g_ThreadKey, (void*)env );
 
-		int nRet = -1;
-		if ( g_HIDDeviceManagerCallbackHandler )
-		{
-			jbyteArray pBuf = NewByteArray( env, pData, nDataLen );
-			nRet = env->CallIntMethod( g_HIDDeviceManagerCallbackHandler, g_midHIDDeviceManagerSendOutputReport, m_nId, pBuf );
-			ExceptionCheck( env, "SendOutputReport" );
-			env->DeleteLocalRef( pBuf );
-		}
-		else
-		{
-			LOGV( "SendOutputReport without callback handler" );
-		}
+		jbyteArray pBuf = NewByteArray( env, pData, nDataLen );
+		int nRet = env->CallIntMethod( g_HIDDeviceManagerCallbackHandler, g_midHIDDeviceManagerSendOutputReport, m_nId, pBuf );
+		ExceptionCheck( env, "SendOutputReport" );
+
+		env->DeleteLocalRef( pBuf );
 		return nRet;
 	}
 
@@ -573,18 +560,10 @@ public:
 		g_JVM->AttachCurrentThread( &env, NULL );
 		pthread_setspecific( g_ThreadKey, (void*)env );
 
-		int nRet = -1;
-		if ( g_HIDDeviceManagerCallbackHandler )
-		{
-			jbyteArray pBuf = NewByteArray( env, pData, nDataLen );
-			nRet = env->CallIntMethod( g_HIDDeviceManagerCallbackHandler, g_midHIDDeviceManagerSendFeatureReport, m_nId, pBuf );
-			ExceptionCheck( env, "SendFeatureReport" );
-			env->DeleteLocalRef( pBuf );
-		}
-		else
-		{
-			LOGV( "SendFeatureReport without callback handler" );
-		}
+		jbyteArray pBuf = NewByteArray( env, pData, nDataLen );
+		int nRet = env->CallIntMethod( g_HIDDeviceManagerCallbackHandler, g_midHIDDeviceManagerSendFeatureReport, m_nId, pBuf );
+		ExceptionCheck( env, "SendFeatureReport" );
+		env->DeleteLocalRef( pBuf );
 		return nRet;
 	}
 
@@ -607,12 +586,6 @@ public:
 		JNIEnv *env;
 		g_JVM->AttachCurrentThread( &env, NULL );
 		pthread_setspecific( g_ThreadKey, (void*)env );
-
-		if ( !g_HIDDeviceManagerCallbackHandler )
-		{
-			LOGV( "GetFeatureReport without callback handler" );
-			return -1;
-		}
 
 		{
 			hid_mutex_guard cvl( &m_cvLock );
@@ -684,11 +657,8 @@ public:
 		g_JVM->AttachCurrentThread( &env, NULL );
 		pthread_setspecific( g_ThreadKey, (void*)env );
 
-		if ( g_HIDDeviceManagerCallbackHandler )
-		{
-			env->CallVoidMethod( g_HIDDeviceManagerCallbackHandler, g_midHIDDeviceManagerClose, m_nId );
-			ExceptionCheck( env, "Close" );
-		}
+		env->CallVoidMethod( g_HIDDeviceManagerCallbackHandler, g_midHIDDeviceManagerClose, m_nId );
+		ExceptionCheck( env, "Close" );
 	
 		hid_mutex_guard dataLock( &m_dataLock );
 		m_vecData.clear();

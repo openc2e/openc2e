@@ -24,6 +24,7 @@
 
 #include "SDL_windowsvideo.h"
 #include "../../../include/SDL_assert.h"
+#include "../../../include/SDL_log.h"
 
 /* Windows CE compatibility */
 #ifndef CDS_FULLSCREEN

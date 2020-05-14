@@ -23,6 +23,7 @@
 #ifdef SDL_JOYSTICK_HIDAPI
 
 #include "SDL_hints.h"
+#include "SDL_log.h"
 #include "SDL_events.h"
 #include "SDL_timer.h"
 #include "SDL_joystick.h"
@@ -230,10 +231,10 @@ HIDAPI_DriverXbox360W_UpdateDevice(SDL_HIDAPI_Device *device)
                 if (connected) {
                     SDL_JoystickID joystickID;
 
-                    HIDAPI_JoystickConnected(device, &joystickID, SDL_FALSE);
+                    HIDAPI_JoystickConnected(device, &joystickID);
 
                 } else if (device->num_joysticks > 0) {
-                    HIDAPI_JoystickDisconnected(device, device->joysticks[0], SDL_FALSE);
+                    HIDAPI_JoystickDisconnected(device, device->joysticks[0]);
                 }
             }
         } else if (size == 29 && data[0] == 0x00 && data[1] == 0x0f && data[2] == 0x00 && data[3] == 0xf0) {
@@ -261,7 +262,7 @@ HIDAPI_DriverXbox360W_UpdateDevice(SDL_HIDAPI_Device *device)
     if (joystick) {
         if (size < 0) {
             /* Read error, device is disconnected */
-            HIDAPI_JoystickDisconnected(device, joystick->instance_id, SDL_FALSE);
+            HIDAPI_JoystickDisconnected(device, joystick->instance_id);
         }
     }
     return (size >= 0);
@@ -295,8 +296,7 @@ SDL_HIDAPI_DeviceDriver SDL_HIDAPI_DriverXbox360W =
     HIDAPI_DriverXbox360W_OpenJoystick,
     HIDAPI_DriverXbox360W_RumbleJoystick,
     HIDAPI_DriverXbox360W_CloseJoystick,
-    HIDAPI_DriverXbox360W_FreeDevice,
-    NULL
+    HIDAPI_DriverXbox360W_FreeDevice
 };
 
 #endif /* SDL_JOYSTICK_HIDAPI_XBOX360 */

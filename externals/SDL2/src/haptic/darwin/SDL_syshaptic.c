@@ -765,10 +765,6 @@ SDL_SYS_SetDirection(FFEFFECT * effect, SDL_HapticDirection * dir, int naxes)
             rglDir[2] = dir->dir[2];
         }
         return 0;
-    case SDL_HAPTIC_STEERING_AXIS:
-        effect->dwFlags |= FFEFF_CARTESIAN;
-        rglDir[0] = 0;
-        return 0;
 
     default:
         return SDL_SetError("Haptic: Unknown direction type.");
@@ -817,11 +813,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest, SDL_HapticEffect * src)
     envelope->dwSize = sizeof(FFENVELOPE);      /* Always should be this. */
 
     /* Axes. */
-    if (src->constant.direction.type == SDL_HAPTIC_STEERING_AXIS) {
-        dest->cAxes = 1;
-    } else {
-        dest->cAxes = haptic->naxes;
-    }
+    dest->cAxes = haptic->naxes;
     if (dest->cAxes > 0) {
         axes = SDL_malloc(sizeof(DWORD) * dest->cAxes);
         if (axes == NULL) {

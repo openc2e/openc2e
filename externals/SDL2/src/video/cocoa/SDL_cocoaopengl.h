@@ -49,8 +49,6 @@ struct SDL_GLDriverData
 - (void)scheduleUpdate;
 - (void)updateIfNeeded;
 - (void)setWindow:(SDL_Window *)window;
-- (SDL_Window*)window;
-- (void)explicitUpdate;
 
 @end
 

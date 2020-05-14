@@ -32,12 +32,8 @@
 #include "SDL_loadso.h"
 #include "SDL_x11opengles.h"
 
-#if defined(__IRIX__) || defined(__NetBSD__)
-/*
- * IRIX doesn't have a GL library versioning system.
- * NetBSD has different GL library versions depending on how the library was
- * installed (package vs. xsrc).
- */
+#if defined(__IRIX__)
+/* IRIX doesn't have a GL library versioning system */
 #define DEFAULT_OPENGL  "libGL.so"
 #elif defined(__MACOSX__)
 #define DEFAULT_OPENGL  "/opt/X11/lib/libGL.1.dylib"

@@ -136,7 +136,6 @@
 
 /* Enable the PSP joystick driver (src/joystick/psp/\*.c) */
 #define SDL_JOYSTICK_PSP        1
-#define SDL_JOYSTICK_VIRTUAL    1
 
 /* Enable the dummy sensor driver */
 #define SDL_SENSOR_DUMMY  1

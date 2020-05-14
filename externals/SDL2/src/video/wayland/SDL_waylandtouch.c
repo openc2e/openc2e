@@ -25,6 +25,7 @@
 
 #ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
 
+#include "SDL_log.h"
 #include "SDL_mouse.h"
 #include "SDL_keyboard.h"
 #include "SDL_waylandtouch.h"

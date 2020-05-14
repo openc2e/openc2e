@@ -336,7 +336,13 @@ void Engine::drawWorld() {
 	// draw the world
 	if (dorendering || refreshdisplay) {
 		refreshdisplay = false;	
-		world.drawWorld();
+
+		if (backend->selfRender()) {
+			// TODO: this makes race/pace hilariously inaccurate, since render time isn't included
+			backend->requestRender();
+		} else {
+			world.drawWorld();
+		}
 	}
 }
 
