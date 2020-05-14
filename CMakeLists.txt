@@ -90,6 +90,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
 endif()
 set(CMAKE_CXX_STANDARD 11)
 
+find_package(Threads REQUIRED) # stupid GCC needs explicit flags to use std::thread
+link_libraries(Threads::Threads)
+
 include_directories(BEFORE
 	${GEN}
 	${SRC}/src
