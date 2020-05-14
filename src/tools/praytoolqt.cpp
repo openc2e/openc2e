@@ -12,6 +12,8 @@
 #include <QPlainTextEdit>
 #include <QVBoxLayout>
 
+#include "backends/qtgui/invokeMethod.h"
+
 
 #include <fstream>
 #include <ghc/filesystem.hpp>
@@ -82,19 +84,19 @@ void PrayToolQt::dragLeaveEvent(QDragLeaveEvent *event) {
 }
 
 static void writeText(PrayToolQt *window, const std::string& text) {
-    QMetaObject::invokeMethod(window, [=]{
+    invokeMethod(window, [=]{
         window->plain_text_edit->appendPlainText(QString::fromStdString(text));
     });        
 }
 
 static void writeRedText(PrayToolQt *window, const std::string& text) {
-    QMetaObject::invokeMethod(window, [=]{
+    invokeMethod(window, [=]{
         window->plain_text_edit->appendHtml(QString::fromStdString("<font color=red>" + text + "</font>"));
     });        
 }
 
 static void do_pray_tool(const std::string& filename, PrayToolQt *window) {
-    QMetaObject::invokeMethod(window, [=]{
+    invokeMethod(window, [=]{
         window->plain_text_edit->setPlainText(QString::fromStdString("Processing " + filename));
     });
     
