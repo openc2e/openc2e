@@ -45,7 +45,7 @@ jobs:
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         IF %ERRORLEVEL% NEQ 0 ( exit %ERRORLEVEL% )
-        cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe
+        cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo
         IF %ERRORLEVEL% NEQ 0 ( exit %ERRORLEVEL% )
         cmake --build build --parallel
     - run: cd build && cmake --build . -t test
