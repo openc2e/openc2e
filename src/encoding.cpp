@@ -1,5 +1,6 @@
 #include "encoding.h"
 #include <array>
+#include <stdexcept>
 #include <utf8proc.h>
 
 static std::string codepoint_to_utf8(char32_t c) {
