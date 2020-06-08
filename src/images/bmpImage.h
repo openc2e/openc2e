@@ -29,7 +29,7 @@ class bmpData {
 private:
 	friend class bmpImage;
 
-	bmpData(std::ifstream &in, std::string n);
+	bmpData(std::istream &in, std::string n);
 
 	uint32_t biWidth, biHeight;
 	uint32_t biCompression;
@@ -46,7 +46,7 @@ protected:
 	std::shared_ptr<bmpData> bmpdata;
 
 public:
-	bmpImage(std::ifstream &in, std::string n);
+	bmpImage(std::istream &in, std::string n);
 	~bmpImage();
 
 	void setBlockSize(unsigned int blockwidth, unsigned int blockheight);

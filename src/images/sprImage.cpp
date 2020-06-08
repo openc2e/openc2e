@@ -22,7 +22,7 @@
 #include "sprImage.h"
 #include <iostream>
 
-sprImage::sprImage(std::ifstream &in, std::string n) : creaturesImage(n) {
+sprImage::sprImage(std::istream &in, std::string n) : creaturesImage(n) {
 	imgformat = if_paletted;
 
 	m_numframes = read16le(in);

@@ -24,7 +24,7 @@
 
 class blkImage : public creaturesImage {
 public:
-	blkImage(std::ifstream &in, std::string n);
+	blkImage(std::istream &in, std::string n);
 	~blkImage();
 	virtual std::string serializedName() { return name + ".blk"; }
 };

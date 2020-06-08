@@ -27,7 +27,7 @@
 #define BI_RLE8 1
 #define BI_BITFIELDS 3
 
-bmpData::bmpData(std::ifstream &in, std::string n) {
+bmpData::bmpData(std::istream &in, std::string n) {
 	palette = 0;
 
 	char magic[2];
@@ -179,7 +179,7 @@ bmpData::~bmpData() {
 	if (palette) delete[] palette;
 }
 
-bmpImage::bmpImage(std::ifstream &in, std::string n) : creaturesImage(n) {
+bmpImage::bmpImage(std::istream &in, std::string n) : creaturesImage(n) {
 	bmpdata = shared_ptr<bmpData>(new bmpData(in, n));
 	imgformat = bmpdata->imgformat;
 	setBlockSize(bmpdata->biWidth, bmpdata->biHeight);

@@ -23,7 +23,7 @@
 #include <cassert>
 #include <iostream>
 
-blkImage::blkImage(std::ifstream &in, std::string n) : creaturesImage(n) {
+blkImage::blkImage(std::istream &in, std::string n) : creaturesImage(n) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	imgformat = is_565 ? if_16bit_565 : if_16bit_555;

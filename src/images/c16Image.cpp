@@ -23,7 +23,7 @@
 #include <cassert>
 #include <memory>
 
-c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
+c16Image::c16Image(std::istream &in, std::string n) : creaturesImage(n) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	assert(flags & 0x02);
@@ -73,7 +73,7 @@ c16Image::c16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
 	}
 }
 
-s16Image::s16Image(std::ifstream &in, std::string n) : creaturesImage(n) {
+s16Image::s16Image(std::istream &in, std::string n) : creaturesImage(n) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	imgformat = is_565 ? if_16bit_565 : if_16bit_555;

@@ -23,13 +23,13 @@
 
 class c16Image : public creaturesImage {
 public:
-	c16Image(std::ifstream &in, std::string n);
+	c16Image(std::istream &in, std::string n);
 	~c16Image();
 };
 
 class s16Image : public creaturesImage {
 public:
-	s16Image(std::ifstream &in, std::string n);
+	s16Image(std::istream &in, std::string n);
 	~s16Image();
 };
 

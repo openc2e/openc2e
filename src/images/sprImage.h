@@ -24,7 +24,7 @@
 
 class sprImage : public creaturesImage {
 public:
-	sprImage(std::ifstream &in, std::string n);
+	sprImage(std::istream &in, std::string n);
 	~sprImage();
 	virtual unsigned int bitdepth() { return 8; }
 };
