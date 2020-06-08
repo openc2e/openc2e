@@ -11,16 +11,22 @@ public:
 	spanstream(const char* buffer, size_t buffer_size)
 		: spanstream(reinterpret_cast<const unsigned char*>(buffer), buffer_size) {}
 
+	spanstream()
+		: spanstream(static_cast<unsigned char*>(nullptr), 0) {}
+
 	template <typename T>
 	spanstream(const T& t)
 		: spanstream(t.data(), t.size()) {}
 
-private:
+protected:
 	class spanstreambuf : public std::streambuf
 	{
 	public:
 		spanstreambuf(const unsigned char* buffer_, size_t buffer_size_)
 			: buffer(buffer_), buffer_size(buffer_size_) {}
+
+		spanstreambuf(const char* buffer_, size_t buffer_size_)
+			: buffer(reinterpret_cast<const unsigned char*>(buffer_)), buffer_size(buffer_size_) {}
 
 	protected:
 		pos_type seekpos(pos_type pos, std::ios_base::openmode which) override {

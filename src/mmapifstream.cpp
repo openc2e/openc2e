@@ -26,39 +26,37 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #endif
-#include <iostream> // debug needs only
+
+mmapifstream::mmapifstream() {}
 
 mmapifstream::mmapifstream(std::string filename) {
-	live = false;
-	mmapopen(filename);
-}
-
-void mmapifstream::mmapopen(std::string filename) {
-	open(filename.c_str(), std::ios::binary);
-	if (!is_open()) return;
 
 #ifdef _WIN32
 	// todo: store the handle somewhere?
 	HANDLE hFile = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ,
 		NULL, OPEN_EXISTING, 0, NULL);
+	LARGE_INTEGER lifilesize;
+	if (!GetFileSizeEx(hFile, &lifilesize)) {
+		setstate(failbit);
+		return;
+	};
+	filesize = lifilesize.QuadPart;
 	HANDLE hMap = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
 	void *mapr = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
 #else
 	FILE *f = fopen(filename.c_str(), "r");
 	assert(f);
-/*	if (!f) {
-		close();
+	if (!f) {
+		fclose(f);
 		setstate(failbit);
-		perror("fopen");
 		return;
-	} */
+	}
 
 	// now do the mmap (work out filesize, then mmap)
 	int fno = fileno(f);
-	seekg(0, std::ios::end);
-	filesize = tellg();
+	fseek(f, 0, SEEK_END);
+	filesize = ftell(f);
 	assert((int)filesize != -1);
-	seekg(0, std::ios::beg);
 
 	void *mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, fno, 0);
 	fclose(f); // we don't need it, now!
@@ -66,15 +64,17 @@ void mmapifstream::mmapopen(std::string filename) {
 
 	assert(mapr != (void *)-1);
 	map = (char *)mapr;
-	live = true;
+
+	buf = spanstreambuf(map, filesize);
 }
 
 mmapifstream::~mmapifstream() {
-	if (live)
+	if (map) {
 #ifdef _WIN32
 		UnmapViewOfFile(map);
 #else
 		munmap(map, filesize);
 #endif
+	}
 }
 /* vim: set noet: */

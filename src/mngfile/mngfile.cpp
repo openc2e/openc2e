@@ -39,7 +39,7 @@ MNGFile::MNGFile(std::string n) {
 	name = n;
 	
 	stream = new mmapifstream(n);
-	if (!stream->live) { delete stream; throw MNGFileException("open failed"); }
+	if (!stream) { delete stream; throw MNGFileException("open failed"); }
 
 	// Read metavariables from beginning of file
 	numsamples = swapEndianLong(*((int *) stream->map));

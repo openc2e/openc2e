@@ -17,23 +17,20 @@
  *
  */
 
-#ifndef _OPENC2E_MMAPIFSTREAM_H
-#define _OPENC2E_MMAPIFSTREAM_H
+#pragma once
 
 #include <string>
-#include <fstream>
+#include "spanstream.h"
 
-// todo: write destructor
-class mmapifstream : public std::ifstream {
+class mmapifstream : public spanstream {
 public:
-	bool live;
-	unsigned int filesize;
-	char *map;
-	mmapifstream() { live = false; }
+	mmapifstream();
 	mmapifstream(std::string filename);
 	~mmapifstream();
-	void mmapopen(std::string filename);
+	bool is_open() { return map != nullptr; }
+	char *map = nullptr;
+private:
+	size_t filesize = 0;
 };
 
-#endif
 /* vim: set noet: */
