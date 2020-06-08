@@ -23,6 +23,7 @@
 #include "images/blkImage.h"
 #include "images/bmpImage.h"
 #include "images/charsetdta.h"
+#include "mmapifstream.h"
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
@@ -42,7 +43,7 @@ enum filetype { blk, s16, c16, spr, bmp };
 shared_ptr<creaturesImage> tryOpen(std::string fname, filetype ft) {
 	path realfile(world.findFile(fname));
 	std::string basename = realfile.filename().stem();
-	std::ifstream in(realfile.string(), std::ios_base::binary);
+	mmapifstream in(realfile.string());
 
 	if (in.is_open()) {
 		switch (ft) {
