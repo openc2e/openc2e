@@ -52,6 +52,7 @@ jobs:
       env:
         CTEST_OUTPUT_ON_FAILURE: TRUE
     - run: cd build && cmake --build . -t dist
+    - run: Invoke-WebRequest "https://aka.ms/vs/16/release/vc_redist.x64.exe" -OutFile "build/${{ env.DIST_NAME }}/vc_redist.x64.exe"
     - uses: actions/upload-artifact@v1
       with:
         name: ${{ env.DIST_NAME }}.zip
