@@ -25,7 +25,7 @@
 class mmapifstream : public spanstream {
 public:
 	mmapifstream();
-	mmapifstream(std::string filename);
+	mmapifstream(const std::string& filename);
 	~mmapifstream();
 	bool is_open() { return map != nullptr; }
 	char *map = nullptr;

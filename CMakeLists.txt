@@ -101,6 +101,7 @@ include_directories(BEFORE
 # Targets
 add_library(openc2e-common STATIC
 	src/encoding.cpp
+	src/mmapifstream.cpp
 )
 target_link_libraries(openc2e-common PRIVATE utf8proc)
 
@@ -112,11 +113,10 @@ target_link_libraries(cobfile PRIVATE ghc_filesystem)
 
 add_library(mngfile
 	src/mngfile/mngfile.cpp
-	src/mmapifstream.cpp
 	${GEN}/mngfile/mnglexer.cpp
 	${GEN}/mngfile/mngparser.tab.cpp
 )
-target_link_libraries(mngfile PRIVATE fmt)
+target_link_libraries(mngfile PRIVATE fmt openc2e-common)
 
 add_library(prayfile
 	src/prayfile/PrayFileReader.cpp

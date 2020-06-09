@@ -18,7 +18,6 @@
  */
 
 #include "mmapifstream.h"
-#include "openc2e.h"
 #include <cassert>
 #ifdef _WIN32
 #include <windows.h>
@@ -29,8 +28,7 @@
 
 mmapifstream::mmapifstream() {}
 
-mmapifstream::mmapifstream(std::string filename) {
-
+mmapifstream::mmapifstream(const std::string& filename) {
 #ifdef _WIN32
 	// todo: store the handle somewhere?
 	HANDLE hFile = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ,
@@ -64,7 +62,6 @@ mmapifstream::mmapifstream(std::string filename) {
 
 	assert(mapr != (void *)-1);
 	map = (char *)mapr;
-
 	buf = spanstreambuf(map, filesize);
 }
 
