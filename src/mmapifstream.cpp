@@ -45,7 +45,6 @@ mmapifstream::mmapifstream(const std::string& filename) {
 	FILE *f = fopen(filename.c_str(), "r");
 	assert(f);
 	if (!f) {
-		fclose(f);
 		setstate(failbit);
 		return;
 	}
