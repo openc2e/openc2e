@@ -100,8 +100,33 @@ make -C build openc2e -j4
 
 ## Running
 
-You need to provide openc2e with the path to the game's data, for example:
+At minimum, you should provide a path to a game's data files with the `-d` or `--data-path` flag:
 
 ```bash
 ./build/openc2e -d /path/to/Creatures2
+```
+
+The engine will guess the game based on files in the directory, defaulting to C3/DS.
+
+You can tell it to run as a specific game type with the `-g` / `--gametype` flag. The following values are supported:
+
+| Flag Value | Games Covered                                                 |
+|------------|---------------------------------------------------------------|
+| `c1`       | Creatures 1                                                   |
+| `c2`       | Creatures 2                                                   |
+| `c3`       | Creatures 3, Docking Station                                  |
+| `cv`       | Creatures Adventures, Creatures Playground, Creatures Village |
+| `sm`       | Sea Monkeys                                                   |
+
+This may be helpful if you're using a non-standard installation or data files from a Mac, Linux, or Windows 3.1 version of a game.
+
+For example, if you wanted to run Docking Station, you could use:
+
+```bash
+./build/openc2e -g c3 -d /path/to/dockingstationdata
+```
+
+For more options, use `-h` / `--help`:
+```bash
+./build/openc2e --help
 ```
