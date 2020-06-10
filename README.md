@@ -56,6 +56,8 @@ openc2e depends on:
 
 ### Linux
 
+#### Ubuntu
+
 On Ubuntu 18.10 you'll need these packages:
 
 ```bash
@@ -67,7 +69,16 @@ sudo apt-get install \
   libsdl2-mixer-dev \
   libsdl2-net-dev \
   libsdl2-ttf-dev \
-  re2c
+  re2c\
+```
+
+You may also need to install the following depending on whether they come with your install:
+```bash
+sudo apt-get install \
+  cmake\
+  bison\
+  flex\
+  libpng-dev
 ```
 
 ### macOS
