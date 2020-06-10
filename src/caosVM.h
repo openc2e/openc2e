@@ -885,6 +885,7 @@ public:
 	void v_VOLM();
 	void v_MUTE();
 	void c_SEZZ();
+	void c_VOIC();
 	void c_VOIS();
 	void c_MIDI();
 	void c_PLDS();

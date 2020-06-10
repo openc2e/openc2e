@@ -294,6 +294,22 @@ void caosVM::c_SEZZ() {
 }
 
 /**
+ VOIC (command) genus (integer) gender (integer) age (integer)
+ %status stub
+
+  Set the the voice of the target agent to specified creature voice, choosing the nearest match.
+*/
+void caosVM::c_VOIC() {
+	VM_PARAM_INTEGER(age)
+	VM_PARAM_INTEGER(gender)
+	VM_PARAM_INTEGER(genus)
+
+	valid_agent(targ);
+	// TODO
+	targ->setVoice("DefaultVoice");
+}
+
+/**
  VOIS (command) voice (string)
  %status maybe
 
