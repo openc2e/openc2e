@@ -123,8 +123,9 @@ For example, if you wanted to run Docking Station, you could use:
 ```bash
 ./build/openc2e -g c3 -d /path/to/dockingstationdata
 ```
-Specifying a game type may be helpful if you're using a non-standard installation or data files from a Mac, Linux, or Windows 3.1 version of a game.
-
+Specifying a game type may be helpful if you're using:
+- a non-standard installation
+- data files from a Mac, Linux, or Windows 3.1 version of a game.
 
 For more options, use `-h` / `--help`:
 ```bash
