@@ -725,14 +725,14 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 		if (available_backends.empty()) available_backends = i->first;
 		else available_backends += ", " + i->first;
 	}
-	available_backends = "Select the backend (options: " + available_backends + "), default is " + preferred_backend;
+	available_backends = "Select the backend (options: " + available_backends + "); default is " + preferred_backend;
 	
 	std::string available_audiobackends;
 	for (std::map<std::string, std::shared_ptr<AudioBackend> >::iterator i = possible_audiobackends.begin(); i != possible_audiobackends.end(); i++) {
 		if (available_audiobackends.empty()) available_audiobackends = i->first;
 		else available_audiobackends += ", " + i->first;
 	}
-	available_audiobackends = "Select the audio backend (options: " + available_audiobackends + "), default is " + preferred_audiobackend;
+	available_audiobackends = "Select the audio backend (options: " + available_audiobackends + "); default is " + preferred_audiobackend;
 	
 	// parse the command-line flags
 	cxxopts::Options desc("openc2e", "");
@@ -740,14 +740,14 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 		("h,help", "Display help on command-line options")
 		("V,version", "Display openc2e version")
 		("s,silent", "Disable all sounds")
-		("l,language", "Select the language, default is '" + language + "'", cxxopts::value<std::string>(language))
+		("l,language", "Select the language; default is '" + language + "'", cxxopts::value<std::string>(language))
 		("k,backend", available_backends, cxxopts::value<std::string>(preferred_backend))
 		("o,audiobackend", available_audiobackends, cxxopts::value<std::string>(preferred_audiobackend))
 		("d,data-path", "Sets or adds a path to a data directory",
 		 cxxopts::value<std::vector<std::string>>(data_vec))
 		("b,bootstrap", "Sets or adds a path or COS file to bootstrap from",
 		 cxxopts::value<std::vector<std::string>>(cmdline_bootstrap))
-		("g,gametype", "Set the game type (c1, c2, cv or c3)", cxxopts::value<std::string>(gametype))
+		("g,gametype", "Set the game type (options: c1, c2, c3, cv, sm); if unspecified the engine will try to detect it automatically or fall back to c3", cxxopts::value<std::string>(gametype))
 		("m,gamename", "Set the game name", cxxopts::value<std::string>(gamename))
 		("n,norun", "Don't run the game, just execute scripts")
 		("a,autokill", "Enable autokill")
