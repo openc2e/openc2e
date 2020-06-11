@@ -42,6 +42,7 @@
 #include <cxxopts.hpp>
 #include <fmt/printf.h>
 #include <memory>
+#include <stdexcept>
 namespace fs = ghc::filesystem;
 
 #ifndef _WIN32
@@ -571,10 +572,15 @@ void Engine::handleMouseButton(SomeEvent &event) {
 }
 
 void Engine::handleTextInput(SomeEvent &event) {
-	auto cp1252_text = utf8_to_cp1252(event.text);
+	std::string cp1252_text;
+	try {
+		 cp1252_text = utf8_to_cp1252(event.text);
+	 } catch (std::domain_error &e) {
+		 // ignore, will be printed next
+	 }
 	if (cp1252_text.size() != 1) {
 		fmt::print(stderr, "bad text input: ");
-		for (unsigned char c : cp1252_text) {
+		for (unsigned char c : event.text) {
 			fmt::print(stderr, "0x{:02x} ", c);
 		}
 		fmt::print(stderr, "\n");
