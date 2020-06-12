@@ -352,7 +352,7 @@ void caosVM::c_ECON() {
 }
 
 /**
- CALL (command) script_no (integer) p1 (any) p2 (any)
+ CALL (command) script_no (integer) p1 (anything) p2 (anything)
  %status maybe
  %pragma variants c2 cv c3 sm
 
