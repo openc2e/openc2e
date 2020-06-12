@@ -123,7 +123,7 @@ void caosVM::c_PAT_DULL_sm() {
 
 
 /**
- PAT: BUTT (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) hoveranim (byte-string) messageid (integer) option (integer)
+ PAT: BUTT (command) part (integer) sprite (string) first_image (integer) image_count (integer) x (integer) y (integer) plane (integer) hoveranim (bytestring) messageid (integer) option (integer)
  %status maybe
  
  Adds a new 'button' part to the TARGed compound agent/vehicle.
