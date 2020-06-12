@@ -446,6 +446,7 @@ list(APPEND dist_args
 		"${BIN}/docs.css"
 		"${GEN}/commandinfo.json"
 		"$<TARGET_FILE:openc2e>"
+		"$<TARGET_FILE:cobdumper>"
 		"$<TARGET_FILE:mngdumper>"
 		"$<TARGET_FILE:praybuilder>"
 		"$<TARGET_FILE:praydumper>"
