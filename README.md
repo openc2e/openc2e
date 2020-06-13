@@ -98,7 +98,7 @@ cmake -B build .
 make -C build openc2e -j4
 ```
 
-On systems with limited RAM, you may want to limit the number of jobs executed in parallel by lowering the number after the `-j` flag to avoid crashes. See the [make documentation](https://www.gnu.org/software/make/manual/html_node/Parallel.html) for further information.
+On systems with limited RAM, you may avoid crashes by to limiting the number of jobs executed in parallel by lowering the number after the `-j` flag. See the [make documentation](https://www.gnu.org/software/make/manual/html_node/Parallel.html) for further information.
 
 ## Running
 
