@@ -98,30 +98,7 @@ cmake -B build .
 make -C build openc2e -j4
 ```
 
-### Limited RAM
-
-On systems with limited RAM, you may want to limit the number of jobs executed in parallel by lowering the number after the `-j` flag, or omitting the flag entirely. If you do not, you may run out of RAM and experience a crash that looks like the following:
-```
-c++: fatal error: Killed signal terminated program cc1plus
-compilation terminated.
-make[3]: *** [CMakeFiles/openc2e-core.dir/build.make:330: CMakeFiles/openc2e-core.dir/src/caosScript.cpp.o] Error 1
-make[3]: *** Waiting for unfinished jobs....
-make[3]: Leaving directory '/openc2e/build'
-make[2]: *** [CMakeFiles/Makefile2:717: CMakeFiles/openc2e-core.dir/all] Error 2
-make[2]: Leaving directory '/openc2e/build'
-make[1]: *** [CMakeFiles/Makefile2:548: CMakeFiles/openc2e.dir/rule] Error 2
-make[1]: Leaving directory '/openc2e/build'
-make: *** [Makefile:306: openc2e] Error 2
-make: Leaving directory '/openc2e/build'
-```
-
-For example, to limit build to only two processes:
-
-```bash
-make -C build openc2e -j2
-```
-
-Virtual Machines and Rapberry Pis are examples of systems where this may be helpful.
+On systems with limited RAM, you may want to limit the number of jobs executed in parallel by lowering the number after the `-j` flag to avoid crashes. See the [make documentation](https://www.gnu.org/software/make/manual/html_node/Parallel.html) for further information.
 
 ## Running
 
