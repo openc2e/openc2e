@@ -226,16 +226,16 @@ private:
 public:
 	TextEntryPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				  unsigned int _z, unsigned int msgid, std::string fontsprite);
-	void setText(std::string t);
-	bool canGainFocus() { return true; }
-	void gainFocus() { focused = true; caretpose = 0; }
-	void loseFocus() { focused = false; }
-	int handleClick(float, float);
+	void setText(std::string t) override;
+	bool canGainFocus() override { return true; }
+	void gainFocus() override { focused = true; caretpose = 0; }
+	void loseFocus() override { focused = false; }
+	int handleClick(float, float) override;
 	void handleTranslatedChar(unsigned char c) override;
 	void handleRawKey(uint8_t c) override;
-	void tick();
-	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
-	bool isTransparent() { return false; }
+	void tick() override;
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset) override;
+	bool isTransparent() override { return false; }
 };
 
 #endif

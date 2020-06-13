@@ -66,13 +66,13 @@ protected:
 	unsigned int poseForWidth(unsigned int width);
 
 public:
-	void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
-	unsigned int getWidth() { return textwidth; }
-	unsigned int getHeight() { return textheight; }
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset) override;
+	unsigned int getWidth() override { return textwidth; }
+	unsigned int getHeight() override { return textheight; }
 
-	bool canGainFocus() { return editable; }
-	void gainFocus();
-	void loseFocus();
+	bool canGainFocus() override { return editable; }
+	void gainFocus() override;
+	void loseFocus() override;
 	void handleTranslatedChar(unsigned char c) override;
 	void handleRawKey(uint8_t key) override;
 };

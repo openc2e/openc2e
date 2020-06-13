@@ -65,14 +65,14 @@ protected:
 	BlackboardPart(Blackboard *p, unsigned int _id);
 
 public:
-	void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
-	unsigned int getWidth() { return 0; }
-	unsigned int getHeight() { return 0; }
+	void partRender(class RenderTarget *renderer, int xoffset, int yoffset) override;
+	unsigned int getWidth() override { return 0; }
+	unsigned int getHeight() override { return 0; }
 
-	bool canGainFocus() { return true; }
-	void gainFocus();
-	void loseFocus();
-	void handleTranslatedChar(unsigned char c);
+	bool canGainFocus() override { return true; }
+	void gainFocus() override;
+	void loseFocus() override;
+	void handleTranslatedChar(unsigned char c) override;
 	void handleRawKey(uint8_t key) override;
 };
 
