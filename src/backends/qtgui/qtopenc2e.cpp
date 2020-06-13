@@ -33,7 +33,7 @@
 #include "qtopenc2e.h"
 #include "openc2eview.h"
 #include "Engine.h"
-#include "AudioBackend.h"
+#include "audiobackend/AudioBackend.h"
 #include "MetaRoom.h"
 #include "Room.h"
 #include "Camera.h"

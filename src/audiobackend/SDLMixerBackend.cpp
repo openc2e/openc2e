@@ -17,10 +17,12 @@
  *
  */
 
-#include "SDLMixerBackend.h"
+#include "audiobackend/SDLMixerBackend.h"
 #include "creaturesException.h"
 #include <SDL.h>
+#include <algorithm>
 #include <cassert>
+#include <climits>
 #include <memory>
 
 SDLMixerBackend::SDLMixerBackend() {

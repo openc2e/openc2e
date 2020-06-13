@@ -20,7 +20,7 @@
 #ifndef SKELETONAUDIOBACKEND_H
 #define SKELETONAUDIOBACKEND_H 1
 
-#include "AudioBackend.h"
+#include "audiobackend/AudioBackend.h"
 
 /* This header exists to provide a skeleton implementation for new
  * audio backends. Normally client code should not include it.

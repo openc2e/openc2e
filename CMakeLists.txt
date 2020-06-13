@@ -238,17 +238,21 @@ else()
 	target_sources(openc2e-core PRIVATE src/caos/caosVM_ser_stub.cpp)
 endif()
 
+add_library(openc2e-audiobackend STATIC
+	src/audiobackend/SDLMixerBackend.cpp
+)
+target_compile_definitions(openc2e-audiobackend PUBLIC "SDLMIXER_SUPPORT")
+target_link_libraries(openc2e-audiobackend PUBLIC SDL2::Mixer)
+
 add_executable(openc2e
 	src/main.cpp
 	src/backends/SDLBackend.cpp
-	src/backends/SDLMixerBackend.cpp
 )
-target_compile_definitions(openc2e PRIVATE "SDLMIXER_SUPPORT")
 target_link_libraries(openc2e
 	openc2e-core
+	openc2e-audiobackend
 	SDL2::Core
 	SDL2::GFX
-	SDL2::Mixer
 	SDL2::Net
 )
 if (OPENC2E_USE_QT)

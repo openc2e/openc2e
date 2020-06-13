@@ -26,8 +26,8 @@
 #include "caosVM.h" // for setupCommandPointers()
 #include "caosScript.h" // for executeNetwork()
 #include "PointerAgent.h"
+#include "audiobackend/NullAudioBackend.h"
 #include "backends/NullBackend.h"
-#include "backends/NullAudioBackend.h"
 #include "encoding.h"
 #include "keycodes.h"
 #include "SFCFile.h"

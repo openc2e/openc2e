@@ -20,11 +20,11 @@
 #ifndef _SDLMIXERBACKEND_H
 #define _SDLMIXERBACKEND_H
 
-#include "SkeletonAudioBackend.h"
+#include "audiobackend/SkeletonAudioBackend.h"
 #include <memory>
 #include <vector>
 
-#include "SDL_mixer.h"
+#include <SDL_mixer.h>
 
 class SDLMixerBuffer {
 protected:

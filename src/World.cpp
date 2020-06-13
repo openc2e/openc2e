@@ -26,10 +26,10 @@
 #include <cassert>
 #include <limits.h> // for MAXINT
 #include <memory>
+#include "audiobackend/AudioBackend.h"
+#include "Backend.h"
 #include "creaturesImage.h"
 #include "creatures/CreatureAgent.h"
-#include "Backend.h"
-#include "AudioBackend.h"
 #include "SFCFile.h"
 #include "Room.h"
 #include "MetaRoom.h"

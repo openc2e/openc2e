@@ -20,8 +20,8 @@
 #ifndef _NULLAUDIOBACKEND_H
 #define _NULLAUDIOBACKEND_H
 
-#include "AudioBackend.h"
-#include "backends/SkeletonAudioBackend.h"
+#include "audiobackend/AudioBackend.h"
+#include "audiobackend/SkeletonAudioBackend.h"
 #include <memory>
 
 class NullAudioSource : public SkeletonAudioSource {};

@@ -25,7 +25,7 @@
 #include "Engine.h"
 #include "backends/SDLBackend.h"
 #ifdef SDLMIXER_SUPPORT
-#include "backends/SDLMixerBackend.h"
+#include "audiobackend/SDLMixerBackend.h"
 #endif
 #ifdef QT_SUPPORT
 #include "backends/qtgui/QtBackend.h"
