@@ -55,7 +55,12 @@ protected:
 	std::vector<AgentRef> chosenagents;
 	bool agentInSight(AgentRef a);
 	void chooseAgents();
-	virtual AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) { return AgentRef(); } // TODO: make pure virtual?
+	// TODO: make pure virtual?
+	virtual AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) {
+		(void)type;
+		(void)possibles;
+		return AgentRef();
+	}
 
 	// linguistic stuff
 
