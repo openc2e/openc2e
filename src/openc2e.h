@@ -30,16 +30,16 @@
 #include <fmt/printf.h>
 using std::shared_ptr;
 
-#include "exceptions.h"
+#include "creaturesException.h"
 
 typedef std::vector<unsigned char> bytestring_t;
 
 class assertFailure : public creaturesException {
 public:
-	assertFailure(const char *x) throw() : creaturesException(x) { }
+	using creaturesException::creaturesException;
 };
 
-#define caos_assert(x) if (!(x)) { throw caosException(fmt::sprintf("%s thrown from %s:%d", #x, __FILE__, __LINE__)); }
+#define caos_assert(x) if (!(x)) { throw assertFailure(fmt::sprintf("%s thrown from %s:%d", #x, __FILE__, __LINE__)); }
 #define ensure_assert(x) do {\
 	bool ensure__v = (x); \
 	if (!ensure__v) \

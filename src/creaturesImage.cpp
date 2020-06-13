@@ -18,7 +18,7 @@
  */
 
 #include "creaturesImage.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 #include <memory>
 
 creaturesImage::creaturesImage(std::string name_, imageformat imgformat_,

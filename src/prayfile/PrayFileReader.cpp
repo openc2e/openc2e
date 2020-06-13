@@ -19,9 +19,10 @@
 
 #include "prayfile/PrayFileReader.h"
 #include "encoding.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "endianlove.h"
 #include "spanstream.h"
+#include <cstring>
 #include <zlib.h>
 
 PrayFileReader::PrayFileReader(std::istream& stream_) : stream(stream_) {

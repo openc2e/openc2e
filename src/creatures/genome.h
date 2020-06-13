@@ -19,7 +19,7 @@
 #ifndef _C2E_GENOME_H
 #define _C2E_GENOME_H
 
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "lifestage.h"
 
 #include <vector>

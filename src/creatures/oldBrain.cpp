@@ -851,7 +851,7 @@ unsigned int minimumLobeSize(unsigned int version, unsigned int lobeid) {
 void oldBrain::processGenes() {
 	// TODO: this likely doesn't work at all well in the presence of later-turn-on lobes
 
-	shared_ptr<genomeFile> genome = parent->getGenome();
+	std::shared_ptr<genomeFile> genome = parent->getGenome();
 	
 	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (!parent->shouldProcessGene(*i)) continue;

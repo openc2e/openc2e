@@ -24,8 +24,6 @@
 #include <set>
 #include <map>
 
-using std::shared_ptr;
-
 struct oldSVRule {
 	unsigned int length;
 	uint8_t rndconst;

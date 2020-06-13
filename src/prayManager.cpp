@@ -20,7 +20,7 @@
 #include "prayfile/PrayFileReader.h"
 
 #include "prayManager.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "World.h" // data_directories
 #include "Catalogue.h"
 #include <cassert>

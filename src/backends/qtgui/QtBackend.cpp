@@ -25,7 +25,7 @@
 #include <fmt/printf.h>
 #include <iostream>
 #include <memory>
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "keycodes.h"
 
 #ifdef _WIN32

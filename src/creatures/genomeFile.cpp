@@ -18,6 +18,7 @@
  */
 #include "genome.h"
 #include "endianlove.h"
+#include <cstring>
 #include <typeinfo>
 #include <exception>
 #include <iostream>
@@ -65,7 +66,7 @@ void genomeFile::readNotes(istream &s) {
 		uint16_t ver = 0;
 
 		while (ver != 0x02) {
-			if (s.fail() || s.eof()) throw genomeException("c3 gno loading broke ... second magic not present");
+			if (s.fail() || s.eof()) throw creaturesException("c3 gno loading broke ... second magic not present");
 			ver = read16le(s);
 		}
 	}
@@ -98,12 +99,12 @@ void genomeFile::writeNotes(ostream &s) const {
 gene *genomeFile::nextGene(istream &s) {
 	uint8_t majic[3];
 	s.read((char *)majic, 3);
-	if (strncmp((char *)majic, "gen", 3) != 0) throw genomeException("bad majic for a gene");
+	if (strncmp((char *)majic, "gen", 3) != 0) throw creaturesException("bad majic for a gene");
 
 	s >> majic[0];
 	if (majic[0] == 'd') return 0;
 	if (majic[0] != 'e')
-		throw genomeException("bad majic at stage2 for a gene");
+		throw creaturesException("bad majic at stage2 for a gene");
 
 	uint8_t type, subtype;
 	s >> type >> subtype;
@@ -151,14 +152,14 @@ gene *genomeFile::nextGene(istream &s) {
 			} break;
 	}
 
-	if (g == 0) throw genomeException("genefactory failed");
+	if (g == 0) throw creaturesException("genefactory failed");
 
 	if (((typeid(*g) == typeid(bioReactionGene))
 		|| (typeid(*g) == typeid(bioEmitterGene)))
 		|| (typeid(*g) == typeid(bioReceptorGene))) {
 		if (currorgan == 0) {
 				if (cversion == 1) genes.push_back(g); // Creatures 1 doesn't have organs
-				else throw genomeException("reaction/emitter/receptor without an attached organ");
+				else throw creaturesException("reaction/emitter/receptor without an attached organ");
 		} else currorgan->genes.push_back(g);
 	} else {
 		genes.push_back(g);
@@ -177,15 +178,15 @@ istream &operator >> (istream &s, genomeFile &f) {
 	if (strncmp((char *)majic, "gen", 3) == 0) {
 		s >> majic[0];
 		if (majic[0] == 'e') f.cversion = 1;
-		else throw genomeException("bad majic for genome");
+		else throw creaturesException("bad majic for genome");
 
 		s.seekg(0, std::ios::beg);
 	} else {
-		if (strncmp((char *)majic, "dna", 3) != 0) throw genomeException("bad majic for genome");
+		if (strncmp((char *)majic, "dna", 3) != 0) throw creaturesException("bad majic for genome");
 
 		s >> majic[0];
 		f.cversion = majic[0] - 48; // 48 = ASCII '0'
-		if ((f.cversion < 1) || (f.cversion > 3)) throw genomeException("unsupported genome version in majic");
+		if ((f.cversion < 1) || (f.cversion > 3)) throw creaturesException("unsupported genome version in majic");
 	}
 
 	//std::cout << "creaturesGenomeFile: reading genome of version " << (unsigned int)f.cversion << ".\n";

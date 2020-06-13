@@ -238,7 +238,7 @@ void BrainInAVat::loadFile(const QString &fileName) {
 	shared_ptr<genomeFile> gfile(new genomeFile());
 	try {
 		f >> *gfile;
-	} catch (genomeException &e) {
+	} catch (std::exception &e) {
 		QApplication::restoreOverrideCursor();
 		QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), tr("Failed loading the genome due to error '%1'!").arg(e.what()));
 		return;
@@ -250,7 +250,7 @@ void BrainInAVat::loadFile(const QString &fileName) {
 	if (gfile->getVersion() == 3) {
 		try {
 			ourCreature = new c2eCreature(gfile, true, 0);
-		} catch (creaturesException &e) {
+		} catch (std::exception &e) {
 			QApplication::restoreOverrideCursor();
 			QMessageBox::warning(this, tr("openc2e's Brain in a Vat"), e.what());
 			return;

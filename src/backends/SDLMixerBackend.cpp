@@ -18,9 +18,9 @@
  */
 
 #include "SDLMixerBackend.h"
-#include "SDL.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "World.h"
+#include <SDL.h>
 #include <cassert>
 #include <memory>
 

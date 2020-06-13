@@ -29,14 +29,13 @@
 #include <typeinfo>
 #include "physics.h"
 #include "alloc_count.h"
+#include "caosException.h"
 
 class Agent;
 
 class wrongCaosVarTypeException : public caosException {
 	public:
-		wrongCaosVarTypeException() throw() : caosException("Wrong caos variable type") {}
-		wrongCaosVarTypeException(const char *s) throw() : caosException(s) { }
-		wrongCaosVarTypeException(const std::string &s) throw() : caosException(s) { }
+		using caosException::caosException;
 };
 
 struct nulltype_tag { };

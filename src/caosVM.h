@@ -26,6 +26,7 @@
 #include <istream>
 #include <memory>
 #include <ostream>
+#include <sstream>
 #include "AgentRef.h"
 #include "caosVar.h"
 #include "alloc_count.h"

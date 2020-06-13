@@ -24,7 +24,7 @@
 #include "Room.h"
 #include "Camera.h"
 #include "endianlove.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "imageManager.h"
 #include "Map.h"
 #include "Agent.h"

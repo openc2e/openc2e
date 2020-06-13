@@ -27,7 +27,7 @@
 #include <istream>
 #include <ghc/filesystem.hpp>
 #include <list>
-#include "exceptions.h"
+#include "creaturesException.h"
 
 class catalogueException : public creaturesException {
 	public:

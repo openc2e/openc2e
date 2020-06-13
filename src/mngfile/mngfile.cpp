@@ -17,8 +17,9 @@
  *
  */
 #include <assert.h>
+#include <sstream>
 #include "endianlove.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "mngfile.h"
 #include "mmapifstream.h"
 

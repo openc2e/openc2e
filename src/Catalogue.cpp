@@ -28,6 +28,7 @@
 #include <ghc/filesystem.hpp>
 #include <fmt/printf.h>
 #include <iostream>
+#include <sstream>
 
 #include <cctype>
 

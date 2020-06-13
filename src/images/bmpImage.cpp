@@ -19,7 +19,7 @@
 
 #include "bmpImage.h"
 #include "endianlove.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 #include "openc2e.h"
 #include <memory>
 

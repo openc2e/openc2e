@@ -19,7 +19,7 @@
 
 #include "peFile.h"
 #include "endianlove.h"
-#include "exceptions.h"
+#include "creaturesException.h"
 
 // debug helper
 std::string nameForType(uint32_t t) {

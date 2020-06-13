@@ -25,8 +25,6 @@
 #include <set>
 #include <map>
 
-using std::shared_ptr;
-
 class Creature;
 
 struct c2ebraincomponentorder {

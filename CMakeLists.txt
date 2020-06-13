@@ -147,6 +147,7 @@ add_library(openc2e-core STATIC
 	src/creatures/c2eBrain.cpp
 	src/CallButton.cpp
 	src/Camera.cpp
+	src/caosException.cpp
 	src/caosScript.cpp
 	src/caosVar.cpp
 	src/caos/caosVM_agent.cpp
@@ -186,7 +187,6 @@ add_library(openc2e-core STATIC
 	src/creaturesImage.cpp
 	src/dialect.cpp
 	src/Engine.cpp
-	src/exceptions.cpp
 	src/creatures/genomeFile.cpp
 	src/historyManager.cpp
 	src/imageManager.cpp
@@ -196,6 +196,7 @@ add_library(openc2e-core STATIC
 	src/MetaRoom.cpp
 	src/MusicManager.cpp
 	src/creatures/oldBrain.cpp
+	src/parseException.cpp
 	src/partzorder.cpp
 	src/PathResolver.cpp
 	src/peFile.cpp
