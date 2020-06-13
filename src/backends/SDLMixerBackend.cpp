@@ -19,7 +19,6 @@
 
 #include "SDLMixerBackend.h"
 #include "creaturesException.h"
-#include "World.h"
 #include <SDL.h>
 #include <cassert>
 #include <memory>
@@ -79,10 +78,7 @@ std::shared_ptr<AudioSource> SDLMixerBackend::newSource() {
 }
 
 std::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filename) {
-	std::string fname = world.findFile(std::string("Sounds/") + filename + ".wav");
-	if (fname.size() == 0) return std::shared_ptr<AudioSource>();
-
-	Mix_Chunk *buffer = Mix_LoadWAV(fname.c_str());
+	Mix_Chunk *buffer = Mix_LoadWAV(filename.c_str());
 	if (!buffer) return std::shared_ptr<AudioSource>();
 
 	SDLMixerSource* source = new SDLMixerSource();

@@ -736,13 +736,18 @@ std::string World::generateMoniker(std::string basename) {
 	return x;
 }
 
-std::shared_ptr<AudioSource> World::playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport) {
-	if (filename.size() == 0) return std::shared_ptr<AudioSource>();
+std::shared_ptr<AudioSource> World::playAudio(std::string name, AgentRef agent, bool controlled, bool loop, bool followviewport) {
+	if (name.size() == 0) return std::shared_ptr<AudioSource>();
+
+	std::string filename = findFile(fmt::format("Sounds/{}.wav", name));
+	if (filename.size() == 0) {
+		if (engine.version < 3) return std::shared_ptr<AudioSource>(); // creatures 1 and 2 ignore non-existent audio clips
+		throw creaturesException(fmt::format("No such clip '{}.wav'", name));
+	}
 
 	std::shared_ptr<AudioSource> sound = engine.audio->loadClip(filename);
 	if (!sound) {
 		// note that more specific error messages can be thrown by implementations of loadClip
-		if (engine.version < 3) return std::shared_ptr<AudioSource>(); // creatures 1 and 2 ignore non-existent audio clips
 		throw creaturesException("failed to load audio clip " + filename);
 	}
 
