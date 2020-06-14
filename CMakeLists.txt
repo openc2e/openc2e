@@ -333,6 +333,16 @@ add_executable(spritedumper
 )
 target_link_libraries(spritedumper fmt ghc_filesystem PNG::PNG)
 
+add_executable(translate_voice
+	src/tools/translate_voice.cpp
+	src/VoiceData.cpp
+	src/Catalogue.cpp
+	${GEN}/cataloglexer.cpp
+	src/catalogparser.cpp
+	src/util.cpp
+)
+target_link_libraries(translate_voice openc2e-audiobackend fmt ghc_filesystem)
+
 # tests
 enable_testing()
 include(GoogleTest)
