@@ -105,6 +105,7 @@ public:
 
 	std::shared_ptr<class VoiceData> voice;
 	std::vector<std::pair<std::string, unsigned int> > pending_voices;
+	unsigned int ticks_until_next_voice = 0;
 	void setVoice(std::string name);
 	void speak(std::string sentence);
 	void tickVoices();

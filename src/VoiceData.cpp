@@ -25,24 +25,26 @@
 
 #define NUM_VOICE_FILES 32
 
+VoiceData::VoiceData() = default;
+
 // Creatures 1 and 2 store this data in .vce files
-VoiceData::VoiceData(std::ifstream &file) {
+VoiceData::VoiceData(std::istream &in) {
 	// voice files and associated delay
 	for (unsigned int i = 0; i < NUM_VOICE_FILES; i++) {
 		char temp[4];
-		file.read((char *)&temp, 4);
+		in.read((char *)&temp, 4);
 		VoiceEntry entry;
 		if (temp[0])
 			entry.name = std::string(temp, 4);
-		entry.delay = read32le(file);
-		Voices.push_back(entry);
+		entry.delay_ticks = read32le(in);
+		voices.push_back(entry);
 	}
 
 	// 3 letters per syllable
 	for (unsigned int i = 0; i < 3; i++) {
 		// 26 possible letters + blank
 		for (unsigned int j = 0; j < 27; j++) {
-			LookupTable.push_back(read32le(file));
+			lookup_table.push_back(read32le(in));
 		}
 	}
 }
@@ -61,36 +63,49 @@ VoiceData::VoiceData(std::string tagname) {
 	const std::vector<std::string> &lookupdata = catalogue.getTag(languagetag);
 	for (unsigned int i = 0; i < lookupdata.size(); i++) {
 		uint32_t data = strtoul(lookupdata[i].c_str(), NULL, 16);
-		LookupTable.push_back(data);
+		lookup_table.push_back(data);
 	}
-	if (LookupTable.size() != 3 * 27) throw creaturesException(
+	if (lookup_table.size() != 3 * 27) throw creaturesException(
 		fmt::sprintf("invalid lookup table size %d reading language tag '%s'",
-		        LookupTable.size(), languagetag));
+		        lookup_table.size(), languagetag));
 
 	// the remaining entries are pairs of (name, delay)
 	for (unsigned int i = 1; i < tagdata.size() - 1; i+=2) {
 		VoiceEntry entry;
 		entry.name = tagdata[i];
-		entry.delay = atoi(tagdata[i+1].c_str());
-		Voices.push_back(entry);
+		entry.delay_ticks = atoi(tagdata[i+1].c_str());
+		voices.push_back(entry);
 	}
 
-	if (Voices.size() != 32) throw creaturesException(
+	if (voices.size() != 32) throw creaturesException(
 		fmt::sprintf("invalid voice table size %d reading voice tag '%s'",
-		        Voices.size(), tagname));
+		        voices.size(), tagname));
 }
 
-std::vector<unsigned int> VoiceData::GetSentenceFor(std::string in) {
+VoiceData::operator bool() const {
+	return voices.size() != 0 && lookup_table.size() != 0;
+}
+
+std::vector<VoiceEntry> VoiceData::GetSyllablesFor(std::string speech) {
+	std::vector<unsigned int> data = GetSentenceFor(speech);
+	unsigned int pos = 1;
+	VoiceEntry entry;
+	std::vector<VoiceEntry> syllables;
+	while (NextSyllableFor(data, pos, entry)) {
+		syllables.push_back(entry);
+	}
+	return syllables;
+}
+
+std::vector<unsigned int> VoiceData::GetSentenceFor(std::string speech) {
 	// we work in lowercase
-	std::transform(in.begin(), in.end(), in.begin(), (int(*)(int))tolower);
+	std::transform(speech.begin(), speech.end(), speech.begin(), (int(*)(int))tolower);
 
 	// we want the string in the form ' word word ', compressing multiple spaces into one;
 	// we rewrite the letters as 0-25 and spaces to 26
 	std::vector<unsigned int> out;
-	if (!LookupTable.size()) return out;
 	out.push_back(26);
-	for (unsigned int i = 0; i < in.size(); i++) {
-		char c = in[i];
+	for (char c : speech) {
 		if (c >= 'a' && c <= 'z')
 			out.push_back(c - 'a');
 		else if (c == ' ' && out[out.size() - 1] != 26)
@@ -120,6 +135,10 @@ bool VoiceData::NextSyllableFor(std::vector<unsigned int> &sentence, unsigned in
 	 * 18-31 for 'abc' (so, in the middle of a word).
 	 */
 
+	if (!*this) {
+		return false;
+	}
+
 	// pos should start at 1
 	assert(pos > 0);
 
@@ -129,7 +148,7 @@ bool VoiceData::NextSyllableFor(std::vector<unsigned int> &sentence, unsigned in
 	unsigned int chars[3] = { sentence[pos - 1], sentence[pos], sentence[pos + 1] };
 	uint32_t sum = chars[0] + chars[1] + chars[2];
 
-	uint32_t lookup = LookupTable[chars[0]] & LookupTable[chars[1] + 27] & LookupTable[chars[2] + 27 + 27];
+	uint32_t lookup = lookup_table[chars[0]] & lookup_table[chars[1] + 27] & lookup_table[chars[2] + 27 + 27];
 	if (chars[1] == 26)
 		lookup &= 0xf; // bits 0-3 (between words)
 	if (chars[0] == 26)
@@ -162,8 +181,8 @@ bool VoiceData::NextSyllableFor(std::vector<unsigned int> &sentence, unsigned in
 			sum = (sum % 14) + 18; // 18-31
 		}
 	}
-	assert(sum < Voices.size());
-	syllable = Voices[sum];
+	assert(sum < voices.size());
+	syllable = voices[sum];
 
 	// skip to the next letter, and then skip over the *next* letter if it's in the middle of a word
 	pos++;

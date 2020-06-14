@@ -26,20 +26,24 @@
 
 struct VoiceEntry {
 	std::string name;
-	unsigned int delay;
+	unsigned int delay_ticks;
 };
 
 class VoiceData {
-protected:
-	std::vector<VoiceEntry> Voices;
-	std::vector<uint32_t> LookupTable;
-
 public:
-	VoiceData(std::ifstream &file);
+	VoiceData();
+	VoiceData(std::istream &in);
 	VoiceData(std::string tagname);
+	operator bool() const;
 
-	std::vector<unsigned int> GetSentenceFor(std::string in);
+	std::vector<VoiceEntry> GetSyllablesFor(std::string speech);
+
+protected:
+	std::vector<unsigned int> GetSentenceFor(std::string speech);
 	bool NextSyllableFor(std::vector<unsigned int> &sentence, unsigned int &pos, VoiceEntry &syllable);
+
+	std::vector<VoiceEntry> voices;
+	std::vector<uint32_t> lookup_table;
 };
 
 #endif

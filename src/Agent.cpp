@@ -1467,31 +1467,30 @@ void Agent::setVoice(std::string name) {
 
 void Agent::speak(std::string sentence) {
 	if (!voice) throw creaturesException("can't speak without voice");
-	std::vector<unsigned int> data = voice->GetSentenceFor(sentence);
-	unsigned int pos = 1;
-	VoiceEntry entry;
-	unsigned int delay = 0;
-	while (voice->NextSyllableFor(data, pos, entry)) {
-		// this might be completely the wrong idea, i don't know quite how this is meant to work
-		pending_voices.push_back(std::pair<std::string, unsigned int>(entry.name, delay));
-
-		// TODO: base this on tickrate?
-		if (engine.version == 3) entry.delay *= 2;
-		delay += entry.delay;
+	std::vector<VoiceEntry> syllables = voice->GetSyllablesFor(sentence);
+	if (pending_voices.size() == 0) {
+		ticks_until_next_voice = 1; // because tickVoices subtracts one every time
+	}
+	for (const auto& entry : syllables) {
+		// TODO: voice delay values are the same across games, even though C3/DS
+		// run more ticks per second! Are C3/DS voices really "faster"?
+		auto delay_ticks = entry.delay_ticks;
+		pending_voices.push_back(std::pair<std::string, unsigned int>(entry.name, entry.delay_ticks));
 	}
 }
 
 void Agent::tickVoices() {
-	for (int i = 0; i < (int)pending_voices.size(); i++) {
-		std::pair<std::string, unsigned int> &entry = pending_voices[i];
-		if (entry.second == 0) {
-			// uncontrolled audio is easier, we shall hope no-one notices
-			playAudio(entry.first, false, false);
-			pending_voices.erase(pending_voices.begin() + i);
-			i--;
-		} else {
-			entry.second--;
-		}
+	if (pending_voices.size() == 0) {
+		return;
+	}
+
+	ticks_until_next_voice--;
+	if (ticks_until_next_voice == 0) {
+		auto it = pending_voices.begin();
+		// uncontrolled audio is easier, we shall hope no-one notices
+		playAudio(it->first, false, false);
+		ticks_until_next_voice = it->second;
+		pending_voices.erase(it);
 	}
 }
 
