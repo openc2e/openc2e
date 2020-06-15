@@ -2,9 +2,12 @@
 #include "MNGMusic.h"
 #include "mngfile/mngfile.h"
 
+#include <atomic>
+#include <condition_variable>
 #include <fstream>
 #include <fmt/format.h>
 #include <ghc/filesystem.hpp>
+#include <mutex>
 #include <thread>
 
 namespace fs = ghc::filesystem;
