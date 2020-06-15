@@ -221,7 +221,7 @@ void caosVM::c_STRK() {
 	VM_PARAM_STRING(track)
 	VM_PARAM_INTEGER(latency)
 
-	musicmanager.playTrack(track, latency);
+	musicmanager.playTrack(track, latency * 1000);
 }
 
 /**

@@ -38,7 +38,6 @@
 #include "historyManager.h"
 #include "imageManager.h"
 #include "Map.h"
-#include "MusicManager.h"
 #include "prayManager.h"
 #include "Scriptorium.h"
 
@@ -246,8 +245,6 @@ void World::tick() {
 
 		si = next;
 	}
-
-	musicmanager.tick();
 
 	// Tick all agents, deleting as necessary.
 	std::list<std::shared_ptr<Agent> >::iterator i = agents.begin();

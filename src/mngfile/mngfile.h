@@ -16,6 +16,9 @@
  *  Lesser General Public License for more details.
  *
  */
+
+#pragma once
+
 #include <string>
 #include <vector>
 #include <list>
@@ -408,7 +411,6 @@ public:
 class MNGFile {
 	private:
 		class mmapifstream *stream;
-		std::string name;
 		int numsamples, scriptoffset, scriptlength, scriptend;
 		unsigned int sampleno;
 
@@ -428,6 +430,7 @@ class MNGFile {
 		void add(class MNGTrackDecNode *n);
 		void add(class MNGVariableDecNode *n);
 		unsigned int getSampleForName(std::string name);
+		std::string name;
 		char * script;
 		std::map<std::string, unsigned int> samplemappings;
 		std::vector< std::pair< char *, int > > samples;

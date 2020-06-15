@@ -23,6 +23,7 @@
 #include "World.h"
 #include "Map.h"
 #include "MetaRoom.h"
+#include "MusicManager.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "caosScript.h" // for executeNetwork()
 #include "PointerAgent.h"
@@ -366,6 +367,9 @@ void Engine::update() {
 		std::shared_ptr<AudioSource> s = world.playAudio(filename, AgentRef(), false, false, true);
 		if (s) s->setVolume(0.4f);
 	}
+
+	// play MNG music
+	musicmanager.tick();
 
 	// update our data for things like pace, race, ticktime, etc
 	ticktimes[ticktimeptr] = backend->ticks() - tickdata;

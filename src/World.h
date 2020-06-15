@@ -36,7 +36,6 @@ class MainCamera;
 class Map;
 class historyManager;
 class imageManager;
-class MusicManager;
 class prayManager;
 class renderable;
 class RenderTarget;
