@@ -311,6 +311,12 @@ target_link_libraries(creaturesarchivedumper fmt ghc_filesystem z)
 add_executable(mngdumper src/tools/mngdumper.cpp)
 target_link_libraries(mngdumper fmt ghc_filesystem mngfile)
 
+add_executable(mngplayer
+	src/MNGMusic.cpp
+	src/tools/mngplayer.cpp
+)
+target_link_libraries(mngplayer openc2e-audiobackend fmt ghc_filesystem mngfile)
+
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper prayfile)
 

@@ -1,0 +1,70 @@
+#include "audiobackend/SDLMixerBackend.h"
+#include "MNGMusic.h"
+#include "mngfile/mngfile.h"
+
+#include <fstream>
+#include <fmt/format.h>
+#include <ghc/filesystem.hpp>
+#include <thread>
+
+namespace fs = ghc::filesystem;
+
+class Event {
+public:
+  Event() {
+      value = false;
+  }
+  void set() {
+      std::lock_guard<std::mutex> lk(mutex);
+      value = true;
+      condvar.notify_all();
+  }
+  
+  void wait() {
+      std::unique_lock<std::mutex> lk(mutex);
+      condvar.wait(lk, [&] { return (bool)value; });
+  }
+  
+  std::atomic<bool> value;
+  std::mutex mutex;
+  std::condition_variable condvar;
+};
+
+int main (int argc, char **argv) {
+    if (argc != 2 && argc != 3) {
+        fmt::print(stderr, "USAGE: {} filename [trackname]\n", argv[0]);
+        return 1;
+    }
+
+    std::string filename = argv[1];
+    if (!fs::exists(filename)) {
+        fmt::print(stderr, "File '{}' doesn't exist\n", filename);
+        return 1;
+    }
+    MNGFile *file = new MNGFile(filename);
+
+    if (argc == 2) {
+        fmt::print("Tracks in {}:\n", filename);
+        for (auto kv : file->tracks) {
+            fmt::print("{}\n", kv.first);
+        }
+        return 0;
+    }
+
+    std::string trackname = argv[2];
+
+    SDLMixerBackend backend;
+    backend.init();
+
+    MNGMusic mng_music;
+    mng_music.startPlayback(backend);
+    mng_music.playTrack(file, trackname);
+    if (mng_music.playing_silence) {
+        // If the track doesn't exist
+        // TODO: better way to check this
+        return 1;
+    }
+
+    Event sleep_forever;
+    sleep_forever.wait();
+}
