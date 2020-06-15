@@ -9,6 +9,22 @@
 
 namespace fs = ghc::filesystem;
 
+std::string escape(const std::string& s) {
+	std::string result;
+	for (char c : s) {
+		if (c == '\n') {
+			result += "\\n";
+		} else if (c == '\r') {
+			result += "\\r";
+		} else if (c == '"') {
+			result += "\\\"";
+		} else {
+			result += c;
+		}
+	}
+	return result;
+}
+
 int main(int argc, char **argv) {
 	if (argc != 2) {
 		std::cerr << "syntax: cobdumper filename" << std::endl;
@@ -31,51 +47,55 @@ int main(int argc, char **argv) {
 	in.seekg(0);
 
 	if (memcmp(magic, "cob2", 4) == 0) {
-		printf("cob2 file!\n");
+		fmt::print("\"cob2\"\n");
+		fmt::print("\n");
 		cobFile cob(input_path);
 		for (auto &b : cob.blocks) {
 			if (b->getType() == "agnt") {
 				cobAgentBlock agnt(b);
 
-				fmt::print("name = {}\n", agnt.name);
-				fmt::print("description = {}\n", agnt.description);
-				fmt::print("quantityremaining = {}\n", agnt.quantityremaining);
-				fmt::print("lastusage = {}\n", agnt.lastusage);
-				fmt::print("reuseinterval = {}\n", agnt.reuseinterval);
-				fmt::print("usebyday = {}\n", agnt.usebyday);
-				fmt::print("usebymonth = {}\n", agnt.usebymonth);
-				fmt::print("usebyyear = {}\n", agnt.usebyyear);
-				fmt::print("installscript = {}\n", agnt.installscript);
-				fmt::print("removescript = {}\n", agnt.removescript);
-				for (auto s : agnt.scripts) {
-					fmt::print("script[] = {}\n", s);
+				fmt::print("group AGNT \"{}\"\n", escape(agnt.name));
+				fmt::print("\"Description\" \"{}\"\n", escape(agnt.description));
+				fmt::print("\"Quantity Remaining\" {}\n", agnt.quantityremaining);
+				fmt::print("\"Last Usage\" {}\n", agnt.lastusage);
+				fmt::print("\"Reuse Interval\" {}\n", agnt.reuseinterval);
+				fmt::print("\"Expiration Day\" {}\n", agnt.usebyday);
+				fmt::print("\"Expiration Month\" {}\n", agnt.usebymonth);
+				fmt::print("\"Expiration Year\" {}\n", agnt.usebyyear);
+				fmt::print("\"Install script\" \"{}\"\n", agnt.installscript);
+				fmt::print("\"Remove script\" \"{}\"\n", agnt.removescript);
+				for (size_t i = 0; i < agnt.scripts.size(); ++i) {
+					fmt::print("\"Script {}\" \"{}\"\n", i + 1, agnt.scripts[i]);
 				}
-				for (auto d : agnt.deptypes) {
-					fmt::print("deptype[] = {}\n", d);
+				for (size_t i = 0; i < std::max(agnt.deptypes.size(), agnt.depnames.size()); ++i) {
+					if (i < agnt.depnames.size()) {
+						fmt::print("\"Dependency {}\" \"{}\"\n", i + 1, agnt.depnames[i]);
+					}
+					if (i < agnt.deptypes.size()) {
+						fmt::print("# deptype {} = {}\n", i + 1, agnt.deptypes[i]);
+					}
 				}
-				for (auto d : agnt.depnames) {
-					fmt::print("dep[] = {}\n", d);
-				}
-				fmt::print("thumbnailwidth = {}\n", agnt.thumbnailwidth);
-				fmt::print("thumbnailheight = {}\n", agnt.thumbnailheight);
+				fmt::print("\"Thumbnail\" @ \"{}.s16\"\n", agnt.name);
+				fmt::print("# thumbnailwidth = {}\n", agnt.thumbnailwidth);
+				fmt::print("# thumbnailheight = {}\n", agnt.thumbnailheight);
 				fmt::print("\n");
 			} else if (b->getType() == "file") {
 				cobFileBlock file(b);
-				fmt::print("filetype = {}\n", file.filetype);
-				fmt::print("filesize = {}\n", file.filesize);
-				fmt::print("filename = {}\n", file.filename);
+				fmt::print("inline FILE \"{}\" \"{}\"\n", file.filename, file.filename);
+				fmt::print("# filetype = {}\n", file.filetype);
+				fmt::print("# filesize = {}\n", file.filesize);
 				fmt::print("\n");
 			} else if (b->getType() == "auth") {
 				cobAuthBlock auth(b);
-				fmt::print("daycreated = {}\n", auth.daycreated);
-				fmt::print("monthcreated = {}\n", auth.monthcreated);
-				fmt::print("yearcreated = {}\n", auth.yearcreated);
-				fmt::print("version = {}\n", auth.version);
-				fmt::print("revision = {}\n", auth.revision);
-				fmt::print("authorname = {}\n", auth.authorname);
-				fmt::print("authoremail = {}\n", auth.authoremail);
-				fmt::print("authorurl = {}\n", auth.authorurl);
-				fmt::print("authorcomments = {}\n", auth.authorcomments);
+				fmt::print("group AUTH \"{}\"\n", auth.authorname);
+				fmt::print("\"Creation Day\" {}\n", auth.daycreated);
+				fmt::print("\"Creation Month\" {}\n", auth.monthcreated);
+				fmt::print("\"Creation Year\" {}\n", auth.yearcreated);
+				fmt::print("\"Version\" {}\n", auth.version);
+				fmt::print("\"Revision\" {}\n", auth.revision);
+				fmt::print("\"Email\" \"{}\"\n", auth.authoremail);
+				fmt::print("\"URL\" \"{}\"\n", auth.authorurl);
+				fmt::print("\"Comments\" \"{}\"\n", escape(auth.authorcomments));
 				fmt::print("\n");
 			}else {
 				fmt::print("unknown block type '{}'\n", b->getType());
