@@ -88,7 +88,7 @@ endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
 	add_compile_options(-Wextra -Wall -Wno-conversion -Wno-unused)
 endif()
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(Threads REQUIRED) # stupid GCC needs explicit flags to use std::thread
 link_libraries(Threads::Threads)
