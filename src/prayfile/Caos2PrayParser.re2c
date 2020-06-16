@@ -16,6 +16,11 @@ static char unescape(char c) {
 	}
 }
 
+static bool iequals(const std::string& a, const std::string& b) {
+	return std::equal(a.begin(), a.end(), b.begin(), b.end(),
+	                  [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+}
+
 static bool imatch(const std::string &s, std::string regex) {
     return std::regex_search(s, std::regex(regex, std::regex::icase));
 }
@@ -379,10 +384,10 @@ class Caos2PrayParserImpl {
                     remove_script += " " + tokens[p].format();
                 }
             } else if (tokens[p].type == token::TOK_COMMENT) {
-                if (tokens[p].strval[0] == '*' && tokens[p].strval[1] == '#') {
+                if (tokens[p].value[0] == '*' && tokens[p].value[1] == '#') {
                     // parse caos2pray comment
                     std::vector<Event> newevents =
-                        parse_caos2pray(tokens[p].strval.c_str() + 2);
+                        parse_caos2pray(tokens[p].value.c_str() + 2);
                     for (auto e : newevents) {
                         if (mpark::holds_alternative<Error>(e)) {
                             return {e};
@@ -394,7 +399,7 @@ class Caos2PrayParserImpl {
             } else if (tokens[p].type == token::TOK_EOI) {
                 break;
             } else if (tokens[p].type == token::TOK_WORD) {
-                if (tokens[p].strval == "rscr") {
+                if (iequals(tokens[p].value, "rscr")) {
                     in_rscr = true;
                 }
             }

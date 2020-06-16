@@ -212,6 +212,7 @@ add_library(openc2e-core STATIC
 	src/SFCFile.cpp
 	src/SimpleAgent.cpp
 	src/creatures/SkeletalCreature.cpp
+	src/token.cpp
 	src/images/sprImage.cpp
 	src/Vehicle.cpp
 	src/VoiceData.cpp
@@ -320,10 +321,18 @@ target_link_libraries(mngplayer openc2e-audiobackend fmt ghc_filesystem mngfile)
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper prayfile)
 
-add_executable(praybuilder src/tools/praybuilder.cpp ${GEN}/caoslexer.cpp)
+add_executable(praybuilder
+	src/tools/praybuilder.cpp
+	${GEN}/caoslexer.cpp
+	src/token.cpp
+)
 target_link_libraries(praybuilder prayfile)
 
-add_executable(praytoolqt src/tools/praytoolqt.cpp ${GEN}/caoslexer.cpp)
+add_executable(praytoolqt
+	src/tools/praytoolqt.cpp
+	${GEN}/caoslexer.cpp
+	src/token.cpp
+)
 target_link_libraries(praytoolqt prayfile Qt5::Widgets)
 set_target_properties(praytoolqt PROPERTIES
 	AUTOMOC ON

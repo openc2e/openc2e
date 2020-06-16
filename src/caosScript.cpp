@@ -246,21 +246,16 @@ struct repsinfo {
 	int loopidx;
 };
 
-
 token *caosScript::tokenPeek() {
 	while (true) {
 		if ((size_t)curindex >= tokens->size()) {
 			return NULL;
 		}
-		if ((*tokens)[curindex].type == token::TOK_COMMENT) {
-			curindex++;
-			continue;
-		}
 		return &(*tokens)[curindex];
 	}
 }
 
-caosScript::logicaltokentype caosScript::logicalType(const token * const t ) {
+caosScript::logicaltokentype caosScript::logicalType(const token * const t) {
 	return logicalType(*t);
 }
 
@@ -282,16 +277,17 @@ caosScript::logicaltokentype caosScript::logicalType(const token& t) {
 			throw parseException("no logical type for a lexer error token");
 		case token::TOK_COMMENT:
 			throw parseException("no logical type for a comment token");
+		case token::TOK_WHITESPACE:
+			throw parseException("no logical type for a whitespace token");
+		case token::TOK_NEWLINE:
+			throw parseException("no logical type for a newline token");
+		case token::TOK_COMMA:
+			throw parseException("no logical type for a comma token");
 	}
 }
 
 token *caosScript::getToken(logicaltokentype expected) {
 	token *t = tokenPeek();
-	while (t && t->type == token::TOK_COMMENT) {
-		curindex++;
-		t = tokenPeek();
-	}
-
 	token dummy;
 	token &r = (t ? *t : dummy);
 	errindex = curindex;
@@ -305,7 +301,7 @@ token *caosScript::getToken(logicaltokentype expected) {
 	return t;
 }
 
-void caosScript::putBackToken(token *) {
+void caosScript::putBackToken(token *t) {
 	curindex--;
 	errindex = curindex - 1; // curindex refers to the /next/ token to be parsed
 							 // so make sure we refer to the token before it
@@ -320,8 +316,38 @@ void caosScript::parse(std::istream &in) {
 		bool using_c2;
 		using_c2 = (d->name == "c1" || d->name == "c2");
 
+		std::vector<token> rawtokens;
+		lexcaos(rawtokens, caostext.c_str(), using_c2);
+
 		tokens = shared_ptr<std::vector<token> >(new std::vector<token>());
-		lexcaos(*tokens, caostext.c_str(), using_c2);
+		size_t index = 0;
+		for (auto& t : rawtokens) {
+			switch (t.type) {
+				case token::TOK_WORD:
+					std::transform(t.value.begin(), t.value.end(), t.value.begin(), tolower);
+					t.index = index++;
+					tokens->push_back(t);
+					break;
+				case token::TOK_BYTESTR:
+				case token::TOK_STRING:
+				case token::TOK_CHAR:
+				case token::TOK_BINARY:
+				case token::TOK_INT:
+				case token::TOK_FLOAT:
+				case token::TOK_EOI:
+				case token::TOK_ERROR:
+					t.index = index++;
+					tokens->push_back(t);
+					break;
+				case token::TOK_COMMENT:
+				case token::TOK_WHITESPACE:
+				case token::TOK_NEWLINE:
+				case token::TOK_COMMA:
+					break;
+				default:
+					abort();
+			}
+		}
 	}
 	curindex = errindex = traceindex = 0;
 
@@ -405,16 +431,16 @@ void caosScript::parse(std::istream &in) {
 
 caosVar caosScript::asConst(const token& token) {
 	if (token.type == token::TOK_STRING) {
-		return caosVar(token.strval);
+		return caosVar(token.stringval());
 	}
 	if (token.type == token::TOK_CHAR || token.type == token::TOK_BINARY
 		|| token.type == token::TOK_INT)
 	{
-		return caosVar(token.intval);
+		return caosVar(token.intval());
 	}
 	if (token.type == token::TOK_FLOAT)
 	{
-		return caosVar(token.floatval);
+		return caosVar(token.floatval());
 	}
 	unexpectedToken(token);
 }
@@ -561,11 +587,17 @@ int caosScript::readCond() {
 	typedef struct { const char *n; int cnd; } cond_entry;
 	const static cond_entry conds[] = {
 		{ "eq", CEQ },
+		{ "=",  CEQ },
 		{ "gt", CGT },
+		{ ">",  CGT },
 		{ "ge", CGE },
+		{ ">=", CGE },
 		{ "lt", CLT },
+		{ "<",  CLT },
 		{ "le", CLE },
+		{ "<=", CLE },
 		{ "ne", CNE },
+		{ "<>", CNE },
 		{ "bt", CBT },
 		{ "bf", CBF },
 		{ NULL, 0 }

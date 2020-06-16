@@ -3,23 +3,12 @@
 #include "caoslexer.h"
 #include <algorithm>
 
-static char string_escape(char c) {
-	switch (c) {
-	case 'n': return '\n';
-	case 'r': return '\r';
-	case 't': return '\t';
-	default : return c;
-	}
-}
-
 
 void lexcaos(std::vector<token> &v, const char *p, bool c2) {
 #define make_word(str) \
 	v.push_back(token(token::TOK_WORD, str, yylineno))
 	int yylineno = 1;
 	int tokidx   = 0;
-	std::string tempstr;
-	std::vector<unsigned char> tempbs;
 	const char *basep, *YYMARKER;
 std:
 	basep = p;
@@ -30,84 +19,87 @@ std:
 	re2c:yych:conversion = 1;
 	re2c:indent:top = 1;
 
-noneoi     = [\001-\377];
-eoi        = [\000];
-any        = noneoi | eoi;	
-DIGIT      = [0-9];
-WORDINIT   = [a-zA-Z_];
-WORDANY    = [$#a-zA-Z0-9:?!_+-];
-SIGN       = [-+];
+	noneoi     = [\001-\377];
+	eoi        = [\000];
+	any        = noneoi | eoi;
+	DIGIT      = [0-9];
+	WORDINIT   = [a-zA-Z_];
+	WORDANY    = [$#a-zA-Z0-9:?!_+-];
+	SIGN       = [-+];
 
-
-	[\n] { ++yylineno; goto std; }
-	[\r] { goto std; }
-	[ \t,] { goto std; }
-	"*" [^\r\n\000]* { v.push_back(token(token::TOK_COMMENT, std::string(basep, p - basep), yylineno)); goto std; }
-	"'" noneoi "'"  { v.push_back(token(token::TOK_CHAR, (int)basep[1], yylineno)); goto std; }
-	[fF] "**" [kK] { make_word("f**k"); goto std; }
+	("\r\n" | "\n") {
+		v.push_back(token(token::TOK_WHITESPACE, std::string(basep, p - basep), yylineno));
+		++yylineno;
+		goto std;
+	}
+	[ \r\t]+ {
+		v.push_back(token(token::TOK_WHITESPACE, std::string(basep, p - basep), yylineno));
+		goto std;
+	}
+	[,] {
+		v.push_back(token(token::TOK_COMMA, std::string(basep, p - basep), yylineno));
+		goto std;
+	}
+	"*" [^\r\n\000]* {
+		v.push_back(token(token::TOK_COMMENT, std::string(basep, p - basep), yylineno));
+		goto std;
+	}
+	"'" noneoi "'"  {
+		v.push_back(token(token::TOK_CHAR, std::string(basep, p - basep), yylineno));
+		goto std;
+	}
+	[fF] "**" [kK] {
+		make_word(std::string(basep, p - basep));
+		goto std;
+	}
 	WORDANY* WORDINIT WORDANY* {
-		std::string word(basep, p - basep);
-		std::transform(word.begin(), word.end(), word.begin(), tolower);
-		make_word(word);
+		make_word(std::string(basep, p - basep));
 		goto std;
 	}
 	"%" [01]* {
-		int accum = 0;
-		for (const char *i = basep + 1; i <= p; i++) {
-			accum <<= 1;
-			accum += (*i == '1');
-		}
-		v.push_back(token(token::TOK_BINARY, accum, yylineno));
+		v.push_back(token(token::TOK_BINARY, std::string(basep, p - basep), yylineno));
 		goto std;
 	}
 	SIGN? DIGIT* "." DIGIT* {
-		v.push_back(token(token::TOK_FLOAT, (float)atof(basep), yylineno));
+		v.push_back(token(token::TOK_FLOAT, std::string(basep, p - basep), yylineno));
 		goto std;
 	}
 	SIGN? DIGIT+  {
-		v.push_back(token(token::TOK_INT, atoi(basep), yylineno));
+		v.push_back(token(token::TOK_INT, std::string(basep, p - basep), yylineno));
 		goto std;
 	}
-"<>"                     { make_word("ne"); goto std; }
-"<="                     { make_word("le"); goto std; }
-">="                     { make_word("ge"); goto std; }
-"<"                      { make_word("lt"); goto std; }
-">"                      { make_word("gt"); goto std; }
-"=="                     { make_word("eq"); goto std; }
-"="                      { make_word("eq"); goto std; }
-"&&"                     { make_word("and"); goto std; }
-"||"                     { make_word("or"); goto std; }
+	"<>" { make_word(std::string(basep, p - basep)); goto std; }
+	"<=" { make_word(std::string(basep, p - basep)); goto std; }
+	">=" { make_word(std::string(basep, p - basep)); goto std; }
+	"<"  { make_word(std::string(basep, p - basep)); goto std; }
+	">"  { make_word(std::string(basep, p - basep)); goto std; }
+	"="  { make_word(std::string(basep, p - basep)); goto std; }
 
-"["  { if (c2) goto brstr; else goto bytestr; }
-"\"" { goto str; }
-eoi { goto out; }
+	"["  { if (c2) goto brstr; else goto bytestr; }
+	"\"" { goto str; }
+	eoi { goto out; }
 
-any { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
+	any { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
 */
 bytestr:
-	basep = p;
-	/*!re2c
-[0-9]+  { tempbs.push_back(atoi(basep)); goto bytestr; }
-[\n\r] { yylineno++; goto bytestr; }
-[ \t] { goto bytestr; }
-"]" { v.push_back(token(token::TOK_BYTESTR, tempbs, yylineno)); tempbs.clear(); goto std; }
-any { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
+/*!re2c
+	[0-9 ] { goto bytestr; }
+	"]" { v.push_back(token(token::TOK_BYTESTR, std::string(basep, p - basep), yylineno)); goto std; }
+	any { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
 */
 brstr:
-	basep = p;
-	/*!re2c
-[\000\r\n] { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
-"]" { v.push_back(token(token::TOK_STRING, tempstr, yylineno)); tempstr.clear(); goto std;  }
-noneoi { tempstr.push_back(*basep); goto brstr; }
+/*!re2c
+	[\000\r\n] { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
+	"]" { v.push_back(token(token::TOK_STRING, std::string(basep, p - basep), yylineno)); goto std;  }
+	noneoi { goto brstr; }
 */
 
 str:
-	basep = p;
-	/*!re2c
-[\000\r\n] { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
-"\\" . { tempstr.push_back(string_escape(basep[1])); goto str; }
-"\"" { v.push_back(token(token::TOK_STRING, tempstr, yylineno)); tempstr.clear(); goto std;  }
-noneoi      { tempstr.push_back(*basep); goto str; }
+/*!re2c
+	[\000\r\n] { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
+	"\\" . { goto str; }
+	"\"" { v.push_back(token(token::TOK_STRING, std::string(basep, p - basep), yylineno)); goto std;  }
+	noneoi { goto str; }
 */
 out:
 	v.push_back(token(token::TOK_EOI, yylineno)); // EOI
