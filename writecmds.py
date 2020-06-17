@@ -3,20 +3,16 @@ import sys
 import json
 
 TDISP = {
-    "any": "CI_ANYVALUE",
     "float": "CI_NUMERIC",
     "integer": "CI_NUMERIC",
     "string": "CI_STRING",
     "agent": "CI_AGENT",
     "bytestring": "CI_BYTESTR",
     "variable": "CI_VARIABLE",
-    "any": "CI_OTHER",
     "anything": "CI_OTHER",
     "condition": None,
     "comparison": None,
     "decimal": "CI_NUMERIC",
-    "decimal variable": "CI_OTHER",
-    "byte-string": "CI_BYTESTR",
     "label": None,
     "vector": "CI_VECTOR",
     "bareword": "CI_BAREWORD",
@@ -119,7 +115,7 @@ def printarr(cmds, variant, arrname):
         buf += "\t\t{}, // stackdelta\n".format(cmd["stackdelta"])
         buf += "\t\t{}, // argtypes\n".format(argp)
 
-        rettype = TDISP[cmd["type"]]
+        rettype = TDISP.get(cmd["type"])
         if not rettype:
             raise Exception(
                 "Unknown return type {} in {}: {}".format(cmd["type"], cmd["name"], cmd)
@@ -143,7 +139,7 @@ def inject_ns(cmds):
     namespaces = {}
     names = {}
     for cmd in cmds:
-        type = "command" if cmd["type"] == "command" else "any"
+        type = "command" if cmd["type"] == "command" else "anything"
         if cmd.get("namespace"):
             namespaces[cmd["namespace"]] = namespaces.get(cmd["namespace"], {})
             namespaces[cmd["namespace"]][type] = (
