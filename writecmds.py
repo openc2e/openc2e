@@ -41,24 +41,6 @@ def printinit(variant, cmdarr):
     print("static Dialect dialect_{}({}, std::string(\"{}\"));".format(variant, cmdarr, variant))
 
 
-def printdispatch():
-    print("#ifdef VCPP_BROKENNESS")
-    print("void dispatchCAOS(class caosVM *vm, int idx) {")
-    print("\tswitch (idx) {")
-    for impl in sorted(DISP_TBL):
-        print("\t\tcase {}: vm->{}(); break;".format(DISP_TBL[impl], impl))
-    print("\t\tdefault:\n\t\t{")
-    print("\t\t\tchar buf[256];")
-    print('\t\t\tsprintf(buf, "%d", idx);')
-    print(
-        '\t\t\tthrow caosException(std::string("Unknown dispatchCAOS index: ") + buf);'
-    )
-    print("\t\t}")
-    print("\t}")
-    print("}")
-    print("#endif")
-
-
 def writelookup(cmds):
     for cmd in cmds:
         if cmd["type"] == "command":
@@ -93,7 +75,6 @@ def printarr(cmds, variant, arrname):
         buf += "\t{{ // {} {}\n".format(idx, cmd["key"])
         idx += 1
 
-        buf += "#ifndef VCPP_BROKENNESS\n"
         if not cmd.get("implementation"):
             cmd["implementation"] = "caosVM::dummy_cmd"
         if not cmd.get("saveimpl"):
@@ -101,10 +82,6 @@ def printarr(cmds, variant, arrname):
 
         buf += "\t\t&{}, // handler\n".format(cmd["implementation"])
         buf += "\t\t&{}, // savehandler\n".format(cmd["saveimpl"])
-        buf += "#else\n"
-        buf += "\t\t{}, // handler_idx\n".format(handler_idx(cmd["implementation"]))
-        buf += "\t\t{}, // savehandler_idx\n".format(handler_idx(cmd["saveimpl"]))
-        buf += "#endif\n"
 
         buf += '\t\t"{}", // lookup_key\n'.format(cmd["lookup_key"])
         buf += '\t\t"{}", // key\n'.format(cmd["key"])
@@ -259,8 +236,6 @@ for variant_name in sorted(data["variants"]):
 
     printarr(cmds, variant_name, "{}_cmds".format(variant_name))
     printinit(variant_name, "{}_cmds".format(variant_name))
-
-printdispatch()
 
 print("Dialect* getDialectByName(const std::string& name) {")
 for variant_name in sorted(data["variants"]):

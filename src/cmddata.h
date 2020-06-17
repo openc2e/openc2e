@@ -16,10 +16,11 @@
  *  Lesser General Public License for more details.
  *
  */
-#ifndef CMDDATA_H
-#define CMDDATA_H 1
 
-class caosVM;
+#pragma once
+
+#include "caosVM.h"
+#include "is_complete.h"
 
 enum ci_type {
 	CI_OTHER = -1,
@@ -37,13 +38,16 @@ enum ci_type {
 };
 
 struct cmdinfo {
-#ifndef VCPP_BROKENNESS
+	// Microsoft Visual C++ can use different representations of member function
+	// pointers, which causes issues when we take pointers before the class is
+	// fully defined. So, MAKE ABSOLUTELY SURE that caosVM is defined if we're
+	// delaring/taking pointers to caos functions.
+	// See https://social.msdn.microsoft.com/Forums/en-US/3c065ad7-a6cc-460a-8114-25b5ee01c76f/stack-corruption-when-passing-pointer-to-member-function-of-a-forward-referenced-class
+	// for more information.
+	static_assert(is_complete<caosVM>, "caosVM must be defined before member function pointers are declared");
 	void (caosVM::*handler)();
 	void (caosVM::*savehandler)();
-#else
-	int handler_idx;
-	int savehandler_idx;
-#endif
+
 	const char *lookup_key;
 	const char *key;
 	const char *name;
@@ -55,12 +59,5 @@ struct cmdinfo {
 	enum ci_type rettype;
 	int evalcost;
 };
-
-#ifdef VCPP_BROKENNESS
-void dispatchCAOS(class caosVM *vm, int idx);
-#endif
-
-#endif
-
 
 /* vim: set noet: */

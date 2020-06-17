@@ -1118,8 +1118,6 @@ public:
 	friend void setupCommandPointers();
 };
 
-typedef void (caosVM::*caosVMmethod)();
-
 class notEnoughParamsException : public caosException {
 	public:
 		notEnoughParamsException() : caosException("Not enough parameters") {}

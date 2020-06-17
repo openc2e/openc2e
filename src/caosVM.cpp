@@ -119,17 +119,10 @@ inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
 	int stackdelta = ci->stackdelta - (is_saver ? 2 : 0);
 	unsigned int stackstart = valueStack.size();
 	assert(result.isNull());
-#ifndef VCPP_BROKENNESS
 	if (is_saver)
 		(this->*(ci->savehandler))();
 	else
 		(this->*(ci->handler))();
-#else
-	if (is_saver)
-		dispatchCAOS(this, ci->savehandler_idx);
-	else
-		dispatchCAOS(this, ci->handler_idx);
-#endif
 	if (!is_saver && !result.isNull()) {
 		valueStack.push_back(result);
 		result.reset();

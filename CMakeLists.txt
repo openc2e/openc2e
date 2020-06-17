@@ -83,7 +83,7 @@ add_subdirectory(externals/utf8proc EXCLUDE_FROM_ALL)
 # Pass flags to the compiler
 add_compile_definitions("_REENTRANT" "YYERROR_VERBOSE")
 if(WIN32)
-	add_compile_definitions("VCPP_BROKENNESS" "NOMINMAX")
+	add_compile_definitions("NOMINMAX")
 endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
 	add_compile_options(-Wextra -Wall -Wno-conversion -Wno-unused)
