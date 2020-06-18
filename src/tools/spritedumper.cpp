@@ -1,7 +1,7 @@
 #include "endianlove.h"
-#include "images/blkImage.h"
-#include "images/c16Image.h"
-#include "images/sprImage.h"
+#include "fileformats/blkImage.h"
+#include "fileformats/c16Image.h"
+#include "fileformats/sprImage.h"
 #include "scope_guard.h"
 
 #include <ghc/filesystem.hpp>

@@ -838,7 +838,7 @@ void SFCFile::copyToWorld() {
 	}
 }
 
-#include "images/sprImage.h"
+#include "fileformats/sprImage.h"
 #include <iostream>
 
 void MapData::copyToWorld() {

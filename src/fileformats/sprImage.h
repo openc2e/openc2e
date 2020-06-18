@@ -1,9 +1,9 @@
 /*
- *  c16Image.h
+ *  sprImage.h
  *  openc2e
  *
- *  Created by Alyssa Milburn on Sat May 22 2004.
- *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
+ *  Created by Alyssa Milburn on Sun Nov 19 2006.
+ *  Copyright (c) 2006 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -17,20 +17,15 @@
  *
  */
 
-#include "creaturesImage.h"
-#include <istream>
-#include <memory>
+#pragma once
 
-class c16Image : public creaturesImage {
-public:
-	c16Image(std::istream &in, std::string n);
-	~c16Image();
-};
+#include "fileformats/creaturesImage.h"
 
-class s16Image : public creaturesImage {
+class sprImage : public creaturesImage {
 public:
-	s16Image(std::istream &in, std::string n);
-	~s16Image();
+	sprImage(std::istream &in, std::string n);
+	~sprImage();
+	virtual unsigned int bitdepth() { return 8; }
 };
 
 /* vim: set noet: */

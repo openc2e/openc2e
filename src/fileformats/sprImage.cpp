@@ -17,9 +17,8 @@
  *
  */
 
-#include "openc2e.h"
 #include "endianlove.h"
-#include "sprImage.h"
+#include "fileformats/sprImage.h"
 #include <iostream>
 
 sprImage::sprImage(std::istream &in, std::string n) : creaturesImage(n) {

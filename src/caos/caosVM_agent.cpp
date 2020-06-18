@@ -24,7 +24,7 @@
 #include "PointerAgent.h"
 #include "creatures/SkeletalCreature.h"
 #include "World.h"
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include <cassert>
 #include <iostream>
 #include <fmt/printf.h>
@@ -2020,7 +2020,7 @@ void caosVM::s_FRZN() {
 	targ->frozen = newvalue.getInt();
 }
 
-#include "images/bmpImage.h"
+#include "fileformats/bmpImage.h"
 
 /**
  BLCK (command) width (integer) height (integer)

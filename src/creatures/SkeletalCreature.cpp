@@ -34,7 +34,7 @@
 #include "Backend.h"
 #include "MetaRoom.h"
 #include "Room.h"
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "imageManager.h"
 #include "Map.h"
 

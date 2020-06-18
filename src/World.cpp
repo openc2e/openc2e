@@ -28,7 +28,7 @@
 #include <memory>
 #include "audiobackend/AudioBackend.h"
 #include "Backend.h"
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "creatures/CreatureAgent.h"
 #include "SFCFile.h"
 #include "Room.h"
@@ -72,7 +72,7 @@ World::~World() {
 		delete *i;
 }
 
-#include "images/bmpImage.h"
+#include "fileformats/bmpImage.h"
 
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
 void World::init() {

@@ -18,11 +18,11 @@
  */
 
 #include "imageManager.h"
-#include "images/c16Image.h"
-#include "images/sprImage.h"
-#include "images/blkImage.h"
-#include "images/bmpImage.h"
-#include "images/charsetdta.h"
+#include "fileformats/c16Image.h"
+#include "fileformats/sprImage.h"
+#include "fileformats/blkImage.h"
+#include "fileformats/bmpImage.h"
+#include "fileformats/charsetdta.h"
 #include "mmapifstream.h"
 #include "openc2e.h"
 #include "World.h"

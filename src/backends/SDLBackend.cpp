@@ -23,7 +23,7 @@
 
 #include <SDL2_gfxPrimitives.h>
 
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "keycodes.h"
 #include "Engine.h"
 #include "openc2e.h"

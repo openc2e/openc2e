@@ -24,7 +24,7 @@
 #include <memory>
 #include <string>
 
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 
 class imageManager {
 protected:

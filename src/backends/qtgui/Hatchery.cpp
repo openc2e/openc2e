@@ -17,7 +17,7 @@
 #include "World.h"
 #include "Hatchery.h"
 #include "Engine.h"
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "qtopenc2e.h"
 
 #include <QBitmap>

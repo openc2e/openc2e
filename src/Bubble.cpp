@@ -22,7 +22,7 @@
 #include "Backend.h"
 #include "Bubble.h"
 #include "Camera.h"
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "Engine.h"
 #include "imageManager.h"
 #include "keycodes.h"

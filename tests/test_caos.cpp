@@ -1,6 +1,6 @@
 #include "caosScript.h"
 #include "caosVM.h"
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "imageManager.h"
 #include "util.h"
 #include "World.h"

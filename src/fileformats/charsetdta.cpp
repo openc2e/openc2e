@@ -1,6 +1,6 @@
 #include "endianlove.h"
 #include "creaturesException.h"
-#include "images/charsetdta.h"
+#include "fileformats/charsetdta.h"
 
 #include <string>
 

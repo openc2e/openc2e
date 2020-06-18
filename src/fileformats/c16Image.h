@@ -1,8 +1,8 @@
 /*
- *  blkImage.h
+ *  c16Image.h
  *  openc2e
  *
- *  Created by Alyssa Milburn on Tue May 25 2004.
+ *  Created by Alyssa Milburn on Sat May 22 2004.
  *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -17,17 +17,20 @@
  *
  */
 
-#ifndef _BLKIMAGE_H
-#define _BLKIMAGE_H
+#include "fileformats/creaturesImage.h"
+#include <istream>
+#include <memory>
 
-#include "creaturesImage.h"
-
-class blkImage : public creaturesImage {
+class c16Image : public creaturesImage {
 public:
-	blkImage(std::istream &in, std::string n);
-	~blkImage();
-	virtual std::string serializedName() { return name + ".blk"; }
+	c16Image(std::istream &in, std::string n);
+	~c16Image();
 };
 
-#endif
+class s16Image : public creaturesImage {
+public:
+	s16Image(std::istream &in, std::string n);
+	~s16Image();
+};
+
 /* vim: set noet: */

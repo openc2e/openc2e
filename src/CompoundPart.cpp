@@ -26,7 +26,7 @@
 #include "CameraPart.h"
 #include "Camera.h"
 #include "CompoundAgent.h"
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "encoding.h"
 #include "Engine.h"
 #include "imageManager.h"
@@ -172,7 +172,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 SpritePart::~SpritePart() {
 }
 
-#include "images/bmpImage.h"
+#include "fileformats/bmpImage.h"
 
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	shared_ptr<creaturesImage> spr = world.gallery->getImage(spritefile);

@@ -17,8 +17,7 @@
  *
  */
 
-#ifndef _CREATURESIMAGE_H
-#define _CREATURESIMAGE_H
+#pragma once
 
 #include <cassert>
 #include <memory>
@@ -58,5 +57,4 @@ public:
 	virtual bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
 };
 
-#endif
 /* vim: set noet: */

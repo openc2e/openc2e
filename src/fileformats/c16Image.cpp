@@ -17,9 +17,8 @@
  *
  */
 
-#include "c16Image.h"
+#include "fileformats/c16Image.h"
 #include "endianlove.h"
-#include "openc2e.h"
 #include <cassert>
 #include <memory>
 

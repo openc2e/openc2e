@@ -1,9 +1,9 @@
 /*
- *  sprImage.h
+ *  blkImage.h
  *  openc2e
  *
- *  Created by Alyssa Milburn on Sun Nov 19 2006.
- *  Copyright (c) 2006 Alyssa Milburn. All rights reserved.
+ *  Created by Alyssa Milburn on Tue May 25 2004.
+ *  Copyright (c) 2004 Alyssa Milburn. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -17,16 +17,16 @@
  *
  */
 
-#ifndef _SPRIMAGE_H
-#define _SPRIMAGE_H
+#ifndef _BLKIMAGE_H
+#define _BLKIMAGE_H
 
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 
-class sprImage : public creaturesImage {
+class blkImage : public creaturesImage {
 public:
-	sprImage(std::istream &in, std::string n);
-	~sprImage();
-	virtual unsigned int bitdepth() { return 8; }
+	blkImage(std::istream &in, std::string n);
+	~blkImage();
+	virtual std::string serializedName() { return name + ".blk"; }
 };
 
 #endif

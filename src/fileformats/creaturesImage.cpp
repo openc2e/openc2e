@@ -17,7 +17,7 @@
  *
  */
 
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include "creaturesException.h"
 #include <memory>
 

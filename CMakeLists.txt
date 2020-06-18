@@ -107,10 +107,15 @@ target_link_libraries(openc2e-common PRIVATE utf8proc)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
+	src/fileformats/blkImage.cpp
+	src/fileformats/bmpImage.cpp
 	${GEN}/fileformats/Caos2PrayParser.cpp
 	${GEN}/fileformats/caoslexer.cpp
 	src/fileformats/caostoken.cpp
+	src/fileformats/charsetdta.cpp
+	src/fileformats/creaturesImage.cpp
 	src/fileformats/c1cobfile.cpp
+	src/fileformats/c16Image.cpp
 	src/fileformats/c2cobfile.cpp
 	src/fileformats/mngfile.cpp
 	${GEN}/fileformats/mnglexer.cpp
@@ -118,6 +123,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/PrayFileReader.cpp
 	src/fileformats/PrayFileWriter.cpp
 	${GEN}/fileformats/PraySourceParser.cpp
+	src/fileformats/sprImage.cpp
 )
 target_link_libraries(openc2e-fileformats
 	PUBLIC fmt ghc_filesystem mpark_variant openc2e-common
@@ -132,12 +138,8 @@ add_library(openc2e-core STATIC
 	src/Backend.cpp
 	src/creatures/Biochemistry.cpp
 	src/Blackboard.cpp
-	src/images/blkImage.cpp
-	src/images/bmpImage.cpp
 	src/Bubble.cpp
 	src/bytecode.cpp
-	src/images/c16Image.cpp
-	src/images/charsetdta.cpp
 	src/creatures/c2eBrain.cpp
 	src/CallButton.cpp
 	src/Camera.cpp
@@ -178,7 +180,6 @@ add_library(openc2e-core STATIC
 	src/creatures/Creature.cpp
 	src/creatures/CreatureAgent.cpp
 	src/creatures/CreatureAI.cpp
-	src/creaturesImage.cpp
 	src/dialect.cpp
 	src/Engine.cpp
 	src/creatures/genomeFile.cpp
@@ -205,7 +206,6 @@ add_library(openc2e-core STATIC
 	src/SFCFile.cpp
 	src/SimpleAgent.cpp
 	src/creatures/SkeletalCreature.cpp
-	src/images/sprImage.cpp
 	src/Vehicle.cpp
 	src/VoiceData.cpp
 	src/World.cpp
@@ -322,14 +322,8 @@ set_target_properties(praytoolqt PROPERTIES
 	AUTOUIC ON
 )
 
-add_executable(spritedumper
-	src/tools/spritedumper.cpp
-	src/images/blkImage.cpp
-	src/images/c16Image.cpp
-	src/images/sprImage.cpp
-	src/creaturesImage.cpp
-)
-target_link_libraries(spritedumper fmt ghc_filesystem PNG::PNG)
+add_executable(spritedumper src/tools/spritedumper.cpp)
+target_link_libraries(spritedumper openc2e-fileformats fmt ghc_filesystem PNG::PNG)
 
 add_executable(translate_voice
 	src/tools/translate_voice.cpp

@@ -20,7 +20,7 @@
 #ifndef _BMPIMAGE_H
 #define _BMPIMAGE_H
 
-#include "creaturesImage.h"
+#include "fileformats/creaturesImage.h"
 #include <memory>
 
 class bmpImage;

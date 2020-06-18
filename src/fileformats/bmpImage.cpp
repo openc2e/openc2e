@@ -17,7 +17,7 @@
  *
  */
 
-#include "bmpImage.h"
+#include "fileformats/bmpImage.h"
 #include "endianlove.h"
 #include "creaturesException.h"
 #include "openc2e.h"

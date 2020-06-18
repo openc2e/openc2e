@@ -22,7 +22,7 @@
 #include "World.h"
 #include "Engine.h"
 #include "imageManager.h"
-#include "images/blkImage.h"
+#include "fileformats/blkImage.h"
 #include "Map.h"
 #include <assert.h>
 #include <memory>

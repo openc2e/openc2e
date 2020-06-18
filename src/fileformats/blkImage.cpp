@@ -17,8 +17,7 @@
  *
  */
 
-#include "openc2e.h"
-#include "blkImage.h"
+#include "fileformats/blkImage.h"
 #include "endianlove.h"
 #include <cassert>
 #include <iostream>
