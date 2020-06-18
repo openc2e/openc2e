@@ -19,8 +19,8 @@
 #include "prayManager.h"
 
 #include "AgentInjector.h"
-#include "cobfile/c1cobfile.h"
-#include "cobfile/c2cobfile.h"
+#include "fileformats/c1cobfile.h"
+#include "fileformats/c2cobfile.h"
 
 #include <cassert>
 #include <ghc/filesystem.hpp>

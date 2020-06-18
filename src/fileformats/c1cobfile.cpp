@@ -1,4 +1,4 @@
-#include "cobfile/c1cobfile.h"
+#include "fileformats/c1cobfile.h"
 #include "endianlove.h"
 
 #include <cassert>

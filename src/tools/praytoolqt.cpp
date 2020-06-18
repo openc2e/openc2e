@@ -15,9 +15,9 @@
 */
 
 #include "tools/praytoolqt.h"
-#include "prayfile/Caos2PrayParser.h"
-#include "prayfile/PraySourceParser.h"
-#include "prayfile/PrayFileWriter.h"
+#include "fileformats/Caos2PrayParser.h"
+#include "fileformats/PraySourceParser.h"
+#include "fileformats/PrayFileWriter.h"
 #include "visit_overloads.h"
 
 #include <QApplication>

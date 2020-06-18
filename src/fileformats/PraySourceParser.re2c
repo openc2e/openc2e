@@ -5,7 +5,7 @@
 #include <string>
 
 #include "encoding.h"
-#include "prayfile/PraySourceParser.h"
+#include "fileformats/PraySourceParser.h"
 #include "visit_overloads.h"
 
 using namespace PraySourceParser;

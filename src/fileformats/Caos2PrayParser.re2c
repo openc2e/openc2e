@@ -1,4 +1,4 @@
-#include "prayfile/Caos2PrayParser.h"
+#include "fileformats/Caos2PrayParser.h"
 #include "caoslexer.h"
 #include "encoding.h"
 #include "token.h"

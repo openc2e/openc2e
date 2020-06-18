@@ -20,7 +20,7 @@
 #include <sstream>
 #include "endianlove.h"
 #include "creaturesException.h"
-#include "mngfile.h"
+#include "fileformats/mngfile.h"
 #include "mmapifstream.h"
 
 MNGFile *g_mngfile = NULL;

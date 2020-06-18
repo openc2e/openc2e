@@ -17,7 +17,7 @@
  *
  */
 
-#include "prayfile/PrayFileReader.h"
+#include "fileformats/PrayFileReader.h"
 
 #include "prayManager.h"
 #include "creaturesException.h"

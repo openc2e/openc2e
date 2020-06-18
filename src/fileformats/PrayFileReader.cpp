@@ -17,7 +17,7 @@
  *
  */
 
-#include "prayfile/PrayFileReader.h"
+#include "fileformats/PrayFileReader.h"
 #include "encoding.h"
 #include "creaturesException.h"
 #include "endianlove.h"

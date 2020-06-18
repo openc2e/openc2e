@@ -1,4 +1,4 @@
-#include "prayfile/PrayFileWriter.h"
+#include "fileformats/PrayFileWriter.h"
 #include "endianlove.h"
 #include "encoding.h"
 

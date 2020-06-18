@@ -1,7 +1,7 @@
-#include "prayfile/Caos2PrayParser.h"
-#include "prayfile/PrayFileReader.h"
-#include "prayfile/PrayFileWriter.h"
-#include "prayfile/PraySourceParser.h"
+#include "fileformats/Caos2PrayParser.h"
+#include "fileformats/PrayFileReader.h"
+#include "fileformats/PrayFileWriter.h"
+#include "fileformats/PraySourceParser.h"
 #include "spanstream.h"
 #include "vectorstream.h"
 #include <gtest/gtest.h>

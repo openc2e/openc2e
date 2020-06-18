@@ -1,5 +1,5 @@
 #include "endianlove.h"
-#include "mngfile/mngfile.h"
+#include "fileformats/mngfile.h"
 
 
 #include <fmt/format.h>

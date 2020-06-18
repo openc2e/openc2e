@@ -20,7 +20,6 @@
 #ifndef _MUSICMANAGER_H
 #define _MUSICMANAGER_H
 
-#include "mngfile/mngfile.h"
 #include "MNGMusic.h"
 #include <map>
 #include <memory>
@@ -36,7 +35,7 @@ public:
 	void render(signed short *data, size_t len);
 
 private:
-	std::map<std::string, MNGFile *> files;
+	std::map<std::string, class MNGFile *> files;
 	MNGMusic mng_music;
 	unsigned int how_long_before_changing_track_ms = 0;
 };

@@ -17,7 +17,7 @@
  *
  */
 
-#include "cobfile/c2cobfile.h"
+#include "fileformats/c2cobfile.h"
 #include "creaturesException.h"
 #include "endianlove.h"
 #include <cassert>

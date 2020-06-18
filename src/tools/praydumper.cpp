@@ -1,4 +1,4 @@
-#include "prayfile/PrayFileReader.h"
+#include "fileformats/PrayFileReader.h"
 #include <iostream>
 #include <fstream>
 #include <ghc/filesystem.hpp>

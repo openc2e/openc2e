@@ -105,25 +105,19 @@ add_library(openc2e-common STATIC
 )
 target_link_libraries(openc2e-common PRIVATE utf8proc)
 
-add_library(cobfile
-	src/cobfile/c1cobfile.cpp
-	src/cobfile/c2cobfile.cpp
+add_library(openc2e-fileformats STATIC
+	src/fileformats/attFile.cpp
+	${GEN}/fileformats/Caos2PrayParser.cpp
+	src/fileformats/c1cobfile.cpp
+	src/fileformats/c2cobfile.cpp
+	src/fileformats/mngfile.cpp
+	${GEN}/fileformats/mnglexer.cpp
+	${GEN}/fileformats/mngparser.tab.cpp
+	src/fileformats/PrayFileReader.cpp
+	src/fileformats/PrayFileWriter.cpp
+	${GEN}/fileformats/PraySourceParser.cpp
 )
-
-add_library(mngfile
-	src/mngfile/mngfile.cpp
-	${GEN}/mngfile/mnglexer.cpp
-	${GEN}/mngfile/mngparser.tab.cpp
-)
-target_link_libraries(mngfile PRIVATE fmt openc2e-common)
-
-add_library(prayfile
-	src/prayfile/PrayFileReader.cpp
-	src/prayfile/PrayFileWriter.cpp
-	${GEN}/prayfile/Caos2PrayParser.cpp
-	${GEN}/prayfile/PraySourceParser.cpp
-)
-target_link_libraries(prayfile
+target_link_libraries(openc2e-fileformats
 	PUBLIC fmt ghc_filesystem mpark_variant openc2e-common
 	PRIVATE ZLIB::ZLIB
 )
@@ -133,7 +127,6 @@ add_library(openc2e-core STATIC
 	src/AgentHelpers.cpp
 	src/AgentRef.cpp
 	src/alloc_count.cpp
-	src/creatures/attFile.cpp
 	src/Backend.cpp
 	src/creatures/Biochemistry.cpp
 	src/Blackboard.cpp
@@ -225,9 +218,7 @@ target_link_libraries(openc2e-core PUBLIC
 	ghc_filesystem
 	mpark_variant
 	openc2e-common
-	cobfile
-	mngfile
-	prayfile
+	openc2e-fileformats
 )
 if(APPLE)
 	target_link_libraries(openc2e-core PUBLIC "-framework CoreFoundation")
@@ -303,36 +294,36 @@ if (OPENC2E_USE_QT)
 endif()
 
 add_executable(cobdumper src/tools/cobdumper.cpp)
-target_link_libraries(cobdumper cobfile fmt ghc_filesystem)
+target_link_libraries(cobdumper openc2e-fileformats fmt ghc_filesystem)
 
 add_executable(creaturesarchivedumper src/tools/creaturesarchivedumper.cpp)
 target_link_libraries(creaturesarchivedumper fmt ghc_filesystem z)
 
 add_executable(mngdumper src/tools/mngdumper.cpp)
-target_link_libraries(mngdumper fmt ghc_filesystem mngfile)
+target_link_libraries(mngdumper fmt ghc_filesystem openc2e-fileformats)
 
 add_executable(mngplayer
 	src/MNGMusic.cpp
 	src/tools/mngplayer.cpp
 )
-target_link_libraries(mngplayer openc2e-audiobackend fmt ghc_filesystem mngfile)
+target_link_libraries(mngplayer openc2e-audiobackend openc2e-fileformats fmt ghc_filesystem)
 
 add_executable(praydumper src/tools/praydumper.cpp)
-target_link_libraries(praydumper prayfile)
+target_link_libraries(praydumper openc2e-fileformats)
 
 add_executable(praybuilder
 	src/tools/praybuilder.cpp
 	${GEN}/caoslexer.cpp
 	src/token.cpp
 )
-target_link_libraries(praybuilder prayfile)
+target_link_libraries(praybuilder openc2e-fileformats)
 
 add_executable(praytoolqt
 	src/tools/praytoolqt.cpp
 	${GEN}/caoslexer.cpp
 	src/token.cpp
 )
-target_link_libraries(praytoolqt prayfile Qt5::Widgets)
+target_link_libraries(praytoolqt openc2e-fileformats Qt5::Widgets)
 set_target_properties(praytoolqt PROPERTIES
 	AUTOMOC ON
 	AUTORCC ON
@@ -423,31 +414,31 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/mngfile/mnglexer.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/mngfile"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/mngfile/mnglexer.cpp ${SRC}/src/mngfile/mnglexer.re2c
-	DEPENDS ${SRC}/src/mngfile/mnglexer.re2c
+	OUTPUT ${GEN}/fileformats/mnglexer.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mnglexer.cpp ${SRC}/src/fileformats/mnglexer.re2c
+	DEPENDS ${SRC}/src/fileformats/mnglexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/prayfile/Caos2PrayParser.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/prayfile"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/prayfile/Caos2PrayParser.cpp ${SRC}/src/prayfile/Caos2PrayParser.re2c
-	DEPENDS ${SRC}/src/prayfile/Caos2PrayParser.re2c
+	OUTPUT ${GEN}/fileformats/Caos2PrayParser.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/Caos2PrayParser.cpp ${SRC}/src/fileformats/Caos2PrayParser.re2c
+	DEPENDS ${SRC}/src/fileformats/Caos2PrayParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/prayfile/PraySourceParser.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/prayfile"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/prayfile/PraySourceParser.cpp ${SRC}/src/prayfile/PraySourceParser.re2c
-	DEPENDS ${SRC}/src/prayfile/PraySourceParser.re2c
+	OUTPUT ${GEN}/fileformats/PraySourceParser.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/PraySourceParser.cpp ${SRC}/src/fileformats/PraySourceParser.re2c
+	DEPENDS ${SRC}/src/fileformats/PraySourceParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/mngfile/mngparser.tab.cpp ${GEN}/mngfile/mngparser.tab.hpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/mngfile"
-	COMMAND ${BISON_EXECUTABLE} -d --name-prefix=mng --file-prefix="${GEN}/mngfile/mngparser" src/mngfile/mngparser.ypp
-	DEPENDS src/mngfile/mngparser.ypp
+	OUTPUT ${GEN}/fileformats/mngparser.tab.cpp ${GEN}/fileformats/mngparser.tab.hpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
+	COMMAND ${BISON_EXECUTABLE} -d --name-prefix=mng --file-prefix="${GEN}/fileformats/mngparser" src/fileformats/mngparser.ypp
+	DEPENDS src/fileformats/mngparser.ypp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)

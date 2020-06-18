@@ -1,6 +1,6 @@
 #include "audiobackend/SDLMixerBackend.h"
 #include "MNGMusic.h"
-#include "mngfile/mngfile.h"
+#include "fileformats/mngfile.h"
 
 #include <atomic>
 #include <condition_variable>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "audiobackend/AudioBackend.h"
-#include "mngfile/mngfile.h"
+#include "fileformats/mngfile.h"
 #include <memory>
 
 class MNGMusic {

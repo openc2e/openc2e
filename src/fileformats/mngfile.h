@@ -25,8 +25,9 @@
 #include <map>
 #include <istream>
 #include <cmath>
-#include "openc2e.h"
 #include <fmt/printf.h>
+
+#include "creaturesException.h"
 
 void mngrestart(std::istream *is);
 

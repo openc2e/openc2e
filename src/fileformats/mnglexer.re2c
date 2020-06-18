@@ -4,8 +4,8 @@
 #include <string>
 #include <list>
 
-#include "mngfile/mngparser.tab.hpp"
-#include "mngfile/mngfile.h"
+#include "fileformats/mngparser.tab.hpp"
+#include "fileformats/mngfile.h"
 #include <cassert>
 
 #include <iostream> // TODO
