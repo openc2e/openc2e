@@ -20,7 +20,7 @@
 #ifndef __C2EBRAIN_H
 #define __C2EBRAIN_H
 
-#include "genome.h"
+#include "fileformats/genomeFile.h"
 #include <cassert>
 #include <set>
 #include <map>

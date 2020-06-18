@@ -20,7 +20,7 @@
 #ifndef __OLDBRAIN_H
 #define __OLDBRAIN_H
 
-#include "genome.h"
+#include "fileformats/genomeFile.h"
 #include <set>
 #include <map>
 

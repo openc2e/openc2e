@@ -117,6 +117,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/c1cobfile.cpp
 	src/fileformats/c16Image.cpp
 	src/fileformats/c2cobfile.cpp
+	src/fileformats/genomeFile.cpp
 	src/fileformats/mngfile.cpp
 	${GEN}/fileformats/mnglexer.cpp
 	${GEN}/fileformats/mngparser.tab.cpp
@@ -183,7 +184,6 @@ add_library(openc2e-core STATIC
 	src/creatures/CreatureAI.cpp
 	src/dialect.cpp
 	src/Engine.cpp
-	src/creatures/genomeFile.cpp
 	src/historyManager.cpp
 	src/imageManager.cpp
 	src/Lift.cpp

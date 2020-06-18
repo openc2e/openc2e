@@ -21,7 +21,7 @@
 #define __CREATURE_H
 
 #include "AgentRef.h"
-#include "genome.h"
+#include "fileformats/genomeFile.h"
 
 #include <cassert>
 #include <deque>

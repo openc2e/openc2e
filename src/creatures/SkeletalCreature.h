@@ -16,13 +16,11 @@
  *  Lesser General Public License for more details.
  *
  */
-#include "fileformats/attFile.h"
 #include <cassert>
 #include <memory>
 
-// for enum lifestage (0 to 6)
-#include "genome.h"
-
+#include "fileformats/attFile.h"
+#include "fileformats/genomeFile.h"
 #include "openc2e.h"
 #include "CreatureAgent.h"
 

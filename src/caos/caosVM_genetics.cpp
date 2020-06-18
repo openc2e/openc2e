@@ -20,6 +20,7 @@
 #include "caosVM.h"
 #include "World.h"
 #include "creatures/CreatureAgent.h"
+#include "fileformats/genomeFile.h"
 #include "historyManager.h"
 #include <cassert>
 #include <fstream>

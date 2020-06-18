@@ -17,7 +17,7 @@
  *
  */
 
-#include "creatures/genome.h"
+#include "fileformats/genomeFile.h"
 #include "historyManager.h"
 #include "World.h"
 #include "Catalogue.h"

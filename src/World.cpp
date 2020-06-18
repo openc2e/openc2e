@@ -29,6 +29,7 @@
 #include "audiobackend/AudioBackend.h"
 #include "Backend.h"
 #include "fileformats/creaturesImage.h"
+#include "fileformats/genomeFile.h"
 #include "creatures/CreatureAgent.h"
 #include "SFCFile.h"
 #include "Room.h"

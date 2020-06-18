@@ -16,7 +16,7 @@
  *  Lesser General Public License for more details.
  *
  */
-#include "genome.h"
+#include "genomeFile.h"
 #include "endianlove.h"
 #include <cstring>
 #include <typeinfo>

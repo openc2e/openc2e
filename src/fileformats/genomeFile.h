@@ -1,5 +1,5 @@
 /*
- *  genome.h
+ *  genomeFile.h
  *  openc2e
  *
  *  Created by Alyssa Milburn on Sat 13 Nov 2004.
@@ -16,11 +16,11 @@
  *  Lesser General Public License for more details.
  *
  */
-#ifndef _C2E_GENOME_H
-#define _C2E_GENOME_H
+
+#pragma once
 
 #include "creaturesException.h"
-#include "lifestage.h"
+#include "creatures/lifestage.h"
 
 #include <vector>
 #include <string>
@@ -584,7 +584,5 @@ public:
   creatureFacialExpressionGene(uint8_t v) : creatureGene(v) { }
   const char *name() { return "Facial Expression"; }
 };
-
-#endif
 
 /* vim: set noet: */
