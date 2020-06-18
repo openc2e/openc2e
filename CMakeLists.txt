@@ -120,6 +120,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/mngfile.cpp
 	${GEN}/fileformats/mnglexer.cpp
 	${GEN}/fileformats/mngparser.tab.cpp
+	src/fileformats/peFile.cpp
 	src/fileformats/PrayFileReader.cpp
 	src/fileformats/PrayFileWriter.cpp
 	${GEN}/fileformats/PraySourceParser.cpp
@@ -194,7 +195,6 @@ add_library(openc2e-core STATIC
 	src/parseException.cpp
 	src/partzorder.cpp
 	src/PathResolver.cpp
-	src/peFile.cpp
 	src/physics.cpp
 	src/PointerAgent.cpp
 	src/Port.cpp

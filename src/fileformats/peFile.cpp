@@ -17,7 +17,7 @@
  *
  */
 
-#include "peFile.h"
+#include "fileformats/peFile.h"
 #include "endianlove.h"
 #include "creaturesException.h"
 

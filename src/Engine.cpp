@@ -32,7 +32,7 @@
 #include "encoding.h"
 #include "keycodes.h"
 #include "SFCFile.h"
-#include "peFile.h"
+#include "fileformats/peFile.h"
 #include "Camera.h"
 #include "prayManager.h"
 #include "userlocale.h"

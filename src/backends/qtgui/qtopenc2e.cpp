@@ -52,7 +52,7 @@
 
 #include "version.h"
 
-#include "peFile.h"
+#include "fileformats/peFile.h"
 
 QPixmap imageFromExeResource(unsigned int resourceid, bool mask = true) {
 	assert(engine.getExeFile());
