@@ -41,14 +41,6 @@ bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
 
  Play an uncontrolled sound at the target agent's current position.
 */
-void caosVM::c_SNDE() {
-	VM_VERIFY_SIZE(1)
-	VM_PARAM_STRING(filename)
-
-	valid_agent(targ);
-	if (engine.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
-	targ->playAudio(filename, false, false);
-}
 
 /**
  SNDE (command) filename (bareword)
@@ -63,11 +55,19 @@ void caosVM::c_SNDE() {
  SNDV (command) filename (string)
  %status maybe
  %pragma variants c1
- %pragma implementation caosVM::c_SNDE
  %cost c1,c2 0
 
  Play an uncontrolled sound at the target agent's current position.
 */
+
+void caosVM::c_SNDE() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(filename)
+
+	valid_agent(targ);
+	if (engine.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	targ->playAudio(filename, false, false);
+}
 
 /**
  SNDC (command) filename (string)
@@ -75,14 +75,6 @@ void caosVM::c_SNDE() {
  
  Start playing a controlled sound with the target agent, which will follow the agent as it moves.
 */
-void caosVM::c_SNDC() {
-	VM_VERIFY_SIZE(1)
-	VM_PARAM_STRING(filename)
-
-	valid_agent(targ);
-	if (engine.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
-	targ->playAudio(filename, true, false);
-}
 
 /**
  SNDC (command) filename (bareword)
@@ -93,12 +85,31 @@ void caosVM::c_SNDC() {
  Start playing a controlled sound with the target agent, which will follow the agent as it moves.
 */
 
+void caosVM::c_SNDC() {
+	VM_VERIFY_SIZE(1)
+	VM_PARAM_STRING(filename)
+
+	valid_agent(targ);
+	if (engine.camera->getMetaRoom() != world.map->metaRoomAt(targ->x, targ->y) || !agentOnCamera(targ)) return; // TODO: is it correct behaviour for only onscreen agents to play?
+	targ->playAudio(filename, true, false);
+}
+
 /**
  SNDL (command) filename (string)
  %status maybe
  
  Start playing a looping controlled sound with the target agent, which will follow the agent as it moves.
 */
+
+/**
+ SNDL (command) filename (bareword)
+ %status maybe
+ %pragma variants c1 c2
+ %cost c1,c2 0
+
+ Start playing a looping controlled sound with the target agent, which will follow the agent as it moves.
+*/
+
 void caosVM::c_SNDL() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(filename)
@@ -106,15 +117,6 @@ void caosVM::c_SNDL() {
 	valid_agent(targ);
 	targ->playAudio(filename, true, true);
 }
-
-/**
- SNDL (command) filename (bareword)
- %status maybe
- %pragma variants c1 c2
- %cost c1,c2 0
- 
- Start playing a looping controlled sound with the target agent, which will follow the agent as it moves.
-*/
 
 /**
  MMSC (command) x (integer) y (integer) track_name (string)

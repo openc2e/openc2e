@@ -113,7 +113,6 @@ void caosVM::c_PAT_DULL() {
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) no_images (integer)
  %status maybe
  %pragma variants sm
- %pragma implementation caosVM::c_PAT_DULL_sm
 */
 void caosVM::c_PAT_DULL_sm() {
 	VM_PARAM_INTEGER(no_images)

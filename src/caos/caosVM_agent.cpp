@@ -204,7 +204,6 @@ void caosVM::c_NEW_SIMP() {
  %status maybe
  %pragma variants c1 c2
  %cost c1,c2 1
- %pragma implementation caosVM::c_NEW_SIMP_c2
 */
 void caosVM::c_NEW_SIMP_c2() {
 	VM_PARAM_INTEGER(clone)
@@ -248,7 +247,6 @@ void caosVM::c_NEW_COMP() {
  NEW: COMP (command) sprite_file (bareword) image_count (integer) first_image (integer) clone (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::c_NEW_COMP_c1
 */
 void caosVM::c_NEW_COMP_c1() {
 	VM_PARAM_INTEGER(clone)
@@ -290,7 +288,6 @@ void caosVM::c_NEW_VHCL() {
  NEW: VHCL (command) sprite_file (bareword) image_count (integer) first_image (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::c_NEW_VHCL_c1
 */
 void caosVM::c_NEW_VHCL_c1() {
 	VM_PARAM_INTEGER(first_image)
@@ -515,7 +512,6 @@ void caosVM::v_FROM() {
  FROM (variable)
  %status maybe
  %pragma variants c3
- %pragma implementation caosVM::v_FROM_ds
 
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
@@ -584,7 +580,6 @@ void caosVM::c_ANIM() {
  ANIM (command) animstring (string)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::c_ANIM_c2
  %cost c1,c2 1
 
  Sets the animation string for TARG, in the format '1234'.
@@ -750,7 +745,6 @@ void caosVM::v_CARR() {
  CARR (agent)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::v_CARR_c1
 
  Returns the agent that is carrying the OWNR agent.  If OWNR is not being carried, returns 
  NULL. 
@@ -1227,7 +1221,6 @@ void caosVM::v_RNGE() {
  RNGE (variable)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_RNGE_c2
 
  Returns the TARG agent's range.
 */
@@ -1771,7 +1764,6 @@ void caosVM::c_SLIM() {
  BHVR (command) click (integer) touch (integer)
  %status stub
  %pragma variants c1 c2
- %pragma implementation caosVM::c_BHVR_c2
  %cost c1,c2 0
 */
 void caosVM::c_BHVR_c2() {
@@ -1884,7 +1876,6 @@ void caosVM::v_LIMR() {
  LIMB (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::v_LIMB_c1
 */
 void caosVM::v_LIMB_c1() {
 	// TODO: is this remotely sane? if so, unstub.

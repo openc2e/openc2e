@@ -188,7 +188,6 @@ void caosVM::v_OBST() {
  OBST (integer) direction (integer)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_OBST_c2
 
  Returns the distance from the TARG agent to the nearest wall that it might collide with in the given direction.
 */
@@ -308,7 +307,6 @@ void caosVM::v_ACCG() {
  ACCG (variable)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_ACCG_c2
  %pragma saveimpl caosVM::s_ACCG_c2
  
  Returns the TARG agent's free-fall acceleration, in pixels/tick squared.
@@ -346,7 +344,6 @@ void caosVM::v_AERO() {
  AERO (variable)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_AERO_c2
  %pragma saveimpl caosVM::s_AERO_c2
 
  Returns the aerodynamics of the TARG agent.
@@ -391,7 +388,6 @@ void caosVM::v_RELY() {
  RELX (integer)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_RELX_c2
 
  Returns the relative horizontal distance between the script owner and the target agent.
 */
@@ -407,7 +403,6 @@ void caosVM::v_RELX_c2() {
  RELY (integer)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_RELY_c2
  
  Returns the relative vertical distance between the script owner and the target agent.
 */

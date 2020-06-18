@@ -229,7 +229,6 @@ void caosVM::v_RTYP() {
  RTYP (integer)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_RTYP_c2
 
  Returns the room type of the room at the centre point of targ.
 */
@@ -368,7 +367,6 @@ void caosVM::v_RGHT() {
 /**
  _UP_ (integer)
  %status maybe
- %pragma implementation caosVM::v_UP
  
  Returns the up constant (2).
 */
@@ -1059,7 +1057,6 @@ void caosVM::c_ROOM() {
  ROOM (command) roomno (integer) left (integer) top (integer) right (integer) bottom (integer) type (integer) floorvalue (integer) organic (integer) inorganic (integer) temperature (integer) pressure (integer) light (integer) radiation (integer) heatsource (integer) pressuresource (integer) lightsource (integer) radiationsource (integer) dropstatus (integer)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::c_ROOM_c2
 */
 void caosVM::c_ROOM_c2() {
 	VM_PARAM_INTEGER(dropstatus)
@@ -1113,7 +1110,6 @@ void caosVM::c_ROOM_c2() {
  ROOM (integer) roomno (integer) data (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::v_ROOM_c1
 
  Return some data for the specified room number.
  Returns 0 if no such room.
@@ -1346,7 +1342,6 @@ void caosVM::s_RMND() {
  DELN (command) room (integer) direction (integer)
  %status stub
  %pragma variants c2
- %pragma implementation caosVM::c_DELN_c2
 */
 void caosVM::c_DELN_c2() {
 	VM_PARAM_INTEGER(direction)

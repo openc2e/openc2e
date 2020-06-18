@@ -119,7 +119,6 @@ void caosVM::c_GPAS() {
  GPAS (command)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::c_GPAS_c2
 */
 void caosVM::c_GPAS_c2() {
 	valid_agent(targ);
@@ -173,7 +172,6 @@ void caosVM::c_DPAS() {
  DPAS (command)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::c_DPAS_c2
 */
 void caosVM::c_DPAS_c2() {
 	valid_agent(targ);

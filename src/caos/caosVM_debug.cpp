@@ -44,6 +44,11 @@ using std::cout;
 
  Outputs a string to the debug log.
 */
+/**
+ DBGM (command) val (bareword)
+ %status maybe
+ %pragma variants c1 c2
+*/
 void caosVM::c_DBG_OUTS() {
 	VM_PARAM_STRING(val)
 	
@@ -51,18 +56,16 @@ void caosVM::c_DBG_OUTS() {
 }
 
 /**
- DBGM (command) val (bareword)
- %status maybe
- %pragma variants c1 c2
- %pragma implementation caosVM::c_DBG_OUTS
-*/
-
-/**
  DBG: OUTV (command) val (decimal)
  %status maybe
  %pragma variants all
  
  Outputs a decimal value to the debug log.
+*/
+/**
+ DBGV (command) val (integer)
+ %status maybe
+ %pragma variants c1 c2
 */
 void caosVM::c_DBG_OUTV() {
 	VM_VERIFY_SIZE(1)
@@ -79,13 +82,6 @@ void caosVM::c_DBG_OUTV() {
 
 	cout << std::endl;
 }
-
-/**
- DBGV (command) val (integer)
- %status maybe
- %pragma variants c1 c2
- %pragma implementation caosVM::c_DBG_OUTV
-*/
 
 /**
  DBUG (command) val (integer)
@@ -118,7 +114,6 @@ void caosVM::v_UNID() {
  UNID (agent)
  %status maybe
  %pragma variants c2
- %pragma implementation caosVM::v_UNID_c2
 
  Returns the unique ID of the target agent.
  This is currently no good for persisting.

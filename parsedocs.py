@@ -60,6 +60,38 @@ def parse_syntaxstring(syntaxstring):
 
 objects = []
 
+
+def find_implementation(name, lines):
+    p = 0
+    while True:
+        if lines[p].strip() == "" or lines[p].strip().startswith("//"):
+            p += 1
+            continue
+        if lines[p].strip().startswith("/*"):
+            p += 1
+            while True:
+                if lines[p].strip().endswith("*/"):
+                    break
+                p += 1
+            p += 1
+            continue
+        break
+
+    function_definition = re.search(
+        "^\s*void (caosVM::[cv]_[A-Za-z0-9_]+)\s*\(\s*\)", lines[p]
+    )
+    if function_definition:
+        return function_definition.group(1)
+
+    caos_lvalue = re.search("^\s*CAOS_LVALUE(_[A-Z_]+)?\(([A-Za-z0-9_]+)\s*,", lines[p])
+    if caos_lvalue:
+        return "caosVM::v_" + caos_lvalue.group(2)
+
+    raise Exception(
+        "Couldn't deduce function name for {} from {}".format(name, repr(lines[p]))
+    )
+
+
 for filename in sys.argv[1:]:
     with open(filename) as f:
         lines = f.read().split("\n")
@@ -93,6 +125,7 @@ for filename in sys.argv[1:]:
 
             while True:
                 if getline().startswith("*/"):
+                    p += 1
                     break
                 comments.append(getline())
                 p += 1
@@ -129,10 +162,7 @@ for filename in sys.argv[1:]:
                 else:
                     obj["evalcost"]["default"] = int(cost)
 
-            # TODO: figure out implementation by parsing C++ ?
-            obj["implementation"] = (
-                getdirective("pragma implementation") or "caosVM::" + obj["uniquename"]
-            )
+            obj["implementation"] = find_implementation(obj["name"], lines[p:])
 
             if any(d.startswith("%pragma") for d in directives):
                 obj["pragma"] = {}

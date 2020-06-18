@@ -64,6 +64,13 @@ void caosVM::c_OUTX() {
 
  Prints the given string to the output stream.  Does nothing when run inside a script.
 */
+
+/**
+ DDE: PUTS (command) val (bareword)
+ %status maybe
+ %pragma variants c1 c2
+*/
+
 void caosVM::c_OUTS() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(val)
@@ -74,19 +81,19 @@ void caosVM::c_OUTS() {
 }
 
 /**
- DDE: PUTS (command) val (bareword)
- %status maybe
- %pragma variants c1 c2
- %pragma implementation caosVM::c_OUTS
-*/
-
-/**
  OUTV (command) val (decimal)
  %status maybe
  %pragma variants all
 
  Prints the given decimal value to the ouput stream.  Does nothing when run inside a script.
 */
+
+/**
+ DDE: PUTV (command) val (integer)
+ %status maybe
+ %pragma variants c1 c2
+*/
+
 void caosVM::c_OUTV() {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALUE(val)
@@ -102,13 +109,6 @@ void caosVM::c_OUTV() {
 		*outputstream << fmt::sprintf("(%0.6f, %0.6f)", v.x, v.y);
 	} else throw badParamException();
 }
-
-/**
- DDE: PUTV (command) val (integer)
- %status maybe
- %pragma variants c1 c2
- %pragma implementation caosVM::c_OUTV
-*/
 
 /**
  GAME (variable) name (string)
@@ -323,7 +323,6 @@ void caosVM::v_TOKN() {
  GAME (variable) category (integer) variable (integer)
  %status stub
  %pragma variants c2
- %pragma implementation caosVM::v_GAME_c2
 */
 CAOS_LVALUE(GAME_c2,
 	VM_PARAM_INTEGER(variable) VM_PARAM_INTEGER(category),

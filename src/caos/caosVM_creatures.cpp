@@ -175,7 +175,6 @@ void caosVM::c_STIM_WRIT() {
 /**
  STIM SHOU (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma implementation caosVM::c_STIM_SHOU_c2
  %pragma variants c1 c2
  %cost c1,c2 0
 */
@@ -199,7 +198,6 @@ void caosVM::c_STIM_SHOU_c2() {
 /**
  STIM SIGN (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma implementation caosVM::c_STIM_SIGN_c2
  %pragma variants c1 c2
  %cost c1,c2 0
 */
@@ -223,7 +221,6 @@ void caosVM::c_STIM_SIGN_c2() {
 /**
  STIM TACT (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma implementation caosVM::c_STIM_TACT_c2
  %pragma variants c1 c2
  %cost c1,c2 0
 */
@@ -247,7 +244,6 @@ void caosVM::c_STIM_TACT_c2() {
 /**
  STIM WRIT (command) creature (agent) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma implementation caosVM::c_STIM_WRIT_c2
  %pragma variants c1 c2
  %cost c1,c2 0
 */
@@ -276,7 +272,6 @@ void caosVM::c_STIM_WRIT_c2() {
 /**
  STIM FROM (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma implementation caosVM::c_STIM_FROM_c1
  %pragma variants c1 c2
  %cost c1,c2 0
 */
@@ -722,7 +717,6 @@ void caosVM::c_CHEM() {
  CHEM (command) chemical_id (integer) adjust (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::c_CHEM_c1
  %cost c1,c2 0
 
  Set the level of a chemical (0 to 255) in target creature's bloodstream.
@@ -760,7 +754,6 @@ void caosVM::v_CHEM() {
  CHEM (integer) chemical_id (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::v_CHEM_c1
  
  Returns the level of a chemical (0 to 255) in target creature's bloodstream.
 */
@@ -1072,7 +1065,6 @@ void caosVM::v_BYIT() {
 /**
  _IT_ (agent)
  %status maybe
- %pragma implementation caosVM::v_IT
  %pragma variants c1 c2 cv c3
 
  Returns the agent that the OWNR creature was focused on when the 
@@ -1145,7 +1137,6 @@ void caosVM::c_NEW_CREA() {
  NEW: CREA (command) moniker (integer) sex (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::c_NEW_CREA_c1
 
  Creates a new creature using the specified moniker for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
@@ -1261,7 +1252,6 @@ void caosVM::c_LTCY() {
  F**K (command)
  %status stub
  %pragma variants c1
- %pragma implementation caosVM::c_MATE
 */
 
 /**
@@ -1282,7 +1272,6 @@ void caosVM::c_MATE() {
 /**
  DRV! (integer)
  %status stub
- %pragma implementation caosVM::v_DRV
  %pragma variants c1 c2 cv c3
 */
 void caosVM::v_DRV() {
@@ -1608,7 +1597,6 @@ void caosVM::c_SNEZ() {
  DRIV (integer) drive (integer)
  %status maybe
  %pragma variants c1 c2
- %pragma implementation caosVM::v_DRIV_c1
 
  Returns the value for the specified drive of the target creature.
 */
@@ -1627,7 +1615,6 @@ void caosVM::v_DRIV_c1() {
  DREA (command) max (integer)
  %status stub
  %pragma variants c1 c2
- %pragma implementation caosVM::c_DREA_c1
 
  Start dreaming and process (at most?) max instincts.
 */

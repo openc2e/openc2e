@@ -44,22 +44,19 @@
 
  Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
  */
-CAOS_LVALUE(VAxx,
-		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
-		var[index],
-		var[index] = newvalue)
-
-
 /**
  VARx (variable)
  %status maybe
  %pragma variants c1 c2
  %pragma stackdelta 0
- %pragma implementation caosVM::v_VAxx
  %pragma saveimpl caosVM::s_VAxx
 
  Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
 */
+CAOS_LVALUE(VAxx,
+		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
+		var[index],
+		var[index] = newvalue)
 
 /**
  MVxx (variable)
@@ -154,22 +151,20 @@ void caosVM::c_SETA() {
 
  Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
  */
-CAOS_LVALUE_TARG(OVxx, 
-		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
-		targ->var[index],
-		targ->var[index] = newvalue)
-
 /**
  OBVx (variable)
  %status maybe
  %pragma stackdelta 0
  %pragma variants c1 c2
- %pragma implementation caosVM::v_OVxx
  %pragma saveimpl caosVM::s_OVxx
 
  Like OVxx, but restricted to 0-2 in C1, or 0-9 in C2. Legacy from Creatures 1.
 */
 // TODO: restrict to 0-2 in C1?
+CAOS_LVALUE_TARG(OVxx, 
+		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
+		targ->var[index],
+		targ->var[index] = newvalue)
 
 /**
  TYPE (integer) value (anything)
@@ -575,24 +570,22 @@ void caosVM::v_SQRT() {
 
 /**
  _P1_ (variable)
- %pragma implementation caosVM::v_P1
  %pragma saveimpl caosVM::s_P1
  %status maybe
  %pragma variants c2 cv c3 sm
 
  The first argument given to the current script.
 */
+CAOS_LVALUE_SIMPLE(P1, _p_[0])
 
 /**
  _P2_ (variable)
- %pragma implementation caosVM::v_P2
  %pragma saveimpl caosVM::s_P2
  %status maybe
  %pragma variants c2 cv c3 sm
 
  The second argument given to the current script.
 */
-CAOS_LVALUE_SIMPLE(P1, _p_[0])
 CAOS_LVALUE_SIMPLE(P2, _p_[1])
 
 /**
