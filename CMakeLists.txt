@@ -108,6 +108,8 @@ target_link_libraries(openc2e-common PRIVATE utf8proc)
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
 	${GEN}/fileformats/Caos2PrayParser.cpp
+	${GEN}/fileformats/caoslexer.cpp
+	src/fileformats/caostoken.cpp
 	src/fileformats/c1cobfile.cpp
 	src/fileformats/c2cobfile.cpp
 	src/fileformats/mngfile.cpp
@@ -182,7 +184,6 @@ add_library(openc2e-core STATIC
 	src/creatures/genomeFile.cpp
 	src/historyManager.cpp
 	src/imageManager.cpp
-	${GEN}/caoslexer.cpp
 	src/Lift.cpp
 	src/Map.cpp
 	src/MetaRoom.cpp
@@ -204,7 +205,6 @@ add_library(openc2e-core STATIC
 	src/SFCFile.cpp
 	src/SimpleAgent.cpp
 	src/creatures/SkeletalCreature.cpp
-	src/token.cpp
 	src/images/sprImage.cpp
 	src/Vehicle.cpp
 	src/VoiceData.cpp
@@ -311,18 +311,10 @@ target_link_libraries(mngplayer openc2e-audiobackend openc2e-fileformats fmt ghc
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper openc2e-fileformats)
 
-add_executable(praybuilder
-	src/tools/praybuilder.cpp
-	${GEN}/caoslexer.cpp
-	src/token.cpp
-)
+add_executable(praybuilder src/tools/praybuilder.cpp)
 target_link_libraries(praybuilder openc2e-fileformats)
 
-add_executable(praytoolqt
-	src/tools/praytoolqt.cpp
-	${GEN}/caoslexer.cpp
-	src/token.cpp
-)
+add_executable(praytoolqt src/tools/praytoolqt.cpp)
 target_link_libraries(praytoolqt openc2e-fileformats Qt5::Widgets)
 set_target_properties(praytoolqt PROPERTIES
 	AUTOMOC ON
@@ -407,10 +399,10 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/caoslexer.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/caoslexer.cpp ${SRC}/src/caoslexer.re2c
-	DEPENDS ${SRC}/src/caoslexer.re2c
+	OUTPUT ${GEN}/fileformats/caoslexer.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/caoslexer.cpp ${SRC}/src/fileformats/caoslexer.re2c
+	DEPENDS ${SRC}/src/fileformats/caoslexer.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(

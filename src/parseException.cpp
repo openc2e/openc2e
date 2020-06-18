@@ -1,5 +1,5 @@
 #include "parseException.h"
-#include "token.h"
+#include "fileformats/caostoken.h"
 #include <sstream>
 
 std::string parseException::prettyPrint() const {

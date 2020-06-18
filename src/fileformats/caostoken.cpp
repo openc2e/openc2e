@@ -1,4 +1,4 @@
-#include "token.h"
+#include "fileformats/caostoken.h"
 
 static char char_unescape(char c) {
 	switch (c) {

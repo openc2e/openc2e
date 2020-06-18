@@ -1,5 +1,5 @@
 /*
- *  token.h
+ *  caostoken.h
  *  openc2e
  *
  *  Created by Bryan Donlan on Thu 11 Aug 2005.

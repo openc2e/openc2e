@@ -32,7 +32,7 @@
 #include "bytecode.h"
 #include "caosVar.h"
 #include "dialect.h"
-#include "token.h"
+#include "fileformats/caostoken.h"
 #include "shared_str.h"
 
 

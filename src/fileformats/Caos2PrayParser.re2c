@@ -1,7 +1,7 @@
 #include "fileformats/Caos2PrayParser.h"
-#include "caoslexer.h"
+#include "fileformats/caoslexer.h"
+#include "fileformats/caostoken.h"
 #include "encoding.h"
-#include "token.h"
 #include "visit_overloads.h"
 
 #include <cassert>
