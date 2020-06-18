@@ -1,5 +1,5 @@
 /*
- *  cobFile.cpp
+ *  c2cobfile.cpp
  *  openc2e
  *
  *  Created by Alyssa Milburn on Fri Jan 18 2008.
@@ -17,23 +17,22 @@
  *
  */
 
-#include "cobfile/cobFile.h"
+#include "cobfile/c2cobfile.h"
 #include "creaturesException.h"
 #include "endianlove.h"
 #include <cassert>
 
-cobFile::cobFile(fs::path filepath) {
-	path = filepath;
-	file.open(path.string().c_str(), std::ios::binary);
+c2cobfile::c2cobfile(std::string _path) : path(_path) {
+	file.open(path.c_str(), std::ios::binary);
 
 	if (!file.is_open())
-		throw creaturesException(std::string("couldn't open COB file \"") + path.string() + "\"");
+		throw creaturesException(std::string("couldn't open COB file \"") + path + "\"");
 
 	// TODO: c1 cob support
 	char majic[4];
 	file.read(majic, 4);
 	if (strncmp(majic, "cob2", 4) != 0)
-		throw creaturesException(std::string("bad magic of C2 COB file \"") + path.string() + "\"");
+		throw creaturesException(std::string("bad magic of C2 COB file \"") + path + "\"");
 	
 	while (!file.eof()) {
 		// TODO: catch exceptions, and free all blocks before passing it up the stack
@@ -44,13 +43,13 @@ cobFile::cobFile(fs::path filepath) {
 	}
 }
 
-cobFile::~cobFile() {
+c2cobfile::~c2cobfile() {
 	for (std::vector<cobBlock *>::iterator i = blocks.begin(); i != blocks.end(); i++) {
 		delete *i;
 	}
 }
 
-cobBlock::cobBlock(cobFile *p) {
+cobBlock::cobBlock(c2cobfile *p) {
 	std::istream &file = p->getStream();
 
 	char cobtype[4];

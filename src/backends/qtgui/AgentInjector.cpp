@@ -20,7 +20,7 @@
 
 #include "AgentInjector.h"
 #include "cobfile/c1cobfile.h"
-#include "cobfile/cobFile.h"
+#include "cobfile/c2cobfile.h"
 
 #include <cassert>
 #include <ghc/filesystem.hpp>
@@ -77,7 +77,7 @@ void AgentInjector::resetAgents() {
 	ui.injectButton->setEnabled(false);
 	ui.removeButton->setEnabled(false);
 
-	for (std::vector<class cobFile *>::iterator i = cobfiles.begin(); i != cobfiles.end(); i++) {
+	for (auto i = cobfiles.begin(); i != cobfiles.end(); i++) {
 		delete *i;
 	}
 }
@@ -108,7 +108,7 @@ void AgentInjector::readAgents() {
 					newItem->setToolTip(cob.c_str());
 				}
 			} else if (engine.version == 2) {
-				cobFile *cobfile = new cobFile(itr->path());
+				c2cobfile *cobfile = new c2cobfile(itr->path());
 				cobfiles.push_back(cobfile);
 
 				for (std::vector<cobBlock *>::iterator i = cobfile->blocks.begin(); i != cobfile->blocks.end(); i++) {
@@ -148,7 +148,7 @@ void AgentInjector::onInject() {
 		cobAgentBlock *b = (cobAgentBlock *)ui.agentList->currentItem()->data(Qt::UserRole).value<void *>();
 		assert(b);
 
-		cobFile *cobfile = b->getParent()->getParent();
+		c2cobfile *cobfile = b->getParent()->getParent();
 		assert(cobfile);
 
 		// dependencies

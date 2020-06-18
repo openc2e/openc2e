@@ -33,7 +33,7 @@ class AgentInjector : public QDialog {
 
 	private:
 		Ui::AgentInjectorForm ui;
-		std::vector<class cobFile *> cobfiles;
+		std::vector<class c2cobfile *> cobfiles;
 
 		void readAgents();
 		void resetAgents();

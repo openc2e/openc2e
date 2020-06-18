@@ -1,5 +1,5 @@
 /*
- *  cobFile.h
+ *  c2cobfile.h
  *  openc2e
  *
  *  Created by Alyssa Milburn on Fri Jan 18 2008.
@@ -17,44 +17,40 @@
  *
  */
 
-#ifndef COBFILE_H
-#define COBFILE_H
+#pragma once
 
 #include <cassert>
 #include <vector>
 #include <string>
 #include <fstream>
-#include <ghc/filesystem.hpp>
-
-namespace fs = ghc::filesystem;
 
 class cobBlock;
 
-class cobFile {
+class c2cobfile {
 protected:
-	fs::path path;
+	std::string path;
 	std::ifstream file;
 
 public:
 	std::vector<cobBlock *> blocks;
 
-	cobFile(fs::path filepath);
-	~cobFile();
-	fs::path getPath() { return path; }
+	c2cobfile(std::string filepath);
+	~c2cobfile();
+	std::string getPath() { return path; }
 	std::istream &getStream() { return file; }
 };
 
 class cobBlock {
 protected:
 	bool loaded;
-	cobFile *parent;
+	c2cobfile *parent;
 	unsigned char *buffer;
 
 	std::streampos offset;
 	unsigned int size;
 
 public:
-	cobBlock(cobFile *p);
+	cobBlock(c2cobfile *p);
 	~cobBlock();
 	void load();
 	void free();
@@ -62,7 +58,7 @@ public:
 	std::string type;
 
 	bool isLoaded() { return loaded; }
-	cobFile *getParent() { return parent; }
+	c2cobfile *getParent() { return parent; }
 	std::streampos getOffset() { return offset; }
 	std::string getType() { return type; }
 	unsigned char *getBuffer() { assert(loaded); return buffer; }
@@ -135,5 +131,4 @@ public:
 	std::string authorcomments;
 };
 
-#endif
 /* vim: set noet: */

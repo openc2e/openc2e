@@ -1,5 +1,5 @@
 #include "cobfile/c1cobfile.h"
-#include "cobfile/cobFile.h"
+#include "cobfile/c2cobfile.h"
 
 #include <fmt/format.h>
 #include <fstream>
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 	if (memcmp(magic, "cob2", 4) == 0) {
 		fmt::print("\"cob2\"\n");
 		fmt::print("\n");
-		cobFile cob(input_path);
+		c2cobfile cob(input_path);
 		for (auto &b : cob.blocks) {
 			if (b->getType() == "agnt") {
 				cobAgentBlock agnt(b);
