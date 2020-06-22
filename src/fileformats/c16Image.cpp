@@ -21,6 +21,7 @@
 #include "endianlove.h"
 #include <cassert>
 #include <memory>
+#include <string.h>
 
 c16Image::c16Image(std::istream &in, std::string n) : creaturesImage(n) {
 	uint32_t flags = read32le(in);

@@ -1,6 +1,7 @@
 #include "MNGMusic.h"
 
 #include "endianlove.h"
+#include "openc2e.h"
 #include <iostream> // for debug messages
 #include <cmath> // for cos/sin
 

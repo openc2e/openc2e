@@ -20,7 +20,10 @@
 #include "fileformats/c2cobfile.h"
 #include "creaturesException.h"
 #include "endianlove.h"
-#include <cassert>
+#include <algorithm>
+#include <assert.h>
+#include <ctype.h>
+#include <string.h>
 
 c2cobfile::c2cobfile(std::string _path) : path(_path) {
 	file.open(path.c_str(), std::ios::binary);
