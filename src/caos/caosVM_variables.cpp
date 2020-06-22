@@ -255,12 +255,12 @@ void caosVM::c_ORRV() {
 }
 
 /**
- ADDV (command) var (variable) add (integer)
+ ADDV (command) var (variable) add (decimal)
  %status maybe
  %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
- Adds the given integer to the given variable and returns the result.
+ Adds the given decimal to the given variable and returns the result.
 */
 void caosVM::c_ADDV() {
 	VM_VERIFY_SIZE(2)

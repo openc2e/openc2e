@@ -272,7 +272,7 @@ void caosVM::v_PRAY_EXPO() {
 }
 
 /**
- PRAY FILE (integer) name (integer) type (integer) install (integer)
+ PRAY FILE (integer) name (string) type (integer) install (integer)
  %status maybe
 
  install a file with given resource name and type
@@ -434,7 +434,7 @@ void caosVM::v_PRAY_MAKE() {
 }
 
 /**
- NET: MAKE (integer) journalspot (integer) journalname (integer) user (string) report (variable)
+ NET: MAKE (integer) journalspot (integer) journalname (string) user (string) report (variable)
  %status stub
 
  Networking is not supported in openc2e, so conveniently fails.
