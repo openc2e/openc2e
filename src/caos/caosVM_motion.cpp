@@ -447,7 +447,7 @@ void caosVM::c_MVSF() {
 	valid_agent(targ);
 
 	if (!targ->tryMoveToPlaceAround(x, y))
-		throw creaturesException(fmt::sprintf("MVSF failed to find a safe place around (%d, %d)", x, y));
+		throw creaturesException(fmt::sprintf("MVSF failed to find a safe place around (%f, %f)", x, y));
 }
 
 /**
