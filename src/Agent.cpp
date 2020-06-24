@@ -1109,10 +1109,7 @@ void Agent::vmTick() {
 				stopScript(); // we still want current script to die
 		} catch (creaturesException &e) {
 			unhandledException(e.prettyPrint(), true);
-		} catch (std::exception &e) {
-			unhandledException(e.what(), true);
 		}
-		
 		// If the VM stopped, it's done.
 		if (vm && vm->stopped()) {
 			world.freeVM(vm);

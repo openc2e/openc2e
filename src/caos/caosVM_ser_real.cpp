@@ -58,7 +58,7 @@ void caosVM::c_SERL_MAPP() {
 			std::cerr << "Deserialization failed; game is in an unknown state!" << std::endl;
 			std::cerr << "Exception was: " << e.what() << std::endl;
 			std::cerr << "Aborting..." << std::endl;
-			abort();
+			throw;
 		}
 	}
 #endif
@@ -85,7 +85,7 @@ void caosVM::c_SERL_SCRP() {
 			std::cerr << "Deserialization failed; game is in an unknown state!" << std::endl;
 			std::cerr << "Exception was: " << e.what() << std::endl;
 			std::cerr << "Aborting..." << std::endl;
-			abort();
+			throw;
 		}
 	}
 }

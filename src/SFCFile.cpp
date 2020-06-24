@@ -1218,8 +1218,6 @@ void SFCScript::install() {
 		script.installScripts();
 	} catch (creaturesException &e) {
 		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.prettyPrint() << std::endl;
-	} catch (std::exception &e) {
-		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.what() << std::endl;
 	}
 }
 

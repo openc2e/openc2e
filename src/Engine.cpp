@@ -316,7 +316,7 @@ std::string Engine::executeNetwork(std::string in) {
 		vm.runEntirely(script.installer);
 		vm.outputstream = 0; // otherwise would point to dead stack
 		return o.str();
-	} catch (std::exception &e) {
+	} catch (creaturesException &e) {
 		vm.outputstream = 0; // otherwise would point to dead stack
 		return std::string("### EXCEPTION: ") + e.what();
 	}

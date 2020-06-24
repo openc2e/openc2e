@@ -537,8 +537,6 @@ void World::executeInitScript(fs::path p) {
 		vm.runEntirely(script.installer);
 	} catch (creaturesException &e) {
 		std::cerr << "exec of \"" << p.filename() << "\" failed due to exception " << e.prettyPrint() << std::endl;
-	} catch (std::exception &e) {
-		std::cerr << "exec of \"" << p.filename() << "\" failed due to exception " << e.what() << std::endl;
 	}
 	std::cout.flush(); std::cerr.flush();
 }

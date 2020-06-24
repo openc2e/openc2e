@@ -445,7 +445,7 @@ void caosVM::v_CAOS() {
 		
 		result.setString(oss.str());
 		sub->outputstream = 0;
-	} catch (std::exception &e) {
+	} catch (creaturesException &e) {
 		sub->outputstream = 0; // very important that this isn't pointing onto dead stack when the VM is freed
 		
 		// TODO: 'catches' should be handled seperately and set report to the error# and string to ***

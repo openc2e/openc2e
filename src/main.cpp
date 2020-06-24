@@ -39,46 +39,37 @@
 #undef main
 
 extern "C" int main(int argc, char *argv[]) {
-	try {
-		std::string version;
+	std::string version;
 #ifdef DEV_BUILD
-		version = "development build";
+	version = "development build";
 #else
-		version = RELEASE_VERSION;
+	version = RELEASE_VERSION;
 #endif
-		std::cout << "openc2e (" << version << "), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 "
-			"Alyssa Milburn and others\n\n";
+	std::cout << "openc2e (" << version << "), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 "
+		"Alyssa Milburn and others\n\n";
 
-		engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
+	engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
 #ifdef QT_SUPPORT
-		std::shared_ptr<QtBackend> qtbackend = std::shared_ptr<QtBackend>(new QtBackend());
-		std::shared_ptr<Backend> qtbackend_generic = std::dynamic_pointer_cast<class Backend, class QtBackend>(qtbackend);
-		engine.addPossibleBackend("qt", qtbackend_generic); // last-added backend is default
+	std::shared_ptr<QtBackend> qtbackend = std::shared_ptr<QtBackend>(new QtBackend());
+	std::shared_ptr<Backend> qtbackend_generic = std::dynamic_pointer_cast<class Backend, class QtBackend>(qtbackend);
+	engine.addPossibleBackend("qt", qtbackend_generic); // last-added backend is default
 #endif
 #ifdef SDLMIXER_SUPPORT
-		engine.addPossibleAudioBackend("sdlmixer", shared_ptr<AudioBackend>(new SDLMixerBackend()));
+	engine.addPossibleAudioBackend("sdlmixer", shared_ptr<AudioBackend>(new SDLMixerBackend()));
 #endif
 
-		// pass command-line flags to the engine, but do no other setup
-		if (!engine.parseCommandLine(argc, argv)) return 1;
-		
-		// get the engine to do all the startup (read catalogue, loading world, etc)
-		if (!engine.initialSetup()) return 0;
+	// pass command-line flags to the engine, but do no other setup
+	if (!engine.parseCommandLine(argc, argv)) return 1;
 	
-		int ret = engine.backend->run(argc, argv);
-		
-		// we're done, be sure to shut stuff down
-		engine.shutdown();
+	// get the engine to do all the startup (read catalogue, loading world, etc)
+	if (!engine.initialSetup()) return 0;
 
-		return ret;
-	} catch (std::exception &e) {
-#ifdef _WIN32
-		MessageBox(NULL, e.what(), "openc2e - Fatal exception encountered:", MB_ICONERROR);
-#else
-		std::cerr << "Fatal exception encountered: " << e.what() << "\n";
-#endif
-		return 1;
-	}
+	int ret = engine.backend->run(argc, argv);
+
+	// we're done, be sure to shut stuff down
+	engine.shutdown();
+
+	return ret;
 }
 
 /* vim: set noet: */
