@@ -22,8 +22,9 @@
 #include "creaturesException.h"
 #include "creatures/lifestage.h"
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
 class gene;
 struct geneNote;
@@ -41,7 +42,7 @@ class genomeFile {
   friend std::istream &operator >> (std::istream &, genomeFile &);
 
 public:
-  std::vector<gene *> genes;
+  std::vector<std::unique_ptr<gene>> genes;
 
   void readNotes(std::istream &);
   void writeNotes(std::ostream &) const;
@@ -135,7 +136,7 @@ protected:
   void read(std::istream &);
 
 public:
-  std::vector<gene *> genes;
+  std::vector<std::unique_ptr<gene>> genes;
 
   bool isBrain() { return brainorgan; }
 

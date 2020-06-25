@@ -58,10 +58,10 @@ void monikerData::init(std::string m, shared_ptr<genomeFile> f) {
 	assert(f);
 	genome = f;
 
-	for (std::vector<gene *>::iterator i = f->genes.begin(); i != f->genes.end(); i++) {
+	for (auto i = f->genes.begin(); i != f->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureGenusGene)) {
 			// initialize genus
-			creatureGenusGene *g = (creatureGenusGene *)(*i);
+			creatureGenusGene *g = (creatureGenusGene *)i->get();
 			genus = g->genus + 1;
 			break;
 		}
@@ -152,10 +152,10 @@ monikerstatus monikerData::getStatus() {
 std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
 	unsigned int genus = 0;
 	
-	for (std::vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureGenusGene)) {
 			// initialize genus
-			creatureGenusGene *g = (creatureGenusGene *)(*i);
+			creatureGenusGene *g = (creatureGenusGene *)i->get();
 			genus = g->genus + 1;
 			break;
 		}

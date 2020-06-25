@@ -438,9 +438,9 @@ void c2eCreature::handleStimulus(unsigned int id, float strength) {
 	creatureStimulusGene *g = 0;
 	
 	// TODO: generate the damn c2eStims in addGene, thus zapping a whole bunch of bugs
-	for (std::vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (typeid(*(*i)) == typeid(creatureStimulusGene)) {
-			creatureStimulusGene *x = (creatureStimulusGene *)(*i);
+			creatureStimulusGene *x = (creatureStimulusGene *)i->get();
 			if (x->stim == id) {
 				g = x;
 				break;

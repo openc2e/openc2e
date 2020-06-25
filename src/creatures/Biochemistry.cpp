@@ -441,18 +441,18 @@ c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 }
 
 void c2Organ::processGenes() {
-	for (std::vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
-		if (!parent->shouldProcessGene(*i)) continue;
+	for (auto i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+		if (!parent->shouldProcessGene(i->get())) continue;
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
 			reactions.push_back(shared_ptr<c2Reaction>(new c2Reaction()));
-			reactions.back()->init((bioReactionGene *)(*i));
+			reactions.back()->init((bioReactionGene *)i->get());
 		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
 			emitters.push_back(c2Emitter());
-			emitters.back().init((bioEmitterGene *)(*i), this);
+			emitters.back().init((bioEmitterGene *)i->get(), this);
 		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
 			receptors.push_back(c2Receptor());
-			receptors.back().init((bioReceptorGene *)(*i), this);
+			receptors.back().init((bioReceptorGene *)i->get(), this);
 		}
 	}
 }
@@ -461,19 +461,19 @@ void c2eOrgan::processGenes() {
 	shared_ptr<c2eReaction> r; // we need to store the previous reaction for possible receptor use
 	// TODO: should this cope with receptors created at other lifestages? i doubt it.. - fuzzie
 
-	for (std::vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
-		if (!parent->shouldProcessGene(*i)) continue;
+	for (auto i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+		if (!parent->shouldProcessGene(i->get())) continue;
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
 			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction()));
 			r = reactions.back();
-			reactions.back()->init((bioReactionGene *)(*i));
+			reactions.back()->init((bioReactionGene *)i->get());
 		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
 			emitters.push_back(c2eEmitter());
-			emitters.back().init((bioEmitterGene *)(*i), this);
+			emitters.back().init((bioEmitterGene *)i->get(), this);
 		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
 			receptors.push_back(c2eReceptor());
-			receptors.back().init((bioReceptorGene *)(*i), this, r);
+			receptors.back().init((bioReceptorGene *)i->get(), this, r);
 		}
 	}
 }

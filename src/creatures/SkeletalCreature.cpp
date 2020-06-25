@@ -134,18 +134,18 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool tryfemale, un
 void SkeletalCreature::processGenes() {
 	shared_ptr<genomeFile> genome = creature->getGenome();
 
-	for (std::vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if (!creature->shouldProcessGene(*i)) continue;
+	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (!creature->shouldProcessGene(i->get())) continue;
 
 		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
-			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
+			creatureAppearanceGene *x = (creatureAppearanceGene *)i->get();
 			if (x->part > 5) continue;
 			appearancegenes[x->part] = x;
 		} else if (typeid(*(*i)) == typeid(creaturePoseGene)) {
-			creaturePoseGene *x = (creaturePoseGene *)(*i);
+			creaturePoseGene *x = (creaturePoseGene *)i->get();
 			posegenes[x->poseno] = x;
 		} else if (typeid(*(*i)) == typeid(creatureGaitGene)) {
-			creatureGaitGene *x = (creatureGaitGene *)(*i);
+			creatureGaitGene *x = (creatureGaitGene *)i->get();
 			gaitgenes[x->drive] = x;
 		}
 	}
@@ -760,11 +760,11 @@ void SkeletalCreature::creatureAged() {
 std::string SkeletalCreature::getFaceSpriteName() {
 	// TODO: we should store the face sprite when we first search for sprites (since it
 	// has to be the baby sprite), rather than this horrible hackery
-	for (std::vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+	for (auto i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
 		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
 		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
-			creatureAppearanceGene *x = (creatureAppearanceGene *)(*i);
+			creatureAppearanceGene *x = (creatureAppearanceGene *)i->get();
 			if (x->part == 0) {
 				return std::string("a") + dataString(0, creature->isFemale(), x->species, x->variant);
 			}

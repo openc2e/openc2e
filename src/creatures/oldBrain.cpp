@@ -853,11 +853,11 @@ void oldBrain::processGenes() {
 
 	std::shared_ptr<genomeFile> genome = parent->getGenome();
 	
-	for (std::vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if (!parent->shouldProcessGene(*i)) continue;
+	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
+		if (!parent->shouldProcessGene(i->get())) continue;
 		
 		if (typeid(**i) == typeid(oldBrainLobeGene)) {
-			oldBrainLobeGene *g = (oldBrainLobeGene *)*i;
+			oldBrainLobeGene *g = (oldBrainLobeGene *)i->get();
 			oldLobe *l = new oldLobe(this, g);
 			lobes.push_back(l);
 		}

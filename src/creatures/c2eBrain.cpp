@@ -948,8 +948,8 @@ c2eBrain::c2eBrain(c2eCreature *p) {
  *
  */
 void c2eBrain::processGenes() {
-	for (std::vector<gene *>::iterator i = parent->getGenome()->genes.begin(); i != parent->getGenome()->genes.end(); i++) {
-		gene *g = *i;
+	for (auto i = parent->getGenome()->genes.begin(); i != parent->getGenome()->genes.end(); i++) {
+		gene *g = i->get();
 
 		if (!parent->shouldProcessGene(g)) continue;
 	

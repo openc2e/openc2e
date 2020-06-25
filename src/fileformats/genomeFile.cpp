@@ -24,16 +24,16 @@
 #include <iostream>
 
 geneNote *genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
-	for (std::vector<gene *>::iterator x = genes.begin(); x != genes.end(); x++) {
-		gene *t = *x;
+	for (auto x = genes.begin(); x != genes.end(); x++) {
+		gene *t = x->get();
 			if ((uint8_t)t->type() == type)
 				if ((uint8_t)t->subtype() == subtype)
 					if ((uint8_t)t->note.which == which)
 						return &t->note;
 
 	if (typeid(*t) == typeid(organGene))
-		for (std::vector<gene *>::iterator y = ((organGene *)t)->genes.begin(); y != ((organGene *)t)->genes.end(); y++) {
-			gene *s = *y;
+		for (auto y = ((organGene *)t)->genes.begin(); y != ((organGene *)t)->genes.end(); y++) {
+			gene *s = y->get();
 				if ((uint8_t)s->type() == type)
 				if ((uint8_t)s->subtype() == subtype)
 					if ((uint8_t)s->note.which == which)
@@ -158,11 +158,11 @@ gene *genomeFile::nextGene(std::istream &s) {
 		|| (typeid(*g) == typeid(bioEmitterGene)))
 		|| (typeid(*g) == typeid(bioReceptorGene))) {
 		if (currorgan == 0) {
-				if (cversion == 1) genes.push_back(g); // Creatures 1 doesn't have organs
+				if (cversion == 1) genes.push_back(std::unique_ptr<gene>(g)); // Creatures 1 doesn't have organs
 				else throw creaturesException("reaction/emitter/receptor without an attached organ");
-		} else currorgan->genes.push_back(g);
+		} else currorgan->genes.push_back(std::unique_ptr<gene>(g));
 	} else {
-		genes.push_back(g);
+		genes.push_back(std::unique_ptr<gene>(g));
 		if (typeid(*g) == typeid(organGene))
 			if (!((organGene *)g)->isBrain())
 				currorgan = (organGene *)g;
@@ -203,7 +203,7 @@ std::ostream &operator << (std::ostream &s, const genomeFile &f) {
 	s.write(majic, 4);
 
 	// iterate through genes
-	for (std::vector<gene *>::iterator x = ((genomeFile &)f).genes.begin(); x != ((genomeFile &)f).genes.end(); x++) {
+	for (auto x = ((genomeFile &)f).genes.begin(); x != ((genomeFile &)f).genes.end(); x++) {
 		s << **x;
 	}
 
@@ -214,15 +214,15 @@ std::ostream &operator << (std::ostream &s, const genomeFile &f) {
 
 gene *genomeFile::getGene(uint8_t type, uint8_t subtype, unsigned int seq) {
 	unsigned int c = 0;
-	for (std::vector<gene *>::iterator i = genes.begin(); i != genes.end(); i++) {
+	for (auto i = genes.begin(); i != genes.end(); i++) {
 		if ((*i)->type() == type)
 			if ((*i)->subtype() == subtype) {
 				c++;
-				if (seq == c) return *i;
+				if (seq == c) return i->get();
 			}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 uint8_t geneFlags::operator () () const {
@@ -680,7 +680,7 @@ void organGene::write(std::ostream &s) const {
 	write8(s, atpdamagecoefficient);
 
 	// iterate through children
-	for (std::vector<gene *>::iterator x = ((organGene *)this)->genes.begin(); x != ((organGene *)this)->genes.end(); x++)
+	for (auto x = ((organGene *)this)->genes.begin(); x != ((organGene *)this)->genes.end(); x++)
 		s << **x;
 }
 
