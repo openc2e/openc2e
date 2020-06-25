@@ -198,6 +198,8 @@ public:
 	
 	void applyInjury(float);
 
+	std::vector<gene *> genes;
+
 };
 
 class c2Creature : public oldCreature {

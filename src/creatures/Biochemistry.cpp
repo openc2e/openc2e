@@ -416,9 +416,6 @@ c2Organ::c2Organ(c2Creature *p, organGene *g) {
 	damagerate = ourGene->damagerate;
 	biotick = 0;
 	atpdamagecoefficient = ourGene->atpdamagecoefficient * (lifeforce / (255.0f * 255.0f));
-	
-	// TODO: is genes.size() always the size we want?
-	energycost = 2 + (ourGene->genes.size() / 10);
 
 	clockratereceptors = repairratereceptors = injuryreceptors = 0;
 }
@@ -435,37 +432,35 @@ c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 	damagerate = ourGene->damagerate / 255.0f;
 	biotick = ourGene->biotickstart / 255.0f;
 	atpdamagecoefficient = ourGene->atpdamagecoefficient * (lifeforce / (255.0f * 255.0f));
-
-	// TODO: is genes.size() always the size we want?
-	energycost = (1.0f / 128.0f) + ourGene->genes.size() * (0.1f / 255.0f);
 }
 
 void c2Organ::processGenes() {
-	for (auto i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
-		if (!parent->shouldProcessGene(i->get())) continue;
+	// TODO: is genes.size() always the size we want?
+	energycost = 2 + (genes.size() / 10);
 
-		if (typeid(*(*i)) == typeid(bioReactionGene)) {
-			reactions.push_back(shared_ptr<c2Reaction>(new c2Reaction((bioReactionGene *)i->get())));
-		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
-			emitters.push_back(c2Emitter((bioEmitterGene *)i->get(), this));
-		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
-			receptors.push_back(c2Receptor((bioReceptorGene *)i->get(), this));
+	for (auto g : genes) {
+		if (typeid(*g) == typeid(bioReactionGene)) {
+			reactions.push_back(shared_ptr<c2Reaction>(new c2Reaction((bioReactionGene *)g)));
+		} else if (typeid(*g) == typeid(bioEmitterGene)) {
+			emitters.push_back(c2Emitter((bioEmitterGene *)g, this));
+		} else if (typeid(*g) == typeid(bioReceptorGene)) {
+			receptors.push_back(c2Receptor((bioReceptorGene *)g, this));
 		}
 	}
 }
 
 void c2eOrgan::processGenes() {
+	// TODO: is genes.size() always the size we want?
+	energycost = (1.0f / 128.0f) + genes.size() * (0.1f / 255.0f);
+
 	// TODO: should this cope with receptors created at other lifestages? i doubt it.. - fuzzie
-
-	for (auto i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
-		if (!parent->shouldProcessGene(i->get())) continue;
-
-		if (typeid(*(*i)) == typeid(bioReactionGene)) {
-			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction((bioReactionGene *)i->get())));
-		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
-			emitters.push_back(c2eEmitter((bioEmitterGene *)i->get(), this));
-		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
-			receptors.push_back(c2eReceptor((bioReceptorGene *)i->get(), this));
+	for (auto g : genes) {
+		if (typeid(*g) == typeid(bioReactionGene)) {
+			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction((bioReactionGene *)g)));
+		} else if (typeid(*g) == typeid(bioEmitterGene)) {
+			emitters.push_back(c2eEmitter((bioEmitterGene *)g, this));
+		} else if (typeid(*g) == typeid(bioReceptorGene)) {
+			receptors.push_back(c2eReceptor((bioReceptorGene *)g, this));
 		}
 	}
 }

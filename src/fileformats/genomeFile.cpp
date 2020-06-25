@@ -30,15 +30,6 @@ geneNote *genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
 				if ((uint8_t)t->subtype() == subtype)
 					if ((uint8_t)t->note.which == which)
 						return &t->note;
-
-	if (typeid(*t) == typeid(organGene))
-		for (auto y = ((organGene *)t)->genes.begin(); y != ((organGene *)t)->genes.end(); y++) {
-			gene *s = y->get();
-				if ((uint8_t)s->type() == type)
-				if ((uint8_t)s->subtype() == subtype)
-					if ((uint8_t)s->note.which == which)
-						return &s->note;
-		}
 	}
 
 	return 0;
@@ -154,20 +145,7 @@ gene *genomeFile::nextGene(std::istream &s) {
 
 	if (g == 0) throw creaturesException("genefactory failed");
 
-	if (((typeid(*g) == typeid(bioReactionGene))
-		|| (typeid(*g) == typeid(bioEmitterGene)))
-		|| (typeid(*g) == typeid(bioReceptorGene))) {
-		if (currorgan == 0) {
-				if (cversion == 1) genes.push_back(std::unique_ptr<gene>(g)); // Creatures 1 doesn't have organs
-				else throw creaturesException("reaction/emitter/receptor without an attached organ");
-		} else currorgan->genes.push_back(std::unique_ptr<gene>(g));
-	} else {
-		genes.push_back(std::unique_ptr<gene>(g));
-		if (typeid(*g) == typeid(organGene))
-			if (!((organGene *)g)->isBrain())
-				currorgan = (organGene *)g;
-	}
-
+	genes.push_back(std::unique_ptr<gene>(g));
 	s >> *g;
 
 	return g;
@@ -678,10 +656,6 @@ void organGene::write(std::ostream &s) const {
 	write8(s, lifeforce);
 	write8(s, biotickstart);
 	write8(s, atpdamagecoefficient);
-
-	// iterate through children
-	for (auto x = ((organGene *)this)->genes.begin(); x != ((organGene *)this)->genes.end(); x++)
-		s << **x;
 }
 
 void organGene::read(std::istream &s) {

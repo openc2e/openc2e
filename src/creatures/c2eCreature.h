@@ -101,6 +101,8 @@ public:
 	size_t getEmitterCount() { return emitters.size(); }
 	size_t getReactionCount() { return reactions.size(); }
 	void applyInjury(float);
+
+	std::vector<gene *> genes;
 };
 
 struct c2eStim {

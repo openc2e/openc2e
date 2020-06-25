@@ -136,8 +136,6 @@ protected:
   void read(std::istream &);
 
 public:
-  std::vector<std::unique_ptr<gene>> genes;
-
   bool isBrain() { return brainorgan; }
 
   uint8_t clockrate;

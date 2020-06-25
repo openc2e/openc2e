@@ -436,6 +436,15 @@ void c2Creature::addGene(gene *g) {
 		if (!o->isBrain()) { // TODO: handle brain organ
 			organs.push_back(shared_ptr<c2Organ>(new c2Organ(this, o)));
 		}
+	} else if (typeid(*g) == typeid(bioReactionGene)) {
+		caos_assert(organs.size() > 0);
+		organs.back()->genes.push_back(g);
+	} else if (typeid(*g) == typeid(bioEmitterGene)) {
+		caos_assert(organs.size() > 0);
+		organs.back()->genes.push_back(g);
+	} else if (typeid(*g) == typeid(bioReceptorGene)) {
+		caos_assert(organs.size() > 0);
+		organs.back()->genes.push_back(g);
 	}
 }
 
@@ -453,6 +462,15 @@ void c2eCreature::addGene(gene *g) {
 		if (!o->isBrain()) { // TODO: handle brain organ
 			organs.push_back(shared_ptr<c2eOrgan>(new c2eOrgan(this, o)));
 		}
+	} else if (typeid(*g) == typeid(bioReactionGene)) {
+		caos_assert(organs.size() > 0);
+		organs.back()->genes.push_back(g);
+	} else if (typeid(*g) == typeid(bioEmitterGene)) {
+		caos_assert(organs.size() > 0);
+		organs.back()->genes.push_back(g);
+	} else if (typeid(*g) == typeid(bioReceptorGene)) {
+		caos_assert(organs.size() > 0);
+		organs.back()->genes.push_back(g);
 	} else if (typeid(*g) == typeid(bioHalfLivesGene)) {
 		bioHalfLivesGene *d = dynamic_cast<bioHalfLivesGene *>(g);
 		assert(d);
