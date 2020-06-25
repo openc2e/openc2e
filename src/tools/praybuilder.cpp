@@ -57,7 +57,7 @@ int main(int argc, char**argv) {
     PrayFileWriter writer(out);
 
     std::map<std::string, std::string> string_tags;
-    std::map<std::string, int> int_tags;
+    std::map<std::string, unsigned int> int_tags;
     
     for (auto res : events) {
       visit_overloads(
@@ -86,10 +86,10 @@ int main(int argc, char**argv) {
                         << std::endl;
               exit(1);
           }
-          std::vector<char> data((std::istreambuf_iterator<char>(in)),
+          std::vector<unsigned char> data((std::istreambuf_iterator<char>(in)),
                           std::istreambuf_iterator<char>());
                           
-            writer.writeBlockRawData(event.type, event.name, data.data(), data.size());
+            writer.writeBlockRawData(event.type, event.name, data);
             
           },
           [&](PraySourceParser::StringTag event) {
