@@ -418,14 +418,11 @@ void c1Creature::addGene(gene *g) {
 	oldCreature::addGene(g);
 
 	if (typeid(*g) == typeid(bioReactionGene)) {
-		reactions.push_back(shared_ptr<c1Reaction>(new c1Reaction()));
-		reactions.back()->init((bioReactionGene *)(g));
+		reactions.push_back(shared_ptr<c1Reaction>(new c1Reaction((bioReactionGene *)g)));
 	} else if (typeid(*g) == typeid(bioEmitterGene)) {
-		emitters.push_back(c1Emitter());
-		emitters.back().init((bioEmitterGene *)(g), this);
+		emitters.push_back(c1Emitter((bioEmitterGene *)g, this));
 	} else if (typeid(*g) == typeid(bioReceptorGene)) {
-		receptors.push_back(c1Receptor());
-		receptors.back().init((bioReceptorGene *)(g), this);
+		receptors.push_back(c1Receptor((bioReceptorGene *)g, this));
 	}
 }
 

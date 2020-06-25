@@ -79,20 +79,20 @@ public:
 // c1
 
 struct c1Reaction {
+	explicit c1Reaction(bioReactionGene *);
 	bioReactionGene *data;
-	void init(bioReactionGene *);
 };
 
 struct c1Receptor {
+	c1Receptor(bioReceptorGene *, class c1Creature *);
 	bioReceptorGene *data;
 	unsigned char *locus;
-	void init(bioReceptorGene *, class c1Creature *);
 };
 
 struct c1Emitter {
+	c1Emitter(bioEmitterGene *, class c1Creature *);
 	bioEmitterGene *data;
 	unsigned char *locus;
-	void init(bioEmitterGene *, class c1Creature *);
 };
 
 class c1Creature : public oldCreature {
@@ -127,23 +127,23 @@ public:
 // c2
 
 struct c2Reaction {
+	explicit c2Reaction(bioReactionGene *);
 	bioReactionGene *data;
-	void init(bioReactionGene *);
 };
 
 struct c2Receptor {
+	c2Receptor(bioReceptorGene *, class c2Organ *);
 	bioReceptorGene *data;
 	bool processed;
 	unsigned char lastvalue;
 	unsigned char *locus;
 	unsigned int *receptors;
-	void init(bioReceptorGene *, class c2Organ *);
 };
 
 struct c2Emitter {
+	c2Emitter(bioEmitterGene *, class c2Organ *);
 	bioEmitterGene *data;
 	unsigned char *locus;
-	void init(bioEmitterGene *, class c2Organ *);
 };
 
 class c2Organ {

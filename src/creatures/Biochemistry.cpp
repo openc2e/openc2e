@@ -445,14 +445,11 @@ void c2Organ::processGenes() {
 		if (!parent->shouldProcessGene(i->get())) continue;
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
-			reactions.push_back(shared_ptr<c2Reaction>(new c2Reaction()));
-			reactions.back()->init((bioReactionGene *)i->get());
+			reactions.push_back(shared_ptr<c2Reaction>(new c2Reaction((bioReactionGene *)i->get())));
 		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
-			emitters.push_back(c2Emitter());
-			emitters.back().init((bioEmitterGene *)i->get(), this);
+			emitters.push_back(c2Emitter((bioEmitterGene *)i->get(), this));
 		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
-			receptors.push_back(c2Receptor());
-			receptors.back().init((bioReceptorGene *)i->get(), this);
+			receptors.push_back(c2Receptor((bioReceptorGene *)i->get(), this));
 		}
 	}
 }
@@ -465,15 +462,12 @@ void c2eOrgan::processGenes() {
 		if (!parent->shouldProcessGene(i->get())) continue;
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
-			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction()));
+			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction((bioReactionGene *)i->get())));
 			r = reactions.back();
-			reactions.back()->init((bioReactionGene *)i->get());
 		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
-			emitters.push_back(c2eEmitter());
-			emitters.back().init((bioEmitterGene *)i->get(), this);
+			emitters.push_back(c2eEmitter((bioEmitterGene *)i->get(), this));
 		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
-			receptors.push_back(c2eReceptor());
-			receptors.back().init((bioReceptorGene *)i->get(), this, r);
+			receptors.push_back(c2eReceptor((bioReceptorGene *)i->get(), this, r));
 		}
 	}
 }
@@ -987,15 +981,15 @@ float *c2eOrgan::getLocusPointer(bool receptor, unsigned char o, unsigned char t
 	return parent->getLocusPointer(receptor, o, t, l);
 }
 
-void c1Reaction::init(bioReactionGene *g) {
+c1Reaction::c1Reaction(bioReactionGene *g) {
 	data = g;
 }
 
-void c2Reaction::init(bioReactionGene *g) {
+c2Reaction::c2Reaction(bioReactionGene *g) {
 	data = g;
 }
 
-void c2eReaction::init(bioReactionGene *g) {
+c2eReaction::c2eReaction(bioReactionGene *g) {
 	data = g;
 
 	// rate is stored in genome as 0 fastest, 255 slowest
@@ -1003,18 +997,18 @@ void c2eReaction::init(bioReactionGene *g) {
 	rate = 1.0 - (g->rate / 255.0);
 }
 
-void c1Receptor::init(bioReceptorGene *g, c1Creature *parent) {
+c1Receptor::c1Receptor(bioReceptorGene *g, c1Creature *parent) {
 	data = g;
 	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus);
 }
 
-void c2Receptor::init(bioReceptorGene *g, c2Organ *parent) {
+c2Receptor::c2Receptor(bioReceptorGene *g, c2Organ *parent) {
 	data = g;
 	processed = false;
 	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus, &receptors);
 }
 	
-void c2eReceptor::init(bioReceptorGene *g, c2eOrgan *parent, shared_ptr<c2eReaction> r) {
+c2eReceptor::c2eReceptor(bioReceptorGene *g, c2eOrgan *parent, shared_ptr<c2eReaction> r) {
 	data = g;
 	processed = false;
 	nominal = g->nominal / 255.0f;
@@ -1023,17 +1017,17 @@ void c2eReceptor::init(bioReceptorGene *g, c2eOrgan *parent, shared_ptr<c2eReact
 	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus, &receptors);
 }
 
-void c1Emitter::init(bioEmitterGene *g, c1Creature *parent) {
+c1Emitter::c1Emitter(bioEmitterGene *g, c1Creature *parent) {
 	data = g;
 	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus);
 }
 
-void c2Emitter::init(bioEmitterGene *g, c2Organ *parent) {
+c2Emitter::c2Emitter(bioEmitterGene *g, c2Organ *parent) {
 	data = g;
 	locus = parent->getLocusPointer(false, g->organ, g->tissue, g->locus, 0);
 }
 
-void c2eEmitter::init(bioEmitterGene *g, c2eOrgan *parent) {
+c2eEmitter::c2eEmitter(bioEmitterGene *g, c2eOrgan *parent) {
 	data = g;
 	sampletick = 0;
 	threshold = g->threshold / 255.0f;

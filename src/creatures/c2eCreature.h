@@ -27,6 +27,7 @@
 // c2e
 
 struct c2eReaction {
+	explicit c2eReaction(bioReactionGene *);
 	bioReactionGene *data;
 	float rate;
 	unsigned int receptors;
@@ -34,21 +35,21 @@ struct c2eReaction {
 };
 
 struct c2eReceptor {
+	c2eReceptor(bioReceptorGene *, class c2eOrgan *, std::shared_ptr<c2eReaction>);
 	bioReceptorGene *data;
 	bool processed;
 	float lastvalue;
 	float *locus;
 	unsigned int *receptors;
 	float nominal, threshold, gain;
-	void init(bioReceptorGene *, class c2eOrgan *, std::shared_ptr<c2eReaction>);
 };
 
 struct c2eEmitter {
+	c2eEmitter(bioEmitterGene *, class c2eOrgan *);
 	bioEmitterGene *data;
 	unsigned char sampletick;
 	float *locus;
 	float threshold, gain;
-	void init(bioEmitterGene *, class c2eOrgan *);
 };
 
 class c2eOrgan {
