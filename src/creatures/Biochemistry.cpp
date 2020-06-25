@@ -455,7 +455,6 @@ void c2Organ::processGenes() {
 }
 
 void c2eOrgan::processGenes() {
-	shared_ptr<c2eReaction> r; // we need to store the previous reaction for possible receptor use
 	// TODO: should this cope with receptors created at other lifestages? i doubt it.. - fuzzie
 
 	for (auto i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
@@ -463,11 +462,10 @@ void c2eOrgan::processGenes() {
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
 			reactions.push_back(shared_ptr<c2eReaction>(new c2eReaction((bioReactionGene *)i->get())));
-			r = reactions.back();
 		} else if (typeid(*(*i)) == typeid(bioEmitterGene)) {
 			emitters.push_back(c2eEmitter((bioEmitterGene *)i->get(), this));
 		} else if (typeid(*(*i)) == typeid(bioReceptorGene)) {
-			receptors.push_back(c2eReceptor((bioReceptorGene *)i->get(), this, r));
+			receptors.push_back(c2eReceptor((bioReceptorGene *)i->get(), this));
 		}
 	}
 }
@@ -1008,7 +1006,7 @@ c2Receptor::c2Receptor(bioReceptorGene *g, c2Organ *parent) {
 	locus = parent->getLocusPointer(true, g->organ, g->tissue, g->locus, &receptors);
 }
 	
-c2eReceptor::c2eReceptor(bioReceptorGene *g, c2eOrgan *parent, shared_ptr<c2eReaction> r) {
+c2eReceptor::c2eReceptor(bioReceptorGene *g, c2eOrgan *parent) {
 	data = g;
 	processed = false;
 	nominal = g->nominal / 255.0f;

@@ -35,7 +35,7 @@ struct c2eReaction {
 };
 
 struct c2eReceptor {
-	c2eReceptor(bioReceptorGene *, class c2eOrgan *, std::shared_ptr<c2eReaction>);
+	c2eReceptor(bioReceptorGene *, class c2eOrgan *);
 	bioReceptorGene *data;
 	bool processed;
 	float lastvalue;
