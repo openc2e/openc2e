@@ -25,7 +25,11 @@ private:
 		pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) override
 		{
 			if (which == std::ios_base::out) {
-				return pos_type(off_type(-1)); // can't change output position
+				if (off == 0) {
+					return pos_type(vector.size());
+				} else {
+					return pos_type(off_type(-1)); // can't change output position
+				}
 			}
 			switch (dir) {
 				case std::ios_base::cur:
