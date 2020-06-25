@@ -134,7 +134,7 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool tryfemale, un
 void SkeletalCreature::processGenes() {
 	shared_ptr<genomeFile> genome = creature->getGenome();
 
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (std::vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (!creature->shouldProcessGene(*i)) continue;
 
 		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
@@ -760,7 +760,7 @@ void SkeletalCreature::creatureAged() {
 std::string SkeletalCreature::getFaceSpriteName() {
 	// TODO: we should store the face sprite when we first search for sprites (since it
 	// has to be the baby sprite), rather than this horrible hackery
-	for (vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+	for (std::vector<gene *>::iterator i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
 		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
 		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {

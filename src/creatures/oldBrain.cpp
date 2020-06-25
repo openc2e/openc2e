@@ -853,7 +853,7 @@ void oldBrain::processGenes() {
 
 	std::shared_ptr<genomeFile> genome = parent->getGenome();
 	
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (std::vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (!parent->shouldProcessGene(*i)) continue;
 		
 		if (typeid(**i) == typeid(oldBrainLobeGene)) {

@@ -441,7 +441,7 @@ c2eOrgan::c2eOrgan(c2eCreature *p, organGene *g) {
 }
 
 void c2Organ::processGenes() {
-	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+	for (std::vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
 		if (!parent->shouldProcessGene(*i)) continue;
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
@@ -461,7 +461,7 @@ void c2eOrgan::processGenes() {
 	shared_ptr<c2eReaction> r; // we need to store the previous reaction for possible receptor use
 	// TODO: should this cope with receptors created at other lifestages? i doubt it.. - fuzzie
 
-	for (vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
+	for (std::vector<gene *>::iterator i = ourGene->genes.begin(); i != ourGene->genes.end(); i++) {
 		if (!parent->shouldProcessGene(*i)) continue;
 
 		if (typeid(*(*i)) == typeid(bioReactionGene)) {
@@ -511,11 +511,11 @@ void c2Organ::tick() {
 			parent->addChemical(100, energycost);	
 			
 			// *** tick emitters
-			for (vector<c2Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
+			for (std::vector<c2Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
 				processEmitter(*i);
 			
 			// *** tick reactions
-			for (vector<shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
+			for (std::vector<shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
 				processReaction(**i);
 		} else {
 			// not enough energy!
@@ -544,7 +544,7 @@ void c2Organ::tick() {
 	if (repairratereceptors != 0) repairrate = 0;
 	if (injuryreceptors != 0) injurytoapply = 0;
 		
-	for (vector<c2Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
+	for (std::vector<c2Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
 		processReceptor(*i, ticked);
 
 	// *** decay life force
@@ -577,11 +577,11 @@ void c2eOrgan::tick() {
 			parent->adjustChemical(36, energycost);
 			
 			// *** tick emitters
-			for (vector<c2eEmitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
+			for (std::vector<c2eEmitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
 				processEmitter(*i);
 			
 			// *** tick reactions
-			for (vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
+			for (std::vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
 				processReaction(**i);
 		} else {
 			// *** out of energy damage	
@@ -604,13 +604,13 @@ void c2eOrgan::tick() {
 	}
 	
 	// *** tick receptors	
-	for (vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
+	for (std::vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
 	clockratereceptors = 0; repairratereceptors = 0; injuryreceptors = 0;
 		
-	for (vector<c2eReceptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
+	for (std::vector<c2eReceptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
 		processReceptor(*i, ticked);
 	
-	for (vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) if ((*i)->receptors > 0) (*i)->rate /= (*i)->receptors;
+	for (std::vector<shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) if ((*i)->receptors > 0) (*i)->rate /= (*i)->receptors;
 	if (clockratereceptors > 0) clockrate /= clockratereceptors;
 	if (repairratereceptors > 0) repairrate /= repairratereceptors;
 	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;

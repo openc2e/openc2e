@@ -83,7 +83,7 @@ bool Creature::shouldProcessGene(gene *g) {
 }
 
 void Creature::processGenes() {
-	for (vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
+	for (std::vector<gene *>::iterator i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (shouldProcessGene(*i)) addGene(*i);
 	}
 }
