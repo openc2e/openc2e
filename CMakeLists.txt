@@ -293,6 +293,9 @@ if (OPENC2E_USE_QT)
 	endif()
 endif()
 
+add_executable(change_breed_slot src/tools/change_breed_slot.cpp)
+target_link_libraries(change_breed_slot openc2e-fileformats)
+
 add_executable(cobdumper src/tools/cobdumper.cpp)
 target_link_libraries(cobdumper openc2e-fileformats fmt ghc_filesystem)
 
