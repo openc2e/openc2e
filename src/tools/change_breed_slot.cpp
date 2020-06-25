@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "creatures/lifestage.h"
+#include "fileformats/PrayFileReader.h"
+#include "fileformats/PrayFileWriter.h"
 #include "spanstream.h"
 #include "util.h"
 #include "vectorstream.h"
@@ -86,8 +88,7 @@ void check_roundtrip(const std::vector<uint8_t> &data) {
     }
 }
 
-void change_genome(std::string filename, int new_species_number, int new_slot_number) {
-    auto data = readfilebinary(filename);
+std::vector<uint8_t> change_genome(const std::vector<uint8_t> &data, int new_species_number, int new_slot_number) {
     check_roundtrip(data);
     
     genomeFile genome;
@@ -126,20 +127,23 @@ void change_genome(std::string filename, int new_species_number, int new_slot_nu
         }
     }
     
-    fmt::print("writing to {}\n", filename);
-    std::ofstream out(filename, std::ios_base::binary);
+    vectorstream out;
     out << genome;
     
     while (static_cast<size_t>(out.tellp()) < data.size()) {
         out.write("", 1);
     }
+    return out.vector();
 }
 
-void change_filename(std::string filename, int new_species_number, int new_slot_number) {
+std::string get_new_filename(std::string filename, int new_species_number, int new_slot_number) {
     std::string directory = fs::path(filename).parent_path();
     std::string stem = fs::path(filename).stem();
     std::transform(stem.begin(), stem.end(), stem.begin(), &tolower);
-    
+
+    std::string extension = fs::path(filename).extension();
+    std::transform(extension.begin(), extension.end(), extension.begin(), &tolower);
+
     if (stem.size() != 4) {
         fmt::print(stderr, "error: doesn't look like an appearance file\n");
         exit(1);
@@ -161,18 +165,56 @@ void change_filename(std::string filename, int new_species_number, int new_slot_
         new_species_number + ((stem[1] - '0') < 4 ? 0 : 4),
         stem[2],
         (char)tolower(breed_slot_to_name(new_slot_number)[0]),
-        fs::path(filename).extension().string()
+        extension
     );
     
     newname = fs::path(filename).parent_path() / newname;
-    if (newname != filename) {
-        fmt::print("renaming to {}\n", newname);
-        int ret = rename(filename.c_str(), newname.c_str());
-        if (ret != 0) {
-            perror("error renaming file");
-            exit(1);
+    return newname;
+}
+
+std::vector<uint8_t> change_prayfile(const std::vector<uint8_t> &data, int new_species_number, int new_slot_number) {
+    spanstream in(data);
+    PrayFileReader reader(in);
+
+    vectorstream out;
+    PrayFileWriter writer(out);
+
+    for (size_t i = 0; i < reader.getNumBlocks(); ++i) {
+        if (reader.getBlockType(i) == "EGGS") {
+            fmt::print("group EGGS \"{}\"\n", reader.getBlockName(i));
+            auto tags = reader.getBlockTags(i);
+            for (auto& kv : tags.second) {
+                std::string value_extension = fs::path(kv.second).extension();
+                std::transform(value_extension.begin(), value_extension.end(), value_extension.begin(), &tolower);
+                if (kv.second.size() == 8 && (value_extension == ".c16" || value_extension == ".s16" || value_extension == ".att")) {
+                    kv.second = get_new_filename(kv.second, new_species_number, new_slot_number);
+                } else if (kv.first == "Egg Gallery female" || kv.first == "Egg Gallery male") {
+                    kv.second = get_new_filename(kv.second, new_species_number, new_slot_number);
+                }
+            }
+            writer.writeBlockTags(reader.getBlockType(i), reader.getBlockName(i), tags.first, tags.second);
+
+        } else if (reader.getBlockType(i) == "FILE") {
+            auto blockname = reader.getBlockName(i);
+            auto data = reader.getBlockRawData(i);
+
+            std::string block_extension = fs::path(blockname).extension();
+            std::transform(block_extension.begin(), block_extension.end(), block_extension.begin(), &tolower);
+            if (block_extension == ".gen") {
+                fmt::print("inline FILE \"{}\"\n", blockname);
+                data = change_genome(data, new_species_number, new_slot_number);
+            } else if (blockname.size() == 8 && (block_extension == ".c16" || block_extension == ".s16" || block_extension == ".att")) {
+                fmt::print("inline FILE \"{}\"\n", blockname);
+                blockname = get_new_filename(blockname, new_species_number, new_slot_number);
+            }
+            writer.writeBlockRawData(reader.getBlockType(i), blockname, data);
+
+        } else {
+            writer.writeBlockRawData(reader.getBlockType(i), reader.getBlockName(i), reader.getBlockRawData(i));
         }
     }
+
+    return out.vector();
 }
 
 int main(int argc, char **argv) {
@@ -193,9 +235,32 @@ int main(int argc, char **argv) {
     std::string extension = fs::path(filename).extension();
     std::transform(extension.begin(), extension.end(), extension.begin(), &tolower);
     if (extension == ".gen") {
-        change_genome(filename, new_species_number, new_slot_number);
+        auto data = readfilebinary(filename);
+        auto newdata = change_genome(data, new_species_number, new_slot_number);
+
+        fmt::print("writing to {}\n", filename);
+        std::ofstream out(filename, std::ios_base::binary);
+        out.write((char*)newdata.data(), newdata.size());
+
     } else if (extension == ".c16" || extension == ".s16" || extension == ".att") {
-        change_filename(filename, new_species_number, new_slot_number);
+        std::string newname = get_new_filename(filename, new_species_number, new_slot_number);
+        if (newname != filename) {
+            fmt::print("renaming to {}\n", newname);
+            int ret = rename(filename.c_str(), newname.c_str());
+            if (ret != 0) {
+                perror("error renaming file");
+                exit(1);
+            }
+        }
+
+    } else if (extension == ".agents" || extension == ".agent") {
+        auto data = readfilebinary(filename);
+        auto newdata = change_prayfile(data, new_species_number, new_slot_number);
+
+        fmt::print("writing to {}\n", filename);
+        std::ofstream out(filename, std::ios_base::binary);
+        out.write((char*)newdata.data(), newdata.size());
+
     } else {
         fmt::print(stderr, "error: unknown file type\n");
     }
