@@ -102,6 +102,7 @@ include_directories(BEFORE
 add_library(openc2e-common STATIC
 	src/encoding.cpp
 	src/mmapifstream.cpp
+	src/util.cpp
 )
 target_link_libraries(openc2e-common PRIVATE utf8proc)
 
@@ -210,7 +211,6 @@ add_library(openc2e-core STATIC
 	src/VoiceData.cpp
 	src/World.cpp
 	src/userlocale.cpp
-	src/util.cpp
 )
 target_link_libraries(openc2e-core PUBLIC
 	cxxopts

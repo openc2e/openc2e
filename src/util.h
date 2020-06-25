@@ -1,10 +1,10 @@
-#ifndef UTIL_H
-#define UTIL_H 1
+#pragma once
 
-#include <string>
 #include <iosfwd>
+#include <string>
+#include <vector>
 
 std::string readfile(const std::string &filename);
 std::string readfile(std::istream &i);
-
-#endif
+std::vector<uint8_t> readfilebinary(const std::string &filename);
+std::vector<uint8_t> readfilebinary(std::istream &i);
