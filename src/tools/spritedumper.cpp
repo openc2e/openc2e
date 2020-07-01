@@ -1,3 +1,4 @@
+#include "creaturesException.h"
 #include "endianlove.h"
 #include "fileformats/blkImage.h"
 #include "fileformats/c16Image.h"
@@ -62,6 +63,84 @@ static bool imatch(const std::string &s, std::string regex) {
     return std::regex_search(s, std::regex(regex, std::regex::icase));
 }
 
+bool is_background_image(const std::unique_ptr<creaturesImage> &image) {
+    if (typeid(*image.get()) == typeid(blkImage)) {
+        return true;
+    }
+    if ((typeid(*image.get()) == typeid(sprImage) && image->numframes() == 464) ||
+        (typeid(*image.get()) == typeid(s16Image) && image->numframes() == 928)) {
+        for (size_t i = 0; i < image->numframes(); ++i) {
+            if (image->width(i) != 144 && image->height(i) != 150) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+void stitch_background_image(std::unique_ptr<creaturesImage> &image) {
+    if (!is_background_image(image)) {
+        throw creaturesException("can't stitch a non-background image");
+    }
+
+    if (typeid(*image.get()) == typeid(sprImage)) {
+        const int sprwidth = 144;
+        const int sprheight = 150;
+        const int heightinsprites = 8;
+        const int widthinsprites = 58;
+        const int totalwidth = sprwidth * widthinsprites;
+        const int totalheight = sprheight * heightinsprites;
+
+        std::vector<uint8_t> buf(totalwidth * totalheight);
+
+        unsigned int stride = totalwidth;
+        for (unsigned int i = 0; i < heightinsprites; i++) {
+            for (int j = 0; j < widthinsprites; j++) {
+                const unsigned int whereweare = j * heightinsprites + i;
+                const int destx = (j * sprwidth);
+                const int desty = (i * sprheight);
+                uint8_t* sprite = (uint8_t*) image->data(whereweare);
+                for (int blocky = 0; blocky < sprheight; blocky++) {
+                    uint8_t* start = &buf[(i * sprheight + blocky) * totalwidth + j * sprwidth];
+                    std::copy(&sprite[blocky * sprwidth], &sprite[blocky * sprwidth] + sprwidth, start);
+                }
+            }
+        }
+
+        image.reset(new creaturesImage(image->getName(), image->format(), { buf }, { totalwidth }, { totalheight }));
+        return;
+    }
+
+    if (typeid(*image.get()) == typeid(s16Image)) {
+        const int sprwidth = 144;
+        const int sprheight = 150;
+        const int heightinsprites = 16;
+        const int widthinsprites = 58;
+        const int totalwidth = sprwidth * widthinsprites;
+        const int totalheight = sprheight * heightinsprites;
+
+        std::vector<uint8_t> buf(totalwidth * totalheight * 2);
+
+        unsigned int stride = totalwidth;
+        for (unsigned int i = 0; i < heightinsprites; i++) {
+            for (int j = 0; j < widthinsprites; j++) {
+                const unsigned int whereweare = j * heightinsprites + i;
+                const int destx = (j * sprwidth);
+                const int desty = (i * sprheight);
+                uint8_t* sprite = (uint8_t*) image->data(whereweare);
+                for (int blocky = 0; blocky < sprheight; blocky++) {
+                    uint8_t* start = &buf[(i * sprheight + blocky) * totalwidth * 2 + j * sprwidth * 2];
+                    std::copy(&sprite[blocky * sprwidth * 2], &sprite[blocky * sprwidth * 2] + sprwidth * 2, start);
+                }
+            }
+        }
+
+        image.reset(new creaturesImage(image->getName(), image->format(), { buf }, { totalwidth }, { totalheight }));
+        return;
+    }
+}
+
 int main(int argc, char **argv) {
 	if (argc != 2) {
 		std::cerr << "syntax: spritedumper filename" << std::endl;
@@ -90,81 +169,21 @@ int main(int argc, char **argv) {
         std::cerr << "File " << input_path << " doesn't have known sprite extension" << std::endl;
         exit(1);
     }
-    	
-	fs::path output_directory = stem;
 
-	if (!fs::create_directories(output_directory)) {
-		if (!fs::is_directory(output_directory)) {
-			std::cerr << "Couldn't create output directory " << output_directory << std::endl;
-			exit(1);
-		}
-	}
+    fs::path output_directory = stem;
 
-    if (imatch(input_path.extension(), "\\.spr$") && image->numframes() == 464) {
-        bool is_background = true;
-        for (size_t i = 0; i < image->numframes(); ++i) {
-            is_background = is_background && image->width(i) == 144 && image->height(i) == 150;
-        }
-        if (is_background) {
-            const int sprwidth = 144;
-            const int sprheight = 150;
-            const int heightinsprites = 8;
-            const int widthinsprites = 58;
-            const int totalwidth = sprwidth * widthinsprites;
-            const int totalheight = sprheight * heightinsprites;
-
-            std::vector<uint8_t> buf(totalwidth * totalheight);
-
-            unsigned int stride = totalwidth;
-            for (unsigned int i = 0; i < heightinsprites; i++) {
-                for (int j = 0; j < widthinsprites; j++) {
-                    const unsigned int whereweare = j * heightinsprites + i;
-                    const int destx = (j * sprwidth);
-                    const int desty = (i * sprheight);
-                    uint8_t* sprite = (uint8_t*) image->data(whereweare);
-                    for (int blocky = 0; blocky < sprheight; blocky++) {
-                        uint8_t* start = &buf[(i * sprheight + blocky) * totalwidth + j * sprwidth];
-                        std::copy(&sprite[blocky * sprwidth], &sprite[blocky * sprwidth] + sprwidth, start);
-                    }
-                }
-            }
-
-            image.reset(new creaturesImage(stem, image->format(), { buf }, { totalwidth }, { totalheight }));
-        }
-    } else if (imatch(input_path.extension(), "\\.s16$") && image->numframes() == 928) {
-        bool is_background = true;
-        for (size_t i = 0; i < image->numframes(); ++i) {
-            is_background = is_background && image->width(i) == 144 && image->height(i) == 150;
-        }
-        if (is_background) {
-            const int sprwidth = 144;
-            const int sprheight = 150;
-            const int heightinsprites = 16;
-            const int widthinsprites = 58;
-            const int totalwidth = sprwidth * widthinsprites;
-            const int totalheight = sprheight * heightinsprites;
-
-            std::vector<uint8_t> buf(totalwidth * totalheight * 2);
-
-            unsigned int stride = totalwidth;
-            for (unsigned int i = 0; i < heightinsprites; i++) {
-                for (int j = 0; j < widthinsprites; j++) {
-                    const unsigned int whereweare = j * heightinsprites + i;
-                    const int destx = (j * sprwidth);
-                    const int desty = (i * sprheight);
-                    uint8_t* sprite = (uint8_t*) image->data(whereweare);
-                    for (int blocky = 0; blocky < sprheight; blocky++) {
-                        uint8_t* start = &buf[(i * sprheight + blocky) * totalwidth * 2 + j * sprwidth * 2];
-                        std::copy(&sprite[blocky * sprwidth * 2], &sprite[blocky * sprwidth * 2] + sprwidth * 2, start);
-                    }
-                }
-            }
-
-            image.reset(new creaturesImage(stem, image->format(), { buf }, { totalwidth }, { totalheight }));
+    if (!fs::create_directories(output_directory)) {
+        if (!fs::is_directory(output_directory)) {
+            std::cerr << "Couldn't create output directory " << output_directory << std::endl;
+            exit(1);
         }
     }
 
-    for (size_t i = 0; i < image->numframes(); ++i) {        
+    if (is_background_image(image)) {
+        stitch_background_image(image);
+    }
+
+    for (size_t i = 0; i < image->numframes(); ++i) {
         fs::path frame_filename = (output_directory / stem).native() + fmt::format("_{:03}.png", i);
         fmt::print("{}\n", frame_filename.string());
         
