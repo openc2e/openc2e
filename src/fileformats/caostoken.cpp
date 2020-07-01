@@ -12,7 +12,7 @@ static char char_unescape(char c) {
 }
 
 std::string token::stringval() const {
-    if (type != TOK_STRING) abort();
+    if (!(type == TOK_STRING || type == TOK_BYTESTR)) abort();
     if (value[0] == '[') {
         return value.substr(1, value.size() - 2);
     }

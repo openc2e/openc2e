@@ -364,7 +364,7 @@ class Caos2PrayParserImpl {
     std::vector<Event> run(std::string script, std::string *output_filename_) {
         std::vector<token> tokens;
         size_t p = 0;
-        lexcaos(tokens, script.c_str(), false);
+        lexcaos(tokens, script.c_str());
 
         std::vector<Event> events;
         events.push_back(StringTag{"Script 1", std::move(script)});

@@ -264,7 +264,11 @@ caosScript::logicaltokentype caosScript::logicalType(const token& t) {
 		case token::TOK_WORD:
 			return TOK_WORD;
 		case token::TOK_BYTESTR:
-			return TOK_BYTESTR;
+			if (d->name == "c1" || d->name == "c2") {
+				return TOK_CONST;
+			} else {
+				return TOK_BYTESTR;
+			}
 		case token::TOK_STRING:
 		case token::TOK_CHAR:
 		case token::TOK_BINARY:
@@ -313,11 +317,8 @@ void caosScript::parse(std::istream &in) {
 	std::string caostext = readfile(in);
 	// run the token parser
 	{
-		bool using_c2;
-		using_c2 = (d->name == "c1" || d->name == "c2");
-
 		std::vector<token> rawtokens;
-		lexcaos(rawtokens, caostext.c_str(), using_c2);
+		lexcaos(rawtokens, caostext.c_str());
 
 		tokens = shared_ptr<std::vector<token> >(new std::vector<token>());
 		size_t index = 0;
@@ -437,8 +438,14 @@ caosVar caosScript::asConst(const token& token) {
 			return caosVar(token.intval());
 		case token::TOK_FLOAT:
 			return caosVar(token.floatval());
-		case token::TOK_WORD:
 		case token::TOK_BYTESTR:
+		{
+			if (d->name == "c1" || d->name == "c2") {
+				return caosVar(token.stringval());
+			}
+			unexpectedToken(token);
+		}
+		case token::TOK_WORD:
 		case token::TOK_COMMENT:
 		case token::TOK_WHITESPACE:
 		case token::TOK_NEWLINE:

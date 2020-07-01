@@ -4,7 +4,7 @@
 #include <algorithm>
 
 
-void lexcaos(std::vector<token> &v, const char *p, bool c2) {
+void lexcaos(std::vector<token> &v, const char *p) {
 #define make_word(str) \
 	v.push_back(token(token::TOK_WORD, str, yylineno))
 	int yylineno = 1;
@@ -75,7 +75,7 @@ std:
 	">"  { make_word(std::string(basep, p - basep)); goto std; }
 	"="  { make_word(std::string(basep, p - basep)); goto std; }
 
-	"["  { if (c2) goto brstr; else goto bytestr; }
+	"["  { goto bytestr; }
 	"\"" { goto str; }
 	eoi { goto out; }
 
@@ -83,15 +83,9 @@ std:
 */
 bytestr:
 /*!re2c
-	[0-9 ] { goto bytestr; }
-	"]" { v.push_back(token(token::TOK_BYTESTR, std::string(basep, p - basep), yylineno)); goto std; }
-	any { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
-*/
-brstr:
-/*!re2c
 	[\000\r\n] { v.push_back(token(token::TOK_ERROR, yylineno)); goto out; }
-	"]" { v.push_back(token(token::TOK_STRING, std::string(basep, p - basep), yylineno)); goto std;  }
-	noneoi { goto brstr; }
+	"]" { v.push_back(token(token::TOK_BYTESTR, std::string(basep, p - basep), yylineno)); goto std;  }
+	noneoi { goto bytestr; }
 */
 
 str:
