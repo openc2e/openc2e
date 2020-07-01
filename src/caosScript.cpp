@@ -344,8 +344,6 @@ void caosScript::parse(std::istream &in) {
 				case token::TOK_NEWLINE:
 				case token::TOK_COMMA:
 					break;
-				default:
-					abort();
 			}
 		}
 	}
@@ -430,19 +428,25 @@ void caosScript::parse(std::istream &in) {
 }
 
 caosVar caosScript::asConst(const token& token) {
-	if (token.type == token::TOK_STRING) {
-		return caosVar(token.stringval());
+	switch (token.type) {
+		case token::TOK_STRING:
+			return caosVar(token.stringval());
+		case token::TOK_CHAR:
+		case token::TOK_BINARY:
+		case token::TOK_INT:
+			return caosVar(token.intval());
+		case token::TOK_FLOAT:
+			return caosVar(token.floatval());
+		case token::TOK_WORD:
+		case token::TOK_BYTESTR:
+		case token::TOK_COMMENT:
+		case token::TOK_WHITESPACE:
+		case token::TOK_NEWLINE:
+		case token::TOK_COMMA:
+		case token::TOK_EOI:
+		case token::TOK_ERROR:
+			unexpectedToken(token);
 	}
-	if (token.type == token::TOK_CHAR || token.type == token::TOK_BINARY
-		|| token.type == token::TOK_INT)
-	{
-		return caosVar(token.intval());
-	}
-	if (token.type == token::TOK_FLOAT)
-	{
-		return caosVar(token.floatval());
-	}
-	unexpectedToken(token);
 }
 
 void caosScript::unexpectedToken(const token& token) {

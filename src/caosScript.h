@@ -264,6 +264,7 @@ protected:
 	void parseloop(int state, void *info);
 
 	caosVar asConst(const token& token);
+	[[ noreturn ]]
 	void unexpectedToken(const token& token);
 
 	enum logicaltokentype {
