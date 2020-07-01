@@ -10,6 +10,7 @@
 #include <fstream>
 #include <png.h>
 #include <regex>
+#include <vector>
 
 namespace fs = ghc::filesystem;
 
@@ -141,6 +142,127 @@ void stitch_background_image(std::unique_ptr<creaturesImage> &image) {
     }
 }
 
+std::vector<uint8_t> frame_as_rgb24(const std::unique_ptr<creaturesImage>& image, size_t i) {
+    if (!(image->format() == if_16bit_565 || image->format() == if_16bit_555)) {
+        throw creaturesException("Don't know how to convert non-RGB565-or-RGB555 format into RGB24");
+    }
+
+    std::vector<uint8_t> out(image->width(i) * image->height(i) * 3);
+    for (size_t j = 0; j < image->width(i) * image->height(i); ++j) {
+        uint16_t pixel = *(((uint16_t*)image->data(i)) + j);
+        if (image->format() == if_16bit_565) {
+            uint16_t r = (pixel & 0xF800) >> 11;
+            uint16_t g = (pixel & 0x07E0) >> 5;
+            uint16_t b = (pixel & 0x001F);
+            r = r * 255 / 31;
+            g = g * 255 / 63;
+            b = b * 255 / 31;
+            out[j * 3] = r;
+            out[j * 3 + 1] = g;
+            out[j * 3 + 2] = b;
+        } else {
+            uint16_t r = (pixel & 0x7C00) >> 10;
+            uint16_t g = (pixel & 0x03E0) >> 5;
+            uint16_t b = (pixel & 0x001F);
+            r = r * 255 / 31;
+            g = g * 255 / 31;
+            b = b * 255 / 31;
+            out[j * 3] = r;
+            out[j * 3 + 1] = g;
+            out[j * 3 + 2] = b;
+        }
+    }
+    return out;
+}
+
+std::vector<uint8_t> frame_as_paletted(const std::unique_ptr<creaturesImage>& image, size_t i) {
+    if (!(image->format() == if_paletted)) {
+        throw creaturesException("Don't know how to convert non-paletted format into paletted");
+    }
+    return std::vector<uint8_t>((uint8_t*)image->data(i), ((uint8_t*)image->data(i)) + image->height(i) * image->width(i));
+}
+
+void stitch_to_sheet(std::unique_ptr<creaturesImage>& image) {
+    if (image->numframes() <= 1) {
+        return;
+    }
+
+    const int depth = [&]{
+        switch (image->format()) {
+            case if_16bit_555:
+            case if_16bit_565:
+                return 2;
+            case if_paletted:
+                return 1;
+            default:
+                throw creaturesException("Don't know how to stitch format into sheet");
+        }
+    }();
+
+    // find good sheet size
+    // TODO: if it's a creature sprite, use the specific layout so poses line up
+    // TODO: better packing algorithm that lets sprites take up multiple rows?
+    const int SHEET_PADDING = 5; // TODO: make customizable?
+    size_t max_width = 800; // TODO: make customizable?
+    size_t total_width = 0;
+    size_t total_height = 0;
+    {
+        size_t current_row_width = SHEET_PADDING;
+        size_t current_row_height = 0;
+        for (size_t i = 0; i < image->numframes(); ++i) {
+            if (current_row_width + image->width(i) + SHEET_PADDING > max_width) {
+                total_height += current_row_height + SHEET_PADDING;
+                current_row_width = SHEET_PADDING;
+                current_row_height = 0;
+            }
+            current_row_width += image->width(i) + SHEET_PADDING;
+            current_row_height = std::max<size_t>(current_row_height, image->height(i));
+            total_width = std::max<size_t>(total_width, current_row_width);
+        }
+        total_height += SHEET_PADDING + current_row_height + SHEET_PADDING;
+    }
+
+    // set up storage, set to default background color
+    std::vector<uint8_t> data(total_width * total_height * depth);
+    for (size_t i = 0; i < total_width * total_height; ++i) {
+        // TODO: avoid existing colors on image borders, or at least alert
+        // TODO: make customizable
+        if (depth == 2) {
+            // rgb(112, 164, 236) in RGB565LE
+            data[2 * i] = 0x3D;
+            data[2 * i + 1] = 0x75;
+        } else if (depth == 1) {
+            // 0x1C,0x29,0x3B in palette.dta -> rgb(112, 164, 236)
+            data[i] = 100;
+        }
+    }
+
+    // copy sprites over
+    size_t current_x = SHEET_PADDING;
+    size_t current_y = SHEET_PADDING;
+    size_t current_row_height = 0;
+    for (size_t i = 0; i < image->numframes(); ++i) {
+        // check row
+        if (current_x + image->width(i) + SHEET_PADDING > total_width) {
+            current_y += current_row_height + SHEET_PADDING;
+            current_x = SHEET_PADDING;
+            current_row_height = 0;
+        }
+        // copy
+        for (size_t y = 0; y < image->height(i); y++) {
+            auto rowstart = ((uint8_t*)image->data(i)) + y * image->width(i) * depth;
+            auto rowend = rowstart + image->width(i) * depth;
+            auto insertpos = &data[(current_y + y) * total_width * depth + current_x * depth];
+            std::copy(rowstart, rowend, insertpos);
+        }
+        current_x += image->width(i) + SHEET_PADDING;
+        current_row_height = std::max<size_t>(current_row_height, image->height(i));
+    }
+
+    // set image
+    image.reset(new creaturesImage(image->getName(), image->format(), { data }, { (unsigned short)total_width }, { (unsigned short)total_height }));
+}
+
 int main(int argc, char **argv) {
 	if (argc != 2) {
 		std::cerr << "syntax: spritedumper filename" << std::endl;
@@ -152,7 +274,7 @@ int main(int argc, char **argv) {
 		std::cerr << "File " << input_path << " doesn't exist" << std::endl;
 		exit(1);
 	}
-    fs::path stem = input_path.stem();
+    std::string stem = input_path.stem();
     
     std::ifstream in(input_path);
     
@@ -170,22 +292,21 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    fs::path output_directory = stem;
-
-    if (!fs::create_directories(output_directory)) {
-        if (!fs::is_directory(output_directory)) {
-            std::cerr << "Couldn't create output directory " << output_directory << std::endl;
-            exit(1);
-        }
-    }
-
     if (is_background_image(image)) {
         stitch_background_image(image);
     }
 
+    stitch_to_sheet(image);
+
     for (size_t i = 0; i < image->numframes(); ++i) {
-        fs::path frame_filename = (output_directory / stem).native() + fmt::format("_{:03}.png", i);
-        fmt::print("{}\n", frame_filename.string());
+        std::string frame_filename = [&](){
+            if (image->numframes() == 1) {
+                return stem + ".png";
+            } else {
+                return stem + fmt::format("_{:03}.png", i);
+            }
+        }();
+        fmt::print("{}\n", frame_filename);
         
         FILE *fp = fopen(frame_filename.c_str(), "wb");
         auto fp_sg = make_scope_guard([&]{ fclose(fp); });
@@ -204,9 +325,7 @@ int main(int argc, char **argv) {
         }
 
         png_init_io(png, fp);
-
         std::vector<uint8_t> out_buffer;
-        std::vector<png_bytep> row_pointers(image->height(i));
 
         if (image->format() == if_16bit_565 || image->format() == if_16bit_555) {
             png_set_IHDR(png, info, image->width(i), image->height(i),
@@ -221,36 +340,11 @@ int main(int argc, char **argv) {
             sbit.gray = 0;
             sbit.alpha = 0;
             png_set_sBIT(png, info, &sbit);
+
             png_write_info(png, info);
 
-            out_buffer.resize(image->width(i) * image->height(i) * 3);
-            for (size_t y = 0; y < image->height(i); ++y) {
-                row_pointers[y] = out_buffer.data() + y * image->width(i) * 3;
-            }
-            for (size_t j = 0; j < image->width(i) * image->height(i); ++j) {
-                uint16_t pixel = *(((uint16_t*)image->data(i)) + j);
-                if (image->format() == if_16bit_565) {
-                    uint16_t r = (pixel & 0xF800) >> 11;
-                    uint16_t g = (pixel & 0x07E0) >> 5;
-                    uint16_t b = (pixel & 0x001F);
-                    r = r * 255 / 31;
-                    g = g * 255 / 63;
-                    b = b * 255 / 31;
-                    out_buffer[j * 3] = r;
-                    out_buffer[j * 3 + 1] = g;
-                    out_buffer[j * 3 + 2] = b;
-                } else {
-                    uint16_t r = (pixel & 0x7C00) >> 10;
-                    uint16_t g = (pixel & 0x03E0) >> 5;
-                    uint16_t b = (pixel & 0x001F);
-                    r = r * 255 / 31;
-                    g = g * 255 / 31;
-                    b = b * 255 / 31;
-                    out_buffer[j * 3] = r;
-                    out_buffer[j * 3 + 1] = g;
-                    out_buffer[j * 3 + 2] = b;
-                }
-            }
+            out_buffer = frame_as_rgb24(image, i);
+
         } else if (image->format() == if_paletted) {
             png_set_IHDR(png, info, image->width(i), image->height(i),
               8, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE,
@@ -265,19 +359,20 @@ int main(int argc, char **argv) {
                 color.blue = CREATURES_PALETTE[i * 3 + 2] << 2;
                 palette[i] = color;
             }
-
             png_set_PLTE(png, info, palette.data(), palette.size());
             png_write_info(png, info);
 
-            out_buffer = std::vector<uint8_t>((uint8_t*)image->data(i), ((uint8_t*)image->data(i)) + image->height(i) * image->width(i));
-            for (size_t y = 0; y < image->height(i); ++y) {
-                row_pointers[y] = out_buffer.data() + y * image->width(i);
-            }
+            out_buffer = frame_as_paletted(image, i);
+
         } else {
             std::cerr << "creaturesImage: expected 8-bit or 16-bit" << std::endl;
             exit(1);
         }
 
+        std::vector<png_bytep> row_pointers(image->height(i));
+        for (size_t y = 0; y < image->height(i); ++y) {
+            row_pointers[y] = out_buffer.data() + y * png_get_rowbytes(png, info);
+        }
         png_write_image(png, row_pointers.data());
         png_write_end(png, info);
     }
