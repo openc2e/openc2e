@@ -10,13 +10,11 @@ TDISP = {
     "bytestring": "CI_BYTESTR",
     "variable": "CI_VARIABLE",
     "anything": "CI_OTHER",
-    "condition": None,
-    "comparison": None,
+    "condition": "CI_CONDITION",
     "decimal": "CI_NUMERIC",
-    "label": None,
+    "label": "CI_LABEL",
     "vector": "CI_VECTOR",
     "bareword": "CI_BAREWORD",
-    "token": "CI_BAREWORD",
     "subcommand": "CI_SUBCOMMAND",
     "command": "CI_COMMAND",
 }
@@ -59,6 +57,8 @@ def printarr(cmds, variant, arrname):
         if cmd.get("arguments") is not None:
             args = ""
             for arg in cmd["arguments"]:
+                if not arg["type"] in TDISP:
+                    raise Exception("Unknown argument type {}".format(arg["type"]))
                 type = TDISP[arg["type"]]
                 if not type:
                     args = None

@@ -34,7 +34,9 @@ enum ci_type {
 	CI_VECTOR,
 	CI_BAREWORD,
 	CI_SUBCOMMAND,
-	CI_ANYVALUE
+	CI_ANYVALUE,
+	CI_CONDITION,
+	CI_LABEL,
 };
 
 struct cmdinfo {
