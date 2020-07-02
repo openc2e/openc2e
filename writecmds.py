@@ -54,23 +54,19 @@ def printarr(cmds, variant, arrname):
     idx = 0
     for cmd in cmds:
         argp = "NULL"
-        if cmd.get("arguments") is not None:
+        if cmd.get("arguments"):
             args = ""
             for arg in cmd["arguments"]:
                 if not arg["type"] in TDISP:
                     raise Exception("Unknown argument type {}".format(arg["type"]))
                 type = TDISP[arg["type"]]
-                if not type:
-                    args = None
-                    break
                 args += "{}, ".format(type)
-            if args is not None:
-                argp = "{}_t_{}_{}".format(arrname, cmd["type"], cmd["key"])
-                print(
-                    "static const enum ci_type {}[] = {{ {}CI_END }};".format(
-                        argp, args
-                    )
+            argp = "{}_t_{}_{}".format(arrname, cmd["type"], cmd["key"])
+            print(
+                "static const enum ci_type {}[] = {{ {} }};".format(
+                    argp, args
                 )
+            )
 
         buf += "\t{{ // {} {}\n".format(idx, cmd["key"])
         idx += 1
@@ -103,7 +99,7 @@ def printarr(cmds, variant, arrname):
         buf += "\t\t{} // evalcost\n".format(cost)
         buf += "\t},\n"
 
-    buf += "\t{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, CI_END, 0 }\n"
+    buf += "\t{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, CI_OTHER, 0 }\n"
     buf += "};"
     print(buf)
 

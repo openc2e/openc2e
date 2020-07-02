@@ -24,8 +24,7 @@
 
 enum ci_type {
 	CI_OTHER = -1,
-	CI_END = 0,
-	CI_COMMAND,
+	CI_COMMAND = 1,
 	CI_NUMERIC,
 	CI_STRING,
 	CI_AGENT,

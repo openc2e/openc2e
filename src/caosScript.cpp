@@ -161,8 +161,8 @@ evalVisit::evalVisit(caosScript *s, bool save_here_)
 
 
 void evalVisit::operator()(const CAOSCmd &cmd) const {
-	for (size_t i = 0; i < cmd.arguments.size(); i++) {
-		bool save_there = (cmd.op->argtypes[i] == CI_VARIABLE);
+	for (int i = 0; i < cmd.arguments.size(); i++) {
+		bool save_there = (i < cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE);
 		cmd.arguments[i]->eval(scr, save_there);
 	}
 	scr->traceindex = cmd.traceidx - 1;
@@ -183,7 +183,7 @@ void evalVisit::operator()(const CAOSCmd &cmd) const {
 	
 	if (cmd.op->rettype != CI_COMMAND) {
 		int rotcount = 0;	
-		for (size_t i = 0; cmd.op->argtypes[i] != CI_END; i++) {
+		for (int i = 0; i < cmd.op->argc; i++) {
 			if (cmd.op->argtypes[i] == CI_VARIABLE)
 				rotcount++;		
 		}
@@ -191,7 +191,7 @@ void evalVisit::operator()(const CAOSCmd &cmd) const {
 			scr->emitOp(CAOS_STACK_ROT, rotcount);
 	}
 	for (int i = cmd.arguments.size() - 1; i >= 0; i--) {
-		if (cmd.op->argtypes[i] == CI_VARIABLE)
+		if (i < cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE)
 			cmd.arguments[i]->save(scr);
 	}
 }
@@ -587,7 +587,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 	const cmdinfo *ci = readCommand(t, std::string(xtype == CI_COMMAND ? "cmd " : "expr "));
 	t->setWord(oldpayload);
 	cmd->op = ci;
-	for (int i = 0; ci->argtypes[i] != CI_END; i++) {
+	for (int i = 0; i < ci->argc; i++) {
 		cmd->arguments.push_back(readExpr(ci->argtypes[i]));
 	}
 	return ce;
