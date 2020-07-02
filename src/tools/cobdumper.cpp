@@ -1,3 +1,4 @@
+#include "endianlove.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 
@@ -103,8 +104,9 @@ int main(int argc, char **argv) {
 		}
 	} else if (memcmp(magic, "\x01\x00", 2) == 0) {
 		c1cobfile cob = read_c1cobfile(in);
+		std::string sprite_filename = stem.string() + ".spr";
 		fmt::print("*# COB-Name \"{}\"\n", cob.name);
-		fmt::print("*# Picture \"{}\"\n", stem.string() + ".spr");
+		fmt::print("*# Picture \"{}\"\n", sprite_filename);
 		fmt::print("*# Quantity available = {}\n", cob.quantity_available);
 		fmt::print("*# Quantity used = {}\n", cob.quantity_used);
 		fmt::print("*# Expiration month = {}\n", cob.expiration_month);
@@ -122,6 +124,16 @@ int main(int argc, char **argv) {
 			// TODO: make sure it ends with endm
 			fmt::print("{}\n\n", s);
 		}
+
+		std::ofstream out(sprite_filename, std::ios_base::binary);
+		write16le(out, 1);
+		write32le(out, 10);
+		write16le(out, cob.picture_width);
+		write16le(out, cob.picture_height);
+		for (int row = cob.picture_height - 1; row >= 0; row--) {
+			out.write((char*)cob.picture_data.data() + cob.picture_width * row, cob.picture_width);
+		}
+
 	} else {
 		fmt::print(stderr, "Not a recognized COB format: bad magic 0x{:02x}{:02x}{:02x}{:02x}\n", magic[0], magic[1], magic[2], magic[3]);
 		exit(1);
