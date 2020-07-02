@@ -28,7 +28,7 @@ std:
 	SIGN       = [-+];
 
 	("\r\n" | "\n") {
-		v.push_back(token(token::TOK_WHITESPACE, std::string(basep, p - basep), yylineno));
+		v.push_back(token(token::TOK_NEWLINE, std::string(basep, p - basep), yylineno));
 		++yylineno;
 		goto std;
 	}
