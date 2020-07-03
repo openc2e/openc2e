@@ -35,7 +35,6 @@ enum ci_type {
 	CI_SUBCOMMAND,
 	CI_ANYVALUE,
 	CI_CONDITION,
-	CI_LABEL,
 };
 
 struct cmdinfo {

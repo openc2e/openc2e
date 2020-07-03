@@ -12,7 +12,7 @@ TDISP = {
     "anything": "CI_OTHER",
     "condition": "CI_CONDITION",
     "decimal": "CI_NUMERIC",
-    "label": "CI_LABEL",
+    "label": "CI_BAREWORD",
     "vector": "CI_VECTOR",
     "bareword": "CI_BAREWORD",
     "subcommand": "CI_SUBCOMMAND",
