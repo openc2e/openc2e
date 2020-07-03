@@ -9,7 +9,7 @@ TDISP = {
     "agent": "CI_AGENT",
     "bytestring": "CI_BYTESTR",
     "variable": "CI_VARIABLE",
-    "anything": "CI_OTHER",
+    "anything": "CI_ANYVALUE",
     "condition": "CI_CONDITION",
     "decimal": "CI_NUMERIC",
     "label": "CI_BAREWORD",
