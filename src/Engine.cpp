@@ -409,7 +409,7 @@ void Engine::handleKeyboardScrolling() {
 	static float vely = 0;
 
 	bool wasdMode = false;
-	caosVar v = world.variables["engine_wasd"];
+	caosValue v = world.variables["engine_wasd"];
 	if (v.hasInt()) {
 		switch (v.getInt()) {
 			case 1: // enable if CTRL is held
@@ -424,7 +424,7 @@ void Engine::handleKeyboardScrolling() {
 				break;
 			default: // disable
 				std::cout << "Warning: engine_wasd_scrolling is set to unknown value " << v.getInt() << std::endl;
-				world.variables["engine_wasd_scrolling"] = caosVar(0);
+				world.variables["engine_wasd_scrolling"] = caosValue(0);
 				wasdMode = false;
 				break;
 		}
@@ -527,8 +527,8 @@ void Engine::handleMouseMove(SomeEvent &event) {
 	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
 		if ((*i)->imsk_mouse_move) {
-			caosVar x; x.setFloat(world.hand()->pointerX());
-			caosVar y; y.setFloat(world.hand()->pointerY());
+			caosValue x; x.setFloat(world.hand()->pointerX());
+			caosValue y; y.setFloat(world.hand()->pointerY());
 			(*i)->queueScript(75, 0, x, y); // Raw Mouse Move
 		}
 	}
@@ -541,7 +541,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 		if ((event.type == eventmousebuttonup && (*i)->imsk_mouse_up) ||
 			(event.type == eventmousebuttondown && (*i)->imsk_mouse_down)) {
 			// set the button value as necessary
-			caosVar button;
+			caosValue button;
 			switch (event.button) { // Backend guarantees that only one button will be set on a mousebuttondown event.
 				// the values here make fuzzie suspicious that c2e combines these events
 				// nornagon seems to think c2e doesn't
@@ -563,7 +563,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 			(event.button == buttonwheelup || event.button == buttonwheeldown) &&
 			(*i)->imsk_mouse_wheel)) {
 			// fire the mouse wheel event with the relevant delta value
-			caosVar delta;
+			caosValue delta;
 			if (event.button == buttonwheeldown)
 				delta.setInt(-120);
 			else
@@ -609,7 +609,7 @@ void Engine::handleTextInput(SomeEvent &event) {
 	}
 
 	// notify agents
-	caosVar k;
+	caosValue k;
 	k.setInt(translated_char);
 	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
@@ -656,7 +656,7 @@ void Engine::handleRawKeyDown(SomeEvent &event) {
 	}
 
 	// handle debug keys, if they're enabled
-	caosVar v = world.variables["engine_debug_keys"];
+	caosValue v = world.variables["engine_debug_keys"];
 	if (v.hasInt() && v.getInt() == 1) {
 		if (backend->keyDown(OPENC2E_KEY_SHIFT)) {
 			MetaRoom *n; // for pageup/pagedown
@@ -705,7 +705,7 @@ void Engine::handleRawKeyDown(SomeEvent &event) {
 	}
 
 	// notify agents
-	caosVar k;
+	caosValue k;
 	k.setInt(event.key);
 	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
@@ -979,8 +979,8 @@ bool Engine::initialSetup() {
 
 	if (world.data_directories.size() < 3) {
 		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
-		caosVar name; name.setString("engine_no_auxiliary_bootstrap_1");
-		caosVar contents; contents.setInt(1);
+		caosValue name; name.setString("engine_no_auxiliary_bootstrap_1");
+		caosValue contents; contents.setInt(1);
 		eame_variables[name] = contents;
 	}
 

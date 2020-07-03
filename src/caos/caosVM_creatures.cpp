@@ -568,7 +568,7 @@ void caosVM::c_NORN() {
  Returns the target Creature.
 */
 CAOS_LVALUE(NORN, (void)0,
-		caosVar(world.selectedcreature),
+		caosValue(world.selectedcreature),
 		world.selectCreature(newvalue.getAgent())
 	)
 

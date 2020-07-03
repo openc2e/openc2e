@@ -21,7 +21,7 @@
 #define __AGENT_H
 
 #include "AgentRef.h"
-#include "caosVar.h"
+#include "caosValue.h"
 #include "CompoundPart.h"
 #include <cassert>
 #include <list>
@@ -60,8 +60,8 @@ private:
 protected:
 	int lastScript;
 
-	caosVar var[100]; // OVxx
-	std::map<caosVar, caosVar, caosVarCompare> name_variables;
+	caosValue var[100]; // OVxx
+	std::map<caosValue, caosValue, caosValueCompare> name_variables;
 	
 	int unused_cint;
 	
@@ -88,7 +88,7 @@ protected:
 	bool dying : 1;
 	
 	void vmTick();
-	virtual bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
+	virtual bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
 
 	virtual void physicsTick();
 	void physicsTickC2();
@@ -177,17 +177,17 @@ public:
 	int category;
 
 	// motion
-	caosVar velx, vely;
+	caosValue velx, vely;
 
 	float avel, fvel, svel;
 	float admp, fdmp, sdmp;
 	float spin;
 	unsigned int spritesperrotation, numberrotations;
 
-	caosVar accg, aero;
+	caosValue accg, aero;
 	unsigned int friction;
 	int perm, elas;
-	caosVar rest;
+	caosValue rest;
 
 	float x, y;
 
@@ -199,16 +199,16 @@ public:
 	bool moved_last_tick : 1; // TODO: icky hack
 	std::weak_ptr<class Room> roomcache[5];
 
-	caosVar range;
+	caosValue range;
 
 	AgentRef floatingagent;
 
 	// Creatures 1/2 bits
-	caosVar objp, babymoniker;
+	caosValue objp, babymoniker;
 
 	// Creatures 2
 	// TODO: size likely duplicate of perm
-	caosVar actv, thrt, size;
+	caosValue actv, thrt, size;
 
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
@@ -227,7 +227,7 @@ public:
 	void addCarried(AgentRef);
 	void dropCarried(AgentRef);
 
-	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
+	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosValue p0 = caosValue(), caosValue p1 = caosValue());
 	void stopScript();
 	void pushVM(caosVM *newvm);
 	bool vmStopped();

@@ -225,7 +225,7 @@ shared_ptr<script> Agent::findScript(unsigned short event) {
 #include "PointerAgent.h"
 #include "creatures/CreatureAgent.h"
 #include "creatures/Creature.h"
-bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
+bool Agent::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
 	// Start running the specified script on the VM of this agent, with FROM set to the provided agent.
 
 	if (dying) return false;
@@ -341,7 +341,7 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosVar one, caosVar t
 	return ranscript;
 }
 
-bool Agent::queueScript(unsigned short event, AgentRef from, caosVar p0, caosVar p1) {
+bool Agent::queueScript(unsigned short event, AgentRef from, caosValue p0, caosValue p1) {
 	// Queue a script for execution on the VM of this agent.
 
 	if (dying) return false;

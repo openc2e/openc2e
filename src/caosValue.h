@@ -1,5 +1,5 @@
 /*
- *  caosVar.h
+ *  caosValue.h
  *  openc2e
  *
  *  Created by Bryan Donlan on Thu Mar 10 2005.
@@ -17,8 +17,7 @@
  *
  */
 
-#ifndef CAOSVAR_H
-#define CAOSVAR_H 1
+#pragma once
 
 #include <memory>
 #include <mpark/variant.hpp>
@@ -33,7 +32,7 @@
 
 class Agent;
 
-class wrongCaosVarTypeException : public caosException {
+class wrongCaosValueTypeException : public caosException {
 	public:
 		using caosException::caosException;
 };
@@ -44,10 +43,10 @@ enum variableType {
 	CAOSNULL = 0, CAOSAGENT, CAOSINT, CAOSFLOAT, CAOSSTR, CAOSVEC
 };
 
-class caosVar {
+class caosValue {
 	private:
-		COUNT_ALLOC(caosVar)
-		FRIEND_SERIALIZE(caosVar)
+		COUNT_ALLOC(caosValue)
+		FRIEND_SERIALIZE(caosValue)
 	protected:
 		struct typeVisit {
 			variableType operator()(int) const { return CAOSINT; }
@@ -61,8 +60,8 @@ class caosVar {
 #define BAD_TYPE(et, gt) \
 		std::conditional<std::is_fundamental<et>::value, et, std::add_lvalue_reference<std::add_const<et>::type>::type>::type \
 		operator()(const gt &) const { \
-			throw wrongCaosVarTypeException( \
-					"Wrong caosVar type: Expected " #et ", got " #gt \
+			throw wrongCaosValueTypeException( \
+					"Wrong caosValue type: Expected " #et ", got " #gt \
 					); \
 		}
 		
@@ -144,25 +143,25 @@ class caosVar {
 			return getType() == CAOSNULL;
 		}
 
-		caosVar() {
+		caosValue() {
 		}
 
-		~caosVar() {
+		~caosValue() {
 		}
 
-		caosVar &operator=(const caosVar &copyFrom) {
+		caosValue &operator=(const caosValue &copyFrom) {
 			value = copyFrom.value;
 			return *this;
 		}
 
-		caosVar(const caosVar &copyFrom) : value(copyFrom.value) { }
+		caosValue(const caosValue &copyFrom) : value(copyFrom.value) { }
 		
-		caosVar(int v) { setInt(v); }
-		caosVar(float v) { setFloat(v); }
-		caosVar(Agent *v) { setAgent(v); }
-		caosVar(const AgentRef &v) { setAgent(v); }
-		caosVar(const std::string &v) { setString(v); } 
-		caosVar(const Vector<float> &v) { setVector(v); }
+		caosValue(int v) { setInt(v); }
+		caosValue(float v) { setFloat(v); }
+		caosValue(Agent *v) { setAgent(v); }
+		caosValue(const AgentRef &v) { setAgent(v); }
+		caosValue(const std::string &v) { setString(v); } 
+		caosValue(const Vector<float> &v) { setVector(v); }
 		
 		bool isEmpty() const { return getType() == CAOSNULL; }
 		bool hasInt() const { return getType() == CAOSINT; }
@@ -216,16 +215,16 @@ class caosVar {
 			return mpark::visit(vectorVisit(), value);
 		}
 
-		bool operator == (const caosVar &v) const;
-		bool operator != (const caosVar &v) const { return !(*this == v); }
-		bool operator > (const caosVar &v) const;
-		bool operator < (const caosVar &v) const;
+		bool operator == (const caosValue &v) const;
+		bool operator != (const caosValue &v) const { return !(*this == v); }
+		bool operator > (const caosValue &v) const;
+		bool operator < (const caosValue &v) const;
 
 		std::string dump() const;
 };
 
-struct caosVarCompare {
-	bool operator()(const caosVar &v1, const caosVar &v2) const {
+struct caosValueCompare {
+	bool operator()(const caosValue &v1, const caosValue &v2) const {
 		if (v1.getType() == v2.getType())
 			return v1 < v2;
 		else
@@ -233,5 +232,4 @@ struct caosVarCompare {
 	}
 };
 
-#endif
 /* vim: set noet: */

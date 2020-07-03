@@ -53,7 +53,7 @@ void CallButton::tick() {
 	}
 }
 
-bool CallButton::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
+bool CallButton::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
 	Lift *ourlift = dynamic_cast<Lift *>(lift.get());
 	assert(ourlift);
 

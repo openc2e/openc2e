@@ -232,7 +232,7 @@ void caosVM::c_ENUM() {
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	caosVar nullv; nullv.reset();
+	caosValue nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
 	for (std::list<std::shared_ptr<Agent> >::iterator i
@@ -243,7 +243,7 @@ void caosVM::c_ENUM() {
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		caosVar v; v.setAgent(a);
+		caosValue v; v.setAgent(a);
 		valueStack.push_back(v);
 	}
 }
@@ -268,12 +268,12 @@ void caosVM::c_ESEE() {
 	if (owner) seeing = owner; else seeing = targ;
 	valid_agent(seeing);
 
-	caosVar nullv; nullv.reset();
+	caosValue nullv; nullv.reset();
 	valueStack.push_back(nullv);
 
 	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
 	for (std::vector<std::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
-		caosVar v; v.setAgent(*i);
+		caosValue v; v.setAgent(*i);
 		valueStack.push_back(v);
 	}
 }
@@ -296,7 +296,7 @@ void caosVM::c_ETCH() {
 	if (owner) touching = owner; else touching = targ;
 	valid_agent(touching);
 	
-	caosVar nullv; nullv.reset();
+	caosValue nullv; nullv.reset();
 	valueStack.push_back(nullv);
 	
 	for (std::list<std::shared_ptr<Agent> >::iterator i
@@ -309,7 +309,7 @@ void caosVM::c_ETCH() {
 		if (a.get() == touching) continue;
 
 		if (agentsTouching(a.get(), touching)) {
-			caosVar v; v.setAgent(a);
+			caosValue v; v.setAgent(a);
 			valueStack.push_back(v);
 		}
 	}
@@ -332,7 +332,7 @@ void caosVM::c_EPAS() {
 	Vehicle *v = dynamic_cast<Vehicle *>(owner.get());
 	caos_assert(v);
 
-	caosVar nullv; nullv.reset();
+	caosValue nullv; nullv.reset();
 	valueStack.push_back(nullv);
 
 	for (std::vector<AgentRef>::iterator i = v->passengers.begin(); i != v->passengers.end(); i++) {
@@ -342,7 +342,7 @@ void caosVM::c_EPAS() {
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		caosVar v; v.setAgent(a); valueStack.push_back(v);
+		caosValue v; v.setAgent(a); valueStack.push_back(v);
 	}
 }
 
@@ -359,7 +359,7 @@ void caosVM::c_ECON() {
 
 	// TODO: should probably implement this (ECON)
 
-	caosVar nullv; nullv.reset();
+	caosValue nullv; nullv.reset();
 	valueStack.push_back(nullv);
 }
 
@@ -380,7 +380,7 @@ void caosVM::c_ESCN() {
 	// TODO: should implement this. C2 has a concept of "scenery objects" created
 	// with NEW: SCEN.
 
-	caosVar nullv; nullv.reset();
+	caosValue nullv; nullv.reset();
 	valueStack.push_back(nullv);
 }
 

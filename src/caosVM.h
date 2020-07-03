@@ -28,7 +28,7 @@
 #include <ostream>
 #include <sstream>
 #include "AgentRef.h"
-#include "caosVar.h"
+#include "caosValue.h"
 #include "alloc_count.h"
 
 #include <mpark/variant.hpp>
@@ -55,11 +55,11 @@ class vmStackItem {
 	COUNT_ALLOC(vmStackItem)
 	protected:
 		struct visit_dump {
-			std::string operator()(const caosVar &i) const {
+			std::string operator()(const caosValue &i) const {
 				return i.dump();
 			}
 
-			std::string operator()(caosVar *i) const {
+			std::string operator()(caosValue *i) const {
 				return std::string("ptr ") + i->dump();
 			}
 
@@ -76,15 +76,15 @@ class vmStackItem {
 
 		struct visit_lval {
 			
-			const caosVar &operator()(const caosVar &i) const {
+			const caosValue &operator()(const caosValue &i) const {
 				return i;
 			}
 
-			const caosVar &operator()(caosVar *i) const {
+			const caosValue &operator()(caosValue *i) const {
 				return *i;
 			}
 
-			const caosVar &operator()(const bytestring_t &) const {
+			const caosValue &operator()(const bytestring_t &) const {
 				throw badParamException();
 			}
 				
@@ -94,19 +94,19 @@ class vmStackItem {
 			bytestring_t operator()(const bytestring_t &i) const {
 				return i;
 			}
-			bytestring_t operator()(caosVar *) const {
+			bytestring_t operator()(caosValue *) const {
 				throw badParamException();
 			}
-			bytestring_t operator()(const caosVar &) const {
+			bytestring_t operator()(const caosValue &) const {
 				throw badParamException();
 			}
 		};
 				
-		mpark::variant<caosVar, bytestring_t> value;
+		mpark::variant<caosValue, bytestring_t> value;
 
 	public:
 
-		vmStackItem(const caosVar &v) {
+		vmStackItem(const caosValue &v) {
 			value = v;
 		}
 
@@ -118,7 +118,7 @@ class vmStackItem {
 			value = orig.value;
 		}
 
-		const caosVar &getRVal() const {
+		const caosValue &getRVal() const {
 			try {
 				return mpark::visit(visit_lval(), value);
 			} catch (mpark::bad_variant_access &e) {
@@ -159,7 +159,7 @@ class blockCond {
 
 // for lazy_array init
 struct caosVM_var_init {
-	static inline void init(caosVar &v) { v = 0; }
+	static inline void init(caosValue &v) { v = 0; }
 };
 
 class caosVM {
@@ -191,10 +191,10 @@ public:
 	std::ostream *outputstream;
 
 	// ...which includes variables accessible to script
-	std::array<caosVar, 100> var;
-	caosVar _p_[2]; // might want to add this onto the end of above map, if done
+	std::array<caosValue, 100> var;
+	caosValue _p_[2]; // might want to add this onto the end of above map, if done
 	AgentRef targ, owner, _it_;
-	caosVar from;
+	caosValue from;
 	int part;
 	weak_ptr<class Camera> camera;
 	class Camera *getCamera();
@@ -205,11 +205,11 @@ private:
 	void resetCore();
 public:
 
-	caosVar result;
+	caosValue result;
 	
 public:
 	void setTarg(const AgentRef &a) { targ = a; }
-	void setVariables(caosVar &one, caosVar &two) { _p_[0] = one; _p_[1] = two; }
+	void setVariables(caosValue &one, caosValue &two) { _p_[0] = one; _p_[1] = two; }
 	void setOwner(Agent *a) { owner = a; }
 	void setOutputStream(std::ostream &o) { outputstream = &o; }
 
@@ -1143,7 +1143,7 @@ class caosVM__lval {
 	protected:
 		caosVM *owner;
 	public:
-		caosVar value;
+		caosValue value;
 		caosVM__lval(caosVM *vm) : owner(vm) {
 			VM_STACK_CHECK(vm);
 			value = owner->valueStack.back().getRVal();
@@ -1154,7 +1154,7 @@ class caosVM__lval {
 		}
 };
 
-#define VM_PARAM_VALUE(name) caosVar name; { VM_STACK_CHECK(vm); \
+#define VM_PARAM_VALUE(name) caosValue name; { VM_STACK_CHECK(vm); \
 	vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_STRING(name) std::string name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
@@ -1169,8 +1169,8 @@ class caosVM__lval {
 	name = __x.getRVal().getAgent(); } vm->valueStack.pop_back();
 // TODO: is usage of valid_agent correct here, or should we be caos_asserting?
 #define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) valid_agent(name);
-#define VM_PARAM_VARIABLE(name) caosVM__lval vm__lval_##name(this); caosVar * const name = &vm__lval_##name.value;
-#define VM_PARAM_DECIMAL(name) caosVar name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+#define VM_PARAM_VARIABLE(name) caosVM__lval vm__lval_##name(this); caosValue * const name = &vm__lval_##name.value;
+#define VM_PARAM_DECIMAL(name) caosValue name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
 	name = __x.getRVal(); } vm->valueStack.pop_back();
 #define VM_PARAM_BYTESTR(name) bytestring_t name; { \
 	VM_STACK_CHECK(vm); \

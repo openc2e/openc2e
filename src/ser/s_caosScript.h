@@ -2,7 +2,7 @@
 #define SER_CAOSSCRIPT_H 1
 
 #include "serialization.h"
-#include "ser/s_caosVar.h"
+#include "ser/s_caosValue.h"
 #include "caosScript.h"
 #include "ser/s_bytecode.h"
 #include "ser/s_shared_str.h"

@@ -58,7 +58,7 @@ void caosVM::v_ADDM() {
 	VM_PARAM_INTEGER(x)
 
 	MetaRoom *r = new MetaRoom(x, y, width, height, background);
-	caosVar v;
+	caosValue v;
 	v.setInt(world.map->addMetaRoom(r));
 	result = v;
 }
@@ -1227,7 +1227,7 @@ CAOS_LVALUE(WRAP,
 		VM_PARAM_INTEGER(metaroom_id);
 		MetaRoom *mr = world.map->getMetaRoom(metaroom_id);
 		caos_assert(mr),
-		caosVar((int)mr->wraparound()),
+		caosValue((int)mr->wraparound()),
 		mr->setWraparound(newvalue.getInt())
 		)
 

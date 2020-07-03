@@ -20,7 +20,7 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
-#include "caosVar.h"
+#include "caosValue.h"
 #include <map>
 #include <ghc/filesystem.hpp>
 #include <memory>
@@ -63,7 +63,7 @@ protected:
 	void loadGameData();
 
 public:
-	std::map<caosVar, caosVar, caosVarCompare> eame_variables; // non-serialised
+	std::map<caosValue, caosValue, caosValueCompare> eame_variables; // non-serialised
 	
 	std::shared_ptr<Backend> backend;
 	std::shared_ptr<class AudioBackend> audio;

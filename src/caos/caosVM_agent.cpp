@@ -1584,7 +1584,7 @@ void caosVM::c_DROP() {
 
 	// TODO: what exactly are we meant to do here? firing the script directly is perhaps not right, but drops must be instant
 	if (targ->carrying) // TODO: valid?
-		targ->carrying->fireScript(5, targ, caosVar(), caosVar());
+		targ->carrying->fireScript(5, targ, caosValue(), caosValue());
 
 	// TODO: only creatures in c1 (and c2?)
 }
@@ -2009,7 +2009,7 @@ void caosVM::c_EDIT() {
 */
 void caosVM::v_FRZN() {
 	valid_agent(targ);
-	caosVar r = targ->frozen ? 1 : 0;
+	caosValue r = targ->frozen ? 1 : 0;
 	valueStack.push_back(r);
 }
 void caosVM::s_FRZN() {

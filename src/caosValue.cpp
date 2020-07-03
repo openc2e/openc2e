@@ -1,5 +1,5 @@
 /*
- *  caosVar.cpp
+ *  caosValue.cpp
  *  openc2e
  *
  *  Created by Bryan Donlan on Thu Mar 10 2005.
@@ -19,7 +19,7 @@
 
 #define IN_CAOSVAR_CPP
 
-#include "caosVar.h"
+#include "caosValue.h"
 #include "Engine.h" // version
 #include "World.h" // unid
 
@@ -28,7 +28,7 @@
 #include <fmt/printf.h>
 
 #ifdef DONT_INLINE_CAOSVAR_ACCESSORS
-#error meh, copy the stuff out of caosVar.h and drop it here
+#error meh, copy the stuff out of caosValue.h and drop it here
 #endif
 
 static inline std::string stringify(double x) {
@@ -37,7 +37,7 @@ static inline std::string stringify(double x) {
 	return o.str();
 }
 
-std::string caosVar::dump() const {
+std::string caosValue::dump() const {
 	switch(getType()) {
 		case CAOSSTR:
 			return fmt::sprintf("String \"%s\" ", getString());
@@ -55,12 +55,12 @@ std::string caosVar::dump() const {
 			return fmt::sprintf("Vector (%f, %f)", getVector().x, getVector().y);
 			break;
 		default:
-			return "[bad caosVar!] ";
+			return "[bad caosValue!] ";
 			break;
 	};
 }
 
-bool caosVar::operator == (const caosVar &v) const {
+bool caosValue::operator == (const caosValue &v) const {
 	// todo: should be able to compare int and float, apparently
 	if (this->hasInt() && v.hasInt()) {
 		return this->getInt() == v.getInt();
@@ -83,10 +83,10 @@ bool caosVar::operator == (const caosVar &v) const {
 		}
 	}
 
-	throw caosException(std::string("caosVar operator == couldn't compare ") + this->dump() + "and " + v.dump());
+	throw caosException(std::string("caosValue operator == couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
-bool caosVar::operator > (const caosVar &v) const {
+bool caosValue::operator > (const caosValue &v) const {
 	if (this->hasDecimal() && v.hasDecimal()) {
 		return this->getFloat() > v.getFloat();
 	} else if (this->hasString() && v.hasString()) {
@@ -104,10 +104,10 @@ bool caosVar::operator > (const caosVar &v) const {
 		else return false;
 	}
 	
-	throw caosException(std::string("caosVar operator > couldn't compare ") + this->dump() + "and " + v.dump());
+	throw caosException(std::string("caosValue operator > couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
-bool caosVar::operator < (const caosVar &v) const {
+bool caosValue::operator < (const caosValue &v) const {
 	if (this->hasDecimal() && v.hasDecimal()) {
 		return this->getFloat() < v.getFloat();
 	} else if (this->hasString() && v.hasString()) {
@@ -116,13 +116,13 @@ bool caosVar::operator < (const caosVar &v) const {
 		return (*this != v) && !(*this > v);
 	}
 	
-	throw caosException(std::string("caosVar operator < couldn't compare ") + this->dump() + "and " + v.dump());
+	throw caosException(std::string("caosValue operator < couldn't compare ") + this->dump() + "and " + v.dump());
 }
 
 AgentRef nullagentref;
 
 // TODO: muh
-const AgentRef &caosVar::agentVisit::operator()(int i) const {
+const AgentRef &caosValue::agentVisit::operator()(int i) const {
 	if (engine.version == 2) {
 		if (i == 0) {
 			return nullagentref;
@@ -131,7 +131,7 @@ const AgentRef &caosVar::agentVisit::operator()(int i) const {
 		// TODO: unid magic?
 	}
 
-	throw wrongCaosVarTypeException("Wrong caosVar type: Expected agent, got int");
+	throw wrongCaosValueTypeException("Wrong caosValue type: Expected agent, got int");
 }
 
 /* vim: set noet: */

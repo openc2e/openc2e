@@ -147,7 +147,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 			{
 				int idx = op.argument;
 				std::string err = "aborted";
-				caosVar constVal = s->getConstant(idx);
+				caosValue constVal = s->getConstant(idx);
 				if (constVal.hasString())
 					err = constVal.getString();
 				throw creaturesException(err);
@@ -218,7 +218,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 					result = (condaccum && result);
 				else
 					result = (condaccum || result);
-				valueStack.push_back(caosVar(result));
+				valueStack.push_back(caosValue(result));
 				break;
 			}
 		case CAOS_CONST:
@@ -228,7 +228,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 			}
 		case CAOS_CONSTINT:
 			{
-				valueStack.push_back(vmStackItem(caosVar(op.argument)));
+				valueStack.push_back(vmStackItem(caosValue(op.argument)));
 				break;
 			}
 		case CAOS_BYTESTR:
@@ -281,7 +281,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				counter--;
 				if (counter) {
 					safeJMP(op.argument);
-					valueStack.push_back(caosVar(counter));
+					valueStack.push_back(caosValue(counter));
 				}
 				break;
 			}

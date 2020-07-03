@@ -196,11 +196,11 @@ void evalVisit::operator()(const CAOSCmd &cmd) const {
 	}
 }
 
-void evalVisit::operator()(const caosVar &v) const {
+void evalVisit::operator()(const caosValue &v) const {
 	scr->emitConst(v);
 }
 
-void caosScript::emitConst(const caosVar &v) {
+void caosScript::emitConst(const caosValue &v) {
 	if (v.hasInt()) {
 		int val = v.getInt();
 		if (val >= -(1 << 24) && val < (1 << 24)) {
@@ -429,20 +429,20 @@ void caosScript::parse(std::istream &in) {
 	}
 }
 
-caosVar caosScript::asConst(const caostoken& token) {
+caosValue caosScript::asConst(const caostoken& token) {
 	switch (token.type) {
 		case caostoken::TOK_STRING:
-			return caosVar(token.stringval());
+			return caosValue(token.stringval());
 		case caostoken::TOK_CHAR:
 		case caostoken::TOK_BINARY:
 		case caostoken::TOK_INT:
-			return caosVar(token.intval());
+			return caosValue(token.intval());
 		case caostoken::TOK_FLOAT:
-			return caosVar(token.floatval());
+			return caosValue(token.floatval());
 		case caostoken::TOK_BYTESTR:
 		{
 			if (d->name == "c1" || d->name == "c2") {
-				return caosVar(token.stringval());
+				return caosValue(token.stringval());
 			}
 			unexpectedToken(token);
 		}
@@ -517,7 +517,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 	traceindex = errindex = curindex;
 	if (xtype == CI_BAREWORD) {
 		if (logicalType(t) == TOK_WORD) {
-			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, caosVar(t->word())));
+			return std::shared_ptr<CAOSExpression>(new CAOSExpression(errindex, caosValue(t->word())));
 		} else if (logicalType(t) == TOK_CONST) {
 			if (asConst(*t).getType() != CAOSSTR)
 				unexpectedToken(*t);
@@ -560,7 +560,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 			const cmdinfo *op = readCommand(t, std::string("expr "));
 			t->setWord(oldpayload);
 
-			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
+			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosValue(idx)));
 			cmd->op = op;
 			cmd->arguments.push_back(arg);
 			return ce;
@@ -578,7 +578,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 			const cmdinfo *op = readCommand(t, std::string("expr "));
 			t->setWord(oldpayload);
 
-			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosVar(idx)));
+			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosValue(idx)));
 			cmd->op = op;
 			cmd->arguments.push_back(arg);
 			return ce;
@@ -674,7 +674,7 @@ void caosScript::parseloop(int state, void *info) {
 			state = ST_BODY;
 			int bits[4];
 			for (int i = 0; i < 4; i++) {
-				caosVar val = asConst(*getToken(TOK_CONST));
+				caosValue val = asConst(*getToken(TOK_CONST));
 				if (val.getType() != CAOSINT)
 					throw parseException("Expected integer constant");
 				bits[i] = val.getInt();
@@ -872,17 +872,17 @@ void caosScript::parseloop(int state, void *info) {
 		} else if (t->word() == "ssfc") {
 			std::shared_ptr<CAOSExpression> roomno_e = readExpr(CI_NUMERIC);
 
-			caosVar coordcount = asConst(*getToken(TOK_CONST));
+			caosValue coordcount = asConst(*getToken(TOK_CONST));
 			if (!coordcount.hasInt())
 				throw parseException("Literal integer expected");
 			int count = coordcount.getInt();
 
 			std::vector<std::pair<int, int> > points(count);
 			for (int i = 0; i < count; i++) {
-				caosVar cvx = asConst(*getToken(TOK_CONST));
+				caosValue cvx = asConst(*getToken(TOK_CONST));
 				if (!cvx.hasInt())
 					throw parseException("Literal integer expected");
-				caosVar cvy = asConst(*getToken(TOK_CONST));
+				caosValue cvy = asConst(*getToken(TOK_CONST));
 				if (!cvy.hasInt())
 					throw parseException("Literal integer expected");
 				points[i].first = cvx.getInt();
@@ -892,8 +892,8 @@ void caosScript::parseloop(int state, void *info) {
 			// emit the values in backwards order
 			for (int i = points.size() - 1; i >= 0; i--) {
 				// y first
-				emitConst(caosVar(points[i].second));
-				emitConst(caosVar(points[i].first));
+				emitConst(caosValue(points[i].second));
+				emitConst(caosValue(points[i].first));
 			}
 			emitConst(coordcount);
 			emitExpr(roomno_e);

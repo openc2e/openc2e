@@ -34,7 +34,7 @@ Lift::Lift(std::string spritefile, unsigned int firstimage, unsigned int imageco
  */
 
 #include "World.h"
-bool Lift::fireScript(unsigned short event, Agent *from, caosVar one, caosVar two) {
+bool Lift::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
 	if (event == 1 || event == 2) {
 		if (!liftAvailable()) return false; // TODO: hack to make sure the lifts aren't activated when not ready
 	}

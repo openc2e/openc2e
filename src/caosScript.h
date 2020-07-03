@@ -26,11 +26,11 @@
 #include <string>
 #include <istream>
 #include <map>
-#include "caosVar.h"
+#include "caosValue.h"
 #include <cassert>
 #include "openc2e.h"
 #include "bytecode.h"
-#include "caosVar.h"
+#include "caosValue.h"
 #include "dialect.h"
 #include "fileformats/caostoken.h"
 #include "shared_str.h"
@@ -74,8 +74,8 @@ class script {
 		// table of all non-trivial constants in the script
 		// small immediates integers are done with CAOS_CONSTINT
 		// mostly for strings and floats
-		std::vector<caosVar> consts;
-		// because caosVar doesn't store bytestrings, we store them in a separate
+		std::vector<caosValue> consts;
+		// because caosValue doesn't store bytestrings, we store them in a separate
 		// table
 		std::vector<bytestring_t> bytestrs;
 		// a normalized copy of the script source. this is used for error tracing
@@ -97,7 +97,7 @@ class script {
 			return ops.size();
 		}
 
-		caosVar getConstant(int idx) const {
+		caosValue getConstant(int idx) const {
 			if (idx < 0 || (size_t)idx >= consts.size()) {
 				throw caosException(
 						fmt::sprintf("Internal error: const %d out of range", idx)
@@ -193,7 +193,7 @@ struct CAOSCmd {
 };
 
 struct CAOSExpression {
-	mpark::variant<CAOSCmd, caosVar, bytestring_t> value;
+	mpark::variant<CAOSCmd, caosValue, bytestring_t> value;
 	int traceidx;
 	void eval(caosScript *scr, bool save_here) const;
 	void save(caosScript *scr) const;
@@ -201,7 +201,7 @@ struct CAOSExpression {
 
 	CAOSExpression(const CAOSExpression &e) : value(e.value), traceidx(e.traceidx) { }
 	CAOSExpression(int idx, const CAOSCmd &c) : value(c), traceidx(idx) { mpark::get<CAOSCmd>(value).traceidx = traceidx; }
-	CAOSExpression(int idx, const caosVar &c) : value(c), traceidx(idx) { }
+	CAOSExpression(int idx, const caosValue &c) : value(c), traceidx(idx) { }
 	CAOSExpression(int idx, const bytestring_t &c) : value(c), traceidx(idx) { }
 };
 
@@ -212,7 +212,7 @@ struct costVisit {
 		costVisit() {}
 		int operator()(const CAOSCmd &cmd) const;
 
-		int operator()(const caosVar &v) const { (void)v; return 0; }
+		int operator()(const caosValue &v) const { (void)v; return 0; }
 		int operator()(const bytestring_t &v) const { (void)v;return 0; }
 };
 
@@ -223,7 +223,7 @@ struct saveVisit {
 		saveVisit(class caosScript *s);
 		void operator()(const CAOSCmd &cmd) const;
 
-		void operator()(const caosVar &v) const { (void)v; }
+		void operator()(const caosValue &v) const { (void)v; }
 		void operator()(const bytestring_t &v) const { (void)v; }
 };
 
@@ -234,7 +234,7 @@ struct evalVisit {
 	public:
 		evalVisit(caosScript *s, bool save_here);
 		void operator()(const CAOSCmd &cmd) const;
-		void operator()(const caosVar &v) const;
+		void operator()(const caosValue &v) const;
 		void operator()(const bytestring_t &bs) const;
 };
 
@@ -257,13 +257,13 @@ protected:
 	void parseCondition();
 	void emitOp(opcode_t op, int argument);
 	void emitCmd(const char *name);
-	void emitConst(const caosVar &);
+	void emitConst(const caosValue &);
 	std::shared_ptr<CAOSExpression> readExpr(const enum ci_type xtype);
 	void emitExpr(std::shared_ptr<CAOSExpression> ce);
 	const cmdinfo *readCommand(caostoken *t, const std::string &prefix, bool except = true);
 	void parseloop(int state, void *info);
 
-	caosVar asConst(const caostoken& token);
+	caosValue asConst(const caostoken& token);
 	[[ noreturn ]]
 	void unexpectedToken(const caostoken& token);
 

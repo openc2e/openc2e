@@ -11,8 +11,8 @@
 #include <sstream>
 #define CV 1
 
-#include "caosVar.h"
-#include "ser/s_caosVar.h"
+#include "caosValue.h"
+#include "ser/s_caosValue.h"
 #include "caosScript.h"
 #include "ser/s_caosScript.h"
 #include "ser/s_genome.h"
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     registerDelegates();
 
     std::ofstream ofs("sertest.dat");
-    caosVar null, str, intv, floatv;
+    caosValue null, str, intv, floatv;
     caosScript scr("c3", "<test input>");
 
     null.reset();
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
         const foo v(42);
         boost::archive::text_oarchive oa(ofs);
         oa << v;
-        oa << (const caosVar &)null << (const caosVar &)str << (const caosVar &)intv << (const caosVar &)floatv;
+        oa << (const caosValue &)null << (const caosValue &)str << (const caosValue &)intv << (const caosValue &)floatv;
         oa << (const caosScript &)scr;
         genomeFile *f = tryLoadGenome();
         oa << (const genomeFile * const)f;
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
     }
     ofs.close();
 
-    caosVar nnull, nstr, nintv, nfloatv;
+    caosValue nnull, nstr, nintv, nfloatv;
     caosScript si;
     {
         foo v;

@@ -130,7 +130,7 @@ void World::init() {
 	// *** set defaults for non-zero GAME engine variables
 	// TODO: this should be doing during world init, rather than global init
 	// TODO: not complete
-	caosVar v;
+	caosValue v;
 	variables.clear();
 
 	// core engine bits
@@ -178,7 +178,7 @@ void World::freeVM(caosVM *v) {
 	vmpool.push_back(v);
 }
 
-void World::queueScript(unsigned short event, AgentRef agent, AgentRef from, caosVar p0, caosVar p1) {
+void World::queueScript(unsigned short event, AgentRef agent, AgentRef from, caosValue p0, caosValue p1) {
 	scriptevent e;
 
 	assert(agent);
@@ -678,7 +678,7 @@ void World::selectCreature(std::shared_ptr<Agent> a) {
 	if (selectedcreature != a) {
 		for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 			if (!*i) continue;
-			(*i)->queueScript(120, 0, caosVar(a), caosVar(selectedcreature)); // selected creature changed
+			(*i)->queueScript(120, 0, caosValue(a), caosValue(selectedcreature)); // selected creature changed
 		}
 
 		selectedcreature = a;

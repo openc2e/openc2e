@@ -162,9 +162,9 @@ void caosVM::c_DBG_MALLOC() {
 	MPRINT(keepcost);
 	malloc_stats(); */
 	
-	/*std::cerr << "caosSlab free=" << caosVarSlab.free_elements() <<
-				 " used=" << caosVarSlab.used_elements() <<
-				 " total=" << caosVarSlab.total_elements() <<
+	/*std::cerr << "caosSlab free=" << caosValueSlab.free_elements() <<
+				 " used=" << caosValueSlab.used_elements() <<
+				 " total=" << caosValueSlab.total_elements() <<
 				 std::endl;*/
 }
 	
@@ -385,7 +385,7 @@ void caosVM::v_DBG_SIZO() {
 	std::ostringstream oss;
 #define SIZEOF_OUT(t) do { oss << "sizeof(" #t ") = " << sizeof(t) << std::endl; } while(0)
 	SIZEOF_OUT(caosVM);
-	SIZEOF_OUT(caosVar);
+	SIZEOF_OUT(caosValue);
 	SIZEOF_OUT(Agent);
 	SIZEOF_OUT(std::string);
 	SIZEOF_OUT(AgentRef);

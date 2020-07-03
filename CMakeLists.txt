@@ -150,7 +150,7 @@ add_library(openc2e-core STATIC
 	src/caosException.cpp
 	src/caosparser.cpp
 	src/caosScript.cpp
-	src/caosVar.cpp
+	src/caosValue.cpp
 	src/caos/caosVM_agent.cpp
 	src/caos/caosVM_camera.cpp
 	src/caos/caosVM_compound.cpp

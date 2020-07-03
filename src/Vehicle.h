@@ -35,7 +35,7 @@ public:
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount); // C1/C2 constructor
 
-	caosVar xvec, yvec;
+	caosValue xvec, yvec;
 	int cabinleft, cabintop, cabinright, cabinbottom; // TODO: should be protected w/accessors?
 	int cabinplane;
 

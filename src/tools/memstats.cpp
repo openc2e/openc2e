@@ -1,4 +1,4 @@
-#include "caosVar.h"
+#include "caosValue.h"
 #include "AgentRef.h"
 #include "Agent.h"
 #include "CompoundAgent.h"
@@ -22,7 +22,7 @@ int main() {
     PSIZE(AgentRef);
     PSIZE(variant);
     PSIZE(std::string);
-    PSIZE(caosVar);
+    PSIZE(caosValue);
     PSIZE(caosVM);
     PSIZE(std::weak_ptr<Agent>);
     return 0;

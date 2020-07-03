@@ -25,7 +25,7 @@
 #include <set>
 #include <utility>
 #include "physics.h"
-#include "caosVar.h"
+#include "caosValue.h"
 #include <iostream>
 #include <algorithm>
 
@@ -48,11 +48,11 @@ public:
 
 	Line left, right, top, bot;
 	
-	caosVar type;
+	caosValue type;
 
 	// Creatures 2
-	caosVar temp, lite, radn, ontr, intr, pres, hsrc, lsrc, rsrc, psrc;
-	caosVar floorvalue, dropstatus;
+	caosValue temp, lite, radn, ontr, intr, pres, hsrc, lsrc, rsrc, psrc;
+	caosValue floorvalue, dropstatus;
 	int windx, windy;
 	
 	std::string music;

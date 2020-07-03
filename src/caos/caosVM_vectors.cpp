@@ -19,7 +19,7 @@
 
 #include "caosVM.h"
 #include <cmath>
-#include "caosVar.h"
+#include "caosValue.h"
 #include "physics.h"
 
 #define PI (atanf(1)*4)

@@ -61,7 +61,7 @@ public:
 	void setZOrder(unsigned int plane);
 
 	int handleClick(float, float);
-	bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
+	bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
 	void setHotspotLoc(unsigned int id, int l, int t, int r, int b);
 	void setHotspotFunc(unsigned int id, unsigned int h);
 	void setHotspotFuncDetails(unsigned int id, uint16_t message, uint8_t flags);

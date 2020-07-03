@@ -142,7 +142,7 @@ CAOS_LVALUE(EAME, VM_PARAM_VALUE(name),
 void caosVM::c_DELG() {
 	VM_PARAM_STRING(name)
 
-	std::map<std::string, caosVar>::iterator i = world.variables.find(name);
+	std::map<std::string, caosValue>::iterator i = world.variables.find(name);
 	if (i != world.variables.end())
 		world.variables.erase(i);
 }
@@ -326,7 +326,7 @@ void caosVM::v_TOKN() {
 */
 CAOS_LVALUE(GAME_c2,
 	VM_PARAM_INTEGER(variable) VM_PARAM_INTEGER(category),
-	caosVar(),
+	caosValue(),
 	(void)0) // TODO
 
 #include <ghc/filesystem.hpp>

@@ -524,7 +524,7 @@ void caosVM::v_MOVS() {
 
 	valid_agent(targ);
 
-	caosVar r;
+	caosValue r;
 
 	// TODO: agents can possibly have multiple MOVS states right now, we should make sure to avoid that
 	if (targ->carriedby) {

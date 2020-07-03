@@ -2,7 +2,7 @@
 #define SER_AGENT_H 1
 
 #include "ser/s_AgentRef.h"
-#include "ser/s_caosVar.h"
+#include "ser/s_caosValue.h"
 #include "serialization.h"
 #include "Agent.h"
 #include <cassert>

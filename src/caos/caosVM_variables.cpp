@@ -203,7 +203,7 @@ void caosVM::v_TYPE() {
 				result.setInt(-2); // unknown agent
 		}
 	} else
-		throw creaturesException("caosVar confused us terribly in TYPE");
+		throw creaturesException("caosValue confused us terribly in TYPE");
 }
 
 /**
@@ -958,7 +958,7 @@ void caosVM::c_DELN() {
 	VM_PARAM_VALUE(name)
 
 	valid_agent(targ);
-	std::map<caosVar, caosVar, caosVarCompare>::iterator i = targ->name_variables.find(name);
+	std::map<caosValue, caosValue, caosValueCompare>::iterator i = targ->name_variables.find(name);
 	if (i == targ->name_variables.end()) return;
 	targ->name_variables.erase(i);
 }
@@ -977,7 +977,7 @@ void caosVM::v_GAMN() {
 		else
 			result.setString(world.variables.begin()->first);
 	} else {
-		std::map<std::string, caosVar>::iterator i = world.variables.find(previous);
+		std::map<std::string, caosValue>::iterator i = world.variables.find(previous);
 		caos_assert(i != world.variables.end()); // TODO: this probably isn't correct behaviour
 		i++;
 		if (i == world.variables.end())
@@ -1002,7 +1002,7 @@ void caosVM::c_NAMN() {
 		else
 			*previous = targ->name_variables.begin()->first;
 	} else {
-		std::map<caosVar, caosVar, caosVarCompare>::iterator i = targ->name_variables.find(*previous);
+		std::map<caosValue, caosValue, caosValueCompare>::iterator i = targ->name_variables.find(*previous);
 		caos_assert(i != targ->name_variables.end()); // TODO: this probably isn't correct behaviour
 		i++;
 		if (i == targ->name_variables.end())

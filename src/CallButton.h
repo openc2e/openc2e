@@ -33,7 +33,7 @@ public:
 		: SimpleAgent(family, genus, species, plane, spritefile, firstimage, imagecount) { }
 
 	void tick();
-	bool fireScript(unsigned short event, Agent *from, caosVar one, caosVar two);
+	bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
 };
 
 #endif

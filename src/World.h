@@ -20,7 +20,7 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
-#include "caosVar.h"
+#include "caosValue.h"
 #include "partzorder.h"
 #include "renderablezorder.h"
 #include <memory>
@@ -50,7 +50,7 @@ struct cainfo {
 struct scriptevent {
 	unsigned short scriptno;
 	AgentRef agent, from;
-	caosVar p[2];
+	caosValue p[2];
 };
 
 class World {
@@ -74,7 +74,7 @@ public:
 	std::list<std::shared_ptr<Agent> > agents;
 
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
-	std::map<std::string, caosVar> variables;
+	std::map<std::string, caosValue> variables;
 
 	std::vector<ghc::filesystem::path> data_directories;
 	std::unique_ptr<Scriptorium> scriptorium;
@@ -102,7 +102,7 @@ public:
 	
 	caosVM *getVM(Agent *owner);
 	void freeVM(caosVM *);
-	void queueScript(unsigned short event, AgentRef agent, AgentRef from = AgentRef(), caosVar p0 = caosVar(), caosVar p1 = caosVar());
+	void queueScript(unsigned short event, AgentRef agent, AgentRef from = AgentRef(), caosValue p0 = caosValue(), caosValue p1 = caosValue());
 	
 	World();
 	~World();
