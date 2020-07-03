@@ -180,6 +180,7 @@ int main(int argc, char **argv) {
 		std::string script;
 		for (size_t i = 0; i < cob.install_scripts.size(); ++i) {
 			script += "iscr," + cob.install_scripts[i] + "\n";
+            // TODO: if only one, don't add iscr, and remove endm
 		}
 		for (size_t i = 0; i < cob.object_scripts.size(); ++i) {
 			script += cob.object_scripts[i] + "\n";
