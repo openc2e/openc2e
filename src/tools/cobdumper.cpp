@@ -1,6 +1,10 @@
+#include "caosparser.h"
+#include "dialect.h"
 #include "endianlove.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
+#include "fileformats/caoslexer.h"
+#include "stringutil.h"
 
 #include <fmt/format.h>
 #include <fstream>
@@ -9,6 +13,62 @@
 #include <sstream>
 
 namespace fs = ghc::filesystem;
+
+void caos1_format_visitor(CAOSNodePtr node, std::string& out) {
+    if (typeid(*node.get()) == typeid(CAOSCommandNode)) {
+        auto ccn = (CAOSCommandNode*)node.get();
+        out += ccn->name;
+        for (auto a : ccn->args) {
+            out += " ";
+            caos1_format_visitor(a, out);
+        }
+    } else if (typeid(*node.get()) == typeid(CAOSConditionNode)) {
+        auto ccn = (CAOSConditionNode*)node.get();
+        for (size_t i = 0; i < ccn->args.size(); ++i) {
+            if (i > 0) out += " ";
+            caos1_format_visitor(ccn->args[i], out);
+        }
+    } else if (typeid(*node.get()) == typeid(CAOSLiteralValueNode)) {
+        auto clvn = (CAOSLiteralValueNode*)node.get();
+        out += fmt::format("{}", clvn->token.value);
+    } else if (typeid(*node.get()) == typeid(CAOSLiteralWordNode)) {
+        auto clwn = (CAOSLiteralWordNode*)node.get();
+        out += clwn->word;
+    } else {
+        abort();
+    }
+}
+
+std::string caos1_format(const std::string& text) {
+    std::vector<token> tokens;
+    lexcaos(tokens, text.c_str());
+    auto toplevel = parse(tokens, getDialectByName("c1"));
+
+    std::string out;
+    int indent = 0;
+    for (auto c : toplevel) {
+        auto ccn = (CAOSCommandNode*)c.get();
+        if (string_in(ccn->name, {"elif", "else", "endi", "ever", "next", "repe", "retn", "untl"})) {
+            indent = std::max(indent - 1, 0);
+        } else if (string_in(ccn->name, {"endm"})) {
+            indent = 0;
+        } else if (string_in(ccn->name, {"iscr", "rscr", "scrp"})) {
+            indent = 0;
+            if (out.size() > 0) {
+                out += "\n";
+            }
+        }
+        for (int i = 0; i < indent; ++i) {
+            out += "    ";
+        }
+        caos1_format_visitor(c, out);
+        if (string_in(ccn->name, {"doif", "elif", "else", "enum", "epas", "esee", "etch", "iscr", "loop", "reps", "scrp"})) {
+            indent++;
+        }
+        out += "\n";
+    }
+    return out;
+}
 
 std::string escape(const std::string& s) {
 	std::string result;
@@ -39,7 +99,6 @@ int main(int argc, char **argv) {
 	}
     
     fs::path stem = input_path.stem();
-    // fs::path output_directory = stem;
 
     std::ifstream in(input_path, std::ios::binary);
 
@@ -108,21 +167,29 @@ int main(int argc, char **argv) {
 		fmt::print("*# COB-Name \"{}\"\n", cob.name);
 		fmt::print("*# Picture \"{}\"\n", sprite_filename);
 		fmt::print("*# Quantity available = {}\n", cob.quantity_available);
-		fmt::print("*# Quantity used = {}\n", cob.quantity_used);
-		fmt::print("*# Expiration month = {}\n", cob.expiration_month);
-		fmt::print("*# Expiration day = {}\n", cob.expiration_day);
-		fmt::print("*# Expiration year = {}\n", cob.expiration_year);
+		if (cob.quantity_used != 0) {
+			fmt::print("*# Quantity used = {}\n", cob.quantity_used);
+		}
+		if (cob.expiration_month != 0 || cob.expiration_day != 0 || cob.expiration_year != 0) {
+			fmt::print("*# Expiration month = {}\n", cob.expiration_month);
+			fmt::print("*# Expiration day = {}\n", cob.expiration_day);
+			fmt::print("*# Expiration year = {}\n", cob.expiration_year);
+		}
 		fmt::print("\n");
+
+		std::string script;
 		for (size_t i = 0; i < cob.install_scripts.size(); ++i) {
-			std::string s = cob.install_scripts[i];
-			std::replace(s.begin(), s.end(), ',', '\n');
-			fmt::print("iscr\n{}\n\n", s);
+			script += "iscr," + cob.install_scripts[i] + "\n";
 		}
 		for (size_t i = 0; i < cob.object_scripts.size(); ++i) {
-			std::string s = cob.object_scripts[i];
-			std::replace(s.begin(), s.end(), ',', '\n');
+			script += cob.object_scripts[i] + "\n";
 			// TODO: make sure it ends with endm
-			fmt::print("{}\n\n", s);
+		}
+		try {
+			fmt::print(caos1_format(script));
+		} catch (creaturesException e) {
+			fmt::print("* exception formatting CAOS: {}\n", e.what());
+			fmt::print(script);
 		}
 
 		std::ofstream out(sprite_filename, std::ios_base::binary);
