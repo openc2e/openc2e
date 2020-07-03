@@ -30,8 +30,8 @@ struct CAOSConditionNode : CAOSNode {
 };
 
 struct CAOSLiteralValueNode : CAOSNode {
-    CAOSLiteralValueNode(token token_) : token(token_) {}
-    token token;
+    CAOSLiteralValueNode(caostoken token_) : token(token_) {}
+    caostoken token;
 };
 
 struct CAOSLiteralWordNode : CAOSNode {
@@ -39,4 +39,4 @@ struct CAOSLiteralWordNode : CAOSNode {
     std::string word;
 };
 
-std::vector<CAOSNodePtr> parse(const std::vector<token>& tokens, Dialect* dialect);
+std::vector<CAOSNodePtr> parse(const std::vector<caostoken>& tokens, Dialect* dialect);

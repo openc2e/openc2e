@@ -362,7 +362,7 @@ class Caos2PrayParserImpl {
     }
 
     std::vector<Event> run(std::string script, std::string *output_filename_) {
-        std::vector<token> tokens;
+        std::vector<caostoken> tokens;
         size_t p = 0;
         lexcaos(tokens, script.c_str());
 
@@ -370,20 +370,20 @@ class Caos2PrayParserImpl {
         events.push_back(StringTag{"Script 1", std::move(script)});
 
         while (true) {
-            if (tokens[p].type == token::TOK_ERROR) {
+            if (tokens[p].type == caostoken::TOK_ERROR) {
                 return {Error{"CAOS lexer error on line " +
                               std::to_string(tokens[p].lineno)}};
             }
             if (in_rscr) {
-                if (tokens[p].type == token::TOK_EOI) {
+                if (tokens[p].type == caostoken::TOK_EOI) {
                     events.push_back(StringTag{"Remove Script", remove_script});
                     break;
                 }
-                if (tokens[p].type != token::TOK_COMMENT) {
+                if (tokens[p].type != caostoken::TOK_COMMENT) {
                     // TODO: include comments and original whitespace
                     remove_script += " " + tokens[p].format();
                 }
-            } else if (tokens[p].type == token::TOK_COMMENT) {
+            } else if (tokens[p].type == caostoken::TOK_COMMENT) {
                 if (tokens[p].value[0] == '*' && tokens[p].value[1] == '#') {
                     // parse caos2pray comment
                     std::vector<Event> newevents =
@@ -396,9 +396,9 @@ class Caos2PrayParserImpl {
                     events.insert(events.end(), newevents.begin(),
                                   newevents.end());
                 }
-            } else if (tokens[p].type == token::TOK_EOI) {
+            } else if (tokens[p].type == caostoken::TOK_EOI) {
                 break;
-            } else if (tokens[p].type == token::TOK_WORD) {
+            } else if (tokens[p].type == caostoken::TOK_WORD) {
                 if (iequals(tokens[p].value, "rscr")) {
                     in_rscr = true;
                 }

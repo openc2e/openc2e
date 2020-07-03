@@ -40,7 +40,7 @@ void caos1_format_visitor(CAOSNodePtr node, std::string& out) {
 }
 
 std::string caos1_format(const std::string& text) {
-    std::vector<token> tokens;
+    std::vector<caostoken> tokens;
     lexcaos(tokens, text.c_str());
     auto toplevel = parse(tokens, getDialectByName("c1"));
 
@@ -66,6 +66,9 @@ std::string caos1_format(const std::string& text) {
             indent++;
         }
         out += "\n";
+        if (string_in(ccn->name, {"wait"})) {
+            out += "\n";
+        }
     }
     return out;
 }

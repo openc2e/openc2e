@@ -11,7 +11,7 @@ static char char_unescape(char c) {
 	}
 }
 
-std::string token::stringval() const {
+std::string caostoken::stringval() const {
     if (!(type == TOK_STRING || type == TOK_BYTESTR)) abort();
     if (value[0] == '[') {
         return value.substr(1, value.size() - 2);
@@ -31,7 +31,7 @@ std::string token::stringval() const {
     abort();
 }
 
-std::vector<unsigned char> token::bytestr() const {
+std::vector<unsigned char> caostoken::bytestr() const {
     if (type != TOK_BYTESTR) abort();
     std::vector<unsigned char> result;
     for (size_t i = 1; i < value.size() - 1; ++i) {
@@ -46,7 +46,7 @@ std::vector<unsigned char> token::bytestr() const {
     return result;
 }
 
-int token::intval() const {
+int caostoken::intval() const {
     if (type == TOK_INT) {
         return std::stoi(value);
     } else if (type == TOK_CHAR) {
@@ -63,14 +63,14 @@ int token::intval() const {
     }
 }
 
-float token::floatval() const {
+float caostoken::floatval() const {
     if (type != TOK_FLOAT) {
         abort();
     }
     return std::stof(value);
 }
 
-std::string token::format() const {
+std::string caostoken::format() const {
 	switch(type) {
 	case TOK_EOI: return "<EOI>";
 	case TOK_ERROR: return "<ERROR>";
@@ -90,7 +90,7 @@ std::string token::format() const {
 	}
 }
 
-std::string token::typeAsString() const {
+std::string caostoken::typeAsString() const {
 	switch(type) {
 	case TOK_WORD: return "word";
 	case TOK_BYTESTR: return "bytestr";

@@ -246,7 +246,7 @@ struct repsinfo {
 	int loopidx;
 };
 
-token *caosScript::tokenPeek() {
+caostoken *caosScript::tokenPeek() {
 	while (true) {
 		if ((size_t)curindex >= tokens->size()) {
 			return NULL;
@@ -255,45 +255,45 @@ token *caosScript::tokenPeek() {
 	}
 }
 
-caosScript::logicaltokentype caosScript::logicalType(const token * const t) {
+caosScript::logicaltokentype caosScript::logicalType(const caostoken * const t) {
 	return logicalType(*t);
 }
 
-caosScript::logicaltokentype caosScript::logicalType(const token& t) {
+caosScript::logicaltokentype caosScript::logicalType(const caostoken& t) {
 	switch (t.type) {
-		case token::TOK_WORD:
+		case caostoken::TOK_WORD:
 			return TOK_WORD;
-		case token::TOK_BYTESTR:
+		case caostoken::TOK_BYTESTR:
 			if (d->name == "c1" || d->name == "c2") {
 				return TOK_CONST;
 			} else {
 				return TOK_BYTESTR;
 			}
-		case token::TOK_STRING:
-		case token::TOK_CHAR:
-		case token::TOK_BINARY:
-		case token::TOK_INT:
-		case token::TOK_FLOAT:
+		case caostoken::TOK_STRING:
+		case caostoken::TOK_CHAR:
+		case caostoken::TOK_BINARY:
+		case caostoken::TOK_INT:
+		case caostoken::TOK_FLOAT:
 			return TOK_CONST;
-		case token::TOK_EOI:
+		case caostoken::TOK_EOI:
 			return EOI;
-		case token::TOK_ERROR:
+		case caostoken::TOK_ERROR:
 			throw parseException("no logical type for a lexer error token");
-		case token::TOK_COMMENT:
+		case caostoken::TOK_COMMENT:
 			throw parseException("no logical type for a comment token");
-		case token::TOK_WHITESPACE:
+		case caostoken::TOK_WHITESPACE:
 			throw parseException("no logical type for a whitespace token");
-		case token::TOK_NEWLINE:
+		case caostoken::TOK_NEWLINE:
 			throw parseException("no logical type for a newline token");
-		case token::TOK_COMMA:
+		case caostoken::TOK_COMMA:
 			throw parseException("no logical type for a comma token");
 	}
 }
 
-token *caosScript::getToken(logicaltokentype expected) {
-	token *t = tokenPeek();
-	token dummy;
-	token &r = (t ? *t : dummy);
+caostoken *caosScript::getToken(logicaltokentype expected) {
+	caostoken *t = tokenPeek();
+	caostoken dummy;
+	caostoken &r = (t ? *t : dummy);
 	errindex = curindex;
 
 	if (expected != ANYTOKEN && logicalType(r) != expected) {
@@ -305,7 +305,7 @@ token *caosScript::getToken(logicaltokentype expected) {
 	return t;
 }
 
-void caosScript::putBackToken(token *t) {
+void caosScript::putBackToken(caostoken *t) {
 	curindex--;
 	errindex = curindex - 1; // curindex refers to the /next/ token to be parsed
 							 // so make sure we refer to the token before it
@@ -317,33 +317,33 @@ void caosScript::parse(std::istream &in) {
 	std::string caostext = readfile(in);
 	// run the token parser
 	{
-		std::vector<token> rawtokens;
+		std::vector<caostoken> rawtokens;
 		lexcaos(rawtokens, caostext.c_str());
 
-		tokens = shared_ptr<std::vector<token> >(new std::vector<token>());
+		tokens = shared_ptr<std::vector<caostoken> >(new std::vector<caostoken>());
 		size_t index = 0;
 		for (auto& t : rawtokens) {
 			switch (t.type) {
-				case token::TOK_WORD:
+				case caostoken::TOK_WORD:
 					std::transform(t.value.begin(), t.value.end(), t.value.begin(), tolower);
 					t.index = index++;
 					tokens->push_back(t);
 					break;
-				case token::TOK_BYTESTR:
-				case token::TOK_STRING:
-				case token::TOK_CHAR:
-				case token::TOK_BINARY:
-				case token::TOK_INT:
-				case token::TOK_FLOAT:
-				case token::TOK_EOI:
-				case token::TOK_ERROR:
+				case caostoken::TOK_BYTESTR:
+				case caostoken::TOK_STRING:
+				case caostoken::TOK_CHAR:
+				case caostoken::TOK_BINARY:
+				case caostoken::TOK_INT:
+				case caostoken::TOK_FLOAT:
+				case caostoken::TOK_EOI:
+				case caostoken::TOK_ERROR:
 					t.index = index++;
 					tokens->push_back(t);
 					break;
-				case token::TOK_COMMENT:
-				case token::TOK_WHITESPACE:
-				case token::TOK_NEWLINE:
-				case token::TOK_COMMA:
+				case caostoken::TOK_COMMENT:
+				case caostoken::TOK_WHITESPACE:
+				case caostoken::TOK_NEWLINE:
+				case caostoken::TOK_COMMA:
 					break;
 			}
 		}
@@ -387,7 +387,7 @@ void caosScript::parse(std::istream &in) {
 		if (errindex < 0 || (size_t)errindex >= tokens->size())
 			throw;
 		e.lineno = (*tokens)[errindex].lineno;
-		e.context = std::shared_ptr<std::vector<token> >(new std::vector<token>());
+		e.context = std::shared_ptr<std::vector<caostoken> >(new std::vector<caostoken>());
 		/* We'd like to capture N tokens on each side of the target, but
 		 * if we can't get all those from one side, get it from the other.
 		 */
@@ -411,7 +411,7 @@ void caosScript::parse(std::istream &in) {
 		assert(leftct >= 0 && rightct >= 0 && errindex >= leftct && (size_t)(errindex + rightct) < tokens->size());
 
 		if (errindex - leftct != 0) {
-			e.context->push_back(token());
+			e.context->push_back(caostoken());
 			e.context->back().setWord("...");
 			prefix = 1;
 		}
@@ -420,7 +420,7 @@ void caosScript::parse(std::istream &in) {
 			e.context->push_back((*tokens)[i]);
 		}
 		if (errindex + rightct + 1 < (int)tokens->size()) {
-			e.context->push_back(token());
+			e.context->push_back(caostoken());
 			e.context->back().setWord("...");
 		}
 		e.ctxoffset = leftct + prefix;
@@ -428,39 +428,39 @@ void caosScript::parse(std::istream &in) {
 	}
 }
 
-caosVar caosScript::asConst(const token& token) {
+caosVar caosScript::asConst(const caostoken& token) {
 	switch (token.type) {
-		case token::TOK_STRING:
+		case caostoken::TOK_STRING:
 			return caosVar(token.stringval());
-		case token::TOK_CHAR:
-		case token::TOK_BINARY:
-		case token::TOK_INT:
+		case caostoken::TOK_CHAR:
+		case caostoken::TOK_BINARY:
+		case caostoken::TOK_INT:
 			return caosVar(token.intval());
-		case token::TOK_FLOAT:
+		case caostoken::TOK_FLOAT:
 			return caosVar(token.floatval());
-		case token::TOK_BYTESTR:
+		case caostoken::TOK_BYTESTR:
 		{
 			if (d->name == "c1" || d->name == "c2") {
 				return caosVar(token.stringval());
 			}
 			unexpectedToken(token);
 		}
-		case token::TOK_WORD:
-		case token::TOK_COMMENT:
-		case token::TOK_WHITESPACE:
-		case token::TOK_NEWLINE:
-		case token::TOK_COMMA:
-		case token::TOK_EOI:
-		case token::TOK_ERROR:
+		case caostoken::TOK_WORD:
+		case caostoken::TOK_COMMENT:
+		case caostoken::TOK_WHITESPACE:
+		case caostoken::TOK_NEWLINE:
+		case caostoken::TOK_COMMA:
+		case caostoken::TOK_EOI:
+		case caostoken::TOK_ERROR:
 			unexpectedToken(token);
 	}
 }
 
-void caosScript::unexpectedToken(const token& token) {
+void caosScript::unexpectedToken(const caostoken& token) {
 	throw parseException("Unexpected " + token.typeAsString());
 }
 
-const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix, bool except) {
+const cmdinfo *caosScript::readCommand(caostoken *t, const std::string &prefix, bool except) {
 	if (!except && logicalType(t) != TOK_WORD)
 		return NULL;
 
@@ -475,7 +475,7 @@ const cmdinfo *caosScript::readCommand(token *t, const std::string &prefix, bool
 	}
 
 	// See if there's a subcommand
-	token *t2 = NULL;
+	caostoken *t2 = NULL;
 	const cmdinfo *subci = NULL;
 	bool need_subcmd = (ci->argtypes && ci->argtypes[0] == CI_SUBCOMMAND);
 
@@ -512,7 +512,7 @@ void caosScript::emitExpr(std::shared_ptr<CAOSExpression> ce) {
 }
 
 std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
-	token *t = getToken();
+	caostoken *t = getToken();
 	traceindex = errindex = curindex;
 	if (xtype == CI_BAREWORD) {
 		if (logicalType(t) == TOK_WORD) {
@@ -594,7 +594,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 }
 
 int caosScript::readCond() {
-	token *t = getToken(TOK_WORD);
+	caostoken *t = getToken(TOK_WORD);
 	typedef struct { const char *n; int cnd; } cond_entry;
 	const static cond_entry conds[] = {
 		{ "eq", CEQ },
@@ -636,7 +636,7 @@ void caosScript::parseCondition() {
 		emitExpr(a2);
 		emitOp(CAOS_COND, cond | (nextIsAnd ? CAND : COR));
 
-		token *peek = tokenPeek();
+		caostoken *peek = tokenPeek();
 		if (!peek) break;
 		if (logicalType(peek) != TOK_WORD) break;
 		if (peek->word() == "and") {
@@ -650,7 +650,7 @@ void caosScript::parseCondition() {
 }
 
 void caosScript::parseloop(int state, void *info) {
-	token *t;
+	caostoken *t;
 	while ((t = getToken(ANYTOKEN))) {
 		traceindex = errindex;
 		if (logicalType(t) == EOI) {
@@ -881,7 +881,7 @@ void caosScript::parseloop(int state, void *info) {
 			emitCmd("cmd ssfc");
 		} else {
 			if (t->word() == "dbg:") {
-				token *t2 = tokenPeek();
+				caostoken *t2 = tokenPeek();
 				if (t2 && logicalType(t2) == TOK_WORD && t2->word() == "asrt") {
 					getToken(TOK_WORD);
 					emitOp(CAOS_CONSTINT, 1);

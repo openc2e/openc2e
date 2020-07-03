@@ -6,13 +6,13 @@
 #include <fmt/core.h>
 
 struct CAOSParserState : noncopyable {
-    CAOSParserState(const std::vector<token>& tokens_, Dialect *dialect_) : tokens(tokens_), dialect(dialect_) {}
-    const std::vector<token>& tokens;
+    CAOSParserState(const std::vector<caostoken>& tokens_, Dialect *dialect_) : tokens(tokens_), dialect(dialect_) {}
+    const std::vector<caostoken>& tokens;
     Dialect *dialect;
     size_t p = 0;
 };
 
-static bool current_token_is(const CAOSParserState& state, std::initializer_list<token::toktype> types) {
+static bool current_token_is(const CAOSParserState& state, std::initializer_list<caostoken::toktype> types) {
     for (auto t : types) {
         if (state.tokens[state.p].type == t) {
             return true;
@@ -21,7 +21,7 @@ static bool current_token_is(const CAOSParserState& state, std::initializer_list
     return false;
 }
 
-static void assert_current_token_is(const CAOSParserState& state, std::initializer_list<token::toktype> types) {
+static void assert_current_token_is(const CAOSParserState& state, std::initializer_list<caostoken::toktype> types) {
     for (auto t : types) {
         if (state.tokens[state.p].type == t) {
             return;
@@ -40,7 +40,7 @@ static void assert_current_token_is(const CAOSParserState& state, std::initializ
 
 static bool maybe_eat_whitespace(CAOSParserState& state) {
     bool ate_whitespace = false;
-    while (current_token_is(state, {token::TOK_WHITESPACE})) {
+    while (current_token_is(state, {caostoken::TOK_WHITESPACE})) {
         ate_whitespace = true;
         state.p += 1;
     }
@@ -59,21 +59,21 @@ static CAOSNodePtr parse_value(CAOSParserState& state) {
     maybe_eat_whitespace(state);
     
     switch (state.tokens[state.p].type) {
-        case token::TOK_WORD:
+        case caostoken::TOK_WORD:
             return parse_command(state, false);
-        case token::TOK_BYTESTR:
-        case token::TOK_STRING:
-        case token::TOK_CHAR:
-        case token::TOK_BINARY:
-        case token::TOK_INT:
-        case token::TOK_FLOAT:
+        case caostoken::TOK_BYTESTR:
+        case caostoken::TOK_STRING:
+        case caostoken::TOK_CHAR:
+        case caostoken::TOK_BINARY:
+        case caostoken::TOK_INT:
+        case caostoken::TOK_FLOAT:
             return CAOSNodePtr{new CAOSLiteralValueNode{state.tokens[state.p++]}};
-        case token::TOK_COMMENT:
-        case token::TOK_WHITESPACE:
-        case token::TOK_NEWLINE:
-        case token::TOK_COMMA:
-        case token::TOK_EOI:
-        case token::TOK_ERROR:
+        case caostoken::TOK_COMMENT:
+        case caostoken::TOK_WHITESPACE:
+        case caostoken::TOK_NEWLINE:
+        case caostoken::TOK_COMMA:
+        case caostoken::TOK_EOI:
+        case caostoken::TOK_ERROR:
             throw creaturesException(fmt::format("Expected value, got {} {}", state.tokens[state.p].typeAsString(), state.tokens[state.p].format()));
     }
 }
@@ -82,7 +82,7 @@ static CAOSNodePtr parse_condition(CAOSParserState &state) {
     auto left = parse_value(state);
     eat_whitespace(state);
 
-    assert_current_token_is(state, {token::TOK_WORD});
+    assert_current_token_is(state, {caostoken::TOK_WORD});
     auto comparison = state.tokens[state.p].value;
     state.p += 1;
 
@@ -130,7 +130,7 @@ static CAOSNodePtr parse_condition(CAOSParserState &state) {
 }
 
 static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
-        assert_current_token_is(state, { token::TOK_WORD });
+        assert_current_token_is(state, { caostoken::TOK_WORD });
 
         std::string command = lowerstring(state.tokens[state.p].value);
         std::string commandnormalized = command;
@@ -168,7 +168,7 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
             // some commands are two words but aren't namespaces!
             // C1 has a bunch of commands like SETV PUHL (integer) (integer) (integer)
             auto set_p = state.p;
-            if (maybe_eat_whitespace(state) && current_token_is(state, {token::TOK_WORD})) {
+            if (maybe_eat_whitespace(state) && current_token_is(state, {caostoken::TOK_WORD})) {
                 std::string newcommand = command + " " + lowerstring(state.tokens[state.p].value);
                 std::string lookup_key = (is_toplevel ? "cmd " : "expr ") + newcommand;
                 auto newcommandinfo = state.dialect->find_command(lookup_key);
@@ -204,7 +204,7 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
                     args.push_back(parse_condition(state));
                     break;
                 case CI_BAREWORD:
-                    assert_current_token_is(state, {token::TOK_WORD});
+                    assert_current_token_is(state, {caostoken::TOK_WORD});
                     args.push_back(CAOSNodePtr(new CAOSLiteralWordNode(state.tokens[state.p].value)));
                     state.p += 1;
                     break;
@@ -218,14 +218,14 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
         } };
 }
 
-std::vector<CAOSNodePtr> parse(const std::vector<token>& tokens, Dialect* dialect) {
+std::vector<CAOSNodePtr> parse(const std::vector<caostoken>& tokens, Dialect* dialect) {
     CAOSParserState state{ tokens, dialect };
     std::vector<CAOSNodePtr> toplevel;
     while (true) {
-        while (current_token_is(state, {token::TOK_WHITESPACE, token::TOK_NEWLINE, token::TOK_COMMENT, token::TOK_COMMA })) {
+        while (current_token_is(state, {caostoken::TOK_WHITESPACE, caostoken::TOK_NEWLINE, caostoken::TOK_COMMENT, caostoken::TOK_COMMA })) {
             state.p += 1;
         }
-        if (state.tokens[state.p].type == token::TOK_EOI) {
+        if (state.tokens[state.p].type == caostoken::TOK_EOI) {
             break;
         }
         toplevel.push_back(parse_command(state, true));
@@ -257,24 +257,24 @@ struct fmt::formatter<ci_type> : public formatter<string_view> {
 };
 
 template <>
-struct fmt::formatter<token::toktype> : public formatter<string_view> {
+struct fmt::formatter<caostoken::toktype> : public formatter<string_view> {
     template <typename FormatContext>
-    auto format(const token::toktype& t, FormatContext& ctx) {
+    auto format(const caostoken::toktype& t, FormatContext& ctx) {
         std::string name;
         switch (t) {
-            case token::TOK_WORD: name = "TOK_WORD"; break;
-            case token::TOK_BYTESTR: name = "TOK_BYTESTR"; break;
-            case token::TOK_STRING: name = "TOK_STRING"; break;
-            case token::TOK_CHAR: name = "TOK_CHAR"; break;
-            case token::TOK_BINARY: name = "TOK_BINARY"; break;
-            case token::TOK_INT: name = "TOK_INT"; break;
-            case token::TOK_FLOAT: name = "TOK_FLOAT"; break;
-            case token::TOK_COMMENT: name = "TOK_COMMENT"; break;
-            case token::TOK_WHITESPACE: name = "TOK_WHITESPACE"; break;
-            case token::TOK_NEWLINE: name = "TOK_NEWLINE"; break;
-            case token::TOK_COMMA: name = "TOK_COMMA"; break;
-            case token::TOK_EOI: name = "TOK_EOI"; break;
-            case token::TOK_ERROR: name = "TOK_ERROR"; break;
+            case caostoken::TOK_WORD: name = "TOK_WORD"; break;
+            case caostoken::TOK_BYTESTR: name = "TOK_BYTESTR"; break;
+            case caostoken::TOK_STRING: name = "TOK_STRING"; break;
+            case caostoken::TOK_CHAR: name = "TOK_CHAR"; break;
+            case caostoken::TOK_BINARY: name = "TOK_BINARY"; break;
+            case caostoken::TOK_INT: name = "TOK_INT"; break;
+            case caostoken::TOK_FLOAT: name = "TOK_FLOAT"; break;
+            case caostoken::TOK_COMMENT: name = "TOK_COMMENT"; break;
+            case caostoken::TOK_WHITESPACE: name = "TOK_WHITESPACE"; break;
+            case caostoken::TOK_NEWLINE: name = "TOK_NEWLINE"; break;
+            case caostoken::TOK_COMMA: name = "TOK_COMMA"; break;
+            case caostoken::TOK_EOI: name = "TOK_EOI"; break;
+            case caostoken::TOK_ERROR: name = "TOK_ERROR"; break;
         }
         return formatter<string_view>::format(name, ctx);
     }

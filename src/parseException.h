@@ -10,7 +10,7 @@ class parseException : public creaturesException {
 public:
     using creaturesException::creaturesException;
 
-    std::shared_ptr<std::vector<struct token> > context;
+    std::shared_ptr<std::vector<struct caostoken> > context;
     int ctxoffset;
     std::string filename;
     int lineno = -1;

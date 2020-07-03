@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-struct token {
+struct caostoken {
 public:
 	enum toktype {
 		TOK_WORD,
@@ -46,10 +46,10 @@ public:
 	int index;
 	int lineno;
 
-	token() : lineno(-1) {}
-	token(toktype type_, int lineno_) :
+	caostoken() : lineno(-1) {}
+	caostoken(toktype type_, int lineno_) :
 		type(type_), lineno(lineno_) {}
-	token(toktype type_, std::string value_, int lineno_) :
+	caostoken(toktype type_, std::string value_, int lineno_) :
 		type(type_), value(value_), lineno(lineno_) {}
 
 	const std::string &word() const {

@@ -260,12 +260,12 @@ protected:
 	void emitConst(const caosVar &);
 	std::shared_ptr<CAOSExpression> readExpr(const enum ci_type xtype);
 	void emitExpr(std::shared_ptr<CAOSExpression> ce);
-	const cmdinfo *readCommand(token *t, const std::string &prefix, bool except = true);
+	const cmdinfo *readCommand(caostoken *t, const std::string &prefix, bool except = true);
 	void parseloop(int state, void *info);
 
-	caosVar asConst(const token& token);
+	caosVar asConst(const caostoken& token);
 	[[ noreturn ]]
-	void unexpectedToken(const token& token);
+	void unexpectedToken(const caostoken& token);
 
 	enum logicaltokentype {
 		ANYTOKEN = 0,
@@ -275,18 +275,18 @@ protected:
 		TOK_CONST,
 	};
 
-	logicaltokentype logicalType(const token *const);
-	logicaltokentype logicalType(const token&);
+	logicaltokentype logicalType(const caostoken *const);
+	logicaltokentype logicalType(const caostoken&);
 
-	shared_ptr<std::vector<token> > tokens;
+	shared_ptr<std::vector<caostoken> > tokens;
 	int curindex; // index to the next token to be read
    	int errindex; // index to the token to report parse errors on
 	int traceindex; // index to the token to report runtime errors on
 	int enumdepth;
 	// deprecated support functions
-	token *tokenPeek();
-	void putBackToken(token *);
-	token *getToken(logicaltokentype expected = ANYTOKEN);
+	caostoken *tokenPeek();
+	void putBackToken(caostoken *);
+	caostoken *getToken(logicaltokentype expected = ANYTOKEN);
 
 	friend struct saveVisit;
 	friend struct evalVisit;
