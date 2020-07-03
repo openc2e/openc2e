@@ -223,6 +223,22 @@ void caosVM::v_OBST_c2() {
 }
 
 /**
+ OBSV (integer) direction (integer)
+ %status stub
+ %pragma variants c2
+
+ Returns the permeability of the first door the TARG agent would collide with in
+ the given direction.
+*/
+void caosVM::v_OBSV() {
+	VM_PARAM_INTEGER(direction)
+
+	valid_agent(targ);
+	// TODO: implement
+	result.setInt(INT_MAX);
+}
+
+/**
  TMVB (integer) deltax (float) deltay (float)
  %status maybe
 
