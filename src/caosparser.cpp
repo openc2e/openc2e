@@ -53,14 +53,15 @@ static void eat_whitespace(CAOSParserState& state) {
     }
 }
 
-static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel);
+static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_type expected_type=CI_ANYVALUE);
 
-static CAOSNodePtr parse_value(CAOSParserState& state) {
+static CAOSNodePtr parse_value(CAOSParserState& state, ci_type expected_type=CI_ANYVALUE) {
     maybe_eat_whitespace(state);
     
     switch (state.tokens[state.p].type) {
         case caostoken::TOK_WORD:
-            return parse_command(state, false);
+            // pass along expected_type to handle FACE
+            return parse_command(state, false, expected_type);
         case caostoken::TOK_BYTESTR:
         case caostoken::TOK_STRING:
         case caostoken::TOK_CHAR:
@@ -129,12 +130,12 @@ static CAOSNodePtr parse_condition(CAOSParserState &state) {
     return CAOSNodePtr(new CAOSConditionNode(args));
 }
 
-static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
+static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_type expected_type) {
         assert_current_token_is(state, { caostoken::TOK_WORD });
 
         std::string command = lowerstring(state.tokens[state.p].value);
         std::string commandnormalized = command;
-        // TODO: <regex> makes compile time slow. migrate to something like RE2?
+        // TODO: <regex> makes compile time slow
         if (command.size() == 4 && command[0] == 'o' && command[1] == 'b' && command[2] == 'v' && isdigit(command[3])) {
             commandnormalized = "obvx";
         } else if (command.size() == 4 && command[0] == 'v' && command[1] == 'a' && command[2] == 'r' && isdigit(command[3])) {
@@ -145,12 +146,20 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
             commandnormalized = "ovxx";
         } else if (command.size() == 4 && command[0] == 'm' && command[1] == 'v' && isdigit(command[2]) && isdigit(command[3])) {
             commandnormalized = "mvxx";
+        } else if (!is_toplevel && command == "face") {
+            // hack for FACE, which returns either a string or integer depending
+            // on what the parent command wants
+            if (expected_type == CI_STRING) {
+                commandnormalized = "face string";
+            } else {
+                commandnormalized = "face int";
+            }
         }
 
         std::string lookup_key = (is_toplevel ? "cmd " : "expr ") + commandnormalized;
         auto commandinfo = state.dialect->find_command(lookup_key);
         if (commandinfo == nullptr) {
-            throw creaturesException(fmt::format("No such {} command '{}'", is_toplevel ? "toplevel" : "expression", command));
+            throw creaturesException(fmt::format("No such {} command '{}'", is_toplevel ? "toplevel" : "expression", commandnormalized));
         }
         state.p += 1;
 
@@ -192,8 +201,11 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
                 case CI_VARIABLE:
                     args.push_back(parse_command(state, false));
                     break;
-                case CI_NUMERIC:
                 case CI_STRING:
+                    // because of FACE
+                    args.push_back(parse_value(state, CI_STRING));
+                    break;
+                case CI_NUMERIC:
                 case CI_AGENT:
                 case CI_BYTESTR:
                 case CI_VECTOR:
