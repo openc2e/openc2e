@@ -22,6 +22,9 @@ class Dialect {
 		int cmdcount() const { return cmdcnt; }
 
 		const cmdinfo *find_command(const char *name) const;
+		const cmdinfo *find_command(const std::string &name) const {
+			return find_command(name.c_str());
+		}
 
 		Dialect(const cmdinfo *cmds, const std::string &n);
 
