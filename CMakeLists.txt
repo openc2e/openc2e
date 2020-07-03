@@ -148,6 +148,7 @@ add_library(openc2e-core STATIC
 	src/CallButton.cpp
 	src/Camera.cpp
 	src/caosException.cpp
+	src/caosparser.cpp
 	src/caosScript.cpp
 	src/caosVar.cpp
 	src/caos/caosVM_agent.cpp
