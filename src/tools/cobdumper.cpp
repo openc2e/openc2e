@@ -62,7 +62,7 @@ std::string caos1_format(const std::string& text) {
             out += "    ";
         }
         caos1_format_visitor(c, out);
-        if (string_in(ccn->name, {"doif", "elif", "else", "enum", "epas", "esee", "etch", "iscr", "loop", "reps", "scrp"})) {
+        if (string_in(ccn->name, {"doif", "elif", "else", "enum", "epas", "esee", "etch", "iscr", "loop", "reps", "scrp", "subr"})) {
             indent++;
         }
         out += "\n";
