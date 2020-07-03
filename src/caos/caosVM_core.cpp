@@ -162,7 +162,7 @@ void caosVM::c_SCRP() {
 /**
  RSCR (command)
  %status done
- %pragma variants c2 cv c3 sm
+ %pragma variants c1 c2 cv c3 sm
 
  Marks the beginning of a removal script.
 */
@@ -173,7 +173,7 @@ void caosVM::c_RSCR() {
 /**
  ISCR (command)
  %status stub
- %pragma variants c2 cv c3 sm
+ %pragma variants c1 c2 cv c3 sm
 
  Marks the beginning of an installer script.
 */
