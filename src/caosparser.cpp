@@ -133,6 +133,7 @@ static CAOSNodePtr parse_condition(CAOSParserState &state) {
 static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_type expected_type) {
         assert_current_token_is(state, { caostoken::TOK_WORD });
 
+        // find a command from the first token
         std::string command = lowerstring(state.tokens[state.p].value);
         std::string commandnormalized = command;
         // TODO: <regex> makes compile time slow
@@ -155,16 +156,12 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_ty
                 commandnormalized = "face int";
             }
         }
-
         std::string lookup_key = (is_toplevel ? "cmd " : "expr ") + commandnormalized;
         auto commandinfo = state.dialect->find_command(lookup_key);
-        if (commandinfo == nullptr) {
-            throw creaturesException(fmt::format("No such {} command '{}'", is_toplevel ? "toplevel" : "expression", commandnormalized));
-        }
         state.p += 1;
 
         // some commands are namespace placeholders
-        if (commandinfo->argc == 1 && commandinfo->argtypes[0] == CI_SUBCOMMAND) {
+        if (commandinfo && commandinfo->argc == 1 && commandinfo->argtypes[0] == CI_SUBCOMMAND) {
             eat_whitespace(state);
             command = command + " " + lowerstring(state.tokens[state.p].value);
             std::string lookup_key = (is_toplevel ? "cmd " : "expr ") + command;
@@ -173,9 +170,11 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_ty
                 throw creaturesException(fmt::format("No such {} command '{}'", is_toplevel ? "toplevel" : "expression", command));
             }
             state.p += 1;
-        } else {
-            // some commands are two words but aren't namespaces!
-            // C1 has a bunch of commands like SETV PUHL (integer) (integer) (integer)
+        }
+        // some commands are two words but aren't namespaces, and may even overlap
+        // with single-word commands!
+        // C1 has a bunch of commands like SETV PUHL (integer) (integer) (integer)
+        else {
             auto set_p = state.p;
             if (maybe_eat_whitespace(state) && current_token_is(state, {caostoken::TOK_WORD})) {
                 std::string newcommand = command + " " + lowerstring(state.tokens[state.p].value);
@@ -189,7 +188,13 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_ty
             }
             state.p = set_p;
         }
+        
+        // whoops, didn't find a single-word command or double-word command
+        if (commandinfo == nullptr) {
+            throw creaturesException(fmt::format("No such {} command '{}'", is_toplevel ? "toplevel" : "expression", commandnormalized));
+        }
 
+        // parse the arguments
         std::vector<CAOSNodePtr> args;
         for (int i = 0; i < commandinfo->argc; ++i) {
             eat_whitespace(state);
