@@ -231,6 +231,7 @@ enum {
 	ST_REMOVAL,
 	ST_DOIF,
 	ST_ENUM,
+	ST_ESCN,
 	ST_LOOP,
 	ST_REPS,
 	ST_INVALID
@@ -706,7 +707,7 @@ void caosScript::parseloop(int state, void *info) {
 				assert(!enumdepth);
 				state = ST_INSTALLER;
 				current = installer;
-			} else if (state == ST_ENUM) {
+			} else if (state == ST_ENUM || state == ST_ESCN) {
 				// fuzzie added this case because she can't remember why the DIAF is here,
 				// if you work it out please add a comment and make it engine-specific!
 				throw parseException("Unexpected ENDM");
@@ -743,7 +744,25 @@ void caosScript::parseloop(int state, void *info) {
 				throw parseException("Unexpected NEXT");
 			}
 			return;
+		} else if (t->word() == "escn") {
+			int nextreloc = current->newRelocation();
+			putBackToken(t);
 
+			enumdepth++;
+			emitExpr(readExpr(CI_COMMAND));
+			emitOp(CAOS_JMP, nextreloc);
+			int startp = current->getNextIndex();
+			parseloop(ST_ESCN, NULL);
+			enumdepth--;
+			current->fixRelocation(nextreloc);
+
+			emitCmd("cmd nscn");
+			emitOp(CAOS_ENUMPOP, startp);
+		} else if (t->word() == "nscn") {
+			if (state != ST_ESCN) {
+				throw parseException("Unexpected NSCN");
+			}
+			return;
 		} else if (t->word() == "subr") {
 			// Yes, this will work in a doif or whatever. This is UB, it may
 			// be made to not compile later.

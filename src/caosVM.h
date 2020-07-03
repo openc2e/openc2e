@@ -472,6 +472,8 @@ public:
 	void c_EPAS();
 	void c_ECON();
 	void c_NEXT();
+	void c_ESCN();
+	void c_NSCN();
 	void c_CALL();
 	void v_CAOS();
 	

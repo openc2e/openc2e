@@ -205,6 +205,18 @@ void caosVM::c_NEXT() {
 }
 
 /**
+ NSCN (command)
+ %status maybe
+ %pragma variants c2
+ %cost c2 0
+
+ The end of an ESCN...NSCN loop.
+*/
+void caosVM::c_NSCN() {
+    targ = owner;
+}
+
+/**
  ENUM (command) family (integer) genus (integer) species (integer)
  %status maybe
  %pragma stackdelta any
@@ -346,6 +358,27 @@ void caosVM::c_ECON() {
 	VM_PARAM_VALIDAGENT(agent)
 
 	// TODO: should probably implement this (ECON)
+
+	caosVar nullv; nullv.reset();
+	valueStack.push_back(nullv);
+}
+
+/**
+ ESCN (command) family (integer) genus (integer) species (integer)
+ %pragma stackdelta any
+ %status stub
+ %pragma variants c2
+
+ Enumerate all specified scenery objects.
+*/
+void caosVM::c_ESCN() {
+	VM_VERIFY_SIZE(3)
+	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
+	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
+	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
+
+	// TODO: should implement this. C2 has a concept of "scenery objects" created
+	// with NEW: SCEN.
 
 	caosVar nullv; nullv.reset();
 	valueStack.push_back(nullv);
