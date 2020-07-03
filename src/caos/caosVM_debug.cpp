@@ -45,7 +45,7 @@ using std::cout;
  Outputs a string to the debug log.
 */
 /**
- DBGM (command) val (bareword)
+ DBGM (command) val (string)
  %status maybe
  %pragma variants c1 c2
 */
