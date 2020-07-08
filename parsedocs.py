@@ -6,6 +6,7 @@ import sys
 FILENAME_TO_CATEGORY = {  # default category mappings
     "caosVM_agent.cpp": "Agents",
     "caosVM_camera.cpp": "Cameras",
+    "caosVM_cdplayer.cpp": "CD Player",
     "caosVM_core.cpp": "Core functions",
     "caosVM_creatures.cpp": "Creatures",
     "caosVM_compound.cpp": "Compound agents",
@@ -146,7 +147,7 @@ for filename in sys.argv[1:]:
                 "filename": os.path.basename(filename),
                 "category": FILENAME_TO_CATEGORY.get(
                     os.path.basename(filename), "unknown"
-                ).lower(),
+                ),
             }
             if "".join(comments).strip():
                 obj["description"] = "\n".join(comments).strip() + "\n"

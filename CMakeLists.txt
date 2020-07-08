@@ -153,6 +153,7 @@ add_library(openc2e-core STATIC
 	src/caosValue.cpp
 	src/caos/caosVM_agent.cpp
 	src/caos/caosVM_camera.cpp
+	src/caos/caosVM_cdplayer.cpp
 	src/caos/caosVM_compound.cpp
 	src/caos/caosVM_core.cpp
 	src/caos/caosVM_creatures.cpp

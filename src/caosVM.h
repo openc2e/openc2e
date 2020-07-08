@@ -704,6 +704,17 @@ public:
 	void c_RGAM();
 	void v_MOWS();
 
+	// cdplayer
+	void c_CD_EJCT();
+	void v_CD_FRQH();
+	void v_CD_FRQL();
+	void v_CD_FRQM();
+	void c_CD_INIT();
+	void c_CD_PAWS();
+	void c_CD_PLAY();
+	void c_CD_SHUT();
+	void c_CD_STOP();
+
 	// compound
 	void c_PART();
 	void v_PART();
