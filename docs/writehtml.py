@@ -28,8 +28,9 @@ for key in catsort:
     # TODO: maybe?
     catsort[key] = sorted(catsort[key], key=lambda _: _["name"])
 
+
 catl = [
-    {"name": captext(_), "ents": catsort[_], "anchor": esc(_)} for _ in sorted(catsort)
+    {"name": captext(_), "ents": catsort[_], "anchor": esc(_)} for _ in sorted(catsort, key=lambda _: _.lower())
 ]
 
 time = datetime.datetime.now()
