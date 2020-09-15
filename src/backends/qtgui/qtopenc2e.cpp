@@ -640,10 +640,6 @@ void QtOpenc2e::tick() {
 		emit ticked();
 	}
 
-	if (viewport->needsRender()) {
-		viewport->viewport()->update();
-	}
-
 	unsigned int i = engine.msUntilTick();
 	if (i != 0 || ourTimer->interval() != 0) // TODO: things get a bit annoyingly unresponsive without this
 		ourTimer->setInterval(i);

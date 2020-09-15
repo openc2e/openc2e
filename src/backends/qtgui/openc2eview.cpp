@@ -44,7 +44,10 @@
 openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstractScrollArea(parent) {
 	backend = b;
 
-	viewport()->setAttribute(Qt::WA_OpaquePaintEvent); // no need for Qt to draw a background
+	setViewport(new openc2eviewport());
+	viewport()->setAttribute(Qt::WA_NativeWindow);
+	viewport()->setAttribute(Qt::WA_NoSystemBackground); // no need for Qt to draw a background
+	viewport()->setAttribute(Qt::WA_PaintOnScreen);
 
 	setAttribute(Qt::WA_InputMethodEnabled);
 
@@ -92,14 +95,6 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 
 	horizontalScrollBar()->setPageStep(width());
 	verticalScrollBar()->setPageStep(height());
-}
-
-void openc2eView::paintEvent(QPaintEvent *) {
-	// TODO: mad hax
-	if (currentwidth == viewport()->width() && currentheight == viewport()->height()) {
-		world.drawWorld();
-		backend->renderDone();
-	}
 }
 
 void openc2eView::mouseMoveEvent(QMouseEvent *m) {
@@ -177,9 +172,5 @@ void openc2eView::tick() {
 		lastMetaroom = engine.camera->getMetaRoom();
 		resizescrollbars();
 	}
-}
-
-bool openc2eView::needsRender() {
-	return backend->needsRender();
 }
 

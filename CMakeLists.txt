@@ -59,6 +59,7 @@ else()
 	find_package(SDL2_mixer REQUIRED)
 	find_package(SDL2_net REQUIRED)
 	find_package(SDL2_gfx REQUIRED)
+	find_package(X11 REQUIRED) # Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
 endif()
 
 if (OPENC2E_USE_SERIALIZATION)
@@ -250,6 +251,10 @@ target_link_libraries(openc2e
 	SDL2::GFX
 	SDL2::Net
 )
+if(X11_FOUND) # Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
+	target_link_libraries(openc2e ${X11_LIBRARIES})
+	target_include_directories(openc2e PRIVATE ${X11_INCLUDE_DIR})
+endif()
 if (OPENC2E_USE_QT)
 	target_sources(openc2e PRIVATE
 		src/backends/qtgui/qtopenc2e.cpp

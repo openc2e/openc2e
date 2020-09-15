@@ -35,11 +35,6 @@ public:
 	void inputMethodEvent(QInputMethodEvent*);
 	void keyEvent(class QKeyEvent *k, bool pressed);
 
-	bool selfRender() { return true; }
-	void requestRender() { needsrender = true; }	
-	bool needsRender() { return needsrender; }
-	void renderDone();
-
 	int run(int argc, char **argv);
 
 protected:
@@ -47,7 +42,6 @@ protected:
 	
 	bool downkeys[256]; // TODO: public data bad
 	class QWidget *viewport;
-	bool needsrender;
 
 	int idealBpp();
 };
