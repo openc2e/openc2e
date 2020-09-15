@@ -101,6 +101,21 @@ typedef struct SDL_EGL_VideoData
                                             void **devices,
                                             EGLint *num_devices);
 
+   /* Atomic functions */
+
+    EGLSyncKHR(EGLAPIENTRY *eglCreateSyncKHR)(EGLDisplay dpy, EGLenum type, const EGLint *attrib_list);
+
+    EGLBoolean(EGLAPIENTRY *eglDestroySyncKHR)(EGLDisplay dpy, EGLSyncKHR sync);
+
+    EGLint(EGLAPIENTRY *eglDupNativeFenceFDANDROID)(EGLDisplay dpy, EGLSyncKHR sync); 
+
+    EGLint(EGLAPIENTRY *eglWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
+
+    EGLint(EGLAPIENTRY *eglClientWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout);
+
+    /* Atomic functions end */
+
+
     /* whether EGL display was offscreen */
     int is_offscreen;
 
@@ -147,12 +162,7 @@ BACKEND ## _GLES_SwapWindow(_THIS, SDL_Window * window) \
 #define SDL_EGL_MakeCurrent_impl(BACKEND) int \
 BACKEND ## _GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context) \
 {\
-    if (window && context) { \
-        return SDL_EGL_MakeCurrent(_this, ((SDL_WindowData *) window->driverdata)->egl_surface, context); \
-    }\
-    else {\
-        return SDL_EGL_MakeCurrent(_this, NULL, NULL);\
-    }\
+    return SDL_EGL_MakeCurrent(_this, window ? ((SDL_WindowData *) window->driverdata)->egl_surface : EGL_NO_SURFACE, context);\
 }
 
 #define SDL_EGL_CreateContext_impl(BACKEND) SDL_GLContext \

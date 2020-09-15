@@ -117,6 +117,7 @@ static void Cocoa_DispatchEvent(NSEvent *theEvent)
 }
 
 - (id)init;
+- (void)localeDidChange:(NSNotification *)notification;
 @end
 
 @implementation SDLAppDelegate : NSObject
@@ -137,6 +138,11 @@ static void Cocoa_DispatchEvent(NSEvent *theEvent)
                    selector:@selector(focusSomeWindow:)
                        name:NSApplicationDidBecomeActiveNotification
                      object:nil];
+
+        [center addObserver:self
+                   selector:@selector(localeDidChange:)
+                       name:NSCurrentLocaleDidChangeNotification
+                     object:nil];
     }
 
     return self;
@@ -148,6 +154,7 @@ static void Cocoa_DispatchEvent(NSEvent *theEvent)
 
     [center removeObserver:self name:NSWindowWillCloseNotification object:nil];
     [center removeObserver:self name:NSApplicationDidBecomeActiveNotification object:nil];
+    [center removeObserver:self name:NSCurrentLocaleDidChangeNotification object:nil];
 
     [super dealloc];
 }
@@ -226,6 +233,11 @@ static void Cocoa_DispatchEvent(NSEvent *theEvent)
     }
 }
 
+- (void)localeDidChange:(NSNotification *)notification;
+{
+    SDL_SendLocaleChangedEvent();
+}
+
 - (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
 {
     return (BOOL)SDL_SendDropFile(NULL, [filename UTF8String]) && SDL_SendDropComplete(NULL);
@@ -248,10 +260,24 @@ static void Cocoa_DispatchEvent(NSEvent *theEvent)
         [NSApp activateIgnoringOtherApps:YES];
     }
 
+    [[NSAppleEventManager sharedAppleEventManager]
+    setEventHandler:self
+        andSelector:@selector(handleURLEvent:withReplyEvent:)
+      forEventClass:kInternetEventClass
+         andEventID:kAEGetURL];
+
     /* If we call this before NSApp activation, macOS might print a complaint
      * about ApplePersistenceIgnoreState. */
     [SDLApplication registerUserDefaults];
 }
+
+- (void)handleURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
+{
+    NSString* path = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+    SDL_SendDropFile(NULL, [path UTF8String]);
+    SDL_SendDropComplete(NULL);
+}
+
 @end
 
 static SDLAppDelegate *appDelegate = nil;

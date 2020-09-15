@@ -359,9 +359,13 @@ WINDOWS_JoystickDetect(void)
         JoyStick_DeviceData *pListNext = NULL;
 
         if (pCurList->bXInputDevice) {
+#if SDL_HAPTIC_XINPUT
             SDL_XINPUT_MaybeRemoveDevice(pCurList->XInputUserId);
+#endif
         } else {
+#if SDL_HAPTIC_DINPUT
             SDL_DINPUT_MaybeRemoveDevice(&pCurList->dxdevice);
+#endif
         }
 
         SDL_PrivateJoystickRemoved(pCurList->nInstanceID);
@@ -380,9 +384,13 @@ WINDOWS_JoystickDetect(void)
         while (pNewJoystick) {
             if (pNewJoystick->send_add_event) {
                 if (pNewJoystick->bXInputDevice) {
+#if SDL_HAPTIC_XINPUT
                     SDL_XINPUT_MaybeAddDevice(pNewJoystick->XInputUserId);
+#endif
                 } else {
+#if SDL_HAPTIC_DINPUT
                     SDL_DINPUT_MaybeAddDevice(&pNewJoystick->dxdevice);
+#endif
                 }
 
                 SDL_PrivateJoystickAdded(pNewJoystick->nInstanceID);
@@ -400,8 +408,9 @@ static const char *
 WINDOWS_JoystickGetDeviceName(int device_index)
 {
     JoyStick_DeviceData *device = SYS_Joystick;
+    int index;
 
-    for (; device_index > 0; device_index--)
+    for (index = device_index; index > 0; index--)
         device = device->pNext;
 
     return device->joystickname;
@@ -458,25 +467,26 @@ WINDOWS_JoystickGetDeviceInstanceID(int device_index)
 static int
 WINDOWS_JoystickOpen(SDL_Joystick * joystick, int device_index)
 {
-    JoyStick_DeviceData *joystickdevice = SYS_Joystick;
+    JoyStick_DeviceData *device = SYS_Joystick;
+    int index;
 
-    for (; device_index > 0; device_index--)
-        joystickdevice = joystickdevice->pNext;
+    for (index = device_index; index > 0; index--)
+        device = device->pNext;
 
     /* allocate memory for system specific hardware data */
-    joystick->instance_id = joystickdevice->nInstanceID;
+    joystick->instance_id = device->nInstanceID;
     joystick->hwdata =
         (struct joystick_hwdata *) SDL_malloc(sizeof(struct joystick_hwdata));
     if (joystick->hwdata == NULL) {
         return SDL_OutOfMemory();
     }
     SDL_zerop(joystick->hwdata);
-    joystick->hwdata->guid = joystickdevice->guid;
+    joystick->hwdata->guid = device->guid;
 
-    if (joystickdevice->bXInputDevice) {
-        return SDL_XINPUT_JoystickOpen(joystick, joystickdevice);
+    if (device->bXInputDevice) {
+        return SDL_XINPUT_JoystickOpen(joystick, device);
     } else {
-        return SDL_DINPUT_JoystickOpen(joystick, joystickdevice);
+        return SDL_DINPUT_JoystickOpen(joystick, device);
     }
 }
 
@@ -555,6 +565,12 @@ WINDOWS_JoystickQuit(void)
     s_bDeviceRemoved = SDL_FALSE;
 }
 
+static SDL_bool
+WINDOWS_JoystickGetGamepadMapping(int device_index, SDL_GamepadMapping *out)
+{
+    return SDL_FALSE;
+}
+
 SDL_JoystickDriver SDL_WINDOWS_JoystickDriver =
 {
     WINDOWS_JoystickInit,
@@ -570,6 +586,7 @@ SDL_JoystickDriver SDL_WINDOWS_JoystickDriver =
     WINDOWS_JoystickUpdate,
     WINDOWS_JoystickClose,
     WINDOWS_JoystickQuit,
+    WINDOWS_JoystickGetGamepadMapping
 };
 
 #endif /* SDL_JOYSTICK_DINPUT || SDL_JOYSTICK_XINPUT */

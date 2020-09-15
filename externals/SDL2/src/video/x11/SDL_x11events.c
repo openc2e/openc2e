@@ -683,7 +683,7 @@ X11_DispatchEvent(_THIS)
         /* But only if we're using one of the DBus IMEs, otherwise
            some XIM IMEs will generate duplicate events */
         if (orig_keycode) {
-#if defined(HAVE_IBUS_IBUS_H) || defined(HAVE_FCITX_FRONTEND_H)
+#if defined(HAVE_IBUS_IBUS_H) || defined(HAVE_FCITX)
             SDL_Scancode scancode = videodata->key_layout[orig_keycode];
             videodata->filter_code = orig_keycode;
             videodata->filter_time = xevent.xkey.time;
@@ -818,9 +818,9 @@ X11_DispatchEvent(_THIS)
                 break;
             }
 
-            if (xevent.xfocus.detail == NotifyInferior) {
+            if (xevent.xfocus.detail == NotifyInferior || xevent.xfocus.detail == NotifyPointer) {
 #ifdef DEBUG_XEVENTS
-                printf("window %p: FocusIn (NotifierInferior, ignoring)\n", data);
+                printf("window %p: FocusIn (NotifyInferior/NotifyPointer, ignoring)\n", data);
 #endif
                 break;
             }
@@ -851,10 +851,12 @@ X11_DispatchEvent(_THIS)
 #endif
                 break;
             }
-            if (xevent.xfocus.detail == NotifyInferior) {
-                /* We still have focus if a child gets focus */
+            if (xevent.xfocus.detail == NotifyInferior || xevent.xfocus.detail == NotifyPointer) {
+                /* We still have focus if a child gets focus. We also don't
+                   care about the position of the pointer when the keyboard
+                   focus changed. */
 #ifdef DEBUG_XEVENTS
-                printf("window %p: FocusOut (NotifierInferior, ignoring)\n", data);
+                printf("window %p: FocusOut (NotifyInferior/NotifyPointer, ignoring)\n", data);
 #endif
                 break;
             }

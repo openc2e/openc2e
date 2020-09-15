@@ -30,7 +30,6 @@
 #include "SDL_joystick.h"
 #include "SDL_assert.h"
 #include "SDL_timer.h"
-#include "SDL_log.h"
 #include "SDL_sysjoystick_c.h"
 #include "../SDL_joystick_c.h"
 
@@ -60,7 +59,7 @@ Emscripten_JoyStickConnected(int eventType, const EmscriptenGamepadEvent *gamepa
     SDL_zerop(item);
     item->index = gamepadEvent->index;
 
-    item->name = SDL_strdup(gamepadEvent->id);
+    item->name = SDL_CreateJoystickName(0, 0, NULL, gamepadEvent->id);
     if ( item->name == NULL ) {
         SDL_free(item);
         return 1;
@@ -404,6 +403,12 @@ EMSCRIPTEN_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, 
     return SDL_Unsupported();
 }
 
+static SDL_bool
+EMSCRIPTEN_JoystickGetGamepadMapping(int device_index, SDL_GamepadMapping *out)
+{
+    return SDL_FALSE;
+}
+
 SDL_JoystickDriver SDL_EMSCRIPTEN_JoystickDriver =
 {
     EMSCRIPTEN_JoystickInit,
@@ -419,6 +424,7 @@ SDL_JoystickDriver SDL_EMSCRIPTEN_JoystickDriver =
     EMSCRIPTEN_JoystickUpdate,
     EMSCRIPTEN_JoystickClose,
     EMSCRIPTEN_JoystickQuit,
+    EMSCRIPTEN_JoystickGetGamepadMapping
 };
 
 #endif /* SDL_JOYSTICK_EMSCRIPTEN */
