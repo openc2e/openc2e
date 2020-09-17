@@ -309,11 +309,11 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 	SDL_Surface *surf;
 	SDL_Color *surfpalette = 0;
 	if (image->format() == if_paletted) {
-		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
+		surf = SDL_CreateRGBSurfaceWithFormatFrom(image->data(frame),
 						image->width(frame), image->height(frame),
-						8, // depth
-						image->width(frame), // pitch
-						0, 0, 0, 0);
+						SDL_BITSPERPIXEL(SDL_PIXELFORMAT_INDEX8), // depth
+						image->width(frame) * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_INDEX8), // pitch
+						SDL_PIXELFORMAT_INDEX8);
 		assert(surf);
 		if (image->hasCustomPalette())
 			surfpalette = (SDL_Color *)image->getCustomPalette();
@@ -322,25 +322,21 @@ void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int fram
 		SDL_SetPaletteColors(surf->format->palette, surfpalette, 0, 256);
 	} else if (image->format() == if_16bit_565 || image->format() == if_16bit_555) {
 		unsigned int rmask, gmask, bmask;
-		if (image->format() == if_16bit_565) {
-			rmask = 0xF800; gmask = 0x07E0; bmask = 0x001F;
-		} else {
-			rmask = 0x7C00; gmask = 0x03E0; bmask = 0x001F;
-		}
-		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
+		Uint32 format = image->format() == if_16bit_565 ? SDL_PIXELFORMAT_RGB565 : SDL_PIXELFORMAT_RGB555;
+		surf = SDL_CreateRGBSurfaceWithFormatFrom(image->data(frame),
 						image->width(frame), image->height(frame),
-						16, // depth
-						image->width(frame) * 2, // pitch
-						rmask, gmask, bmask, 0); // RGBA mask
+						SDL_BITSPERPIXEL(format), // depth
+						image->width(frame) * SDL_BYTESPERPIXEL(format), // pitch
+						format);
 		assert(surf);
 	} else {
 		assert(image->format() == if_24bit);
 
-		surf = SDL_CreateRGBSurfaceFrom(image->data(frame),
+		surf = SDL_CreateRGBSurfaceWithFormatFrom(image->data(frame),
 						image->width(frame), image->height(frame),
-						24, // depth
-						image->width(frame) * 3, // pitch
-						0x00FF0000, 0x0000FF00, 0x000000FF, 0); // RGBA mask
+						SDL_BITSPERPIXEL(SDL_PIXELFORMAT_RGB888), // depth
+						image->width(frame) * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_RGB888), // pitch
+						SDL_PIXELFORMAT_RGB888);
 		assert(surf);
 
 	}
