@@ -34,7 +34,7 @@ protected:
 	unsigned int metaroom;
 
 	bool panning;
-	unsigned int destx, desty;
+	// unsigned int destx, desty;
 	float velx, vely;
 
 	AgentRef trackedagent;
