@@ -28,6 +28,7 @@
 #include "imageManager.h"
 #include "Map.h"
 #include "Agent.h"
+#include "DullPart.h"
 
 /*
  * sfcdumper.py has better commentary on this format - use it for debugging

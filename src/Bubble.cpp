@@ -26,6 +26,7 @@
 #include "Engine.h"
 #include "imageManager.h"
 #include "keycodes.h"
+#include "SpritePart.h"
 #include "World.h"
 
 Bubble::Bubble(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
@@ -169,7 +170,7 @@ void BubblePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	unsigned int charpos = 0;
 	for (unsigned char c : text) {
 		assert(c < charsetsprite->numframes()); // handled in setText
-		renderer->render(charsetsprite, c, xoffset + x + textoffset + charpos, yoffset + y);
+		renderer->renderTexture(charsetsprite->texture_atlas, c, xoffset + x + textoffset + charpos, yoffset + y);
 		charpos += charsetsprite->width(c) + 1;
 	}
 }

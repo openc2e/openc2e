@@ -21,6 +21,9 @@
 #include <memory>
 #include "Backend.h"
 
+class MetaRoom;
+class QtBackend;
+
 class openc2eviewport : public QWidget {
 	Q_OBJECT
 public:
@@ -31,7 +34,7 @@ class openc2eView : public QAbstractScrollArea {
 	Q_OBJECT
 
 public:
-	openc2eView(QWidget *parent, std::shared_ptr<class QtBackend>);
+	openc2eView(QWidget *parent, QtBackend* backend);
 	~openc2eView();
 
 protected:
@@ -53,15 +56,14 @@ protected:
 	void scrollContentsBy(int dx, int dy);
 
 	// variables
-	std::shared_ptr<class QtBackend> backend;
+	QtBackend *backend;
 	int lastmousex, lastmousey;
-	class MetaRoom *lastMetaroom;
+	MetaRoom *lastMetaroom;
 
 	// helpers
 	void resizescrollbars();
 
 public:
-	std::shared_ptr<class Backend> getBackend();
 	void tick();
 };
 

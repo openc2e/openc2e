@@ -182,8 +182,17 @@ add_library(openc2e-core STATIC
 	src/Catalogue.cpp
 	${GEN}/cmddata.cpp
 	src/CompoundAgent.cpp
-	src/creatures/CompoundCreature.cpp
+	src/AnimatablePart.cpp
+	src/ButtonPart.cpp
+	src/CameraPart.cpp
 	src/CompoundPart.cpp
+	src/DullPart.cpp
+	src/FixedTextPart.cpp
+	src/GraphPart.cpp
+	src/SpritePart.cpp
+	src/TextPart.cpp
+	src/TextEntryPart.cpp
+	src/creatures/CompoundCreature.cpp
 	src/creatures/Creature.cpp
 	src/creatures/CreatureAgent.cpp
 	src/creatures/CreatureAI.cpp

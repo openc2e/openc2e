@@ -24,7 +24,8 @@
 #include <string>
 #include <vector>
 
-enum imageformat { if_paletted, if_16bit_555, if_16bit_565, if_24bit };
+#include "imageformat.h"
+#include "TextureAtlas.h"
 
 unsigned int bitDepthOf(imageformat f);
 
@@ -55,6 +56,8 @@ public:
 	virtual uint8_t *getCustomPalette();
 	
 	virtual bool transparentAt(unsigned int frame, unsigned int x, unsigned int y);
+	
+	TextureAtlasHandle texture_atlas;
 };
 
 /* vim: set noet: */

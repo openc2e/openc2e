@@ -86,7 +86,7 @@ void Blackboard::renderText(RenderTarget *renderer, int xoffset, int yoffset) {
 			continue;
 		}
 		// TODO: is +1 really the right fix here?
-		renderer->render(charsetsprite, c, xoffset + textx + 1 + charpos, yoffset + texty + 1);
+		renderer->renderTexture(charsetsprite->texture_atlas, c, xoffset + textx + 1 + charpos, yoffset + texty + 1);
 		charpos += charsetsprite->width(c) + 1;
 	}
 }

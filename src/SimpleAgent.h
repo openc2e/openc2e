@@ -17,12 +17,13 @@
  *
  */
 
-#include "CompoundAgent.h"
-#include <string>
-#include <vector>
+#pragma once
 
-#ifndef _C2E_SIMPLEAGENT_H
-#define _C2E_SIMPLEAGENT_H
+#include "Agent.h"
+#include <string>
+
+class CompoundPart;
+class DullPart;
 
 class SimpleAgent : public Agent {
 protected:
@@ -37,5 +38,4 @@ public:
 	CompoundPart *part(unsigned int id);
 };
 
-#endif
 /* vim: set noet: */

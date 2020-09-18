@@ -18,9 +18,11 @@
 #define _QTBACKEND_H
 
 #include "backends/SDLBackend.h"
+#include <QApplication>
 #include <deque>
 
 class QInputMethodEvent;
+class QtOpenc2e;
 
 class QtBackend : public SDLBackend {
 public:
@@ -29,8 +31,8 @@ public:
 	void init();
 	void setup(class QWidget *vp);
 	void resized(int w, int h);
-	bool pollEvent(SomeEvent &e);
-	void pushEvent(SomeEvent e);
+	bool pollEvent(BackendEvent &e);
+	void pushEvent(BackendEvent e);
 	bool keyDown(int key);
 	void inputMethodEvent(QInputMethodEvent*);
 	void keyEvent(class QKeyEvent *k, bool pressed);
@@ -38,7 +40,9 @@ public:
 	int run(int argc, char **argv);
 
 protected:
-	std::deque<SomeEvent> events;
+	QApplication* app;
+	QtOpenc2e* myvat;
+	std::deque<BackendEvent> events;
 	
 	bool downkeys[256]; // TODO: public data bad
 	class QWidget *viewport;

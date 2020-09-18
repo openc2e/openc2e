@@ -25,9 +25,8 @@
 
 class NullRenderTarget : public RenderTarget {
 public:
-	virtual void render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false) { }
+	virtual void renderTexture(const TextureAtlasHandle&, size_t, int, int, uint8_t, bool) { }
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) { }
-	virtual void renderText(int x, int y, std::string text, unsigned int colour, unsigned int bgcolour) { }
 	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h)  { }
 	virtual unsigned int getWidth() const { return 800; }
 	virtual unsigned int getHeight() const { return 600; }
@@ -47,7 +46,7 @@ public:
 	virtual void resize(unsigned int width, unsigned int height) { }
 
 	virtual unsigned int ticks() { return 0; }
-	virtual bool pollEvent(SomeEvent &e) { return false; }
+	virtual bool pollEvent(BackendEvent &e) { return false; }
 	virtual void handleEvents() { }
 	virtual bool keyDown(int key) { return false; }
 
@@ -57,6 +56,8 @@ public:
 	virtual RenderTarget *getMainRenderTarget() { return &surface; }
 	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) { return 0; }
 	virtual void freeRenderTarget(RenderTarget *surf) { }
+	
+	virtual TextureAtlasHandle createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>&) { return {}; }
 			
 	virtual void setPalette(uint8_t *data) { }
 	virtual unsigned int textWidth(std::string text) { return 0; }

@@ -30,9 +30,11 @@
 #include <fmt/printf.h>
 #include <memory>
 #include "AgentHelpers.h"
+#include "AnimatablePart.h"
 #include "Room.h" // LIML/LIMT etc
 #include "Engine.h" // C2 hack in POSE
 #include "Map.h"
+#include "SpritePart.h"
 #include <climits>
 
 using std::cerr;

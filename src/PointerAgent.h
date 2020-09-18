@@ -17,11 +17,12 @@
  *
  */
 
-#include "SimpleAgent.h"
-#include "Backend.h"
+#pragma once
 
-#ifndef _C2E_POINTERAGENT_H
-#define _C2E_POINTERAGENT_H
+#include "BackendEvent.h"
+#include "SimpleAgent.h"
+
+class DullPart;
 
 class PointerAgent : public SimpleAgent {
 private:
@@ -53,12 +54,11 @@ public:
 	void physicsTick();
 	void tick();
 	void kill();
-	void handleEvent(SomeEvent &event);
+	void handleEvent(BackendEvent &event);
 	void setHotspot(int, int);
 
 	int pointerX() { return x + hotspotx; }
 	int pointerY() { return y + hotspoty; }
 };
 
-#endif
 /* vim: set noet: */

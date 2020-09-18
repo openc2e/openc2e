@@ -32,6 +32,9 @@
 #include <windows.h>
 #endif
 
+static int QT_ARGC = 1;
+static char *QT_ARGV[] = { (char*)"openc2e", nullptr };
+
 QtBackend::QtBackend() {
 	viewport = 0;
 
@@ -47,6 +50,10 @@ void QtBackend::shutdown() {
 }
 
 void QtBackend::init() {
+	app = new QApplication(QT_ARGC, QT_ARGV);
+	
+	myvat = new QtOpenc2e(this);
+	myvat->show();
 }
 
 void QtBackend::setup(QWidget *vp) {
@@ -74,14 +81,14 @@ void QtBackend::resized(int w, int h) {
 	SDLBackend::resizeNotify(w, h);
 
 	// add resize window event to backend queue
-	SomeEvent e;
+	BackendEvent e;
 	e.type = eventresizewindow;
 	e.x = w;
 	e.y = h;
 	pushEvent(e);
 }
 
-bool QtBackend::pollEvent(SomeEvent &e) {
+bool QtBackend::pollEvent(BackendEvent &e) {
 	// skip events from SDL
 	while (SDLBackend::pollEvent(e)) {};
 
@@ -93,7 +100,7 @@ bool QtBackend::pollEvent(SomeEvent &e) {
 	return true;
 }
 
-void QtBackend::pushEvent(SomeEvent e) {
+void QtBackend::pushEvent(BackendEvent e) {
 	events.push_back(e);
 }
 
@@ -178,7 +185,7 @@ void QtBackend::inputMethodEvent(QInputMethodEvent *event) {
 	if (utf8.length() == 0) {
 		return;
 	}
-	SomeEvent e;
+	BackendEvent e;
 	e.type = eventtextinput;
 	e.text = std::string(utf8.data(), utf8.data() + utf8.length());
 	pushEvent(e);
@@ -189,7 +196,7 @@ void QtBackend::keyEvent(QKeyEvent *k, bool pressed) {
 	if (translatedkey != -1) {
 		downkeys[translatedkey] = pressed;
 
-		SomeEvent e;
+		BackendEvent e;
 		e.type = pressed ? eventrawkeydown : eventrawkeyup;
 		e.key = translatedkey;
 		pushEvent(e);
@@ -202,7 +209,7 @@ void QtBackend::keyEvent(QKeyEvent *k, bool pressed) {
 	if (utf8.length() == 0) {
 		return;
 	}
-	SomeEvent e;
+	BackendEvent e;
 	e.type = eventtextinput;
 	e.text = std::string(utf8.data(), utf8.data() + utf8.length());
 	pushEvent(e);
@@ -212,13 +219,6 @@ bool QtBackend::keyDown(int key) {
 	return downkeys[key];
 }
 
-int QtBackend::run(int argc, char **argv) {
-	QApplication app(argc, argv);
-	std::shared_ptr<QtBackend> qtbackend = std::dynamic_pointer_cast<class QtBackend, class Backend>(engine.backend);
-	assert(qtbackend.get() == this);
-
-	QtOpenc2e myvat(qtbackend);
-	myvat.show();
-
-	return app.exec();
+int QtBackend::run(int, char **) {
+	return app->exec();
 }

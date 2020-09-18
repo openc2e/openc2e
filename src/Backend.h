@@ -23,33 +23,17 @@
 #include <memory>
 #include <string>
 
+#include "BackendEvent.h"
+#include "imageformat.h"
+#include "TextureAtlas.h"
+
 using std::shared_ptr;
-
-enum eventtype {
-	eventquit,
-	eventtextinput,
-	eventrawkeyup,
-	eventrawkeydown,
-	eventmousebuttondown,
-	eventmousebuttonup,
-	eventmousemove,
-	eventresizewindow,
-};
-enum eventbuttons { buttonleft=0x1, buttonright=0x2, buttonmiddle=0x4, buttonwheeldown=0x8, buttonwheelup=0x10 };
-
-struct SomeEvent {
-	eventtype type;
-	int x, y, xrel, yrel;
-	int key;
-	unsigned int button;
-	std::string text;
-};
 
 class creaturesImage;
 
 class RenderTarget {
 public:
-	virtual void render(std::shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false) = 0;
+	virtual void renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) = 0;
 	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h) = 0;
 	virtual unsigned int getWidth() const = 0;
@@ -66,7 +50,7 @@ public:
 	virtual void shutdown() = 0;
 
 	virtual unsigned int ticks() = 0;	
-	virtual bool pollEvent(SomeEvent &e) = 0;
+	virtual bool pollEvent(BackendEvent &e) = 0;
 	virtual void handleEvents() = 0;
 	virtual bool keyDown(int key) = 0;
 
@@ -75,8 +59,10 @@ public:
 	virtual RenderTarget *getMainRenderTarget() = 0;
 	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) = 0;
 	virtual void freeRenderTarget(RenderTarget *surf) = 0;
-			
+
 	virtual void setPalette(uint8_t *data) = 0;
+	
+	virtual TextureAtlasHandle createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>& image) = 0;
 	
 	virtual int run(int argc, char **argv);
 	virtual void delay(int msec) = 0;

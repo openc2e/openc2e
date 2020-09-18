@@ -28,7 +28,7 @@
 class Backend;
 class AudioBackend;
 class MainCamera;
-struct SomeEvent;
+struct BackendEvent;
 
 class Engine {
 protected:
@@ -52,12 +52,12 @@ protected:
 	std::string preferred_backend, preferred_audiobackend;
 
 	void handleKeyboardScrolling();
-	void handleResizedWindow(SomeEvent &event);
-	void handleMouseMove(SomeEvent &event);
-	void handleMouseButton(SomeEvent &event);
-	void handleTextInput(SomeEvent &event);
-	void handleRawKeyDown(SomeEvent &event);
-	void handleRawKeyUp(SomeEvent &event);
+	void handleResizedWindow(BackendEvent &event);
+	void handleMouseMove(BackendEvent &event);
+	void handleMouseButton(BackendEvent &event);
+	void handleTextInput(BackendEvent &event);
+	void handleRawKeyDown(BackendEvent &event);
+	void handleRawKeyUp(BackendEvent &event);
 
 	class peFile *exefile;
 	void loadGameData();

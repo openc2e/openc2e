@@ -41,6 +41,7 @@
 #include "Map.h"
 #include "prayManager.h"
 #include "Scriptorium.h"
+#include "SpritePart.h"
 
 #include <fmt/printf.h>
 #include <ghc/filesystem.hpp>
@@ -421,6 +422,7 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	int sprheight = bkgd->height(0);
 
 	// draw the blk
+	// TODO: clear the rendertarget background to black
 	unsigned int heightinsprites = m->fullheight() / sprheight;
 	unsigned int widthinsprites = m->fullwidth() / sprwidth;
 	for (unsigned int i = 0; i < heightinsprites; i++) {
@@ -440,8 +442,9 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 				// if the block's on screen, render it.
 				if ((destx >= -sprwidth) && (desty >= -sprheight) &&
 						(destx - sprwidth <= (int)surface->getWidth()) &&
-						(desty - sprheight <= (int)surface->getHeight()))
-					surface->render(bkgd, whereweare, destx, desty, false, 0, false, true);
+						(desty - sprheight <= (int)surface->getHeight())) {
+					surface->renderTexture(bkgd->texture_atlas, whereweare, destx, desty);
+				}
 			}
 		}
 	}

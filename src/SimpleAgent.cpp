@@ -18,6 +18,7 @@
  */
 
 #include "SimpleAgent.h"
+#include "DullPart.h"
 
 SimpleAgent::SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 			 std::string spritefile, unsigned int firstimage, unsigned int imagecount) :

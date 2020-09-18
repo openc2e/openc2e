@@ -27,6 +27,7 @@
 #include "MetaRoom.h"
 #include "Camera.h"
 #include "creatures/SkeletalCreature.h"
+#include "DullPart.h"
 #include <cassert>
 #include <climits>
 #include <memory>
@@ -187,7 +188,7 @@ void PointerAgent::setHotspot(int x, int y) {
 	hotspoty = y;
 }
 
-void PointerAgent::handleEvent(SomeEvent &event) {
+void PointerAgent::handleEvent(BackendEvent &event) {
 	int x = pointerX(), y = pointerY();
 		
 	if (event.type == eventmousemove) {

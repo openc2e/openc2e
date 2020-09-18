@@ -16,9 +16,13 @@
  *  Lesser General Public License for more details.
  *
  */
+ 
+#pragma once
+ 
 #include <cassert>
 #include <memory>
 
+#include "AnimatablePart.h"
 #include "fileformats/attFile.h"
 #include "fileformats/genomeFile.h"
 #include "openc2e.h"

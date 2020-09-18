@@ -87,7 +87,7 @@ QIcon iconFromImageList(QPixmap l, unsigned int n) {
 }
 
 // Constructor which creates the main window.
-QtOpenc2e::QtOpenc2e(std::shared_ptr<QtBackend> backend) {
+QtOpenc2e::QtOpenc2e(QtBackend* backend) {
 	viewport = new openc2eView(this, backend);
 	setCentralWidget(viewport);
 

@@ -20,15 +20,17 @@
 #ifndef _CAMERAPART_H
 #define _CAMERAPART_H
 
-#include "CompoundPart.h"
+#include "SpritePart.h"
 #include <memory>
 
 class Camera;
+class RenderTarget;
 
 class CameraPart : public SpritePart {
 protected:
 	unsigned int viewheight, viewwidth, cameraheight, camerawidth;
-	shared_ptr<Camera> camera;
+	std::shared_ptr<Camera> camera;
+	std::unique_ptr<RenderTarget, void(*)(RenderTarget*)> rendertarget;
 	
 public:
 	CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,

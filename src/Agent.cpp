@@ -34,6 +34,7 @@
 #include "Camera.h"
 #include "Map.h"
 #include "Scriptorium.h"
+#include "SpritePart.h"
 #include "VoiceData.h"
 
 void Agent::core_init() {

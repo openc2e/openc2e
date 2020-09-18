@@ -82,6 +82,13 @@ void SDLBackend::init() {
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	assert(renderer);
 
+	{
+		SDL_RendererInfo info;
+		info.name = nullptr;
+		SDL_GetRendererInfo(renderer, &info);
+		printf("* SDL Renderer: %s\n", info.name);
+	}
+
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
 }
@@ -96,6 +103,13 @@ void SDLBackend::initFrom(void *window_id) {
 	assert(window);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	assert(renderer);
+
+	{
+		SDL_RendererInfo info;
+		info.name = nullptr;
+		SDL_GetRendererInfo(renderer, &info);
+		printf("* SDL Renderer: %s\n", info.name);
+	}
 
 #if defined(SDL_VIDEO_DRIVER_X11)
 	// Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
@@ -181,7 +195,7 @@ void SDLBackend::handleNetworking() {
 	}
 }
 
-bool SDLBackend::pollEvent(SomeEvent &e) {
+bool SDLBackend::pollEvent(BackendEvent &e) {
 	SDL_Event event;
 retry:
 	if (!SDL_PollEvent(&event)) return false;
@@ -296,77 +310,108 @@ SDL_Color getColourFromRGBA(unsigned int c) {
 	return sdlc;
 }
 
-void SDLRenderTarget::render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans, unsigned char transparency, bool mirror, bool is_background) {
-	assert(image);
-	assert(image->numframes() > frame);
-
-	// don't bother rendering off-screen stuff
-	if (x >= (int)width) return; if (y >= (int)height) return;
-	if ((x + image->width(frame)) <= 0) return;
-	if ((y + image->height(frame)) <= 0) return;
-
+SDL_Texture* SDLBackend::createTexture(void *data, unsigned int width, unsigned int height, imageformat format, bool black_is_transparent, uint8_t* custom_palette) {
+	assert(data);
+	assert(width > 0);
+	assert(height > 0);
+	if (format != if_paletted) {
+		assert(custom_palette == nullptr);
+	}	
+	
 	// create surface
-	SDL_Surface *surf;
-	SDL_Color *surfpalette = 0;
-	if (image->format() == if_paletted) {
-		surf = SDL_CreateRGBSurfaceWithFormatFrom(image->data(frame),
-						image->width(frame), image->height(frame),
-						SDL_BITSPERPIXEL(SDL_PIXELFORMAT_INDEX8), // depth
-						image->width(frame) * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_INDEX8), // pitch
-						SDL_PIXELFORMAT_INDEX8);
-		assert(surf);
-		if (image->hasCustomPalette())
-			surfpalette = (SDL_Color *)image->getCustomPalette();
-		else
-			surfpalette = palette;
-		SDL_SetPaletteColors(surf->format->palette, surfpalette, 0, 256);
-	} else if (image->format() == if_16bit_565 || image->format() == if_16bit_555) {
-		unsigned int rmask, gmask, bmask;
-		Uint32 format = image->format() == if_16bit_565 ? SDL_PIXELFORMAT_RGB565 : SDL_PIXELFORMAT_RGB555;
-		surf = SDL_CreateRGBSurfaceWithFormatFrom(image->data(frame),
-						image->width(frame), image->height(frame),
-						SDL_BITSPERPIXEL(format), // depth
-						image->width(frame) * SDL_BYTESPERPIXEL(format), // pitch
-						format);
-		assert(surf);
-	} else {
-		assert(image->format() == if_24bit);
-
-		surf = SDL_CreateRGBSurfaceWithFormatFrom(image->data(frame),
-						image->width(frame), image->height(frame),
-						SDL_BITSPERPIXEL(SDL_PIXELFORMAT_RGB888), // depth
-						image->width(frame) * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_RGB888), // pitch
-						SDL_PIXELFORMAT_RGB888);
-		assert(surf);
-
+	Uint32 sdlformat = SDL_PIXELFORMAT_UNKNOWN;
+	switch (format) {
+		case if_paletted:
+			sdlformat = SDL_PIXELFORMAT_INDEX8;
+			break;
+		case if_16bit_555:
+			sdlformat = SDL_PIXELFORMAT_RGB565;
+			break;
+		case if_16bit_565:
+			sdlformat = SDL_PIXELFORMAT_RGB565;
+			break;
+		case if_24bit:
+			sdlformat = SDL_PIXELFORMAT_RGB888;
+			break;
 	}
 	
+	SDL_Surface *surf = SDL_CreateRGBSurfaceWithFormatFrom(
+		data,
+		width,
+		height,
+		SDL_BITSPERPIXEL(sdlformat), // depth
+		width * SDL_BYTESPERPIXEL(sdlformat), // pitch
+		sdlformat
+	);
+	assert(surf);
+
+	if (format == if_paletted) {
+		SDL_SetPaletteColors(
+			surf->format->palette,
+			// TODO: custom_palette not guaranteed to fit SDL_Color ?
+			custom_palette ? (SDL_Color *)custom_palette : palette,
+			0,
+			256);
+	}
+
 	// set colour-keying
-	if (!is_background) {
+	if (black_is_transparent) {
 		SDL_SetColorKey(surf, SDL_TRUE, 0);
 	}
-
+	
 	// create texture
-	SDL_Texture *tex = SDL_CreateTextureFromSurface(parent->renderer, surf);
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
 	assert(tex);
 	SDL_FreeSurface(surf);
+	return tex;
+}
 
-	// do actual render
-	if (trans) {
-		SDL_SetTextureAlphaMod(tex, 255 - transparency);
+class SDLTextureAtlas : public TextureAtlas {
+public:
+	~SDLTextureAtlas() {
+		for (auto* t : textures) {
+			SDL_DestroyTexture(t);
+		}
 	}
+	std::vector<SDL_Texture*> textures;
+};
+
+TextureAtlasHandle SDLBackend::createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>& image) {
+	assert(image);
+	
+	auto atlas = std::make_shared<SDLTextureAtlas>();
+	atlas->textures.resize(image->numframes());
+	for (size_t i = 0; i < image->numframes(); ++i) {
+		atlas->textures[i] = createTexture(
+			image->data(i),
+			image->width(i),
+			image->height(i),
+			image->format(),
+			true,
+			image->hasCustomPalette() ? image->getCustomPalette() : nullptr
+		);
+	}
+	return std::dynamic_pointer_cast<TextureAtlas>(atlas);
+}
+
+void SDLRenderTarget::renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency, bool mirror) {
+	auto sdl_atlas = std::dynamic_pointer_cast<SDLTextureAtlas>(atlas);
+	assert(i < sdl_atlas->textures.size());
+	
+	SDL_Texture *tex = sdl_atlas->textures[i];
+	
+	// do actual render
+	SDL_SetTextureAlphaMod(tex, 255 - transparency);
 	SDL_RendererFlip flip = mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+	
 	SDL_Rect destrect;
 	destrect.x = x;
 	destrect.y = y;
-	destrect.w = image->width(frame);
-	destrect.h = image->height(frame);
+	SDL_QueryTexture(tex, nullptr, nullptr, &destrect.w, &destrect.h);
+	
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_RenderCopyEx(parent->renderer, tex, nullptr, &destrect, 0, nullptr, flip);
 	SDL_SetRenderTarget(parent->renderer, nullptr);
-
-	// free texture
-	SDL_DestroyTexture(tex);
 }
 
 void SDLRenderTarget::renderClear() {
@@ -511,12 +556,11 @@ bool SDLBackend::keyDown(int key) {
 }
 
 void SDLBackend::setPalette(uint8_t *data) {
-	// TODO: we only set the palette on our main surface, so will fail for any C1 cameras!
 	for (unsigned int i = 0; i < 256; i++) {
-		mainrendertarget.palette[i].r = data[i * 3];
-		mainrendertarget.palette[i].g = data[(i * 3) + 1];
-		mainrendertarget.palette[i].b = data[(i * 3) + 2];
-		mainrendertarget.palette[i].a = 255;
+		palette[i].r = data[i * 3];
+		palette[i].g = data[(i * 3) + 1];
+		palette[i].b = data[(i * 3) + 2];
+		palette[i].a = 255;
 	}
 }
 

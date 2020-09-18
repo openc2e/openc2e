@@ -27,6 +27,7 @@
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
+#include "Backend.h"
 #include "PathResolver.h"
 
 #include <iostream>
@@ -116,6 +117,8 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
 		return shared_ptr<creaturesImage>();
 	}
+	
+	img->texture_atlas = engine.backend->createTextureAtlasFromCreaturesImage(img);
 
 	return img;
 }
@@ -183,7 +186,9 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 		}
 	}
 
-	return std::make_shared<creaturesImage>(path(filename).stem(), format, buffers, widths, heights);
+	auto img = std::make_shared<creaturesImage>(path(filename).stem(), format, buffers, widths, heights);
+	img->texture_atlas = engine.backend->createTextureAtlasFromCreaturesImage(img);
+	return img;
 }
 
 std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creaturesImage>& oldimage,
@@ -312,6 +317,7 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 		oldimage->widths,
 		oldimage->heights
 	));
+	img->texture_atlas = engine.backend->createTextureAtlasFromCreaturesImage(img);
 	return img;
 }
 

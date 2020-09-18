@@ -41,7 +41,7 @@
  *
  */
 
-openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstractScrollArea(parent) {
+openc2eView::openc2eView(QWidget *parent, QtBackend* b) : QAbstractScrollArea(parent) {
 	backend = b;
 
 	setViewport(new openc2eviewport());
@@ -67,10 +67,6 @@ openc2eView::openc2eView(QWidget *parent, std::shared_ptr<QtBackend> b) : QAbstr
 }
 
 openc2eView::~openc2eView() {
-}
-
-std::shared_ptr<class Backend> openc2eView::getBackend() {
-	return std::dynamic_pointer_cast<class Backend, class QtBackend>(backend);
 }
 
 void openc2eView::resizescrollbars() {
@@ -99,7 +95,7 @@ void openc2eView::resizeEvent(QResizeEvent *) {
 
 void openc2eView::mouseMoveEvent(QMouseEvent *m) {
 	// add mouse move event to backend queue
-	SomeEvent e;
+	BackendEvent e;
 	e.type = eventmousemove;
 	e.xrel = m->x() - lastmousex;
 	e.yrel = m->y() - lastmousey;
@@ -114,7 +110,7 @@ void openc2eView::mouseMoveEvent(QMouseEvent *m) {
 
 // helper function
 void openc2eView::mouseEvent(QMouseEvent *m, eventtype t) {
-	SomeEvent e;
+	BackendEvent e;
 	e.type = t;
 	e.x = m->x();
 	e.y = m->y();
@@ -136,7 +132,7 @@ void openc2eView::mouseReleaseEvent(QMouseEvent *m) {
 }
 
 void openc2eView::wheelEvent(QWheelEvent *w) {
-	SomeEvent e;
+	BackendEvent e;
 	e.type = eventmousebuttondown;
 	e.x = w->x();
 	e.y = w->y();	

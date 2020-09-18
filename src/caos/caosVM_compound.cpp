@@ -17,10 +17,16 @@
  *
  */
 
+#include "Blackboard.h"
+#include "ButtonPart.h"
 #include "caosVM.h"
 #include "CompoundAgent.h"
 #include "CameraPart.h"
-#include "Blackboard.h"
+#include "DullPart.h"
+#include "FixedTextPart.h"
+#include "GraphPart.h"
+#include "TextPart.h"
+#include "TextEntryPart.h"
 #include "openc2e.h"
 #include "World.h"
 #include "Engine.h"

@@ -32,12 +32,11 @@ protected:
 	class SDLBackend *parent;
 	SDL_Texture *texture;
 	unsigned int width, height;
-	SDL_Color palette[256];
 	
 	SDLRenderTarget(SDLBackend *p) { parent = p; }
 
 public:
-	void render(shared_ptr<creaturesImage> image, unsigned int frame, int x, int y, bool trans = false, unsigned char transparency = 0, bool mirror = false, bool is_background = false);
+	void renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency = 0, bool mirror = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h);
 	unsigned int getWidth() const { return width; }
@@ -56,11 +55,13 @@ protected:
 	SDL_Renderer *renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
 	TCPsocket listensocket;
+	SDL_Color palette[256];
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
 
 	SDL_Surface *getMainSDLSurface() { return SDL_GetWindowSurface(window); }
+	SDL_Texture* createTexture(void *data, unsigned int width, unsigned int height, imageformat format, bool black_is_transparent = true, uint8_t* custom_palette = nullptr);
 
 	virtual int idealBpp();
 
@@ -73,11 +74,13 @@ public:
 
 	void resize(unsigned int w, unsigned int h) { resizeNotify(w, h); }
 
-	bool pollEvent(SomeEvent &e);
+	bool pollEvent(BackendEvent &e);
 	
 	unsigned int ticks() { return SDL_GetTicks(); }
 	
 	void handleEvents();
+	
+	TextureAtlasHandle createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>& image);
 
 	RenderTarget *getMainRenderTarget() { return &mainrendertarget; }
 	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);

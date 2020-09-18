@@ -143,26 +143,6 @@ static std::vector<std::string> read_wordlist(peFile* exefile, uint32_t lang) {
 }
 
 void Engine::loadGameData() {
-	// load palette for C1
-	if (gametype == "c1") {
-		// TODO: case-sensitivity for the lose
-		fs::path palpath(world.findFile("Palettes/palette.dta"));
-		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
-			palette = new unsigned char[768];
-
-			std::ifstream f(palpath.string().c_str(), std::ios::binary);
-			f >> std::noskipws;
-			f.read((char *)palette, 768);
-			
-			for (unsigned int i = 0; i < 768; i++) {
-				palette[i] = palette[i] * 4;
-			}
-
-			backend->setPalette((uint8_t *)palette);
-		} else
-			throw creaturesException("Couldn't find C1 palette data!");
-	}
-
 	// load word list translations for C1
 	// C1 does not keep translations for all languages, so we embed them
 	if (gametype == "c1") {
@@ -467,7 +447,7 @@ void Engine::handleKeyboardScrolling() {
 }
 
 void Engine::processEvents() {
-	SomeEvent event;
+	BackendEvent event;
 	while (backend->pollEvent(event)) {
 		switch (event.type) {
 			case eventresizewindow:
@@ -505,7 +485,7 @@ void Engine::processEvents() {
 	}
 }
 
-void Engine::handleResizedWindow(SomeEvent &event) {
+void Engine::handleResizedWindow(BackendEvent &event) {
 	// notify agents
 	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
@@ -513,7 +493,7 @@ void Engine::handleResizedWindow(SomeEvent &event) {
 	}
 }
 
-void Engine::handleMouseMove(SomeEvent &event) {
+void Engine::handleMouseMove(BackendEvent &event) {
 	// move the cursor
 	world.hand()->handleEvent(event);
 
@@ -528,7 +508,7 @@ void Engine::handleMouseMove(SomeEvent &event) {
 	}
 }
 
-void Engine::handleMouseButton(SomeEvent &event) {
+void Engine::handleMouseButton(BackendEvent &event) {
 	// notify agents
 	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
 		if (!*i) continue;
@@ -569,7 +549,7 @@ void Engine::handleMouseButton(SomeEvent &event) {
 	world.hand()->handleEvent(event);
 }
 
-void Engine::handleTextInput(SomeEvent &event) {
+void Engine::handleTextInput(BackendEvent &event) {
 	std::string cp1252_text;
 	try {
 		 cp1252_text = utf8_to_cp1252(event.text);
@@ -612,7 +592,7 @@ void Engine::handleTextInput(SomeEvent &event) {
 	}
 }
 
-void Engine::handleRawKeyUp(SomeEvent &event) {
+void Engine::handleRawKeyUp(BackendEvent &event) {
 	switch (event.key) {
 		case OPENC2E_KEY_W:
 			w_down = false;
@@ -631,7 +611,7 @@ void Engine::handleRawKeyUp(SomeEvent &event) {
 	}
 }
 
-void Engine::handleRawKeyDown(SomeEvent &event) {
+void Engine::handleRawKeyDown(BackendEvent &event) {
 	switch (event.key) {
 		case OPENC2E_KEY_W:
 			w_down = true;
@@ -911,6 +891,63 @@ bool Engine::initialSetup() {
 	// finally, add our cache directory to the end
 	world.data_directories.push_back(storageDirectory());
 	
+	// initialize backends
+	if (cmdline_norun) preferred_backend = "null";
+	if (preferred_backend != "null") std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;	
+	shared_ptr<Backend> b = possible_backends[preferred_backend];
+	if (!b)	throw creaturesException("No such backend " + preferred_backend);
+	b->init(); setBackend(b);
+	possible_backends.clear();
+
+	if (cmdline_norun || !cmdline_enable_sound) preferred_audiobackend = "null";
+	if (preferred_audiobackend != "null") std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;	
+	shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
+	if (!a)	throw creaturesException("No such audio backend " + preferred_audiobackend);
+	try{
+		a->init(); audio = a;
+	} catch (creaturesException &e) {
+		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl << "* Continuing without sound." << std::endl;
+		audio = shared_ptr<AudioBackend>(new NullAudioBackend());
+		audio->init();
+	}
+	possible_audiobackends.clear();
+	
+	int listenport = backend->networkInit();
+	if (listenport != -1) {
+		// inform the user of the port used, and store it in the relevant file
+		std::cout << "* Listening for connections on port " << listenport << "." << std::endl;
+#ifndef _WIN32
+		fs::path p = fs::path(homeDirectory().string() + "/.creaturesengine");
+		if (!fs::exists(p))
+			fs::create_directory(p);
+		if (fs::is_directory(p)) {
+			std::ofstream f((p.string() + "/port").c_str(), std::ios::trunc);
+			f << fmt::sprintf("%d", listenport);
+		}
+#endif
+	}
+	
+	// load palette for C1
+	if (gametype == "c1") {
+		std::cout << "* Loading palette.dta..." << std::endl;
+		// TODO: case-sensitivity for the lose
+		fs::path palpath(world.findFile("Palettes/palette.dta"));
+		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
+			palette = new unsigned char[768];
+
+			std::ifstream f(palpath.string().c_str(), std::ios::binary);
+			f >> std::noskipws;
+			f.read((char *)palette, 768);
+			
+			for (unsigned int i = 0; i < 768; i++) {
+				palette[i] = palette[i] * 4;
+			}
+
+			backend->setPalette((uint8_t *)palette);
+		} else
+			throw creaturesException("Couldn't find C1 palette data!");
+	}
+	
 	// initial setup
 	std::cout << "* Reading catalogue files..." << std::endl;
 	world.initCatalogue();
@@ -935,41 +972,6 @@ bool Engine::initialSetup() {
 	else // err, oops
 		std::cerr << "Warning: Setting working directory to " << exepath << " failed.";
 #endif
-
-	if (cmdline_norun) preferred_backend = "null";
-	if (preferred_backend != "null") std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;	
-	shared_ptr<Backend> b = possible_backends[preferred_backend];
-	if (!b)	throw creaturesException("No such backend " + preferred_backend);
-	b->init(); setBackend(b);
-	possible_backends.clear();
-
-	if (cmdline_norun || !cmdline_enable_sound) preferred_audiobackend = "null";
-	if (preferred_audiobackend != "null") std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;	
-	shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
-	if (!a)	throw creaturesException("No such audio backend " + preferred_audiobackend);
-	try{
-		a->init(); audio = a;
-	} catch (creaturesException &e) {
-		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl << "* Continuing without sound." << std::endl;
-		audio = shared_ptr<AudioBackend>(new NullAudioBackend());
-		audio->init();
-	}
-	possible_audiobackends.clear();
-
-	int listenport = backend->networkInit();
-	if (listenport != -1) {
-		// inform the user of the port used, and store it in the relevant file
-		std::cout << "Listening for connections on port " << listenport << "." << std::endl;
-#ifndef _WIN32
-		fs::path p = fs::path(homeDirectory().string() + "/.creaturesengine");
-		if (!fs::exists(p))
-			fs::create_directory(p);
-		if (fs::is_directory(p)) {
-			std::ofstream f((p.string() + "/port").c_str(), std::ios::trunc);
-			f << fmt::sprintf("%d", listenport);
-		}
-#endif
-	}
 
 	if (world.data_directories.size() < 3) {
 		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
