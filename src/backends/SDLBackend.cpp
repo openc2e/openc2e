@@ -296,7 +296,6 @@ retry:
 void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
 	SDL_SetRenderTarget(parent->renderer, texture);
 	aalineColor(parent->renderer, x1, y1, x2, y2, colour);
-	SDL_SetRenderTarget(parent->renderer, nullptr);
 }
 
 SDL_Color getColourFromRGBA(unsigned int c) {
@@ -411,18 +410,17 @@ void SDLRenderTarget::renderTexture(const TextureAtlasHandle& atlas, size_t i, i
 	
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_RenderCopyEx(parent->renderer, tex, nullptr, &destrect, 0, nullptr, flip);
-	SDL_SetRenderTarget(parent->renderer, nullptr);
 }
 
 void SDLRenderTarget::renderClear() {
 	SDL_SetRenderDrawColor(parent->renderer, 0, 0, 0, 255);
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_RenderClear(parent->renderer);
-	SDL_SetRenderTarget(parent->renderer, nullptr);
 }
 
 void SDLRenderTarget::renderDone() {
 	if (this == &parent->mainrendertarget) {
+		SDL_SetRenderTarget(parent->renderer, texture);
 		SDL_RenderPresent(parent->renderer);
 	}
 }
@@ -434,7 +432,6 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget *s, int x, int y, int w, int
 	SDL_Rect r; r.x = x; r.y = y; r.w = w; r.h = h;
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_RenderCopy(parent->renderer, src->texture, nullptr, &r);
-	SDL_SetRenderTarget(parent->renderer, nullptr);
 }
 
 RenderTarget *SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
