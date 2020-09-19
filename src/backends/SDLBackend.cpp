@@ -298,17 +298,6 @@ void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int co
 	aalineColor(parent->renderer, x1, y1, x2, y2, colour);
 }
 
-SDL_Color getColourFromRGBA(unsigned int c) {
-	// SDL's functions seem to want a pixelformat, which is more effort to fake than just doing this
-	SDL_Color sdlc;
-	sdlc.b = c & 0xff;
-	sdlc.g = (c >> 8) & 0xff;
-	sdlc.r = (c >> 16) & 0xff;
-	assert(c >> 24 == 0);
-	sdlc.a = 255;
-	return sdlc;
-}
-
 SDL_Texture* SDLBackend::createTexture(void *data, unsigned int width, unsigned int height, imageformat format, bool black_is_transparent, uint8_t* custom_palette) {
 	assert(data);
 	assert(width > 0);
