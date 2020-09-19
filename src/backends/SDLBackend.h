@@ -58,6 +58,7 @@ protected:
 	SDLRenderTarget mainrendertarget;
 	TCPsocket listensocket;
 	SDL_Color palette[256];
+	float userscale = 1.0;
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
@@ -73,6 +74,7 @@ public:
 	void initFrom(void *window_id);
 	int networkInit();
 	void shutdown();
+	void setUserScale(float scale);
 
 	void resize(unsigned int w, unsigned int h) { resizeNotify(w, h); }
 

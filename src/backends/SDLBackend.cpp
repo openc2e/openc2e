@@ -62,12 +62,17 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 	SDL_GetRendererOutputSize(renderer, &mainrendertarget.drawablewidth, &mainrendertarget.drawableheight);
 	assert(mainrendertarget.drawablewidth / windowwidth == mainrendertarget.drawableheight / windowheight);
 	float oldscale = mainrendertarget.scale;
-	float newscale = mainrendertarget.drawablewidth / windowwidth;
+	float newscale = mainrendertarget.drawablewidth / windowwidth * userscale;
 	if (abs(newscale) > 0.01 && abs(oldscale - newscale) > 0.01) {
 		printf("* SDL setting scale to %.2fx\n", newscale);	
 		mainrendertarget.scale = newscale;
 		SDL_RenderSetScale(renderer, mainrendertarget.scale, mainrendertarget.scale);
 	}
+}
+
+void SDLBackend::setUserScale(float userscale_) {
+	userscale = userscale_;
+	resizeNotify(windowwidth, windowheight);
 }
 
 void SDLBackend::init() {
@@ -228,10 +233,10 @@ retry:
 
 		case SDL_MOUSEMOTION:
 			e.type = eventmousemove;
-			e.x = event.motion.x;
-			e.y = event.motion.y;
-			e.xrel = event.motion.xrel;
-			e.yrel = event.motion.yrel;
+			e.x = event.motion.x / userscale;
+			e.y = event.motion.y / userscale;
+			e.xrel = event.motion.xrel / userscale;
+			e.yrel = event.motion.yrel / userscale;
 			e.button = 0;
 			if (event.motion.state & SDL_BUTTON(1))
 				e.button |= buttonleft;
@@ -253,8 +258,8 @@ retry:
 				case SDL_BUTTON_MIDDLE: e.button = buttonmiddle; break;
 				default: goto retry;
 			}
-			e.x = event.button.x;
-			e.y = event.button.y;
+			e.x = event.button.x / userscale;
+			e.y = event.button.y / userscale;
 			break;
 
 		case SDL_MOUSEWHEEL:

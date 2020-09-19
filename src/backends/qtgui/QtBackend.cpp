@@ -101,6 +101,16 @@ bool QtBackend::pollEvent(BackendEvent &e) {
 }
 
 void QtBackend::pushEvent(BackendEvent e) {
+	if (e.type == eventmousemove) {
+		e.x /= userscale;
+		e.xrel /= userscale;
+		e.y /= userscale;
+		e.yrel /= userscale;
+	}
+	if (e.type == eventmousebuttonup || e.type == eventmousebuttondown) {
+		e.x /= userscale;
+		e.y /= userscale;
+	}
 	events.push_back(e);
 }
 
