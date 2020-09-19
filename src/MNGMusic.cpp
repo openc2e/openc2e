@@ -40,9 +40,10 @@ void MNGMusic::startPlayback(AudioBackend &audio) {
 
 void MNGMusic::playSilence() {
 	playing_silence = true;
-	currenttrack->startFadeOut();
+	if (currenttrack) {
+		currenttrack->startFadeOut();
+	}
 	nexttrack.reset();
-	return;
 }
 
 void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
