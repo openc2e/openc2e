@@ -120,16 +120,6 @@ QtOpenc2e::QtOpenc2e(QtBackend* backend) {
 	creatureGrapherDock->setFloating(true);
 	creatureGrapherDock->resize(QSize(300, 300));
 	creatureGrapherDock->setWindowTitle(tr("Creature Grapher"));
-
-	constructMenus();
-
-	if (engine.version == 2 && engine.getExeFile()) {
-		loadC2Images();
-		createC2Toolbars();
-		setupC2Statusbar();
-	}
-
-	onCreatureChange();
 }
 
 void QtOpenc2e::constructMenus() {
@@ -546,7 +536,26 @@ void QtOpenc2e::onCreatureChange() {
 	}
 }
 
+static bool s_has_populated_gui = false;
+
 void QtOpenc2e::tick() {
+	// we need to create a window before starting the engine so that we have
+	// information on the graphics backend. but, we can't set up all of the Qt UI
+	// until the engine has started and we know what game we're running
+	if (!s_has_populated_gui) {
+		s_has_populated_gui = true;
+
+		constructMenus();
+
+		if (engine.version == 2 && engine.getExeFile()) {
+			loadC2Images();
+			createC2Toolbars();
+			setupC2Statusbar();
+		}
+
+		onCreatureChange();
+	}
+
 	// set refreshdisplay occasionally, for updates when dorendering is false
 	if (world.worldtickcount % world.ticktime == 0) // every 10 in-world seconds, with default times
 		engine.refreshdisplay = true;
