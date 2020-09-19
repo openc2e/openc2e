@@ -39,12 +39,12 @@
 
 SDLBackend *g_backend;
 
+// reasonable defaults
+constexpr int OPENC2E_DEFAULT_WIDTH = 800;
+constexpr int OPENC2E_DEFAULT_HEIGHT = 600;
+
 SDLBackend::SDLBackend() : mainrendertarget(this) {
 	networkingup = false;
-
-	// reasonable defaults
-	mainrendertarget.width = 800;
-	mainrendertarget.height = 600;
 
 	mainrendertarget.texture = nullptr;
 }
@@ -56,8 +56,18 @@ int SDLBackend::idealBpp() {
 }
 
 void SDLBackend::resizeNotify(int _w, int _h) {
-	mainrendertarget.width = _w;
-	mainrendertarget.height = _h;
+	windowwidth = _w;
+	windowheight = _h;
+
+	SDL_GetRendererOutputSize(renderer, &mainrendertarget.drawablewidth, &mainrendertarget.drawableheight);
+	assert(mainrendertarget.drawablewidth / windowwidth == mainrendertarget.drawableheight / windowheight);
+	float oldscale = mainrendertarget.scale;
+	float newscale = mainrendertarget.drawablewidth / windowwidth;
+	if (abs(newscale) > 0.01 && abs(oldscale - newscale) > 0.01) {
+		printf("* SDL setting scale to %.2fx\n", newscale);	
+		mainrendertarget.scale = newscale;
+		SDL_RenderSetScale(renderer, mainrendertarget.scale, mainrendertarget.scale);
+	}
 }
 
 void SDLBackend::init() {
@@ -74,8 +84,8 @@ void SDLBackend::init() {
 	window = SDL_CreateWindow(titlebar.c_str(),
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		mainrendertarget.width, mainrendertarget.height,
-		SDL_WINDOW_RESIZABLE
+		OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT,
+		SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
 	);
 	assert(window);
 
@@ -88,6 +98,9 @@ void SDLBackend::init() {
 		SDL_GetRendererInfo(renderer, &info);
 		printf("* SDL Renderer: %s\n", info.name);
 	}
+
+	SDL_GetWindowSize(window, &windowwidth, &windowheight);
+	resizeNotify(windowwidth, windowheight);
 
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
@@ -382,6 +395,13 @@ TextureAtlasHandle SDLBackend::createTextureAtlasFromCreaturesImage(const std::s
 	return std::dynamic_pointer_cast<TextureAtlas>(atlas);
 }
 
+unsigned int SDLRenderTarget::getWidth() const {
+	return drawablewidth / scale;
+}
+unsigned int SDLRenderTarget::getHeight() const {
+	return drawableheight / scale;
+}
+
 void SDLRenderTarget::renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency, bool mirror) {
 	auto sdl_atlas = std::dynamic_pointer_cast<SDLTextureAtlas>(atlas);
 	assert(i < sdl_atlas->textures.size());
@@ -429,8 +449,8 @@ RenderTarget *SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
 
 	SDLRenderTarget *newtarget = new SDLRenderTarget(this);
 	newtarget->texture = texture;
-	newtarget->width = w;
-	newtarget->height = h;
+	newtarget->drawablewidth = w;
+	newtarget->drawableheight = h;
 	return newtarget;
 }
 

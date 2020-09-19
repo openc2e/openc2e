@@ -31,7 +31,8 @@ class SDLRenderTarget : public RenderTarget {
 protected:
 	class SDLBackend *parent;
 	SDL_Texture *texture;
-	unsigned int width, height;
+	int drawablewidth, drawableheight;
+	float scale = 1.0;
 	
 	SDLRenderTarget(SDLBackend *p) { parent = p; }
 
@@ -39,8 +40,8 @@ public:
 	void renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency = 0, bool mirror = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h);
-	unsigned int getWidth() const { return width; }
-	unsigned int getHeight() const { return height; }
+	unsigned int getWidth() const;
+	unsigned int getHeight() const;
 	void renderClear();
 	void renderDone();
 };
@@ -52,6 +53,7 @@ protected:
 	bool networkingup;
 
 	SDL_Window *window = nullptr;
+	int windowwidth, windowheight;
 	SDL_Renderer *renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
 	TCPsocket listensocket;
