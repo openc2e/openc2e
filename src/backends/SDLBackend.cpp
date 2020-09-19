@@ -435,7 +435,7 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget *s, int x, int y, int w, int
 }
 
 RenderTarget *SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
-	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB32, SDL_TEXTUREACCESS_TARGET, w, h);
+	SDL_Texture *texture = SDL_CreateTexture(renderer, 0, SDL_TEXTUREACCESS_TARGET, w, h);
 	assert(texture);
 
 	SDLRenderTarget *newtarget = new SDLRenderTarget(this);
