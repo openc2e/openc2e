@@ -6,5 +6,5 @@ add_library(SDL2_gfx
 	SDL2_imageFilter.c
 	SDL2_rotozoom.c
 )
-target_link_libraries(SDL2_gfx PRIVATE SDL2)
+target_link_libraries(SDL2_gfx PUBLIC SDL2::SDL2)
 target_include_directories(SDL2_gfx PUBLIC .)

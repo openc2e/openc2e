@@ -15,4 +15,4 @@ add_library(SDL2_mixer
         music_timidity.c music_wav.c)
 target_compile_definitions(SDL2_mixer PRIVATE MUSIC_WAV)
 target_include_directories(SDL2_mixer PUBLIC .)
-target_link_libraries(SDL2_mixer PRIVATE SDL2)
+target_link_libraries(SDL2_mixer PUBLIC SDL2::SDL2)

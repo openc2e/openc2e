@@ -7,7 +7,7 @@ set(GEN "${BIN}/generated")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "") # so openc2e can find the DLLs
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "") # so dist can find the shared libraries
 
-set(CMAKE_MODULE_PATH "${SRC}/cmake" "${SRC}/externals/aminosbh-sdl2-cmake-modules")
+set(CMAKE_MODULE_PATH "${SRC}/cmake")
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
@@ -48,7 +48,7 @@ if(WIN32 OR APPLE)
 	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_net EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_gfx EXCLUDE_FROM_ALL)
-	add_library(SDL2::Core ALIAS SDL2)
+	add_library(SDL2::SDL2 ALIAS SDL2)
 	add_library(SDL2::Mixer ALIAS SDL2_mixer)
 	add_library(SDL2::Net ALIAS SDL2_net)
 	add_library(SDL2::GFX ALIAS SDL2_gfx)
@@ -256,7 +256,7 @@ add_executable(openc2e
 target_link_libraries(openc2e
 	openc2e-core
 	openc2e-audiobackend
-	SDL2::Core
+	SDL2::SDL2
 	SDL2::GFX
 	SDL2::Net
 )
