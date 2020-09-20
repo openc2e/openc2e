@@ -302,10 +302,6 @@ std::string Engine::executeNetwork(std::string in) {
 	}
 }
 
-bool Engine::needsUpdate() {
-	return fastticks || !backend->ticks() || (backend->ticks() > (tickdata + world.ticktime));
-}
-
 unsigned int Engine::msUntilTick() {
 	if (fastticks) return 0;
 	if (world.paused) return world.ticktime; // TODO: correct?
@@ -361,12 +357,20 @@ bool Engine::tick() {
 	assert(backend);
 	backend->handleEvents();
 
-	// tick+draw the world, if necessary
-	bool needupdate = needsUpdate();
-	if (needupdate) {
-		if (!world.paused)
+	// tick if necessary
+	bool needupdate = fastticks || !backend->ticks() || (backend->ticks() - tickdata >= world.ticktime - 5);
+	if (needupdate && !world.paused) {
+		if (fastticks) {
+			using clock = std::chrono::steady_clock;
+			using std::chrono::duration_cast;
+			using std::chrono::milliseconds;
+			auto start = clock::now();
+			while (duration_cast<milliseconds>(clock::now() - start).count() < 1000 / world.ticktime) {
+				update();
+			}
+		} else {
 			update();
-		drawWorld();
+		}
 	}
 
 	processEvents();

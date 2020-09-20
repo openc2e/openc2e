@@ -561,6 +561,7 @@ void QtOpenc2e::tick() {
 		engine.refreshdisplay = true;
 
 	bool didtick = engine.tick();
+	engine.drawWorld();
 
 	int y = engine.camera->getY();
 	int x = engine.camera->getX();

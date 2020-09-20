@@ -90,7 +90,6 @@ public:
 	~Engine();
 	void setBackend(std::shared_ptr<Backend> b);
 	std::string executeNetwork(std::string in);
-	bool needsUpdate();
 	unsigned int msUntilTick();
 	void drawWorld();
 	void update();

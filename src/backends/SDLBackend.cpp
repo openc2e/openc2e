@@ -586,10 +586,22 @@ int SDLBackend::run() {
 	// do a first-pass draw of the world. TODO: correct?
 	world.drawWorld();
 
+	const int OPENC2E_MAX_FPS = 60;
+
 	while (!engine.done) {
-		if (!engine.tick()) // if the engine didn't need an update..
-			delay(10); // .. delay for a short while
-	} // main loop
+
+		Uint32 frame_start = SDL_GetTicks();
+
+		engine.tick();
+		world.drawWorld();
+
+		bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+		Uint32 desired_ticks_per_frame = focused ? 1000 / OPENC2E_MAX_FPS : world.ticktime;
+		Uint32 frame_end = SDL_GetTicks();
+		if (frame_end - frame_start < desired_ticks_per_frame) {
+			SDL_Delay(desired_ticks_per_frame - (frame_end - frame_start));
+		}
+	}
 
 	return 0;
 }
