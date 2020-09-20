@@ -229,6 +229,6 @@ bool QtBackend::keyDown(int key) {
 	return downkeys[key];
 }
 
-int QtBackend::run(int, char **) {
+int QtBackend::run() {
 	return app->exec();
 }

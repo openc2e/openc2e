@@ -37,7 +37,7 @@ public:
 	void inputMethodEvent(QInputMethodEvent*);
 	void keyEvent(class QKeyEvent *k, bool pressed);
 
-	int run(int argc, char **argv);
+	int run();
 
 protected:
 	QApplication* app;

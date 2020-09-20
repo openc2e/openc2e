@@ -41,6 +41,7 @@ protected:
 public:
 	virtual void init() { }
 	virtual int networkInit() { return -1; }
+	virtual int run() { return 1; }
 	virtual void shutdown() { }
 
 	virtual void resize(unsigned int width, unsigned int height) { }

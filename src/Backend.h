@@ -64,7 +64,7 @@ public:
 	
 	virtual TextureAtlasHandle createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>& image) = 0;
 	
-	virtual int run(int argc, char **argv);
+	virtual int run() = 0;
 	virtual void delay(int msec) = 0;
 	virtual ~Backend() { }
 };

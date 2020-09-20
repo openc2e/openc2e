@@ -73,6 +73,7 @@ public:
 	void init();
 	void initFrom(void *window_id);
 	int networkInit();
+	int run();
 	void shutdown();
 	void setUserScale(float scale);
 

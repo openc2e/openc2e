@@ -140,7 +140,6 @@ add_library(openc2e-core STATIC
 	src/AgentHelpers.cpp
 	src/AgentRef.cpp
 	src/alloc_count.cpp
-	src/Backend.cpp
 	src/creatures/Biochemistry.cpp
 	src/Blackboard.cpp
 	src/Bubble.cpp

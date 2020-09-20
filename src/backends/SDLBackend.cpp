@@ -28,6 +28,7 @@
 #include "Engine.h"
 #include "openc2e.h"
 #include "SDLBackend.h"
+#include "World.h"
 
 #if defined(SDL_VIDEO_DRIVER_X11)
 // Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
@@ -577,4 +578,18 @@ void SDLBackend::setPalette(uint8_t *data) {
 
 void SDLBackend::delay(int msec) {
 	SDL_Delay(msec);
+}
+
+int SDLBackend::run() {
+	resize(800, 600);
+	
+	// do a first-pass draw of the world. TODO: correct?
+	world.drawWorld();
+
+	while (!engine.done) {
+		if (!engine.tick()) // if the engine didn't need an update..
+			delay(10); // .. delay for a short while
+	} // main loop
+
+	return 0;
 }
