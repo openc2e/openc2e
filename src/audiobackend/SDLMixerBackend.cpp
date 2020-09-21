@@ -41,6 +41,10 @@ void SDLMixerBackend::mixer_callback(void *userdata, uint8_t *buffer, int num_by
 	bgm_render_buffer.resize(num_samples);
 	stream->produce(bgm_render_buffer.data(), bgm_render_buffer.size() * 2);
 
+	if (backend->muted) {
+		return;
+	}
+
 	int16_t *buf = (int16_t*)buffer;
 	for (size_t i = 0; i < num_samples; ++i) {
 		buf[i] = std::max(SHRT_MIN, std::min(buf[i] + bgm_render_buffer[i], SHRT_MAX));
@@ -71,8 +75,8 @@ void SDLMixerBackend::setViewpointCenter(float, float) {
 }
 
 void SDLMixerBackend::setMute(bool m) {
-	// TODO
 	muted = m;
+	Mix_Volume(-1, muted ? 0 : MIX_MAX_VOLUME);
 }
 
 std::shared_ptr<AudioSource> SDLMixerBackend::newSource() {
