@@ -75,6 +75,7 @@ public:
 	~peFile();
 
 	resourceInfo *getResource(uint32_t type, uint32_t lang, uint32_t name);
+	Image getBitmap(uint32_t name);
 };
 
 #endif

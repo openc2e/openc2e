@@ -4,6 +4,7 @@
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
+#include "fileformats/pngImage.h"
 #include "stringutil.h"
 
 #include <fmt/format.h>
@@ -139,8 +140,8 @@ int main(int argc, char **argv) {
 					}
 				}
 				fmt::print("\"Thumbnail\" @ \"{}.s16\"\n", agnt.name);
-				fmt::print("# thumbnailwidth = {}\n", agnt.thumbnailwidth);
-				fmt::print("# thumbnailheight = {}\n", agnt.thumbnailheight);
+				fmt::print("# thumbnailwidth = {}\n", agnt.thumbnail.width);
+				fmt::print("# thumbnailheight = {}\n", agnt.thumbnail.height);
 				fmt::print("\n");
 			} else if (b->getType() == "file") {
 				cobFileBlock file(b);
@@ -166,7 +167,7 @@ int main(int argc, char **argv) {
 		}
 	} else if (memcmp(magic, "\x01\x00", 2) == 0) {
 		c1cobfile cob = read_c1cobfile(in);
-		std::string sprite_filename = stem.string() + ".spr";
+		std::string sprite_filename = stem.string() + ".png";
 		fmt::print("*# COB-Name \"{}\"\n", cob.name);
 		fmt::print("*# Picture \"{}\"\n", sprite_filename);
 		fmt::print("*# Quantity available = {}\n", cob.quantity_available);
@@ -196,14 +197,8 @@ int main(int argc, char **argv) {
 			fmt::print(script);
 		}
 
-		std::ofstream out(sprite_filename, std::ios_base::binary);
-		write16le(out, 1);
-		write32le(out, 10);
-		write16le(out, cob.picture_width);
-		write16le(out, cob.picture_height);
-		for (int row = cob.picture_height - 1; row >= 0; row--) {
-			out.write((char*)cob.picture_data.data() + cob.picture_width * row, cob.picture_width);
-		}
+    std::ofstream out(sprite_filename, std::ios_base::binary);
+    WritePngFile(cob.picture, out);
 
 	} else {
 		fmt::print(stderr, "Not a recognized COB format: bad magic 0x{:02x}{:02x}{:02x}{:02x}\n", magic[0], magic[1], magic[2], magic[3]);

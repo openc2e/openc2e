@@ -24,15 +24,18 @@
 #include <memory>
 #include <string>
 
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 
 class imageManager {
 protected:
 	friend class Openc2eTestHelper;
 	std::map<std::string, std::weak_ptr<creaturesImage> > images;
 	void addImage(std::shared_ptr<creaturesImage>);
+	shared_array<Color> palette;
 
 public:
+	void loadDefaultPalette();
+	shared_array<Color> getDefaultPalette();
 	std::shared_ptr<creaturesImage> getImage(std::string name, bool is_background = false);
 	std::shared_ptr<creaturesImage> getCharsetDta(imageformat format, uint32_t bgcolor,
 	                                              uint32_t textcolor, uint32_t aliascolor);

@@ -21,7 +21,7 @@
 #include <cassert>
 #include <memory>
 
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "keycodes.h"
 #include "Engine.h"
 #include "openc2e.h"
@@ -320,88 +320,68 @@ void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int co
 	SDL_RenderDrawLine(parent->renderer, x1, y1, x2, y2);
 }
 
-SDL_Texture* SDLBackend::createTexture(void *data, unsigned int width, unsigned int height, imageformat format, bool black_is_transparent, uint8_t* custom_palette) {
-	assert(data);
-	assert(width > 0);
-	assert(height > 0);
-	if (format != if_paletted) {
-		assert(custom_palette == nullptr);
+Texture SDLBackend::createTexture(const Image& image) {
+	assert(image.data);
+	assert(image.width > 0);
+	assert(image.height > 0);
+	if (image.format != if_index8) {
+		assert(image.palette.data() == nullptr);
 	}	
 	
 	// create surface
 	Uint32 sdlformat = SDL_PIXELFORMAT_UNKNOWN;
-	switch (format) {
-		case if_paletted:
+	switch (image.format) {
+		case if_index8:
 			sdlformat = SDL_PIXELFORMAT_INDEX8;
 			break;
-		case if_16bit_555:
+		case if_rgb555:
 			sdlformat = SDL_PIXELFORMAT_RGB565;
 			break;
-		case if_16bit_565:
+		case if_rgb565:
 			sdlformat = SDL_PIXELFORMAT_RGB565;
 			break;
-		case if_24bit:
-			sdlformat = SDL_PIXELFORMAT_RGB888;
+		case if_bgr24:
+			sdlformat = SDL_PIXELFORMAT_BGR24;
+			break;
+		case if_rgb24:
+			sdlformat = SDL_PIXELFORMAT_RGB24;
 			break;
 	}
 	
 	SDL_Surface *surf = SDL_CreateRGBSurfaceWithFormatFrom(
-		data,
-		width,
-		height,
+		const_cast<uint8_t*>(image.data.data()),
+		image.width,
+		image.height,
 		SDL_BITSPERPIXEL(sdlformat), // depth
-		width * SDL_BYTESPERPIXEL(sdlformat), // pitch
+		image.width * SDL_BYTESPERPIXEL(sdlformat), // pitch
 		sdlformat
 	);
 	assert(surf);
 
-	if (format == if_paletted) {
-		SDL_SetPaletteColors(
-			surf->format->palette,
-			// TODO: custom_palette not guaranteed to fit SDL_Color ?
-			custom_palette ? (SDL_Color *)custom_palette : palette,
-			0,
-			256);
+	if (image.format == if_index8) {
+		if (image.palette.data()) {
+			shared_array<SDL_Color> palette(image.palette.size());
+			for (size_t i = 0; i < image.palette.size(); ++i) {
+				palette[i].r = image.palette[i].r;
+				palette[i].g = image.palette[i].g;
+				palette[i].b = image.palette[i].b;
+				palette[i].a = image.palette[i].a;
+			}
+			SDL_SetPaletteColors(surf->format->palette, palette.data(), 0, palette.size());
+		} else {
+			SDL_SetPaletteColors(surf->format->palette, default_palette.data(), 0, default_palette.size());
+		}
 	}
 
 	// set colour-keying
-	if (black_is_transparent) {
-		SDL_SetColorKey(surf, SDL_TRUE, 0);
-	}
+	SDL_SetColorKey(surf, SDL_TRUE, 0);
 	
 	// create texture
-	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
-	assert(tex);
-	SDL_FreeSurface(surf);
+	Texture tex;
+	tex.data = SDL_CreateTextureFromSurface(renderer, surf);
+	tex.deleter = [](void *data) { SDL_DestroyTexture(static_cast<SDL_Texture*>(data)); };
+	assert(tex.data);
 	return tex;
-}
-
-class SDLTextureAtlas : public TextureAtlas {
-public:
-	~SDLTextureAtlas() {
-		for (auto* t : textures) {
-			SDL_DestroyTexture(t);
-		}
-	}
-	std::vector<SDL_Texture*> textures;
-};
-
-TextureAtlasHandle SDLBackend::createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>& image) {
-	assert(image);
-	
-	auto atlas = std::make_shared<SDLTextureAtlas>();
-	atlas->textures.resize(image->numframes());
-	for (size_t i = 0; i < image->numframes(); ++i) {
-		atlas->textures[i] = createTexture(
-			image->data(i),
-			image->width(i),
-			image->height(i),
-			image->format(),
-			true,
-			image->hasCustomPalette() ? image->getCustomPalette() : nullptr
-		);
-	}
-	return std::dynamic_pointer_cast<TextureAtlas>(atlas);
 }
 
 unsigned int SDLRenderTarget::getWidth() const {
@@ -411,23 +391,32 @@ unsigned int SDLRenderTarget::getHeight() const {
 	return drawableheight / scale;
 }
 
-void SDLRenderTarget::renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency, bool mirror) {
-	auto sdl_atlas = std::dynamic_pointer_cast<SDLTextureAtlas>(atlas);
-	assert(i < sdl_atlas->textures.size());
-	
-	SDL_Texture *tex = sdl_atlas->textures[i];
-	
-	// do actual render
+void SDLRenderTarget::renderCreaturesImage(const creaturesImage& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
+	SDL_Texture *tex = static_cast<SDL_Texture*>(img.getTextureForFrame(frame).data);
+	assert(tex);
+
 	SDL_SetTextureAlphaMod(tex, 255 - transparency);
 	SDL_RendererFlip flip = mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-	
+
+	SDL_Rect srcrect;
+	srcrect.x = img.getXOffsetForFrame(frame);
+	srcrect.y = img.getYOffsetForFrame(frame);
+	srcrect.w = img.width(frame);
+	srcrect.h = img.height(frame);
+
 	SDL_Rect destrect;
 	destrect.x = x;
 	destrect.y = y;
-	SDL_QueryTexture(tex, nullptr, nullptr, &destrect.w, &destrect.h);
-	
+	destrect.w = srcrect.w;
+	destrect.h = srcrect.h;
+
 	SDL_SetRenderTarget(parent->renderer, texture);
-	SDL_RenderCopyEx(parent->renderer, tex, nullptr, &destrect, 0, nullptr, flip);
+	SDL_RenderCopyEx(parent->renderer, tex, &srcrect, &destrect, 0, nullptr, flip);
+}
+
+void SDLRenderTarget::renderCreaturesImage(const std::shared_ptr<creaturesImage>& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
+	assert(img.get() != nullptr);
+	renderCreaturesImage(*img.get(), frame, x, y, transparency, mirror);
 }
 
 void SDLRenderTarget::renderClear() {
@@ -570,12 +559,15 @@ bool SDLBackend::keyDown(int key) {
 	return false;
 }
 
-void SDLBackend::setPalette(uint8_t *data) {
+void SDLBackend::setDefaultPalette(span<Color> palette) {
+	if (palette.size() != 256) {
+		throw creaturesException("Default palette must have 256 colors");
+	}
 	for (unsigned int i = 0; i < 256; i++) {
-		palette[i].r = data[i * 3];
-		palette[i].g = data[(i * 3) + 1];
-		palette[i].b = data[(i * 3) + 2];
-		palette[i].a = 255;
+		default_palette[i].r = palette[i].r;
+		default_palette[i].g = palette[i].g;
+		default_palette[i].b = palette[i].b;
+		default_palette[i].a = palette[i].a;
 	}
 }
 

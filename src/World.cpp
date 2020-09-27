@@ -28,7 +28,7 @@
 #include <memory>
 #include "audiobackend/AudioBackend.h"
 #include "Backend.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "fileformats/genomeFile.h"
 #include "creatures/CreatureAgent.h"
 #include "SFCFile.h"
@@ -74,8 +74,6 @@ World::~World() {
 		delete *i;
 }
 
-#include "fileformats/bmpImage.h"
-
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
 void World::init() {
 	// First, try initialising the mouse cursor from the catalogue tag.
@@ -95,8 +93,7 @@ void World::init() {
 					// TODO: seamonkeys has 'numImages baseImage' too
 					int blockwidth, blockheight;
 					if (sscanf(pointerinfo[4].c_str(), "%d %d", &blockwidth, &blockheight) == 2) {
-						bmpImage *bmpimg = dynamic_cast<bmpImage *>(img.get());
-						if (bmpimg) bmpimg->setBlockSize(blockwidth, blockheight);
+						img->setBlockSize(blockwidth, blockheight);
 					}
 				}
 				theHand->finishInit();
@@ -443,7 +440,7 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 				if ((destx >= -sprwidth) && (desty >= -sprheight) &&
 						(destx - sprwidth <= (int)surface->getWidth()) &&
 						(desty - sprheight <= (int)surface->getHeight())) {
-					surface->renderTexture(bkgd->texture_atlas, whereweare, destx, desty);
+					surface->renderCreaturesImage(bkgd, whereweare, destx, desty);
 				}
 			}
 		}

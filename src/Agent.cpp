@@ -30,7 +30,7 @@
 #include "Room.h"
 #include "Vehicle.h"
 #include "AgentHelpers.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "Camera.h"
 #include "Map.h"
 #include "Scriptorium.h"

@@ -2,7 +2,6 @@
 #include "Agent.h"
 #include "Backend.h"
 #include "Engine.h"
-#include "fileformats/bmpImage.h"
 #include "imageManager.h"
 #include "World.h"
 
@@ -28,7 +27,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 		} else if (engine.bmprenderer) {
 			// BLCK hasn't been called yet, so we can't check validity yet
 		} else {
-			throw caosException(fmt::sprintf("Failed to create sprite part: first sprite %d is beyond %d sprite(s) in file", firstimg, sprite->numframes()));
+			throw caosException(fmt::sprintf("Failed to create sprite part: first sprite %d is beyond %d sprite(s) in file %s", firstimg, sprite->numframes(), sprite->getName()));
 		}
 	}
 }
@@ -50,7 +49,7 @@ void SpritePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 		}
 	}
 	assert(getCurrentSprite() < getSprite()->numframes());
-	renderer->renderTexture(getSprite()->texture_atlas, getCurrentSprite(), xoffset + x, yoffset + y, has_alpha ? alpha : 0, draw_mirrored);
+	renderer->renderCreaturesImage(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha ? alpha : 0, draw_mirrored);
 }
 
 void SpritePart::setFrameNo(unsigned int f) {
@@ -100,9 +99,7 @@ void SpritePart::changeSprite(shared_ptr<creaturesImage> spr) {
 	
 	// TODO: this is a hack for the bmprenderer, is it really a good idea?
 	if (engine.bmprenderer) {
-		bmpImage *origimg = dynamic_cast<bmpImage *>(sprite.get());
-		bmpImage *newimg = dynamic_cast<bmpImage *>(spr.get());
-		if (origimg && newimg && origimg->numframes() > 0) newimg->setBlockSize(origimg->width(0), origimg->height(0));
+		if (sprite->numframes() > 0) spr->setBlockSize(sprite->width(0), sprite->height(0));
 	}
 
 	origsprite = sprite = spr;

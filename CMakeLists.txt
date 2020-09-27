@@ -113,8 +113,8 @@ add_library(openc2e-fileformats STATIC
 	${GEN}/fileformats/caoslexer.cpp
 	src/fileformats/caostoken.cpp
 	src/fileformats/charsetdta.cpp
-	src/fileformats/creaturesImage.cpp
 	src/fileformats/c1cobfile.cpp
+	src/fileformats/c1defaultpalette.cpp
 	src/fileformats/c16Image.cpp
 	src/fileformats/c2cobfile.cpp
 	src/fileformats/genomeFile.cpp
@@ -122,14 +122,17 @@ add_library(openc2e-fileformats STATIC
 	${GEN}/fileformats/mnglexer.cpp
 	${GEN}/fileformats/mngparser.tab.cpp
 	src/fileformats/peFile.cpp
+	src/fileformats/pngImage.cpp
 	src/fileformats/PrayFileReader.cpp
 	src/fileformats/PrayFileWriter.cpp
 	${GEN}/fileformats/PraySourceParser.cpp
+	src/fileformats/s16Image.cpp
 	src/fileformats/sprImage.cpp
+	src/fileformats/ImageUtils.cpp
 )
 target_link_libraries(openc2e-fileformats
 	PUBLIC fmt ghc_filesystem mpark_variant openc2e-common
-	PRIVATE ZLIB::ZLIB
+	PRIVATE ZLIB::ZLIB PNG::PNG
 )
 
 add_library(openc2e-core STATIC
@@ -178,6 +181,7 @@ add_library(openc2e-core STATIC
 	src/Catalogue.cpp
 	${GEN}/cmddata.cpp
 	src/CompoundAgent.cpp
+	src/creaturesImage.cpp
 	src/AnimatablePart.cpp
 	src/ButtonPart.cpp
 	src/CameraPart.cpp
@@ -338,7 +342,7 @@ set_target_properties(praytoolqt PROPERTIES
 )
 
 add_executable(spritedumper src/tools/spritedumper.cpp)
-target_link_libraries(spritedumper openc2e-fileformats fmt ghc_filesystem PNG::PNG)
+target_link_libraries(spritedumper openc2e-fileformats fmt ghc_filesystem)
 
 add_executable(translate_voice
 	src/tools/translate_voice.cpp

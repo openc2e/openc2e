@@ -34,7 +34,7 @@
 #include "Backend.h"
 #include "MetaRoom.h"
 #include "Room.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "imageManager.h"
 #include "Map.h"
 
@@ -292,7 +292,7 @@ void SkeletalCreature::render(RenderTarget *renderer, int xoffset, int yoffset) 
 
 		assert(images[i]);
 
-		renderer->renderTexture(images[i]->texture_atlas, ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, 0, mirror);
+		renderer->renderCreaturesImage(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, 0, mirror);
 
 		if (displaycore) {
 			// TODO: we draw a lot of points twice here :)

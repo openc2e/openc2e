@@ -19,13 +19,6 @@
 
 #pragma once
 
-#include "fileformats/creaturesImage.h"
+#include "Image.h"
 
-class sprImage : public creaturesImage {
-public:
-	sprImage(std::istream &in, std::string n);
-	~sprImage();
-	virtual unsigned int bitdepth() { return 8; }
-};
-
-/* vim: set noet: */
+MultiImage ReadSprFile(std::istream &in);

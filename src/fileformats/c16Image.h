@@ -17,20 +17,10 @@
  *
  */
 
-#include "fileformats/creaturesImage.h"
+#pragma once
+
+#include "Image.h"
 #include <istream>
-#include <memory>
+#include <string>
 
-class c16Image : public creaturesImage {
-public:
-	c16Image(std::istream &in, std::string n);
-	~c16Image();
-};
-
-class s16Image : public creaturesImage {
-public:
-	s16Image(std::istream &in, std::string n);
-	~s16Image();
-};
-
-/* vim: set noet: */
+MultiImage ReadC16File(std::istream &in);

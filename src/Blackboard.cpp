@@ -35,10 +35,10 @@ Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned
 
 	if (engine.version == 1) {
 		strings.resize(16, std::pair<unsigned int, std::string>(0, std::string()));
-		charsetsprite = world.gallery->getCharsetDta(if_paletted, bgcolour, ckcolour, alcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_index8, bgcolour, ckcolour, alcolour);
 	} else {
 		strings.resize(48, std::pair<unsigned int, std::string>(0, std::string()));
-		charsetsprite = world.gallery->getCharsetDta(if_24bit, bgcolour, ckcolour, alcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_bgr24, bgcolour, ckcolour, alcolour);
 	}
 }
 
@@ -86,7 +86,7 @@ void Blackboard::renderText(RenderTarget *renderer, int xoffset, int yoffset) {
 			continue;
 		}
 		// TODO: is +1 really the right fix here?
-		renderer->renderTexture(charsetsprite->texture_atlas, c, xoffset + textx + 1 + charpos, yoffset + texty + 1);
+		renderer->renderCreaturesImage(charsetsprite, c, xoffset + textx + 1 + charpos, yoffset + texty + 1);
 		charpos += charsetsprite->width(c) + 1;
 	}
 }

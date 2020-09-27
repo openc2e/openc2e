@@ -17,7 +17,7 @@
 #include "World.h"
 #include "Hatchery.h"
 #include "Engine.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "qtopenc2e.h"
 
 #include <QBitmap>
@@ -56,12 +56,12 @@
  * alpha transparency to the rest of the image.
  */
 QImage imageFromSpriteFrame(shared_ptr<creaturesImage> img, unsigned int frame, bool makealpha = false) {
-	assert(img->format() == if_16bit_565 || img->format() == if_16bit_555);
+	assert(img->format(0) == if_rgb565 || img->format(0) == if_rgb555);
 
 	// img->data is not 32-bit-aligned so we have to make a copy here.
 	QImage ourimg = QImage(img->width(frame), img->height(frame),
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
-			img->format() == if_16bit_565 ? QImage::Format_RGB16 : QImage::Format_RGB555
+			img->format(0) == if_rgb565 ? QImage::Format_RGB16 : QImage::Format_RGB555
 #else
 			// versions of Qt before 4.4 don't support 16-bit images
 			QImage::Format_ARGB32
@@ -170,8 +170,7 @@ public:
 
 // TODO: these are from imageManager.cpp, it'd be nice to have a non-hacky interface,
 // but we probably need to fix the image object model first due to endianism issues
-enum filetype { blk, s16, c16, spr, bmp };
-shared_ptr<creaturesImage> tryOpen(std::string fname, filetype ft);
+shared_ptr<creaturesImage> tryOpen(std::string fname);
 
 Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 	qtopenc2e = parent;
@@ -278,7 +277,7 @@ Hatchery::Hatchery(QtOpenc2e *parent) : QDialog(parent) {
 		/* gender marker animation */
 		// TODO
 	} else { // C2
-		omelettedata = tryOpen("Applet Data/Omelette.s16", s16);
+		omelettedata = tryOpen("Applet Data/Omelette.s16");
 		if (!omelettedata) {
 			return;
 		}

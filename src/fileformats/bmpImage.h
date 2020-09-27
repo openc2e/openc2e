@@ -17,43 +17,10 @@
  *
  */
 
-#ifndef _BMPIMAGE_H
-#define _BMPIMAGE_H
+#pragma once
 
-#include "fileformats/creaturesImage.h"
-#include <memory>
+#include <istream>
+#include "Image.h"
 
-class bmpImage;
-
-class bmpData {
-private:
-	friend class bmpImage;
-
-	bmpData(std::istream &in, std::string n);
-
-	uint32_t biWidth, biHeight;
-	uint32_t biCompression;
-	std::vector<char> bmpdata;
-	uint8_t *palette;
-	imageformat imgformat;
-
-public:
-	~bmpData(); // shared_ptr needs to be able to call the destructor
-};
-
-class bmpImage : public creaturesImage {
-protected:
-	std::shared_ptr<bmpData> bmpdata;
-
-public:
-	bmpImage(std::istream &in, std::string n);
-	~bmpImage();
-
-	void setBlockSize(unsigned int blockwidth, unsigned int blockheight);
-
-	bool hasCustomPalette() { return imgformat == if_paletted; }
-	uint8_t *getCustomPalette() { return bmpdata->palette; }
-};
-
-#endif
-/* vim: set noet: */
+Image ReadBmpFile(std::istream &in);
+Image ReadDibFile(std::istream &in);

@@ -17,47 +17,42 @@
  *
  */
 
+#include "c1defaultpalette.h"
 #include "endianlove.h"
-#include "fileformats/sprImage.h"
-#include <iostream>
+#include "sprImage.h"
 
-sprImage::sprImage(std::istream &in, std::string n) : creaturesImage(n) {
-	imgformat = if_paletted;
+MultiImage ReadSprFile(std::istream &in) {
+	int numframes = read16le(in);
+	MultiImage images(numframes);
 
-	m_numframes = read16le(in);
-
-	widths.resize(m_numframes);
-	heights.resize(m_numframes);
-	std::vector<uint32_t> offsets(m_numframes);
-	buffers.resize(m_numframes);
-
-	for (unsigned int i = 0; i < m_numframes; i++) {
+	std::vector<uint32_t> offsets(numframes);
+	for (int i = 0; i < numframes; i++) {
 		offsets[i] = read32le(in);
-		widths[i] = read16le(in);
-		heights[i] = read16le(in);
+		images[i].width = read16le(in);
+		images[i].height = read16le(in);
+		images[i].format = if_index8;
+		images[i].palette = getCreatures1DefaultPalette();
 	}
 
-	// check for Terra Nornia's corrupt background sprite
-	if (n == "buro") {
-		// apply stupid hack for corrupt offset tables in SPR files
-		// Only works if the file has 'normal' offsets we can predict, but this will only be called
-		// on known files anyway.
-		// TODO: can't we have a better check, eg checking if offsets are identical?
-		std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
-		unsigned int currpos = 2 + (8 * m_numframes);
-		for (unsigned int i = 0; i < m_numframes; i++) {
-			offsets[i] = currpos;
-			currpos += widths[i] * heights[i];
-		}
-	}
+	// // check for Terra Nornia's corrupt background sprite
+	// if (n == "buro") {
+	// 	// apply stupid hack for corrupt offset tables in SPR files
+	// 	// Only works if the file has 'normal' offsets we can predict, but this will only be called
+	// 	// on known files anyway.
+	// 	// TODO: can't we have a better check, eg checking if offsets are identical?
+	// 	std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
+	// 	unsigned int currpos = 2 + (8 * numframes);
+	// 	for (unsigned int i = 0; i < numframes; i++) {
+	// 		offsets[i] = currpos;
+	// 		currpos += images[i].width * images[i].height;
+	// 	}
+	// }
 
-	for (unsigned int i = 0; i < m_numframes; i++) {
+	for (int i = 0; i < numframes; i++) {
 		in.seekg(offsets[i]);
-		buffers[i].resize(widths[i] * heights[i]);
-		in.read(reinterpret_cast<char*>(buffers[i].data()), widths[i] * heights[i]);
+		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
+		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
 	}
+
+	return images;
 }
-
-sprImage::~sprImage() {}
-
-/* vim: set noet: */

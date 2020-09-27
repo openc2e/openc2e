@@ -53,29 +53,41 @@
 #include "version.h"
 
 #include "fileformats/peFile.h"
+#include "fileformats/ImageUtils.h"
 
 QPixmap imageFromExeResource(unsigned int resourceid, bool mask = true) {
 	assert(engine.getExeFile());
 
-	resourceInfo *r = engine.getExeFile()->getResource(PE_RESOURCETYPE_BITMAP, HORRID_LANG_ENGLISH, resourceid);
-	if (!r) r = engine.getExeFile()->getResource(PE_RESOURCETYPE_BITMAP, 0x400, resourceid);
-	if (!r) return QPixmap();
+	Image bmp = engine.getExeFile()->getBitmap(resourceid);
+	if (!bmp.data) {
+		return QPixmap();
+	}
 
-	unsigned int size = r->getSize() + 14;
-	char *bmpdata = (char *)malloc(size);
+	QImage::Format qtformat;
+	switch (bmp.format) {
+		case if_index8:
+			qtformat = QImage::Format_Indexed8;
+			break;
+		case if_bgr24:
+			bmp = ImageUtils::ToRGB24(bmp);
+			qtformat = QImage::Format_RGB888;
+			break;
+		default:
+			printf("Unsupported format\n");
+			abort();
+	}
 
-	// fake a BITMAPFILEHEADER
-	bmpdata[0] = 'B'; bmpdata[1] = 'M';
-	memcpy(bmpdata + 2, &size, 4);
-	memset(bmpdata + 6, 0, 8);
+	QImage img(bmp.data.data(), bmp.width, bmp.height, bmp.width, qtformat);
+	if (qtformat == QImage::Format_Indexed8) {
+		QVector<QRgb> colormap;
+		for (auto c : bmp.palette) {
+			colormap.append(QColor(c.r, c.g, c.b).rgb());
+		}
+		img.setColorTable(colormap);
+	}
 
-	memcpy(bmpdata + 14, r->getData(), r->getSize());
-
-	QPixmap i;
-	i.loadFromData((const uchar *)bmpdata, (int)size);
+	QPixmap i = QPixmap::fromImage(img);
 	if (mask) i.setMask(i.createHeuristicMask());
-
-	free(bmpdata);
 
 	return i;
 }

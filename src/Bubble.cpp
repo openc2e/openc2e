@@ -22,7 +22,7 @@
 #include "Backend.h"
 #include "Bubble.h"
 #include "Camera.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "Engine.h"
 #include "imageManager.h"
 #include "keycodes.h"
@@ -160,9 +160,9 @@ BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int t
 	backgroundcolour = bgcolour;
 
 	if (engine.version == 1) {
-		charsetsprite = world.gallery->getCharsetDta(if_paletted, bgcolour, tcolour, tcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_index8, bgcolour, tcolour, tcolour);
 	} else {
-		charsetsprite = world.gallery->getCharsetDta(if_24bit, bgcolour, tcolour, tcolour);
+		charsetsprite = world.gallery->getCharsetDta(if_bgr24, bgcolour, tcolour, tcolour);
 	}
 }
 
@@ -170,7 +170,7 @@ void BubblePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 	unsigned int charpos = 0;
 	for (unsigned char c : text) {
 		assert(c < charsetsprite->numframes()); // handled in setText
-		renderer->renderTexture(charsetsprite->texture_atlas, c, xoffset + x + textoffset + charpos, yoffset + y);
+		renderer->renderCreaturesImage(charsetsprite, c, xoffset + x + textoffset + charpos, yoffset + y);
 		charpos += charsetsprite->width(c) + 1;
 	}
 }

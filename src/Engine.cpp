@@ -34,6 +34,7 @@
 #include "SFCFile.h"
 #include "fileformats/peFile.h"
 #include "Camera.h"
+#include "imageManager.h"
 #include "prayManager.h"
 #include "userlocale.h"
 
@@ -83,7 +84,6 @@ Engine::Engine() {
 	cmdline_enable_sound = true;
 	cmdline_norun = false;
 
-	palette = 0;
 	exefile = 0;
 
 	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
@@ -93,7 +93,6 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
-	if (palette) delete[] palette;
 }
 
 void Engine::addPossibleBackend(std::string s, std::shared_ptr<Backend> b) {
@@ -935,25 +934,7 @@ bool Engine::initialSetup() {
 	}
 	
 	// load palette for C1
-	if (gametype == "c1") {
-		std::cout << "* Loading palette.dta..." << std::endl;
-		// TODO: case-sensitivity for the lose
-		fs::path palpath(world.findFile("Palettes/palette.dta"));
-		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
-			palette = new unsigned char[768];
-
-			std::ifstream f(palpath.string().c_str(), std::ios::binary);
-			f >> std::noskipws;
-			f.read((char *)palette, 768);
-			
-			for (unsigned int i = 0; i < 768; i++) {
-				palette[i] = palette[i] * 4;
-			}
-
-			backend->setPalette((uint8_t *)palette);
-		} else
-			throw creaturesException("Couldn't find C1 palette data!");
-	}
+	world.gallery->loadDefaultPalette();
 	
 	// initial setup
 	std::cout << "* Reading catalogue files..." << std::endl;

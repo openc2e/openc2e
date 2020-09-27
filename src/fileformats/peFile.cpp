@@ -17,9 +17,11 @@
  *
  */
 
-#include "fileformats/peFile.h"
-#include "endianlove.h"
 #include "creaturesException.h"
+#include "endianlove.h"
+#include "fileformats/bmpImage.h"
+#include "fileformats/peFile.h"
+#include "spanstream.h"
 
 // debug helper
 std::string nameForType(uint32_t t) {
@@ -183,6 +185,17 @@ resourceInfo *peFile::getResource(uint32_t type, uint32_t lang, uint32_t name) {
 		file.read(r->data, r->size);
 	}
 	return r;
+}
+
+Image peFile::getBitmap(uint32_t name) {
+	resourceInfo *r = getResource(PE_RESOURCETYPE_BITMAP, HORRID_LANG_ENGLISH, name);
+	if (!r) r = getResource(PE_RESOURCETYPE_BITMAP, 0x400, name);
+	if (!r) return {};
+	
+	spanstream ss(r->getData(), r->getSize());
+	
+	Image bmp = ReadDibFile(ss);
+	return bmp;
 }
 
 std::vector<std::string> resourceInfo::parseStrings() {

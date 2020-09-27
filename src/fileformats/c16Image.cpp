@@ -23,39 +23,38 @@
 #include <memory>
 #include <string.h>
 
-c16Image::c16Image(std::istream &in, std::string n) : creaturesImage(n) {
+MultiImage ReadC16File(std::istream &in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	assert(flags & 0x02);
-	imgformat = is_565 ? if_16bit_565 : if_16bit_555;
-	m_numframes = read16le(in);
+	imageformat imgformat = is_565 ? if_rgb565 : if_rgb555;
+	auto numframes = read16le(in);
 
-	widths.resize(m_numframes);
-	heights.resize(m_numframes);
-	std::vector<std::vector<uint32_t>> lineoffsets(m_numframes);
+	MultiImage images(numframes);
+
+	std::vector<std::vector<uint32_t>> lineoffsets(numframes);
 
 	// first, read the headers.
-	for (unsigned int i = 0; i < m_numframes; i++) {
+	for (size_t i = 0; i < numframes; i++) {
 		uint32_t offset = read32le(in);
-		widths[i] = read16le(in);
-		heights[i] = read16le(in);
-		lineoffsets[i].resize(heights[i]);
-		if (heights[i] > 0) {
+		images[i].width = read16le(in);
+		images[i].height = read16le(in);
+		images[i].format = imgformat;
+		lineoffsets[i].resize(images[i].height);
+		if (images[i].height > 0) {
 			lineoffsets[i][0] = offset;
 		}
-		for (unsigned int j = 1; j < heights[i]; j++) {
+		for (unsigned int j = 1; j < images[i].height; j++) {
 			lineoffsets[i][j] = read32le(in);
 		}
 	}
 	
-	buffers.resize(m_numframes);
-	
 	// then, read the files. this involves seeking around, and is hence immensely ghey
 	// todo: we assume the file format is valid here. we shouldn't.
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i].resize(widths[i] * heights[i] * 2);
-		uint16_t *bufferpos = (uint16_t *)buffers[i].data();
-		for (unsigned int j = 0; j < heights[i]; j++) {
+	for (unsigned int i = 0; i < numframes; i++) {
+		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height * 2);
+		uint16_t *bufferpos = (uint16_t *)images[i].data.data();
+		for (unsigned int j = 0; j < images[i].height; j++) {
 			in.seekg(lineoffsets[i][j], std::ios::beg);
 			while (true) {
 				uint16_t tag = read16le(in);
@@ -71,35 +70,6 @@ c16Image::c16Image(std::istream &in, std::string n) : creaturesImage(n) {
 			}
 		}
 	}
+
+	return images;
 }
-
-s16Image::s16Image(std::istream &in, std::string n) : creaturesImage(n) {
-	uint32_t flags = read32le(in);
-	bool is_565 = (flags & 0x01);
-	imgformat = is_565 ? if_16bit_565 : if_16bit_555;
-	m_numframes = read16le(in);
-
-	widths.resize(m_numframes);
-	heights.resize(m_numframes);
-	std::vector<uint32_t> offsets(m_numframes);
-
-	// first, read the headers.
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		offsets[i] = read32le(in);
-		widths[i] = read16le(in);
-		heights[i] = read16le(in);
-	}
-	
-	buffers.resize(m_numframes);
-
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		buffers[i].resize(2 * widths[i] * heights[i]);
-		readmany16le(in, (uint16_t*)buffers[i].data(), widths[i] * heights[i]);
-	}
-}
-
-s16Image::~s16Image() {}
-
-c16Image::~c16Image() {}
-
-/* vim: set noet: */

@@ -26,7 +26,7 @@
 #include "CameraPart.h"
 #include "Camera.h"
 #include "CompoundAgent.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "encoding.h"
 #include "Engine.h"
 #include "imageManager.h"

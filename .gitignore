@@ -12,6 +12,7 @@ out/
 # Misc debris
 .*.sw?
 *~
+.DS_Store
 
 # Convenient symlinks
 openc2e

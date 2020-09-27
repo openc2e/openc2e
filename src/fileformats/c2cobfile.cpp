@@ -168,15 +168,14 @@ cobAgentBlock::cobAgentBlock(cobBlock *p) {
 		depnames.push_back(depname);
 	}
 
-	thumbnailwidth = read16le(file);
-	thumbnailheight = read16le(file);
-	thumbnail = new unsigned short[thumbnailwidth * thumbnailheight];
-	file.read((char *)thumbnail, 2 * thumbnailwidth * thumbnailheight);
+	thumbnail.width = read16le(file);
+	thumbnail.height = read16le(file);
+	thumbnail.format = if_rgb565;
+	thumbnail.data = shared_array<uint8_t>(2 * thumbnail.width * thumbnail.height);
+	file.read((char *)thumbnail.data.data(), 2 * thumbnail.width * thumbnail.height);
 }
 
-cobAgentBlock::~cobAgentBlock() {
-	delete[] thumbnail;
-}
+cobAgentBlock::~cobAgentBlock() = default;
 
 cobFileBlock::cobFileBlock(cobBlock *p) {
 	parent = p;
