@@ -21,8 +21,6 @@
 #include <cassert>
 #include <memory>
 
-#include <SDL2_gfxPrimitives.h>
-
 #include "fileformats/creaturesImage.h"
 #include "keycodes.h"
 #include "Engine.h"
@@ -312,9 +310,14 @@ retry:
 	return true;
 }
 
-void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int colour) {
+void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int color) {
+	Uint8 r = (color >> 24) & 0xff;
+	Uint8 g = (color >> 16) & 0xff;
+	Uint8 b = (color >> 8)  & 0xff;
+	Uint8 a = (color >> 0)  & 0xff;
 	SDL_SetRenderTarget(parent->renderer, texture);
-	aalineColor(parent->renderer, x1, y1, x2, y2, colour);
+	SDL_SetRenderDrawColor(parent->renderer, r, g, b, a);
+	SDL_RenderDrawLine(parent->renderer, x1, y1, x2, y2);
 }
 
 SDL_Texture* SDLBackend::createTexture(void *data, unsigned int width, unsigned int height, imageformat format, bool black_is_transparent, uint8_t* custom_palette) {
