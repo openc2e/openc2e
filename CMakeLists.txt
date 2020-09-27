@@ -47,18 +47,15 @@ if(WIN32 OR APPLE)
 	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_net EXCLUDE_FROM_ALL)
-	add_subdirectory(externals/SDL2_gfx EXCLUDE_FROM_ALL)
 	add_library(SDL2::SDL2 ALIAS SDL2)
 	add_library(SDL2::Mixer ALIAS SDL2_mixer)
 	add_library(SDL2::Net ALIAS SDL2_net)
-	add_library(SDL2::GFX ALIAS SDL2_gfx)
 else()
 	find_package(PNG REQUIRED)
 
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
 	find_package(SDL2_net REQUIRED)
-	find_package(SDL2_gfx REQUIRED)
 	find_package(X11 REQUIRED) # Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
 endif()
 
@@ -256,7 +253,6 @@ target_link_libraries(openc2e
 	openc2e-core
 	openc2e-audiobackend
 	SDL2::SDL2
-	SDL2::GFX
 	SDL2::Net
 )
 if(X11_FOUND) # Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
