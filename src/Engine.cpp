@@ -903,7 +903,7 @@ bool Engine::initialSetup() {
 	b->init(); setBackend(b);
 	possible_backends.clear();
 
-	if (cmdline_norun || !cmdline_enable_sound) preferred_audiobackend = "null";
+	if (cmdline_norun) preferred_audiobackend = "null";
 	if (preferred_audiobackend != "null") std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;	
 	shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
 	if (!a)	throw creaturesException("No such audio backend " + preferred_audiobackend);
@@ -913,6 +913,9 @@ bool Engine::initialSetup() {
 		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl << "* Continuing without sound." << std::endl;
 		audio = shared_ptr<AudioBackend>(new NullAudioBackend());
 		audio->init();
+	}
+	if (!cmdline_enable_sound) {
+		audio->setMute(true);
 	}
 	possible_audiobackends.clear();
 	
