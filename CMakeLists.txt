@@ -14,7 +14,6 @@ if (NOT CMAKE_BUILD_TYPE)
 		"The type of build to perform. Valid values are: RelWithDebInfo (default), Debug, Release, MinSizeRel" FORCE)
 endif()
 
-option(OPENC2E_USE_QT "Build the qt GUI" ON)
 option(OPENC2E_USE_SERIALIZATION "Build the experimental serialization code" OFF)
 option(OPENC2E_PROFILE_ALLOCATION "Collect allocation profile stats for DBG: SIZO" OFF)
 if (OPENC2E_PROFILE_ALLOCATION)
@@ -56,18 +55,10 @@ else()
 
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
-	find_package(X11 REQUIRED) # Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
 endif()
 
 if (OPENC2E_USE_SERIALIZATION)
 	find_package(Boost 1.34.0 COMPONENTS serialization REQUIRED)
-endif()
-if (OPENC2E_USE_QT)
-	if(WIN32)
-		file(GLOB qt_directories "C:/Qt/Qt5.*/5.*/msvc*")
-		list(APPEND CMAKE_PREFIX_PATH ${qt_directories})
-	endif()
-	find_package(Qt5 COMPONENTS Widgets REQUIRED)
 endif()
 
 add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
@@ -278,55 +269,6 @@ target_link_libraries(openc2e
 	imgui_sdl
 	SDL2::SDL2
 )
-if(X11_FOUND) # Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
-	target_link_libraries(openc2e ${X11_LIBRARIES})
-	target_include_directories(openc2e PRIVATE ${X11_INCLUDE_DIR})
-endif()
-if (OPENC2E_USE_QT)
-	target_sources(openc2e PRIVATE
-		src/backends/qtgui/qtopenc2e.cpp
-		src/backends/qtgui/openc2eview.cpp
-		src/backends/qtgui/AgentInjector.cpp
-		src/backends/qtgui/BrainViewer.cpp
-		src/backends/qtgui/imagepreview.cpp
-		src/backends/qtgui/QtBackend.cpp
-		src/backends/qtgui/GraphWidget.cpp
-		src/backends/qtgui/CreatureGrapher.cpp
-		src/backends/qtgui/ChemicalSelector.cpp
-		src/backends/qtgui/Hatchery.cpp
-		src/tools/braininavat/brainview.cpp
-		src/backends/qtgui/agents.ui
-	)
-	target_link_libraries(openc2e Qt5::Widgets)
-	target_compile_definitions(openc2e PUBLIC "QT_SUPPORT")
-	set_target_properties(openc2e PROPERTIES
-		AUTOMOC ON
-		AUTORCC ON
-		AUTOUIC ON
-	)
-
-	if (WIN32)
-		find_program(WINDEPLOYQT_EXECUTABLE windeployqt)
-		get_target_property(qt_core_location Qt5::Core LOCATION)
-		get_filename_component(qt_runtime_dir "${qt_core_location}" DIRECTORY)
-		add_custom_command(
-			TARGET openc2e POST_BUILD
-			COMMAND ${CMAKE_COMMAND}
-			-D "DIST_DIR=${CMAKE_CURRENT_BINARY_DIR}"
-			-D "EXTRA_LIB_DIRS=${qt_runtime_dir}"
-			-P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Openc2eBundle.cmake
-		)
-		if(OPENC2E_USE_QT)
-				add_custom_command(
-				  TARGET openc2e POST_BUILD
-					COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/platforms/"
-					COMMAND ${CMAKE_COMMAND} -E copy_if_different
-					"$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>"
-					"${CMAKE_CURRENT_BINARY_DIR}/platforms/"
-				)
-		endif()
-	endif()
-endif()
 
 add_executable(change_breed_slot src/tools/change_breed_slot.cpp)
 target_link_libraries(change_breed_slot openc2e-fileformats)
@@ -351,14 +293,6 @@ target_link_libraries(praydumper openc2e-fileformats)
 
 add_executable(praybuilder src/tools/praybuilder.cpp)
 target_link_libraries(praybuilder openc2e-fileformats)
-
-add_executable(praytoolqt src/tools/praytoolqt.cpp)
-target_link_libraries(praytoolqt openc2e-fileformats Qt5::Widgets)
-set_target_properties(praytoolqt PROPERTIES
-	AUTOMOC ON
-	AUTORCC ON
-	AUTOUIC ON
-)
 
 add_executable(spritedumper src/tools/spritedumper.cpp)
 target_link_libraries(spritedumper openc2e-fileformats fmt ghc_filesystem)
@@ -506,23 +440,6 @@ if(APPLE)
 		COMMAND echo "sudo xattr -r -d com.apple.quarantine ." > "${dist_dir}/fix_unidentified_developer.sh"
 		COMMAND chmod +x "${dist_dir}/fix_unidentified_developer.sh"
 	)
-endif()
-if(OPENC2E_USE_QT)
-	if(WIN32)
-		list(APPEND dist_args
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/platforms/"
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>"
-			"${dist_dir}/platforms/"
-		)
-	elseif(APPLE)
-		list(APPEND dist_args
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/platforms/"
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"$<TARGET_FILE:Qt5::QCocoaIntegrationPlugin>"
-			"${dist_dir}/platforms/"
-		)
-	endif()
 endif()
 add_custom_target(dist ${dist_args})
 

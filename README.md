@@ -47,7 +47,6 @@ openc2e depends on:
 * bison
 * re2c
 * Python
-* Qt5
 * CMake
 * Boost.Serialization (optional)
 
@@ -79,7 +78,7 @@ brew install cmake qt
 
 ### Windows
 
-Install [Qt](https://www.qt.io/download), [Python](https://www.microsoft.com/en-us/p/python-38/9mssztt1n39l#activetab=pivot:overviewtab), and Visual Studio's [C++ CMake Tools for Windows](https://docs.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=vs-2019#installation).
+Install [Python](https://www.microsoft.com/en-us/p/python-38/9mssztt1n39l#activetab=pivot:overviewtab), and Visual Studio's [C++ CMake Tools for Windows](https://docs.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=vs-2019#installation).
 
 Open the folder in Visual Studio and it will automatically run CMake and set up the build system.
 

@@ -571,7 +571,6 @@ void Engine::handleTextInput(BackendEvent &event) {
 
 	int translated_char = cp1252_text[0];
 
-	// some backends (*cough*Qt*cough* think DEL is text)
 	if (!cp1252_isprint(translated_char)) {
 		return;
 	}

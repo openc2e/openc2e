@@ -67,7 +67,6 @@ protected:
 public:
 	SDLBackend();
 	void init();
-	void initFrom(void *window_id);
 	int run();
 	void shutdown();
 	void setUserScale(float scale);

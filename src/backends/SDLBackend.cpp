@@ -104,45 +104,6 @@ void SDLBackend::init() {
 	SDL_StartTextInput();
 }
 
-void SDLBackend::initFrom(void *window_id) {
-	int init = SDL_INIT_VIDEO;
-
-	if (SDL_Init(init) < 0)
-		throw creaturesException(std::string("SDL error during initialization: ") + SDL_GetError());
-
-	window = SDL_CreateWindowFrom(window_id);
-	if (!window) {
-		throw creaturesException(std::string("SDL error creating window: ") + SDL_GetError());
-	}
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-	if (!renderer) {
-		throw creaturesException(std::string("SDL error creating renderer: ") + SDL_GetError());
-	}
-
-	{
-		SDL_RendererInfo info;
-		info.name = nullptr;
-		SDL_GetRendererInfo(renderer, &info);
-		printf("* SDL Renderer: %s\n", info.name);
-	}
-
-#if defined(SDL_VIDEO_DRIVER_X11)
-	// Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(window, &info);
-	if (info.subsystem == SDL_SYSWM_X11) {
-		XSelectInput(info.info.x11.display, info.info.x11.window,
-		             (FocusChangeMask | EnterWindowMask | LeaveWindowMask |
-		              ExposureMask | ButtonReleaseMask | PointerMotionMask |
-		              KeyPressMask | KeyReleaseMask | PropertyChangeMask |
-		              StructureNotifyMask | KeymapStateMask));
-	}
-#endif
-	SDL_ShowCursor(false);
-	SDL_StartTextInput();
-}
-
 void SDLBackend::shutdown() {
 	SDL_Quit();
 }

@@ -26,9 +26,6 @@
 #ifdef SDLMIXER_SUPPORT
 #include "audiobackend/SDLMixerBackend.h"
 #endif
-#ifdef QT_SUPPORT
-#include "backends/qtgui/QtBackend.h"
-#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -48,11 +45,6 @@ extern "C" int main(int argc, char *argv[]) {
 		"Alyssa Milburn and others\n\n";
 
 	engine.addPossibleBackend("sdl", std::shared_ptr<Backend>(new SDLBackend()));
-#ifdef QT_SUPPORT
-	std::shared_ptr<QtBackend> qtbackend = std::shared_ptr<QtBackend>(new QtBackend());
-	std::shared_ptr<Backend> qtbackend_generic = std::dynamic_pointer_cast<class Backend, class QtBackend>(qtbackend);
-	engine.addPossibleBackend("qt", qtbackend_generic); // last-added backend is default
-#endif
 #ifdef SDLMIXER_SUPPORT
 	engine.addPossibleAudioBackend("sdlmixer", std::shared_ptr<AudioBackend>(new SDLMixerBackend()));
 #endif

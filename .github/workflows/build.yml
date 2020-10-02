@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - run: sudo apt-get update && sudo apt-get install bison ccache ninja-build libsdl2-dev libsdl2-mixer-dev qtbase5-dev libutf8proc-dev
+    - run: sudo apt-get update && sudo apt-get install bison ccache ninja-build libsdl2-dev libsdl2-mixer-dev libutf8proc-dev
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
       shell: cmake -P {0}
@@ -40,7 +40,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@v1
-    - uses: jurplel/install-qt-action@v2
     - shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
@@ -62,7 +61,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - run: brew install ccache ninja qt
+    - run: brew install ccache ninja
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
       shell: cmake -P {0}
@@ -74,7 +73,7 @@ jobs:
         path: .ccache
         key: ccache-macos-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
         restore-keys: ccache-macos-
-    - run: mkdir build && cd build && cmake .. -G Ninja -DCMAKE_PREFIX_PATH=/usr/local/opt/qt -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel
+    - run: mkdir build && cd build && cmake .. -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel
       env:
         CCACHE_BASEDIR: ${{ github.workspace }}
         CCACHE_DIR: ${{ github.workspace }}/.ccache
