@@ -75,6 +75,8 @@ add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
+add_subdirectory(externals/imgui EXCLUDE_FROM_ALL)
+add_subdirectory(externals/imgui_sdl EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 
 
@@ -258,6 +260,8 @@ add_executable(openc2e
 target_link_libraries(openc2e
 	openc2e-core
 	openc2e-audiobackend
+	imgui
+	imgui_sdl
 	SDL2::SDL2
 )
 if(X11_FOUND) # Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
