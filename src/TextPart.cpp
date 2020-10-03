@@ -2,7 +2,7 @@
 #include "Backend.h"
 #include "encoding.h"
 #include "Engine.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "imageManager.h"
 #include "TextEntryPart.h"
 #include "World.h"
@@ -228,7 +228,7 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 
 	unsigned int startline = pages[currpage];
 	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
-	TextureAtlasHandle textures_to_use = textsprite->texture_atlas;
+	std::shared_ptr<creaturesImage> sprite_to_use = textsprite;
 	unsigned int currtint = 0;
 	for (unsigned int i = startline; i < endline; i++) {	
 		int currentx = 0, somex = xoff;
@@ -239,13 +239,13 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 
 		for (unsigned int x = 0; x < lines[i].text.size(); x++) {
 			if (currtint < tints.size() && tints[currtint].offset == lines[i].offset + x) {
-				textures_to_use = tints[currtint].sprite->texture_atlas;
+				sprite_to_use = tints[currtint].sprite;
 				currtint++;
 			}
 		
 			if (((unsigned char)lines[i].text[x]) < 32) continue; // TODO: replace with space or similar?
 			int spriteid = ((unsigned char)lines[i].text[x]) - 32;
-			renderer->renderTexture(textures_to_use, spriteid, somex + currentx, yoff + currenty, has_alpha ? alpha : 0);
+			renderer->renderCreaturesImage(sprite_to_use, spriteid, somex + currentx, yoff + currenty, has_alpha ? alpha : 0);
 			if ((caretdata) && (caretdata->caretpos == lines[i].offset + x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 			currentx += textsprite->width(spriteid) + charspacing;

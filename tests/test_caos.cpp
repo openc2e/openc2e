@@ -1,6 +1,6 @@
 #include "caosScript.h"
 #include "caosVM.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "imageManager.h"
 #include "util.h"
 #include "World.h"
@@ -10,19 +10,17 @@
 class Openc2eTestHelper {
 public:
     static std::shared_ptr<creaturesImage> addBlnkSprite() {
-        std::vector<std::vector<unsigned char>> buffers;
-        std::vector<unsigned char> pureblack;
-        pureblack.resize(2 * 41 * 18, 0);
-        buffers.push_back(pureblack);
-        buffers.push_back(pureblack);
-
-        shared_ptr<creaturesImage> img(new creaturesImage(
-            "blnk",
-            if_16bit_565,
-            buffers,
-            { 41, 41 },
-            { 18, 18 }
-        ));
+        shared_array<uint8_t> pureblack(2 * 41 * 18);
+        std::vector<Image> images(2);
+        for (size_t i = 0; i < images.size(); ++i) {
+          images[i].width = 41;
+          images[i].height = 18;
+          images[i].format = if_rgb565;
+          images[i].data = pureblack;
+        }
+        
+        shared_ptr<creaturesImage> img(new creaturesImage("blnk"));
+        img->images = images;
 
         world.gallery->addImage(img);
         return img;

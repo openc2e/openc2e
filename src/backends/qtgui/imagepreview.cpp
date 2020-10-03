@@ -18,17 +18,17 @@
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "endianlove.h"
+#include "imageManager.h"
 #include "Engine.h"
+#include "World.h"
 
 #include <QPainter>
 #include <cassert>
 
 ImagePreview::ImagePreview(QWidget *parent): QWidget(parent) {
-	imgdata = 0;
 }
 
 ImagePreview::~ImagePreview() {
-	if (imgdata) delete imgdata;
 }
 
 void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
@@ -48,35 +48,35 @@ void ImagePreview::onSelect(QListWidgetItem *current, QListWidgetItem *prev) {
 
 		c1cobfile cobfile = read_c1cobfile(cobstream);
 
-		if (cobfile.picture_width > 0 && cobfile.picture_height > 0) {
-			previewimg = QImage((uchar*)cobfile.picture_data.data(), cobfile.picture_width, cobfile.picture_height, QImage::Format_Indexed8).mirrored();
+		if (cobfile.picture.width > 0 && cobfile.picture.height > 0) {
+			previewimg = QImage((uchar*)cobfile.picture.data.data(), cobfile.picture.width, cobfile.picture.height, QImage::Format_Indexed8);
 			previewimg.setColorCount(256);
-			unsigned char *palette = engine.getPalette();
-			if (palette) {
+			shared_array<Color> palette = world.gallery->getDefaultPalette();
+			if (palette.data()) {
 				for (unsigned int i = 0; i < 256; i++) {
-					previewimg.setColor(i, QColor(palette[i*3],palette[i*3+1],palette[i*3+2]).rgb());
+					previewimg.setColor(i, QColor(palette[i].r,palette[i].g,palette[i].b).rgb());
 				}
 			}
 		}
 	} else if (engine.version == 2) {
 		cobAgentBlock *b = (cobAgentBlock *)current->data(Qt::UserRole).value<void *>();
 		assert(b);
-		if (b->thumbnailwidth > 0 && b->thumbnailheight > 0) {
-			unsigned short *oldimgdata = b->thumbnail;
-			assert(b->thumbnail);
-			if (imgdata) delete imgdata;
-			imgdata = new unsigned int[b->thumbnailwidth * b->thumbnailheight];
+		if (b->thumbnail.width > 0 && b->thumbnail.height > 0) {
+			assert(b->thumbnail.data.data());
+			imgdata = b->thumbnail.data;
+			// unsigned short *oldimgdata = (unsigned short*)b->thumbnail.data.data();
+			// if (imgdata) delete imgdata;
+			// imgdata = new uint8_t[b->thumbnail.width * b->thumbnail.height * 2];
+			// 
+			// for (unsigned int i = 0; i < (unsigned int)b->thumbnail.width * (unsigned int)b->thumbnail.height; i++) {
+			// 	unsigned int v = oldimgdata[i];
+			// 	unsigned int red = ((v & 0xf800) >> 8) & 0xFF;
+			// 	unsigned int green = ((v & 0x07e0) >> 3) & 0xFF;
+			// 	unsigned int blue = ((v & 0x001f) << 3) & 0xFF;
+			// 	imgdata[i] = (red << 16) + (green << 8) + blue;
+			// }
 
-			for (unsigned int i = 0; i < (unsigned int)b->thumbnailwidth * (unsigned int)b->thumbnailheight; i++) {
-				unsigned int v = oldimgdata[i];
-				v = swapEndianShort(v);
-				unsigned int red = ((v & 0xf800) >> 8) & 0xFF;
-				unsigned int green = ((v & 0x07e0) >> 3) & 0xFF;
-				unsigned int blue = ((v & 0x001f) << 3) & 0xFF;
-				imgdata[i] = (red << 16) + (green << 8) + blue;
-			}
-
-			previewimg = QImage((uchar*)imgdata, b->thumbnailwidth, b->thumbnailheight, QImage::Format_RGB32);
+			previewimg = QImage(imgdata.data(), b->thumbnail.width, b->thumbnail.height, QImage::Format_RGB16);
 		}
 	}
 

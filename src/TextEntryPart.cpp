@@ -2,7 +2,7 @@
 #include "Agent.h"
 #include "Backend.h"
 #include "Engine.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "imageManager.h"
 #include "keycodes.h"
 #include "World.h"
@@ -87,7 +87,7 @@ void TextEntryPart::partRender(RenderTarget *renderer, int xoffset, int yoffset)
 
 void TextEntryPart::renderCaret(RenderTarget *renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
-	renderer->renderTexture(caretsprite->texture_atlas, caretpose, xoffset, yoffset, has_alpha ? alpha : 0);
+	renderer->renderCreaturesImage(caretsprite, caretpose, xoffset, yoffset, has_alpha ? alpha : 0);
 }
 
 void TextEntryPart::tick() {

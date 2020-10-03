@@ -22,10 +22,10 @@
 #include <cassert>
 #include <iostream>
 
-blkImage::blkImage(std::istream &in, std::string n) : creaturesImage(n) {
+Image ReadBlkFile(std::istream &in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
-	imgformat = is_565 ? if_16bit_565 : if_16bit_555;
+	imageformat imgformat = is_565 ? if_rgb565 : if_rgb555;
 
 	uint16_t width = read16le(in);
 	uint16_t height = read16le(in);
@@ -42,12 +42,7 @@ blkImage::blkImage(std::istream &in, std::string n) : creaturesImage(n) {
 		uint16_t frameheight = read16le(in); assert(frameheight == 128);
 	}
 
-	m_numframes = 1;
-	widths = { totalwidth };
-	heights = { totalheight };
-	
-	buffers.resize(1);
-	buffers[0].resize(totalwidth * totalheight * 2);
+	shared_array<uint8_t> buffer(totalwidth * totalheight * 2);
 	const size_t sprheight = 128, sprwidth = 128;
 	const size_t heightinsprites = totalheight / sprheight;
 	const size_t widthinsprites = totalwidth / sprwidth;
@@ -60,12 +55,15 @@ blkImage::blkImage(std::istream &in, std::string n) : creaturesImage(n) {
 			const int desty = (i * sprheight);
 			in.seekg(offsets[whereweare]);
 			for (int blocky = 0; blocky < 128; blocky++) {
-				readmany16le(in, (uint16_t*)&(buffers[0][(i * 128 + blocky) * totalwidth * 2 + j * 128 * 2]), 128);
+				readmany16le(in, (uint16_t*)&(buffer[(i * 128 + blocky) * totalwidth * 2 + j * 128 * 2]), 128);
 			}
 		}
 	}
+
+	Image image;
+	image.width = totalwidth;
+	image.height = totalheight;
+	image.format = imgformat;
+	image.data = buffer;
+	return image;
 }
-
-blkImage::~blkImage() {}
-
-/* vim: set noet: */

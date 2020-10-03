@@ -19,6 +19,7 @@
 
 #include <QWidget>
 #include <QListWidgetItem>
+#include "shared_array.h"
 
 class ImagePreview : public QWidget {
 	Q_OBJECT
@@ -33,7 +34,7 @@ class ImagePreview : public QWidget {
 
 	private:
 		QImage previewimg; // TODO: change to a boost::scoped_ptr or similar?
-		unsigned int *imgdata;
+		shared_array<uint8_t> imgdata;
 };
 
 #endif /* IMAGEPREVIEW_H */

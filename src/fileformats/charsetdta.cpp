@@ -3,35 +3,70 @@
 #include "fileformats/charsetdta.h"
 
 #include <string>
+#include <string.h>
 
-CharsetDtaReader::CharsetDtaReader(span<const uint8_t> buf_) : buf(buf_) {
-	if (!(buf.size() == 9472 || buf.size() == 18944)) {
-		throw creaturesException("Expected size of charset.dta file to be 9472 or 18944 - got " + std::to_string(buf.size()));
-	}
+/*
+  CHARSET.DTA and EuroCharset.dta character data is a form of indexed data: each
+  byte is either 0 (for transparent), or an integer. The game engine will pass
+  in what colors it wants, but we define a simple default palette here just for
+  debugging and ease of use.
+*/
+static shared_array<Color> getDefaultCharsetPalette() {
+  static shared_array<Color> s_default_charset_palette;
+  if (!s_default_charset_palette) {
+    s_default_charset_palette = shared_array<Color>(256);
+    s_default_charset_palette[0].a = 0;
+    for (int i = 1; i < 256; i++) {
+      s_default_charset_palette[i].r = 0xff;
+      s_default_charset_palette[i].g = 0xff;
+      s_default_charset_palette[i].b = 0xff;
+      s_default_charset_palette[i].a = 0xff;
+    }
+    // nice background color used by spritedumper
+    s_default_charset_palette[100].r = 112;
+    s_default_charset_palette[100].g = 164;
+    s_default_charset_palette[100].b = 236;
+  }
+  return s_default_charset_palette;
 }
 
-size_t CharsetDtaReader::getNumCharacters() const {
-	return buf.size() / 74;
-}
+/*
+ Creatures 1 and 2 define their fonts in a custom file format, used by the
+ CHARSET.DTA and EuroCharset.dta files. CHARSET.DTA covers the 128 ASCII
+ characters, and EuroCharset.dta covers the 256 Windows-1252 characters.
+ 
+ The file format starts with either 128 or 256 72-byte blocks of character data.
+ Within the character data, each row is padded out to 6 bytes, and each character
+ is 12 pixels high.
+ 
+ After the character data, there are either 128 or 256 2-byte integers that
+ define the character widths.
+*/
+MultiImage ReadCharsetDtaFile(std::istream &in) {
+  std::vector<uint8_t> filedata{std::istreambuf_iterator<char>(in), {}};
+  
+  if (!(filedata.size() == 9472 || filedata.size() == 18944)) {
+    throw creaturesException("Expected size of charset.dta file to be 9472 or 18944 - got " + std::to_string(filedata.size()));
+  }
+  const unsigned int num_characters = filedata.size() / 74;
 
-size_t CharsetDtaReader::getCharWidth(size_t index) const {
-	size_t pos = getNumCharacters() * 72 + index * 2;
-	return read16le(buf.data() + pos);
-}
-
-size_t CharsetDtaReader::getCharHeight(size_t) const {
-	return 12;
-}
-
-std::vector<uint8_t> CharsetDtaReader::getCharData(size_t index) const {
-	const size_t width = getCharWidth(index);
-	std::vector<uint8_t> data(12 * width);
-	const size_t charstartpos = index * 72;
-	size_t charpos = 0;
-	for (size_t row = 0; row < 12; ++row) {
-		size_t rowpos = charstartpos + 6 * row;
-		std::copy(&buf[rowpos], &buf[rowpos + width], data.data() + charpos);
-		charpos += width;
-	}
-	return data;
+  MultiImage images(num_characters);
+  for (unsigned int i = 0; i < num_characters; i++) {
+    const unsigned int char_width = read16le(filedata.data() + num_characters * 72 + i * 2);
+    const unsigned int char_height = 12;
+    
+    images[i].width = char_width;
+    images[i].height = char_height;
+    images[i].format = if_index8;
+    images[i].palette = getDefaultCharsetPalette();
+    images[i].data = shared_array<uint8_t>(char_height * char_width);
+    for (unsigned int row = 0; row < char_height; ++row) {
+      memcpy(
+        images[i].data.data() + row * char_width,
+        filedata.data() + i * 72 + row * 6,
+        char_width
+      );
+    }
+  }
+  return images;
 }

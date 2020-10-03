@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "Image.h"
+
 struct c1cobfile {
     std::string name;
     
@@ -18,10 +20,7 @@ struct c1cobfile {
     std::vector<std::string> object_scripts;
     std::vector<std::string> install_scripts;
     
-    uint32_t picture_width;
-    uint32_t picture_height;
-    
-    std::vector<uint8_t> picture_data;
+    Image picture;
 };
 
 c1cobfile read_c1cobfile(std::istream &in);

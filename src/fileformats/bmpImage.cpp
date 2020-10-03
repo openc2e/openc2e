@@ -21,27 +21,35 @@
 #include "endianlove.h"
 #include "creaturesException.h"
 #include "openc2e.h"
+#include "Engine.h"
+#include "Backend.h"
 #include <memory>
 
 #define BI_RGB 0
 #define BI_RLE8 1
 #define BI_BITFIELDS 3
 
-bmpData::bmpData(std::istream &in, std::string n) {
-	palette = 0;
 
+Image ReadBmpFile(std::istream &in) {
 	char magic[2];
 	in.read(magic, 2);
 	if (std::string(magic, 2) != "BM")
-		throw creaturesException(n + " doesn't seem to be a BMP file.");
+		throw creaturesException("Doesn't seem to be a BMP file.");
 
-	in.seekg(8, std::ios::cur); // skip filesize and reserved bytes
+	in.seekg(12, std::ios::cur); // skip filesize, reserved bytes, and data offset
 
-	uint32_t dataoffset = read32le(in);
+	return ReadDibFile(in);
+}
 
+Image ReadDibFile(std::istream &in) {
+	uint32_t biWidth, biHeight;
+	shared_array<Color> palette;
+	imageformat imgformat;
+	shared_array<uint8_t> bmpdata;
+	
 	uint32_t biSize = read32le(in);
 	if (biSize != 40) // win3.x format, which the seamonkeys files are in
-		throw creaturesException(n + " is a BMP format we don't understand.");
+		throw creaturesException("BMP format we don't understand.");
 
 	biWidth = read32le(in);
 	biHeight = read32le(in);
@@ -49,81 +57,82 @@ bmpData::bmpData(std::istream &in, std::string n) {
 	
 	uint16_t biPlanes = read16le(in);
 	if (biPlanes != 1) // single image plane
-		throw creaturesException(n + " contains BMP data we don't understand.");
+		throw creaturesException("Contains BMP data we don't understand.");
 	
 	uint16_t biBitCount = read16le(in);
-	biCompression = read32le(in);
+	uint16_t biCompression = read32le(in);
 
 	// and now for some stuff we really don't care about
 	uint32_t biSizeImage = read32le(in);
 	uint32_t biXPelsPerMeter = read32le(in);
 	uint32_t biYPelsPerMeter = read32le(in);
-	uint32_t biClrUsed = read32le(in);
-	uint32_t biClrImportant = read32le(in);
+	uint32_t biColorsUsed = read32le(in);
+	uint32_t biColorsImportant = read32le(in);
 
 	switch (biCompression) {
 		case BI_RGB:
 			break;
 
 		case BI_RLE8:
-			if (biBitCount != 8) throw creaturesException(n + " contains BMP data compressed in a way which isn't possible.");
+			if (biBitCount != 8) throw creaturesException("Contains BMP data compressed in a way which isn't possible.");
 			break;
 
 		case BI_BITFIELDS:
 		default:
-			throw creaturesException(n + " contains BMP data compressed in a way we don't understand.");
+			throw creaturesException("Contains BMP data compressed in a way we don't understand.");
 	}
 
 	switch (biBitCount)  {
 		case 4:
 		case 8:
 			{
-			imgformat = if_paletted;
-			unsigned int num_palette_entries = (biBitCount == 4 ? 16 : 256);
+			imgformat = if_index8;
+			unsigned int num_palette_entries = biColorsUsed != 0 ? biColorsUsed : (biBitCount == 4 ? 16 : 256);
 			std::vector<uint8_t> filepalette(num_palette_entries * 4);
 			in.read((char*)filepalette.data(), filepalette.size());
-			palette = new uint8_t[256 * 4];
+			palette = shared_array<Color>(num_palette_entries);
 			for (unsigned int i = 0; i < num_palette_entries; i++) {
-				palette[i * 4] = filepalette[(i * 4) + 2];
-				palette[(i * 4) + 1] = filepalette[(i * 4) + 1];
-				palette[(i * 4) + 2] = filepalette[i * 4];
-				palette[(i * 4) + 3] = 0;
+				palette[i].r = filepalette[(i * 4) + 2];
+				palette[i].g = filepalette[(i * 4) + 1];
+				palette[i].b = filepalette[i * 4];
+				palette[i].a = 0xff;
 			}
 			}
 			break;
 			
 		case 24:
-			imgformat = if_24bit;
+			imgformat = if_bgr24;
 			break;
 
 		default:
-			throw creaturesException(n + " contains BMP data of an unsupported bit depth.");
+			throw creaturesException("Contains BMP data of an unsupported bit depth.");
 	}
 
 	if (biSizeImage == 0) {
 		biSizeImage = biWidth * biHeight * biBitCount / 8;
 	}
-
-	in.seekg(dataoffset);
-	bmpdata.resize(biSizeImage);
-	in.read(bmpdata.data(), biSizeImage);
+	
+	if (biCompression == BI_RGB) {
+		size_t rowsize = biWidth * biBitCount / 8;
+		size_t stride = (biWidth * biBitCount + 31) / 32 * 4; // ceil(biWidth * biBitCount / 32) * 4
+		
+		bmpdata = shared_array<uint8_t>(rowsize * biHeight);
+		for (size_t i = 0; i < biHeight; ++i) {
+			in.read((char*)bmpdata.data() + (biHeight - 1 - i) * rowsize, rowsize);
+			in.seekg(stride - rowsize, std::ios_base::cur);
+		}
+	} else {
+		bmpdata = shared_array<uint8_t>(biSizeImage);
+		in.read((char*)bmpdata.data(), biSizeImage);
+	}
 
 	if (biBitCount == 4) {
 		auto srcdata = bmpdata;
-		char* srcdatap = srcdata.data();
-		bmpdata.clear();
-		bmpdata.resize(biWidth * biHeight);
-
-		for (char *dest = bmpdata.data(); dest < bmpdata.data() + biWidth * biHeight; dest += biWidth) {
-			uint8_t pixel = 0;
-			for (unsigned int i = 0; i < biWidth; i++) {
-				if (i % 2 == 0) {
-					pixel = *srcdatap;
-					srcdatap++;
-				}
-				*(dest + i) = (pixel >> 4);
-				pixel <<= 4;
-			}
+		bmpdata = shared_array<uint8_t>(biWidth * biHeight);
+		
+		for (size_t i = 0; i < srcdata.size(); ++i) {
+			bmpdata[i * 2] = (srcdata[i] >> 4) & 0xf;
+			bmpdata[i * 2 + 1] = srcdata[i] & 0xf;
 		}
 	}
 
@@ -131,8 +140,7 @@ bmpData::bmpData(std::istream &in, std::string n) {
 		// decode an RLE-compressed 8-bit image
 		// TODO: sanity checking
 		auto srcdata = bmpdata;
-		bmpdata.clear();
-		bmpdata.resize(biWidth * biHeight, 0); // TODO
+		bmpdata = shared_array<uint8_t>(biWidth * biHeight); // TODO
 		
 		unsigned int x = 0, y = 0;
 		for (unsigned int i = 0; i < biSizeImage;) {
@@ -152,7 +160,7 @@ bmpData::bmpData(std::istream &in, std::string n) {
 				} else { // absolute mode
 					for (unsigned int j = 0; j < val; j++) {
 						if (x + (y * biWidth) >= biHeight * biWidth) break;
-						bmpdata[x + (y * biWidth)] = srcdata[i];
+						bmpdata[x + ((biHeight - 1 - y) * biWidth)] = srcdata[i];
 						i++; x++;
 					}
 					if (val % 2 == 1) i++; // skip padding byte
@@ -160,7 +168,7 @@ bmpData::bmpData(std::istream &in, std::string n) {
 			} else { // run of pixels
 				for (unsigned int j = 0; j < nopixels; j++) {
 					if (x + (y * biWidth) >= biHeight * biWidth) break;
-					bmpdata[x + (y * biWidth)] = val;
+					bmpdata[x + ((biHeight - 1 - y) * biWidth)] = val;
 					x++;
 				}
 			}
@@ -172,66 +180,12 @@ bmpData::bmpData(std::istream &in, std::string n) {
 			if (x + (y * biWidth) >= biHeight * biWidth) break;
 		}
 	}
-
+	
+	Image image;
+	image.width = biWidth;
+	image.height = biHeight;
+	image.format = imgformat;
+	image.data = bmpdata;
+	image.palette = palette;
+	return image;
 }
-
-bmpData::~bmpData() {
-	if (palette) delete[] palette;
-}
-
-bmpImage::bmpImage(std::istream &in, std::string n) : creaturesImage(n) {
-	bmpdata = shared_ptr<bmpData>(new bmpData(in, n));
-	imgformat = bmpdata->imgformat;
-	setBlockSize(bmpdata->biWidth, bmpdata->biHeight);
-}
-
-bmpImage::~bmpImage() {}
-
-void bmpImage::setBlockSize(unsigned int blockwidth, unsigned int blockheight) {
-	buffers.resize(0);
-	m_numframes = 0;
-
-	// Note that the blockwidth/height isn't always a multiple of the image width/height, there can be useless pixels.
-	unsigned int widthinblocks = bmpdata->biWidth / blockwidth;
-	unsigned int heightinblocks = bmpdata->biHeight / blockheight;
-
-	m_numframes = widthinblocks * heightinblocks;
-	caos_assert(m_numframes > 0);
-
-	widths.resize(m_numframes);
-	heights.resize(m_numframes);
-	buffers.resize(m_numframes);
-
-	unsigned int pitch = bmpdata->biWidth;
-	if (imgformat == if_24bit) pitch = (((pitch * 3) + 3) / 4) * 4;
-	else if (bmpdata->biCompression == BI_RGB) pitch = ((pitch + 3) / 4) * 4;
-
-	unsigned int curr_row = 0, curr_col = 0;
-	for (unsigned int i = 0; i < m_numframes; i++) {
-		widths[i] = blockwidth;
-		heights[i] = blockheight;
-
-		unsigned int buffersize = blockwidth * blockheight;
-		if (imgformat == if_24bit) { buffersize *= 3; }
-		
-		buffers[i].resize(buffersize);
-
-		for (unsigned int j = 0; j < blockheight; j++) {
-			unsigned int srcoffset = (curr_col * blockwidth);
-			unsigned int destoffset = blockwidth * j;
-			unsigned int datasize = blockwidth;
-			if (imgformat == if_24bit) { srcoffset *= 3; destoffset *= 3; datasize *= 3; }
-			srcoffset += ((bmpdata->biHeight - 1) - (blockheight * curr_row) - j) * pitch;
-			
-			memcpy((char *)buffers[i].data() + destoffset, (char *)bmpdata->bmpdata.data() + srcoffset, datasize);
-		}
-
-		curr_col++;
-		if (curr_col == widthinblocks) {
-			curr_col = 0;
-			curr_row++;
-		}
-	}
-}
-
-/* vim: set noet: */

@@ -24,8 +24,9 @@
 #include <string>
 
 #include "BackendEvent.h"
-#include "imageformat.h"
-#include "TextureAtlas.h"
+#include "Image.h"
+#include "Texture.h"
+#include "span.h"
 
 using std::shared_ptr;
 
@@ -33,7 +34,8 @@ class creaturesImage;
 
 class RenderTarget {
 public:
-	virtual void renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
+	virtual void renderCreaturesImage(const creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
+	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) = 0;
 	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h) = 0;
 	virtual unsigned int getWidth() const = 0;
@@ -60,11 +62,10 @@ public:
 	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) = 0;
 	virtual void freeRenderTarget(RenderTarget *surf) = 0;
 
-	virtual void setPalette(uint8_t *data) = 0;
+	virtual void setDefaultPalette(span<Color> palette) = 0;
+	virtual Texture createTexture(const Image& image) = 0;
 	
-	virtual TextureAtlasHandle createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>& image) = 0;
-	
-	virtual int run(int argc, char **argv);
+	virtual int run() = 0;
 	virtual void delay(int msec) = 0;
 	virtual ~Backend() { }
 };

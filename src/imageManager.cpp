@@ -18,11 +18,7 @@
  */
 
 #include "imageManager.h"
-#include "fileformats/c16Image.h"
-#include "fileformats/sprImage.h"
-#include "fileformats/blkImage.h"
-#include "fileformats/bmpImage.h"
-#include "fileformats/charsetdta.h"
+#include "fileformats/ImageUtils.h"
 #include "mmapifstream.h"
 #include "openc2e.h"
 #include "World.h"
@@ -30,6 +26,7 @@
 #include "Backend.h"
 #include "PathResolver.h"
 
+#include <array>
 #include <iostream>
 #include <fmt/format.h>
 #include <fstream>
@@ -41,21 +38,45 @@ using namespace ghc::filesystem;
 
 enum filetype { blk, s16, c16, spr, bmp };
 
-shared_ptr<creaturesImage> tryOpen(std::string fname, filetype ft) {
+shared_ptr<creaturesImage> tryOpen(std::string fname) {
 	path realfile(world.findFile(fname));
 	std::string basename = realfile.filename().stem();
-	mmapifstream in(realfile.string());
 
-	if (in.is_open()) {
-		switch (ft) {
-			case blk: return shared_ptr<creaturesImage>(new blkImage(in, basename));
-			case c16: return shared_ptr<creaturesImage>(new c16Image(in, basename));
-			case s16: return shared_ptr<creaturesImage>(new s16Image(in, basename));
-			case spr: return shared_ptr<creaturesImage>(new sprImage(in, basename));
-			case bmp: return shared_ptr<creaturesImage>(new bmpImage(in, basename)); // TODO: don't commit this ;p
-		}
+	if (exists(realfile)) {
+		auto img = std::make_shared<creaturesImage>(basename);
+		img->images = ImageUtils::ReadImage(realfile);
+		return img;
 	}
 	return {};
+}
+
+void imageManager::loadDefaultPalette() {
+	if (engine.gametype == "c1") {
+		std::cout << "* Loading palette.dta..." << std::endl;
+		// TODO: case-sensitivity for the lose
+		path palpath(world.findFile("Palettes/palette.dta"));
+		if (exists(palpath) && !is_directory(palpath)) {
+			std::ifstream f(palpath.string().c_str(), std::ios::binary);
+			f >> std::noskipws;
+			std::array<uint8_t, 768> palette_data;
+			f.read((char *)palette_data.data(), 768);
+			
+			palette = shared_array<Color>(256);
+			for (unsigned int i = 0; i < 256; i++) {
+				palette[i].r = palette_data[i * 3] * 4;
+				palette[i].g = palette_data[i * 3 + 1] * 4;
+				palette[i].b = palette_data[i * 3 + 2] * 4;
+				palette[i].a = 0xff;
+			}
+			
+			engine.backend->setDefaultPalette(palette);
+		} else
+			throw creaturesException("Couldn't find C1 palette data!");
+	}
+}
+
+shared_array<Color> imageManager::getDefaultPalette() {
+	return palette;
 }
 
 /*
@@ -99,14 +120,14 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 
 	shared_ptr<creaturesImage> img;
 	if (engine.bmprenderer) {
-		img = tryOpen(fname + ".bmp", bmp);
+		img = tryOpen(fname + ".bmp");
 	} else {
 		if (is_background) {
-			img = tryOpen(fname + ".blk", blk);
+			img = tryOpen(fname + ".blk");
 		} else {
-			img = tryOpen(fname + ".s16", s16);
-			if (!img) img = tryOpen(fname + ".c16", c16);
-			if (!img) img = tryOpen(fname + ".spr", spr);
+			img = tryOpen(fname + ".s16");
+			if (!img) img = tryOpen(fname + ".c16");
+			if (!img) img = tryOpen(fname + ".spr");
 		}
 	}
 
@@ -118,7 +139,10 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 		return shared_ptr<creaturesImage>();
 	}
 	
-	img->texture_atlas = engine.backend->createTextureAtlasFromCreaturesImage(img);
+	img->textures.resize(img->images.size());
+	for (size_t i = 0; i < img->images.size(); ++i) {
+		img->textures[i] = engine.backend->createTexture(img->images[i]);
+	}
 
 	return img;
 }
@@ -140,184 +164,63 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 	if (filename.empty()) {
 		return {};
 	}
-
-	std::ifstream in(filename, std::ios::binary);
-	if (!in) {
-		return {};
-	}
-
-	std::vector<uint8_t> filedata{std::istreambuf_iterator<char>(in), {}};
-	CharsetDtaReader reader(filedata);
-
-	std::vector<std::vector<uint8_t>> buffers(reader.getNumCharacters());
-	std::vector<uint16_t> widths(reader.getNumCharacters());
-	std::vector<uint16_t> heights(reader.getNumCharacters());
-	for (size_t i = 0; i < reader.getNumCharacters(); ++i) {
-		std::vector<uint8_t> chardata = reader.getCharData(i);
-		widths[i] = reader.getCharWidth(i);
-		heights[i] = reader.getCharHeight(i);
-
-		// TODO: how do the values in the CHARSET.DTA map to actual color values?
-		// just setting them all to the textcolor right now, but the real engines
-		// do some shading/aliasing
-		switch (format) {
-			case if_paletted:
-				for (size_t j = 0; j < reader.getCharWidth(i) * reader.getCharHeight(i); ++j) {
-					if (chardata[j] != 0) {
-						chardata[j] = textcolor;
+	
+	MultiImage images = ImageUtils::ReadImage(filename);
+	
+	// TODO: how do the values in the CHARSET.DTA map to actual color values?
+	// just setting them all to the textcolor right now, but the real engines
+	// do some shading/aliasing
+	switch (format) {
+		case if_index8:
+			for (size_t i = 0; i < images.size(); ++i) {
+				images[i].palette = palette;
+				for (size_t j = 0; j < images[i].data.size(); ++j) {
+					if (images[i].data[j] != 0) {
+						images[i].data[j] = textcolor;
 					}
 				}
-				buffers[i] = std::move(chardata);
-				break;
-			case if_24bit:
-				buffers[i].resize(chardata.size() * 3, 0);
-				for (size_t j = 0; j < reader.getCharWidth(i) * reader.getCharHeight(i); ++j) {
-					if (chardata[j] != 0) {
-						buffers[i][j*3] = (textcolor >> 16) & 0xff;
-						buffers[i][j*3 + 1] = (textcolor >> 8) & 0xff;
-						buffers[i][j*3 + 2] = textcolor & 0xff;
-					}
+			}
+			break;
+		case if_bgr24:
+			{
+				shared_array<Color> palette(256);
+				palette[0].a = 0;
+				for (int i = 1; i < 256; i++) {
+					palette[i].r = (textcolor >> 16) & 0xff;
+					palette[i].g = (textcolor >> 8) & 0xff;
+					palette[i].b = textcolor & 0xff;
+					palette[i].a = 0xff;
 				}
-				break;
-			case if_16bit_555:
-				throw creaturesException("Unimplemented format if_16bit_555 when loading charset.dta");
-			case if_16bit_565:
-				throw creaturesException("Unimplemented format if_16bit_565 when loading charset.dta");
-		}
+				for (size_t i = 0; i < images.size(); ++i) {
+					images[i].palette = palette;
+				}
+			}
+			break;
+		default:
+			throw creaturesException("Unimplemented image format when loading charset.dta");
 	}
 
-	auto img = std::make_shared<creaturesImage>(path(filename).stem(), format, buffers, widths, heights);
-	img->texture_atlas = engine.backend->createTextureAtlasFromCreaturesImage(img);
+	auto img = std::make_shared<creaturesImage>(path(filename).stem());
+	img->images = images;
+	img->textures.resize(img->images.size());
+	for (size_t i = 0; i < img->images.size(); ++i) {
+		img->textures[i] = engine.backend->createTexture(img->images[i]);
+	}
 	return img;
 }
 
 std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creaturesImage>& oldimage,
                                                    unsigned char r, unsigned char g, unsigned char b,
                                                    unsigned char rotation, unsigned char swap) {
-	if (!(oldimage->format() == if_16bit_565 || oldimage->format() == if_16bit_555)) {
-		throw creaturesException(fmt::format(
-			"Internal error: Tried to tint a sprite \"{}\" which doesn't support that.",
-			oldimage->getName()
-		));
+	auto img = std::make_shared<creaturesImage>(oldimage->getName());
+	img->images.resize(oldimage->images.size());
+	img->textures.resize(img->images.size());
+	
+	for (size_t i = 0; i < img->images.size(); ++i) {
+		img->images[i] = ImageUtils::Tint(oldimage->images[i], r, g, b, rotation, swap);
+		img->textures[i] = engine.backend->createTexture(img->images[i]);
 	}
 
-	if (128 == r && 128 == g && 128  == b && 128  == rotation && 128 == swap) return oldimage; // duh
-
-	auto buffers = oldimage->buffers;
-
-	/*
-	 * CDN:
-	 * if rotation >= 128
-	 * absRot = rotation-128
-	 * else
-	 * absRot = 128 - rotation
-	 * endif
-	 * invRot = 127-absRot
-	 */
-	int absRot;
-	if (rotation >= 128)
-		absRot = (int)rotation - 128;
-	else
-		absRot = 128 - (int)rotation;
-	int invRot = 127 - absRot;
-
-	/*
-	 * CDN:
-	 * if swap >= 128
-	 * absSwap = swap - 128
-	 * else
-	 * absSwap = 128 - swap
-	 * endif
-	 * invSwap = 127-absSwap
-	 */
-	int absSwap;
-	if (swap >= 128)
-		absSwap = (int)swap - 128;
-	else
-		absSwap = 128 - (int)swap;
-	int invSwap = 127 - absSwap;
-
-	/*
-	 * CDN:
-	 * redTint = red-128
-	 * greenTint = green-128
-	 * blueTint = blue-128
-	 */
-
-	int redTint = (int)r - 128;
-	int greenTint = (int)g - 128;
-	int blueTint = (int)b - 128;
-
-	for (unsigned int i = 0; i < oldimage->m_numframes; i++) {
-		for (unsigned int j = 0; j < oldimage->heights[i]; j++) {
-			for (unsigned int k = 0; k < oldimage->widths[i]; k++) {
-				unsigned short v = ((unsigned short *)buffers[i].data())[(j * oldimage->widths[i]) + k];
-				if (v == 0) continue;
-
-				/*
-				 * CDN:
-				 * tempRed = RedValue + redTint;
-				 * tempGreen = GreenValue + greenTint;
-				 * tempBlue = BlueValue + blueTint;
-				 */
-				// TODO: should this work differently for 565 vs 555 color?
-				int red = (((uint32_t)(v) & 0xf800) >> 8) + redTint;
-				if (red < 0) red = 0; else if (red > 255) red = 255;
-				int green = (((uint32_t)(v) & 0x07e0) >> 3) + greenTint;
-				if (green < 0) green = 0; else if (green > 255) green = 255;
-				int blue = (((uint32_t)(v) & 0x001f) << 3) + blueTint;
-				if (blue < 0) blue = 0; else if (blue > 255) blue = 255;
-
-				/*
-				 * CDN:
-				 * if (rotation < 128)
-				 * rotRed = ((absRot * tempBlue) + (invRot * tempRed)) / 256
-				 * rotGreen = ((absRot * tempRed) + (invRot * tempGreen)) / 256
-				 * rotBlue = ((absRot * tempGreen) + (invRot * tempBlue)) / 256
-				 * endif
-				 */
-
-				int rotRed, rotGreen, rotBlue;
-				rotRed = ((blue * absRot) + (red * invRot)) / 128;
-				rotGreen = ((red * absRot) + (green * invRot)) / 128;
-				rotBlue = ((green * absRot) + (blue * invRot)) / 128;
-
-
-				/*
-				 * CDN:
-				 * swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed))/256
-				 * swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue))/256
-				 *
-				 * fuzzie notes that this doesn't seem to be a no-op for swap=128..
-				 */
-				int swappedRed = ((absSwap * blue) + (invSwap * red)) / 128;
-				int swappedBlue = ((absSwap * red) + (invSwap * blue)) / 128;
-
-				/*
-				 * SetColour(definedcolour to (swappedRed,rotGreen,swappedBlue))
-				 */
-				swappedRed = (swappedRed << 8) & 0xf800;
-				rotGreen = (rotGreen << 3) & 0x7e0;
-				swappedBlue = (swappedBlue >> 3) & 0x1f;
-				v = (swappedRed | rotGreen | swappedBlue);
-				/*
-				 * if definedcolour ==0 SetColour(definedcolour to (1,1,1))
-				 */
-				if (v == 0)
-					v = (1 << 11 | 1 << 5 | 1);
-				((unsigned short *)buffers[i].data())[(j * oldimage->widths[i]) + k] = v;
-			}
-		}
-	}
-
-	std::shared_ptr<creaturesImage> img(new creaturesImage(
-		oldimage->getName(),
-		oldimage->imgformat,
-		buffers,
-		oldimage->widths,
-		oldimage->heights
-	));
-	img->texture_atlas = engine.backend->createTextureAtlasFromCreaturesImage(img);
 	return img;
 }
 

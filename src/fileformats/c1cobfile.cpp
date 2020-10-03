@@ -1,4 +1,5 @@
-#include "fileformats/c1cobfile.h"
+#include "c1cobfile.h"
+#include "c1defaultpalette.h"
 #include "endianlove.h"
 
 #include <cassert>
@@ -37,14 +38,18 @@ c1cobfile read_c1cobfile(std::istream &in) {
         cob.install_scripts.push_back(read_string(in));
     }
     
-    cob.picture_width = read32le(in);
-    cob.picture_height = read32le(in);
+    cob.picture.width = read32le(in);
+    cob.picture.height = read32le(in);
+    cob.picture.format = if_index8;
+    cob.picture.palette = getCreatures1DefaultPalette();
     uint16_t unknown_always_picture_width = read16le(in);
      // ABK- Egg Gender.cob has it zeroed
-    assert(unknown_always_picture_width == 0 || unknown_always_picture_width == cob.picture_width);
+    assert(unknown_always_picture_width == 0 || unknown_always_picture_width == cob.picture.width);
     
-    cob.picture_data.resize(cob.picture_width * cob.picture_height);
-    in.read((char*)cob.picture_data.data(), cob.picture_data.size());
+    cob.picture.data = shared_array<uint8_t>(cob.picture.width * cob.picture.height);
+    for (size_t i = 0; i < cob.picture.height; ++i) {
+      in.read((char*)cob.picture.data.data() + cob.picture.width * (cob.picture.height - 1 - i), cob.picture.width);
+    }
     
     cob.name = read_string(in);
     

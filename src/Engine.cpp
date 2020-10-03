@@ -34,6 +34,7 @@
 #include "SFCFile.h"
 #include "fileformats/peFile.h"
 #include "Camera.h"
+#include "imageManager.h"
 #include "prayManager.h"
 #include "userlocale.h"
 
@@ -83,7 +84,6 @@ Engine::Engine() {
 	cmdline_enable_sound = true;
 	cmdline_norun = false;
 
-	palette = 0;
 	exefile = 0;
 
 	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
@@ -93,7 +93,6 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
-	if (palette) delete[] palette;
 }
 
 void Engine::addPossibleBackend(std::string s, std::shared_ptr<Backend> b) {
@@ -302,10 +301,6 @@ std::string Engine::executeNetwork(std::string in) {
 	}
 }
 
-bool Engine::needsUpdate() {
-	return fastticks || !backend->ticks() || (backend->ticks() > (tickdata + world.ticktime));
-}
-
 unsigned int Engine::msUntilTick() {
 	if (fastticks) return 0;
 	if (world.paused) return world.ticktime; // TODO: correct?
@@ -361,12 +356,20 @@ bool Engine::tick() {
 	assert(backend);
 	backend->handleEvents();
 
-	// tick+draw the world, if necessary
-	bool needupdate = needsUpdate();
-	if (needupdate) {
-		if (!world.paused)
+	// tick if necessary
+	bool needupdate = fastticks || !backend->ticks() || (backend->ticks() - tickdata >= world.ticktime - 5);
+	if (needupdate && !world.paused) {
+		if (fastticks) {
+			using clock = std::chrono::steady_clock;
+			using std::chrono::duration_cast;
+			using std::chrono::milliseconds;
+			auto start = clock::now();
+			while (duration_cast<milliseconds>(clock::now() - start).count() < 1000 / world.ticktime) {
+				update();
+			}
+		} else {
 			update();
-		drawWorld();
+		}
 	}
 
 	processEvents();
@@ -899,7 +902,7 @@ bool Engine::initialSetup() {
 	b->init(); setBackend(b);
 	possible_backends.clear();
 
-	if (cmdline_norun || !cmdline_enable_sound) preferred_audiobackend = "null";
+	if (cmdline_norun) preferred_audiobackend = "null";
 	if (preferred_audiobackend != "null") std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;	
 	shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
 	if (!a)	throw creaturesException("No such audio backend " + preferred_audiobackend);
@@ -909,6 +912,9 @@ bool Engine::initialSetup() {
 		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl << "* Continuing without sound." << std::endl;
 		audio = shared_ptr<AudioBackend>(new NullAudioBackend());
 		audio->init();
+	}
+	if (!cmdline_enable_sound) {
+		audio->setMute(true);
 	}
 	possible_audiobackends.clear();
 	
@@ -928,25 +934,7 @@ bool Engine::initialSetup() {
 	}
 	
 	// load palette for C1
-	if (gametype == "c1") {
-		std::cout << "* Loading palette.dta..." << std::endl;
-		// TODO: case-sensitivity for the lose
-		fs::path palpath(world.findFile("Palettes/palette.dta"));
-		if (fs::exists(palpath) && !fs::is_directory(palpath)) {
-			palette = new unsigned char[768];
-
-			std::ifstream f(palpath.string().c_str(), std::ios::binary);
-			f >> std::noskipws;
-			f.read((char *)palette, 768);
-			
-			for (unsigned int i = 0; i < 768; i++) {
-				palette[i] = palette[i] * 4;
-			}
-
-			backend->setPalette((uint8_t *)palette);
-		} else
-			throw creaturesException("Couldn't find C1 palette data!");
-	}
+	world.gallery->loadDefaultPalette();
 	
 	// initial setup
 	std::cout << "* Reading catalogue files..." << std::endl;

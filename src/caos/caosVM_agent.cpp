@@ -24,7 +24,7 @@
 #include "PointerAgent.h"
 #include "creatures/SkeletalCreature.h"
 #include "World.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include <cassert>
 #include <iostream>
 #include <fmt/printf.h>
@@ -2022,8 +2022,6 @@ void caosVM::s_FRZN() {
 	targ->frozen = newvalue.getInt();
 }
 
-#include "fileformats/bmpImage.h"
-
 /**
  BLCK (command) width (integer) height (integer)
  %status maybe
@@ -2035,10 +2033,8 @@ void caosVM::c_BLCK() {
 
 	SpritePart *p = getCurrentSpritePart();
 	caos_assert(p);
-	shared_ptr<creaturesImage> i = p->getSprite();
-	bmpImage *img = dynamic_cast<bmpImage *>(i.get());
-	caos_assert(img);
-
+	shared_ptr<creaturesImage> img = p->getSprite();
+	caos_assert(img.get());
 	img->setBlockSize(width, height);
 }
 

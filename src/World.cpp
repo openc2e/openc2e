@@ -28,7 +28,7 @@
 #include <memory>
 #include "audiobackend/AudioBackend.h"
 #include "Backend.h"
-#include "fileformats/creaturesImage.h"
+#include "creaturesImage.h"
 #include "fileformats/genomeFile.h"
 #include "creatures/CreatureAgent.h"
 #include "SFCFile.h"
@@ -74,8 +74,6 @@ World::~World() {
 		delete *i;
 }
 
-#include "fileformats/bmpImage.h"
-
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
 void World::init() {
 	// First, try initialising the mouse cursor from the catalogue tag.
@@ -95,8 +93,7 @@ void World::init() {
 					// TODO: seamonkeys has 'numImages baseImage' too
 					int blockwidth, blockheight;
 					if (sscanf(pointerinfo[4].c_str(), "%d %d", &blockwidth, &blockheight) == 2) {
-						bmpImage *bmpimg = dynamic_cast<bmpImage *>(img.get());
-						if (bmpimg) bmpimg->setBlockSize(blockwidth, blockheight);
+						img->setBlockSize(blockwidth, blockheight);
 					}
 				}
 				theHand->finishInit();
@@ -443,7 +440,7 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 				if ((destx >= -sprwidth) && (desty >= -sprheight) &&
 						(destx - sprwidth <= (int)surface->getWidth()) &&
 						(desty - sprheight <= (int)surface->getHeight())) {
-					surface->renderTexture(bkgd->texture_atlas, whereweare, destx, desty);
+					surface->renderCreaturesImage(bkgd, whereweare, destx, desty);
 				}
 			}
 		}
@@ -480,24 +477,27 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	}
 
 	if (showrooms) {
-		shared_ptr<Room> r = map->roomAt(hand()->x, hand()->y);
-		for (std::vector<shared_ptr<Room> >::iterator i = cam->getMetaRoom()->rooms.begin();
-				 i != cam->getMetaRoom()->rooms.end(); i++) {
-			unsigned int col = 0xFFFF00CC;
-			if (*i == r) col = 0xFF00FFCC;
-			else if (r) {
-				if ((**i).doors.find(r) != (**i).doors.end())
-					col = 0x00FFFFCC;
-			}
-
+		shared_ptr<Room> room_under_hand = map->roomAt(hand()->x, hand()->y);
+		auto draw_room = [&](const auto& r, unsigned int color) {
 			// rooms don't wrap over the boundary, so just draw twice
-			for (unsigned int z = 0; z < (m->wraparound() ? 2 : 1); z++) {
-				int newx = adjustx;
-				if (z == 1)
-					newx -= m->width();
-
-				(*i)->renderBorders(surface, newx, adjusty, col);
+			r->renderBorders(surface, adjustx, adjusty, color);
+			if (m->wraparound()) {
+				r->renderBorders(surface, adjustx - m->width(), adjusty, color);
 			}
+		};
+		for (const auto &r : cam->getMetaRoom()->rooms) {
+			if (!room_under_hand || (r != room_under_hand && r->doors.find(room_under_hand) == r->doors.end())) {
+				draw_room(r, 0xFFFF00CC);
+			}
+		}
+		if (room_under_hand) {
+			for (const auto &door : room_under_hand->doors) {
+				const auto r = door.first.lock();
+				if (r) {
+					draw_room(r, 0x00FFFFCC);
+				}
+			}
+			draw_room(room_under_hand, 0xFF00FFCC);
 		}
 	}
 

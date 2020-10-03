@@ -20,8 +20,9 @@
 #ifndef _SDLBACKEND_H
 #define _SDLBACKEND_H
 
-#include "SDL.h"
+#include <SDL.h>
 #include <SDL_net.h>
+#include <array>
 #include <memory>
 #include "Backend.h"
 
@@ -37,7 +38,8 @@ protected:
 	SDLRenderTarget(SDLBackend *p) { parent = p; }
 
 public:
-	void renderTexture(const TextureAtlasHandle& atlas, size_t i, int x, int y, uint8_t transparency = 0, bool mirror = false);
+	void renderCreaturesImage(const creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false);
+	void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h);
 	unsigned int getWidth() const;
@@ -57,14 +59,13 @@ protected:
 	SDL_Renderer *renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
 	TCPsocket listensocket;
-	SDL_Color palette[256];
+	std::array<SDL_Color, 256> default_palette;
 	float userscale = 1.0;
 
 	void handleNetworking();
 	void resizeNotify(int _w, int _h);
 
 	SDL_Surface *getMainSDLSurface() { return SDL_GetWindowSurface(window); }
-	SDL_Texture* createTexture(void *data, unsigned int width, unsigned int height, imageformat format, bool black_is_transparent = true, uint8_t* custom_palette = nullptr);
 
 	virtual int idealBpp();
 
@@ -73,6 +74,7 @@ public:
 	void init();
 	void initFrom(void *window_id);
 	int networkInit();
+	int run();
 	void shutdown();
 	void setUserScale(float scale);
 
@@ -84,7 +86,7 @@ public:
 	
 	void handleEvents();
 	
-	TextureAtlasHandle createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>& image);
+	Texture createTexture(const Image& image);
 
 	RenderTarget *getMainRenderTarget() { return &mainrendertarget; }
 	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);
@@ -93,7 +95,7 @@ public:
 	bool keyDown(int key);
 	int translateScancode(int key);
 	
-	void setPalette(uint8_t *data);
+	void setDefaultPalette(span<Color> palette);
 	void delay(int msec);
 };
 

@@ -25,7 +25,8 @@
 
 class NullRenderTarget : public RenderTarget {
 public:
-	virtual void renderTexture(const TextureAtlasHandle&, size_t, int, int, uint8_t, bool) { }
+	virtual void renderCreaturesImage(const creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) { }
+	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) { }
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) { }
 	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h)  { }
 	virtual unsigned int getWidth() const { return 800; }
@@ -41,6 +42,7 @@ protected:
 public:
 	virtual void init() { }
 	virtual int networkInit() { return -1; }
+	virtual int run() { return 1; }
 	virtual void shutdown() { }
 
 	virtual void resize(unsigned int width, unsigned int height) { }
@@ -57,9 +59,9 @@ public:
 	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) { return 0; }
 	virtual void freeRenderTarget(RenderTarget *surf) { }
 	
-	virtual TextureAtlasHandle createTextureAtlasFromCreaturesImage(const std::shared_ptr<creaturesImage>&) { return {}; }
+	virtual Texture createTexture(const Image& image) { return {}; };
 			
-	virtual void setPalette(uint8_t *data) { }
+	virtual void setDefaultPalette(span<Color> data) { }
 	virtual unsigned int textWidth(std::string text) { return 0; }
 	virtual void delay(int msec) { }
 };

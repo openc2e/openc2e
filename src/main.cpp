@@ -64,7 +64,7 @@ extern "C" int main(int argc, char *argv[]) {
 	// get the engine to do all the startup (read catalogue, loading world, etc)
 	if (!engine.initialSetup()) return 0;
 
-	int ret = engine.backend->run(argc, argv);
+	int ret = engine.backend->run();
 
 	// we're done, be sure to shut stuff down
 	engine.shutdown();

@@ -17,17 +17,8 @@
  *
  */
 
-#ifndef _BLKIMAGE_H
-#define _BLKIMAGE_H
+#pragma once
 
-#include "fileformats/creaturesImage.h"
+#include "Image.h"
 
-class blkImage : public creaturesImage {
-public:
-	blkImage(std::istream &in, std::string n);
-	~blkImage();
-	virtual std::string serializedName() { return name + ".blk"; }
-};
-
-#endif
-/* vim: set noet: */
+Image ReadBlkFile(std::istream &in);

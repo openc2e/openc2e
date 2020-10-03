@@ -24,6 +24,8 @@
 #include <string>
 #include <fstream>
 
+#include "Image.h"
+
 class cobBlock;
 
 class c2cobfile {
@@ -91,9 +93,7 @@ public:
 	std::vector<unsigned short> deptypes;
 	std::vector<std::string> depnames;
 
-	unsigned short thumbnailwidth;
-	unsigned short thumbnailheight;
-	unsigned short *thumbnail;
+	Image thumbnail;
 };
 
 class cobFileBlock {
