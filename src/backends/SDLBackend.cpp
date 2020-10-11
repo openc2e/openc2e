@@ -329,6 +329,10 @@ void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int co
 }
 
 Texture SDLBackend::createTexture(const Image& image) {
+	return createTextureWithTransparentColor(image, Color{});
+}
+
+Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color transparent_color) {
 	assert(image.data);
 	assert(image.width > 0);
 	assert(image.height > 0);
@@ -382,7 +386,18 @@ Texture SDLBackend::createTexture(const Image& image) {
 	}
 
 	// set colour-keying
-	SDL_SetColorKey(surf, SDL_TRUE, 0);
+	if (transparent_color.a > 0) {
+		if (transparent_color.a != 255) {
+			throw creaturesException("Expected alpha value of transparent color to be 255");
+		}
+		Uint32 sdlcolorkey = SDL_MapRGB(
+			surf->format,
+			transparent_color.r,
+			transparent_color.g,
+			transparent_color.b
+		);
+		SDL_SetColorKey(surf, SDL_TRUE, sdlcolorkey);
+	}
 	
 	// create texture
 	Texture tex;

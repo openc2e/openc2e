@@ -15,7 +15,10 @@ static shared_array<Color> getDefaultCharsetPalette() {
   static shared_array<Color> s_default_charset_palette;
   if (!s_default_charset_palette) {
     s_default_charset_palette = shared_array<Color>(256);
-    s_default_charset_palette[0].a = 0;
+    s_default_charset_palette[0].r = 0;
+    s_default_charset_palette[0].g = 0;
+    s_default_charset_palette[0].b = 0;
+    s_default_charset_palette[0].a = 0xff;
     for (int i = 1; i < 256; i++) {
       s_default_charset_palette[i].r = 0xff;
       s_default_charset_palette[i].g = 0xff;

@@ -64,6 +64,7 @@ public:
 
 	virtual void setDefaultPalette(span<Color> palette) = 0;
 	virtual Texture createTexture(const Image& image) = 0;
+	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) = 0;
 	
 	virtual int run() = 0;
 	virtual void delay(int msec) = 0;

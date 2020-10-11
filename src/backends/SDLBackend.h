@@ -87,6 +87,7 @@ public:
 	void handleEvents();
 	
 	Texture createTexture(const Image& image);
+	Texture createTextureWithTransparentColor(const Image& image, Color transparent);
 
 	RenderTarget *getMainRenderTarget() { return &mainrendertarget; }
 	RenderTarget *newRenderTarget(unsigned int width, unsigned int height);

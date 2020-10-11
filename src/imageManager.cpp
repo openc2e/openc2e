@@ -141,7 +141,7 @@ shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_back
 	
 	img->textures.resize(img->images.size());
 	for (size_t i = 0; i < img->images.size(); ++i) {
-		img->textures[i] = engine.backend->createTexture(img->images[i]);
+		img->textures[i] = engine.backend->createTextureWithTransparentColor(img->images[i], Color{0, 0, 0, 0xff});
 	}
 
 	return img;
@@ -184,7 +184,7 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 		case if_bgr24:
 			{
 				shared_array<Color> palette(256);
-				palette[0].a = 0;
+				palette[0] = Color{0, 0, 0, 0xff}; // black is set as the transparent color
 				for (int i = 1; i < 256; i++) {
 					palette[i].r = (textcolor >> 16) & 0xff;
 					palette[i].g = (textcolor >> 8) & 0xff;
@@ -204,7 +204,7 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 	img->images = images;
 	img->textures.resize(img->images.size());
 	for (size_t i = 0; i < img->images.size(); ++i) {
-		img->textures[i] = engine.backend->createTexture(img->images[i]);
+		img->textures[i] = engine.backend->createTextureWithTransparentColor(img->images[i], Color{0, 0, 0, 0xff});
 	}
 	return img;
 }
@@ -218,7 +218,7 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
 	
 	for (size_t i = 0; i < img->images.size(); ++i) {
 		img->images[i] = ImageUtils::Tint(oldimage->images[i], r, g, b, rotation, swap);
-		img->textures[i] = engine.backend->createTexture(img->images[i]);
+		img->textures[i] = engine.backend->createTextureWithTransparentColor(img->images[i], Color{0, 0, 0, 0xff});
 	}
 
 	return img;

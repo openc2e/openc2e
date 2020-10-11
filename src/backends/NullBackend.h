@@ -59,7 +59,8 @@ public:
 	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) { return 0; }
 	virtual void freeRenderTarget(RenderTarget *surf) { }
 	
-	virtual Texture createTexture(const Image& image) { return {}; };
+	virtual Texture createTexture(const Image& image) { return {}; }
+	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) { return {}; }
 			
 	virtual void setDefaultPalette(span<Color> data) { }
 	virtual unsigned int textWidth(std::string text) { return 0; }
