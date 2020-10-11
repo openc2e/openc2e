@@ -43,6 +43,8 @@ endif()
 
 if(WIN32 OR APPLE)
 	add_subdirectory(externals/libpng EXCLUDE_FROM_ALL)
+	add_subdirectory(externals/utf8proc EXCLUDE_FROM_ALL)
+	add_library(utf8proc::utf8proc ALIAS utf8proc)
 
 	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
@@ -52,6 +54,7 @@ if(WIN32 OR APPLE)
 	add_library(SDL2::Net ALIAS SDL2_net)
 else()
 	find_package(PNG REQUIRED)
+	find_package(utf8proc REQUIRED)
 
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
@@ -76,7 +79,7 @@ add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
-add_subdirectory(externals/utf8proc EXCLUDE_FROM_ALL)
+
 
 # Pass flags to the compiler
 add_compile_definitions("_REENTRANT" "YYERROR_VERBOSE")
@@ -103,7 +106,7 @@ add_library(openc2e-common STATIC
 	src/stringutil.cpp
 	src/util.cpp
 )
-target_link_libraries(openc2e-common PRIVATE utf8proc)
+target_link_libraries(openc2e-common PRIVATE utf8proc::utf8proc)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
