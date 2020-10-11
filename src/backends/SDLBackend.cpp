@@ -91,10 +91,14 @@ void SDLBackend::init() {
 		OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT,
 		SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
 	);
-	assert(window);
+	if (!window) {
+		throw creaturesException(std::string("SDL error creating window: ") + SDL_GetError());
+	}
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-	assert(renderer);
+	if (!renderer) {
+		throw creaturesException(std::string("SDL error creating renderer: ") + SDL_GetError());
+	}
 
 	{
 		SDL_RendererInfo info;
@@ -117,9 +121,13 @@ void SDLBackend::initFrom(void *window_id) {
 		throw creaturesException(std::string("SDL error during initialization: ") + SDL_GetError());
 
 	window = SDL_CreateWindowFrom(window_id);
-	assert(window);
+	if (!window) {
+		throw creaturesException(std::string("SDL error creating window: ") + SDL_GetError());
+	}
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-	assert(renderer);
+	if (!renderer) {
+		throw creaturesException(std::string("SDL error creating renderer: ") + SDL_GetError());
+	}
 
 	{
 		SDL_RendererInfo info;
