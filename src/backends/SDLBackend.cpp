@@ -400,10 +400,13 @@ Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color 
 	}
 	
 	// create texture
-	Texture tex;
-	tex.data = SDL_CreateTextureFromSurface(renderer, surf);
-	tex.deleter = [](void *data) { SDL_DestroyTexture(static_cast<SDL_Texture*>(data)); };
-	assert(tex.data);
+	Texture tex(
+		SDL_CreateTextureFromSurface(renderer, surf),
+		image.width,
+		image.height,
+		&SDL_DestroyTexture
+	);
+	assert(tex);
 	return tex;
 }
 
@@ -415,7 +418,7 @@ unsigned int SDLRenderTarget::getHeight() const {
 }
 
 void SDLRenderTarget::renderCreaturesImage(const creaturesImage& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
-	SDL_Texture *tex = static_cast<SDL_Texture*>(img.getTextureForFrame(frame).data);
+	SDL_Texture *tex = const_cast<SDL_Texture*>(img.getTextureForFrame(frame).as<SDL_Texture>());
 	assert(tex);
 
 	SDL_SetTextureAlphaMod(tex, 255 - transparency);

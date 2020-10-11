@@ -4,28 +4,27 @@
 
 class Texture {
 public:
-  Texture() = default;
-  ~Texture() {
-    if (data) {
-      deleter(data);
-    }
+  Texture() {};
+
+  template <typename T>
+  Texture(T *ptr_, unsigned int width_, unsigned int height_, void(*deleter_)(T*))
+    : ptr(ptr_, deleter_), width(width_), height(height_) {}
+
+  explicit operator bool() const {
+    return ptr.get() != nullptr;
   }
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
-  Texture(Texture&& other) {
-    data = other.data;
-    deleter = other.deleter;
-    other.data = nullptr;
-    other.deleter = nullptr;
-  };
-  Texture& operator=(Texture&& other) {
-    data = other.data;
-    deleter = other.deleter;
-    other.data = nullptr;
-    other.deleter = nullptr;
-    return *this;
+
+  template <typename T>
+  T* as() {
+    return reinterpret_cast<T*>(ptr.get());
   }
   
-  void *data = nullptr;
-  void (*deleter)(void*) = nullptr;
+  template <typename T>
+  const T* as() const {
+    return reinterpret_cast<const T*>(ptr.get());
+  }
+
+  std::shared_ptr<void> ptr;
+  unsigned int width = 0;
+  unsigned int height = 0;
 };
