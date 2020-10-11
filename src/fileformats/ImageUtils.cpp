@@ -279,4 +279,40 @@ Image Tint(const Image& oldimage, unsigned char r, unsigned char g, unsigned cha
 
 }
 
+Color GetPixelColor(const Image& image, unsigned int x, unsigned int y) {
+  if (image.format == if_index8) {
+    uint8_t palette_index = image.data[y * image.width + x];
+    return image.palette[palette_index];
+
+  } else if (image.format == if_rgb555) {
+    uint16_t pixel = ((uint16_t*)image.data.data())[y * image.width + x];
+    uint8_t r = (pixel & 0x7C00) >> 10;
+    uint8_t g = (pixel & 0x03E0) >> 5;
+    uint8_t b = (pixel & 0x001F);
+    r = r * 255 / 31;
+    g = g * 255 / 31;
+    b = b * 255 / 31;
+    return Color{r, g, b, 255};
+
+  } else if (image.format == if_rgb565) {
+    uint16_t pixel = ((uint16_t*)image.data.data())[y * image.width + x];
+    uint8_t r = (pixel & 0xF800) >> 11;
+    uint8_t g = (pixel & 0x07E0) >> 5;
+    uint8_t b = (pixel & 0x001F);
+    r = r * 255 / 31;
+    g = g * 255 / 63;
+    b = b * 255 / 31;
+    return Color{r, g, b, 255};
+
+  } else if (image.format == if_bgr24) {
+    uint8_t b = image.data[(y * image.width + x) * 3];
+    uint8_t g = image.data[(y * image.width + x) * 3 + 1];
+    uint8_t r = image.data[(y * image.width + x) * 3 + 2];
+    return Color{r, g, b, 255};
+
+  } else {
+    throw creaturesException("GetPixelColor unimplemented for format " + std::to_string(image.format));
+  }
+}
+
 } // namespace ImageUtils
