@@ -43,10 +43,7 @@ There are lots of [open issues](https://github.com/openc2e/openc2e/issues) that 
 openc2e depends on:
 
 * SDL2
-  * SDL2_gfx
   * SDL2_mixer
-  * SDL2_net
-  * SDL2_ttf
 * bison
 * re2c
 * Python
@@ -65,10 +62,7 @@ sudo apt-get install \
   build-essential \
   qtbase5-dev \
   libsdl2-dev \
-  libsdl2-gfx-dev \
   libsdl2-mixer-dev \
-  libsdl2-net-dev \
-  libsdl2-ttf-dev \
   re2c\
   cmake\
   bison\
