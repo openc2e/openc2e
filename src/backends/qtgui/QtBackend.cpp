@@ -64,19 +64,6 @@ void QtBackend::setup(QWidget *vp) {
 	viewport->setCursor(Qt::BlankCursor);
 }
 
-int QtBackend::idealBpp() {
-	// TODO: handle 8bpp for C1
-
-#ifdef _WIN32
-	// TODO: how to pick up real depth on windows?
-	if (viewport->depth() == 16) return 16;
-	return 24;
-#endif
-
-	return 32;
-}
-
-
 void QtBackend::resized(int w, int h) {
 	SDLBackend::resizeNotify(w, h);
 

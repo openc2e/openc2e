@@ -46,12 +46,6 @@ SDLBackend::SDLBackend() : mainrendertarget(this) {
 	mainrendertarget.texture = nullptr;
 }
 
-int SDLBackend::idealBpp() {
-	// shadow surfaces seem to generally be faster (presumably due to overdraw), so get SDL to create one for us
-	if (engine.version == 1) return 0;
-	else return 16;
-}
-
 void SDLBackend::resizeNotify(int _w, int _h) {
 	windowwidth = _w;
 	windowheight = _h;

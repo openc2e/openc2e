@@ -62,8 +62,6 @@ protected:
 
 	SDL_Surface *getMainSDLSurface() { return SDL_GetWindowSurface(window); }
 
-	virtual int idealBpp();
-
 public:
 	SDLBackend();
 	void init();

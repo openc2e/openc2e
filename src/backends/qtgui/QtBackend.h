@@ -46,8 +46,6 @@ protected:
 	
 	bool downkeys[256]; // TODO: public data bad
 	class QWidget *viewport;
-
-	int idealBpp();
 };
 
 #endif
