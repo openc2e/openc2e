@@ -43,8 +43,6 @@ constexpr int OPENC2E_DEFAULT_WIDTH = 800;
 constexpr int OPENC2E_DEFAULT_HEIGHT = 600;
 
 SDLBackend::SDLBackend() : mainrendertarget(this) {
-	networkingup = false;
-
 	mainrendertarget.texture = nullptr;
 }
 
@@ -153,78 +151,8 @@ void SDLBackend::initFrom(void *window_id) {
 	SDL_StartTextInput();
 }
 
-int SDLBackend::networkInit() {
-	const int init_result = sockinit();
-	if (init_result != 0) {
-		throw creaturesException(fmt::format("Networking error during initialization: {}", init_result));
-	}
-
-	networkingup = true;
-
-	listensocket = INVALID_SOCKET;
-	int listenport;
-	for (listenport = 20001; listenport < 20050; listenport++) {
-		listensocket = sockcreatetcplistener(0, listenport);
-		if (listensocket != INVALID_SOCKET) {
-			break;
-		}
-	}
-
-	if (listensocket == INVALID_SOCKET)
-		throw creaturesException(std::string("Failed to open a port to listen on."));
-
-	return listenport;
-}
-
 void SDLBackend::shutdown() {
-	if (networkingup && listensocket != INVALID_SOCKET)
-		sockdestroy(listensocket);
-	sockquit();
-
 	SDL_Quit();
-}
-
-void SDLBackend::handleEvents() {
-	if (networkingup)
-		handleNetworking();
-}
-
-void SDLBackend::handleNetworking() {
-	// handle incoming network connections
-	while (true) {
-		SOCKET connection = sockacceptnonblocking(listensocket);
-		if (connection == INVALID_SOCKET) {
-			break;
-		}
-		// check this connection is coming from localhost
-		uint32_t peer_addr = sockgetpeeraddress(connection);
-		unsigned char *rip = (unsigned char *)&peer_addr;
-		if ((rip[0] != 127) || (rip[1] != 0) || (rip[2] != 0) || (rip[3] != 1)) {
-			std::cout << "Someone tried connecting via non-localhost address! IP: " << (int)rip[0] << "." << (int)rip[1] << "." << (int)rip[2] << "." << (int)rip[3] << std::endl;
-			sockdestroy(connection);
-			continue;
-		}
-
-		// read the data from the socket
-		std::string data;
-		bool done = false;
-		while (!done) {
-			char buffer;
-			int i = sockrecvblocking(connection, &buffer, 1, 0);
-			if (i == 1) {
-				data = data + buffer;
-				// TODO: maybe we should check for rscr\n like c2e seems to
-				if ((data.size() > 3) && (data.find("rscr\n", data.size() - 5) != data.npos)) done = true;
-			} else done = true;
-		}
-
-		// pass the data onto the engine, and send back our response
-		std::string tosend = engine.executeNetwork(data);
-		socksendblocking(connection, tosend.c_str(), tosend.size(), 0);
-
-		// and finally, close the connection
-		sockdestroy(connection);
-	}
 }
 
 bool SDLBackend::pollEvent(BackendEvent &e) {

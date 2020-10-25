@@ -41,7 +41,6 @@ protected:
 
 public:
 	virtual void init() { }
-	virtual int networkInit() { return -1; }
 	virtual int run() { return 1; }
 	virtual void shutdown() { }
 
@@ -49,7 +48,6 @@ public:
 
 	virtual unsigned int ticks() { return 0; }
 	virtual bool pollEvent(BackendEvent &e) { return false; }
-	virtual void handleEvents() { }
 	virtual bool keyDown(int key) { return false; }
 
 	virtual bool selfRender() { return false; }

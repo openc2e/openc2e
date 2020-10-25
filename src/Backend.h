@@ -48,12 +48,10 @@ public:
 class Backend {
 public:
 	virtual void init() = 0;
-	virtual int networkInit() = 0;
 	virtual void shutdown() = 0;
 
 	virtual unsigned int ticks() = 0;	
 	virtual bool pollEvent(BackendEvent &e) = 0;
-	virtual void handleEvents() = 0;
 	virtual bool keyDown(int key) = 0;
 
 	virtual void resize(unsigned int width, unsigned int height) = 0;

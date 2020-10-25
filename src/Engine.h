@@ -66,6 +66,7 @@ public:
 	
 	std::shared_ptr<Backend> backend;
 	std::shared_ptr<class AudioBackend> audio;
+	std::shared_ptr<class NetBackend> net;
 	std::string getBackendName() { return preferred_backend; }
 	std::string getAudioBackendName() { return preferred_audiobackend; }
 

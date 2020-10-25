@@ -24,6 +24,7 @@
 #include "Map.h"
 #include "MetaRoom.h"
 #include "MusicManager.h"
+#include "NetBackend.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "caosScript.h" // for executeNetwork()
 #include "PointerAgent.h"
@@ -354,7 +355,6 @@ void Engine::update() {
 
 bool Engine::tick() {
 	assert(backend);
-	backend->handleEvents();
 
 	// tick if necessary
 	bool needupdate = fastticks || !backend->ticks() || (backend->ticks() - tickdata >= world.ticktime - 5);
@@ -450,6 +450,8 @@ void Engine::handleKeyboardScrolling() {
 }
 
 void Engine::processEvents() {
+	net->handleEvents();
+
 	BackendEvent event;
 	while (backend->pollEvent(event)) {
 		switch (event.type) {
@@ -918,7 +920,8 @@ bool Engine::initialSetup() {
 	}
 	possible_audiobackends.clear();
 	
-	int listenport = backend->networkInit();
+	net = std::make_shared<NetBackend>();
+	int listenport = net->init();
 	if (listenport != -1) {
 		// inform the user of the port used, and store it in the relevant file
 		std::cout << "* Listening for connections on port " << listenport << "." << std::endl;
@@ -1028,6 +1031,7 @@ void Engine::shutdown() {
 	world.shutdown();
 	audio->shutdown();
 	backend->shutdown();
+	net->shutdown();
 }
 
 fs::path Engine::homeDirectory() {

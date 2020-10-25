@@ -205,6 +205,7 @@ add_library(openc2e-core STATIC
 	src/MetaRoom.cpp
 	src/MNGMusic.cpp
 	src/MusicManager.cpp
+	src/NetBackend.cpp
 	src/creatures/oldBrain.cpp
 	src/parseException.cpp
 	src/partzorder.cpp

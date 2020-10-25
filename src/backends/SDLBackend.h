@@ -24,7 +24,6 @@
 #include <array>
 #include <memory>
 #include "Backend.h"
-#include "socket.h"
 
 class SDLRenderTarget : public RenderTarget {
 	friend class SDLBackend;
@@ -52,17 +51,13 @@ class SDLBackend : public Backend {
 	friend class SDLRenderTarget;
 
 protected:
-	bool networkingup;
-
 	SDL_Window *window = nullptr;
 	int windowwidth, windowheight;
 	SDL_Renderer *renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
-	SOCKET listensocket;
 	std::array<SDL_Color, 256> default_palette;
 	float userscale = 1.0;
 
-	void handleNetworking();
 	void resizeNotify(int _w, int _h);
 
 	SDL_Surface *getMainSDLSurface() { return SDL_GetWindowSurface(window); }
@@ -73,7 +68,6 @@ public:
 	SDLBackend();
 	void init();
 	void initFrom(void *window_id);
-	int networkInit();
 	int run();
 	void shutdown();
 	void setUserScale(float scale);
@@ -83,8 +77,6 @@ public:
 	bool pollEvent(BackendEvent &e);
 	
 	unsigned int ticks() { return SDL_GetTicks(); }
-	
-	void handleEvents();
 	
 	Texture createTexture(const Image& image);
 	Texture createTextureWithTransparentColor(const Image& image, Color transparent);
