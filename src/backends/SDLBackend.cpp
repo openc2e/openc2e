@@ -154,30 +154,33 @@ void SDLBackend::initFrom(void *window_id) {
 }
 
 int SDLBackend::networkInit() {
-	if (SDLNet_Init() < 0)
-		throw creaturesException(std::string("SDL_net error during initialization: ") + SDLNet_GetError());
+	const int init_result = sockinit();
+	if (init_result != 0) {
+		throw creaturesException(fmt::format("Networking error during initialization: {}", init_result));
+	}
+
 	networkingup = true;
 
-	listensocket = 0;
-	int listenport = 20000;
-	while ((!listensocket) && (listenport < 20050)) {
-		listenport++;
-		IPaddress ip;
-
-		SDLNet_ResolveHost(&ip, 0, listenport);
-		listensocket = SDLNet_TCP_Open(&ip);
+	listensocket = INVALID_SOCKET;
+	int listenport;
+	for (listenport = 20001; listenport < 20050; listenport++) {
+		listensocket = sockcreatetcplistener(0, listenport);
+		if (listensocket != INVALID_SOCKET) {
+			break;
+		}
 	}
-	
-	if (!listensocket)
+
+	if (listensocket == INVALID_SOCKET)
 		throw creaturesException(std::string("Failed to open a port to listen on."));
 
 	return listenport;
 }
 
 void SDLBackend::shutdown() {
-	if (networkingup && listensocket)
-		SDLNet_TCP_Close(listensocket);
-	SDLNet_Quit();
+	if (networkingup && listensocket != INVALID_SOCKET)
+		sockdestroy(listensocket);
+	sockquit();
+
 	SDL_Quit();
 }
 
@@ -188,22 +191,26 @@ void SDLBackend::handleEvents() {
 
 void SDLBackend::handleNetworking() {
 	// handle incoming network connections
-	while (TCPsocket connection = SDLNet_TCP_Accept(listensocket)) {
+	while (true) {
+		SOCKET connection = sockacceptnonblocking(listensocket);
+		if (connection == INVALID_SOCKET) {
+			break;
+		}
 		// check this connection is coming from localhost
-		IPaddress *remote_ip = SDLNet_TCP_GetPeerAddress(connection);
-		unsigned char *rip = (unsigned char *)&remote_ip->host;
+		uint32_t peer_addr = sockgetpeeraddress(connection);
+		unsigned char *rip = (unsigned char *)&peer_addr;
 		if ((rip[0] != 127) || (rip[1] != 0) || (rip[2] != 0) || (rip[3] != 1)) {
 			std::cout << "Someone tried connecting via non-localhost address! IP: " << (int)rip[0] << "." << (int)rip[1] << "." << (int)rip[2] << "." << (int)rip[3] << std::endl;
-			SDLNet_TCP_Close(connection);
+			sockdestroy(connection);
 			continue;
 		}
-			
+
 		// read the data from the socket
 		std::string data;
 		bool done = false;
 		while (!done) {
 			char buffer;
-			int i = SDLNet_TCP_Recv(connection, &buffer, 1);
+			int i = sockrecvblocking(connection, &buffer, 1, 0);
 			if (i == 1) {
 				data = data + buffer;
 				// TODO: maybe we should check for rscr\n like c2e seems to
@@ -213,10 +220,10 @@ void SDLBackend::handleNetworking() {
 
 		// pass the data onto the engine, and send back our response
 		std::string tosend = engine.executeNetwork(data);
-		SDLNet_TCP_Send(connection, (void *)tosend.c_str(), tosend.size());
-		
+		socksendblocking(connection, tosend.c_str(), tosend.size(), 0);
+
 		// and finally, close the connection
-		SDLNet_TCP_Close(connection);
+		sockdestroy(connection);
 	}
 }
 

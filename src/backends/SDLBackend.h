@@ -21,10 +21,10 @@
 #define _SDLBACKEND_H
 
 #include <SDL.h>
-#include <SDL_net.h>
 #include <array>
 #include <memory>
 #include "Backend.h"
+#include "socket.h"
 
 class SDLRenderTarget : public RenderTarget {
 	friend class SDLBackend;
@@ -58,7 +58,7 @@ protected:
 	int windowwidth, windowheight;
 	SDL_Renderer *renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
-	TCPsocket listensocket;
+	SOCKET listensocket;
 	std::array<SDL_Color, 256> default_palette;
 	float userscale = 1.0;
 
