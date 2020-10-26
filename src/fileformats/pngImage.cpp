@@ -2,11 +2,21 @@
 #include "ImageUtils.h"
 #include "pngImage.h"
 #include "scope_guard.h"
+#include <fstream>
 #include <memory>
 #include <png.h>
 #include <zlib.h>
 
-void WritePngFile(const Image& image, std::ostream& out) { 
+void WritePngFile(const Image& image, const std::string& path) {
+  std::ofstream out(path, std::ios_base::binary);
+  return WritePngFile(image, out);
+}
+
+void WritePngFile(const Image& image, std::ostream& out) {
+  if (image.width == 0 || image.height == 0 || !image.data) {
+    throw creaturesException("Can't write image with no data");
+  }
+
   png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (!png) {
     abort();
