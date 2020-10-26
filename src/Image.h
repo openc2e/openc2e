@@ -28,6 +28,10 @@ public:
   imageformat format;
   shared_array<uint8_t> data;
   shared_array<Color> palette;
+
+  explicit operator bool() const {
+    return width > 0 && height > 0 && data;
+  }
 };
 
 using MultiImage = std::vector<Image>;
