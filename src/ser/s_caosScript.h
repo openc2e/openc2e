@@ -7,7 +7,7 @@
 #include "ser/s_bytecode.h"
 #include "ser/s_shared_str.h"
 
-#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/std::shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/map.hpp>

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bytestring.h"
 #include "CompoundPart.h"
 
 class AnimatablePart : public CompoundPart {

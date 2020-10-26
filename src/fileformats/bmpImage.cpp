@@ -17,10 +17,10 @@
  *
  */
 
+#include "caos_assert.h"
 #include "fileformats/bmpImage.h"
 #include "endianlove.h"
 #include "creaturesException.h"
-#include "openc2e.h"
 #include "Engine.h"
 #include "Backend.h"
 #include <memory>

@@ -120,8 +120,8 @@ public:
 
 	std::shared_ptr<AudioSource> playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport = false);
 
-	void newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
-	shared_ptr<genomeFile> loadGenome(std::string &filename);
+	void newMoniker(std::shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
+	std::shared_ptr<genomeFile> loadGenome(std::string &filename);
 	std::string generateMoniker(std::string basename);
 
 	int findCategory(unsigned char family, unsigned char genus, unsigned short species);
@@ -134,7 +134,7 @@ public:
 	void setUNID(Agent *whofor, int unid);
 	void freeUNID(int unid);
 
-	shared_ptr<Agent> lookupUNID(int unid);
+	std::shared_ptr<Agent> lookupUNID(int unid);
 };
 
 extern World world;

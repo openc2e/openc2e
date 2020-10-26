@@ -17,9 +17,9 @@
  *
  */
 
+#include "caos_assert.h"
 #include "CompoundAgent.h"
 #include "DullPart.h"
-#include "openc2e.h"
 #include "World.h"
 #include "Engine.h" // version
 #include <algorithm> // sort

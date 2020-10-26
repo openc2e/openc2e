@@ -20,8 +20,7 @@
 #ifndef BYTECODE_H
 #define BYTECODE_H 1
 
-#include "openc2e.h"
-
+#include "serfwd.h"
 #include <stdlib.h> // for NULL
 #include <assert.h>
 #include <string>

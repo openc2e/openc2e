@@ -18,6 +18,7 @@
  */
 
 
+#include "caos_assert.h"
 #include "caosVM.h"
 #include "World.h"
 #include <fstream>

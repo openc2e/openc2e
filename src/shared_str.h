@@ -1,5 +1,6 @@
 #pragma once
 
+#include "serfwd.h"
 #include <memory>
 #include <string>
 

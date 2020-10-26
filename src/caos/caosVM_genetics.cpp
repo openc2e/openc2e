@@ -17,6 +17,7 @@
  *
  */
 
+#include "caos_assert.h"
 #include "caosVM.h"
 #include "World.h"
 #include "creatures/CreatureAgent.h"
@@ -86,7 +87,7 @@ void caosVM::c_GENE_LOAD() {
 	VM_PARAM_INTEGER(slot)
 	VM_PARAM_VALIDAGENT(agent)
 
-	shared_ptr<genomeFile> p = world.loadGenome(genefile);
+	std::shared_ptr<genomeFile> p = world.loadGenome(genefile);
 	if (!p)
 		throw creaturesException("failed to find genome file '" + genefile + "'");
 	
@@ -108,7 +109,7 @@ void caosVM::c_GENE_MOVE() {
 	VM_PARAM_INTEGER(dest_slot)
 	VM_PARAM_VALIDAGENT(dest_agent)
 
-	std::map<unsigned int, shared_ptr<class genomeFile> >::iterator i = src_agent->genome_slots.find(src_slot);
+	std::map<unsigned int, std::shared_ptr<class genomeFile> >::iterator i = src_agent->genome_slots.find(src_slot);
 	caos_assert(i != src_agent->genome_slots.end());
 
 	std::string moniker = world.history->findMoniker(i->second);
@@ -132,7 +133,7 @@ void caosVM::v_GTOS() {
 	if (targ->genome_slots.find(slot) == targ->genome_slots.end()) {
 		result.setString(""); // CV needs this, at least
 	} else {
-		shared_ptr<class genomeFile> g = targ->genome_slots[slot];
+		std::shared_ptr<class genomeFile> g = targ->genome_slots[slot];
 		result.setString(world.history->findMoniker(g));
 	}
 }

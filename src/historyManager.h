@@ -64,7 +64,7 @@ public:
 	bool warpveteran;
 	unsigned int no_crossover_points, no_point_mutations;
 	
-	void init(std::string, shared_ptr<genomeFile>);
+	void init(std::string, std::shared_ptr<genomeFile>);
 	historyevent &addEvent(unsigned int event, std::string moniker1 = "", std::string moniker2 = "");
 	void moveToAgent(AgentRef a);
 	void moveToCreature(AgentRef c);
@@ -78,10 +78,10 @@ private:
 	std::map<std::string, monikerData> monikers;
 
 public:
-	std::string newMoniker(shared_ptr<genomeFile>);
+	std::string newMoniker(std::shared_ptr<genomeFile>);
 	bool hasMoniker(std::string);
 	monikerData &getMoniker(std::string);
-	std::string findMoniker(shared_ptr<genomeFile>);
+	std::string findMoniker(std::shared_ptr<genomeFile>);
 	std::string findMoniker(AgentRef);
 	void delMoniker(std::string);
 };

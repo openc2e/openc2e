@@ -20,6 +20,7 @@
 #ifndef __AGENT_H
 #define __AGENT_H
 
+#include "serfwd.h"
 #include "AgentRef.h"
 #include "caosValue.h"
 #include "CompoundPart.h"
@@ -27,7 +28,6 @@
 #include <list>
 #include <map>
 #include <memory>
-#include "openc2e.h"
 #include "Port.h"
 #include "physics.h"
 #include <set>
@@ -113,7 +113,7 @@ public:
 	std::shared_ptr<class AudioSource> sound;
 
 	// these are maps rather than vectors because ports can be destroyed
-	std::map<unsigned int, std::shared_ptr<InputPort> > inports; // XXX: do these need to be shared_ptr?
+	std::map<unsigned int, std::shared_ptr<InputPort> > inports; // XXX: do these need to be std::shared_ptr?
 	std::map<unsigned int, std::shared_ptr<OutputPort> > outports;
 
 	void join(unsigned int outid, AgentRef dest, unsigned int inid);
@@ -245,7 +245,7 @@ public:
 	unsigned int getHeight() { return part(0)->getHeight(); }
 	Point const boundingBoxPoint(unsigned int n);
 	Point const boundingBoxPoint(unsigned int n, Point p, float w, float h);
-	shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, class MetaRoom *m, shared_ptr<Room> exclude);
+	std::shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, class MetaRoom *m, std::shared_ptr<Room> exclude);
 	void findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
 
 	bool validInRoomSystem();
@@ -258,7 +258,7 @@ public:
 	virtual void setZOrder(unsigned int plane); // should be overridden!
 	virtual unsigned int getZOrder() const;
 
-	class shared_ptr<script> findScript(unsigned short event);
+	class std::shared_ptr<script> findScript(unsigned short event);
 	
 	int getUNID() const;
 	std::string identify() const;

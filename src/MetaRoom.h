@@ -20,7 +20,7 @@
 #ifndef _C2E_METAROOM_H
 #define _C2E_METAROOM_H
 
-#include "openc2e.h"
+#include "serfwd.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -32,14 +32,14 @@ class MetaRoom {
 protected:
 	FRIEND_SERIALIZE(MetaRoom)
 	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
-	std::map<std::string, shared_ptr<creaturesImage> > backgrounds;
-	shared_ptr<creaturesImage> firstback;
+	std::map<std::string, std::shared_ptr<creaturesImage> > backgrounds;
+	std::shared_ptr<creaturesImage> firstback;
 	bool wraps;
 	
 	MetaRoom() { }
 
 public:
-	std::vector<shared_ptr<class Room> > rooms;
+	std::vector<std::shared_ptr<class Room> > rooms;
 
 	unsigned int x() { return xloc; }
 	unsigned int y() { return yloc; }
@@ -50,21 +50,21 @@ public:
 	bool wraparound() { return wraps; }
 	void setWraparound(bool w) { wraps = !!w; }
 
-	unsigned int addRoom(shared_ptr<class Room>);
-	void addBackground(std::string, shared_ptr<creaturesImage> = shared_ptr<creaturesImage>());
-	shared_ptr<creaturesImage> getBackground(std::string);
+	unsigned int addRoom(std::shared_ptr<class Room>);
+	void addBackground(std::string, std::shared_ptr<creaturesImage> = std::shared_ptr<creaturesImage>());
+	std::shared_ptr<creaturesImage> getBackground(std::string);
 	std::vector<std::string> backgroundList();
 
-	shared_ptr<Room> nextFloorFromPoint(float x, float y);
+	std::shared_ptr<Room> nextFloorFromPoint(float x, float y);
 
-	shared_ptr<Room> roomAt(float x, float y);
-	std::vector<shared_ptr<Room> > roomsAt(float x, float y);
+	std::shared_ptr<Room> roomAt(float x, float y);
+	std::vector<std::shared_ptr<Room> > roomsAt(float x, float y);
 
 	std::string music;
 
 	unsigned int id;
 
-	MetaRoom(int _x, int _y, int width, int height, const std::string &back, shared_ptr<creaturesImage> = shared_ptr<creaturesImage>(), bool wrap = false);
+	MetaRoom(int _x, int _y, int width, int height, const std::string &back, std::shared_ptr<creaturesImage> = std::shared_ptr<creaturesImage>(), bool wrap = false);
 	~MetaRoom();
 };
 

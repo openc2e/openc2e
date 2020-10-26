@@ -26,19 +26,19 @@ inline unsigned int Scriptorium::calculateValue(unsigned char family, unsigned c
 	return (family + (genus << 8) + (species << 16));
 }
 
-void Scriptorium::addScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event, shared_ptr<script> s) {
-	std::map<unsigned short, shared_ptr<script> > &m = getScripts(calculateValue(family, genus, species));
+void Scriptorium::addScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event, std::shared_ptr<script> s) {
+	std::map<unsigned short, std::shared_ptr<script> > &m = getScripts(calculateValue(family, genus, species));
 	m[event] = s;
 }
 
 void Scriptorium::delScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
 	// Retrieve the list of scripts for the classifier, return if there aren't any.
-	std::map<unsigned int, std::map<unsigned short, shared_ptr<script> > >::iterator x = scripts.find(calculateValue(family, genus, species));
+	std::map<unsigned int, std::map<unsigned short, std::shared_ptr<script> > >::iterator x = scripts.find(calculateValue(family, genus, species));
 	if (x == scripts.end())
 		return;
 
 	// Retrieve the script, return if it doesn't exist.
-	std::map<unsigned short, shared_ptr<script> >::iterator j = x->second.find(event);
+	std::map<unsigned short, std::shared_ptr<script> >::iterator j = x->second.find(event);
 	if (j == x->second.end())
 		return;
 
@@ -50,16 +50,16 @@ void Scriptorium::delScript(unsigned char family, unsigned char genus, unsigned 
 		scripts.erase(x);
 }
 
-shared_ptr<script> Scriptorium::getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
-	std::map<unsigned short, shared_ptr<script> > &x = getScripts(calculateValue(family, genus, species));
+std::shared_ptr<script> Scriptorium::getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
+	std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(family, genus, species));
 	if (x.find(event) == x.end()) {
-		std::map<unsigned short, shared_ptr<script> > &x = getScripts(calculateValue(family, genus, 0));
+		std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(family, genus, 0));
 		if (x.find(event) == x.end()) {
-			std::map<unsigned short, shared_ptr<script> > &x = getScripts(calculateValue(family, 0, 0));
+			std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(family, 0, 0));
 			if (x.find(event) == x.end()) {
-				std::map<unsigned short, shared_ptr<script> > &x = getScripts(calculateValue(0, 0, 0));
+				std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(0, 0, 0));
 				if (x.find(event) == x.end()) {
-					return shared_ptr<script>();
+					return std::shared_ptr<script>();
 				} else return x[event];
 			} else return x[event];
 		} else return x[event];

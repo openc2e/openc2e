@@ -17,6 +17,7 @@
  *
  */
 
+#include "caos_assert.h"
 #include "MetaRoom.h"
 #include "Room.h"
 #include "World.h"
@@ -28,7 +29,7 @@
 #include <memory>
 #include "Backend.h"
 
-MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, shared_ptr<creaturesImage> spr, bool wrap) {
+MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, std::shared_ptr<creaturesImage> spr, bool wrap) {
 	xloc = _x; yloc = _y; wid = _width; hei = _height; wraps = wrap;
 
 	// if we were provided with a background, add it
@@ -41,8 +42,8 @@ MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &b
 	}
 }
 
-void MetaRoom::addBackground(std::string back, shared_ptr<creaturesImage> spr) {
-	shared_ptr<creaturesImage> backsprite;
+void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> spr) {
+	std::shared_ptr<creaturesImage> backsprite;
 	unsigned int totalwidth, totalheight;
 
 	caos_assert(!back.empty());
@@ -82,19 +83,19 @@ std::vector<std::string> MetaRoom::backgroundList() {
 	// construct a temporary vector from our std::map
 
 	std::vector<std::string> b;
-	for (std::map<std::string, shared_ptr<creaturesImage> >::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
+	for (std::map<std::string, std::shared_ptr<creaturesImage> >::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
 		b.push_back(i->first);
 	return b;
 }
 
-shared_ptr<creaturesImage> MetaRoom::getBackground(std::string back) {
+std::shared_ptr<creaturesImage> MetaRoom::getBackground(std::string back) {
 	// return the first background by default
 	if (back.empty()) {
 		return firstback;
 	}
 	
 	// if this background name isn't found, return null
-	if (backgrounds.find(back) != backgrounds.end()) return shared_ptr<creaturesImage>();
+	if (backgrounds.find(back) != backgrounds.end()) return std::shared_ptr<creaturesImage>();
 	
 	// otherwise, return the relevant background
 	return backgrounds[back];
@@ -104,10 +105,10 @@ MetaRoom::~MetaRoom() {
 	// we hold the only strong reference to our contained rooms, so they'll be auto-deleted
 }
 
-shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
-	shared_ptr<Room> closest_up, closest_down;
+std::shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
+	std::shared_ptr<Room> closest_up, closest_down;
 	float dist_down = -1, dist_up = -1;
-	for (std::vector<shared_ptr<Room> >::iterator r = rooms.begin(); r != rooms.end(); r++) {
+	for (std::vector<std::shared_ptr<Room> >::iterator r = rooms.begin(); r != rooms.end(); r++) {
 		if (!(*r)->bot.containsX(x)) continue;
 		float dist = (*r)->bot.pointAtX(x).y - y; // down is positive
 		float absdist = fabs(dist);
@@ -121,10 +122,10 @@ shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
 	}
 	if (closest_down) return closest_down;
 	if (closest_up) return closest_up;
-	return shared_ptr<Room>();
+	return std::shared_ptr<Room>();
 }
 
-unsigned int MetaRoom::addRoom(shared_ptr<Room> r) {
+unsigned int MetaRoom::addRoom(std::shared_ptr<Room> r) {
 	// add to both our local list and the global list
 	rooms.push_back(r);
 	world.map->rooms.push_back(r);
@@ -134,30 +135,30 @@ unsigned int MetaRoom::addRoom(shared_ptr<Room> r) {
 	return r->id;
 }
 
-shared_ptr<Room> MetaRoom::roomAt(float _x, float _y) {
+std::shared_ptr<Room> MetaRoom::roomAt(float _x, float _y) {
 	if (wraps) {
 		if (_x > (int)xloc + (int)wid) _x -= wid;
 		else if (_x < (int)xloc) _x += wid;
 	}
 
-	for (std::vector<shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
-		shared_ptr<Room> r = *i;
+	for (std::vector<std::shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		std::shared_ptr<Room> r = *i;
 		if (r->containsPoint(_x, _y)) return r;
 	}
 
-	return shared_ptr<Room>();
+	return std::shared_ptr<Room>();
 }
 
-std::vector<shared_ptr<Room> > MetaRoom::roomsAt(float _x, float _y) {
+std::vector<std::shared_ptr<Room> > MetaRoom::roomsAt(float _x, float _y) {
 	if (wraps) {
 		if (_x > (int)xloc + (int)wid) _x -= wid;
 		else if (_x < (int)xloc) _x += wid;
 	}
 
-	std::vector<shared_ptr<Room> > ourlist;
+	std::vector<std::shared_ptr<Room> > ourlist;
 
-	for (std::vector<shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
-		shared_ptr<Room> r = *i;
+	for (std::vector<std::shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
+		std::shared_ptr<Room> r = *i;
 		if (r->containsPoint(_x, _y)) ourlist.push_back(r);
 	}
 

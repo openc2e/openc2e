@@ -24,7 +24,6 @@
 #include "caosVM.h"
 #include "fileformats/caoslexer.h"
 #include "fileformats/caostoken.h"
-#include "openc2e.h"
 #include "Engine.h"
 #include "parseException.h"
 #include "World.h"
@@ -112,18 +111,18 @@ caosScript::caosScript(const std::string &dialect, const std::string &fn) {
 	d = getDialectByName(dialect);
 	if (!d)
 		throw parseException(std::string("Unknown dialect ") + dialect);
-	current = installer = shared_ptr<script> (new script(d, fn));
+	current = installer = std::shared_ptr<script> (new script(d, fn));
 	filename = fn;
 }
 
 caosScript::~caosScript() {
-	// Nothing to do, yay shared_ptr!
+	// Nothing to do, yay std::shared_ptr!
 }
 
 void caosScript::installScripts() {
-	std::vector<shared_ptr<script> >::iterator i = scripts.begin();
+	std::vector<std::shared_ptr<script> >::iterator i = scripts.begin();
 	while (i != scripts.end()) {
-		shared_ptr<script> s = *i;
+		std::shared_ptr<script> s = *i;
 		world.scriptorium->addScript(s->fmly, s->gnus, s->spcs, s->scrp, s);
 		i++;
 	}
@@ -321,7 +320,7 @@ void caosScript::parse(std::istream &in) {
 		std::vector<caostoken> rawtokens;
 		lexcaos(rawtokens, caostext.c_str());
 
-		tokens = shared_ptr<std::vector<caostoken> >(new std::vector<caostoken>());
+		tokens = std::shared_ptr<std::vector<caostoken> >(new std::vector<caostoken>());
 		size_t index = 0;
 		for (auto& t : rawtokens) {
 			switch (t.type) {
@@ -355,7 +354,7 @@ void caosScript::parse(std::istream &in) {
 		parseloop(ST_INSTALLER, NULL);
 
 		std::ostringstream oss;
-		shared_ptr<std::vector<toktrace> > tokinfo(new std::vector<toktrace>());
+		std::shared_ptr<std::vector<toktrace> > tokinfo(new std::vector<toktrace>());
 		for (size_t p = 0; p < tokens->size(); p++) {
 			std::string tok = (*tokens)[p].format();
 			int len = tok.size();
@@ -375,7 +374,7 @@ void caosScript::parse(std::istream &in) {
 			removal->tokinfo = tokinfo;
 			removal->code = code;
 		}
-		std::vector<shared_ptr<script> >::iterator i = scripts.begin();
+		std::vector<std::shared_ptr<script> >::iterator i = scripts.begin();
 		while (i != scripts.end()) {
 			(*i)->tokinfo = tokinfo;
 			(*i)->code = code;
@@ -683,7 +682,7 @@ void caosScript::parseloop(int state, void *info) {
 			int gnus = bits[1];
 			int spcs = bits[2];
 			int scrp = bits[3];
-			scripts.push_back(shared_ptr<script>(new script(d, filename, fmly, gnus, spcs, scrp)));
+			scripts.push_back(std::shared_ptr<script>(new script(d, filename, fmly, gnus, spcs, scrp)));
 			current = scripts.back();
 		} else if (t->word() == "rscr") {
 			if (state == ST_INSTALLER || state == ST_BODY || state == ST_REMOVAL)
@@ -691,7 +690,7 @@ void caosScript::parseloop(int state, void *info) {
 			else
 				throw parseException("Unexpected RSCR");
 			if (!removal)
-				removal = shared_ptr<script>(new script(d, filename));
+				removal = std::shared_ptr<script>(new script(d, filename));
 			current = removal;
 		} else if (t->word() == "iscr") {
 			if (state == ST_INSTALLER || state == ST_BODY || state == ST_REMOVAL)

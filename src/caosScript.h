@@ -20,6 +20,8 @@
 #ifndef CAOSSCRIPT_H
 #define CAOSSCRIPT_H
 
+#include "bytestring.h"
+#include "serfwd.h"
 #include <memory>
 #include <vector>
 #include <list>
@@ -28,7 +30,6 @@
 #include <map>
 #include "caosValue.h"
 #include <cassert>
-#include "openc2e.h"
 #include "bytecode.h"
 #include "caosValue.h"
 #include "dialect.h"
@@ -80,7 +81,7 @@ class script {
 		std::vector<bytestring_t> bytestrs;
 		// a normalized copy of the script source. this is used for error tracing
 		shared_str code;
-		shared_ptr<std::vector<toktrace> > tokinfo;
+		std::shared_ptr<std::vector<toktrace> > tokinfo;
 	public:
 		int fmly, gnus, spcs, scrp;
 		const class Dialect *dialect;
@@ -100,7 +101,7 @@ class script {
 		caosValue getConstant(int idx) const {
 			if (idx < 0 || (size_t)idx >= consts.size()) {
 				throw caosException(
-						fmt::sprintf("Internal error: const %d out of range", idx)
+						fmt::format("Internal error: const {} out of range", idx)
 				);
 			}
 			return consts[idx];
@@ -109,7 +110,7 @@ class script {
 		bytestring_t getBytestr(int idx) const {
 			if (idx < 0 || (size_t)idx >= bytestrs.size()) {
 				throw caosException(
-						fmt::sprintf("Internal error: const %d out of range", idx)
+						fmt::format("Internal error: const {} out of range", idx)
 				);
 			}
 			return bytestrs[idx];
@@ -242,9 +243,9 @@ class caosScript { //: Collectable {
 public:
 	const Dialect *d;
 	std::string filename;
-	shared_ptr<script> installer, removal;
-	std::vector<shared_ptr<script> > scripts;
-	shared_ptr<script> current;
+	std::shared_ptr<script> installer, removal;
+	std::vector<std::shared_ptr<script> > scripts;
+	std::shared_ptr<script> current;
 
 	caosScript(const std::string &dialect, const std::string &fn);
 	caosScript() { d = NULL; }
@@ -278,7 +279,7 @@ protected:
 	logicaltokentype logicalType(const caostoken *const);
 	logicaltokentype logicalType(const caostoken&);
 
-	shared_ptr<std::vector<caostoken> > tokens;
+	std::shared_ptr<std::vector<caostoken> > tokens;
 	int curindex; // index to the next token to be read
    	int errindex; // index to the token to report parse errors on
 	int traceindex; // index to the token to report runtime errors on

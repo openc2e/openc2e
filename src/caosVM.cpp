@@ -17,8 +17,8 @@
  *
  */
 
+#include "caos_assert.h"
 #include "caosVM.h"
-#include "openc2e.h"
 #include "World.h"
 #include "bytecode.h"
 #include "caosScript.h"
@@ -318,7 +318,7 @@ inline void caosVM::runOp() {
 	runops++;
 	if (runops > 1000000) throw creaturesException("script exceeded 1m ops");
 
-	shared_ptr<script> scr = currentscript;
+	std::shared_ptr<script> scr = currentscript;
 	caosOp op = currentscript->getOp(cip);
 	
 	try {
@@ -357,7 +357,7 @@ void caosVM::stop() {
 	std::fill(var.begin(), var.end(), 0);
 }
 
-void caosVM::runEntirely(shared_ptr<script> s) {
+void caosVM::runEntirely(std::shared_ptr<script> s) {
 	// caller is responsible for resetting/setting *all* state!
 	cip = nip = runops = 0;
 	currentscript = s;
@@ -373,7 +373,7 @@ void caosVM::runEntirely(shared_ptr<script> s) {
 	}
 }
 
-bool caosVM::fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm) {
+bool caosVM::fireScript(std::shared_ptr<script> s, bool nointerrupt, Agent *frm) {
 	assert(owner);
 	assert(s);
 	if (lock) return false; // can't interrupt scripts which called LOCK

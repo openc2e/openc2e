@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "openc2e.h"
 #include "partzorder.h"
 #include "renderable.h"
 #include <map>

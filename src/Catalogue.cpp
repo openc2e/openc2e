@@ -32,7 +32,6 @@
 
 #include <cctype>
 
-#include "openc2e.h"
 #include "util.h"
 
 

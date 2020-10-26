@@ -1,3 +1,4 @@
+#include "caos_assert.h"
 #include "TextPart.h"
 #include "Backend.h"
 #include "encoding.h"

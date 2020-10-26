@@ -17,8 +17,8 @@
  *
  */
 
+#include "caos_assert.h"
 #include "caosVM.h"
-#include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
 #include <iostream>

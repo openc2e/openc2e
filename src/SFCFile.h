@@ -26,8 +26,8 @@
 #include <istream>
 
 /*
- * Note that we don't use shared_ptr here, everything is owned by the
- * SFCFile. I couldn't find a way to cast downwards with shared_ptr,
+ * Note that we don't use std::shared_ptr here, everything is owned by the
+ * SFCFile. I couldn't find a way to cast downwards with std::shared_ptr,
  * and since everything revolves around slurpMFC - which can only return
  * the base SFCClass type - it seemed best to just use pointers, since
  * ownership is clear. - fuzzie

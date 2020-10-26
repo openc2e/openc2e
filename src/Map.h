@@ -20,8 +20,8 @@
 #ifndef _OPENC2E_MAP_H
 #define _OPENC2E_MAP_H
 
+#include "serfwd.h"
 #include "physics.h"
-#include "openc2e.h"
 #include <memory>
 #include <vector>
 
@@ -33,7 +33,7 @@ protected:
 	FRIEND_SERIALIZE(Map)
 	unsigned int width, height;
 	std::vector<MetaRoom *> metarooms;
-	std::vector<shared_ptr<Room> > rooms;
+	std::vector<std::shared_ptr<Room> > rooms;
 
 	friend class MetaRoom;
 
@@ -60,15 +60,15 @@ public:
 	MetaRoom *getArrayMetaRoom(unsigned int i) { return metarooms[i]; } // TODO: hack!
 	
 	unsigned int getMetaRoomCount();
-	shared_ptr<Room> getRoom(unsigned int);
+	std::shared_ptr<Room> getRoom(unsigned int);
 	unsigned int getRoomCount();
 
 	MetaRoom *metaRoomAt(unsigned int, unsigned int);
-	shared_ptr<Room> roomAt(float, float);
-	std::vector<shared_ptr<Room> > roomsAt(float, float);
+	std::shared_ptr<Room> roomAt(float, float);
+	std::vector<std::shared_ptr<Room> > roomsAt(float, float);
 
-	bool collideLineWithRoomSystem(Point src, Point dest, shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm);
-	bool collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> room, shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm);
+	bool collideLineWithRoomSystem(Point src, Point dest, std::shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm);
+	bool collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<Room> room, std::shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm);
 
 	void tick();
 };

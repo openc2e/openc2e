@@ -28,6 +28,7 @@
 #include <QToolBar>
 #include <cassert>
 #include <memory>
+#include <fmt/core.h>
 
 #include "World.h"
 #include "qtopenc2e.h"
@@ -453,7 +454,7 @@ QtOpenc2e::~QtOpenc2e() {
 }
 
 monikerData &monikerDataFor(AgentRef a) {
-	shared_ptr<class genomeFile> g = a->getSlot(0);
+	std::shared_ptr<class genomeFile> g = a->getSlot(0);
 	assert(g);
 	std::string moniker = world.history->findMoniker(g);
 	return world.history->getMoniker(moniker);
@@ -598,9 +599,9 @@ void QtOpenc2e::tick() {
 			if (world.timeofday < 5 && timeofdayimage->pixmap()->cacheKey() != timeofdayicon[world.timeofday].cacheKey()) {
 				timeofdayimage->setPixmap(timeofdayicon[world.timeofday]);
 			}
-			yeartext->setText(fmt::sprintf("Year: %03i", (int)world.year).c_str());
+			yeartext->setText(fmt::format("Year: {:03i}", (int)world.year).c_str());
 		
-			shared_ptr<Room> room_for_tempcheck;
+			std::shared_ptr<Room> room_for_tempcheck;
 			if (world.selectedcreature) { // prefer the room the selected creature is in
 				room_for_tempcheck = roomContainingAgent(world.selectedcreature);
 			}
@@ -813,7 +814,7 @@ void QtOpenc2e::newNorn() {
 	if (engine.version > 2) return; // TODO: fixme
 
 	std::string genomefile = "test";
-	shared_ptr<genomeFile> genome;
+	std::shared_ptr<genomeFile> genome;
 	try {
 		genome = world.loadGenome(genomefile);
 	} catch (creaturesException &e) {
@@ -862,7 +863,7 @@ void QtOpenc2e::newEgg() {
 void QtOpenc2e::makeNewEgg() {
 	std::string eggscript;
 	/* create the egg obj */
-	eggscript = fmt::sprintf("new: simp eggs 8 %d 2000 0\n", ((rand() % 6) * 8));
+	eggscript = fmt::format("new: simp eggs 8 {} 2000 0\n", ((rand() % 6) * 8));
 	/* set the pose */
 	eggscript += "pose 3\n";	
 	/* set the correct class/attributes */
@@ -872,7 +873,7 @@ void QtOpenc2e::makeNewEgg() {
 		eggscript += "setv cls2 2 5 2\nsetv attr 195\n";
 	/* create the genome */
 	if (engine.version == 1)
-		eggscript += fmt::sprintf("new: gene tokn dad%d tokn mum%d obv0\n", (1 + rand() % 6), (1 + rand() % 6));
+		eggscript += fmt::format("new: gene tokn dad%d tokn mum{} obv0\n", (1 + rand() % 6), (1 + rand() % 6));
 	else if (engine.version == 2)
 		eggscript += "new: gene tokn norn tokn norn obv0\n";
 	/* set the gender */
@@ -883,9 +884,9 @@ void QtOpenc2e::makeNewEgg() {
 	/* move it into place */
 	/* TODO: good positions? */
 	if (engine.version == 1)
-		eggscript += fmt::sprintf("mvto %d 870\n", (2600 + rand() % 200));
+		eggscript += fmt::format("mvto {} 870\n", (2600 + rand() % 200));
 	else if (engine.version == 2)
-		eggscript += fmt::sprintf("mvto %d 750\n", (4900 + rand() % 350));
+		eggscript += fmt::format("mvto {} 750\n", (4900 + rand() % 350));
 
 	/* c2: enable gravity */
 	if (engine.version == 2)

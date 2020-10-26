@@ -1,3 +1,4 @@
+#include "caos_assert.h"
 #include "TextEntryPart.h"
 #include "Agent.h"
 #include "Backend.h"

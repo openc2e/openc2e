@@ -34,10 +34,9 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/string.hpp>
-#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/std::shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "openc2e.h"
 
 template<class Archive, class Object>
 void pre_save(Archive &ar, const Object & obj, const unsigned int version) { }

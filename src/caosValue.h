@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "serfwd.h"
 #include <memory>
 #include <mpark/variant.hpp>
-#include "openc2e.h"
 #include <string>
 #include <cassert>
 #include "AgentRef.h"

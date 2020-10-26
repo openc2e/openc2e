@@ -87,8 +87,8 @@ Engine::Engine() {
 
 	exefile = 0;
 
-	addPossibleBackend("null", shared_ptr<Backend>(new NullBackend()));
-	addPossibleAudioBackend("null", shared_ptr<AudioBackend>(new NullAudioBackend()));
+	addPossibleBackend("null", std::shared_ptr<Backend>(new NullBackend()));
+	addPossibleAudioBackend("null", std::shared_ptr<AudioBackend>(new NullAudioBackend()));
 
 	camera.reset(new MainCamera);
 }
@@ -110,7 +110,7 @@ void Engine::addPossibleAudioBackend(std::string s, std::shared_ptr<AudioBackend
 	possible_audiobackends[s] = b;
 }
 
-void Engine::setBackend(shared_ptr<Backend> b) {
+void Engine::setBackend(std::shared_ptr<Backend> b) {
 	backend = b;
 	lasttimestamp = backend->ticks();
 }
@@ -899,20 +899,20 @@ bool Engine::initialSetup() {
 	// initialize backends
 	if (cmdline_norun) preferred_backend = "null";
 	if (preferred_backend != "null") std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;	
-	shared_ptr<Backend> b = possible_backends[preferred_backend];
+	std::shared_ptr<Backend> b = possible_backends[preferred_backend];
 	if (!b)	throw creaturesException("No such backend " + preferred_backend);
 	b->init(); setBackend(b);
 	possible_backends.clear();
 
 	if (cmdline_norun) preferred_audiobackend = "null";
 	if (preferred_audiobackend != "null") std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;	
-	shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
+	std::shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
 	if (!a)	throw creaturesException("No such audio backend " + preferred_audiobackend);
 	try{
 		a->init(); audio = a;
 	} catch (creaturesException &e) {
 		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl << "* Continuing without sound." << std::endl;
-		audio = shared_ptr<AudioBackend>(new NullAudioBackend());
+		audio = std::shared_ptr<AudioBackend>(new NullAudioBackend());
 		audio->init();
 	}
 	if (!cmdline_enable_sound) {

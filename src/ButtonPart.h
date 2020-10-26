@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bytestring.h"
 #include "SpritePart.h"
 
 class ButtonPart : public SpritePart {

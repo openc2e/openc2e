@@ -17,10 +17,10 @@
  *
  */
 
+#include "caos_assert.h"
 #include "caosVM.h"
 #include <iostream>
 #include <memory>
-#include "openc2e.h"
 #include "Vehicle.h"
 #include "World.h"
 #include "AgentHelpers.h" // agentsTouching

@@ -212,7 +212,6 @@ print(
 #include "cmddata.h"
 #include "caosVM.h"
 #include "dialect.h"
-#include "openc2e.h"
 
 """
 )

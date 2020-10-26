@@ -2,7 +2,7 @@
 #define SER_SHARED_STR_H 1
 
 #include "serialization.h"
-#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/std::shared_ptr.hpp>
 #include <boost/serialization/string.hpp>
 
 SERIALIZE(shared_str) { ar & obj.p; }

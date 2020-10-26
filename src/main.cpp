@@ -18,7 +18,6 @@
  *
  */
 
-#include "openc2e.h"
 #include "version.h"
 #include <iostream>
 #include <memory>
@@ -48,14 +47,14 @@ extern "C" int main(int argc, char *argv[]) {
 	std::cout << "openc2e (" << version << "), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 "
 		"Alyssa Milburn and others\n\n";
 
-	engine.addPossibleBackend("sdl", shared_ptr<Backend>(new SDLBackend()));
+	engine.addPossibleBackend("sdl", std::shared_ptr<Backend>(new SDLBackend()));
 #ifdef QT_SUPPORT
 	std::shared_ptr<QtBackend> qtbackend = std::shared_ptr<QtBackend>(new QtBackend());
 	std::shared_ptr<Backend> qtbackend_generic = std::dynamic_pointer_cast<class Backend, class QtBackend>(qtbackend);
 	engine.addPossibleBackend("qt", qtbackend_generic); // last-added backend is default
 #endif
 #ifdef SDLMIXER_SUPPORT
-	engine.addPossibleAudioBackend("sdlmixer", shared_ptr<AudioBackend>(new SDLMixerBackend()));
+	engine.addPossibleAudioBackend("sdlmixer", std::shared_ptr<AudioBackend>(new SDLMixerBackend()));
 #endif
 
 	// pass command-line flags to the engine, but do no other setup

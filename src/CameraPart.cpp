@@ -12,7 +12,7 @@ CameraPart::CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	viewheight = view_height;
 	camerawidth = camera_width;
 	cameraheight = camera_height;
-	camera = shared_ptr<Camera>(new PartCamera(this));
+	camera = std::shared_ptr<Camera>(new PartCamera(this));
 }
 
 void CameraPart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {

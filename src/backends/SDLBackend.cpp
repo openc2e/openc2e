@@ -24,7 +24,6 @@
 #include "creaturesImage.h"
 #include "keycodes.h"
 #include "Engine.h"
-#include "openc2e.h"
 #include "SDLBackend.h"
 #include "World.h"
 

@@ -1,5 +1,6 @@
 #include "AnimatablePart.h"
 #include "Agent.h"
+#include <fmt/core.h>
 
 void AnimatablePart::updateAnimation() {
 	if (animation.empty()) return;
@@ -18,7 +19,7 @@ void AnimatablePart::updateAnimation() {
 
 			if (frameno >= animation.size()) {
 				// this is an internal error because it should have been validated at pose-setting time
-				std::string err = fmt::sprintf("internal animation error: tried looping back to frame %d but that is beyond animation size %d",
+				std::string err = fmt::format("internal animation error: tried looping back to frame {} but that is beyond animation size {}",
 				        (int)frameno, (int)animation.size());
 				parent->unhandledException(err, false);
 				animation.clear();

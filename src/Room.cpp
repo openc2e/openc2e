@@ -98,7 +98,7 @@ void Room::postTick() {
 	// adjust for diffusion to/from surrounding rooms
 	// TODO: absolutely no clue if this is correct
 	for (auto d = doors.begin(); d != doors.end(); d++) {
-		shared_ptr<Room> dest = d->second->first.lock();
+		std::shared_ptr<Room> dest = d->second->first.lock();
 		if (dest.get() == this) dest = d->second->second.lock();
 		assert(dest);
 

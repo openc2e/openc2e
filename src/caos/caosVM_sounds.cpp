@@ -17,7 +17,7 @@
  *
  */
 
-#include "openc2e.h"
+#include "caos_assert.h"
 #include "caosVM.h"
 #include "Agent.h"
 #include "World.h"
@@ -32,6 +32,10 @@
 #include <memory>
 using std::cout;
 using std::cerr;
+
+#ifndef M_PI
+# define M_PI           3.14159265358979323846  /* pi */
+#endif
 
 bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
 
@@ -165,7 +169,7 @@ void caosVM::c_RMSC() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	shared_ptr<Room> r = world.map->roomAt(x, y);
+	std::shared_ptr<Room> r = world.map->roomAt(x, y);
 	caos_assert(r);
 
 	r->music = track_name;
@@ -182,7 +186,7 @@ void caosVM::v_RMSC() {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	shared_ptr<Room> r = world.map->roomAt(x, y);
+	std::shared_ptr<Room> r = world.map->roomAt(x, y);
 	caos_assert(r);
 
 	result.setString(r->music);

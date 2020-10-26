@@ -24,7 +24,7 @@
 #include <iostream> // XXX debug
 #include <cmath>   // sqrt
 #include <algorithm> // swap
-#include "openc2e.h" // FRIEND_SERIALIZE
+#include "serfwd.h"
 
 // OS X header files use Point and Line, so..
 #define Point MyPoint

@@ -20,7 +20,8 @@
 #ifndef _CAOSVM_H
 #define _CAOSVM_H
 
-#include "openc2e.h"
+#include "caos_assert.h"
+#include "bytestring.h"
 #include <array>
 #include <map>
 #include <istream>
@@ -177,7 +178,7 @@ public:
 	const caosVM_p vm; // == this
 	
 	// script state...
-	shared_ptr<script> currentscript;
+	std::shared_ptr<script> currentscript;
 	int nip, cip, runops;
 	
 	bool inst, lock, stop_loop;
@@ -1118,11 +1119,11 @@ public:
 	void invoke_cmd(script *s, bool is_saver, int opidx);
 	void runOpCore(script *s, struct caosOp op);
 	void runOp();
-	void runEntirely(shared_ptr<script> s);
+	void runEntirely(std::shared_ptr<script> s);
 
 	void tick();
 	void stop();
-	bool fireScript(shared_ptr<script> s, bool nointerrupt, Agent *frm = 0);
+	bool fireScript(std::shared_ptr<script> s, bool nointerrupt, Agent *frm = 0);
 
 	caosVM(const AgentRef &o);
 	~caosVM();
@@ -1216,7 +1217,7 @@ class caosVM__lval {
 #define STUB throw caosException("stub in " __FILE__)
 
 // FIXME: use do { ... } while (0)
-#define valid_agent(x) do { if (!(x)) throw invalidAgentException(fmt::sprintf("Invalid agent handle: %s thrown from %s:%d", #x, __FILE__, __LINE__)); } while(0)
+#define valid_agent(x) do { if (!(x)) throw invalidAgentException(fmt::format("Invalid agent handle: {} thrown from {}:{}", #x, __FILE__, __LINE__)); } while(0)
 
 #endif
 /* vim: set noet: */

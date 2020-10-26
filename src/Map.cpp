@@ -18,7 +18,6 @@
  */
 
 #include "Map.h"
-#include "openc2e.h"
 #include "Room.h"
 #include "MetaRoom.h"
 #include <cassert>
@@ -58,11 +57,11 @@ MetaRoom *Map::getMetaRoom(unsigned int room) {
 	return 0;
 }
 
-shared_ptr<Room> Map::getRoom(unsigned int r) {
-	for (std::vector<shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++)
+std::shared_ptr<Room> Map::getRoom(unsigned int r) {
+	for (std::vector<std::shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++)
 		if ((*i)->id == r)
 			return *i;
-	return shared_ptr<Room>();
+	return std::shared_ptr<Room>();
 }
 
 unsigned int Map::getMetaRoomCount() {
@@ -78,13 +77,13 @@ void Map::tick() {
 
 	// Three passes..
 	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+		for (std::vector<std::shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
 			(*i)->tick();
 	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+		for (std::vector<std::shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
 			(*i)->postTick();
 	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+		for (std::vector<std::shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
 			(*i)->resetTick();
 }
 
@@ -98,20 +97,20 @@ MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 	return 0;
 }
 
-shared_ptr<Room> Map::roomAt(float _x, float _y) {
+std::shared_ptr<Room> Map::roomAt(float _x, float _y) {
 	MetaRoom *m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
-	if (!m) return shared_ptr<Room>();
+	if (!m) return std::shared_ptr<Room>();
 	return m->roomAt(_x, _y);
 }
 
-std::vector<shared_ptr<Room> > Map::roomsAt(float _x, float _y) {
+std::vector<std::shared_ptr<Room> > Map::roomsAt(float _x, float _y) {
 	MetaRoom *m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
-	if (!m) return std::vector<shared_ptr<Room> >();
+	if (!m) return std::vector<std::shared_ptr<Room> >();
 	return m->roomsAt(_x, _y);
 }
 
-bool Map::collideLineWithRoomSystem(Point src, Point dest, shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm) {
-	shared_ptr<Room> newRoom;
+bool Map::collideLineWithRoomSystem(Point src, Point dest, std::shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm) {
+	std::shared_ptr<Room> newRoom;
 
 	where = src;
 	
@@ -132,7 +131,7 @@ bool Map::collideLineWithRoomSystem(Point src, Point dest, shared_ptr<Room> &roo
 /*
  * poss. optimisation: skip checking the rest of the lines if our distance is 0?
  */
-bool Map::collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> room, shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm) {
+bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<Room> room, std::shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm) {
 	assert(room);
 	// TODO: this assert fails. why? 'where' is presumably outside the dest room sometimes.. mmh
 	//assert(room->containsPoint(src.x, src.y));
@@ -199,11 +198,11 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> 
 				continue; // continue, bad collision
 			}
 
-			shared_ptr<Room> nextroom;
+			std::shared_ptr<Room> nextroom;
 			bool foundroom = false;
 
 			for (auto r = room->doors.begin(); r != room->doors.end(); r++) {
-				shared_ptr<Room> otherroom = r->first.lock();
+				std::shared_ptr<Room> otherroom = r->first.lock();
 				assert(otherroom);
 				assert(r->second);
 				if (otherroom->containsPoint(newx, newy)) {
@@ -227,7 +226,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, shared_ptr<Room> 
 				}
 			}*/
 		
-			shared_ptr<Room> z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
+			std::shared_ptr<Room> z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
 			if (!z) {
 				// TODO: commented out this error message for sake of fuzzie's sanity, but it's still an issue
 				/*std::cout << "physics bug: fell out of room system at (" << where.x << ", " << where.y << ")" << std::endl;

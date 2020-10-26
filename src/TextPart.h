@@ -11,7 +11,7 @@ struct linedata {
 };
 
 struct texttintinfo {
-	shared_ptr<creaturesImage> sprite;
+	std::shared_ptr<creaturesImage> sprite;
 	unsigned int offset;
 };
 
@@ -27,7 +27,7 @@ protected:
 	unsigned int currpage;
 	std::string text;
 	
-	shared_ptr<creaturesImage> textsprite;
+	std::shared_ptr<creaturesImage> textsprite;
 	
 	int leftmargin, topmargin, rightmargin, bottommargin;
 	int linespacing, charspacing;

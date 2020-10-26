@@ -19,7 +19,7 @@ public:
           images[i].data = pureblack;
         }
         
-        shared_ptr<creaturesImage> img(new creaturesImage("blnk"));
+        std::shared_ptr<creaturesImage> img(new creaturesImage("blnk"));
         img->images = images;
 
         world.gallery->addImage(img);

@@ -1,9 +1,12 @@
 #include "MNGMusic.h"
 
 #include "endianlove.h"
-#include "openc2e.h"
 #include <iostream> // for debug messages
 #include <cmath> // for cos/sin
+
+#ifndef M_PI
+# define M_PI           3.14159265358979323846  /* pi */
+#endif
 
 class MNGStream : public AudioStreamBase {
 public:

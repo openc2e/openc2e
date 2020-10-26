@@ -17,6 +17,7 @@
  *
  */
 
+#include "caos_assert.h"
 #include "World.h"
 #include "Engine.h"
 #include "caosVM.h" // for setupCommandPointers()
@@ -80,7 +81,7 @@ void World::init() {
 	if (engine.version > 2 && catalogue.hasTag("Pointer Information")) {
 		const std::vector<std::string> &pointerinfo = catalogue.getTag("Pointer Information");
 		if (pointerinfo.size() >= 3) {
-			shared_ptr<creaturesImage> img = gallery->getImage(pointerinfo[2]);
+			std::shared_ptr<creaturesImage> img = gallery->getImage(pointerinfo[2]);
 			if (img) {
 				theHand = new PointerAgent(pointerinfo[2]);
 				int family, genus, species;
@@ -105,7 +106,7 @@ void World::init() {
 	
 	// If for some reason we failed to do that (missing/bad catalogue tag? missing file?), try falling back to a sane default.
 	if (!theHand) {
-		shared_ptr<creaturesImage> img;
+		std::shared_ptr<creaturesImage> img;
 		if (engine.gametype == "c3")
 			img = gallery->getImage("hand"); // as used in C3 and DS
 		else
@@ -384,8 +385,8 @@ void World::freeUNID(int unid) {
 	unidmap.erase(unid);
 }
 
-shared_ptr<Agent> World::lookupUNID(int unid) {
-	if (unid == 0) return shared_ptr<Agent>();
+std::shared_ptr<Agent> World::lookupUNID(int unid) {
+	if (unid == 0) return std::shared_ptr<Agent>();
 	return unidmap[unid].lock();
 }
 
@@ -408,7 +409,7 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	}
 	int adjustx = cam->getX();
 	int adjusty = cam->getY();
-	shared_ptr<creaturesImage> bkgd = m->getBackground(""); // TODO
+	std::shared_ptr<creaturesImage> bkgd = m->getBackground(""); // TODO
 
 	// TODO: work out what c2e does when it doesn't have a background..
 	if (!bkgd) return;
@@ -477,7 +478,7 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	}
 
 	if (showrooms) {
-		shared_ptr<Room> room_under_hand = map->roomAt(hand()->x, hand()->y);
+		std::shared_ptr<Room> room_under_hand = map->roomAt(hand()->x, hand()->y);
 		auto draw_room = [&](const auto& r, unsigned int color) {
 			// rooms don't wrap over the boundary, so just draw twice
 			r->renderBorders(surface, adjustx, adjusty, color);
@@ -688,12 +689,12 @@ void World::selectCreature(std::shared_ptr<Agent> a) {
 	}
 }
 
-shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
+std::shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
 	std::vector<std::string> possibles = findFiles("Genetics/", genefile + ".gen");
-	if (possibles.empty()) return shared_ptr<genomeFile>();
+	if (possibles.empty()) return std::shared_ptr<genomeFile>();
 	genefile = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
 
-	shared_ptr<genomeFile> p(new genomeFile());
+	std::shared_ptr<genomeFile> p(new genomeFile());
 	std::ifstream gfile(genefile.c_str(), std::ios::binary);
 	caos_assert(gfile.is_open());
 	gfile >> std::noskipws;
@@ -702,7 +703,7 @@ shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
 	return p;
 }
 
-void World::newMoniker(shared_ptr<genomeFile> g, std::string genefile, AgentRef agent) {
+void World::newMoniker(std::shared_ptr<genomeFile> g, std::string genefile, AgentRef agent) {
 	std::string d = history->newMoniker(g);
 	world.history->getMoniker(d).addEvent(2, "", genefile);
 	world.history->getMoniker(d).moveToAgent(agent);

@@ -27,6 +27,7 @@
 	* sanity checks: eg check that sprites have enough frames at load time
 */
 
+#include "caos_assert.h"
 #include "SkeletalCreature.h"
 #include "Creature.h"
 #include "World.h"
@@ -132,7 +133,7 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool tryfemale, un
 }
 
 void SkeletalCreature::processGenes() {
-	shared_ptr<genomeFile> genome = creature->getGenome();
+	std::shared_ptr<genomeFile> genome = creature->getGenome();
 
 	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
 		if (!creature->shouldProcessGene(i->get())) continue;
@@ -248,12 +249,12 @@ void SkeletalCreature::skeletonInit() {
 	}
 }
 
-shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(shared_ptr<creaturesImage> s) {
+std::shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(std::shared_ptr<creaturesImage> s) {
 	// TODO: don't bother tinting if we don't need to
 	
 	// TODO: work out tinting for other engine versions
 	if (engine.version > 2) {
-		shared_ptr<creaturesImage> newimage = world.gallery->tint(s, creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
+		std::shared_ptr<creaturesImage> newimage = world.gallery->tint(s, creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
 		return newimage;
 	}
 
@@ -396,7 +397,7 @@ void SkeletalCreature::snapDownFoot() {
 	MetaRoom *m = world.map->metaRoomAt(x, y);
 	if (!m) return; // TODO: exceptiony death
 
-	shared_ptr<Room> newroom;
+	std::shared_ptr<Room> newroom;
 
 	if (downfootroom) {
 		if (downfootroom->containsPoint(footx, footy)) {
@@ -407,7 +408,7 @@ void SkeletalCreature::snapDownFoot() {
 			} else {
 				float ydiff = 10000.0f; // TODO: big number
 				for (auto i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
-					shared_ptr<Room> thisroom = i->first.lock();
+					std::shared_ptr<Room> thisroom = i->first.lock();
 					if (engine.version == 2 && size.getInt() > i->second->perm) continue;
 					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
 						float thisydiff = fabs(footy - thisroom->floorYatX(footx));
@@ -420,7 +421,7 @@ void SkeletalCreature::snapDownFoot() {
 			}
 		}
 	} else {	
-		newroom = bestRoomAt(footx, footy, 3, m, shared_ptr<Room>());
+		newroom = bestRoomAt(footx, footy, 3, m, std::shared_ptr<Room>());
 
 		// insane emergency handling
 		float newfooty = footy;
@@ -441,7 +442,7 @@ void SkeletalCreature::snapDownFoot() {
 	if (!downfootroom /*|| !falling */) {
 		// TODO: hackery to cope with scripts moving us, this needs handling correctly somewhere
 		if (fabs(lastgoodfootx - attachmentX(orig_footpart, 1) - x) > 50.0f || fabs(lastgoodfooty - attachmentY(orig_footpart, 1) - y) > 50.0f) {
-			downfootroom = bestRoomAt(footx, footy, 3, m, shared_ptr<Room>());
+			downfootroom = bestRoomAt(footx, footy, 3, m, std::shared_ptr<Room>());
 			if (downfootroom) {
 				snapDownFoot();
 				return;
@@ -499,7 +500,7 @@ void SkeletalCreature::snapDownFoot() {
 			}
 		} else {
 			// TODO: hilar hack: same as above for perm
-			shared_ptr<Room> downroom = world.map->roomAt(footx, downfootroom->y_left_floor + 1);
+			std::shared_ptr<Room> downroom = world.map->roomAt(footx, downfootroom->y_left_floor + 1);
 			if (downfootroom->doors.find(downroom) != downfootroom->doors.end()) {
 				int permsize = (engine.version == 2 ? size.getInt() : perm);
 				if (permsize <= downfootroom->doors[downroom]->perm) {

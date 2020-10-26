@@ -4,7 +4,7 @@
 
 class SpritePart : public AnimatablePart {
 protected:
-	shared_ptr<creaturesImage> origsprite, sprite;
+	std::shared_ptr<creaturesImage> origsprite, sprite;
 	unsigned int firstimg, pose, base, spriteno;
 	SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 				 unsigned int _z);
@@ -14,7 +14,7 @@ public:
 	bool draw_mirrored;
 	unsigned char framerate;
 	unsigned int framedelay;
-	shared_ptr<creaturesImage> getSprite() { return sprite; }
+	std::shared_ptr<creaturesImage> getSprite() { return sprite; }
 	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
 	virtual void tick();
 	unsigned int getPose() { return pose; }
@@ -28,7 +28,7 @@ public:
 	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
 	void setBase(unsigned int b);
 	void changeSprite(std::string spritefile, unsigned int fimg);
-	void changeSprite(shared_ptr<creaturesImage> spr);
+	void changeSprite(std::shared_ptr<creaturesImage> spr);
 	void tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap);
 	virtual bool isTransparent() { return is_transparent; }
 	bool transparentAt(unsigned int x, unsigned int y);

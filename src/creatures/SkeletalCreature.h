@@ -25,7 +25,6 @@
 #include "AnimatablePart.h"
 #include "fileformats/attFile.h"
 #include "fileformats/genomeFile.h"
-#include "openc2e.h"
 #include "CreatureAgent.h"
 
 class creaturesImage;
@@ -46,13 +45,13 @@ protected:
 	int oldfootx, oldfooty;
 	int lastgoodfootx, lastgoodfooty; // TODO: sucky code
 	bool downfoot_left;
-	shared_ptr<class Room> downfootroom;
+	std::shared_ptr<class Room> downfootroom;
 
 	creatureAppearanceGene *appearancegenes[6];
 	std::map<unsigned int, creaturePoseGene *> posegenes;
 	std::map<unsigned int, creatureGaitGene *> gaitgenes;
 
-	shared_ptr<creaturesImage> images[17];
+	std::shared_ptr<creaturesImage> images[17];
 	attFile att[17];
 
 	int width, height, adjustx, adjusty;
@@ -73,7 +72,7 @@ protected:
 	void processGenes();
 
 	creatureAppearanceGene *appearanceGeneForPart(char p);
-	shared_ptr<creaturesImage> tintBodySprite(shared_ptr<creaturesImage>);
+	std::shared_ptr<creaturesImage> tintBodySprite(std::shared_ptr<creaturesImage>);
 
 	Agent *getAgent() { return this; }
 

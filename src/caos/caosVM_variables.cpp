@@ -17,13 +17,13 @@
  *
  */
 
+#include "caos_assert.h"
 #include "caosVM.h"
 #include "Agent.h"
 #include <memory>
 #include <stdlib.h> // rand()
 #include <iostream>
 #include <math.h> // abs()/fabs()
-#include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
 #include "Catalogue.h"
@@ -35,6 +35,10 @@
 #include "Vehicle.h"
 #include "PointerAgent.h"
 #include "creatures/CreatureAgent.h"
+
+#ifndef M_PI
+# define M_PI           3.14159265358979323846  /* pi */
+#endif
 
 /**
  VAxx (variable)

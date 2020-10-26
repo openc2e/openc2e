@@ -17,6 +17,7 @@
  *
  */
 
+#include "caos_assert.h"
 #include "caosVM.h"
 #include "historyManager.h"
 #include "World.h"

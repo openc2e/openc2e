@@ -14,6 +14,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "caos_assert.h"
 #include "World.h"
 #include "Engine.h"
 #include "prayManager.h"

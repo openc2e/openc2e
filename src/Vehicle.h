@@ -21,7 +21,6 @@
 #define __VEHICLE_H
 
 #include "CompoundAgent.h"
-#include "openc2e.h"
 
 class Vehicle : public CompoundAgent {
 protected:

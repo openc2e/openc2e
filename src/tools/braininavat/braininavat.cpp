@@ -235,7 +235,7 @@ void BrainInAVat::loadFile(const QString &fileName) {
 
 	// read genome
 	f >> noskipws;
-	shared_ptr<genomeFile> gfile(new genomeFile());
+	std::shared_ptr<genomeFile> gfile(new genomeFile());
 	try {
 		f >> *gfile;
 	} catch (std::exception &e) {

@@ -1,3 +1,4 @@
+#include "caos_assert.h"
 #include "SpritePart.h"
 #include "Agent.h"
 #include "Backend.h"
@@ -27,7 +28,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 		} else if (engine.bmprenderer) {
 			// BLCK hasn't been called yet, so we can't check validity yet
 		} else {
-			throw caosException(fmt::sprintf("Failed to create sprite part: first sprite %d is beyond %d sprite(s) in file %s", firstimg, sprite->numframes(), sprite->getName()));
+			throw caosException(fmt::format("Failed to create sprite part: first sprite {} is beyond {} sprite(s) in file {}", firstimg, sprite->numframes(), sprite->getName()));
 		}
 	}
 }
@@ -42,7 +43,7 @@ void SpritePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 			// hack for invalid poses - use the last sprite in the file (as real C2 does)
 			spriteno = getSprite()->numframes() - 1;
 		} else {
-			std::string err = fmt::sprintf("pose to be rendered %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)",
+			std::string err = fmt::format("pose to be rendered {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
 			        pose, firstimg, base, getSprite()->getName(), getSprite()->numframes());
 			parent->unhandledException(err, false);
 			return;
@@ -64,7 +65,7 @@ void SpritePart::setPose(unsigned int p) {
 			spriteno = getSprite()->numframes() - 1;
 		} else {
 			// TODO: mention anim frame if animation is non-empty
-			std::string err = fmt::sprintf("new pose %d (firstimg %d, base %d) was past end of sprite file '%s' (%d sprites)",
+			std::string err = fmt::format("new pose {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
 			        p, firstimg, base, getSprite()->getName(), getSprite()->numframes());
 			parent->unhandledException(err, false);
 			return;
@@ -85,14 +86,14 @@ bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 }
 
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
-	shared_ptr<creaturesImage> spr = world.gallery->getImage(spritefile);
+	std::shared_ptr<creaturesImage> spr = world.gallery->getImage(spritefile);
 	changeSprite(spr);
 	
 	caos_assert(spr->numframes() > fimg);
 	firstimg = fimg;
 }
 
-void SpritePart::changeSprite(shared_ptr<creaturesImage> spr) {
+void SpritePart::changeSprite(std::shared_ptr<creaturesImage> spr) {
 	caos_assert(spr);
 	// TODO: should we preserve tint?
 	base = 0; // TODO: should we preserve base?

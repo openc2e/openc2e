@@ -25,7 +25,7 @@
 #include <cassert>
 #include <memory>
 
-bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, shared_ptr<Room> ownerroom) {
+bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, std::shared_ptr<Room> ownerroom) {
 	assert(ownermeta && ownerroom);
 
 	if (seeing == a) return false;
@@ -35,7 +35,7 @@ bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoo
 	float thisy = a->y + (a->getHeight() / 2.0f);
 	MetaRoom *m = world.map->metaRoomAt(thisx, thisy);
 	if (m != ownermeta) return false;
-	shared_ptr<Room> r = world.map->roomAt(thisx, thisy);
+	std::shared_ptr<Room> r = world.map->roomAt(thisx, thisy);
 	if (!r) return false;
 		
 	// compare squared distance with range
@@ -46,7 +46,7 @@ bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoo
 	// do the actual visibiltiy check using a line between centers
 	Point src(ownerx, ownery), dest(thisx, thisy);
 	Line dummywall; unsigned int dummydir;
-	shared_ptr<Room> newroom = ownerroom;
+	std::shared_ptr<Room> newroom = ownerroom;
 	world.map->collideLineWithRoomSystem(src, dest, newroom, src, dummywall, dummydir, seeing->perm);
 	if (src != dest) return false;
 
@@ -57,7 +57,7 @@ bool agentIsVisible(Agent *seeing, Agent *dest) {
 	float ownerx = (seeing->x + (seeing->getWidth() / 2.0f));
 	float ownery = (seeing->y + (seeing->getHeight() / 2.0f));
 	MetaRoom *ownermeta = world.map->metaRoomAt(ownerx, ownery);
-	shared_ptr<Room> ownerroom = world.map->roomAt(ownerx, ownery);
+	std::shared_ptr<Room> ownerroom = world.map->roomAt(ownerx, ownery);
 	if (!ownermeta) return false; if (!ownerroom) return false;
 
 	return agentIsVisible(seeing, dest, ownerx, ownery, ownermeta, ownerroom);
@@ -69,7 +69,7 @@ std::vector<std::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char
 	float ownerx = (seeing->x + (seeing->getWidth() / 2.0f));
 	float ownery = (seeing->y + (seeing->getHeight() / 2.0f));
 	MetaRoom *ownermeta = world.map->metaRoomAt(ownerx, ownery);
-	shared_ptr<Room> ownerroom = world.map->roomAt(ownerx, ownery);
+	std::shared_ptr<Room> ownerroom = world.map->roomAt(ownerx, ownery);
 	if (!ownermeta) return agents; if (!ownerroom) return agents;
 
 	for (std::list<std::shared_ptr<Agent> >::iterator i
@@ -118,9 +118,9 @@ bool agentsTouching(Agent *first, Agent *second) {
 	return true;
 }
 
-shared_ptr<Room> roomContainingAgent(AgentRef agent) {
+std::shared_ptr<Room> roomContainingAgent(AgentRef agent) {
 	MetaRoom *m = world.map->metaRoomAt(agent->x, agent->y);
-	if (!m) return shared_ptr<Room>();
+	if (!m) return std::shared_ptr<Room>();
 	return m->roomAt(agent->x + (agent->getWidth() / 2.0f), agent->y + (agent->getHeight() / 2.0f));
 }
 

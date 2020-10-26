@@ -3,7 +3,7 @@
 #include "noncopyable.h"
 #include "stringutil.h"
 #include <ctype.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 struct CAOSParserState : noncopyable {
     CAOSParserState(const std::vector<caostoken>& tokens_, Dialect *dialect_) : tokens(tokens_), dialect(dialect_) {}

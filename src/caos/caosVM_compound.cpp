@@ -17,6 +17,7 @@
  *
  */
 
+#include "caos_assert.h"
 #include "Blackboard.h"
 #include "ButtonPart.h"
 #include "caosVM.h"
@@ -27,7 +28,6 @@
 #include "GraphPart.h"
 #include "TextPart.h"
 #include "TextEntryPart.h"
-#include "openc2e.h"
 #include "World.h"
 #include "Engine.h"
 

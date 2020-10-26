@@ -46,7 +46,7 @@ historyevent::historyevent(unsigned int eno, CreatureAgent *c) {
 	}
 }
 
-void monikerData::init(std::string m, shared_ptr<genomeFile> f) {
+void monikerData::init(std::string m, std::shared_ptr<genomeFile> f) {
 	moniker = m;
 	status = unreferenced;
 	warpveteran = false;
@@ -149,7 +149,7 @@ monikerstatus monikerData::getStatus() {
 
 }
 
-std::string historyManager::newMoniker(shared_ptr<genomeFile> genome) {
+std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 	unsigned int genus = 0;
 	
 	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
@@ -210,7 +210,7 @@ monikerData &historyManager::getMoniker(std::string s) {
 	return i->second;
 }
 
-std::string historyManager::findMoniker(shared_ptr<genomeFile> g) {
+std::string historyManager::findMoniker(std::shared_ptr<genomeFile> g) {
 	for (std::map<std::string, monikerData>::iterator i = monikers.begin(); i != monikers.end(); i++) {
 		if (i->second.genome.lock() == g) return i->first;
 	}
