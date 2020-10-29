@@ -37,9 +37,25 @@ MusicManager::~MusicManager() {
 }
 
 void MusicManager::playTrack(std::string track, unsigned int _how_long_before_changing_track_ms) {
+	if (track == last_track) {
+		return;
+	}
+	last_track = track;
+
 	if (track == "Silence") {
 		mng_music.playSilence();
 	} else {
+
+		if (engine.gametype == "cv") {
+			std::string filename = world.findFile("Sounds/" + track + ".mid");
+			if (!filename.size()) {
+				fmt::print("Couldn't find MID file '{}'!\n", track);
+				return;
+			}
+			engine.audio->setBackgroundMusic(filename);
+			return;
+		}
+
 		std::string filename, trackname;
 
 		std::string::size_type n = track.find("\\");
@@ -56,7 +72,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 		if (files.find(filename) == files.end()) {
 			std::string realfilename = world.findFile("Sounds/" + filename);
 			if (!realfilename.size()) {
-				std::cout << "Couldn't find MNG file '" << filename << "'!" << std::endl;
+				fmt::print("Couldn't find MNG file '{}'!\n", filename);
 				return; // TODO: exception?
 			}
 

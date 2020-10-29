@@ -29,7 +29,14 @@ SDLMixerBackend::SDLMixerBackend() {
 }
 
 void SDLMixerBackend::setBackgroundMusic(const std::string& filename) {
-	throw creaturesException("Setting background music from a filename is unimplemented\n");
+	Mix_Music* music = Mix_LoadMUS(filename.c_str());
+	if (!music) {
+		printf("Couldn't load %s: %s\n", filename.c_str(), Mix_GetError());
+		return;
+	}
+	stopBackgroundMusic();
+	Mix_PlayMusic(music, -1); // TODO: is looping forever correct?
+	bgm_music = music;
 }
 
 void SDLMixerBackend::setBackgroundMusic(AudioStream stream) {
@@ -39,9 +46,15 @@ void SDLMixerBackend::setBackgroundMusic(AudioStream stream) {
 }
 
 void SDLMixerBackend::stopBackgroundMusic() {
-	Mix_HookMusic(NULL, NULL);
-	Mix_HaltMusic();
-	bgm_stream = {};
+	if (bgm_music) {
+		Mix_HaltMusic();
+		Mix_FreeMusic(bgm_music);
+		bgm_music = nullptr;
+	}
+	if (bgm_stream) {
+		Mix_HookMusic(NULL, NULL);
+		bgm_stream = {};
+	}
 }
 
 void SDLMixerBackend::mixer_callback(void *userdata, uint8_t *buffer, int num_bytes) {	
@@ -74,6 +87,10 @@ void SDLMixerBackend::init() {
 
 	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
 		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
+
+	if (!Mix_Init(MIX_INIT_MID)) {
+		printf("* SDLMixer: failed to load MIDI support: %s\n", Mix_GetError());
+	}
 
 	Mix_AllocateChannels(50); // TODO
 }

@@ -80,6 +80,7 @@ protected:
 	bool muted;
 
 	AudioStream bgm_stream;
+	Mix_Music* bgm_music = nullptr;
 	std::vector<int16_t> bgm_render_buffer;
 	static void mixer_callback(void *userdata, uint8_t *buffer, int num_bytes);
 

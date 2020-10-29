@@ -37,6 +37,7 @@ public:
 private:
 	std::map<std::string, class MNGFile *> files;
 	MNGMusic mng_music;
+	std::string last_track;
 	unsigned int how_long_before_changing_track_ms = 0;
 };
 
