@@ -7,17 +7,11 @@
 #include "fileformats/charsetdta.h"
 #include "fileformats/s16Image.h"
 #include "fileformats/sprImage.h"
+#include "utils/ascii_tolower.h"
 
 namespace fs = ghc::filesystem;
 
 namespace ImageUtils {
-  
-static void ascii_to_lower(std::string &s) {
-    for (auto& c : s) {
-      if (c <= 'Z' && c >= 'A')
-          c = c - ('Z' - 'z');
-    }
-}
 
 MultiImage ReadImage(std::string path) {
   if (!fs::exists(path)) {
@@ -25,7 +19,7 @@ MultiImage ReadImage(std::string path) {
   }
   
   std::string ext = fs::path(path).extension();
-  ascii_to_lower(ext);
+  ext = ascii_tolower(ext);
   
   std::ifstream in(path, std::ios::binary);
   if (ext == ".spr") {
@@ -45,7 +39,7 @@ MultiImage ReadImage(std::string path) {
   }
   
   std::string filename = fs::path(path).filename();
-  ascii_to_lower(filename);
+  filename = ascii_tolower(filename);
   
   if (filename == "charset.dta" || filename == "eurocharset.dta") {
     return ReadCharsetDtaFile(in);

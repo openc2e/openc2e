@@ -11,7 +11,7 @@
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "spanstream.h"
-#include "util.h"
+#include "utils/readfile.h"
 #include "vectorstream.h"
 
 namespace fs = ghc::filesystem;

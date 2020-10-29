@@ -27,14 +27,6 @@
 #include "SDLBackend.h"
 #include "World.h"
 
-#if defined(SDL_VIDEO_DRIVER_X11)
-// Workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=5289
-#include "SDL_config.h"
-#undef SDL_VIDEO_DRIVER_DIRECTFB // pulls in directfb.h otherwise
-#include "SDL_syswm.h"
-#include <X11/Xlib.h>
-#endif
-
 SDLBackend *g_backend;
 
 // reasonable defaults

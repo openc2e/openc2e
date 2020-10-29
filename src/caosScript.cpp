@@ -28,7 +28,7 @@
 #include "parseException.h"
 #include "World.h"
 #include "dialect.h"
-#include "util.h"
+#include "utils/readfile.h"
 #include "Scriptorium.h"
 #include <cassert>
 #include <iostream>

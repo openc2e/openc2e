@@ -101,9 +101,9 @@ include_directories(BEFORE
 # Targets
 add_library(openc2e-common STATIC
 	src/encoding.cpp
-	src/mmapifstream.cpp
-	src/stringutil.cpp
-	src/util.cpp
+	src/mmapifstream.cpp	
+	src/utils/readfile.cpp
+	src/utils/string_in.cpp
 )
 target_link_libraries(openc2e-common PRIVATE utf8proc::utf8proc)
 
@@ -357,9 +357,8 @@ add_executable(translate_voice
 	src/Catalogue.cpp
 	${GEN}/cataloglexer.cpp
 	src/catalogparser.cpp
-	src/util.cpp
 )
-target_link_libraries(translate_voice openc2e-audiobackend fmt ghc_filesystem)
+target_link_libraries(translate_voice openc2e-common openc2e-audiobackend fmt ghc_filesystem)
 
 # tests
 enable_testing()

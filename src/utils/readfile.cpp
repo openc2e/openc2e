@@ -1,9 +1,9 @@
-#include "util.h"
+#include "readfile.h"
 
 #include <fstream>
 
 std::string readfile(const std::string &filename) {
-	std::ifstream in(filename);
+	std::ifstream in(filename, std::ios_base::binary);
 	return readfile(in);
 }
 

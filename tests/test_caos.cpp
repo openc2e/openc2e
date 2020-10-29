@@ -2,7 +2,7 @@
 #include "caosVM.h"
 #include "creaturesImage.h"
 #include "imageManager.h"
-#include "util.h"
+#include "utils/readfile.h"
 #include "World.h"
 
 #include <gtest/gtest.h>

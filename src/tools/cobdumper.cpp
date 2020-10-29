@@ -5,7 +5,7 @@
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
 #include "fileformats/pngImage.h"
-#include "stringutil.h"
+#include "utils/string_in.h"
 
 #include <fmt/format.h>
 #include <fstream>
