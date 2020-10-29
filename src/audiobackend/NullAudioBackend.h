@@ -56,13 +56,12 @@ public:
 	void setViewpointCenter(float, float) { }
 	void setMute(bool b) { muted = b; }
 	bool isMuted() const { return muted; }
-	std::shared_ptr<AudioSource> newSource() { return std::shared_ptr<AudioSource>(); }
+
 	std::shared_ptr<AudioSource> loadClip(const std::string &filename) {
 		if (filename.size() == 0) return std::shared_ptr<AudioSource>();
 		return std::shared_ptr<AudioSource>(new NullAudioSource());
 	}
-
-	std::shared_ptr<AudioSource> getBGMSource() {
-		return std::shared_ptr<AudioSource>();
-	}
+	void setBackgroundMusic(const std::string& filename) { }
+	void setBackgroundMusic(AudioStream stream) { }
+	void stopBackgroundMusic() { }
 };

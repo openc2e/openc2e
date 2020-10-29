@@ -29,16 +29,7 @@ MNGMusic::MNGMusic() = default;
 MNGMusic::~MNGMusic() = default;
 
 void MNGMusic::startPlayback(AudioBackend &audio) {
-	if (!stream) {
-		// we assume no-one else ever steals the BGM stream from
-		// under us, but what are we meant to do then anyway?
-		std::shared_ptr<AudioSource> src = audio.getBGMSource();
-		if (src) {
-			stream = std::shared_ptr<MNGStream>(new MNGStream(*this));
-			src->setStream(stream);
-			src->play();
-		}
-	}
+	audio.setBackgroundMusic(std::make_shared<MNGStream>(*this));
 }
 
 void MNGMusic::playSilence() {

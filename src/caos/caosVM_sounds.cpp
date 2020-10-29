@@ -410,18 +410,10 @@ void caosVM::c_DBG_SINE() {
 		if (targ->sound)
 			targ->sound->stop();
 	}
-	std::shared_ptr<AudioSource> src;
-	if (track == 2)
-		src = engine.audio->getBGMSource();
-	else
-		src = targ->sound = engine.audio->newSource();
-	if (!src)
-		throw creaturesException("Audio is unavailable");
-	src->setStream(AudioStream(new SineStream(rate, stereo, ampl)));
-	if (track != 2) {
-		src->setFollowingView(!track);
-	}
-	src->play();
+	// TODO: SDL_Mixer can't do multiple dynamic audio streams, and we already use
+	// one for MNG music...
+	// Maybe generate a wav file and set it looping?
+	throw creaturesException("DBG: SINE unimplemented");
 }
 
 /**
@@ -432,9 +424,7 @@ void caosVM::c_DBG_SINE() {
  Don't touch.
  */
 void caosVM::c_DBG_SBGM() {
-	std::shared_ptr<AudioSource> src = engine.audio->getBGMSource();
-	if (src)
-		src->stop();
+	engine.audio->stopBackgroundMusic();
 }
 
 

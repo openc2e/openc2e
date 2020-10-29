@@ -26,12 +26,27 @@
 #include <memory>
 
 SDLMixerBackend::SDLMixerBackend() {
-	bgm_source.reset(new SDLMixerSource);
+}
+
+void SDLMixerBackend::setBackgroundMusic(const std::string& filename) {
+	throw creaturesException("Setting background music from a filename is unimplemented\n");
+}
+
+void SDLMixerBackend::setBackgroundMusic(AudioStream stream) {
+	stopBackgroundMusic();
+	bgm_stream = stream;
+	Mix_HookMusic(SDLMixerBackend::mixer_callback, this);
+}
+
+void SDLMixerBackend::stopBackgroundMusic() {
+	Mix_HookMusic(NULL, NULL);
+	Mix_HaltMusic();
+	bgm_stream = {};
 }
 
 void SDLMixerBackend::mixer_callback(void *userdata, uint8_t *buffer, int num_bytes) {	
 	SDLMixerBackend *backend = (SDLMixerBackend*)userdata;
-	AudioStream stream = ((SDLMixerSource*)backend->bgm_source.get())->stream;
+	AudioStream& stream = backend->bgm_stream;
 	if (!stream) {
 		return;
 	}
@@ -60,8 +75,6 @@ void SDLMixerBackend::init() {
 	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
 		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
 
-	Mix_HookMusic(SDLMixerBackend::mixer_callback, this);
-
 	Mix_AllocateChannels(50); // TODO
 }
 
@@ -79,10 +92,6 @@ void SDLMixerBackend::setMute(bool m) {
 	Mix_Volume(-1, muted ? 0 : MIX_MAX_VOLUME);
 }
 
-std::shared_ptr<AudioSource> SDLMixerBackend::newSource() {
-	return std::shared_ptr<AudioSource>(new SDLMixerSource());
-}
-
 std::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filename) {
 	Mix_Chunk *buffer = Mix_LoadWAV(filename.c_str());
 	if (!buffer) return std::shared_ptr<AudioSource>();
@@ -91,10 +100,6 @@ std::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filena
 	source->clip = SDLMixerClip(new SDLMixerBuffer(buffer));
 
 	return std::shared_ptr<AudioSource>(source);
-}
-
-std::shared_ptr<AudioSource> SDLMixerBackend::getBGMSource() {
-	return bgm_source;
 }
 
 SDLMixerSource::SDLMixerSource() {

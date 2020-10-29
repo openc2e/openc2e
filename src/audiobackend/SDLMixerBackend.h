@@ -53,12 +53,10 @@ protected:
 	bool followview;
 	float x, y, z, volume;
 	SDLMixerClip clip;
-	AudioStream stream;
 	int channel;
 
 public:
 	~SDLMixerSource();
-	
 
 	SourceState getState() const;
 	void play();
@@ -75,20 +73,13 @@ public:
 	bool isMuted() const { return muted; }
 	void setFollowingView(bool);
 	bool isFollowingView() const { return followview; }
-
-	AudioStream getStream() const {
-		return stream;
-	}
-	void setStream(const AudioStream &stream_) {
-		stream = stream_;
-	}
 };
 
 class SDLMixerBackend : public AudioBackend {
 protected:
 	bool muted;
 
-	std::shared_ptr<AudioSource> bgm_source;
+	AudioStream bgm_stream;
 	std::vector<int16_t> bgm_render_buffer;
 	static void mixer_callback(void *userdata, uint8_t *buffer, int num_bytes);
 
@@ -100,8 +91,9 @@ public:
 	void setViewpointCenter(float, float);
 	void setMute(bool);
 	bool isMuted() const { return muted; }
-	std::shared_ptr<AudioSource> newSource();
-	std::shared_ptr<AudioSource> loadClip(const std::string &);
 
-	std::shared_ptr<AudioSource> getBGMSource();
+	std::shared_ptr<AudioSource> loadClip(const std::string &);
+	void setBackgroundMusic(const std::string& filename);
+	void setBackgroundMusic(AudioStream stream);
+	void stopBackgroundMusic();
 };

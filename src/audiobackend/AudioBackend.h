@@ -66,16 +66,6 @@ public:
 	virtual ~AudioSource() { }
 	virtual SourceState getState() const = 0;
 
-	// The effect of calling this function on a AudioSource initialized with loadClip
-	// is undefined
-	virtual AudioStream getStream() const = 0;
-	virtual void setStream(const AudioStream &) = 0;
-	// Convenience function for setting to a new AudioStream.
-	// Ownership passes to AudioSource (or rather, AudioStream's reference counting)
-	virtual void setStream(AudioStreamBase *p) {
-		setStream(AudioStream(p));
-	}
-
 	virtual void play() = 0; /* requires that clip not be a null ref */
 	virtual void stop() = 0;
 	virtual void fadeOut() = 0;
@@ -108,17 +98,11 @@ public:
 	virtual bool isMuted() const = 0;
 
 	/* TODO: global vol controls */
-	virtual std::shared_ptr<AudioSource> newSource() = 0;
-	/* Returns an AudioSource with a fixed position relative to the viewpoint.
-	 *
-	 * The effect of invoking setPos on this source is undefined.
-	 */
-	virtual std::shared_ptr<AudioSource> getBGMSource() = 0;
+	
 	virtual std::shared_ptr<AudioSource> loadClip(const std::string &filename) = 0;
-
-	virtual void begin() { }
-	virtual void commit() { }
-	virtual void poll() { }
+	virtual void setBackgroundMusic(const std::string& filename) = 0;
+	virtual void setBackgroundMusic(AudioStream stream) = 0;
+	virtual void stopBackgroundMusic() = 0;
 };
 
 #endif
