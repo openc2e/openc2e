@@ -24,10 +24,11 @@
 #include "creaturesImage.h"
 #include "keycodes.h"
 #include "Engine.h"
+#include "openc2eimgui/Openc2eImGui.h"
 #include "SDLBackend.h"
 #include "World.h"
-
-SDLBackend *g_backend;
+#include "PointerAgent.h"
+#include "Camera.h"
 
 // reasonable defaults
 constexpr int OPENC2E_DEFAULT_WIDTH = 800;
@@ -46,7 +47,7 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 	float oldscale = mainrendertarget.scale;
 	float newscale = mainrendertarget.drawablewidth / windowwidth * userscale;
 	if (abs(newscale) > 0.01 && abs(oldscale - newscale) > 0.01) {
-		printf("* SDL setting scale to %.2fx\n", newscale);	
+		printf("* SDL setting scale to %.2fx\n", newscale);
 		mainrendertarget.scale = newscale;
 		SDL_RenderSetScale(renderer, mainrendertarget.scale, mainrendertarget.scale);
 	}
@@ -78,7 +79,11 @@ void SDLBackend::init() {
 		throw creaturesException(std::string("SDL error creating window: ") + SDL_GetError());
 	}
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+	renderer = SDL_CreateRenderer(
+		window,
+		-1,
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC
+	);
 	if (!renderer) {
 		throw creaturesException(std::string("SDL error creating renderer: ") + SDL_GetError());
 	}
@@ -92,6 +97,8 @@ void SDLBackend::init() {
 
 	SDL_GetWindowSize(window, &windowwidth, &windowheight);
 	resizeNotify(windowwidth, windowheight);
+
+	Openc2eImGui::Init(window);
 
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
@@ -145,6 +152,10 @@ bool SDLBackend::pollEvent(BackendEvent &e) {
 retry:
 	if (!SDL_PollEvent(&event)) return false;
 
+	if (Openc2eImGui::ConsumeEvent(event)) {
+		goto retry;
+	}
+
 	switch (event.type) {
 		case SDL_WINDOWEVENT:
 			switch (event.window.event) {
@@ -161,7 +172,7 @@ retry:
 		case SDL_MOUSEMOTION:
 			e.type = eventmousemove;
 			e.x = event.motion.x / userscale;
-			e.y = event.motion.y / userscale;
+			e.y = event.motion.y / userscale - mainrendertarget.viewport_offset_top;
 			e.xrel = event.motion.xrel / userscale;
 			e.yrel = event.motion.yrel / userscale;
 			e.button = 0;
@@ -186,7 +197,7 @@ retry:
 				default: goto retry;
 			}
 			e.x = event.button.x / userscale;
-			e.y = event.button.y / userscale;
+			e.y = event.button.y / userscale - mainrendertarget.viewport_offset_top;
 			break;
 
 		case SDL_MOUSEWHEEL:
@@ -205,16 +216,16 @@ retry:
 			e.text = event.text.text;
 			break;
 
-        case SDL_KEYUP:
-            {
-                int key = translateScancode(event.key.keysym.scancode);
-                if (key != -1) {
-                    e.type = eventrawkeyup;
-                    e.key = key;
-                    return true;
-                }
-                goto retry;
-            }
+		case SDL_KEYUP:
+			{
+				int key = translateScancode(event.key.keysym.scancode);
+				if (key != -1) {
+					e.type = eventrawkeyup;
+					e.key = key;
+					return true;
+				}
+				goto retry;
+			}
 
 		case SDL_KEYDOWN:
 			{
@@ -245,7 +256,7 @@ void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int co
 	Uint8 a = (color >> 0)  & 0xff;
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_SetRenderDrawColor(parent->renderer, r, g, b, a);
-	SDL_RenderDrawLine(parent->renderer, x1, y1, x2, y2);
+	SDL_RenderDrawLine(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 
 Texture SDLBackend::createTexture(const Image& image) {
@@ -334,7 +345,7 @@ unsigned int SDLRenderTarget::getWidth() const {
 	return drawablewidth / scale;
 }
 unsigned int SDLRenderTarget::getHeight() const {
-	return drawableheight / scale;
+	return drawableheight / scale - viewport_offset_top - viewport_offset_bottom;
 }
 
 void SDLRenderTarget::renderCreaturesImage(const creaturesImage& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
@@ -352,7 +363,7 @@ void SDLRenderTarget::renderCreaturesImage(const creaturesImage& img, unsigned i
 
 	SDL_Rect destrect;
 	destrect.x = x;
-	destrect.y = y;
+	destrect.y = y + viewport_offset_top;
 	destrect.w = srcrect.w;
 	destrect.h = srcrect.h;
 
@@ -372,9 +383,8 @@ void SDLRenderTarget::renderClear() {
 }
 
 void SDLRenderTarget::renderDone() {
-	if (this == &parent->mainrendertarget) {
-		SDL_SetRenderTarget(parent->renderer, texture);
-		SDL_RenderPresent(parent->renderer);
+	if (this != &parent->mainrendertarget) {
+		return;
 	}
 }
 
@@ -382,7 +392,7 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget *s, int x, int y, int w, int
 	SDLRenderTarget *src = dynamic_cast<SDLRenderTarget *>(s);
 	assert(src);
 
-	SDL_Rect r; r.x = x; r.y = y; r.w = w; r.h = h;
+	SDL_Rect r; r.x = x; r.y = y + viewport_offset_top; r.w = w; r.h = h;
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_RenderCopy(parent->renderer, src->texture, nullptr, &r);
 }
@@ -523,9 +533,6 @@ void SDLBackend::delay(int msec) {
 
 int SDLBackend::run() {
 	resize(800, 600);
-	
-	// do a first-pass draw of the world. TODO: correct?
-	world.drawWorld();
 
 	const int OPENC2E_MAX_FPS = 60;
 
@@ -534,7 +541,29 @@ int SDLBackend::run() {
 		Uint32 frame_start = SDL_GetTicks();
 
 		engine.tick();
+
+		// TODO: calculate scale etc here instead of in resizeNotify
+		// TODO: we have to calculate renderer sizes when the backend is initialized,
+		// otherwise side panels get in weird locations. related to issue with panels
+		// when resizing in general?
+
+		Openc2eImGui::Update(window);
+		mainrendertarget.viewport_offset_top = Openc2eImGui::GetViewportOffsetTop();
+		mainrendertarget.viewport_offset_bottom = Openc2eImGui::GetViewportOffsetBottom();
+
 		world.drawWorld();
+
+		SDL_SetRenderTarget(renderer, nullptr);
+		Openc2eImGui::Render();
+
+		{
+			// TODO: hack to display the hand above ImGui windows
+			int adjustx = engine.camera->getX();
+			int adjusty = engine.camera->getY();
+			world.hand()->part(0)->render(getMainRenderTarget(), -adjustx, -adjusty);
+		}
+
+		SDL_RenderPresent(renderer);
 
 		bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
 		Uint32 desired_ticks_per_frame = focused ? 1000 / OPENC2E_MAX_FPS : world.ticktime;

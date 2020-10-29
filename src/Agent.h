@@ -268,6 +268,7 @@ public:
 
 	void playAudio(std::string filename, bool controlled, bool loop);
 
+	void setSlot(unsigned int s, std::shared_ptr<genomeFile> g) { genome_slots[s] = g; }
 	std::shared_ptr<genomeFile> getSlot(unsigned int s) { return genome_slots[s]; }
 };
 

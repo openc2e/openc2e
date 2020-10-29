@@ -101,7 +101,7 @@ include_directories(BEFORE
 # Targets
 add_library(openc2e-common STATIC
 	src/encoding.cpp
-	src/mmapifstream.cpp	
+	src/mmapifstream.cpp
 	src/utils/readfile.cpp
 	src/utils/string_in.cpp
 )
@@ -189,6 +189,8 @@ add_library(openc2e-core STATIC
 	src/AnimatablePart.cpp
 	src/ButtonPart.cpp
 	src/CameraPart.cpp
+	src/ChemicalNamesManager.cpp
+	src/CobManager.cpp
 	src/CompoundPart.cpp
 	src/DullPart.cpp
 	src/FixedTextPart.cpp
@@ -258,6 +260,16 @@ target_link_libraries(openc2e-audiobackend PUBLIC SDL2::Mixer)
 add_executable(openc2e
 	src/main.cpp
 	src/backends/SDLBackend.cpp
+	src/backends/openc2eimgui/AgentInjector.cpp
+	src/backends/openc2eimgui/BrainViewer.cpp
+	src/backends/openc2eimgui/C1ToolBar.cpp
+	src/backends/openc2eimgui/C2StatusBar.cpp
+	src/backends/openc2eimgui/C2ToolBar.cpp
+	src/backends/openc2eimgui/CreatureGrapher.cpp
+	src/backends/openc2eimgui/Hatchery.cpp
+	src/backends/openc2eimgui/ImGuiUtils.cpp
+	src/backends/openc2eimgui/MainMenu.cpp
+	src/backends/openc2eimgui/Openc2eImGui.cpp
 )
 target_link_libraries(openc2e
 	openc2e-core
