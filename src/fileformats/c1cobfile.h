@@ -23,4 +23,5 @@ struct c1cobfile {
     Image picture;
 };
 
+c1cobfile read_c1cobfile(const std::string &path);
 c1cobfile read_c1cobfile(std::istream &in);
