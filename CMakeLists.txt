@@ -130,6 +130,8 @@ add_library(openc2e-fileformats STATIC
 	${GEN}/fileformats/PraySourceParser.cpp
 	src/fileformats/s16Image.cpp
 	src/fileformats/sprImage.cpp
+	src/fileformats/strFile.cpp
+	src/fileformats/verticalbarFile.cpp
 	src/fileformats/ImageUtils.cpp
 )
 target_link_libraries(openc2e-fileformats
