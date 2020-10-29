@@ -1,4 +1,5 @@
 #include "fileformats/caostoken.h"
+#include "creaturesException.h"
 
 static char char_unescape(char c) {
 	switch (c) {
@@ -48,7 +49,12 @@ std::vector<unsigned char> caostoken::bytestr() const {
 
 int caostoken::intval() const {
     if (type == TOK_INT) {
-        return std::stoi(value);
+        try {
+          return std::stoi(value);
+        } catch (std::out_of_range&) {
+          // Creatures Village has some 2147483700 literals, which don't fit in int32_t
+          throw creaturesException("Integer literal " + value + " is out of range");
+        }
     } else if (type == TOK_CHAR) {
         return value[1];
     } else if (type == TOK_BINARY) {
