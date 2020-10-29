@@ -550,13 +550,17 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(Mix_MusicType music_type, SDL_RWops *src,
     start = SDL_RWtell(src);
     for (i = 0; i < get_num_music_interfaces(); ++i) {
         interface = get_music_interface(i);
+        printf("interface %i %i\n", i, interface->api);
         if (!interface->opened) {
+          printf("not opened\n");
             continue;
         }
         if (interface->type != music_type) {
+          printf("type doesn't match %i %i\n", interface->type, music_type);
             continue;
         }
         if (!interface->CreateFromRW || !interface->GetAudio) {
+          printf("no functions\n");
             continue;
         }
 
@@ -564,10 +568,12 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(Mix_MusicType music_type, SDL_RWops *src,
         if (interface->api == MIX_MUSIC_CMD ||
              interface->api == MIX_MUSIC_MIKMOD ||
              interface->api == MIX_MUSIC_NATIVEMIDI) {
+              printf("not safe\n");
             continue;
         }
 
         music = interface->CreateFromRW(src, freesrc);
+        printf("music %p\n", music);
         if (music) {
             /* The interface owns the data source now */
             freesrc = SDL_FALSE;
@@ -721,6 +727,7 @@ Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
         loaded = Mix_LoadVOC_RW(src, freesrc, &wavespec, (Uint8 **)&chunk->abuf, &chunk->alen);
     } else {
         Mix_MusicType music_type = detect_music_type_from_magic(magic);
+        printf("music type %i\n", music_type);
         loaded = Mix_LoadMusic_RW(music_type, src, freesrc, &wavespec, (Uint8 **)&chunk->abuf, &chunk->alen);
     }
     if (!loaded) {
