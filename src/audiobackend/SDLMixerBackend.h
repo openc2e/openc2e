@@ -17,10 +17,9 @@
  *
  */
 
-#ifndef _SDLMIXERBACKEND_H
-#define _SDLMIXERBACKEND_H
+#pragma once
 
-#include "audiobackend/SkeletonAudioBackend.h"
+#include "audiobackend/AudioBackend.h"
 #include <memory>
 #include <vector>
 
@@ -43,34 +42,44 @@ public:
 
 typedef std::unique_ptr<SDLMixerBuffer> SDLMixerClip;
 
-class SDLMixerSource : public SkeletonAudioSource {
+class SDLMixerSource : public AudioSource {
 protected:
 	SDLMixerSource();
 	
 	friend class SDLMixerBackend;
 	
+	bool looping;
+	bool muted;
+	bool followview;
+	float x, y, z, volume;
 	SDLMixerClip clip;
 	AudioStream stream;
 	int channel;
 
 public:
 	~SDLMixerSource();
+	
 
-	virtual SourceState getState() const;
-	virtual void play();
-	virtual void stop();
-	virtual void fadeOut();
-	virtual void setPos(float x, float y, float plane);
-	virtual bool isLooping() const;
-	virtual void setLooping(bool);
-	virtual void setVolume(float v);
-	virtual void setMute(bool);
-	virtual void setFollowingView(bool);
+	SourceState getState() const;
+	void play();
+	void stop();
+	void fadeOut();
+	void setPos(float x, float y, float plane);
+	void getPos(float &x, float &y, float &plane) const;
+	void setVelocity(float, float) { }
+	bool isLooping() const;
+	void setLooping(bool);
+	void setVolume(float v);
+	float getVolume() const { return volume; }
+	void setMute(bool);
+	bool isMuted() const { return muted; }
+	void setFollowingView(bool);
+	bool isFollowingView() const { return followview; }
 
-	virtual AudioStream getStream() const {
+	AudioStream getStream() const {
 		return stream;
 	}
-	virtual void setStream(const AudioStream &stream_) {
+	void setStream(const AudioStream &stream_) {
 		stream = stream_;
 	}
 };
@@ -96,7 +105,3 @@ public:
 
 	std::shared_ptr<AudioSource> getBGMSource();
 };
-
-#endif
-
-/* vim: set noet: */

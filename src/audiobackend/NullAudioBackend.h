@@ -17,14 +17,33 @@
  *
  */
 
-#ifndef _NULLAUDIOBACKEND_H
-#define _NULLAUDIOBACKEND_H
+#pragma once
 
 #include "audiobackend/AudioBackend.h"
-#include "audiobackend/SkeletonAudioBackend.h"
 #include <memory>
 
-class NullAudioSource : public SkeletonAudioSource {};
+class NullAudioSource : public AudioSource {
+	SourceState getState() const {
+		return SS_STOP;
+	}
+	void play() { }
+	void stop() { }
+	void pause() { }
+	void fadeOut() { }
+	void setPos(float, float, float) { }
+	void getPos(float&, float&, float&) const { }
+	void setVelocity(float, float) { }
+	bool isLooping() const { return false; }
+	void setLooping(bool) { }
+	void setVolume(float) { }
+	float getVolume() const { return 0; }
+	bool isMuted() const { return true; }
+	void setMute(bool) { }
+	bool isFollowingView() const { return false; }
+	void setFollowingView(bool) { }
+	void setStream(const AudioStream&) { }
+	AudioStream getStream() const { return {}; }
+};
 
 class NullAudioBackend : public AudioBackend {
 protected:
@@ -47,6 +66,3 @@ public:
 		return std::shared_ptr<AudioSource>();
 	}
 };
- 
-#endif
-

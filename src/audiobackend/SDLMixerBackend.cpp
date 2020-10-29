@@ -98,6 +98,10 @@ std::shared_ptr<AudioSource> SDLMixerBackend::getBGMSource() {
 }
 
 SDLMixerSource::SDLMixerSource() {
+	looping = false;
+	muted = false;
+	volume = 1.0f;
+	followview = false;
 	channel = -1;
 }
 
@@ -138,18 +142,29 @@ void SDLMixerSource::fadeOut() {
 	Mix_FadeOutChannel(channel, 500); // TODO: is 500 a good value?
 }
 
-void SDLMixerSource::setPos(float x, float y, float plane) {
-	this->SkeletonAudioSource::setPos(x, y, plane);
+void SDLMixerSource::setPos(float x_, float y_, float z_) {
+	x = x_;
+	y = y_;
+	z = z_;
 	// TODO
 	// Mix_SetPanning(soundchannel, left, right);
 }
 
+void SDLMixerSource::getPos(float &x_, float &y_, float &z_) const {
+	x_ = x;
+	y_ = y;
+	z_ = z;
+	// TODO
+	// Mix_GetPanning(soundchannel, left, right); ?
+}
+
+
 bool SDLMixerSource::isLooping() const {
-	return this->SkeletonAudioSource::isLooping();
+	return looping;
 }
 
 void SDLMixerSource::setLooping(bool l) {
-	this->SkeletonAudioSource::setLooping(l);
+	looping = l;
 	// handled in play()
 }
 

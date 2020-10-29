@@ -78,7 +78,6 @@ public:
 
 	virtual void play() = 0; /* requires that clip not be a null ref */
 	virtual void stop() = 0;
-	virtual void pause() = 0;
 	virtual void fadeOut() = 0;
 	virtual void setPos(float x, float y, float plane) = 0;
 	virtual void getPos(float &x, float &y, float &plane) const = 0;
