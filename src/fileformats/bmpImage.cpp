@@ -23,12 +23,17 @@
 #include "creaturesException.h"
 #include "Engine.h"
 #include "Backend.h"
+#include <fstream>
 #include <memory>
 
 #define BI_RGB 0
 #define BI_RLE8 1
 #define BI_BITFIELDS 3
 
+Image ReadBmpFile(const std::string &path) {
+	std::ifstream in(path, std::ios_base::binary);
+	return ReadBmpFile(in);
+}
 
 Image ReadBmpFile(std::istream &in) {
 	char magic[2];
