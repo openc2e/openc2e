@@ -339,7 +339,7 @@ void caosVM::c_VOIS() {
 void caosVM::c_MIDI() {
 	VM_PARAM_STRING(midifile)
 
-	// TODO
+	musicmanager.playTrack(midifile, 0);
 }
 
 /**

@@ -46,13 +46,17 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 		mng_music.playSilence();
 	} else {
 
-		if (engine.gametype == "cv") {
+		// TODO: this needs to be smarter, based on the gametype, use of the CAOS command
+		// "MIDI", and engine_usemidimusicsystem. C2E has three channels that can be
+		// controlled separately: sound effects (0), MIDI (1), and generated music (2)
+		if (engine.gametype == "cv" || engine.gametype == "sm") {
 			std::string filename = world.findFile("Sounds/" + track + ".mid");
 			if (!filename.size()) {
-				fmt::print("Couldn't find MID file '{}'!\n", track);
+				fmt::print("Couldn't find MIDI file '{}'!\n", track);
 				return;
 			}
 			engine.audio->setBackgroundMusic(filename);
+			how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
 			return;
 		}
 
