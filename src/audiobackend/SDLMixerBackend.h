@@ -77,7 +77,7 @@ public:
 
 class SDLMixerBackend : public AudioBackend {
 protected:
-	bool muted;
+	bool muted = false;
 
 	AudioStream bgm_stream;
 	Mix_Music* bgm_music = nullptr;
