@@ -35,7 +35,7 @@
 #include <memory>
 #include <algorithm>
 #include <cstring>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 using std::string;
 

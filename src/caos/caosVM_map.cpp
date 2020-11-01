@@ -28,10 +28,8 @@
 #include "Agent.h"
 
 #include <assert.h>
-#include <iostream>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <memory>
-using std::cerr;
 
 #define CAOS_LVALUE_TARG_ROOM(name, check, get, set) \
 	CAOS_LVALUE_TARG(name, \
@@ -571,7 +569,7 @@ void caosVM::v_GRID() {
 	std::shared_ptr<Room> ourRoom = world.map->roomAt(src.x, src.y);
 	if (!ourRoom) {
 		// (should we REALLY check for it being in the room system, here?)
-		cerr << agent->identify() << " tried using GRID but isn't in the room system!\n";
+		fmt::print(stderr, "{} tried using GRID but isn't in the room system!\n", agent->identify());
 		result.setInt(-1);
 		return;
 	}
@@ -656,7 +654,7 @@ void caosVM::v_RLOC() {
 	std::shared_ptr<Room> r = world.map->getRoom(roomid);
 	caos_assert(r);
 
-	result.setString(fmt::sprintf("%d %d %d %d %d %d", r->x_left, r->x_right, r->y_left_ceiling, r->y_right_ceiling, r->y_left_floor, r->y_right_floor));
+	result.setString(fmt::format("{} {} {} {} {} {}", r->x_left, r->x_right, r->y_left_ceiling, r->y_right_ceiling, r->y_left_floor, r->y_right_floor));
 }
 
 /**
@@ -671,7 +669,7 @@ void caosVM::v_MLOC() {
 	MetaRoom *r = world.map->getMetaRoom(metaroomid);
 	caos_assert(r);
 
-	result.setString(fmt::sprintf("%d %d %d %d", r->x(), r->y(), r->width(), r->height()));
+	result.setString(fmt::format("{} {} {} {}", r->x(), r->y(), r->width(), r->height()));
 }
 
 /**
@@ -712,7 +710,7 @@ void caosVM::v_ERID() {
 		MetaRoom *r = world.map->getMetaRoom(metaroom_id);
 		for (std::vector<std::shared_ptr<Room> >::iterator i = r->rooms.begin(); i != r->rooms.end(); i++) {
 			if (out.size() > 0) out = out + " ";
-			out = out + fmt::sprintf("%d", (*i)->id);
+			out = out + fmt::format("{}", (*i)->id);
 		}
 	}
 

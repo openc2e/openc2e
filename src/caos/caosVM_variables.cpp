@@ -30,7 +30,7 @@
 
 #include <cctype> // toupper/tolower
 #include <algorithm> // transform
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 #include "Vehicle.h"
 #include "PointerAgent.h"
@@ -621,10 +621,10 @@ void caosVM::v_VTOS() {
 	VM_PARAM_DECIMAL(value)
 
 	if (value.hasInt()) {
-		result.setString(fmt::sprintf("%i", value.getInt()));
+		result.setString(std::to_string(value.getInt()));
 	} else {
 		// TODO: this format isn't right (see OUTS also)
-		result.setString(fmt::sprintf("%f", value.getFloat()));
+		result.setString(fmt::format("{:0.06f}", value.getFloat()));
 	}
 }
 

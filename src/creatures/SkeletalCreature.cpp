@@ -42,7 +42,7 @@
 #include <cassert>
 #include <memory>
 #include <typeinfo> // TODO: remove when genome system is fixed
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 struct bodypartinfo {
 	char letter;
@@ -223,7 +223,7 @@ void SkeletalCreature::skeletonInit() {
 			tryfemale = false;
 		}
 		if (!images[i])
-			throw creaturesException(fmt::sprintf("SkeletalCreature couldn't find an image for part %c of species %d, variant %d, stage %d", x, (int)partspecies, (int)partvariant, (int)creature->getStage()));
+			throw creaturesException(fmt::format("SkeletalCreature couldn't find an image for part {:c} of species {}, variant {}, stage {}", x, (int)partspecies, (int)partvariant, (int)creature->getStage()));
 
 		// find relevant ATT data
 		std::string attfilename;
@@ -237,12 +237,12 @@ void SkeletalCreature::skeletonInit() {
 			var--;
 		}
 		if (attfilename.empty())
-			throw creaturesException(fmt::sprintf("SkeletalCreature couldn't find body data for part %c of species %d, variant %d, stage %d", x, (int)partspecies, (int)partvariant, creature->getStage()));
+			throw creaturesException(fmt::format("SkeletalCreature couldn't find body data for part {:c} of species {}, variant {}, stage {}", x, (int)partspecies, (int)partvariant, creature->getStage()));
 
 		// load ATT file
 		std::ifstream in(attfilename.c_str());
 		if (in.fail())
-			throw creaturesException(fmt::sprintf("SkeletalCreature couldn't load body data for part %c of species %d, variant %d, stage %d (tried file %s)", x, (int)partspecies, (int)partvariant, creature->getStage(), attfilename));
+			throw creaturesException(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attfilename));
 		in >> att[i];
 		
 		images[i] = tintBodySprite(images[i]);

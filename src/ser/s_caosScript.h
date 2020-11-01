@@ -65,7 +65,7 @@ POST_LOAD(script) {
 	const Dialect *d = obj.dialect = dialects[name].get();
 	if (!d) {
 		throw creaturesException(
-			fmt::sprintf("Deserialization error: Unknown dialect '%s'", name)
+			fmt::format("Deserialization error: Unknown dialect '{}'", name)
 		);
 	}
 
@@ -75,7 +75,7 @@ POST_LOAD(script) {
 			const cmdinfo *ci = d->find_command(cmdname.c_str());
 			if (!ci) {
 				throw creaturesException(
-						fmt::sprintf("Deserialization error: Unknown key '%s' in dialect '%s'", cmdname, name));
+						fmt::format("Deserialization error: Unknown key '{}' in dialect '{}'", cmdname, name));
 			}
 			obj.ops[i].argument = d->cmd_index(ci);
 		}

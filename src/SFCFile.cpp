@@ -40,7 +40,7 @@
 #include "CallButton.h"
 
 #include <cassert>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <iostream>
 #include <limits.h>
 #include <memory>
@@ -66,7 +66,7 @@
 #define TYPE_MACRO 14
 #define TYPE_OBJECT 100
 
-#define sfccheck(x) if (!(x)) throw creaturesException(std::string("failure while reading SFC file: '" #x "' in " __FILE__ " at line ") + fmt::sprintf("%d", __LINE__));
+#define sfccheck(x) if (!(x)) throw creaturesException(std::string("failure while reading SFC file: '" #x "' in " __FILE__ " at line ") + std::to_string(__LINE__));
 
 SFCFile::~SFCFile() {
 	// This contains all the objects we've constructed, so we can just zap this and
@@ -289,7 +289,7 @@ void SFCFile::setVersion(unsigned int v) {
 	} else if (v == 1) {
 		sfccheck(engine.gametype == "c2");
 	} else {
-		throw creaturesException(fmt::sprintf("unknown version# %d", v));
+		throw creaturesException(fmt::format("unknown version# {}", v));
 	}
 
 	ver = v;
@@ -1200,7 +1200,7 @@ void SFCScenery::copyToWorld() {
 }
 
 void SFCScript::install() {
-	std::string scriptinfo = fmt::sprintf("<SFC script %d, %d, %d: %d>", (int)family, (int)genus, species, eventno);
+	std::string scriptinfo = fmt::format("<SFC script {}, {}, {}: {}>", (int)family, (int)genus, species, eventno);
 	caosScript script(engine.gametype, scriptinfo);
 	try {
 		script.parse(data);

@@ -26,7 +26,7 @@
 #include "Engine.h" // version
 
 #include <cassert>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <memory>
 
 historyevent::historyevent(unsigned int eno, CreatureAgent *c) {
@@ -165,15 +165,17 @@ std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 
 	if (engine.version > 2) {
 		const std::vector<std::string> *extensions = 0;
-		std::string tagname = fmt::sprintf("Moniker Friendly Names %i", genus);
+		std::string tagname = fmt::format("Moniker Friendly Names {}", (int)genus);
 	
 		if (catalogue.hasTag(tagname)) {
 			extensions = &catalogue.getTag(tagname);
 		} else if (catalogue.hasTag("Moniker Friendly Names")) {
 			extensions = &catalogue.getTag("Moniker Friendly Names");
 		} else {
-			std::cout << "Warning: No \"Moniker Friendly Names\" in catalogue for genus " << genus <<
-				", defaulting to 'xxxx' for a moniker friendly name." << std::endl;
+			fmt::print(
+				"Warning: No \"Moniker Friendly Names\" in catalogue for genus {}, defaulting to 'xxxx' for a moniker friendly name.\n",
+				genus
+			);
 		}
 
 		if (extensions) {

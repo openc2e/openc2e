@@ -26,8 +26,7 @@
 #include "World.h"
 #include "creaturesImage.h"
 #include <cassert>
-#include <iostream>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <memory>
 #include "AgentHelpers.h"
 #include "AnimatablePart.h"
@@ -1789,7 +1788,7 @@ void caosVM::c_BHVR_c2() {
 		default:
 			// C2, at least, seems to produce random garbage (going off the end of a
 			// lookup table?) in this situation .. let's not
-			throw creaturesException(fmt::sprintf("silly BHVR click value: %d", click));
+			throw creaturesException(fmt::format("silly BHVR click value: {}", click));
 	}
 
 	// TODO

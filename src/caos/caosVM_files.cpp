@@ -24,7 +24,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
@@ -95,7 +95,7 @@ void caosVM::c_FILE_GLOB() {
 
 	std::vector<std::string> possiblefiles = world.findFiles(dirportion, specportion);
 
-	std::string str = fmt::sprintf("%d\n", possiblefiles.size());
+	std::string str = fmt::format("{}\n", possiblefiles.size());
 	for (std::vector<std::string>::iterator i = possiblefiles.begin(); i != possiblefiles.end(); i++) {
 		str += *i + "\n";
 	}
@@ -203,7 +203,7 @@ void caosVM::c_FILE_OOPE() {
 
 	if (outputstream->fail()) {
 		outputstream = 0;
-		throw caosException(fmt::sprintf("FILE OOPE failed to open %s", fullfilename));
+		throw caosException(fmt::format("FILE OOPE failed to open {}", fullfilename));
 	}
 }
 

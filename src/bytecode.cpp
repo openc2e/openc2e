@@ -19,7 +19,7 @@
 #include "bytecode.h"
 #include "dialect.h"
 #include "cmddata.h"
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 const char *cnams[] = {
 	NULL,
@@ -35,50 +35,50 @@ const char *cnams[] = {
 static std::string try_lookup(const Dialect *d, int idx) {
 	if (d)
 		return std::string(d->getcmd(idx)->fullname);
-	return fmt::sprintf("%d", idx);
+	return std::to_string(idx);
 }
 
 std::string dumpOp(const Dialect *d, caosOp op) {
 	int arg = op.argument; // weird C++ issues
 	switch (op.opcode) {
 		case CAOS_NOP:
-			return std::string("NOP");
+			return "NOP";
 		case CAOS_DIE:
-			return fmt::sprintf("DIE %d", arg);
+			return fmt::format("DIE {}", arg);
 		case CAOS_STOP:
-			return std::string("STOP");
+			return "STOP";
 		case CAOS_CMD:
-			return fmt::sprintf("CMD %s", try_lookup(d, arg));
+			return fmt::format("CMD {}", try_lookup(d, arg));
 		case CAOS_COND:
-			return fmt::sprintf("COND %s %s", (arg & CAND ? "AND" : "OR"), cnams[arg & CMASK]);
+			return fmt::format("COND {} {}", (arg & CAND ? "AND" : "OR"), cnams[arg & CMASK]);
 		case CAOS_CONST:
-			return fmt::sprintf("CONST %d", arg);
+			return fmt::format("CONST {}", arg);
 		case CAOS_CONSTINT:
-			return fmt::sprintf("CONSTINT %d", arg);
+			return fmt::format("CONSTINT {}", arg);
 		case CAOS_BYTESTR:
-			return fmt::sprintf("BYTESTR %d", arg);
+			return fmt::format("BYTESTR {}", arg);
 		case CAOS_PUSH_AUX:
-			return fmt::sprintf("PUSH AUX %d", arg);
+			return fmt::format("PUSH AUX {}", arg);
 		case CAOS_RESTORE_AUX:
-			return fmt::sprintf("RESTORE AUX %d", arg);
+			return fmt::format("RESTORE AUX {}", arg);
 		case CAOS_SAVE_CMD:
-			return fmt::sprintf("CMD SAVE %s", try_lookup(d, arg));
+			return fmt::format("CMD SAVE {}", try_lookup(d, arg));
 		case CAOS_YIELD:
-			return fmt::sprintf("YIELD %d", arg);
+			return fmt::format("YIELD {}", arg);
 		case CAOS_STACK_ROT:
-			return fmt::sprintf("STACK ROT %d", arg);
+			return fmt::format("STACK ROT {}", arg);
 
 		case CAOS_CJMP:
-			return fmt::sprintf("CJMP %08d", arg);
+			return fmt::format("CJMP {:08d}", arg);
 		case CAOS_JMP:
-			return fmt::sprintf("JMP %08d", arg);
+			return fmt::format("JMP {:08d}", arg);
 		case CAOS_DECJNZ:
-			return fmt::sprintf("DECJNZ %08d", arg);
+			return fmt::format("DECJNZ {:08d}", arg);
 		case CAOS_GSUB:
-			return fmt::sprintf("GSUB %08d", arg);
+			return fmt::format("GSUB {:08d}", arg);
 		case CAOS_ENUMPOP:
-			return fmt::sprintf("ENUMPOP %08d", arg);
+			return fmt::format("ENUMPOP {:08d}", arg);
 		default:
-			return fmt::sprintf("UNKNOWN %02x %06x", arg);
+			return fmt::format("UNKNOWN {:02x} {:06x}", arg);
 	}
 }

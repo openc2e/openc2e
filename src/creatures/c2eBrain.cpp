@@ -21,7 +21,7 @@
 #include "c2eCreature.h"
 #include <cassert>
 #include <math.h>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 float dummyValues[8] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -182,8 +182,8 @@ std::string c2eTract::dump() {
 	std::string srclobename = std::string((char *)g->srclobe, 4);
 	std::string destlobename = std::string((char *)g->destlobe, 4);
 
-	std::string data = fmt::sprintf(
-		"tract %s->%s, src neurons %d-%d #cons %d, dest neurons %d-%d #cons %d",
+	std::string data = fmt::format(
+		"tract {}->{}, src neurons {}-{} #cons {}, dest neurons {}-{} #cons {}",
 		srclobename, destlobename, (int)g->srclobe_lowerbound,
 		(int)g->srclobe_upperbound, (int)g->src_noconnections,
 		(int)g->destlobe_lowerbound, (int)g->destlobe_upperbound,

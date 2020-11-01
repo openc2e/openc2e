@@ -44,7 +44,7 @@
 #include "Scriptorium.h"
 #include "SpritePart.h"
 
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
@@ -713,10 +713,10 @@ std::string World::generateMoniker(std::string basename) {
 	if (engine.version < 3) {
 		/* old-style monikers are four characters in a format like 9GVC */
 		unsigned int n = 1 + (unsigned int)(9.0 * (rand() / (RAND_MAX + 1.0)));
-		std::string moniker = fmt::sprintf("%d", n);
+		std::string moniker = std::to_string(n);
 		for (unsigned int i = 0; i < 3; i++) {
 			unsigned int n = (unsigned int)(26.0 * (rand() / (RAND_MAX + 1.0)));
-			moniker += fmt::sprintf("%c", (char)('A' + n));
+			moniker += fmt::format("{:c}", (char)('A' + n));
 		}
 		return moniker;
 	}
@@ -730,7 +730,7 @@ std::string World::generateMoniker(std::string basename) {
 	std::string x = basename;
 	for (unsigned int i = 0; i < 4; i++) {
 		unsigned int n = (unsigned int) (0xfffff * (rand() / (RAND_MAX + 1.0)));
-		x = x + "-" + fmt::sprintf("%05x", n);
+		x = x + "-" + fmt::format("{:05x}", n);
 	}
 	
 	return x;
@@ -792,11 +792,11 @@ int World::findCategory(unsigned char family, unsigned char genus, unsigned shor
 	const std::vector<std::string> &t = catalogue.getTag("Agent Classifiers");
 
 	for (unsigned int i = 0; i < t.size(); i++) {
-		std::string buffer = fmt::sprintf("%d %d %d", (int)family, (int)genus, (int)species);
+		std::string buffer = fmt::format("{} {} {}", (int)family, (int)genus, (int)species);
 		if (t[i] == buffer) return i;
-		buffer = fmt::sprintf("%d %d 0", (int)family, (int)genus);
+		buffer = fmt::format("{} {} 0", (int)family, (int)genus);
 		if (t[i] == buffer) return i;
-		buffer = fmt::sprintf("%d 0 0", (int)family);
+		buffer = fmt::format("{} 0 0", (int)family);
 		if (t[i] == buffer) return i;
 		// leave it here: 0 0 0 would be silly to have in Agent Classifiers.
 	}

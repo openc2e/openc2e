@@ -21,7 +21,7 @@
 #include "endianlove.h"
 #include "Catalogue.h"
 #include <cassert>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 #define NUM_VOICE_FILES 32
 
@@ -66,7 +66,7 @@ VoiceData::VoiceData(std::string tagname) {
 		lookup_table.push_back(data);
 	}
 	if (lookup_table.size() != 3 * 27) throw creaturesException(
-		fmt::sprintf("invalid lookup table size %d reading language tag '%s'",
+		fmt::format("invalid lookup table size {} reading language tag '{}'",
 		        lookup_table.size(), languagetag));
 
 	// the remaining entries are pairs of (name, delay)
@@ -78,7 +78,7 @@ VoiceData::VoiceData(std::string tagname) {
 	}
 
 	if (voices.size() != 32) throw creaturesException(
-		fmt::sprintf("invalid voice table size %d reading voice tag '%s'",
+		fmt::format("invalid voice table size {} reading voice tag '{}'",
 		        voices.size(), tagname));
 }
 

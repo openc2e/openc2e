@@ -26,7 +26,7 @@
 
 #include "catalogparser.h"
 #include <ghc/filesystem.hpp>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <iostream>
 
 #include <cctype>

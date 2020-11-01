@@ -25,11 +25,9 @@
 #include "Engine.h" // version
 #include "Camera.h" // FLTX/FLTY
 #include "Map.h"
-#include <iostream>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <climits>
 #include <memory>
-using std::cerr;
 
 #ifndef M_PI
 # define M_PI           3.14159265358979323846  /* pi */
@@ -467,7 +465,7 @@ void caosVM::c_MVSF() {
 	valid_agent(targ);
 
 	if (!targ->tryMoveToPlaceAround(x, y))
-		throw creaturesException(fmt::sprintf("MVSF failed to find a safe place around (%f, %f)", x, y));
+		throw creaturesException(fmt::format("MVSF failed to find a safe place around ({}, {})", x, y));
 }
 
 /**

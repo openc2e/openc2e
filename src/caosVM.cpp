@@ -23,15 +23,10 @@
 #include "bytecode.h"
 #include "caosScript.h"
 #include <cassert>
-#include <iostream>
 #include <climits>
 #include <memory>
 
-#include <fmt/printf.h>
-
-using std::cout;
-using std::cerr;
-using std::endl;
+#include <fmt/core.h>
 
 #ifdef __GNUG__
 #include <cxxabi.h>
@@ -51,15 +46,15 @@ std::string demangle(const char* name) {
 #endif
 
 void dumpStack(caosVM *vm) {
-	std::cerr << "\tvalueStack: ";
+  fmt::print(stderr, "\tvalueStack: ");
 	int i, c = 0;
 	for (i = vm->valueStack.size() - 1; i >= 0 && c++ < 5; i--)
-		std::cerr << vm->valueStack[i].dump() << " | ";
+    fmt::print(stderr, "{} | ", vm->valueStack[i].dump());
 	if (i >= 0)
-		std::cerr << "...";
+    fmt::print(stderr, "...");
 	else
-		std::cerr << "END";
-	std::cerr << std::endl;
+    fmt::print(stderr, "END");
+  fmt::print(stderr, "\n");
 }
 
 caosVM::caosVM(const AgentRef &o)
@@ -100,14 +95,14 @@ void caosVM::startBlocking(blockCond *whileWhat) {
 }
 
 inline void caosVM::safeJMP(int dest) {
-//	std::cerr << "jmp from " << cip << " to " << dest << "(old nip = " << nip << ") in script of length " << currentscript->scriptLength() << std::endl;
+//	fmt::print(stderr, "jmp from {} to {} (old nip = {}) in script of length {}\n", cip, dest, nip, currentscript->scriptLength());
 	if (dest < 0) {
-		std::cerr << currentscript->dump();
-		throw caosException(fmt::sprintf("Internal error: Unrelocated jump at %08x", cip));
+		fmt::print(stderr, "{}", currentscript->dump());
+		throw caosException(fmt::format("Internal error: Unrelocated jump at {:08x}", cip));
 	}
 	if (dest >= currentscript->scriptLength()) {
-		std::cerr << currentscript->dump();
-		throw creaturesException(fmt::sprintf("Internal error: Jump out of bounds at %08x", cip));
+		fmt::print(stderr, "{}", currentscript->dump());
+		throw creaturesException(fmt::format("Internal error: Jump out of bounds at {:08x}", cip));
 	}
 	nip = dest;
 }
@@ -132,8 +127,8 @@ inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
 	if (stackdelta < INT_MAX - 1) {
 		if ((int)stackstart + stackdelta != (int)valueStack.size()) {
 			dumpStack(this);
-			throw caosException(fmt::sprintf(
-				"Internal error: Stack imbalance detected: expected to be %d after start of %d, but stack size is now %d",
+			throw caosException(fmt::format(
+				"Internal error: Stack imbalance detected: expected to be {} after start of {}, but stack size is now {}",
 				stackdelta, (int)stackstart, (int)valueStack.size()
 			));
 		}
@@ -307,7 +302,7 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 				break;
 			}
 		default:
-			throw creaturesException(fmt::sprintf("Illegal opcode %d", (int)op.opcode));
+			throw creaturesException(fmt::format("Illegal opcode {}", (int)op.opcode));
 	}
 }
 
@@ -323,16 +318,15 @@ inline void caosVM::runOp() {
 	
 	try {
 		if (trace) {
-			std::cerr
-				<< fmt::sprintf(
-					"optrace(%s): INST=%d TS=%d %p @%08d top=%s depth=%d ",
-					scr->filename.c_str(), (int)inst, (int)timeslice,
-					(void *)this, cip,
-					(valueStack.empty() ? std::string("(empty)") : valueStack.back().dump()),
-					valueStack.size()
-				)
-				<< dumpOp(currentscript->dialect, op)
-				<< std::endl;
+			fmt::print(
+				stderr,
+				"optrace({}): INST={} TS={} {} @{:08d} top={} depth={} {}\n",
+				scr->filename.c_str(), (int)inst, (int)timeslice,
+				(void *)this, cip,
+				(valueStack.empty() ? std::string("(empty)") : valueStack.back().dump()),
+				valueStack.size(),
+				dumpOp(currentscript->dialect, op)
+			);
 			if (trace >= 2) {
 				dumpStack(this);
 			}

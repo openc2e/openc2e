@@ -472,6 +472,7 @@ void caosVM::v_CAOS() {
 		
 		std::ostringstream oss;
 		sub->outputstream = &oss;
+    
 		
 		sub->runEntirely(s.installer);
 		

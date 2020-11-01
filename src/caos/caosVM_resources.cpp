@@ -25,7 +25,7 @@
 #include "Catalogue.h"
 
 #include "prayManager.h"
-#include <fmt/printf.h>
+#include <fmt/core.h>
 #include <fstream>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
@@ -106,8 +106,8 @@ int prayInstallDeps(std::string name, bool actually_install) {
 	int nodeps = j->second; caos_assert(nodeps >= 0);
 
 	for (int z = 1; z <= nodeps; z++) {
-		std::string depcatname = fmt::sprintf("Dependency Category %d", z);
-		std::string depname = fmt::sprintf("Dependency %d", z);
+		std::string depcatname = fmt::format("Dependency Category {}", z);
+		std::string depname = fmt::format("Dependency {}", z);
 		j = p->integerValues.find(depcatname);
 		if (j == p->integerValues.end()) {
 			return (-2 - nodeps - z);
@@ -366,7 +366,7 @@ void caosVM::v_PRAY_INJT() {
 	// .. and iterate over the scripts.
 	for (int z = 1; z <= noscripts; z++) {
 		// First, retrieve the script.
-		std::string scriptname = fmt::sprintf("Script %d", z);
+		std::string scriptname = fmt::format("Script {}", z);
 		std::map<std::string, std::string>::iterator k = p->stringValues.find(scriptname);
 		if (k == p->stringValues.end()) {
 			result.setInt(-1);

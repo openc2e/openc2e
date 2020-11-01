@@ -25,7 +25,7 @@
 #include <map>
 #include <istream>
 #include <cmath>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 #include "creaturesException.h"
 
@@ -133,7 +133,7 @@ protected:
 
 public:
 	MNGConstantNode(float n) { value = n; }
-	std::string dump() { return fmt::sprintf("%f", value); }
+	std::string dump() { return fmt::format("{}", value); }
 	float getValue() { return value; }
 };
 

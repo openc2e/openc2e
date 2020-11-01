@@ -23,10 +23,7 @@
 #include "Engine.h"
 #include <iostream>
 
-#include <fmt/printf.h>
-
-using std::cout;
-using std::cerr;
+#include <fmt/core.h>
 
 /**
  OUTX (command) val (string)
@@ -101,12 +98,12 @@ void caosVM::c_OUTV() {
 	if (!outputstream) return;
 	
 	if (val.hasFloat()) {
-		*outputstream << fmt::sprintf("%0.06f", val.getFloat());
+		*outputstream << fmt::format("{:0.06f}", val.getFloat());
 	} else if (val.hasInt()) {
 		*outputstream << val.getInt();
 	} else if (val.hasVector()) {
 		const Vector<float> &v = val.getVector();
-		*outputstream << fmt::sprintf("(%0.6f, %0.6f)", v.x, v.y);
+		*outputstream << fmt::format("({:0.6f}, {:%0.6f})", v.x, v.y);
 	} else throw badParamException();
 }
 
@@ -248,7 +245,7 @@ void caosVM::c_VRSN() {
 	int thisversion = (engine.version == 1) ? 2 : 0;
 
 	if (thisversion < required) {
-		std::cout << "Warning: stopping script due to version requirement of " << required << " (we are reporting a version of " << thisversion << ")" << std::endl;
+		fmt::print("Warning: stopping script due to version requirement of {} (we are reporting a version of {})\n", required, thisversion);
 		stop();
 	}
 }
