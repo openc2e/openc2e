@@ -1215,16 +1215,18 @@ int Agent::getUNID() const {
 #include "Catalogue.h"
 
 std::string Agent::identify() const {
-	std::ostringstream o;
-	o << (int)family << " " << (int)genus << " " << species;
+	std::string buf = fmt::format("{} {} {}", (int)family, (int)genus, species);
 	const std::string n = catalogue.getAgentName(family, genus, species);
-	if (n.size())
-		o << " (" + n + ")";
-	/*if (unid != -1)
-		o << " unid " << unid;
-	else
-		o << " (no unid assigned)"; */
-	return o.str();
+	if (n.size()) {
+		buf += " (" + n + ")";
+	}
+	/*if (unid != -1) {
+		buf += " unid ";
+		buf += to_string(unid);
+	} else {
+		buf += " (no unid assigned)";
+	} */
+	return buf;
 }
 
 void Agent::pushVM(caosVM *newvm) {

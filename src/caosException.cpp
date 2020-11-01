@@ -1,7 +1,5 @@
 #include "caosException.h"
-
 #include "caosScript.h"
-#include <sstream>
 
 void caosException::trace(std::shared_ptr<class script> scr, int traceindex) throw() {
 	this->script = scr;
@@ -9,16 +7,18 @@ void caosException::trace(std::shared_ptr<class script> scr, int traceindex) thr
 }
 
 std::string caosException::prettyPrint() const {
-	std::ostringstream oss;
-	oss << what() << std::endl;
-	if (!script) return oss.str() + "Source information unavailable.\n";
-	oss << "in file " << script->filename;
+	std::string buf;
+	buf += what();
+	buf += "\n";
+	if (!script) return buf + "Source information unavailable.\n";
+	buf += "in file ";
+	buf += script->filename;
 	if (traceindex < 0 || (size_t)traceindex >= script->tokinfo->size()) {
-		oss << std::endl;
-		return oss.str();
+		buf += "\n";
+		return buf;
 	}
 	toktrace tr = (*script->tokinfo)[traceindex];
-	oss << " near line " << tr.lineno;
+	buf += " near line " + std::to_string(tr.lineno);
 
 	int start = 0;
 	for (int i = 0; i < traceindex; i++) {
@@ -26,10 +26,10 @@ std::string caosException::prettyPrint() const {
 	}
 	int end = start + tr.width;
 	if ((size_t)start >= script->code->size() || (size_t)end >= script->code->size()) {
-		oss << std::endl;
-		return oss.str();
+		buf += "\n";
+		return buf;
 	}
-	oss << ":" << std::endl;
+	buf += ":\n";
 
 	int linelen  = 73; // XXX, margins aren't being counted it seems
 	int contextl = (linelen - tr.width) / 2;
@@ -56,7 +56,7 @@ std::string caosException::prettyPrint() const {
 
 	if (contextl < start) {
 		marginl = 3;
-		oss << "...";
+		buf += "...";
 		contextl -= 3;
 		if (contextl < 0) {
 			contextr += contextl;
@@ -78,17 +78,17 @@ std::string caosException::prettyPrint() const {
 	}
 
 	for (int i = start - contextl; i < end + contextr; i++)
-		oss << (*script->code)[i];
+		buf += (*script->code)[i];
 	if (marginr)
-		oss << "...";
-	oss << std::endl;
+		buf += "...";
+	buf += "\n";
 
 	for (int i = 0; i < contextl + marginl; i++)
-		oss << " ";
+		buf += " ";
 	for (int i = 0; i < tr.width; i++)
-		oss << "^";
-	oss << std::endl;
-	return oss.str();
+		buf += "^";
+	buf += "\n";
+	return buf;
 }
 
 

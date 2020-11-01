@@ -373,16 +373,15 @@ void caosVM::v_PRAY_INJT() {
 			report->setString(scriptname);
 			return;
 		}
-		std::string script = k->second;
+		std::string caostext = k->second;
 
 		if (!install) continue;
 		
 		// Then, execute it.
 		caosVM *vm = world.getVM(NULL);
 		try {
-			std::istringstream iss(script);
 			caosScript script(engine.gametype, name + " - PRAY " + scriptname);
-			script.parse(iss);
+			script.parse(caostext);
 			script.installScripts();
 			vm->resetCore();
 			vm->runEntirely(script.installer);

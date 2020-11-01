@@ -18,6 +18,7 @@
  */
 
 #include "SFCFile.h"
+#include "caosScript.h"
 #include "World.h"
 #include "Engine.h"
 #include "MetaRoom.h"
@@ -25,10 +26,24 @@
 #include "Camera.h"
 #include "endianlove.h"
 #include "creaturesException.h"
+#include "SimpleAgent.h"
 #include "imageManager.h"
 #include "Map.h"
 #include "Agent.h"
 #include "DullPart.h"
+#include "fileformats/sprImage.h"
+#include "CompoundAgent.h"
+#include "PointerAgent.h"
+#include "Blackboard.h"
+#include "Vehicle.h"
+#include "Lift.h"
+#include "CallButton.h"
+
+#include <cassert>
+#include <fmt/printf.h>
+#include <iostream>
+#include <limits.h>
+#include <memory>
 
 /*
  * sfcdumper.py has better commentary on this format - use it for debugging
@@ -51,9 +66,6 @@
 #define TYPE_MACRO 14
 #define TYPE_OBJECT 100
 
-#include <cassert>
-#include <fmt/printf.h>
-#include <memory>
 #define sfccheck(x) if (!(x)) throw creaturesException(std::string("failure while reading SFC file: '" #x "' in " __FILE__ " at line ") + fmt::sprintf("%d", __LINE__));
 
 SFCFile::~SFCFile() {
@@ -839,9 +851,6 @@ void SFCFile::copyToWorld() {
 	}
 }
 
-#include "fileformats/sprImage.h"
-#include <iostream>
-
 void MapData::copyToWorld() {
 	// find the background sprite
 	std::shared_ptr<creaturesImage> spr = world.gallery->getImage(background->filename);
@@ -976,9 +985,6 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 	}
 }
 
-#include "CompoundAgent.h"
-
-#include <limits.h>
 void SFCCompoundObject::copyToWorld() {
 	sfccheck(parts.size() > 0);
 
@@ -1055,8 +1061,6 @@ void SFCCompoundObject::copyToWorld() {
 	}
 }
 
-#include "SimpleAgent.h"
-
 void SFCSimpleObject::copyToWorld() {
 	// construct our equivalent object
 	if (!ourAgent) {
@@ -1117,7 +1121,6 @@ void SFCSimpleObject::copyToWorld() {
 	}
 }
 
-#include "PointerAgent.h"
 void SFCPointerTool::copyToWorld() {
 	world.hand()->setClassifier(family, genus, species);
 	world.hand()->setZOrder(entity->zorder);
@@ -1126,8 +1129,6 @@ void SFCPointerTool::copyToWorld() {
 	ourAgent = world.hand();
 	SFCSimpleObject::copyToWorld(); // TODO: think about this call some more, is it appropriate for an already-finished agent?
 }
-
-#include "Blackboard.h"
 
 void SFCBlackboard::copyToWorld() {
 	ourAgent = new Blackboard(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes, textx, texty, backgroundcolour, chalkcolour, aliascolour);
@@ -1139,8 +1140,6 @@ void SFCBlackboard::copyToWorld() {
 		a->addBlackboardString(i, strings[i].first, engine.translateWordlistWord(strings[i].second));
 	}
 }
-
-#include "Vehicle.h"
 
 void SFCVehicle::copyToWorld() {
 	if (!ourAgent) {
@@ -1160,8 +1159,6 @@ void SFCVehicle::copyToWorld() {
 	a->yvec.setInt(yvec);
 }
 
-#include "Lift.h"
-
 void SFCLift::copyToWorld() {
 	Lift *a = new Lift(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
 	ourAgent = a;
@@ -1180,8 +1177,6 @@ void SFCLift::copyToWorld() {
 		a->alignwithcabin = alignwithcabin;
 	}
 }
-
-#include "CallButton.h"
 
 void SFCCallButton::copyToWorld() {
 	CallButton *a = new CallButton(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
@@ -1204,17 +1199,11 @@ void SFCScenery::copyToWorld() {
 	p->is_transparent = true;
 }
 
-#include <fmt/printf.h>
-#include <sstream>
-
-#include "caosScript.h"
-
 void SFCScript::install() {
 	std::string scriptinfo = fmt::sprintf("<SFC script %d, %d, %d: %d>", (int)family, (int)genus, species, eventno);
 	caosScript script(engine.gametype, scriptinfo);
-	std::istringstream s(data);
 	try {
-		script.parse(s);
+		script.parse(data);
 		script.installInstallScript(family, genus, species, eventno);
 		script.installScripts();
 	} catch (creaturesException &e) {

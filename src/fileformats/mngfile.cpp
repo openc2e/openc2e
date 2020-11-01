@@ -16,8 +16,9 @@
  *  Lesser General Public License for more details.
  *
  */
+#include <algorithm>
 #include <assert.h>
-#include <sstream>
+#include <fmt/core.h>
 #include "endianlove.h"
 #include "creaturesException.h"
 #include "fileformats/mngfile.h"
@@ -140,18 +141,20 @@ void MNGFile::add(class MNGVariableDecNode *n) {
 }
 
 std::string MNGFile::dump() {
-	std::ostringstream oss;
+	std::string buf;
 
 	std::map<std::string, class MNGEffectDecNode *>::iterator ei;
 	std::map<std::string, class MNGTrackDecNode *>::iterator ti;
 
-	for (ei = effects.begin(); ei != effects.end(); ei++)
-		oss << ei->first << " " << ei->second->dump() << std::endl;
+	for (ei = effects.begin(); ei != effects.end(); ei++) {
+		buf += fmt::format("{} {}\n", ei->first, ei->second->dump());
+	}
 
-	for (ti = tracks.begin(); ti != tracks.end(); ti++)
-		oss << ti->first << " " << ti->second->dump() << std::endl;
+	for (ti = tracks.begin(); ti != tracks.end(); ti++) {
+		buf += fmt::format("{} {}\n", ti->first, ti->second->dump());
+	}
 
-	return oss.str();
+	return buf;
 }
 
 void mngerror(char const *s) {

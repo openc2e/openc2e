@@ -33,7 +33,6 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
-#include <sstream>
 #include <algorithm>
 #include <cstring>
 #include <fmt/printf.h>
@@ -92,18 +91,15 @@ script::script(const Dialect *v, const std::string &fn,
 }
 
 std::string script::dump() {
-	std::ostringstream oss;
-	oss << "Relocations:" << std::endl;
+	std::string buf = "Relocations:\n";
 	for (unsigned int i = 1; i < relocations.size(); i++) {
-		oss << fmt::sprintf("%08d -> %08d", i, relocations[i]) << std::endl;
+		buf += fmt::format("{:08d} -> {:08d}\n", i, relocations[i]);
 	}
-	oss << "Code:" << std::endl;
+	buf += "Code:\n";
 	for (unsigned int i = 0; i < ops.size(); i++) {
-		oss << fmt::sprintf("%08d: ", i);
-		oss << dumpOp(dialect, ops[i]);
-		oss << std::endl;
+		buf += fmt::format("{:08d}: {}\n", i, dumpOp(dialect, ops[i]));
 	}
-	return oss.str();
+	return buf;
 }
 
 caosScript::caosScript(const std::string &dialect, const std::string &fn) {
@@ -312,9 +308,12 @@ void caosScript::putBackToken(caostoken *t) {
 }
 
 void caosScript::parse(std::istream &in) {
-	assert(!tokens);
 	// slurp our input stream
-	std::string caostext = readfile(in);
+	return parse(readfile(in));
+}
+
+void caosScript::parse(const std::string &caostext) {
+	assert(!tokens);
 	// run the token parser
 	{
 		std::vector<caostoken> rawtokens;
@@ -353,7 +352,7 @@ void caosScript::parse(std::istream &in) {
 	try {
 		parseloop(ST_INSTALLER, NULL);
 
-		std::ostringstream oss;
+		std::string buf;
 		std::shared_ptr<std::vector<toktrace> > tokinfo(new std::vector<toktrace>());
 		for (size_t p = 0; p < tokens->size(); p++) {
 			std::string tok = (*tokens)[p].format();
@@ -362,10 +361,11 @@ void caosScript::parse(std::istream &in) {
 				errindex = p;
 				throw parseException("Overlong token");
 			}
-			oss << tok << " ";
+			buf += tok;
+			buf += " ";
 			tokinfo->push_back(toktrace(len, (*tokens)[p].lineno));
 		}
-		shared_str code(oss.str());
+		shared_str code(buf);
 		installer->code = code;
 		installer->tokinfo = tokinfo;
 		installer->link();

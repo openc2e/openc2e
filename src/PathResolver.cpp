@@ -27,8 +27,6 @@
 #include <cctype>
 #include <string>
 #include <algorithm>
-#include <iostream>
-#include <sstream>
 
 using std::map;
 using std::set;
@@ -157,20 +155,22 @@ bool doCacheDir(path &dir) {
 }
 
 static std::regex constructSearchPattern(const std::string &wild) {
-	std::ostringstream matchbuf;
-	matchbuf << "^";
+	std::string matchstr;
+	matchstr += "^";
 	for (size_t i = 0; i < wild.size(); i++) {
-		if (wild[i] == '*')
-			matchbuf << ".*";
-		else if (wild[i] == '?')
-			matchbuf << ".";
-		else if (!(isalpha(wild[i]) || isdigit(wild[i]) || wild[i] == ' '))
-			matchbuf << "[" << wild[i] << "]";
-		else
-			matchbuf << wild[i];
+		if (wild[i] == '*') {
+			matchstr += ".*";
+		} else if (wild[i] == '?') {
+			matchstr += ".";
+		} else if (!(isalpha(wild[i]) || isdigit(wild[i]) || wild[i] == ' ')) {
+			matchstr += "[";
+			matchstr += wild[i];
+			matchstr += "]";
+		} else {
+			matchstr += wild[i];
+		}
 	}
-	matchbuf << "$";
-	std::string matchstr = matchbuf.str();
+	matchstr += "$";
 	return std::regex(matchstr.c_str());
 }
 

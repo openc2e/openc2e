@@ -23,6 +23,7 @@
 #include "World.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <fmt/printf.h>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;

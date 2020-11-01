@@ -249,6 +249,7 @@ public:
 
 	caosScript(const std::string &dialect, const std::string &fn);
 	caosScript() { d = NULL; }
+	void parse(const std::string &caostext);
 	void parse(std::istream &in);
 	~caosScript();
 	void installScripts();

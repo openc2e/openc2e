@@ -23,36 +23,28 @@
 #include "Engine.h" // version
 #include "World.h" // unid
 
-#include <iostream>
-#include <sstream>
-#include <fmt/printf.h>
+#include <fmt/core.h>
 
 #ifdef DONT_INLINE_CAOSVAR_ACCESSORS
 #error meh, copy the stuff out of caosValue.h and drop it here
 #endif
 
-static inline std::string stringify(double x) {
-	std::ostringstream o;
-	if (!(o << x)) throw "stringify() failed";
-	return o.str();
-}
-
 std::string caosValue::dump() const {
 	switch(getType()) {
 		case CAOSSTR:
-			return fmt::sprintf("String \"%s\" ", getString());
+			return fmt::format("String \"{}\" ", getString());
 			break;
 		case CAOSINT:
-			return fmt::sprintf("Int %d ", getInt());
+			return fmt::format("Int {} ", getInt());
 			break;
 		case CAOSFLOAT:
-			return fmt::sprintf("Float %f ", getFloat());
+			return fmt::format("Float {} ", getFloat());
 			break;
 		case CAOSAGENT:
-			return fmt::sprintf("Agent %p ", (void *)getAgent().get());
+			return fmt::format("Agent {} ", (void *)getAgent().get());
 			break;
 		case CAOSVEC:
-			return fmt::sprintf("Vector (%f, %f)", getVector().x, getVector().y);
+			return fmt::format("Vector ({}, {})", getVector().x, getVector().y);
 			break;
 		default:
 			return "[bad caosValue!] ";

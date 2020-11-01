@@ -1,8 +1,9 @@
 #include "MNGMusic.h"
 
 #include "endianlove.h"
-#include <iostream> // for debug messages
+#include <algorithm>
 #include <cmath> // for cos/sin
+#include <iostream> // for debug messages
 
 #ifndef M_PI
 # define M_PI           3.14159265358979323846  /* pi */

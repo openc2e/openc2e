@@ -7,7 +7,6 @@
 #include "Catalogue.h"
 #include "catalogparser.h"
 #include <cctype>
-#include <sstream>
 #include <cassert>
 
 const char *Catalogue::catalogue_parse_p = NULL;
@@ -52,20 +51,20 @@ array { return CTOK_ARRAY; }
 override { return CTOK_OVERRIDE; }
 number { catalval.number = atoi(basep); return CTOK_INT; }
 quote { goto str; }
-any { catalogueParseError(); }
+any { catalogueParseError("Unexpected character"); }
 */
 str:
 	{
-		std::ostringstream temp;
+		std::string temp;
 strloop:
 		basep = catalogue_parse_p;
 
 /*!re2c
-	backslash any { temp << catalogue_descape(basep[1]); goto strloop; }
-	quote { catalval.string = std::string(temp.str()); return CTOK_STR; }
+	backslash any { temp += catalogue_descape(basep[1]); goto strloop; }
+	quote { catalval.string = temp; return CTOK_STR; }
 	backslash ? eoi { catalogueParseError("premature end of input"); }
-	newline { temp << basep[0]; yylineno++; goto strloop; }
-	any { temp << basep[0]; goto strloop; }
+	newline { temp += basep[0]; yylineno++; goto strloop; }
+	any { temp += basep[0]; goto strloop; }
 */
 	}
 eoi:

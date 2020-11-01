@@ -1,22 +1,22 @@
 #include "parseException.h"
 #include "fileformats/caostoken.h"
-#include <sstream>
+#include <fmt/core.h>
 
 std::string parseException::prettyPrint() const {
-        std::ostringstream oss;
         std::string filename = this->filename;
         if (filename == "")
                 filename = std::string("(UNKNOWN)");
-        oss << "Parse error at line ";
-        if (lineno == -1)
-                oss << "(UNKNOWN)";
-        else
-                oss << lineno;
-        oss << " in file " << filename << ": " << what();
+                
+        std::string buf = fmt::format(
+          "Parse error at line {} in file {}: {}",
+          lineno == -1 ? "(UNKNOWN)" : std::to_string(lineno),
+          filename,
+          what()
+        );
         if (!context)
-                oss << std::endl;
+                buf += "\n";
         else {
-                oss << " near:" << std::endl;
+                buf += " near:\n";
                 int toklen = -1, stlen = 0;
                 for (size_t i = 0; i < context->size(); i++) {
                         std::string tokstr = (*context)[i].format();
@@ -25,17 +25,18 @@ std::string parseException::prettyPrint() const {
                         } else if (toklen == -1) {
                                 stlen += tokstr.size() + 1;
                         }
-                        oss << tokstr << " ";
+                        buf += tokstr;
+                        buf += " ";
                 }
-                oss << std::endl;
+                buf += "\n";
                 if (toklen != -1) {
                         for (int i = 0; i < stlen; i++)
-                                oss << " ";
+                                buf += " ";
                         for (int i = 0; i < toklen; i++)
-                                oss << "^";
-                        oss << std::endl;
+                                buf += "^";
+                        buf += "\n";
                 }
         }
-        return oss.str();
+        return buf;
 }
 

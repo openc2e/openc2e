@@ -1,5 +1,4 @@
-#ifndef ALLOC_COUNT_H
-#define ALLOC_COUNT_H
+#pragma once
 
 // Generic structure allocation counter
 //
@@ -109,5 +108,3 @@ AllocationCounterHeap<T> AllocationCounterHeap<T>::counter;
 	private:
 
 #endif // PROFILE_ALLOCATION_COUNT
-
-#endif

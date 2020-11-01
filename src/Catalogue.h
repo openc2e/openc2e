@@ -45,7 +45,7 @@ protected:
 	static int catalex();
 	friend int cataparse();
 	friend void cataerror(const char *);
-	static void catalogueParseError(const char *err = NULL);
+	static void catalogueParseError(const char *err);
 public:
 	std::map<std::string, std::vector<std::string> > data;
 

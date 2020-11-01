@@ -27,7 +27,6 @@
 #include <istream>
 #include <memory>
 #include <ostream>
-#include <sstream>
 #include "AgentRef.h"
 #include "caosValue.h"
 #include "alloc_count.h"
@@ -65,13 +64,14 @@ class vmStackItem {
 			}
 
 			std::string operator()(const bytestring_t &bs) const {
-				std::ostringstream oss;
-				oss << "[ ";
+				std::string buf;
+				buf += "[ ";
 				for (bytestring_t::const_iterator i = bs.begin(); i != bs.end(); i++) {
-					oss << (int)*i << " ";
+					buf += std::to_string((int)*i);
+					buf += " ";
 				}
-				oss << "]";
-				return oss.str();
+				buf += "]";
+				return buf;
 			}
 		};
 

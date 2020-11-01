@@ -4,7 +4,6 @@
 #include "vectorstream.h"
 
 #include <cassert>
-#include <sstream>
 #include <vector>
 #include <zlib.h>
 
