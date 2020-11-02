@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "creaturesImage.h"
 #include "imageManager.h"
+#include "encoding.h"
 #include "keycodes.h"
 #include "World.h"
 
@@ -35,6 +36,9 @@ int TextEntryPart::handleClick(float clickx, float clicky) {
 }
 
 void TextEntryPart::handleTranslatedChar(unsigned char c) {
+	if (!cp1252_isprint(c)) {
+		return;
+	}
 	text.insert(caretpos, 1, c);
 	caretpos++;
 	recalculateData();

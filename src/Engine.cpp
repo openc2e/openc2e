@@ -568,12 +568,10 @@ void Engine::handleTextInput(BackendEvent &event) {
 
 	int translated_char = cp1252_text[0];
 
-	if (!cp1252_isprint(translated_char)) {
-		return;
-	}
-
-	if (version < 3 && !world.focusagent) {
-		Bubble::newBubble(world.hand(), false, std::string());	
+	if (cp1252_isprint(translated_char)) {
+		if (version < 3 && !world.focusagent) {
+			Bubble::newBubble(world.hand(), false, std::string());
+		}
 	}
 
 	// tell the agent with keyboard focus
@@ -686,6 +684,34 @@ void Engine::handleRawKeyDown(BackendEvent &event) {
 		if (!*i) continue;
 		if ((*i)->imsk_key_down)
 			(*i)->queueScript(73, 0, k); // key down script
+	}
+
+	// certain raw keys get passed as translated chars, too, after the raw key event
+	// these correspond to the CP1252/ASCII control codes
+	// TODO: should this be handled in Backend instead?
+	BackendEvent translatedevent;
+	translatedevent.type = eventtextinput;
+	switch (event.key) {
+		case OPENC2E_KEY_BACKSPACE:
+			translatedevent.text = "\x08";
+			break;
+		case OPENC2E_KEY_TAB:
+			translatedevent.text = "\t";
+			break;
+		case OPENC2E_KEY_RETURN:
+			translatedevent.text = "\n";
+			break;
+		case OPENC2E_KEY_ESCAPE:
+			translatedevent.text = "\x1b";
+			break;
+		case OPENC2E_KEY_DELETE:
+			translatedevent.text = "\x7f";
+			break;
+		default:
+			break;
+	}
+	if (translatedevent.text.size()) {
+		handleTextInput(translatedevent);
 	}
 }
 
