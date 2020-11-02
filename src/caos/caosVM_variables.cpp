@@ -22,7 +22,6 @@
 #include "Agent.h"
 #include <memory>
 #include <stdlib.h> // rand()
-#include <iostream>
 #include <math.h> // abs()/fabs()
 #include "World.h"
 #include "Engine.h"

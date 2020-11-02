@@ -111,11 +111,11 @@ void prayManager::update() {
 
 	const std::vector<std::string> &extensions = catalogue.getTag("Pray System File Extensions");
 
-	for (std::vector<fs::path>::iterator i = world.data_directories.begin(); i != world.data_directories.end(); i++) {
-		assert(fs::exists(*i));
-		assert(fs::is_directory(*i));
+	for (auto dd : world.data_directories) {
+		assert(fs::exists(dd));
+		assert(fs::is_directory(dd));
 
-		fs::path praydir(*i / fs::path("My Agents/"));
+		fs::path praydir(dd / fs::path("My Agents/"));
 
 		if (fs::exists(praydir) && fs::is_directory(praydir)) {
 			fs::directory_iterator fsend;

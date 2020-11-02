@@ -524,11 +524,10 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	surface->renderDone();
 }
 
-void World::executeInitScript(fs::path p) {
-	assert(fs::exists(p));
-	assert(!fs::is_directory(p));
+void World::executeInitScript(std::string x) {
+	assert(fs::exists(x));
+	assert(!fs::is_directory(x));
 
-	std::string x = p.string();
 	std::ifstream s(x.c_str());
 	assert(s.is_open());
 	//std::cout << "executing script " << x << "...\n";
@@ -540,12 +539,12 @@ void World::executeInitScript(fs::path p) {
 		script.installScripts();
 		vm.runEntirely(script.installer);
 	} catch (creaturesException &e) {
-		std::cerr << "exec of \"" << p.filename() << "\" failed due to exception " << e.prettyPrint() << std::endl;
+		std::cerr << "exec of \"" << fs::path(x).filename() << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	}
 	std::cout.flush(); std::cerr.flush();
 }
 
-void World::executeBootstrap(fs::path p) {
+void World::executeBootstrap(std::string p) {
 	if (!fs::is_directory(p)) {
 		executeInitScript(p);
 		return;
@@ -560,8 +559,9 @@ void World::executeBootstrap(fs::path p) {
 	}
 
 	std::sort(scripts.begin(), scripts.end());
-	for (std::vector<fs::path>::iterator i = scripts.begin(); i != scripts.end(); i++)
-		executeInitScript(*i);
+	for (auto s : scripts) {
+		executeInitScript(s);
+	}
 }
 
 void World::executeBootstrap(bool switcher) {
@@ -572,7 +572,7 @@ void World::executeBootstrap(bool switcher) {
 			throw creaturesException("C1/2 can't run without data directories!");
 
 		// TODO: case-sensitivity for the lose
-		fs::path edenpath(data_directories[0] / "Eden.sfc");
+		auto edenpath = fs::path(data_directories[0]) / "Eden.sfc";
 		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
 			SFCFile sfc;
 			std::ifstream f(edenpath.string().c_str(), std::ios::binary);
@@ -590,23 +590,22 @@ void World::executeBootstrap(bool switcher) {
 	if (switcher) {
 		for (auto p : data_directories) {
 			// TODO: cvillage has switcher code in 'Startup', so i included it here too
-			if (fs::exists(p / "Bootstrap" / "000 Switcher")) {
-				printf("%s\n", p.string().c_str());
-				executeBootstrap(p / "Bootstrap" / "000 Switcher");
+			if (fs::exists(fs::path(p) / "Bootstrap" / "000 Switcher")) {
+				executeBootstrap(fs::path(p) / "Bootstrap" / "000 Switcher");
 				return;
 			}
-			if (fs::exists(p / "Bootstrap" / "Startup")) {
-				executeBootstrap(p / "Bootstrap" / "Startup");
+			if (fs::exists(fs::path(p) / "Bootstrap" / "Startup")) {
+				executeBootstrap(fs::path(p) / "Bootstrap" / "Startup");
 				return;
 			}
 		}
 		throw creaturesException("couldn't find '000 Switcher' or 'Startup' bootstrap directory");
 	}
 
-	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
-		assert(fs::exists(*i));
-		assert(fs::is_directory(*i));
-		fs::path b(*i / "Bootstrap/");
+	for (auto dd : data_directories) {
+		assert(fs::exists(dd));
+		assert(fs::is_directory(dd));
+		auto b = fs::path(dd) / "Bootstrap/";
 		if (fs::exists(b) && fs::is_directory(b)) {
 			fs::directory_iterator fsend;
 			// iterate through each bootstrap directory
@@ -629,11 +628,11 @@ void World::executeBootstrap(bool switcher) {
 }
 
 void World::initCatalogue() {
-	for (std::vector<fs::path>::iterator i = data_directories.begin(); i != data_directories.end(); i++) {
-		assert(fs::exists(*i));
-		assert(fs::is_directory(*i));
+	for (auto d : data_directories) {
+		assert(fs::exists(d));
+		assert(fs::is_directory(d));
 
-		fs::path c(*i / "Catalogue/");
+		auto c = fs::path(d) / "Catalogue/";
 		if (fs::exists(c) && fs::is_directory(c))
 			catalogue.initFrom(c, engine.language);
 	}
@@ -670,7 +669,7 @@ std::string World::getUserDataDir() {
 	if (data_directories.size() ==  0) {
 		throw creaturesException("Can't get user data directory when there are no data directories");
 	}
-	return data_directories.back().string();
+	return data_directories.back();
 }
 
 void World::selectCreature(std::shared_ptr<Agent> a) {

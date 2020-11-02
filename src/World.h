@@ -27,7 +27,6 @@
 #include <set>
 #include <map>
 #include <list>
-#include <ghc/filesystem.hpp>
 
 class caosVM;
 class CompoundPart;
@@ -76,7 +75,7 @@ public:
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosValue> variables;
 
-	std::vector<ghc::filesystem::path> data_directories;
+	std::vector<std::string> data_directories;
 	std::unique_ptr<Scriptorium> scriptorium;
 	std::unique_ptr<prayManager> praymanager;
 	std::unique_ptr<imageManager> gallery;
@@ -110,8 +109,8 @@ public:
 	void initCatalogue();
 	void shutdown();
 
-	void executeInitScript(ghc::filesystem::path p);
-	void executeBootstrap(ghc::filesystem::path p);
+	void executeInitScript(std::string p);
+	void executeBootstrap(std::string p);
 	void executeBootstrap(bool switcher);
 
 	std::string getUserDataDir();

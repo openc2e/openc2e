@@ -21,9 +21,12 @@
 #include "caosVM.h"
 #include "World.h"
 #include "Engine.h"
+#include <ghc/filesystem.hpp>
 #include <iostream>
 
 #include <fmt/core.h>
+
+namespace fs = ghc::filesystem;
 
 /**
  OUTX (command) val (string)
@@ -338,9 +341,8 @@ CAOS_LVALUE(GAME_c2,
 void caosVM::v_OC2E_DDIR() {
 	std::string d;
 
-	for (std::vector<ghc::filesystem::path>::iterator i = world.data_directories.begin(); i != world.data_directories.end(); i++) {
-		ghc::filesystem::path &p = *i;
-		d = d + ghc::filesystem::absolute(p).string() + "\n";
+	for (auto p : world.data_directories) {
+		d += fs::absolute(p).string() + "\n";
 	}
 	
 	result.setString(d);
