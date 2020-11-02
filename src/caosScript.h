@@ -35,6 +35,7 @@
 #include "dialect.h"
 #include "fileformats/caostoken.h"
 #include "shared_str.h"
+#include <fmt/core.h>
 
 
 class Agent;

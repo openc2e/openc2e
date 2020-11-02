@@ -38,6 +38,7 @@
 #include "Vehicle.h"
 #include "Lift.h"
 #include "CallButton.h"
+#include "macro_stringify.h"
 
 #include <cassert>
 #include <fmt/core.h>
@@ -66,7 +67,7 @@
 #define TYPE_MACRO 14
 #define TYPE_OBJECT 100
 
-#define sfccheck(x) if (!(x)) throw creaturesException(std::string("failure while reading SFC file: '" #x "' in " __FILE__ " at line ") + std::to_string(__LINE__));
+#define sfccheck(x) if (!(x)) throw creaturesException("failure while reading SFC file: '" #x "' at " __FILE__ ":" stringify(__LINE__));
 
 SFCFile::~SFCFile() {
 	// This contains all the objects we've constructed, so we can just zap this and

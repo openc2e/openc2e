@@ -23,7 +23,6 @@
 #include "caos_assert.h"
 #include "bytestring.h"
 #include <array>
-#include <map>
 #include <istream>
 #include <memory>
 #include <ostream>
@@ -32,7 +31,6 @@
 #include "alloc_count.h"
 
 #include <mpark/variant.hpp>
-using std::weak_ptr;
 
 class script;
 
@@ -197,7 +195,7 @@ public:
 	AgentRef targ, owner, _it_;
 	caosValue from;
 	int part;
-	weak_ptr<class Camera> camera;
+	std::weak_ptr<class Camera> camera;
 	class Camera *getCamera();
 	
 	void resetScriptState(); // resets everything except OWNR
@@ -1216,8 +1214,11 @@ class caosVM__lval {
 	CAOS_LVALUE_TARG(name, (void)0, exp, exp = newvalue)
 #define STUB throw caosException("stub in " __FILE__)
 
-// FIXME: use do { ... } while (0)
-#define valid_agent(x) do { if (!(x)) throw invalidAgentException(fmt::format("Invalid agent handle: {} thrown from {}:{}", #x, __FILE__, __LINE__)); } while(0)
+#define valid_agent(x) do { \
+		if (!(x)) { \
+			throw invalidAgentException("Invalid agent handle: " #x " thrown from " __FILE__ ":" stringify(__LINE__)); \
+		} \
+	} while(0)
 
 #endif
 /* vim: set noet: */
