@@ -91,8 +91,6 @@ void SDLMixerBackend::init() {
 	if (!Mix_Init(MIX_INIT_MID)) {
 		printf("* SDLMixer: failed to load MIDI support: %s\n", Mix_GetError());
 	}
-
-	Mix_AllocateChannels(50); // TODO
 }
 
 void SDLMixerBackend::shutdown() {
@@ -144,6 +142,14 @@ void SDLMixerSource::play() {
 	setFollowingView(followview); // re-register in the backend if needed
 
 	channel = Mix_PlayChannel(-1, clip->buffer, (looping ? -1 : 0));
+	if (channel == -1) {
+		Mix_AllocateChannels(Mix_AllocateChannels(-1) + 1);
+		channel = Mix_PlayChannel(-1, clip->buffer, (looping ? -1 : 0));
+		if (channel == -1) {
+			printf("Couldn't play source: %s\n", Mix_GetError());
+			return;
+		}
+	}
 
 	Mix_UnregisterAllEffects(channel); // TODO: needed?
 }
