@@ -25,10 +25,10 @@
 
 class NullRenderTarget : public RenderTarget {
 public:
-	virtual void renderCreaturesImage(const creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) { }
-	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) { }
-	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) { }
-	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h)  { }
+	virtual void renderCreaturesImage(const creaturesImage&, unsigned int, int, int, uint8_t, bool) { }
+	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>&, unsigned int, int, int, uint8_t, bool) { }
+	virtual void renderLine(int, int, int, int, unsigned int) { }
+	virtual void blitRenderTarget(RenderTarget*, int, int, int, int)  { }
 	virtual unsigned int getWidth() const { return 800; }
 	virtual unsigned int getHeight() const { return 600; }
 	virtual void renderClear() {}
@@ -44,25 +44,25 @@ public:
 	virtual int run() { return 1; }
 	virtual void shutdown() { }
 
-	virtual void resize(unsigned int width, unsigned int height) { }
+	virtual void resize(unsigned int, unsigned int) { }
 
 	virtual unsigned int ticks() { return 0; }
-	virtual bool pollEvent(BackendEvent &e) { return false; }
-	virtual bool keyDown(int key) { return false; }
+	virtual bool pollEvent(BackendEvent&) { return false; }
+	virtual bool keyDown(int) { return false; }
 
 	virtual bool selfRender() { return false; }
 	virtual void requestRender() { }
 	
 	virtual RenderTarget *getMainRenderTarget() { return &surface; }
-	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) { return 0; }
-	virtual void freeRenderTarget(RenderTarget *surf) { }
+	virtual RenderTarget *newRenderTarget(unsigned int, unsigned int) { return nullptr; }
+	virtual void freeRenderTarget(RenderTarget*) { }
 	
-	virtual Texture createTexture(const Image& image) { return {}; }
-	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) { return {}; }
+	virtual Texture createTexture(const Image&) { return {}; }
+	virtual Texture createTextureWithTransparentColor(const Image&, Color) { return {}; }
 			
-	virtual void setDefaultPalette(span<Color> data) { }
-	virtual unsigned int textWidth(std::string text) { return 0; }
-	virtual void delay(int msec) { }
+	virtual void setDefaultPalette(span<Color>) { }
+	virtual unsigned int textWidth(std::string) { return 0; }
+	virtual void delay(int) { }
 };
 
 #endif
