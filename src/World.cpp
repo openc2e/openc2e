@@ -40,6 +40,7 @@
 #include "historyManager.h"
 #include "imageManager.h"
 #include "Map.h"
+#include "PathResolver.h"
 #include "prayManager.h"
 #include "Scriptorium.h"
 #include "SpritePart.h"
@@ -638,16 +639,14 @@ void World::initCatalogue() {
 	}
 }
 
-#include "PathResolver.h"
 std::string World::findFile(std::string name) {
 	// Go backwards, so we find files in more 'modern' directories first..
 	for (int i = data_directories.size() - 1; i != -1; i--) {
-		fs::path p = data_directories[i];
-		std::string r = (p / fs::path(name)).string();
-		if (resolveFile(r))
-			return r;
+		std::string resolved = resolveFile(fs::path(data_directories[i]) / name);
+		if (!resolved.empty()) {
+			return resolved;
+		}
 	}
-	
 	return "";
 }
 

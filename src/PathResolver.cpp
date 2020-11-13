@@ -2,9 +2,6 @@
  *  PathResolver.cpp
  *  openc2e
  *
- *  Created by Bryan Donlan
- *  Copyright (c) 2005 Bryan Donlan. All rights reserved.
- *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
@@ -18,196 +15,115 @@
  */
 
 #include "PathResolver.h"
+#include "utils/ascii_tolower.h"
 
-#include <cassert>
 #include <ghc/filesystem.hpp>
 #include <regex>
-#include <set>
-#include <map>
-#include <cctype>
 #include <string>
-#include <algorithm>
+#include <system_error>
+#include <unordered_map>
+#include <vector>
 
-using std::map;
-using std::set;
-using std::string;
-using namespace ghc::filesystem;
+namespace fs = ghc::filesystem;
 
-static set<string> dircache;
-static map<string, string> cache;
+struct cacheinfo {
+	std::string realfilename;
+	fs::file_time_type mtime = fs::file_time_type::min();
+};
+static std::unordered_map<std::string, cacheinfo> s_cache;
 
-static bool checkDirCache(path &dir);
-static bool doCacheDir(path &dir);
-
-/* C++ is far too verbose for its own good */
-static string toLowerCase(string in) {
-	transform(in.begin(), in.end(), in.begin(), (int(*)(int))tolower);
-	return in;
-}
-
-static path lcpath(path &orig) {
-	return path(toLowerCase(orig.string()));
-}
-
-static path lcleaf(path &orig) {
-	path br, leaf;
-	br = orig.parent_path();
-	leaf = path(toLowerCase(orig.filename().string()));
-	return br / leaf;
-}
-
-bool resolveFile(path &p) {
-#ifndef _WIN32
-	string s = p.string();
-	if (!resolveFile(s)) {
-		// Maybe something changed underneath us; reset the cache and try again
-		cache.clear();
-		dircache.clear();
-		if (!resolveFile(s))
-			return false;
-	}
-	p = path(s);
-	return true;
-#else
-	return exists(p);
-#endif
-}
-
-bool resolveFile_(string &srcPath) {
-	path orig(srcPath);
-	if (exists(orig))
-		return true;
-
-	orig = orig.lexically_normal();
-	path dir = orig.parent_path();
-	path leaf = path(orig.filename());
-
-	if (!checkDirCache(dir))
-		return false;
-
-	orig = dir / lcpath(leaf);
-	string fn = orig.string();
-
-	if (exists(orig)) {
-		srcPath = fn;
-		return true;
+static void updateDirectory(std::string dirname) {
+	// if the directory is already cached and matches what's on disk, then do nothing
+	fs::path lcdirname = ascii_tolower(dirname);
+	std::error_code mtime_error;
+	if (s_cache.count(lcdirname)
+	    // avoid a check for directory existence by using the non-throwing overload
+	    // of fs::last_write_time, which returns file_time_type::min() on errors
+	    && fs::last_write_time(s_cache[lcdirname].realfilename, mtime_error) == s_cache[lcdirname].mtime)
+	{
+		return;
 	}
 
-	map<string, string>::iterator i = cache.find(fn);
-	if (i == cache.end()) {
-		assert(!exists(orig));
-		return false;
-	}
-	srcPath = cache[fn];
-	return true;
-}
-
-bool resolveFile(std::string &path) {
-	std::string orig = path;
-#ifndef _WIN32
-	bool res = resolveFile_(path);
-	return res;
-#else
-	return exists(path);
-#endif
-}
-
-
-/* If dir is cached, do nothing.
- * If dir exists, cache it.
- * If dir does not exist, see if there's one with different capitalization.
- *
- * If we find a dir, return true. Else, false.
- */
-bool checkDirCache(path &dir) {
-	if (dir == path())
-		dir = path(".");
-//	std::cerr << "checkDirCache: " << dir.string() << std::endl;
-	if (dircache.end() != dircache.find(dir.string())) {
-		return true;
-	}
-	if (exists(dir))
-		return doCacheDir(dir);
-	if (dir.empty())
-		return false;
-	bool res = resolveFile(dir);
-	if (!res)
-		return false;
-	return checkDirCache(dir);
-}
-
-/* Cache a dir. Return true for success.
- */
-bool doCacheDir(path &dir) {
-//	std::cerr << "cacheing: " << dir.string() << std::endl;
-	directory_iterator it(dir);
-	directory_iterator fsend;
-	while (it != fsend) {
-		path cur = *it++;
-		string key, val;
-		key = cur.string();
-		val = lcleaf(cur).string();
-//		std::cerr << "Cache put: " << val << " -> " << key << std::endl;
-		cache[val] = key;
-	}
-	dircache.insert(dir.string());
-	return true;
-}
-
-static std::regex constructSearchPattern(const std::string &wild) {
-	std::string matchstr;
-	matchstr += "^";
-	for (size_t i = 0; i < wild.size(); i++) {
-		if (wild[i] == '*') {
-			matchstr += ".*";
-		} else if (wild[i] == '?') {
-			matchstr += ".";
-		} else if (!(isalpha(wild[i]) || isdigit(wild[i]) || wild[i] == ' ')) {
-			matchstr += "[";
-			matchstr += wild[i];
-			matchstr += "]";
+	// remove existing cache entries
+	fs::path withtrailingslash = lcdirname / "";
+	for (auto it = s_cache.begin(); it != s_cache.end();) {
+		// str.rfind(s, 0) == 0 is equivalent to str.startswith(s)
+		if (it->first.rfind(withtrailingslash, 0) == 0) {
+			it = s_cache.erase(it);
 		} else {
-			matchstr += wild[i];
+			it++;
 		}
 	}
-	matchstr += "$";
-	return std::regex(matchstr.c_str());
+
+	// optimistically try the passed-in directory name, otherwise use resolveFile
+	std::error_code directory_iterator_error;
+	auto iter = fs::directory_iterator(dirname, directory_iterator_error);
+	if (directory_iterator_error) {
+		dirname = resolveFile(dirname);
+		if (dirname == "") {
+			s_cache[lcdirname] = { dirname, fs::file_time_type::min() }; // I guess?
+			return;
+		}
+		iter = fs::directory_iterator(dirname);
+	}
+
+	// cache directory contents
+	s_cache[lcdirname] = { dirname, fs::last_write_time(dirname) };
+	for (const auto& entry : fs::directory_iterator(dirname)) {
+		s_cache[ascii_tolower(entry.path())] = { entry.path() };
+	}
 }
 
-std::vector<std::string> findByWildcard(std::string dir, std::string wild) {
-	cache.clear();
-	dircache.clear();
-
-	wild = toLowerCase(wild);
-
-	path dirp(dir);
-	dirp = dirp.lexically_normal();
-	if (!resolveFile(dirp))
-		return std::vector<std::string>();
-	dir = dirp.string();
-
-	if (!doCacheDir(dirp))
-		return std::vector<std::string>();
-	std::vector<std::string> results;
-	std::regex l = constructSearchPattern(wild);
-
-	std::string lcdir = toLowerCase(dir);
-	std::map<string, string>::iterator skey = cache.lower_bound(dir);
-	for (; skey != cache.end(); skey++) {
-		if (skey->first.length() < lcdir.length())
-			break;
-		std::string dirpart, filepart; // XXX: we should use boost fops, maybe
-		dirpart = skey->first.substr(0, lcdir.length());
-		if (dirpart != dir)
-			break;
-		if (skey->first.length() < lcdir.length() + 2)
-			continue;
-		filepart = toLowerCase(path(skey->first).lexically_relative(dirp).string());
-		if (!std::regex_match(filepart, l))
-			continue;
-		results.push_back(skey->second);
+std::string resolveFile(fs::path path) {
+	if (path.empty()) {
+		return "";
 	}
+	if (path.filename().empty()) {
+		path = path.parent_path();
+	}
+	fs::path lcpath = ascii_tolower(path);
+
+	// if file exists in cache and on filesystem, return it
+	if (s_cache.count(lcpath) && fs::exists(s_cache[lcpath].realfilename)) {
+		return s_cache[lcpath].realfilename;
+	}
+	updateDirectory(path.parent_path());
+
+	if (s_cache.count(lcpath)) {
+		return s_cache[lcpath].realfilename;
+	}
+	return "";
+}
+
+std::vector<std::string> findByWildcard(std::string dirname, std::string wild) {
+	// make sure dir is normal and ends with a trailing slash
+	dirname = fs::path(dirname).lexically_normal() / "";
+	auto lcdirname = ascii_tolower(dirname);
+	updateDirectory(dirname);
+
+	std::string search_pattern = "^";
+	for (auto c : wild) {
+		if (c == '*') {
+			search_pattern += ".*";
+		} else if (c == '?') {
+			search_pattern += ".";
+		} else {
+			search_pattern += std::string("[") + c + "]";
+		}
+	}
+	search_pattern += "$";
+	std::regex re(search_pattern);
+
+	std::vector<std::string> results;
+	for (const auto& it : s_cache) {
+		// str.rfind(s, 0) != 0 is equivalent to !str.startswith(s)
+		if (it.first.rfind(lcdirname, 0) != 0) {
+			continue;
+		}
+		if (std::regex_match(it.first.substr(lcdirname.size()), re)) {
+			results.push_back(it.second.realfilename);
+		}
+	}
+
 	return results;
 }
-
-/* vim: set noet: */

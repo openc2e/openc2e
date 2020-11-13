@@ -28,10 +28,7 @@
  *
  * Find a file's name, without caring about its capitalization.
  */
-bool resolveFile(std::string &srcPath);
-
-bool resolveFile(ghc::filesystem::path &path);
-
+std::string resolveFile(ghc::filesystem::path path);
 std::vector<std::string> findByWildcard(std::string dir, std::string wild);
 
 #endif
