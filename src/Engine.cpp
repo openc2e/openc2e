@@ -866,25 +866,26 @@ bool Engine::initialSetup() {
 
 	// autodetect gametype if necessary
 	if (gametype.empty()) {
-		std::cout << "Warning: No gametype specified, ";
+		std::string msg = "Warning: No gametype specified, ";
 		// TODO: is this sane? especially unsure about about.exe
 		if (!world.findFile("Creatures.exe").empty()) {
-			std::cout << "found Creatures.exe, assuming C1 (c1)";
+			msg += "found Creatures.exe, assuming C1 (c1)";
 			gametype = "c1";
 		} else if (!world.findFile("Creatures2.exe").empty()) {
-			std::cout << "found Creatures2.exe, assuming C2 (c2)";
+			msg += "found Creatures2.exe, assuming C2 (c2)";
 			gametype = "c2";
 		} else if (!world.findFile("Sea-Monkeys.ico").empty()) {
-			std::cout << "found Sea-Monkeys.ico, assuming Sea-Monkeys (sm)";
+			msg += "found Sea-Monkeys.ico, assuming Sea-Monkeys (sm)";
 			gametype = "sm";
 		} else if (!world.findFile("about.exe").empty()) {
-			std::cout << "found about.exe, assuming CA, CP or CV (cv)";
+			msg += "found about.exe, assuming CA, CP or CV (cv)";
 			gametype = "cv";
 		} else {
-			std::cout << "assuming C3/DS (c3)";
+			msg += "assuming C3/DS (c3)";
 			gametype = "c3";
 		}
-		std::cout << ", see --help if you need to specify one." << std::endl;
+		msg += ", see --help if you need to specify one.\n";
+		std::cout << msg;
 	}
 
 	// set engine version
