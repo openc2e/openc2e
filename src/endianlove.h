@@ -57,8 +57,10 @@ static inline uint16_t read16be(std::istream &s) {
 }
 
 static inline void readmany16le(std::istream &s, uint16_t* out, size_t n) {
+	s.read(reinterpret_cast<char*>(out), n * 2);
 	for (size_t i = 0; i < n; ++i) {
-		out[i] = read16le(s);
+		out[i] = (reinterpret_cast<uint8_t*>(out)[i * 2] << 0) |
+		         (reinterpret_cast<uint8_t*>(out)[i * 2 + 1] << 8);
 	}
 }
 
