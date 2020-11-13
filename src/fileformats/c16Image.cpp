@@ -49,26 +49,37 @@ MultiImage ReadC16File(std::istream &in) {
 		}
 	}
 	
-	// then, read the files. this involves seeking around, and is hence immensely ghey
+	// track position manually because ifstreams implementations often call seek
+	// on the underlying file even when we're already at the right position!
+	size_t curpos = in.tellg();
+	
 	// todo: we assume the file format is valid here. we shouldn't.
 	for (unsigned int i = 0; i < numframes; i++) {
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height * 2);
 		uint16_t *bufferpos = (uint16_t *)images[i].data.data();
 		for (unsigned int j = 0; j < images[i].height; j++) {
-			in.seekg(lineoffsets[i][j], std::ios::beg);
+			if (lineoffsets[i][j] != curpos) {
+				// TODO: log warning?
+				in.seekg(lineoffsets[i][j], std::ios::beg);
+			}
 			while (true) {
 				uint16_t tag = read16le(in);
+				curpos += 2;
 				if (tag == 0) break;
 				bool transparentrun = ((tag & 0x0001) == 0);
 				uint16_t runlength = (tag & 0xFFFE) >> 1;
-				if (transparentrun)
+				if (transparentrun) {
 					memset((char *)bufferpos, 0, (runlength * 2));
-				else {
+				} else {
 					readmany16le(in, bufferpos, runlength);
+					curpos += 2 * runlength;
 				}
 				bufferpos += runlength;
 			}
 		}
+		uint16_t endofimagemarker = read16le(in);
+		curpos += 2;
+		assert(endofimagemarker == 0);
 	}
 
 	return images;

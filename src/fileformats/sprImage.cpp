@@ -49,6 +49,7 @@ MultiImage ReadSprFile(std::istream &in) {
 	// }
 
 	for (int i = 0; i < numframes; i++) {
+		// TODO: don't seek
 		in.seekg(offsets[i]);
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
 		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);

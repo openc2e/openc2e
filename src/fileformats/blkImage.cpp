@@ -53,6 +53,7 @@ Image ReadBlkFile(std::istream &in) {
 			const unsigned int whereweare = j * heightinsprites + i;
 			const int destx = (j * sprwidth);
 			const int desty = (i * sprheight);
+			// TODO: don't seek, it's slow
 			in.seekg(offsets[whereweare]);
 			for (int blocky = 0; blocky < 128; blocky++) {
 				readmany16le(in, (uint16_t*)&(buffer[(i * 128 + blocky) * totalwidth * 2 + j * 128 * 2]), 128);
