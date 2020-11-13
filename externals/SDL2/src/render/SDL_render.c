@@ -24,10 +24,10 @@
 
 #include "SDL_assert.h"
 #include "SDL_hints.h"
+#include "SDL_log.h"
 #include "SDL_render.h"
 #include "SDL_sysrender.h"
 #include "software/SDL_render_sw_c.h"
-#include "../video/SDL_pixels_c.h"
 
 #if defined(__ANDROID__)
 #  include "../core/android/SDL_android.h"
@@ -660,17 +660,15 @@ SDL_RendererEventWatch(void *userdata, SDL_Event *event)
                 event->motion.y -= (int)(viewport.y * renderer->dpi_scale.y);
                 event->motion.x = (int)(event->motion.x / (scale.x * renderer->dpi_scale.x));
                 event->motion.y = (int)(event->motion.y / (scale.y * renderer->dpi_scale.y));
-                if (event->motion.xrel != 0 && renderer->relative_scaling) {
-                    float rel = renderer->xrel + event->motion.xrel / (scale.x * renderer->dpi_scale.x);
-                    float trunc = SDL_truncf(rel);
-                    renderer->xrel = rel - trunc;
-                    event->motion.xrel = (Sint32) trunc;
+                if (event->motion.xrel > 0) {
+                    event->motion.xrel = SDL_max(1, (int)(event->motion.xrel / (scale.x * renderer->dpi_scale.x)));
+                } else if (event->motion.xrel < 0) {
+                    event->motion.xrel = SDL_min(-1, (int)(event->motion.xrel / (scale.x * renderer->dpi_scale.x)));
                 }
-                if (event->motion.yrel != 0 && renderer->relative_scaling) {
-                    float rel = renderer->yrel + event->motion.yrel / (scale.y * renderer->dpi_scale.y);
-                    float trunc = SDL_truncf(rel);
-                    renderer->yrel = rel - trunc;
-                    event->motion.yrel = (Sint32) trunc;
+                if (event->motion.yrel > 0) {
+                    event->motion.yrel = SDL_max(1, (int)(event->motion.yrel / (scale.y * renderer->dpi_scale.y)));
+                } else if (event->motion.yrel < 0) {
+                    event->motion.yrel = SDL_min(-1, (int)(event->motion.yrel / (scale.y * renderer->dpi_scale.y)));
                 }
             }
         }
@@ -688,60 +686,40 @@ SDL_RendererEventWatch(void *userdata, SDL_Event *event)
                 event->button.x = (int)(event->button.x / (scale.x * renderer->dpi_scale.x));
                 event->button.y = (int)(event->button.y / (scale.y * renderer->dpi_scale.y));
             }
-        }                               
+        }
     } else if (event->type == SDL_FINGERDOWN ||
                event->type == SDL_FINGERUP ||
                event->type == SDL_FINGERMOTION) {
         int logical_w, logical_h;
-        float physical_w, physical_h;
         SDL_Rect viewport;
         SDL_FPoint scale;
         GetWindowViewportValues(renderer, &logical_w, &logical_h, &viewport, &scale);
-
-        /* !!! FIXME: we probably should drop events that are outside of the
-           !!! FIXME: viewport, but we can't do that from an event watcher,
-           !!! FIXME: and we would have to track if a touch happened outside
-           !!! FIXME: the viewport and then slid into it to insert extra
-           !!! FIXME: events, which is a mess, so for now we just clamp these
-           !!! FIXME: events to the edge. */
-
-        if (renderer->GetOutputSize) {
+        if (logical_w) {
             int w, h;
-            renderer->GetOutputSize(renderer, &w, &h);
-            physical_w = (float) w;
-            physical_h = (float) h;
-        } else {
-            int w, h;
-            SDL_GetWindowSize(renderer->window, &w, &h);
-            physical_w = ((float) w) * renderer->dpi_scale.x;
-            physical_h = ((float) h) * renderer->dpi_scale.y;
-        }
 
-        if (physical_w == 0.0f) {  /* nowhere for the touch to go, avoid division by zero and put it dead center. */
-            event->tfinger.x = 0.5f;
-        } else {
-            const float normalized_viewport_x = ((float) viewport.x) / physical_w;
-            const float normalized_viewport_w = ((float) viewport.w) / physical_w;
-            if (event->tfinger.x <= normalized_viewport_x) {
-                event->tfinger.x = 0.0f;  /* to the left of the viewport, clamp to the edge. */
-            } else if (event->tfinger.x >= (normalized_viewport_x + normalized_viewport_w)) {
-                event->tfinger.x = 1.0f;  /* to the right of the viewport, clamp to the edge. */
+            if (renderer->GetOutputSize) {
+                renderer->GetOutputSize(renderer, &w, &h);
             } else {
-                event->tfinger.x = (event->tfinger.x - normalized_viewport_x) / normalized_viewport_w;
+                SDL_GetWindowSize(renderer->window, &w, &h);
             }
-        }
 
-        if (physical_h == 0.0f) {  /* nowhere for the touch to go, avoid division by zero and put it dead center. */
-            event->tfinger.y = 0.5f;
-        } else {
-            const float normalized_viewport_y = ((float) viewport.y) / physical_h;
-            const float normalized_viewport_h = ((float) viewport.h) / physical_h;
-            if (event->tfinger.y <= normalized_viewport_y) {
-                event->tfinger.y = 0.0f;  /* to the left of the viewport, clamp to the edge. */
-            } else if (event->tfinger.y >= (normalized_viewport_y + normalized_viewport_h)) {
-                event->tfinger.y = 1.0f;  /* to the right of the viewport, clamp to the edge. */
+            event->tfinger.x *= (w - 1);
+            event->tfinger.y *= (h - 1);
+
+            event->tfinger.x -= (viewport.x * renderer->dpi_scale.x);
+            event->tfinger.y -= (viewport.y * renderer->dpi_scale.y);
+            event->tfinger.x = (event->tfinger.x / (scale.x * renderer->dpi_scale.x));
+            event->tfinger.y = (event->tfinger.y / (scale.y * renderer->dpi_scale.y));
+
+            if (logical_w > 1) {
+                event->tfinger.x = event->tfinger.x / (logical_w - 1);
             } else {
-                event->tfinger.y = (event->tfinger.y - normalized_viewport_y) / normalized_viewport_h;
+                event->tfinger.x = 0.5f;
+            }
+            if (logical_h > 1) {
+                event->tfinger.y = event->tfinger.y / (logical_h - 1);
+            } else {
+                event->tfinger.y = 0.5f;
             }
         }
     }
@@ -894,8 +872,6 @@ SDL_CreateRenderer(SDL_Window * window, int index, Uint32 flags)
             renderer->dpi_scale.y = (float)window_h / output_h;
         }
     }
-
-    renderer->relative_scaling = SDL_GetHintBoolean(SDL_HINT_MOUSE_RELATIVE_SCALING, SDL_TRUE);
 
     if (SDL_GetWindowFlags(window) & (SDL_WINDOW_HIDDEN|SDL_WINDOW_MINIMIZED)) {
         renderer->hidden = SDL_TRUE;
@@ -1189,10 +1165,12 @@ SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface)
 
     /* If Palette contains alpha values, promotes to alpha format */
     if (fmt->palette) {
-        SDL_bool is_opaque, has_alpha_channel;
-        SDL_DetectPalette(fmt->palette, &is_opaque, &has_alpha_channel);
-        if (!is_opaque) {
-            needAlpha = SDL_TRUE;
+        for (i = 0; i < fmt->palette->ncolors; i++) {
+            Uint8 alpha_value = fmt->palette->colors[i].a;
+            if (alpha_value != 0 && alpha_value != SDL_ALPHA_OPAQUE) {
+                needAlpha = SDL_TRUE;
+                break;
+            }
         }
     }
 
@@ -1765,8 +1743,7 @@ SDL_LockTextureToSurface(SDL_Texture *texture, const SDL_Rect *rect,
 {
     SDL_Rect real_rect;
     void *pixels = NULL;
-    int pitch = 0; /* fix static analysis */
-    int ret;
+    int pitch, ret;
 
     if (texture == NULL || surface == NULL) {
         return -1;

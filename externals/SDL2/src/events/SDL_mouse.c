@@ -722,24 +722,23 @@ Uint32
 SDL_GetGlobalMouseState(int *x, int *y)
 {
     SDL_Mouse *mouse = SDL_GetMouse();
+    int tmpx, tmpy;
 
-    if (mouse->GetGlobalMouseState) {
-        int tmpx, tmpy;
-
-        /* make sure these are never NULL for the backend implementations... */
-        if (!x) {
-            x = &tmpx;
-        }
-        if (!y) {
-            y = &tmpy;
-        }
-
-        *x = *y = 0;
-
-        return mouse->GetGlobalMouseState(x, y);
-    } else {
-        return SDL_GetMouseState(x, y);
+    /* make sure these are never NULL for the backend implementations... */
+    if (!x) {
+        x = &tmpx;
     }
+    if (!y) {
+        y = &tmpy;
+    }
+
+    *x = *y = 0;
+
+    if (!mouse->GetGlobalMouseState) {
+        return 0;
+    }
+
+    return mouse->GetGlobalMouseState(x, y);
 }
 
 void

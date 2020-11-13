@@ -50,6 +50,12 @@
 #include "SDL_rpiopengles.h"
 #include "SDL_rpimouse.h"
 
+static int
+RPI_Available(void)
+{
+    return 1;
+}
+
 static void
 RPI_Destroy(SDL_VideoDevice * device)
 {
@@ -144,6 +150,7 @@ RPI_Create()
 VideoBootStrap RPI_bootstrap = {
     "RPI",
     "RPI Video Driver",
+    RPI_Available,
     RPI_Create
 };
 

@@ -52,10 +52,11 @@ extern int SDL_JoystickGetDeviceIndexFromInstanceID(SDL_JoystickID instance_id);
 /* Function to extract information from an SDL joystick GUID */
 extern void SDL_GetJoystickGUIDInfo(SDL_JoystickGUID guid, Uint16 *vendor, Uint16 *product, Uint16 *version);
 
-/* Function to standardize the name for a controller
-   This should be freed with SDL_free() when no longer needed
- */
-extern char *SDL_CreateJoystickName(Uint16 vendor, Uint16 product, const char *vendor_name, const char *product_name);
+/* Function to get a custom name for a controller manufacturer, if it's available */
+extern const char *SDL_GetCustomJoystickManufacturer(const char *manufacturer);
+
+/* Function to get a custom name for a controller, if it's available */
+extern const char *SDL_GetCustomJoystickName(Uint16 vendor, Uint16 product);
 
 /* Function to return the type of a controller */
 extern SDL_GameControllerType SDL_GetJoystickGameControllerTypeFromGUID(SDL_JoystickGUID guid, const char *name);
@@ -70,17 +71,8 @@ extern SDL_bool SDL_IsJoystickSteamController(Uint16 vendor_id, Uint16 product_i
 /* Function to return whether a joystick guid comes from the XInput driver */
 extern SDL_bool SDL_IsJoystickXInput(SDL_JoystickGUID guid);
 
-/* Function to return whether a joystick guid comes from the WGI driver */
-extern SDL_bool SDL_IsJoystickWGI(SDL_JoystickGUID guid);
-
 /* Function to return whether a joystick guid comes from the HIDAPI driver */
 extern SDL_bool SDL_IsJoystickHIDAPI(SDL_JoystickGUID guid);
-
-/* Function to return whether a joystick guid comes from the RAWINPUT driver */
-extern SDL_bool SDL_IsJoystickRAWINPUT(SDL_JoystickGUID guid);
-
-/* Function to return whether a joystick guid comes from the Virtual driver */
-extern SDL_bool SDL_IsJoystickVirtual(SDL_JoystickGUID guid);
 
 /* Function to return whether a joystick should be ignored */
 extern SDL_bool SDL_ShouldIgnoreJoystick(const char *name, SDL_JoystickGUID guid);
@@ -110,49 +102,6 @@ extern void SDL_PrivateJoystickBatteryLevel(SDL_Joystick * joystick,
 
 /* Internal sanity checking functions */
 extern SDL_bool SDL_PrivateJoystickValid(SDL_Joystick * joystick);
-
-typedef enum
-{
-    EMappingKind_None = 0,
-    EMappingKind_Button = 1,
-    EMappingKind_Axis = 2,
-    EMappingKind_Hat = 3
-} EMappingKind;
-
-typedef struct _SDL_InputMapping
-{
-    EMappingKind kind;
-    Uint8 target;
-} SDL_InputMapping;
-
-typedef struct _SDL_GamepadMapping
-{
-    SDL_InputMapping a;
-    SDL_InputMapping b;
-    SDL_InputMapping x;
-    SDL_InputMapping y;
-    SDL_InputMapping back;
-    SDL_InputMapping guide;
-    SDL_InputMapping start;
-    SDL_InputMapping leftstick;
-    SDL_InputMapping rightstick;
-    SDL_InputMapping leftshoulder;
-    SDL_InputMapping rightshoulder;
-    SDL_InputMapping dpup;
-    SDL_InputMapping dpdown;
-    SDL_InputMapping dpleft;
-    SDL_InputMapping dpright;
-    SDL_InputMapping leftx;
-    SDL_InputMapping lefty;
-    SDL_InputMapping rightx;
-    SDL_InputMapping righty;
-    SDL_InputMapping lefttrigger;
-    SDL_InputMapping righttrigger;
-} SDL_GamepadMapping;
-
-/* Function to get autodetected gamepad controller mapping from the driver */
-extern SDL_bool SDL_PrivateJoystickGetAutoGamepadMapping(int device_index,
-                                                         SDL_GamepadMapping *out);
 
 #endif /* SDL_joystick_c_h_ */
 

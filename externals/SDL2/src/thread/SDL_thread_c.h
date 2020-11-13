@@ -60,14 +60,11 @@ struct SDL_Thread
     SDL_error errbuf;
     char *name;
     size_t stacksize;  /* 0 for default, >0 for user-specified stack size. */
-    int (SDLCALL * userfunc) (void *);
-    void *userdata;
     void *data;
-    void *endfunc;  /* only used on some platforms. */
 };
 
 /* This is the function called to run a thread */
-extern void SDL_RunThread(SDL_Thread *thread);
+extern void SDL_RunThread(void *data);
 
 /* This is the system-independent thread local storage structure */
 typedef struct {

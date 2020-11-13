@@ -516,18 +516,13 @@ SDL_wcsncmp(const wchar_t *str1, const wchar_t *str2, size_t maxlen)
 #if defined(HAVE_WCSNCMP)
     return wcsncmp(str1, str2, maxlen);
 #else
-    while (*str1 && *str2 && maxlen) {
+    while (*str1 && *str2) {
         if (*str1 != *str2)
             break;
         ++str1;
         ++str2;
-        --maxlen;
     }
-    if (!maxlen) {
-        return 0;
-    }
-    return (int) (*str1 - *str2);
-
+    return (int)(*str1 - *str2);
 #endif /* HAVE_WCSNCMP */
 }
 

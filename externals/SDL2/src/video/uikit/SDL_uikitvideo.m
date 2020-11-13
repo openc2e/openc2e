@@ -52,6 +52,12 @@ static void UIKit_VideoQuit(_THIS);
 
 /* DUMMY driver bootstrap functions */
 
+static int
+UIKit_Available(void)
+{
+    return 1;
+}
+
 static void UIKit_DeleteDevice(SDL_VideoDevice * device)
 {
     @autoreleasepool {
@@ -96,7 +102,6 @@ UIKit_CreateDevice(int devindex)
         device->DestroyWindow = UIKit_DestroyWindow;
         device->GetWindowWMInfo = UIKit_GetWindowWMInfo;
         device->GetDisplayUsableBounds = UIKit_GetDisplayUsableBounds;
-        device->GetDisplayDPI = UIKit_GetDisplayDPI;
 
 #if SDL_IPHONE_KEYBOARD
         device->HasScreenKeyboardSupport = UIKit_HasScreenKeyboardSupport;
@@ -134,8 +139,6 @@ UIKit_CreateDevice(int devindex)
 #if SDL_VIDEO_METAL
         device->Metal_CreateView = UIKit_Metal_CreateView;
         device->Metal_DestroyView = UIKit_Metal_DestroyView;
-        device->Metal_GetLayer = UIKit_Metal_GetLayer;
-        device->Metal_GetDrawableSize = UIKit_Metal_GetDrawableSize;
 #endif
 
         device->gl_config.accelerated = 1;
@@ -146,7 +149,7 @@ UIKit_CreateDevice(int devindex)
 
 VideoBootStrap UIKIT_bootstrap = {
     UIKITVID_DRIVER_NAME, "SDL UIKit video driver",
-    UIKit_CreateDevice
+    UIKit_Available, UIKit_CreateDevice
 };
 
 

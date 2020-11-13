@@ -120,15 +120,25 @@ get_classname()
     return SDL_strdup("SDL_App");
 }
 
+/* Wayland driver bootstrap functions */
+static int
+Wayland_Available(void)
+{
+    struct wl_display *display = NULL;
+    if (SDL_WAYLAND_LoadSymbols()) {
+        display = WAYLAND_wl_display_connect(NULL);
+        if (display != NULL) {
+            WAYLAND_wl_display_disconnect(display);
+        }
+        SDL_WAYLAND_UnloadSymbols();
+    }
+
+    return (display != NULL);
+}
+
 static void
 Wayland_DeleteDevice(SDL_VideoDevice *device)
 {
-    SDL_VideoData *data = (SDL_VideoData *)device->driverdata;
-    if (data->display) {
-        WAYLAND_wl_display_flush(data->display);
-        WAYLAND_wl_display_disconnect(data->display);
-    }
-    SDL_free(data);
     SDL_free(device);
     SDL_WAYLAND_UnloadSymbols();
 }
@@ -137,40 +147,18 @@ static SDL_VideoDevice *
 Wayland_CreateDevice(int devindex)
 {
     SDL_VideoDevice *device;
-    SDL_VideoData *data;
-    struct wl_display *display;
 
     if (!SDL_WAYLAND_LoadSymbols()) {
         return NULL;
     }
 
-    display = WAYLAND_wl_display_connect(NULL);
-    if (display == NULL) {
-        SDL_WAYLAND_UnloadSymbols();
-        return NULL;
-    }
-
-    data = SDL_calloc(1, sizeof(*data));
-    if (data == NULL) {
-        WAYLAND_wl_display_disconnect(display);
-        SDL_WAYLAND_UnloadSymbols();
-        SDL_OutOfMemory();
-        return NULL;
-    }
-
-    data->display = display;
-
     /* Initialize all variables that we clean on shutdown */
     device = SDL_calloc(1, sizeof(SDL_VideoDevice));
     if (!device) {
-        SDL_free(data);
-        WAYLAND_wl_display_disconnect(display);
         SDL_WAYLAND_UnloadSymbols();
         SDL_OutOfMemory();
         return NULL;
     }
-
-    device->driverdata = data;
 
     /* Set the function pointers */
     device->VideoInit = Wayland_VideoInit;
@@ -196,7 +184,6 @@ Wayland_CreateDevice(int devindex)
     device->ShowWindow = Wayland_ShowWindow;
     device->SetWindowFullscreen = Wayland_SetWindowFullscreen;
     device->MaximizeWindow = Wayland_MaximizeWindow;
-    device->SetWindowGrab = Wayland_SetWindowGrab;
     device->RestoreWindow = Wayland_RestoreWindow;
     device->SetWindowBordered = Wayland_SetWindowBordered;
     device->SetWindowSize = Wayland_SetWindowSize;
@@ -223,7 +210,7 @@ Wayland_CreateDevice(int devindex)
 
 VideoBootStrap Wayland_bootstrap = {
     WAYLANDVID_DRIVER_NAME, "SDL Wayland video driver",
-    Wayland_CreateDevice
+    Wayland_Available, Wayland_CreateDevice
 };
 
 static void
@@ -377,7 +364,7 @@ display_handle_global(void *data, struct wl_registry *registry, uint32_t id,
     } else if (strcmp(interface, "wl_output") == 0) {
         Wayland_add_display(d, id);
     } else if (strcmp(interface, "wl_seat") == 0) {
-        Wayland_display_add_input(d, id, version);
+        Wayland_display_add_input(d, id);
     } else if (strcmp(interface, "xdg_wm_base") == 0) {
         d->shell.xdg = wl_registry_bind(d->registry, id, &xdg_wm_base_interface, 1);
         xdg_wm_base_add_listener(d->shell.xdg, &shell_listener_xdg, NULL);
@@ -425,11 +412,20 @@ static const struct wl_registry_listener registry_listener = {
 int
 Wayland_VideoInit(_THIS)
 {
-    SDL_VideoData *data = (SDL_VideoData*)_this->driverdata;
+    SDL_VideoData *data = SDL_calloc(1, sizeof(*data));
+    if (data == NULL)
+        return SDL_OutOfMemory();
+
+    _this->driverdata = data;
 
     data->xkb_context = WAYLAND_xkb_context_new(0);
     if (!data->xkb_context) {
         return SDL_SetError("Failed to create XKB context");
+    }
+
+    data->display = WAYLAND_wl_display_connect(NULL);
+    if (data->display == NULL) {
+        return SDL_SetError("Failed to connect to a Wayland display");
     }
 
     data->registry = wl_display_get_registry(data->display);
@@ -528,7 +524,14 @@ Wayland_VideoQuit(_THIS)
     if (data->registry)
         wl_registry_destroy(data->registry);
 
+    if (data->display) {
+        WAYLAND_wl_display_flush(data->display);
+        WAYLAND_wl_display_disconnect(data->display);
+    }
+
     SDL_free(data->classname);
+    SDL_free(data);
+    _this->driverdata = NULL;
 }
 
 #endif /* SDL_VIDEO_DRIVER_WAYLAND */

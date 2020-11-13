@@ -38,7 +38,6 @@
 #include <linux/joystick.h>
 
 #include "SDL_assert.h"
-#include "SDL_hints.h"
 #include "SDL_joystick.h"
 #include "SDL_endian.h"
 #include "SDL_timer.h"
@@ -53,36 +52,8 @@
 #ifndef SYN_DROPPED
 #define SYN_DROPPED 3
 #endif
-#ifndef BTN_SOUTH
-#define BTN_SOUTH       0x130
-#endif
-#ifndef BTN_EAST
-#define BTN_EAST        0x131
-#endif
-#ifndef BTN_NORTH
-#define BTN_NORTH       0x133
-#endif
-#ifndef BTN_WEST
-#define BTN_WEST        0x134
-#endif
-#ifndef BTN_DPAD_UP
-#define BTN_DPAD_UP     0x220
-#endif
-#ifndef BTN_DPAD_DOWN
-#define BTN_DPAD_DOWN   0x221
-#endif
-#ifndef BTN_DPAD_LEFT
-#define BTN_DPAD_LEFT   0x222
-#endif
-#ifndef BTN_DPAD_RIGHT
-#define BTN_DPAD_RIGHT  0x223
-#endif
 
 #include "../../core/linux/SDL_udev.h"
-
-#if 0
-#define DEBUG_INPUT_EVENTS 1
-#endif
 
 static int MaybeAddDevice(const char *path);
 #if SDL_USE_LIBUDEV
@@ -117,6 +88,20 @@ static time_t last_input_dir_mtime;
     (((1UL << ((nr) % (sizeof(long) * 8))) & ((addr)[(nr) / (sizeof(long) * 8)])) != 0)
 #define NBITS(x) ((((x)-1)/(sizeof(long) * 8))+1)
 
+static int
+PrefixMatch(const char *a, const char *b)
+{
+    int matchlen = 0;
+    while (*a && *b) {
+        if (*a++ == *b++) {
+            ++matchlen;
+        } else {
+            break;
+        }
+    }
+    return matchlen;
+}
+
 static void
 FixupDeviceInfoForMapping(int fd, struct input_id *inpid)
 {
@@ -133,26 +118,14 @@ FixupDeviceInfoForMapping(int fd, struct input_id *inpid)
     }
 }
 
-#ifdef SDL_JOYSTICK_HIDAPI
-static SDL_bool
-IsVirtualJoystick(Uint16 vendor, Uint16 product, Uint16 version, const char *name)
-{
-    if (vendor == USB_VENDOR_MICROSOFT && product == USB_PRODUCT_XBOX_ONE_S && version == 0 &&
-        SDL_strcmp(name, "Xbox One S Controller") == 0) {
-        /* This is the virtual device created by the xow driver */
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
-}
-#endif /* SDL_JOYSTICK_HIDAPI */
 
 static int
-IsJoystick(int fd, char **name_return, SDL_JoystickGUID *guid)
+IsJoystick(int fd, char *namebuf, const size_t namebuflen, SDL_JoystickGUID *guid)
 {
     struct input_id inpid;
     Uint16 *guid16 = (Uint16 *)guid->data;
-    char *name;
-    char product_string[128];
+    const char *name;
+    const char *spot;
 
 #if !SDL_USE_LIBUDEV
     /* When udev is enabled we only get joystick devices here, so there's no need to test them */
@@ -176,20 +149,27 @@ IsJoystick(int fd, char **name_return, SDL_JoystickGUID *guid)
         return 0;
     }
 
-    if (ioctl(fd, EVIOCGNAME(sizeof(product_string)), product_string) < 0) {
-        return 0;
-    }
+    name = SDL_GetCustomJoystickName(inpid.vendor, inpid.product);
+    if (name) {
+        SDL_strlcpy(namebuf, name, namebuflen);
+    } else {
+        if (ioctl(fd, EVIOCGNAME(namebuflen), namebuf) < 0) {
+            return 0;
+        }
 
-    name = SDL_CreateJoystickName(inpid.vendor, inpid.product, NULL, product_string);
-    if (!name) {
-        return 0;
+        /* Remove duplicate manufacturer in the name */
+        for (spot = namebuf + 1; *spot; ++spot) {
+            int matchlen = PrefixMatch(namebuf, spot);
+            if (matchlen > 0 && spot[matchlen - 1] == ' ') {
+                SDL_memmove(namebuf, spot, SDL_strlen(spot)+1);
+                break;
+            }
+        }
     }
 
 #ifdef SDL_JOYSTICK_HIDAPI
-    if (!IsVirtualJoystick(inpid.vendor, inpid.product, inpid.version, name) &&
-        HIDAPI_IsDevicePresent(inpid.vendor, inpid.product, inpid.version, name)) {
+    if (HIDAPI_IsDevicePresent(inpid.vendor, inpid.product, inpid.version, namebuf)) {
         /* The HIDAPI driver is taking care of this device */
-        SDL_free(name);
         return 0;
     }
 #endif
@@ -197,7 +177,7 @@ IsJoystick(int fd, char **name_return, SDL_JoystickGUID *guid)
     FixupDeviceInfoForMapping(fd, &inpid);
 
 #ifdef DEBUG_JOYSTICK
-    printf("Joystick: %s, bustype = %d, vendor = 0x%.4x, product = 0x%.4x, version = %d\n", name, inpid.bustype, inpid.vendor, inpid.product, inpid.version);
+    printf("Joystick: %s, bustype = %d, vendor = 0x%.4x, product = 0x%.4x, version = %d\n", namebuf, inpid.bustype, inpid.vendor, inpid.product, inpid.version);
 #endif
 
     SDL_memset(guid->data, 0, sizeof(guid->data));
@@ -215,14 +195,12 @@ IsJoystick(int fd, char **name_return, SDL_JoystickGUID *guid)
         *guid16++ = SDL_SwapLE16(inpid.version);
         *guid16++ = 0;
     } else {
-        SDL_strlcpy((char*)guid16, name, sizeof(guid->data) - 4);
+        SDL_strlcpy((char*)guid16, namebuf, sizeof(guid->data) - 4);
     }
 
-    if (SDL_ShouldIgnoreJoystick(name, *guid)) {
-        SDL_free(name);
+    if (SDL_ShouldIgnoreJoystick(namebuf, *guid)) {
         return 0;
     }
-    *name_return = name;
     return 1;
 }
 
@@ -258,7 +236,7 @@ MaybeAddDevice(const char *path)
     struct stat sb;
     int fd = -1;
     int isstick = 0;
-    char *name = NULL;
+    char namebuf[128];
     SDL_JoystickGUID guid;
     SDL_joylist_item *item;
 
@@ -286,7 +264,7 @@ MaybeAddDevice(const char *path)
     printf("Checking %s\n", path);
 #endif
 
-    isstick = IsJoystick(fd, &name, &guid);
+    isstick = IsJoystick(fd, namebuf, sizeof (namebuf), &guid);
     close(fd);
     if (!isstick) {
         return -1;
@@ -300,7 +278,7 @@ MaybeAddDevice(const char *path)
     SDL_zerop(item);
     item->devnum = sb.st_rdev;
     item->path = SDL_strdup(path);
-    item->name = name;
+    item->name = SDL_strdup(namebuf);
     item->guid = guid;
 
     if ((item->path == NULL) || (item->name == NULL)) {
@@ -685,7 +663,6 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
                 printf("Joystick has button: 0x%x\n", i);
 #endif
                 joystick->hwdata->key_map[i] = joystick->nbuttons;
-                joystick->hwdata->has_key[i] = SDL_TRUE;
                 ++joystick->nbuttons;
             }
         }
@@ -695,7 +672,6 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
                 printf("Joystick has button: 0x%x\n", i);
 #endif
                 joystick->hwdata->key_map[i] = joystick->nbuttons;
-                joystick->hwdata->has_key[i] = SDL_TRUE;
                 ++joystick->nbuttons;
             }
         }
@@ -707,7 +683,6 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
             }
             if (test_bit(i, absbit)) {
                 struct input_absinfo absinfo;
-                SDL_bool hint_used = SDL_GetHintBoolean(SDL_HINT_LINUX_JOYSTICK_DEADZONES, SDL_TRUE);
 
                 if (ioctl(fd, EVIOCGABS(i), &absinfo) < 0) {
                     continue;
@@ -719,11 +694,10 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
                        absinfo.fuzz, absinfo.flat);
 #endif /* DEBUG_INPUT_EVENTS */
                 joystick->hwdata->abs_map[i] = joystick->naxes;
-                joystick->hwdata->has_abs[i] = SDL_TRUE;
                 if (absinfo.minimum == absinfo.maximum) {
                     joystick->hwdata->abs_correct[i].used = 0;
                 } else {
-                    joystick->hwdata->abs_correct[i].used = hint_used;
+                    joystick->hwdata->abs_correct[i].used = 1;
                     joystick->hwdata->abs_correct[i].coef[0] =
                         (absinfo.maximum + absinfo.minimum) - 2 * absinfo.flat;
                     joystick->hwdata->abs_correct[i].coef[1] =
@@ -754,7 +728,6 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
                        absinfo.fuzz, absinfo.flat);
 #endif /* DEBUG_INPUT_EVENTS */
                 joystick->hwdata->hats_indices[hat_index] = joystick->nhats++;
-                joystick->hwdata->has_hat[hat_index] = SDL_TRUE;
             }
         }
         if (test_bit(REL_X, relbit) || test_bit(REL_Y, relbit)) {
@@ -844,7 +817,7 @@ LINUX_JoystickOpen(SDL_Joystick * joystick, int device_index)
     item->hwdata = joystick->hwdata;
 
     /* mark joystick as fresh and ready */
-    joystick->hwdata->fresh = SDL_TRUE;
+    joystick->hwdata->fresh = 1;
 
     return (0);
 }
@@ -956,12 +929,11 @@ static SDL_INLINE void
 PollAllValues(SDL_Joystick * joystick)
 {
     struct input_absinfo absinfo;
-    unsigned long keyinfo[NBITS(KEY_MAX)];
     int i;
 
     /* Poll all axis */
     for (i = ABS_X; i < ABS_MAX; i++) {
-        if (i == ABS_HAT0X) {  /* we handle hats in the next loop, skip them for now. */
+        if (i == ABS_HAT0X) {
             i = ABS_HAT3Y;
             continue;
         }
@@ -979,37 +951,6 @@ PollAllValues(SDL_Joystick * joystick)
             }
         }
     }
-
-    /* Poll all hats */
-    for (i = ABS_HAT0X; i <= ABS_HAT3Y; i++) {
-        const int baseaxis = i - ABS_HAT0X;
-        const int hatidx = baseaxis / 2;
-        SDL_assert(hatidx < SDL_arraysize(joystick->hwdata->has_hat));
-        if (joystick->hwdata->has_hat[hatidx]) {
-            if (ioctl(joystick->hwdata->fd, EVIOCGABS(i), &absinfo) >= 0) {
-                const int hataxis = baseaxis % 2;
-                HandleHat(joystick, joystick->hwdata->hats_indices[hatidx], hataxis, absinfo.value);
-            }
-        }
-    }
-
-    /* Poll all buttons */
-    SDL_zeroa(keyinfo);
-    if (ioctl(joystick->hwdata->fd, EVIOCGKEY(sizeof (keyinfo)), keyinfo) >= 0) {
-        for (i = 0; i < KEY_MAX; i++) {
-            if (joystick->hwdata->has_key[i]) {
-                const Uint8 value = test_bit(i, keyinfo) ? SDL_PRESSED : SDL_RELEASED;
-#ifdef DEBUG_INPUT_EVENTS
-                printf("Joystick : Re-read Button %d (%d) val= %d\n",
-                    joystick->hwdata->key_map[i], i, value);
-#endif
-                SDL_PrivateJoystickButton(joystick,
-                        joystick->hwdata->key_map[i], value);
-            }
-        }
-    }
-
-    /* Joyballs are relative input, so there's no poll state. Events only! */
 }
 
 static SDL_INLINE void
@@ -1021,21 +962,13 @@ HandleInputEvents(SDL_Joystick * joystick)
 
     if (joystick->hwdata->fresh) {
         PollAllValues(joystick);
-        joystick->hwdata->fresh = SDL_FALSE;
+        joystick->hwdata->fresh = 0;
     }
 
     while ((len = read(joystick->hwdata->fd, events, (sizeof events))) > 0) {
         len /= sizeof(events[0]);
         for (i = 0; i < len; ++i) {
             code = events[i].code;
-
-            /* If the kernel sent a SYN_DROPPED, we are supposed to ignore the
-               rest of the packet (the end of it signified by a SYN_REPORT) */
-            if ( joystick->hwdata->recovering_from_dropped &&
-                 ((events[i].type != EV_SYN) || (code != SYN_REPORT)) ) {
-                continue;
-            }
-
             switch (events[i].type) {
             case EV_KEY:
                 SDL_PrivateJoystickButton(joystick,
@@ -1083,13 +1016,7 @@ HandleInputEvents(SDL_Joystick * joystick)
 #ifdef DEBUG_INPUT_EVENTS
                     printf("Event SYN_DROPPED detected\n");
 #endif
-                    joystick->hwdata->recovering_from_dropped = SDL_TRUE;
-                    break;
-                case SYN_REPORT :
-                    if (joystick->hwdata->recovering_from_dropped) {
-                        joystick->hwdata->recovering_from_dropped = SDL_FALSE;
-                        PollAllValues(joystick);  /* try to sync up to current state now */
-                    }
+                    PollAllValues(joystick);
                     break;
                 default:
                     break;
@@ -1180,180 +1107,6 @@ LINUX_JoystickQuit(void)
     SDL_QuitSteamControllers();
 }
 
-/*
-   This is based on the Linux Gamepad Specification
-   available at: https://www.kernel.org/doc/html/v4.15/input/gamepad.html
- */
-static SDL_bool
-LINUX_JoystickGetGamepadMapping(int device_index, SDL_GamepadMapping *out)
-{
-    SDL_Joystick * joystick;
-
-    joystick = (SDL_Joystick *) SDL_calloc(sizeof(*joystick), 1);
-    if (joystick == NULL) {
-        SDL_OutOfMemory();
-        return SDL_FALSE;
-    }
-
-    /* We temporarily open the device to check how it's configured. */
-    if (LINUX_JoystickOpen(joystick, device_index) < 0) {
-        SDL_free(joystick);
-        return SDL_FALSE;
-    }
-
-    if (!joystick->hwdata->has_key[BTN_GAMEPAD]) {
-        /* Not a gamepad according to the specs. */
-        LINUX_JoystickClose(joystick);
-        SDL_free(joystick);
-        return SDL_FALSE;
-    }
-
-    /* We have a gamepad, start filling out the mappings */
-
-    if (joystick->hwdata->has_key[BTN_SOUTH]) {
-        out->a.kind = EMappingKind_Button;
-        out->a.target = joystick->hwdata->key_map[BTN_SOUTH];
-    }
-
-    if (joystick->hwdata->has_key[BTN_EAST]) {
-        out->b.kind = EMappingKind_Button;
-        out->b.target = joystick->hwdata->key_map[BTN_EAST];
-    }
-
-    if (joystick->hwdata->has_key[BTN_NORTH]) {
-        out->y.kind = EMappingKind_Button;
-        out->y.target = joystick->hwdata->key_map[BTN_NORTH];
-    }
-
-    if (joystick->hwdata->has_key[BTN_WEST]) {
-        out->x.kind = EMappingKind_Button;
-        out->x.target = joystick->hwdata->key_map[BTN_WEST];
-    }
-
-    if (joystick->hwdata->has_key[BTN_SELECT]) {
-        out->back.kind = EMappingKind_Button;
-        out->back.target = joystick->hwdata->key_map[BTN_SELECT];
-    }
-
-    if (joystick->hwdata->has_key[BTN_START]) {
-        out->start.kind = EMappingKind_Button;
-        out->start.target = joystick->hwdata->key_map[BTN_START];
-    }
-
-    if (joystick->hwdata->has_key[BTN_THUMBL]) {
-        out->leftstick.kind = EMappingKind_Button;
-        out->leftstick.target = joystick->hwdata->key_map[BTN_THUMBL];
-    }
-
-    if (joystick->hwdata->has_key[BTN_THUMBR]) {
-        out->rightstick.kind = EMappingKind_Button;
-        out->rightstick.target = joystick->hwdata->key_map[BTN_THUMBR];
-    }
-
-    if (joystick->hwdata->has_key[BTN_MODE]) {
-        out->guide.kind = EMappingKind_Button;
-        out->guide.target = joystick->hwdata->key_map[BTN_MODE];
-    }
-
-    /*
-       According to the specs the D-Pad, the shoulder buttons and the triggers
-       can be digital, or analog, or both at the same time.
-     */
-
-    /* Prefer digital shoulder buttons, but settle for analog if missing. */
-    if (joystick->hwdata->has_key[BTN_TL]) {
-        out->leftshoulder.kind = EMappingKind_Button;
-        out->leftshoulder.target = joystick->hwdata->key_map[BTN_TL];
-    }
-
-    if (joystick->hwdata->has_key[BTN_TR]) {
-        out->rightshoulder.kind = EMappingKind_Button;
-        out->rightshoulder.target = joystick->hwdata->key_map[BTN_TR];
-    }
-
-    if (joystick->hwdata->has_hat[1] && /* Check if ABS_HAT1{X, Y} is available. */
-       (!joystick->hwdata->has_key[BTN_TL] || !joystick->hwdata->has_key[BTN_TR])) {
-        int hat = joystick->hwdata->hats_indices[1] << 4;
-        out->leftshoulder.kind = EMappingKind_Hat;
-        out->rightshoulder.kind = EMappingKind_Hat;
-        out->leftshoulder.target = hat | 0x4;
-        out->rightshoulder.target = hat | 0x2;
-    }
-
-    /* Prefer analog triggers, but settle for digital if missing. */
-    if (joystick->hwdata->has_hat[2]) { /* Check if ABS_HAT2{X,Y} is available. */
-        int hat = joystick->hwdata->hats_indices[2] << 4;
-        out->lefttrigger.kind = EMappingKind_Hat;
-        out->righttrigger.kind = EMappingKind_Hat;
-        out->lefttrigger.target = hat | 0x4;
-        out->righttrigger.target = hat | 0x2;
-    } else {
-        if (joystick->hwdata->has_key[BTN_TL2]) {
-            out->lefttrigger.kind = EMappingKind_Button;
-            out->lefttrigger.target = joystick->hwdata->key_map[BTN_TL2];
-        }
-
-        if (joystick->hwdata->has_key[BTN_TR2]) {
-            out->righttrigger.kind = EMappingKind_Button;
-            out->righttrigger.target = joystick->hwdata->key_map[BTN_TR2];
-        }
-    }
-
-    /* Prefer digital D-Pad, but settle for analog if missing. */
-    if (joystick->hwdata->has_key[BTN_DPAD_UP]) {
-        out->dpup.kind = EMappingKind_Button;
-        out->dpup.target = joystick->hwdata->key_map[BTN_DPAD_UP];
-    }
-
-    if (joystick->hwdata->has_key[BTN_DPAD_DOWN]) {
-        out->dpdown.kind = EMappingKind_Button;
-        out->dpdown.target = joystick->hwdata->key_map[BTN_DPAD_DOWN];
-    }
-
-    if (joystick->hwdata->has_key[BTN_DPAD_LEFT]) {
-        out->dpleft.kind = EMappingKind_Button;
-        out->dpleft.target = joystick->hwdata->key_map[BTN_DPAD_LEFT];
-    }
-
-    if (joystick->hwdata->has_key[BTN_DPAD_RIGHT]) {
-        out->dpright.kind = EMappingKind_Button;
-        out->dpright.target = joystick->hwdata->key_map[BTN_DPAD_RIGHT];
-    }
-
-    if (joystick->hwdata->has_hat[0] && /* Check if ABS_HAT0{X,Y} is available. */
-       (!joystick->hwdata->has_key[BTN_DPAD_LEFT] || !joystick->hwdata->has_key[BTN_DPAD_RIGHT] ||
-        !joystick->hwdata->has_key[BTN_DPAD_UP] || !joystick->hwdata->has_key[BTN_DPAD_DOWN])) {
-       int hat = joystick->hwdata->hats_indices[0] << 4;
-       out->dpleft.kind = EMappingKind_Hat;
-       out->dpright.kind = EMappingKind_Hat;
-       out->dpup.kind = EMappingKind_Hat;
-       out->dpdown.kind = EMappingKind_Hat;
-       out->dpleft.target = hat | 0x8;
-       out->dpright.target = hat | 0x2;
-       out->dpup.target = hat | 0x1;
-       out->dpdown.target = hat | 0x4;
-    }
-
-    if (joystick->hwdata->has_abs[ABS_X] && joystick->hwdata->has_abs[ABS_Y]) {
-        out->leftx.kind = EMappingKind_Axis;
-        out->lefty.kind = EMappingKind_Axis;
-        out->leftx.target = joystick->hwdata->abs_map[ABS_X];
-        out->lefty.target = joystick->hwdata->abs_map[ABS_Y];
-    }
-
-    if (joystick->hwdata->has_abs[ABS_RX] && joystick->hwdata->has_abs[ABS_RY]) {
-        out->rightx.kind = EMappingKind_Axis;
-        out->righty.kind = EMappingKind_Axis;
-        out->rightx.target = joystick->hwdata->abs_map[ABS_RX];
-        out->righty.target = joystick->hwdata->abs_map[ABS_RY];
-    }
-
-    LINUX_JoystickClose(joystick);
-    SDL_free(joystick);
-
-    return SDL_TRUE;
-}
-
 SDL_JoystickDriver SDL_LINUX_JoystickDriver =
 {
     LINUX_JoystickInit,
@@ -1369,7 +1122,6 @@ SDL_JoystickDriver SDL_LINUX_JoystickDriver =
     LINUX_JoystickUpdate,
     LINUX_JoystickClose,
     LINUX_JoystickQuit,
-    LINUX_JoystickGetGamepadMapping
 };
 
 #endif /* SDL_JOYSTICK_LINUX */

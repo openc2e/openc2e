@@ -22,7 +22,6 @@
 #define SDL_BAPP_H
 
 #include <InterfaceKit.h>
-#include <LocaleRoster.h>
 #if SDL_VIDEO_OPENGL
 #include <OpenGLKit.h>
 #endif
@@ -152,10 +151,6 @@ public:
 
         case BAPP_WINDOW_RESIZED:
             _HandleWindowResized(message);
-            break;
-
-        case B_LOCALE_CHANGED:
-            SDL_SendLocaleChangedEvent();
             break;
 
         case BAPP_SCREEN_CHANGED:

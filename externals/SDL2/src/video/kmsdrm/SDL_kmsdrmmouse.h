@@ -1,7 +1,6 @@
 /*
   Simple DirectMedia Layer
   Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
-  Atomic KMSDRM backend by Manuel Alfayate Corchete <redwindwanderer@gmail.com>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,18 +29,12 @@
 #define MAX_CURSOR_W 512
 #define MAX_CURSOR_H 512
 
-/* Driverdata with driver-side info about the cursor. */
 typedef struct _KMSDRM_CursorData
 {
     struct gbm_bo *bo;
-    struct plane *plane;
     uint32_t       crtc_id;
-    uint16_t       hot_x, hot_y;
-    uint16_t       w, h;
-    /* The video devide implemented on SDL_kmsdrmvideo.c 
-     * to be used as _THIS pointer in SDL_kmsdrmvideo.c 
-     * functions that need it. */
-    SDL_VideoDevice *video;
+    int            hot_x, hot_y;
+    int            w, h;
 } KMSDRM_CursorData;
 
 extern void KMSDRM_InitMouse(_THIS);

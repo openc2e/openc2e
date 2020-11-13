@@ -104,12 +104,6 @@ DUMMY_JoystickQuit(void)
 {
 }
 
-static SDL_bool
-DUMMY_JoystickGetGamepadMapping(int device_index, SDL_GamepadMapping *out)
-{
-    return SDL_FALSE;
-}
-
 SDL_JoystickDriver SDL_DUMMY_JoystickDriver =
 {
     DUMMY_JoystickInit,
@@ -125,7 +119,6 @@ SDL_JoystickDriver SDL_DUMMY_JoystickDriver =
     DUMMY_JoystickUpdate,
     DUMMY_JoystickClose,
     DUMMY_JoystickQuit,
-    DUMMY_JoystickGetGamepadMapping
 };
 
 #endif /* SDL_JOYSTICK_DUMMY || SDL_JOYSTICK_DISABLED */

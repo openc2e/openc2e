@@ -50,7 +50,6 @@ struct haptic_hwdata
 /*
  * Haptic system effect data.
  */
-#if SDL_HAPTIC_DINPUT || SDL_HAPTIC_XINPUT
 struct haptic_hweffect
 {
 #if SDL_HAPTIC_DINPUT
@@ -61,7 +60,6 @@ struct haptic_hweffect
     XINPUT_VIBRATION vibration;
 #endif
 };
-#endif
 
 /*
 * List of available haptic devices.

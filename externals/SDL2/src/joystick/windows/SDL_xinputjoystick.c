@@ -26,10 +26,10 @@
 
 #include "SDL_assert.h"
 #include "SDL_hints.h"
+#include "SDL_log.h"
 #include "SDL_timer.h"
 #include "SDL_windowsjoystick_c.h"
 #include "SDL_xinputjoystick_c.h"
-#include "SDL_rawinputjoystick_c.h"
 #include "../hidapi/SDL_hidapijoystick_c.h"
 
 /*
@@ -71,10 +71,10 @@ SDL_XINPUT_JoystickInit(void)
     return 0;
 }
 
-static const char *
+static char *
 GetXInputName(const Uint8 userid, BYTE SubType)
 {
-    static char name[32];
+    char name[32];
 
     if (SDL_XInputUseOldJoystickMapping()) {
         SDL_snprintf(name, sizeof(name), "X360 Controller #%u", 1 + userid);
@@ -111,7 +111,7 @@ GetXInputName(const Uint8 userid, BYTE SubType)
             break;
         }
     }
-    return name;
+    return SDL_strdup(name);
 }
 
 /* We can't really tell what device is being used for XInput, but we can guess
@@ -155,7 +155,6 @@ GuessXInputDevice(Uint8 userid, Uint16 *pVID, Uint16 *pPID, Uint16 *pVersion)
                     *pVID = (Uint16)rdi.hid.dwVendorId;
                     *pPID = (Uint16)rdi.hid.dwProductId;
                     *pVersion = (Uint16)rdi.hid.dwVersionNumber;
-                    SDL_free(devices);
                     return;
                 }
             }
@@ -202,7 +201,6 @@ GuessXInputDevice(Uint8 userid, Uint16 *pVID, Uint16 *pPID, Uint16 *pVersion)
                     SDL_free(s_arrXInputDevicePath[userid]);
                 }
                 s_arrXInputDevicePath[userid] = SDL_strdup(devName);
-                SDL_free(devices);
                 return;
             }
         }
@@ -222,6 +220,7 @@ AddXInputDevice(Uint8 userid, BYTE SubType, JoyStick_DeviceData **pContext)
     Uint16 vendor = 0;
     Uint16 product = 0;
     Uint16 version = 0;
+    const char *name;
     JoyStick_DeviceData *pPrevJoystick = NULL;
     JoyStick_DeviceData *pNewJoystick = *pContext;
 
@@ -275,7 +274,13 @@ AddXInputDevice(Uint8 userid, BYTE SubType, JoyStick_DeviceData **pContext)
     }
     pNewJoystick->SubType = SubType;
     pNewJoystick->XInputUserId = userid;
-    pNewJoystick->joystickname = SDL_CreateJoystickName(vendor, product, NULL, GetXInputName(userid, SubType));
+
+    name = SDL_GetCustomJoystickName(vendor, product);
+    if (name) {
+        pNewJoystick->joystickname = SDL_strdup(name);
+    } else {
+        pNewJoystick->joystickname = GetXInputName(userid, SubType);
+    }
     if (!pNewJoystick->joystickname) {
         SDL_free(pNewJoystick);
         return; /* better luck next time? */
@@ -289,14 +294,6 @@ AddXInputDevice(Uint8 userid, BYTE SubType, JoyStick_DeviceData **pContext)
 #ifdef SDL_JOYSTICK_HIDAPI
     if (HIDAPI_IsDevicePresent(vendor, product, version, pNewJoystick->joystickname)) {
         /* The HIDAPI driver is taking care of this device */
-        SDL_free(pNewJoystick);
-        return;
-    }
-#endif
-
-#ifdef SDL_JOYSTICK_RAWINPUT
-    if (RAWINPUT_IsDevicePresent(vendor, product, version)) {
-        /* The RAWINPUT driver is taking care of this device */
         SDL_free(pNewJoystick);
         return;
     }
@@ -328,18 +325,6 @@ SDL_XINPUT_JoystickDetect(JoyStick_DeviceData **pContext)
         const Uint8 userid = (Uint8)iuserid;
         XINPUT_CAPABILITIES capabilities;
         if (XINPUTGETCAPABILITIES(userid, XINPUT_FLAG_GAMEPAD, &capabilities) == ERROR_SUCCESS) {
-            /* Adding a new device, must handle all removes first, or GuessXInputDevice goes terribly wrong (returns
-              a product/vendor ID that is not even attached to the system) when we get a remove and add on the same tick
-              (e.g. when disconnecting a device and the OS reassigns which userid an already-attached controller is)
-            */
-            int iuserid2;
-            for (iuserid2 = iuserid - 1; iuserid2 >= 0; iuserid2--) {
-                const Uint8 userid2 = (Uint8)iuserid2;
-                XINPUT_CAPABILITIES capabilities2;
-                if (XINPUTGETCAPABILITIES(userid2, XINPUT_FLAG_GAMEPAD, &capabilities2) != ERROR_SUCCESS) {
-                    DelXInputDevice(userid2);
-                }
-            }
             AddXInputDevice(userid, capabilities.SubType, pContext);
         } else {
             DelXInputDevice(userid);

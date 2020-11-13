@@ -39,9 +39,6 @@ static SDL_SensorDriver *SDL_sensor_drivers[] = {
 #ifdef SDL_SENSOR_COREMOTION
     &SDL_COREMOTION_SensorDriver,
 #endif
-#ifdef SDL_SENSOR_WINDOWS
-	&SDL_WINDOWS_SensorDriver,
-#endif
 #if defined(SDL_SENSOR_DUMMY) || defined(SDL_SENSOR_DISABLED)
     &SDL_DUMMY_SensorDriver
 #endif
@@ -51,7 +48,7 @@ static SDL_bool SDL_updating_sensor = SDL_FALSE;
 static SDL_mutex *SDL_sensor_lock = NULL; /* This needs to support recursive locks */
 static SDL_atomic_t SDL_next_sensor_instance_id;
 
-void
+static void
 SDL_LockSensors(void)
 {
     if (SDL_sensor_lock) {
@@ -59,7 +56,7 @@ SDL_LockSensors(void)
     }
 }
 
-void
+static void
 SDL_UnlockSensors(void)
 {
     if (SDL_sensor_lock) {

@@ -46,21 +46,7 @@
 #include <tlhelp32.h>
 #endif
 
-#if SDL_JOYSTICK_VIRTUAL
-#include "./virtual/SDL_virtualjoystick_c.h"
-#endif
-
 static SDL_JoystickDriver *SDL_joystick_drivers[] = {
-#ifdef SDL_JOYSTICK_RAWINPUT /* Before WINDOWS_ driver, as WINDOWS wants to check if this driver is handling things */
-    /* Also before HIDAPI, as HIDAPI wants to check if this driver is handling things */
-    &SDL_RAWINPUT_JoystickDriver,
-#endif
-#ifdef SDL_JOYSTICK_HIDAPI /* Before WINDOWS_ driver, as WINDOWS wants to check if this driver is handling things */
-    &SDL_HIDAPI_JoystickDriver,
-#endif
-#if defined(SDL_JOYSTICK_WGI)
-    &SDL_WGI_JoystickDriver,
-#endif
 #if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
     &SDL_WINDOWS_JoystickDriver,
 #endif
@@ -70,7 +56,7 @@ static SDL_JoystickDriver *SDL_joystick_drivers[] = {
 #ifdef SDL_JOYSTICK_IOKIT
     &SDL_DARWIN_JoystickDriver,
 #endif
-#if (defined(__IPHONEOS__) || defined(__TVOS__)) && !defined(SDL_JOYSTICK_DISABLED)
+#if defined(__IPHONEOS__) || defined(__TVOS__)
     &SDL_IOS_JoystickDriver,
 #endif
 #ifdef SDL_JOYSTICK_ANDROID
@@ -85,8 +71,8 @@ static SDL_JoystickDriver *SDL_joystick_drivers[] = {
 #ifdef SDL_JOYSTICK_USBHID  /* !!! FIXME: "USBHID" is a generic name, and doubly-confusing with HIDAPI next to it. This is the *BSD interface, rename this. */
     &SDL_BSD_JoystickDriver,
 #endif
-#ifdef SDL_JOYSTICK_VIRTUAL
-    &SDL_VIRTUAL_JoystickDriver,
+#ifdef SDL_JOYSTICK_HIDAPI
+    &SDL_HIDAPI_JoystickDriver,
 #endif
 #if defined(SDL_JOYSTICK_DUMMY) || defined(SDL_JOYSTICK_DISABLED)
     &SDL_DUMMY_JoystickDriver
@@ -293,6 +279,23 @@ SDL_GetDriverAndJoystickIndex(int device_index, SDL_JoystickDriver **driver, int
 }
 
 /*
+ * Perform any needed fixups for joystick names
+ */
+static const char *
+SDL_FixupJoystickName(const char *name)
+{
+    if (name) {
+        const char *skip_prefix = "NVIDIA Corporation ";
+
+        if (SDL_strncmp(name, skip_prefix, SDL_strlen(skip_prefix)) == 0) {
+            name += SDL_strlen(skip_prefix);
+        }
+    }
+    return name;
+}
+
+
+/*
  * Get the implementation dependent name of a joystick
  */
 const char *
@@ -303,7 +306,7 @@ SDL_JoystickNameForIndex(int device_index)
 
     SDL_LockJoysticks();
     if (SDL_GetDriverAndJoystickIndex(device_index, &driver, &device_index)) {
-        name = driver->GetDeviceName(device_index);
+        name = SDL_FixupJoystickName(driver->GetDeviceName(device_index));
     }
     SDL_UnlockJoysticks();
 
@@ -470,102 +473,6 @@ SDL_JoystickOpen(int device_index)
 }
 
 
-int
-SDL_JoystickAttachVirtual(SDL_JoystickType type,
-                          int naxes,
-                          int nbuttons,
-                          int nhats)
-{
-#if SDL_JOYSTICK_VIRTUAL
-    return SDL_JoystickAttachVirtualInner(type,
-                                          naxes,
-                                          nbuttons,
-                                          nhats);
-#else
-    return SDL_SetError("SDL not built with virtual-joystick support");
-#endif
-}
-
-
-int
-SDL_JoystickDetachVirtual(int device_index)
-{
-#if SDL_JOYSTICK_VIRTUAL
-    SDL_JoystickDriver *driver;
-
-    SDL_LockJoysticks();
-    if (SDL_GetDriverAndJoystickIndex(device_index, &driver, &device_index)) {
-        if (driver == &SDL_VIRTUAL_JoystickDriver) {
-            const int result = SDL_JoystickDetachVirtualInner(device_index);
-            SDL_UnlockJoysticks();
-            return result;
-        }
-    }
-    SDL_UnlockJoysticks();
-
-    return SDL_SetError("Virtual joystick not found at provided index");
-#else
-    return SDL_SetError("SDL not built with virtual-joystick support");
-#endif
-}
-
-
-SDL_bool
-SDL_JoystickIsVirtual(int device_index)
-{
-#if SDL_JOYSTICK_VIRTUAL
-    SDL_JoystickDriver *driver;
-    int driver_device_index;
-    SDL_bool is_virtual = SDL_FALSE;
-
-    SDL_LockJoysticks();
-    if (SDL_GetDriverAndJoystickIndex(device_index, &driver, &driver_device_index)) {
-        if (driver == &SDL_VIRTUAL_JoystickDriver) {
-            is_virtual = SDL_TRUE;
-        }
-    }
-    SDL_UnlockJoysticks();
-
-    return is_virtual;
-#else
-    return SDL_FALSE;
-#endif
-}
-
-
-int
-SDL_JoystickSetVirtualAxis(SDL_Joystick * joystick, int axis, Sint16 value)
-{
-#if SDL_JOYSTICK_VIRTUAL
-    return SDL_JoystickSetVirtualAxisInner(joystick, axis, value);
-#else
-    return SDL_SetError("SDL not built with virtual-joystick support");
-#endif
-}
-
-
-int
-SDL_JoystickSetVirtualButton(SDL_Joystick * joystick, int button, Uint8 value)
-{
-#if SDL_JOYSTICK_VIRTUAL
-    return SDL_JoystickSetVirtualButtonInner(joystick, button, value);
-#else
-    return SDL_SetError("SDL not built with virtual-joystick support");
-#endif
-}
-
-
-int
-SDL_JoystickSetVirtualHat(SDL_Joystick * joystick, int hat, Uint8 value)
-{
-#if SDL_JOYSTICK_VIRTUAL
-    return SDL_JoystickSetVirtualHatInner(joystick, hat, value);
-#else
-    return SDL_SetError("SDL not built with virtual-joystick support");
-#endif
-}
-
-
 /*
  * Checks to make sure the joystick is valid.
  */
@@ -582,21 +489,6 @@ SDL_PrivateJoystickValid(SDL_Joystick * joystick)
     }
 
     return valid;
-}
-
-SDL_bool
-SDL_PrivateJoystickGetAutoGamepadMapping(int device_index, SDL_GamepadMapping * out)
-{
-    SDL_JoystickDriver *driver;
-    SDL_bool is_ok = SDL_FALSE;
-
-    SDL_LockJoysticks();
-    if (SDL_GetDriverAndJoystickIndex(device_index, &driver, &device_index)) {
-        is_ok = driver->GetGamepadMapping(device_index, out);
-    }
-    SDL_UnlockJoysticks();
-
-    return is_ok;
 }
 
 /*
@@ -829,7 +721,7 @@ SDL_JoystickName(SDL_Joystick * joystick)
         return NULL;
     }
 
-    return joystick->name;
+    return SDL_FixupJoystickName(joystick->name);
 }
 
 /**
@@ -1092,46 +984,14 @@ static void UpdateEventsForDeviceRemoval()
     SDL_small_free(events, isstack);
 }
 
-static void
-SDL_PrivateJoystickForceRecentering(SDL_Joystick *joystick)
-{
-    int i;
-
-    /* Tell the app that everything is centered/unpressed... */
-    for (i = 0; i < joystick->naxes; i++) {
-        if (joystick->axes[i].has_initial_value) {
-            SDL_PrivateJoystickAxis(joystick, i, joystick->axes[i].zero);
-        }
-    }
-
-    for (i = 0; i < joystick->nbuttons; i++) {
-        SDL_PrivateJoystickButton(joystick, i, 0);
-    }
-
-    for (i = 0; i < joystick->nhats; i++) {
-        SDL_PrivateJoystickHat(joystick, i, SDL_HAT_CENTERED);
-    }
-}
-
 void SDL_PrivateJoystickRemoved(SDL_JoystickID device_instance)
 {
-    SDL_Joystick *joystick = NULL;
+    SDL_Joystick *joystick;
     int player_index;
+
 #if !SDL_EVENTS_DISABLED
     SDL_Event event;
-#endif
 
-    /* Find this joystick... */
-    for (joystick = SDL_joysticks; joystick; joystick = joystick->next) {
-        if (joystick->instance_id == device_instance) {
-            SDL_PrivateJoystickForceRecentering(joystick);
-            joystick->attached = SDL_FALSE;
-            break;
-        }
-    }
-
-#if !SDL_EVENTS_DISABLED
-    SDL_zero(event);
     event.type = SDL_JOYDEVICEREMOVED;
 
     if (SDL_GetEventState(event.type) == SDL_ENABLE) {
@@ -1141,6 +1001,15 @@ void SDL_PrivateJoystickRemoved(SDL_JoystickID device_instance)
 
     UpdateEventsForDeviceRemoval();
 #endif /* !SDL_EVENTS_DISABLED */
+
+    /* Mark this joystick as no longer attached */
+    for (joystick = SDL_joysticks; joystick; joystick = joystick->next) {
+        if (joystick->instance_id == device_instance) {
+            joystick->attached = SDL_FALSE;
+            joystick->force_recentering = SDL_TRUE;
+            break;
+        }
+    }
 
     SDL_LockJoysticks();
     player_index = SDL_GetPlayerIndexForJoystickID(device_instance);
@@ -1163,15 +1032,16 @@ SDL_PrivateJoystickAxis(SDL_Joystick * joystick, Uint8 axis, Sint16 value)
 
     info = &joystick->axes[axis];
     if (!info->has_initial_value ||
-        (!info->has_second_value && (info->initial_value <= -32767 || info->initial_value == 32767) && SDL_abs(value) < (SDL_JOYSTICK_AXIS_MAX / 4))) {
+        (!info->has_second_value && (info->initial_value == -32768 || info->initial_value == 32767) && SDL_abs(value) < (SDL_JOYSTICK_AXIS_MAX / 4))) {
         info->initial_value = value;
         info->value = value;
         info->zero = value;
         info->has_initial_value = SDL_TRUE;
-    } else if (value == info->value) {
-        return 0;
     } else {
         info->has_second_value = SDL_TRUE;
+    }
+    if (value == info->value) {
+        return 0;
     }
     if (!info->sent_initial_value) {
         /* Make sure we don't send motion until there's real activity on this axis */
@@ -1180,7 +1050,7 @@ SDL_PrivateJoystickAxis(SDL_Joystick * joystick, Uint8 axis, Sint16 value)
             return 0;
         }
         info->sent_initial_value = SDL_TRUE;
-        info->value = ~value; /* Just so we pass the check above */
+        info->value = value; /* Just so we pass the check above */
         SDL_PrivateJoystickAxis(joystick, axis, info->initial_value);
     }
 
@@ -1389,6 +1259,25 @@ SDL_JoystickUpdate(void)
             }
             SDL_UnlockJoysticks();
         }
+
+        if (joystick->force_recentering) {
+            /* Tell the app that everything is centered/unpressed... */
+            for (i = 0; i < joystick->naxes; i++) {
+                if (joystick->axes[i].has_initial_value) {
+                    SDL_PrivateJoystickAxis(joystick, i, joystick->axes[i].zero);
+                }
+            }
+
+            for (i = 0; i < joystick->nbuttons; i++) {
+                SDL_PrivateJoystickButton(joystick, i, 0);
+            }
+
+            for (i = 0; i < joystick->nhats; i++) {
+                SDL_PrivateJoystickHat(joystick, i, SDL_HAT_CENTERED);
+            }
+
+            joystick->force_recentering = SDL_FALSE;
+        }
     }
 
     SDL_LockJoysticks();
@@ -1480,116 +1369,23 @@ void SDL_GetJoystickGUIDInfo(SDL_JoystickGUID guid, Uint16 *vendor, Uint16 *prod
     }
 }
 
-static int
-PrefixMatch(const char *a, const char *b)
+const char *
+SDL_GetCustomJoystickManufacturer(const char *manufacturer)
 {
-    int matchlen = 0;
-    while (*a && *b) {
-        if (SDL_tolower(*a++) == SDL_tolower(*b++)) {
-            ++matchlen;
-        } else {
-            break;
+    if (manufacturer) {
+        if (SDL_strcmp(manufacturer, "Performance Designed Products") == 0) {
+            return "PDP";
+        } else if (SDL_strcmp(manufacturer, "HORI CO.,LTD") == 0) {
+            return "HORI";
         }
     }
-    return matchlen;
+    return manufacturer;
 }
 
-char *
-SDL_CreateJoystickName(Uint16 vendor, Uint16 product, const char *vendor_name, const char *product_name)
+const char *
+SDL_GetCustomJoystickName(Uint16 vendor, Uint16 product)
 {
-    static struct {
-        const char *prefix;
-        const char *replacement;
-    } replacements[] = {
-        { "NVIDIA Corporation ", "" },
-        { "Performance Designed Products", "PDP" },
-        { "HORI CO.,LTD", "HORI" },
-    };
-    const char *custom_name;
-    char *name;
-    size_t i, len;
-
-    custom_name = GuessControllerName(vendor, product);
-    if (custom_name) {
-        return SDL_strdup(custom_name);
-    }
-
-    if (!vendor_name) {
-        vendor_name = "";
-    }
-    if (!product_name) {
-        product_name = "";
-    }
-
-    while (*vendor_name == ' ') {
-        ++vendor_name;
-    }
-    while (*product_name == ' ') {
-        ++product_name;
-    }
-
-    if (*vendor_name && *product_name) {
-        len = (SDL_strlen(vendor_name) + 1 + SDL_strlen(product_name) + 1);
-        name = (char *)SDL_malloc(len);
-        if (!name) {
-            return NULL;
-        }
-        SDL_snprintf(name, len, "%s %s", vendor_name, product_name);
-    } else if (*product_name) {
-        name = SDL_strdup(product_name);
-    } else if (vendor || product) {
-        len = (6 + 1 + 6 + 1);
-        name = (char *)SDL_malloc(len);
-        if (!name) {
-            return NULL;
-        }
-        SDL_snprintf(name, len, "0x%.4x/0x%.4x", vendor, product);
-    } else {
-        name = SDL_strdup("Controller");
-    }
-
-    /* Trim trailing whitespace */
-    for (len = SDL_strlen(name); (len > 0 && name[len - 1] == ' '); --len) {
-        /* continue */
-    }
-    name[len] = '\0';
-
-    /* Compress duplicate spaces */
-    for (i = 0; i < (len - 1); ) {
-        if (name[i] == ' ' && name[i+1] == ' ') {
-            SDL_memmove(&name[i], &name[i+1], (len - i));
-            --len;
-        } else {
-            ++i;
-        }
-    }
-
-    /* Remove duplicate manufacturer or product in the name */
-    for (i = 1; i < (len - 1); ++i) {
-        int matchlen = PrefixMatch(name, &name[i]);
-        if (matchlen > 0 && name[matchlen-1] == ' ') {
-            SDL_memmove(name, name+matchlen, len-matchlen+1);
-            len -= matchlen;
-            break;
-        } else if (matchlen > 0 && name[matchlen] == ' ') {
-            SDL_memmove(name, name+matchlen+1, len-matchlen);
-            len -= (matchlen + 1);
-            break;
-        }
-    }
-
-    /* Perform any manufacturer replacements */
-    for (i = 0; i < SDL_arraysize(replacements); ++i) {
-        size_t prefixlen = SDL_strlen(replacements[i].prefix);
-        if (SDL_strncasecmp(name, replacements[i].prefix, prefixlen) == 0) {
-            size_t replacementlen = SDL_strlen(replacements[i].replacement);
-            SDL_memcpy(name, replacements[i].replacement, replacementlen);
-            SDL_memmove(name+replacementlen, name+prefixlen, (len-prefixlen+1));
-            break;
-        }
-    }
-
-    return name;
+    return GuessControllerName(vendor, product);
 }
 
 SDL_GameControllerType
@@ -1692,8 +1488,6 @@ SDL_GetJoystickGameControllerType(const char *name, Uint16 vendor, Uint16 produc
                 SDL_strcmp(name, "Wireless Gamepad") == 0) {
                 /* HORI or PowerA Switch Pro Controller clone */
                 type = SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO;
-            } else if (SDL_strcmp(name, "Virtual Joystick") == 0) {
-                type = SDL_CONTROLLER_TYPE_VIRTUAL;
             } else {
                 type = SDL_CONTROLLER_TYPE_UNKNOWN;
             }
@@ -1750,27 +1544,9 @@ SDL_IsJoystickXInput(SDL_JoystickGUID guid)
 }
 
 SDL_bool
-SDL_IsJoystickWGI(SDL_JoystickGUID guid)
-{
-    return (guid.data[14] == 'w') ? SDL_TRUE : SDL_FALSE;
-}
-
-SDL_bool
 SDL_IsJoystickHIDAPI(SDL_JoystickGUID guid)
 {
     return (guid.data[14] == 'h') ? SDL_TRUE : SDL_FALSE;
-}
-
-SDL_bool
-SDL_IsJoystickRAWINPUT(SDL_JoystickGUID guid)
-{
-    return (guid.data[14] == 'r') ? SDL_TRUE : SDL_FALSE;
-}
-
-SDL_bool
-SDL_IsJoystickVirtual(SDL_JoystickGUID guid)
-{
-    return (guid.data[14] == 'v') ? SDL_TRUE : SDL_FALSE;
 }
 
 static SDL_bool SDL_IsJoystickProductWheel(Uint32 vidpid)
@@ -1782,7 +1558,6 @@ static SDL_bool SDL_IsJoystickProductWheel(Uint32 vidpid)
         MAKE_VIDPID(0x046d, 0xc299),    /* Logitech G25 */
         MAKE_VIDPID(0x046d, 0xc29a),    /* Logitech Driving Force GT */
         MAKE_VIDPID(0x046d, 0xc29b),    /* Logitech G27 */
-        MAKE_VIDPID(0x046d, 0xc24f),    /* Logitech G29 */
         MAKE_VIDPID(0x046d, 0xc261),    /* Logitech G920 (initial mode) */
         MAKE_VIDPID(0x046d, 0xc262),    /* Logitech G920 (active mode) */
         MAKE_VIDPID(0x044f, 0xb65d),    /* Thrustmaster Wheel FFB */
@@ -1865,14 +1640,6 @@ static SDL_JoystickType SDL_GetJoystickGUIDType(SDL_JoystickGUID guid)
         }
     }
 
-    if (SDL_IsJoystickWGI(guid)) {
-        return (SDL_JoystickType)guid.data[15];
-    }
-
-    if (SDL_IsJoystickVirtual(guid)) {
-        return (SDL_JoystickType)guid.data[15];
-    }
-
     SDL_GetJoystickGUIDInfo(guid, &vendor, &product, NULL);
     vidpid = MAKE_VIDPID(vendor, product);
 
@@ -1934,29 +1701,29 @@ SDL_bool SDL_ShouldIgnoreJoystick(const char *name, SDL_JoystickGUID guid)
        https://raw.githubusercontent.com/denilsonsa/udev-joystick-blacklist/master/generate_rules.py
      */
     static Uint32 joystick_blacklist[] = {
-        /* Microsoft Microsoft Wireless Optical Desktop 2.10 */
+        /* Microsoft Microsoft Wireless Optical Desktop® 2.10 */
         /* Microsoft Wireless Desktop - Comfort Edition */
         MAKE_VIDPID(0x045e, 0x009d),
 
-        /* Microsoft Microsoft Digital Media Pro Keyboard */
+        /* Microsoft Microsoft® Digital Media Pro Keyboard */
         /* Microsoft Corp. Digital Media Pro Keyboard */
         MAKE_VIDPID(0x045e, 0x00b0),
 
-        /* Microsoft Microsoft Digital Media Keyboard */
+        /* Microsoft Microsoft® Digital Media Keyboard */
         /* Microsoft Corp. Digital Media Keyboard 1.0A */
         MAKE_VIDPID(0x045e, 0x00b4),
 
-        /* Microsoft Microsoft Digital Media Keyboard 3000 */
+        /* Microsoft Microsoft® Digital Media Keyboard 3000 */
         MAKE_VIDPID(0x045e, 0x0730),
 
-        /* Microsoft Microsoft 2.4GHz Transceiver v6.0 */
-        /* Microsoft Microsoft 2.4GHz Transceiver v8.0 */
+        /* Microsoft Microsoft® 2.4GHz Transceiver v6.0 */
+        /* Microsoft Microsoft® 2.4GHz Transceiver v8.0 */
         /* Microsoft Corp. Nano Transceiver v1.0 for Bluetooth */
         /* Microsoft Wireless Mobile Mouse 1000 */
         /* Microsoft Wireless Desktop 3000 */
         MAKE_VIDPID(0x045e, 0x0745),
 
-        /* Microsoft SideWinder(TM) 2.4GHz Transceiver */
+        /* Microsoft® SideWinder(TM) 2.4GHz Transceiver */
         MAKE_VIDPID(0x045e, 0x0748),
 
         /* Microsoft Corp. Wired Keyboard 600 */
@@ -1968,16 +1735,16 @@ SDL_bool SDL_ShouldIgnoreJoystick(const char *name, SDL_JoystickGUID guid)
         /* Microsoft Corp. Arc Touch Mouse Transceiver */
         MAKE_VIDPID(0x045e, 0x0773),
 
-        /* Microsoft 2.4GHz Transceiver v9.0 */
-        /* Microsoft Nano Transceiver v2.1 */
+        /* Microsoft® 2.4GHz Transceiver v9.0 */
+        /* Microsoft® Nano Transceiver v2.1 */
         /* Microsoft Sculpt Ergonomic Keyboard (5KV-00001) */
         MAKE_VIDPID(0x045e, 0x07a5),
 
-        /* Microsoft Nano Transceiver v1.0 */
+        /* Microsoft® Nano Transceiver v1.0 */
         /* Microsoft Wireless Keyboard 800 */
         MAKE_VIDPID(0x045e, 0x07b2),
 
-        /* Microsoft Nano Transceiver v2.0 */
+        /* Microsoft® Nano Transceiver v2.0 */
         MAKE_VIDPID(0x045e, 0x0800),
 
         MAKE_VIDPID(0x046d, 0xc30a),  /* Logitech, Inc. iTouch Composite keboard */
