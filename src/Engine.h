@@ -51,7 +51,7 @@ protected:
 	std::string preferred_backend, preferred_audiobackend;
 
 	void handleKeyboardScrolling();
-	void handleResizedWindow(BackendEvent &event);
+	void handleResizedWindow();
 	void handleMouseMove(BackendEvent &event);
 	void handleMouseButton(BackendEvent &event);
 	void handleTextInput(BackendEvent &event);

@@ -446,7 +446,7 @@ void Engine::processEvents() {
 	while (backend->pollEvent(event)) {
 		switch (event.type) {
 			case eventresizewindow:
-				handleResizedWindow(event);
+				handleResizedWindow();
 				break;
 
 			case eventmousemove:
@@ -480,11 +480,11 @@ void Engine::processEvents() {
 	}
 }
 
-void Engine::handleResizedWindow(BackendEvent &event) {
+void Engine::handleResizedWindow() {
 	// notify agents
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		if (!*i) continue;
-		(*i)->queueScript(123, 0); // window resized script
+	for (auto& a : world.agents) {
+		if (!a) continue;
+		a->queueScript(123, 0); // window resized script
 	}
 }
 
@@ -1038,6 +1038,11 @@ bool Engine::initialSetup() {
 		shutdown();
 		return false;
 	}
+
+	// Let agents know the window size (makes the DS sound options panel update
+	// to match actual engine state when starting muted)
+	// TODO: does this happen in real c2e?
+	handleResizedWindow();
 
 	return true;
 }
