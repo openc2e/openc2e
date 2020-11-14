@@ -102,7 +102,7 @@ std::vector<std::string> findByWildcard(std::string dirname, std::string wild) {
 	updateDirectory(dirname);
 
 	std::string search_pattern = "^";
-	for (auto c : wild) {
+	for (auto c : ascii_tolower(wild)) {
 		if (c == '*') {
 			search_pattern += ".*";
 		} else if (c == '?') {
