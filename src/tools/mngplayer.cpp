@@ -79,6 +79,12 @@ int main (int argc, char **argv) {
       Event sleep_forever;
       sleep_forever.wait();
 
+    } else if (ext == ".wav") {
+      auto channel = backend->playClip(filename);
+      while (backend->getChannelState(channel) == AUDIO_PLAYING) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      }
+
     } else {
       fmt::print(stderr, "Don't know how to play file '{}'\n", filename);
       return 1;
