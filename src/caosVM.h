@@ -359,9 +359,14 @@ public:
 	// core
 	void v_GAME();
 	void s_GAME();
+	void v_GAME_c2();
+	void s_GAME_c2();
+	void v_GAMN();
+	void c_DELG();
 	void v_EAME();
 	void s_EAME();
-	void c_DELG();
+	void v_EAMN();
+	void c_DELE();
 	void c_OUTX();
 	void c_OUTS();
 	void c_OUTV();
@@ -374,8 +379,6 @@ public:
 	void v_WOLF();
 	void v_LANG();
 	void v_TOKN();
-	void v_GAME_c2();
-	void s_GAME_c2();
 	void c_VRSN();
 	void v_VRSN();
 	void v_OC2E_DDIR();
@@ -446,7 +449,6 @@ public:
 	void c_DELN();
 	void v_REAN();
 	void c_NAMN();
-	void v_GAMN();
 	void c_POWV();
 	void c_RNDV();
 	void v_EGGL();

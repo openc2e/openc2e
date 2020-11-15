@@ -989,9 +989,7 @@ bool Engine::initialSetup() {
 
 	if (world.data_directories.size() < 3) {
 		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
-		caosValue name; name.setString("engine_no_auxiliary_bootstrap_1");
-		caosValue contents; contents.setInt(1);
-		eame_variables[name] = contents;
+		eame_variables["engine_no_auxiliary_bootstrap_1"] = caosValue(1);
 	}
 
 	loadGameData();

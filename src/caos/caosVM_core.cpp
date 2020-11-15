@@ -122,16 +122,48 @@ CAOS_LVALUE(GAME, VM_PARAM_STRING(name),
 		)
 
 /**
- EAME (variable) name (anything)
- %status maybe
-
- Returns the non-persistent game variable with the given name.
+ GAME (variable) category (integer) variable (integer)
+ %status stub
+ %pragma variants c2
 */
-// XXX: should this be a string argument?
-CAOS_LVALUE(EAME, VM_PARAM_VALUE(name),
-		engine.eame_variables[name],
-		engine.eame_variables[name] = newvalue
-		)
+CAOS_LVALUE(GAME_c2,
+	VM_PARAM_INTEGER(variable) VM_PARAM_INTEGER(category),
+	caosValue(),
+	(void)0) // TODO
+
+/**
+ RGAM (command)
+ %status stub
+
+ Refresh all settings that are read from game variables at startup.
+*/
+void caosVM::c_RGAM() { }
+
+/**
+ GAMN (string) previous (string)
+ %status maybe
+ 
+ Enumerates through game variable names, starting and ending with an empty string.
+*/
+void caosVM::v_GAMN() {
+	VM_PARAM_STRING(previous)
+
+	// TODO: we assume that GAME variables don't have an empty string
+	if (previous.empty()) {
+		if (world.variables.size() == 0)
+			result.setString("");
+		else
+			result.setString(world.variables.begin()->first);
+	} else {
+		std::map<std::string, caosValue>::iterator i = world.variables.find(previous);
+		caos_assert(i != world.variables.end()); // TODO: this probably isn't correct behaviour
+		i++;
+		if (i == world.variables.end())
+			result.setString("");
+		else
+			result.setString(i->first);
+	}
+}
 
 /**
  DELG (command) name (string)
@@ -141,10 +173,55 @@ CAOS_LVALUE(EAME, VM_PARAM_VALUE(name),
 */
 void caosVM::c_DELG() {
 	VM_PARAM_STRING(name)
+	world.variables.erase(name);
+}
 
-	std::map<std::string, caosValue>::iterator i = world.variables.find(name);
-	if (i != world.variables.end())
-		world.variables.erase(i);
+/**
+ EAME (variable) name (string)
+ %status maybe
+
+ Returns the non-persistent game variable with the given name.
+*/
+CAOS_LVALUE(EAME, VM_PARAM_STRING(name),
+		engine.eame_variables[name],
+		engine.eame_variables[name] = newvalue
+		)
+
+/**
+ EAMN (string) previous (string)
+ %status maybe
+ 
+ Enumerates through engine variable names, starting and ending with an empty string.
+*/
+void caosVM::v_EAMN() {
+	VM_PARAM_STRING(previous)
+
+	// TODO: we assume that EAME variables don't have an empty string
+	if (previous.empty()) {
+		if (engine.eame_variables.size() == 0)
+			result.setString("");
+		else
+			result.setString(engine.eame_variables.begin()->first);
+	} else {
+		std::map<std::string, caosValue>::iterator i = engine.eame_variables.find(previous);
+		caos_assert(i != engine.eame_variables.end()); // TODO: this probably isn't correct behaviour
+		i++;
+		if (i == engine.eame_variables.end())
+			result.setString("");
+		else
+			result.setString(i->first);
+	}
+}
+
+/**
+ DELE (command) name (string)
+ %status maybe
+ 
+ Deletes the engine variable with the given name.
+*/
+void caosVM::c_DELE() {
+	VM_PARAM_STRING(name);
+	engine.eame_variables.erase(name);
 }
 
 /**
@@ -192,14 +269,6 @@ void caosVM::c_ISCR() {
 void caosVM::c_ENDM() {
 	stop();
 }
-
-/**
- RGAM (command)
- %status stub
-
- Restore all game variables to their saved or default values.
-*/
-void caosVM::c_RGAM() {}
 
 /**
  MOWS (integer)
@@ -318,18 +387,6 @@ void caosVM::v_TOKN() {
 	int *data = (int *)token.c_str();
 	result.setInt(*data);
 }
-
-/**
- GAME (variable) category (integer) variable (integer)
- %status stub
- %pragma variants c2
-*/
-CAOS_LVALUE(GAME_c2,
-	VM_PARAM_INTEGER(variable) VM_PARAM_INTEGER(category),
-	caosValue(),
-	(void)0) // TODO
-
-#include <ghc/filesystem.hpp>
 
 /**
  OC2E DDIR (string)

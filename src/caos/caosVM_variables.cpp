@@ -967,30 +967,6 @@ void caosVM::c_DELN() {
 }
 
 /**
- GAMN (string) previous (string)
- %status maybe
-*/
-void caosVM::v_GAMN() {
-	VM_PARAM_STRING(previous)
-
-	// TODO: we assume that GAME variables don't have an empty string
-	if (previous.empty()) {
-		if (world.variables.size() == 0)
-			result.setString("");
-		else
-			result.setString(world.variables.begin()->first);
-	} else {
-		std::map<std::string, caosValue>::iterator i = world.variables.find(previous);
-		caos_assert(i != world.variables.end()); // TODO: this probably isn't correct behaviour
-		i++;
-		if (i == world.variables.end())
-			result.setString("");
-		else
-			result.setString(i->first);
-	}
-}
-
-/**
  NAMN (command) previous (variable)
  %status maybe
 */

@@ -62,7 +62,7 @@ protected:
 	void loadGameData();
 
 public:
-	std::map<caosValue, caosValue, caosValueCompare> eame_variables; // non-serialised
+	std::map<std::string, caosValue> eame_variables; // non-serialised
 	
 	std::shared_ptr<Backend> backend;
 	std::shared_ptr<class AudioBackend> audio;
