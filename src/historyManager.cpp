@@ -24,6 +24,7 @@
 #include "creatures/CreatureAgent.h"
 #include "creatures/Creature.h"
 #include "Engine.h" // version
+#include "creaturesException.h"
 
 #include <cassert>
 #include <fmt/core.h>
@@ -144,9 +145,8 @@ monikerstatus monikerData::getStatus() {
 				return deadandkilled;
 
 		default:
-			assert(false); // explode!
+			throw creaturesException("monikerData::getStatus should not be here");
 	}
-
 }
 
 std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
