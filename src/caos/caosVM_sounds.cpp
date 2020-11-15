@@ -19,15 +19,18 @@
 
 #include "caos_assert.h"
 #include "caosVM.h"
+#include "caosScript.h"
 #include "Agent.h"
 #include "World.h"
 #include "Engine.h"
-#include "audiobackend/AudioBackend.h"
 #include "MusicManager.h"
+#include "SoundManager.h"
 #include "Camera.h"
 #include "MetaRoom.h"
 #include "Room.h"
 #include "Map.h"
+#include <string>
+#include <limits.h>
 #include <iostream>
 #include <memory>
 using std::cout;
@@ -123,6 +126,23 @@ void caosVM::c_SNDL() {
 }
 
 /**
+ SNDQ (command) filename (string) delay (integer)
+ %status stub
+ %pragma variants all
+
+ Play an uncontrolled sound at the target agent's current position, but delay before playing.
+*/
+void caosVM::c_SNDQ() {
+	VM_PARAM_INTEGER(delay);
+	VM_PARAM_STRING(filename);
+
+	valid_agent(targ);
+
+	// This appears to be a CAOS command in every game, but isn't used in any official
+	// scripts.
+}
+
+/**
  MMSC (command) x (integer) y (integer) track_name (string)
  %status maybe
 
@@ -202,8 +222,9 @@ void caosVM::c_FADE() {
 	VM_VERIFY_SIZE(0)
 		
 	valid_agent(targ);
-	if (targ->sound)
-		targ->sound->fadeOut();
+	if (targ->sound) {
+		targ->sound.fadeOut();
+	}
 }
 
 /**
@@ -214,7 +235,9 @@ void caosVM::c_FADE() {
 */
 void caosVM::c_STPC() {
 	valid_agent(targ);
-	targ->sound.reset();
+	if (targ->sound) {
+		targ->sound.stop();
+	}
 }
 
 /**
@@ -232,7 +255,7 @@ void caosVM::c_STRK() {
 
 /**
  VOLM (command) type (integer) volume (integer)
- %status stub
+ %status maybe
 
  Changes the volume of the specified type of audio; 0 for sound effects, 1 for midi or 2 for dynamic music.
  Volume is from -10000 (silent) to 0 (maximum).
@@ -241,20 +264,49 @@ void caosVM::c_VOLM() {
 	VM_PARAM_INTEGER(volume)
 	VM_PARAM_INTEGER(type)
 
-	// TODO
+	float scaled_volume = volume / 10000.0 + 1;
+
+	if (type == 0) {
+		soundmanager.setVolume(scaled_volume);
+	} else if (type == 1) {
+		musicmanager.setMIDIVolume(scaled_volume);
+	} else if (type == 2) {
+		musicmanager.setVolume(scaled_volume);
+	} else {
+		// In Creatures Village's !startup.cos
+		// TODO: do a full stacktrace like CaosException?
+		printf(
+			"exec of \"%s\" raised warning: VOLM: Can't set volume of audio type %i\n",
+			currentscript->filename.size() ? currentscript->filename.c_str() : "(null)",
+			type
+		);
+	}
 }
 
 /**
  VOLM (integer) type (integer)
- %status stub
+ %status maybe
 
- Return the volumne of the specified type of audio; 0 for sound effects, 1 for midi or 2 for dynamic music.
+ Return the volume of the specified type of audio; 0 for sound effects, 1 for midi or 2 for dynamic music.
  Volume is from -10000 (silent) to 0 (maximum).
 */
 void caosVM::v_VOLM() {
 	VM_PARAM_INTEGER(type)
 
-	result.setInt(0); // TODO
+	float volume = 1.0;
+	if (type == 0) {
+		volume = soundmanager.getVolume();
+	} else if (type == 1) {
+		// Official documentation says "Currently not supported for MIDI", but Sea-Monkeys
+		// uses it.
+		volume = musicmanager.getMIDIVolume();
+	} else if (type == 2) {
+		volume = musicmanager.getVolume();
+	} else {
+		throw caosException("Can't get volume of audio type " + std::to_string(type));
+	}
+
+	result.setInt(std::round((volume - 1) * 10000));
 }
 
 /**
@@ -269,20 +321,16 @@ void caosVM::v_MUTE() {
 	VM_PARAM_INTEGER(eormask)
 	VM_PARAM_INTEGER(andmask)
 
-	// TODO: we should maintain state despite having no audio engine, probably
-	// (UI scripting assumes changes were successful)
-	if (!engine.audio) {
-		result.setInt(0);
-		return;
-	}
+	int value = 0;
+	if (soundmanager.isMuted()) value |= 1;
+	if (musicmanager.isMuted()) value |= 2;
 
-	// TODO: music
+	value ^= eormask;
 
-	if (eormask & 1) engine.audio->setMute(!engine.audio->isMuted());
+	soundmanager.setMuted(value & 1);
+	musicmanager.setMuted(value & 2);
 
-	int r = 0;
-	if (andmask & 1 && engine.audio->isMuted()) r += 1;
-	result.setInt(r);
+	result.setInt(value & andmask);
 }
 
 /**
@@ -358,41 +406,35 @@ void caosVM::c_PLDS() {
 	// TODO
 }
 
-struct SineStream : AudioStreamBase {
-	double period;
-	double phase;
-	bool stereo;
-	int amplitude;
-	SineStream(int freq, bool stereo_, int ampl)
-		: period((double)44100/(double)freq), phase(0), stereo(stereo_), amplitude(ampl) { }
+struct SineStream : AudioStream {
+	int position = 0;
+	bool stereo = true;
+	int frequency;
+	SineStream(int frequency_)
+		: frequency(frequency_) {}
 
 	// avoid panning?
-	virtual bool isStereo() const { return stereo; }
-	virtual int sampleRate() const { return 44100; }
-	virtual int latency() const { return 1000; }
-	virtual bool reset() { return true; }
-	virtual int bitDepth() const { return 16; }
 	virtual size_t produce(void *data, size_t len) {
 		int sampleCount = len / (stereo ? 4 : 2);
 		int p = 0;
-		unsigned short *buf = (unsigned short *)data;
+		signed short *buf = (signed short *)data;
 
 		for (int i = 0; i < sampleCount; i++) {
-			phase += (1/period);
-			if (phase > 1)
-				phase = phase - 1;
-			double wave = sin( phase * M_PI * 2) * amplitude;
-			buf[p++] = (signed short)wave;
-			if (stereo)
-				buf[p++] = (signed short)wave;
+			float t1 = sin(2*M_PI*position*350/frequency);
+			buf[p++] = (SHRT_MAX / 2) * t1;
+			if (stereo) {
+				float t2 = sin(2*M_PI*position*440/frequency);
+				buf[p++] = (SHRT_MAX / 2) * t2;
+			}
+			position++;
 		}
 		return len;
 	}
 };
 
 /**
- DBG: SINE (command) rate (integer) stereo (integer) track (integer) amplitude (integer)
- %status maybe
+ DBG: SINE (command) rate (integer) track (integer)
+ %status stub
 
  Plays a sine wave coming from TARG
 
@@ -400,20 +442,23 @@ struct SineStream : AudioStreamBase {
  view, track = 2 to inject it into the BGM source
  */
 void caosVM::c_DBG_SINE() {
-	VM_PARAM_INTEGER(ampl);
 	VM_PARAM_INTEGER(track);
-	VM_PARAM_INTEGER(stereo);
 	VM_PARAM_INTEGER(rate);
 	if (track != 2) {
 		valid_agent(targ);
 
-		if (targ->sound)
-			targ->sound->stop();
+		if (targ->sound) {
+			targ->sound.stop();
+			targ->sound = {};
+		}
 	}
-	// TODO: SDL_Mixer can't do multiple dynamic audio streams, and we already use
-	// one for MNG music...
-	// Maybe generate a wav file and set it looping?
-	throw creaturesException("DBG: SINE unimplemented");
+
+	auto stream = std::make_shared<SineStream>(rate);
+	// if (track == 2) {
+		// soundmanager.playMusic(stream);
+	// } else {
+		// TODO
+	// }
 }
 
 /**
@@ -424,7 +469,7 @@ void caosVM::c_DBG_SINE() {
  Don't touch.
  */
 void caosVM::c_DBG_SBGM() {
-	engine.audio->stopBackgroundMusic();
+	musicmanager.stop();
 }
 
 

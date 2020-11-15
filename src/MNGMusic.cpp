@@ -9,29 +9,9 @@
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
 
-class MNGStream : public AudioStreamBase {
-public:
-	MNGStream(MNGMusic& _mng_music) : mng_music(_mng_music) {}
-	virtual bool isStereo() const { return true; }
-	virtual int sampleRate() const { return 22050; }
-	virtual int latency() const { return 1000; }
-	virtual bool reset() { return true; }
-	virtual int bitDepth() const { return 16; }
-
-	virtual size_t produce(void *data, size_t len_in_bytes) {
-		mng_music.render((signed short *)data, len_in_bytes / 2);
-		return len_in_bytes;
-	}
-	
-	MNGMusic& mng_music;
-};
 
 MNGMusic::MNGMusic() = default;
 MNGMusic::~MNGMusic() = default;
-
-void MNGMusic::startPlayback(AudioBackend &audio) {
-	audio.setBackgroundMusic(std::make_shared<MNGStream>(*this));
-}
 
 void MNGMusic::playSilence() {
 	playing_silence = true;

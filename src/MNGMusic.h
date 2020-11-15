@@ -4,7 +4,7 @@
 #include "fileformats/mngfile.h"
 #include <memory>
 
-class MNGMusic {
+class MNGMusic : public AudioStream {
 private:
 	void playTrack(std::shared_ptr<class MusicTrack> track);
 
@@ -20,6 +20,10 @@ public:
 	void playSilence();
 
 	void render(signed short *data, size_t len);
+	virtual size_t produce(void *data, size_t len_in_bytes) {
+		render((signed short *)data, len_in_bytes / 2);
+		return len_in_bytes;
+	}
 	
 	bool playing_silence = true;
 };

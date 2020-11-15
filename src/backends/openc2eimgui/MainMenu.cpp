@@ -5,7 +5,7 @@
 #include <imgui.h>
 
 #include "AgentInjector.h"
-#include "audiobackend/AudioBackend.h"
+#include "SoundManager.h"
 #include "BrainViewer.h"
 #include "CreatureGrapher.h"
 #include "creatures/c2eCreature.h"
@@ -14,6 +14,8 @@
 #include "Engine.h"
 #include "Hatchery.h"
 #include "historyManager.h"
+#include "MusicManager.h"
+#include "SoundManager.h"
 #include "PointerAgent.h"
 #include "ImGuiUtils.h"
 #include "World.h"
@@ -163,8 +165,15 @@ void DrawMainMenu() {
     if (ImGui::MenuItem("Pause", nullptr, world.paused)) {
       world.paused = !world.paused;
     }
-    if (ImGui::MenuItem("Mute", nullptr, engine.audio->isMuted())) {
-      engine.audio->setMute(!engine.audio->isMuted());
+    if (ImGui::MenuItem("Mute", nullptr, soundmanager.isMuted() && musicmanager.isMuted())) {
+      bool muted = soundmanager.isMuted() && musicmanager.isMuted();
+      soundmanager.setMuted(!muted);
+      musicmanager.setMuted(!muted);
+      // hack to make C3/DS sound options panel update (also makes it slide back in, but whatever)
+      for (auto& a : world.agents) {
+          if (!a) continue;
+          a->queueScript(123, 0); // window resized script
+      }
     }
     ImGui::Separator();
     if (ImGui::MenuItem("Fast speed", nullptr, engine.fastticks)) {

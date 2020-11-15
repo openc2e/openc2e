@@ -58,8 +58,6 @@ protected:
 	class PointerAgent *theHand;
 	std::list<scriptevent> scriptqueue;
 
-	std::list<std::pair<std::shared_ptr<class AudioSource>, bool> > uncontrolled_sounds; // audio, followingviewport
-
 	std::map<int, std::weak_ptr<Agent> > unidmap;
 	std::vector<caosVM *> vmpool;
 
@@ -117,8 +115,6 @@ public:
 	std::string getUserDataDir();
 	std::string findFile(std::string path);
 	std::vector<std::string> findFiles(std::string dir, std::string wild);
-
-	std::shared_ptr<AudioSource> playAudio(std::string filename, AgentRef agent, bool controlled, bool loop, bool followviewport = false);
 
 	void newMoniker(std::shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
 	std::shared_ptr<genomeFile> loadGenome(std::string &filename);

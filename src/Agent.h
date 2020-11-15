@@ -22,6 +22,7 @@
 
 #include "serfwd.h"
 #include "AgentRef.h"
+#include "Sound.h"
 #include "caosValue.h"
 #include "CompoundPart.h"
 #include <cassert>
@@ -83,7 +84,7 @@ protected:
 	std::list<caosVM *> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
 
-	void updateAudio(std::shared_ptr<class AudioSource>);
+	void updateAudio(Sound);
 	bool dying : 1;
 	
 	void vmTick();
@@ -109,7 +110,7 @@ public:
 	void speak(std::string sentence);
 	void tickVoices();
 	
-	std::shared_ptr<class AudioSource> sound;
+	Sound sound;
 
 	// these are maps rather than vectors because ports can be destroyed
 	std::map<unsigned int, std::shared_ptr<InputPort> > inports; // XXX: do these need to be std::shared_ptr?

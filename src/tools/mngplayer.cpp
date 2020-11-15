@@ -46,6 +46,9 @@ int main (int argc, char **argv) {
         return 1;
     }
 
+    auto backend = SDLMixerBackend::getInstance();
+    backend->init();
+
     std::string ext = ascii_tolower(fs::path(filename).extension());
     if (ext == ".mng") {
       MNGFile *file = new MNGFile(filename);
@@ -60,26 +63,19 @@ int main (int argc, char **argv) {
 
       std::string trackname = argv[2];
 
-      SDLMixerBackend backend;
-      backend.init();
-
       MNGMusic mng_music;
-      mng_music.startPlayback(backend);
       mng_music.playTrack(file, trackname);
       if (mng_music.playing_silence) {
           // If the track doesn't exist
           // TODO: better way to check this
           return 1;
       }
-
+      backend->playStream(&mng_music);
       Event sleep_forever;
       sleep_forever.wait();
 
     } else if (ext == ".mid" || ext == ".midi") {
-      SDLMixerBackend backend;
-      backend.init();
-      backend.setBackgroundMusic(filename);
-
+      backend->playMIDIFile(filename);
       Event sleep_forever;
       sleep_forever.wait();
 

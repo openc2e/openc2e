@@ -2,6 +2,7 @@
 #include "Catalogue.h"
 #include "VoiceData.h"
 
+#include <algorithm>
 #include <fstream>
 #include <fmt/format.h>
 #include <ghc/filesystem.hpp>
@@ -39,23 +40,28 @@ int main (int argc, char **argv) {
         return 1;
     }
     
-    SDLMixerBackend backend;
-    backend.init();
+    auto backend = SDLMixerBackend::getInstance();
+    backend->init();
     
     fmt::print("{} ->\n", sentence);
-    std::vector<std::shared_ptr<AudioSource>> clips;
+    std::vector<AudioChannel> channels;
     auto syllables = voices.GetSyllablesFor(sentence);
     for (auto entry : syllables) {
         unsigned int delay_ms = entry.delay_ticks * (is_c2e ? 50 : 100);
         fmt::print("{} {}ms\n", entry.name.size() > 0 ? entry.name : "(silence)", delay_ms);
         
         if (entry.name.size() > 0) {
-            auto clip = backend.loadClip(fs::path(datadirectory) / "Sounds" / (entry.name + ".wav"));
-            clip->play();
-            clips.push_back(clip); // don't cut off the clip before it's done
+            channels.push_back(backend->playClip(fs::path(datadirectory) / "Sounds" / (entry.name + ".wav")));
         }
             
         std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // don't cut off any clips
+    while (true) {
+        if (std::all_of(channels.begin(), channels.end(), [&](auto c) {
+                return backend->getChannelState(c) == AUDIO_STOPPED;
+        })) {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 }

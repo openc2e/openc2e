@@ -27,7 +27,6 @@
 #include <cassert>
 #include <limits.h> // for MAXINT
 #include <memory>
-#include "audiobackend/AudioBackend.h"
 #include "Backend.h"
 #include "creaturesImage.h"
 #include "fileformats/genomeFile.h"
@@ -156,7 +155,6 @@ void World::init() {
 
 void World::shutdown() {
 	agents.clear();
-	uncontrolled_sounds.clear();
 	map->Reset();
 }
 
@@ -220,31 +218,6 @@ void World::tick() {
 		// due to destruction ordering we must explicitly destroy all agents here
 		agents.clear();
 		engine.done = true;
-	}
-
-	// Notify the audio backend about our current viewpoint center.
-	engine.audio->setViewpointCenter(engine.camera->getXCentre(), engine.camera->getYCentre());
-
-	std::list<std::pair<std::shared_ptr<AudioSource>, bool> >::iterator si = uncontrolled_sounds.begin();
-	while (si != uncontrolled_sounds.end()) {
-		std::list<std::pair<std::shared_ptr<AudioSource>, bool> >::iterator next = si; next++;
-		if (si->first->getState() != SS_PLAY) {
-			// sound is stopped, so release our reference
-			uncontrolled_sounds.erase(si);
-		} else {
-			if (si->second) {
-				// follow viewport
-				si->first->setPos(engine.camera->getXCentre(), engine.camera->getYCentre(), 0);
-			} else {
-				// mute/unmute off-screen uncontrolled audio if necessary
-				float x, y, z;
-				si->first->getPos(x, y, z);
-				if (engine.version > 2) // TODO: this is because of wrap issues, but we need a better fix
-					si->first->setMute(engine.camera->getMetaRoom() != world.map->metaRoomAt(x, y));
-			}
-		}
-
-		si = next;
 	}
 
 	// Tick all agents, deleting as necessary.
@@ -732,47 +705,6 @@ std::string World::generateMoniker(std::string basename) {
 	}
 	
 	return x;
-}
-
-std::shared_ptr<AudioSource> World::playAudio(std::string name, AgentRef agent, bool controlled, bool loop, bool followviewport) {
-	if (name.size() == 0) return std::shared_ptr<AudioSource>();
-
-	std::string filename = findFile(fmt::format("Sounds/{}.wav", name));
-	if (filename.size() == 0) {
-		if (engine.version < 3) return std::shared_ptr<AudioSource>(); // creatures 1 and 2 ignore non-existent audio clips
-		throw creaturesException(fmt::format("No such clip '{}.wav'", name));
-	}
-
-	std::shared_ptr<AudioSource> sound = engine.audio->loadClip(filename);
-	if (!sound) {
-		// note that more specific error messages can be thrown by implementations of loadClip
-		throw creaturesException("failed to load audio clip " + filename);
-	}
-
-	if (loop) {
-		assert(controlled);
-		sound->setLooping(true);
-	}
-
-	if (agent) {
-		assert(!followviewport);
-
-		agent->updateAudio(sound);
-		if (controlled)
-			agent->sound = sound;
-		else
-			uncontrolled_sounds.push_back(std::pair<std::shared_ptr<class AudioSource>, bool>(sound, false));
-	} else {
-		assert(!controlled);
-
-		// TODO: handle non-agent sounds
-		sound->setPos(engine.camera->getXCentre(), engine.camera->getYCentre(), 0);
-		uncontrolled_sounds.push_back(std::pair<std::shared_ptr<class AudioSource>, bool>(sound, followviewport));
-	}
-	
-	sound->play();
-
-	return sound;
 }
 
 int World::findCategory(unsigned char family, unsigned char genus, unsigned short species) {

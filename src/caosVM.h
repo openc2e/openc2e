@@ -889,6 +889,7 @@ public:
 	// sounds
 	void c_SNDE();
 	void c_SNDC();
+	void c_SNDQ();
 	void c_MMSC();
 	void v_MMSC();
 	void c_RMSC();

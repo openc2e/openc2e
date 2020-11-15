@@ -46,7 +46,7 @@ extern "C" int main(int argc, char *argv[]) {
 
 	engine.addPossibleBackend("sdl", std::shared_ptr<Backend>(new SDLBackend()));
 #ifdef SDLMIXER_SUPPORT
-	engine.addPossibleAudioBackend("sdlmixer", std::shared_ptr<AudioBackend>(new SDLMixerBackend()));
+	engine.addPossibleAudioBackend("sdlmixer", SDLMixerBackend::getInstance());
 #endif
 
 	// pass command-line flags to the engine, but do no other setup

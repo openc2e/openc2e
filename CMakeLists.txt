@@ -219,6 +219,8 @@ add_library(openc2e-core STATIC
 	src/SimpleAgent.cpp
 	src/creatures/SkeletalCreature.cpp
 	src/socket.cpp
+	src/Sound.cpp
+	src/SoundManager.cpp
 	src/Vehicle.cpp
 	src/VoiceData.cpp
 	src/World.cpp

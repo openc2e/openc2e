@@ -18,6 +18,7 @@
  */
 
 #include "caos_assert.h"
+#include "SoundManager.h"
 #include "Agent.h"
 #include "MetaRoom.h"
 #include "World.h"
@@ -406,51 +407,19 @@ int Agent::handleClick(float clickx, float clicky) {
 void Agent::playAudio(std::string filename, bool controlled, bool loop) {
 	assert(!dying);
 
-	sound.reset();
-	world.playAudio(filename, this, controlled, loop);
+	sound.stop();
+	sound = soundmanager.playSound(filename, loop);
+	updateAudio(sound);
+	if (!controlled) {
+		sound = {};
+	}
 }
 
 bool agentOnCamera(Agent *targ, bool checkall = false); // caosVM_camera.cpp
 
-static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int width, unsigned int height) {
-	const static unsigned int buffer = 500;
-
-	if (engine.camera->getMetaRoom() != room)
-		return false;
-	if (x + buffer < engine.camera->getX() || x + width - buffer > engine.camera->getX() + engine.camera->getWidth())
-		return false;
-	if (y + buffer < engine.camera->getY() || y + height - buffer > engine.camera->getY() + engine.camera->getHeight())
-		return false;
-	return true;
-}
-
-void Agent::updateAudio(std::shared_ptr<AudioSource> s) {
+void Agent::updateAudio(Sound s) {
 	assert(s);
-	MetaRoom *room = world.map->metaRoomAt(x, y);
-	if (!room) {
-		// TODO: think about inrange when positioning outside-metaroom agents
-		s->setPos(x + getWidth() / 2, y + getHeight() / 2, zorder);
-		return;
-	}
-
-	float xc = x;
-
-	bool inrange = false;
-	if (inrange_at(room, x, y, getWidth(), getHeight())) {
-		xc = x;
-		inrange = true;
-	} else if (room->wraparound()) {
-		if (inrange_at(room, x - room->width(), y, getWidth(), getHeight())) {
-			xc = x - room->width();
-			inrange = true;
-		} else if (inrange_at(room, x + room->width(), y, getWidth(), getHeight())) {
-			xc = x + room->width();
-			inrange = true;
-		}
-	}
-	s->setMute(!inrange);
-	if (inrange)
-		s->setPos(xc + getWidth() / 2, y + getHeight() / 2, zorder);
+	s.setPosition(x, y, getWidth(), getHeight());
 	// TODO: setVelocity?
 }
 
@@ -1012,15 +981,9 @@ void Agent::tick() {
 	LifeAssert la(this);
 	if (dying) return;
 	
+	// reposition audio
 	if (sound) {
-		// if the sound is no longer playing...
-		if (sound->getState() != SS_PLAY) {
-			// ...release our reference to it
-			sound.reset();
-		} else {
-			// otherwise, reposition audio
-			updateAudio(sound);
-		}
+		updateAudio(sound);
 	}
 
 	// don't tick paused agents
@@ -1151,8 +1114,8 @@ Agent::~Agent() {
 		zotstack();
 
 		if (sound) {
-			sound->stop();
-			sound.reset();
+			sound.stop();
+			sound = {};
 		}
 	}
 }
@@ -1177,8 +1140,8 @@ void Agent::kill() {
 	agents_iter->reset();
 
 	if (sound) {
-		sound->stop();
-		sound.reset();
+		sound.stop();
+		sound = {};
 	}
 }
 

@@ -44,7 +44,7 @@ struct processState {
 class MNGNode {
 public:
 	virtual std::string dump() { return "[unknown node]"; }
-	virtual void postProcess(processState *s) { } // walk the tree, setting up parent pointers correctly
+	virtual void postProcess(processState*) { } // walk the tree, setting up parent pointers correctly
 	virtual ~MNGNode() { }
 };
 

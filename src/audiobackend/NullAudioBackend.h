@@ -20,48 +20,28 @@
 #pragma once
 
 #include "audiobackend/AudioBackend.h"
-#include <memory>
-
-class NullAudioSource : public AudioSource {
-	SourceState getState() const {
-		return SS_STOP;
-	}
-	void play() { }
-	void stop() { }
-	void pause() { }
-	void fadeOut() { }
-	void setPos(float, float, float) { }
-	void getPos(float&, float&, float&) const { }
-	void setVelocity(float, float) { }
-	bool isLooping() const { return false; }
-	void setLooping(bool) { }
-	void setVolume(float) { }
-	float getVolume() const { return 0; }
-	bool isMuted() const { return true; }
-	void setMute(bool) { }
-	bool isFollowingView() const { return false; }
-	void setFollowingView(bool) { }
-	void setStream(const AudioStream&) { }
-	AudioStream getStream() const { return {}; }
-};
 
 class NullAudioBackend : public AudioBackend {
-protected:
-	bool muted;
-
 public:
-	NullAudioBackend() { }
-	void init() { muted = false; }
+	NullAudioBackend() = default;
+	void init() { }
 	void shutdown() { }
-	void setViewpointCenter(float, float) { }
-	void setMute(bool b) { muted = b; }
-	bool isMuted() const { return muted; }
 
-	std::shared_ptr<AudioSource> loadClip(const std::string &filename) {
-		if (filename.size() == 0) return std::shared_ptr<AudioSource>();
-		return std::shared_ptr<AudioSource>(new NullAudioSource());
+	AudioChannel playClip(const std::string& filename, bool) {
+		if (filename.size() == 0) return {};
+		return { 1 };
 	}
-	void setBackgroundMusic(const std::string& filename) { }
-	void setBackgroundMusic(AudioStream stream) { }
-	void stopBackgroundMusic() { }
+	AudioChannel playStream(AudioStream*) {
+		return { 1 };
+	}
+	
+	void fadeOutChannel(AudioChannel) { }
+	void setChannelVolume(AudioChannel, float) { }
+	void setChannelPan(AudioChannel, float, float) { }
+	AudioState getChannelState(AudioChannel) { return AUDIO_STOPPED; }
+	void stopChannel(AudioChannel) { }
+	
+	void playMIDIFile(const std::string&) { }
+	void setMIDIVolume(float) { }
+	void stopMIDI() { }
 };

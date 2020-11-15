@@ -24,6 +24,7 @@
 #include "Map.h"
 #include "MetaRoom.h"
 #include "MusicManager.h"
+#include "SoundManager.h"
 #include "NetBackend.h"
 #include "caosVM.h" // for setupCommandPointers()
 #include "caosScript.h" // for executeNetwork()
@@ -324,18 +325,10 @@ void Engine::update() {
 	// tick the world
 	world.tick();
 
-	// play C1 music
-	// TODO: this doesn't seem to actually be every 7 seconds, but actually somewhat random
-	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
-	// TODO: is this the right place for this?
-	if (version == 1 && (world.tickcount % 70) == 0) {
-		int piece = 1 + (rand() % 28);
-		std::string filename = fmt::format("MU{:02d}", piece);
-		std::shared_ptr<AudioSource> s = world.playAudio(filename, AgentRef(), false, false, true);
-		if (s) s->setVolume(0.4f);
-	}
-
-	// play MNG music
+	// update sounds
+	soundmanager.tick();
+	
+	// play C1 background wavs and MNG and MIDI music
 	musicmanager.tick();
 
 	// update our data for things like pace, race, ticktime, etc
@@ -939,7 +932,8 @@ bool Engine::initialSetup() {
 		audio->init();
 	}
 	if (!cmdline_enable_sound) {
-		audio->setMute(true);
+		soundmanager.setMuted(true);
+		musicmanager.setMuted(true);
 	}
 	possible_audiobackends.clear();
 	

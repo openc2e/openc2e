@@ -18,8 +18,9 @@
  */
 
 #include "MusicManager.h"
-#include "World.h"
 #include "Engine.h"
+#include "SoundManager.h"
+#include "World.h"
 
 // this is all for MusicManager::tick
 #include "World.h"
@@ -31,9 +32,52 @@ MusicManager musicmanager;
 
 MusicManager::MusicManager() = default;
 MusicManager::~MusicManager() {
+	stop();
 	for (std::map<std::string, MNGFile *>::iterator i = files.begin(); i != files.end(); i++) {
 		delete i->second;
 	}
+}
+
+void MusicManager::stop() {
+	if (engine.audio) {
+		engine.audio->stopChannel(mng_channel);
+		engine.audio->stopMIDI();
+	}
+}
+
+float MusicManager::getVolume() {
+	return music_volume;
+}
+
+void MusicManager::setVolume(float volume) {
+	music_volume = volume;
+	updateVolumes();
+}
+
+float MusicManager::getMIDIVolume() {
+	return midi_volume;
+}
+
+void MusicManager::setMIDIVolume(float volume) {
+	midi_volume = volume;
+	updateVolumes();
+}
+
+bool MusicManager::isMuted() {
+	return music_muted;
+}
+
+void MusicManager::setMuted(bool muted) {
+	music_muted = muted;
+	updateVolumes();
+}
+
+void MusicManager::updateVolumes() {
+	// TODO: handle game variable engine_mute for MIDI muting? It's only ever set
+	// to 0 (non-muted) in official scripts
+	engine.audio->setMIDIVolume(midi_volume);
+	engine.audio->setChannelVolume(mng_channel, music_muted ? 0 : music_volume);
+	engine.audio->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.4);
 }
 
 void MusicManager::playTrack(std::string track, unsigned int _how_long_before_changing_track_ms) {
@@ -42,24 +86,31 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 	}
 	last_track = track;
 
-	if (track == "Silence") {
-		mng_music.playSilence();
-	} else {
+	auto eame_usemidimusicsystem = world.variables["engine_usemidimusicsystem"];
+	bool usemidimusicsystem = eame_usemidimusicsystem.hasInt() && eame_usemidimusicsystem.getInt() != 0;
+	// TODO: what happens if you call the CAOS command MIDI and usemidimusicsystem isn't enabled?
 
-		// TODO: this needs to be smarter, based on the gametype, use of the CAOS command
-		// "MIDI", and engine_usemidimusicsystem. C2E has three channels that can be
-		// controlled separately: sound effects (0), MIDI (1), and generated music (2)
-		if (engine.gametype == "cv" || engine.gametype == "sm") {
-			std::string filename = world.findFile("Sounds/" + track + ".mid");
-			if (!filename.size()) {
-				fmt::print("Couldn't find MIDI file '{}'!\n", track);
-				return;
-			}
-			engine.audio->setBackgroundMusic(filename);
-			how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
+	if (usemidimusicsystem) {
+		mng_music.playSilence(); // or just stop it?
+
+		if (track == "") {
+			engine.audio->stopMIDI();
 			return;
 		}
 
+		std::string filename = world.findFile("Sounds/" + track + ".mid");
+		if (!filename.size()) {
+			fmt::print("Couldn't find MIDI file '{}'!\n", track);
+			return;
+		}
+		engine.audio->playMIDIFile(filename);
+		how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
+		return;
+	}
+
+	if (track == "Silence") {
+		mng_music.playSilence();
+	} else {
 		std::string filename, trackname;
 
 		std::string::size_type n = track.find("\\");
@@ -87,12 +138,31 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 		}
 
 		mng_music.playTrack(file, trackname);
-		mng_music.startPlayback(*engine.audio);
+		if (engine.audio->getChannelState(mng_channel) != AUDIO_PLAYING) {
+			mng_channel = engine.audio->playStream(&mng_music);
+			updateVolumes();
+		}
 	}
 	how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
 }
 
 void MusicManager::tick() {
+	// play C1 music
+	// TODO: this doesn't seem to actually be every 7 seconds, but actually somewhat random
+	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
+	// TODO: is this the right place for this?
+	if (engine.version == 1 && (world.tickcount % 70) == 0 &&
+	    engine.audio->getChannelState(creatures1_channel) == AUDIO_STOPPED)
+	{
+		auto sounds = world.findFiles("Sounds", "MU*.wav");
+		if (sounds.size()) {
+			creatures1_channel = engine.audio->playClip(sounds[rand() % sounds.size()]);
+			updateVolumes();
+		}
+	}
+	
+	// play MNG/MIDI music
+	// TODO: how does engine_near_death_track_name work?
 	if (how_long_before_changing_track_ms > 0) {
 		how_long_before_changing_track_ms -= world.ticktime;
 	}
@@ -108,10 +178,6 @@ void MusicManager::tick() {
 			}
 		}
 	}
-}
-
-void MusicManager::render(signed short *data, size_t len) {
-	mng_music.render(data, len);
 }
 
 /* vim: set noet: */

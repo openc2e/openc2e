@@ -21,6 +21,7 @@
 #define _MUSICMANAGER_H
 
 #include "MNGMusic.h"
+#include "audiobackend/AudioChannel.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -29,12 +30,28 @@ class MusicManager {
 public:
 	MusicManager();
 	~MusicManager();
+	void stop();
+
+	float getVolume();
+	void setVolume(float volume);
+	float getMIDIVolume();
+	void setMIDIVolume(float volume);
+	bool isMuted();
+	void setMuted(bool muted);
 
 	void tick();
 	void playTrack(std::string track, unsigned int how_long_before_changing_track_ms);
-	void render(signed short *data, size_t len);
 
 private:
+	void updateVolumes();
+	
+	bool music_muted = false;
+	float music_volume = 1.0;
+	bool midi_muted = false;
+	float midi_volume = 1.0;
+	
+	AudioChannel creatures1_channel;
+	AudioChannel mng_channel;
 	std::map<std::string, class MNGFile *> files;
 	MNGMusic mng_music;
 	std::string last_track;

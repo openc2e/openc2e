@@ -21,61 +21,58 @@
 #include "creaturesException.h"
 #include <SDL.h>
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <climits>
 #include <memory>
+#include <string.h>
+
+constexpr int SDLMIXERBACKEND_CHUNK_SIZE = 1024;
+
+static std::vector<uint16_t> s_channel_to_generation;
+
+static int audiochannel_to_int(AudioChannel source) {
+	uint16_t channel = source.handle & 0xffff;
+	uint16_t generation = (source.handle >> 16) & 0xffff;
+	if (channel >= s_channel_to_generation.size()) {
+		return -1;
+	}
+	if (s_channel_to_generation[channel] != generation) {
+		return -1;
+	}
+	return channel;
+}
+
+static AudioChannel int_to_audio_channel(int channel) {
+	if (channel < 0) return {};
+	return {
+		(uint32_t)channel | ((uint32_t)s_channel_to_generation[channel]) << 16
+	};
+}
 
 SDLMixerBackend::SDLMixerBackend() {
 }
 
-void SDLMixerBackend::setBackgroundMusic(const std::string& filename) {
+void SDLMixerBackend::playMIDIFile(const std::string& filename) {
 	Mix_Music* music = Mix_LoadMUS(filename.c_str());
 	if (!music) {
-		printf("Couldn't load %s: %s\n", filename.c_str(), Mix_GetError());
+		printf("* SDLMixer: Couldn't load %s: %s\n", filename.c_str(), Mix_GetError());
 		return;
 	}
-	stopBackgroundMusic();
+	stopMIDI();
 	Mix_PlayMusic(music, -1); // TODO: is looping forever correct?
-	bgm_music = music;
+	midi = music;
 }
 
-void SDLMixerBackend::setBackgroundMusic(AudioStream stream) {
-	stopBackgroundMusic();
-	bgm_stream = stream;
-	Mix_HookMusic(SDLMixerBackend::mixer_callback, this);
+void SDLMixerBackend::setMIDIVolume(float volume) {
+	Mix_VolumeMusic(volume * MIX_MAX_VOLUME);
 }
 
-void SDLMixerBackend::stopBackgroundMusic() {
-	if (bgm_music) {
+void SDLMixerBackend::stopMIDI() {
+	if (midi) {
 		Mix_HaltMusic();
-		Mix_FreeMusic(bgm_music);
-		bgm_music = nullptr;
-	}
-	if (bgm_stream) {
-		Mix_HookMusic(NULL, NULL);
-		bgm_stream = {};
-	}
-}
-
-void SDLMixerBackend::mixer_callback(void *userdata, uint8_t *buffer, int num_bytes) {	
-	SDLMixerBackend *backend = (SDLMixerBackend*)userdata;
-	AudioStream& stream = backend->bgm_stream;
-	if (!stream) {
-		return;
-	}
-
-	size_t num_samples = num_bytes / 2;
-	auto& bgm_render_buffer = backend->bgm_render_buffer;
-	bgm_render_buffer.resize(num_samples);
-	stream->produce(bgm_render_buffer.data(), bgm_render_buffer.size() * 2);
-
-	if (backend->muted) {
-		return;
-	}
-
-	int16_t *buf = (int16_t*)buffer;
-	for (size_t i = 0; i < num_samples; ++i) {
-		buf[i] = std::max(SHRT_MIN, std::min(buf[i] + bgm_render_buffer[i], SHRT_MAX));
+		Mix_FreeMusic(midi);
+		midi = nullptr;
 	}
 }
 
@@ -85,146 +82,119 @@ void SDLMixerBackend::init() {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 		throw creaturesException(std::string("SDL error during sound initialization: ") + SDL_GetError());
 
-	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
+	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, SDLMIXERBACKEND_CHUNK_SIZE) < 0)
 		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
 
 	if (!Mix_Init(MIX_INIT_MID)) {
 		printf("* SDLMixer: failed to load MIDI support: %s\n", Mix_GetError());
 	}
+
+	Mix_ChannelFinished([](int i) {
+		// free the chunk we just played
+		// DANGEROUS: each channel must use its own chunk! if you want channels to share data, 
+		// create new chunks each time using Mix_QuickLoad_RAW(chunk->abuf, chunk->alen)
+		Mix_Chunk* chunk = Mix_GetChunk(i);
+		if (chunk) {
+			Mix_FreeChunk(chunk);
+		}
+		// track which handles we've given out are still valid
+		if ((unsigned int)i >= s_channel_to_generation.size()) {
+			printf("* SDLMixer: channel %i finished that we weren't tracking, this shouldn't happen\n", i);
+		} else {
+			s_channel_to_generation[i]++;
+		}
+	});
 }
 
 void SDLMixerBackend::shutdown() {
+	if (arbitrary_audio_chunk) {
+		Mix_FreeChunk(arbitrary_audio_chunk);
+		arbitrary_audio_chunk = nullptr;
+	}
 	Mix_CloseAudio();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-void SDLMixerBackend::setViewpointCenter(float, float) {
-	// TODO
-}
-
-void SDLMixerBackend::setMute(bool m) {
-	muted = m;
-	Mix_Volume(-1, muted ? 0 : MIX_MAX_VOLUME);
-}
-
-std::shared_ptr<AudioSource> SDLMixerBackend::loadClip(const std::string &filename) {
-	Mix_Chunk *buffer = Mix_LoadWAV(filename.c_str());
-	if (!buffer) return std::shared_ptr<AudioSource>();
-
-	SDLMixerSource* source = new SDLMixerSource();
-	source->clip = SDLMixerClip(new SDLMixerBuffer(buffer));
-
-	return std::shared_ptr<AudioSource>(source);
-}
-
-SDLMixerSource::SDLMixerSource() {
-	looping = false;
-	muted = false;
-	volume = 1.0f;
-	followview = false;
-	channel = -1;
-}
-
-SDLMixerSource::~SDLMixerSource() {
-}
-
-SourceState SDLMixerSource::getState() const {
-	if (channel == -1) return SS_STOP;
-	if (!Mix_Playing(channel)) return SS_STOP;
-
-	if (Mix_Paused(channel)) return SS_PAUSE;
-	
-	return SS_PLAY;
-}
-
-void SDLMixerSource::play() {
-	if (!clip) return;
-	setFollowingView(followview); // re-register in the backend if needed
-
-	channel = Mix_PlayChannel(-1, clip->buffer, (looping ? -1 : 0));
+static int playChannel(Mix_Chunk *chunk, bool looping) {
+	int channel = Mix_PlayChannel(-1, chunk, (looping ? -1 : 0));
 	if (channel == -1) {
 		Mix_AllocateChannels(Mix_AllocateChannels(-1) + 1);
-		channel = Mix_PlayChannel(-1, clip->buffer, (looping ? -1 : 0));
-		if (channel == -1) {
-			printf("Couldn't play source: %s\n", Mix_GetError());
-			return;
-		}
+		channel = Mix_PlayChannel(-1, chunk, (looping ? -1 : 0));
 	}
-
-	Mix_UnregisterAllEffects(channel); // TODO: needed?
+	if (channel == -1) {
+		printf("Couldn't play source: %s\n", Mix_GetError());
+		return -1;
+	}
+	if ((unsigned int)channel >= s_channel_to_generation.size()) {
+		SDL_LockAudio();
+		s_channel_to_generation.resize(channel + 1, 0);
+		SDL_UnlockAudio();
+	}
+	return channel;
 }
 
-void SDLMixerSource::stop() {
+AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping) {
+	Mix_Chunk* chunk = Mix_LoadWAV(filename.c_str());
+	if (!chunk) return {};
+	
+	int channel = playChannel(chunk, looping);
+	if (channel == -1) {
+		Mix_FreeChunk(chunk);
+		return {};
+	}
+	return int_to_audio_channel(channel);
+}
+
+AudioChannel SDLMixerBackend::playStream(AudioStream* stream) {
+	static std::array<uint8_t, SDLMIXERBACKEND_CHUNK_SIZE * 4> arbitrary_audio_data;
+	
+	Mix_Chunk* arbitrary_audio_chunk = Mix_QuickLoad_RAW(arbitrary_audio_data.data(), arbitrary_audio_data.size());
+	if (!arbitrary_audio_chunk) {
+		return {};
+	}
+	
+	int channel = playChannel(arbitrary_audio_chunk, true);
+	if (channel == -1) {
+		return {};
+	}
+	Mix_RegisterEffect(channel, [](int channel, void *buf, int length_in_bytes, void *udata) {
+		(void)channel;
+		AudioStream *stream = (AudioStream*)udata;
+		stream->produce(buf, length_in_bytes);
+	}, NULL, stream);
+	return int_to_audio_channel(channel);
+}
+
+void SDLMixerBackend::fadeOutChannel(AudioChannel source) {
+	int channel = audiochannel_to_int(source);
 	if (channel == -1) return;
-
-	// TODO
-	bool oldfollow = followview;
-	setFollowingView(false);          // unregister in backend
-	followview = oldfollow;
-
-	Mix_HaltChannel(channel);
-	channel = -1;
-}
-
-void SDLMixerSource::fadeOut() {
 	Mix_FadeOutChannel(channel, 500); // TODO: is 500 a good value?
 }
 
-void SDLMixerSource::setPos(float x_, float y_, float z_) {
-	x = x_;
-	y = y_;
-	z = z_;
+void SDLMixerBackend::setChannelVolume(AudioChannel source, float v) {
+	int channel = audiochannel_to_int(source);
+	if (channel == -1) return;
+	Mix_Volume(channel, v * MIX_MAX_VOLUME);
+}
+
+void SDLMixerBackend::setChannelPan(AudioChannel, float left, float right) {
 	// TODO
-	// Mix_SetPanning(soundchannel, left, right);
+	(void)left;
+	(void)right;
 }
 
-void SDLMixerSource::getPos(float &x_, float &y_, float &z_) const {
-	x_ = x;
-	y_ = y;
-	z_ = z;
-	// TODO
-	// Mix_GetPanning(soundchannel, left, right); ?
+AudioState SDLMixerBackend::getChannelState(AudioChannel source) {
+	int channel = audiochannel_to_int(source);
+	if (channel != -1 && Mix_Playing(channel)) {
+		return AUDIO_PLAYING;
+	}
+	return AUDIO_STOPPED;
 }
 
-
-bool SDLMixerSource::isLooping() const {
-	return looping;
-}
-
-void SDLMixerSource::setLooping(bool l) {
-	looping = l;
-	// handled in play()
-}
-
-void SDLMixerSource::setVolume(float v) {
-	volume = v;
-	Mix_VolumeChunk(clip->buffer, v * MIX_MAX_VOLUME);
-}
-
-void SDLMixerSource::setMute(bool m) {
-	Mix_VolumeChunk(clip->buffer, m ? 0 : volume * MIX_MAX_VOLUME);
-}
-
-void SDLMixerSource::setFollowingView(bool f) {
-	followview = f;
-	// TODO
-}
-
-SDLMixerBuffer::SDLMixerBuffer(Mix_Chunk *b) {
-	assert(b);
-	buffer = b;
-}
-
-SDLMixerBuffer::~SDLMixerBuffer() {
-	Mix_FreeChunk(buffer);
-}
-
-unsigned int SDLMixerBuffer::length_ms() const {
-	return buffer->alen / 22050; // TODO: good?
-}
-
-unsigned int SDLMixerBuffer::length_samples() const {
-	return buffer->alen;
+void SDLMixerBackend::stopChannel(AudioChannel source) {
+	int channel = audiochannel_to_int(source);
+	if (channel == -1) return;
+	Mix_HaltChannel(channel);
 }
 
 /* vim: set noet: */
