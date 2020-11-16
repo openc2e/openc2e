@@ -127,7 +127,7 @@ void SoundManager::tick() {
 	// update positioned sounds
 	for (auto& s : sources) {
 		if (!(s.isAlive() && s.positioned)) {
-			return;
+			continue;
 		}
 
 		MetaRoom *room = world.map->metaRoomAt(s.x, s.y);
