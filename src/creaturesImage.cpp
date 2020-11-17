@@ -64,10 +64,19 @@ shared_array<Color> creaturesImage::getCustomPalette(unsigned int frame) const {
   return images[frame].palette;
 }
 
-const Texture& creaturesImage::getTextureForFrame(unsigned int frame) const {
+const Image& creaturesImage::getImageForFrame(unsigned int frame) const {
   if (block_width || block_height) {
+    return images[0];
+  }
+  return images[frame];
+}
+
+Texture& creaturesImage::getTextureForFrame(unsigned int frame) {
+  if (block_width || block_height) {
+    if (textures.size() <= 0) textures.resize(1);
     return textures[0];
   }
+  if (textures.size() <= frame) textures.resize(frame+1);
   return textures[frame];
 }
 
@@ -75,7 +84,6 @@ unsigned int creaturesImage::getXOffsetForFrame(unsigned int frame) const {
   if (block_width) {
     return block_width * (frame % (images[0].width / block_width));
   }
-  
   return 0;
 }
 

@@ -137,11 +137,6 @@ std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is
 		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
 		return std::shared_ptr<creaturesImage>();
 	}
-	
-	img->textures.resize(img->images.size());
-	for (size_t i = 0; i < img->images.size(); ++i) {
-		img->textures[i] = engine.backend->createTextureWithTransparentColor(img->images[i], Color{0, 0, 0, 0xff});
-	}
 
 	return img;
 }
@@ -201,10 +196,6 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 
 	auto img = std::make_shared<creaturesImage>(path(filename).stem());
 	img->images = images;
-	img->textures.resize(img->images.size());
-	for (size_t i = 0; i < img->images.size(); ++i) {
-		img->textures[i] = engine.backend->createTextureWithTransparentColor(img->images[i], Color{0, 0, 0, 0xff});
-	}
 	return img;
 }
 
@@ -213,13 +204,9 @@ std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creatur
                                                    unsigned char rotation, unsigned char swap) {
 	auto img = std::make_shared<creaturesImage>(oldimage->getName());
 	img->images.resize(oldimage->images.size());
-	img->textures.resize(img->images.size());
-	
 	for (size_t i = 0; i < img->images.size(); ++i) {
 		img->images[i] = ImageUtils::Tint(oldimage->images[i], r, g, b, rotation, swap);
-		img->textures[i] = engine.backend->createTextureWithTransparentColor(img->images[i], Color{0, 0, 0, 0xff});
 	}
-
 	return img;
 }
 

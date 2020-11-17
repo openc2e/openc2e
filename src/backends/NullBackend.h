@@ -25,7 +25,7 @@
 
 class NullRenderTarget : public RenderTarget {
 public:
-	virtual void renderCreaturesImage(const creaturesImage&, unsigned int, int, int, uint8_t, bool) { }
+	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, uint8_t, bool) { }
 	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>&, unsigned int, int, int, uint8_t, bool) { }
 	virtual void renderLine(int, int, int, int, unsigned int) { }
 	virtual void blitRenderTarget(RenderTarget*, int, int, int, int)  { }

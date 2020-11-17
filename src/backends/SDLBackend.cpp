@@ -309,11 +309,16 @@ unsigned int SDLRenderTarget::getHeight() const {
 	return drawableheight / scale - viewport_offset_top - viewport_offset_bottom;
 }
 
-void SDLRenderTarget::renderCreaturesImage(const creaturesImage& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
+void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
 	if ((x + img.width(frame) <= 0 || x >= (int)getWidth()) && (y + img.height(frame) <= 0 || y >= (int)getHeight())) {
 		return;
 	}
-	SDL_Texture *tex = const_cast<SDL_Texture*>(img.getTextureForFrame(frame).as<SDL_Texture>());
+
+	if (!img.getTextureForFrame(frame)) {
+		img.getTextureForFrame(frame) = engine.backend->createTextureWithTransparentColor(img.getImageForFrame(frame), Color{0, 0, 0, 0xff});
+	}
+
+	SDL_Texture *tex = img.getTextureForFrame(frame).as<SDL_Texture>();
 	assert(tex);
 
 	SDL_SetTextureAlphaMod(tex, 255 - transparency);

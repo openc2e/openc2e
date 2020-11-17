@@ -39,7 +39,7 @@ protected:
 	SDLRenderTarget(SDLBackend *p) { parent = p; }
 
 public:
-	void renderCreaturesImage(const creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false);
+	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false);
 	void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h);

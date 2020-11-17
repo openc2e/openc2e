@@ -45,7 +45,8 @@ public:
 	const void *data(unsigned int frame) const;
 	std::string getName() const;
 	
-	const Texture& getTextureForFrame(unsigned int frame) const;
+	const Image& getImageForFrame(unsigned int frame) const;
+	Texture& getTextureForFrame(unsigned int frame);
 
 	bool hasCustomPalette(unsigned int frame) const;
 	shared_array<Color> getCustomPalette(unsigned int frame) const;
