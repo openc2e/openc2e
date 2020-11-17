@@ -310,6 +310,9 @@ unsigned int SDLRenderTarget::getHeight() const {
 }
 
 void SDLRenderTarget::renderCreaturesImage(const creaturesImage& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
+	if ((x + img.width(frame) <= 0 || x >= (int)getWidth()) && (y + img.height(frame) <= 0 || y >= (int)getHeight())) {
+		return;
+	}
 	SDL_Texture *tex = const_cast<SDL_Texture*>(img.getTextureForFrame(frame).as<SDL_Texture>());
 	assert(tex);
 
