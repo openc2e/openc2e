@@ -931,10 +931,6 @@ bool Engine::initialSetup() {
 		audio = std::shared_ptr<AudioBackend>(new NullAudioBackend());
 		audio->init();
 	}
-	if (!cmdline_enable_sound) {
-		soundmanager.setMuted(true);
-		musicmanager.setMuted(true);
-	}
 	possible_audiobackends.clear();
 	
 	net = std::make_shared<NetBackend>();
@@ -1037,6 +1033,12 @@ bool Engine::initialSetup() {
 		std::cout << "Told not to run the world, so stopping now." << std::endl;
 		shutdown();
 		return false;
+	}
+
+	if (!cmdline_enable_sound) {
+		soundmanager.setMuted(true);
+		musicmanager.setMuted(true);
+		musicmanager.setMIDIMuted(true);
 	}
 
 	// Let agents know the window size (makes the DS sound options panel update

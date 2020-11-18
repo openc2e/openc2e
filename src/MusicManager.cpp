@@ -72,10 +72,18 @@ void MusicManager::setMuted(bool muted) {
 	updateVolumes();
 }
 
+bool MusicManager::isMIDIMuted() {
+	auto it = world.variables.find("engine_mute");
+	return it != world.variables.end() && it->second.hasInt() && it->second.getInt() != 0;
+}
+
+void MusicManager::setMIDIMuted(bool muted) {
+	world.variables["engine_mute"] = muted ? 1 : 0;
+	updateVolumes();
+}
+
 void MusicManager::updateVolumes() {
-	// TODO: handle game variable engine_mute for MIDI muting? It's only ever set
-	// to 0 (non-muted) in official scripts
-	engine.audio->setMIDIVolume(midi_volume);
+	engine.audio->setMIDIVolume(isMIDIMuted() ? 0 : midi_volume);
 	engine.audio->setChannelVolume(mng_channel, music_muted ? 0 : music_volume);
 	engine.audio->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.4);
 }
@@ -86,8 +94,8 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 	}
 	last_track = track;
 
-	auto eame_usemidimusicsystem = world.variables["engine_usemidimusicsystem"];
-	bool usemidimusicsystem = eame_usemidimusicsystem.hasInt() && eame_usemidimusicsystem.getInt() != 0;
+	auto game_usemidimusicsystem = world.variables["engine_usemidimusicsystem"];
+	bool usemidimusicsystem = game_usemidimusicsystem.hasInt() && game_usemidimusicsystem.getInt() != 0;
 	// TODO: what happens if you call the CAOS command MIDI and usemidimusicsystem isn't enabled?
 
 	if (usemidimusicsystem) {
@@ -157,10 +165,9 @@ void MusicManager::tick() {
 		auto sounds = world.findFiles("Sounds", "MU*.wav");
 		if (sounds.size()) {
 			creatures1_channel = engine.audio->playClip(sounds[rand() % sounds.size()]);
-			updateVolumes();
 		}
 	}
-	
+
 	// play MNG/MIDI music
 	// TODO: how does engine_near_death_track_name work?
 	if (how_long_before_changing_track_ms > 0) {
@@ -178,6 +185,9 @@ void MusicManager::tick() {
 			}
 		}
 	}
+	
+	// update volumes based on new volumes, muting, etc
+	updateVolumes();
 }
 
 /* vim: set noet: */

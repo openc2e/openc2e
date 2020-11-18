@@ -165,10 +165,11 @@ void DrawMainMenu() {
     if (ImGui::MenuItem("Pause", nullptr, world.paused)) {
       world.paused = !world.paused;
     }
-    if (ImGui::MenuItem("Mute", nullptr, soundmanager.isMuted() && musicmanager.isMuted())) {
+    if (ImGui::MenuItem("Mute", nullptr, soundmanager.isMuted() && musicmanager.isMuted() && musicmanager.isMIDIMuted())) {
       bool muted = soundmanager.isMuted() && musicmanager.isMuted();
       soundmanager.setMuted(!muted);
       musicmanager.setMuted(!muted);
+      musicmanager.setMIDIMuted(!muted);
       // hack to make C3/DS sound options panel update (also makes it slide back in, but whatever)
       for (auto& a : world.agents) {
           if (!a) continue;

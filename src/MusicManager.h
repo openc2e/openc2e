@@ -38,6 +38,8 @@ public:
 	void setMIDIVolume(float volume);
 	bool isMuted();
 	void setMuted(bool muted);
+	bool isMIDIMuted();
+	void setMIDIMuted(bool muted);
 
 	void tick();
 	void playTrack(std::string track, unsigned int how_long_before_changing_track_ms);
@@ -47,7 +49,6 @@ private:
 	
 	bool music_muted = false;
 	float music_volume = 1.0;
-	bool midi_muted = false;
 	float midi_volume = 1.0;
 	
 	AudioChannel creatures1_channel;
