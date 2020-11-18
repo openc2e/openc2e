@@ -1,11 +1,8 @@
 include(BundleUtilities)
-if(NOT DIST_DIR)
-    message(FATAL_ERROR "DIST_DIR not defined")
-endif()
-
-set(install_prefix "${DIST_DIR}")
+set(install_prefix "${CMAKE_INSTALL_PREFIX}")
 get_filename_component(install_prefix "${install_prefix}" ABSOLUTE)
 
+message(STATUS "Fixing up bundle: ${install_prefix}")
 if(WIN32)
     fixup_bundle("${install_prefix}/openc2e.exe" "" "${CMAKE_CURRENT_BINARY_DIR};${EXTRA_LIB_DIRS}")
 elseif(APPLE)

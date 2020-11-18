@@ -6,85 +6,47 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  CTEST_OUTPUT_ON_FAILURE: TRUE
+  # GitHub runners have two cores each
+  MAKEFLAGS: -j3
+  # set some variables for Visual Studio
+  MultiProcessorCompilation: true
+  UseMultiToolTask: true
+  EnforceProcessCountAcrossBuilds: true
+
 jobs:
-  build-ubuntu:
-    runs-on: ubuntu-latest
-
+  build:
+    name: build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest,ubuntu-latest,macos-latest]
     steps:
-    - uses: actions/checkout@v2
-    - run: sudo apt-get update && sudo apt-get install bison ccache ninja-build libsdl2-dev libsdl2-mixer-dev libutf8proc-dev
-    - name: Prepare ccache timestamp
-      id: ccache_cache_timestamp
-      shell: cmake -P {0}
+    - name: "Check out source"
+      uses: actions/checkout@v2
+    - name: "Install dependencies (Ubuntu)"
+      if: "startsWith(matrix.os, 'ubuntu-')"
+      run: sudo apt-get update && sudo apt-get install bison libpng-dev libsdl2-dev libsdl2-mixer-dev libutf8proc-dev zlib1g-dev
+    - name: "Set environment variables (Windows)"
+      if: runner.os == 'Windows'
+      shell: cmd
       run: |
-        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
-        message("::set-output name=timestamp::${current_date}")
-    - uses: pat-s/always-upload-cache@v1.1.4
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" || exit
+        set >> $GITHUB_ENV || exit
+    - name: "Configure"
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    - name: "Build"
+      run: cmake --build build --config RelWithDebInfo
+    - name: "Test"
+      run: cd build && ctest --build-config RelWithDebInfo
+    - name: "Create distribution artifact"
+      if: runner.os == 'Windows' || runner.os == 'macOS'
+      run: cmake --install build --config RelWithDebInfo --prefix "openc2e-${{ github.sha }}-${{ runner.os }}"
+    - name: "Upload distribution artifact"
+      if: runner.os == 'Windows' || runner.os == 'macOS'
+      uses: actions/upload-artifact@v1
       with:
-        path: .ccache
-        key: ccache-ubuntu-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
-        restore-keys: ccache-ubuntu-
-    - run: mkdir build && cd build && cmake .. -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja && cmake --build . --parallel
-      env:
-        CCACHE_BASEDIR: ${{ github.workspace }}
-        CCACHE_DIR: ${{ github.workspace }}/.ccache
-        CCACHE_COMPRESS: true
-        CCACHE_COMPRESSLEVEL: 6
-        CCACHE_MAXSIZE: 500M
-    - run: cd build && cmake --build . -t test
-      env:
-        CTEST_OUTPUT_ON_FAILURE: TRUE
-
-  build-windows:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: seanmiddleditch/gha-setup-ninja@v1
-    - shell: cmd
-      run: |
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        IF %ERRORLEVEL% NEQ 0 ( exit %ERRORLEVEL% )
-        cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        IF %ERRORLEVEL% NEQ 0 ( exit %ERRORLEVEL% )
-        cmake --build build --parallel
-    - run: cd build && cmake --build . -t test
-      env:
-        CTEST_OUTPUT_ON_FAILURE: TRUE
-    - run: cd build && cmake --build . -t dist
-    - run: Invoke-WebRequest "https://aka.ms/vs/16/release/vc_redist.x64.exe" -OutFile "build/${{ env.DIST_NAME }}/vc_redist.x64.exe"
-    - uses: actions/upload-artifact@v1
-      with:
-        name: ${{ env.DIST_NAME }}.zip
-        path: build/${{ env.DIST_NAME }}
-
-  build-macos:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - run: brew install ccache ninja
-    - name: Prepare ccache timestamp
-      id: ccache_cache_timestamp
-      shell: cmake -P {0}
-      run: |
-        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
-        message("::set-output name=timestamp::${current_date}")
-    - uses: pat-s/always-upload-cache@v1.1.4
-      with:
-        path: .ccache
-        key: ccache-macos-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
-        restore-keys: ccache-macos-
-    - run: mkdir build && cd build && cmake .. -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel
-      env:
-        CCACHE_BASEDIR: ${{ github.workspace }}
-        CCACHE_DIR: ${{ github.workspace }}/.ccache
-        CCACHE_COMPRESS: true
-        CCACHE_COMPRESSLEVEL: 6
-        CCACHE_MAXSIZE: 500M
-    - run: cd build && cmake --build . -t test
-      env:
-        CTEST_OUTPUT_ON_FAILURE: TRUE
-    - run: cd build && cmake --build . -t dist
-    - uses: actions/upload-artifact@v1
-      with:
-        name: ${{ env.DIST_NAME }}.zip
-        path: build/${{ env.DIST_NAME }}
+        name: openc2e-${{ github.sha }}-${{ runner.os }}.zip
+        path: openc2e-${{ github.sha }}-${{ runner.os }}

@@ -1,3 +1,10 @@
+# if we don't have .git, just say we don't know
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
+    message(WARNING "Couldn't parse Git rev, not in a Git repository")
+    set(git_short_rev "unknown")
+    return()
+endif()
+
 # set up so CMake re-runs if .git changes
 set_property(
 	DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
@@ -12,13 +19,6 @@ set_property(
     ${head_ref_files}
     ${tag_ref_files}
 )
-
-# if we don't have .git, just say we don't know
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
-    message(WARNING "Couldn't parse Git rev, not in a Git repository")
-    set(git_short_rev "unknown")
-    return()
-endif()
 
 # read .git/HEAD
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/.git/HEAD" head_contents)
