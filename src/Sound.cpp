@@ -29,7 +29,7 @@ void Sound::setPosition(float x, float y, float width, float height) {
 		source_data->y = y;
 		source_data->width = width;
 		source_data->height = height;
-		// handled in SoundManager::tick()
+		soundmanager.updateVolume(*source_data);
 	}
 }
 

@@ -62,12 +62,49 @@ Sound SoundManager::getNewSound(AudioChannel handle) {
 	return source;
 }
 
+static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int width, unsigned int height) {
+	const static unsigned int buffer = 500;
+
+	if (engine.camera->getMetaRoom() != room)
+		return false;
+	if (x + buffer < engine.camera->getX() || x + width - buffer > engine.camera->getX() + engine.camera->getWidth())
+		return false;
+	if (y + buffer < engine.camera->getY() || y + height - buffer > engine.camera->getY() + engine.camera->getHeight())
+		return false;
+	return true;
+}
+
 void SoundManager::updateVolume(SoundData& s) {
 	if (!s.isAlive()) {
 		return;
 	}
-	
-	float volume = (s.muted || sound_effects_muted) ? 0 : s.volume * sound_effects_volume;
+
+	bool sound_muted = s.muted;
+
+	if (s.positioned) {
+		MetaRoom *room = world.map->metaRoomAt(s.x, s.y);
+		// TODO: think about inrange when positioning outside-metaroom agents
+		if (room) {
+			// TODO: combine all this into inrange (somehow)
+			float xc = s.x;
+			bool inrange = false;
+			if (inrange_at(room, s.x, s.y, s.width, s.height)) {
+				xc = s.x;
+				inrange = true;
+			} else if (room->wraparound()) {
+				if (inrange_at(room, s.x - room->width(), s.y, s.width, s.height)) {
+					xc = s.x - room->width();
+					inrange = true;
+				} else if (inrange_at(room, s.x + room->width(), s.y, s.width, s.height)) {
+					xc = s.x + room->width();
+					inrange = true;
+				}
+			}
+			sound_muted |= !inrange;
+		}
+	}
+
+	float volume = (sound_muted || sound_effects_muted) ? 0 : s.volume * sound_effects_volume;
 	engine.audio->setChannelVolume(s.handle, volume);
 }
 
@@ -107,18 +144,6 @@ Sound SoundManager::playSound(std::string name, bool loop) {
 	return getNewSound(handle);
 }
 
-static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int width, unsigned int height) {
-	const static unsigned int buffer = 500;
-
-	if (engine.camera->getMetaRoom() != room)
-		return false;
-	if (x + buffer < engine.camera->getX() || x + width - buffer > engine.camera->getX() + engine.camera->getWidth())
-		return false;
-	if (y + buffer < engine.camera->getY() || y + height - buffer > engine.camera->getY() + engine.camera->getHeight())
-		return false;
-	return true;
-}
-
 void SoundManager::tick() {
 	// track our current viewpoint center
 	viewpoint_center_x = engine.camera->getXCentre();
@@ -126,33 +151,9 @@ void SoundManager::tick() {
 
 	// update positioned sounds
 	for (auto& s : sources) {
-		if (!(s.isAlive() && s.positioned)) {
+		if (!s.isAlive() || !s.positioned) {
 			continue;
 		}
-
-		MetaRoom *room = world.map->metaRoomAt(s.x, s.y);
-		if (!room) {
-			// TODO: think about inrange when positioning outside-metaroom agents
-			continue;
-		}
-
-		// TODO: combine all this into inrange (somehow)
-		float xc = s.x;
-		bool inrange = false;
-		if (inrange_at(room, s.x, s.y, s.width, s.height)) {
-			xc = s.x;
-			inrange = true;
-		} else if (room->wraparound()) {
-			if (inrange_at(room, s.x - room->width(), s.y, s.width, s.height)) {
-				xc = s.x - room->width();
-				inrange = true;
-			} else if (inrange_at(room, s.x + room->width(), s.y, s.width, s.height)) {
-				xc = s.x + room->width();
-				inrange = true;
-			}
-		}
-
-		s.muted = !inrange;
 		updateVolume(s);
 	}
 }
