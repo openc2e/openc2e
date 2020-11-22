@@ -1456,7 +1456,8 @@ void Agent::tickVoices() {
 	if (ticks_until_next_voice == 0) {
 		auto it = pending_voices.begin();
 		// uncontrolled audio is easier, we shall hope no-one notices
-		playAudio(it->first, false, false);
+		auto voice = soundmanager.playVoice(it->first);
+		updateAudio(voice);
 		ticks_until_next_voice = it->second;
 		pending_voices.erase(it);
 	}

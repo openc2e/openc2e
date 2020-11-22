@@ -41,7 +41,7 @@ bool SoundManager::SoundData::isAlive() {
 	}
 }
 
-Sound SoundManager::getNewSound(AudioChannel handle) {
+Sound SoundManager::getNewSound(AudioChannel handle, bool is_voice) {
 	size_t i = 0;
 	for (; i < sources.size(); ++i) {
 		if (!sources[i].isAlive()) {
@@ -53,6 +53,7 @@ Sound SoundManager::getNewSound(AudioChannel handle) {
 	}
 	
 	sources[i].handle = handle;
+	sources[i].is_voice = is_voice;
 	updateVolume(sources[i]);
 	
 	Sound source;
@@ -74,12 +75,26 @@ static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int widt
 	return true;
 }
 
+bool SoundManager::areVoicesMuted() {
+	if (engine.version == 3) {
+		// TODO: is this slow?
+		auto it = world.variables.find("engine_dumb_creatures");
+		return it != world.variables.end() && it->second.hasInt() && it->second.getInt() != 0;
+	} else {
+		return false;
+	}
+}
+
 void SoundManager::updateVolume(SoundData& s) {
 	if (!s.isAlive()) {
 		return;
 	}
 
 	bool sound_muted = s.muted;
+
+	if (s.is_voice && areVoicesMuted()) {
+		sound_muted = true;
+	}
 
 	if (s.positioned) {
 		MetaRoom *room = world.map->metaRoomAt(s.x, s.y);
@@ -144,18 +159,33 @@ Sound SoundManager::playSound(std::string name, bool loop) {
 	return getNewSound(handle);
 }
 
+Sound SoundManager::playVoice(std::string name) {
+	if (name.size() == 0) return {};
+
+	std::string filename = world.findFile(fmt::format("Sounds/{}.wav", name));
+	if (filename.size() == 0) {
+		if (engine.version < 3) return {}; // creatures 1 and 2 ignore non-existent audio clips
+		throw creaturesException(fmt::format("No such clip '{}.wav'", name));
+	}
+
+	auto handle = engine.audio->playClip(filename);
+	if (!handle) {
+		// note that more specific error messages can be thrown by implementations of playClip
+		throw creaturesException("failed to load audio clip " + filename);
+	}
+
+	return getNewSound(handle, true);
+}
+
+
 void SoundManager::tick() {
 	// track our current viewpoint center
 	viewpoint_center_x = engine.camera->getXCentre();
 	viewpoint_center_y = engine.camera->getYCentre();
 
-	// update positioned sounds
-	for (auto& s : sources) {
-		if (!s.isAlive() || !s.positioned) {
-			continue;
-		}
-		updateVolume(s);
-	}
+	// update sounds
+	// TODO: is this slow?
+	updateVolumes();
 }
 
 /* vim: set noet: */

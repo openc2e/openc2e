@@ -13,12 +13,14 @@ public:
 	~SoundManager();
 
 	void tick();
-	Sound playSound(std::string filename, bool loop);
+	Sound playSound(std::string filename, bool loop = false);
+	Sound playVoice(std::string filename);
 
 	float getVolume();
 	void setVolume(float);
 	bool isMuted();
 	void setMuted(bool);
+	bool areVoicesMuted();
 
 private:
 	friend class Sound;
@@ -36,6 +38,7 @@ private:
 			generation++;
 			handle = {};
 			muted = false;
+			is_voice = false;
 			volume = 1.0;
 			positioned = false;
 			x = 0;
@@ -48,6 +51,7 @@ private:
 		AudioChannel handle;
 
 		bool muted;
+		bool is_voice;
 		float volume;
 		bool positioned;
 		float x;
@@ -60,7 +64,7 @@ private:
 	void updateVolume(SoundData& source);
 	void updateVolumes();
 	SoundData* getSoundData(Sound& source);
-	Sound getNewSound(AudioChannel);
+	Sound getNewSound(AudioChannel handle, bool is_voice = false);
 	
 	bool sound_effects_muted = false;
 	float sound_effects_volume = 1.0;
