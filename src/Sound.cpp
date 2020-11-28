@@ -33,24 +33,10 @@ void Sound::setPosition(float x, float y, float width, float height) {
 	}
 }
 
-void Sound::setMuted(bool muted) {
-	if (auto source_data = soundmanager.getSoundData(*this)) {
-		source_data->muted = muted;
-		soundmanager.updateVolume(*source_data);
-	}
-}
-
 AudioState Sound::getState() {
 	if (auto source_data = soundmanager.getSoundData(*this)) {
 		return engine.audio->getChannelState(source_data->handle);
 	} else {
 		return AUDIO_STOPPED;
-	}
-}
-
-void Sound::setVolume(float volume) {
-	if (auto source_data = soundmanager.getSoundData(*this)) {
-		source_data->volume = volume;
-		soundmanager.updateVolume(*source_data);
 	}
 }

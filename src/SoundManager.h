@@ -37,9 +37,7 @@ private:
 		void resetAndIncrementGeneration() {
 			generation++;
 			handle = {};
-			muted = false;
 			is_voice = false;
-			volume = 1.0;
 			positioned = false;
 			x = 0;
 			y = 0;
@@ -50,9 +48,7 @@ private:
 		int generation = 0;
 		AudioChannel handle;
 
-		bool muted;
 		bool is_voice;
-		float volume;
 		bool positioned;
 		float x;
 		float y;

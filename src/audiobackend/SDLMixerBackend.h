@@ -42,7 +42,7 @@ public:
 	
 	void fadeOutChannel(AudioChannel);
 	void setChannelVolume(AudioChannel, float);
-	void setChannelPan(AudioChannel, float left, float right);
+	void setChannelPan(AudioChannel, float pan);
 	AudioState getChannelState(AudioChannel);
 	void stopChannel(AudioChannel);
 	

@@ -9,6 +9,8 @@
 #include "Room.h"
 #include "MetaRoom.h"
 
+#include <cmath>
+
 SoundManager soundmanager;
 
 SoundManager::SoundManager() {}
@@ -63,18 +65,6 @@ Sound SoundManager::getNewSound(AudioChannel handle, bool is_voice) {
 	return source;
 }
 
-static bool inrange_at(const MetaRoom *room, float x, float y, unsigned int width, unsigned int height) {
-	const static unsigned int buffer = 500;
-
-	if (engine.camera->getMetaRoom() != room)
-		return false;
-	if (x + buffer < engine.camera->getX() || x + width - buffer > engine.camera->getX() + engine.camera->getWidth())
-		return false;
-	if (y + buffer < engine.camera->getY() || y + height - buffer > engine.camera->getY() + engine.camera->getHeight())
-		return false;
-	return true;
-}
-
 bool SoundManager::areVoicesMuted() {
 	if (engine.version == 3) {
 		// TODO: is this slow?
@@ -85,41 +75,61 @@ bool SoundManager::areVoicesMuted() {
 	}
 }
 
+template <typename T, typename U, typename V>
+auto clamp(T value, U low, V high) {
+	assert(!(high < low) );
+	return (value < low) ? low : (high < value) ? high : value;
+}
+
 void SoundManager::updateVolume(SoundData& s) {
 	if (!s.isAlive()) {
 		return;
 	}
 
-	bool sound_muted = s.muted;
+	float volume = sound_effects_muted ? 0 : sound_effects_volume;
 
 	if (s.is_voice && areVoicesMuted()) {
-		sound_muted = true;
+		volume = 0;
 	}
 
 	if (s.positioned) {
 		MetaRoom *room = world.map->metaRoomAt(s.x, s.y);
-		// TODO: think about inrange when positioning outside-metaroom agents
-		if (room) {
-			// TODO: combine all this into inrange (somehow)
-			float xc = s.x;
-			bool inrange = false;
-			if (inrange_at(room, s.x, s.y, s.width, s.height)) {
-				xc = s.x;
-				inrange = true;
-			} else if (room->wraparound()) {
-				if (inrange_at(room, s.x - room->width(), s.y, s.width, s.height)) {
-					xc = s.x - room->width();
-					inrange = true;
-				} else if (inrange_at(room, s.x + room->width(), s.y, s.width, s.height)) {
-					xc = s.x + room->width();
-					inrange = true;
-				}
+		if (room && engine.camera->getMetaRoom() == room) {
+			// std::remainder gives the distance between x and camerax, taking
+			// into account metaroom wraparound ("modular distance")
+			const float distx = std::remainder(s.x + s.width / 2 - engine.camera->getXCentre(), room->width());
+			const float disty = s.y + s.height / 2 - engine.camera->getYCentre();
+
+			const float screen_width = engine.camera->getWidth();
+			const float screen_height = engine.camera->getHeight();
+
+			// If a sound is on-screen, then play it at full volume.
+			// If it's more than a screen offscreen, then mute it.
+			// TODO: Does this sound right?
+			const float starts_fading = 0.5;
+			const float cutoff = 1.5;
+			// the math
+			float volx = 1.0;
+			if (std::abs(distx) / screen_width > starts_fading) {
+				volx = clamp(1 - (std::abs(distx) / screen_width - starts_fading) / (cutoff - starts_fading), 0, 1);
 			}
-			sound_muted |= !inrange;
+			float voly = 1.0;
+			if (std::abs(disty) / screen_height > starts_fading) {
+				voly = clamp(1 - (std::abs(disty) / screen_height - starts_fading) / (cutoff - starts_fading), 0, 1);
+			}
+			volume *= std::min(volx, voly);
+
+			// Pan sound as we get closer to screen edge
+			// TODO: Does this sound right?
+			float pan = clamp(distx / screen_width, -1, 1);
+			engine.audio->setChannelPan(s.handle, pan);
+		} else if (!room) {
+			// TODO: think about volume when positioning outside-metaroom agents
+			volume = 0;
+		} else {
+			volume = 0;
 		}
 	}
-
-	float volume = (sound_muted || sound_effects_muted) ? 0 : s.volume * sound_effects_volume;
 	engine.audio->setChannelVolume(s.handle, volume);
 }
 

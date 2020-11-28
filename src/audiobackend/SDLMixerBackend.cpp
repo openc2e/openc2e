@@ -177,10 +177,16 @@ void SDLMixerBackend::setChannelVolume(AudioChannel source, float v) {
 	Mix_Volume(channel, v * MIX_MAX_VOLUME);
 }
 
-void SDLMixerBackend::setChannelPan(AudioChannel, float left, float right) {
-	// TODO
-	(void)left;
-	(void)right;
+void SDLMixerBackend::setChannelPan(AudioChannel source, float pan) {
+	int channel = audiochannel_to_int(source);
+	if (channel == -1) return;
+	if (pan > 0) {
+		pan = pan > 1 ? 1 : pan;
+		Mix_SetPanning(channel, 255 * (1 - pan), 255);
+	} else {
+		pan = pan < -1 ? -1 : pan;
+		Mix_SetPanning(channel, 255, 255 * (1 + pan));
+	}
 }
 
 AudioState SDLMixerBackend::getChannelState(AudioChannel source) {

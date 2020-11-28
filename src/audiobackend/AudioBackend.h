@@ -53,7 +53,7 @@ public:
 	
 	virtual void fadeOutChannel(AudioChannel) = 0;
 	virtual void setChannelVolume(AudioChannel, float) = 0;
-	virtual void setChannelPan(AudioChannel, float left, float right) = 0;
+	virtual void setChannelPan(AudioChannel, float pan) = 0;
 	virtual AudioState getChannelState(AudioChannel) = 0;
 	virtual void stopChannel(AudioChannel) = 0;
 	
