@@ -43,7 +43,7 @@ bool SoundManager::SoundData::isAlive() {
 	}
 }
 
-Sound SoundManager::getNewSound(AudioChannel handle, bool is_voice) {
+Sound SoundManager::getNewSound(AudioChannel handle, bool is_creature_voice) {
 	size_t i = 0;
 	for (; i < sources.size(); ++i) {
 		if (!sources[i].isAlive()) {
@@ -55,7 +55,7 @@ Sound SoundManager::getNewSound(AudioChannel handle, bool is_voice) {
 	}
 	
 	sources[i].handle = handle;
-	sources[i].is_voice = is_voice;
+	sources[i].is_creature_voice = is_creature_voice;
 	updateVolume(sources[i]);
 	
 	Sound source;
@@ -65,7 +65,7 @@ Sound SoundManager::getNewSound(AudioChannel handle, bool is_voice) {
 	return source;
 }
 
-bool SoundManager::areVoicesMuted() {
+bool SoundManager::areCreatureVoicesMuted() {
 	if (engine.version == 3) {
 		// TODO: is this slow?
 		auto it = world.variables.find("engine_dumb_creatures");
@@ -88,7 +88,7 @@ void SoundManager::updateVolume(SoundData& s) {
 
 	float volume = sound_effects_muted ? 0 : sound_effects_volume;
 
-	if (s.is_voice && areVoicesMuted()) {
+	if (s.is_creature_voice && areCreatureVoicesMuted()) {
 		volume = 0;
 	}
 

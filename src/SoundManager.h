@@ -20,7 +20,7 @@ public:
 	void setVolume(float);
 	bool isMuted();
 	void setMuted(bool);
-	bool areVoicesMuted();
+	bool areCreatureVoicesMuted();
 
 private:
 	friend class Sound;
@@ -37,7 +37,7 @@ private:
 		void resetAndIncrementGeneration() {
 			generation++;
 			handle = {};
-			is_voice = false;
+			is_creature_voice = false;
 			positioned = false;
 			x = 0;
 			y = 0;
@@ -48,7 +48,7 @@ private:
 		int generation = 0;
 		AudioChannel handle;
 
-		bool is_voice;
+		bool is_creature_voice;
 		bool positioned;
 		float x;
 		float y;
@@ -60,7 +60,7 @@ private:
 	void updateVolume(SoundData& source);
 	void updateVolumes();
 	SoundData* getSoundData(Sound& source);
-	Sound getNewSound(AudioChannel handle, bool is_voice = false);
+	Sound getNewSound(AudioChannel handle, bool is_creature_voice = false);
 	
 	bool sound_effects_muted = false;
 	float sound_effects_volume = 1.0;
