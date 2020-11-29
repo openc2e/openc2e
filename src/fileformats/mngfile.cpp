@@ -44,21 +44,20 @@ MNGFile::MNGFile(std::string n) {
 	if (!stream) { delete stream; throw MNGFileException("open failed"); }
 
 	// Read metavariables from beginning of file
-	numsamples = swapEndianLong(*((int *) stream->map));
-	scriptoffset = swapEndianLong(*(((int *) stream->map) + 1));
-	scriptend = swapEndianLong(*(((int *) stream->map) + 3));
-	scriptlength = scriptend - scriptoffset;
+	numsamples = read32le(stream->map);
+	scriptoffset = read32le(stream->map + 4);
+	scriptlength = read32le(stream->map + 8);
 
 	// read the samples
 	for(int i = 0; i < numsamples; i++) {
 		// Sample offsets and lengths are stored in pairs after the initial 16 bytes
-		int position = swapEndianLong(*((int *) stream->map + 3 + (2 * i)));
+		int position = read32le(stream->map + 12 + (8 * i));
 
 		// skip four bytes of the WAVE header, four of the FMT header, 
 		// the FMT chunk and four of the DATA header
-		position += swapEndianLong(*(int *)(stream->map + position)) + 8;
+		position += read32le(stream->map + position) + 8; 
 
-		int size = swapEndianLong(*((int *) (stream->map + position)));
+		int size = read32le(stream->map + position);
 		position += 4; // Skip the size field
 		
 		samples.push_back(std::make_pair(stream->map + position, size));

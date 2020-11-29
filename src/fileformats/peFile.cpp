@@ -200,18 +200,16 @@ Image peFile::getBitmap(uint32_t name) {
 
 std::vector<std::string> resourceInfo::parseStrings() {
 	std::vector<std::string> strings;
-	uint16_t *udata = (uint16_t *)data;
 
 	for (unsigned int i = 0; i < size / 2;) {
-		uint16_t strsize = *udata;
-		strsize = swapEndianShort(strsize);
-		udata++; i++;
+		uint16_t strsize = read16le(data + i * 2);
+		i++;
 
 		std::string s;
 		for (unsigned int j = 0; (j < strsize) && (i < size / 2); j++) {
-			uint16_t d = *udata; d = swapEndianShort(d);
+			uint16_t d = read16le(data + i * 2);
 			s += (uint8_t)d; // TODO: convert properly from utf16, somehow
-			i++; udata++;
+			i++;
 		}
 		strings.push_back(s);
 	}

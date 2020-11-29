@@ -176,12 +176,12 @@ MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
 	if (sampleno >= p->samples.size())
 		throw MNGFileException("sample not present");
 	// TODO: someday, fix these casts at their source
-	signed short *data = (signed short *)p->samples[sampleno].first;
+	char *data = p->samples[sampleno].first;
 	unsigned int length = (unsigned int)p->samples[sampleno].second;
 	buffer = FloatAudioBuffer(new float[length], length);
 	for (unsigned int i = 0; i < length / 2; i++) {
-		buffer.data[i*2] = (signed short)swapEndianShort((unsigned short)data[i]);
-		buffer.data[(i*2) + 1] = (signed short)swapEndianShort((unsigned short)data[i]);
+		buffer.data[i*2] = (signed short)read16le(data + i * 2);
+		buffer.data[(i*2) + 1] = (signed short)read16le(data + i * 2);
 	}
 }
 
