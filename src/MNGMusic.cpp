@@ -1,6 +1,7 @@
 #include "MNGMusic.h"
 
 #include "endianlove.h"
+#include "utils/ascii_tolower.h"
 #include <algorithm>
 #include <cmath> // for cos/sin
 #include <iostream> // for debug messages
@@ -22,20 +23,18 @@ void MNGMusic::playSilence() {
 }
 
 void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
-	std::transform(trackname.begin(), trackname.end(), trackname.begin(), (int(*)(int))tolower);
+	trackname = ascii_tolower(trackname);
 
 	// TODO: these lowercase transformations are ridiculous, we should store inside MusicTrack
 	if (nexttrack && nexttrack->getParent() == file) {
-		std::string nextname = nexttrack->getName();
-		std::transform(nextname.begin(), nextname.end(), nextname.begin(), (int(*)(int))tolower);
+		std::string nextname = ascii_tolower(nexttrack->getName());
 		if (nextname == trackname) {
 			// already moving to this track
 			return;
 		}
 	}
 	if (currenttrack && currenttrack->getParent() == file) {
-		std::string thisname = currenttrack->getName();
-		std::transform(thisname.begin(), thisname.end(), thisname.begin(), (int(*)(int))tolower);
+		std::string thisname = ascii_tolower(currenttrack->getName());
 		if (thisname == trackname) {
 			// already playing this track!
 			if (!playing_silence && !nexttrack) return;
@@ -50,19 +49,17 @@ void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
 		return; // TODO: exception?
 	}
 
-	std::shared_ptr<MusicTrack> tracknode(new MusicTrack(file, file->tracks[trackname]));
-	tracknode->init();
-	playTrack(tracknode);
+	playTrack(std::make_shared<MusicTrack>(file, file->tracks[trackname]));
 }
 
 void MNGMusic::playTrack(std::shared_ptr<MusicTrack> track) {
 	playing_silence = false;
 	track->startFadeIn();
-	if (!currenttrack) {
-		currenttrack = track;
-	} else {
-		nexttrack = track;
+	if (currenttrack) {
 		currenttrack->startFadeOut();
+		nexttrack = track;
+	} else {
+		currenttrack = track;
 	}
 }
 
@@ -83,8 +80,7 @@ void MNGMusic::render(signed short *data, size_t len) {
 }
 
 float evaluateExpression(MNGExpression *e, MusicStage *stage = NULL, MusicVoice *voice = NULL, MusicLayer *layer = NULL) {
-	MNGVariableNode *v = dynamic_cast<MNGVariableNode *>(e);
-	if (v) {
+	if (MNGVariableNode *v = dynamic_cast<MNGVariableNode *>(e)) {
 		if (stage) switch (v->getType()) {
 			case NAMED:
 			case INTERVAL:
@@ -120,49 +116,41 @@ float evaluateExpression(MNGExpression *e, MusicStage *stage = NULL, MusicVoice 
 		}
 	}
 
-	MNGConstantNode *c = dynamic_cast<MNGConstantNode *>(e);
-	if (c) {
+	if (MNGConstantNode *c = dynamic_cast<MNGConstantNode *>(e)) {
 		return c->getValue();
 	}
 
-	MNGAddNode *add = dynamic_cast<MNGAddNode *>(e);
-	if (add) {
+	if (MNGAddNode *add = dynamic_cast<MNGAddNode *>(e)) {
 		return evaluateExpression(add->first(), stage, voice, layer)
 			+ evaluateExpression(add->second(), stage, voice, layer);
 	}
 
-	MNGSubtractNode *sub = dynamic_cast<MNGSubtractNode *>(e);
-	if (sub) {
+	if (MNGSubtractNode *sub = dynamic_cast<MNGSubtractNode *>(e)) {
 		return evaluateExpression(sub->first(), stage, voice, layer)
 			- evaluateExpression(sub->second(), stage, voice, layer);
 	}
 
-	MNGMultiplyNode *mul = dynamic_cast<MNGMultiplyNode *>(e);
-	if (mul) {
+	if (MNGMultiplyNode *mul = dynamic_cast<MNGMultiplyNode *>(e)) {
 		return evaluateExpression(mul->first(), stage, voice, layer)
 			* evaluateExpression(mul->second(), stage, voice, layer);
 	}
 
-	MNGDivideNode *div = dynamic_cast<MNGDivideNode *>(e);
-	if (div) {
+	if (MNGDivideNode *div = dynamic_cast<MNGDivideNode *>(e)) {
 		return evaluateExpression(div->first(), stage, voice, layer)
 			/ evaluateExpression(div->second(), stage, voice, layer);
 	}
 
-	MNGSineWaveNode *sinewave = dynamic_cast<MNGSineWaveNode *>(e);
-	if (sinewave) {
+	if (MNGSineWaveNode *sinewave = dynamic_cast<MNGSineWaveNode *>(e)) {
 		return sin(2 * M_PI * (evaluateExpression(sinewave->first(), stage, voice, layer)
 			/ evaluateExpression(sinewave->second(), stage, voice, layer)));
 	}
 
-	MNGCosineWaveNode *cosinewave = dynamic_cast<MNGCosineWaveNode *>(e);
-	if (cosinewave) {
+	if (MNGCosineWaveNode *cosinewave = dynamic_cast<MNGCosineWaveNode *>(e)) {
 		return cos(2 * M_PI * (evaluateExpression(cosinewave->first(), stage, voice, layer)
 			/ evaluateExpression(cosinewave->second(), stage, voice, layer)));
 	}
 
-	MNGRandomNode *r = dynamic_cast<MNGRandomNode *>(e);
-	if (r) {
+	if (MNGRandomNode *r = dynamic_cast<MNGRandomNode *>(e)) {
 		float first = evaluateExpression(r->first(), stage, voice, layer);
 		float second = evaluateExpression(r->second(), stage, voice, layer);
 		return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
@@ -194,36 +182,29 @@ MusicWave::~MusicWave() {
 	delete[] buffer.data;
 }
 
-MusicStage::MusicStage(MNGStageNode *n) {
-	node = n;
+MusicStage::MusicStage(MNGStageNode *node) {
 	pan = NULL;
 	volume = NULL;
 	delay = NULL;
 	tempodelay = NULL;
 
-	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
-		MNGNode *n = *i;
-
-		MNGPanNode *p = dynamic_cast<MNGPanNode *>(n);
-		if (p) {
+	for (auto &n : *node->children) {
+		if (MNGPanNode *p = dynamic_cast<MNGPanNode *>(n)) {
 			pan = p->getExpression();
 			continue;
 		}
 
-		MNGEffectVolumeNode *v = dynamic_cast<MNGEffectVolumeNode *>(n);
-		if (v) {
+		if (MNGEffectVolumeNode *v = dynamic_cast<MNGEffectVolumeNode *>(n)) {
 			volume = v->getExpression();
 			continue;
 		}
 
-		MNGDelayNode *d = dynamic_cast<MNGDelayNode *>(n);
-		if (d) {
+		if (MNGDelayNode *d = dynamic_cast<MNGDelayNode *>(n)) {
 			delay = d->getExpression();
 			continue;
 		}
 
-		MNGTempoDelayNode *td = dynamic_cast<MNGTempoDelayNode *>(n);
-		if (td) {
+		if (MNGTempoDelayNode *td = dynamic_cast<MNGTempoDelayNode *>(n)) {
 			tempodelay = td->getExpression();
 			continue;
 		}
@@ -253,14 +234,12 @@ std::vector<FloatAudioBuffer> MusicStage::applyStage(std::vector<FloatAudioBuffe
 
 	unsigned int offset_amt = 22050 * delay_value;
 	std::vector<FloatAudioBuffer> buffers;
-	for (std::vector<FloatAudioBuffer>::iterator i = sources.begin(); i != sources.end(); i++) {
-		FloatAudioBuffer &src = *i;
+	for (auto &src : sources) {
 		src.start_offset += offset_amt;
 		volume_value *= src.volume;
 		// TODO: better pan_value calculation
 		if (src.pan != 0.0f) {
-			if (pan_value) pan_value = (src.pan + pan_value) / 2.0f;
-			else pan_value = src.pan;
+			pan_value = pan_value ? (src.pan + pan_value) / 2.0f : src.pan;
 		}
 		buffers.push_back(FloatAudioBuffer(src.data, src.len, src.start_offset, volume_value, pan_value));
 	}
@@ -268,31 +247,26 @@ std::vector<FloatAudioBuffer> MusicStage::applyStage(std::vector<FloatAudioBuffe
 	return buffers;
 }
 
-MusicEffect::MusicEffect(MNGEffectDecNode *n) {
-	node = n;
-
-	for (std::list<MNGStageNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
-		std::shared_ptr<MusicStage> stage(new MusicStage(*i));
-		stages.push_back(stage);
+MusicEffect::MusicEffect(MNGEffectDecNode *node) {
+	for (auto &c : *node->children) {
+		stages.push_back(std::make_shared<MusicStage>(c));
 	}
 }
 
 std::vector<FloatAudioBuffer> MusicEffect::applyEffect(class MusicTrack *t, std::vector<FloatAudioBuffer> src, float beatlength) {
 	std::vector<FloatAudioBuffer> buffers;
 
-	for (std::vector<std::shared_ptr<MusicStage> >::iterator i = stages.begin(); i != stages.end(); i++) {
-		std::vector<FloatAudioBuffer> newbuffers = (*i)->applyStage(src, beatlength);
-		for (std::vector<FloatAudioBuffer>::iterator j = newbuffers.begin(); j != newbuffers.end(); j++) {
-			buffers.push_back(*j);
-		}
+	for (auto &stage : stages) {
+		std::vector<FloatAudioBuffer> newbuffers = stage->applyStage(src, beatlength);
+		buffers.insert(buffers.end(), newbuffers.begin(), newbuffers.end());
 	}
 
 	return buffers;
 }
 
-MusicVoice::MusicVoice(std::shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
+MusicVoice::MusicVoice(MusicLayer *p, MNGVoiceNode *n) {
 	node = n;
-	parent = p.get();
+	parent = p;
 
 	interval = 0.0f;
 	interval_expression = NULL;
@@ -300,46 +274,39 @@ MusicVoice::MusicVoice(std::shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 
 	updatenode = NULL;
 
-	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
-		MNGNode *n = *i;
-
-		MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n);
-		if (e) {
+	for (auto &n : *node->children) {
+		if (MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n)) {
 			// TODO: share duplicate MusicWaves
-			wave = std::shared_ptr<MusicWave>(new MusicWave(p->getParent()->getParent(), e));
+			wave = std::make_shared<MusicWave>(p->getParent()->getParent(), e);
 			continue;
 		}
 
-		MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n);
-		if (in) {
+		if (MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n)) {
 			interval_expression = in->getExpression();
 			continue;
 		}
 
-		MNGConditionNode *c = dynamic_cast<MNGConditionNode *>(n);
-		if (c) {
+		if (MNGConditionNode *c = dynamic_cast<MNGConditionNode *>(n)) {
 			conditions.push_back(c);
 			continue;
 		}
 
-		MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n);
-		if (u) {
+		if (MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n)) {
 			updatenode = u;
 			continue;
 		}
 
-		MNGEffectNode *eff = dynamic_cast<MNGEffectNode *>(n);
-		if (eff) {
+		if (MNGEffectNode *eff = dynamic_cast<MNGEffectNode *>(n)) {
 			if (effect)
 				throw MNGFileException("got effect '" + eff->getName() + "' but we already have one!");
 
 			// TODO: share effects
-			std::map<std::string, class MNGEffectDecNode *> &effects = parent->getParent()->getParent()->effects;
+			auto &effects = parent->getParent()->getParent()->effects;
 			if (effects.find(eff->getName()) == effects.end())
 				throw MNGFileException("couldn't find effect '" + eff->getName() + "'");
 
 			MNGEffectDecNode *n = effects[eff->getName()];
-			effect = std::shared_ptr<MusicEffect>(new MusicEffect(n));
+			effect = std::make_shared<MusicEffect>(n);
 			continue;
 		}
 
@@ -348,9 +315,7 @@ MusicVoice::MusicVoice(std::shared_ptr<MusicLayer> p, MNGVoiceNode *n) {
 }
 
 bool MusicVoice::shouldPlay() {
-	for (std::vector<MNGConditionNode *>::iterator i = conditions.begin(); i != conditions.end(); i++) {
-		MNGConditionNode *n = *i;
-
+	for (auto &n : conditions) {
 		float value = evaluateExpression(n->getVariable(), NULL, this);
 		if (value < n->minimum() || value > n->maximum())
 			return false;
@@ -358,8 +323,8 @@ bool MusicVoice::shouldPlay() {
 	return true;
 }
 
-MusicLayer::MusicLayer(std::shared_ptr<MusicTrack> p) {
-	parent = p.get();
+MusicLayer::MusicLayer(MusicTrack *p) {
+	parent = p;
 
 	updaterate = 1.0f;
 	volume = 1.0f;
@@ -379,9 +344,7 @@ MusicLayer::MusicLayer(std::shared_ptr<MusicTrack> p) {
 void MusicLayer::runUpdateBlock() {
 	if (!updatenode) return;
 
-	for (std::list<MNGAssignmentNode *>::iterator i = updatenode->children->begin(); i != updatenode->children->end(); i++) {
-		MNGAssignmentNode *n = *i;
-
+	for (auto &n : *updatenode->children) {
 		float value = evaluateExpression(n->getExpression(), NULL, NULL, this);
 		MNGVariableNode *var = n->getVariable();
 		switch (var->getType()) {
@@ -409,9 +372,7 @@ void MusicVoice::runUpdateBlock() {
 
 	if (!updatenode) return;
 
-	for (std::list<MNGAssignmentNode *>::iterator i = updatenode->children->begin(); i != updatenode->children->end(); i++) {
-		MNGAssignmentNode *n = *i;
-
+	for (auto &n : *updatenode->children) {
 		float value = evaluateExpression(n->getExpression(), NULL, this);
 		MNGVariableNode *var = n->getVariable();
 		switch (var->getType()) {
@@ -433,16 +394,9 @@ void MusicVoice::runUpdateBlock() {
 	}
 }
 
-MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *n, std::shared_ptr<MusicTrack> p) : MusicLayer(p) {
-	node = n;
-}
-
-void MusicAleotoricLayer::init() {
-	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
-		MNGNode *n = *i;
-
-		MNGEffectNode *e = dynamic_cast<MNGEffectNode *>(n);
-		if (e) {
+MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *node, MusicTrack *p) : MusicLayer(p) {
+	for (auto &n : *node->children) {
+		if (MNGEffectNode *e = dynamic_cast<MNGEffectNode *>(n)) {
 			if (effect)
 				throw MNGFileException("got effect '" + e->getName() + "' but we already have one!");
 
@@ -452,51 +406,43 @@ void MusicAleotoricLayer::init() {
 				throw MNGFileException("couldn't find effect '" + e->getName() + "'");
 
 			MNGEffectDecNode *n = effects[e->getName()];
-			effect = std::shared_ptr<MusicEffect>(new MusicEffect(n));
+			effect = std::make_shared<MusicEffect>(n);
 			continue;
 		}
 
-		MNGVoiceNode *v = dynamic_cast<MNGVoiceNode *>(n);
-		if (v) {
-			std::shared_ptr<MusicVoice> voice(new MusicVoice(shared_from_this(), v));
-			voices.push_back(voice);
+		if (MNGVoiceNode *v = dynamic_cast<MNGVoiceNode *>(n)) {
+			voices.push_back(std::make_shared<MusicVoice>(this, v));
 			continue;
 		}
 
-		MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n);
-		if (u) {
+		if (MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n)) {
 			updatenode = u;
 			continue;
 		}
 
-		MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n);
-		if (lv) {
+		if (MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n)) {
 			volume = evaluateExpression(lv->getExpression());
 			continue;
 		}
 
-		MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n);
-		if (ur) {
+		if (MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n)) {
 			updaterate = evaluateExpression(ur->getExpression());
 			continue;
 		}
 
-		MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n);
-		if (vd) {
+		if (MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n)) {
 			std::string name = vd->getName();
 			float value = evaluateExpression(vd->getExpression());
 			variables[name] = value;
 			continue;
 		}
 
-		MNGBeatSynchNode *bs = dynamic_cast<MNGBeatSynchNode *>(n);
-		if (bs) {
+		if (MNGBeatSynchNode *bs = dynamic_cast<MNGBeatSynchNode *>(n)) {
 			beatsynch = evaluateExpression(bs->getExpression());
 			continue;
 		}
 
-		MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n);
-		if (in) {
+		if (MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n)) {
 			interval = evaluateExpression(in->getExpression());
 			continue;
 		}
@@ -516,20 +462,18 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 	std::vector<FloatAudioBuffer> buffers;
 
 	float our_volume = volume * parent->getVolume();
-	for (std::vector<std::shared_ptr<MusicVoice> >::iterator i = voices.begin(); i != voices.end(); i++) {
-		if (!(*i)->shouldPlay()) continue;
+	for (auto &voice : voices) {
+		if (!voice->shouldPlay()) continue;
 
-		if ((*i)->getWave()) {
-			FloatAudioBuffer &data = (*i)->getWave()->getData();
+		if (voice->getWave()) {
+			FloatAudioBuffer &data = voice->getWave()->getData();
 			FloatAudioBuffer voicebuffer = FloatAudioBuffer(data.data, data.len, offset, our_volume, pan);
-			std::shared_ptr<MusicEffect> voice_effect = (*i)->getEffect();
+			std::shared_ptr<MusicEffect> voice_effect = voice->getEffect();
 			if (voice_effect) {
 				std::vector<FloatAudioBuffer> newbuffers;
 				newbuffers.push_back(voicebuffer);
 				newbuffers = voice_effect->applyEffect(parent, newbuffers, parent->getBeatLength());
-				for (std::vector<FloatAudioBuffer>::iterator i = newbuffers.begin(); i != newbuffers.end(); i++) {
-					buffers.push_back(*i);
-				}
+				buffers.insert(buffers.end(), newbuffers.begin(), newbuffers.end());
 			} else {
 				buffers.push_back(voicebuffer);
 			}
@@ -538,17 +482,17 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
 		 * GR's source says "These take effect after playback of the voice has begun"
 		 * so I try to run it in the same place that code does, for now */
-		(*i)->runUpdateBlock();
+		voice->runUpdateBlock();
 
-		float our_interval = interval + (*i)->getInterval() + (beatsynch * parent->getBeatLength());
+		float our_interval = interval + voice->getInterval() + (beatsynch * parent->getBeatLength());
 		offset += 22050 * our_interval;
 	}
 
 	if (effect) {
 		buffers = effect->applyEffect(parent, buffers, parent->getBeatLength());
 	}
-	for (std::vector<FloatAudioBuffer>::iterator i = buffers.begin(); i != buffers.end(); i++) {
-		parent->addBuffer(*i);
+	for (auto &b : buffers) {
+		parent->addBuffer(b);
 	}
 
 	runUpdateBlock();
@@ -556,38 +500,29 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 	next_offset = offset;
 }
 
-MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *n, std::shared_ptr<MusicTrack> p) : MusicLayer(p) {
-	node = n;
+MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *node, MusicTrack *p) : MusicLayer(p) {
 	update_period = 0;
-}
-
-void MusicLoopLayer::init() {
-	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
-		MNGNode *n = *i;
-
-		MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n);
-		if (e) {
+	
+	for (auto &n : *node->children) {
+		if (MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n)) {
 			// TODO: share duplicate MusicWaves
 			wave = std::shared_ptr<MusicWave>(new MusicWave(parent->getParent(), e));
 			continue;
 		}
 
-		MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n);
-		if (ur) {
+		if (MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n)) {
 			updaterate = evaluateExpression(ur->getExpression());
 			continue;
 		}
 
-		MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n);
-		if (vd) {
+		if (MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n)) {
 			std::string name = vd->getName();
 			float value = evaluateExpression(vd->getExpression());
 			variables[name] = value;
 			continue;
 		}
 
-		MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n);
-		if (u) {
+		if (MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n)) {
 			updatenode = u;
 			continue;
 		}
@@ -631,51 +566,38 @@ MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 	beatlength = 0.0f;
 
 	fadein_count = fadeout_count = 0;
-}
 
-// shared_from_this
-void MusicTrack::init() {
-	for (std::list<MNGNode *>::iterator i = node->children->begin(); i != node->children->end(); i++) {
-		MNGNode *n = *i;
-
-		MNGAleotoricLayerNode *al = dynamic_cast<MNGAleotoricLayerNode *>(n);
-		if (al) {
-			MusicAleotoricLayer *ptr = new MusicAleotoricLayer(al, shared_from_this());
-			std::shared_ptr<MusicLayer> mal(ptr);
-			ptr->init();
-			layers.push_back(mal);
+	for (auto &n : *node->children) {
+		if (MNGAleotoricLayerNode *al = dynamic_cast<MNGAleotoricLayerNode *>(n)) {
+			layers.push_back(std::dynamic_pointer_cast<MusicLayer>(
+				std::make_shared<MusicAleotoricLayer>(al, this)
+			));
 			continue;
 		}
 
-		MNGLoopLayerNode *ll = dynamic_cast<MNGLoopLayerNode *>(n);
-		if (ll) {
-			MusicLoopLayer *ptr = new MusicLoopLayer(ll, shared_from_this());
-			std::shared_ptr<MusicLayer> mll(ptr);
-			ptr->init();
-			layers.push_back(mll);
+		if (MNGLoopLayerNode *ll = dynamic_cast<MNGLoopLayerNode *>(n)) {
+			layers.push_back(std::dynamic_pointer_cast<MusicLayer>(
+				std::make_shared<MusicLoopLayer>(ll, this)
+			));
 			continue;
 		}
 
-		MNGFadeInNode *fi = dynamic_cast<MNGFadeInNode *>(n);
-		if (fi) {
+		if (MNGFadeInNode *fi = dynamic_cast<MNGFadeInNode *>(n)) {
 			fadein = evaluateExpression(fi->getExpression());
 			continue;
 		}
 
-		MNGFadeOutNode *fo = dynamic_cast<MNGFadeOutNode *>(n);
-		if (fo) {
+		if (MNGFadeOutNode *fo = dynamic_cast<MNGFadeOutNode *>(n)) {
 			fadeout = evaluateExpression(fo->getExpression());
 			continue;
 		}
 
-		MNGBeatLengthNode *bl = dynamic_cast<MNGBeatLengthNode *>(n);
-		if (bl) {
+		if (MNGBeatLengthNode *bl = dynamic_cast<MNGBeatLengthNode *>(n)) {
 			beatlength = evaluateExpression(bl->getExpression());
 			continue;
 		}
 
-		MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n);
-		if (lv) {
+		if (MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n)) {
 			volume = evaluateExpression(lv->getExpression());
 			continue;
 		}
@@ -684,30 +606,37 @@ void MusicTrack::init() {
 	}
 }
 
-MusicTrack::~MusicTrack() {
-}
-
 void MusicTrack::update(unsigned int latency_in_frames) {
-	for (std::vector<std::shared_ptr<MusicLayer> >::iterator i = layers.begin(); i != layers.end(); i++) {
-		(*i)->update(latency_in_frames);
+	for (auto &l : layers) {
+		l->update(latency_in_frames);
 	}
 }
 
 void MusicTrack::startFadeIn() {
-	if (fadein_count) return;
+	if (fadein_count) {
+		return;
+	}
 	if (fadeout_count) {
 		fadein_count = (fadein * 22050 * 2) * (1.0 - (float)(fadeout_count / (fadeout * 22050 * 2)));
 		fadeout_count = 0;
-	} else fadein_count = fadein * 22050 * 2;
+	} else {
+		fadein_count = fadein * 22050 * 2;
+	}
 }
 
 void MusicTrack::startFadeOut() {
-	if (fadeout_count) return;
+	if (fadeout_count) {
+		return;
+	}
 	if (fadein_count) {
 		fadeout_count = (fadeout * 22050 * 2) * (1.0 - (float)(fadein_count / (fadein * 22050 * 2)));
 		fadein_count = 0;
-	} else fadeout_count = fadeout * 22050 * 2;
-	if (!fadeout_count) fadeout_count = 1;
+	} else {
+		fadeout_count = fadeout * 22050 * 2;
+	}
+	if (!fadeout_count) {
+		fadeout_count = 1;
+	}
 }
 
 bool MusicTrack::fadedOut() {
@@ -716,7 +645,7 @@ bool MusicTrack::fadedOut() {
 
 void MusicTrack::render(signed short *data, size_t len) {
 	float *output = (float *)alloca(len * sizeof(float));
-	for (unsigned int i = 0; i < len; i++) output[i] = 0.0f;
+	memset(output, 0.0f, len * sizeof(float));
 
 	// mix pending buffers, render
 	//unsigned int numbuffers = 0;
