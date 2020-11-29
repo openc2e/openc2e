@@ -30,7 +30,7 @@
 
 MusicManager musicmanager;
 
-MusicManager::MusicManager() = default;
+MusicManager::MusicManager(std::shared_ptr<AudioBackend> backend_) : backend(backend_), mng_music(backend_) {}
 MusicManager::~MusicManager() {
 	stop();
 	for (std::map<std::string, MNGFile *>::iterator i = files.begin(); i != files.end(); i++) {
@@ -39,9 +39,9 @@ MusicManager::~MusicManager() {
 }
 
 void MusicManager::stop() {
-	if (engine.audio) {
-		engine.audio->stopChannel(mng_channel);
-		engine.audio->stopMIDI();
+	mng_music.stop();
+	if (backend) {
+		backend->stopMIDI();
 	}
 }
 
@@ -83,9 +83,9 @@ void MusicManager::setMIDIMuted(bool muted) {
 }
 
 void MusicManager::updateVolumes() {
-	engine.audio->setMIDIVolume(isMIDIMuted() ? 0 : midi_volume);
-	engine.audio->setChannelVolume(mng_channel, music_muted ? 0 : music_volume);
-	engine.audio->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.4);
+	mng_music.setVolume(music_muted ? 0 : music_volume);
+	backend->setMIDIVolume(isMIDIMuted() ? 0 : midi_volume);
+	backend->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.4);
 }
 
 void MusicManager::playTrack(std::string track, unsigned int _how_long_before_changing_track_ms) {
@@ -102,7 +102,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 		mng_music.playSilence(); // or just stop it?
 
 		if (track == "") {
-			engine.audio->stopMIDI();
+			backend->stopMIDI();
 			return;
 		}
 
@@ -111,7 +111,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 			fmt::print("Couldn't find MIDI file '{}'!\n", track);
 			return;
 		}
-		engine.audio->playMIDIFile(filename);
+		backend->playMIDIFile(filename);
 		how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
 		return;
 	}
@@ -144,12 +144,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 		} else {
 			file = files[filename];
 		}
-
 		mng_music.playTrack(file, trackname);
-		if (engine.audio->getChannelState(mng_channel) != AUDIO_PLAYING) {
-			mng_channel = engine.audio->playStream(&mng_music);
-			updateVolumes();
-		}
 	}
 	how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
 }
@@ -160,11 +155,11 @@ void MusicManager::tick() {
 	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
 	// TODO: is this the right place for this?
 	if (engine.version == 1 && (world.tickcount % 70) == 0 &&
-	    engine.audio->getChannelState(creatures1_channel) == AUDIO_STOPPED)
+	    backend->getChannelState(creatures1_channel) == AUDIO_STOPPED)
 	{
 		auto sounds = world.findFiles("Sounds", "MU*.wav");
 		if (sounds.size()) {
-			creatures1_channel = engine.audio->playClip(sounds[rand() % sounds.size()]);
+			creatures1_channel = backend->playClip(sounds[rand() % sounds.size()]);
 		}
 	}
 
@@ -185,6 +180,7 @@ void MusicManager::tick() {
 			}
 		}
 	}
+	mng_music.update();
 	
 	// update volumes based on new volumes, muting, etc
 	updateVolumes();

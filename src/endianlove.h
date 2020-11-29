@@ -92,13 +92,16 @@ static inline uint32_t read32le(std::istream &s) {
 	return read32le(t);
 }
 
+static inline void write32le(uint8_t* buf, uint32_t v) {
+	buf[0] = static_cast<uint8_t>(v >> 0);
+	buf[1] = static_cast<uint8_t>(v >> 8);
+	buf[2] = static_cast<uint8_t>(v >> 16);
+	buf[3] = static_cast<uint8_t>(v >> 24);
+}
+
 static inline void write32le(std::ostream &s, uint32_t v) {
-	uint8_t t[] = {
-		static_cast<uint8_t>(v >> 0),
-		static_cast<uint8_t>(v >> 8),
-		static_cast<uint8_t>(v >> 16),
-		static_cast<uint8_t>(v >> 24)
-	};
+	uint8_t t[4];
+	write32le(t, v);
 	s.write(reinterpret_cast<char *>(t), 4);
 }
 

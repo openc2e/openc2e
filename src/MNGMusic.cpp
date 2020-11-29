@@ -10,8 +10,7 @@
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
 
-
-MNGMusic::MNGMusic() = default;
+MNGMusic::MNGMusic(const std::shared_ptr<AudioBackend>& b) : backend(b) {}
 MNGMusic::~MNGMusic() = default;
 
 void MNGMusic::playSilence() {
@@ -26,14 +25,14 @@ void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
 	trackname = ascii_tolower(trackname);
 
 	// TODO: these lowercase transformations are ridiculous, we should store inside MusicTrack
-	if (nexttrack && nexttrack->getParent() == file) {
+	if (nexttrack && nexttrack->parent == file) {
 		std::string nextname = ascii_tolower(nexttrack->getName());
 		if (nextname == trackname) {
 			// already moving to this track
 			return;
 		}
 	}
-	if (currenttrack && currenttrack->getParent() == file) {
+	if (currenttrack && currenttrack->parent == file) {
 		std::string thisname = ascii_tolower(currenttrack->getName());
 		if (thisname == trackname) {
 			// already playing this track!
@@ -49,7 +48,7 @@ void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
 		return; // TODO: exception?
 	}
 
-	playTrack(std::make_shared<MusicTrack>(file, file->tracks[trackname]));
+	playTrack(std::make_shared<MusicTrack>(file, file->tracks[trackname], backend.get()));
 }
 
 void MNGMusic::playTrack(std::shared_ptr<MusicTrack> track) {
@@ -63,20 +62,23 @@ void MNGMusic::playTrack(std::shared_ptr<MusicTrack> track) {
 	}
 }
 
-void MNGMusic::render(signed short *data, size_t len) {
+void MNGMusic::update() {
 	if (!currenttrack) {
-		// silence
-		memset((void *)data, 0, len * 2);
 		return;
 	}
-
-	currenttrack->update(len / 2);
-	currenttrack->render(data, len);
-	
+	currenttrack->update();
 	if (nexttrack && currenttrack->fadedOut()) {
 		currenttrack = nexttrack;
-		nexttrack.reset(); // TODO: do this not in the audio thread?
+		nexttrack.reset();
 	}
+}
+
+void MNGMusic::setVolume(float volume) {
+	// TODO
+}
+
+void MNGMusic::stop() {
+	// TODO
 }
 
 float evaluateExpression(MNGExpression *e, MusicStage *stage = NULL, MusicVoice *voice = NULL, MusicLayer *layer = NULL) {
@@ -160,26 +162,23 @@ float evaluateExpression(MNGExpression *e, MusicStage *stage = NULL, MusicVoice 
 }
 
 MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
-	unsigned int sampleno = n->getSampleNumber();
-	if (sampleno >= p->samples.size())
+	parent = p;
+	sampleno = n->getSampleNumber();
+	if (sampleno >= parent->samples.size())
 		throw MNGFileException("sample not present");
-	// TODO: someday, fix these casts at their source
-	char *data = p->samples[sampleno].first;
-	unsigned int length = (unsigned int)p->samples[sampleno].second;
-
-	// skip fmt chunk and go straight to data
-	data += 20;
-	length -= 20;
-
-	buffer = FloatAudioBuffer(new float[length], length);
-	for (unsigned int i = 0; i < length / 2; i++) {
-		buffer.data[i*2] = (signed short)read16le(data + i * 2);
-		buffer.data[(i*2) + 1] = (signed short)read16le(data + i * 2);
-	}
 }
 
 MusicWave::~MusicWave() {
-	delete[] buffer.data;
+}
+
+AudioChannel MusicWave::play(AudioBackend *backend, bool looping) {
+	char *data = parent->samples[sampleno].first;
+	unsigned int length = (unsigned int)parent->samples[sampleno].second;
+	std::vector<uint8_t> buf(length + 8);
+	memcpy(buf.data(), "WAVEfmt ", 8);
+	memcpy(buf.data() + 8, data, length);
+	// TODO: prettify this, don't depend on SDLMixerBackend
+	return backend->playWavData(buf.data(), buf.size(), looping);
 }
 
 MusicStage::MusicStage(MNGStageNode *node) {
@@ -213,55 +212,10 @@ MusicStage::MusicStage(MNGStageNode *node) {
 	}
 }
 
-std::vector<FloatAudioBuffer> MusicStage::applyStage(std::vector<FloatAudioBuffer> &sources, float beatlength) {
-	float pan_value = 0.0f, volume_value = 1.0f, delay_value = 0.0f;
-
-	if (pan) {
-		pan_value = evaluateExpression(pan, this);
-	}
-
-	if (volume) {
-		volume_value = evaluateExpression(volume, this);
-	}
-
-	if (delay) {
-		delay_value = evaluateExpression(delay, this);
-	}
-
-	if (tempodelay) {
-		delay_value += evaluateExpression(tempodelay, this) * beatlength;
-	}
-
-	unsigned int offset_amt = 22050 * delay_value;
-	std::vector<FloatAudioBuffer> buffers;
-	for (auto &src : sources) {
-		src.start_offset += offset_amt;
-		volume_value *= src.volume;
-		// TODO: better pan_value calculation
-		if (src.pan != 0.0f) {
-			pan_value = pan_value ? (src.pan + pan_value) / 2.0f : src.pan;
-		}
-		buffers.push_back(FloatAudioBuffer(src.data, src.len, src.start_offset, volume_value, pan_value));
-	}
-
-	return buffers;
-}
-
 MusicEffect::MusicEffect(MNGEffectDecNode *node) {
 	for (auto &c : *node->children) {
 		stages.push_back(std::make_shared<MusicStage>(c));
 	}
-}
-
-std::vector<FloatAudioBuffer> MusicEffect::applyEffect(class MusicTrack *t, std::vector<FloatAudioBuffer> src, float beatlength) {
-	std::vector<FloatAudioBuffer> buffers;
-
-	for (auto &stage : stages) {
-		std::vector<FloatAudioBuffer> newbuffers = stage->applyStage(src, beatlength);
-		buffers.insert(buffers.end(), newbuffers.begin(), newbuffers.end());
-	}
-
-	return buffers;
 }
 
 MusicVoice::MusicVoice(MusicLayer *p, MNGVoiceNode *n) {
@@ -277,7 +231,7 @@ MusicVoice::MusicVoice(MusicLayer *p, MNGVoiceNode *n) {
 	for (auto &n : *node->children) {
 		if (MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n)) {
 			// TODO: share duplicate MusicWaves
-			wave = std::make_shared<MusicWave>(p->getParent()->getParent(), e);
+			wave = std::make_shared<MusicWave>(p->getParent()->parent, e);
 			continue;
 		}
 
@@ -301,7 +255,7 @@ MusicVoice::MusicVoice(MusicLayer *p, MNGVoiceNode *n) {
 				throw MNGFileException("got effect '" + eff->getName() + "' but we already have one!");
 
 			// TODO: share effects
-			auto &effects = parent->getParent()->getParent()->effects;
+			auto &effects = parent->getParent()->parent->effects;
 			if (effects.find(eff->getName()) == effects.end())
 				throw MNGFileException("couldn't find effect '" + eff->getName() + "'");
 
@@ -335,8 +289,6 @@ MusicLayer::MusicLayer(MusicTrack *p) {
 	interval = 0.0f;
 	beatsynch = 0.0f;
 	pan = 0.0f;
-
-	next_offset = 0;
 
 	updatenode = NULL;
 
@@ -398,14 +350,15 @@ void MusicVoice::runUpdateBlock() {
 	}
 }
 
-MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *node, MusicTrack *p) : MusicLayer(p) {
+MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *node, MusicTrack *p, AudioBackend *b) : MusicLayer(p) {
+	backend = b;
 	for (auto &n : *node->children) {
 		if (MNGEffectNode *e = dynamic_cast<MNGEffectNode *>(n)) {
 			if (effect)
 				throw MNGFileException("got effect '" + e->getName() + "' but we already have one!");
 
 			// TODO: share effects
-			std::map<std::string, class MNGEffectDecNode *> &effects = parent->getParent()->effects;
+			std::map<std::string, class MNGEffectDecNode *> &effects = parent->parent->effects;
 			if (effects.find(e->getName()) == effects.end())
 				throw MNGFileException("couldn't find effect '" + e->getName() + "'");
 
@@ -457,11 +410,26 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *node, MusicTrack
 	runUpdateBlock();
 }
 
-void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
-	unsigned int parent_offset = parent->getCurrentOffset();
+void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
+	float current_volume = volume * track_volume;
 
-	if (next_offset > parent_offset + latency_in_frames) return;
-	unsigned int offset = next_offset;
+	// TODO: handle updaterate correctly
+	// TODO: keep track of playing voices and update them?
+
+	for (auto qw = queued_waves.begin(); qw != queued_waves.end(); ) {
+		if (mngclock::now() >= qw->start_time) {
+			auto channel = qw->wave->play(backend);
+			backend->setChannelVolume(channel, qw->volume * current_volume);
+			backend->setChannelPan(channel, qw->pan);
+			qw = queued_waves.erase(qw);
+		} else {
+			qw++;
+		}
+	}
+
+	if (mngclock::now() < next_update_at) {
+		return;
+	}
 
 	runUpdateBlock();
 
@@ -479,15 +447,32 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 
 	if (available_voices.size()) {
 		auto voice = last_voice = available_voices[rand() % available_voices.size()];
+		auto voice_effect = voice->getEffect() ? voice->getEffect() : effect;
+		// TODO: do effects play the original voice, and then each stage? or just each stage?
+		if (voice_effect) {
+			mngtimepoint start_offset = mngclock::now();
+			for (auto &stage : voice_effect->stages) {
+				float volume_value = stage->volume ? evaluateExpression(stage->volume, stage.get()) : 1.0f;
 
-		FloatAudioBuffer &data = voice->getWave()->getData();
-		std::vector<FloatAudioBuffer> buffers{{
-			FloatAudioBuffer(data.data, data.len, offset, volume * parent->getVolume(), pan)
-		}};
-		if (voice->getEffect()) {
-			buffers = voice->getEffect()->applyEffect(parent, buffers, parent->getBeatLength());
-		} else if (effect) {
-			buffers = effect->applyEffect(parent, buffers, parent->getBeatLength());
+				float pan_value = stage->pan ? evaluateExpression(stage->pan, stage.get()) : 0.0f;
+				// TODO: better pan_value calculation
+				if (pan != 0.0f) {
+					pan_value = pan_value ? (pan + pan_value) / 2.0f : pan;
+				}
+
+				float delay_value = stage->delay ? evaluateExpression(stage->delay, stage.get()) : 0.0f;
+				if (stage->tempodelay) {
+					delay_value += evaluateExpression(stage->tempodelay, stage.get()) * track_beatlength;
+				}
+
+				// first as float and then as whatever internal representation...
+				start_offset += dseconds(delay_value);
+				queued_waves.push_back({voice->getWave(), start_offset, volume_value, pan_value});
+			}
+		} else {
+			auto channel = voice->getWave()->play(backend); // TODO: hold onto this to change params later as layer params update
+			backend->setChannelVolume(channel, current_volume);
+			backend->setChannelPan(channel, pan);
 		}
 
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
@@ -495,24 +480,19 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 		 * so I try to run it in the same place that code does, for now */
 		voice->runUpdateBlock();
 
-		float our_interval = interval + voice->getInterval() + (beatsynch * parent->getBeatLength());
-		offset += 22050 * our_interval;
-		
-		for (auto &b : buffers) {
-			parent->addBuffer(b);
-		}
+		// TODO: this isn't right. we should update offset even if a voice doesn't play,
+		// TODO: and also the intervals aren't added, the voice interval overrides the track interval.
+		float our_interval = interval + voice->getInterval() + (beatsynch * track_beatlength);
+		next_update_at = mngclock::now() + dseconds(our_interval);
 	}
-
-	next_offset = offset;
 }
 
-MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *node, MusicTrack *p) : MusicLayer(p) {
-	update_period = 0;
+MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *node, MusicTrack *p, AudioBackend *b) : MusicLayer(p) {
+	backend = b;
 	
 	for (auto &n : *node->children) {
 		if (MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n)) {
-			// TODO: share duplicate MusicWaves
-			wave = std::shared_ptr<MusicWave>(new MusicWave(parent->getParent(), e));
+			wave = std::make_shared<MusicWave>(p->parent, e);
 			continue;
 		}
 
@@ -535,35 +515,26 @@ MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *node, MusicTrack *p) : MusicLay
 
 		throw MNGFileException("unexpected node in LoopLayer: " + n->dump());
 	}
-
-	runUpdateBlock();
 }
 
-void MusicLoopLayer::update(unsigned int latency_in_frames) {
-	if (!wave) return;
+void MusicLoopLayer::update(float track_volume, float track_beatlength) {
+	if (!channel) {
+		channel = wave->play(backend, true);
+	}
 
-	unsigned int parent_offset = parent->getCurrentOffset();
+	float current_volume = volume * track_volume;
+	backend->setChannelVolume(channel, current_volume);
+	backend->setChannelPan(channel, pan);
 
-	if (next_offset > parent_offset + latency_in_frames) return;
-
-	float our_volume = volume * parent->getVolume();
-
-	FloatAudioBuffer &data = wave->getData();
-	parent->addBuffer(FloatAudioBuffer(data.data, data.len, next_offset, our_volume, pan));
-
-	next_offset += data.len;
-
-	update_period += updaterate;
-	if (update_period > 1.0f) {
+	if (mngclock::now() >= next_update_at) {
 		runUpdateBlock();
-		update_period -= 1.0f;
+		next_update_at = mngclock::now() + dseconds(updaterate);
 	}
 }
 
-MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
+MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n, AudioBackend *b) {
 	node = n;
 	parent = p;
-	current_offset = 0;
 
 	volume = 1.0f;
 	// TODO: what's the default fadein/fadeout?
@@ -571,19 +542,17 @@ MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 	fadein = fadeout = 1.0f;
 	beatlength = 0.0f;
 
-	fadein_count = fadeout_count = 0;
-
 	for (auto &n : *node->children) {
 		if (MNGAleotoricLayerNode *al = dynamic_cast<MNGAleotoricLayerNode *>(n)) {
 			layers.push_back(std::dynamic_pointer_cast<MusicLayer>(
-				std::make_shared<MusicAleotoricLayer>(al, this)
+				std::make_shared<MusicAleotoricLayer>(al, this, b)
 			));
 			continue;
 		}
 
 		if (MNGLoopLayerNode *ll = dynamic_cast<MNGLoopLayerNode *>(n)) {
 			layers.push_back(std::dynamic_pointer_cast<MusicLayer>(
-				std::make_shared<MusicLoopLayer>(ll, this)
+				std::make_shared<MusicLoopLayer>(ll, this, b)
 			));
 			continue;
 		}
@@ -612,88 +581,62 @@ MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n) {
 	}
 }
 
-void MusicTrack::update(unsigned int latency_in_frames) {
+float MusicTrack::getCurrentFadeMultiplier() {
+	if (fadein_start && fadeout_start) {
+		throw creaturesException("Track is both fading in and fading out, this shouldn't happen");
+	}
+	if (fadein_start) {
+		const float time_since_fadein_start = dseconds(mngclock::now() - *fadein_start).count();
+		if (time_since_fadein_start < fadein) {
+			return time_since_fadein_start / fadein;
+		}
+		fadein_start = {};
+	}
+	if (fadeout_start) {
+		const float time_since_fadeout_start = dseconds(mngclock::now() - *fadeout_start).count();
+		if (time_since_fadeout_start < fadeout) {
+			return 1.0 - time_since_fadeout_start / fadeout;
+		}
+		return 0.0;
+	}
+	return 1.0;
+}
+
+void MusicTrack::update() {
+	float our_volume = volume * getCurrentFadeMultiplier();
 	for (auto &l : layers) {
-		l->update(latency_in_frames);
+		l->update(our_volume, beatlength);
 	}
 }
 
 void MusicTrack::startFadeIn() {
-	if (fadein_count) {
+	if (fadein_start) {
 		return;
 	}
-	if (fadeout_count) {
-		fadein_count = (fadein * 22050 * 2) * (1.0 - (float)(fadeout_count / (fadeout * 22050 * 2)));
-		fadeout_count = 0;
+
+	// backdate fadein_start so the volume change is seamless
+	if (fadeout_start) {
+		fadein_start = mngclock::now() - getCurrentFadeMultiplier() * dseconds(fadein);
+		fadeout_start = {};
 	} else {
-		fadein_count = fadein * 22050 * 2;
+		fadein_start = mngclock::now();
 	}
 }
 
 void MusicTrack::startFadeOut() {
-	if (fadeout_count) {
+	if (fadeout_start) {
 		return;
 	}
-	if (fadein_count) {
-		fadeout_count = (fadeout * 22050 * 2) * (1.0 - (float)(fadein_count / (fadein * 22050 * 2)));
-		fadein_count = 0;
+
+	// backdate fadeout_start so the volume change is seamless
+	if (fadein_start) {
+		fadeout_start = mngclock::now() - (1 - getCurrentFadeMultiplier()) * dseconds(fadeout);
+		fadein_start = {};
 	} else {
-		fadeout_count = fadeout * 22050 * 2;
-	}
-	if (!fadeout_count) {
-		fadeout_count = 1;
+		fadeout_start = mngclock::now();
 	}
 }
 
 bool MusicTrack::fadedOut() {
-	return fadeout_count == 1;
-}
-
-void MusicTrack::render(signed short *data, size_t len) {
-	float *output = (float *)alloca(len * sizeof(float));
-	memset(output, 0.0f, len * sizeof(float));
-
-	// mix pending buffers, render
-	//unsigned int numbuffers = 0;
-	for (int i = 0; i < (int)buffers.size(); i++) {
-		FloatAudioBuffer &buffer = buffers[i];
-		unsigned int j = 0;
-		if (buffer.start_offset > current_offset) {
-			// buffer hasn't started (quite) yet
-			if (buffer.start_offset > current_offset + len)
-				continue;
-			j = 2 * (buffer.start_offset - current_offset);
-		}
-		//numbuffers++;
-		float left_pan = 1.0f - buffer.pan;
-		float right_pan = 1.0f + buffer.pan;
-		for (; j < len && buffer.position < buffer.len; j++) {
-			output[j] += buffer.data[buffer.position] * buffer.volume * left_pan;
-			buffer.position++;
-			j++;
-			output[j] += buffer.data[buffer.position] * buffer.volume * right_pan;
-			buffer.position++;
-		}
-		if (buffer.position == buffer.len) {
-			buffers.erase(buffers.begin() + i);
-			i--;
-		}
-	}
-	//float mul = (1.0f/numbuffers) * 0.8f; // TODO: this is a hack to try and avoid clipping
-	float mul = 0.3f;
-	if (fadein_count) {
-		mul *= 1.0 - (fadein_count / (fadein * 22050 * 2));
-		if (fadein_count >= len) fadein_count -= len; else fadein_count = 0;
-	} else if (fadeout_count) {
-		mul *= (fadeout_count / (fadeout * 22050 * 2));
-		if (fadeout_count > len) fadeout_count -= len; else fadeout_count = 1;
-	}
-	for (unsigned int i = 0; i < len; i++) {
-		output[i] *= mul;
-	}
-	for (unsigned int i = 0; i < len; i++) {
-		data[i] = (signed short)output[i];
-	}
-
-	current_offset += len / 2;
+	return fadeout_start && mngclock::now() >= *fadeout_start + dseconds(fadeout);
 }

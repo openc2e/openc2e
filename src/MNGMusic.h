@@ -2,74 +2,58 @@
 
 #include "audiobackend/AudioBackend.h"
 #include "fileformats/mngfile.h"
+#include "optional.h"
+#include <chrono>
 #include <memory>
 
-class MNGMusic : public AudioStream {
+// use times as floating-point numbers because that's how MNG files are written,
+// and this makes calculations much easier (avoiding duration_cast and manual
+// arithmetic)
+using dseconds = std::chrono::duration<double>;
+
+using mngclock = std::chrono::steady_clock;
+using mngtimepoint = std::chrono::time_point<mngclock, dseconds>;
+
+class MNGMusic {
 private:
 	void playTrack(std::shared_ptr<class MusicTrack> track);
-
-	std::shared_ptr<class MNGStream> stream;
 	std::shared_ptr<class MusicTrack> currenttrack, nexttrack;
+	std::shared_ptr<AudioBackend> backend;
 
 public:
-	MNGMusic();
+	MNGMusic(const std::shared_ptr<AudioBackend>& backend);
 	~MNGMusic();
+	void update();
+	void setVolume(float);
+	void stop();
 
 	void playTrack(MNGFile* file, std::string trackname);
 	void playSilence();
 
-	void render(signed short *data, size_t len);
-	virtual size_t produce(void *data, size_t len_in_bytes) {
-		render((signed short *)data, len_in_bytes / 2);
-		return len_in_bytes;
-	}
-	
 	bool playing_silence = true;
-};
-
-struct FloatAudioBuffer {
-	unsigned int start_offset;
-	size_t len, position;
-	float *data;
-	float volume, pan;
-
-	FloatAudioBuffer() { data = NULL; len = 0; position = 0; start_offset = 0; volume = 1.0f; pan = 0.0f; }
-	FloatAudioBuffer(float *d, size_t l, unsigned int o = 0, float v = 1.0f, float p = 0.0f) {
-		position = 0;
-		len = l;
-		data = d;
-		start_offset = o;
-		volume = v;
-		pan = p;
-	}
 };
 
 class MusicWave {
 protected:
-	FloatAudioBuffer buffer;
+	unsigned int sampleno;
+	MNGFile *parent;
 
 public:
 	MusicWave(MNGFile *p, MNGWaveNode *w);
 	~MusicWave();
-	FloatAudioBuffer &getData() { return buffer; }
+	AudioChannel play(AudioBackend *b, bool looping=false);
 };
 
 class MusicStage {
-protected:
-	MNGExpression *pan, *volume, *delay, *tempodelay;
-
 public:
 	MusicStage(MNGStageNode *n);
-	std::vector<FloatAudioBuffer> applyStage(std::vector<FloatAudioBuffer> &sources, float beatlength);
+	MNGExpression *pan, *volume, *delay, *tempodelay;
 };
 
 class MusicEffect {
-protected:
-	std::vector<std::shared_ptr<MusicStage> > stages;
-
 public:
 	MusicEffect(MNGEffectDecNode *n);
-	std::vector<FloatAudioBuffer> applyEffect(class MusicTrack *t, std::vector<FloatAudioBuffer> src, float beatlength);
+	std::vector<std::shared_ptr<MusicStage> > stages;
 };
 
 class MusicVoice {
@@ -99,9 +83,7 @@ public:
 class MusicLayer {
 protected:
 	MNGUpdateNode *updatenode;
-
 	MusicTrack *parent;
-	unsigned int next_offset;
 
 	std::map<std::string, float> variables;
 	float updaterate, volume, interval, beatsynch, pan;
@@ -113,7 +95,7 @@ public:
 	virtual ~MusicLayer() = default;
 	MusicTrack *getParent() { return parent; }
 	float &getVariable(std::string name) { return variables[name]; }
-	virtual void update(unsigned int latency_in_frames) = 0;
+	virtual void update(float track_volume, float track_beatlength) = 0;
 	float getVolume() { return volume; }
 	float getInterval() { return interval; }
 	float getPan() { return pan; }
@@ -121,27 +103,39 @@ public:
 
 class MusicAleotoricLayer : public MusicLayer {
 protected:
+	struct QueuedWave {
+		std::shared_ptr<MusicWave> wave;
+		mngtimepoint start_time;
+		float volume;
+		float pan;
+	};
+
 	std::shared_ptr<MusicEffect> effect;
 	std::vector<std::shared_ptr<MusicVoice> > voices;
+	mngtimepoint next_update_at;
 	std::shared_ptr<MusicVoice> last_voice;
+	std::vector<QueuedWave> queued_waves;
+	AudioBackend* backend;
 
 public:
-	MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p);
-	void update(unsigned int latency_in_frames);
+	MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p, AudioBackend *b);
+	void update(float track_volume, float track_beatlength);
 };
 
 class MusicLoopLayer : public MusicLayer {
 protected:
-	unsigned int update_period;
 	std::shared_ptr<MusicWave> wave;
+	AudioChannel channel;
+	mngtimepoint next_update_at;
+	AudioBackend* backend;
 
 public:
-	MusicLoopLayer(MNGLoopLayerNode *n, MusicTrack *p);
-	void update(unsigned int latency_in_frames);
+	MusicLoopLayer(MNGLoopLayerNode *n, MusicTrack *p, AudioBackend *b);
+	void update(float track_volume, float track_beatlength);
 };
 
 class MusicTrack {
-protected:
+public:
 	MNGTrackDecNode *node;
 	MNGFile *parent;
 
@@ -149,24 +143,16 @@ protected:
 
 	float fadein, fadeout, beatlength, volume;
 
-	unsigned int fadein_count, fadeout_count;
-
-	unsigned int current_offset;
-	std::vector<FloatAudioBuffer> buffers;
-
-public:
-	MusicTrack(MNGFile *p, MNGTrackDecNode *n);
-	void render(signed short *data, size_t len);
-	void addBuffer(FloatAudioBuffer buf) { buffers.push_back(buf); }
-	unsigned int getCurrentOffset() { return current_offset; }
-	void update(unsigned int latency_in_frames);
-	float getVolume() { return volume; }
-	float getBeatLength() { return beatlength; }
+	MusicTrack(MNGFile *p, MNGTrackDecNode *n, AudioBackend *b);
+	void update();
 
 	void startFadeIn();
 	void startFadeOut();
 	bool fadedOut();
+	float getCurrentFadeMultiplier();
 
-	MNGFile *getParent() { return parent; }
 	std::string getName() { return node->getName(); }
+
+	optional<mngtimepoint> fadein_start;
+	optional<mngtimepoint> fadeout_start;
 };

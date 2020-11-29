@@ -65,16 +65,17 @@ int main (int argc, char **argv) {
 
       srand(time(NULL));
 
-      MNGMusic mng_music;
+      MNGMusic mng_music(backend);
       mng_music.playTrack(file, trackname);
       if (mng_music.playing_silence) {
           // If the track doesn't exist
           // TODO: better way to check this
           return 1;
       }
-      backend->playStream(&mng_music);
-      Event sleep_forever;
-      sleep_forever.wait();
+      while (true) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+          mng_music.update();
+      }
 
     } else if (ext == ".mid" || ext == ".midi") {
       backend->playMIDIFile(filename);

@@ -28,7 +28,7 @@
 
 class MusicManager {
 public:
-	MusicManager();
+	MusicManager(const std::shared_ptr<AudioBackend>& backend);
 	~MusicManager();
 	void stop();
 
@@ -47,12 +47,12 @@ public:
 private:
 	void updateVolumes();
 	
+	std::shared_ptr<AudioBackend> backend;
 	bool music_muted = false;
 	float music_volume = 1.0;
 	float midi_volume = 1.0;
 	
 	AudioChannel creatures1_channel;
-	AudioChannel mng_channel;
 	std::map<std::string, class MNGFile *> files;
 	MNGMusic mng_music;
 	std::string last_track;
