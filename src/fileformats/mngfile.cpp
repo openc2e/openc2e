@@ -52,14 +52,7 @@ MNGFile::MNGFile(std::string n) {
 	for(int i = 0; i < numsamples; i++) {
 		// Sample offsets and lengths are stored in pairs after the initial 16 bytes
 		int position = read32le(stream->map + 12 + (8 * i));
-
-		// skip four bytes of the WAVE header, four of the FMT header, 
-		// the FMT chunk and four of the DATA header
-		position += read32le(stream->map + position) + 8; 
-
-		int size = read32le(stream->map + position);
-		position += 4; // Skip the size field
-		
+		int size = read32le(stream->map + 16 + (8 * i));
 		samples.push_back(std::make_pair(stream->map + position, size));
 	}
 

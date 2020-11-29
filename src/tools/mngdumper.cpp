@@ -43,18 +43,9 @@ int main(int argc, char **argv) {
 		std::ofstream sample((output_directory / kv.first).native() + ".wav", std::ios_base::binary);
 
 		sample.write("RIFF", 4);
-		write32le(sample, 36 + file.samples[kv.second].second); // TODO: RIFF chunk size
+		write32le(sample, 4 + file.samples[kv.second].second); // TODO: RIFF chunk size
 		sample.write("WAVE", 4);
 		sample.write("fmt ", 4);
-		write32le(sample, 16); // fmt chunk size
-		write16le(sample, 0x0001); // WAVE_FORMAT_PCM
-		write16le(sample, 1); // num channels
-		write32le(sample, 22050); // samples per sec
-		write32le(sample, 22050 * 2); // bytes per sec
-		write16le(sample, 2); // block align
-		write16le(sample, 8 * 2); // bits per sample
-		sample.write("data", 4);
-		write32le(sample, file.samples[kv.second].second); // data chunk size
 		sample.write(file.samples[kv.second].first, file.samples[kv.second].second);
 	}
 }
