@@ -1,6 +1,6 @@
 #include "endianlove.h"
 #include "fileformats/mngfile.h"
-
+#include "utils/enumerate.h"
 
 #include <fmt/format.h>
 #include <ghc/filesystem.hpp>
@@ -37,15 +37,20 @@ int main(int argc, char **argv) {
 	std::ofstream script(script_filename, std::ios_base::binary);
 	script << file.script;
 
-	for (auto kv : file.samplemappings) {
-		fs::path sample_filename((output_directory / kv.first).native() + ".wav");
-		fmt::print("{}\n", sample_filename.string());
-		std::ofstream sample((output_directory / kv.first).native() + ".wav", std::ios_base::binary);
+	for (auto sample : enumerate(file.samples)) {
+		for (auto kv : file.samplemappings) {
+			if (kv.second != sample.i) {
+				continue;
+			}
+			fs::path sample_filename((output_directory / kv.first).native() + ".wav");
+			fmt::print("{}\n", sample_filename.string());
 
-		sample.write("RIFF", 4);
-		write32le(sample, 4 + file.samples[kv.second].second); // TODO: RIFF chunk size
-		sample.write("WAVE", 4);
-		sample.write("fmt ", 4);
-		sample.write(file.samples[kv.second].first, file.samples[kv.second].second);
+			std::ofstream out((output_directory / kv.first).native() + ".wav", std::ios_base::binary);
+			out.write("RIFF", 4);
+			write32le(out, 4 + sample->second); // TODO: RIFF chunk size
+			out.write("WAVE", 4);
+			out.write("fmt ", 4);
+			out.write(sample->first, sample->second);
+		}
 	}
 }
