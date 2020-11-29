@@ -49,6 +49,7 @@ public:
 	virtual void shutdown() = 0;
 	
 	virtual AudioChannel playClip(const std::string &filename, bool looping = false) = 0;
+	virtual AudioChannel playWavData(const uint8_t *data, size_t size, bool looping = false) = 0;
 	virtual AudioChannel playStream(AudioStream*) = 0;
 	
 	virtual void fadeOutChannel(AudioChannel) = 0;

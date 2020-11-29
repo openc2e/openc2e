@@ -38,6 +38,7 @@ public:
 	void shutdown();
 	
 	AudioChannel playClip(const std::string& filename, bool looping = false);
+	AudioChannel playWavData(const uint8_t *data, size_t size, bool looping = false);
 	AudioChannel playStream(AudioStream*);
 	
 	void fadeOutChannel(AudioChannel);

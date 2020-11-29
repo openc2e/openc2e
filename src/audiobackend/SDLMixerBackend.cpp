@@ -145,6 +145,20 @@ AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping
 	return int_to_audio_channel(channel);
 }
 
+AudioChannel SDLMixerBackend::playWavData(const uint8_t *data, size_t size, bool looping) {
+	Mix_Chunk* chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(data, size), SDL_TRUE);
+	if (!chunk) {
+		return {};
+	}
+	
+	int channel = playChannel(chunk, looping);
+	if (channel == -1) {
+		Mix_FreeChunk(chunk);
+		return {};
+	}
+	return int_to_audio_channel(channel);
+}
+
 AudioChannel SDLMixerBackend::playStream(AudioStream* stream) {
 	static std::array<uint8_t, SDLMIXERBACKEND_CHUNK_SIZE * 4> arbitrary_audio_data;
 	

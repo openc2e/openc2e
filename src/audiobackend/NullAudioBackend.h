@@ -31,6 +31,9 @@ public:
 		if (filename.size() == 0) return {};
 		return { 1 };
 	}
+	virtual AudioChannel playWavData(const uint8_t*, size_t, bool) {
+		return { 1 };
+	}
 	AudioChannel playStream(AudioStream*) {
 		return { 1 };
 	}
