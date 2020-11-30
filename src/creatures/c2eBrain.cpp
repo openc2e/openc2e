@@ -19,6 +19,7 @@
 
 #include "c2eBrain.h"
 #include "c2eCreature.h"
+#include <algorithm>
 #include <cassert>
 #include <math.h>
 #include <fmt/core.h>
