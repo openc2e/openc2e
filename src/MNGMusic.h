@@ -123,6 +123,7 @@ class MusicAleotoricLayer : public MusicLayer {
 protected:
 	std::shared_ptr<MusicEffect> effect;
 	std::vector<std::shared_ptr<MusicVoice> > voices;
+	std::shared_ptr<MusicVoice> last_voice;
 
 public:
 	MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p);

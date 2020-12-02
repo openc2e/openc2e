@@ -312,6 +312,10 @@ MusicVoice::MusicVoice(MusicLayer *p, MNGVoiceNode *n) {
 
 		throw MNGFileException("unexpected node in Voice: " + n->dump());
 	}
+
+	if (!wave) {
+		throw MNGFileException("Voice must have a Wave node: " + n->dump());
+	}
 }
 
 bool MusicVoice::shouldPlay() {
@@ -459,24 +463,32 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 	if (next_offset > parent_offset + latency_in_frames) return;
 	unsigned int offset = next_offset;
 
-	std::vector<FloatAudioBuffer> buffers;
+	runUpdateBlock();
 
-	float our_volume = volume * parent->getVolume();
+	decltype(voices) available_voices;
 	for (auto &voice : voices) {
 		if (!voice->shouldPlay()) continue;
+		if (last_voice.get() == voice.get()) continue;
+		available_voices.push_back(voice);
+	}
+	// try to avoid playing the same voice twice in a row, it sounds awful and
+	// doesn't seem to happen in the real engine
+	if (!available_voices.size() && last_voice->shouldPlay()) {
+		available_voices.push_back(last_voice);
+	}
 
-		if (voice->getWave()) {
-			FloatAudioBuffer &data = voice->getWave()->getData();
-			FloatAudioBuffer voicebuffer = FloatAudioBuffer(data.data, data.len, offset, our_volume, pan);
-			std::shared_ptr<MusicEffect> voice_effect = voice->getEffect();
-			if (voice_effect) {
-				std::vector<FloatAudioBuffer> newbuffers;
-				newbuffers.push_back(voicebuffer);
-				newbuffers = voice_effect->applyEffect(parent, newbuffers, parent->getBeatLength());
-				buffers.insert(buffers.end(), newbuffers.begin(), newbuffers.end());
-			} else {
-				buffers.push_back(voicebuffer);
-			}
+	if (available_voices.size()) {
+		auto voice = last_voice = available_voices[rand() % available_voices.size()];
+
+		FloatAudioBuffer &data = voice->getWave()->getData();
+		std::vector<FloatAudioBuffer> buffers{{
+			FloatAudioBuffer(data.data, data.len, offset, volume * parent->getVolume(), pan)
+		}};
+		if (voice->getEffect()) {
+			buffers = voice->getEffect()->applyEffect(parent, buffers, parent->getBeatLength());
+		}
+		if (effect) {
+			buffers = effect->applyEffect(parent, buffers, parent->getBeatLength());
 		}
 
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
@@ -486,16 +498,11 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 
 		float our_interval = interval + voice->getInterval() + (beatsynch * parent->getBeatLength());
 		offset += 22050 * our_interval;
+		
+		for (auto &b : buffers) {
+			parent->addBuffer(b);
+		}
 	}
-
-	if (effect) {
-		buffers = effect->applyEffect(parent, buffers, parent->getBeatLength());
-	}
-	for (auto &b : buffers) {
-		parent->addBuffer(b);
-	}
-
-	runUpdateBlock();
 
 	next_offset = offset;
 }
