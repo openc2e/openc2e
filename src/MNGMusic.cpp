@@ -486,8 +486,7 @@ void MusicAleotoricLayer::update(unsigned int latency_in_frames) {
 		}};
 		if (voice->getEffect()) {
 			buffers = voice->getEffect()->applyEffect(parent, buffers, parent->getBeatLength());
-		}
-		if (effect) {
+		} else if (effect) {
 			buffers = effect->applyEffect(parent, buffers, parent->getBeatLength());
 		}
 
