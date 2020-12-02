@@ -82,7 +82,11 @@ void SDLMixerBackend::init() {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 		throw creaturesException(std::string("SDL error during sound initialization: ") + SDL_GetError());
 
-	if (Mix_OpenAudio(22050, AUDIO_S16SYS, 2, SDLMIXERBACKEND_CHUNK_SIZE) < 0)
+	// Try to run at 44,100 Hz. Across supported games, the most common sound
+	// file sampling rates are 11,025 Hz, 22,050 Hz, 32,075 Hz and 44,100 Hz.
+	// There are only three sounds above 44,100 (all in Creatures Village, at
+	// 48,000 Hz).
+	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, SDLMIXERBACKEND_CHUNK_SIZE) < 0)
 		throw creaturesException(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
 
 	if (!Mix_Init(MIX_INIT_MID)) {
