@@ -12,7 +12,8 @@ template <class T>
 class optional {
 public:
   optional() = default;
-  optional(T value) {
+  template <class U>
+  optional(U value) {
     has_value_ = true;
     new(&storage_) T(value);
   }
