@@ -484,7 +484,13 @@ class Object:
 				eventno = read16(f)
 				species = read16(f)
 			script = readstring(f)
-			print "event #" + str(eventno) + " for " + str(family) + ", " + str(genus) + ", " + str(species) + ": " + script
+			print "event #{eventno} for {family}, {genus}, {species}: scrp {family} {genus} {species} {eventno},{script}".format(
+				eventno=eventno,
+				family=family,
+				genus=genus,
+				species=species,
+				script=script
+			)
 			self.scripts[eventno] = script
 
 class SimpleObject(Object):
@@ -1108,7 +1114,13 @@ for i in range(numscripts):
 		eventno = read16(f)
 		species = read16(f)
 	script = readstring(f)
-	print "event #" + str(eventno) + " for " + str(family) + ", " + str(genus) + ", " + str(species) + " (global): " + script
+	print "event #{eventno} for {family}, {genus}, {species} (global): scrp {family} {genus} {species} {eventno},{script}".format(
+		eventno=eventno,
+		family=family,
+		genus=genus,
+		species=species,
+		script=script
+	)
 	scripts[eventno] = script
 
 print
