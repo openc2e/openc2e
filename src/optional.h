@@ -41,7 +41,14 @@ public:
       throw bad_optional_access();
     }
   }
-  
+  T value_or(const T& default_value) {
+      if (*this) {
+          return **this;
+      } else {
+          return default_value;
+      }
+  }
+
 private:
   bool has_value_ = false;
   typename std::aligned_storage<sizeof(T), alignof(T)>::type storage_;
