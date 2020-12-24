@@ -4,7 +4,7 @@ template <typename T>
 class Singleton {
 public:
 	static std::shared_ptr<T> getInstance() {
-		std::weak_ptr<T> weak;
+		static std::weak_ptr<T> weak;
 		std::shared_ptr<T> instance = weak.lock();
 		if (!instance) {
 			weak = instance = std::shared_ptr<T>(new T);
