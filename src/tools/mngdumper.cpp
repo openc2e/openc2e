@@ -1,10 +1,12 @@
 #include "endianlove.h"
 #include "fileformats/mngfile.h"
 #include "utils/enumerate.h"
+#include "utils/zip.h"
 
 #include <fmt/format.h>
 #include <ghc/filesystem.hpp>
 #include <fstream>
+#include <utility>
 
 namespace fs = ghc::filesystem;
 
@@ -37,20 +39,15 @@ int main(int argc, char **argv) {
 	std::ofstream script(script_filename, std::ios_base::binary);
 	script << file.script;
 
-	for (auto sample : enumerate(file.samples)) {
-		for (auto kv : file.samplemappings) {
-			if (kv.second != sample.i) {
-				continue;
-			}
-			fs::path sample_filename((output_directory / kv.first).native() + ".wav");
-			fmt::print("{}\n", sample_filename.string());
+	for (auto kv : zip(file.getSampleNames(), file.samples)) {
+		fs::path sample_filename((output_directory / kv.first).native() + ".wav");
+		fmt::print("{}\n", sample_filename.string());
 
-			std::ofstream out((output_directory / kv.first).native() + ".wav", std::ios_base::binary);
-			out.write("RIFF", 4);
-			write32le(out, 4 + sample->second); // TODO: RIFF chunk size
-			out.write("WAVE", 4);
-			out.write("fmt ", 4);
-			out.write(sample->first, sample->second);
-		}
+		std::ofstream out((output_directory / kv.first).native() + ".wav", std::ios_base::binary);
+		out.write("RIFF", 4);
+		write32le(out, 4 + kv.second.size()); // TODO: RIFF chunk size
+		out.write("WAVE", 4);
+		out.write("fmt ", 4);
+		out.write((const char*)kv.second.data(), kv.second.size());
 	}
 }

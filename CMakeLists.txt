@@ -28,13 +28,8 @@ if(NOT RE2C_EXECUTABLE)
 endif()
 
 if(WIN32)
-	add_subdirectory(externals/winflexbison EXCLUDE_FROM_ALL)
-	set(BISON_EXECUTABLE "win_bison")
-
 	add_subdirectory(externals/zlib EXCLUDE_FROM_ALL)
 else()
-	find_package(BISON REQUIRED)
-
 	find_package(ZLIB REQUIRED)
 endif()
 
@@ -110,8 +105,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/c2cobfile.cpp
 	src/fileformats/genomeFile.cpp
 	src/fileformats/mngfile.cpp
-	${GEN}/fileformats/mnglexer.cpp
-	${GEN}/fileformats/mngparser.tab.cpp
+	${GEN}/fileformats/mngparser.cpp
 	src/fileformats/peFile.cpp
 	src/fileformats/pngImage.cpp
 	src/fileformats/PrayFileReader.cpp
@@ -347,8 +341,8 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SRC}/docs/openc2e.6 ${BIN}/openc2e.6
 	DEPENDS docs/openc2e.6
 	)
-# it seems these add_custom_command for flex and bison could be made
-# into a macro... e.g. FLEX(file1) FLEX(file2) etc...
+# it seems these add_custom_command for re2c could be made
+# into a macro... e.g. RE2C(file1) RE2C(file2) etc...
 add_custom_command(
 	OUTPUT ${GEN}/cataloglexer.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
@@ -371,10 +365,10 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/fileformats/mnglexer.cpp
+	OUTPUT ${GEN}/fileformats/mngparser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mnglexer.cpp ${SRC}/src/fileformats/mnglexer.re2c
-	DEPENDS ${SRC}/src/fileformats/mnglexer.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mngparser.cpp ${SRC}/src/fileformats/mngparser.re2c
+	DEPENDS ${SRC}/src/fileformats/mngparser.re2c
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
@@ -391,18 +385,10 @@ add_custom_command(
 	DEPENDS ${SRC}/src/fileformats/PraySourceParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
-add_custom_command(
-	OUTPUT ${GEN}/fileformats/mngparser.tab.cpp ${GEN}/fileformats/mngparser.tab.hpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${BISON_EXECUTABLE} -d --name-prefix=mng --file-prefix="${GEN}/fileformats/mngparser" src/fileformats/mngparser.ypp
-	DEPENDS src/fileformats/mngparser.ypp
-	WORKING_DIRECTORY ${SRC})
-
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
 add_custom_target(generated DEPENDS
 	${GEN}/caoslexer.cpp
-	${GEN}/mngparser.tab.cpp ${GEN}/mngparser.tab.hpp
-	${GEN}/mnglexer.cpp
+	${GEN}/mngparser.cpp
 	${GEN}/cataloglexer.cpp
 	${GEN}/cmddata.cpp
 )

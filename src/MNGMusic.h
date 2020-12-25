@@ -2,6 +2,7 @@
 
 #include "audiobackend/AudioBackend.h"
 #include "fileformats/mngfile.h"
+#include "fileformats/mngparser.h"
 #include "optional.h"
 #include <chrono>
 #include <memory>
@@ -33,117 +34,95 @@ public:
 	bool playing_silence = true;
 };
 
-class MusicWave {
-protected:
-	unsigned int sampleno;
-	MNGFile *parent;
-
-public:
-	MusicWave(MNGFile *p, MNGWaveNode *w);
-	~MusicWave();
-	AudioChannel play(AudioBackend *b, bool looping=false);
-};
-
 class MusicStage {
 public:
-	MusicStage(MNGStageNode *n);
-	MNGExpression *pan, *volume, *delay, *tempodelay;
+	MusicStage(MNGStage);
+	optional<MNGExpression> pan, volume, delay, tempodelay;
 };
 
 class MusicEffect {
 public:
-	MusicEffect(MNGEffectDecNode *n);
+	MusicEffect(MNGEffect);
+	std::string name;
 	std::vector<std::shared_ptr<MusicStage> > stages;
 };
 
 class MusicVoice {
-protected:
-	MNGVoiceNode *node;
-	MNGUpdateNode *updatenode;
-	class MusicLayer *parent;
-	std::shared_ptr<MusicWave> wave;
-	std::shared_ptr<MusicEffect> effect;
-
-	std::vector<MNGConditionNode *> conditions;
-
-	MNGExpression *interval_expression;
-	float interval, volume;
-
 public:
-	MusicVoice(class MusicLayer *p, MNGVoiceNode *n);
-	std::shared_ptr<MusicWave> getWave() { return wave; }
-	float getInterval() { return interval; }
-	float getVolume() { return volume; }
-	std::shared_ptr<MusicEffect> getEffect() { return effect; }
+	class MusicLayer *parent;
+	std::string wave;
+	std::vector<MNGCondition> conditions;
+	std::shared_ptr<MusicEffect> effect;
+	optional<MNGExpression> interval;
+	std::vector<MNGUpdate> updates;
+
+	MusicVoice(class MusicLayer *p, MNGVoice n);
 	bool shouldPlay();
 	void runUpdateBlock();
-	MusicLayer *getParent() { return parent; }
 };
 
 class MusicLayer {
-protected:
-	MNGUpdateNode *updatenode;
-	MusicTrack *parent;
-
-	std::map<std::string, float> variables;
-	float updaterate, volume, interval, beatsynch, pan;
-
-	MusicLayer(MusicTrack *p);
-	void runUpdateBlock();
-
 public:
+	MusicTrack *parent = nullptr;
+	std::unordered_map<std::string, float> variables;
+	std::vector<MNGUpdate> updates;
+	float updaterate, volume;
+
 	virtual ~MusicLayer() = default;
+	void runUpdateBlock();
 	MusicTrack *getParent() { return parent; }
-	float &getVariable(std::string name) { return variables[name]; }
-	virtual void update(float track_volume, float track_beatlength) = 0;
-	float getVolume() { return volume; }
-	float getInterval() { return interval; }
-	float getPan() { return pan; }
+	virtual float &getVariable(std::string name) = 0;
 };
 
 class MusicAleotoricLayer : public MusicLayer {
-protected:
+public:
 	struct QueuedWave {
-		std::shared_ptr<MusicWave> wave;
+		std::string wave_name;
 		mngtimepoint start_time;
 		float volume;
 		float pan;
 	};
 
+	std::string name;
 	std::shared_ptr<MusicEffect> effect;
 	std::vector<std::shared_ptr<MusicVoice> > voices;
 	mngtimepoint next_update_at;
 	std::shared_ptr<MusicVoice> last_voice;
 	std::vector<QueuedWave> queued_waves;
 	AudioBackend* backend;
+	float interval;
+	optional<float> beatsynch;
 
-public:
-	MusicAleotoricLayer(MNGAleotoricLayerNode *n, MusicTrack *p, AudioBackend *b);
+	MusicAleotoricLayer(MNGAleotoricLayer n, MusicTrack *p, AudioBackend *b);
 	void update(float track_volume, float track_beatlength);
+	float &getVariable(std::string name);
 };
 
 class MusicLoopLayer : public MusicLayer {
-protected:
-	std::shared_ptr<MusicWave> wave;
+public:
+	std::string wave;
 	AudioChannel channel;
 	mngtimepoint next_update_at;
 	AudioBackend* backend;
+	float pan = 0.0;
 
-public:
-	MusicLoopLayer(MNGLoopLayerNode *n, MusicTrack *p, AudioBackend *b);
-	void update(float track_volume, float track_beatlength);
+	MusicLoopLayer(MNGLoopLayer n, MusicTrack *p, AudioBackend *b);
+	void update(float track_volume);
+	float &getVariable(std::string name);
 };
 
 class MusicTrack {
 public:
-	MNGTrackDecNode *node;
+	MNGTrack node;
 	MNGFile *parent;
 
-	std::vector<std::shared_ptr<MusicLayer> > layers;
+	std::vector<std::shared_ptr<MusicAleotoricLayer>> aleotoriclayers;
+	std::vector<std::shared_ptr<MusicLoopLayer>> looplayers;
+	std::vector<std::shared_ptr<MusicEffect>> effects;
 
 	float fadein, fadeout, beatlength, volume;
 
-	MusicTrack(MNGFile *p, MNGTrackDecNode *n, AudioBackend *b);
+	MusicTrack(MNGFile *p, MNGScript s, MNGTrack n, AudioBackend *b);
 	void update();
 
 	void startFadeIn();
@@ -151,7 +130,7 @@ public:
 	bool fadedOut();
 	float getCurrentFadeMultiplier();
 
-	std::string getName() { return node->getName(); }
+	std::string getName() { return node.name; }
 
 	optional<mngtimepoint> fadein_start;
 	optional<mngtimepoint> fadeout_start;

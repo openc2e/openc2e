@@ -2,6 +2,7 @@
 
 #include "endianlove.h"
 #include "utils/ascii_tolower.h"
+#include "utils/find_if.h"
 #include <algorithm>
 #include <cmath> // for cos/sin
 #include <iostream> // for debug messages
@@ -9,6 +10,8 @@
 #ifndef M_PI
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
+
+using namespace mngtoktype;
 
 MNGMusic::MNGMusic(const std::shared_ptr<AudioBackend>& b) : backend(b) {}
 MNGMusic::~MNGMusic() = default;
@@ -43,12 +46,14 @@ void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
 		}
 	}
 
-	if (file->tracks.find(trackname) == file->tracks.end()) {
+	auto parsed_script = mngparse(file->script);
+	auto track = find_if(parsed_script.tracks, [&](const auto &t){ return ascii_tolower(t.name) == trackname; });
+	if (!track) {
 		std::cout << "Couldn't find MNG track '" << trackname << "' ('" << file->name << "')!" << std::endl;
 		return; // TODO: exception?
 	}
 
-	playTrack(std::make_shared<MusicTrack>(file, file->tracks[trackname], backend.get()));
+	playTrack(std::make_shared<MusicTrack>(file, parsed_script, *track, backend.get()));
 }
 
 void MNGMusic::playTrack(std::shared_ptr<MusicTrack> track) {
@@ -81,333 +86,164 @@ void MNGMusic::stop() {
 	// TODO
 }
 
-float evaluateExpression(MNGExpression *e, MusicStage *stage = NULL, MusicVoice *voice = NULL, MusicLayer *layer = NULL) {
-	if (MNGVariableNode *v = dynamic_cast<MNGVariableNode *>(e)) {
-		if (stage) switch (v->getType()) {
-			case NAMED:
-			case INTERVAL:
-				throw MNGFileException("expression " + e->dump() + " invalid in Stage");
-
-			case VOLUME:
-			case PAN:
-				throw MNGFileException(e->dump() + " not evaluatable in Stage yet"); // TODO
+static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = nullptr) {
+	switch (e.type) {
+		case MNGExpression::MNGEXPRESSION_FLOAT:
+			return e.getFloat();
+		case MNGExpression::MNGEXPRESSION_STRING:
+		{
+			std::string variable = e.getString();
+			if (layer == nullptr) {
+				throw MNGFileException("Variable '" + variable + "' only valid inside Layer");
+			}
+			return layer->getVariable(variable);
 		}
-		else if (voice) switch (v->getType()) {
-			case NAMED:
-				return voice->getParent()->getVariable(v->getName());
-
-			case PAN:
-				throw MNGFileException("expression " + e->dump() + " invalid in Voice");
-
-			case INTERVAL:
-			case VOLUME:
-				throw MNGFileException(e->dump() + " not evaluatable in Voice yet"); // TODO
+		case MNGExpression::MNGEXPRESSION_FUNCTION:
+		{
+			const auto& function = e.getFunction();
+			switch (function.type) {
+			case MNG_ADD:
+				return evaluateExpression(function.first, layer)
+					+ evaluateExpression(function.second, layer);
+			case MNG_SUBTRACT:
+				return evaluateExpression(function.first, layer)
+					- evaluateExpression(function.second, layer);
+			case MNG_MULTIPLY:
+				return evaluateExpression(function.first, layer)
+					* evaluateExpression(function.second, layer);
+			case MNG_DIVIDE:
+				return evaluateExpression(function.first, layer)
+					/ evaluateExpression(function.second, layer);
+			case MNG_SINEWAVE:
+				return sin(2 * M_PI * (evaluateExpression(function.first, layer)
+					/ evaluateExpression(function.second, layer)));
+			case MNG_COSINEWAVE:
+				return cos(2 * M_PI * (evaluateExpression(function.first, layer)
+					/ evaluateExpression(function.second, layer)));
+			case MNG_RANDOM:
+			{
+				float first = evaluateExpression(function.first, layer);
+				float second = evaluateExpression(function.second, layer);
+				return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
+			}
+			default:
+				// TODO: set up actual function names enum
+				break;
+			}
 		}
-		else if (layer) switch (v->getType()) {
-			case NAMED:
-				return layer->getVariable(v->getName());
-
-			case VOLUME:
-				return layer->getVolume();
-
-			case INTERVAL:
-				return layer->getInterval();
-
-			case PAN:
-				return layer->getPan();
-		}
 	}
-
-	if (MNGConstantNode *c = dynamic_cast<MNGConstantNode *>(e)) {
-		return c->getValue();
-	}
-
-	if (MNGAddNode *add = dynamic_cast<MNGAddNode *>(e)) {
-		return evaluateExpression(add->first(), stage, voice, layer)
-			+ evaluateExpression(add->second(), stage, voice, layer);
-	}
-
-	if (MNGSubtractNode *sub = dynamic_cast<MNGSubtractNode *>(e)) {
-		return evaluateExpression(sub->first(), stage, voice, layer)
-			- evaluateExpression(sub->second(), stage, voice, layer);
-	}
-
-	if (MNGMultiplyNode *mul = dynamic_cast<MNGMultiplyNode *>(e)) {
-		return evaluateExpression(mul->first(), stage, voice, layer)
-			* evaluateExpression(mul->second(), stage, voice, layer);
-	}
-
-	if (MNGDivideNode *div = dynamic_cast<MNGDivideNode *>(e)) {
-		return evaluateExpression(div->first(), stage, voice, layer)
-			/ evaluateExpression(div->second(), stage, voice, layer);
-	}
-
-	if (MNGSineWaveNode *sinewave = dynamic_cast<MNGSineWaveNode *>(e)) {
-		return sin(2 * M_PI * (evaluateExpression(sinewave->first(), stage, voice, layer)
-			/ evaluateExpression(sinewave->second(), stage, voice, layer)));
-	}
-
-	if (MNGCosineWaveNode *cosinewave = dynamic_cast<MNGCosineWaveNode *>(e)) {
-		return cos(2 * M_PI * (evaluateExpression(cosinewave->first(), stage, voice, layer)
-			/ evaluateExpression(cosinewave->second(), stage, voice, layer)));
-	}
-
-	if (MNGRandomNode *r = dynamic_cast<MNGRandomNode *>(e)) {
-		float first = evaluateExpression(r->first(), stage, voice, layer);
-		float second = evaluateExpression(r->second(), stage, voice, layer);
-		return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
-	}
-
-	throw MNGFileException("couldn't evaluate expression " + e->dump());
+	// TODO: e->dump
+	throw MNGFileException("couldn't evaluate expression");
 }
 
-MusicWave::MusicWave(MNGFile *p, MNGWaveNode *n) {
-	parent = p;
-	sampleno = n->getSampleNumber();
-	if (sampleno >= parent->samples.size())
-		throw MNGFileException("sample not present");
-}
-
-MusicWave::~MusicWave() {
-}
-
-AudioChannel MusicWave::play(AudioBackend *backend, bool looping) {
-	char *data = parent->samples[sampleno].first;
-	unsigned int length = (unsigned int)parent->samples[sampleno].second;
+static AudioChannel playSample(const std::string& name, MNGFile *file, AudioBackend* backend, bool looping=false) {
+	unsigned int sampleno = file->getSampleForName(name);
+	auto *data = file->samples[sampleno].data();
+	auto length = file->samples[sampleno].size();
 	std::vector<uint8_t> buf(length + 8);
 	memcpy(buf.data(), "WAVEfmt ", 8);
 	memcpy(buf.data() + 8, data, length);
-	// TODO: prettify this, don't depend on SDLMixerBackend
+	// TODO: prettify this
 	return backend->playWavData(buf.data(), buf.size(), looping);
 }
 
-MusicStage::MusicStage(MNGStageNode *node) {
-	pan = NULL;
-	volume = NULL;
-	delay = NULL;
-	tempodelay = NULL;
+MusicStage::MusicStage(MNGStage node) {
+	pan = node.pan.value_or(0.0);
+	volume = node.volume.value_or(1.0);
+	delay = node.delay.value_or(1.0); // TODO: default? error if doesn't have one of these or tempodelay?
+	tempodelay = node.delay.value_or(1.0); // TODO: default?
+}
 
-	for (auto &n : *node->children) {
-		if (MNGPanNode *p = dynamic_cast<MNGPanNode *>(n)) {
-			pan = p->getExpression();
-			continue;
-		}
-
-		if (MNGEffectVolumeNode *v = dynamic_cast<MNGEffectVolumeNode *>(n)) {
-			volume = v->getExpression();
-			continue;
-		}
-
-		if (MNGDelayNode *d = dynamic_cast<MNGDelayNode *>(n)) {
-			delay = d->getExpression();
-			continue;
-		}
-
-		if (MNGTempoDelayNode *td = dynamic_cast<MNGTempoDelayNode *>(n)) {
-			tempodelay = td->getExpression();
-			continue;
-		}
-
-		throw MNGFileException("unexpected node in Stage: " + n->dump());
+MusicEffect::MusicEffect(MNGEffect node) {
+	name = node.name;
+	for (auto &s : node.stages) {
+		stages.push_back(std::make_shared<MusicStage>(s));
 	}
 }
 
-MusicEffect::MusicEffect(MNGEffectDecNode *node) {
-	for (auto &c : *node->children) {
-		stages.push_back(std::make_shared<MusicStage>(c));
-	}
-}
-
-MusicVoice::MusicVoice(MusicLayer *p, MNGVoiceNode *n) {
-	node = n;
+MusicVoice::MusicVoice(MusicLayer *p, MNGVoice node) {
 	parent = p;
 
-	interval = 0.0f;
-	interval_expression = NULL;
-	volume = 1.0f;
-
-	updatenode = NULL;
-
-	for (auto &n : *node->children) {
-		if (MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n)) {
-			// TODO: share duplicate MusicWaves
-			wave = std::make_shared<MusicWave>(p->getParent()->parent, e);
-			continue;
+	wave = node.wave;
+	conditions = node.conditions;
+	
+	if (node.effect) {
+		auto toplevel_effect = find_if(parent->parent->effects,
+			[&](auto e) { return ascii_tolower(e->name) == ascii_tolower(*node.effect); });
+		if (!toplevel_effect) {
+			throw MNGFileException("couldn't find effect '" + *node.effect + "'");
 		}
-
-		if (MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n)) {
-			interval_expression = in->getExpression();
-			continue;
-		}
-
-		if (MNGConditionNode *c = dynamic_cast<MNGConditionNode *>(n)) {
-			conditions.push_back(c);
-			continue;
-		}
-
-		if (MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n)) {
-			updatenode = u;
-			continue;
-		}
-
-		if (MNGEffectNode *eff = dynamic_cast<MNGEffectNode *>(n)) {
-			if (effect)
-				throw MNGFileException("got effect '" + eff->getName() + "' but we already have one!");
-
-			// TODO: share effects
-			auto &effects = parent->getParent()->parent->effects;
-			if (effects.find(eff->getName()) == effects.end())
-				throw MNGFileException("couldn't find effect '" + eff->getName() + "'");
-
-			MNGEffectDecNode *n = effects[eff->getName()];
-			effect = std::make_shared<MusicEffect>(n);
-			continue;
-		}
-
-		throw MNGFileException("unexpected node in Voice: " + n->dump());
+		effect = *toplevel_effect;
 	}
-
-	if (!wave) {
-		throw MNGFileException("Voice must have a Wave node: " + n->dump());
-	}
+	interval = node.interval;
+	updates = node.updates;
 }
 
 bool MusicVoice::shouldPlay() {
 	for (auto &n : conditions) {
-		float value = evaluateExpression(n->getVariable(), NULL, this);
-		if (value < n->minimum() || value > n->maximum())
+		float value = parent->getVariable(n.variable);
+		float minimum = evaluateExpression(n.minimum, parent);
+		float maximum = evaluateExpression(n.maximum, parent);
+		if (value < minimum || value > maximum) {
 			return false;
+		}
 	}
 	return true;
 }
 
-MusicLayer::MusicLayer(MusicTrack *p) {
-	parent = p;
-
-	updaterate = 1.0f;
-	volume = 1.0f;
-	interval = 0.0f;
-	beatsynch = 0.0f;
-	pan = 0.0f;
-
-	updatenode = NULL;
-
-	// TODO: hack
-	variables["Mood"] = 1.0f;
-	variables["Threat"] = 0.5f;
-}
-
 void MusicLayer::runUpdateBlock() {
-	if (!updatenode) return;
-
-	for (auto &n : *updatenode->children) {
-		float value = evaluateExpression(n->getExpression(), NULL, NULL, this);
-		MNGVariableNode *var = n->getVariable();
-		switch (var->getType()) {
-			case NAMED:
-				variables[var->getName()] = value;
-				break;
-
-			case INTERVAL:
-				interval = value;
-				break;
-
-			case VOLUME:
-				volume = value;
-				break;
-
-			case PAN:
-				pan = value;
-				break;
-		}
+	for (auto update : updates) {
+		getVariable(update.variable) = evaluateExpression(update.value, this);
 	}
 }
 
 void MusicVoice::runUpdateBlock() {
-	if (interval_expression) interval = evaluateExpression(interval_expression, NULL, this);
-
-	if (!updatenode) return;
-
-	for (auto &n : *updatenode->children) {
-		float value = evaluateExpression(n->getExpression(), NULL, this);
-		MNGVariableNode *var = n->getVariable();
-		switch (var->getType()) {
-			case NAMED:
-				parent->getVariable(var->getName()) = value;
-				break;
-
-			case INTERVAL:
-				interval = value;
-				break;
-
-			case VOLUME:
-				volume = value;
-				break;
-
-			case PAN:
-				throw MNGFileException("panic: attempt to set Pan inside Voice update"); // TODO?
-		}
+	for (auto kv : updates) {
+		parent->getVariable(kv.variable) = evaluateExpression(kv.value, parent);
 	}
 }
 
-MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayerNode *node, MusicTrack *p, AudioBackend *b) : MusicLayer(p) {
+MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack *p, AudioBackend *b) {
+	parent = p;
 	backend = b;
-	for (auto &n : *node->children) {
-		if (MNGEffectNode *e = dynamic_cast<MNGEffectNode *>(n)) {
-			if (effect)
-				throw MNGFileException("got effect '" + e->getName() + "' but we already have one!");
-
-			// TODO: share effects
-			std::map<std::string, class MNGEffectDecNode *> &effects = parent->parent->effects;
-			if (effects.find(e->getName()) == effects.end())
-				throw MNGFileException("couldn't find effect '" + e->getName() + "'");
-
-			MNGEffectDecNode *n = effects[e->getName()];
-			effect = std::make_shared<MusicEffect>(n);
-			continue;
+	name = node.name;
+	
+	volume = node.volume.value_or(1.0);
+	if (node.effect) {
+		auto toplevel_effect = find_if(parent->effects,
+			[&](auto e) { return ascii_tolower(e->name) == ascii_tolower(*node.effect); });
+		if (!toplevel_effect) {
+			throw MNGFileException("couldn't find effect '" + *node.effect + "'");
 		}
-
-		if (MNGVoiceNode *v = dynamic_cast<MNGVoiceNode *>(n)) {
-			voices.push_back(std::make_shared<MusicVoice>(this, v));
-			continue;
-		}
-
-		if (MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n)) {
-			updatenode = u;
-			continue;
-		}
-
-		if (MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n)) {
-			volume = evaluateExpression(lv->getExpression());
-			continue;
-		}
-
-		if (MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n)) {
-			updaterate = evaluateExpression(ur->getExpression());
-			continue;
-		}
-
-		if (MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n)) {
-			std::string name = vd->getName();
-			float value = evaluateExpression(vd->getExpression());
-			variables[name] = value;
-			continue;
-		}
-
-		if (MNGBeatSynchNode *bs = dynamic_cast<MNGBeatSynchNode *>(n)) {
-			beatsynch = evaluateExpression(bs->getExpression());
-			continue;
-		}
-
-		if (MNGIntervalNode *in = dynamic_cast<MNGIntervalNode *>(n)) {
-			interval = evaluateExpression(in->getExpression());
-			continue;
-		}
-
-		throw MNGFileException("unexpected node in AleotoricLayer: " + n->dump());
+		effect = *toplevel_effect;
 	}
+	beatsynch = node.beatsynch; // TODO: default?
+	updaterate = node.updaterate.value_or(0.0); // TODO: default?
+	interval = node.interval.value_or(1.0); // TODO: default?
+	variables = node.variables;
+	updates = node.updates;
+	for (auto v : node.voices) {
+		voices.push_back(std::make_shared<MusicVoice>(this, v));
+	}
+	
+	// TODO: hack
+	variables["Mood"] = 1.0f;
+	variables["Threat"] = 0.5f;
 
 	runUpdateBlock();
+}
+
+float& MusicAleotoricLayer::getVariable(std::string name) {
+	if (name == "Volume") {
+		return volume;
+	}
+	if (name == "Interval") {
+		return interval;
+	}
+	if (name == "Pan") {
+		throw creaturesException("'Pan' is not a valid variable inside AleotoricLayer");
+	}
+	return variables[name];
 }
 
 void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
@@ -418,7 +254,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 
 	for (auto qw = queued_waves.begin(); qw != queued_waves.end(); ) {
 		if (mngclock::now() >= qw->start_time) {
-			auto channel = qw->wave->play(backend);
+			auto channel = playSample(qw->wave_name, parent->parent, backend);
 			backend->setChannelVolume(channel, qw->volume * current_volume);
 			backend->setChannelPan(channel, qw->pan);
 			qw = queued_waves.erase(qw);
@@ -441,85 +277,83 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	}
 	// try to avoid playing the same voice twice in a row, it sounds awful and
 	// doesn't seem to happen in the real engine
-	if (!available_voices.size() && last_voice->shouldPlay()) {
+	if (!available_voices.size() && last_voice && last_voice->shouldPlay()) {
 		available_voices.push_back(last_voice);
 	}
 
 	if (available_voices.size()) {
 		auto voice = last_voice = available_voices[rand() % available_voices.size()];
-		auto voice_effect = voice->getEffect() ? voice->getEffect() : effect;
+		auto our_effect = voice->effect ? voice->effect : effect;
 		// TODO: do effects play the original voice, and then each stage? or just each stage?
-		if (voice_effect) {
+		if (our_effect) {
 			mngtimepoint start_offset = mngclock::now();
-			for (auto &stage : voice_effect->stages) {
-				float volume_value = stage->volume ? evaluateExpression(stage->volume, stage.get()) : 1.0f;
+			for (auto &stage : our_effect->stages) {
+				float volume_value = stage->volume ? evaluateExpression(*stage->volume) : 1.0f;
 
-				float pan_value = stage->pan ? evaluateExpression(stage->pan, stage.get()) : 0.0f;
-				// TODO: better pan_value calculation
-				if (pan != 0.0f) {
-					pan_value = pan_value ? (pan + pan_value) / 2.0f : pan;
-				}
+				float pan_value = stage->pan ? evaluateExpression(*stage->pan) : 0.0f;
 
-				float delay_value = stage->delay ? evaluateExpression(stage->delay, stage.get()) : 0.0f;
+				float delay_value = stage->delay ? evaluateExpression(*stage->delay) : 0.0f;
 				if (stage->tempodelay) {
-					delay_value += evaluateExpression(stage->tempodelay, stage.get()) * track_beatlength;
+					delay_value += evaluateExpression(*stage->tempodelay) * track_beatlength;
 				}
 
 				// first as float and then as whatever internal representation...
 				start_offset += dseconds(delay_value);
-				queued_waves.push_back({voice->getWave(), start_offset, volume_value, pan_value});
+				queued_waves.push_back({voice->wave, start_offset, volume_value, pan_value});
 			}
 		} else {
-			auto channel = voice->getWave()->play(backend); // TODO: hold onto this to change params later as layer params update
+			auto channel = playSample(voice->wave, parent->parent, backend); // TODO: hold onto this to change params later as layer params update
 			backend->setChannelVolume(channel, current_volume);
-			backend->setChannelPan(channel, pan);
 		}
-
+		
+		auto our_interval = [&]{
+			if (voice->interval) { return evaluateExpression(*voice->interval, this); }
+			if (beatsynch) { return *beatsynch * track_beatlength; }
+			return interval;
+		}();
+		
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
 		 * GR's source says "These take effect after playback of the voice has begun"
 		 * so I try to run it in the same place that code does, for now */
 		voice->runUpdateBlock();
 
 		// TODO: this isn't right. we should update offset even if a voice doesn't play,
-		// TODO: and also the intervals aren't added, the voice interval overrides the track interval.
-		float our_interval = interval + voice->getInterval() + (beatsynch * track_beatlength);
+		// TODO: updates are distinct from starting new voices, handle the timers separately
 		next_update_at = mngclock::now() + dseconds(our_interval);
 	}
 }
 
-MusicLoopLayer::MusicLoopLayer(MNGLoopLayerNode *node, MusicTrack *p, AudioBackend *b) : MusicLayer(p) {
+MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack *p, AudioBackend *b) {
+	parent = p;
 	backend = b;
+
+	wave = node.wave;
+	volume = node.volume.value_or(1.0);
+	updaterate = node.updaterate.value_or(0); // TODO: what should the default be?
+	variables = node.variables;
+	updates = node.updates;
 	
-	for (auto &n : *node->children) {
-		if (MNGWaveNode *e = dynamic_cast<MNGWaveNode *>(n)) {
-			wave = std::make_shared<MusicWave>(p->parent, e);
-			continue;
-		}
-
-		if (MNGUpdateRateNode *ur = dynamic_cast<MNGUpdateRateNode *>(n)) {
-			updaterate = evaluateExpression(ur->getExpression());
-			continue;
-		}
-
-		if (MNGVariableDecNode *vd = dynamic_cast<MNGVariableDecNode *>(n)) {
-			std::string name = vd->getName();
-			float value = evaluateExpression(vd->getExpression());
-			variables[name] = value;
-			continue;
-		}
-
-		if (MNGUpdateNode *u = dynamic_cast<MNGUpdateNode *>(n)) {
-			updatenode = u;
-			continue;
-		}
-
-		throw MNGFileException("unexpected node in LoopLayer: " + n->dump());
-	}
+	// TODO: hack
+	variables["Mood"] = 1.0f;
+	variables["Threat"] = 0.5f;
 }
 
-void MusicLoopLayer::update(float track_volume, float track_beatlength) {
+float& MusicLoopLayer::getVariable(std::string name) {
+	if (name == "Volume") {
+		return volume;
+	}
+	if (name == "Interval") {
+		throw creaturesException("'Interval' is not a valid variable inside LoopLayer");
+	}
+	if (name == "Pan") {
+		return pan;
+	}
+	return variables[name];
+}
+
+void MusicLoopLayer::update(float track_volume) {
 	if (!channel) {
-		channel = wave->play(backend, true);
+		channel = playSample(wave, parent->parent, backend, true);
 	}
 
 	float current_volume = volume * track_volume;
@@ -532,52 +366,29 @@ void MusicLoopLayer::update(float track_volume, float track_beatlength) {
 	}
 }
 
-MusicTrack::MusicTrack(MNGFile *p, MNGTrackDecNode *n, AudioBackend *b) {
+MusicTrack::MusicTrack(MNGFile *p, MNGScript script, MNGTrack n, AudioBackend *b) {
 	node = n;
 	parent = p;
 
-	volume = 1.0f;
+	volume = n.volume.value_or(1.0);
 	// TODO: what's the default fadein/fadeout?
 	// for now, changed this from 0.0f to 1.0f because otherwise c3 sounds silly
-	fadein = fadeout = 1.0f;
-	beatlength = 0.0f;
+	fadein = n.fadein.value_or(1.0);
+	fadeout = n.fadeout.value_or(1.0);
+	beatlength = n.beatlength.value_or(0.0f);
 
-	for (auto &n : *node->children) {
-		if (MNGAleotoricLayerNode *al = dynamic_cast<MNGAleotoricLayerNode *>(n)) {
-			layers.push_back(std::dynamic_pointer_cast<MusicLayer>(
-				std::make_shared<MusicAleotoricLayer>(al, this, b)
-			));
-			continue;
+	for (auto e : script.effects) {
+		effects.push_back(std::make_shared<MusicEffect>(e));
+	}
+	for (auto l : n.layers) {
+		switch (l.type) {
+			case MNGLayer::LOOPING:
+				looplayers.push_back(std::make_shared<MusicLoopLayer>(l.looplayer, this, b));
+				break;
+			case MNGLayer::ALEOTORIC:
+				aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(l.aleotoriclayer, this, b));
+				break;
 		}
-
-		if (MNGLoopLayerNode *ll = dynamic_cast<MNGLoopLayerNode *>(n)) {
-			layers.push_back(std::dynamic_pointer_cast<MusicLayer>(
-				std::make_shared<MusicLoopLayer>(ll, this, b)
-			));
-			continue;
-		}
-
-		if (MNGFadeInNode *fi = dynamic_cast<MNGFadeInNode *>(n)) {
-			fadein = evaluateExpression(fi->getExpression());
-			continue;
-		}
-
-		if (MNGFadeOutNode *fo = dynamic_cast<MNGFadeOutNode *>(n)) {
-			fadeout = evaluateExpression(fo->getExpression());
-			continue;
-		}
-
-		if (MNGBeatLengthNode *bl = dynamic_cast<MNGBeatLengthNode *>(n)) {
-			beatlength = evaluateExpression(bl->getExpression());
-			continue;
-		}
-
-		if (MNGLayerVolumeNode *lv = dynamic_cast<MNGLayerVolumeNode *>(n)) {
-			volume = evaluateExpression(lv->getExpression());
-			continue;
-		}
-
-		throw MNGFileException("unexpected node in Track: " + n->dump());
 	}
 }
 
@@ -604,8 +415,11 @@ float MusicTrack::getCurrentFadeMultiplier() {
 
 void MusicTrack::update() {
 	float our_volume = volume * getCurrentFadeMultiplier();
-	for (auto &l : layers) {
-		l->update(our_volume, beatlength);
+	for (auto ll : looplayers) {
+		ll->update(our_volume);
+	}
+	for (auto al : aleotoriclayers) {
+		al->update(our_volume, beatlength);
 	}
 }
 

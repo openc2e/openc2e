@@ -44,7 +44,6 @@ openc2e depends on:
 
 * SDL2
   * SDL2_mixer
-* bison
 * re2c
 * Python
 * CMake

@@ -21,11 +21,10 @@
 #include <fmt/core.h>
 #include "endianlove.h"
 #include "creaturesException.h"
-#include "fileformats/mngfile.h"
+#include "mngfile.h"
+#include "mngparser.h"
 #include "mmapifstream.h"
-
-MNGFile *g_mngfile = NULL;
-extern int mngparse(); // parser
+#include "shared_array.h"
 
 void decryptbuf(char * buf, int len) {
 	int i;
@@ -37,120 +36,53 @@ void decryptbuf(char * buf, int len) {
 }
 
 MNGFile::MNGFile(std::string n) {
-	sampleno = 0;
 	name = n;
 	
 	stream = new mmapifstream(n);
 	if (!stream) { delete stream; throw MNGFileException("open failed"); }
 
 	// Read metavariables from beginning of file
-	numsamples = read32le(stream->map);
-	scriptoffset = read32le(stream->map + 4);
-	scriptlength = read32le(stream->map + 8);
+	uint32_t numsamples = read32le(stream->map);
+	uint32_t scriptoffset = read32le(stream->map + 4);
+	uint32_t scriptlength = read32le(stream->map + 8);
 
 	// read the samples
-	for(int i = 0; i < numsamples; i++) {
+	for (size_t i = 0; i < numsamples; i++) {
 		// Sample offsets and lengths are stored in pairs after the initial 16 bytes
-		int position = read32le(stream->map + 12 + (8 * i));
-		int size = read32le(stream->map + 16 + (8 * i));
-		samples.push_back(std::make_pair(stream->map + position, size));
+		uint32_t position = read32le(stream->map + 12 + (8 * i));
+		uint32_t size = read32le(stream->map + 16 + (8 * i));
+		samples.push_back(shared_array<uint8_t>(stream->map + position, stream->map + position + size));
 	}
 
 	// now we have the samples, read and decode the MNG script
-	script = (char *) malloc(scriptlength + 1);
-	script[scriptlength] = 0;
-	if(! script) { delete stream; throw MNGFileException("malloc failed"); }
-	memcpy(script, stream->map + scriptoffset, scriptlength);
-	decryptbuf(script, scriptlength);
+	script = std::string(stream->map + scriptoffset, stream->map + scriptoffset + scriptlength);
+	// script = (char *) malloc(scriptlength + 1);
+	// script[scriptlength] = 0;
+	// if(! script) { delete stream; throw MNGFileException("malloc failed"); }
+	// memcpy(script, stream->map + scriptoffset, scriptlength);
+	decryptbuf(const_cast<char*>(script.c_str()), scriptlength);
 
-	yyinit(script);
-	g_mngfile = this;
-	try {
-		mngparse();
-	} catch (...) {
-		delete stream;
-		g_mngfile = 0;
-		throw;
+	auto mngscript = mngparse(script);
+	
+	auto wave_names = mngscript.getWaveNames();
+	for (size_t i = 0; i < wave_names.size(); ++i) {
+		samplemappings[wave_names[i]] = i;
 	}
-	g_mngfile = 0;
-
-	processState *p = new processState(this);
-	for (std::map<std::string, MNGEffectDecNode *>::iterator i = effects.begin(); i != effects.end(); i++)
-		(*i).second->postProcess(p);
-	for (std::map<std::string, MNGTrackDecNode *>::iterator i = tracks.begin(); i != tracks.end(); i++)
-		(*i).second->postProcess(p);
-	// don't call postProcess on variabledec!
-	delete p;
 }
 
-void MNGFile::enumerateSamples() {
-	std::vector< std::pair< char *, int > >::iterator i;
-	for(i = samples.begin(); i != samples.end(); i++) {
-		printf("Position: \"%p\" Length: %i\n", (void *)(*i).first, (*i).second);
-		// PlaySound((*i).second.first, (*i).second.second);
-	}
+std::vector<std::string> MNGFile::getSampleNames() const {
+	return mngparse(script).getWaveNames();
 }
 
 unsigned int MNGFile::getSampleForName(std::string name) {
-	unsigned int n = -1;
-
-	if (samplemappings.find(name) != samplemappings.end()) {
-		n = samplemappings[name];
-	} else {
-		n = sampleno;
-		if (n >= samples.size())
-			throw MNGFileException("ran out of samples"); // TODO: more info
-		samplemappings[name] = n;
-		sampleno++;
+	if (samplemappings.find(name) == samplemappings.end()) {
+		throw MNGFileException("unknown sample name"); // TODO: more info
 	}
-
-	return n;
+	return samplemappings[name];
 }
 
 MNGFile::~MNGFile() {
-	for (std::map<std::string, MNGEffectDecNode *>::iterator i = effects.begin(); i != effects.end(); i++)
-		delete i->second;
-	for (std::map<std::string, MNGTrackDecNode *>::iterator i = tracks.begin(); i != tracks.end(); i++)
-		delete i->second;
-	for (std::map<std::string, MNGVariableDecNode *>::iterator i = variables.begin(); i != variables.end(); i++)
-		delete i->second;
-	free(script);
 	delete stream;
-}	
-
-void MNGFile::add(class MNGEffectDecNode *n) {
-	effects[n->getName()] = n;
-}
-
-void MNGFile::add(class MNGTrackDecNode *n) {
-	std::string trackname = n->getName();
-	std::transform(trackname.begin(), trackname.end(), trackname.begin(), (int(*)(int))tolower);
-	tracks[trackname] = n;
-}
-
-void MNGFile::add(class MNGVariableDecNode *n) {
-	variables[n->getName()] = n;
-}
-
-std::string MNGFile::dump() {
-	std::string buf;
-
-	std::map<std::string, class MNGEffectDecNode *>::iterator ei;
-	std::map<std::string, class MNGTrackDecNode *>::iterator ti;
-
-	for (ei = effects.begin(); ei != effects.end(); ei++) {
-		buf += fmt::format("{} {}\n", ei->first, ei->second->dump());
-	}
-
-	for (ti = tracks.begin(); ti != tracks.end(); ti++) {
-		buf += fmt::format("{} {}\n", ti->first, ti->second->dump());
-	}
-
-	return buf;
-}
-
-void mngerror(char const *s) {
-	throw MNGFileException(s, g_mngfile->yylineno);
 }
 
 /* vim: set noet: */

@@ -51,12 +51,13 @@ int main (int argc, char **argv) {
 
     std::string ext = ascii_tolower(fs::path(filename).extension());
     if (ext == ".mng") {
-      MNGFile *file = new MNGFile(filename);
+      MNGFile file(filename);
 
       if (argc == 2) {
+          auto parsed_script = mngparse(file.script);
           fmt::print("Tracks in {}:\n", filename);
-          for (auto kv : file->tracks) {
-              fmt::print("{}\n", kv.first);
+          for (auto t : parsed_script.tracks) {
+              fmt::print("{}\n", t.name);
           }
           return 0;
       }
@@ -66,7 +67,7 @@ int main (int argc, char **argv) {
       srand(time(NULL));
 
       MNGMusic mng_music(backend);
-      mng_music.playTrack(file, trackname);
+      mng_music.playTrack(&file, trackname);
       if (mng_music.playing_silence) {
           // If the track doesn't exist
           // TODO: better way to check this
