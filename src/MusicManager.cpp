@@ -19,6 +19,7 @@
 
 #include "MusicManager.h"
 #include "Engine.h"
+#include "MNGMusic.h"
 #include "SoundManager.h"
 #include "World.h"
 
@@ -28,9 +29,9 @@
 #include "Room.h"
 #include "MetaRoom.h"
 
-MusicManager musicmanager;
+MusicManager::MusicManager(const std::shared_ptr<AudioBackend>& backend_)
+	: backend(backend_), mng_music(std::make_unique<MNGMusic>(backend_)) {}
 
-MusicManager::MusicManager(std::shared_ptr<AudioBackend> backend_) : backend(backend_), mng_music(backend_) {}
 MusicManager::~MusicManager() {
 	stop();
 	for (std::map<std::string, MNGFile *>::iterator i = files.begin(); i != files.end(); i++) {
@@ -39,10 +40,8 @@ MusicManager::~MusicManager() {
 }
 
 void MusicManager::stop() {
-	mng_music.stop();
-	if (backend) {
-		backend->stopMIDI();
-	}
+	mng_music->stop();
+	backend->stopMIDI();
 }
 
 float MusicManager::getVolume() {
@@ -83,7 +82,7 @@ void MusicManager::setMIDIMuted(bool muted) {
 }
 
 void MusicManager::updateVolumes() {
-	mng_music.setVolume(music_muted ? 0 : music_volume);
+	mng_music->setVolume(music_muted ? 0 : music_volume);
 	backend->setMIDIVolume(isMIDIMuted() ? 0 : midi_volume);
 	backend->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.4);
 }
@@ -99,7 +98,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 	// TODO: what happens if you call the CAOS command MIDI and usemidimusicsystem isn't enabled?
 
 	if (usemidimusicsystem) {
-		mng_music.playSilence(); // or just stop it?
+		mng_music->playSilence(); // or just stop it?
 
 		if (track == "") {
 			backend->stopMIDI();
@@ -117,7 +116,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 	}
 
 	if (track == "Silence") {
-		mng_music.playSilence();
+		mng_music->playSilence();
 	} else {
 		std::string filename, trackname;
 
@@ -144,7 +143,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 		} else {
 			file = files[filename];
 		}
-		mng_music.playTrack(file, trackname);
+		mng_music->playTrack(file, trackname);
 	}
 	how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
 }
@@ -180,7 +179,7 @@ void MusicManager::tick() {
 			}
 		}
 	}
-	mng_music.update();
+	mng_music->update();
 	
 	// update volumes based on new volumes, muting, etc
 	updateVolumes();

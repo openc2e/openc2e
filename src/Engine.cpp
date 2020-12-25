@@ -329,7 +329,7 @@ void Engine::update() {
 	soundmanager.tick();
 	
 	// play C1 background wavs and MNG and MIDI music
-	musicmanager.tick();
+	musicmanager->tick();
 
 	// update our data for things like pace, race, ticktime, etc
 	ticktimes[ticktimeptr] = backend->ticks() - tickdata;
@@ -953,6 +953,7 @@ bool Engine::initialSetup() {
 	world.gallery->loadDefaultPalette();
 	
 	// initial setup
+	musicmanager = std::make_unique<MusicManager>(audio);
 	std::cout << "* Reading catalogue files..." << std::endl;
 	world.initCatalogue();
 	std::cout << "* Initial setup..." << std::endl;
@@ -1037,8 +1038,8 @@ bool Engine::initialSetup() {
 
 	if (!cmdline_enable_sound) {
 		soundmanager.setMuted(true);
-		musicmanager.setMuted(true);
-		musicmanager.setMIDIMuted(true);
+		musicmanager->setMuted(true);
+		musicmanager->setMIDIMuted(true);
 	}
 
 	// Let agents know the window size (makes the DS sound options panel update

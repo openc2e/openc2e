@@ -250,7 +250,7 @@ void caosVM::c_STRK() {
 	VM_PARAM_STRING(track)
 	VM_PARAM_INTEGER(latency)
 
-	musicmanager.playTrack(track, latency * 1000);
+	engine.musicmanager->playTrack(track, latency * 1000);
 }
 
 /**
@@ -269,9 +269,9 @@ void caosVM::c_VOLM() {
 	if (type == 0) {
 		soundmanager.setVolume(scaled_volume);
 	} else if (type == 1) {
-		musicmanager.setMIDIVolume(scaled_volume);
+		engine.musicmanager->setMIDIVolume(scaled_volume);
 	} else if (type == 2) {
-		musicmanager.setVolume(scaled_volume);
+		engine.musicmanager->setVolume(scaled_volume);
 	} else {
 		// In Creatures Village's !startup.cos
 		// TODO: do a full stacktrace like CaosException?
@@ -299,9 +299,9 @@ void caosVM::v_VOLM() {
 	} else if (type == 1) {
 		// Official documentation says "Currently not supported for MIDI", but Sea-Monkeys
 		// uses it.
-		volume = musicmanager.getMIDIVolume();
+		volume = engine.musicmanager->getMIDIVolume();
 	} else if (type == 2) {
-		volume = musicmanager.getVolume();
+		volume = engine.musicmanager->getVolume();
 	} else {
 		throw caosException("Can't get volume of audio type " + std::to_string(type));
 	}
@@ -323,12 +323,12 @@ void caosVM::v_MUTE() {
 
 	int value = 0;
 	if (soundmanager.isMuted()) value |= 1;
-	if (musicmanager.isMuted()) value |= 2;
+	if (engine.musicmanager->isMuted()) value |= 2;
 
 	value ^= eormask;
 
 	soundmanager.setMuted(value & 1);
-	musicmanager.setMuted(value & 2);
+	engine.musicmanager->setMuted(value & 2);
 
 	result.setInt(value & andmask);
 }
@@ -387,7 +387,7 @@ void caosVM::c_VOIS() {
 void caosVM::c_MIDI() {
 	VM_PARAM_STRING(midifile)
 
-	musicmanager.playTrack(midifile, 0);
+	engine.musicmanager->playTrack(midifile, 0);
 }
 
 /**
@@ -469,7 +469,7 @@ void caosVM::c_DBG_SINE() {
  Don't touch.
  */
 void caosVM::c_DBG_SBGM() {
-	musicmanager.stop();
+	engine.musicmanager->stop();
 }
 
 

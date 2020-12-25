@@ -20,11 +20,13 @@
 #ifndef _MUSICMANAGER_H
 #define _MUSICMANAGER_H
 
-#include "MNGMusic.h"
 #include "audiobackend/AudioChannel.h"
 #include <map>
 #include <memory>
 #include <string>
+
+class AudioBackend;
+class MNGMusic;
 
 class MusicManager {
 public:
@@ -54,12 +56,10 @@ private:
 	
 	AudioChannel creatures1_channel;
 	std::map<std::string, class MNGFile *> files;
-	MNGMusic mng_music;
+	std::unique_ptr<MNGMusic> mng_music;
 	std::string last_track;
 	unsigned int how_long_before_changing_track_ms = 0;
 };
-
-extern MusicManager musicmanager;
 
 #endif
 /* vim: set noet: */
