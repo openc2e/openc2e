@@ -276,6 +276,9 @@ target_link_libraries(creaturesarchivedumper fmt ghc_filesystem z)
 add_executable(mngdumper src/tools/mngdumper.cpp)
 target_link_libraries(mngdumper fmt ghc_filesystem openc2e-fileformats)
 
+add_executable(mngbuild src/tools/mngbuild.cpp)
+target_link_libraries(mngbuild fmt ghc_filesystem openc2e-fileformats)
+
 add_executable(mngplayer
 	src/MNGMusic.cpp
 	src/tools/mngplayer.cpp
@@ -459,6 +462,7 @@ list(APPEND dist_args
 		"$<TARGET_FILE:openc2e>"
 		"$<TARGET_FILE:cobdumper>"
 		"$<TARGET_FILE:mngdumper>"
+		"$<TARGET_FILE:mngbuild>"
 		"$<TARGET_FILE:praybuilder>"
 		"$<TARGET_FILE:praydumper>"
 		"$<TARGET_FILE:spritedumper>"
