@@ -101,6 +101,7 @@ public:
 
 	MusicAleotoricLayer(MNGAleotoricLayer n, MusicTrack *p, AudioBackend *b);
 	void update(float track_volume, float track_beatlength);
+	void stop();
 	float &getVariable(std::string name);
 };
 
@@ -114,6 +115,7 @@ public:
 
 	MusicLoopLayer(MNGLoopLayer n, MusicTrack *p, AudioBackend *b);
 	void update(float track_volume);
+	void stop();
 	float &getVariable(std::string name);
 };
 
@@ -130,7 +132,7 @@ public:
 
 	MusicTrack(MNGFile *p, MNGScript s, MNGTrack n, AudioBackend *b);
 	void update(float system_volume);
-
+	void stop();
 	void startFadeIn();
 	void startFadeOut();
 	bool fadedOut();

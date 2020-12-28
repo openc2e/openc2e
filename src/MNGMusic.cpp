@@ -14,7 +14,9 @@
 using namespace mngtoktype;
 
 MNGMusic::MNGMusic(const std::shared_ptr<AudioBackend>& b) : backend(b) {}
-MNGMusic::~MNGMusic() = default;
+MNGMusic::~MNGMusic() {
+	stop();
+}
 
 void MNGMusic::playSilence() {
 	playing_silence = true;
@@ -86,7 +88,13 @@ void MNGMusic::setVolume(float volume_) {
 }
 
 void MNGMusic::stop() {
-	// TODO
+	if (currenttrack) {
+		currenttrack->stop();
+		currenttrack.reset();
+	}
+	if (nexttrack) {
+		nexttrack.reset();
+	}
 }
 
 static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = nullptr) {
@@ -249,6 +257,14 @@ float& MusicAleotoricLayer::getVariable(std::string name) {
 	return variables[name];
 }
 
+void MusicAleotoricLayer::stop() {
+	for (auto pw : playing_waves) {
+		backend->stopChannel(pw.channel);
+	}
+	playing_waves = {};
+	queued_waves = {};
+}
+
 void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	float current_volume = volume * track_volume;
 
@@ -379,6 +395,11 @@ void MusicLoopLayer::update(float track_volume) {
 	}
 }
 
+void MusicLoopLayer::stop() {
+	backend->stopChannel(channel);
+	channel = {};
+}
+
 MusicTrack::MusicTrack(MNGFile *p, MNGScript script, MNGTrack n, AudioBackend *b) {
 	node = n;
 	parent = p;
@@ -466,4 +487,13 @@ void MusicTrack::startFadeOut() {
 
 bool MusicTrack::fadedOut() {
 	return fadeout_start && mngclock::now() >= *fadeout_start + dseconds(fadeout);
+}
+
+void MusicTrack::stop() {
+	for (auto ll : looplayers) {
+		ll->stop();
+	}
+	for (auto al : aleotoriclayers) {
+		al->stop();
+	}
 }
