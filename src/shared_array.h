@@ -9,6 +9,10 @@ class shared_array {
 public:
   shared_array() = default;
   explicit shared_array(size_t n) : ptr_(new T[n], [](T* t) { delete[] t; }), size_(n) {}
+  template <typename Iterator>
+  shared_array(Iterator begin, Iterator end) : shared_array(end - begin) {
+      std::copy(begin, end, data());
+  }
 
   T& operator[](ptrdiff_t i) {
     assert(ptr_);
