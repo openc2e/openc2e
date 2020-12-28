@@ -20,6 +20,7 @@ private:
 	void playTrack(std::shared_ptr<class MusicTrack> track);
 	std::shared_ptr<class MusicTrack> currenttrack, nexttrack;
 	std::shared_ptr<AudioBackend> backend;
+	float volume = 1.0;
 
 public:
 	MNGMusic(const std::shared_ptr<AudioBackend>& backend);
@@ -123,7 +124,7 @@ public:
 	float fadein, fadeout, beatlength, volume;
 
 	MusicTrack(MNGFile *p, MNGScript s, MNGTrack n, AudioBackend *b);
-	void update();
+	void update(float system_volume);
 
 	void startFadeIn();
 	void startFadeOut();

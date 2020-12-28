@@ -71,15 +71,18 @@ void MNGMusic::update() {
 	if (!currenttrack) {
 		return;
 	}
-	currenttrack->update();
+	currenttrack->update(volume);
 	if (nexttrack && currenttrack->fadedOut()) {
 		currenttrack = nexttrack;
 		nexttrack.reset();
 	}
 }
 
-void MNGMusic::setVolume(float volume) {
-	// TODO
+void MNGMusic::setVolume(float volume_) {
+	if (volume_ != volume) {
+		volume = volume_;
+		update();
+	}
 }
 
 void MNGMusic::stop() {
@@ -413,8 +416,8 @@ float MusicTrack::getCurrentFadeMultiplier() {
 	return 1.0;
 }
 
-void MusicTrack::update() {
-	float our_volume = volume * getCurrentFadeMultiplier();
+void MusicTrack::update(float system_volume) {
+	float our_volume = system_volume * volume * getCurrentFadeMultiplier();
 	for (auto ll : looplayers) {
 		ll->update(our_volume);
 	}
