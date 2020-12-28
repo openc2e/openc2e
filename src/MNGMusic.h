@@ -92,6 +92,7 @@ public:
 	std::shared_ptr<MusicEffect> effect;
 	std::vector<std::shared_ptr<MusicVoice> > voices;
 	mngtimepoint next_update_at;
+	mngtimepoint next_voice_at;
 	std::shared_ptr<MusicVoice> last_voice;
 	std::vector<QueuedWave> queued_waves;
 	std::vector<PlayingWave> playing_waves;

@@ -276,9 +276,6 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 			pw = playing_waves.erase(pw);
 		}
 	}
-
-	// TODO: handle updaterate correctly
-
 	for (auto qw = queued_waves.begin(); qw != queued_waves.end(); ) {
 		if (mngclock::now() >= qw->start_time) {
 			auto channel = playSample(qw->wave_name, parent->parent, backend);
@@ -291,26 +288,35 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 		}
 	}
 
-	if (mngclock::now() < next_update_at) {
+	if (mngclock::now() >= next_update_at) {
+		// I think this is how it works.. otherwise why allow UpdateRate in AleotoricLayer?
+		runUpdateBlock();
+		next_update_at = mngclock::now() + dseconds(updaterate);
+	}
+
+	if (mngclock::now() < next_voice_at) {
 		return;
 	}
 
-	runUpdateBlock();
+	auto voice = [&] {
+		decltype(voices) available_voices;
+		for (auto &voice : voices) {
+			if (!voice->shouldPlay()) continue;
+			if (last_voice.get() == voice.get()) continue;
+			available_voices.push_back(voice);
+		}
+		if (available_voices.size()) {
+			return last_voice = available_voices[rand() % available_voices.size()];
+		}
+		// try to avoid playing the same voice twice in a row, it sounds awful and
+		// doesn't seem to happen in the real engine
+		if (last_voice && last_voice->shouldPlay()) {
+			return last_voice;
+		}
+		return std::shared_ptr<MusicVoice>();
+	}();
 
-	decltype(voices) available_voices;
-	for (auto &voice : voices) {
-		if (!voice->shouldPlay()) continue;
-		if (last_voice.get() == voice.get()) continue;
-		available_voices.push_back(voice);
-	}
-	// try to avoid playing the same voice twice in a row, it sounds awful and
-	// doesn't seem to happen in the real engine
-	if (!available_voices.size() && last_voice && last_voice->shouldPlay()) {
-		available_voices.push_back(last_voice);
-	}
-
-	if (available_voices.size()) {
-		auto voice = last_voice = available_voices[rand() % available_voices.size()];
+	if (voice) {
 		auto our_effect = voice->effect ? voice->effect : effect;
 		// TODO: do effects play the original voice, and then each stage? or just each stage?
 		if (our_effect) {
@@ -334,22 +340,23 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 			backend->setChannelVolume(channel, current_volume);
 			playing_waves.push_back({channel, 1.0});
 		}
-		
-		auto our_interval = [&]{
-			if (voice->interval) { return evaluateExpression(*voice->interval, this); }
-			if (beatsynch) { return *beatsynch * track_beatlength; }
-			return interval;
-		}();
-		
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
 		 * GR's source says "These take effect after playback of the voice has begun"
 		 * so I try to run it in the same place that code does, for now */
 		voice->runUpdateBlock();
-
-		// TODO: this isn't right. we should update offset even if a voice doesn't play,
-		// TODO: updates are distinct from starting new voices, handle the timers separately
-		next_update_at = mngclock::now() + dseconds(our_interval);
 	}
+
+	// Voices' Update blocks can alter the Layer Interval, so keep this after the Voice Update block
+	float our_interval = [&]{
+		if (voice && voice->interval) {
+			return evaluateExpression(*voice->interval, this);
+		}
+		if (beatsynch) {
+			return *beatsynch * track_beatlength;
+		}
+		return interval;
+	}();
+	next_voice_at = mngclock::now() + dseconds(our_interval);
 }
 
 MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack *p, AudioBackend *b) {
