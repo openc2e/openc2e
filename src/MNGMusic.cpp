@@ -252,14 +252,23 @@ float& MusicAleotoricLayer::getVariable(std::string name) {
 void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	float current_volume = volume * track_volume;
 
+	for (auto pw = playing_waves.begin(); pw != playing_waves.end(); ) {
+		if (backend->getChannelState(pw->channel) == AUDIO_PLAYING) {
+			backend->setChannelVolume(pw->channel, pw->volume * current_volume);
+			pw++;
+		} else {
+			pw = playing_waves.erase(pw);
+		}
+	}
+
 	// TODO: handle updaterate correctly
-	// TODO: keep track of playing voices and update them?
 
 	for (auto qw = queued_waves.begin(); qw != queued_waves.end(); ) {
 		if (mngclock::now() >= qw->start_time) {
 			auto channel = playSample(qw->wave_name, parent->parent, backend);
 			backend->setChannelVolume(channel, qw->volume * current_volume);
 			backend->setChannelPan(channel, qw->pan);
+			playing_waves.push_back({channel, qw->volume});
 			qw = queued_waves.erase(qw);
 		} else {
 			qw++;
@@ -305,8 +314,9 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 				queued_waves.push_back({voice->wave, start_offset, volume_value, pan_value});
 			}
 		} else {
-			auto channel = playSample(voice->wave, parent->parent, backend); // TODO: hold onto this to change params later as layer params update
+			auto channel = playSample(voice->wave, parent->parent, backend);
 			backend->setChannelVolume(channel, current_volume);
+			playing_waves.push_back({channel, 1.0});
 		}
 		
 		auto our_interval = [&]{

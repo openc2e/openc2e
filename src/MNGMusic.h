@@ -83,6 +83,10 @@ public:
 		float volume;
 		float pan;
 	};
+	struct PlayingWave {
+		AudioChannel channel;
+		float volume;
+	};
 
 	std::string name;
 	std::shared_ptr<MusicEffect> effect;
@@ -90,6 +94,7 @@ public:
 	mngtimepoint next_update_at;
 	std::shared_ptr<MusicVoice> last_voice;
 	std::vector<QueuedWave> queued_waves;
+	std::vector<PlayingWave> playing_waves;
 	AudioBackend* backend;
 	float interval;
 	optional<float> beatsynch;
