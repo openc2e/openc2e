@@ -32,7 +32,6 @@ openc2e is intended to support:
 * Physics improvements (Especially C3+)
 * Network ability (the Docking Station warp)
 * Serialization (world saving, creature exporting, ...)
-* Music
 
 There are lots of [open issues](https://github.com/openc2e/openc2e/issues) that still need solving.
 
