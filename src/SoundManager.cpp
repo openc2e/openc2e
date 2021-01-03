@@ -1,4 +1,5 @@
 #include "SoundManager.h"
+#include "caosValue.h"
 #include "World.h"
 #include "Engine.h"
 #include "Map.h"

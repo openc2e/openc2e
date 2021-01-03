@@ -20,15 +20,17 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
-#include "caosValue.h"
+#include "AgentRef.h"
 #include "partzorder.h"
 #include "renderablezorder.h"
 #include <memory>
 #include <set>
+#include <string>
 #include <map>
 #include <list>
 #include <vector>
 
+class caosValue;
 class caosVM;
 class CompoundPart;
 class genomeFile;
@@ -40,17 +42,12 @@ class prayManager;
 class renderable;
 class RenderTarget;
 class Scriptorium;
+struct scriptevent;
 
 struct cainfo {
 	float gain;
 	float loss;
 	float diffusion;
-};
-
-struct scriptevent {
-	unsigned short scriptno;
-	AgentRef agent, from;
-	caosValue p[2];
 };
 
 class World {
@@ -100,7 +97,7 @@ public:
 	
 	caosVM *getVM(Agent *owner);
 	void freeVM(caosVM *);
-	void queueScript(unsigned short event, AgentRef agent, AgentRef from = AgentRef(), caosValue p0 = caosValue(), caosValue p1 = caosValue());
+	void queueScript(unsigned short event, AgentRef agent, AgentRef from, caosValue p0, caosValue p1);
 	
 	World();
 	~World();

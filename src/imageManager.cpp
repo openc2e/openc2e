@@ -18,6 +18,7 @@
  */
 
 #include "imageManager.h"
+#include "creaturesException.h"
 #include "fileformats/ImageUtils.h"
 #include "mmapifstream.h"
 #include "World.h"

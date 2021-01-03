@@ -48,6 +48,12 @@
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
+struct scriptevent {
+	unsigned short scriptno;
+	AgentRef agent, from;
+	caosValue p[2];
+};
+
 World world;
 
 World::World() {

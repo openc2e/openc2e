@@ -17,6 +17,7 @@
  *
  */
 
+#include "caosValue.h"
 #include "MusicManager.h"
 #include "Engine.h"
 #include "MNGMusic.h"
