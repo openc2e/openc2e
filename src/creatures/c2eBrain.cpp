@@ -66,7 +66,7 @@ void c2eTract::setupTract() {
 	std::string destlobename = std::string((char *)g->destlobe, 4);
 
 	if (b->lobes.find(srclobename) == b->lobes.end() || b->lobes.find(destlobename) == b->lobes.end()) {
-		std::cout << "brain debug: failed to create dendrites for " << dump() << " (missing lobe)" << std::endl;
+		fmt::print("brain debug: failed to create dendrites for {} (missing lobe)\n", dump());
 		return;
 	}
 	c2eLobe *srclobe = b->lobes[srclobename];
@@ -83,7 +83,7 @@ void c2eTract::setupTract() {
 	}
 
 	if (src_neurons.size() == 0 || dest_neurons.size() == 0) {
-		std::cout << "brain debug: failed to create dendrites for " << dump() << " (no neurons)" << std::endl;
+		fmt::print("brain debug: failed to create dendrites for {} (no neurons)\n", dump());
 		return;
 	}
 	
@@ -91,11 +91,11 @@ void c2eTract::setupTract() {
 	if (g->migrates) {
 		// You can't have *both* sides of the tract unconstrained, we'd have no idea how many dendrites to make!
 		if (g->src_noconnections == 0 && g->dest_noconnections == 0) {
-			std::cout << "brain debug: failed to create dendrites for " << dump() << " (both connections unconstrained)" << std::endl;
+			fmt::print("brain debug: failed to create dendrites for {} (both connections unconstrained)\n", dump());
 			return;
 		} else if (g->src_noconnections != 0 && g->dest_noconnections != 0) {
 			// TODO: correct behaviour? seems to be, given CL's brain-in-a-vat behaviour
-			std::cout << "brain debug: failed to create dendrites for " << dump() << " (no unconstrained connections)" << std::endl;
+			fmt::print("brain debug: failed to create dendrites for {} (no unconstrained connections)\n", dump());
 			return;
 		}
 
@@ -131,7 +131,7 @@ void c2eTract::setupTract() {
 	} else {
 		// if the genome tells us to make no connections, give up
 		if (g->src_noconnections == 0 || g->dest_noconnections == 0) {
-			std::cout << "brain debug: failed to create dendrites for " << dump() << " (no connections)" << std::endl;
+			fmt::print("brain debug: failed to create dendrites for {} (no connections)\n", dump());
 			return;
 		}
 	
@@ -301,7 +301,7 @@ void c2eTract::doMigration() {
 				}
 			// else if we migrate to make limited connections to the *dest*
 			} else {
-				std::cout << "wah, you used something which isn't in the standard brain model, meanie" << std::endl; // TODO
+				fmt::print("wah, you used something which isn't in the standard brain model, meanie\n"); // TODO
 			}
 		}
 	}
@@ -429,7 +429,7 @@ void c2eSVRule::init(uint8_t ruledata[48]) {
 			case 4: // spare neuron
 				// TODO: what should we do here?
 				if (rule.operanddata > 7) {
-					std::cout << "brain debug: had a too-high variable number" << std::endl;
+					fmt::print("brain debug: had a too-high variable number\n");
 					rule.operanddata = 7;
 				}
 				break;
@@ -482,8 +482,11 @@ inline void warnUnimplementedSVRule(unsigned char data, bool opcode = true) {
 	if (warnedalready) return;
 	warnedalready = true;
 
-	std::cout << "brain debug: something tried using unimplemented " << (opcode ? "opcode" : "operand type" ) <<
-		(unsigned int)data << ", will not warn about unimplemented svrule bits again." << std::endl;
+	fmt::print(
+		"brain debug: something tried using unimplemented {} {}, will not warn "
+		"about unimplemented svrule bits again.\n",
+		opcode ? "opcode" : "operand type", (unsigned int)data
+	);
 }
 
 // goto locations are one-based

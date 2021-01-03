@@ -17,11 +17,8 @@
  *
  */
 
-#ifndef AGENTREF_H
-#define AGENTREF_H 1
+#pragma once
 
-#include <cstdlib> // for NULL
-#include <iostream>
 #include <memory>
 
 class Agent;
@@ -50,7 +47,7 @@ public:
 	Agent *operator=(Agent *a) { set(a); return a; }
 	Agent &operator*() const { checkLife(); return *ref.lock().get(); }
 	Agent *operator->() const { checkLife(); return ref.lock().get(); }
-	bool operator!() const { return lock().get() == NULL; }
+	bool operator!() const { return lock().get() == nullptr; }
 	/* This next line breaks builds with MSVC, tossing errors about ambiguous operators.
 	operator bool() const { return ref; } */
 	operator Agent *() const { return ref.lock().get(); }
@@ -67,8 +64,5 @@ public:
 	std::shared_ptr<Agent> lock() const;
 	Agent *get() const { return lock().get(); }
 };
-		
-
-#endif
 
 /* vim: set noet: */

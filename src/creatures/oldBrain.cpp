@@ -21,6 +21,7 @@
 #include "oldCreature.h"
 #include <cassert>
 #include <memory>
+#include <fmt/core.h>
 
 /*
  * svrule examples:
@@ -996,8 +997,10 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 		}
 
 		if (!srclobe[i]) {
-			std::cout << "instinct: ignoring source lobe " << (int)instinct.lobes[i] <<
-				" because it's not perceptible" << std::endl;
+			fmt::print(
+				"instinct: ignoring source lob {} because it's not perceptible\n",
+				(int)instinct.lobes[i]
+			);
 		}
 	}
 
@@ -1017,9 +1020,13 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 		// (see cdouble's posts about Canny norns causing crashes with instincts using non-perceptible lobes)
 		// TODO: sanity-check this at source (ie, above, when finding feed lobe) also?
 		if (offset >= lobes[0]->getNoNeurons()) {
-			std::cout << "instinct: ignoring offset " << (int)offset << " (was lobe " <<
-				(int)instinct.lobes[i] << ", now lobe " << (int)srclobe[i] <<
-				", neu offset " << (int)instinct.neurons[i] << ")" << std::endl;
+			fmt::print(
+				"instinct: ignoring offset {} (was lobe {}, now lobe {}, new offset {})\n",
+				(int)offset,
+				(int)instinct.lobes[i],
+				(int)srclobe[i],
+				(int)instinct.neurons[i]
+			);
 			continue;
 		}
 		percept_neu_offsets.push_back(offset);
@@ -1027,13 +1034,13 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 
 	// were there no valid lobes? then we're done
 	if (!percept_neu_offsets.size()) {
-		std::cout << "instinct failed: no valid lobes" << std::endl;
+		fmt::print("instinct failed: no valid lobes\n");
 		return;
 	}
 
 	// we need a concept lobe (lobe 8) for instincts to work
 	if (lobes.size() < 9) {
-		std::cout << "instinct failed: no concept lobe" << std::endl;
+		fmt::print("instinct failed: no concept lobe\n");
 		return;
 	}
 	// TODO: verify the concept lobe does actually have type 0 dendrites pointing at the perceptible lobe?
@@ -1060,8 +1067,10 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 	}
 
 	if (candidateneuron == 0xFFFFFFFF) {
-		std::cout << "instinct failed: no candidate concept neuron with " <<
-			(int)percept_neu_offsets.size() << " type 0 dendrites" << std::endl;
+		fmt::print(
+			"instinct failed: no candidate concept neuron with {} type 0 dendrites\n",
+			(int)percept_neu_offsets.size()
+		);
 		return;
 	}
 
@@ -1098,7 +1107,7 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 
 	if (candidatedendrite == 0xFFFFFFFF) {
 		// brain can't learn this!
-		std::cout << "instinct failed: no candidate decision dendrite (!) " << std::endl;
+		fmt::print("instinct failed: no candidate decision dendrite (!)\n");
 		return;
 	}
 

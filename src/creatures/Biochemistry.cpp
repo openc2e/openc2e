@@ -24,6 +24,7 @@
 #include <memory>
 #include "c2eBrain.h"
 #include "oldBrain.h"
+#include <fmt/core.h>
 
 using std::shared_ptr;
 
@@ -292,9 +293,10 @@ unsigned char *c1Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 			break;
 	}
 
-	std::cout << "c1Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
-		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
-		<< std::endl;
+	fmt::print(
+		"c1Creature::getLocusPointer failed to interpret locus ({}, {}, {}) of {}\n",
+		(int)o, (int)t, (int)l, receptor ? "receptor" : "emitter"
+	);
 
 	return 0;
 }
@@ -321,9 +323,10 @@ unsigned char *c2Creature::getLocusPointer(bool receptor, unsigned char o, unsig
 			break;
 	}
 
-	std::cout << "c2Creature::getLocusPointer failed to interpret locus (" << (int)o << ", "
-		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
-		<< std::endl;
+	fmt::print(
+		"c2Creature::getLocusPointer failed to interpret locus ({}, {}, {}) of {}\n",
+		(int)o, (int)t, (int)l, receptor ? "receptor" : "emitter"
+	);
 
 	return 0;
 }
@@ -394,9 +397,10 @@ float *c2eCreature::getLocusPointer(bool receptor, unsigned char o, unsigned cha
 
 	}
 
-	std::cout << "c2eCreature::getLocusPointer failed to interpret locus (" << (int)o << ", "
-		<< (int)t << ", " << (int)l << ") of " << (receptor ? "receptor" : "emitter")
-		<< std::endl;
+	fmt::print(
+		"c2eCreature::getLocusPointer failed to interpret locus ({}, {}, {}) of {}\n",
+		(int)o, (int)t, (int)l, receptor ? "receptor" : "emitter"
+	);
 	return 0;
 }
  
@@ -962,7 +966,7 @@ float *c2eOrgan::getLocusPointer(bool receptor, unsigned char o, unsigned char t
 			if (t == 0 && l == 0) { // reaction rate
 				std::shared_ptr<c2eReaction> r = reactions.back();
 				if (!r) {
-					std::cout << "c2eOrgan::getLocusPointer failed to find a reaction" << std::endl;
+					fmt::print("c2eOrgan::getLocusPointer failed to find a reaction\n");
 					return 0;
 				} else {
 					if (receptors) *receptors = &r->receptors;
