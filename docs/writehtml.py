@@ -1,8 +1,9 @@
 import collections
 import datetime
+import functools
+import json
 import re
 import sys
-import json
 
 
 def captext(s):
@@ -16,8 +17,12 @@ def esc(t):
 with open(sys.argv[1]) as f:
     data = json.load(f)
 
+def merge_dict(l, r):
+    return dict(list(l.items()) + list(r.items()))
+
 # XXX
-data = {"ops": data["variants"]["c3"]}
+data = {"ops": functools.reduce(merge_dict, data["variants"].values())}
+
 
 catsort = collections.defaultdict(lambda: [])
 for key in sorted(data["ops"]):
