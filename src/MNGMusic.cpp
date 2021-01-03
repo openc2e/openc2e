@@ -3,6 +3,7 @@
 #include "endianlove.h"
 #include "utils/ascii_tolower.h"
 #include "utils/find_if.h"
+#include "utils/overload.h"
 #include <algorithm>
 #include <cmath> // for cos/sin
 #include <iostream> // for debug messages
@@ -98,53 +99,50 @@ void MNGMusic::stop() {
 }
 
 static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = nullptr) {
-	switch (e.type) {
-		case MNGExpression::MNGEXPRESSION_FLOAT:
-			return e.getFloat();
-		case MNGExpression::MNGEXPRESSION_STRING:
-		{
-			std::string variable = e.getString();
+	return visit(overload(
+		[&](float float_value) {
+			return float_value;
+		},
+		[&](const std::string& variable) {
 			if (layer == nullptr) {
 				throw MNGFileException("Variable '" + variable + "' only valid inside Layer");
 			}
 			return layer->getVariable(variable);
-		}
-		case MNGExpression::MNGEXPRESSION_FUNCTION:
-		{
-			const auto& function = e.getFunction();
-			switch (function.type) {
+		},
+		[&](const heap_value<MNGFunction>& function) -> float {
+			switch (function->type) {
 			case MNG_ADD:
-				return evaluateExpression(function.first, layer)
-					+ evaluateExpression(function.second, layer);
+				return evaluateExpression(function->first, layer)
+					+ evaluateExpression(function->second, layer);
 			case MNG_SUBTRACT:
-				return evaluateExpression(function.first, layer)
-					- evaluateExpression(function.second, layer);
+				return evaluateExpression(function->first, layer)
+					- evaluateExpression(function->second, layer);
 			case MNG_MULTIPLY:
-				return evaluateExpression(function.first, layer)
-					* evaluateExpression(function.second, layer);
+				return evaluateExpression(function->first, layer)
+					* evaluateExpression(function->second, layer);
 			case MNG_DIVIDE:
-				return evaluateExpression(function.first, layer)
-					/ evaluateExpression(function.second, layer);
+				return evaluateExpression(function->first, layer)
+					/ evaluateExpression(function->second, layer);
 			case MNG_SINEWAVE:
-				return sin(2 * M_PI * (evaluateExpression(function.first, layer)
-					/ evaluateExpression(function.second, layer)));
+				return sin(2 * M_PI * (evaluateExpression(function->first, layer)
+					/ evaluateExpression(function->second, layer)));
 			case MNG_COSINEWAVE:
-				return cos(2 * M_PI * (evaluateExpression(function.first, layer)
-					/ evaluateExpression(function.second, layer)));
+				return cos(2 * M_PI * (evaluateExpression(function->first, layer)
+					/ evaluateExpression(function->second, layer)));
 			case MNG_RANDOM:
 			{
-				float first = evaluateExpression(function.first, layer);
-				float second = evaluateExpression(function.second, layer);
+				float first = evaluateExpression(function->first, layer);
+				float second = evaluateExpression(function->second, layer);
 				return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
 			}
 			default:
 				// TODO: set up actual function names enum
+				// TODO: e->dump
+				throw MNGFileException("couldn't evaluate expression");
 				break;
 			}
 		}
-	}
-	// TODO: e->dump
-	throw MNGFileException("couldn't evaluate expression");
+	), e);
 }
 
 static AudioChannel playSample(const std::string& name, MNGFile *file, AudioBackend* backend, bool looping=false) {
@@ -422,14 +420,14 @@ MusicTrack::MusicTrack(MNGFile *p, MNGScript script, MNGTrack n, AudioBackend *b
 		effects.push_back(std::make_shared<MusicEffect>(e));
 	}
 	for (auto l : n.layers) {
-		switch (l.type) {
-			case MNGLayer::LOOPING:
-				looplayers.push_back(std::make_shared<MusicLoopLayer>(l.looplayer, this, b));
-				break;
-			case MNGLayer::ALEOTORIC:
-				aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(l.aleotoriclayer, this, b));
-				break;
-		}
+		visit(overload(
+			[&](MNGLoopLayer& ll) {
+				looplayers.push_back(std::make_shared<MusicLoopLayer>(ll, this, b));
+			},
+			[&](MNGAleotoricLayer& al) {
+				aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(al, this, b));
+			}
+		), l);
 	}
 }
 

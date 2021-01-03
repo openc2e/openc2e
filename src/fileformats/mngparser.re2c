@@ -1,93 +1,10 @@
 #include "fileformats/mngparser.h"
 #include "creaturesException.h"
+#include "utils/overload.h"
 #include <assert.h>
 #include <unordered_set>
 
 using namespace mngtoktype;
-
-MNGExpression::MNGExpression() : type(MNGEXPRESSION_FLOAT), float_value(0) {}
-MNGExpression::MNGExpression(float f) : type(MNGEXPRESSION_FLOAT), float_value(f) {}
-MNGExpression::MNGExpression(const std::string& s) : type(MNGEXPRESSION_STRING), stringp_value(new std::string(s)) {}
-MNGExpression::MNGExpression(const MNGFunction& f) : type(MNGEXPRESSION_FUNCTION), functionp_value(new MNGFunction(f)) {}
-MNGExpression::MNGExpression(const MNGExpression& other) {
-	switch (other.type) {
-		case MNGEXPRESSION_FLOAT:
-			new (this) MNGExpression(other.float_value);
-			break;
-		case MNGEXPRESSION_STRING:
-			new (this) MNGExpression(*other.stringp_value);
-			break;
-		case MNGEXPRESSION_FUNCTION:
-			new (this) MNGExpression(*other.functionp_value);
-			break;
-	}
-}
-MNGExpression::MNGExpression(MNGExpression&& other) : MNGExpression(other) {}
-MNGExpression& MNGExpression::operator=(const MNGExpression& other) {
-	this->~MNGExpression();
-	new (this) MNGExpression(other);
-	return *this;
-}
-MNGExpression& MNGExpression::operator=(MNGExpression&& other) {
-	return *this = other;
-}
-MNGExpression::~MNGExpression() {
-	switch (type) {
-		case MNGEXPRESSION_FLOAT:
-			break;
-		case MNGEXPRESSION_STRING:
-			delete stringp_value;
-			stringp_value = nullptr;
-			break;
-		case MNGEXPRESSION_FUNCTION:
-			delete functionp_value;
-			functionp_value = nullptr;
-			break;
-	}
-}
-float MNGExpression::getFloat() const {
-	assert(type == MNGEXPRESSION_FLOAT);
-	return float_value;
-}
-const std::string& MNGExpression::getString() const {
-	assert(type == MNGEXPRESSION_STRING);
-	return *stringp_value;
-}
-const MNGFunction& MNGExpression::getFunction() const {
-	assert(type == MNGEXPRESSION_FUNCTION);
-	return *functionp_value;
-}
-
-MNGLayer::MNGLayer(MNGLoopLayer ll) : type(LOOPING), looplayer(ll) {}
-MNGLayer::MNGLayer(MNGAleotoricLayer al) : type(ALEOTORIC), aleotoriclayer(al) {}
-MNGLayer::MNGLayer(const MNGLayer& other) {
-	type = other.type;
-	switch (type) {
-		case LOOPING:
-			new (&looplayer) MNGLoopLayer(other.looplayer);
-			break;
-		case ALEOTORIC:
-			new (&aleotoriclayer) MNGAleotoricLayer(other.aleotoriclayer);
-			break;
-	}
-}
-MNGLayer::MNGLayer(MNGLayer&& other) : MNGLayer(other) {}
-MNGLayer& MNGLayer::operator=(const MNGLayer& other) {
-	this->~MNGLayer();
-	new (this) MNGLayer(other);
-	return *this;
-}
-MNGLayer& MNGLayer::operator=(MNGLayer&& other) { return *this = other; }
-MNGLayer::~MNGLayer() {
-	switch (type) {
-		case LOOPING:
-			looplayer.~MNGLoopLayer();
-			break;
-		case ALEOTORIC:
-			aleotoriclayer.~MNGAleotoricLayer();
-			break;
-	}
-}
 
 struct MNGParserState {
 	MNGParserState(std::vector<mngtoken> tokens_) : tokens(tokens_) {}
@@ -697,22 +614,22 @@ std::vector<std::string> MNGScript::getWaveNames() const {
 	std::unordered_set<std::string> seen;
 	for (auto t : tracks) {
 		for (auto& l : t.layers) {
-			switch (l.type) {
-				case MNGLayer::LOOPING:
-					if (seen.find(l.looplayer.wave) == seen.end()) {
-						seen.insert(l.looplayer.wave);
-						names.push_back(l.looplayer.wave);
-					}
-					break;
-				case MNGLayer::ALEOTORIC:
-					for (auto v : l.aleotoriclayer.voices) {
+			visit(overload(
+				[&](const MNGAleotoricLayer& al) {
+					for (auto v : al.voices) {
 						if (seen.find(v.wave) == seen.end()) {
 							seen.insert(v.wave);
 							names.push_back(v.wave);
 						}
 					}
-					break;
-			}
+				},
+				[&](const MNGLoopLayer& ll) {
+					if (seen.find(ll.wave) == seen.end()) {
+						seen.insert(ll.wave);
+						names.push_back(ll.wave);
+					}
+				}
+			), l);
 		}
 	}
 	return names;

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "optional.h"
+#include "utils/heap_value.h"
+#include <mpark/variant.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -71,32 +73,8 @@ MNGScript mngparse(const char *script);
 MNGScript mngparse(const std::vector<mngtoken>& tokens);
 
 struct MNGFunction;
-struct MNGExpression {
-	enum expression_type {
-		MNGEXPRESSION_FLOAT,
-		MNGEXPRESSION_STRING,
-		MNGEXPRESSION_FUNCTION
-	};
-	expression_type type;
-	MNGExpression();
-	MNGExpression(float f);
-	MNGExpression(const std::string&);
-	MNGExpression(const MNGFunction&);
-	MNGExpression(const MNGExpression&);
-	MNGExpression(MNGExpression&&);
-	MNGExpression& operator=(const MNGExpression&);
-	MNGExpression& operator=(MNGExpression&&);
-	~MNGExpression();
-	float getFloat() const;
-	const std::string& getString() const;
-	const MNGFunction& getFunction() const;
-private:
-	union {
-		float float_value;
-		std::string* stringp_value;
-		MNGFunction* functionp_value;
-	};
-};
+
+using MNGExpression = mpark::variant<float, std::string, heap_value<MNGFunction>>;
 
 struct MNGFunction {
 	mngtoktype::toktype type;
@@ -159,24 +137,7 @@ struct MNGLoopLayer {
 	std::vector<MNGUpdate> updates;
 };
 
-struct MNGLayer {
-	enum layertype {
-		LOOPING,
-		ALEOTORIC
-	};
-	MNGLayer(MNGLoopLayer);
-	MNGLayer(MNGAleotoricLayer);
-	MNGLayer(const MNGLayer&);
-	MNGLayer(MNGLayer&&);
-	MNGLayer& operator=(const MNGLayer&);
-	MNGLayer& operator=(MNGLayer&&);
-	~MNGLayer();
-	layertype type;
-	union {
-		MNGLoopLayer looplayer;
-		MNGAleotoricLayer aleotoriclayer;
-	};
-};
+using MNGLayer = mpark::variant<MNGLoopLayer, MNGAleotoricLayer>;
 
 struct MNGTrack {
 	std::string name;
