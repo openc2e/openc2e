@@ -19,18 +19,18 @@
  */
 #include "physics.h"
 #include <cassert>
+#include <fmt/core.h>
 
 void Line::dump() const {
-	std::cout << "pst = (" << start.x << "," << start.y << ") end=(" << end.x << "," << end.y << ")" << std::endl;
-	std::cout << "xi = " << x_icept << " yi = " << y_icept << " m=" << slope << std::endl;
-	std::cout << "type = ";
-	switch (type) {
-		case NORMAL: std::cout << "NORMAL"; break;
-		case HORIZONTAL: std::cout << "HORIZ"; break;
-		case VERTICAL: std::cout << "VERT"; break;
-		default: std::cout << "?? (" << type << ")"; break;
-	}
-	std::cout << std::endl;
+	fmt::print("pst = ({}, {}) end=({}, {})\n", start.x, start.y, end.x, end.y);
+	fmt::print("xi = {} yi = {} m = {}\n", x_icept, y_icept, slope);
+	fmt::print("type = {}\n", [&]{
+		switch (type) {
+			case NORMAL: return "NORMAL"; break;
+			case HORIZONTAL: return "HORIZ"; break;
+			case VERTICAL: return "VERT"; break;
+		}
+	}());
 	sanity_check();
 }
 

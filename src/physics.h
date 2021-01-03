@@ -17,13 +17,10 @@
  *  Lesser General Public License for more details.
  *
  */
-#ifndef PHYSICS_H
-#define PHYSICS_H 1
+#pragma once
 
 #include <cassert>
-#include <iostream> // XXX debug
 #include <cmath>   // sqrt
-#include <algorithm> // swap
 #include "serfwd.h"
 
 // OS X header files use Point and Line, so..
@@ -223,5 +220,4 @@ Point operator+(const Point &p, const Vector<T> &v) {
 	return v + p;
 }
 
-#endif
 /* vim: set noet: */
