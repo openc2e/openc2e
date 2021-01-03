@@ -20,11 +20,11 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
-#include "caosValue.h"
 #include <map>
 #include <ghc/filesystem.hpp>
 #include <memory>
 
+class caosValue;
 class Backend;
 class AudioBackend;
 class MainCamera;
