@@ -21,13 +21,13 @@
 #define _WORLD_H
 
 #include "caosValue.h"
-#include "caosVM.h"
 #include "partzorder.h"
 #include "renderablezorder.h"
 #include <memory>
 #include <set>
 #include <map>
 #include <list>
+#include <vector>
 
 class caosVM;
 class CompoundPart;
