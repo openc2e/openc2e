@@ -29,6 +29,7 @@
 #include "AgentRef.h"
 #include "caosValue.h"
 #include "alloc_count.h"
+#include <type_traits>
 
 #include <mpark/variant.hpp>
 
@@ -1167,19 +1168,25 @@ class caosVM__lval {
 		}
 };
 
-#define VM_PARAM_VALUE(name) caosValue name; { VM_STACK_CHECK(vm); \
-	vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal(); } vm->valueStack.pop_back();
-#define VM_PARAM_STRING(name) std::string name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal().getString(); } vm->valueStack.pop_back();
-#define VM_PARAM_INTEGER(name) int name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal().getInt(); } vm->valueStack.pop_back();
-#define VM_PARAM_FLOAT(name) float name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal().getFloat(); } vm->valueStack.pop_back();
-#define VM_PARAM_VECTOR(name) Vector<float> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal().getVector(); } vm->valueStack.pop_back();
-#define VM_PARAM_AGENT(name) std::shared_ptr<Agent> name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal().getAgent(); } vm->valueStack.pop_back();
+template <typename T> auto vmparamhelper(const caosValue& val);
+template <> inline auto vmparamhelper<caosValue>(const caosValue& val) { return val; }
+template <> inline auto vmparamhelper<std::string>(const caosValue& val) { return val.getString(); }
+template <> inline auto vmparamhelper<int>(const caosValue& val) { return val.getInt(); }
+template <> inline auto vmparamhelper<float>(const caosValue& val) { return val.getFloat(); }
+template <> inline auto vmparamhelper<Vector<float>>(const caosValue& val) { return val.getVector(); }
+template <> inline auto vmparamhelper<std::shared_ptr<Agent>>(const caosValue& val) { return val.getAgent(); }
+template <> inline auto vmparamhelper<AgentRef>(const caosValue& val) { return val.getAgent(); }
+
+#define VM_PARAM_OF_TYPE(name, type) \
+	type name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
+		name = vmparamhelper<type>(__x.getRVal()); } vm->valueStack.pop_back();
+
+#define VM_PARAM_VALUE(name) VM_PARAM_OF_TYPE(name, caosValue)
+#define VM_PARAM_STRING(name) VM_PARAM_OF_TYPE(name, std::string)
+#define VM_PARAM_INTEGER(name) VM_PARAM_OF_TYPE(name, int)
+#define VM_PARAM_FLOAT(name) VM_PARAM_OF_TYPE(name, float)
+#define VM_PARAM_VECTOR(name) VM_PARAM_OF_TYPE(name, Vector<float>)
+#define VM_PARAM_AGENT(name) VM_PARAM_OF_TYPE(name, std::shared_ptr<Agent>)
 // TODO: is usage of valid_agent correct here, or should we be caos_asserting?
 #define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) valid_agent(name);
 #define VM_PARAM_VARIABLE(name) caosVM__lval vm__lval_##name(this); caosValue * const name = &vm__lval_##name.value;
@@ -1193,11 +1200,11 @@ class caosVM__lval {
 #define CAOS_LVALUE(name, check, get, set) \
 	void caosVM::v_##name() { \
 		check; \
-		valueStack.push_back((get)); \
+		valueStack.push_back(caosValue(get)); \
 	} \
 	void caosVM::s_##name() { \
 		check; \
-		VM_PARAM_VALUE(newvalue) \
+		VM_PARAM_OF_TYPE(newvalue, std::remove_reference_t<decltype(get)>) \
 		set; \
 	}
 
