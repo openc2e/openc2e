@@ -44,7 +44,7 @@ void Vehicle::tick() {
 	if (paused) return;
 
 	// move by xvec/yvec!
-	moveTo(x + xvec.getInt() / 256.0, y + yvec.getInt() / 256.0);
+	moveTo(x + xvec / 256.0, y + yvec / 256.0);
 }
 
 void Vehicle::carry(AgentRef passenger) {

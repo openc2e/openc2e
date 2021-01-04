@@ -48,7 +48,7 @@ static void NewDebugNorn() {
     world.history->getMoniker(world.history->findMoniker(genome)).moveToCreature(a);
 
     // default values of c3_creature_accg, c3_creature_bhvr, c3_creature_attr, c3_creature_perm
-    a->accg = caosValue(5);
+    a->accg = 5;
     a->perm = 100;
     a->attr = 198;
     a->cr_can_push = true;

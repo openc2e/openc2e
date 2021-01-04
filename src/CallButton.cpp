@@ -18,6 +18,7 @@
  */
 
 #include "CallButton.h"
+#include "caosValue.h"
 #include <cassert>
 
 // TODO: this code is a first attempt and is probably completely wrong
@@ -29,7 +30,7 @@ void CallButton::tick() {
 	Lift *ourlift = dynamic_cast<Lift *>(lift.get());
 	assert(ourlift);
 
-	if (actv.getInt() == 1) {
+	if (actv == 1) {
 		// TODO: hrm..
 		if (ourlift->currentbutton == buttonid && ourlift->liftBottom() == ourlift->callbuttony[buttonid]) { // has arrived at us
 			queueScript(0); // deactivate ourselves

@@ -137,7 +137,7 @@ void c2eCreature::tickBrain() {
 			float distance = theirxpos - ourxpos;
 
 			// TODO: squash result into appropriate range?
-			visnlobe->setNeuronInput(i, distance / parentagent->range.getFloat());
+			visnlobe->setNeuronInput(i, distance / parentagent->range);
 		}
 	}
 

@@ -223,13 +223,4 @@ class caosValue {
 		std::string dump() const;
 };
 
-struct caosValueCompare {
-	bool operator()(const caosValue &v1, const caosValue &v2) const {
-		if (v1.getType() == v2.getType())
-			return v1 < v2;
-		else
-			return v1.getType() < v2.getType();
-	}
-};
-
 /* vim: set noet: */

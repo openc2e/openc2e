@@ -17,10 +17,10 @@
  *
  */
 
-#include "Vehicle.h"
+#pragma once
 
-#ifndef _C2E_LIFT_H
-#define _C2E_LIFT_H
+#include "Vehicle.h"
+#include <vector>
 
 class Lift : public Vehicle {
 public:
@@ -32,9 +32,8 @@ public:
 	Lift(std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	void tick();
 	bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
-	bool liftAvailable() { return (var[0].getInt() == 0); }
+	bool liftAvailable() const;
 	float liftBottom();
 };
 
-#endif
 /* vim: set noet: */

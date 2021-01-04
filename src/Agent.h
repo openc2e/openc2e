@@ -23,18 +23,23 @@
 #include "serfwd.h"
 #include "AgentRef.h"
 #include "Sound.h"
-#include "caosValue.h"
 #include "CompoundPart.h"
 #include <cassert>
 #include <list>
 #include <map>
 #include <memory>
 #include "Port.h"
+#include "utils/heap_array.h"
 #include "physics.h"
 #include <set>
 
 class script;
 class genomeFile;
+
+class caosValue;
+struct caosValueCompare {
+	bool operator()(const caosValue &v1, const caosValue &v2) const;
+};
 
 class Agent : public std::enable_shared_from_this<Agent> {
 	
@@ -54,13 +59,9 @@ class Agent : public std::enable_shared_from_this<Agent> {
 protected:
 	bool initialized;
 	int lifecount;
-private:
-	void core_init();
-	Agent() { core_init(); } // for boost only
-protected:
 	int lastScript;
 
-	caosValue var[100]; // OVxx
+	heap_array<caosValue, 100> var; // OVxx
 	std::map<caosValue, caosValue, caosValueCompare> name_variables;
 	
 	int unused_cint;
@@ -177,17 +178,19 @@ public:
 	int category;
 
 	// motion
-	caosValue velx, vely;
+	float velx = 0;
+	float vely = 0;
 
 	float avel, fvel, svel;
 	float admp, fdmp, sdmp;
 	float spin;
 	unsigned int spritesperrotation, numberrotations;
 
-	caosValue accg, aero;
+	float accg = 0;
+	int aero = 0;
 	unsigned int friction;
 	int perm, elas;
-	caosValue rest;
+	int rest = 0;
 
 	float x, y;
 
@@ -199,16 +202,19 @@ public:
 	bool moved_last_tick : 1; // TODO: icky hack
 	std::weak_ptr<class Room> roomcache[5];
 
-	caosValue range;
+	float range = 0;
 
 	AgentRef floatingagent;
 
 	// Creatures 1/2 bits
-	caosValue objp, babymoniker;
+	AgentRef objp;
+	int babymoniker = 0;
 
 	// Creatures 2
 	// TODO: size likely duplicate of perm
-	caosValue actv, thrt, size;
+	int actv = 0;
+	int thrt = 0;
+	int size = 0;
 
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
@@ -227,7 +233,10 @@ public:
 	void addCarried(AgentRef);
 	void dropCarried(AgentRef);
 
-	bool queueScript(unsigned short event, AgentRef from = AgentRef(), caosValue p0 = caosValue(), caosValue p1 = caosValue());
+	bool queueScript(unsigned short event);
+	bool queueScript(unsigned short event, AgentRef from);
+	bool queueScript(unsigned short event, AgentRef from, caosValue p0);
+	bool queueScript(unsigned short event, AgentRef from, caosValue p0, caosValue p1);
 	void stopScript();
 	void pushVM(caosVM *newvm);
 	bool vmStopped();

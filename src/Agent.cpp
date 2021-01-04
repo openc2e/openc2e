@@ -43,14 +43,17 @@
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
 
-void Agent::core_init() {
-	initialized = false;
-	lifecount = 0;
+bool caosValueCompare::operator()(const caosValue &v1, const caosValue &v2) const {
+	if (v1.getType() == v2.getType())
+		return v1 < v2;
+	else
+		return v1.getType() < v2.getType();
 }
 
 Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
   vm(0), zorder(p), timerrate(0), attr(0), visible(true) {
-	core_init();
+	initialized = false;
+	lifecount = 0;
 
 	setClassifier(f, g, s);
 
@@ -60,8 +63,8 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 
 	has_custom_core_size = false;
 
-	velx.setFloat(0.0f);
-	vely.setFloat(0.0f);
+	velx = 0.0f;
+	vely = 0.0f;
 
 	avel = 0.0f; fvel = 0.0f; svel = 0.0f;
 	admp = 0.0f; fdmp = 0.0f; sdmp = 0.0f;
@@ -111,7 +114,7 @@ Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p)
 
 	emitca_index = -1; emitca_amount = 0.0f;
 
-	objp.setAgent(0); // not strictly necessary
+	objp = {}; // not strictly necessary
 }
 
 void Agent::finishInit() {
@@ -245,17 +248,17 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosValue one, caosVal
 		case 0: // deactivate
 			if (c && !cr_can_stop) return false;
 			// TODO: not sure if this is the right place to do this.
-			actv.setInt(event);
+			actv = event;
 			break;
 		case 1: // activate 1
 			if (c && !cr_can_push) return false;
 			// TODO: not sure if this is the right place to do this.
-			actv.setInt(event);
+			actv = event;
 			break;
 		case 2: // activate 2
 			if (c && !cr_can_pull) return false;
 			// TODO: not sure if this is the right place to do this.
-			actv.setInt(event);
+			actv = event;
 			break;
 		case 3: // hit
 			if (c && !cr_can_hit) return false;
@@ -348,6 +351,18 @@ bool Agent::fireScript(unsigned short event, Agent *from, caosValue one, caosVal
 	return ranscript;
 }
 
+bool Agent::queueScript(unsigned short event) {
+	return queueScript(event, {});
+}
+
+bool Agent::queueScript(unsigned short event, AgentRef from) {
+	return queueScript(event, from, {});
+}
+
+bool Agent::queueScript(unsigned short event, AgentRef from, caosValue p0) {
+	return queueScript(event, from, p0, {});
+}
+
 bool Agent::queueScript(unsigned short event, AgentRef from, caosValue p0, caosValue p1) {
 	// Queue a script for execution on the VM of this agent.
 
@@ -384,8 +399,8 @@ int Agent::handleClick(float clickx, float clicky) {
 		int action = -1;
 
 		// look up the relevant action for our ACTV state from the clac table
-		if ((unsigned int)actv.getInt() < 3)
-			action = clac[actv.getInt()];
+		if ((unsigned int)actv < 3)
+			action = clac[(unsigned int)actv];
 
 		if (action != -1) {
 			return calculateScriptId(action);
@@ -538,12 +553,12 @@ void Agent::physicsTick() {
 	if (invehicle) return; // TODO: c2e verhicle physics
 
 	// set destination point based on velocities
-	float destx = x + velx.getFloat();
-	float desty = y + vely.getFloat();
+	float destx = x + velx;
+	float desty = y + vely;
 
 	if (rotatable()) {
 		// TODO: the real engine seems to reset velx/vely, so i do that here, but why?
-		velx.setFloat(0.0f); vely.setFloat(0.0f);
+		velx = 0.0f; vely = 0.0f;
 
 		// TODO: which order should these be in?
 
@@ -571,7 +586,7 @@ void Agent::physicsTick() {
 		//falling = false;
 		// increase speed according to accg
 		// TODO: should we be changing vely first, instead of after a successful move (below)?
-		desty += accg.getFloat();
+		desty += accg;
 	}
 	
 	if (suffercollisions()) {
@@ -651,14 +666,14 @@ void Agent::physicsTick() {
 
 				if (elas != 0) {
 					if (wall.getType() == HORIZONTAL) {
-						vely.setFloat(-vely.getFloat());
+						vely = -vely;
 					} else if (wall.getType() == VERTICAL) {
-						velx.setFloat(-velx.getFloat());
+						velx = -velx;
 					} else {
 						// line starts always have a lower x value than the end
 						float xdiff = wall.getEnd().x - wall.getStart().x;
 						float ydiff = wall.getEnd().y - wall.getStart().y;
-						float fvelx = velx.getFloat(), fvely = vely.getFloat();
+						float fvelx = velx, fvely = vely;
 					
 						// calculate input/slope angles
 						double inputangle;
@@ -680,40 +695,39 @@ void Agent::physicsTick() {
 						float xoutput = cos(outputangle) * vectorlength;
 						float youtput = sin(outputangle) * vectorlength;
 
-						velx.setFloat(xoutput);
-						vely.setFloat(-youtput);
+						velx = xoutput;
+						vely = -youtput;
 					}
 
 					if (elas != 100.0f) {
-						velx.setFloat(velx.getFloat() * (elas / 100.0f));
-						vely.setFloat(vely.getFloat() * (elas / 100.0f));
+						velx = velx * (elas / 100.0f);
+						vely = vely * (elas / 100.0f);
 					}
 				} else				
-					vely.setFloat(0);
+					vely = 0;
 			} else if (sufferphysics() && accg != 0) {
-				vely.setFloat(vely.getFloat() + accg.getFloat());
+				vely = vely + accg;
 			}
 		} else {
 			// TODO: correct?
 			if (sufferphysics()) {
-				if (velx.getFloat() == 0.0f && vely.getFloat() == 0.0f)
+				if (velx == 0.0f && vely == 0.0f)
 					falling = false;
 			}
-			velx.setFloat(0);
-			vely.setFloat(0);
+			velx = 0;
+			vely = 0;
 		}
 	} else {
-		if (vely.hasDecimal() || velx.hasDecimal())
-			moveTo(destx, desty);
+		moveTo(destx, desty);
 		if (sufferphysics())
-			vely.setFloat(vely.getFloat() + accg.getFloat());
+			vely = vely + accg;
 	}
 
 	if (sufferphysics() && (aero != 0)) {
 		// reduce speed according to AERO
 		// TODO: aero should be an integer!
-		velx.setFloat(velx.getFloat() - (velx.getFloat() * (aero.getFloat() / 100.0f)));
-		vely.setFloat(vely.getFloat() - (vely.getFloat() * (aero.getFloat() / 100.0f)));
+		velx = velx - (velx * (aero / 100.0f));
+		vely = vely - (vely * (aero / 100.0f));
 	}
 
 	if (rotatable()) {
@@ -861,7 +875,7 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 			// collide if there's no new room connected to this one
 			else if (room->doors.find(newroom) == room->doors.end()) { collision = true; }
 			// collide if the PERM between this room and the new room is smaller than or equal to our size
-			else if (size.getInt() > room->doors[newroom]->perm) { collision = true; }
+			else if (size > room->doors[newroom]->perm) { collision = true; }
 
 			if (collision && (trycollisions || (!newroom))) {
 				collided = true;
@@ -872,7 +886,7 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 			room = newroom;
 		}
 	
-		if (room->floorpoints.size() && i == 3 && dy >= 0 && size.getInt() > room->floorvalue) { // TODO: Hack!
+		if (room->floorpoints.size() && i == 3 && dy >= 0 && size > room->floorvalue) { // TODO: Hack!
 			// TODO: we don't check floorYatX isn't returning a 'real' room floor, but floorpoints should cover the whole floor anyway
 			int floory = room->floorYatX(src.x + p.x);
 			
@@ -902,27 +916,27 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 }
 
 void Agent::physicsTickC2() {
-	int dx = velx.getInt(), dy = vely.getInt();
+	int dx = round(velx), dy = round(vely);
 
 	if (dx != 0 || dy != 0) falling = true;
 
 	if (falling && sufferphysics()) {
-		dy += accg.getInt();
+		dy += round(accg);
 	}
 
 	falling = true;
 
 	if (dy == 0 && dx == 0) { // nothing to do
-		if (vely.getInt() == 0) {
+		if (round(vely) == 0) {
 			// really no motion
 			falling = false;
 		} else {
 			// y motion cancelled by gravity
-			vely.setInt(dy);
+			vely = dy;
 		}
 		return;
 	}
-	vely.setInt(dy);
+	vely = dy;
 
 	Point deltapt(0,0);
 	double delta = 1000000000;
@@ -948,30 +962,30 @@ void Agent::physicsTickC2() {
 		deltapt.y = dy;
 	}
 	
-	if (collided && (velx.getInt() != 0 || vely.getInt() != 0) && moved_last_tick) {
+	if (collided && (round(velx) != 0 || round(vely) != 0) && moved_last_tick) {
 		if (lastcollidedirection >= 2) // up and down
-			vely.setInt(-(vely.getInt() - (rest.getInt() * vely.getInt()) / 100));
+			vely = -(round(vely) - (rest * round(vely)) / 100);
 		else
-			velx.setInt(-(velx.getInt() - (rest.getInt() * velx.getInt()) / 100));
+			velx = -(round(velx) - (rest * round(velx)) / 100);
 		queueScript(6, 0);	
 	}
 	if ((int)deltapt.x == 0 && (int)deltapt.y == 0) {
 		if (!moved_last_tick) {
 			falling = false;
-			velx.setInt(0);
-			vely.setInt(0);
+			velx = 0;
+			vely = 0;
 		}
 		moved_last_tick = false;
 	} else {
 		moved_last_tick = true;
 		moveTo(x + (int)deltapt.x, y + (int)deltapt.y);
 		if (sufferphysics()) {
-			int fricx = (aero.getInt() * velx.getInt()) / 100;
-			int fricy = (aero.getInt() * vely.getInt()) / 100;
-			if (abs(velx.getInt()) > 0 && fricx == 0) fricx = (velx.getInt() < 0) ? -1 : 1;
-			if (abs(vely.getInt()) > 0 && fricy == 0) fricy = (vely.getInt() < 0) ? -1 : 1;
-			velx.setInt(velx.getInt() - fricx);
-			vely.setInt(vely.getInt() - fricy);
+			int fricx = (aero * round(velx)) / 100;
+			int fricy = (aero * round(vely)) / 100;
+			if (abs(round(velx)) > 0 && fricx == 0) fricx = (round(velx) < 0) ? -1 : 1;
+			if (abs(round(vely)) > 0 && fricy == 0) fricy = (round(vely) < 0) ? -1 : 1;
+			velx = round(velx) - fricx;
+			vely = round(vely) - fricy;
 		}
 	}
 }

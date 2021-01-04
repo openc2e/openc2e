@@ -28,6 +28,7 @@
 */
 
 #include "caos_assert.h"
+#include "caosValue.h"
 #include "SkeletalCreature.h"
 #include "Creature.h"
 #include "World.h"
@@ -106,10 +107,10 @@ SkeletalCreature::SkeletalCreature(unsigned char _family) : Agent(_family, 0, 0,
 	} else if (engine.version == 2) {
 		setAttributes(128 + 64 + 4 + 2); // mouseable, activateable, suffersphysics, sufferscollisions
 		// default values from original engine
-		size.setInt(224);
-		rest.setInt(70);
-		accg.setInt(15);
-		aero.setInt(10);
+		size = 224;
+		rest = 70;
+		accg = 15;
+		aero = 10;
 	}
 
 	for (unsigned int i = 0; i < 6; i++) appearancegenes[i] = 0;
@@ -409,7 +410,7 @@ void SkeletalCreature::snapDownFoot() {
 				float ydiff = 10000.0f; // TODO: big number
 				for (auto i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
 					std::shared_ptr<Room> thisroom = i->first.lock();
-					if (engine.version == 2 && size.getInt() > i->second->perm) continue;
+					if (engine.version == 2 && size > i->second->perm) continue;
 					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
 						float thisydiff = fabs(footy - thisroom->floorYatX(footx));
 						if (thisydiff < ydiff) {
@@ -494,7 +495,7 @@ void SkeletalCreature::snapDownFoot() {
 	if (engine.version > 2) {
 		if (engine.version == 2 && !belowfloor && downfootroom->floorpoints.size()) {
 			// TODO: hilar hack: same as above for floorvalue
-			if (size.getInt() <= downfootroom->floorvalue) {
+			if (size <= downfootroom->floorvalue) {
 				falling = true;
 				return;
 			}
@@ -502,7 +503,7 @@ void SkeletalCreature::snapDownFoot() {
 			// TODO: hilar hack: same as above for perm
 			std::shared_ptr<Room> downroom = world.map->roomAt(footx, downfootroom->y_left_floor + 1);
 			if (downfootroom->doors.find(downroom) != downfootroom->doors.end()) {
-				int permsize = (engine.version == 2 ? size.getInt() : perm);
+				int permsize = (engine.version == 2 ? size : perm);
 				if (permsize <= downfootroom->doors[downroom]->perm) {
 					falling = true;
 					return;

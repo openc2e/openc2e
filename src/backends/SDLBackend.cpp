@@ -21,6 +21,7 @@
 #include <cassert>
 #include <memory>
 
+#include "creaturesException.h"
 #include "creaturesImage.h"
 #include "keycodes.h"
 #include "Engine.h"

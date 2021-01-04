@@ -20,6 +20,7 @@
 #include "fileformats/genomeFile.h"
 #include "historyManager.h"
 #include "World.h"
+#include "caosValue.h"
 #include "Catalogue.h"
 #include "creatures/CreatureAgent.h"
 #include "creatures/Creature.h"

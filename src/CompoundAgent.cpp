@@ -155,7 +155,7 @@ int CompoundAgent::handleClick(float clickx, float clicky) {
 
 bool CompoundAgent::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
 	// TODO: this is a hack to deal with ACTV on compound agents in c1/c2
-	if (engine.version < 3 && actv.getInt() == event) return false;
+	if (engine.version < 3 && actv == event) return false;
 
 	return Agent::fireScript(event, from, one, two);
 }

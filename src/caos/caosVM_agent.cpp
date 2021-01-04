@@ -1215,7 +1215,7 @@ void caosVM::c_RNGE() {
 void caosVM::v_RNGE() {
 	VM_VERIFY_SIZE(0)
 	valid_agent(targ);
-	result.setFloat(targ->range.getFloat());
+	result.setFloat(targ->range);
 }
 
 /**

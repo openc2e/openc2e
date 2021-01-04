@@ -21,6 +21,7 @@
 
 #include "Backend.h"
 #include "Blackboard.h"
+#include "caosValue.h"
 #include "Engine.h"
 #include "imageManager.h"
 #include "keycodes.h"

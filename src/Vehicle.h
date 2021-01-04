@@ -17,8 +17,7 @@
  *
  */
 
-#ifndef __VEHICLE_H
-#define __VEHICLE_H
+#pragma once
 
 #include "CompoundAgent.h"
 
@@ -34,7 +33,7 @@ public:
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount); // C1/C2 constructor
 
-	caosValue xvec, yvec;
+	int xvec = 0, yvec = 0;
 	int cabinleft, cabintop, cabinright, cabinbottom; // TODO: should be protected w/accessors?
 	int cabinplane;
 
@@ -52,5 +51,4 @@ public:
 	virtual void kill();
 };
 
-#endif
 /* vim: set noet: */

@@ -18,7 +18,9 @@
  */
 
 #include "Lift.h"
+#include "caosValue.h"
 #include "Engine.h" // version
+#include "World.h"
 
 Lift::Lift(std::string spritefile, unsigned int firstimage, unsigned int imagecount)
 		: Vehicle(spritefile, firstimage, imagecount) {
@@ -33,7 +35,6 @@ Lift::Lift(std::string spritefile, unsigned int firstimage, unsigned int imageco
  * TODO: this code is a first attempt and might be completely wrong
  */
 
-#include "World.h"
 bool Lift::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
 	if (event == 1 || event == 2) {
 		if (!liftAvailable()) return false; // TODO: hack to make sure the lifts aren't activated when not ready
@@ -58,14 +59,14 @@ void Lift::tick() {
 	if (paused) return;
 
 	// if we're moving..
-	if (yvec.getInt() != 0) {
+	if (yvec != 0) {
 		// are we beyond the call button y point?
 		if (
-			(yvec.getInt() < 0 && liftBottom() <= callbuttony[currentbutton]) || // upwards
-			(yvec.getInt() > 0 && liftBottom() >= callbuttony[currentbutton]) // downwards 
+			(yvec < 0 && liftBottom() <= callbuttony[currentbutton]) || // upwards
+			(yvec > 0 && liftBottom() >= callbuttony[currentbutton]) // downwards
 			) {
 			// stop movement (and make sure we're in the right spot)
-			yvec.setInt(0);
+			yvec = 0;
 			moveTo(x, callbuttony[currentbutton] - (alignwithcabin ? cabinbottom : getHeight()));
 
 			// send deactivate event
@@ -88,6 +89,10 @@ float Lift::liftBottom() {
 		return y + cabinbottom;
 	else
 		return y + getHeight();
+}
+
+bool Lift::liftAvailable() const {
+	return var[0].getInt() == 0;
 }
 
 /* vim: set noet: */

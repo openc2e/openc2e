@@ -1131,8 +1131,6 @@ public:
 	~caosVM();
 
 	bool stopped() { return !currentscript; }
-
-	friend void setupCommandPointers();
 };
 
 class notEnoughParamsException : public caosException {

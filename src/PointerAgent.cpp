@@ -192,8 +192,8 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 		
 	if (event.type == eventmousemove) {
 		moveTo(event.x + engine.camera->getX() - hotspotx, event.y + engine.camera->getY() - hotspoty);
-		velx.setInt(event.xrel * 4);
-		vely.setInt(event.yrel * 4);
+		velx = (int)event.xrel * 4;
+		vely = (int)event.yrel * 4;
 
 		if (editAgent)
 			editAgent->moveTo(pointerX(), pointerY());
@@ -373,8 +373,8 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 					// TODO: is this the correct check?
 					if (carrying->sufferphysics() && carrying->suffercollisions()) {
 						// TODO: do this in the pointer agent?
-						carrying->velx.setFloat(velx.getFloat());
-						carrying->vely.setFloat(vely.getFloat());
+						carrying->velx = velx;
+						carrying->vely = vely;
 					}
 				} else {
 					if (engine.version == 2) {

@@ -557,13 +557,13 @@ void caosVM::v_GRID() {
 	
 	switch (direction) {
 		case 0: // left
-			dest.x -= targ->range.getFloat(); break;
+			dest.x -= targ->range; break;
 		case 1: // right
-			dest.x += targ->range.getFloat(); break;
+			dest.x += targ->range; break;
 		case 2: // top 
-			dest.y -= targ->range.getFloat(); break;
+			dest.y -= targ->range; break;
 		case 3: // bottom 
-			dest.y += targ->range.getFloat(); break;
+			dest.y += targ->range; break;
 	}
 
 	std::shared_ptr<Room> ourRoom = world.map->roomAt(src.x, src.y);

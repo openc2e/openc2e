@@ -1006,7 +1006,7 @@ void SFCCompoundObject::copyToWorld() {
 	// C2 attributes are a subset of c2e ones
 	a->setAttributes(attr);
 	
-	a->actv.setInt(actv);
+	a->actv = actv;
 
 	// ticking
 	a->tickssincelasttimer = tickstate;
@@ -1017,15 +1017,15 @@ void SFCCompoundObject::copyToWorld() {
 		a->var[i].setInt(variables[i]);
 
 	if (parent->version() == 1) {
-		a->size.setInt(size);
-		a->thrt.setInt(threat);
-		a->range.setInt(range);
-		a->accg.setInt(accg);
+		a->size = size;
+		a->thrt = threat;
+		a->range = range;
+		a->accg = accg;
 		a->falling = (gravdata == 0xFFFFFFFF ? false : true); // TODO
-		a->velx.setInt(velx);
-		a->vely.setInt(vely);
-		a->rest.setInt(rest);
-		a->aero.setInt(aero);
+		a->velx = velx;
+		a->vely = vely;
+		a->rest = rest;
+		a->aero = aero;
 		a->paused = frozen; // TODO
 	}
 
@@ -1082,7 +1082,7 @@ void SFCSimpleObject::copyToWorld() {
 	// C2 attributes are a subset of c2e ones
 	a->setAttributes(attr);
 	
-	a->actv.setInt(actv);
+	a->actv = actv;
 
 	// copy bhvrclick data
 	a->clac[0] = entity->bhvrclick[0];
@@ -1098,15 +1098,15 @@ void SFCSimpleObject::copyToWorld() {
 		a->var[i].setInt(variables[i]);
 	
 	if (parent->version() == 1) {
-		a->size.setInt(size);
-		a->thrt.setInt(threat);
-		a->range.setInt(range);
-		a->accg.setInt(accg);
+		a->size = size;
+		a->thrt = threat;
+		a->range = range;
+		a->accg = accg;
 		a->falling = (gravdata == 0xFFFFFFFF ? false : true); // TODO
-		a->velx.setInt(velx);
-		a->vely.setInt(vely);
-		a->rest.setInt(rest);
-		a->aero.setInt(aero);
+		a->velx = velx;
+		a->vely = vely;
+		a->rest = rest;
+		a->aero = aero;
 		a->paused = frozen; // TODO
 	}
 
@@ -1156,8 +1156,8 @@ void SFCVehicle::copyToWorld() {
 
 	// set bump, xvec and yvec
 	a->bump = bump;
-	a->xvec.setInt(xvec);
-	a->yvec.setInt(yvec);
+	a->xvec = xvec;
+	a->yvec = yvec;
 }
 
 void SFCLift::copyToWorld() {

@@ -29,7 +29,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 		} else if (engine.bmprenderer) {
 			// BLCK hasn't been called yet, so we can't check validity yet
 		} else {
-			throw caosException(fmt::format("Failed to create sprite part: first sprite {} is beyond {} sprite(s) in file {}", firstimg, sprite->numframes(), sprite->getName()));
+			throw creaturesException(fmt::format("Failed to create sprite part: first sprite {} is beyond {} sprite(s) in file {}", firstimg, sprite->numframes(), sprite->getName()));
 		}
 	}
 }

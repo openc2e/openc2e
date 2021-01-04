@@ -101,15 +101,12 @@ void caosVM::c_MVBY() {
 */
 void caosVM::v_VELX() {
 	valid_agent(targ);
-	valueStack.push_back(targ->velx);
+	valueStack.push_back(caosValue(targ->velx));
 }
 void caosVM::s_VELX() {
-	VM_PARAM_VALUE(newvalue)
-	caos_assert(newvalue.hasDecimal());
-
-	valid_agent(targ);	
+	VM_PARAM_FLOAT(newvalue)
+	valid_agent(targ);
 	targ->velx = newvalue;
-
 	targ->falling = true;
 }
 
@@ -122,15 +119,12 @@ void caosVM::s_VELX() {
 */
 void caosVM::v_VELY() {
 	valid_agent(targ);
-	valueStack.push_back(targ->vely);
+	valueStack.push_back(caosValue(targ->vely));
 }
 void caosVM::s_VELY() {
-	VM_PARAM_VALUE(newvalue)
-	caos_assert(newvalue.hasDecimal());
-	
-	valid_agent(targ);	
+	VM_PARAM_FLOAT(newvalue)	
+	valid_agent(targ);
 	targ->vely = newvalue;
-
 	targ->falling = true;
 }
 
@@ -159,13 +153,13 @@ void caosVM::v_OBST() {
 
 	switch (direction) {
 		case 0: // left
-			dest.x -= targ->range.getFloat(); break;
+			dest.x -= targ->range; break;
 		case 1: // right
-			dest.x += targ->range.getFloat(); break;
+			dest.x += targ->range; break;
 		case 2: // top
-			dest.y -= targ->range.getFloat(); break;
+			dest.y -= targ->range; break;
 		case 3: // bottom
-			dest.y += targ->range.getFloat(); break;
+			dest.y += targ->range; break;
 	}
 
 	std::shared_ptr<Room> ourRoom = world.map->roomAt(src.x, src.y);
@@ -318,7 +312,7 @@ void caosVM::v_ACCG() {
 	VM_VERIFY_SIZE(0)
 
 	valid_agent(targ);
-	result.setFloat(targ->accg.getFloat());
+	result.setFloat(targ->accg);
 }
 
 /**
@@ -355,7 +349,7 @@ void caosVM::v_AERO() {
 	VM_VERIFY_SIZE(0)
 	
 	valid_agent(targ);
-	result.setFloat(targ->aero.getFloat());
+	result.setFloat(targ->aero);
 }
 
 /**
@@ -444,10 +438,8 @@ void caosVM::c_VELO() {
 	VM_PARAM_FLOAT(velx)
 
 	valid_agent(targ);
-	targ->velx.reset();
-	targ->velx.setFloat(velx);
-	targ->vely.reset();
-	targ->vely.setFloat(vely);
+	targ->velx = velx;
+	targ->vely = vely;
 
 	targ->falling = true;
 }
