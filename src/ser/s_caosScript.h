@@ -26,7 +26,6 @@ SERIALIZE(script) {
 
 	ar & obj.ops;
 	ar & obj.consts;
-	ar & obj.bytestrs;
 	ar & obj.code;
 	ar & obj.tokinfo;
 

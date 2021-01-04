@@ -207,11 +207,6 @@ void caosScript::emitConst(const caosValue &v) {
 	emitOp(CAOS_CONST, current->consts.size() - 1);
 }
 
-void evalVisit::operator()(const bytestring_t &bs) const {
-	scr->current->bytestrs.push_back(bs);
-	scr->emitOp(CAOS_BYTESTR, scr->current->bytestrs.size() - 1);
-}
-
 int costVisit::operator()(const CAOSCmd &cmd) const {
 	int accum = cmd.op->evalcost;
 	for (size_t i = 0; i < cmd.arguments.size(); i++)

@@ -20,7 +20,6 @@
 #ifndef CAOSSCRIPT_H
 #define CAOSSCRIPT_H
 
-#include "bytestring.h"
 #include "serfwd.h"
 #include <memory>
 #include <vector>
@@ -36,6 +35,7 @@
 #include "fileformats/caostoken.h"
 #include "shared_str.h"
 #include <fmt/core.h>
+#include <mpark/variant.hpp>
 
 
 class Agent;
@@ -77,9 +77,6 @@ class script {
 		// small immediates integers are done with CAOS_CONSTINT
 		// mostly for strings and floats
 		std::vector<caosValue> consts;
-		// because caosValue doesn't store bytestrings, we store them in a separate
-		// table
-		std::vector<bytestring_t> bytestrs;
 		// a normalized copy of the script source. this is used for error tracing
 		shared_str code;
 		std::shared_ptr<std::vector<toktrace> > tokinfo;
@@ -108,15 +105,6 @@ class script {
 			return consts[idx];
 		}
 
-		bytestring_t getBytestr(int idx) const {
-			if (idx < 0 || (size_t)idx >= bytestrs.size()) {
-				throw caosException(
-						fmt::format("Internal error: const {} out of range", idx)
-				);
-			}
-			return bytestrs[idx];
-		}
-		
 		std::map<std::string, int> gsub;
 		int getNextIndex() { return ops.size(); }
 		// add op as the next opcode
@@ -195,7 +183,7 @@ struct CAOSCmd {
 };
 
 struct CAOSExpression {
-	mpark::variant<CAOSCmd, caosValue, bytestring_t> value;
+	mpark::variant<CAOSCmd, caosValue> value;
 	int traceidx;
 	void eval(caosScript *scr, bool save_here) const;
 	void save(caosScript *scr) const;
@@ -204,7 +192,6 @@ struct CAOSExpression {
 	CAOSExpression(const CAOSExpression &e) : value(e.value), traceidx(e.traceidx) { }
 	CAOSExpression(int idx, const CAOSCmd &c) : value(c), traceidx(idx) { mpark::get<CAOSCmd>(value).traceidx = traceidx; }
 	CAOSExpression(int idx, const caosValue &c) : value(c), traceidx(idx) { }
-	CAOSExpression(int idx, const bytestring_t &c) : value(c), traceidx(idx) { }
 };
 
 class caosScript;
@@ -213,9 +200,7 @@ struct costVisit {
 	public:
 		costVisit() {}
 		int operator()(const CAOSCmd &cmd) const;
-
 		int operator()(const caosValue &v) const { (void)v; return 0; }
-		int operator()(const bytestring_t &v) const { (void)v;return 0; }
 };
 
 struct saveVisit {
@@ -224,9 +209,7 @@ struct saveVisit {
 	public:
 		saveVisit(class caosScript *s);
 		void operator()(const CAOSCmd &cmd) const;
-
 		void operator()(const caosValue &v) const { (void)v; }
-		void operator()(const bytestring_t &v) const { (void)v; }
 };
 
 struct evalVisit {
@@ -237,7 +220,6 @@ struct evalVisit {
 		evalVisit(caosScript *s, bool save_here);
 		void operator()(const CAOSCmd &cmd) const;
 		void operator()(const caosValue &v) const;
-		void operator()(const bytestring_t &bs) const;
 };
 
 class caosScript { //: Collectable {

@@ -31,8 +31,6 @@
 #include "alloc_count.h"
 #include <type_traits>
 
-#include <mpark/variant.hpp>
-
 class script;
 
 //#define CAOSDEBUG
@@ -50,101 +48,8 @@ class badParamException : public caosException {
 		badParamException() : caosException("parameter type mismatch") {}
 };
 
-class vmStackItem {
-	COUNT_ALLOC(vmStackItem)
-	protected:
-		struct visit_dump {
-			std::string operator()(const caosValue &i) const {
-				return i.dump();
-			}
-
-			std::string operator()(caosValue *i) const {
-				return std::string("ptr ") + i->dump();
-			}
-
-			std::string operator()(const bytestring_t &bs) const {
-				std::string buf;
-				buf += "[ ";
-				for (bytestring_t::const_iterator i = bs.begin(); i != bs.end(); i++) {
-					buf += std::to_string((int)*i);
-					buf += " ";
-				}
-				buf += "]";
-				return buf;
-			}
-		};
-
-		struct visit_lval {
-			
-			const caosValue &operator()(const caosValue &i) const {
-				return i;
-			}
-
-			const caosValue &operator()(caosValue *i) const {
-				return *i;
-			}
-
-			const caosValue &operator()(const bytestring_t &) const {
-				throw badParamException();
-			}
-				
-		};
-
-		struct visit_bs {
-			bytestring_t operator()(const bytestring_t &i) const {
-				return i;
-			}
-			bytestring_t operator()(caosValue *) const {
-				throw badParamException();
-			}
-			bytestring_t operator()(const caosValue &) const {
-				throw badParamException();
-			}
-		};
-				
-		mpark::variant<caosValue, bytestring_t> value;
-
-	public:
-
-		vmStackItem(const caosValue &v) {
-			value = v;
-		}
-
-		vmStackItem(bytestring_t bs) {
-			value = bs;
-		}
-
-		vmStackItem(const vmStackItem &orig) {
-			value = orig.value;
-		}
-
-		const caosValue &getRVal() const {
-			try {
-				return mpark::visit(visit_lval(), value);
-			} catch (mpark::bad_variant_access &e) {
-				throw badParamException();
-			}
-		}
-
-		bytestring_t getByteStr() const {
-			try {
-				return mpark::visit(visit_bs(), value);
-			} catch (mpark::bad_variant_access &e) {
-				throw badParamException();
-			}
-		}
-
-		std::string dump() const {
-			try {
-				return mpark::visit(visit_dump(), value);
-			} catch (mpark::bad_variant_access &e) {
-				return std::string("ERR::bad_visit");
-			}
-		}
-};
-
 struct callStackItem {
-	std::vector<vmStackItem> valueStack;
+	std::vector<caosValue> valueStack;
 	int nip;
 };
 
@@ -183,8 +88,8 @@ public:
 	bool inst, lock, stop_loop;
 	int timeslice;
 
-	std::vector<vmStackItem> valueStack;
-	std::vector<vmStackItem> auxStack;
+	std::vector<caosValue> valueStack;
+	std::vector<caosValue> auxStack;
 	std::vector<callStackItem> callStack;
 	
 	std::istream *inputstream;
@@ -1158,7 +1063,7 @@ class caosVM__lval {
 		caosValue value;
 		caosVM__lval(caosVM *vm) : owner(vm) {
 			VM_STACK_CHECK(vm);
-			value = owner->valueStack.back().getRVal();
+			value = owner->valueStack.back();
 			owner->valueStack.pop_back();
 		}
 		~caosVM__lval() {
@@ -1176,8 +1081,8 @@ template <> inline auto vmparamhelper<std::shared_ptr<Agent>>(const caosValue& v
 template <> inline auto vmparamhelper<AgentRef>(const caosValue& val) { return val.getAgent(); }
 
 #define VM_PARAM_OF_TYPE(name, type) \
-	type name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-		name = vmparamhelper<type>(__x.getRVal()); } vm->valueStack.pop_back();
+	type name; { VM_STACK_CHECK(vm); caosValue __x = vm->valueStack.back(); \
+		name = vmparamhelper<type>(__x); } vm->valueStack.pop_back();
 
 #define VM_PARAM_VALUE(name) VM_PARAM_OF_TYPE(name, caosValue)
 #define VM_PARAM_STRING(name) VM_PARAM_OF_TYPE(name, std::string)
@@ -1188,11 +1093,11 @@ template <> inline auto vmparamhelper<AgentRef>(const caosValue& val) { return v
 // TODO: is usage of valid_agent correct here, or should we be caos_asserting?
 #define VM_PARAM_VALIDAGENT(name) VM_PARAM_AGENT(name) valid_agent(name);
 #define VM_PARAM_VARIABLE(name) caosVM__lval vm__lval_##name(this); caosValue * const name = &vm__lval_##name.value;
-#define VM_PARAM_DECIMAL(name) caosValue name; { VM_STACK_CHECK(vm); vmStackItem __x = vm->valueStack.back(); \
-	name = __x.getRVal(); } vm->valueStack.pop_back();
+#define VM_PARAM_DECIMAL(name) caosValue name; { VM_STACK_CHECK(vm); caosValue __x = vm->valueStack.back(); \
+	name = __x; } vm->valueStack.pop_back();
 #define VM_PARAM_BYTESTR(name) bytestring_t name; { \
 	VM_STACK_CHECK(vm); \
-	vmStackItem __x = vm->valueStack.back(); \
+	caosValue __x = vm->valueStack.back(); \
 	name = __x.getByteStr(); } vm->valueStack.pop_back();
 
 #define CAOS_LVALUE(name, check, get, set) \

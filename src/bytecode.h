@@ -65,10 +65,6 @@ enum opcode_t {
 	 * Argument: An integer
 	 */
 	CAOS_CONSTINT,
-	/* Push a bytestring onto the stack.
-	 * Argument: An index into the bytestrings table.
-	 */
-	CAOS_BYTESTR,
 	/* Copies the element (argument) elements from the top of the 
 	 * argument stack into the top of the aux stack. The values remain on
 	 * the argument stack.

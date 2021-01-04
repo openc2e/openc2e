@@ -218,17 +218,12 @@ inline void caosVM::runOpCore(script *s, caosOp op) {
 			}
 		case CAOS_CONST:
 			{
-				valueStack.push_back(vmStackItem(s->getConstant(op.argument)));
+				valueStack.push_back(s->getConstant(op.argument));
 				break;
 			}
 		case CAOS_CONSTINT:
 			{
-				valueStack.push_back(vmStackItem(caosValue(op.argument)));
-				break;
-			}
-		case CAOS_BYTESTR:
-			{
-				valueStack.push_back(vmStackItem(s->getBytestr(op.argument)));
+				valueStack.push_back(caosValue(op.argument));
 				break;
 			}
 		case CAOS_PUSH_AUX:

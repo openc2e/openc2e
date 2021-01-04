@@ -31,24 +31,28 @@
 
 std::string caosValue::dump() const {
 	switch(getType()) {
+		case CAOSNULL:
+			return "Null";
 		case CAOSSTR:
 			return fmt::format("String \"{}\" ", getString());
-			break;
 		case CAOSINT:
 			return fmt::format("Int {} ", getInt());
-			break;
 		case CAOSFLOAT:
 			return fmt::format("Float {} ", getFloat());
-			break;
 		case CAOSAGENT:
 			return fmt::format("Agent {} ", (void *)getAgent().get());
-			break;
+		case CAOSBYTESTRING:
+			{
+				std::string buf = "Bytestring [";
+				for (auto c : getByteStr()) {
+					buf += std::to_string((int)c);
+					buf += " ";
+				}
+				buf += "]";
+				return buf;
+			}
 		case CAOSVEC:
 			return fmt::format("Vector ({}, {})", getVector().x, getVector().y);
-			break;
-		default:
-			return "[bad caosValue!] ";
-			break;
 	};
 }
 

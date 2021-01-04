@@ -55,8 +55,6 @@ std::string dumpOp(const Dialect *d, caosOp op) {
 			return fmt::format("CONST {}", arg);
 		case CAOS_CONSTINT:
 			return fmt::format("CONSTINT {}", arg);
-		case CAOS_BYTESTR:
-			return fmt::format("BYTESTR {}", arg);
 		case CAOS_PUSH_AUX:
 			return fmt::format("PUSH AUX {}", arg);
 		case CAOS_RESTORE_AUX:
