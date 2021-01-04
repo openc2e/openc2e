@@ -494,7 +494,7 @@ void SkeletalCreature::snapDownFoot() {
 	if (engine.version > 2) {
 		if (engine.version == 2 && !belowfloor && downfootroom->floorpoints.size()) {
 			// TODO: hilar hack: same as above for floorvalue
-			if (size.getInt() <= downfootroom->floorvalue.getInt()) {
+			if (size.getInt() <= downfootroom->floorvalue) {
 				falling = true;
 				return;
 			}

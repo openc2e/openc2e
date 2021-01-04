@@ -17,20 +17,14 @@
  *
  */
 
-#ifndef _C2E_ROOM_H
-#define _C2E_ROOM_H
+#pragma once
 
+#include "physics.h"
 #include <map>
 #include <memory>
-#include <set>
+#include <string>
 #include <utility>
-#include "physics.h"
-#include "caosValue.h"
-#include <iostream>
-#include <algorithm>
 #include <vector>
-
-using std::cerr;
 
 #define CA_COUNT 20
 
@@ -48,12 +42,11 @@ public:
 	std::vector<std::pair<unsigned int, unsigned int> > floorpoints;
 
 	Line left, right, top, bot;
-	
-	caosValue type;
+	int type = 0;
 
 	// Creatures 2
-	caosValue temp, lite, radn, ontr, intr, pres, hsrc, lsrc, rsrc, psrc;
-	caosValue floorvalue, dropstatus;
+	int temp = 0, lite = 0, radn = 0, ontr = 0, intr = 0, pres = 0, hsrc = 0, lsrc = 0, rsrc = 0, psrc = 0;
+	int floorvalue = 0, dropstatus = 0;
 	int windx, windy;
 	
 	std::string music;
@@ -83,5 +76,4 @@ public:
 	void renderBorders(class RenderTarget *surf, int xoffset, int yoffset, unsigned int col);
 };
 
-#endif
 /* vim: set noet: */

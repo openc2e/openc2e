@@ -869,7 +869,7 @@ void MapData::copyToWorld() {
 
 		// create a new room, set the type
 		std::shared_ptr<Room> r(new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom));
-		r->type.setInt(src->roomtype);
+		r->type = src->roomtype;
 
 		// add the room to the world, ensure it matches the id we retrieved
 		while (src->id > world.map->room_base) world.map->room_base++; // skip any gaps (deleted rooms)
@@ -881,23 +881,23 @@ void MapData::copyToWorld() {
 			r->floorpoints = src->floorpoints;
 
 			// set CAs
-			r->intr.setInt(src->inorganicnutrients);
-			r->ontr.setInt(src->organicnutrients);
-			r->temp.setInt(src->temperature);
-			r->pres.setInt(src->pressure);
-			r->lite.setInt(src->lightlevel);
-			r->radn.setInt(src->radiation);
-			r->hsrc.setInt(src->heatsource);
-			r->psrc.setInt(src->pressuresource);
-			r->lsrc.setInt(src->lightsource);
-			r->rsrc.setInt(src->radiationsource);
+			r->intr = src->inorganicnutrients;
+			r->ontr = src->organicnutrients;
+			r->temp = src->temperature;
+			r->pres = src->pressure;
+			r->lite = src->lightlevel;
+			r->radn = src->radiation;
+			r->hsrc = src->heatsource;
+			r->psrc = src->pressuresource;
+			r->lsrc = src->lightsource;
+			r->rsrc = src->radiationsource;
 
 			// set wind x/y
 			r->windx = src->windx;
 			r->windy = src->windy;
 
-			r->dropstatus.setInt(src->dropstatus);
-			r->floorvalue.setInt(src->floorvalue);
+			r->dropstatus = src->dropstatus;
+			r->floorvalue = src->floorvalue;
 
 			r->music = src->music;
 		}

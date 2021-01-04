@@ -219,7 +219,7 @@ void caosVM::v_RTYP() {
 
 	std::shared_ptr<Room> room = world.map->getRoom(roomid);
 	if (room)
-		result.setInt(room->type.getInt());
+		result.setInt(room->type);
 	else
 		result.setInt(-1);
 }
@@ -236,7 +236,7 @@ void caosVM::v_RTYP_c2() {
 	std::shared_ptr<Room> r = world.map->roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 	if (!r) result.setInt(-1);
 	else {
-		result.setInt(r->type.getInt());
+		result.setInt(r->type);
 	}
 }
 
@@ -257,7 +257,7 @@ void caosVM::c_SETV_RTYP() {
 	std::shared_ptr<Room> r = world.map->roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
 	if (!r) return; // TODO: correct behaviour?
 	else
-		r->type.setInt(roomtype);
+		r->type = roomtype;
 }
 
 /**
@@ -1049,7 +1049,7 @@ void caosVM::c_ROOM() {
 		r->y_left_floor = r->y_right_floor = bottom;
 	}
 
-	r->type.setInt(type);
+	r->type = type;
 }
 
 /**
@@ -1150,27 +1150,27 @@ void caosVM::v_ROOM_c1() {
 			break;
 
 		case 4:
-			result.setInt(r->type.getInt());
+			result.setInt(r->type);
 			break;
 		
 		case 5:
-			result.setInt(r->floorvalue.getInt());
+			result.setInt(r->floorvalue);
 			break;
 
 		case 6:
-			result.setInt(r->ontr.getInt());
+			result.setInt(r->ontr);
 			break;
 
 		case 7:
-			result.setInt(r->intr.getInt());
+			result.setInt(r->intr);
 			break;
 
 		case 8:
-			result.setInt(r->temp.getInt());
+			result.setInt(r->temp);
 			break;
 
 		case 9:
-			result.setInt(r->pres.getInt());
+			result.setInt(r->pres);
 			break;
 
 		case 10:
@@ -1182,27 +1182,27 @@ void caosVM::v_ROOM_c1() {
 			break;
 
 		case 12:
-			result.setInt(r->lite.getInt());
+			result.setInt(r->lite);
 			break;
 
 		case 13:
-			result.setInt(r->radn.getInt());
+			result.setInt(r->radn);
 			break;
 
 		case 14:
-			result.setInt(r->hsrc.getInt());
+			result.setInt(r->hsrc);
 			break;
 
 		case 15:
-			result.setInt(r->psrc.getInt());
+			result.setInt(r->psrc);
 			break;
 
 		case 16:
-			result.setInt(r->lsrc.getInt());
+			result.setInt(r->lsrc);
 			break;
 
 		case 17:
-			result.setInt(r->rsrc.getInt());
+			result.setInt(r->rsrc);
 			break;
 
 		case 18:
@@ -1210,7 +1210,7 @@ void caosVM::v_ROOM_c1() {
 			break;
 
 		case 19:
-			result.setInt(r->dropstatus.getInt());
+			result.setInt(r->dropstatus);
 			break;
 	}
 }

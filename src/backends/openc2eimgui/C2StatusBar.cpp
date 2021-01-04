@@ -23,7 +23,7 @@ static optional<int> getTemperatureNearSelectedCreature() {
   if (world.selectedcreature) {
     auto room = roomContainingAgent(world.selectedcreature);
     if (room) {
-      return room->temp.getInt();
+      return room->temp;
     }
   }
   return {};
@@ -32,7 +32,7 @@ static optional<int> getTemperatureNearSelectedCreature() {
 static optional<int> getTemperatureAtCenterOfCamera() {
   auto room = engine.camera->getMetaRoom()->roomAt(engine.camera->getXCentre(), engine.camera->getYCentre());
   if (room) {
-    return room->temp.getInt();
+    return room->temp;
   }
   return {};
 }

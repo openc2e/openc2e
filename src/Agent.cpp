@@ -872,7 +872,7 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom *m, Point sr
 			room = newroom;
 		}
 	
-		if (room->floorpoints.size() && i == 3 && dy >= 0 && size.getInt() > room->floorvalue.getInt()) { // TODO: Hack!
+		if (room->floorpoints.size() && i == 3 && dy >= 0 && size.getInt() > room->floorvalue) { // TODO: Hack!
 			// TODO: we don't check floorYatX isn't returning a 'real' room floor, but floorpoints should cover the whole floor anyway
 			int floory = room->floorYatX(src.x + p.x);
 			
