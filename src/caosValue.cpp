@@ -17,17 +17,216 @@
  *
  */
 
-#define IN_CAOSVAR_CPP
-
 #include "caosValue.h"
 #include "Engine.h" // version
 #include "World.h" // unid
+#include "utils/overload.h"
 
 #include <fmt/core.h>
 
-#ifdef DONT_INLINE_CAOSVAR_ACCESSORS
-#error meh, copy the stuff out of caosValue.h and drop it here
-#endif
+const char* variableTypeToString(variableType type) {
+	switch (type) {
+		case CAOSNULL:
+			return "null";
+		case CAOSAGENT:
+			return "agent";
+		case CAOSINT:
+			return "integer";
+		case CAOSFLOAT:
+			return "float";
+		case CAOSSTR:
+			return "string";
+		case CAOSBYTESTRING:
+			return "bytestring";
+		case CAOSVEC:
+			return "vector";
+	}
+}
+
+struct typeVisit {
+	variableType operator()(int) const { return CAOSINT; }
+	variableType operator()(float) const { return CAOSFLOAT; }
+	variableType operator()(const std::string &) const { return CAOSSTR; }
+	variableType operator()(const AgentRef &) const { return CAOSAGENT; }
+	variableType operator()(nulltype_tag) const { return CAOSNULL; }
+	variableType operator()(const bytestring_t&) const { return CAOSBYTESTRING; }
+	variableType operator()(const Vector<float> &) const { return CAOSVEC; }
+};
+
+#define BAD_TYPE(et, gt) \
+std::conditional<std::is_fundamental<et>::value, et, std::add_lvalue_reference<std::add_const<et>::type>::type>::type \
+operator()(const gt &) const { \
+	throw wrongCaosValueTypeException( \
+			"Wrong caosValue type: Expected " #et ", got " #gt \
+			); \
+}
+
+struct intVisit {
+	int operator()(int i) const { return i; }
+	int operator()(float f) const {
+		// horror necessary for rounding without C99
+		int x = (int)f; float diff = f - x;
+		if (f >= 0.0f) {
+			if (diff >= 0.5f) return ++x; else return x;
+		} else {
+			if (diff <= -0.5f) return --x; else return x;
+		}
+	}
+	int operator()(const Vector<float> &v) const {
+		return (int)v.getMagnitude();
+	}
+	BAD_TYPE(int, std::string);
+	BAD_TYPE(int, AgentRef);
+	BAD_TYPE(int, bytestring_t);
+	BAD_TYPE(int, nulltype_tag);
+};
+
+struct floatVisit {
+	float operator()(int i) const { return (float)i; }
+	float operator()(float f) const { return f; }
+	float operator()(const Vector<float> &v) const { return v.getMagnitude(); }
+	BAD_TYPE(float, std::string);
+	BAD_TYPE(float, AgentRef);
+	BAD_TYPE(float, bytestring_t);
+	BAD_TYPE(float, nulltype_tag);
+};
+
+struct stringVisit {
+	const std::string &operator()(const std::string &s) const {
+		return s;
+	}
+	BAD_TYPE(std::string, AgentRef);
+	BAD_TYPE(std::string, nulltype_tag);
+	BAD_TYPE(std::string, int);
+	BAD_TYPE(std::string, float);
+	BAD_TYPE(std::string, bytestring_t);
+	BAD_TYPE(std::string, Vector<float>);
+};
+
+struct agentVisit {
+	const AgentRef &operator()(const AgentRef &a) const {
+		return a;
+	}
+	BAD_TYPE(AgentRef, std::string);
+	BAD_TYPE(AgentRef, nulltype_tag);
+	const AgentRef &operator()(int i) const;
+	BAD_TYPE(AgentRef, float);
+	BAD_TYPE(AgentRef, bytestring_t);
+	BAD_TYPE(AgentRef, Vector<float>);
+};
+
+struct vectorVisit {
+	const Vector<float> &operator()(const Vector<float> &v) const {
+		return v;
+	}
+	BAD_TYPE(Vector<float>, std::string);
+	BAD_TYPE(Vector<float>, nulltype_tag);
+	BAD_TYPE(Vector<float>, int);
+	BAD_TYPE(Vector<float>, float);
+	BAD_TYPE(Vector<float>, bytestring_t);
+	BAD_TYPE(Vector<float>, AgentRef);
+};
+
+	
+#undef BAD_TYPE
+
+variableType caosValue::getType() const {
+	return visit(typeVisit(), value);
+}
+
+void caosValue::reset() {
+	value = nulltype_tag();
+}
+
+bool caosValue::isNull() const {
+	return getType() == CAOSNULL;
+}
+
+caosValue::caosValue() {
+}
+
+caosValue::~caosValue() {
+}
+
+caosValue &caosValue::operator=(const caosValue &copyFrom) {
+	value = copyFrom.value;
+	return *this;
+}
+
+caosValue::caosValue(const caosValue &copyFrom) : value(copyFrom.value) { }
+
+caosValue::caosValue(int v) { setInt(v); }
+caosValue::caosValue(float v) { setFloat(v); }
+caosValue::caosValue(Agent *v) { setAgent(v); }
+caosValue::caosValue(const AgentRef &v) { setAgent(v); }
+caosValue::caosValue(const std::string &v) { setString(v); }
+caosValue::caosValue(const bytestring_t &v) { setByteStr(v); }
+caosValue::caosValue(const Vector<float> &v) { setVector(v); }
+
+bool caosValue::isEmpty() const { return getType() == CAOSNULL; }
+bool caosValue::hasInt() const { return getType() == CAOSINT; }
+bool caosValue::hasFloat() const { return getType() == CAOSFLOAT; }
+bool caosValue::hasAgent() const { return getType() == CAOSAGENT; }
+bool caosValue::hasString() const { return getType() == CAOSSTR; }
+bool caosValue::hasDecimal() const { return getType() == CAOSINT || getType() == CAOSFLOAT || getType() == CAOSVEC; }
+bool caosValue::hasNumber() const { return hasDecimal(); }
+bool caosValue::hasByteStr() const { return getType() == CAOSBYTESTRING; }
+bool caosValue::hasVector() const { return getType() == CAOSVEC; }
+
+void caosValue::setInt(int i) { value = i; }
+void caosValue::setFloat(float i) { value = i; }
+void caosValue::setAgent(Agent *i) {
+	value = AgentRef(i);
+}
+void caosValue::setAgent(const AgentRef &r) {
+	value = r;
+}
+void caosValue::setString(const std::string &i) {
+	value = i;
+}
+void caosValue::setByteStr(const bytestring_t &bs) {
+	value = bs;
+}
+void caosValue::setVector(const Vector<float> &v) {
+	value = v;
+}
+
+int caosValue::getInt() const {
+	return visit(intVisit(), value);
+}
+
+float caosValue::getFloat() const {
+	return visit(floatVisit(), value);
+}
+
+void caosValue::getString(std::string &s) const {
+	s = getString();
+}
+
+const std::string &caosValue::getString() const {
+	return visit(stringVisit(), value);
+}
+
+std::shared_ptr<Agent> caosValue::getAgent() const {
+	return getAgentRef().lock();
+}
+
+const AgentRef &caosValue::getAgentRef() const {
+	return visit(agentVisit(), value);
+}
+
+const bytestring_t &caosValue::getByteStr() const {
+	return visit(overload(
+		[](const bytestring_t &bs) -> const bytestring_t& { return bs; },
+		[](const auto&) -> const bytestring_t& {
+			throw wrongCaosValueTypeException("Wrong caosValue type: Expected bytestring");
+		}
+	), value);
+}
+
+const Vector<float> &caosValue::getVector() const {
+	return visit(vectorVisit(), value);
+}
 
 std::string caosValue::dump() const {
 	switch(getType()) {
@@ -118,7 +317,7 @@ bool caosValue::operator < (const caosValue &v) const {
 AgentRef nullagentref;
 
 // TODO: muh
-const AgentRef &caosValue::agentVisit::operator()(int i) const {
+const AgentRef &agentVisit::operator()(int i) const {
 	if (engine.version == 2) {
 		if (i == 0) {
 			return nullagentref;
