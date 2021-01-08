@@ -2,7 +2,7 @@
 #include "fileformats/caoslexer.h"
 #include "fileformats/caostoken.h"
 #include "encoding.h"
-#include "visit_overloads.h"
+#include "utils/overload.h"
 
 #include <cassert>
 #include <regex>
@@ -414,15 +414,15 @@ class Caos2PrayParserImpl {
         tags.push_back(IntegerTag{"Script Count", script_count});
 
         for (auto &e : events) {
-            visit_overloads(
-                e, [&](const GroupBlockStart &g) { group_blocks.push_back(g); },
+            visit(overload(
+                [&](const GroupBlockStart &g) { group_blocks.push_back(g); },
                 [&](const InlineBlock &) { inline_blocks.push_back(e); },
                 [&](const StringTag &) { tags.push_back(e); },
                 [&](const StringTagFromFile &) { tags.push_back(e); },
                 [&](const IntegerTag &) { tags.push_back(e); },
                 [](const GroupBlockEnd &) { abort(); }, // not created yet
                 [](const Error &) { abort(); }          // handled already
-            );
+            ), e);
         }
 
         if (group_blocks.size() == 0 && inline_blocks.size() == 0) {

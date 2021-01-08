@@ -1,7 +1,7 @@
 #include "fileformats/Caos2PrayParser.h"
 #include "fileformats/PraySourceParser.h"
 #include "fileformats/PrayFileWriter.h"
-#include "visit_overloads.h"
+#include "utils/overload.h"
 
 #include <iostream>
 #include <map>
@@ -60,8 +60,8 @@ int main(int argc, char**argv) {
     std::map<std::string, unsigned int> int_tags;
     
     for (auto res : events) {
-      visit_overloads(
-          res, [](PraySourceParser::Error) {
+      visit(overload(
+          [](PraySourceParser::Error) {
               /* handled already */
           },
           [&](PraySourceParser::GroupBlockStart) {
@@ -111,7 +111,8 @@ int main(int argc, char**argv) {
           },
           [&](PraySourceParser::IntegerTag event) {
             int_tags[event.key] = event.value;
-          });
+          }
+      ), res);
     }
 
     std::cout << "Done!" << std::endl;
