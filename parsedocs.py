@@ -79,14 +79,14 @@ def find_implementation(name, lines):
         break
 
     function_definition = re.search(
-        "^\s*void (caosVM::[cv]_[A-Za-z0-9_]+)\s*\(\s*\)", lines[p]
+        "^\s*void ([cv]_[A-Za-z0-9_]+)\s*\(", lines[p]
     )
     if function_definition:
         return function_definition.group(1)
 
     caos_lvalue = re.search("^\s*CAOS_LVALUE(_[A-Z_]+)?\(([A-Za-z0-9_]+)\s*,", lines[p])
     if caos_lvalue:
-        return "caosVM::v_" + caos_lvalue.group(2)
+        return "v_" + caos_lvalue.group(2)
 
     raise Exception(
         "Couldn't deduce function name for {} from {}".format(name, repr(lines[p]))
@@ -181,8 +181,6 @@ for filename in sys.argv[1:]:
                 obj["saveimpl"] = getdirective("pragma saveimpl")
             elif obj["type"] == "variable":
                 obj["saveimpl"] = obj["implementation"].replace("v_", "s_")
-            else:
-                obj["saveimpl"] = "caosVM::dummy_cmd"
 
             if getdirective("pragma stackdelta"):
                 obj["stackdelta"] = getdirective("pragma stackdelta")

@@ -25,7 +25,7 @@
  LOAD (command) worldname (string)
  %status stub
 */
-void caosVM::c_LOAD() {
+void c_LOAD(caosVM *vm) {
 	VM_PARAM_STRING(worldname)
 
 	// TODO
@@ -40,7 +40,7 @@ void caosVM::c_LOAD() {
  the script will execute the next instruction, often QUIT or LOAD, which is
  bad).
 */
-void caosVM::c_SAVE() {
+void c_SAVE(caosVM*) {
 	// note, world.saving doesn't mean anything yet
 	world.saving = true;
 }
@@ -51,7 +51,7 @@ void caosVM::c_SAVE() {
 
  Quit the game engine at the start of the nexttick
 */
-void caosVM::c_QUIT() {
+void c_QUIT(caosVM*) {
 	// TODO
 	world.quitting = true;
 }
@@ -62,9 +62,9 @@ void caosVM::c_QUIT() {
 
  Returns the name of the current world.
 */
-void caosVM::v_WNAM() {
+void v_WNAM(caosVM *vm) {
 	// result.setString(world.name);
-	result.setString("oh"); // TODO
+	vm->result.setString("oh"); // TODO
 }
 
 /**
@@ -73,9 +73,9 @@ void caosVM::v_WNAM() {
 
  Returns the unique identifier (moniker?) of the current world.
 */
-void caosVM::v_WUID() {
+void v_WUID(caosVM *vm) {
 	// result.setString(world.moniker);
-	result.setString("dock-aaaaa-bbbbb-ccccc-ddddd"); // TODO
+	vm->result.setString("dock-aaaaa-bbbbb-ccccc-ddddd"); // TODO
 }
 
 /**
@@ -84,7 +84,7 @@ void caosVM::v_WUID() {
 
  Sets an index in the mysterious global tint table to have the specified values. No, we have no idea what that means either.
 */
-void caosVM::c_WTNT() {
+void c_WTNT(caosVM *vm) {
 	VM_PARAM_INTEGER(swap)
 	VM_PARAM_INTEGER(rotation)
 	VM_PARAM_INTEGER(blue)
@@ -99,8 +99,8 @@ void caosVM::c_WTNT() {
  NWLD (integer)
  %status stub
 */
-void caosVM::v_NWLD() {
-	result.setInt(0); // TODO
+void v_NWLD(caosVM *vm) {
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -109,7 +109,7 @@ void caosVM::v_NWLD() {
 
  Create a new world directory to prepare for the creation of the specified world.
 */
-void caosVM::c_WRLD() {
+void c_WRLD(caosVM *vm) {
 	VM_PARAM_STRING(name)
 
 	// TODO
@@ -121,7 +121,7 @@ void caosVM::c_WRLD() {
 
  Return the name of the specified world (zero-indexed, see NWLD).
 */
-void caosVM::v_WRLD() {
+void v_WRLD(caosVM *vm) {
 	VM_PARAM_INTEGER(world)
 
 	caos_assert(false); // TODO
@@ -131,7 +131,7 @@ void caosVM::v_WRLD() {
  PSWD (command) password (string)
  %status stub
 */
-void caosVM::c_PSWD() {
+void c_PSWD(caosVM *vm) {
 	VM_PARAM_STRING(password)
 
 	// TODO
@@ -143,10 +143,10 @@ void caosVM::c_PSWD() {
 
  Return the password for the specified world (zero-indexed, see NWLD), or an empty string for no password.
 */
-void caosVM::v_PSWD() {
+void v_PSWD(caosVM *vm) {
 	VM_PARAM_INTEGER(world)
 
-	result.setString(""); // TODO
+	vm->result.setString(""); // TODO
 }
 
 /**
@@ -155,10 +155,10 @@ void caosVM::v_PSWD() {
 
  Return the world identifier for the specified world name, or -1 if it doesn't exist.
 */
-void caosVM::v_WNTI() {
+void v_WNTI(caosVM *vm) {
 	VM_PARAM_STRING(name)
 
-	result.setInt(-1); // TODO
+	vm->result.setInt(-1); // TODO
 }
 
 /**
@@ -167,7 +167,7 @@ void caosVM::v_WNTI() {
 
  Delete the specified world directory and all contents.
 */
-void caosVM::c_DELW() {
+void c_DELW(caosVM *vm) {
 	VM_PARAM_STRING(name)
 
 	caos_assert(false); // TODO

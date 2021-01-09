@@ -41,6 +41,8 @@ struct caosValueCompare {
 	bool operator()(const caosValue &v1, const caosValue &v2) const;
 };
 
+class caosVM;
+
 class Agent : public std::enable_shared_from_this<Agent> {
 	
 	friend class caosVM;
@@ -61,25 +63,14 @@ protected:
 	int lifecount;
 	int lastScript;
 
-	heap_array<caosValue, 100> var; // OVxx
-	std::map<caosValue, caosValue, caosValueCompare> name_variables;
-	
 	int unused_cint;
-	
-	std::map<unsigned int, std::shared_ptr<genomeFile> > genome_slots;
-	
-	class caosVM *vm;
 
 	void zotstack();
 
 	mutable int unid;
-	unsigned int zorder;
-	unsigned int tickssincelasttimer, timerrate;
+	unsigned int tickssincelasttimer;
 
 	bool wasmoved;
-
-	int emitca_index; float emitca_amount;
-	int lastcollidedirection;
 
 	std::list<std::shared_ptr<Agent> >::iterator agents_iter;
 	std::list<caosVM *> vmstack; // for CALL etc
@@ -89,7 +80,6 @@ protected:
 	bool dying : 1;
 	
 	void vmTick();
-	virtual bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
 
 	virtual void physicsTick();
 	void physicsTickC2();
@@ -102,6 +92,16 @@ protected:
 	virtual void adjustCarried(float xoffset, float yoffset);
 
 public:
+	int emitca_index; float emitca_amount;
+	std::map<unsigned int, std::shared_ptr<genomeFile> > genome_slots;
+	int lastcollidedirection;
+	std::map<caosValue, caosValue, caosValueCompare> name_variables;
+	unsigned int timerrate;
+	heap_array<caosValue, 100> var; // OVxx	
+	caosVM *vm;
+	unsigned int zorder;
+	virtual bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
+
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 
 	std::shared_ptr<class VoiceData> voice;

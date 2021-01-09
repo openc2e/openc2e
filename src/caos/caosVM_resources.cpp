@@ -181,7 +181,7 @@ std::string findBlock(std::string type, std::string last, bool forward, bool loo
  using the specified resource, returns the integer value associated with the given tag,
  or default if the tag doesn't exist
 */
-void caosVM::v_PRAY_AGTI() {
+void v_PRAY_AGTI(caosVM *vm) {
 	VM_PARAM_INTEGER(_default)
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
@@ -192,9 +192,9 @@ void caosVM::v_PRAY_AGTI() {
 	PrayBlock *p = i->second.get();
 	p->parseTags();
 	if (p->integerValues.find(tag) == p->integerValues.end())
-		result.setInt(_default);
+		vm->result.setInt(_default);
 	else
-		result.setInt(p->integerValues[tag]);
+		vm->result.setInt(p->integerValues[tag]);
 }
 
 /**
@@ -204,7 +204,7 @@ void caosVM::v_PRAY_AGTI() {
  using the specified resource, returns the string value associated with the given tag,
  or default if the tag doesn't exist
 */
-void caosVM::v_PRAY_AGTS() {
+void v_PRAY_AGTS(caosVM *vm) {
 	VM_PARAM_STRING(_default)
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
@@ -215,9 +215,9 @@ void caosVM::v_PRAY_AGTS() {
 	PrayBlock *p = i->second.get();
 	p->parseTags();
 	if (p->stringValues.find(tag) == p->stringValues.end())
-		result.setString(_default);
+		vm->result.setString(_default);
 	else
-		result.setString(p->stringValues[tag]);
+		vm->result.setString(p->stringValues[tag]);
 }
 
 /**
@@ -227,11 +227,11 @@ void caosVM::v_PRAY_AGTS() {
  returns the name of the resource of the specified type which is immediately previous to last
  see PRAY PREV if you want to loop around
 */
-void caosVM::v_PRAY_BACK() {
+void v_PRAY_BACK(caosVM *vm) {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 
-	result.setString(findBlock(type, last, false, false));
+	vm->result.setString(findBlock(type, last, false, false));
 }
 
 /**
@@ -240,7 +240,7 @@ void caosVM::v_PRAY_BACK() {
 
  return the number of resources of the specified type available
 */
-void caosVM::v_PRAY_COUN() {
+void v_PRAY_COUN(caosVM *vm) {
 	VM_PARAM_STRING(type)
 
 	unsigned int count = 0;
@@ -248,28 +248,28 @@ void caosVM::v_PRAY_COUN() {
 		if (i->second->type == type)
 			count++;
 	
-	result.setInt(count);
+	vm->result.setInt(count);
 }
 
 /**
  PRAY DEPS (integer) name (string) install (integer)
  %status maybe
 */
-void caosVM::v_PRAY_DEPS() {
+void v_PRAY_DEPS(caosVM *vm) {
 	VM_PARAM_INTEGER(install)
 	VM_PARAM_STRING(name)
 
-	result.setInt(prayInstallDeps(name, install != 0));
+	vm->result.setInt(prayInstallDeps(name, install != 0));
 }
 
 /**
  PRAY EXPO (integer) type (string)
  %status stub
 */
-void caosVM::v_PRAY_EXPO() {
+void v_PRAY_EXPO(caosVM *vm) {
 	VM_PARAM_STRING(type)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -280,15 +280,15 @@ void caosVM::v_PRAY_EXPO() {
  if install is 0, the install doesn't actually happen, it's just tested
  returns 0 on success, 1 on failure
 */
-void caosVM::v_PRAY_FILE() {
+void v_PRAY_FILE(caosVM *vm) {
 	VM_PARAM_INTEGER(install)
 	VM_PARAM_INTEGER(type)
 	VM_PARAM_STRING(name)
 
 	if (prayInstall(name, type, (install != 0)))
-		result.setInt(0);
+		vm->result.setInt(0);
 	else
-		result.setInt(1);
+		vm->result.setInt(1);
 }
 
 /**
@@ -298,11 +298,11 @@ void caosVM::v_PRAY_FILE() {
  returns the name of the resource of the specified type which is immediately after last
  see PRAY NEXT if you want to loop around
 */
-void caosVM::v_PRAY_FORE() {
+void v_PRAY_FORE(caosVM *vm) {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 
-	result.setString(findBlock(type, last, true, false));
+	vm->result.setString(findBlock(type, last, true, false));
 }
 
 /**
@@ -314,7 +314,7 @@ void caosVM::v_PRAY_FORE() {
 
  recommended to be called after intensive PRAY usage, eg agent installation
 */
-void caosVM::c_PRAY_GARB() {
+void c_PRAY_GARB(caosVM *vm) {
 	VM_PARAM_INTEGER(force)
 
 	// TODO
@@ -324,19 +324,19 @@ void caosVM::c_PRAY_GARB() {
  PRAY IMPO (integer) moniker (string) doit (integer) keepfile (integer)
  %status stub
 */
-void caosVM::v_PRAY_IMPO() {
+void v_PRAY_IMPO(caosVM *vm) {
 	VM_PARAM_INTEGER(keepfile)
 	VM_PARAM_INTEGER(doit)
 	VM_PARAM_STRING(moniker)
 
-	result.setInt(4); // TODO
+	vm->result.setInt(4); // TODO
 }
 
 /**
  PRAY INJT (integer) name (string) install (integer) report (variable)
  %status maybe
 */
-void caosVM::v_PRAY_INJT() {
+void v_PRAY_INJT(caosVM *vm) {
 	VM_PARAM_VARIABLE(report)
 	VM_PARAM_INTEGER(install)
 	VM_PARAM_STRING(name)
@@ -344,7 +344,7 @@ void caosVM::v_PRAY_INJT() {
 	// Try installing the dependencies.
 	int r = prayInstallDeps(name, install != 0);
 	if (r != 0) {
-		result.setInt(-3);
+		vm->result.setInt(-3);
 		report->setInt(r);
 		return;
 	}
@@ -358,7 +358,7 @@ void caosVM::v_PRAY_INJT() {
 	// .. grab the script count ..
 	std::map<std::string, uint32_t>::iterator j = p->integerValues.find("Script Count");
 	if (j == p->integerValues.end()) {
-		result.setInt(-3); // TODO: this isn't really a dependency fail, what do I do here?
+		vm->result.setInt(-3); // TODO: this isn't really a dependency fail, what do I do here?
 		return;
 	}
 	int noscripts = j->second; caos_assert(noscripts >= 0);
@@ -369,7 +369,7 @@ void caosVM::v_PRAY_INJT() {
 		std::string scriptname = fmt::format("Script {}", z);
 		std::map<std::string, std::string>::iterator k = p->stringValues.find(scriptname);
 		if (k == p->stringValues.end()) {
-			result.setInt(-1);
+			vm->result.setInt(-1);
 			report->setString(scriptname);
 			return;
 		}
@@ -387,7 +387,7 @@ void caosVM::v_PRAY_INJT() {
 			vm->runEntirely(script.installer);
 		} catch (caosException &e) {
 			world.freeVM(vm);
-			result.setInt(-2);
+			vm->result.setInt(-2);
 			report->setString(scriptname + " error: " + e.what());
 			std::cerr << "PRAY INJT caught exception trying to inject " << name << " - PRAY " << scriptname << ": " << e.prettyPrint() << std::endl;
 			return;
@@ -395,7 +395,7 @@ void caosVM::v_PRAY_INJT() {
 		world.freeVM(vm);
 	}
 	
-	result.setInt(0);
+	vm->result.setInt(0);
 }
 
 /**
@@ -406,24 +406,24 @@ void caosVM::v_PRAY_INJT() {
 
  returns 1 upon success, or 0 upon failure (typically no such resource)
 */
-void caosVM::v_PRAY_KILL() {
+void v_PRAY_KILL(caosVM *vm) {
 	VM_PARAM_STRING(resource)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
  PRAY MAKE (integer) journalspot (integer) journalname (string) prayspot (integer) name (string) report (variable)
  %status stub
 */
-void caosVM::v_PRAY_MAKE() {
+void v_PRAY_MAKE(caosVM *vm) {
 	VM_PARAM_VARIABLE(report)
 	VM_PARAM_STRING(name)
 	VM_PARAM_INTEGER(prayspot)
 	VM_PARAM_STRING(journalname)
 	VM_PARAM_INTEGER(journalspot)
 
-	result.setInt(1); // TODO
+	vm->result.setInt(1); // TODO
 	report->setString("hat u");
 }
 
@@ -433,13 +433,13 @@ void caosVM::v_PRAY_MAKE() {
 
  Networking is not supported in openc2e, so conveniently fails.
 */
-void caosVM::v_NET_MAKE() {
+void v_NET_MAKE(caosVM *vm) {
 	VM_PARAM_VARIABLE(report)
 	VM_PARAM_STRING(user)
 	VM_PARAM_STRING(journalname)
 	VM_PARAM_INTEGER(journalspot)
 
-	result.setInt(1);
+	vm->result.setInt(1);
 	report->setString("Networking unsupported.");
 }
 
@@ -450,11 +450,11 @@ void caosVM::v_NET_MAKE() {
  returns the name of the resource of the specified type which is immediately after last
  see PRAY FORE if you don't want to loop around
 */
-void caosVM::v_PRAY_NEXT() {
+void v_PRAY_NEXT(caosVM *vm) {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 	
-	result.setString(findBlock(type, last, true, true));
+	vm->result.setString(findBlock(type, last, true, true));
 }
 
 /**
@@ -464,11 +464,11 @@ void caosVM::v_PRAY_NEXT() {
  returns the name of the resource of the specified type which is immediately previous to last
  see PRAY BACK if you don't want to loop around
 */
-void caosVM::v_PRAY_PREV() {
+void v_PRAY_PREV(caosVM *vm) {
 	VM_PARAM_STRING(last)
 	VM_PARAM_STRING(type)
 
-	result.setString(findBlock(type, last, false, true));
+	vm->result.setString(findBlock(type, last, false, true));
 }
 
 /**
@@ -477,7 +477,7 @@ void caosVM::v_PRAY_PREV() {
 
  make the pray manager check for deleted/new files in the resource directory
 */
-void caosVM::c_PRAY_REFR() {
+void c_PRAY_REFR(caosVM*) {
 	world.praymanager->update();
 }
 
@@ -485,20 +485,20 @@ void caosVM::c_PRAY_REFR() {
  PRAY TEST (integer) name (string)
  %status maybe
 */
-void caosVM::v_PRAY_TEST() {
+void v_PRAY_TEST(caosVM *vm) {
 	VM_PARAM_STRING(name)
 
 	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
 	if (i == world.praymanager->blocks.end())
-		result.setInt(0);
+		vm->result.setInt(0);
 	else {
 		PrayBlock *p = i->second.get();
 		if (p->isLoaded())
-			result.setInt(1);
+			vm->result.setInt(1);
 		else if (p->isCompressed())
-			result.setInt(3);
+			vm->result.setInt(3);
 		else
-			result.setInt(2);
+			vm->result.setInt(2);
 	}
 }
 

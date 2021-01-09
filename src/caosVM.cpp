@@ -114,10 +114,11 @@ inline void caosVM::invoke_cmd(script *s, bool is_saver, int opidx) {
 	int stackdelta = ci->stackdelta - (is_saver ? 2 : 0);
 	unsigned int stackstart = valueStack.size();
 	assert(result.isNull());
-	if (is_saver)
-		(this->*(ci->savehandler))();
-	else
-		(this->*(ci->handler))();
+	if (is_saver) {
+		if (ci->savehandler) (ci->savehandler)(this);
+	} else {
+		if (ci->handler) (ci->handler)(this);
+	}
 	if (!is_saver && !result.isNull()) {
 		valueStack.push_back(result);
 		result.reset();
@@ -394,10 +395,14 @@ void caosVM::resetCore() {
 	inst = lock = 0;
 	timeslice = 0;
 
-	c_FILE_ICLO(); // make sure input stream is freed
-	inputstream = 0; // .. possibly not strictly necessary, when all is bugfree
-	c_FILE_OCLO(); // make sure output stream is freed
-	outputstream = 0;
+	if (inputstream) {
+		delete inputstream;
+		inputstream = nullptr;
+	}
+	if (outputstream) {
+		delete outputstream;
+		outputstream = nullptr;
+	}
 
 	_it_ = NULL;
 	from.setAgent(NULL);
@@ -422,7 +427,4 @@ void caosVM::tick() {
 	}
 }
 
-void caosVM::dummy_cmd() {
-	// no-op
-}
 /* vim: set noet: */

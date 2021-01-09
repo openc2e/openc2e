@@ -1,4 +1,5 @@
 #include "caosparser.h"
+#include "creaturesException.h"
 #include "dialect.h"
 #include "noncopyable.h"
 #include "utils/ascii_tolower.h"

@@ -1,4 +1,5 @@
 #include "caosparser.h"
+#include "creaturesException.h"
 #include "dialect.h"
 #include "endianlove.h"
 #include "fileformats/c1cobfile.h"

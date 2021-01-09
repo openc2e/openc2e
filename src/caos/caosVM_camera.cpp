@@ -63,15 +63,15 @@ bool agentOnCamera(Agent *targ, bool checkall) {
  Returns 1 if the TARG agent is on camera, or 0 otherwise. If checkall is 0, only checks 
  main camera, otherwise checks all.
 */
-void caosVM::v_VISI() {
+void v_VISI(caosVM *vm) {
 	VM_PARAM_INTEGER(checkall)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	if (agentOnCamera(targ, checkall))
-		result.setInt(1);
+	if (agentOnCamera(vm->targ, checkall))
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
@@ -81,14 +81,14 @@ void caosVM::v_VISI() {
  Returns 1 if the specified agent is on camera, or 0 otherwise. If checkall is 0, only checks 
  main camera, otherwise checks all.
 */
-void caosVM::v_ONTV() {
+void v_ONTV(caosVM *vm) {
 	VM_PARAM_INTEGER(checkall)
 	VM_PARAM_VALIDAGENT(agent)
 
 	if (agentOnCamera(agent.get(), checkall))
-		result.setInt(1);
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
@@ -100,7 +100,7 @@ void caosVM::v_ONTV() {
  
  Transition: 0 for none, 1 for flip horzizontally, 2 for burst.
  */
-void caosVM::c_META() {
+void c_META(caosVM *vm) {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(transition)
 	VM_PARAM_INTEGER(camera_y)
@@ -114,7 +114,7 @@ void caosVM::c_META() {
 	int camerax = camera_x; if (camerax == -1) camerax = m->x();
 	int cameray = camera_y; if (cameray == -1) cameray = m->y();
 
-	getCamera()->goToMetaRoom(metaroom_id, camerax, cameray, (cameratransition)transition);
+	vm->getCamera()->goToMetaRoom(metaroom_id, camerax, cameray, (cameratransition)transition);
 }
 
 /**
@@ -123,12 +123,12 @@ void caosVM::c_META() {
 
  Returns the metaroom the current camera is looking at.
 */
-void caosVM::v_META() {
-	if (getCamera()->getMetaRoom())
-		result.setInt(getCamera()->getMetaRoom()->id);
+void v_META(caosVM *vm) {
+	if (vm->getCamera()->getMetaRoom())
+		vm->result.setInt(vm->getCamera()->getMetaRoom()->id);
 	else // this is a hack for empathic vendor.cos in DS, which uses META before it's setup
 		// TODO: work out what we should do instead of the hack
-		result.setInt(-1);
+		vm->result.setInt(-1);
 }
 
 /**
@@ -140,17 +140,17 @@ void caosVM::v_META() {
  Set pan to 0 for no panning (jump), 1 for smooth scrolling if in the same metaroom, or 2 
  for smooth scrolling if the given location is already visible.
 */
-void caosVM::c_CMRT() {
+void c_CMRT(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pan)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	MetaRoom *r = world.map->metaRoomAt(targ->x, targ->y);
-	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) + (targ->getWidth() / 2.0f));
-	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) + (targ->getHeight() / 2.0f));
+	MetaRoom *r = world.map->metaRoomAt(vm->targ->x, vm->targ->y);
+	int xpos = (int)(vm->targ->x - (vm->getCamera()->getWidth() / 2.0f) + (vm->targ->getWidth() / 2.0f));
+	int ypos = (int)(vm->targ->y - (vm->getCamera()->getHeight() / 2.0f) + (vm->targ->getHeight() / 2.0f));
 	if (r)
-		getCamera()->goToMetaRoom(r->id, xpos, ypos, (cameratransition)pan); // TODO: pan okay?
+		vm->getCamera()->goToMetaRoom(r->id, xpos, ypos, (cameratransition)pan); // TODO: pan okay?
 }
 
 /**
@@ -162,13 +162,13 @@ void caosVM::c_CMRT() {
 
  Set pan to 0 for no panning (jump), or 1 for smooth scrolling if in the same metaroom.
 */
-void caosVM::c_CMRA() {
+void c_CMRA(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(pan)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	
-	getCamera()->moveToGlobal(x, y, (panstyle)pan);
+	vm->getCamera()->moveToGlobal(x, y, (panstyle)pan);
 }
 
 /**
@@ -180,13 +180,13 @@ void caosVM::c_CMRA() {
  Set pan to 0 for no panning (jump), 1 for smooth scrolling if in the same metaroom, or 2 
  for smooth scrolling if the given location is already visible.
 */
-void caosVM::c_CMRP() {
+void c_CMRP(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(pan)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	
-	getCamera()->moveToGlobal(x - (getCamera()->getWidth() / 2), y - (getCamera()->getHeight() / 2), (panstyle)pan);
+	vm->getCamera()->moveToGlobal(x - (vm->getCamera()->getWidth() / 2), y - (vm->getCamera()->getHeight() / 2), (panstyle)pan);
 }
 
 /**
@@ -196,10 +196,10 @@ void caosVM::c_CMRP() {
 
  Returns the X position at the center of the current camera's view.
 */
-void caosVM::v_CMRX() {
+void v_CMRX(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(getCamera()->getXCentre());
+	vm->result.setInt(vm->getCamera()->getXCentre());
 }
 
 /**
@@ -209,10 +209,10 @@ void caosVM::v_CMRX() {
 
  Returns the Y position at the center of the current camera's view.
 */
-void caosVM::v_CMRY() {
+void v_CMRY(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(getCamera()->getYCentre());
+	vm->result.setInt(vm->getCamera()->getYCentre());
 }
 
 /**
@@ -221,10 +221,10 @@ void caosVM::v_CMRY() {
 
  Returns the width of the current camera's view.
 */
-void caosVM::v_WNDW() {
+void v_WNDW(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(getCamera()->getWidth());
+	vm->result.setInt(vm->getCamera()->getWidth());
 }
 
 /**
@@ -233,10 +233,10 @@ void caosVM::v_WNDW() {
 
  Returns the height of the current camera's view.
 */
-void caosVM::v_WNDH() {
+void v_WNDH(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(getCamera()->getHeight());
+	vm->result.setInt(vm->getCamera()->getHeight());
 }
 
 /**
@@ -245,10 +245,10 @@ void caosVM::v_WNDH() {
 
  Returns the position of the bottom edge of the current camera's view.
 */
-void caosVM::v_WNDB() {
+void v_WNDB(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(getCamera()->getY() + getCamera()->getHeight());
+	vm->result.setInt(vm->getCamera()->getY() + vm->getCamera()->getHeight());
 }
 
 /**
@@ -257,10 +257,10 @@ void caosVM::v_WNDB() {
 
  Returns the position of the left edge of the current camera's view.
 */
-void caosVM::v_WNDL() {
+void v_WNDL(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	result.setInt(getCamera()->getX());
+	vm->result.setInt(vm->getCamera()->getX());
 }
 
 /**
@@ -269,10 +269,10 @@ void caosVM::v_WNDL() {
 
  Returns the position of the right edge of the current camera's view.
 */
-void caosVM::v_WNDR() {
+void v_WNDR(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(getCamera()->getX() + getCamera()->getWidth());
+	vm->result.setInt(vm->getCamera()->getX() + vm->getCamera()->getWidth());
 }
 
 /**
@@ -281,10 +281,10 @@ void caosVM::v_WNDR() {
 
  Returns the position of the top edge of the current camera's view.
 */
-void caosVM::v_WNDT() {
+void v_WNDT(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	result.setInt(getCamera()->getY());
+	vm->result.setInt(vm->getCamera()->getY());
 }
 
 /**
@@ -293,7 +293,7 @@ void caosVM::v_WNDT() {
 
  Toggles full-screen mode on and off.
 */
-void caosVM::c_WDOW() {
+void c_WDOW(caosVM*) {
 	// TODO
 }
 
@@ -303,8 +303,8 @@ void caosVM::c_WDOW() {
 
  Returns 1 if in full-screen mode, or 0 otherwise (windowed).
 */
-void caosVM::v_WDOW() {
-	result.setInt(0);
+void v_WDOW(caosVM *vm) {
+	vm->result.setInt(0);
 }
 
 /**
@@ -318,14 +318,14 @@ void caosVM::v_WDOW() {
  rectangle.
  Rransition: 0 for none, 1 for flip horizontal, 2 for burst.
 */
-void caosVM::c_TRCK() {
+void c_TRCK(caosVM *vm) {
 	VM_PARAM_INTEGER(transition)
 	VM_PARAM_INTEGER(style)
 	VM_PARAM_INTEGER(ypercent)
 	VM_PARAM_INTEGER(xpercent)
 	VM_PARAM_AGENT(agent)
 
-	getCamera()->trackAgent(agent, xpercent, ypercent, (trackstyle)style, (cameratransition)transition);
+	vm->getCamera()->trackAgent(agent, xpercent, ypercent, (trackstyle)style, (cameratransition)transition);
 }
 
 /**
@@ -334,8 +334,8 @@ void caosVM::c_TRCK() {
 
  Returns agent being tracked by the current camera, if any.
 */
-void caosVM::v_TRCK() {
-	result.setAgent(getCamera()->trackedAgent());
+void v_TRCK(caosVM *vm) {
+	vm->result.setAgent(vm->getCamera()->trackedAgent());
 }
 
 /**
@@ -350,7 +350,7 @@ void caosVM::v_TRCK() {
 
  Setting the the endpoints to the same point will remove all lines for the agent.
 */
-void caosVM::c_LINE() {
+void c_LINE(caosVM *vm) {
 	VM_PARAM_INTEGER(stipple_off)
 	VM_PARAM_INTEGER(stipple_on)
 	VM_PARAM_INTEGER(b)
@@ -361,7 +361,7 @@ void caosVM::c_LINE() {
 	VM_PARAM_INTEGER(y1)
 	VM_PARAM_INTEGER(x1)
 	
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -372,14 +372,14 @@ void caosVM::c_LINE() {
  Determines whether or not the given image file exists in the world 
  images directory (0 or 1).
 */
-void caosVM::v_SNAX() {
+void v_SNAX(caosVM *vm) {
 	VM_PARAM_STRING(filename)
 	
-	result.setInt(0);
+	vm->result.setInt(0);
 	if (!world.findFile(std::string("Images/") + filename + ".s16").empty())
-		result.setInt(1);
+		vm->result.setInt(1);
 	else if (!world.findFile(std::string("Images/") + filename + ".c16").empty())
-		result.setInt(1);
+		vm->result.setInt(1);
 }
 
 /**
@@ -389,12 +389,12 @@ void caosVM::v_SNAX() {
  Sets which camera to use in camera macro commands.  If 'agent' and 
  'part' are NULL, the main camera will be used.
 */
-void caosVM::c_SCAM() {
+void c_SCAM(caosVM *vm) {
 	VM_PARAM_INTEGER(part)
 	VM_PARAM_AGENT(agent)
 
 	if (!agent) {
-		camera.reset();
+		vm->camera.reset();
 		return;
 	}
 	
@@ -405,7 +405,7 @@ void caosVM::c_SCAM() {
 	CameraPart *c = dynamic_cast<CameraPart *>(p);
 	caos_assert(c);
 
-	camera = c->getCamera();
+	vm->camera = c->getCamera();
 }
 
 /**
@@ -416,7 +416,7 @@ void caosVM::c_SCAM() {
  coordinates in the world.  If the coordinates are set to -1, the 
  current center position of the camera's view will be used.
 */
-void caosVM::c_ZOOM() {
+void c_ZOOM(caosVM *vm) {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(pixels)
@@ -430,7 +430,7 @@ void caosVM::c_ZOOM() {
 
  Take a snapshot and save it to the given filename (don't include the extension). x/y are the centerpoint, width/height the size, and zoom the percentage to zoom out.
 */
-void caosVM::c_SNAP() {
+void c_SNAP(caosVM *vm) {
 	VM_PARAM_INTEGER(zoom)
 	VM_PARAM_INTEGER(height)
 	VM_PARAM_INTEGER(width)
@@ -445,17 +445,17 @@ void caosVM::c_SNAP() {
  LOFT (integer) filename (string)
  %status stub
 */
-void caosVM::v_LOFT() {
+void v_LOFT(caosVM *vm) {
 	VM_PARAM_STRING(filename)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
  BKGD (command) metaroom_id (integer) background (string) transition (integer)
  %status stub
 */
-void caosVM::c_BKGD() {
+void c_BKGD(caosVM *vm) {
 	VM_PARAM_INTEGER(transition)
 	VM_PARAM_STRING(background)
 	VM_PARAM_INTEGER(metaroomid)
@@ -470,20 +470,20 @@ void caosVM::c_BKGD() {
  BKGD (string) metaroom_id (integer)
  %status stub
 */
-void caosVM::v_BKGD() {
+void v_BKGD(caosVM *vm) {
 	VM_PARAM_INTEGER(metaroomid)
 
 	MetaRoom *metaroom = world.map->getMetaRoom(metaroomid);
 	caos_assert(metaroom);
 
-	result.setString(""); // TODO
+	vm->result.setString(""); // TODO
 }
 
 /**
  FRSH (command)
  %status stub
 */
-void caosVM::c_FRSH() {
+void c_FRSH(caosVM*) {
 	// TODO
 }
 
@@ -495,11 +495,11 @@ void caosVM::c_FRSH() {
  Smooth scroll the camera so that the specified coordinates are in the center of the window.
  (Yes, this differs from what the incorrect C2 documentation says.)
 */
-void caosVM::c_SYS_CMRP() {
+void c_SYS_CMRP(caosVM *vm) {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	getCamera()->moveTo(x - (getCamera()->getWidth() / 2), y - (getCamera()->getWidth() / 2), smoothscroll);
+	vm->getCamera()->moveTo(x - (vm->getCamera()->getWidth() / 2), y - (vm->getCamera()->getWidth() / 2), smoothscroll);
 }
 
 /**
@@ -507,11 +507,11 @@ void caosVM::c_SYS_CMRP() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_SYS_CMRA() {
+void c_SYS_CMRA(caosVM *vm) {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	getCamera()->moveTo(x, y);
+	vm->getCamera()->moveTo(x, y);
 }
 
 /**
@@ -519,11 +519,11 @@ void caosVM::c_SYS_CMRA() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_SYS_CAMT() {
+void c_SYS_CAMT(caosVM *vm) {
 	// TODO: does CAMT behave like this in c1/c2?
-	int xpos = (int)(targ->x - (getCamera()->getWidth() / 2.0f) + (targ->getWidth() / 2.0f));
-	int ypos = (int)(targ->y - (getCamera()->getHeight() / 2.0f) + (targ->getHeight() / 2.0f));
-	getCamera()->moveTo(xpos, ypos);
+	int xpos = (int)(vm->targ->x - (vm->getCamera()->getWidth() / 2.0f) + (vm->targ->getWidth() / 2.0f));
+	int ypos = (int)(vm->targ->y - (vm->getCamera()->getHeight() / 2.0f) + (vm->targ->getHeight() / 2.0f));
+	vm->getCamera()->moveTo(xpos, ypos);
 }
 
 /**
@@ -533,7 +533,7 @@ void caosVM::c_SYS_CAMT() {
 
  Move the main window to the front of the screen.
 */
-void caosVM::c_SYS_WTOP() {
+void c_SYS_WTOP(caosVM*) {
 	// TODO
 }
 

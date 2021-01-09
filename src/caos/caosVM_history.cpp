@@ -32,28 +32,28 @@
  HIST CAGE (integer) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_CAGE() {
+void v_HIST_CAGE(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
-	result.setInt(m.events[event].stage);
+	vm->result.setInt(m.events[event].stage);
 }
 
 /**
  HIST COUN (integer) moniker (string)
  %status maybe
 */
-void caosVM::v_HIST_COUN() {
+void v_HIST_COUN(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	if (world.history->hasMoniker(moniker)) {
 		monikerData &m = world.history->getMoniker(moniker);
-		result.setInt(m.events.size());
+		vm->result.setInt(m.events.size());
 	} else {
-		result.setInt(0);
+		vm->result.setInt(0);
 	}
 }
 
@@ -61,11 +61,11 @@ void caosVM::v_HIST_COUN() {
  HIST CROS (integer) moniker (string)
  %status maybe
 */
-void caosVM::v_HIST_CROS() {
+void v_HIST_CROS(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
-	result.setInt(world.history->getMoniker(moniker).no_crossover_points);
+	vm->result.setInt(world.history->getMoniker(moniker).no_crossover_points);
 }
 
 /**
@@ -74,7 +74,7 @@ void caosVM::v_HIST_CROS() {
 
  Fire a life event of the specified type with the specified moniker.
 */
-void caosVM::c_HIST_EVNT() {
+void c_HIST_EVNT(caosVM *vm) {
 	VM_PARAM_STRING(relatedmoniker2)
 	VM_PARAM_STRING(relatedmoniker1)
 	VM_PARAM_INTEGER(type)
@@ -89,7 +89,7 @@ void caosVM::c_HIST_EVNT() {
  HIST FIND (integer) moniker (string) event (integer) from (integer)
  %status maybe
 */
-void caosVM::v_HIST_FIND() {
+void v_HIST_FIND(caosVM *vm) {
 	VM_PARAM_INTEGER(from)
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
@@ -99,19 +99,19 @@ void caosVM::v_HIST_FIND() {
 
 	for (int i = from + 1; i >= 0 && (unsigned int)i < m.events.size(); i++) {
 		if (m.events[i].eventno == (unsigned int)event) {
-			result.setInt(i);
+			vm->result.setInt(i);
 			return;
 		}
 	}
 
-	result.setInt(-1);
+	vm->result.setInt(-1);
 }
 
 /**
  HIST FINR (integer) moniker (string) event (integer) from (integer)
  %status maybe
 */
-void caosVM::v_HIST_FINR() {
+void v_HIST_FINR(caosVM *vm) {
 	VM_PARAM_INTEGER(from)
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
@@ -123,19 +123,19 @@ void caosVM::v_HIST_FINR() {
 
 	for (int i = from - 1; i >= 0 && (unsigned int)i < m.events.size(); i--) {
 		if (m.events[i].eventno == (unsigned int)event) {
-			result.setInt(i);
+			vm->result.setInt(i);
 			return;
 		}
 	}
 
-	result.setInt(-1);
+	vm->result.setInt(-1);
 }
 
 /**
  HIST FOTO (string) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_FOTO() {
+void v_HIST_FOTO(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -143,14 +143,14 @@ void caosVM::v_HIST_FOTO() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setString(m.events[event].photo);
+	vm->result.setString(m.events[event].photo);
 }
 
 /**
  HIST FOTO (command) moniker (string) event (integer) photo (string)
  %status maybe
 */
-void caosVM::c_HIST_FOTO() {
+void c_HIST_FOTO(caosVM *vm) {
 	VM_PARAM_STRING(photo)
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
@@ -167,33 +167,33 @@ void caosVM::c_HIST_FOTO() {
  HIST GEND (integer) moniker (string)
  %status maybe
 */
-void caosVM::v_HIST_GEND() {
+void v_HIST_GEND(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData &m = world.history->getMoniker(moniker);
 
-	result.setInt(m.gender);
+	vm->result.setInt(m.gender);
 }
 
 /**
  HIST GNUS (integer) moniker (string)
  %status maybe
 */
-void caosVM::v_HIST_GNUS() {
+void v_HIST_GNUS(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData &m = world.history->getMoniker(moniker);
 
-	result.setInt(m.genus);
+	vm->result.setInt(m.genus);
 }
 
 /**
  HIST MON1 (string) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_MON1() {
+void v_HIST_MON1(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -201,14 +201,14 @@ void caosVM::v_HIST_MON1() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setString(m.events[event].monikers[0]);
+	vm->result.setString(m.events[event].monikers[0]);
 }
 
 /**
  HIST MON2 (string) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_MON2() {
+void v_HIST_MON2(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -216,20 +216,20 @@ void caosVM::v_HIST_MON2() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setString(m.events[event].monikers[1]);
+	vm->result.setString(m.events[event].monikers[1]);
 }
 
 /**
  HIST MUTE (integer) moniker (string)
  %status maybe
 */
-void caosVM::v_HIST_MUTE() {
+void v_HIST_MUTE(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData &m = world.history->getMoniker(moniker);
 
-	result.setInt(m.no_point_mutations);
+	vm->result.setInt(m.no_point_mutations);
 }
 
 /**
@@ -238,20 +238,20 @@ void caosVM::v_HIST_MUTE() {
 
  Return the name of the creature with the given moniker.
 */
-void caosVM::v_HIST_NAME() {
+void v_HIST_NAME(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData &m = world.history->getMoniker(moniker);
 
-	result.setString(m.name);
+	vm->result.setString(m.name);
 }
 
 /**
  HIST NAME (command) moniker (string) name (string)
  %status maybe
 */
-void caosVM::c_HIST_NAME() {
+void c_HIST_NAME(caosVM *vm) {
 	VM_PARAM_STRING(name)
 	VM_PARAM_STRING(moniker)
 
@@ -265,7 +265,7 @@ void caosVM::c_HIST_NAME() {
  HIST NETU (string) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_NETU() {
+void v_HIST_NETU(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -273,34 +273,34 @@ void caosVM::v_HIST_NETU() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setString(m.events[event].networkid);
+	vm->result.setString(m.events[event].networkid);
 }
 
 /**
  HIST NEXT (string) moniker (string)
  %status stub
 */
-void caosVM::v_HIST_NEXT() {
+void v_HIST_NEXT(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
-	result.setString(""); // TODO
+	vm->result.setString(""); // TODO
 }
 
 /**
  HIST PREV (string) moniker (string)
  %status stub
 */
-void caosVM::v_HIST_PREV() {
+void v_HIST_PREV(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
-	result.setString(""); // TODO
+	vm->result.setString(""); // TODO
 }
 
 /**
  HIST RTIM (integer) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_RTIM() {
+void v_HIST_RTIM(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -308,14 +308,14 @@ void caosVM::v_HIST_RTIM() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setInt(m.events[event].timestamp);
+	vm->result.setInt(m.events[event].timestamp);
 }
 
 /**
  HIST TAGE (integer) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_TAGE() {
+void v_HIST_TAGE(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -323,14 +323,14 @@ void caosVM::v_HIST_TAGE() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setInt(m.events[event].tage);
+	vm->result.setInt(m.events[event].tage);
 }
 
 /**
  HIST TYPE (integer) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_TYPE() {
+void v_HIST_TYPE(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -338,14 +338,14 @@ void caosVM::v_HIST_TYPE() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setInt(m.events[event].eventno);
+	vm->result.setInt(m.events[event].eventno);
 }
 
 /**
  HIST UTXT (command) moniker (string) event (integer) value (string)
  %status maybe
 */
-void caosVM::c_HIST_UTXT() {
+void c_HIST_UTXT(caosVM *vm) {
 	VM_PARAM_STRING(value)
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
@@ -361,7 +361,7 @@ void caosVM::c_HIST_UTXT() {
  HIST UTXT (string) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_UTXT() {
+void v_HIST_UTXT(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -369,27 +369,27 @@ void caosVM::v_HIST_UTXT() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setString(m.events[event].usertext);
+	vm->result.setString(m.events[event].usertext);
 }
 
 /**
  HIST VARI (integer) moniker (string)
  %status maybe
 */
-void caosVM::v_HIST_VARI() {
+void v_HIST_VARI(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData &m = world.history->getMoniker(moniker);
 
-	result.setInt(m.variant);
+	vm->result.setInt(m.variant);
 }
 
 /**
  HIST WIPE (command) moniker (string)
  %status stub
 */
-void caosVM::c_HIST_WIPE() {
+void c_HIST_WIPE(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
@@ -402,7 +402,7 @@ void caosVM::c_HIST_WIPE() {
  HIST WNAM (string) moniker (string) event (integer)
  %status stub
 */
-void caosVM::v_HIST_WNAM() {
+void v_HIST_WNAM(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -410,14 +410,14 @@ void caosVM::v_HIST_WNAM() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setString(m.events[event].worldname); // TODO
+	vm->result.setString(m.events[event].worldname); // TODO
 }
 
 /**
  HIST WTIK (integer) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_WTIK() {
+void v_HIST_WTIK(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -425,14 +425,14 @@ void caosVM::v_HIST_WTIK() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setInt(m.events[event].worldtick);
+	vm->result.setInt(m.events[event].worldtick);
 }
 
 /**
  HIST WUID (string) moniker (string) event (integer)
  %status maybe
 */
-void caosVM::v_HIST_WUID() {
+void v_HIST_WUID(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_STRING(moniker)
 
@@ -440,23 +440,23 @@ void caosVM::v_HIST_WUID() {
 	monikerData &m = world.history->getMoniker(moniker);
 	caos_assert(event >= 0 && (unsigned int)event < m.events.size());
 	
-	result.setString(m.events[event].worldmoniker);
+	vm->result.setString(m.events[event].worldmoniker);
 }
 
 /**
  HIST WVET (integer) moniker (string)
  %status maybe
 */
-void caosVM::v_HIST_WVET() {
+void v_HIST_WVET(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData &m = world.history->getMoniker(moniker);
 
 	if (m.warpveteran)
-		result.setInt(1);
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
@@ -466,15 +466,15 @@ void caosVM::v_HIST_WVET() {
  Return the current status of the given moniker.
  0 is unknown (never existed?), 1 is in slot, 2 is NEW: CREA creature, 3 is BORN creature, 4 is exported, 5 is dead, 6 is gone (no body), 7 is unreferenced.
 */
-void caosVM::v_OOWW() {
+void v_OOWW(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
-	result.setInt(0);
+	vm->result.setInt(0);
 
 	if (world.history->hasMoniker(moniker)) {
 		monikerData &m = world.history->getMoniker(moniker);
 
-		result.setInt((int)m.getStatus());
+		vm->result.setInt((int)m.getStatus());
 	}
 }
 
@@ -483,7 +483,7 @@ void caosVM::v_OOWW() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_EVNT() {
+void c_EVNT(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(object)
 
 	// TODO
@@ -494,7 +494,7 @@ void caosVM::c_EVNT() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_RMEV() {
+void c_RMEV(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(object)
 
 	// TODO
@@ -505,7 +505,7 @@ void caosVM::c_RMEV() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_DDE_NEGG() {
+void c_DDE_NEGG(caosVM*) {
 	// TODO
 }
 
@@ -514,7 +514,7 @@ void caosVM::c_DDE_NEGG() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_DDE_DIED() {
+void c_DDE_DIED(caosVM*) {
 	// TODO
 }
 
@@ -523,7 +523,7 @@ void caosVM::c_DDE_DIED() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_DDE_LIVE() {
+void c_DDE_LIVE(caosVM*) {
 	// TODO
 }
 

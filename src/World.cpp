@@ -17,8 +17,9 @@
  *
  */
 
-#include "caos_assert.h"
 #include "World.h"
+#include "caos_assert.h"
+#include "caosVM.h"
 #include "Engine.h"
 #include "caosScript.h"
 #include "PointerAgent.h"

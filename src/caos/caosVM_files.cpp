@@ -80,7 +80,7 @@ std::string calculateJournalFilename(int directory, std::string filename, bool w
  this consists of the number of results on the first line, and then the full filename paths to the matched
  files on the remaining lines.
 */
-void caosVM::c_FILE_GLOB() {
+void c_FILE_GLOB(caosVM *vm) {
 	VM_PARAM_STRING(filespec)
 	VM_PARAM_INTEGER(directory)
 
@@ -100,7 +100,7 @@ void caosVM::c_FILE_GLOB() {
 		str += *i + "\n";
 	}
 
-	inputstream = new std::istringstream(str);
+	vm->inputstream = new std::istringstream(str);
 }
 
 /**
@@ -109,10 +109,10 @@ void caosVM::c_FILE_GLOB() {
 
  Disconnects everything from the input stream.
 */
-void caosVM::c_FILE_ICLO() {
-	if (inputstream) {
-		delete inputstream;
-		inputstream = 0;
+void c_FILE_ICLO(caosVM *vm) {
+	if (vm->inputstream) {
+		delete vm->inputstream;
+		vm->inputstream = 0;
 	}
 }
 
@@ -124,18 +124,18 @@ void caosVM::c_FILE_ICLO() {
  directory) on the current VM's input stream, for use by INOK, INNL, INNI and INNF.
  If a file is already open, it will be closed first.
 */
-void caosVM::c_FILE_IOPE() {
+void c_FILE_IOPE(caosVM *vm) {
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
 
-	c_FILE_ICLO();
+	c_FILE_ICLO(vm);
 	
 	std::string fullfilename = calculateJournalFilename(directory, filename, false);
-	inputstream = new std::ifstream(fullfilename.c_str());
+	vm->inputstream = new std::ifstream(fullfilename.c_str());
 
-	if (inputstream->fail()) {
-		delete inputstream;
-		inputstream = 0;
+	if (vm->inputstream->fail()) {
+		delete vm->inputstream;
+		vm->inputstream = 0;
 	}
 }
 
@@ -146,7 +146,7 @@ void caosVM::c_FILE_IOPE() {
  Removes the given file in the given directory (pass 1 for the world directory, or 0 for the main 
  directory) immediately.
 */
-void caosVM::c_FILE_JDEL() {
+void c_FILE_JDEL(caosVM *vm) {
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
 	
@@ -161,10 +161,10 @@ void caosVM::c_FILE_JDEL() {
 
  Disconnects everything from the output stream.
 */
-void caosVM::c_FILE_OCLO() {
-	if (outputstream) {
-		delete outputstream;
-		outputstream = 0;
+void c_FILE_OCLO(caosVM *vm) {
+	if (vm->outputstream) {
+		delete vm->outputstream;
+		vm->outputstream = 0;
 	}
 }
 
@@ -174,9 +174,9 @@ void caosVM::c_FILE_OCLO() {
 
  Flushes the current output stream; if this is a file, all data in the buffer will be written to it.
 */
-void caosVM::c_FILE_OFLU() {
-	if (outputstream)
-		outputstream->flush();
+void c_FILE_OFLU(caosVM *vm) {
+	if (vm->outputstream)
+		vm->outputstream->flush();
 }
 
 /**
@@ -187,22 +187,22 @@ void caosVM::c_FILE_OFLU() {
  directory) on the current VM's output stream.
  If a file is already open, it will be closed first. 
 */
-void caosVM::c_FILE_OOPE() {
+void c_FILE_OOPE(caosVM *vm) {
 	VM_PARAM_INTEGER(append)
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
 
-	c_FILE_OCLO();
+	c_FILE_OCLO(vm);
 
 	std::string fullfilename = calculateJournalFilename(directory, filename, true);
 
 	if (append)
-		outputstream = new std::ofstream(fullfilename.c_str(), std::ios::app);
+		vm->outputstream = new std::ofstream(fullfilename.c_str(), std::ios::app);
 	else	
-		outputstream = new std::ofstream(fullfilename.c_str(), std::ios::trunc);
+		vm->outputstream = new std::ofstream(fullfilename.c_str(), std::ios::trunc);
 
-	if (outputstream->fail()) {
-		outputstream = 0;
+	if (vm->outputstream->fail()) {
+		vm->outputstream = 0;
 		throw caosException(fmt::format("FILE OOPE failed to open {}", fullfilename));
 	}
 }
@@ -213,10 +213,10 @@ void caosVM::c_FILE_OOPE() {
 
  Returns an safe (not-in-use) filename for naming worlds and other saved files.
 */
-void caosVM::v_FVWM() {
+void v_FVWM(caosVM *vm) {
 	VM_PARAM_STRING(name)
 
-	result.setString(name + "_something"); // TODO
+	vm->result.setString(name + "_something"); // TODO
 }
 
 /**
@@ -225,13 +225,13 @@ void caosVM::v_FVWM() {
 
  Fetches a float from the current input stream, or 0.0 if there is no data.
 */
-void caosVM::v_INNF() {
-	if (!inputstream)
+void v_INNF(caosVM *vm) {
+	if (!vm->inputstream)
 		throw caosException("no input stream in INNF!");
 
 	float f = 0.0f;
-	*inputstream >> f;
-	result.setFloat(f);
+	*vm->inputstream >> f;
+	vm->result.setFloat(f);
 }
 
 /**
@@ -240,13 +240,13 @@ void caosVM::v_INNF() {
 
  Fetches an integer from the current input stream, or 0 if there is no data.
 */
-void caosVM::v_INNI() {
-	if (!inputstream)
+void v_INNI(caosVM *vm) {
+	if (!vm->inputstream)
 		throw caosException("no input stream in INNI!");
 
 	int i = 0;
-	*inputstream >> i;
-	result.setInt(i);
+	*vm->inputstream >> i;
+	vm->result.setInt(i);
 }
 
 /**
@@ -255,12 +255,12 @@ void caosVM::v_INNI() {
 
  Fetches a string of text from the input stream.
 */
-void caosVM::v_INNL() {
-	if (!inputstream)
+void v_INNL(caosVM *vm) {
+	if (!vm->inputstream)
 		throw caosException("no input stream in INNL!");
 	std::string str;
-	std::getline(*inputstream, str);
-	result.setString(str);
+	std::getline(*vm->inputstream, str);
+	vm->result.setString(str);
 }
 
 /**
@@ -269,13 +269,13 @@ void caosVM::v_INNL() {
 
  Determines whether the current input stream is usable (0 or 1).
 */
-void caosVM::v_INOK() {
-	if (!inputstream)
-		result.setInt(0);
-	else if (inputstream->fail())
-		result.setInt(0);
+void v_INOK(caosVM *vm) {
+	if (!vm->inputstream)
+		vm->result.setInt(0);
+	else if (vm->inputstream->fail())
+		vm->result.setInt(0);
 	else
-		result.setInt(1);
+		vm->result.setInt(1);
 }
 
 /**
@@ -284,7 +284,7 @@ void caosVM::v_INOK() {
 
  Launches the specified URL, prepended with 'http://' (so you'd only specify, for example, 'example.com/foo.html'), in the user's browser.
 */
-void caosVM::c_WEBB() {
+void c_WEBB(caosVM *vm) {
 	VM_PARAM_STRING(url)
 
 	// TODO

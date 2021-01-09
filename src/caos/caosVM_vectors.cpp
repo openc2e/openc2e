@@ -33,11 +33,11 @@
  * Openc2e-only command
  */
 
-	void caosVM::v_VEC_MAKE() {
+	void v_VEC_MAKE(caosVM *vm) {
 		VM_PARAM_FLOAT(y)
 		VM_PARAM_FLOAT(x)
 
-		result.setVector(Vector<float>(x, y));
+		vm->result.setVector(Vector<float>(x, y));
 	}
 
 /**
@@ -49,7 +49,7 @@
  * Openc2e-only command
  */
 
-	void caosVM::c_VEC_GETC() {
+	void c_VEC_GETC(caosVM *vm) {
 		VM_PARAM_VARIABLE(y)
 		VM_PARAM_VARIABLE(x)
 		VM_PARAM_VECTOR(vec)
@@ -72,7 +72,7 @@
  * Openc2e-only command.
  */
 
-void caosVM::v_VEC_ANGL() {
+void v_VEC_ANGL(caosVM *vm) {
 	float ret = 0;
 	VM_PARAM_VECTOR(vec)
 
@@ -92,7 +92,7 @@ void caosVM::v_VEC_ANGL() {
 	if (ret == -180)
 		ret = 180; // hacky -_-;;
 
-	result.setFloat(ret);
+	vm->result.setFloat(ret);
 }
 
 /**
@@ -104,7 +104,7 @@ void caosVM::v_VEC_ANGL() {
  * Openc2e-only command.
  */
 
-	void caosVM::c_VEC_SUBV() {
+	void c_VEC_SUBV(caosVM *vm) {
 		VM_PARAM_VECTOR(vec2)
 		VM_PARAM_VARIABLE(vec1)
 
@@ -123,7 +123,7 @@ void caosVM::v_VEC_ANGL() {
  * Openc2e-only command.
  */
 
-	void caosVM::c_VEC_ADDV() {
+	void c_VEC_ADDV(caosVM *vm) {
 		VM_PARAM_VECTOR(vec2)
 		VM_PARAM_VARIABLE(vec1)
 
@@ -143,7 +143,7 @@ void caosVM::v_VEC_ANGL() {
  * Openc2e-only command
  */
 
-	void caosVM::c_VEC_MULV() {
+	void c_VEC_MULV(caosVM *vm) {
 		VM_PARAM_FLOAT(mag)
 		VM_PARAM_VARIABLE(vec)
 
@@ -161,10 +161,10 @@ void caosVM::v_VEC_ANGL() {
  * Openc2e-only command,
  */
 
-	void caosVM::v_VEC_UNIT() {
+	void v_VEC_UNIT(caosVM *vm) {
 		VM_PARAM_FLOAT(angle)
 
-		result.setVector(Vector<float>::unitVector(angle * PI / 180));
+		vm->result.setVector(Vector<float>::unitVector(angle * PI / 180));
 	}
 
 /**
@@ -176,8 +176,8 @@ void caosVM::v_VEC_ANGL() {
  * Openc2e-only command
  */
 
-	void caosVM::v_VEC_NULL() {
-		result.setVector(Vector<float>(0,0));
+	void v_VEC_NULL(caosVM *vm) {
+		vm->result.setVector(Vector<float>(0,0));
 	}
 
 /**
@@ -188,10 +188,10 @@ void caosVM::v_VEC_ANGL() {
  *
  * Openc2e-only command.
  */
-	void caosVM::v_VEC_MAGN() {
+	void v_VEC_MAGN(caosVM *vm) {
 		VM_PARAM_VECTOR(vec)
 
-		result.setFloat(vec.getMagnitude());
+		vm->result.setFloat(vec.getMagnitude());
 	}
 
 /**
@@ -202,7 +202,7 @@ void caosVM::v_VEC_ANGL() {
  *
  * Openc2e-only command
  */
-	void caosVM::c_VEC_SETV() {
+	void c_VEC_SETV(caosVM *vm) {
 		VM_PARAM_VECTOR(src)
 		VM_PARAM_VARIABLE(dest)
 

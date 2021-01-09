@@ -18,6 +18,7 @@
  */
 
 #include "Bubble.h"
+#include "caosVM.h"
 #include "Room.h"
 #include "Engine.h"
 #include "World.h"

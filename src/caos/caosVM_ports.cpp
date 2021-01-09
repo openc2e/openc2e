@@ -28,7 +28,7 @@
  PRT: BANG (command) strength (integer)
  %status stub
 */
-void caosVM::c_PRT_BANG() {
+void c_PRT_BANG(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(strength)
 }
@@ -40,15 +40,15 @@ void caosVM::c_PRT_BANG() {
  Returns agent to which the specified input port is connected, NULL if not
  connected or the port doesn't exist.
 */
-void caosVM::v_PRT_FRMA() {
+void v_PRT_FRMA(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(inputport)
 
-	valid_agent(targ);
-	if (targ->inports.find(inputport) != targ->inports.end())
-		result.setAgent(targ->inports[inputport]->source);
+	valid_agent(vm->targ);
+	if (vm->targ->inports.find(inputport) != vm->targ->inports.end())
+		vm->result.setAgent(vm->targ->inports[inputport]->source);
 	else
-		result.setAgent(0);
+		vm->result.setAgent(0);
 }
 
 /**
@@ -59,15 +59,15 @@ void caosVM::v_PRT_FRMA() {
  input port. Returns a negative value if the port is not connected or if the
  source agent does not exist.
 */
-void caosVM::v_PRT_FROM() {
+void v_PRT_FROM(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(inputport)
 
-	valid_agent(targ);
-	if (targ->inports.find(inputport) != targ->inports.end() && targ->inports[inputport]->source)
-		result.setInt(targ->inports[inputport]->sourceid);
+	valid_agent(vm->targ);
+	if (vm->targ->inports.find(inputport) != vm->targ->inports.end() && vm->targ->inports[inputport]->source)
+		vm->result.setInt(vm->targ->inports[inputport]->sourceid);
 	else
-		result.setInt(-1);
+		vm->result.setInt(-1);
 }
 
 /**
@@ -78,7 +78,7 @@ void caosVM::v_PRT_FROM() {
  when a signal arrives through the port. _P1_ of that message will be the data
  of the signal.
 */
-void caosVM::c_PRT_INEW() {
+void c_PRT_INEW(caosVM *vm) {
 	VM_VERIFY_SIZE(6)
 	VM_PARAM_INTEGER(msgnum)
 	VM_PARAM_INTEGER(y)
@@ -87,9 +87,9 @@ void caosVM::c_PRT_INEW() {
 	VM_PARAM_STRING(name)
 	VM_PARAM_INTEGER(id)
 
-	valid_agent(targ);
-	caos_assert(targ->inports.find(id) == targ->inports.end()); // TODO: multiple PRT: INEWs with the same id allowed?
-	targ->inports[id] = std::shared_ptr<InputPort>(new InputPort(x, y, name, desc, msgnum));
+	valid_agent(vm->targ);
+	caos_assert(vm->targ->inports.find(id) == vm->targ->inports.end()); // TODO: multiple PRT: INEWs with the same id allowed?
+	vm->targ->inports[id] = std::shared_ptr<InputPort>(new InputPort(x, y, name, desc, msgnum));
 }
 
 /**
@@ -98,13 +98,13 @@ void caosVM::c_PRT_INEW() {
 
  Returns the total number of input ports.
 */
-void caosVM::v_PRT_ITOT() {
+void v_PRT_ITOT(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// TODO: not strictly correct, I think; the CAOS docs are vague (surprise!)
-	result.setInt(targ->inports.size());
+	vm->result.setInt(vm->targ->inports.size());
 }
 
 /**
@@ -113,26 +113,26 @@ void caosVM::v_PRT_ITOT() {
 
  Removes the input port with given id.
 */
-void caosVM::c_PRT_IZAP() {
+void c_PRT_IZAP(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(id)
 
-	valid_agent(targ);
-	caos_assert(targ->inports.find(id) != targ->inports.end());
-	AgentRef src = targ->inports[id]->source;
+	valid_agent(vm->targ);
+	caos_assert(vm->targ->inports.find(id) != vm->targ->inports.end());
+	AgentRef src = vm->targ->inports[id]->source;
 	if (src) {
-		PortConnectionList &dests = src->outports[targ->inports[id]->sourceid]->dests;
+		PortConnectionList &dests = src->outports[vm->targ->inports[id]->sourceid]->dests;
 		PortConnectionList::iterator i = dests.begin();
 		while (i != dests.end()) {
 			if (id < 0) throw caosException ("Comparison of signed negative integer to unsigned integer");
-			if (i->first == targ && i->second == (unsigned)id) {
+			if (i->first == vm->targ && i->second == (unsigned)id) {
 				dests.erase(i);
 				break;
 			}
 			i++;
 		}
 	}
-	targ->inports.erase(id);
+	vm->targ->inports.erase(id);
 }
 
 /**
@@ -141,7 +141,7 @@ void caosVM::c_PRT_IZAP() {
 
  Joins the output port from source to the input port of dest.
 */
-void caosVM::c_PRT_JOIN() {
+void c_PRT_JOIN(caosVM *vm) {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(inputport)
 	VM_PARAM_VALIDAGENT(dest)
@@ -161,7 +161,7 @@ void caosVM::c_PRT_JOIN() {
  Breaks a connection on agent. If is_outport, kill all connections connected to
  the port. Else, kill the connection to the inport.
 */
-void caosVM::c_PRT_KRAK() {
+void c_PRT_KRAK(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(port)
 	VM_PARAM_INTEGER(is_outport)
@@ -194,19 +194,19 @@ void caosVM::c_PRT_KRAK() {
 
  Returns the name of the specified port. Returns "" if the port doesn't exist.
 */
-void caosVM::v_PRT_NAME() {
+void v_PRT_NAME(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	VM_PARAM_INTEGER(port)
 	VM_PARAM_INTEGER(is_outport)
 	VM_PARAM_VALIDAGENT(agent)
 
-	result.setString("");
+	vm->result.setString("");
 	if (is_outport) {
 		if (agent->outports.find(port) != agent->outports.end())
-			result.setString(agent->outports[port]->name);
+			vm->result.setString(agent->outports[port]->name);
 	} else {
 		if (agent->inports.find(port) != agent->inports.end())
-			result.setString(agent->inports[port]->name);
+			vm->result.setString(agent->inports[port]->name);
 	}
 }
 
@@ -216,7 +216,7 @@ void caosVM::v_PRT_NAME() {
 
  Creates a new output port on targ.
 */
-void caosVM::c_PRT_ONEW() {
+void c_PRT_ONEW(caosVM *vm) {
 	VM_VERIFY_SIZE(5)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
@@ -224,9 +224,9 @@ void caosVM::c_PRT_ONEW() {
 	VM_PARAM_STRING(name)
 	VM_PARAM_INTEGER(id)
 
-	valid_agent(targ);
-	caos_assert(targ->outports.find(id) == targ->outports.end());
-	targ->outports[id] = std::shared_ptr<OutputPort>(new OutputPort(x, y, name, desc));
+	valid_agent(vm->targ);
+	caos_assert(vm->targ->outports.find(id) == vm->targ->outports.end());
+	vm->targ->outports[id] = std::shared_ptr<OutputPort>(new OutputPort(x, y, name, desc));
 }
 
 /**
@@ -235,11 +235,11 @@ void caosVM::c_PRT_ONEW() {
 
  Returns the total number of output ports.
 */
-void caosVM::v_PRT_OTOT() {
+void v_PRT_OTOT(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
-	result.setInt(targ->outports.size());
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->outports.size());
 }
 
 /**
@@ -248,18 +248,18 @@ void caosVM::v_PRT_OTOT() {
 
  Destroys output port with given id.
 */
-void caosVM::c_PRT_OZAP() {
+void c_PRT_OZAP(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(id)
 
-	valid_agent(targ);
-	caos_assert(targ->outports.find(id) != targ->outports.end());
-	for (PortConnectionList::iterator i = targ->outports[id]->dests.begin(); i != targ->outports[id]->dests.end(); i++) {
+	valid_agent(vm->targ);
+	caos_assert(vm->targ->outports.find(id) != vm->targ->outports.end());
+	for (PortConnectionList::iterator i = vm->targ->outports[id]->dests.begin(); i != vm->targ->outports[id]->dests.end(); i++) {
 		if (!i->first) continue;
 		if (i->first->inports.find(i->second) == i->first->inports.end()) continue;
 		i->first->inports[i->second]->source.clear();
 	}
-	targ->outports.erase(id);
+	vm->targ->outports.erase(id);
 }
 
 /**
@@ -268,24 +268,24 @@ void caosVM::c_PRT_OZAP() {
  
  Sends information over targ's output port.
 */
-void caosVM::c_PRT_SEND() {
+void c_PRT_SEND(caosVM *vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_VALUE(data)
 	VM_PARAM_INTEGER(id)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	caos_assert(targ->outports.find(id) != targ->outports.end());
+	caos_assert(vm->targ->outports.find(id) != vm->targ->outports.end());
 
-	PortConnectionList::iterator i = targ->outports[id]->dests.begin();
-	while (i != targ->outports[id]->dests.end()) {
+	PortConnectionList::iterator i = vm->targ->outports[id]->dests.begin();
+	while (i != vm->targ->outports[id]->dests.end()) {
 		PortConnectionList::iterator next = i; next++;
 		if (!i->first || i->first->inports.find(i->second) == i->first->inports.end()) {
-			targ->outports[id]->dests.erase(i);
+			vm->targ->outports[id]->dests.erase(i);
 			i = next;
 			continue;
 		}
-		i->first->queueScript(i->first->inports[i->second]->messageno, targ, data);
+		i->first->queueScript(i->first->inports[i->second]->messageno, vm->targ, data);
 		i = next;
 	}
 }

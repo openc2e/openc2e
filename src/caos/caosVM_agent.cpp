@@ -62,15 +62,15 @@ SpritePart *caosVM::getCurrentSpritePart() {
 
  Determines whether the two given agents are touching.  Returns 0 (if not) or 1 (if so).
 */
-void caosVM::v_TOUC() {
+void v_TOUC(caosVM *vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_AGENT(second)
 	VM_PARAM_AGENT(first)
 
 	if (first && second && agentsTouching(first.get(), second.get()))
-		result.setInt(1);
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
@@ -81,13 +81,13 @@ void caosVM::v_TOUC() {
 
  Sets TARG to a random agent with the given family/genus/species.
  */ 
-void caosVM::c_RTAR() {
+void c_RTAR(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 	
-	setTarg(0);
+	vm->setTarg(0);
 
 	/* XXX: maybe use a map of classifier -> agents? */
 	std::vector<std::shared_ptr<Agent> > temp;
@@ -106,7 +106,7 @@ void caosVM::c_RTAR() {
 
 	if (temp.size() == 0) return;
 	int i = rand() % temp.size(); // TODO: better randomness
-	setTarg(temp[i]);
+	vm->setTarg(temp[i]);
 }
 
 /**
@@ -116,15 +116,15 @@ void caosVM::c_RTAR() {
  Locates a random agent that is touching OWNR (see ETCH) and that 
  matches the given classifier, and sets it to TARG.
 */
-void caosVM::c_TTAR() {
+void c_TTAR(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 
-	setTarg(0);
+	vm->setTarg(0);
 
 	/* XXX: maybe use a map of classifier -> agents? */
 	std::vector<std::shared_ptr<Agent> > temp;
@@ -138,13 +138,13 @@ void caosVM::c_TTAR() {
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		if (agentsTouching(owner, a))
+		if (agentsTouching(vm->owner, a))
 			temp.push_back(*i);
 	}
 
 	if (temp.size() == 0) return;
 	int i = rand() % temp.size(); // TODO: better randomness
-	setTarg(temp[i]);
+	vm->setTarg(temp[i]);
 }
 
 /**
@@ -155,24 +155,24 @@ void caosVM::c_TTAR() {
  Locates a random agent that is visible to OWNR (see ESEE) and that
  matches the given classifier, then sets it to TARG.
 */
-void caosVM::c_STAR() {
+void c_STAR(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	Agent *seeing;
-	if (owner) seeing = owner; else seeing = targ;
+	if (vm->owner) seeing = vm->owner; else seeing = vm->targ;
 	valid_agent(seeing);
 
 	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
 	if (agents.size() == 0) {
-		setTarg(0);
+		vm->setTarg(0);
 	} else {
 		unsigned int i = (int) (agents.size() * (rand() / (RAND_MAX + 1.0)));
-		setTarg(agents[i]);
+		vm->setTarg(agents[i]);
 	}
 }
 
@@ -184,7 +184,7 @@ void caosVM::c_STAR() {
  available starting at first_image in the spritefile, at the screen depth given by plane.
  TARG is set to the newly-created agent.
 */
-void caosVM::c_NEW_SIMP() {
+void c_NEW_SIMP(caosVM *vm) {
 	VM_VERIFY_SIZE(7)
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(first_image)
@@ -196,8 +196,8 @@ void caosVM::c_NEW_SIMP() {
 
 	SimpleAgent *a = new SimpleAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	a->finishInit();
-	setTarg(a);
-	part = 0; // TODO: correct?
+	vm->setTarg(a);
+	vm->part = 0; // TODO: correct?
 }
 
 /**
@@ -206,7 +206,7 @@ void caosVM::c_NEW_SIMP() {
  %pragma variants c1 c2
  %cost c1,c2 1
 */
-void caosVM::c_NEW_SIMP_c2() {
+void c_NEW_SIMP_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(clone)
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(first_image)
@@ -217,8 +217,8 @@ void caosVM::c_NEW_SIMP_c2() {
 	// TODO: should we init with 0/0/0 or with a different constructor?
 	SimpleAgent *a = new SimpleAgent(0, 0, 0, plane, sprite_file, first_image, image_count);
 	a->finishInit();
-	setTarg(a);
-	part = 0; // TODO: correct?
+	vm->setTarg(a);
+	vm->part = 0; // TODO: correct?
 }
 
 /**
@@ -228,7 +228,7 @@ void caosVM::c_NEW_SIMP_c2() {
  Creates a new composite agent with given family/genus/species, given spritefile with image_count sprites
  available starting at first_image in the spritefile, with the first part at the screen depth given by plane.
 */
-void caosVM::c_NEW_COMP() {
+void c_NEW_COMP(caosVM *vm) {
 	VM_VERIFY_SIZE(7)
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(first_image)
@@ -240,8 +240,8 @@ void caosVM::c_NEW_COMP() {
 
 	CompoundAgent *a = new CompoundAgent(family, genus, species, plane, sprite_file, first_image, image_count);
 	a->finishInit();
-	setTarg(a);
-	part = 0; // TODO: correct?
+	vm->setTarg(a);
+	vm->part = 0; // TODO: correct?
 }
 
 /**
@@ -249,7 +249,7 @@ void caosVM::c_NEW_COMP() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_NEW_COMP_c1() {
+void c_NEW_COMP_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(clone)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
@@ -258,7 +258,7 @@ void caosVM::c_NEW_COMP_c1() {
 	// TODO: what does clone do?
 	CompoundAgent *a = new CompoundAgent(sprite_file, first_image, image_count);
 	a->finishInit();
-	setTarg(a);
+	vm->setTarg(a);
 	// TODO: should part be set here?
 }
 
@@ -269,7 +269,7 @@ void caosVM::c_NEW_COMP_c1() {
  Creates a new vehicle agent with given family/genus/species, given spritefile with image_count sprites
  available starting at first_image in the spritefile, with the first part at the screen depth given by plane.
 */
-void caosVM::c_NEW_VHCL() {
+void c_NEW_VHCL(caosVM *vm) {
 	VM_VERIFY_SIZE(7)
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(first_image)
@@ -281,8 +281,8 @@ void caosVM::c_NEW_VHCL() {
 
 	Vehicle *a = new Vehicle(family, genus, species, plane, sprite_file, first_image, image_count);
 	a->finishInit();
-	setTarg(a);
-	part = 0; // TODO: correct?
+	vm->setTarg(a);
+	vm->part = 0; // TODO: correct?
 }
 
 /**
@@ -290,14 +290,14 @@ void caosVM::c_NEW_VHCL() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_NEW_VHCL_c1() {
+void c_NEW_VHCL_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
 
 	Vehicle *a = new Vehicle(sprite_file, first_image, image_count);
 	a->finishInit();
-	setTarg(a);
+	vm->setTarg(a);
 	// TODO: should part be set here?
 }
 
@@ -306,7 +306,7 @@ void caosVM::c_NEW_VHCL_c1() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_NEW_BKBD() {
+void c_NEW_BKBD(caosVM *vm) {
 	VM_PARAM_INTEGER(texty)
 	VM_PARAM_INTEGER(textx)
 	VM_PARAM_INTEGER(alias_colour)
@@ -318,7 +318,7 @@ void caosVM::c_NEW_BKBD() {
 
 	Blackboard *a = new Blackboard(sprite_file, first_image, image_count, textx, texty, background_colour, chalk_colour, alias_colour);
 	a->finishInit();
-	setTarg(a);
+	vm->setTarg(a);
 }
 
 /**
@@ -326,7 +326,7 @@ void caosVM::c_NEW_BKBD() {
  %status maybe
  %pragma variants c2
 */
-void caosVM::c_NEW_CBUB() {
+void c_NEW_CBUB(caosVM *vm) {
 	VM_PARAM_INTEGER(stringid)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
@@ -342,9 +342,9 @@ void caosVM::c_NEW_CBUB() {
 
  Returns TARG, the currently-targeted agent.
 */
-void caosVM::v_TARG() {
+void v_TARG(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	result.setAgent(targ);
+	vm->result.setAgent(vm->targ);
 }
 
 /**
@@ -355,9 +355,9 @@ void caosVM::v_TARG() {
  
  Returns OWNR, the agent that is running the script.
 */
-void caosVM::v_OWNR() {
+void v_OWNR(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	result.setAgent(owner);
+	vm->result.setAgent(vm->owner);
 }
 
 /**
@@ -366,10 +366,10 @@ void caosVM::v_OWNR() {
 
  Returns a null (zero) agent.
 */
-void caosVM::v_NULL() {
+void v_NULL(caosVM *vm) {
 	static const AgentRef nullref;
 	VM_VERIFY_SIZE(0)
-	result.setAgent(nullref);
+	vm->result.setAgent(nullref);
 }
 
 /**
@@ -380,11 +380,11 @@ void caosVM::v_NULL() {
 
  Sets the displayed sprite of TARG to the frame in the sprite file with the given integer.
 */
-void caosVM::c_POSE() {
+void c_POSE(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(pose)
 
-	AnimatablePart *p = getCurrentAnimatablePart();
+	AnimatablePart *p = vm->getCurrentAnimatablePart();
 	caos_assert(p);
 
 	SpritePart *s = dynamic_cast<SpritePart *>(p);
@@ -401,21 +401,21 @@ void caosVM::c_POSE() {
 
  Sets attributes of the TARG agent.
 */
-void caosVM::c_ATTR() {
+void c_ATTR(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(attr)
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	
-	bool oldfloat = targ->floatable();
-	targ->setAttributes(attr);
+	bool oldfloat = vm->targ->floatable();
+	vm->targ->setAttributes(attr);
 
 	// TODO: this is an icky hack to enable floating, we should write correct floating
 	// behaviour so we don't need to maintain floating lists like this :/
-	if (oldfloat != targ->floatable()) {
-		if (targ->floatable())
-			targ->floatSetup();
+	if (oldfloat != vm->targ->floatable()) {
+		if (vm->targ->floatable())
+			vm->targ->floatSetup();
 		else
-			targ->floatRelease();
+			vm->targ->floatRelease();
 	}
 }
 
@@ -426,16 +426,16 @@ void caosVM::c_ATTR() {
 
  Attributes of the TARG agent.
 */
-void caosVM::v_ATTR() {
-	valid_agent(targ);
-	result.setInt(targ->getAttributes());
+void v_ATTR(caosVM *vm) {
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->getAttributes());
 }
-void caosVM::s_ATTR() {
+void s_ATTR(caosVM *vm) {
 	VM_PARAM_VALUE(newvalue)
 	caos_assert(newvalue.hasInt());
 
-	valid_agent(targ);
-	targ->setAttributes(newvalue.getInt());
+	valid_agent(vm->targ);
+	vm->targ->setAttributes(newvalue.getInt());
 }
 
 /**
@@ -447,11 +447,11 @@ void caosVM::s_ATTR() {
  Initiates the agent timer-- the Timer script will then be run once every tickrate ticks.
  Setting tickrate to zero will stop the timer.
 */
-void caosVM::c_TICK() {
+void c_TICK(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(tickrate)
-	valid_agent(targ);
-	targ->setTimerRate(tickrate);
+	valid_agent(vm->targ);
+	vm->targ->setTimerRate(tickrate);
 }
 
 /**
@@ -460,28 +460,28 @@ void caosVM::c_TICK() {
 
  Sets the behaviour of the TARG agent.
 */
-void caosVM::c_BHVR() {
+void c_BHVR(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(bhvr)
 	
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// reset bhvr
-	targ->cr_can_push = targ->cr_can_pull = targ->cr_can_stop =
-		targ->cr_can_hit = targ->cr_can_eat = targ->cr_can_pickup = false;
+	vm->targ->cr_can_push = vm->targ->cr_can_pull = vm->targ->cr_can_stop =
+		vm->targ->cr_can_hit = vm->targ->cr_can_eat = vm->targ->cr_can_pickup = false;
 	
 	if (bhvr & 0x1) // creature can push
-		targ->cr_can_push = true;
+		vm->targ->cr_can_push = true;
 	if (bhvr & 0x2) // creature can pull
-		targ->cr_can_pull = true;
+		vm->targ->cr_can_pull = true;
 	if (bhvr & 0x4) // creature can stop
-		targ->cr_can_stop = true;
+		vm->targ->cr_can_stop = true;
 	if (bhvr & 0x8) // creature can hit
-		targ->cr_can_hit = true;
+		vm->targ->cr_can_hit = true;
 	if (bhvr & 0x10) // creature can eat
-		targ->cr_can_eat = true;
+		vm->targ->cr_can_eat = true;
 	if (bhvr & 0x20) // creature can pick up
-		targ->cr_can_pickup = true;
+		vm->targ->cr_can_pickup = true;
 }
 
 /**
@@ -492,10 +492,10 @@ void caosVM::c_BHVR() {
 
  Sets TARG (the target agent) to the given agent.
 */
-void caosVM::c_TARG() {
+void c_TARG(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(a)
-	setTarg(a);
+	vm->setTarg(a);
 }
 
 /**
@@ -505,8 +505,8 @@ void caosVM::c_TARG() {
 
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
-void caosVM::v_FROM() {
-	result.setAgent(from.getAgent());
+void v_FROM(caosVM *vm) {
+	vm->result.setAgent(vm->from.getAgent());
 }
 
 /**
@@ -517,7 +517,7 @@ void caosVM::v_FROM() {
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
  	// Returns a variable because DS is insane and uses this for network events too (and so, of course, scripts abuse it).
-CAOS_LVALUE_SIMPLE(FROM_ds, from)
+CAOS_LVALUE_SIMPLE(FROM_ds, vm->from)
 
 /**
  POSE (integer)
@@ -526,16 +526,16 @@ CAOS_LVALUE_SIMPLE(FROM_ds, from)
 
  Returns the number of the frame in the TARG part/agent's sprite file that is currently being displayed, or -1 if part# doesn't exist on a compound agent.
 */
-void caosVM::v_POSE() {
+void v_POSE(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	if (p)
-		result.setInt(p->getPose());
+		vm->result.setInt(p->getPose());
 	else
-		result.setInt(-1);
+		vm->result.setInt(-1);
 }
 
 /**
@@ -547,7 +547,7 @@ void caosVM::v_POSE() {
  Destroys the agent in question. However, you cannot destroy PNTR.
  Remember, use DEAD first for Creatures!
 */
-void caosVM::c_KILL() {
+void c_KILL(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALIDAGENT(a)
 
@@ -564,13 +564,13 @@ void caosVM::c_KILL() {
 
  <i>todo: compound agent stuff</i>
 */
-void caosVM::c_ANIM() {
+void c_ANIM(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_BYTESTR(bs)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	AnimatablePart *p = getCurrentAnimatablePart();
+	AnimatablePart *p = vm->getCurrentAnimatablePart();
 	caos_assert(p);
 	p->animation = bs;
 	
@@ -586,15 +586,15 @@ void caosVM::c_ANIM() {
  Sets the animation string for TARG, in the format '1234'.
  If it ends with 'R', loops back to the beginning.
 */
-void caosVM::c_ANIM_c2() {
+void c_ANIM_c2(caosVM *vm) {
 	VM_PARAM_STRING(animstring)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	
 	// TODO: support creatures (using AnimatablePart, see c2e ANIM) for this (with format like "001002003R")
-	if (dynamic_cast<SkeletalCreature *>(targ.get())) return;
+	if (dynamic_cast<SkeletalCreature *>(vm->targ.get())) return;
 
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 
 	p->animation.clear();
@@ -622,7 +622,7 @@ void caosVM::c_ANIM_c2() {
 
  Exactly like ANIM, only using a string and not a bytestring for poselist source.
 */
-void caosVM::c_ANMS() {
+void c_ANMS(caosVM *vm) {
 	VM_PARAM_STRING(poselist)
 
 	// TODO: technically, we should parse this properly, also do error checking
@@ -641,7 +641,7 @@ void caosVM::c_ANMS() {
 			t = t + poselist[i];
 	}
 
-	AnimatablePart *p = getCurrentAnimatablePart();
+	AnimatablePart *p = vm->getCurrentAnimatablePart();
 	caos_assert(p);
 	p->animation = animation;
 	
@@ -654,14 +654,14 @@ void caosVM::c_ANMS() {
 
  Returns the first_image (ie, absolute base) value for the current agent/part, or -1 if part# doesn't exist on a compound agent.
 */
-void caosVM::v_ABBA() {
+void v_ABBA(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	if (p)
-		result.setInt(p->getFirstImg());
+		vm->result.setInt(p->getFirstImg());
 	else
-		result.setInt(-1);
+		vm->result.setInt(-1);
 }
 
 /**
@@ -673,13 +673,13 @@ void caosVM::v_ABBA() {
  Sets the frame in the TARG agent's spritefile that will be used as its base image.
  This is relative to the first image set with one of the NEW: commands.
 */
-void caosVM::c_BASE() {
+void c_BASE(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(index)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 	// Note that we don't check validity here because a lot of code changes BASE and then only afterwards POSE/ANIM.
 	p->setBase(index);
@@ -691,14 +691,14 @@ void caosVM::c_BASE() {
 
  Returns the frame in the TARG agent/part's spritefile being used as the BASE image, or -1 if part# doesn't exist on a compound agent.
 */
-void caosVM::v_BASE() {
+void v_BASE(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 		
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	if (p)
-		result.setInt(p->getBase());
+		vm->result.setInt(p->getBase());
 	else
-		result.setInt(-1);
+		vm->result.setInt(-1);
 }
 
 /**
@@ -707,21 +707,21 @@ void caosVM::v_BASE() {
 
  Returns the behaviour of the TARG agent.
 */
-void caosVM::v_BHVR() {
+void v_BHVR(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	
 	unsigned char bvr = 0;
 
-	if (targ->cr_can_push) bvr += 0x1;
-	if (targ->cr_can_pull) bvr += 0x2;
-	if (targ->cr_can_stop) bvr += 0x4;
-	if (targ->cr_can_hit) bvr += 0x8;
-	if (targ->cr_can_eat) bvr += 0x10;
-	if (targ->cr_can_pickup) bvr += 0x20;
+	if (vm->targ->cr_can_push) bvr += 0x1;
+	if (vm->targ->cr_can_pull) bvr += 0x2;
+	if (vm->targ->cr_can_stop) bvr += 0x4;
+	if (vm->targ->cr_can_hit) bvr += 0x8;
+	if (vm->targ->cr_can_eat) bvr += 0x10;
+	if (vm->targ->cr_can_pickup) bvr += 0x20;
 
-	result.setInt(bvr);
+	vm->result.setInt(bvr);
 }
 
 /**
@@ -731,15 +731,15 @@ void caosVM::v_BHVR() {
  Returns the agent that is carrying the TARG agent.  If TARG is not being carried, returns 
  NULL. 
 */
-void caosVM::v_CARR() {
+void v_CARR(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// TODO: muh, should totally be virtual
-	if (targ->invehicle)
-		result.setAgent(targ->invehicle);
+	if (vm->targ->invehicle)
+		vm->result.setAgent(vm->targ->invehicle);
 	else
-		result.setAgent(targ->carriedby);
+		vm->result.setAgent(vm->targ->carriedby);
 }
 
 /**
@@ -750,14 +750,14 @@ void caosVM::v_CARR() {
  Returns the agent that is carrying the OWNR agent.  If OWNR is not being carried, returns 
  NULL. 
 */
-void caosVM::v_CARR_c1() {
+void v_CARR_c1(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(owner);
+	valid_agent(vm->owner);
 	
-	if (owner->invehicle)
-		result.setAgent(owner->invehicle);
+	if (vm->owner->invehicle)
+		vm->result.setAgent(vm->owner->invehicle);
 	else
-		result.setAgent(owner->carriedby);
+		vm->result.setAgent(vm->owner->carriedby);
 }
 
 /**
@@ -767,10 +767,10 @@ void caosVM::v_CARR_c1() {
 
  Returns the family of the TARG agent.
 */
-void caosVM::v_FMLY() {
+void v_FMLY(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setInt(targ->family);
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->family);
 }
 
 /**
@@ -780,10 +780,10 @@ void caosVM::v_FMLY() {
 
  Returns the genus of the TARG agent.
 */
-void caosVM::v_GNUS() {
+void v_GNUS(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setInt(targ->genus);
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->genus);
 }
 
 /**
@@ -793,10 +793,10 @@ void caosVM::v_GNUS() {
 
  Returns the species of the TARG agent.
 */
-void caosVM::v_SPCS() {
+void v_SPCS(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setInt(targ->species);
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->species);
 }
 
 /**
@@ -805,10 +805,10 @@ void caosVM::v_SPCS() {
 
  Returns the plane (z-order) of the TARG agent.
 */
-void caosVM::v_PLNE() {
+void v_PLNE(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setInt(targ->getZOrder());
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->getZOrder());
 }
 
 /**
@@ -818,9 +818,9 @@ void caosVM::v_PLNE() {
 
  Returns the pointer agent (the Hand).
 */
-void caosVM::v_PNTR() {
+void v_PNTR(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	result.setAgent(world.hand());
+	vm->result.setAgent(world.hand());
 }
 
 #include "Engine.h" // for engine.version check, sigh
@@ -852,12 +852,12 @@ unsigned int calculateScriptId(unsigned int message_id) {
  Sends a message of type message_id to the given agent.  FROM will be set to OWNR unless 
  there is no agent involved in sending the message.
 */
-void caosVM::c_MESG_WRIT() {
+void c_MESG_WRIT(caosVM *vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(message_id)
 	VM_PARAM_VALIDAGENT(agent);
 
-	agent->queueScript(calculateScriptId(message_id), owner.get());
+	agent->queueScript(calculateScriptId(message_id), vm->owner.get());
 }
 
 /**
@@ -870,7 +870,7 @@ void caosVM::c_MESG_WRIT() {
  addition of parameters.  The message will be sent after waiting the number of ticks set 
  in delay (except doesn't, right now.  Delay must be set to zero for now.)
 */
-void caosVM::c_MESG_WRT() {
+void c_MESG_WRT(caosVM *vm) {
 	VM_VERIFY_SIZE(5)
 	VM_PARAM_INTEGER(delay)
 	VM_PARAM_VALUE(param_2)
@@ -881,7 +881,7 @@ void caosVM::c_MESG_WRT() {
 	// I'm not sure how to handle the 'delay'; is it a background delay, or do we actually block for delay ticks?
 	// TODO: fuzzie can't work out how on earth delays work in c2e, someone fixit
 
-	agent->queueScript(calculateScriptId(message_id), owner.get(), param_1, param_2);
+	agent->queueScript(calculateScriptId(message_id), vm->owner.get(), param_1, param_2);
 }
 
 /**
@@ -891,7 +891,7 @@ void caosVM::c_MESG_WRT() {
 
  Returns the total number of in-game agents matching the given family/genus/species.
 */
-void caosVM::v_TOTL() {
+void v_TOTL(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
@@ -905,7 +905,7 @@ void caosVM::v_TOTL() {
 				if ((*i)->species == species || species == 0)
 					x++;
 	}
-	result.setInt(x);
+	vm->result.setInt(x);
 }
 
 /**
@@ -914,21 +914,21 @@ void caosVM::v_TOTL() {
  
  Sets visibility of the TARG agent to cameras. 0 = invisible, 1 = visible.
 */
-void caosVM::c_SHOW() {
+void c_SHOW(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(visibility)
 	caos_assert((visibility == 0) || (visibility == 1));
-	valid_agent(targ);
-	targ->visible = visibility;
+	valid_agent(vm->targ);
+	vm->targ->visible = visibility;
 }
 
 /**
  SHOW (integer)
  %status maybe
 */
-void caosVM::v_SHOW() {
-	valid_agent(targ);
-	result.setInt(targ->visible ? 1 : 0);
+void v_SHOW(caosVM *vm) {
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->visible ? 1 : 0);
 }
 
 /**
@@ -938,10 +938,10 @@ void caosVM::v_SHOW() {
 
  Returns the X position of the TARG agent in the world.
 */
-void caosVM::v_POSX() {
+void v_POSX(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setFloat(targ->x + (targ->getWidth() / 2.0f));
+	valid_agent(vm->targ);
+	vm->result.setFloat(vm->targ->x + (vm->targ->getWidth() / 2.0f));
 }
 
 /**
@@ -951,10 +951,10 @@ void caosVM::v_POSX() {
 
  Returns the Y position of the TARG agent in the world.
 */
-void caosVM::v_POSY() {
+void v_POSY(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setFloat(targ->y + (targ->getHeight() / 2.0f));
+	valid_agent(vm->targ);
+	vm->result.setFloat(vm->targ->y + (vm->targ->getHeight() / 2.0f));
 }
 
 /**
@@ -964,14 +964,14 @@ void caosVM::v_POSY() {
  Sets the delay between frame changes of the TARG agent or current PART.
  Must be from 1 to 255, 1 being the normal rate, 2 being half as quickly, and so on.
 */
-void caosVM::c_FRAT() {
+void c_FRAT(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(framerate)
 
 	caos_assert(framerate >= 1 && framerate <= 255);
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 	p->setFramerate(framerate);
 	p->framedelay = 0;
@@ -1012,12 +1012,12 @@ class blockUntilOver : public blockCond {
 
  Waits (blocks the TARG agent) until the animation of the TARG agent or PART is over.
 */
-void caosVM::c_OVER() {
-	valid_agent(targ);
+void c_OVER(caosVM *vm) {
+	valid_agent(vm->targ);
 
 	// TODO: The Burrows uses OVER in install script, so fuzzie's making this optional for now, but is this right?
-	if (owner)
-		startBlocking(new blockUntilOver(targ, part));
+	if (vm->owner)
+		vm->startBlocking(new blockUntilOver(vm->targ, vm->part));
 }
 
 /**
@@ -1027,26 +1027,26 @@ void caosVM::c_OVER() {
  Sets relative x/y coordinates for TARG's pickup point.
  Pose is -1 for all poses, or a pose relative to the first image specified in NEW: (not BASE).
 */
-void caosVM::c_PUHL() {
+void c_PUHL(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(pose)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	if (pose == -1) {
-		SpritePart *s = dynamic_cast<SpritePart *>(targ->part(0));
+		SpritePart *s = dynamic_cast<SpritePart *>(vm->targ->part(0));
 		if (s) {
 			for (unsigned int i = 0; i < (s->getFirstImg() + s->getSprite()->numframes()); i++) {
-				targ->carried_points[i] = std::pair<int, int>(x, y);
+				vm->targ->carried_points[i] = std::pair<int, int>(x, y);
 			}
 		} else {
 			// ..Assume a single pose for non-sprite parts.
-			targ->carried_points[0] = std::pair<int, int>(x, y);
+			vm->targ->carried_points[0] = std::pair<int, int>(x, y);
 		}
 	} else {
-		targ->carried_points[pose] = std::pair<int, int>(x, y);
+		vm->targ->carried_points[pose] = std::pair<int, int>(x, y);
 	}
 }
 
@@ -1058,8 +1058,8 @@ void caosVM::c_PUHL() {
  Sets relative x/y coordinates for TARG's pickup point.
  Pose is -1 for all poses, or a pose relative to the first image specified in NEW: (not BASE).
 */
-void caosVM::c_SETV_PUHL() {
-	c_PUHL();
+void c_SETV_PUHL(caosVM *vm) {
+	c_PUHL(vm);
 }
 
 /**
@@ -1068,18 +1068,18 @@ void caosVM::c_SETV_PUHL() {
 
  Returns the coordinate for TARG's pickup point. x_or_y should be 1 for x, or 2 for y.
 */
-void caosVM::v_PUHL() {
+void v_PUHL(caosVM *vm) {
 	VM_PARAM_INTEGER(x_or_y)
 	VM_PARAM_INTEGER(pose)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// TODO: this creates the variable if it doesn't exist yet, correct behaviour?
 	if (x_or_y == 1) {
-		result.setInt(targ->carried_points[pose].first);
+		vm->result.setInt(vm->targ->carried_points[pose].first);
 	} else {
 		caos_assert(x_or_y == 2);
-		result.setInt(targ->carried_points[pose].second);
+		vm->result.setInt(vm->targ->carried_points[pose].second);
 	}
 }
 
@@ -1090,11 +1090,11 @@ void caosVM::v_PUHL() {
 
  Returns the position of the left side of TARG's bounding box.
 */
-void caosVM::v_POSL() {
+void v_POSL(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
-	result.setFloat(targ->x);
+	valid_agent(vm->targ);
+	vm->result.setFloat(vm->targ->x);
 }
 
 /**
@@ -1104,11 +1104,11 @@ void caosVM::v_POSL() {
 
  Returns the position of the top side of TARG's bounding box.
 */
-void caosVM::v_POST() {
+void v_POST(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
-	result.setFloat(targ->y);
+	valid_agent(vm->targ);
+	vm->result.setFloat(vm->targ->y);
 }
 
 /**
@@ -1118,11 +1118,11 @@ void caosVM::v_POST() {
 
  Returns the position of the right side of TARG's bounding box.
 */
-void caosVM::v_POSR() {
+void v_POSR(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
-	result.setFloat(targ->x + targ->getWidth());
+	valid_agent(vm->targ);
+	vm->result.setFloat(vm->targ->x + vm->targ->getWidth());
 }
 
 /**
@@ -1132,11 +1132,11 @@ void caosVM::v_POSR() {
 
  Returns the position of the bottom side of TARG's bounding box.
 */
-void caosVM::v_POSB() {
+void v_POSB(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
-	result.setFloat(targ->y + targ->getHeight());
+	valid_agent(vm->targ);
+	vm->result.setFloat(vm->targ->y + vm->targ->getHeight());
 }
 
 /**
@@ -1146,11 +1146,11 @@ void caosVM::v_POSB() {
 
  Returns the TARG agent's width.
 */
-void caosVM::v_WDTH() {
+void v_WDTH(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
-	result.setInt(targ->getWidth());
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->getWidth());
 }
 
 /**
@@ -1159,12 +1159,12 @@ void caosVM::v_WDTH() {
 
  Sets the plane (the z-order) of the TARG agent.  Higher values are closer to the camera.
 */
-void caosVM::c_PLNE() {
+void c_PLNE(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(depth)
 
-	valid_agent(targ);
-	targ->setZOrder(depth);
+	valid_agent(vm->targ);
+	vm->targ->setZOrder(depth);
 }
 
 /**
@@ -1173,7 +1173,7 @@ void caosVM::c_PLNE() {
 
  Sets the tinting of the TARG agent to the given red, blue, and green values.
 */
-void caosVM::c_TINT() {
+void c_TINT(caosVM *vm) {
 	VM_VERIFY_SIZE(5)
 	VM_PARAM_INTEGER(swap)
 	VM_PARAM_INTEGER(rotation)
@@ -1187,7 +1187,7 @@ void caosVM::c_TINT() {
 	caos_assert(swap >= 0 && swap <= 256);
 	caos_assert(rotation >= 0 && rotation <= 256);
 
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 	p->tint(red_tint, green_tint, blue_tint, rotation, swap);
 }
@@ -1198,12 +1198,12 @@ void caosVM::c_TINT() {
 
  Sets the TARG agent's range (i.e., the distance it can see and hear).
 */
-void caosVM::c_RNGE() {
+void c_RNGE(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(distance)
 
-	valid_agent(targ);
-	targ->range = distance;
+	valid_agent(vm->targ);
+	vm->targ->range = distance;
 }
 
 /**
@@ -1212,10 +1212,10 @@ void caosVM::c_RNGE() {
 
  Returns the TARG agent's range.
 */
-void caosVM::v_RNGE() {
+void v_RNGE(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setFloat(targ->range);
+	valid_agent(vm->targ);
+	vm->result.setFloat(vm->targ->range);
 }
 
 /**
@@ -1225,7 +1225,7 @@ void caosVM::v_RNGE() {
 
  Returns the TARG agent's range.
 */
-CAOS_LVALUE_TARG_SIMPLE(RNGE_c2, targ->range)
+CAOS_LVALUE_TARG_SIMPLE(RNGE_c2, vm->targ->range)
 
 /**
  TRAN (integer) x (integer) y (integer)
@@ -1234,21 +1234,21 @@ CAOS_LVALUE_TARG_SIMPLE(RNGE_c2, targ->range)
  Tests if the pixel at (x,y) on the TARG agent is transparent.
  Returns 0 or 1.
 */
-void caosVM::v_TRAN() {
+void v_TRAN(caosVM *vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	valid_agent(targ);
-	CompoundPart *s = targ->part(0); assert(s);
+	valid_agent(vm->targ);
+	CompoundPart *s = vm->targ->part(0); assert(s);
 	SpritePart *p = dynamic_cast<SpritePart *>(s);
 	caos_assert(p);
 	caos_assert(x >= 0 && x <= (int)p->getWidth());
 	caos_assert(y >= 0 && y <= (int)p->getHeight());
 	if (p->transparentAt(x, y))
-		result.setInt(1);
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 	
 /**
@@ -1259,14 +1259,14 @@ void caosVM::v_TRAN() {
  parts of the agent can't be clicked.  If 0, anywhere on the agent (including transparent 
  parts) can be clicked.
 */
-void caosVM::c_TRAN() {
+void c_TRAN(caosVM *vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(part_no)
 	VM_PARAM_INTEGER(transparency)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO: handle -1?
-	CompoundPart *s = targ->part(part_no);
+	CompoundPart *s = vm->targ->part(part_no);
 	caos_assert(s);
 	SpritePart *p = dynamic_cast<SpritePart *>(s);
 	caos_assert(p);
@@ -1280,11 +1280,11 @@ void caosVM::c_TRAN() {
 
  Returns the TARG agent's height.
 */
-void caosVM::v_HGHT() {
+void v_HGHT(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	result.setInt(targ->getHeight());
+	vm->result.setInt(vm->targ->getHeight());
 }
 
 /**
@@ -1293,10 +1293,10 @@ void caosVM::v_HGHT() {
 
  Returns the name of the Hand; default is 'hand'.
 */
-void caosVM::v_HAND() {
+void v_HAND(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	result.setString(world.hand()->name);
+	vm->result.setString(world.hand()->name);
 }
 
 /**
@@ -1305,7 +1305,7 @@ void caosVM::v_HAND() {
 
  Sets the name of the Hand.
 */
-void caosVM::c_HAND() {
+void c_HAND(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(name)
 
@@ -1319,11 +1319,11 @@ void caosVM::c_HAND() {
 
  Return the agent timer tick rate of the TARG agent.
 */
-void caosVM::v_TICK() {
+void v_TICK(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	valid_agent(targ);
-	result.setInt(targ->timerrate);
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->timerrate);
 }
 
 /**
@@ -1333,27 +1333,27 @@ void caosVM::v_TICK() {
  Sets relative x/y coordinates for the location in the world where the TARG agent picks up 
  objects.  The pose is relative to the first image set in NEW: (not BASE).
 */
-void caosVM::c_PUPT() {
+void c_PUPT(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(pose)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	
 	// this is basically a copy of PUHL, change that first
 	if (pose == -1) {
-		SpritePart *s = dynamic_cast<SpritePart *>(targ->part(0));
+		SpritePart *s = dynamic_cast<SpritePart *>(vm->targ->part(0));
 		if (s) {
 			for (unsigned int i = 0; i < (s->getFirstImg() + s->getSprite()->numframes()); i++) {
-				targ->carry_points[i] = std::pair<int, int>(x, y);
+				vm->targ->carry_points[i] = std::pair<int, int>(x, y);
 			}
 		} else {
 			// ..Assume a single pose for non-sprite parts.
-			targ->carry_points[0] = std::pair<int, int>(x, y);
+			vm->targ->carry_points[0] = std::pair<int, int>(x, y);
 		}
 	} else {
-		targ->carry_points[pose] = std::pair<int, int>(x, y);
+		vm->targ->carry_points[pose] = std::pair<int, int>(x, y);
 	}
 }
 
@@ -1362,8 +1362,8 @@ void caosVM::c_PUPT() {
  %status maybe
  %pragma variants c2
 */
-void caosVM::c_SETV_PUPT() {
-	c_PUPT();
+void c_SETV_PUPT(caosVM *vm) {
+	c_PUPT(vm);
 }
 
 /**
@@ -1372,9 +1372,9 @@ void caosVM::c_SETV_PUPT() {
 
  Stop the script running in TARG, if any.
 */
-void caosVM::c_STPT() {
-	valid_agent(targ);
-	targ->stopScript();
+void c_STPT(caosVM *vm) {
+	valid_agent(vm->targ);
+	vm->targ->stopScript();
 }
 
 /**
@@ -1386,11 +1386,11 @@ void caosVM::c_STPT() {
  Turns the display of the TARG agent's physical core on and off. Gives a general idea of 
  its size and location (including invisible agents).
 */
-void caosVM::c_DCOR() {
+void c_DCOR(caosVM *vm) {
 	VM_PARAM_INTEGER(core_on)
 
-	valid_agent(targ);
-	targ->displaycore = core_on;
+	valid_agent(vm->targ);
+	vm->targ->displaycore = core_on;
 }
 
 /**
@@ -1399,14 +1399,14 @@ void caosVM::c_DCOR() {
 
  Determines whether or not the TARG agent's current sprite is mirrored. Returns 0 or 1.
 */
-void caosVM::v_MIRA() {
-	valid_agent(targ);
+void v_MIRA(caosVM *vm) {
+	valid_agent(vm->targ);
 	
 	// TODO: correct?
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 
-	result.setInt(p->draw_mirrored);
+	vm->result.setInt(p->draw_mirrored);
 }
  
 /**
@@ -1415,14 +1415,14 @@ void caosVM::v_MIRA() {
 
  Turns mirroring of the TARG agent's current sprite on or off (0 or 1).
 */
-void caosVM::c_MIRA() {
+void c_MIRA(caosVM *vm) {
 	VM_PARAM_INTEGER(mirror_on)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// TODO: what does 'current sprite' mean?
 	// TODO: correct?
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 
 	p->draw_mirrored = mirror_on;
@@ -1435,15 +1435,15 @@ void caosVM::c_MIRA() {
  Calculates the square of the distance between the centers of the TARG agent and the given 
  agent.
 */
-void caosVM::v_DISQ() {
+void v_DISQ(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(other)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	
-	float x = (targ->x + (targ->getWidth() / 2.0f)) - (other->x + (other->getWidth() / 2.0f));
-	float y = (targ->y + (targ->getHeight() / 2.0f)) - (other->y + (other->getHeight() / 2.0f));
+	float x = (vm->targ->x + (vm->targ->getWidth() / 2.0f)) - (other->x + (other->getWidth() / 2.0f));
+	float y = (vm->targ->y + (vm->targ->getHeight() / 2.0f)) - (other->y + (other->getHeight() / 2.0f));
 
-	result.setFloat(x*x + y*y);
+	vm->result.setFloat(x*x + y*y);
 }
 
 /**
@@ -1453,23 +1453,23 @@ void caosVM::v_DISQ() {
  Sets the degree of alpha blending on the TARG agent, to a value from 0 (solid) to 256 
  (invisible). The second parameter will turn alpha blending on and off.
 */
-void caosVM::c_ALPH() {
+void c_ALPH(caosVM *vm) {
 	VM_PARAM_INTEGER(enable)
 	VM_PARAM_INTEGER(alpha_value)
 	
 	if (alpha_value < 0) alpha_value = 0;
 	else if (alpha_value > 255) alpha_value = 255;
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(targ.get());
-	if (c && part == -1) {
+	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	if (c && vm->part == -1) {
 		for (std::vector<CompoundPart *>::iterator i = c->parts.begin(); i != c->parts.end(); i++) {
 			(*i)->has_alpha = enable;
 			(*i)->alpha = alpha_value;
 		}
 	} else {
-		CompoundPart *p = targ->part(part);
+		CompoundPart *p = vm->targ->part(vm->part);
 		caos_assert(p);
 		p->has_alpha = enable;
 		p->alpha = alpha_value;
@@ -1482,19 +1482,19 @@ void caosVM::c_ALPH() {
 
  Returns the agent currently held by the TARG agent, or a random one if there are more than one.
 */
-void caosVM::v_HELD() {
-	valid_agent(targ);
+void v_HELD(caosVM *vm) {
+	valid_agent(vm->targ);
 
 	// TODO: this whole thing perhaps belongs in a virtual function
-	Vehicle *v = dynamic_cast<Vehicle *>(targ.get());
+	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
 	if (v) {
 		// TODO: it should be random .. ?
 		if (v->passengers.size())
-			result.setAgent(v->passengers[0]);
+			vm->result.setAgent(v->passengers[0]);
 		else
-			result.setAgent(0);
+			vm->result.setAgent(0);
 	} else {
-		result.setAgent(targ->carrying);
+		vm->result.setAgent(vm->targ->carrying);
 	}
 }
 
@@ -1504,11 +1504,11 @@ void caosVM::v_HELD() {
 
  Changes the sprite file and first image associated with the TARG agent or current PART.
 */
-void caosVM::c_GALL() {
+void c_GALL(caosVM *vm) {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(spritefile)
 
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 	p->changeSprite(spritefile, first_image);
 }
@@ -1519,12 +1519,12 @@ void caosVM::c_GALL() {
 
  Returns the name of the sprite file associated with the TARG agent or current PART, or a blank string if part# is invalid on a compound agent.
 */
-void caosVM::v_GALL() {
-	SpritePart *p = getCurrentSpritePart();
+void v_GALL(caosVM *vm) {
+	SpritePart *p = vm->getCurrentSpritePart();
 	if (p)
-		result.setString(p->getSprite()->getName());
+		vm->result.setString(p->getSprite()->getName());
 	else
-		result.setString("");
+		vm->result.setString("");
 }
 
 /**
@@ -1533,14 +1533,14 @@ void caosVM::v_GALL() {
 
  Returns 1 if the first agent can see the other, or 0 otherwise.
 */
-void caosVM::v_SEEE() {
+void v_SEEE(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(second)
 	VM_PARAM_VALIDAGENT(first)
 
 	if (agentIsVisible(first.get(), second.get()))
-		result.setInt(1);
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
@@ -1549,11 +1549,11 @@ void caosVM::v_SEEE() {
 
  Returns the tint value for TARG agent. Pass 1 for red, 2 for blue, 3 for green, 4 for rotation or 5 for swap.
 */
-void caosVM::v_TINT() {
+void v_TINT(caosVM *vm) {
 	VM_PARAM_INTEGER(attribute)
 
-	valid_agent(targ);
-	result.setInt(0); // TODO
+	valid_agent(vm->targ);
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -1562,7 +1562,7 @@ void caosVM::v_TINT() {
 
  Works like the TINT command, but only applies the tint to the current frame, and discards the rest.
 */
-void caosVM::c_TINO() {
+void c_TINO(caosVM *vm) {
 	VM_PARAM_INTEGER(swap)
 	VM_PARAM_INTEGER(rotation)
 	VM_PARAM_INTEGER(blue)
@@ -1580,12 +1580,12 @@ void caosVM::c_TINO() {
 
  Causes the TARG agent to drop what it is carrying in a safe location.
 */
-void caosVM::c_DROP() {
-	valid_agent(targ);
+void c_DROP(caosVM *vm) {
+	valid_agent(vm->targ);
 
 	// TODO: what exactly are we meant to do here? firing the script directly is perhaps not right, but drops must be instant
-	if (targ->carrying) // TODO: valid?
-		targ->carrying->fireScript(5, targ, caosValue(), caosValue());
+	if (vm->targ->carrying) // TODO: valid?
+		vm->targ->carrying->fireScript(5, vm->targ, caosValue(), caosValue());
 
 	// TODO: only creatures in c1 (and c2?)
 }
@@ -1630,69 +1630,69 @@ AgentRef findNextAgent(AgentRef previous, unsigned char family, unsigned char ge
  NCLS (agent) previous (agent) family (integer) genus (integer) species (integer)
  %status maybe
 */
-void caosVM::v_NCLS() {
+void v_NCLS(caosVM *vm) {
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 	VM_PARAM_AGENT(previous)
 
-	result.setAgent(findNextAgent(previous, family, genus, species, true));
+	vm->result.setAgent(findNextAgent(previous, family, genus, species, true));
 }
 
 /**
  PCLS (agent) previous (agent) family (integer) genus (integer) species (integer)
  %status maybe
 */
-void caosVM::v_PCLS() {
+void v_PCLS(caosVM *vm) {
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 	VM_PARAM_AGENT(previous)
 
-	result.setAgent(findNextAgent(previous, family, genus, species, false));
+	vm->result.setAgent(findNextAgent(previous, family, genus, species, false));
 }
 
 /**
  TCOR (integer) topy (float) bottomy (float) leftx (float) rightx (float)
  %status stub
 */
-void caosVM::v_TCOR() {
+void v_TCOR(caosVM *vm) {
 	VM_PARAM_FLOAT(rightx)
 	VM_PARAM_FLOAT(leftx)
 	VM_PARAM_FLOAT(bottomy)
 	VM_PARAM_FLOAT(topy)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
  CORE (command) topy (float) bottomy (float) leftx (float) rightx (float)
  %status maybe
 */
-void caosVM::c_CORE() {
+void c_CORE(caosVM *vm) {
 	VM_PARAM_FLOAT(rightx)
 	VM_PARAM_FLOAT(leftx)
 	VM_PARAM_FLOAT(bottomy)
 	VM_PARAM_FLOAT(topy)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	targ->has_custom_core_size = true;
-	targ->custom_core_xleft = leftx;
-	targ->custom_core_xright = rightx;
-	targ->custom_core_ytop = topy;
-	targ->custom_core_ybottom = bottomy;
+	vm->targ->has_custom_core_size = true;
+	vm->targ->custom_core_xleft = leftx;
+	vm->targ->custom_core_xright = rightx;
+	vm->targ->custom_core_ytop = topy;
+	vm->targ->custom_core_ybottom = bottomy;
 }
 
 /**
  TWIN (agent) source (agent) null_vars (integer)
  %status stub
 */
-void caosVM::v_TWIN() {
+void v_TWIN(caosVM *vm) {
 	VM_PARAM_INTEGER(null_vars)
 	VM_PARAM_VALIDAGENT(source)
 
-	result.setAgent(0); // TODO
+	vm->result.setAgent(0); // TODO
 }
 
 /**
@@ -1700,14 +1700,14 @@ void caosVM::v_TWIN() {
  %status maybe
  %pragma variants c1 c2
 */
-CAOS_LVALUE_TARG_SIMPLE(ACTV, targ->actv)
+CAOS_LVALUE_TARG_SIMPLE(ACTV, vm->targ->actv)
 
 /**
  THRT (variable)
  %status maybe
  %pragma variants c2
 */
-CAOS_LVALUE_TARG_SIMPLE(THRT, targ->thrt)
+CAOS_LVALUE_TARG_SIMPLE(THRT, vm->targ->thrt)
 
 /**
  SIZE (variable)
@@ -1715,23 +1715,23 @@ CAOS_LVALUE_TARG_SIMPLE(THRT, targ->thrt)
  %pragma variants c2
 */
 	// TODO: stub because this likely == perm
-CAOS_LVALUE_TARG_SIMPLE(SIZE, targ->size)
+CAOS_LVALUE_TARG_SIMPLE(SIZE, vm->targ->size)
 
 /**
  GRAV (variable)
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_GRAV() {
-	valid_agent(targ);
-	result.setInt(targ->falling);
+void v_GRAV(caosVM *vm) {
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->falling);
 }
-void caosVM::s_GRAV() {
+void s_GRAV(caosVM *vm) {
 	VM_PARAM_VALUE(newvalue)
 	caos_assert(newvalue.hasInt());
 
-	valid_agent(targ);
-	targ->falling = newvalue.getInt();
+	valid_agent(vm->targ);
+	vm->targ->falling = newvalue.getInt();
 }
 
 /**
@@ -1741,14 +1741,14 @@ void caosVM::s_GRAV() {
 
  Creatures 2 command to set the family, genus and species of an agent.
 */
-void caosVM::c_SETV_CLS2() {
+void c_SETV_CLS2(caosVM *vm) {
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	targ->setClassifier(family, genus, species);
+	vm->targ->setClassifier(family, genus, species);
 }
 
 /**
@@ -1757,7 +1757,7 @@ void caosVM::c_SETV_CLS2() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_SLIM() {
+void c_SLIM(caosVM*) {
 	// TODO: probably shouldn't do anything, but make sure :)
 }
 
@@ -1767,24 +1767,24 @@ void caosVM::c_SLIM() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_BHVR_c2() {
+void c_BHVR_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(touch)
 	VM_PARAM_INTEGER(click)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// see Agent::handleClick for details of what these values mean
 	switch (click) {
 		// clicks have no effect
-		case 0: targ->clac[0] = -1; targ->clac[1] = -1; targ->clac[2] = -1; break;
+		case 0: vm->targ->clac[0] = -1; vm->targ->clac[1] = -1; vm->targ->clac[2] = -1; break;
 		// monostable
-		case 1: targ->clac[0] = 0; targ->clac[1] = -1; targ->clac[2] = -1; break;
+		case 1: vm->targ->clac[0] = 0; vm->targ->clac[1] = -1; vm->targ->clac[2] = -1; break;
 		// retriggerable monostable
-		case 2: targ->clac[0] = 0; targ->clac[1] = 0; targ->clac[2] = -1; break;
+		case 2: vm->targ->clac[0] = 0; vm->targ->clac[1] = 0; vm->targ->clac[2] = -1; break;
 		// toggle
-		case 3: targ->clac[0] = 0; targ->clac[1] = 2; targ->clac[2] = -1; break;
+		case 3: vm->targ->clac[0] = 0; vm->targ->clac[1] = 2; vm->targ->clac[2] = -1; break;
 		// cycle
-		case 4: targ->clac[0] = 0; targ->clac[1] = 1; targ->clac[2] = 2; break;
+		case 4: vm->targ->clac[0] = 0; vm->targ->clac[1] = 1; vm->targ->clac[2] = 2; break;
 		default:
 			// C2, at least, seems to produce random garbage (going off the end of a
 			// lookup table?) in this situation .. let's not
@@ -1801,12 +1801,12 @@ void caosVM::c_BHVR_c2() {
 
  Set family, genus and species of the target agent. Creatures 1 era command.
 */
-void caosVM::c_SETV_CLAS() {
+void c_SETV_CLAS(caosVM *vm) {
 	VM_PARAM_INTEGER(identifier)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	targ->setClassifier(
+	vm->targ->setClassifier(
 		(identifier >> 24) & 0xff,
 		(identifier >> 16) & 0xff,
 		(identifier >> 8) & 0xff
@@ -1818,18 +1818,18 @@ void caosVM::c_SETV_CLAS() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::v_LIML() {
+void v_LIML(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	if (targ->invehicle) {
-		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
-		result.setInt((int)v->x + v->cabinleft);
+	if (vm->targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ->invehicle.get()); assert(v);
+		vm->result.setInt((int)v->x + v->cabinleft);
 	} else {
-		std::shared_ptr<Room> r = world.map->roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+		std::shared_ptr<Room> r = world.map->roomAt(vm->targ->x + (vm->targ->getWidth() / 2.0f), vm->targ->y + (vm->targ->getHeight() / 2.0f));
 
-		if (r) result.setInt(r->x_left);
-		else result.setInt(0);
+		if (r) vm->result.setInt(r->x_left);
+		else vm->result.setInt(0);
 	}
 }
 
@@ -1838,18 +1838,18 @@ void caosVM::v_LIML() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::v_LIMT() {
+void v_LIMT(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	if (targ->invehicle) {
-		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
-		result.setInt((int)v->y + v->cabintop);
+	if (vm->targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ->invehicle.get()); assert(v);
+		vm->result.setInt((int)v->y + v->cabintop);
 	} else {
-		std::shared_ptr<Room> r = world.map->roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+		std::shared_ptr<Room> r = world.map->roomAt(vm->targ->x + (vm->targ->getWidth() / 2.0f), vm->targ->y + (vm->targ->getHeight() / 2.0f));
 
-		if (r) result.setInt(r->y_left_ceiling);
-		else result.setInt(0);
+		if (r) vm->result.setInt(r->y_left_ceiling);
+		else vm->result.setInt(0);
 	}
 }
 
@@ -1858,18 +1858,18 @@ void caosVM::v_LIMT() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::v_LIMR() {
+void v_LIMR(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	if (targ->invehicle) {
-		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
-		result.setInt((int)v->x + v->cabinright);
+	if (vm->targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ->invehicle.get()); assert(v);
+		vm->result.setInt((int)v->x + v->cabinright);
 	} else {
-		std::shared_ptr<Room> r = world.map->roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+		std::shared_ptr<Room> r = world.map->roomAt(vm->targ->x + (vm->targ->getWidth() / 2.0f), vm->targ->y + (vm->targ->getHeight() / 2.0f));
 
-		if (r) result.setInt(r->x_right);
-		else result.setInt(8352); // TODO
+		if (r) vm->result.setInt(r->x_right);
+		else vm->result.setInt(8352); // TODO
 	}
 }
 
@@ -1878,18 +1878,18 @@ void caosVM::v_LIMR() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::v_LIMB_c1() {
+void v_LIMB_c1(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	if (targ->invehicle) {
-		Vehicle *v = dynamic_cast<Vehicle *>(targ->invehicle.get()); assert(v);
-		result.setInt((int)v->y + v->cabinbottom);
+	if (vm->targ->invehicle) {
+		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ->invehicle.get()); assert(v);
+		vm->result.setInt((int)v->y + v->cabinbottom);
 	} else {
-		std::shared_ptr<Room> r = world.map->roomAt(targ->x + (targ->getWidth() / 2.0f), targ->y + (targ->getHeight() / 2.0f));
+		std::shared_ptr<Room> r = world.map->roomAt(vm->targ->x + (vm->targ->getWidth() / 2.0f), vm->targ->y + (vm->targ->getHeight() / 2.0f));
 
-		if (r) result.setInt(r->y_left_floor);
-		else result.setInt(1200); // TODO
+		if (r) vm->result.setInt(r->y_left_floor);
+		else vm->result.setInt(1200); // TODO
 	}
 }
 
@@ -1899,7 +1899,7 @@ void caosVM::v_LIMB_c1() {
  %pragma variants c1 c2
 */
 	// TODO: c1 scripts seem to depend on this being from OWNR, but is that always the case?
-CAOS_LVALUE_WITH_SIMPLE(OBJP, owner, owner->objp)
+CAOS_LVALUE_WITH_SIMPLE(OBJP, vm->owner, vm->owner->objp)
 
 /**
  XIST (integer) agent (agent)
@@ -1908,24 +1908,24 @@ CAOS_LVALUE_WITH_SIMPLE(OBJP, owner, owner->objp)
 
  Undocumented C2 command; returns 1 if specified agent exists, or 0 otherwise (ie, if it is null).
 */
-void caosVM::v_XIST() {
+void v_XIST(caosVM *vm) {
 	VM_PARAM_AGENT(agent)
 
 	if (agent.get())
-		result.setInt(1);
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
  SCLE (command) pose (integer) scaleby (integer)
  %status stub
 */
-void caosVM::c_SCLE() {
+void c_SCLE(caosVM *vm) {
 	VM_PARAM_INTEGER(scaleby)
 	VM_PARAM_INTEGER(pose)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// TODO
 }
@@ -1936,12 +1936,12 @@ void caosVM::c_SCLE() {
 
  Draw the current agent (or part? don't know) with the given width/height (ie, stretch the sprite). Set enable to 1 to enable, or 0 to disable.
 */
-void caosVM::c_STRC() {
+void c_STRC(caosVM *vm) {
 	VM_PARAM_INTEGER(enable)
 	VM_PARAM_INTEGER(height)
 	VM_PARAM_INTEGER(width)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// TODO
 }
@@ -1950,7 +1950,7 @@ void caosVM::c_STRC() {
  IMGE (command) filename (string)
  %status stub
 */
-void caosVM::c_IMGE() {
+void c_IMGE(caosVM *vm) {
 	VM_PARAM_STRING(filename)
 
 	// TODO
@@ -1960,7 +1960,7 @@ void caosVM::c_IMGE() {
  TNTW (command) index (integer)
  %status stub
 */
-void caosVM::c_TNTW() {
+void c_TNTW(caosVM *vm) {
 	VM_PARAM_INTEGER(index)
 
 	// TODO
@@ -1970,7 +1970,7 @@ void caosVM::c_TNTW() {
  PRNT (command) pose (integer)
  %status stub
 */
-void caosVM::c_PRNT() {
+void c_PRNT(caosVM *vm) {
 	VM_PARAM_INTEGER(pose)
 
 	// TODO
@@ -1981,13 +1981,13 @@ void caosVM::c_PRNT() {
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_TCAR() {
-	valid_agent(targ);
+void v_TCAR(caosVM *vm) {
+	valid_agent(vm->targ);
 
-	if (targ->invehicle)
-		result.setAgent(targ->invehicle);
+	if (vm->targ->invehicle)
+		vm->result.setAgent(vm->targ->invehicle);
 	else
-		result.setAgent(targ->carriedby);
+		vm->result.setAgent(vm->targ->carriedby);
 }
 
 /**
@@ -1997,10 +1997,10 @@ void caosVM::v_TCAR() {
 
  Attach the target agent to the mouse cursor for positioning purposes.
 */
-void caosVM::c_EDIT() {
-	valid_agent(targ);
+void c_EDIT(caosVM *vm) {
+	valid_agent(vm->targ);
 
-	world.hand()->editAgent = targ;
+	world.hand()->editAgent = vm->targ;
 }
 
 /**
@@ -2008,17 +2008,17 @@ void caosVM::c_EDIT() {
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_FRZN() {
-	valid_agent(targ);
-	caosValue r = targ->frozen ? 1 : 0;
-	valueStack.push_back(r);
+void v_FRZN(caosVM *vm) {
+	valid_agent(vm->targ);
+	caosValue r = vm->targ->frozen ? 1 : 0;
+	vm->valueStack.push_back(r);
 }
-void caosVM::s_FRZN() {
+void s_FRZN(caosVM *vm) {
 	VM_PARAM_VALUE(newvalue)
 	caos_assert(newvalue.hasInt());
 	
-	valid_agent(targ);
-	targ->frozen = newvalue.getInt();
+	valid_agent(vm->targ);
+	vm->targ->frozen = newvalue.getInt();
 }
 
 /**
@@ -2026,11 +2026,11 @@ void caosVM::s_FRZN() {
  %status maybe
  %pragma variants sm
 */
-void caosVM::c_BLCK() {
+void c_BLCK(caosVM *vm) {
 	VM_PARAM_INTEGER(height)
 	VM_PARAM_INTEGER(width)
 
-	SpritePart *p = getCurrentSpritePart();
+	SpritePart *p = vm->getCurrentSpritePart();
 	caos_assert(p);
 	std::shared_ptr<creaturesImage> img = p->getSprite();
 	caos_assert(img.get());
@@ -2044,13 +2044,13 @@ void caosVM::c_BLCK() {
 
  Enable/disable drawing of a shadow on the target agent with the specified intensity at the given x/y offset.
 */
-void caosVM::c_SHAD() {
+void c_SHAD(caosVM *vm) {
 	VM_PARAM_INTEGER(enable)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(intensity)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
 	// TODO
 }
@@ -2063,7 +2063,7 @@ void caosVM::c_SHAD() {
  This is supposed to convert the provided image name to the display depth, displaying a progress dialog if show_progress is non-zero.
  However, it does nothing under openc2e.
 */
-void caosVM::c_SYS_CONV() {
+void c_SYS_CONV(caosVM *vm) {
 	VM_PARAM_INTEGER(show_progress)
 	VM_PARAM_STRING(filename)
 }

@@ -46,7 +46,7 @@
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_DBG_OUTS() {
+void c_DBG_OUTS(caosVM *vm) {
 	VM_PARAM_STRING(val)
 	
 	fmt::print("{}\n", val);
@@ -64,7 +64,7 @@ void caosVM::c_DBG_OUTS() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_DBG_OUTV() {
+void c_DBG_OUTV(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALUE(val)
 
@@ -84,9 +84,9 @@ void caosVM::c_DBG_OUTV() {
  %status maybe
  %pragma variants c1 c2
 */
-void caosVM::c_DBUG() {
-	inst = true;
-	c_DBG_OUTV();
+void c_DBUG(caosVM *vm) {
+	vm->inst = true;
+	c_DBG_OUTV(vm);
 }
 
 /**
@@ -100,10 +100,10 @@ void caosVM::c_DBUG() {
 XXX: when serialization support works, this might well become good for
 	 persisting :)
 */
-void caosVM::v_UNID() {
+void v_UNID(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setInt(targ->getUNID());
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->getUNID());
 }
 
 /**
@@ -114,10 +114,10 @@ void caosVM::v_UNID() {
  Returns the unique ID of the target agent.
  This is currently no good for persisting.
 */
-void caosVM::v_UNID_c2() {
+void v_UNID_c2(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
-	valid_agent(targ);
-	result.setAgent(targ);
+	valid_agent(vm->targ);
+	vm->result.setAgent(vm->targ);
 }
 
 /**
@@ -126,11 +126,11 @@ void caosVM::v_UNID_c2() {
 
  Returns the agent with the given UNID, or NULL if agent has been deleted.
 */
-void caosVM::v_AGNT() {
+void v_AGNT(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(id)
 
-	result.setAgent(world.lookupUNID(id));
+	vm->result.setAgent(world.lookupUNID(id));
 }
 
 /**
@@ -139,7 +139,7 @@ void caosVM::v_AGNT() {
 
  Dumps some random memory stats to stderr.
 */
-void caosVM::c_DBG_MALLOC() {
+void c_DBG_MALLOC(caosVM*) {
 	VM_VERIFY_SIZE(0)
 	
 	// more unportable horror!
@@ -171,7 +171,7 @@ void caosVM::c_DBG_MALLOC() {
 
  Dumps the current script's bytecode to stderr.
 */
-void caosVM::c_DBG_DUMP() {
+void c_DBG_DUMP(caosVM *vm) {
 	std::cerr << vm->currentscript->dump();
 }	
 
@@ -182,7 +182,7 @@ void caosVM::c_DBG_DUMP() {
 
  Sets opcode trace level. Zero disables.
 */
-void caosVM::c_DBG_TRACE() {
+void c_DBG_TRACE(caosVM *vm) {
 	VM_PARAM_INTEGER(en)
 
 	std::cerr << "trace: " << en << std::endl;
@@ -197,13 +197,13 @@ void caosVM::c_DBG_TRACE() {
  
  Looks up documentation on the given command and spits it on the current output stream.
 */
-void caosVM::c_MANN() {
+void c_MANN(caosVM *vm) {
 	VM_PARAM_STRING(cmd)
 
-	caos_assert(outputstream);
+	caos_assert(vm->outputstream);
 
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
-	const cmdinfo *i = currentscript->dialect->cmdbase();
+	const cmdinfo *i = vm->currentscript->dialect->cmdbase();
 	
 	bool found = false;
 	while (i->lookup_key) {
@@ -213,16 +213,16 @@ void caosVM::c_MANN() {
 			std::string d = i->docs;
 			// TODO: docs should always include name/parameters/etc, so should never be empty
 			if (d.size())
-				*outputstream << std::string(i->docs) << std::endl;
+				*vm->outputstream << std::string(i->docs) << std::endl;
 			else
-				*outputstream << "no documentation for " << cmd << std::endl << std::endl;
+				*vm->outputstream << "no documentation for " << cmd << std::endl << std::endl;
 		}
 	
 		i++;
 	}
 
 	if (!found) {
-		*outputstream << "didn't find " << cmd << std::endl;
+		*vm->outputstream << "didn't find " << cmd << std::endl;
 		return;
 	}
 }
@@ -238,22 +238,22 @@ void caosVM::c_MANN() {
 
  If the script is not found no output will be generated.
  */
-void caosVM::c_DBG_DISA() {
+void c_DBG_DISA(caosVM *vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
 	
-	caos_assert(outputstream);
+	caos_assert(vm->outputstream);
 
 	std::shared_ptr<script> s = world.scriptorium->getScript(family, genus, species, event);
 	if (s) {
 		if (s->fmly != family || s->gnus != genus || s->spcs != species) {
-			*outputstream << "warning: search resulted in script from " << s->fmly << ", " << s->gnus << ", " << s->spcs << " script" << std::endl;
+			*vm->outputstream << "warning: search resulted in script from " << s->fmly << ", " << s->gnus << ", " << s->spcs << " script" << std::endl;
 		}
-		*outputstream << s->dump();
+		*vm->outputstream << s->dump();
 	} else
-		*outputstream << "no such script" << std::endl;
+		*vm->outputstream << "no such script" << std::endl;
 }
 
 /**
@@ -264,7 +264,7 @@ void caosVM::c_DBG_DISA() {
 
  Blows up unless the given condition is true.
 */
-void caosVM::c_DBG_ASRT() {
+void c_DBG_ASRT(caosVM*) {
 	throw caosException("DBG: ASRT condition failed");
 }
 
@@ -276,7 +276,7 @@ void caosVM::c_DBG_ASRT() {
  (openc2e-only)
  Blows up unless the given condition is false.
 */
-void caosVM::c_DBG_ASRF() {
+void c_DBG_ASRF(caosVM*) {
 	throw caosException("DBG ASRF condition succeeded");
 }
 
@@ -288,7 +288,7 @@ void caosVM::c_DBG_ASRF() {
  (openc2e-only)
  Blows up.
 */
-void caosVM::c_DBG_FAIL() {
+void c_DBG_FAIL(caosVM*) {
 	throw caosException("DBG: FAIL reached");
 }
 
@@ -301,13 +301,13 @@ void caosVM::c_DBG_FAIL() {
  Return a nicely-formatted string identifying the classifier of the agent,
  using the catalogue to find the name if possible.
 */
-void caosVM::v_DBG_IDNT() {
+void v_DBG_IDNT(caosVM *vm) {
 	VM_PARAM_AGENT(a)
 	
 	if (!a)
-		result.setString("(null)");
+		vm->result.setString("(null)");
 	else
-		result.setString(a->identify());
+		vm->result.setString(a->identify());
 }
 
 /**
@@ -316,7 +316,7 @@ void caosVM::v_DBG_IDNT() {
 
  Dumps the current agent profiling information to the output stream, in CSV format.
 */
-void caosVM::c_DBG_PROF() {
+void c_DBG_PROF(caosVM*) {
 	// TODO
 }
 
@@ -326,7 +326,7 @@ void caosVM::c_DBG_PROF() {
 
  Clears the current agent profiling information.
 */
-void caosVM::c_DBG_CPRO() {
+void c_DBG_CPRO(caosVM*) {
 	// TODO
 }
 
@@ -337,10 +337,10 @@ void caosVM::c_DBG_CPRO() {
 
  Returns the bare token in 'bareword' as a string.
 */
-void caosVM::v_DBG_STOK() {
+void v_DBG_STOK(caosVM *vm) {
 	VM_PARAM_STRING(bareword)
 	
-	result.setString(bareword);
+	vm->result.setString(bareword);
 }
 
 /**
@@ -353,9 +353,9 @@ void caosVM::v_DBG_STOK() {
  affects only the current timeslice; future slices use the normal amount for
  the dialect in question.
 */
-void caosVM::c_DBG_TSLC() {
+void c_DBG_TSLC(caosVM *vm) {
 	VM_PARAM_INTEGER(tslc);
-	timeslice = tslc;
+	vm->timeslice = tslc;
 }
 
 /**
@@ -365,8 +365,8 @@ void caosVM::c_DBG_TSLC() {
  
  Returns the number of ticks left in the current script's remaining timeslice.
 */
-void caosVM::v_DBG_TSLC() {
-	result.setInt(timeslice);
+void v_DBG_TSLC(caosVM *vm) {
+	vm->result.setInt(vm->timeslice);
 }
 
 /**
@@ -377,7 +377,7 @@ DBG: SIZO (string)
  Returns a human-readable profile of the sizes and allocation counts of
  various internal data structures
  */
-void caosVM::v_DBG_SIZO() {
+void v_DBG_SIZO(caosVM *vm) {
 	std::ostringstream oss;
 #define SIZEOF_OUT(t) do { oss << "sizeof(" #t ") = " << sizeof(t) << std::endl; } while(0)
 	SIZEOF_OUT(caosVM);
@@ -394,7 +394,7 @@ void caosVM::v_DBG_SIZO() {
 	oss << "caosVMs in pool: " << world.vmpool_size() << std::endl;
 #undef SIZEOF_OUT
 
-	result.setString(oss.str());
+	vm->result.setString(oss.str());
 }
 
 /* vim: set noet: */

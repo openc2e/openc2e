@@ -71,13 +71,14 @@ def printarr(cmds, variant, arrname):
         buf += "\t{{ // {} {}\n".format(idx, cmd["key"])
         idx += 1
 
-        if not cmd.get("implementation"):
-            cmd["implementation"] = "caosVM::dummy_cmd"
-        if not cmd.get("saveimpl"):
-            cmd["saveimpl"] = "caosVM::dummy_cmd"
-
-        buf += "\t\t&{}, // handler\n".format(cmd["implementation"])
-        buf += "\t\t&{}, // savehandler\n".format(cmd["saveimpl"])
+        if cmd.get("implementation"):
+            buf += "\t\t&{}, // handler\n".format(cmd["implementation"])
+        else:
+            buf += "\t\tnullptr, // handler\n"
+        if cmd.get("saveimpl"):
+            buf += "\t\t&{}, // savehandler\n".format(cmd["saveimpl"])
+        else:
+            buf += "\t\tnullptr, // savehandler\n"
 
         buf += '\t\t"{}", // lookup_key\n'.format(cmd["lookup_key"])
         buf += '\t\t"{}", // key\n'.format(cmd["key"])
@@ -210,11 +211,26 @@ print(
 #include <cstdio>
 #include <climits>
 #include "cmddata.h"
-#include "caosVM.h"
 #include "dialect.h"
 
+class caosVM;
 """
 )
+
+declarations = set()
+
+for variant_name in data["variants"]:
+    variant = data["variants"][variant_name]
+    cmds = list(variant.values())
+    
+    for c in cmds:
+        declarations.add(c["implementation"])
+        if "saveimpl" in c:
+            declarations.add(c["saveimpl"])
+
+for d in sorted(declarations):
+    print("void {}(caosVM*);".format(d))
+print("")
 
 for variant_name in sorted(data["variants"]):
     variant = data["variants"][variant_name]

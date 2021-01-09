@@ -31,7 +31,7 @@
 // Note: this file may require an exorbitant amount of RAM to compile
 // You have been warned.
 
-void caosVM::c_SERS_MAPP() {
+void c_SERS_MAPP(caosVM *vm) {
 	VM_PARAM_STRING(filename)
 #if 0
 	std::ofstream outf(filename.c_str(), std::ios::binary);
@@ -45,7 +45,7 @@ void caosVM::c_SERS_MAPP() {
 #endif
 }
 
-void caosVM::c_SERL_MAPP() {
+void c_SERL_MAPP(caosVM *vm) {
 	VM_PARAM_STRING(filename);
 #if 0
 	std::ifstream inf(filename.c_str(), std::ios::binary);
@@ -64,7 +64,7 @@ void caosVM::c_SERL_MAPP() {
 #endif
 }
 
-void caosVM::c_SERS_SCRP() {
+void c_SERS_SCRP(caosVM *vm) {
 	VM_PARAM_STRING(filename);
 	std::ofstream ofs(filename.c_str(), std::ios::binary);
 	{
@@ -74,7 +74,7 @@ void caosVM::c_SERS_SCRP() {
 	ofs.close();
 }
 
-void caosVM::c_SERL_SCRP() {
+void c_SERL_SCRP(caosVM *vm) {
 	VM_PARAM_STRING(filename);
 	std::ifstream inf(filename.c_str(), std::ios::binary);
 	{

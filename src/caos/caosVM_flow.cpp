@@ -38,7 +38,7 @@
  Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
  otherwise continues executing the script.
 */
-void caosVM::c_DOIF() {
+void c_DOIF(caosVM*) {
 	// handled elsewhere
 }
 
@@ -52,7 +52,7 @@ void caosVM::c_DOIF() {
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
  If found outside a DOIF block, it is equivalent to a DOIF. If you take advantage of this behavior, fuzzie is of the opinion that you should be shot.
 */
-void caosVM::c_ELIF() {
+void c_ELIF(caosVM*) {
 	// handled elsewhere
 }
 
@@ -65,7 +65,7 @@ void caosVM::c_ELIF() {
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
 */
-void caosVM::c_ELSE() {
+void c_ELSE(caosVM*) {
 	// handled elsewhere
 }
 
@@ -77,7 +77,7 @@ void caosVM::c_ELSE() {
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
 */
-void caosVM::c_ENDI() {
+void c_ENDI(caosVM*) {
 	// TODO: cost in c2e?
 }
 
@@ -90,12 +90,12 @@ void caosVM::c_ENDI() {
 
  The start of a REPS...REPE loop. The body of the loop will be executed (reps) times.
 */
-void caosVM::c_REPS() {
+void c_REPS(caosVM *vm) {
 	// Our expression parameter might push on a value that's a pointer
 	// (or otherwise not an integer); deal with it
 	
 	VM_PARAM_INTEGER(n);
-	result.setInt(n+1); // we'll visit the DECJNZ first to handle 0 etc
+	vm->result.setInt(n+1); // we'll visit the DECJNZ first to handle 0 etc
 }
 
 /**
@@ -106,7 +106,7 @@ void caosVM::c_REPS() {
 
  The end of a REPS...REPE loop.
 */
-void caosVM::c_REPE() {
+void c_REPE(caosVM*) {
 	// handled elsewhere
 }
 
@@ -118,7 +118,7 @@ void caosVM::c_REPE() {
  
  The start of a LOOP...EVER or LOOP...UNTL loop.
 */
-void caosVM::c_LOOP() {
+void c_LOOP(caosVM*) {
 	// handled elsewhere
 }
 
@@ -129,7 +129,7 @@ void caosVM::c_LOOP() {
  
  Jumps back to the matching LOOP, no matter what.
 */
-void caosVM::c_EVER() {
+void c_EVER(caosVM*) {
 	// handled elsewhere
 }
 
@@ -142,7 +142,7 @@ void caosVM::c_EVER() {
  
  Jumps back to the matching LOOP unless the condition evaluates to true.
 */
-void caosVM::c_UNTL() {
+void c_UNTL(caosVM*) {
 	// handled elsewhere
 }
 
@@ -155,7 +155,7 @@ void caosVM::c_UNTL() {
  
  Jumps to a subroutine defined by SUBR with label (label).
 */
-void caosVM::c_GSUB() {
+void c_GSUB(caosVM*) {
 	// TODO: is cost correct?
 	// handled elsewhere
 }
@@ -169,7 +169,7 @@ void caosVM::c_GSUB() {
  Defines the start of a subroute to be called with GSUB, with label (label).
  If the command is encountered during execution, it acts like a STOP.
 */
-void caosVM::c_SUBR() {
+void c_SUBR(caosVM*) {
 	// handled elsewhere
 }
 
@@ -182,14 +182,14 @@ void caosVM::c_SUBR() {
  
  Returns from a subroutine called with GSUB.
 */
-void caosVM::c_RETN() {
+void c_RETN(caosVM *vm) {
 	// TODO: is cost correct?
-	if (callStack.empty())
+	if (vm->callStack.empty())
 		throw creaturesException("RETN with an empty callstack");
-	nip = callStack.back().nip;
-	callStack.back().valueStack.swap(valueStack);
-	callStack.back().valueStack.clear(); // just in case
-	callStack.pop_back();
+	vm->nip = vm->callStack.back().nip;
+	vm->callStack.back().valueStack.swap(vm->valueStack);
+	vm->callStack.back().valueStack.clear(); // just in case
+	vm->callStack.pop_back();
 }
 
 /**
@@ -200,8 +200,8 @@ void caosVM::c_RETN() {
 
  The end of an ENUM...NEXT loop.
 */
-void caosVM::c_NEXT() {
-	targ = owner;
+void c_NEXT(caosVM *vm) {
+	vm->targ = vm->owner;
 }
 
 /**
@@ -212,8 +212,8 @@ void caosVM::c_NEXT() {
 
  The end of an ESCN...NSCN loop.
 */
-void caosVM::c_NSCN() {
-    targ = owner;
+void c_NSCN(caosVM *vm) {
+    vm->targ = vm->owner;
 }
 
 /**
@@ -226,14 +226,14 @@ void caosVM::c_NSCN() {
  Loops through all agents with the given classifier.  0 on any field is a
  wildcard. The loop body is terminated by a NEXT.
 */
-void caosVM::c_ENUM() {
+void c_ENUM(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	caosValue nullv; nullv.reset();
-	valueStack.push_back(nullv);
+	vm->valueStack.push_back(nullv);
 	
 	for (std::list<std::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
@@ -244,7 +244,7 @@ void caosVM::c_ENUM() {
 		if (family && family != a->family) continue;
 
 		caosValue v; v.setAgent(a);
-		valueStack.push_back(v);
+		vm->valueStack.push_back(v);
 	}
 }
 
@@ -258,23 +258,23 @@ void caosVM::c_ENUM() {
  An agent can be seen if it is within the range set by RNGE, and is visible (this includes the PERM value
  of walls that lie between them, and, if the agent is a Creature, it not having the 'invisible' attribute).
 */
-void caosVM::c_ESEE() {
+void c_ESEE(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	Agent *seeing;
-	if (owner) seeing = owner; else seeing = targ;
+	if (vm->owner) seeing = vm->owner; else seeing = vm->targ;
 	valid_agent(seeing);
 
 	caosValue nullv; nullv.reset();
-	valueStack.push_back(nullv);
+	vm->valueStack.push_back(nullv);
 
 	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
 	for (std::vector<std::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
 		caosValue v; v.setAgent(*i);
-		valueStack.push_back(v);
+		vm->valueStack.push_back(v);
 	}
 }
 
@@ -286,18 +286,18 @@ void caosVM::c_ESEE() {
 
  Similar to ENUM, but iterates through the agents OWNR is touching, or TARG is touching in an install script.
 */
-void caosVM::c_ETCH() {
+void c_ETCH(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	Agent *touching;
-	if (owner) touching = owner; else touching = targ;
+	if (vm->owner) touching = vm->owner; else touching = vm->targ;
 	valid_agent(touching);
 	
 	caosValue nullv; nullv.reset();
-	valueStack.push_back(nullv);
+	vm->valueStack.push_back(nullv);
 	
 	for (std::list<std::shared_ptr<Agent> >::iterator i
 			= world.agents.begin(); i != world.agents.end(); i++) {
@@ -310,7 +310,7 @@ void caosVM::c_ETCH() {
 
 		if (agentsTouching(a.get(), touching)) {
 			caosValue v; v.setAgent(a);
-			valueStack.push_back(v);
+			vm->valueStack.push_back(v);
 		}
 	}
 }
@@ -322,18 +322,18 @@ void caosVM::c_ETCH() {
 
  Similar to ENUM, but iterates through the OWNR vehicle's passengers.
 */
-void caosVM::c_EPAS() {
+void c_EPAS(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
-	caos_assert(owner);
-	Vehicle *v = dynamic_cast<Vehicle *>(owner.get());
+	caos_assert(vm->owner);
+	Vehicle *v = dynamic_cast<Vehicle *>(vm->owner.get());
 	caos_assert(v);
 
 	caosValue nullv; nullv.reset();
-	valueStack.push_back(nullv);
+	vm->valueStack.push_back(nullv);
 
 	for (std::vector<AgentRef>::iterator i = v->passengers.begin(); i != v->passengers.end(); i++) {
 		AgentRef a = *i;
@@ -342,7 +342,7 @@ void caosVM::c_EPAS() {
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		caosValue v; v.setAgent(a); valueStack.push_back(v);
+		caosValue v; v.setAgent(a); vm->valueStack.push_back(v);
 	}
 }
 
@@ -353,14 +353,14 @@ void caosVM::c_EPAS() {
 
  Loops through all the agents in the connective system containing the given agent.
 */
-void caosVM::c_ECON() {
+void c_ECON(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_VALIDAGENT(agent)
 
 	// TODO: should probably implement this (ECON)
 
 	caosValue nullv; nullv.reset();
-	valueStack.push_back(nullv);
+	vm->valueStack.push_back(nullv);
 }
 
 /**
@@ -371,7 +371,7 @@ void caosVM::c_ECON() {
 
  Enumerate all specified scenery objects.
 */
-void caosVM::c_ESCN() {
+void c_ESCN(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(species) caos_assert(species >= 0); caos_assert(species <= 65535);
 	VM_PARAM_INTEGER(genus) caos_assert(genus >= 0); caos_assert(genus <= 255);
@@ -381,7 +381,7 @@ void caosVM::c_ESCN() {
 	// with NEW: SCEN.
 
 	caosValue nullv; nullv.reset();
-	valueStack.push_back(nullv);
+	vm->valueStack.push_back(nullv);
 }
 
 /**
@@ -397,25 +397,25 @@ void caosVM::c_ESCN() {
  Script variables (VAxx) will not be preserved - you'll have to use OVxx
  for any parameters.
  */
-void caosVM::c_CALL() {
+void c_CALL(caosVM *vm) {
 	VM_PARAM_VALUE(p2)
 	VM_PARAM_VALUE(p1)
 	VM_PARAM_INTEGER(script_no)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 	caos_assert(script_no >= 0 && script_no < 65536);
 
-	std::shared_ptr<script> s = owner->findScript(script_no);
+	std::shared_ptr<script> s = vm->owner->findScript(script_no);
 	if (!s) return;
-	caosVM *newvm = world.getVM(owner);
-	newvm->trace = trace;
+	caosVM *newvm = world.getVM(vm->owner);
+	newvm->trace = vm->trace;
 
 	ensure_assert(newvm->fireScript(s, false));
-	newvm->inst = inst;
+	newvm->inst = vm->inst;
 	newvm->_p_[0] = p1;
 	newvm->_p_[1] = p2;
-	owner->pushVM(newvm);
-	stop_loop = true;
+	vm->owner->pushVM(newvm);
+	vm->stop_loop = true;
 }
 
 /**
@@ -428,7 +428,7 @@ void caosVM::c_CALL() {
 
 // XXX: exception catching is very broken right now
 
-void caosVM::v_CAOS() {
+void v_CAOS(caosVM *vm) {
 	// XXX: capture output
 	VM_PARAM_VARIABLE(report)
 	VM_PARAM_INTEGER(catches)
@@ -445,15 +445,15 @@ void caosVM::v_CAOS() {
 	sub->resetCore();
 	
 	if (inl) {
-		sub->targ = targ;
-		sub->_it_ = _it_;
-		sub->part = part;
-		sub->owner = owner;
+		sub->targ = vm->targ;
+		sub->_it_ = vm->_it_;
+		sub->part = vm->part;
+		sub->owner = vm->owner;
 		// sub->from = from;
 	}
 	
 	if (state_trans) {
-		sub->owner = owner;
+		sub->owner = vm->owner;
 		// sub->from = from;
 	}
 	
@@ -465,7 +465,7 @@ void caosVM::v_CAOS() {
 		if (inl) {
 			// Inline CAOS calls are expensive, mmmkay?
 			for (int i = 0; i < 100; i++)
-				sub->var[s.installer->mapVAxx(i)] = var[currentscript->mapVAxx(i)];
+				sub->var[s.installer->mapVAxx(i)] = vm->var[vm->currentscript->mapVAxx(i)];
 		}
 
 		s.installScripts();
@@ -476,7 +476,7 @@ void caosVM::v_CAOS() {
 		
 		sub->runEntirely(s.installer);
 		
-		result.setString(oss.str());
+		vm->result.setString(oss.str());
 		sub->outputstream = 0;
 	} catch (creaturesException &e) {
 		sub->outputstream = 0; // very important that this isn't pointing onto dead stack when the VM is freed
@@ -485,7 +485,7 @@ void caosVM::v_CAOS() {
 		// but we have no idea what error# to provide right now (see errors in CAOS.catalogue)
 		if (!throws || catches) {
 			report->setString(e.what());
-			result.setString("###");
+			vm->result.setString("###");
 		} else {
 			world.freeVM(sub);
 			throw;

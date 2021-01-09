@@ -64,7 +64,7 @@ c2eCreature *getc2eCreature(Agent *a) {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STM_SHOU() {
+void c_STM_SHOU(caosVM *vm) {
 	VM_PARAM_INTEGER(stimulusno)
 
 	// TODO
@@ -76,7 +76,7 @@ void caosVM::c_STM_SHOU() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STM_SIGN() {
+void c_STM_SIGN(caosVM *vm) {
 	VM_PARAM_INTEGER(stimulusno)
 
 	// TODO
@@ -88,7 +88,7 @@ void caosVM::c_STM_SIGN() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STM_TACT() {
+void c_STM_TACT(caosVM *vm) {
 	VM_PARAM_INTEGER(stimulusno)
 
 	// TODO
@@ -100,7 +100,7 @@ void caosVM::c_STM_TACT() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STM_WRIT() {
+void c_STM_WRIT(caosVM *vm) {
 	VM_PARAM_INTEGER(stimulusno)
 	VM_PARAM_VALIDAGENT(object)
 
@@ -117,7 +117,7 @@ void caosVM::c_STM_WRIT() {
 
  Send a stimulus of the given type to all Creatures who can hear OWNR.
 */
-void caosVM::c_STIM_SHOU() {
+void c_STIM_SHOU(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
@@ -131,7 +131,7 @@ void caosVM::c_STIM_SHOU() {
 
  Sends a stimulus of the given type to all Creatures who can see OWNR.
 */
-void caosVM::c_STIM_SIGN() {
+void c_STIM_SIGN(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
@@ -145,7 +145,7 @@ void caosVM::c_STIM_SIGN() {
 
  Sends a stimulus of the given type to all Creatures who are touching OWNR.
 */
-void caosVM::c_STIM_TACT() {
+void c_STIM_TACT(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
@@ -159,7 +159,7 @@ void caosVM::c_STIM_TACT() {
 
  Sends a stimulus of the given type to specific Creature.
 */
-void caosVM::c_STIM_WRIT() {
+void c_STIM_WRIT(caosVM *vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(strength)
 	VM_PARAM_INTEGER(stimulus)
@@ -178,7 +178,7 @@ void caosVM::c_STIM_WRIT() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STIM_SHOU_c2() {
+void c_STIM_SHOU_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(amount3)
 	VM_PARAM_INTEGER(chem3)
 	VM_PARAM_INTEGER(amount2)
@@ -201,7 +201,7 @@ void caosVM::c_STIM_SHOU_c2() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STIM_SIGN_c2() {
+void c_STIM_SIGN_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(amount3)
 	VM_PARAM_INTEGER(chem3)
 	VM_PARAM_INTEGER(amount2)
@@ -224,7 +224,7 @@ void caosVM::c_STIM_SIGN_c2() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STIM_TACT_c2() {
+void c_STIM_TACT_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(amount3)
 	VM_PARAM_INTEGER(chem3)
 	VM_PARAM_INTEGER(amount2)
@@ -247,7 +247,7 @@ void caosVM::c_STIM_TACT_c2() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STIM_WRIT_c2() {
+void c_STIM_WRIT_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(amount3)
 	VM_PARAM_INTEGER(chem3)
 	VM_PARAM_INTEGER(amount2)
@@ -275,7 +275,7 @@ void caosVM::c_STIM_WRIT_c2() {
  %pragma variants c1 c2
  %cost c1,c2 0
 */
-void caosVM::c_STIM_FROM_c1() {
+void c_STIM_FROM_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(amount3)
 	VM_PARAM_INTEGER(chem3)
 	VM_PARAM_INTEGER(amount2)
@@ -289,7 +289,7 @@ void caosVM::c_STIM_FROM_c1() {
 	VM_PARAM_INTEGER(input)
 	VM_PARAM_INTEGER(significance)
 
-	valid_agent(from.getAgent());
+	valid_agent(vm->from.getAgent());
 	// TODO
 }
 
@@ -299,7 +299,7 @@ void caosVM::c_STIM_FROM_c1() {
 
  Adjusts these four drives in all Creatures who can hear OWNR.
 */
-void caosVM::c_SWAY_SHOU() {
+void c_SWAY_SHOU(caosVM *vm) {
 	VM_VERIFY_SIZE(8)
 	VM_PARAM_FLOAT(adjust4)
 	VM_PARAM_INTEGER(drive4)
@@ -310,7 +310,7 @@ void caosVM::c_SWAY_SHOU() {
 	VM_PARAM_FLOAT(adjust1)
 	VM_PARAM_INTEGER(drive1)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 	//TODO
 }
 
@@ -320,7 +320,7 @@ void caosVM::c_SWAY_SHOU() {
 
  Adjusts these four drives in all Creatures who can see OWNR.
 */
-void caosVM::c_SWAY_SIGN() {
+void c_SWAY_SIGN(caosVM *vm) {
 	VM_VERIFY_SIZE(8)
 	VM_PARAM_FLOAT(adjust4)
 	VM_PARAM_INTEGER(drive4)
@@ -331,7 +331,7 @@ void caosVM::c_SWAY_SIGN() {
 	VM_PARAM_FLOAT(adjust1)
 	VM_PARAM_INTEGER(drive1)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 	//TODO
 }
 
@@ -341,7 +341,7 @@ void caosVM::c_SWAY_SIGN() {
 
  Adjusts these four drives in all Creatures who are touching OWNR.
 */
-void caosVM::c_SWAY_TACT() {
+void c_SWAY_TACT(caosVM *vm) {
 	VM_VERIFY_SIZE(8)
 	VM_PARAM_FLOAT(adjust4)
 	VM_PARAM_INTEGER(drive4)
@@ -352,7 +352,7 @@ void caosVM::c_SWAY_TACT() {
 	VM_PARAM_FLOAT(adjust1)
 	VM_PARAM_INTEGER(drive1)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 	//TODO
 }
 
@@ -362,7 +362,7 @@ void caosVM::c_SWAY_TACT() {
 
  Adjusts these four drives in the specified creature.
 */
-void caosVM::c_SWAY_WRIT() {
+void c_SWAY_WRIT(caosVM *vm) {
 	VM_VERIFY_SIZE(8)
 	VM_PARAM_FLOAT(adjust4)
 	VM_PARAM_INTEGER(drive4)
@@ -374,7 +374,7 @@ void caosVM::c_SWAY_WRIT() {
 	VM_PARAM_INTEGER(drive1)
 	VM_PARAM_VALIDAGENT(creature)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 	//TODO
 }
 
@@ -384,12 +384,12 @@ void caosVM::c_SWAY_WRIT() {
 
  Tells the target Creature to stop holding hands with the pointer.
 */
-void caosVM::c_NOHH() {
+void c_NOHH(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	if (!targ) return; // DS agent help, at least, does 'targ hhld nohh'
+	if (!vm->targ) return; // DS agent help, at least, does 'targ hhld nohh'
 	
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	// TODO
 }
 
@@ -400,11 +400,11 @@ void caosVM::c_NOHH() {
  Turns zombification of the target Creature on and off.  Set to 1 to disconnect the brain and 
  motor of the target Creature, and 0 to undo.
 */
-void caosVM::c_ZOMB() {
+void c_ZOMB(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(zombie)
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 
 	c->setZombie(zombie);
 }
@@ -415,9 +415,9 @@ void caosVM::c_ZOMB() {
 
  Returns 1 if target Creature is zombified, or 0 if otherwise.
 */
-void caosVM::v_ZOMB() {
-	Creature *c = getTargCreature();
-	result.setInt(c->isZombie());
+void v_ZOMB(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt(c->isZombie());
 }
 
 /**
@@ -426,13 +426,13 @@ void caosVM::v_ZOMB() {
 
  Changes the target Creature to face a different direction.
 */
-void caosVM::c_DIRN() {
+void c_DIRN(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(direction)
 
 	caos_assert(direction >= 0 && direction <= 3);
 
-	CreatureAgent *c = getTargCreatureAgent();
+	CreatureAgent *c = vm->getTargCreatureAgent();
 	c->setDirection(direction);
 }
 
@@ -443,10 +443,10 @@ void caosVM::c_DIRN() {
 
  Returns the direction the target Creatures is facing.
 */
-void caosVM::v_DIRN() {
-	CreatureAgent *c = getTargCreatureAgent();
+void v_DIRN(caosVM *vm) {
+	CreatureAgent *c = vm->getTargCreatureAgent();
 	
-	result.setInt(c->getDirection());
+	vm->result.setInt(c->getDirection());
 }
 	
 /**
@@ -455,10 +455,10 @@ void caosVM::v_DIRN() {
 
  Returns Creatures that are holding hands with pointer, or NULL if none.
 */
-void caosVM::v_HHLD() {
+void v_HHLD(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 
-	result.setAgent(0); // TODO
+	vm->result.setAgent(0); // TODO
 }
 
 /**
@@ -468,20 +468,20 @@ void caosVM::v_HHLD() {
  Move the target Creature's foot (along with the rest of the Creature, obviously) to the given 
  coordinates.  You should use this rather than MVTO for Creatures.
 */
-void caosVM::c_MVFT() {
+void c_MVFT(caosVM *vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	caos_assert(targ);
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
+	caos_assert(vm->targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(vm->targ.get());
 	caos_assert(c);
 
 	// TODO: this should be nicer
 	float downfootxoffset = c->attachmentX(c->isLeftFootDown() ? 11 : 12, 0);
 	float downfootyoffset = c->attachmentY(c->isLeftFootDown() ? 11 : 12, 0);
 
-	targ->moveTo(x - downfootxoffset, y - downfootyoffset);
+	vm->targ->moveTo(x - downfootxoffset, y - downfootyoffset);
 }
 	
 /**
@@ -490,13 +490,13 @@ void caosVM::c_MVFT() {
 
  Determines whether the given agent is a creature or not (0 or 1).
 */
-void caosVM::v_CREA() {
+void v_CREA(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_AGENT(agent)
 
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(agent.get());
-	if (c) result.setInt(1);
-	else result.setInt(0);
+	if (c) vm->result.setInt(1);
+	else vm->result.setInt(0);
 }
 
 /**
@@ -505,10 +505,10 @@ void caosVM::v_CREA() {
 
  Makes the target Creature learn all vocabulary words immediately.
 */
-void caosVM::c_VOCB() {
+void c_VOCB(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 
 	// TODO
 }
@@ -519,8 +519,8 @@ void caosVM::c_VOCB() {
 
  Kill the target Creature biologically.
 */
-void caosVM::c_DEAD() {
-	Creature *c = getTargCreature();
+void c_DEAD(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
 	c->die();
 }
@@ -532,13 +532,13 @@ void caosVM::c_DEAD() {
 
  Determines whether the target Creature is alive (0) or dead (255 in c1/c2, 1 otherwise).
 */
-void caosVM::v_DEAD() {
-	Creature *c = getTargCreature();
+void v_DEAD(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
 	if (engine.version < 3 && !c->isAlive())
-		result.setInt(255);
+		vm->result.setInt(255);
 	else
-		result.setInt(!c->isAlive());
+		vm->result.setInt(!c->isAlive());
 }
 
 /**
@@ -547,7 +547,7 @@ void caosVM::v_DEAD() {
 
  Sets the target Creature to the given one.
 */
-void caosVM::c_NORN() {
+void c_NORN(caosVM *vm) {
 	VM_PARAM_AGENT(creature)
 
 	world.selectCreature(creature);
@@ -581,12 +581,12 @@ CAOS_LVALUE(NORN, (void)0,
  Urges all Creatures who can hear OWNR to perform the given action on OWNR.
  The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
 */
-void caosVM::c_URGE_SHOU() {
+void c_URGE_SHOU(caosVM *vm) {
 	VM_PARAM_FLOAT(verb_stim)
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 
 	// TODO
 }
@@ -598,22 +598,22 @@ void caosVM::c_URGE_SHOU() {
  Urges all Creatures who can see OWNR to perform the given action on OWNR.
  The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
 */
-void caosVM::c_URGE_SIGN() {
+void c_URGE_SIGN(caosVM *vm) {
 	VM_PARAM_FLOAT(verb_stim)
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 
 	// TODO: sanitise stim params (bind to -1.0/1.0)
 	c2eStim stim;
-	stim.noun_id = owner->category;
+	stim.noun_id = vm->owner->category;
 	if (stim.noun_id == -1) return; // TODO: correct?
 	stim.noun_amount = noun_stim;
 	stim.verb_id = verb_id;
 	stim.verb_amount = verb_stim;
 
-	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(owner, 0, 0, 0);
+	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(vm->owner, 0, 0, 0);
 	for (std::vector<std::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
 		std::shared_ptr<Agent> a = *i; // guaranteed to be valid from getVisibleList
 
@@ -633,12 +633,12 @@ void caosVM::c_URGE_SIGN() {
  Urges all Creatures who are touching OWNR to perform the given action on OWNR.
  The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
 */
-void caosVM::c_URGE_TACT() {
+void c_URGE_TACT(caosVM *vm) {
 	VM_PARAM_FLOAT(verb_stim)
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
 
-	valid_agent(owner);
+	valid_agent(vm->owner);
 	
 	// TODO
 }
@@ -650,7 +650,7 @@ void caosVM::c_URGE_TACT() {
  Urges the specified Creature to perform the specified action (verb) on the specified object type 
  (noun).  Provide a stim greater than 1 to force, and an id of -1 and a stim greater than 1 to unforce.
 */
-void caosVM::c_URGE_WRIT() {
+void c_URGE_WRIT(caosVM *vm) {
 	VM_PARAM_FLOAT(verb_stim)
 	VM_PARAM_INTEGER(verb_id)
 	VM_PARAM_FLOAT(noun_stim)
@@ -670,12 +670,12 @@ void caosVM::c_URGE_WRIT() {
 
  Modifies the level of a drive in target Creature by the given level, which can range from -1.0 (decrease) to 1.0 (increase).
 */
-void caosVM::c_DRIV() {
+void c_DRIV(caosVM *vm) {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id >= 0 && drive_id < 20);
 	
-	valid_agent(targ);
-	c2eCreature *c = getc2eCreature(targ.get());
+	valid_agent(vm->targ);
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	if (!c) return; // ignored on non-creatures
 
 	c->adjustDrive(drive_id, adjust);
@@ -687,13 +687,13 @@ void caosVM::c_DRIV() {
 
  Returns the level of a drive (0.0 to 1.0) in target Creature.
 */
-void caosVM::v_DRIV() {
+void v_DRIV(caosVM *vm) {
 	VM_PARAM_INTEGER(drive_id) caos_assert(drive_id >= 0 && drive_id < 20);
 
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
-	result.setFloat(c->getDrive(drive_id));
+	vm->result.setFloat(c->getDrive(drive_id));
 }
 
 /**
@@ -702,12 +702,12 @@ void caosVM::v_DRIV() {
 
  Modifies the level of a chemical in target Creature's bloodstream by adjust, which can range from -1.0 (decrease) to 1.0 (increase).
 */
-void caosVM::c_CHEM() {
+void c_CHEM(caosVM *vm) {
 	VM_PARAM_FLOAT(adjust)
 	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 
-	valid_agent(targ);
-	c2eCreature *c = getc2eCreature(targ.get());
+	valid_agent(vm->targ);
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	if (!c) return; // ignored on non-creatures
 	
 	c->adjustChemical(chemical_id, adjust);
@@ -721,14 +721,14 @@ void caosVM::c_CHEM() {
 
  Set the level of a chemical (0 to 255) in target creature's bloodstream.
 */
-void caosVM::c_CHEM_c1() {
+void c_CHEM_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(adjust)
 	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 
 	// TODO: can adjust be negative?
 
-	valid_agent(targ);
-	oldCreature *c = getoldCreature(targ.get());
+	valid_agent(vm->targ);
+	oldCreature *c = getoldCreature(vm->targ.get());
 	if (!c) return; // ignored on non-creatures
 	
 	c->addChemical(chemical_id, adjust);
@@ -740,14 +740,14 @@ void caosVM::c_CHEM_c1() {
 
  Returns the level of a chemical (0.0 to 1.0) in target creature's bloodstream.
 */
-void caosVM::v_CHEM() {
+void v_CHEM(caosVM *vm) {
 	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 	
-	valid_agent(targ);
-	c2eCreature *c = getc2eCreature(targ.get());
+	valid_agent(vm->targ);
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
-	result.setFloat(c->getChemical(chemical_id));
+	vm->result.setFloat(c->getChemical(chemical_id));
 }
 
 /**
@@ -757,14 +757,14 @@ void caosVM::v_CHEM() {
  
  Returns the level of a chemical (0 to 255) in target creature's bloodstream.
 */
-void caosVM::v_CHEM_c1() {
+void v_CHEM_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(chemical_id) caos_assert(chemical_id >= 0 && chemical_id < 256);
 	
-	valid_agent(targ);
-	oldCreature *c = getoldCreature(targ.get());
+	valid_agent(vm->targ);
+	oldCreature *c = getoldCreature(vm->targ.get());
 	caos_assert(c);
 
-	result.setInt(c->getChemical(chemical_id));
+	vm->result.setInt(c->getChemical(chemical_id));
 }
 
 /**
@@ -774,10 +774,10 @@ void caosVM::v_CHEM_c1() {
 
  If asleep is 1, makes the target creature sleep. If asleep is 0, makes the target creature wake.
 */
-void caosVM::c_ASLP() {
+void c_ASLP(caosVM *vm) {
 	VM_PARAM_INTEGER(asleep)
 	
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 
 	c->setAsleep(asleep);
 }
@@ -790,10 +790,10 @@ void caosVM::c_ASLP() {
 
  Determines whether the target Creature is asleep.
 */
-void caosVM::v_ASLP() {
-	Creature *c = getTargCreature();
+void v_ASLP(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
-	result.setInt(c->isAsleep());
+	vm->result.setInt(c->isAsleep());
 }
 
 #include "AgentHelpers.h"
@@ -835,11 +835,11 @@ class blockUntilApproached : public blockCond {
  Makes the target Creature approach the IT agent (or if none, an agent of that category using CAs), 
  blocking until it makes it there or gives up.
 */
-void caosVM::c_APPR() {
-	CreatureAgent *a = getTargCreatureAgent();
+void c_APPR(caosVM *vm) {
+	CreatureAgent *a = vm->getTargCreatureAgent();
 	caos_assert(a);
 	
-	startBlocking(new blockUntilApproached(targ, _it_));
+	vm->startBlocking(new blockUntilApproached(vm->targ, vm->_it_));
 }
 
 /**
@@ -848,10 +848,10 @@ void caosVM::c_APPR() {
 
  Makes the target Creature conscious if 0, or unconscious if 1.
 */
-void caosVM::c_UNCS() {
+void c_UNCS(caosVM *vm) {
 	VM_PARAM_INTEGER(unconscious)
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 
 	// TODO
 }
@@ -863,21 +863,21 @@ void caosVM::c_UNCS() {
 
  Returns 1 if the target Creature is unconscious, or 0 otherwise.
 */
-void caosVM::v_UNCS() {
-	Creature *c = getTargCreature();
+void v_UNCS(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
  FACE (command) number (integer)
  %status stub
 */
-void caosVM::c_FACE() {
+void c_FACE(caosVM *vm) {
 	VM_PARAM_INTEGER(number)
 
-	caos_assert(targ);
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
+	caos_assert(vm->targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(vm->targ.get());
 	caos_assert(c);
 
 	// TODO
@@ -889,12 +889,12 @@ void caosVM::c_FACE() {
 
  Returns the front-facing pose for the current facial expression of the target creature.
 */
-void caosVM::v_FACE_INT() {
-	caos_assert(targ);
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
+void v_FACE_INT(caosVM *vm) {
+	caos_assert(vm->targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(vm->targ.get());
 	caos_assert(c);
 
-	result.setInt(c->getFaceSpriteFrame());
+	vm->result.setInt(c->getFaceSpriteFrame());
 }
 
 /**
@@ -903,12 +903,12 @@ void caosVM::v_FACE_INT() {
 
  Returns the current sprite filename for the face of the target creature.
 */
-void caosVM::v_FACE_STRING() {
-	caos_assert(targ);
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(targ.get());
+void v_FACE_STRING(caosVM *vm) {
+	caos_assert(vm->targ);
+	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(vm->targ.get());
 	caos_assert(c);
 
-	result.setString(c->getFaceSpriteName());
+	vm->result.setString(c->getFaceSpriteName());
 }
 
 /**
@@ -917,10 +917,10 @@ void caosVM::v_FACE_STRING() {
  
  Causes the target Creature to state an opinion about the specified Creature.
 */
-void caosVM::c_LIKE() {
+void c_LIKE(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(creature)
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 
 	// TODO
 }
@@ -931,16 +931,16 @@ void caosVM::c_LIKE() {
  
  Returns the filename for the specified part of a Creature, substituting as necessary.
 */
-void caosVM::v_LIMB() {
+void v_LIMB(caosVM *vm) {
 	VM_PARAM_INTEGER(variant)
 	VM_PARAM_INTEGER(age)
 	VM_PARAM_INTEGER(gender)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(bodypart)
 	
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	
-	result.setString(""); // TODO
+	vm->result.setString(""); // TODO
 }
 
 /**
@@ -949,10 +949,10 @@ void caosVM::v_LIMB() {
 
  Makes the target Creature speak the specified speech to all creatures in hearing range.
 */
-void caosVM::c_ORDR_SHOU() {
+void c_ORDR_SHOU(caosVM *vm) {
 	VM_PARAM_STRING(speech)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -962,10 +962,10 @@ void caosVM::c_ORDR_SHOU() {
 
  Makes the target Creature speak the specified speech to all creatures that can see it.
 */
-void caosVM::c_ORDR_SIGN() {
+void c_ORDR_SIGN(caosVM *vm) {
 	VM_PARAM_STRING(speech)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -975,10 +975,10 @@ void caosVM::c_ORDR_SIGN() {
 
  Makes the target Creature speak the specified speech to all creatures that are touching it.
 */
-void caosVM::c_ORDR_TACT() {
+void c_ORDR_TACT(caosVM *vm) {
 	VM_PARAM_STRING(speech)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -988,11 +988,11 @@ void caosVM::c_ORDR_TACT() {
 
  Makes the target Creature speak the specified speech to the specified creature.
 */
-void caosVM::c_ORDR_WRIT() {
+void c_ORDR_WRIT(caosVM *vm) {
 	VM_PARAM_STRING(speech)
 	VM_PARAM_VALIDAGENT(creature)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -1004,10 +1004,10 @@ void caosVM::c_ORDR_WRIT() {
  processed while it is dreaming.  If it is not asleep already, then it 
  will be made to sleep before dreaming begins.
 */
-void caosVM::c_DREA() {
+void c_DREA(caosVM *vm) {
 	VM_PARAM_INTEGER(dream)
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	c->setDreaming(dream);
 }
 
@@ -1017,9 +1017,9 @@ void caosVM::c_DREA() {
 
  Returns whether or not the target Creature is dreaming (0 or 1).
 */
-void caosVM::v_DREA() {
-	Creature *c = getTargCreature();
-	result.setInt(c->isDreaming());
+void v_DREA(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt(c->isDreaming());
 }
 
 /**
@@ -1029,8 +1029,8 @@ void caosVM::v_DREA() {
  Registers the birth of the target Creature, and sends a birth event to 
  the game.
 */
-void caosVM::c_BORN() {
-	Creature *c = getTargCreature();
+void c_BORN(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 	c->born();
 }
 
@@ -1041,9 +1041,9 @@ void caosVM::c_BORN() {
 
  Returns the integer value of the target Creature's current life stage.
 */
-void caosVM::v_CAGE() {
-	Creature *c = getTargCreature();
-	result.setInt((int)c->getStage());
+void v_CAGE(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt((int)c->getStage());
 }
 
 /**
@@ -1053,13 +1053,13 @@ void caosVM::v_CAGE() {
  Determines whether or not the target Creature can reach the IT agent (0 
  or 1).
 */
-void caosVM::v_BYIT() {
-	Creature *c = getTargCreature();
+void v_BYIT(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
-	if (_it_ && agentsTouching(targ, _it_)) // TODO
-		result.setInt(1);
+	if (vm->_it_ && agentsTouching(vm->targ, vm->_it_)) // TODO
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
@@ -1070,10 +1070,10 @@ void caosVM::v_BYIT() {
  Returns the agent that the OWNR creature was focused on when the 
  current script began running.
 */
-void caosVM::v_IT() {
-	valid_agent(owner);
-	caos_assert(dynamic_cast<CreatureAgent *>(owner.get())); // TODO: return null instead?
-	result.setAgent(_it_);
+void v_IT(caosVM *vm) {
+	valid_agent(vm->owner);
+	caos_assert(dynamic_cast<CreatureAgent *>(vm->owner.get())); // TODO: return null instead?
+	vm->result.setAgent(vm->_it_);
 }
 
 /**
@@ -1082,7 +1082,7 @@ void caosVM::v_IT() {
  
  Creates a new creature over the space of a few ticks, using the specified agent/slot for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
-void caosVM::c_NEWC() {
+void c_NEWC(caosVM *vm) {
 	VM_PARAM_INTEGER(variant)
 	VM_PARAM_INTEGER(sex)
 	VM_PARAM_INTEGER(gene_slot)
@@ -1113,7 +1113,7 @@ void caosVM::c_NEWC() {
 	world.history->getMoniker(world.history->findMoniker(i->second)).moveToCreature(a);
 	gene_agent->genome_slots.erase(i);
 
-	setTarg(a);
+	vm->setTarg(a);
 }
 
 /**
@@ -1122,14 +1122,14 @@ void caosVM::c_NEWC() {
  
  Creates a new creature using the specified agent/slot for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
-void caosVM::c_NEW_CREA() {
+void c_NEW_CREA(caosVM *vm) {
 	/*VM_PARAM_INTEGER(variant)
 	VM_PARAM_INTEGER(sex)
 	VM_PARAM_INTEGER(gene_slot)
 	VM_PARAM_VALIDAGENT(gene_agent)
 	VM_PARAM_INTEGER(family)*/
 
-	c_NEWC(); // TODO
+	c_NEWC(vm); // TODO
 	//targ = NULL; // TODO
 }
 
@@ -1140,7 +1140,7 @@ void caosVM::c_NEW_CREA() {
 
  Creates a new creature using the specified moniker for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
-void caosVM::c_NEW_CREA_c1() {
+void c_NEW_CREA_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(sex)
 	VM_PARAM_INTEGER(moniker)
 
@@ -1177,7 +1177,7 @@ void caosVM::c_NEW_CREA_c1() {
 	world.newMoniker(genome, realmoniker, a);
 	world.history->getMoniker(world.history->findMoniker(genome)).moveToCreature(a);
 
-	setTarg(a);
+	vm->setTarg(a);
 }
 
 /**
@@ -1185,7 +1185,7 @@ void caosVM::c_NEW_CREA_c1() {
  %status maybe
  %pragma variants c3 sm
 */
-void caosVM::c_NEW_CRAG() {
+void c_NEW_CRAG(caosVM *vm) {
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
@@ -1218,7 +1218,7 @@ void caosVM::c_NEW_CRAG() {
 	world.history->getMoniker(world.history->findMoniker(i->second)).moveToCreature(a);
 	i->second.reset(); // TODO: remove the slot from the gene_agent entirely
 
-	setTarg(a);
+	vm->setTarg(a);
 
 }
 
@@ -1229,14 +1229,14 @@ int calculateRand(int value1, int value2); // caosVM_variables.cpp
  %status maybe
  %pragma variants c1 c2 cv c3
 */
-void caosVM::c_LTCY() {
+void c_LTCY(caosVM *vm) {
 	VM_PARAM_INTEGER(max); caos_assert(max >= 0 && max <= 255);
 	VM_PARAM_INTEGER(min); caos_assert(min >= 0 && min <= 255);
 	VM_PARAM_INTEGER(action);
 
 	int n = calculateRand(min, max);
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	
 	c2eCreature *c2ec = dynamic_cast<c2eCreature *>(c);
 	if (c2ec) {
@@ -1259,10 +1259,10 @@ void caosVM::c_LTCY() {
  %pragma variants c2 cv c3
  %status stub
 */
-void caosVM::c_MATE() {
-	Creature *c = getTargCreature();
-	caos_assert(_it_);
-	CreatureAgent *t = dynamic_cast<CreatureAgent *>(_it_.get());
+void c_MATE(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	caos_assert(vm->_it_);
+	CreatureAgent *t = dynamic_cast<CreatureAgent *>(vm->_it_.get());
 	caos_assert(t);
 	Creature *d = t->getCreature();
 
@@ -1274,9 +1274,9 @@ void caosVM::c_MATE() {
  %status stub
  %pragma variants c1 c2 cv c3
 */
-void caosVM::v_DRV() {
-	Creature *c = getTargCreature();
-	result.setInt(0); // TODO
+void v_DRV(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -1285,9 +1285,9 @@ void caosVM::v_DRV() {
 
  Return the agent which the target creature is currently focused on. Note that you should probably use _IT_ in creature scripts.
 */
-void caosVM::v_IITT() {
-	Creature *c = getTargCreature();
-	result.setAgent(c->getAttentionFocus());
+void v_IITT(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setAgent(c->getAttentionFocus());
 }
 
 /**
@@ -1296,11 +1296,11 @@ void caosVM::v_IITT() {
 
  Age (ie, increase the life stage of) the target creature the specified number of times.
 */
-void caosVM::c_AGES() {
+void c_AGES(caosVM *vm) {
 	VM_PARAM_INTEGER(times)
 	caos_assert(times >= 0);
 	
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	for (int i = 0; i < times; i++) {
 		c->ageCreature();
 	}
@@ -1313,14 +1313,14 @@ void caosVM::c_AGES() {
  Set the value of the specified loci of the target creature. 'type' is 0 for receptor loci and 1 for emitter loci.
  See genetics documentation for details of the parameters.
 */
-void caosVM::c_LOCI() {
+void c_LOCI(caosVM *vm) {
 	VM_PARAM_FLOAT(value)
 	VM_PARAM_INTEGER(id)
 	VM_PARAM_INTEGER(tissue)
 	VM_PARAM_INTEGER(organ)
 	VM_PARAM_INTEGER(type)
 
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
 	float *f = c->getLocusPointer(!type, organ, tissue, id);
@@ -1335,18 +1335,18 @@ void caosVM::c_LOCI() {
  Return the current value of the specified loci of the target creature. 'type' is 0 for receptor loci and 1 for emitter loci.
  See genetics documentation for details of thei parameters.
 */
-void caosVM::v_LOCI() {
+void v_LOCI(caosVM *vm) {
 	VM_PARAM_INTEGER(id)
 	VM_PARAM_INTEGER(tissue)
 	VM_PARAM_INTEGER(organ)
 	VM_PARAM_INTEGER(type)
 
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
 	float *f = c->getLocusPointer(!type, organ, tissue, id);
 	caos_assert(f);
-	result.setFloat(*f);
+	vm->result.setFloat(*f);
 }
 
 /**
@@ -1355,9 +1355,9 @@ void caosVM::v_LOCI() {
 
  Returns age of target creature, in ticks. Only counts ticks since it was BORN.
 */
-void caosVM::v_TAGE() {
-	Creature *c = getTargCreature();
-	result.setInt(c->getAge());
+void v_TAGE(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt(c->getAge());
 }
 
 /**
@@ -1366,10 +1366,10 @@ void caosVM::v_TAGE() {
 
  Return the number of organs the target creature has.
 */
-void caosVM::v_ORGN() {
-	c2eCreature *c = getc2eCreature(targ.get());
+void v_ORGN(caosVM *vm) {
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
-	result.setInt(c->noOrgans());
+	vm->result.setInt(c->noOrgans());
 }
 
 /**
@@ -1392,31 +1392,31 @@ void caosVM::v_ORGN() {
 
  Returns -1 if the specified organ or value is invalid.
 */
-void caosVM::v_ORGF() {
+void v_ORGF(caosVM *vm) {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(organ)
 	
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 	if (organ < 0 || (unsigned int)organ >= c->noOrgans()) {
-		result.setFloat(-1.0f);
+		vm->result.setFloat(-1.0f);
 		return;
 	}
 	
 	std::shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {
-		case 0: result.setFloat(o->getClockRate()); break;
-		case 1: result.setFloat(o->getShortTermLifeforce() / o->getInitialLifeforce()); break;
-		case 2: result.setFloat(o->getRepairRate()); break;
-		case 3: result.setFloat(o->getInjuryToApply()); break;
-		case 4: result.setFloat(o->getInitialLifeforce()); break;
-		case 5: result.setFloat(o->getShortTermLifeforce()); break;
-		case 6: result.setFloat(o->getLongTermLifeforce()); break;
-		case 7: result.setFloat(o->getDamageRate()); break;
-		case 8: result.setFloat(o->getEnergyCost()); break;
-		case 9: result.setFloat(o->getATPDamageCoefficient()); break;
-		default: result.setFloat(-1.0f); break;
+		case 0: vm->result.setFloat(o->getClockRate()); break;
+		case 1: vm->result.setFloat(o->getShortTermLifeforce() / o->getInitialLifeforce()); break;
+		case 2: vm->result.setFloat(o->getRepairRate()); break;
+		case 3: vm->result.setFloat(o->getInjuryToApply()); break;
+		case 4: vm->result.setFloat(o->getInitialLifeforce()); break;
+		case 5: vm->result.setFloat(o->getShortTermLifeforce()); break;
+		case 6: vm->result.setFloat(o->getLongTermLifeforce()); break;
+		case 7: vm->result.setFloat(o->getDamageRate()); break;
+		case 8: vm->result.setFloat(o->getEnergyCost()); break;
+		case 9: vm->result.setFloat(o->getATPDamageCoefficient()); break;
+		default: vm->result.setFloat(-1.0f); break;
 	}
 }
 
@@ -1428,24 +1428,24 @@ void caosVM::v_ORGF() {
  
  Returns -1 if the specified organ or value is invalid.
 */
-void caosVM::v_ORGI() {
+void v_ORGI(caosVM *vm) {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(organ)
 	
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 	if (organ < 0 || (unsigned int)organ >= c->noOrgans()) {
-		result.setFloat(-1.0f);
+		vm->result.setFloat(-1.0f);
 		return;
 	}
 	
 	std::shared_ptr<c2eOrgan> o = c->getOrgan(organ);
 
 	switch (value) {
-		case 0: result.setInt(o->getReceptorCount()); break;
-		case 1: result.setInt(o->getEmitterCount()); break;
-		case 2: result.setInt(o->getReactionCount()); break;
-		default: result.setFloat(-1.0f); break;
+		case 0: vm->result.setInt(o->getReceptorCount()); break;
+		case 1: vm->result.setInt(o->getEmitterCount()); break;
+		case 2: vm->result.setInt(o->getReactionCount()); break;
+		default: vm->result.setFloat(-1.0f); break;
 	}
 }
 
@@ -1453,12 +1453,12 @@ void caosVM::v_ORGI() {
  SOUL (command) part (integer) on (integer)
  %status stub
 */
-void caosVM::c_SOUL() {
+void c_SOUL(caosVM *vm) {
 	VM_PARAM_INTEGER(on)
 	VM_PARAM_INTEGER(part)
 	caos_assert(part >= 0 && part <= 8);
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	// TODO
 }
 	
@@ -1466,30 +1466,30 @@ void caosVM::c_SOUL() {
  SOUL (integer) part (integer)
  %status stub
 */
-void caosVM::v_SOUL() {
+void v_SOUL(caosVM *vm) {
 	VM_PARAM_INTEGER(part)
 	caos_assert(part >= 0 && part <= 8);
 		
-	Creature *c = getTargCreature();
-	result.setInt(1); // TODO
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt(1); // TODO
 }
 
 /**
  DECN (integer)
  %status maybe
 */
-void caosVM::v_DECN() {
-	Creature *c = getTargCreature();
-	result.setInt(c->getDecisionId());
+void v_DECN(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt(c->getDecisionId());
 }
 
 /**
  ATTN (integer)
  %status maybe
 */
-void caosVM::v_ATTN() {
-	Creature *c = getTargCreature();
-	result.setInt(c->getAttentionId());
+void v_ATTN(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
+	vm->result.setInt(c->getAttentionId());
 }
 
 /**
@@ -1497,8 +1497,8 @@ void caosVM::v_ATTN() {
  %status stub
  %pragma variants c1 c2 cv c3
 */
-void caosVM::c_TOUC() {
-	Creature *c = getTargCreature();
+void c_TOUC(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
 	// TODO
 }
@@ -1507,10 +1507,10 @@ void caosVM::c_TOUC() {
  FORF (command) creature (agent)
  %status stub
 */
-void caosVM::c_FORF() {
+void c_FORF(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(creature)
 		
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	// TODO: do we handle pointer as well?
 	Creature *learn = dynamic_cast<Creature *>(creature.get());
 	if (!learn) return;
@@ -1523,8 +1523,8 @@ void caosVM::c_FORF() {
  %status maybe
  %pragma variants c1 c2 cv c3
 */
-void caosVM::c_WALK() {
-	CreatureAgent *c = getTargCreatureAgent();
+void c_WALK(caosVM *vm) {
+	CreatureAgent *c = vm->getTargCreatureAgent();
 	
 	c->startWalking();
 }
@@ -1534,8 +1534,8 @@ void caosVM::c_WALK() {
  %status stub
  %pragma variants c1 c2 cv c3
 */
-void caosVM::c_DONE() {
-	Creature *c = getTargCreature();
+void c_DONE(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
 	// TODO
 }
@@ -1545,8 +1545,8 @@ void caosVM::c_DONE() {
  %status stub
  %pragma variants c1 c2 cv c3
 */
-void caosVM::c_SAYN() {
-	Creature *c = getTargCreature();
+void c_SAYN(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
 	// TODO
 }
@@ -1556,7 +1556,7 @@ void caosVM::c_SAYN() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_IMPT() {
+void c_IMPT(caosVM *vm) {
 	VM_PARAM_INTEGER(nudge)
 
 	// TODO: check for creature targ?
@@ -1568,7 +1568,7 @@ void caosVM::c_IMPT() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_AIM() {
+void c_AIM(caosVM *vm) {
 	VM_PARAM_INTEGER(actionno)
 
 	// TODO: check for creature targ? who knows?
@@ -1580,15 +1580,15 @@ void caosVM::c_AIM() {
  %status maybe
  %pragma variants c1 c2
 */
-CAOS_LVALUE_TARG_SIMPLE(BABY, targ->babymoniker) // TODO
+CAOS_LVALUE_TARG_SIMPLE(BABY, vm->targ->babymoniker) // TODO
 
 /**
  SNEZ (command)
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_SNEZ() {
-	Creature *c = getTargCreature();
+void c_SNEZ(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 
 	// TODO
 }
@@ -1600,15 +1600,15 @@ void caosVM::c_SNEZ() {
 
  Returns the value for the specified drive of the target creature.
 */
-void caosVM::v_DRIV_c1() {
+void v_DRIV_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(drive)
 	caos_assert(drive < 16);
 
-	oldCreature *c = getoldCreature(targ.get());
+	oldCreature *c = getoldCreature(vm->targ.get());
 	// TODO: c2 support
 	caos_assert(c);
 
-	result.setInt(c->getDrive(drive));
+	vm->result.setInt(c->getDrive(drive));
 }
 
 /**
@@ -1618,10 +1618,10 @@ void caosVM::v_DRIV_c1() {
 
  Start dreaming and process (at most?) max instincts.
 */
-void caosVM::c_DREA_c1() {
+void c_DREA_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(max)
 
-	oldCreature *c = getoldCreature(targ.get());
+	oldCreature *c = getoldCreature(vm->targ.get());
 	caos_assert(c);
 
 	// TODO
@@ -1631,25 +1631,25 @@ void caosVM::c_DREA_c1() {
  BRED (integer) part (integer)
  %status stub
 */
-void caosVM::v_BRED() {
+void v_BRED(caosVM *vm) {
 	VM_PARAM_INTEGER(part)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
  BVAR (integer)
  %status stub
 */
-void caosVM::v_BVAR() {
-	result.setInt(0); // TODO
+void v_BVAR(caosVM *vm) {
+	vm->result.setInt(0); // TODO
 }
 
 /**
  EXPR (command) index (integer) ticks (integer)
  %status stub
 */
-void caosVM::c_EXPR() {
+void c_EXPR(caosVM *vm) {
 	VM_PARAM_INTEGER(ticks)
 	VM_PARAM_INTEGER(index)
 
@@ -1660,15 +1660,15 @@ void caosVM::c_EXPR() {
  EXPR (integer)
  %status stub
 */
-void caosVM::v_EXPR() {
-	result.setInt(0); // TODO
+void v_EXPR(caosVM *vm) {
+	vm->result.setInt(0); // TODO
 }
 
 /**
  TNTC (command) tintindex (integer) part (integer) commit (integer)
  %status stub
 */
-void caosVM::c_TNTC() {
+void c_TNTC(caosVM *vm) {
 	VM_PARAM_INTEGER(commit)
 	VM_PARAM_INTEGER(part)
 	VM_PARAM_INTEGER(tintindex)
@@ -1681,11 +1681,11 @@ void caosVM::c_TNTC() {
  %status stub
  %pragma variants c2
 */
-void caosVM::c_INJR() {
+void c_INJR(caosVM *vm) {
 	VM_PARAM_INTEGER(amount)
 	VM_PARAM_INTEGER(organ)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -1694,10 +1694,10 @@ void caosVM::c_INJR() {
  %status stub
  %pragma variants c1 c2
 */
-void caosVM::c_SAY() {
+void c_SAY(caosVM *vm) {
 	VM_PARAM_STRING(string)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -1706,12 +1706,12 @@ void caosVM::c_SAY() {
  %status stub
  %pragma variants c2
 */
-void caosVM::c_TRIG() {
+void c_TRIG(caosVM *vm) {
 	VM_PARAM_INTEGER(amount)
 	VM_PARAM_INTEGER(cell)
 	VM_PARAM_INTEGER(lobe)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 	// TODO
 }
 
@@ -1720,21 +1720,21 @@ void caosVM::c_TRIG() {
  %status stub
  %pragma variants c2
 */
-void caosVM::v_MONK() {
-	oldCreature *c = getoldCreature(targ.get());
+void v_MONK(caosVM *vm) {
+	oldCreature *c = getoldCreature(vm->targ.get());
 	caos_assert(c);
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
  MOTR (command) enable (integer)
  %status stub
 */
-void caosVM::c_MOTR() {
+void c_MOTR(caosVM *vm) {
 	VM_PARAM_INTEGER(enable)
 
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
 	// TODO
@@ -1744,21 +1744,21 @@ void caosVM::c_MOTR() {
  MOTR (integer)
  %status stub
 */
-void caosVM::v_MOTR() {
-	c2eCreature *c = getc2eCreature(targ.get());
+void v_MOTR(caosVM *vm) {
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
-	result.setInt(1); // TODO
+	vm->result.setInt(1); // TODO
 }
 
 /**
  MIND (command) enable (integer)
  %status stub
 */
-void caosVM::c_MIND() {
+void c_MIND(caosVM *vm) {
 	VM_PARAM_INTEGER(enable)
 
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
 	// TODO
@@ -1768,21 +1768,21 @@ void caosVM::c_MIND() {
  MIND (integer)
  %status stub
 */
-void caosVM::v_MIND() {
-	c2eCreature *c = getc2eCreature(targ.get());
+void v_MIND(caosVM *vm) {
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
-	result.setInt(1); // TODO
+	vm->result.setInt(1); // TODO
 }
 
 /**
  STEP (command) faculty (integer)
  %status stub
 */
-void caosVM::c_STEP() {
+void c_STEP(caosVM *vm) {
 	VM_PARAM_INTEGER(faculty)
 
-	c2eCreature *c = getc2eCreature(targ.get());
+	c2eCreature *c = getc2eCreature(vm->targ.get());
 	caos_assert(c);
 
 	// TODO
@@ -1792,16 +1792,16 @@ void caosVM::c_STEP() {
  SEEN (agent) category (integer)
  %status maybe
 */
-void caosVM::v_SEEN() {
+void v_SEEN(caosVM *vm) {
 	VM_PARAM_INTEGER(category)
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	caos_assert(c);
 
 	caos_assert(category >= 0);
 	caos_assert((unsigned int)category < c->getNoCategories());
 
-	result.setAgent(c->getChosenAgentForCategory(category));
+	vm->result.setAgent(c->getChosenAgentForCategory(category));
 }
 
 /**
@@ -1810,10 +1810,10 @@ void caosVM::v_SEEN() {
 
  Make the target creature process the specified number of instincts.
 */
-void caosVM::c_DOIN() {
+void c_DOIN(caosVM *vm) {
 	VM_PARAM_INTEGER(noinstincts)
 
-	Creature *c = getTargCreature();
+	Creature *c = vm->getTargCreature();
 	caos_assert(c);
 
 	// TODO
@@ -1825,11 +1825,11 @@ void caosVM::c_DOIN() {
 
  Return the number of unprocessed instincts left in the instinct queue for the target creature.
 */
-void caosVM::v_INS() {
-	Creature *c = getTargCreature();
+void v_INS(caosVM *vm) {
+	Creature *c = vm->getTargCreature();
 	caos_assert(c);
 
-	result.setInt(c->getNoUnprocessedInstincts());
+	vm->result.setInt(c->getNoUnprocessedInstincts());
 }
 
 // clothes
@@ -1838,7 +1838,7 @@ void caosVM::v_INS() {
  BODY (command) set (integer) layer (integer)
  %status stub
 */
-void caosVM::c_BODY() {
+void c_BODY(caosVM *vm) {
 	VM_PARAM_INTEGER(layer)
 	VM_PARAM_INTEGER(set)
 
@@ -1849,17 +1849,17 @@ void caosVM::c_BODY() {
  BODY (integer) part (integer)
  %status stub
 */
-void caosVM::v_BODY() {
+void v_BODY(caosVM *vm) {
 	VM_PARAM_INTEGER(part)
 
-	result.setInt(-1); // TODO
+	vm->result.setInt(-1); // TODO
 }
 
 /**
  DYED (command) part (integer) overlay (integer) set (integer) layer (integer)
  %status stub
 */
-void caosVM::c_DYED() {
+void c_DYED(caosVM *vm) {
 	VM_PARAM_INTEGER(layer)
 	VM_PARAM_INTEGER(set)
 	VM_PARAM_INTEGER(overlay)
@@ -1872,7 +1872,7 @@ void caosVM::c_DYED() {
  HAIR (command) ruffleness (integer)
  %status stub
 */
-void caosVM::c_HAIR() {
+void c_HAIR(caosVM *vm) {
 	VM_PARAM_INTEGER(ruffleness)
 
 	// TODO
@@ -1882,7 +1882,7 @@ void caosVM::c_HAIR() {
  NUDE (command)
  %status stub
 */
-void caosVM::c_NUDE() {
+void c_NUDE(caosVM*) {
 	// TODO
 }
 
@@ -1890,7 +1890,7 @@ void caosVM::c_NUDE() {
  RSET (command)
  %status stub
 */
-void caosVM::c_RSET() {
+void c_RSET(caosVM*) {
 	// TODO
 }
 
@@ -1898,7 +1898,7 @@ void caosVM::c_RSET() {
  STRE (command)
  %status stub
 */
-void caosVM::c_STRE() {
+void c_STRE(caosVM*) {
 	// TODO
 }
 
@@ -1906,7 +1906,7 @@ void caosVM::c_STRE() {
  SWAP (command) variant (integer) part (integer) commit (integer)
  %status stub
 */
-void caosVM::c_SWAP() {
+void c_SWAP(caosVM *vm) {
 	VM_PARAM_INTEGER(commit)
 	VM_PARAM_INTEGER(part)
 	VM_PARAM_INTEGER(variant)
@@ -1918,7 +1918,7 @@ void caosVM::c_SWAP() {
  WEAR (command) part (integer) set (integer) layer (integer)
  %status stub
 */
-void caosVM::c_WEAR() {
+void c_WEAR(caosVM *vm) {
 	VM_PARAM_INTEGER(layer)
 	VM_PARAM_INTEGER(set)
 	VM_PARAM_INTEGER(part)
@@ -1930,18 +1930,18 @@ void caosVM::c_WEAR() {
  WEAR (integer) part (integer) layer (integer)
  %status stub
 */
-void caosVM::v_WEAR() {
+void v_WEAR(caosVM *vm) {
 	VM_PARAM_INTEGER(layer)
 	VM_PARAM_INTEGER(part)
 
-	result.setInt(-1); // TODO
+	vm->result.setInt(-1); // TODO
 }
 
 /**
  TNTO (command) tintindex (integer) part (integer) set (integer) layer (integer)
  %status stub
 */
-void caosVM::c_TNTO() {
+void c_TNTO(caosVM *vm) {
 	VM_PARAM_INTEGER(layer)
 	VM_PARAM_INTEGER(set)
 	VM_PARAM_INTEGER(part)
@@ -1956,67 +1956,67 @@ void caosVM::c_TNTO() {
  DFTX (float)
  %status stub
 */
-void caosVM::v_DFTX() {
-	result.setFloat(0); // TODO
+void v_DFTX(caosVM *vm) {
+	vm->result.setFloat(0); // TODO
 }
 
 /**
  DFTY (float)
  %status stub
 */
-void caosVM::v_DFTY() {
-	result.setFloat(0); // TODO
+void v_DFTY(caosVM *vm) {
+	vm->result.setFloat(0); // TODO
 }
 
 /**
  UFTX (float)
  %status stub
 */
-void caosVM::v_UFTX() {
-	result.setFloat(0); // TODO
+void v_UFTX(caosVM *vm) {
+	vm->result.setFloat(0); // TODO
 }
 
 /**
  UFTY (float)
  %status stub
 */
-void caosVM::v_UFTY() {
-	result.setFloat(0); // TODO
+void v_UFTY(caosVM *vm) {
+	vm->result.setFloat(0); // TODO
 }
 
 /**
  HEDX (float) index (integer)
  %status stub
 */
-void caosVM::v_HEDX() {
+void v_HEDX(caosVM *vm) {
 	VM_PARAM_INTEGER(index)
 
-	result.setFloat(0); // TODO
+	vm->result.setFloat(0); // TODO
 }
 
 /**
  HEDY (float) index (integer)
  %status stub
 */
-void caosVM::v_HEDY() {
+void v_HEDY(caosVM *vm) {
 	VM_PARAM_INTEGER(index)
 
-	result.setFloat(0); // TODO
+	vm->result.setFloat(0); // TODO
 }
 
 /**
  MTHX (float)
  %status stub
 */
-void caosVM::v_MTHX() {
-	result.setFloat(0); // TODO
+void v_MTHX(caosVM *vm) {
+	vm->result.setFloat(0); // TODO
 }
 
 /**
  MTHY (float)
  %status stub
 */
-void caosVM::v_MTHY() {
-	result.setFloat(0); // TODO
+void v_MTHY(caosVM *vm) {
+	vm->result.setFloat(0); // TODO
 }
 

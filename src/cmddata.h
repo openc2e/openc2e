@@ -19,8 +19,7 @@
 
 #pragma once
 
-#include "caosVM.h"
-#include "is_complete.h"
+class caosVM;
 
 enum ci_type {
 	CI_OTHER = -1,
@@ -38,15 +37,8 @@ enum ci_type {
 };
 
 struct cmdinfo {
-	// Microsoft Visual C++ can use different representations of member function
-	// pointers, which causes issues when we take pointers before the class is
-	// fully defined. So, MAKE ABSOLUTELY SURE that caosVM is defined if we're
-	// delaring/taking pointers to caos functions.
-	// See https://social.msdn.microsoft.com/Forums/en-US/3c065ad7-a6cc-460a-8114-25b5ee01c76f/stack-corruption-when-passing-pointer-to-member-function-of-a-forward-referenced-class
-	// for more information.
-	static_assert(is_complete<caosVM>, "caosVM must be defined before member function pointers are declared");
-	void (caosVM::*handler)();
-	void (caosVM::*savehandler)();
+	void (*handler)(caosVM*);
+	void (*savehandler)(caosVM*);
 
 	const char *lookup_key;
 	const char *key;

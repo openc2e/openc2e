@@ -34,15 +34,15 @@
 
  You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is above 1.0.
 */
-void caosVM::v_PACE() {
-	result.setFloat(world.pace);
+void v_PACE(caosVM *vm) {
+	vm->result.setFloat(world.pace);
 }
 
 /**
  BUZZ (command) interval (integer)
  %status maybe
 */
-void caosVM::c_BUZZ() {
+void c_BUZZ(caosVM *vm) {
 	VM_PARAM_INTEGER(interval)
 
 	world.ticktime = interval;
@@ -52,8 +52,8 @@ void caosVM::c_BUZZ() {
  BUZZ (integer)
  %status maybe
 */
-void caosVM::v_BUZZ() {
-	result.setInt(world.ticktime);
+void v_BUZZ(caosVM *vm) {
+	vm->result.setInt(world.ticktime);
 }
 
 /**
@@ -62,8 +62,8 @@ void caosVM::v_BUZZ() {
 
  Returns the day in the season of the current game world, starting at 0.
 */
-void caosVM::v_DATE() {
-	result.setInt(world.dayofseason);
+void v_DATE(caosVM *vm) {
+	vm->result.setInt(world.dayofseason);
 }
 
 /**
@@ -72,10 +72,10 @@ void caosVM::v_DATE() {
  
  Returns the day in the season of the current game world at the specified world tick, starting at 0. See DATE.
 */
-void caosVM::v_HIST_DATE() {
+void v_HIST_DATE(caosVM *vm) {
 	VM_PARAM_INTEGER(tick)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -85,8 +85,8 @@ void caosVM::v_HIST_DATE() {
 
  Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter.
 */
-void caosVM::v_SEAN() {
-	result.setInt(world.season);
+void v_SEAN(caosVM *vm) {
+	vm->result.setInt(world.season);
 }
 
 /**
@@ -95,10 +95,10 @@ void caosVM::v_SEAN() {
 
  Returns the current game world season at the specified world tick. 0 is spring, 1 is summer, 2 is autumn and 3 is winter. See SEAN.
 */
-void caosVM::v_HIST_SEAN() {
+void v_HIST_SEAN(caosVM *vm) {
 	VM_PARAM_INTEGER(tick)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -107,8 +107,8 @@ void caosVM::v_HIST_SEAN() {
 
  Returns the time of day in the current game world. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night.
 */
-void caosVM::v_TIME() {
-	result.setInt(world.timeofday);
+void v_TIME(caosVM *vm) {
+	vm->result.setInt(world.timeofday);
 }
 
 /**
@@ -117,10 +117,10 @@ void caosVM::v_TIME() {
  
  Returns the time of day in the current game world at the specified world tick. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night. See TIME.
 */
-void caosVM::v_HIST_TIME() {
+void v_HIST_TIME(caosVM *vm) {
 	VM_PARAM_INTEGER(tick)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -130,8 +130,8 @@ void caosVM::v_HIST_TIME() {
 
  Returns the number of game years elapsed in the current world.
 */
-void caosVM::v_YEAR() {
-	result.setInt(world.year);
+void v_YEAR(caosVM *vm) {
+	vm->result.setInt(world.year);
 }
 
 /**
@@ -140,18 +140,18 @@ void caosVM::v_YEAR() {
 
  Returns the number of game years elapsed at the specified world tick. See YEAR.
 */
-void caosVM::v_HIST_YEAR() {
+void v_HIST_YEAR(caosVM *vm) {
 	VM_PARAM_INTEGER(tick)
 
-	result.setInt(0); // TODO
+	vm->result.setInt(0); // TODO
 }
 
 /**
  MSEC (integer)
  %status maybe
 */
-void caosVM::v_MSEC() {
-	result.setInt(engine.backend->ticks());
+void v_MSEC(caosVM *vm) {
+	vm->result.setInt(engine.backend->ticks());
 }
 
 /**
@@ -160,7 +160,7 @@ void caosVM::v_MSEC() {
  
  If paused is 0, enable world ticks, otherwise (1) disable them.
 */
-void caosVM::c_WPAU() {
+void c_WPAU(caosVM *vm) {
 	VM_PARAM_INTEGER(paused)
 
 	// TODO
@@ -172,8 +172,8 @@ void caosVM::c_WPAU() {
 
  Returns 1 if world ticks are paused, or 0 otherwise.
 */
-void caosVM::v_WPAU() {
-	result.setInt(0); // TODO
+void v_WPAU(caosVM *vm) {
+	vm->result.setInt(0); // TODO
 }
 
 /**
@@ -182,12 +182,12 @@ void caosVM::v_WPAU() {
 
  If paused is 0, unpause target agent, otherwise (1) pause it.
 */
-void caosVM::c_PAUS() {
+void c_PAUS(caosVM *vm) {
 	VM_PARAM_INTEGER(paused)
 
-	valid_agent(targ);
+	valid_agent(vm->targ);
 
-	targ->paused = paused;
+	vm->targ->paused = paused;
 }
 
 /**
@@ -196,13 +196,13 @@ void caosVM::c_PAUS() {
 
  Returns 1 if target agent is paused, or 0 otherwise.
 */
-void caosVM::v_PAUS() {
-	valid_agent(targ);
+void v_PAUS(caosVM *vm) {
+	valid_agent(vm->targ);
 
-	if (targ->paused)
-		result.setInt(1);
+	if (vm->targ->paused)
+		vm->result.setInt(1);
 	else
-		result.setInt(0);
+		vm->result.setInt(0);
 }
 
 /**
@@ -211,7 +211,7 @@ void caosVM::v_PAUS() {
 
  Returns the result of strftime with the current timestamp and format.
 */
-void caosVM::v_RTIF() {
+void v_RTIF(caosVM *vm) {
 	VM_PARAM_STRING(format)
 	VM_PARAM_INTEGER(timestamp)
 	
@@ -219,39 +219,39 @@ void caosVM::v_RTIF() {
 	time_t tstamp = timestamp;
 	strftime(buffer, 1000, format.c_str(), gmtime(&tstamp)); // TODO: does gmtime return null?
 
-	result.setString(buffer);
+	vm->result.setString(buffer);
 }
 
 /**
  RTIM (integer)
  %status maybe
 */
-void caosVM::v_RTIM() {
-	result.setInt(time(0));
+void v_RTIM(caosVM *vm) {
+	vm->result.setInt(time(0));
 }
 
 /**
  WTIK (integer)
  %status maybe
 */
-void caosVM::v_WTIK() {
-	result.setInt(world.worldtickcount);
+void v_WTIK(caosVM *vm) {
+	vm->result.setInt(world.worldtickcount);
 }
 
 /**
  RACE (integer)
  %status maybe
 */
-void caosVM::v_RACE() {
-	result.setInt(world.race);
+void v_RACE(caosVM *vm) {
+	vm->result.setInt(world.race);
 }
 
 /**
  ETIK (integer)
  %status maybe
 */
-void caosVM::v_ETIK() {
-	result.setInt(world.tickcount);
+void v_ETIK(caosVM *vm) {
+	vm->result.setInt(world.tickcount);
 }
 
 /**
@@ -259,7 +259,7 @@ void caosVM::v_ETIK() {
  %status stub
  %pragma variants c2
 */
-void caosVM::c_ASEA() {
+void c_ASEA(caosVM*) {
 	// TODO
 }
 
@@ -268,8 +268,8 @@ void caosVM::c_ASEA() {
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_TMOD() {
-	result.setInt(world.timeofday); // TODO
+void v_TMOD(caosVM *vm) {
+	vm->result.setInt(world.timeofday); // TODO
 }
 
 /**
@@ -277,25 +277,25 @@ void caosVM::v_TMOD() {
  %status maybe
  %pragma variants c2
 */
-void caosVM::v_SEAV() {
+void v_SEAV(caosVM *vm) {
 	// TODO: hardcoding bad?
-	result.setInt((world.dayofseason * 4) + world.timeofday);
+	vm->result.setInt((world.dayofseason * 4) + world.timeofday);
 }
 
 /**
  DAYT (integer)
  %status stub
 */
-void caosVM::v_DAYT() {
-	result.setInt(0); // TODO
+void v_DAYT(caosVM *vm) {
+	vm->result.setInt(0); // TODO
 }
 
 /**
  MONT (integer)
  %status stub
 */
-void caosVM::v_MONT() {
-	result.setInt(0); // TODO
+void v_MONT(caosVM *vm) {
+	vm->result.setInt(0); // TODO
 }
 
 /* vim: set noet: */

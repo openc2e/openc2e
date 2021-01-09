@@ -7,7 +7,7 @@
 
  Eject the CD tray.
 */
-void caosVM::c_CD_EJCT() {
+void c_CD_EJCT(caosVM*) {
 }
 
 /**
@@ -17,8 +17,8 @@ void caosVM::c_CD_EJCT() {
  Returns the average value for the highest frequencies detected in the CD player
  for the current tick.
 */
-void caosVM::v_CD_FRQH() {
-	result.setInt(0);
+void v_CD_FRQH(caosVM *vm) {
+	vm->result.setInt(0);
 }
 
 /**
@@ -28,8 +28,8 @@ void caosVM::v_CD_FRQH() {
  Returns the average value for the lowest frequencies detected in the CD player
  for the current tick.
 */
-void caosVM::v_CD_FRQL() {
-	result.setInt(0);
+void v_CD_FRQL(caosVM *vm) {
+	vm->result.setInt(0);
 }
 
 /**
@@ -39,8 +39,8 @@ void caosVM::v_CD_FRQL() {
  Returns the average value for the medium frequencies detected in the CD player
  for the current tick.
 */
-void caosVM::v_CD_FRQM() {
-	result.setInt(0);
+void v_CD_FRQM(caosVM *vm) {
+	vm->result.setInt(0);
 }
 
 /**
@@ -50,7 +50,7 @@ void caosVM::v_CD_FRQM() {
  Let the game know that you wish to use the cd player. This will shut down all
  in game sounds and music as the mixer is needed to gauge the frequency spectrum.
 */
-void caosVM::c_CD_INIT() {
+void c_CD_INIT(caosVM*) {
 }
 
 /**
@@ -60,7 +60,7 @@ void caosVM::c_CD_INIT() {
  Pause the CD player if the parameter is greater than zero, to continue playing
  a previous paused track set the parameter to 1.
 */
-void caosVM::c_CD_PAWS() {
+void c_CD_PAWS(caosVM *vm) {
 	VM_PARAM_INTEGER(on_off);
 }
 
@@ -70,7 +70,7 @@ void caosVM::c_CD_PAWS() {
 
  Tell the CD Player to play the given track.
 */
-void caosVM::c_CD_PLAY() {
+void c_CD_PLAY(caosVM *vm) {
 	VM_PARAM_INTEGER(last_track);
 	VM_PARAM_INTEGER(first_track);
 }
@@ -82,7 +82,7 @@ void caosVM::c_CD_PLAY() {
  Tell the game that you have finished with the cd player. This will reinstate
  the in game sounds and music.
 */
-void caosVM::c_CD_SHUT() {
+void c_CD_SHUT(caosVM*) {
 }
 
 /**
@@ -91,5 +91,5 @@ void caosVM::c_CD_SHUT() {
 
  Stop the cd player.
 */
-void caosVM::c_CD_STOP() {
+void c_CD_STOP(caosVM*) {
 }
