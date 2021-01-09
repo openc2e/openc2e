@@ -37,8 +37,16 @@ class wrongCaosValueTypeException : public caosException {
 
 struct nulltype_tag { };
 
+struct FaceValue {
+	// FACE is the only command in any game whose return type depends on what
+	// the desired return type is! stupid. Just give it both types at once,
+	// to simplify the CAOS code and make it obvious that this is a weirdo.
+	int pose;
+	std::string sprite_filename;
+};
+
 enum variableType {
-	CAOSNULL = 0, CAOSAGENT, CAOSINT, CAOSFLOAT, CAOSSTR, CAOSBYTESTRING, CAOSVEC
+	CAOSNULL = 0, CAOSAGENT, CAOSINT, CAOSFLOAT, CAOSSTR, CAOSBYTESTRING, CAOSFACEVALUE, CAOSVEC
 };
 
 const char* variableTypeToString(variableType);
@@ -48,7 +56,7 @@ class caosValue {
 		COUNT_ALLOC(caosValue)
 		FRIEND_SERIALIZE(caosValue)
 	protected:
-		mpark::variant<int, float, AgentRef, std::string, bytestring_t, nulltype_tag, Vector<float>> value;
+		mpark::variant<int, float, AgentRef, std::string, bytestring_t, FaceValue, nulltype_tag, Vector<float>> value;
 
 	public:
 		caosValue();
@@ -58,6 +66,7 @@ class caosValue {
 		caosValue(const AgentRef &v);
 		caosValue(const std::string &v);
 		caosValue(const bytestring_t &v);
+		caosValue(const FaceValue &v);
 		caosValue(const Vector<float> &v);
 		caosValue(const caosValue&);
 		caosValue &operator=(const caosValue&);

@@ -532,14 +532,6 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 	}
 
 	std::string oldpayload = t->word();
-	if (t->word() == "face" && xtype != CI_COMMAND) {
-		// horrible hack, yay
-		if (xtype == CI_NUMERIC)
-			t->setWord("face int");
-		else
-			t->setWord("face string");
-	}
-
 	std::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
 	CAOSCmd *cmd = mpark::get_if<CAOSCmd>(&ce->value);
 

@@ -38,6 +38,8 @@ const char* variableTypeToString(variableType type) {
 			return "string";
 		case CAOSBYTESTRING:
 			return "bytestring";
+		case CAOSFACEVALUE:
+			return "facevalue";
 		case CAOSVEC:
 			return "vector";
 	}
@@ -50,6 +52,7 @@ struct typeVisit {
 	variableType operator()(const AgentRef &) const { return CAOSAGENT; }
 	variableType operator()(nulltype_tag) const { return CAOSNULL; }
 	variableType operator()(const bytestring_t&) const { return CAOSBYTESTRING; }
+	variableType operator()(const FaceValue&) const { return CAOSFACEVALUE; }
 	variableType operator()(const Vector<float> &) const { return CAOSVEC; }
 };
 
@@ -72,6 +75,7 @@ struct intVisit {
 			if (diff <= -0.5f) return --x; else return x;
 		}
 	}
+	int operator()(const FaceValue &fv) const { return fv.pose; }
 	int operator()(const Vector<float> &v) const {
 		return (int)v.getMagnitude();
 	}
@@ -85,6 +89,7 @@ struct floatVisit {
 	float operator()(int i) const { return (float)i; }
 	float operator()(float f) const { return f; }
 	float operator()(const Vector<float> &v) const { return v.getMagnitude(); }
+	float operator()(const FaceValue &fv) const { return fv.pose; }
 	BAD_TYPE(float, std::string);
 	BAD_TYPE(float, AgentRef);
 	BAD_TYPE(float, bytestring_t);
@@ -94,6 +99,9 @@ struct floatVisit {
 struct stringVisit {
 	const std::string &operator()(const std::string &s) const {
 		return s;
+	}
+	const std::string &operator()(const FaceValue &fv) const {
+		return fv.sprite_filename;
 	}
 	BAD_TYPE(std::string, AgentRef);
 	BAD_TYPE(std::string, nulltype_tag);
@@ -112,6 +120,7 @@ struct agentVisit {
 	const AgentRef &operator()(int i) const;
 	BAD_TYPE(AgentRef, float);
 	BAD_TYPE(AgentRef, bytestring_t);
+	BAD_TYPE(AgentRef, FaceValue);
 	BAD_TYPE(AgentRef, Vector<float>);
 };
 
@@ -124,6 +133,7 @@ struct vectorVisit {
 	BAD_TYPE(Vector<float>, int);
 	BAD_TYPE(Vector<float>, float);
 	BAD_TYPE(Vector<float>, bytestring_t);
+	BAD_TYPE(Vector<float>, FaceValue);
 	BAD_TYPE(Vector<float>, AgentRef);
 };
 
@@ -161,14 +171,15 @@ caosValue::caosValue(Agent *v) { setAgent(v); }
 caosValue::caosValue(const AgentRef &v) { setAgent(v); }
 caosValue::caosValue(const std::string &v) { setString(v); }
 caosValue::caosValue(const bytestring_t &v) { setByteStr(v); }
+caosValue::caosValue(const FaceValue &v) : value(v) {}
 caosValue::caosValue(const Vector<float> &v) { setVector(v); }
 
 bool caosValue::isEmpty() const { return getType() == CAOSNULL; }
-bool caosValue::hasInt() const { return getType() == CAOSINT; }
+bool caosValue::hasInt() const { return getType() == CAOSINT || getType() == CAOSFACEVALUE; }
 bool caosValue::hasFloat() const { return getType() == CAOSFLOAT; }
 bool caosValue::hasAgent() const { return getType() == CAOSAGENT; }
-bool caosValue::hasString() const { return getType() == CAOSSTR; }
-bool caosValue::hasDecimal() const { return getType() == CAOSINT || getType() == CAOSFLOAT || getType() == CAOSVEC; }
+bool caosValue::hasString() const { return getType() == CAOSSTR || getType() == CAOSFACEVALUE; }
+bool caosValue::hasDecimal() const { return getType() == CAOSINT || getType() == CAOSFLOAT || getType() == CAOSFACEVALUE || getType() == CAOSVEC; }
 bool caosValue::hasNumber() const { return hasDecimal(); }
 bool caosValue::hasByteStr() const { return getType() == CAOSBYTESTRING; }
 bool caosValue::hasVector() const { return getType() == CAOSVEC; }
@@ -250,6 +261,8 @@ std::string caosValue::dump() const {
 				buf += "]";
 				return buf;
 			}
+		case CAOSFACEVALUE:
+			return fmt::format("FaceValue ({}, \"{}\")", getInt(), getString());
 		case CAOSVEC:
 			return fmt::format("Vector ({}, {})", getVector().x, getVector().y);
 	};

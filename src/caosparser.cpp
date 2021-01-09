@@ -55,15 +55,14 @@ static void eat_whitespace(CAOSParserState& state) {
     }
 }
 
-static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_type expected_type=CI_ANYVALUE);
+static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel);
 
-static CAOSNodePtr parse_value(CAOSParserState& state, ci_type expected_type=CI_ANYVALUE) {
+static CAOSNodePtr parse_value(CAOSParserState& state) {
     maybe_eat_whitespace(state);
     
     switch (state.tokens[state.p].type) {
         case caostoken::TOK_WORD:
-            // pass along expected_type to handle FACE
-            return parse_command(state, false, expected_type);
+            return parse_command(state, false);
         case caostoken::TOK_BYTESTR:
         case caostoken::TOK_STRING:
         case caostoken::TOK_CHAR:
@@ -132,7 +131,7 @@ static CAOSNodePtr parse_condition(CAOSParserState &state) {
     return CAOSNodePtr(new CAOSConditionNode(args));
 }
 
-static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_type expected_type) {
+static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
         assert_current_token_is(state, { caostoken::TOK_WORD });
 
         // find a command from the first token
@@ -149,14 +148,6 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_ty
             commandnormalized = "ovxx";
         } else if (command.size() == 4 && command[0] == 'm' && command[1] == 'v' && isdigit(command[2]) && isdigit(command[3])) {
             commandnormalized = "mvxx";
-        } else if (!is_toplevel && command == "face") {
-            // hack for FACE, which returns either a string or integer depending
-            // on what the parent command wants
-            if (expected_type == CI_STRING) {
-                commandnormalized = "face string";
-            } else {
-                commandnormalized = "face int";
-            }
         }
         std::string lookup_key = (is_toplevel ? "cmd " : "expr ") + commandnormalized;
         auto commandinfo = state.dialect->find_command(lookup_key);
@@ -209,9 +200,7 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel, ci_ty
                     args.push_back(parse_command(state, false));
                     break;
                 case CI_STRING:
-                    // because of FACE
-                    args.push_back(parse_value(state, CI_STRING));
-                    break;
+                case CI_FACEVALUE:
                 case CI_NUMERIC:
                 case CI_AGENT:
                 case CI_BYTESTR:
@@ -265,6 +254,7 @@ struct fmt::formatter<ci_type> : public formatter<string_view> {
             case CI_AGENT: name = "CI_AGENT"; break;
             case CI_VARIABLE: name = "CI_VARIABLE"; break;
             case CI_BYTESTR: name = "CI_BYTESTR"; break;
+            case CI_FACEVALUE: name = "CI_FACEVALUE"; break;
             case CI_VECTOR: name = "CI_VECTOR"; break;
             case CI_BAREWORD: name = "CI_BAREWORD"; break;
             case CI_SUBCOMMAND: name = "CI_SUBCOMMAND"; break;

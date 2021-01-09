@@ -884,31 +884,21 @@ void c_FACE(caosVM *vm) {
 }
 
 /**
- FACE INT (integer)
+ FACE (facevalue)
  %status maybe
 
- Returns the front-facing pose for the current facial expression of the target creature.
+ Returns the front-facing pose for the current facial expression or the current
+ sprite filename of the target creature, depending on the desired return type.
 */
-void v_FACE_INT(caosVM *vm) {
+void v_FACE(caosVM *vm) {
 	caos_assert(vm->targ);
 	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(vm->targ.get());
 	caos_assert(c);
 
-	vm->result.setInt(c->getFaceSpriteFrame());
-}
-
-/**
- FACE STRING (string)
- %status maybe
-
- Returns the current sprite filename for the face of the target creature.
-*/
-void v_FACE_STRING(caosVM *vm) {
-	caos_assert(vm->targ);
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(vm->targ.get());
-	caos_assert(c);
-
-	vm->result.setString(c->getFaceSpriteName());
+	vm->result = FaceValue{
+		(int)c->getFaceSpriteFrame(),
+		c->getFaceSpriteName()
+	};
 }
 
 /**

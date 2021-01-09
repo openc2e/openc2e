@@ -17,6 +17,7 @@ TDISP = {
     "bareword": "CI_BAREWORD",
     "subcommand": "CI_SUBCOMMAND",
     "command": "CI_COMMAND",
+    "facevalue": "CI_FACEVALUE",
 }
 
 
