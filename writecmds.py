@@ -48,25 +48,29 @@ def writelookup(cmds):
         cmd["lookup_key"] = prefix + cmd["name"].lower()
 
 
+already_printed_argps = set()
+
 def printarr(cmds, variant, arrname):
-    buf = ""
+    buf = "\n"
     buf += "static const struct cmdinfo {}[] = {{\n".format(arrname)
     idx = 0
     for cmd in cmds:
         argp = "NULL"
         if cmd.get("arguments"):
-            args = ""
+            args = []
             for arg in cmd["arguments"]:
                 if not arg["type"] in TDISP:
                     raise Exception("Unknown argument type {}".format(arg["type"]))
                 type = TDISP[arg["type"]]
-                args += "{}, ".format(type)
-            argp = "{}_t_{}_{}".format(arrname, cmd["type"], cmd["key"])
-            print(
-                "static const enum ci_type {}[] = {{ {} }};".format(
-                    argp, args
+                args.append(type)
+            argp = "args_{}".format("_".join(t.lower().split("ci_", 1)[1] for t in args))
+            if argp not in already_printed_argps:
+                print(
+                    "static const enum ci_type {}[] = {{ {} }};".format(
+                        argp, ", ".join(args)
+                    )
                 )
-            )
+                already_printed_argps.add(argp)
 
         buf += "\t{{ // {} {}\n".format(idx, cmd["key"])
         idx += 1
