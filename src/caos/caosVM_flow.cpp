@@ -387,7 +387,7 @@ void c_ESCN(caosVM *vm) {
 /**
  CALL (command) script_no (integer) p1 (anything) p2 (anything)
  %status maybe
- %variants c2 cv c3 sm
+ %variants c3 cv sm
 
  Calls script_no on OWNR, then waits for it to return. The invoked script
  will inherit the caller's INST setting, but any changes it makes to it will
