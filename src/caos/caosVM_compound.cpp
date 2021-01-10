@@ -34,7 +34,7 @@
 /**
  PART (command) part_id (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  
  Sets the part number of the TARGeted compound agent or vehicle to work on (ANIM/POSE use this, 
  amongst other commands).
@@ -67,7 +67,7 @@ void v_PART(caosVM *vm) {
 /**
  NEW: PART (command) part (integer) x (integer) y (integer) first_image (integer) plane (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_NEW_PART(caosVM *vm) {
 	VM_PARAM_INTEGER(plane)
@@ -91,7 +91,7 @@ void c_NEW_PART(caosVM *vm) {
 /**
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer)
  %status maybe
- %pragma variants cv c3
+ %variants cv c3
 
  Adds a new 'dull' part to the TARGed compound agent/vehicle which does nothing but display an image.
  Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.
@@ -118,7 +118,7 @@ void c_PAT_DULL(caosVM *vm) {
 /**
  PAT: DULL (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) no_images (integer)
  %status maybe
- %pragma variants sm
+ %variants sm
 */
 void c_PAT_DULL_sm(caosVM *vm) {
 	VM_PARAM_INTEGER(no_images)
@@ -543,7 +543,7 @@ void c_GRPL(caosVM *vm) {
 /**
  BBD: WORD (command) index (integer) id (integer) text (string)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Change the word at index to target blackboard, setting to the provided id and text.
 */
@@ -568,7 +568,7 @@ void c_BBD_WORD(caosVM *vm) {
 /**
  BBD: SHOW (command) show (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  If show is 1, draw the current text onto part 0 of the target blackboard. If 0,
  remove it from the blackboard.
@@ -586,7 +586,7 @@ void c_BBD_SHOW(caosVM *vm) {
 /**
  BBD: EMIT (command) audible (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Broadcast the current word of the target blackboard. If audible is 1, broadcast
  to all nearby creatures. If 0, broadcast to all creatures looking at it.
@@ -604,7 +604,7 @@ void c_BBD_EMIT(caosVM *vm) {
 /**
  BBD: EDIT (command) allow (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  If allow is 1, switch target blackboard into editing mode, give it focus. If it
  is 0, remove focus from target blackboard.
@@ -630,7 +630,7 @@ void c_BBD_EDIT(caosVM *vm) {
 /**
  BBD: VOCB (command) blackboardstart (integer) globalstart (integer) count (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Copy count words into the blackboard word list from the global word list.
 */
@@ -658,7 +658,7 @@ void c_BBD_VOCB(caosVM *vm) {
 /**
  NEW: BBTX (command) part (integer) x (integer) y (integer) width (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 
  Create a new C2 text part for a compound bubble object. Text will wrap as required to fit width.
 */
@@ -675,7 +675,7 @@ void c_NEW_BBTX(caosVM *vm) {
 /**
  BBTX (command) part (integer) stringindex (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void c_BBTX(caosVM *vm) {
 	VM_PARAM_INTEGER(stringindex)
@@ -688,7 +688,7 @@ void c_BBTX(caosVM *vm) {
 /**
  SPOT (command) spotno (integer) left (integer) top (integer) right (integer) bottom (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_SPOT(caosVM *vm) {
 	VM_PARAM_INTEGER(bottom)
@@ -707,7 +707,7 @@ void c_SPOT(caosVM *vm) {
 /**
  KNOB (command) function (integer) spotno (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_KNOB(caosVM *vm) {
 	VM_PARAM_INTEGER(spotno)
@@ -723,7 +723,7 @@ void c_KNOB(caosVM *vm) {
 /**
  KMSG (command) function (integer) flags (integer) message (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void c_KMSG(caosVM *vm) {
 	VM_PARAM_INTEGER(message)
@@ -740,7 +740,7 @@ void c_KMSG(caosVM *vm) {
 /**
  BBLE (command) text (string) ticks (integer) type (integer) track (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 
  Display the given text for the given number of ticks, in a bubble (type is 0 for speech or 1 for thought).
 */
@@ -756,7 +756,7 @@ void c_BBLE(caosVM *vm) {
 /**
  BBFD (command) part (integer) red (integer) green (integer) blue (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void c_BBFD(caosVM *vm) {
 	VM_PARAM_INTEGER(blue)

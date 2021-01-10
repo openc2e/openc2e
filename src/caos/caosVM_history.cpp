@@ -481,7 +481,7 @@ void v_OOWW(caosVM *vm) {
 /**
  EVNT (command) object (agent)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_EVNT(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(object)
@@ -492,7 +492,7 @@ void c_EVNT(caosVM *vm) {
 /**
  RMEV (command) object (agent)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_RMEV(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(object)
@@ -503,7 +503,7 @@ void c_RMEV(caosVM *vm) {
 /**
  DDE: NEGG (command)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_DDE_NEGG(caosVM*) {
 	// TODO
@@ -512,7 +512,7 @@ void c_DDE_NEGG(caosVM*) {
 /**
  DDE: DIED (command)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_DDE_DIED(caosVM*) {
 	// TODO
@@ -521,7 +521,7 @@ void c_DDE_DIED(caosVM*) {
 /**
  DDE: LIVE (command)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_DDE_LIVE(caosVM*) {
 	// TODO

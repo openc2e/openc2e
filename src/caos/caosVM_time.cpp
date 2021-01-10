@@ -81,7 +81,7 @@ void v_HIST_DATE(caosVM *vm) {
 /**
  SEAN (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %variants c2 cv c3
 
  Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter.
 */
@@ -126,7 +126,7 @@ void v_HIST_TIME(caosVM *vm) {
 /**
  YEAR (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %variants c2 cv c3
 
  Returns the number of game years elapsed in the current world.
 */
@@ -257,7 +257,7 @@ void v_ETIK(caosVM *vm) {
 /**
  ASEA (command)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void c_ASEA(caosVM*) {
 	// TODO
@@ -266,7 +266,7 @@ void c_ASEA(caosVM*) {
 /**
  TMOD (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void v_TMOD(caosVM *vm) {
 	vm->result.setInt(world.timeofday); // TODO
@@ -275,7 +275,7 @@ void v_TMOD(caosVM *vm) {
 /**
  SEAV (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void v_SEAV(caosVM *vm) {
 	// TODO: hardcoding bad?

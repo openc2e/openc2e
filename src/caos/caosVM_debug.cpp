@@ -37,14 +37,14 @@
 /**
  DBG: OUTS (command) val (string)
  %status maybe
- %pragma variants all
+ %variants all
 
  Outputs a string to the debug log.
 */
 /**
  DBGM (command) val (string)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_DBG_OUTS(caosVM *vm) {
 	VM_PARAM_STRING(val)
@@ -55,14 +55,14 @@ void c_DBG_OUTS(caosVM *vm) {
 /**
  DBG: OUTV (command) val (decimal)
  %status maybe
- %pragma variants all
+ %variants all
  
  Outputs a decimal value to the debug log.
 */
 /**
  DBGV (command) val (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_DBG_OUTV(caosVM *vm) {
 	VM_VERIFY_SIZE(1)
@@ -82,7 +82,7 @@ void c_DBG_OUTV(caosVM *vm) {
 /**
  DBUG (command) val (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_DBUG(caosVM *vm) {
 	vm->inst = true;
@@ -92,7 +92,7 @@ void c_DBUG(caosVM *vm) {
 /**
  UNID (integer)
  %status maybe
- %pragma variants c3 cv sm
+ %variants c3 cv sm
 
  Returns the unique ID of the target agent.
  This is currently no good for persisting.
@@ -109,7 +109,7 @@ void v_UNID(caosVM *vm) {
 /**
  UNID (agent)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Returns the unique ID of the target agent.
  This is currently no good for persisting.
@@ -167,7 +167,7 @@ void c_DBG_MALLOC(caosVM*) {
 /**
  DBG: DUMP (command)
  %status ok
- %pragma variants all
+ %variants all
 
  Dumps the current script's bytecode to stderr.
 */
@@ -178,7 +178,7 @@ void c_DBG_DUMP(caosVM *vm) {
 /**
  DBG: TRACE (command) level (integer)
  %status ok
- %pragma variants all
+ %variants all
 
  Sets opcode trace level. Zero disables.
 */
@@ -229,7 +229,7 @@ void c_MANN(caosVM *vm) {
 
 /**
  DBG: DISA (command) family (integer) genus (integer) species (integer) event (integer)
- %pragma variants all
+ %variants all
  %status ok
 
  Dumps the "bytecode" of the indicated script to the current output channel.
@@ -258,7 +258,7 @@ void c_DBG_DISA(caosVM *vm) {
 
 /**
  DBG: ASRT (command) condition (condition)
- %pragma variants all
+ %variants all
  %status maybe
 
  Blows up unless the given condition is true.
@@ -269,7 +269,7 @@ void c_DBG_ASRT(caosVM*) {
 
 /**
  DBG: ASRF (command) condition (condition)
- %pragma variants all
+ %variants all
  %status maybe
 
  (openc2e-only)
@@ -281,7 +281,7 @@ void c_DBG_ASRF(caosVM*) {
 
 /**
  DBG: FAIL (command)
- %pragma variants all
+ %variants all
  %status maybe
 
  (openc2e-only)
@@ -294,7 +294,7 @@ void c_DBG_FAIL(caosVM*) {
 /**
  DBG: IDNT (string) agent (agent)
  %status ok
- %pragma variants all
+ %variants all
 
  (openc2e-only)
  Return a nicely-formatted string identifying the classifier of the agent,
@@ -332,7 +332,7 @@ void c_DBG_CPRO(caosVM*) {
 /**
  DBG: STOK (string) bareword (bareword)
  %status ok
- %pragma variants all
+ %variants all
 
  Returns the bare token in 'bareword' as a string.
 */
@@ -345,7 +345,7 @@ void v_DBG_STOK(caosVM *vm) {
 /**
  DBG: TSLC (command) timeslice (integer)
  %status ok
- %pragma variants all
+ %variants all
  %cost 0
 
  Sets the currently executing script's remaining timeslice value. This command
@@ -360,7 +360,7 @@ void c_DBG_TSLC(caosVM *vm) {
 /**
  DBG: TSLC (integer)
  %status ok
- %pragma variants all
+ %variants all
  
  Returns the number of ticks left in the current script's remaining timeslice.
 */
@@ -371,7 +371,7 @@ void v_DBG_TSLC(caosVM *vm) {
 /**
 DBG: SIZO (string)
  %status ok
- %pragma variants all
+ %variants all
 
  Returns a human-readable profile of the sizes and allocation counts of
  various internal data structures

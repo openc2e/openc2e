@@ -43,14 +43,14 @@
  VAxx (variable)
  %status maybe
  %stackdelta 0
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
  */
 /**
  VARx (variable)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
  %stackdelta 0
 
  Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
@@ -104,7 +104,7 @@ void c_SETS(caosVM *vm) {
 /**
  SETV (command) var (variable) value (decimal)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
  %% Don't enable c1 or c2 here; we activate them with horrible hacks later
 
@@ -149,7 +149,7 @@ void c_SETA(caosVM *vm) {
  OVxx (variable)
  %status maybe
  %stackdelta 0
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
  */
@@ -157,7 +157,7 @@ void c_SETA(caosVM *vm) {
  OBVx (variable)
  %status maybe
  %stackdelta 0
- %pragma variants c1 c2
+ %variants c1 c2
 
  Like OVxx, but restricted to 0-2 in C1, or 0-9 in C2. Legacy from Creatures 1.
 */
@@ -210,7 +210,7 @@ void v_TYPE(caosVM *vm) {
 /**
  MODV (command) var (variable) mod (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Divides the given variable by the given integer, and returns the remainder (var % mod).
@@ -226,7 +226,7 @@ void c_MODV(caosVM *vm) {
 /**
  ANDV (command) var (variable) and (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
@@ -242,7 +242,7 @@ void c_ANDV(caosVM *vm) {
 /**
  ORRV (command) var (variable) or (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
@@ -258,7 +258,7 @@ void c_ORRV(caosVM *vm) {
 /**
  ADDV (command) var (variable) add (decimal)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Adds the given decimal to the given variable and returns the result.
@@ -280,7 +280,7 @@ void c_ADDV(caosVM *vm) {
 /**
  SUBV (command) var (variable) sub (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Subtracts the given integer from the given variable and returns the result.
@@ -300,7 +300,7 @@ void c_SUBV(caosVM *vm) {
 /**
  NEGV (command) var (variable)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
@@ -319,7 +319,7 @@ void c_NEGV(caosVM *vm) {
 /**
  DIVV (command) var (variable) div (decimal)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
  Divides the given variable by the given integer and returns the result.
@@ -346,7 +346,7 @@ void c_DIVV(caosVM *vm) {
 /**
  MULV (command) var (variable) mul (decimal)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Multiplies the given variable by the given integer and returns the result.
@@ -422,7 +422,7 @@ void v_UFOS(caosVM *vm) {
 /**
  MODU (string)
  %status stub
- %pragma variants all
+ %variants all
 
  Returns information about which modules are being used by the engine (for now, backend and audio backend names).
 */
@@ -435,7 +435,7 @@ void v_MODU(caosVM *vm) {
 /**
  GNAM (string)
  %status maybe
- %pragma variants all
+ %variants all
  
  Returns the currently-running game (like "Creatures 1" or "Docking Station").
 */
@@ -572,7 +572,7 @@ void v_SQRT(caosVM *vm) {
 /**
  _P1_ (variable)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  The first argument given to the current script.
 */
@@ -581,7 +581,7 @@ CAOS_LVALUE_SIMPLE(P1, vm->_p_[0])
 /**
  _P2_ (variable)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  The second argument given to the current script.
 */
@@ -1007,7 +1007,7 @@ void c_POWV(caosVM *vm) {
 /**
  RNDV (command) var (variable) value1 (integer) value (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_RNDV(caosVM *vm) {
@@ -1021,7 +1021,7 @@ void c_RNDV(caosVM *vm) {
 /**
  EGGL (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 
  Returns the egg limit - when there are more than this many norns in the world, eggs should not hatch.
 */
@@ -1032,7 +1032,7 @@ void v_EGGL(caosVM *vm) {
 /**
  HATL (integer)
  %status stub
- %pragma variants c2
+ %variants c2
  
  Returns the hatchery limit - when there are more than this many norns in the world, the hatchery should shut down.
 */

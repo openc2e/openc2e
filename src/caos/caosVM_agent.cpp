@@ -57,7 +57,7 @@ SpritePart *caosVM::getCurrentSpritePart() {
 /**
  TOUC (integer) first (agent) second (agent)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Determines whether the two given agents are touching.  Returns 0 (if not) or 1 (if so).
@@ -76,7 +76,7 @@ void v_TOUC(caosVM *vm) {
 /**
  RTAR (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Sets TARG to a random agent with the given family/genus/species.
@@ -150,7 +150,7 @@ void c_TTAR(caosVM *vm) {
 /**
  STAR (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Locates a random agent that is visible to OWNR (see ESEE) and that
  matches the given classifier, then sets it to TARG.
@@ -203,7 +203,7 @@ void c_NEW_SIMP(caosVM *vm) {
 /**
  NEW: SIMP (command) sprite_file (bareword) image_count (integer) first_image (integer) plane (integer) clone (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 1
 */
 void c_NEW_SIMP_c2(caosVM *vm) {
@@ -247,7 +247,7 @@ void c_NEW_COMP(caosVM *vm) {
 /**
  NEW: COMP (command) sprite_file (bareword) image_count (integer) first_image (integer) clone (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_NEW_COMP_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(clone)
@@ -288,7 +288,7 @@ void c_NEW_VHCL(caosVM *vm) {
 /**
  NEW: VHCL (command) sprite_file (bareword) image_count (integer) first_image (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_NEW_VHCL_c1(caosVM *vm) {
 	VM_PARAM_INTEGER(first_image)
@@ -304,7 +304,7 @@ void c_NEW_VHCL_c1(caosVM *vm) {
 /**
  NEW: BKBD (command) sprite_file (bareword) image_count (integer) first_image (integer) background_colour (integer) chalk_colour (integer) alias_colour (integer) textx (integer) texty (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_NEW_BKBD(caosVM *vm) {
 	VM_PARAM_INTEGER(texty)
@@ -324,7 +324,7 @@ void c_NEW_BKBD(caosVM *vm) {
 /**
  NEW: CBUB (command) sprite_file (bareword) image_count (integer) first_image (integer) stringid (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void c_NEW_CBUB(caosVM *vm) {
 	VM_PARAM_INTEGER(stringid)
@@ -338,7 +338,7 @@ void c_NEW_CBUB(caosVM *vm) {
 /**
  TARG (agent)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns TARG, the currently-targeted agent.
 */
@@ -350,7 +350,7 @@ void v_TARG(caosVM *vm) {
 /**
  OWNR (agent)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
  Returns OWNR, the agent that is running the script.
@@ -375,7 +375,7 @@ void v_NULL(caosVM *vm) {
 /**
  POSE (command) pose (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 1
 
  Sets the displayed sprite of TARG to the frame in the sprite file with the given integer.
@@ -422,7 +422,7 @@ void c_ATTR(caosVM *vm) {
 /**
  ATTR (variable)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Attributes of the TARG agent.
 */
@@ -441,7 +441,7 @@ void s_ATTR(caosVM *vm) {
 /**
  TICK (command) tickrate (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Initiates the agent timer-- the Timer script will then be run once every tickrate ticks.
@@ -487,7 +487,7 @@ void c_BHVR(caosVM *vm) {
 /**
  TARG (command) agent (agent)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Sets TARG (the target agent) to the given agent.
@@ -501,7 +501,7 @@ void c_TARG(caosVM *vm) {
 /**
  FROM (agent)
  %status maybe
- %pragma variants c1 c2 cv sm
+ %variants c1 c2 cv sm
 
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
@@ -512,7 +512,7 @@ void v_FROM(caosVM *vm) {
 /**
  FROM (variable)
  %status maybe
- %pragma variants c3
+ %variants c3
 
  Returns the agent that sent the message being processed, or NULL if no agent was involved.
 */
@@ -522,7 +522,7 @@ CAOS_LVALUE_SIMPLE(FROM_ds, vm->from)
 /**
  POSE (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the number of the frame in the TARG part/agent's sprite file that is currently being displayed, or -1 if part# doesn't exist on a compound agent.
 */
@@ -541,7 +541,7 @@ void v_POSE(caosVM *vm) {
 /**
  KILL (command) agent (agent)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 1
 
  Destroys the agent in question. However, you cannot destroy PNTR.
@@ -580,7 +580,7 @@ void c_ANIM(caosVM *vm) {
 /**
  ANIM (command) animstring (string)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 1
 
  Sets the animation string for TARG, in the format '1234'.
@@ -667,7 +667,7 @@ void v_ABBA(caosVM *vm) {
 /**
  BASE (command) index (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Sets the frame in the TARG agent's spritefile that will be used as its base image.
@@ -745,7 +745,7 @@ void v_CARR(caosVM *vm) {
 /**
  CARR (agent)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Returns the agent that is carrying the OWNR agent.  If OWNR is not being carried, returns 
  NULL. 
@@ -763,7 +763,7 @@ void v_CARR_c1(caosVM *vm) {
 /**
  FMLY (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the family of the TARG agent.
 */
@@ -776,7 +776,7 @@ void v_FMLY(caosVM *vm) {
 /**
  GNUS (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the genus of the TARG agent.
 */
@@ -789,7 +789,7 @@ void v_GNUS(caosVM *vm) {
 /**
  SPCS (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the species of the TARG agent.
 */
@@ -814,7 +814,7 @@ void v_PLNE(caosVM *vm) {
 /**
  PNTR (agent)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the pointer agent (the Hand).
 */
@@ -846,7 +846,7 @@ unsigned int calculateScriptId(unsigned int message_id) {
 /**
  MESG WRIT (command) agent (agent) message_id (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Sends a message of type message_id to the given agent.  FROM will be set to OWNR unless 
@@ -863,7 +863,7 @@ void c_MESG_WRIT(caosVM *vm) {
 /**
  MESG WRT+ (command) agent (agent) message_id (integer) param_1 (anything) param_2 (anything) delay (integer)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
  %cost c1,c2 0
 
  Sends a message of type message_id to the given agent, much like MESG WRIT, but with the 
@@ -887,7 +887,7 @@ void c_MESG_WRT(caosVM *vm) {
 /**
  TOTL (integer) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the total number of in-game agents matching the given family/genus/species.
 */
@@ -934,7 +934,7 @@ void v_SHOW(caosVM *vm) {
 /**
  POSX (float)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Returns the X position of the TARG agent in the world.
 */
@@ -947,7 +947,7 @@ void v_POSX(caosVM *vm) {
 /**
  POSY (float)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Returns the Y position of the TARG agent in the world.
 */
@@ -1008,7 +1008,7 @@ class blockUntilOver : public blockCond {
 /**
  OVER (command)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Waits (blocks the TARG agent) until the animation of the TARG agent or PART is over.
 */
@@ -1053,7 +1053,7 @@ void c_PUHL(caosVM *vm) {
 /**
  SETV PUHL (command) pose (integer) x (integer) y (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Sets relative x/y coordinates for TARG's pickup point.
  Pose is -1 for all poses, or a pose relative to the first image specified in NEW: (not BASE).
@@ -1086,7 +1086,7 @@ void v_PUHL(caosVM *vm) {
 /**
  POSL (float)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the position of the left side of TARG's bounding box.
 */
@@ -1100,7 +1100,7 @@ void v_POSL(caosVM *vm) {
 /**
  POST (float)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the position of the top side of TARG's bounding box.
 */
@@ -1114,7 +1114,7 @@ void v_POST(caosVM *vm) {
 /**
  POSR (float)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the position of the right side of TARG's bounding box.
 */
@@ -1128,7 +1128,7 @@ void v_POSR(caosVM *vm) {
 /**
  POSB (float)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the position of the bottom side of TARG's bounding box.
 */
@@ -1142,7 +1142,7 @@ void v_POSB(caosVM *vm) {
 /**
  WDTH (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the TARG agent's width.
 */
@@ -1221,7 +1221,7 @@ void v_RNGE(caosVM *vm) {
 /**
  RNGE (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Returns the TARG agent's range.
 */
@@ -1276,7 +1276,7 @@ void c_TRAN(caosVM *vm) {
 /**
  HGHT (integer)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns the TARG agent's height.
 */
@@ -1315,7 +1315,7 @@ void c_HAND(caosVM *vm) {
 /**
  TICK (integer)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Return the agent timer tick rate of the TARG agent.
 */
@@ -1360,7 +1360,7 @@ void c_PUPT(caosVM *vm) {
 /**
  SETV PUPT (command) pose (integer) x (integer) y (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void c_SETV_PUPT(caosVM *vm) {
 	c_PUPT(vm);
@@ -1381,7 +1381,7 @@ void c_STPT(caosVM *vm) {
  DCOR (command) core_on (integer)
  %status done
 
- %pragma variants all
+ %variants all
 
  Turns the display of the TARG agent's physical core on and off. Gives a general idea of 
  its size and location (including invisible agents).
@@ -1575,7 +1575,7 @@ void c_TINO(caosVM *vm) {
 /**
  DROP (command)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
  Causes the TARG agent to drop what it is carrying in a safe location.
@@ -1698,21 +1698,21 @@ void v_TWIN(caosVM *vm) {
 /**
  ACTV (variable)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 CAOS_LVALUE_TARG_SIMPLE(ACTV, vm->targ->actv)
 
 /**
  THRT (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_TARG_SIMPLE(THRT, vm->targ->thrt)
 
 /**
  SIZE (variable)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 	// TODO: stub because this likely == perm
 CAOS_LVALUE_TARG_SIMPLE(SIZE, vm->targ->size)
@@ -1720,7 +1720,7 @@ CAOS_LVALUE_TARG_SIMPLE(SIZE, vm->targ->size)
 /**
  GRAV (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void v_GRAV(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -1737,7 +1737,7 @@ void s_GRAV(caosVM *vm) {
 /**
  SETV CLS2 (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Creatures 2 command to set the family, genus and species of an agent.
 */
@@ -1754,7 +1754,7 @@ void c_SETV_CLS2(caosVM *vm) {
 /**
  SLIM (command)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_SLIM(caosVM*) {
@@ -1764,7 +1764,7 @@ void c_SLIM(caosVM*) {
 /**
  BHVR (command) click (integer) touch (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_BHVR_c2(caosVM *vm) {
@@ -1797,7 +1797,7 @@ void c_BHVR_c2(caosVM *vm) {
 /**
  SETV CLAS (command) identifier (integer)
  %status maybe
- %pragma variants c1
+ %variants c1
 
  Set family, genus and species of the target agent. Creatures 1 era command.
 */
@@ -1816,7 +1816,7 @@ void c_SETV_CLAS(caosVM *vm) {
 /**
  LIML (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void v_LIML(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
@@ -1836,7 +1836,7 @@ void v_LIML(caosVM *vm) {
 /**
  LIMT (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void v_LIMT(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
@@ -1856,7 +1856,7 @@ void v_LIMT(caosVM *vm) {
 /**
  LIMR (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void v_LIMR(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
@@ -1876,7 +1876,7 @@ void v_LIMR(caosVM *vm) {
 /**
  LIMB (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void v_LIMB_c1(caosVM *vm) {
 	// TODO: is this remotely sane? if so, unstub.
@@ -1896,7 +1896,7 @@ void v_LIMB_c1(caosVM *vm) {
 /**
  OBJP (variable)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 	// TODO: c1 scripts seem to depend on this being from OWNR, but is that always the case?
 CAOS_LVALUE_WITH_SIMPLE(OBJP, vm->owner, vm->owner->objp)
@@ -1904,7 +1904,7 @@ CAOS_LVALUE_WITH_SIMPLE(OBJP, vm->owner, vm->owner->objp)
 /**
  XIST (integer) agent (agent)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Undocumented C2 command; returns 1 if specified agent exists, or 0 otherwise (ie, if it is null).
 */
@@ -1979,7 +1979,7 @@ void c_PRNT(caosVM *vm) {
 /**
  TCAR (agent)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void v_TCAR(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -1993,7 +1993,7 @@ void v_TCAR(caosVM *vm) {
 /**
  EDIT (command)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Attach the target agent to the mouse cursor for positioning purposes.
 */
@@ -2006,7 +2006,7 @@ void c_EDIT(caosVM *vm) {
 /**
  FRZN (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void v_FRZN(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -2024,7 +2024,7 @@ void s_FRZN(caosVM *vm) {
 /**
  BLCK (command) width (integer) height (integer)
  %status maybe
- %pragma variants sm
+ %variants sm
 */
 void c_BLCK(caosVM *vm) {
 	VM_PARAM_INTEGER(height)
@@ -2040,7 +2040,7 @@ void c_BLCK(caosVM *vm) {
 /**
  SHAD (command) intensity (integer) x (integer) y (integer) enable (integer)
  %status stub
- %pragma variants sm
+ %variants sm
 
  Enable/disable drawing of a shadow on the target agent with the specified intensity at the given x/y offset.
 */
@@ -2058,7 +2058,7 @@ void c_SHAD(caosVM *vm) {
 /**
  SYS: CONV (command) filename (bareword) show_progress (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 
  This is supposed to convert the provided image name to the display depth, displaying a progress dialog if show_progress is non-zero.
  However, it does nothing under openc2e.

@@ -192,16 +192,25 @@ for filename in sys.argv[1:]:
                     if a["type"] != "variable":
                         obj["stackdelta"] -= 1
 
+            if getdirective("variants"):
+                variants = getdirective("variants")
+                if variants == "all":
+                    obj["variants"] = ("c1", "c2", "c3", "cv", "sm")
+                else:
+                    obj["variants"] = [_.strip() for _ in variants.strip().split(" ")]
+            else:
+                obj["variants"] = ("c3", "cv", "sm")
+
             for d in directives:
                 d = d.replace("%", "").strip()
-                if d.split(" ")[0] not in ("pragma", "status", "cost", "stackdelta"):
+                if d.split(" ")[0] not in ("pragma", "status", "cost", "stackdelta", "variants"):
                     raise Exception("Unknown directive: {}".format(d))
                 if d.startswith("pragma"):
                     d = d.split(" ", 1)[1].strip()
                     if d.split(" ")[0] not in (
-                        "variants",
                     ):
                         raise Exception("Unknown pragma: {}".format(d))
+
 
             objects.append(obj)
     except Exception as e:
@@ -217,16 +226,8 @@ variants = {
 }
 
 for obj in objects:
-    if obj.get("pragma", {}).get("variants"):
-        if obj["pragma"]["variants"] == "all":
-            for key in variants:
-                variants[key][obj["uniquename"]] = obj
-        else:
-            for v in obj["pragma"]["variants"].split(" "):
-                variants[v][obj["uniquename"]] = obj
-    else:
-        for key in ("c3", "cv", "sm"):
-            variants[key][obj["uniquename"]] = obj
+    for v in obj["variants"]:
+        variants[v][obj["uniquename"]] = obj
 
 
 print(json.dumps({"namespaces": [], "variants": variants},))

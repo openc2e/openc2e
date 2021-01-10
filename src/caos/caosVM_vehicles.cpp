@@ -28,7 +28,7 @@
 /**
  CABN (command) left (integer) top (integer) right (integer) bottom (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 */
 void c_CABN(caosVM *vm) {
 	VM_VERIFY_SIZE(4)
@@ -60,7 +60,7 @@ void c_CABW(caosVM *vm) {
 /**
  SPAS (command) vehicle (agent) passenger (agent)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 
  make specified vehicle agent pick up specified passenger
 */
@@ -118,7 +118,7 @@ void c_GPAS(caosVM *vm) {
 /**
  GPAS (command)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_GPAS_c2(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -171,7 +171,7 @@ void c_DPAS(caosVM *vm) {
 /**
  DPAS (command)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_DPAS_c2(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -252,7 +252,7 @@ void c_RPAS(caosVM *vm) {
 /**
  XVEC (variable)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 CAOS_LVALUE_TARG(XVEC,
 		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get()); caos_assert(v)
@@ -263,7 +263,7 @@ CAOS_LVALUE_TARG(XVEC,
 /**
  YVEC (variable)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 CAOS_LVALUE_TARG(YVEC,
 		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get()); caos_assert(v)
@@ -274,7 +274,7 @@ CAOS_LVALUE_TARG(YVEC,
 /**
  BUMP (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void v_BUMP(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -287,7 +287,7 @@ void v_BUMP(caosVM *vm) {
 /**
  TELE (command) x (integer) y (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 
  Teleport occupants of target vehicle to (x, y).
 */
@@ -305,7 +305,7 @@ void c_TELE(caosVM *vm) {
 /**
  DPS2 (command) gravity (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 
  Drop passengers of targ vehicle, like DPAS. If gravity is zero, passengers do not get gravity activated.
 */

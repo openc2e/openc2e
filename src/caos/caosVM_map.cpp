@@ -227,7 +227,7 @@ void v_RTYP(caosVM *vm) {
 /**
  RTYP (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Returns the room type of the room at the centre point of targ.
 */
@@ -243,7 +243,7 @@ void v_RTYP_c2(caosVM *vm) {
 /**
  SETV RTYP (command) roomtype (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Sets the type of the given room to roomtype.
 */
@@ -602,7 +602,7 @@ void c_EMIT(caosVM *vm) {
 /**
  WALL (integer)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Returns the direction of the last wall the TARG agent collided with.
 */
@@ -687,7 +687,7 @@ void c_DMAP(caosVM *vm) {
 /**
  SYS: DMAP (command) mapon (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void c_SYS_DMAP(caosVM *vm) {
 	c_DMAP(vm);
@@ -720,7 +720,7 @@ void v_ERID(caosVM *vm) {
 /**
  DELR (command) room_id (integer)
  %status stub
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Removes the given room from the map.
 */
@@ -833,7 +833,7 @@ void c_CACL(caosVM *vm) {
 /**
  WIND (integer)
  %status stub
- %pragma variants c1
+ %variants c1
 
  Always returns zero, since this command was stubbed in C1.
 */
@@ -844,77 +844,77 @@ void v_WIND(caosVM *vm) {
 /**
  TEMP (variable)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(TEMP, r->temp)
 
 /**
  LITE (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(LITE, r->lite)
 
 /**
  RADN (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(RADN, r->radn)
 
 /**
  ONTR (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(ONTR, r->ontr)
 
 /**
  INTR (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(INTR, r->intr)
 
 /**
  PRES (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(PRES, r->pres)
 
 /**
  HSRC (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(HSRC, r->hsrc)
 
 /**
  LSRC (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(LSRC, r->lsrc)
 
 /**
  RSRC (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(RSRC, r->rsrc)
 
 /**
  PSRC (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_ROOM_SIMPLE(PSRC, r->psrc)
 
 /**
  WNDX (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void v_WNDX(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -926,7 +926,7 @@ void v_WNDX(caosVM *vm) {
 /**
  WNDY (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void v_WNDY(caosVM *vm) {
 	valid_agent(vm->targ);
@@ -948,7 +948,7 @@ void c_DOCA(caosVM *vm) {
 /**
  SETV DOOR (command) direction (integer) room1 (integer) room2 (integer) value (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void c_SETV_DOOR(caosVM *vm) {
 	VM_PARAM_INTEGER(value)
@@ -978,7 +978,7 @@ void c_SETV_DOOR(caosVM *vm) {
 /**
  FLOR (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Return y coordinate of floor below centre of target agent.
 */
@@ -995,7 +995,7 @@ void v_FLOR(caosVM *vm) {
 /**
  GNDW (integer)
  %status stub
- %pragma variants c1
+ %variants c1
 
  Return the number of horizontal pixels per piece of ground level data.
 */
@@ -1006,7 +1006,7 @@ void v_GNDW(caosVM *vm) {
 /**
  GRND (integer) index (integer)
  %status maybe
- %pragma variants c1
+ %variants c1
 
  Return the ground level data at the provided index. See GNDW to work out the index required.
 */
@@ -1021,7 +1021,7 @@ void v_GRND(caosVM *vm) {
 /**
  ROOM (command) roomno (integer) left (integer) top (integer) right (integer) bottom (integer) type (integer)
  %status maybe
- %pragma variants c1
+ %variants c1
 
  Create or modify a room.
 */
@@ -1055,7 +1055,7 @@ void c_ROOM(caosVM *vm) {
 /**
  ROOM (command) roomno (integer) left (integer) top (integer) right (integer) bottom (integer) type (integer) floorvalue (integer) organic (integer) inorganic (integer) temperature (integer) pressure (integer) light (integer) radiation (integer) heatsource (integer) pressuresource (integer) lightsource (integer) radiationsource (integer) dropstatus (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 void c_ROOM_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(dropstatus)
@@ -1108,7 +1108,7 @@ void c_ROOM_c2(caosVM *vm) {
 /**
  ROOM (integer) roomno (integer) data (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Return some data for the specified room number.
  Returns 0 if no such room.
@@ -1218,7 +1218,7 @@ void v_ROOM_c1(caosVM *vm) {
 /**
  WRAP (variable) metaroom_id (integer)
  %status broken
- %pragma variants all
+ %variants all
 
  The world-wrapping flag for the specified metaroom. 1 to enable wrapping, 0 to disable.
 */
@@ -1233,7 +1233,7 @@ CAOS_LVALUE(WRAP,
 /**
  SSFC (command) roomno (integer) count (integer) x1 (integer) y1 (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
  %stackdelta any
 
  Set floor points of the specified rooms.
@@ -1276,7 +1276,7 @@ void c_SSFC(caosVM *vm) {
 /**
  RMNO (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */ 
 void v_RMNO(caosVM *vm) {
 	vm->result.setInt(0); // TODO
@@ -1285,7 +1285,7 @@ void v_RMNO(caosVM *vm) {
 /**
  RMN# (integer) room (integer) direction (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void v_RMN(caosVM *vm) {
 	VM_PARAM_INTEGER(door)
@@ -1297,7 +1297,7 @@ void v_RMN(caosVM *vm) {
 /**
  RMNR (variable) room (integer) direction (integer) door (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void v_RMNR(caosVM *vm) {
 	VM_PARAM_INTEGER(door)
@@ -1319,7 +1319,7 @@ void s_RMNR(caosVM *vm) {
 /**
  RMND (variable) room (integer) direction (integer) door (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void v_RMND(caosVM *vm) {
 	VM_PARAM_INTEGER(door)
@@ -1340,7 +1340,7 @@ void s_RMND(caosVM *vm) {
 /**
  DELN (command) room (integer) direction (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void c_DELN_c2(caosVM *vm) {
 	VM_PARAM_INTEGER(direction)

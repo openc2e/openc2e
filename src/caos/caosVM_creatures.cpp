@@ -61,7 +61,7 @@ c2eCreature *getc2eCreature(Agent *a) {
 /**
  STM# SHOU (command) stimulusno (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STM_SHOU(caosVM *vm) {
@@ -73,7 +73,7 @@ void c_STM_SHOU(caosVM *vm) {
 /**
  STM# SIGN (command) stimulusno (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STM_SIGN(caosVM *vm) {
@@ -85,7 +85,7 @@ void c_STM_SIGN(caosVM *vm) {
 /**
  STM# TACT (command) stimulusno (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STM_TACT(caosVM *vm) {
@@ -97,7 +97,7 @@ void c_STM_TACT(caosVM *vm) {
 /**
  STM# WRIT (command) object (agent) stimulusno (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STM_WRIT(caosVM *vm) {
@@ -175,7 +175,7 @@ void c_STIM_WRIT(caosVM *vm) {
 /**
  STIM SHOU (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STIM_SHOU_c2(caosVM *vm) {
@@ -198,7 +198,7 @@ void c_STIM_SHOU_c2(caosVM *vm) {
 /**
  STIM SIGN (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STIM_SIGN_c2(caosVM *vm) {
@@ -221,7 +221,7 @@ void c_STIM_SIGN_c2(caosVM *vm) {
 /**
  STIM TACT (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STIM_TACT_c2(caosVM *vm) {
@@ -244,7 +244,7 @@ void c_STIM_TACT_c2(caosVM *vm) {
 /**
  STIM WRIT (command) creature (agent) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STIM_WRIT_c2(caosVM *vm) {
@@ -272,7 +272,7 @@ void c_STIM_WRIT_c2(caosVM *vm) {
 /**
  STIM FROM (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 */
 void c_STIM_FROM_c1(caosVM *vm) {
@@ -439,7 +439,7 @@ void c_DIRN(caosVM *vm) {
 /**
  DIRN (integer)
  %status maybe
- %pragma variants c2 cv c3
+ %variants c2 cv c3
 
  Returns the direction the target Creatures is facing.
 */
@@ -528,7 +528,7 @@ void c_DEAD(caosVM *vm) {
 /**
  DEAD (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 
  Determines whether the target Creature is alive (0) or dead (255 in c1/c2, 1 otherwise).
 */
@@ -556,14 +556,14 @@ void c_NORN(caosVM *vm) {
 /**
  NORN (agent)
  %status maybe
- %pragma variants cv c3
+ %variants cv c3
 
  Returns the target Creature.
 */
 /**
  NORN (variable)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Returns the target Creature.
 */
@@ -716,7 +716,7 @@ void c_CHEM(caosVM *vm) {
 /**
  CHEM (command) chemical_id (integer) adjust (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
  %cost c1,c2 0
 
  Set the level of a chemical (0 to 255) in target creature's bloodstream.
@@ -753,7 +753,7 @@ void v_CHEM(caosVM *vm) {
 /**
  CHEM (integer) chemical_id (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
  
  Returns the level of a chemical (0 to 255) in target creature's bloodstream.
 */
@@ -770,7 +770,7 @@ void v_CHEM_c1(caosVM *vm) {
 /**
  ASLP (command) asleep (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 
  If asleep is 1, makes the target creature sleep. If asleep is 0, makes the target creature wake.
 */
@@ -785,7 +785,7 @@ void c_ASLP(caosVM *vm) {
 /**
  ASLP (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
  %cost c1,c2 0
 
  Determines whether the target Creature is asleep.
@@ -830,7 +830,7 @@ class blockUntilApproached : public blockCond {
 /**
  APPR (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 
  Makes the target Creature approach the IT agent (or if none, an agent of that category using CAs), 
  blocking until it makes it there or gives up.
@@ -859,7 +859,7 @@ void c_UNCS(caosVM *vm) {
 /**
  UNCS (integer)
  %status stub
- %pragma variants c2 cv c3
+ %variants c2 cv c3
 
  Returns 1 if the target Creature is unconscious, or 0 otherwise.
 */
@@ -1027,7 +1027,7 @@ void c_BORN(caosVM *vm) {
 /**
  CAGE (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 
  Returns the integer value of the target Creature's current life stage.
 */
@@ -1055,7 +1055,7 @@ void v_BYIT(caosVM *vm) {
 /**
  _IT_ (agent)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 
  Returns the agent that the OWNR creature was focused on when the 
  current script began running.
@@ -1126,7 +1126,7 @@ void c_NEW_CREA(caosVM *vm) {
 /**
  NEW: CREA (command) moniker (integer) sex (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Creates a new creature using the specified moniker for genetic data. sex is 0 for random, 1 for male or 2 for female.
 */
@@ -1173,7 +1173,7 @@ void c_NEW_CREA_c1(caosVM *vm) {
 /**
  NEW: CRAG (command) family (integer) gene_agent (agent) gene_slot (integer) sex (integer) variant (integer) sprite_file (string) image_count (integer) first_image (integer) plane (integer)
  %status maybe
- %pragma variants c3 sm
+ %variants c3 sm
 */
 void c_NEW_CRAG(caosVM *vm) {
 	VM_PARAM_INTEGER(plane)
@@ -1217,7 +1217,7 @@ int calculateRand(int value1, int value2); // caosVM_variables.cpp
 /**
  LTCY (command) action (integer) min (integer) max (integer)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 */
 void c_LTCY(caosVM *vm) {
 	VM_PARAM_INTEGER(max); caos_assert(max >= 0 && max <= 255);
@@ -1241,12 +1241,12 @@ void c_LTCY(caosVM *vm) {
 /**
  F**K (command)
  %status stub
- %pragma variants c1
+ %variants c1
 */
 
 /**
  MATE (command)
- %pragma variants c2 cv c3
+ %variants c2 cv c3
  %status stub
 */
 void c_MATE(caosVM *vm) {
@@ -1262,7 +1262,7 @@ void c_MATE(caosVM *vm) {
 /**
  DRV! (integer)
  %status stub
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 */
 void v_DRV(caosVM *vm) {
 	Creature *c = vm->getTargCreature();
@@ -1485,7 +1485,7 @@ void v_ATTN(caosVM *vm) {
 /**
  TOUC (command)
  %status stub
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 */
 void c_TOUC(caosVM *vm) {
 	Creature *c = vm->getTargCreature();
@@ -1511,7 +1511,7 @@ void c_FORF(caosVM *vm) {
 /**
  WALK (command)
  %status maybe
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 */
 void c_WALK(caosVM *vm) {
 	CreatureAgent *c = vm->getTargCreatureAgent();
@@ -1522,7 +1522,7 @@ void c_WALK(caosVM *vm) {
 /**
  DONE (command)
  %status stub
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 */
 void c_DONE(caosVM *vm) {
 	Creature *c = vm->getTargCreature();
@@ -1533,7 +1533,7 @@ void c_DONE(caosVM *vm) {
 /**
  SAYN (command)
  %status stub
- %pragma variants c1 c2 cv c3
+ %variants c1 c2 cv c3
 */
 void c_SAYN(caosVM *vm) {
 	Creature *c = vm->getTargCreature();
@@ -1544,7 +1544,7 @@ void c_SAYN(caosVM *vm) {
 /**
  IMPT (command) nudge (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_IMPT(caosVM *vm) {
 	VM_PARAM_INTEGER(nudge)
@@ -1556,7 +1556,7 @@ void c_IMPT(caosVM *vm) {
 /**
  AIM: (command) actionno (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_AIM(caosVM *vm) {
 	VM_PARAM_INTEGER(actionno)
@@ -1568,14 +1568,14 @@ void c_AIM(caosVM *vm) {
 /**
  BABY (variable)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 CAOS_LVALUE_TARG_SIMPLE(BABY, vm->targ->babymoniker) // TODO
 
 /**
  SNEZ (command)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_SNEZ(caosVM *vm) {
 	Creature *c = vm->getTargCreature();
@@ -1586,7 +1586,7 @@ void c_SNEZ(caosVM *vm) {
 /**
  DRIV (integer) drive (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Returns the value for the specified drive of the target creature.
 */
@@ -1604,7 +1604,7 @@ void v_DRIV_c1(caosVM *vm) {
 /**
  DREA (command) max (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 
  Start dreaming and process (at most?) max instincts.
 */
@@ -1669,7 +1669,7 @@ void c_TNTC(caosVM *vm) {
 /**
  INJR (command) organ (integer) amount (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void c_INJR(caosVM *vm) {
 	VM_PARAM_INTEGER(amount)
@@ -1682,7 +1682,7 @@ void c_INJR(caosVM *vm) {
 /**
  SAY$ (command) string (string)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_SAY(caosVM *vm) {
 	VM_PARAM_STRING(string)
@@ -1694,7 +1694,7 @@ void c_SAY(caosVM *vm) {
 /**
  TRIG (command) lobe (integer) cell (integer) amount (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void c_TRIG(caosVM *vm) {
 	VM_PARAM_INTEGER(amount)
@@ -1708,7 +1708,7 @@ void c_TRIG(caosVM *vm) {
 /**
  MONK (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 void v_MONK(caosVM *vm) {
 	oldCreature *c = getoldCreature(vm->targ.get());

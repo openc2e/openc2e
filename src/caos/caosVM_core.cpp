@@ -60,7 +60,7 @@ void c_OUTX(caosVM *vm) {
 /**
  OUTS (command) val (string)
  %status maybe
- %pragma variants all
+ %variants all
 
  Prints the given string to the output stream.  Does nothing when run inside a script.
 */
@@ -68,7 +68,7 @@ void c_OUTX(caosVM *vm) {
 /**
  DDE: PUTS (command) val (bareword)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 
 void c_OUTS(caosVM *vm) {
@@ -83,7 +83,7 @@ void c_OUTS(caosVM *vm) {
 /**
  OUTV (command) val (decimal)
  %status maybe
- %pragma variants all
+ %variants all
 
  Prints the given decimal value to the ouput stream.  Does nothing when run inside a script.
 */
@@ -91,7 +91,7 @@ void c_OUTS(caosVM *vm) {
 /**
  DDE: PUTV (command) val (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 
 void c_OUTV(caosVM *vm) {
@@ -124,7 +124,7 @@ CAOS_LVALUE(GAME, VM_PARAM_STRING(name),
 /**
  GAME (variable) category (integer) variable (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE(GAME_c2,
 	VM_PARAM_INTEGER(variable) VM_PARAM_INTEGER(category),
@@ -227,7 +227,7 @@ void c_DELE(caosVM *vm) {
 /**
  SCRP (command) family (integer) genus (integer) species (integer) event (integer)
  %status done
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Marks the beginning of a normal script applying to the agent with the given classifier 
  info.
@@ -239,7 +239,7 @@ void c_SCRP(caosVM*) {
 /**
  RSCR (command)
  %status done
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Marks the beginning of a removal script.
 */
@@ -250,7 +250,7 @@ void c_RSCR(caosVM*) {
 /**
  ISCR (command)
  %status stub
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Marks the beginning of an installer script.
 */
@@ -262,7 +262,7 @@ void c_ISCR(caosVM*) {
 /**
  ENDM (command)
  %status done
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Marks the end of a script.
 */
@@ -306,7 +306,7 @@ void v_VMJR(caosVM *vm) {
 /**
  VRSN (command) required (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Stop running this script unless VRSN is equal to or greater than the specified value.
 */
@@ -325,7 +325,7 @@ void c_VRSN(caosVM *vm) {
 /**
  VRSN (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 
  Return the build version number of the engine.
 */
@@ -377,7 +377,7 @@ void v_LANG(caosVM *vm) {
 /**
  TOKN (integer) token (bareword)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void v_TOKN(caosVM *vm) {
 	VM_PARAM_STRING(token)
@@ -391,7 +391,7 @@ void v_TOKN(caosVM *vm) {
 /**
  OC2E DDIR (string)
  %status maybe
- %pragma variants all
+ %variants all
 
  Returns a list of the data directories available, separated with \n. Remember that the last one is the working directory.
 */
@@ -408,7 +408,7 @@ void v_OC2E_DDIR(caosVM *vm) {
 /**
  SYS: CMND (command) menuid (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 
  Do something by providing a menu ID from the original Creatures 1 or Creatures 2 engines. This is obviously limited to the IDs that openc2e is aware of.
 */

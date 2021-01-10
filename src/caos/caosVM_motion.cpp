@@ -63,7 +63,7 @@ void v_ELAS(caosVM *vm) {
 /**
  MVTO (command) x (float) y (float)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 1
 
  Places the TARG agent at the given x/y position in the world (using the upper left hand corner of the agent).
@@ -79,7 +79,7 @@ void c_MVTO(caosVM *vm) {
 /**
  MVBY (command) x (float) y (float)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
  %cost c1,c2 1
 
  Changes the TARG agent's position by the given relative distances.
@@ -95,7 +95,7 @@ void c_MVBY(caosVM *vm) {
 /**
  VELX (variable)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Returns the current horizontal velocity, in pixels/tick, of the TARG agent.
 */
@@ -113,7 +113,7 @@ void s_VELX(caosVM *vm) {
 /**
  VELY (variable)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Returns the current vertical velocity, in pixels/tick, of the TARG agent.
 */
@@ -131,7 +131,7 @@ void s_VELY(caosVM *vm) {
 /**
  OBST (float) direction (integer)
  %status maybe
- %pragma variants cv c3 sm
+ %variants cv c3 sm
 
  Returns the distance from the TARG agent to the nearest wall that it might collide with in the given direction.
  (except right now it just gives the direction to the nearest wall at world edge - fuzzie)
@@ -183,7 +183,7 @@ void v_OBST(caosVM *vm) {
 /**
  OBST (integer) direction (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Returns the distance from the TARG agent to the nearest wall that it might collide with in the given direction.
 */
@@ -221,7 +221,7 @@ void v_OBST_c2(caosVM *vm) {
 /**
  OBSV (integer) direction (integer)
  %status stub
- %pragma variants c2
+ %variants c2
 
  Returns the permeability of the first door the TARG agent would collide with in
  the given direction.
@@ -318,7 +318,7 @@ void v_ACCG(caosVM *vm) {
 /**
  ACCG (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
  
  Returns the TARG agent's free-fall acceleration, in pixels/tick squared.
 */
@@ -354,7 +354,7 @@ void v_AERO(caosVM *vm) {
 /**
  AERO (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Returns the aerodynamics of the TARG agent.
 */
@@ -397,7 +397,7 @@ void v_RELY(caosVM *vm) {
 /**
  RELX (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Returns the relative horizontal distance between the script owner and the target agent.
 */
@@ -412,7 +412,7 @@ void v_RELX_c2(caosVM *vm) {
 /**
  RELY (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
  
  Returns the relative vertical distance between the script owner and the target agent.
 */
@@ -506,7 +506,7 @@ void v_FALL(caosVM *vm) {
 /**
  MOVS (variable)
  %status maybe
- %pragma variants c1 c2 cv c3 sm
+ %variants c1 c2 cv c3 sm
 
  Returns an integer representing the motion status of the TARG agent.  0 is autonomous, 1 is moving by mouse, 2 is 
  floating, 3 is inside a vehicle, and 4 is being carried.
@@ -602,7 +602,7 @@ void v_FLTY(caosVM *vm) {
 /**
  MCRT (command) x (integer) y (integer)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 
  Remove limits from target object and move it to (x, y).
 */
@@ -613,7 +613,7 @@ void c_MCRT(caosVM *vm) {
 /**
  REST (variable)
  %status maybe
- %pragma variants c2
+ %variants c2
 */
 CAOS_LVALUE_TARG_SIMPLE(REST, vm->targ->rest)
 

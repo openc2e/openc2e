@@ -192,7 +192,7 @@ void c_CMRP(caosVM *vm) {
 /**
  CMRX (integer)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Returns the X position at the center of the current camera's view.
 */
@@ -205,7 +205,7 @@ void v_CMRX(caosVM *vm) {
 /**
  CMRY (integer)
  %status maybe
- %pragma variants c2 cv c3 sm
+ %variants c2 cv c3 sm
 
  Returns the Y position at the center of the current camera's view.
 */
@@ -490,7 +490,7 @@ void c_FRSH(caosVM*) {
 /**
  SYS: CMRP (command) x (integer) y (integer)
  %status maybe
- %pragma variants c2
+ %variants c2
 
  Smooth scroll the camera so that the specified coordinates are in the center of the window.
  (Yes, this differs from what the incorrect C2 documentation says.)
@@ -505,7 +505,7 @@ void c_SYS_CMRP(caosVM *vm) {
 /**
  SYS: CMRA (command) x (integer) y (integer)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_SYS_CMRA(caosVM *vm) {
 	VM_PARAM_INTEGER(y)
@@ -517,7 +517,7 @@ void c_SYS_CMRA(caosVM *vm) {
 /**
  SYS: CAMT (command)
  %status maybe
- %pragma variants c1 c2
+ %variants c1 c2
 */
 void c_SYS_CAMT(caosVM *vm) {
 	// TODO: does CAMT behave like this in c1/c2?
@@ -529,7 +529,7 @@ void c_SYS_CAMT(caosVM *vm) {
 /**
  SYS: WTOP (command)
  %status stub
- %pragma variants c1 c2
+ %variants c1 c2
 
  Move the main window to the front of the screen.
 */
