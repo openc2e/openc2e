@@ -1,3 +1,4 @@
+import itertools
 import re
 import sys
 import json
@@ -224,25 +225,22 @@ class caosVM;
 
 declarations = set()
 
-for variant_name in data["variants"]:
-    variant = data["variants"][variant_name]
-    cmds = list(variant.values())
-    
-    for c in cmds:
-        declarations.add(c["implementation"])
-        if "saveimpl" in c:
-            declarations.add(c["saveimpl"])
+for cmd in data:
+    declarations.add(cmd["implementation"])
+    if "saveimpl" in cmd:
+        declarations.add(cmd["saveimpl"])
 
 for d in sorted(declarations):
     print("void {}(caosVM*);".format(d))
 print("")
 
-for variant_name in sorted(data["variants"]):
-    variant = data["variants"][variant_name]
-    for key in variant:
-        variant[key]["key"] = key
+variants = sorted(set(itertools.chain.from_iterable(cmd["variants"] for cmd in data)))
 
-    cmds = list(variant.values())
+for cmd in data:
+    cmd["key"] = cmd["uniquename"]
+
+for variant_name in variants:
+    cmds = [cmd for cmd in data if variant_name in cmd["variants"]]
 
     inject_ns(cmds)
     writelookup(cmds)
@@ -254,11 +252,11 @@ for variant_name in sorted(data["variants"]):
     printinit(variant_name, "{}_cmds".format(variant_name))
 
 print("Dialect* getDialectByName(const std::string& name) {")
-for variant_name in sorted(data["variants"]):
+for variant_name in variants:
     print("\tif (name == \"{}\") {{ return &dialect_{}; }}".format(variant_name, variant_name))
 print("\treturn nullptr;")
 print("}")
 
 print("std::vector<std::string> getDialectNames() {")
-print("\treturn { " + ", ".join('"{}"'.format(name) for name in sorted(data["variants"])) + "};")
+print("\treturn { " + ", ".join('"{}"'.format(name) for name in variants) + "};")
 print("}")

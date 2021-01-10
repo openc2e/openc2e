@@ -22,13 +22,13 @@ def merge_dict(l, r):
     return dict(list(l.items()) + list(r.items()))
 
 # XXX
-data = {"ops": functools.reduce(merge_dict, data["variants"].values())}
+data = {"ops": sorted(data, key=lambda cmd: cmd["name"])}
 
 
 catsort = collections.defaultdict(lambda: [])
-for key in sorted(data["ops"]):
-    data["ops"][key]["key"] = key
-    catsort[data["ops"][key]["category"]].append(data["ops"][key])
+for cmd in data["ops"]:
+    cmd["key"] = cmd["uniquename"]
+    catsort[cmd["category"]].append(cmd)
 
 for key in catsort:
     # TODO: maybe?
@@ -82,7 +82,7 @@ st_insert = {
 st_insert["stub"] = st_insert["todo"]
 st_insert["done"] = st_insert["ok"]
 
-for op in data["ops"].values():
+for op in data["ops"]:
     st_insert[op["status"]][3] += 1
 
 cstat = []
@@ -108,13 +108,13 @@ print(
 \t<ul>"""
 )
 
-for key in sorted(data["ops"]):
-    if not key.startswith("c_"):
+for cmd in data["ops"]:
+    if not cmd["key"].startswith("c_"):
         continue
-    classname = st_insert[data["ops"][key]["status"]][0] or "st_wtf"
+    classname = st_insert[cmd["status"]][0] or "st_wtf"
     print(
         '<li><a class="{}" href="#k_{}">{}</a></li>\n'.format(
-            classname, key, data["ops"][key]["name"]
+            classname, key, cmd["name"]
         )
     )
 
@@ -124,13 +124,13 @@ print(
 \t<ul>"""
 )
 
-for key in sorted(data["ops"]):
-    if not key.startswith("v_"):
+for cmd in data["ops"]:
+    if not cmd["key"].startswith("v_"):
         continue
-    classname = st_insert[data["ops"][key]["status"]][0] or "st_wtf"
+    classname = st_insert[cmd["status"]][0] or "st_wtf"
     print(
         '<li><a class="{}" href="#k_{}">{}</a></li>\n'.format(
-            classname, key, data["ops"][key]["name"]
+            classname, key, cmd["name"]
         )
     )
 

@@ -192,6 +192,10 @@ for filename in sys.argv[1:]:
             else:
                 obj["variants"] = ("c3", "cv", "sm")
 
+            for v in obj["variants"]:
+                if v not in ("c1", "c2", "c3", "cv", "sm"):
+                    raise Exception("Unknown variant '{}' when parsing command {}".format(v, obj['name']))
+
             for d in directives:
                 d = d.replace("%", "").strip()
                 if d.split(" ")[0] not in ("status", "cost", "stackdelta", "variants"):
@@ -202,17 +206,4 @@ for filename in sys.argv[1:]:
         sys.stderr.write("{} at {} line {}\n".format(type(e).__name__, filename, p))
         raise
 
-variants = {
-    "c1": {},
-    "c2": {},
-    "c3": {},
-    "cv": {},
-    "sm": {},
-}
-
-for obj in objects:
-    for v in obj["variants"]:
-        variants[v][obj["uniquename"]] = obj
-
-
-print(json.dumps({"namespaces": [], "variants": variants},))
+print(json.dumps(objects))
