@@ -85,16 +85,16 @@ for clas in ("ok", "broken", "maybe", "probablyok", "todo"):
         cstat.append("{} {}".format(st_insert[clas][3], st_insert[clas][2]))
 
 
-sys.stdout.write('<div id="summary">')
-sys.stdout.write("{} commands in total; ".format(len(data["ops"])))
-sys.stdout.write(", ".join(cstat))
-sys.stdout.write(".</div>")
-sys.stdout.write('<div id="index"><ul>')
+print('<div id="summary">')
+print("{} commands in total; ".format(len(data["ops"])))
+print(", ".join(cstat))
+print(".</div>")
+print('<div id="index"><ul>')
 for c in catl:
-    sys.stdout.write(
+    print(
         '<li><a href="#c_' + c["anchor"] + '">' + c["name"] + "</a></li>\n"
     )
-sys.stdout.write("</ul></div>\n")
+print("</ul></div>\n")
 
 print(
     """\t<div id="sidebar">
@@ -106,7 +106,7 @@ for key in sorted(data["ops"]):
     if not key.startswith("c_"):
         continue
     classname = st_insert[data["ops"][key]["status"]][0] or "st_wtf"
-    sys.stdout.write(
+    print(
         '<li><a class="{}" href="#k_{}">{}</a></li>\n'.format(
             classname, key, data["ops"][key]["name"]
         )
@@ -122,13 +122,13 @@ for key in sorted(data["ops"]):
     if not key.startswith("v_"):
         continue
     classname = st_insert[data["ops"][key]["status"]][0] or "st_wtf"
-    sys.stdout.write(
+    print(
         '<li><a class="{}" href="#k_{}">{}</a></li>\n'.format(
             classname, key, data["ops"][key]["name"]
         )
     )
 
-sys.stdout.write('</ul></div><div id="content">')
+print('</ul></div><div id="content">')
 for cat in catl:
     print('<div class="category" id="c_{}">'.format(cat["anchor"]))
     print("<h2>{}</h2><hr/>".format(cat["name"]))
@@ -140,42 +140,42 @@ for cat in catl:
         for arg in op.get("arguments", []):
             print('<span class="argname">{}</span>'.format(arg["name"]))
             print('<span class="argtype">({})</span>'.format(arg["type"]))
-        sys.stdout.write('</div><div class="description">')
+        print('</div><div class="description">')
         if op.get("description"):
             print('<div class="docs">{}</div>'.format(op["description"]))
         else:
             print('<div class="nodocs">This command is currently undocumented.</div>')
-        sys.stdout.write('</div><div class="status">')
+        print('</div><div class="status">')
         if op["status"] in st_insert:
-            sys.stdout.write('<div class="{}">'.format(st_insert[op["status"]][0]))
-            sys.stdout.write(st_insert[op["status"]][1])
-            sys.stdout.write("</div>")
+            print('<div class="{}">'.format(st_insert[op["status"]][0]))
+            print(st_insert[op["status"]][1])
+            print("</div>")
         else:
-            sys.stdout.write(
+            print(
                 '<div class="st_wtf">This command has an unknown status tag of {}.'.format(
                     op["status"]
                 )
             )
-            sys.stdout.write(
+            print(
                 "Please beat whoever set that status with a shovel or some other heavy object."
             )
-            sys.stdout.write("</div>")
-        sys.stdout.write("</div>")
-        sys.stdout.write('<div class="administrivia"><ul>')
+            print("</div>")
+        print("</div>")
+        print('<div class="administrivia"><ul>')
 
-        sys.stdout.write("<li>Implemented in: {}</li>".format(op["filename"]))
-        sys.stdout.write(
+        print("<li>Implemented in: {}</li>".format(op["filename"]))
+        print(
             "<li>Implementation functions (may be wrong): {}</li>".format(
                 op["implementation"]
             )
         )
         if op.get("pragma"):
-            sys.stdout.write("<li>Pragmas:<ul>")
+            print("<li>Pragmas:<ul>")
             for pk in sorted(op["pragma"]):
-                sys.stdout.write("<li>{} =&gt; {}</li>".format(pk, op["pragma"][pk]))
-            sys.stdout.write("</ul></li>")
-        sys.stdout.write("</ul></div>")
-        sys.stdout.write("</div>")
-    sys.stdout.write("</div>")
+                print("<li>{} =&gt; {}</li>".format(pk, op["pragma"][pk]))
+            print("</ul></li>")
+        print("</ul></div>")
+        print("</div>")
+    print("</div>")
 
-sys.stdout.write("</div></body></html>")
+print("</div></body></html>")
