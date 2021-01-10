@@ -1476,10 +1476,31 @@ void v_DECN(caosVM *vm) {
 /**
  ATTN (integer)
  %status maybe
+ 
+ Returns the current focus of attention id.
 */
 void v_ATTN(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
-	vm->result.setInt(c->getAttentionId());
+	vm->result.setInt(vm->getTargCreature()->getAttentionId());
+	// TODO: should this be targ? or ownr like C1?
+}
+
+static Creature* getOwnerCreature(caosVM *vm) {
+	valid_agent(vm->owner);
+	CreatureAgent *c = dynamic_cast<CreatureAgent *>(vm->owner.get());
+	caos_assert(c);
+	return c->getCreature();
+}
+
+/**
+ ATTN (integer)
+ %status maybe
+ %variants c1
+ 
+ IT - obj that OWNR creature is attending to (may be NULL)
+ NOTE: only OWNR's IT can be determined, not TARG's
+*/
+void v_ATTN_c1(caosVM *vm) {
+	vm->result.setInt(getOwnerCreature(vm)->getAttentionId());
 }
 
 /**
