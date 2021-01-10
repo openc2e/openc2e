@@ -27,7 +27,6 @@ data = {"ops": sorted(data, key=lambda cmd: cmd["name"])}
 
 catsort = collections.defaultdict(lambda: [])
 for cmd in data["ops"]:
-    cmd["key"] = cmd["uniquename"]
     catsort[cmd["category"]].append(cmd)
 
 for key in catsort:
@@ -109,12 +108,12 @@ print(
 )
 
 for cmd in data["ops"]:
-    if not cmd["key"].startswith("c_"):
+    if not cmd["type"] == "command":
         continue
     classname = st_insert[cmd["status"]][0] or "st_wtf"
     print(
         '<li><a class="{}" href="#k_{}">{}</a></li>\n'.format(
-            classname, key, cmd["name"]
+            classname, cmd["uniquename"], cmd["name"]
         )
     )
 
@@ -125,12 +124,12 @@ print(
 )
 
 for cmd in data["ops"]:
-    if not cmd["key"].startswith("v_"):
+    if cmd["type"] == "command":
         continue
     classname = st_insert[cmd["status"]][0] or "st_wtf"
     print(
         '<li><a class="{}" href="#k_{}">{}</a></li>\n'.format(
-            classname, key, cmd["name"]
+            classname, cmd["uniquename"], cmd["name"]
         )
     )
 
@@ -139,7 +138,7 @@ for cat in catl:
     print('<div class="category" id="c_{}">'.format(cat["anchor"]))
     print("<h2>{}</h2><hr/>".format(cat["name"]))
     for op in cat["ents"]:
-        print('<div class="command" id="k_{}">'.format(op["key"]))
+        print('<div class="command" id="k_{}">'.format(op["uniquename"]))
         print('<div class="header">')
         print('<span class="cmdname">{}</span>'.format(op["name"]))
         print('<span class="cmdtype">({})</span>'.format(op["type"]))

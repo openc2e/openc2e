@@ -50,8 +50,6 @@ def parse_syntaxstring(syntaxstring):
         "match": name.split(" ")[-1],
         "type": type,
         "syntaxstring": syntaxstring,
-        "uniquename": ("c_" if type == "command" else "v_")
-        + re.sub(r"[^A-Za-z0-9_]", "", re.sub(r"\s+", "_", name)),
     }
     if " " in name:
         props["namespace"] = name.split(" ")[0].lower()
@@ -200,6 +198,12 @@ for filename in sys.argv[1:]:
                 d = d.replace("%", "").strip()
                 if d.split(" ")[0] not in ("status", "cost", "stackdelta", "variants"):
                     raise Exception("Unknown directive: {}".format(d))
+
+            obj["uniquename"] = (
+                ("cmd_" if type == "command" else "expr_")
+                + re.sub(r"(\s|[^A-Za-z0-9])+", "_", obj["name"])
+                + "_" + "_".join(sorted(obj["variants"]))
+            )
 
             objects.append(obj)
     except Exception as e:
