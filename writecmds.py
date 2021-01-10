@@ -74,7 +74,7 @@ def printarr(cmds, variant, arrname):
                 )
                 already_printed_argps.add(argp)
 
-        buf += "\t{{ // {} {}\n".format(idx, cmd["key"])
+        buf += "\t{{ // {} {}\n".format(idx, cmd["lookup_key"])
         idx += 1
 
         if cmd.get("implementation"):
@@ -87,7 +87,6 @@ def printarr(cmds, variant, arrname):
             buf += "\t\tnullptr, // savehandler\n"
 
         buf += '\t\t"{}", // lookup_key\n'.format(cmd["lookup_key"])
-        buf += '\t\t"{}", // key\n'.format(cmd["key"])
         buf += '\t\t"{}", // name\n'.format(cmd["match"].lower())
         buf += '\t\t"{}", // fullname\n'.format(cmd["name"])
         buf += '\t\t"{}", // docs\n'.format(cescape(cmd.get("description")))
@@ -106,7 +105,7 @@ def printarr(cmds, variant, arrname):
         buf += "\t\t{} // evalcost\n".format(cost)
         buf += "\t},\n"
 
-    buf += "\t{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, CI_OTHER, 0 }\n"
+    buf += "\t{ NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, CI_OTHER, 0 }\n"
     buf += "};"
     print(buf)
 
@@ -135,8 +134,6 @@ def inject_ns(cmds):
                 continue
             if names.get("{} {}".format(type, ns).lower()):
                 continue
-            key = "k_" + ns.upper()
-            key = re.sub(r"[^a-zA-Z0-9_]", "", key)
             cmds.append(
                 dict(
                     arguments=[dict(name="cmd", type="subcommand")],
@@ -149,7 +146,6 @@ def inject_ns(cmds):
                     name=ns.lower(),
                     pragma=dict(),
                     status="internal",
-                    key=key,
                     type=type,
                     syntaxstring="{} (command/expr) subcommand (subcommand)\n".format(
                         ns.upper()
@@ -235,9 +231,6 @@ for d in sorted(declarations):
 print("")
 
 variants = sorted(set(itertools.chain.from_iterable(cmd["variants"] for cmd in data)))
-
-for cmd in data:
-    cmd["key"] = cmd["uniquename"]
 
 for variant_name in variants:
     cmds = [cmd for cmd in data if variant_name in cmd["variants"]]

@@ -42,7 +42,6 @@ struct cmdinfo {
 	void (*savehandler)(caosVM*);
 
 	const char *lookup_key;
-	const char *key;
 	const char *name;
 	const char *fullname;
 	const char *docs;
