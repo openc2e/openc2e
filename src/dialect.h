@@ -1,12 +1,12 @@
-#ifndef DIALECT_H
-#define DIALECT_H 1
+#pragma once
 
-#include "cmddata.h"
 #include <cassert>
 #include <memory>
 #include <string>
 #include <map>
 #include <vector>
+
+struct cmdinfo;
 
 class Dialect {
 	private:
@@ -15,10 +15,7 @@ class Dialect {
 	public:
 		const std::string name;
 		const struct cmdinfo *cmdbase() const { return cmds; }
-		const struct cmdinfo *getcmd(int idx) const {
-			assert(idx >= 0 && idx < cmdcnt);
-			return cmdbase() + idx;
-		}
+		const struct cmdinfo *getcmd(int idx) const;
 		int cmdcount() const { return cmdcnt; }
 
 		const cmdinfo *find_command(const char *name) const;
@@ -33,6 +30,3 @@ class Dialect {
 
 std::vector<std::string> getDialectNames(); // defined in generated cmddata.cpp
 Dialect* getDialectByName(const std::string&); // defined in generated cmddata.cpp
-
-#endif
-

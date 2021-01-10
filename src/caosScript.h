@@ -31,6 +31,7 @@
 #include <cassert>
 #include "bytecode.h"
 #include "caosValue.h"
+#include "cmddata.h"
 #include "dialect.h"
 #include "fileformats/caostoken.h"
 #include "shared_str.h"

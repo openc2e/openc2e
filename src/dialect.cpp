@@ -1,4 +1,5 @@
 #include "dialect.h"
+#include "cmddata.h"
 #include "creaturesException.h"
 #include <cassert>
 #include <memory>
@@ -30,6 +31,11 @@ Dialect::Dialect(const cmdinfo *cmds_, const std::string &n) : cmdcnt(count_cmds
 
 const cmdinfo *Dialect::find_command(const char *name) const {
 	return find_cmd(cmds, cmdcnt, name);
+}
+
+const struct cmdinfo *Dialect::getcmd(int idx) const {
+	assert(idx >= 0 && idx < cmdcnt);
+	return cmdbase() + idx;
 }
 
 int Dialect::cmd_index(const cmdinfo *ci) const {
