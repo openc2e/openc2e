@@ -258,7 +258,6 @@ void c_DBG_DISA(caosVM *vm) {
 
 /**
  DBG: ASRT (command) condition (condition)
- %pragma parser new AssertParser()
  %pragma variants all
  %status maybe
 

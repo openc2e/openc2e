@@ -52,7 +52,6 @@
  %status maybe
  %pragma variants c1 c2
  %pragma stackdelta 0
- %pragma saveimpl s_VAxx
 
  Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
 */
@@ -159,7 +158,6 @@ void c_SETA(caosVM *vm) {
  %status maybe
  %pragma stackdelta 0
  %pragma variants c1 c2
- %pragma saveimpl s_OVxx
 
  Like OVxx, but restricted to 0-2 in C1, or 0-9 in C2. Legacy from Creatures 1.
 */
@@ -573,7 +571,6 @@ void v_SQRT(caosVM *vm) {
 
 /**
  _P1_ (variable)
- %pragma saveimpl s_P1
  %status maybe
  %pragma variants c2 cv c3 sm
 
@@ -583,7 +580,6 @@ CAOS_LVALUE_SIMPLE(P1, vm->_p_[0])
 
 /**
  _P2_ (variable)
- %pragma saveimpl s_P2
  %status maybe
  %pragma variants c2 cv c3 sm
 

@@ -177,9 +177,7 @@ for filename in sys.argv[1:]:
             if getdirective("status"):
                 obj["status"] = getdirective("status")
 
-            if getdirective("pragma saveimpl"):
-                obj["saveimpl"] = getdirective("pragma saveimpl")
-            elif obj["type"] == "variable":
+            if obj["type"] == "variable":
                 obj["saveimpl"] = obj["implementation"].replace("v_", "s_")
 
             if getdirective("pragma stackdelta"):
@@ -201,11 +199,8 @@ for filename in sys.argv[1:]:
                 if d.startswith("pragma"):
                     d = d.split(" ", 1)[1].strip()
                     if d.split(" ")[0] not in (
-                        "implementation",
                         "variants",
-                        "parser",
                         "stackdelta",
-                        "saveimpl",
                     ):
                         raise Exception("Unknown pragma: {}".format(d))
 

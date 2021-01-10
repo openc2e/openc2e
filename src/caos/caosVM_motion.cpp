@@ -319,7 +319,6 @@ void v_ACCG(caosVM *vm) {
  ACCG (variable)
  %status maybe
  %pragma variants c2
- %pragma saveimpl s_ACCG_c2
  
  Returns the TARG agent's free-fall acceleration, in pixels/tick squared.
 */
@@ -356,7 +355,6 @@ void v_AERO(caosVM *vm) {
  AERO (variable)
  %status maybe
  %pragma variants c2
- %pragma saveimpl s_AERO_c2
 
  Returns the aerodynamics of the TARG agent.
 */
