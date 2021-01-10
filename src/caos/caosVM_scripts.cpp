@@ -119,7 +119,7 @@ void c_WAIT(caosVM *vm) {
 /**
  STOP (command)
  %status maybe
- %pragma stackdelta any
+ %stackdelta any
  %pragma variants c1 c2 cv c3 sm
 
  Aborts the script.

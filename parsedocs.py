@@ -180,8 +180,8 @@ for filename in sys.argv[1:]:
             if obj["type"] == "variable":
                 obj["saveimpl"] = obj["implementation"].replace("v_", "s_")
 
-            if getdirective("pragma stackdelta"):
-                obj["stackdelta"] = getdirective("pragma stackdelta")
+            if getdirective("stackdelta"):
+                obj["stackdelta"] = getdirective("stackdelta")
                 if obj["stackdelta"] == "any":
                     obj["stackdelta"] = "INT_MAX"
                 else:
@@ -194,13 +194,12 @@ for filename in sys.argv[1:]:
 
             for d in directives:
                 d = d.replace("%", "").strip()
-                if d.split(" ")[0] not in ("pragma", "status", "cost",):
+                if d.split(" ")[0] not in ("pragma", "status", "cost", "stackdelta"):
                     raise Exception("Unknown directive: {}".format(d))
                 if d.startswith("pragma"):
                     d = d.split(" ", 1)[1].strip()
                     if d.split(" ")[0] not in (
                         "variants",
-                        "stackdelta",
                     ):
                         raise Exception("Unknown pragma: {}".format(d))
 

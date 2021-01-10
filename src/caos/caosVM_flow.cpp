@@ -32,7 +32,7 @@
  DOIF (command) condition (condition)
  %status maybe
  %pragma variants c1 c2 cv c3 sm
- %pragma stackdelta 0
+ %stackdelta 0
  %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
@@ -46,7 +46,7 @@ void c_DOIF(caosVM*) {
  ELIF (command) condition (condition)
  %pragma variants all
  %status maybe
- %pragma stackdelta 0
+ %stackdelta 0
  %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
@@ -84,7 +84,7 @@ void c_ENDI(caosVM*) {
 /**
  REPS (command) reps (integer)
  %status maybe
- %pragma stackdelta 0
+ %stackdelta 0
  %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
@@ -136,7 +136,7 @@ void c_EVER(caosVM*) {
 /**
  UNTL (command) condition (condition)
  %status maybe
- %pragma stackdelta 0
+ %stackdelta 0
  %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
  
@@ -148,7 +148,7 @@ void c_UNTL(caosVM*) {
 
 /**
  GSUB (command) label (label)
- %pragma stackdelta 0
+ %stackdelta 0
  %status maybe
  %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
@@ -163,7 +163,7 @@ void c_GSUB(caosVM*) {
 /**
  SUBR (command) label (label)
  %status maybe
- %pragma stackdelta 0
+ %stackdelta 0
  %pragma variants c1 c2 cv c3 sm
  
  Defines the start of a subroute to be called with GSUB, with label (label).
@@ -175,7 +175,7 @@ void c_SUBR(caosVM*) {
 
 /**
  RETN (command)
- %pragma stackdelta any
+ %stackdelta any
  %status maybe
  %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
@@ -219,7 +219,7 @@ void c_NSCN(caosVM *vm) {
 /**
  ENUM (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma stackdelta any
+ %stackdelta any
  %pragma variants c1 c2 cv c3 sm
  %cost c1,c2 0
 
@@ -251,7 +251,7 @@ void c_ENUM(caosVM *vm) {
 /**
  ESEE (command) family (integer) genus (integer) species (integer)
  %status maybe
- %pragma stackdelta any
+ %stackdelta any
  %pragma variants c2 cv c3 sm
  
  Simular to ENUM, but iterates through agents visible to OWNR, or visible to TARG in an install script.
@@ -280,7 +280,7 @@ void c_ESEE(caosVM *vm) {
 
 /**
  ETCH (command) family (integer) genus (integer) species (integer)
- %pragma stackdelta any
+ %stackdelta any
  %status maybe
  %pragma variants c2 cv c3 sm
 
@@ -317,7 +317,7 @@ void c_ETCH(caosVM *vm) {
 
 /**
  EPAS (command) family (integer) genus (integer) species (integer)
- %pragma stackdelta any
+ %stackdelta any
  %status maybe
 
  Similar to ENUM, but iterates through the OWNR vehicle's passengers.
@@ -348,7 +348,7 @@ void c_EPAS(caosVM *vm) {
 
 /**
  ECON (command) agent (agent)
- %pragma stackdelta any
+ %stackdelta any
  %status stub
 
  Loops through all the agents in the connective system containing the given agent.
@@ -365,7 +365,7 @@ void c_ECON(caosVM *vm) {
 
 /**
  ESCN (command) family (integer) genus (integer) species (integer)
- %pragma stackdelta any
+ %stackdelta any
  %status stub
  %pragma variants c2
 

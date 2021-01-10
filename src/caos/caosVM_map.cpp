@@ -1234,7 +1234,7 @@ CAOS_LVALUE(WRAP,
  SSFC (command) roomno (integer) count (integer) x1 (integer) y1 (integer)
  %status maybe
  %pragma variants c2
- %pragma stackdelta any
+ %stackdelta any
 
  Set floor points of the specified rooms.
  You must provide 'count' pairs of (x, y) coordinates as parameters, relative to the room, and with the y coordinates inverted (ie, 0 is the bottom of the room).

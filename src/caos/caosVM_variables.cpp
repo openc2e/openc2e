@@ -42,7 +42,7 @@
 /**
  VAxx (variable)
  %status maybe
- %pragma stackdelta 0
+ %stackdelta 0
  %pragma variants c2 cv c3 sm
 
  Script-local variables (exist only in the current script) with xx being from 00 to 99.  Examples: VA01, VA45. 
@@ -51,7 +51,7 @@
  VARx (variable)
  %status maybe
  %pragma variants c1 c2
- %pragma stackdelta 0
+ %stackdelta 0
 
  Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
 */
@@ -62,7 +62,7 @@ CAOS_LVALUE(VAxx,
 
 /**
  MVxx (variable)
- %pragma stackdelta 0
+ %stackdelta 0
  %status maybe
 
  Like OVxx, only for OWNR, not TARG.
@@ -148,7 +148,7 @@ void c_SETA(caosVM *vm) {
 /**
  OVxx (variable)
  %status maybe
- %pragma stackdelta 0
+ %stackdelta 0
  %pragma variants c2 cv c3 sm
 
  Agent-local variables (exist only in the current agent's VM) from TARG, with xx being from 00 to 99.  Examples: OV01, OV45.
@@ -156,7 +156,7 @@ void c_SETA(caosVM *vm) {
 /**
  OBVx (variable)
  %status maybe
- %pragma stackdelta 0
+ %stackdelta 0
  %pragma variants c1 c2
 
  Like OVxx, but restricted to 0-2 in C1, or 0-9 in C2. Legacy from Creatures 1.
