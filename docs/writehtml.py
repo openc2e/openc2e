@@ -2,6 +2,7 @@ import collections
 import datetime
 import functools
 import json
+import os
 import re
 import sys
 
@@ -38,6 +39,9 @@ catl = [
     {"name": captext(_), "ents": catsort[_], "anchor": esc(_)} for _ in sorted(catsort, key=lambda _: _.lower())
 ]
 
+with open(os.path.join(os.path.dirname(__file__), "docs.css")) as f:
+    stylesheet = f.read()
+
 time = datetime.datetime.now()
 print(
     """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
@@ -45,7 +49,9 @@ print(
 <html>
 \t<head>
 \t\t<title>CAOS command reference - openc2e</title>
-\t\t<link rel="stylesheet" type="text/css" href="docs.css" />
+\t\t<style type="text/css">""" +
+    stylesheet
++ """\t\t</style>
 \t</head>
 \t<body>
 \t\t<h1>CAOS command reference - openc2e dev build</h1>"""

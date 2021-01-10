@@ -335,11 +335,6 @@ add_custom_command(
 	DEPENDS docs/writehtml.py ${GEN}/commandinfo.json
 	WORKING_DIRECTORY ${SRC})
 add_custom_command(
-	OUTPUT ${BIN}/docs.css
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different docs/docs.css ${BIN}/docs.css
-	DEPENDS docs/docs.css
-	WORKING_DIRECTORY ${SRC})
-add_custom_command(
 	OUTPUT ${BIN}/openc2e.6
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SRC}/docs/openc2e.6 ${BIN}/openc2e.6
 	DEPENDS docs/openc2e.6
@@ -388,7 +383,7 @@ add_custom_command(
 	DEPENDS ${SRC}/src/fileformats/PraySourceParser.re2c
 	WORKING_DIRECTORY ${SRC})
 
-add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/docs.css ${BIN}/openc2e.6)
+add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/openc2e.6)
 add_custom_target(generated DEPENDS
 	${GEN}/caoslexer.cpp
 	${GEN}/mngparser.cpp
@@ -401,8 +396,7 @@ install(FILES
 	COPYING
 	README.md
 	docs/openc2e.6
-	${BIN}/caosdocs.html	
-	${BIN}/docs.css
+	${BIN}/caosdocs.html
 	${GEN}/commandinfo.json
 	DESTINATION "."
 )
@@ -457,7 +451,6 @@ list(APPEND dist_args
 		"${CMAKE_CURRENT_SOURCE_DIR}/README.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/docs/openc2e.6"
 		"${BIN}/caosdocs.html"
-		"${BIN}/docs.css"
 		"${GEN}/commandinfo.json"
 		"$<TARGET_FILE:openc2e>"
 		"$<TARGET_FILE:cobdumper>"
@@ -467,7 +460,7 @@ list(APPEND dist_args
 		"$<TARGET_FILE:praydumper>"
 		"$<TARGET_FILE:spritedumper>"
 		"${dist_dir}/"
-	DEPENDS "${BIN}/caosdocs.html" "${BIN}/docs.css"
+	DEPENDS "${BIN}/caosdocs.html"
 	COMMAND ${CMAKE_COMMAND}
 		-D "DIST_DIR=${dist_dir}"
 		-D "EXTRA_LIB_DIRS=$<TARGET_FILE_DIR:openc2e>" # MSVC puts built binaries and DLLs under $BUILD_TYPE
