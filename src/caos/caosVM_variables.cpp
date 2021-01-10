@@ -422,7 +422,7 @@ void v_UFOS(caosVM *vm) {
 /**
  MODU (string)
  %status stub
- %variants all
+ %variants c3 cv sm openc2e
 
  Returns information about which modules are being used by the engine (for now, backend and audio backend names).
 */
@@ -435,7 +435,7 @@ void v_MODU(caosVM *vm) {
 /**
  GNAM (string)
  %status maybe
- %variants all
+ %variants c3 cv sm openc2e
  
  Returns the currently-running game (like "Creatures 1" or "Docking Station").
 */
@@ -989,7 +989,8 @@ void c_NAMN(caosVM *vm) {
 
 /**
  * POWV (command) value (variable) exponent (decimal)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Raises value to the exponent power, and saves the result back in value.
  * Results are undefined if value is negative.

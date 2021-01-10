@@ -191,7 +191,7 @@ for filename in sys.argv[1:]:
                 obj["variants"] = ("c3", "cv", "sm")
 
             for v in obj["variants"]:
-                if v not in ("c1", "c2", "c3", "cv", "sm"):
+                if v not in ("c1", "c2", "c3", "cv", "sm", "openc2e"):
                     raise Exception("Unknown variant '{}' when parsing command {}".format(v, obj['name']))
 
             for d in directives:

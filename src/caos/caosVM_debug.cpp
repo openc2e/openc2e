@@ -37,7 +37,7 @@
 /**
  DBG: OUTS (command) val (string)
  %status maybe
- %variants all
+ %variants c3 cv sm openc2e
 
  Outputs a string to the debug log.
 */
@@ -55,7 +55,7 @@ void c_DBG_OUTS(caosVM *vm) {
 /**
  DBG: OUTV (command) val (decimal)
  %status maybe
- %variants all
+ %variants c3 cv sm openc2e
  
  Outputs a decimal value to the debug log.
 */
@@ -136,6 +136,7 @@ void v_AGNT(caosVM *vm) {
 /**
  DBG: MALLOC (command)
  %status stub
+ %variants openc2e
 
  Dumps some random memory stats to stderr.
 */
@@ -167,7 +168,7 @@ void c_DBG_MALLOC(caosVM*) {
 /**
  DBG: DUMP (command)
  %status ok
- %variants all
+ %variants openc2e
 
  Dumps the current script's bytecode to stderr.
 */
@@ -178,7 +179,7 @@ void c_DBG_DUMP(caosVM *vm) {
 /**
  DBG: TRACE (command) level (integer)
  %status ok
- %variants all
+ %variants openc2e
 
  Sets opcode trace level. Zero disables.
 */
@@ -229,7 +230,7 @@ void c_MANN(caosVM *vm) {
 
 /**
  DBG: DISA (command) family (integer) genus (integer) species (integer) event (integer)
- %variants all
+ %variants openc2e
  %status ok
 
  Dumps the "bytecode" of the indicated script to the current output channel.
@@ -258,8 +259,8 @@ void c_DBG_DISA(caosVM *vm) {
 
 /**
  DBG: ASRT (command) condition (condition)
- %variants all
- %status maybe
+ %variants c3 cv sm openc2e
+ %status ok
 
  Blows up unless the given condition is true.
 */
@@ -269,8 +270,8 @@ void c_DBG_ASRT(caosVM*) {
 
 /**
  DBG: ASRF (command) condition (condition)
- %variants all
- %status maybe
+ %variants openc2e
+ %status ok
 
  (openc2e-only)
  Blows up unless the given condition is false.
@@ -281,8 +282,8 @@ void c_DBG_ASRF(caosVM*) {
 
 /**
  DBG: FAIL (command)
- %variants all
- %status maybe
+ %variants openc2e
+ %status ok
 
  (openc2e-only)
  Blows up.
@@ -294,7 +295,7 @@ void c_DBG_FAIL(caosVM*) {
 /**
  DBG: IDNT (string) agent (agent)
  %status ok
- %variants all
+ %variants openc2e
 
  (openc2e-only)
  Return a nicely-formatted string identifying the classifier of the agent,
@@ -332,7 +333,7 @@ void c_DBG_CPRO(caosVM*) {
 /**
  DBG: STOK (string) bareword (bareword)
  %status ok
- %variants all
+ %variants openc2e
 
  Returns the bare token in 'bareword' as a string.
 */
@@ -345,7 +346,7 @@ void v_DBG_STOK(caosVM *vm) {
 /**
  DBG: TSLC (command) timeslice (integer)
  %status ok
- %variants all
+ %variants openc2e
  %cost 0
 
  Sets the currently executing script's remaining timeslice value. This command
@@ -360,7 +361,7 @@ void c_DBG_TSLC(caosVM *vm) {
 /**
  DBG: TSLC (integer)
  %status ok
- %variants all
+ %variants openc2e
  
  Returns the number of ticks left in the current script's remaining timeslice.
 */
@@ -371,7 +372,7 @@ void v_DBG_TSLC(caosVM *vm) {
 /**
 DBG: SIZO (string)
  %status ok
- %variants all
+ %variants openc2e
 
  Returns a human-readable profile of the sizes and allocation counts of
  various internal data structures

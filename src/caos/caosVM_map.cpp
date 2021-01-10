@@ -1217,8 +1217,8 @@ void v_ROOM_c1(caosVM *vm) {
 
 /**
  WRAP (variable) metaroom_id (integer)
- %status broken
- %variants all
+ %status done
+ %variants openc2e
 
  The world-wrapping flag for the specified metaroom. 1 to enable wrapping, 0 to disable.
 */

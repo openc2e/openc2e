@@ -225,6 +225,8 @@ for cmd in data:
     declarations.add(cmd["implementation"])
     if "saveimpl" in cmd:
         declarations.add(cmd["saveimpl"])
+    if "openc2e" in cmd["variants"]:
+        cmd["variants"] = ("c1", "c2", "c3", "cv", "sm")
 
 for d in sorted(declarations):
     print("void {}(caosVM*);".format(d))

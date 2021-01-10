@@ -60,7 +60,7 @@ void c_OUTX(caosVM *vm) {
 /**
  OUTS (command) val (string)
  %status maybe
- %variants all
+ %variants c3 cv sm openc2e
 
  Prints the given string to the output stream.  Does nothing when run inside a script.
 */
@@ -83,7 +83,7 @@ void c_OUTS(caosVM *vm) {
 /**
  OUTV (command) val (decimal)
  %status maybe
- %variants all
+ %variants c3 cv sm openc2e
 
  Prints the given decimal value to the ouput stream.  Does nothing when run inside a script.
 */
@@ -390,8 +390,8 @@ void v_TOKN(caosVM *vm) {
 
 /**
  OC2E DDIR (string)
- %status maybe
- %variants all
+ %status ok
+ %variants openc2e
 
  Returns a list of the data directories available, separated with \n. Remember that the last one is the working directory.
 */

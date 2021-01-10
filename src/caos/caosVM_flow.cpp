@@ -44,7 +44,7 @@ void c_DOIF(caosVM*) {
 
 /**
  ELIF (command) condition (condition)
- %variants all
+ %variants c3 cv sm openc2e
  %status maybe
  %stackdelta 0
  %cost c1,c2 0

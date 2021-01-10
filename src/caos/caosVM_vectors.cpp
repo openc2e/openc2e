@@ -26,7 +26,8 @@
 
 /**
  * VEC: MAKE (vector) x (float) y (float)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Creates and returns a vector with the given components.
  *
@@ -42,7 +43,8 @@
 
 /**
  * VEC: GETC (command) vec (vector) x (variable) y (variable)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Extracts the components of vector vec and places them in x and y.
  *
@@ -60,7 +62,8 @@
 
 /**
  * VEC: ANGL (float) vec (vector)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Find and return the angle from the X-axis of the given vector.
  * This is computed using atan(y/x) if X is nonzero, and a hard-coded
@@ -97,7 +100,8 @@ void v_VEC_ANGL(caosVM *vm) {
 
 /**
  * VEC: SUBV (command) vec1 (variable) vec2 (vector)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Subtracts vec2 from vec1 and stores the result in vec1.
  *
@@ -116,7 +120,8 @@ void v_VEC_ANGL(caosVM *vm) {
 
 /**
  * VEC: ADDV (command) vec1 (variable) vec2 (vector)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Adds vec1 to vec2 and stores the result in vec1.
  *
@@ -135,7 +140,8 @@ void v_VEC_ANGL(caosVM *vm) {
 
 /**
  * VEC: MULV (command) vec (variable) mag (decimal)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Multiplies the magnitude of the vector vec by mag, and stores the result
  * in vec.
@@ -154,7 +160,8 @@ void v_VEC_ANGL(caosVM *vm) {
 
 /**
  * VEC: UNIT (vector) angle (decimal)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Constructs and returns a unit vector with angle angle.
  *
@@ -169,7 +176,8 @@ void v_VEC_ANGL(caosVM *vm) {
 
 /**
  * VEC: NULL (vector)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Returns the nullary (0,0) vector.
  *
@@ -182,7 +190,8 @@ void v_VEC_ANGL(caosVM *vm) {
 
 /**
  * VEC: MAGN (float) vec (vector)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Returns the magnitude of the passed vector.
  *
@@ -196,7 +205,8 @@ void v_VEC_ANGL(caosVM *vm) {
 
 /**
  * VEC: SETV (command) dest (variable) src (vector)
- * %status maybe
+ * %status ok
+ * %variants openc2e
  *
  * Sets the variable passed in dest to the vector in src
  *

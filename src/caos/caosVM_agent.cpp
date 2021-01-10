@@ -1380,8 +1380,7 @@ void c_STPT(caosVM *vm) {
 /**
  DCOR (command) core_on (integer)
  %status done
-
- %variants all
+ %variants c3 cv sm openc2e
 
  Turns the display of the TARG agent's physical core on and off. Gives a general idea of 
  its size and location (including invisible agents).

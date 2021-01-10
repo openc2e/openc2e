@@ -151,7 +151,7 @@ void v_KEYD(caosVM *vm) {
 /**
  HOTS (agent)
  %status maybe
- %variants all
+ %variants c3 cv sm openc2e
 
  Returns the agent that is currently underneath the Hand.
  NB: this command is not a real c1/c2 command, backported for convenience
