@@ -177,11 +177,6 @@ for cat in catl:
         )
         if op.get("variants"):
             print("<li>Variants: {}</li>".format(" ".join(op.get("variants"))))
-        if op.get("pragma"):
-            print("<li>Pragmas:<ul>")
-            for pk in sorted(op["pragma"]):
-                print("<li>{} =&gt; {}</li>".format(pk, op["pragma"][pk]))
-            print("</ul></li>")
         print("</ul></div>")
         print("</div>")
     print("</div>")

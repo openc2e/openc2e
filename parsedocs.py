@@ -165,15 +165,6 @@ for filename in sys.argv[1:]:
 
             obj["implementation"] = find_implementation(obj["name"], lines[p:])
 
-            if any(d.startswith("%pragma") for d in directives):
-                obj["pragma"] = {}
-                for d in directives:
-                    if not d.startswith("%pragma"):
-                        continue
-                    obj["pragma"][d.replace("%pragma ", "").split(" ")[0]] = d.replace(
-                        "%pragma ", ""
-                    ).split(" ", 1)[1]
-
             if getdirective("status"):
                 obj["status"] = getdirective("status")
 
@@ -203,14 +194,8 @@ for filename in sys.argv[1:]:
 
             for d in directives:
                 d = d.replace("%", "").strip()
-                if d.split(" ")[0] not in ("pragma", "status", "cost", "stackdelta", "variants"):
+                if d.split(" ")[0] not in ("status", "cost", "stackdelta", "variants"):
                     raise Exception("Unknown directive: {}".format(d))
-                if d.startswith("pragma"):
-                    d = d.split(" ", 1)[1].strip()
-                    if d.split(" ")[0] not in (
-                    ):
-                        raise Exception("Unknown pragma: {}".format(d))
-
 
             objects.append(obj)
     except Exception as e:
