@@ -1030,7 +1030,7 @@ void SFCCompoundObject::copyToWorld() {
 	}
 
 	// make sure the zorder of the first part is 0..
-	unsigned int basezorder = INT_MAX; // TODO: unsigned or signed?
+	int basezorder = INT_MAX; // TODO: unsigned or signed?
 	for (unsigned int i = 0; i < parts.size(); i++) {
 		SFCEntity *e = parts[i];
 		if (!e) continue;

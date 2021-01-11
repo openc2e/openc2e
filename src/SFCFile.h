@@ -79,7 +79,7 @@ public:
 	uint8_t read8();
 	uint16_t read16();
 	uint32_t read32();
-	signed int reads32() { return (signed int)read32(); }
+	int32_t reads32() { return (int32_t)read32(); }
 	std::string readBytes(unsigned int n);
 	std::string readstring();
 
@@ -137,9 +137,9 @@ public:
 class CRoom : public SFCClass {
 public:
 	uint32_t id;
-	uint32_t left, top, right, bottom;
+	int32_t left, top, right, bottom;
 	std::vector<CDoor *> doors[4];
-	uint32_t roomtype;
+	int32_t roomtype;
 	uint8_t floorvalue;
 	uint8_t inorganicnutrients, organicnutrients, temperature, pressure, lightlevel, radiation;
 	signed char heatsource, pressuresource, lightsource, radiationsource;
@@ -173,7 +173,7 @@ public:
 	CGallery *sprite;
 
 	uint8_t currframe, imgoffset;
-	uint32_t zorder;
+	int32_t zorder;
 	uint32_t x, y;
 	bool haveanim;
 	uint8_t animframe;
@@ -215,7 +215,8 @@ public:
 	uint32_t variables[100];
 
 	uint8_t size, threat;
-	uint32_t range, accg, velx, vely, rest, aero;
+	uint32_t range, accg, rest, aero;
+	int32_t velx, vely;
 	uint32_t gravdata;
 
 	bool frozen;
