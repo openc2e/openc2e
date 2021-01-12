@@ -26,7 +26,6 @@ static void DrawAgentPreview(Texture& texture) {
 	ImDrawList* drawlist = ImGui::GetWindowDrawList();
 	ImVec2 p = ImGui::GetCursorScreenPos();
 	// should be approx 300 x 170. Alima.bmp is 312 x 211
-	ImGuiIO& io = ImGui::GetIO();
 	
 	ImRect bb(p, p + size);
 	drawlist->AddRectFilled(

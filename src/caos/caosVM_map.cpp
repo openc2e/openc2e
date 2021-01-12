@@ -576,6 +576,8 @@ void v_GRID(caosVM *vm) {
 
 	unsigned int dummy1; Line dummy2; Point point; std::shared_ptr<Room> room;
 	bool collided = world.map->collideLineWithRoomBoundaries(src, dest, ourRoom, room, point, dummy2, dummy1, vm->targ->perm);
+	// TODO: do something with collided?
+	(void)collided;
 
 	if (!room) vm->result.setInt(-1);
 	else vm->result.setInt(room->id);
@@ -1038,8 +1040,8 @@ void c_ROOM(caosVM *vm) {
 		std::shared_ptr<Room> r2(new Room(left, right, top, top, bottom, bottom));
 		r = r2;
 
-		MetaRoom *m = world.map->getMetaRoom(0);
-		unsigned int roomid = m->addRoom(r);
+		// MetaRoom *m = world.map->getMetaRoom(0);
+		// unsigned int roomid = m->addRoom(r);
 		//assert(roomid == (unsigned int)roomno); // TODO: this is fairly likely to fail, but is a major bug if it does, FIX ME!
 		r->id = roomno;
 	} else {
@@ -1080,8 +1082,6 @@ void c_ROOM_c2(caosVM *vm) {
 	std::shared_ptr<Room> r = world.map->getRoom(roomno);
 	if (!r) {
 		r = std::shared_ptr<Room>(new Room(left, right, top, top, bottom, bottom));
-		MetaRoom *m = world.map->getMetaRoom(0);
-		unsigned int roomid = m->addRoom(r);
 		r->id = roomno;
 	} else {
 		r->x_left = left;

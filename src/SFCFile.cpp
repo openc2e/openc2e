@@ -155,7 +155,7 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		return 0;
 	} else if (pid == 0xffff) {
 		// completely new class, read details
-		uint16_t schemaid = read16();
+		(void)read16(); // schemaid
 		uint16_t strlen = read16();
 		char *temp = new char[strlen];
 		ourStream->read(temp, strlen);
@@ -207,7 +207,6 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		sfccheck(temp);
 		return temp;
 	} else {
-		uint16_t oldpid = pid;
 		// create a new object of an existing class
 		pid ^= 0x8000;
 		pid -= 1;

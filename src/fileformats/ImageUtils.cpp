@@ -133,12 +133,9 @@ Image StitchBackground(const MultiImage &images) {
     newimage.palette = images[0].palette;
     newimage.data = shared_array<uint8_t>(totalwidth * totalheight * bytes_per_pixel);
 
-    unsigned int stride = totalwidth;
     for (unsigned int i = 0; i < heightinsprites; i++) {
         for (int j = 0; j < widthinsprites; j++) {
             const unsigned int whereweare = j * heightinsprites + i;
-            const int destx = (j * sprwidth);
-            const int desty = (i * sprheight);
             uint8_t* sprite = (uint8_t*) images[whereweare].data.data();
             for (int blocky = 0; blocky < sprheight; blocky++) {
                 uint8_t* start = &newimage.data[(i * sprheight + blocky) * totalwidth * bytes_per_pixel + j * sprwidth * bytes_per_pixel];

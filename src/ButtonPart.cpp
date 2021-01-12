@@ -9,7 +9,7 @@ ButtonPart::ButtonPart(Agent *p, unsigned int _id, std::string spritefile, unsig
 
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
 
-int ButtonPart::handleClick(float x, float y) {
+int ButtonPart::handleClick(float, float) {
 	return calculateScriptId(messageid);
 }
 

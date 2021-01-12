@@ -8,7 +8,6 @@ void lexcaos(std::vector<caostoken> &v, const char *p) {
 #define make_word(str) \
 	v.push_back(caostoken(caostoken::TOK_WORD, str, yylineno))
 	int yylineno = 1;
-	int tokidx   = 0;
 	const char *basep, *YYMARKER;
 std:
 	basep = p;

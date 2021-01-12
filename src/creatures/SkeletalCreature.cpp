@@ -139,15 +139,12 @@ void SkeletalCreature::processGenes() {
 	for (auto & gene : genome->genes) {
 		if (!creature->shouldProcessGene(gene.get())) continue;
 
-		if (typeid(*gene) == typeid(creatureAppearanceGene)) {
-			creatureAppearanceGene *x = (creatureAppearanceGene *)gene.get();
+		if (creatureAppearanceGene *x = dynamic_cast<creatureAppearanceGene*>(gene.get())) {
 			if (x->part > 5) continue;
 			appearancegenes[x->part] = x;
-		} else if (typeid(*gene) == typeid(creaturePoseGene)) {
-			creaturePoseGene *x = (creaturePoseGene *)gene.get();
+		} else if (creaturePoseGene *x = dynamic_cast<creaturePoseGene*>(gene.get())) {
 			posegenes[x->poseno] = x;
-		} else if (typeid(*gene) == typeid(creatureGaitGene)) {
-			creatureGaitGene *x = (creatureGaitGene *)gene.get();
+		} else if (creatureGaitGene *x = dynamic_cast<creatureGaitGene*>(gene.get())) {
 			gaitgenes[x->drive] = x;
 		}
 	}
@@ -329,7 +326,7 @@ void SkeletalCreature::recalculateSkeleton() {
 			partx[i] = 0; party[i] = 0;
 		} else {
 			attFile &bodyattinfo = att[0];
-			attFile &attinfo = att[i];
+			// attFile &attinfo = att[i];
 
 			int attachx = att[i].attachments[pose[i]][0];
 			int attachy = att[i].attachments[pose[i]][1];
@@ -712,7 +709,8 @@ void SkeletalCreature::gaitTick() {
 	gaiti++; if (gaiti > 7) gaiti = 0;
 }
 
-CompoundPart *SkeletalCreature::part(unsigned int id) {
+CompoundPart *SkeletalCreature::part(unsigned int part_id) {
+	caos_assert(part_id == 0);
 	return skeleton;
 }
 
@@ -765,8 +763,7 @@ std::string SkeletalCreature::getFaceSpriteName() {
 	for (auto & gene : creature->getGenome()->genes) {
 		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
-		if (typeid(*gene) == typeid(creatureAppearanceGene)) {
-			creatureAppearanceGene *x = (creatureAppearanceGene *)gene.get();
+		if (creatureAppearanceGene *x = dynamic_cast<creatureAppearanceGene*>(gene.get())) {
 			if (x->part == 0) {
 				return std::string("a") + dataString(0, creature->isFemale(), x->species, x->variant);
 			}
@@ -782,6 +779,7 @@ unsigned int SkeletalCreature::getFaceSpriteFrame() {
 
 int SkeletalCreature::handleClick(float clickx, float clicky) {
 	// TODO: muh, horror
+	(void)clickx;
 
 	clicky -= y;
 	if (clicky >= getSkelHeight() / 2.0) {

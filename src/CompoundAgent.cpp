@@ -66,6 +66,7 @@ CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsign
 				std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
 				Agent(_family, _genus, _species, plane) {
 	// TODO: we ignore image count acos it sucks
+	(void)imagecount;
 	CompoundPart *p = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
 	caos_assert(p);
 	addPart(p);

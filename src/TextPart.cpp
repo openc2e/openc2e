@@ -214,7 +214,7 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 	unsigned int textwidth = getWidth() - leftmargin - rightmargin;
 	unsigned int textheight = getHeight() - topmargin - bottommargin;
 
-	int currenty = 0, usedheight = 0;
+	int currenty = 0;
 	if (vert_align == bottom) {
 		currenty = textheight - pageheights[currpage];
 	} else if (vert_align == middle) {

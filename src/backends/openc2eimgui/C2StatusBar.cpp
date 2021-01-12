@@ -113,6 +113,7 @@ void DrawC2StatusBar() {
         ImGuiUtils::Image(s_temperature_icons_texs[tempiconid]);
       }
       unsigned int temp_celsius = ((temp * 80) / 255) - 15;
+      ImGui::Text("%u°", temp_celsius);
       // TODO: fahrenheit calculation + textual version of temperature
       // (0 = -15C = 5F, 48 = 0C = 32F, 255 = 65C = 149F)
     }

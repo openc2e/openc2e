@@ -393,8 +393,6 @@ void c_HIST_WIPE(caosVM *vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
-	monikerData &m = world.history->getMoniker(moniker);
-
 	// TODO
 }
 

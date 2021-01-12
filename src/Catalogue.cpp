@@ -62,17 +62,15 @@ char catalogue_descape(char c) {
 	return c;
 }
 
-static const char *tok_str[] = { "EOF", "word", "string", "integer" };
-
 std::string cat_str;
 int cat_int = -1;
 
 Catalogue *parsing_cat = NULL;
 
-void Catalogue::addVals(std::string &title, bool override, int count,
-		const std::list<std::string> &vals)
+void Catalogue::addVals(std::string &title, bool override, const std::list<std::string> &vals)
 {
 	// TODO: how the heck does override work? DS has an "Option Text" tag which has to overwrite the C3 one, so commenting this out for now..
+	(void)override;
 	/*if (data.find(title) != data.end() && !override)
 		return; // XXX: ?*/
 	data[title].clear();

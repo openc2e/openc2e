@@ -19,7 +19,7 @@
 
 #include "fileformats/blkImage.h"
 #include "endianlove.h"
-#include <cassert>
+#include "caos_assert.h"
 #include <iostream>
 
 Image ReadBlkFile(std::istream &in) {
@@ -33,26 +33,23 @@ Image ReadBlkFile(std::istream &in) {
 	uint16_t totalheight = height * 128;
 	
 	uint16_t numsprites = read16le(in);
-	assert(numsprites == (unsigned int) (width * height));
+	caos_assert(numsprites == (unsigned int) (width * height));
 
 	std::vector<uint32_t> offsets(numsprites);
 	for (unsigned int i = 0; i < numsprites; i++) {
 		offsets[i] = read32le(in) + 4;
-		uint16_t framewidth = read16le(in); assert(framewidth == 128);
-		uint16_t frameheight = read16le(in); assert(frameheight == 128);
+		uint16_t framewidth = read16le(in); caos_assert(framewidth == 128);
+		uint16_t frameheight = read16le(in); caos_assert(frameheight == 128);
 	}
 
 	shared_array<uint8_t> buffer(totalwidth * totalheight * 2);
 	const size_t sprheight = 128, sprwidth = 128;
 	const size_t heightinsprites = totalheight / sprheight;
 	const size_t widthinsprites = totalwidth / sprwidth;
-	const size_t stride = totalwidth * 2;
 
 	for (size_t i = 0; i < heightinsprites; i++) {
 		for (size_t j = 0; j < widthinsprites; j++) {
 			const unsigned int whereweare = j * heightinsprites + i;
-			const int destx = (j * sprwidth);
-			const int desty = (i * sprheight);
 			// TODO: don't seek, it's slow
 			in.seekg(offsets[whereweare]);
 			for (int blocky = 0; blocky < 128; blocky++) {

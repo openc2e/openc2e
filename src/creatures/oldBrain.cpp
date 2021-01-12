@@ -856,8 +856,7 @@ void oldBrain::processGenes() {
 	for (auto & gene : genome->genes) {
 		if (!parent->shouldProcessGene(gene.get())) continue;
 		
-		if (typeid(*gene) == typeid(oldBrainLobeGene)) {
-			oldBrainLobeGene *g = (oldBrainLobeGene *)gene.get();
+		if (oldBrainLobeGene *g = dynamic_cast<oldBrainLobeGene*>(gene.get())) {
 			oldLobe *l = new oldLobe(this, g);
 			lobes.push_back(l);
 		}

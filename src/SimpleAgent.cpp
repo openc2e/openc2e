@@ -17,12 +17,15 @@
  *
  */
 
+#include "caos_assert.h"
 #include "SimpleAgent.h"
 #include "DullPart.h"
 
 SimpleAgent::SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 			 std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
 	Agent(family, genus, species, plane) {
+	// TODO: imagecount
+	(void)imagecount;
 	dullpart = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
 }
 
@@ -36,7 +39,9 @@ void SimpleAgent::setZOrder(unsigned int plane) {
 	dullpart->addZOrder();
 }
 
-CompoundPart *SimpleAgent::part(unsigned int id) {
+CompoundPart *SimpleAgent::part(unsigned int part_id) {
+	// TODO: should we assert part_id == 0 ? makes Creatures 3's marine cave water.cos error
+	(void)part_id;
 	return dullpart;
 }
 

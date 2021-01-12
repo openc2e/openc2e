@@ -16,24 +16,20 @@
 namespace fs = ghc::filesystem;
 
 void caos1_format_visitor(CAOSNodePtr node, std::string& out) {
-    if (typeid(*node.get()) == typeid(CAOSCommandNode)) {
-        auto ccn = (CAOSCommandNode*)node.get();
+    if (CAOSCommandNode *ccn = dynamic_cast<CAOSCommandNode*>(node.get())) {
         out += ccn->name;
         for (auto a : ccn->args) {
             out += " ";
             caos1_format_visitor(a, out);
         }
-    } else if (typeid(*node.get()) == typeid(CAOSConditionNode)) {
-        auto ccn = (CAOSConditionNode*)node.get();
+    } else if (CAOSConditionNode *ccn = dynamic_cast<CAOSConditionNode*>(node.get())) {
         for (size_t i = 0; i < ccn->args.size(); ++i) {
             if (i > 0) out += " ";
             caos1_format_visitor(ccn->args[i], out);
         }
-    } else if (typeid(*node.get()) == typeid(CAOSLiteralValueNode)) {
-        auto clvn = (CAOSLiteralValueNode*)node.get();
+    } else if (CAOSLiteralValueNode *clvn = dynamic_cast<CAOSLiteralValueNode*>(node.get())) {
         out += fmt::format("{}", clvn->token.value);
-    } else if (typeid(*node.get()) == typeid(CAOSLiteralWordNode)) {
-        auto clwn = (CAOSLiteralWordNode*)node.get();
+    } else if (CAOSLiteralWordNode *clwn = dynamic_cast<CAOSLiteralWordNode*>(node.get())) {
         out += clwn->word;
     } else {
         abort();

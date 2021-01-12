@@ -20,6 +20,7 @@
 #include "fileformats/genomeFile.h"
 #include "historyManager.h"
 #include "World.h"
+#include "caos_assert.h"
 #include "caosValue.h"
 #include "Catalogue.h"
 #include "creatures/CreatureAgent.h"
@@ -61,9 +62,8 @@ void monikerData::init(std::string m, std::shared_ptr<genomeFile> f) {
 	genome = f;
 
 	for (auto & gene : f->genes) {
-		if (typeid(*gene) == typeid(creatureGenusGene)) {
+		if (creatureGenusGene *g = dynamic_cast<creatureGenusGene*>(gene.get())) {
 			// initialize genus
-			creatureGenusGene *g = (creatureGenusGene *)gene.get();
 			genus = g->genus + 1;
 			break;
 		}
@@ -102,14 +102,14 @@ void monikerData::moveToCreature(AgentRef a) {
 	moveToAgent(a);
 	
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
-	assert(c);
+	caos_assert(c);
 	status = creature;
 }
 
 void monikerData::wasBorn() {
-	assert(status == creature);
+	caos_assert(status == creature);
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
-	assert(c);
+	caos_assert(c);
 	
 	status = borncreature;
 	gender = (c->getCreature()->isFemale() ? 2 : 1);
@@ -118,7 +118,7 @@ void monikerData::wasBorn() {
 
 void monikerData::hasDied() {
 	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
-	assert(c);
+	caos_assert(c);
 	
 	// TODO
 
@@ -154,9 +154,8 @@ std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 	unsigned int genus = 0;
 	
 	for (auto & gene : genome->genes) {
-		if (typeid(*gene) == typeid(creatureGenusGene)) {
+		if (creatureGenusGene *g = dynamic_cast<creatureGenusGene*>(gene.get())) {
 			// initialize genus
-			creatureGenusGene *g = (creatureGenusGene *)gene.get();
 			genus = g->genus + 1;
 			break;
 		}

@@ -391,6 +391,7 @@ void c_NOHH(caosVM *vm) {
 	
 	Creature *c = vm->getTargCreature();
 	// TODO
+	(void)c;
 }
 
 /**
@@ -508,8 +509,7 @@ void v_CREA(caosVM *vm) {
 void c_VOCB(caosVM *vm) {
 	VM_VERIFY_SIZE(0)
 	
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	// TODO
 }
 
@@ -851,8 +851,7 @@ void c_APPR(caosVM *vm) {
 void c_UNCS(caosVM *vm) {
 	VM_PARAM_INTEGER(unconscious)
 
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	// TODO
 }
 
@@ -864,8 +863,7 @@ void c_UNCS(caosVM *vm) {
  Returns 1 if the target Creature is unconscious, or 0 otherwise.
 */
 void v_UNCS(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	vm->result.setInt(0); // TODO
 }
 
@@ -910,8 +908,7 @@ void v_FACE(caosVM *vm) {
 void c_LIKE(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(creature)
 
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	// TODO
 }
 
@@ -928,8 +925,7 @@ void v_LIMB(caosVM *vm) {
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(bodypart)
 	
-	Creature *c = vm->getTargCreature();
-	
+	vm->getTargCreature();
 	vm->result.setString(""); // TODO
 }
 
@@ -1044,7 +1040,7 @@ void v_CAGE(caosVM *vm) {
  or 1).
 */
 void v_BYIT(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
+	vm->getTargCreature();
 
 	if (vm->_it_ && agentsTouching(vm->targ, vm->_it_)) // TODO
 		vm->result.setInt(1);
@@ -1250,11 +1246,11 @@ void c_LTCY(caosVM *vm) {
  %status stub
 */
 void c_MATE(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
+	vm->getTargCreature();
 	caos_assert(vm->_it_);
 	CreatureAgent *t = dynamic_cast<CreatureAgent *>(vm->_it_.get());
 	caos_assert(t);
-	Creature *d = t->getCreature();
+	t->getCreature();
 
 	// TODO
 }
@@ -1265,7 +1261,7 @@ void c_MATE(caosVM *vm) {
  %variants c1 c2 cv c3
 */
 void v_DRV(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
+	vm->getTargCreature();
 	vm->result.setInt(0); // TODO
 }
 
@@ -1448,7 +1444,7 @@ void c_SOUL(caosVM *vm) {
 	VM_PARAM_INTEGER(part)
 	caos_assert(part >= 0 && part <= 8);
 
-	Creature *c = vm->getTargCreature();
+	vm->getTargCreature();
 	// TODO
 }
 	
@@ -1460,7 +1456,7 @@ void v_SOUL(caosVM *vm) {
 	VM_PARAM_INTEGER(part)
 	caos_assert(part >= 0 && part <= 8);
 		
-	Creature *c = vm->getTargCreature();
+	vm->getTargCreature();
 	vm->result.setInt(1); // TODO
 }
 
@@ -1509,8 +1505,7 @@ void v_ATTN_c1(caosVM *vm) {
  %variants c1 c2 cv c3
 */
 void c_TOUC(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	// TODO
 }
 
@@ -1521,7 +1516,7 @@ void c_TOUC(caosVM *vm) {
 void c_FORF(caosVM *vm) {
 	VM_PARAM_VALIDAGENT(creature)
 		
-	Creature *c = vm->getTargCreature();
+	vm->getTargCreature();
 	// TODO: do we handle pointer as well?
 	Creature *learn = dynamic_cast<Creature *>(creature.get());
 	if (!learn) return;
@@ -1536,7 +1531,6 @@ void c_FORF(caosVM *vm) {
 */
 void c_WALK(caosVM *vm) {
 	CreatureAgent *c = vm->getTargCreatureAgent();
-	
 	c->startWalking();
 }
 
@@ -1546,8 +1540,7 @@ void c_WALK(caosVM *vm) {
  %variants c1 c2 cv c3
 */
 void c_DONE(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	// TODO
 }
 
@@ -1557,8 +1550,7 @@ void c_DONE(caosVM *vm) {
  %variants c1 c2 cv c3
 */
 void c_SAYN(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	// TODO
 }
 
@@ -1599,8 +1591,7 @@ CAOS_LVALUE_TARG_SIMPLE(BABY, vm->targ->babymoniker) // TODO
  %variants c1 c2
 */
 void c_SNEZ(caosVM *vm) {
-	Creature *c = vm->getTargCreature();
-
+	vm->getTargCreature();
 	// TODO
 }
 

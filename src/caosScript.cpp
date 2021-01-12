@@ -156,8 +156,8 @@ evalVisit::evalVisit(caosScript *s, bool save_here_)
 
 
 void evalVisit::operator()(const CAOSCmd &cmd) const {
-	for (int i = 0; i < cmd.arguments.size(); i++) {
-		bool save_there = (i < cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE);
+	for (size_t i = 0; i < cmd.arguments.size(); i++) {
+		bool save_there = (i < (size_t)cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE);
 		cmd.arguments[i]->eval(scr, save_there);
 	}
 	scr->traceindex = cmd.traceidx - 1;
@@ -296,7 +296,7 @@ caostoken *caosScript::getToken(logicaltokentype expected) {
 	return t;
 }
 
-void caosScript::putBackToken(caostoken *t) {
+void caosScript::putBackToken(caostoken*) {
 	curindex--;
 	errindex = curindex - 1; // curindex refers to the /next/ token to be parsed
 							 // so make sure we refer to the token before it

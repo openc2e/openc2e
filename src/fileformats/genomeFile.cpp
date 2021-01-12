@@ -37,22 +37,22 @@ geneNote *genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
 
 void genomeFile::readNotes(std::istream &s) {
 	if (cversion == 3) {
-		uint16_t gnover = read16le(s);
+		(void)read16le(s); // gnover
 		uint16_t nosvnotes = read16le(s);
 		std::cout << "we have " << nosvnotes << " notes" << std::endl;
 
 		for (int i = 0; i < nosvnotes; i++) {
-			uint16_t type = read16le(s);
-			uint16_t subtype = read16le(s);
-			uint16_t which = read16le(s);
-			uint16_t rule = read16le(s);
+			(void)read16le(s); // type
+			(void)read16le(s); // subtype
+			(void)read16le(s); // which
+			(void)read16le(s); // rule
 
 			// TODO: we currently skip all the notes (note that there are 18 and then 1!)
 			for (int i = 0; i < 19; i++) {
 				uint16_t skip = read16le(s);
 				uint8_t *dummy = new uint8_t[skip]; s.read((char *)dummy, skip); delete[] dummy;
 			}
-			}
+		}
 
 		uint16_t ver = 0;
 
@@ -83,7 +83,7 @@ void genomeFile::readNotes(std::istream &s) {
 	}
 }
 
-void genomeFile::writeNotes(std::ostream &s) const {
+void genomeFile::writeNotes(std::ostream&) const {
 	// TODO
 }
 

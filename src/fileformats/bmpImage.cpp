@@ -69,10 +69,10 @@ Image ReadDibFile(std::istream &in) {
 
 	// and now for some stuff we really don't care about
 	uint32_t biSizeImage = read32le(in);
-	uint32_t biXPelsPerMeter = read32le(in);
-	uint32_t biYPelsPerMeter = read32le(in);
+	(void)read32le(in); // biXPelsPerMeter
+	(void)read32le(in); // biYPelsPerMeter
 	uint32_t biColorsUsed = read32le(in);
-	uint32_t biColorsImportant = read32le(in);
+	(void)read32le(in); // biColorsImportant
 
 	switch (biCompression) {
 		case BI_RGB:

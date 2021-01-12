@@ -50,16 +50,17 @@ bool caosValueCompare::operator()(const caosValue &v1, const caosValue &v2) cons
 		return v1.getType() < v2.getType();
 }
 
-Agent::Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p) :
-  vm(0), zorder(p), timerrate(0), attr(0), visible(true) {
+Agent::Agent(unsigned char family_, unsigned char genus_, unsigned short species_, unsigned int zorder_) :
+  timerrate(0), vm(0), attr(0), visible(true) {
 	initialized = false;
 	lifecount = 0;
 
-	setClassifier(f, g, s);
+	setClassifier(family_, genus_, species_);
 
 	lastScript = -1;
 
 	x = 0; y = 0; // note that c2e agents are moved in finishInit
+	zorder = zorder_;
 
 	has_custom_core_size = false;
 
@@ -185,7 +186,7 @@ void Agent::moveTo(float _x, float _y, bool force) {
 
 void Agent::floatTo(AgentRef a) {
 	std::vector<AgentRef>::iterator i = std::find(floated.begin(), floated.end(), a);
-	assert(i == floated.end()); // loops are bad, mmkay
+	caos_assert(i == floated.end()); // loops are bad, mmkay
 
 	if (floatable()) floatRelease();
 	floatingagent = a;
@@ -393,6 +394,9 @@ bool Agent::queueScript(unsigned short event, AgentRef from, caosValue p0, caosV
 int Agent::handleClick(float clickx, float clicky) {
 	// Handle a mouse click.
 	if (!activateable()) return -1;
+	// TODO: do something with clickx and clicky?
+	(void)clickx;
+	(void)clicky;
 
 	// old-style click handling (c1/c2)
 	if (engine.version < 3) {
@@ -1366,10 +1370,10 @@ std::pair<int, int> Agent::getCarriedPoint() {
 void Agent::adjustCarried(float unusedxoffset, float unusedyoffset) {
 	// Adjust the position of the agent we're carrying.
 	// TODO: this doesn't actually position the carried agent correctly, sigh
+	(void)unusedxoffset;
+	(void)unusedyoffset;
 
 	if (!carrying) return;
-
-	unsigned int ourpose = 0;
 
 	int xoffset = 0, yoffset = 0;
 	if (engine.version < 3 && world.hand() == this) {
@@ -1456,7 +1460,6 @@ void Agent::speak(std::string sentence) {
 	for (const auto& entry : syllables) {
 		// TODO: voice delay values are the same across games, even though C3/DS
 		// run more ticks per second! Are C3/DS voices really "faster"?
-		auto delay_ticks = entry.delay_ticks;
 		pending_voices.push_back(std::pair<std::string, unsigned int>(entry.name, entry.delay_ticks));
 	}
 }

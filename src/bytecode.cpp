@@ -50,7 +50,7 @@ std::string dumpOp(const Dialect *d, caosOp op) {
 		case CAOS_CMD:
 			return fmt::format("CMD {}", try_lookup(d, arg));
 		case CAOS_COND:
-			return fmt::format("COND {} {}", (arg & CAND ? "AND" : "OR"), cnams[arg & CMASK]);
+			return fmt::format("COND {} {}", (arg & CAND ? "AND" : "OR"), cnams[arg & CONDITIONMASK]);
 		case CAOS_CONST:
 			return fmt::format("CONST {}", arg);
 		case CAOS_CONSTINT:

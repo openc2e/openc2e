@@ -47,6 +47,7 @@ void Camera::goToMetaRoom(unsigned int m, int _x, int _y, cameratransition trans
 	metaroom = m;
 	moveTo(_x, _y);
 	// TODO: transition
+	(void)transition;
 	
 	checkBounds();
 }
@@ -57,6 +58,7 @@ void Camera::moveTo(int _x, int _y, panstyle pan) {
 	y = _y;
 
 	// TODO: panning
+	(void)pan;
 	
 	checkBounds();
 }
@@ -95,6 +97,11 @@ void MainCamera::delFloated(AgentRef a) {
 }
 
 void Camera::trackAgent(AgentRef a, int xp, int yp, trackstyle s, cameratransition transition) {
+	// TODO: xp and yp
+	(void)xp;
+	(void)yp;
+	// TODO: transition
+	(void)transition;
 	trackedagent = a;
 	trackingstyle = s;
 	updateTracking();

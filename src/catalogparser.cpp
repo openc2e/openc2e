@@ -1,5 +1,6 @@
 #include "catalogparser.h"
 #include "Catalogue.h"
+#include "caos_assert.h"
 
 CatalogueParserToken catalval;
 
@@ -52,6 +53,9 @@ int cataparse() {
             strings.push_back(catalval.string);
             token = Catalogue::catalex();
         }
-        parsing_cat->addVals(first_string, override, count, strings);
+        if (count != -1) {
+            caos_assert((size_t)count == strings.size());
+        }
+        parsing_cat->addVals(first_string, override, strings);
     }
 }

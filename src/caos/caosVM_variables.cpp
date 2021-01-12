@@ -185,8 +185,8 @@ void v_TYPE(caosVM *vm) {
 	else if (value.hasString())
 		vm->result.setInt(2);
 	else if (value.hasAgent()) {
-		std::shared_ptr<Agent> a = value.getAgent();
-		if (a == 0)
+		Agent* a = value.getAgent().get();
+		if (a == nullptr)
 			vm->result.setInt(-1);
 		else if (typeid(*a) == typeid(SimpleAgent))
 			vm->result.setInt(3);
@@ -197,7 +197,7 @@ void v_TYPE(caosVM *vm) {
 		else if (typeid(*a) == typeid(Vehicle))
 			vm->result.setInt(6);
 		else {
-			CreatureAgent *c = dynamic_cast<CreatureAgent *>(a.get());
+			CreatureAgent *c = dynamic_cast<CreatureAgent *>(a);
 			if (c)
 				vm->result.setInt(7);
 			else

@@ -70,7 +70,7 @@ if(WIN32)
 	add_compile_definitions("NOMINMAX")
 endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
-	add_compile_options(-Wextra -Wall -Wno-conversion -Wno-unused)
+	add_compile_options(-Wextra -Wall -Wno-conversion)
 endif()
 set(CMAKE_CXX_STANDARD 14)
 

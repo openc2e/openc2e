@@ -38,6 +38,7 @@ bool agentOnCamera(Agent *targ, bool checkall) {
 	if (!m || m != engine.camera->getMetaRoom()) return false;
 
 	// TODO: check non-main cameras?
+	(void)checkall;
 	// TODO: do compound parts stick out of the agent?
 
 	// y coordinates don't wrap

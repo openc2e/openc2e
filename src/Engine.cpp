@@ -720,7 +720,6 @@ static void opt_version() {
 
 bool Engine::parseCommandLine(int argc, char *argv[]) {
 	// variables for command-line flags
-	int optret;
 	std::vector<std::string> data_vec;
 
 	// generate help for backend options

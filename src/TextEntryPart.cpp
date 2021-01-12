@@ -29,7 +29,8 @@ void TextEntryPart::setText(std::string t) {
 
 unsigned int calculateScriptId(unsigned int message_id); // from caosVM_agent.cpp, TODO: move into shared file
 
-int TextEntryPart::handleClick(float clickx, float clicky) {
+int TextEntryPart::handleClick(float, float) {
+	// TODO: do something with click coordinates?
 	world.setFocus(this);
 
 	return -1; // TODO: this shouldn't be passed onto the parent agent?

@@ -65,11 +65,11 @@ void CompoundPart::loseFocus() {
 	throw creaturesException("impossible loseFocus() call");
 }
 
-void CompoundPart::handleTranslatedChar(unsigned char c) {
+void CompoundPart::handleTranslatedChar(unsigned char) {
 	throw creaturesException("impossible handleTranslatedChar() call");
 }
 
-void CompoundPart::handleRawKey(uint8_t c) {
+void CompoundPart::handleRawKey(uint8_t) {
 	throw creaturesException("impossible handleRawKey() call");
 }
 

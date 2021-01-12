@@ -161,7 +161,7 @@ std::string dumpOp(const class Dialect *d, caosOp op);
 #define CBF 16
 #define CAND 32
 #define COR  0
-#define CMASK (CEQ | CLT | CGT | CBT | CBF)
+#define CONDITIONMASK (CEQ | CLT | CGT | CBT | CBF)
 #define CLE (CEQ | CLT)
 #define CGE (CEQ | CGT)
 #define CNE (CLT | CGT)

@@ -365,7 +365,7 @@ void Creature::chooseAgents() {
 
 AgentRef oldCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) {
 	// TODO: proper selection method
-
+	(void)type;
 	if (possibles.size() > 0)
 		return possibles[rand() % possibles.size()];
 	else
@@ -374,7 +374,7 @@ AgentRef oldCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> 
 
 AgentRef c2eCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> possibles) {
 	// TODO: proper selection method
-
+	(void)type;
 	if (possibles.size() > 0)
 		return possibles[rand() % possibles.size()];
 	else
@@ -393,6 +393,7 @@ int c2eCreature::reverseMapVerbToNeuron(unsigned int verb) {
 
 void oldCreature::handleStimulus(unsigned int id) {
 	// TODO
+	(void)id;
 }
 
 void c2eCreature::handleStimulus(c2eStim &stim) {
@@ -438,8 +439,7 @@ void c2eCreature::handleStimulus(unsigned int id, float strength) {
 	
 	// TODO: generate the damn c2eStims in addGene, thus zapping a whole bunch of bugs
 	for (auto & gene : genome->genes) {
-		if (typeid(*gene) == typeid(creatureStimulusGene)) {
-			creatureStimulusGene *x = (creatureStimulusGene *)gene.get();
+		if (creatureStimulusGene *x = dynamic_cast<creatureStimulusGene*>(gene.get())) {
 			if (x->stim == id) {
 				g = x;
 				break;

@@ -18,6 +18,7 @@
  *
  */
 #include "physics.h"
+#include "caos_assert.h"
 #include <cassert>
 #include <fmt/core.h>
 
@@ -138,8 +139,8 @@ void Line::sanity_check() const {
 	if (type == NORMAL) {
 		double xp = pointAtY(yIntercept()).x;
 		double yp = pointAtX(xIntercept()).y;
-		assert(fabs(xp) < 1);
-		assert(fabs(yp) < 1);
+		caos_assert(fabs(xp) < 1);
+		caos_assert(fabs(yp) < 1);
 	}
 }
 
