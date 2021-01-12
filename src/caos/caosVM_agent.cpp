@@ -91,17 +91,16 @@ void c_RTAR(caosVM *vm) {
 
 	/* XXX: maybe use a map of classifier -> agents? */
 	std::vector<std::shared_ptr<Agent> > temp;
-	for (std::list<std::shared_ptr<Agent> >::iterator i
-		= world.agents.begin(); i != world.agents.end(); i++) {
+	for (auto & agent : world.agents) {
 		
-		Agent *a = i->get();
+		Agent *a = agent.get();
 		if (!a) continue;
 		
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;
 
-		temp.push_back(*i);
+		temp.push_back(agent);
 	}
 
 	if (temp.size() == 0) return;
@@ -128,10 +127,9 @@ void c_TTAR(caosVM *vm) {
 
 	/* XXX: maybe use a map of classifier -> agents? */
 	std::vector<std::shared_ptr<Agent> > temp;
-	for (std::list<std::shared_ptr<Agent> >::iterator i
-		= world.agents.begin(); i != world.agents.end(); i++) {
+	for (auto & agent : world.agents) {
 		
-		Agent *a = i->get();
+		Agent *a = agent.get();
 		if (!a) continue;
 		
 		if (species && species != a->species) continue;
@@ -139,7 +137,7 @@ void c_TTAR(caosVM *vm) {
 		if (family && family != a->family) continue;
 
 		if (agentsTouching(vm->owner, a))
-			temp.push_back(*i);
+			temp.push_back(agent);
 	}
 
 	if (temp.size() == 0) return;
@@ -599,17 +597,17 @@ void c_ANIM_c2(caosVM *vm) {
 
 	p->animation.clear();
 
-	for (unsigned int i = 0; i < animstring.size(); i++) {
-		if (animstring[i] == 'R') {
+	for (char i : animstring) {
+		if (i == 'R') {
 			p->animation.push_back(255);
-		} else if (animstring[i] >= 48 && animstring[i] <= 57) {
-			p->animation.push_back(animstring[i] - 48);
-		} else if (animstring[i] >= 97 && animstring[i] <= 122) {
+		} else if (i >= 48 && i <= 57) {
+			p->animation.push_back(i - 48);
+		} else if (i >= 97 && i <= 122) {
 			// TODO: c1 grendel eggs have 'a' at the end of their animation strings, this is an untested attempt to handle that
-			p->animation.push_back(animstring[i] - 97);
+			p->animation.push_back(i - 97);
 		} else {
 			p->animation.clear();
-			throw creaturesException(std::string("old-style animation string contained '") + animstring[i] + "', which we didn't understand");
+			throw creaturesException(std::string("old-style animation string contained '") + i + "', which we didn't understand");
 		}
 	}
 
@@ -629,8 +627,8 @@ void c_ANMS(caosVM *vm) {
 	bytestring_t animation;
 
 	std::string t;
-	for (unsigned int i = 0; i < poselist.size(); i++) {
-		if (poselist[i] == ' ') {
+	for (char i : poselist) {
+		if (i == ' ') {
 			if (!t.empty()) {
 				int n = atoi(t.c_str());
 				caos_assert(n >= 0 && n < 256);
@@ -638,7 +636,7 @@ void c_ANMS(caosVM *vm) {
 				t.clear();
 			}
 		} else
-			t = t + poselist[i];
+			t = t + i;
 	}
 
 	AnimatablePart *p = vm->getCurrentAnimatablePart();
@@ -898,11 +896,11 @@ void v_TOTL(caosVM *vm) {
 	VM_PARAM_INTEGER(family) caos_assert(family >= 0); caos_assert(family <= 255);
 
 	unsigned int x = 0;
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		if (!*i) continue;
-		if ((*i)->family == family || family == 0)
-			if ((*i)->genus == genus || genus == 0)
-				if ((*i)->species == species || species == 0)
+	for (auto & agent : world.agents) {
+		if (!agent) continue;
+		if (agent->family == family || family == 0)
+			if (agent->genus == genus || genus == 0)
+				if (agent->species == species || species == 0)
 					x++;
 	}
 	vm->result.setInt(x);
@@ -1463,9 +1461,9 @@ void c_ALPH(caosVM *vm) {
 
 	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
 	if (c && vm->part == -1) {
-		for (std::vector<CompoundPart *>::iterator i = c->parts.begin(); i != c->parts.end(); i++) {
-			(*i)->has_alpha = enable;
-			(*i)->alpha = alpha_value;
+		for (auto & part : c->parts) {
+			part->has_alpha = enable;
+			part->alpha = alpha_value;
 		}
 	} else {
 		CompoundPart *p = vm->targ->part(vm->part);

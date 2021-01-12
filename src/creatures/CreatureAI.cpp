@@ -256,8 +256,8 @@ bool c2eCreature::processInstinct() {
 	// *** reset brain
 	
 	// TODO: is this a sensible place to wipe the lobes?
-	for (std::map<std::string, c2eLobe *>::iterator i = brain->lobes.begin(); i != brain->lobes.end(); i++)
-		i->second->wipe();
+	for (auto & lobe : brain->lobes)
+		lobe.second->wipe();
 
 	// TODO: non-hardcode 212/213? they seem to be in "Brain Parameters" catalogue tag
 	// TODO: won't learning be sort of ruined by the repeated application of pre-REM?
@@ -305,8 +305,8 @@ bool c2eCreature::processInstinct() {
 
 	// wipe the lobes again, to stop any issues with neurons being set which shouldn't be at the end of an instinct run
 	// TODO: is wiping the lobes here truly what we should do?
-	for (std::map<std::string, c2eLobe *>::iterator i = brain->lobes.begin(); i != brain->lobes.end(); i++)
-		i->second->wipe();
+	for (auto & lobe : brain->lobes)
+		lobe.second->wipe();
 
 	//std::cout << "*** instinct done" << std::endl;
 	//std::cout << std::endl;
@@ -341,9 +341,8 @@ void Creature::chooseAgents() {
 
 	std::vector<std::vector<AgentRef> > possibles(chosenagents.size());
 
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		std::shared_ptr<Agent> a = *i;
-		if (!a) continue;
+	for (auto a : world.agents) {
+			if (!a) continue;
 
 		// if agent category is -1 or outside of our #categories, continue
 		if (a->category < 0) continue;
@@ -438,9 +437,9 @@ void c2eCreature::handleStimulus(unsigned int id, float strength) {
 	creatureStimulusGene *g = 0;
 	
 	// TODO: generate the damn c2eStims in addGene, thus zapping a whole bunch of bugs
-	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creatureStimulusGene)) {
-			creatureStimulusGene *x = (creatureStimulusGene *)i->get();
+	for (auto & gene : genome->genes) {
+		if (typeid(*gene) == typeid(creatureStimulusGene)) {
+			creatureStimulusGene *x = (creatureStimulusGene *)gene.get();
 			if (x->stim == id) {
 				g = x;
 				break;

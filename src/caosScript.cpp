@@ -57,9 +57,9 @@ void script::link() {
 			p = relocations[-p];
 		relocations[i] = p;
 	}
-	for (unsigned int i = 0; i < ops.size(); i++) {
-		if (op_is_relocatable(ops[i].opcode) && ops[i].argument < 0)
-			ops[i].argument = relocations[-ops[i].argument];
+	for (auto & op : ops) {
+		if (op_is_relocatable(op.opcode) && op.argument < 0)
+			op.argument = relocations[-op.argument];
 	}
 	linked = true;
 //	std::cout << "Post-link:" << std::endl << dump();
@@ -209,8 +209,8 @@ void caosScript::emitConst(const caosValue &v) {
 
 int costVisit::operator()(const CAOSCmd &cmd) const {
 	int accum = cmd.op->evalcost;
-	for (size_t i = 0; i < cmd.arguments.size(); i++)
-		accum += cmd.arguments[i]->cost();
+	for (const auto & argument : cmd.arguments)
+		accum += argument->cost();
 	return accum;
 }
 
@@ -659,11 +659,11 @@ void caosScript::parseloop(int state, void *info) {
 			assert(!enumdepth);
 			state = ST_BODY;
 			int bits[4];
-			for (int i = 0; i < 4; i++) {
+			for (int & bit : bits) {
 				caosValue val = asConst(*getToken(TOK_CONST));
 				if (val.getType() != CAOSINT)
 					throw parseException("Expected integer constant");
-				bits[i] = val.getInt();
+				bit = val.getInt();
 			}
 			int fmly = bits[0];
 			int gnus = bits[1];

@@ -76,9 +76,9 @@ void MainCamera::moveTo(int _x, int _y, panstyle pan) {
 	int yoffset = _y - y;
 	Camera::moveTo(_x, _y, pan);
 
-	for (std::vector<AgentRef>::iterator i = floated.begin(); i != floated.end(); i++) {
+	for (auto & i : floated) {
 		assert(*i);
-		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
+		i->moveTo(i->x + xoffset, i->y + yoffset);
 	}
 }
 

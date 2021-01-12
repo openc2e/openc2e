@@ -77,7 +77,7 @@ Engine::Engine() {
 	}
 
 	tickdata = 0;
-	for (unsigned int i = 0; i < 10; i++) ticktimes[i] = 0;
+	for (unsigned int & ticktime : ticktimes) ticktime = 0;
 	ticktimeptr = 0;
 	version = 0; // TODO: something something
 	
@@ -133,11 +133,11 @@ static std::vector<std::string> read_wordlist(peFile* exefile, uint32_t lang) {
 	std::string wordlistdata = strings[5];
 
 	std::string s;
-	for (unsigned int i = 0; i < wordlistdata.size(); i++) {
-		if (wordlistdata[i] == '|') {
+	for (char i : wordlistdata) {
+		if (i == '|') {
 			wordlist.push_back(s);
 			s.clear();
-		} else s += wordlistdata[i];
+		} else s += i;
 	}
 
 	return wordlist;
@@ -336,7 +336,7 @@ void Engine::update() {
 	ticktimeptr++;
 	if (ticktimeptr == 10) ticktimeptr = 0;
 	float avgtime = 0;
-	for (unsigned int i = 0; i < 10; i++) avgtime += ((float)ticktimes[i] / world.ticktime);
+	for (unsigned int ticktime : ticktimes) avgtime += ((float)ticktime / world.ticktime);
 	world.pace = avgtime / 10;
 		
 	world.race = backend->ticks() - lasttimestamp;
@@ -505,10 +505,10 @@ void Engine::handleMouseMove(BackendEvent &event) {
 
 void Engine::handleMouseButton(BackendEvent &event) {
 	// notify agents
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		if (!*i) continue;
-		if ((event.type == eventmousebuttonup && (*i)->imsk_mouse_up) ||
-			(event.type == eventmousebuttondown && (*i)->imsk_mouse_down)) {
+	for (auto & agent : world.agents) {
+		if (!agent) continue;
+		if ((event.type == eventmousebuttonup && agent->imsk_mouse_up) ||
+			(event.type == eventmousebuttondown && agent->imsk_mouse_down)) {
 			// set the button value as necessary
 			caosValue button;
 			switch (event.button) { // Backend guarantees that only one button will be set on a mousebuttondown event.
@@ -523,21 +523,21 @@ void Engine::handleMouseButton(BackendEvent &event) {
 			// if it was a mouse button we're interested in, then fire the relevant raw event
 			if (button.getInt() != 0) {
 				if (event.type == eventmousebuttonup)
-					(*i)->queueScript(77, 0, button); // Raw Mouse Up
+					agent->queueScript(77, 0, button); // Raw Mouse Up
 				else
-					(*i)->queueScript(76, 0, button); // Raw Mouse Down
+					agent->queueScript(76, 0, button); // Raw Mouse Down
 			}
 		}
 		if ((event.type == eventmousebuttondown &&
 			(event.button == buttonwheelup || event.button == buttonwheeldown) &&
-			(*i)->imsk_mouse_wheel)) {
+			agent->imsk_mouse_wheel)) {
 			// fire the mouse wheel event with the relevant delta value
 			caosValue delta;
 			if (event.button == buttonwheeldown)
 				delta.setInt(-120);
 			else
 				delta.setInt(120);
-			(*i)->queueScript(78, 0, delta); // Raw Mouse Wheel
+			agent->queueScript(78, 0, delta); // Raw Mouse Wheel
 		}
 	}
 
@@ -577,10 +577,10 @@ void Engine::handleTextInput(BackendEvent &event) {
 	// notify agents
 	caosValue k;
 	k.setInt(translated_char);
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		if (!*i) continue;
-		if ((*i)->imsk_translated_char)
-			(*i)->queueScript(79, 0, k); // translated char script
+	for (auto & agent : world.agents) {
+		if (!agent) continue;
+		if (agent->imsk_translated_char)
+			agent->queueScript(79, 0, k); // translated char script
 	}
 }
 
@@ -673,10 +673,10 @@ void Engine::handleRawKeyDown(BackendEvent &event) {
 	// notify agents
 	caosValue k;
 	k.setInt(event.key);
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		if (!*i) continue;
-		if ((*i)->imsk_key_down)
-			(*i)->queueScript(73, 0, k); // key down script
+	for (auto & agent : world.agents) {
+		if (!agent) continue;
+		if (agent->imsk_key_down)
+			agent->queueScript(73, 0, k); // key down script
 	}
 
 	// certain raw keys get passed as translated chars, too, after the raw key event
@@ -725,16 +725,16 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 
 	// generate help for backend options
 	std::string available_backends;
-	for (std::map<std::string, std::shared_ptr<Backend> >::iterator i = possible_backends.begin(); i != possible_backends.end(); i++) {
-		if (available_backends.empty()) available_backends = i->first;
-		else available_backends += ", " + i->first;
+	for (auto & possible_backend : possible_backends) {
+		if (available_backends.empty()) available_backends = possible_backend.first;
+		else available_backends += ", " + possible_backend.first;
 	}
 	available_backends = "Select the backend (options: " + available_backends + "); default is " + preferred_backend;
 	
 	std::string available_audiobackends;
-	for (std::map<std::string, std::shared_ptr<AudioBackend> >::iterator i = possible_audiobackends.begin(); i != possible_audiobackends.end(); i++) {
-		if (available_audiobackends.empty()) available_audiobackends = i->first;
-		else available_audiobackends += ", " + i->first;
+	for (auto & possible_audiobackend : possible_audiobackends) {
+		if (available_audiobackends.empty()) available_audiobackends = possible_audiobackend.first;
+		else available_audiobackends += ", " + possible_audiobackend.first;
 	}
 	available_audiobackends = "Select the audio backend (options: " + available_audiobackends + "); default is " + preferred_audiobackend;
 	
@@ -835,10 +835,10 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 	}
 
 	// add all the data directories to the list
-	for (std::vector<std::string>::iterator i = data_vec.begin(); i != data_vec.end(); i++) {
-		fs::path datadir(*i);
+	for (auto & i : data_vec) {
+		fs::path datadir(i);
 		if (!fs::exists(datadir)) {
-			throw creaturesException("data path '" + *i + "' doesn't exist");
+			throw creaturesException("data path '" + i + "' doesn't exist");
 		}
 		world.data_directories.push_back(datadir);
 	}
@@ -846,9 +846,9 @@ bool Engine::parseCommandLine(int argc, char *argv[]) {
 	// make a vague attempt at blacklisting some characters inside the gamename
 	// (it's used in directory names, registry keys, etc)
 	std::string invalidchars = "\\/:*?\"<>|";
-	for (unsigned int i = 0; i < invalidchars.size(); i++) {
-		if (gamename.find(invalidchars[i]) != gamename.npos)
-			throw creaturesException(std::string("The character ") + invalidchars[i] + " is not valid in a gamename.");
+	for (char invalidchar : invalidchars) {
+		if (gamename.find(invalidchar) != gamename.npos)
+			throw creaturesException(std::string("The character ") + invalidchar + " is not valid in a gamename.");
 	}
 
 	return true;
@@ -995,13 +995,13 @@ bool Engine::initialSetup() {
 		if (engine.version < 3 && cmdline_bootstrap.size() != 1)
 			throw creaturesException("multiple bootstrap files provided in C1/C2 mode");
 		
-		for (std::vector< std::string >::iterator bsi = cmdline_bootstrap.begin(); bsi != cmdline_bootstrap.end(); bsi++) {
-			fs::path scriptdir(*bsi);
+		for (auto & bsi : cmdline_bootstrap) {
+			fs::path scriptdir(bsi);
 			if (engine.version > 2 || scriptdir.extension().string() == ".cos") {
 				// pass it to the world to execute (it handles both files and directories)
 
 				if (!fs::exists(scriptdir)) {
-					std::cerr << "Warning: Couldn't find a specified script directory (trying " << *bsi << ")!\n";
+					std::cerr << "Warning: Couldn't find a specified script directory (trying " << bsi << ")!\n";
 					continue;
 				}
 

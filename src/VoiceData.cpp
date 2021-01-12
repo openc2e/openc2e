@@ -61,8 +61,8 @@ VoiceData::VoiceData(std::string tagname) {
 	std::string languagetag = tagdata[0];
 	if (!catalogue.hasTag(languagetag)) return;
 	const std::vector<std::string> &lookupdata = catalogue.getTag(languagetag);
-	for (unsigned int i = 0; i < lookupdata.size(); i++) {
-		uint32_t data = strtoul(lookupdata[i].c_str(), NULL, 16);
+	for (const auto & i : lookupdata) {
+		uint32_t data = strtoul(i.c_str(), NULL, 16);
 		lookup_table.push_back(data);
 	}
 	if (lookup_table.size() != 3 * 27) throw creaturesException(

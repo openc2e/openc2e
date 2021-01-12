@@ -54,8 +54,8 @@ Creature::Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char 
 
 	attn = decn = -1;
 
-	for (unsigned int i = 0; i < 5; i++)
-		tintinfo[i] = 128;
+	for (unsigned short & i : tintinfo)
+		i = 128;
 }
 
 Creature::~Creature() {
@@ -84,8 +84,8 @@ bool Creature::shouldProcessGene(gene *g) {
 }
 
 void Creature::processGenes() {
-	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if (shouldProcessGene(i->get())) addGene(i->get());
+	for (auto & gene : genome->genes) {
+		if (shouldProcessGene(gene.get())) addGene(gene.get());
 	}
 }
 
@@ -97,8 +97,8 @@ void oldCreature::processGenes() {
 void c2Creature::processGenes() {
 	oldCreature::processGenes();
 
-	for (std::vector<std::shared_ptr<c2Organ> >::iterator x = organs.begin(); x != organs.end(); x++) {
-		(*x)->processGenes();
+	for (auto & organ : organs) {
+		organ->processGenes();
 	}
 }
 
@@ -108,8 +108,8 @@ void c2eCreature::processGenes() {
 
 	brain->processGenes();
 	Creature::processGenes();
-	for (std::vector<std::shared_ptr<c2eOrgan> >::iterator x = organs.begin(); x != organs.end(); x++) {
-		(*x)->processGenes();
+	for (auto & organ : organs) {
+		organ->processGenes();
 	}
 }
 
@@ -205,12 +205,12 @@ oldCreature::oldCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned
 	biochemticks = 0;
 	halflives = 0;
 	
-	for (unsigned int i = 0; i < 8; i++) floatingloci[i] = 0;
-	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0;
-	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0;
-	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0;
+	for (unsigned char & i : floatingloci) i = 0;
+	for (unsigned char & i : lifestageloci) i = 0;
+	for (unsigned char & i : involaction) i = 0;
+	for (unsigned char & chemical : chemicals) chemical = 0;
 	
-	for (unsigned int i = 0; i < 8; i++) involactionlatency[i] = 0;
+	for (unsigned int & i : involactionlatency) i = 0;
 	
 	muscleenergy = 0;
 	fertile = pregnant = receptive = 0;
@@ -222,9 +222,9 @@ oldCreature::oldCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned
 c1Creature::c1Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 1);
 
-	for (unsigned int i = 0; i < 6; i++) senses[i] = 0;
-	for (unsigned int i = 0; i < 8; i++) gaitloci[i] = 0;
-	for (unsigned int i = 0; i < 16; i++) drives[i] = 0;
+	for (unsigned char & sense : senses) sense = 0;
+	for (unsigned char & i : gaitloci) i = 0;
+	for (unsigned char & drive : drives) drive = 0;
 	
 	// TODO: chosenagents size
 
@@ -236,9 +236,9 @@ c1Creature::c1Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned c
 c2Creature::c2Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 2);
 
-	for (unsigned int i = 0; i < 14; i++) senses[i] = 0;
-	for (unsigned int i = 0; i < 16; i++) gaitloci[i] = 0;
-	for (unsigned int i = 0; i < 17; i++) drives[i] = 0;
+	for (unsigned char & sense : senses) sense = 0;
+	for (unsigned char & i : gaitloci) i = 0;
+	for (unsigned char & drive : drives) drive = 0;
 
 	mutationchance = 0; mutationdegree = 0;
 
@@ -252,28 +252,28 @@ c2Creature::c2Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned c
 c2eCreature::c2eCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : Creature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 3);
 
-	for (unsigned int i = 0; i < 256; i++) chemicals[i] = 0.0f;
+	for (float & chemical : chemicals) chemical = 0.0f;
 
 	// initialise loci
-	for (unsigned int i = 0; i < 7; i++) lifestageloci[i] = 0.0f;
+	for (float & i : lifestageloci) i = 0.0f;
 	muscleenergy = 0.0f;
-	for (unsigned int i = 0; i < 32; i++) floatingloci[i] = 0.0f;
+	for (float & i : floatingloci) i = 0.0f;
 	fertile = pregnant = ovulate = receptive = chanceofmutation = degreeofmutation = 0.0f;
 	dead = 0.0f;
-	for (unsigned int i = 0; i < 8; i++) involaction[i] = 0.0f;
-	for (unsigned int i = 0; i < 16; i++) gaitloci[i] = 0.0f;
-	for (unsigned int i = 0; i < 14; i++) senses[i] = 0.0f;
-	for (unsigned int i = 0; i < 20; i++) drives[i] = 0.0f;
+	for (float & i : involaction) i = 0.0f;
+	for (float & i : gaitloci) i = 0.0f;
+	for (float & sense : senses) sense = 0.0f;
+	for (float & drive : drives) drive = 0.0f;
 
-	for (unsigned int i = 0; i < 8; i++) involactionlatency[i] = 0;
+	for (unsigned int & i : involactionlatency) i = 0;
 
 	halflives = 0;
 
 	if (!catalogue.hasTag("Action Script To Neuron Mappings"))
 		throw creaturesException("c2eCreature was unable to read the 'Action Script To Neuron Mappings' catalogue tag");
 	const std::vector<std::string> &mappinginfotag = catalogue.getTag("Action Script To Neuron Mappings");
-	for (std::vector<std::string>::const_iterator i = mappinginfotag.begin(); i != mappinginfotag.end(); i++)
-		mappinginfo.push_back(atoi(i->c_str()));
+	for (const auto & i : mappinginfotag)
+		mappinginfo.push_back(atoi(i.c_str()));
 
 	// TODO: should we really hard-code this?
 	chosenagents.resize(40);

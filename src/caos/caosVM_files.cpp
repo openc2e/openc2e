@@ -96,8 +96,8 @@ void c_FILE_GLOB(caosVM *vm) {
 	std::vector<std::string> possiblefiles = world.findFiles(dirportion, specportion);
 
 	std::string str = fmt::format("{}\n", possiblefiles.size());
-	for (std::vector<std::string>::iterator i = possiblefiles.begin(); i != possiblefiles.end(); i++) {
-		str += *i + "\n";
+	for (auto & possiblefile : possiblefiles) {
+		str += possiblefile + "\n";
 	}
 
 	vm->inputstream = new std::istringstream(str);

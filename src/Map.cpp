@@ -26,8 +26,8 @@
 #include "Engine.h"
 
 void Map::Reset() {
-	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
-		delete *i;
+	for (auto & metaroom : metarooms) {
+		delete metaroom;
 	}
 	metarooms.clear();
 	// todo: metarooms should be responsible for deleting rooms, so use the following instead of clear:
@@ -51,16 +51,16 @@ int Map::addMetaRoom(MetaRoom *m) {
 }
 
 MetaRoom *Map::getMetaRoom(unsigned int room) {
-	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++)
-		if ((*i)->id == room)
-			return *i;
+	for (auto & metaroom : metarooms)
+		if (metaroom->id == room)
+			return metaroom;
 	return 0;
 }
 
 std::shared_ptr<Room> Map::getRoom(unsigned int r) {
-	for (std::vector<std::shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++)
-		if ((*i)->id == r)
-			return *i;
+	for (auto & room : rooms)
+		if (room->id == r)
+			return room;
 	return std::shared_ptr<Room>();
 }
 
@@ -76,21 +76,20 @@ void Map::tick() {
 	if (engine.version < 3) return; // TODO: tick rooms in C2
 
 	// Three passes..
-	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<std::shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+	for (auto & metaroom : metarooms)
+		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
 			(*i)->tick();
-	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<std::shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+	for (auto & metaroom : metarooms)
+		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
 			(*i)->postTick();
-	for (std::vector<MetaRoom *>::iterator m = metarooms.begin(); m != metarooms.end(); m++)
-		for (std::vector<std::shared_ptr<Room> >::iterator i = (*m)->rooms.begin(); i != (*m)->rooms.end(); i++)
+	for (auto & metaroom : metarooms)
+		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
 			(*i)->resetTick();
 }
 
 MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
-	for (std::vector<MetaRoom *>::iterator i = metarooms.begin(); i != metarooms.end(); i++) {
-		MetaRoom *r = *i;
-		if ((_x >= r->x()) && (_y >= r->y()))
+	for (auto r : metarooms) {
+			if ((_x >= r->x()) && (_y >= r->y()))
 			if ((_x <= (r->x() + r->width())) && (_y <= (r->y() + r->height())))
 				return r;
 	}

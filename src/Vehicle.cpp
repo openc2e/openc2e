@@ -97,9 +97,9 @@ void Vehicle::drop(AgentRef passenger) {
 void Vehicle::adjustCarried(float xoffset, float yoffset) {
 	Agent::adjustCarried(xoffset, yoffset);
 
-	for (std::vector<AgentRef>::iterator i = passengers.begin(); i != passengers.end(); i++) {
-		if (!(*i)) continue; // TODO: muh
-		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
+	for (auto & passenger : passengers) {
+		if (!passenger) continue; // TODO: muh
+		passenger->moveTo(passenger->x + xoffset, passenger->y + yoffset);
 	}
 }
 

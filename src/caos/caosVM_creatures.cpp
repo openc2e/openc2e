@@ -614,8 +614,8 @@ void c_URGE_SIGN(caosVM *vm) {
 	stim.verb_amount = verb_stim;
 
 	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(vm->owner, 0, 0, 0);
-	for (std::vector<std::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
-		std::shared_ptr<Agent> a = *i; // guaranteed to be valid from getVisibleList
+	for (auto a : agents) {
+		// guaranteed to be valid from getVisibleList
 
 		CreatureAgent *ca = dynamic_cast<CreatureAgent *>(a.get());
 		if (!ca) continue;

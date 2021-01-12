@@ -165,8 +165,8 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 }
 
 peFile::~peFile() {
-	for (std::map<std::pair<uint32_t, uint32_t>, std::map<uint32_t, resourceInfo> >::iterator i = resources.begin(); i != resources.end(); i++) {
-		for (std::map<uint32_t, resourceInfo>::iterator j = i->second.begin(); j != i->second.end(); j++) {
+	for (auto & resource : resources) {
+		for (std::map<uint32_t, resourceInfo>::iterator j = resource.second.begin(); j != resource.second.end(); j++) {
 			if (j->second.data) {
 				delete[] j->second.data;
 			}

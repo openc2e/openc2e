@@ -72,9 +72,8 @@ std::vector<std::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char
 	std::shared_ptr<Room> ownerroom = world.map->roomAt(ownerx, ownery);
 	if (!ownermeta) return agents; if (!ownerroom) return agents;
 
-	for (std::list<std::shared_ptr<Agent> >::iterator i
-			= world.agents.begin(); i != world.agents.end(); i++) {
-		std::shared_ptr<Agent> a = (*i);
+	for (auto & agent : world.agents) {
+		std::shared_ptr<Agent> a = agent;
 		if (!a) continue;
 		
 		// TODO: if owner is a creature, skip stuff with invisible attribute

@@ -15,13 +15,9 @@ int main(int argc, char **argv) {
     std::string wild(argv[2]);
     std::vector<std::string> results = findByWildcard(dir, wild);
 
-    for (
-            std::vector<std::string>::iterator it = results.begin();
-            it != results.end();
-            it++
-        )
+    for (auto & result : results)
     {
-        std::cout << "Result: " << *it << std::endl;
+        std::cout << "Result: " << result << std::endl;
     }
     return EXIT_SUCCESS;
 }

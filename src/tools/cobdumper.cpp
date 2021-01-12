@@ -184,12 +184,12 @@ int main(int argc, char **argv) {
 		fmt::print("\n");
 
 		std::string script;
-		for (size_t i = 0; i < cob.install_scripts.size(); ++i) {
-			script += "iscr," + cob.install_scripts[i] + "\n";
+		for (auto & install_script : cob.install_scripts) {
+			script += "iscr," + install_script + "\n";
             // TODO: if only one, don't add iscr, and remove endm
 		}
-		for (size_t i = 0; i < cob.object_scripts.size(); ++i) {
-			script += cob.object_scripts[i] + "\n";
+		for (auto & object_script : cob.object_scripts) {
+			script += object_script + "\n";
 			// TODO: make sure it ends with endm
 		}
 		try {

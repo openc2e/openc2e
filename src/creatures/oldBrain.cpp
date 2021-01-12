@@ -262,9 +262,9 @@ unsigned char oldLobe::dendrite_sum(oldNeuron &neu, unsigned int type, bool only
 	// (and remember you can calculate both only_if_firing and not only_if_firing in one go!)
 	bool all_firing = true;
 	unsigned int sum = 0; // sum((src output * strength) / 255)
-	for (unsigned int j = 0; j < neu.dendrites[type].size(); j++) {
-		if (neu.dendrites[type][j].src->output == 0) all_firing = false;
-		else sum += (neu.dendrites[type][j].src->output * neu.dendrites[type][j].strength) / 255;
+	for (auto & j : neu.dendrites[type]) {
+		if (j.src->output == 0) all_firing = false;
+		else sum += (j.src->output * j.strength) / 255;
 	}
 	if (!neu.dendrites[type].size()) sum = 255;
 
@@ -275,9 +275,9 @@ unsigned char oldLobe::dendrite_sum(oldNeuron &neu, unsigned int type, bool only
 // TODO: precalculate this if we end up using it much?
 unsigned int oldLobe::getDendriteCount() {
 	unsigned int count = 0;
-	for (unsigned int i = 0; i < neurons.size(); i++) {
-		count += neurons[i].dendrites[0].size();
-		count += neurons[i].dendrites[1].size();
+	for (auto & neuron : neurons) {
+		count += neuron.dendrites[0].size();
+		count += neuron.dendrites[1].size();
 	}
 	return count;
 }
@@ -321,8 +321,8 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 
 	// TODO
 
-	for (unsigned int i = 0; i < 6; i++) {
-		chems[i] = 0;
+	for (unsigned char & chem : chems) {
+		chem = 0;
 	}
 
 	// TODO: good starting values?
@@ -355,7 +355,7 @@ void oldLobe::init() {
 	// TODO: when reading from gene, we should enforce max >= min
 	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
 
-	for (unsigned int i = 0; i < neurons.size(); i++) {
+	for (auto & neuron : neurons) {
 		for (unsigned int type = 0; type < 2; type++) {
 			int our_min = dend_info[type]->min;
 			int our_range = dend_info[type]->max - our_min;
@@ -383,7 +383,7 @@ void oldLobe::init() {
 			}
 			value += our_min;
 			for (unsigned int j = 0; j < (unsigned int)value; j++) {
-				neurons[i].dendrites[type].push_back(oldDendrite());
+				neuron.dendrites[type].push_back(oldDendrite());
 			}
 		}
 	}
@@ -406,9 +406,8 @@ void oldLobe::connect() {
 		unsigned int destsize = width * height, srcsize = src->width * src->height;
 
 		unsigned int offset = 0;
-		for (unsigned int i = 0; i < neurons.size(); i++) {
-			oldNeuron &destneu = neurons[i];
-			std::vector<oldDendrite> &dendrites = destneu.dendrites[type];
+		for (auto & destneu : neurons) {
+				std::vector<oldDendrite> &dendrites = destneu.dendrites[type];
 			if (dendrites.size() == 0) continue;
 
 			unsigned int srcneu_id = offset / destsize;
@@ -483,8 +482,8 @@ void oldLobe::connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *d
 }
 
 void oldLobe::wipe() {
-	for (unsigned int i = 0; i < neurons.size(); i++) {
-		neurons[i].state = neurons[i].output = ourGene->reststate; // TODO: good?
+	for (auto & neuron : neurons) {
+		neuron.state = neuron.output = ourGene->reststate; // TODO: good?
 	}
 }
 
@@ -534,12 +533,12 @@ void oldLobe::tick() {
 		// TODO: some kind of magic ignoring for attn lobe?
 		unsigned char bestvalue = 0;
 		unsigned char *bestoutput = NULL;
-		for (unsigned int i = 0; i < neurons.size(); i++) {
-			if (neurons[i].output > bestvalue) {
-				bestvalue = neurons[i].output;
-				bestoutput = &neurons[i].output;
+		for (auto & neuron : neurons) {
+			if (neuron.output > bestvalue) {
+				bestvalue = neuron.output;
+				bestoutput = &neuron.output;
 			}
-			neurons[i].output = 0;
+			neuron.output = 0;
 		}
 		if (bestoutput)
 			*bestoutput = bestvalue;
@@ -552,10 +551,10 @@ void oldLobe::tick() {
 			// TODO: see fix srclobe comment above (in oldLobe::connect)
 			assert(src);
 
-			for (unsigned int i = 0; i < neurons.size(); i++) {
-				if (!neurons[i].output) continue;
+			for (auto & neuron : neurons) {
+				if (!neuron.output) continue;
 
-				neuronTryMigration(type, neurons[i], src);
+				neuronTryMigration(type, neuron, src);
 			}
 		}
 	}
@@ -594,9 +593,9 @@ unsigned int oldNeuron::magicalHash(unsigned int type) {
 	// TODO: make this less stupid
 	unsigned int out = 1, outsum = 0;
 	for (unsigned int t = type; t <= type_limit; t++) {
-		for (unsigned int d = 0; d < dendrites[t].size(); d++) {
+		for (auto & d : dendrites[t]) {
 			// it is a haaaaash, so hopefully nothing will explode about the cast
-			unsigned int v = (unsigned long)dendrites[t][d].src;
+			unsigned int v = (unsigned long)d.src;
 			outsum += v;
 			out *= v;
 		}
@@ -854,11 +853,11 @@ void oldBrain::processGenes() {
 
 	std::shared_ptr<genomeFile> genome = parent->getGenome();
 	
-	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if (!parent->shouldProcessGene(i->get())) continue;
+	for (auto & gene : genome->genes) {
+		if (!parent->shouldProcessGene(gene.get())) continue;
 		
-		if (typeid(**i) == typeid(oldBrainLobeGene)) {
-			oldBrainLobeGene *g = (oldBrainLobeGene *)i->get();
+		if (typeid(*gene) == typeid(oldBrainLobeGene)) {
+			oldBrainLobeGene *g = (oldBrainLobeGene *)gene.get();
 			oldLobe *l = new oldLobe(this, g);
 			lobes.push_back(l);
 		}
@@ -888,14 +887,14 @@ void oldBrain::processGenes() {
 		lobes[0]->ensure_minimum_size(size);
 
 	// we have to create the neurons here, so that they can be attached to by receptors/emitters
-	for (unsigned int i = 0; i < lobes.size(); i++) {
-		if (!lobes[i]->wasInited()) lobes[i]->init();
+	for (auto & lobe : lobes) {
+		if (!lobe->wasInited()) lobe->init();
 	}
 }
 
 void oldBrain::init() {
-	for (unsigned int i = 0; i < lobes.size(); i++) {
-		if (!lobes[i]->wasInited()) lobes[i]->connect();
+	for (auto & lobe : lobes) {
+		if (!lobe->wasInited()) lobe->connect();
 	}
 
 	// construct processing order list

@@ -235,9 +235,8 @@ void c_ENUM(caosVM *vm) {
 	caosValue nullv; nullv.reset();
 	vm->valueStack.push_back(nullv);
 	
-	for (std::list<std::shared_ptr<Agent> >::iterator i
-			= world.agents.begin(); i != world.agents.end(); i++) {
-		std::shared_ptr<Agent> a = (*i);
+	for (auto & agent : world.agents) {
+		std::shared_ptr<Agent> a = agent;
 		if (!a) continue;
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
@@ -272,8 +271,8 @@ void c_ESEE(caosVM *vm) {
 	vm->valueStack.push_back(nullv);
 
 	std::vector<std::shared_ptr<Agent> > agents = getVisibleList(seeing, family, genus, species);
-	for (std::vector<std::shared_ptr<Agent> >::iterator i = agents.begin(); i != agents.end(); i++) {
-		caosValue v; v.setAgent(*i);
+	for (auto & agent : agents) {
+		caosValue v; v.setAgent(agent);
 		vm->valueStack.push_back(v);
 	}
 }
@@ -299,9 +298,8 @@ void c_ETCH(caosVM *vm) {
 	caosValue nullv; nullv.reset();
 	vm->valueStack.push_back(nullv);
 	
-	for (std::list<std::shared_ptr<Agent> >::iterator i
-			= world.agents.begin(); i != world.agents.end(); i++) {
-		std::shared_ptr<Agent> a = (*i);
+	for (auto & agent : world.agents) {
+		std::shared_ptr<Agent> a = agent;
 		if (!a) continue;
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
@@ -335,9 +333,8 @@ void c_EPAS(caosVM *vm) {
 	caosValue nullv; nullv.reset();
 	vm->valueStack.push_back(nullv);
 
-	for (std::vector<AgentRef>::iterator i = v->passengers.begin(); i != v->passengers.end(); i++) {
-		AgentRef a = *i;
-		if (!a) continue; // TODO: hrr
+	for (auto a : v->passengers) {
+			if (!a) continue; // TODO: hrr
 		if (species && species != a->species) continue;
 		if (genus && genus != a->genus) continue;
 		if (family && family != a->family) continue;

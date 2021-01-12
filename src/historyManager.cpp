@@ -60,10 +60,10 @@ void monikerData::init(std::string m, std::shared_ptr<genomeFile> f) {
 	assert(f);
 	genome = f;
 
-	for (auto i = f->genes.begin(); i != f->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creatureGenusGene)) {
+	for (auto & gene : f->genes) {
+		if (typeid(*gene) == typeid(creatureGenusGene)) {
 			// initialize genus
-			creatureGenusGene *g = (creatureGenusGene *)i->get();
+			creatureGenusGene *g = (creatureGenusGene *)gene.get();
 			genus = g->genus + 1;
 			break;
 		}
@@ -78,10 +78,10 @@ historyevent &monikerData::addEvent(unsigned int event, std::string moniker1, st
 	events.back().monikers[0] = moniker1;
 	events.back().monikers[1] = moniker2;
 
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		if (!*i) continue;
+	for (auto & agent : world.agents) {
+		if (!agent) continue;
 
-		(*i)->queueScript(127, 0, moniker, (int)(events.size() - 1)); // new life event
+		agent->queueScript(127, 0, moniker, (int)(events.size() - 1)); // new life event
 	}
 	
 	return events.back();
@@ -153,10 +153,10 @@ monikerstatus monikerData::getStatus() {
 std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 	unsigned int genus = 0;
 	
-	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if (typeid(*(*i)) == typeid(creatureGenusGene)) {
+	for (auto & gene : genome->genes) {
+		if (typeid(*gene) == typeid(creatureGenusGene)) {
 			// initialize genus
-			creatureGenusGene *g = (creatureGenusGene *)i->get();
+			creatureGenusGene *g = (creatureGenusGene *)gene.get();
 			genus = g->genus + 1;
 			break;
 		}
@@ -214,16 +214,16 @@ monikerData &historyManager::getMoniker(std::string s) {
 }
 
 std::string historyManager::findMoniker(std::shared_ptr<genomeFile> g) {
-	for (std::map<std::string, monikerData>::iterator i = monikers.begin(); i != monikers.end(); i++) {
-		if (i->second.genome.lock() == g) return i->first;
+	for (auto & moniker : monikers) {
+		if (moniker.second.genome.lock() == g) return moniker.first;
 	}
 
 	return "";
 }
 
 std::string historyManager::findMoniker(AgentRef a) {
-	for (std::map<std::string, monikerData>::iterator i = monikers.begin(); i != monikers.end(); i++) {
-		if (i->second.owner == a) return i->first;
+	for (auto & moniker : monikers) {
+		if (moniker.second.owner == a) return moniker.first;
 	}
 
 	return "";

@@ -142,8 +142,8 @@ void Agent::finishInit() {
 
 void Agent::zotstack() {
 	// Zap the VM stack.
-	for (std::list<caosVM *>::iterator i = vmstack.begin(); i != vmstack.end(); i++) {
-		world.freeVM(*i);
+	for (auto & i : vmstack) {
+		world.freeVM(i);
 	}
 	vmstack.clear();
 }
@@ -175,9 +175,9 @@ void Agent::moveTo(float _x, float _y, bool force) {
 		}
 	}
 
-	for (std::vector<AgentRef>::iterator i = floated.begin(); i != floated.end(); i++) {
+	for (auto & i : floated) {
 		assert(*i);
-		(*i)->moveTo((*i)->x + xoffset, (*i)->y + yoffset);
+		i->moveTo(i->x + xoffset, i->y + yoffset);
 	}
 
 	adjustCarried(xoffset, yoffset);
@@ -1279,8 +1279,8 @@ bool Agent::beDropped() {
 
 	if (!wasinvehicle) { // ie, we're not being dropped by a vehicle
 		// TODO: check for vehicles in a saner manner?
-		for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-			std::shared_ptr<Agent> a = (*i);
+		for (auto & agent : world.agents) {
+			std::shared_ptr<Agent> a = agent;
 			if (!a) continue;
 			Vehicle *v = dynamic_cast<Vehicle *>(a.get());
 			if (!v) continue;

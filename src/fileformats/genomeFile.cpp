@@ -24,8 +24,8 @@
 #include <iostream>
 
 geneNote *genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
-	for (auto x = genes.begin(); x != genes.end(); x++) {
-		gene *t = x->get();
+	for (auto & x : genes) {
+		gene *t = x.get();
 			if ((uint8_t)t->type() == type)
 				if ((uint8_t)t->subtype() == subtype)
 					if ((uint8_t)t->note.which == which)
@@ -181,8 +181,8 @@ std::ostream &operator << (std::ostream &s, const genomeFile &f) {
 	s.write(majic, 4);
 
 	// iterate through genes
-	for (auto x = ((genomeFile &)f).genes.begin(); x != ((genomeFile &)f).genes.end(); x++) {
-		s << **x;
+	for (auto & gene : ((genomeFile &)f).genes) {
+		s << *gene;
 	}
 
 	s.write("gend", 4);
@@ -192,11 +192,11 @@ std::ostream &operator << (std::ostream &s, const genomeFile &f) {
 
 gene *genomeFile::getGene(uint8_t type, uint8_t subtype, unsigned int seq) {
 	unsigned int c = 0;
-	for (auto i = genes.begin(); i != genes.end(); i++) {
-		if ((*i)->type() == type)
-			if ((*i)->subtype() == subtype) {
+	for (auto & gene : genes) {
+		if (gene->type() == type)
+			if (gene->subtype() == subtype) {
 				c++;
-				if (seq == c) return i->get();
+				if (seq == c) return gene.get();
 			}
 	}
 
@@ -277,14 +277,14 @@ void bioEmitterGene::read(std::istream &s) {
 }
 
 void bioHalfLivesGene::write(std::ostream &s) const {
-	for (int i = 0; i < 256; i++) {
-		write8(s, halflives[i]);
+	for (unsigned char halflive : halflives) {
+		write8(s, halflive);
 	}
 }
 
 void bioHalfLivesGene::read(std::istream &s) {
-	for (int i = 0; i < 256; i++) {
-		halflives[i] = read8(s);
+	for (unsigned char & halflive : halflives) {
+		halflive = read8(s);
 	}
 }
 
@@ -367,7 +367,7 @@ void bioReceptorGene::read(std::istream &s) {
 }
 
 void c2eBrainLobeGene::write(std::ostream &s) const {
-	for (int i = 0; i < 4; i++) write8(s, id[i]);
+	for (unsigned char i : id) write8(s, i);
 
 	write16be(s, updatetime);
 	write16be(s, x);
@@ -382,13 +382,13 @@ void c2eBrainLobeGene::write(std::ostream &s) const {
 	write8(s, tissue);
 	write8(s, initrulealways);
 
-	for (int i = 0; i < 7; i++) write8(s, spare[i]);
-	for (int i = 0; i < 48; i++) write8(s, initialiserule[i]);
-	for (int i = 0; i < 48; i++) write8(s, updaterule[i]);
+	for (unsigned char i : spare) write8(s, i);
+	for (unsigned char i : initialiserule) write8(s, i);
+	for (unsigned char i : updaterule) write8(s, i);
 }
 
 void c2eBrainLobeGene::read(std::istream &s) {
-	for (int i = 0; i < 4; i++) id[i] = read8(s);
+	for (unsigned char & i : id) i = read8(s);
 
 	updatetime = read16be(s);
 	x = read16be(s);
@@ -403,18 +403,18 @@ void c2eBrainLobeGene::read(std::istream &s) {
 	tissue = read8(s);
 	initrulealways = read8(s);
 
-	for (int i = 0; i < 7; i++) spare[i] = read8(s);
-	for (int i = 0; i < 48; i++) initialiserule[i] = read8(s);
-	for (int i = 0; i < 48; i++) updaterule[i] = read8(s);
+	for (unsigned char & i : spare) i = read8(s);
+	for (unsigned char & i : initialiserule) i = read8(s);
+	for (unsigned char & i : updaterule) i = read8(s);
 }
 
 void c2eBrainTractGene::write(std::ostream &s) const {
 	write16be(s, updatetime);
-	for (int i = 0; i < 4; i++) write8(s, srclobe[i]);
+	for (unsigned char i : srclobe) write8(s, i);
 	write16be(s, srclobe_lowerbound);
 	write16be(s, srclobe_upperbound);
 	write16be(s, src_noconnections);
-	for (int i = 0; i < 4; i++) write8(s, destlobe[i]);
+	for (unsigned char i : destlobe) write8(s, i);
 	write16be(s, destlobe_lowerbound);
 	write16be(s, destlobe_upperbound);
 	write16be(s, dest_noconnections);
@@ -423,18 +423,18 @@ void c2eBrainTractGene::write(std::ostream &s) const {
 	write8(s, srcvar);
 	write8(s, destvar);
 	write8(s, initrulealways);
-	for (int i = 0; i < 5; i++) write8(s, spare[i]);
-	for (int i = 0; i < 48; i++) write8(s, initialiserule[i]);
-	for (int i = 0; i < 48; i++) write8(s, updaterule[i]);
+	for (unsigned char i : spare) write8(s, i);
+	for (unsigned char i : initialiserule) write8(s, i);
+	for (unsigned char i : updaterule) write8(s, i);
 }
 
 void c2eBrainTractGene::read(std::istream &s) {
 	updatetime = read16be(s);
-	for (int i = 0; i < 4; i++) srclobe[i] = read8(s);
+	for (unsigned char & i : srclobe) i = read8(s);
 	srclobe_lowerbound = read16be(s);
 	srclobe_upperbound = read16be(s);
 	src_noconnections = read16be(s);
-	for (int i = 0; i < 4; i++) destlobe[i] = read8(s);
+	for (unsigned char & i : destlobe) i = read8(s);
 	destlobe_lowerbound = read16be(s);
 	destlobe_upperbound = read16be(s);
 	dest_noconnections = read16be(s);
@@ -443,9 +443,9 @@ void c2eBrainTractGene::read(std::istream &s) {
 	srcvar = read8(s);
 	destvar = read8(s);
 	initrulealways = read8(s);
-	for (int i = 0; i < 5; i++) spare[i] = read8(s);
-	for (int i = 0; i < 48; i++) initialiserule[i] = read8(s);
-	for (int i = 0; i < 48; i++) updaterule[i] = read8(s);
+	for (unsigned char & i : spare) i = read8(s);
+	for (unsigned char & i : initialiserule) i = read8(s);
+	for (unsigned char & i : updaterule) i = read8(s);
 }
 
 void creatureAppearanceGene::write(std::ostream &s) const {

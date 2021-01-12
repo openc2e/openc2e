@@ -31,8 +31,8 @@ static ImVec2 GetBrainViewSize(Creature *creature) {
 		c2eBrain *b = c->getBrain();
 		assert(b);
 
-		for (std::map<std::string, c2eLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-			c2eBrainLobeGene *lobe = i->second->getGene();
+		for (auto & i : b->lobes) {
+			c2eBrainLobeGene *lobe = i.second->getGene();
 			int this_x = lobe->x + lobe->width;
 			int this_y = lobe->y + lobe->height;
 			if (this_x > neededwidth)
@@ -44,10 +44,10 @@ static ImVec2 GetBrainViewSize(Creature *creature) {
 		oldBrain *b = oc->getBrain();
 		assert(b);
 		
-		for (std::vector<oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-			oldBrainLobeGene *lobe = (*i)->getGene();
-			int this_x = lobe->x + (*i)->getWidth();
-			int this_y = lobe->y + (*i)->getHeight();
+		for (auto & i : b->lobes) {
+			oldBrainLobeGene *lobe = i->getGene();
+			int this_x = lobe->x + i->getWidth();
+			int this_y = lobe->y + i->getHeight();
 			if (this_x > neededwidth)
 				neededwidth = this_x;
 			if (this_y > neededheight)
@@ -95,15 +95,15 @@ static void drawOldBrain(oldBrain *b) {
   std::map<oldNeuron *, std::pair<unsigned int, unsigned int> > neuroncoords;
 
   unsigned int id = 0;
-  for (std::vector< oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-    oldBrainLobeGene *lobe = (*i)->getGene();
-    drawLobeBoundaries(lobe->x, lobe->y, (*i)->getWidth(), (*i)->getHeight(), niceNameForOldLobe(id));
+  for (auto & i : b->lobes) {
+    oldBrainLobeGene *lobe = i->getGene();
+    drawLobeBoundaries(lobe->x, lobe->y, i->getWidth(), i->getHeight(), niceNameForOldLobe(id));
     id++;
 
-    for (unsigned int y = 0; y < (*i)->getHeight(); y++) {
-      for (unsigned int x = 0; x < (*i)->getWidth(); x++) {
-        unsigned int neuronid = x + (y * (*i)->getWidth());
-        oldNeuron *neuron = (*i)->getNeuron(neuronid);
+    for (unsigned int y = 0; y < i->getHeight(); y++) {
+      for (unsigned int x = 0; x < i->getWidth(); x++) {
+        unsigned int neuronid = x + (y * i->getWidth());
+        oldNeuron *neuron = i->getNeuron(neuronid);
         
         int lobex = (lobe->x + 4) * 20;
         int lobey = (lobe->y + 4) * 20;
@@ -132,12 +132,12 @@ static void drawOldBrain(oldBrain *b) {
     }	
   }
 
-  for (std::vector< oldLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-    for (unsigned int j = 0; j < (*i)->getNoNeurons(); j++) {
-      oldNeuron *dest = (*i)->getNeuron(j);
-      for (unsigned int type = 0; type < 2; type++) {
-        for (std::vector<oldDendrite>::iterator d = dest->dendrites[type].begin();
-          d != dest->dendrites[type].end(); d++) {
+  for (auto & lobe : b->lobes) {
+    for (unsigned int j = 0; j < lobe->getNoNeurons(); j++) {
+      oldNeuron *dest = lobe->getNeuron(j);
+      for (auto & dendrite : dest->dendrites) {
+        for (std::vector<oldDendrite>::iterator d = dendrite.begin();
+          d != dendrite.end(); d++) {
           oldNeuron *src = d->src;
 
           float var = d->strength / 255.0;
@@ -172,16 +172,16 @@ static void drawC2eBrain(c2eBrain *b) {
 	std::map<c2eNeuron *, std::pair<unsigned int, unsigned int> > neuroncoords;
 
 	// draw lobes/neurons
-	for (std::map<std::string, c2eLobe *>::iterator i = b->lobes.begin(); i != b->lobes.end(); i++) {
-		c2eBrainLobeGene *lobe = i->second->getGene();
+	for (auto & i : b->lobes) {
+		c2eBrainLobeGene *lobe = i.second->getGene();
 		ImU32 color = IM_COL32(lobe->red, lobe->green, lobe->blue, 255);
     // TODO: set color
-		drawLobeBoundaries(lobe->x, lobe->y, lobe->width, lobe->height, i->first);
+		drawLobeBoundaries(lobe->x, lobe->y, lobe->width, lobe->height, i.first);
 
 		for (unsigned int y = 0; y < lobe->height; y++) {
 			for (unsigned int x = 0; x < lobe->width; x++) {
 				unsigned int neuronid = x + (y * lobe->width);
-				c2eNeuron *neuron = i->second->getNeuron(neuronid);
+				c2eNeuron *neuron = i.second->getNeuron(neuronid);
 
 				int lobex = (lobe->x + 4) * 20;
 				int lobey = (lobe->y + 4) * 20;
@@ -191,9 +191,9 @@ static void drawC2eBrain(c2eBrain *b) {
 				neuroncoords[neuron] = std::pair<unsigned int, unsigned int>(lobex + (x * 20) + 10, lobey + (y * 20) + 10);
 				
 				// always highlight spare neuron
-				if (i->second->getSpareNeuron() == neuronid) {
+				if (i.second->getSpareNeuron() == neuronid) {
 					// TODO: don't hardcode these names?
-					if (i->second->getId() == "attn" || i->second->getId() == "decn" || i->second->getId() == "comb") {
+					if (i.second->getId() == "attn" || i.second->getId() == "decn" || i.second->getId() == "comb") {
             ImVec2 p(lobex + (x * 20) + 5, lobey + (y * 20) + 5);
             drawlist->AddRect(cur + p, cur + p + ImVec2(10, 10), color);
 					}

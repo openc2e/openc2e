@@ -77,8 +77,8 @@ World::World() {
 
 World::~World() {
 	agents.clear();
-	for (std::vector<caosVM *>::iterator i = vmpool.begin(); i != vmpool.end(); i++)
-		delete *i;
+	for (auto & i : vmpool)
+		delete i;
 }
 
 // annoyingly, if we put this in the constructor, the catalogue isn't available yet
@@ -243,17 +243,17 @@ void World::tick() {
 	
 	// Process the script queue.
 	std::list<scriptevent> newqueue;
-	for (std::list<scriptevent>::iterator i = scriptqueue.begin(); i != scriptqueue.end(); i++) {
-		std::shared_ptr<Agent> agent = i->agent.lock();
+	for (auto & i : scriptqueue) {
+		std::shared_ptr<Agent> agent = i.agent.lock();
 		if (agent) {
 			if (engine.version < 3) {
 				// only try running a collision script if the agent doesn't have a running script
 				// TODO: we don't really understand how script interruption in c1/c2 works
-				if (agent->vm && !agent->vm->stopped() && i->scriptno == 6) {
+				if (agent->vm && !agent->vm->stopped() && i.scriptno == 6) {
 					continue;
 				}
 			}
-			agent->fireScript(i->scriptno, i->from, i->p[0], i->p[1]);
+			agent->fireScript(i.scriptno, i.from, i.p[0], i.p[1]);
 		}
 	}
 	scriptqueue.clear();
@@ -302,9 +302,8 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 
 	MetaRoom *m = world.map->metaRoomAt(x, y); // for wraparound checking
 
-	for (std::multiset<CompoundPart *, partzorder>::iterator i = zorder.begin(); i != zorder.end(); i++) {
-		CompoundPart *p = *i;
-		if (p->getParent() == theHand) continue;
+	for (auto p : zorder) {
+			if (p->getParent() == theHand) continue;
 
 		int ax = (int)(x - p->getParent()->x);
 		int ay = (int)(y - p->getParent()->y);
@@ -428,24 +427,23 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	}
 
 	// render all the agents
-	for (std::multiset<renderable *, renderablezorder>::iterator i = renders.begin(); i != renders.end(); i++) {
-		if ((*i)->showOnRemoteCameras() || cam == engine.camera.get()) {
+	for (auto render : renders) {
+		if (render->showOnRemoteCameras() || cam == engine.camera.get()) {
 			// three-pass for wraparound rooms, the third since agents often straddle the boundary
 			// TODO: same as above with background rendering
 			for (unsigned int z = 0; z < (m->wraparound() ? 3 : 1); z++) {
 				int newx = -adjustx, newy = -adjusty;
 				if (z == 1) newx += m->width();
 				else if (z == 2) newx -= m->width();
-				(*i)->render(surface, newx, newy);
+				render->render(surface, newx, newy);
 			}
 		}
 	}
 
 	// render port connection lines. TODO: these should be rendered as some kind
 	// of renderable, not directly like this.
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		std::shared_ptr<Agent> a = *i;
-		if (!a) continue;
+	for (auto a : world.agents) {
+			if (!a) continue;
 		for (std::map<unsigned int, std::shared_ptr<OutputPort> >::iterator p = a->outports.begin();
 		     p != a->outports.end(); p++) {
 			for (PortConnectionList::iterator c = p->second->dests.begin(); c != p->second->dests.end(); c++) {
@@ -602,8 +600,8 @@ void World::executeBootstrap(bool switcher) {
 		}
 	}
 
-	for (std::multimap<std::string, fs::path>::iterator i = bootstraps.begin(); i != bootstraps.end(); i++) {
-		executeBootstrap(i->second);
+	for (auto & bootstrap : bootstraps) {
+		executeBootstrap(bootstrap.second);
 	}
 }
 
@@ -657,9 +655,9 @@ void World::selectCreature(std::shared_ptr<Agent> a) {
 	}
 
 	if (selectedcreature != a) {
-		for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-			if (!*i) continue;
-			(*i)->queueScript(120, 0, caosValue(a), caosValue(selectedcreature)); // selected creature changed
+		for (auto & agent : world.agents) {
+			if (!agent) continue;
+			agent->queueScript(120, 0, caosValue(a), caosValue(selectedcreature)); // selected creature changed
 		}
 
 		selectedcreature = a;

@@ -244,8 +244,8 @@ void v_PRAY_COUN(caosVM *vm) {
 	VM_PARAM_STRING(type)
 
 	unsigned int count = 0;
-	for (std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.begin(); i != world.praymanager->blocks.end(); i++)
-		if (i->second->type == type)
+	for (auto & block : world.praymanager->blocks)
+		if (block.second->type == type)
 			count++;
 	
 	vm->result.setInt(count);

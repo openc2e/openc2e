@@ -93,13 +93,13 @@ void Room::postTick() {
 
 	// adjust for diffusion to/from surrounding rooms
 	// TODO: absolutely no clue if this is correct
-	for (auto d = doors.begin(); d != doors.end(); d++) {
-		std::shared_ptr<Room> dest = d->second->first.lock();
-		if (dest.get() == this) dest = d->second->second.lock();
+	for (auto & door : doors) {
+		std::shared_ptr<Room> dest = door.second->first.lock();
+		if (dest.get() == this) dest = door.second->second.lock();
 		assert(dest);
 
 		for (unsigned int i = 0; i < CA_COUNT; i++) {
-			float possiblediffusion = dest->catemp[i] * diffusion[i] * (d->second->perm / 100.0f);
+			float possiblediffusion = dest->catemp[i] * diffusion[i] * (door.second->perm / 100.0f);
 			if (possiblediffusion > 1.0f) possiblediffusion = 1.0f;
 			if (possiblediffusion > ca[i])
 				ca[i] = possiblediffusion;
@@ -108,8 +108,8 @@ void Room::postTick() {
 }
 
 void Room::resetTick() {
-	for (unsigned int i = 0; i < CA_COUNT; i++)
-		catemp[i] = 0.0f;
+	for (float & i : catemp)
+		i = 0.0f;
 }
 
 void Room::renderBorders(RenderTarget *surface, int adjustx, int adjusty, unsigned int col) {

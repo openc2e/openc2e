@@ -56,8 +56,8 @@ unsigned int CompoundAgent::nextPartSequenceNumber() {
 }
 
 CompoundPart *CompoundAgent::part(unsigned int id) {
-	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-		if ((*x)->id == id) return *x;
+	for (auto & part : parts) {
+		if (part->id == id) return part;
 	}
 	return 0;
 }
@@ -92,21 +92,21 @@ CompoundAgent::CompoundAgent(std::string _spritefile, unsigned int _firstimage, 
 }
 
 CompoundAgent::~CompoundAgent() {
-	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-		delete *x;
+	for (auto & part : parts) {
+		delete part;
 	}
 }
 
 void CompoundAgent::setZOrder(unsigned int plane) {
 	Agent::setZOrder(plane);
-	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) (*x)->zapZOrder();
-	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) (*x)->addZOrder();
+	for (auto & part : parts) part->zapZOrder();
+	for (auto & part : parts) part->addZOrder();
 }
 
 void CompoundAgent::tick() {
 	if (!paused) {
-		for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-			(*x)->tick();
+		for (auto & part : parts) {
+			part->tick();
 		}
 	}
 	

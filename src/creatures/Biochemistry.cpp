@@ -78,18 +78,18 @@ void c1Creature::tickBiochemistry() {
 	if ((ticks % 5) != 0) return; // TODO: what is the correct tick rate?
 
 	// process emitters
-	for (std::vector<c1Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++) {
-		processEmitter(*i);
+	for (auto & emitter : emitters) {
+		processEmitter(emitter);
 	}
 
 	// process receptors
-	for (std::vector<c1Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++) {
-		processReceptor(*i);
+	for (auto & receptor : receptors) {
+		processReceptor(receptor);
 	}
 
 	// process reactions
-	for (std::vector<std::shared_ptr<c1Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) {
-		processReaction(**i);
+	for (auto & reaction : reactions) {
+		processReaction(*reaction);
 	}
 
 	oldCreature::tickBiochemistry();
@@ -101,8 +101,8 @@ void c2Creature::tickBiochemistry() {
 	if ((ticks % 2) != 0) return; // every 2 ticks (0.2s)
 
 	// tick organs
-	for (std::vector<std::shared_ptr<c2Organ> >::iterator x = organs.begin(); x != organs.end(); x++) {
-		(*x)->tick();
+	for (auto & organ : organs) {
+		organ->tick();
 	}
 
 	oldCreature::tickBiochemistry();
@@ -134,8 +134,8 @@ void c2eCreature::tickBiochemistry() {
 	if ((ticks % 4) != 0) return;
 	
 	// tick organs
-	for (std::vector<std::shared_ptr<c2eOrgan> >::iterator x = organs.begin(); x != organs.end(); x++) {
-		(*x)->tick();
+	for (auto & organ : organs) {
+		organ->tick();
 	}
 
 	// process half-lives for chemicals
@@ -502,12 +502,12 @@ void c2Organ::tick() {
 			parent->addChemical(100, energycost);	
 			
 			// *** tick emitters
-			for (std::vector<c2Emitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
-				processEmitter(*i);
+			for (auto & emitter : emitters)
+				processEmitter(emitter);
 			
 			// *** tick reactions
-			for (std::vector<std::shared_ptr<c2Reaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
-				processReaction(**i);
+			for (auto & reaction : reactions)
+				processReaction(*reaction);
 		} else {
 			// not enough energy!
 			// TODO: apply atpdamagecoefficient
@@ -535,8 +535,8 @@ void c2Organ::tick() {
 	if (repairratereceptors != 0) repairrate = 0;
 	if (injuryreceptors != 0) injurytoapply = 0;
 		
-	for (std::vector<c2Receptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
-		processReceptor(*i, ticked);
+	for (auto & receptor : receptors)
+		processReceptor(receptor, ticked);
 
 	// *** decay life force
 	if (ticked) {
@@ -568,12 +568,12 @@ void c2eOrgan::tick() {
 			parent->adjustChemical(36, energycost);
 			
 			// *** tick emitters
-			for (std::vector<c2eEmitter>::iterator i = emitters.begin(); i != emitters.end(); i++)
-				processEmitter(*i);
+			for (auto & emitter : emitters)
+				processEmitter(emitter);
 			
 			// *** tick reactions
-			for (std::vector<std::shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++)
-				processReaction(**i);
+			for (auto & reaction : reactions)
+				processReaction(*reaction);
 		} else {
 			// *** out of energy damage	
 			applyInjury(atpdamagecoefficient);
@@ -595,13 +595,13 @@ void c2eOrgan::tick() {
 	}
 	
 	// *** tick receptors	
-	for (std::vector<std::shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) (*i)->receptors = 0;
+	for (auto & reaction : reactions) reaction->receptors = 0;
 	clockratereceptors = 0; repairratereceptors = 0; injuryreceptors = 0;
 		
-	for (std::vector<c2eReceptor>::iterator i = receptors.begin(); i != receptors.end(); i++)
-		processReceptor(*i, ticked);
+	for (auto & receptor : receptors)
+		processReceptor(receptor, ticked);
 	
-	for (std::vector<std::shared_ptr<c2eReaction> >::iterator i = reactions.begin(); i != reactions.end(); i++) if ((*i)->receptors > 0) (*i)->rate /= (*i)->receptors;
+	for (auto & reaction : reactions) if (reaction->receptors > 0) reaction->rate /= reaction->receptors;
 	if (clockratereceptors > 0) clockrate /= clockratereceptors;
 	if (repairratereceptors > 0) repairrate /= repairratereceptors;
 	if (injuryreceptors > 0) injurytoapply /= injuryreceptors;

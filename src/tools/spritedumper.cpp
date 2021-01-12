@@ -35,14 +35,14 @@ void stitch_to_sheet(MultiImage& image) {
     {
         size_t current_row_width = SHEET_PADDING;
         size_t current_row_height = 0;
-        for (size_t i = 0; i < image.size(); ++i) {
-            if (current_row_width + image[i].width + SHEET_PADDING > max_width) {
+        for (auto & i : image) {
+            if (current_row_width + i.width + SHEET_PADDING > max_width) {
                 total_height += current_row_height + SHEET_PADDING;
                 current_row_width = SHEET_PADDING;
                 current_row_height = 0;
             }
-            current_row_width += image[i].width + SHEET_PADDING;
-            current_row_height = std::max<size_t>(current_row_height, image[i].height);
+            current_row_width += i.width + SHEET_PADDING;
+            current_row_height = std::max<size_t>(current_row_height, i.height);
             total_width = std::max<size_t>(total_width, current_row_width);
         }
         total_height += SHEET_PADDING + current_row_height + SHEET_PADDING;
@@ -67,22 +67,22 @@ void stitch_to_sheet(MultiImage& image) {
     size_t current_x = SHEET_PADDING;
     size_t current_y = SHEET_PADDING;
     size_t current_row_height = 0;
-    for (size_t i = 0; i < image.size(); ++i) {
+    for (auto & i : image) {
         // check row
-        if (current_x + image[i].width + SHEET_PADDING > total_width) {
+        if (current_x + i.width + SHEET_PADDING > total_width) {
             current_y += current_row_height + SHEET_PADDING;
             current_x = SHEET_PADDING;
             current_row_height = 0;
         }
         // copy
-        for (size_t y = 0; y < image[i].height; y++) {
-            auto rowstart = ((uint8_t*)image[i].data.data()) + y * image[i].width * depth;
-            auto rowend = rowstart + image[i].width * depth;
+        for (size_t y = 0; y < i.height; y++) {
+            auto rowstart = ((uint8_t*)i.data.data()) + y * i.width * depth;
+            auto rowend = rowstart + i.width * depth;
             auto insertpos = &data[(current_y + y) * total_width * depth + current_x * depth];
             std::copy(rowstart, rowend, insertpos);
         }
-        current_x += image[i].width + SHEET_PADDING;
-        current_row_height = std::max<size_t>(current_row_height, image[i].height);
+        current_x += i.width + SHEET_PADDING;
+        current_row_height = std::max<size_t>(current_row_height, i.height);
     }
 
     // set image

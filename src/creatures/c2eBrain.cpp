@@ -203,8 +203,8 @@ std::string c2eTract::dump() {
  *
  */
 c2eDendrite *c2eTract::getDendriteFromTo(c2eNeuron *from, c2eNeuron *to) {
-	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
-		if (i->source == from && i->dest == to) return &(*i);
+	for (auto & dendrite : dendrites) {
+		if (dendrite.source == from && dendrite.dest == to) return &dendrite;
 	}
 	
 	return 0;
@@ -222,18 +222,18 @@ void c2eTract::tick() {
 		doMigration();
 
 	// run the svrule(s) against every neuron
-	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
-		if (ourGene->initrulealways) initrule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
-		updaterule.runRule(i->source->variables[0], i->source->variables, i->dest->variables, dummyValues, i->variables, parent->getParent());
+	for (auto & dendrite : dendrites) {
+		if (ourGene->initrulealways) initrule.runRule(dendrite.source->variables[0], dendrite.source->variables, dendrite.dest->variables, dummyValues, dendrite.variables, parent->getParent());
+		updaterule.runRule(dendrite.source->variables[0], dendrite.source->variables, dendrite.dest->variables, dummyValues, dendrite.variables, parent->getParent());
 	}
 
 	// TODO: reward/punishment? anything else? scary brains!
 }
 
 void c2eTract::wipe() {
-	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
+	for (auto & dendrite : dendrites) {
 		for (unsigned int j = 0; j < 8; j++)
-			i->variables[j] = 0.0f;
+			dendrite.variables[j] = 0.0f;
 	}
 }
 
@@ -243,10 +243,10 @@ void c2eTract::init() {
 	setupTract();
 	wipe();
 
-	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
+	for (auto & dendrite : dendrites) {
 		// TODO: good way to run rule?
 		if (!ourGene->initrulealways)
-			initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, i->variables, parent->getParent());
+			initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, dendrite.variables, parent->getParent());
 	}
 }
 
@@ -254,10 +254,8 @@ void c2eTract::doMigration() {
 	/*
 	 * TODO: this is utter guesswork(tm)
 	 */
-	for (std::vector<c2eDendrite>::iterator i = dendrites.begin(); i != dendrites.end(); i++) {
-		c2eDendrite &d = *i;
-
-		// 7 = strength
+	for (auto & d : dendrites) {
+			// 7 = strength
 		// TODO: prbly "Migration Parameters" catalogue tag thing
 		if (d.variables[7] == 0.0f) {
 			// this one is loose!
@@ -268,9 +266,8 @@ void c2eTract::doMigration() {
 				
 				// search for the highest NGF in d->source
 				c2eNeuron *highestsrc = 0;
-				for (std::vector<c2eNeuron *>::iterator i = src_neurons.begin(); i != src_neurons.end(); i++) {
-					c2eNeuron *n = *i;
-					if ((highestsrc && n->variables[ourGene->srcvar] > highestsrc->variables[ourGene->srcvar]) || n->variables[ourGene->srcvar] > 0.0f) {
+				for (auto n : src_neurons) {
+						if ((highestsrc && n->variables[ourGene->srcvar] > highestsrc->variables[ourGene->srcvar]) || n->variables[ourGene->srcvar] > 0.0f) {
 						highestsrc = n;
 					}
 				}
@@ -278,9 +275,8 @@ void c2eTract::doMigration() {
 
 				// search for the highest NGF in d->dest which isn't already linked
 				c2eNeuron *highestdest = 0;
-				for (std::vector<c2eNeuron *>::iterator i = dest_neurons.begin(); i != dest_neurons.end(); i++) {
-					c2eNeuron *n = *i;
-					if ((highestdest && n->variables[ourGene->destvar] > highestdest->variables[ourGene->destvar]) || n->variables[ourGene->destvar] > 0.0f) {
+				for (auto n : dest_neurons) {
+						if ((highestdest && n->variables[ourGene->destvar] > highestdest->variables[ourGene->destvar]) || n->variables[ourGene->destvar] > 0.0f) {
 						if (!getDendriteFromTo(highestsrc, n))
 							highestdest = n;
 					}
@@ -293,8 +289,8 @@ void c2eTract::doMigration() {
 
 				if (ourGene->initrulealways) {
 					// wipe
-					for (unsigned int j = 0; j < 8; j++)
-						d.variables[j] = 0.0f;
+					for (float & variable : d.variables)
+						variable = 0.0f;
 				} else {
 					// re-run init rule
 					initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, d.variables, parent->getParent());
@@ -342,9 +338,9 @@ c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
  *
  */
 void c2eLobe::wipe() {
-	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
+	for (auto & neuron : neurons) {
 		for (unsigned int j = 0; j < 8; j++)
-			i->variables[j] = 0.0f;
+			neuron.variables[j] = 0.0f;
 	}
 }
 
@@ -376,11 +372,11 @@ void c2eLobe::init() {
 
 	wipe();
 
-	for (std::vector<c2eNeuron>::iterator i = neurons.begin(); i != neurons.end(); i++) {
+	for (auto & neuron : neurons) {
 		// TODO: good way to run rule?
 		if (!ourGene->initrulealways)
-			initrule.runRule(0.0f, dummyValues, i->variables, dummyValues, dummyValues, parent->getParent());
-		i->input = 0.0f; // TODO: good to do that here?
+			initrule.runRule(0.0f, dummyValues, neuron.variables, dummyValues, dummyValues, parent->getParent());
+		neuron.input = 0.0f; // TODO: good to do that here?
 	}
 }
 
@@ -952,8 +948,8 @@ c2eBrain::c2eBrain(c2eCreature *p) {
  *
  */
 void c2eBrain::processGenes() {
-	for (auto i = parent->getGenome()->genes.begin(); i != parent->getGenome()->genes.end(); i++) {
-		gene *g = i->get();
+	for (auto & i : parent->getGenome()->genes) {
+		gene *g = i.get();
 
 		if (!parent->shouldProcessGene(g)) continue;
 	
@@ -976,9 +972,9 @@ void c2eBrain::processGenes() {
  *
  */
 void c2eBrain::init() {
-	for (std::multiset<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
-		if (!(*i)->wasInited())
-			(*i)->init();
+	for (auto component : components) {
+		if (!component->wasInited())
+			component->init();
 	}
 }
 
@@ -989,10 +985,10 @@ void c2eBrain::init() {
  *
  */
 void c2eBrain::tick() {
-	for (std::multiset<c2eBrainComponent *, c2ebraincomponentorder>::iterator i = components.begin(); i != components.end(); i++) {
+	for (auto component : components) {
 		// TODO: good check for this?
-		if ((*i)->getUpdateTime() != 0)
-			(*i)->tick();
+		if (component->getUpdateTime() != 0)
+			component->tick();
 	}
 }
 
@@ -1003,9 +999,9 @@ void c2eBrain::tick() {
  *
  */
 c2eLobe *c2eBrain::getLobeByTissue(unsigned int id) {
-	for (std::map<std::string, c2eLobe *>::iterator i = lobes.begin(); i != lobes.end(); i++) {
-		if (i->second->getGene()->tissue == id)
-			return i->second;
+	for (auto & lobe : lobes) {
+		if (lobe.second->getGene()->tissue == id)
+			return lobe.second;
 	}
 
 	return 0;

@@ -167,11 +167,11 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 	// do some shading/aliasing
 	switch (format) {
 		case if_index8:
-			for (size_t i = 0; i < images.size(); ++i) {
-				images[i].palette = palette;
-				for (size_t j = 0; j < images[i].data.size(); ++j) {
-					if (images[i].data[j] != 0) {
-						images[i].data[j] = textcolor;
+			for (auto & image : images) {
+				image.palette = palette;
+				for (size_t j = 0; j < image.data.size(); ++j) {
+					if (image.data[j] != 0) {
+						image.data[j] = textcolor;
 					}
 				}
 			}
@@ -186,8 +186,8 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 					palette[i].b = textcolor & 0xff;
 					palette[i].a = 0xff;
 				}
-				for (size_t i = 0; i < images.size(); ++i) {
-					images[i].palette = palette;
+				for (auto & image : images) {
+					image.palette = palette;
 				}
 			}
 			break;

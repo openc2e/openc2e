@@ -42,15 +42,15 @@ void c_OUTX(caosVM *vm) {
 
 	std::string oh = "\"";
 	
-	for (unsigned int i = 0; i < val.size(); i++) {
-		switch (val[i]) {
+	for (char i : val) {
+		switch (i) {
 			case '\r': oh += "\\r"; break;
 			case '\n': oh += "\\n"; break;
 			case '\t': oh += "\\t"; break;
 			case '\\': oh += "\\\\"; break;
 			case '"': oh += "\\\""; break;
 			case '\'': oh += "\\'"; break;
-			default: oh += val[i];
+			default: oh += i;
 		}
 	}
 

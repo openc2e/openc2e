@@ -464,9 +464,9 @@ static const std::array<_keytrans, 72> keytrans = {{
 }};
 
 int SDLBackend::translateScancode(int key) {
-	for (unsigned int i = 0; i < keytrans.size(); i++) {
-		if (keytrans[i].sdl == key)
-			return keytrans[i].openc2e;
+	for (auto keytran : keytrans) {
+		if (keytran.sdl == key)
+			return keytran.openc2e;
 	}
 
 	return -1;
@@ -476,9 +476,9 @@ int SDLBackend::translateScancode(int key) {
 bool SDLBackend::keyDown(int key) {
 	const Uint8 *keystate = SDL_GetKeyboardState(nullptr);
 	
-	for (unsigned int i = 0; i < keytrans.size(); i++) {
-		if (keytrans[i].openc2e == key)
-			if (keystate[keytrans[i].sdl])
+	for (auto keytran : keytrans) {
+		if (keytran.openc2e == key)
+			if (keystate[keytran.sdl])
 				return true;
 	}
 

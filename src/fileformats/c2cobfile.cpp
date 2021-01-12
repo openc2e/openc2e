@@ -47,8 +47,8 @@ c2cobfile::c2cobfile(std::string _path) : path(_path) {
 }
 
 c2cobfile::~c2cobfile() {
-	for (std::vector<cobBlock *>::iterator i = blocks.begin(); i != blocks.end(); i++) {
-		delete *i;
+	for (auto & block : blocks) {
+		delete block;
 	}
 }
 

@@ -427,11 +427,11 @@ void v_PNXT(caosVM *vm) {
 	// TODO: this might not be the best way to do this..
 	CompoundPart *curpart = 0;
 	
-	for (std::vector<CompoundPart *>::iterator x = c->parts.begin(); x != c->parts.end(); x++) {
-		unsigned int i = (*x)->id;
+	for (auto & part : c->parts) {
+		unsigned int i = part->id;
 		if ((int)i > previous_part)
 			if (!curpart || i < curpart->id)
-				curpart = *x;
+				curpart = part;
 	}
 
 	if (curpart) vm->result.setInt(curpart->id);

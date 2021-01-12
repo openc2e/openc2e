@@ -83,8 +83,8 @@ std::vector<std::string> MetaRoom::backgroundList() {
 	// construct a temporary vector from our std::map
 
 	std::vector<std::string> b;
-	for (std::map<std::string, std::shared_ptr<creaturesImage> >::iterator i = backgrounds.begin(); i != backgrounds.end(); i++)
-		b.push_back(i->first);
+	for (auto & background : backgrounds)
+		b.push_back(background.first);
 	return b;
 }
 
@@ -108,16 +108,16 @@ MetaRoom::~MetaRoom() {
 std::shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
 	std::shared_ptr<Room> closest_up, closest_down;
 	float dist_down = -1, dist_up = -1;
-	for (std::vector<std::shared_ptr<Room> >::iterator r = rooms.begin(); r != rooms.end(); r++) {
-		if (!(*r)->bot.containsX(x)) continue;
-		float dist = (*r)->bot.pointAtX(x).y - y; // down is positive
+	for (auto & room : rooms) {
+		if (!room->bot.containsX(x)) continue;
+		float dist = room->bot.pointAtX(x).y - y; // down is positive
 		float absdist = fabs(dist);
 		if (dist >= 0 && (absdist < dist_down || dist_down < 0)) {
 			dist_down = absdist;
-			closest_down = *r;
+			closest_down = room;
 		} else if (dist < 0 && (absdist < dist_up || dist_up < 0)) {
 			dist_up = absdist;
-			closest_up = *r;
+			closest_up = room;
 		}
 	}
 	if (closest_down) return closest_down;
@@ -141,9 +141,8 @@ std::shared_ptr<Room> MetaRoom::roomAt(float _x, float _y) {
 		else if (_x < (int)xloc) _x += wid;
 	}
 
-	for (std::vector<std::shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
-		std::shared_ptr<Room> r = *i;
-		if (r->containsPoint(_x, _y)) return r;
+	for (auto r : rooms) {
+			if (r->containsPoint(_x, _y)) return r;
 	}
 
 	return std::shared_ptr<Room>();
@@ -157,9 +156,8 @@ std::vector<std::shared_ptr<Room> > MetaRoom::roomsAt(float _x, float _y) {
 
 	std::vector<std::shared_ptr<Room> > ourlist;
 
-	for (std::vector<std::shared_ptr<Room> >::iterator i = rooms.begin(); i != rooms.end(); i++) {
-		std::shared_ptr<Room> r = *i;
-		if (r->containsPoint(_x, _y)) ourlist.push_back(r);
+	for (auto r : rooms) {
+			if (r->containsPoint(_x, _y)) ourlist.push_back(r);
 	}
 
 	return ourlist;

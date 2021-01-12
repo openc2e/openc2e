@@ -154,11 +154,11 @@ void v_BKDS(caosVM *vm) {
 
 	std::vector<std::string> backs = m->backgroundList();
 	std::string s;
-	for (std::vector<std::string>::iterator i = backs.begin(); i != backs.end(); i++) {
+	for (auto & back : backs) {
 		if (s.empty())
-			s = *i;
+			s = back;
 		else
-			s = s + "," + *i;
+			s = s + "," + back;
 	}
 			
 	vm->result.setString(s);
@@ -708,9 +708,9 @@ void v_ERID(caosVM *vm) {
 		// TODO
 	} else {
 		MetaRoom *r = world.map->getMetaRoom(metaroom_id);
-		for (std::vector<std::shared_ptr<Room> >::iterator i = r->rooms.begin(); i != r->rooms.end(); i++) {
+		for (auto & room : r->rooms) {
 			if (out.size() > 0) out = out + " ";
-			out = out + fmt::format("{}", (*i)->id);
+			out = out + fmt::format("{}", room->id);
 		}
 	}
 

@@ -35,8 +35,8 @@ MusicManager::MusicManager(const std::shared_ptr<AudioBackend>& backend_)
 
 MusicManager::~MusicManager() {
 	stop();
-	for (std::map<std::string, MNGFile *>::iterator i = files.begin(); i != files.end(); i++) {
-		delete i->second;
+	for (auto & file : files) {
+		delete file.second;
 	}
 }
 

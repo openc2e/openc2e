@@ -72,8 +72,8 @@
 SFCFile::~SFCFile() {
 	// This contains all the objects we've constructed, so we can just zap this and
 	// everything neatly disappears.
-	for (std::vector<SFCClass *>::iterator i = storage.begin(); i != storage.end(); i++) {
-		delete *i;
+	for (auto & i : storage) {
+		delete i;
 	}
 }
 
@@ -339,8 +339,8 @@ void MapData::read() {
 
 	// read groundlevel data
 	if (parent->version() == 0) {
-		for (unsigned int i = 0; i < 261; i++) {
-			groundlevels[i] = read32();
+		for (unsigned int & groundlevel : groundlevels) {
+			groundlevel = read32();
 		}
 
 		readBytes(800); // TODO
@@ -350,8 +350,8 @@ void MapData::read() {
 MapData::~MapData() {
 	// In C1, we create rooms which aren't MFC objects, so we need to destroy them afterwards.
 	if (parent->version() == 0) {
-		for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
-			delete *i;
+		for (auto & room : rooms) {
+			delete room;
 		}
 	}
 }
@@ -391,12 +391,12 @@ void CRoom::read() {
 	right = read32();
 	bottom = read32();
 
-	for (unsigned int i = 0; i < 4; i++) {
+	for (auto & door : doors) {
 		uint16_t nodoors = read16();
 		for (unsigned int j = 0; j < nodoors; j++) {
 			CDoor *temp = (CDoor*)slurpMFC(TYPE_CDOOR);
 			sfccheck(temp);
-			doors[i].push_back(temp);
+			door.push_back(temp);
 		}
 	}
 
@@ -647,27 +647,27 @@ void SFCCompoundObject::read() {
 	}
 
 	// read hotspot coordinates
-	for (unsigned int i = 0; i < 6; i++) {
-		hotspots[i].left = reads32();
-		hotspots[i].top = reads32();
-		hotspots[i].right = reads32();
-		hotspots[i].bottom = reads32();
+	for (auto & hotspot : hotspots) {
+		hotspot.left = reads32();
+		hotspot.top = reads32();
+		hotspot.right = reads32();
+		hotspot.bottom = reads32();
 	}
 	
 	// read hotspot function data
-	for (unsigned int i = 0; i < 6; i++) {
+	for (auto & hotspot : hotspots) {
 		// (this is actually a map of function->hotspot)
-		hotspots[i].function = reads32();
+		hotspot.function = reads32();
 	}
 
 	if (parent->version() == 1) {
 		// read C2-specific hotspot function data (again, actually maps function->hotspot)
-		for (unsigned int i = 0; i < 6; i++) {
-			hotspots[i].message = read16();
+		for (auto & hotspot : hotspots) {
+			hotspot.message = read16();
 			sfccheck(read16() == 0);
 		}
-		for (unsigned int i = 0; i < 6; i++) {
-			hotspots[i].mask = read8();
+		for (auto & hotspot : hotspots) {
+			hotspot.mask = read8();
 		}
 	}
 }
@@ -734,8 +734,8 @@ void SFCLift::read() {
 	// discard unknown bytes
 	sfccheck(readBytes(5) == std::string("\xff\xff\xff\xff\x00", 5));
 
-	for (unsigned int i = 0; i < 8; i++) {
-		callbuttony[i] = read32();
+	for (unsigned int & i : callbuttony) {
+		i = read32();
 
 		// discard unknown bytes
 		sfccheck(read16() == 0);
@@ -792,23 +792,23 @@ void SFCFile::copyToWorld() {
 	mapdata->copyToWorld();
 
 	// install scripts
-	for (std::vector<SFCScript>::iterator i = scripts.begin(); i != scripts.end(); i++) {
-		i->install();
+	for (auto & script : scripts) {
+		script.install();
 	}
 	
 	// create normal objects
-	for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
-		(*i)->copyToWorld();
+	for (auto & object : objects) {
+		object->copyToWorld();
 	}
 
 	// create scenery
-	for (std::vector<SFCScenery *>::iterator i = scenery.begin(); i != scenery.end(); i++) {
-		(*i)->copyToWorld();
+	for (auto & i : scenery) {
+		i->copyToWorld();
 	}
 
 	// activate old scripts
-	for (std::vector<SFCMacro *>::iterator i = macros.begin(); i != macros.end(); i++) {
-		(*i)->activate();
+	for (auto & macro : macros) {
+		macro->activate();
 	}
 
 	// move the camera to the correct position
@@ -817,8 +817,8 @@ void SFCFile::copyToWorld() {
 	// patch agents
 	// TODO: do we really need to do this, and if so, should it be done here?
 	// I like this for now because it makes debugging suck a lot less - fuzzie
-	for (std::list<std::shared_ptr<Agent> >::iterator i = world.agents.begin(); i != world.agents.end(); i++) {
-		std::shared_ptr<Agent> a = (*i);
+	for (auto & agent : world.agents) {
+		std::shared_ptr<Agent> a = agent;
 
 		#define NUM_SFC_PATCHES 5
 
@@ -831,13 +831,13 @@ void SFCFile::copyToWorld() {
 		{ 1, 2, 25, 6, 1} // c2 nuts
 		};
 
-		for (unsigned int j = 0; j < NUM_SFC_PATCHES; j++) {
-			if (version() == patchdata[j][0] && a->family == patchdata[j][1] && a->genus == patchdata[j][2] && a->species == patchdata[j][3]) {
+		for (auto & j : patchdata) {
+			if (version() == j[0] && a->family == j[1] && a->genus == j[2] && a->species == j[3]) {
 				// patch variable to actually refer to an agent
-				unsigned int varno = patchdata[j][4];
-				for (std::vector<SFCObject *>::iterator i = objects.begin(); i != objects.end(); i++) {
-					if ((*i)->unid == (uint32_t)a->var[varno].getInt()) {
-						a->var[varno].setAgent((*i)->copiedAgent());
+				unsigned int varno = j[4];
+				for (auto & object : objects) {
+					if (object->unid == (uint32_t)a->var[varno].getInt()) {
+						a->var[varno].setAgent(object->copiedAgent());
 						break;
 					}
 				}
@@ -863,11 +863,9 @@ void MapData::copyToWorld() {
 	MetaRoom *m = new MetaRoom(0, 0, 8352, w, background->filename, spr, true);
 	world.map->addMetaRoom(m);
 
-	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
+	for (auto src : rooms) {
 		// retrieve our room data
-		CRoom *src = *i;
-
-		// create a new room, set the type
+			// create a new room, set the type
 		std::shared_ptr<Room> r(new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom));
 		r->type = src->roomtype;
 
@@ -904,18 +902,16 @@ void MapData::copyToWorld() {
 	}
 
 	if (parent->version() == 0) {
-		for (unsigned int i = 0; i < 261; i++) {
-			world.groundlevels.push_back(groundlevels[i]);
+		for (unsigned int & groundlevel : groundlevels) {
+			world.groundlevels.push_back(groundlevel);
 		}
 
 		return;
 	}
 
-	for (std::vector<CRoom *>::iterator i = rooms.begin(); i != rooms.end(); i++) {
-		CRoom *src = *i;
-
-		for (unsigned int j = 0; j < 4; j++) {
-			for (std::vector<CDoor *>::iterator k = src->doors[j].begin(); k < src->doors[j].end(); k++) {
+	for (auto src : rooms) {
+			for (auto & j : src->doors) {
+			for (std::vector<CDoor *>::iterator k = j.begin(); k < j.end(); k++) {
 				CDoor *door = *k;
 				std::shared_ptr<Room> r1 = world.map->getRoom(src->id);
 				std::shared_ptr<Room> r2 = world.map->getRoom(door->otherroom);
@@ -948,12 +944,12 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 	
 	// animation
 	if (entity->haveanim) {
-		for (unsigned int i = 0; i < entity->animstring.size(); i++) {
-			if (entity->animstring[i] == 'R')
+		for (char i : entity->animstring) {
+			if (i == 'R')
 				p->animation.push_back(255);
 			else {
-				sfccheck(entity->animstring[i] >= 48 && entity->animstring[i] <= 57);
-				p->animation.push_back(entity->animstring[i] - 48);
+				sfccheck(i >= 48 && i <= 57);
+				p->animation.push_back(i - 48);
 			}
 		}
 
@@ -1031,9 +1027,8 @@ void SFCCompoundObject::copyToWorld() {
 
 	// make sure the zorder of the first part is 0..
 	int basezorder = INT_MAX; // TODO: unsigned or signed?
-	for (unsigned int i = 0; i < parts.size(); i++) {
-		SFCEntity *e = parts[i];
-		if (!e) continue;
+	for (auto e : parts) {
+			if (!e) continue;
 		if (e->zorder < basezorder)
 			basezorder = e->zorder;
 	}
@@ -1223,10 +1218,8 @@ void SFCMacro::activate() {
 	 * At the moment, this just starts scripts from the beginning, anew.
 	 */
 
-	for (std::vector<SFCScript>::iterator i = parent->scripts.begin(); i != parent->scripts.end(); i++) {
-		SFCScript &s = *i;
-
-		if (s.genus != ourAgent->genus) continue;
+	for (auto & s : parent->scripts) {
+			if (s.genus != ourAgent->genus) continue;
 		if (s.family != ourAgent->family) continue;
 		if (s.species != ourAgent->species) continue;
 		

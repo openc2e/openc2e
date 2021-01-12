@@ -113,7 +113,7 @@ SkeletalCreature::SkeletalCreature(unsigned char _family) : Agent(_family, 0, 0,
 		aero = 10;
 	}
 
-	for (unsigned int i = 0; i < 6; i++) appearancegenes[i] = 0;
+	for (auto & appearancegene : appearancegenes) appearancegene = 0;
 
 	skeleton = new SkeletonPart(this);
 }
@@ -136,18 +136,18 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool tryfemale, un
 void SkeletalCreature::processGenes() {
 	std::shared_ptr<genomeFile> genome = creature->getGenome();
 
-	for (auto i = genome->genes.begin(); i != genome->genes.end(); i++) {
-		if (!creature->shouldProcessGene(i->get())) continue;
+	for (auto & gene : genome->genes) {
+		if (!creature->shouldProcessGene(gene.get())) continue;
 
-		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
-			creatureAppearanceGene *x = (creatureAppearanceGene *)i->get();
+		if (typeid(*gene) == typeid(creatureAppearanceGene)) {
+			creatureAppearanceGene *x = (creatureAppearanceGene *)gene.get();
 			if (x->part > 5) continue;
 			appearancegenes[x->part] = x;
-		} else if (typeid(*(*i)) == typeid(creaturePoseGene)) {
-			creaturePoseGene *x = (creaturePoseGene *)i->get();
+		} else if (typeid(*gene) == typeid(creaturePoseGene)) {
+			creaturePoseGene *x = (creaturePoseGene *)gene.get();
 			posegenes[x->poseno] = x;
-		} else if (typeid(*(*i)) == typeid(creatureGaitGene)) {
-			creatureGaitGene *x = (creatureGaitGene *)i->get();
+		} else if (typeid(*gene) == typeid(creatureGaitGene)) {
+			creatureGaitGene *x = (creatureGaitGene *)gene.get();
 			gaitgenes[x->drive] = x;
 		}
 	}
@@ -762,11 +762,11 @@ void SkeletalCreature::creatureAged() {
 std::string SkeletalCreature::getFaceSpriteName() {
 	// TODO: we should store the face sprite when we first search for sprites (since it
 	// has to be the baby sprite), rather than this horrible hackery
-	for (auto i = creature->getGenome()->genes.begin(); i != creature->getGenome()->genes.end(); i++) {
+	for (auto & gene : creature->getGenome()->genes) {
 		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
-		if (typeid(*(*i)) == typeid(creatureAppearanceGene)) {
-			creatureAppearanceGene *x = (creatureAppearanceGene *)i->get();
+		if (typeid(*gene) == typeid(creatureAppearanceGene)) {
+			creatureAppearanceGene *x = (creatureAppearanceGene *)gene.get();
 			if (x->part == 0) {
 				return std::string("a") + dataString(0, creature->isFemale(), x->species, x->variant);
 			}
