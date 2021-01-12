@@ -17,12 +17,13 @@
  *
  */
 
-#include "oldCreature.h"
-#include "c2eCreature.h"
 #include "CreatureAgent.h"
 #include "World.h"
 #include "c2eBrain.h"
+#include "c2eCreature.h"
 #include "oldBrain.h"
+#include "oldCreature.h"
+
 #include <memory>
 
 void oldCreature::tickBrain() {
@@ -30,7 +31,8 @@ void oldCreature::tickBrain() {
 		attn = -1;
 		decn = -1;
 		attention.clear(); // TODO: doesn't belong here
-		if (!dreaming) return; // TODO
+		if (!dreaming)
+			return; // TODO
 	}
 
 	// TODO: correct timing?
@@ -42,7 +44,7 @@ void oldCreature::tickBrain() {
 	}
 
 	// TODO
-	
+
 	chooseAgents();
 
 	// TODO
@@ -58,7 +60,8 @@ void oldCreature::tickBrain() {
 	if (attn >= 0 && attn < (int)chosenagents.size())
 		attention = chosenagents[attn];
 
-	if (zombie) return; // TODO: docs say zombies "don't process decision scripts", correct?
+	if (zombie)
+		return; // TODO: docs say zombies "don't process decision scripts", correct?
 
 	// involuntary actions
 	for (unsigned int i = 0; i < 8; i++) {
@@ -85,7 +88,8 @@ void c2eCreature::tickBrain() {
 		attn = -1;
 		decn = -1;
 		attention.clear(); // TODO: doesn't belong here
-		if (!dreaming) return; // TODO
+		if (!dreaming)
+			return; // TODO
 	}
 
 	// TODO: correct timing?
@@ -99,7 +103,7 @@ void c2eCreature::tickBrain() {
 		return;
 	}
 
-	c2eLobe *drivlobe = brain->getLobeById("driv");
+	c2eLobe* drivlobe = brain->getLobeById("driv");
 	if (drivlobe) {
 		for (unsigned int i = 0; i < 20 && i < drivlobe->getNoNeurons(); i++) {
 			drivlobe->setNeuronInput(i, drives[i]);
@@ -120,16 +124,17 @@ void c2eCreature::tickBrain() {
 		}	
 	}*/
 
-#ifndef _CREATURE_STANDALONE	
+#ifndef _CREATURE_STANDALONE
 	// TODO: situ, detl
-	
+
 	chooseAgents();
-	
-	c2eLobe *visnlobe = brain->getLobeById("visn");
+
+	c2eLobe* visnlobe = brain->getLobeById("visn");
 	if (visnlobe) {
 		for (unsigned int i = 0; i < visnlobe->getNoNeurons() && i < chosenagents.size(); i++) {
 			AgentRef a = chosenagents[i];
-			if (!a) continue;
+			if (!a)
+				continue;
 
 			// TODO: use eye position? see Creature::agentInSight
 			float ourxpos = parentagent->x + (parentagent->getWidth() / 2.0f);
@@ -141,24 +146,24 @@ void c2eCreature::tickBrain() {
 		}
 	}
 
-	c2eLobe *smellobe = brain->getLobeById("smel");
+	c2eLobe* smellobe = brain->getLobeById("smel");
 	if (smellobe) {
 		// TODO
 	}
 #endif
 
 	brain->tick();
-	
-#ifndef _CREATURE_STANDALONE	
+
+#ifndef _CREATURE_STANDALONE
 	AgentRef oldattn = attention;
 	int olddecn = decn;
 
-	c2eLobe *attnlobe = brain->getLobeById("attn");
+	c2eLobe* attnlobe = brain->getLobeById("attn");
 	if (attnlobe) {
 		attn = attnlobe->getSpareNeuron();
 	}
 
-	c2eLobe *decnlobe = brain->getLobeById("decn");
+	c2eLobe* decnlobe = brain->getLobeById("decn");
 	if (decnlobe) {
 		// TODO: check bounds of mappinginfo
 		decn = mappinginfo[decnlobe->getSpareNeuron()];
@@ -168,14 +173,15 @@ void c2eCreature::tickBrain() {
 	if (attn >= 0 && attn < (int)chosenagents.size())
 		attention = chosenagents[attn];
 
-	if (zombie) return; // TODO: docs say zombies "don't process decision scripts", correct?
+	if (zombie)
+		return; // TODO: docs say zombies "don't process decision scripts", correct?
 
 	// fire scripts as needed
 	// TODO: doesn't belong here
 	// TODO: deal with decisions which don't have agents attached
 	// TODO: deal with moving between ATTNs which don't have a choseagent right now (eg, nothing in sight)
 	if (parentagent->vmStopped() || oldattn != attention || olddecn != decn) {
-		if (attention && dynamic_cast<CreatureAgent *>(attention.get())) {
+		if (attention && dynamic_cast<CreatureAgent*>(attention.get())) {
 			parentagent->queueScript(decn + 32); // 'on creatures'
 		} else {
 			parentagent->queueScript(decn + 16); // 'on agents'
@@ -197,15 +203,17 @@ void c2eCreature::tickBrain() {
 }
 
 bool c2eCreature::processInstinct() {
-	if (unprocessedinstincts.empty()) return false;
+	if (unprocessedinstincts.empty())
+		return false;
 
-	creatureInstinctGene *g = unprocessedinstincts.front();
+	creatureInstinctGene* g = unprocessedinstincts.front();
 	unprocessedinstincts.pop_front();
 
 	// *** work out which verb neuron to fire by reverse-mapping from the mapping table
 	int actualverb = reverseMapVerbToNeuron(g->action);
 	// we have no idea which verb neuron to use, so no instinct processing
-	if (actualverb == -1) return false;
+	if (actualverb == -1)
+		return false;
 
 	// *** debug output
 
@@ -229,34 +237,40 @@ bool c2eCreature::processInstinct() {
 
 	// *** sanity checks/setup
 
-	c2eLobe *resplobe = brain->getLobeById("resp");
-	c2eLobe *verblobe = brain->getLobeById("verb");
+	c2eLobe* resplobe = brain->getLobeById("resp");
+	c2eLobe* verblobe = brain->getLobeById("verb");
 	// no response/verb lobe? no instincts for you, then..
-	if (!resplobe || !verblobe) return false;
+	if (!resplobe || !verblobe)
+		return false;
 
 	// if action/drive are beyond the size of the relevant lobe, can't process instinct
-	if ((unsigned int)actualverb >= verblobe->getNoNeurons()) return false;
-	if (g->drive >= resplobe->getNoNeurons()) return false;
+	if ((unsigned int)actualverb >= verblobe->getNoNeurons())
+		return false;
+	if (g->drive >= resplobe->getNoNeurons())
+		return false;
 
-	c2eLobe *inputlobe[3] = { 0, 0, 0 };
+	c2eLobe* inputlobe[3] = {0, 0, 0};
 
 	for (unsigned int i = 0; i < 3; i++) {
 		// TODO: what about unused?
 		uint8_t lobetissueid = g->lobes[i];
-		if (lobetissueid == 255) continue;
+		if (lobetissueid == 255)
+			continue;
 		/* fuzzie would like to take this opportunity to quote from the pygenes source:
 		 * Apparently, someone decided that because the rows are 1 above the lobe IDs, they should write the ROW NUMBER into the file, instead. Someone, somewhere, needs SHOOTING. */
 		lobetissueid -= 1;
 		inputlobe[i] = brain->getLobeByTissue(lobetissueid);
 		// TODO: should we really barf out if this happens?
-		if (!inputlobe[i]) return false;
-		if (g->neurons[i] >= inputlobe[i]->getNoNeurons()) return false;
+		if (!inputlobe[i])
+			return false;
+		if (g->neurons[i] >= inputlobe[i]->getNoNeurons())
+			return false;
 	}
 
 	// *** reset brain
-	
+
 	// TODO: is this a sensible place to wipe the lobes?
-	for (auto & lobe : brain->lobes)
+	for (auto& lobe : brain->lobes)
 		lobe.second->wipe();
 
 	// TODO: non-hardcode 212/213? they seem to be in "Brain Parameters" catalogue tag
@@ -277,7 +291,7 @@ bool c2eCreature::processInstinct() {
 			 * we use 0.1, like c2e seems to feed it (the joys of hacked genetics and brain-in-a-vat!)
 			 */
 			// TODO: shouldn't we check lobe size?
-			c2eLobe *visnlobe = brain->getLobeById("visn");
+			c2eLobe* visnlobe = brain->getLobeById("visn");
 			if (visnlobe)
 				visnlobe->setNeuronInput(g->neurons[i], 0.1f);
 		}
@@ -305,7 +319,7 @@ bool c2eCreature::processInstinct() {
 
 	// wipe the lobes again, to stop any issues with neurons being set which shouldn't be at the end of an instinct run
 	// TODO: is wiping the lobes here truly what we should do?
-	for (auto & lobe : brain->lobes)
+	for (auto& lobe : brain->lobes)
 		lobe.second->wipe();
 
 	//std::cout << "*** instinct done" << std::endl;
@@ -317,8 +331,9 @@ bool c2eCreature::processInstinct() {
 #include "AgentHelpers.h"
 
 bool Creature::agentInSight(AgentRef a) {
-#ifndef _CREATURE_STANDALONE	
-	if (a->invisible()) return false;
+#ifndef _CREATURE_STANDALONE
+	if (a->invisible())
+		return false;
 
 	// TODO: specify x/y location for eyes
 	// TODO: check open cabin?
@@ -329,7 +344,7 @@ bool Creature::agentInSight(AgentRef a) {
 }
 
 void Creature::chooseAgents() {
-#ifndef _CREATURE_STANDALONE	
+#ifndef _CREATURE_STANDALONE
 	// zot any chosen agents which went out of range, went invisible or changed category
 	for (unsigned int i = 0; i < chosenagents.size(); i++) {
 		AgentRef a = chosenagents[i];
@@ -342,16 +357,21 @@ void Creature::chooseAgents() {
 	std::vector<std::vector<AgentRef> > possibles(chosenagents.size());
 
 	for (auto a : world.agents) {
-			if (!a) continue;
+		if (!a)
+			continue;
 
 		// if agent category is -1 or outside of our #categories, continue
-		if (a->category < 0) continue;
-		if (a->category >= (int)chosenagents.size()) continue;
+		if (a->category < 0)
+			continue;
+		if (a->category >= (int)chosenagents.size())
+			continue;
 
 		// if we already chose an agent from this category, continue
-		if (chosenagents[a->category]) continue;
+		if (chosenagents[a->category])
+			continue;
 
-		if (!agentInSight(a)) continue;
+		if (!agentInSight(a))
+			continue;
 
 		possibles[a->category].push_back(a);
 	}
@@ -396,11 +416,11 @@ void oldCreature::handleStimulus(unsigned int id) {
 	(void)id;
 }
 
-void c2eCreature::handleStimulus(c2eStim &stim) {
+void c2eCreature::handleStimulus(c2eStim& stim) {
 	// TODO: handle out-of-range verb_amount/noun_amount
 
 	if (stim.verb_id >= 0) {
-		c2eLobe *verblobe = brain->getLobeById("verb");
+		c2eLobe* verblobe = brain->getLobeById("verb");
 		if (verblobe) {
 			if ((unsigned int)stim.verb_id < verblobe->getNoNeurons())
 				verblobe->setNeuronInput(stim.verb_id, stim.verb_amount);
@@ -408,7 +428,7 @@ void c2eCreature::handleStimulus(c2eStim &stim) {
 	}
 
 	if (stim.noun_id >= 0) {
-		c2eLobe *nounlobe = brain->getLobeById("noun");
+		c2eLobe* nounlobe = brain->getLobeById("noun");
 		if (nounlobe) {
 			if ((unsigned int)stim.noun_id < nounlobe->getNoNeurons())
 				nounlobe->setNeuronInput(stim.noun_id, stim.noun_amount);
@@ -420,7 +440,7 @@ void c2eCreature::handleStimulus(c2eStim &stim) {
 			unsigned char chemno = stim.drive_id[i] + 148;
 			adjustChemical(chemno, stim.drive_amount[i]);
 			if (!stim.drive_silent[i]) {
-				c2eLobe *resplobe = brain->getLobeById("resp");
+				c2eLobe* resplobe = brain->getLobeById("resp");
 				if (resplobe) {
 					if ((unsigned int)stim.drive_id[i] < resplobe->getNoNeurons())
 						resplobe->setNeuronInput(stim.drive_id[i], stim.drive_amount[i]);
@@ -433,26 +453,28 @@ void c2eCreature::handleStimulus(c2eStim &stim) {
 // TODO: this needs to be passed noun details, it seems, judging by documentation
 void c2eCreature::handleStimulus(unsigned int id, float strength) {
 	// note that g->addoffset does not seem to exist in c2e
-	
+
 	c2eStim stim;
-	creatureStimulusGene *g = 0;
-	
+	creatureStimulusGene* g = 0;
+
 	// TODO: generate the damn c2eStims in addGene, thus zapping a whole bunch of bugs
-	for (auto & gene : genome->genes) {
-		if (creatureStimulusGene *x = dynamic_cast<creatureStimulusGene*>(gene.get())) {
+	for (auto& gene : genome->genes) {
+		if (creatureStimulusGene* x = dynamic_cast<creatureStimulusGene*>(gene.get())) {
 			if (x->stim == id) {
 				g = x;
 				break;
 			}
 		}
 	}
-	if (!g) return;
+	if (!g)
+		return;
 
 	// if we're asleep and the stimulus isn't to be processed when asleep, return
-	if (!g->whenasleep && isAsleep()) return;
+	if (!g->whenasleep && isAsleep())
+		return;
 
 	// TODO: g->modulate
-	
+
 	// TODO: is multipler usage below okay?
 	float multiplier = (strength == 0.0f ? 1.0f : strength);
 
@@ -472,7 +494,7 @@ void c2eCreature::handleStimulus(unsigned int id, float strength) {
 		// TODO: fuzzie is suspicious about multiply/dividing on g->amounts here
 		if (g->drives[i] != 255)
 			stim.setupDriveStim(i, g->drives[i], ((g->amounts[i] * (1.0f / 124.0f)) - 1.0f) * multiplier, g->silent[i]);
-		
+
 		if (strength == 0.0f)
 			stim.drive_silent[i] = true;
 	}

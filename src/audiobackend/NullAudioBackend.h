@@ -22,29 +22,30 @@
 #include "audiobackend/AudioBackend.h"
 
 class NullAudioBackend : public AudioBackend {
-public:
+  public:
 	NullAudioBackend() = default;
-	void init() { }
-	void shutdown() { }
+	void init() {}
+	void shutdown() {}
 
 	AudioChannel playClip(const std::string& filename, bool) {
-		if (filename.size() == 0) return {};
-		return { 1 };
+		if (filename.size() == 0)
+			return {};
+		return {1};
 	}
 	virtual AudioChannel playWavData(const uint8_t*, size_t, bool) {
-		return { 1 };
+		return {1};
 	}
 	AudioChannel playStream(AudioStream*) {
-		return { 1 };
+		return {1};
 	}
-	
-	void fadeOutChannel(AudioChannel) { }
-	void setChannelVolume(AudioChannel, float) { }
-	void setChannelPan(AudioChannel, float) { }
+
+	void fadeOutChannel(AudioChannel) {}
+	void setChannelVolume(AudioChannel, float) {}
+	void setChannelPan(AudioChannel, float) {}
 	AudioState getChannelState(AudioChannel) { return AUDIO_STOPPED; }
-	void stopChannel(AudioChannel) { }
-	
-	void playMIDIFile(const std::string&) { }
-	void setMIDIVolume(float) { }
-	void stopMIDI() { }
+	void stopChannel(AudioChannel) {}
+
+	void playMIDIFile(const std::string&) {}
+	void setMIDIVolume(float) {}
+	void stopMIDI() {}
 };

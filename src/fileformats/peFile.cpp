@@ -17,10 +17,11 @@
  *
  */
 
+#include "fileformats/peFile.h"
+
 #include "creaturesException.h"
 #include "endianlove.h"
 #include "fileformats/bmpImage.h"
-#include "fileformats/peFile.h"
 #include "spanstream.h"
 
 // debug helper
@@ -87,9 +88,10 @@ peFile::peFile(fs::path filepath) {
 	file.seekg(optionalheadersize, std::ios::cur);
 
 	for (unsigned int i = 0; i < nosections; i++) {
-		char section_name[9]; section_name[8] = 0;
+		char section_name[9];
+		section_name[8] = 0;
 		file.read(section_name, 8);
-		
+
 		file.seekg(4, std::ios::cur);
 
 		peSection section;
@@ -97,7 +99,7 @@ peFile::peFile(fs::path filepath) {
 		section.size = read32le(file);
 		section.offset = read32le(file);
 		sections[std::string(section_name)] = section;
-		
+
 		file.seekg(16, std::ios::cur);
 	}
 
@@ -106,19 +108,20 @@ peFile::peFile(fs::path filepath) {
 
 void peFile::parseResources() {
 	std::map<std::string, peSection>::iterator si = sections.find(std::string(".rsrc"));
-	if (si == sections.end()) return;
-	peSection &s = si->second;
+	if (si == sections.end())
+		return;
+	peSection& s = si->second;
 
 	parseResourcesLevel(s, s.offset, 0);
 }
 
 unsigned int currtype, currname, currlang;
 
-void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int level) {
+void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int level) {
 	file.seekg(off, std::ios::beg);
 
 	file.seekg(12, std::ios::cur);
-	
+
 	uint16_t nonamedentries = read16le(file);
 	uint16_t noidentries = read16le(file);
 
@@ -127,7 +130,7 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 		uint32_t offset = read32le(file);
 
 		unsigned int here = file.tellg();
-	
+
 		if (level == 0) {
 			currtype = name;
 		} else if (level == 1) {
@@ -145,12 +148,12 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 			/* bottom level, file data is here */
 
 			file.seekg(s.offset + offset, std::ios::beg);
-			
+
 			uint32_t offset = read32le(file);
 			offset += s.offset;
 			offset -= s.vaddr;
 			uint32_t size = read32le(file);
-				
+
 			resourceInfo info;
 			info.offset = offset;
 			info.size = size;
@@ -159,13 +162,13 @@ void peFile::parseResourcesLevel(peSection &s, unsigned int off, unsigned int le
 			//if ((currlang & 0xff) == 0x09) // LANG_ENGLISH
 			resources[std::pair<uint32_t, uint32_t>(currtype, currlang)][currname] = info;
 		}
-		
+
 		file.seekg(here, std::ios::beg);
 	}
 }
 
 peFile::~peFile() {
-	for (auto & resource : resources) {
+	for (auto& resource : resources) {
 		for (std::map<uint32_t, resourceInfo>::iterator j = resource.second.begin(); j != resource.second.end(); j++) {
 			if (j->second.data) {
 				delete[] j->second.data;
@@ -174,11 +177,13 @@ peFile::~peFile() {
 	}
 }
 
-resourceInfo *peFile::getResource(uint32_t type, uint32_t lang, uint32_t name) {
-	if (resources.find(std::pair<uint32_t, uint32_t>(type, lang)) == resources.end()) return 0;
-	if (resources[std::pair<uint32_t, uint32_t>(type, lang)].find(name) == resources[std::pair<uint32_t, uint32_t>(type, lang)].end()) return 0;
+resourceInfo* peFile::getResource(uint32_t type, uint32_t lang, uint32_t name) {
+	if (resources.find(std::pair<uint32_t, uint32_t>(type, lang)) == resources.end())
+		return 0;
+	if (resources[std::pair<uint32_t, uint32_t>(type, lang)].find(name) == resources[std::pair<uint32_t, uint32_t>(type, lang)].end())
+		return 0;
 
-	resourceInfo *r = &resources[std::pair<uint32_t, uint32_t>(type, lang)][name];
+	resourceInfo* r = &resources[std::pair<uint32_t, uint32_t>(type, lang)][name];
 	if (!r->data) {
 		file.seekg(r->offset, std::ios::beg);
 		r->data = new char[r->size];
@@ -188,12 +193,14 @@ resourceInfo *peFile::getResource(uint32_t type, uint32_t lang, uint32_t name) {
 }
 
 Image peFile::getBitmap(uint32_t name) {
-	resourceInfo *r = getResource(PE_RESOURCETYPE_BITMAP, HORRID_LANG_ENGLISH, name);
-	if (!r) r = getResource(PE_RESOURCETYPE_BITMAP, 0x400, name);
-	if (!r) return {};
-	
+	resourceInfo* r = getResource(PE_RESOURCETYPE_BITMAP, HORRID_LANG_ENGLISH, name);
+	if (!r)
+		r = getResource(PE_RESOURCETYPE_BITMAP, 0x400, name);
+	if (!r)
+		return {};
+
 	spanstream ss(r->getData(), r->getSize());
-	
+
 	Image bmp = ReadDibFile(ss);
 	return bmp;
 }

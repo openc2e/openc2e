@@ -17,25 +17,27 @@
  *
  */
 
-#include "caosValue.h"
 #include "MusicManager.h"
+
 #include "Engine.h"
 #include "MNGMusic.h"
 #include "SoundManager.h"
 #include "World.h"
+#include "caosValue.h"
 
 // this is all for MusicManager::tick
-#include "World.h"
 #include "Camera.h"
-#include "Room.h"
 #include "MetaRoom.h"
+#include "Room.h"
+#include "World.h"
 
 MusicManager::MusicManager(const std::shared_ptr<AudioBackend>& backend_)
-	: backend(backend_), mng_music(std::make_unique<MNGMusic>(backend_)) {}
+	: backend(backend_), mng_music(std::make_unique<MNGMusic>(backend_)) {
+}
 
 MusicManager::~MusicManager() {
 	stop();
-	for (auto & file : files) {
+	for (auto& file : files) {
 		delete file.second;
 	}
 }
@@ -130,8 +132,8 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 			trackname = track.substr(n + 1, std::string::npos);
 		}
 
-		MNGFile *file;
-		std::transform(filename.begin(), filename.end(), filename.begin(), (int(*)(int))tolower);
+		MNGFile* file;
+		std::transform(filename.begin(), filename.end(), filename.begin(), (int (*)(int))tolower);
 		if (files.find(filename) == files.end()) {
 			std::string realfilename = world.findFile("Sounds/" + filename);
 			if (!realfilename.size()) {
@@ -155,8 +157,7 @@ void MusicManager::tick() {
 	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
 	// TODO: is this the right place for this?
 	if (engine.version == 1 && (world.tickcount % 70) == 0 &&
-	    backend->getChannelState(creatures1_channel) == AUDIO_STOPPED)
-	{
+		backend->getChannelState(creatures1_channel) == AUDIO_STOPPED) {
 		auto sounds = world.findFiles("Sounds", "MU*.wav");
 		if (sounds.size()) {
 			creatures1_channel = backend->playClip(sounds[rand() % sounds.size()]);
@@ -170,7 +171,7 @@ void MusicManager::tick() {
 	}
 	if (how_long_before_changing_track_ms <= 0) {
 		// TODO: this behaviour is different in C2, and should probably be cleverer
-		MetaRoom *m = engine.camera->getMetaRoom();
+		MetaRoom* m = engine.camera->getMetaRoom();
 		if (m) {
 			std::shared_ptr<Room> r = m->roomAt(engine.camera->getXCentre(), engine.camera->getYCentre());
 			if (r && r->music.size()) {
@@ -181,7 +182,7 @@ void MusicManager::tick() {
 		}
 	}
 	mng_music->update();
-	
+
 	// update volumes based on new volumes, muting, etc
 	updateVolumes();
 }

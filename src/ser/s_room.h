@@ -21,29 +21,30 @@
 #define S_ROOM_H 1
 
 #include "Room.h"
-#include "ser/s_physics.h"
 #include "ser/s_metaroom.h"
+#include "ser/s_physics.h"
 #include "serialization.h"
+
 #include <boost/serialization/set.hpp>
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 SERIALIZE(RoomDoor) {
-	ar & obj.first & obj.second & obj.perm;
+	ar& obj.first& obj.second& obj.perm;
 }
 
 SERIALIZE(Room) {
-	ar & obj.doors & obj.nearby;
-	ar & obj.x_left & obj.x_right;
-	ar & obj.y_left_ceiling & obj.y_right_ceiling;
-	ar & obj.y_left_floor & obj.y_right_floor;
+	ar& obj.doors& obj.nearby;
+	ar& obj.x_left& obj.x_right;
+	ar& obj.y_left_ceiling& obj.y_right_ceiling;
+	ar& obj.y_left_floor& obj.y_right_floor;
 
-	ar & obj.left & obj.right & obj.top & obj.bot;
+	ar& obj.left& obj.right& obj.top& obj.bot;
 
-	ar & obj.type & obj.id;
-	ar & obj.metaroom;
+	ar& obj.type& obj.id;
+	ar& obj.metaroom;
 	std::string t("CA PREMARK");
-	ar & t;
+	ar& t;
 	assert(t == "CA PREMARK");
 #if 0
 	std::vector<float> hack;
@@ -54,11 +55,10 @@ SERIALIZE(Room) {
 				  std::cerr << "Post=" << obj.ca[i] << std::endl;*/
 	}
 #endif
-	ar & obj.ca;
+	ar& obj.ca;
 	std::string t2("CA POSTMARK");
-	ar & t2;
+	ar& t2;
 	assert(t2 == "CA POSTMARK");
 }
 
 #endif
-

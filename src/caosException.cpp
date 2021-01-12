@@ -1,4 +1,5 @@
 #include "caosException.h"
+
 #include "caosScript.h"
 
 void caosException::trace(std::shared_ptr<class script> scr, int traceindex) throw() {
@@ -10,7 +11,8 @@ std::string caosException::prettyPrint() const {
 	std::string buf;
 	buf += what();
 	buf += "\n";
-	if (!script) return buf + "Source information unavailable.\n";
+	if (!script)
+		return buf + "Source information unavailable.\n";
 	buf += "in file ";
 	buf += script->filename;
 	if (traceindex < 0 || (size_t)traceindex >= script->tokinfo->size()) {
@@ -31,11 +33,11 @@ std::string caosException::prettyPrint() const {
 	}
 	buf += ":\n";
 
-	int linelen  = 73; // XXX, margins aren't being counted it seems
+	int linelen = 73; // XXX, margins aren't being counted it seems
 	int contextl = (linelen - tr.width) / 2;
 	int contextr = linelen - contextl;
-	int marginl  = 0;
-	int marginr  = 0;
+	int marginl = 0;
+	int marginr = 0;
 
 	if (linelen <= tr.width) {
 		contextl = contextr = 0;
@@ -90,7 +92,3 @@ std::string caosException::prettyPrint() const {
 	buf += "\n";
 	return buf;
 }
-
-
-
-

@@ -22,13 +22,13 @@
 #include "CompoundAgent.h"
 
 class Vehicle : public CompoundAgent {
-protected:
+  protected:
 	friend class SFCVehicle;
 
 	unsigned int capacity;
 	unsigned int bump;
 
-public:
+  public:
 	Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount); // C1/C2 constructor
@@ -37,12 +37,17 @@ public:
 	int cabinleft, cabintop, cabinright, cabinbottom; // TODO: should be protected w/accessors?
 	int cabinplane;
 
-	void setCabinRect(int l, int t, int r, int b) { cabinleft = l; cabintop = t; cabinright = r; cabinbottom = b; }
+	void setCabinRect(int l, int t, int r, int b) {
+		cabinleft = l;
+		cabintop = t;
+		cabinright = r;
+		cabinbottom = b;
+	}
 	void setCapacity(unsigned int c) { capacity = c; }
 	unsigned int getBump() { return bump; }
 
 	std::vector<AgentRef> passengers;
-	
+
 	virtual void carry(AgentRef);
 	virtual void drop(AgentRef);
 	virtual void adjustCarried(float xoffset, float yoffset);

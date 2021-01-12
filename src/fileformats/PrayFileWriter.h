@@ -1,30 +1,31 @@
 #pragma once
 
+#include "span.h"
+
 #include <iosfwd>
 #include <map>
 #include <string>
-#include "span.h"
 
 class PrayFileWriter {
-public:
-  enum Compression {
-      PRAY_COMPRESS_ON,
-      PRAY_COMPRESS_OFF
-  };
+  public:
+	enum Compression {
+		PRAY_COMPRESS_ON,
+		PRAY_COMPRESS_OFF
+	};
 
-  PrayFileWriter(std::ostream &stream);
+	PrayFileWriter(std::ostream& stream);
 
-  void writeBlockRawData(const std::string &type, const std::string &name,
-                         const unsigned char *data, size_t data_size,
-                         Compression compress = PRAY_COMPRESS_ON);
-  void writeBlockRawData(const std::string &type, const std::string &name,
-                         span<const unsigned char> data, Compression compress = PRAY_COMPRESS_ON);
+	void writeBlockRawData(const std::string& type, const std::string& name,
+		const unsigned char* data, size_t data_size,
+		Compression compress = PRAY_COMPRESS_ON);
+	void writeBlockRawData(const std::string& type, const std::string& name,
+		span<const unsigned char> data, Compression compress = PRAY_COMPRESS_ON);
 
-  void writeBlockTags(const std::string &type, const std::string &name,
-                      const std::map<std::string, unsigned int> &integer_tags,
-                      const std::map<std::string, std::string> &string_tags,
-                      Compression compress = PRAY_COMPRESS_ON);
+	void writeBlockTags(const std::string& type, const std::string& name,
+		const std::map<std::string, unsigned int>& integer_tags,
+		const std::map<std::string, std::string>& string_tags,
+		Compression compress = PRAY_COMPRESS_ON);
 
-private:
-  std::ostream& stream;
+  private:
+	std::ostream& stream;
 };

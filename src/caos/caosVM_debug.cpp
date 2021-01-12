@@ -17,22 +17,23 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
 #include "Agent.h"
+#include "Scriptorium.h"
 #include "World.h"
+#include "caosScript.h"
+#include "caosVM.h"
+#include "caos_assert.h"
+#include "cmddata.h"
+#include "dialect.h"
+
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <memory>
-#include "cmddata.h"
-#include <cctype>
-#include "dialect.h"
-#include <algorithm>
-#include "caosScript.h"
-#include "Scriptorium.h"
 
 // #include "malloc.h" <- unportable horror!
-#include <sstream>
 #include <fmt/core.h>
+#include <sstream>
 
 /**
  DBG: OUTS (command) val (string)
@@ -46,9 +47,9 @@
  %status maybe
  %variants c1 c2
 */
-void c_DBG_OUTS(caosVM *vm) {
+void c_DBG_OUTS(caosVM* vm) {
 	VM_PARAM_STRING(val)
-	
+
 	fmt::print("{}\n", val);
 }
 
@@ -64,7 +65,7 @@ void c_DBG_OUTS(caosVM *vm) {
  %status maybe
  %variants c1 c2
 */
-void c_DBG_OUTV(caosVM *vm) {
+void c_DBG_OUTV(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALUE(val)
 
@@ -73,9 +74,10 @@ void c_DBG_OUTV(caosVM *vm) {
 	} else if (val.hasInt()) {
 		fmt::print("{}", val.getInt());
 	} else if (val.hasVector()) {
-		const Vector<float> &v = val.getVector();
+		const Vector<float>& v = val.getVector();
 		fmt::print("({:0.6f}, {:0.6f})", v.x, v.y);
-	} else throw badParamException();
+	} else
+		throw badParamException();
 	fmt::print("\n");
 }
 
@@ -84,7 +86,7 @@ void c_DBG_OUTV(caosVM *vm) {
  %status maybe
  %variants c1 c2
 */
-void c_DBUG(caosVM *vm) {
+void c_DBUG(caosVM* vm) {
 	vm->inst = true;
 	c_DBG_OUTV(vm);
 }
@@ -100,7 +102,7 @@ void c_DBUG(caosVM *vm) {
 XXX: when serialization support works, this might well become good for
 	 persisting :)
 */
-void v_UNID(caosVM *vm) {
+void v_UNID(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	valid_agent(vm->targ);
 	vm->result.setInt(vm->targ->getUNID());
@@ -114,7 +116,7 @@ void v_UNID(caosVM *vm) {
  Returns the unique ID of the target agent.
  This is currently no good for persisting.
 */
-void v_UNID_c2(caosVM *vm) {
+void v_UNID_c2(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	valid_agent(vm->targ);
 	vm->result.setAgent(vm->targ);
@@ -126,7 +128,7 @@ void v_UNID_c2(caosVM *vm) {
 
  Returns the agent with the given UNID, or NULL if agent has been deleted.
 */
-void v_AGNT(caosVM *vm) {
+void v_AGNT(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(id)
 
@@ -142,9 +144,9 @@ void v_AGNT(caosVM *vm) {
 */
 void c_DBG_MALLOC(caosVM*) {
 	VM_VERIFY_SIZE(0)
-	
+
 	// more unportable horror!
-/*	struct mallinfo mi = mallinfo();
+	/*	struct mallinfo mi = mallinfo();
 #define MPRINT(name) \
 	fprintf(stderr, "%10s = %d\n", #name, mi. name)
 	MPRINT(arena);
@@ -158,13 +160,13 @@ void c_DBG_MALLOC(caosVM*) {
 	MPRINT(fordblks);
 	MPRINT(keepcost);
 	malloc_stats(); */
-	
+
 	/*std::cerr << "caosSlab free=" << caosValueSlab.free_elements() <<
 				 " used=" << caosValueSlab.used_elements() <<
 				 " total=" << caosValueSlab.total_elements() <<
 				 std::endl;*/
 }
-	
+
 /**
  DBG: DUMP (command)
  %status ok
@@ -172,9 +174,9 @@ void c_DBG_MALLOC(caosVM*) {
 
  Dumps the current script's bytecode to stderr.
 */
-void c_DBG_DUMP(caosVM *vm) {
+void c_DBG_DUMP(caosVM* vm) {
 	std::cerr << vm->currentscript->dump();
-}	
+}
 
 /**
  DBG: TRACE (command) level (integer)
@@ -183,7 +185,7 @@ void c_DBG_DUMP(caosVM *vm) {
 
  Sets opcode trace level. Zero disables.
 */
-void c_DBG_TRACE(caosVM *vm) {
+void c_DBG_TRACE(caosVM* vm) {
 	VM_PARAM_INTEGER(en)
 
 	std::cerr << "trace: " << en << std::endl;
@@ -198,14 +200,14 @@ void c_DBG_TRACE(caosVM *vm) {
  
  Looks up documentation on the given command and spits it on the current output stream.
 */
-void c_MANN(caosVM *vm) {
+void c_MANN(caosVM* vm) {
 	VM_PARAM_STRING(cmd)
 
 	caos_assert(vm->outputstream);
 
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), toupper);
-	const cmdinfo *i = vm->currentscript->dialect->cmdbase();
-	
+	const cmdinfo* i = vm->currentscript->dialect->cmdbase();
+
 	bool found = false;
 	while (i->lookup_key) {
 		// TODO: this doesn't work for FACE at the moment due to hack elsewhere
@@ -216,9 +218,10 @@ void c_MANN(caosVM *vm) {
 			if (d.size())
 				*vm->outputstream << std::string(i->docs) << std::endl;
 			else
-				*vm->outputstream << "no documentation for " << cmd << std::endl << std::endl;
+				*vm->outputstream << "no documentation for " << cmd << std::endl
+								  << std::endl;
 		}
-	
+
 		i++;
 	}
 
@@ -239,12 +242,12 @@ void c_MANN(caosVM *vm) {
 
  If the script is not found no output will be generated.
  */
-void c_DBG_DISA(caosVM *vm) {
+void c_DBG_DISA(caosVM* vm) {
 	VM_PARAM_INTEGER(event)
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family)
-	
+
 	caos_assert(vm->outputstream);
 
 	std::shared_ptr<script> s = world.scriptorium->getScript(family, genus, species, event);
@@ -301,9 +304,9 @@ void c_DBG_FAIL(caosVM*) {
  Return a nicely-formatted string identifying the classifier of the agent,
  using the catalogue to find the name if possible.
 */
-void v_DBG_IDNT(caosVM *vm) {
+void v_DBG_IDNT(caosVM* vm) {
 	VM_PARAM_AGENT(a)
-	
+
 	if (!a)
 		vm->result.setString("(null)");
 	else
@@ -337,9 +340,9 @@ void c_DBG_CPRO(caosVM*) {
 
  Returns the bare token in 'bareword' as a string.
 */
-void v_DBG_STOK(caosVM *vm) {
+void v_DBG_STOK(caosVM* vm) {
 	VM_PARAM_STRING(bareword)
-	
+
 	vm->result.setString(bareword);
 }
 
@@ -353,7 +356,7 @@ void v_DBG_STOK(caosVM *vm) {
  affects only the current timeslice; future slices use the normal amount for
  the dialect in question.
 */
-void c_DBG_TSLC(caosVM *vm) {
+void c_DBG_TSLC(caosVM* vm) {
 	VM_PARAM_INTEGER(tslc);
 	vm->timeslice = tslc;
 }
@@ -365,7 +368,7 @@ void c_DBG_TSLC(caosVM *vm) {
  
  Returns the number of ticks left in the current script's remaining timeslice.
 */
-void v_DBG_TSLC(caosVM *vm) {
+void v_DBG_TSLC(caosVM* vm) {
 	vm->result.setInt(vm->timeslice);
 }
 
@@ -377,9 +380,12 @@ DBG: SIZO (string)
  Returns a human-readable profile of the sizes and allocation counts of
  various internal data structures
  */
-void v_DBG_SIZO(caosVM *vm) {
+void v_DBG_SIZO(caosVM* vm) {
 	std::ostringstream oss;
-#define SIZEOF_OUT(t) do { oss << "sizeof(" #t ") = " << sizeof(t) << std::endl; } while(0)
+#define SIZEOF_OUT(t) \
+	do { \
+		oss << "sizeof(" #t ") = " << sizeof(t) << std::endl; \
+	} while (0)
 	SIZEOF_OUT(caosVM);
 	SIZEOF_OUT(caosValue);
 	SIZEOF_OUT(Agent);

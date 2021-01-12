@@ -1,25 +1,24 @@
 #include "Openc2eImGui.h"
 
-#include <imgui.h>
-#include <imgui_impl_sdl.h>
-#include <imgui_sdl.h>
-#include <imgui_internal.h>
-#include <SDL.h>
-
 #include "AgentInjector.h"
 #include "BrainViewer.h"
 #include "C1ToolBar.h"
 #include "C2StatusBar.h"
-#include "MainMenu.h"
-#include "Hatchery.h"
 #include "C2ToolBar.h"
 #include "CreatureGrapher.h"
-
 #include "Engine.h"
+#include "Hatchery.h"
+#include "MainMenu.h"
+
+#include <SDL.h>
+#include <imgui.h>
+#include <imgui_impl_sdl.h>
+#include <imgui_internal.h>
+#include <imgui_sdl.h>
 
 namespace Openc2eImGui {
 
-void Init(SDL_Window *window) {
+void Init(SDL_Window* window) {
 	{
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
@@ -44,10 +43,10 @@ void Init(SDL_Window *window) {
 		// style.Colors[ImGuiCol_PopupBg] = ImVec4(224 / 255.0, 224 / 255.0, 224 / 255.0, 1.0);
 
 		// ImGui::GetStyle().ScaleAllSizes(2);
-		
+
 		ImGui_ImplSDL2_Init(window);
 
-		SDL_Renderer *renderer = SDL_GetRenderer(window);
+		SDL_Renderer* renderer = SDL_GetRenderer(window);
 
 		int w = 0, h = 0;
 		assert(SDL_GetRendererOutputSize(renderer, &w, &h) == 0);
@@ -55,7 +54,7 @@ void Init(SDL_Window *window) {
 	}
 }
 
-void Update(SDL_Window *window) {
+void Update(SDL_Window* window) {
 	ImGui_ImplSDL2_NewFrame(window);
 	ImGui::NewFrame();
 
@@ -101,23 +100,15 @@ void Render() {
 	ImGuiSDL::Render(ImGui::GetDrawData());
 }
 
-bool ConsumeEvent(const SDL_Event &event) {
+bool ConsumeEvent(const SDL_Event& event) {
 	ImGui_ImplSDL2_ProcessEvent(&event);
-	if (ImGui::GetIO().WantCaptureMouse && (
-		event.type == SDL_MOUSEBUTTONDOWN
-		|| event.type == SDL_MOUSEBUTTONUP
-		|| event.type == SDL_MOUSEWHEEL)
-	) {
+	if (ImGui::GetIO().WantCaptureMouse && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL)) {
 		return true;
 	}
-	if (ImGui::GetIO().WantCaptureKeyboard && (
-		event.type == SDL_KEYDOWN
-		|| event.type == SDL_KEYUP
-		|| event.type == SDL_TEXTINPUT)
-	) {
+	if (ImGui::GetIO().WantCaptureKeyboard && (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_TEXTINPUT)) {
 		return true;
 	}
-	
+
 	return false;
 }
 

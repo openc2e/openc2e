@@ -25,20 +25,20 @@
 class DullPart;
 
 class PointerAgent : public SimpleAgent {
-private:
-	DullPart *overlay;
+  private:
+	DullPart* overlay;
 	int overlayTimer;
 
-protected:
+  protected:
 	int hotspotx, hotspoty;
-	
+
 	AgentRef agent_under_pointer;
 	unsigned int part_under_pointer;
 
 	void carry(AgentRef);
 	void drop(AgentRef);
 
-public:
+  public:
 	std::string name;
 	bool handle_events;
 
@@ -50,11 +50,11 @@ public:
 
 	PointerAgent(std::string spritefile);
 	void finishInit();
-	void firePointerScript(unsigned short event, Agent *src);
+	void firePointerScript(unsigned short event, Agent* src);
 	void physicsTick();
 	void tick();
 	void kill();
-	void handleEvent(BackendEvent &event);
+	void handleEvent(BackendEvent& event);
 	void setHotspot(int, int);
 
 	int pointerX() { return x + hotspotx; }

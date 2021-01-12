@@ -22,22 +22,23 @@
 #define _SCRIPTORIUM_H
 
 #include "serfwd.h"
+
 #include <map>
 #include <memory>
 
 class script;
 
 class Scriptorium {
-protected:
+  protected:
 	FRIEND_SERIALIZE(Scriptorium)
 	// unsigned int = combined family/genus/species
 	// unsigned short = event id
 	std::map<unsigned int, std::map<unsigned short, std::shared_ptr<script> > > scripts;
-	
-	std::map<unsigned short, std::shared_ptr<script> > &getScripts(unsigned int value) { return scripts[value]; }
+
+	std::map<unsigned short, std::shared_ptr<script> >& getScripts(unsigned int value) { return scripts[value]; }
 	unsigned int calculateValue(unsigned char family, unsigned char genus, unsigned short species);
 
-public:
+  public:
 	void addScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event, std::shared_ptr<script> s);
 	void delScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event);
 	std::shared_ptr<script> getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event);

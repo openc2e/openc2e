@@ -1,9 +1,10 @@
 #include "partzorder.h"
+
 #include "Agent.h"
 #include "CompoundPart.h"
 #include "Engine.h"
 
-bool partzorder::operator ()(const CompoundPart *s1, const CompoundPart *s2) const {
+bool partzorder::operator()(const CompoundPart* s1, const CompoundPart* s2) const {
 	// TODO: unsure about all of this, needs a check (but seems to work)
 	if (s1->getParent() == s2->getParent()) {
 		return s1->part_sequence_number > s2->part_sequence_number;

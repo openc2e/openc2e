@@ -19,9 +19,11 @@
 
 #pragma once
 
-#include <iosfwd>
 #include "Image.h"
 
-Image ReadBmpFile(std::istream &in);
-Image ReadBmpFile(const std::string &path);
-Image ReadDibFile(std::istream &in);
+#include <iosfwd>
+#include <string>
+
+Image ReadBmpFile(std::istream& in);
+Image ReadBmpFile(const std::string& path);
+Image ReadDibFile(std::istream& in);

@@ -16,58 +16,59 @@
 namespace fs = ghc::filesystem;
 
 void caos1_format_visitor(CAOSNodePtr node, std::string& out) {
-    if (CAOSCommandNode *ccn = dynamic_cast<CAOSCommandNode*>(node.get())) {
-        out += ccn->name;
-        for (auto a : ccn->args) {
-            out += " ";
-            caos1_format_visitor(a, out);
-        }
-    } else if (CAOSConditionNode *ccn = dynamic_cast<CAOSConditionNode*>(node.get())) {
-        for (size_t i = 0; i < ccn->args.size(); ++i) {
-            if (i > 0) out += " ";
-            caos1_format_visitor(ccn->args[i], out);
-        }
-    } else if (CAOSLiteralValueNode *clvn = dynamic_cast<CAOSLiteralValueNode*>(node.get())) {
-        out += fmt::format("{}", clvn->token.value);
-    } else if (CAOSLiteralWordNode *clwn = dynamic_cast<CAOSLiteralWordNode*>(node.get())) {
-        out += clwn->word;
-    } else {
-        abort();
-    }
+	if (CAOSCommandNode* ccn = dynamic_cast<CAOSCommandNode*>(node.get())) {
+		out += ccn->name;
+		for (auto a : ccn->args) {
+			out += " ";
+			caos1_format_visitor(a, out);
+		}
+	} else if (CAOSConditionNode* ccn = dynamic_cast<CAOSConditionNode*>(node.get())) {
+		for (size_t i = 0; i < ccn->args.size(); ++i) {
+			if (i > 0)
+				out += " ";
+			caos1_format_visitor(ccn->args[i], out);
+		}
+	} else if (CAOSLiteralValueNode* clvn = dynamic_cast<CAOSLiteralValueNode*>(node.get())) {
+		out += fmt::format("{}", clvn->token.value);
+	} else if (CAOSLiteralWordNode* clwn = dynamic_cast<CAOSLiteralWordNode*>(node.get())) {
+		out += clwn->word;
+	} else {
+		abort();
+	}
 }
 
 std::string caos1_format(const std::string& text) {
-    std::vector<caostoken> tokens;
-    lexcaos(tokens, text.c_str());
-    auto toplevel = parse(tokens, getDialectByName("c1"));
+	std::vector<caostoken> tokens;
+	lexcaos(tokens, text.c_str());
+	auto toplevel = parse(tokens, getDialectByName("c1"));
 
-    std::string out;
-    int indent = 0;
-    for (auto c : toplevel) {
-        auto ccn = (CAOSCommandNode*)c.get();
-        if (string_in(ccn->name, {"elif", "else", "endi", "ever", "next", "repe", "retn", "untl"})) {
-            indent = std::max(indent - 1, 0);
-        } else if (string_in(ccn->name, {"endm"})) {
-            indent = 0;
-        } else if (string_in(ccn->name, {"iscr", "rscr", "scrp"})) {
-            indent = 0;
-            if (out.size() > 0) {
-                out += "\n";
-            }
-        }
-        for (int i = 0; i < indent; ++i) {
-            out += "    ";
-        }
-        caos1_format_visitor(c, out);
-        if (string_in(ccn->name, {"doif", "elif", "else", "enum", "epas", "esee", "etch", "iscr", "loop", "reps", "scrp", "subr"})) {
-            indent++;
-        }
-        out += "\n";
-        if (string_in(ccn->name, {"wait"})) {
-            out += "\n";
-        }
-    }
-    return out;
+	std::string out;
+	int indent = 0;
+	for (auto c : toplevel) {
+		auto ccn = (CAOSCommandNode*)c.get();
+		if (string_in(ccn->name, {"elif", "else", "endi", "ever", "next", "repe", "retn", "untl"})) {
+			indent = std::max(indent - 1, 0);
+		} else if (string_in(ccn->name, {"endm"})) {
+			indent = 0;
+		} else if (string_in(ccn->name, {"iscr", "rscr", "scrp"})) {
+			indent = 0;
+			if (out.size() > 0) {
+				out += "\n";
+			}
+		}
+		for (int i = 0; i < indent; ++i) {
+			out += "    ";
+		}
+		caos1_format_visitor(c, out);
+		if (string_in(ccn->name, {"doif", "elif", "else", "enum", "epas", "esee", "etch", "iscr", "loop", "reps", "scrp", "subr"})) {
+			indent++;
+		}
+		out += "\n";
+		if (string_in(ccn->name, {"wait"})) {
+			out += "\n";
+		}
+	}
+	return out;
 }
 
 std::string escape(const std::string& s) {
@@ -86,7 +87,7 @@ std::string escape(const std::string& s) {
 	return result;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 	if (argc != 2) {
 		std::cerr << "syntax: cobdumper filename" << std::endl;
 		exit(1);
@@ -97,10 +98,10 @@ int main(int argc, char **argv) {
 		std::cerr << "File " << input_path << " doesn't exist" << std::endl;
 		exit(1);
 	}
-    
-    fs::path stem = input_path.stem();
 
-    std::ifstream in(input_path, std::ios::binary);
+	fs::path stem = input_path.stem();
+
+	std::ifstream in(input_path, std::ios::binary);
 
 	unsigned char magic[4];
 	in.read((char*)magic, 4);
@@ -110,7 +111,7 @@ int main(int argc, char **argv) {
 		fmt::print("\"cob2\"\n");
 		fmt::print("\n");
 		c2cobfile cob(input_path);
-		for (auto &b : cob.blocks) {
+		for (auto& b : cob.blocks) {
 			if (b->getType() == "agnt") {
 				cobAgentBlock agnt(b);
 
@@ -157,7 +158,7 @@ int main(int argc, char **argv) {
 				fmt::print("\"URL\" \"{}\"\n", auth.authorurl);
 				fmt::print("\"Comments\" \"{}\"\n", escape(auth.authorcomments));
 				fmt::print("\n");
-			}else {
+			} else {
 				fmt::print("unknown block type '{}'\n", b->getType());
 			}
 		}
@@ -180,11 +181,11 @@ int main(int argc, char **argv) {
 		fmt::print("\n");
 
 		std::string script;
-		for (auto & install_script : cob.install_scripts) {
+		for (auto& install_script : cob.install_scripts) {
 			script += "iscr," + install_script + "\n";
-            // TODO: if only one, don't add iscr, and remove endm
+			// TODO: if only one, don't add iscr, and remove endm
 		}
-		for (auto & object_script : cob.object_scripts) {
+		for (auto& object_script : cob.object_scripts) {
 			script += object_script + "\n";
 			// TODO: make sure it ends with endm
 		}

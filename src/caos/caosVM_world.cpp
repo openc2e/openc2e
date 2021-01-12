@@ -17,15 +17,15 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
 #include "World.h"
+#include "caosVM.h"
+#include "caos_assert.h"
 
 /**
  LOAD (command) worldname (string)
  %status stub
 */
-void c_LOAD(caosVM *vm) {
+void c_LOAD(caosVM* vm) {
 	VM_PARAM_STRING(worldname)
 
 	// TODO
@@ -62,7 +62,7 @@ void c_QUIT(caosVM*) {
 
  Returns the name of the current world.
 */
-void v_WNAM(caosVM *vm) {
+void v_WNAM(caosVM* vm) {
 	// result.setString(world.name);
 	vm->result.setString("oh"); // TODO
 }
@@ -73,7 +73,7 @@ void v_WNAM(caosVM *vm) {
 
  Returns the unique identifier (moniker?) of the current world.
 */
-void v_WUID(caosVM *vm) {
+void v_WUID(caosVM* vm) {
 	// result.setString(world.moniker);
 	vm->result.setString("dock-aaaaa-bbbbb-ccccc-ddddd"); // TODO
 }
@@ -84,7 +84,7 @@ void v_WUID(caosVM *vm) {
 
  Sets an index in the mysterious global tint table to have the specified values. No, we have no idea what that means either.
 */
-void c_WTNT(caosVM *vm) {
+void c_WTNT(caosVM* vm) {
 	VM_PARAM_INTEGER(swap)
 	VM_PARAM_INTEGER(rotation)
 	VM_PARAM_INTEGER(blue)
@@ -99,7 +99,7 @@ void c_WTNT(caosVM *vm) {
  NWLD (integer)
  %status stub
 */
-void v_NWLD(caosVM *vm) {
+void v_NWLD(caosVM* vm) {
 	vm->result.setInt(0); // TODO
 }
 
@@ -109,7 +109,7 @@ void v_NWLD(caosVM *vm) {
 
  Create a new world directory to prepare for the creation of the specified world.
 */
-void c_WRLD(caosVM *vm) {
+void c_WRLD(caosVM* vm) {
 	VM_PARAM_STRING(name)
 
 	// TODO
@@ -121,7 +121,7 @@ void c_WRLD(caosVM *vm) {
 
  Return the name of the specified world (zero-indexed, see NWLD).
 */
-void v_WRLD(caosVM *vm) {
+void v_WRLD(caosVM* vm) {
 	VM_PARAM_INTEGER(world)
 
 	caos_assert(false); // TODO
@@ -131,7 +131,7 @@ void v_WRLD(caosVM *vm) {
  PSWD (command) password (string)
  %status stub
 */
-void c_PSWD(caosVM *vm) {
+void c_PSWD(caosVM* vm) {
 	VM_PARAM_STRING(password)
 
 	// TODO
@@ -143,7 +143,7 @@ void c_PSWD(caosVM *vm) {
 
  Return the password for the specified world (zero-indexed, see NWLD), or an empty string for no password.
 */
-void v_PSWD(caosVM *vm) {
+void v_PSWD(caosVM* vm) {
 	VM_PARAM_INTEGER(world)
 
 	vm->result.setString(""); // TODO
@@ -155,7 +155,7 @@ void v_PSWD(caosVM *vm) {
 
  Return the world identifier for the specified world name, or -1 if it doesn't exist.
 */
-void v_WNTI(caosVM *vm) {
+void v_WNTI(caosVM* vm) {
 	VM_PARAM_STRING(name)
 
 	vm->result.setInt(-1); // TODO
@@ -167,7 +167,7 @@ void v_WNTI(caosVM *vm) {
 
  Delete the specified world directory and all contents.
 */
-void c_DELW(caosVM *vm) {
+void c_DELW(caosVM* vm) {
 	VM_PARAM_STRING(name)
 
 	caos_assert(false); // TODO

@@ -21,4 +21,4 @@
 
 #include "Image.h"
 
-MultiImage ReadSprFile(std::istream &in);
+MultiImage ReadSprFile(std::istream& in);

@@ -3,27 +3,24 @@
 #include <iostream>
 #include <vector>
 
-class vectorstream : public std::iostream
-{
-public:
+class vectorstream : public std::iostream {
+  public:
 	vectorstream()
 		: std::iostream(&buf), buf(vector_) {}
 
 	const std::vector<unsigned char>& vector() { return vector_; }
 
-private:
-	class vectorstreambuf : public std::streambuf
-	{
-	public:
-		vectorstreambuf(std::vector<unsigned char> &vector_)
+  private:
+	class vectorstreambuf : public std::streambuf {
+	  public:
+		vectorstreambuf(std::vector<unsigned char>& vector_)
 			: vector(vector_) {}
 
 		pos_type seekpos(pos_type pos, std::ios_base::openmode which) override {
 			return seekoff(pos, std::ios_base::beg, which);
 		}
 
-		pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) override
-		{
+		pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) override {
 			if (which == std::ios_base::out) {
 				if (off == 0) {
 					return pos_type(vector.size());
@@ -60,8 +57,9 @@ private:
 			}
 			return ret;
 		}
-	private:
-		std::vector<unsigned char> &vector;
+
+	  private:
+		std::vector<unsigned char>& vector;
 		size_t position = 0;
 	};
 	std::vector<unsigned char> vector_;

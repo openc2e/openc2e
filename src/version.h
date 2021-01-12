@@ -24,4 +24,3 @@
 
 #define DEV_BUILD 1
 #define RELEASE_VERSION "alpha 0.1"
-

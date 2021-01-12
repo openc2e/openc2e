@@ -20,15 +20,14 @@
 #ifndef S_METAROOM_H
 #define S_METAROOM_H 1
 
-#include "ser/s_room.h"
 #include "MetaRoom.h"
-#include "serialization.h"
 #include "ser/s_creaturesImage.h"
+#include "ser/s_room.h"
+#include "serialization.h"
 
 SERIALIZE(MetaRoom) {
-	ar & obj.xloc & obj.yloc & obj.wid & obj.hei;
-	ar & obj.backgrounds & obj.firstback;
+	ar& obj.xloc& obj.yloc& obj.wid& obj.hei;
+	ar& obj.backgrounds& obj.firstback;
 }
 
 #endif
-

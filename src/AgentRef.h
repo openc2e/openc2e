@@ -25,44 +25,57 @@ class Agent;
 
 class AgentRef {
 	friend class Agent;
-	
-protected:
+
+  protected:
 	std::weak_ptr<Agent> ref;
 	void checkLife() const;
 
-public:
+  public:
 	void dump() const;
-	
-	AgentRef() { }
+
+	AgentRef() {}
 	AgentRef(std::shared_ptr<Agent> a) { ref = a; }
 	AgentRef(std::weak_ptr<Agent> a) { ref = a; }
-	AgentRef(Agent *a) { set(a); }
-	AgentRef(const AgentRef &r) : ref(r.ref) {}
+	AgentRef(Agent* a) { set(a); }
+	AgentRef(const AgentRef& r)
+		: ref(r.ref) {}
 
 	void clear() { ref.reset(); }
-	
+
 	~AgentRef() { clear(); };
 
-	AgentRef &operator=(const AgentRef &r) { ref = r.ref; return *this; }
-	Agent *operator=(Agent *a) { set(a); return a; }
-	Agent &operator*() const { checkLife(); return *ref.lock().get(); }
-	Agent *operator->() const { checkLife(); return ref.lock().get(); }
+	AgentRef& operator=(const AgentRef& r) {
+		ref = r.ref;
+		return *this;
+	}
+	Agent* operator=(Agent* a) {
+		set(a);
+		return a;
+	}
+	Agent& operator*() const {
+		checkLife();
+		return *ref.lock().get();
+	}
+	Agent* operator->() const {
+		checkLife();
+		return ref.lock().get();
+	}
 	bool operator!() const { return lock().get() == nullptr; }
 	/* This next line breaks builds with MSVC, tossing errors about ambiguous operators.
 	operator bool() const { return ref; } */
-	operator Agent *() const { return ref.lock().get(); }
-	bool operator==(const AgentRef &r) const { return lock() == r.lock(); }
-	bool operator==(const Agent *r) const { return r == lock().get(); }
-	bool operator!=(const AgentRef &r) const { return !(*this == r);}
-	bool operator!=(const Agent *r) const { return !(*this == r); }
+	operator Agent*() const { return ref.lock().get(); }
+	bool operator==(const AgentRef& r) const { return lock() == r.lock(); }
+	bool operator==(const Agent* r) const { return r == lock().get(); }
+	bool operator!=(const AgentRef& r) const { return !(*this == r); }
+	bool operator!=(const Agent* r) const { return !(*this == r); }
 
-	void set(Agent *a);
-	void set(const AgentRef &r) { ref = r.ref; }
-	void set(const std::shared_ptr<Agent> &r) { ref = r; }
-	void set(const std::weak_ptr<Agent> &r) { ref = r; }
+	void set(Agent* a);
+	void set(const AgentRef& r) { ref = r.ref; }
+	void set(const std::shared_ptr<Agent>& r) { ref = r; }
+	void set(const std::weak_ptr<Agent>& r) { ref = r; }
 
 	std::shared_ptr<Agent> lock() const;
-	Agent *get() const { return lock().get(); }
+	Agent* get() const { return lock().get(); }
 };
 
 /* vim: set noet: */

@@ -21,33 +21,33 @@
 
 #include "audiobackend/AudioBackend.h"
 #include "utils/singleton.h"
+
+#include <SDL_mixer.h>
 #include <memory>
 #include <vector>
 
-#include <SDL_mixer.h>
-
 class SDLMixerBackend : public AudioBackend, public Singleton<SDLMixerBackend> {
-private:
+  private:
 	friend Singleton<SDLMixerBackend>;
 	SDLMixerBackend();
 	Mix_Music* midi = nullptr;
 	Mix_Chunk* arbitrary_audio_chunk = nullptr;
-	
-public:
+
+  public:
 	void init();
 	void shutdown();
-	
+
 	AudioChannel playClip(const std::string& filename, bool looping = false);
-	AudioChannel playWavData(const uint8_t *data, size_t size, bool looping = false);
+	AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false);
 	AudioChannel playStream(AudioStream*);
-	
+
 	void fadeOutChannel(AudioChannel);
 	void setChannelVolume(AudioChannel, float);
 	void setChannelPan(AudioChannel, float pan);
 	AudioState getChannelState(AudioChannel);
 	void stopChannel(AudioChannel);
-	
-	void playMIDIFile(const std::string &filename);
+
+	void playMIDIFile(const std::string& filename);
 	void setMIDIVolume(float);
 	void stopMIDI();
 };

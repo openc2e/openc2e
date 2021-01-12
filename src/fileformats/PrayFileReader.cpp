@@ -18,14 +18,17 @@
  */
 
 #include "fileformats/PrayFileReader.h"
-#include "encoding.h"
+
 #include "creaturesException.h"
+#include "encoding.h"
 #include "endianlove.h"
 #include "spanstream.h"
+
 #include <cstring>
 #include <zlib.h>
 
-PrayFileReader::PrayFileReader(std::istream& stream_) : stream(stream_) {
+PrayFileReader::PrayFileReader(std::istream& stream_)
+	: stream(stream_) {
 	char majic[4];
 	stream.read(majic, 4);
 	if (strncmp(majic, "PRAY", 4) != 0)
@@ -39,9 +42,9 @@ PrayFileReader::PrayFileReader(std::istream& stream_) : stream(stream_) {
 		if (!stream) {
 			throw creaturesException("Stream failure while reading PRAY file");
 		}
-		
+
 		block_offsets.push_back(stream.tellg());
-		
+
 		stream.seekg(132, std::ios::cur); // skip type and name
 		uint32_t compressedsize = read32le(stream);
 		stream.seekg(8 + compressedsize, std::ios::cur);
@@ -57,14 +60,16 @@ size_t PrayFileReader::getNumBlocks() {
 
 std::string PrayFileReader::getBlockType(size_t i) {
 	stream.seekg(block_offsets[i]);
-	char type[5]; type[4] = 0;
+	char type[5];
+	type[4] = 0;
 	stream.read(type, 4);
 	return type;
 }
 
 std::string PrayFileReader::getBlockName(size_t i) {
 	stream.seekg(block_offsets[i] + 4);
-	char name[129]; name[128] = 0;
+	char name[129];
+	name[128] = 0;
 	stream.read(name, 128);
 	return ensure_utf8(name);
 }
@@ -77,18 +82,18 @@ bool PrayFileReader::getBlockIsCompressed(size_t i) {
 
 std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 	std::string name = getBlockName(i);
-	
+
 	stream.seekg(block_offsets[i] + 132);
 	uint32_t compressedsize = read32le(stream);
 	uint32_t size = read32le(stream);
 	uint32_t flags = read32le(stream);
 	bool compressed = ((flags & 1) == 1);
-	
+
 	if (!compressed && size != compressedsize)
 		throw creaturesException("Size doesn't match compressed size for uncompressed block.");
-	
+
 	std::vector<unsigned char> buffer(size);
-	
+
 	if (compressed) {
 		// TODO: check pray_uncompress_sanity_check
 		std::vector<unsigned char> src(compressedsize);
@@ -97,7 +102,7 @@ std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 			throw creaturesException("Failed to read all of compressed block.");
 		}
 		uLongf usize = size;
-		int r = uncompress((Bytef *)buffer.data(), (uLongf *)&usize, (Bytef *)src.data(), compressedsize);
+		int r = uncompress((Bytef*)buffer.data(), (uLongf*)&usize, (Bytef*)src.data(), compressedsize);
 		if (r != Z_OK) {
 			std::string o = "Unknown error";
 			switch (r) {
@@ -112,12 +117,12 @@ std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 			throw creaturesException("Decompressed data is not the correct size.");
 		}
 	} else {
-		stream.read((char *)buffer.data(), size);
+		stream.read((char*)buffer.data(), size);
 		if (!stream.good()) {
 			throw creaturesException("Failed to read all of uncompressed block.");
 		}
 	}
-	
+
 	return buffer;
 }
 
@@ -134,7 +139,7 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 
 	std::map<std::string, uint32_t> integerValues;
 	std::map<std::string, std::string> stringValues;
-	
+
 	auto buffer = getBlockRawData(i);
 	spanstream s(buffer);
 
@@ -159,7 +164,7 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
 		}
 	}
-	
+
 	if (!s) {
 		throw creaturesException("Stream failure reading tags from PRAY block \"" + name + "\"");
 	}

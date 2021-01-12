@@ -17,22 +17,24 @@
  *
  */
 
-#include "caos_assert.h"
 #include "CompoundAgent.h"
+
 #include "DullPart.h"
-#include "World.h"
 #include "Engine.h" // version
+#include "World.h"
+#include "caosVM.h" // calculateScriptId
+#include "caos_assert.h"
+
 #include <algorithm> // sort
 #include <cassert>
 #include <functional> // binary_function
-#include "caosVM.h" // calculateScriptId
 
 // the list of parts is a list of pointers to CompoundPart, so we need a custom sort
-struct less_part : public std::binary_function<CompoundPart *, CompoundPart *, bool> {
-	bool operator()(CompoundPart *x, CompoundPart *y) { return *x < *y; }
+struct less_part : public std::binary_function<CompoundPart*, CompoundPart*, bool> {
+	bool operator()(CompoundPart* x, CompoundPart* y) { return *x < *y; }
 };
 
-void CompoundAgent::addPart(CompoundPart *p) {
+void CompoundAgent::addPart(CompoundPart* p) {
 	assert(p);
 	assert(!part(p->id)); // todo: handle better
 
@@ -44,10 +46,14 @@ void CompoundAgent::addPart(CompoundPart *p) {
 void CompoundAgent::delPart(unsigned int id) {
 	caos_assert(id != 0);
 
-	for (std::vector<CompoundPart *>::iterator x = parts.begin(); x != parts.end(); x++) {
-		if ((*x)->id == id) { delete *x; parts.erase(x); return; }
+	for (std::vector<CompoundPart*>::iterator x = parts.begin(); x != parts.end(); x++) {
+		if ((*x)->id == id) {
+			delete *x;
+			parts.erase(x);
+			return;
+		}
 	}
-	
+
 	throw caosException("delPart got a bad id"); // TODO: handle this exception properly
 }
 
@@ -55,30 +61,34 @@ unsigned int CompoundAgent::nextPartSequenceNumber() {
 	return next_part_sequence_number++;
 }
 
-CompoundPart *CompoundAgent::part(unsigned int id) {
-	for (auto & part : parts) {
-		if (part->id == id) return part;
+CompoundPart* CompoundAgent::part(unsigned int id) {
+	for (auto& part : parts) {
+		if (part->id == id)
+			return part;
 	}
 	return 0;
 }
 
 CompoundAgent::CompoundAgent(unsigned char _family, unsigned char _genus, unsigned short _species, unsigned int plane,
-				std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
-				Agent(_family, _genus, _species, plane) {
+	std::string spritefile, unsigned int firstimage, unsigned int imagecount)
+	: Agent(_family, _genus, _species, plane) {
 	// TODO: we ignore image count acos it sucks
 	(void)imagecount;
-	CompoundPart *p = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
+	CompoundPart* p = new DullPart(this, 0, spritefile, firstimage, 0, 0, 0);
 	caos_assert(p);
 	addPart(p);
 
 	for (unsigned int i = 0; i < 6; i++) {
-		hotspots[i].left = -1; hotspots[i].right = -1; hotspots[i].top = -1;
+		hotspots[i].left = -1;
+		hotspots[i].right = -1;
+		hotspots[i].top = -1;
 		hotspots[i].bottom = -1;
 		hotspotfunctions[i].hotspot = -1;
 	}
 }
 
-CompoundAgent::CompoundAgent(std::string _spritefile, unsigned int _firstimage, unsigned int _imagecount) : Agent(0, 0, 0, 0) {
+CompoundAgent::CompoundAgent(std::string _spritefile, unsigned int _firstimage, unsigned int _imagecount)
+	: Agent(0, 0, 0, 0) {
 	// TODO: think about plane
 
 	spritefile = _spritefile;
@@ -86,65 +96,76 @@ CompoundAgent::CompoundAgent(std::string _spritefile, unsigned int _firstimage, 
 	imagecount = _imagecount;
 
 	for (unsigned int i = 0; i < 6; i++) {
-		hotspots[i].left = -1; hotspots[i].right = -1; hotspots[i].top = -1;
+		hotspots[i].left = -1;
+		hotspots[i].right = -1;
+		hotspots[i].top = -1;
 		hotspots[i].bottom = -1;
 		hotspotfunctions[i].hotspot = -1;
 	}
 }
 
 CompoundAgent::~CompoundAgent() {
-	for (auto & part : parts) {
+	for (auto& part : parts) {
 		delete part;
 	}
 }
 
 void CompoundAgent::setZOrder(unsigned int plane) {
 	Agent::setZOrder(plane);
-	for (auto & part : parts) part->zapZOrder();
-	for (auto & part : parts) part->addZOrder();
+	for (auto& part : parts)
+		part->zapZOrder();
+	for (auto& part : parts)
+		part->addZOrder();
 }
 
 void CompoundAgent::tick() {
 	if (!paused) {
-		for (auto & part : parts) {
+		for (auto& part : parts) {
 			part->tick();
 		}
 	}
-	
+
 	Agent::tick();
 }
 
 int CompoundAgent::handleClick(float clickx, float clicky) {
-	if (!activateable()) return -1;
-	
+	if (!activateable())
+		return -1;
+
 	if (engine.version > 2) {
 		return Agent::handleClick(clickx, clicky);
 	}
 
 	// the hotspots are relative to us
-	clickx -= x; clicky -= y;
+	clickx -= x;
+	clicky -= y;
 
 	// TODO: this whole thing needs more thought/work
 
 	unsigned int i = 0;
-	if (engine.version == 1) i = 3; // skip C1 creature-only points
+	if (engine.version == 1)
+		i = 3; // skip C1 creature-only points
 	for (; i < 6; i++) {
-		if (hotspotfunctions[i].hotspot < 0) continue;
-		if (hotspotfunctions[i].hotspot >= 6) continue;
+		if (hotspotfunctions[i].hotspot < 0)
+			continue;
+		if (hotspotfunctions[i].hotspot >= 6)
+			continue;
 		unsigned short func;
 		if (engine.version == 1) {
 			// C1: we only check 3/4/5
 			func = calculateScriptId(i - 3);
 		} else {
-			if (hotspotfunctions[i].mask == 1) continue; // creature only
+			if (hotspotfunctions[i].mask == 1)
+				continue; // creature only
 			func = calculateScriptId(hotspotfunctions[i].message);
 		}
 
 		int j = hotspotfunctions[i].hotspot;
 
-		if (hotspots[j].left == -1) continue;
+		if (hotspots[j].left == -1)
+			continue;
 		// TODO: check other items for being -1?
-	
+
 		if ((clickx >= hotspots[j].left && clickx <= hotspots[j].right) &&
 			(clicky >= hotspots[j].top && clicky <= hotspots[j].bottom)) {
 			return func;
@@ -154,9 +175,10 @@ int CompoundAgent::handleClick(float clickx, float clicky) {
 	return -1;
 }
 
-bool CompoundAgent::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
+bool CompoundAgent::fireScript(unsigned short event, Agent* from, caosValue one, caosValue two) {
 	// TODO: this is a hack to deal with ACTV on compound agents in c1/c2
-	if (engine.version < 3 && actv == event) return false;
+	if (engine.version < 3 && actv == event)
+		return false;
 
 	return Agent::fireScript(event, from, one, two);
 }
@@ -174,7 +196,7 @@ void CompoundAgent::setHotspotFunc(unsigned int id, unsigned int f) {
 	assert(id < 6);
 
 	hotspotfunctions[id].hotspot = f;
-	
+
 	// TODO: this tries to make c2 work nicely, necessary?
 	hotspotfunctions[id].mask = 3;
 	if (id < 3)

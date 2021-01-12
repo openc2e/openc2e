@@ -1,16 +1,16 @@
+#include "endianlove.h"
+#include "spanstream.h"
+
 #include <fmt/format.h>
 #include <fstream>
 #include <ghc/filesystem.hpp>
 #include <zlib.h>
 
-#include "endianlove.h"
-#include "spanstream.h"
-
 namespace fs = ghc::filesystem;
 
 static const std::string CREATURES_ARCHIVE_MAGIC = "Creatures Evolution Engine - Archived information file. zLib 1.13 compressed";
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 	if (argc != 2) {
 		std::cerr << "syntax: creaturesarchivedumper filename" << std::endl;
 		exit(1);
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
 	std::vector<uint8_t> decompressed_data(data.size() * 20); // TODO: ???
 	uLongf usize = decompressed_data.size();
-	int r = uncompress((Bytef *)decompressed_data.data(), (uLongf *)&usize, (Bytef *)data.data() + s.tellg(), data.size() - s.tellg());
+	int r = uncompress((Bytef*)decompressed_data.data(), (uLongf*)&usize, (Bytef*)data.data() + s.tellg(), data.size() - s.tellg());
 	if (r != Z_OK) {
 		std::string o;
 		switch (r) {

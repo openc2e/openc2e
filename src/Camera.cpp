@@ -18,13 +18,15 @@
  */
 
 #include "Camera.h"
+
+#include "Agent.h"
+#include "Backend.h"
 #include "CameraPart.h"
 #include "Engine.h"
-#include "World.h"
-#include "Backend.h"
 #include "Map.h"
 #include "MetaRoom.h"
-#include "Agent.h"
+#include "World.h"
+
 #include <cassert>
 
 Camera::Camera() {
@@ -34,7 +36,7 @@ Camera::Camera() {
 	y = 0;
 }
 
-MetaRoom * Camera::getMetaRoom() const {
+MetaRoom* Camera::getMetaRoom() const {
 	return world.map->getMetaRoom(metaroom);
 }
 
@@ -48,7 +50,7 @@ void Camera::goToMetaRoom(unsigned int m, int _x, int _y, cameratransition trans
 	moveTo(_x, _y);
 	// TODO: transition
 	(void)transition;
-	
+
 	checkBounds();
 }
 
@@ -59,14 +61,15 @@ void Camera::moveTo(int _x, int _y, panstyle pan) {
 
 	// TODO: panning
 	(void)pan;
-	
+
 	checkBounds();
 }
 
 void Camera::moveToGlobal(int _x, int _y, panstyle pan) {
-	MetaRoom *m = world.map->metaRoomAt(_x, _y);
+	MetaRoom* m = world.map->metaRoomAt(_x, _y);
 	if (m) {
-		if (m->id != metaroom) pan = jump; // inter-metaroom panning is always jump
+		if (m->id != metaroom)
+			pan = jump; // inter-metaroom panning is always jump
 		metaroom = m->id;
 	}
 
@@ -78,7 +81,7 @@ void MainCamera::moveTo(int _x, int _y, panstyle pan) {
 	int yoffset = _y - y;
 	Camera::moveTo(_x, _y, pan);
 
-	for (auto & i : floated) {
+	for (auto& i : floated) {
 		assert(*i);
 		i->moveTo(i->x + xoffset, i->y + yoffset);
 	}
@@ -92,7 +95,8 @@ void MainCamera::addFloated(AgentRef a) {
 void MainCamera::delFloated(AgentRef a) {
 	assert(a);
 	std::vector<AgentRef>::iterator i = std::find(floated.begin(), floated.end(), a);
-	if (i == floated.end()) return;
+	if (i == floated.end())
+		return;
 	floated.erase(i);
 }
 
@@ -108,9 +112,10 @@ void Camera::trackAgent(AgentRef a, int xp, int yp, trackstyle s, cameratransiti
 }
 
 void Camera::checkBounds() {
-	MetaRoom *m = getMetaRoom();
-	if (!m) return;
-	
+	MetaRoom* m = getMetaRoom();
+	if (!m)
+		return;
+
 	if (m->wraparound()) {
 		// handle wrapping around, if necessary
 		if (x < (int)m->x()) {
@@ -140,7 +145,8 @@ void Camera::tick() {
 }
 
 void Camera::updateTracking() {
-	if (!trackedagent) return;
+	if (!trackedagent)
+		return;
 
 	// TODO: not very intelligent :) also, are int casts correct?
 	int trackx = (int)trackedagent->x + ((int)trackedagent->getWidth() / 2) - (int)(getWidth() / 2);

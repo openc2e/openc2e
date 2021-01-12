@@ -21,39 +21,43 @@
 #define __CREATUREAGENT_H
 
 #include "Agent.h"
+
 #include <cassert>
 
 class Creature;
 
 class CreatureAgent {
-protected:
-	Creature *creature;
+  protected:
+	Creature* creature;
 	friend class Creature;
 
 	unsigned int direction;
 	bool walking, approaching;
 	AgentRef approachtarget;
 
-	virtual void creatureBorn() { }
-	virtual void creatureAged() { }
-	virtual void creatureDied() { }
-	
-	virtual Agent *getAgent() = 0;
+	virtual void creatureBorn() {}
+	virtual void creatureAged() {}
+	virtual void creatureDied() {}
 
-public:
+	virtual Agent* getAgent() = 0;
+
+  public:
 	CreatureAgent();
 	virtual ~CreatureAgent();
 	void tick();
 
-	void setCreature(Creature *c);
-	Creature *getCreature() { return creature; }
-	
-	void setDirection(unsigned int d) { assert(d < 4); direction = d; }
+	void setCreature(Creature* c);
+	Creature* getCreature() { return creature; }
+
+	void setDirection(unsigned int d) {
+		assert(d < 4);
+		direction = d;
+	}
 	unsigned int getDirection() { return direction; }
 	void startWalking();
 	void stopWalking();
 	void approach(AgentRef it);
-	bool isApproaching() { return approaching; }	
+	bool isApproaching() { return approaching; }
 };
 
 #endif

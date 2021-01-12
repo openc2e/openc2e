@@ -18,8 +18,10 @@
  */
 
 #include "VoiceData.h"
-#include "endianlove.h"
+
 #include "Catalogue.h"
+#include "endianlove.h"
+
 #include <cassert>
 #include <fmt/core.h>
 
@@ -28,11 +30,11 @@
 VoiceData::VoiceData() = default;
 
 // Creatures 1 and 2 store this data in .vce files
-VoiceData::VoiceData(std::istream &in) {
+VoiceData::VoiceData(std::istream& in) {
 	// voice files and associated delay
 	for (unsigned int i = 0; i < NUM_VOICE_FILES; i++) {
 		char temp[4];
-		in.read((char *)&temp, 4);
+		in.read((char*)&temp, 4);
 		VoiceEntry entry;
 		if (temp[0])
 			entry.name = std::string(temp, 4);
@@ -51,35 +53,40 @@ VoiceData::VoiceData(std::istream &in) {
 
 // c2e stores this data in the catalogue
 VoiceData::VoiceData(std::string tagname) {
-	if (!catalogue.hasTag(tagname)) return;
+	if (!catalogue.hasTag(tagname))
+		return;
 
-	const std::vector<std::string> &tagdata = catalogue.getTag(tagname);
-	if (!tagdata.size()) return;
+	const std::vector<std::string>& tagdata = catalogue.getTag(tagname);
+	if (!tagdata.size())
+		return;
 
 	// the first entry refers to another tag (usually DefaultLanguage),
 	// which has the lookup table as hex strings
 	std::string languagetag = tagdata[0];
-	if (!catalogue.hasTag(languagetag)) return;
-	const std::vector<std::string> &lookupdata = catalogue.getTag(languagetag);
-	for (const auto & i : lookupdata) {
+	if (!catalogue.hasTag(languagetag))
+		return;
+	const std::vector<std::string>& lookupdata = catalogue.getTag(languagetag);
+	for (const auto& i : lookupdata) {
 		uint32_t data = strtoul(i.c_str(), NULL, 16);
 		lookup_table.push_back(data);
 	}
-	if (lookup_table.size() != 3 * 27) throw creaturesException(
-		fmt::format("invalid lookup table size {} reading language tag '{}'",
-		        lookup_table.size(), languagetag));
+	if (lookup_table.size() != 3 * 27)
+		throw creaturesException(
+			fmt::format("invalid lookup table size {} reading language tag '{}'",
+				lookup_table.size(), languagetag));
 
 	// the remaining entries are pairs of (name, delay)
-	for (unsigned int i = 1; i < tagdata.size() - 1; i+=2) {
+	for (unsigned int i = 1; i < tagdata.size() - 1; i += 2) {
 		VoiceEntry entry;
 		entry.name = tagdata[i];
-		entry.delay_ticks = atoi(tagdata[i+1].c_str());
+		entry.delay_ticks = atoi(tagdata[i + 1].c_str());
 		voices.push_back(entry);
 	}
 
-	if (voices.size() != 32) throw creaturesException(
-		fmt::format("invalid voice table size {} reading voice tag '{}'",
-		        voices.size(), tagname));
+	if (voices.size() != 32)
+		throw creaturesException(
+			fmt::format("invalid voice table size {} reading voice tag '{}'",
+				voices.size(), tagname));
 }
 
 VoiceData::operator bool() const {
@@ -99,7 +106,7 @@ std::vector<VoiceEntry> VoiceData::GetSyllablesFor(std::string speech) {
 
 std::vector<unsigned int> VoiceData::GetSentenceFor(std::string speech) {
 	// we work in lowercase
-	std::transform(speech.begin(), speech.end(), speech.begin(), (int(*)(int))tolower);
+	std::transform(speech.begin(), speech.end(), speech.begin(), (int (*)(int))tolower);
 
 	// we want the string in the form ' word word ', compressing multiple spaces into one;
 	// we rewrite the letters as 0-25 and spaces to 26
@@ -125,7 +132,7 @@ static unsigned int bitcount(unsigned int n) {
 	return count;
 }
 
-bool VoiceData::NextSyllableFor(std::vector<unsigned int> &sentence, unsigned int &pos, VoiceEntry &syllable) {
+bool VoiceData::NextSyllableFor(std::vector<unsigned int>& sentence, unsigned int& pos, VoiceEntry& syllable) {
 	/*
 	 * The idea behind the voice generator is to work in groups of three letters (a 'syllable')
 	 * and, for each syllable, to transform the sum of the letters into an entry in the voice list.
@@ -143,9 +150,10 @@ bool VoiceData::NextSyllableFor(std::vector<unsigned int> &sentence, unsigned in
 	assert(pos > 0);
 
 	// if there's less than two letters left, no more syllables
-	if (pos + 1 >= sentence.size()) return false;
+	if (pos + 1 >= sentence.size())
+		return false;
 
-	unsigned int chars[3] = { sentence[pos - 1], sentence[pos], sentence[pos + 1] };
+	unsigned int chars[3] = {sentence[pos - 1], sentence[pos], sentence[pos + 1]};
 	uint32_t sum = chars[0] + chars[1] + chars[2];
 
 	uint32_t lookup = lookup_table[chars[0]] & lookup_table[chars[1] + 27] & lookup_table[chars[2] + 27 + 27];

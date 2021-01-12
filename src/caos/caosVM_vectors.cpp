@@ -18,11 +18,12 @@
  */
 
 #include "caosVM.h"
-#include <cmath>
 #include "caosValue.h"
 #include "physics.h"
 
-#define PI (atanf(1)*4)
+#include <cmath>
+
+#define PI (atanf(1) * 4)
 
 /**
  * VEC: MAKE (vector) x (float) y (float)
@@ -34,12 +35,12 @@
  * Openc2e-only command
  */
 
-	void v_VEC_MAKE(caosVM *vm) {
-		VM_PARAM_FLOAT(y)
-		VM_PARAM_FLOAT(x)
+void v_VEC_MAKE(caosVM* vm) {
+	VM_PARAM_FLOAT(y)
+	VM_PARAM_FLOAT(x)
 
-		vm->result.setVector(Vector<float>(x, y));
-	}
+	vm->result.setVector(Vector<float>(x, y));
+}
 
 /**
  * VEC: GETC (command) vec (vector) x (variable) y (variable)
@@ -51,14 +52,14 @@
  * Openc2e-only command
  */
 
-	void c_VEC_GETC(caosVM *vm) {
-		VM_PARAM_VARIABLE(y)
-		VM_PARAM_VARIABLE(x)
-		VM_PARAM_VECTOR(vec)
+void c_VEC_GETC(caosVM* vm) {
+	VM_PARAM_VARIABLE(y)
+	VM_PARAM_VARIABLE(x)
+	VM_PARAM_VECTOR(vec)
 
-		x->setFloat(vec.x);
-		y->setFloat(vec.y);
-	}
+	x->setFloat(vec.x);
+	y->setFloat(vec.y);
+}
 
 /**
  * VEC: ANGL (float) vec (vector)
@@ -75,18 +76,17 @@
  * Openc2e-only command.
  */
 
-void v_VEC_ANGL(caosVM *vm) {
+void v_VEC_ANGL(caosVM* vm) {
 	float ret = 0;
 	VM_PARAM_VECTOR(vec)
 
 	if (vec.x != 0) {
-		ret = atanf(fabsf(vec.y/vec.x))*180/PI;
+		ret = atanf(fabsf(vec.y / vec.x)) * 180 / PI;
 		if (vec.x < 0)
 			ret = 180 - ret;
 		if (vec.y < 0)
 			ret = -ret;
-	}
-	else if (vec.y > 0)
+	} else if (vec.y > 0)
 		ret = 90;
 	else if (vec.y < 0)
 		ret = -90;
@@ -108,15 +108,15 @@ void v_VEC_ANGL(caosVM *vm) {
  * Openc2e-only command.
  */
 
-	void c_VEC_SUBV(caosVM *vm) {
-		VM_PARAM_VECTOR(vec2)
-		VM_PARAM_VARIABLE(vec1)
+void c_VEC_SUBV(caosVM* vm) {
+	VM_PARAM_VECTOR(vec2)
+	VM_PARAM_VARIABLE(vec1)
 
-		if (!vec1->hasVector())
-			throw badParamException();
+	if (!vec1->hasVector())
+		throw badParamException();
 
-		vec1->setVector(vec1->getVector() - vec2);
-	}
+	vec1->setVector(vec1->getVector() - vec2);
+}
 
 /**
  * VEC: ADDV (command) vec1 (variable) vec2 (vector)
@@ -128,15 +128,15 @@ void v_VEC_ANGL(caosVM *vm) {
  * Openc2e-only command.
  */
 
-	void c_VEC_ADDV(caosVM *vm) {
-		VM_PARAM_VECTOR(vec2)
-		VM_PARAM_VARIABLE(vec1)
+void c_VEC_ADDV(caosVM* vm) {
+	VM_PARAM_VECTOR(vec2)
+	VM_PARAM_VARIABLE(vec1)
 
-		if (!vec1->hasVector())
-			throw badParamException();
+	if (!vec1->hasVector())
+		throw badParamException();
 
-		vec1->setVector(vec1->getVector() + vec2);
-	}
+	vec1->setVector(vec1->getVector() + vec2);
+}
 
 /**
  * VEC: MULV (command) vec (variable) mag (decimal)
@@ -149,14 +149,14 @@ void v_VEC_ANGL(caosVM *vm) {
  * Openc2e-only command
  */
 
-	void c_VEC_MULV(caosVM *vm) {
-		VM_PARAM_FLOAT(mag)
-		VM_PARAM_VARIABLE(vec)
+void c_VEC_MULV(caosVM* vm) {
+	VM_PARAM_FLOAT(mag)
+	VM_PARAM_VARIABLE(vec)
 
-		if (!vec->hasVector())
-			throw badParamException();
-		vec->setVector(vec->getVector().scale(mag));
-	}
+	if (!vec->hasVector())
+		throw badParamException();
+	vec->setVector(vec->getVector().scale(mag));
+}
 
 /**
  * VEC: UNIT (vector) angle (decimal)
@@ -168,11 +168,11 @@ void v_VEC_ANGL(caosVM *vm) {
  * Openc2e-only command,
  */
 
-	void v_VEC_UNIT(caosVM *vm) {
-		VM_PARAM_FLOAT(angle)
+void v_VEC_UNIT(caosVM* vm) {
+	VM_PARAM_FLOAT(angle)
 
-		vm->result.setVector(Vector<float>::unitVector(angle * PI / 180));
-	}
+	vm->result.setVector(Vector<float>::unitVector(angle * PI / 180));
+}
 
 /**
  * VEC: NULL (vector)
@@ -184,9 +184,9 @@ void v_VEC_ANGL(caosVM *vm) {
  * Openc2e-only command
  */
 
-	void v_VEC_NULL(caosVM *vm) {
-		vm->result.setVector(Vector<float>(0,0));
-	}
+void v_VEC_NULL(caosVM* vm) {
+	vm->result.setVector(Vector<float>(0, 0));
+}
 
 /**
  * VEC: MAGN (float) vec (vector)
@@ -197,11 +197,11 @@ void v_VEC_ANGL(caosVM *vm) {
  *
  * Openc2e-only command.
  */
-	void v_VEC_MAGN(caosVM *vm) {
-		VM_PARAM_VECTOR(vec)
+void v_VEC_MAGN(caosVM* vm) {
+	VM_PARAM_VECTOR(vec)
 
-		vm->result.setFloat(vec.getMagnitude());
-	}
+	vm->result.setFloat(vec.getMagnitude());
+}
 
 /**
  * VEC: SETV (command) dest (variable) src (vector)
@@ -212,11 +212,11 @@ void v_VEC_ANGL(caosVM *vm) {
  *
  * Openc2e-only command
  */
-	void c_VEC_SETV(caosVM *vm) {
-		VM_PARAM_VECTOR(src)
-		VM_PARAM_VARIABLE(dest)
+void c_VEC_SETV(caosVM* vm) {
+	VM_PARAM_VECTOR(src)
+	VM_PARAM_VARIABLE(dest)
 
-		dest->setVector(src);
-	}
+	dest->setVector(src);
+}
 
 /* vim: set noet: */

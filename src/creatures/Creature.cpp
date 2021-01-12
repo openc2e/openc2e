@@ -17,20 +17,22 @@
  *
  */
 
-#include "caos_assert.h"
 #include "Creature.h"
-#include "oldCreature.h"
-#include "c2eCreature.h"
+
+#include "Catalogue.h"
 #include "CreatureAgent.h"
 #include "World.h"
-#include "Catalogue.h"
 #include "c2eBrain.h"
+#include "c2eCreature.h"
+#include "caos_assert.h"
 #include "historyManager.h"
 #include "oldBrain.h"
+#include "oldCreature.h"
+
 #include <cassert>
 #include <memory>
 
-Creature::Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) {
+Creature::Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent* a) {
 	assert(g);
 	genome = g;
 
@@ -41,9 +43,9 @@ Creature::Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char 
 
 	parent = a;
 	assert(parent);
-	parentagent = dynamic_cast<Agent *>(parent);
+	parentagent = dynamic_cast<Agent*>(parent);
 	assert(parentagent);
-	
+
 	alive = true; // ?
 	asleep = false; // ?
 	dreaming = false; // ?
@@ -54,7 +56,7 @@ Creature::Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char 
 
 	attn = decn = -1;
 
-	for (unsigned short & i : tintinfo)
+	for (unsigned short& i : tintinfo)
 		i = 128;
 }
 
@@ -65,27 +67,32 @@ void Creature::finishInit() {
 	processGenes();
 }
 
-bool Creature::shouldProcessGene(gene *g) {
-	geneFlags &flags = g->header.flags;
+bool Creature::shouldProcessGene(gene* g) {
+	geneFlags& flags = g->header.flags;
 
 	// non-expressed genes are to be ignored
-	if (flags.notexpressed) return false;
+	if (flags.notexpressed)
+		return false;
 
-	// gender-specific genes are only to be processed if they are of this 
-	if (flags.femaleonly && !female) return false;
-	if (flags.maleonly && female) return false;
+	// gender-specific genes are only to be processed if they are of this
+	if (flags.femaleonly && !female)
+		return false;
+	if (flags.maleonly && female)
+		return false;
 
 	// obviously we only switch on at the stage in question
-	if (g->header.switchontime != stage) return false;
+	if (g->header.switchontime != stage)
+		return false;
 
 	// TODO: header.variant?
-	
+
 	return true;
 }
 
 void Creature::processGenes() {
-	for (auto & gene : genome->genes) {
-		if (shouldProcessGene(gene.get())) addGene(gene.get());
+	for (auto& gene : genome->genes) {
+		if (shouldProcessGene(gene.get()))
+			addGene(gene.get());
 	}
 }
 
@@ -97,7 +104,7 @@ void oldCreature::processGenes() {
 void c2Creature::processGenes() {
 	oldCreature::processGenes();
 
-	for (auto & organ : organs) {
+	for (auto& organ : organs) {
 		organ->processGenes();
 	}
 }
@@ -108,24 +115,24 @@ void c2eCreature::processGenes() {
 
 	brain->processGenes();
 	Creature::processGenes();
-	for (auto & organ : organs) {
+	for (auto& organ : organs) {
 		organ->processGenes();
 	}
 }
 
-void Creature::addGene(gene *g) {
+void Creature::addGene(gene* g) {
 	if (typeid(*g) == typeid(creatureInstinctGene)) {
-		unprocessedinstincts.push_back((creatureInstinctGene *)g);
+		unprocessedinstincts.push_back((creatureInstinctGene*)g);
 	} else if (typeid(*g) == typeid(creatureGenusGene)) {
 		// TODO: mmh, genus changes after setup shouldn't be valid
-		genus = ((creatureGenusGene *)g)->genus;
+		genus = ((creatureGenusGene*)g)->genus;
 		parentagent->genus = genus + 1;
 	} else if (typeid(*g) == typeid(creaturePigmentGene)) {
-		creaturePigmentGene &p = *((creaturePigmentGene *)g);
+		creaturePigmentGene& p = *((creaturePigmentGene*)g);
 		// TODO: we don't sanity-check
 		tintinfo[p.color] = p.amount;
 	} else if (typeid(*g) == typeid(creaturePigmentBleedGene)) {
-		creaturePigmentBleedGene &p = *((creaturePigmentBleedGene *)g);
+		creaturePigmentBleedGene& p = *((creaturePigmentBleedGene*)g);
 		tintinfo[3] = p.rotation;
 		tintinfo[4] = p.swap;
 	}
@@ -181,11 +188,11 @@ void Creature::die() {
 	world.history->getMoniker(world.history->findMoniker(genome)).addEvent(7, "", ""); // died event
 #endif
 	// TODO: disable brain/biochemistry updates
-	
+
 	// force die script
 	parentagent->stopScript();
 	parentagent->queueScript(72); // Death script in c1, c2 and c2e
-	
+
 	// skeletalcreature eyes, also? see setAsleep comment
 	alive = false;
 }
@@ -193,25 +200,33 @@ void Creature::die() {
 void Creature::tick() {
 	ticks++;
 
-	if (!alive) return;
+	if (!alive)
+		return;
 
-	if (tickage) age++;
+	if (tickage)
+		age++;
 }
 
 /*
  * oldCreature contains the shared elements of C1 of C2 (creatures are mostly identical in both games)
  */
-oldCreature::oldCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : Creature(g, is_female, _variant, a) {
+oldCreature::oldCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent* a)
+	: Creature(g, is_female, _variant, a) {
 	biochemticks = 0;
 	halflives = 0;
-	
-	for (unsigned char & i : floatingloci) i = 0;
-	for (unsigned char & i : lifestageloci) i = 0;
-	for (unsigned char & i : involaction) i = 0;
-	for (unsigned char & chemical : chemicals) chemical = 0;
-	
-	for (unsigned int & i : involactionlatency) i = 0;
-	
+
+	for (unsigned char& i : floatingloci)
+		i = 0;
+	for (unsigned char& i : lifestageloci)
+		i = 0;
+	for (unsigned char& i : involaction)
+		i = 0;
+	for (unsigned char& chemical : chemicals)
+		chemical = 0;
+
+	for (unsigned int& i : involactionlatency)
+		i = 0;
+
 	muscleenergy = 0;
 	fertile = pregnant = receptive = 0;
 	dead = 0;
@@ -219,13 +234,17 @@ oldCreature::oldCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned
 	brain = 0; // just in case
 }
 
-c1Creature::c1Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {
+c1Creature::c1Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent* a)
+	: oldCreature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 1);
 
-	for (unsigned char & sense : senses) sense = 0;
-	for (unsigned char & i : gaitloci) i = 0;
-	for (unsigned char & drive : drives) drive = 0;
-	
+	for (unsigned char& sense : senses)
+		sense = 0;
+	for (unsigned char& i : gaitloci)
+		i = 0;
+	for (unsigned char& drive : drives)
+		drive = 0;
+
 	// TODO: chosenagents size
 
 	brain = new oldBrain(this);
@@ -233,46 +252,60 @@ c1Creature::c1Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned c
 	brain->init();
 }
 
-c2Creature::c2Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : oldCreature(g, is_female, _variant, a) {
+c2Creature::c2Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent* a)
+	: oldCreature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 2);
 
-	for (unsigned char & sense : senses) sense = 0;
-	for (unsigned char & i : gaitloci) i = 0;
-	for (unsigned char & drive : drives) drive = 0;
+	for (unsigned char& sense : senses)
+		sense = 0;
+	for (unsigned char& i : gaitloci)
+		i = 0;
+	for (unsigned char& drive : drives)
+		drive = 0;
 
-	mutationchance = 0; mutationdegree = 0;
+	mutationchance = 0;
+	mutationdegree = 0;
 
 	// TODO: chosenagents size
 
 	brain = new oldBrain(this);
 	finishInit();
-	brain->init();	
+	brain->init();
 }
 
-c2eCreature::c2eCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a) : Creature(g, is_female, _variant, a) {
+c2eCreature::c2eCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent* a)
+	: Creature(g, is_female, _variant, a) {
 	assert(g->getVersion() == 3);
 
-	for (float & chemical : chemicals) chemical = 0.0f;
+	for (float& chemical : chemicals)
+		chemical = 0.0f;
 
 	// initialise loci
-	for (float & i : lifestageloci) i = 0.0f;
+	for (float& i : lifestageloci)
+		i = 0.0f;
 	muscleenergy = 0.0f;
-	for (float & i : floatingloci) i = 0.0f;
+	for (float& i : floatingloci)
+		i = 0.0f;
 	fertile = pregnant = ovulate = receptive = chanceofmutation = degreeofmutation = 0.0f;
 	dead = 0.0f;
-	for (float & i : involaction) i = 0.0f;
-	for (float & i : gaitloci) i = 0.0f;
-	for (float & sense : senses) sense = 0.0f;
-	for (float & drive : drives) drive = 0.0f;
+	for (float& i : involaction)
+		i = 0.0f;
+	for (float& i : gaitloci)
+		i = 0.0f;
+	for (float& sense : senses)
+		sense = 0.0f;
+	for (float& drive : drives)
+		drive = 0.0f;
 
-	for (unsigned int & i : involactionlatency) i = 0;
+	for (unsigned int& i : involactionlatency)
+		i = 0;
 
 	halflives = 0;
 
 	if (!catalogue.hasTag("Action Script To Neuron Mappings"))
 		throw creaturesException("c2eCreature was unable to read the 'Action Script To Neuron Mappings' catalogue tag");
-	const std::vector<std::string> &mappinginfotag = catalogue.getTag("Action Script To Neuron Mappings");
-	for (const auto & i : mappinginfotag)
+	const std::vector<std::string>& mappinginfotag = catalogue.getTag("Action Script To Neuron Mappings");
+	for (const auto& i : mappinginfotag)
 		mappinginfo.push_back(atoi(i.c_str()));
 
 	// TODO: should we really hard-code this?
@@ -280,7 +313,7 @@ c2eCreature::c2eCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned
 
 	brain = new c2eBrain(this);
 	finishInit();
-	brain->init();	
+	brain->init();
 }
 
 unsigned int c1Creature::getGait() {
@@ -315,14 +348,15 @@ unsigned int c2eCreature::getGait() {
 
 void c1Creature::tick() {
 	// TODO: should we tick some things even if dead?
-	if (!alive) return;
+	if (!alive)
+		return;
 
 	senses[0] = 255; // always-on
 	senses[1] = (asleep ? 255 : 0); // asleep
 	senses[2] = 0; // air coldness (TODO)
 	senses[3] = 0; // air hotness (TODO)
 	senses[4] = 0; // light level (TODO)
-	senses[5] = 0; // crowdedness (TODO)	
+	senses[5] = 0; // crowdedness (TODO)
 
 	tickBrain();
 	tickBiochemistry();
@@ -333,14 +367,16 @@ void c1Creature::tick() {
 			ageCreature();
 	}
 
-	if (dead != 0) die();
+	if (dead != 0)
+		die();
 
 	Creature::tick();
 }
 
 void c2Creature::tick() {
 	// TODO: should we tick some things even if dead?
-	if (!alive) return;
+	if (!alive)
+		return;
 
 	senses[0] = 255; // always-on
 	senses[1] = (asleep ? 255 : 0); // asleep
@@ -360,21 +396,23 @@ void c2Creature::tick() {
 	tickBrain();
 	// TODO: update brain organ every 0.4ms (ie: when brain is processed)!
 	tickBiochemistry();
-	
+
 	// lifestage checks
 	for (unsigned int i = 0; i < 7; i++) {
 		if ((lifestageloci[i] != 0) && (stage == (lifestage)i))
 			ageCreature();
 	}
 
-	if (dead != 0) die();
+	if (dead != 0)
+		die();
 
 	Creature::tick();
 }
 
 void c2eCreature::tick() {
 	// TODO: should we tick some things even if dead?
-	if (!alive) return;
+	if (!alive)
+		return;
 
 	// TODO: update muscleenergy
 
@@ -397,42 +435,43 @@ void c2eCreature::tick() {
 			ageCreature();
 	}
 
-	if (dead != 0.0f) die();
-	
+	if (dead != 0.0f)
+		die();
+
 	Creature::tick();
 }
 
-void oldCreature::addGene(gene *g) {
+void oldCreature::addGene(gene* g) {
 	Creature::addGene(g);
 	if (typeid(*g) == typeid(bioInitialConcentrationGene)) {
 		// initialise chemical levels
-		bioInitialConcentrationGene *b = (bioInitialConcentrationGene *)(g);
+		bioInitialConcentrationGene* b = (bioInitialConcentrationGene*)(g);
 		chemicals[b->chemical] = b->quantity;
 	} else if (typeid(*g) == typeid(bioHalfLivesGene)) {
-		bioHalfLivesGene *d = dynamic_cast<bioHalfLivesGene *>(g);
+		bioHalfLivesGene* d = dynamic_cast<bioHalfLivesGene*>(g);
 		assert(d);
 		halflives = d;
-	}	
-}
-
-void c1Creature::addGene(gene *g) {
-	oldCreature::addGene(g);
-
-	if (typeid(*g) == typeid(bioReactionGene)) {
-		reactions.push_back(std::shared_ptr<c1Reaction>(new c1Reaction((bioReactionGene *)g)));
-	} else if (typeid(*g) == typeid(bioEmitterGene)) {
-		emitters.push_back(c1Emitter((bioEmitterGene *)g, this));
-	} else if (typeid(*g) == typeid(bioReceptorGene)) {
-		receptors.push_back(c1Receptor((bioReceptorGene *)g, this));
 	}
 }
 
-void c2Creature::addGene(gene *g) {
+void c1Creature::addGene(gene* g) {
+	oldCreature::addGene(g);
+
+	if (typeid(*g) == typeid(bioReactionGene)) {
+		reactions.push_back(std::shared_ptr<c1Reaction>(new c1Reaction((bioReactionGene*)g)));
+	} else if (typeid(*g) == typeid(bioEmitterGene)) {
+		emitters.push_back(c1Emitter((bioEmitterGene*)g, this));
+	} else if (typeid(*g) == typeid(bioReceptorGene)) {
+		receptors.push_back(c1Receptor((bioReceptorGene*)g, this));
+	}
+}
+
+void c2Creature::addGene(gene* g) {
 	oldCreature::addGene(g);
 
 	if (typeid(*g) == typeid(organGene)) {
 		// create organ
-		organGene *o = dynamic_cast<organGene *>(g);
+		organGene* o = dynamic_cast<organGene*>(g);
 		assert(o);
 		if (!o->isBrain()) { // TODO: handle brain organ
 			organs.push_back(std::shared_ptr<c2Organ>(new c2Organ(this, o)));
@@ -449,16 +488,16 @@ void c2Creature::addGene(gene *g) {
 	}
 }
 
-void c2eCreature::addGene(gene *g) {
+void c2eCreature::addGene(gene* g) {
 	Creature::addGene(g);
 
 	if (typeid(*g) == typeid(bioInitialConcentrationGene)) {
 		// initialise chemical levels
-		bioInitialConcentrationGene *b = (bioInitialConcentrationGene *)(g);
+		bioInitialConcentrationGene* b = (bioInitialConcentrationGene*)(g);
 		chemicals[b->chemical] = b->quantity / 255.0f; // TODO: correctness unchecked
 	} else if (typeid(*g) == typeid(organGene)) {
 		// create organ
-		organGene *o = dynamic_cast<organGene *>(g);
+		organGene* o = dynamic_cast<organGene*>(g);
 		assert(o);
 		if (!o->isBrain()) { // TODO: handle brain organ
 			organs.push_back(std::shared_ptr<c2eOrgan>(new c2eOrgan(this, o)));
@@ -473,7 +512,7 @@ void c2eCreature::addGene(gene *g) {
 		caos_assert(organs.size() > 0);
 		organs.back()->genes.push_back(g);
 	} else if (typeid(*g) == typeid(bioHalfLivesGene)) {
-		bioHalfLivesGene *d = dynamic_cast<bioHalfLivesGene *>(g);
+		bioHalfLivesGene* d = dynamic_cast<bioHalfLivesGene*>(g);
 		assert(d);
 		halflives = d;
 	}
@@ -483,8 +522,10 @@ void c2eCreature::adjustDrive(unsigned int id, float value) {
 	assert(id < 20);
 	drives[id] += value;
 
-	if (drives[id] < 0.0f) drives[id] = 0.0f;
-	else if (drives[id] > 1.0f) drives[id] = 1.0f;
+	if (drives[id] < 0.0f)
+		drives[id] = 0.0f;
+	else if (drives[id] > 1.0f)
+		drives[id] = 1.0f;
 }
 
 /* vim: set noet: */

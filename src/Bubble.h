@@ -25,16 +25,16 @@
 class Bubble : public CompoundAgent {
 	friend class BubblePart;
 
-protected:
-	class BubblePart *ourPart;
+  protected:
+	class BubblePart* ourPart;
 	unsigned int timeout;
 	bool leftside;
 
 	void turnIntoSpeech();
 
-public:
+  public:
 	Bubble(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-		std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount,
 		unsigned int tx, unsigned int ty, unsigned int twidth, unsigned int theight,
 		unsigned int tcolour, unsigned int bgcolour);
 
@@ -46,14 +46,14 @@ public:
 	void setTimeout(unsigned int i);
 	void tick();
 
-	static Bubble *newBubble(Agent *parent, bool speech, std::string text);
+	static Bubble* newBubble(Agent* parent, bool speech, std::string text);
 };
 
 class BubblePart : public CompoundPart {
 	friend class Bubble;
 
-protected:
-	BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int tcolor, unsigned int bgcolor);
+  protected:
+	BubblePart(Bubble* p, unsigned int _id, int x, int y, unsigned int tcolor, unsigned int bgcolor);
 
 	bool editable;
 	std::string text;
@@ -65,8 +65,8 @@ protected:
 	void setText(std::string s);
 	unsigned int poseForWidth(unsigned int width);
 
-public:
-	void partRender(class RenderTarget *renderer, int xoffset, int yoffset) override;
+  public:
+	void partRender(class RenderTarget* renderer, int xoffset, int yoffset) override;
 	unsigned int getWidth() override { return textwidth; }
 	unsigned int getHeight() override { return textheight; }
 

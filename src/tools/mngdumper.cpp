@@ -4,13 +4,13 @@
 #include "utils/zip.h"
 
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 #include <fstream>
+#include <ghc/filesystem.hpp>
 #include <utility>
 
 namespace fs = ghc::filesystem;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 	if (argc != 2) {
 		std::cerr << "syntax: mngdumper filename" << std::endl;
 		exit(1);

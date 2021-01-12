@@ -17,14 +17,14 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
-#include "World.h"
 #include "Engine.h"
-#include <ghc/filesystem.hpp>
-#include <iostream>
+#include "World.h"
+#include "caosVM.h"
+#include "caos_assert.h"
 
 #include <fmt/core.h>
+#include <ghc/filesystem.hpp>
+#include <iostream>
 
 namespace fs = ghc::filesystem;
 
@@ -35,13 +35,14 @@ namespace fs = ghc::filesystem;
  Prints the given string on the output stream, after first quoting it and transforming 
  escapes in the string to quoted escapes.
 */
-void c_OUTX(caosVM *vm) {
+void c_OUTX(caosVM* vm) {
 	VM_PARAM_STRING(val)
 
-	if (!vm->outputstream) return;
+	if (!vm->outputstream)
+		return;
 
 	std::string oh = "\"";
-	
+
 	for (char i : val) {
 		switch (i) {
 			case '\r': oh += "\\r"; break;
@@ -71,12 +72,13 @@ void c_OUTX(caosVM *vm) {
  %variants c1 c2
 */
 
-void c_OUTS(caosVM *vm) {
+void c_OUTS(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_STRING(val)
 
-	if (!vm->outputstream) return;
-	
+	if (!vm->outputstream)
+		return;
+
 	*vm->outputstream << val;
 }
 
@@ -94,20 +96,22 @@ void c_OUTS(caosVM *vm) {
  %variants c1 c2
 */
 
-void c_OUTV(caosVM *vm) {
+void c_OUTV(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALUE(val)
 
-	if (!vm->outputstream) return;
-	
+	if (!vm->outputstream)
+		return;
+
 	if (val.hasFloat()) {
 		*vm->outputstream << fmt::format("{:0.06f}", val.getFloat());
 	} else if (val.hasInt()) {
 		*vm->outputstream << val.getInt();
 	} else if (val.hasVector()) {
-		const Vector<float> &v = val.getVector();
+		const Vector<float>& v = val.getVector();
 		*vm->outputstream << fmt::format("({:0.6f}, {:%0.6f})", v.x, v.y);
-	} else throw badParamException();
+	} else
+		throw badParamException();
 }
 
 /**
@@ -117,9 +121,8 @@ void c_OUTV(caosVM *vm) {
  Returns the game variable with the given name.
 */
 CAOS_LVALUE(GAME, VM_PARAM_STRING(name),
-		world.variables[name],
-		world.variables[name] = newvalue
-		)
+	world.variables[name],
+	world.variables[name] = newvalue)
 
 /**
  GAME (variable) category (integer) variable (integer)
@@ -137,7 +140,8 @@ CAOS_LVALUE(GAME_c2,
 
  Refresh all settings that are read from game variables at startup.
 */
-void c_RGAM(caosVM*) { }
+void c_RGAM(caosVM*) {
+}
 
 /**
  GAMN (string) previous (string)
@@ -145,7 +149,7 @@ void c_RGAM(caosVM*) { }
  
  Enumerates through game variable names, starting and ending with an empty string.
 */
-void v_GAMN(caosVM *vm) {
+void v_GAMN(caosVM* vm) {
 	VM_PARAM_STRING(previous)
 
 	// TODO: we assume that GAME variables don't have an empty string
@@ -171,7 +175,7 @@ void v_GAMN(caosVM *vm) {
 
  Deletes the game variable with the given name.
 */
-void c_DELG(caosVM *vm) {
+void c_DELG(caosVM* vm) {
 	VM_PARAM_STRING(name)
 	world.variables.erase(name);
 }
@@ -183,9 +187,8 @@ void c_DELG(caosVM *vm) {
  Returns the non-persistent game variable with the given name.
 */
 CAOS_LVALUE(EAME, VM_PARAM_STRING(name),
-		engine.eame_variables[name],
-		engine.eame_variables[name] = newvalue
-		)
+	engine.eame_variables[name],
+	engine.eame_variables[name] = newvalue)
 
 /**
  EAMN (string) previous (string)
@@ -193,7 +196,7 @@ CAOS_LVALUE(EAME, VM_PARAM_STRING(name),
  
  Enumerates through engine variable names, starting and ending with an empty string.
 */
-void v_EAMN(caosVM *vm) {
+void v_EAMN(caosVM* vm) {
 	VM_PARAM_STRING(previous)
 
 	// TODO: we assume that EAME variables don't have an empty string
@@ -219,7 +222,7 @@ void v_EAMN(caosVM *vm) {
  
  Deletes the engine variable with the given name.
 */
-void c_DELE(caosVM *vm) {
+void c_DELE(caosVM* vm) {
 	VM_PARAM_STRING(name);
 	engine.eame_variables.erase(name);
 }
@@ -234,7 +237,7 @@ void c_DELE(caosVM *vm) {
 */
 void c_SCRP(caosVM*) {
 	// handled elsewhere
-}	
+}
 
 /**
  RSCR (command)
@@ -245,7 +248,7 @@ void c_SCRP(caosVM*) {
 */
 void c_RSCR(caosVM*) {
 	// handled elsewhere
-}	
+}
 
 /**
  ISCR (command)
@@ -266,7 +269,7 @@ void c_ISCR(caosVM*) {
 
  Marks the end of a script.
 */
-void c_ENDM(caosVM *vm) {
+void c_ENDM(caosVM* vm) {
 	vm->stop();
 }
 
@@ -279,7 +282,7 @@ void c_ENDM(caosVM *vm) {
 
  In openc2e, currently a no-op (ie, the lawn is never, ever cut properly).
 */
-void v_MOWS(caosVM *vm) {
+void v_MOWS(caosVM* vm) {
 	vm->result.setInt(0); // We're too busy coding to mow the lawn.
 }
 
@@ -289,7 +292,7 @@ void v_MOWS(caosVM *vm) {
 
  Returns the minor version number of the engine.
 */
-void v_VMNR(caosVM *vm) {
+void v_VMNR(caosVM* vm) {
 	vm->result.setInt(1);
 }
 
@@ -299,7 +302,7 @@ void v_VMNR(caosVM *vm) {
 
  Returns the major version number of the engine.
 */
-void v_VMJR(caosVM *vm) {
+void v_VMJR(caosVM* vm) {
 	vm->result.setInt(0);
 }
 
@@ -310,7 +313,7 @@ void v_VMJR(caosVM *vm) {
 
  Stop running this script unless VRSN is equal to or greater than the specified value.
 */
-void c_VRSN(caosVM *vm) {
+void c_VRSN(caosVM* vm) {
 	VM_PARAM_INTEGER(required)
 
 	// TODO: is this good for c1? which version is c2?
@@ -329,7 +332,7 @@ void c_VRSN(caosVM *vm) {
 
  Return the build version number of the engine.
 */
-void v_VRSN(caosVM *vm) {
+void v_VRSN(caosVM* vm) {
 	// TODO: is this good for c1? which version is c2?
 	int thisversion = (engine.version == 1) ? 2 : 0;
 
@@ -349,20 +352,28 @@ void v_VRSN(caosVM *vm) {
  (note that 4 is unset by the engine when the display is refreshed)
  8 is autokill
 */
-void v_WOLF(caosVM *vm) {
+void v_WOLF(caosVM* vm) {
 	VM_PARAM_INTEGER(eormask)
 	VM_PARAM_INTEGER(andmask)
 
-	if (eormask & 1) engine.dorendering = !engine.dorendering;
-	if (eormask & 2) engine.fastticks = !engine.fastticks;
-	if (eormask & 4) engine.refreshdisplay = !engine.refreshdisplay;
-	if (eormask & 8) world.autokill = !world.autokill;
+	if (eormask & 1)
+		engine.dorendering = !engine.dorendering;
+	if (eormask & 2)
+		engine.fastticks = !engine.fastticks;
+	if (eormask & 4)
+		engine.refreshdisplay = !engine.refreshdisplay;
+	if (eormask & 8)
+		world.autokill = !world.autokill;
 
 	int r = 0;
-	if (andmask & 1 && engine.dorendering) r += 1;
-	if (andmask & 2 && engine.fastticks) r += 2;
-	if (andmask & 4 && engine.refreshdisplay) r += 4;
-	if (andmask & 8 && world.autokill) r += 8;
+	if (andmask & 1 && engine.dorendering)
+		r += 1;
+	if (andmask & 2 && engine.fastticks)
+		r += 2;
+	if (andmask & 4 && engine.refreshdisplay)
+		r += 4;
+	if (andmask & 8 && world.autokill)
+		r += 8;
 	vm->result.setInt(r);
 }
 
@@ -370,7 +381,7 @@ void v_WOLF(caosVM *vm) {
  LANG (string)
  %status done
 */
-void v_LANG(caosVM *vm) {
+void v_LANG(caosVM* vm) {
 	vm->result.setString(engine.language);
 }
 
@@ -379,12 +390,12 @@ void v_LANG(caosVM *vm) {
  %status maybe
  %variants c1 c2
 */
-void v_TOKN(caosVM *vm) {
+void v_TOKN(caosVM* vm) {
 	VM_PARAM_STRING(token)
 
 	caos_assert(token.size() == 4);
 
-	int *data = (int *)token.c_str();
+	int* data = (int*)token.c_str();
 	vm->result.setInt(*data);
 }
 
@@ -395,13 +406,13 @@ void v_TOKN(caosVM *vm) {
 
  Returns a list of the data directories available, separated with \n. Remember that the last one is the working directory.
 */
-void v_OC2E_DDIR(caosVM *vm) {
+void v_OC2E_DDIR(caosVM* vm) {
 	std::string d;
 
 	for (auto p : world.data_directories) {
 		d += fs::absolute(p).string() + "\n";
 	}
-	
+
 	vm->result.setString(d);
 }
 
@@ -412,7 +423,7 @@ void v_OC2E_DDIR(caosVM *vm) {
 
  Do something by providing a menu ID from the original Creatures 1 or Creatures 2 engines. This is obviously limited to the IDs that openc2e is aware of.
 */
-void c_SYS_CMND(caosVM *vm) {
+void c_SYS_CMND(caosVM* vm) {
 	VM_PARAM_INTEGER(menuid)
 
 	// TODO

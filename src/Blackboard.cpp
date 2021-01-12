@@ -17,20 +17,23 @@
  *
  */
 
-#include <cassert>
+#include "Blackboard.h"
 
 #include "Backend.h"
-#include "Blackboard.h"
-#include "caosValue.h"
 #include "Engine.h"
+#include "World.h" // setFocus
+#include "caosValue.h"
 #include "imageManager.h"
 #include "keycodes.h"
-#include "World.h" // setFocus
 
-Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
-		unsigned int tx, unsigned int ty, uint32_t bgcolour, uint32_t ckcolour,
-		uint32_t alcolour) : CompoundAgent(spritefile, firstimage, imagecount) {
-	textx = tx; texty = ty;
+#include <cassert>
+
+Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount,
+	unsigned int tx, unsigned int ty, uint32_t bgcolour, uint32_t ckcolour,
+	uint32_t alcolour)
+	: CompoundAgent(spritefile, firstimage, imagecount) {
+	textx = tx;
+	texty = ty;
 	ourPart = 0;
 	editing = false;
 
@@ -43,7 +46,7 @@ Blackboard::Blackboard(std::string spritefile, unsigned int firstimage, unsigned
 	}
 }
 
-void Blackboard::addPart(CompoundPart *p) {
+void Blackboard::addPart(CompoundPart* p) {
 	CompoundAgent::addPart(p);
 
 	// if we're adding the first part..
@@ -62,7 +65,8 @@ std::string Blackboard::getText() {
 }
 
 void Blackboard::showText(bool show) {
-	if (editing) stopEditing(false);
+	if (editing)
+		stopEditing(false);
 
 	if (show) {
 		currenttext = getText();
@@ -75,9 +79,10 @@ void Blackboard::addBlackboardString(unsigned int n, unsigned int id, std::strin
 	strings[n] = std::pair<unsigned int, std::string>(id, text);
 }
 
-void Blackboard::renderText(RenderTarget *renderer, int xoffset, int yoffset) {
+void Blackboard::renderText(RenderTarget* renderer, int xoffset, int yoffset) {
 	std::string ourtext = currenttext;
-	if (editing) ourtext += "_"; // TODO: should this be rendered in aliascolour?
+	if (editing)
+		ourtext += "_"; // TODO: should this be rendered in aliascolour?
 
 	unsigned int charpos = 0;
 	for (unsigned char c : ourtext) {
@@ -119,33 +124,34 @@ void Blackboard::stopEditing(bool losingfocus) {
 #include "Bubble.h"
 void Blackboard::broadcast(bool audible) {
 	// TODO: blackboard broadcasts
-	
+
 	if (audible) {
 		Bubble::newBubble(this, true, getText());
 	}
 }
 
-BlackboardPart::BlackboardPart(Blackboard *p, unsigned int _id) : CompoundPart(p, _id, 0, 0, 1) {
+BlackboardPart::BlackboardPart(Blackboard* p, unsigned int _id)
+	: CompoundPart(p, _id, 0, 0, 1) {
 	// TODO: think about plane
 }
 
-void BlackboardPart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
-	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
+void BlackboardPart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
+	Blackboard* bbd = dynamic_cast<Blackboard*>(parent);
 	bbd->renderText(renderer, xoffset, yoffset);
 }
 
 void BlackboardPart::gainFocus() {
-	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
+	Blackboard* bbd = dynamic_cast<Blackboard*>(parent);
 	bbd->startEditing();
 }
 
 void BlackboardPart::loseFocus() {
-	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
+	Blackboard* bbd = dynamic_cast<Blackboard*>(parent);
 	bbd->stopEditing(true);
 }
 
 void BlackboardPart::handleTranslatedChar(unsigned char c) {
-	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
+	Blackboard* bbd = dynamic_cast<Blackboard*>(parent);
 
 	if (c >= bbd->charsetsprite->numframes()) {
 		// skip accented characters when we only have CHARSET.DTA
@@ -153,7 +159,7 @@ void BlackboardPart::handleTranslatedChar(unsigned char c) {
 		return;
 	}
 
-	std::string &s = bbd->strings[bbd->editingindex].second;
+	std::string& s = bbd->strings[bbd->editingindex].second;
 	if (s.size() < 10) {
 		s += (char)c;
 		bbd->currenttext = s;
@@ -161,13 +167,14 @@ void BlackboardPart::handleTranslatedChar(unsigned char c) {
 }
 
 void BlackboardPart::handleRawKey(uint8_t c) {
-	Blackboard *bbd = dynamic_cast<Blackboard *>(parent);
+	Blackboard* bbd = dynamic_cast<Blackboard*>(parent);
 
 	switch (c) {
 		case OPENC2E_KEY_BACKSPACE:
-			if (bbd->currenttext.size() == 0) return;
+			if (bbd->currenttext.size() == 0)
+				return;
 			{
-				std::string &s = bbd->strings[bbd->editingindex].second;
+				std::string& s = bbd->strings[bbd->editingindex].second;
 				s.erase(s.begin() + (s.size() - 1));
 				bbd->currenttext = s;
 			}

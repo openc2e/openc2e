@@ -20,6 +20,7 @@
 #pragma once
 
 #include "physics.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -34,11 +35,11 @@ struct RoomDoor {
 };
 
 class Room {
-public:
-	std::map<std::weak_ptr<Room>, RoomDoor *, std::owner_less<std::weak_ptr<Room> > > doors;
+  public:
+	std::map<std::weak_ptr<Room>, RoomDoor*, std::owner_less<std::weak_ptr<Room> > > doors;
 	unsigned int x_left, x_right, y_left_ceiling, y_right_ceiling;
 	unsigned int y_left_floor, y_right_floor;
-	
+
 	std::vector<std::pair<unsigned int, unsigned int> > floorpoints;
 
 	Line left, right, top, bot;
@@ -48,32 +49,38 @@ public:
 	int temp = 0, lite = 0, radn = 0, ontr = 0, intr = 0, pres = 0, hsrc = 0, lsrc = 0, rsrc = 0, psrc = 0;
 	int floorvalue = 0, dropstatus = 0;
 	int windx, windy;
-	
+
 	std::string music;
 
 	unsigned int id;
-	class MetaRoom *metaroom;
+	class MetaRoom* metaroom;
 
 	float ca[CA_COUNT], catemp[CA_COUNT];
 
-	bool containsPoint(float x, float y) {	
-		if (x > (float)x_right || x < (float)x_left) { return false; }
-		if (bot.pointAtX(x).y < y) { return false; }
-		if (top.pointAtX(x).y > y) { return false; }
+	bool containsPoint(float x, float y) {
+		if (x > (float)x_right || x < (float)x_left) {
+			return false;
+		}
+		if (bot.pointAtX(x).y < y) {
+			return false;
+		}
+		if (top.pointAtX(x).y > y) {
+			return false;
+		}
 		return true;
 	}
 
 	bool containsPoint(Point p) { return containsPoint(p.x, p.y); }
 
 	float floorYatX(float x);
-	
+
 	Room();
 	Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int y_r_t, unsigned int y_l_b, unsigned int y_r_b);
 	void tick();
 	void postTick();
 	void resetTick();
 
-	void renderBorders(class RenderTarget *surf, int xoffset, int yoffset, unsigned int col);
+	void renderBorders(class RenderTarget* surf, int xoffset, int yoffset, unsigned int col);
 };
 
 /* vim: set noet: */

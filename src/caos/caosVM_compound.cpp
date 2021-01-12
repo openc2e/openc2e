@@ -17,19 +17,19 @@
  *
  */
 
-#include "caos_assert.h"
 #include "Blackboard.h"
 #include "ButtonPart.h"
-#include "caosVM.h"
-#include "CompoundAgent.h"
 #include "CameraPart.h"
+#include "CompoundAgent.h"
 #include "DullPart.h"
+#include "Engine.h"
 #include "FixedTextPart.h"
 #include "GraphPart.h"
-#include "TextPart.h"
 #include "TextEntryPart.h"
+#include "TextPart.h"
 #include "World.h"
-#include "Engine.h"
+#include "caosVM.h"
+#include "caos_assert.h"
 
 /**
  PART (command) part_id (integer)
@@ -39,7 +39,7 @@
  Sets the part number of the TARGeted compound agent or vehicle to work on (ANIM/POSE use this, 
  amongst other commands).
 */
-void c_PART(caosVM *vm) {
+void c_PART(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part_id)
 
@@ -53,7 +53,7 @@ void c_PART(caosVM *vm) {
 
  Returns 1 if the given part number exists on the target agent, or 0 if otherwise.
 */
-void v_PART(caosVM *vm) {
+void v_PART(caosVM* vm) {
 	VM_PARAM_INTEGER(part_id)
 
 	caos_assert(part_id >= 0); // TODO: should we do this?
@@ -62,27 +62,27 @@ void v_PART(caosVM *vm) {
 		vm->result.setInt(1);
 	else
 		vm->result.setInt(0);
-}	
+}
 
 /**
  NEW: PART (command) part (integer) x (integer) y (integer) first_image (integer) plane (integer)
  %status maybe
  %variants c1 c2
 */
-void c_NEW_PART(caosVM *vm) {
+void c_NEW_PART(caosVM* vm) {
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(partno)
-	
+
 	caos_assert(partno >= 0 && partno <= 9);
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
 
 	// TODO: fix zordering
-	CompoundPart *p = new DullPart(a, partno, a->getSpriteFile(), a->getFirstImage() + first_image, x, y, plane - a->zorder);
+	CompoundPart* p = new DullPart(a, partno, a->getSpriteFile(), a->getFirstImage() + first_image, x, y, plane - a->zorder);
 	a->addPart(p);
 
 	vm->part = partno;
@@ -96,7 +96,7 @@ void c_NEW_PART(caosVM *vm) {
  Adds a new 'dull' part to the TARGed compound agent/vehicle which does nothing but display an image.
  Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.
 */
-void c_PAT_DULL(caosVM *vm) {
+void c_PAT_DULL(caosVM* vm) {
 	VM_VERIFY_SIZE(6)
 	VM_PARAM_INTEGER(plane)
 	// TODO: should x/y be int? original docs say 'decimal'
@@ -105,13 +105,13 @@ void c_PAT_DULL(caosVM *vm) {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
-	
+
 	caos_assert(part >= 0);
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
 
-	CompoundPart *p = new DullPart(a, part, sprite, first_image, x, y, plane);
+	CompoundPart* p = new DullPart(a, part, sprite, first_image, x, y, plane);
 	a->addPart(p);
 }
 
@@ -120,7 +120,7 @@ void c_PAT_DULL(caosVM *vm) {
  %status maybe
  %variants sm
 */
-void c_PAT_DULL_sm(caosVM *vm) {
+void c_PAT_DULL_sm(caosVM* vm) {
 	VM_PARAM_INTEGER(no_images)
 
 	c_PAT_DULL(vm);
@@ -137,7 +137,7 @@ void c_PAT_DULL_sm(caosVM *vm) {
  'messageid' is the message sent when the button is clicked - _p1_ of the message is set to the part number.
  If option is 1, mouseclicks/hovers only apply to non-transparent areas. otherwise, option should be 0.
 */
-void c_PAT_BUTT(caosVM *vm) {
+void c_PAT_BUTT(caosVM* vm) {
 	VM_VERIFY_SIZE(10)
 	VM_PARAM_INTEGER(option)
 	VM_PARAM_INTEGER(messageid)
@@ -150,15 +150,15 @@ void c_PAT_BUTT(caosVM *vm) {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
-	
+
 	caos_assert(part >= 0);
 	// caos_assert((option == 0) || (option == 1)); .. I've seen '1000' and '255' used, so, gah. TODO: make sure all non-zero values are identical
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
 
 	// TODO TODO TODO we don't take image_count!!
-	CompoundPart *p = new ButtonPart(a, part, sprite, first_image, x, y, plane, hoveranim, messageid, option);
+	CompoundPart* p = new ButtonPart(a, part, sprite, first_image, x, y, plane, hoveranim, messageid, option);
 	a->addPart(p);
 }
 
@@ -170,7 +170,7 @@ void c_PAT_BUTT(caosVM *vm) {
  Part ID numbers begin at 1. x/y/plane are relative to the agent you're working on.
  The 'first_image' frame of the given sprite file will be used underneath the text, which is set with PTXT.
 */
-void c_PAT_FIXD(caosVM *vm) {
+void c_PAT_FIXD(caosVM* vm) {
 	VM_PARAM_STRING(fontsprite)
 	VM_PARAM_INTEGER(plane)
 	// TODO: should x/y be int? original docs say 'decimal'
@@ -178,14 +178,14 @@ void c_PAT_FIXD(caosVM *vm) {
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(sprite)
-	VM_PARAM_INTEGER(part)	
-	
+	VM_PARAM_INTEGER(part)
+
 	caos_assert(part >= 0);
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
-	
-	CompoundPart *p = new FixedTextPart(a, part, sprite, first_image, x, y, plane, fontsprite);
+
+	CompoundPart* p = new FixedTextPart(a, part, sprite, first_image, x, y, plane, fontsprite);
 	a->addPart(p);
 }
 
@@ -198,7 +198,7 @@ void c_PAT_FIXD(caosVM *vm) {
  The 'first_image' frame of the given sprite file will be used underneath the text.  The part will 
  gain the focus when FCUS is called or when it is clicked.  A message of the given type will be sent.
 */
-void c_PAT_TEXT(caosVM *vm) {
+void c_PAT_TEXT(caosVM* vm) {
 	VM_PARAM_STRING(fontsprite)
 	VM_PARAM_INTEGER(message_id)
 	VM_PARAM_INTEGER(plane)
@@ -207,14 +207,14 @@ void c_PAT_TEXT(caosVM *vm) {
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(sprite)
-	VM_PARAM_INTEGER(part)	
-	
+	VM_PARAM_INTEGER(part)
+
 	caos_assert(part >= 0);
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
-	
-	CompoundPart *p = new TextEntryPart(a, part, sprite, first_image, x, y, plane, message_id, fontsprite);
+
+	CompoundPart* p = new TextEntryPart(a, part, sprite, first_image, x, y, plane, message_id, fontsprite);
 	a->addPart(p);
 }
 
@@ -222,7 +222,7 @@ void c_PAT_TEXT(caosVM *vm) {
  PAT: CMRA (command) part (integer) sprite (string) first_image (integer) x (integer) y (integer) plane (integer) viewwidth (integer) viewheight (integer) camerawidth (integer) cameraheight(integer)
  %status maybe
 */
-void c_PAT_CMRA(caosVM *vm) {
+void c_PAT_CMRA(caosVM* vm) {
 	VM_PARAM_INTEGER(cameraheight)
 	VM_PARAM_INTEGER(camerawidth)
 	VM_PARAM_INTEGER(viewheight)
@@ -237,10 +237,10 @@ void c_PAT_CMRA(caosVM *vm) {
 
 	caos_assert(part >= 0);
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
 
-	CompoundPart *p = new CameraPart(a, part, sprite, first_image, x, y, plane, viewwidth, viewheight, camerawidth, cameraheight);
+	CompoundPart* p = new CameraPart(a, part, sprite, first_image, x, y, plane, viewwidth, viewheight, camerawidth, cameraheight);
 	a->addPart(p);
 }
 
@@ -250,7 +250,7 @@ void c_PAT_CMRA(caosVM *vm) {
 
  
 */
-void c_PAT_GRPH(caosVM *vm) {
+void c_PAT_GRPH(caosVM* vm) {
 	VM_PARAM_INTEGER(numvalues)
 	VM_PARAM_INTEGER(plane)
 	// TODO: should x/y be int? original docs say 'decimal'
@@ -259,13 +259,13 @@ void c_PAT_GRPH(caosVM *vm) {
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
-	
+
 	caos_assert(part >= 0);
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
 
-	CompoundPart *p = new GraphPart(a, part, sprite, first_image, x, y, plane, numvalues);
+	CompoundPart* p = new GraphPart(a, part, sprite, first_image, x, y, plane, numvalues);
 	a->addPart(p);
 }
 
@@ -275,16 +275,17 @@ void c_PAT_GRPH(caosVM *vm) {
  
  Kills the specified part of the TARGed compound agent or vehicle.
 */
-void c_PAT_KILL(caosVM *vm) {
+void c_PAT_KILL(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(part)
-	
+
 	caos_assert(part > 0);
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
-	if (!a->part(part)) return; // Edynn does PAT: KILL on nonexistant parts
-	
+	if (!a->part(part))
+		return; // Edynn does PAT: KILL on nonexistant parts
+
 	a->delPart(part);
 }
 
@@ -294,16 +295,16 @@ void c_PAT_KILL(caosVM *vm) {
 
  move the compound part specified to the new relative position specified
 */
-void c_PAT_MOVE(caosVM *vm) {
+void c_PAT_MOVE(caosVM* vm) {
 	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 	VM_PARAM_INTEGER(part)
 
 	valid_agent(vm->targ);
-	CompoundAgent *a = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* a = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(a);
-	CompoundPart *p = a->part(part);
+	CompoundPart* p = a->part(part);
 	caos_assert(p);
 
 	p->x = x;
@@ -317,15 +318,15 @@ void c_PAT_MOVE(caosVM *vm) {
  Focus the current targeted part, which must be a PAT: TEXT.
  If the target is null, then the current part will be unfocused.
 */
-void c_FCUS(caosVM *vm) {
+void c_FCUS(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 
 	if (!vm->targ)
 		world.setFocus(0);
 	else {
-		CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+		CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 		caos_assert(c);
-		TextEntryPart *p = dynamic_cast<TextEntryPart *>(c->part(vm->part));
+		TextEntryPart* p = dynamic_cast<TextEntryPart*>(c->part(vm->part));
 		caos_assert(p);
 		world.setFocus(p);
 	}
@@ -339,7 +340,7 @@ void c_FCUS(caosVM *vm) {
  pixels.  Justification can be 0 for left, 1 for right, 2 for center, 4 for bottom, 8 for middle or 16 
  for 'last page scroll' (TODO?), and you can add these together (except 0/1 are mutually exclusive, obviously).
 */
-void c_FRMT(caosVM *vm) {
+void c_FRMT(caosVM* vm) {
 	VM_PARAM_INTEGER(justification)
 	VM_PARAM_INTEGER(char_spacing)
 	VM_PARAM_INTEGER(line_spacing)
@@ -349,23 +350,30 @@ void c_FRMT(caosVM *vm) {
 	VM_PARAM_INTEGER(left_margin)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	TextPart *p = dynamic_cast<TextPart *>(c->part(vm->part));
+	TextPart* p = dynamic_cast<TextPart*>(c->part(vm->part));
 	caos_assert(p);
 
 	horizontalalign h;
-	if ((justification & 3) == 1) h = rightalign;
-	else if ((justification & 3) == 2) h = centeralign;
-	else h = leftalign;
-	
-	verticalalign v;
-	if ((justification & 12) == 4) v = bottom;
-	else if ((justification & 12) == 8) v = middle;
-	else v = top; // TODO: i haven't verified this is the correct fallback - fuzzie
+	if ((justification & 3) == 1)
+		h = rightalign;
+	else if ((justification & 3) == 2)
+		h = centeralign;
+	else
+		h = leftalign;
 
-	if (char_spacing == 1) char_spacing = 0; // TODO: horrible hack to try and fix issues
-	
+	verticalalign v;
+	if ((justification & 12) == 4)
+		v = bottom;
+	else if ((justification & 12) == 8)
+		v = middle;
+	else
+		v = top; // TODO: i haven't verified this is the correct fallback - fuzzie
+
+	if (char_spacing == 1)
+		char_spacing = 0; // TODO: horrible hack to try and fix issues
+
 	p->setFormat(left_margin, top_margin, right_margin, bottom_margin, line_spacing, char_spacing, h, v, (justification & 16));
 }
 
@@ -375,17 +383,17 @@ void c_FRMT(caosVM *vm) {
  
  Sets the text displayed in the current text part.
 */
-void c_PTXT(caosVM *vm) {
+void c_PTXT(caosVM* vm) {
 	VM_PARAM_STRING(text)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	TextPart *p = dynamic_cast<TextPart *>(c->part(vm->part));
+	TextPart* p = dynamic_cast<TextPart*>(c->part(vm->part));
 	caos_assert(p);
 
 	p->setText(text);
-}	
+}
 
 /**
  PTXT (string)
@@ -393,13 +401,13 @@ void c_PTXT(caosVM *vm) {
 
  Returns the text displayed in the current text part.
 */
-void v_PTXT(caosVM *vm) {
+void v_PTXT(caosVM* vm) {
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	TextPart *p = dynamic_cast<TextPart *>(c->part(vm->part));
+	TextPart* p = dynamic_cast<TextPart*>(c->part(vm->part));
 	caos_assert(p);
-	
+
 	vm->result.setString(p->getText());
 }
 
@@ -410,12 +418,12 @@ void v_PTXT(caosVM *vm) {
  Returns the next part of the TARG compound agent or vehicle, (or -1 if you have reached the end, or 
  the first part if you go past -1).
 */
-void v_PNXT(caosVM *vm) {
+void v_PNXT(caosVM* vm) {
 	VM_PARAM_INTEGER(previous_part)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
-	
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
+
 	if (!c) { // handle non-compound agents
 		if (previous_part == -1)
 			vm->result.setInt(0);
@@ -425,17 +433,19 @@ void v_PNXT(caosVM *vm) {
 	}
 
 	// TODO: this might not be the best way to do this..
-	CompoundPart *curpart = 0;
-	
-	for (auto & part : c->parts) {
+	CompoundPart* curpart = 0;
+
+	for (auto& part : c->parts) {
 		unsigned int i = part->id;
 		if ((int)i > previous_part)
 			if (!curpart || i < curpart->id)
 				curpart = part;
 	}
 
-	if (curpart) vm->result.setInt(curpart->id);
-	else vm->result.setInt(-1);
+	if (curpart)
+		vm->result.setInt(curpart->id);
+	else
+		vm->result.setInt(-1);
 }
 
 /**
@@ -444,15 +454,15 @@ void v_PNXT(caosVM *vm) {
 
  Sets the zero-based page number of the current text part.  This must be less than NPGS.
 */
-void c_PAGE(caosVM *vm) {
+void c_PAGE(caosVM* vm) {
 	VM_PARAM_INTEGER(page)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	CompoundPart *p = c->part(vm->part);
+	CompoundPart* p = c->part(vm->part);
 	caos_assert(p);
-	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
+	FixedTextPart* t = dynamic_cast<FixedTextPart*>(p);
 	caos_assert(t);
 
 	t->setPage(page);
@@ -464,13 +474,13 @@ void c_PAGE(caosVM *vm) {
 
  Returns the zero-based page number of the current text part.
 */
-void v_PAGE(caosVM *vm) {
+void v_PAGE(caosVM* vm) {
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	CompoundPart *p = c->part(vm->part);
+	CompoundPart* p = c->part(vm->part);
 	caos_assert(p);
-	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
+	FixedTextPart* t = dynamic_cast<FixedTextPart*>(p);
 	caos_assert(t);
 
 	vm->result.setInt(t->getPage());
@@ -482,13 +492,13 @@ void v_PAGE(caosVM *vm) {
 
  Returns the number of pages for the current text part.
 */
-void v_NPGS(caosVM *vm) {
+void v_NPGS(caosVM* vm) {
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	CompoundPart *p = c->part(vm->part);
+	CompoundPart* p = c->part(vm->part);
 	caos_assert(p);
-	FixedTextPart *t = dynamic_cast<FixedTextPart *>(p);
+	FixedTextPart* t = dynamic_cast<FixedTextPart*>(p);
 	caos_assert(t);
 
 	vm->result.setInt(t->noPages());
@@ -500,16 +510,16 @@ void v_NPGS(caosVM *vm) {
 
  Add the given value to the given line on a graph.
 */
-void c_GRPV(caosVM *vm) {
+void c_GRPV(caosVM* vm) {
 	VM_PARAM_FLOAT(value)
 	VM_PARAM_INTEGER(line)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	CompoundPart *p = c->part(vm->part);
+	CompoundPart* p = c->part(vm->part);
 	caos_assert(p);
-	GraphPart *t = dynamic_cast<GraphPart *>(p);
+	GraphPart* t = dynamic_cast<GraphPart*>(p);
 	caos_assert(t);
 
 	// TODO
@@ -522,7 +532,7 @@ void c_GRPV(caosVM *vm) {
  Add a new line to a graph created with PAT: GRPH with the given 
  characteristics.
 */
-void c_GRPL(caosVM *vm) {
+void c_GRPL(caosVM* vm) {
 	VM_PARAM_FLOAT(max)
 	VM_PARAM_FLOAT(min)
 	VM_PARAM_INTEGER(blue)
@@ -530,11 +540,11 @@ void c_GRPL(caosVM *vm) {
 	VM_PARAM_INTEGER(red)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
-	CompoundPart *p = c->part(vm->part);
+	CompoundPart* p = c->part(vm->part);
 	caos_assert(p);
-	GraphPart *t = dynamic_cast<GraphPart *>(p);
+	GraphPart* t = dynamic_cast<GraphPart*>(p);
 	caos_assert(t);
 
 	// TODO
@@ -547,7 +557,7 @@ void c_GRPL(caosVM *vm) {
 
  Change the word at index to target blackboard, setting to the provided id and text.
 */
-void c_BBD_WORD(caosVM *vm) {
+void c_BBD_WORD(caosVM* vm) {
 	VM_PARAM_STRING(text)
 	VM_PARAM_INTEGER(id)
 	VM_PARAM_INTEGER(index)
@@ -559,7 +569,7 @@ void c_BBD_WORD(caosVM *vm) {
 	}
 
 	valid_agent(vm->targ);
-	Blackboard *b = dynamic_cast<Blackboard *>(vm->targ.get());
+	Blackboard* b = dynamic_cast<Blackboard*>(vm->targ.get());
 	caos_assert(b);
 
 	b->addBlackboardString(index, id, text);
@@ -573,11 +583,11 @@ void c_BBD_WORD(caosVM *vm) {
  If show is 1, draw the current text onto part 0 of the target blackboard. If 0,
  remove it from the blackboard.
 */
-void c_BBD_SHOW(caosVM *vm) {
+void c_BBD_SHOW(caosVM* vm) {
 	VM_PARAM_INTEGER(show)
 
 	valid_agent(vm->targ);
-	Blackboard *b = dynamic_cast<Blackboard *>(vm->targ.get());
+	Blackboard* b = dynamic_cast<Blackboard*>(vm->targ.get());
 	caos_assert(b);
 
 	b->showText(show);
@@ -591,11 +601,11 @@ void c_BBD_SHOW(caosVM *vm) {
  Broadcast the current word of the target blackboard. If audible is 1, broadcast
  to all nearby creatures. If 0, broadcast to all creatures looking at it.
 */
-void c_BBD_EMIT(caosVM *vm) {
+void c_BBD_EMIT(caosVM* vm) {
 	VM_PARAM_INTEGER(audible)
 
 	valid_agent(vm->targ);
-	Blackboard *b = dynamic_cast<Blackboard *>(vm->targ.get());
+	Blackboard* b = dynamic_cast<Blackboard*>(vm->targ.get());
 	caos_assert(b);
 
 	b->broadcast(audible);
@@ -609,16 +619,16 @@ void c_BBD_EMIT(caosVM *vm) {
  If allow is 1, switch target blackboard into editing mode, give it focus. If it
  is 0, remove focus from target blackboard.
 */
-void c_BBD_EDIT(caosVM *vm) {
+void c_BBD_EDIT(caosVM* vm) {
 	VM_PARAM_INTEGER(allow)
 
 	valid_agent(vm->targ);
 
-	Blackboard *b = dynamic_cast<Blackboard *>(vm->targ.get());
+	Blackboard* b = dynamic_cast<Blackboard*>(vm->targ.get());
 	caos_assert(b);
-	BlackboardPart *p = b->getBlackboardPart();
+	BlackboardPart* p = b->getBlackboardPart();
 	caos_assert(p);
-	
+
 	if (allow) {
 		world.setFocus(p);
 	} else {
@@ -634,7 +644,7 @@ void c_BBD_EDIT(caosVM *vm) {
 
  Copy count words into the blackboard word list from the global word list.
 */
-void c_BBD_VOCB(caosVM *vm) {
+void c_BBD_VOCB(caosVM* vm) {
 	VM_PARAM_INTEGER(count)
 	VM_PARAM_INTEGER(globalstart)
 	VM_PARAM_INTEGER(blackboardstart)
@@ -644,10 +654,11 @@ void c_BBD_VOCB(caosVM *vm) {
 	caos_assert(blackboardstart >= 0);
 
 	valid_agent(vm->targ);
-	Blackboard *b = dynamic_cast<Blackboard *>(vm->targ.get());
+	Blackboard* b = dynamic_cast<Blackboard*>(vm->targ.get());
 	caos_assert(b);
 
-	if (engine.wordlist.size() == 0) return; // no word list!
+	if (engine.wordlist.size() == 0)
+		return; // no word list!
 	caos_assert((unsigned int)globalstart < engine.wordlist.size());
 
 	for (unsigned int i = 0; (i < (unsigned int)count) && ((unsigned int)globalstart + i < engine.wordlist.size()); i++) {
@@ -662,7 +673,7 @@ void c_BBD_VOCB(caosVM *vm) {
 
  Create a new C2 text part for a compound bubble object. Text will wrap as required to fit width.
 */
-void c_NEW_BBTX(caosVM *vm) {
+void c_NEW_BBTX(caosVM* vm) {
 	VM_PARAM_INTEGER(width)
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
@@ -677,7 +688,7 @@ void c_NEW_BBTX(caosVM *vm) {
  %status stub
  %variants c2
 */
-void c_BBTX(caosVM *vm) {
+void c_BBTX(caosVM* vm) {
 	VM_PARAM_INTEGER(stringindex)
 	VM_PARAM_INTEGER(part)
 
@@ -690,7 +701,7 @@ void c_BBTX(caosVM *vm) {
  %status maybe
  %variants c1 c2
 */
-void c_SPOT(caosVM *vm) {
+void c_SPOT(caosVM* vm) {
 	VM_PARAM_INTEGER(bottom)
 	VM_PARAM_INTEGER(right)
 	VM_PARAM_INTEGER(top)
@@ -698,7 +709,7 @@ void c_SPOT(caosVM *vm) {
 	VM_PARAM_INTEGER(spotno)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
 
 	c->setHotspotLoc(spotno, left, top, right, bottom);
@@ -709,12 +720,12 @@ void c_SPOT(caosVM *vm) {
  %status maybe
  %variants c1 c2
 */
-void c_KNOB(caosVM *vm) {
+void c_KNOB(caosVM* vm) {
 	VM_PARAM_INTEGER(spotno)
 	VM_PARAM_INTEGER(function)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
 
 	c->setHotspotFunc(function, spotno);
@@ -725,13 +736,13 @@ void c_KNOB(caosVM *vm) {
  %status maybe
  %variants c2
 */
-void c_KMSG(caosVM *vm) {
+void c_KMSG(caosVM* vm) {
 	VM_PARAM_INTEGER(message)
 	VM_PARAM_INTEGER(flags)
 	VM_PARAM_INTEGER(function)
 
 	valid_agent(vm->targ);
-	CompoundAgent *c = dynamic_cast<CompoundAgent *>(vm->targ.get());
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
 	caos_assert(c);
 
 	c->setHotspotFuncDetails(function, message, flags);
@@ -744,7 +755,7 @@ void c_KMSG(caosVM *vm) {
 
  Display the given text for the given number of ticks, in a bubble (type is 0 for speech or 1 for thought).
 */
-void c_BBLE(caosVM *vm) {
+void c_BBLE(caosVM* vm) {
 	VM_PARAM_INTEGER(track)
 	VM_PARAM_INTEGER(type)
 	VM_PARAM_INTEGER(ticks)
@@ -758,7 +769,7 @@ void c_BBLE(caosVM *vm) {
  %status stub
  %variants c2
 */
-void c_BBFD(caosVM *vm) {
+void c_BBFD(caosVM* vm) {
 	VM_PARAM_INTEGER(blue)
 	VM_PARAM_INTEGER(green)
 	VM_PARAM_INTEGER(red)

@@ -20,9 +20,9 @@
 #ifndef PATHRESOLVER_H
 #define PATHRESOLVER_H 1
 
+#include <ghc/filesystem.hpp>
 #include <string>
 #include <vector>
-#include <ghc/filesystem.hpp>
 
 /* resolveFile
  *

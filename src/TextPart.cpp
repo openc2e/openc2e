@@ -1,22 +1,28 @@
-#include "caos_assert.h"
 #include "TextPart.h"
+
 #include "Backend.h"
-#include "encoding.h"
 #include "Engine.h"
-#include "creaturesImage.h"
-#include "imageManager.h"
 #include "TextEntryPart.h"
 #include "World.h"
+#include "caos_assert.h"
+#include "creaturesImage.h"
+#include "encoding.h"
+#include "imageManager.h"
 
-TextPart::TextPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
-	                : SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
+TextPart::TextPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
+	: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = world.gallery->getImage(fontsprite);
 	caos_assert(textsprite);
 	caos_assert(textsprite->numframes() == 224);
-	
-	leftmargin = 8; topmargin = 8; rightmargin = 8; bottommargin = 8;
-	linespacing = 0; charspacing = 0;
-	horz_align = leftalign; vert_align = top;
+
+	leftmargin = 8;
+	topmargin = 8;
+	rightmargin = 8;
+	bottommargin = 8;
+	linespacing = 0;
+	charspacing = 0;
+	horz_align = leftalign;
+	vert_align = top;
 	currpage = 0;
 	recalculateData(); // ie, insert a blank first page
 }
@@ -27,7 +33,7 @@ TextPart::~TextPart() {
 void TextPart::addTint(std::string tintinfo) {
 	// add a tint, starting at text.size(), using the data in tintinfo
 	// TODO: there's some caching to be done here, but tinting is rather rare, so..
-	
+
 	unsigned short r = 128, g = 128, b = 128, rot = 128, swap = 128;
 	int where = 0;
 	std::string cur;
@@ -45,14 +51,16 @@ void TextPart::addTint(std::string tintinfo) {
 			} // TODO: else explode();
 			where++;
 			cur = "";
-			if (where > 4) break;
-		} else cur += tintinfo[i];
+			if (where > 4)
+				break;
+		} else
+			cur += tintinfo[i];
 	}
 
 	texttintinfo t;
 	t.offset = text.size();
 
-	if (!(r == 128 && g == 128 &&  b == 128 && rot == 128 && swap == 128)) {
+	if (!(r == 128 && g == 128 && b == 128 && rot == 128 && swap == 128)) {
 		t.sprite = world.gallery->tint(textsprite, r, g, b, rot, swap);
 	} else {
 		t.sprite = textsprite;
@@ -68,13 +76,14 @@ void TextPart::setText(std::string t) {
 
 	// parse and remove the <tint> tagging
 	for (unsigned int i = 0; i < t.size(); i++) {
-		if ((t[i] == '<') && (t.size() > i+4))
+		if ((t[i] == '<') && (t.size() > i + 4))
 			if ((t[i + 1] == 't') && (t[i + 2] == 'i') && (t[i + 3] == 'n') && (t[i + 4] == 't')) {
 				i += 5;
 				std::string tintinfo;
-				if (t[i] == ' ') i++; // skip initial space, if any
+				if (t[i] == ' ')
+					i++; // skip initial space, if any
 				for (; i < t.size(); i++) {
-					if (t[i] == '>') 
+					if (t[i] == '>')
 						break;
 					tintinfo += t[i];
 				}
@@ -83,7 +92,7 @@ void TextPart::setText(std::string t) {
 			}
 		text += t[i];
 	}
-	
+
 	recalculateData();
 }
 
@@ -105,11 +114,13 @@ unsigned int TextPart::calculateWordWidth(std::string word) {
 
 	unsigned int x = 0;
 	for (unsigned int i = 0; i < word.size(); i++) {
-		if (((unsigned char)word[i]) < 32) continue; // TODO: replace with space or similar?
+		if (((unsigned char)word[i]) < 32)
+			continue; // TODO: replace with space or similar?
 		int spriteid = ((unsigned char)word[i]) - 32;
 
 		x += textsprite->width(spriteid);
-		if (i != 0) x += charspacing;
+		if (i != 0)
+			x += charspacing;
 	}
 	return x;
 }
@@ -142,7 +153,8 @@ void TextPart::recalculateData() {
 		std::string word;
 		for (; i < text.size(); i++) {
 			if ((text[i] == ' ') || (text[i] == '\n')) {
-				if (text[i] == '\n') newline = true;
+				if (text[i] == '\n')
+					newline = true;
 				i++;
 				break;
 			}
@@ -160,7 +172,8 @@ void TextPart::recalculateData() {
 		if (currentdata.width + possiblelen <= textwidth) {
 			// the rest of the word fits on the current line, so that's okay.
 			// add a space if we're not the first word on this line
-			if (currentdata.text.size() > 0) word = std::string(" ") + word;
+			if (currentdata.text.size() > 0)
+				word = std::string(" ") + word;
 			currentdata.text += word;
 			currentdata.width += possiblelen;
 		} else if (wordlen <= textwidth) {
@@ -199,16 +212,17 @@ void TextPart::recalculateData() {
 
 	if (currentdata.text.size() > 0) {
 		currenty += usedheight;
-		if (text[text.size() - 1] == ' ') currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
+		if (text[text.size() - 1] == ' ')
+			currentdata.text += " "; // TODO: HACK THINK ABOUT THIS
 		lines.push_back(currentdata);
 	}
-	
+
 	pageheights.push_back(currenty);
 }
 
-void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, TextEntryPart *caretdata) {
+void TextPart::partRender(RenderTarget* renderer, int xoffset, int yoffset, TextEntryPart* caretdata) {
 	SpritePart::partRender(renderer, xoffset, yoffset);
-	
+
 	int xoff = xoffset + x + leftmargin;
 	int yoff = yoffset + y + topmargin;
 	unsigned int textwidth = getWidth() - leftmargin - rightmargin;
@@ -231,7 +245,7 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 	unsigned int endline = (currpage + 1 < pages.size() ? pages[currpage + 1] : lines.size());
 	std::shared_ptr<creaturesImage> sprite_to_use = textsprite;
 	unsigned int currtint = 0;
-	for (unsigned int i = startline; i < endline; i++) {	
+	for (unsigned int i = startline; i < endline; i++) {
 		int currentx = 0, somex = xoff;
 		if (horz_align == rightalign)
 			somex = somex + (textwidth - lines[i].width);
@@ -243,8 +257,9 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 				sprite_to_use = tints[currtint].sprite;
 				currtint++;
 			}
-		
-			if (((unsigned char)lines[i].text[x]) < 32) continue; // TODO: replace with space or similar?
+
+			if (((unsigned char)lines[i].text[x]) < 32)
+				continue; // TODO: replace with space or similar?
 			int spriteid = ((unsigned char)lines[i].text[x]) - 32;
 			renderer->renderCreaturesImage(sprite_to_use, spriteid, somex + currentx, yoff + currenty, has_alpha ? alpha : 0);
 			if ((caretdata) && (caretdata->caretpos == lines[i].offset + x))
@@ -252,7 +267,7 @@ void TextPart::partRender(RenderTarget *renderer, int xoffset, int yoffset, Text
 			currentx += textsprite->width(spriteid) + charspacing;
 		}
 		if ((caretdata) && (caretdata->caretpos == lines[i].offset + lines[i].text.size()))
-			caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);		
+			caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 		currenty += textsprite->height(0) + linespacing;
 	}
 }

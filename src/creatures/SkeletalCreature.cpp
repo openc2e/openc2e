@@ -27,23 +27,24 @@
 	* sanity checks: eg check that sprites have enough frames at load time
 */
 
-#include "caos_assert.h"
-#include "caosValue.h"
 #include "SkeletalCreature.h"
-#include "Creature.h"
-#include "World.h"
-#include "Engine.h"
+
 #include "Backend.h"
+#include "Creature.h"
+#include "Engine.h"
+#include "Map.h"
 #include "MetaRoom.h"
 #include "Room.h"
+#include "World.h"
+#include "caosValue.h"
+#include "caos_assert.h"
 #include "creaturesImage.h"
 #include "imageManager.h"
-#include "Map.h"
 
 #include <cassert>
+#include <fmt/core.h>
 #include <memory>
 #include <typeinfo> // TODO: remove when genome system is fixed
-#include <fmt/core.h>
 
 struct bodypartinfo {
 	char letter;
@@ -52,35 +53,34 @@ struct bodypartinfo {
 };
 
 bodypartinfo cee_bodyparts[17] = {
-	{ 'b', -1, -1 }, // body
-	{ 'a', 0, 0 }, // head - attached to body
-	{ 'c', 0, 1 }, // left thigh - attached to body
-	{ 'f', 0, 2 }, // right thigh - attached to body
-	{ 'i', 0, 3 }, // left humerus - attached to body
-	{ 'k', 0, 4 }, // right humerus - attached to body
-	{ 'm', 0, 5 }, // tail root - attached to body
-	{ 'd', 2, 1 }, // left shin - attached to left thigh
-	{ 'g', 3, 1 }, // right shin - attached to right thigh
-	{ 'j', 4, 1 }, // left radius - attached to left humerus
-	{ 'l', 5, 1 }, // right radius - attached to right humerus
-	{ 'e', 7, 1 }, // left foot - attached to left shin
-	{ 'h', 8, 1 }, // right foot - attached to right shin
-	{ 'n', 6, 1 }, // tail tip - attached to tail root
+	{'b', -1, -1}, // body
+	{'a', 0, 0}, // head - attached to body
+	{'c', 0, 1}, // left thigh - attached to body
+	{'f', 0, 2}, // right thigh - attached to body
+	{'i', 0, 3}, // left humerus - attached to body
+	{'k', 0, 4}, // right humerus - attached to body
+	{'m', 0, 5}, // tail root - attached to body
+	{'d', 2, 1}, // left shin - attached to left thigh
+	{'g', 3, 1}, // right shin - attached to right thigh
+	{'j', 4, 1}, // left radius - attached to left humerus
+	{'l', 5, 1}, // right radius - attached to right humerus
+	{'e', 7, 1}, // left foot - attached to left shin
+	{'h', 8, 1}, // right foot - attached to right shin
+	{'n', 6, 1}, // tail tip - attached to tail root
 	// Creatures Village only:
-	{ 'o', 1, 2 }, // left ear - attached to head
-	{ 'p', 1, 3 }, // right ear - attached to head
-	{ 'q', 1, 4 } // hair - attached to head
+	{'o', 1, 2}, // left ear - attached to head
+	{'p', 1, 3}, // right ear - attached to head
+	{'q', 1, 4} // hair - attached to head
 };
 
 unsigned int cee_zorder[4][17] = {
-	{ 6, 13, 2, 7, 11, 4, 9, 0, 14, 1, 16, 15, 5, 3, 8, 10, 12 },
-	{ 6, 13, 3, 8, 12, 5, 10, 0, 15, 1, 16, 14, 2, 7, 11, 4, 9 },
-	{ 6, 13, 2, 4, 9, 5, 3, 7, 8, 10, 0, 11, 12, 16, 14, 15, 1 },
-	{ 2, 4, 9, 1, 14, 15, 16, 5, 3, 7, 8, 10, 11, 12, 0, 6, 13 }
-};
+	{6, 13, 2, 7, 11, 4, 9, 0, 14, 1, 16, 15, 5, 3, 8, 10, 12},
+	{6, 13, 3, 8, 12, 5, 10, 0, 15, 1, 16, 14, 2, 7, 11, 4, 9},
+	{6, 13, 2, 4, 9, 5, 3, 7, 8, 10, 0, 11, 12, 16, 14, 15, 1},
+	{2, 4, 9, 1, 14, 15, 16, 5, 3, 7, 8, 10, 11, 12, 0, 6, 13}};
 
 // needed for setPose(string) at least .. maybe cee_bodyparts should be indexed by letter
-unsigned int cee_lookup[17] = { 1, 0, 2, 7, 11, 3, 8, 12, 4, 9, 5, 10, 6, 13, 14, 15, 16 };
+unsigned int cee_lookup[17] = {1, 0, 2, 7, 11, 3, 8, 12, 4, 9, 5, 10, 6, 13, 14, 15, 16};
 
 int SkeletalPartCount() {
 	if (engine.gametype == "cv")
@@ -89,7 +89,8 @@ int SkeletalPartCount() {
 		return 14;
 }
 
-SkeletalCreature::SkeletalCreature(unsigned char _family) : Agent(_family, 0, 0, 0) {
+SkeletalCreature::SkeletalCreature(unsigned char _family)
+	: Agent(_family, 0, 0, 0) {
 	facialexpression = 0;
 	pregnancy = 0;
 	eyesclosed = false;
@@ -99,7 +100,7 @@ SkeletalCreature::SkeletalCreature(unsigned char _family) : Agent(_family, 0, 0,
 
 	ticks = 0;
 	gaitgene = 0;
-	
+
 	calculated = false;
 
 	if (engine.version == 1) {
@@ -113,7 +114,8 @@ SkeletalCreature::SkeletalCreature(unsigned char _family) : Agent(_family, 0, 0,
 		aero = 10;
 	}
 
-	for (auto & appearancegene : appearancegenes) appearancegene = 0;
+	for (auto& appearancegene : appearancegenes)
+		appearancegene = 0;
 
 	skeleton = new SkeletonPart(this);
 }
@@ -136,21 +138,23 @@ std::string SkeletalCreature::dataString(unsigned int _stage, bool tryfemale, un
 void SkeletalCreature::processGenes() {
 	std::shared_ptr<genomeFile> genome = creature->getGenome();
 
-	for (auto & gene : genome->genes) {
-		if (!creature->shouldProcessGene(gene.get())) continue;
+	for (auto& gene : genome->genes) {
+		if (!creature->shouldProcessGene(gene.get()))
+			continue;
 
-		if (creatureAppearanceGene *x = dynamic_cast<creatureAppearanceGene*>(gene.get())) {
-			if (x->part > 5) continue;
+		if (creatureAppearanceGene* x = dynamic_cast<creatureAppearanceGene*>(gene.get())) {
+			if (x->part > 5)
+				continue;
 			appearancegenes[x->part] = x;
-		} else if (creaturePoseGene *x = dynamic_cast<creaturePoseGene*>(gene.get())) {
+		} else if (creaturePoseGene* x = dynamic_cast<creaturePoseGene*>(gene.get())) {
 			posegenes[x->poseno] = x;
-		} else if (creatureGaitGene *x = dynamic_cast<creatureGaitGene*>(gene.get())) {
+		} else if (creatureGaitGene* x = dynamic_cast<creatureGaitGene*>(gene.get())) {
 			gaitgenes[x->drive] = x;
 		}
 	}
 }
 
-creatureAppearanceGene *SkeletalCreature::appearanceGeneForPart(char x) {
+creatureAppearanceGene* SkeletalCreature::appearanceGeneForPart(char x) {
 	// TODO: tail madness?
 
 	if (x == 'a' || x >= 'o') {
@@ -169,7 +173,7 @@ creatureAppearanceGene *SkeletalCreature::appearanceGeneForPart(char x) {
 		// tail
 		return appearancegenes[4];
 	}
-	
+
 	return 0;
 }
 
@@ -179,19 +183,21 @@ void SkeletalCreature::skeletonInit() {
 
 	for (int i = 0; i < SkeletalPartCount(); i++) { // CV hackery
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
-			if (i == 6 || i == 13) continue;
+			if (i == 6 || i == 13)
+				continue;
 
 		// reset the existing image reference
 		images[i].reset();
 
 		// find the relevant gene
 		char x = cee_bodyparts[i].letter;
-		creatureAppearanceGene *partapp = appearanceGeneForPart(x);
+		creatureAppearanceGene* partapp = appearanceGeneForPart(x);
 
 		int partspecies, partvariant;
 		partspecies = creature->getGenus();
 		if (partapp) {
-			if (engine.version > 1) partspecies = partapp->species;
+			if (engine.version > 1)
+				partspecies = partapp->species;
 			partvariant = partapp->variant;
 		} else {
 			partvariant = creature->getVariant();
@@ -217,7 +223,8 @@ void SkeletalCreature::skeletonInit() {
 				}
 				var--;
 			}
-			if (!tryfemale) break;
+			if (!tryfemale)
+				break;
 			tryfemale = false;
 		}
 		if (!images[i])
@@ -242,14 +249,14 @@ void SkeletalCreature::skeletonInit() {
 		if (in.fail())
 			throw creaturesException(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attfilename));
 		in >> att[i];
-		
+
 		images[i] = tintBodySprite(images[i]);
 	}
 }
 
 std::shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(std::shared_ptr<creaturesImage> s) {
 	// TODO: don't bother tinting if we don't need to
-	
+
 	// TODO: work out tinting for other engine versions
 	if (engine.version > 2) {
 		std::shared_ptr<creaturesImage> newimage = world.gallery->tint(s, creature->getTint(0), creature->getTint(1), creature->getTint(2), creature->getTint(3), creature->getTint(4));
@@ -259,17 +266,19 @@ std::shared_ptr<creaturesImage> SkeletalCreature::tintBodySprite(std::shared_ptr
 	return s;
 }
 
-void SkeletalCreature::render(RenderTarget *renderer, int xoffset, int yoffset) {
+void SkeletalCreature::render(RenderTarget* renderer, int xoffset, int yoffset) {
 	bool mirror_body_parts = (world.variables["engine_mirror_creature_body_parts"] == 1);
 
 	for (int j = 0; j < 17; j++) {
 		int i = cee_zorder[posedirection][j];
-		if (i >= SkeletalPartCount()) continue; // CV hackery
+		if (i >= SkeletalPartCount())
+			continue; // CV hackery
 
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
-			if (i == 6 || i == 13) continue;
+			if (i == 6 || i == 13)
+				continue;
 
-		bodypartinfo *part = &cee_bodyparts[i];
+		bodypartinfo* part = &cee_bodyparts[i];
 
 		unsigned int ourpose = pose[i];
 
@@ -283,8 +292,7 @@ void SkeletalCreature::render(RenderTarget *renderer, int xoffset, int yoffset) 
 		if (part->parent == -1) { // body
 			ourpose += (pregnancy * (engine.version < 3 ? 10 : 16));
 		} else if (i == 1) { // head
-			ourpose += (eyesclosed ? (engine.version < 3 ? 10 : 16) : 0)
-				+ (facialexpression * (engine.version < 3 ? 20 : 32));
+			ourpose += (eyesclosed ? (engine.version < 3 ? 10 : 16) : 0) + (facialexpression * (engine.version < 3 ? 20 : 32));
 		} else if (i == 16) { // hair
 			ourpose += 0; // TODO: 16 * hair
 		}
@@ -298,7 +306,8 @@ void SkeletalCreature::render(RenderTarget *renderer, int xoffset, int yoffset) 
 			int atx = attachmentX(i, 0) + xoffset, aty = attachmentY(i, 0) + yoffset;
 			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF0000CC);
 			renderer->renderLine(atx, aty - 1, atx, aty + 1, 0xFF0000CC);
-			atx = attachmentX(i, 1) + xoffset; aty = attachmentY(i, 1) + yoffset;
+			atx = attachmentX(i, 1) + xoffset;
+			aty = attachmentY(i, 1) + yoffset;
 			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF0000CC);
 			renderer->renderLine(atx, aty - 1, atx, aty + 1, 0xFF0000CC);
 		}
@@ -318,14 +327,16 @@ void SkeletalCreature::recalculateSkeleton() {
 
 	for (int i = 0; i < SkeletalPartCount(); i++) {
 		if (engine.version == 1) // TODO: this is hackery to skip tails for C1
-			if (i == 6 || i == 13) continue;
+			if (i == 6 || i == 13)
+				continue;
 
-		bodypartinfo *part = &cee_bodyparts[i];
+		bodypartinfo* part = &cee_bodyparts[i];
 
 		if (part->parent == -1) {
-			partx[i] = 0; party[i] = 0;
+			partx[i] = 0;
+			party[i] = 0;
 		} else {
-			attFile &bodyattinfo = att[0];
+			attFile& bodyattinfo = att[0];
 			// attFile &attinfo = att[i];
 
 			int attachx = att[i].attachments[pose[i]][0];
@@ -336,21 +347,30 @@ void SkeletalCreature::recalculateSkeleton() {
 				x = bodyattinfo.attachments[pose[0]][part->attorder * 2];
 				y = bodyattinfo.attachments[pose[0]][(part->attorder * 2) + 1];
 			} else { // extra limb
-				attFile &parentattinfo = att[part->parent];
+				attFile& parentattinfo = att[part->parent];
 
-				x = partx[part->parent] + parentattinfo.attachments[pose[part->parent]][part->attorder * 2]; 
+				x = partx[part->parent] + parentattinfo.attachments[pose[part->parent]][part->attorder * 2];
 				y = party[part->parent] + parentattinfo.attachments[pose[part->parent]][(part->attorder * 2) + 1];
 			}
 
 			x = x - attachx;
 			y = y - attachy;
 
-			partx[i] = x; party[i] = y;
+			partx[i] = x;
+			party[i] = y;
 
-			if (x < lowestx) { lowestx = x; }
-			if (y < lowesty) { lowesty = y; }
-			if (x + (int)images[i]->width(pose[i]) > highestx) { highestx = x + images[i]->width(pose[i]); }
-			if (y + (int)images[i]->height(pose[i]) > highesty) { highesty = y + images[i]->height(pose[i]); }
+			if (x < lowestx) {
+				lowestx = x;
+			}
+			if (y < lowesty) {
+				lowesty = y;
+			}
+			if (x + (int)images[i]->width(pose[i]) > highestx) {
+				highestx = x + images[i]->width(pose[i]);
+			}
+			if (y + (int)images[i]->height(pose[i]) > highesty) {
+				highesty = y + images[i]->height(pose[i]);
+			}
 		}
 	}
 
@@ -373,7 +393,7 @@ void SkeletalCreature::recalculateSkeleton() {
 	int orig_footpart = (downfoot_left ? 11 : 12);
 	oldfootx = attachmentX(orig_footpart, 1);
 	oldfooty = attachmentY(orig_footpart, 1);
-	
+
 	// recalculate width/height
 	height = downfoot_left ? leftfoot : rightfoot;
 	width = 50; // TODO: arbitary values bad
@@ -392,8 +412,9 @@ void SkeletalCreature::snapDownFoot() {
 	float footx = x + attachmentX(orig_footpart, 1);
 	float footy = y + attachmentY(orig_footpart, 1);
 
-	MetaRoom *m = world.map->metaRoomAt(x, y);
-	if (!m) return; // TODO: exceptiony death
+	MetaRoom* m = world.map->metaRoomAt(x, y);
+	if (!m)
+		return; // TODO: exceptiony death
 
 	std::shared_ptr<Room> newroom;
 
@@ -407,7 +428,8 @@ void SkeletalCreature::snapDownFoot() {
 				float ydiff = 10000.0f; // TODO: big number
 				for (auto i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
 					std::shared_ptr<Room> thisroom = i->first.lock();
-					if (engine.version == 2 && size > i->second->perm) continue;
+					if (engine.version == 2 && size > i->second->perm)
+						continue;
 					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
 						float thisydiff = fabs(footy - thisroom->floorYatX(footx));
 						if (thisydiff < ydiff) {
@@ -418,7 +440,7 @@ void SkeletalCreature::snapDownFoot() {
 				}
 			}
 		}
-	} else {	
+	} else {
 		newroom = bestRoomAt(footx, footy, 3, m, std::shared_ptr<Room>());
 
 		// insane emergency handling
@@ -436,7 +458,7 @@ void SkeletalCreature::snapDownFoot() {
 	bool newroomchosen = (newroom != downfootroom) && downfootroom;
 	bool hadroom = downfootroom != nullptr;
 	downfootroom = newroom;
-	
+
 	if (!downfootroom /*|| !falling */) {
 		// TODO: hackery to cope with scripts moving us, this needs handling correctly somewhere
 		if (fabs(lastgoodfootx - attachmentX(orig_footpart, 1) - x) > 50.0f || fabs(lastgoodfooty - attachmentY(orig_footpart, 1) - y) > 50.0f) {
@@ -542,7 +564,7 @@ void SkeletalCreature::setPose(std::string s) {
 		case '2': posedirection = 0; break;
 		case '3': posedirection = 1; break;
 		case 'X': break; // do nothing
-		default: 
+		default:
 			std::cout << "internal warning: SkeletalCreature::setPose didn't understand direction " << s[0] << " in pose '" << s << "'." << std::endl;
 			break;
 	}
@@ -556,23 +578,29 @@ void SkeletalCreature::setPose(std::string s) {
 			case '2': newpose = 2; break;
 			case '3': newpose = 3; break;
 			case '4': newpose = (engine.version < 3) ? 8 : 10; break; // 'to camera'
-			case '?': assert(i == 0); { // TODO
+			case '?':
+				assert(i == 0);
+				{ // TODO
 					// make the head look in the posedirection of _IT_
 					float attachmenty = attachmentY(1, 0) + y; // head attachment point, which we'll use to 'look' from atm
-					
+
 					// TODO: this is horrible, but i have no idea how the head angle is calculated
 					AgentRef attention = creature->getAttentionFocus();
-					if (attention && attention->y > (attachmenty + 30)) newpose = 0;
-					else if (attention && attention->y < (attachmenty - 70)) newpose = 3;
-					else if (attention && attention->y < (attachmenty - 30)) newpose = 2;
-					else newpose = 1;
+					if (attention && attention->y > (attachmenty + 30))
+						newpose = 0;
+					else if (attention && attention->y < (attachmenty - 70))
+						newpose = 3;
+					else if (attention && attention->y < (attachmenty - 30))
+						newpose = 2;
+					else
+						newpose = 1;
 				}
 				break;
 			// TODO: '!' also?
 			case 'X': continue; // do nothing
 			default:
-				  std::cout << "internal warning: SkeletalCreature::setPose didn't understand " << s[i + 1] << " in pose '" << s << "'." << std::endl;
-				  continue;
+				std::cout << "internal warning: SkeletalCreature::setPose didn't understand " << s[i + 1] << " in pose '" << s << "'." << std::endl;
+				continue;
 		}
 
 		assert(newpose != -1);
@@ -588,25 +616,28 @@ void SkeletalCreature::setPose(std::string s) {
 
 		pose[cee_lookup[i]] = newpose;
 
-		// TODO: this is some hackery for CV, 
-		if (engine.gametype != "cv") continue;
+		// TODO: this is some hackery for CV,
+		if (engine.gametype != "cv")
+			continue;
 		if (i == 0) { // head
-			pose[14] = newpose; pose[15] = newpose; // ears
+			pose[14] = newpose;
+			pose[15] = newpose; // ears
 			pose[16] = newpose; // hair
 		} else if (i == 1) {
 			pose[6] = newpose; // tail root
 			pose[13] = newpose; // tail tip
 		}
 	}
-		
+
 	recalculateSkeleton();
 }
 
 void SkeletalCreature::setPoseGene(unsigned int poseno) {
-	std::map<unsigned int, creaturePoseGene *>::iterator i = posegenes.find(poseno);
-	if (i == posegenes.end()) return; // TODO: is there a better behaviour here?
+	std::map<unsigned int, creaturePoseGene*>::iterator i = posegenes.find(poseno);
+	if (i == posegenes.end())
+		return; // TODO: is there a better behaviour here?
 
-	creaturePoseGene *g = i->second;
+	creaturePoseGene* g = i->second;
 	assert(g->poseno == poseno);
 	gaitgene = 0;
 	walking = false; // TODO: doesn't belong here, does it? really the idea of a 'walking' bool is horrid
@@ -614,13 +645,15 @@ void SkeletalCreature::setPoseGene(unsigned int poseno) {
 }
 
 void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure if this is *useful*
-	std::map<unsigned int, creatureGaitGene *>::iterator i = gaitgenes.find(gaitdrive);
-	if (i == gaitgenes.end()) return; // TODO: is there a better behaviour here?
+	std::map<unsigned int, creatureGaitGene*>::iterator i = gaitgenes.find(gaitdrive);
+	if (i == gaitgenes.end())
+		return; // TODO: is there a better behaviour here?
 
-	creatureGaitGene *g = i->second;
+	creatureGaitGene* g = i->second;
 	assert(g->drive == gaitdrive);
 
-	if (g == gaitgene) return;
+	if (g == gaitgene)
+		return;
 
 	// reset our gait details to default
 	gaitgene = g;
@@ -631,15 +664,17 @@ void SkeletalCreature::setGaitGene(unsigned int gaitdrive) { // TODO: not sure i
 void SkeletalCreature::tick() {
 	Agent::tick();
 
-	if (paused) return;
-	
+	if (paused)
+		return;
+
 	CreatureAgent::tick();
 
 	eyesclosed = creature->isAsleep() || !creature->isAlive();
 
 	// TODO: every 2 ticks = correct? what about the engine var?
 	ticks++;
-	if (ticks % 2 == 0) return;
+	if (ticks % 2 == 0)
+		return;
 
 	//if (eyesclosed) return; // TODO: hack, this is wrong :)
 
@@ -660,7 +695,7 @@ void SkeletalCreature::tick() {
 			// TODO: we should only do this if we're moving :-P
 			gaitTick();
 		}
-		
+
 		approaching = false;
 	}
 
@@ -689,27 +724,31 @@ void SkeletalCreature::physicsTick() {
 }
 
 void SkeletalCreature::gaitTick() {
-	if (!gaitgene) return;
+	if (!gaitgene)
+		return;
 	uint8_t pose = gaitgene->pose[gaiti];
 	if (pose == 0) {
-		if (gaiti == 0) return; // non-worky gait
+		if (gaiti == 0)
+			return; // non-worky gait
 
 		gaiti = 0;
 		gaitTick();
 		return;
 	}
 
-	std::map<unsigned int, creaturePoseGene *>::iterator i = posegenes.find(pose);
+	std::map<unsigned int, creaturePoseGene*>::iterator i = posegenes.find(pose);
 	if (i != posegenes.end()) {
-		creaturePoseGene *poseg = i->second;
+		creaturePoseGene* poseg = i->second;
 		assert(poseg->poseno == pose);
 		setPose(poseg->getPoseString());
 	}
 
-	gaiti++; if (gaiti > 7) gaiti = 0;
+	gaiti++;
+	if (gaiti > 7)
+		gaiti = 0;
 }
 
-CompoundPart *SkeletalCreature::part(unsigned int part_id) {
+CompoundPart* SkeletalCreature::part(unsigned int part_id) {
 	caos_assert(part_id == 0);
 	return skeleton;
 }
@@ -720,7 +759,8 @@ void SkeletalCreature::setZOrder(unsigned int plane) {
 	skeleton->addZOrder();
 }
 
-SkeletonPart::SkeletonPart(SkeletalCreature *p) : AnimatablePart(p, 0, 0, 0, 0) {
+SkeletonPart::SkeletonPart(SkeletalCreature* p)
+	: AnimatablePart(p, 0, 0, 0, 0) {
 }
 
 void SkeletonPart::tick() {
@@ -728,7 +768,7 @@ void SkeletonPart::tick() {
 }
 
 void SkeletonPart::setPose(unsigned int p) {
-	((SkeletalCreature *)parent)->setPoseGene(p);
+	((SkeletalCreature*)parent)->setPoseGene(p);
 }
 
 void SkeletonPart::setFrameNo(unsigned int p) {
@@ -736,9 +776,9 @@ void SkeletonPart::setFrameNo(unsigned int p) {
 	frameno = p;
 }
 
-void SkeletonPart::partRender(class RenderTarget *renderer, int xoffset, int yoffset) {
-	SkeletalCreature *c = dynamic_cast<SkeletalCreature *>(parent);
-	c->render(renderer, xoffset, yoffset);	
+void SkeletonPart::partRender(class RenderTarget* renderer, int xoffset, int yoffset) {
+	SkeletalCreature* c = dynamic_cast<SkeletalCreature*>(parent);
+	c->render(renderer, xoffset, yoffset);
 }
 
 void SkeletalCreature::finishInit() {
@@ -760,10 +800,10 @@ void SkeletalCreature::creatureAged() {
 std::string SkeletalCreature::getFaceSpriteName() {
 	// TODO: we should store the face sprite when we first search for sprites (since it
 	// has to be the baby sprite), rather than this horrible hackery
-	for (auto & gene : creature->getGenome()->genes) {
+	for (auto& gene : creature->getGenome()->genes) {
 		//if ((*i)->header.switchontime != creature->getStage()) continue;
 
-		if (creatureAppearanceGene *x = dynamic_cast<creatureAppearanceGene*>(gene.get())) {
+		if (creatureAppearanceGene* x = dynamic_cast<creatureAppearanceGene*>(gene.get())) {
 			if (x->part == 0) {
 				return std::string("a") + dataString(0, creature->isFemale(), x->species, x->variant);
 			}

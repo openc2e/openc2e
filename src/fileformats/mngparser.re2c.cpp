@@ -1,21 +1,23 @@
-#include "fileformats/mngparser.h"
 #include "creaturesException.h"
+#include "fileformats/mngparser.h"
 #include "utils/overload.h"
+
 #include <assert.h>
 #include <unordered_set>
 
 using namespace mngtoktype;
 
 struct MNGParserState {
-	MNGParserState(std::vector<mngtoken> tokens_) : tokens(tokens_) {}
+	MNGParserState(std::vector<mngtoken> tokens_)
+		: tokens(tokens_) {}
 	std::vector<mngtoken> tokens;
 	size_t p = 0;
-	
+
 	mngtoken peek();
 	toktype peektype();
 	mngtoken consume();
 	mngtoken consume(toktype type);
-	
+
 	MNGScript parse_script();
 	std::pair<std::string, float> parse_variable_declaration();
 	MNGEffect parse_effect();
@@ -26,17 +28,14 @@ struct MNGParserState {
 	MNGLoopLayer parse_loop_layer();
 	std::vector<MNGUpdate> parse_update_block();
 	MNGExpression parse_expression();
-	
+
 	float parse_constant_holder(toktype type);
 	std::string parse_ident_holder(toktype type);
 	MNGExpression parse_expression_holder(toktype type);
 };
 
 mngtoken MNGParserState::peek() {
-	while (tokens[p].type == MNG_WHITESPACE
-		|| tokens[p].type == MNG_NEWLINE
-		|| tokens[p].type == MNG_COMMENT
-	) {
+	while (tokens[p].type == MNG_WHITESPACE || tokens[p].type == MNG_NEWLINE || tokens[p].type == MNG_COMMENT) {
 		p++;
 	}
 	return tokens[p];
@@ -75,17 +74,17 @@ std::pair<std::string, float> MNGParserState::parse_variable_declaration() {
 }
 
 MNGExpression MNGParserState::parse_expression() {
-	#define BINARY_OP(type) \
-		if (peektype() == type) { \
-			consume(type); \
-			consume(MNG_LPAREN); \
-			auto left = parse_expression(); \
-			consume(MNG_COMMA); \
-			auto right = parse_expression(); \
-			consume(MNG_RPAREN); \
-			return MNGFunction(type, left, right); \
-		}
-	
+#define BINARY_OP(type) \
+	if (peektype() == type) { \
+		consume(type); \
+		consume(MNG_LPAREN); \
+		auto left = parse_expression(); \
+		consume(MNG_COMMA); \
+		auto right = parse_expression(); \
+		consume(MNG_RPAREN); \
+		return MNGFunction(type, left, right); \
+	}
+
 	BINARY_OP(MNG_ADD);
 	BINARY_OP(MNG_SUBTRACT);
 	BINARY_OP(MNG_MULTIPLY);
@@ -93,7 +92,7 @@ MNGExpression MNGParserState::parse_expression() {
 	BINARY_OP(MNG_RANDOM);
 	BINARY_OP(MNG_SINEWAVE);
 	BINARY_OP(MNG_COSINEWAVE);
-	
+
 	if (peektype() == MNG_CONST_NUMBER) {
 		float value = std::stof(consume(MNG_CONST_NUMBER).value);
 		return value;
@@ -148,26 +147,21 @@ MNGStage MNGParserState::parse_stage() {
 		auto type = peektype();
 		if (type == MNG_RCURLY) {
 			break;
-		}
-		else if (type == MNG_PAN) {
+		} else if (type == MNG_PAN) {
 			stage.pan = parse_expression_holder(MNG_PAN);
 			// TODO: error if pan defined twice?
-		}
-		else if (type == MNG_VOLUME) {
+		} else if (type == MNG_VOLUME) {
 			stage.volume = parse_expression_holder(MNG_VOLUME);
 			// TODO: error if volume defined twice?
-		}
-		else if (type == MNG_DELAY) {
+		} else if (type == MNG_DELAY) {
 			stage.delay = parse_expression_holder(MNG_DELAY);
 			// TODO: error if delay defined twice?
 			// TODO: error if delay already defined?
-		}
-		else if (type == MNG_TEMPODELAY) {
+		} else if (type == MNG_TEMPODELAY) {
 			stage.tempodelay = parse_expression_holder(MNG_TEMPODELAY);
 			// TODO: error if tempodelay defined twice?
 			// TODO: error if delay already defined?
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token when parsing stage: " + peek().dump());
 		}
 	}
@@ -186,11 +180,9 @@ MNGEffect MNGParserState::parse_effect() {
 		auto type = peektype();
 		if (type == MNG_RCURLY) {
 			break;
-		}
-		else if (type == MNG_STAGE) {
+		} else if (type == MNG_STAGE) {
 			effect.stages.push_back(parse_stage());
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token when parsing effect: " + peek().dump());
 		}
 	}
@@ -206,21 +198,19 @@ std::vector<MNGUpdate> MNGParserState::parse_update_block() {
 		auto type = peektype();
 		if (type == MNG_RCURLY) {
 			break;
-		}
-		else if (type == MNG_CONST_NAME || type == MNG_VOLUME || type == MNG_INTERVAL || type == MNG_PAN) {
+		} else if (type == MNG_CONST_NAME || type == MNG_VOLUME || type == MNG_INTERVAL || type == MNG_PAN) {
 			std::string name = consume().value;
 			assert(name.size());
 			consume(MNG_EQUALS);
 			auto expr = parse_expression();
 			updates.push_back({name, expr});
 			// TODO: should require a newline after this?
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token when parsing update block: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
-	return updates;	
+	return updates;
 }
 
 MNGVoice MNGParserState::parse_voice() {
@@ -231,8 +221,7 @@ MNGVoice MNGParserState::parse_voice() {
 		auto type = peektype();
 		if (type == MNG_RCURLY) {
 			break;
-		}
-		else if (type == MNG_CONDITION) {
+		} else if (type == MNG_CONDITION) {
 			consume(MNG_CONDITION);
 			consume(MNG_LPAREN);
 			auto variable = consume(MNG_CONST_NAME).value;
@@ -243,27 +232,22 @@ MNGVoice MNGParserState::parse_voice() {
 			consume(MNG_RPAREN);
 			voice.conditions.push_back({variable, left, right});
 			// TODO: are multiple conditions actually allowed?
-		}
-		else if (type == MNG_EFFECT) {
+		} else if (type == MNG_EFFECT) {
 			voice.effect = parse_ident_holder(MNG_EFFECT);
 			// TODO: error if multiple effects defined
-		}
-		else if (type == MNG_WAVE) {
+		} else if (type == MNG_WAVE) {
 			voice.wave = parse_ident_holder(MNG_WAVE);
 			// TODO: error if multiple waves defined
-		}
-		else if (type == MNG_INTERVAL) {
+		} else if (type == MNG_INTERVAL) {
 			consume(MNG_INTERVAL);
 			consume(MNG_LPAREN);
 			voice.interval = parse_expression();
 			consume(MNG_RPAREN);
 			// TODO: error if multiple voices defined
-		}
-		else if (type == MNG_UPDATE) {
+		} else if (type == MNG_UPDATE) {
 			auto updates = parse_update_block();
 			voice.updates.insert(voice.updates.end(), updates.begin(), updates.end());
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token when parsing voice: " + peek().dump());
 		}
 	}
@@ -283,32 +267,24 @@ MNGAleotoricLayer MNGParserState::parse_aleotoric_layer() {
 		auto type = peektype();
 		if (type == MNG_RCURLY) {
 			break;
-		}
-		else if (type == MNG_EFFECT) {
+		} else if (type == MNG_EFFECT) {
 			aleotoriclayer.effect = parse_ident_holder(MNG_EFFECT);
-		}
-		else if (type == MNG_VARIABLE) {
+		} else if (type == MNG_VARIABLE) {
 			aleotoriclayer.variables.insert(parse_variable_declaration());
-		}
-		else if (type == MNG_VOLUME) {
+		} else if (type == MNG_VOLUME) {
 			aleotoriclayer.volume = parse_constant_holder(MNG_VOLUME);
-		}
-		else if (type == MNG_UPDATE) {
+		} else if (type == MNG_UPDATE) {
 			auto updates = parse_update_block();
 			aleotoriclayer.updates.insert(aleotoriclayer.updates.end(), updates.begin(), updates.end());
-		}
-		else if (type == MNG_INTERVAL) {
+		} else if (type == MNG_INTERVAL) {
 			aleotoriclayer.interval = parse_constant_holder(MNG_INTERVAL);
-		}
-		else if (type == MNG_UPDATERATE) {
+		} else if (type == MNG_UPDATERATE) {
 			aleotoriclayer.updaterate = parse_constant_holder(MNG_UPDATERATE);
 		} else if (type == MNG_BEATSYNCH) {
 			aleotoriclayer.beatsynch = parse_constant_holder(MNG_BEATSYNCH);
-		}
-		else if (type == MNG_VOICE) {
+		} else if (type == MNG_VOICE) {
 			aleotoriclayer.voices.push_back(parse_voice());
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token when parsing aleotoriclayer: " + peek().dump());
 		}
 	}
@@ -327,22 +303,17 @@ MNGLoopLayer MNGParserState::parse_loop_layer() {
 		auto type = peektype();
 		if (type == MNG_RCURLY) {
 			break;
-		}
-		else if (type == MNG_VARIABLE) {
+		} else if (type == MNG_VARIABLE) {
 			looplayer.variables.insert(parse_variable_declaration());
 			// TODO: error if variable defined twice?
-		}
-		else if (type == MNG_UPDATERATE) {
+		} else if (type == MNG_UPDATERATE) {
 			looplayer.updaterate = parse_constant_holder(MNG_UPDATERATE);
-		}
-		else if (type == MNG_WAVE) {
+		} else if (type == MNG_WAVE) {
 			looplayer.wave = parse_ident_holder(MNG_WAVE);
-		}
-		else if (type == MNG_UPDATE) {
+		} else if (type == MNG_UPDATE) {
 			auto updates = parse_update_block();
 			looplayer.updates.insert(looplayer.updates.end(), updates.begin(), updates.end());
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token when parsing looplayer: " + peek().dump());
 		}
 	}
@@ -361,31 +332,25 @@ MNGTrack MNGParserState::parse_track() {
 		auto type = peektype();
 		if (type == MNG_RCURLY) {
 			break;
-		}
-		else if (type == MNG_FADEIN) {
+		} else if (type == MNG_FADEIN) {
 			track.fadein = parse_constant_holder(MNG_FADEIN);
 			// TODO: error if fadein defined twice?
-		}
-		else if (type == MNG_FADEOUT) {
+		} else if (type == MNG_FADEOUT) {
 			track.fadeout = parse_constant_holder(MNG_FADEOUT);
 			// TODO: error if fadeout defined twice?
-		}
-		else if (type == MNG_VOLUME) {
+		} else if (type == MNG_VOLUME) {
 			track.volume = parse_constant_holder(MNG_VOLUME);
 			// TODO: error if volume defined twice?
 		} else if (type == MNG_BEATLENGTH) {
 			track.beatlength = parse_constant_holder(MNG_BEATLENGTH);
 			// TODO: error if beatlength defined twice?
-		}
-		else if (type == MNG_LOOPLAYER) {
+		} else if (type == MNG_LOOPLAYER) {
 			track.layers.push_back(parse_loop_layer());
 			// TODO: error if a layer is defined twice?
-		}
-		else if (type == MNG_ALEOTORICLAYER) {
+		} else if (type == MNG_ALEOTORICLAYER) {
 			track.layers.push_back(parse_aleotoric_layer());
 			// TODO: error if a layer is defined twice?
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token when parsing track: " + peek().dump());
 		}
 	}
@@ -395,14 +360,13 @@ MNGTrack MNGParserState::parse_track() {
 
 MNGScript MNGParserState::parse_script() {
 	MNGScript script;
-	
+
 	// parse variables and effects and tracks
 	while (true) {
 		auto type = peektype();
 		if (type == MNG_EOI) {
 			return script;
-		}
-		else if (type == MNG_VARIABLE) {
+		} else if (type == MNG_VARIABLE) {
 			// TODO: does managerVar actually do anything?
 			consume(MNG_VARIABLE);
 			consume(MNG_LPAREN);
@@ -416,16 +380,13 @@ MNGScript MNGParserState::parse_script() {
 				throw creaturesException("Toplevel variable declaration 'managerVar' not 0.0");
 			}
 			consume(MNG_RPAREN);
-		}
-		else if (type == MNG_EFFECT) {
+		} else if (type == MNG_EFFECT) {
 			script.effects.push_back(parse_effect());
 			// TODO: error if effect defined twice?
-		}
-		else if (type == MNG_TRACK) {
+		} else if (type == MNG_TRACK) {
 			script.tracks.push_back(parse_track());
 			// TODO: error if track defined twice?
-		}
-		else {
+		} else {
 			throw creaturesException("Unexpected token " + peek().dump());
 		}
 	}
@@ -434,7 +395,7 @@ MNGScript MNGParserState::parse_script() {
 MNGScript mngparse(const std::string& script) {
 	return mngparse(script.c_str());
 }
-MNGScript mngparse(const char *script) {
+MNGScript mngparse(const char* script) {
 	return mngparse(mnglex(script));
 }
 MNGScript mngparse(const std::vector<mngtoken>& tokens) {
@@ -446,19 +407,23 @@ std::vector<mngtoken> mnglex(const std::string& script) {
 	return mnglex(script.c_str());
 }
 
-std::vector<mngtoken> mnglex(const char *p) {
+std::vector<mngtoken> mnglex(const char* p) {
 	std::vector<mngtoken> v;
-	const char *basep;
-	const char *YYMARKER = NULL;
+	const char* basep;
+	const char* YYMARKER = NULL;
 	assert(p);
 
 start:
 	basep = p;
 
-#define push_token(type) v.push_back(mngtoken(type)); goto start;
-#define push_value(type) v.push_back(mngtoken(type, std::string(basep, p - basep))); goto start;
+#define push_token(type) \
+	v.push_back(mngtoken(type)); \
+	goto start;
+#define push_value(type) \
+	v.push_back(mngtoken(type, std::string(basep, p - basep))); \
+	goto start;
 
-/*!re2c
+	/*!re2c
 	re2c:define:YYCTYPE = "unsigned char";
 	re2c:define:YYCURSOR = p;
 	re2c:yyfill:enable = 0;
@@ -615,21 +580,21 @@ std::vector<std::string> MNGScript::getWaveNames() const {
 	for (auto t : tracks) {
 		for (auto& l : t.layers) {
 			visit(overload(
-				[&](const MNGAleotoricLayer& al) {
-					for (auto v : al.voices) {
-						if (seen.find(v.wave) == seen.end()) {
-							seen.insert(v.wave);
-							names.push_back(v.wave);
-						}
-					}
-				},
-				[&](const MNGLoopLayer& ll) {
-					if (seen.find(ll.wave) == seen.end()) {
-						seen.insert(ll.wave);
-						names.push_back(ll.wave);
-					}
-				}
-			), l);
+					  [&](const MNGAleotoricLayer& al) {
+						  for (auto v : al.voices) {
+							  if (seen.find(v.wave) == seen.end()) {
+								  seen.insert(v.wave);
+								  names.push_back(v.wave);
+							  }
+						  }
+					  },
+					  [&](const MNGLoopLayer& ll) {
+						  if (seen.find(ll.wave) == seen.end()) {
+							  seen.insert(ll.wave);
+							  names.push_back(ll.wave);
+						  }
+					  }),
+				l);
 		}
 	}
 	return names;

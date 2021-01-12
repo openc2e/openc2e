@@ -20,7 +20,8 @@
 #pragma once
 
 #include "Image.h"
+
 #include <istream>
 #include <string>
 
-MultiImage ReadC16File(std::istream &in);
+MultiImage ReadC16File(std::istream& in);

@@ -18,16 +18,19 @@
  */
 
 #include "CallButton.h"
+
 #include "caosValue.h"
+
 #include <cassert>
 
 // TODO: this code is a first attempt and is probably completely wrong
 
 void CallButton::tick() {
 	SimpleAgent::tick();
-	if (paused) return;
+	if (paused)
+		return;
 
-	Lift *ourlift = dynamic_cast<Lift *>(lift.get());
+	Lift* ourlift = dynamic_cast<Lift*>(lift.get());
 	assert(ourlift);
 
 	if (actv == 1) {
@@ -35,7 +38,7 @@ void CallButton::tick() {
 		if (ourlift->currentbutton == buttonid && ourlift->liftBottom() == ourlift->callbuttony[buttonid]) { // has arrived at us
 			queueScript(0); // deactivate ourselves
 		}
-		
+
 		if (ourlift->liftAvailable()) { // not moving
 			if (ourlift->currentbutton != buttonid) {
 				/*
@@ -54,8 +57,8 @@ void CallButton::tick() {
 	}
 }
 
-bool CallButton::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
-	Lift *ourlift = dynamic_cast<Lift *>(lift.get());
+bool CallButton::fireScript(unsigned short event, Agent* from, caosValue one, caosValue two) {
+	Lift* ourlift = dynamic_cast<Lift*>(lift.get());
 	assert(ourlift);
 
 	switch (event) {

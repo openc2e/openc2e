@@ -21,24 +21,25 @@
 #define _C2E_METAROOM_H
 
 #include "serfwd.h"
+
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 class creaturesImage;
 
 class MetaRoom {
-protected:
+  protected:
 	FRIEND_SERIALIZE(MetaRoom)
 	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
 	std::map<std::string, std::shared_ptr<creaturesImage> > backgrounds;
 	std::shared_ptr<creaturesImage> firstback;
 	bool wraps;
-	
-	MetaRoom() { }
 
-public:
+	MetaRoom() {}
+
+  public:
 	std::vector<std::shared_ptr<class Room> > rooms;
 
 	unsigned int x() { return xloc; }
@@ -64,7 +65,7 @@ public:
 
 	unsigned int id;
 
-	MetaRoom(int _x, int _y, int width, int height, const std::string &back, std::shared_ptr<creaturesImage> = std::shared_ptr<creaturesImage>(), bool wrap = false);
+	MetaRoom(int _x, int _y, int width, int height, const std::string& back, std::shared_ptr<creaturesImage> = std::shared_ptr<creaturesImage>(), bool wrap = false);
 	~MetaRoom();
 };
 

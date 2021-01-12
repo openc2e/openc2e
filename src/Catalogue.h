@@ -20,48 +20,50 @@
 #ifndef _CATALOGUE_H
 #define _CATALOGUE_H
 
+#include "creaturesException.h"
+
+#include <ghc/filesystem.hpp>
 #include <iostream>
+#include <istream>
+#include <list>
 #include <map>
 #include <string>
 #include <vector>
-#include <istream>
-#include <ghc/filesystem.hpp>
-#include <list>
-#include "creaturesException.h"
 
 class catalogueException : public creaturesException {
-	public:
-		catalogueException(const char *s) throw()
-			: creaturesException(s) {}
-		catalogueException(const std::string &s) throw()
-			: creaturesException(s) {}
-};	
+  public:
+	catalogueException(const char* s) throw()
+		: creaturesException(s) {}
+	catalogueException(const std::string& s) throw()
+		: creaturesException(s) {}
+};
 
 class Catalogue {
-protected:
+  protected:
 	static int yylineno;
-	static const char *catalogue_parse_p;
-	static void yyinit(const char *buf);
+	static const char* catalogue_parse_p;
+	static void yyinit(const char* buf);
 	static int catalex();
 	friend int cataparse();
-	friend void cataerror(const char *);
-	static void catalogueParseError(const char *err);
-public:
+	friend void cataerror(const char*);
+	static void catalogueParseError(const char* err);
+
+  public:
 	std::map<std::string, std::vector<std::string> > data;
 
-public:
-	friend std::istream &operator >> (std::istream &, Catalogue &);
+  public:
+	friend std::istream& operator>>(std::istream&, Catalogue&);
 
-	const std::vector<std::string> &getTag(std::string t) const { return (*data.find(t)).second; }
+	const std::vector<std::string>& getTag(std::string t) const { return (*data.find(t)).second; }
 	bool hasTag(std::string t) const { return (data.find(t) != data.end()); }
 	const std::string getAgentName(unsigned char family, unsigned char genus, unsigned short species) const;
 	std::string calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const;
-  
+
 	void reset();
 	void addFile(ghc::filesystem::path path);
 	void initFrom(ghc::filesystem::path path, std::string language);
 
-	void addVals(std::string &title, bool override, const std::list<std::string> &vals);
+	void addVals(std::string& title, bool override, const std::list<std::string>& vals);
 };
 
 extern Catalogue catalogue;

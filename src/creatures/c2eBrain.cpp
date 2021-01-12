@@ -18,13 +18,15 @@
  */
 
 #include "c2eBrain.h"
+
 #include "c2eCreature.h"
+
 #include <algorithm>
 #include <cassert>
-#include <math.h>
 #include <fmt/core.h>
+#include <math.h>
 
-float dummyValues[8] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+float dummyValues[8] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 /*
  * c2ebraincomponentorder::operator()
@@ -32,7 +34,7 @@ float dummyValues[8] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
  * A functor to sort brain components by their update time.
  *
  */
-bool c2ebraincomponentorder::operator()(const class c2eBrainComponent *b1, const class c2eBrainComponent *b2) const {
+bool c2ebraincomponentorder::operator()(const class c2eBrainComponent* b1, const class c2eBrainComponent* b2) const {
 	return b1->updatetime < b2->updatetime;
 }
 
@@ -42,7 +44,8 @@ bool c2ebraincomponentorder::operator()(const class c2eBrainComponent *b1, const
  * Constructor for a c2eTract. Pass it the relevant gene.
  *
  */
-c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) : c2eBrainComponent(b) {
+c2eTract::c2eTract(c2eBrain* b, c2eBrainTractGene* g)
+	: c2eBrainComponent(b) {
 	assert(g);
 	ourGene = g;
 	updatetime = g->updatetime;
@@ -59,26 +62,28 @@ c2eTract::c2eTract(c2eBrain *b, c2eBrainTractGene *g) : c2eBrainComponent(b) {
  *
  */
 void c2eTract::setupTract() {
-	c2eBrainTractGene *g = ourGene;
-	c2eBrain *b = parent;
+	c2eBrainTractGene* g = ourGene;
+	c2eBrain* b = parent;
 
-	std::string srclobename = std::string((char *)g->srclobe, 4);
-	std::string destlobename = std::string((char *)g->destlobe, 4);
+	std::string srclobename = std::string((char*)g->srclobe, 4);
+	std::string destlobename = std::string((char*)g->destlobe, 4);
 
 	if (b->lobes.find(srclobename) == b->lobes.end() || b->lobes.find(destlobename) == b->lobes.end()) {
 		fmt::print("brain debug: failed to create dendrites for {} (missing lobe)\n", dump());
 		return;
 	}
-	c2eLobe *srclobe = b->lobes[srclobename];
-	c2eLobe *destlobe = b->lobes[destlobename];
+	c2eLobe* srclobe = b->lobes[srclobename];
+	c2eLobe* destlobe = b->lobes[destlobename];
 
 	for (unsigned int i = g->srclobe_lowerbound; i <= g->srclobe_upperbound; i++) {
-		if (i >= srclobe->getNoNeurons()) break;
+		if (i >= srclobe->getNoNeurons())
+			break;
 		src_neurons.push_back(srclobe->getNeuron(i));
 	}
 
 	for (unsigned int i = g->destlobe_lowerbound; i <= g->destlobe_upperbound; i++) {
-		if (i >= destlobe->getNoNeurons()) break;
+		if (i >= destlobe->getNoNeurons())
+			break;
 		dest_neurons.push_back(destlobe->getNeuron(i));
 	}
 
@@ -86,7 +91,7 @@ void c2eTract::setupTract() {
 		fmt::print("brain debug: failed to create dendrites for {} (no neurons)\n", dump());
 		return;
 	}
-	
+
 	// create/distribute dendrites as needed
 	if (g->migrates) {
 		// You can't have *both* sides of the tract unconstrained, we'd have no idea how many dendrites to make!
@@ -134,7 +139,7 @@ void c2eTract::setupTract() {
 			fmt::print("brain debug: failed to create dendrites for {} (no connections)\n", dump());
 			return;
 		}
-	
+
 		// distribute neurons
 		// this seems identical to CL's brain-in-a-vat for the default brain and for some test cases fuzzie made up
 		// TODO: test the algorithm a bit more
@@ -142,12 +147,13 @@ void c2eTract::setupTract() {
 		unsigned int srcneuron = 0, srcconns = 0;
 		unsigned int destneuron = 0, destconns = 0;
 		while (true) {
-			c2eNeuron *src = src_neurons[srcneuron];
-			c2eNeuron *dest = dest_neurons[destneuron];
+			c2eNeuron* src = src_neurons[srcneuron];
+			c2eNeuron* dest = dest_neurons[destneuron];
 
 			// if there's already a dendrite like the one we're about to create, we're done
-			if (getDendriteFromTo(src, dest)) return;
-			
+			if (getDendriteFromTo(src, dest))
+				return;
+
 			c2eDendrite d;
 			d.source = src;
 			d.dest = dest;
@@ -178,20 +184,20 @@ void c2eTract::setupTract() {
  *
  */
 std::string c2eTract::dump() {
-	c2eBrainTractGene *g = ourGene;
+	c2eBrainTractGene* g = ourGene;
 
-	std::string srclobename = std::string((char *)g->srclobe, 4);
-	std::string destlobename = std::string((char *)g->destlobe, 4);
+	std::string srclobename = std::string((char*)g->srclobe, 4);
+	std::string destlobename = std::string((char*)g->destlobe, 4);
 
 	std::string data = fmt::format(
 		"tract {}->{}, src neurons {}-{} #cons {}, dest neurons {}-{} #cons {}",
 		srclobename, destlobename, (int)g->srclobe_lowerbound,
 		(int)g->srclobe_upperbound, (int)g->src_noconnections,
 		(int)g->destlobe_lowerbound, (int)g->destlobe_upperbound,
-		(int)g->dest_noconnections
-		);
+		(int)g->dest_noconnections);
 
-	if (g->migrates) data += ", migratory";
+	if (g->migrates)
+		data += ", migratory";
 
 	return data;
 }
@@ -202,11 +208,12 @@ std::string c2eTract::dump() {
  * Returns the dendrite from this tract between the two neurons, or null if there isn't one.
  *
  */
-c2eDendrite *c2eTract::getDendriteFromTo(c2eNeuron *from, c2eNeuron *to) {
-	for (auto & dendrite : dendrites) {
-		if (dendrite.source == from && dendrite.dest == to) return &dendrite;
+c2eDendrite* c2eTract::getDendriteFromTo(c2eNeuron* from, c2eNeuron* to) {
+	for (auto& dendrite : dendrites) {
+		if (dendrite.source == from && dendrite.dest == to)
+			return &dendrite;
 	}
-	
+
 	return 0;
 }
 
@@ -222,8 +229,9 @@ void c2eTract::tick() {
 		doMigration();
 
 	// run the svrule(s) against every neuron
-	for (auto & dendrite : dendrites) {
-		if (ourGene->initrulealways) initrule.runRule(dendrite.source->variables[0], dendrite.source->variables, dendrite.dest->variables, dummyValues, dendrite.variables, parent->getParent());
+	for (auto& dendrite : dendrites) {
+		if (ourGene->initrulealways)
+			initrule.runRule(dendrite.source->variables[0], dendrite.source->variables, dendrite.dest->variables, dummyValues, dendrite.variables, parent->getParent());
 		updaterule.runRule(dendrite.source->variables[0], dendrite.source->variables, dendrite.dest->variables, dummyValues, dendrite.variables, parent->getParent());
 	}
 
@@ -231,7 +239,7 @@ void c2eTract::tick() {
 }
 
 void c2eTract::wipe() {
-	for (auto & dendrite : dendrites) {
+	for (auto& dendrite : dendrites) {
 		for (unsigned int j = 0; j < 8; j++)
 			dendrite.variables[j] = 0.0f;
 	}
@@ -243,7 +251,7 @@ void c2eTract::init() {
 	setupTract();
 	wipe();
 
-	for (auto & dendrite : dendrites) {
+	for (auto& dendrite : dendrites) {
 		// TODO: good way to run rule?
 		if (!ourGene->initrulealways)
 			initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, dendrite.variables, parent->getParent());
@@ -254,34 +262,36 @@ void c2eTract::doMigration() {
 	/*
 	 * TODO: this is utter guesswork(tm)
 	 */
-	for (auto & d : dendrites) {
-			// 7 = strength
+	for (auto& d : dendrites) {
+		// 7 = strength
 		// TODO: prbly "Migration Parameters" catalogue tag thing
 		if (d.variables[7] == 0.0f) {
 			// this one is loose!
-		
+
 			// if we migrate to make limited connections to the *src*
 			if (ourGene->src_noconnections != 0) {
 				// srcvar, destvar
-				
+
 				// search for the highest NGF in d->source
-				c2eNeuron *highestsrc = 0;
+				c2eNeuron* highestsrc = 0;
 				for (auto n : src_neurons) {
-						if ((highestsrc && n->variables[ourGene->srcvar] > highestsrc->variables[ourGene->srcvar]) || n->variables[ourGene->srcvar] > 0.0f) {
+					if ((highestsrc && n->variables[ourGene->srcvar] > highestsrc->variables[ourGene->srcvar]) || n->variables[ourGene->srcvar] > 0.0f) {
 						highestsrc = n;
 					}
 				}
-				if (!highestsrc) continue;
+				if (!highestsrc)
+					continue;
 
 				// search for the highest NGF in d->dest which isn't already linked
-				c2eNeuron *highestdest = 0;
+				c2eNeuron* highestdest = 0;
 				for (auto n : dest_neurons) {
-						if ((highestdest && n->variables[ourGene->destvar] > highestdest->variables[ourGene->destvar]) || n->variables[ourGene->destvar] > 0.0f) {
+					if ((highestdest && n->variables[ourGene->destvar] > highestdest->variables[ourGene->destvar]) || n->variables[ourGene->destvar] > 0.0f) {
 						if (!getDendriteFromTo(highestsrc, n))
 							highestdest = n;
 					}
 				}
-				if (!highestdest) continue;
+				if (!highestdest)
+					continue;
 
 				// connect them!
 				d.source = highestsrc;
@@ -289,13 +299,13 @@ void c2eTract::doMigration() {
 
 				if (ourGene->initrulealways) {
 					// wipe
-					for (float & variable : d.variables)
+					for (float& variable : d.variables)
 						variable = 0.0f;
 				} else {
 					// re-run init rule
 					initrule.runRule(0.0f, dummyValues, dummyValues, dummyValues, d.variables, parent->getParent());
 				}
-			// else if we migrate to make limited connections to the *dest*
+				// else if we migrate to make limited connections to the *dest*
 			} else {
 				fmt::print("wah, you used something which isn't in the standard brain model, meanie\n"); // TODO
 			}
@@ -309,7 +319,8 @@ void c2eTract::doMigration() {
  * Constructor for a c2eLobe. Pass it the relevant gene.
  *
  */
-c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
+c2eLobe::c2eLobe(c2eBrain* b, c2eBrainLobeGene* g)
+	: c2eBrainComponent(b) {
 	assert(g);
 	ourGene = g;
 	updatetime = g->updatetime;
@@ -317,8 +328,10 @@ c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
 	spare = 0;
 
 	unsigned int width = g->width, height = g->height;
-	if (width < 1) width = 1;
-	if (height < 1) height = 1;
+	if (width < 1)
+		width = 1;
+	if (height < 1)
+		height = 1;
 
 	neurons.reserve(width * height);
 
@@ -338,7 +351,7 @@ c2eLobe::c2eLobe(c2eBrain *b, c2eBrainLobeGene *g) : c2eBrainComponent(b) {
  *
  */
 void c2eLobe::wipe() {
-	for (auto & neuron : neurons) {
+	for (auto& neuron : neurons) {
 		for (unsigned int j = 0; j < 8; j++)
 			neuron.variables[j] = 0.0f;
 	}
@@ -372,7 +385,7 @@ void c2eLobe::init() {
 
 	wipe();
 
-	for (auto & neuron : neurons) {
+	for (auto& neuron : neurons) {
 		// TODO: good way to run rule?
 		if (!ourGene->initrulealways)
 			initrule.runRule(0.0f, dummyValues, neuron.variables, dummyValues, dummyValues, parent->getParent());
@@ -397,7 +410,7 @@ void c2eLobe::setNeuronInput(unsigned int i, float input) {
  *
  */
 std::string c2eLobe::getId() {
-	return std::string((char *)ourGene->id, 4);
+	return std::string((char*)ourGene->id, 4);
 }
 
 /*
@@ -417,7 +430,7 @@ void c2eSVRule::init(uint8_t ruledata[48]) {
 		rule.operanddata = ruledata[(i * 3) + 2];
 
 		switch (rule.operandtype) {
-			// for neuron/dendrite values, sanitise value (there are only 8 options)
+				// for neuron/dendrite values, sanitise value (there are only 8 options)
 
 			case 1: // input neuron
 			case 2: // dendrite
@@ -430,8 +443,8 @@ void c2eSVRule::init(uint8_t ruledata[48]) {
 				}
 				break;
 
-			// for constant values, precalculate data
-			
+				// for constant values, precalculate data
+
 			case 9: // zero
 				rule.operandvalue = 0.0f;
 				break;
@@ -467,27 +480,32 @@ void c2eSVRule::init(uint8_t ruledata[48]) {
 
 // convenience function for c2eSVRule::runRule
 inline float bindFloatValue(float val, float min = -1.0f, float max = 1.0f) {
-	if (val > max) return max;
-	else if (val < min) return min;
-	else return val;
+	if (val > max)
+		return max;
+	else if (val < min)
+		return min;
+	else
+		return val;
 }
 
 // warn-once function for unimplemented svrule opcodes/operand types in c2eSVRule::runRule
 inline void warnUnimplementedSVRule(unsigned char data, bool opcode = true) {
 	static bool warnedalready = false;
-	if (warnedalready) return;
+	if (warnedalready)
+		return;
 	warnedalready = true;
 
 	fmt::print(
 		"brain debug: something tried using unimplemented {} {}, will not warn "
 		"about unimplemented svrule bits again.\n",
-		opcode ? "opcode" : "operand type", (unsigned int)data
-	);
+		opcode ? "opcode" : "operand type", (unsigned int)data);
 }
 
 // goto locations are one-based
 // we must never jump backwards, only forwards
-#define HANDLE_GOTO if ((unsigned int)operandvalue - 2 > i) i = (unsigned int)operandvalue - 2;
+#define HANDLE_GOTO \
+	if ((unsigned int)operandvalue - 2 > i) \
+		i = (unsigned int)operandvalue - 2;
 
 /*
  * c2eSVRule::runRule
@@ -497,18 +515,18 @@ inline void warnUnimplementedSVRule(unsigned char data, bool opcode = true) {
  * Returns whether the 'register as spare' opcode was executed or not.
  *
  */
-bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], c2eCreature *creature) {
+bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float spareneuron[8], float dendrite[8], c2eCreature* creature) {
 	float accumulator = acc;
 	float operandvalue = 0.0f; // valid rules should never use this
 	float tendrate = 0.0f;
-	float *operandpointer;
+	float* operandpointer;
 	float dummy;
 	static float stw = 0.0f; // TODO: good default?
 	bool is_spare = false;
 	bool skip_next = false;
 
 	for (unsigned int i = 0; i < rules.size(); i++) {
-		c2erule &rule = rules[i];
+		c2erule& rule = rules[i];
 
 		if (skip_next) { // if the last if opcode was *false*..
 			// .. then don't execute the next line
@@ -706,7 +724,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 			case 26: // load negation of
 				accumulator = -operandvalue;
 				break;
-			
+
 			case 27: // load abs of
 				accumulator = fabsf(operandvalue);
 				break;
@@ -757,7 +775,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				// TODO
 				warnUnimplementedSVRule(rule.opcode);
 				break;
-			
+
 			case 38: // rest state
 				// TODO
 				warnUnimplementedSVRule(rule.opcode);
@@ -807,19 +825,23 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 46: // stop if zero
-				if (operandvalue == 0.0f) goto done;
+				if (operandvalue == 0.0f)
+					goto done;
 				break;
 
 			case 47: // stop if non-zero
-				if (operandvalue != 0.0f) goto done;
+				if (operandvalue != 0.0f)
+					goto done;
 				break;
 
 			case 48: // if zero goto
-				if (accumulator == 0.0f) HANDLE_GOTO
+				if (accumulator == 0.0f)
+					HANDLE_GOTO
 				break;
 
 			case 49: // if non-zero goto
-				if (accumulator != 0.0f) HANDLE_GOTO
+				if (accumulator != 0.0f)
+					HANDLE_GOTO
 				break;
 
 			case 50: // divide by, add to neuron input
@@ -836,19 +858,23 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 				break;
 
 			case 53: // stop if <
-				if (accumulator < operandvalue) goto done;
+				if (accumulator < operandvalue)
+					goto done;
 				break;
 
 			case 54: // stop if >
-				if (accumulator > operandvalue) goto done;
+				if (accumulator > operandvalue)
+					goto done;
 				break;
 
 			case 55: // stop if <=
-				if (accumulator <= operandvalue) goto done;
+				if (accumulator <= operandvalue)
+					goto done;
 				break;
 
 			case 56: // stop if >=
-				if (accumulator >= operandvalue) goto done;
+				if (accumulator >= operandvalue)
+					goto done;
 				break;
 
 			case 57: // reward threshold
@@ -883,40 +909,54 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 
 			case 63: // preserve neuron SV
 				// TODO: this seems too crazy to be true :)
-				{ unsigned int index = (unsigned int)operandvalue;
-				if (index > 7) index = 7; // TODO: binding okay?
-				neuron[4] = neuron[index]; }
+				{
+					unsigned int index = (unsigned int)operandvalue;
+					if (index > 7)
+						index = 7; // TODO: binding okay?
+					neuron[4] = neuron[index];
+				}
 				break;
 
 			case 64: // restore neuron SV
 				// TODO: this seems too crazy to be true :)
-				{ unsigned int index = (unsigned int)operandvalue;
-				if (index > 7) index = 7; // TODO: binding okay?
-				neuron[index] = neuron[4]; }
+				{
+					unsigned int index = (unsigned int)operandvalue;
+					if (index > 7)
+						index = 7; // TODO: binding okay?
+					neuron[index] = neuron[4];
+				}
 				break;
 
 			case 65: // preserve spare neuron
 				// TODO: this seems too crazy to be true :)
-				{ unsigned int index = (unsigned int)operandvalue;
-				if (index > 7) index = 7; // TODO: binding okay?
-				spareneuron[4] = spareneuron[index]; }
+				{
+					unsigned int index = (unsigned int)operandvalue;
+					if (index > 7)
+						index = 7; // TODO: binding okay?
+					spareneuron[4] = spareneuron[index];
+				}
 				break;
 
 			case 66: // restore spare neuron
 				// TODO: this seems too crazy to be true :)
-				{ unsigned int index = (unsigned int)operandvalue;
-				if (index > 7) index = 7; // TODO: binding okay?
-				spareneuron[index] = spareneuron[4]; }
+				{
+					unsigned int index = (unsigned int)operandvalue;
+					if (index > 7)
+						index = 7; // TODO: binding okay?
+					spareneuron[index] = spareneuron[4];
+				}
 				break;
 
 			case 67: // if negative goto
 				// TODO: make sure this is correct
-				if (accumulator < 0.0f) HANDLE_GOTO
+				if (accumulator < 0.0f)
+					HANDLE_GOTO
 				break;
 
 			case 68: // if positive goto
 				// TODO: make sure this is correct
-				if (accumulator > 0.0f) HANDLE_GOTO
+				if (accumulator > 0.0f)
+					HANDLE_GOTO
 				break;
 
 			default:
@@ -936,9 +976,9 @@ done:
  * Constructor for a c2eBrain. Pass it the creature it belongs to, and it will construct itself.
  *
  */
-c2eBrain::c2eBrain(c2eCreature *p) {
+c2eBrain::c2eBrain(c2eCreature* p) {
 	assert(p);
-	parent = p;		
+	parent = p;
 }
 
 /*
@@ -948,17 +988,18 @@ c2eBrain::c2eBrain(c2eCreature *p) {
  *
  */
 void c2eBrain::processGenes() {
-	for (auto & i : parent->getGenome()->genes) {
-		gene *g = i.get();
+	for (auto& i : parent->getGenome()->genes) {
+		gene* g = i.get();
 
-		if (!parent->shouldProcessGene(g)) continue;
-	
+		if (!parent->shouldProcessGene(g))
+			continue;
+
 		if (typeid(*g) == typeid(c2eBrainLobeGene)) {
-			c2eLobe *l = new c2eLobe(this, (c2eBrainLobeGene *)g);
+			c2eLobe* l = new c2eLobe(this, (c2eBrainLobeGene*)g);
 			components.insert(l);
 			lobes[l->getId()] = l;
 		} else if (typeid(*g) == typeid(c2eBrainTractGene)) {
-			c2eTract *t = new c2eTract(this, (c2eBrainTractGene *)g);
+			c2eTract* t = new c2eTract(this, (c2eBrainTractGene*)g);
 			components.insert(t);
 			tracts.push_back(t);
 		}
@@ -998,8 +1039,8 @@ void c2eBrain::tick() {
  * Given a tissue ID as used internally in the genome, return the relevant c2eLobe object, if any, or null otherwise.
  *
  */
-c2eLobe *c2eBrain::getLobeByTissue(unsigned int id) {
-	for (auto & lobe : lobes) {
+c2eLobe* c2eBrain::getLobeByTissue(unsigned int id) {
+	for (auto& lobe : lobes) {
 		if (lobe.second->getGene()->tissue == id)
 			return lobe.second;
 	}
@@ -1013,8 +1054,8 @@ c2eLobe *c2eBrain::getLobeByTissue(unsigned int id) {
  * Given a lobe ID, return the relevant c2eLobe object, if any, or null otherwise.
  *
  */
-c2eLobe *c2eBrain::getLobeById(std::string id) {
-	std::map<std::string, c2eLobe *>::iterator i = lobes.find(id);
+c2eLobe* c2eBrain::getLobeById(std::string id) {
+	std::map<std::string, c2eLobe*>::iterator i = lobes.find(id);
 
 	if (i != lobes.end())
 		return i->second;

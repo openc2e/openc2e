@@ -2,8 +2,8 @@
 
 template <typename T>
 class heap_value {
-public:
-	template <typename ...Args>
+  public:
+	template <typename... Args>
 	explicit heap_value(Args&&... args) {
 		ptr = new T(std::forward<Args>(args)...);
 	}
@@ -53,6 +53,7 @@ public:
 	const T* operator->() const {
 		return ptr;
 	}
-private:
+
+  private:
 	T* ptr = nullptr;
 };

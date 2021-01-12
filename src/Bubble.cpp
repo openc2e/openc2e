@@ -17,23 +17,24 @@
  *
  */
 
-#include <cassert>
+#include "Bubble.h"
 
 #include "Backend.h"
-#include "Bubble.h"
 #include "Camera.h"
-#include "creaturesImage.h"
 #include "Engine.h"
-#include "imageManager.h"
-#include "keycodes.h"
 #include "SpritePart.h"
 #include "World.h"
+#include "creaturesImage.h"
+#include "imageManager.h"
+#include "keycodes.h"
+
+#include <cassert>
 
 Bubble::Bubble(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-		std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
-		unsigned int tx, unsigned int ty, unsigned int twidth, unsigned int theight,
-		unsigned int tcolour, unsigned int bgcolour)
-		: CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
+	std::string spritefile, unsigned int firstimage, unsigned int imagecount,
+	unsigned int tx, unsigned int ty, unsigned int twidth, unsigned int theight,
+	unsigned int tcolour, unsigned int bgcolour)
+	: CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
 	ourPart = new BubblePart(this, 1, tx, ty, tcolour, bgcolour);
 	addPart(ourPart);
 	ourPart->textwidth = twidth;
@@ -67,12 +68,13 @@ void Bubble::tick() {
 
 	if (!paused && timeout) {
 		timeout--;
-		if (timeout == 0) kill();
+		if (timeout == 0)
+			kill();
 	}
 }
 
 void Bubble::turnIntoSpeech() {
-	newBubble((Agent *)world.hand(), true, getText());
+	newBubble((Agent*)world.hand(), true, getText());
 
 	// TODO: announce via shou
 	// TODO: add to speech history
@@ -80,14 +82,15 @@ void Bubble::turnIntoSpeech() {
 	kill();
 }
 
-Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
+Bubble* Bubble::newBubble(Agent* parent, bool speech, std::string text) {
 	assert(engine.version < 3);
 
 	assert(parent);
 
 	bool leftside = false;
 	// TODO: cope with wrap
-	if (parent->x - engine.camera->getX() < engine.camera->getWidth() / 2) leftside = true;
+	if (parent->x - engine.camera->getX() < engine.camera->getWidth() / 2)
+		leftside = true;
 
 	int pose;
 	if (engine.version == 1) {
@@ -110,7 +113,7 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 		plane = 9000;
 	} else {
 		// C2
-		if (parent == (Agent *)world.hand()) {
+		if (parent == (Agent*)world.hand()) {
 			if (speech)
 				plane = 9996;
 			else
@@ -126,7 +129,7 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	unsigned int textcolor = (engine.version == 1) ? 0xb : 0x080808; // TODO
 	unsigned int bgcolor = (engine.version == 1) ? 0x1 : 0xFFFFFF; // TODO
 
-	Bubble *ourBubble = new Bubble(2, 1, 2, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, textcolor, bgcolor);
+	Bubble* ourBubble = new Bubble(2, 1, 2, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, textcolor, bgcolor);
 	ourBubble->finishInit();
 	ourBubble->leftside = leftside;
 
@@ -149,9 +152,8 @@ Bubble *Bubble::newBubble(Agent *parent, bool speech, std::string text) {
 	return ourBubble;
 }
 
-BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int tcolour, unsigned int bgcolour)
-	: CompoundPart(p, _id, x, y, 0)
-{
+BubblePart::BubblePart(Bubble* p, unsigned int _id, int x, int y, unsigned int tcolour, unsigned int bgcolour)
+	: CompoundPart(p, _id, x, y, 0) {
 	editable = false;
 	textwidth = 0;
 	textheight = 0;
@@ -166,7 +168,7 @@ BubblePart::BubblePart(Bubble *p, unsigned int _id, int x, int y, unsigned int t
 	}
 }
 
-void BubblePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
+void BubblePart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 	unsigned int charpos = 0;
 	for (unsigned char c : text) {
 		assert(c < charsetsprite->numframes()); // handled in setText
@@ -190,27 +192,35 @@ void BubblePart::handleTranslatedChar(unsigned char c) {
 void BubblePart::handleRawKey(uint8_t key) {
 	switch (key) {
 		case OPENC2E_KEY_BACKSPACE:
-			if (text.size() == 0) { loseFocus(); return; }
+			if (text.size() == 0) {
+				loseFocus();
+				return;
+			}
 			{
 				std::string s = text;
 				s.erase(s.begin() + (s.size() - 1));
 				setText(s);
 			}
-			if (text.size() == 0) { loseFocus(); return; }
+			if (text.size() == 0) {
+				loseFocus();
+				return;
+			}
 			break;
 
 		case OPENC2E_KEY_RETURN:
-			((Bubble *)parent)->turnIntoSpeech(); // TODO: omg hax
+			((Bubble*)parent)->turnIntoSpeech(); // TODO: omg hax
 			break;
 	}
 }
 
 unsigned int BubblePart::poseForWidth(unsigned int width) {
-	if (engine.version == 1) return 0;
-	SpritePart *s;
-	if (!(s = dynamic_cast<SpritePart *>(parent->part(0)))) return 0;
+	if (engine.version == 1)
+		return 0;
+	SpritePart* s;
+	if (!(s = dynamic_cast<SpritePart*>(parent->part(0))))
+		return 0;
 	unsigned int sprite = s->getFirstImg();
-	while (sprite < s->getFirstImg()+2 && width > s->getSprite()->width(sprite) - 17)
+	while (sprite < s->getFirstImg() + 2 && width > s->getSprite()->width(sprite) - 17)
 		sprite++;
 	return sprite - s->getFirstImg();
 }
@@ -233,8 +243,8 @@ void BubblePart::setText(std::string str) {
 
 	if (engine.version == 2) {
 		unsigned int pose = poseForWidth(twidth);
-		SpritePart *s;
-		if ((s = dynamic_cast<SpritePart *>(parent->part(0)))) {
+		SpritePart* s;
+		if ((s = dynamic_cast<SpritePart*>(parent->part(0)))) {
 			if (pose != s->getPose()) {
 				s->setPose(pose);
 				textwidth = s->getWidth() - 17;
@@ -244,7 +254,8 @@ void BubblePart::setText(std::string str) {
 			}
 		}
 	}
-	if (twidth > textwidth) return;
+	if (twidth > textwidth)
+		return;
 
 	text = newtext;
 	textoffset = (textwidth - twidth) / 2;

@@ -22,14 +22,13 @@
 
 #include <cassert>
 #include <ghc/filesystem.hpp>
-
 #include <map>
 #include <string>
 
 namespace fs = ghc::filesystem;
 
 class PrayBlock {
-protected:
+  protected:
 	bool loaded;
 	bool tagsloaded;
 	std::vector<unsigned char> buffer;
@@ -40,7 +39,7 @@ protected:
 
 	std::string filename;
 
-public:
+  public:
 	PrayBlock();
 	PrayBlock(const std::string& filename, const std::string& type, const std::string& name, bool is_compressed);
 	~PrayBlock();
@@ -54,15 +53,21 @@ public:
 
 	bool isCompressed() { return compressed; }
 	bool isLoaded() { return loaded; }
-	unsigned char *getBuffer() { assert(loaded); return buffer.data(); }
-	unsigned int getSize() { assert(loaded); return size; }
+	unsigned char* getBuffer() {
+		assert(loaded);
+		return buffer.data();
+	}
+	unsigned int getSize() {
+		assert(loaded);
+		return size;
+	}
 };
 
 class prayManager {
-protected:
+  protected:
 	void addFile(const fs::path&);
 
-public:
+  public:
 	std::map<std::string, std::unique_ptr<PrayBlock> > blocks;
 
 	~prayManager();

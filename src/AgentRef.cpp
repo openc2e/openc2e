@@ -18,7 +18,9 @@
  */
 
 #include "AgentRef.h"
+
 #include "Agent.h"
+
 #include <cassert>
 #include <iostream>
 #include <memory>
@@ -27,7 +29,7 @@ void AgentRef::checkLife() const {
 	assert(ref.expired() || !(ref.lock()->isDying()));
 }
 
-void AgentRef::set(Agent *a) {
+void AgentRef::set(Agent* a) {
 	if (a && !a->isDying())
 		set(a->shared_from_this());
 	else
@@ -35,7 +37,7 @@ void AgentRef::set(Agent *a) {
 }
 
 void AgentRef::dump() const {
-	std::cerr << "AgentRef " << (void *)this << " pointing to " << (void *)ref.lock().get() << std::endl;
+	std::cerr << "AgentRef " << (void*)this << " pointing to " << (void*)ref.lock().get() << std::endl;
 }
 
 std::shared_ptr<Agent> AgentRef::lock() const {

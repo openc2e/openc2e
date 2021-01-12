@@ -2,6 +2,8 @@
 
 #include "Image.h"
 
+#include <string>
+
 namespace ImageUtils {
 
 MultiImage ReadImage(std::string path);

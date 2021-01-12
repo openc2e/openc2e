@@ -17,28 +17,30 @@
  *
  */
 #include "fileformats/attFile.h"
+
 #include <cassert>
 #include <regex>
 
-std::istream &operator >> (std::istream &i, attFile &f) {
+std::istream& operator>>(std::istream& i, attFile& f) {
 	f.nolines = 0;
 
 	std::string s;
 	while (std::getline(i, s)) {
-		if (s.size() == 0) return i;
-		if (f.nolines >= 16) return i; // TODO: what the heck? wah
+		if (s.size() == 0)
+			return i;
+		if (f.nolines >= 16)
+			return i; // TODO: what the heck? wah
 		assert(f.nolines < 16);
 
 		f.noattachments[f.nolines] = 0;
-		
+
 		bool havefirst = false;
 		unsigned int x = 0;
 		const std::regex ws_re("\\s+");
 		for (
 			auto beg = std::sregex_token_iterator(s.begin(), s.end(), ws_re, -1);
 			beg != std::sregex_token_iterator();
-			beg++
-		) {
+			beg++) {
 			unsigned int val = atoi(beg->str().c_str());
 			if (havefirst) {
 				f.attachments[f.nolines][f.noattachments[f.nolines] * 2] = x;
@@ -47,7 +49,7 @@ std::istream &operator >> (std::istream &i, attFile &f) {
 				f.noattachments[f.nolines]++;
 			} else {
 				havefirst = true;
-				x = val; 
+				x = val;
 			}
 		}
 

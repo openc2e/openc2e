@@ -19,40 +19,43 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
-#include <istream>
-#include <cmath>
-#include <fmt/core.h>
-
 #include "creaturesException.h"
 #include "shared_array.h"
 
+#include <cmath>
+#include <fmt/core.h>
+#include <istream>
+#include <list>
+#include <map>
+#include <string>
+#include <vector>
+
 class MNGFileException : public creaturesException {
-	public:
-		int lineno;
-		MNGFileException(const char * m) throw() : creaturesException(m) { lineno = 0; }
-		MNGFileException(const std::string &m) throw() : creaturesException(m) { lineno = 0; }
-		MNGFileException(const char * m, int l) throw() : creaturesException(m) { lineno = l; }
-		MNGFileException(const std::string &m, int l) throw() : creaturesException(m) { lineno = l; }
+  public:
+	int lineno;
+	MNGFileException(const char* m) throw()
+		: creaturesException(m) { lineno = 0; }
+	MNGFileException(const std::string& m) throw()
+		: creaturesException(m) { lineno = 0; }
+	MNGFileException(const char* m, int l) throw()
+		: creaturesException(m) { lineno = l; }
+	MNGFileException(const std::string& m, int l) throw()
+		: creaturesException(m) { lineno = l; }
 };
 
 class MNGFile {
-	private:
-		class mmapifstream *stream;
+  private:
+	class mmapifstream* stream;
 
-	public:
-		MNGFile(std::string);
-		~MNGFile();
-		std::vector<std::string> getSampleNames() const;
-		unsigned int getSampleForName(std::string name);
-		std::string name;
-		std::string script;
-		std::map<std::string, unsigned int> samplemappings;
-		std::vector<shared_array<uint8_t>> samples;
+  public:
+	MNGFile(std::string);
+	~MNGFile();
+	std::vector<std::string> getSampleNames() const;
+	unsigned int getSampleForName(std::string name);
+	std::string name;
+	std::string script;
+	std::map<std::string, unsigned int> samplemappings;
+	std::vector<shared_array<uint8_t>> samples;
 
-		std::string dump();
+	std::string dump();
 };
-

@@ -19,9 +19,10 @@
  */
 #pragma once
 
-#include <cassert>
-#include <cmath>   // sqrt
 #include "serfwd.h"
+
+#include <cassert>
+#include <cmath> // sqrt
 
 // OS X header files use Point and Line, so..
 #define Point MyPoint
@@ -30,193 +31,194 @@
 struct Point {
 	float x, y;
 	Point() { x = y = 0; }
-	Point(float _x, float _y) : x(_x), y(_y) {}
-	Point(const Point &p) : x(p.x), y(p.y) { }
+	Point(float _x, float _y)
+		: x(_x), y(_y) {}
+	Point(const Point& p)
+		: x(p.x), y(p.y) {}
 
-	bool operator==(const Point &p) { return x == p.x && y == p.y; }
-	bool operator!=(const Point &p) { return !(*this == p); }
-	Point &operator=(const Point &r) {
+	bool operator==(const Point& p) { return x == p.x && y == p.y; }
+	bool operator!=(const Point& p) { return !(*this == p); }
+	Point& operator=(const Point& r) {
 		x = r.x;
 		y = r.y;
 		return *this;
 	}
 };
 
-enum linetype { NORMAL, HORIZONTAL, VERTICAL };
+enum linetype { NORMAL,
+	HORIZONTAL,
+	VERTICAL };
 
 class Line {
-	protected:
-		FRIEND_SERIALIZE(Line)
-		Point start, end;
-		double x_icept, y_icept, slope;
-		linetype type;
-	public:
+  protected:
+	FRIEND_SERIALIZE(Line)
+	Point start, end;
+	double x_icept, y_icept, slope;
+	linetype type;
 
-		void dump() const;
+  public:
+	void dump() const;
 
-		Line() {
-			start = Point(0,0);
-			end = Point(1,1);
-			x_icept = y_icept = 0;
-			slope = 1;
-			type = NORMAL;
+	Line() {
+		start = Point(0, 0);
+		end = Point(1, 1);
+		x_icept = y_icept = 0;
+		slope = 1;
+		type = NORMAL;
+	}
+
+	Line(const Line& l) {
+		start = l.start;
+		end = l.end;
+		x_icept = l.x_icept;
+		y_icept = l.y_icept;
+		slope = l.slope;
+		type = l.type;
+	}
+
+	Line(Point s, Point e);
+
+	Line& operator=(const Line& l) {
+		start = l.start;
+		end = l.end;
+		x_icept = l.x_icept;
+		y_icept = l.y_icept;
+		slope = l.slope;
+		type = l.type;
+		return *this;
+	}
+
+	bool intersect(const Line& l, Point& where) const;
+
+	linetype getType() const { return type; }
+	double xIntercept() const { return x_icept; }
+	double yIntercept() const { return y_icept; }
+	double getSlope() const { return slope; }
+	const Point& getStart() const { return start; }
+	const Point& getEnd() const { return end; }
+
+	// TODO: this code hasn't really been tested - fuzzie
+	bool containsPoint(Point p) const {
+		if (type == VERTICAL) {
+			bool is_x = fabs(start.x - p.x) < 1;
+			bool is_y = containsY(p.y);
+			// TODO
+			//bool is_v = (start.x > (p.x + 0.5)) && (start.x < (p.x - 0.5));
+			//bool is_h = (start.y > (p.y + 0.5)) && (start.y < (p.y - 0.5));
+			return (is_x && is_y);
+		} else if (type == HORIZONTAL) {
+			bool is_y = fabs(start.y - p.y) < 1;
+			bool is_x = containsX(p.x);
+
+			return is_x && is_y;
+		} else {
+			Point point_on_line = pointAtX(p.x);
+			return containsX(p.x) && fabs(point_on_line.y - p.y) < 1;
 		}
+	}
 
-		Line(const Line &l) {
-			start = l.start;
-			end = l.end;
-			x_icept = l.x_icept;
-			y_icept = l.y_icept;
-			slope = l.slope;
-			type = l.type;
-		}
-		
-		Line(Point s, Point e);
+	Point pointAtX(double x) const {
+		assert(type != VERTICAL);
+		if (type == NORMAL)
+			return Point(x, (x - start.x) * slope + start.y);
+		else
+			return Point(x, start.y);
+	}
+	Point pointAtY(double y) const {
+		assert(type != HORIZONTAL);
+		if (type == NORMAL)
+			return Point((y - start.y) / slope + start.x, y);
+		else
+			return Point(start.x, y);
+	}
 
-		Line &operator=(const Line &l) {
-			start = l.start;
-			end = l.end;
-			x_icept = l.x_icept;
-			y_icept = l.y_icept;
-			slope = l.slope;
-			type = l.type;
-			return *this;
-		}
+	bool containsX(double x) const {
+		return x >= start.x && x <= end.x;
+	}
 
-		bool intersect(const Line &l, Point &where) const; 
+	bool containsY(double y) const {
+		if (start.y > end.y)
+			return y <= start.y && y >= end.y;
+		else
+			return y >= start.y && y <= end.y;
+	}
 
-		linetype getType() const { return type; }
-		double xIntercept() const { return x_icept; }
-		double yIntercept() const { return y_icept; }
-		double getSlope() const { return slope; }
-		const Point &getStart() const { return start; }
-		const Point &getEnd() const { return end; }
-
-		// TODO: this code hasn't really been tested - fuzzie
-		bool containsPoint(Point p) const {
-			if (type == VERTICAL) {
-				bool is_x = fabs(start.x - p.x) < 1;
-				bool is_y = containsY(p.y);
-				// TODO
-				//bool is_v = (start.x > (p.x + 0.5)) && (start.x < (p.x - 0.5));
-				//bool is_h = (start.y > (p.y + 0.5)) && (start.y < (p.y - 0.5));
-				return (is_x && is_y);
-			} else if (type == HORIZONTAL) {
-				bool is_y = fabs(start.y - p.y) < 1;
-				bool is_x = containsX(p.x);
-
-				return is_x && is_y;
-			} else {
-				Point point_on_line = pointAtX(p.x);
-				return containsX(p.x) && fabs(point_on_line.y - p.y) < 1;
-			}
-		}
-					
-		Point pointAtX(double x) const
-			{ 
-				assert(type != VERTICAL);
-				if (type == NORMAL)
-					return Point(x, (x - start.x) * slope + start.y); 
-				else
-					return Point(x, start.y);
-				
-			}
-		Point pointAtY(double y) const
-			{
-				assert(type != HORIZONTAL);
-				if (type == NORMAL)
-					return Point((y - start.y) / slope + start.x, y);
-				else
-					return Point(start.x, y);
-			}
-
-		bool containsX(double x) const {
-			return x >= start.x && x <= end.x;
-		}
-
-		bool containsY(double y) const {
-			if (start.y > end.y)
-				return y <= start.y && y >= end.y;
-			else
-				return y >= start.y && y <= end.y;
-		}
-
-		void sanity_check() const;
+	void sanity_check() const;
 };
 
 template <class T = double>
 class Vector {
-	public:
-		T x, y;
-		Vector() {
-			x = y = 0;
-		}
+  public:
+	T x, y;
+	Vector() {
+		x = y = 0;
+	}
 
-		Vector(T _x, T _y) {
-			x = _x;
-			y = _y;
-		}
+	Vector(T _x, T _y) {
+		x = _x;
+		y = _y;
+	}
 
-		Vector(const Point &s, const Point &e) {
-			x = e.x - s.x;
-			y = e.y - s.y;
-		}
+	Vector(const Point& s, const Point& e) {
+		x = e.x - s.x;
+		y = e.y - s.y;
+	}
 
-		T getMagnitude() const { return sqrt(x*x+y*y); }
-		
-		Line extendFrom(const Point &p)  const {
-			return Line(p, Point(p.x + x, p.y + y));
-		}
+	T getMagnitude() const { return sqrt(x * x + y * y); }
 
-		Vector scaleToMagnitude(T m) const {
-			return Vector(x/getMagnitude()*m, y/getMagnitude()*m);
-		}
+	Line extendFrom(const Point& p) const {
+		return Line(p, Point(p.x + x, p.y + y));
+	}
 
-		Vector scale(T multiplier) const {
-			return Vector(x * multiplier, y * multiplier);
-		}
-		
-		bool extendIntersect(const Point &start, Line barrier,
-				Vector &residual) const {
-			Line l = extendFrom(start);
-			Point i;
-			if (!l.intersect(barrier, i))
-				return false;
-			residual = Vector(i, Point(start.x + x, start.y + y));
-			return true;
-		}
+	Vector scaleToMagnitude(T m) const {
+		return Vector(x / getMagnitude() * m, y / getMagnitude() * m);
+	}
 
-		T getX() const { return x; }
-		T getY() const { return y; }
+	Vector scale(T multiplier) const {
+		return Vector(x * multiplier, y * multiplier);
+	}
 
-		Vector operator*(T m) const {
-			return scale(m);
-		}
+	bool extendIntersect(const Point& start, Line barrier,
+		Vector& residual) const {
+		Line l = extendFrom(start);
+		Point i;
+		if (!l.intersect(barrier, i))
+			return false;
+		residual = Vector(i, Point(start.x + x, start.y + y));
+		return true;
+	}
 
-		Vector operator+(const Vector &v) const {
-			return Vector(x + v.x, y + v.y);
-		}
+	T getX() const { return x; }
+	T getY() const { return y; }
 
-		Vector operator-(const Vector &v) const {
-			return Vector(x - v.x, y - v.y);
-		}
+	Vector operator*(T m) const {
+		return scale(m);
+	}
 
-		bool operator==(const Vector &v) const {
-			return (x == v.x) && (y == v.y);
-		}
+	Vector operator+(const Vector& v) const {
+		return Vector(x + v.x, y + v.y);
+	}
 
-		static Vector unitVector(T angle) {
-			return Vector(cos(angle), sin(angle));
-		}
+	Vector operator-(const Vector& v) const {
+		return Vector(x - v.x, y - v.y);
+	}
+
+	bool operator==(const Vector& v) const {
+		return (x == v.x) && (y == v.y);
+	}
+
+	static Vector unitVector(T angle) {
+		return Vector(cos(angle), sin(angle));
+	}
 };
 
 template <class T>
-Point operator+(const Vector<T> &v, const Point &p) {
+Point operator+(const Vector<T>& v, const Point& p) {
 	return Point(v.x + p.x, v.y + p.y);
 }
 
 template <class T>
-Point operator+(const Point &p, const Vector<T> &v) {
+Point operator+(const Point& p, const Vector<T>& v) {
 	return v + p;
 }
 

@@ -21,15 +21,14 @@
 #define S_MAP_H 1
 
 #include "Map.h"
-#include "ser/s_room.h"
 #include "ser/s_metaroom.h"
+#include "ser/s_room.h"
 #include "serialization.h"
 
 SERIALIZE(Map) {
-	ar & obj.width & obj.height;
-	ar & obj.metarooms & obj.rooms;
-	ar & obj.room_base & obj.metaroom_base;
+	ar& obj.width& obj.height;
+	ar& obj.metarooms& obj.rooms;
+	ar& obj.room_base& obj.metaroom_base;
 }
 
 #endif
-

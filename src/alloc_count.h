@@ -22,61 +22,64 @@
 
 #else
 
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 class AllocationCounter {
-	protected:
-		static AllocationCounter *alloc_count_walk;
+  protected:
+	static AllocationCounter* alloc_count_walk;
 #ifdef PROFILE_ALLOCATION_THREAD_SAFE
-		volatile
+	volatile
 #endif
-		long curCount, maxCount, totalAllocs;
-		AllocationCounter *next;
+		long curCount,
+		maxCount, totalAllocs;
+	AllocationCounter* next;
 
-		void walk_one(std::ostream &);
+	void walk_one(std::ostream&);
 
-	public:
-		virtual std::string getName() const = 0;
-		long getCount() const { return curCount; }
-		long getMaxCount() const { return maxCount; }
-		long getTotalAllocs() const { return totalAllocs; }
+  public:
+	virtual std::string getName() const = 0;
+	long getCount() const { return curCount; }
+	long getMaxCount() const { return maxCount; }
+	long getTotalAllocs() const { return totalAllocs; }
 
-		void dump(std::ostream &);
-		static void walk(std::ostream &s);
+	void dump(std::ostream&);
+	static void walk(std::ostream& s);
 
-		AllocationCounter() {
-			next = alloc_count_walk;
-			alloc_count_walk = this;
-			curCount = maxCount = totalAllocs = 0;
-		}
-		~AllocationCounter() { }
-		void increment();
-		void decrement();
+	AllocationCounter() {
+		next = alloc_count_walk;
+		alloc_count_walk = this;
+		curCount = maxCount = totalAllocs = 0;
+	}
+	~AllocationCounter() {}
+	void increment();
+	void decrement();
 };
 
-template<class T>
+template <class T>
 class AllocationCounterMain : public AllocationCounter {
-	protected:
-		std::string getName() const { return std::string(T::at__getname()); }
+  protected:
+	std::string getName() const { return std::string(T::at__getname()); }
 };
 
-template<class T>
+template <class T>
 class AllocationCounterHeap : public AllocationCounter {
-	protected:
-		std::string getName() const { return std::string(T::at__getname()) + " (heap)"; }
-	public:
-		static AllocationCounterHeap counter;
+  protected:
+	std::string getName() const { return std::string(T::at__getname()) + " (heap)"; }
+
+  public:
+	static AllocationCounterHeap counter;
 };
 
-template<class T>
+template <class T>
 class AllocationToken {
-	private:
-		static AllocationCounterMain<T> counter;
-	public:
-		AllocationToken() { counter.increment(); }
-		~AllocationToken() { counter.decrement(); }
+  private:
+	static AllocationCounterMain<T> counter;
+
+  public:
+	AllocationToken() { counter.increment(); }
+	~AllocationToken() { counter.decrement(); }
 };
 template <class T>
 AllocationCounterMain<T> AllocationToken<T>::counter;
@@ -84,27 +87,30 @@ template <class T>
 AllocationCounterHeap<T> AllocationCounterHeap<T>::counter;
 
 #define COUNT_ALLOC(classname) \
-	private: \
-		AllocationToken<classname> at__; \
-		friend class AllocationCounterMain<classname>; \
-		friend class AllocationCounterHeap<classname>; \
-		static const char *at__getname() { return #classname; } \
-	public: \
-		static void *operator new(size_t len) throw (std::bad_alloc) { \
-			void *p = malloc(len); \
-			if (!p) throw std::bad_alloc(); \
-			AllocationCounterHeap<classname>::counter.increment(); \
-			return p; \
-		} \
-		static void operator delete(void *p) throw() { \
-			free(p); \
-			AllocationCounterHeap<classname>::counter.decrement(); \
-		} \
-/* These next two are needed for mpark::variant; since we override operator new, we must \
- * also provide the declarations from <new> below.										 \
- */																						 \
-		static void *operator new(size_t, void *p) throw() { return p; } \
-		static void operator delete(void *, void *) throw() { } \
-	private:
+  private: \
+	AllocationToken<classname> at__; \
+	friend class AllocationCounterMain<classname>; \
+	friend class AllocationCounterHeap<classname>; \
+	static const char* at__getname() { return #classname; } \
+\
+  public: \
+	static void* operator new(size_t len) throw(std::bad_alloc) { \
+		void* p = malloc(len); \
+		if (!p) \
+			throw std::bad_alloc(); \
+		AllocationCounterHeap<classname>::counter.increment(); \
+		return p; \
+	} \
+	static void operator delete(void* p) throw() { \
+		free(p); \
+		AllocationCounterHeap<classname>::counter.decrement(); \
+	} \
+	/* These next two are needed for mpark::variant; since we override operator new, we must \
+	 * also provide the declarations from <new> below. \
+	 */ \
+	static void* operator new(size_t, void* p) throw() { return p; } \
+	static void operator delete(void*, void*) throw() {} \
+\
+  private:
 
 #endif // PROFILE_ALLOCATION_COUNT

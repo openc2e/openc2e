@@ -27,14 +27,14 @@
 class prayFileBlock;
 
 class PrayFileReader {
-protected:
+  protected:
 	std::istream& stream;
 	std::vector<size_t> block_offsets;
 
-public:
+  public:
 	PrayFileReader(std::istream& stream);
 	~PrayFileReader();
-	
+
 	size_t getNumBlocks();
 	std::string getBlockType(size_t index);
 	std::string getBlockName(size_t index);

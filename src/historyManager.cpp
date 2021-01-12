@@ -17,29 +17,30 @@
  *
  */
 
-#include "fileformats/genomeFile.h"
 #include "historyManager.h"
-#include "World.h"
-#include "caos_assert.h"
-#include "caosValue.h"
+
 #include "Catalogue.h"
-#include "creatures/CreatureAgent.h"
-#include "creatures/Creature.h"
 #include "Engine.h" // version
+#include "World.h"
+#include "caosValue.h"
+#include "caos_assert.h"
+#include "creatures/Creature.h"
+#include "creatures/CreatureAgent.h"
 #include "creaturesException.h"
+#include "fileformats/genomeFile.h"
 
 #include <cassert>
 #include <fmt/core.h>
 #include <memory>
 
-historyevent::historyevent(unsigned int eno, CreatureAgent *c) {
+historyevent::historyevent(unsigned int eno, CreatureAgent* c) {
 	timestamp = time(NULL);
 	eventno = eno;
 	worldtick = world.tickcount;
 	// TODO: worldname = world.name;
 	// TODO: worldmoniker = world.moniker;
 	// TODO: networkid = world.username;
-	
+
 	if (c) {
 		tage = c->getCreature()->getAge();
 		stage = c->getCreature()->getStage();
@@ -57,12 +58,12 @@ void monikerData::init(std::string m, std::shared_ptr<genomeFile> f) {
 	gender = -1;
 	no_crossover_points = 0;
 	no_point_mutations = 0;
-	
+
 	assert(f);
 	genome = f;
 
-	for (auto & gene : f->genes) {
-		if (creatureGenusGene *g = dynamic_cast<creatureGenusGene*>(gene.get())) {
+	for (auto& gene : f->genes) {
+		if (creatureGenusGene* g = dynamic_cast<creatureGenusGene*>(gene.get())) {
 			// initialize genus
 			genus = g->genus + 1;
 			break;
@@ -70,20 +71,22 @@ void monikerData::init(std::string m, std::shared_ptr<genomeFile> f) {
 	}
 }
 
-historyevent &monikerData::addEvent(unsigned int event, std::string moniker1, std::string moniker2) {
-	CreatureAgent *c = 0;
-	if (owner) c = dynamic_cast<CreatureAgent *>(owner.get());	
-	
+historyevent& monikerData::addEvent(unsigned int event, std::string moniker1, std::string moniker2) {
+	CreatureAgent* c = 0;
+	if (owner)
+		c = dynamic_cast<CreatureAgent*>(owner.get());
+
 	events.push_back(historyevent(event, c));
 	events.back().monikers[0] = moniker1;
 	events.back().monikers[1] = moniker2;
 
-	for (auto & agent : world.agents) {
-		if (!agent) continue;
+	for (auto& agent : world.agents) {
+		if (!agent)
+			continue;
 
 		agent->queueScript(127, 0, moniker, (int)(events.size() - 1)); // new life event
 	}
-	
+
 	return events.back();
 }
 
@@ -100,26 +103,26 @@ void monikerData::moveToAgent(AgentRef a) {
 
 void monikerData::moveToCreature(AgentRef a) {
 	moveToAgent(a);
-	
-	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
+
+	CreatureAgent* c = dynamic_cast<CreatureAgent*>(owner.get());
 	caos_assert(c);
 	status = creature;
 }
 
 void monikerData::wasBorn() {
 	caos_assert(status == creature);
-	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
+	CreatureAgent* c = dynamic_cast<CreatureAgent*>(owner.get());
 	caos_assert(c);
-	
+
 	status = borncreature;
 	gender = (c->getCreature()->isFemale() ? 2 : 1);
 	variant = c->getCreature()->getVariant();
 }
 
 void monikerData::hasDied() {
-	CreatureAgent *c = dynamic_cast<CreatureAgent *>(owner.get());
+	CreatureAgent* c = dynamic_cast<CreatureAgent*>(owner.get());
 	caos_assert(c);
-	
+
 	// TODO
 
 	status = dead;
@@ -131,14 +134,14 @@ monikerstatus monikerData::getStatus() {
 		case exported:
 		case unreferenced:
 			return status;
-		
+
 		case creature:
 		case borncreature:
 			if (owner)
 				return status;
 			else
 				return deadandkilled; // we missed it?! TODO: what's correct behaviour here?
-			
+
 		case dead:
 			if (owner)
 				return dead;
@@ -152,21 +155,21 @@ monikerstatus monikerData::getStatus() {
 
 std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 	unsigned int genus = 0;
-	
-	for (auto & gene : genome->genes) {
-		if (creatureGenusGene *g = dynamic_cast<creatureGenusGene*>(gene.get())) {
+
+	for (auto& gene : genome->genes) {
+		if (creatureGenusGene* g = dynamic_cast<creatureGenusGene*>(gene.get())) {
 			// initialize genus
 			genus = g->genus + 1;
 			break;
 		}
 	}
-	
+
 	std::string basename = "xxxx";
 
 	if (engine.version > 2) {
-		const std::vector<std::string> *extensions = 0;
+		const std::vector<std::string>* extensions = 0;
 		std::string tagname = fmt::format("Moniker Friendly Names {}", (int)genus);
-	
+
 		if (catalogue.hasTag(tagname)) {
 			extensions = &catalogue.getTag(tagname);
 		} else if (catalogue.hasTag("Moniker Friendly Names")) {
@@ -174,16 +177,15 @@ std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 		} else {
 			fmt::print(
 				"Warning: No \"Moniker Friendly Names\" in catalogue for genus {}, defaulting to 'xxxx' for a moniker friendly name.\n",
-				genus
-			);
+				genus);
 		}
 
 		if (extensions) {
-			unsigned int i = (int) (extensions->size() * (rand() / (RAND_MAX + 1.0)));
+			unsigned int i = (int)(extensions->size() * (rand() / (RAND_MAX + 1.0)));
 			basename = (*extensions)[i];
 		}
 	}
-	
+
 	std::string newmoniker = world.generateMoniker(basename);
 	unsigned int i = 0;
 	while (hasMoniker(newmoniker)) { // last-moment sanity check..
@@ -202,27 +204,32 @@ std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 
 bool historyManager::hasMoniker(std::string s) {
 	std::map<std::string, monikerData>::iterator i = monikers.find(s);
-	if (i == monikers.end()) return false;
-	else return true;
+	if (i == monikers.end())
+		return false;
+	else
+		return true;
 }
 
-monikerData &historyManager::getMoniker(std::string s) {
+monikerData& historyManager::getMoniker(std::string s) {
 	std::map<std::string, monikerData>::iterator i = monikers.find(s);
-	if (i == monikers.end()) throw creaturesException("getMoniker was called with a non-existant moniker");
+	if (i == monikers.end())
+		throw creaturesException("getMoniker was called with a non-existant moniker");
 	return i->second;
 }
 
 std::string historyManager::findMoniker(std::shared_ptr<genomeFile> g) {
-	for (auto & moniker : monikers) {
-		if (moniker.second.genome.lock() == g) return moniker.first;
+	for (auto& moniker : monikers) {
+		if (moniker.second.genome.lock() == g)
+			return moniker.first;
 	}
 
 	return "";
 }
 
 std::string historyManager::findMoniker(AgentRef a) {
-	for (auto & moniker : monikers) {
-		if (moniker.second.owner == a) return moniker.first;
+	for (auto& moniker : monikers) {
+		if (moniker.second.owner == a)
+			return moniker.first;
 	}
 
 	return "";
@@ -230,7 +237,8 @@ std::string historyManager::findMoniker(AgentRef a) {
 
 void historyManager::delMoniker(std::string s) {
 	std::map<std::string, monikerData>::iterator i = monikers.find(s);
-	if (i == monikers.end()) throw creaturesException("getMoniker was called with a non-existant moniker");
+	if (i == monikers.end())
+		throw creaturesException("getMoniker was called with a non-existant moniker");
 	monikers.erase(i);
 }
 

@@ -1,23 +1,23 @@
 #include "endianlove.h"
-#include "utils/readfile.h"
 #include "fileformats/mngparser.h"
+#include "utils/readfile.h"
 
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 #include <fstream>
+#include <ghc/filesystem.hpp>
 
 namespace fs = ghc::filesystem;
 
-void decryptbuf(char * buf, int len) {
+void decryptbuf(char* buf, int len) {
 	int i;
 	unsigned char pad = 5;
-	for(i = 0; i < len; i++) {
+	for (i = 0; i < len; i++) {
 		buf[i] ^= pad;
 		pad += 0xC1;
 	}
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 	if (argc != 2) {
 		fmt::print(stderr, "syntax: mngdumper scriptfile\n");
 		exit(1);
@@ -28,10 +28,10 @@ int main(int argc, char **argv) {
 		fmt::print(stderr, "File {} doesn't exist\n", script_path);
 		exit(1);
 	}
-	
+
 	auto script = readfile(script_path);
 	auto sample_names = mngparse(script).getWaveNames();
-	for (auto &s : sample_names) {
+	for (auto& s : sample_names) {
 		// TODO: case-insensitive
 		s = (fs::path(script_path).parent_path() / s).string() + ".wav";
 	}
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 	fmt::print("Writing script...\n");
 	decryptbuf((char*)script.data(), script.size());
 	out.write((char*)script.data(), script_size);
-	
+
 	fmt::print("Writing samples...\n");
 	for (auto s : sample_names) {
 		fmt::print("{}\n", s);

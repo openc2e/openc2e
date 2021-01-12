@@ -1,12 +1,13 @@
 #include "CobManager.h"
-#include "creaturesException.h"
+
 #include "Engine.h"
+#include "PathResolver.h"
+#include "World.h"
+#include "creaturesException.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
-#include "PathResolver.h"
 #include "utils/ascii_tolower.h"
 #include "utils/find_if.h"
-#include "World.h"
 
 #include <algorithm>
 #include <fmt/format.h>
@@ -32,7 +33,8 @@ void CobManager::update() {
 			c2cobfile cobfile(cob);
 
 			for (auto b : cobfile.blocks) {
-				if (b->type != "agnt") continue;
+				if (b->type != "agnt")
+					continue;
 				cobAgentBlock a(b);
 				objects.emplace_back(a.name, cob);
 				if (a.removescript.size() > 0) {
@@ -42,7 +44,7 @@ void CobManager::update() {
 		}
 	}
 
-	std::sort(objects.begin(), objects.end(), [](auto &a, auto &b) { return a.name < b.name; });
+	std::sort(objects.begin(), objects.end(), [](auto& a, auto& b) { return a.name < b.name; });
 }
 
 Image CobManager::getPicture(const CobFileInfo& info) {
@@ -53,14 +55,15 @@ Image CobManager::getPicture(const CobFileInfo& info) {
 			// TODO: don't require casting
 			return cobfile.picture;
 		}
-	}
-	else if (engine.version == 2) {
+	} else if (engine.version == 2) {
 		c2cobfile cobfile(info.filename);
-		
+
 		for (auto b : cobfile.blocks) {
-			if (b->type != "agnt") continue;
+			if (b->type != "agnt")
+				continue;
 			cobAgentBlock a(b);
-			if (a.name != info.name) continue;
+			if (a.name != info.name)
+				continue;
 			return a.thumbnail;
 		}
 	}
@@ -79,20 +82,20 @@ void CobManager::inject(const CobFileInfo& info) {
 		}
 	} else if (engine.version == 2) {
 		c2cobfile cobfile(info.filename);
-		auto block = find_if(cobfile.blocks, [&](auto &b) {
+		auto block = find_if(cobfile.blocks, [&](auto& b) {
 			return b->type == "agnt" && cobAgentBlock(b).name == info.name;
 		});
 		if (!block) {
 			throw creaturesException(fmt::format("Couldn't find agent {}", info.name));
 		}
 		cobAgentBlock a(*block);
-		
+
 		// dependencies
 		assert(a.deptypes.size() == a.depnames.size());
 		for (size_t i = 0; i < a.deptypes.size(); i++) {
 			int deptype = a.deptypes[i];
 			std::string depname = a.depnames[i];
-			
+
 			fs::path resourcedir;
 			switch (deptype) {
 				case 0: resourcedir = "Images/"; break;
@@ -100,36 +103,37 @@ void CobManager::inject(const CobFileInfo& info) {
 				default:
 					throw creaturesException("Unknown dependency type " + std::to_string(deptype));
 			}
-							
-			if (world.findFile(resourcedir / depname).size()) continue; // TODO: update file if necessary?
-			
-			auto depBlock = find_if(cobfile.blocks, [&](auto &b) {
+
+			if (world.findFile(resourcedir / depname).size())
+				continue; // TODO: update file if necessary?
+
+			auto depBlock = find_if(cobfile.blocks, [&](auto& b) {
 				return b->type == "file" && cobFileBlock(b).filetype == deptype && cobFileBlock(b).filename == depname;
 			});
 			if (!depBlock) {
 				throw creaturesException(fmt::format("Couldn't find dependency {} (type {})", depname, deptype));
 			}
 			cobFileBlock f(*depBlock);
-			
+
 			fs::path dir = fs::path(world.getUserDataDir()) / resourcedir;
 			if (!fs::exists(dir)) {
 				fs::create_directory(dir);
 			}
 			assert(fs::exists(dir) && fs::is_directory(dir)); // TODO: error handling
-			
+
 			std::string outputfile = dir / depname;
 			assert(!fs::exists(outputfile));
-			
+
 			std::ofstream output(outputfile, std::ios::binary);
 			output.write((char*)f.getFileContents(), f.filesize);
 		}
-		
+
 		for (auto s : a.scripts) {
 			idata += s + "\n";
 		}
 		idata += "iscr," + a.installscript + "\n";
 	}
-	
+
 	// idata += "rscr\n";
 	std::string result = engine.executeNetwork(idata);
 	if (result.size()) {
@@ -148,7 +152,7 @@ void CobManager::remove(const CobFileInfo& info) {
 
 	} else if (engine.version == 2) {
 		c2cobfile cobfile(info.filename);
-		auto block = find_if(cobfile.blocks, [&](auto &b) {
+		auto block = find_if(cobfile.blocks, [&](auto& b) {
 			return b->type == "agnt" && cobAgentBlock(b).name == info.name;
 		});
 		if (!block) {
@@ -158,7 +162,7 @@ void CobManager::remove(const CobFileInfo& info) {
 
 		rdata = a.removescript;
 	}
-	
+
 	rdata += "\nrscr\n";
 	std::string result = engine.executeNetwork(rdata);
 	if (result.size()) {

@@ -22,9 +22,10 @@
 
 #include "AgentRef.h"
 #include "creatures/lifestage.h"
+
+#include <map>
 #include <memory>
 #include <vector>
-#include <map>
 
 using std::shared_ptr;
 using std::weak_ptr;
@@ -43,17 +44,23 @@ struct historyevent {
 	std::string worldname;
 	std::string worldmoniker;
 	unsigned int worldtick;
-	historyevent(unsigned int eno, class CreatureAgent * = 0);
+	historyevent(unsigned int eno, class CreatureAgent* = 0);
 };
 
-enum monikerstatus { referenced = 1, creature = 2, borncreature = 3, exported = 4, dead = 5, deadandkilled = 6, unreferenced = 7 };
+enum monikerstatus { referenced = 1,
+	creature = 2,
+	borncreature = 3,
+	exported = 4,
+	dead = 5,
+	deadandkilled = 6,
+	unreferenced = 7 };
 
 class monikerData {
-private:
+  private:
 	monikerstatus status;
 	std::string moniker;
 
-public:
+  public:
 	weak_ptr<genomeFile> genome;
 	AgentRef owner;
 	std::vector<historyevent> events;
@@ -63,9 +70,9 @@ public:
 	unsigned char genus;
 	bool warpveteran;
 	unsigned int no_crossover_points, no_point_mutations;
-	
+
 	void init(std::string, std::shared_ptr<genomeFile>);
-	historyevent &addEvent(unsigned int event, std::string moniker1 = "", std::string moniker2 = "");
+	historyevent& addEvent(unsigned int event, std::string moniker1 = "", std::string moniker2 = "");
 	void moveToAgent(AgentRef a);
 	void moveToCreature(AgentRef c);
 	void wasBorn();
@@ -74,13 +81,13 @@ public:
 };
 
 class historyManager {
-private:
+  private:
 	std::map<std::string, monikerData> monikers;
 
-public:
+  public:
 	std::string newMoniker(std::shared_ptr<genomeFile>);
 	bool hasMoniker(std::string);
-	monikerData &getMoniker(std::string);
+	monikerData& getMoniker(std::string);
 	std::string findMoniker(std::shared_ptr<genomeFile>);
 	std::string findMoniker(AgentRef);
 	void delMoniker(std::string);

@@ -17,20 +17,21 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
-#include <iostream>
-#include <memory>
+#include "AgentHelpers.h" // agentsTouching
 #include "Vehicle.h"
 #include "World.h"
-#include "AgentHelpers.h" // agentsTouching
+#include "caosVM.h"
+#include "caos_assert.h"
+
+#include <iostream>
+#include <memory>
 
 /**
  CABN (command) left (integer) top (integer) right (integer) bottom (integer)
  %status maybe
  %variants c1 c2 cv c3
 */
-void c_CABN(caosVM *vm) {
+void c_CABN(caosVM* vm) {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(bottom)
 	VM_PARAM_INTEGER(right)
@@ -38,7 +39,7 @@ void c_CABN(caosVM *vm) {
 	VM_PARAM_INTEGER(left)
 
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 	v->setCabinRect(left, top, right, bottom);
 }
@@ -47,12 +48,12 @@ void c_CABN(caosVM *vm) {
  CABW (command) cap (integer)
  %status maybe
 */
-void c_CABW(caosVM *vm) {
+void c_CABW(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(cap)
 
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 	v->setCapacity(cap);
 }
@@ -64,17 +65,17 @@ void c_CABW(caosVM *vm) {
 
  make specified vehicle agent pick up specified passenger
 */
-void c_SPAS(caosVM *vm) {
+void c_SPAS(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_AGENT(passenger)
 	VM_PARAM_AGENT(vehicle)
 
 	valid_agent(vehicle);
 	valid_agent(passenger);
-	
+
 	// TODO: ensure passenger is a creature for c1/c2?
 
-	Vehicle *v = dynamic_cast<Vehicle *>(vehicle.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vehicle.get());
 	caos_assert(v);
 	v->addCarried(passenger);
 }
@@ -86,7 +87,7 @@ void c_SPAS(caosVM *vm) {
  pick up all nearby agents matching classifier, as passengers to target vehicle
  options = 0 to pick up based on agent bounding rect, or 1 to pick up based on cabin rect
 */
-void c_GPAS(caosVM *vm) {
+void c_GPAS(caosVM* vm) {
 	VM_VERIFY_SIZE(4)
 	VM_PARAM_INTEGER(options)
 	// TODO: assert ranges for these
@@ -95,19 +96,24 @@ void c_GPAS(caosVM *vm) {
 	VM_PARAM_INTEGER(family)
 
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
-	
+
 	// TODO: see other GPAS below
 	// TODO: are we sure c2e grabs passengers by agent rect?
 	// TODO: do we need to check greedycabin attr for anything?
-	for (auto & agent : world.agents) {
+	for (auto& agent : world.agents) {
 		std::shared_ptr<Agent> a = agent;
-		if (!a) continue;
-		if (a.get() == v) continue;
-		if (family && family != a->family) continue;
-		if (genus && genus != a->genus) continue;
-		if (species && species != a->species) continue;
+		if (!a)
+			continue;
+		if (a.get() == v)
+			continue;
+		if (family && family != a->family)
+			continue;
+		if (genus && genus != a->genus)
+			continue;
+		if (species && species != a->species)
+			continue;
 
 		if (agentsTouching(a.get(), v)) {
 			v->addCarried(a);
@@ -120,18 +126,21 @@ void c_GPAS(caosVM *vm) {
  %status maybe
  %variants c1 c2
 */
-void c_GPAS_c2(caosVM *vm) {
+void c_GPAS_c2(caosVM* vm) {
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	// TODO: are we sure c1/c2 grab passengers by agent rect?
 	// TODO: do we need to check greedycabin attr for anything?
-	for (auto & agent : world.agents) {
+	for (auto& agent : world.agents) {
 		std::shared_ptr<Agent> a = agent;
-		if (!a) continue;
-		if (a.get() == v) continue;
-		if (a->family != 4) continue; // only pickup creatures (TODO: good check?)
+		if (!a)
+			continue;
+		if (a.get() == v)
+			continue;
+		if (a->family != 4)
+			continue; // only pickup creatures (TODO: good check?)
 
 		if (agentsTouching(a.get(), v)) {
 			v->addCarried(a);
@@ -145,7 +154,7 @@ void c_GPAS_c2(caosVM *vm) {
 
  drop all agents matching classifier from target vehicle
 */
-void c_DPAS(caosVM *vm) {
+void c_DPAS(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
 	// TODO: assert ranges for these
 	VM_PARAM_INTEGER(species)
@@ -153,16 +162,21 @@ void c_DPAS(caosVM *vm) {
 	VM_PARAM_INTEGER(family)
 
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	for (unsigned int i = 0; i < v->passengers.size(); i++) {
 		AgentRef a = v->passengers[i];
-		if (!a) continue;
-		if (a.get() == v) continue;
-		if (family && family != a->family) continue;
-		if (genus && genus != a->genus) continue;
-		if (species && species != a->species) continue;
+		if (!a)
+			continue;
+		if (a.get() == v)
+			continue;
+		if (family && family != a->family)
+			continue;
+		if (genus && genus != a->genus)
+			continue;
+		if (species && species != a->species)
+			continue;
 		v->drop(a);
 		i--; // since we dropped the last one out of the list
 	}
@@ -173,16 +187,19 @@ void c_DPAS(caosVM *vm) {
  %status maybe
  %variants c1 c2
 */
-void c_DPAS_c2(caosVM *vm) {
+void c_DPAS_c2(caosVM* vm) {
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	for (unsigned int i = 0; i < v->passengers.size(); i++) {
 		AgentRef a = v->passengers[i];
-		if (!a) continue;
-		if (a.get() == v) continue;
-		if (a->family != 4) continue; // only drop creatures (TODO: good check?)
+		if (!a)
+			continue;
+		if (a.get() == v)
+			continue;
+		if (a->family != 4)
+			continue; // only drop creatures (TODO: good check?)
 		v->drop(a);
 		i--; // since we dropped the last one out of the list
 	}
@@ -192,11 +209,11 @@ void c_DPAS_c2(caosVM *vm) {
  CABP (command) plane (integer)
  %status maybe
 */
-void c_CABP(caosVM *vm) {
+void c_CABP(caosVM* vm) {
 	VM_PARAM_INTEGER(plane)
-	
+
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	v->cabinplane = plane;
@@ -206,13 +223,13 @@ void c_CABP(caosVM *vm) {
  CABV (command) room_id (integer)
  %status stub
 */
-void c_CABV(caosVM *vm) {
+void c_CABV(caosVM* vm) {
 	VM_PARAM_INTEGER(room_id)
-	
+
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
-	
+
 	// TODO
 }
 
@@ -220,9 +237,9 @@ void c_CABV(caosVM *vm) {
  CABV (integer)
  %status stub
 */
-void v_CABV(caosVM *vm) {
+void v_CABV(caosVM* vm) {
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	vm->result.setInt(-1); // TODO
@@ -232,16 +249,17 @@ void v_CABV(caosVM *vm) {
  RPAS (command) vehicle (agent) passenger (agent)
  %status maybe
 */
-void c_RPAS(caosVM *vm) {
+void c_RPAS(caosVM* vm) {
 	VM_PARAM_AGENT(passenger)
 	VM_PARAM_AGENT(vehicle)
 
-	Vehicle *v = dynamic_cast<Vehicle *>(vehicle.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vehicle.get());
 	caos_assert(v);
 
 	for (unsigned int i = 0; i < v->passengers.size(); i++) {
 		AgentRef a = v->passengers[i];
-		if (!a) continue;
+		if (!a)
+			continue;
 		if (a == passenger) {
 			v->drop(a);
 			return;
@@ -255,10 +273,8 @@ void c_RPAS(caosVM *vm) {
  %variants c1 c2
 */
 CAOS_LVALUE_TARG(XVEC,
-		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get()); caos_assert(v)
-	,	v->xvec
-	,	v->xvec = newvalue
-	)
+				 Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
+				 caos_assert(v), v->xvec, v->xvec = newvalue)
 
 /**
  YVEC (variable)
@@ -266,19 +282,17 @@ CAOS_LVALUE_TARG(XVEC,
  %variants c1 c2
 */
 CAOS_LVALUE_TARG(YVEC,
-		Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get()); caos_assert(v)
-	,	v->yvec
-	,	v->yvec = newvalue
-	)
+				 Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
+				 caos_assert(v), v->yvec, v->yvec = newvalue)
 
 /**
  BUMP (integer)
  %status stub
  %variants c1 c2
 */
-void v_BUMP(caosVM *vm) {
+void v_BUMP(caosVM* vm) {
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	vm->result.setInt(v->getBump());
@@ -291,12 +305,12 @@ void v_BUMP(caosVM *vm) {
 
  Teleport occupants of target vehicle to (x, y).
 */
-void c_TELE(caosVM *vm) {
+void c_TELE(caosVM* vm) {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	// TODO
@@ -309,11 +323,11 @@ void c_TELE(caosVM *vm) {
 
  Drop passengers of targ vehicle, like DPAS. If gravity is zero, passengers do not get gravity activated.
 */
-void c_DPS2(caosVM *vm) {
+void c_DPS2(caosVM* vm) {
 	VM_PARAM_INTEGER(gravity)
 
 	valid_agent(vm->targ);
-	Vehicle *v = dynamic_cast<Vehicle *>(vm->targ.get());
+	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
 	caos_assert(v);
 
 	// TODO

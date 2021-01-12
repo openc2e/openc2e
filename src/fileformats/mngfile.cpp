@@ -16,20 +16,22 @@
  *  Lesser General Public License for more details.
  *
  */
+#include "mngfile.h"
+
+#include "creaturesException.h"
+#include "endianlove.h"
+#include "mmapifstream.h"
+#include "mngparser.h"
+#include "shared_array.h"
+
 #include <algorithm>
 #include <assert.h>
 #include <fmt/core.h>
-#include "endianlove.h"
-#include "creaturesException.h"
-#include "mngfile.h"
-#include "mngparser.h"
-#include "mmapifstream.h"
-#include "shared_array.h"
 
-void decryptbuf(char * buf, int len) {
+void decryptbuf(char* buf, int len) {
 	int i;
 	unsigned char pad = 5;
-	for(i = 0; i < len; i++) {
+	for (i = 0; i < len; i++) {
 		buf[i] ^= pad;
 		pad += 0xC1;
 	}
@@ -37,9 +39,12 @@ void decryptbuf(char * buf, int len) {
 
 MNGFile::MNGFile(std::string n) {
 	name = n;
-	
+
 	stream = new mmapifstream(n);
-	if (!stream) { delete stream; throw MNGFileException("open failed"); }
+	if (!stream) {
+		delete stream;
+		throw MNGFileException("open failed");
+	}
 
 	// Read metavariables from beginning of file
 	uint32_t numsamples = read32le(stream->map);
@@ -63,7 +68,7 @@ MNGFile::MNGFile(std::string n) {
 	decryptbuf(const_cast<char*>(script.c_str()), scriptlength);
 
 	auto mngscript = mngparse(script);
-	
+
 	auto wave_names = mngscript.getWaveNames();
 	for (size_t i = 0; i < wave_names.size(); ++i) {
 		samplemappings[wave_names[i]] = i;

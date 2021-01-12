@@ -1,21 +1,24 @@
 #include "SoundManager.h"
-#include "caosValue.h"
-#include "World.h"
+
 #include "Engine.h"
 #include "Map.h"
+#include "World.h"
+#include "caosValue.h"
 
 // this is all for SoundManager::tick
-#include "World.h"
 #include "Camera.h"
-#include "Room.h"
 #include "MetaRoom.h"
+#include "Room.h"
+#include "World.h"
 
 #include <cmath>
 
 SoundManager soundmanager;
 
-SoundManager::SoundManager() {}
-SoundManager::~SoundManager() {}
+SoundManager::SoundManager() {
+}
+SoundManager::~SoundManager() {
+}
 
 float SoundManager::getVolume() {
 	return sound_effects_volume;
@@ -54,15 +57,15 @@ Sound SoundManager::getNewSound(AudioChannel handle, bool is_creature_voice) {
 	if (i >= sources.size()) {
 		sources.resize(i + 1);
 	}
-	
+
 	sources[i].handle = handle;
 	sources[i].is_creature_voice = is_creature_voice;
 	updateVolume(sources[i]);
-	
+
 	Sound source;
 	source.index = i;
 	source.generation = sources[source.index].generation;
-	
+
 	return source;
 }
 
@@ -78,7 +81,7 @@ bool SoundManager::areCreatureVoicesMuted() {
 
 template <typename T, typename U, typename V>
 auto clamp(T value, U low, V high) {
-	assert(!(high < low) );
+	assert(!(high < low));
 	return (value < low) ? low : (high < value) ? high : value;
 }
 
@@ -94,7 +97,7 @@ void SoundManager::updateVolume(SoundData& s) {
 	}
 
 	if (s.positioned) {
-		MetaRoom *room = world.map->metaRoomAt(s.x, s.y);
+		MetaRoom* room = world.map->metaRoomAt(s.x, s.y);
 		if (room && engine.camera->getMetaRoom() == room) {
 			// std::remainder gives the distance between x and camerax, taking
 			// into account metaroom wraparound ("modular distance")
@@ -135,17 +138,13 @@ void SoundManager::updateVolume(SoundData& s) {
 }
 
 void SoundManager::updateVolumes() {
-	for (auto &s : sources) {
+	for (auto& s : sources) {
 		updateVolume(s);
 	}
 }
 
 SoundManager::SoundData* SoundManager::getSoundData(Sound& source) {
-	if (source.index < 0
-		|| static_cast<unsigned int>(source.index) >= sources.size()
-		|| source.generation != sources[source.index].generation
-		|| !sources[source.index].isAlive())
-	{
+	if (source.index < 0 || static_cast<unsigned int>(source.index) >= sources.size() || source.generation != sources[source.index].generation || !sources[source.index].isAlive()) {
 		source = {};
 		return nullptr;
 	}
@@ -153,11 +152,13 @@ SoundManager::SoundData* SoundManager::getSoundData(Sound& source) {
 }
 
 Sound SoundManager::playSound(std::string name, bool loop) {
-	if (name.size() == 0) return {};
+	if (name.size() == 0)
+		return {};
 
 	std::string filename = world.findFile(fmt::format("Sounds/{}.wav", name));
 	if (filename.size() == 0) {
-		if (engine.version < 3) return {}; // creatures 1 and 2 ignore non-existent audio clips
+		if (engine.version < 3)
+			return {}; // creatures 1 and 2 ignore non-existent audio clips
 		throw creaturesException(fmt::format("No such clip '{}.wav'", name));
 	}
 
@@ -171,11 +172,13 @@ Sound SoundManager::playSound(std::string name, bool loop) {
 }
 
 Sound SoundManager::playVoice(std::string name) {
-	if (name.size() == 0) return {};
+	if (name.size() == 0)
+		return {};
 
 	std::string filename = world.findFile(fmt::format("Sounds/{}.wav", name));
 	if (filename.size() == 0) {
-		if (engine.version < 3) return {}; // creatures 1 and 2 ignore non-existent audio clips
+		if (engine.version < 3)
+			return {}; // creatures 1 and 2 ignore non-existent audio clips
 		throw creaturesException(fmt::format("No such clip '{}.wav'", name));
 	}
 

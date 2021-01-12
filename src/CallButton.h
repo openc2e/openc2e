@@ -17,23 +17,23 @@
  *
  */
 
-#include "SimpleAgent.h"
 #include "Lift.h"
+#include "SimpleAgent.h"
 
 #ifndef _C2E_CALLBUTTON_H
 #define _C2E_CALLBUTTON_H
 
 class CallButton : public SimpleAgent {
-public:
+  public:
 	AgentRef lift;
 	unsigned char buttonid;
 
 	CallButton(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
 		std::string spritefile, unsigned int firstimage, unsigned int imagecount)
-		: SimpleAgent(family, genus, species, plane, spritefile, firstimage, imagecount) { }
+		: SimpleAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {}
 
 	void tick();
-	bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
+	bool fireScript(unsigned short event, Agent* from, caosValue one, caosValue two);
 };
 
 #endif

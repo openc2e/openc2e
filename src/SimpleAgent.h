@@ -20,22 +20,23 @@
 #pragma once
 
 #include "Agent.h"
+
 #include <string>
 
 class CompoundPart;
 class DullPart;
 
 class SimpleAgent : public Agent {
-protected:
-	DullPart *dullpart;
+  protected:
+	DullPart* dullpart;
 
-public:
+  public:
 	SimpleAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-							std::string spritefile, unsigned int firstimage, unsigned int imagecount);
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	virtual ~SimpleAgent();
 	void setZOrder(unsigned int plane);
 	void tick();
-	CompoundPart *part(unsigned int id);
+	CompoundPart* part(unsigned int id);
 };
 
 /* vim: set noet: */

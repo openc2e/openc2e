@@ -25,19 +25,25 @@
   not 100% sure about this enum ... is 'baby' equal to 'embryo', or is 'embryo'
   zero and the rest shifted?
 */
-enum lifestage { baby = 0, child = 1, adolescent = 2, youth = 3, adult = 4, old = 5, senile = 6 };
+enum lifestage { baby = 0,
+	child = 1,
+	adolescent = 2,
+	youth = 3,
+	adult = 4,
+	old = 5,
+	senile = 6 };
 
 inline std::string lifestage_to_name(lifestage l) {
-    switch (l) {
-        case baby: return "Baby";
-        case child: return "Child";
-        case adolescent: return "Adolescent";
-        case youth: return "Youth";
-        case adult: return "Adult";
-        case old: return "Old";
-        case senile: return "Senile";
-        default: return std::to_string(l);
-    }
+	switch (l) {
+		case baby: return "Baby";
+		case child: return "Child";
+		case adolescent: return "Adolescent";
+		case youth: return "Youth";
+		case adult: return "Adult";
+		case old: return "Old";
+		case senile: return "Senile";
+		default: return std::to_string(l);
+	}
 }
 
 #endif

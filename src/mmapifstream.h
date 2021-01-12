@@ -19,17 +19,19 @@
 
 #pragma once
 
-#include <string>
 #include "spanstream.h"
 
+#include <string>
+
 class mmapifstream : public spanstream {
-public:
+  public:
 	mmapifstream();
 	mmapifstream(const std::string& filename);
 	~mmapifstream();
 	bool is_open() { return map != nullptr; }
-	char *map = nullptr;
-private:
+	char* map = nullptr;
+
+  private:
 	size_t filesize = 0;
 };
 

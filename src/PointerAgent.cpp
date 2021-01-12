@@ -18,21 +18,24 @@
  */
 
 #include "PointerAgent.h"
-#include "World.h"
+
+#include "Camera.h"
+#include "DullPart.h"
 #include "Engine.h"
-#include "caosVM.h"
-#include "Room.h"
 #include "Map.h"
 #include "MetaRoom.h"
-#include "Camera.h"
+#include "Room.h"
+#include "World.h"
+#include "caosVM.h"
 #include "creatures/SkeletalCreature.h"
-#include "DullPart.h"
+
 #include <cassert>
 #include <climits>
 #include <memory>
 
 // TODO: change imagecount?
-PointerAgent::PointerAgent(std::string spritefile) : SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {
+PointerAgent::PointerAgent(std::string spritefile)
+	: SimpleAgent(2, 1, 1, INT_MAX, spritefile, 0, 0) {
 	name = "hand";
 	handle_events = true;
 	holdingWire = 0;
@@ -57,26 +60,36 @@ void PointerAgent::finishInit() {
 void PointerAgent::carry(AgentRef a) {
 	Agent::carry(a);
 
-	int eve; if (engine.version < 3) eve = 53; else eve = 104;
+	int eve;
+	if (engine.version < 3)
+		eve = 53;
+	else
+		eve = 104;
 	firePointerScript(eve, a); // Pointer Pickup
 }
 
 void PointerAgent::drop(AgentRef a) {
 	Agent::drop(a);
 
-	int eve; if (engine.version < 3) eve = 54; else eve = 105;
+	int eve;
+	if (engine.version < 3)
+		eve = 54;
+	else
+		eve = 105;
 	firePointerScript(eve, a); // Pointer Drop
 }
 
 // TODO: this should have a queueScript equiv too
-void PointerAgent::firePointerScript(unsigned short event, Agent *src) {
+void PointerAgent::firePointerScript(unsigned short event, Agent* src) {
 	assert(src); // TODO: I /think/ this should only be called by the engine..
 	std::shared_ptr<script> s = src->findScript(event);
 	if (!s && engine.version < 3) { // TODO: are we sure this doesn't apply to c2e?
 		s = findScript(event); // TODO: we should make sure this actually belongs to the pointer agent and isn't a fallback, maybe
 	}
-	if (!s) return;
-	if (!vm) vm = world.getVM(this);
+	if (!s)
+		return;
+	if (!vm)
+		vm = world.getVM(this);
 	if (vm->fireScript(s, false, src)) { // TODO: should FROM be src?
 		vm->setTarg(this);
 		zotstack();
@@ -90,20 +103,23 @@ void PointerAgent::physicsTick() {
 void PointerAgent::tick() {
 	if (!paused) {
 		int x = pointerX(), y = pointerY();
-		CompoundPart *a = world.partAt(x, y);
-		Agent *parent = 0;
-	
+		CompoundPart* a = world.partAt(x, y);
+		Agent* parent = 0;
+
 		// work out what the old part was, if it hasn't disappeared from under us
 		// TODO: what if the old part was replaced by a new part with identical id? :(
-		CompoundPart *oldpart = 0;
-		if (agent_under_pointer) oldpart = agent_under_pointer->part(part_under_pointer);
+		CompoundPart* oldpart = 0;
+		if (agent_under_pointer)
+			oldpart = agent_under_pointer->part(part_under_pointer);
 
 		// handle mouse in/out events
 		if (oldpart != a) {
-			if (oldpart) oldpart->mouseOut();
-			if (a) a->mouseIn();
+			if (oldpart)
+				oldpart->mouseOut();
+			if (a)
+				a->mouseIn();
 		}
-		
+
 		// update our memory of what part we're over
 		if (a) {
 			part_under_pointer = a->id;
@@ -120,7 +136,8 @@ void PointerAgent::tick() {
 				if (engine.version == 2) {
 					if (overlayTimer != -1) { // dodgy hax. -1 is devil, -2 is angel.
 						overlayTimer = -1;
-						if (overlay) delete overlay;
+						if (overlay)
+							delete overlay;
 						overlay = new DullPart(this, 0, "syst", 16, 32, 32, 1);
 					}
 				} else if (engine.version == 3) {
@@ -134,7 +151,8 @@ void PointerAgent::tick() {
 				if (engine.version == 2) {
 					if (overlayTimer != -2) {
 						overlayTimer = -2;
-						if (overlay) delete overlay;
+						if (overlay)
+							delete overlay;
 						overlay = new DullPart(this, 0, "syst", 15, 32, 32, 1);
 					}
 				} else if (engine.version == 3) {
@@ -187,9 +205,9 @@ void PointerAgent::setHotspot(int x, int y) {
 	hotspoty = y;
 }
 
-void PointerAgent::handleEvent(BackendEvent &event) {
+void PointerAgent::handleEvent(BackendEvent& event) {
 	int x = pointerX(), y = pointerY();
-		
+
 	if (event.type == eventmousemove) {
 		moveTo(event.x + engine.camera->getX() - hotspotx, event.y + engine.camera->getY() - hotspoty);
 		velx = (int)event.xrel * 4;
@@ -207,7 +225,7 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 	} else if (event.type == eventmousebuttondown) {
 		// do our custom handling
 		if (event.button == buttonleft) {
-			CompoundPart *a = world.partAt(x, y, true, false, true);
+			CompoundPart* a = world.partAt(x, y, true, false, true);
 			if (a) {
 				Agent* parent = a->getParent();
 
@@ -216,7 +234,7 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 				bool foundport = false;
 				if (engine.version > 2) {
 					for (std::map<unsigned int, std::shared_ptr<OutputPort> >::iterator i = parent->outports.begin();
-							 i != parent->outports.end(); i++) {
+						 i != parent->outports.end(); i++) {
 						// TODO: 4 is a magic number i pulled out of nooooowhere
 						if (abs(i->second->x + parent->x - x) < 4 && abs(i->second->y + parent->y - y) < 4) {
 							foundport = true;
@@ -235,7 +253,7 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 					}
 					if (!foundport) {
 						for (std::map<unsigned int, std::shared_ptr<InputPort> >::iterator i = parent->inports.begin();
-								 i != parent->inports.end(); i++) {
+							 i != parent->inports.end(); i++) {
 							// TODO: 4 is a magic number i pulled out of nooooowhere
 							if (abs(i->second->x + parent->x - x) < 4 && abs(i->second->y + parent->y - y) < 4) {
 								foundport = true;
@@ -279,11 +297,13 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 							// fire the script
 							// _p1_ is id of part for button clicks, according to Edynn code
 							// TODO: should _p1_ always be set? :)
-							if (!parent->paused) parent->queueScript(scriptid, world.hand(), (int)a->id);
+							if (!parent->paused)
+								parent->queueScript(scriptid, world.hand(), (int)a->id);
 
 							// annoyingly queueScript doesn't reliably tell us if it did anything useful.
 							// TODO: work out the mess which is queueScript's return values etc
-							if (!parent->findScript(scriptid)) return;
+							if (!parent->findScript(scriptid))
+								return;
 
 							// fire the associated pointer script too, if necessary
 							// TODO: fuzzie has no idea if this code is remotely correct
@@ -302,7 +322,8 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 					}
 				}
 
-				if (eve != -1) firePointerScript(eve, a->getParent());
+				if (eve != -1)
+					firePointerScript(eve, a->getParent());
 			} else if (engine.version > 2) {
 				if (holdingWire) {
 					holdingWire = 0;
@@ -312,13 +333,14 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 				}
 			}
 		} else if (event.button == buttonright) {
-			if (editAgent) { 
+			if (editAgent) {
 				editAgent.clear();
 				return;
 			}
 
-			if (world.paused) return; // TODO: wrong?
-							
+			if (world.paused)
+				return; // TODO: wrong?
+
 			// picking up and dropping are implictly handled by the scripts (well,
 			// messages) 4 and 5	TODO: check if this is correct behaviour, one issue
 			// is that this isn't instant, another is the messages might only be
@@ -328,9 +350,11 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 				if (engine.version == 1) {
 					// ensure there's a room to drop into, in C1
 					MetaRoom* m = world.map->metaRoomAt(x, y);
-					if (!m) return;
+					if (!m)
+						return;
 					std::shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
-					if (!r) return;
+					if (!r)
+						return;
 
 					carrying->queueScript(5, this); // drop
 
@@ -345,7 +369,8 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 					if (m) {
 						std::shared_ptr<Room> r = m->roomAt(carrying->x, carrying->y);
 						if (r) {
-							if (r->dropstatus == 0) allowdrop = false; // Never
+							if (r->dropstatus == 0)
+								allowdrop = false; // Never
 							else if (r->dropstatus == 1) { // Above-Floor
 								float floory = r->floorYatX(carrying->x);
 								if (floory < (carrying->y + carrying->getHeight())) {
@@ -358,8 +383,10 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 									}
 								}
 							}
-						} else allowdrop = false;
-					} else allowdrop = false;
+						} else
+							allowdrop = false;
+					} else
+						allowdrop = false;
 				}
 
 				/* deny drops which result in agents lying outside the room system */
@@ -378,7 +405,8 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 					}
 				} else {
 					if (engine.version == 2) {
-						if (overlay) delete overlay;
+						if (overlay)
+							delete overlay;
 						overlay = new DullPart(this, 0, "syst", 17, 0, 0, 1);
 						overlayTimer = 8;
 
@@ -389,15 +417,16 @@ void PointerAgent::handleEvent(BackendEvent &event) {
 					}
 				}
 			} else {
-				Agent *a = world.agentAt(x, y, false, true);
+				Agent* a = world.agentAt(x, y, false, true);
 				if (a) {
 					a->queueScript(4, this); // pickup
 				}
 			}
 		} else if (event.button == buttonmiddle) {
 			std::vector<std::shared_ptr<Room> > rooms = world.map->roomsAt(x, y);
-			if (rooms.size() > 0) std::cout << "Room at cursor is " << rooms[0]->id << std::endl;
-			Agent *a = world.agentAt(x, y, true);
+			if (rooms.size() > 0)
+				std::cout << "Room at cursor is " << rooms[0]->id << std::endl;
+			Agent* a = world.agentAt(x, y, true);
 			if (a)
 				std::cout << "Agent under mouse is " << a->identify();
 			else

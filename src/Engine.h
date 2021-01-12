@@ -20,8 +20,8 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
-#include <map>
 #include <ghc/filesystem.hpp>
+#include <map>
 #include <memory>
 
 class caosValue;
@@ -31,7 +31,7 @@ class MainCamera;
 struct BackendEvent;
 
 class Engine {
-protected:
+  protected:
 	unsigned int tickdata;
 	unsigned int ticktimes[10];
 	unsigned int ticktimeptr;
@@ -52,18 +52,18 @@ protected:
 
 	void handleKeyboardScrolling();
 	void handleResizedWindow();
-	void handleMouseMove(BackendEvent &event);
-	void handleMouseButton(BackendEvent &event);
-	void handleTextInput(BackendEvent &event);
-	void handleRawKeyDown(BackendEvent &event);
-	void handleRawKeyUp(BackendEvent &event);
+	void handleMouseMove(BackendEvent& event);
+	void handleMouseButton(BackendEvent& event);
+	void handleTextInput(BackendEvent& event);
+	void handleRawKeyDown(BackendEvent& event);
+	void handleRawKeyUp(BackendEvent& event);
 
-	class peFile *exefile;
+	class peFile* exefile;
 	void loadGameData();
 
-public:
+  public:
 	std::map<std::string, caosValue> eame_variables; // non-serialised
-	
+
 	std::shared_ptr<Backend> backend;
 	std::shared_ptr<class AudioBackend> audio;
 	std::shared_ptr<class NetBackend> net;
@@ -75,7 +75,9 @@ public:
 
 	std::vector<std::string> wordlist;
 	std::string translateWordlistWord(const std::string& s);
-	class peFile *getExeFile() { return exefile; }
+	class peFile* getExeFile() {
+		return exefile;
+	}
 
 	std::string getGameName() { return gamename; }
 
@@ -98,8 +100,8 @@ public:
 
 	void addPossibleBackend(std::string, std::shared_ptr<Backend>);
 	void addPossibleAudioBackend(std::string, std::shared_ptr<AudioBackend>);
-	
-	bool parseCommandLine(int argc, char *argv[]);
+
+	bool parseCommandLine(int argc, char* argv[]);
 	bool initialSetup();
 	void shutdown();
 

@@ -1,16 +1,18 @@
-#include "caos_assert.h"
 #include "TextEntryPart.h"
+
 #include "Agent.h"
 #include "Backend.h"
 #include "Engine.h"
-#include "creaturesImage.h"
-#include "imageManager.h"
-#include "encoding.h"
-#include "keycodes.h"
 #include "World.h"
+#include "caos_assert.h"
+#include "creaturesImage.h"
+#include "encoding.h"
+#include "imageManager.h"
+#include "keycodes.h"
 
-TextEntryPart::TextEntryPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-		                                  unsigned int _z, unsigned int msgid, std::string fontsprite) : TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
+TextEntryPart::TextEntryPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+	unsigned int _z, unsigned int msgid, std::string fontsprite)
+	: TextPart(p, _id, spritefile, fimg, _x, _y, _z, fontsprite) {
 	caretsprite = world.gallery->getImage("cursor");
 	caos_assert(caretsprite);
 
@@ -48,7 +50,8 @@ void TextEntryPart::handleTranslatedChar(unsigned char c) {
 void TextEntryPart::handleRawKey(uint8_t c) {
 	switch (c) {
 		case OPENC2E_KEY_BACKSPACE:
-			if (caretpos == 0) return;
+			if (caretpos == 0)
+				return;
 			text.erase(text.begin() + (caretpos - 1));
 			caretpos--;
 			break;
@@ -59,12 +62,14 @@ void TextEntryPart::handleRawKey(uint8_t c) {
 			return;
 
 		case OPENC2E_KEY_LEFT:
-			if (caretpos == 0) return;
+			if (caretpos == 0)
+				return;
 			caretpos--;
 			return;
 
 		case OPENC2E_KEY_RIGHT:
-			if (caretpos == text.size()) return;
+			if (caretpos == text.size())
+				return;
 			caretpos++;
 			return;
 
@@ -87,11 +92,11 @@ void TextEntryPart::handleRawKey(uint8_t c) {
 	recalculateData();
 }
 
-void TextEntryPart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
+void TextEntryPart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 	TextPart::partRender(renderer, xoffset, yoffset, (focused ? this : 0));
 }
 
-void TextEntryPart::renderCaret(RenderTarget *renderer, int xoffset, int yoffset) {
+void TextEntryPart::renderCaret(RenderTarget* renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
 	renderer->renderCreaturesImage(caretsprite, caretpose, xoffset, yoffset, has_alpha ? alpha : 0);
 }

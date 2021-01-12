@@ -21,8 +21,9 @@
 #define BYTECODE_H 1
 
 #include "serfwd.h"
-#include <stdlib.h> // for NULL
+
 #include <assert.h>
+#include <stdlib.h> // for NULL
 #include <string>
 
 enum opcode_t {
@@ -122,15 +123,14 @@ enum opcode_t {
 	CAOS_ENUMPOP,
 
 	CAOS_INVALID
-}; 
+};
 
 static inline bool op_is_valid(opcode_t opcode) {
-	return (opcode >= 0 && opcode < CAOS_NONRELOC_END)
-		|| (opcode >  CAOS_RELOCATABLE_BEGIN && opcode < CAOS_INVALID);
+	return (opcode >= 0 && opcode < CAOS_NONRELOC_END) || (opcode > CAOS_RELOCATABLE_BEGIN && opcode < CAOS_INVALID);
 }
 
 static inline bool op_is_relocatable(opcode_t opcode) {
-	return (opcode >  CAOS_RELOCATABLE_BEGIN && opcode < CAOS_INVALID);
+	return (opcode > CAOS_RELOCATABLE_BEGIN && opcode < CAOS_INVALID);
 }
 
 struct caosOp {
@@ -138,7 +138,7 @@ struct caosOp {
 	int argument : 24;
 	int traceindex; // -1 if unknown
 
-	caosOp(enum opcode_t oc, int arg, int ti){
+	caosOp(enum opcode_t oc, int arg, int ti) {
 		assert(op_is_valid(oc));
 		assert(arg >= -(1 << 24) && arg < (1 << 24));
 		assert(ti >= -1);
@@ -146,12 +146,13 @@ struct caosOp {
 		argument = arg;
 		traceindex = ti;
 	}
-private:
+
+  private:
 	FRIEND_SERIALIZE(caosOp)
-	caosOp() { }
+	caosOp() {}
 };
 
-std::string dumpOp(const class Dialect *d, caosOp op);
+std::string dumpOp(const class Dialect* d, caosOp op);
 
 // Condition classes
 #define CEQ 1
@@ -160,13 +161,13 @@ std::string dumpOp(const class Dialect *d, caosOp op);
 #define CBT 8
 #define CBF 16
 #define CAND 32
-#define COR  0
+#define COR 0
 #define CONDITIONMASK (CEQ | CLT | CGT | CBT | CBF)
 #define CLE (CEQ | CLT)
 #define CGE (CEQ | CGT)
 #define CNE (CLT | CGT)
 
-extern const char *cnams[];
+extern const char* cnams[];
 
 #endif
 /* vim: set noet: */

@@ -1,9 +1,11 @@
-#include "endianlove.h"
 #include "s16Image.h"
+
+#include "endianlove.h"
 #include "shared_array.h"
+
 #include <vector>
 
-MultiImage ReadS16File(std::istream &in) {
+MultiImage ReadS16File(std::istream& in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	imageformat imgformat = is_565 ? if_rgb565 : if_rgb555;

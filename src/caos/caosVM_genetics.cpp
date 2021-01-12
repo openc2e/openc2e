@@ -17,12 +17,13 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
 #include "World.h"
+#include "caosVM.h"
+#include "caos_assert.h"
 #include "creatures/CreatureAgent.h"
 #include "fileformats/genomeFile.h"
 #include "historyManager.h"
+
 #include <cassert>
 #include <fstream>
 #include <memory>
@@ -33,7 +34,7 @@
  
  Clone a genome. A new moniker is created.
 */
-void c_GENE_CLON(caosVM *vm) {
+void c_GENE_CLON(caosVM* vm) {
 	VM_PARAM_INTEGER(src_slot)
 	VM_PARAM_VALIDAGENT(src_agent)
 	VM_PARAM_INTEGER(dest_slot)
@@ -48,7 +49,7 @@ void c_GENE_CLON(caosVM *vm) {
 
  Cross two genomes, creating a new one.
 */
-void c_GENE_CROS(caosVM *vm) {
+void c_GENE_CROS(caosVM* vm) {
 	VM_PARAM_INTEGER(dad_mutation_degree)
 	VM_PARAM_INTEGER(dad_mutation_chance)
 	VM_PARAM_INTEGER(mum_mutation_degree)
@@ -69,7 +70,7 @@ void c_GENE_CROS(caosVM *vm) {
 
  Delete a genome from a slot.
 */
-void c_GENE_KILL(caosVM *vm) {
+void c_GENE_KILL(caosVM* vm) {
 	VM_PARAM_INTEGER(slot)
 	VM_PARAM_VALIDAGENT(agent)
 
@@ -82,7 +83,7 @@ void c_GENE_KILL(caosVM *vm) {
 
  Load a genome file into a slot. You can use * and ? wildcards in the filename.
 */
-void c_GENE_LOAD(caosVM *vm) {
+void c_GENE_LOAD(caosVM* vm) {
 	VM_PARAM_STRING(genefile)
 	VM_PARAM_INTEGER(slot)
 	VM_PARAM_VALIDAGENT(agent)
@@ -90,7 +91,7 @@ void c_GENE_LOAD(caosVM *vm) {
 	std::shared_ptr<genomeFile> p = world.loadGenome(genefile);
 	if (!p)
 		throw creaturesException("failed to find genome file '" + genefile + "'");
-	
+
 	caos_assert(p->getVersion() == 3);
 
 	agent->genome_slots[slot] = p;
@@ -103,7 +104,7 @@ void c_GENE_LOAD(caosVM *vm) {
 
  Move a genome to another slot.
 */
-void c_GENE_MOVE(caosVM *vm) {
+void c_GENE_MOVE(caosVM* vm) {
 	VM_PARAM_INTEGER(src_slot)
 	VM_PARAM_VALIDAGENT(src_agent)
 	VM_PARAM_INTEGER(dest_slot)
@@ -126,7 +127,7 @@ void c_GENE_MOVE(caosVM *vm) {
  
  Return the moniker stored in the given gene slot of the target agent.
 */
-void v_GTOS(caosVM *vm) {
+void v_GTOS(caosVM* vm) {
 	VM_PARAM_INTEGER(slot)
 
 	valid_agent(vm->targ);
@@ -144,7 +145,7 @@ void v_GTOS(caosVM *vm) {
 
  Return the agent which has the given moniker stored in a gene slot, or NULL if none.
 */
-void v_MTOA(caosVM *vm) {
+void v_MTOA(caosVM* vm) {
 	VM_PARAM_STRING(moniker)
 
 	caos_assert(world.history->hasMoniker(moniker));
@@ -157,14 +158,16 @@ void v_MTOA(caosVM *vm) {
 
  Return the live creature with the given moniker, or NULL if none.
 */
-void v_MTOC(caosVM *vm) {
+void v_MTOC(caosVM* vm) {
 	VM_PARAM_STRING(moniker)
 
 	vm->result.setAgent(0);
-	if (!world.history->hasMoniker(moniker)) return;
-	Agent *a = world.history->getMoniker(moniker).owner;
-	if (!a) return;
-	CreatureAgent *c = dynamic_cast<CreatureAgent *>(a);
+	if (!world.history->hasMoniker(moniker))
+		return;
+	Agent* a = world.history->getMoniker(moniker).owner;
+	if (!a)
+		return;
+	CreatureAgent* c = dynamic_cast<CreatureAgent*>(a);
 	caos_assert(c); // TODO: is this assert valid? can history events have non-creature owners?
 	vm->result.setAgent(a);
 }
@@ -174,7 +177,7 @@ void v_MTOC(caosVM *vm) {
  %status stub
  %variants c1 c2
 */
-void c_NEW_GENE(caosVM *vm) {
+void c_NEW_GENE(caosVM* vm) {
 	VM_PARAM_VARIABLE(destination)
 	VM_PARAM_INTEGER(dad)
 	VM_PARAM_INTEGER(mum)

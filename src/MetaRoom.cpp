@@ -17,20 +17,26 @@
  *
  */
 
-#include "caos_assert.h"
 #include "MetaRoom.h"
+
+#include "Backend.h"
+#include "Engine.h"
+#include "Map.h"
 #include "Room.h"
 #include "World.h"
-#include "Engine.h"
-#include "imageManager.h"
+#include "caos_assert.h"
 #include "fileformats/blkImage.h"
-#include "Map.h"
+#include "imageManager.h"
+
 #include <assert.h>
 #include <memory>
-#include "Backend.h"
 
-MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string &back, std::shared_ptr<creaturesImage> spr, bool wrap) {
-	xloc = _x; yloc = _y; wid = _width; hei = _height; wraps = wrap;
+MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string& back, std::shared_ptr<creaturesImage> spr, bool wrap) {
+	xloc = _x;
+	yloc = _y;
+	wid = _width;
+	hei = _height;
+	wraps = wrap;
 
 	// if we were provided with a background, add it
 	if (!back.empty()) {
@@ -50,7 +56,8 @@ void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> s
 	// TODO: cadv adds backgrounds which have already been added as the default, look into this,
 	// should we preserve the default once extra backgrounds have been added and change this to
 	// a caos_assert?
-	if (backgrounds.find(back) != backgrounds.end()) return;
+	if (backgrounds.find(back) != backgrounds.end())
+		return;
 
 	if (!spr) {
 		// we weren't passed a sprite, so we need to load one
@@ -73,7 +80,8 @@ void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> s
 		fullhei = totalheight;
 	} else {
 		// make sure other backgrounds are the same size
-		if (engine.gametype == "sm") return; // TODO: seamonkeys fails the background size checks :/
+		if (engine.gametype == "sm")
+			return; // TODO: seamonkeys fails the background size checks :/
 		assert(totalwidth == fullwid);
 		assert(totalheight == fullhei);
 	}
@@ -83,7 +91,7 @@ std::vector<std::string> MetaRoom::backgroundList() {
 	// construct a temporary vector from our std::map
 
 	std::vector<std::string> b;
-	for (auto & background : backgrounds)
+	for (auto& background : backgrounds)
 		b.push_back(background.first);
 	return b;
 }
@@ -93,14 +101,15 @@ std::shared_ptr<creaturesImage> MetaRoom::getBackground(std::string back) {
 	if (back.empty()) {
 		return firstback;
 	}
-	
+
 	// if this background name isn't found, return null
-	if (backgrounds.find(back) != backgrounds.end()) return std::shared_ptr<creaturesImage>();
-	
+	if (backgrounds.find(back) != backgrounds.end())
+		return std::shared_ptr<creaturesImage>();
+
 	// otherwise, return the relevant background
 	return backgrounds[back];
 }
-	
+
 MetaRoom::~MetaRoom() {
 	// we hold the only strong reference to our contained rooms, so they'll be auto-deleted
 }
@@ -108,8 +117,9 @@ MetaRoom::~MetaRoom() {
 std::shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
 	std::shared_ptr<Room> closest_up, closest_down;
 	float dist_down = -1, dist_up = -1;
-	for (auto & room : rooms) {
-		if (!room->bot.containsX(x)) continue;
+	for (auto& room : rooms) {
+		if (!room->bot.containsX(x))
+			continue;
 		float dist = room->bot.pointAtX(x).y - y; // down is positive
 		float absdist = fabs(dist);
 		if (dist >= 0 && (absdist < dist_down || dist_down < 0)) {
@@ -120,8 +130,10 @@ std::shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
 			closest_up = room;
 		}
 	}
-	if (closest_down) return closest_down;
-	if (closest_up) return closest_up;
+	if (closest_down)
+		return closest_down;
+	if (closest_up)
+		return closest_up;
 	return std::shared_ptr<Room>();
 }
 
@@ -137,12 +149,15 @@ unsigned int MetaRoom::addRoom(std::shared_ptr<Room> r) {
 
 std::shared_ptr<Room> MetaRoom::roomAt(float _x, float _y) {
 	if (wraps) {
-		if (_x > (int)xloc + (int)wid) _x -= wid;
-		else if (_x < (int)xloc) _x += wid;
+		if (_x > (int)xloc + (int)wid)
+			_x -= wid;
+		else if (_x < (int)xloc)
+			_x += wid;
 	}
 
 	for (auto r : rooms) {
-			if (r->containsPoint(_x, _y)) return r;
+		if (r->containsPoint(_x, _y))
+			return r;
 	}
 
 	return std::shared_ptr<Room>();
@@ -150,14 +165,17 @@ std::shared_ptr<Room> MetaRoom::roomAt(float _x, float _y) {
 
 std::vector<std::shared_ptr<Room> > MetaRoom::roomsAt(float _x, float _y) {
 	if (wraps) {
-		if (_x > (int)xloc + (int)wid) _x -= wid;
-		else if (_x < (int)xloc) _x += wid;
+		if (_x > (int)xloc + (int)wid)
+			_x -= wid;
+		else if (_x < (int)xloc)
+			_x += wid;
 	}
 
 	std::vector<std::shared_ptr<Room> > ourlist;
 
 	for (auto r : rooms) {
-			if (r->containsPoint(_x, _y)) ourlist.push_back(r);
+		if (r->containsPoint(_x, _y))
+			ourlist.push_back(r);
 	}
 
 	return ourlist;

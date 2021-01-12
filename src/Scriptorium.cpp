@@ -19,6 +19,7 @@
  */
 
 #include "Scriptorium.h"
+
 #include <iostream>
 #include <memory>
 
@@ -27,7 +28,7 @@ inline unsigned int Scriptorium::calculateValue(unsigned char family, unsigned c
 }
 
 void Scriptorium::addScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event, std::shared_ptr<script> s) {
-	std::map<unsigned short, std::shared_ptr<script> > &m = getScripts(calculateValue(family, genus, species));
+	std::map<unsigned short, std::shared_ptr<script> >& m = getScripts(calculateValue(family, genus, species));
 	m[event] = s;
 }
 
@@ -51,19 +52,23 @@ void Scriptorium::delScript(unsigned char family, unsigned char genus, unsigned 
 }
 
 std::shared_ptr<script> Scriptorium::getScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short event) {
-	std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(family, genus, species));
+	std::map<unsigned short, std::shared_ptr<script> >& x = getScripts(calculateValue(family, genus, species));
 	if (x.find(event) == x.end()) {
-		std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(family, genus, 0));
+		std::map<unsigned short, std::shared_ptr<script> >& x = getScripts(calculateValue(family, genus, 0));
 		if (x.find(event) == x.end()) {
-			std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(family, 0, 0));
+			std::map<unsigned short, std::shared_ptr<script> >& x = getScripts(calculateValue(family, 0, 0));
 			if (x.find(event) == x.end()) {
-				std::map<unsigned short, std::shared_ptr<script> > &x = getScripts(calculateValue(0, 0, 0));
+				std::map<unsigned short, std::shared_ptr<script> >& x = getScripts(calculateValue(0, 0, 0));
 				if (x.find(event) == x.end()) {
 					return std::shared_ptr<script>();
-				} else return x[event];
-			} else return x[event];
-		} else return x[event];
-	} else return x[event];
+				} else
+					return x[event];
+			} else
+				return x[event];
+		} else
+			return x[event];
+	} else
+		return x[event];
 }
 
 /* vim: set noet: */

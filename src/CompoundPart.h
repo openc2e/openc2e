@@ -21,6 +21,7 @@
 
 #include "partzorder.h"
 #include "renderable.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -30,13 +31,13 @@ class Agent;
 class creaturesImage;
 
 class CompoundPart : public renderable {
-protected:
-	std::multiset<CompoundPart *, partzorder>::iterator zorder_iter;
-	Agent *parent;
+  protected:
+	std::multiset<CompoundPart*, partzorder>::iterator zorder_iter;
+	Agent* parent;
 
-	CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z);
+	CompoundPart(Agent* p, unsigned int _id, int _x, int _y, int _z);
 
-public:
+  public:
 	int x, y;
 	unsigned int zorder, id;
 	unsigned int part_sequence_number;
@@ -44,13 +45,13 @@ public:
 	bool has_alpha;
 	unsigned char alpha;
 
-	virtual void render(class RenderTarget *renderer, int xoffset, int yoffset);
-	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset) = 0;
-	virtual void tick() { }
+	virtual void render(class RenderTarget* renderer, int xoffset, int yoffset);
+	virtual void partRender(class RenderTarget* renderer, int xoffset, int yoffset) = 0;
+	virtual void tick() {}
 
-	virtual void mouseIn() { }
-	virtual void mouseOut() { }
-	
+	virtual void mouseIn() {}
+	virtual void mouseOut() {}
+
 	virtual bool canGainFocus() { return false; }
 	virtual void gainFocus();
 	virtual void loseFocus();
@@ -64,13 +65,13 @@ public:
 	virtual bool showOnRemoteCameras();
 
 	virtual bool canClick();
-	
-	Agent *getParent() const { return parent; }
+
+	Agent* getParent() const { return parent; }
 	unsigned int getZOrder() const;
 	void zapZOrder();
 	void addZOrder();
 
-	bool operator < (const CompoundPart &b) const {
+	bool operator<(const CompoundPart& b) const {
 		return zorder < b.zorder;
 	}
 

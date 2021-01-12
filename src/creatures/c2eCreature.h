@@ -21,44 +21,45 @@
 #define __C2ECREATURE_H
 
 #include "Creature.h"
+
 #include <cassert>
 #include <memory>
 
 // c2e
 
 struct c2eReaction {
-	explicit c2eReaction(bioReactionGene *);
-	bioReactionGene *data;
+	explicit c2eReaction(bioReactionGene*);
+	bioReactionGene* data;
 	float rate;
 	unsigned int receptors;
-	void init(bioReactionGene *);
+	void init(bioReactionGene*);
 };
 
 struct c2eReceptor {
-	c2eReceptor(bioReceptorGene *, class c2eOrgan *);
-	bioReceptorGene *data;
+	c2eReceptor(bioReceptorGene*, class c2eOrgan*);
+	bioReceptorGene* data;
 	bool processed;
 	float lastvalue;
-	float *locus;
-	unsigned int *receptors;
+	float* locus;
+	unsigned int* receptors;
 	float nominal, threshold, gain;
 };
 
 struct c2eEmitter {
-	c2eEmitter(bioEmitterGene *, class c2eOrgan *);
-	bioEmitterGene *data;
+	c2eEmitter(bioEmitterGene*, class c2eOrgan*);
+	bioEmitterGene* data;
 	unsigned char sampletick;
-	float *locus;
+	float* locus;
 	float threshold, gain;
 };
 
 class c2eOrgan {
-protected:
+  protected:
 	friend struct c2eReceptor;
 	friend struct c2eEmitter;
 
-	class c2eCreature *parent;	
-	organGene *ourGene;
+	class c2eCreature* parent;
+	organGene* ourGene;
 
 	std::vector<std::shared_ptr<c2eReaction> > reactions;
 	std::vector<c2eReceptor> receptors;
@@ -66,22 +67,22 @@ protected:
 
 	// data
 	float energycost, atpdamagecoefficient;
-	
+
 	// variables
 	float lifeforce, shorttermlifeforce, longtermlifeforce;
-	
+
 	// locuses
 	float biotick, damagerate, repairrate, clockrate, injurytoapply;
 	unsigned int clockratereceptors, repairratereceptors, injuryreceptors;
 
-	void processReaction(c2eReaction &);
-	void processEmitter(c2eEmitter &);
-	void processReceptor(c2eReceptor &, bool checkchem);
-	
-	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int **receptors);
+	void processReaction(c2eReaction&);
+	void processEmitter(c2eEmitter&);
+	void processReceptor(c2eReceptor&, bool checkchem);
 
-public:
-	c2eOrgan(c2eCreature *p, organGene *g);
+	float* getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l, unsigned int** receptors);
+
+  public:
+	c2eOrgan(c2eCreature* p, organGene* g);
 	void tick();
 
 	void processGenes();
@@ -95,14 +96,14 @@ public:
 	float getShortTermLifeforce() { return shorttermlifeforce; }
 	float getLongTermLifeforce() { return longtermlifeforce; }
 	float getATPDamageCoefficient() { return atpdamagecoefficient; }
-	
-	
+
+
 	size_t getReceptorCount() { return receptors.size(); }
 	size_t getEmitterCount() { return emitters.size(); }
 	size_t getReactionCount() { return reactions.size(); }
 	void applyInjury(float);
 
-	std::vector<gene *> genes;
+	std::vector<gene*> genes;
 };
 
 struct c2eStim {
@@ -114,16 +115,27 @@ struct c2eStim {
 	int drive_id[4];
 	float drive_amount[4];
 	bool drive_silent[4];
-	
-	c2eStim() { noun_id = -1; verb_id = -1; drive_id[0] = -1; drive_id[1] = -1; drive_id[2] = -1; drive_id[3] = -1; }
-	void setupDriveStim(unsigned int num, int id, float amt, bool si) { drive_id[num] = id; drive_amount[num] = amt; drive_silent[num] = si; }
+
+	c2eStim() {
+		noun_id = -1;
+		verb_id = -1;
+		drive_id[0] = -1;
+		drive_id[1] = -1;
+		drive_id[2] = -1;
+		drive_id[3] = -1;
+	}
+	void setupDriveStim(unsigned int num, int id, float amt, bool si) {
+		drive_id[num] = id;
+		drive_amount[num] = amt;
+		drive_silent[num] = si;
+	}
 };
 
 class c2eCreature : public Creature {
-protected:
+  protected:
 	// brain config: should possibly be global
 	std::vector<unsigned int> mappinginfo;
-	
+
 	// biochemistry
 	std::vector<std::shared_ptr<c2eOrgan> > organs;
 	float chemicals[256];
@@ -139,41 +151,52 @@ protected:
 
 	unsigned int involactionlatency[8];
 
-	bioHalfLivesGene *halflives;
+	bioHalfLivesGene* halflives;
 
-	class c2eBrain *brain;
+	class c2eBrain* brain;
 
 	void tickBrain();
 	bool processInstinct();
 	void tickBiochemistry();
 	void processGenes();
-	void addGene(gene *);
+	void addGene(gene*);
 
 	int reverseMapVerbToNeuron(unsigned int verb);
 	AgentRef selectRepresentativeAgent(int type, std::vector<AgentRef> possibles);
 
-public:
-	c2eCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+  public:
+	c2eCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent* a);
 
 	void tick();
 
 	void adjustChemical(unsigned char id, float value);
 	float getChemical(unsigned char id) { return chemicals[id]; }
 	void adjustDrive(unsigned int id, float value);
-	float getDrive(unsigned int id) { assert(id < 20); return drives[id]; }
+	float getDrive(unsigned int id) {
+		assert(id < 20);
+		return drives[id];
+	}
 
-	void setInvolActionLatency(unsigned int id, unsigned int n) { assert(id < 8); involactionlatency[id] = n; }
+	void setInvolActionLatency(unsigned int id, unsigned int n) {
+		assert(id < 8);
+		involactionlatency[id] = n;
+	}
 
-	void handleStimulus(c2eStim &stim);
+	void handleStimulus(c2eStim& stim);
 	void handleStimulus(unsigned int id, float strength);
 
 	unsigned int noOrgans() { return organs.size(); }
-	std::shared_ptr<c2eOrgan> getOrgan(unsigned int i) { assert(i < organs.size()); return organs[i]; }
-	
-	class c2eBrain *getBrain() { return brain; }
+	std::shared_ptr<c2eOrgan> getOrgan(unsigned int i) {
+		assert(i < organs.size());
+		return organs[i];
+	}
 
-	float *getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
-	
+	class c2eBrain* getBrain() {
+		return brain;
+	}
+
+	float* getLocusPointer(bool receptor, unsigned char o, unsigned char t, unsigned char l);
+
 	unsigned int getGait();
 };
 

@@ -18,20 +18,26 @@
  */
 
 #include "Vehicle.h"
+
 #include "Engine.h"
+
 #include <cassert>
 
 Vehicle::Vehicle(unsigned int family, unsigned int genus, unsigned int species, unsigned int plane,
-		std::string spritefile, unsigned int firstimage, unsigned int imagecount) :
-		CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
+	std::string spritefile, unsigned int firstimage, unsigned int imagecount)
+	: CompoundAgent(family, genus, species, plane, spritefile, firstimage, imagecount) {
 	capacity = 0;
 	bump = 0;
 
-	cabinleft = 0; cabintop = 0; cabinright = getWidth(); cabinbottom = getHeight();
+	cabinleft = 0;
+	cabintop = 0;
+	cabinright = getWidth();
+	cabinbottom = getHeight();
 	cabinplane = 1; // TODO: is this sane? seems to be the default in c2e
 }
 
-Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount) : CompoundAgent(spritefile, firstimage, imagecount) {
+Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int imagecount)
+	: CompoundAgent(spritefile, firstimage, imagecount) {
 	capacity = 0;
 	bump = 0;
 
@@ -41,7 +47,8 @@ Vehicle::Vehicle(std::string spritefile, unsigned int firstimage, unsigned int i
 
 void Vehicle::tick() {
 	CompoundAgent::tick();
-	if (paused) return;
+	if (paused)
+		return;
 
 	// move by xvec/yvec!
 	moveTo(x + xvec / 256.0, y + yvec / 256.0);
@@ -50,33 +57,41 @@ void Vehicle::tick() {
 void Vehicle::carry(AgentRef passenger) {
 	// TODO: 'return' is not a good idea here, because the callung function already does stuff
 
-	if (passenger->carriedby) return; // TODO: change to assert?
-	if (passenger->invehicle) return; // TODO: change to assert?
+	if (passenger->carriedby)
+		return; // TODO: change to assert?
+	if (passenger->invehicle)
+		return; // TODO: change to assert?
 
 	int cabinwidth = cabinright - cabinleft;
 	int cabinheight = cabinbottom - cabintop;
 
 	if (engine.version > 2) {
 		// reject if passenger is too big
-		if ((int)passenger->getWidth() > cabinwidth) return;
-		if ((int)passenger->getHeight() > cabinheight) return;
+		if ((int)passenger->getWidth() > cabinwidth)
+			return;
+		if ((int)passenger->getHeight() > cabinheight)
+			return;
 	}
 
 	// push into our cabin
 	// TODO: should we use moveTo here?
-	if (passenger->x + passenger->getWidth() > (x + cabinright)) passenger->x = x + cabinright - passenger->getWidth();
-	if (passenger->x < (x + cabinleft)) passenger->x = x + cabinleft;
+	if (passenger->x + passenger->getWidth() > (x + cabinright))
+		passenger->x = x + cabinright - passenger->getWidth();
+	if (passenger->x < (x + cabinleft))
+		passenger->x = x + cabinleft;
 	if (engine.version > 1) {
 		// TODO: not sure if this is good for too-high agents, if it's possible for them to exist (see comment above)
-		if (passenger->y + passenger->getHeight() > (y + cabinbottom)) passenger->y = y + cabinbottom - passenger->getHeight();
-		if (passenger->y < (y + cabintop)) passenger->y = y + cabintop;
+		if (passenger->y + passenger->getHeight() > (y + cabinbottom))
+			passenger->y = y + cabinbottom - passenger->getHeight();
+		if (passenger->y < (y + cabintop))
+			passenger->y = y + cabintop;
 	} else {
 		passenger->y = y + cabinbottom - passenger->getHeight();
 	}
 
 	passengers.push_back(passenger);
 	passenger->invehicle = this;
-	
+
 	if (engine.version >= 3)
 		passenger->queueScript(121, this); // Vehicle Pickup, TODO: is this valid call?
 }
@@ -97,8 +112,9 @@ void Vehicle::drop(AgentRef passenger) {
 void Vehicle::adjustCarried(float xoffset, float yoffset) {
 	Agent::adjustCarried(xoffset, yoffset);
 
-	for (auto & passenger : passengers) {
-		if (!passenger) continue; // TODO: muh
+	for (auto& passenger : passengers) {
+		if (!passenger)
+			continue; // TODO: muh
 		passenger->moveTo(passenger->x + xoffset, passenger->y + yoffset);
 	}
 }
@@ -106,10 +122,12 @@ void Vehicle::adjustCarried(float xoffset, float yoffset) {
 void Vehicle::kill() {
 	// TODO: sane?
 	while (passengers.size() > 0) {
-		if (passengers[0]) dropCarried(passengers[0]);
-		else passengers.erase(passengers.begin());
+		if (passengers[0])
+			dropCarried(passengers[0]);
+		else
+			passengers.erase(passengers.begin());
 	}
-	
+
 	Agent::kill();
 }
 

@@ -17,11 +17,12 @@
  *
  */
 
-#include "c1defaultpalette.h"
-#include "endianlove.h"
 #include "sprImage.h"
 
-MultiImage ReadSprFile(std::istream &in) {
+#include "c1defaultpalette.h"
+#include "endianlove.h"
+
+MultiImage ReadSprFile(std::istream& in) {
 	int numframes = read16le(in);
 	MultiImage images(numframes);
 

@@ -1,15 +1,15 @@
 #include "AgentInjector.h"
 
-#include <imgui.h>
-#include <imgui_internal.h>
-#include <ghc/filesystem.hpp>
-
 #include "Backend.h"
 #include "CobManager.h"
-#include "Texture.h"
 #include "Engine.h"
 #include "ImGuiUtils.h"
+#include "Texture.h"
 #include "World.h"
+
+#include <ghc/filesystem.hpp>
+#include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Openc2eImgui {
 
@@ -26,14 +26,13 @@ static void DrawAgentPreview(Texture& texture) {
 	ImDrawList* drawlist = ImGui::GetWindowDrawList();
 	ImVec2 p = ImGui::GetCursorScreenPos();
 	// should be approx 300 x 170. Alima.bmp is 312 x 211
-	
+
 	ImRect bb(p, p + size);
 	drawlist->AddRectFilled(
 		bb.Min,
 		bb.Max,
 		IM_COL32(0, 0, 0, 255),
-		ImGui::GetStyle().FrameRounding
-	);
+		ImGui::GetStyle().FrameRounding);
 
 	if (texture) {
 		int w = texture.width, h = texture.height;
@@ -51,7 +50,7 @@ bool IsAgentInjectorEnabled() {
 }
 
 void SetAgentInjectorOpen(bool is_open) {
-  s_agent_injector_open = is_open;
+	s_agent_injector_open = is_open;
 }
 
 void DrawAgentInjector() {
@@ -74,9 +73,8 @@ void DrawAgentInjector() {
 		}
 
 		if (!s_cob_texture && s_object_selected_index < s_object_injector.objects.size()) {
-				s_cob_texture = engine.backend->createTexture(
-					s_object_injector.getPicture(s_object_injector.objects[s_object_selected_index])
-				);
+			s_cob_texture = engine.backend->createTexture(
+				s_object_injector.getPicture(s_object_injector.objects[s_object_selected_index]));
 		}
 		DrawAgentPreview(s_cob_texture);
 
@@ -91,7 +89,7 @@ void DrawAgentInjector() {
 		} else {
 			ImGuiUtils::DisabledButton("Remove Object");
 		}
-		
+
 		ImGuiUtils::EndWindow();
 	}
 }

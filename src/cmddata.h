@@ -41,13 +41,13 @@ struct cmdinfo {
 	void (*handler)(caosVM*);
 	void (*savehandler)(caosVM*);
 
-	const char *lookup_key;
-	const char *name;
-	const char *fullname;
-	const char *docs;
+	const char* lookup_key;
+	const char* name;
+	const char* fullname;
+	const char* docs;
 	int argc;
 	int stackdelta;
-	const enum ci_type *argtypes;
+	const enum ci_type* argtypes;
 	enum ci_type rettype;
 	int evalcost;
 };

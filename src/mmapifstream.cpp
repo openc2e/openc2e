@@ -18,15 +18,17 @@
  */
 
 #include "mmapifstream.h"
+
 #include <cassert>
 #ifdef _WIN32
 #include <windows.h>
 #else // assume POSIX
-#include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/types.h>
 #endif
 
-mmapifstream::mmapifstream() {}
+mmapifstream::mmapifstream() {
+}
 
 mmapifstream::mmapifstream(const std::string& filename) {
 #ifdef _WIN32
@@ -40,9 +42,9 @@ mmapifstream::mmapifstream(const std::string& filename) {
 	};
 	filesize = lifilesize.QuadPart;
 	HANDLE hMap = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-	void *mapr = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+	void* mapr = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
 #else
-	FILE *f = fopen(filename.c_str(), "r");
+	FILE* f = fopen(filename.c_str(), "r");
 	assert(f);
 	if (!f) {
 		setstate(failbit);
@@ -55,12 +57,12 @@ mmapifstream::mmapifstream(const std::string& filename) {
 	filesize = ftell(f);
 	assert((int)filesize != -1);
 
-	void *mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, fno, 0);
+	void* mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, fno, 0);
 	fclose(f); // we don't need it, now!
 #endif
 
-	assert(mapr != (void *)-1);
-	map = (char *)mapr;
+	assert(mapr != (void*)-1);
+	map = (char*)mapr;
 	buf = spanstreambuf(map, filesize);
 }
 

@@ -12,13 +12,14 @@ struct zip_impl {
 		TIter left_end;
 		UIter right_end;
 		iterator(TIter left_iter_, UIter right_iter_, TIter left_end_, UIter right_end_)
-			: left_iter(left_iter_), right_iter(right_iter_), left_end(left_end_), right_end(right_end_)
-			{}
+			: left_iter(left_iter_), right_iter(right_iter_), left_end(left_end_), right_end(right_end_) {}
 		iterator& operator++() {
 			left_iter++;
 			right_iter++;
-			if (left_iter == left_end) right_iter = right_end;
-			if (right_iter == right_end) left_iter = left_end;
+			if (left_iter == left_end)
+				right_iter = right_end;
+			if (right_iter == right_end)
+				left_iter = left_end;
 			return *this;
 		}
 		auto operator*() {
@@ -31,12 +32,13 @@ struct zip_impl {
 			return !(*this == other);
 		}
 	};
-	
+
 	T left;
 	U right;
-	
-	zip_impl(T left_, U right_) : left(left_), right(right_) {}
-	
+
+	zip_impl(T left_, U right_)
+		: left(left_), right(right_) {}
+
 	auto begin() {
 		return iterator(left.begin(), right.begin(), left.end(), right.end());
 	}

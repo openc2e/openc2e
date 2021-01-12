@@ -17,22 +17,26 @@
  *
  */
 
+#include "prayManager.h"
+
+#include "Catalogue.h"
+#include "World.h" // data_directories
+#include "creaturesException.h"
 #include "fileformats/PrayFileReader.h"
 
-#include "prayManager.h"
-#include "creaturesException.h"
-#include "World.h" // data_directories
-#include "Catalogue.h"
 #include <cassert>
 #include <ghc/filesystem.hpp>
 
-PrayBlock::PrayBlock() {}
+PrayBlock::PrayBlock() {
+}
 
 PrayBlock::PrayBlock(const std::string& filename_, const std::string& type_, const std::string& name_, bool compressed_)
 	: loaded(false), tagsloaded(false), buffer(), compressed(compressed_),
-	  size(0), compressedsize(0), filename(filename_), type(type_), name(name_)  {}
+	  size(0), compressedsize(0), filename(filename_), type(type_), name(name_) {
+}
 
-PrayBlock::~PrayBlock() {}
+PrayBlock::~PrayBlock() {
+}
 
 void PrayBlock::load() {
 	if (loaded) {
@@ -109,7 +113,7 @@ void prayManager::update() {
 		return;
 	}
 
-	const std::vector<std::string> &extensions = catalogue.getTag("Pray System File Extensions");
+	const std::vector<std::string>& extensions = catalogue.getTag("Pray System File Extensions");
 
 	for (auto dd : world.data_directories) {
 		assert(fs::exists(dd));
@@ -121,13 +125,14 @@ void prayManager::update() {
 			fs::directory_iterator fsend;
 			for (fs::directory_iterator d(praydir); d != fsend; ++d) {
 				std::string x = d->path().extension().string();
-				if (!x.empty()) x.erase(x.begin());
+				if (!x.empty())
+					x.erase(x.begin());
 				if (std::find(extensions.begin(), extensions.end(), x) != extensions.end()) {
 					// TODO: language checking!
 					//std::cout << "scanning PRAY file " << d->path().string() << std::endl;
 					try {
 						addFile(*d);
-					} catch (creaturesException &e) {
+					} catch (creaturesException& e) {
 						std::cerr << "PRAY file \"" << d->path().string() << "\" failed to load: " << e.what() << std::endl;
 					}
 				}
@@ -144,11 +149,12 @@ std::string prayManager::getResourceDir(unsigned int type) {
 		case 3: return "Genetics/"; // genetics
 		case 4: return "Body Data/"; // body data
 		case 5: return "Overlay Data/"; // overlay data
-		case 6: return "Backgrounds/";// backgrounds
-		case 7: return "Catalogue/"; // catalogue
+		case 6: return "Backgrounds/"; // backgrounds
+		case 7:
+			return "Catalogue/"; // catalogue
 		//case 8: return "Bootstrap/"; // bootstrap
 		//case 9: return "My Worlds/"; // my worlds
-		case 10: return "My Creatures/";// my creatures
+		case 10: return "My Creatures/"; // my creatures
 		case 11: return "My Agents/"; // my agents
 	}
 

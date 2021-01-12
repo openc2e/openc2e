@@ -21,17 +21,18 @@
 #define _RENDERABLE_H
 
 #include "renderablezorder.h"
+
 #include <set>
 
 
 class renderable {
-protected:
+  protected:
 	bool added;
-	std::multiset<renderable *, renderablezorder>::iterator renders_iter;
-		
-public:
+	std::multiset<renderable*, renderablezorder>::iterator renders_iter;
+
+  public:
 	renderable() { added = false; }
-	virtual void render(class RenderTarget *renderer, int xoffset, int yoffset) = 0;
+	virtual void render(class RenderTarget* renderer, int xoffset, int yoffset) = 0;
 	virtual bool showOnRemoteCameras() { return true; }
 	virtual unsigned int getZOrder() const = 0;
 	virtual void zapZOrder();

@@ -17,11 +17,12 @@
  *
  */
 
-#include "caosVM.h"
-#include "World.h"
-#include "Engine.h"
-#include "Backend.h"
 #include "Agent.h"
+#include "Backend.h"
+#include "Engine.h"
+#include "World.h"
+#include "caosVM.h"
+
 #include <time.h> // gmtime and strftime
 
 /**
@@ -34,7 +35,7 @@
 
  You might want to use this to reduce the amount of agents created or the amount of processing done if the speed factor is above 1.0.
 */
-void v_PACE(caosVM *vm) {
+void v_PACE(caosVM* vm) {
 	vm->result.setFloat(world.pace);
 }
 
@@ -42,7 +43,7 @@ void v_PACE(caosVM *vm) {
  BUZZ (command) interval (integer)
  %status maybe
 */
-void c_BUZZ(caosVM *vm) {
+void c_BUZZ(caosVM* vm) {
 	VM_PARAM_INTEGER(interval)
 
 	world.ticktime = interval;
@@ -52,7 +53,7 @@ void c_BUZZ(caosVM *vm) {
  BUZZ (integer)
  %status maybe
 */
-void v_BUZZ(caosVM *vm) {
+void v_BUZZ(caosVM* vm) {
 	vm->result.setInt(world.ticktime);
 }
 
@@ -62,7 +63,7 @@ void v_BUZZ(caosVM *vm) {
 
  Returns the day in the season of the current game world, starting at 0.
 */
-void v_DATE(caosVM *vm) {
+void v_DATE(caosVM* vm) {
 	vm->result.setInt(world.dayofseason);
 }
 
@@ -72,7 +73,7 @@ void v_DATE(caosVM *vm) {
  
  Returns the day in the season of the current game world at the specified world tick, starting at 0. See DATE.
 */
-void v_HIST_DATE(caosVM *vm) {
+void v_HIST_DATE(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
 
 	vm->result.setInt(0); // TODO
@@ -85,7 +86,7 @@ void v_HIST_DATE(caosVM *vm) {
 
  Returns the current game world season. 0 is spring, 1 is summer, 2 is autumn and 3 is winter.
 */
-void v_SEAN(caosVM *vm) {
+void v_SEAN(caosVM* vm) {
 	vm->result.setInt(world.season);
 }
 
@@ -95,7 +96,7 @@ void v_SEAN(caosVM *vm) {
 
  Returns the current game world season at the specified world tick. 0 is spring, 1 is summer, 2 is autumn and 3 is winter. See SEAN.
 */
-void v_HIST_SEAN(caosVM *vm) {
+void v_HIST_SEAN(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
 
 	vm->result.setInt(0); // TODO
@@ -107,7 +108,7 @@ void v_HIST_SEAN(caosVM *vm) {
 
  Returns the time of day in the current game world. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night.
 */
-void v_TIME(caosVM *vm) {
+void v_TIME(caosVM* vm) {
 	vm->result.setInt(world.timeofday);
 }
 
@@ -117,7 +118,7 @@ void v_TIME(caosVM *vm) {
  
  Returns the time of day in the current game world at the specified world tick. 0 is dawn, 1 is morning, 2 is afternoon, 3 is evening and 4 is night. See TIME.
 */
-void v_HIST_TIME(caosVM *vm) {
+void v_HIST_TIME(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
 
 	vm->result.setInt(0); // TODO
@@ -130,7 +131,7 @@ void v_HIST_TIME(caosVM *vm) {
 
  Returns the number of game years elapsed in the current world.
 */
-void v_YEAR(caosVM *vm) {
+void v_YEAR(caosVM* vm) {
 	vm->result.setInt(world.year);
 }
 
@@ -140,7 +141,7 @@ void v_YEAR(caosVM *vm) {
 
  Returns the number of game years elapsed at the specified world tick. See YEAR.
 */
-void v_HIST_YEAR(caosVM *vm) {
+void v_HIST_YEAR(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
 
 	vm->result.setInt(0); // TODO
@@ -150,7 +151,7 @@ void v_HIST_YEAR(caosVM *vm) {
  MSEC (integer)
  %status maybe
 */
-void v_MSEC(caosVM *vm) {
+void v_MSEC(caosVM* vm) {
 	vm->result.setInt(engine.backend->ticks());
 }
 
@@ -160,7 +161,7 @@ void v_MSEC(caosVM *vm) {
  
  If paused is 0, enable world ticks, otherwise (1) disable them.
 */
-void c_WPAU(caosVM *vm) {
+void c_WPAU(caosVM* vm) {
 	VM_PARAM_INTEGER(paused)
 
 	// TODO
@@ -172,7 +173,7 @@ void c_WPAU(caosVM *vm) {
 
  Returns 1 if world ticks are paused, or 0 otherwise.
 */
-void v_WPAU(caosVM *vm) {
+void v_WPAU(caosVM* vm) {
 	vm->result.setInt(0); // TODO
 }
 
@@ -182,7 +183,7 @@ void v_WPAU(caosVM *vm) {
 
  If paused is 0, unpause target agent, otherwise (1) pause it.
 */
-void c_PAUS(caosVM *vm) {
+void c_PAUS(caosVM* vm) {
 	VM_PARAM_INTEGER(paused)
 
 	valid_agent(vm->targ);
@@ -196,7 +197,7 @@ void c_PAUS(caosVM *vm) {
 
  Returns 1 if target agent is paused, or 0 otherwise.
 */
-void v_PAUS(caosVM *vm) {
+void v_PAUS(caosVM* vm) {
 	valid_agent(vm->targ);
 
 	if (vm->targ->paused)
@@ -211,10 +212,10 @@ void v_PAUS(caosVM *vm) {
 
  Returns the result of strftime with the current timestamp and format.
 */
-void v_RTIF(caosVM *vm) {
+void v_RTIF(caosVM* vm) {
 	VM_PARAM_STRING(format)
 	VM_PARAM_INTEGER(timestamp)
-	
+
 	char buffer[1000]; // no idea what maximum length should be.. we can't really do this dynamically
 	time_t tstamp = timestamp;
 	strftime(buffer, 1000, format.c_str(), gmtime(&tstamp)); // TODO: does gmtime return null?
@@ -226,7 +227,7 @@ void v_RTIF(caosVM *vm) {
  RTIM (integer)
  %status maybe
 */
-void v_RTIM(caosVM *vm) {
+void v_RTIM(caosVM* vm) {
 	vm->result.setInt(time(0));
 }
 
@@ -234,7 +235,7 @@ void v_RTIM(caosVM *vm) {
  WTIK (integer)
  %status maybe
 */
-void v_WTIK(caosVM *vm) {
+void v_WTIK(caosVM* vm) {
 	vm->result.setInt(world.worldtickcount);
 }
 
@@ -242,7 +243,7 @@ void v_WTIK(caosVM *vm) {
  RACE (integer)
  %status maybe
 */
-void v_RACE(caosVM *vm) {
+void v_RACE(caosVM* vm) {
 	vm->result.setInt(world.race);
 }
 
@@ -250,7 +251,7 @@ void v_RACE(caosVM *vm) {
  ETIK (integer)
  %status maybe
 */
-void v_ETIK(caosVM *vm) {
+void v_ETIK(caosVM* vm) {
 	vm->result.setInt(world.tickcount);
 }
 
@@ -268,7 +269,7 @@ void c_ASEA(caosVM*) {
  %status maybe
  %variants c2
 */
-void v_TMOD(caosVM *vm) {
+void v_TMOD(caosVM* vm) {
 	vm->result.setInt(world.timeofday); // TODO
 }
 
@@ -277,7 +278,7 @@ void v_TMOD(caosVM *vm) {
  %status maybe
  %variants c2
 */
-void v_SEAV(caosVM *vm) {
+void v_SEAV(caosVM* vm) {
 	// TODO: hardcoding bad?
 	vm->result.setInt((world.dayofseason * 4) + world.timeofday);
 }
@@ -286,7 +287,7 @@ void v_SEAV(caosVM *vm) {
  DAYT (integer)
  %status stub
 */
-void v_DAYT(caosVM *vm) {
+void v_DAYT(caosVM* vm) {
 	vm->result.setInt(0); // TODO
 }
 
@@ -294,7 +295,7 @@ void v_DAYT(caosVM *vm) {
  MONT (integer)
  %status stub
 */
-void v_MONT(caosVM *vm) {
+void v_MONT(caosVM* vm) {
 	vm->result.setInt(0); // TODO
 }
 

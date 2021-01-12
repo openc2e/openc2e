@@ -23,11 +23,12 @@
 #include "AgentRef.h"
 #include "partzorder.h"
 #include "renderablezorder.h"
+
+#include <list>
+#include <map>
 #include <memory>
 #include <set>
 #include <string>
-#include <map>
-#include <list>
 #include <vector>
 
 class caosValue;
@@ -51,21 +52,21 @@ struct cainfo {
 };
 
 class World {
-protected:
-	class PointerAgent *theHand;
+  protected:
+	class PointerAgent* theHand;
 	std::list<scriptevent> scriptqueue;
 
 	std::map<int, std::weak_ptr<Agent> > unidmap;
-	std::vector<caosVM *> vmpool;
+	std::vector<caosVM*> vmpool;
 
-public:
+  public:
 	int vmpool_size() const { return vmpool.size(); }
 	bool quitting, saving, paused;
 
 	std::unique_ptr<Map> map;
 
-	std::multiset<CompoundPart *, partzorder> zorder; // sorted from top to bottom
-	std::multiset<renderable *, renderablezorder> renders; // sorted from bottom to top
+	std::multiset<CompoundPart*, partzorder> zorder; // sorted from top to bottom
+	std::multiset<renderable*, renderablezorder> renders; // sorted from bottom to top
 	std::list<std::shared_ptr<Agent> > agents;
 
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
@@ -88,17 +89,20 @@ public:
 
 	AgentRef selectedcreature;
 	void selectCreature(std::shared_ptr<Agent> c);
-	AgentRef focusagent; unsigned int focuspart;
-	void setFocus(class CompoundPart *p);
+	AgentRef focusagent;
+	unsigned int focuspart;
+	void setFocus(class CompoundPart* p);
 
-	Agent *agentAt(unsigned int x, unsigned int y, bool obey_all_transparency = true, bool needs_mouseable = false);
-	CompoundPart *partAt(unsigned int x, unsigned int y, bool obey_all_transparency = true, bool needs_mouseable = false, bool needs_activateable = false);
-	class PointerAgent *hand() { return theHand; }
-	
-	caosVM *getVM(Agent *owner);
-	void freeVM(caosVM *);
+	Agent* agentAt(unsigned int x, unsigned int y, bool obey_all_transparency = true, bool needs_mouseable = false);
+	CompoundPart* partAt(unsigned int x, unsigned int y, bool obey_all_transparency = true, bool needs_mouseable = false, bool needs_activateable = false);
+	class PointerAgent* hand() {
+		return theHand;
+	}
+
+	caosVM* getVM(Agent* owner);
+	void freeVM(caosVM*);
 	void queueScript(unsigned short event, AgentRef agent, AgentRef from, caosValue p0, caosValue p1);
-	
+
 	World();
 	~World();
 	void init();
@@ -114,17 +118,17 @@ public:
 	std::vector<std::string> findFiles(std::string dir, std::string wild);
 
 	void newMoniker(std::shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
-	std::shared_ptr<genomeFile> loadGenome(std::string &filename);
+	std::shared_ptr<genomeFile> loadGenome(std::string& filename);
 	std::string generateMoniker(std::string basename);
 
 	int findCategory(unsigned char family, unsigned char genus, unsigned short species);
-	
+
 	void tick();
 	void drawWorld();
-	void drawWorld(class Camera *cam, RenderTarget *surface);
+	void drawWorld(class Camera* cam, RenderTarget* surface);
 
-	int newUNID(Agent *whofor);
-	void setUNID(Agent *whofor, int unid);
+	int newUNID(Agent* whofor);
+	void setUNID(Agent* whofor, int unid);
 	void freeUNID(int unid);
 
 	std::shared_ptr<Agent> lookupUNID(int unid);

@@ -31,16 +31,16 @@ class Agent;
 class CreatureAgent;
 
 class Creature {
-protected:
-	CreatureAgent *parent;
-	Agent *parentagent;
+  protected:
+	CreatureAgent* parent;
+	Agent* parentagent;
 	std::shared_ptr<genomeFile> genome;
 
 	// non-specific bits
 	unsigned short genus;
 	unsigned int variant;
 	bool female;
-	
+
 	// state
 	bool alive, asleep, dreaming, tickage;
 	bool zombie;
@@ -51,7 +51,7 @@ protected:
 
 	AgentRef attention;
 	int attn, decn;
-	
+
 	std::vector<AgentRef> chosenagents;
 	bool agentInSight(AgentRef a);
 	void chooseAgents();
@@ -65,19 +65,19 @@ protected:
 	// linguistic stuff
 
 	// to-be-processed instincts
-	std::deque<creatureInstinctGene *> unprocessedinstincts;
+	std::deque<creatureInstinctGene*> unprocessedinstincts;
 
 	// conscious flag? brain/motor enabled flags? flags for each 'faculty'?
-	
+
 	unsigned short tintinfo[5]; // red, green, blue, rotation, swap
 
 	virtual void processGenes();
-	virtual void addGene(gene *);
+	virtual void addGene(gene*);
 
-	Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent *a);
+	Creature(std::shared_ptr<genomeFile> g, bool is_female, unsigned char _variant, CreatureAgent* a);
 	void finishInit();
 
-public:
+  public:
 	virtual ~Creature();
 	virtual void tick();
 
@@ -102,17 +102,20 @@ public:
 	size_t getNoUnprocessedInstincts() { return unprocessedinstincts.size(); }
 
 	size_t getNoCategories() { return chosenagents.size(); }
-	AgentRef getChosenAgentForCategory(unsigned int cat) { assert(cat < chosenagents.size()); return chosenagents[cat]; }
+	AgentRef getChosenAgentForCategory(unsigned int cat) {
+		assert(cat < chosenagents.size());
+		return chosenagents[cat];
+	}
 	AgentRef getAttentionFocus() { return attention; }
 	int getAttentionId() { return attn; }
 	int getDecisionId() { return decn; }
 
 	virtual unsigned int getGait() = 0;
-	
+
 	void born();
 	void die();
-	
-	bool shouldProcessGene(gene *);
+
+	bool shouldProcessGene(gene*);
 };
 
 #endif

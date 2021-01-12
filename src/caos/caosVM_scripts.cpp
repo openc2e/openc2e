@@ -17,13 +17,14 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
-#include "caosScript.h"
-#include "World.h"
-#include "Engine.h"
 #include "Agent.h"
+#include "Engine.h"
 #include "Scriptorium.h"
+#include "World.h"
+#include "caosScript.h"
+#include "caosVM.h"
+#include "caos_assert.h"
+
 #include <iostream>
 #include <memory>
 using std::cerr;
@@ -36,7 +37,7 @@ using std::cerr;
  Forces the following commands to be executed in one tick, rather than scheduling them, until SLOW or the end 
  of the script is encountered.
  */
-void c_INST(caosVM *vm) {
+void c_INST(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	vm->inst = true;
 	// TODO: do we need a state similar to locked? i commented it out because it doesn't seem right - fuzzie
@@ -50,9 +51,9 @@ void c_INST(caosVM *vm) {
 
  Reverses the effects of INST.
  */
-void c_SLOW(caosVM *vm) {
+void c_SLOW(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
-	
+
 	vm->inst = false;
 }
 
@@ -63,7 +64,7 @@ void c_SLOW(caosVM *vm) {
 
  Prevent the script from being interrupted by another until UNLK or the end of the script is encountered.
  */
-void c_LOCK(caosVM *vm) {
+void c_LOCK(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	vm->lock = true;
 }
@@ -75,23 +76,25 @@ void c_LOCK(caosVM *vm) {
 
  Reverses the effects of LOCK.
  */
-void c_UNLK(caosVM *vm) {
+void c_UNLK(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
-	
+
 	vm->lock = false;
 }
 
 class blockUntilTime : public blockCond {
-	protected:
-		unsigned int end;
-	public:
-		bool operator()() {
-			if (world.tickcount < end)
-				return true;
-			return false;
-		}
+  protected:
+	unsigned int end;
 
-		blockUntilTime(int delta) : end(world.tickcount + delta) {}
+  public:
+	bool operator()() {
+		if (world.tickcount < end)
+			return true;
+		return false;
+	}
+
+	blockUntilTime(int delta)
+		: end(world.tickcount + delta) {}
 };
 
 /**
@@ -102,7 +105,7 @@ class blockUntilTime : public blockCond {
 
  Stops the script from running for the given number of ticks.
  */
-void c_WAIT(caosVM *vm) {
+void c_WAIT(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(ticks)
 
@@ -124,7 +127,7 @@ void c_WAIT(caosVM *vm) {
 
  Aborts the script.
 */
-void c_STOP(caosVM *vm) {
+void c_STOP(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	vm->stop();
 }
@@ -136,19 +139,19 @@ void c_STOP(caosVM *vm) {
 
  Deletes the event script in question from the scriptoruium.
 */
-void c_SCRX(caosVM *vm) {
+void c_SCRX(caosVM* vm) {
 	VM_VERIFY_SIZE(4)
-	VM_PARAM_INTEGER(event) 
-	caos_assert(event >= 0); 
+	VM_PARAM_INTEGER(event)
+	caos_assert(event >= 0);
 	caos_assert(event <= 65535);
-	VM_PARAM_INTEGER(species) 
-	caos_assert(species >= 0); 
+	VM_PARAM_INTEGER(species)
+	caos_assert(species >= 0);
 	caos_assert(species <= 65535);
-	VM_PARAM_INTEGER(genus) 
-	caos_assert(genus >= 0); 
+	VM_PARAM_INTEGER(genus)
+	caos_assert(genus >= 0);
 	caos_assert(genus <= 255);
-	VM_PARAM_INTEGER(family) 
-	caos_assert(family >= 0); 
+	VM_PARAM_INTEGER(family)
+	caos_assert(family >= 0);
 	caos_assert(family <= 255);
 	world.scriptorium->delScript(family, genus, species, event);
 }
@@ -160,14 +163,14 @@ void c_SCRX(caosVM *vm) {
  Returns script number running in the TARG agent. Returns -1 if target is not
  running anything (or if it's running something that's not an event script).
 */
-void v_CODE(caosVM *vm) {
+void v_CODE(caosVM* vm) {
 	valid_agent(vm->targ);
 	int res;
 	if (vm->targ->vm && vm->targ->vm->currentscript)
 		res = vm->targ->vm->currentscript->scrp;
 	else
 		res = -1;
-	
+
 	vm->result.setInt(res);
 }
 
@@ -178,14 +181,14 @@ void v_CODE(caosVM *vm) {
  Returns script family running in the TARG agent. Returns -1 if target is not
  running anything (or if it's running something that's not an event script).
 */
-void v_CODF(caosVM *vm) {
+void v_CODF(caosVM* vm) {
 	valid_agent(vm->targ);
 	int res;
 	if (vm->targ->vm && vm->targ->vm->currentscript)
 		res = vm->targ->vm->currentscript->fmly;
 	else
 		res = -1;
-	
+
 	vm->result.setInt(res);
 }
 
@@ -196,14 +199,14 @@ void v_CODF(caosVM *vm) {
  Returns script genus running in the target. Returns -1 if target is not
  running anything (or if it's running something that's not an event script).
 */
-void v_CODG(caosVM *vm) {
+void v_CODG(caosVM* vm) {
 	valid_agent(vm->targ);
 	int res;
 	if (vm->targ->vm && vm->targ->vm->currentscript)
 		res = vm->targ->vm->currentscript->gnus;
 	else
 		res = -1;
-	
+
 	vm->result.setInt(res);
 }
 
@@ -214,14 +217,14 @@ void v_CODG(caosVM *vm) {
  Returns script species running in the target. Returns -1 if target is not
  running anything (or if it's running something that's not an event script).
 */
-void v_CODS(caosVM *vm) {
+void v_CODS(caosVM* vm) {
 	valid_agent(vm->targ);
 	int res;
 	if (vm->targ->vm && vm->targ->vm->currentscript)
 		res = vm->targ->vm->currentscript->spcs;
 	else
 		res = -1;
-	
+
 	vm->result.setInt(res);
 }
 
@@ -232,7 +235,7 @@ void v_CODS(caosVM *vm) {
  Inject a script from the current bootstrap. 'file' must be the full filename.
  Flags can be 1 for remove script, 2 for event scripts and 4 for install script.
 */
-void c_JECT(caosVM *vm) {
+void c_JECT(caosVM* vm) {
 	VM_PARAM_INTEGER(flags)
 	VM_PARAM_STRING(file)
 
@@ -243,15 +246,21 @@ void c_JECT(caosVM *vm) {
  SORQ (integer) family (integer) genus (integer) species (integer) event (integer)
  %status maybe
 */
-void v_SORQ(caosVM *vm) {
-	VM_PARAM_INTEGER(event) caos_assert(event >= 0 && event <= 65535);
-	VM_PARAM_INTEGER(species) caos_assert(event >= 0 && event <= 65535);
-	VM_PARAM_INTEGER(genus) caos_assert(event >= 0 && event <= 255);
-	VM_PARAM_INTEGER(family) caos_assert(event >= 0 && event <= 255);
+void v_SORQ(caosVM* vm) {
+	VM_PARAM_INTEGER(event)
+	caos_assert(event >= 0 && event <= 65535);
+	VM_PARAM_INTEGER(species)
+	caos_assert(event >= 0 && event <= 65535);
+	VM_PARAM_INTEGER(genus)
+	caos_assert(event >= 0 && event <= 255);
+	VM_PARAM_INTEGER(family)
+	caos_assert(event >= 0 && event <= 255);
 
 	std::shared_ptr<script> s = world.scriptorium->getScript(family, genus, species, event);
-	if (s) vm->result.setInt(1);
-	else vm->result.setInt(0);
+	if (s)
+		vm->result.setInt(1);
+	else
+		vm->result.setInt(0);
 }
 
 /* vim: set noet: */

@@ -1,17 +1,18 @@
 #include "NetBackend.h"
-#include "creaturesException.h"
+
 #include "Engine.h"
+#include "creaturesException.h"
 
 #include <fmt/core.h>
 
 NetBackend::NetBackend() = default;
 
 NetBackend::~NetBackend() {
-  shutdown();
+	shutdown();
 };
 
 int NetBackend::init() {
-  const int init_result = sockinit();
+	const int init_result = sockinit();
 	if (init_result != 0) {
 		throw creaturesException(fmt::format("Networking error during initialization: {}", init_result));
 	}
@@ -29,17 +30,17 @@ int NetBackend::init() {
 
 	if (listensocket == INVALID_SOCKET) {
 		throw creaturesException(std::string("Failed to open a port to listen on."));
-  }
+	}
 
 	return listenport;
 }
 
 void NetBackend::handleEvents() {
-  if (!networkingup) {
-    return;
-  }
-  
-  // handle incoming network connections
+	if (!networkingup) {
+		return;
+	}
+
+	// handle incoming network connections
 	while (true) {
 		SOCKET connection = sockacceptnonblocking(listensocket);
 		if (connection == INVALID_SOCKET) {
@@ -47,7 +48,7 @@ void NetBackend::handleEvents() {
 		}
 		// check this connection is coming from localhost
 		uint32_t peer_addr = sockgetpeeraddress(connection);
-		unsigned char *rip = (unsigned char *)&peer_addr;
+		unsigned char* rip = (unsigned char*)&peer_addr;
 		if ((rip[0] != 127) || (rip[1] != 0) || (rip[2] != 0) || (rip[3] != 1)) {
 			fmt::print("Someone tried connecting via non-localhost address! IP: {}.{}.{}.{}\n", rip[0], rip[1], rip[2], rip[3]);
 			sockdestroy(connection);
@@ -63,8 +64,10 @@ void NetBackend::handleEvents() {
 			if (i == 1) {
 				data = data + buffer;
 				// TODO: maybe we should check for rscr\n like c2e seems to
-				if ((data.size() > 3) && (data.find("rscr\n", data.size() - 5) != data.npos)) done = true;
-			} else done = true;
+				if ((data.size() > 3) && (data.find("rscr\n", data.size() - 5) != data.npos))
+					done = true;
+			} else
+				done = true;
 		}
 
 		// pass the data onto the engine, and send back our response
@@ -77,11 +80,11 @@ void NetBackend::handleEvents() {
 }
 
 void NetBackend::shutdown() {
-  if (listensocket != INVALID_SOCKET) {
+	if (listensocket != INVALID_SOCKET) {
 		sockdestroy(listensocket);
-  }
-  if (networkingup) {
-	   sockquit();
-   }
-  networkingup = false;
+	}
+	if (networkingup) {
+		sockquit();
+	}
+	networkingup = false;
 }

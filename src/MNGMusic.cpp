@@ -4,17 +4,20 @@
 #include "utils/ascii_tolower.h"
 #include "utils/find_if.h"
 #include "utils/overload.h"
+
 #include <algorithm>
 #include <cmath> // for cos/sin
 #include <iostream> // for debug messages
 
 #ifndef M_PI
-# define M_PI           3.14159265358979323846  /* pi */
+#define M_PI 3.14159265358979323846 /* pi */
 #endif
 
 using namespace mngtoktype;
 
-MNGMusic::MNGMusic(const std::shared_ptr<AudioBackend>& b) : backend(b) {}
+MNGMusic::MNGMusic(const std::shared_ptr<AudioBackend>& b)
+	: backend(b) {
+}
 MNGMusic::~MNGMusic() {
 	stop();
 }
@@ -27,7 +30,7 @@ void MNGMusic::playSilence() {
 	nexttrack.reset();
 }
 
-void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
+void MNGMusic::playTrack(MNGFile* file, std::string trackname) {
 	trackname = ascii_tolower(trackname);
 
 	// TODO: these lowercase transformations are ridiculous, we should store inside MusicTrack
@@ -42,7 +45,8 @@ void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
 		std::string thisname = ascii_tolower(currenttrack->getName());
 		if (thisname == trackname) {
 			// already playing this track!
-			if (!playing_silence && !nexttrack) return;
+			if (!playing_silence && !nexttrack)
+				return;
 			nexttrack.reset();
 			currenttrack->startFadeIn();
 			return;
@@ -50,7 +54,7 @@ void MNGMusic::playTrack(MNGFile *file, std::string trackname) {
 	}
 
 	auto parsed_script = mngparse(file->script);
-	auto track = find_if(parsed_script.tracks, [&](const auto &t){ return ascii_tolower(t.name) == trackname; });
+	auto track = find_if(parsed_script.tracks, [&](const auto& t) { return ascii_tolower(t.name) == trackname; });
 	if (!track) {
 		std::cout << "Couldn't find MNG track '" << trackname << "' ('" << file->name << "')!" << std::endl;
 		return; // TODO: exception?
@@ -100,54 +104,47 @@ void MNGMusic::stop() {
 
 static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = nullptr) {
 	return visit(overload(
-		[&](float float_value) {
-			return float_value;
-		},
-		[&](const std::string& variable) {
-			if (layer == nullptr) {
-				throw MNGFileException("Variable '" + variable + "' only valid inside Layer");
-			}
-			return layer->getVariable(variable);
-		},
-		[&](const heap_value<MNGFunction>& function) -> float {
-			switch (function->type) {
-			case MNG_ADD:
-				return evaluateExpression(function->first, layer)
-					+ evaluateExpression(function->second, layer);
-			case MNG_SUBTRACT:
-				return evaluateExpression(function->first, layer)
-					- evaluateExpression(function->second, layer);
-			case MNG_MULTIPLY:
-				return evaluateExpression(function->first, layer)
-					* evaluateExpression(function->second, layer);
-			case MNG_DIVIDE:
-				return evaluateExpression(function->first, layer)
-					/ evaluateExpression(function->second, layer);
-			case MNG_SINEWAVE:
-				return sin(2 * M_PI * (evaluateExpression(function->first, layer)
-					/ evaluateExpression(function->second, layer)));
-			case MNG_COSINEWAVE:
-				return cos(2 * M_PI * (evaluateExpression(function->first, layer)
-					/ evaluateExpression(function->second, layer)));
-			case MNG_RANDOM:
-			{
-				float first = evaluateExpression(function->first, layer);
-				float second = evaluateExpression(function->second, layer);
-				return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
-			}
-			default:
-				// TODO: set up actual function names enum
-				// TODO: e->dump
-				throw MNGFileException("couldn't evaluate expression");
-				break;
-			}
-		}
-	), e);
+					 [&](float float_value) {
+						 return float_value;
+					 },
+					 [&](const std::string& variable) {
+						 if (layer == nullptr) {
+							 throw MNGFileException("Variable '" + variable + "' only valid inside Layer");
+						 }
+						 return layer->getVariable(variable);
+					 },
+					 [&](const heap_value<MNGFunction>& function) -> float {
+						 switch (function->type) {
+							 case MNG_ADD:
+								 return evaluateExpression(function->first, layer) + evaluateExpression(function->second, layer);
+							 case MNG_SUBTRACT:
+								 return evaluateExpression(function->first, layer) - evaluateExpression(function->second, layer);
+							 case MNG_MULTIPLY:
+								 return evaluateExpression(function->first, layer) * evaluateExpression(function->second, layer);
+							 case MNG_DIVIDE:
+								 return evaluateExpression(function->first, layer) / evaluateExpression(function->second, layer);
+							 case MNG_SINEWAVE:
+								 return sin(2 * M_PI * (evaluateExpression(function->first, layer) / evaluateExpression(function->second, layer)));
+							 case MNG_COSINEWAVE:
+								 return cos(2 * M_PI * (evaluateExpression(function->first, layer) / evaluateExpression(function->second, layer)));
+							 case MNG_RANDOM: {
+								 float first = evaluateExpression(function->first, layer);
+								 float second = evaluateExpression(function->second, layer);
+								 return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
+							 }
+							 default:
+								 // TODO: set up actual function names enum
+								 // TODO: e->dump
+								 throw MNGFileException("couldn't evaluate expression");
+								 break;
+						 }
+					 }),
+		e);
 }
 
-static AudioChannel playSample(const std::string& name, MNGFile *file, AudioBackend* backend, bool looping=false) {
+static AudioChannel playSample(const std::string& name, MNGFile* file, AudioBackend* backend, bool looping = false) {
 	unsigned int sampleno = file->getSampleForName(name);
-	auto *data = file->samples[sampleno].data();
+	auto* data = file->samples[sampleno].data();
 	auto length = file->samples[sampleno].size();
 	std::vector<uint8_t> buf(length + 8);
 	memcpy(buf.data(), "WAVEfmt ", 8);
@@ -165,17 +162,17 @@ MusicStage::MusicStage(MNGStage node) {
 
 MusicEffect::MusicEffect(MNGEffect node) {
 	name = node.name;
-	for (auto &s : node.stages) {
+	for (auto& s : node.stages) {
 		stages.push_back(std::make_shared<MusicStage>(s));
 	}
 }
 
-MusicVoice::MusicVoice(MusicLayer *p, MNGVoice node) {
+MusicVoice::MusicVoice(MusicLayer* p, MNGVoice node) {
 	parent = p;
 
 	wave = node.wave;
 	conditions = node.conditions;
-	
+
 	if (node.effect) {
 		auto toplevel_effect = find_if(parent->parent->effects,
 			[&](auto e) { return ascii_tolower(e->name) == ascii_tolower(*node.effect); });
@@ -189,7 +186,7 @@ MusicVoice::MusicVoice(MusicLayer *p, MNGVoice node) {
 }
 
 bool MusicVoice::shouldPlay() {
-	for (auto &n : conditions) {
+	for (auto& n : conditions) {
 		float value = parent->getVariable(n.variable);
 		float minimum = evaluateExpression(n.minimum, parent);
 		float maximum = evaluateExpression(n.maximum, parent);
@@ -212,11 +209,11 @@ void MusicVoice::runUpdateBlock() {
 	}
 }
 
-MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack *p, AudioBackend *b) {
+MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack* p, AudioBackend* b) {
 	parent = p;
 	backend = b;
 	name = node.name;
-	
+
 	volume = node.volume.value_or(1.0);
 	if (node.effect) {
 		auto toplevel_effect = find_if(parent->effects,
@@ -234,7 +231,7 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack *p, 
 	for (auto v : node.voices) {
 		voices.push_back(std::make_shared<MusicVoice>(this, v));
 	}
-	
+
 	// TODO: hack
 	variables["Mood"] = 1.0f;
 	variables["Threat"] = 0.5f;
@@ -266,7 +263,7 @@ void MusicAleotoricLayer::stop() {
 void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	float current_volume = volume * track_volume;
 
-	for (auto pw = playing_waves.begin(); pw != playing_waves.end(); ) {
+	for (auto pw = playing_waves.begin(); pw != playing_waves.end();) {
 		if (backend->getChannelState(pw->channel) == AUDIO_PLAYING) {
 			backend->setChannelVolume(pw->channel, pw->volume * current_volume);
 			pw++;
@@ -274,7 +271,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 			pw = playing_waves.erase(pw);
 		}
 	}
-	for (auto qw = queued_waves.begin(); qw != queued_waves.end(); ) {
+	for (auto qw = queued_waves.begin(); qw != queued_waves.end();) {
 		if (mngclock::now() >= qw->start_time) {
 			auto channel = playSample(qw->wave_name, parent->parent, backend);
 			backend->setChannelVolume(channel, qw->volume * current_volume);
@@ -298,9 +295,11 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 
 	auto voice = [&] {
 		decltype(voices) available_voices;
-		for (auto &voice : voices) {
-			if (!voice->shouldPlay()) continue;
-			if (last_voice.get() == voice.get()) continue;
+		for (auto& voice : voices) {
+			if (!voice->shouldPlay())
+				continue;
+			if (last_voice.get() == voice.get())
+				continue;
 			available_voices.push_back(voice);
 		}
 		if (available_voices.size()) {
@@ -319,7 +318,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 		// TODO: do effects play the original voice, and then each stage? or just each stage?
 		if (our_effect) {
 			mngtimepoint start_offset = mngclock::now();
-			for (auto &stage : our_effect->stages) {
+			for (auto& stage : our_effect->stages) {
 				float volume_value = stage->volume ? evaluateExpression(*stage->volume) : 1.0f;
 
 				float pan_value = stage->pan ? evaluateExpression(*stage->pan) : 0.0f;
@@ -345,7 +344,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	}
 
 	// Voices' Update blocks can alter the Layer Interval, so keep this after the Voice Update block
-	float our_interval = [&]{
+	float our_interval = [&] {
 		if (voice && voice->interval) {
 			return evaluateExpression(*voice->interval, this);
 		}
@@ -357,7 +356,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	next_voice_at = mngclock::now() + dseconds(our_interval);
 }
 
-MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack *p, AudioBackend *b) {
+MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack* p, AudioBackend* b) {
 	parent = p;
 	backend = b;
 
@@ -366,7 +365,7 @@ MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack *p, AudioBackend *b
 	updaterate = node.updaterate.value_or(0); // TODO: what should the default be?
 	variables = node.variables;
 	updates = node.updates;
-	
+
 	// TODO: hack
 	variables["Mood"] = 1.0f;
 	variables["Threat"] = 0.5f;
@@ -405,7 +404,7 @@ void MusicLoopLayer::stop() {
 	channel = {};
 }
 
-MusicTrack::MusicTrack(MNGFile *p, MNGScript script, MNGTrack n, AudioBackend *b) {
+MusicTrack::MusicTrack(MNGFile* p, MNGScript script, MNGTrack n, AudioBackend* b) {
 	node = n;
 	parent = p;
 
@@ -421,13 +420,13 @@ MusicTrack::MusicTrack(MNGFile *p, MNGScript script, MNGTrack n, AudioBackend *b
 	}
 	for (auto l : n.layers) {
 		visit(overload(
-			[&](MNGLoopLayer& ll) {
-				looplayers.push_back(std::make_shared<MusicLoopLayer>(ll, this, b));
-			},
-			[&](MNGAleotoricLayer& al) {
-				aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(al, this, b));
-			}
-		), l);
+				  [&](MNGLoopLayer& ll) {
+					  looplayers.push_back(std::make_shared<MusicLoopLayer>(ll, this, b));
+				  },
+				  [&](MNGAleotoricLayer& al) {
+					  aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(al, this, b));
+				  }),
+			l);
 	}
 }
 

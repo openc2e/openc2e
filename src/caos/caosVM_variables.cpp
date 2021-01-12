@@ -17,26 +17,25 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
 #include "Agent.h"
-#include <memory>
-#include <stdlib.h> // rand()
-#include <math.h> // abs()/fabs()
-#include "World.h"
-#include "Engine.h"
 #include "Catalogue.h"
-
-#include <cctype> // toupper/tolower
-#include <algorithm> // transform
-#include <fmt/core.h>
-
-#include "Vehicle.h"
+#include "Engine.h"
 #include "PointerAgent.h"
+#include "Vehicle.h"
+#include "World.h"
+#include "caosVM.h"
+#include "caos_assert.h"
 #include "creatures/CreatureAgent.h"
 
+#include <algorithm> // transform
+#include <cctype> // toupper/tolower
+#include <fmt/core.h>
+#include <math.h> // abs()/fabs()
+#include <memory>
+#include <stdlib.h> // rand()
+
 #ifndef M_PI
-# define M_PI           3.14159265358979323846  /* pi */
+#define M_PI 3.14159265358979323846 /* pi */
 #endif
 
 /**
@@ -56,9 +55,10 @@
  Like VAxx, but restricted to 0-9. Legacy from Creatures 1.
 */
 CAOS_LVALUE(VAxx,
-		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
-		vm->var[index],
-		vm->var[index] = newvalue)
+			VM_PARAM_INTEGER(index);
+			caos_assert(index >= 0 && index < 100),
+			vm->var[index],
+			vm->var[index] = newvalue)
 
 /**
  MVxx (variable)
@@ -68,9 +68,10 @@ CAOS_LVALUE(VAxx,
  Like OVxx, only for OWNR, not TARG.
  */
 CAOS_LVALUE_WITH(MVxx, vm->owner,
-		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
-		vm->owner->var[index],
-		vm->owner->var[index] = newvalue)
+				 VM_PARAM_INTEGER(index);
+				 caos_assert(index >= 0 && index < 100),
+				 vm->owner->var[index],
+				 vm->owner->var[index] = newvalue)
 
 /**
  ADDS (command) var (variable) value (string)
@@ -78,7 +79,7 @@ CAOS_LVALUE_WITH(MVxx, vm->owner,
 
  Append the given string to the given variable.
 */
-void c_ADDS(caosVM *vm) {
+void c_ADDS(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_STRING(value)
 	VM_PARAM_VARIABLE(variable)
@@ -93,7 +94,7 @@ void c_ADDS(caosVM *vm) {
 
  Sets the given variable to the given string.
 */
-void c_SETS(caosVM *vm) {
+void c_SETS(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_STRING(value)
 	VM_PARAM_VARIABLE(var)
@@ -110,19 +111,20 @@ void c_SETS(caosVM *vm) {
 
  Sets the given variable to the given decimal value.
  */
-void c_SETV(caosVM *vm) {
+void c_SETV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	// TODO: hackery for c2
 	//VM_PARAM_DECIMAL(value)
 	VM_PARAM_VALUE(value)
 	VM_PARAM_VARIABLE(var)
 	var->reset();
-	
+
 	// TODO: hackery for c2
 	if (value.hasAgent()) {
 		var->setAgent(value.getAgent());
 		return;
-	} else caos_assert(value.hasDecimal());
+	} else
+		caos_assert(value.hasDecimal());
 
 	if (value.hasFloat()) {
 		var->setFloat(value.getFloat());
@@ -137,7 +139,7 @@ void c_SETV(caosVM *vm) {
 
  Sets the given variable to the given agent.
 */
-void c_SETA(caosVM *vm) {
+void c_SETA(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_AGENT(value)
 	VM_PARAM_VARIABLE(var)
@@ -162,10 +164,11 @@ void c_SETA(caosVM *vm) {
  Like OVxx, but restricted to 0-2 in C1, or 0-9 in C2. Legacy from Creatures 1.
 */
 // TODO: restrict to 0-2 in C1?
-CAOS_LVALUE_TARG(OVxx, 
-		VM_PARAM_INTEGER(index); caos_assert(index >= 0 && index < 100),
-		vm->targ->var[index],
-		vm->targ->var[index] = newvalue)
+CAOS_LVALUE_TARG(OVxx,
+				 VM_PARAM_INTEGER(index);
+				 caos_assert(index >= 0 && index < 100),
+				 vm->targ->var[index],
+				 vm->targ->var[index] = newvalue)
 
 /**
  TYPE (integer) value (anything)
@@ -173,7 +176,7 @@ CAOS_LVALUE_TARG(OVxx,
 
  Returns a integer value representing the type of data in 'value'.  0 is integer, 1 is float, 2 is string, 3 is agent.
 */
-void v_TYPE(caosVM *vm) {
+void v_TYPE(caosVM* vm) {
 	VM_PARAM_VALUE(value)
 
 	caos_assert(!value.isEmpty());
@@ -197,7 +200,7 @@ void v_TYPE(caosVM *vm) {
 		else if (typeid(*a) == typeid(Vehicle))
 			vm->result.setInt(6);
 		else {
-			CreatureAgent *c = dynamic_cast<CreatureAgent *>(a);
+			CreatureAgent* c = dynamic_cast<CreatureAgent*>(a);
 			if (c)
 				vm->result.setInt(7);
 			else
@@ -215,11 +218,12 @@ void v_TYPE(caosVM *vm) {
 
  Divides the given variable by the given integer, and returns the remainder (var % mod).
 */
-void c_MODV(caosVM *vm) {
+void c_MODV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(mod)
 	VM_PARAM_VARIABLE(v) // integer
-	if (!v->hasInt()) throw badParamException();
+	if (!v->hasInt())
+		throw badParamException();
 	v->setInt(v->getInt() % mod);
 }
 
@@ -231,11 +235,12 @@ void c_MODV(caosVM *vm) {
 
  Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
 */
-void c_ANDV(caosVM *vm) {
+void c_ANDV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(andv)
 	VM_PARAM_VARIABLE(v)
-	if (!v->hasInt()) throw badParamException();
+	if (!v->hasInt())
+		throw badParamException();
 	v->setInt(v->getInt() & andv);
 }
 
@@ -247,11 +252,12 @@ void c_ANDV(caosVM *vm) {
 
  Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
 */
-void c_ORRV(caosVM *vm) {
+void c_ORRV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(orv)
 	VM_PARAM_VARIABLE(v)
-	if (!v->hasInt()) throw badParamException();
+	if (!v->hasInt())
+		throw badParamException();
 	v->setInt(v->getInt() | orv);
 }
 
@@ -263,7 +269,7 @@ void c_ORRV(caosVM *vm) {
 
  Adds the given decimal to the given variable and returns the result.
 */
-void c_ADDV(caosVM *vm) {
+void c_ADDV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(add)
 	VM_PARAM_VARIABLE(v)
@@ -285,7 +291,7 @@ void c_ADDV(caosVM *vm) {
 
  Subtracts the given integer from the given variable and returns the result.
 */
-void c_SUBV(caosVM *vm) {
+void c_SUBV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(sub)
 	VM_PARAM_VARIABLE(v)
@@ -305,7 +311,7 @@ void c_SUBV(caosVM *vm) {
 
  Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
 */
-void c_NEGV(caosVM *vm) {
+void c_NEGV(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VARIABLE(v)
 	if (v->hasFloat())
@@ -324,14 +330,15 @@ void c_NEGV(caosVM *vm) {
  
  Divides the given variable by the given integer and returns the result.
 */
-void c_DIVV(caosVM *vm) {
+void c_DIVV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(div)
 	VM_PARAM_VARIABLE(v)
 
 	caos_assert(div.hasDecimal());
-	if (div.getFloat() == 0.0f) throw caosException("attempt to divide by zero");
-	
+	if (div.getFloat() == 0.0f)
+		throw caosException("attempt to divide by zero");
+
 	if ((engine.version < 3 && v->hasDecimal() && div.hasDecimal()) || (v->hasInt() && div.hasInt())) {
 		// integer division
 		v->setInt(v->getInt() / div.getInt());
@@ -351,7 +358,7 @@ void c_DIVV(caosVM *vm) {
 
  Multiplies the given variable by the given integer and returns the result.
 */
-void c_MULV(caosVM *vm) {
+void c_MULV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(mul)
 	VM_PARAM_VARIABLE(v)
@@ -378,7 +385,6 @@ int calculateRand(int value1, int value2) {
 	double r = rand() / ((unsigned int)RAND_MAX + 1.0);
 
 	return (int)(r * diff) + val;
-
 }
 
 /**
@@ -387,7 +393,7 @@ int calculateRand(int value1, int value2) {
 
  Returns a random integer between 'value1' and 'value2', inclusive.
  */
-void v_RAND(caosVM *vm) {
+void v_RAND(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(value2)
 	VM_PARAM_INTEGER(value1)
@@ -414,7 +420,7 @@ void c_REAF(caosVM*) {
  
  Returns 'uname -a' on platforms which support it, or OS details in another format otherwise.
 */
-void v_UFOS(caosVM *vm) {
+void v_UFOS(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	vm->result.setString("some random platform"); // TODO
 }
@@ -426,7 +432,7 @@ void v_UFOS(caosVM *vm) {
 
  Returns information about which modules are being used by the engine (for now, backend and audio backend names).
 */
-void v_MODU(caosVM *vm) {
+void v_MODU(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	vm->result.setString(engine.getBackendName() + ", " + engine.getAudioBackendName());
 	//result.setString("OriginalDisplay SDL (netbabel 148)"); // TODO
@@ -439,7 +445,7 @@ void v_MODU(caosVM *vm) {
  
  Returns the currently-running game (like "Creatures 1" or "Docking Station").
 */
-void v_GNAM(caosVM *vm) {
+void v_GNAM(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 	vm->result.setString(engine.getGameName());
 }
@@ -450,13 +456,16 @@ void v_GNAM(caosVM *vm) {
  
  Modifies the given variable, if negative, so that its value is positive (absolute value).
 */
-void c_ABSV(caosVM *vm) {
+void c_ABSV(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VARIABLE(var)
-	
-	if (var->hasFloat()) var->setFloat(fabs(var->getFloat()));
-	else if (var->hasInt()) var->setInt(abs(var->getInt()));
-	else throw badParamException();
+
+	if (var->hasFloat())
+		var->setFloat(fabs(var->getFloat()));
+	else if (var->hasInt())
+		var->setInt(abs(var->getInt()));
+	else
+		throw badParamException();
 }
 
 /**
@@ -465,7 +474,7 @@ void c_ABSV(caosVM *vm) {
  
  Returns the arccosine of x in degrees.
 */
-void v_ACOS(caosVM *vm) {
+void v_ACOS(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
 
@@ -481,10 +490,10 @@ void v_ACOS(caosVM *vm) {
  
  Returns the arcsine of x in degrees.
 */
-void v_ASIN(caosVM *vm) {
+void v_ASIN(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
-	
+
 	double f = asin(x);
 	f = f * 360;
 	f = f / (M_PI * 2);
@@ -497,10 +506,10 @@ void v_ASIN(caosVM *vm) {
  
  Returns the arctangent of x in degrees.
 */
-void v_ATAN(caosVM *vm) {
+void v_ATAN(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
-	
+
 	double f = atan(x);
 	f = f * 360;
 	f = f / (M_PI * 2);
@@ -513,11 +522,11 @@ void v_ATAN(caosVM *vm) {
  
  Returns the cosine of x in degrees.
 */
-void v_COS_(caosVM *vm) {
+void v_COS_(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
-	
-	double f = x * (M_PI * 2);	
+
+	double f = x * (M_PI * 2);
 	f = f / 360;
 	vm->result.setFloat(cos(f));
 }
@@ -528,13 +537,13 @@ void v_COS_(caosVM *vm) {
  
  Returns the sine of x in degrees.
 */
-void v_SIN_(caosVM *vm) {
+void v_SIN_(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
-	
-	double f = x * (M_PI * 2);	
+
+	double f = x * (M_PI * 2);
 	f = f / 360;
-	
+
 	vm->result.setFloat(sin(f));
 }
 
@@ -544,13 +553,13 @@ void v_SIN_(caosVM *vm) {
  
  Returns the tangent of x in degrees.
 */
-void v_TAN_(caosVM *vm) {
+void v_TAN_(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
 
-	double f = x * (M_PI * 2);	
+	double f = x * (M_PI * 2);
 	f = f / 360;
-	
+
 	vm->result.setFloat(tan(f));
 }
 
@@ -560,12 +569,12 @@ void v_TAN_(caosVM *vm) {
  
  Returns the square root of v.
 */
-void v_SQRT(caosVM *vm) {
+void v_SQRT(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_FLOAT(x)
 
 	caos_assert(x >= 0); // no imaginary numbers for you!
-	
+
 	vm->result.setFloat(sqrt(x));
 }
 
@@ -594,16 +603,13 @@ CAOS_LVALUE_SIMPLE(P2, vm->_p_[1])
  Returns the value of OVxx for the given agent, where xx is equal to 'index'.
 */
 CAOS_LVALUE(AVAR,
-		VM_VERIFY_SIZE(2)
-		VM_PARAM_INTEGER(index)
-		VM_PARAM_AGENT(agent)
-		caos_assert(index >= 0 && index < 100);
-		valid_agent(agent)
-	,
-		agent->var[index]
-	,
-		agent->var[index] = newvalue
-)
+			VM_VERIFY_SIZE(2)
+				VM_PARAM_INTEGER(index)
+					VM_PARAM_AGENT(agent)
+						caos_assert(index >= 0 && index < 100);
+			valid_agent(agent),
+			agent->var[index],
+			agent->var[index] = newvalue)
 
 /**
  VTOS (string) value (decimal)
@@ -611,7 +617,7 @@ CAOS_LVALUE(AVAR,
 
  Returns a string representation of the given value.
 */
-void v_VTOS(caosVM *vm) {
+void v_VTOS(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_DECIMAL(value)
 
@@ -630,14 +636,14 @@ void v_VTOS(caosVM *vm) {
  Returns the character at position 'index' of the given string.
  Indexes start at 1.
 */
-void v_CHAR(caosVM *vm) {
+void v_CHAR(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(index)
 	VM_PARAM_STRING(str)
 
 	caos_assert(index >= 1);
 	caos_assert(str.size() >= (unsigned int)index);
-	
+
 	vm->result.setInt(str[index - 1]);
 }
 
@@ -648,13 +654,13 @@ void v_CHAR(caosVM *vm) {
  Sets the character at position 'index' of the given string.
  Indexes start at 1. 
 */
-void c_CHAR(caosVM *vm) {
+void c_CHAR(caosVM* vm) {
 	VM_PARAM_INTEGER(character)
 	VM_PARAM_INTEGER(index)
 	VM_PARAM_VARIABLE(str)
 
 	caos_assert(0 <= character && character <= 255);
-	
+
 	caos_assert(str->hasString());
 	std::string mystr = str->getString();
 	caos_assert(index >= 1);
@@ -670,7 +676,7 @@ void c_CHAR(caosVM *vm) {
 
  Converts the given integer to a float.
 */
-void v_ITOF(caosVM *vm) {
+void v_ITOF(caosVM* vm) {
 	VM_PARAM_FLOAT(number) // watson tells me this function is COMPLETELY pointless - fuzzie
 
 	vm->result.setFloat(number);
@@ -682,7 +688,7 @@ void v_ITOF(caosVM *vm) {
 
  Converts the given float to an integer, by rounding.
 */
-void v_FTOI(caosVM *vm) {
+void v_FTOI(caosVM* vm) {
 	VM_PARAM_INTEGER(number)
 
 	vm->result.setInt(number);
@@ -694,7 +700,7 @@ void v_FTOI(caosVM *vm) {
 
  Returns the length in characters of the given string.
 */
-void v_STRL(caosVM *vm) {
+void v_STRL(caosVM* vm) {
 	VM_PARAM_STRING(string)
 
 	vm->result.setInt(string.size());
@@ -707,13 +713,13 @@ void v_STRL(caosVM *vm) {
  Returns the value of the string at 'offset' inside the given catalogue tag.
  Offsets start at zero. Throws an error if tag doesn't exist.
 */
-void v_READ(caosVM *vm) {
+void v_READ(caosVM* vm) {
 	VM_PARAM_INTEGER(offset)
 	VM_PARAM_STRING(tag)
 
 	// TODO: i'm not sure if we're meant to throw errors here. - fuzzie
 	caos_assert(catalogue.hasTag(tag));
-	const std::vector<std::string> &t = catalogue.getTag(tag);
+	const std::vector<std::string>& t = catalogue.getTag(tag);
 	caos_assert(offset >= 0);
 	caos_assert((unsigned int)offset < t.size());
 	vm->result.setString(t[offset]);
@@ -725,7 +731,7 @@ void v_READ(caosVM *vm) {
 
  Returns 1 if the specified catalogue tag exists, or 0 otherwise.
 */
-void v_REAQ(caosVM *vm) {
+void v_REAQ(caosVM* vm) {
 	VM_PARAM_STRING(tag)
 
 	if (catalogue.hasTag(tag))
@@ -740,7 +746,7 @@ void v_REAQ(caosVM *vm) {
 
  Returns the agent category of the TARG agent.
 */
-void v_CATA(caosVM *vm) {
+void v_CATA(caosVM* vm) {
 	valid_agent(vm->targ);
 
 	vm->result.setInt(vm->targ->category);
@@ -752,7 +758,7 @@ void v_CATA(caosVM *vm) {
 
  Returns the agent category for the given family/genus/species.
 */
-void v_CATI(caosVM *vm) {
+void v_CATI(caosVM* vm) {
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
 	VM_PARAM_INTEGER(family) // TODO: check values are in range
@@ -766,16 +772,15 @@ void v_CATI(caosVM *vm) {
 
  Returns a string containing the name of the given category.
 */
-void v_CATX(caosVM *vm) {
+void v_CATX(caosVM* vm) {
 	VM_PARAM_INTEGER(category_id)
 
 	caos_assert(catalogue.hasTag("Agent Categories"));
-	const std::vector<std::string> &t = catalogue.getTag("Agent Categories");
+	const std::vector<std::string>& t = catalogue.getTag("Agent Categories");
 	if (category_id >= 0 && (unsigned int)category_id < t.size())
 		vm->result.setString(t[category_id]);
 	else
 		vm->result.setString("");
-		
 }
 
 /**
@@ -784,7 +789,7 @@ void v_CATX(caosVM *vm) {
 
  Sets the agent category of the TARG agent. If the specified category is -1, sets the category based on the family/genus/species of the agent (see CATI).
 */
-void c_CATO(caosVM *vm) {
+void c_CATO(caosVM* vm) {
 	VM_PARAM_INTEGER(category_id)
 
 	valid_agent(vm->targ);
@@ -805,7 +810,7 @@ void c_CATO(caosVM *vm) {
  exist, at which point an error is thrown.  If it does find a suitable one, it
  returns the string at offset inside the tag. See READ.
 */
-void v_WILD(caosVM *vm) {
+void v_WILD(caosVM* vm) {
 	VM_PARAM_INTEGER(offset)
 	VM_PARAM_STRING(tag)
 	VM_PARAM_INTEGER(species)
@@ -815,7 +820,7 @@ void v_WILD(caosVM *vm) {
 	std::string searchstring = catalogue.calculateWildcardTag(tag, family, genus, species); // calculate tag name
 	caos_assert(searchstring.size()); // check we found a tag
 
-	const std::vector<std::string> &t = catalogue.getTag(searchstring); // retrieve tag
+	const std::vector<std::string>& t = catalogue.getTag(searchstring); // retrieve tag
 	caos_assert(offset >= 0);
 	caos_assert((unsigned int)offset < t.size()); // check the offset is useful for the tag we found
 
@@ -829,9 +834,8 @@ void v_WILD(caosVM *vm) {
  Named, agent-local variables (like OVxx) in the TARG agent.
 */
 CAOS_LVALUE_TARG(NAME, VM_PARAM_VALUE(name),
-		vm->targ->name_variables[name],
-		vm->targ->name_variables[name] = newvalue
-	)
+	vm->targ->name_variables[name],
+	vm->targ->name_variables[name] = newvalue)
 
 /**
  MAME (variable) name (anything)
@@ -840,10 +844,9 @@ CAOS_LVALUE_TARG(NAME, VM_PARAM_VALUE(name),
  Like NAME variables, except for OWNR rather than TARG.
 */
 CAOS_LVALUE_WITH(MAME, vm->owner,
-		VM_PARAM_VALUE(name),
-		vm->owner->name_variables[name],
-		vm->owner->name_variables[name] = newvalue
-	)
+	VM_PARAM_VALUE(name),
+	vm->owner->name_variables[name],
+	vm->owner->name_variables[name] = newvalue)
 
 /**
  SUBS (string) value (string) start (integer) count (integer)
@@ -851,7 +854,7 @@ CAOS_LVALUE_WITH(MAME, vm->owner,
 
  Returns the text in a string starting at 'start' into the string (starting at 1), and with 'count' characters.
 */
-void v_SUBS(caosVM *vm) {
+void v_SUBS(caosVM* vm) {
 	VM_PARAM_INTEGER(count)
 	VM_PARAM_INTEGER(start)
 	VM_PARAM_STRING(value)
@@ -865,7 +868,7 @@ void v_SUBS(caosVM *vm) {
 
  Returns the provided string as an integer, or 0 if it can't be converted.
 */
-void v_STOI(caosVM *vm) {
+void v_STOI(caosVM* vm) {
 	VM_PARAM_STRING(string)
 
 	vm->result.setInt(atoi(string.c_str()));
@@ -877,9 +880,9 @@ void v_STOI(caosVM *vm) {
 
  Returns the provided string as a float, or 0 if it can't be converted.
 */
-void v_STOF(caosVM *vm) {
+void v_STOF(caosVM* vm) {
 	VM_PARAM_STRING(string)
-		
+
 	vm->result.setFloat(atof(string.c_str()));
 }
 
@@ -889,10 +892,10 @@ void v_STOF(caosVM *vm) {
 
  Return a lower-cased version of a string.
 */
-void v_LOWA(caosVM *vm) {
+void v_LOWA(caosVM* vm) {
 	VM_PARAM_STRING(string)
 
-	std::transform(string.begin(), string.end(), string.begin(), (int(*)(int))tolower);
+	std::transform(string.begin(), string.end(), string.begin(), (int (*)(int))tolower);
 	vm->result.setString(string);
 }
 
@@ -902,10 +905,10 @@ void v_LOWA(caosVM *vm) {
 
  Return an upper-cased version of a string.
 */
-void v_UPPA(caosVM *vm) {
+void v_UPPA(caosVM* vm) {
 	VM_PARAM_STRING(string)
 
-	std::transform(string.begin(), string.end(), string.begin(), (int(*)(int))toupper);
+	std::transform(string.begin(), string.end(), string.begin(), (int (*)(int))toupper);
 	vm->result.setString(string);
 }
 
@@ -916,9 +919,10 @@ void v_UPPA(caosVM *vm) {
  Searches for an occurance of 'searchstring' inside 'string', starting at the given index inside 'string' (first character is 1).
  The index of the 'searchstring' inside the string is returned, or -1 if the searchstring wasn't found.
 */
-void v_SINS(caosVM *vm) {
+void v_SINS(caosVM* vm) {
 	VM_PARAM_STRING(searchstring)
-	VM_PARAM_INTEGER(index) caos_assert(index > 0);
+	VM_PARAM_INTEGER(index)
+	caos_assert(index > 0);
 	VM_PARAM_STRING(string)
 
 	// TODO: check for string having a size, perhaps?
@@ -936,13 +940,13 @@ void v_SINS(caosVM *vm) {
  
  Return number of strings associated with the catalogue tag specified.
 */
-void v_REAN(caosVM *vm) {
+void v_REAN(caosVM* vm) {
 	VM_PARAM_STRING(tag)
-		
+
 	if (!catalogue.hasTag(tag))
 		vm->result.setInt(0);
 	else {
-		const std::vector<std::string> &t = catalogue.getTag(tag);
+		const std::vector<std::string>& t = catalogue.getTag(tag);
 		vm->result.setInt(t.size());
 	}
 }
@@ -953,12 +957,13 @@ void v_REAN(caosVM *vm) {
 
  Delete the specified NAME variable on the target agent.
 */
-void c_DELN(caosVM *vm) {
+void c_DELN(caosVM* vm) {
 	VM_PARAM_VALUE(name)
 
 	valid_agent(vm->targ);
 	std::map<caosValue, caosValue, caosValueCompare>::iterator i = vm->targ->name_variables.find(name);
-	if (i == vm->targ->name_variables.end()) return;
+	if (i == vm->targ->name_variables.end())
+		return;
 	vm->targ->name_variables.erase(i);
 }
 
@@ -966,7 +971,7 @@ void c_DELN(caosVM *vm) {
  NAMN (command) previous (variable)
  %status maybe
 */
-void c_NAMN(caosVM *vm) {
+void c_NAMN(caosVM* vm) {
 	VM_PARAM_VARIABLE(previous)
 
 	valid_agent(vm->targ);
@@ -998,10 +1003,10 @@ void c_NAMN(caosVM *vm) {
  * Openc2e-only command
  */
 
-void c_POWV(caosVM *vm) {
+void c_POWV(caosVM* vm) {
 	VM_PARAM_FLOAT(exponent)
 	VM_PARAM_VARIABLE(value)
-	
+
 	value->setFloat(powf(value->getFloat(), exponent));
 }
 
@@ -1011,7 +1016,7 @@ void c_POWV(caosVM *vm) {
  %variants c1 c2
  %cost c1,c2 0
 */
-void c_RNDV(caosVM *vm) {
+void c_RNDV(caosVM* vm) {
 	VM_PARAM_INTEGER(value2)
 	VM_PARAM_INTEGER(value1)
 	VM_PARAM_VARIABLE(var)
@@ -1026,7 +1031,7 @@ void c_RNDV(caosVM *vm) {
 
  Returns the egg limit - when there are more than this many norns in the world, eggs should not hatch.
 */
-void v_EGGL(caosVM *vm) {
+void v_EGGL(caosVM* vm) {
 	vm->result.setInt(16); // TODO
 }
 
@@ -1037,7 +1042,7 @@ void v_EGGL(caosVM *vm) {
  
  Returns the hatchery limit - when there are more than this many norns in the world, the hatchery should shut down.
 */
-void v_HATL(caosVM *vm) {
+void v_HATL(caosVM* vm) {
 	vm->result.setInt(12); // TODO
 }
 

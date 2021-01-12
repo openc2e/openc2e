@@ -17,15 +17,15 @@
  *
  */
 
-#include "caos_assert.h"
-#include "caosVM.h"
-#include "World.h"
+#include "Agent.h"
+#include "AgentHelpers.h"
 #include "Engine.h" // version
 #include "Map.h"
 #include "MetaRoom.h"
 #include "Room.h"
-#include "AgentHelpers.h"
-#include "Agent.h"
+#include "World.h"
+#include "caosVM.h"
+#include "caos_assert.h"
 
 #include <assert.h>
 #include <fmt/core.h>
@@ -33,11 +33,11 @@
 
 #define CAOS_LVALUE_TARG_ROOM(name, check, get, set) \
 	CAOS_LVALUE_TARG(name, \
-			std::shared_ptr<Room> r = roomContainingAgent(vm->targ); \
-			caos_assert(r); \
-			check, \
-			get, \
-			set)
+					 std::shared_ptr<Room> r = roomContainingAgent(vm->targ); \
+					 caos_assert(r); \
+					 check, \
+					 get, \
+					 set)
 
 #define CAOS_LVALUE_ROOM_SIMPLE(name, expr) \
 	CAOS_LVALUE_TARG_ROOM(name, (void)0, expr, expr = newvalue)
@@ -48,7 +48,7 @@
  
  Creates a metaroom with the given height and width, at the coordinates given.  Returns the id of the new metaroom.
  */
-void v_ADDM(caosVM *vm) {
+void v_ADDM(caosVM* vm) {
 	VM_VERIFY_SIZE(5)
 	VM_PARAM_STRING(background)
 	VM_PARAM_INTEGER(height)
@@ -56,7 +56,7 @@ void v_ADDM(caosVM *vm) {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	MetaRoom *r = new MetaRoom(x, y, width, height, background);
+	MetaRoom* r = new MetaRoom(x, y, width, height, background);
 	caosValue v;
 	v.setInt(world.map->addMetaRoom(r));
 	vm->result = v;
@@ -68,11 +68,11 @@ void v_ADDM(caosVM *vm) {
 
  Adds a new background to an existing metaroom, to be displayed with BKGD.
 */
-void c_ADDB(caosVM *vm) {
+void c_ADDB(caosVM* vm) {
 	VM_PARAM_STRING(background)
 	VM_PARAM_INTEGER(metaroomid)
 
-	MetaRoom *m = world.map->getMetaRoom(metaroomid);
+	MetaRoom* m = world.map->getMetaRoom(metaroomid);
 	caos_assert(m);
 
 	m->addBackground(background);
@@ -84,9 +84,9 @@ void c_ADDB(caosVM *vm) {
  
  Sets the base ID numbers for new metarooms and rooms to the given values.
  */
-void c_BRMI(caosVM *vm) {
+void c_BRMI(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
-	
+
 	VM_PARAM_INTEGER(room_base)
 	VM_PARAM_INTEGER(metaroom_base)
 
@@ -100,7 +100,7 @@ void c_BRMI(caosVM *vm) {
  
  Sets the world map dimensions, inside which metarooms are placed.
  */
-void c_MAPD(caosVM *vm) {
+void c_MAPD(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(height)
 	VM_PARAM_INTEGER(width)
@@ -114,7 +114,7 @@ void c_MAPD(caosVM *vm) {
  
  Returns the width of the world map.
 */
-void v_MAPW(caosVM *vm) {
+void v_MAPW(caosVM* vm) {
 	vm->result.setInt(world.map->getWidth());
 }
 
@@ -124,7 +124,7 @@ void v_MAPW(caosVM *vm) {
 
  Returns the height of the world map.
 */
-void v_MAPH(caosVM *vm) {
+void v_MAPH(caosVM* vm) {
 	vm->result.setInt(world.map->getHeight());
 }
 
@@ -146,21 +146,21 @@ void c_MAPK(caosVM*) {
 
  Determines all of the background names in use by the given metaroom, and returns them in a comma-seperated string.
 */
-void v_BKDS(caosVM *vm) {
+void v_BKDS(caosVM* vm) {
 	VM_PARAM_INTEGER(metaroomid)
 
-	MetaRoom *m = world.map->getMetaRoom(metaroomid);
+	MetaRoom* m = world.map->getMetaRoom(metaroomid);
 	caos_assert(m);
 
 	std::vector<std::string> backs = m->backgroundList();
 	std::string s;
-	for (auto & back : backs) {
+	for (auto& back : backs) {
 		if (s.empty())
 			s = back;
 		else
 			s = s + "," + back;
 	}
-			
+
 	vm->result.setString(s);
 }
 
@@ -171,7 +171,7 @@ void v_BKDS(caosVM *vm) {
  Makes a new room inside the given metaroom.  Rooms can have sloped floors and ceilings, but only vertical walls.  
  The id of the new room is returned.
 */
-void v_ADDR(caosVM *vm) {
+void v_ADDR(caosVM* vm) {
 	VM_VERIFY_SIZE(7)
 	VM_PARAM_INTEGER(y_right_floor)
 	VM_PARAM_INTEGER(y_left_floor)
@@ -182,9 +182,9 @@ void v_ADDR(caosVM *vm) {
 	VM_PARAM_INTEGER(metaroomid)
 
 	std::shared_ptr<Room> r(new Room(x_left, x_right,
-			y_left_ceiling, y_right_ceiling,
-			y_left_floor, y_right_floor));
-	MetaRoom *m = world.map->getMetaRoom(metaroomid);
+		y_left_ceiling, y_right_ceiling,
+		y_left_floor, y_right_floor));
+	MetaRoom* m = world.map->getMetaRoom(metaroomid);
 	caos_assert(m);
 	r->metaroom = m;
 	r->id = m->addRoom(r);
@@ -197,7 +197,7 @@ void v_ADDR(caosVM *vm) {
 
  Defines the 'type' of the given room.  The types vary with different games.
 */
-void c_RTYP(caosVM *vm) {
+void c_RTYP(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(roomtype)
 	VM_PARAM_INTEGER(roomid)
@@ -213,7 +213,7 @@ void c_RTYP(caosVM *vm) {
 
  Returns the 'type' of the given room, or -1 if 'roomid' is invalid.
 */
-void v_RTYP(caosVM *vm) {
+void v_RTYP(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(roomid)
 
@@ -231,10 +231,11 @@ void v_RTYP(caosVM *vm) {
 
  Returns the room type of the room at the centre point of targ.
 */
-void v_RTYP_c2(caosVM *vm) {
+void v_RTYP_c2(caosVM* vm) {
 	valid_agent(vm->targ);
 	std::shared_ptr<Room> r = world.map->roomAt(vm->targ->x + (vm->targ->getWidth() / 2.0f), vm->targ->y + (vm->targ->getHeight() / 2.0f));
-	if (!r) vm->result.setInt(-1);
+	if (!r)
+		vm->result.setInt(-1);
 	else {
 		vm->result.setInt(r->type);
 	}
@@ -247,7 +248,7 @@ void v_RTYP_c2(caosVM *vm) {
 
  Sets the type of the given room to roomtype.
 */
-void c_SETV_RTYP(caosVM *vm) {
+void c_SETV_RTYP(caosVM* vm) {
 	VM_VERIFY_SIZE(1);
 	VM_PARAM_INTEGER(roomtype);
 
@@ -255,7 +256,8 @@ void c_SETV_RTYP(caosVM *vm) {
 	// seems to work for the airlock, anyway  -nornagon
 	valid_agent(vm->targ);
 	std::shared_ptr<Room> r = world.map->roomAt(vm->targ->x + (vm->targ->getWidth() / 2.0f), vm->targ->y + (vm->targ->getHeight() / 2.0f));
-	if (!r) return; // TODO: correct behaviour?
+	if (!r)
+		return; // TODO: correct behaviour?
 	else
 		r->type = roomtype;
 }
@@ -266,7 +268,7 @@ void c_SETV_RTYP(caosVM *vm) {
 
  Sets how permeable the door between the two given rooms will be. (See PERM).
 */
-void c_DOOR(caosVM *vm) {
+void c_DOOR(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(perm)
 	VM_PARAM_INTEGER(room2)
@@ -274,16 +276,17 @@ void c_DOOR(caosVM *vm) {
 
 	std::shared_ptr<Room> r1 = world.map->getRoom(room1);
 	std::shared_ptr<Room> r2 = world.map->getRoom(room2);
-	caos_assert(r1); caos_assert(r2);
+	caos_assert(r1);
+	caos_assert(r2);
 	if (r1->doors.find(r2) == r1->doors.end()) {
-		RoomDoor *door = new RoomDoor;
+		RoomDoor* door = new RoomDoor;
 		door->first = r1;
 		door->second = r2;
 		door->perm = perm;
 		r1->doors[r2] = door;
 		r2->doors[r1] = door;
 	} else {
-		RoomDoor *door = r1->doors[r2];
+		RoomDoor* door = r1->doors[r2];
 		door->perm = perm;
 	}
 }
@@ -292,7 +295,7 @@ void c_DOOR(caosVM *vm) {
  DOOR (integer) room1 (integer) room2 (integer)
  %status stub
 */
-void v_DOOR(caosVM *vm) {
+void v_DOOR(caosVM* vm) {
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
@@ -307,7 +310,7 @@ void v_DOOR(caosVM *vm) {
  agents inside the room, 'loss' defines how much will be lost into the air, and 'diffusion' defines how easily it 
  will spread to other rooms.
 */
-void c_RATE(caosVM *vm) {
+void c_RATE(caosVM* vm) {
 	VM_VERIFY_SIZE(5)
 	VM_PARAM_FLOAT(diffusion)
 	VM_PARAM_FLOAT(loss)
@@ -328,10 +331,10 @@ void c_RATE(caosVM *vm) {
  
  Returns the room that contains the given agent (jugding by its center).
 */
-void v_ROOM(caosVM *vm) {
+void v_ROOM(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_VALIDAGENT(agent)
-	
+
 	std::shared_ptr<Room> r = roomContainingAgent(agent);
 	if (r)
 		vm->result.setInt(r->id);
@@ -345,9 +348,9 @@ void v_ROOM(caosVM *vm) {
  
  Returns the left constant (0).
 */
-void v_LEFT(caosVM *vm) {
+void v_LEFT(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
-	
+
 	vm->result.setInt(0);
 }
 
@@ -357,9 +360,9 @@ void v_LEFT(caosVM *vm) {
  
  Returns the right constant (1).
 */
-void v_RGHT(caosVM *vm) {
+void v_RGHT(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
-	
+
 	vm->result.setInt(1);
 }
 
@@ -369,9 +372,9 @@ void v_RGHT(caosVM *vm) {
  
  Returns the up constant (2).
 */
-void v_UP(caosVM *vm) {
+void v_UP(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
-	
+
 	vm->result.setInt(2);
 }
 
@@ -381,9 +384,9 @@ void v_UP(caosVM *vm) {
  
  Returns the down constant (3).
 */
-void v_DOWN(caosVM *vm) {
+void v_DOWN(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
-	
+
 	vm->result.setInt(3);
 }
 
@@ -394,7 +397,7 @@ void v_DOWN(caosVM *vm) {
  Defines the level of the given CA in the given room.  Valid settings are between 0 and 1; if higher, it will be 
  reset to 1.
 */
-void c_PROP(caosVM *vm) {
+void c_PROP(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(cavalue)
 	VM_PARAM_INTEGER(caindex)
@@ -417,11 +420,11 @@ void c_PROP(caosVM *vm) {
 
  Returns the level of the given CA in the given room, or 0 if a roomid of -1 is passed.
 */
-void v_PROP(caosVM *vm) {
+void v_PROP(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_INTEGER(caindex)
 	VM_PARAM_INTEGER(roomid)
-	
+
 	caos_assert(0 <= caindex && caindex <= 19);
 
 	if (roomid == -1) {
@@ -431,7 +434,7 @@ void v_PROP(caosVM *vm) {
 
 	std::shared_ptr<Room> room = world.map->getRoom(roomid);
 	caos_assert(room);
-		vm->result.setFloat(room->ca[caindex]);
+	vm->result.setFloat(room->ca[caindex]);
 }
 
 /**
@@ -440,13 +443,15 @@ void v_PROP(caosVM *vm) {
 
  Sets the TARG agent's permiability.  Valid settings are between 1 and 100.
 */
-void c_PERM(caosVM *vm) {
+void c_PERM(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(perm)
 
 	// TODO: setting of 0 valid?
-	if (perm < 0) perm = 0;
-	if (perm > 100) perm = 100;
+	if (perm < 0)
+		perm = 0;
+	if (perm > 100)
+		perm = 100;
 
 	valid_agent(vm->targ);
 	vm->targ->perm = perm;
@@ -458,7 +463,7 @@ void c_PERM(caosVM *vm) {
 
  Returns the TARG agent's permiability.
 */
-void v_PERM(caosVM *vm) {
+void v_PERM(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 
 	valid_agent(vm->targ);
@@ -471,7 +476,7 @@ void v_PERM(caosVM *vm) {
 
  Returns the id of the room at the coordinates (x, y), or -1 if nothing's there.
 */
-void v_GRAP(caosVM *vm) {
+void v_GRAP(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
@@ -490,12 +495,12 @@ void v_GRAP(caosVM *vm) {
 
  Returns the id of the metaroom at the coordinates (x, y), or -1 if nothing's there.
 */
-void v_GMAP(caosVM *vm) {
+void v_GMAP(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(y)
 	VM_PARAM_FLOAT(x)
 
-	MetaRoom *room = world.map->metaRoomAt(x, y);
+	MetaRoom* room = world.map->metaRoomAt(x, y);
 	if (room) {
 		vm->result.setInt(room->id);
 	} else {
@@ -509,7 +514,7 @@ void v_GMAP(caosVM *vm) {
 
  Defines the permeability of the link between the two given rooms.  This is used for CA diffusion.
 */
-void c_LINK(caosVM *vm) {
+void c_LINK(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(perm)
 	VM_PARAM_INTEGER(room2)
@@ -528,7 +533,7 @@ void c_LINK(caosVM *vm) {
 
  Returns the permeability of the link between the given two rooms, or 0 if no link exists.
 */
-void v_LINK(caosVM *vm) {
+void v_LINK(caosVM* vm) {
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
@@ -546,24 +551,30 @@ void v_LINK(caosVM *vm) {
  Returns the nearest adjacent room to the specified agent in the given direction (one of the direction constants), or 
  -1 otherwise.
 */
-void v_GRID(caosVM *vm) {
+void v_GRID(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_INTEGER(direction) caos_assert(direction >= 0); caos_assert(direction <= 3);
+	VM_PARAM_INTEGER(direction)
+	caos_assert(direction >= 0);
+	caos_assert(direction <= 3);
 	VM_PARAM_VALIDAGENT(agent)
 
 	valid_agent(vm->targ);
 	Point src = vm->targ->boundingBoxPoint(direction);
 	Point dest = src;
-	
+
 	switch (direction) {
 		case 0: // left
-			dest.x -= vm->targ->range; break;
+			dest.x -= vm->targ->range;
+			break;
 		case 1: // right
-			dest.x += vm->targ->range; break;
-		case 2: // top 
-			dest.y -= vm->targ->range; break;
-		case 3: // bottom 
-			dest.y += vm->targ->range; break;
+			dest.x += vm->targ->range;
+			break;
+		case 2: // top
+			dest.y -= vm->targ->range;
+			break;
+		case 3: // bottom
+			dest.y += vm->targ->range;
+			break;
 	}
 
 	std::shared_ptr<Room> ourRoom = world.map->roomAt(src.x, src.y);
@@ -574,13 +585,18 @@ void v_GRID(caosVM *vm) {
 		return;
 	}
 
-	unsigned int dummy1; Line dummy2; Point point; std::shared_ptr<Room> room;
+	unsigned int dummy1;
+	Line dummy2;
+	Point point;
+	std::shared_ptr<Room> room;
 	bool collided = world.map->collideLineWithRoomBoundaries(src, dest, ourRoom, room, point, dummy2, dummy1, vm->targ->perm);
 	// TODO: do something with collided?
 	(void)collided;
 
-	if (!room) vm->result.setInt(-1);
-	else vm->result.setInt(room->id);
+	if (!room)
+		vm->result.setInt(-1);
+	else
+		vm->result.setInt(room->id);
 }
 
 /**
@@ -589,11 +605,11 @@ void v_GRID(caosVM *vm) {
 
  Makes the TARG agent continually emit the specified amount of the specified CA into the room.
 */
-void c_EMIT(caosVM *vm) {
+void c_EMIT(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_FLOAT(amount)
 	VM_PARAM_INTEGER(caindex)
-	
+
 	caos_assert((0 <= caindex && caindex <= 19) || caindex == -1);
 	valid_agent(vm->targ);
 
@@ -608,7 +624,7 @@ void c_EMIT(caosVM *vm) {
 
  Returns the direction of the last wall the TARG agent collided with.
 */
-void v_WALL(caosVM *vm) {
+void v_WALL(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
 
 	valid_agent(vm->targ);
@@ -622,12 +638,12 @@ void v_WALL(caosVM *vm) {
  Modifies the level of the given CA in the room specified.
  If 'roomid' is -1, the room containing the TARG agent will be used.
 */
-void c_ALTR(caosVM *vm) {
+void c_ALTR(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_FLOAT(delta);
 	VM_PARAM_INTEGER(caindex);
 	VM_PARAM_INTEGER(roomid);
-	
+
 	caos_assert(0 <= caindex && caindex <= 19);
 
 	std::shared_ptr<Room> room;
@@ -638,8 +654,10 @@ void c_ALTR(caosVM *vm) {
 		room = world.map->getRoom(roomid);
 	caos_assert(room);
 	float newvalue = room->ca[caindex] + delta;
-	if (newvalue < 0.0f) newvalue = 0.0f;
-	else if (newvalue > 1.0f) newvalue = 1.0f;
+	if (newvalue < 0.0f)
+		newvalue = 0.0f;
+	else if (newvalue > 1.0f)
+		newvalue = 1.0f;
 	room->ca[caindex] = newvalue;
 }
 
@@ -650,7 +668,7 @@ void c_ALTR(caosVM *vm) {
  Returns a string containing the location of the given room in the following format: x_left, x_right, y_left_ceiling,
  y_right_ceiling, y_left_floor, y_right_floor.
 */
-void v_RLOC(caosVM *vm) {
+void v_RLOC(caosVM* vm) {
 	VM_PARAM_INTEGER(roomid)
 
 	std::shared_ptr<Room> r = world.map->getRoom(roomid);
@@ -665,10 +683,10 @@ void v_RLOC(caosVM *vm) {
 
  Returns a string containing the location of the given metaroom in the following format: x y width height
 */
-void v_MLOC(caosVM *vm) {
+void v_MLOC(caosVM* vm) {
 	VM_PARAM_INTEGER(metaroomid)
 
-	MetaRoom *r = world.map->getMetaRoom(metaroomid);
+	MetaRoom* r = world.map->getMetaRoom(metaroomid);
 	caos_assert(r);
 
 	vm->result.setString(fmt::format("{} {} {} {}", r->x(), r->y(), r->width(), r->height()));
@@ -680,9 +698,9 @@ void v_MLOC(caosVM *vm) {
 
  Turns the debug map on and off, which shows the edges of rooms and vehicles.
 */
-void c_DMAP(caosVM *vm) {
+void c_DMAP(caosVM* vm) {
 	VM_PARAM_INTEGER(mapon)
-		
+
 	world.showrooms = mapon;
 }
 
@@ -691,7 +709,7 @@ void c_DMAP(caosVM *vm) {
  %status maybe
  %variants c2
 */
-void c_SYS_DMAP(caosVM *vm) {
+void c_SYS_DMAP(caosVM* vm) {
 	c_DMAP(vm);
 }
 
@@ -701,7 +719,7 @@ void c_SYS_DMAP(caosVM *vm) {
 
  Returns a space-seperated list of all room id's contained by the given metaroom.
 */
-void v_ERID(caosVM *vm) {
+void v_ERID(caosVM* vm) {
 	VM_PARAM_INTEGER(metaroom_id)
 
 	std::string out;
@@ -709,9 +727,10 @@ void v_ERID(caosVM *vm) {
 	if (metaroom_id == -1) {
 		// TODO
 	} else {
-		MetaRoom *r = world.map->getMetaRoom(metaroom_id);
-		for (auto & room : r->rooms) {
-			if (out.size() > 0) out = out + " ";
+		MetaRoom* r = world.map->getMetaRoom(metaroom_id);
+		for (auto& room : r->rooms) {
+			if (out.size() > 0)
+				out = out + " ";
 			out = out + fmt::format("{}", room->id);
 		}
 	}
@@ -726,7 +745,7 @@ void v_ERID(caosVM *vm) {
 
  Removes the given room from the map.
 */
-void c_DELR(caosVM *vm) {
+void c_DELR(caosVM* vm) {
 	VM_PARAM_INTEGER(room_id)
 
 	std::shared_ptr<Room> r = world.map->getRoom(room_id);
@@ -741,10 +760,10 @@ void c_DELR(caosVM *vm) {
 
  Removes the given metaroom from the map.
 */
-void c_DELM(caosVM *vm) {
+void c_DELM(caosVM* vm) {
 	VM_PARAM_INTEGER(metaroom_id)
 
-	MetaRoom *r = world.map->getMetaRoom(metaroom_id);
+	MetaRoom* r = world.map->getMetaRoom(metaroom_id);
 	caos_assert(r);
 
 	// TODO
@@ -754,9 +773,10 @@ void c_DELM(caosVM *vm) {
  HIRP (integer) roomid (integer) caindex (integer) direction (integer)
  %status stub
 */
-void v_HIRP(caosVM *vm) {
+void v_HIRP(caosVM* vm) {
 	VM_PARAM_INTEGER(direction)
-	VM_PARAM_INTEGER(caindex) caos_assert(0 <= caindex && caindex <= 19);
+	VM_PARAM_INTEGER(caindex)
+	caos_assert(0 <= caindex && caindex <= 19);
 	VM_PARAM_INTEGER(roomid)
 
 	std::shared_ptr<Room> r = world.map->getRoom(roomid);
@@ -769,9 +789,10 @@ void v_HIRP(caosVM *vm) {
  LORP (integer) roomid (integer) caindex (integer) direction (integer)
  %status stub
 */
-void v_LORP(caosVM *vm) {
+void v_LORP(caosVM* vm) {
 	VM_PARAM_INTEGER(direction)
-	VM_PARAM_INTEGER(caindex) caos_assert(0 <= caindex && caindex <= 19);
+	VM_PARAM_INTEGER(caindex)
+	caos_assert(0 <= caindex && caindex <= 19);
 	VM_PARAM_INTEGER(roomid)
 
 	std::shared_ptr<Room> r = world.map->getRoom(roomid);
@@ -784,7 +805,7 @@ void v_LORP(caosVM *vm) {
  TORX (float) roomid (integer)
  %status maybe
 */
-void v_TORX(caosVM *vm) {
+void v_TORX(caosVM* vm) {
 	VM_PARAM_INTEGER(roomid)
 
 	std::shared_ptr<Room> r = world.map->getRoom(roomid);
@@ -799,7 +820,7 @@ void v_TORX(caosVM *vm) {
  TORY (float) roomid (integer)
  %status maybe
 */
-void v_TORY(caosVM *vm) {
+void v_TORY(caosVM* vm) {
 	VM_PARAM_INTEGER(roomid)
 
 	std::shared_ptr<Room> r = world.map->getRoom(roomid);
@@ -808,12 +829,16 @@ void v_TORY(caosVM *vm) {
 
 	// TODO: calculate this however c2e does it.. or at least check this is right
 	float topy = (r->y_left_ceiling - r->y_right_ceiling) / 2.0f;
-	if (topy >= 0.0f) topy = r->y_left_ceiling + topy;
-	else topy = r->y_right_ceiling - topy;
+	if (topy >= 0.0f)
+		topy = r->y_left_ceiling + topy;
+	else
+		topy = r->y_right_ceiling - topy;
 
 	float bottomy = (r->y_left_floor - r->y_right_floor) / 2.0f;
-	if (bottomy >= 0.0f) topy = r->y_left_floor + bottomy;
-	else bottomy = r->y_right_floor - bottomy;
+	if (bottomy >= 0.0f)
+		topy = r->y_left_floor + bottomy;
+	else
+		bottomy = r->y_right_floor - bottomy;
 
 	float centrey = topy + ((bottomy - topy) / 2.0f);
 	vm->result.setFloat(centrey - vm->targ->y);
@@ -823,11 +848,15 @@ void v_TORY(caosVM *vm) {
  CACL (command) family (integer) genus (integer) species (integer) caindex (integer)
  %status stub
 */
-void c_CACL(caosVM *vm) {
-	VM_PARAM_INTEGER(caindex) caos_assert(0 <= caindex && caindex <= 19);
-	VM_PARAM_INTEGER(species) caos_assert(0 <= species && species <= 65535);
-	VM_PARAM_INTEGER(genus) caos_assert(0 <= genus && genus <= 255);
-	VM_PARAM_INTEGER(family) caos_assert(0 <= family && family <= 255);
+void c_CACL(caosVM* vm) {
+	VM_PARAM_INTEGER(caindex)
+	caos_assert(0 <= caindex && caindex <= 19);
+	VM_PARAM_INTEGER(species)
+	caos_assert(0 <= species && species <= 65535);
+	VM_PARAM_INTEGER(genus)
+	caos_assert(0 <= genus && genus <= 255);
+	VM_PARAM_INTEGER(family)
+	caos_assert(0 <= family && family <= 255);
 
 	// TODO
 }
@@ -839,7 +868,7 @@ void c_CACL(caosVM *vm) {
 
  Always returns zero, since this command was stubbed in C1.
 */
-void v_WIND(caosVM *vm) {
+void v_WIND(caosVM* vm) {
 	vm->result.setInt(0);
 }
 
@@ -918,7 +947,7 @@ CAOS_LVALUE_ROOM_SIMPLE(PSRC, r->psrc)
  %status maybe
  %variants c2
 */
-void v_WNDX(caosVM *vm) {
+void v_WNDX(caosVM* vm) {
 	valid_agent(vm->targ);
 	std::shared_ptr<Room> r = roomContainingAgent(vm->targ);
 	caos_assert(r);
@@ -930,7 +959,7 @@ void v_WNDX(caosVM *vm) {
  %status maybe
  %variants c2
 */
-void v_WNDY(caosVM *vm) {
+void v_WNDY(caosVM* vm) {
 	valid_agent(vm->targ);
 	std::shared_ptr<Room> r = roomContainingAgent(vm->targ);
 	caos_assert(r);
@@ -941,7 +970,7 @@ void v_WNDY(caosVM *vm) {
  DOCA (command) times (integer)
  %status stub
 */
-void c_DOCA(caosVM *vm) {
+void c_DOCA(caosVM* vm) {
 	VM_PARAM_INTEGER(times)
 
 	// TODO
@@ -952,7 +981,7 @@ void c_DOCA(caosVM *vm) {
  %status maybe
  %variants c2
 */
-void c_SETV_DOOR(caosVM *vm) {
+void c_SETV_DOOR(caosVM* vm) {
 	VM_PARAM_INTEGER(value)
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
@@ -963,16 +992,17 @@ void c_SETV_DOOR(caosVM *vm) {
 	// code identical to c2e DOOR
 	std::shared_ptr<Room> r1 = world.map->getRoom(room1);
 	std::shared_ptr<Room> r2 = world.map->getRoom(room2);
-	caos_assert(r1); caos_assert(r2);
+	caos_assert(r1);
+	caos_assert(r2);
 	if (r1->doors.find(r2) == r1->doors.end()) {
-		RoomDoor *door = new RoomDoor;
+		RoomDoor* door = new RoomDoor;
 		door->first = r1;
 		door->second = r2;
 		door->perm = perm;
 		r1->doors[r2] = door;
 		r2->doors[r1] = door;
 	} else {
-		RoomDoor *door = r1->doors[r2];
+		RoomDoor* door = r1->doors[r2];
 		door->perm = perm;
 	}
 }
@@ -984,7 +1014,7 @@ void c_SETV_DOOR(caosVM *vm) {
 
  Return y coordinate of floor below centre of target agent.
 */
-void v_FLOR(caosVM *vm) {
+void v_FLOR(caosVM* vm) {
 	valid_agent(vm->targ);
 
 	std::shared_ptr<Room> r = roomContainingAgent(vm->targ);
@@ -1001,7 +1031,7 @@ void v_FLOR(caosVM *vm) {
 
  Return the number of horizontal pixels per piece of ground level data.
 */
-void v_GNDW(caosVM *vm) {
+void v_GNDW(caosVM* vm) {
 	vm->result.setInt(32); // TODO: is it always 32? :) it said 4 here before! help! - fuzzie
 }
 
@@ -1012,7 +1042,7 @@ void v_GNDW(caosVM *vm) {
 
  Return the ground level data at the provided index. See GNDW to work out the index required.
 */
-void v_GRND(caosVM *vm) {
+void v_GRND(caosVM* vm) {
 	VM_PARAM_INTEGER(index)
 
 	caos_assert(index >= 0 && (unsigned int)index < world.groundlevels.size());
@@ -1027,7 +1057,7 @@ void v_GRND(caosVM *vm) {
 
  Create or modify a room.
 */
-void c_ROOM(caosVM *vm) {
+void c_ROOM(caosVM* vm) {
 	VM_PARAM_INTEGER(type)
 	VM_PARAM_INTEGER(bottom)
 	VM_PARAM_INTEGER(right)
@@ -1059,7 +1089,7 @@ void c_ROOM(caosVM *vm) {
  %status maybe
  %variants c2
 */
-void c_ROOM_c2(caosVM *vm) {
+void c_ROOM_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(dropstatus)
 	VM_PARAM_INTEGER(radiationsource)
 	VM_PARAM_INTEGER(lightsource)
@@ -1087,7 +1117,7 @@ void c_ROOM_c2(caosVM *vm) {
 		r->x_left = left;
 		r->x_right = right;
 		r->y_left_ceiling = r->y_right_ceiling = top;
-		r->y_left_floor = r->y_right_floor = bottom;	
+		r->y_left_floor = r->y_right_floor = bottom;
 	}
 
 	r->type = type;
@@ -1120,10 +1150,11 @@ void c_ROOM_c2(caosVM *vm) {
  source, 17 is radiation source, 18 is the visited flag and 19 is the
  drop status
 */
-void v_ROOM_c1(caosVM *vm) {
+void v_ROOM_c1(caosVM* vm) {
 	// TODO: the original docs here (for C1) said 1 is right and 2 is top, check?
 
-	VM_PARAM_INTEGER(data) caos_assert(data >= 0 && data <= (engine.version == 1 ? 4 : 19));
+	VM_PARAM_INTEGER(data)
+	caos_assert(data >= 0 && data <= (engine.version == 1 ? 4 : 19));
 	VM_PARAM_INTEGER(roomno)
 
 	std::shared_ptr<Room> r = world.map->getRoom(roomno);
@@ -1152,7 +1183,7 @@ void v_ROOM_c1(caosVM *vm) {
 		case 4:
 			vm->result.setInt(r->type);
 			break;
-		
+
 		case 5:
 			vm->result.setInt(r->floorvalue);
 			break;
@@ -1223,12 +1254,11 @@ void v_ROOM_c1(caosVM *vm) {
  The world-wrapping flag for the specified metaroom. 1 to enable wrapping, 0 to disable.
 */
 CAOS_LVALUE(WRAP,
-		VM_PARAM_INTEGER(metaroom_id);
-		MetaRoom *mr = world.map->getMetaRoom(metaroom_id);
-		caos_assert(mr),
-		caosValue((int)mr->wraparound()),
-		mr->setWraparound(newvalue.getInt())
-		)
+			VM_PARAM_INTEGER(metaroom_id);
+			MetaRoom* mr = world.map->getMetaRoom(metaroom_id);
+			caos_assert(mr),
+			caosValue((int)mr->wraparound()),
+			mr->setWraparound(newvalue.getInt()))
 
 /**
  SSFC (command) roomno (integer) count (integer) x1 (integer) y1 (integer)
@@ -1241,7 +1271,7 @@ CAOS_LVALUE(WRAP,
  The coordinates must start at the left side of the room, and end on the right side.
  Count can be zero, which removes any existing floor points.
 */
-void c_SSFC(caosVM *vm) {
+void c_SSFC(caosVM* vm) {
 	// Note: due to parser hacks, our arguments are passed in a different order than normal
 	VM_PARAM_INTEGER(roomno);
 	VM_PARAM_INTEGER(coordcount);
@@ -1277,8 +1307,8 @@ void c_SSFC(caosVM *vm) {
  RMNO (integer)
  %status stub
  %variants c2
-*/ 
-void v_RMNO(caosVM *vm) {
+*/
+void v_RMNO(caosVM* vm) {
 	vm->result.setInt(0); // TODO
 }
 
@@ -1287,7 +1317,7 @@ void v_RMNO(caosVM *vm) {
  %status stub
  %variants c2
 */
-void v_RMN(caosVM *vm) {
+void v_RMN(caosVM* vm) {
 	VM_PARAM_INTEGER(door)
 	VM_PARAM_INTEGER(direction)
 
@@ -1299,14 +1329,14 @@ void v_RMN(caosVM *vm) {
  %status stub
  %variants c2
 */
-void v_RMNR(caosVM *vm) {
+void v_RMNR(caosVM* vm) {
 	VM_PARAM_INTEGER(door)
 	VM_PARAM_INTEGER(direction)
 	VM_PARAM_INTEGER(room)
 
 	vm->result.setInt(0); // TODO
 }
-void s_RMNR(caosVM *vm) {
+void s_RMNR(caosVM* vm) {
 	VM_PARAM_INTEGER(door)
 	VM_PARAM_INTEGER(direction)
 	VM_PARAM_INTEGER(room)
@@ -1321,14 +1351,14 @@ void s_RMNR(caosVM *vm) {
  %status stub
  %variants c2
 */
-void v_RMND(caosVM *vm) {
+void v_RMND(caosVM* vm) {
 	VM_PARAM_INTEGER(door)
 	VM_PARAM_INTEGER(direction)
 	VM_PARAM_INTEGER(room)
 
 	vm->result.setInt(0); // TODO
 }
-void s_RMND(caosVM *vm) {
+void s_RMND(caosVM* vm) {
 	VM_PARAM_INTEGER(door)
 	VM_PARAM_INTEGER(direction)
 	VM_PARAM_INTEGER(room)
@@ -1342,11 +1372,11 @@ void s_RMND(caosVM *vm) {
  %status stub
  %variants c2
 */
-void c_DELN_c2(caosVM *vm) {
+void c_DELN_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(direction)
 	VM_PARAM_INTEGER(room)
 
 	// TODO
 }
-	
+
 /* vim: set noet: */

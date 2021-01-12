@@ -1,10 +1,11 @@
 /* vim: set ft=cpp : */
-#include "fileformats/caostoken.h"
 #include "fileformats/caoslexer.h"
+#include "fileformats/caostoken.h"
+
 #include <algorithm>
 
 
-void lexcaos(std::vector<caostoken> &v, const char *p) {
+void lexcaos(std::vector<caostoken>& v, const char* p) {
 #define make_word(str) \
 	v.push_back(caostoken(caostoken::TOK_WORD, str, yylineno))
 	int yylineno = 1;
@@ -81,7 +82,7 @@ std:
 	any { v.push_back(caostoken(caostoken::TOK_ERROR, yylineno)); goto out; }
 */
 bytestr:
-/*!re2c
+	/*!re2c
 	[\000\r\n] { v.push_back(caostoken(caostoken::TOK_ERROR, yylineno)); goto out; }
 	"]" { v.push_back(caostoken(caostoken::TOK_BYTESTR, std::string(basep, p - basep), yylineno)); goto std;  }
 	noneoi { goto bytestr; }

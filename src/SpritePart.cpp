@@ -1,18 +1,21 @@
-#include "caos_assert.h"
 #include "SpritePart.h"
+
 #include "Agent.h"
 #include "Backend.h"
 #include "Engine.h"
-#include "imageManager.h"
 #include "World.h"
+#include "caos_assert.h"
+#include "imageManager.h"
+
 #include <fmt/core.h>
 
-SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg,
-						int _x, int _y, unsigned int _z) : AnimatablePart(p, _id, _x, _y, _z) {
+SpritePart::SpritePart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg,
+	int _x, int _y, unsigned int _z)
+	: AnimatablePart(p, _id, _x, _y, _z) {
 	origsprite = sprite = world.gallery->getImage(spritefile);
 	firstimg = fimg;
 	caos_assert(sprite);
-	
+
 	pose = 0;
 	base = 0;
 	spriteno = firstimg;
@@ -20,7 +23,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 	framerate = 1;
 	framedelay = 0;
 	draw_mirrored = false;
-	
+
 	if (sprite->numframes() <= firstimg) {
 		if (engine.gametype == "cv") {
 			// Creatures Village allows you to create sprites with crazy invalid data, do the same as it does
@@ -37,7 +40,7 @@ SpritePart::SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsig
 SpritePart::~SpritePart() {
 }
 
-void SpritePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
+void SpritePart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 	// TODO: we need a nicer way to handle such errors
 	if (getCurrentSprite() >= getSprite()->numframes()) {
 		if (engine.version == 2) {
@@ -45,7 +48,7 @@ void SpritePart::partRender(RenderTarget *renderer, int xoffset, int yoffset) {
 			spriteno = getSprite()->numframes() - 1;
 		} else {
 			std::string err = fmt::format("pose to be rendered {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
-			        pose, firstimg, base, getSprite()->getName(), getSprite()->numframes());
+				pose, firstimg, base, getSprite()->getName(), getSprite()->numframes());
 			parent->unhandledException(err, false);
 			return;
 		}
@@ -67,7 +70,7 @@ void SpritePart::setPose(unsigned int p) {
 		} else {
 			// TODO: mention anim frame if animation is non-empty
 			std::string err = fmt::format("new pose {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
-			        p, firstimg, base, getSprite()->getName(), getSprite()->numframes());
+				p, firstimg, base, getSprite()->getName(), getSprite()->numframes());
 			parent->unhandledException(err, false);
 			return;
 		}
@@ -89,7 +92,7 @@ bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	std::shared_ptr<creaturesImage> spr = world.gallery->getImage(spritefile);
 	changeSprite(spr);
-	
+
 	caos_assert(spr->numframes() > fimg);
 	firstimg = fimg;
 }
@@ -98,15 +101,16 @@ void SpritePart::changeSprite(std::shared_ptr<creaturesImage> spr) {
 	caos_assert(spr);
 	// TODO: should we preserve tint?
 	base = 0; // TODO: should we preserve base?
-	
+
 	// TODO: this is a hack for the bmprenderer, is it really a good idea?
 	if (engine.bmprenderer) {
-		if (sprite->numframes() > 0) spr->setBlockSize(sprite->width(0), sprite->height(0));
+		if (sprite->numframes() > 0)
+			spr->setBlockSize(sprite->width(0), sprite->height(0));
 	}
 
 	origsprite = sprite = spr;
 
-	setPose(pose); // TODO: we need to preserve pose, but shouldn't we do some sanity checking?	
+	setPose(pose); // TODO: we need to preserve pose, but shouldn't we do some sanity checking?
 }
 
 unsigned int SpritePart::getWidth() {
@@ -118,7 +122,7 @@ unsigned int SpritePart::getHeight() {
 }
 
 void SpritePart::tint(unsigned char r, unsigned char g, unsigned char b, unsigned char rotation, unsigned char swap) {
-	sprite = world.gallery->tint(origsprite, r, g, b, rotation, swap);	
+	sprite = world.gallery->tint(origsprite, r, g, b, rotation, swap);
 }
 
 void SpritePart::tick() {
@@ -129,7 +133,7 @@ void SpritePart::tick() {
 				framedelay = 0;
 		}
 	}
-		
+
 	if (framedelay == 0)
 		updateAnimation();
 }

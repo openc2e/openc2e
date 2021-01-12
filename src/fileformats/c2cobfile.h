@@ -19,40 +19,40 @@
 
 #pragma once
 
-#include <cassert>
-#include <vector>
-#include <string>
-#include <fstream>
-
 #include "Image.h"
+
+#include <cassert>
+#include <fstream>
+#include <string>
+#include <vector>
 
 class cobBlock;
 
 class c2cobfile {
-protected:
+  protected:
 	std::string path;
 	std::ifstream file;
 
-public:
-	std::vector<cobBlock *> blocks;
+  public:
+	std::vector<cobBlock*> blocks;
 
 	c2cobfile(std::string filepath);
 	~c2cobfile();
 	std::string getPath() { return path; }
-	std::istream &getStream() { return file; }
+	std::istream& getStream() { return file; }
 };
 
 class cobBlock {
-protected:
+  protected:
 	bool loaded;
-	c2cobfile *parent;
-	unsigned char *buffer;
+	c2cobfile* parent;
+	unsigned char* buffer;
 
 	std::streampos offset;
 	unsigned int size;
 
-public:
-	cobBlock(c2cobfile *p);
+  public:
+	cobBlock(c2cobfile* p);
 	~cobBlock();
 	void load();
 	void free();
@@ -60,22 +60,25 @@ public:
 	std::string type;
 
 	bool isLoaded() { return loaded; }
-	c2cobfile *getParent() { return parent; }
+	c2cobfile* getParent() { return parent; }
 	std::streampos getOffset() { return offset; }
 	std::string getType() { return type; }
-	unsigned char *getBuffer() { assert(loaded); return buffer; }
+	unsigned char* getBuffer() {
+		assert(loaded);
+		return buffer;
+	}
 	unsigned int getSize() { return size; }
 };
 
 class cobAgentBlock {
-protected:
-	cobBlock *parent;
+  protected:
+	cobBlock* parent;
 
-public:
-	cobAgentBlock(cobBlock *p);
+  public:
+	cobAgentBlock(cobBlock* p);
 	~cobAgentBlock();
 
-	cobBlock *getParent() { return parent; }
+	cobBlock* getParent() { return parent; }
 
 	unsigned short quantityremaining;
 	unsigned int lastusage;
@@ -97,27 +100,27 @@ public:
 };
 
 class cobFileBlock {
-protected:
-	cobBlock *parent;
+  protected:
+	cobBlock* parent;
 
-public:
-	cobFileBlock(cobBlock *p);
+  public:
+	cobFileBlock(cobBlock* p);
 	~cobFileBlock();
-	
-	cobBlock *getParent() { return parent; }
+
+	cobBlock* getParent() { return parent; }
 
 	unsigned short filetype;
 	unsigned int filesize;
 	std::string filename;
-	unsigned char *getFileContents();
+	unsigned char* getFileContents();
 };
 
 class cobAuthBlock {
-protected:
-	cobBlock *parent;
+  protected:
+	cobBlock* parent;
 
-public:
-	cobAuthBlock(cobBlock *p);
+  public:
+	cobAuthBlock(cobBlock* p);
 	~cobAuthBlock();
 
 	uint8_t daycreated;

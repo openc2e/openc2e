@@ -17,13 +17,15 @@
  *
  */
 
-#include "caos_assert.h"
 #include "fileformats/c16Image.h"
+
+#include "caos_assert.h"
 #include "endianlove.h"
+
 #include <memory>
 #include <string.h>
 
-MultiImage ReadC16File(std::istream &in) {
+MultiImage ReadC16File(std::istream& in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	caos_assert(flags & 0x02);
@@ -48,15 +50,15 @@ MultiImage ReadC16File(std::istream &in) {
 			lineoffsets[i][j] = read32le(in);
 		}
 	}
-	
+
 	// track position manually because ifstreams implementations often call seek
 	// on the underlying file even when we're already at the right position!
 	size_t curpos = in.tellg();
-	
+
 	// todo: we assume the file format is valid here. we shouldn't.
 	for (unsigned int i = 0; i < numframes; i++) {
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height * 2);
-		uint16_t *bufferpos = (uint16_t *)images[i].data.data();
+		uint16_t* bufferpos = (uint16_t*)images[i].data.data();
 		for (unsigned int j = 0; j < images[i].height; j++) {
 			if (lineoffsets[i][j] != curpos) {
 				// TODO: log warning?
@@ -65,11 +67,12 @@ MultiImage ReadC16File(std::istream &in) {
 			while (true) {
 				uint16_t tag = read16le(in);
 				curpos += 2;
-				if (tag == 0) break;
+				if (tag == 0)
+					break;
 				bool transparentrun = ((tag & 0x0001) == 0);
 				uint16_t runlength = (tag & 0xFFFE) >> 1;
 				if (transparentrun) {
-					memset((char *)bufferpos, 0, (runlength * 2));
+					memset((char*)bufferpos, 0, (runlength * 2));
 				} else {
 					readmany16le(in, bufferpos, runlength);
 					curpos += 2 * runlength;

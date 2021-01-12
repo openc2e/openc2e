@@ -18,9 +18,11 @@
  */
 
 #include "CreatureAgent.h"
-#include "Creature.h"
+
 #include "Catalogue.h"
+#include "Creature.h"
 #include "Engine.h"
+
 #include <cassert>
 
 CreatureAgent::CreatureAgent() {
@@ -36,7 +38,7 @@ CreatureAgent::~CreatureAgent() {
 		delete creature;
 }
 
-void CreatureAgent::setCreature(Creature *c) {
+void CreatureAgent::setCreature(Creature* c) {
 	assert(c);
 	creature = c;
 

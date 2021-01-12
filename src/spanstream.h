@@ -2,9 +2,8 @@
 
 #include <iostream>
 
-class spanstream : public std::istream
-{
-public:
+class spanstream : public std::istream {
+  public:
 	spanstream(const unsigned char* buffer, size_t buffer_size)
 		: std::istream(&buf), buf(buffer, buffer_size) {}
 
@@ -18,17 +17,16 @@ public:
 	spanstream(const T& t)
 		: spanstream(t.data(), t.size()) {}
 
-protected:
-	class spanstreambuf : public std::streambuf
-	{
-	public:
+  protected:
+	class spanstreambuf : public std::streambuf {
+	  public:
 		spanstreambuf(const unsigned char* buffer_, size_t buffer_size_)
 			: buffer(buffer_), buffer_size(buffer_size_) {}
 
 		spanstreambuf(const char* buffer_, size_t buffer_size_)
 			: buffer(reinterpret_cast<const unsigned char*>(buffer_)), buffer_size(buffer_size_) {}
 
-	protected:
+	  protected:
 		pos_type seekpos(pos_type pos, std::ios_base::openmode which) override {
 			return seekoff(pos, std::ios_base::beg, which);
 		}
@@ -50,7 +48,7 @@ protected:
 			}
 		}
 
-		std::streamsize xsgetn(char *s, std::streamsize n) override {
+		std::streamsize xsgetn(char* s, std::streamsize n) override {
 			if (position + n <= buffer_size) {
 				std::copy(buffer + position, buffer + position + n, s);
 				position += n;
@@ -70,8 +68,9 @@ protected:
 			}
 			return ret;
 		}
-	private:
-		const unsigned char *buffer;
+
+	  private:
+		const unsigned char* buffer;
 		size_t buffer_size;
 		size_t position = 0;
 	};

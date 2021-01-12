@@ -18,15 +18,17 @@
  */
 
 #include "Map.h"
-#include "Room.h"
+
+#include "Engine.h"
 #include "MetaRoom.h"
+#include "Room.h"
+
 #include <cassert>
 #include <iostream>
 #include <memory>
-#include "Engine.h"
 
 void Map::Reset() {
-	for (auto & metaroom : metarooms) {
+	for (auto& metaroom : metarooms) {
 		delete metaroom;
 	}
 	metarooms.clear();
@@ -41,7 +43,7 @@ void Map::SetMapDimensions(unsigned int w, unsigned int h) {
 	height = h;
 }
 
-int Map::addMetaRoom(MetaRoom *m) {
+int Map::addMetaRoom(MetaRoom* m) {
 	// todo: check if it's outlying
 	while (getMetaRoom(metaroom_base))
 		metaroom_base++;
@@ -50,15 +52,15 @@ int Map::addMetaRoom(MetaRoom *m) {
 	return m->id;
 }
 
-MetaRoom *Map::getMetaRoom(unsigned int room) {
-	for (auto & metaroom : metarooms)
+MetaRoom* Map::getMetaRoom(unsigned int room) {
+	for (auto& metaroom : metarooms)
 		if (metaroom->id == room)
 			return metaroom;
 	return 0;
 }
 
 std::shared_ptr<Room> Map::getRoom(unsigned int r) {
-	for (auto & room : rooms)
+	for (auto& room : rooms)
 		if (room->id == r)
 			return room;
 	return std::shared_ptr<Room>();
@@ -73,23 +75,24 @@ unsigned int Map::getRoomCount() {
 }
 
 void Map::tick() {
-	if (engine.version < 3) return; // TODO: tick rooms in C2
+	if (engine.version < 3)
+		return; // TODO: tick rooms in C2
 
 	// Three passes..
-	for (auto & metaroom : metarooms)
+	for (auto& metaroom : metarooms)
 		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
 			(*i)->tick();
-	for (auto & metaroom : metarooms)
+	for (auto& metaroom : metarooms)
 		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
 			(*i)->postTick();
-	for (auto & metaroom : metarooms)
+	for (auto& metaroom : metarooms)
 		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
 			(*i)->resetTick();
 }
 
-MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
+MetaRoom* Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 	for (auto r : metarooms) {
-			if ((_x >= r->x()) && (_y >= r->y()))
+		if ((_x >= r->x()) && (_y >= r->y()))
 			if ((_x <= (r->x() + r->width())) && (_y <= (r->y() + r->height())))
 				return r;
 	}
@@ -97,22 +100,24 @@ MetaRoom *Map::metaRoomAt(unsigned int _x, unsigned int _y) {
 }
 
 std::shared_ptr<Room> Map::roomAt(float _x, float _y) {
-	MetaRoom *m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
-	if (!m) return std::shared_ptr<Room>();
+	MetaRoom* m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
+	if (!m)
+		return std::shared_ptr<Room>();
 	return m->roomAt(_x, _y);
 }
 
 std::vector<std::shared_ptr<Room> > Map::roomsAt(float _x, float _y) {
-	MetaRoom *m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
-	if (!m) return std::vector<std::shared_ptr<Room> >();
+	MetaRoom* m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
+	if (!m)
+		return std::vector<std::shared_ptr<Room> >();
 	return m->roomsAt(_x, _y);
 }
 
-bool Map::collideLineWithRoomSystem(Point src, Point dest, std::shared_ptr<Room> &room, Point &where, Line &wall, unsigned int &walldir, int perm) {
+bool Map::collideLineWithRoomSystem(Point src, Point dest, std::shared_ptr<Room>& room, Point& where, Line& wall, unsigned int& walldir, int perm) {
 	std::shared_ptr<Room> newRoom;
 
 	where = src;
-	
+
 	while (true) {
 		if (!collideLineWithRoomBoundaries(where, dest, room, newRoom, where, wall, walldir, perm))
 			return false; // failure
@@ -120,9 +125,9 @@ bool Map::collideLineWithRoomSystem(Point src, Point dest, std::shared_ptr<Room>
 			return true; // collision
 		if (where == dest)
 			return false; // got there
-		
+
 		assert(newRoom != room); // tsk
-		
+
 		room = newRoom;
 	}
 }
@@ -130,11 +135,12 @@ bool Map::collideLineWithRoomSystem(Point src, Point dest, std::shared_ptr<Room>
 /*
  * poss. optimisation: skip checking the rest of the lines if our distance is 0?
  */
-bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<Room> room, std::shared_ptr<Room> &newroom, Point &where, Line &wall, unsigned int &walldir, int perm) {
+bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<Room> room, std::shared_ptr<Room>& newroom, Point& where, Line& wall, unsigned int& walldir, int perm) {
 	assert(room);
 	// TODO: this assert fails. why? 'where' is presumably outside the dest room sometimes.. mmh
 	//assert(room->containsPoint(src.x, src.y));
-	if (src == dest) return false;
+	if (src == dest)
+		return false;
 
 	newroom.reset();
 
@@ -149,7 +155,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 	Point oldpoint = where;
 	Line movement(src, dest);
 
-	Line x[4] = { room->left, room->right, room->top, room->bot };
+	Line x[4] = {room->left, room->right, room->top, room->bot};
 	for (unsigned int i = 0; i < 4; i++) {
 		/*if (previousroom)
 			if (x[i].containsPoint(oldpoint)) continue; */
@@ -171,10 +177,10 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 			// see if this is nearer than any previous points we've found
 			double distx = temppoint.x - src.x;
 			double disty = temppoint.y - src.y;
-			double d = distx*distx + disty*disty;
+			double d = distx * distx + disty * disty;
 			if (d > distance)
 				continue;
-		
+
 			// work out which room is next along our movement vector
 			// TODO: this code utterly sucks, doesn't work properly
 			float newx, newy;
@@ -183,8 +189,8 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 				newx = temppoint.x + (src.x <= dest.x ? (src.x == dest.x ? 0.0 : -0.5) : 0.5);
 				newy = temppoint.y + (src.y <= dest.y ? (src.y == dest.y ? 0.0 : -0.5) : 0.5);
 			} else {*/
-				newx = temppoint.x + (src.x <= dest.x ? (src.x == dest.x ? 0.0 : 0.5) : -0.5);
-				newy = temppoint.y + (src.y <= dest.y ? (src.y == dest.y ? 0.0 : 0.5) : -0.5);
+			newx = temppoint.x + (src.x <= dest.x ? (src.x == dest.x ? 0.0 : 0.5) : -0.5);
+			newy = temppoint.y + (src.y <= dest.y ? (src.y == dest.y ? 0.0 : 0.5) : -0.5);
 			//}
 
 			if (room->containsPoint(newx, newy)) { // if a little along our movement vector is still in our room, forget it
@@ -213,7 +219,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 					break;
 				}
 			}
-			
+
 			if (!foundroom && !nextroom)
 				nextroom = roomAt(newx, newy);
 
@@ -224,7 +230,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 					break;
 				}
 			}*/
-		
+
 			std::shared_ptr<Room> z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
 			if (!z) {
 				// TODO: commented out this error message for sake of fuzzie's sanity, but it's still an issue
@@ -261,5 +267,5 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 
 	return true;
 }
-	
+
 /* vim: set noet: */

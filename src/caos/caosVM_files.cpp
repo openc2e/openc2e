@@ -18,14 +18,15 @@
  */
 
 
-#include "caos_assert.h"
-#include "caosVM.h"
 #include "World.h"
+#include "caosVM.h"
+#include "caos_assert.h"
+
+#include <fmt/core.h>
 #include <fstream>
+#include <ghc/filesystem.hpp>
 #include <iostream>
 #include <sstream>
-#include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
 std::string calculateJournalFilename(int directory, std::string filename, bool writable) {
@@ -38,19 +39,21 @@ std::string calculateJournalFilename(int directory, std::string filename, bool w
 		if (filename[i] == '.') {
 			filename.erase(i, 1);
 			i--;
-		} else break;
+		} else
+			break;
 	}
-	
+
 	std::string fullfilename;
-	
+
 	// TODO: point at the correct journal directories!
-	
+
 	if (!writable) {
 		// search all directories for a readable file
 		fullfilename = world.findFile("Journal/" + filename);
 
 		// if we found one, return that
-		if (fullfilename.size()) return fullfilename;
+		if (fullfilename.size())
+			return fullfilename;
 	}
 
 	// otherwise, we should always write to the journal directory
@@ -60,7 +63,7 @@ std::string calculateJournalFilename(int directory, std::string filename, bool w
 		case 2: fullfilename = world.getUserDataDir() + "/Journal/"; break;
 		default: throw caosException("unknown Journal directory");
 	}
-	
+
 	fs::path dir = fs::path(fullfilename);
 	if (!fs::exists(dir))
 		fs::create_directory(dir);
@@ -80,13 +83,15 @@ std::string calculateJournalFilename(int directory, std::string filename, bool w
  this consists of the number of results on the first line, and then the full filename paths to the matched
  files on the remaining lines.
 */
-void c_FILE_GLOB(caosVM *vm) {
+void c_FILE_GLOB(caosVM* vm) {
 	VM_PARAM_STRING(filespec)
 	VM_PARAM_INTEGER(directory)
 
 	std::string::size_type n = filespec.find_last_of("/\\") + 1;
-	std::string dirportion; dirportion.assign(filespec, 0, n);
-	std::string specportion; specportion.assign(filespec, n, filespec.size() - n);
+	std::string dirportion;
+	dirportion.assign(filespec, 0, n);
+	std::string specportion;
+	specportion.assign(filespec, n, filespec.size() - n);
 
 	if (directory == 1)
 		dirportion = "Journal/" + dirportion;
@@ -96,7 +101,7 @@ void c_FILE_GLOB(caosVM *vm) {
 	std::vector<std::string> possiblefiles = world.findFiles(dirportion, specportion);
 
 	std::string str = fmt::format("{}\n", possiblefiles.size());
-	for (auto & possiblefile : possiblefiles) {
+	for (auto& possiblefile : possiblefiles) {
 		str += possiblefile + "\n";
 	}
 
@@ -109,7 +114,7 @@ void c_FILE_GLOB(caosVM *vm) {
 
  Disconnects everything from the input stream.
 */
-void c_FILE_ICLO(caosVM *vm) {
+void c_FILE_ICLO(caosVM* vm) {
 	if (vm->inputstream) {
 		delete vm->inputstream;
 		vm->inputstream = 0;
@@ -124,12 +129,12 @@ void c_FILE_ICLO(caosVM *vm) {
  directory) on the current VM's input stream, for use by INOK, INNL, INNI and INNF.
  If a file is already open, it will be closed first.
 */
-void c_FILE_IOPE(caosVM *vm) {
+void c_FILE_IOPE(caosVM* vm) {
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
 
 	c_FILE_ICLO(vm);
-	
+
 	std::string fullfilename = calculateJournalFilename(directory, filename, false);
 	vm->inputstream = new std::ifstream(fullfilename.c_str());
 
@@ -146,10 +151,10 @@ void c_FILE_IOPE(caosVM *vm) {
  Removes the given file in the given directory (pass 1 for the world directory, or 0 for the main 
  directory) immediately.
 */
-void c_FILE_JDEL(caosVM *vm) {
+void c_FILE_JDEL(caosVM* vm) {
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
-	
+
 	std::string fullfilename = calculateJournalFilename(directory, filename, true);
 
 	// TODO
@@ -161,7 +166,7 @@ void c_FILE_JDEL(caosVM *vm) {
 
  Disconnects everything from the output stream.
 */
-void c_FILE_OCLO(caosVM *vm) {
+void c_FILE_OCLO(caosVM* vm) {
 	if (vm->outputstream) {
 		delete vm->outputstream;
 		vm->outputstream = 0;
@@ -174,7 +179,7 @@ void c_FILE_OCLO(caosVM *vm) {
 
  Flushes the current output stream; if this is a file, all data in the buffer will be written to it.
 */
-void c_FILE_OFLU(caosVM *vm) {
+void c_FILE_OFLU(caosVM* vm) {
 	if (vm->outputstream)
 		vm->outputstream->flush();
 }
@@ -187,7 +192,7 @@ void c_FILE_OFLU(caosVM *vm) {
  directory) on the current VM's output stream.
  If a file is already open, it will be closed first. 
 */
-void c_FILE_OOPE(caosVM *vm) {
+void c_FILE_OOPE(caosVM* vm) {
 	VM_PARAM_INTEGER(append)
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
@@ -198,7 +203,7 @@ void c_FILE_OOPE(caosVM *vm) {
 
 	if (append)
 		vm->outputstream = new std::ofstream(fullfilename.c_str(), std::ios::app);
-	else	
+	else
 		vm->outputstream = new std::ofstream(fullfilename.c_str(), std::ios::trunc);
 
 	if (vm->outputstream->fail()) {
@@ -213,7 +218,7 @@ void c_FILE_OOPE(caosVM *vm) {
 
  Returns an safe (not-in-use) filename for naming worlds and other saved files.
 */
-void v_FVWM(caosVM *vm) {
+void v_FVWM(caosVM* vm) {
 	VM_PARAM_STRING(name)
 
 	vm->result.setString(name + "_something"); // TODO
@@ -225,7 +230,7 @@ void v_FVWM(caosVM *vm) {
 
  Fetches a float from the current input stream, or 0.0 if there is no data.
 */
-void v_INNF(caosVM *vm) {
+void v_INNF(caosVM* vm) {
 	if (!vm->inputstream)
 		throw caosException("no input stream in INNF!");
 
@@ -240,7 +245,7 @@ void v_INNF(caosVM *vm) {
 
  Fetches an integer from the current input stream, or 0 if there is no data.
 */
-void v_INNI(caosVM *vm) {
+void v_INNI(caosVM* vm) {
 	if (!vm->inputstream)
 		throw caosException("no input stream in INNI!");
 
@@ -255,7 +260,7 @@ void v_INNI(caosVM *vm) {
 
  Fetches a string of text from the input stream.
 */
-void v_INNL(caosVM *vm) {
+void v_INNL(caosVM* vm) {
 	if (!vm->inputstream)
 		throw caosException("no input stream in INNL!");
 	std::string str;
@@ -269,7 +274,7 @@ void v_INNL(caosVM *vm) {
 
  Determines whether the current input stream is usable (0 or 1).
 */
-void v_INOK(caosVM *vm) {
+void v_INOK(caosVM* vm) {
 	if (!vm->inputstream)
 		vm->result.setInt(0);
 	else if (vm->inputstream->fail())
@@ -284,7 +289,7 @@ void v_INOK(caosVM *vm) {
 
  Launches the specified URL, prepended with 'http://' (so you'd only specify, for example, 'example.com/foo.html'), in the user's browser.
 */
-void c_WEBB(caosVM *vm) {
+void c_WEBB(caosVM* vm) {
 	VM_PARAM_STRING(url)
 
 	// TODO

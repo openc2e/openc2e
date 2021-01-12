@@ -25,7 +25,7 @@
 
  Networking is not supported in openc2e, so does nothing.
 */
-void c_NET_PASS(caosVM *vm) {
+void c_NET_PASS(caosVM* vm) {
 	VM_PARAM_STRING(password)
 	VM_PARAM_STRING(nick_name)
 }
@@ -36,7 +36,7 @@ void c_NET_PASS(caosVM *vm) {
 
  Networking is not supported in openc2e, so always returns "nobody".
 */
-void v_NET_PASS(caosVM *vm) {
+void v_NET_PASS(caosVM* vm) {
 	vm->result.setString("nobody");
 }
 
@@ -46,7 +46,7 @@ void v_NET_PASS(caosVM *vm) {
 
  Networking is not supported in openc2e, so does nothing.
 */
-void c_NET_LINE(caosVM *vm) {
+void c_NET_LINE(caosVM* vm) {
 	VM_PARAM_INTEGER(connect)
 }
 
@@ -56,7 +56,7 @@ void c_NET_LINE(caosVM *vm) {
 
  Networking is not supported in openc2e, so always returns 1.
 */
-void v_NET_LINE(caosVM *vm) {
+void v_NET_LINE(caosVM* vm) {
 	vm->result.setInt(1);
 }
 
@@ -66,7 +66,7 @@ void v_NET_LINE(caosVM *vm) {
 
  Networking is not supported in openc2e, so always returns 0.
 */
-void v_NET_ERRA(caosVM *vm) {
+void v_NET_ERRA(caosVM* vm) {
 	vm->result.setInt(0);
 }
 
@@ -76,7 +76,7 @@ void v_NET_ERRA(caosVM *vm) {
 
  Networking is not supported in openc2e, so always returns 0.
 */
-void v_NET_ULIN(caosVM *vm) {
+void v_NET_ULIN(caosVM* vm) {
 	vm->result.setInt(0);
 }
 
@@ -95,7 +95,7 @@ void c_NET_WHOZ(caosVM*) {
 
  Networking is not supported in openc2e, so does nothing.
 */
-void c_NET_WHON(caosVM *vm) {
+void c_NET_WHON(caosVM* vm) {
 	VM_PARAM_STRING(username)
 }
 
@@ -105,7 +105,7 @@ void c_NET_WHON(caosVM *vm) {
 
  Networking is not supported in openc2e, so returns an empty string.
 */
-void v_NET_USER(caosVM *vm) {
+void v_NET_USER(caosVM* vm) {
 	vm->result.setString("");
 }
 
@@ -115,7 +115,7 @@ void v_NET_USER(caosVM *vm) {
  
  Networking is not supported in openc2e, so returns an empty string.
 */
-void v_NET_FROM(caosVM *vm) {
+void v_NET_FROM(caosVM* vm) {
 	VM_PARAM_STRING(resource_name)
 	vm->result.setString("");
 }
@@ -126,7 +126,7 @@ void v_NET_FROM(caosVM *vm) {
 
  Networking is not supported in openc2e, so always returns 0.
 */
-void v_NET_EXPO(caosVM *vm) {
+void v_NET_EXPO(caosVM* vm) {
 	VM_PARAM_STRING(dest_user)
 	VM_PARAM_STRING(chunk_type)
 	vm->result.setInt(0);
@@ -138,7 +138,7 @@ void v_NET_EXPO(caosVM *vm) {
 
  Networking is not supported in openc2e, so sets result to an empty string.
 */
-void c_NET_RUSO(caosVM *vm) {
+void c_NET_RUSO(caosVM* vm) {
 	VM_PARAM_VARIABLE(result)
 
 	result->setString("");
@@ -159,7 +159,7 @@ void c_NET_HEAD(caosVM*) {
 
  Networking is not supported in openc2e, so does nothing.
 */
-void c_NET_HEAR(caosVM *vm) {
+void c_NET_HEAR(caosVM* vm) {
 	VM_PARAM_STRING(channel)
 }
 
@@ -169,7 +169,7 @@ void c_NET_HEAR(caosVM *vm) {
 
  Networking is not supported in openc2e, so returns an empty string.
 */
-void v_NET_HOST(caosVM *vm) {
+void v_NET_HOST(caosVM* vm) {
 	vm->result.setString("");
 }
 
@@ -179,7 +179,7 @@ void v_NET_HOST(caosVM *vm) {
 
  Networking is not supported in openc2e, so returns zero.
 */
-void v_NET_RAWE(caosVM *vm) {
+void v_NET_RAWE(caosVM* vm) {
 	vm->result.setInt(0);
 }
 
@@ -189,7 +189,7 @@ void v_NET_RAWE(caosVM *vm) {
 
  Networking is not supported in openc2e, so sets everything to -1.
 */
-void c_NET_STAT(caosVM *vm) {
+void c_NET_STAT(caosVM* vm) {
 	VM_PARAM_VARIABLE(bytessent)
 	VM_PARAM_VARIABLE(bytesreceived)
 	VM_PARAM_VARIABLE(usersonline)
@@ -207,7 +207,7 @@ void c_NET_STAT(caosVM *vm) {
 
  Networking is not supported in openc2e, so sets result to an empty string.
 */
-void c_NET_UNIK(caosVM *vm) {
+void c_NET_UNIK(caosVM* vm) {
 	VM_PARAM_VARIABLE(result)
 	VM_PARAM_STRING(userid)
 
@@ -220,7 +220,7 @@ void c_NET_UNIK(caosVM *vm) {
  
  Networking is not supported in openc2e, so return an empty string.
 */
-void v_NET_WHAT(caosVM *vm) {
+void v_NET_WHAT(caosVM* vm) {
 	vm->result.setString("");
 }
 
@@ -239,7 +239,7 @@ void c_NET_WHOD(caosVM*) {
 
  Networking is not supported in openc2e, so does nothing.
 */
-void c_NET_WHOF(caosVM *vm) {
+void c_NET_WHOF(caosVM* vm) {
 	VM_PARAM_STRING(user)
 }
 
@@ -249,7 +249,7 @@ void c_NET_WHOF(caosVM *vm) {
  
  Networking is not supported in openc2e, so does nothing.
 */
-void c_NET_WRIT(caosVM *vm) {
+void c_NET_WRIT(caosVM* vm) {
 	VM_PARAM_VALUE(param2)
 	VM_PARAM_VALUE(param1)
 	VM_PARAM_STRING(messageid)

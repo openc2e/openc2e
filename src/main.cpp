@@ -18,11 +18,12 @@
  *
  */
 
-#include "version.h"
-#include <iostream>
-#include <memory>
 #include "Engine.h"
 #include "backends/SDLBackend.h"
+#include "version.h"
+
+#include <iostream>
+#include <memory>
 #ifdef SDLMIXER_SUPPORT
 #include "audiobackend/SDLMixerBackend.h"
 #endif
@@ -34,7 +35,7 @@
 // SDL tries stealing main on some platforms, which we don't want.
 #undef main
 
-extern "C" int main(int argc, char *argv[]) {
+extern "C" int main(int argc, char* argv[]) {
 	std::string version;
 #ifdef DEV_BUILD
 	version = "development build";
@@ -42,7 +43,7 @@ extern "C" int main(int argc, char *argv[]) {
 	version = RELEASE_VERSION;
 #endif
 	std::cout << "openc2e (" << version << "), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 "
-		"Alyssa Milburn and others\n\n";
+										   "Alyssa Milburn and others\n\n";
 
 	engine.addPossibleBackend("sdl", std::shared_ptr<Backend>(new SDLBackend()));
 #ifdef SDLMIXER_SUPPORT
@@ -50,10 +51,12 @@ extern "C" int main(int argc, char *argv[]) {
 #endif
 
 	// pass command-line flags to the engine, but do no other setup
-	if (!engine.parseCommandLine(argc, argv)) return 1;
-	
+	if (!engine.parseCommandLine(argc, argv))
+		return 1;
+
 	// get the engine to do all the startup (read catalogue, loading world, etc)
-	if (!engine.initialSetup()) return 0;
+	if (!engine.initialSetup())
+		return 0;
 
 	int ret = engine.backend->run();
 

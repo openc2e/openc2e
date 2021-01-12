@@ -18,107 +18,113 @@
  */
 
 #include "creaturesImage.h"
+
 #include "creaturesException.h"
+
 #include <memory>
-	
-creaturesImage::creaturesImage(std::string n) { name = n; }
+
+creaturesImage::creaturesImage(std::string n) {
+	name = n;
+}
 
 imageformat creaturesImage::format(unsigned int frame) const {
-  return images[frame].format;
+	return images[frame].format;
 }
 
 unsigned int creaturesImage::numframes() const {
-  if (block_width || block_height) {
-    auto val = images[0].width / block_width * images[0].height / block_height;
-    return val;
-  }
-  return images.size();
+	if (block_width || block_height) {
+		auto val = images[0].width / block_width * images[0].height / block_height;
+		return val;
+	}
+	return images.size();
 }
 
 unsigned int creaturesImage::width(unsigned int frame) const {
-  if (block_width) {
-    return block_width;
-  }
-  return images[frame].width;
+	if (block_width) {
+		return block_width;
+	}
+	return images[frame].width;
 }
 
 unsigned int creaturesImage::height(unsigned int frame) const {
-  if (block_height) {
-    return block_height;
-  }
-  return images[frame].height;
+	if (block_height) {
+		return block_height;
+	}
+	return images[frame].height;
 }
 
-const void *creaturesImage::data(unsigned int frame) const {
-  return images[frame].data.data();
+const void* creaturesImage::data(unsigned int frame) const {
+	return images[frame].data.data();
 }
 
 std::string creaturesImage::getName() const {
-  return name;
+	return name;
 }
 
 bool creaturesImage::hasCustomPalette(unsigned int frame) const {
-  return images[frame].palette.data() != nullptr;
+	return images[frame].palette.data() != nullptr;
 }
 shared_array<Color> creaturesImage::getCustomPalette(unsigned int frame) const {
-  return images[frame].palette;
+	return images[frame].palette;
 }
 
 const Image& creaturesImage::getImageForFrame(unsigned int frame) const {
-  if (block_width || block_height) {
-    return images[0];
-  }
-  return images[frame];
+	if (block_width || block_height) {
+		return images[0];
+	}
+	return images[frame];
 }
 
 Texture& creaturesImage::getTextureForFrame(unsigned int frame) {
-  if (block_width || block_height) {
-    if (textures.size() <= 0) textures.resize(1);
-    return textures[0];
-  }
-  if (textures.size() <= frame) textures.resize(frame+1);
-  return textures[frame];
+	if (block_width || block_height) {
+		if (textures.size() <= 0)
+			textures.resize(1);
+		return textures[0];
+	}
+	if (textures.size() <= frame)
+		textures.resize(frame + 1);
+	return textures[frame];
 }
 
 unsigned int creaturesImage::getXOffsetForFrame(unsigned int frame) const {
-  if (block_width) {
-    return block_width * (frame % (images[0].width / block_width));
-  }
-  return 0;
+	if (block_width) {
+		return block_width * (frame % (images[0].width / block_width));
+	}
+	return 0;
 }
 
 unsigned int creaturesImage::getYOffsetForFrame(unsigned int frame) const {
-  if (block_width && block_height) {
-    return block_height * (frame / (images[0].width / block_width));
-  }
-  return 0;
+	if (block_width && block_height) {
+		return block_height * (frame / (images[0].width / block_width));
+	}
+	return 0;
 }
 
 bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned int y) const {
-  if (block_width || block_height) {
-    // TODO: implement this when we figure out to get seamonkeys past the load screen
-    return false;
-  }
-  
-  imageformat imgformat = format(frame);
+	if (block_width || block_height) {
+		// TODO: implement this when we figure out to get seamonkeys past the load screen
+		return false;
+	}
+
+	imageformat imgformat = format(frame);
 	if (imgformat == if_rgb565 || imgformat == if_rgb555) {
 		size_t offset = (y * width(frame)) + x;
-		uint16_t *buffer = (uint16_t *)data(frame);
+		uint16_t* buffer = (uint16_t*)data(frame);
 		return buffer[offset] == 0;
 	} else if (imgformat == if_index8 && !hasCustomPalette(frame)) {
 		size_t offset = (y * width(frame)) + x;
-		uint8_t *buffer = (uint8_t *)data(frame);
+		uint8_t* buffer = (uint8_t*)data(frame);
 		return buffer[offset] == 0;
 	}
 	return false;
 }
 
 void creaturesImage::setBlockSize(int width, int height) {
-  if (images.size() != 1) {
-    throw creaturesException("Can't set block size on image with more than one frame");
-  }
-  block_width = width;
-  block_height = height;
+	if (images.size() != 1) {
+		throw creaturesException("Can't set block size on image with more than one frame");
+	}
+	block_width = width;
+	block_height = height;
 }
 
 /* vim: set noet: */

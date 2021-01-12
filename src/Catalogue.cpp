@@ -20,18 +20,16 @@
 #include "Catalogue.h"
 
 // make sure we have the header imports that bison's horrible .h file needs
-#include <cassert>
-#include <string>
-#include <list>
-
 #include "catalogparser.h"
-#include <ghc/filesystem.hpp>
-#include <fmt/core.h>
-#include <iostream>
-
-#include <cctype>
-
 #include "utils/readfile.h"
+
+#include <cassert>
+#include <cctype>
+#include <fmt/core.h>
+#include <ghc/filesystem.hpp>
+#include <iostream>
+#include <list>
+#include <string>
 
 
 namespace fs = ghc::filesystem;
@@ -44,15 +42,14 @@ struct quote_subst {
 };
 
 static struct quote_subst subst_table[] = {
-	{ 'n', '\n' },
-	{ '\\', '\\' },
-	{ '\"', '\"' },
-	{ 't', '\t' },
-	{ 0, 0 }
-};
+	{'n', '\n'},
+	{'\\', '\\'},
+	{'\"', '\"'},
+	{'t', '\t'},
+	{0, 0}};
 
 char catalogue_descape(char c) {
-	struct quote_subst *qs = subst_table;
+	struct quote_subst* qs = subst_table;
 	while (qs->escape) {
 		if (qs->escape == c)
 			return qs->subst;
@@ -65,18 +62,17 @@ char catalogue_descape(char c) {
 std::string cat_str;
 int cat_int = -1;
 
-Catalogue *parsing_cat = NULL;
+Catalogue* parsing_cat = NULL;
 
-void Catalogue::addVals(std::string &title, bool override, const std::list<std::string> &vals)
-{
+void Catalogue::addVals(std::string& title, bool override, const std::list<std::string>& vals) {
 	// TODO: how the heck does override work? DS has an "Option Text" tag which has to overwrite the C3 one, so commenting this out for now..
-	(void)override;
+	(void) override;
 	/*if (data.find(title) != data.end() && !override)
 		return; // XXX: ?*/
 	data[title].clear();
-//	copy(vals.begin(), vals.end(), data[title].begin());
+	//	copy(vals.begin(), vals.end(), data[title].begin());
 	std::list<std::string>::const_iterator i = vals.begin();
-	while(i != vals.end()) {
+	while (i != vals.end()) {
 		data[title].push_back(*i++);
 	}
 }
@@ -84,15 +80,15 @@ void Catalogue::addVals(std::string &title, bool override, const std::list<std::
 
 extern int cataparse();
 
-void Catalogue::catalogueParseError(const char *err) {
+void Catalogue::catalogueParseError(const char* err) {
 	throw catalogueException(fmt::format("Catalogue parse error at line {}: {}", yylineno, err));
 }
 
-std::istream &operator >> (std::istream &s, Catalogue &c) {
+std::istream& operator>>(std::istream& s, Catalogue& c) {
 	std::string buf = readfile(s);
 	Catalogue::yyinit(buf.c_str());
 	parsing_cat = &c;
-			
+
 	cataparse();
 
 	return s;
@@ -109,15 +105,16 @@ void Catalogue::addFile(fs::path path) {
 	try {
 		fs::ifstream f(path);
 		f >> *this;
-	} catch (const catalogueException &ex) {
-		std::cerr << "Error reading catalogue file " << path.string() << ":" << std::endl << '\t' << ex.what() << std::endl;
+	} catch (const catalogueException& ex) {
+		std::cerr << "Error reading catalogue file " << path.string() << ":" << std::endl
+				  << '\t' << ex.what() << std::endl;
 	}
 }
 
 void Catalogue::initFrom(fs::path path, std::string language) {
 	assert(fs::exists(path));
 	assert(fs::is_directory(path));
-	
+
 	//std::cout << "Catalogue is reading " << path.string() << std::endl;
 
 	fs::directory_iterator end;
@@ -125,7 +122,6 @@ void Catalogue::initFrom(fs::path path, std::string language) {
 	for (fs::directory_iterator i(path); i != end; ++i) {
 		try {
 			if ((!fs::is_directory(*i)) && (i->path().extension().string() == ".catalogue")) {
-
 				std::string x = i->path().stem().string();
 				bool has_language_suffix = x.size() > 3 && x[x.size() - 3] == '-';
 
@@ -142,11 +138,10 @@ void Catalogue::initFrom(fs::path path, std::string language) {
 					}
 				}
 			}
-		}
-		catch (const std::exception &ex) {
+		} catch (const std::exception& ex) {
 			std::cerr << "directory_iterator died on '" << i->path().filename() << "' with " << ex.what() << std::endl;
 		}
-	}	
+	}
 }
 
 const std::string Catalogue::getAgentName(unsigned char family, unsigned char genus, unsigned short species) const {
@@ -160,10 +155,14 @@ const std::string Catalogue::getAgentName(unsigned char family, unsigned char ge
 
 std::string Catalogue::calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const {
 	std::string searchstring = fmt::format("{} {} {} {}", tag, (int)family, (int)genus, species);
-	if (hasTag(searchstring)) return searchstring;
-	if (species != 0) return calculateWildcardTag (tag, family, genus, 0);
-	if (genus != 0) return calculateWildcardTag (tag, family, 0, 0);
-	if (family != 0) return calculateWildcardTag (tag, 0, 0, 0);
+	if (hasTag(searchstring))
+		return searchstring;
+	if (species != 0)
+		return calculateWildcardTag(tag, family, genus, 0);
+	if (genus != 0)
+		return calculateWildcardTag(tag, family, 0, 0);
+	if (family != 0)
+		return calculateWildcardTag(tag, 0, 0, 0);
 	return "";
 }
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
-#include <vector>
-
 #include "Image.h"
 #include "shared_array.h"
 #include "span.h"
 
-MultiImage ReadCharsetDtaFile(std::istream &in);
+#include <cstdint>
+#include <vector>
+
+MultiImage ReadCharsetDtaFile(std::istream& in);

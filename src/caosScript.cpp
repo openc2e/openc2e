@@ -17,29 +17,31 @@
  *
  */
 
+#include "caosScript.h"
+
+#include "Engine.h"
+#include "Scriptorium.h"
+#include "World.h"
 #include "bytecode.h"
+#include "caosVM.h"
 #include "cmddata.h"
 #include "creaturesException.h"
-#include "caosScript.h"
-#include "caosVM.h"
+#include "dialect.h"
 #include "fileformats/caoslexer.h"
 #include "fileformats/caostoken.h"
-#include "Engine.h"
 #include "parseException.h"
-#include "World.h"
-#include "dialect.h"
 #include "utils/readfile.h"
-#include "Scriptorium.h"
-#include <cassert>
-#include <iostream>
-#include <memory>
+
 #include <algorithm>
+#include <cassert>
 #include <cstring>
 #include <fmt/core.h>
+#include <iostream>
+#include <memory>
 
 using std::string;
 
-class unexpectedEOIexception { };
+class unexpectedEOIexception {};
 
 script::~script() {
 }
@@ -48,7 +50,7 @@ script::~script() {
 void script::link() {
 	ops.push_back(caosOp(CAOS_STOP, 0, -1));
 	assert(!linked);
-//	std::cout << "Pre-link:" << std::endl << dump();
+	//	std::cout << "Pre-link:" << std::endl << dump();
 	// check relocations
 	for (unsigned int i = 1; i < relocations.size(); i++) {
 		// handle relocations-to-relocations
@@ -57,19 +59,18 @@ void script::link() {
 			p = relocations[-p];
 		relocations[i] = p;
 	}
-	for (auto & op : ops) {
+	for (auto& op : ops) {
 		if (op_is_relocatable(op.opcode) && op.argument < 0)
 			op.argument = relocations[-op.argument];
 	}
 	linked = true;
-//	std::cout << "Post-link:" << std::endl << dump();
+	//	std::cout << "Post-link:" << std::endl << dump();
 	relocations.clear();
 }
 
-script::script(const Dialect *v, const std::string &fn)
+script::script(const Dialect* v, const std::string& fn)
 	: fmly(-1), gnus(-1), spcs(-1), scrp(-1),
-		dialect(v), filename(fn)
-{
+	  dialect(v), filename(fn) {
 	// advance past reserved index 0
 	ops.push_back(caosOp(CAOS_NOP, 0, -1));
 	relocations.push_back(0);
@@ -77,12 +78,11 @@ script::script(const Dialect *v, const std::string &fn)
 	varUsed = 0;
 	linked = false;
 }
-	
-script::script(const Dialect *v, const std::string &fn,
-		int fmly_, int gnus_, int spcs_, int scrp_)
+
+script::script(const Dialect* v, const std::string& fn,
+	int fmly_, int gnus_, int spcs_, int scrp_)
 	: fmly(fmly_), gnus(gnus_), spcs(spcs_), scrp(scrp_),
-		dialect(v), filename(fn)
-{
+	  dialect(v), filename(fn) {
 	ops.push_back(caosOp(CAOS_NOP, 0, -1));
 	relocations.push_back(0);
 	memset(varRemap, 0xFF, 100);
@@ -102,12 +102,12 @@ std::string script::dump() {
 	return buf;
 }
 
-caosScript::caosScript(const std::string &dialect, const std::string &fn) {
+caosScript::caosScript(const std::string& dialect, const std::string& fn) {
 	enumdepth = 0;
 	d = getDialectByName(dialect);
 	if (!d)
 		throw parseException(std::string("Unknown dialect ") + dialect);
-	current = installer = std::shared_ptr<script> (new script(d, fn));
+	current = installer = std::shared_ptr<script>(new script(d, fn));
 	filename = fn;
 }
 
@@ -136,11 +136,11 @@ void caosScript::installInstallScript(unsigned char family, unsigned char genus,
 }
 
 
-saveVisit::saveVisit(caosScript *s)
-	: scr(s)
-{ }
+saveVisit::saveVisit(caosScript* s)
+	: scr(s) {
+}
 
-void saveVisit::operator()(const CAOSCmd &cmd) const {
+void saveVisit::operator()(const CAOSCmd& cmd) const {
 	scr->errindex = scr->traceindex = cmd.traceidx - 1;
 	if (cmd.op->rettype != CI_VARIABLE) {
 		throw parseException(std::string("RValue ") + cmd.op->fullname + " used where LValue expected");
@@ -149,13 +149,12 @@ void saveVisit::operator()(const CAOSCmd &cmd) const {
 	scr->emitOp(CAOS_SAVE_CMD, scr->d->cmd_index(cmd.op));
 }
 
-evalVisit::evalVisit(caosScript *s, bool save_here_)
-	: scr(s), save_here(save_here_)
-{ }
+evalVisit::evalVisit(caosScript* s, bool save_here_)
+	: scr(s), save_here(save_here_) {
+}
 
 
-
-void evalVisit::operator()(const CAOSCmd &cmd) const {
+void evalVisit::operator()(const CAOSCmd& cmd) const {
 	for (size_t i = 0; i < cmd.arguments.size(); i++) {
 		bool save_there = (i < (size_t)cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE);
 		cmd.arguments[i]->eval(scr, save_there);
@@ -175,12 +174,12 @@ void evalVisit::operator()(const CAOSCmd &cmd) const {
 	// result down below them.
 	// This is theoretical at the moment - no expression-type commands also
 	// write back to their args.
-	
+
 	if (cmd.op->rettype != CI_COMMAND) {
-		int rotcount = 0;	
+		int rotcount = 0;
 		for (int i = 0; i < cmd.op->argc; i++) {
 			if (cmd.op->argtypes[i] == CI_VARIABLE)
-				rotcount++;		
+				rotcount++;
 		}
 		if (rotcount)
 			scr->emitOp(CAOS_STACK_ROT, rotcount);
@@ -191,11 +190,11 @@ void evalVisit::operator()(const CAOSCmd &cmd) const {
 	}
 }
 
-void evalVisit::operator()(const caosValue &v) const {
+void evalVisit::operator()(const caosValue& v) const {
 	scr->emitConst(v);
 }
 
-void caosScript::emitConst(const caosValue &v) {
+void caosScript::emitConst(const caosValue& v) {
 	if (v.hasInt()) {
 		int val = v.getInt();
 		if (val >= -(1 << 24) && val < (1 << 24)) {
@@ -207,9 +206,9 @@ void caosScript::emitConst(const caosValue &v) {
 	emitOp(CAOS_CONST, current->consts.size() - 1);
 }
 
-int costVisit::operator()(const CAOSCmd &cmd) const {
+int costVisit::operator()(const CAOSCmd& cmd) const {
 	int accum = cmd.op->evalcost;
-	for (const auto & argument : cmd.arguments)
+	for (const auto& argument : cmd.arguments)
 		accum += argument->cost();
 	return accum;
 }
@@ -237,7 +236,7 @@ struct repsinfo {
 	int loopidx;
 };
 
-caostoken *caosScript::tokenPeek() {
+caostoken* caosScript::tokenPeek() {
 	while (true) {
 		if ((size_t)curindex >= tokens->size()) {
 			return NULL;
@@ -246,7 +245,7 @@ caostoken *caosScript::tokenPeek() {
 	}
 }
 
-caosScript::logicaltokentype caosScript::logicalType(const caostoken * const t) {
+caosScript::logicaltokentype caosScript::logicalType(const caostoken* const t) {
 	return logicalType(*t);
 }
 
@@ -281,10 +280,10 @@ caosScript::logicaltokentype caosScript::logicalType(const caostoken& t) {
 	}
 }
 
-caostoken *caosScript::getToken(logicaltokentype expected) {
-	caostoken *t = tokenPeek();
+caostoken* caosScript::getToken(logicaltokentype expected) {
+	caostoken* t = tokenPeek();
 	caostoken dummy;
-	caostoken &r = (t ? *t : dummy);
+	caostoken& r = (t ? *t : dummy);
 	errindex = curindex;
 
 	if (expected != ANYTOKEN && logicalType(r) != expected) {
@@ -299,15 +298,15 @@ caostoken *caosScript::getToken(logicaltokentype expected) {
 void caosScript::putBackToken(caostoken*) {
 	curindex--;
 	errindex = curindex - 1; // curindex refers to the /next/ token to be parsed
-							 // so make sure we refer to the token before it
+		// so make sure we refer to the token before it
 }
 
-void caosScript::parse(std::istream &in) {
+void caosScript::parse(std::istream& in) {
 	// slurp our input stream
 	return parse(readfile(in));
 }
 
-void caosScript::parse(const std::string &caostext) {
+void caosScript::parse(const std::string& caostext) {
 	assert(!tokens);
 	// run the token parser
 	{
@@ -375,7 +374,7 @@ void caosScript::parse(const std::string &caostext) {
 			(*i)->code = code;
 			(*i++)->link();
 		}
-	} catch (parseException &e) {
+	} catch (parseException& e) {
 		e.filename = filename;
 		if (!tokens)
 			throw;
@@ -433,8 +432,7 @@ caosValue caosScript::asConst(const caostoken& token) {
 			return caosValue(token.intval());
 		case caostoken::TOK_FLOAT:
 			return caosValue(token.floatval());
-		case caostoken::TOK_BYTESTR:
-		{
+		case caostoken::TOK_BYTESTR: {
 			if (d->name == "c1" || d->name == "c2") {
 				return caosValue(token.stringval());
 			}
@@ -455,13 +453,13 @@ void caosScript::unexpectedToken(const caostoken& token) {
 	throw parseException("Unexpected " + token.typeAsString());
 }
 
-const cmdinfo *caosScript::readCommand(caostoken *t, const std::string &prefix, bool except) {
+const cmdinfo* caosScript::readCommand(caostoken* t, const std::string& prefix, bool except) {
 	if (!except && logicalType(t) != TOK_WORD)
 		return NULL;
 
 	std::string fullname = prefix + t->word();
 	errindex = t->index;
-	const cmdinfo *ci = d->find_command(fullname.c_str());
+	const cmdinfo* ci = d->find_command(fullname.c_str());
 
 	if (!ci) {
 		if (!except)
@@ -470,8 +468,8 @@ const cmdinfo *caosScript::readCommand(caostoken *t, const std::string &prefix, 
 	}
 
 	// See if there's a subcommand
-	caostoken *t2 = NULL;
-	const cmdinfo *subci = NULL;
+	caostoken* t2 = NULL;
+	const cmdinfo* subci = NULL;
 	bool need_subcmd = (ci->argtypes && ci->argtypes[0] == CI_SUBCOMMAND);
 
 	t2 = getToken(ANYTOKEN);
@@ -507,7 +505,7 @@ void caosScript::emitExpr(std::shared_ptr<CAOSExpression> ce) {
 }
 
 std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
-	caostoken *t = getToken();
+	caostoken* t = getToken();
 	traceindex = errindex = curindex;
 	if (xtype == CI_BAREWORD) {
 		if (logicalType(t) == TOK_WORD) {
@@ -533,17 +531,15 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 
 	std::string oldpayload = t->word();
 	std::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
-	CAOSCmd *cmd = mpark::get_if<CAOSCmd>(&ce->value);
+	CAOSCmd* cmd = mpark::get_if<CAOSCmd>(&ce->value);
 
 	if (t->word().size() == 4 && isdigit(t->word()[2]) && isdigit(t->word()[3])) {
-		if (	!strncmp(t->word().c_str(), "va", 2)
-			||	!strncmp(t->word().c_str(), "ov", 2)
-			||	!strncmp(t->word().c_str(), "mv", 2)) {
+		if (!strncmp(t->word().c_str(), "va", 2) || !strncmp(t->word().c_str(), "ov", 2) || !strncmp(t->word().c_str(), "mv", 2)) {
 			int idx = atoi(t->word().c_str() + 2);
 			if (!strncmp(t->word().c_str(), "va", 2))
 				idx = current->mapVAxx(idx);
 			t->setWord(t->word().substr(0, 2) + "xx");
-			const cmdinfo *op = readCommand(t, std::string("expr "));
+			const cmdinfo* op = readCommand(t, std::string("expr "));
 			t->setWord(oldpayload);
 
 			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosValue(idx)));
@@ -555,13 +551,12 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 
 	if (t->word().size() == 4 && isdigit(t->word()[3]) && engine.version < 3) {
 		// OBVx VARx hacks
-		if (	!strncmp(t->word().c_str(), "obv", 3)
-			||	!strncmp(t->word().c_str(), "var", 3)) {
+		if (!strncmp(t->word().c_str(), "obv", 3) || !strncmp(t->word().c_str(), "var", 3)) {
 			int idx = atoi(t->word().c_str() + 3);
 			if (!strncmp(t->word().c_str(), "var", 3))
 				idx = current->mapVAxx(idx);
 			t->setWord(t->word().substr(0, 3) + "x");
-			const cmdinfo *op = readCommand(t, std::string("expr "));
+			const cmdinfo* op = readCommand(t, std::string("expr "));
 			t->setWord(oldpayload);
 
 			std::shared_ptr<CAOSExpression> arg(new CAOSExpression(errindex, caosValue(idx)));
@@ -570,8 +565,8 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 			return ce;
 		}
 	}
-	
-	const cmdinfo *ci = readCommand(t, std::string(xtype == CI_COMMAND ? "cmd " : "expr "));
+
+	const cmdinfo* ci = readCommand(t, std::string(xtype == CI_COMMAND ? "cmd " : "expr "));
 	t->setWord(oldpayload);
 	cmd->op = ci;
 	for (int i = 0; i < ci->argc; i++) {
@@ -581,27 +576,29 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 }
 
 int caosScript::readCond() {
-	caostoken *t = getToken(TOK_WORD);
-	typedef struct { const char *n; int cnd; } cond_entry;
+	caostoken* t = getToken(TOK_WORD);
+	typedef struct {
+		const char* n;
+		int cnd;
+	} cond_entry;
 	const static cond_entry conds[] = {
-		{ "eq", CEQ },
-		{ "=",  CEQ },
-		{ "gt", CGT },
-		{ ">",  CGT },
-		{ "ge", CGE },
-		{ ">=", CGE },
-		{ "lt", CLT },
-		{ "<",  CLT },
-		{ "le", CLE },
-		{ "<=", CLE },
-		{ "ne", CNE },
-		{ "<>", CNE },
-		{ "bt", CBT },
-		{ "bf", CBF },
-		{ NULL, 0 }
-	};
+		{"eq", CEQ},
+		{"=", CEQ},
+		{"gt", CGT},
+		{">", CGT},
+		{"ge", CGE},
+		{">=", CGE},
+		{"lt", CLT},
+		{"<", CLT},
+		{"le", CLE},
+		{"<=", CLE},
+		{"ne", CNE},
+		{"<>", CNE},
+		{"bt", CBT},
+		{"bf", CBF},
+		{NULL, 0}};
 
-	const cond_entry *c = conds;
+	const cond_entry* c = conds;
 	while (c->n != NULL) {
 		if (t->word() == c->n)
 			return c->cnd;
@@ -623,21 +620,24 @@ void caosScript::parseCondition() {
 		emitExpr(a2);
 		emitOp(CAOS_COND, cond | (nextIsAnd ? CAND : COR));
 
-		caostoken *peek = tokenPeek();
-		if (!peek) break;
-		if (logicalType(peek) != TOK_WORD) break;
+		caostoken* peek = tokenPeek();
+		if (!peek)
+			break;
+		if (logicalType(peek) != TOK_WORD)
+			break;
 		if (peek->word() == "and") {
 			getToken();
 			nextIsAnd = true;
 		} else if (peek->word() == "or") {
 			getToken();
 			nextIsAnd = false;
-		} else break;
+		} else
+			break;
 	}
 }
 
-void caosScript::parseloop(int state, void *info) {
-	caostoken *t;
+void caosScript::parseloop(int state, void* info) {
+	caostoken* t;
 	while ((t = getToken(ANYTOKEN))) {
 		traceindex = errindex;
 		if (logicalType(t) == EOI) {
@@ -659,7 +659,7 @@ void caosScript::parseloop(int state, void *info) {
 			assert(!enumdepth);
 			state = ST_BODY;
 			int bits[4];
-			for (int & bit : bits) {
+			for (int& bit : bits) {
 				caosValue val = asConst(*getToken(TOK_CONST));
 				if (val.getType() != CAOSINT)
 					throw parseException("Expected integer constant");
@@ -688,7 +688,7 @@ void caosScript::parseloop(int state, void *info) {
 			current = installer;
 		} else if (t->word() == "endm") {
 			emitOp(CAOS_STOP, 0);
-			
+
 			if (state == ST_INSTALLER || state == ST_BODY || state == ST_REMOVAL) {
 				assert(!enumdepth);
 				state = ST_INSTALLER;
@@ -707,11 +707,7 @@ void caosScript::parseloop(int state, void *info) {
 			}
 			// No we will not emit c_ENDM() thankyouverymuch
 
-		} else if (t->word() == "enum"
-				|| t->word() == "esee"
-				|| t->word() == "etch"
-				|| t->word() == "epas"
-				|| t->word() == "econ") {
+		} else if (t->word() == "enum" || t->word() == "esee" || t->word() == "etch" || t->word() == "epas" || t->word() == "econ") {
 			int nextreloc = current->newRelocation();
 			putBackToken(t);
 
@@ -764,13 +760,13 @@ void caosScript::parseloop(int state, void *info) {
 		} else if (t->word() == "loop") {
 			int loop = current->getNextIndex();
 			emitCmd("cmd loop");
-			parseloop(ST_LOOP, (void *)&loop);			
+			parseloop(ST_LOOP, (void*)&loop);
 		} else if (t->word() == "untl") {
 			if (state != ST_LOOP)
 				throw parseException("Unexpected UNTL");
 			// TODO: zerocost logic inversion - do in c_UNTL()?
-			int loop = *(int *)info;
-			int out  = current->newRelocation();
+			int loop = *(int*)info;
+			int out = current->newRelocation();
 			parseCondition();
 			emitCmd("cmd untl");
 			emitOp(CAOS_CJMP, out);
@@ -780,7 +776,7 @@ void caosScript::parseloop(int state, void *info) {
 		} else if (t->word() == "ever") {
 			if (state != ST_LOOP)
 				throw parseException("Unexpected EVER");
-			int loop = *(int *)info;
+			int loop = *(int*)info;
 			emitOp(CAOS_JMP, loop);
 			return;
 
@@ -791,11 +787,11 @@ void caosScript::parseloop(int state, void *info) {
 			emitExpr(readExpr(CI_COMMAND));
 			emitOp(CAOS_JMP, ri.jnzreloc);
 			ri.loopidx = current->getNextIndex();
-			parseloop(ST_REPS, (void *)&ri);
+			parseloop(ST_REPS, (void*)&ri);
 		} else if (t->word() == "repe") {
 			if (state != ST_REPS)
 				throw parseException("Unexpected repe");
-			struct repsinfo *ri = (repsinfo *)info;
+			struct repsinfo* ri = (repsinfo*)info;
 			current->fixRelocation(ri->jnzreloc);
 			emitOp(CAOS_DECJNZ, ri->loopidx);
 			emitCmd("cmd repe");
@@ -812,7 +808,7 @@ void caosScript::parseloop(int state, void *info) {
 			emitOp(CAOS_CJMP, okreloc);
 			emitOp(CAOS_JMP, di.failreloc);
 			current->fixRelocation(okreloc);
-			parseloop(ST_DOIF, (void *)&di);
+			parseloop(ST_DOIF, (void*)&di);
 			if (di.failreloc)
 				current->fixRelocation(di.failreloc);
 			current->fixRelocation(di.donereloc);
@@ -823,7 +819,7 @@ void caosScript::parseloop(int state, void *info) {
 				t->setWord(std::string("doif"));
 				continue;
 			}
-			struct doifinfo *di = (struct doifinfo *)info;
+			struct doifinfo* di = (struct doifinfo*)info;
 			int okreloc = current->newRelocation();
 
 			emitOp(CAOS_JMP, di->donereloc);
@@ -839,7 +835,7 @@ void caosScript::parseloop(int state, void *info) {
 		} else if (t->word() == "else") {
 			if (state != ST_DOIF)
 				throw parseException("Unexpected ELSE");
-			struct doifinfo *di = (struct doifinfo *)info;
+			struct doifinfo* di = (struct doifinfo*)info;
 			if (!di->failreloc)
 				throw parseException("Duplicate ELSE");
 			emitOp(CAOS_JMP, di->donereloc);
@@ -886,7 +882,7 @@ void caosScript::parseloop(int state, void *info) {
 			emitCmd("cmd ssfc");
 		} else {
 			if (t->word() == "dbg:") {
-				caostoken *t2 = tokenPeek();
+				caostoken* t2 = tokenPeek();
 				if (t2 && logicalType(t2) == TOK_WORD && t2->word() == "asrt") {
 					getToken(TOK_WORD);
 					emitOp(CAOS_CONSTINT, 1);
@@ -916,19 +912,19 @@ void caosScript::parseloop(int state, void *info) {
 		}
 	}
 }
-			
-void caosScript::emitCmd(const char *name) {
-	const cmdinfo *ci = d->find_command(name);
+
+void caosScript::emitCmd(const char* name) {
+	const cmdinfo* ci = d->find_command(name);
 	emitOp(CAOS_CMD, d->cmd_index(ci));
 	if (ci->evalcost)
 		emitOp(CAOS_YIELD, ci->evalcost);
 }
 
-void CAOSExpression::eval(caosScript *scr, bool save_here) const {
+void CAOSExpression::eval(caosScript* scr, bool save_here) const {
 	mpark::visit(evalVisit(scr, save_here), value);
 }
 
-void CAOSExpression::save(caosScript *scr) const {
+void CAOSExpression::save(caosScript* scr) const {
 	mpark::visit(saveVisit(scr), value);
 }
 

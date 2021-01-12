@@ -20,11 +20,13 @@
 #ifndef PEFILE_H
 #define PEFILE_H
 
+#include "Image.h"
+
+#include <fstream>
+#include <ghc/filesystem.hpp>
+#include <map>
 #include <string>
 #include <vector>
-#include <fstream>
-#include <map>
-#include <ghc/filesystem.hpp>
 
 namespace fs = ghc::filesystem;
 
@@ -51,16 +53,16 @@ class resourceInfo {
 
 	uint32_t offset;
 	uint32_t size;
-	char *data;
+	char* data;
 
-public:
+  public:
 	uint32_t getSize() { return size; }
-	char *getData() { return data; }
+	char* getData() { return data; }
 	std::vector<std::string> parseStrings();
 };
 
 class peFile {
-protected:
+  protected:
 	fs::path path;
 	std::ifstream file;
 
@@ -68,13 +70,13 @@ protected:
 	std::map<std::pair<uint32_t, uint32_t>, std::map<uint32_t, resourceInfo> > resources;
 
 	void parseResources();
-	void parseResourcesLevel(peSection &s, unsigned int off, unsigned int level);
+	void parseResourcesLevel(peSection& s, unsigned int off, unsigned int level);
 
-public:
+  public:
 	peFile(fs::path filepath);
 	~peFile();
 
-	resourceInfo *getResource(uint32_t type, uint32_t lang, uint32_t name);
+	resourceInfo* getResource(uint32_t type, uint32_t lang, uint32_t name);
 	Image getBitmap(uint32_t name);
 };
 

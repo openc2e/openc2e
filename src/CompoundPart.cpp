@@ -17,24 +17,25 @@
  *
  */
 
-#include <cassert>
-#include <memory>
+#include "CompoundPart.h"
 
 #include "Agent.h"
 #include "Backend.h"
-#include "CompoundPart.h"
-#include "CameraPart.h"
 #include "Camera.h"
+#include "CameraPart.h"
 #include "CompoundAgent.h"
+#include "Engine.h"
+#include "World.h"
 #include "creaturesException.h"
 #include "creaturesImage.h"
 #include "encoding.h"
-#include "Engine.h"
 #include "imageManager.h"
 #include "keycodes.h"
-#include "World.h"
 
-void CompoundPart::render(RenderTarget *renderer, int xoffset, int yoffset) {
+#include <cassert>
+#include <memory>
+
+void CompoundPart::render(RenderTarget* renderer, int xoffset, int yoffset) {
 	if (parent->visible) {
 		partRender(renderer, xoffset + (int)parent->x, yoffset + (int)parent->y);
 		if (parent->displaycore /*&& (id == 0)*/) {
@@ -45,7 +46,7 @@ void CompoundPart::render(RenderTarget *renderer, int xoffset, int yoffset) {
 			renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF0000CC);
 			renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF0000CC);
 			renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF0000CC);
-		}	
+		}
 	}
 }
 
@@ -77,14 +78,15 @@ int CompoundPart::handleClick(float clickx, float clicky) {
 	return parent->handleClick(clickx + x + parent->x, clicky + y + parent->y);
 }
 
-CompoundPart::CompoundPart(Agent *p, unsigned int _id, int _x, int _y, int _z) : parent(p), zorder(_z), id(_id) {
+CompoundPart::CompoundPart(Agent* p, unsigned int _id, int _x, int _y, int _z)
+	: parent(p), zorder(_z), id(_id) {
 	auto compound_parent = dynamic_cast<CompoundAgent*>(parent);
 	part_sequence_number = compound_parent ? compound_parent->nextPartSequenceNumber() : 0;
 
-	addZOrder();	
+	addZOrder();
 	x = _x;
 	y = _y;
-	
+
 	has_alpha = false;
 }
 
@@ -103,5 +105,5 @@ void CompoundPart::zapZOrder() {
 
 void CompoundPart::addZOrder() {
 	renderable::addZOrder();
-	zorder_iter = world.zorder.insert(this);	
+	zorder_iter = world.zorder.insert(this);
 }

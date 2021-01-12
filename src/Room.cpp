@@ -18,8 +18,10 @@
  */
 
 #include "Room.h"
-#include "World.h"
+
 #include "Backend.h"
+#include "World.h"
+
 #include <cassert>
 #include <memory>
 
@@ -29,12 +31,15 @@ Room::Room() {
 }
 
 Room::Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int y_r_t,
-		unsigned int y_l_b, unsigned int y_r_b) {
-	if (x_l > x_r) std::swap(x_l, x_r);
+	unsigned int y_l_b, unsigned int y_r_b) {
+	if (x_l > x_r)
+		std::swap(x_l, x_r);
 	x_left = x_l;
 	x_right = x_r;
-	if (y_l_b < y_l_t) std::swap(y_l_b, y_l_t);
-	if (y_r_b < y_r_t) std::swap(y_r_b, y_r_t);
+	if (y_l_b < y_l_t)
+		std::swap(y_l_b, y_l_t);
+	if (y_r_b < y_r_t)
+		std::swap(y_r_b, y_r_t);
 	y_left_ceiling = y_l_t;
 	y_right_ceiling = y_r_t;
 	y_left_floor = y_l_b;
@@ -55,18 +60,22 @@ Room::Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int 
 }
 
 void Room::tick() {
-	if (world.carates.find(type) == world.carates.end()) return;
-	std::map<unsigned int, cainfo> &rates = world.carates[type];
+	if (world.carates.find(type) == world.carates.end())
+		return;
+	std::map<unsigned int, cainfo>& rates = world.carates[type];
 
 	for (unsigned int i = 0; i < CA_COUNT; i++) {
-		if (rates.find(i) == rates.end()) continue;
-		cainfo &info = rates[i];
+		if (rates.find(i) == rates.end())
+			continue;
+		cainfo& info = rates[i];
 
 		// adjust for loss
 		ca[i] -= (ca[i] * info.loss);
 
-		if (catemp[i] > 1.0f) catemp[i] = 1.0f;
-		else if (catemp[i] < 0.0f) catemp[i] = 0.0f;
+		if (catemp[i] > 1.0f)
+			catemp[i] = 1.0f;
+		else if (catemp[i] < 0.0f)
+			catemp[i] = 0.0f;
 
 		// adjust for gain from agents
 		if (catemp[i] > ca[i]) {
@@ -81,26 +90,31 @@ void Room::tick() {
 }
 
 void Room::postTick() {
-	if (world.carates.find(type) == world.carates.end()) return;
-	std::map<unsigned int, cainfo> &rates = world.carates[type];
+	if (world.carates.find(type) == world.carates.end())
+		return;
+	std::map<unsigned int, cainfo>& rates = world.carates[type];
 
 	float diffusion[CA_COUNT];
 	for (unsigned int i = 0; i < CA_COUNT; i++) {
 		ca[i] = catemp[i];
-		if (rates.find(i) == rates.end()) diffusion[i] = 0.0f;
-		else diffusion[i] = rates[i].diffusion;
+		if (rates.find(i) == rates.end())
+			diffusion[i] = 0.0f;
+		else
+			diffusion[i] = rates[i].diffusion;
 	}
 
 	// adjust for diffusion to/from surrounding rooms
 	// TODO: absolutely no clue if this is correct
-	for (auto & door : doors) {
+	for (auto& door : doors) {
 		std::shared_ptr<Room> dest = door.second->first.lock();
-		if (dest.get() == this) dest = door.second->second.lock();
+		if (dest.get() == this)
+			dest = door.second->second.lock();
 		assert(dest);
 
 		for (unsigned int i = 0; i < CA_COUNT; i++) {
 			float possiblediffusion = dest->catemp[i] * diffusion[i] * (door.second->perm / 100.0f);
-			if (possiblediffusion > 1.0f) possiblediffusion = 1.0f;
+			if (possiblediffusion > 1.0f)
+				possiblediffusion = 1.0f;
 			if (possiblediffusion > ca[i])
 				ca[i] = possiblediffusion;
 		}
@@ -108,33 +122,33 @@ void Room::postTick() {
 }
 
 void Room::resetTick() {
-	for (float & i : catemp)
+	for (float& i : catemp)
 		i = 0.0f;
 }
 
-void Room::renderBorders(RenderTarget *surface, int adjustx, int adjusty, unsigned int col) {
+void Room::renderBorders(RenderTarget* surface, int adjustx, int adjusty, unsigned int col) {
 	// ceiling
 	surface->renderLine(x_left - adjustx, y_left_ceiling - adjusty,
-			x_right - adjustx, y_right_ceiling - adjusty,
-			col);
+		x_right - adjustx, y_right_ceiling - adjusty,
+		col);
 	// floor
 	surface->renderLine(x_left - adjustx, y_left_floor - adjusty,
-			x_right - adjustx, y_right_floor - adjusty,
-			col);
+		x_right - adjustx, y_right_floor - adjusty,
+		col);
 	// left side
 	surface->renderLine(x_left - adjustx, y_left_ceiling - adjusty,
-			x_left - adjustx, y_left_floor - adjusty,
-			col);
+		x_left - adjustx, y_left_floor - adjusty,
+		col);
 	// right side
-	surface->renderLine(x_right  - adjustx, y_right_ceiling - adjusty,
-			x_right - adjustx, y_right_floor - adjusty,
-			col);
+	surface->renderLine(x_right - adjustx, y_right_ceiling - adjusty,
+		x_right - adjustx, y_right_floor - adjusty,
+		col);
 
 	// c2 floor points
 	for (unsigned int i = 1; i < floorpoints.size(); i++) {
 		surface->renderLine(x_left + floorpoints[i - 1].first - adjustx, y_left_floor - floorpoints[i - 1].second - adjusty,
-				x_left + floorpoints[i].first - adjustx, y_left_floor - floorpoints[i].second - adjusty,
-				col);
+			x_left + floorpoints[i].first - adjustx, y_left_floor - floorpoints[i].second - adjusty,
+			col);
 	}
 }
 
@@ -143,8 +157,10 @@ float Room::floorYatX(float x) {
 		unsigned int roomheight = y_left_floor - y_left_ceiling;
 
 		for (unsigned int i = 1; i < floorpoints.size(); i++) {
-			if (floorpoints[i].first + x_left < x) continue;
-			if (floorpoints[i - 1].first + x_left > x) break;
+			if (floorpoints[i].first + x_left < x)
+				continue;
+			if (floorpoints[i - 1].first + x_left > x)
+				break;
 
 			Point roomtl(x_left, y_left_ceiling);
 

@@ -18,11 +18,13 @@
  */
 
 #include "fileformats/blkImage.h"
-#include "endianlove.h"
+
 #include "caos_assert.h"
+#include "endianlove.h"
+
 #include <iostream>
 
-Image ReadBlkFile(std::istream &in) {
+Image ReadBlkFile(std::istream& in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	imageformat imgformat = is_565 ? if_rgb565 : if_rgb555;
@@ -31,15 +33,17 @@ Image ReadBlkFile(std::istream &in) {
 	uint16_t height = read16le(in);
 	uint16_t totalwidth = width * 128;
 	uint16_t totalheight = height * 128;
-	
+
 	uint16_t numsprites = read16le(in);
-	caos_assert(numsprites == (unsigned int) (width * height));
+	caos_assert(numsprites == (unsigned int)(width * height));
 
 	std::vector<uint32_t> offsets(numsprites);
 	for (unsigned int i = 0; i < numsprites; i++) {
 		offsets[i] = read32le(in) + 4;
-		uint16_t framewidth = read16le(in); caos_assert(framewidth == 128);
-		uint16_t frameheight = read16le(in); caos_assert(frameheight == 128);
+		uint16_t framewidth = read16le(in);
+		caos_assert(framewidth == 128);
+		uint16_t frameheight = read16le(in);
+		caos_assert(frameheight == 128);
 	}
 
 	shared_array<uint8_t> buffer(totalwidth * totalheight * 2);

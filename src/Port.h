@@ -1,9 +1,10 @@
 #ifndef PORT_H
 #define PORT_H 1
 
-#include <string>
-#include <list>
 #include "AgentRef.h"
+
+#include <list>
+#include <string>
 
 // never use this directly, kthx
 struct Port {

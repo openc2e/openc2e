@@ -18,10 +18,12 @@
  */
 
 #include "oldBrain.h"
+
 #include "oldCreature.h"
+
 #include <cassert>
-#include <memory>
 #include <fmt/core.h>
+#include <memory>
 
 /*
  * svrule examples:
@@ -41,7 +43,7 @@
  *
  */
 
-void oldSVRule::init(uint8_t version, uint8_t *src) {
+void oldSVRule::init(uint8_t version, uint8_t* src) {
 	length = (version == 0) ? 8 : 12;
 	for (unsigned int i = 0; i < length; i++) {
 		rules[i] = src[i];
@@ -51,7 +53,7 @@ void oldSVRule::init(uint8_t version, uint8_t *src) {
 	rndconst = 0; // TODO: correct?
 }
 
-unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8_t id, oldSVRule &rule) {
+unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron* cell, oldDendrite* dend, uint8_t id, oldSVRule& rule) {
 	switch (id) {
 		/*
 		 * these numbers are the C2 svrules (see rewrite in oldSVRule constructor)
@@ -104,30 +106,36 @@ unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend
 
 		case 16: // input
 			// This comes from IMPT for the decision lobe.
-			if (!dend) return 0;
+			if (!dend)
+				return 0;
 			return dend->src->output;
 
 		case 17: // conduct
 			// unused?
-			if (!dend) return 0;
+			if (!dend)
+				return 0;
 			return 0; // TODO: what's this?
 
 		case 18: // suscept
-			if (!dend) return 0;
+			if (!dend)
+				return 0;
 			return dend->suscept;
 
 		case 19: // STW
-			if (!dend) return 0;
+			if (!dend)
+				return 0;
 			return dend->stw;
 
 		case 20: // LTW
 			// unused?
-			if (!dend) return 0;
+			if (!dend)
+				return 0;
 			return dend->ltw;
 
 		case 21: // strength
 			// unused?
-			if (!dend) return 0;
+			if (!dend)
+				return 0;
 			return dend->strength;
 
 		case 22: // 32
@@ -158,7 +166,8 @@ unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend
 
 		case 29: // curr src leak in
 			// unused: back/forward prop
-			if (!dend) return 0;
+			if (!dend)
+				return 0;
 			return dend->src->leakin;
 
 		default:
@@ -166,7 +175,7 @@ unsigned char oldLobe::evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend
 	}
 }
 
-unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRule &rule) {
+unsigned char oldLobe::processSVRule(oldNeuron* cell, oldDendrite* dend, oldSVRule& rule) {
 	unsigned char state = 0;
 
 	// original engine seems to simply happily walk off the end of the svrule array for constants!
@@ -182,25 +191,29 @@ unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRu
 				break;
 
 			case 30: // TRUE
-				if (!state) return 0;
+				if (!state)
+					return 0;
 				break;
 
 			case 31: // PLUS
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				state = state + evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				break;
 
 			case 32: // MINUS
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				state = state - evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				break;
 
 			case 33: // TIMES
 				// unused?
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				state = (state * evaluateSVRuleConstant(cell, dend, rule.rules[i], rule)) / 256;
 				break;
 
@@ -215,74 +228,85 @@ unsigned char oldLobe::processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRu
 				break;
 
 			case 36: // FALSE
-				if (state) return 0;
+				if (state)
+					return 0;
 				break;
 
 			case 37: // multiply
 				// unused?
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				state = state * evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				break;
 
 			case 38: // average
 				// unused?
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				state = (state + evaluateSVRuleConstant(cell, dend, rule.rules[i], rule)) / 2;
 				break;
 
 			case 39: { // move twrds
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				unsigned char towards = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				unsigned char multiplier = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				state = ((towards - state) * multiplier) / 256;
-				} break;
+			} break;
 
 			case 40: { // random
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				unsigned char min = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				i++;
-				if (i == rule.length) return state;
+				if (i == rule.length)
+					return state;
 				unsigned char max = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
 				state = (rand() % (max - min + 1)) + min;
-				} break;
+			} break;
 		}
 	}
 
 	return state;
 }
 
-unsigned char oldLobe::dendrite_sum(oldNeuron &neu, unsigned int type, bool only_if_firing) {
+unsigned char oldLobe::dendrite_sum(oldNeuron& neu, unsigned int type, bool only_if_firing) {
 	// TODO: cache this result, since it will be used every time the svrule runs
 	// (and remember you can calculate both only_if_firing and not only_if_firing in one go!)
 	bool all_firing = true;
 	unsigned int sum = 0; // sum((src output * strength) / 255)
-	for (auto & j : neu.dendrites[type]) {
-		if (j.src->output == 0) all_firing = false;
-		else sum += (j.src->output * j.strength) / 255;
+	for (auto& j : neu.dendrites[type]) {
+		if (j.src->output == 0)
+			all_firing = false;
+		else
+			sum += (j.src->output * j.strength) / 255;
 	}
-	if (!neu.dendrites[type].size()) sum = 255;
+	if (!neu.dendrites[type].size())
+		sum = 255;
 
-	if (only_if_firing && !all_firing) return 0;
+	if (only_if_firing && !all_firing)
+		return 0;
 	return (sum * inputgain) / 255;
 }
 
 // TODO: precalculate this if we end up using it much?
 unsigned int oldLobe::getDendriteCount() {
 	unsigned int count = 0;
-	for (auto & neuron : neurons) {
+	for (auto& neuron : neurons) {
 		count += neuron.dendrites[0].size();
 		count += neuron.dendrites[1].size();
 	}
 	return count;
 }
 
-oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
+oldLobe::oldLobe(oldBrain* b, oldBrainLobeGene* g) {
 	assert(b);
 	parent = b;
 	assert(g);
@@ -290,20 +314,21 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 
 	inited = false;
 
-	staterule.init(g->version(), (uint8_t *)g->staterule);
+	staterule.init(g->version(), (uint8_t*)g->staterule);
 
 	for (unsigned int i = 0; i < 2; i++) {
-		oldDendriteInfo *dend_info = &g->dendrite1;
-		if (i == 1) dend_info = &g->dendrite2;
+		oldDendriteInfo* dend_info = &g->dendrite1;
+		if (i == 1)
+			dend_info = &g->dendrite2;
 
-		strgainrule[i].init(g->version(), (uint8_t *)dend_info->strgainrule);
-		strlossrule[i].init(g->version(), (uint8_t *)dend_info->strlossrule);
-		susceptrule[i].init(g->version(), (uint8_t *)dend_info->susceptrule);
-		relaxrule[i].init(g->version(), (uint8_t *)dend_info->relaxrule);
+		strgainrule[i].init(g->version(), (uint8_t*)dend_info->strgainrule);
+		strlossrule[i].init(g->version(), (uint8_t*)dend_info->strlossrule);
+		susceptrule[i].init(g->version(), (uint8_t*)dend_info->susceptrule);
+		relaxrule[i].init(g->version(), (uint8_t*)dend_info->relaxrule);
 
 		if (g->version() == 1) { // back/forward propogation is C2 only
-			backproprule[i].init(g->version(), (uint8_t *)dend_info->backproprule);
-			forproprule[i].init(g->version(), (uint8_t *)dend_info->forproprule);
+			backproprule[i].init(g->version(), (uint8_t*)dend_info->backproprule);
+			forproprule[i].init(g->version(), (uint8_t*)dend_info->forproprule);
 		} else {
 			backproprule[i].length = 0;
 			forproprule[i].length = 0;
@@ -315,13 +340,15 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 	inputgain = g->inputgain;
 
 	width = g->width;
-	if (width < 1) width = 1;
+	if (width < 1)
+		width = 1;
 	height = g->height;
-	if (height < 1) height = 1;
+	if (height < 1)
+		height = 1;
 
 	// TODO
 
-	for (unsigned char & chem : chems) {
+	for (unsigned char& chem : chems) {
 		chem = 0;
 	}
 
@@ -333,13 +360,17 @@ oldLobe::oldLobe(oldBrain *b, oldBrainLobeGene *g) {
 void oldLobe::ensure_minimum_size(unsigned int size) {
 	assert(!inited);
 
-	if (!height) height = 3;
+	if (!height)
+		height = 3;
 
 	while ((width * height) < size)
 		width += 1;
 
 	// sanity check
-	if (width * height > 1024) { width = 256; height = 256; }
+	if (width * height > 1024) {
+		width = 256;
+		height = 256;
+	}
 }
 
 void oldLobe::init() {
@@ -353,9 +384,9 @@ void oldLobe::init() {
 	wipe();
 
 	// TODO: when reading from gene, we should enforce max >= min
-	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+	oldDendriteInfo* dend_info[2] = {&ourGene->dendrite1, &ourGene->dendrite2};
 
-	for (auto & neuron : neurons) {
+	for (auto& neuron : neurons) {
 		for (unsigned int type = 0; type < 2; type++) {
 			int our_min = dend_info[type]->min;
 			int our_range = dend_info[type]->max - our_min;
@@ -392,23 +423,24 @@ void oldLobe::init() {
 }
 
 void oldLobe::connect() {
-	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+	oldDendriteInfo* dend_info[2] = {&ourGene->dendrite1, &ourGene->dendrite2};
 
 	for (unsigned int type = 0; type < 2; type++) {
-		oldLobe *src = parent->getLobeByTissue(dend_info[type]->srclobe);
+		oldLobe* src = parent->getLobeByTissue(dend_info[type]->srclobe);
 		// TODO: fix srclobe for all dendrites to be within range (srclobe = srclobe % lobes.size())
 		assert(src);
 
 		// TODO: handle src->neurons.size() being empty? or rather, maybe should never let that happen
 
-		uint8_t &fanout = dend_info[type]->fanout;
+		uint8_t& fanout = dend_info[type]->fanout;
 
 		unsigned int destsize = width * height, srcsize = src->width * src->height;
 
 		unsigned int offset = 0;
-		for (auto & destneu : neurons) {
-				std::vector<oldDendrite> &dendrites = destneu.dendrites[type];
-			if (dendrites.size() == 0) continue;
+		for (auto& destneu : neurons) {
+			std::vector<oldDendrite>& dendrites = destneu.dendrites[type];
+			if (dendrites.size() == 0)
+				continue;
 
 			unsigned int srcneu_id = offset / destsize;
 			unsigned int divwidth = srcneu_id / src->width;
@@ -419,14 +451,16 @@ void oldLobe::connect() {
 
 			for (unsigned int dend_id = 1; dend_id < dendrites.size(); dend_id++) {
 				unsigned int attempts = 0;
-repeat_this_dend:
+			repeat_this_dend:
 				// for the other dendrites, find a source neuron to connect to using fanout
 				int src_x = (rand() % ((2 * fanout) + 1)) + divwidth_r - fanout;
 				int src_y = (rand() % ((2 * fanout) + 1)) + divwidth_r + divwidth;
 				src_x = src_x % src->width;
-				if (src_x < 0) src_x += src->width;
+				if (src_x < 0)
+					src_x += src->width;
 				src_y = src_y % src->height;
-				if (src_y < 0) src_y += src->height;
+				if (src_y < 0)
+					src_y += src->height;
 				unsigned int src_neuid = (src_y * src->width) + src_x;
 
 				// don't loop forever trying the impossible
@@ -441,12 +475,13 @@ repeat_this_dend:
 								break;
 							}
 						}
-						if (d < dend_id) break; // continue from above break
+						if (d < dend_id)
+							break; // continue from above break
 					}
 					// (if we didn't find anything acceptable, fine, go on and connect to src_neuid..)
 				}
 
-				oldNeuron &srcneu = src->neurons[src_neuid];
+				oldNeuron& srcneu = src->neurons[src_neuid];
 
 				// percept_src is set on neurons in the perception lobe which are copied
 				// from 'mutually exclusive' lobes, so we may only connect *one* dendrite
@@ -472,8 +507,8 @@ repeat_this_dend:
 	inited = true;
 }
 
-void oldLobe::connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *dest) {
-	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+void oldLobe::connectDendrite(unsigned int type, oldDendrite& dend, oldNeuron* dest) {
+	oldDendriteInfo* dend_info[2] = {&ourGene->dendrite1, &ourGene->dendrite2};
 
 	dend.src = dest;
 	dend.suscept = 0;
@@ -482,16 +517,20 @@ void oldLobe::connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *d
 }
 
 void oldLobe::wipe() {
-	for (auto & neuron : neurons) {
+	for (auto& neuron : neurons) {
 		neuron.state = neuron.output = ourGene->reststate; // TODO: good?
 	}
 }
 
 void oldLobe::tick() {
-	if (ourGene->dendrite1.migrateflag == 1) loose_dendrites[0] = 255;
-	else loose_dendrites[0] = 0;
-	if (ourGene->dendrite2.migrateflag == 1) loose_dendrites[1] = 255;
-	else loose_dendrites[1] = 0;
+	if (ourGene->dendrite1.migrateflag == 1)
+		loose_dendrites[0] = 255;
+	else
+		loose_dendrites[0] = 0;
+	if (ourGene->dendrite2.migrateflag == 1)
+		loose_dendrites[1] = 255;
+	else
+		loose_dendrites[1] = 0;
 	active_neurons.clear();
 
 	last_loose_neuron[0] = 0xFFFFFFFF;
@@ -532,8 +571,8 @@ void oldLobe::tick() {
 		// winner takes all
 		// TODO: some kind of magic ignoring for attn lobe?
 		unsigned char bestvalue = 0;
-		unsigned char *bestoutput = NULL;
-		for (auto & neuron : neurons) {
+		unsigned char* bestoutput = NULL;
+		for (auto& neuron : neurons) {
 			if (neuron.output > bestvalue) {
 				bestvalue = neuron.output;
 				bestoutput = &neuron.output;
@@ -544,15 +583,16 @@ void oldLobe::tick() {
 			*bestoutput = bestvalue;
 	}
 
-	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+	oldDendriteInfo* dend_info[2] = {&ourGene->dendrite1, &ourGene->dendrite2};
 	for (unsigned int type = 0; type < 2; type++) {
 		if (dend_info[type]->migrateflag == 1) {
-			oldLobe *src = parent->getLobeByTissue(dend_info[type]->srclobe);
+			oldLobe* src = parent->getLobeByTissue(dend_info[type]->srclobe);
 			// TODO: see fix srclobe comment above (in oldLobe::connect)
 			assert(src);
 
-			for (auto & neuron : neurons) {
-				if (!neuron.output) continue;
+			for (auto& neuron : neurons) {
+				if (!neuron.output)
+					continue;
 
 				neuronTryMigration(type, neuron, src);
 			}
@@ -566,7 +606,7 @@ void oldLobe::tick() {
 				continue;
 			}
 			assert(last_loose_neuron[type] < neurons.size());
-			oldNeuron &neu = neurons[last_loose_neuron[type]];
+			oldNeuron& neu = neurons[last_loose_neuron[type]];
 			if (dend_info[1 - type]->migrateflag == 2) {
 				// try (single) combined migration
 				neuronTryAllLooseMigration(2, neu);
@@ -586,14 +626,17 @@ void oldLobe::tick() {
 // helper function for neuronTryAllLooseMigration (below)
 unsigned int oldNeuron::magicalHash(unsigned int type) {
 	unsigned int type_limit = type;
-	if (type == 2) { type = 0; type_limit--; }
+	if (type == 2) {
+		type = 0;
+		type_limit--;
+	}
 
 	// this is just a silly hash of the connected source neurons, so we can check
 	// if we're connected to the same sources as another neuron (type==2 for both)
 	// TODO: make this less stupid
 	unsigned int out = 1, outsum = 0;
 	for (unsigned int t = type; t <= type_limit; t++) {
-		for (auto & d : dendrites[t]) {
+		for (auto& d : dendrites[t]) {
 			// it is a haaaaash, so hopefully nothing will explode about the cast
 			unsigned int v = (unsigned long)d.src;
 			outsum += v;
@@ -604,7 +647,7 @@ unsigned int oldNeuron::magicalHash(unsigned int type) {
 }
 
 // helper function for neuronTryAllLooseMigration (below)
-bool oldLobe::migrationTryCandidateSlice(unsigned int type, oldLobe *src, std::vector<oldDendrite> &dendrites, unsigned int i) {
+bool oldLobe::migrationTryCandidateSlice(unsigned int type, oldLobe* src, std::vector<oldDendrite>& dendrites, unsigned int i) {
 	// we examine a 'slice' of candidate active neurons, one for each dendrite, starting at i
 	for (unsigned int j = 0; j < dendrites.size(); j++) {
 		// if the neuron is perceptible..
@@ -635,25 +678,29 @@ bool oldLobe::migrationTryCandidateSlice(unsigned int type, oldLobe *src, std::v
  *
  * pass type == 2 to migrate both types at once, otherwise it migrates the specified type only.
  */
-void oldLobe::neuronTryAllLooseMigration(unsigned int type, oldNeuron &neu) {
+void oldLobe::neuronTryAllLooseMigration(unsigned int type, oldNeuron& neu) {
 	unsigned int original_type = type;
 	unsigned int type_limit = type;
-	if (type == 2) { type = 0; type_limit--; }
+	if (type == 2) {
+		type = 0;
+		type_limit--;
+	}
 
-	oldDendriteInfo *dend_info[2] = { &ourGene->dendrite1, &ourGene->dendrite2 };
+	oldDendriteInfo* dend_info[2] = {&ourGene->dendrite1, &ourGene->dendrite2};
 
-	oldLobe *src[2] = { NULL, NULL };
+	oldLobe* src[2] = {NULL, NULL};
 	for (unsigned int t = type; t <= type_limit; t++) {
 		src[t] = parent->getLobeByTissue(dend_info[t]->srclobe);
 		// TODO: see fix srclobe comment above (in oldLobe::connect)
 		assert(src[t]);
 
 		// not enough active source dendrites at present?
-		if (src[t]->active_neurons.size() < neu.dendrites[t].size()) return;
+		if (src[t]->active_neurons.size() < neu.dendrites[t].size())
+			return;
 	}
 
 	// store old source neurons (in case we can't find a valid connection)
-	std::vector<oldNeuron *> srcneus[2];
+	std::vector<oldNeuron*> srcneus[2];
 	for (unsigned int t = type; t <= type_limit; t++) {
 		for (unsigned int i = 0; i < neu.dendrites[t].size(); i++) {
 			srcneus[t].push_back(neu.dendrites[t][i].src);
@@ -671,15 +718,18 @@ void oldLobe::neuronTryAllLooseMigration(unsigned int type, oldNeuron &neu) {
 	}
 
 	for (unsigned int i = 0; i <= src[type]->active_neurons.size() - neu.dendrites[type].size(); i++) {
-		if (!migrationTryCandidateSlice(type, src[type], neu.dendrites[type], i)) continue;
+		if (!migrationTryCandidateSlice(type, src[type], neu.dendrites[type], i))
+			continue;
 
 		// repeat inner loop *once* for one type, or a bunch of times for two types
 		unsigned int count = 0;
-		if (original_type == 2) count = src[1]->active_neurons.size() - neu.dendrites[1].size();
+		if (original_type == 2)
+			count = src[1]->active_neurons.size() - neu.dendrites[1].size();
 
 		for (unsigned int k = 0; k <= count; k++) {
 			if (original_type == 2)
-				if (!migrationTryCandidateSlice(1, src[1], neu.dendrites[1], k)) continue;
+				if (!migrationTryCandidateSlice(1, src[1], neu.dendrites[1], k))
+					continue;
 
 			// are there any other active neurons attached to the same source neurons as us?
 			unsigned int hash = neu.magicalHash(original_type);
@@ -687,10 +737,13 @@ void oldLobe::neuronTryAllLooseMigration(unsigned int type, oldNeuron &neu) {
 			for (t = type; t <= type_limit; t++) {
 				unsigned int j;
 				for (j = 0; j < active_neurons.size(); j++) {
-					if (neurons[active_neurons[j]].dendrites[t].size() != neu.dendrites[t].size()) break;
-					if (neurons[active_neurons[j]].magicalHash(original_type) == hash) break;
+					if (neurons[active_neurons[j]].dendrites[t].size() != neu.dendrites[t].size())
+						break;
+					if (neurons[active_neurons[j]].magicalHash(original_type) == hash)
+						break;
 				}
-				if (j == active_neurons.size()) break;
+				if (j == active_neurons.size())
+					break;
 			}
 			if (t == type_limit + 1) {
 				// success!
@@ -711,45 +764,53 @@ void oldLobe::neuronTryAllLooseMigration(unsigned int type, oldNeuron &neu) {
 	}
 }
 
-void oldLobe::neuronTryMigration(unsigned int type, oldNeuron &neu, oldLobe *src) {
-	if (!src->active_neurons.size()) return;
+void oldLobe::neuronTryMigration(unsigned int type, oldNeuron& neu, oldLobe* src) {
+	if (!src->active_neurons.size())
+		return;
 
 	// find a dendrite with strength zero
 	unsigned int d;
 	for (d = 0; d < neu.dendrites[type].size(); d++) {
-		if (!neu.dendrites[type][d].strength) break;
+		if (!neu.dendrites[type][d].strength)
+			break;
 	}
-	if (d == neu.dendrites[type].size()) return;
-	oldDendrite &dend = neu.dendrites[type][d];
+	if (d == neu.dendrites[type].size())
+		return;
+	oldDendrite& dend = neu.dendrites[type][d];
 
 	// pick a random firing neuron in the source lobe
 	unsigned int n = rand() % src->active_neurons.size();
-	oldNeuron *srcneu = &src->neurons[src->active_neurons[n]];
+	oldNeuron* srcneu = &src->neurons[src->active_neurons[n]];
 
 	for (d = 0; d < neu.dendrites[type].size(); d++) {
 		// give up if we're already connected to chosen source neuron
-		if (neu.dendrites[type][d].src == srcneu) break;
+		if (neu.dendrites[type][d].src == srcneu)
+			break;
 	}
-	if (d != neu.dendrites[type].size()) return;
+	if (d != neu.dendrites[type].size())
+		return;
 
 	connectDendrite(type, dend, &neu);
 
-	if (loose_dendrites[type]) loose_dendrites[type]--;
+	if (loose_dendrites[type])
+		loose_dendrites[type]--;
 }
 
 void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
-	oldDendriteInfo *dend_info = &ourGene->dendrite1;
-	if (type == 1) dend_info = &ourGene->dendrite2;
+	oldDendriteInfo* dend_info = &ourGene->dendrite1;
+	if (type == 1)
+		dend_info = &ourGene->dendrite2;
 
-	oldNeuron &dest = neurons[id];
+	oldNeuron& dest = neurons[id];
 
 	unsigned int loose_dends = 0;
 	for (unsigned int i = 0; i < dest.dendrites[type].size(); i++) {
 		unsigned char out;
 
-		oldDendrite &dend = dest.dendrites[type][i];
+		oldDendrite& dend = dest.dendrites[type][i];
 
-		if (!dend.strength) loose_dends++;
+		if (!dend.strength)
+			loose_dends++;
 
 		// recalculate suscept
 		out = processSVRule(&dest, &dend, susceptrule[type]);
@@ -784,15 +845,19 @@ void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
 		// strength gain
 		if (dend.strength < 255 && dend_info->strgain && (parent->getTicks() % dend_info->strgain) == 0) {
 			out = processSVRule(&dest, &dend, strgainrule[type]);
-			if ((int)dend.strength + (int)out > 255) dend.strength = 255;
-			else dend.strength += out;
+			if ((int)dend.strength + (int)out > 255)
+				dend.strength = 255;
+			else
+				dend.strength += out;
 		}
 
 		// strength loss
 		if (dend.strength && dend_info->strloss && (parent->getTicks() % dend_info->strloss) == 0) {
 			out = processSVRule(&dest, &dend, strlossrule[type]);
-			if ((int)dend.strength - (int)out < 0) dend.strength = 0;
-			else dend.strength -= out;
+			if ((int)dend.strength - (int)out < 0)
+				dend.strength = 0;
+			else
+				dend.strength -= out;
 			if (!dend.strength) {
 				loose_dends++;
 				// also reset STW, LTW, suscept, output/state on dest neuron
@@ -827,7 +892,7 @@ void oldLobe::tickDendrites(unsigned int id, unsigned int type) {
 	}
 }
 
-oldBrain::oldBrain(oldCreature *p) {
+oldBrain::oldBrain(oldCreature* p) {
 	assert(p);
 	parent = p;
 
@@ -852,12 +917,13 @@ void oldBrain::processGenes() {
 	// TODO: this likely doesn't work at all well in the presence of later-turn-on lobes
 
 	std::shared_ptr<genomeFile> genome = parent->getGenome();
-	
-	for (auto & gene : genome->genes) {
-		if (!parent->shouldProcessGene(gene.get())) continue;
-		
-		if (oldBrainLobeGene *g = dynamic_cast<oldBrainLobeGene*>(gene.get())) {
-			oldLobe *l = new oldLobe(this, g);
+
+	for (auto& gene : genome->genes) {
+		if (!parent->shouldProcessGene(gene.get()))
+			continue;
+
+		if (oldBrainLobeGene* g = dynamic_cast<oldBrainLobeGene*>(gene.get())) {
+			oldLobe* l = new oldLobe(this, g);
 			lobes.push_back(l);
 		}
 	}
@@ -886,14 +952,16 @@ void oldBrain::processGenes() {
 		lobes[0]->ensure_minimum_size(size);
 
 	// we have to create the neurons here, so that they can be attached to by receptors/emitters
-	for (auto & lobe : lobes) {
-		if (!lobe->wasInited()) lobe->init();
+	for (auto& lobe : lobes) {
+		if (!lobe->wasInited())
+			lobe->init();
 	}
 }
 
 void oldBrain::init() {
-	for (auto & lobe : lobes) {
-		if (!lobe->wasInited()) lobe->connect();
+	for (auto& lobe : lobes) {
+		if (!lobe->wasInited())
+			lobe->connect();
 	}
 
 	// construct processing order list
@@ -923,7 +991,8 @@ void oldBrain::init() {
 	// precalculate mutually exclusive (percept src) data for neurons
 	unsigned int offset = 0;
 	for (unsigned int i = 1; i < lobes.size(); i++) {
-		if (!lobes[i]->getGene()->perceptflag) continue;
+		if (!lobes[i]->getGene()->perceptflag)
+			continue;
 		if (lobes[i]->getGene()->perceptflag == 2) { // mutually exclusive
 			for (unsigned int j = 0; j < lobes[i]->getNoNeurons(); j++) {
 				// (we should be able to guarantee lobes[0] exists
@@ -944,10 +1013,11 @@ void oldBrain::tick() {
 			// perception lobe copy
 			unsigned int offset = 0;
 			for (unsigned int n = 1; n < lobes.size(); n++) {
-				if (!lobes[n]->getGene()->perceptflag) continue;
+				if (!lobes[n]->getGene()->perceptflag)
+					continue;
 				for (unsigned int j = 0; j < lobes[n]->getNoNeurons(); j++) {
 					unsigned char output = lobes[n]->getNeuron(j)->output;
-					oldNeuron *destneu = lobes[0]->getNeuron(offset);
+					oldNeuron* destneu = lobes[0]->getNeuron(offset);
 					if (destneu->state < output)
 						destneu->state = output;
 					offset++;
@@ -960,22 +1030,24 @@ void oldBrain::tick() {
 	ticks++;
 }
 
-oldLobe *oldBrain::getLobeByTissue(unsigned int id) {
+oldLobe* oldBrain::getLobeByTissue(unsigned int id) {
 	if (id >= lobes.size())
 		return 0;
 
 	return lobes[id];
 }
 
-void oldBrain::processInstinct(creatureInstinctGene &instinct) {
+void oldBrain::processInstinct(creatureInstinctGene& instinct) {
 	// work out *true* source lobe
-	unsigned int srclobe[3] = { 0, 0, 0 } ;
+	unsigned int srclobe[3] = {0, 0, 0};
 	for (unsigned int i = 0; i < 3; i++) {
 		// no lobe in the instinct?
-		if (!instinct.lobes[i]) continue;
+		if (!instinct.lobes[i])
+			continue;
 
 		// TODO: instincts should be sanitised somewhere?
-		if (instinct.lobes[i] >= lobes.size()) continue;
+		if (instinct.lobes[i] >= lobes.size())
+			continue;
 
 		if (lobes[instinct.lobes[i]]->getGene()->perceptflag) {
 			// perceptible! we can use this
@@ -984,7 +1056,8 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 			// lobe is not perceptible; try finding a lobe which
 			// feeds from it which *is* perceptible
 			for (unsigned int j = 1; j < lobes.size(); j++) {
-				if (!lobes[j]->getGene()->perceptflag) continue;
+				if (!lobes[j]->getGene()->perceptflag)
+					continue;
 				// TODO: check max connections too?
 				if (lobes[j]->getGene()->dendrite1.srclobe == instinct.lobes[i] ||
 					lobes[j]->getGene()->dendrite2.srclobe == instinct.lobes[i]) {
@@ -997,19 +1070,20 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 		if (!srclobe[i]) {
 			fmt::print(
 				"instinct: ignoring source lob {} because it's not perceptible\n",
-				(int)instinct.lobes[i]
-			);
+				(int)instinct.lobes[i]);
 		}
 	}
 
 	// find the offsets into the perceptible lobe
 	std::vector<unsigned int> percept_neu_offsets;
 	for (unsigned int i = 0; i < 3; i++) {
-		if (!srclobe[i]) continue;
+		if (!srclobe[i])
+			continue;
 
 		unsigned int offset = 0;
 		for (unsigned int j = 1; j < srclobe[i]; j++) {
-			if (!lobes[j]->getGene()->perceptflag) continue;
+			if (!lobes[j]->getGene()->perceptflag)
+				continue;
 			offset += lobes[j]->getNoNeurons();
 		}
 		offset += instinct.neurons[i];
@@ -1023,8 +1097,7 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 				(int)offset,
 				(int)instinct.lobes[i],
 				(int)srclobe[i],
-				(int)instinct.neurons[i]
-			);
+				(int)instinct.neurons[i]);
 			continue;
 		}
 		percept_neu_offsets.push_back(offset);
@@ -1048,34 +1121,36 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 	unsigned int candidateneuron = 0xFFFFFFFF;
 	for (unsigned int maxstr = 0; maxstr < 256; maxstr++) {
 		for (unsigned int i = 0; i < lobes[8]->getNoNeurons(); i++) {
-			oldNeuron *neu = lobes[8]->getNeuron(i);
+			oldNeuron* neu = lobes[8]->getNeuron(i);
 
-			if (neu->dendrites[0].size() != percept_neu_offsets.size()) continue;
+			if (neu->dendrites[0].size() != percept_neu_offsets.size())
+				continue;
 
 			unsigned int j;
 			for (j = 0; j < neu->dendrites[0].size(); j++) {
-				if (neu->dendrites[0][j].strength > maxstr) break;
+				if (neu->dendrites[0][j].strength > maxstr)
+					break;
 			}
 			if (j == neu->dendrites[0].size()) {
 				candidateneuron = i;
 				break;
 			}
 		}
-		if (candidateneuron != 0xFFFFFFFF) break;
+		if (candidateneuron != 0xFFFFFFFF)
+			break;
 	}
 
 	if (candidateneuron == 0xFFFFFFFF) {
 		fmt::print(
 			"instinct failed: no candidate concept neuron with {} type 0 dendrites\n",
-			(int)percept_neu_offsets.size()
-		);
+			(int)percept_neu_offsets.size());
 		return;
 	}
 
 	// connect the discovered concept neuron to the relevant perceptible neurons
-	oldNeuron *conceptneu = lobes[8]->getNeuron(candidateneuron);
+	oldNeuron* conceptneu = lobes[8]->getNeuron(candidateneuron);
 	for (unsigned int i = 0; i < percept_neu_offsets.size(); i++) {
-		oldDendrite &dend = conceptneu->dendrites[0][i];
+		oldDendrite& dend = conceptneu->dendrites[0][i];
 		dend.ltw = dend.stw = dend.strength = instinct.level;
 		// in theory thanks to earlier sanity checks, all percept_neu_offsets should be in range
 		dend.src = lobes[0]->getNeuron(percept_neu_offsets[i]);
@@ -1083,7 +1158,7 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 
 	// find relevant decision neuron
 	// TODO: again, instincts should be sanitised somewhere
-	oldNeuron *decnneu = lobes[6]->getNeuron(instinct.action);
+	oldNeuron* decnneu = lobes[6]->getNeuron(instinct.action);
 
 	// work out relevant dendrite type
 	// type 1 for punishment chem, type 0 otherwise (reward)
@@ -1100,7 +1175,8 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 				break;
 			}
 		}
-		if (candidatedendrite != 0xFFFFFFFF) break;
+		if (candidatedendrite != 0xFFFFFFFF)
+			break;
 	}
 
 	if (candidatedendrite == 0xFFFFFFFF) {
@@ -1110,7 +1186,7 @@ void oldBrain::processInstinct(creatureInstinctGene &instinct) {
 	}
 
 	// finally, wire the concept neuron up to the relevant decision
-	oldDendrite &dend = decnneu->dendrites[type][candidatedendrite];
+	oldDendrite& dend = decnneu->dendrites[type][candidatedendrite];
 	dend.ltw = dend.stw = dend.strength = instinct.level;
 	dend.src = conceptneu;
 }

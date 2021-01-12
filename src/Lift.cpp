@@ -18,12 +18,13 @@
  */
 
 #include "Lift.h"
-#include "caosValue.h"
+
 #include "Engine.h" // version
 #include "World.h"
+#include "caosValue.h"
 
 Lift::Lift(std::string spritefile, unsigned int firstimage, unsigned int imagecount)
-		: Vehicle(spritefile, firstimage, imagecount) {
+	: Vehicle(spritefile, firstimage, imagecount) {
 	if (engine.version == 1) {
 		alignwithcabin = true;
 	} else {
@@ -35,19 +36,24 @@ Lift::Lift(std::string spritefile, unsigned int firstimage, unsigned int imageco
  * TODO: this code is a first attempt and might be completely wrong
  */
 
-bool Lift::fireScript(unsigned short event, Agent *from, caosValue one, caosValue two) {
+bool Lift::fireScript(unsigned short event, Agent* from, caosValue one, caosValue two) {
 	if (event == 1 || event == 2) {
-		if (!liftAvailable()) return false; // TODO: hack to make sure the lifts aren't activated when not ready
+		if (!liftAvailable())
+			return false; // TODO: hack to make sure the lifts aren't activated when not ready
 	}
 
 	// if we need to select a new callbutton.. TODO: this is hacky
-	if (from == (Agent *)world.hand()) {
+	if (from == (Agent*)world.hand()) {
 		if (event == 1) {
-			if (currentbutton + 1 == callbuttony.size()) return false;
-			currentbutton++; newbutton = currentbutton;
+			if (currentbutton + 1 == callbuttony.size())
+				return false;
+			currentbutton++;
+			newbutton = currentbutton;
 		} else if (event == 2) {
-			if (currentbutton == 0) return false;
-			currentbutton--; newbutton = currentbutton;
+			if (currentbutton == 0)
+				return false;
+			currentbutton--;
+			newbutton = currentbutton;
 		}
 	}
 
@@ -56,7 +62,8 @@ bool Lift::fireScript(unsigned short event, Agent *from, caosValue one, caosValu
 
 void Lift::tick() {
 	Vehicle::tick();
-	if (paused) return;
+	if (paused)
+		return;
 
 	// if we're moving..
 	if (yvec != 0) {
@@ -64,7 +71,7 @@ void Lift::tick() {
 		if (
 			(yvec < 0 && liftBottom() <= callbuttony[currentbutton]) || // upwards
 			(yvec > 0 && liftBottom() >= callbuttony[currentbutton]) // downwards
-			) {
+		) {
 			// stop movement (and make sure we're in the right spot)
 			yvec = 0;
 			moveTo(x, callbuttony[currentbutton] - (alignwithcabin ? cabinbottom : getHeight()));

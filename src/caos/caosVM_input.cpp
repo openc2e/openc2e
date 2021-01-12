@@ -17,11 +17,12 @@
  *
  */
 
-#include "World.h"
+#include "Backend.h"
 #include "Engine.h"
 #include "PointerAgent.h"
-#include "Backend.h"
+#include "World.h"
 #include "caosVM.h"
+
 #include <iostream>
 using std::cerr;
 
@@ -32,7 +33,7 @@ using std::cerr;
  Sets the type of message sent to the TARG agent when clicked.  If set to -1, no message
  will be sent.  Using this command will override and reset the value set with CLIK.
 */
-void c_CLAC(caosVM *vm) {
+void c_CLAC(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
 	VM_PARAM_INTEGER(message)
 
@@ -46,7 +47,7 @@ void c_CLAC(caosVM *vm) {
  CLAC (integer)
  %status maybe
 */
-void v_CLAC(caosVM *vm) {
+void v_CLAC(caosVM* vm) {
 	valid_agent(vm->targ);
 
 	if (vm->targ->clik == -1)
@@ -63,14 +64,14 @@ void v_CLAC(caosVM *vm) {
  rotating basis.  Setting any of the three types to -1 will cause it to be ignored. Using
  this command will override and reset the value set by CLAC.
 */
-void c_CLIK(caosVM *vm) {
+void c_CLIK(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
 	VM_PARAM_INTEGER(msg3)
 	VM_PARAM_INTEGER(msg2)
 	VM_PARAM_INTEGER(msg1)
 
 	valid_agent(vm->targ);
-	
+
 	vm->targ->clac[0] = msg1;
 	vm->targ->clac[1] = msg2;
 	vm->targ->clac[2] = msg3;
@@ -81,19 +82,20 @@ void c_CLIK(caosVM *vm) {
  CLIK (integer) data (integer)
  %status maybe
 */
-void v_CLIK(caosVM *vm) {
+void v_CLIK(caosVM* vm) {
 	VM_PARAM_INTEGER(data)
-	
+
 	valid_agent(vm->targ);
 
 	if (vm->targ->clik == -1)
 		vm->result.setInt(-2);
-	else switch (data) {
-		case 0: vm->result.setInt(vm->targ->clik); break;
-		case 1: vm->result.setInt(vm->targ->clac[0]); break;
-		case 2: vm->result.setInt(vm->targ->clac[1]); break;
-		case 3: vm->result.setInt(vm->targ->clac[2]); break;
-	}
+	else
+		switch (data) {
+			case 0: vm->result.setInt(vm->targ->clik); break;
+			case 1: vm->result.setInt(vm->targ->clac[0]); break;
+			case 2: vm->result.setInt(vm->targ->clac[1]); break;
+			case 3: vm->result.setInt(vm->targ->clac[2]); break;
+		}
 }
 
 /**
@@ -108,7 +110,7 @@ void v_CLIK(caosVM *vm) {
 
  TODO: link to the script details (event numbers and parameters).
 */
-void c_IMSK(caosVM *vm) {
+void c_IMSK(caosVM* vm) {
 	VM_PARAM_INTEGER(flags)
 
 	valid_agent(vm->targ);
@@ -128,7 +130,7 @@ void c_IMSK(caosVM *vm) {
 
  Returns the input event flags for the target agent. See the IMSK command for details.
 */
-void v_IMSK(caosVM *vm) {
+void v_IMSK(caosVM* vm) {
 	valid_agent(vm->targ);
 	vm->result.setInt(0); // TODO
 }
@@ -139,7 +141,7 @@ void v_IMSK(caosVM *vm) {
 
  Returns 1 if the specified key is held down, or 0 otherwise.
 */
-void v_KEYD(caosVM *vm) {
+void v_KEYD(caosVM* vm) {
 	VM_PARAM_INTEGER(keycode) // keycodes are crazy broken windows things
 
 	if (engine.backend->keyDown(keycode))
@@ -156,9 +158,9 @@ void v_KEYD(caosVM *vm) {
  Returns the agent that is currently underneath the Hand.
  NB: this command is not a real c1/c2 command, backported for convenience
 */
-void v_HOTS(caosVM *vm) {
-	Agent *a = world.agentAt(world.hand()->pointerX(), world.hand()->pointerY()); // TODO: use hotspot
-	
+void v_HOTS(caosVM* vm) {
+	Agent* a = world.agentAt(world.hand()->pointerX(), world.hand()->pointerY()); // TODO: use hotspot
+
 	vm->result.setAgent(a);
 }
 
@@ -170,8 +172,8 @@ void v_HOTS(caosVM *vm) {
 
  Transparency of the parts themselves is ignored.
 */
-void v_HOTP(caosVM *vm) {
-	CompoundPart *a = world.partAt(world.hand()->pointerX(), world.hand()->pointerY(), false);
+void v_HOTP(caosVM* vm) {
+	CompoundPart* a = world.partAt(world.hand()->pointerX(), world.hand()->pointerY(), false);
 	if (a)
 		vm->result.setInt(a->id);
 	else
@@ -186,7 +188,7 @@ void v_HOTP(caosVM *vm) {
 
  If set to off, CLIK and CLAC will not work, and clicking events must be handled by IMSK.
 */
-void c_PURE(caosVM *vm) {
+void c_PURE(caosVM* vm) {
 	VM_PARAM_INTEGER(value)
 
 	world.hand()->handle_events = !value;
@@ -198,7 +200,7 @@ void c_PURE(caosVM *vm) {
 
  Returns whether the normal pointing and clicking behavior of the Hand is on or off.
 */
-void v_PURE(caosVM *vm) {
+void v_PURE(caosVM* vm) {
 	// TODO: alex claims PURE is inverse behaviour for the command, is this true for this function too? (assuming it is for now)
 	if (world.hand()->handle_events)
 		vm->result.setInt(0);
@@ -212,7 +214,7 @@ void v_PURE(caosVM *vm) {
 
  Returns the current X coordinate of the Hand in the world.
 */
-void v_MOPX(caosVM *vm) {
+void v_MOPX(caosVM* vm) {
 	vm->result.setInt((int)world.hand()->pointerX());
 }
 
@@ -222,7 +224,7 @@ void v_MOPX(caosVM *vm) {
 
  Returns the current Y coordinate of the Hand in the world.
 */
-void v_MOPY(caosVM *vm) {
+void v_MOPY(caosVM* vm) {
 	vm->result.setInt((int)world.hand()->pointerY());
 }
 
@@ -230,7 +232,7 @@ void v_MOPY(caosVM *vm) {
  SCOL (integer) andmask (integer) eormask (integer) upspeeds (bytestring) downspeeds (bytestring)
  %status stub
 */
-void v_SCOL(caosVM *vm) {
+void v_SCOL(caosVM* vm) {
 	VM_PARAM_BYTESTR(downspeeds)
 	VM_PARAM_BYTESTR(upspeeds)
 	VM_PARAM_INTEGER(eormask)
@@ -245,7 +247,7 @@ void v_SCOL(caosVM *vm) {
 
  Turns on (1) or off (0) keyboard/mouse scrolling.
 */
-void c_SCRL(caosVM *vm) {
+void c_SCRL(caosVM* vm) {
 	VM_PARAM_INTEGER(enable)
 
 	// TODO
@@ -255,9 +257,9 @@ void c_SCRL(caosVM *vm) {
  MOUS (command) behaviour (integer)
  %status stub
 */
-void c_MOUS(caosVM *vm) {
+void c_MOUS(caosVM* vm) {
 	VM_PARAM_INTEGER(behaviour)
-	
+
 	// TODO
 }
 

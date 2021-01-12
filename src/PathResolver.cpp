@@ -15,6 +15,7 @@
  */
 
 #include "PathResolver.h"
+
 #include "utils/ascii_tolower.h"
 
 #include <ghc/filesystem.hpp>
@@ -37,10 +38,9 @@ static void updateDirectory(std::string dirname) {
 	fs::path lcdirname = ascii_tolower(dirname);
 	std::error_code mtime_error;
 	if (s_cache.count(lcdirname)
-	    // avoid a check for directory existence by using the non-throwing overload
-	    // of fs::last_write_time, which returns file_time_type::min() on errors
-	    && fs::last_write_time(s_cache[lcdirname].realfilename, mtime_error) == s_cache[lcdirname].mtime)
-	{
+		// avoid a check for directory existence by using the non-throwing overload
+		// of fs::last_write_time, which returns file_time_type::min() on errors
+		&& fs::last_write_time(s_cache[lcdirname].realfilename, mtime_error) == s_cache[lcdirname].mtime) {
 		return;
 	}
 
@@ -61,16 +61,16 @@ static void updateDirectory(std::string dirname) {
 	if (directory_iterator_error) {
 		dirname = resolveFile(dirname);
 		if (dirname == "") {
-			s_cache[lcdirname] = { dirname, fs::file_time_type::min() }; // I guess?
+			s_cache[lcdirname] = {dirname, fs::file_time_type::min()}; // I guess?
 			return;
 		}
 		iter = fs::directory_iterator(dirname);
 	}
 
 	// cache directory contents
-	s_cache[lcdirname] = { dirname, fs::last_write_time(dirname) };
+	s_cache[lcdirname] = {dirname, fs::last_write_time(dirname)};
 	for (const auto& entry : fs::directory_iterator(dirname)) {
-		s_cache[ascii_tolower(entry.path())] = { entry.path() };
+		s_cache[ascii_tolower(entry.path())] = {entry.path()};
 	}
 }
 

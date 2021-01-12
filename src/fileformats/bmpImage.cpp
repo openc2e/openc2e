@@ -17,12 +17,14 @@
  *
  */
 
-#include "caos_assert.h"
 #include "fileformats/bmpImage.h"
-#include "endianlove.h"
-#include "creaturesException.h"
-#include "Engine.h"
+
 #include "Backend.h"
+#include "Engine.h"
+#include "caos_assert.h"
+#include "creaturesException.h"
+#include "endianlove.h"
+
 #include <fstream>
 #include <memory>
 
@@ -30,12 +32,12 @@
 #define BI_RLE8 1
 #define BI_BITFIELDS 3
 
-Image ReadBmpFile(const std::string &path) {
+Image ReadBmpFile(const std::string& path) {
 	std::ifstream in(path, std::ios_base::binary);
 	return ReadBmpFile(in);
 }
 
-Image ReadBmpFile(std::istream &in) {
+Image ReadBmpFile(std::istream& in) {
 	char magic[2];
 	in.read(magic, 2);
 	if (std::string(magic, 2) != "BM")
@@ -46,12 +48,12 @@ Image ReadBmpFile(std::istream &in) {
 	return ReadDibFile(in);
 }
 
-Image ReadDibFile(std::istream &in) {
+Image ReadDibFile(std::istream& in) {
 	uint32_t biWidth, biHeight;
 	shared_array<Color> palette;
 	imageformat imgformat;
 	shared_array<uint8_t> bmpdata;
-	
+
 	uint32_t biSize = read32le(in);
 	if (biSize != 40) // win3.x format, which the seamonkeys files are in
 		throw creaturesException("BMP format we don't understand.");
@@ -59,11 +61,11 @@ Image ReadDibFile(std::istream &in) {
 	biWidth = read32le(in);
 	biHeight = read32le(in);
 	caos_assert((int)biHeight > 0);
-	
+
 	uint16_t biPlanes = read16le(in);
 	if (biPlanes != 1) // single image plane
 		throw creaturesException("Contains BMP data we don't understand.");
-	
+
 	uint16_t biBitCount = read16le(in);
 	uint16_t biCompression = read32le(in);
 
@@ -79,7 +81,8 @@ Image ReadDibFile(std::istream &in) {
 			break;
 
 		case BI_RLE8:
-			if (biBitCount != 8) throw creaturesException("Contains BMP data compressed in a way which isn't possible.");
+			if (biBitCount != 8)
+				throw creaturesException("Contains BMP data compressed in a way which isn't possible.");
 			break;
 
 		case BI_BITFIELDS:
@@ -87,10 +90,9 @@ Image ReadDibFile(std::istream &in) {
 			throw creaturesException("Contains BMP data compressed in a way we don't understand.");
 	}
 
-	switch (biBitCount)  {
+	switch (biBitCount) {
 		case 4:
-		case 8:
-			{
+		case 8: {
 			imgformat = if_index8;
 			unsigned int num_palette_entries = biColorsUsed != 0 ? biColorsUsed : (biBitCount == 4 ? 16 : 256);
 			std::vector<uint8_t> filepalette(num_palette_entries * 4);
@@ -102,9 +104,8 @@ Image ReadDibFile(std::istream &in) {
 				palette[i].b = filepalette[i * 4];
 				palette[i].a = 0xff;
 			}
-			}
-			break;
-			
+		} break;
+
 		case 24:
 			imgformat = if_bgr24;
 			break;
@@ -116,11 +117,11 @@ Image ReadDibFile(std::istream &in) {
 	if (biSizeImage == 0) {
 		biSizeImage = biWidth * biHeight * biBitCount / 8;
 	}
-	
+
 	if (biCompression == BI_RGB) {
 		size_t rowsize = biWidth * biBitCount / 8;
 		size_t stride = (biWidth * biBitCount + 31) / 32 * 4; // ceil(biWidth * biBitCount / 32) * 4
-		
+
 		bmpdata = shared_array<uint8_t>(rowsize * biHeight);
 		for (size_t i = 0; i < biHeight; ++i) {
 			in.read((char*)bmpdata.data() + (biHeight - 1 - i) * rowsize, rowsize);
@@ -134,7 +135,7 @@ Image ReadDibFile(std::istream &in) {
 	if (biBitCount == 4) {
 		auto srcdata = bmpdata;
 		bmpdata = shared_array<uint8_t>(biWidth * biHeight);
-		
+
 		for (size_t i = 0; i < srcdata.size(); ++i) {
 			bmpdata[i * 2] = (srcdata[i] >> 4) & 0xf;
 			bmpdata[i * 2 + 1] = srcdata[i] & 0xf;
@@ -146,11 +147,13 @@ Image ReadDibFile(std::istream &in) {
 		// TODO: sanity checking
 		auto srcdata = bmpdata;
 		bmpdata = shared_array<uint8_t>(biWidth * biHeight); // TODO
-		
+
 		unsigned int x = 0, y = 0;
 		for (unsigned int i = 0; i < biSizeImage;) {
-			unsigned char nopixels = srcdata[i]; i++;
-			unsigned char val = srcdata[i]; i++;
+			unsigned char nopixels = srcdata[i];
+			i++;
+			unsigned char val = srcdata[i];
+			i++;
 			if (nopixels == 0) { // special
 				if (val == 0) { // end of line
 					x = 0;
@@ -158,34 +161,42 @@ Image ReadDibFile(std::istream &in) {
 				} else if (val == 1) { // end of bitmap
 					break;
 				} else if (val == 2) { // delta
-					unsigned char horz = srcdata[i]; i++;
-					unsigned char vert = srcdata[i]; i++;
+					unsigned char horz = srcdata[i];
+					i++;
+					unsigned char vert = srcdata[i];
+					i++;
 					x += horz;
 					y += vert;
 				} else { // absolute mode
 					for (unsigned int j = 0; j < val; j++) {
-						if (x + (y * biWidth) >= biHeight * biWidth) break;
+						if (x + (y * biWidth) >= biHeight * biWidth)
+							break;
 						bmpdata[x + ((biHeight - 1 - y) * biWidth)] = srcdata[i];
-						i++; x++;
+						i++;
+						x++;
 					}
-					if (val % 2 == 1) i++; // skip padding byte
+					if (val % 2 == 1)
+						i++; // skip padding byte
 				}
 			} else { // run of pixels
 				for (unsigned int j = 0; j < nopixels; j++) {
-					if (x + (y * biWidth) >= biHeight * biWidth) break;
+					if (x + (y * biWidth) >= biHeight * biWidth)
+						break;
 					bmpdata[x + ((biHeight - 1 - y) * biWidth)] = val;
 					x++;
 				}
 			}
-			
+
 			while (x > biWidth) {
-				x -= biWidth; y++;
+				x -= biWidth;
+				y++;
 			}
 
-			if (x + (y * biWidth) >= biHeight * biWidth) break;
+			if (x + (y * biWidth) >= biHeight * biWidth)
+				break;
 		}
 	}
-	
+
 	Image image;
 	image.width = biWidth;
 	image.height = biHeight;

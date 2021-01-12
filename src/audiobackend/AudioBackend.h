@@ -35,30 +35,30 @@
  * will be called, if at all.
  */
 struct AudioStream {
-	virtual ~AudioStream() { }
-	virtual size_t produce(void *data, size_t len_in_bytes) = 0;
+	virtual ~AudioStream() {}
+	virtual size_t produce(void* data, size_t len_in_bytes) = 0;
 };
 
 class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
-protected:
-	AudioBackend() { }
+  protected:
+	AudioBackend() {}
 
-public:
-	virtual ~AudioBackend() { }
+  public:
+	virtual ~AudioBackend() {}
 	virtual void init() = 0;
 	virtual void shutdown() = 0;
-	
-	virtual AudioChannel playClip(const std::string &filename, bool looping = false) = 0;
-	virtual AudioChannel playWavData(const uint8_t *data, size_t size, bool looping = false) = 0;
+
+	virtual AudioChannel playClip(const std::string& filename, bool looping = false) = 0;
+	virtual AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false) = 0;
 	virtual AudioChannel playStream(AudioStream*) = 0;
-	
+
 	virtual void fadeOutChannel(AudioChannel) = 0;
 	virtual void setChannelVolume(AudioChannel, float) = 0;
 	virtual void setChannelPan(AudioChannel, float pan) = 0;
 	virtual AudioState getChannelState(AudioChannel) = 0;
 	virtual void stopChannel(AudioChannel) = 0;
-	
-	virtual void playMIDIFile(const std::string &filename) = 0;
+
+	virtual void playMIDIFile(const std::string& filename) = 0;
 	virtual void setMIDIVolume(float) = 0;
 	virtual void stopMIDI() = 0;
 };

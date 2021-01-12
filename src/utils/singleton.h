@@ -2,7 +2,7 @@
 
 template <typename T>
 class Singleton {
-public:
+  public:
 	static std::shared_ptr<T> getInstance() {
 		static std::weak_ptr<T> weak;
 		std::shared_ptr<T> instance = weak.lock();
@@ -15,6 +15,7 @@ public:
 	Singleton(Singleton&&) = delete;
 	Singleton& operator=(const Singleton&) = delete;
 	Singleton& operator=(Singleton&&) = delete;
-protected:
+
+  protected:
 	Singleton() = default;
 };

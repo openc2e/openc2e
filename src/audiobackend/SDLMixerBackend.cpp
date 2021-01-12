@@ -18,7 +18,9 @@
  */
 
 #include "audiobackend/SDLMixerBackend.h"
+
 #include "creaturesException.h"
+
 #include <SDL.h>
 #include <algorithm>
 #include <array>
@@ -44,10 +46,10 @@ static int audiochannel_to_int(AudioChannel source) {
 }
 
 static AudioChannel int_to_audio_channel(int channel) {
-	if (channel < 0) return {};
+	if (channel < 0)
+		return {};
 	return {
-		(uint32_t)channel | ((uint32_t)s_channel_to_generation[channel]) << 16
-	};
+		(uint32_t)channel | ((uint32_t)s_channel_to_generation[channel]) << 16};
 }
 
 SDLMixerBackend::SDLMixerBackend() {
@@ -95,7 +97,7 @@ void SDLMixerBackend::init() {
 
 	Mix_ChannelFinished([](int i) {
 		// free the chunk we just played
-		// DANGEROUS: each channel must use its own chunk! if you want channels to share data, 
+		// DANGEROUS: each channel must use its own chunk! if you want channels to share data,
 		// create new chunks each time using Mix_QuickLoad_RAW(chunk->abuf, chunk->alen)
 		Mix_Chunk* chunk = Mix_GetChunk(i);
 		if (chunk) {
@@ -119,7 +121,7 @@ void SDLMixerBackend::shutdown() {
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-static int playChannel(Mix_Chunk *chunk, bool looping) {
+static int playChannel(Mix_Chunk* chunk, bool looping) {
 	int channel = Mix_PlayChannel(-1, chunk, (looping ? -1 : 0));
 	if (channel == -1) {
 		Mix_AllocateChannels(Mix_AllocateChannels(-1) + 1);
@@ -139,8 +141,9 @@ static int playChannel(Mix_Chunk *chunk, bool looping) {
 
 AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping) {
 	Mix_Chunk* chunk = Mix_LoadWAV(filename.c_str());
-	if (!chunk) return {};
-	
+	if (!chunk)
+		return {};
+
 	int channel = playChannel(chunk, looping);
 	if (channel == -1) {
 		Mix_FreeChunk(chunk);
@@ -149,12 +152,12 @@ AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping
 	return int_to_audio_channel(channel);
 }
 
-AudioChannel SDLMixerBackend::playWavData(const uint8_t *data, size_t size, bool looping) {
+AudioChannel SDLMixerBackend::playWavData(const uint8_t* data, size_t size, bool looping) {
 	Mix_Chunk* chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(data, size), SDL_TRUE);
 	if (!chunk) {
 		return {};
 	}
-	
+
 	int channel = playChannel(chunk, looping);
 	if (channel == -1) {
 		Mix_FreeChunk(chunk);
@@ -165,39 +168,44 @@ AudioChannel SDLMixerBackend::playWavData(const uint8_t *data, size_t size, bool
 
 AudioChannel SDLMixerBackend::playStream(AudioStream* stream) {
 	static std::array<uint8_t, SDLMIXERBACKEND_CHUNK_SIZE * 4> arbitrary_audio_data;
-	
+
 	Mix_Chunk* arbitrary_audio_chunk = Mix_QuickLoad_RAW(arbitrary_audio_data.data(), arbitrary_audio_data.size());
 	if (!arbitrary_audio_chunk) {
 		return {};
 	}
-	
+
 	int channel = playChannel(arbitrary_audio_chunk, true);
 	if (channel == -1) {
 		return {};
 	}
-	Mix_RegisterEffect(channel, [](int channel, void *buf, int length_in_bytes, void *udata) {
-		(void)channel;
-		AudioStream *stream = (AudioStream*)udata;
-		stream->produce(buf, length_in_bytes);
-	}, NULL, stream);
+	Mix_RegisterEffect(
+		channel, [](int channel, void* buf, int length_in_bytes, void* udata) {
+			(void)channel;
+			AudioStream* stream = (AudioStream*)udata;
+			stream->produce(buf, length_in_bytes);
+		},
+		NULL, stream);
 	return int_to_audio_channel(channel);
 }
 
 void SDLMixerBackend::fadeOutChannel(AudioChannel source) {
 	int channel = audiochannel_to_int(source);
-	if (channel == -1) return;
+	if (channel == -1)
+		return;
 	Mix_FadeOutChannel(channel, 500); // TODO: is 500 a good value?
 }
 
 void SDLMixerBackend::setChannelVolume(AudioChannel source, float v) {
 	int channel = audiochannel_to_int(source);
-	if (channel == -1) return;
+	if (channel == -1)
+		return;
 	Mix_Volume(channel, v * MIX_MAX_VOLUME);
 }
 
 void SDLMixerBackend::setChannelPan(AudioChannel source, float pan) {
 	int channel = audiochannel_to_int(source);
-	if (channel == -1) return;
+	if (channel == -1)
+		return;
 	if (pan > 0) {
 		pan = pan > 1 ? 1 : pan;
 		Mix_SetPanning(channel, 255 * (1 - pan), 255);
@@ -217,7 +225,8 @@ AudioState SDLMixerBackend::getChannelState(AudioChannel source) {
 
 void SDLMixerBackend::stopChannel(AudioChannel source) {
 	int channel = audiochannel_to_int(source);
-	if (channel == -1) return;
+	if (channel == -1)
+		return;
 	Mix_HaltChannel(channel);
 }
 

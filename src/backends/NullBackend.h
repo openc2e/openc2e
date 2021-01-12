@@ -21,48 +21,49 @@
 #define _NULLBACKEND_H
 
 #include "Backend.h"
+
 #include <memory>
 
 class NullRenderTarget : public RenderTarget {
-public:
-	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, uint8_t, bool) { }
-	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>&, unsigned int, int, int, uint8_t, bool) { }
-	virtual void renderLine(int, int, int, int, unsigned int) { }
-	virtual void blitRenderTarget(RenderTarget*, int, int, int, int)  { }
+  public:
+	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, uint8_t, bool) {}
+	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>&, unsigned int, int, int, uint8_t, bool) {}
+	virtual void renderLine(int, int, int, int, unsigned int) {}
+	virtual void blitRenderTarget(RenderTarget*, int, int, int, int) {}
 	virtual unsigned int getWidth() const { return 800; }
 	virtual unsigned int getHeight() const { return 600; }
 	virtual void renderClear() {}
-	virtual void renderDone() { }
+	virtual void renderDone() {}
 };
 
 class NullBackend : public Backend {
-protected:
+  protected:
 	NullRenderTarget surface;
 
-public:
-	virtual void init() { }
+  public:
+	virtual void init() {}
 	virtual int run() { return 1; }
-	virtual void shutdown() { }
+	virtual void shutdown() {}
 
-	virtual void resize(unsigned int, unsigned int) { }
+	virtual void resize(unsigned int, unsigned int) {}
 
 	virtual unsigned int ticks() { return 0; }
 	virtual bool pollEvent(BackendEvent&) { return false; }
 	virtual bool keyDown(int) { return false; }
 
 	virtual bool selfRender() { return false; }
-	virtual void requestRender() { }
-	
-	virtual RenderTarget *getMainRenderTarget() { return &surface; }
-	virtual RenderTarget *newRenderTarget(unsigned int, unsigned int) { return nullptr; }
-	virtual void freeRenderTarget(RenderTarget*) { }
-	
+	virtual void requestRender() {}
+
+	virtual RenderTarget* getMainRenderTarget() { return &surface; }
+	virtual RenderTarget* newRenderTarget(unsigned int, unsigned int) { return nullptr; }
+	virtual void freeRenderTarget(RenderTarget*) {}
+
 	virtual Texture createTexture(const Image&) { return {}; }
 	virtual Texture createTextureWithTransparentColor(const Image&, Color) { return {}; }
-			
-	virtual void setDefaultPalette(span<Color>) { }
+
+	virtual void setDefaultPalette(span<Color>) {}
 	virtual unsigned int textWidth(std::string) { return 0; }
-	virtual void delay(int) { }
+	virtual void delay(int) {}
 };
 
 #endif

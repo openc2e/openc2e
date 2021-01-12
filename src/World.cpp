@@ -18,34 +18,35 @@
  */
 
 #include "World.h"
-#include "caos_assert.h"
-#include "caosVM.h"
-#include "Engine.h"
-#include "caosScript.h"
-#include "PointerAgent.h"
-#include "CompoundAgent.h" // for setFocus
-#include <cassert>
-#include <limits.h> // for MAXINT
-#include <memory>
+
 #include "Backend.h"
-#include "creaturesImage.h"
-#include "fileformats/genomeFile.h"
-#include "creatures/CreatureAgent.h"
-#include "SFCFile.h"
-#include "Room.h"
-#include "MetaRoom.h"
-#include "Catalogue.h"
 #include "Camera.h"
-#include "historyManager.h"
-#include "imageManager.h"
+#include "Catalogue.h"
+#include "CompoundAgent.h" // for setFocus
+#include "Engine.h"
 #include "Map.h"
+#include "MetaRoom.h"
 #include "PathResolver.h"
-#include "prayManager.h"
+#include "PointerAgent.h"
+#include "Room.h"
+#include "SFCFile.h"
 #include "Scriptorium.h"
 #include "SpritePart.h"
+#include "caosScript.h"
+#include "caosVM.h"
+#include "caos_assert.h"
+#include "creatures/CreatureAgent.h"
+#include "creaturesImage.h"
+#include "fileformats/genomeFile.h"
+#include "historyManager.h"
+#include "imageManager.h"
+#include "prayManager.h"
 
+#include <cassert>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
+#include <limits.h> // for MAXINT
+#include <memory>
 namespace fs = ghc::filesystem;
 
 struct scriptevent {
@@ -77,7 +78,7 @@ World::World() {
 
 World::~World() {
 	agents.clear();
-	for (auto & i : vmpool)
+	for (auto& i : vmpool)
 		delete i;
 }
 
@@ -85,7 +86,7 @@ World::~World() {
 void World::init() {
 	// First, try initialising the mouse cursor from the catalogue tag.
 	if (engine.version > 2 && catalogue.hasTag("Pointer Information")) {
-		const std::vector<std::string> &pointerinfo = catalogue.getTag("Pointer Information");
+		const std::vector<std::string>& pointerinfo = catalogue.getTag("Pointer Information");
 		if (pointerinfo.size() >= 3) {
 			std::shared_ptr<creaturesImage> img = gallery->getImage(pointerinfo[2]);
 			if (img) {
@@ -109,7 +110,7 @@ void World::init() {
 			}
 		}
 	}
-	
+
 	// If for some reason we failed to do that (missing/bad catalogue tag? missing file?), try falling back to a sane default.
 	if (!theHand) {
 		std::shared_ptr<creaturesImage> img;
@@ -139,23 +140,31 @@ void World::init() {
 	variables.clear();
 
 	// core engine bits
-	v.setInt(1); variables["engine_debug_keys"] = v;
-	v.setInt(1); variables["engine_full_screen_toggle"] = v;
-	v.setInt(9998); variables["engine_plane_for_lines"] = v;
-	v.setInt(6); variables["engine_zlib_compression"] = v;
+	v.setInt(1);
+	variables["engine_debug_keys"] = v;
+	v.setInt(1);
+	variables["engine_full_screen_toggle"] = v;
+	v.setInt(9998);
+	variables["engine_plane_for_lines"] = v;
+	v.setInt(6);
+	variables["engine_zlib_compression"] = v;
 
 	// creature pregnancy
-	v.setInt(1); variables["engine_multiple_birth_maximum"] = v;
-	v.setFloat(0.5f); variables["engine_multiple_birth_identical_chance"] = v;
-	
+	v.setInt(1);
+	variables["engine_multiple_birth_maximum"] = v;
+	v.setFloat(0.5f);
+	variables["engine_multiple_birth_identical_chance"] = v;
+
 	// port lines
-	v.setFloat(600.0f); variables["engine_distance_before_port_line_warns"] = v;
-	v.setFloat(800.0f); variables["engine_distance_before_port_line_snaps"] = v;
+	v.setFloat(600.0f);
+	variables["engine_distance_before_port_line_warns"] = v;
+	v.setFloat(800.0f);
+	variables["engine_distance_before_port_line_snaps"] = v;
 
 	// adjust to default tick rate for C1/C2 if necessary
 	if (engine.version < 3)
 		ticktime = 100;
-	
+
 	timeofday = dayofseason = season = year = 0;
 }
 
@@ -164,11 +173,11 @@ void World::shutdown() {
 	map->Reset();
 }
 
-caosVM *World::getVM(Agent *a) {
+caosVM* World::getVM(Agent* a) {
 	if (vmpool.empty()) {
 		return new caosVM(a);
 	} else {
-		caosVM *x = vmpool.back();
+		caosVM* x = vmpool.back();
 		vmpool.pop_back();
 		x->setOwner(a);
 		x->resetScriptState();
@@ -176,7 +185,7 @@ caosVM *World::getVM(Agent *a) {
 	}
 }
 
-void World::freeVM(caosVM *v) {
+void World::freeVM(caosVM* v) {
 	// we don't reset the script state here because caosVM might be in our call stack and we don't want to reset the VM from under itself
 	v->setOwner(0);
 	vmpool.push_back(v);
@@ -197,14 +206,14 @@ void World::queueScript(unsigned short event, AgentRef agent, AgentRef from, cao
 }
 
 // TODO: eventually, the part should be referenced via a weak_ptr, maaaaybe?
-void World::setFocus(CompoundPart *p) {
+void World::setFocus(CompoundPart* p) {
 	assert(!p || p->canGainFocus());
 
 	// Unfocus the current agent. Not sure if c2e always does this (what if the agent/part is bad?).
 	if (focusagent) {
-		CompoundAgent *c = dynamic_cast<CompoundAgent *>(focusagent.get());
+		CompoundAgent* c = dynamic_cast<CompoundAgent*>(focusagent.get());
 		assert(c);
-		CompoundPart *p = c->part(focuspart);
+		CompoundPart* p = c->part(focuspart);
 		if (p && p->canGainFocus())
 			p->loseFocus();
 	}
@@ -219,7 +228,8 @@ void World::setFocus(CompoundPart *p) {
 }
 
 void World::tick() {
-	if (saving) {} // TODO: save
+	if (saving) {
+	} // TODO: save
 	if (quitting) {
 		// due to destruction ordering we must explicitly destroy all agents here
 		agents.clear();
@@ -240,10 +250,10 @@ void World::tick() {
 		i++;
 		a->tick();
 	}
-	
+
 	// Process the script queue.
 	std::list<scriptevent> newqueue;
-	for (auto & i : scriptqueue) {
+	for (auto& i : scriptqueue) {
 		std::shared_ptr<Agent> agent = i.agent.lock();
 		if (agent) {
 			if (engine.version < 3) {
@@ -287,40 +297,45 @@ void World::tick() {
 	world.hand()->vely = world.hand()->vely / 2.0f;
 }
 
-Agent *World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {
-	CompoundPart *p = partAt(x, y, obey_all_transparency, needs_mouseable);
+Agent* World::agentAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable) {
+	CompoundPart* p = partAt(x, y, obey_all_transparency, needs_mouseable);
 	if (p)
 		return p->getParent();
 	else
 		return 0;
 }
 
-CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable, bool needs_clickable) {
-	Agent *transagent = 0;
+CompoundPart* World::partAt(unsigned int x, unsigned int y, bool obey_all_transparency, bool needs_mouseable, bool needs_clickable) {
+	Agent* transagent = 0;
 	if (!obey_all_transparency)
 		transagent = agentAt(x, y, true, needs_mouseable);
 
-	MetaRoom *m = world.map->metaRoomAt(x, y); // for wraparound checking
+	MetaRoom* m = world.map->metaRoomAt(x, y); // for wraparound checking
 
 	for (auto p : zorder) {
-			if (p->getParent() == theHand) continue;
+		if (p->getParent() == theHand)
+			continue;
 
 		int ax = (int)(x - p->getParent()->x);
 		int ay = (int)(y - p->getParent()->y);
 
 		// we check the wrap too..
 		if (!m || !m->wraparound() || p->x > ax + (int)m->width() || p->x + (int)p->getWidth() < ax + (int)m->width()) {
-			if (p->x > ax) continue;
-			if (p->x + (int)p->getWidth() < ax) continue;
+			if (p->x > ax)
+				continue;
+			if (p->x + (int)p->getWidth() < ax)
+				continue;
 		} else {
 			// wrapped!
 			ax += m->width();
 		}
 
-		if (p->y > ay) continue;
-		if (p->y + (int)p->getHeight() < ay) continue;
+		if (p->y > ay)
+			continue;
+		if (p->y + (int)p->getHeight() < ay)
+			continue;
 
-		SpritePart *s = dynamic_cast<SpritePart *>(p);
+		SpritePart* s = dynamic_cast<SpritePart*>(p);
 		if (s && s->isTransparent() && obey_all_transparency) {
 			// transparent parts in C1/C2 are scenery
 			// TODO: always true? you can't sekritly set parts to be transparent in C2?
@@ -340,17 +355,17 @@ CompoundPart *World::partAt(unsigned int x, unsigned int y, bool obey_all_transp
 
 		return p;
 	}
-	
+
 	return 0;
 }
 
-void World::setUNID(Agent *whofor, int unid) {
+void World::setUNID(Agent* whofor, int unid) {
 	assert(whofor->shared_from_this() == unidmap[unid].lock() || unidmap[unid].expired());
 	whofor->unid = unid;
 	unidmap[unid] = whofor->shared_from_this();
 }
 
-int World::newUNID(Agent *whofor) {
+int World::newUNID(Agent* whofor) {
 	do {
 		int unid = rand();
 		if (unid && unidmap[unid].expired()) {
@@ -365,7 +380,8 @@ void World::freeUNID(int unid) {
 }
 
 std::shared_ptr<Agent> World::lookupUNID(int unid) {
-	if (unid == 0) return std::shared_ptr<Agent>();
+	if (unid == 0)
+		return std::shared_ptr<Agent>();
 	return unidmap[unid].lock();
 }
 
@@ -373,11 +389,11 @@ void World::drawWorld() {
 	drawWorld(engine.camera.get(), engine.backend->getMainRenderTarget());
 }
 
-void World::drawWorld(Camera *cam, RenderTarget *surface) {
+void World::drawWorld(Camera* cam, RenderTarget* surface) {
 	assert(surface);
 	surface->renderClear();
 
-	MetaRoom *m = cam->getMetaRoom();
+	MetaRoom* m = cam->getMetaRoom();
 	if (!m) {
 		// Whoops - the room we're in vanished, or maybe we were never in one?
 		// Try to get a new one ...
@@ -391,7 +407,8 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	std::shared_ptr<creaturesImage> bkgd = m->getBackground(""); // TODO
 
 	// TODO: work out what c2e does when it doesn't have a background..
-	if (!bkgd) return;
+	if (!bkgd)
+		return;
 
 	assert(bkgd->numframes() > 0);
 
@@ -406,7 +423,7 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 		for (int j = widthinsprites - 1; j >= 0; j--) { // reverse order, so wrapping always works
 			// figure out which block number to use
 			unsigned int whereweare = j * heightinsprites + i;
-			
+
 			// make one pass for non-wraparound rooms, or two passes for wraparound ones
 			// TODO: implement this in a more sensible way, or at least optimise it
 			for (unsigned int z = 0; z < (m->wraparound() ? 2 : 1); z++) {
@@ -414,12 +431,13 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 				int desty = (i * sprheight) - adjusty + m->y();
 
 				// if we're on the second pass, render to the *right* of the normal area
-				if (z == 1) destx += m->width();
+				if (z == 1)
+					destx += m->width();
 
 				// if the block's on screen, render it.
 				if ((destx >= -sprwidth) && (desty >= -sprheight) &&
-						(destx - sprwidth <= (int)surface->getWidth()) &&
-						(desty - sprheight <= (int)surface->getHeight())) {
+					(destx - sprwidth <= (int)surface->getWidth()) &&
+					(desty - sprheight <= (int)surface->getHeight())) {
 					surface->renderCreaturesImage(bkgd, whereweare, destx, desty);
 				}
 			}
@@ -433,8 +451,10 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 			// TODO: same as above with background rendering
 			for (unsigned int z = 0; z < (m->wraparound() ? 3 : 1); z++) {
 				int newx = -adjustx, newy = -adjusty;
-				if (z == 1) newx += m->width();
-				else if (z == 2) newx -= m->width();
+				if (z == 1)
+					newx += m->width();
+				else if (z == 2)
+					newx -= m->width();
 				render->render(surface, newx, newy);
 			}
 		}
@@ -443,14 +463,16 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 	// render port connection lines. TODO: these should be rendered as some kind
 	// of renderable, not directly like this.
 	for (auto a : world.agents) {
-			if (!a) continue;
+		if (!a)
+			continue;
 		for (std::map<unsigned int, std::shared_ptr<OutputPort> >::iterator p = a->outports.begin();
-		     p != a->outports.end(); p++) {
+			 p != a->outports.end(); p++) {
 			for (PortConnectionList::iterator c = p->second->dests.begin(); c != p->second->dests.end(); c++) {
-				if (!c->first) continue;
-				InputPort *target = c->first->inports[c->second].get();
+				if (!c->first)
+					continue;
+				InputPort* target = c->first->inports[c->second].get();
 				surface->renderLine(a->x + p->second->x - adjustx, a->y + p->second->y - adjusty,
-						c->first->x + target->x - adjustx, c->first->y + target->y - adjusty, 0x00ff00ff);
+					c->first->x + target->x - adjustx, c->first->y + target->y - adjusty, 0x00ff00ff);
 			}
 		}
 	}
@@ -464,13 +486,13 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 				r->renderBorders(surface, adjustx - m->width(), adjusty, color);
 			}
 		};
-		for (const auto &r : cam->getMetaRoom()->rooms) {
+		for (const auto& r : cam->getMetaRoom()->rooms) {
 			if (!room_under_hand || (r != room_under_hand && r->doors.find(room_under_hand) == r->doors.end())) {
 				draw_room(r, 0xFFFF00CC);
 			}
 		}
 		if (room_under_hand) {
-			for (const auto &door : room_under_hand->doors) {
+			for (const auto& door : room_under_hand->doors) {
 				const auto r = door.first.lock();
 				if (r) {
 					draw_room(r, 0x00FFFFCC);
@@ -487,15 +509,17 @@ void World::drawWorld(Camera *cam, RenderTarget *surface) {
 			int x, y;
 			if (hand()->holdingWire == 1) {
 				// holding from outport
-				OutputPort *out = hand()->wireOriginAgent->outports[hand()->wireOriginID].get();
-				x = out->x; y = out->y;
+				OutputPort* out = hand()->wireOriginAgent->outports[hand()->wireOriginID].get();
+				x = out->x;
+				y = out->y;
 			} else {
 				// holding from inport
-				InputPort *in = hand()->wireOriginAgent->inports[hand()->wireOriginID].get();
-				x = in->x; y = in->y;
+				InputPort* in = hand()->wireOriginAgent->inports[hand()->wireOriginID].get();
+				x = in->x;
+				y = in->y;
 			}
 			surface->renderLine(x + hand()->wireOriginAgent->x - adjustx,
-					y + hand()->wireOriginAgent->y - adjusty, hand()->x - adjustx, hand()->y - adjusty, 0x00ff00ff);
+				y + hand()->wireOriginAgent->y - adjusty, hand()->x - adjustx, hand()->y - adjusty, 0x00ff00ff);
 		}
 	}
 
@@ -516,10 +540,11 @@ void World::executeInitScript(std::string x) {
 		caosVM vm(0);
 		script.installScripts();
 		vm.runEntirely(script.installer);
-	} catch (creaturesException &e) {
+	} catch (creaturesException& e) {
 		std::cerr << "exec of \"" << fs::path(x).filename() << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	}
-	std::cout.flush(); std::cerr.flush();
+	std::cout.flush();
+	std::cerr.flush();
 }
 
 void World::executeBootstrap(std::string p) {
@@ -529,7 +554,7 @@ void World::executeBootstrap(std::string p) {
 	}
 
 	std::vector<fs::path> scripts;
-	
+
 	fs::directory_iterator fsend;
 	for (fs::directory_iterator d(p); d != fsend; ++d) {
 		if ((!fs::is_directory(*d)) && (d->path().extension().string() == ".cos"))
@@ -545,7 +570,7 @@ void World::executeBootstrap(std::string p) {
 void World::executeBootstrap(bool switcher) {
 	if (engine.version < 3) {
 		// read from Eden.sfc
-		
+
 		if (data_directories.size() == 0)
 			throw creaturesException("C1/2 can't run without data directories!");
 
@@ -593,14 +618,14 @@ void World::executeBootstrap(bool switcher) {
 					if (s == "000 Switcher" || s == "Startup") {
 						continue;
 					}
-					
+
 					bootstraps.insert(std::pair<std::string, fs::path>(s, *d));
 				}
 			}
 		}
 	}
 
-	for (auto & bootstrap : bootstraps) {
+	for (auto& bootstrap : bootstraps) {
 		executeBootstrap(bootstrap.second);
 	}
 }
@@ -629,7 +654,7 @@ std::string World::findFile(std::string name) {
 
 std::vector<std::string> World::findFiles(std::string dir, std::string wild) {
 	std::vector<std::string> possibles;
-	
+
 	// Go backwards, so we find files in more 'modern' directories first..
 	for (int i = data_directories.size() - 1; i != -1; i--) {
 		fs::path p = data_directories[i];
@@ -642,7 +667,7 @@ std::vector<std::string> World::findFiles(std::string dir, std::string wild) {
 }
 
 std::string World::getUserDataDir() {
-	if (data_directories.size() ==  0) {
+	if (data_directories.size() == 0) {
 		throw creaturesException("Can't get user data directory when there are no data directories");
 	}
 	return data_directories.back();
@@ -650,13 +675,14 @@ std::string World::getUserDataDir() {
 
 void World::selectCreature(std::shared_ptr<Agent> a) {
 	if (a) {
-		CreatureAgent *c = dynamic_cast<CreatureAgent *>(a.get());
+		CreatureAgent* c = dynamic_cast<CreatureAgent*>(a.get());
 		caos_assert(c);
 	}
 
 	if (selectedcreature != a) {
-		for (auto & agent : world.agents) {
-			if (!agent) continue;
+		for (auto& agent : world.agents) {
+			if (!agent)
+				continue;
 			agent->queueScript(120, 0, caosValue(a), caosValue(selectedcreature)); // selected creature changed
 		}
 
@@ -664,9 +690,10 @@ void World::selectCreature(std::shared_ptr<Agent> a) {
 	}
 }
 
-std::shared_ptr<genomeFile> World::loadGenome(std::string &genefile) {
+std::shared_ptr<genomeFile> World::loadGenome(std::string& genefile) {
 	std::vector<std::string> possibles = findFiles("Genetics/", genefile + ".gen");
-	if (possibles.empty()) return std::shared_ptr<genomeFile>();
+	if (possibles.empty())
+		return std::shared_ptr<genomeFile>();
 	genefile = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
 
 	std::shared_ptr<genomeFile> p(new genomeFile());
@@ -704,34 +731,42 @@ std::string World::generateMoniker(std::string basename) {
 
 	std::string x = basename;
 	for (unsigned int i = 0; i < 4; i++) {
-		unsigned int n = (unsigned int) (0xfffff * (rand() / (RAND_MAX + 1.0)));
+		unsigned int n = (unsigned int)(0xfffff * (rand() / (RAND_MAX + 1.0)));
 		x = x + "-" + fmt::format("{:05x}", n);
 	}
-	
+
 	return x;
 }
 
 int World::findCategory(unsigned char family, unsigned char genus, unsigned short species) {
 	if (engine.version < 3) {
-		if (family == 2 && genus == 1 && species == 1) return genus; // 2 1 1 (hand) -> 1
-		if (family == 2 && genus > 1 && genus < 26) return genus; // 2 2 0 to 2 25 0 -> 2 to 25
-		if (family == 3 && genus < 10) return genus + 25; // 3 1 0 to 3 9 0 -> 26 to 35
-		if (family == 4 && genus < 5) return genus + 35; // 4 1 0 to 4 4 0 -> 36 to 39
+		if (family == 2 && genus == 1 && species == 1)
+			return genus; // 2 1 1 (hand) -> 1
+		if (family == 2 && genus > 1 && genus < 26)
+			return genus; // 2 2 0 to 2 25 0 -> 2 to 25
+		if (family == 3 && genus < 10)
+			return genus + 25; // 3 1 0 to 3 9 0 -> 26 to 35
+		if (family == 4 && genus < 5)
+			return genus + 35; // 4 1 0 to 4 4 0 -> 36 to 39
 
 		return -1;
 	}
 
-	if (!catalogue.hasTag("Agent Classifiers")) return -1;
+	if (!catalogue.hasTag("Agent Classifiers"))
+		return -1;
 
-	const std::vector<std::string> &t = catalogue.getTag("Agent Classifiers");
+	const std::vector<std::string>& t = catalogue.getTag("Agent Classifiers");
 
 	for (unsigned int i = 0; i < t.size(); i++) {
 		std::string buffer = fmt::format("{} {} {}", (int)family, (int)genus, (int)species);
-		if (t[i] == buffer) return i;
+		if (t[i] == buffer)
+			return i;
 		buffer = fmt::format("{} {} 0", (int)family, (int)genus);
-		if (t[i] == buffer) return i;
+		if (t[i] == buffer)
+			return i;
 		buffer = fmt::format("{} 0 0", (int)family);
-		if (t[i] == buffer) return i;
+		if (t[i] == buffer)
+			return i;
 		// leave it here: 0 0 0 would be silly to have in Agent Classifiers.
 	}
 

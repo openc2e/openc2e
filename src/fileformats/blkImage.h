@@ -21,4 +21,4 @@
 
 #include "Image.h"
 
-Image ReadBlkFile(std::istream &in);
+Image ReadBlkFile(std::istream& in);

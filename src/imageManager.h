@@ -20,28 +20,28 @@
 #ifndef _IMAGEMANAGER_H
 #define _IMAGEMANAGER_H
 
+#include "creaturesImage.h"
+
 #include <map>
 #include <memory>
 #include <string>
 
-#include "creaturesImage.h"
-
 class imageManager {
-protected:
+  protected:
 	friend class Openc2eTestHelper;
 	std::map<std::string, std::weak_ptr<creaturesImage> > images;
 	void addImage(std::shared_ptr<creaturesImage>);
 	shared_array<Color> palette;
 
-public:
+  public:
 	void loadDefaultPalette();
 	shared_array<Color> getDefaultPalette();
 	std::shared_ptr<creaturesImage> getImage(std::string name, bool is_background = false);
 	std::shared_ptr<creaturesImage> getCharsetDta(imageformat format, uint32_t bgcolor,
-	                                              uint32_t textcolor, uint32_t aliascolor);
+		uint32_t textcolor, uint32_t aliascolor);
 	std::shared_ptr<creaturesImage> tint(const std::shared_ptr<creaturesImage>& image,
-	                                     unsigned char r, unsigned char g, unsigned char b,
-	                                     unsigned char rotation, unsigned char swap);
+		unsigned char r, unsigned char g, unsigned char b,
+		unsigned char rotation, unsigned char swap);
 };
 
 #endif

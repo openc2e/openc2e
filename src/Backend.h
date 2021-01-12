@@ -20,53 +20,53 @@
 #ifndef _BACKEND_H
 #define _BACKEND_H
 
-#include <memory>
-#include <string>
-
 #include "BackendEvent.h"
 #include "Image.h"
 #include "Texture.h"
 #include "span.h"
+
+#include <memory>
+#include <string>
 
 using std::shared_ptr;
 
 class creaturesImage;
 
 class RenderTarget {
-public:
+  public:
 	virtual void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
 	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) = 0;
-	virtual void blitRenderTarget(RenderTarget *src, int x, int y, int w, int h) = 0;
+	virtual void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h) = 0;
 	virtual unsigned int getWidth() const = 0;
 	virtual unsigned int getHeight() const = 0;
 	virtual void renderClear() = 0;
 	virtual void renderDone() = 0;
-	virtual ~RenderTarget() { }
+	virtual ~RenderTarget() {}
 };
 
 class Backend {
-public:
+  public:
 	virtual void init() = 0;
 	virtual void shutdown() = 0;
 
-	virtual unsigned int ticks() = 0;	
-	virtual bool pollEvent(BackendEvent &e) = 0;
+	virtual unsigned int ticks() = 0;
+	virtual bool pollEvent(BackendEvent& e) = 0;
 	virtual bool keyDown(int key) = 0;
 
 	virtual void resize(unsigned int width, unsigned int height) = 0;
-	
-	virtual RenderTarget *getMainRenderTarget() = 0;
-	virtual RenderTarget *newRenderTarget(unsigned int width, unsigned int height) = 0;
-	virtual void freeRenderTarget(RenderTarget *surf) = 0;
+
+	virtual RenderTarget* getMainRenderTarget() = 0;
+	virtual RenderTarget* newRenderTarget(unsigned int width, unsigned int height) = 0;
+	virtual void freeRenderTarget(RenderTarget* surf) = 0;
 
 	virtual void setDefaultPalette(span<Color> palette) = 0;
 	virtual Texture createTexture(const Image& image) = 0;
 	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) = 0;
-	
+
 	virtual int run() = 0;
 	virtual void delay(int msec) = 0;
-	virtual ~Backend() { }
+	virtual ~Backend() {}
 };
 
 #endif

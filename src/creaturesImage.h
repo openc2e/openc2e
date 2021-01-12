@@ -19,44 +19,44 @@
 
 #pragma once
 
+#include "Image.h"
+#include "Texture.h"
+#include "shared_array.h"
+
 #include <cassert>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "Image.h"
-#include "Texture.h"
-#include "shared_array.h"
-
 
 class creaturesImage final {
-protected:
+  protected:
 	friend class imageManager;
 	std::string name;
 	unsigned int block_width = 0;
 	unsigned int block_height = 0;
 
-public:
+  public:
 	creaturesImage(std::string n = std::string());
 	imageformat format(unsigned int frame) const;
 	unsigned int numframes() const;
 	unsigned int width(unsigned int frame) const;
 	unsigned int height(unsigned int frame) const;
-	const void *data(unsigned int frame) const;
+	const void* data(unsigned int frame) const;
 	std::string getName() const;
-	
+
 	const Image& getImageForFrame(unsigned int frame) const;
 	Texture& getTextureForFrame(unsigned int frame);
 
 	bool hasCustomPalette(unsigned int frame) const;
 	shared_array<Color> getCustomPalette(unsigned int frame) const;
-	
+
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y) const;
-	
+
 	void setBlockSize(int width, int height);
 	unsigned int getXOffsetForFrame(unsigned int frame) const;
 	unsigned int getYOffsetForFrame(unsigned int frame) const;
-	
+
 	std::vector<Texture> textures;
 	std::vector<Image> images;
 };

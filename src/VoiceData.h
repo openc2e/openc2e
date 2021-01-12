@@ -20,9 +20,9 @@
 #ifndef _VOICEDATA_H
 #define _VOICEDATA_H
 
-#include <vector>
-#include <string>
 #include <istream>
+#include <string>
+#include <vector>
 
 struct VoiceEntry {
 	std::string name;
@@ -30,17 +30,17 @@ struct VoiceEntry {
 };
 
 class VoiceData {
-public:
+  public:
 	VoiceData();
-	VoiceData(std::istream &in);
+	VoiceData(std::istream& in);
 	VoiceData(std::string tagname);
 	operator bool() const;
 
 	std::vector<VoiceEntry> GetSyllablesFor(std::string speech);
 
-protected:
+  protected:
 	std::vector<unsigned int> GetSentenceFor(std::string speech);
-	bool NextSyllableFor(std::vector<unsigned int> &sentence, unsigned int &pos, VoiceEntry &syllable);
+	bool NextSyllableFor(std::vector<unsigned int>& sentence, unsigned int& pos, VoiceEntry& syllable);
 
 	std::vector<VoiceEntry> voices;
 	std::vector<uint32_t> lookup_table;

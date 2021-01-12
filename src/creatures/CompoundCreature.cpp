@@ -29,7 +29,8 @@ CompoundCreature::~CompoundCreature() {
 void CompoundCreature::tick() {
 	CompoundAgent::tick();
 
-	if (paused) return;
+	if (paused)
+		return;
 
 	CreatureAgent::tick();
 }

@@ -21,18 +21,19 @@
 #define __OLDBRAIN_H
 
 #include "fileformats/genomeFile.h"
-#include <set>
+
 #include <map>
+#include <set>
 
 struct oldSVRule {
 	unsigned int length;
 	uint8_t rndconst;
 	uint8_t rules[12];
-	void init(uint8_t version, uint8_t *src);
+	void init(uint8_t version, uint8_t* src);
 };
 
 struct oldDendrite {
-	struct oldNeuron *src;
+	struct oldNeuron* src;
 	unsigned char strength, stw, ltw, suscept;
 };
 
@@ -40,16 +41,22 @@ struct oldNeuron {
 	unsigned char state, output, leakin, leakout;
 	std::vector<oldDendrite> dendrites[2];
 	unsigned char percept_src;
-	oldNeuron() { state = 0; output = 0; leakin = 0; leakout = 0; percept_src = 0; }
+	oldNeuron() {
+		state = 0;
+		output = 0;
+		leakin = 0;
+		leakout = 0;
+		percept_src = 0;
+	}
 	unsigned int magicalHash(unsigned int type);
 };
 
 class oldLobe {
-protected:
-	class oldBrain *parent;
-	oldBrainLobeGene *ourGene;
+  protected:
+	class oldBrain* parent;
+	oldBrainLobeGene* ourGene;
 	std::vector<oldNeuron> neurons;
-	oldLobe *sourceLobe[2];
+	oldLobe* sourceLobe[2];
 	bool inited;
 
 	unsigned int width, height;
@@ -70,20 +77,20 @@ protected:
 	oldSVRule relaxrule[2];
 	oldSVRule backproprule[2], forproprule[2];
 
-	unsigned char evaluateSVRuleConstant(oldNeuron *cell, oldDendrite *dend, uint8_t id, oldSVRule &rule);
-	unsigned char processSVRule(oldNeuron *cell, oldDendrite *dend, oldSVRule &rule);
+	unsigned char evaluateSVRuleConstant(oldNeuron* cell, oldDendrite* dend, uint8_t id, oldSVRule& rule);
+	unsigned char processSVRule(oldNeuron* cell, oldDendrite* dend, oldSVRule& rule);
 
-	unsigned char dendrite_sum(oldNeuron &cell, unsigned int type, bool only_if_all_firing);
+	unsigned char dendrite_sum(oldNeuron& cell, unsigned int type, bool only_if_all_firing);
 
-	bool migrationTryCandidateSlice(unsigned int type, oldLobe *src, std::vector<oldDendrite> &dendrites, unsigned int i);
-	void neuronTryAllLooseMigration(unsigned int type, oldNeuron &neu);
-	void neuronTryMigration(unsigned int type, oldNeuron &neu, oldLobe *src);
-	void connectDendrite(unsigned int type, oldDendrite &dend, oldNeuron *dest);
+	bool migrationTryCandidateSlice(unsigned int type, oldLobe* src, std::vector<oldDendrite>& dendrites, unsigned int i);
+	void neuronTryAllLooseMigration(unsigned int type, oldNeuron& neu);
+	void neuronTryMigration(unsigned int type, oldNeuron& neu, oldLobe* src);
+	void connectDendrite(unsigned int type, oldDendrite& dend, oldNeuron* dest);
 
 	void tickDendrites(unsigned int id, unsigned int type);
 
-public:
-	oldLobe(class oldBrain *b, oldBrainLobeGene *g);
+  public:
+	oldLobe(class oldBrain* b, oldBrainLobeGene* g);
 	bool wasInited() { return inited; }
 	void ensure_minimum_size(unsigned int size);
 	void tick();
@@ -91,40 +98,40 @@ public:
 	void connect();
 	void wipe();
 
-	oldBrainLobeGene *getGene() { return ourGene; }
+	oldBrainLobeGene* getGene() { return ourGene; }
 
 	unsigned int getNoNeurons() { return neurons.size(); }
-	oldNeuron *getNeuron(unsigned int i) { return &neurons[i]; }
+	oldNeuron* getNeuron(unsigned int i) { return &neurons[i]; }
 	unsigned int getDendriteCount();
 	unsigned int getWidth() { return width; }
 	unsigned int getHeight() { return height; }
 
-	unsigned char *getChemPointer(unsigned int chemid) { return &chems[chemid]; }
-	unsigned char *getThresholdPointer() { return &threshold; }
-	unsigned char *getLeakageRatePointer() { return &leakagerate; }
-	unsigned char *getInputGainPointer() { return &inputgain; }
-	unsigned char *getLooseDendsPointer(unsigned int type) { return &loose_dendrites[type]; }
-	unsigned char *getLobeActivityPointer() { return &lobe_activity; }
+	unsigned char* getChemPointer(unsigned int chemid) { return &chems[chemid]; }
+	unsigned char* getThresholdPointer() { return &threshold; }
+	unsigned char* getLeakageRatePointer() { return &leakagerate; }
+	unsigned char* getInputGainPointer() { return &inputgain; }
+	unsigned char* getLooseDendsPointer(unsigned int type) { return &loose_dendrites[type]; }
+	unsigned char* getLobeActivityPointer() { return &lobe_activity; }
 };
 
 class oldBrain {
-protected:
-	class oldCreature *parent;
+  protected:
+	class oldCreature* parent;
 	unsigned int ticks;
 	std::vector<unsigned int> lobe_process_order;
 
-public:
-	std::vector<oldLobe *> lobes;
+  public:
+	std::vector<oldLobe*> lobes;
 
-	oldBrain(oldCreature *p);
+	oldBrain(oldCreature* p);
 	void tick();
 	void processGenes();
 	void init();
 
-	void processInstinct(creatureInstinctGene &instinct);
+	void processInstinct(creatureInstinctGene& instinct);
 
-	oldLobe *getLobeByTissue(unsigned int id);
-	oldCreature *getParent() { return parent; }
+	oldLobe* getLobeByTissue(unsigned int id);
+	oldCreature* getParent() { return parent; }
 	unsigned int getTicks() { return ticks; }
 };
 

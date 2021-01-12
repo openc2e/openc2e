@@ -17,11 +17,13 @@
  *
  */
 #include "bytecode.h"
-#include "dialect.h"
+
 #include "cmddata.h"
+#include "dialect.h"
+
 #include <fmt/core.h>
 
-const char *cnams[] = {
+const char* cnams[] = {
 	NULL,
 	"EQ",
 	"LT",
@@ -29,16 +31,15 @@ const char *cnams[] = {
 	"GT",
 	"GE",
 	"NE",
-	NULL
-};
+	NULL};
 
-static std::string try_lookup(const Dialect *d, int idx) {
+static std::string try_lookup(const Dialect* d, int idx) {
 	if (d)
 		return std::string(d->getcmd(idx)->fullname);
 	return std::to_string(idx);
 }
 
-std::string dumpOp(const Dialect *d, caosOp op) {
+std::string dumpOp(const Dialect* d, caosOp op) {
 	int arg = op.argument; // weird C++ issues
 	switch (op.opcode) {
 		case CAOS_NOP:

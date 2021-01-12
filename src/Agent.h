@@ -20,17 +20,18 @@
 #ifndef __AGENT_H
 #define __AGENT_H
 
-#include "serfwd.h"
 #include "AgentRef.h"
-#include "Sound.h"
 #include "CompoundPart.h"
+#include "Port.h"
+#include "Sound.h"
+#include "physics.h"
+#include "serfwd.h"
+#include "utils/heap_array.h"
+
 #include <cassert>
 #include <list>
 #include <map>
 #include <memory>
-#include "Port.h"
-#include "utils/heap_array.h"
-#include "physics.h"
 #include <set>
 
 class script;
@@ -38,13 +39,12 @@ class genomeFile;
 
 class caosValue;
 struct caosValueCompare {
-	bool operator()(const caosValue &v1, const caosValue &v2) const;
+	bool operator()(const caosValue& v1, const caosValue& v2) const;
 };
 
 class caosVM;
 
 class Agent : public std::enable_shared_from_this<Agent> {
-	
 	friend class caosVM;
 	friend class AgentRef;
 	friend class World;
@@ -57,8 +57,8 @@ class Agent : public std::enable_shared_from_this<Agent> {
 	friend class CreatureAgent;
 
 	FRIEND_SERIALIZE(Agent)
-	
-protected:
+
+  protected:
 	bool initialized;
 	int lifecount;
 	int lastScript;
@@ -73,17 +73,17 @@ protected:
 	bool wasmoved;
 
 	std::list<std::shared_ptr<Agent> >::iterator agents_iter;
-	std::list<caosVM *> vmstack; // for CALL etc
+	std::list<caosVM*> vmstack; // for CALL etc
 	std::vector<AgentRef> floated;
 
 	void updateAudio(Sound);
 	bool dying : 1;
-	
+
 	void vmTick();
 
 	virtual void physicsTick();
 	void physicsTickC2();
-	
+
 	virtual void carry(AgentRef);
 	virtual void drop(AgentRef);
 
@@ -91,16 +91,17 @@ protected:
 	virtual std::pair<int, int> getCarriedPoint();
 	virtual void adjustCarried(float xoffset, float yoffset);
 
-public:
-	int emitca_index; float emitca_amount;
+  public:
+	int emitca_index;
+	float emitca_amount;
 	std::map<unsigned int, std::shared_ptr<genomeFile> > genome_slots;
 	int lastcollidedirection;
 	std::map<caosValue, caosValue, caosValueCompare> name_variables;
 	unsigned int timerrate;
-	heap_array<caosValue, 100> var; // OVxx	
-	caosVM *vm;
+	heap_array<caosValue, 100> var; // OVxx
+	caosVM* vm;
 	unsigned int zorder;
-	virtual bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
+	virtual bool fireScript(unsigned short event, Agent* from, caosValue one, caosValue two);
 
 	std::map<unsigned int, std::pair<int, int> > carry_points, carried_points;
 
@@ -110,7 +111,7 @@ public:
 	void setVoice(std::string name);
 	void speak(std::string sentence);
 	void tickVoices();
-	
+
 	Sound sound;
 
 	// these are maps rather than vectors because ports can be destroyed
@@ -122,11 +123,11 @@ public:
 	AgentRef carrying;
 	AgentRef carriedby;
 	AgentRef invehicle;
-	
+
 	inline bool isDying() const {
 		return dying;
 	}
-	
+
 	// attr
 	unsigned int attr;
 	// values which are always the same
@@ -164,13 +165,14 @@ public:
 	bool imsk_mouse_up : 1;
 	bool imsk_mouse_wheel : 1;
 	bool imsk_translated_char : 1;
-	
+
 	bool paused : 1;
 	bool frozen : 1;
 	bool visible : 1;
 	bool displaycore : 1;
 
-	int clac[3]; int clik;
+	int clac[3];
+	int clik;
 
 	void setClassifier(unsigned char f, unsigned char g, unsigned short s);
 	unsigned char family, genus;
@@ -218,7 +220,7 @@ public:
 
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
-	
+
 	virtual void finishInit();
 
 	void floatSetup();
@@ -229,7 +231,7 @@ public:
 	void floatTo(float x, float y);
 
 	bool beDropped();
-	
+
 	void addCarried(AgentRef);
 	void dropCarried(AgentRef);
 
@@ -238,24 +240,27 @@ public:
 	bool queueScript(unsigned short event, AgentRef from, caosValue p0);
 	bool queueScript(unsigned short event, AgentRef from, caosValue p0, caosValue p1);
 	void stopScript();
-	void pushVM(caosVM *newvm);
+	void pushVM(caosVM* newvm);
 	bool vmStopped();
 
 	void moveTo(float, float, bool force = false);
 	bool tryMoveToPlaceAround(float x, float y);
 
-	void setTimerRate(unsigned int r) { tickssincelasttimer = 0; timerrate = r; }
-	
+	void setTimerRate(unsigned int r) {
+		tickssincelasttimer = 0;
+		timerrate = r;
+	}
+
 	virtual int handleClick(float, float);
-	
-	virtual CompoundPart *part(unsigned int id) = 0;
-	
+
+	virtual CompoundPart* part(unsigned int id) = 0;
+
 	unsigned int getWidth() { return part(0)->getWidth(); }
 	unsigned int getHeight() { return part(0)->getHeight(); }
 	Point const boundingBoxPoint(unsigned int n);
 	Point const boundingBoxPoint(unsigned int n, Point p, float w, float h);
-	std::shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, class MetaRoom *m, std::shared_ptr<Room> exclude);
-	void findCollisionInDirection(unsigned int i, class MetaRoom *m, Point src, int &dx, int &dy, Point &deltapt, double &delta, bool &collided, bool followrooms);
+	std::shared_ptr<class Room> const bestRoomAt(unsigned int x, unsigned int y, unsigned int direction, class MetaRoom* m, std::shared_ptr<Room> exclude);
+	void findCollisionInDirection(unsigned int i, class MetaRoom* m, Point src, int& dx, int& dy, Point& deltapt, double& delta, bool& collided, bool followrooms);
 
 	bool validInRoomSystem();
 	bool validInRoomSystem(Point p, float w, float h, int testperm);
@@ -268,7 +273,7 @@ public:
 	virtual unsigned int getZOrder() const;
 
 	class std::shared_ptr<script> findScript(unsigned short event);
-	
+
 	int getUNID() const;
 	std::string identify() const;
 
@@ -282,32 +287,33 @@ public:
 };
 
 class LifeAssert {
-	protected:
-		Agent *p;
-	public:
-		LifeAssert(const AgentRef &ref) {
-			p = ref.get();
-			assert(p);
-			p->lifecount++;
-		}
-		LifeAssert(const std::weak_ptr<Agent> &p_) {
-			p = p_.lock().get();
-			assert(p);
-			p->lifecount++;
-		}
-		LifeAssert(const std::shared_ptr<Agent> &p_) {
-			p = p_.get();
-			assert(p);
-			p->lifecount++;
-		}
-		LifeAssert(Agent *p_) {
-			p = p_;
-			assert(p);
-			p->lifecount++;
-		}
-		~LifeAssert() {
-			p->lifecount--;
-		}
+  protected:
+	Agent* p;
+
+  public:
+	LifeAssert(const AgentRef& ref) {
+		p = ref.get();
+		assert(p);
+		p->lifecount++;
+	}
+	LifeAssert(const std::weak_ptr<Agent>& p_) {
+		p = p_.lock().get();
+		assert(p);
+		p->lifecount++;
+	}
+	LifeAssert(const std::shared_ptr<Agent>& p_) {
+		p = p_.get();
+		assert(p);
+		p->lifecount++;
+	}
+	LifeAssert(Agent* p_) {
+		p = p_;
+		assert(p);
+		p->lifecount++;
+	}
+	~LifeAssert() {
+		p->lifecount--;
+	}
 };
 
 

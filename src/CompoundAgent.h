@@ -21,9 +21,10 @@
 #define _COMPOUNDAGENT_H
 
 #include "Agent.h"
+#include "CompoundPart.h"
+
 #include <map>
 #include <string>
-#include "CompoundPart.h"
 
 struct Hotspot {
 	int left, top, right, bottom;
@@ -36,22 +37,22 @@ struct HotspotFunction {
 };
 
 class CompoundAgent : public Agent {
-public:
+  public:
 	CompoundAgent(unsigned char family, unsigned char genus, unsigned short species, unsigned int plane,
-								std::string spritefile, unsigned int firstimage, unsigned int imagecount);
+		std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	CompoundAgent(std::string spritefile, unsigned int firstimage, unsigned int imagecount); // C1/C2 constructor
 	virtual ~CompoundAgent();
-		
+
 	unsigned int partCount() { return parts.size(); }
-	CompoundPart *part(unsigned int id);
-	virtual void addPart(CompoundPart *);
+	CompoundPart* part(unsigned int id);
+	virtual void addPart(CompoundPart*);
 	void delPart(unsigned int);
 	unsigned int nextPartSequenceNumber();
 	virtual void tick();
 	void setZOrder(unsigned int plane);
 
 	int handleClick(float, float);
-	bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
+	bool fireScript(unsigned short event, Agent* from, caosValue one, caosValue two);
 	void setHotspotLoc(unsigned int id, int l, int t, int r, int b);
 	void setHotspotFunc(unsigned int id, unsigned int h);
 	void setHotspotFuncDetails(unsigned int id, uint16_t message, uint8_t flags);
@@ -62,8 +63,8 @@ public:
 	unsigned int getImageCount() { return imagecount; }
 
 	friend class caosVM;
-	
-	std::vector<CompoundPart *> parts;
+
+	std::vector<CompoundPart*> parts;
 	// C1/C2 data
 	Hotspot hotspots[6];
 	HotspotFunction hotspotfunctions[6];

@@ -20,16 +20,23 @@
 #ifndef _OPENC2E_CAMERA_H
 #define _OPENC2E_CAMERA_H
 
-#include <memory>
-#include <vector>
 #include "AgentRef.h"
 
-enum cameratransition { none = 0, fliphorz = 1, burst = 2 };
-enum trackstyle { brittle = 0, flexible = 1, hard = 2 };
-enum panstyle { jump = 0, smoothscroll = 1, smoothscrollifvisible = 2 };
+#include <memory>
+#include <vector>
+
+enum cameratransition { none = 0,
+	fliphorz = 1,
+	burst = 2 };
+enum trackstyle { brittle = 0,
+	flexible = 1,
+	hard = 2 };
+enum panstyle { jump = 0,
+	smoothscroll = 1,
+	smoothscrollifvisible = 2 };
 
 class Camera {
-protected:
+  protected:
 	int x, y;
 	unsigned int metaroom;
 
@@ -38,8 +45,8 @@ protected:
 
 	AgentRef trackedagent;
 	trackstyle trackingstyle;
-	
-public:
+
+  public:
 	Camera();
 	virtual unsigned int getWidth() const = 0;
 	virtual unsigned int getHeight() const = 0;
@@ -48,8 +55,8 @@ public:
 	unsigned int getY() const { return y; }
 	unsigned int getXCentre() const { return x + (getWidth() / 2); }
 	unsigned int getYCentre() const { return y + (getHeight() / 2); }
-	
-	class MetaRoom * getMetaRoom() const;
+
+	class MetaRoom* getMetaRoom() const;
 	void goToMetaRoom(unsigned int m);
 	void goToMetaRoom(unsigned int m, int x, int y, cameratransition transition);
 	virtual void moveTo(int _x, int _y, panstyle pan = jump);
@@ -65,11 +72,11 @@ public:
 };
 
 class PartCamera : public Camera {
-protected:
-	class CameraPart *part;
+  protected:
+	class CameraPart* part;
 
-public:
-	PartCamera(class CameraPart *p) { part = p; }
+  public:
+	PartCamera(class CameraPart* p) { part = p; }
 	unsigned int getWidth() const;
 	unsigned int getHeight() const;
 
@@ -79,15 +86,15 @@ public:
 class Backend;
 
 class MainCamera : public Camera {
-protected:
+  protected:
 	std::vector<AgentRef> floated;
 
-public:
-	MainCamera() { }
+  public:
+	MainCamera() {}
 	unsigned int getWidth() const;
 	unsigned int getHeight() const;
 	void moveTo(int _x, int _y, panstyle pan = jump);
-	
+
 	void addFloated(AgentRef);
 	void delFloated(AgentRef);
 };

@@ -2,20 +2,20 @@
 #define SER_BYTECODE_H 1
 
 #include "bytecode.h"
+#include "dialect.h"
 #include "ser/s_caosValue.h"
 #include "serialization.h"
-#include "dialect.h"
 
 BOOST_CLASS_IMPLEMENTATION(caosOp, boost::serialization::object_serializable);
 BOOST_CLASS_TRACKING(caosOp, boost::serialization::track_never);
 SAVE(caosOp) {
 	uint32_t op = obj.opcode | ((obj.argument + 0x800000) << 8);
-	ar & op & obj.traceindex;
+	ar& op& obj.traceindex;
 }
 
 LOAD(caosOp) {
 	uint32_t op;
-	ar & op & obj.traceindex;
+	ar& op& obj.traceindex;
 	obj.opcode = op & 0xFF;
 	obj.argument = (op >> 8) - 0x800000;
 }
@@ -23,4 +23,3 @@ LOAD(caosOp) {
 #undef SER_xVxx
 
 #endif
-

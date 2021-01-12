@@ -18,26 +18,27 @@
  */
 
 #include "SFCFile.h"
-#include "caosScript.h"
-#include "World.h"
-#include "Engine.h"
-#include "MetaRoom.h"
-#include "Room.h"
-#include "Camera.h"
-#include "endianlove.h"
-#include "creaturesException.h"
-#include "SimpleAgent.h"
-#include "imageManager.h"
-#include "Map.h"
+
 #include "Agent.h"
-#include "DullPart.h"
-#include "fileformats/sprImage.h"
-#include "CompoundAgent.h"
-#include "PointerAgent.h"
 #include "Blackboard.h"
-#include "Vehicle.h"
-#include "Lift.h"
 #include "CallButton.h"
+#include "Camera.h"
+#include "CompoundAgent.h"
+#include "DullPart.h"
+#include "Engine.h"
+#include "Lift.h"
+#include "Map.h"
+#include "MetaRoom.h"
+#include "PointerAgent.h"
+#include "Room.h"
+#include "SimpleAgent.h"
+#include "Vehicle.h"
+#include "World.h"
+#include "caosScript.h"
+#include "creaturesException.h"
+#include "endianlove.h"
+#include "fileformats/sprImage.h"
+#include "imageManager.h"
 #include "macro_stringify.h"
 
 #include <cassert>
@@ -67,37 +68,40 @@
 #define TYPE_MACRO 14
 #define TYPE_OBJECT 100
 
-#define sfccheck(x) if (!(x)) throw creaturesException("failure while reading SFC file: '" #x "' at " __FILE__ ":" stringify(__LINE__));
+#define sfccheck(x) \
+	if (!(x)) \
+		throw creaturesException("failure while reading SFC file: '" #x "' at " __FILE__ ":" stringify(__LINE__));
 
 SFCFile::~SFCFile() {
 	// This contains all the objects we've constructed, so we can just zap this and
 	// everything neatly disappears.
-	for (auto & i : storage) {
+	for (auto& i : storage) {
 		delete i;
 	}
 }
 
-void SFCFile::read(std::istream *i) {
+void SFCFile::read(std::istream* i) {
 	ourStream = i;
 
-	mapdata = (MapData *)slurpMFC(TYPE_MAPDATA);
+	mapdata = (MapData*)slurpMFC(TYPE_MAPDATA);
 	sfccheck(mapdata);
 
 	// TODO: hackery to seek to the next bit
 	uint8_t x = 0;
-	while (x == 0) x = read8();
+	while (x == 0)
+		x = read8();
 	ourStream->seekg(-1, std::ios::cur);
 
 	uint32_t numobjects = read32();
 	for (unsigned int i = 0; i < numobjects; i++) {
-		SFCObject *o = (SFCObject *)slurpMFC(TYPE_OBJECT);
+		SFCObject* o = (SFCObject*)slurpMFC(TYPE_OBJECT);
 		sfccheck(o);
 		objects.push_back(o);
 	}
 
 	uint32_t numscenery = read32();
 	for (unsigned int i = 0; i < numscenery; i++) {
-		SFCScenery *o = (SFCScenery *)slurpMFC(TYPE_SCENERY);
+		SFCScenery* o = (SFCScenery*)slurpMFC(TYPE_SCENERY);
 		sfccheck(o);
 		scenery.push_back(o);
 	}
@@ -129,22 +133,26 @@ void SFCFile::read(std::istream *i) {
 
 	uint32_t nomacros = read32();
 	for (unsigned int i = 0; i < nomacros; i++) {
-		SFCMacro *o = (SFCMacro *)slurpMFC(TYPE_MACRO);
+		SFCMacro* o = (SFCMacro*)slurpMFC(TYPE_MACRO);
 		if (o) // TODO: ugh
 			macros.push_back(o);
 	}
 }
 
 bool validSFCType(unsigned int type, unsigned int reqtype) {
-	if (reqtype == 0) return true;
-	if (type == reqtype) return true;
-	if ((reqtype == TYPE_OBJECT) && (type >= TYPE_COMPOUNDOBJECT)) return true;
-	if ((reqtype == TYPE_COMPOUNDOBJECT) && (type >= TYPE_COMPOUNDOBJECT) && (type <= TYPE_LIFT)) return true;
+	if (reqtype == 0)
+		return true;
+	if (type == reqtype)
+		return true;
+	if ((reqtype == TYPE_OBJECT) && (type >= TYPE_COMPOUNDOBJECT))
+		return true;
+	if ((reqtype == TYPE_COMPOUNDOBJECT) && (type >= TYPE_COMPOUNDOBJECT) && (type <= TYPE_LIFT))
+		return true;
 
 	return false;
 }
 
-SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
+SFCClass* SFCFile::slurpMFC(unsigned int reqtype) {
 	sfccheck(!ourStream->fail());
 
 	// read the pid (this only works up to 0x7ffe, but we'll cope)
@@ -157,13 +165,13 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		// completely new class, read details
 		(void)read16(); // schemaid
 		uint16_t strlen = read16();
-		char *temp = new char[strlen];
+		char* temp = new char[strlen];
 		ourStream->read(temp, strlen);
 		std::string classname(temp, strlen);
 		delete[] temp;
-		
+
 		pid = storage.size();
-		
+
 		// push a null onto the stack
 		storage.push_back(0);
 
@@ -203,7 +211,7 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		pid -= 1;
 		sfccheck(pid < storage.size());
 		sfccheck(validSFCType(types[pid], reqtype));
-		SFCClass *temp = storage[pid];
+		SFCClass* temp = storage[pid];
 		sfccheck(temp);
 		return temp;
 	} else {
@@ -214,7 +222,7 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 		sfccheck(!(storage[pid]));
 	}
 
-	SFCClass *newobj;
+	SFCClass* newobj;
 
 	// construct new object of specified type
 	sfccheck(validSFCType(types[pid], reqtype));
@@ -237,16 +245,20 @@ SFCClass *SFCFile::slurpMFC(unsigned int reqtype) {
 			throw creaturesException("SFCFile didn't find a valid type in internal variable, argh!");
 	}
 
-	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT)) reading_compound = true;
-	else if (types[pid] == TYPE_SCENERY) reading_scenery = true;
+	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT))
+		reading_compound = true;
+	else if (types[pid] == TYPE_SCENERY)
+		reading_scenery = true;
 
 	// push the object onto storage, and make it deserialize itself
 	types[storage.size()] = types[pid];
 	storage.push_back(newobj);
 	newobj->read();
 
-	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT)) reading_compound = false;
-	else if (types[pid] == TYPE_SCENERY) reading_scenery = false;
+	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT))
+		reading_compound = false;
+	else if (types[pid] == TYPE_SCENERY)
+		reading_scenery = false;
 
 	// return this new object
 	return newobj;
@@ -276,7 +288,7 @@ std::string SFCFile::readstring() {
 }
 
 std::string SFCFile::readBytes(unsigned int n) {
-	char *temp = new char[n];
+	char* temp = new char[n];
 	ourStream->read(temp, n);
 	std::string t = std::string(temp, n);
 	delete[] temp;
@@ -311,14 +323,14 @@ void MapData::read() {
 	}
 
 	// background sprite
-	background = (CGallery *)slurpMFC(TYPE_CGALLERY);
+	background = (CGallery*)slurpMFC(TYPE_CGALLERY);
 	sfccheck(background);
 
 	// room data
 	uint32_t norooms = read32();
 	for (unsigned int i = 0; i < norooms; i++) {
 		if (parent->version() == 0) {
-			CRoom *temp = new CRoom(parent);
+			CRoom* temp = new CRoom(parent);
 			temp->id = i;
 			temp->left = reads32();
 			temp->top = read32();
@@ -328,7 +340,7 @@ void MapData::read() {
 			sfccheck(temp->roomtype < 3);
 			rooms.push_back(temp);
 		} else {
-			CRoom *temp = (CRoom*)slurpMFC(TYPE_CROOM);
+			CRoom* temp = (CRoom*)slurpMFC(TYPE_CROOM);
 			if (temp)
 				rooms.push_back(temp);
 			else
@@ -338,7 +350,7 @@ void MapData::read() {
 
 	// read groundlevel data
 	if (parent->version() == 0) {
-		for (unsigned int & groundlevel : groundlevels) {
+		for (unsigned int& groundlevel : groundlevels) {
 			groundlevel = read32();
 		}
 
@@ -349,7 +361,7 @@ void MapData::read() {
 MapData::~MapData() {
 	// In C1, we create rooms which aren't MFC objects, so we need to destroy them afterwards.
 	if (parent->version() == 0) {
-		for (auto & room : rooms) {
+		for (auto& room : rooms) {
 			delete room;
 		}
 	}
@@ -359,22 +371,26 @@ void CGallery::read() {
 	noframes = read32();
 	filename = parent->readBytes(4);
 	firstimg = read32();
-	
+
 	// discard unknown bytes
 	read32();
 
 	for (unsigned int i = 0; i < noframes; i++) {
 		// discard unknown bytes
-		read8(); read8(); read8();
+		read8();
+		read8();
+		read8();
 		// discard width, height and offset
-		read32(); read32(); read32();
+		read32();
+		read32();
+		read32();
 	}
 }
 
 void CDoor::read() {
 	openness = read8();
 	otherroom = read16();
-	
+
 	// discard unknown bytes
 	sfccheck(read16() == 0);
 }
@@ -390,16 +406,17 @@ void CRoom::read() {
 	right = read32();
 	bottom = read32();
 
-	for (auto & door : doors) {
+	for (auto& door : doors) {
 		uint16_t nodoors = read16();
 		for (unsigned int j = 0; j < nodoors; j++) {
-			CDoor *temp = (CDoor*)slurpMFC(TYPE_CDOOR);
+			CDoor* temp = (CDoor*)slurpMFC(TYPE_CDOOR);
 			sfccheck(temp);
 			door.push_back(temp);
 		}
 	}
 
-	roomtype = read32(); sfccheck(roomtype < 4);
+	roomtype = read32();
+	sfccheck(roomtype < 4);
 
 	floorvalue = read8();
 	inorganicnutrients = read8();
@@ -433,7 +450,8 @@ void CRoom::read() {
 	sfccheck(read32() == 0);
 
 	music = readstring();
-	dropstatus = read32(); sfccheck(dropstatus < 3);
+	dropstatus = read32();
+	sfccheck(dropstatus < 3);
 }
 
 void SFCMacro::read() {
@@ -441,17 +459,18 @@ void SFCMacro::read() {
 
 	script = readstring();
 
-	read32(); read32();
+	read32();
+	read32();
 	if (parent->version() == 0)
 		readBytes(120);
 	else
 		readBytes(480);
 
-	owner = (SFCObject *)slurpMFC(TYPE_OBJECT);
+	owner = (SFCObject*)slurpMFC(TYPE_OBJECT);
 	sfccheck(owner);
-	from = (SFCObject *)slurpMFC(TYPE_OBJECT);
+	from = (SFCObject*)slurpMFC(TYPE_OBJECT);
 	sfccheck(read16() == 0);
-	targ = (SFCObject *)slurpMFC(TYPE_OBJECT);
+	targ = (SFCObject*)slurpMFC(TYPE_OBJECT);
 
 	readBytes(18);
 
@@ -461,7 +480,7 @@ void SFCMacro::read() {
 
 void SFCEntity::read() {
 	// read sprite
-	sprite = (CGallery *)slurpMFC(TYPE_CGALLERY);
+	sprite = (CGallery*)slurpMFC(TYPE_CGALLERY);
 	sfccheck(sprite);
 
 	// read current frame and offset from base
@@ -484,13 +503,17 @@ void SFCEntity::read() {
 
 		// read the animation string
 		std::string tempstring;
-		if (parent->version() == 0) tempstring = readBytes(32);
-		else tempstring = readBytes(99);
+		if (parent->version() == 0)
+			tempstring = readBytes(32);
+		else
+			tempstring = readBytes(99);
 		// chop off non-null-terminated bits
 		animstring = std::string(tempstring.c_str());
-	} else haveanim = false;
+	} else
+		haveanim = false;
 
-	if (parent->readingScenery()) return;
+	if (parent->readingScenery())
+		return;
 
 	if (parent->readingCompound()) {
 		relx = read32();
@@ -509,17 +532,20 @@ void SFCEntity::read() {
 	// read BHVR touch
 	bhvrtouch = read8();
 
-	if (parent->version() == 0) return;
+	if (parent->version() == 0)
+		return;
 
 	// read pickup handles/points
 	uint16_t num_pickup_handles = read16();
 	for (unsigned int i = 0; i < num_pickup_handles; i++) {
-		int x = reads32(); int y = reads32();
+		int x = reads32();
+		int y = reads32();
 		pickup_handles.push_back(std::pair<int, int>(x, y));
 	}
 	uint16_t num_pickup_points = read16();
 	for (unsigned int i = 0; i < num_pickup_points; i++) {
-		int x = reads32(); int y = reads32();
+		int x = reads32();
+		int y = reads32();
 		pickup_points.push_back(std::pair<int, int>(x, y));
 	}
 }
@@ -573,7 +599,7 @@ void SFCObject::read() {
 	actv = read8();
 
 	// read sprite
-	sprite = (CGallery *)slurpMFC(TYPE_CGALLERY);
+	sprite = (CGallery*)slurpMFC(TYPE_CGALLERY);
 	sfccheck(sprite);
 
 	tickreset = read32();
@@ -596,7 +622,7 @@ void SFCObject::read() {
 		// read physics values
 		size = read8();
 		range = read32();
-	
+
 		// TODO: this is mysterious and unknown
 		gravdata = read32();
 
@@ -633,39 +659,40 @@ void SFCCompoundObject::read() {
 	uint32_t numparts = read32();
 
 	for (unsigned int i = 0; i < numparts; i++) {
-		SFCEntity *e = (SFCEntity *)slurpMFC(TYPE_ENTITY);
+		SFCEntity* e = (SFCEntity*)slurpMFC(TYPE_ENTITY);
 		if (!e) {
 			sfccheck(i != 0);
 			// if entity is null, discard unknown bytes
 			readBytes(8);
 		}
-		if (i == 0) sfccheck((e->relx == 0) && (e->rely == 0));
+		if (i == 0)
+			sfccheck((e->relx == 0) && (e->rely == 0));
 
 		// push the entity, even if it is null..
 		parts.push_back(e);
 	}
 
 	// read hotspot coordinates
-	for (auto & hotspot : hotspots) {
+	for (auto& hotspot : hotspots) {
 		hotspot.left = reads32();
 		hotspot.top = reads32();
 		hotspot.right = reads32();
 		hotspot.bottom = reads32();
 	}
-	
+
 	// read hotspot function data
-	for (auto & hotspot : hotspots) {
+	for (auto& hotspot : hotspots) {
 		// (this is actually a map of function->hotspot)
 		hotspot.function = reads32();
 	}
 
 	if (parent->version() == 1) {
 		// read C2-specific hotspot function data (again, actually maps function->hotspot)
-		for (auto & hotspot : hotspots) {
+		for (auto& hotspot : hotspots) {
 			hotspot.message = read16();
 			sfccheck(read16() == 0);
 		}
-		for (auto & hotspot : hotspots) {
+		for (auto& hotspot : hotspots) {
 			hotspot.mask = read8();
 		}
 	}
@@ -705,7 +732,7 @@ void SFCVehicle::read() {
 	xvec = reads32();
 	yvec = reads32();
 	bump = read8();
-	
+
 	// discard unknown bytes
 	read16();
 	unsigned short x = read16();
@@ -729,11 +756,11 @@ void SFCLift::read() {
 
 	nobuttons = read32();
 	currentbutton = read32();
-	
+
 	// discard unknown bytes
 	sfccheck(readBytes(5) == std::string("\xff\xff\xff\xff\x00", 5));
 
-	for (unsigned int & i : callbuttony) {
+	for (unsigned int& i : callbuttony) {
 		i = read32();
 
 		// discard unknown bytes
@@ -749,7 +776,7 @@ void SFCLift::read() {
 void SFCSimpleObject::read() {
 	SFCObject::read();
 
-	entity = (SFCEntity *)slurpMFC(TYPE_ENTITY);
+	entity = (SFCEntity*)slurpMFC(TYPE_ENTITY);
 }
 
 void SFCPointerTool::read() {
@@ -765,11 +792,11 @@ void SFCPointerTool::read() {
 void SFCCallButton::read() {
 	SFCSimpleObject::read();
 
-	ourLift = (SFCLift *)slurpMFC(TYPE_LIFT);
+	ourLift = (SFCLift*)slurpMFC(TYPE_LIFT);
 	liftid = read8();
 }
 
-void SFCScript::read(SFCFile *f) {
+void SFCScript::read(SFCFile* f) {
 	if (f->version() == 0) {
 		eventno = f->read8();
 		species = f->read8();
@@ -791,22 +818,22 @@ void SFCFile::copyToWorld() {
 	mapdata->copyToWorld();
 
 	// install scripts
-	for (auto & script : scripts) {
+	for (auto& script : scripts) {
 		script.install();
 	}
-	
+
 	// create normal objects
-	for (auto & object : objects) {
+	for (auto& object : objects) {
 		object->copyToWorld();
 	}
 
 	// create scenery
-	for (auto & i : scenery) {
+	for (auto& i : scenery) {
 		i->copyToWorld();
 	}
 
 	// activate old scripts
-	for (auto & macro : macros) {
+	for (auto& macro : macros) {
 		macro->activate();
 	}
 
@@ -816,25 +843,25 @@ void SFCFile::copyToWorld() {
 	// patch agents
 	// TODO: do we really need to do this, and if so, should it be done here?
 	// I like this for now because it makes debugging suck a lot less - fuzzie
-	for (auto & agent : world.agents) {
+	for (auto& agent : world.agents) {
 		std::shared_ptr<Agent> a = agent;
 
-		#define NUM_SFC_PATCHES 5
+#define NUM_SFC_PATCHES 5
 
 		/* version, family, genus, species, variable# */
 		unsigned int patchdata[NUM_SFC_PATCHES][5] = {
-		{ 1, 2, 20, 10, 10 }, // c2's Pitz
-		{ 1, 2, 17, 2, 1 }, // c2's bees
-		{ 1, 2, 1, 50, 0 }, // c2 flask thing
-		{ 1, 2, 25, 1, 1}, // c2 tomatoes
-		{ 1, 2, 25, 6, 1} // c2 nuts
+			{1, 2, 20, 10, 10}, // c2's Pitz
+			{1, 2, 17, 2, 1}, // c2's bees
+			{1, 2, 1, 50, 0}, // c2 flask thing
+			{1, 2, 25, 1, 1}, // c2 tomatoes
+			{1, 2, 25, 6, 1} // c2 nuts
 		};
 
-		for (auto & j : patchdata) {
+		for (auto& j : patchdata) {
 			if (version() == j[0] && a->family == j[1] && a->genus == j[2] && a->species == j[3]) {
 				// patch variable to actually refer to an agent
 				unsigned int varno = j[4];
-				for (auto & object : objects) {
+				for (auto& object : objects) {
 					if (object->unid == (uint32_t)a->var[varno].getInt()) {
 						a->var[varno].setAgent(object->copiedAgent());
 						break;
@@ -859,17 +886,18 @@ void MapData::copyToWorld() {
 	// create the global metaroom
 	// TODO: hardcoded size bad?
 	unsigned int w = parent->version() == 0 ? 1200 : 2400;
-	MetaRoom *m = new MetaRoom(0, 0, 8352, w, background->filename, spr, true);
+	MetaRoom* m = new MetaRoom(0, 0, 8352, w, background->filename, spr, true);
 	world.map->addMetaRoom(m);
 
 	for (auto src : rooms) {
 		// retrieve our room data
-			// create a new room, set the type
+		// create a new room, set the type
 		std::shared_ptr<Room> r(new Room(src->left, src->right, src->top, src->top, src->bottom, src->bottom));
 		r->type = src->roomtype;
 
 		// add the room to the world, ensure it matches the id we retrieved
-		while (src->id > world.map->room_base) world.map->room_base++; // skip any gaps (deleted rooms)
+		while (src->id > world.map->room_base)
+			world.map->room_base++; // skip any gaps (deleted rooms)
 		unsigned int roomid = m->addRoom(r);
 		sfccheck(roomid == src->id);
 
@@ -901,7 +929,7 @@ void MapData::copyToWorld() {
 	}
 
 	if (parent->version() == 0) {
-		for (unsigned int & groundlevel : groundlevels) {
+		for (unsigned int& groundlevel : groundlevels) {
 			world.groundlevels.push_back(groundlevel);
 		}
 
@@ -909,15 +937,15 @@ void MapData::copyToWorld() {
 	}
 
 	for (auto src : rooms) {
-			for (auto & j : src->doors) {
-			for (std::vector<CDoor *>::iterator k = j.begin(); k < j.end(); k++) {
-				CDoor *door = *k;
+		for (auto& j : src->doors) {
+			for (std::vector<CDoor*>::iterator k = j.begin(); k < j.end(); k++) {
+				CDoor* door = *k;
 				std::shared_ptr<Room> r1 = world.map->getRoom(src->id);
 				std::shared_ptr<Room> r2 = world.map->getRoom(door->otherroom);
 
 				if (r1->doors.find(r2) == r1->doors.end()) {
 					// create a new door between rooms!
-					RoomDoor *roomdoor = new RoomDoor();
+					RoomDoor* roomdoor = new RoomDoor();
 					roomdoor->first = r1;
 					roomdoor->second = r2;
 					roomdoor->perm = door->openness;
@@ -926,7 +954,7 @@ void MapData::copyToWorld() {
 					// TODO: ADDR adds to nearby?
 				} else {
 					// sanity check
-					RoomDoor *roomdoor = r1->doors[r2];
+					RoomDoor* roomdoor = r1->doors[r2];
 					sfccheck(roomdoor->perm == door->openness);
 				}
 			}
@@ -936,11 +964,11 @@ void MapData::copyToWorld() {
 	// TODO: misc data?
 }
 
-void copyEntityData(SFCEntity *entity, DullPart *p) {
+void copyEntityData(SFCEntity* entity, DullPart* p) {
 	// pose
 	p->setBase(entity->imgoffset);
 	p->setPose(entity->currframe - entity->imgoffset);
-	
+
 	// animation
 	if (entity->haveanim) {
 		for (char i : entity->animstring) {
@@ -958,15 +986,18 @@ void copyEntityData(SFCEntity *entity, DullPart *p) {
 				p->setFrameNo(0);
 			else
 				p->setFrameNo(entity->animframe);
-		} else p->animation.clear();
+		} else
+			p->animation.clear();
 	}
 
-	if (entity->getParent()->version() == 0) return;
+	if (entity->getParent()->version() == 0)
+		return;
 
 	// TODO: pickup/carry points are per-agent in openc2e but apparently per-part in the SFC file?
-	if (p->id != 0) return;
+	if (p->id != 0)
+		return;
 
-	Agent *parent = p->getParent();
+	Agent* parent = p->getParent();
 
 	for (unsigned int i = 0; i < entity->pickup_handles.size(); i++) {
 		int x = entity->pickup_handles[i].first, y = entity->pickup_handles[i].second;
@@ -990,24 +1021,26 @@ void SFCCompoundObject::copyToWorld() {
 	ourAgent->setClassifier(family, genus, species);
 
 	// initialise the agent, move it into position
-	CompoundAgent *a = ourAgent;
+	CompoundAgent* a = ourAgent;
 	a->finishInit();
 	a->moveTo(parts[0]->x, parts[0]->y);
 	a->queueScript(7); // enter scope
-	
-	if (parent->version() == 1) world.setUNID(a, unid);
+
+	if (parent->version() == 1)
+		world.setUNID(a, unid);
 
 	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
 	a->setAttributes(attr);
-	
+
 	a->actv = actv;
 
 	// ticking
 	a->tickssincelasttimer = tickstate;
-	if (a->tickssincelasttimer == tickreset) a->tickssincelasttimer = 0;
+	if (a->tickssincelasttimer == tickreset)
+		a->tickssincelasttimer = 0;
 	a->timerrate = tickreset;
-	
+
 	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
 		a->var[i].setInt(variables[i]);
 
@@ -1027,15 +1060,17 @@ void SFCCompoundObject::copyToWorld() {
 	// make sure the zorder of the first part is 0..
 	int basezorder = INT_MAX; // TODO: unsigned or signed?
 	for (auto e : parts) {
-			if (!e) continue;
+		if (!e)
+			continue;
 		if (e->zorder < basezorder)
 			basezorder = e->zorder;
 	}
 
 	for (unsigned int i = 0; i < parts.size(); i++) {
-		SFCEntity *e = parts[i];
-		if (!e) continue;
-		DullPart *p;
+		SFCEntity* e = parts[i];
+		if (!e)
+			continue;
+		DullPart* p;
 		p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder - basezorder);
 		a->addPart(p);
 
@@ -1061,21 +1096,22 @@ void SFCSimpleObject::copyToWorld() {
 	if (!ourAgent) {
 		ourAgent = new SimpleAgent(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
 	}
-	SimpleAgent *a = ourAgent;
+	SimpleAgent* a = ourAgent;
 
 	a->finishInit();
 	//a->moveTo(entity->x - (a->part(0)->getWidth() / 2), entity->y - (a->part(0) -> getHeight() / 2));
 	a->moveTo(entity->x, entity->y);
 	a->queueScript(7); // enter scope
 
-	if (parent->version() == 1) world.setUNID(a, unid);
-	
+	if (parent->version() == 1)
+		world.setUNID(a, unid);
+
 	// copy data from ourselves
-	
+
 	// TODO: c1 attributes!
 	// C2 attributes are a subset of c2e ones
 	a->setAttributes(attr);
-	
+
 	a->actv = actv;
 
 	// copy bhvrclick data
@@ -1085,12 +1121,13 @@ void SFCSimpleObject::copyToWorld() {
 
 	// ticking
 	a->tickssincelasttimer = tickstate;
-	if (a->tickssincelasttimer == tickreset) a->tickssincelasttimer = 0;
+	if (a->tickssincelasttimer == tickreset)
+		a->tickssincelasttimer = 0;
 	a->timerrate = tickreset;
-	
+
 	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
 		a->var[i].setInt(variables[i]);
-	
+
 	if (parent->version() == 1) {
 		a->size = size;
 		a->thrt = threat;
@@ -1105,12 +1142,12 @@ void SFCSimpleObject::copyToWorld() {
 	}
 
 	// copy data from entity
-	DullPart *p = (DullPart *)a->part(0);
+	DullPart* p = (DullPart*)a->part(0);
 	copyEntityData(entity, p);
-	
+
 	// TODO: bhvr
 	// TODO: pickup handles/points
-	
+
 	if (currentsound.size() != 0) {
 		a->playAudio(currentsound, true, true);
 	}
@@ -1127,7 +1164,7 @@ void SFCPointerTool::copyToWorld() {
 
 void SFCBlackboard::copyToWorld() {
 	ourAgent = new Blackboard(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes, textx, texty, backgroundcolour, chalkcolour, aliascolour);
-	Blackboard *a = dynamic_cast<Blackboard *>(ourAgent);
+	Blackboard* a = dynamic_cast<Blackboard*>(ourAgent);
 
 	SFCCompoundObject::copyToWorld();
 
@@ -1140,7 +1177,7 @@ void SFCVehicle::copyToWorld() {
 	if (!ourAgent) {
 		ourAgent = new Vehicle(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
 	}
-	Vehicle *a = dynamic_cast<Vehicle *>(ourAgent);
+	Vehicle* a = dynamic_cast<Vehicle*>(ourAgent);
 	assert(a);
 
 	SFCCompoundObject::copyToWorld();
@@ -1155,14 +1192,14 @@ void SFCVehicle::copyToWorld() {
 }
 
 void SFCLift::copyToWorld() {
-	Lift *a = new Lift(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
+	Lift* a = new Lift(parts[0]->sprite->filename, parts[0]->sprite->firstimg, parts[0]->sprite->noframes);
 	ourAgent = a;
 
 	SFCVehicle::copyToWorld();
 
 	// set current button
 	a->currentbutton = a->newbutton = currentbutton;
-	
+
 	// set call button y locations
 	for (unsigned int i = 0; i < nobuttons; i++) {
 		a->callbuttony.push_back(callbuttony[i]);
@@ -1174,14 +1211,14 @@ void SFCLift::copyToWorld() {
 }
 
 void SFCCallButton::copyToWorld() {
-	CallButton *a = new CallButton(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
+	CallButton* a = new CallButton(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
 	ourAgent = a;
 
 	SFCSimpleObject::copyToWorld();
 
 	// set lift
 	sfccheck(ourLift->ourAgent);
-	assert(dynamic_cast<Lift *>(ourLift->ourAgent));
+	assert(dynamic_cast<Lift*>(ourLift->ourAgent));
 	a->lift = ourLift->ourAgent;
 
 	a->buttonid = liftid;
@@ -1189,7 +1226,7 @@ void SFCCallButton::copyToWorld() {
 
 void SFCScenery::copyToWorld() {
 	SFCSimpleObject::copyToWorld();
-	SpritePart *p = dynamic_cast<SpritePart *>(ourAgent->part(0));
+	SpritePart* p = dynamic_cast<SpritePart*>(ourAgent->part(0));
 	assert(p);
 	p->is_transparent = true;
 }
@@ -1201,14 +1238,14 @@ void SFCScript::install() {
 		script.parse(data);
 		script.installInstallScript(family, genus, species, eventno);
 		script.installScripts();
-	} catch (creaturesException &e) {
+	} catch (creaturesException& e) {
 		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.prettyPrint() << std::endl;
 	}
 }
 
 void SFCMacro::activate() {
 	assert(owner);
-	Agent *ourAgent = owner->copiedAgent();
+	Agent* ourAgent = owner->copiedAgent();
 	assert(ourAgent);
 
 	/*
@@ -1217,16 +1254,22 @@ void SFCMacro::activate() {
 	 * At the moment, this just starts scripts from the beginning, anew.
 	 */
 
-	for (auto & s : parent->scripts) {
-			if (s.genus != ourAgent->genus) continue;
-		if (s.family != ourAgent->family) continue;
-		if (s.species != ourAgent->species) continue;
-		
-		if (s.data != script) continue; // TODO: no better way?
+	for (auto& s : parent->scripts) {
+		if (s.genus != ourAgent->genus)
+			continue;
+		if (s.family != ourAgent->family)
+			continue;
+		if (s.species != ourAgent->species)
+			continue;
+
+		if (s.data != script)
+			continue; // TODO: no better way?
 
 		// TODO: this is a horrible hack to get around the fact that fireScript enforces actv
-		if (s.eventno != 0) ourAgent->actv = 0;
-		else ourAgent->actv = 1;
+		if (s.eventno != 0)
+			ourAgent->actv = 0;
+		else
+			ourAgent->actv = 1;
 
 		ourAgent->queueScript(s.eventno);
 		return;

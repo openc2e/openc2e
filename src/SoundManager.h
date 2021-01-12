@@ -1,14 +1,15 @@
 #pragma once
 
-#include "audiobackend/AudioBackend.h"
-#include "Sound.h"
 #include "MNGMusic.h"
+#include "Sound.h"
+#include "audiobackend/AudioBackend.h"
+
 #include <map>
 #include <memory>
 #include <string>
 
 class SoundManager {
-public:
+  public:
 	SoundManager();
 	~SoundManager();
 
@@ -22,7 +23,7 @@ public:
 	void setMuted(bool);
 	bool areCreatureVoicesMuted();
 
-private:
+  private:
 	friend class Sound;
 	struct SoundData {
 		SoundData() {
@@ -44,7 +45,7 @@ private:
 			width = 0;
 			height = 0;
 		}
-		
+
 		int generation = 0;
 		AudioChannel handle;
 
@@ -56,15 +57,15 @@ private:
 		float height;
 	};
 	std::vector<SoundData> sources;
-	
+
 	void updateVolume(SoundData& source);
 	void updateVolumes();
 	SoundData* getSoundData(Sound& source);
 	Sound getNewSound(AudioChannel handle, bool is_creature_voice = false);
-	
+
 	bool sound_effects_muted = false;
 	float sound_effects_volume = 1.0;
-	
+
 	float viewpoint_center_x;
 	float viewpoint_center_y;
 };

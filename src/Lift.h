@@ -20,10 +20,11 @@
 #pragma once
 
 #include "Vehicle.h"
+
 #include <vector>
 
 class Lift : public Vehicle {
-public:
+  public:
 	bool alignwithcabin;
 	unsigned int currentbutton;
 	unsigned int newbutton;
@@ -31,7 +32,7 @@ public:
 
 	Lift(std::string spritefile, unsigned int firstimage, unsigned int imagecount);
 	void tick();
-	bool fireScript(unsigned short event, Agent *from, caosValue one, caosValue two);
+	bool fireScript(unsigned short event, Agent* from, caosValue one, caosValue two);
 	bool liftAvailable() const;
 	float liftBottom();
 };

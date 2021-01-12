@@ -3,19 +3,19 @@
 #include "AnimatablePart.h"
 
 class SpritePart : public AnimatablePart {
-protected:
+  protected:
 	std::shared_ptr<creaturesImage> origsprite, sprite;
 	unsigned int firstimg, pose, base, spriteno;
-	SpritePart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-				 unsigned int _z);
+	SpritePart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+		unsigned int _z);
 
-public:
+  public:
 	bool is_transparent;
 	bool draw_mirrored;
 	unsigned char framerate;
 	unsigned int framedelay;
 	std::shared_ptr<creaturesImage> getSprite() { return sprite; }
-	virtual void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
+	virtual void partRender(class RenderTarget* renderer, int xoffset, int yoffset);
 	virtual void tick();
 	unsigned int getPose() { return pose; }
 	unsigned int getBase() { return base; }
@@ -25,7 +25,10 @@ public:
 	unsigned int getHeight();
 	void setFrameNo(unsigned int f);
 	void setPose(unsigned int p);
-	void setFramerate(unsigned char f) { framerate = f; framedelay = 0; }
+	void setFramerate(unsigned char f) {
+		framerate = f;
+		framedelay = 0;
+	}
 	void setBase(unsigned int b);
 	void changeSprite(std::string spritefile, unsigned int fimg);
 	void changeSprite(std::shared_ptr<creaturesImage> spr);

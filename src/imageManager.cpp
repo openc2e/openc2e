@@ -18,25 +18,29 @@
  */
 
 #include "imageManager.h"
+
+#include "Backend.h"
+#include "Engine.h"
+#include "PathResolver.h"
+#include "World.h"
 #include "creaturesException.h"
 #include "fileformats/ImageUtils.h"
 #include "mmapifstream.h"
-#include "World.h"
-#include "Engine.h"
-#include "Backend.h"
-#include "PathResolver.h"
 
 #include <array>
-#include <iostream>
 #include <fmt/format.h>
 #include <fstream>
-#include <memory>
-
 #include <ghc/filesystem.hpp>
+#include <iostream>
+#include <memory>
 
 using namespace ghc::filesystem;
 
-enum filetype { blk, s16, c16, spr, bmp };
+enum filetype { blk,
+	s16,
+	c16,
+	spr,
+	bmp };
 
 std::shared_ptr<creaturesImage> tryOpen(std::string fname) {
 	path realfile(world.findFile(fname));
@@ -59,8 +63,8 @@ void imageManager::loadDefaultPalette() {
 			std::ifstream f(palpath.string().c_str(), std::ios::binary);
 			f >> std::noskipws;
 			std::array<uint8_t, 768> palette_data;
-			f.read((char *)palette_data.data(), 768);
-			
+			f.read((char*)palette_data.data(), 768);
+
 			palette = shared_array<Color>(256);
 			for (unsigned int i = 0; i < 256; i++) {
 				palette[i].r = palette_data[i * 3] * 4;
@@ -68,7 +72,7 @@ void imageManager::loadDefaultPalette() {
 				palette[i].b = palette_data[i * 3 + 2] * 4;
 				palette[i].a = 0xff;
 			}
-			
+
 			engine.backend->setDefaultPalette(palette);
 		} else
 			throw creaturesException("Couldn't find C1 palette data!");
@@ -102,12 +106,14 @@ void imageManager::addImage(std::shared_ptr<creaturesImage> image) {
  * extension. To retrieve a background, pass the full filename (ie, with .blk).
  */
 std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_background) {
-	if (name.empty()) return std::shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
+	if (name.empty())
+		return std::shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
 
 	// step one: see if the image is already in the gallery
 	std::map<std::string, std::weak_ptr<creaturesImage> >::iterator i = images.find(name);
 	if (i != images.end() && i->second.lock()) {
-		if (!is_background) return i->second.lock(); // TODO: handle backgrounds
+		if (!is_background)
+			return i->second.lock(); // TODO: handle backgrounds
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
@@ -126,8 +132,10 @@ std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is
 			img = tryOpen(fname + ".blk");
 		} else {
 			img = tryOpen(fname + ".s16");
-			if (!img) img = tryOpen(fname + ".c16");
-			if (!img) img = tryOpen(fname + ".spr");
+			if (!img)
+				img = tryOpen(fname + ".c16");
+			if (!img)
+				img = tryOpen(fname + ".spr");
 		}
 	}
 
@@ -143,9 +151,9 @@ std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is
 }
 
 std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
-                                                            uint32_t bgcolor,
-                                                            uint32_t textcolor,
-                                                            uint32_t aliascolor) {
+	uint32_t bgcolor,
+	uint32_t textcolor,
+	uint32_t aliascolor) {
 	// TODO: cache this?
 
 	// TODO: use bgcolor and aliascolor
@@ -159,15 +167,15 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 	if (filename.empty()) {
 		return {};
 	}
-	
+
 	MultiImage images = ImageUtils::ReadImage(filename);
-	
+
 	// TODO: how do the values in the CHARSET.DTA map to actual color values?
 	// just setting them all to the textcolor right now, but the real engines
 	// do some shading/aliasing
 	switch (format) {
 		case if_index8:
-			for (auto & image : images) {
+			for (auto& image : images) {
 				image.palette = palette;
 				for (size_t j = 0; j < image.data.size(); ++j) {
 					if (image.data[j] != 0) {
@@ -176,21 +184,19 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 				}
 			}
 			break;
-		case if_bgr24:
-			{
-				shared_array<Color> palette(256);
-				palette[0] = Color{0, 0, 0, 0xff}; // black is set as the transparent color
-				for (int i = 1; i < 256; i++) {
-					palette[i].r = (textcolor >> 16) & 0xff;
-					palette[i].g = (textcolor >> 8) & 0xff;
-					palette[i].b = textcolor & 0xff;
-					palette[i].a = 0xff;
-				}
-				for (auto & image : images) {
-					image.palette = palette;
-				}
+		case if_bgr24: {
+			shared_array<Color> palette(256);
+			palette[0] = Color{0, 0, 0, 0xff}; // black is set as the transparent color
+			for (int i = 1; i < 256; i++) {
+				palette[i].r = (textcolor >> 16) & 0xff;
+				palette[i].g = (textcolor >> 8) & 0xff;
+				palette[i].b = textcolor & 0xff;
+				palette[i].a = 0xff;
 			}
-			break;
+			for (auto& image : images) {
+				image.palette = palette;
+			}
+		} break;
 		default:
 			throw creaturesException("Unimplemented image format when loading charset.dta");
 	}
@@ -201,8 +207,8 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 }
 
 std::shared_ptr<creaturesImage> imageManager::tint(const std::shared_ptr<creaturesImage>& oldimage,
-                                                   unsigned char r, unsigned char g, unsigned char b,
-                                                   unsigned char rotation, unsigned char swap) {
+	unsigned char r, unsigned char g, unsigned char b,
+	unsigned char rotation, unsigned char swap) {
 	auto img = std::make_shared<creaturesImage>(oldimage->getName());
 	img->images.resize(oldimage->images.size());
 	for (size_t i = 0; i < img->images.size(); ++i) {

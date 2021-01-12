@@ -25,9 +25,9 @@
 class Blackboard : public CompoundAgent {
 	friend class BlackboardPart;
 
-protected:
-	class BlackboardPart *ourPart;
-	
+  protected:
+	class BlackboardPart* ourPart;
+
 	// configuration
 	unsigned int textx, texty;
 
@@ -38,22 +38,24 @@ protected:
 	unsigned int editingindex;
 	std::shared_ptr<creaturesImage> charsetsprite;
 
-	void renderText(class RenderTarget *renderer, int xoffset, int yoffset);
+	void renderText(class RenderTarget* renderer, int xoffset, int yoffset);
 	std::string getText();
 
 	void startEditing();
 	void stopEditing(bool losingfocus);
 
-public:
-	Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount, 
+  public:
+	Blackboard(std::string spritefile, unsigned int firstimage, unsigned int imagecount,
 		unsigned int tx, unsigned int ty, uint32_t bgcolour, uint32_t ckcolour,
 		uint32_t alcolour);
 
 	void addBlackboardString(unsigned int n, unsigned int id, std::string text);
 	void showText(bool show);
 
-	void addPart(CompoundPart *); // override
-	class BlackboardPart *getBlackboardPart() { return ourPart; }
+	void addPart(CompoundPart*); // override
+	class BlackboardPart* getBlackboardPart() {
+		return ourPart;
+	}
 
 	void broadcast(bool audible);
 };
@@ -61,11 +63,11 @@ public:
 class BlackboardPart : public CompoundPart {
 	friend class Blackboard;
 
-protected:
-	BlackboardPart(Blackboard *p, unsigned int _id);
+  protected:
+	BlackboardPart(Blackboard* p, unsigned int _id);
 
-public:
-	void partRender(class RenderTarget *renderer, int xoffset, int yoffset) override;
+  public:
+	void partRender(class RenderTarget* renderer, int xoffset, int yoffset) override;
 	unsigned int getWidth() override { return 0; }
 	unsigned int getHeight() override { return 0; }
 

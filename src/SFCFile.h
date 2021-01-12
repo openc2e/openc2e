@@ -20,10 +20,10 @@
 #ifndef _SFCFILE_H
 #define _SFCFILE_H
 
-#include <map>
-#include <vector>
-#include <string>
 #include <istream>
+#include <map>
+#include <string>
+#include <vector>
 
 /*
  * Note that we don't use std::shared_ptr here, everything is owned by the
@@ -44,37 +44,38 @@ struct SFCScript {
 	uint16_t species, eventno;
 	std::string data;
 
-	void read(class SFCFile *);
+	void read(class SFCFile*);
 	void install();
 };
 
 class SFCFile {
-private:
+  private:
 	bool reading_compound;
 	bool reading_scenery;
 	unsigned int ver;
-	
-	std::vector<SFCClass *> storage;
+
+	std::vector<SFCClass*> storage;
 	std::map<unsigned int, unsigned int> types;
 
-	std::istream *ourStream;
+	std::istream* ourStream;
 
-public:
-	MapData *mapdata;
-	std::vector<SFCObject *> objects;
-	std::vector<SFCScenery *> scenery;
+  public:
+	MapData* mapdata;
+	std::vector<SFCObject*> objects;
+	std::vector<SFCScenery*> scenery;
 	std::vector<SFCScript> scripts;
-	std::vector<SFCMacro *> macros;
+	std::vector<SFCMacro*> macros;
 
 	uint32_t scrollx, scrolly;
 	std::string favplacename;
 	uint32_t favplacex, favplacey;
 	std::vector<std::string> speech_history;
 
-	SFCFile() : reading_compound(false), reading_scenery(false) { }
+	SFCFile()
+		: reading_compound(false), reading_scenery(false) {}
 	~SFCFile();
-	void read(std::istream *i);
-	SFCClass *slurpMFC(unsigned int reqtype = 0);
+	void read(std::istream* i);
+	SFCClass* slurpMFC(unsigned int reqtype = 0);
 
 	uint8_t read8();
 	uint16_t read16();
@@ -92,14 +93,15 @@ public:
 };
 
 class SFCClass {
-protected:
+  protected:
 	friend class SFCFile;
 
-	SFCFile *parent;
-	SFCClass(SFCFile *p) : parent(p) { }
-	virtual ~SFCClass() { }
+	SFCFile* parent;
+	SFCClass(SFCFile* p)
+		: parent(p) {}
+	virtual ~SFCClass() {}
 
-	SFCClass *slurpMFC(unsigned int reqtype = 0) { return parent->slurpMFC(reqtype); }
+	SFCClass* slurpMFC(unsigned int reqtype = 0) { return parent->slurpMFC(reqtype); }
 	uint8_t read8() { return parent->read8(); }
 	uint16_t read16() { return parent->read16(); }
 	uint32_t read32() { return parent->read32(); }
@@ -109,36 +111,38 @@ protected:
 
 	virtual void read() = 0;
 
-public:
-	SFCFile *getParent() { return parent; }
+  public:
+	SFCFile* getParent() { return parent; }
 };
 
 class CGallery : public SFCClass {
-public:
+  public:
 	uint32_t noframes;
 	uint32_t firstimg;
 	std::string filename;
 
 	// no real need for sizes/offsets/etc..
 
-	CGallery(SFCFile *p) : SFCClass(p) { }
+	CGallery(SFCFile* p)
+		: SFCClass(p) {}
 	void read();
 };
 
 class CDoor : public SFCClass {
-public:
+  public:
 	uint8_t openness;
 	uint16_t otherroom;
-	
-	CDoor(SFCFile *p) : SFCClass(p) { }
+
+	CDoor(SFCFile* p)
+		: SFCClass(p) {}
 	void read();
 };
 
 class CRoom : public SFCClass {
-public:
+  public:
 	uint32_t id;
 	int32_t left, top, right, bottom;
-	std::vector<CDoor *> doors[4];
+	std::vector<CDoor*> doors[4];
 	int32_t roomtype;
 	uint8_t floorvalue;
 	uint8_t inorganicnutrients, organicnutrients, temperature, pressure, lightlevel, radiation;
@@ -149,28 +153,30 @@ public:
 	uint32_t dropstatus;
 
 	// TODO: misc data
-	
-	CRoom(SFCFile *p) : SFCClass(p) { }
+
+	CRoom(SFCFile* p)
+		: SFCClass(p) {}
 	void read();
 };
 
 class MapData : public SFCClass {
-public:
-	CGallery *background;
-	std::vector<CRoom *> rooms;
+  public:
+	CGallery* background;
+	std::vector<CRoom*> rooms;
 	unsigned int groundlevels[261];
 
 	// TODO: misc data
-	
-	MapData(SFCFile *p) : SFCClass(p) { }
+
+	MapData(SFCFile* p)
+		: SFCClass(p) {}
 	void read();
 	void copyToWorld();
 	virtual ~MapData();
 };
 
 class SFCEntity : public SFCClass {
-public:
-	CGallery *sprite;
+  public:
+	CGallery* sprite;
 
 	uint8_t currframe, imgoffset;
 	int32_t zorder;
@@ -189,15 +195,17 @@ public:
 	std::vector<std::pair<int, int> > pickup_points;
 
 	// TODO: misc data/flags
-	SFCEntity(SFCFile *p) : SFCClass(p) { }
+	SFCEntity(SFCFile* p)
+		: SFCClass(p) {}
 	void read();
 };
 
 class SFCObject : public SFCClass {
-protected:
-	SFCObject(SFCFile *p) : SFCClass(p) { }
+  protected:
+	SFCObject(SFCFile* p)
+		: SFCClass(p) {}
 
-public:
+  public:
 	uint8_t genus, family;
 	uint16_t species;
 
@@ -208,7 +216,7 @@ public:
 
 	std::string currentsound;
 
-	CGallery *sprite;
+	CGallery* sprite;
 
 	uint32_t tickreset, tickstate;
 
@@ -224,7 +232,7 @@ public:
 	std::vector<SFCScript> scripts;
 	void read();
 	virtual void copyToWorld() = 0;
-	virtual class Agent *copiedAgent() = 0;
+	virtual class Agent* copiedAgent() = 0;
 };
 
 struct SFCHotspot {
@@ -235,40 +243,45 @@ struct SFCHotspot {
 };
 
 class SFCCompoundObject : public SFCObject {
-protected:
-	class CompoundAgent *ourAgent;
+  protected:
+	class CompoundAgent* ourAgent;
 
-public:
-	std::vector<SFCEntity *> parts;
+  public:
+	std::vector<SFCEntity*> parts;
 
 	SFCHotspot hotspots[6];
 
-	SFCCompoundObject(SFCFile *p) : SFCObject(p) { ourAgent = 0; }
+	SFCCompoundObject(SFCFile* p)
+		: SFCObject(p) { ourAgent = 0; }
 	void read();
 	void copyToWorld();
-	class Agent *copiedAgent() { return (Agent *)ourAgent; }
+	class Agent* copiedAgent() {
+		return (Agent*)ourAgent;
+	}
 };
 
 class SFCBlackboard : public SFCCompoundObject {
-public:
+  public:
 	uint32_t textx, texty;
 	uint32_t backgroundcolour, chalkcolour, aliascolour;
 	std::vector<std::pair<uint32_t, std::string> > strings;
 
-	SFCBlackboard(SFCFile *p) : SFCCompoundObject(p) { }
+	SFCBlackboard(SFCFile* p)
+		: SFCCompoundObject(p) {}
 	void read();
 	void copyToWorld();
 };
 
 class SFCVehicle : public SFCCompoundObject {
-public:
+  public:
 	uint32_t cabinleft, cabintop, cabinright, cabinbottom;
 	int xvec, yvec;
 	uint8_t bump;
 
 	// TODO: misc data
 
-	SFCVehicle(SFCFile *p) : SFCCompoundObject(p) { }
+	SFCVehicle(SFCFile* p)
+		: SFCCompoundObject(p) {}
 	void read();
 	void copyToWorld();
 };
@@ -276,63 +289,71 @@ public:
 class SFCLift : public SFCVehicle {
 	friend class SFCCallButton;
 
-public:
+  public:
 	uint32_t nobuttons;
 	uint32_t currentbutton;
 	uint32_t callbuttony[8];
 	bool alignwithcabin;
 	// TODO: misc data
 
-	SFCLift(SFCFile *p) : SFCVehicle(p) { }
+	SFCLift(SFCFile* p)
+		: SFCVehicle(p) {}
 	void read();
 	void copyToWorld();
 };
 
 class SFCSimpleObject : public SFCObject {
-protected:
-	class SimpleAgent *ourAgent;
+  protected:
+	class SimpleAgent* ourAgent;
 
-public:
-	SFCEntity *entity;
+  public:
+	SFCEntity* entity;
 
-	SFCSimpleObject(SFCFile *p) : SFCObject(p) { ourAgent = 0; }
+	SFCSimpleObject(SFCFile* p)
+		: SFCObject(p) { ourAgent = 0; }
 	void read();
 	void copyToWorld();
-	class Agent *copiedAgent() { return (Agent *)ourAgent; }
+	class Agent* copiedAgent() {
+		return (Agent*)ourAgent;
+	}
 };
 
 class SFCPointerTool : public SFCSimpleObject {
-public:
+  public:
 	// TODO: misc data
 
-	SFCPointerTool(SFCFile *p) : SFCSimpleObject(p) { }
+	SFCPointerTool(SFCFile* p)
+		: SFCSimpleObject(p) {}
 	void read();
 	void copyToWorld();
 };
 
 class SFCCallButton : public SFCSimpleObject {
-public:
-	SFCLift *ourLift;
+  public:
+	SFCLift* ourLift;
 	uint8_t liftid;
 
-	SFCCallButton(SFCFile *p) : SFCSimpleObject(p) { }
+	SFCCallButton(SFCFile* p)
+		: SFCSimpleObject(p) {}
 	void read();
 	void copyToWorld();
 };
 
 class SFCScenery : public SFCSimpleObject {
-public:
-	SFCScenery(SFCFile *p) : SFCSimpleObject(p) { }
+  public:
+	SFCScenery(SFCFile* p)
+		: SFCSimpleObject(p) {}
 	void copyToWorld();
 };
 
 class SFCMacro : public SFCClass {
-protected:
+  protected:
 	SFCObject *owner, *from, *targ;
 	std::string script;
 
-public:
-	SFCMacro(SFCFile *p) : SFCClass(p) { }
+  public:
+	SFCMacro(SFCFile* p)
+		: SFCClass(p) {}
 	void read();
 	void activate();
 };

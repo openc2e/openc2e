@@ -28,11 +28,11 @@ class AgentRef;
 class MetaRoom;
 class Room;
 
-bool agentIsVisible(Agent *seeing, Agent *a, float ownerx, float ownery, MetaRoom *ownermeta, std::shared_ptr<Room> ownerroom);
-bool agentIsVisible(Agent *seeing, Agent *dest);
-std::vector<std::shared_ptr<Agent> > getVisibleList(Agent *seeing, unsigned char family, unsigned char genus, unsigned short species);
+bool agentIsVisible(Agent* seeing, Agent* a, float ownerx, float ownery, MetaRoom* ownermeta, std::shared_ptr<Room> ownerroom);
+bool agentIsVisible(Agent* seeing, Agent* dest);
+std::vector<std::shared_ptr<Agent> > getVisibleList(Agent* seeing, unsigned char family, unsigned char genus, unsigned short species);
 
-bool agentsTouching(Agent *first, Agent *second);
+bool agentsTouching(Agent* first, Agent* second);
 std::shared_ptr<Room> roomContainingAgent(AgentRef agent);
 
 #endif

@@ -21,26 +21,27 @@
 #define _CAMERAPART_H
 
 #include "SpritePart.h"
+
 #include <memory>
 
 class Camera;
 class RenderTarget;
 
 class CameraPart : public SpritePart {
-protected:
+  protected:
 	unsigned int viewheight, viewwidth, cameraheight, camerawidth;
 	std::shared_ptr<Camera> camera;
-	std::unique_ptr<RenderTarget, void(*)(RenderTarget*)> rendertarget;
-	
-public:
-	CameraPart(Agent *p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
-			   unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
-			   unsigned int camerawidth, unsigned int cameraheight);
+	std::unique_ptr<RenderTarget, void (*)(RenderTarget*)> rendertarget;
+
+  public:
+	CameraPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
+		unsigned int _z, unsigned int viewwidth, unsigned int viewheight,
+		unsigned int camerawidth, unsigned int cameraheight);
 
 	unsigned int cameraWidth() const { return viewwidth; }
 	unsigned int cameraHeight() const { return viewheight; }
-	std::shared_ptr<Camera> &getCamera() { return camera; }
-	void partRender(class RenderTarget *renderer, int xoffset, int yoffset);
+	std::shared_ptr<Camera>& getCamera() { return camera; }
+	void partRender(class RenderTarget* renderer, int xoffset, int yoffset);
 	void tick();
 };
 

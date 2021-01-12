@@ -18,8 +18,10 @@
  */
 
 #include "renderable.h"
-#include "World.h"
+
 #include "Engine.h"
+#include "World.h"
+
 #include <cassert>
 
 void renderable::zapZOrder() {

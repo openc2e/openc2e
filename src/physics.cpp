@@ -18,14 +18,16 @@
  *
  */
 #include "physics.h"
+
 #include "caos_assert.h"
+
 #include <cassert>
 #include <fmt/core.h>
 
 void Line::dump() const {
 	fmt::print("pst = ({}, {}) end=({}, {})\n", start.x, start.y, end.x, end.y);
 	fmt::print("xi = {} yi = {} m = {}\n", x_icept, y_icept, slope);
-	fmt::print("type = {}\n", [&]{
+	fmt::print("type = {}\n", [&] {
 		switch (type) {
 			case NORMAL: return "NORMAL"; break;
 			case HORIZONTAL: return "HORIZ"; break;
@@ -40,7 +42,7 @@ Line::Line(Point s, Point e) {
 		std::swap(s, e);
 	start = s;
 	end = e;
-		
+
 	if (s.x == e.x) {
 		type = VERTICAL;
 		x_icept = s.x;
@@ -58,11 +60,11 @@ Line::Line(Point s, Point e) {
 		/* 0 = mx + b
 		 * x = -b/m
 		 */
-		x_icept = -y_icept/slope;
+		x_icept = -y_icept / slope;
 	}
 }
 
-bool Line::intersect(const Line &l, Point &where) const {
+bool Line::intersect(const Line& l, Point& where) const {
 	if (type == HORIZONTAL) {
 		if (l.type == HORIZONTAL)
 			//return l.start.y == start.y;
@@ -84,10 +86,9 @@ bool Line::intersect(const Line &l, Point &where) const {
 			if (l.containsX(x) && containsX(x)) {
 				where = Point(x, start.y);
 				return true;
-			}
-			else return false;
+			} else
+				return false;
 		}
-		
 	}
 	if (type == VERTICAL) {
 		if (l.type == VERTICAL)
@@ -109,9 +110,9 @@ bool Line::intersect(const Line &l, Point &where) const {
 
 	if (l.type != NORMAL)
 		return l.intersect(*this, where);
-	
+
 	assert(l.type == NORMAL && type == NORMAL);
-	
+
 	double x, y;
 
 	if (slope == l.slope)
@@ -127,9 +128,9 @@ bool Line::intersect(const Line &l, Point &where) const {
 	 */
 	x = (y_icept - l.y_icept) / (l.slope - slope);
 	y = slope * x + y_icept;
-	
+
 	if (containsX(x) && l.containsX(x)) {
-		where = Point(x,y);
+		where = Point(x, y);
 		return true;
 	}
 	return false;

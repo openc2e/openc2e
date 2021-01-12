@@ -1,13 +1,14 @@
 #include "fileformats/PrayFileReader.h"
-#include <iostream>
+
+#include <array>
 #include <fstream>
 #include <ghc/filesystem.hpp>
-#include <array>
+#include <iostream>
 
 namespace fs = ghc::filesystem;
 
-using std::cout;
 using std::cerr;
+using std::cout;
 using std::endl;
 using std::ifstream;
 using std::ofstream;
@@ -27,7 +28,7 @@ const std::array<std::string, 11> tagblocks = {
 	"DFAM" // DS starter family
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 	if (argc != 2) {
 		cerr << "syntax: praydumper filename" << endl;
 		return 1;
@@ -53,7 +54,8 @@ int main(int argc, char **argv) {
 	std::ofstream pray_source(pray_source_filename);
 	cout << "Writing \"" << pray_source_filename << "\"" << endl;
 	pray_source << "(- praydumper-generated PRAY file from '" << argv[0] << "' -)" << endl;
-	pray_source << endl << "\"en-GB\"" << endl;
+	pray_source << endl
+				<< "\"en-GB\"" << endl;
 
 	std::ifstream in(inputfile.string(), std::ios::binary);
 	if (!in) {
@@ -65,12 +67,13 @@ int main(int argc, char **argv) {
 
 	for (size_t i = 0; i < file.getNumBlocks(); i++) {
 		// TODO: s/"/\\"/ in the data (use find/replace methods of string)
-		
+
 		bool handled = false;
 		for (auto tagblock : tagblocks) {
 			if (file.getBlockType(i) == tagblock) {
 				handled = true;
-				pray_source << endl << "group " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\"" << endl;
+				pray_source << endl
+							<< "group " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\"" << endl;
 
 				auto tags = file.getBlockTags(i);
 				auto int_tags = tags.first;
@@ -79,10 +82,10 @@ int main(int argc, char **argv) {
 				for (auto y : int_tags) {
 					pray_source << "\"" << y.first << "\" " << y.second << endl;
 				}
-				
+
 				for (auto y : string_tags) {
 					std::string name = y.first;
-					if ((name.substr(0, 7) ==  "Script ") || (name.substr(0, 13) == "Remove script")) {
+					if ((name.substr(0, 7) == "Script ") || (name.substr(0, 13) == "Remove script")) {
 						name = file.getBlockName(i) + " - " + name + ".cos";
 						cout << "Writing " << (output_directory / name) << endl;
 						ofstream output(output_directory / name);
@@ -94,14 +97,14 @@ int main(int argc, char **argv) {
 				}
 			}
 		}
-		
+
 		if (!handled) {
-			pray_source << endl << "inline " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\" \"" << file.getBlockName(i) << "\"" << endl;
+			pray_source << endl
+						<< "inline " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\" \"" << file.getBlockName(i) << "\"" << endl;
 			cout << "Writing " << (output_directory / file.getBlockName(i)) << endl;
 			ofstream output(output_directory / file.getBlockName(i));
 			auto buf = file.getBlockRawData(i);
-			output.write((char *)buf.data(), buf.size());
+			output.write((char*)buf.data(), buf.size());
 		}
 	}
 }
-
