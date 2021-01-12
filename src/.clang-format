@@ -1,0 +1,28 @@
+BasedOnStyle: LLVM
+AlignAfterOpenBracket: DontAlign
+AlignEscapedNewlines: DontAlign
+AlignTrailingComments: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBraces: Custom
+ColumnLimit: 0
+Cpp11BracedListStyle: true
+DerivePointerAlignment: false
+IncludeBlocks: Regroup
+IncludeCategories:
+- Regex:           '^"'
+  Priority:        1
+- Regex:           '^<'
+  Priority:        2
+IndentCaseLabels: true
+IndentWidth: 4
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
+PointerAlignment: Left
+SortIncludes: true
+Standard: Auto
+TabWidth: 4
+UseTab: ForContinuationAndIndentation
