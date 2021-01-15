@@ -344,8 +344,8 @@ add_custom_command(
 add_custom_command(
 	OUTPUT ${GEN}/cataloglexer.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c
-	DEPENDS ${SRC}/src/cataloglexer.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c.cpp
+	DEPENDS ${SRC}/src/cataloglexer.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
@@ -358,29 +358,29 @@ add_custom_command(
 add_custom_command(
 	OUTPUT ${GEN}/fileformats/caoslexer.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/caoslexer.cpp ${SRC}/src/fileformats/caoslexer.re2c
-	DEPENDS ${SRC}/src/fileformats/caoslexer.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/caoslexer.cpp ${SRC}/src/fileformats/caoslexer.re2c.cpp
+	DEPENDS ${SRC}/src/fileformats/caoslexer.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/fileformats/mngparser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mngparser.cpp ${SRC}/src/fileformats/mngparser.re2c
-	DEPENDS ${SRC}/src/fileformats/mngparser.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mngparser.cpp ${SRC}/src/fileformats/mngparser.re2c.cpp
+	DEPENDS ${SRC}/src/fileformats/mngparser.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/fileformats/Caos2PrayParser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/Caos2PrayParser.cpp ${SRC}/src/fileformats/Caos2PrayParser.re2c
-	DEPENDS ${SRC}/src/fileformats/Caos2PrayParser.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/Caos2PrayParser.cpp ${SRC}/src/fileformats/Caos2PrayParser.re2c.cpp
+	DEPENDS ${SRC}/src/fileformats/Caos2PrayParser.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${GEN}/fileformats/PraySourceParser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/PraySourceParser.cpp ${SRC}/src/fileformats/PraySourceParser.re2c
-	DEPENDS ${SRC}/src/fileformats/PraySourceParser.re2c
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/PraySourceParser.cpp ${SRC}/src/fileformats/PraySourceParser.re2c.cpp
+	DEPENDS ${SRC}/src/fileformats/PraySourceParser.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/openc2e.6)
