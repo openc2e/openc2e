@@ -1,10 +1,13 @@
 #include "encoding.h"
 
+#include "endianlove.h"
+
 #include <array>
+#include <assert.h>
 #include <stdexcept>
 #include <utf8proc.h>
 
-static std::string codepoint_to_utf8(char32_t c) {
+std::string codepoint_to_utf8(char32_t c) {
 	std::array<uint8_t, 5> s = {0, 0, 0, 0, 0};
 	if (utf8proc_encode_char(c, s.data()) <= 0) {
 		throw std::domain_error("Can't convert " + std::to_string(c) + " into UTF-8");
@@ -179,4 +182,26 @@ bool cp1252_isprint(unsigned char c) {
 		return false;
 	}
 	return true;
+}
+
+static char32_t utf16le_to_codepoint(uint8_t** p) {
+	assert(p);
+	assert(*p);
+	uint16_t c1 = read16le(*p);
+	*p += 2;
+	if (c1 >= 0xd800 && c1 < 0xdc00) {
+		uint16_t c2 = read16le(*p);
+		*p += 2;
+		return ((c1 & 0x3ff) << 10) + (c2 & 0x3ff) + 0x10000;
+	}
+	return c1;
+}
+
+std::string utf16le_to_utf8(uint8_t* data, size_t num_bytes) {
+	std::string s;
+	uint8_t* p = data;
+	while (p < data + num_bytes) {
+		s += codepoint_to_utf8(utf16le_to_codepoint(&p));
+	}
+	return s;
 }

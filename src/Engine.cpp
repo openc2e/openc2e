@@ -118,22 +118,21 @@ void Engine::setBackend(std::shared_ptr<Backend> b) {
 	lasttimestamp = backend->ticks();
 }
 
-static std::vector<std::string> read_wordlist(peFile* exefile, uint32_t lang) {
-	resourceInfo* r = exefile->getResource(PE_RESOURCETYPE_STRING, lang, 14);
+static std::vector<std::string> read_wordlist(peFile* exefile, PeLanguage lang) {
+	optional<resourceInfo> r = exefile->findResource(PE_RESOURCETYPE_STRING, lang, 14);
 	if (!r) {
 		std::cout << "Warning: Couldn't load word list (couldn't find resource)!" << std::endl;
 		return {};
 	}
 
-	std::vector<std::string> strings = r->parseStrings();
+	std::vector<std::string> strings = exefile->getResourceStrings(*r);
 	if (strings.size() < 6) {
 		std::cout << "Warning: Couldn't load word list (string table too small)!" << std::endl;
 		return {};
 	}
 
+	std::string wordlistdata = utf8_to_cp1252(strings[5]);
 	std::vector<std::string> wordlist;
-	std::string wordlistdata = strings[5];
-
 	std::string s;
 	for (char i : wordlistdata) {
 		if (i == '|') {
@@ -246,20 +245,20 @@ void Engine::loadGameData() {
 			std::cout << "Warning: Couldn't load word list (couldn't find Creatures2.exe)!" << std::endl;
 
 		if (exefile) {
-			auto english_wordlist = read_wordlist(exefile, HORRID_LANG_ENGLISH);
+			auto english_wordlist = read_wordlist(exefile, PE_LANGUAGE_ENGLISH);
 
 			wordlist.clear();
 			wordlist_translations.clear();
 			if (language == "de") {
-				wordlist = read_wordlist(exefile, HORRID_LANG_GERMAN);
+				wordlist = read_wordlist(exefile, PE_LANGUAGE_GERMAN);
 			} else if (language == "fr") {
-				wordlist = read_wordlist(exefile, HORRID_LANG_FRENCH);
+				wordlist = read_wordlist(exefile, PE_LANGUAGE_FRENCH);
 			} else if (language == "it") {
-				wordlist = read_wordlist(exefile, HORRID_LANG_ITALIAN);
+				wordlist = read_wordlist(exefile, PE_LANGUAGE_ITALIAN);
 			} else if (language == "nl") {
-				wordlist = read_wordlist(exefile, HORRID_LANG_DUTCH);
+				wordlist = read_wordlist(exefile, PE_LANGUAGE_DUTCH);
 			} else if (language == "es") {
-				wordlist = read_wordlist(exefile, HORRID_LANG_SPANISH);
+				wordlist = read_wordlist(exefile, PE_LANGUAGE_SPANISH);
 			}
 
 			if (wordlist.empty()) {

@@ -20,29 +20,10 @@
 #include "fileformats/peFile.h"
 
 #include "creaturesException.h"
+#include "encoding.h"
 #include "endianlove.h"
 #include "fileformats/bmpImage.h"
 #include "spanstream.h"
-
-// debug helper
-std::string nameForType(uint32_t t) {
-	switch (t) {
-		case 1: return "Cursor";
-		case 2: return "Bitmap";
-		case 3: return "Icon";
-		case 4: return "Menu";
-		case 5: return "Dialog";
-		case 6: return "String";
-		case 7: return "Fontdir";
-		case 8: return "Font";
-		case 9: return "Accelerator";
-		case 10: return "RCData";
-		case 11: return "MessageTable";
-		case 16: return "Version";
-	}
-
-	return "Unknown";
-}
 
 /*
  * This isn't a full PE parser, but it manages to extract resources from the
@@ -63,7 +44,7 @@ peFile::peFile(fs::path filepath) {
 		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (not a PE file?)");
 
 	// skip the rest of the DOS header
-	file.seekg(58, std::ios::cur);
+	file.ignore(58);
 
 	// read the location of the PE header
 	uint32_t e_lfanew = read32le(file);
@@ -78,21 +59,22 @@ peFile::peFile(fs::path filepath) {
 		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (corrupt?)");
 
 	// read the necessary data from the PE file header
-	file.seekg(2, std::ios::cur);
+	file.ignore(2);
 	uint16_t nosections = read16le(file);
-	file.seekg(12, std::ios::cur);
+	file.ignore(12);
 	uint16_t optionalheadersize = read16le(file);
-	file.seekg(2, std::ios::cur);
+	file.ignore(2);
 
 	// skip the optional header
-	file.seekg(optionalheadersize, std::ios::cur);
+	file.ignore(optionalheadersize);
 
+	std::map<std::string, peSection> sections;
 	for (unsigned int i = 0; i < nosections; i++) {
 		char section_name[9];
 		section_name[8] = 0;
 		file.read(section_name, 8);
 
-		file.seekg(4, std::ios::cur);
+		file.ignore(4);
 
 		peSection section;
 		section.vaddr = read32le(file);
@@ -100,14 +82,11 @@ peFile::peFile(fs::path filepath) {
 		section.offset = read32le(file);
 		sections[std::string(section_name)] = section;
 
-		file.seekg(16, std::ios::cur);
+		file.ignore(16);
 	}
 
-	parseResources();
-}
-
-void peFile::parseResources() {
-	std::map<std::string, peSection>::iterator si = sections.find(std::string(".rsrc"));
+	// parse resources
+	auto si = sections.find(std::string(".rsrc"));
 	if (si == sections.end())
 		return;
 	peSection& s = si->second;
@@ -115,12 +94,10 @@ void peFile::parseResources() {
 	parseResourcesLevel(s, s.offset, 0);
 }
 
-unsigned int currtype, currname, currlang;
-
 void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int level) {
 	file.seekg(off, std::ios::beg);
 
-	file.seekg(12, std::ios::cur);
+	file.ignore(12);
 
 	uint16_t nonamedentries = read16le(file);
 	uint16_t noidentries = read16le(file);
@@ -137,7 +114,8 @@ void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int le
 			/* we don't check for strings here because we don't care :) */
 			currname = name;
 		} else if (level == 2) {
-			currlang = name;
+			currlang = name & 0xff;
+			currsublang = name >> 10;
 		}
 
 		if (level < 2) {
@@ -155,12 +133,15 @@ void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int le
 			uint32_t size = read32le(file);
 
 			resourceInfo info;
+			info.type = (PeResourceType)currtype;
+			info.lang = (PeLanguage)currlang;
+			info.sublang = (PeSubLanguage)currsublang;
+			info.name = currname;
 			info.offset = offset;
 			info.size = size;
-			info.data = 0;
 
-			//if ((currlang & 0xff) == 0x09) // LANG_ENGLISH
-			resources[std::pair<uint32_t, uint32_t>(currtype, currlang)][currname] = info;
+			// if ((currlang & 0xff) == 0x09) // LANG_ENGLISH
+			resources.push_back(info);
 		}
 
 		file.seekg(here, std::ios::beg);
@@ -168,60 +149,139 @@ void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int le
 }
 
 peFile::~peFile() {
-	for (auto& resource : resources) {
-		for (std::map<uint32_t, resourceInfo>::iterator j = resource.second.begin(); j != resource.second.end(); j++) {
-			if (j->second.data) {
-				delete[] j->second.data;
-			}
-		}
-	}
 }
 
-resourceInfo* peFile::getResource(uint32_t type, uint32_t lang, uint32_t name) {
-	if (resources.find(std::pair<uint32_t, uint32_t>(type, lang)) == resources.end())
-		return 0;
-	if (resources[std::pair<uint32_t, uint32_t>(type, lang)].find(name) == resources[std::pair<uint32_t, uint32_t>(type, lang)].end())
-		return 0;
-
-	resourceInfo* r = &resources[std::pair<uint32_t, uint32_t>(type, lang)][name];
-	if (!r->data) {
-		file.seekg(r->offset, std::ios::beg);
-		r->data = new char[r->size];
-		file.read(r->data, r->size);
+optional<resourceInfo> peFile::findResource(PeResourceType type, PeLanguage lang, uint32_t name) {
+	optional<resourceInfo> best_match;
+	for (auto& r : resources) {
+		if (!(r.type == type && r.lang == lang && r.name == name)) {
+			continue;
+		}
+		if (r.sublang == PE_SUBLANG_DEFAULT) {
+			best_match = r;
+			break;
+		}
+		if (!best_match) {
+			best_match = r;
+		}
 	}
-	return r;
+	return best_match;
+}
+
+optional<resourceInfo> peFile::findResource(
+	PeResourceType type, PeLanguage lang, PeSubLanguage sublang, uint32_t name) {
+	for (auto& r : resources) {
+		if (!(r.type == type && r.lang == lang && r.sublang == sublang && r.name == name)) {
+			continue;
+		}
+		return r;
+	}
+	return {};
+}
+
+shared_array<uint8_t> peFile::getResourceData(resourceInfo r) {
+	shared_array<uint8_t> data(r.size);
+	file.seekg(r.offset, std::ios::beg);
+	file.read((char*)data.data(), r.size);
+	return data;
 }
 
 Image peFile::getBitmap(uint32_t name) {
-	resourceInfo* r = getResource(PE_RESOURCETYPE_BITMAP, HORRID_LANG_ENGLISH, name);
+	auto r = findResource(PE_RESOURCETYPE_BITMAP, PE_LANGUAGE_ENGLISH, name);
 	if (!r)
-		r = getResource(PE_RESOURCETYPE_BITMAP, 0x400, name);
+		r = findResource(PE_RESOURCETYPE_BITMAP, PE_LANGUAGE_NEUTRAL, name);
 	if (!r)
 		return {};
 
-	spanstream ss(r->getData(), r->getSize());
-
+	auto data = getResourceData(*r);
+	spanstream ss(data.data(), data.size());
 	Image bmp = ReadDibFile(ss);
 	return bmp;
 }
 
-std::vector<std::string> resourceInfo::parseStrings() {
+std::vector<std::string> peFile::getResourceStrings(resourceInfo r) {
+	auto data = getResourceData(r);
+
 	std::vector<std::string> strings;
 
-	for (unsigned int i = 0; i < size / 2;) {
-		uint16_t strsize = read16le(data + i * 2);
-		i++;
-
-		std::string s;
-		for (unsigned int j = 0; (j < strsize) && (i < size / 2); j++) {
-			uint16_t d = read16le(data + i * 2);
-			s += (uint8_t)d; // TODO: convert properly from utf16, somehow
-			i++;
-		}
-		strings.push_back(s);
+	uint8_t* p = data.data();
+	while (p < data.data() + data.size()) {
+		uint16_t strsize = read16le(p);
+		p += 2;
+		strings.push_back(utf16le_to_utf8(p, strsize * 2));
+		p += strsize * 2;
 	}
 
 	return strings;
+}
+
+std::string peFile::resource_type_to_string(PeResourceType type) {
+	switch (type) {
+		case PE_RESOURCETYPE_CURSOR: return "cursor";
+		case PE_RESOURCETYPE_BITMAP: return "bitmap";
+		case PE_RESOURCETYPE_ICON: return "icon";
+		case PE_RESOURCETYPE_MENU: return "menu";
+		case PE_RESOURCETYPE_DIALOG: return "dialog";
+		case PE_RESOURCETYPE_STRING: return "string";
+		case PE_RESOURCETYPE_ACCELERATOR: return "accelerator";
+		case PE_RESOURCETYPE_GROUP_CURSOR: return "group_cursor";
+		case PE_RESOURCETYPE_GROUP_ICON: return "group_icon";
+		case PE_RESOURCETYPE_VERSION: return "version";
+		case PE_RESOURCETYPE_TOOLBAR: return "toolbar";
+	}
+	return std::to_string((uint32_t)type);
+}
+
+std::string peFile::language_to_string(PeLanguage lang, PeSubLanguage sublang) {
+	switch (lang) {
+		case PE_LANGUAGE_NEUTRAL:
+			if (sublang == PE_SUBLANG_DEFAULT) {
+				return "neutral";
+			}
+			return "neutral-sublang" + std::to_string((uint32_t)sublang);
+		case PE_LANGUAGE_GERMAN:
+			if (sublang == PE_SUBLANG_GERMAN) {
+				return "de";
+			}
+			return "de-sublang" + std::to_string((uint32_t)sublang);
+		case PE_LANGUAGE_ENGLISH:
+			if (sublang == PE_SUBLANG_ENGLISH_US) {
+				return "en-US";
+			}
+			if (sublang == PE_SUBLANG_ENGLISH_UK) {
+				return "en-GB";
+			}
+			return "en-sublang" + std::to_string((uint32_t)sublang);
+		case PE_LANGUAGE_FRENCH:
+			if (sublang == PE_SUBLANG_FRENCH) {
+				return "fr";
+			}
+			return "fr-sublang" + std::to_string((uint32_t)sublang);
+		case PE_LANGUAGE_ITALIAN:
+			if (sublang == PE_SUBLANG_ITALIAN) {
+				return "it";
+			}
+			return "it-sublang" + std::to_string((uint32_t)sublang);
+		case PE_LANGUAGE_DUTCH:
+			if (sublang == PE_SUBLANG_DUTCH) {
+				return "nl";
+			}
+			return "nl-sublang" + std::to_string((uint32_t)sublang);
+		case PE_LANGUAGE_JAPANESE:
+			if (sublang == PE_SUBLANG_JAPANESE) {
+				return "ja";
+			}
+			return "ja-sublang" + std::to_string((uint32_t)sublang);
+		case PE_LANGUAGE_SPANISH:
+			if (sublang == PE_SUBLANG_SPANISH_MODERN) {
+				return "es";
+			}
+			if (sublang == PE_SUBLANG_SPANISH) {
+				return "es-ES";
+			}
+			return "es-sublang" + std::to_string((uint32_t)sublang);
+	}
+	return "lang" + std::to_string((uint32_t)lang) + "-sublang" + std::to_string((uint32_t)sublang);
 }
 
 /* vim: set noet: */
