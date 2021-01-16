@@ -22,6 +22,7 @@
 /**
  * SERS MAPP (command) filename (string)
  * %status maybe
+ * %variants openc2e
  *
  * Saves the map to the specified file.
  */
@@ -34,6 +35,7 @@ void c_SERS_MAPP(caosVM* vm) {
 /**
  * SERL MAPP (command) filename (string)
  * %status maybe
+ * %variants openc2e
  *
  * Loads the map from the specified file
  *
@@ -47,6 +49,7 @@ void c_SERL_MAPP(caosVM* vm) {
 /**
  * SERS SCRP (command) filename (string)
  * %status maybe
+ * %variants openc2e
  *
  * Saves the scriptorium to the specified file
  */
@@ -58,6 +61,7 @@ void c_SERS_SCRP(caosVM* vm) {
 /**
  * SERL SCRP (command) filename (string)
  * %status maybe
+ * %variants openc2e
  *
  * Loads the scriptorium from the specified file
  */
