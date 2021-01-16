@@ -285,6 +285,9 @@ add_executable(mngplayer
 )
 target_link_libraries(mngplayer openc2e-audiobackend openc2e-fileformats fmt ghc_filesystem)
 
+add_executable(pefiledumper src/tools/pefiledumper.cpp)
+target_link_libraries(pefiledumper openc2e-fileformats)
+
 add_executable(praydumper src/tools/praydumper.cpp)
 target_link_libraries(praydumper openc2e-fileformats)
 
