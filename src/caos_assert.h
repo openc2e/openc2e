@@ -1,7 +1,7 @@
 #pragma once
 
 #include "creaturesException.h"
-#include "macro_stringify.h"
+#include "utils/macro_stringify.h"
 
 #include <cassert>
 

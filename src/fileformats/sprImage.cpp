@@ -20,7 +20,7 @@
 #include "sprImage.h"
 
 #include "c1defaultpalette.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 MultiImage ReadSprFile(std::istream& in) {
 	int numframes = read16le(in);

@@ -2,8 +2,8 @@
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
-#include "spanstream.h"
-#include "vectorstream.h"
+#include "utils/spanstream.h"
+#include "utils/vectorstream.h"
 #include <gtest/gtest.h>
 #include <fmt/format.h>
 

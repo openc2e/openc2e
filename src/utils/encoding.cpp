@@ -1,6 +1,6 @@
 #include "encoding.h"
 
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <array>
 #include <assert.h>

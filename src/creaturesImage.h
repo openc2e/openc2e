@@ -21,7 +21,7 @@
 
 #include "Image.h"
 #include "Texture.h"
-#include "shared_array.h"
+#include "utils/shared_array.h"
 
 #include <cassert>
 #include <memory>

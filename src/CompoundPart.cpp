@@ -28,9 +28,9 @@
 #include "World.h"
 #include "creaturesException.h"
 #include "creaturesImage.h"
-#include "encoding.h"
 #include "imageManager.h"
 #include "keycodes.h"
+#include "utils/encoding.h"
 
 #include <cassert>
 #include <memory>

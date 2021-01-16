@@ -20,7 +20,7 @@
 #pragma once
 
 #include "creaturesException.h"
-#include "shared_array.h"
+#include "utils/shared_array.h"
 
 #include <cmath>
 #include <fmt/core.h>

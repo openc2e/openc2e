@@ -1,7 +1,7 @@
 #include "MNGMusic.h"
 
-#include "endianlove.h"
 #include "utils/ascii_tolower.h"
+#include "utils/endianlove.h"
 #include "utils/find_if.h"
 #include "utils/overload.h"
 

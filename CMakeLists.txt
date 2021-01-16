@@ -83,13 +83,18 @@ include_directories(BEFORE
 )
 
 # Targets
-add_library(openc2e-common STATIC
-	src/encoding.cpp
-	src/mmapifstream.cpp
+add_library(openc2e-utils STATIC
+	src/utils/encoding.cpp
+	src/utils/mmapifstream.cpp
 	src/utils/readfile.cpp
 	src/utils/string_in.cpp
+	src/utils/userlocale.cpp
 )
-target_link_libraries(openc2e-common PRIVATE utf8proc::utf8proc)
+target_link_libraries(openc2e-utils PRIVATE utf8proc::utf8proc)
+
+add_library(openc2e-utils-socket STATIC
+	src/utils/socket.cpp # separate because it links to Ws2_32.lib
+)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
@@ -118,7 +123,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/ImageUtils.cpp
 )
 target_link_libraries(openc2e-fileformats
-	PUBLIC fmt ghc_filesystem mpark_variant openc2e-common
+	PUBLIC fmt ghc_filesystem mpark_variant openc2e-utils
 	PRIVATE ZLIB::ZLIB PNG::PNG
 )
 
@@ -210,20 +215,19 @@ add_library(openc2e-core STATIC
 	src/SFCFile.cpp
 	src/SimpleAgent.cpp
 	src/creatures/SkeletalCreature.cpp
-	src/socket.cpp
 	src/Sound.cpp
 	src/SoundManager.cpp
 	src/Vehicle.cpp
 	src/VoiceData.cpp
 	src/World.cpp
-	src/userlocale.cpp
 )
 target_link_libraries(openc2e-core PUBLIC
 	cxxopts
 	fmt
 	ghc_filesystem
 	mpark_variant
-	openc2e-common
+	openc2e-utils
+	openc2e-utils-socket
 	openc2e-fileformats
 )
 if(APPLE)
@@ -304,7 +308,7 @@ add_executable(translate_voice
 	${GEN}/cataloglexer.cpp
 	src/catalogparser.cpp
 )
-target_link_libraries(translate_voice openc2e-common openc2e-audiobackend fmt ghc_filesystem)
+target_link_libraries(translate_voice openc2e-utils openc2e-audiobackend fmt ghc_filesystem)
 
 # tests
 enable_testing()

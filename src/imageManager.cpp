@@ -25,7 +25,7 @@
 #include "World.h"
 #include "creaturesException.h"
 #include "fileformats/ImageUtils.h"
-#include "mmapifstream.h"
+#include "utils/mmapifstream.h"
 
 #include <array>
 #include <fmt/format.h>

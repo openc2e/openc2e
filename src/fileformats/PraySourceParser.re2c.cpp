@@ -1,5 +1,5 @@
-#include "encoding.h"
 #include "fileformats/PraySourceParser.h"
+#include "utils/encoding.h"
 #include "utils/overload.h"
 
 #include <cassert>

@@ -20,7 +20,7 @@
 #include "fileformats/c2cobfile.h"
 
 #include "creaturesException.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <algorithm>
 #include <assert.h>

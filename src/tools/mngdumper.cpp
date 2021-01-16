@@ -1,5 +1,5 @@
-#include "endianlove.h"
 #include "fileformats/mngfile.h"
+#include "utils/endianlove.h"
 #include "utils/enumerate.h"
 #include "utils/zip.h"
 

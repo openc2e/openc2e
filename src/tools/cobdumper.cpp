@@ -1,11 +1,11 @@
 #include "caosparser.h"
 #include "creaturesException.h"
 #include "dialect.h"
-#include "endianlove.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
 #include "fileformats/pngImage.h"
+#include "utils/endianlove.h"
 #include "utils/string_in.h"
 
 #include <fmt/format.h>

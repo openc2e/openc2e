@@ -1,7 +1,7 @@
 #include "s16Image.h"
 
-#include "endianlove.h"
-#include "shared_array.h"
+#include "utils/endianlove.h"
+#include "utils/shared_array.h"
 
 #include <vector>
 

@@ -21,7 +21,7 @@
 #define PEFILE_H
 
 #include "Image.h"
-#include "optional.h"
+#include "utils/optional.h"
 
 #include <fstream>
 #include <ghc/filesystem.hpp>

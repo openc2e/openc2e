@@ -20,7 +20,7 @@
 #include "fileformats/c16Image.h"
 
 #include "caos_assert.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <memory>
 #include <string.h>

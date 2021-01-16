@@ -20,7 +20,7 @@
 #include "VoiceData.h"
 
 #include "Catalogue.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <cassert>
 #include <fmt/core.h>

@@ -1,8 +1,8 @@
 #include "fileformats/PrayFileWriter.h"
 
-#include "encoding.h"
-#include "endianlove.h"
-#include "vectorstream.h"
+#include "utils/encoding.h"
+#include "utils/endianlove.h"
+#include "utils/vectorstream.h"
 
 #include <cassert>
 #include <vector>

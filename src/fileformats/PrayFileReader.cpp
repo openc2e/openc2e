@@ -20,9 +20,9 @@
 #include "fileformats/PrayFileReader.h"
 
 #include "creaturesException.h"
-#include "encoding.h"
-#include "endianlove.h"
-#include "spanstream.h"
+#include "utils/encoding.h"
+#include "utils/endianlove.h"
+#include "utils/spanstream.h"
 
 #include <cstring>
 #include <zlib.h>

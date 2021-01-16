@@ -23,7 +23,7 @@
 #include "Engine.h"
 #include "caos_assert.h"
 #include "creaturesException.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <fstream>
 #include <memory>

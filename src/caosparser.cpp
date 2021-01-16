@@ -2,16 +2,17 @@
 
 #include "creaturesException.h"
 #include "dialect.h"
-#include "noncopyable.h"
 #include "utils/ascii_tolower.h"
 #include "utils/string_in.h"
 
 #include <ctype.h>
 #include <fmt/format.h>
 
-struct CAOSParserState : noncopyable {
+struct CAOSParserState {
 	CAOSParserState(const std::vector<caostoken>& tokens_, Dialect* dialect_)
 		: tokens(tokens_), dialect(dialect_) {}
+	CAOSParserState(const CAOSParserState&) = delete;
+	CAOSParserState& operator=(const CAOSParserState&) = delete;
 	const std::vector<caostoken>& tokens;
 	Dialect* dialect;
 	size_t p = 0;

@@ -2,9 +2,9 @@
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/genomeFile.h"
-#include "spanstream.h"
 #include "utils/readfile.h"
-#include "vectorstream.h"
+#include "utils/spanstream.h"
+#include "utils/vectorstream.h"
 
 #include <algorithm>
 #include <ctype.h>

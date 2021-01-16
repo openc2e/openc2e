@@ -6,8 +6,8 @@
 #include "World.h"
 #include "caos_assert.h"
 #include "creaturesImage.h"
-#include "encoding.h"
 #include "imageManager.h"
+#include "utils/encoding.h"
 
 TextPart::TextPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
 	: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {

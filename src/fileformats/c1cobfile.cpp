@@ -2,7 +2,7 @@
 
 #include "c1defaultpalette.h"
 #include "caos_assert.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <cassert>
 #include <fstream>

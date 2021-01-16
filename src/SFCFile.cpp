@@ -36,10 +36,10 @@
 #include "World.h"
 #include "caosScript.h"
 #include "creaturesException.h"
-#include "endianlove.h"
 #include "fileformats/sprImage.h"
 #include "imageManager.h"
-#include "macro_stringify.h"
+#include "utils/endianlove.h"
+#include "utils/macro_stringify.h"
 
 #include <cassert>
 #include <fmt/core.h>

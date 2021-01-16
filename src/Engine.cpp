@@ -34,12 +34,12 @@
 #include "backends/NullBackend.h"
 #include "caosScript.h" // for executeNetwork()
 #include "caosVM.h"
-#include "encoding.h"
 #include "fileformats/peFile.h"
 #include "imageManager.h"
 #include "keycodes.h"
 #include "prayManager.h"
-#include "userlocale.h"
+#include "utils/encoding.h"
+#include "utils/userlocale.h"
 
 #include <cassert>
 #include <ghc/filesystem.hpp>

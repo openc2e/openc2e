@@ -1,7 +1,7 @@
 #include "strFile.h"
 
 #include "creaturesException.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <fstream>
 

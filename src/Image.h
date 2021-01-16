@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared_array.h"
+#include "utils/shared_array.h"
 
 #include <memory>
 #include <vector>

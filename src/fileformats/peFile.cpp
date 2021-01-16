@@ -20,10 +20,10 @@
 #include "fileformats/peFile.h"
 
 #include "creaturesException.h"
-#include "encoding.h"
-#include "endianlove.h"
 #include "fileformats/bmpImage.h"
-#include "spanstream.h"
+#include "utils/encoding.h"
+#include "utils/endianlove.h"
+#include "utils/spanstream.h"
 
 /*
  * This isn't a full PE parser, but it manages to extract resources from the

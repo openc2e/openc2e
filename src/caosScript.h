@@ -26,7 +26,7 @@
 #include "dialect.h"
 #include "fileformats/caostoken.h"
 #include "serfwd.h"
-#include "shared_str.h"
+#include "utils/shared_str.h"
 
 #include <cassert>
 #include <fmt/core.h>

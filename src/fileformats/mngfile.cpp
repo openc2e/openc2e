@@ -19,10 +19,10 @@
 #include "mngfile.h"
 
 #include "creaturesException.h"
-#include "endianlove.h"
-#include "mmapifstream.h"
 #include "mngparser.h"
-#include "shared_array.h"
+#include "utils/endianlove.h"
+#include "utils/mmapifstream.h"
+#include "utils/shared_array.h"
 
 #include <algorithm>
 #include <assert.h>

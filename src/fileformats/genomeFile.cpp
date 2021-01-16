@@ -18,7 +18,7 @@
  */
 #include "genomeFile.h"
 
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <cstring>
 #include <exception>

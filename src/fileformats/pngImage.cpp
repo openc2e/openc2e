@@ -2,7 +2,7 @@
 
 #include "ImageUtils.h"
 #include "creaturesException.h"
-#include "scope_guard.h"
+#include "utils/scope_guard.h"
 
 #include <fstream>
 #include <memory>

@@ -7,8 +7,8 @@
 #include "fileformats/charsetdta.h"
 #include "fileformats/s16Image.h"
 #include "fileformats/sprImage.h"
-#include "mmapifstream.h"
 #include "utils/ascii_tolower.h"
+#include "utils/mmapifstream.h"
 
 #include <ghc/filesystem.hpp>
 

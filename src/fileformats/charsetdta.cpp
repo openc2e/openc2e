@@ -1,7 +1,7 @@
 #include "fileformats/charsetdta.h"
 
 #include "creaturesException.h"
-#include "endianlove.h"
+#include "utils/endianlove.h"
 
 #include <string.h>
 #include <string>
