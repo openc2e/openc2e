@@ -578,13 +578,11 @@ void v_GRID(caosVM* vm) {
 	Point point;
 	std::shared_ptr<Room> room;
 	bool collided = world.map->collideLineWithRoomBoundaries(src, dest, ourRoom, room, point, dummy2, dummy1, vm->targ->perm);
-	// TODO: do something with collided?
-	(void)collided;
-
-	if (!room)
-		vm->result.setInt(-1);
-	else
+	if (collided && room) {
 		vm->result.setInt(room->id);
+	} else {
+		vm->result.setInt(-1);
+	}
 }
 
 /**
