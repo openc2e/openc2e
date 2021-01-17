@@ -938,19 +938,13 @@ void MapData::copyToWorld() {
 				std::shared_ptr<Room> r1 = world.map->getRoom(src->id);
 				std::shared_ptr<Room> r2 = world.map->getRoom(door->otherroom);
 
-				if (r1->doors.find(r2) == r1->doors.end()) {
+				if (!world.map->hasDoor(r1, r2)) {
 					// create a new door between rooms!
-					RoomDoor* roomdoor = new RoomDoor();
-					roomdoor->first = r1;
-					roomdoor->second = r2;
-					roomdoor->perm = door->openness;
-					r1->doors[r2] = roomdoor;
-					r2->doors[r1] = roomdoor;
+					world.map->setDoorPerm(r1, r2, door->openness);
 					// TODO: ADDR adds to nearby?
 				} else {
 					// sanity check
-					RoomDoor* roomdoor = r1->doors[r2];
-					sfccheck(roomdoor->perm == door->openness);
+					sfccheck(world.map->getDoorPerm(r1, r2) == door->openness);
 				}
 			}
 		}

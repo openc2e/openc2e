@@ -22,6 +22,7 @@
 #include "Engine.h"
 #include "MetaRoom.h"
 #include "Room.h"
+#include "creaturesException.h"
 
 #include <cassert>
 #include <iostream>
@@ -76,6 +77,31 @@ MetaRoom* Map::getMetaRoom(unsigned int room) {
 		if (metaroom->id == room)
 			return metaroom.get();
 	return nullptr;
+}
+
+bool Map::hasDoor(const std::shared_ptr<Room>& r1, const std::shared_ptr<Room>& r2) {
+	auto i = r1->doors.find(r2);
+	if (i == r1->doors.end()) {
+		return false;
+	}
+	return true;
+}
+
+void Map::setDoorPerm(const std::shared_ptr<Room>& r1, const std::shared_ptr<Room>& r2, int perm) {
+	if (hasDoor(r1, r2)) {
+		r1->doors[r2].perm = perm;
+		r2->doors[r1].perm = perm;
+	} else {
+		r1->doors[r2] = RoomDoor{perm};
+		r2->doors[r1] = RoomDoor{perm};
+	}
+}
+
+int Map::getDoorPerm(const std::shared_ptr<Room>& r1, const std::shared_ptr<Room>& r2) {
+	if (!hasDoor(r1, r2)) {
+		throw creaturesException("Door doesn't exist!");
+	}
+	return r1->doors[r2].perm;
 }
 
 std::shared_ptr<Room> Map::getRoom(unsigned int r) {
@@ -235,7 +261,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 					// this is our next room!
 					foundroom = true;
 					// if boundary perm is going to let us through..
-					if (perm <= r->second->perm) // TODO: right?
+					if (perm <= r->second.perm) // TODO: right?
 						nextroom = otherroom;
 					break;
 				}

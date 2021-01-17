@@ -59,6 +59,10 @@ class Map {
 	MetaRoom* addMetaRoom(int x, int y, int width, int height, const std::string& background, bool wrap = false);
 	MetaRoom* getMetaRoom(unsigned int);
 
+	bool hasDoor(const std::shared_ptr<Room>& r1, const std::shared_ptr<Room>& r2);
+	void setDoorPerm(const std::shared_ptr<Room>& r1, const std::shared_ptr<Room>& r2, int perm);
+	int getDoorPerm(const std::shared_ptr<Room>& r1, const std::shared_ptr<Room>& r2);
+
 	unsigned int getMetaRoomCount();
 	std::shared_ptr<Room> getRoom(unsigned int);
 	unsigned int getRoomCount();

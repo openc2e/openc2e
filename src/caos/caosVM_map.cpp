@@ -166,7 +166,7 @@ void v_BKDS(caosVM* vm) {
  ADDR (integer) metaroomid (integer) x_left (integer) x_right (integer) y_left_ceiling (integer) y_right_ceiling (integer) y_left_floor (integer) y_right_floor (integer)
  %status maybe
 
- Makes a new room inside the given metaroom.  Rooms can have sloped floors and ceilings, but only vertical walls.  
+ Makes a new room inside the given metaroom.  Rooms can have sloped floors and ceilings, but only vertical walls.
  The id of the new room is returned.
 */
 void v_ADDR(caosVM* vm) {
@@ -184,7 +184,6 @@ void v_ADDR(caosVM* vm) {
 		y_left_floor, y_right_floor));
 	MetaRoom* m = world.map->getMetaRoom(metaroomid);
 	caos_assert(m);
-	r->metaroom = m;
 	r->id = m->addRoom(r);
 	vm->result.setInt(r->id);
 }
@@ -276,17 +275,8 @@ void c_DOOR(caosVM* vm) {
 	std::shared_ptr<Room> r2 = world.map->getRoom(room2);
 	caos_assert(r1);
 	caos_assert(r2);
-	if (r1->doors.find(r2) == r1->doors.end()) {
-		RoomDoor* door = new RoomDoor;
-		door->first = r1;
-		door->second = r2;
-		door->perm = perm;
-		r1->doors[r2] = door;
-		r2->doors[r1] = door;
-	} else {
-		RoomDoor* door = r1->doors[r2];
-		door->perm = perm;
-	}
+
+	world.map->setDoorPerm(r1, r2, perm);
 }
 
 /**
@@ -992,17 +982,7 @@ void c_SETV_DOOR(caosVM* vm) {
 	std::shared_ptr<Room> r2 = world.map->getRoom(room2);
 	caos_assert(r1);
 	caos_assert(r2);
-	if (r1->doors.find(r2) == r1->doors.end()) {
-		RoomDoor* door = new RoomDoor;
-		door->first = r1;
-		door->second = r2;
-		door->perm = perm;
-		r1->doors[r2] = door;
-		r2->doors[r1] = door;
-	} else {
-		RoomDoor* door = r1->doors[r2];
-		door->perm = perm;
-	}
+	world.map->setDoorPerm(r1, r2, perm);
 }
 
 /**

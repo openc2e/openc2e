@@ -968,11 +968,11 @@ void Agent::findCollisionInDirection(unsigned int i, class MetaRoom* m, Point sr
 				collision = true;
 			}
 			// collide if there's no new room connected to this one
-			else if (room->doors.find(newroom) == room->doors.end()) {
+			else if (!world.map->hasDoor(room, newroom)) {
 				collision = true;
 			}
 			// collide if the PERM between this room and the new room is smaller than or equal to our size
-			else if (size > room->doors[newroom]->perm) {
+			else if (size > world.map->getDoorPerm(room, newroom)) {
 				collision = true;
 			}
 

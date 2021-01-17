@@ -426,9 +426,9 @@ void SkeletalCreature::snapDownFoot() {
 				newroom = downfootroom; // TODO, we're just forcing for now
 			} else {
 				float ydiff = 10000.0f; // TODO: big number
-				for (auto i = downfootroom->doors.begin(); i != downfootroom->doors.end(); i++) {
-					std::shared_ptr<Room> thisroom = i->first.lock();
-					if (engine.version == 2 && size > i->second->perm)
+				for (auto& d : downfootroom->getDoors()) {
+					std::shared_ptr<Room> thisroom = d.first;
+					if (engine.version == 2 && size > d.second.perm)
 						continue;
 					if (thisroom->x_left <= footx && thisroom->x_right >= footx) {
 						float thisydiff = fabs(footy - thisroom->floorYatX(footx));
@@ -521,9 +521,9 @@ void SkeletalCreature::snapDownFoot() {
 		} else {
 			// TODO: hilar hack: same as above for perm
 			std::shared_ptr<Room> downroom = world.map->roomAt(footx, downfootroom->y_left_floor + 1);
-			if (downfootroom->doors.find(downroom) != downfootroom->doors.end()) {
+			if (world.map->hasDoor(downfootroom, downroom)) {
 				int permsize = (engine.version == 2 ? size : perm);
-				if (permsize <= downfootroom->doors[downroom]->perm) {
+				if (permsize <= world.map->getDoorPerm(downfootroom, downroom)) {
 					falling = true;
 					return;
 				}

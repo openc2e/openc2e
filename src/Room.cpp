@@ -21,9 +21,27 @@
 
 #include "Backend.h"
 #include "World.h"
+#include "creaturesException.h"
 
 #include <cassert>
 #include <memory>
+
+bool Room::containsPoint(float x, float y) {
+	if (x > (float)x_right || x < (float)x_left) {
+		return false;
+	}
+	if (bot.pointAtX(x).y < y) {
+		return false;
+	}
+	if (top.pointAtX(x).y > y) {
+		return false;
+	}
+	return true;
+}
+
+bool Room::containsPoint(Point p) {
+	return containsPoint(p.x, p.y);
+}
 
 Room::Room() {
 	for (unsigned int i = 0; i < CA_COUNT; i++)
@@ -106,13 +124,12 @@ void Room::postTick() {
 	// adjust for diffusion to/from surrounding rooms
 	// TODO: absolutely no clue if this is correct
 	for (auto& door : doors) {
-		std::shared_ptr<Room> dest = door.second->first.lock();
-		if (dest.get() == this)
-			dest = door.second->second.lock();
+		std::shared_ptr<Room> dest = door.first.lock();
 		assert(dest);
+		assert(dest.get() != this);
 
 		for (unsigned int i = 0; i < CA_COUNT; i++) {
-			float possiblediffusion = dest->catemp[i] * diffusion[i] * (door.second->perm / 100.0f);
+			float possiblediffusion = dest->catemp[i] * diffusion[i] * (door.second.perm / 100.0f);
 			if (possiblediffusion > 1.0f)
 				possiblediffusion = 1.0f;
 			if (possiblediffusion > ca[i])
@@ -172,6 +189,17 @@ float Room::floorYatX(float x) {
 	}
 
 	return bot.pointAtX(x).y;
+}
+
+std::vector<std::pair<std::shared_ptr<Room>, RoomDoor>> Room::getDoors() {
+	std::vector<std::pair<std::shared_ptr<Room>, RoomDoor>> result;
+	for (auto& kv : doors) {
+		std::shared_ptr<Room> otherroom = kv.first.lock();
+		if (!otherroom)
+			continue;
+		result.emplace_back(otherroom, kv.second);
+	}
+	return result;
 }
 
 /* vim: set noet: */

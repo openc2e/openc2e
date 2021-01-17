@@ -487,16 +487,13 @@ void World::drawWorld(Camera* cam, RenderTarget* surface) {
 			}
 		};
 		for (const auto& r : cam->getMetaRoom()->rooms) {
-			if (!room_under_hand || (r != room_under_hand && r->doors.find(room_under_hand) == r->doors.end())) {
+			if (!room_under_hand || (r != room_under_hand && !map->hasDoor(room_under_hand, r))) {
 				draw_room(r, 0xFFFF00CC);
 			}
 		}
 		if (room_under_hand) {
-			for (const auto& door : room_under_hand->doors) {
-				const auto r = door.first.lock();
-				if (r) {
-					draw_room(r, 0x00FFFFCC);
-				}
+			for (const auto& door : room_under_hand->getDoors()) {
+				draw_room(door.first, 0x00FFFFCC);
 			}
 			draw_room(room_under_hand, 0xFF00FFCC);
 		}

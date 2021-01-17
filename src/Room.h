@@ -27,20 +27,26 @@
 #include <utility>
 #include <vector>
 
-#define CA_COUNT 20
+constexpr int CA_COUNT = 20;
+
+class Map;
+class Room;
+class RenderTarget;
 
 struct RoomDoor {
-	std::weak_ptr<class Room> first, second;
-	unsigned short perm;
+	int perm;
 };
 
 class Room {
+  private:
+	friend Map;
+	std::map<std::weak_ptr<Room>, RoomDoor, std::owner_less<std::weak_ptr<Room>>> doors;
+
   public:
-	std::map<std::weak_ptr<Room>, RoomDoor*, std::owner_less<std::weak_ptr<Room> > > doors;
 	unsigned int x_left, x_right, y_left_ceiling, y_right_ceiling;
 	unsigned int y_left_floor, y_right_floor;
 
-	std::vector<std::pair<unsigned int, unsigned int> > floorpoints;
+	std::vector<std::pair<unsigned int, unsigned int>> floorpoints;
 
 	Line left, right, top, bot;
 	int type = 0;
@@ -53,26 +59,14 @@ class Room {
 	std::string music;
 
 	unsigned int id;
-	class MetaRoom* metaroom;
 
 	float ca[CA_COUNT], catemp[CA_COUNT];
 
-	bool containsPoint(float x, float y) {
-		if (x > (float)x_right || x < (float)x_left) {
-			return false;
-		}
-		if (bot.pointAtX(x).y < y) {
-			return false;
-		}
-		if (top.pointAtX(x).y > y) {
-			return false;
-		}
-		return true;
-	}
-
-	bool containsPoint(Point p) { return containsPoint(p.x, p.y); }
+	bool containsPoint(float x, float y);
+	bool containsPoint(Point p);
 
 	float floorYatX(float x);
+	std::vector<std::pair<std::shared_ptr<Room>, RoomDoor>> getDoors();
 
 	Room();
 	Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int y_r_t, unsigned int y_l_b, unsigned int y_r_b);
@@ -80,7 +74,7 @@ class Room {
 	void postTick();
 	void resetTick();
 
-	void renderBorders(class RenderTarget* surf, int xoffset, int yoffset, unsigned int col);
+	void renderBorders(RenderTarget* surf, int xoffset, int yoffset, unsigned int col);
 };
 
 /* vim: set noet: */
