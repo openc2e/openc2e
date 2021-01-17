@@ -583,9 +583,10 @@ bool Agent::validInRoomSystem(Point p, float w, float h, int testperm) {
 
 			unsigned int dir;
 			Line wall;
-			world.map->collideLineWithRoomSystem(src, dest, ourRoom, src, wall, dir, testperm);
+			Point newsrc = src;
+			bool collision = world.map->collideLineWithRoomSystem(src, dest, ourRoom, newsrc, wall, dir, testperm);
 
-			if (src != dest)
+			if (collision && newsrc != dest)
 				return false;
 		}
 	}
