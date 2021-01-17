@@ -27,10 +27,20 @@
 #include <iostream>
 #include <memory>
 
+MetaRoom* Map::getFallbackMetaroom() {
+	return metarooms.size() == 0 ? NULL : metarooms[0].get();
+}
+
+Map::Map() {
+	width = 0;
+	height = 0;
+	room_base = 0;
+	metaroom_base = 0;
+}
+
+Map::~Map() = default;
+
 void Map::Reset() {
-	for (auto& metaroom : metarooms) {
-		delete metaroom;
-	}
 	metarooms.clear();
 	// todo: metarooms should be responsible for deleting rooms, so use the following instead of clear:
 	// assert(rooms.empty());
@@ -43,20 +53,29 @@ void Map::SetMapDimensions(unsigned int w, unsigned int h) {
 	height = h;
 }
 
-int Map::addMetaRoom(MetaRoom* m) {
+MetaRoom* Map::addMetaRoom(int _x, int _y, int _width, int _height, const std::string& back, bool wrap) {
 	// todo: check if it's outlying
+	std::unique_ptr<MetaRoom> m(new MetaRoom);
 	while (getMetaRoom(metaroom_base))
 		metaroom_base++;
 	m->id = metaroom_base++;
-	metarooms.push_back(m);
-	return m->id;
+	m->xloc = _x;
+	m->yloc = _y;
+	m->wid = _width;
+	m->hei = _height;
+	m->wraps = wrap;
+	if (!back.empty()) {
+		m->addBackground(back);
+	}
+	metarooms.emplace_back(std::move(m));
+	return metarooms.back().get();
 }
 
 MetaRoom* Map::getMetaRoom(unsigned int room) {
 	for (auto& metaroom : metarooms)
 		if (metaroom->id == room)
-			return metaroom;
-	return 0;
+			return metaroom.get();
+	return nullptr;
 }
 
 std::shared_ptr<Room> Map::getRoom(unsigned int r) {
@@ -80,23 +99,25 @@ void Map::tick() {
 
 	// Three passes..
 	for (auto& metaroom : metarooms)
-		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
-			(*i)->tick();
+		for (auto& r : metaroom->rooms)
+			r->tick();
 	for (auto& metaroom : metarooms)
-		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
-			(*i)->postTick();
+		for (auto& r : metaroom->rooms)
+			r->postTick();
 	for (auto& metaroom : metarooms)
-		for (std::vector<std::shared_ptr<Room> >::iterator i = metaroom->rooms.begin(); i != metaroom->rooms.end(); i++)
-			(*i)->resetTick();
+		for (auto& r : metaroom->rooms)
+			r->resetTick();
 }
 
-MetaRoom* Map::metaRoomAt(unsigned int _x, unsigned int _y) {
-	for (auto r : metarooms) {
-		if ((_x >= r->x()) && (_y >= r->y()))
-			if ((_x <= (r->x() + r->width())) && (_y <= (r->y() + r->height())))
-				return r;
+MetaRoom* Map::metaRoomAt(unsigned int x, unsigned int y) {
+	for (auto& m : metarooms) {
+		if (x >= m->x() && y >= m->y()) {
+			if (x <= m->x() + m->width() && y <= m->y() + m->height()) {
+				return m.get();
+			}
+		}
 	}
-	return 0;
+	return nullptr;
 }
 
 std::shared_ptr<Room> Map::roomAt(float _x, float _y) {
@@ -106,10 +127,10 @@ std::shared_ptr<Room> Map::roomAt(float _x, float _y) {
 	return m->roomAt(_x, _y);
 }
 
-std::vector<std::shared_ptr<Room> > Map::roomsAt(float _x, float _y) {
+std::vector<std::shared_ptr<Room>> Map::roomsAt(float _x, float _y) {
 	MetaRoom* m = metaRoomAt((unsigned int)_x, (unsigned int)_y); // TODO: good casts?
 	if (!m)
-		return std::vector<std::shared_ptr<Room> >();
+		return std::vector<std::shared_ptr<Room>>();
 	return m->roomsAt(_x, _y);
 }
 

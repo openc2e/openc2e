@@ -31,23 +31,6 @@
 #include <assert.h>
 #include <memory>
 
-MetaRoom::MetaRoom(int _x, int _y, int _width, int _height, const std::string& back, std::shared_ptr<creaturesImage> spr, bool wrap) {
-	xloc = _x;
-	yloc = _y;
-	wid = _width;
-	hei = _height;
-	wraps = wrap;
-
-	// if we were provided with a background, add it
-	if (!back.empty()) {
-		if (spr) {
-			addBackground(back, spr);
-		} else {
-			addBackground(back);
-		}
-	}
-}
-
 void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> spr) {
 	std::shared_ptr<creaturesImage> backsprite;
 	unsigned int totalwidth, totalheight;
@@ -62,8 +45,8 @@ void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> s
 	if (!spr) {
 		// we weren't passed a sprite, so we need to load one
 		backsprite = world.gallery->getImage(back, true);
-		totalwidth = backsprite->width(0);
-		totalheight = backsprite->height(0);
+		totalwidth = std::max(wid, backsprite->width(0));
+		totalheight = std::max(hei, backsprite->height(0));
 	} else {
 		// we were provided with a sprite, so use it
 		backsprite = spr;
@@ -73,9 +56,9 @@ void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> s
 
 	// store the background
 	backgrounds[back] = backsprite;
-	if (!firstback) {
+	if (!firstback.size()) {
 		// set the first background
-		firstback = backsprite;
+		firstback = back;
 		fullwid = totalwidth;
 		fullhei = totalheight;
 	} else {
@@ -99,7 +82,7 @@ std::vector<std::string> MetaRoom::backgroundList() {
 std::shared_ptr<creaturesImage> MetaRoom::getBackground(std::string back) {
 	// return the first background by default
 	if (back.empty()) {
-		return firstback;
+		return backgrounds[firstback];
 	}
 
 	// if this background name isn't found, return null

@@ -879,15 +879,10 @@ void SFCFile::copyToWorld() {
 }
 
 void MapData::copyToWorld() {
-	// find the background sprite
-	std::shared_ptr<creaturesImage> spr = world.gallery->getImage(background->filename);
-	sfccheck(spr);
-
 	// create the global metaroom
 	// TODO: hardcoded size bad?
 	unsigned int w = parent->version() == 0 ? 1200 : 2400;
-	MetaRoom* m = new MetaRoom(0, 0, 8352, w, background->filename, spr, true);
-	world.map->addMetaRoom(m);
+	MetaRoom* m = world.map->addMetaRoom(0, 0, 8352, w, background->filename, true);
 
 	for (auto src : rooms) {
 		// retrieve our room data

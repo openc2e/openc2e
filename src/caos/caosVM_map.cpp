@@ -56,10 +56,8 @@ void v_ADDM(caosVM* vm) {
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
 
-	MetaRoom* r = new MetaRoom(x, y, width, height, background);
-	caosValue v;
-	v.setInt(world.map->addMetaRoom(r));
-	vm->result = v;
+	MetaRoom* r = world.map->addMetaRoom(x, y, width, height, background);
+	vm->result.setInt(r->id);
 }
 
 /**

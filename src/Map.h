@@ -24,6 +24,7 @@
 #include "serfwd.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 class Room;
@@ -33,8 +34,8 @@ class Map {
   protected:
 	FRIEND_SERIALIZE(Map)
 	unsigned int width, height;
-	std::vector<MetaRoom*> metarooms;
-	std::vector<std::shared_ptr<Room> > rooms;
+	std::vector<std::unique_ptr<MetaRoom>> metarooms;
+	std::vector<std::shared_ptr<Room>> rooms;
 
 	friend class MetaRoom;
 
@@ -43,27 +44,20 @@ class Map {
 	 *
 	 * For those times when you really, really need a room.
 	 */
-	MetaRoom* getFallbackMetaroom() {
-		return metarooms.size() == 0 ? NULL : metarooms[0];
-	}
+	MetaRoom* getFallbackMetaroom();
 
 	unsigned int room_base, metaroom_base;
 
-	Map() {
-		width = 0;
-		height = 0;
-		room_base = 0;
-		metaroom_base = 0;
-	}
+	Map();
+	~Map();
 
 	void Reset();
 	void SetMapDimensions(unsigned int, unsigned int);
 	unsigned int getWidth() { return width; }
 	unsigned int getHeight() { return height; }
 
-	int addMetaRoom(MetaRoom*);
+	MetaRoom* addMetaRoom(int x, int y, int width, int height, const std::string& background, bool wrap = false);
 	MetaRoom* getMetaRoom(unsigned int);
-	MetaRoom* getArrayMetaRoom(unsigned int i) { return metarooms[i]; } // TODO: hack!
 
 	unsigned int getMetaRoomCount();
 	std::shared_ptr<Room> getRoom(unsigned int);
@@ -71,7 +65,7 @@ class Map {
 
 	MetaRoom* metaRoomAt(unsigned int, unsigned int);
 	std::shared_ptr<Room> roomAt(float, float);
-	std::vector<std::shared_ptr<Room> > roomsAt(float, float);
+	std::vector<std::shared_ptr<Room>> roomsAt(float, float);
 
 	bool collideLineWithRoomSystem(Point src, Point dest, std::shared_ptr<Room>& room, Point& where, Line& wall, unsigned int& walldir, int perm);
 	bool collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<Room> room, std::shared_ptr<Room>& newroom, Point& where, Line& wall, unsigned int& walldir, int perm);

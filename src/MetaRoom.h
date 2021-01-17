@@ -28,13 +28,15 @@
 #include <vector>
 
 class creaturesImage;
+class Map;
 
 class MetaRoom {
   protected:
+	friend Map;
 	FRIEND_SERIALIZE(MetaRoom)
 	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
 	std::map<std::string, std::shared_ptr<creaturesImage> > backgrounds;
-	std::shared_ptr<creaturesImage> firstback;
+	std::string firstback;
 	bool wraps;
 
 	MetaRoom() {}
@@ -65,7 +67,6 @@ class MetaRoom {
 
 	unsigned int id;
 
-	MetaRoom(int _x, int _y, int width, int height, const std::string& back, std::shared_ptr<creaturesImage> = std::shared_ptr<creaturesImage>(), bool wrap = false);
 	~MetaRoom();
 };
 

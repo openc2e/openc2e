@@ -118,7 +118,7 @@ std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is
 
 	// step two: try opening it in .c16 form first, then try .s16 form
 	std::string fname;
-	if (is_background) {
+	if (is_background && engine.version == 3) {
 		fname = std::string("Backgrounds/") + name;
 	} else {
 		fname = std::string("Images/") + name;
@@ -128,7 +128,7 @@ std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is
 	if (engine.bmprenderer) {
 		img = tryOpen(fname + ".bmp");
 	} else {
-		if (is_background) {
+		if (is_background && engine.version == 3) {
 			img = tryOpen(fname + ".blk");
 		} else {
 			img = tryOpen(fname + ".s16");
