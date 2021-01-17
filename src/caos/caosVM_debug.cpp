@@ -210,7 +210,6 @@ void c_MANN(caosVM* vm) {
 
 	bool found = false;
 	while (i->lookup_key) {
-		// TODO: this doesn't work for FACE at the moment due to hack elsewhere
 		if (cmd == i->fullname) {
 			found = true;
 			std::string d = i->docs;
@@ -221,7 +220,6 @@ void c_MANN(caosVM* vm) {
 				*vm->outputstream << "no documentation for " << cmd << std::endl
 								  << std::endl;
 		}
-
 		i++;
 	}
 
