@@ -55,8 +55,9 @@ bool agentIsVisible(Agent* seeing, Agent* a, float ownerx, float ownery, MetaRoo
 	Line dummywall;
 	unsigned int dummydir;
 	std::shared_ptr<Room> newroom = ownerroom;
-	world.map->collideLineWithRoomSystem(src, dest, newroom, src, dummywall, dummydir, seeing->perm);
-	if (src != dest)
+	Point where = src;
+	bool collision = world.map->collideLineWithRoomSystem(src, dest, newroom, where, dummywall, dummydir, seeing->perm);
+	if (collision && where != dest)
 		return false;
 
 	return true;
