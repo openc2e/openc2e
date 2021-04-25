@@ -109,6 +109,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/c16Image.cpp
 	src/fileformats/c2cobfile.cpp
 	src/fileformats/genomeFile.cpp
+	src/fileformats/hedfile.cpp
 	src/fileformats/mngfile.cpp
 	${GEN}/fileformats/mngparser.cpp
 	src/fileformats/peFile.cpp
