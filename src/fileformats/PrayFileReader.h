@@ -26,6 +26,8 @@
 
 class prayFileBlock;
 
+using PrayTagBlock = std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>>;
+
 class PrayFileReader {
   protected:
 	std::istream& stream;
@@ -40,5 +42,5 @@ class PrayFileReader {
 	std::string getBlockName(size_t index);
 	bool getBlockIsCompressed(size_t index);
 	std::vector<unsigned char> getBlockRawData(size_t index);
-	std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> getBlockTags(size_t i);
+	PrayTagBlock getBlockTags(size_t i);
 };
