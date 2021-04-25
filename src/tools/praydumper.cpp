@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 	std::string pray_source_filename = (output_directory / inputfile.stem()).string() + ".txt";
 	std::ofstream pray_source(pray_source_filename);
 	cout << "Writing \"" << pray_source_filename << "\"" << endl;
-	pray_source << "(- praydumper-generated PRAY file from '" << argv[0] << "' -)" << endl;
+	pray_source << "(- praydumper-generated PRAY file from '" << inputfile.filename().string() << "' -)" << endl;
 	pray_source << endl
 				<< "\"en-GB\"" << endl;
 
