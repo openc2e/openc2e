@@ -2153,7 +2153,9 @@ void c_BLCK(caosVM* vm) {
 	caos_assert(p);
 	std::shared_ptr<creaturesImage> img = p->getSprite();
 	caos_assert(img.get());
-	img->setBlockSize(width, height);
+	caos_assert(width > 0);
+	caos_assert(height > 0);
+	img->setBlockSize((unsigned int)width, (unsigned int)height);
 }
 
 /**

@@ -22,6 +22,7 @@
 #include "creaturesException.h"
 
 #include <memory>
+#include <stdio.h>
 
 creaturesImage::creaturesImage(std::string n) {
 	name = n;
@@ -119,9 +120,13 @@ bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned 
 	return false;
 }
 
-void creaturesImage::setBlockSize(int width, int height) {
+void creaturesImage::setBlockSize(unsigned int width, unsigned int height) {
 	if (images.size() != 1) {
 		throw creaturesException("Can't set block size on image with more than one frame");
+	}
+	if ((block_width || block_height) && (block_width != width || block_height != height)) {
+		printf("Warning: setting block size %ix%i on image '%s' that already has block size %ix%i\n",
+			width, height, name.c_str(), block_width, block_height);
 	}
 	block_width = width;
 	block_height = height;

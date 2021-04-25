@@ -53,7 +53,7 @@ class creaturesImage final {
 
 	bool transparentAt(unsigned int frame, unsigned int x, unsigned int y) const;
 
-	void setBlockSize(int width, int height);
+	void setBlockSize(unsigned int width, unsigned int height);
 	unsigned int getXOffsetForFrame(unsigned int frame) const;
 	unsigned int getYOffsetForFrame(unsigned int frame) const;
 

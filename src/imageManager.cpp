@@ -25,6 +25,7 @@
 #include "World.h"
 #include "creaturesException.h"
 #include "fileformats/ImageUtils.h"
+#include "fileformats/hedfile.h"
 #include "utils/mmapifstream.h"
 
 #include <array>
@@ -35,12 +36,6 @@
 #include <memory>
 
 using namespace ghc::filesystem;
-
-enum filetype { blk,
-	s16,
-	c16,
-	spr,
-	bmp };
 
 std::shared_ptr<creaturesImage> tryOpen(std::string fname) {
 	path realfile(world.findFile(fname));
@@ -127,6 +122,17 @@ std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is
 	std::shared_ptr<creaturesImage> img;
 	if (engine.bmprenderer) {
 		img = tryOpen(fname + ".bmp");
+		if (img && !is_background) {
+			path hedfilename(world.findFile("Images/" + name + ".hed"));
+			if (!hedfilename.empty()) {
+				hedfile hed = read_hedfile(hedfilename);
+				// TODO: hmm. should block size be per agent/part, instead of per loaded sprite?
+				img->setBlockSize(hed.frame_width, hed.frame_height);
+				if (img->numframes() != hed.numframes) {
+					std::cerr << hedfilename.string() << ": number of frames doesn't match\n";
+				}
+			}
+		}
 	} else {
 		if (is_background && engine.version == 3) {
 			img = tryOpen(fname + ".blk");
