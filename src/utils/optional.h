@@ -53,19 +53,15 @@ class optional {
 		return has_value_;
 	}
 	T& operator*() {
-		// needs std::launder in C++17
 		return *reinterpret_cast<T*>(&storage_);
 	}
 	const T& operator*() const {
-		// needs std::launder in C++17
 		return *reinterpret_cast<const T*>(&storage_);
 	}
 	T* operator->() {
-		// needs std::launder in C++17
 		return reinterpret_cast<T*>(&storage_);
 	}
 	const T* operator->() const {
-		// needs std::launder in C++17
 		return reinterpret_cast<const T*>(&storage_);
 	}
 
