@@ -202,7 +202,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 	Point oldpoint = where;
 	Line movement(src, dest);
 
-	Line x[4] = {room->left, room->right, room->top, room->bot};
+	Line x[4] = {room->left, room->right, room->top, room->bottom};
 	for (unsigned int i = 0; i < 4; i++) {
 		/*if (previousroom)
 			if (x[i].containsPoint(oldpoint)) continue; */

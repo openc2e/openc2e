@@ -377,7 +377,7 @@ bool Agent::fireScript(unsigned short event, Agent* from, caosValue one, caosVal
 			std::shared_ptr<Room> r = m->nextFloorFromPoint(x, y);
 			if (!r)
 				break;
-			moveTo(x, r->bot.pointAtX(x).y - getHeight());
+			moveTo(x, r->bottom.pointAtX(x).y - getHeight());
 
 			break;
 	}

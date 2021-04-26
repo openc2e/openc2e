@@ -495,7 +495,7 @@ void SkeletalCreature::snapDownFoot() {
 	if (engine.version == 2 && hadroom && y > newy) {
 		// TODO: hilar hack: cope with walking below floors
 		belowfloor = true;
-		newy = downfootroom->bot.pointAtX(footx).y;
+		newy = downfootroom->bottom.pointAtX(footx).y;
 	}
 
 	if (engine.version > 1) {

@@ -30,7 +30,7 @@ bool Room::containsPoint(float x, float y) {
 	if (x > (float)x_right || x < (float)x_left) {
 		return false;
 	}
-	if (bot.pointAtX(x).y < y) {
+	if (bottom.pointAtX(x).y < y) {
 		return false;
 	}
 	if (top.pointAtX(x).y > y) {
@@ -71,7 +71,7 @@ Room::Room(unsigned int x_l, unsigned int x_r, unsigned int y_l_t, unsigned int 
 	left = Line(ul, bl);
 	right = Line(ur, br);
 	top = Line(ul, ur);
-	bot = Line(bl, br);
+	bottom = Line(bl, br);
 
 	for (unsigned int i = 0; i < CA_COUNT; i++)
 		ca[i] = catemp[i] = 0.0f;
@@ -188,7 +188,7 @@ float Room::floorYatX(float x) {
 		}
 	}
 
-	return bot.pointAtX(x).y;
+	return bottom.pointAtX(x).y;
 }
 
 std::vector<std::pair<std::shared_ptr<Room>, RoomDoor>> Room::getDoors() {

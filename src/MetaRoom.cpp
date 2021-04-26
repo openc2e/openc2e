@@ -101,9 +101,9 @@ std::shared_ptr<Room> MetaRoom::nextFloorFromPoint(float x, float y) {
 	std::shared_ptr<Room> closest_up, closest_down;
 	float dist_down = -1, dist_up = -1;
 	for (auto& room : rooms) {
-		if (!room->bot.containsX(x))
+		if (!room->bottom.containsX(x))
 			continue;
-		float dist = room->bot.pointAtX(x).y - y; // down is positive
+		float dist = room->bottom.pointAtX(x).y - y; // down is positive
 		float absdist = fabs(dist);
 		if (dist >= 0 && (absdist < dist_down || dist_down < 0)) {
 			dist_down = absdist;

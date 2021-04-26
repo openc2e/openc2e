@@ -48,7 +48,7 @@ class Room {
 
 	std::vector<std::pair<unsigned int, unsigned int>> floorpoints;
 
-	Line left, right, top, bot;
+	Line left, right, top, bottom;
 	int type = 0;
 
 	// Creatures 2
