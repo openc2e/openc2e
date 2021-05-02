@@ -267,6 +267,7 @@ target_link_libraries(openc2e
 	imgui
 	imgui_sdl
 	SDL2::SDL2
+	${CMAKE_DL_LIBS}
 )
 
 add_executable(change_breed_slot src/tools/change_breed_slot.cpp)
