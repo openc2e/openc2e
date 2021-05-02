@@ -57,13 +57,11 @@ On Ubuntu 18.10 and up, you'll need these packages:
 ```bash
 sudo apt-get install \
   build-essential \
-  qtbase5-dev \
   libsdl2-dev \
   libsdl2-mixer-dev \
-  re2c\
   cmake\
-  bison\
-  libpng-dev
+  libpng-dev \
+  libutf8proc-dev
 ```
 
 ### macOS
