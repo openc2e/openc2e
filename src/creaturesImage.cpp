@@ -107,6 +107,11 @@ bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned 
 		return false;
 	}
 
+	// Docking Station's snotrock triggers this, as does something in Creatures Village.
+	// TODO: why does it happen??
+	if (x >= images[frame].width || y >= images[frame].height)
+		return true;
+
 	imageformat imgformat = format(frame);
 	if (imgformat == if_rgb565 || imgformat == if_rgb555) {
 		size_t offset = (y * width(frame)) + x;
