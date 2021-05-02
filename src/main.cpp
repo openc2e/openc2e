@@ -20,6 +20,7 @@
 
 #include "Engine.h"
 #include "backends/SDLBackend.h"
+#include "backtrace.h"
 #include "version.h"
 
 #include <iostream>
@@ -36,6 +37,8 @@
 #undef main
 
 extern "C" int main(int argc, char* argv[]) {
+	install_backtrace_printer();
+
 	std::string version;
 #ifdef DEV_BUILD
 	version = "development build";
