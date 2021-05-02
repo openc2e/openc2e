@@ -31,10 +31,7 @@
 #include <assert.h>
 #include <memory>
 
-void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> spr) {
-	std::shared_ptr<creaturesImage> backsprite;
-	unsigned int totalwidth, totalheight;
-
+void MetaRoom::addBackground(std::string back) {
 	caos_assert(!back.empty());
 	// TODO: cadv adds backgrounds which have already been added as the default, look into this,
 	// should we preserve the default once extra backgrounds have been added and change this to
@@ -42,17 +39,10 @@ void MetaRoom::addBackground(std::string back, std::shared_ptr<creaturesImage> s
 	if (backgrounds.find(back) != backgrounds.end())
 		return;
 
-	if (!spr) {
-		// we weren't passed a sprite, so we need to load one
-		backsprite = world.gallery->getImage(back, true);
-		totalwidth = std::max(wid, backsprite->width(0));
-		totalheight = std::max(hei, backsprite->height(0));
-	} else {
-		// we were provided with a sprite, so use it
-		backsprite = spr;
-		totalwidth = wid;
-		totalheight = hei;
-	}
+	// load the background sprite
+	std::shared_ptr<creaturesImage> backsprite = world.gallery->getBackground(back, wid, hei);
+	unsigned int totalwidth = std::max(wid, backsprite->width(0));
+	unsigned int totalheight = std::max(hei, backsprite->height(0));
 
 	// store the background
 	backgrounds[back] = backsprite;

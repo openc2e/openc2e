@@ -99,7 +99,7 @@ Image ToRGB24(const Image& oldimage) {
 bool IsBackground(const MultiImage& images) {
 	if (images.size() == 464 || images.size() == 928) {
 		for (const auto& image : images) {
-			if (image.width != 144 && image.height != 150) {
+			if (image.width != 144 || image.height != 150) {
 				return false;
 			}
 		}

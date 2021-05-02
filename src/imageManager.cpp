@@ -96,33 +96,89 @@ void imageManager::addImage(std::shared_ptr<creaturesImage> image) {
 	images[image->getName()] = image;
 }
 
+std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& name, unsigned int metaroom_width, unsigned int metaroom_height) {
+	if (name.empty())
+		return std::shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
+
+	// TODO: cache backgrounds
+	std::shared_ptr<creaturesImage> img;
+	if (engine.version == 1) {
+		img = tryOpen("Images/" + name + ".spr");
+		// TODO: do any C1 metarooms have non-standard sizes?
+		if (metaroom_width != 8352 || metaroom_height != 1200) {
+			throw creaturesException(fmt::format("Expected Creatures 1 metaroom size to be 5x5 but got {}x{}", metaroom_width, metaroom_height));
+		}
+		if (img) {
+			if (img->images.size() != 464) {
+				throw creaturesException(fmt::format("'{}.spr' is not a valid Creatures 1 background, expected 464 frames but got {}", name, img->images.size()));
+			}
+			for (const auto& frame : img->images) {
+				if (frame.width != 144 || frame.height != 150) {
+					throw creaturesException(fmt::format("'{}.spr' is not a valid Creatures 1 background, expected frame size to be 144x150 but got {}x{}", name, frame.width, frame.height));
+				}
+			}
+			img->images = {ImageUtils::StitchBackground(img->images)};
+		}
+	} else if (engine.version == 2) {
+		printf("here\n");
+		img = tryOpen("Images/" + name + ".s16");
+		// TODO: do any C2 metarooms have non-standard sizes?
+		if (metaroom_width != 8352 || metaroom_height != 2400) {
+			throw creaturesException(fmt::format("Expected Creatures 1 metaroom size to be 5x5 but got {}x{}", metaroom_width, metaroom_height));
+		}
+		if (img) {
+			if (img->images.size() != 928) {
+				throw creaturesException(fmt::format("'{}.s16' is not a valid Creatures 2 background, expected 928 frames but got {}", name, img->images.size()));
+			}
+			for (const auto& frame : img->images) {
+				if (frame.width != 144 || frame.height != 150) {
+					throw creaturesException(fmt::format("'{}.s16' is not a valid Creatures 2 background, expected frame size to be 144x150 but got {}x{}", name, frame.width, frame.height));
+				}
+			}
+			img->images = {ImageUtils::StitchBackground(img->images)};
+		}
+	} else if (engine.bmprenderer) {
+		img = tryOpen("Backgrounds/" + name + ".bmp");
+	} else if (engine.version == 3) {
+		img = tryOpen("Backgrounds/" + name + ".blk");
+	} else {
+		throw creaturesException("Don't know how to load backgrounds for current engine type");
+	}
+	if (!img) {
+		std::cerr << "imageGallery couldn't find the background '" << name << "'" << std::endl;
+	}
+	assert(img->images.size() == 1);
+	if (img->width(0) < metaroom_width || img->height(0) < metaroom_height) {
+		// Sea-Monkeys triggers this, because of course it does
+		fmt::print(stderr, "warning: background '{}' has size {}x{} but metaroom is size {}x{}\n", name, img->width(0), img->height(0), metaroom_width, metaroom_height);
+	}
+	return img;
+}
+
 /*
  * Retrieve an image for rendering use. To retrieve a sprite, pass the name without
  * extension. To retrieve a background, pass the full filename (ie, with .blk).
  */
-std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is_background) {
+std::shared_ptr<creaturesImage> imageManager::getImage(const std::string& name) {
 	if (name.empty())
 		return std::shared_ptr<creaturesImage>(); // empty sprites definitely don't exist
 
 	// step one: see if the image is already in the gallery
 	std::map<std::string, std::weak_ptr<creaturesImage> >::iterator i = images.find(name);
 	if (i != images.end() && i->second.lock()) {
-		if (!is_background)
-			return i->second.lock(); // TODO: handle backgrounds
+		return i->second.lock();
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
-	std::string fname;
-	if (is_background && engine.version == 3) {
-		fname = std::string("Backgrounds/") + name;
-	} else {
-		fname = std::string("Images/") + name;
-	}
-
+	const std::string fname = "Images/" + name;
 	std::shared_ptr<creaturesImage> img;
-	if (engine.bmprenderer) {
+	if (engine.version == 1) {
+		img = tryOpen(fname + ".spr");
+	} else if (engine.version == 2) {
+		img = tryOpen(fname + ".s16");
+	} else if (engine.bmprenderer) {
 		img = tryOpen(fname + ".bmp");
-		if (img && !is_background) {
+		if (img) {
 			path hedfilename(world.findFile("Images/" + name + ".hed"));
 			if (!hedfilename.empty()) {
 				hedfile hed = read_hedfile(hedfilename);
@@ -133,21 +189,17 @@ std::shared_ptr<creaturesImage> imageManager::getImage(std::string name, bool is
 				}
 			}
 		}
-	} else {
-		if (is_background && engine.version == 3) {
-			img = tryOpen(fname + ".blk");
-		} else {
+	} else if (engine.version == 3) {
+		img = tryOpen(fname + ".c16");
+		if (!img) {
 			img = tryOpen(fname + ".s16");
-			if (!img)
-				img = tryOpen(fname + ".c16");
-			if (!img)
-				img = tryOpen(fname + ".spr");
 		}
+	} else {
+		throw creaturesException("Don't know how to load sprites for current engine type");
 	}
 
 	if (img) {
-		if (!is_background) // TODO: handle backgrounds
-			images[name] = img;
+		images[name] = img;
 	} else {
 		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
 		return std::shared_ptr<creaturesImage>();

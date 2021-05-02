@@ -36,7 +36,8 @@ class imageManager {
   public:
 	void loadDefaultPalette();
 	shared_array<Color> getDefaultPalette();
-	std::shared_ptr<creaturesImage> getImage(std::string name, bool is_background = false);
+	std::shared_ptr<creaturesImage> getImage(const std::string& name);
+	std::shared_ptr<creaturesImage> getBackground(const std::string& name, unsigned int metaroom_width, unsigned int metaroom_height);
 	std::shared_ptr<creaturesImage> getCharsetDta(imageformat format, uint32_t bgcolor,
 		uint32_t textcolor, uint32_t aliascolor);
 	std::shared_ptr<creaturesImage> tint(const std::shared_ptr<creaturesImage>& image,

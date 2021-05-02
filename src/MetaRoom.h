@@ -54,7 +54,7 @@ class MetaRoom {
 	void setWraparound(bool w) { wraps = !!w; }
 
 	unsigned int addRoom(std::shared_ptr<class Room>);
-	void addBackground(std::string, std::shared_ptr<creaturesImage> = std::shared_ptr<creaturesImage>());
+	void addBackground(std::string);
 	std::shared_ptr<creaturesImage> getBackground(std::string);
 	std::vector<std::string> backgroundList();
 

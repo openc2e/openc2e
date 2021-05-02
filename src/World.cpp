@@ -412,36 +412,14 @@ void World::drawWorld(Camera* cam, RenderTarget* surface) {
 
 	assert(bkgd->numframes() > 0);
 
-	int sprwidth = bkgd->width(0);
-	int sprheight = bkgd->height(0);
-
-	// draw the blk
+	// draw the background
 	// TODO: clear the rendertarget background to black
-	unsigned int heightinsprites = m->fullheight() / sprheight;
-	unsigned int widthinsprites = m->fullwidth() / sprwidth;
-	for (unsigned int i = 0; i < heightinsprites; i++) {
-		for (int j = widthinsprites - 1; j >= 0; j--) { // reverse order, so wrapping always works
-			// figure out which block number to use
-			unsigned int whereweare = j * heightinsprites + i;
-
-			// make one pass for non-wraparound rooms, or two passes for wraparound ones
-			// TODO: implement this in a more sensible way, or at least optimise it
-			for (unsigned int z = 0; z < (m->wraparound() ? 2 : 1); z++) {
-				int destx = (j * sprwidth) - adjustx + m->x();
-				int desty = (i * sprheight) - adjusty + m->y();
-
-				// if we're on the second pass, render to the *right* of the normal area
-				if (z == 1)
-					destx += m->width();
-
-				// if the block's on screen, render it.
-				if ((destx >= -sprwidth) && (desty >= -sprheight) &&
-					(destx - sprwidth <= (int)surface->getWidth()) &&
-					(desty - sprheight <= (int)surface->getHeight())) {
-					surface->renderCreaturesImage(bkgd, whereweare, destx, desty);
-				}
-			}
-		}
+	const int destx = m->x() - adjustx;
+	const int desty = m->y() - adjusty;
+	surface->renderCreaturesImage(bkgd, 0, destx, desty);
+	if (m->wraparound()) {
+		// if we're on the second pass, render to the *right* of the normal area
+		surface->renderCreaturesImage(bkgd, 0, destx + m->width(), desty);
 	}
 
 	// render all the agents
