@@ -120,7 +120,6 @@ std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& n
 			img->images = {ImageUtils::StitchBackground(img->images)};
 		}
 	} else if (engine.version == 2) {
-		printf("here\n");
 		img = tryOpen("Images/" + name + ".s16");
 		// TODO: do any C2 metarooms have non-standard sizes?
 		if (metaroom_width != 8352 || metaroom_height != 2400) {
@@ -147,10 +146,12 @@ std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& n
 	if (!img) {
 		std::cerr << "imageGallery couldn't find the background '" << name << "'" << std::endl;
 	}
-	assert(img->images.size() == 1);
-	if (img->width(0) < metaroom_width || img->height(0) < metaroom_height) {
-		// Sea-Monkeys triggers this, because of course it does
-		fmt::print(stderr, "warning: background '{}' has size {}x{} but metaroom is size {}x{}\n", name, img->width(0), img->height(0), metaroom_width, metaroom_height);
+	if (img) {
+		assert(img->images.size() == 1);
+		if (img->width(0) < metaroom_width || img->height(0) < metaroom_height) {
+			// Sea-Monkeys triggers this, because of course it does
+			fmt::print(stderr, "warning: background '{}' has size {}x{} but metaroom is size {}x{}\n", name, img->width(0), img->height(0), metaroom_width, metaroom_height);
+		}
 	}
 	return img;
 }
