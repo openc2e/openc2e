@@ -82,7 +82,7 @@ void MainCamera::moveTo(int _x, int _y, panstyle pan) {
 	Camera::moveTo(_x, _y, pan);
 
 	for (auto& i : floated) {
-		assert(*i);
+		assert(i);
 		i->moveTo(i->x + xoffset, i->y + yoffset);
 	}
 }

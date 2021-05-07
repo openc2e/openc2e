@@ -27,6 +27,7 @@
 
 #include <algorithm> // sort
 #include <cassert>
+#include <fmt/core.h>
 #include <functional> // binary_function
 
 // the list of parts is a list of pointers to CompoundPart, so we need a custom sort
@@ -36,7 +37,10 @@ struct less_part : public std::binary_function<CompoundPart*, CompoundPart*, boo
 
 void CompoundAgent::addPart(CompoundPart* p) {
 	assert(p);
-	assert(!part(p->id)); // todo: handle better
+	if (part(p->id)) {
+		// todo: handle better
+		throw creaturesException(fmt::format("Added part with already-taken id {}\n", p->id));
+	}
 
 	// TODO: we should prbly insert at the right place, not call sort
 	parts.push_back(p);

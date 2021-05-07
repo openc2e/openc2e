@@ -83,6 +83,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
 endif()
 set(CMAKE_CXX_STANDARD 14)
 
+# make sure assert() works
+string(REPLACE "/DNDEBUG" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+string(REPLACE "-DNDEBUG" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+
 find_package(Threads REQUIRED) # stupid GCC needs explicit flags to use std::thread
 link_libraries(Threads::Threads)
 

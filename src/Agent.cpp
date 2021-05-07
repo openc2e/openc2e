@@ -190,7 +190,7 @@ void Agent::moveTo(float _x, float _y, bool force) {
 	}
 
 	for (auto& i : floated) {
-		assert(*i);
+		assert(i);
 		i->moveTo(i->x + xoffset, i->y + yoffset);
 	}
 

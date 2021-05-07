@@ -256,7 +256,7 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 			for (auto r = room->doors.begin(); r != room->doors.end(); r++) {
 				std::shared_ptr<Room> otherroom = r->first.lock();
 				assert(otherroom);
-				assert(r->second);
+				// assert(r->second);
 				if (otherroom->containsPoint(newx, newy)) {
 					// this is our next room!
 					foundroom = true;
