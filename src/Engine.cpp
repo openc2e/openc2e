@@ -754,9 +754,19 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 
 	// parse the command-line flags
 	cxxopts::Options desc("openc2e", "");
-	desc.add_options()("h,help", "Display help on command-line options")("V,version", "Display openc2e version")("s,silent", "Disable all sounds")("l,language", "Select the language; default is '" + language + "'", cxxopts::value<std::string>(language))("k,backend", available_backends, cxxopts::value<std::string>(preferred_backend))("o,audiobackend", available_audiobackends, cxxopts::value<std::string>(preferred_audiobackend))("d,data-path", "Sets or adds a path to a data directory",
-		cxxopts::value<std::vector<std::string>>(data_vec))("b,bootstrap", "Sets or adds a path or COS file to bootstrap from",
-		cxxopts::value<std::vector<std::string>>(cmdline_bootstrap))("g,gametype", "Set the game type (options: c1, c2, c3, cv, sm); if unspecified the engine will try to detect it automatically or fall back to c3", cxxopts::value<std::string>(gametype))("m,gamename", "Set the game name", cxxopts::value<std::string>(gamename))("n,norun", "Don't run the game, just execute scripts")("a,autokill", "Enable autokill")("autostop", "Enable autostop (or disable it, for CV)");
+	desc.add_options()("h,help", "Display help on command-line options");
+	desc.add_options()("V,version", "Display openc2e version");
+	desc.add_options()("s,silent", "Disable all sounds");
+	desc.add_options()("l,language", "Select the language; default is '" + language + "'", cxxopts::value<std::string>(language));
+	desc.add_options()("k,backend", available_backends, cxxopts::value<std::string>(preferred_backend));
+	desc.add_options()("o,audiobackend", available_audiobackends, cxxopts::value<std::string>(preferred_audiobackend));
+	desc.add_options()("d,data-path", "Sets or adds a path to a data directory", cxxopts::value<std::vector<std::string>>(data_vec));
+	desc.add_options()("b,bootstrap", "Sets or adds a path or COS file to bootstrap from", cxxopts::value<std::vector<std::string>>(cmdline_bootstrap));
+	desc.add_options()("g,gametype", "Set the game type (options: c1, c2, c3, cv, sm); if unspecified the engine will try to detect it automatically or fall back to c3", cxxopts::value<std::string>(gametype));
+	desc.add_options()("m,gamename", "Set the game name", cxxopts::value<std::string>(gamename));
+	desc.add_options()("n,norun", "Don't run the game, just execute scripts");
+	desc.add_options()("a,autokill", "Enable autokill");
+	desc.add_options()("autostop", "Enable autostop (or disable it, for CV)");
 	auto vm = desc.parse(argc, argv);
 	cmdline_enable_sound = !vm.count("silent");
 	cmdline_norun = vm.count("norun");
