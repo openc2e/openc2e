@@ -117,6 +117,7 @@ add_library(openc2e-fileformats STATIC
 	${GEN}/fileformats/Caos2PrayParser.cpp
 	${GEN}/fileformats/caoslexer.cpp
 	src/fileformats/caostoken.cpp
+	${GEN}/fileformats/cfgFile.cpp
 	src/fileformats/charsetdta.cpp
 	src/fileformats/c1cobfile.cpp
 	src/fileformats/c1defaultpalette.cpp
@@ -383,6 +384,13 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
 	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/caoslexer.cpp ${SRC}/src/fileformats/caoslexer.re2c.cpp
 	DEPENDS ${SRC}/src/fileformats/caoslexer.re2c.cpp
+	WORKING_DIRECTORY ${SRC})
+
+add_custom_command(
+	OUTPUT ${GEN}/fileformats/cfgFile.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/cfgFile.cpp ${SRC}/src/fileformats/cfgFile.re2c.cpp
+	DEPENDS ${SRC}/src/fileformats/cfgFile.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
