@@ -102,8 +102,9 @@ add_library(openc2e-utils STATIC
 	src/utils/readfile.cpp
 	src/utils/string_in.cpp
 	src/utils/userlocale.cpp
+	src/utils/case_insensitive_filesystem.cpp
 )
-target_link_libraries(openc2e-utils PRIVATE utf8proc::utf8proc)
+target_link_libraries(openc2e-utils PRIVATE ghc_filesystem utf8proc::utf8proc)
 
 add_library(openc2e-utils-socket STATIC
 	src/utils/socket.cpp # separate because it links to Ws2_32.lib
