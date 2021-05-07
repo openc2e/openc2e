@@ -24,6 +24,7 @@
 #include "Engine.h"
 #include "Map.h"
 #include "MetaRoom.h"
+#include "PathResolver.h"
 #include "Room.h"
 #include "Scriptorium.h"
 #include "SoundManager.h"
@@ -35,6 +36,7 @@
 #include "caosVM.h"
 #include "caos_assert.h"
 #include "creaturesImage.h"
+#include "utils/namedifstream.h"
 
 #include <cassert>
 #include <fmt/core.h>
@@ -1563,12 +1565,12 @@ void Agent::join(unsigned int outid, AgentRef dest, unsigned int inid) {
 
 void Agent::setVoice(std::string name) {
 	if (engine.version < 3) {
-		std::string path = world.findFile(name + ".vce");
-		if (!path.size())
-			throw creaturesException(fmt::format("can't find {}.vce", name));
-		std::ifstream f(path.c_str());
-		if (!f.is_open())
+		namedifstream f = openVoiceFile(name + ".vce");
+		if (!f.is_open() && f.fail()) {
 			throw creaturesException(fmt::format("can't open {}.vce", name));
+		} else if (!f.is_open()) {
+			throw creaturesException(fmt::format("can't find {}.vce", name));
+		}
 		voice = std::shared_ptr<VoiceData>(new VoiceData(f));
 	} else {
 		voice = std::shared_ptr<VoiceData>(new VoiceData(name));

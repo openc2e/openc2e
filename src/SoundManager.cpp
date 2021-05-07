@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 #include "Map.h"
+#include "PathResolver.h"
 #include "World.h"
 #include "caosValue.h"
 
@@ -155,7 +156,7 @@ Sound SoundManager::playSound(std::string name, bool loop) {
 	if (name.size() == 0)
 		return {};
 
-	std::string filename = world.findFile(fmt::format("Sounds/{}.wav", name));
+	std::string filename = findSoundFile(name + ".wav");
 	if (filename.size() == 0) {
 		if (engine.version < 3)
 			return {}; // creatures 1 and 2 ignore non-existent audio clips
@@ -175,7 +176,7 @@ Sound SoundManager::playVoice(std::string name) {
 	if (name.size() == 0)
 		return {};
 
-	std::string filename = world.findFile(fmt::format("Sounds/{}.wav", name));
+	std::string filename = findSoundFile(name + ".wav");
 	if (filename.size() == 0) {
 		if (engine.version < 3)
 			return {}; // creatures 1 and 2 ignore non-existent audio clips

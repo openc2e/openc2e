@@ -37,8 +37,20 @@
 
 using namespace ghc::filesystem;
 
-std::shared_ptr<creaturesImage> tryOpen(std::string fname) {
-	path realfile(world.findFile(fname));
+std::shared_ptr<creaturesImage> tryOpenImage(std::string fname) {
+	path realfile(findImageFile(fname));
+	std::string basename = realfile.filename().stem();
+
+	if (exists(realfile)) {
+		auto img = std::make_shared<creaturesImage>(basename);
+		img->images = ImageUtils::ReadImage(realfile);
+		return img;
+	}
+	return {};
+}
+
+std::shared_ptr<creaturesImage> tryOpenBackground(std::string fname) {
+	path realfile(findBackgroundFile(fname));
 	std::string basename = realfile.filename().stem();
 
 	if (exists(realfile)) {
@@ -53,7 +65,7 @@ void imageManager::loadDefaultPalette() {
 	if (engine.gametype == "c1") {
 		std::cout << "* Loading palette.dta..." << std::endl;
 		// TODO: case-sensitivity for the lose
-		path palpath(world.findFile("Palettes/palette.dta"));
+		path palpath(findMainDirectoryFile("Palettes/palette.dta"));
 		if (exists(palpath) && !is_directory(palpath)) {
 			std::ifstream f(palpath.string().c_str(), std::ios::binary);
 			f >> std::noskipws;
@@ -103,7 +115,7 @@ std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& n
 	// TODO: cache backgrounds
 	std::shared_ptr<creaturesImage> img;
 	if (engine.version == 1) {
-		img = tryOpen("Images/" + name + ".spr");
+		img = tryOpenImage(name + ".spr");
 		// TODO: do any C1 metarooms have non-standard sizes?
 		if (metaroom_width != 8352 || metaroom_height != 1200) {
 			throw creaturesException(fmt::format("Expected Creatures 1 metaroom size to be 5x5 but got {}x{}", metaroom_width, metaroom_height));
@@ -120,7 +132,7 @@ std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& n
 			img->images = {ImageUtils::StitchBackground(img->images)};
 		}
 	} else if (engine.version == 2) {
-		img = tryOpen("Images/" + name + ".s16");
+		img = tryOpenImage(name + ".s16");
 		// TODO: do any C2 metarooms have non-standard sizes?
 		if (metaroom_width != 8352 || metaroom_height != 2400) {
 			throw creaturesException(fmt::format("Expected Creatures 1 metaroom size to be 5x5 but got {}x{}", metaroom_width, metaroom_height));
@@ -137,9 +149,9 @@ std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& n
 			img->images = {ImageUtils::StitchBackground(img->images)};
 		}
 	} else if (engine.bmprenderer) {
-		img = tryOpen("Backgrounds/" + name + ".bmp");
+		img = tryOpenBackground(name + ".bmp");
 	} else if (engine.version == 3) {
-		img = tryOpen("Backgrounds/" + name + ".blk");
+		img = tryOpenBackground(name + ".blk");
 	} else {
 		throw creaturesException("Don't know how to load backgrounds for current engine type");
 	}
@@ -171,16 +183,15 @@ std::shared_ptr<creaturesImage> imageManager::getImage(const std::string& name) 
 	}
 
 	// step two: try opening it in .c16 form first, then try .s16 form
-	const std::string fname = "Images/" + name;
 	std::shared_ptr<creaturesImage> img;
 	if (engine.version == 1) {
-		img = tryOpen(fname + ".spr");
+		img = tryOpenImage(name + ".spr");
 	} else if (engine.version == 2) {
-		img = tryOpen(fname + ".s16");
+		img = tryOpenImage(name + ".s16");
 	} else if (engine.bmprenderer) {
-		img = tryOpen(fname + ".bmp");
+		img = tryOpenImage(name + ".bmp");
 		if (img) {
-			path hedfilename(world.findFile("Images/" + name + ".hed"));
+			path hedfilename(findImageFile(name + ".hed"));
 			if (!hedfilename.empty()) {
 				hedfile hed = read_hedfile(hedfilename);
 				// TODO: hmm. should block size be per agent/part, instead of per loaded sprite?
@@ -191,9 +202,9 @@ std::shared_ptr<creaturesImage> imageManager::getImage(const std::string& name) 
 			}
 		}
 	} else if (engine.version == 3) {
-		img = tryOpen(fname + ".c16");
+		img = tryOpenImage(name + ".c16");
 		if (!img) {
-			img = tryOpen(fname + ".s16");
+			img = tryOpenImage(name + ".s16");
 		}
 	} else {
 		throw creaturesException("Don't know how to load sprites for current engine type");
@@ -219,9 +230,9 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 	(void)bgcolor;
 	(void)aliascolor;
 
-	std::string filename = world.findFile("Images/EuroCharset.dta");
+	std::string filename = findImageFile("EuroCharset.dta");
 	if (filename.empty()) {
-		filename = world.findFile("Images/CHARSET.DTA");
+		filename = findImageFile("CHARSET.DTA");
 	}
 	if (filename.empty()) {
 		return {};

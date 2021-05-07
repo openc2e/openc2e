@@ -3,6 +3,7 @@
 #include "creaturesImage.h"
 #include "imageManager.h"
 #include "utils/readfile.h"
+#include "PathResolver.h"
 #include "World.h"
 
 #include <gtest/gtest.h>
@@ -52,13 +53,13 @@ TEST(caos, assert) {
 }
 TEST(caos, file) {
     struct auto_data_directories {
-        decltype(world.data_directories) data_directories;
+        decltype(data_directories) original_data_directories;
         auto_data_directories() {
-            data_directories = world.data_directories;
-            world.data_directories = { "." };
+            original_data_directories = data_directories;
+            data_directories = { DataDirectory(".") };
         }
         ~auto_data_directories() {
-            world.data_directories = data_directories;
+            data_directories = original_data_directories;
         }
     } auto_directories;
     run_script("c3", readfile("../tests/file.cos"));

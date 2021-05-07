@@ -18,6 +18,7 @@
  */
 
 
+#include "PathResolver.h"
 #include "World.h"
 #include "caosVM.h"
 #include "caos_assert.h"
@@ -29,12 +30,13 @@
 #include <sstream>
 namespace fs = ghc::filesystem;
 
-std::string calculateJournalFilename(int directory, std::string filename, bool writable) {
+static fs::path calculateJournalFilename(int directory, std::string filename) {
 	// sanitise string: remove leading dots, replace slashes with underscores
 	// todo: check DS behaviour for backslashes (a problem on Windows)
 	std::string::size_type r;
 	while ((r = filename.find("/", 0)) != std::string::npos)
 		filename.replace(r, 1, "_");
+
 	for (unsigned int i = 0; i < filename.size(); i++) {
 		if (filename[i] == '.') {
 			filename.erase(i, 1);
@@ -43,33 +45,12 @@ std::string calculateJournalFilename(int directory, std::string filename, bool w
 			break;
 	}
 
-	std::string fullfilename;
-
-	// TODO: point at the correct journal directories!
-
-	if (!writable) {
-		// search all directories for a readable file
-		fullfilename = world.findFile("Journal/" + filename);
-
-		// if we found one, return that
-		if (fullfilename.size())
-			return fullfilename;
-	}
-
-	// otherwise, we should always write to the journal directory
 	switch (directory) {
-		case 0: fullfilename = world.getUserDataDir() + "/Journal/"; break;
-		case 1: fullfilename = world.getUserDataDir() + "/Journal/"; break;
-		case 2: fullfilename = world.getUserDataDir() + "/Journal/"; break;
+		case 0: return getCurrentWorldJournalPath(filename);
+		case 1: return getMainJournalPath(filename);
+		case 2: return getOtherWorldJournalPath(filename);
 		default: throw caosException("unknown Journal directory");
 	}
-
-	fs::path dir = fs::path(fullfilename);
-	if (!fs::exists(dir))
-		fs::create_directory(dir);
-	caos_assert(fs::exists(dir) && fs::is_directory(dir));
-
-	return fullfilename + filename;
 }
 
 /**
@@ -87,22 +68,15 @@ void c_FILE_GLOB(caosVM* vm) {
 	VM_PARAM_STRING(filespec)
 	VM_PARAM_INTEGER(directory)
 
-	std::string::size_type n = filespec.find_last_of("/\\") + 1;
-	std::string dirportion;
-	dirportion.assign(filespec, 0, n);
-	std::string specportion;
-	specportion.assign(filespec, n, filespec.size() - n);
-
-	if (directory == 1)
-		dirportion = "Journal/" + dirportion;
-	else
+	if (directory != 1) {
 		throw creaturesException("whoops, openc2e doesn't support FILE GLOB in world journal directory yet, bug fuzzie");
+	}
 
-	std::vector<std::string> possiblefiles = world.findFiles(dirportion, specportion);
+	std::vector<fs::path> possiblefiles = findJournalFiles(filespec);
 
 	std::string str = fmt::format("{}\n", possiblefiles.size());
 	for (auto& possiblefile : possiblefiles) {
-		str += possiblefile + "\n";
+		str += possiblefile.string() + "\n";
 	}
 
 	vm->inputstream = new std::istringstream(str);
@@ -135,7 +109,7 @@ void c_FILE_IOPE(caosVM* vm) {
 
 	c_FILE_ICLO(vm);
 
-	std::string fullfilename = calculateJournalFilename(directory, filename, false);
+	std::string fullfilename = calculateJournalFilename(directory, filename);
 	vm->inputstream = new std::ifstream(fullfilename.c_str());
 
 	if (vm->inputstream->fail()) {
@@ -155,7 +129,7 @@ void c_FILE_JDEL(caosVM* vm) {
 	VM_PARAM_STRING(filename)
 	VM_PARAM_INTEGER(directory)
 
-	std::string fullfilename = calculateJournalFilename(directory, filename, true);
+	std::string fullfilename = calculateJournalFilename(directory, filename);
 
 	// TODO
 }
@@ -199,7 +173,7 @@ void c_FILE_OOPE(caosVM* vm) {
 
 	c_FILE_OCLO(vm);
 
-	std::string fullfilename = calculateJournalFilename(directory, filename, true);
+	std::string fullfilename = calculateJournalFilename(directory, filename);
 
 	if (append)
 		vm->outputstream = new std::ofstream(fullfilename.c_str(), std::ios::app);

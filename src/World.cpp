@@ -549,11 +549,10 @@ void World::executeBootstrap(bool switcher) {
 		if (data_directories.size() == 0)
 			throw creaturesException("C1/2 can't run without data directories!");
 
-		// TODO: case-sensitivity for the lose
-		auto edenpath = fs::path(data_directories[0]) / "Eden.sfc";
+		std::string edenpath = findMainDirectoryFile("Eden.sfc");
 		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
 			SFCFile sfc;
-			std::ifstream f(edenpath.string().c_str(), std::ios::binary);
+			std::ifstream f(edenpath.c_str(), std::ios::binary);
 			f >> std::noskipws;
 			sfc.read(&f);
 			sfc.copyToWorld();
@@ -566,86 +565,28 @@ void World::executeBootstrap(bool switcher) {
 	std::multimap<std::string, fs::path> bootstraps;
 
 	if (switcher) {
-		for (auto p : data_directories) {
-			// TODO: cvillage has switcher code in 'Startup', so i included it here too
-			if (fs::exists(fs::path(p) / "Bootstrap" / "000 Switcher")) {
-				executeBootstrap(fs::path(p) / "Bootstrap" / "000 Switcher");
-				return;
-			}
-			if (fs::exists(fs::path(p) / "Bootstrap" / "Startup")) {
-				executeBootstrap(fs::path(p) / "Bootstrap" / "Startup");
-				return;
+		executeBootstrap(getWorldSwitcherBootstrapDirectory());
+	} else {
+		if (engine.version == 3) {
+			if (!catalogue.hasTag("patch_level")) {
+				// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
+				engine.eame_variables["engine_no_auxiliary_bootstrap_1"] = caosValue(1);
 			}
 		}
-		throw creaturesException("couldn't find '000 Switcher' or 'Startup' bootstrap directory");
-	}
 
-	for (auto dd : data_directories) {
-		assert(fs::exists(dd));
-		assert(fs::is_directory(dd));
-		auto b = fs::path(dd) / "Bootstrap/";
-		if (fs::exists(b) && fs::is_directory(b)) {
-			fs::directory_iterator fsend;
-			// iterate through each bootstrap directory
-			for (fs::directory_iterator d(b); d != fsend; ++d) {
-				if (fs::exists(*d) && fs::is_directory(*d)) {
-					std::string s = d->path().filename().string();
-					if (s == "000 Switcher" || s == "Startup") {
-						continue;
-					}
-
-					bootstraps.insert(std::pair<std::string, fs::path>(s, *d));
-				}
-			}
+		for (auto d : getBootstrapDirectories()) {
+			printf("* Executing scripts from: %s\n", d.string().c_str());
+			executeBootstrap(d);
 		}
-	}
-
-	for (auto& bootstrap : bootstraps) {
-		executeBootstrap(bootstrap.second);
 	}
 }
 
 void World::initCatalogue() {
-	for (auto d : data_directories) {
-		assert(fs::exists(d));
-		assert(fs::is_directory(d));
-
-		auto c = fs::path(d) / "Catalogue/";
-		if (fs::exists(c) && fs::is_directory(c))
-			catalogue.initFrom(c, engine.language);
+	auto dirs = getCatalogueDirectories();
+	for (auto it = dirs.rbegin(); it != dirs.rend(); ++it) {
+		if (fs::exists(*it) && fs::is_directory(*it))
+			catalogue.initFrom(*it, engine.language);
 	}
-}
-
-std::string World::findFile(std::string name) {
-	// Go backwards, so we find files in more 'modern' directories first..
-	for (int i = data_directories.size() - 1; i != -1; i--) {
-		std::string resolved = resolveFile(fs::path(data_directories[i]) / name);
-		if (!resolved.empty()) {
-			return resolved;
-		}
-	}
-	return "";
-}
-
-std::vector<std::string> World::findFiles(std::string dir, std::string wild) {
-	std::vector<std::string> possibles;
-
-	// Go backwards, so we find files in more 'modern' directories first..
-	for (int i = data_directories.size() - 1; i != -1; i--) {
-		fs::path p = data_directories[i];
-		std::string r = (p / fs::path(dir)).string();
-		std::vector<std::string> results = findByWildcard(r, wild);
-		possibles.insert(possibles.end(), results.begin(), results.end()); // merge results
-	}
-
-	return possibles;
-}
-
-std::string World::getUserDataDir() {
-	if (data_directories.size() == 0) {
-		throw creaturesException("Can't get user data directory when there are no data directories");
-	}
-	return data_directories.back();
 }
 
 void World::selectCreature(std::shared_ptr<Agent> a) {
@@ -666,13 +607,13 @@ void World::selectCreature(std::shared_ptr<Agent> a) {
 }
 
 std::shared_ptr<genomeFile> World::loadGenome(std::string& genefile) {
-	std::vector<std::string> possibles = findFiles("Genetics/", genefile + ".gen");
+	std::vector<fs::path> possibles = findGeneticsFiles(genefile + ".gen");
 	if (possibles.empty())
 		return std::shared_ptr<genomeFile>();
-	genefile = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
+	auto filename = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
 
 	std::shared_ptr<genomeFile> p(new genomeFile());
-	std::ifstream gfile(genefile.c_str(), std::ios::binary);
+	std::ifstream gfile(filename, std::ios::binary);
 	caos_assert(gfile.is_open());
 	gfile >> std::noskipws;
 	gfile >> *(p.get());

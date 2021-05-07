@@ -25,7 +25,6 @@
 #include <ghc/filesystem.hpp>
 #include <iostream>
 #include <istream>
-#include <list>
 #include <map>
 #include <string>
 #include <vector>
@@ -63,7 +62,7 @@ class Catalogue {
 	void addFile(ghc::filesystem::path path);
 	void initFrom(ghc::filesystem::path path, std::string language);
 
-	void addVals(std::string& title, bool override, const std::list<std::string>& vals);
+	void addVals(std::string& title, bool override, const std::vector<std::string>& vals);
 };
 
 extern Catalogue catalogue;

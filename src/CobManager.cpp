@@ -7,6 +7,7 @@
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "utils/ascii_tolower.h"
+#include "utils/case_insensitive_filesystem.h"
 #include "utils/find_if.h"
 
 #include <algorithm>
@@ -18,15 +19,13 @@ namespace fs = ghc::filesystem;
 void CobManager::update() {
 	objects.clear();
 
-	std::string directory = "";
-	if (engine.version == 2) {
-		directory = "Objects";
-	}
-	for (auto cob : world.findFiles(directory, "*.cob")) {
+	for (auto cob : findCobFiles("*.cob")) {
 		if (engine.version == 1) {
 			c1cobfile cobfile = read_c1cobfile(cob);
 			objects.emplace_back(cobfile.name, cob);
-			if (world.findFile(fs::path(cob).stem().string() + ".rcb").size()) {
+			auto rcb = cob;
+			rcb.replace_extension("rcb");
+			if (!findCobFile(rcb).empty()) {
 				objects.back().is_removable = true;
 			}
 		} else if (engine.version == 2) {
@@ -97,15 +96,15 @@ void CobManager::inject(const CobFileInfo& info) {
 			std::string depname = a.depnames[i];
 
 			fs::path resourcedir;
-			switch (deptype) {
-				case 0: resourcedir = "Images/"; break;
-				case 1: resourcedir = "Sounds/"; break;
-				default:
-					throw creaturesException("Unknown dependency type " + std::to_string(deptype));
+			if (deptype == 0) {
+				if (!findImageFile(depname).empty())
+					continue; // TODO: update file if necessary?
+			} else if (deptype == 1) {
+				if (!findSoundFile(depname).empty())
+					continue; // TODO: update file if necessary?
+			} else {
+				throw creaturesException("Unknown dependency type " + std::to_string(deptype));
 			}
-
-			if (world.findFile(resourcedir / depname).size())
-				continue; // TODO: update file if necessary?
 
 			auto depBlock = find_if(cobfile.blocks, [&](auto& b) {
 				return b->type == "file" && cobFileBlock(b).filetype == deptype && cobFileBlock(b).filename == depname;
@@ -115,16 +114,15 @@ void CobManager::inject(const CobFileInfo& info) {
 			}
 			cobFileBlock f(*depBlock);
 
-			fs::path dir = fs::path(world.getUserDataDir()) / resourcedir;
-			if (!fs::exists(dir)) {
-				fs::create_directory(dir);
+			std::ofstream output;
+			if (deptype == 0) {
+				output = createUserImageFile(depname);
+			} else if (deptype == 1) {
+				output = createUserSoundFile(depname);
+			} else {
+				throw creaturesException("Unknown dependency type " + std::to_string(deptype));
 			}
-			assert(fs::exists(dir) && fs::is_directory(dir)); // TODO: error handling
 
-			std::string outputfile = dir / depname;
-			assert(!fs::exists(outputfile));
-
-			std::ofstream output(outputfile, std::ios::binary);
 			output.write((char*)f.getFileContents(), f.filesize);
 		}
 
@@ -144,7 +142,7 @@ void CobManager::inject(const CobFileInfo& info) {
 void CobManager::remove(const CobFileInfo& info) {
 	std::string rdata;
 	if (engine.version == 1) {
-		std::string rcbpath = world.findFile(fs::path(info.filename).stem().string() + ".rcb");
+		std::string rcbpath = findCobFile(fs::path(info.filename).stem().string() + ".rcb");
 		c1cobfile cobfile = read_c1cobfile(rcbpath);
 		for (auto s : cobfile.install_scripts) {
 			rdata += s + "\n";

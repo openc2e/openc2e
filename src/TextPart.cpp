@@ -13,6 +13,7 @@ TextPart::TextPart(Agent* p, unsigned int _id, std::string spritefile, unsigned 
 	: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = world.gallery->getImage(fontsprite);
 	caos_assert(textsprite);
+	// TODO: Creatures 3's WhiteOnTransparentPasswordChars.s16 has only 96 frames (which matches ASCII printable characters + 0x7f/DEL)
 	caos_assert(textsprite->numframes() == 224);
 
 	leftmargin = 8;

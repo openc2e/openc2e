@@ -46,7 +46,7 @@ int cataparse() {
 			token = Catalogue::catalex();
 		}
 
-		std::list<std::string> strings;
+		std::vector<std::string> strings;
 		while (true) {
 			if (token != CTOK_STR) {
 				break;

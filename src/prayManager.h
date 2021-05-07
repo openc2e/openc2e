@@ -73,8 +73,6 @@ class prayManager {
 	~prayManager();
 
 	void update();
-
-	static std::string getResourceDir(unsigned int id);
 };
 
 #endif

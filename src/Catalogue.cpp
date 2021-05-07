@@ -64,17 +64,19 @@ int cat_int = -1;
 
 Catalogue* parsing_cat = NULL;
 
-void Catalogue::addVals(std::string& title, bool override, const std::list<std::string>& vals) {
-	// TODO: how the heck does override work? DS has an "Option Text" tag which has to overwrite the C3 one, so commenting this out for now..
+void Catalogue::addVals(std::string& title, bool override, const std::vector<std::string>& vals) {
+	// TODO: how the heck does override work?
+	// There seem to be three groups of conflicting tags:
+	// (1) Tags with the same value. Some are marked OVERRIDE, some aren't.
+	// (2) Tags in Docking Station that have additional values on the end. None of these are marked OVERRIDE.
+	// (3) Tags with OVERRIDE. These only appear in Docking Station.
+
 	(void) override;
 	/*if (data.find(title) != data.end() && !override)
 		return; // XXX: ?*/
 	data[title].clear();
 	//	copy(vals.begin(), vals.end(), data[title].begin());
-	std::list<std::string>::const_iterator i = vals.begin();
-	while (i != vals.end()) {
-		data[title].push_back(*i++);
-	}
+	data[title] = vals;
 }
 
 
@@ -103,7 +105,7 @@ void Catalogue::addFile(fs::path path) {
 	assert(!fs::is_directory(path));
 
 	try {
-		fs::ifstream f(path);
+		std::ifstream f(path);
 		f >> *this;
 	} catch (const catalogueException& ex) {
 		std::cerr << "Error reading catalogue file " << path.string() << ":" << std::endl

@@ -7,6 +7,7 @@
 #include "Hatchery.h"
 #include "ImGuiUtils.h"
 #include "MusicManager.h"
+#include "PathResolver.h"
 #include "PointerAgent.h"
 #include "SoundManager.h"
 #include "World.h"
@@ -25,7 +26,7 @@ namespace Openc2eImgui {
 
 static void NewDebugNorn() {
 	if (engine.version == 3 && engine.gametype != "sm") {
-		auto possibles = world.findFiles("Genetics/", "*.gen");
+		auto possibles = findGeneticsFiles("*.gen");
 		if (possibles.size() == 0) {
 			return;
 		}

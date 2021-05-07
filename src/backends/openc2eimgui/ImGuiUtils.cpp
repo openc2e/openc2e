@@ -2,6 +2,7 @@
 
 #include "Backend.h"
 #include "Engine.h"
+#include "PathResolver.h"
 #include "World.h"
 #include "fileformats/ImageUtils.h"
 #include "fileformats/peFile.h"
@@ -30,7 +31,7 @@ Texture GetTextureFromExeFileWithTransparentTopLeft(uint32_t resource) {
 }
 
 std::vector<Texture> LoadImageWithTransparentTopLeft(const std::string& name) {
-	std::string path = world.findFile(name);
+	std::string path = findMainDirectoryFile(name);
 	if (path.empty()) {
 		return {};
 	}

@@ -18,6 +18,7 @@
  */
 
 #include "Engine.h"
+#include "PathResolver.h"
 #include "World.h"
 #include "caosVM.h"
 #include "caos_assert.h"
@@ -409,7 +410,7 @@ void v_TOKN(caosVM* vm) {
 void v_OC2E_DDIR(caosVM* vm) {
 	std::string d;
 
-	for (auto p : world.data_directories) {
+	for (auto p : getMainDirectories()) {
 		d += fs::absolute(p).string() + "\n";
 	}
 

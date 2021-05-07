@@ -72,7 +72,6 @@ class World {
 	std::map<unsigned int, std::map<unsigned int, cainfo> > carates;
 	std::map<std::string, caosValue> variables;
 
-	std::vector<std::string> data_directories;
 	std::unique_ptr<Scriptorium> scriptorium;
 	std::unique_ptr<prayManager> praymanager;
 	std::unique_ptr<imageManager> gallery;
@@ -112,10 +111,6 @@ class World {
 	void executeInitScript(std::string p);
 	void executeBootstrap(std::string p);
 	void executeBootstrap(bool switcher);
-
-	std::string getUserDataDir();
-	std::string findFile(std::string path);
-	std::vector<std::string> findFiles(std::string dir, std::string wild);
 
 	void newMoniker(std::shared_ptr<genomeFile> g, std::string genefile, AgentRef agent);
 	std::shared_ptr<genomeFile> loadGenome(std::string& filename);

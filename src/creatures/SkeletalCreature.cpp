@@ -34,12 +34,14 @@
 #include "Engine.h"
 #include "Map.h"
 #include "MetaRoom.h"
+#include "PathResolver.h"
 #include "Room.h"
 #include "World.h"
 #include "caosValue.h"
 #include "caos_assert.h"
 #include "creaturesImage.h"
 #include "imageManager.h"
+#include "utils/namedifstream.h"
 
 #include <cassert>
 #include <fmt/core.h>
@@ -231,24 +233,23 @@ void SkeletalCreature::skeletonInit() {
 			throw creaturesException(fmt::format("SkeletalCreature couldn't find an image for part {:c} of species {}, variant {}, stage {}", x, (int)partspecies, (int)partvariant, (int)creature->getStage()));
 
 		// find relevant ATT data
-		std::string attfilename;
+		namedifstream attfile;
 		int var = partvariant;
-		while (var > -1 && attfilename.empty()) {
+		while (var > -1 && !attfile.is_open()) {
 			int stage_to_try = creature->getStage();
-			while (stage_to_try > -1 && attfilename.empty()) {
-				attfilename = world.findFile(std::string("Body Data/") + x + dataString(stage_to_try, false, spe, var) + ".att");
+			while (stage_to_try > -1 && !attfile.is_open()) {
+				attfile = openBodyDataFile(x + dataString(stage_to_try, false, spe, var) + ".att");
 				stage_to_try--;
 			}
 			var--;
 		}
-		if (attfilename.empty())
+		if (!attfile.is_open())
 			throw creaturesException(fmt::format("SkeletalCreature couldn't find body data for part {:c} of species {}, variant {}, stage {}", x, (int)partspecies, (int)partvariant, creature->getStage()));
 
 		// load ATT file
-		std::ifstream in(attfilename.c_str());
-		if (in.fail())
-			throw creaturesException(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attfilename));
-		in >> att[i];
+		if (attfile.fail())
+			throw creaturesException(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attfile.name().string()));
+		attfile >> att[i];
 
 		images[i] = tintBodySprite(images[i]);
 	}

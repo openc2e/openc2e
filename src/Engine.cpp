@@ -25,6 +25,7 @@
 #include "MetaRoom.h"
 #include "MusicManager.h"
 #include "NetBackend.h"
+#include "PathResolver.h"
 #include "PointerAgent.h"
 #include "Room.h"
 #include "SFCFile.h"
@@ -234,7 +235,7 @@ void Engine::loadGameData() {
 
 	// load word list for C2
 	if (gametype == "c2") {
-		fs::path exepath(world.findFile("Creatures2.exe"));
+		fs::path exepath(findMainDirectoryFile("Creatures2.exe"));
 		if (fs::exists(exepath) && !fs::is_directory(exepath)) {
 			try {
 				exefile = new peFile(exepath);
@@ -836,7 +837,7 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 		if (!fs::exists(datadir)) {
 			throw creaturesException("data path '" + i + "' doesn't exist");
 		}
-		world.data_directories.push_back(datadir);
+		data_directories.push_back(datadir);
 	}
 
 	// make a vague attempt at blacklisting some characters inside the gamename
@@ -851,22 +852,22 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 }
 
 bool Engine::initialSetup() {
-	assert(world.data_directories.size() > 0);
+	assert(data_directories.size() > 0);
 
 	// autodetect gametype if necessary
 	if (gametype.empty()) {
 		std::string msg = "Warning: No gametype specified, ";
 		// TODO: is this sane? especially unsure about about.exe
-		if (!world.findFile("Creatures.exe").empty()) {
+		if (!findMainDirectoryFile("Creatures.exe").empty()) {
 			msg += "found Creatures.exe, assuming C1 (c1)";
 			gametype = "c1";
-		} else if (!world.findFile("Creatures2.exe").empty()) {
+		} else if (!findMainDirectoryFile("Creatures2.exe").empty()) {
 			msg += "found Creatures2.exe, assuming C2 (c2)";
 			gametype = "c2";
-		} else if (!world.findFile("Sea-Monkeys.ico").empty()) {
+		} else if (!findMainDirectoryFile("Sea-Monkeys.ico").empty()) {
 			msg += "found Sea-Monkeys.ico, assuming Sea-Monkeys (sm)";
 			gametype = "sm";
-		} else if (!world.findFile("about.exe").empty()) {
+		} else if (!findMainDirectoryFile("about.exe").empty()) {
 			msg += "found about.exe, assuming CA, CP or CV (cv)";
 			gametype = "cv";
 		} else {
@@ -889,7 +890,7 @@ bool Engine::initialSetup() {
 		version = 2;
 	} else if (gametype == "c3") {
 		if (gamename.empty()) {
-			if (!world.findFile("Docking Station.ico").empty()) {
+			if (!findMainDirectoryFile("Docking Station.ico").empty()) {
 				gamename = "Docking Station";
 			} else {
 				gamename = "Creatures 3";
@@ -910,7 +911,7 @@ bool Engine::initialSetup() {
 		throw creaturesException(fmt::format("unknown gametype '{}'!", gametype));
 
 	// finally, add our cache directory to the end
-	world.data_directories.push_back(storageDirectory());
+	data_directories.push_back(storageDirectory());
 
 	// initialize backends
 	if (cmdline_norun)
@@ -986,11 +987,6 @@ bool Engine::initialSetup() {
 		std::cerr << "Warning: Setting working directory to " << exepath << " failed.";
 #endif
 
-	if (world.data_directories.size() < 3) {
-		// TODO: This is a hack for DS, basically. Not sure if it works properly. - fuzzie
-		eame_variables["engine_no_auxiliary_bootstrap_1"] = caosValue(1);
-	}
-
 	loadGameData();
 
 	// execute the initial scripts!
@@ -1063,59 +1059,6 @@ void Engine::shutdown() {
 	audio->shutdown();
 	backend->shutdown();
 	net->shutdown();
-}
-
-fs::path Engine::homeDirectory() {
-	fs::path p;
-
-#ifndef _WIN32
-	char* envhome = getenv("HOME");
-	if (envhome)
-		p = fs::path(envhome);
-	if ((!envhome) || (!fs::is_directory(p)))
-		p = fs::path(getpwuid(getuid())->pw_dir);
-	if (!fs::is_directory(p)) {
-		std::cerr << "Can't work out what your home directory is, giving up and using /tmp for now." << std::endl;
-		p = fs::path("/tmp"); // sigh
-	}
-#else
-	TCHAR szPath[_MAX_PATH];
-	SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, TRUE);
-
-	p = fs::path(szPath);
-	if (!fs::exists(p) || !fs::is_directory(p))
-		throw creaturesException("Windows reported that your My Documents folder is at '" + std::string(szPath) + "' but there's no directory there!");
-#endif
-
-	return p;
-}
-
-fs::path Engine::storageDirectory() {
-#ifdef _WIN32
-	std::string dirname = "/My Games";
-#else
-#ifdef __APPLE__
-	std::string dirname = "/Documents/openc2e Data";
-#else
-	std::string dirname = "/.openc2e";
-#endif
-#endif
-
-	// main storage dir
-	fs::path p = fs::path(homeDirectory().string() + dirname);
-	if (!fs::exists(p))
-		fs::create_directory(p);
-	else if (!fs::is_directory(p))
-		throw creaturesException("Your openc2e data directory " + p.string() + " is a file, not a directory. That's bad.");
-
-	// game-specific storage dir
-	p = fs::path(p.string() + std::string("/" + gamename));
-	if (!fs::exists(p))
-		fs::create_directory(p);
-	else if (!fs::is_directory(p))
-		throw creaturesException("Your openc2e game data directory " + p.string() + " is a file, not a directory. That's bad.");
-
-	return p;
 }
 
 /* vim: set noet: */

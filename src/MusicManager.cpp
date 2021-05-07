@@ -21,6 +21,7 @@
 
 #include "Engine.h"
 #include "MNGMusic.h"
+#include "PathResolver.h"
 #include "SoundManager.h"
 #include "World.h"
 #include "caosValue.h"
@@ -108,7 +109,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 			return;
 		}
 
-		std::string filename = world.findFile("Sounds/" + track + ".mid");
+		std::string filename = findSoundFile(track + ".mid");
 		if (!filename.size()) {
 			fmt::print("Couldn't find MIDI file '{}'!\n", track);
 			return;
@@ -135,7 +136,7 @@ void MusicManager::playTrack(std::string track, unsigned int _how_long_before_ch
 		MNGFile* file;
 		std::transform(filename.begin(), filename.end(), filename.begin(), (int (*)(int))tolower);
 		if (files.find(filename) == files.end()) {
-			std::string realfilename = world.findFile("Sounds/" + filename);
+			std::string realfilename = findSoundFile(filename);
 			if (!realfilename.size()) {
 				fmt::print("Couldn't find MNG file '{}'!\n", filename);
 				return; // TODO: exception?
@@ -158,7 +159,7 @@ void MusicManager::tick() {
 	// TODO: is this the right place for this?
 	if (engine.version == 1 && (world.tickcount % 70) == 0 &&
 		backend->getChannelState(creatures1_channel) == AUDIO_STOPPED) {
-		auto sounds = world.findFiles("Sounds", "MU*.wav");
+		auto sounds = findSoundFiles("MU*.wav");
 		if (sounds.size()) {
 			creatures1_channel = backend->playClip(sounds[rand() % sounds.size()]);
 		}

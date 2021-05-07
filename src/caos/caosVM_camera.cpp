@@ -23,6 +23,7 @@
 #include "Engine.h"
 #include "Map.h"
 #include "MetaRoom.h"
+#include "PathResolver.h"
 #include "World.h"
 #include "caosVM.h"
 #include "caos_assert.h"
@@ -386,11 +387,11 @@ void c_LINE(caosVM* vm) {
 void v_SNAX(caosVM* vm) {
 	VM_PARAM_STRING(filename)
 
-	vm->result.setInt(0);
-	if (!world.findFile(std::string("Images/") + filename + ".s16").empty())
+	if (!findImageFile(filename + ".s16").empty() || !findImageFile(filename + ".c16").empty()) {
 		vm->result.setInt(1);
-	else if (!world.findFile(std::string("Images/") + filename + ".c16").empty())
-		vm->result.setInt(1);
+	} else {
+		vm->result.setInt(0);
+	}
 }
 
 /**

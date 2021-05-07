@@ -25,7 +25,6 @@
 #include "historyManager.h"
 
 #include <cassert>
-#include <fstream>
 #include <memory>
 
 /**

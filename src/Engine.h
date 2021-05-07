@@ -106,9 +106,6 @@ class Engine {
 	void shutdown();
 
 	bool noRun() { return cmdline_norun; }
-
-	ghc::filesystem::path homeDirectory();
-	ghc::filesystem::path storageDirectory();
 };
 
 extern Engine engine;

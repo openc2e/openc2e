@@ -2,6 +2,7 @@
 
 #include "Catalogue.h"
 #include "Engine.h"
+#include "PathResolver.h"
 #include "World.h"
 #include "fileformats/strFile.h"
 #include "fileformats/verticalbarFile.h"
@@ -19,7 +20,7 @@ const std::vector<std::string>& ChemicalNamesManager::getChemicalNames() {
 	if (!chemical_names_loaded) {
 		if (engine.version < 3) {
 			// c1/c2 are easy; c2e wants scary catalogue stuff.
-			chemical_names = ReadStrFile(world.findFile("allchemicals.str"));
+			chemical_names = ReadStrFile(findMainDirectoryFile("allchemicals.str"));
 		} else {
 			if (catalogue.hasTag("chemical_names")) {
 				// c2e has chemical names in a catalogue file
@@ -48,7 +49,7 @@ const std::vector<std::pair<std::string, std::vector<int>>>& ChemicalNamesManage
 
 		if (engine.version == 2) {
 			// c2 has a ChemGroups file with useful data.
-			auto lines = ReadVerticalBarSeparatedValuesFile(world.findFile("Applet Data/ChemGroups"));
+			auto lines = ReadVerticalBarSeparatedValuesFile(findMainDirectoryFile("Applet Data/ChemGroups"));
 
 			std::vector<std::pair<std::string, std::vector<int>>> chemgroups;
 			for (auto l : lines) {

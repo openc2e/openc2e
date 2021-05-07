@@ -19,11 +19,14 @@
 
 #include "Catalogue.h"
 #include "Engine.h"
+#include "PathResolver.h"
 #include "World.h"
 #include "caosScript.h" // PRAY INJT
 #include "caosVM.h"
 #include "caos_assert.h"
 #include "prayManager.h"
+#include "utils/case_insensitive_filesystem.h"
+#include "utils/spanstream.h"
 
 #include <fmt/core.h>
 #include <fstream>
@@ -31,22 +34,48 @@
 namespace fs = ghc::filesystem;
 
 bool prayInstall(std::string name, unsigned int type, bool actually_install) {
-	std::string directory = world.praymanager->getResourceDir(type);
-	caos_assert(!directory.empty());
+	fs::path (*find_func)(fs::path);
+	std::ofstream (*create_func)(fs::path);
 
-	fs::path dir = fs::path(world.getUserDataDir()) / fs::path(directory);
-	if (!fs::exists(dir))
-		fs::create_directory(dir);
-	caos_assert(fs::exists(dir) && fs::is_directory(dir));
-
-	fs::path outputfile = dir / fs::path(name);
-	if (fs::exists(outputfile)) {
-		// TODO: update file if necessary? check it's not a directory :P
-		return true;
+	switch (type) {
+		// case 0: find_func = &findMainFile; create_func = &createUserMainFile; directory = ""; break; // main
+		case 1: // sounds
+			find_func = &findSoundFile;
+			create_func = &createUserSoundFile;
+			break;
+		case 2: // images
+			find_func = &findImageFile;
+			create_func = &createUserImageFile;
+			break;
+		case 3: // genetics
+			find_func = &findGeneticsFile;
+			create_func = &createUserGeneticsFile;
+			break;
+		case 4: // body data
+			find_func = &findBodyDataFile;
+			create_func = &createUserBodyDataFile;
+			break;
+		case 5: // overlay data
+			find_func = &findOverlayDataFile;
+			create_func = &createUserOverlayDataFile;
+			break;
+		case 6: // backgrounds
+			find_func = &findBackgroundFile;
+			create_func = &createUserBackgroundFile;
+			break;
+		case 7: // catalogue
+			find_func = &findCatalogueFile;
+			create_func = &createUserCatalogueFile;
+			break;
+		//case 8: find_func = &findBootstrapFile; create_func = &createUserBootstrapFile; // bootstrap
+		//case 9: find_func = &findMyWorldsFile; create_func = &createUserMyWorldsFile; // my worlds
+		// case 10: find_func = &findMyCreaturesFile; create_func = &createUserMyCreaturesFile; // my creatures
+		// case 11: find_func = &findMyAgentsFile; create_func = &createUserMyAgentsFile; // my agents
+		default: throw creaturesException(fmt::format("Unimplemented PRAY resource type {}", type));
 	}
 
-	fs::path possiblefile = fs::path(directory) / fs::path(name);
-	if (!world.findFile(possiblefile.string()).empty()) {
+	if (!find_func(name).empty()) {
+		// TODO: update file if necessary? check it's not a directory :P
 		// TODO: we need to return 'okay' if the file exists anywhere, but someone needs to work out update behaviour (see other comment above, also)
 		return true;
 	}
@@ -70,7 +99,8 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	}
 
 	p->load();
-	std::ofstream output(outputfile.string().c_str(), std::ios::binary);
+
+	std::ofstream output = create_func(name);
 	output.write((char*)p->getBuffer(), p->getSize());
 	// p->unload();
 
@@ -78,7 +108,7 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 		output.flush();
 		output.close();
 		// TODO: verify it is a catalogue file first, perhaps?
-		catalogue.addFile(outputfile);
+		catalogue.addFile(findCatalogueFile(name));
 	}
 
 	return true;
