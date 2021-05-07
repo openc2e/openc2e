@@ -388,7 +388,7 @@ fs::path homeDirectory() {
 
 	p = fs::path(szPath);
 	if (!fs::exists(p) || !fs::is_directory(p))
-		throw creaturesException("Windows reported that your My Documents folder is at '" + szPath.string() + "' but there's no directory there!");
+		throw creaturesException("Windows reported that your My Documents folder is at '" + p.string() + "' but there's no directory there!");
 #endif
 
 	return p;

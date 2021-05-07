@@ -35,11 +35,14 @@
 #include "backends/NullBackend.h"
 #include "caosScript.h" // for executeNetwork()
 #include "caosVM.h"
+#include "fileformats/cfgFile.h"
 #include "fileformats/peFile.h"
 #include "imageManager.h"
 #include "keycodes.h"
 #include "prayManager.h"
+#include "utils/case_insensitive_filesystem.h"
 #include "utils/encoding.h"
+#include "utils/find_if.h"
 #include "utils/userlocale.h"
 
 #include <cassert>
@@ -729,6 +732,107 @@ static void opt_version() {
 			  << "...please don't sue us." << std::endl;
 }
 
+static std::string detectGameType(fs::path directory) {
+	if (!case_insensitive_filesystem::resolve_filename(directory / "creatures.exe").empty()) {
+		return "c1";
+	}
+	if (!case_insensitive_filesystem::resolve_filename(directory / "creatures2.exe").empty()) {
+		return "c2";
+	}
+
+	auto catalogue_directory = directory / "Catalogue";
+	auto machine_cfg_filename = case_insensitive_filesystem::resolve_filename(directory / "machine.cfg");
+	if (!machine_cfg_filename.empty()) {
+		auto machine_cfg = readcfgfile(machine_cfg_filename);
+		if (machine_cfg.count("Catalogue Directory")) {
+			catalogue_directory = machine_cfg["Catalogue Directory"];
+			if (!catalogue_directory.is_absolute()) {
+				catalogue_directory = directory / catalogue_directory;
+			}
+		}
+	}
+
+	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Docking Station.catalogue").empty()) {
+		return "ds";
+	}
+	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Creatures 3.catalogue").empty()) {
+		return "c3";
+	}
+	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Creatures Adventures.catalogue").empty()) {
+		return "cv";
+	}
+	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Sea Monkeys.catalogue").empty()) {
+		return "sm";
+	}
+	throw creaturesException("Couldn't auto-detect game type");
+}
+
+static std::vector<DataDirectory> data_directories_from_machine_cfg(fs::path machine_cfg_filename) {
+	auto parent_directory = machine_cfg_filename.parent_path();
+	machine_cfg_filename = case_insensitive_filesystem::resolve_filename(machine_cfg_filename);
+	if (machine_cfg_filename.empty()) {
+		return {parent_directory};
+	}
+
+	std::vector<DataDirectory> result;
+	auto normalize = [&](fs::path s) {
+		if (s.empty()) {
+			return s;
+		}
+		if (s.is_absolute()) {
+			return s.lexically_normal();
+		}
+		return fs::absolute((parent_directory / s).lexically_normal());
+	};
+	auto machine_cfg = readcfgfile(machine_cfg_filename);
+	if (!machine_cfg.count("Main Directory")) {
+		throw creaturesException("machine.cfg missing \"Main Directory\"");
+	}
+	DataDirectory dir(normalize(machine_cfg["Main Directory"]));
+	dir.backgrounds = normalize(machine_cfg["Backgrounds Directory"]);
+	dir.body_data = normalize(machine_cfg["Body Data Directory"]);
+	dir.bootstrap = normalize(machine_cfg["Bootstrap Directory"]);
+	dir.catalogue = normalize(machine_cfg["Catalogue Directory"]);
+	dir.creature_galleries = normalize(machine_cfg["Creature Galleries Directory"]);
+	dir.exported_creatures = normalize(machine_cfg["Exported Creatures Directory"]);
+	dir.genetics = normalize(machine_cfg["Genetics Directory"]);
+	dir.images = normalize(machine_cfg["Images Directory"]);
+	dir.journal = normalize(machine_cfg["Journal Directory"]);
+	dir.overlay_data = normalize(machine_cfg["Overlay Data Directory"]);
+	dir.agents = normalize(machine_cfg["Resource Files Directory"]);
+	dir.sounds = normalize(machine_cfg["Sounds Directory"]);
+	dir.users = normalize(machine_cfg["Users Directory"]);
+	dir.worlds = normalize(machine_cfg["Worlds Directory"]);
+	result.push_back(dir);
+
+	for (int i = 1;; ++i) {
+		std::string prefix = fmt::format("Auxiliary {} ", i);
+		if (!find_if(machine_cfg, [&](auto& kv) { return kv.first.rfind(prefix) == 0; })) {
+			break;
+		}
+		if (!machine_cfg.count(prefix + "Main Directory")) {
+			throw creaturesException(fmt::format("machine.cfg missing \"{}Main Directory\"", prefix));
+		}
+		DataDirectory dir(normalize(machine_cfg[prefix + "Main Directory"]));
+		dir.backgrounds = normalize(machine_cfg[prefix + "Backgrounds Directory"]);
+		dir.body_data = normalize(machine_cfg[prefix + "Body Data Directory"]);
+		dir.bootstrap = normalize(machine_cfg[prefix + "Bootstrap Directory"]);
+		dir.catalogue = normalize(machine_cfg[prefix + "Catalogue Directory"]);
+		dir.creature_galleries = normalize(machine_cfg[prefix + "Creature Galleries Directory"]);
+		dir.exported_creatures = normalize(machine_cfg[prefix + "Exported Creatures Directory"]);
+		dir.genetics = normalize(machine_cfg[prefix + "Genetics Directory"]);
+		dir.images = normalize(machine_cfg[prefix + "Images Directory"]);
+		dir.journal = normalize(machine_cfg[prefix + "Journal Directory"]);
+		dir.overlay_data = normalize(machine_cfg[prefix + "Overlay Data Directory"]);
+		dir.agents = normalize(machine_cfg[prefix + "Resource Files Directory"]);
+		dir.sounds = normalize(machine_cfg[prefix + "Sounds Directory"]);
+		dir.users = normalize(machine_cfg[prefix + "Users Directory"]);
+		dir.worlds = normalize(machine_cfg[prefix + "Worlds Directory"]);
+		result.push_back(dir);
+	}
+	return result;
+}
+
 bool Engine::parseCommandLine(int argc, char* argv[]) {
 	// variables for command-line flags
 	std::vector<std::string> data_vec;
@@ -762,7 +866,6 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 	desc.add_options()("o,audiobackend", available_audiobackends, cxxopts::value<std::string>(preferred_audiobackend));
 	desc.add_options()("d,data-path", "Sets or adds a path to a data directory", cxxopts::value<std::vector<std::string>>(data_vec));
 	desc.add_options()("b,bootstrap", "Sets or adds a path or COS file to bootstrap from", cxxopts::value<std::vector<std::string>>(cmdline_bootstrap));
-	desc.add_options()("g,gametype", "Set the game type (options: c1, c2, c3, cv, sm); if unspecified the engine will try to detect it automatically or fall back to c3", cxxopts::value<std::string>(gametype));
 	desc.add_options()("m,gamename", "Set the game name", cxxopts::value<std::string>(gamename));
 	desc.add_options()("n,norun", "Don't run the game, just execute scripts");
 	desc.add_options()("a,autokill", "Enable autokill");
@@ -841,13 +944,64 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 		}
 	}
 
-	// add all the data directories to the list
-	for (auto& i : data_vec) {
-		fs::path datadir(i);
-		if (!fs::exists(datadir)) {
-			throw creaturesException("data path '" + i + "' doesn't exist");
+	// detect game type from first data directory
+	gametype = detectGameType(data_vec[0]).c_str();
+	fmt::print("* Detected game type: {}\n", gametype);
+
+	// set engine version
+	// TODO: set gamename
+	if (gametype == "c1") {
+		if (gamename.empty())
+			gamename = "Creatures 1";
+		version = 1;
+	} else if (gametype == "c2") {
+		if (gamename.empty())
+			gamename = "Creatures 2";
+		version = 2;
+	} else if (gametype == "c3") {
+		if (gamename.empty()) {
+			gamename = "Creatures 3";
 		}
-		data_directories.push_back(datadir);
+		version = 3;
+	} else if (gametype == "ds") {
+		gametype = "c3";
+		if (gamename.empty()) {
+			gamename = "Docking Station";
+		}
+		version = 3;
+	} else if (gametype == "cv") {
+		if (gamename.empty())
+			gamename = "Creatures Village";
+		version = 3;
+		world.autostop = !world.autostop;
+	} else if (gametype == "sm") {
+		if (gamename.empty())
+			gamename = "Sea-Monkeys";
+		version = 3;
+		bmprenderer = true;
+	} else
+		throw creaturesException(fmt::format("unknown gametype '{}'!", gametype));
+
+	// try to read machine.cfg
+	if (!fs::exists(data_vec[0])) {
+		throw creaturesException("data path '" + data_vec[0] + "' doesn't exist");
+	}
+	if (engine.version == 3) {
+		data_directories = data_directories_from_machine_cfg(fs::path(data_vec[0]) / "machine.cfg");
+	} else {
+		data_directories.push_back(fs::path(data_vec[0]));
+	}
+
+	// add remaining data directories
+	for (auto it = data_vec.begin() + 1; it != data_vec.end(); ++it) {
+		if (!fs::exists(*it)) {
+			throw creaturesException("data path '" + *it + "' doesn't exist");
+		}
+		if (find_if(data_directories, [&](auto d) { return fs::absolute(d.main) == fs::absolute(*it); })) {
+			printf("* Warning: ignoring duplicate data directory %s\n", it->c_str());
+			continue;
+		}
+		data_directories.push_back(fs::path(*it));
 	}
 
 	// make a vague attempt at blacklisting some characters inside the gamename
@@ -863,62 +1017,6 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 
 bool Engine::initialSetup() {
 	assert(data_directories.size() > 0);
-
-	// autodetect gametype if necessary
-	if (gametype.empty()) {
-		std::string msg = "Warning: No gametype specified, ";
-		// TODO: is this sane? especially unsure about about.exe
-		if (!findMainDirectoryFile("Creatures.exe").empty()) {
-			msg += "found Creatures.exe, assuming C1 (c1)";
-			gametype = "c1";
-		} else if (!findMainDirectoryFile("Creatures2.exe").empty()) {
-			msg += "found Creatures2.exe, assuming C2 (c2)";
-			gametype = "c2";
-		} else if (!findMainDirectoryFile("Sea-Monkeys.ico").empty()) {
-			msg += "found Sea-Monkeys.ico, assuming Sea-Monkeys (sm)";
-			gametype = "sm";
-		} else if (!findMainDirectoryFile("about.exe").empty()) {
-			msg += "found about.exe, assuming CA, CP or CV (cv)";
-			gametype = "cv";
-		} else {
-			msg += "assuming C3/DS (c3)";
-			gametype = "c3";
-		}
-		msg += ", see --help if you need to specify one.\n";
-		std::cout << msg;
-	}
-
-	// set engine version
-	// TODO: set gamename
-	if (gametype == "c1") {
-		if (gamename.empty())
-			gamename = "Creatures 1";
-		version = 1;
-	} else if (gametype == "c2") {
-		if (gamename.empty())
-			gamename = "Creatures 2";
-		version = 2;
-	} else if (gametype == "c3") {
-		if (gamename.empty()) {
-			if (!findMainDirectoryFile("Docking Station.ico").empty()) {
-				gamename = "Docking Station";
-			} else {
-				gamename = "Creatures 3";
-			}
-		}
-		version = 3;
-	} else if (gametype == "cv") {
-		if (gamename.empty())
-			gamename = "Creatures Village";
-		version = 3;
-		world.autostop = !world.autostop;
-	} else if (gametype == "sm") {
-		if (gamename.empty())
-			gamename = "Sea-Monkeys";
-		version = 3;
-		bmprenderer = true;
-	} else
-		throw creaturesException(fmt::format("unknown gametype '{}'!", gametype));
 
 	// finally, add our cache directory to the end
 	data_directories.push_back(storageDirectory());
