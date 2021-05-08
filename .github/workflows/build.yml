@@ -9,7 +9,7 @@ on:
 env:
   CTEST_OUTPUT_ON_FAILURE: TRUE
   # GitHub runners have two cores each
-  MAKEFLAGS: -j3
+  MAKEFLAGS: -j3 -k
   # set some variables for Visual Studio
   MultiProcessorCompilation: true
   UseMultiToolTask: true
@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v2
     - name: "Install dependencies (Ubuntu)"
       if: "startsWith(matrix.os, 'ubuntu-')"
-      run: sudo apt-get update && sudo apt-get install bison libpng-dev libsdl2-dev libsdl2-mixer-dev libutf8proc-dev zlib1g-dev
+      run: sudo apt-get update && sudo apt-get install libpng-dev libsdl2-dev libsdl2-mixer-dev libutf8proc-dev zlib1g-dev
     - name: "Set environment variables (Windows)"
       if: runner.os == 'Windows'
       shell: cmd
