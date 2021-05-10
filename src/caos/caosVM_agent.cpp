@@ -1737,6 +1737,10 @@ void v_PCLS(caosVM* vm) {
 /**
  TCOR (integer) topy (float) bottomy (float) leftx (float) rightx (float)
  %status stub
+
+ Tests setting the bounding box of the physical core of the object TARG. May be
+ set to smaller (or larger) than the sprite's rectangle. Returns 1 if OK to set
+ (using CORE), 0 if not.
 */
 void v_TCOR(caosVM* vm) {
 	VM_PARAM_FLOAT(rightx)
@@ -1744,7 +1748,8 @@ void v_TCOR(caosVM* vm) {
 	VM_PARAM_FLOAT(bottomy)
 	VM_PARAM_FLOAT(topy)
 
-	vm->result.setInt(0); // TODO
+	valid_agent(vm->targ);
+	vm->result.setInt(1); // TODO
 }
 
 /**
