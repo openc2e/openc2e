@@ -94,12 +94,22 @@ static fs::path getDirectory(const DataDirectory& d, FileDirectory type) {
 		case DIRECTORY_BOOTSTRAP: return nonempty_or(d.bootstrap, d.main / "Bootstrap");
 		case DIRECTORY_CATALOGUE: return nonempty_or(d.catalogue, d.main / "Catalogue");
 		case DIRECTORY_CREATURE_GALLERIES: return nonempty_or(d.creature_galleries, d.main / "Creature Galleries");
-		case DIRECTORY_EXPORTED_CREATURES: return nonempty_or(d.exported_creatures, d.main / "My Creatures");
+		case DIRECTORY_EXPORTED_CREATURES: {
+			if (engine.gametype == "sm") {
+				return nonempty_or(d.exported_creatures, d.main / "Exported Creatures");
+			}
+			return nonempty_or(d.exported_creatures, d.main / "My Creatures");
+		}
 		case DIRECTORY_GENETICS: return nonempty_or(d.genetics, d.main / "Genetics");
 		case DIRECTORY_IMAGES: return nonempty_or(d.images, d.main / "Images");
 		case DIRECTORY_JOURNAL: return nonempty_or(d.journal, d.main / "Journal");
 		case DIRECTORY_OVERLAY_DATA: return nonempty_or(d.overlay_data, d.main / "Overlay Data");
-		case DIRECTORY_AGENTS: return nonempty_or(d.agents, d.main / "My Agents");
+		case DIRECTORY_AGENTS: {
+			if (engine.gametype == "sm") {
+				return nonempty_or(d.agents, d.main / "Resource Files");
+			}
+			return nonempty_or(d.agents, d.main / "My Agents");
+		}
 		case DIRECTORY_SOUNDS: return nonempty_or(d.sounds, d.main / "Sounds");
 		case DIRECTORY_USERS: return nonempty_or(d.users, d.main / "Users");
 		case DIRECTORY_WORLDS: return nonempty_or(d.worlds, d.main / "My Worlds");
