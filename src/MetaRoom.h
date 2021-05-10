@@ -37,6 +37,7 @@ class MetaRoom {
 	unsigned int xloc, yloc, wid, hei, fullwid, fullhei;
 	std::map<std::string, std::shared_ptr<creaturesImage> > backgrounds;
 	std::string firstback;
+	std::string current_background;
 	bool wraps;
 
 	MetaRoom() {}
@@ -54,8 +55,12 @@ class MetaRoom {
 	void setWraparound(bool w) { wraps = !!w; }
 
 	unsigned int addRoom(std::shared_ptr<class Room>);
+
 	void addBackground(std::string);
-	std::shared_ptr<creaturesImage> getBackground(std::string);
+	bool hasBackground(std::string) const;
+	void setBackground(std::string);
+	std::shared_ptr<creaturesImage> getCurrentBackground();
+	std::string getCurrentBackgroundName() const;
 	std::vector<std::string> backgroundList();
 
 	std::shared_ptr<Room> nextFloorFromPoint(float x, float y);

@@ -404,7 +404,8 @@ void World::drawWorld(Camera* cam, RenderTarget* surface) {
 	}
 	int adjustx = cam->getX();
 	int adjusty = cam->getY();
-	std::shared_ptr<creaturesImage> bkgd = m->getBackground(""); // TODO
+	// TODO: current backgrounds is per camera (supposedly?)
+	std::shared_ptr<creaturesImage> bkgd = m->getCurrentBackground();
 
 	// TODO: work out what c2e does when it doesn't have a background..
 	if (!bkgd)

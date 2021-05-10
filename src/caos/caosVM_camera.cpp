@@ -465,7 +465,13 @@ void v_LOFT(caosVM* vm) {
 
 /**
  BKGD (command) metaroom_id (integer) background (string) transition (integer)
- %status stub
+ %status maybe
+
+ Changes the current background displayed for the selected camera (with SCAM).
+ Transition is as for META. The background must have been specified with the ADDM
+ or ADDB command first.
+
+ TODO: track different backgrounds per metaroom per camera
 */
 void c_BKGD(caosVM* vm) {
 	VM_PARAM_INTEGER(transition)
@@ -474,8 +480,10 @@ void c_BKGD(caosVM* vm) {
 
 	MetaRoom* metaroom = world.map->getMetaRoom(metaroomid);
 	caos_assert(metaroom);
-
-	// TODO
+	caos_assert(background.size());
+	caos_assert(metaroom->hasBackground(background));
+	caos_assert(transition == 0);
+	metaroom->setBackground(background);
 }
 
 /**
@@ -487,8 +495,7 @@ void v_BKGD(caosVM* vm) {
 
 	MetaRoom* metaroom = world.map->getMetaRoom(metaroomid);
 	caos_assert(metaroom);
-
-	vm->result.setString(""); // TODO
+	vm->result.setString(metaroom->getCurrentBackgroundName());
 }
 
 /**

@@ -51,6 +51,7 @@ void MetaRoom::addBackground(std::string back) {
 		firstback = back;
 		fullwid = totalwidth;
 		fullhei = totalheight;
+		current_background = back;
 	} else {
 		// make sure other backgrounds are the same size
 		if (engine.gametype == "sm")
@@ -69,18 +70,23 @@ std::vector<std::string> MetaRoom::backgroundList() {
 	return b;
 }
 
-std::shared_ptr<creaturesImage> MetaRoom::getBackground(std::string back) {
-	// return the first background by default
-	if (back.empty()) {
-		return backgrounds[firstback];
-	}
+std::shared_ptr<creaturesImage> MetaRoom::getCurrentBackground() {
+	return backgrounds[current_background];
+}
 
-	// if this background name isn't found, return null
-	if (backgrounds.find(back) != backgrounds.end())
-		return std::shared_ptr<creaturesImage>();
+std::string MetaRoom::getCurrentBackgroundName() const {
+	return current_background;
+}
 
-	// otherwise, return the relevant background
-	return backgrounds[back];
+bool MetaRoom::hasBackground(std::string back) const {
+	return backgrounds.find(back) != backgrounds.end();
+}
+
+void MetaRoom::setBackground(std::string back) {
+	// TODO: supposedly the current background is per-camera
+	// TODO: camera transition effects??
+	assert(hasBackground(back));
+	current_background = back;
 }
 
 MetaRoom::~MetaRoom() {
