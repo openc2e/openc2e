@@ -246,6 +246,19 @@ void v_MOPY(caosVM* vm) {
 /**
  SCOL (integer) andmask (integer) eormask (integer) upspeeds (bytestring) downspeeds (bytestring)
  %status stub
+
+ Set an AND and an EOR mask, to control the following scrolling functions:
+
+ 1 - Screen edge nudgy scrolling
+ 2 - Keyboard scrolling
+ 4 - Middle mouse button screen dragging
+ 8 - Mouse wheel screen scrolling
+
+ The byte strings is used for nudgy and keyboard scrolling. The defaults are
+ [1 2 4 8 16 32 64] and [0 1 2 4 8 16 32]. They represent the number of pixels
+ scrolled each consecutive tick, as the scrolling gets slower and faster.
+
+ If you use [] for a byte string, then the string won't be changed at all.
 */
 void v_SCOL(caosVM* vm) {
 	VM_PARAM_BYTESTR(downspeeds)
