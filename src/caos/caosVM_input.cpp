@@ -100,7 +100,7 @@ void v_CLIK(caosVM* vm) {
 
 /**
  IMSK (command) flags (integer)
- %status stub
+ %status maybe
 
  Sets the input event flags for the target agent, which tell the engine which events the 
  agent requires scripts to be fired for. For example, setting the "key up" flag means the 
@@ -121,18 +121,33 @@ void c_IMSK(caosVM* vm) {
 	vm->targ->imsk_mouse_up = (flags & 16);
 	vm->targ->imsk_mouse_wheel = (flags & 32);
 	vm->targ->imsk_translated_char = (flags & 64);
-	// TODO
 }
 
 /**
  IMSK (integer)
- %status stub
+ %status maybe
 
  Returns the input event flags for the target agent. See the IMSK command for details.
 */
 void v_IMSK(caosVM* vm) {
 	valid_agent(vm->targ);
-	vm->result.setInt(0); // TODO
+
+	int flags = 0;
+	if (vm->targ->imsk_key_down)
+		flags |= 1;
+	if (vm->targ->imsk_key_up)
+		flags |= 2;
+	if (vm->targ->imsk_mouse_move)
+		flags |= 4;
+	if (vm->targ->imsk_mouse_down)
+		flags |= 8;
+	if (vm->targ->imsk_mouse_up)
+		flags |= 16;
+	if (vm->targ->imsk_mouse_wheel)
+		flags |= 32;
+	if (vm->targ->imsk_translated_char)
+		flags |= 64;
+	vm->result.setInt(flags);
 }
 
 /**
