@@ -102,7 +102,7 @@ static fs::path getDirectory(const DataDirectory& d, FileDirectory type) {
 		case DIRECTORY_AGENTS: return nonempty_or(d.agents, d.main / "My Agents");
 		case DIRECTORY_SOUNDS: return nonempty_or(d.sounds, d.main / "Sounds");
 		case DIRECTORY_USERS: return nonempty_or(d.users, d.main / "Users");
-		case DIRECTORY_WORLDS: return nonempty_or(d.worlds, d.main / "Worlds");
+		case DIRECTORY_WORLDS: return nonempty_or(d.worlds, d.main / "My Worlds");
 	}
 }
 
