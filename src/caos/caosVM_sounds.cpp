@@ -253,7 +253,7 @@ void c_STRK(caosVM* vm) {
 	VM_PARAM_STRING(track)
 	VM_PARAM_INTEGER(latency)
 
-	engine.musicmanager->playTrack(track, latency * 1000);
+	engine.musicmanager->playTrackForAtLeastThisManyMilliseconds(track, latency * 1000);
 }
 
 /**
@@ -384,14 +384,14 @@ void c_VOIS(caosVM* vm) {
 
 /**
  MIDI (command) midifile (string)
- %status stub
+ %status done
 
  Plays the MIDI file specified, or stops playing if passed an empty string.
 */
 void c_MIDI(caosVM* vm) {
 	VM_PARAM_STRING(midifile)
 
-	engine.musicmanager->playTrack(midifile, 0);
+	engine.musicmanager->playTrack(midifile);
 }
 
 /**

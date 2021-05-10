@@ -45,7 +45,8 @@ class MusicManager {
 	void setMIDIMuted(bool muted);
 
 	void tick();
-	void playTrack(std::string track, unsigned int how_long_before_changing_track_ms);
+	void playTrack(std::string track);
+	void playTrackForAtLeastThisManyMilliseconds(std::string track, unsigned int how_long_before_changing_track_ms);
 
   private:
 	void updateVolumes();

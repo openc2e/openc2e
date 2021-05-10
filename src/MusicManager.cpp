@@ -91,7 +91,11 @@ void MusicManager::updateVolumes() {
 	backend->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.4);
 }
 
-void MusicManager::playTrack(std::string track, unsigned int _how_long_before_changing_track_ms) {
+void MusicManager::playTrack(std::string track) {
+	return playTrackForAtLeastThisManyMilliseconds(track, 0);
+}
+
+void MusicManager::playTrackForAtLeastThisManyMilliseconds(std::string track, unsigned int _how_long_before_changing_track_ms) {
 	if (track == last_track) {
 		return;
 	}
@@ -176,9 +180,9 @@ void MusicManager::tick() {
 		if (m) {
 			std::shared_ptr<Room> r = m->roomAt(engine.camera->getXCentre(), engine.camera->getYCentre());
 			if (r && r->music.size()) {
-				playTrack(r->music, 0);
+				playTrack(r->music);
 			} else if (m->music.size()) {
-				playTrack(m->music, 0);
+				playTrack(m->music);
 			}
 		}
 	}
