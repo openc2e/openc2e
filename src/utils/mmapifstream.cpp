@@ -56,6 +56,9 @@ mmapifstream::mmapifstream(const std::string& filename) {
 	fseek(f, 0, SEEK_END);
 	filesize = ftell(f);
 	assert((int)filesize != -1);
+	if (filesize == 0) {
+		return;
+	}
 
 	void* mapr = mmap(0, filesize, PROT_READ, MAP_PRIVATE, fno, 0);
 	fclose(f); // we don't need it, now!
