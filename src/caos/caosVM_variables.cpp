@@ -273,10 +273,10 @@ void c_ADDV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(add)
 	VM_PARAM_VARIABLE(v)
-	if (v->hasFloat())
-		v->setFloat(v->getFloat() + (add.hasFloat() ? add.getFloat() : add.getInt()));
-	else if (v->hasInt())
-		v->setInt((int)(v->getInt() + (add.hasFloat() ? add.getFloat() : add.getInt())));
+	if (v->hasFloat() || add.hasFloat())
+		v->setFloat(v->getFloat() + add.getFloat());
+	else if (v->hasInt() && add.hasInt())
+		v->setInt(v->getInt() + add.getInt());
 	else if (add.hasFloat())
 		v->setFloat(add.getFloat()); // default back to zero
 	else
@@ -295,10 +295,10 @@ void c_SUBV(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
 	VM_PARAM_DECIMAL(sub)
 	VM_PARAM_VARIABLE(v)
-	if (v->hasFloat())
-		v->setFloat(v->getFloat() - (sub.hasFloat() ? sub.getFloat() : sub.getInt()));
-	else if (v->hasInt())
-		v->setInt((int)(v->getInt() - (sub.hasFloat() ? sub.getFloat() : sub.getInt())));
+	if (v->hasFloat() || sub.hasFloat())
+		v->setFloat(v->getFloat() - sub.getFloat());
+	else if (v->hasInt() && sub.hasInt())
+		v->setInt(v->getInt() - sub.getInt());
 	else
 		throw badParamException();
 }
@@ -344,8 +344,7 @@ void c_DIVV(caosVM* vm) {
 		v->setInt(v->getInt() / div.getInt());
 	} else if (v->hasInt() || v->hasFloat()) {
 		// floating point division
-		v->setFloat((v->hasFloat() ? v->getFloat() : v->getInt()) /
-					(div.hasFloat() ? div.getFloat() : div.getInt()));
+		v->setFloat(v->getFloat() / div.getFloat());
 	} else
 		throw badParamException();
 }
