@@ -30,6 +30,7 @@
 
 #define BI_RGB 0
 #define BI_RLE8 1
+#define BI_RLE4 2
 #define BI_BITFIELDS 3
 
 Image ReadBmpFile(const std::string& path) {
@@ -80,6 +81,11 @@ Image ReadDibFile(std::istream& in) {
 		case BI_RGB:
 			break;
 
+		case BI_RLE4:
+			if (biBitCount != 4)
+				throw creaturesException("Contains BMP data compressed in a way which isn't possible.");
+			break;
+
 		case BI_RLE8:
 			if (biBitCount != 8)
 				throw creaturesException("Contains BMP data compressed in a way which isn't possible.");
@@ -87,7 +93,7 @@ Image ReadDibFile(std::istream& in) {
 
 		case BI_BITFIELDS:
 		default:
-			throw creaturesException("Contains BMP data compressed in a way we don't understand.");
+			throw creaturesException("Contains BMP data compressed in a way we don't understand: " + std::to_string(biCompression));
 	}
 
 	switch (biBitCount) {
@@ -132,13 +138,86 @@ Image ReadDibFile(std::istream& in) {
 		in.read((char*)bmpdata.data(), biSizeImage);
 	}
 
-	if (biBitCount == 4) {
+	if (biBitCount == 4 && biCompression == BI_RGB) {
 		auto srcdata = bmpdata;
 		bmpdata = shared_array<uint8_t>(biWidth * biHeight);
 
 		for (size_t i = 0; i < srcdata.size(); ++i) {
 			bmpdata[i * 2] = (srcdata[i] >> 4) & 0xf;
 			bmpdata[i * 2 + 1] = srcdata[i] & 0xf;
+		}
+	}
+
+	if (biCompression == BI_RLE4) {
+		// decode an RLE-compressed 4-bit image
+		// TODO: sanity checking
+		auto srcdata = bmpdata;
+		bmpdata = shared_array<uint8_t>(biWidth * (biHeight + 2)); // TODO
+		memset(bmpdata.data(), 0, bmpdata.size());
+
+		size_t p = 0;
+		unsigned int x = 0;
+		unsigned int y = 0;
+		while (true) {
+			assert(srcdata.size() - p >= 2);
+			const unsigned char nopixels = srcdata[p++];
+			const unsigned char val = srcdata[p++];
+			if (nopixels == 0) { // special
+				if (val == 0) { // end of line
+					x = 0;
+					y += 1;
+				} else if (val == 1) { // end of bitmap
+					break;
+				} else if (val == 2) { // delta
+					assert(srcdata.size() - p >= 2);
+					const unsigned char horz = srcdata[p++];
+					const unsigned char vert = srcdata[p++];
+					x += horz;
+					y += vert;
+				} else { // absolute mode
+					uint8_t remaining = val;
+					while (remaining) {
+						assert(srcdata.size() - p >= 1);
+						const unsigned char raw = srcdata[p++];
+						const unsigned char upper = (raw >> 4) & 0xf;
+						const unsigned char lower = raw & 0xf;
+						if (x < biWidth) {
+							bmpdata[x + (biHeight - 1 - y) * biWidth] = upper;
+							x++;
+						}
+						remaining--;
+						if (remaining) {
+							if (x < biWidth) {
+								bmpdata[x + (biHeight - 1 - y) * biWidth] = lower;
+								x++;
+							}
+							remaining--;
+						}
+					}
+					if (p % 2 == 1) {
+						assert(srcdata[p] == 0);
+						p++; // skip padding byte
+					}
+				}
+			} else { // encoded mode
+				const unsigned char upper = (val >> 4) & 0xf;
+				const unsigned char lower = val & 0xf;
+				uint8_t remaining = nopixels;
+				while (remaining) {
+					if (x < biWidth) {
+						bmpdata[x + (biHeight - 1 - y) * biWidth] = upper;
+						x++;
+					}
+					remaining--;
+					if (remaining) {
+						if (x < biWidth) {
+							bmpdata[x + (biHeight - 1 - y) * biWidth] = lower;
+							x++;
+						}
+						remaining--;
+					}
+				}
+			}
 		}
 	}
 
