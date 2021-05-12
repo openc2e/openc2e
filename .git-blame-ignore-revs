@@ -1,0 +1,5 @@
+# Make CAOS functions not be members of caosVM
+52ee40a8db709c696a7b8024eaf274eae337644b
+
+# Initial clang-format
+424b6af92a39b0c294bae60755796300e21240f0
