@@ -300,7 +300,9 @@ void SkeletalCreature::render(RenderTarget* renderer, int xoffset, int yoffset) 
 
 		assert(images[i]);
 
-		renderer->renderCreaturesImage(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, 0, mirror);
+		RenderOptions render_opts;
+		render_opts.mirror = mirror;
+		renderer->renderCreaturesImage(images[i], ourpose, partx[i] + adjustx + xoffset, party[i] + adjusty + yoffset, render_opts);
 
 		if (displaycore) {
 			// TODO: we draw a lot of points twice here :)

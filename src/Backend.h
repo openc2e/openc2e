@@ -32,10 +32,22 @@ using std::shared_ptr;
 
 class creaturesImage;
 
+struct RenderOptions {
+	uint8_t alpha = 255;
+	bool mirror = false;
+	float scale = 1.0;
+	bool override_drawsize = false;
+	int overridden_drawwidth;
+	int overridden_drawheight;
+};
+
 class RenderTarget {
   public:
-	virtual void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
-	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, uint8_t transparency = 0, bool mirror = false) = 0;
+	virtual void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options = {}) = 0;
+	void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, RenderOptions options = {}) {
+		assert(tex.get() != nullptr);
+		renderCreaturesImage(*tex.get(), frame, x, y, options);
+	}
 	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int colour) = 0;
 	virtual void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h) = 0;
 	virtual unsigned int getWidth() const = 0;

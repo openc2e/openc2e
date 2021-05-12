@@ -309,7 +309,7 @@ unsigned int SDLRenderTarget::getHeight() const {
 	return drawableheight / scale - viewport_offset_top - viewport_offset_bottom;
 }
 
-void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
+void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, RenderOptions options) {
 	if ((x + img.width(frame) <= 0 || x >= (int)getWidth()) && (y + img.height(frame) <= 0 || y >= (int)getHeight())) {
 		return;
 	}
@@ -321,8 +321,8 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 	SDL_Texture* tex = img.getTextureForFrame(frame).as<SDL_Texture>();
 	assert(tex);
 
-	SDL_SetTextureAlphaMod(tex, 255 - transparency);
-	SDL_RendererFlip flip = mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+	SDL_SetTextureAlphaMod(tex, options.alpha);
+	SDL_RendererFlip flip = options.mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
 	SDL_Rect srcrect;
 	srcrect.x = img.getXOffsetForFrame(frame);
@@ -333,16 +333,11 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 	SDL_Rect destrect;
 	destrect.x = x;
 	destrect.y = y + viewport_offset_top;
-	destrect.w = srcrect.w;
-	destrect.h = srcrect.h;
+	destrect.w = (options.override_drawsize ? options.overridden_drawwidth : srcrect.w) * options.scale;
+	destrect.h = (options.override_drawsize ? options.overridden_drawheight : srcrect.h) * options.scale;
 
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_RenderCopyEx(parent->renderer, tex, &srcrect, &destrect, 0, nullptr, flip);
-}
-
-void SDLRenderTarget::renderCreaturesImage(const std::shared_ptr<creaturesImage>& img, unsigned int frame, int x, int y, uint8_t transparency, bool mirror) {
-	assert(img.get() != nullptr);
-	renderCreaturesImage(*img.get(), frame, x, y, transparency, mirror);
 }
 
 void SDLRenderTarget::renderClear() {

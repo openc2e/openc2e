@@ -1,5 +1,6 @@
 #include "TextPart.h"
 
+#include "Agent.h"
 #include "Backend.h"
 #include "Engine.h"
 #include "TextEntryPart.h"
@@ -262,7 +263,9 @@ void TextPart::partRender(RenderTarget* renderer, int xoffset, int yoffset, Text
 			if (((unsigned char)lines[i].text[x]) < 32)
 				continue; // TODO: replace with space or similar?
 			int spriteid = ((unsigned char)lines[i].text[x]) - 32;
-			renderer->renderCreaturesImage(sprite_to_use, spriteid, somex + currentx, yoff + currenty, has_alpha ? alpha : 0);
+			RenderOptions render_opts;
+			render_opts.alpha = parent->alpha;
+			renderer->renderCreaturesImage(sprite_to_use, spriteid, somex + currentx, yoff + currenty, render_opts);
 			if ((caretdata) && (caretdata->caretpos == lines[i].offset + x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
 			currentx += textsprite->width(spriteid) + charspacing;

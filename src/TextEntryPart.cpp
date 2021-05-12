@@ -98,7 +98,9 @@ void TextEntryPart::partRender(RenderTarget* renderer, int xoffset, int yoffset)
 
 void TextEntryPart::renderCaret(RenderTarget* renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
-	renderer->renderCreaturesImage(caretsprite, caretpose, xoffset, yoffset, has_alpha ? alpha : 0);
+	RenderOptions render_opts;
+	render_opts.alpha = parent->alpha;
+	renderer->renderCreaturesImage(caretsprite, caretpose, xoffset, yoffset, render_opts);
 }
 
 void TextEntryPart::tick() {

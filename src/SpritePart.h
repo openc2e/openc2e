@@ -11,7 +11,6 @@ class SpritePart : public AnimatablePart {
 
   public:
 	bool is_transparent;
-	bool draw_mirrored;
 	unsigned char framerate;
 	unsigned int framedelay;
 	std::shared_ptr<creaturesImage> getSprite() { return sprite; }

@@ -1465,22 +1465,6 @@ void c_DCOR(caosVM* vm) {
 }
 
 /**
- MIRA (integer)
- %status maybe
-
- Determines whether or not the TARG agent's current sprite is mirrored. Returns 0 or 1.
-*/
-void v_MIRA(caosVM* vm) {
-	valid_agent(vm->targ);
-
-	// TODO: correct?
-	SpritePart* p = vm->getCurrentSpritePart();
-	caos_assert(p);
-
-	vm->result.setInt(p->draw_mirrored);
-}
-
-/**
  MIRA (command) mirror_on (integer)
  %status maybe
 
@@ -1490,13 +1474,73 @@ void c_MIRA(caosVM* vm) {
 	VM_PARAM_INTEGER(mirror_on)
 
 	valid_agent(vm->targ);
+	caos_assert(mirror_on == 0 || mirror_on == 1);
+	vm->targ->draw_mirrored = mirror_on;
+}
 
-	// TODO: what does 'current sprite' mean?
-	// TODO: correct?
-	SpritePart* p = vm->getCurrentSpritePart();
-	caos_assert(p);
+/**
+ MIRA (integer)
+ %status maybe
 
-	p->draw_mirrored = mirror_on;
+ Determines whether or not the TARG agent's current sprite is mirrored. Returns 0 or 1.
+*/
+void v_MIRA(caosVM* vm) {
+	valid_agent(vm->targ);
+	vm->result.setInt(vm->targ->draw_mirrored);
+}
+
+/**
+ FLIP (command) onoroff (integer)
+ %status stub
+ %variants sm
+
+ Tell the agent to draw the current sprite vertically flipped.
+*/
+void c_FLIP(caosVM* vm) {
+	VM_PARAM_INTEGER(onoroff);
+	valid_agent(vm->targ);
+	caos_assert(onoroff == 0 || onoroff == 1);
+	// TODO (this isn't actually used anywhere, afaict)
+}
+
+/**
+ FLIP (integer)
+ %status stub
+ %variants sm
+
+ Is the current sprite for this agent vertically flipped?
+*/
+void v_FLIP(caosVM* vm) {
+	valid_agent(vm->targ);
+	// TODO (this isn't actually used anywhere, afaict)
+	vm->result.setInt(0);
+}
+
+/**
+ ROTA (command) angle (integer)
+ %status stub
+ %variants sm
+
+ Tell the agent to draw the current sprite rotated clockwise by the given angle a value between 0 and 360.
+*/
+void c_ROTA(caosVM* vm) {
+	VM_PARAM_INTEGER(angle)
+
+	valid_agent(vm->targ);
+	caos_assert(angle >= 0 && angle <= 360);
+	// TODO: doesn't actually do anything in original engine?
+}
+
+/**
+ ROTA (integer)
+ %status stub
+ %variants sm
+
+ By what angle is the current sprite for this agent rotated returns angle between 0 and 360.
+*/
+void v_ROTA(caosVM* vm) {
+	valid_agent(vm->targ);
+	vm->result.setInt(0);
 }
 
 /**
@@ -1518,7 +1562,7 @@ void v_DISQ(caosVM* vm) {
 }
 
 /**
- ALPH (command) alpha_value (integer) enable (integer)
+ ALPH (command) transparency (integer) enable (integer)
  %status maybe
 
  Sets the degree of alpha blending on the TARG agent, to a value from 0 (solid) to 256 
@@ -1526,27 +1570,16 @@ void v_DISQ(caosVM* vm) {
 */
 void c_ALPH(caosVM* vm) {
 	VM_PARAM_INTEGER(enable)
-	VM_PARAM_INTEGER(alpha_value)
+	VM_PARAM_INTEGER(transparency)
 
-	if (alpha_value < 0)
-		alpha_value = 0;
-	else if (alpha_value > 255)
-		alpha_value = 255;
+	caos_assert(transparency >= 0 && transparency <= 256);
+	if (transparency == 256) {
+		transparency = 255;
+	}
+	caos_assert(enable == 0 || enable == 1);
 
 	valid_agent(vm->targ);
-
-	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
-	if (c && vm->part == -1) {
-		for (auto& part : c->parts) {
-			part->has_alpha = enable;
-			part->alpha = alpha_value;
-		}
-	} else {
-		CompoundPart* p = vm->targ->part(vm->part);
-		caos_assert(p);
-		p->has_alpha = enable;
-		p->alpha = alpha_value;
-	}
+	vm->targ->alpha = enable ? 255 - transparency : 255;
 }
 
 /**
@@ -2042,14 +2075,32 @@ void v_XIST(caosVM* vm) {
 }
 
 /**
- SCLE (command) pose (integer) scaleby (integer)
- %status stub
+ SCLE (command) scaleby (float) yesorno (integer)
+ %status done
+ %variants sm
 */
-void c_SCLE(caosVM* vm) {
-	VM_PARAM_INTEGER(scaleby)
+void c_SCLE_sm(caosVM* vm) {
+	VM_PARAM_INTEGER(yesorno)
+	VM_PARAM_FLOAT(scaleby)
+
+	valid_agent(vm->targ);
+
+	caos_assert(yesorno == 0 || yesorno == 1);
+	vm->targ->scle = yesorno ? scaleby : 1.0;
+}
+
+/**
+ SCLE (command) pose(integer) scaleby (float)
+ %status stub
+ %variants cv
+*/
+void c_SCLE_cv(caosVM* vm) {
+	VM_PARAM_FLOAT(scaleby)
 	VM_PARAM_INTEGER(pose)
 
 	valid_agent(vm->targ);
+
+	caos_assert(pose == 1 || pose == -1);
 
 	// TODO
 }
@@ -2057,8 +2108,9 @@ void c_SCLE(caosVM* vm) {
 /**
  STRC (command) width (integer) height (integer) enable (integer)
  %status stub
+ %variants sm
 
- Draw the current agent (or part? don't know) with the given width/height (ie, stretch the sprite). Set enable to 1 to enable, or 0 to disable.
+ Draw the current agent with the given width/height (ie, stretch the sprite). Set enable to 1 to enable, or 0 to disable.
 */
 void c_STRC(caosVM* vm) {
 	VM_PARAM_INTEGER(enable)
@@ -2066,8 +2118,11 @@ void c_STRC(caosVM* vm) {
 	VM_PARAM_INTEGER(width)
 
 	valid_agent(vm->targ);
-
-	// TODO
+	caos_assert(enable == 0 || enable == 1);
+	// TODO: does this affect agent's width/height?
+	vm->targ->strc = enable;
+	vm->targ->strc_width = width;
+	vm->targ->strc_height = height;
 }
 
 /**
@@ -2178,7 +2233,9 @@ void c_SHAD(caosVM* vm) {
 
 	valid_agent(vm->targ);
 
-	// TODO
+	// TODO: only used by clams in Sea-Monkeys.
+	// Intensity doesn't map directly to alpha 0.0–1.0, maybe 0–0.5?
+	// Needs to either only be on primary part, or all shadows rendered before all parts
 }
 
 /**

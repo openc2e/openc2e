@@ -22,7 +22,6 @@ SpritePart::SpritePart(Agent* p, unsigned int _id, std::string spritefile, unsig
 	is_transparent = (engine.version > 2);
 	framerate = 1;
 	framedelay = 0;
-	draw_mirrored = false;
 
 	if (sprite->numframes() <= firstimg) {
 		if (engine.gametype == "cv") {
@@ -54,7 +53,16 @@ void SpritePart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 		}
 	}
 	assert(getCurrentSprite() < getSprite()->numframes());
-	renderer->renderCreaturesImage(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, has_alpha ? alpha : 0, draw_mirrored);
+	RenderOptions render_opts;
+	render_opts.alpha = parent->alpha;
+	render_opts.mirror = parent->draw_mirrored;
+	render_opts.scale = parent->scle;
+	if (parent->strc) {
+		render_opts.override_drawsize = true;
+		render_opts.overridden_drawwidth = parent->strc_width;
+		render_opts.overridden_drawheight = parent->strc_height;
+	}
+	renderer->renderCreaturesImage(getSprite(), getCurrentSprite(), xoffset + x, yoffset + y, render_opts);
 }
 
 void SpritePart::setFrameNo(unsigned int f) {

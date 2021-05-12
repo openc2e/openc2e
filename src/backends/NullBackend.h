@@ -26,8 +26,7 @@
 
 class NullRenderTarget : public RenderTarget {
   public:
-	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, uint8_t, bool) {}
-	virtual void renderCreaturesImage(const std::shared_ptr<creaturesImage>&, unsigned int, int, int, uint8_t, bool) {}
+	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) {}
 	virtual void renderLine(int, int, int, int, unsigned int) {}
 	virtual void blitRenderTarget(RenderTarget*, int, int, int, int) {}
 	virtual unsigned int getWidth() const { return 800; }

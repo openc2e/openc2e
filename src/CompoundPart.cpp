@@ -86,8 +86,6 @@ CompoundPart::CompoundPart(Agent* p, unsigned int _id, int _x, int _y, int _z)
 	addZOrder();
 	x = _x;
 	y = _y;
-
-	has_alpha = false;
 }
 
 CompoundPart::~CompoundPart() {

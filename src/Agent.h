@@ -218,6 +218,14 @@ class Agent : public std::enable_shared_from_this<Agent> {
 	int thrt = 0;
 	int size = 0;
 
+	// drawing
+	uint8_t alpha = 255;
+	bool draw_mirrored = false;
+	float scle = 1.0; // Sea-Monkeys only
+	bool strc = false; // Sea-Monkeys only
+	unsigned int strc_width; // Sea-Monkeys only
+	unsigned int strc_height; // Sea-Monkeys only
+
 	Agent(unsigned char f, unsigned char g, unsigned short s, unsigned int p);
 	virtual ~Agent();
 
