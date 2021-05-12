@@ -2135,6 +2135,7 @@ void c_STRC(caosVM* vm) {
 /**
  IMGE (command) filename (string)
  %status stub
+ %variants cv
 */
 void c_IMGE(caosVM* vm) {
 	VM_PARAM_STRING(filename)
@@ -2145,6 +2146,9 @@ void c_IMGE(caosVM* vm) {
 /**
  TNTW (command) index (integer)
  %status stub
+ %variants cv
+
+ TODO: also might exist in Docking Station
 */
 void c_TNTW(caosVM* vm) {
 	VM_PARAM_INTEGER(index)
