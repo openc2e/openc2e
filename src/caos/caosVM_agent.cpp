@@ -1311,12 +1311,19 @@ void v_TRAN(caosVM* vm) {
 	VM_PARAM_INTEGER(x)
 
 	valid_agent(vm->targ);
+	// TODO: check first part? or all parts?
 	CompoundPart* s = vm->targ->part(0);
 	assert(s);
 	SpritePart* p = dynamic_cast<SpritePart*>(s);
 	caos_assert(p);
-	caos_assert(x >= 0 && x <= (int)p->getWidth());
-	caos_assert(y >= 0 && y <= (int)p->getHeight());
+
+	if (!(x >= 0 && x < (int)p->getWidth() && y >= 0 && y < (int)p->getHeight())) {
+		// Happens in Sea-Monkeys, of course
+		// TODO: because we're checking first instead of all parts?
+		printf("Warning: TRAN: coordinates out of part's bounds x=%i y=%i width=%i height=%i\n", x, y, (int)p->getWidth(), (int)p->getHeight());
+		vm->result.setInt(1);
+		return;
+	}
 	if (p->transparentAt(x, y))
 		vm->result.setInt(1);
 	else
