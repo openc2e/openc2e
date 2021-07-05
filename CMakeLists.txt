@@ -333,6 +333,7 @@ include(GoogleTest)
 include(Openc2eOutputOnTestFailure)
 
 add_executable(test_openc2e
+        tests/test_demangle.cpp
 	tests/test_caos.cpp
 	tests/test_encoding.cpp
 	tests/test_pray.cpp
