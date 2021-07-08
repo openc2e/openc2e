@@ -18,15 +18,18 @@ class optional {
 		new (&storage_) T(value);
 	}
 	optional(const optional& other) {
-		*this = other;
+		has_value_ = other.has_value_;
+		if (has_value_) {
+			new (&storage_) T(*other);
+		}
 	}
 	optional(optional&& other) {
-		*this = std::move(other);
+		has_value_ = other.has_value_;
+		if (has_value_) {
+			new (&storage_) T(std::move(*other));
+		}
 	}
 	optional& operator=(const optional& other) {
-		if (has_value_) {
-			(&**this)->~T();
-		}
 		has_value_ = other.has_value_;
 		if (has_value_) {
 			new (&storage_) T(*other);
@@ -34,13 +37,9 @@ class optional {
 		return *this;
 	}
 	optional& operator=(optional&& other) {
-		if (has_value_) {
-			(&**this)->~T();
-		}
 		has_value_ = other.has_value_;
 		if (has_value_) {
-			storage_ = other.storage_;
-			other.has_value_ = false;
+			new (&storage_) T(std::move(*other));
 		}
 		return *this;
 	}
