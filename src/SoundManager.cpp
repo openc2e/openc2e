@@ -6,6 +6,8 @@
 #include "World.h"
 #include "caosValue.h"
 
+#include <fmt/core.h>
+
 // this is all for SoundManager::tick
 #include "Camera.h"
 #include "MetaRoom.h"

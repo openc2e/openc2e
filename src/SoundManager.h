@@ -1,12 +1,11 @@
 #pragma once
 
-#include "MNGMusic.h"
 #include "Sound.h"
 #include "audiobackend/AudioBackend.h"
 
-#include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 class SoundManager {
   public:
