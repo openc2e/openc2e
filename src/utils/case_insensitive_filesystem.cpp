@@ -4,7 +4,6 @@
 
 #include <assert.h>
 #include <ghc/filesystem.hpp>
-#include <regex>
 #include <string>
 #include <system_error>
 #include <unordered_map>
