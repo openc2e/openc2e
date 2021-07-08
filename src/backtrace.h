@@ -77,7 +77,11 @@ static void signalhandler(int) {
 
 void install_backtrace_printer() {
 #ifndef _WIN32
-	signal(SIGSEGV, signalhandler);
 	signal(SIGABRT, signalhandler);
+	signal(SIGBUS, signalhandler);
+	signal(SIGFPE, signalhandler);
+	signal(SIGILL, signalhandler);
+	signal(SIGSEGV, signalhandler);
+	signal(SIGTRAP, signalhandler);
 #endif
 }
