@@ -10,12 +10,20 @@
 #include "imageManager.h"
 #include "utils/encoding.h"
 
+#include <fmt/core.h>
+
 TextPart::TextPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y, unsigned int _z, std::string fontsprite)
 	: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = world.gallery->getImage(fontsprite);
 	caos_assert(textsprite);
-	// TODO: Creatures 3's WhiteOnTransparentPasswordChars.s16 has only 96 frames (which matches ASCII printable characters + 0x7f/DEL)
-	caos_assert(textsprite->numframes() == 224);
+	if (textsprite->numframes() != 224) {
+		// TODO: better way to log warnings from inside CAOS
+		// TODO: if the sprite only has 96 frames, should we map text from CP-1252 to ASCII?
+		// Creatures 3's WhiteOnTransparentPasswordChars.s16 has only 96 frames (which matches ASCII printable characters + 0x7f/DEL)
+		// some other sprites on English installs of Creatures 3 have been reported to also only have 96 frames
+		fmt::print("warning: \"{}\" only has {} sprites, not enough to cover the full CP-1252 character set\n");
+	}
+	caos_assert(textsprite->numframes() == 224 || textsprite->numframes() == 96);
 
 	leftmargin = 8;
 	topmargin = 8;
