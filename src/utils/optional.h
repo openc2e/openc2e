@@ -24,7 +24,9 @@ class optional {
 		*this = std::move(other);
 	}
 	optional& operator=(const optional& other) {
-		this->~optional();
+		if (has_value_) {
+			(&**this)->~T();
+		}
 		has_value_ = other.has_value_;
 		if (has_value_) {
 			new (&storage_) T(*other);
@@ -32,7 +34,9 @@ class optional {
 		return *this;
 	}
 	optional& operator=(optional&& other) {
-		this->~optional();
+		if (has_value_) {
+			(&**this)->~T();
+		}
 		has_value_ = other.has_value_;
 		if (has_value_) {
 			storage_ = other.storage_;
