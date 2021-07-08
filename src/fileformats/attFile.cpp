@@ -19,9 +19,11 @@
 #include "fileformats/attFile.h"
 
 #include <cassert>
-#include <regex>
+#include <cctype>
+#include <string>
 
 std::istream& operator>>(std::istream& i, attFile& f) {
+	// TODO: replace this whole thing with a proper parser
 	f.nolines = 0;
 
 	std::string s;
@@ -36,12 +38,13 @@ std::istream& operator>>(std::istream& i, attFile& f) {
 
 		bool havefirst = false;
 		unsigned int x = 0;
-		const std::regex ws_re("\\s+");
-		for (
-			auto beg = std::sregex_token_iterator(s.begin(), s.end(), ws_re, -1);
-			beg != std::sregex_token_iterator();
-			beg++) {
-			unsigned int val = atoi(beg->str().c_str());
+		size_t p = 0;
+		while (true) {
+			const char* start = s.c_str() + p;
+			while (p < s.size() && std::isdigit(s[p])) {
+				p++;
+			}
+			unsigned int val = atoi(start);
 			if (havefirst) {
 				f.attachments[f.nolines][f.noattachments[f.nolines] * 2] = x;
 				f.attachments[f.nolines][(f.noattachments[f.nolines] * 2) + 1] = val;
@@ -50,6 +53,16 @@ std::istream& operator>>(std::istream& i, attFile& f) {
 			} else {
 				havefirst = true;
 				x = val;
+			}
+			if (p == s.size()) {
+				break;
+			}
+			assert(s[p] == ' ' || s[p] == '\r');
+			while (p < s.size() && s[p] == ' ') {
+				p++;
+			}
+			if (p == s.size() || s[p] == '\r') {
+				break;
 			}
 		}
 

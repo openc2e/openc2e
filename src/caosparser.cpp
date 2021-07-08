@@ -139,7 +139,6 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
 	// find a command from the first token
 	std::string command = ascii_tolower(state.tokens[state.p].value);
 	std::string commandnormalized = command;
-	// TODO: <regex> makes compile time slow
 	if (command.size() == 4 && command[0] == 'o' && command[1] == 'b' && command[2] == 'v' && isdigit(command[3])) {
 		commandnormalized = "obvx";
 	} else if (command.size() == 4 && command[0] == 'v' && command[1] == 'a' && command[2] == 'r' && isdigit(command[3])) {

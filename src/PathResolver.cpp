@@ -23,11 +23,11 @@
 #include "utils/ascii_tolower.h"
 #include "utils/case_insensitive_filesystem.h"
 #include "utils/namedifstream.h"
+#include "utils/wildcard_match.h"
 
 #include <assert.h>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
-#include <regex>
 #include <string>
 #include <system_error>
 #include <unordered_map>
@@ -128,25 +128,12 @@ static fs::path findFile(FileDirectory type, fs::path name) {
 }
 
 static std::vector<fs::path> findByWildcard(FileDirectory type, std::string wild) {
-	fs::path::string_type search_pattern = "^";
-	for (auto c : wild) {
-		if (c == '*') {
-			search_pattern += ".*";
-		} else if (c == '?') {
-			search_pattern += ".";
-		} else {
-			search_pattern += std::string("[") + c + "]";
-		}
-	}
-	search_pattern += "$";
-	std::basic_regex<fs::path::value_type> re(search_pattern, std::regex_constants::icase);
-
 	std::vector<fs::path> results;
 	// TODO: check user directory before or after data directories?
 	for (auto d : data_directories) {
 		auto dirname = getDirectory(d, type);
 		for (const auto& entry : case_insensitive_filesystem::directory_iterator(dirname)) {
-			if (std::regex_match(entry.lexically_relative(dirname).native(), re)) {
+			if (wildcard_match(wild, entry.lexically_relative(dirname).native())) {
 				results.push_back(entry);
 			}
 		}

@@ -2,10 +2,10 @@
 #include "fileformats/caoslexer.h"
 #include "fileformats/caostoken.h"
 #include "utils/encoding.h"
+#include "utils/iendswith.h"
 #include "utils/overload.h"
 
 #include <cassert>
-#include <regex>
 
 static char unescape(char c) {
 	switch (c) {
@@ -19,10 +19,6 @@ static char unescape(char c) {
 static bool iequals(const std::string& a, const std::string& b) {
 	return std::equal(a.begin(), a.end(), b.begin(), b.end(),
 		[](char a, char b) { return std::tolower(a) == std::tolower(b); });
-}
-
-static bool imatch(const std::string& s, std::string regex) {
-	return std::regex_search(s, std::regex(regex, std::regex::icase));
 }
 
 struct c2ptoken {
@@ -188,19 +184,19 @@ class Caos2PrayParserImpl {
 			"Dependency " + std::to_string(dependency_count), a});
 		std::string categorykey =
 			"Dependency Category " + std::to_string(dependency_count);
-		if (imatch(a, "\\.(mng|wav)$")) {
+		if (iendswith(a, ".mng") || iendswith(a, ".wav")) {
 			events->push_back(IntegerTag{categorykey, 1});
-		} else if (imatch(a, "\\.(c16|s16)$")) {
+		} else if (iendswith(a, ".c16") || iendswith(a, ".s16")) {
 			events->push_back(IntegerTag{categorykey, 2});
-		} else if (imatch(a, "\\.(gen|gno)$")) {
+		} else if (iendswith(a, ".gen") || iendswith(a, ".gno")) {
 			events->push_back(IntegerTag{categorykey, 3});
-		} else if (imatch(a, "\\.att$")) {
+		} else if (iendswith(a, ".att")) {
 			events->push_back(IntegerTag{categorykey, 4});
 		}
 		// skip category 5, which is Overlay Data
-		else if (imatch(a, "\\.blk$")) {
+		else if (iendswith(a, ".blk")) {
 			events->push_back(IntegerTag{categorykey, 6});
-		} else if (imatch(a, "\\.catalogue$")) {
+		} else if (iendswith(a, ".catalogue")) {
 			events->push_back(IntegerTag{categorykey, 7});
 		} else {
 			*events = {Error{"Unknown dependency category for '" + a}};

@@ -333,10 +333,10 @@ include(GoogleTest)
 include(Openc2eOutputOnTestFailure)
 
 add_executable(test_openc2e
-        tests/test_demangle.cpp
 	tests/test_caos.cpp
 	tests/test_encoding.cpp
 	tests/test_pray.cpp
+        tests/test_utils.cpp
 )
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
 if(COMMAND gtest_discover_testsp)
