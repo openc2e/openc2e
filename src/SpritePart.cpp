@@ -46,10 +46,8 @@ void SpritePart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 			// hack for invalid poses - use the last sprite in the file (as real C2 does)
 			spriteno = getSprite()->numframes() - 1;
 		} else {
-			std::string err = fmt::format("pose to be rendered {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
-				pose, firstimg, base, getSprite()->getName(), getSprite()->numframes());
-			parent->unhandledException(err, false);
-			return;
+			throw creaturesException(fmt::format("pose to be rendered {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
+				pose, firstimg, base, getSprite()->getName(), getSprite()->numframes()));
 		}
 	}
 	assert(getCurrentSprite() < getSprite()->numframes());
@@ -77,10 +75,8 @@ void SpritePart::setPose(unsigned int p) {
 			spriteno = getSprite()->numframes() - 1;
 		} else {
 			// TODO: mention anim frame if animation is non-empty
-			std::string err = fmt::format("new pose {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
-				p, firstimg, base, getSprite()->getName(), getSprite()->numframes());
-			parent->unhandledException(err, false);
-			return;
+			throw creaturesException(fmt::format("new pose {} (firstimg {}, base {}) was past end of sprite file '{}' ({} sprites)",
+				p, firstimg, base, getSprite()->getName(), getSprite()->numframes()));
 		}
 	} else {
 		spriteno = firstimg + base + p;

@@ -434,11 +434,6 @@ void c_POSE(caosVM* vm) {
 
 	AnimatablePart* p = vm->getCurrentAnimatablePart();
 	caos_assert(p);
-
-	SpritePart* s = dynamic_cast<SpritePart*>(p);
-	if (s && engine.version != 2) // C2 has special handling for invalid poses, see SpritePart::setPose
-		caos_assert(s->getFirstImg() + s->getBase() + pose < s->getSprite()->numframes());
-
 	p->animation.clear();
 	p->setPose(pose);
 }
