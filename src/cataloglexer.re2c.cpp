@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cctype>
+#include <fmt/core.h>
 #include <list>
 #include <string>
 
@@ -59,7 +60,11 @@ strloop:
 	basep = catalogue_parse_p;
 
 	/*!re2c
-	backslash any { temp += catalogue_descape(basep[1]); goto strloop; }
+	"\\n" { temp += '\n'; goto strloop; }
+	"\\t" { temp += '\t'; goto strloop; }
+	"\\\\" { temp += '\\'; goto strloop; }
+	"\\\"" { temp += '"'; goto strloop; }
+	backslash any { catalogueParseError(fmt::format("Unknown substitution \\{}", basep[1])); }
 	quote { catalval.string = temp; return CTOK_STR; }
 	backslash ? eoi { catalogueParseError("premature end of input"); }
 	newline { temp += basep[0]; yylineno++; goto strloop; }

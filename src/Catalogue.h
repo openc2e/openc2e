@@ -44,8 +44,7 @@ class Catalogue {
 	static void yyinit(const char* buf);
 	static int catalex();
 	friend int cataparse();
-	friend void cataerror(const char*);
-	static void catalogueParseError(const char* err);
+	static void catalogueParseError(const std::string& err);
 
   public:
 	std::map<std::string, std::vector<std::string> > data;
@@ -66,10 +65,6 @@ class Catalogue {
 };
 
 extern Catalogue catalogue;
-
-/* For lexer/parser, don't use for anything else. */
-
-char catalogue_descape(char c);
 
 #endif
 /* vim: set noet: */

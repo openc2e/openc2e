@@ -36,29 +36,6 @@ namespace fs = ghc::filesystem;
 
 Catalogue catalogue;
 
-struct quote_subst {
-	char escape;
-	char subst;
-};
-
-static struct quote_subst subst_table[] = {
-	{'n', '\n'},
-	{'\\', '\\'},
-	{'\"', '\"'},
-	{'t', '\t'},
-	{0, 0}};
-
-char catalogue_descape(char c) {
-	struct quote_subst* qs = subst_table;
-	while (qs->escape) {
-		if (qs->escape == c)
-			return qs->subst;
-		qs++;
-	}
-	std::cerr << "Unmatched substitution: \\" << c << std::endl;
-	return c;
-}
-
 std::string cat_str;
 int cat_int = -1;
 
@@ -82,7 +59,7 @@ void Catalogue::addVals(std::string& title, bool override, const std::vector<std
 
 extern int cataparse();
 
-void Catalogue::catalogueParseError(const char* err) {
+void Catalogue::catalogueParseError(const std::string& err) {
 	throw catalogueException(fmt::format("Catalogue parse error at line {}: {}", yylineno, err));
 }
 
