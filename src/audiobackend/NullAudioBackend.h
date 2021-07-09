@@ -42,7 +42,12 @@ class NullAudioBackend : public AudioBackend {
 	void fadeOutChannel(AudioChannel) {}
 	void setChannelVolume(AudioChannel, float) {}
 	void setChannelPan(AudioChannel, float) {}
-	AudioState getChannelState(AudioChannel) { return AUDIO_STOPPED; }
+	AudioState getChannelState(AudioChannel) {
+		// TODO: pretend to play audio for the correct duration, so that consumers
+		// of this API don't assume all sounds fail to play.
+		return AUDIO_STOPPED;
+	}
+
 	void stopChannel(AudioChannel) {}
 
 	void playMIDIFile(const std::string&) {}

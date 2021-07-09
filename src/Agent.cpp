@@ -466,6 +466,9 @@ void Agent::playAudio(std::string filename, bool controlled, bool loop) {
 
 	sound.stop();
 	sound = soundmanager.playSound(filename, loop);
+	if (!sound) {
+		unhandledException(fmt::format("Couldn't play sound '{}'", filename), false);
+	}
 	updateAudio(sound);
 	if (!controlled) {
 		sound = {};
@@ -475,7 +478,6 @@ void Agent::playAudio(std::string filename, bool controlled, bool loop) {
 bool agentOnCamera(Agent* targ, bool checkall = false); // caosVM_camera.cpp
 
 void Agent::updateAudio(Sound s) {
-	assert(s);
 	s.setPosition(x, y, getWidth(), getHeight());
 	// TODO: setVelocity?
 }
@@ -1601,6 +1603,9 @@ void Agent::tickVoices() {
 		auto it = pending_voices.begin();
 		// uncontrolled audio is easier, we shall hope no-one notices
 		auto voice = soundmanager.playVoice(it->first);
+		if (!voice) {
+			unhandledException(fmt::format("Couldn't play voice '{}'", it->first), false);
+		}
 		updateAudio(voice);
 		ticks_until_next_voice = it->second;
 		pending_voices.erase(it);
