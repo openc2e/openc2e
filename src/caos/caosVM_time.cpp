@@ -242,8 +242,19 @@ void v_WTIK(caosVM* vm) {
 /**
  RACE (integer)
  %status maybe
+ 
+ Returns the time in milliseconds which the last tick took overall.
 */
 void v_RACE(caosVM* vm) {
+	if (world.race < 1) {
+		// When in fast ticks mode on a fast computer, it is possible that a tick
+		// can take less than a millisecond. This causes the Wolf Control GUI to
+		// divide by zero. This is not an openc2e bug — the real engine behaves
+		// this way! But it is annoying and there's no benefit to keeping that
+		// behavior, so always return at least 1.
+		vm->result.setInt(1);
+		return;
+	}
 	vm->result.setInt(world.race);
 }
 
