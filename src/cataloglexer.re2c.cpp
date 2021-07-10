@@ -64,6 +64,7 @@ strloop:
 	"\\t" { temp += '\t'; goto strloop; }
 	"\\\\" { temp += '\\'; goto strloop; }
 	"\\\"" { temp += '"'; goto strloop; }
+	"\\'" { temp += '\''; goto strloop; }
 	backslash any { catalogueParseError(fmt::format("Unknown substitution \\{}", basep[1])); }
 	quote { catalval.string = temp; return CTOK_STR; }
 	backslash ? eoi { catalogueParseError("premature end of input"); }
