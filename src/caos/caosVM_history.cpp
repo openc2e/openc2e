@@ -80,6 +80,14 @@ void c_HIST_EVNT(caosVM* vm) {
 	VM_PARAM_INTEGER(type)
 	VM_PARAM_STRING(moniker)
 
+	if (!world.history->hasMoniker(moniker) && type == 0 && relatedmoniker1 == "" && relatedmoniker2 == "") {
+		// In C3 and DS, when choosing to start with a couple of pre-trained adult
+		// norns, HIST EVNT va00 0 "" "" is called even though the moniker doesn't
+		// exist. DS claims it's to "doctor history so reconciliation fails".
+		// TODO: what is this actually supposed to do? delete the history maybe?
+		return;
+	}
+
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData& m = world.history->getMoniker(moniker);
 	m.addEvent(type, relatedmoniker1, relatedmoniker2);
