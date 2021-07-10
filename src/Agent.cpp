@@ -1601,12 +1601,16 @@ void Agent::tickVoices() {
 	ticks_until_next_voice--;
 	if (ticks_until_next_voice == 0) {
 		auto it = pending_voices.begin();
-		// uncontrolled audio is easier, we shall hope no-one notices
-		auto voice = soundmanager.playVoice(it->first);
-		if (!voice) {
-			unhandledException(fmt::format("Couldn't play voice '{}'", it->first), false);
+		if (it->first == "") {
+			// just delay for number of ticks
+		} else {
+			// uncontrolled audio is easier, we shall hope no-one notices
+			auto voice = soundmanager.playVoice(it->first);
+			if (!voice) {
+				unhandledException(fmt::format("Couldn't play voice '{}'", it->first), false);
+			}
+			updateAudio(voice);
 		}
-		updateAudio(voice);
 		ticks_until_next_voice = it->second;
 		pending_voices.erase(it);
 	}
