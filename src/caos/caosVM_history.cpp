@@ -72,7 +72,7 @@ void v_HIST_CROS(caosVM* vm) {
  HIST EVNT (command) moniker (string) type (integer) relatedmoniker1 (string) relatedmoniker2 (string)
  %status maybe
 
- Fire a life event of the specified type with the specified moniker.
+ Fire a life event of the specified type with the specified moniker. See HIST TYPE for details on life event numbers.
 */
 void c_HIST_EVNT(caosVM* vm) {
 	VM_PARAM_STRING(relatedmoniker2)
@@ -83,6 +83,8 @@ void c_HIST_EVNT(caosVM* vm) {
 	caos_assert(world.history->hasMoniker(moniker));
 	monikerData& m = world.history->getMoniker(moniker);
 	m.addEvent(type, relatedmoniker1, relatedmoniker2);
+
+	// TODO: CAOS documentation says "All new events made call the Life Event script."
 }
 
 /**
@@ -330,6 +332,34 @@ void v_HIST_TAGE(caosVM* vm) {
 /**
  HIST TYPE (integer) moniker (string) event (integer)
  %status maybe
+ 
+ For the given life event, return it's type.
+ 
+ All histories begin with one of the following four events. You can read the associated monikers with HIST MON1 and HIST MON2.
+ 0 Conceived - a natural start to life, associated monikers are the mother's and father's
+ 1 Spliced - created using GENE CROS to crossover the two associated monikers
+ 2 Engineered - from a human made genome with GENE LOAD, the first associated moniker is blank, and the second is the filename
+ 14 Cloned - such as when importing a creature that already exists in the world and reallocating the new moniker, when TWINing or GENE CLONing; associated moniker is who we were cloned from
+
+ The following events happen during a creature's life:
+ 3 Born - triggered by the BORN command, associated monikers are the parents.
+ 4 Aged - reached the next life stage, either naturally from the ageing loci or with AGES
+ 5 Exported - emmigrated to another world
+ 6 Imported - immigrated back again
+ 7 Died - triggered naturally with the death trigger locus, or by the DEAD command
+ 8 Became pregnant - the first associated moniker is the child, and the second the father
+ 9 Impregnated - first associated moniker is the child, second the mother
+ 10 Child born - first moniker is the child, second the other parent
+ 15 Clone source - someone was cloned from you, first moniker is whom
+ 16 Warped out - exported through a worm hole with NET: EXPO
+ 17 Warped in - imported through a worm hole
+
+ These events aren't triggered by the engine, but reserved for CAOS to use with these numbers:
+ 11 Laid by mother
+ 12 Laid an egg
+ 13 Photographed
+
+ Other numbers can also be used for custom life events. Start with numbers 100 and above, as events below that are reserved for the engine. You send your own events using HIST EVNT.
 */
 void v_HIST_TYPE(caosVM* vm) {
 	VM_PARAM_INTEGER(event)
