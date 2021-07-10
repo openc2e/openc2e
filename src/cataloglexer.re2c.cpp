@@ -52,7 +52,7 @@ array { return CTOK_ARRAY; }
 override { return CTOK_OVERRIDE; }
 number { catalval.number = atoi(basep); return CTOK_INT; }
 quote { goto str; }
-any { catalogueParseError("Unexpected character"); }
+any { catalogueParseError(fmt::format("Unexpected character '{}' ({:#x})", (char)basep[0], basep[0])); }
 */
 str : {
 	std::string temp;
