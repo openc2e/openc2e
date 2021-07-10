@@ -99,7 +99,7 @@ void TextEntryPart::partRender(RenderTarget* renderer, int xoffset, int yoffset)
 void TextEntryPart::renderCaret(RenderTarget* renderer, int xoffset, int yoffset) {
 	// TODO: fudge xoffset/yoffset as required
 	RenderOptions render_opts;
-	render_opts.alpha = parent->alpha;
+	render_opts.alpha = alpha;
 	renderer->renderCreaturesImage(caretsprite, caretpose, xoffset, yoffset, render_opts);
 }
 

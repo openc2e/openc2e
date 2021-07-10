@@ -219,7 +219,6 @@ class Agent : public std::enable_shared_from_this<Agent> {
 	int size = 0;
 
 	// drawing
-	uint8_t alpha = 255;
 	bool draw_mirrored = false;
 	float scle = 1.0; // Sea-Monkeys only
 	bool strc = false; // Sea-Monkeys only

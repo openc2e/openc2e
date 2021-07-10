@@ -52,7 +52,7 @@ void SpritePart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 	}
 	assert(getCurrentSprite() < getSprite()->numframes());
 	RenderOptions render_opts;
-	render_opts.alpha = parent->alpha;
+	render_opts.alpha = alpha;
 	render_opts.mirror = parent->draw_mirrored;
 	render_opts.scale = parent->scle;
 	if (parent->strc) {

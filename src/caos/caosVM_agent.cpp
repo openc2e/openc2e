@@ -1579,9 +1579,19 @@ void c_ALPH(caosVM* vm) {
 		transparency = 255;
 	}
 	caos_assert(enable == 0 || enable == 1);
+	uint8_t alpha = enable ? 255 - transparency : 255;
 
 	valid_agent(vm->targ);
-	vm->targ->alpha = enable ? 255 - transparency : 255;
+	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
+	if (vm->part == -1) {
+		for (auto& part : c->parts) {
+			part->alpha = alpha;
+		}
+	} else {
+		CompoundPart* p = vm->targ->part(vm->part);
+		caos_assert(p);
+		p->alpha = alpha;
+	}
 }
 
 /**

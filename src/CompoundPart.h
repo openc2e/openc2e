@@ -42,6 +42,8 @@ class CompoundPart : public renderable {
 	unsigned int zorder, id;
 	unsigned int part_sequence_number;
 
+	uint8_t alpha = 255;
+
 	virtual void render(class RenderTarget* renderer, int xoffset, int yoffset);
 	virtual void partRender(class RenderTarget* renderer, int xoffset, int yoffset) = 0;
 	virtual void tick() {}
