@@ -95,10 +95,9 @@ bool SpritePart::transparentAt(unsigned int x, unsigned int y) {
 
 void SpritePart::changeSprite(std::string spritefile, unsigned int fimg) {
 	std::shared_ptr<creaturesImage> spr = world.gallery->getImage(spritefile);
-	changeSprite(spr);
-
 	caos_assert(spr->numframes() > fimg);
 	firstimg = fimg;
+	changeSprite(spr);
 }
 
 void SpritePart::changeSprite(std::shared_ptr<creaturesImage> spr) {
