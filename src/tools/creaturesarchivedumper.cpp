@@ -8,7 +8,7 @@
 
 namespace fs = ghc::filesystem;
 
-static const std::string CREATURES_ARCHIVE_MAGIC = "Creatures Evolution Engine - Archived information file. zLib 1.13 compressed";
+static const std::string CREATURES_ARCHIVE_MAGIC = "Creatures Evolution Engine - Archived information file. zLib 1.13 compressed.";
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
@@ -21,8 +21,6 @@ int main(int argc, char** argv) {
 		std::cerr << "File " << input_path << " doesn't exist" << std::endl;
 		exit(1);
 	}
-
-	fs::path stem = input_path.stem();
 
 	std::ifstream in(input_path, std::ios::binary);
 	std::vector<uint8_t> data(std::istreambuf_iterator<char>{in}, {});
@@ -42,12 +40,20 @@ int main(int argc, char** argv) {
 	fmt::print("magic = \"{}\"\n", magic);
 	fmt::print("magic size = {}\n", magic.size());
 
-	uint8_t unknown1 = read8(s);
-	uint8_t unknown2 = read8(s);
-	uint8_t unknown3 = read8(s);
-	fmt::print("unknown1 = 0x{:02x} ({} << 8 = {})\n", unknown1, unknown1, unknown1 << 8);
-	fmt::print("unknown2 = 0x{:02x} ({} << 8 = {})\n", unknown2, unknown2, unknown2 << 8);
-	fmt::print("unknown3 = 0x{:02x} ({} << 8 = {})\n", unknown3, unknown3, unknown3 << 8);
+	uint8_t sub = read8(s);
+	uint8_t eot = read8(s);
+	fmt::print("sub = 0x{:02x}\n", sub);
+	fmt::print("eot = 0x{:02x}\n", eot);
+	if (sub != 0x1a || eot != 0x04) {
+		if (sub != 0x1a) {
+			fmt::print(stderr, "Expected SUB (0x1a), got {:#x}\n", sub);
+			exit(1);
+		}
+		if (eot != 0x04) {
+			fmt::print(stderr, "Expected EOT (0x04), got {:#x}\n", sub);
+			exit(1);
+		}
+	}
 
 	fmt::print("stream position = {}\n", s.tellg());
 
@@ -69,7 +75,7 @@ int main(int argc, char** argv) {
 
 	fmt::print("decompressed data size = {}\n", usize);
 
-	fs::path output_filename("creaturesarchive.out");
+	fs::path output_filename = input_path.filename().string() + ".out";
 	fmt::print("writing to {}\n", output_filename.string());
 	std::ofstream out(output_filename, std::ios::binary);
 	out.write((char*)decompressed_data.data(), usize);
