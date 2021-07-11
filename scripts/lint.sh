@@ -30,7 +30,7 @@ for f in ${modified_files}; do
   if ! echo "${f}" | egrep -q "[.](cpp|c|h)$"; then
     continue
   fi
-  if ! echo "${f}" | egrep -q "^src"; then
+  if ! echo "${f}" | egrep -q "^(src|tests)"; then
     continue
   fi
   f="$(git rev-parse --show-toplevel)/${f}"
