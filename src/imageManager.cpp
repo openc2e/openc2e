@@ -26,6 +26,7 @@
 #include "creaturesException.h"
 #include "fileformats/ImageUtils.h"
 #include "fileformats/hedfile.h"
+#include "fileformats/paletteFile.h"
 #include "utils/mmapifstream.h"
 
 #include <array>
@@ -67,22 +68,10 @@ void imageManager::loadDefaultPalette() {
 		// TODO: case-sensitivity for the lose
 		path palpath(findMainDirectoryFile("Palettes/palette.dta"));
 		if (exists(palpath) && !is_directory(palpath)) {
-			std::ifstream f(palpath.string().c_str(), std::ios::binary);
-			f >> std::noskipws;
-			std::array<uint8_t, 768> palette_data;
-			f.read((char*)palette_data.data(), 768);
-
-			palette = shared_array<Color>(256);
-			for (unsigned int i = 0; i < 256; i++) {
-				palette[i].r = palette_data[i * 3] * 4;
-				palette[i].g = palette_data[i * 3 + 1] * 4;
-				palette[i].b = palette_data[i * 3 + 2] * 4;
-				palette[i].a = 0xff;
-			}
-
-			engine.backend->setDefaultPalette(palette);
-		} else
+			engine.backend->setDefaultPalette(ReadPaletteFile(palpath));
+		} else {
 			throw creaturesException("Couldn't find C1 palette data!");
+		}
 	}
 }
 

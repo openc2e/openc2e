@@ -1,5 +1,7 @@
 #include "creaturesException.h"
 #include "fileformats/ImageUtils.h"
+#include "fileformats/c1defaultpalette.h"
+#include "fileformats/paletteFile.h"
 #include "fileformats/pngImage.h"
 
 #include <fmt/format.h>
@@ -114,6 +116,19 @@ int main(int argc, char** argv) {
 	}
 
 	stitch_to_sheet(image);
+
+	shared_array<Color> palette;
+	if (image[0].format == if_index8) {
+		// TODO: case-sensitivity for the lose
+		if (fs::exists(input_path.replace_filename("PALETTE.DTA"))) {
+			palette = ReadPaletteFile(input_path.replace_filename("PALETTE.DTA"));
+		} else {
+			palette = getCreatures1DefaultPalette();
+		}
+		for (auto& i : image) {
+			i.palette = palette;
+		}
+	}
 
 	for (size_t i = 0; i < image.size(); ++i) {
 		std::string frame_filename = [&]() {

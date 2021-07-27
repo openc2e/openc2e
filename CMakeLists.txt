@@ -127,6 +127,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/hedfile.cpp
 	src/fileformats/mngfile.cpp
 	${GEN}/fileformats/mngparser.cpp
+	src/fileformats/paletteFile.cpp
 	src/fileformats/peFile.cpp
 	src/fileformats/pngImage.cpp
 	src/fileformats/PrayFileReader.cpp

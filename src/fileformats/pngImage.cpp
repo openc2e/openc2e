@@ -18,6 +18,9 @@ void WritePngFile(const Image& image, std::ostream& out) {
 	if (image.width == 0 || image.height == 0 || !image.data) {
 		throw creaturesException("Can't write image with no data");
 	}
+	if (image.format == if_index8 && !image.palette) {
+		throw creaturesException("Can't write indexed image with no palette");
+	}
 
 	png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png) {
