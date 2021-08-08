@@ -44,8 +44,6 @@ endif()
 
 if(WIN32 OR APPLE)
 	add_subdirectory(externals/libpng EXCLUDE_FROM_ALL)
-	add_subdirectory(externals/utf8proc EXCLUDE_FROM_ALL)
-	add_library(utf8proc::utf8proc ALIAS utf8proc)
 
 	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
@@ -53,7 +51,6 @@ if(WIN32 OR APPLE)
 	add_library(SDL2::Mixer ALIAS SDL2_mixer)
 else()
 	find_package(PNG REQUIRED)
-	find_package(utf8proc REQUIRED)
 
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
@@ -104,7 +101,7 @@ add_library(openc2e-utils STATIC
 	src/utils/userlocale.cpp
 	src/utils/case_insensitive_filesystem.cpp
 )
-target_link_libraries(openc2e-utils PRIVATE ghc_filesystem utf8proc::utf8proc)
+target_link_libraries(openc2e-utils PRIVATE ghc_filesystem)
 
 add_library(openc2e-utils-socket STATIC
 	src/utils/socket.cpp # separate because it links to Ws2_32.lib

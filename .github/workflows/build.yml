@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v2
     - name: "Install dependencies (Ubuntu)"
       if: "startsWith(matrix.os, 'ubuntu-')"
-      run: sudo apt-get update && sudo apt-get install libpng-dev libsdl2-dev libsdl2-mixer-dev libutf8proc-dev zlib1g-dev
+      run: sudo apt-get update && sudo apt-get install libpng-dev libsdl2-dev libsdl2-mixer-dev zlib1g-dev
     - name: "Set environment variables (Windows)"
       if: runner.os == 'Windows'
       shell: cmd

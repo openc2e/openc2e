@@ -61,7 +61,6 @@ sudo apt-get install \
   libsdl2-mixer-dev \
   cmake\
   libpng-dev \
-  libutf8proc-dev
 ```
 
 ### macOS

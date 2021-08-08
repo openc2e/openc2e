@@ -2,6 +2,13 @@
 
 #include <gtest/gtest.h>
 
+TEST(encoding, is_valid_utf8) {
+  // surrogate half
+  EXPECT_FALSE(is_valid_utf8("\xed\xa0\x80"));
+  // overlong
+  EXPECT_FALSE(is_valid_utf8("\xc0\xa0"));
+}
+
 TEST(encoding, ensure_utf8) {
   EXPECT_EQ(ensure_utf8("hello world"), "hello world");
   EXPECT_EQ(ensure_utf8("tr\xc3\xa8s cool"), "tr\xc3\xa8s cool");

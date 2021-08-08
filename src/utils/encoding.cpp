@@ -5,32 +5,176 @@
 #include <array>
 #include <assert.h>
 #include <stdexcept>
-#include <utf8proc.h>
 
 std::string codepoint_to_utf8(char32_t c) {
 	std::array<uint8_t, 5> s = {0, 0, 0, 0, 0};
-	if (utf8proc_encode_char(c, s.data()) <= 0) {
+	if (c <= 0x7f) {
+		s[0] = c;
+	} else if (c <= 0x7ff) {
+		s[0] = 0xc0 | (c >> 6);
+		s[1] = 0x80 | (c & 0x3f);
+	} else if (c <= 0xffff) {
+		s[0] = 0xe0 | (c >> 12);
+		s[1] = 0x80 | ((c >> 6) & 0x3f);
+		s[2] = 0x80 | (c & 0x3f);
+	} else if (c <= 0x10ffff) {
+		s[0] = 0xf0 | (c >> 18);
+		s[1] = 0x80 | ((c >> 12) & 0x3f);
+		s[2] = 0x80 | ((c >> 6) & 0x3f);
+		s[3] = 0x80 | (c & 0x3f);
+	} else {
 		throw std::domain_error("Can't convert " + std::to_string(c) + " into UTF-8");
-	};
+	}
 	return std::string((char*)s.data());
 }
 
+static int utf8decode(const unsigned char* s, char32_t* c) {
+	int n = 0;
+	if (s[0] <= 0x7f) {
+		n = 1;
+		*c = (char32_t)s[0];
+	} else if (
+		s[0] >= 0xc0 && s[0] <= 0xdf &&
+		s[1] >= 0x80 && s[1] <= 0xbf) {
+		n = 2;
+		*c = ((char32_t)(s[0] & 0x1f) << 6) |
+			 ((char32_t)(s[1] & 0x3f));
+	} else if (
+		s[0] >= 0xe0 && s[0] <= 0xef &&
+		s[1] >= 0x80 && s[1] <= 0xbf &&
+		s[2] >= 0x80 && s[2] <= 0xbf) {
+		n = 3;
+		*c = ((char32_t)(s[0] & 0x0f) << 12) |
+			 ((char32_t)(s[1] & 0x3f) << 6) |
+			 ((char32_t)(s[2] & 0x3f));
+	} else if (
+		s[0] >= 0xf0 && s[0] <= 0xf7 &&
+		s[1] >= 0x80 && s[1] <= 0xbf &&
+		s[2] >= 0x80 && s[2] <= 0xbf &&
+		s[3] >= 0x80 && s[3] <= 0xbf) {
+		n = 4;
+		*c = ((char32_t)(s[0] & 0x07) << 18) |
+			 ((char32_t)(s[1] & 0x3f) << 12) |
+			 ((char32_t)(s[2] & 0x3f) << 6) |
+			 ((char32_t)(s[3] & 0x3f));
+	} else {
+		// TODO: 5- and 6-byte sequences
+		return 0;
+	}
+	// no surrogate halves allowed
+	if (*c >= 0xd800 && *c <= 0xdfff) {
+		return 0;
+	}
+	// no overlongs
+	if (*c <= 0x7f) {
+		if (n != 1)
+			return 0;
+	} else if (*c <= 0x7ff) {
+		if (n != 2)
+			return 0;
+	} else if (*c <= 0xffff) {
+		if (n != 3)
+			return 0;
+	} else if (*c <= 0x1fffff) {
+		if (n != 4)
+			return 0;
+	}
+	return n;
+}
+
+static char32_t utf8_combine_diacriticals(char32_t c, char32_t combining) {
+	// basic NFC normalization for characters that exist in both Unicode and CP-1252
+	// clang-format off
+	if (combining == 0x300 && c == 0x41) return 0xc0;
+	if (combining == 0x300 && c == 0x45) return 0xc8;
+	if (combining == 0x300 && c == 0x49) return 0xcc;
+	if (combining == 0x300 && c == 0x4f) return 0xd2;
+	if (combining == 0x300 && c == 0x55) return 0xd9;
+	if (combining == 0x300 && c == 0x61) return 0xe0;
+	if (combining == 0x300 && c == 0x65) return 0xe8;
+	if (combining == 0x300 && c == 0x69) return 0xec;
+	if (combining == 0x300 && c == 0x6f) return 0xf2;
+	if (combining == 0x300 && c == 0x75) return 0xf9;
+	if (combining == 0x301 && c == 0x41) return 0xc1;
+	if (combining == 0x301 && c == 0x45) return 0xc9;
+	if (combining == 0x301 && c == 0x49) return 0xcd;
+	if (combining == 0x301 && c == 0x4f) return 0xd3;
+	if (combining == 0x301 && c == 0x55) return 0xda;
+	if (combining == 0x301 && c == 0x59) return 0xdd;
+	if (combining == 0x301 && c == 0x61) return 0xe1;
+	if (combining == 0x301 && c == 0x65) return 0xe9;
+	if (combining == 0x301 && c == 0x69) return 0xed;
+	if (combining == 0x301 && c == 0x6f) return 0xf3;
+	if (combining == 0x301 && c == 0x75) return 0xfa;
+	if (combining == 0x301 && c == 0x79) return 0xfd;
+	if (combining == 0x302 && c == 0x41) return 0xc2;
+	if (combining == 0x302 && c == 0x45) return 0xca;
+	if (combining == 0x302 && c == 0x49) return 0xce;
+	if (combining == 0x302 && c == 0x4f) return 0xd4;
+	if (combining == 0x302 && c == 0x55) return 0xdb;
+	if (combining == 0x302 && c == 0x61) return 0xe2;
+	if (combining == 0x302 && c == 0x65) return 0xea;
+	if (combining == 0x302 && c == 0x69) return 0xee;
+	if (combining == 0x302 && c == 0x6f) return 0xf4;
+	if (combining == 0x302 && c == 0x75) return 0xfb;
+	if (combining == 0x303 && c == 0x41) return 0xc3;
+	if (combining == 0x303 && c == 0x4e) return 0xd1;
+	if (combining == 0x303 && c == 0x4f) return 0xd5;
+	if (combining == 0x303 && c == 0x61) return 0xe3;
+	if (combining == 0x303 && c == 0x6e) return 0xf1;
+	if (combining == 0x303 && c == 0x6f) return 0xf5;
+	if (combining == 0x308 && c == 0x41) return 0xc4;
+	if (combining == 0x308 && c == 0x45) return 0xcb;
+	if (combining == 0x308 && c == 0x49) return 0xcf;
+	if (combining == 0x308 && c == 0x4f) return 0xd6;
+	if (combining == 0x308 && c == 0x55) return 0xdc;
+	if (combining == 0x308 && c == 0x59) return 0x178;
+	if (combining == 0x308 && c == 0x61) return 0xe4;
+	if (combining == 0x308 && c == 0x65) return 0xeb;
+	if (combining == 0x308 && c == 0x69) return 0xef;
+	if (combining == 0x308 && c == 0x6f) return 0xf6;
+	if (combining == 0x308 && c == 0x75) return 0xfc;
+	if (combining == 0x308 && c == 0x79) return 0xff;
+	if (combining == 0x30a && c == 0x41) return 0xc5;
+	if (combining == 0x30a && c == 0x61) return 0xe5;
+	if (combining == 0x30c && c == 0x53) return 0x160;
+	if (combining == 0x30c && c == 0x5a) return 0x17d;
+	if (combining == 0x30c && c == 0x73) return 0x161;
+	if (combining == 0x30c && c == 0x7a) return 0x17e;
+	if (combining == 0x327 && c == 0x43) return 0xc7;
+	if (combining == 0x327 && c == 0x63) return 0xe7;
+	// clang-format on
+	return 0;
+}
+
 static char32_t utf8_to_codepoint(const std::string& s, size_t& pos) {
-	int32_t codepoint;
-	utf8proc_ssize_t bytes_read = utf8proc_iterate((unsigned char*)s.c_str() + pos, s.size() - pos, &codepoint);
-	if (bytes_read < 0 || codepoint == -1) {
+	char32_t c;
+	int bytes_read = utf8decode((unsigned char*)s.data() + pos, &c);
+	if (bytes_read == 0) {
 		throw std::domain_error("Invalid UTF-8 codepoint starting with " + std::to_string(s[pos]));
 	}
 	pos += bytes_read;
-	return codepoint;
+
+	// check for combining diacritical marks, some very basic NFC normalization
+	if (s[pos] == '\xcc' || s[pos] == '\xcd') {
+		char32_t combining = 0;
+		bytes_read = utf8decode((unsigned char*)s.data() + pos, &combining);
+		char32_t new_c = utf8_combine_diacriticals(c, combining);
+		if (new_c != 0) {
+			c = new_c;
+			pos += bytes_read;
+		}
+	}
+
+	return c;
 }
 
-static bool is_valid_utf8(const std::string& str) {
+bool is_valid_utf8(const std::string& str) {
 	size_t pos = 0;
 	while (pos < str.size()) {
-		int32_t codepoint;
-		utf8proc_ssize_t bytes_read = utf8proc_iterate((unsigned char*)str.c_str() + pos, str.size() - pos, &codepoint);
-		if (bytes_read < 0 || codepoint == -1) {
+		char32_t codepoint;
+		int bytes_read = utf8decode((unsigned char*)str.c_str() + pos, &codepoint);
+		if (bytes_read == 0) {
 			return false;
 		}
 		pos += bytes_read;
@@ -47,20 +191,11 @@ std::string cp1252_to_utf8(const std::string& cp1252_str) {
 }
 
 std::string utf8_to_cp1252(const std::string& utf8_str) {
-	uint8_t* nfc_char_p = utf8proc_NFC(reinterpret_cast<const unsigned char*>(utf8_str.c_str()));
-	std::string nfc_str;
-	if (nfc_char_p) {
-		nfc_str = std::string(reinterpret_cast<char*>(nfc_char_p));
-		free(nfc_char_p);
-	} else {
-		// TODO: error?
-		nfc_str = utf8_str;
-	}
-
+	// TODO: assert valid utf8?
 	std::string cp1252_str;
 	size_t pos = 0;
-	while (pos < nfc_str.size()) {
-		cp1252_str += unicode_to_cp1252(utf8_to_codepoint(nfc_str, pos));
+	while (pos < utf8_str.size()) {
+		cp1252_str += unicode_to_cp1252(utf8_to_codepoint(utf8_str, pos));
 	}
 	return cp1252_str;
 }
@@ -130,10 +265,10 @@ char32_t cp1252_to_codepoint(unsigned char cp1252_char) {
 }
 
 unsigned char unicode_to_cp1252(char32_t codepoint) {
-	if (codepoint <= 0x007f) {
+	if (codepoint <= 0x7f) {
 		return codepoint;
 	}
-	if (codepoint >= 0x00a0 && codepoint <= 0x00ff) {
+	if (codepoint >= 0xa0 && codepoint <= 0xff) {
 		return codepoint;
 	}
 	switch (codepoint) {
