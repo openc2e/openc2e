@@ -82,6 +82,10 @@ static int utf8decode(const unsigned char* s, char32_t* c) {
 	return n;
 }
 
+static bool utf8_is_combining_diacritical(char32_t codepoint) {
+	return codepoint >= 0x300 && codepoint <= 0x36f;
+}
+
 static char32_t utf8_combine_diacriticals(char32_t c, char32_t combining) {
 	// basic NFC normalization for characters that exist in both Unicode and CP-1252
 	// clang-format off
@@ -154,18 +158,6 @@ static char32_t utf8_to_codepoint(const std::string& s, size_t& pos) {
 		throw std::domain_error("Invalid UTF-8 codepoint starting with " + std::to_string(s[pos]));
 	}
 	pos += bytes_read;
-
-	// check for combining diacritical marks, some very basic NFC normalization
-	if (s[pos] == '\xcc' || s[pos] == '\xcd') {
-		char32_t combining = 0;
-		bytes_read = utf8decode((unsigned char*)s.data() + pos, &combining);
-		char32_t new_c = utf8_combine_diacriticals(c, combining);
-		if (new_c != 0) {
-			c = new_c;
-			pos += bytes_read;
-		}
-	}
-
 	return c;
 }
 
@@ -195,7 +187,15 @@ std::string utf8_to_cp1252(const std::string& utf8_str) {
 	std::string cp1252_str;
 	size_t pos = 0;
 	while (pos < utf8_str.size()) {
-		cp1252_str += unicode_to_cp1252(utf8_to_codepoint(utf8_str, pos));
+		char32_t codepoint = utf8_to_codepoint(utf8_str, pos);
+		if (utf8_is_combining_diacritical(codepoint) && cp1252_str.size() > 0) {
+			char32_t combined = utf8_combine_diacriticals(cp1252_str.back(), codepoint);
+			if (combined != 0) {
+				cp1252_str.back() = unicode_to_cp1252(combined);
+				continue;
+			}
+		}
+		cp1252_str += unicode_to_cp1252(codepoint);
 	}
 	return cp1252_str;
 }
