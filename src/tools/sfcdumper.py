@@ -268,8 +268,6 @@ class MapData:
 			# disease data? TODO
 			self.randombytes = f.read(800)
 
-readingcompound = False
-
 class Entity: # like a compound part?
 	def read(self, f):
 		print("--- start part ---")
@@ -305,12 +303,6 @@ class Entity: # like a compound part?
 			if x != -1:
 				self.animstring = self.animstring[:x]
 			print("on frame " + str(self.animframe) + " of animation '" + repr(self.animstring) + "'")
-
-		if readingcompound:
-			self.relx = read32(f)
-			self.rely = read32(f)
-			print("part offset: " + str(self.relx) + ", " + str(self.rely))
-			return
 
 class Object:
 	def identify(self):
@@ -564,15 +556,17 @@ class CompoundObject(Object):
 	def read(self, f):
 		Object.partialread(self, f)
 
-		global readingcompound
-		readingcompound = True
-
 		num_parts = read32(f)
 		self.parts = []
 		print("reading " + str(num_parts) + " parts..")
 		for i in range(num_parts):
 			print("reading part #" + str(i))
 			e = slurpMFC(f, Entity)
+			if e:
+				# hmm maybe even if it's null?
+				e.relx = read32(f)
+				e.rely = read32(f)
+				print("part offset: " + str(e.relx) + ", " + str(e.rely))
 			if not e:
 				# TODO: hackery?
 				x = f.read(8)
@@ -583,7 +577,6 @@ class CompoundObject(Object):
 				assert e, "part 0 was null"
 				assert e.relx == 0 and e.rely == 0
 			self.parts.append(e)
-		readingcompound = False
 
 		self.hotspots = []
 		for i in range(6):

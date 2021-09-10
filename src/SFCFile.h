@@ -50,7 +50,6 @@ struct SFCScript {
 
 class SFCFile {
   private:
-	bool reading_compound;
 	unsigned int ver;
 
 	std::vector<SFCClass*> storage;
@@ -70,8 +69,7 @@ class SFCFile {
 	uint32_t favplacex, favplacey;
 	std::vector<std::string> speech_history;
 
-	SFCFile()
-		: reading_compound(false) {}
+	SFCFile() {}
 	~SFCFile();
 	void read(std::istream* i);
 	SFCClass* slurpMFC(unsigned int reqtype = 0);
@@ -83,7 +81,6 @@ class SFCFile {
 	std::string readBytes(unsigned int n);
 	std::string readstring();
 
-	bool readingCompound() { return reading_compound; }
 	void setVersion(unsigned int v);
 	unsigned int version() { return ver; }
 
@@ -183,8 +180,6 @@ class SFCEntity : public SFCClass {
 	uint8_t animframe;
 	std::string animstring;
 
-	uint32_t relx, rely;
-
 	// TODO: misc data/flags
 	SFCEntity(SFCFile* p)
 		: SFCClass(p) {}
@@ -239,6 +234,8 @@ class SFCCompoundObject : public SFCObject {
 
   public:
 	std::vector<SFCEntity*> parts;
+	std::vector<uint32_t> parts_relx;
+	std::vector<uint32_t> parts_rely;
 
 	SFCHotspot hotspots[6];
 

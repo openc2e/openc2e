@@ -245,16 +245,10 @@ SFCClass* SFCFile::slurpMFC(unsigned int reqtype) {
 			throw creaturesException("SFCFile didn't find a valid type in internal variable, argh!");
 	}
 
-	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT))
-		reading_compound = true;
-
 	// push the object onto storage, and make it deserialize itself
 	types[storage.size()] = types[pid];
 	storage.push_back(newobj);
 	newobj->read();
-
-	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT))
-		reading_compound = false;
 
 	// return this new object
 	return newobj;
@@ -505,13 +499,8 @@ void SFCEntity::read() {
 			tempstring = readBytes(99);
 		// chop off non-null-terminated bits
 		animstring = std::string(tempstring.c_str());
-	} else
+	} else {
 		haveanim = false;
-
-	if (parent->readingCompound()) {
-		relx = read32();
-		rely = read32();
-		return;
 	}
 }
 
@@ -624,17 +613,18 @@ void SFCCompoundObject::read() {
 	uint32_t numparts = read32();
 
 	for (unsigned int i = 0; i < numparts; i++) {
-		SFCEntity* e = (SFCEntity*)slurpMFC(TYPE_ENTITY);
-		if (!e) {
-			sfccheck(i != 0);
-			// if entity is null, discard unknown bytes
-			readBytes(8);
+		SFCEntity* part = (SFCEntity*)slurpMFC(TYPE_ENTITY);
+		uint32_t relx = read32();
+		uint32_t rely = read32();
+		if (i == 0) {
+			sfccheck(part);
+			sfccheck(relx == 0 && rely == 0);
 		}
-		if (i == 0)
-			sfccheck((e->relx == 0) && (e->rely == 0));
 
 		// push the entity, even if it is null..
-		parts.push_back(e);
+		parts.push_back(part);
+		parts_relx.push_back(relx);
+		parts_rely.push_back(rely);
 	}
 
 	// read hotspot coordinates
@@ -1030,7 +1020,7 @@ void SFCCompoundObject::copyToWorld() {
 		if (!e)
 			continue;
 		DullPart* p;
-		p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, e->relx, e->rely, e->zorder - basezorder);
+		p = new DullPart(a, i, e->sprite->filename, e->sprite->firstimg, parts_relx[i], parts_rely[i], e->zorder - basezorder);
 		a->addPart(p);
 
 		copyEntityData(e, p);
