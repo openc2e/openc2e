@@ -51,7 +51,6 @@ struct SFCScript {
 class SFCFile {
   private:
 	bool reading_compound;
-	bool reading_scenery;
 	unsigned int ver;
 
 	std::vector<SFCClass*> storage;
@@ -72,7 +71,7 @@ class SFCFile {
 	std::vector<std::string> speech_history;
 
 	SFCFile()
-		: reading_compound(false), reading_scenery(false) {}
+		: reading_compound(false) {}
 	~SFCFile();
 	void read(std::istream* i);
 	SFCClass* slurpMFC(unsigned int reqtype = 0);
@@ -84,7 +83,6 @@ class SFCFile {
 	std::string readBytes(unsigned int n);
 	std::string readstring();
 
-	bool readingScenery() { return reading_scenery; }
 	bool readingCompound() { return reading_compound; }
 	void setVersion(unsigned int v);
 	unsigned int version() { return ver; }
@@ -186,13 +184,6 @@ class SFCEntity : public SFCClass {
 	std::string animstring;
 
 	uint32_t relx, rely;
-
-	uint32_t partzorder;
-	int bhvrclick[3];
-	uint8_t bhvrtouch;
-
-	std::vector<std::pair<int, int> > pickup_handles;
-	std::vector<std::pair<int, int> > pickup_points;
 
 	// TODO: misc data/flags
 	SFCEntity(SFCFile* p)
@@ -309,6 +300,13 @@ class SFCSimpleObject : public SFCObject {
   public:
 	SFCEntity* entity;
 
+	uint32_t partzorder;
+	int bhvrclick[3];
+	uint8_t bhvrtouch;
+
+	std::vector<std::pair<int, int> > pickup_handles;
+	std::vector<std::pair<int, int> > pickup_points;
+
 	SFCSimpleObject(SFCFile* p)
 		: SFCObject(p) { ourAgent = 0; }
 	void read();
@@ -339,11 +337,20 @@ class SFCCallButton : public SFCSimpleObject {
 	void copyToWorld();
 };
 
-class SFCScenery : public SFCSimpleObject {
+class SFCScenery : public SFCObject {
+  protected:
+	class SimpleAgent* ourAgent = nullptr;
+
   public:
+	SFCEntity* entity;
+
 	SFCScenery(SFCFile* p)
-		: SFCSimpleObject(p) {}
+		: SFCObject(p) {}
+	void read();
 	void copyToWorld();
+	class Agent* copiedAgent() {
+		return (Agent*)ourAgent;
+	}
 };
 
 class SFCMacro : public SFCClass {

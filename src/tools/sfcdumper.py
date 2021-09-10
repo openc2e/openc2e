@@ -269,7 +269,6 @@ class MapData:
 			self.randombytes = f.read(800)
 
 readingcompound = False
-readingscenery = False
 
 class Entity: # like a compound part?
 	def read(self, f):
@@ -307,41 +306,11 @@ class Entity: # like a compound part?
 				self.animstring = self.animstring[:x]
 			print("on frame " + str(self.animframe) + " of animation '" + repr(self.animstring) + "'")
 
-		if readingscenery:
-			return
-
 		if readingcompound:
 			self.relx = read32(f)
 			self.rely = read32(f)
 			print("part offset: " + str(self.relx) + ", " + str(self.rely))
 			return
-
-		self.zorder2 = reads32(f)
-		if self.zorder != self.zorder2:
-			# kaelis's Eden.sfc has this differing for obj#816!
-			# TODO: work out what the heck
-			print("strange zorder: " + str(self.zorder2))
-
-		# TODO: finish decoding this
-		self.clickbhvr = f.read(3)
-		self.touchbhvr = read8(f)
-		print("* touch bhvr: " + str(self.touchbhvr) + ", click bhvr:")
-		for z in self.clickbhvr: print("%02X" % z)
-		print()
-
-		if version == 0: return
-		
-		num_pickup_handles = read16(f)
-		self.pickup_handles = []
-		for i in range(num_pickup_handles):
-			self.pickup_handles.append((read32(f), read32(f)))
-
-		num_pickup_points = read16(f)
-		self.pickup_points = []
-		for i in range(num_pickup_points):
-			self.pickup_points.append((read32(f), read32(f)))
-
-		print("read " + str(len(self.pickup_handles)) + " pickup handles and " + str(len(self.pickup_points)) + " pickup points")
 
 class Object:
 	def identify(self):
@@ -499,6 +468,33 @@ class SimpleObject(Object):
 
 		self.entity = slurpMFC(f, Entity)
 		assert self.entity
+
+		self.zorder2 = reads32(f)
+		if self.entity.zorder != self.zorder2:
+			# kaelis's Eden.sfc has this differing for obj#816!
+			# TODO: work out what the heck
+			print("strange zorder: " + str(self.zorder2))
+
+		# TODO: finish decoding this
+		self.clickbhvr = f.read(3)
+		self.touchbhvr = read8(f)
+		print("* touch bhvr: " + str(self.touchbhvr) + ", click bhvr:")
+		for z in self.clickbhvr: print("%02X" % z)
+		print()
+
+		if version == 0: return
+		
+		num_pickup_handles = read16(f)
+		self.pickup_handles = []
+		for i in range(num_pickup_handles):
+			self.pickup_handles.append((read32(f), read32(f)))
+
+		num_pickup_points = read16(f)
+		self.pickup_points = []
+		for i in range(num_pickup_points):
+			self.pickup_points.append((read32(f), read32(f)))
+
+		print("read " + str(len(self.pickup_handles)) + " pickup handles and " + str(len(self.pickup_points)) + " pickup points")
 
 class PointerTool(SimpleObject):
 	def read(self, f):
@@ -707,12 +703,10 @@ class Blackboard(CompoundObject):
 			if len(x) > 0:
 				print("blackboard string #" + str(num) + ": " + repr(x))
 
-class Scenery(SimpleObject):
+class Scenery(Object):
 	def read(self, f):
-		global readingscenery
-		readingscenery = True
-		SimpleObject.read(self, f)
-		readingscenery = False
+		Object.partialread(self, f)
+		self.entity = slurpMFC(f, Entity)
 
 class Creature:
 	def read(self, f):

@@ -54,6 +54,7 @@ class Agent : public std::enable_shared_from_this<Agent> {
 	friend class SFCFile;
 	friend class SFCSimpleObject;
 	friend class SFCCompoundObject;
+	friend class SFCScenery;
 	friend class CreatureAgent;
 
 	FRIEND_SERIALIZE(Agent)

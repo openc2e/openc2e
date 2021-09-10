@@ -247,8 +247,6 @@ SFCClass* SFCFile::slurpMFC(unsigned int reqtype) {
 
 	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT))
 		reading_compound = true;
-	else if (types[pid] == TYPE_SCENERY)
-		reading_scenery = true;
 
 	// push the object onto storage, and make it deserialize itself
 	types[storage.size()] = types[pid];
@@ -257,8 +255,6 @@ SFCClass* SFCFile::slurpMFC(unsigned int reqtype) {
 
 	if (validSFCType(types[pid], TYPE_COMPOUNDOBJECT))
 		reading_compound = false;
-	else if (types[pid] == TYPE_SCENERY)
-		reading_scenery = false;
 
 	// return this new object
 	return newobj;
@@ -512,41 +508,10 @@ void SFCEntity::read() {
 	} else
 		haveanim = false;
 
-	if (parent->readingScenery())
-		return;
-
 	if (parent->readingCompound()) {
 		relx = read32();
 		rely = read32();
 		return;
-	}
-
-	// read part zorder
-	partzorder = read32();
-
-	// read bhvrclick
-	bhvrclick[0] = (signed char)read8();
-	bhvrclick[1] = (signed char)read8();
-	bhvrclick[2] = (signed char)read8();
-
-	// read BHVR touch
-	bhvrtouch = read8();
-
-	if (parent->version() == 0)
-		return;
-
-	// read pickup handles/points
-	uint16_t num_pickup_handles = read16();
-	for (unsigned int i = 0; i < num_pickup_handles; i++) {
-		int x = reads32();
-		int y = reads32();
-		pickup_handles.push_back(std::pair<int, int>(x, y));
-	}
-	uint16_t num_pickup_points = read16();
-	for (unsigned int i = 0; i < num_pickup_points; i++) {
-		int x = reads32();
-		int y = reads32();
-		pickup_points.push_back(std::pair<int, int>(x, y));
 	}
 }
 
@@ -772,6 +737,34 @@ void SFCSimpleObject::read() {
 	SFCObject::read();
 
 	entity = (SFCEntity*)slurpMFC(TYPE_ENTITY);
+
+	// read part zorder
+	partzorder = read32();
+
+	// read bhvrclick
+	bhvrclick[0] = (signed char)read8();
+	bhvrclick[1] = (signed char)read8();
+	bhvrclick[2] = (signed char)read8();
+
+	// read BHVR touch
+	bhvrtouch = read8();
+
+	if (parent->version() == 0)
+		return;
+
+	// read pickup handles/points
+	uint16_t num_pickup_handles = read16();
+	for (unsigned int i = 0; i < num_pickup_handles; i++) {
+		int x = reads32();
+		int y = reads32();
+		pickup_handles.push_back(std::pair<int, int>(x, y));
+	}
+	uint16_t num_pickup_points = read16();
+	for (unsigned int i = 0; i < num_pickup_points; i++) {
+		int x = reads32();
+		int y = reads32();
+		pickup_points.push_back(std::pair<int, int>(x, y));
+	}
 }
 
 void SFCPointerTool::read() {
@@ -976,24 +969,6 @@ void copyEntityData(SFCEntity* entity, DullPart* p) {
 
 	if (entity->getParent()->version() == 0)
 		return;
-
-	// TODO: pickup/carry points are per-agent in openc2e but apparently per-part in the SFC file?
-	if (p->id != 0)
-		return;
-
-	Agent* parent = p->getParent();
-
-	for (unsigned int i = 0; i < entity->pickup_handles.size(); i++) {
-		int x = entity->pickup_handles[i].first, y = entity->pickup_handles[i].second;
-		if (x != -1 || y != -1)
-			parent->carried_points[i] = entity->pickup_handles[i];
-	}
-
-	for (unsigned int i = 0; i < entity->pickup_points.size(); i++) {
-		int x = entity->pickup_points[i].first, y = entity->pickup_points[i].second;
-		if (x != -1 || y != -1)
-			parent->carry_points[i] = entity->pickup_points[i];
-	}
 }
 
 void SFCCompoundObject::copyToWorld() {
@@ -1099,9 +1074,9 @@ void SFCSimpleObject::copyToWorld() {
 	a->actv = actv;
 
 	// copy bhvrclick data
-	a->clac[0] = entity->bhvrclick[0];
-	a->clac[1] = entity->bhvrclick[1];
-	a->clac[2] = entity->bhvrclick[2];
+	a->clac[0] = bhvrclick[0];
+	a->clac[1] = bhvrclick[1];
+	a->clac[2] = bhvrclick[2];
 
 	// ticking
 	a->tickssincelasttimer = tickstate;
@@ -1130,7 +1105,19 @@ void SFCSimpleObject::copyToWorld() {
 	copyEntityData(entity, p);
 
 	// TODO: bhvr
-	// TODO: pickup handles/points
+
+	// pickup handles/points
+	for (unsigned int i = 0; i < pickup_handles.size(); i++) {
+		int x = pickup_handles[i].first, y = pickup_handles[i].second;
+		if (x != -1 || y != -1)
+			a->carried_points[i] = pickup_handles[i];
+	}
+
+	for (unsigned int i = 0; i < pickup_points.size(); i++) {
+		int x = pickup_points[i].first, y = pickup_points[i].second;
+		if (x != -1 || y != -1)
+			a->carry_points[i] = pickup_points[i];
+	}
 
 	if (currentsound.size() != 0) {
 		a->playAudio(currentsound, true, true);
@@ -1208,11 +1195,66 @@ void SFCCallButton::copyToWorld() {
 	a->buttonid = liftid;
 }
 
+void SFCScenery::read() {
+	SFCObject::read();
+	entity = (SFCEntity*)slurpMFC(TYPE_ENTITY);
+}
+
 void SFCScenery::copyToWorld() {
-	SFCSimpleObject::copyToWorld();
-	SpritePart* p = dynamic_cast<SpritePart*>(ourAgent->part(0));
-	assert(p);
+	// construct our equivalent object
+	if (!ourAgent) {
+		ourAgent = new SimpleAgent(family, genus, species, entity->zorder, sprite->filename, sprite->firstimg, sprite->noframes);
+	}
+	SimpleAgent* a = ourAgent;
+
+	a->finishInit();
+	//a->moveTo(entity->x - (a->part(0)->getWidth() / 2), entity->y - (a->part(0) -> getHeight() / 2));
+	a->moveTo(entity->x, entity->y);
+	a->queueScript(7); // enter scope
+
+	if (parent->version() == 1)
+		world.setUNID(a, unid);
+
+	// copy data from ourselves
+
+	// TODO: is all of this really needed for scenery?
+
+	// TODO: c1 attributes!
+	// C2 attributes are a subset of c2e ones
+	a->setAttributes(attr);
+
+	a->actv = actv;
+
+	// ticking
+	a->tickssincelasttimer = tickstate;
+	if (a->tickssincelasttimer == tickreset)
+		a->tickssincelasttimer = 0;
+	a->timerrate = tickreset;
+
+	for (unsigned int i = 0; i < (parent->version() == 0 ? 3 : 100); i++)
+		a->var[i].setInt(variables[i]);
+
+	if (parent->version() == 1) {
+		a->size = size;
+		a->thrt = threat;
+		a->range = range;
+		a->accg = accg;
+		a->falling = (gravdata == 0xFFFFFFFF ? false : true); // TODO
+		a->velx = velx;
+		a->vely = vely;
+		a->rest = rest;
+		a->aero = aero;
+		a->paused = frozen; // TODO
+	}
+
+	// copy data from entity
+	DullPart* p = (DullPart*)a->part(0);
+	copyEntityData(entity, p);
 	p->is_transparent = true;
+
+	if (currentsound.size() != 0) {
+		a->playAudio(currentsound, true, true);
+	}
 }
 
 void SFCScript::install() {
