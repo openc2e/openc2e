@@ -17,8 +17,7 @@
  *  Lesser General Public License for more details.
  *
  */
-#ifndef _CATALOGUE_H
-#define _CATALOGUE_H
+#pragma once
 
 #include "creaturesException.h"
 
@@ -29,28 +28,9 @@
 #include <string>
 #include <vector>
 
-class catalogueException : public creaturesException {
-  public:
-	catalogueException(const char* s) throw()
-		: creaturesException(s) {}
-	catalogueException(const std::string& s) throw()
-		: creaturesException(s) {}
-};
-
 class Catalogue {
-  protected:
-	static int yylineno;
-	static const char* catalogue_parse_p;
-	static void yyinit(const char* buf);
-	static int catalex();
-	friend int cataparse();
-	static void catalogueParseError(const std::string& err);
-
   public:
 	std::map<std::string, std::vector<std::string> > data;
-
-  public:
-	friend std::istream& operator>>(std::istream&, Catalogue&);
 
 	const std::vector<std::string>& getTag(std::string t) const { return (*data.find(t)).second; }
 	bool hasTag(std::string t) const { return (data.find(t) != data.end()); }
@@ -61,10 +41,8 @@ class Catalogue {
 	void addFile(ghc::filesystem::path path);
 	void initFrom(ghc::filesystem::path path, std::string language);
 
-	void addVals(std::string& title, bool override, const std::vector<std::string>& vals);
+  private:
+	void addVals(const std::string& title, bool override, const std::vector<std::string>& vals);
 };
 
 extern Catalogue catalogue;
-
-#endif
-/* vim: set noet: */

@@ -19,16 +19,12 @@
  */
 #include "Catalogue.h"
 
-// make sure we have the header imports that bison's horrible .h file needs
-#include "catalogparser.h"
-#include "utils/readfile.h"
+#include "fileformats/catalogueFile.h"
 
 #include <cassert>
-#include <cctype>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
 #include <iostream>
-#include <list>
 #include <string>
 
 
@@ -36,12 +32,7 @@ namespace fs = ghc::filesystem;
 
 Catalogue catalogue;
 
-std::string cat_str;
-int cat_int = -1;
-
-Catalogue* parsing_cat = NULL;
-
-void Catalogue::addVals(std::string& title, bool override, const std::vector<std::string>& vals) {
+void Catalogue::addVals(const std::string& title, bool override, const std::vector<std::string>& vals) {
 	// TODO: how the heck does override work?
 	// There seem to be three groups of conflicting tags:
 	// (1) Tags with the same value. Some are marked OVERRIDE, some aren't.
@@ -56,23 +47,6 @@ void Catalogue::addVals(std::string& title, bool override, const std::vector<std
 	data[title] = vals;
 }
 
-
-extern int cataparse();
-
-void Catalogue::catalogueParseError(const std::string& err) {
-	throw catalogueException(fmt::format("Catalogue parse error at line {}: {}", yylineno, err));
-}
-
-std::istream& operator>>(std::istream& s, Catalogue& c) {
-	std::string buf = readfile(s);
-	Catalogue::yyinit(buf.c_str());
-	parsing_cat = &c;
-
-	cataparse();
-
-	return s;
-}
-
 void Catalogue::reset() {
 	data.clear();
 }
@@ -82,8 +56,10 @@ void Catalogue::addFile(fs::path path) {
 	assert(!fs::is_directory(path));
 
 	try {
-		std::ifstream f(path);
-		f >> *this;
+		CatalogueFile file = readCatalogueFile(path);
+		for (const auto& tag : file.tags) {
+			addVals(tag.name, tag.override, tag.values);
+		}
 	} catch (const catalogueException& ex) {
 		std::cerr << "Error reading catalogue file " << path.string() << ":" << std::endl
 				  << '\t' << ex.what() << std::endl;

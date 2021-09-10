@@ -114,6 +114,7 @@ add_library(openc2e-fileformats STATIC
 	${GEN}/fileformats/Caos2PrayParser.cpp
 	${GEN}/fileformats/caoslexer.cpp
 	src/fileformats/caostoken.cpp
+	${GEN}/fileformats/catalogueFile.cpp
 	${GEN}/fileformats/cfgFile.cpp
 	src/fileformats/charsetdta.cpp
 	src/fileformats/c1cobfile.cpp
@@ -182,8 +183,6 @@ add_library(openc2e-core STATIC
 	src/caos/caosVM_vectors.cpp
 	src/caos/caosVM_vehicles.cpp
 	src/caos/caosVM_world.cpp
-	${GEN}/cataloglexer.cpp
-	src/catalogparser.cpp
 	src/Catalogue.cpp
 	${GEN}/cmddata.cpp
 	src/CompoundAgent.cpp
@@ -320,10 +319,8 @@ add_executable(translate_voice
 	src/tools/translate_voice.cpp
 	src/VoiceData.cpp
 	src/Catalogue.cpp
-	${GEN}/cataloglexer.cpp
-	src/catalogparser.cpp
 )
-target_link_libraries(translate_voice openc2e-utils openc2e-audiobackend fmt ghc_filesystem)
+target_link_libraries(translate_voice openc2e-fileformats openc2e-utils openc2e-audiobackend fmt ghc_filesystem)
 
 # tests
 enable_testing()
@@ -386,6 +383,13 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
+	OUTPUT ${GEN}/fileformats/catalogueFile.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
+	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/catalogueFile.cpp ${SRC}/src/fileformats/catalogueFile.re2c.cpp
+	DEPENDS ${SRC}/src/fileformats/catalogueFile.re2c.cpp
+	WORKING_DIRECTORY ${SRC})
+
+add_custom_command(
 	OUTPUT ${GEN}/fileformats/cfgFile.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
 	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/cfgFile.cpp ${SRC}/src/fileformats/cfgFile.re2c.cpp
@@ -417,7 +421,6 @@ add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/openc2e.6)
 add_custom_target(generated DEPENDS
 	${GEN}/caoslexer.cpp
 	${GEN}/mngparser.cpp
-	${GEN}/cataloglexer.cpp
 	${GEN}/cmddata.cpp
 )
 
