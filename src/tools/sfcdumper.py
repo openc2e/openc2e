@@ -617,25 +617,16 @@ class CompoundObject(Object):
 class Vehicle(CompoundObject):
 	def read(self, f):
 		CompoundObject.read(self, f)
+		
+		print(f"vehicle compound {self.parts[0].x} {self.parts[0].y}")
 
 		# TODO: correct?
 		self.xvec = reads32(f)
 		self.yvec = reads32(f)
-		self.bump = read8(f)
-		print("xvec: " + str(self.xvec) + ", yvec: " + str(self.yvec) + ", bump flags: " + str(self.bump))
+		print("vehicle xvec: " + str(self.xvec) + ", yvec: " + str(self.yvec))
 
-		self.coordx = read16(f)
-		if version == 0:
-			x = f.read(2)
-			print("vehicl bytes:")
-			for z in x: print("%02X" % z)
-			print()
-		else:
-			x = read16(f)
-			assert x == 0
-		self.coordy = read16(f)
-		x = read8(f)
-		assert x == 0
+		self.coordx = reads32(f) >> 8
+		self.coordy = reads32(f) >> 8
 		print("vehicle coords: " + str(self.coordx) + ", " + str(self.coordy))
 
 		# TODO: this could all be nonsense, really
@@ -644,10 +635,10 @@ class Vehicle(CompoundObject):
 		self.cabinright = read32(f)
 		self.cabinbottom = read32(f)
 
-		print("cabin coords: " + str(self.cabinleft) + ", " + str(self.cabintop) + ", " + str(self.cabinright) + ", " + str(self.cabinbottom))
+		print("vehicle cabin coords: " + str(self.cabinleft) + ", " + str(self.cabintop) + ", " + str(self.cabinright) + ", " + str(self.cabinbottom))
 
-		x = read32(f)
-		assert x == 0
+		self.bump = read32(f)
+		print("vehicle bump flags: " + str(self.bump))
 
 # TODO: is it Vehicle subclass?
 class Lift(Vehicle):

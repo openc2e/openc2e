@@ -731,15 +731,11 @@ void SFCVehicle::read() {
 
 	xvec = reads32();
 	yvec = reads32();
-	bump = read8();
-
-	// discard unknown bytes
-	read16();
-	unsigned short x = read16();
-	if (parent->version() == 1)
-		sfccheck(x == 0);
-	read16();
-	sfccheck(read8() == 0);
+	uint32_t xcoord = read32() / 256;
+	uint32_t ycoord = read32() / 256;
+	// TODO
+	(void)xcoord;
+	(void)ycoord;
 
 	// read cabin boundaries
 	cabinleft = read32();
@@ -747,8 +743,7 @@ void SFCVehicle::read() {
 	cabinright = read32();
 	cabinbottom = read32();
 
-	// discard unknown bytes
-	sfccheck(read32() == 0);
+	bump = read32();
 }
 
 void SFCLift::read() {
