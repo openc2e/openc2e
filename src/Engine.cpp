@@ -1070,8 +1070,15 @@ bool Engine::initialSetup() {
 	// load palette for C1
 	world.gallery->loadDefaultPalette();
 
-	// initial setup
+	// audio
 	musicmanager = std::make_unique<MusicManager>(audio);
+	if (!cmdline_enable_sound) {
+		soundmanager.setMuted(true);
+		musicmanager->setMuted(true);
+		musicmanager->setMIDIMuted(true);
+	}
+
+	// initial setup
 	std::cout << "* Reading catalogue files..." << std::endl;
 	world.initCatalogue();
 	std::cout << "* Initial setup..." << std::endl;
@@ -1146,12 +1153,6 @@ bool Engine::initialSetup() {
 		std::cout << "Told not to run the world, so stopping now." << std::endl;
 		shutdown();
 		return false;
-	}
-
-	if (!cmdline_enable_sound) {
-		soundmanager.setMuted(true);
-		musicmanager->setMuted(true);
-		musicmanager->setMIDIMuted(true);
 	}
 
 	// Let agents know the window size (makes the DS sound options panel update
