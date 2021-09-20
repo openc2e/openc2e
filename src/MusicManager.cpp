@@ -33,7 +33,7 @@
 #include "World.h"
 
 MusicManager::MusicManager(const std::shared_ptr<AudioBackend>& backend_)
-	: backend(backend_), mng_music(std::make_unique<MNGMusic>(backend_)) {
+	: backend(backend_), creatures1_ticks_until_next_sound(20), mng_music(std::make_unique<MNGMusic>(backend_)) {
 }
 
 MusicManager::~MusicManager() {
@@ -88,7 +88,7 @@ void MusicManager::setMIDIMuted(bool muted) {
 void MusicManager::updateVolumes() {
 	mng_music->setVolume(music_muted ? 0 : music_volume);
 	backend->setMIDIVolume(isMIDIMuted() ? 0 : midi_volume);
-	backend->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.4);
+	backend->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.8);
 }
 
 void MusicManager::playTrack(std::string track) {
@@ -158,14 +158,17 @@ void MusicManager::playTrackForAtLeastThisManyMilliseconds(std::string track, un
 
 void MusicManager::tick() {
 	// play C1 music
-	// TODO: this doesn't seem to actually be every 7 seconds, but actually somewhat random
 	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
-	// TODO: is this the right place for this?
-	if (engine.version == 1 && (world.tickcount % 70) == 0 &&
-		backend->getChannelState(creatures1_channel) == AUDIO_STOPPED) {
-		auto sounds = findSoundFiles("MU*.wav");
-		if (sounds.size()) {
-			creatures1_channel = backend->playClip(sounds[rand() % sounds.size()]);
+	// TODO: this should probably be in a separate C1MusicManager class
+	if (engine.version == 1) {
+		if (creatures1_ticks_until_next_sound == 0 && backend->getChannelState(creatures1_channel) == AUDIO_STOPPED) {
+			auto sounds = findSoundFiles("MU*.wav");
+			if (sounds.size()) {
+				creatures1_channel = backend->playClip(sounds[rand() % sounds.size()]);
+			}
+			creatures1_ticks_until_next_sound = 50 + (rand() % 50);
+		} else {
+			creatures1_ticks_until_next_sound--;
 		}
 	}
 
