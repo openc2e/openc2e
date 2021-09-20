@@ -1079,8 +1079,10 @@ bool Engine::initialSetup() {
 	}
 
 	// initial setup
-	std::cout << "* Reading catalogue files..." << std::endl;
-	world.initCatalogue();
+	if (engine.version == 3) {
+		std::cout << "* Reading catalogue files..." << std::endl;
+		world.initCatalogue();
+	}
 	std::cout << "* Initial setup..." << std::endl;
 	world.init(); // just reads mouse cursor (we want this after the catalogue reading so we don't play "guess the filename")
 	if (engine.version > 2) {
