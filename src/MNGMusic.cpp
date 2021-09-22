@@ -34,14 +34,14 @@ void MNGMusic::playTrack(MNGFile* file, std::string trackname) {
 	trackname = ascii_tolower(trackname);
 
 	// TODO: these lowercase transformations are ridiculous, we should store inside MusicTrack
-	if (nexttrack && nexttrack->parent == file) {
+	if (nexttrack && nexttrack->file == file) {
 		std::string nextname = ascii_tolower(nexttrack->getName());
 		if (nextname == trackname) {
 			// already moving to this track
 			return;
 		}
 	}
-	if (currenttrack && currenttrack->parent == file) {
+	if (currenttrack && currenttrack->file == file) {
 		std::string thisname = ascii_tolower(currenttrack->getName());
 		if (thisname == trackname) {
 			// already playing this track!
@@ -60,7 +60,7 @@ void MNGMusic::playTrack(MNGFile* file, std::string trackname) {
 		return; // TODO: exception?
 	}
 
-	playTrack(std::make_shared<MusicTrack>(file, parsed_script, *track, backend.get()));
+	playTrack(std::make_shared<MusicTrack>(this, file, parsed_script, *track, backend.get()));
 }
 
 void MNGMusic::playTrack(std::shared_ptr<MusicTrack> track) {
@@ -89,6 +89,20 @@ void MNGMusic::setVolume(float volume_) {
 	if (volume_ != volume) {
 		volume = volume_;
 		update();
+	}
+}
+
+void MNGMusic::setMood(float mood_) {
+	// TODO: adjust slowly?
+	if (mood_ != mood) {
+		mood = mood_;
+	}
+}
+
+void MNGMusic::setThreat(float threat_) {
+	// TODO: adjust slowly?
+	if (threat_ != threat) {
+		threat = threat_;
 	}
 }
 
@@ -199,13 +213,13 @@ bool MusicVoice::shouldPlay() {
 
 void MusicLayer::runUpdateBlock() {
 	for (auto update : updates) {
-		getVariable(update.variable) = evaluateExpression(update.value, this);
+		setVariable(update.variable, evaluateExpression(update.value, this));
 	}
 }
 
 void MusicVoice::runUpdateBlock() {
 	for (auto kv : updates) {
-		parent->getVariable(kv.variable) = evaluateExpression(kv.value, parent);
+		parent->setVariable(kv.variable, evaluateExpression(kv.value, parent));
 	}
 }
 
@@ -239,17 +253,36 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack* p, 
 	runUpdateBlock();
 }
 
-float& MusicAleotoricLayer::getVariable(std::string name) {
+float MusicAleotoricLayer::getVariable(std::string name) {
 	if (name == "Volume") {
 		return volume;
-	}
-	if (name == "Interval") {
+	} else if (name == "Interval") {
 		return interval;
-	}
-	if (name == "Pan") {
+	} else if (name == "Pan") {
 		throw creaturesException("'Pan' is not a valid variable inside AleotoricLayer");
+	} else if (name == "Mood") {
+		return parent->parent->mood;
+	} else if (name == "Threat") {
+		return parent->parent->threat;
+	} else {
+		return variables[name];
 	}
-	return variables[name];
+}
+
+void MusicAleotoricLayer::setVariable(std::string name, float value) {
+	if (name == "Volume") {
+		volume = value;
+	} else if (name == "Interval") {
+		interval = value;
+	} else if (name == "Pan") {
+		throw creaturesException("'Pan' is not a valid variable inside AleotoricLayer");
+	} else if (name == "Mood") {
+		throw creaturesException("'Mood' cannot be set inside AleotoricLayer");
+	} else if (name == "Threat") {
+		throw creaturesException("'Threat' cannot be set inside AleotoricLayer");
+	} else {
+		variables[name] = value;
+	}
 }
 
 void MusicAleotoricLayer::stop() {
@@ -273,7 +306,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	}
 	for (auto qw = queued_waves.begin(); qw != queued_waves.end();) {
 		if (mngclock::now() >= qw->start_time) {
-			auto channel = playSample(qw->wave_name, parent->parent, backend);
+			auto channel = playSample(qw->wave_name, parent->file, backend);
 			backend->setChannelVolume(channel, qw->volume * current_volume);
 			backend->setChannelPan(channel, qw->pan);
 			playing_waves.push_back({channel, qw->volume});
@@ -333,7 +366,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 				queued_waves.push_back({voice->wave, start_offset, volume_value, pan_value});
 			}
 		} else {
-			auto channel = playSample(voice->wave, parent->parent, backend);
+			auto channel = playSample(voice->wave, parent->file, backend);
 			backend->setChannelVolume(channel, current_volume);
 			playing_waves.push_back({channel, 1.0});
 		}
@@ -371,22 +404,41 @@ MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack* p, AudioBackend* b
 	variables["Threat"] = 0.5f;
 }
 
-float& MusicLoopLayer::getVariable(std::string name) {
+float MusicLoopLayer::getVariable(std::string name) {
 	if (name == "Volume") {
 		return volume;
-	}
-	if (name == "Interval") {
+	} else if (name == "Interval") {
 		throw creaturesException("'Interval' is not a valid variable inside LoopLayer");
-	}
-	if (name == "Pan") {
+	} else if (name == "Pan") {
 		return pan;
+	} else if (name == "Mood") {
+		return parent->parent->mood;
+	} else if (name == "Threat") {
+		return parent->parent->threat;
+	} else {
+		return variables[name];
 	}
-	return variables[name];
+}
+
+void MusicLoopLayer::setVariable(std::string name, float value) {
+	if (name == "Volume") {
+		volume = value;
+	} else if (name == "Interval") {
+		throw creaturesException("'Interval' is not a valid variable inside LoopLayer");
+	} else if (name == "Pan") {
+		pan = value;
+	} else if (name == "Mood") {
+		throw creaturesException("'Mood' cannot be set inside LoopLayer");
+	} else if (name == "Threat") {
+		throw creaturesException("'Threat' cannot be set inside LoopLayer");
+	} else {
+		variables[name] = value;
+	}
 }
 
 void MusicLoopLayer::update(float track_volume) {
 	if (!channel) {
-		channel = playSample(wave, parent->parent, backend, true);
+		channel = playSample(wave, parent->file, backend, true);
 	}
 
 	float current_volume = volume * track_volume;
@@ -404,8 +456,9 @@ void MusicLoopLayer::stop() {
 	channel = {};
 }
 
-MusicTrack::MusicTrack(MNGFile* p, MNGScript script, MNGTrack n, AudioBackend* b) {
+MusicTrack::MusicTrack(MNGMusic* p, MNGFile* f, MNGScript script, MNGTrack n, AudioBackend* b) {
 	node = n;
+	file = f;
 	parent = p;
 
 	volume = n.volume.value_or(1.0);

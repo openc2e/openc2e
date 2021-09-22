@@ -22,12 +22,19 @@ class MNGMusic {
 	std::shared_ptr<class MusicTrack> currenttrack, nexttrack;
 	std::shared_ptr<AudioBackend> backend;
 	float volume = 1.0;
+	float mood = 1.0;
+	float threat = 0.5;
+
+	friend class MusicLoopLayer;
+	friend class MusicAleotoricLayer;
 
   public:
 	MNGMusic(const std::shared_ptr<AudioBackend>& backend);
 	~MNGMusic();
 	void update();
 	void setVolume(float);
+	void setMood(float);
+	void setThreat(float);
 	void stop();
 
 	void playTrack(MNGFile* file, std::string trackname);
@@ -73,7 +80,8 @@ class MusicLayer {
 	virtual ~MusicLayer() = default;
 	void runUpdateBlock();
 	MusicTrack* getParent() { return parent; }
-	virtual float& getVariable(std::string name) = 0;
+	virtual float getVariable(std::string name) = 0;
+	virtual void setVariable(std::string name, float value) = 0;
 };
 
 class MusicAleotoricLayer : public MusicLayer {
@@ -104,7 +112,8 @@ class MusicAleotoricLayer : public MusicLayer {
 	MusicAleotoricLayer(MNGAleotoricLayer n, MusicTrack* p, AudioBackend* b);
 	void update(float track_volume, float track_beatlength);
 	void stop();
-	float& getVariable(std::string name);
+	float getVariable(std::string name);
+	void setVariable(std::string name, float value);
 };
 
 class MusicLoopLayer : public MusicLayer {
@@ -118,13 +127,15 @@ class MusicLoopLayer : public MusicLayer {
 	MusicLoopLayer(MNGLoopLayer n, MusicTrack* p, AudioBackend* b);
 	void update(float track_volume);
 	void stop();
-	float& getVariable(std::string name);
+	float getVariable(std::string name);
+	void setVariable(std::string name, float value);
 };
 
 class MusicTrack {
   public:
 	MNGTrack node;
-	MNGFile* parent;
+	MNGFile* file;
+	MNGMusic* parent;
 
 	std::vector<std::shared_ptr<MusicAleotoricLayer>> aleotoriclayers;
 	std::vector<std::shared_ptr<MusicLoopLayer>> looplayers;
@@ -132,7 +143,7 @@ class MusicTrack {
 
 	float fadein, fadeout, beatlength, volume;
 
-	MusicTrack(MNGFile* p, MNGScript s, MNGTrack n, AudioBackend* b);
+	MusicTrack(MNGMusic* p, MNGFile* f, MNGScript s, MNGTrack n, AudioBackend* b);
 	void update(float system_volume);
 	void stop();
 	void startFadeIn();
