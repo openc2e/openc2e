@@ -221,11 +221,11 @@ Image Tint(const Image& oldimage, unsigned char r, unsigned char g, unsigned cha
 			};
 
 			/*
-       * CDN:
-       * tempRed = RedValue + redTint;
-       * tempGreen = GreenValue + greenTint;
-       * tempBlue = BlueValue + blueTint;
-       */
+			 * CDN:
+			 * tempRed = RedValue + redTint;
+			 * tempGreen = GreenValue + greenTint;
+			 * tempBlue = BlueValue + blueTint;
+			 */
 			// TODO: should this work differently for 565 vs 555 color?
 			int red = (((uint32_t)(v)&0xf800) >> 8) + redTint;
 			if (red < 0)
@@ -244,13 +244,13 @@ Image Tint(const Image& oldimage, unsigned char r, unsigned char g, unsigned cha
 				blue = 255;
 
 			/*
-       * CDN:
-       * if (rotation < 128)
-       * rotRed = ((absRot * tempBlue) + (invRot * tempRed)) / 256
-       * rotGreen = ((absRot * tempRed) + (invRot * tempGreen)) / 256
-       * rotBlue = ((absRot * tempGreen) + (invRot * tempBlue)) / 256
-       * endif
-       */
+			 * CDN:
+			 * if (rotation < 128)
+			 * rotRed = ((absRot * tempBlue) + (invRot * tempRed)) / 256
+			 * rotGreen = ((absRot * tempRed) + (invRot * tempGreen)) / 256
+			 * rotBlue = ((absRot * tempGreen) + (invRot * tempBlue)) / 256
+			 * endif
+			 */
 
 			int rotRed, rotGreen, rotBlue;
 			rotRed = ((blue * absRot) + (red * invRot)) / 128;
@@ -259,25 +259,25 @@ Image Tint(const Image& oldimage, unsigned char r, unsigned char g, unsigned cha
 
 
 			/*
-       * CDN:
-       * swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed))/256
-       * swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue))/256
-       *
-       * fuzzie notes that this doesn't seem to be a no-op for swap=128..
-       */
-			int swappedRed = ((absSwap * blue) + (invSwap * red)) / 128;
-			int swappedBlue = ((absSwap * red) + (invSwap * blue)) / 128;
+			 * CDN:
+			 * swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed))/256
+			 * swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue))/256
+			 *
+			 * fuzzie notes that this doesn't seem to be a no-op for swap=128..
+			 */
+			int swappedRed = ((absSwap * rotBlue) + (invSwap * rotRed)) / 128;
+			int swappedBlue = ((absSwap * rotRed) + (invSwap * rotBlue)) / 128;
 
 			/*
-       * SetColour(definedcolour to (swappedRed,rotGreen,swappedBlue))
-       */
+			 * SetColour(definedcolour to (swappedRed,rotGreen,swappedBlue))
+			 */
 			swappedRed = (swappedRed << 8) & 0xf800;
 			rotGreen = (rotGreen << 3) & 0x7e0;
 			swappedBlue = (swappedBlue >> 3) & 0x1f;
 			v = (swappedRed | rotGreen | swappedBlue);
 			/*
-       * if definedcolour ==0 SetColour(definedcolour to (1,1,1))
-       */
+			 * if definedcolour ==0 SetColour(definedcolour to (1,1,1))
+			 */
 			if (v == 0)
 				v = (1 << 11 | 1 << 5 | 1);
 			((unsigned short*)newimage.data.data())[(j * newimage.width) + k] = v;
