@@ -40,31 +40,34 @@ void decryptbuf(char* buf, int len) {
 MNGFile::MNGFile(std::string n) {
 	name = n;
 
-	stream = new mmapifstream(n);
+	mmapifstream stream(n);
 	if (!stream) {
-		delete stream;
 		throw MNGFileException("open failed");
 	}
 
 	// Read metavariables from beginning of file
-	uint32_t numsamples = read32le(stream->map);
-	uint32_t scriptoffset = read32le(stream->map + 4);
-	uint32_t scriptlength = read32le(stream->map + 8);
+	uint32_t numsamples = read32le(stream);
+	uint32_t scriptoffset = read32le(stream);
+	uint32_t scriptlength = read32le(stream);
+
+	struct MNGSampleHeader {
+		uint32_t position;
+		uint32_t size;
+	};
+	std::vector<MNGSampleHeader> sample_headers(numsamples);
 
 	// read the samples
-	for (size_t i = 0; i < numsamples; i++) {
+	for (uint32_t i = 0; i < numsamples; i++) {
 		// Sample offsets and lengths are stored in pairs after the initial 16 bytes
-		uint32_t position = read32le(stream->map + 12 + (8 * i));
-		uint32_t size = read32le(stream->map + 16 + (8 * i));
-		samples.push_back(shared_array<uint8_t>(stream->map + position, stream->map + position + size));
+		sample_headers[i].position = read32le(stream);
+		sample_headers[i].size = read32le(stream);
 	}
 
-	// now we have the samples, read and decode the MNG script
-	script = std::string(stream->map + scriptoffset, stream->map + scriptoffset + scriptlength);
-	// script = (char *) malloc(scriptlength + 1);
-	// script[scriptlength] = 0;
-	// if(! script) { delete stream; throw MNGFileException("malloc failed"); }
-	// memcpy(script, stream->map + scriptoffset, scriptlength);
+	// read and decode the MNG script
+	// TODO: warning if scriptoffset isn't in usual place?
+	stream.seekg(scriptoffset);
+	script = std::string(scriptlength, '\0');
+	stream.read(&script[0], scriptlength);
 	decryptbuf(const_cast<char*>(script.c_str()), scriptlength);
 
 	auto mngscript = mngparse(script);
@@ -72,6 +75,15 @@ MNGFile::MNGFile(std::string n) {
 	auto wave_names = mngscript.getWaveNames();
 	for (size_t i = 0; i < wave_names.size(); ++i) {
 		samplemappings[wave_names[i]] = i;
+	}
+
+	// read the samples
+	for (uint32_t i = 0; i < numsamples; i++) {
+		// TODO: warning if sample isn't in expected place?
+		stream.seekg(sample_headers[i].position);
+		shared_array<uint8_t> data(sample_headers[i].size);
+		stream.read(reinterpret_cast<char*>(data.data()), data.size());
+		samples.push_back(data);
 	}
 }
 
@@ -87,7 +99,6 @@ unsigned int MNGFile::getSampleForName(std::string name) {
 }
 
 MNGFile::~MNGFile() {
-	delete stream;
 }
 
 /* vim: set noet: */

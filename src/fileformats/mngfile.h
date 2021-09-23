@@ -44,9 +44,6 @@ class MNGFileException : public creaturesException {
 };
 
 class MNGFile {
-  private:
-	class mmapifstream* stream;
-
   public:
 	MNGFile(std::string);
 	~MNGFile();
