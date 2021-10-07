@@ -28,7 +28,7 @@ class directory_iterator {
   private:
 	directory_iterator();
 	fs::path lcdirname;
-	std::unordered_map<std::string, cacheinfo>::iterator it;
+	std::unordered_map<fs::path, cacheinfo>::iterator it;
 };
 
 } // namespace case_insensitive_filesystem

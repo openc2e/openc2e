@@ -2,9 +2,9 @@
 
 #include "utils/ascii_tolower.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <ghc/filesystem.hpp>
-#include <string>
 #include <system_error>
 #include <unordered_map>
 #include <vector>
@@ -13,7 +13,21 @@ namespace case_insensitive_filesystem {
 
 namespace fs = ghc::filesystem;
 
-static std::unordered_map<std::string, cacheinfo> s_cache;
+struct path_hash {
+	std::size_t operator()(const fs::path& path) const {
+		return hash_value(path);
+	}
+};
+
+static std::unordered_map<fs::path, cacheinfo, path_hash> s_cache;
+
+static bool path_startswith(const fs::path& path, fs::path prefix) {
+	auto end = prefix.end();
+	if (!std::prev(end)->has_filename()) {
+		end--;
+	}
+	return std::equal(prefix.begin(), end, path.begin());
+}
 
 static void updateDirectory(fs::path dirname) {
 	assert(!dirname.empty());
@@ -31,8 +45,7 @@ static void updateDirectory(fs::path dirname) {
 	// remove existing cache entries
 	fs::path withtrailingslash = lcdirname / "";
 	for (auto it = s_cache.begin(); it != s_cache.end();) {
-		// str.rfind(s, 0) == 0 is equivalent to str.startswith(s)
-		if (it->first.rfind(withtrailingslash, 0) == 0) {
+		if (path_startswith(it->first, lcdirname)) {
 			it = s_cache.erase(it);
 		} else {
 			it++;
@@ -98,8 +111,7 @@ directory_iterator::directory_iterator(fs::path dirname) {
 
 	it = s_cache.begin();
 	while (it != s_cache.end()) {
-		// str.rfind(s, 0) == 0 is equivalent to str.startswith(s)
-		if (it->first.rfind(lcdirname, 0) == 0 && it->first != lcdirname) {
+		if (path_startswith(it->first, lcdirname) && it->first != lcdirname) {
 			break;
 		}
 		it++;
@@ -117,8 +129,7 @@ const fs::path& directory_iterator::operator*() const {
 directory_iterator& directory_iterator::operator++() {
 	it++;
 	while (it != s_cache.end()) {
-		// str.rfind(s, 0) == 0 is equivalent to str.startswith(s)
-		if (it->first.rfind(lcdirname, 0) == 0 && it->first != lcdirname) {
+		if (path_startswith(it->first, lcdirname) && it->first != lcdirname) {
 			break;
 		}
 		it++;
