@@ -26,6 +26,7 @@
 
 #include <fstream>
 #include <memory>
+#include <string.h>
 
 #define BI_RGB 0
 #define BI_RLE8 1
