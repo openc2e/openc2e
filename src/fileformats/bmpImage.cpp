@@ -20,7 +20,6 @@
 #include "fileformats/bmpImage.h"
 
 #include "Backend.h"
-#include "Engine.h"
 #include "caos_assert.h"
 #include "creaturesException.h"
 #include "utils/endianlove.h"
