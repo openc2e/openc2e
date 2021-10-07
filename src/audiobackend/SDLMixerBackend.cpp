@@ -29,6 +29,12 @@
 #include <memory>
 #include <string.h>
 
+#if SDL_MIXER_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 2)
+enum {
+	MIX_INIT_MID = MIX_INIT_FLUIDSYNTH
+};
+#endif
+
 constexpr int SDLMIXERBACKEND_CHUNK_SIZE = 1024;
 
 static std::vector<uint16_t> s_channel_to_generation;
