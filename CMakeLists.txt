@@ -5,7 +5,10 @@ set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 set(BIN "${CMAKE_CURRENT_BINARY_DIR}")
 set(GEN "${BIN}/generated")
 
-set(CMAKE_MODULE_PATH "${SRC}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${SRC}/cmake")
+if(EMSCRIPTEN)
+	list(APPEND CMAKE_MODULE_PATH "${SRC}/cmake-emscripten")
+endif()
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
@@ -13,7 +16,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 include(CheckCXXSourceCompiles)
-if(NOT WIN32)
+if(NOT (WIN32 OR EMSCRIPTEN))
 	set(CMAKE_REQUIRED_FLAGS "-fsanitize=address")
 	check_cxx_source_compiles("int main(int, char**) { return 0; }" have_fsanitize_address)
 	if(have_fsanitize_address)

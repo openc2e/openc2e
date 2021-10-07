@@ -1,5 +1,13 @@
 include(FindPackageHandleStandardArgs)
 
+if(EMSCRIPTEN)
+    add_library(sdl2_mixer INTERFACE)
+    add_library(SDL2::Mixer ALIAS sdl2_mixer)
+	target_compile_options(sdl2_mixer INTERFACE "SHELL:-s USE_SDL_MIXER=2")
+	target_link_libraries(sdl2_mixer INTERFACE "-s USE_SDL_MIXER=2")
+    return()
+endif()
+
 find_library(SDL2_MIXER_LIBRARY "SDL2_mixer")
 find_path(SDL2_MIXER_INCLUDE_DIR "SDL2/SDL_mixer.h")
 
