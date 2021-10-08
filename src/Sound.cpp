@@ -12,7 +12,9 @@ Sound::operator bool() {
 
 void Sound::fadeOut() {
 	if (auto source_data = soundmanager.getSoundData(*this)) {
-		engine.audio->fadeOutChannel(source_data->handle);
+		// fade out over 15 ticks, which in C3/DS is 3/4 of a second
+		source_data->fade_start = std::chrono::steady_clock::now();
+		source_data->fade_length = std::chrono::milliseconds(750);
 	}
 }
 

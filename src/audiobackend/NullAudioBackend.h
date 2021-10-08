@@ -39,7 +39,6 @@ class NullAudioBackend : public AudioBackend {
 		return {1};
 	}
 
-	void fadeOutChannel(AudioChannel) {}
 	void setChannelVolume(AudioChannel, float) {}
 	void setChannelPan(AudioChannel, float) {}
 	AudioState getChannelState(AudioChannel) {

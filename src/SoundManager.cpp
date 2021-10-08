@@ -137,6 +137,15 @@ void SoundManager::updateVolume(SoundData& s) {
 			volume = 0;
 		}
 	}
+
+	if (s.fade_start != decltype(s.fade_start)()) {
+		float volume_multiplier = 1 - (std::chrono::steady_clock::now() - s.fade_start) / s.fade_length;
+		if (volume_multiplier <= 0) {
+			engine.audio->stopChannel(s.handle);
+		}
+		volume *= volume_multiplier;
+	}
+
 	engine.audio->setChannelVolume(s.handle, volume);
 }
 

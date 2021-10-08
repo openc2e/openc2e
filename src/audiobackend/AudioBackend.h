@@ -52,7 +52,6 @@ class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
 	virtual AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false) = 0;
 	virtual AudioChannel playStream(AudioStream*) = 0;
 
-	virtual void fadeOutChannel(AudioChannel) = 0;
 	virtual void setChannelVolume(AudioChannel, float) = 0;
 	virtual void setChannelPan(AudioChannel, float pan) = 0;
 	virtual AudioState getChannelState(AudioChannel) = 0;

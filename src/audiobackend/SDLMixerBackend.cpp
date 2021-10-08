@@ -194,13 +194,6 @@ AudioChannel SDLMixerBackend::playStream(AudioStream* stream) {
 	return int_to_audio_channel(channel);
 }
 
-void SDLMixerBackend::fadeOutChannel(AudioChannel source) {
-	int channel = audiochannel_to_int(source);
-	if (channel == -1)
-		return;
-	Mix_FadeOutChannel(channel, 500); // TODO: is 500 a good value?
-}
-
 void SDLMixerBackend::setChannelVolume(AudioChannel source, float v) {
 	int channel = audiochannel_to_int(source);
 	if (channel == -1)

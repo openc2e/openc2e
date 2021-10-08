@@ -41,7 +41,6 @@ class SDLMixerBackend : public AudioBackend, public Singleton<SDLMixerBackend> {
 	AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false);
 	AudioChannel playStream(AudioStream*);
 
-	void fadeOutChannel(AudioChannel);
 	void setChannelVolume(AudioChannel, float);
 	void setChannelPan(AudioChannel, float pan);
 	AudioState getChannelState(AudioChannel);

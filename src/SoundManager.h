@@ -3,9 +3,12 @@
 #include "Sound.h"
 #include "audiobackend/AudioBackend.h"
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
+
+using fmilliseconds = std::chrono::duration<float, std::milli>;
 
 class SoundManager {
   public:
@@ -43,6 +46,8 @@ class SoundManager {
 			y = 0;
 			width = 0;
 			height = 0;
+			fade_start = {};
+			fade_length = {};
 		}
 
 		int generation = 0;
@@ -54,6 +59,9 @@ class SoundManager {
 		float y;
 		float width;
 		float height;
+
+		std::chrono::time_point<std::chrono::steady_clock> fade_start;
+		fmilliseconds fade_length;
 	};
 	std::vector<SoundData> sources;
 
