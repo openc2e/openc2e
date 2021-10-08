@@ -30,10 +30,10 @@
 mmapifstream::mmapifstream() {
 }
 
-mmapifstream::mmapifstream(const std::string& filename) {
+mmapifstream::mmapifstream(const ghc::filesystem::path& filename) {
 #ifdef _WIN32
 	// todo: store the handle somewhere?
-	HANDLE hFile = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ,
+	HANDLE hFile = CreateFileW(filename.wstring().c_str(), GENERIC_READ, FILE_SHARE_READ,
 		NULL, OPEN_EXISTING, 0, NULL);
 	LARGE_INTEGER lifilesize;
 	if (!GetFileSizeEx(hFile, &lifilesize)) {

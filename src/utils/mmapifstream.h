@@ -21,12 +21,13 @@
 
 #include "spanstream.h"
 
+#include <ghc/filesystem.hpp>
 #include <string>
 
 class mmapifstream : public spanstream {
   public:
 	mmapifstream();
-	mmapifstream(const std::string& filename);
+	mmapifstream(const ghc::filesystem::path& filename);
 	~mmapifstream();
 	bool is_open() { return map != nullptr; }
 
