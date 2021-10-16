@@ -8,7 +8,8 @@
 #include "fileformats/s16Image.h"
 #include "fileformats/sprImage.h"
 #include "utils/ascii_tolower.h"
-#include "utils/mmapifstream.h"
+#include "utils/mappedfile.h"
+#include "utils/spanstream.h"
 
 #include <ghc/filesystem.hpp>
 
@@ -24,7 +25,8 @@ MultiImage ReadImage(std::string path) {
 	std::string ext = fs::path(path).extension();
 	ext = ascii_tolower(ext);
 
-	mmapifstream in(path);
+	mappedfile m(path);
+	spanstream in(m);
 	if (ext == ".spr") {
 		return ReadSprFile(in);
 	}

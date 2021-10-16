@@ -19,21 +19,32 @@
 
 #pragma once
 
-#include "spanstream.h"
-
 #include <ghc/filesystem.hpp>
+#include <stdexcept>
 #include <string>
 
-class mmapifstream : public spanstream {
+class mappedfileerror : public std::runtime_error {
   public:
-	mmapifstream();
-	mmapifstream(const ghc::filesystem::path& filename);
-	~mmapifstream();
-	bool is_open() { return map != nullptr; }
-
-  private:
-	char* map = nullptr;
-	size_t filesize = 0;
+	using runtime_error::runtime_error;
 };
 
-/* vim: set noet: */
+class mappedfile final {
+  public:
+	mappedfile();
+	mappedfile(const ghc::filesystem::path& filename);
+	~mappedfile();
+	bool is_open() const;
+	void close();
+	const uint8_t* data() const;
+	size_t size() const;
+
+  private:
+#ifdef _WIN32
+	void* m_file = (void*)-1; // INVALID_HANDLE_VALUE
+	void* m_mapping = nullptr;
+	void* m_view = nullptr;
+#else
+	void* m_map = nullptr;
+#endif
+	size_t m_size = 0;
+};

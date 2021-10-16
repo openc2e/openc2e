@@ -27,7 +27,6 @@
 #include "fileformats/ImageUtils.h"
 #include "fileformats/hedfile.h"
 #include "fileformats/paletteFile.h"
-#include "utils/mmapifstream.h"
 
 #include <array>
 #include <fmt/format.h>

@@ -21,8 +21,9 @@
 #include "creaturesException.h"
 #include "mngparser.h"
 #include "utils/endianlove.h"
-#include "utils/mmapifstream.h"
+#include "utils/mappedfile.h"
 #include "utils/shared_array.h"
+#include "utils/spanstream.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -40,7 +41,8 @@ void decryptbuf(char* buf, int len) {
 MNGFile::MNGFile(std::string n) {
 	name = n;
 
-	mmapifstream stream(n);
+	mappedfile m(n);
+	spanstream stream(m);
 	if (!stream) {
 		throw MNGFileException("open failed");
 	}
