@@ -1,0 +1,72 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: Vat - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\camms\LOCALS~1\Temp\RSP36.tmp" with contents
+[
+ddraw.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib zdll.lib /nologo /subsystem:windows /incremental:yes /pdb:"Debug/Vat.pdb" /debug /machine:I386 /out:"c:\program files\gameware development\Creatures exodus\docking station\Vat.exe" /pdbtype:sept 
+".\Debug\BrainDlgContainer.obj"
+".\Debug\BrainViewport.obj"
+".\Debug\Edit.obj"
+".\Debug\EnginePatch.obj"
+".\Debug\GeneAgeDlg.obj"
+".\Debug\GraphDlg.obj"
+".\Debug\LobeGraphDlg.obj"
+".\Debug\LobeInputDlg.obj"
+".\Debug\LobeNames.obj"
+".\Debug\MainFrame.obj"
+".\Debug\SVCaptions.obj"
+".\Debug\SVRuleDlg.obj"
+".\Debug\TextViewport.obj"
+".\Debug\ThreshHoldDlg.obj"
+".\Debug\Tips.obj"
+".\Debug\VarDlg.obj"
+".\Debug\VarGraphDlg.obj"
+".\Debug\Viewport.obj"
+".\Debug\WinMain.obj"
+".\Debug\Wnd.obj"
+".\Debug\Brain.obj"
+".\Debug\BrainComponent.obj"
+".\Debug\Dendrite.obj"
+".\Debug\Faculty.obj"
+".\Debug\instinct.obj"
+".\Debug\Lobe.obj"
+".\Debug\Neuron.obj"
+".\Debug\SVRule.obj"
+".\Debug\Tract.obj"
+".\Debug\Genome.obj"
+".\Debug\AgentHandle.obj"
+".\Debug\BrainScriptFunctions.obj"
+".\Debug\C2eServices.obj"
+".\Debug\CAOSVar.obj"
+".\Debug\Configurator.obj"
+".\Debug\CreaturesArchive.obj"
+".\Debug\File.obj"
+".\Debug\FileFuncs.obj"
+".\Debug\FlightRecorder.obj"
+".\Debug\Maths.obj"
+".\Debug\PersistentObject.obj"
+".\Debug\Catalogue.obj"
+".\Debug\clientside.obj"
+".\Debug\FileLocaliser.obj"
+".\Debug\GameInterface.obj"
+".\Debug\Grapher.obj"
+".\Debug\SimpleLexer.obj"
+".\Debug\WhichEngine.obj"
+".\Debug\Vat.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\camms\LOCALS~1\Temp\RSP36.tmp"
+<h3>Output Window</h3>
+Linking...
+
+
+
+<h3>Results</h3>
+Vat.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,48 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "BabelClient"=..\..\..\Babel\BabelClient\BabelClientC2e.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/BabelClient", BAAAAAAA
+    ..\..\..\babel\babelclient
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "NornDynasty"=.\NornDynasty.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name BabelClient
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

@@ -1,0 +1,63 @@
+This is a list of ways to improve the CAOS Debugger
+
+Basic
+-----
+
+Icon graphic
+
+Still crashes when you resize bar between source and watch 
+
+Has crashed on me elsewhere 
+Maybe freeze with IPC?
+
+Future
+------
+
+Clear monitor button
+Copy and paste right menu things
+
+Check all virtual machine returned values work
+
+Put graph module in it, and let you graph an arbitary command
+
+Special values in agent - add more to DBGA
+
+Click on agent in game to select it in tree view
+
+Notice type of something - vehicle etc. pointer
+Have mechanism select table according to agent type
+
+Generic command scripts to send to agent in list, or agent in watch window
+(TRCK, KILL, CMRT, etc.?)
+
+Breakpoints
+ on specific line in specific script
+ restrict to specific instance of agent
+
+Run game with each tick driven by the debugger, alternating with
+state query commands.
+
+Trace all functions run and in what agent
+
+Step over (ignores subroutines)
+
+Sort agents by room / metaroom
+Picture of sprite currently being used
+
+If an agent raises an exception, it dies.  Allow monitoring and analysis of agents which die like this.
+
+Breakpoints
+ conditional on anything in watch window
+ on watch window value changing for particular agent - for any agent of type?
+Jumping (move instruction pointer where you want in current script, "time travel")
+
+Tracepoints (trace when line of code run, and any value from watch window)
+
+Debug install scripts
+
+Message queue monitoring
+  show what messages are waiting, and what message launched this script
+
+Profiler :-)
+
+Time travel - log what every agent has done and let you look back over it :-)

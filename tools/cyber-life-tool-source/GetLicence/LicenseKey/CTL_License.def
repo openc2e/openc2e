@@ -1,0 +1,14 @@
+; CTL_License.def
+; The LIBRARY entry must be same as the name of your DLL, the name of 
+; our DLL is CTLLicense.dll
+LIBRARY CTLLicense
+EXPORTS    
+
+	CTL_GenerateKey
+	CTL_ValidKey
+	CTL_ValidKeyInRegistry
+	CTL_ValidKeyInRegistryApp
+	CTL_GENERATE_KEY = CTL_GenerateKey ; Visual basic calling
+	CTL_VALID_KEY = CTL_ValidKey ; Visual basic calling
+	CTL_VALID_KEY_IN_REGISTRY = CTL_ValidKeyInRegistry; Visual basic calling
+	CTL_VALID_KEY_IN_REGISTRY_APP = CTL_ValidKeyInRegistryApp; Visual basic calling

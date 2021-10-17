@@ -1,0 +1,1372 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\PoseEditor.ico"
+IDR_GENOMETYPE          ICON    DISCARDABLE     "res\\PoseEditorDoc.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP  MOVEABLE PURE   "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR DISCARDABLE  16, 15
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_EDIT_UNDO
+    BUTTON      ID_EDIT_REDO
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU PRELOAD DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&User Guide",                 ID_HELP_USERGUIDE
+        MENUITEM "&About PoseEditor...",        ID_APP_ABOUT
+    END
+END
+
+IDR_GENOMETYPE MENU PRELOAD DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        POPUP "Na&mes"
+        BEGIN
+            MENUITEM "Import &Pose Names...",       ID_FILE_NAMES_IMPORTPOSENAMES
+
+            MENUITEM "Import &Gait Names...",       ID_FILE_NAMES_IMPORTGAITNAMES
+
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y",               ID_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&New Window",                 ID_WINDOW_NEW
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "&Tile",                       ID_WINDOW_TILE_HORZ
+        MENUITEM "&Arrange Icons",              ID_WINDOW_ARRANGE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&User Guide",                 ID_HELP_USERGUIDE
+        MENUITEM "&About PoseEditor...",        ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
+BEGIN
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "Y",            ID_EDIT_REDO,           VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About PoseEditor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "PoseEditor Version 0.1",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 1999",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_POSEEDITOR_FORM DIALOGEX 0, 0, 356, 196
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LISTBOX         IDC_GAIT_LIST,232,12,116,160,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Sex:",IDC_STATIC,8,15,15,8
+    LTEXT           "&Age:",IDC_STATIC,8,31,16,8
+    COMBOBOX        IDC_SEX,35,12,56,44,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_AGE,35,28,56,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Genus:",IDC_STATIC,8,55,24,8
+    COMBOBOX        IDC_GENUS,35,52,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_HEAD,35,76,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Head:",IDC_STATIC,8,79,20,8
+    COMBOBOX        IDC_BODY,35,92,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Body:",IDC_STATIC,8,95,19,8
+    COMBOBOX        IDC_LEGS,35,108,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Legs:",IDC_STATIC,8,111,18,8
+    COMBOBOX        IDC_ARMS,35,124,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Arms:",IDC_STATIC,8,127,18,8
+    COMBOBOX        IDC_TAIL,35,140,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Tail:",IDC_STATIC,8,143,14,8
+    COMBOBOX        IDC_HEAD_VAR,79,76,28,116,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_BODY_VAR,79,92,28,116,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_LEGS_VAR,79,108,28,116,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_ARMS_VAR,79,124,28,116,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_TAIL_VAR,79,140,28,116,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Poses",IDC_STATIC,112,3,20,8
+    LTEXT           "&Gaits",IDC_STATIC,232,3,20,8
+    PUSHBUTTON      "Add",IDC_ADD_POSE,112,176,36,12
+    PUSHBUTTON      "Remove",IDC_REMOVE_POSE,152,176,36,12
+    PUSHBUTTON      "Properties",IDC_EDIT_POSE,192,176,36,12
+    PUSHBUTTON      "Add",IDC_ADD_GAIT,232,176,36,12
+    PUSHBUTTON      "Remove",IDC_REMOVE_GAIT,272,176,36,12
+    PUSHBUTTON      "Properties",IDC_EDIT_GAIT,312,176,36,12
+    CONTROL         "List1",IDC_POSE_LIST_VIEW,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_NOCOLUMNHEADER | WS_BORDER | 
+                    WS_TABSTOP,112,12,116,160,WS_EX_CLIENTEDGE
+    LTEXT           "&Ears",IDC_STATIC,7,159,19,9
+    COMBOBOX        IDC_EARS,35,156,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_EARS_VAR,79,156,28,116,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "&Hair",IDC_STATIC,7,174,19,9
+    COMBOBOX        IDC_HAIR,35,172,44,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_HAIR_VAR,79,172,28,116,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "PoseEditor MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "PoseEditor\0"
+            VALUE "LegalCopyright", "Copyright (C) 1999\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "PoseEditor.EXE\0"
+            VALUE "ProductName", "PoseEditor Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_POSEEDITOR_FORM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 349
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 189
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_POSEEDITOR_FORM DLGINIT
+BEGIN
+    IDC_SEX, 0x403, 5, 0
+0x614d, 0x656c, "\000" 
+    IDC_SEX, 0x403, 7, 0
+0x6546, 0x616d, 0x656c, "\000" 
+    IDC_AGE, 0x403, 7, 0
+0x6d45, 0x7262, 0x6f79, "\000" 
+    IDC_AGE, 0x403, 6, 0
+0x6843, 0x6c69, 0x0064, 
+    IDC_AGE, 0x403, 11, 0
+0x6441, 0x6c6f, 0x7365, 0x6563, 0x746e, "\000" 
+    IDC_AGE, 0x403, 6, 0
+0x6f59, 0x7475, 0x0068, 
+    IDC_AGE, 0x403, 6, 0
+0x6441, 0x6c75, 0x0074, 
+    IDC_AGE, 0x403, 4, 0
+0x6c4f, 0x0064, 
+    IDC_AGE, 0x403, 7, 0
+0x6553, 0x696e, 0x656c, "\000" 
+    IDC_GENUS, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_GENUS, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_GENUS, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_HEAD, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_HEAD, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_HEAD, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_BODY, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_BODY, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_BODY, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_LEGS, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_LEGS, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_LEGS, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_ARMS, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_ARMS, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_ARMS, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_TAIL, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_TAIL, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_TAIL, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0030, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0031, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0032, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0033, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0034, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0035, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0036, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0037, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0038, 
+    IDC_HEAD_VAR, 0x403, 2, 0
+0x0039, 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3731, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3831, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3931, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3032, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3132, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3232, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3332, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3432, "\000" 
+    IDC_HEAD_VAR, 0x403, 3, 0
+0x3532, "\000" 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0030, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0031, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0032, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0033, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0034, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0035, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0036, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0037, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0038, 
+    IDC_BODY_VAR, 0x403, 2, 0
+0x0039, 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3731, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3831, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3931, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3032, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3132, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3232, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3332, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3432, "\000" 
+    IDC_BODY_VAR, 0x403, 3, 0
+0x3532, "\000" 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0030, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0031, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0032, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0033, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0034, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0035, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0036, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0037, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0038, 
+    IDC_LEGS_VAR, 0x403, 2, 0
+0x0039, 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3731, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3831, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3931, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3032, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3132, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3232, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3332, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3432, "\000" 
+    IDC_LEGS_VAR, 0x403, 3, 0
+0x3532, "\000" 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0030, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0031, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0032, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0033, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0034, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0035, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0036, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0037, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0038, 
+    IDC_ARMS_VAR, 0x403, 2, 0
+0x0039, 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3731, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3831, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3931, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3032, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3132, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3232, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3332, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3432, "\000" 
+    IDC_ARMS_VAR, 0x403, 3, 0
+0x3532, "\000" 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0030, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0031, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0032, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0033, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0034, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0035, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0036, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0037, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0038, 
+    IDC_TAIL_VAR, 0x403, 2, 0
+0x0039, 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3731, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3831, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3931, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3032, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3132, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3232, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3332, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3432, "\000" 
+    IDC_TAIL_VAR, 0x403, 3, 0
+0x3532, "\000" 
+    IDC_EARS, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_EARS, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_EARS, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0030, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0031, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0032, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0033, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0034, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0035, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0036, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0037, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0038, 
+    IDC_EARS_VAR, 0x403, 2, 0
+0x0039, 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3731, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3831, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3931, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3032, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3132, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3232, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3332, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3432, "\000" 
+    IDC_EARS_VAR, 0x403, 3, 0
+0x3532, "\000" 
+    IDC_HAIR, 0x403, 5, 0
+0x6f4e, 0x6e72, "\000" 
+    IDC_HAIR, 0x403, 8, 0
+0x7247, 0x6e65, 0x6564, 0x006c, 
+    IDC_HAIR, 0x403, 6, 0
+0x7445, 0x6974, 0x006e, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0030, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0031, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0032, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0033, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0034, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0035, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0036, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0037, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0038, 
+    IDC_HAIR_VAR, 0x403, 2, 0
+0x0039, 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3731, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3831, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3931, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3032, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3132, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3232, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3332, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3432, "\000" 
+    IDC_HAIR_VAR, 0x403, 3, 0
+0x3532, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    IDR_MAINFRAME           "Pose and Gait Editor"
+    IDR_GENOMETYPE          "\nGenome\nGenome\nGenome Files (*.gen)\n.gen\nPoseEditor.Document\nPoseEditor Document"
+END
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "Pose and Gait Editor"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document"
+    ID_FILE_MRU_FILE2       "Open this document"
+    ID_FILE_MRU_FILE3       "Open this document"
+    ID_FILE_MRU_FILE4       "Open this document"
+    ID_FILE_MRU_FILE5       "Open this document"
+    ID_FILE_MRU_FILE6       "Open this document"
+    ID_FILE_MRU_FILE7       "Open this document"
+    ID_FILE_MRU_FILE8       "Open this document"
+    ID_FILE_MRU_FILE9       "Open this document"
+    ID_FILE_MRU_FILE10      "Open this document"
+    ID_FILE_MRU_FILE11      "Open this document"
+    ID_FILE_MRU_FILE12      "Open this document"
+    ID_FILE_MRU_FILE13      "Open this document"
+    ID_FILE_MRU_FILE14      "Open this document"
+    ID_FILE_MRU_FILE15      "Open this document"
+    ID_FILE_MRU_FILE16      "Open this document"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_WINDOW_NEW           "Open another window for the active document\nNew Window"
+    ID_WINDOW_ARRANGE       "Arrange icons at the bottom of the window\nArrange Icons"
+    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
+    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+    AFX_IDS_MDICHILD        "Activate this window"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BUTTON_FACE         BITMAP  DISCARDABLE     "res\\bitmap1.bmp"
+IDB_BITMAP1             BITMAP  DISCARDABLE     "res\\bmp00001.bmp"
+IDB_BITMAP2             BITMAP  DISCARDABLE     "res\\bitmap2.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_POSE DIALOG DISCARDABLE  0, 0, 309, 183
+STYLE WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CAPTION | WS_SYSMENU
+CAPTION "Pose"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,147,165,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,201,165,50,14
+    CONTROL         "0",IDC_PART0,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,4,12,12
+    CONTROL         "1",IDC_DIR1,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,4,12,12
+    CONTROL         "2",IDC_DIR2,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,4,12,12
+    CONTROL         "3",IDC_DIR3,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,4,12,12
+    CONTROL         "X",IDC_DIR4,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,4,12,12
+    CONTROL         "?",IDC_DIR5,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,101,4,12,12
+    CONTROL         "!",IDC_DIR6,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,113,4,12,12
+    CONTROL         "0",IDC_PART1,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,20,12,12
+    CONTROL         "1",IDC_HEAD1,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,20,12,12
+    CONTROL         "2",IDC_HEAD2,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,20,12,12
+    CONTROL         "3",IDC_HEAD3,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,20,12,12
+    CONTROL         "4",IDC_HEAD4,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,20,12,12
+    CONTROL         "5",IDC_HEAD5,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,101,20,12,12
+    CONTROL         "X",IDC_HEAD6,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,113,20,12,12
+    CONTROL         "?",IDC_HEAD7,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,125,20,12,12
+    CONTROL         "0",IDC_PART2,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,36,12,12
+    CONTROL         "1",IDC_HEAD9,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,36,12,12
+    CONTROL         "2",IDC_HEAD10,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,36,12,12
+    CONTROL         "3",IDC_HEAD11,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,36,12,12
+    CONTROL         "X",IDC_HEAD14,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,36,12,12
+    CONTROL         "0",IDC_PART9,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,65,12,12
+    CONTROL         "1",IDC_HEAD13,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,65,12,12
+    CONTROL         "2",IDC_HEAD15,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,65,12,12
+    CONTROL         "3",IDC_HEAD16,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,65,12,12
+    CONTROL         "X",IDC_HEAD17,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,65,12,12
+    CONTROL         "0",IDC_PART11,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,109,65,12,12
+    CONTROL         "1",IDC_HEAD19,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,121,65,12,12
+    CONTROL         "2",IDC_HEAD20,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,133,65,12,12
+    CONTROL         "3",IDC_HEAD21,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,145,65,12,12
+    CONTROL         "X",IDC_HEAD22,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,157,65,12,12
+    CONTROL         "0",IDC_PART10,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,81,12,12
+    CONTROL         "1",IDC_HEAD24,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,81,12,12
+    CONTROL         "2",IDC_HEAD25,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,81,12,12
+    CONTROL         "3",IDC_HEAD26,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,81,12,12
+    CONTROL         "X",IDC_HEAD27,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,81,12,12
+    CONTROL         "0",IDC_PART12,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,109,81,12,12
+    CONTROL         "1",IDC_HEAD29,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,121,81,12,12
+    CONTROL         "2",IDC_HEAD30,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,133,81,12,12
+    CONTROL         "3",IDC_HEAD31,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,145,81,12,12
+    CONTROL         "X",IDC_HEAD32,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,157,81,12,12
+    CONTROL         "0",IDC_PART3,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,97,12,12
+    CONTROL         "1",IDC_HEAD34,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,97,12,12
+    CONTROL         "2",IDC_HEAD35,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,97,12,12
+    CONTROL         "3",IDC_HEAD36,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,97,12,12
+    CONTROL         "X",IDC_HEAD37,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,97,12,12
+    CONTROL         "0",IDC_PART6,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,109,97,12,12
+    CONTROL         "1",IDC_HEAD39,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,121,97,12,12
+    CONTROL         "2",IDC_HEAD40,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,133,97,12,12
+    CONTROL         "3",IDC_HEAD41,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,145,97,12,12
+    CONTROL         "X",IDC_HEAD42,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,157,97,12,12
+    CONTROL         "0",IDC_PART4,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,113,12,12
+    CONTROL         "1",IDC_HEAD44,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,113,12,12
+    CONTROL         "2",IDC_HEAD45,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,113,12,12
+    CONTROL         "3",IDC_HEAD46,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,113,12,12
+    CONTROL         "X",IDC_HEAD47,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,113,12,12
+    CONTROL         "0",IDC_PART7,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,109,113,12,12
+    CONTROL         "1",IDC_HEAD49,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,121,113,12,12
+    CONTROL         "2",IDC_HEAD50,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,133,113,12,12
+    CONTROL         "3",IDC_HEAD51,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,145,113,12,12
+    CONTROL         "X",IDC_HEAD52,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,157,113,12,12
+    CONTROL         "0",IDC_PART5,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,129,12,12
+    CONTROL         "1",IDC_HEAD54,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,129,12,12
+    CONTROL         "2",IDC_HEAD55,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,129,12,12
+    CONTROL         "3",IDC_HEAD56,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,129,12,12
+    CONTROL         "X",IDC_HEAD57,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,129,12,12
+    CONTROL         "0",IDC_PART8,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,109,129,12,12
+    CONTROL         "1",IDC_HEAD59,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,121,129,12,12
+    CONTROL         "2",IDC_HEAD60,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,133,129,12,12
+    CONTROL         "3",IDC_HEAD61,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,145,129,12,12
+    CONTROL         "X",IDC_HEAD62,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,157,129,12,12
+    CONTROL         "0",IDC_PART14,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,151,12,12
+    CONTROL         "1",IDC_HEAD64,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,151,12,12
+    CONTROL         "2",IDC_HEAD65,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,151,12,12
+    CONTROL         "3",IDC_HEAD66,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,151,12,12
+    CONTROL         "X",IDC_HEAD67,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,151,12,12
+    CONTROL         "0",IDC_PART13,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT | WS_GROUP,41,167,12,12
+    CONTROL         "1",IDC_HEAD69,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,53,167,12,12
+    CONTROL         "2",IDC_HEAD70,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,65,167,12,12
+    CONTROL         "3",IDC_HEAD71,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,77,167,12,12
+    CONTROL         "X",IDC_HEAD72,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | 
+                    BS_FLAT,89,167,12,12
+    LTEXT           "&Direction",IDC_STATIC,4,6,29,8
+    LTEXT           "&Head",IDC_STATIC,4,22,18,8
+    LTEXT           "&Body",IDC_STATIC,4,38,17,8
+    LTEXT           "Left",IDC_STATIC,65,53,13,8
+    LTEXT           "Right",IDC_STATIC,130,53,18,8
+    LTEXT           "&Radius",IDC_STATIC,4,84,23,8
+    LTEXT           "&Thigh",IDC_STATIC,4,100,19,8
+    LTEXT           "&Shin",IDC_STATIC,4,116,15,8
+    LTEXT           "&Foot",IDC_STATIC,4,132,15,8
+    LTEXT           "&Humerous",IDC_STATIC,4,68,33,8
+    LTEXT           "Tail &Tip",IDC_STATIC,4,153,24,8
+    LTEXT           "Tail &Root",IDC_STATIC,4,171,30,8
+    PUSHBUTTON      "Apply",ID_APPLY,255,165,50,14,WS_DISABLED
+    CONTROL         "",IDC_CREATUREPIC,
+                    "{843EACE9-D2D6-11D2-9D30-0090271EEABE}",WS_TABSTOP,176,
+                    4,129,141
+    EDITTEXT        IDC_STRING,201,149,104,12,ES_AUTOHSCROLL
+    LTEXT           "&String",IDC_STATIC,177,150,19,8
+END
+
+IDD_GAIT DIALOG DISCARDABLE  0, 0, 328, 213
+STYLE WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Gait"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,159,195,52,14
+    PUSHBUTTON      "Cancel",IDCANCEL,215,195,52,14
+    PUSHBUTTON      "Apply",ID_APPLY,272,195,52,14,WS_DISABLED
+    CONTROL         "1",IDC_CAPTION0,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT | WS_GROUP,4,40,40,12
+    CONTROL         "2",IDC_CAPTION1,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT,44,40,40,12
+    CONTROL         "3",IDC_CAPTION2,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT,84,40,40,12
+    CONTROL         "4",IDC_CAPTION3,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT,124,40,40,12
+    CONTROL         "5",IDC_CAPTION4,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT,164,40,40,12
+    CONTROL         "6",IDC_CAPTION5,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT,204,40,40,12
+    CONTROL         "7",IDC_CAPTION6,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT,244,40,40,12
+    CONTROL         "8",IDC_CAPTION7,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT,284,40,40,12
+    COMBOBOX        IDC_POSE,4,176,124,124,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Insert",IDC_ADD,4,195,60,14
+    PUSHBUTTON      "&Remove",IDC_REMOVE,68,195,60,14
+    LTEXT           "&Angle",IDC_STATIC,136,179,19,8
+    EDITTEXT        IDC_ANGLE,163,177,36,12,ES_AUTOHSCROLL
+    CONTROL         "Spin1",IDC_SPIN1,"msctls_updown32",UDS_ALIGNRIGHT | 
+                    UDS_AUTOBUDDY | UDS_ARROWKEYS,195,177,11,12
+    CONTROL         "&Friction",IDC_FRICTION,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,209,179,39,10
+    CONTROL         "",IDC_PIC0,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,4,4,40,36
+    CONTROL         "",IDC_PIC1,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,44,4,40,36
+    CONTROL         "",IDC_PIC2,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,84,4,40,36
+    CONTROL         "",IDC_PIC3,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,124,4,40,36
+    CONTROL         "",IDC_PIC4,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,164,4,40,36
+    CONTROL         "",IDC_PIC5,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,204,4,40,36
+    CONTROL         "",IDC_PIC6,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,244,4,40,36
+    CONTROL         "",IDC_PIC7,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,284,4,40,36
+    CONTROL         "",IDC_CURRENT,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,4,56,124,116
+    CONTROL         "",IDC_ANIMATOR,"{843EACE9-D2D6-11D2-9D30-0090271EEABE}",
+                    WS_TABSTOP,136,56,188,116
+END
+
+IDD_NEW_POSE DIALOG DISCARDABLE  0, 0, 169, 142
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Pose"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "&New Pose",IDC_POSE_OPT,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,7,49,10
+    CONTROL         "&Variant (new switch on time for existing pose)",
+                    IDC_POSE_OPT2,"Button",BS_AUTORADIOBUTTON,7,20,157,10
+    LTEXT           "&Pose Name:",IDC_STATIC,7,43,40,8
+    EDITTEXT        IDC_POSE_NAME,54,41,108,12,ES_AUTOHSCROLL
+    LTEXT           "&Pose:",IDC_STATIC,7,62,19,8
+    COMBOBOX        IDC_POSE,54,59,108,124,CBS_DROPDOWNLIST | WS_DISABLED | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Switch On:",IDC_STATIC,7,85,36,8
+    COMBOBOX        IDC_AGE,54,82,56,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,57,121,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,112,121,50,14
+    LTEXT           "* indicates a Switch On Time has already been used for this pose.",
+                    IDC_STATIC,7,99,155,19
+END
+
+IDD_NEW_GAIT DIALOG DISCARDABLE  0, 0, 167, 46
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Gait"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,55,25,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,110,25,50,14
+    LTEXT           "&Gait Name:",IDC_STATIC,7,8,36,8
+    EDITTEXT        IDC_GAIT_NAME,53,7,107,12,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_POSE, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 305
+        VERTGUIDE, 41
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 179
+    END
+
+    IDD_GAIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 324
+        VERTGUIDE, 128
+        VERTGUIDE, 136
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 209
+        HORZGUIDE, 49
+        HORZGUIDE, 172
+        HORZGUIDE, 177
+    END
+
+    IDD_NEW_POSE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 162
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 135
+    END
+
+    IDD_NEW_GAIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 160
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 39
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_POSE DLGINIT
+BEGIN
+    IDC_CREATUREPIC, 0x376, 32, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x140d, 0x0000, 0x17ab, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x006c, 0x0049, 0x0044, 0x1f30, 0x0681, 
+    0
+END
+
+IDD_GAIT DLGINIT
+BEGIN
+    IDC_PIC0, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_PIC1, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_PIC2, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_PIC3, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_PIC4, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_PIC5, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_PIC6, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_PIC7, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x0634, 0x0000, 0x0619, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_CURRENT, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x1339, 0x0000, 0x1389, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    IDC_ANIMATOR, 0x376, 24, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x1d25, 0x0000, 0x1389, 0x0000, 0x0020, 
+0x0000, 0x0001, 0x0000, 
+    0
+END
+
+IDD_NEW_POSE DLGINIT
+BEGIN
+    IDC_AGE, 0x403, 7, 0
+0x6d45, 0x7262, 0x6f79, "\000" 
+    IDC_AGE, 0x403, 6, 0
+0x6843, 0x6c69, 0x0064, 
+    IDC_AGE, 0x403, 11, 0
+0x6441, 0x6c6f, 0x7365, 0x6563, 0x746e, "\000" 
+    IDC_AGE, 0x403, 6, 0
+0x6f59, 0x7475, 0x0068, 
+    IDC_AGE, 0x403, 6, 0
+0x6441, 0x6c75, 0x0074, 
+    IDC_AGE, 0x403, 4, 0
+0x6c4f, 0x0064, 
+    IDC_AGE, 0x403, 7, 0
+0x6553, 0x696e, 0x656c, "\000" 
+    0
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\PoseEditor.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#include ""afxprint.rc""       // printing/print preview resources\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\PoseEditor.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#include "afxprint.rc"       // printing/print preview resources
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

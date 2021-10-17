@@ -1,0 +1,38 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: QuickNorn - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\WINDOWS\TEMP\RSP12F2.TMP" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Release/QuickNorn.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Projects\QuickNorn2\NornConfig.cpp"
+]
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP12F2.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP12F3.TMP" with contents
+[
+/nologo /subsystem:windows /incremental:no /pdb:"Release/QuickNorn.pdb" /machine:I386 /out:"Release/QuickNorn.exe" 
+.\Release\DirDlg.obj
+.\Release\NornConfig.obj
+.\Release\PictureEx.obj
+.\Release\QuickNorn.obj
+.\Release\QuickNornDlg.obj
+.\Release\StdAfx.obj
+.\Release\QuickNorn.res
+]
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP12F3.TMP"
+<h3>Output Window</h3>
+Compiling...
+NornConfig.cpp
+Linking...
+
+
+
+<h3>Results</h3>
+QuickNorn.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: ImageConverter - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\camms\LOCALS~1\Temp\RSP87.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Debug/ImageConverter.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"I:\Source\c3\c2e\tools\ImageConverter\Main.cpp"
+"I:\Source\c3\c2e\tools\ImageConverter\ProgressDlg.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\camms\LOCALS~1\Temp\RSP87.tmp" 
+Creating temporary file "C:\DOCUME~1\camms\LOCALS~1\Temp\RSP88.tmp" with contents
+[
+gdk-1.3.lib gtk-1.3.lib glib-1.3.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"Debug/ImageConverter.pdb" /debug /machine:I386 /out:"Debug/ImageConverter.exe" /pdbtype:sept 
+.\Debug\Convert.obj
+.\Debug\Main.obj
+.\Debug\ProgressDlg.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\camms\LOCALS~1\Temp\RSP88.tmp"
+<h3>Output Window</h3>
+Compiling...
+Main.cpp
+i:\source\c3\c2e\tools\imageconverter\main.cpp(24) : fatal error C1083: Cannot open include file: 'gtk/gtk.h': No such file or directory
+ProgressDlg.cpp
+i:\source\c3\c2e\tools\imageconverter\progressdlg.h(4) : fatal error C1083: Cannot open include file: 'gtk/gtk.h': No such file or directory
+Error executing cl.exe.
+
+
+
+<h3>Results</h3>
+ImageConverter.exe - 2 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

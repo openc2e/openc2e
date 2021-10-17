@@ -1,0 +1,62 @@
+#! /bin/bash
+
+# This is a prototype single step debugger.  It isn't very
+# useful yet, but gives some ideas for things you can do.
+
+# Requires unix netcat 
+# http://www.l0pht.com/~weld/netcat/
+
+set -e
+
+# Gets one char from kbd, no "Enter" necessary 
+function getch
+{ 
+    OLD_STTY=`stty -g` 
+    stty cbreak -echo 
+    GETCH=`dd if=/dev/tty bs=1 count=1 2>/dev/null` 
+    stty $OLD_STTY 
+} 
+
+function display_source
+{
+	SCRIPT=`inject targ agnt $UNID outv codf outs \" \" outv codg outs \" \" outv cods outs \" \" outv code`
+	CHAR=`inject targ agnt $UNID outv codp`
+	echo Current script: $SCRIPT, place $CHAR
+	if [ "$CHAR" != "-1" -a "$SCRIPT" != "-1 -1 -1 -1" ]; then
+		SOURCE=`inject outs sorc $SCRIPT`
+		START=$((CHAR>35 ? CHAR-35 : 0))
+		LENG=$((CHAR>35 ? 35 : CHAR))
+		echo "${SOURCE:START:LENG}*${SOURCE:CHAR:35}"
+	else
+		echo "Nothing"
+	fi
+}
+
+function inject
+{
+	echo -e "$*\n\nrscr" | nc localhost `cat ~/.creaturesengine/port`
+}
+
+# I can't get this to work
+# trap recover 0
+function recover
+{
+	inject dbg: play
+	echo "Recovered"
+}
+
+echo "CAOS debugger"
+echo "Enter family, genus, species of agent"
+
+read FAMILY GENUS SPECIES
+UNID=`inject rtar $FAMILY $GENUS $SPECIES outv unid`
+
+echo Unique identifier $UNID
+
+while true; do
+	SCRIPT=`inject dbg: tack agnt $UNID`
+	display_source
+	getch
+	display_source
+done
+

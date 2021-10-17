@@ -1,0 +1,55 @@
+#! /bin/bash
+
+# Simple CAOS command line for use with Docking Station
+# or Creatures 3 running under Linux.  It lets you inject
+# commands in the game scripting language into a running
+# world.
+
+# To learn more about CAOS, see http://cdn.creatures.net
+
+# Requires installation of netcat (nc) first.  Your
+# distribution should have a package for it, or it is very
+# easy to compile from source.
+
+function cleanup()
+{
+	# Turn off yellow text
+	echo -n "[0m"
+}
+
+cat <<END
+CAOS Command Line
+Warning! You can damage your world with this utility.
+Return executes the last command again.
+Press Ctrl+C to exit.
+END
+
+trap cleanup EXIT
+PREVIOUS=help
+
+while [ 1 = 1 ]
+do
+	# TODO: Bonus points if you can work out how to get read -e 
+	# to have a history featuer, so up arrow goes to previous
+	# commands.  Email francis.irving@creaturelabs.com if
+	# you find out how!
+	# TODO: Also, you can only enter single lines.  The way
+	# injection works in Linux, you need multiple lines to enter
+	# scripts (without an error from rscr not being understood).
+	read -e -p "CAOS [1;33m" INPUT
+	echo -n "[0m"
+	[ -z "$INPUT" ] && INPUT=$PREVIOUS
+	# We send the input to the appropriate local port, followed
+	# by the text "rscr".  The text "rscr" completes the CAOS
+	# telling the engine to execute what it has up to then, and
+	# close the socket.
+	nc localhost `cat ~/.creaturesengine/port` <<END
+$INPUT
+
+rscr
+END
+	echo
+	PREVIOUS=$INPUT
+done
+
+

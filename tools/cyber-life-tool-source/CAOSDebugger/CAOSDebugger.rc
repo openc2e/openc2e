@@ -1,0 +1,470 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\CAOSDebugger.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP  MOVEABLE PURE   "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR DISCARDABLE  19, 19
+BEGIN
+    BUTTON      ID_PAWS
+    BUTTON      ID_STEP
+    SEPARATOR
+    BUTTON      ID_DRIVE_GAME
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU PRELOAD DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Refresh Syntax\tCtrl+U",     ID_REFRESH_SYNTAX
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "&Monitor\tM",                 ID_VIEW_MONITOR
+    END
+    POPUP "&Debug"
+    BEGIN
+        MENUITEM "&Pause / Play\tPause, P",     ID_PAWS
+        MENUITEM "&Step\tSpace, S",             ID_STEP
+        MENUITEM "&Drive Game\tD",              ID_DRIVE_GAME
+        MENUITEM SEPARATOR
+        MENUITEM "&Fast Drive\tF",              ID_FAST_DRIVE
+        MENUITEM SEPARATOR
+        MENUITEM "&Flush Input",                ID_FLUSH
+    END
+    POPUP "&Agent"
+    BEGIN
+        MENUITEM "&Kill\tCtrl+K",               ID_KILL_AGENT
+        MENUITEM "&Camera\tC",                  ID_CAMERA_TO_AGENT
+        MENUITEM "&Track\tK",                   ID_AGENT_TRACK
+    END
+    POPUP "&Watch"
+    BEGIN
+        MENUITEM "&Global Watch\tG",            IDM_GLOBAL_WATCH
+        MENUITEM "&Hot Watch\tH",               IDM_HOT_WATCH
+        MENUITEM SEPARATOR
+        MENUITEM "&Refresh Now\tR",             ID_REFRESH_FROM_GAME
+        MENUITEM "&Refresh on Timer\tT",        ID_WATCH_REFRESHONTOCK
+        MENUITEM SEPARATOR
+        MENUITEM "&Close All",                  ID_WATCH_CLOSEALL
+    END
+    POPUP "&Profile"
+    BEGIN
+        MENUITEM "&Start Profile",              ID_PROFILE_CLEARPROFILE
+        MENUITEM "&Finish Profile",             ID_PROFILE_GENERATEPROFILE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About CAOS Debugger...",     ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
+BEGIN
+    "C",            ID_CAMERA_TO_AGENT,     VIRTKEY, NOINVERT
+    "D",            ID_DRIVE_GAME,          VIRTKEY, NOINVERT
+    "F",            ID_FAST_DRIVE,          VIRTKEY, NOINVERT
+    "G",            IDM_GLOBAL_WATCH,       VIRTKEY, NOINVERT
+    "H",            IDM_HOT_WATCH,          VIRTKEY, NOINVERT
+    "I",            ID_FOLLOW_AGENTS_CODE,    VIRTKEY, NOINVERT
+    "K",            ID_AGENT_TRACK,         VIRTKEY, NOINVERT
+    "K",            ID_KILL_AGENT,          VIRTKEY, CONTROL, NOINVERT
+    "M",            ID_VIEW_MONITOR,        VIRTKEY, NOINVERT
+    "P",            ID_PAWS,                VIRTKEY, NOINVERT
+    "R",            ID_REFRESH_FROM_GAME,   VIRTKEY, NOINVERT
+    "S",            ID_STEP,                VIRTKEY, NOINVERT
+    "T",            ID_WATCH_REFRESHONTOCK, VIRTKEY, NOINVERT
+    "U",            ID_REFRESH_SYNTAX,      VIRTKEY, CONTROL, NOINVERT
+    VK_PAUSE,       ID_PAWS,                VIRTKEY, NOINVERT
+    VK_SPACE,       ID_STEP,                VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About CAOS Debugger"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "CAOS Debugger Version 1.25",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright 2000 Creature Labs",IDC_STATIC,40,
+                    25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_WATCH DIALOG DISCARDABLE  0, 0, 264, 223
+STYLE DS_3DLOOK | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Watch"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_EDITLABELS | LVS_NOSORTHEADER | 
+                    WS_TABSTOP,7,7,119,209
+END
+
+IDD_MONITOR DIALOG DISCARDABLE  0, 0, 198, 161
+STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Monitor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDC_MONITOR_RICH_EDIT,"RICHEDIT",ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_NOHIDESEL | 
+                    ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,7,
+                    184,147
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_WATCH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 257
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 216
+    END
+
+    IDD_MONITOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 154
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    IDR_MAINFRAME           "CAOS Debugger"
+    IDR_CAOSDETYPE          "\nCAOS Debugger\nCAOS Debugger"
+END
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "CAOSDebugger"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application\nExit"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_WINDOW_ARRANGE       "Arrange icons at the bottom of the window\nArrange Icons"
+    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
+    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+    AFX_IDS_MDICHILD        "Activate this window"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_PAWS                 "Pause the game engine\nPause / Play"
+    ID_STEP                 "Advance the game by one tick\nStep a Tick"
+    ID_FLUSH                "Flush the input buffer in the game\nFlush Input"
+    IDM_GLOBAL_WATCH        "A generic watch window, for looking at game global values"
+    ID_WATCH_CLOSEALL       "Close all watch windows"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_REFRESH_FROM_GAME    "Refresh the agent list, and all watch windows from the game"
+    ID_WATCH_REFRESHONTOCK  "Poll the game periodically, and refresh watch windows"
+    ID_DRIVE_GAME           "Drive the game from the debugger\nDrive Game"
+    ID_KILL_AGENT           "Kill selected agent, or all agents in selected classifier"
+    ID_CAMERA_TO_AGENT      "Move camera to selected agent"
+    ID_REFRESH_SYNTAX       "Get latest CAOS syntax from the game\nRefresh Syntax"
+    ID_AGENT_TRACK          "Track the agent with the camera"
+    ID_VIEW_MONITOR         "Monitors CAOS debug trace statements"
+    IDM_HOT_WATCH           "A watch window which tells you about whatever the pointer is pointing at"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_DEBUG_FASTDRIVE      "When in drive mode, make the engine run at full speed."
+    ID_FAST_DRIVE           "In driven mode, run the game as fast as possible "
+    ID_PROFILE_CLEARPROFILE "Resets agent profiling data inside the engine"
+    ID_PROFILE_GENERATEPROFILE 
+                            "Outputs agent profiling data from the engine as a CSV file and launches it - your spreadsheet should load it"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_IMAGELIST           BITMAP  DISCARDABLE     "res\\imagelist.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_WATCH_POPUP MENU DISCARDABLE 
+BEGIN
+    POPUP "&Placeholder"
+    BEGIN
+        MENUITEM "&Add Entry\tIns",             ID_WATCH_ADD
+        MENUITEM "&Delete Entry\tDel",          ID_WATCH_DELETE
+        MENUITEM "&Edit CAOS\tF2",              ID_EDIT_CAOS
+        MENUITEM SEPARATOR
+        MENUITEM "&Cycle Classifier\tY",        ID_CYCLECLASSIFIER
+        MENUITEM "&Show Source",                ID_SOURCE_TOGGLE
+        MENUITEM "Always on &Top",              ID_ALWAYS_ON_TOP
+        MENUITEM SEPARATOR
+        MENUITEM "&Follow Agent's Code\tI",     ID_FOLLOW_AGENTS_CODE
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\CAOSDebugger.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_WATCH_ADD            "Insert a new watch row"
+    ID_WATCH_DELETE         "Delete a watch row"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_SOURCE_TOGGLE        "Toggle source code view"
+    ID_EDIT_CAOS            "Edit CAOS code for selected watch"
+    ID_PLACEHOLDER_CYCLECLASSIFIER "Go to a new agent of the same classifier"
+    ID_CYCLECLASSIFIER      "Go to the next agent with the same classifier"
+    ID_PLACEHOLDER_LOCKTOAGENT 
+                            "Used with dynamic targets to statically change to the current one"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_ALWAYS_ON_TOP        "Make the watch window always above other windows"
+    ID_FOLLOW_AGENTS_CODE     "The debugger now single steps through this agents code."
+END
+
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\CAOSDebugger.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

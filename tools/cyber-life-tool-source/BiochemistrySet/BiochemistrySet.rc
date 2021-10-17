@@ -1,0 +1,443 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 51
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Biochemistry Set"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,15,20,20
+    LTEXT           "Biochemistry Set Version 1.27",IDC_STATIC,42,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright CyberLife Technology 1999",IDC_STATIC,42,34,
+                    130,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+    LTEXT           "By Francis Irving",IDC_STATIC,42,22,53,8
+END
+
+IDD_BIOCHEMISTRYSET_DIALOG DIALOGEX 0, 0, 215, 105
+STYLE WS_MINIMIZEBOX | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Biochemistry Set"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         143,IDC_SCIENCE_PIC,"Static",SS_BITMAP | 
+                    SS_REALSIZEIMAGE | WS_BORDER,6,28,108,71
+    PUSHBUTTON      "&Graph...",IDC_GRAPH,6,6,44,14
+    PUSHBUTTON      "&Inject...",IDC_INJECT,58,6,44,14
+    PUSHBUTTON      "&Organ...",IDC_ORGAN,110,6,44,14
+    PUSHBUTTON      "&Log...",IDC_LOG,162,6,44,14
+    LTEXT           "Saved windows:",IDC_STATIC,127,37,53,8
+    COMBOBOX        IDC_FAV_COMBO,127,52,77,80,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "O&pen...",IDC_OPEN_FAV,127,72,32,14
+    PUSHBUTTON      "&Delete",IDC_DELETE_FAV,172,72,32,14
+END
+
+IDD_GRAPHER_DIALOG DIALOGEX 0, 0, 210, 102
+STYLE WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CAPTION | WS_SYSMENU | 
+    WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Biochemistry Set - Graph"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+END
+
+IDD_LOG_DIALOG DIALOGEX 0, 0, 199, 27
+STYLE DS_MODALFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Biochemistry Set - Long Term Log"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Log file:",IDC_STATIC,6,10,26,8
+    EDITTEXT        IDC_FILENAME,36,7,156,14,ES_AUTOHSCROLL | WS_DISABLED
+END
+
+IDD_PARAMETERS DIALOGEX 0, 0, 202, 219
+STYLE WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Parameters"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Creature to &monitor:",IDC_STATIC,7,8,62,8,WS_TABSTOP
+    LISTBOX         IDC_CREATURE_LIST,7,20,95,71,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Chemicals:",IDC_CHEMICALS_STATIC,7,96,33,9,WS_TABSTOP
+    CONTROL         "List1",IDC_CHEM_LISTVIEW,"SysListView32",LVS_LIST | 
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,108,185,104
+    LTEXT           "&Sample rate:",IDC_STATIC,108,18,45,8
+    EDITTEXT        IDC_SAMPLE_RATE,153,16,40,14,ES_AUTOHSCROLL
+    LTEXT           "&Time span:",IDC_TIME_SPAN_STATIC,108,38,45,8
+    EDITTEXT        IDC_TIME_SPAN,153,36,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,124,62,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,124,80,50,14
+END
+
+IDD_NAME_FAVOURITE DIALOG DISCARDABLE  0, 0, 163, 52
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Save Window"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "&Name:",IDC_STATIC,8,9,22,8
+    EDITTEXT        IDC_NAME,35,7,120,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,21,30,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,93,30,50,14
+END
+
+IDD_ORGAN_DIALOG DIALOGEX 0, 0, 357, 170
+STYLE WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CAPTION | WS_SYSMENU | 
+    WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Biochemistry Set - Organ Monitor"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_ORGAN_LIST,"SysListView32",LVS_REPORT | 
+                    WS_BORDER | WS_TABSTOP,7,7,343,156
+END
+
+IDD_INJECTION_DIALOG DIALOGEX 0, 0, 172, 179
+STYLE WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CAPTION | WS_SYSMENU | 
+    WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Biochemistry Set - Injection"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_CHEMLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,7,112,165
+    CONTROL         "Slider1",IDC_LEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_VERT | WS_TABSTOP,129,7,26,129
+    EDITTEXT        IDC_LEVEL_NUMBER,130,138,24,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Set",IDC_SET,127,159,30,14
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "Biochemistry Set MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "Biochemistry Set\0"
+            VALUE "LegalCopyright", "Copyright (C) 1999\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "BiochemistrySet.EXE\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "BiochemistrySet Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 44
+    END
+
+    IDD_BIOCHEMISTRYSET_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 208
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 97
+    END
+
+    IDD_GRAPHER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 203
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 95
+    END
+
+    IDD_LOG_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 192
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 20
+    END
+
+    IDD_PARAMETERS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 195
+        TOPMARGIN, 8
+        BOTTOMMARGIN, 212
+    END
+
+    IDD_NAME_FAVOURITE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 156
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 45
+    END
+
+    IDD_ORGAN_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 350
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 163
+    END
+
+    IDD_INJECTION_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 165
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 172
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About Biochemistry Set..."
+    IDS_TOOLTIP             "This is a tooltip"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\BiochemistrySet.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res/BiochemistrySet.ico"
+IDR_MAINFRAME_SMALL     ICON    DISCARDABLE     "res/idr_main.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_GRAPHER_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Placeholder"
+    BEGIN
+        MENUITEM "A&xes",                       IDC_AXES
+        MENUITEM "&White Page",                 IDC_WHITE_PAGE
+        MENUITEM SEPARATOR
+        MENUITEM "&Inject...",                  IDC_INJECT
+        MENUITEM "&Log...",                     IDC_LOG
+        MENUITEM "&Clone...",                   IDC_GRAPH
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties...",              IDC_PROPERTIES
+        MENUITEM "&Save Window...",             IDC_FAVOURITE
+    END
+END
+
+IDR_GENERIC_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Placeholder"
+    BEGIN
+        MENUITEM "&Properties...",              IDC_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "&Save Window...",             IDC_FAVOURITE
+    END
+END
+
+IDR_PROPERTIES_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Placeholder"
+    BEGIN
+        MENUITEM "&Tick all",                   ID_TICK_ALL
+        MENUITEM "&Untick all",                 ID_UNTICK_ALL
+    END
+END
+
+IDR_LOGGER_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Placeholder"
+    BEGIN
+        MENUITEM "&Graph...",                   IDC_GRAPH
+        MENUITEM "&Inject...",                  IDC_INJECT
+        MENUITEM "&Clone...",                   IDC_LOG
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties...",              IDC_PROPERTIES
+        MENUITEM "&Save Window...",             IDC_FAVOURITE
+    END
+END
+
+IDR_INJECTER_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Placeholder"
+    BEGIN
+        MENUITEM "&Graph...",                   IDC_GRAPH
+        MENUITEM "&Log...",                     IDC_LOG
+        MENUITEM "&Clone...",                   IDC_INJECT
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties...",              IDC_PROPERTIES
+        MENUITEM "&Save Window...",             IDC_FAVOURITE
+    END
+END
+
+IDR_ORGAN_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Placeholder"
+    BEGIN
+        MENUITEM "&Clone...",                   IDC_ORGAN
+        MENUITEM "&Properties...",              IDC_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "&Save Window...",             IDC_FAVOURITE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_COVER_BITMAP        BITMAP  DISCARDABLE     "res/SmallScience.bmp"
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res/BiochemistrySet.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

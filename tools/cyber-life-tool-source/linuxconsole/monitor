@@ -1,0 +1,20 @@
+#! /bin/bash
+
+# Run this script in a console and it will display
+# all text from DBG: OUTV and DBG: OUTS in the
+# Creatures game engine.
+
+# Requires unix netcat 
+# http://www.l0pht.com/~weld/netcat/
+
+set -e
+PORT=`cat ~/.creaturesengine/port`
+
+while true; do
+	nc localhost $PORT <<END
+dbg: poll
+rscr
+END
+	sleep 1s
+done
+

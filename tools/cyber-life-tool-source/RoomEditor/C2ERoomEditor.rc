@@ -1,0 +1,1112 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\MapEditor256.ico"
+IDR_C2EROOTYPE          ICON    DISCARDABLE     "res\\C2ERoomEditorDoc.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP  MOVEABLE PURE   "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR DISCARDABLE  20, 20
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_FILE_LOADFROMGAME
+    BUTTON      ID_FILE_SAVE_TO_GAME
+    BUTTON      ID_FILE_SAVE_TO_GAME_ADDON
+    BUTTON      ID_FILE_SAVETOBOOTSTRAPMAPCOS
+    BUTTON      ID_FILE_SAVETOBOOTSTRAPADDONCOS
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_EDIT_UNDO
+    BUTTON      ID_EDIT_REDO
+    SEPARATOR
+    BUTTON      ID_TOOLS_SELECT_ROOM
+    BUTTON      ID_TOOLS_SELECT_METAROOM
+    BUTTON      ID_TOOLS_ZOOM
+    SEPARATOR
+    BUTTON      ID_TOOLS_ADD_ROOM
+    BUTTON      ID_TOOLS_ADD_METAROOM
+    SEPARATOR
+    BUTTON      32829
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU PRELOAD DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "Open from &Game\tCtrl+G",     ID_FILE_LOADFROMGAME
+        MENUITEM SEPARATOR
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Contents\tF1",               ID_HELP_CONTENTS
+        MENUITEM "CDN &Website\tF2",            ID_CDN_WEBSITE
+        MENUITEM "&Tip of the Day",             CG_IDS_TIPOFTHEDAY
+        MENUITEM SEPARATOR
+        MENUITEM "&About Creatures Map Editor...", ID_APP_ABOUT
+    END
+END
+
+IDR_C2EROOTYPE MENU PRELOAD DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "Open from &Game\tCtrl+G",     ID_FILE_LOADFROMGAME
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "Inject as World\tF9",         ID_FILE_SAVE_TO_GAME
+        MENUITEM "Inject as Addon\tF10",        ID_FILE_SAVE_TO_GAME_ADDON
+        MENUITEM "&Export as !World.cos",       ID_FILE_SAVETOBOOTSTRAPMAPCOS
+
+        MENUITEM "E&xport as !Addon.cos",       ID_FILE_SAVETOBOOTSTRAPADDONCOS
+
+        MENUITEM "&Validate",                   ID_FILE_VALIDATE
+        MENUITEM SEPARATOR
+        MENUITEM "Property &Types...",          ID_FILE_PROPERTY_TYPES
+        MENUITEM "CA &Rates...",                ID_FILE_CA_RATES
+        MENUITEM "&World Properties...",        ID_FILE_WORLD_SIZE
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y",               ID_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "&Delete\tDel",                ID_EDIT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Background...",               ID_EDIT_BACKGROUND
+        MENUITEM "&Music",                      ID_EDIT_MUSIC
+        MENUITEM SEPARATOR
+        MENUITEM "Check &Heights...",           ID_EDIT_CHECKHEIGHTS
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "Show &Background",            ID_VIEW_SHOW_BACKGROUND
+        MENUITEM SEPARATOR
+        POPUP "&Zoom"
+        BEGIN
+            MENUITEM "&World",                      ID_VIEW_ZOOM_WORLD
+            MENUITEM "&Out\t-",                     ID_VIEW_ZOOM_OUT
+            MENUITEM "&In\t+",                      ID_VIEW_ZOOM_IN
+            MENUITEM SEPARATOR
+            MENUITEM "&Back",                       ID_VIEW_ZOOM_LAST
+            MENUITEM "&Forward",                    ID_VIEW_ZOOM_FORWARD
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "&Data Bars",                  ID_VIEW_DATA_BARS
+        MENUITEM "D&ata Colours",               ID_VIEW_DATA_COLOURS
+        POPUP "&Colour Rooms"
+        BEGIN
+            MENUITEM "CA0",                         ID_VIEW_COLOURROOMS_CA0
+            MENUITEM "CA1",                         ID_VIEW_COLOURROOMS_CA1
+            MENUITEM "CA2",                         ID_VIEW_COLOURROOMS_CA2
+            MENUITEM "CA3",                         ID_VIEW_COLOURROOMS_CA3
+            MENUITEM "CA4",                         ID_VIEW_COLOURROOMS_CA4
+            MENUITEM "CA5",                         ID_VIEW_COLOURROOMS_CA5
+            MENUITEM "CA6",                         ID_VIEW_COLOURROOMS_CA6
+            MENUITEM "CA7",                         ID_VIEW_COLOURROOMS_CA7
+            MENUITEM "CA8",                         ID_VIEW_COLOURROOMS_CA8
+            MENUITEM "CA9",                         ID_VIEW_COLOURROOMS_CA9
+            MENUITEM "CA10",                        ID_VIEW_COLOURROOMS_CA10
+            MENUITEM "CA11",                        ID_VIEW_COLOURROOMS_CA11
+            MENUITEM "CA12",                        ID_VIEW_COLOURROOMS_CA12
+            MENUITEM "CA13",                        ID_VIEW_COLOURROOMS_CA13
+            MENUITEM "CA14",                        ID_VIEW_COLOURROOMS_CA14
+            MENUITEM "CA15",                        ID_VIEW_COLOURROOMS_CA15
+            MENUITEM "CA16",                        ID_VIEW_COLOURROOMS_CA16
+            MENUITEM "CA17",                        ID_VIEW_COLOURROOMS_CA17
+            MENUITEM "CA18",                        ID_VIEW_COLOURROOMS_CA18
+            MENUITEM "CA19",                        ID_VIEW_COLOURROOMS_CA19
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Floor/Ceiling Values...",     ID_EDIT_FLOORCEILINGVALUES
+        MENUITEM "&Properties\tEnter",          ID_VIEW_PROPERTIES
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&Select\t1",                  ID_TOOLS_SELECT_ROOM
+        MENUITEM "&Add Room\t2",                ID_TOOLS_ADD_ROOM
+        MENUITEM "&Zoom\t3",                    ID_TOOLS_ZOOM
+        MENUITEM SEPARATOR
+        MENUITEM "Select &Metaroom\t4",         ID_TOOLS_SELECT_METAROOM
+        MENUITEM "A&dd Metaroom\t5",            ID_TOOLS_ADD_METAROOM
+        MENUITEM SEPARATOR
+        MENUITEM "&Update CA from Game",        ID_TOOLS_UPDATE_CA_FROM_GAME
+        MENUITEM SEPARATOR
+        MENUITEM "Set Metaroom in &Game...",    ID_TOOLS_SET_METAROOM_IN_GAME
+
+        MENUITEM SEPARATOR
+        MENUITEM "&Options...",                 ID_TOOLS_OPTIONS
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&New Window",                 ID_WINDOW_NEW
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "&Tile",                       ID_WINDOW_TILE_HORZ
+        MENUITEM "&Arrange Icons",              ID_WINDOW_ARRANGE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Contents\tF1",               ID_HELP_CONTENTS
+        MENUITEM "CDN &Website\tF2",            ID_CDN_WEBSITE
+        MENUITEM "&Tip of the Day",             CG_IDS_TIPOFTHEDAY
+        MENUITEM SEPARATOR
+        MENUITEM "&About Creatures Map Editor...", ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
+BEGIN
+    "-",            ID_VIEW_ZOOM_OUT,       ASCII,  NOINVERT
+    "1",            ID_TOOLS_SELECT_ROOM,   VIRTKEY, NOINVERT
+    "2",            ID_TOOLS_ADD_ROOM,      VIRTKEY, NOINVERT
+    "3",            ID_TOOLS_ZOOM,          VIRTKEY, NOINVERT
+    "4",            ID_TOOLS_SELECT_METAROOM, VIRTKEY, NOINVERT
+    "5",            ID_TOOLS_ADD_METAROOM,  VIRTKEY, NOINVERT
+    "=",            ID_VIEW_ZOOM_IN,        ASCII,  NOINVERT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "G",            ID_FILE_LOADFROMGAME,   VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_ADD,         ID_VIEW_ZOOM_IN,        VIRTKEY, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    VK_DELETE,      ID_EDIT_DELETE,         VIRTKEY, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    VK_F1,          ID_HELP_CONTENTS,       VIRTKEY, NOINVERT
+    VK_F2,          ID_CDN_WEBSITE,         VIRTKEY, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    VK_RETURN,      ID_VIEW_PROPERTIES,     VIRTKEY, NOINVERT
+    VK_SUBTRACT,    ID_VIEW_ZOOM_OUT,       VIRTKEY, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "Y",            ID_EDIT_REDO,           VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Creatures Map Editor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "Creatures Map Editor 1.08",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright Creature Labs 2001",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "Map Editor Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "Map Editor\0"
+            VALUE "LegalCopyright", "Copyright (C) 2001\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "MapEditor.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "Map Editor\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    IDR_MAINFRAME           "Creatures Map Editor"
+    IDR_C2EROOTYPE          "\nMap\nMap\nMap Files (*.2er)\n.2er\nC2ERoomEditor.Document\nC2E World"
+    IDS_ACTION_NONE         "No Action"
+    IDS_ACTION_ADD_ROOM     "Add Room"
+    IDS_ACTION_ADD_METAROOM "Add Metaroom"
+    IDS_ACTION_REMOVE_ROOM  "Remove Room"
+    IDS_ACTION_REMOVE_METAROOM "Remove Metaroom"
+    IDS_ACTION_MODIFY_ROOM  "Modify Room"
+    IDS_ACTION_MODIFY_METAROOM "Modify Metaroom"
+    IDS_UNDO                "Undo"
+    IDS_REDO                "Redo"
+    IDS_ACTION_MOVE_METAROOM "Move Metaroom"
+    IDS_ACTION_ROOM_PROPERTY "Set Room Property"
+    IDS_ACTION_MOVE_ROOM    "Move Room"
+    IDS_ACTION_DOOR_PROPERTY "Set Door Opening"
+    IDS_ACTION_SET_METAROOM_BACKGROUND "Set Metaroom Background"
+END
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "Map Editor"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document"
+    ID_FILE_MRU_FILE2       "Open this document"
+    ID_FILE_MRU_FILE3       "Open this document"
+    ID_FILE_MRU_FILE4       "Open this document"
+    ID_FILE_MRU_FILE5       "Open this document"
+    ID_FILE_MRU_FILE6       "Open this document"
+    ID_FILE_MRU_FILE7       "Open this document"
+    ID_FILE_MRU_FILE8       "Open this document"
+    ID_FILE_MRU_FILE9       "Open this document"
+    ID_FILE_MRU_FILE10      "Open this document"
+    ID_FILE_MRU_FILE11      "Open this document"
+    ID_FILE_MRU_FILE12      "Open this document"
+    ID_FILE_MRU_FILE13      "Open this document"
+    ID_FILE_MRU_FILE14      "Open this document"
+    ID_FILE_MRU_FILE15      "Open this document"
+    ID_FILE_MRU_FILE16      "Open this document"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_WINDOW_NEW           "Open another window for the active document\nNew Window"
+    ID_WINDOW_ARRANGE       "Arrange icons at the bottom of the window\nArrange Icons"
+    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
+    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+    AFX_IDS_MDICHILD        "Activate this window"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_TOOLS_ADD_ROOM       "Create rooms by clicking on the desired location of each corner\nAdd Rooms"
+    ID_TOOLS_SELECT_ROOM    "Select and modify rooms using the mouse\nSelect"
+    ID_TOOLS_SELECT_METAROOM 
+                            "Select and modify metarooms using the mouse\nSelect Metarooms"
+    ID_TOOLS_ADD_METAROOM   "Create metarooms by clicking on the desired location of the top left corner of the new metaroom\nAdd Metarooms"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_DELETE          "Delete the current selection\tDelete"
+    ID_VIEW_PROPERTIES      "Edits the current selection's properties\nProperties"
+    ID_TOOLS_ZOOM           "Use the mouse to select the desired ziewing area\nZoom"
+    ID_VIEW_ZOOM_WORLD      "View the whole world\nWorld View"
+    ID_VIEW_ZOOM_LAST       "View the last area selected\nBack"
+    ID_VIEW_ZOOM_FORWARD    "View area selected before you selected Back\nForward"
+    ID_FILE_SAVETOGAME      "Save curent world map to the Game Engine\nSave To Game"
+    ID_FILE_SAVE_TO_GAME    "Save map data to running game deleting everything that is already there\nInject as World"
+    ID_FILE_WORLD_SIZE      "Set size of world."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ACTION_ADD_METAROOM_BACKGROUND "Add Metaroom Background"
+    IDS_ACTION_REMOVE_METAROOM_BACKGROUND "Remove Metaroom Background"
+    IDS_ACTION_MULTIPLE     "Multiple Action"
+    IDS_ACTION_CHANGE_METAROOM_BACKGROUND "Change Metaroom Background"
+    IDS_ACTION_WORLD_SIZE   "Change World Properties"
+    IDS_SAVING_TO_GAME      "Working"
+    IDS_CURRENT_POINT       "XXXXXX, XXXXXX"
+    IDS_LOADING_FROM_GAME   "Opening from Game"
+    IDS_ACTION_SET_METAROOM_MUSIC "Set Metaroom Music"
+    IDS_ACTION_SET_ROOM_MUSIC "Set Room Music"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_TOOLS_CHEESE         "Cheese"
+    32829                   "Refresh Room CA properties from game.\nRefresh"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_LOADFROMGAME    "Load Map Data from game (must be running)\nOpen from Game"
+    ID_FILE_SAVETOBOOTSTRAPMAPCOS 
+                            "Save a CAOS script copy of the room data in the current game bootstrap directory.\nExport as World"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_SAVETOBOOTSTRAPADDONCOS 
+                            "Save a CAOS script copy of the room data in the current game bootstrap directory.\nExport as Addon"
+    ID_FILE_SAVE_TO_GAME_ADDON 
+                            "Save map data to running game\nInject as Addon"
+    ID_HELP_CONTENTS        "Launch reference to room editor commands in browser"
+    ID_CDN_WEBSITE          "View Creatures Developer Network website in your browser"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    CG_IDS_TIPOFTHEDAY      "View a top tip for today"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON    DISCARDABLE     "res\\icon1.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_LIGHTBULB           BITMAP  DISCARDABLE     "res\\litebulb.bmp"
+IDR_TOOLBAR1            BITMAP  DISCARDABLE     "res\\toolbar1.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR1 TOOLBAR DISCARDABLE  16, 15
+BEGIN
+    BUTTON      ID_TOOLS_CHEESE
+    BUTTON      ID_TOOLS_STEPCA
+    BUTTON      ID_TOOLS_RUN_CA
+    BUTTON      ID_VIEW_DATA_BARS
+    BUTTON      ID_VIEW_DETAILS
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_ZOOM_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&Zoom"
+    BEGIN
+        MENUITEM "&World",                      ID_VIEW_ZOOM_WORLD
+        MENUITEM "&Out\t-",                     ID_VIEW_ZOOM_OUT
+        MENUITEM "&In\t+",                      ID_VIEW_ZOOM_IN
+        MENUITEM SEPARATOR
+        MENUITEM "&Back",                       ID_VIEW_ZOOM_LAST
+        MENUITEM "&Forward",                    ID_VIEW_ZOOM_FORWARD
+    END
+END
+
+IDR_SELECT_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y",               ID_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "&Delete\tDel",                ID_EDIT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties\tEnter",          ID_VIEW_PROPERTIES
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_C2EROOTYPE ACCELERATORS DISCARDABLE 
+BEGIN
+    VK_F10,         ID_FILE_SAVE_TO_GAME_ADDON, VIRTKEY, NOINVERT
+    VK_F9,          ID_FILE_SAVE_TO_GAME,   VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+CG_IDD_PROGRESS DIALOG DISCARDABLE  0, 0, 186, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Cancel",IDCANCEL,67,58,50,14
+    CONTROL         "Progress1",CG_IDC_PROGDLG_PROGRESS,"msctls_progress32",
+                    WS_BORDER,15,34,154,13
+    LTEXT           " 0 %",CG_IDC_PROGDLG_PERCENT,85,23,18,8
+    LTEXT           "",CG_IDC_PROGDLG_STATUS,13,7,158,8
+END
+
+IDD_PROPERY_TYPES DIALOG DISCARDABLE  0, 0, 275, 124
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Property Types"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,218,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,218,24,50,14
+    LISTBOX         IDC_PROPERTY_TYPES_LIST,7,16,201,101,LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Edit",IDC_EDIT,218,46,50,14
+    LTEXT           "Name",IDC_STATIC,7,7,20,8
+    LTEXT           "Min",IDC_STATIC,138,7,12,8
+    LTEXT           "Max",IDC_STATIC,162,7,14,8
+    LTEXT           "Enum",IDC_STATIC,188,7,19,8
+END
+
+IDD_PROPERTY_TYPE DIALOG DISCARDABLE  0, 0, 186, 143
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Property Type"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "&Name:",IDC_STATIC,7,9,22,8
+    EDITTEXT        IDC_NAME,35,7,86,12,ES_AUTOHSCROLL
+    LTEXT           "&Min:",IDC_STATIC,7,25,14,8
+    EDITTEXT        IDC_MIN,35,23,48,12,ES_AUTOHSCROLL
+    LTEXT           "Ma&x:",IDC_STATIC,7,41,16,8
+    EDITTEXT        IDC_MAX,35,39,48,12,ES_AUTOHSCROLL
+    CONTROL         "&Enumerated",IDC_ENUMERATED,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,7,57,54,10
+    LTEXT           "Enumerated &Values:",IDC_STATIC,7,71,64,8
+    EDITTEXT        IDC_ENUM_VALUES,7,81,172,55,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | WS_VSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
+END
+
+IDD_ROOM_PROPERTIES DIALOGEX 0, 0, 88, 134
+STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Properties"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT,14,61,35,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | 
+                    NOT WS_BORDER
+    CONTROL         "",IDC_DROP_BUTTON,"Button",BS_OWNERDRAW | NOT 
+                    WS_VISIBLE | WS_TABSTOP,37,86,11,10
+    CONTROL         "Spin1",IDC_SPIN,"msctls_updown32",UDS_ARROWKEYS | NOT 
+                    WS_VISIBLE,57,42,11,10
+    LISTBOX         IDC_PROPERTY_LIST,0,0,88,134,LBS_OWNERDRAWFIXED | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_METAROOM_BACKGROUND DIALOG DISCARDABLE  0, 0, 175, 149
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Metaroom Background"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         IDC_LIST,7,7,160,72,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Add",IDC_ADD,7,85,50,14
+    PUSHBUTTON      "&Remove",IDC_REMOVE,62,85,50,14
+    DEFPUSHBUTTON   "&Properties",IDC_PROPERTIES,117,85,50,14
+    PUSHBUTTON      "Close",IDCANCEL,117,128,50,14
+    PUSHBUTTON      "&Set as Current Backgound",IDC_SET,7,103,160,14
+END
+
+IDD_BACKGROUND_FILE DIALOG DISCARDABLE  0, 0, 206, 154
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Background File"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "&Source:",IDC_STATIC,7,7,26,8
+    EDITTEXT        IDC_SOURCE,7,17,150,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "&Browse...",IDC_BUTTON1,162,17,37,12
+    CONTROL         "&Generate &Game Background",IDC_MAKE_SPRITE_FILE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,38,107,10
+    CONTROL         "&Generate &Preview",IDC_MAKE_PREVIEW_FILE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,51,73,10
+    GROUPBOX        "Preview &Contrast",IDC_PREVIEW,7,66,192,62
+    LTEXT           "Mi&nimum:",IDC_STATIC,13,82,30,8
+    EDITTEXT        IDC_MIN,50,80,38,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Ma&ximum:",IDC_STATIC,109,82,32,8
+    EDITTEXT        IDC_MAX,147,80,38,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "The closer together these numbers are, the lower the contrast will be. If you enter the values 0 and 255, the contrast will be unaffected.",
+                    IDC_STATIC,13,95,181,26
+    DEFPUSHBUTTON   "OK",IDOK,94,133,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,149,133,50,14
+END
+
+IDD_WORLD_SIZE DIALOG DISCARDABLE  0, 0, 171, 169
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "World Properties"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "&Width:",IDC_STATIC,28,22,22,8
+    EDITTEXT        IDC_WIDTH,85,19,58,12,ES_AUTOHSCROLL
+    LTEXT           "&Height:",IDC_STATIC,28,39,24,8
+    EDITTEXT        IDC_HEIGHT,85,38,58,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,7,148,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,114,148,50,14
+    LTEXT           "&Metaroom Base",IDC_STATIC,28,104,50,8
+    EDITTEXT        IDC_METAROOM_BASE,85,102,58,12,ES_AUTOHSCROLL
+    LTEXT           "&Room Base",IDC_STATIC,28,123,38,8
+    EDITTEXT        IDC_ROOM_BASE,85,121,58,12,ES_AUTOHSCROLL
+    GROUPBOX        "&Size",IDC_STATIC,7,7,157,51
+    GROUPBOX        "&Index Bases",IDC_STATIC,7,64,157,78
+    LTEXT           "These are hints only - do not rely on room or",
+                    IDC_STATIC,15,79,141,8
+    LTEXT           "metaroom numbers, use coordinates instead.",IDC_STATIC,
+                    15,89,143,8
+END
+
+IDD_OPTIONS DIALOG DISCARDABLE  0, 0, 158, 87
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "&Validation",IDC_STATIC,7,7,144,52
+    CONTROL         "&Manual Only",IDC_VALIDATION,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,16,19,55,10
+    CONTROL         "&Automatic (after every action)",IDC_VALIDATION2,"Button",
+                    BS_AUTORADIOBUTTON,16,31,108,10
+    CONTROL         "&Automatic with &Undo",IDC_VALIDATION3,"Button",
+                    BS_AUTORADIOBUTTON,16,43,81,10
+    DEFPUSHBUTTON   "OK",IDOK,46,66,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,101,66,50,14
+END
+
+IDD_SWITCH_METAROOM DIALOG DISCARDABLE  0, 0, 186, 82
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Switch Metaroom"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,19,61,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,75,61,50,14
+    LTEXT           "Metaroom:",IDC_STATIC,7,9,34,8
+    COMBOBOX        IDC_METAROOM,55,7,32,76,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Background:",IDC_STATIC,7,27,42,8
+    COMBOBOX        IDC_BACKGROUND,55,25,124,76,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&Display Map",IDC_DISPLAY_MAP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,55,44,59,9
+    PUSHBUTTON      "&Apply",IDB_APPLY,129,61,50,14
+END
+
+IDD_TIP DIALOG DISCARDABLE  0, 0, 231, 164
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tip of the Day"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",-1,"Static",SS_BLACKFRAME,12,11,207,123
+    LTEXT           "Some String",IDC_TIPSTRING,28,63,177,60
+    CONTROL         "&Show Tips on StartUp",IDC_STARTUP,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,13,146,85,10
+    PUSHBUTTON      "&Next Tip",IDC_NEXTTIP,109,143,50,14,WS_GROUP
+    DEFPUSHBUTTON   "&Close",IDOK,168,143,50,14,WS_GROUP
+    CONTROL         "",IDC_BULB,"Static",SS_BITMAP,20,17,190,111
+END
+
+IDD_CA_PROPERTIES DIALOG DISCARDABLE  0, 0, 278, 122
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "CA Properties"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "&Room Type",IDC_STATIC,7,7,38,8
+    LISTBOX         IDC_ROOM_TYPE,7,18,72,97,LBS_NOINTEGRALHEIGHT | 
+                    LBS_EXTENDEDSEL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&CA Property",IDC_STATIC,84,7,38,8
+    LISTBOX         IDC_CA_PROPERTIES,84,18,72,97,LBS_NOINTEGRALHEIGHT | 
+                    LBS_EXTENDEDSEL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "&Parameters",IDC_STATIC,162,13,109,82
+    LTEXT           "&Gain Rate",IDC_STATIC,173,32,33,8
+    EDITTEXT        IDC_GAIN,224,30,36,12,ES_AUTOHSCROLL
+    LTEXT           "&Loss Rate",IDC_STATIC,173,52,33,8
+    EDITTEXT        IDC_LOSS,224,50,36,12,ES_AUTOHSCROLL
+    LTEXT           "&Diffusion Rate",IDC_STATIC,173,72,46,8
+    EDITTEXT        IDC_DIFFUSION,224,70,36,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,166,101,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,221,101,50,14
+END
+
+IDD_FLOOR_VALUES DIALOG DISCARDABLE  0, 0, 120, 70
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Floor/Ceiling values"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "&X",IDC_STATIC,12,14,8,8
+    EDITTEXT        IDC_X,21,12,92,12,ES_AUTOHSCROLL
+    LTEXT           "&Y",IDC_STATIC,12,31,8,8
+    EDITTEXT        IDC_Y,21,29,92,12,ES_AUTOHSCROLL | ES_READONLY
+    DEFPUSHBUTTON   "Calculate",IDC_CALCULATE,7,49,50,14
+    PUSHBUTTON      "Close",IDCANCEL,63,49,50,14
+END
+
+IDD_MUSIC DIALOG DISCARDABLE  0, 0, 119, 49
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Music"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,28,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,62,28,50,14
+    EDITTEXT        IDC_MUSIC,7,7,105,12,ES_AUTOHSCROLL
+END
+
+IDD_HEIGHT_CHECK DIALOG DISCARDABLE  0, 0, 127, 68
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Height Check"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Minimum &Permability",IDC_STATIC,7,9,64,8
+    EDITTEXT        IDC_MIN_PERM,78,8,42,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Minimum &Height",IDC_STATIC,7,27,51,8
+    EDITTEXT        IDC_MIN_HEIGHT,78,25,42,12,ES_AUTOHSCROLL | ES_NUMBER
+    DEFPUSHBUTTON   "OK",IDOK,7,47,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,70,47,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    CG_IDD_PROGRESS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 72
+    END
+
+    IDD_PROPERY_TYPES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 268
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 117
+    END
+
+    IDD_PROPERTY_TYPE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 136
+    END
+
+    IDD_METAROOM_BACKGROUND, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 167
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 142
+    END
+
+    IDD_BACKGROUND_FILE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 199
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 147
+    END
+
+    IDD_WORLD_SIZE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 164
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 162
+    END
+
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 151
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 80
+    END
+
+    IDD_SWITCH_METAROOM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 75
+    END
+
+    IDD_TIP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 224
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 157
+    END
+
+    IDD_CA_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 271
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_FLOOR_VALUES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 113
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 63
+    END
+
+    IDD_MUSIC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 112
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 42
+    END
+
+    IDD_HEIGHT_CHECK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 120
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 61
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\C2ERoomEditor.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#include ""afxprint.rc""       // printing/print preview resources\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_ZOOM                CURSOR  DISCARDABLE     "res\\zoom.cur"
+IDC_ADD_ROOM            CURSOR  DISCARDABLE     "res\\cursor1.cur"
+IDC_ADD_METAROOM        CURSOR  DISCARDABLE     "res\\cur00001.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    CG_IDS_PROGRESS_CAPTION "Loading"
+    CG_IDS_TIPOFTHEDAY      "Displays a Tip of the Day."
+    CG_IDS_TIPOFTHEDAYMENU  "Ti&p of the Day..."
+    CG_IDS_DIDYOUKNOW       "Did you know..."
+    CG_IDS_FILE_ABSENT      "Tips file does not exist in the prescribed directory"
+    CG_IDP_FILE_CORRUPT     "Trouble reading the tips file"
+    CG_IDS_TIPOFTHEDAYHELP  "&Help"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_DELETE          "Delete the current selection\tDelete"
+    ID_VIEW_PROPERTIES      "Edits the current selection's properties\nProperties"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_TOOLS_CHEESE         "Cheese"
+END
+
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\C2ERoomEditor.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#include "afxprint.rc"       // printing/print preview resources
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

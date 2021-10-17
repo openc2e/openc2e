@@ -1,0 +1,78 @@
+// CreaturePicture.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (CreaturePicture2.tlb) that will become a resource in
+// CreaturePicture.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(843EACE6-D2D6-11D2-9D30-0090271EEABE), version(1.0),
+  helpfile("CreaturePicture2.hlp"),
+  helpstring("CreaturePicture2 ActiveX Control module"),
+  control ]
+library CREATUREPICTURE2Lib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CCreaturePicture2Ctrl
+
+	[ uuid(843EACE7-D2D6-11D2-9D30-0090271EEABE),
+	  helpstring("Dispatch interface for CreaturePicture2 Control"), hidden ]
+	dispinterface _DCreaturePicture2
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CCreaturePictureCtrl)
+			[id(4)] short PoseCount;
+			[id(DISPID_BORDERSTYLE), bindable, requestedit] short BorderStyle;
+			[id(1)] float Scale;
+			[id(2)] boolean Friction;
+			[id(3)] double Angle;
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CCreaturePictureCtrl)
+			[id(6), propget] BSTR PoseString(short Index);
+			[id(6), propput] void PoseString(short Index, BSTR lpszNewValue);
+			[id(5)] void SetAppearance(short HeadGenus, short HeadVariant, short BodyGenus, short BodyVariant, short LegsGenus, short LegsVariant, short ArmsGenus, short ArmsVariant, short TailGenus, short TailVariant, short EarGenus, short EarVariant, short HairGenus, short HairVariant, short Sex, short Age);
+			//}}AFX_ODL_METHOD
+
+			[id(DISPID_ABOUTBOX)] void AboutBox();
+	};
+
+	//  Event dispatch interface for CCreaturePicture2Ctrl
+
+	[ uuid(843EACE8-D2D6-11D2-9D30-0090271EEABE),
+	  helpstring("Event interface for CreaturePicture2 Control") ]
+	dispinterface _DCreaturePicture2Events
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CCreaturePictureCtrl)
+			[id(DISPID_CLICK)] void Click();
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CCreaturePictureCtrl
+
+	[ uuid(843EACE9-D2D6-11D2-9D30-0090271EEABE),
+	  helpstring("CreaturePicture2 Control"), control ]
+	coclass CreaturePicture2
+	{
+		[default] dispinterface _DCreaturePicture2;
+		[default, source] dispinterface _DCreaturePicture2Events;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

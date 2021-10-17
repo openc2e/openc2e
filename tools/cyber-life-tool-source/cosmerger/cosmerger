@@ -1,0 +1,22 @@
+#! bash
+# .cosmerger
+# bash shell script to merge COS files
+
+echo Merging cos files in current directory...
+rm iscr.work
+rm scrp.work
+rm world.work
+
+for COSNAME in *.cos;
+do
+  echo $COSNAME...
+  perl cosmerger.pl "$COSNAME"
+done
+
+echo inst >>world.work
+cat <iscr.work >>world.work
+echo endm >>world.work
+echo >>world.work
+cat <scrp.work >>world.work
+echo >>world.work
+echo worldscriptend >>world.work

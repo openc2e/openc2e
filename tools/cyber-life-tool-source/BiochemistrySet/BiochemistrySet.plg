@@ -1,0 +1,57 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: BiochemistrySet - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\camms\LOCALS~1\Temp\RSP1D.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GR /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"C:\Projects\Creatures 3\c2e\common\WhichEngine.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\camms\LOCALS~1\Temp\RSP1D.tmp" 
+Creating temporary file "C:\DOCUME~1\camms\LOCALS~1\Temp\RSP1E.tmp" with contents
+[
+Shlwapi.lib /nologo /subsystem:windows /incremental:yes /pdb:"Debug/BiochemistrySet.pdb" /debug /machine:I386 /out:"Debug/BiochemistrySet.exe" /pdbtype:sept 
+".\Debug\BaseDlg.obj"
+".\Debug\BiochemistrySet.obj"
+".\Debug\BiochemistrySetDlg.obj"
+".\Debug\Catalogue.obj"
+".\Debug\ChemNames.obj"
+".\Debug\clientside.obj"
+".\Debug\CreatureMoniker.obj"
+".\Debug\DialogSpec.obj"
+".\Debug\FavouriteClass.obj"
+".\Debug\FavouriteName.obj"
+".\Debug\FileFuncs.obj"
+".\Debug\FileLocaliser.obj"
+".\Debug\GameInterface.obj"
+".\Debug\Grapher.obj"
+".\Debug\GrapherDlg.obj"
+".\Debug\InjectionDlg.obj"
+".\Debug\LabelThing.obj"
+".\Debug\LoggerDlg.obj"
+".\Debug\OrganDlg.obj"
+".\Debug\ParametersDlg.obj"
+".\Debug\SimpleLexer.obj"
+".\Debug\StdAfx.obj"
+".\Debug\WhichEngine.obj"
+".\Debug\WindowState.obj"
+".\Debug\BiochemistrySet.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\camms\LOCALS~1\Temp\RSP1E.tmp"
+<h3>Output Window</h3>
+Compiling...
+WhichEngine.cpp
+Linking...
+   Creating library Debug/BiochemistrySet.lib and object Debug/BiochemistrySet.exp
+
+
+
+<h3>Results</h3>
+BiochemistrySet.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

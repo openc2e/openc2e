@@ -1,0 +1,25 @@
+This is a list of ideas for ways to improve the Biochemistry Set
+
+Maybe later
+-----------
+
+Find out why main window is different in on-top-ness
+Use Dave's generic label class
+Monitor all chemicals so their history appears instantly
+
+Place labels at top right of mouse, so pointer doesn't cover them as much?
+Scroll labels with graph and stop them flickering if you point to one place?
+
+Colours in injection kit same as in the monitoring graph - 
+perhaps make 255 colours and keep each chemical the same colour always?
+
+Histogram style graph
+Save and restore all chemical levels in a Norn
+Breakpoint if chemical level (or any other monitorable thing)
+ changes above/below certain value (in any/all Norns)
+Graph of rate of change of chemical
+Close all windows
+Save all window states
+Printing (launch .bmp with "print"?)
+Measure time in ticks (with SysTick returning command) - to log file as well
+

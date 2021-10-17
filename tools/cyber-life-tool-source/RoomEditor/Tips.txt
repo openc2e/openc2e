@@ -1,0 +1,8 @@
+You can get annoying 'Tips' like this every time you start this program.
+You can remove the last point you entered when you are adding a room by pressing the backspace key.
+You can undo your last action by choosing Undo from the Edit menu.
+You can quickly find your way around the map using the Zoom tool (magnifying glass). Right-click using this tool for extra navigation short-cuts.
+You can set the current metaroom and background in the game by choosing 'Switch Metaroom in Game' option from the Tools menu.
+You can select several rooms at once. Either drag a rectangle around all the rooms you want to select or ctrl-click on each room in turn. You can then set common property values for all selected rooms.
+You can use the keys 1...5 to quickly select a different mouse tool.
+You can force room floors and ceilings to be exactly horizontal by holding down the shift-key whilst adding a room.

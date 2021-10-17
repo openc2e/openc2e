@@ -1,0 +1,447 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "Resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+// winemaker replaces all afxres.h occurances with winres.h
+
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,4,0,1
+ PRODUCTVERSION 1,4,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "CyberLife Technology Ltd\0"
+            VALUE "FileDescription", "Vat\0"
+            VALUE "FileVersion", "1, 4, 0, 1\0"
+            VALUE "InternalName", "Neuroscience\0"
+            VALUE "LegalCopyright", "Copyright © 1999\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "Vat.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "CyberLife Technology Ltd Neuroscience\0"
+            VALUE "ProductVersion", "1, 4, 0, 1\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_VIEWPORTTOOLBAR TOOLBAR DISCARDABLE  16, 15
+BEGIN
+    BUTTON      ID_BUTTONZOOMIN
+    BUTTON      ID_BUTTONZOOMOUT
+    SEPARATOR
+    BUTTON      ID_BUTTONPLAY
+    BUTTON      ID_BUTTONSTOP
+    BUTTON      ID_BUTTONLOOP
+    BUTTON      ID_BUTTONINSTINCT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_VIEWPORTTOOLBAR     BITMAP  DISCARDABLE     "vptoolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_POPUPS MENU DISCARDABLE 
+BEGIN
+    POPUP "neuron"
+    BEGIN
+        MENUITEM "Graph Neuron",                ID_GRAPHVARS
+        MENUITEM "Neuron Variables",            ID_VARIABLES
+        MENUITEM SEPARATOR
+        MENUITEM "SV Rule",                     ID_SVRULE
+        MENUITEM "Graph Lobe",                  ID_GRAPHLOBE
+        MENUITEM "Hide Lobe",                   ID_HIDE
+    END
+    POPUP "dendrite"
+    BEGIN
+        MENUITEM "Graph Dendrite",              ID_GRAPHVARS
+        MENUITEM "Dendrite Variables",          ID_VARIABLES
+        MENUITEM SEPARATOR
+        MENUITEM "SV Rule",                     ID_SVRULE
+        MENUITEM "Hide Tract",                  ID_HIDE
+    END
+    POPUP "lobe"
+    BEGIN
+        MENUITEM "SV Rule",                     ID_SVRULE
+        MENUITEM "Graph Lobe",                  ID_GRAPHLOBE
+        MENUITEM "Hide Lobe",                   ID_HIDE
+    END
+    POPUP "tract"
+    BEGIN
+        MENUITEM "SV Rule",                     ID_SVRULE
+        MENUITEM "Hide Tract",                  ID_HIDE
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "Neuron var 0",                ID_VIEW_NEURONVAR0, CHECKED
+        MENUITEM "Neuron var 1",                ID_VIEW_NEURONVAR1
+        MENUITEM "Neuron var 2",                ID_VIEW_NEURONVAR2
+        MENUITEM "Neuron var 3",                ID_VIEW_NEURONVAR3
+        MENUITEM "Neuron var 4",                ID_VIEW_NEURONVAR4
+        MENUITEM "Neuron var 5",                ID_VIEW_NEURONVAR5
+        MENUITEM "Neuron var 6",                ID_VIEW_NEURONVAR6
+        MENUITEM "Neuron var 7",                ID_VIEW_NEURONVAR7
+        MENUITEM SEPARATOR
+        MENUITEM "Dendrite Var 0",              ID_VIEW_DENDRITEVAR0
+        , CHECKED
+        MENUITEM "Dendrite var 1",              ID_VIEW_DENDRITEVAR1
+        MENUITEM "Dendrite var 2",              ID_VIEW_DENDRITEVAR2
+        MENUITEM "Dendrite var 3",              ID_VIEW_DENDRITEVAR3
+        MENUITEM "Dendrite var 4",              ID_VIEW_DENDRITEVAR4
+        MENUITEM "Dendrite var 5",              ID_VIEW_DENDRITEVAR5
+        MENUITEM "Dendrite var 6",              ID_VIEW_DENDRITEVAR6
+        MENUITEM "Dendrite var 7",              ID_VIEW_DENDRITEVAR7
+        MENUITEM SEPARATOR
+        MENUITEM "Hide Details",                ID_VIEW_HIDEDETAILS
+        MENUITEM "Set Threshold View",          ID_VIEW_SETTHRESHHOLDVIEW
+    END
+    POPUP "Vars"
+    BEGIN
+        MENUITEM "Variable 0",                  ID_VAR0
+        MENUITEM "Variable 1",                  ID_VAR1
+        MENUITEM "Variable 2",                  ID_VAR2
+        MENUITEM "Variable 3",                  ID_VAR3
+        MENUITEM "Variable 4",                  ID_VAR4
+        MENUITEM "Variable 5",                  ID_VAR5
+        MENUITEM "Variable 6",                  ID_VAR6
+        MENUITEM "Variable 7",                  ID_VAR7
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDR_MAINFRAME           "Vat and Zone Tool"
+    IDR_VIEWPORT            "Viewport"
+    IDR_BRAINVIEWPORT       "Brain Viewport"
+    IDR_INPUTVIEWPORT       "Input Neuron Viewport"
+    IDR_LOBEINPUTDLG        "lobe Input Dialog"
+    IDR_LIST                "List View"
+    IDR_INPUTLIST           "Input Neuron List View"
+    IDR_VARDLG              "Variable Dialog"
+    IDR_SVRULEDLG           "SV Rule Dialog"
+    IDR_VARGRAPHDLG         "Variable Graph Dialog"
+    IDR_GRAPHDLG            "Graph Dialog Window"
+    IDR_TEXTVIEWPORT        "Text Viewport Window"
+    IDR_TIPS                "Tips Window"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_OFFLINEINACTIVEMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open",                       ID_FILE_OPENGENOME
+        MENUITEM "&Close",                      ID_FILE_CLOSEBRAIN, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Connect to Creatures",        ID_FILE_CONNECTTOCREATURES
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit",                       ID_FILE_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "Neuron var 0",                ID_VIEW_NEURONVAR0, GRAYED
+        MENUITEM "Neuron var 1",                ID_VIEW_NEURONVAR1, GRAYED
+        MENUITEM "Neuron var 2",                ID_VIEW_NEURONVAR2, GRAYED
+        MENUITEM "Neuron var 3",                ID_VIEW_NEURONVAR3, GRAYED
+        MENUITEM "Neuron var 4",                ID_VIEW_NEURONVAR4, GRAYED
+        MENUITEM "Neuron var 5",                ID_VIEW_NEURONVAR5, GRAYED
+        MENUITEM "Neuron var 6",                ID_VIEW_NEURONVAR6, GRAYED
+        MENUITEM "Neuron var 7",                ID_VIEW_NEURONVAR7, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Dendrite var 0",              ID_VIEW_DENDRITEVAR0, GRAYED
+        MENUITEM "Dendrite var 1",              ID_VIEW_DENDRITEVAR1, GRAYED
+        MENUITEM "Dendrite var 2",              ID_VIEW_DENDRITEVAR2, GRAYED
+        MENUITEM "Dendrite var 3",              ID_VIEW_DENDRITEVAR3, GRAYED
+        MENUITEM "Dendrite var 4",              ID_VIEW_DENDRITEVAR4, GRAYED
+        MENUITEM "Dendrite var 5",              ID_VIEW_DENDRITEVAR5, GRAYED
+        MENUITEM "Dendrite var 6",              ID_VIEW_DENDRITEVAR6, GRAYED
+        MENUITEM "Dendrite var 7",              ID_VIEW_DENDRITEVAR7, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Hide Details",                ID_VIEW_HIDEDETAILS, GRAYED
+        MENUITEM "Set Threshold View",          ID_VIEW_SETTHRESHHOLDVIEW
+        , GRAYED
+    END
+    POPUP "&Windows"
+    BEGIN
+        MENUITEM "None",                        ID_WINDOWS_NONE, GRAYED
+    END
+END
+
+IDR_OFFLINEACTIVEMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open",                       ID_FILE_OPENGENOME
+        MENUITEM "&Close",                      ID_FILE_CLOSEBRAIN
+        MENUITEM SEPARATOR
+        MENUITEM "Connect to Creatures",        ID_FILE_CONNECTTOCREATURES
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+END
+
+IDR_ONLINEACTIVEMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Refresh Online Creature List", 
+                                                ID_FILE_REFRESHONLINECREATURELIST
+
+        MENUITEM SEPARATOR
+        MENUITEM "Disconnect from Creatures",   ID_FILE_DISCONNECTFROMCREATURES
+
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+END
+
+IDR_ONLINEINACTIVEMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Refresh Online Creature List", 
+                                                ID_FILE_REFRESHONLINECREATURELIST
+
+        MENUITEM SEPARATOR
+        MENUITEM "Disconnect from Creatures",   ID_FILE_DISCONNECTFROMCREATURES
+
+        MENUITEM "&Exit",                       ID_FILE_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "Neuron var 0",                ID_VIEW_NEURONVAR0, GRAYED
+        MENUITEM "Neuron var 1",                ID_VIEW_NEURONVAR1, GRAYED
+        MENUITEM "Neuron var 2",                ID_VIEW_NEURONVAR2, GRAYED
+        MENUITEM "Neuron var 3",                ID_VIEW_NEURONVAR3, GRAYED
+        MENUITEM "Neuron var 4",                ID_VIEW_NEURONVAR4, GRAYED
+        MENUITEM "Neuron var 5",                ID_VIEW_NEURONVAR5, GRAYED
+        MENUITEM "Neuron var 6",                ID_VIEW_NEURONVAR6, GRAYED
+        MENUITEM "Neuron var 7",                ID_VIEW_NEURONVAR7, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Dendrite var 0",              ID_VIEW_DENDRITEVAR0, GRAYED
+        MENUITEM "Dendrite var 1",              ID_VIEW_DENDRITEVAR1, GRAYED
+        MENUITEM "Dendrite var 2",              ID_VIEW_DENDRITEVAR2, GRAYED
+        MENUITEM "Dendrite var 3",              ID_VIEW_DENDRITEVAR3, GRAYED
+        MENUITEM "Dendrite var 4",              ID_VIEW_DENDRITEVAR4, GRAYED
+        MENUITEM "Dendrite var 5",              ID_VIEW_DENDRITEVAR5, GRAYED
+        MENUITEM "Dendrite var 6",              ID_VIEW_DENDRITEVAR6, GRAYED
+        MENUITEM "Dendrite var 7",              ID_VIEW_DENDRITEVAR7, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Hide Details",                ID_VIEW_HIDEDETAILS, GRAYED
+        MENUITEM "Set Threshold View",          ID_VIEW_SETTHRESHHOLDVIEW
+        , GRAYED
+    END
+    POPUP "&Windows"
+    BEGIN
+        MENUITEM "None",                        ID_WINDOWS_NONE, GRAYED
+    END
+END
+
+IDR_OFFLINERECONNECTMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open",                       ID_FILE_OPENGENOME
+        MENUITEM "&Close",                      ID_FILE_CLOSEBRAIN, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Reconnect to Creatures",      ID_FILE_RECONNECTTOCREATURES
+        MENUITEM "Connect to Creatures",        ID_FILE_CONNECTTOCREATURES
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    MENUITEM "",                            65535
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOGTHRESH DIALOG DISCARDABLE  0, 0, 146, 98
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Threshold View"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,89,77,50,14
+    CONTROL         "No Threshold",IDC_RADIONOTHRESH,"Button",
+                    BS_AUTORADIOBUTTON,7,7,132,10
+    CONTROL         "Non Zero Values",IDC_RADIONONZERO,"Button",
+                    BS_AUTORADIOBUTTON,7,17,132,10
+    CONTROL         "Above Threshold",IDC_RADIOABOVETHRESH,"Button",
+                    BS_AUTORADIOBUTTON,7,26,132,10
+    CONTROL         "Below Threshold",IDC_RADIOBELOWTHRESH,"Button",
+                    BS_AUTORADIOBUTTON,7,35,132,10
+    CONTROL         "Slider1",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,48,107,18
+    LTEXT           "Static",IDC_THRESHLABEL,115,50,24,13,SS_CENTERIMAGE
+END
+
+IDD_DIALOG_GENEAGE DIALOG DISCARDABLE  0, 0, 167, 108
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Gene Expression Age"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,110,7,50,14
+    LTEXT           "Age",IDC_STATIC,7,7,14,8
+    LISTBOX         IDC_AGE_LIST,7,19,95,82,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_DIALOGTHRESH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 139
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 91
+    END
+
+    IDD_DIALOG_GENEAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 160
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 101
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON2               ICON    DISCARDABLE     "icon2.ico"
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CAT_DIR=/usr/local/games/creatures3/Catalogue/
+# CAT_DIR=~/c2e/engine/Catalogues
+
+./catcheck en $CAT_DIR > /tmp/c3catcheck.en
+for lang in en en-GB fr de nl es it; do
+	echo "---------------------------------"
+	echo $lang
+	./catcheck $lang $CAT_DIR | diff - /tmp/c3catcheck.en
+done
+
+
