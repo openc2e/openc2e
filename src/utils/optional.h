@@ -3,7 +3,7 @@
 // Once openc2e goes to C++17, replace this with std::optional
 
 #include <exception>
-#include <type_traits>
+#include <stdint.h>
 
 class bad_optional_access : public std::exception {
 };
@@ -85,7 +85,7 @@ class optional {
 
   private:
 	bool has_value_ = false;
-	typename std::aligned_storage<sizeof(T), alignof(T)>::type storage_;
+	alignas(T) uint8_t storage_[sizeof(T)];
 };
 
 template <class T>
