@@ -348,20 +348,23 @@ file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/caos/caosVM_*.cpp)
 add_custom_command(
 	OUTPUT ${GEN}/commandinfo.json
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND ${Python_EXECUTABLE} parsedocs.py ${CAOSVM_FILES} > ${GEN}/commandinfo.json
-	DEPENDS parsedocs.py ${CAOSVM_FILES}
+	COMMAND ${Python_EXECUTABLE} scripts/parsedocs.py ${CAOSVM_FILES} > ${GEN}/commandinfo.json
+	DEPENDS scripts/parsedocs.py ${CAOSVM_FILES}
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
 	OUTPUT ${BIN}/caosdocs.html
-	COMMAND ${Python_EXECUTABLE} docs/writehtml.py ${GEN}/commandinfo.json > ${BIN}/caosdocs.html
-	DEPENDS docs/writehtml.py ${GEN}/commandinfo.json
+	COMMAND ${Python_EXECUTABLE} scripts/writehtml.py ${GEN}/commandinfo.json > ${BIN}/caosdocs.html
+	DEPENDS scripts/writehtml.py scripts/docs.css ${GEN}/commandinfo.json
 	WORKING_DIRECTORY ${SRC})
+
 add_custom_command(
-	OUTPUT ${BIN}/openc2e.6
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SRC}/docs/openc2e.6 ${BIN}/openc2e.6
-	DEPENDS docs/openc2e.6
-	)
+	OUTPUT ${GEN}/cmddata.cpp
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
+	COMMAND ${Python_EXECUTABLE} scripts/writecmds.py ${GEN}/commandinfo.json > ${GEN}/cmddata.cpp
+	DEPENDS scripts/writecmds.py ${GEN}/commandinfo.json
+	WORKING_DIRECTORY ${SRC})
+
 # it seems these add_custom_command for re2c could be made
 # into a macro... e.g. RE2C(file1) RE2C(file2) etc...
 add_custom_command(
@@ -369,13 +372,6 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
 	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c.cpp
 	DEPENDS ${SRC}/src/cataloglexer.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
-add_custom_command(
-	OUTPUT ${GEN}/cmddata.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND ${Python_EXECUTABLE} writecmds.py ${GEN}/commandinfo.json > ${GEN}/cmddata.cpp
-	DEPENDS ${GEN}/commandinfo.json writecmds.py
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
@@ -420,7 +416,7 @@ add_custom_command(
 	DEPENDS ${SRC}/src/fileformats/PraySourceParser.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
-add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html ${BIN}/openc2e.6)
+add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html)
 add_custom_target(generated DEPENDS
 	${GEN}/caoslexer.cpp
 	${GEN}/mngparser.cpp
@@ -431,7 +427,6 @@ install(FILES
 	AUTHORS
 	COPYING
 	README.md
-	docs/openc2e.6
 	${BIN}/caosdocs.html
 	${GEN}/commandinfo.json
 	DESTINATION "."
@@ -485,7 +480,6 @@ list(APPEND dist_args
 		"${CMAKE_CURRENT_SOURCE_DIR}/AUTHORS"
 		"${CMAKE_CURRENT_SOURCE_DIR}/COPYING"
 		"${CMAKE_CURRENT_SOURCE_DIR}/README.md"
-		"${CMAKE_CURRENT_SOURCE_DIR}/docs/openc2e.6"
 		"${BIN}/caosdocs.html"
 		"${GEN}/commandinfo.json"
 		"$<TARGET_FILE:openc2e>"
