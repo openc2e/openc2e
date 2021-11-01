@@ -195,7 +195,6 @@ struct CAOSExpression {
 	int traceidx;
 	void eval(caosScript* scr, bool save_here) const;
 	void save(caosScript* scr) const;
-	int cost() const;
 
 	CAOSExpression(const CAOSExpression& e)
 		: value(e.value), traceidx(e.traceidx) {}
@@ -206,16 +205,6 @@ struct CAOSExpression {
 };
 
 class caosScript;
-
-struct costVisit {
-  public:
-	costVisit() {}
-	int operator()(const CAOSCmd& cmd) const;
-	int operator()(const caosValue& v) const {
-		(void)v;
-		return 0;
-	}
-};
 
 struct saveVisit {
   private:

@@ -34,7 +34,6 @@
  %status maybe
  %variants c1 c2 cv c3 sm
  %stackdelta 0
- %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. Jumps to the next part of the block if condition is false, 
  otherwise continues executing the script.
@@ -48,7 +47,6 @@ void c_DOIF(caosVM*) {
  %variants c3 cv sm openc2e
  %status maybe
  %stackdelta 0
- %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If none of the previous DOIF/ELIF conditions have been true, and condition evaluates to true, then the code in the ELIF block is executed.
  If found outside a DOIF block, it is equivalent to a DOIF. If you take advantage of this behavior, fuzzie is of the opinion that you should be shot.
@@ -62,7 +60,6 @@ void c_ELIF(caosVM*) {
  ELSE (command)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  Part of a DOIF/ELIF/ELSE/ENDI block. If ELSE is present, it is jumped to when none of the previous DOIF/ELIF conditions are true.
 */
@@ -74,7 +71,6 @@ void c_ELSE(caosVM*) {
  ENDI (command)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  The end of a DOIF/ELIF/ELSE/ENDI block.
 */
@@ -87,7 +83,6 @@ void c_ENDI(caosVM*) {
  %status maybe
  %stackdelta 0
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  The start of a REPS...REPE loop. The body of the loop will be executed (reps) times.
 */
@@ -103,7 +98,6 @@ void c_REPS(caosVM* vm) {
  REPE (command)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  The end of a REPS...REPE loop.
 */
@@ -115,7 +109,6 @@ void c_REPE(caosVM*) {
  LOOP (command)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  The start of a LOOP...EVER or LOOP...UNTL loop.
 */
@@ -139,7 +132,6 @@ void c_EVER(caosVM*) {
  %status maybe
  %stackdelta 0
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  Jumps back to the matching LOOP unless the condition evaluates to true.
 */
@@ -152,7 +144,6 @@ void c_UNTL(caosVM*) {
  %stackdelta 0
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  Jumps to a subroutine defined by SUBR with label (label).
 */
@@ -179,7 +170,6 @@ void c_SUBR(caosVM*) {
  %stackdelta any
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  Returns from a subroutine called with GSUB.
 */
@@ -197,7 +187,6 @@ void c_RETN(caosVM* vm) {
  NEXT (command)
  %status maybe
  %variants all
- %cost c1,c2 0
 
  The end of an ENUM...NEXT loop.
 */
@@ -209,7 +198,6 @@ void c_NEXT(caosVM* vm) {
  NSCN (command)
  %status maybe
  %variants c2
- %cost c2 0
 
  The end of an ESCN...NSCN loop.
 */
@@ -222,7 +210,6 @@ void c_NSCN(caosVM* vm) {
  %status maybe
  %stackdelta any
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Loops through all agents with the given classifier.  0 on any field is a
  wildcard. The loop body is terminated by a NEXT.

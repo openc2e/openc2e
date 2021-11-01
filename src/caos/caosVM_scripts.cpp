@@ -101,7 +101,6 @@ class blockUntilTime : public blockCond {
  WAIT (command) ticks (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Stops the script from running for the given number of ticks.
  */

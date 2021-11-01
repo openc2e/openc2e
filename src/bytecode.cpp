@@ -63,7 +63,7 @@ std::string dumpOp(const Dialect* d, caosOp op) {
 		case CAOS_SAVE_CMD:
 			return fmt::format("CMD SAVE {}", try_lookup(d, arg));
 		case CAOS_YIELD:
-			return fmt::format("YIELD {}", arg);
+			return "YIELD";
 		case CAOS_STACK_ROT:
 			return fmt::format("STACK ROT {}", arg);
 

@@ -49,7 +49,6 @@ struct cmdinfo {
 	int stackdelta;
 	const enum ci_type* argtypes;
 	enum ci_type rettype;
-	int evalcost;
 };
 
 /* vim: set noet: */

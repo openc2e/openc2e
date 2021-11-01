@@ -54,7 +54,6 @@ bool agentOnCamera(Agent* targ, bool checkall = false); // caosVM_camera.cpp
  SNDE (command) filename (bareword)
  %status maybe
  %variants c1 c2
- %cost c1,c2 0
 
  Play an uncontrolled sound at the target agent's current position.
 */
@@ -63,7 +62,6 @@ bool agentOnCamera(Agent* targ, bool checkall = false); // caosVM_camera.cpp
  SNDV (command) filename (string)
  %status maybe
  %variants c1
- %cost c1,c2 0
 
  Play an uncontrolled sound at the target agent's current position.
 */
@@ -89,7 +87,6 @@ void c_SNDE(caosVM* vm) {
  SNDC (command) filename (bareword)
  %status maybe
  %variants c1 c2
- %cost c1,c2 0
 
  Start playing a controlled sound with the target agent, which will follow the agent as it moves.
 */
@@ -115,7 +112,6 @@ void c_SNDC(caosVM* vm) {
  SNDL (command) filename (bareword)
  %status maybe
  %variants c1 c2
- %cost c1,c2 0
 
  Start playing a looping controlled sound with the target agent, which will follow the agent as it moves.
 */
@@ -219,7 +215,6 @@ void v_RMSC(caosVM* vm) {
  FADE (command)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 */
 void c_FADE(caosVM* vm) {
 	VM_VERIFY_SIZE(0)
@@ -234,7 +229,6 @@ void c_FADE(caosVM* vm) {
  STPC (command)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 */
 void c_STPC(caosVM* vm) {
 	valid_agent(vm->targ);

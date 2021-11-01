@@ -151,16 +151,6 @@ for filename in sys.argv[1:]:
                 obj["description"] = "\n".join(comments).strip() + "\n"
             obj.update(parse_syntaxstring(syntaxstring))
 
-            obj["evalcost"] = {"default": 1 if obj["type"] == "command" else 0}
-            cost = getdirective("cost")
-            if cost:
-                if " " in cost:
-                    variants, cost = re.split(r"\s+", cost.strip())
-                    for v in variants.split(","):
-                        obj["evalcost"][v] = int(cost)
-                else:
-                    obj["evalcost"]["default"] = int(cost)
-
             obj["implementation"] = find_implementation(obj["name"], lines[p:])
 
             if getdirective("status"):
@@ -196,7 +186,7 @@ for filename in sys.argv[1:]:
 
             for d in directives:
                 d = d.replace("%", "").strip()
-                if d.split(" ")[0] not in ("status", "cost", "stackdelta", "variants"):
+                if d.split(" ")[0] not in ("status", "stackdelta", "variants"):
                     raise Exception("Unknown directive: {}".format(d))
 
             obj["uniquename"] = (

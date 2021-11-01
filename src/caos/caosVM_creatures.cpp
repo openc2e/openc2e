@@ -67,7 +67,6 @@ c2eCreature* getc2eCreature(Agent* a) {
  STM# SHOU (command) stimulusno (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STM_SHOU(caosVM* vm) {
 	VM_PARAM_INTEGER(stimulusno)
@@ -79,7 +78,6 @@ void c_STM_SHOU(caosVM* vm) {
  STM# SIGN (command) stimulusno (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STM_SIGN(caosVM* vm) {
 	VM_PARAM_INTEGER(stimulusno)
@@ -91,7 +89,6 @@ void c_STM_SIGN(caosVM* vm) {
  STM# TACT (command) stimulusno (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STM_TACT(caosVM* vm) {
 	VM_PARAM_INTEGER(stimulusno)
@@ -103,7 +100,6 @@ void c_STM_TACT(caosVM* vm) {
  STM# WRIT (command) object (agent) stimulusno (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STM_WRIT(caosVM* vm) {
 	VM_PARAM_INTEGER(stimulusno)
@@ -183,7 +179,6 @@ void c_STIM_WRIT(caosVM* vm) {
  STIM SHOU (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STIM_SHOU_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(amount3)
@@ -206,7 +201,6 @@ void c_STIM_SHOU_c2(caosVM* vm) {
  STIM SIGN (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STIM_SIGN_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(amount3)
@@ -229,7 +223,6 @@ void c_STIM_SIGN_c2(caosVM* vm) {
  STIM TACT (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STIM_TACT_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(amount3)
@@ -252,7 +245,6 @@ void c_STIM_TACT_c2(caosVM* vm) {
  STIM WRIT (command) creature (agent) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STIM_WRIT_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(amount3)
@@ -280,7 +272,6 @@ void c_STIM_WRIT_c2(caosVM* vm) {
  STIM FROM (command) significance (integer) input (integer) intensity (integer) features (integer) chem0 (integer) amount0 (integer) chem1 (integer) amount1 (integer) chem2 (integer) amount2 (integer) chem3 (integer) amount3 (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_STIM_FROM_c1(caosVM* vm) {
 	VM_PARAM_INTEGER(amount3)
@@ -736,7 +727,6 @@ void c_CHEM(caosVM* vm) {
  CHEM (command) chemical_id (integer) adjust (integer)
  %status maybe
  %variants c1 c2
- %cost c1,c2 0
 
  Set the level of a chemical (0 to 255) in target creature's bloodstream.
 */
@@ -809,7 +799,6 @@ void c_ASLP(caosVM* vm) {
  ASLP (integer)
  %status maybe
  %variants c1 c2 cv c3
- %cost c1,c2 0
 
  Determines whether the target Creature is asleep.
 */

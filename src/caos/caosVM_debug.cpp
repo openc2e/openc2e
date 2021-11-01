@@ -348,7 +348,6 @@ void v_DBG_STOK(caosVM* vm) {
  DBG: TSLC (command) timeslice (integer)
  %status ok
  %variants openc2e
- %cost 0
 
  Sets the currently executing script's remaining timeslice value. This command
  affects only the current timeslice; future slices use the normal amount for

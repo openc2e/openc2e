@@ -61,7 +61,6 @@ SpritePart* caosVM::getCurrentSpritePart() {
  TOUC (integer) first (agent) second (agent)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Determines whether the two given agents are touching.  Returns 0 (if not) or 1 (if so).
 */
@@ -80,7 +79,6 @@ void v_TOUC(caosVM* vm) {
  RTAR (command) family (integer) genus (integer) species (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Sets TARG to a random agent with the given family/genus/species.
  */
@@ -240,7 +238,6 @@ void c_NEW_SIMP(caosVM* vm) {
  NEW: SIMP (command) sprite_file (bareword) image_count (integer) first_image (integer) plane (integer) clone (integer)
  %status maybe
  %variants c1 c2
- %cost c1,c2 1
 */
 void c_NEW_SIMP_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(clone)
@@ -399,7 +396,6 @@ void v_TARG(caosVM* vm) {
  OWNR (agent)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  Returns OWNR, the agent that is running the script.
 */
@@ -424,7 +420,6 @@ void v_NULL(caosVM* vm) {
  POSE (command) pose (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 1
 
  Sets the displayed sprite of TARG to the frame in the sprite file with the given integer.
 */
@@ -485,7 +480,6 @@ void s_ATTR(caosVM* vm) {
  TICK (command) tickrate (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Initiates the agent timer-- the Timer script will then be run once every tickrate ticks.
  Setting tickrate to zero will stop the timer.
@@ -531,7 +525,6 @@ void c_BHVR(caosVM* vm) {
  TARG (command) agent (agent)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Sets TARG (the target agent) to the given agent.
 */
@@ -585,7 +578,6 @@ void v_POSE(caosVM* vm) {
  KILL (command) agent (agent)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 1
 
  Destroys the agent in question. However, you cannot destroy PNTR.
  Remember, use DEAD first for Creatures!
@@ -625,7 +617,6 @@ void c_ANIM(caosVM* vm) {
  ANIM (command) animstring (string)
  %status maybe
  %variants c1 c2
- %cost c1,c2 1
 
  Sets the animation string for TARG, in the format '1234'.
  If it ends with 'R', loops back to the beginning.
@@ -715,7 +706,6 @@ void v_ABBA(caosVM* vm) {
  BASE (command) index (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Sets the frame in the TARG agent's spritefile that will be used as its base image.
  This is relative to the first image set with one of the NEW: commands.
@@ -900,7 +890,6 @@ unsigned int calculateScriptId(unsigned int message_id) {
  MESG WRIT (command) agent (agent) message_id (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Sends a message of type message_id to the given agent.  FROM will be set to OWNR unless 
  there is no agent involved in sending the message.
@@ -917,7 +906,6 @@ void c_MESG_WRIT(caosVM* vm) {
  MESG WRT+ (command) agent (agent) message_id (integer) param_1 (anything) param_2 (anything) delay (integer)
  %status maybe
  %variants c2 cv c3 sm
- %cost c1,c2 0
 
  Sends a message of type message_id to the given agent, much like MESG WRIT, but with the 
  addition of parameters.  The message will be sent after waiting the number of ticks set 
@@ -1694,7 +1682,6 @@ void c_TINO(caosVM* vm) {
  DROP (command)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Causes the TARG agent to drop what it is carrying in a safe location.
 */
@@ -1893,7 +1880,6 @@ void c_SETV_CLS2(caosVM* vm) {
  SLIM (command)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_SLIM(caosVM*) {
 	// TODO: probably shouldn't do anything, but make sure :)
@@ -1903,7 +1889,6 @@ void c_SLIM(caosVM*) {
  BHVR (command) click (integer) touch (integer)
  %status stub
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_BHVR_c2(caosVM* vm) {
 	VM_PARAM_INTEGER(touch)

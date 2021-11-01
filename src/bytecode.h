@@ -82,8 +82,8 @@ enum opcode_t {
 	 * Argument: An index into the commands table.
 	 */
 	CAOS_SAVE_CMD,
-	/* Exhausts the specified number of time slices.
-	 * Argument: A number of time slices to spend. Can be negative or zero.
+	/* Exhausts one time slice.
+	 * Argument: ignored
 	 */
 	CAOS_YIELD,
 	/* Moves the top element on the value stack down (argument) places.

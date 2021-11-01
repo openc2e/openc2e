@@ -22,21 +22,6 @@ TDISP = {
 }
 
 
-def miscprep(variant, cmds):
-    for cmd in cmds:
-        cmd["evalcost"][variant] = cmd["evalcost"].get(
-            variant, cmd["evalcost"]["default"]
-        )
-        if cmd["type"] != "command" and cmd["evalcost"][variant] != 0:
-            raise Exception(
-                (
-                    "{} has non-zero evalcost in an expression cost.\n"
-                    + "This causes a race condition which can potentially lead to crashes.\n"
-                    + "If you really need this, please contact bd_. Aborting for now."
-                ).format(cmd["lookup_key"])
-            )
-
-
 def printinit(variant, cmdarr):
     print("static Dialect dialect_{}({}, std::string(\"{}\"));".format(variant, cmdarr, variant))
 
@@ -101,11 +86,9 @@ def printarr(cmds, variant, arrname):
             )
 
         buf += "\t\t{}, // rettype\n".format(rettype)
-        cost = cmd["evalcost"][variant]
-        buf += "\t\t{} // evalcost\n".format(cost)
         buf += "\t},\n"
 
-    buf += "\t{ NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, CI_OTHER, 0 }\n"
+    buf += "\t{ NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, CI_OTHER, }\n"
     buf += "};"
     print(buf)
 
@@ -139,7 +122,6 @@ def inject_ns(cmds):
                     arguments=[dict(name="cmd", type="subcommand")],
                     category="internal",
                     description="",
-                    evalcost=dict(default=0),
                     filename="",
                     implementation=None,
                     match=ns.upper(),
@@ -241,7 +223,6 @@ for variant_name in variants:
     writelookup(cmds)
     checkdup(cmds, "{} commands".format(variant_name))
     sortname(cmds)
-    miscprep(variant_name, cmds)
 
     printarr(cmds, variant_name, "{}_cmds".format(variant_name))
     printinit(variant_name, "{}_cmds".format(variant_name))

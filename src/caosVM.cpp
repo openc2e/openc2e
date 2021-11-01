@@ -156,7 +156,7 @@ inline void caosVM::runOpCore(script* s, caosOp op) {
 			caos_assert(auxStack.size() == 0);
 #endif
 			if (!inst)
-				timeslice -= op.argument;
+				timeslice -= 1;
 			break;
 		}
 		case CAOS_COND: {

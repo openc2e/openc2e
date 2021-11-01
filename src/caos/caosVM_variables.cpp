@@ -106,7 +106,6 @@ void c_SETS(caosVM* vm) {
  SETV (command) var (variable) value (decimal)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  %% Don't enable c1 or c2 here; we activate them with horrible hacks later
 
  Sets the given variable to the given decimal value.
@@ -214,7 +213,6 @@ void v_TYPE(caosVM* vm) {
  MODV (command) var (variable) mod (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Divides the given variable by the given integer, and returns the remainder (var % mod).
 */
@@ -231,7 +229,6 @@ void c_MODV(caosVM* vm) {
  ANDV (command) var (variable) and (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Returns the result of a bitwise AND comparison of the given variable and the given integer (var & and).
 */
@@ -248,7 +245,6 @@ void c_ANDV(caosVM* vm) {
  ORRV (command) var (variable) or (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Returns the result of a bitwise OR comparison of the given variable and the given integer (var | or)
 */
@@ -265,7 +261,6 @@ void c_ORRV(caosVM* vm) {
  ADDV (command) var (variable) add (decimal)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Adds the given decimal to the given variable and returns the result.
 */
@@ -287,7 +282,6 @@ void c_ADDV(caosVM* vm) {
  SUBV (command) var (variable) sub (integer)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Subtracts the given integer from the given variable and returns the result.
 */
@@ -307,7 +301,6 @@ void c_SUBV(caosVM* vm) {
  NEGV (command) var (variable)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Returns the inverse of (negates) the given variable.  For example, 1 to -1, or -4 to 4.
 */
@@ -326,7 +319,6 @@ void c_NEGV(caosVM* vm) {
  DIVV (command) var (variable) div (decimal)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
  
  Divides the given variable by the given integer and returns the result.
 */
@@ -353,7 +345,6 @@ void c_DIVV(caosVM* vm) {
  MULV (command) var (variable) mul (decimal)
  %status maybe
  %variants c1 c2 cv c3 sm
- %cost c1,c2 0
 
  Multiplies the given variable by the given integer and returns the result.
 */
@@ -1013,7 +1004,6 @@ void c_POWV(caosVM* vm) {
  RNDV (command) var (variable) value1 (integer) value (integer)
  %status maybe
  %variants c1 c2
- %cost c1,c2 0
 */
 void c_RNDV(caosVM* vm) {
 	VM_PARAM_INTEGER(value2)

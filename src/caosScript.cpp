@@ -206,13 +206,6 @@ void caosScript::emitConst(const caosValue& v) {
 	emitOp(CAOS_CONST, current->consts.size() - 1);
 }
 
-int costVisit::operator()(const CAOSCmd& cmd) const {
-	int accum = cmd.op->evalcost;
-	for (const auto& argument : cmd.arguments)
-		accum += argument->cost();
-	return accum;
-}
-
 // parser states
 enum {
 	ST_INSTALLER,
@@ -499,9 +492,6 @@ void caosScript::emitOp(opcode_t op, int argument) {
 
 void caosScript::emitExpr(std::shared_ptr<CAOSExpression> ce) {
 	ce->eval(this, false);
-	int cost = ce->cost();
-	if (cost)
-		emitOp(CAOS_YIELD, cost);
 }
 
 std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
@@ -713,6 +703,7 @@ void caosScript::parseloop(int state, void* info) {
 
 			enumdepth++;
 			emitExpr(readExpr(CI_COMMAND));
+			emitOp(CAOS_YIELD, 0);
 			emitOp(CAOS_JMP, nextreloc);
 			int startp = current->getNextIndex();
 			parseloop(ST_ENUM, NULL);
@@ -732,6 +723,7 @@ void caosScript::parseloop(int state, void* info) {
 
 			enumdepth++;
 			emitExpr(readExpr(CI_COMMAND));
+			emitOp(CAOS_YIELD, 0);
 			emitOp(CAOS_JMP, nextreloc);
 			int startp = current->getNextIndex();
 			parseloop(ST_ESCN, NULL);
@@ -785,6 +777,7 @@ void caosScript::parseloop(int state, void* info) {
 			ri.jnzreloc = current->newRelocation();
 			putBackToken(t);
 			emitExpr(readExpr(CI_COMMAND));
+			emitOp(CAOS_YIELD, 0);
 			emitOp(CAOS_JMP, ri.jnzreloc);
 			ri.loopidx = current->getNextIndex();
 			parseloop(ST_REPS, (void*)&ri);
@@ -909,6 +902,7 @@ void caosScript::parseloop(int state, void* info) {
 			}
 			putBackToken(t);
 			emitExpr(readExpr(CI_COMMAND));
+			emitOp(CAOS_YIELD, 0);
 		}
 	}
 }
@@ -916,8 +910,7 @@ void caosScript::parseloop(int state, void* info) {
 void caosScript::emitCmd(const char* name) {
 	const cmdinfo* ci = d->find_command(name);
 	emitOp(CAOS_CMD, d->cmd_index(ci));
-	if (ci->evalcost)
-		emitOp(CAOS_YIELD, ci->evalcost);
+	emitOp(CAOS_YIELD, 0);
 }
 
 void CAOSExpression::eval(caosScript* scr, bool save_here) const {
@@ -928,9 +921,6 @@ void CAOSExpression::save(caosScript* scr) const {
 	mpark::visit(saveVisit(scr), value);
 }
 
-int CAOSExpression::cost() const {
-	return mpark::visit(costVisit(), value);
-}
 
 int script::mapVAxx(int index) {
 	assert(index >= 0 && index < 100);
