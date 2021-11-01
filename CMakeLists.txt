@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.3)
 project(openc2e)
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -502,7 +502,7 @@ if(APPLE)
 		COMMAND chmod +x "${dist_dir}/fix_unidentified_developer.sh"
 	)
 endif()
-if(WIN32 OR TRUE)
+if(WIN32)
 	include(Openc2eDetectTargetArchitecture)
 	if(TARGETARCH_X64)
 		file(WRITE "${BIN}/Openc2eDownloadVCRedistX64.cmake" "file(DOWNLOAD \"https://aka.ms/vs/16/release/vc_redist.x64.exe\" \"${dist_dir}/vc_redist.x64.exe\")")
