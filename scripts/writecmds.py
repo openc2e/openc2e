@@ -21,6 +21,23 @@ TDISP = {
     "facevalue": "CI_FACEVALUE",
 }
 
+TDISP2 = {
+    "agent": "a",
+    "bytestring": "b",
+    "condition": "c",
+    "integer": "d",
+    "float": "d",
+    "decimal": "d",
+    "anything": "m",
+    "string": "s",
+    "variable": "v",
+    "vector": "u",
+    "label": "#",
+    "bareword": "#",
+    "subcommand": "*",
+    "facevalue": "%",
+}
+
 
 def printinit(variant, cmdarr):
     print("static Dialect dialect_{}({}, std::string(\"{}\"));".format(variant, cmdarr, variant))
@@ -43,21 +60,12 @@ def printarr(cmds, variant, arrname):
     idx = 0
     for cmd in cmds:
         argp = "NULL"
+        argsstring = ''
         if cmd.get("arguments"):
-            args = []
             for arg in cmd["arguments"]:
-                if not arg["type"] in TDISP:
+                if not arg["type"] in TDISP2:
                     raise Exception("Unknown argument type {}".format(arg["type"]))
-                type = TDISP[arg["type"]]
-                args.append(type)
-            argp = "args_{}".format("_".join(t.lower().split("ci_", 1)[1] for t in args))
-            if argp not in already_printed_argps:
-                print(
-                    "static const enum ci_type {}[] = {{ {} }};".format(
-                        argp, ", ".join(args)
-                    )
-                )
-                already_printed_argps.add(argp)
+                argsstring += TDISP2[arg["type"]]
 
         buf += "\t{{ // {} {}\n".format(idx, cmd["lookup_key"])
         idx += 1
@@ -77,7 +85,7 @@ def printarr(cmds, variant, arrname):
         buf += '\t\t"{}", // docs\n'.format(cescape(cmd.get("description")))
         buf += "\t\t{}, // argc\n".format(len(cmd["arguments"]))
         buf += "\t\t{}, // stackdelta\n".format(cmd["stackdelta"])
-        buf += "\t\t{}, // argtypes\n".format(argp)
+        buf += '\t\t(const enum ci_type *)"{}", // argtypes\n'.format(argsstring)
 
         rettype = TDISP.get(cmd["type"])
         if not rettype:

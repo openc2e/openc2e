@@ -19,22 +19,24 @@
 
 #pragma once
 
+#include <stdint.h>
+
 class caosVM;
 
-enum ci_type {
-	CI_OTHER = -1,
+enum ci_type : uint8_t {
+	CI_OTHER = (uint8_t)-1,
 	CI_COMMAND = 1,
-	CI_NUMERIC,
-	CI_STRING,
-	CI_AGENT,
-	CI_VARIABLE,
-	CI_BYTESTR,
-	CI_VECTOR,
-	CI_BAREWORD,
-	CI_SUBCOMMAND,
-	CI_ANYVALUE,
-	CI_CONDITION,
-	CI_FACEVALUE
+	CI_AGENT = 'a',
+	CI_BYTESTR = 'b',
+	CI_CONDITION = 'c',
+	CI_NUMERIC = 'd',
+	CI_ANYVALUE = 'm',
+	CI_STRING = 's',
+	CI_VARIABLE = 'v',
+	CI_VECTOR = 'u',
+	CI_BAREWORD = '#',
+	CI_SUBCOMMAND = '*',
+	CI_FACEVALUE = '%',
 };
 
 struct cmdinfo {
