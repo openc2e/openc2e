@@ -4,6 +4,9 @@
 
 #include <algorithm>
 
+void lexcaos(std::vector<caostoken>& v, const std::string& p) {
+	return lexcaos(v, p.c_str());
+}
 
 void lexcaos(std::vector<caostoken>& v, const char* p) {
 #define make_word(str) \

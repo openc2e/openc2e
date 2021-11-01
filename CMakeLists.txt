@@ -285,6 +285,9 @@ target_link_libraries(openc2e
 	${CMAKE_DL_LIBS}
 )
 
+add_executable(caos_to_bytecode src/tools/caos_to_bytecode.cpp)
+target_link_libraries(caos_to_bytecode openc2e-core)
+
 add_executable(change_breed_slot src/tools/change_breed_slot.cpp)
 target_link_libraries(change_breed_slot openc2e-fileformats)
 

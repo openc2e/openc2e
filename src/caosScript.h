@@ -246,7 +246,7 @@ class caosScript { //: Collectable {
 	std::vector<std::shared_ptr<script> > scripts;
 	std::shared_ptr<script> current;
 
-	caosScript(const std::string& dialect, const std::string& fn);
+	caosScript(const std::string& dialect, const std::string& filename);
 	caosScript() { d = NULL; }
 	void parse(const std::string& caostext);
 	void parse(std::istream& in);

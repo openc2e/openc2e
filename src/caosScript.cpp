@@ -102,13 +102,13 @@ std::string script::dump() {
 	return buf;
 }
 
-caosScript::caosScript(const std::string& dialect, const std::string& fn) {
+caosScript::caosScript(const std::string& dialect, const std::string& _filename) {
 	enumdepth = 0;
 	d = getDialectByName(dialect);
 	if (!d)
 		throw parseException(std::string("Unknown dialect ") + dialect);
-	current = installer = std::shared_ptr<script>(new script(d, fn));
-	filename = fn;
+	current = installer = std::shared_ptr<script>(new script(d, _filename));
+	filename = _filename;
 }
 
 caosScript::~caosScript() {
