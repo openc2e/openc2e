@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Image.h"
-#include "utils/shared_array.h"
+#include "common/Image.h"
+#include "common/shared_array.h"
 
 shared_array<Color> getCreatures1DefaultPalette();

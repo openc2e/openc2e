@@ -16,7 +16,7 @@
  *  Lesser General Public License for more details.
  *
  */
-#include "fileformats/attFile.h"
+#include "attFile.h"
 
 #include <cassert>
 #include <cctype>

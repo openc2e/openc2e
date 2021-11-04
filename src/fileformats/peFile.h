@@ -17,11 +17,10 @@
  *
  */
 
-#ifndef PEFILE_H
-#define PEFILE_H
+#pragma once
 
-#include "Image.h"
-#include "utils/optional.h"
+#include "common/Image.h"
+#include "common/optional.h"
 
 #include <fstream>
 #include <ghc/filesystem.hpp>
@@ -109,6 +108,3 @@ class peFile {
 	static std::string resource_type_to_string(PeResourceType);
 	static std::string language_to_string(PeLanguage, PeSubLanguage);
 };
-
-#endif
-/* vim: set noet: */

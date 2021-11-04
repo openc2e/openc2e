@@ -65,7 +65,7 @@ int main() {
 		//		cout << "\n*** catalogue test\n\n";
 		//		testCatalogue();
 		cout << "\n*** done\n";
-	} catch (creaturesException& t) {
+	} catch (Exception& t) {
 		cout << "exception raised: " << t.what() << "!\n";
 		return -1;
 	}

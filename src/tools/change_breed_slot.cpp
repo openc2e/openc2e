@@ -1,10 +1,10 @@
-#include "creatures/lifestage.h"
+#include "common/readfile.h"
+#include "common/spanstream.h"
+#include "common/vectorstream.h"
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/genomeFile.h"
-#include "utils/readfile.h"
-#include "utils/spanstream.h"
-#include "utils/vectorstream.h"
+#include "openc2e-core/creatures/lifestage.h"
 
 #include <algorithm>
 #include <ctype.h>

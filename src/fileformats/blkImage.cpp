@@ -17,10 +17,10 @@
  *
  */
 
-#include "fileformats/blkImage.h"
+#include "blkImage.h"
 
-#include "caos_assert.h"
-#include "utils/endianlove.h"
+#include "common/endianlove.h"
+#include "common/throw_ifnot.h"
 
 #include <iostream>
 
@@ -35,15 +35,15 @@ Image ReadBlkFile(std::istream& in) {
 	uint16_t totalheight = height * 128;
 
 	uint16_t numsprites = read16le(in);
-	caos_assert(numsprites == (unsigned int)(width * height));
+	THROW_IFNOT(numsprites == (unsigned int)(width * height));
 
 	std::vector<uint32_t> offsets(numsprites);
 	for (unsigned int i = 0; i < numsprites; i++) {
 		offsets[i] = read32le(in) + 4;
 		uint16_t framewidth = read16le(in);
-		caos_assert(framewidth == 128);
+		THROW_IFNOT(framewidth == 128);
 		uint16_t frameheight = read16le(in);
-		caos_assert(frameheight == 128);
+		THROW_IFNOT(frameheight == 128);
 	}
 
 	shared_array<uint8_t> buffer(totalwidth * totalheight * 2);

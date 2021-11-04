@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Image.h"
-#include "utils/shared_array.h"
-#include "utils/span.h"
+#include "common/Image.h"
+#include "common/shared_array.h"
+#include "common/span.h"
 
 #include <cstdint>
 #include <vector>

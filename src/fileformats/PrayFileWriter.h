@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/span.h"
+#include "common/span.h"
 
 #include <iosfwd>
 #include <map>

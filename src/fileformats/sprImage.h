@@ -19,6 +19,6 @@
 
 #pragma once
 
-#include "Image.h"
+#include "common/Image.h"
 
 MultiImage ReadSprFile(std::istream& in);

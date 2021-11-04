@@ -1,15 +1,15 @@
 #include "ImageUtils.h"
 
-#include "creaturesException.h"
-#include "fileformats/blkImage.h"
-#include "fileformats/bmpImage.h"
-#include "fileformats/c16Image.h"
-#include "fileformats/charsetdta.h"
-#include "fileformats/s16Image.h"
-#include "fileformats/sprImage.h"
-#include "utils/ascii_tolower.h"
-#include "utils/mappedfile.h"
-#include "utils/spanstream.h"
+#include "blkImage.h"
+#include "bmpImage.h"
+#include "c16Image.h"
+#include "charsetdta.h"
+#include "common/Exception.h"
+#include "common/ascii_tolower.h"
+#include "common/mappedfile.h"
+#include "common/spanstream.h"
+#include "s16Image.h"
+#include "sprImage.h"
 
 #include <ghc/filesystem.hpp>
 
@@ -19,7 +19,7 @@ namespace ImageUtils {
 
 MultiImage ReadImage(std::string path) {
 	if (!fs::exists(path)) {
-		throw creaturesException("File '" + path + "' doesn't exist");
+		throw Exception("File '" + path + "' doesn't exist");
 	}
 
 	std::string ext = fs::path(path).extension();
@@ -50,7 +50,7 @@ MultiImage ReadImage(std::string path) {
 		return ReadCharsetDtaFile(in);
 	}
 
-	throw creaturesException("Don't know how to read image '" + path + "'");
+	throw Exception("Don't know how to read image '" + path + "'");
 }
 
 Image ToRGB24(const Image& oldimage) {
@@ -58,7 +58,7 @@ Image ToRGB24(const Image& oldimage) {
 		return oldimage;
 
 	if (!(oldimage.format == if_rgb565 || oldimage.format == if_rgb555 || oldimage.format == if_bgr24)) {
-		throw creaturesException("Don't know how to convert non-RGB565-or-RGB555 format into RGB24");
+		throw Exception("Don't know how to convert non-RGB565-or-RGB555 format into RGB24");
 	}
 
 	Image newimage = oldimage;
@@ -112,7 +112,7 @@ bool IsBackground(const MultiImage& images) {
 
 Image StitchBackground(const MultiImage& images) {
 	if (!IsBackground(images)) {
-		throw creaturesException("Stitching non-background images not implemented");
+		throw Exception("Stitching non-background images not implemented");
 	}
 
 	const int sprwidth = 144;
@@ -123,14 +123,14 @@ Image StitchBackground(const MultiImage& images) {
 			return 8;
 		if (images.size() == 928)
 			return 16;
-		throw creaturesException("Number of frames should be 464 or 928");
+		throw Exception("Number of frames should be 464 or 928");
 	}();
 	const int bytes_per_pixel = [&] {
 		if (images[0].format == if_index8)
 			return 1;
 		if (images[0].format == if_rgb555 || images[0].format == if_rgb565)
 			return 2;
-		throw creaturesException("Format should be 8-bit, RGB555, or RGB565");
+		throw Exception("Format should be 8-bit, RGB555, or RGB565");
 	}();
 	const int totalwidth = sprwidth * widthinsprites;
 	const int totalheight = sprheight * heightinsprites;
@@ -159,7 +159,7 @@ Image StitchBackground(const MultiImage& images) {
 Image Tint(const Image& oldimage, unsigned char r, unsigned char g, unsigned char b,
 	unsigned char rotation, unsigned char swap) {
 	if (!(oldimage.format == if_rgb565 || oldimage.format == if_rgb555)) {
-		throw creaturesException("Tried to tint a sprite in an unsupported format");
+		throw Exception("Tried to tint a sprite in an unsupported format");
 	}
 
 	if (128 == r && 128 == g && 128 == b && 128 == rotation && 128 == swap)
@@ -321,7 +321,7 @@ Color GetPixelColor(const Image& image, unsigned int x, unsigned int y) {
 		return Color{r, g, b, 255};
 
 	} else {
-		throw creaturesException("GetPixelColor unimplemented for format " + std::to_string(image.format));
+		throw Exception("GetPixelColor unimplemented for format " + std::to_string(image.format));
 	}
 }
 

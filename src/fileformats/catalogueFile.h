@@ -1,16 +1,16 @@
 #pragma once
 
-#include "creaturesException.h"
+#include "common/Exception.h"
 
 #include <ghc/filesystem.hpp>
 #include <iosfwd>
 #include <string>
 #include <vector>
 
-class catalogueException : public creaturesException {
+class catalogueException : public Exception {
   public:
 	catalogueException(const std::string& s) throw()
-		: creaturesException(s) {}
+		: Exception(s) {}
 };
 
 struct CatalogueTag {

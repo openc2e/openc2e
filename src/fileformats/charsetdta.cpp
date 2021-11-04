@@ -1,7 +1,7 @@
-#include "fileformats/charsetdta.h"
+#include "charsetdta.h"
 
-#include "creaturesException.h"
-#include "utils/endianlove.h"
+#include "common/Exception.h"
+#include "common/endianlove.h"
 
 #include <string.h>
 #include <string>
@@ -65,7 +65,7 @@ MultiImage ReadCharsetDtaFile(std::istream& in) {
 	std::vector<uint8_t> filedata{std::istreambuf_iterator<char>(in), {}};
 
 	if (!(filedata.size() == 9472 || filedata.size() == 17152 || filedata.size() == 18944)) {
-		throw creaturesException("Expected size of charset.dta file to be 9472, 17152, 18944 - got " + std::to_string(filedata.size()));
+		throw Exception("Expected size of charset.dta file to be 9472, 17152, 18944 - got " + std::to_string(filedata.size()));
 	}
 
 	const unsigned int char_width = filedata.size() == 17152 ? 11 : 6;

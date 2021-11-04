@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Image.h"
+#include "common/Image.h"
 
 #include <istream>
 

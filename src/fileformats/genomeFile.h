@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "creatures/lifestage.h"
-#include "creaturesException.h"
+#include "common/Exception.h"
+#include "openc2e-core/creatures/lifestage.h"
 
 #include <memory>
 #include <string>

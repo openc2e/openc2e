@@ -18,7 +18,7 @@
  */
 #include "genomeFile.h"
 
-#include "utils/endianlove.h"
+#include "common/endianlove.h"
 
 #include <cstring>
 #include <exception>
@@ -62,7 +62,7 @@ void genomeFile::readNotes(std::istream& s) {
 
 		while (ver != 0x02) {
 			if (s.fail() || s.eof())
-				throw creaturesException("c3 gno loading broke ... second magic not present");
+				throw Exception("c3 gno loading broke ... second magic not present");
 			ver = read16le(s);
 		}
 	}
@@ -101,13 +101,13 @@ gene* genomeFile::nextGene(std::istream& s) {
 	uint8_t majic[3];
 	s.read((char*)majic, 3);
 	if (strncmp((char*)majic, "gen", 3) != 0)
-		throw creaturesException("bad majic for a gene");
+		throw Exception("bad majic for a gene");
 
 	majic[0] = read8(s);
 	if (majic[0] == 'd')
 		return 0;
 	if (majic[0] != 'e')
-		throw creaturesException("bad majic at stage2 for a gene");
+		throw Exception("bad majic at stage2 for a gene");
 
 	uint8_t type = read8(s);
 	uint8_t subtype = read8(s);
@@ -161,7 +161,7 @@ gene* genomeFile::nextGene(std::istream& s) {
 	}
 
 	if (g == 0)
-		throw creaturesException("genefactory failed");
+		throw Exception("genefactory failed");
 
 	genes.push_back(std::unique_ptr<gene>(g));
 	s >> *g;
@@ -177,17 +177,17 @@ std::istream& operator>>(std::istream& s, genomeFile& f) {
 		if (majic[0] == 'e')
 			f.cversion = 1;
 		else
-			throw creaturesException("bad majic for genome");
+			throw Exception("bad majic for genome");
 
 		s.seekg(0, std::ios::beg);
 	} else {
 		if (strncmp((char*)majic, "dna", 3) != 0)
-			throw creaturesException("bad majic for genome");
+			throw Exception("bad majic for genome");
 
 		majic[0] = read8(s);
 		f.cversion = majic[0] - 48; // 48 = ASCII '0'
 		if ((f.cversion < 1) || (f.cversion > 3))
-			throw creaturesException("unsupported genome version in majic");
+			throw Exception("unsupported genome version in majic");
 	}
 
 	//std::cout << "creaturesGenomeFile: reading genome of version " << (unsigned int)f.cversion << ".\n";

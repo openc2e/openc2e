@@ -1,8 +1,8 @@
 #include "pngImage.h"
 
 #include "ImageUtils.h"
-#include "creaturesException.h"
-#include "utils/scope_guard.h"
+#include "common/Exception.h"
+#include "common/scope_guard.h"
 
 #include <fstream>
 #include <memory>
@@ -16,10 +16,10 @@ void WritePngFile(const Image& image, const std::string& path) {
 
 void WritePngFile(const Image& image, std::ostream& out) {
 	if (image.width == 0 || image.height == 0 || !image.data) {
-		throw creaturesException("Can't write image with no data");
+		throw Exception("Can't write image with no data");
 	}
 	if (image.format == if_index8 && !image.palette) {
-		throw creaturesException("Can't write indexed image with no palette");
+		throw Exception("Can't write indexed image with no palette");
 	}
 
 	png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -73,7 +73,7 @@ void WritePngFile(const Image& image, std::ostream& out) {
 			PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
 		if (!image.palette) {
-			throw creaturesException("No palette on paletted image");
+			throw Exception("No palette on paletted image");
 		}
 
 		std::vector<png_color_struct> palette(image.palette.size());
@@ -98,7 +98,7 @@ void WritePngFile(const Image& image, std::ostream& out) {
 		out_buffer = ImageUtils::ToRGB24(image).data;
 
 	} else {
-		throw creaturesException("Unsupported format");
+		throw Exception("Unsupported format");
 	}
 
 	// libpng by default uses Z_FILTERED, which has good compression but is slower

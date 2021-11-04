@@ -1,6 +1,5 @@
-/* vim: set ft=cpp : */
-#include "fileformats/caoslexer.h"
-#include "fileformats/caostoken.h"
+#include "caoslexer.h"
+#include "caostoken.h"
 
 #include <algorithm>
 

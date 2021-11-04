@@ -19,6 +19,6 @@
 
 #pragma once
 
-#include "Image.h"
+#include "common/Image.h"
 
 Image ReadBlkFile(std::istream& in);

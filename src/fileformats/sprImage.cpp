@@ -20,7 +20,7 @@
 #include "sprImage.h"
 
 #include "c1defaultpalette.h"
-#include "utils/endianlove.h"
+#include "common/endianlove.h"
 
 static MultiImage ReadPrototypeSprFile(std::istream& in, int numframes, uint32_t first_offset) {
 	MultiImage images(numframes);

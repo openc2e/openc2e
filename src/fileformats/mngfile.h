@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "creaturesException.h"
-#include "utils/shared_array.h"
+#include "common/Exception.h"
+#include "common/shared_array.h"
 
 #include <cmath>
 #include <fmt/core.h>
@@ -30,17 +30,17 @@
 #include <string>
 #include <vector>
 
-class MNGFileException : public creaturesException {
+class MNGFileException : public Exception {
   public:
 	int lineno;
 	MNGFileException(const char* m) throw()
-		: creaturesException(m) { lineno = 0; }
+		: Exception(m) { lineno = 0; }
 	MNGFileException(const std::string& m) throw()
-		: creaturesException(m) { lineno = 0; }
+		: Exception(m) { lineno = 0; }
 	MNGFileException(const char* m, int l) throw()
-		: creaturesException(m) { lineno = l; }
+		: Exception(m) { lineno = l; }
 	MNGFileException(const std::string& m, int l) throw()
-		: creaturesException(m) { lineno = l; }
+		: Exception(m) { lineno = l; }
 };
 
 class MNGFile {

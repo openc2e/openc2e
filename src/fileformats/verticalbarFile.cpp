@@ -1,13 +1,13 @@
 #include "verticalbarFile.h"
 
-#include "creaturesException.h"
+#include "common/Exception.h"
 
 #include <fstream>
 
 std::vector<std::vector<std::string>> ReadVerticalBarSeparatedValuesFile(const std::string& path) {
 	std::ifstream in(path, std::ios_base::binary);
 	if (!in.good()) {
-		throw creaturesException("Couldn't open " + path);
+		throw Exception("Couldn't open " + path);
 	}
 
 	std::vector<std::vector<std::string>> lines;

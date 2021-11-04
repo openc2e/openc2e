@@ -1,12 +1,12 @@
-#include "caosparser.h"
-#include "creaturesException.h"
-#include "dialect.h"
+#include "common/Exception.h"
+#include "common/endianlove.h"
+#include "common/string_in.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
 #include "fileformats/pngImage.h"
-#include "utils/endianlove.h"
-#include "utils/string_in.h"
+#include "openc2e-core/caosparser.h"
+#include "openc2e-core/dialect.h"
 
 #include <fmt/format.h>
 #include <fstream>
@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
 		}
 		try {
 			fmt::print(caos1_format(script));
-		} catch (creaturesException e) {
+		} catch (Exception e) {
 			fmt::print("* exception formatting CAOS: {}\n", e.what());
 			fmt::print(script);
 		}

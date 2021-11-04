@@ -1,9 +1,9 @@
-#include "fileformats/Caos2PrayParser.h"
-#include "fileformats/caoslexer.h"
-#include "fileformats/caostoken.h"
-#include "utils/encoding.h"
-#include "utils/iendswith.h"
-#include "utils/overload.h"
+#include "Caos2PrayParser.h"
+#include "caoslexer.h"
+#include "caostoken.h"
+#include "common/encoding.h"
+#include "common/iendswith.h"
+#include "common/overload.h"
 
 #include <cassert>
 

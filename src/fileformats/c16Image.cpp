@@ -17,10 +17,10 @@
  *
  */
 
-#include "fileformats/c16Image.h"
+#include "c16Image.h"
 
-#include "caos_assert.h"
-#include "utils/endianlove.h"
+#include "common/endianlove.h"
+#include "common/throw_ifnot.h"
 
 #include <memory>
 #include <string.h>
@@ -28,7 +28,7 @@
 MultiImage ReadC16File(std::istream& in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
-	caos_assert(flags & 0x02);
+	THROW_IFNOT(flags & 0x02);
 	imageformat imgformat = is_565 ? if_rgb565 : if_rgb555;
 	auto numframes = read16le(in);
 
@@ -82,7 +82,7 @@ MultiImage ReadC16File(std::istream& in) {
 		}
 		uint16_t endofimagemarker = read16le(in);
 		curpos += 2;
-		caos_assert(endofimagemarker == 0);
+		THROW_IFNOT(endofimagemarker == 0);
 	}
 
 	return images;

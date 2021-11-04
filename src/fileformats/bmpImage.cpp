@@ -17,12 +17,11 @@
  *
  */
 
-#include "fileformats/bmpImage.h"
+#include "bmpImage.h"
 
-#include "Backend.h"
-#include "caos_assert.h"
-#include "creaturesException.h"
-#include "utils/endianlove.h"
+#include "common/Exception.h"
+#include "common/endianlove.h"
+#include "common/throw_ifnot.h"
 
 #include <fstream>
 #include <memory>
@@ -42,7 +41,7 @@ Image ReadBmpFile(std::istream& in) {
 	char magic[2];
 	in.read(magic, 2);
 	if (std::string(magic, 2) != "BM")
-		throw creaturesException("Doesn't seem to be a BMP file.");
+		throw Exception("Doesn't seem to be a BMP file.");
 
 	in.seekg(12, std::ios::cur); // skip filesize, reserved bytes, and data offset
 
@@ -57,15 +56,15 @@ Image ReadDibFile(std::istream& in) {
 
 	uint32_t biSize = read32le(in);
 	if (biSize != 40) // win3.x format, which the seamonkeys files are in
-		throw creaturesException("BMP format we don't understand.");
+		throw Exception("BMP format we don't understand.");
 
 	biWidth = read32le(in);
 	biHeight = read32le(in);
-	caos_assert((int)biHeight > 0);
+	THROW_IFNOT((int)biHeight > 0);
 
 	uint16_t biPlanes = read16le(in);
 	if (biPlanes != 1) // single image plane
-		throw creaturesException("Contains BMP data we don't understand.");
+		throw Exception("Contains BMP data we don't understand.");
 
 	uint16_t biBitCount = read16le(in);
 	uint16_t biCompression = read32le(in);
@@ -83,17 +82,17 @@ Image ReadDibFile(std::istream& in) {
 
 		case BI_RLE4:
 			if (biBitCount != 4)
-				throw creaturesException("Contains BMP data compressed in a way which isn't possible.");
+				throw Exception("Contains BMP data compressed in a way which isn't possible.");
 			break;
 
 		case BI_RLE8:
 			if (biBitCount != 8)
-				throw creaturesException("Contains BMP data compressed in a way which isn't possible.");
+				throw Exception("Contains BMP data compressed in a way which isn't possible.");
 			break;
 
 		case BI_BITFIELDS:
 		default:
-			throw creaturesException("Contains BMP data compressed in a way we don't understand: " + std::to_string(biCompression));
+			throw Exception("Contains BMP data compressed in a way we don't understand: " + std::to_string(biCompression));
 	}
 
 	switch (biBitCount) {
@@ -117,7 +116,7 @@ Image ReadDibFile(std::istream& in) {
 			break;
 
 		default:
-			throw creaturesException("Contains BMP data of an unsupported bit depth.");
+			throw Exception("Contains BMP data of an unsupported bit depth.");
 	}
 
 	if (biSizeImage == 0) {

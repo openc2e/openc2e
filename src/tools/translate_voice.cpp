@@ -1,6 +1,6 @@
-#include "Catalogue.h"
-#include "VoiceData.h"
-#include "audiobackend/SDLMixerBackend.h"
+#include "openc2e-audiobackend/SDLMixerBackend.h"
+#include "openc2e-core/Catalogue.h"
+#include "openc2e-core/VoiceData.h"
 
 #include <algorithm>
 #include <fmt/format.h>

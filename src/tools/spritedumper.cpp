@@ -1,4 +1,4 @@
-#include "creaturesException.h"
+#include "common/Exception.h"
 #include "fileformats/ImageUtils.h"
 #include "fileformats/c1defaultpalette.h"
 #include "fileformats/paletteFile.h"
@@ -23,7 +23,7 @@ void stitch_to_sheet(MultiImage& image) {
 			case if_index8:
 				return 1;
 			default:
-				throw creaturesException("Don't know how to stitch format into sheet");
+				throw Exception("Don't know how to stitch format into sheet");
 		}
 	}();
 
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
 	MultiImage image = [&] {
 		try {
 			return ImageUtils::ReadImage(input_path);
-		} catch (creaturesException& e) {
+		} catch (Exception& e) {
 			fmt::print(stderr, "Exception: {}\n", e.prettyPrint());
 			exit(1);
 		}

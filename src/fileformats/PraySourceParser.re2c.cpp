@@ -1,6 +1,6 @@
-#include "fileformats/PraySourceParser.h"
-#include "utils/encoding.h"
-#include "utils/overload.h"
+#include "PraySourceParser.h"
+#include "common/encoding.h"
+#include "common/overload.h"
 
 #include <cassert>
 #include <fmt/format.h>

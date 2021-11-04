@@ -17,12 +17,12 @@
  *
  */
 
-#include "fileformats/PrayFileReader.h"
+#include "PrayFileReader.h"
 
-#include "creaturesException.h"
-#include "utils/encoding.h"
-#include "utils/endianlove.h"
-#include "utils/spanstream.h"
+#include "common/Exception.h"
+#include "common/encoding.h"
+#include "common/endianlove.h"
+#include "common/spanstream.h"
 
 #include <cstring>
 #include <zlib.h>
@@ -32,7 +32,7 @@ PrayFileReader::PrayFileReader(std::istream& stream_)
 	char majic[4];
 	stream.read(majic, 4);
 	if (strncmp(majic, "PRAY", 4) != 0)
-		throw creaturesException("bad magic of PRAY file");
+		throw Exception("bad magic of PRAY file");
 
 	while (true) {
 		stream.peek();
@@ -40,7 +40,7 @@ PrayFileReader::PrayFileReader(std::istream& stream_)
 			break;
 		}
 		if (!stream) {
-			throw creaturesException("Stream failure while reading PRAY file");
+			throw Exception("Stream failure while reading PRAY file");
 		}
 
 		block_offsets.push_back(stream.tellg());
@@ -90,7 +90,7 @@ std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 	bool compressed = ((flags & 1) == 1);
 
 	if (!compressed && size != compressedsize)
-		throw creaturesException("Size doesn't match compressed size for uncompressed block.");
+		throw Exception("Size doesn't match compressed size for uncompressed block.");
 
 	std::vector<unsigned char> buffer(size);
 
@@ -99,7 +99,7 @@ std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 		std::vector<unsigned char> src(compressedsize);
 		stream.read((char*)src.data(), compressedsize);
 		if (!stream.good()) {
-			throw creaturesException("Failed to read all of compressed block.");
+			throw Exception("Failed to read all of compressed block.");
 		}
 		uLongf usize = size;
 		int r = uncompress((Bytef*)buffer.data(), (uLongf*)&usize, (Bytef*)src.data(), compressedsize);
@@ -111,15 +111,15 @@ std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 				case Z_DATA_ERROR: o = "Corrupt data"; break;
 			}
 			o = o + " while decompressing PRAY block \"" + name + "\"";
-			throw creaturesException(o);
+			throw Exception(o);
 		}
 		if (usize != size) {
-			throw creaturesException("Decompressed data is not the correct size.");
+			throw Exception("Decompressed data is not the correct size.");
 		}
 	} else {
 		stream.read((char*)buffer.data(), size);
 		if (!stream.good()) {
-			throw creaturesException("Failed to read all of uncompressed block.");
+			throw Exception("Failed to read all of uncompressed block.");
 		}
 	}
 
@@ -150,7 +150,7 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 		if (integerValues.find(n) == integerValues.end()) {
 			integerValues[n] = v;
 		} else if (integerValues[n] != v) {
-			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
+			throw Exception(std::string("Duplicate tag \"") + n + "\"");
 		}
 	}
 
@@ -161,16 +161,16 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 		if (stringValues.find(n) == stringValues.end()) {
 			stringValues[n] = v;
 		} else if (stringValues[n] != v) {
-			throw creaturesException(std::string("Duplicate tag \"") + n + "\"");
+			throw Exception(std::string("Duplicate tag \"") + n + "\"");
 		}
 	}
 
 	if (!s) {
-		throw creaturesException("Stream failure reading tags from PRAY block \"" + name + "\"");
+		throw Exception("Stream failure reading tags from PRAY block \"" + name + "\"");
 	}
 	s.peek();
 	if (!s.eof()) {
-		throw creaturesException("Didn't read whole block while reading tags from PRAY block \"" + name + "\"");
+		throw Exception("Didn't read whole block while reading tags from PRAY block \"" + name + "\"");
 	}
 
 	return {integerValues, stringValues};

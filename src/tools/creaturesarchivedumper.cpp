@@ -1,5 +1,5 @@
-#include "utils/endianlove.h"
-#include "utils/spanstream.h"
+#include "common/endianlove.h"
+#include "common/spanstream.h"
 
 #include <fmt/format.h>
 #include <fstream>

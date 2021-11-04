@@ -1,8 +1,8 @@
+#include "common/endianlove.h"
+#include "common/optional.h"
+#include "common/span.h"
+#include "common/spanstream.h"
 #include "fileformats/PrayFileReader.h"
-#include "utils/endianlove.h"
-#include "utils/optional.h"
-#include "utils/span.h"
-#include "utils/spanstream.h"
 
 #include <array>
 #include <fstream>

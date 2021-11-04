@@ -1,5 +1,5 @@
-#include "fileformats/catalogueFile.h"
-#include "utils/readfile.h"
+#include "catalogueFile.h"
+#include "common/readfile.h"
 
 #include <assert.h>
 #include <fmt/core.h>

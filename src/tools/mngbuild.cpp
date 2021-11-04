@@ -1,6 +1,6 @@
+#include "common/endianlove.h"
+#include "common/readfile.h"
 #include "fileformats/mngparser.h"
-#include "utils/endianlove.h"
-#include "utils/readfile.h"
 
 #include <fmt/format.h>
 #include <fstream>

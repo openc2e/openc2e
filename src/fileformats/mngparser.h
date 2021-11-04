@@ -1,7 +1,7 @@
 #pragma once
 
-#include "utils/heap_value.h"
-#include "utils/optional.h"
+#include "common/heap_value.h"
+#include "common/optional.h"
 
 #include <mpark/variant.hpp>
 #include <string>

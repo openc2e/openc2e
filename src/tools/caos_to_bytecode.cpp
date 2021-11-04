@@ -1,5 +1,5 @@
-#include "caosScript.h"
-#include "utils/readfile.h"
+#include "common/readfile.h"
+#include "openc2e-core/caosScript.h"
 
 #include <fmt/core.h>
 

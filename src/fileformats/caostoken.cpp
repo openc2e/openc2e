@@ -1,6 +1,6 @@
-#include "fileformats/caostoken.h"
+#include "caostoken.h"
 
-#include "creaturesException.h"
+#include "common/Exception.h"
 
 static char char_unescape(char c) {
 	switch (c) {
@@ -56,7 +56,7 @@ int caostoken::intval() const {
 			return std::stoi(value);
 		} catch (std::out_of_range&) {
 			// Creatures Village has some 2147483700 literals, which don't fit in int32_t
-			throw creaturesException("Integer literal " + value + " is out of range");
+			throw Exception("Integer literal " + value + " is out of range");
 		}
 	} else if (type == TOK_CHAR) {
 		return value[1];

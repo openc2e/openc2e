@@ -1,8 +1,8 @@
 #include "c1cobfile.h"
 
 #include "c1defaultpalette.h"
-#include "caos_assert.h"
-#include "utils/endianlove.h"
+#include "common/endianlove.h"
+#include "common/throw_ifnot.h"
 
 #include <cassert>
 #include <fstream>
@@ -27,7 +27,7 @@ c1cobfile read_c1cobfile(std::istream& in) {
 	c1cobfile cob;
 
 	uint16_t version = read16le(in);
-	caos_assert(version == 1);
+	THROW_IFNOT(version == 1);
 
 	cob.quantity_available = read16le(in);
 	cob.expiration_month = read32le(in);
@@ -52,7 +52,7 @@ c1cobfile read_c1cobfile(std::istream& in) {
 	cob.picture.palette = getCreatures1DefaultPalette();
 	uint16_t unknown_always_picture_width = read16le(in);
 	// ABK- Egg Gender.cob has it zeroed
-	caos_assert(unknown_always_picture_width == 0 || unknown_always_picture_width == cob.picture.width);
+	THROW_IFNOT(unknown_always_picture_width == 0 || unknown_always_picture_width == cob.picture.width);
 
 	if (cob.picture.width > 0 && cob.picture.height > 0) {
 		cob.picture.data = shared_array<uint8_t>(cob.picture.width * cob.picture.height);

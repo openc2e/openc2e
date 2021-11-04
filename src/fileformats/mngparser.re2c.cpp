@@ -1,6 +1,6 @@
-#include "creaturesException.h"
-#include "fileformats/mngparser.h"
-#include "utils/overload.h"
+#include "common/Exception.h"
+#include "common/overload.h"
+#include "mngparser.h"
 
 #include <assert.h>
 #include <unordered_set>
@@ -59,7 +59,7 @@ mngtoken MNGParserState::consume(toktype type) {
 				printf("%s\n", tokens[p + i].dump().c_str());
 			}
 		}
-		throw creaturesException("Unexpected token: " + peek().dump());
+		throw Exception("Unexpected token: " + peek().dump());
 	}
 }
 
@@ -112,7 +112,7 @@ MNGExpression MNGParserState::parse_expression() {
 		consume(MNG_PAN);
 		return std::string("Pan");
 	}
-	throw creaturesException("Unexpected token when parsing expression: " + peek().dump());
+	throw Exception("Unexpected token when parsing expression: " + peek().dump());
 }
 
 float MNGParserState::parse_constant_holder(toktype type) {
@@ -162,7 +162,7 @@ MNGStage MNGParserState::parse_stage() {
 			// TODO: error if tempodelay defined twice?
 			// TODO: error if delay already defined?
 		} else {
-			throw creaturesException("Unexpected token when parsing stage: " + peek().dump());
+			throw Exception("Unexpected token when parsing stage: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
@@ -183,7 +183,7 @@ MNGEffect MNGParserState::parse_effect() {
 		} else if (type == MNG_STAGE) {
 			effect.stages.push_back(parse_stage());
 		} else {
-			throw creaturesException("Unexpected token when parsing effect: " + peek().dump());
+			throw Exception("Unexpected token when parsing effect: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
@@ -206,7 +206,7 @@ std::vector<MNGUpdate> MNGParserState::parse_update_block() {
 			updates.push_back({name, expr});
 			// TODO: should require a newline after this?
 		} else {
-			throw creaturesException("Unexpected token when parsing update block: " + peek().dump());
+			throw Exception("Unexpected token when parsing update block: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
@@ -248,7 +248,7 @@ MNGVoice MNGParserState::parse_voice() {
 			auto updates = parse_update_block();
 			voice.updates.insert(voice.updates.end(), updates.begin(), updates.end());
 		} else {
-			throw creaturesException("Unexpected token when parsing voice: " + peek().dump());
+			throw Exception("Unexpected token when parsing voice: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
@@ -285,7 +285,7 @@ MNGAleotoricLayer MNGParserState::parse_aleotoric_layer() {
 		} else if (type == MNG_VOICE) {
 			aleotoriclayer.voices.push_back(parse_voice());
 		} else {
-			throw creaturesException("Unexpected token when parsing aleotoriclayer: " + peek().dump());
+			throw Exception("Unexpected token when parsing aleotoriclayer: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
@@ -314,7 +314,7 @@ MNGLoopLayer MNGParserState::parse_loop_layer() {
 			auto updates = parse_update_block();
 			looplayer.updates.insert(looplayer.updates.end(), updates.begin(), updates.end());
 		} else {
-			throw creaturesException("Unexpected token when parsing looplayer: " + peek().dump());
+			throw Exception("Unexpected token when parsing looplayer: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
@@ -351,7 +351,7 @@ MNGTrack MNGParserState::parse_track() {
 			track.layers.push_back(parse_aleotoric_layer());
 			// TODO: error if a layer is defined twice?
 		} else {
-			throw creaturesException("Unexpected token when parsing track: " + peek().dump());
+			throw Exception("Unexpected token when parsing track: " + peek().dump());
 		}
 	}
 	consume(MNG_RCURLY);
@@ -372,12 +372,12 @@ MNGScript MNGParserState::parse_script() {
 			consume(MNG_LPAREN);
 			std::string name = consume(MNG_CONST_NAME).value;
 			if (name != "managerVar") {
-				throw creaturesException("Unexpected toplevel variable declaration '" + name + "'");
+				throw Exception("Unexpected toplevel variable declaration '" + name + "'");
 			}
 			consume(MNG_COMMA);
 			float value = std::stof(consume(MNG_CONST_NUMBER).value);
 			if (value != 0) {
-				throw creaturesException("Toplevel variable declaration 'managerVar' not 0.0");
+				throw Exception("Toplevel variable declaration 'managerVar' not 0.0");
 			}
 			consume(MNG_RPAREN);
 		} else if (type == MNG_EFFECT) {
@@ -387,7 +387,7 @@ MNGScript MNGParserState::parse_script() {
 			script.tracks.push_back(parse_track());
 			// TODO: error if track defined twice?
 		} else {
-			throw creaturesException("Unexpected token " + peek().dump());
+			throw Exception("Unexpected token " + peek().dump());
 		}
 	}
 }

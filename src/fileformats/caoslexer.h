@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fileformats/caostoken.h"
+#include "caostoken.h"
 
 #include <string>
 #include <vector>

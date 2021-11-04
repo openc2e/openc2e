@@ -1,7 +1,7 @@
+#include "common/endianlove.h"
+#include "common/enumerate.h"
+#include "common/zip.h"
 #include "fileformats/mngfile.h"
-#include "utils/endianlove.h"
-#include "utils/enumerate.h"
-#include "utils/zip.h"
 
 #include <fmt/format.h>
 #include <fstream>

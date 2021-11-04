@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fileformats/PraySourceParser.h"
+#include "PraySourceParser.h"
 
 #include <string>
 #include <vector>

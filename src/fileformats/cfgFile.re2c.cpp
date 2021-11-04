@@ -1,5 +1,5 @@
-#include "fileformats/cfgFile.h"
-#include "utils/readfile.h"
+#include "cfgFile.h"
+#include "common/readfile.h"
 
 #include <assert.h>
 #include <fstream>

@@ -17,10 +17,10 @@
  *
  */
 
-#include "fileformats/c2cobfile.h"
+#include "c2cobfile.h"
 
-#include "creaturesException.h"
-#include "utils/endianlove.h"
+#include "common/Exception.h"
+#include "common/endianlove.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -32,13 +32,13 @@ c2cobfile::c2cobfile(std::string _path)
 	file.open(path.c_str(), std::ios::binary);
 
 	if (!file.is_open())
-		throw creaturesException(std::string("couldn't open COB file \"") + path + "\"");
+		throw Exception(std::string("couldn't open COB file \"") + path + "\"");
 
 	// TODO: c1 cob support
 	char majic[4];
 	file.read(majic, 4);
 	if (strncmp(majic, "cob2", 4) != 0)
-		throw creaturesException(std::string("bad magic of C2 COB file \"") + path + "\"");
+		throw Exception(std::string("bad magic of C2 COB file \"") + path + "\"");
 
 	while (!file.eof()) {
 		// TODO: catch exceptions, and free all blocks before passing it up the stack
@@ -84,7 +84,7 @@ void cobBlock::load() {
 	file.clear();
 	file.seekg(offset);
 	if (!file.good())
-		throw creaturesException("Failed to seek to block offset.");
+		throw Exception("Failed to seek to block offset.");
 
 	loaded = true;
 
@@ -92,7 +92,7 @@ void cobBlock::load() {
 	file.read((char*)buffer, size);
 	if (!file.good()) {
 		free();
-		throw creaturesException("Failed to read block.");
+		throw Exception("Failed to read block.");
 	}
 }
 
@@ -113,7 +113,7 @@ std::string readstring(std::istream& file) {
 	while (true) {
 		file.read(&buf[i], 1);
 		if (!file.good())
-			throw creaturesException("Failed to read string.");
+			throw Exception("Failed to read string.");
 
 		// found null terminator
 		if (buf[i] == 0) {
@@ -139,7 +139,7 @@ cobAgentBlock::cobAgentBlock(cobBlock* p) {
 	file.clear();
 	file.seekg(p->getOffset());
 	if (!file.good())
-		throw creaturesException("Failed to seek to block offset.");
+		throw Exception("Failed to seek to block offset.");
 
 	quantityremaining = read16le(file);
 	lastusage = read32le(file);
@@ -187,7 +187,7 @@ cobFileBlock::cobFileBlock(cobBlock* p) {
 	file.clear();
 	file.seekg(p->getOffset());
 	if (!file.good())
-		throw creaturesException("Failed to seek to block offset.");
+		throw Exception("Failed to seek to block offset.");
 
 	filetype = read16le(file);
 	file.seekg(4, std::ios::cur); // unused
@@ -215,7 +215,7 @@ cobAuthBlock::cobAuthBlock(cobBlock* p) {
 	file.clear();
 	file.seekg(p->getOffset());
 	if (!file.good())
-		throw creaturesException("Failed to seek to block offset.");
+		throw Exception("Failed to seek to block offset.");
 
 	daycreated = read8(file);
 	monthcreated = read8(file);

@@ -18,12 +18,12 @@
  */
 #include "mngfile.h"
 
-#include "creaturesException.h"
+#include "common/Exception.h"
+#include "common/endianlove.h"
+#include "common/mappedfile.h"
+#include "common/shared_array.h"
+#include "common/spanstream.h"
 #include "mngparser.h"
-#include "utils/endianlove.h"
-#include "utils/mappedfile.h"
-#include "utils/shared_array.h"
-#include "utils/spanstream.h"
 
 #include <algorithm>
 #include <assert.h>

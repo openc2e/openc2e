@@ -1,7 +1,7 @@
 #include "hedfile.h"
 
-#include "caos_assert.h"
-#include "utils/endianlove.h"
+#include "common/endianlove.h"
+#include "common/throw_ifnot.h"
 
 #include <fstream>
 
@@ -17,9 +17,9 @@ hedfile read_hedfile(std::istream& in) {
 	hed.frame_height = read32le(in);
 	hed.numframes = read32le(in);
 
-	caos_assert(!in.fail());
+	THROW_IFNOT(!in.fail());
 	in.peek();
-	caos_assert(in.eof());
+	THROW_IFNOT(in.eof());
 
 	return hed;
 }

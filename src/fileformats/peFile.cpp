@@ -17,13 +17,13 @@
  *
  */
 
-#include "fileformats/peFile.h"
+#include "peFile.h"
 
-#include "creaturesException.h"
-#include "fileformats/bmpImage.h"
-#include "utils/encoding.h"
-#include "utils/endianlove.h"
-#include "utils/spanstream.h"
+#include "bmpImage.h"
+#include "common/Exception.h"
+#include "common/encoding.h"
+#include "common/endianlove.h"
+#include "common/spanstream.h"
 
 /*
  * This isn't a full PE parser, but it manages to extract resources from the
@@ -35,13 +35,13 @@ peFile::peFile(fs::path filepath) {
 	file.open(path.string().c_str(), std::ios::binary);
 
 	if (!file.is_open())
-		throw creaturesException(std::string("couldn't open PE file \"") + path.string() + "\"");
+		throw Exception(std::string("couldn't open PE file \"") + path.string() + "\"");
 
 	// check the signature of the file
 	char majic[2];
 	file.read(majic, 2);
 	if (strncmp(majic, "MZ", 2) != 0)
-		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (not a PE file?)");
+		throw Exception(std::string("couldn't understand PE file \"") + path.string() + "\" (not a PE file?)");
 
 	// skip the rest of the DOS header
 	file.ignore(58);
@@ -49,14 +49,14 @@ peFile::peFile(fs::path filepath) {
 	// read the location of the PE header
 	uint32_t e_lfanew = read32le(file);
 	if (e_lfanew == 0)
-		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (DOS program?)");
+		throw Exception(std::string("couldn't understand PE file \"") + path.string() + "\" (DOS program?)");
 
 	// seek to the PE header and check the signature
 	file.seekg(e_lfanew, std::ios::beg);
 	char pemajic[4];
 	file.read(pemajic, 4);
 	if (memcmp(pemajic, "PE\0\0", 4) != 0)
-		throw creaturesException(std::string("couldn't understand PE file \"") + path.string() + "\" (corrupt?)");
+		throw Exception(std::string("couldn't understand PE file \"") + path.string() + "\" (corrupt?)");
 
 	// read the necessary data from the PE file header
 	file.ignore(2);

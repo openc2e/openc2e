@@ -1,14 +1,14 @@
 #include "strFile.h"
 
-#include "creaturesException.h"
-#include "utils/endianlove.h"
+#include "common/Exception.h"
+#include "common/endianlove.h"
 
 #include <fstream>
 
 std::vector<std::string> ReadStrFile(const std::string& path) {
 	std::ifstream in(path, std::ios_base::binary);
 	if (!in.good()) {
-		throw creaturesException("Couldn't open " + path);
+		throw Exception("Couldn't open " + path);
 	}
 
 	int num_strings = read16le(in);
