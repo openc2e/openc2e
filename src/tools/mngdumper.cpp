@@ -44,10 +44,6 @@ int main(int argc, char** argv) {
 		fmt::print("{}\n", sample_filename.string());
 
 		std::ofstream out((output_directory / kv.first).native() + ".wav", std::ios_base::binary);
-		out.write("RIFF", 4);
-		write32le(out, 4 + kv.second.size()); // TODO: RIFF chunk size
-		out.write("WAVE", 4);
-		out.write("fmt ", 4);
 		out.write((const char*)kv.second.data(), kv.second.size());
 	}
 }

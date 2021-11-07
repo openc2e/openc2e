@@ -157,14 +157,8 @@ static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = null
 }
 
 static AudioChannel playSample(const std::string& name, MNGFile* file, AudioBackend* backend, bool looping = false) {
-	unsigned int sampleno = file->getSampleForName(name);
-	auto* data = file->samples[sampleno].data();
-	auto length = file->samples[sampleno].size();
-	std::vector<uint8_t> buf(length + 8);
-	memcpy(buf.data(), "WAVEfmt ", 8);
-	memcpy(buf.data() + 8, data, length);
-	// TODO: prettify this
-	return backend->playWavData(buf.data(), buf.size(), looping);
+	const auto& sample = file->samples[file->getSampleForName(name)];
+	return backend->playWavData(sample.data(), sample.size(), looping);
 }
 
 MusicStage::MusicStage(MNGStage node) {

@@ -83,8 +83,11 @@ MNGFile::MNGFile(std::string n) {
 	for (uint32_t i = 0; i < numsamples; i++) {
 		// TODO: warning if sample isn't in expected place?
 		stream.seekg(sample_headers[i].position);
-		shared_array<uint8_t> data(sample_headers[i].size);
-		stream.read(reinterpret_cast<char*>(data.data()), data.size());
+		shared_array<uint8_t> data(sample_headers[i].size + 16);
+		memcpy(&data[0], "RIFF", 4);
+		write32le(&data[4], sample_headers[i].size + 4);
+		memcpy(&data[8], "WAVEfmt ", 8);
+		stream.read(reinterpret_cast<char*>(&data[16]), sample_headers[i].size);
 		samples.push_back(data);
 	}
 }
