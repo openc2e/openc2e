@@ -23,7 +23,7 @@
 #include "backtrace.h"
 #include "version.h"
 
-#include <iostream>
+#include <fmt/core.h>
 #include <memory>
 #ifdef SDLMIXER_SUPPORT
 #include "openc2e-audiobackend/SDLMixerBackend.h"
@@ -45,8 +45,7 @@ extern "C" int main(int argc, char* argv[]) {
 #else
 	version = RELEASE_VERSION;
 #endif
-	std::cout << "openc2e (" << version << "), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 "
-										   "Alyssa Milburn and others\n\n";
+	fmt::print("openc2e ({}), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n", version);
 
 	engine.addPossibleBackend("sdl", std::shared_ptr<Backend>(new SDLBackend()));
 #ifdef SDLMIXER_SUPPORT
