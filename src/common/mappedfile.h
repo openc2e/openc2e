@@ -32,7 +32,12 @@ class mappedfile final {
   public:
 	mappedfile();
 	mappedfile(const ghc::filesystem::path& filename);
+	mappedfile(const mappedfile&) = delete;
+	mappedfile& operator=(const mappedfile&) = delete;
+	mappedfile(mappedfile&&);
+	mappedfile& operator=(mappedfile&&);
 	~mappedfile();
+
 	bool is_open() const;
 	void close();
 	const uint8_t* data() const;

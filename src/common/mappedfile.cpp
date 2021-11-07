@@ -75,6 +75,26 @@ mappedfile::mappedfile(const ghc::filesystem::path& filename) {
 #endif
 }
 
+mappedfile::mappedfile(mappedfile&& other)
+	: mappedfile() {
+	*this = std::move(other);
+}
+
+mappedfile& mappedfile::operator=(mappedfile&& other) {
+	close();
+
+#ifdef _WIN32
+	std::swap(m_file, other.m_file);
+	std::swap(m_mapping, other.m_mapping);
+	std::swap(m_view, other.m_view);
+#else
+	std::swap(m_map, other.m_map);
+#endif
+	std::swap(m_size, other.m_size);
+
+	return *this;
+}
+
 mappedfile::~mappedfile() {
 	try {
 		close();
@@ -89,8 +109,12 @@ void mappedfile::close() {
 		return;
 	}
 	UnmapViewOfFile(m_view); // TODO: handle error
+	m_view = nullptr;
 	CloseHandle(m_mapping); // TODO: handle error
+	m_mapping = nullptr;
 	CloseHandle(m_file); // TODO: handle error
+	m_file = INVALID_HANDLE_VALUE;
+	m_size = 0;
 #else
 	if (!m_map) {
 		return;
