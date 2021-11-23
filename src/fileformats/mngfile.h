@@ -23,7 +23,6 @@
 #include "common/shared_array.h"
 
 #include <cmath>
-#include <fmt/core.h>
 #include <istream>
 #include <list>
 #include <map>
@@ -45,6 +44,7 @@ class MNGFileException : public Exception {
 
 class MNGFile {
   public:
+	MNGFile();
 	MNGFile(std::string);
 	~MNGFile();
 	std::vector<std::string> getSampleNames() const;

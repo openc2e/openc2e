@@ -142,6 +142,11 @@ target_link_libraries(openc2e-fileformats
 	PRIVATE ZLIB::ZLIB PNG::PNG
 )
 
+add_library(openc2e-mngmusic STATIC
+	src/libmngmusic/MNGMusic.cpp
+)
+target_link_libraries(openc2e-mngmusic PRIVATE openc2e-fileformats)
+
 add_library(openc2e-core STATIC
 	src/openc2e-core/Agent.cpp
 	src/openc2e-core/AgentHelpers.cpp
@@ -210,7 +215,6 @@ add_library(openc2e-core STATIC
 	src/openc2e-core/Lift.cpp
 	src/openc2e-core/Map.cpp
 	src/openc2e-core/MetaRoom.cpp
-	src/openc2e-core/MNGMusic.cpp
 	src/openc2e-core/MusicManager.cpp
 	src/openc2e-core/net/socket.cpp
 	src/openc2e-core/NetBackend.cpp
@@ -243,6 +247,7 @@ target_link_libraries(openc2e-core PUBLIC
 	mpark_variant
 	openc2e-common
 	openc2e-fileformats
+	openc2e-mngmusic
 )
 if(APPLE)
 	target_link_libraries(openc2e-core PUBLIC "-framework CoreFoundation")
@@ -305,7 +310,7 @@ target_link_libraries(mngbuild fmt ghc_filesystem openc2e-fileformats)
 add_executable(mngplayer
 	src/tools/mngplayer.cpp
 )
-target_link_libraries(mngplayer openc2e-audiobackend openc2e-core openc2e-fileformats fmt ghc_filesystem)
+target_link_libraries(mngplayer openc2e-audiobackend openc2e-mngmusic openc2e-fileformats fmt ghc_filesystem)
 
 add_executable(pefiledumper src/tools/pefiledumper.cpp)
 target_link_libraries(pefiledumper openc2e-fileformats)

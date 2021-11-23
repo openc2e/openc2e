@@ -1,7 +1,7 @@
 #include "common/ascii_tolower.h"
 #include "fileformats/mngfile.h"
+#include "libmngmusic/MNGMusic.h"
 #include "openc2e-audiobackend/SDLMixerBackend.h"
-#include "openc2e-core/MNGMusic.h"
 
 #include <atomic>
 #include <condition_variable>

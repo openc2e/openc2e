@@ -20,11 +20,13 @@
 #include "MusicManager.h"
 
 #include "Engine.h"
-#include "MNGMusic.h"
 #include "PathResolver.h"
 #include "SoundManager.h"
 #include "World.h"
 #include "caosValue.h"
+#include "libmngmusic/MNGMusic.h"
+
+#include <fmt/core.h>
 
 // this is all for MusicManager::tick
 #include "Camera.h"
