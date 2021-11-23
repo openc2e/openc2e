@@ -110,6 +110,11 @@ static inline void write32le(std::ostream& s, uint32_t v) {
 	s.write(reinterpret_cast<char*>(&t), 4);
 }
 
+static inline void write32le(uint8_t* b, uint32_t v) {
+	uint32_t t = is_little_endian() ? v : byte_swap_32(v);
+	memcpy(b, &t, 4);
+}
+
 // big-endian integers are used in two places: c2e genome files (yes, for some
 // crazy reason!), and macOS versions of spritefiles (.m16, .n16, and .blk)
 
