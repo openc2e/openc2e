@@ -6,7 +6,7 @@ The list below consist mostly of ideas noted down before they are requested/disc
 It's mostly a bunch of personal notes, probably incomplete. Feel free to query if you have any questions.
 
  - doc/test: add a proper documentation+regression testing system (#435)
- - doc/test: checklist app to verify binding/integration of imgui (test inputs, rendering, callback, etc.).
+ - doc/test: checklist app to verify backends/integration of imgui (test inputs, rendering, callback, etc.).
  - doc/tips: tips of the day: website? applet in imgui_club?
  - doc/wiki: work on the wiki https://github.com/ocornut/imgui/wiki
 
@@ -88,6 +88,7 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - input text: access public fields via a non-callback API e.g. InputTextGetState("xxx") that may return NULL if not active.
  - input text: flag to disable live update of the user buffer (also applies to float/int text input) (#701)
  - input text: hover tooltip could show unclamped text
+ - input text: support for INSERT key to toggle overwrite mode. currently disabled because stb_textedit behavior is unsatisfactory on multi-line. (#2863)
  - input text: option to Tab after an Enter validation.
  - input text: add ImGuiInputTextFlags_EnterToApply? (off #218)
  - input text: easier ways to update buffer (from source char*) while owned. preserve some sort of cursor position for multi-line text.
@@ -129,18 +130,6 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - group: IsHovered() after EndGroup() covers whole aabb rather than the intersection of individual items. Is that desirable?
  - group: merge deactivation/activation within same group (fwd WasEdited flag). (#2550)
 
- - columns: sizing policy (e.g. for each column: fixed size, %, fill, distribute default size among fills) (#513, #125)
- - columns: add a conditional parameter to SetColumnOffset() (#513, #125)
- - columns: headers. re-orderable. (#513, #125)
- - columns: optional sorting modifiers (up/down), sort list so sorting can be done multi-criteria. notify user when sort order changed.
- - columns: option to alternate background colors on odd/even scanlines.
- - columns: allow columns to recurse.
- - columns: allow a same columns set to be interrupted by e.g. CollapsingHeader and resume with columns in sync when moving them.
- - columns: sizing is lossy when columns width is very small (default width may turn negative etc.)
- - columns: separator function or parameter that works within the column (currently Separator() bypass all columns) (#125)
- - columns: flag to add horizontal separator above/below)
- - columns/layout: setup minimum line height (equivalent of automatically calling AlignFirstTextHeightToWidgets)
-
 !- color: the color conversion helpers/types are a mess and needs sorting out.
  - color: (api breaking) ImGui::ColorConvertXXX functions should be loose ImColorConvertXX to match imgui_internals.h
 
@@ -167,7 +156,7 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - dock: dock out from a collapsing header? would work nicely but need emitting window to keep submitting the code.
 
  - tabs: "there is currently a problem because TabItem() will try to submit their own tooltip after 0.50 second, and this will have the effect of making your tooltip flicker once." -> tooltip priority work
- - tabs: close button tends to overlap unsaved-document star 
+ - tabs: close button tends to overlap unsaved-document star
  - tabs: consider showing the star at the same spot as the close button, like VS Code does.
  - tabs: make EndTabBar fail if users doesn't respect BeginTabBar return value, for consistency/future-proofing.
  - tabs: persistent order/focus in BeginTabBar() api (#261, #351)
@@ -195,14 +184,13 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
 
  - combo: use clipper: make it easier to disable clipper with a single flag.
  - combo: flag for BeginCombo to not return true when unchanged (#1182)
- - combo: a way/helper to customize the combo preview (#1658)
+ - combo: a way/helper to customize the combo preview (#1658) -> exeperimental BeginComboPreview()
  - combo/listbox: keyboard control. need InputText-like non-active focus + key handling. considering keyboard for custom listbox (pr #203)
- - listbox: refactor and clean the begin/end api
  - listbox: multiple selection.
  - listbox: unselect option (#1208)
  - listbox: make it easier/more natural to implement range-select (need some sort of info/ref about the last clicked/focused item that user can translate to an index?) (wip stash)
  - listbox: user may want to initial scroll to focus on the one selected value?
- - listbox: expose hovered item for a basic ListBox
+ - listbox: expose hovered item for a simplified ListBox api
  - listbox: keyboard navigation.
  - listbox: disable capturing mouse wheel if the listbox has no scrolling. (#1681)
  - listbox: scrolling should track modified selection.
@@ -228,6 +216,7 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - shortcuts: local-style shortcut api, e.g. parse "&Save"
  - shortcuts,menus: global-style shortcut api e.g. "Save (CTRL+S)" -> explicit flag for recursing into closed menu
  - shortcuts: programmatically access shortcuts "Focus("&Save"))
+ - menus: hovering a disabled BeginMenu or MenuItem won't close another menu
  - menus: menu-bar: main menu-bar could affect clamping of windows position (~ akin to modifying DisplayMin)
  - menus: hovering from menu to menu on a menu-bar has 1 frame without any menu, which is a little annoying. ideally either 0 either longer.
  - menus: could merge draw call in most cases (how about storing an optional aabb in ImDrawCmd to move the burden of merging in a single spot).
@@ -259,18 +248,21 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - style: gradients fill (#1223) ~ 2 bg colors for each fill? tricky with rounded shapes and using textures for corners.
  - style editor: color child window height expressed in multiple of line height.
 
+ - log: improve logging of ArrowButton, ListBox, TabItem
+ - log: carry on indent / tree depth when opening a child window
+ - log: enabling log ends up pushing and growing vertices buffers because we don't distinguish layout vs render clipping
  - log: have more control over the log scope (e.g. stop logging when leaving current tree node scope)
  - log: be able to log anything (e.g. right-click on a window/tree-node, shows context menu? log into tty/file/clipboard)
  - log: let user copy any window content to clipboard easily (CTRL+C on windows? while moving it? context menu?). code is commented because it fails with multiple Begin/End pairs.
  - log: obsolete LogButtons() all together.
  - log: LogButtons() options for specifying depth and/or hiding depth slider
- - log: enabling log ends up pushing and growing vertices buffersbecause we don't distinguish layout vs render clipping
 
  - filters: set a current filter that tree node can automatically query to hide themselves
  - filters: handle wild-cards (with implicit leading/trailing *), reg-exprs
  - filters: fuzzy matches (may use code at blog.forrestthewoods.com/4cffeed33fdb)
 
  - drag and drop: fix/support/options for overlapping drag sources.
+ - drag and drop: focus drag target window on hold (even without open)
  - drag and drop: releasing a drop shows the "..." tooltip for one frame - since e13e598 (#1725)
  - drag and drop: drag source on a group object (would need e.g. an invisible button covering group in EndGroup) https://twitter.com/paniq/status/1121446364909535233
  - drag and drop: have some way to know when a drag begin from BeginDragDropSource() pov. (see 2018/01/11 post in #143)
@@ -334,6 +326,7 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - nav: some features such as PageUp/Down/Home/End should probably work without ImGuiConfigFlags_NavEnableKeyboard? (where do we draw the line?)
  - nav: configuration flag to disable global shortcuts (currently only CTRL-Tab) ?
  ! nav: never clear NavId on some setup (e.g. gamepad centric)
+ - nav: scroll up/down if possible when move request fails
  - nav: there's currently no way to completely clear focus with the keyboard. depending on patterns used by the application to dispatch inputs, it may be desirable.
  - nav: code to focus child-window on restoring NavId appears to have issue: e.g. when focus change is implicit because of window closure.
  - nav: Home/End behavior when navigable item is not fully visible at the edge of scrolling? should be backtrack to keep item into view?
@@ -342,9 +335,10 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - nav: patterns to make it possible for arrows key to update selection (see JustMovedTo in range_select branch)
  - nav: restore/find nearest NavId when current one disappear (e.g. pressed a button that disappear, or perhaps auto restoring when current button change name)
  - nav: SetItemDefaultFocus() level of priority, so widget like Selectable when inside a popup could claim a low-priority default focus on the first selected iem
+ - nav: NavFlattened: init requests don't work properly on flattened siblings.
+ - nav: NavFlattened: pageup/pagedown/home/end don't work properly on flattened siblings.
  - nav: NavFlattened: ESC on a flattened child should select something.
  - nav: NavFlattened: broken: in typical usage scenario, the items of a fully clipped child are currently not considered to enter into a NavFlattened child.
- - nav: NavFlattened: init request doesn't select items that are part of a NavFlattened child
  - nav: NavFlattened: cannot access menu-bar of a flattened child window with Alt/menu key (not a very common use case..).
  - nav: simulate right-click or context activation? (SHIFT+F10)
  - nav/tabbing: refactor old tabbing system and turn into navigation, should pass through all widgets (in submission order?).
@@ -360,8 +354,6 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - nav/windowing: when CTRL-Tab/windowing is active, the HoveredWindow detection doesn't take account of the window display re-ordering.
  - nav/windowing: Resizing window will currently fail with certain types of resizing constraints/callback applied
  - focus: preserve ActiveId/focus stack state, e.g. when opening a menu and close it, previously selected InputText() focus gets restored (#622)
- - focus: SetKeyboardFocusHere() on with >= 0 offset could be done on same frame (else latch and modulate on beginning of next frame)
- - focus: unable to use SetKeyboardFocusHere() on clipped widgets. (#787)
 
  - inputs: we need an explicit flag about whether the imgui window is focused, to be able to distinguish focused key releases vs alt-tabbing all release behaviors.
  - inputs: rework IO system to be able to pass actual ordered/timestamped events. use an event queue? (~#335, #71)
@@ -370,7 +362,7 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - inputs/io: clarify/standardize/expose repeat rate and repeat delays (#1808)
  - inputs/scrolling: support for smooth scrolling (#2462, #2569)
 
- - misc: idle: expose "woken up" boolean (set by inputs) and/or animation time (for cursor blink) for back-end to be able stop refreshing easily.
+ - misc: idle: expose "woken up" boolean (set by inputs) and/or animation time (for cursor blink) for backend to be able stop refreshing easily.
  - misc: idle: if cursor blink if the _only_ visible animation, core imgui could rewrite vertex alpha to avoid CPU pass on ImGui:: calls.
  - misc: idle: if cursor blink if the _only_ visible animation, could even expose a dirty rectangle that optionally can be leverage by some app to render in a smaller viewport, getting rid of much pixel shading cost.
  - misc: no way to run a root-most GetID() with ImGui:: api since there's always a Debug window in the stack. (mentioned in #2960)
@@ -399,7 +391,6 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - backends: opengl: rename imgui_impl_opengl2 to impl_opengl_legacy and imgui_impl_opengl3 to imgui_impl_opengl? (#1900)
  - backends: opengl: could use a single vertex buffer and glBufferSubData for uploads?
  - backends: opengl: explicitly disable GL_STENCIL_TEST in bindings.
- - backends: opengl: consider gl_lite loader https://github.com/ApoorvaJ/Papaya/blob/3808e39b0f45d4ca4972621c847586e4060c042a/src/libs/gl_lite.h
  - backends: vulkan: viewport: support for synchronized swapping of multiple swap chains.
  - backends: bgfx: https://gist.github.com/RichardGale/6e2b74bc42b3005e08397236e4be0fd0
  - backends: mscriptem: with refactored examples, we could provide a direct imgui_impl_emscripten platform layer (see eg. https://github.com/floooh/sokol-samples/blob/master/html5/imgui-emsc.cc#L42)
