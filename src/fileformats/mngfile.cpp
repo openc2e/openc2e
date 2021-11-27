@@ -38,6 +38,8 @@ void decryptbuf(char* buf, int len) {
 	}
 }
 
+MNGFile::MNGFile() = default;
+
 MNGFile::MNGFile(std::string n) {
 	name = n;
 
