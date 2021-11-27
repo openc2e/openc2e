@@ -79,7 +79,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for 
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/imgui EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
-
+add_subdirectory(externals/nativefiledialog EXCLUDE_FROM_ALL)
 
 # Pass flags to the compiler
 add_compile_definitions("_REENTRANT" "YYERROR_VERBOSE")
@@ -323,6 +323,27 @@ add_executable(mngplayer
 )
 target_link_libraries(mngplayer openc2e-audiobackend openc2e-mngmusic openc2e-fileformats fmt ghc_filesystem)
 
+add_executable(mngplayer2
+    src/mngplayer2/mngplayer2.cpp
+    src/mngplayer2/mngplayer2.rc
+)
+target_link_libraries(mngplayer2
+	SDL2::SDL2
+	fmt
+	ghc_filesystem
+	imgui
+	imgui_sdl
+	nativefiledialog
+	openc2e-audiobackend
+	openc2e-fileformats
+	openc2e-mngmusic
+	${CMAKE_DL_LIBS}
+)
+if(WIN32)
+	target_link_libraries(mngplayer2 SDL2main)
+	set_target_properties(mngplayer2 PROPERTIES WIN32_EXECUTABLE TRUE OUTPUT_NAME MNGPlayer2)
+endif()
+
 add_executable(pefiledumper src/tools/pefiledumper.cpp)
 target_link_libraries(pefiledumper openc2e-fileformats)
 
@@ -454,6 +475,12 @@ install(TARGETS
 	praydumper
 	spritedumper
 	DESTINATION "."
+)
+
+install(TARGETS
+	mngplayer2
+	DESTINATION "."
+	COMPONENT mngplayer2
 )
 
 if(WIN32)
