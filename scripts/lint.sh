@@ -27,7 +27,7 @@ fi
 
 modified_files=$(git diff --name-only --diff-filter=ACMRTUXB HEAD)
 for f in ${modified_files}; do
-  if ! echo "${f}" | egrep -q "[.](cpp|c|h)$"; then
+  if ! echo "${f}" | egrep -q "[.](cpp|c|mm|m|h)$"; then
     continue
   fi
   if ! echo "${f}" | egrep -q "^(src|tests)"; then
