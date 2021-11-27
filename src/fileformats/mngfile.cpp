@@ -48,6 +48,7 @@ MNGFile::MNGFile(std::string n) {
 	if (!stream) {
 		throw MNGFileException("open failed");
 	}
+	stream.exceptions(spanstream::failbit | spanstream::badbit);
 
 	// Read metavariables from beginning of file
 	uint32_t numsamples = read32le(stream);
