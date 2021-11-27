@@ -45,6 +45,10 @@
 #include "openc2e-audiobackend/NullAudioBackend.h"
 #include "prayManager.h"
 
+#ifdef _WIN32
+#include "common/ComPtr.h"
+#endif
+
 #include <cassert>
 #include <ghc/filesystem.hpp>
 #define CXXOPTS_VECTOR_DELIMITER '\0'
@@ -52,17 +56,16 @@
 #include <fmt/core.h>
 #include <memory>
 #include <stdexcept>
-namespace fs = ghc::filesystem;
-
-#ifndef _WIN32
-#include <pwd.h> // getpwuid
-#include <sys/types.h> // passwd*
-#endif
 
 #ifdef _WIN32
 #include <shlobj.h>
 #include <windows.h>
+#else
+#include <pwd.h> // getpwuid
+#include <sys/types.h> // passwd*
 #endif
+
+namespace fs = ghc::filesystem;
 
 Engine engine;
 
@@ -833,6 +836,45 @@ static std::vector<DataDirectory> data_directories_from_machine_cfg(fs::path mac
 	return result;
 }
 
+#ifdef _WIN32
+static fs::path showDirectoryPicker() {
+	if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE))) {
+		// TODO: handle RPC_E_CHANGED_MODE, we can continu w/ a multithreaded COM.
+		return {};
+	}
+
+	struct coinit_scope {
+		~coinit_scope() { CoUninitialize(); }
+	} coinit_scope_instance;
+
+	ComPtr<IFileOpenDialog> fo;
+	if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, fo.receive_vpp()))) {
+		std::cout << "Couldn't open File Dialog" << std::endl;
+		return {};
+	}
+	fo->SetOptions(FOS_PICKFOLDERS);
+
+	// Show the Open dialog box.
+	if (FAILED(fo->Show(NULL))) {
+		std::cout << "Couldn't show File Open Dialog" << std::endl;
+		return {};
+	}
+
+	// Get the file name from the dialog box.
+	ComPtr<IShellItem> pItem;
+	if (FAILED(fo->GetResult(pItem.receive()))) {
+		return {};
+	}
+
+	ComHeapPtr<WCHAR> pszFilePath;
+	if (FAILED(pItem->GetDisplayName(SIGDN_FILESYSPATH, pszFilePath.receive()))) {
+		return {};
+	}
+
+	return fs::path(pszFilePath.get());
+}
+#endif
+
 bool Engine::parseCommandLine(int argc, char* argv[]) {
 	// variables for command-line flags
 	std::vector<std::string> data_vec;
@@ -894,49 +936,10 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 
 	if (vm.count("data-path") == 0) {
 #ifdef _WIN32
-
-		HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-											  COINIT_DISABLE_OLE1DDE);
-
-		if (SUCCEEDED(hr)) {
-			struct coinit_scope {
-				~coinit_scope() { CoUninitialize(); }
-			} coinit_scope_instance;
-
-			IFileOpenDialog* fo;
-			hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
-				IID_IFileOpenDialog, reinterpret_cast<void**>(&fo));
-
-			if (SUCCEEDED(hr)) {
-				fo->SetOptions(FOS_PICKFOLDERS);
-				// Show the Open dialog box.
-				hr = fo->Show(NULL);
-
-				// Get the file name from the dialog box.
-				if (SUCCEEDED(hr)) {
-					IShellItem* pItem;
-					hr = fo->GetResult(&pItem);
-					if (SUCCEEDED(hr)) {
-						PWSTR pszFilePath;
-						hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-						if (SUCCEEDED(hr)) {
-							std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> wtos;
-							std::string path = wtos.to_bytes(pszFilePath);
-							data_vec.push_back(path);
-							CoTaskMemFree(pszFilePath);
-						}
-						pItem->Release();
-					}
-				} else {
-					std::cout << "Couldn't show File Open Dialog" << std::endl;
-				}
-				fo->Release();
-			} else {
-				std::cout << "Couldn't open File Dialog" << std::endl;
-			}
+		fs::path picked_path = showDirectoryPicker();
+		if (!picked_path.empty()) {
+			data_vec.push_back(picked_path);
 		}
-
-
 #endif
 		if (data_vec.empty()) {
 			std::cout << "Warning: No data path specified, trying default of '" << data_default << "', see --help if you need to specify one." << std::endl;
