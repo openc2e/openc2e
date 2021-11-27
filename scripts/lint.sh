@@ -25,7 +25,9 @@ if [ $CLANG_FORMAT_MAJOR != $REQUIRED_CLANG_FORMAT_MAJOR ]; then
   echo >&2 "warning: clang-format is wrong version (wanted $REQUIRED_CLANG_FORMAT_MAJOR, got $CLANG_FORMAT_MAJOR)"
 fi
 
-modified_files=$(git diff --name-only --diff-filter=ACMRTUXB HEAD)
+since_rev="${1:-HEAD}"
+
+modified_files=$(git diff --name-only --diff-filter=ACMRTUXB "${since_rev}")
 for f in ${modified_files}; do
   if ! echo "${f}" | egrep -q "[.](cpp|c|mm|m|h)$"; then
     continue
