@@ -78,7 +78,6 @@ add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/imgui EXCLUDE_FROM_ALL)
-add_subdirectory(externals/imgui_sdl EXCLUDE_FROM_ALL)
 add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 
 
@@ -273,6 +272,9 @@ add_library(openc2e-audiobackend STATIC
 )
 target_compile_definitions(openc2e-audiobackend PUBLIC "SDLMIXER_SUPPORT")
 target_link_libraries(openc2e-audiobackend PUBLIC openc2e-common SDL2::Mixer)
+
+add_library(imgui_sdl src/imgui_sdl/imgui_sdl.cpp)
+target_link_libraries(imgui_sdl PRIVATE imgui)
 
 add_executable(openc2e
 	src/openc2e-main/main.cpp

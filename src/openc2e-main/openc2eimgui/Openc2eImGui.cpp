@@ -9,12 +9,12 @@
 #include "Engine.h"
 #include "Hatchery.h"
 #include "MainMenu.h"
+#include "common/Exception.h"
+#include "imgui_sdl/imgui_sdl.h"
 
 #include <SDL.h>
 #include <imgui.h>
-#include <imgui_impl_sdl.h>
 #include <imgui_internal.h>
-#include <imgui_sdl.h>
 
 namespace Openc2eImGui {
 
@@ -44,18 +44,14 @@ void Init(SDL_Window* window) {
 
 		// ImGui::GetStyle().ScaleAllSizes(2);
 
-		ImGui_ImplSDL2_Init(window);
-
-		SDL_Renderer* renderer = SDL_GetRenderer(window);
-
-		int w = 0, h = 0;
-		assert(SDL_GetRendererOutputSize(renderer, &w, &h) == 0);
-		ImGuiSDL::Initialize(renderer, w, h);
+		if (!ImGuiSDL_Init(window)) {
+			throw Exception("Couldn't initialize ImGui - are you using SDL's OpenGL backend?");
+		}
 	}
 }
 
 void Update(SDL_Window* window) {
-	ImGui_ImplSDL2_NewFrame(window);
+	ImGuiSDL_NewFrame(window);
 	ImGui::NewFrame();
 
 	if (engine.version == 1) {
@@ -97,11 +93,11 @@ int GetViewportOffsetBottom() {
 
 void Render() {
 	ImGui::Render();
-	ImGuiSDL::Render(ImGui::GetDrawData());
+	ImGuiSDL_RenderDrawData(ImGui::GetDrawData());
 }
 
 bool ConsumeEvent(const SDL_Event& event) {
-	ImGui_ImplSDL2_ProcessEvent(&event);
+	ImGuiSDL_ProcessEvent(&event);
 	if (ImGui::GetIO().WantCaptureMouse && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL)) {
 		return true;
 	}
