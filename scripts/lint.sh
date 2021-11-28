@@ -27,7 +27,7 @@ fi
 
 since_rev="${1:-HEAD}"
 
-modified_files=$(git diff --name-only --diff-filter=ACMRTUXB "${since_rev}")
+modified_files=$(git diff --name-only --diff-filter=ACMRTUXB "${since_rev}" --)
 for f in ${modified_files}; do
   if ! echo "${f}" | egrep -q "[.](cpp|c|mm|m|h)$"; then
     continue
