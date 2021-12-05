@@ -1,5 +1,5 @@
 #include "common/demangle.h"
-#include "common/iendswith.h"
+#include "common/ends_with.h"
 #include "common/wildcard_match.h"
 
 #include <gtest/gtest.h>
@@ -19,12 +19,13 @@ TEST(common, demangle) {
 		<< name << "\".";
 }
 
-TEST(common, iendswith) {
-	EXPECT_TRUE(iendswith("my agent.catalogue", ".catalogue"));
-	EXPECT_TRUE(iendswith("my agent.CATalOgue", ".catalogue"));
-	EXPECT_FALSE(iendswith("my agent.cataloguep", ".catalogue"));
-	EXPECT_FALSE(iendswith("my agent.s16", ".catalogue"));
-	EXPECT_TRUE(iendswith("my agent.s16", ".s16"));
+TEST(common, ends_with_ignore_case) {
+	EXPECT_TRUE(ends_with_ignore_case("my agent.catalogue", ".catalogue"));
+	EXPECT_TRUE(ends_with_ignore_case("my agent.CATalOgue", ".catalogue"));
+	EXPECT_FALSE(ends_with_ignore_case("my agent.cataloguep", ".catalogue"));
+	EXPECT_FALSE(ends_with_ignore_case("my agent.s16", ".catalogue"));
+	EXPECT_FALSE(ends_with_ignore_case("", ".s16"));
+	EXPECT_TRUE(ends_with_ignore_case("my agent.s16", ".s16"));
 }
 
 TEST(common, wildcard_match) {

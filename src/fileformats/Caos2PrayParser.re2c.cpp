@@ -2,7 +2,7 @@
 #include "caoslexer.h"
 #include "caostoken.h"
 #include "common/encoding.h"
-#include "common/iendswith.h"
+#include "common/ends_with.h"
 #include "common/overload.h"
 
 #include <cassert>
@@ -184,19 +184,19 @@ class Caos2PrayParserImpl {
 			"Dependency " + std::to_string(dependency_count), a});
 		std::string categorykey =
 			"Dependency Category " + std::to_string(dependency_count);
-		if (iendswith(a, ".mng") || iendswith(a, ".wav")) {
+		if (ends_with_ignore_case(a, ".mng") || ends_with_ignore_case(a, ".wav")) {
 			events->push_back(IntegerTag{categorykey, 1});
-		} else if (iendswith(a, ".c16") || iendswith(a, ".s16")) {
+		} else if (ends_with_ignore_case(a, ".c16") || ends_with_ignore_case(a, ".s16")) {
 			events->push_back(IntegerTag{categorykey, 2});
-		} else if (iendswith(a, ".gen") || iendswith(a, ".gno")) {
+		} else if (ends_with_ignore_case(a, ".gen") || ends_with_ignore_case(a, ".gno")) {
 			events->push_back(IntegerTag{categorykey, 3});
-		} else if (iendswith(a, ".att")) {
+		} else if (ends_with_ignore_case(a, ".att")) {
 			events->push_back(IntegerTag{categorykey, 4});
 		}
 		// skip category 5, which is Overlay Data
-		else if (iendswith(a, ".blk")) {
+		else if (ends_with_ignore_case(a, ".blk")) {
 			events->push_back(IntegerTag{categorykey, 6});
-		} else if (iendswith(a, ".catalogue")) {
+		} else if (ends_with_ignore_case(a, ".catalogue")) {
 			events->push_back(IntegerTag{categorykey, 7});
 		} else {
 			*events = {Error{"Unknown dependency category for '" + a}};
