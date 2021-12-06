@@ -1,5 +1,6 @@
 #include "common/endianlove.h"
 #include "common/readfile.h"
+#include "fileformats/mngfile.h"
 #include "fileformats/mngparser.h"
 
 #include <fmt/format.h>
@@ -7,15 +8,6 @@
 #include <ghc/filesystem.hpp>
 
 namespace fs = ghc::filesystem;
-
-void decryptbuf(char* buf, int len) {
-	int i;
-	unsigned char pad = 5;
-	for (i = 0; i < len; i++) {
-		buf[i] ^= pad;
-		pad += 0xC1;
-	}
-}
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
@@ -65,8 +57,8 @@ int main(int argc, char** argv) {
 	}
 
 	fmt::print("Writing script...\n");
-	decryptbuf((char*)script.data(), script.size());
-	out.write((char*)script.data(), script_size);
+	auto scrambled_script = mngencrypt(script);
+	out.write((char*)scrambled_script.data(), scrambled_script.size());
 
 	fmt::print("Writing samples...\n");
 	for (auto s : sample_names) {

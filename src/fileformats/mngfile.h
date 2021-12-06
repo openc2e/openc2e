@@ -29,6 +29,9 @@
 #include <string>
 #include <vector>
 
+std::string mngdecrypt(const std::vector<uint8_t>&);
+std::vector<uint8_t> mngencrypt(const std::string&);
+
 class MNGFileException : public Exception {
   public:
 	int lineno;

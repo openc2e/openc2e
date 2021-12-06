@@ -29,13 +29,24 @@
 #include <assert.h>
 #include <fmt/core.h>
 
-void decryptbuf(char* buf, int len) {
-	int i;
+static void decryptbuf(uint8_t* buf, size_t len) {
 	unsigned char pad = 5;
-	for (i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		buf[i] ^= pad;
 		pad += 0xC1;
 	}
+}
+
+std::string mngdecrypt(const std::vector<uint8_t>& buf) {
+	std::string s((char*)buf.data(), (char*)buf.data() + buf.size());
+	decryptbuf((uint8_t*)&s[0], s.size());
+	return s;
+}
+
+std::vector<uint8_t> mngencrypt(const std::string& s) {
+	std::vector<uint8_t> buf((uint8_t*)s.data(), (uint8_t*)s.data() + s.size());
+	decryptbuf(&buf[0], buf.size());
+	return buf;
 }
 
 MNGFile::MNGFile() = default;
@@ -71,9 +82,9 @@ MNGFile::MNGFile(std::string n) {
 	// read and decode the MNG script
 	// TODO: warning if scriptoffset isn't in usual place?
 	stream.seekg(scriptoffset);
-	script = std::string(scriptlength, '\0');
-	stream.read(&script[0], scriptlength);
-	decryptbuf(const_cast<char*>(script.c_str()), scriptlength);
+	std::vector<uint8_t> scrambled_script(scriptlength);
+	stream.read(reinterpret_cast<char*>(scrambled_script.data()), scrambled_script.size());
+	script = mngdecrypt(scrambled_script);
 
 	auto mngscript = mngparse(script);
 
