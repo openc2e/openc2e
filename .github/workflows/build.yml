@@ -53,11 +53,11 @@ jobs:
     - name: "Test"
       run: cd build && ctest --build-config RelWithDebInfo
     - name: "Create distribution artifact"
-      if: runner.os == 'Windows' || runner.os == 'macOS'
+      if: runner.os == 'Windows'
       run: cmake --install build --config RelWithDebInfo --prefix "openc2e-${{ github.sha }}-${{ runner.os }}"
     - name: "Upload distribution artifact"
-      if: runner.os == 'Windows' || runner.os == 'macOS'
+      if: runner.os == 'Windows'
       uses: actions/upload-artifact@v1
       with:
-        name: openc2e-${{ github.sha }}-${{ runner.os }}.zip
+        name: openc2e-${{ github.sha }}-${{ runner.os }}
         path: openc2e-${{ github.sha }}-${{ runner.os }}

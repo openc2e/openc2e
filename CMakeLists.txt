@@ -455,88 +455,12 @@ install(TARGETS
 	spritedumper
 	DESTINATION "."
 )
-if(TARGET SDL2 AND BUILD_SHARED_LIBS)
-	install(TARGETS SDL2 DESTINATION ".")
-endif()
-install(SCRIPT "cmake/Openc2eBundle.cmake")
-if(APPLE)
-	install(CODE "message(STATUS \"Writing: fix_unidentified_developer.sh\")
-	              file(WRITE \"\${CMAKE_INSTALL_PREFIX}/fix_unidentified_developer.sh\" \"sudo xattr -r -d com.apple.quarantine .\")")
-endif()
-if(WIN32 AND BUILD_SHARED_LIBS)
-	include(Openc2eDetectTargetArchitecture)
-	if(TARGETARCH_X64)
-		install(CODE "message(STATUS \"Downloading: vc_redist.x64.exe\")
-		              file(DOWNLOAD \"https://aka.ms/vs/16/release/vc_redist.x64.exe\" \"\${CMAKE_INSTALL_PREFIX}/vc_redist.x64.exe\")")
-	endif()
-	if(TARGETARCH_ARM64)
-		install(CODE "message(STATUS \"Downloading: vc_redist.arm64.exe\")
-		              file(DOWNLOAD \"https://aka.ms/vs/16/release/vc_redist.arm64.exe\" \"\${CMAKE_INSTALL_PREFIX}/vc_redist.arm64.exe\")")
-	endif()
-endif()
 
 if(WIN32)
 	set(CPACK_GENERATOR ZIP)
 else()
-	set(CPACK_GENERATOR TXZ)
+	set(CPACK_GENERATOR TGZ)
 endif()
 include(Openc2eReadGitRev)
 set(CPACK_PACKAGE_VERSION "${git_short_rev}")
 include(CPack)
-
-# Creating folder for distribution
-include(Openc2eReadGitRev)
-set(dist_name "openc2e-${git_short_rev}-${CMAKE_SYSTEM_NAME}")
-set(dist_dir "${CMAKE_CURRENT_BINARY_DIR}/${dist_name}")
-set(dist_args)
-list(APPEND dist_args
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${dist_dir}/"
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		"${CMAKE_CURRENT_SOURCE_DIR}/AUTHORS"
-		"${CMAKE_CURRENT_SOURCE_DIR}/COPYING"
-		"${CMAKE_CURRENT_SOURCE_DIR}/README.md"
-		"${BIN}/caosdocs.html"
-		"${GEN}/commandinfo.json"
-		"$<TARGET_FILE:openc2e>"
-		"$<TARGET_FILE:cobdumper>"
-		"$<TARGET_FILE:mngdumper>"
-		"$<TARGET_FILE:mngbuild>"
-		"$<TARGET_FILE:praybuilder>"
-		"$<TARGET_FILE:praydumper>"
-		"$<TARGET_FILE:spritedumper>"
-		"${dist_dir}/"
-	DEPENDS "${BIN}/caosdocs.html"
-	COMMAND ${CMAKE_COMMAND}
-		-D "DIST_DIR=${dist_dir}"
-		-D "EXTRA_LIB_DIRS=$<TARGET_FILE_DIR:openc2e>" # MSVC puts built binaries and DLLs under $BUILD_TYPE
-		-P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Openc2eBundle.cmake
-)
-if(APPLE)
-	list(APPEND dist_args
-		COMMAND echo "sudo xattr -r -d com.apple.quarantine ." > "${dist_dir}/fix_unidentified_developer.sh"
-		COMMAND chmod +x "${dist_dir}/fix_unidentified_developer.sh"
-	)
-endif()
-if(WIN32)
-	include(Openc2eDetectTargetArchitecture)
-	if(TARGETARCH_X64)
-		file(WRITE "${BIN}/Openc2eDownloadVCRedistX64.cmake" "file(DOWNLOAD \"https://aka.ms/vs/16/release/vc_redist.x64.exe\" \"${dist_dir}/vc_redist.x64.exe\")")
-		list(APPEND dist_args COMMAND cmake -P "${BIN}/Openc2eDownloadVCRedistX64.cmake")
-	endif()
-	if(TARGETARCH_ARM64)
-		file(WRITE "${BIN}/Openc2eDownloadVCRedistArm64.cmake" "file(DOWNLOAD \"https://aka.ms/vs/16/release/vc_redist.arm64.exe\" \"${dist_dir}/vc_redist.arm64.exe\")")
-		list(APPEND dist_args COMMAND cmake -P "${BIN}/Openc2eDownloadVCRedistARM64.cmake")
-	endif()
-endif()
-if(DEFINED ENV{GITHUB_ENV})
-	list(APPEND dist_args
-		COMMAND echo "DIST_NAME=${dist_name}" >> "$ENV{GITHUB_ENV}"
-	)
-endif()
-add_custom_target(dist ${dist_args})
-
-add_custom_target(dist-xz COMMAND ${CMAKE_COMMAND} -E tar cfvJ "${dist_name}.tar.xz" "${dist_dir}")
-add_dependencies(dist-xz dist)
-
-add_custom_target(dist-zip COMMAND ${CMAKE_COMMAND} -E tar cfv "${dist_name}.zip" --format=zip "${dist_dir}")
-add_dependencies(dist-zip dist)
