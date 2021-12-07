@@ -327,7 +327,11 @@ static char32_t utf16le_to_codepoint(uint8_t** p) {
 	if (c1 >= 0xd800 && c1 < 0xdc00) {
 		uint16_t c2 = read16le(*p);
 		*p += 2;
-		return ((c1 & 0x3ff) << 10) + (c2 & 0x3ff) + 0x10000;
+		if (c2 >= 0xdc00 && c2 < 0xe000) {
+			return ((c1 & 0x3ff) << 10) + (c2 & 0x3ff) + 0x10000;
+		} else {
+			throw std::domain_error("Encountered unpaired surrogate in UTF-16-LE data");
+		}
 	}
 	return c1;
 }
