@@ -32,7 +32,7 @@ namespace fs = ghc::filesystem;
 constexpr int OPENC2E_DEFAULT_WIDTH = 300;
 constexpr int OPENC2E_DEFAULT_HEIGHT = 400;
 
-constexpr const char* ABOUT_TEXT = R"(MNGPlayer2 v1.0
+constexpr const char* ABOUT_TEXT = R"(MNGPlayer2 v1.0.1
 Copyright (C) 2021 the openc2e project
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
