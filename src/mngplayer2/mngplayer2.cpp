@@ -427,7 +427,6 @@ static struct AppState {
 		volume = clamp(volume, 0, 1);
 		mng_music->setMood(mood);
 		mng_music->setThreat(threat);
-
 		mng_music->setVolume(volume);
 	}
 } app_state;
@@ -739,6 +738,7 @@ void InitMNGMusic() {
 	app_state.backend = SDLMixerBackend::getInstance();
 	app_state.backend->init();
 	app_state.mng_music = std::make_unique<MNGMusic>(app_state.backend);
+	app_state.variablesUpdated();
 }
 
 void InitImGui() {
