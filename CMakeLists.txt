@@ -7,7 +7,7 @@ set(GEN "${BIN}/generated")
 
 list(APPEND CMAKE_MODULE_PATH "${SRC}/cmake")
 if(EMSCRIPTEN)
-	list(APPEND CMAKE_MODULE_PATH "${SRC}/cmake-emscripten")
+	list(APPEND CMAKE_MODULE_PATH "${SRC}/cmake/emscripten")
 endif()
 
 if (NOT CMAKE_BUILD_TYPE)
