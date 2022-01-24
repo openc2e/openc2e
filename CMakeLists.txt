@@ -124,6 +124,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/c2cobfile.cpp
 	src/fileformats/genomeFile.cpp
 	src/fileformats/hedfile.cpp
+	src/fileformats/MfcReader.cpp
 	src/fileformats/mngfile.cpp
 	${GEN}/fileformats/mngparser.cpp
 	src/fileformats/paletteFile.cpp
@@ -347,6 +348,9 @@ target_link_libraries(praydumper openc2e-fileformats)
 
 add_executable(praybuilder src/tools/praybuilder.cpp)
 target_link_libraries(praybuilder openc2e-fileformats)
+
+add_executable(sfcdumper src/tools/sfcdumper.cpp)
+target_link_libraries(sfcdumper openc2e-fileformats fmt ghc_filesystem)
 
 add_executable(spritedumper src/tools/spritedumper.cpp)
 target_link_libraries(spritedumper openc2e-fileformats fmt ghc_filesystem)
