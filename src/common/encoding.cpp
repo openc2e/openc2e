@@ -344,3 +344,21 @@ std::string utf16le_to_utf8(uint8_t* data, size_t num_bytes) {
 	}
 	return s;
 }
+
+bool is_valid_ascii(const uint8_t* s, size_t n) {
+	if (s == nullptr) {
+		return false;
+	}
+	size_t pos = 0;
+	while (pos < n) {
+		if (s[pos] > 127) {
+			return false;
+		}
+		pos += 1;
+	}
+	return true;
+}
+
+bool is_valid_ascii(const std::vector<uint8_t>& data) {
+	return is_valid_ascii(data.data(), data.size());
+}

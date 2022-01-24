@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 // If a string is UTF-8, simply return a copy (minus any BOM), otherwise assume
 // it's CP-1252 and convert it.
@@ -21,4 +22,6 @@ std::string utf16le_to_utf8(uint8_t* data, size_t num_bytes);
 
 // helper functions
 bool is_valid_utf8(const std::string& str);
+bool is_valid_ascii(const uint8_t* s, size_t n);
+bool is_valid_ascii(const std::vector<uint8_t>& data);
 bool cp1252_isprint(unsigned char cp1252_char);

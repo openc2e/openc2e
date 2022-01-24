@@ -27,3 +27,9 @@ TEST(encoding, utf8_to_cp1252) {
 TEST(encoding, utf8_to_cp1252_combining_diacriticals) {
 	EXPECT_EQ(utf8_to_cp1252("tre\xcc\x80s cool"), "tr\xe8s cool");
 }
+
+TEST(encoding, is_valid_ascii) {
+	EXPECT_TRUE(is_valid_ascii((uint8_t*)"hello world", 12));
+	EXPECT_FALSE(is_valid_ascii((uint8_t*)"tr\xe8s cool", 10));
+	EXPECT_FALSE(is_valid_ascii((uint8_t*)"tr\xc3\xa8s cool", 11));
+}
