@@ -300,6 +300,9 @@ target_link_libraries(openc2e
 	${CMAKE_DL_LIBS}
 )
 
+add_executable(attparser src/tools/attparser.cpp)
+target_link_libraries(attparser openc2e-fileformats fmt)
+
 add_executable(caos_to_bytecode src/tools/caos_to_bytecode.cpp)
 target_link_libraries(caos_to_bytecode openc2e-core)
 
