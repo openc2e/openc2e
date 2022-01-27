@@ -31,6 +31,7 @@
 
 #include <cassert>
 #include <climits>
+#include <iostream>
 #include <memory>
 
 // TODO: change imagecount?

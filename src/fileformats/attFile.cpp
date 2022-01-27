@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <cctype>
+#include <iostream>
 #include <string>
 
 std::istream& operator>>(std::istream& i, attFile& f) {

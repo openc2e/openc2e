@@ -45,6 +45,7 @@
 
 #include <cassert>
 #include <fmt/core.h>
+#include <iostream>
 #include <memory>
 #include <typeinfo> // TODO: remove when genome system is fixed
 

@@ -37,8 +37,6 @@
 #include <fmt/core.h>
 #include <memory>
 
-using std::cerr;
-
 AnimatablePart* caosVM::getCurrentAnimatablePart() {
 	valid_agent(targ);
 	CompoundPart* p = targ->part(part);

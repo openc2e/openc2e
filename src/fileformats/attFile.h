@@ -16,7 +16,7 @@
  *  Lesser General Public License for more details.
  *
  */
-#include <iostream>
+#include <iosfwd>
 
 class attFile {
   public:
