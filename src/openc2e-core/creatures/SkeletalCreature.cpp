@@ -250,7 +250,7 @@ void SkeletalCreature::skeletonInit() {
 		// load ATT file
 		if (attfile.fail())
 			throw Exception(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attfile.name().string()));
-		attfile >> att[i];
+		att[i] = ReadAttFile(attfile);
 
 		images[i] = tintBodySprite(images[i]);
 	}

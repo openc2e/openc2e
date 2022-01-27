@@ -16,14 +16,19 @@
  *  Lesser General Public License for more details.
  *
  */
+
+#pragma once
+
+#include <array>
 #include <iosfwd>
+#include <vector>
 
 class attFile {
   public:
-	unsigned int attachments[16][20];
-	unsigned int noattachments[16];
-	unsigned int nolines;
-	friend std::istream& operator>>(std::istream&, attFile&);
+	std::array<std::array<unsigned int, 12>, 16> attachments = {};
+	std::array<unsigned int, 16> noattachments = {};
+	unsigned int nolines = 0;
+	std::vector<uint8_t> extra_data;
 };
 
-/* vim: set noet: */
+attFile ReadAttFile(std::istream& in);
