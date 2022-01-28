@@ -118,7 +118,6 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
 	src/fileformats/blkImage.cpp
 	src/fileformats/bmpImage.cpp
-	${GEN}/fileformats/Caos2PrayParser.cpp
 	${GEN}/fileformats/caoslexer.cpp
 	src/fileformats/caostoken.cpp
 	${GEN}/fileformats/catalogueFile.cpp
@@ -439,13 +438,6 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
 	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mngparser.cpp ${SRC}/src/fileformats/mngparser.re2c.cpp
 	DEPENDS ${SRC}/src/fileformats/mngparser.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
-add_custom_command(
-	OUTPUT ${GEN}/fileformats/Caos2PrayParser.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/Caos2PrayParser.cpp ${SRC}/src/fileformats/Caos2PrayParser.re2c.cpp
-	DEPENDS ${SRC}/src/fileformats/Caos2PrayParser.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(

@@ -1,5 +1,4 @@
 #include "common/overload.h"
-#include "fileformats/Caos2PrayParser.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
 
@@ -27,20 +26,11 @@ int main(int argc, char** argv) {
 		std::string output_filename;
 		if (argc == 3) {
 			output_filename = argv[2];
-		}
-		std::vector<PraySourceParser::Event> events;
-		if (fs::path(argv[1]).extension() == ".txt") {
-			events = PraySourceParser::parse(str);
-		} else if (fs::path(argv[1]).extension() == ".cos") {
-			events = Caos2PrayParser::parse(str, output_filename.size() ? nullptr : &output_filename);
 		} else {
-			std::cout << "Don't know how to handle input file \"" << argv[1] << "\"" << std::endl;
-			exit(1);
-		}
-		if (!output_filename.size()) {
 			output_filename = fs::path(argv[1]).stem().string() + ".agents";
 		}
 
+		auto events = PraySourceParser::parse(str);
 		if (mpark::holds_alternative<PraySourceParser::Error>(events[0])) {
 			std::cout << "Error: "
 					  << mpark::get<PraySourceParser::Error>(events[0]).message << "\n";

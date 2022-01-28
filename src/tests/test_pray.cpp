@@ -1,6 +1,5 @@
 #include "common/spanstream.h"
 #include "common/vectorstream.h"
-#include "fileformats/Caos2PrayParser.h"
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
@@ -43,22 +42,6 @@ TEST(praysourceparser, character_escapes) {
         "Agent Description" "A \"really cool\" agent\nThis is a backslash\\"
     )");
 	auto string_tag = matchEvent<PraySourceParser::StringTag>(events);
-	if (!string_tag)
-		FAIL() << "No such event in:\n" + eventsToString(events);
-	ASSERT_EQ(string_tag->value,
-		"A \"really cool\" agent\nThis is a backslash\\");
-}
-
-TEST(caos2prayparser, character_escapes) {
-	auto events = Caos2PrayParser::parse(R"(
-        *# DS-Name "My Agent"
-        *# Agent Description = "A \"really cool\" agent\nThis is a backslash\\"
-    )",
-		nullptr);
-	auto string_tag = matchEvent<PraySourceParser::StringTag>(
-		events, [](const PraySourceParser::StringTag& e) {
-			return e.key == "Agent Description";
-		});
 	if (!string_tag)
 		FAIL() << "No such event in:\n" + eventsToString(events);
 	ASSERT_EQ(string_tag->value,
@@ -117,34 +100,6 @@ TEST(praysourceparser, utf8_to_utf8) {
 	if (!string_tag)
 		FAIL() << "No such event in:\n" + eventsToString(events);
 	ASSERT_EQ(string_tag->value, "Mon agent est tr\xc3\xa8s cool");
-}
-
-TEST(caos2prayparser, cp1252_to_utf8) {
-	auto events = Caos2PrayParser::parse(std::string(R"(
-        *# DS-Name "My Agent"
-        *# Agent Description-fr = )") + "\"Un tr\xe8s cool agent\"",
-		nullptr);
-	auto string_tag = matchEvent<PraySourceParser::StringTag>(
-		events, [](const PraySourceParser::StringTag& e) {
-			return e.key == "Agent Description-fr";
-		});
-	if (!string_tag)
-		FAIL() << "No such event in:\n" + eventsToString(events);
-	ASSERT_EQ(string_tag->value, "Un tr\xc3\xa8s cool agent");
-}
-
-TEST(caos2prayparser, utf8_to_utf8) {
-	auto events = Caos2PrayParser::parse(std::string(R"(
-        *# DS-Name "My Agent"
-        *# Agent Description-fr = )") + "\"Un tr\xc3\xa8s cool agent\"",
-		nullptr);
-	auto string_tag = matchEvent<PraySourceParser::StringTag>(
-		events, [](const PraySourceParser::StringTag& e) {
-			return e.key == "Agent Description-fr";
-		});
-	if (!string_tag)
-		FAIL() << "No such event in:\n" + eventsToString(events);
-	ASSERT_EQ(string_tag->value, "Un tr\xc3\xa8s cool agent");
 }
 
 TEST(praywriter, utf8_to_cp1252) {
