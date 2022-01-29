@@ -1,6 +1,5 @@
 #include "PraySourceParser.h"
 #include "common/encoding.h"
-#include "common/overload.h"
 
 #include <cassert>
 #include <fmt/format.h>
@@ -347,13 +346,28 @@ std::vector<PraySourceParser::Event> PraySourceParser::parse(const std::string& 
 }
 
 std::string PraySourceParser::eventToString(const Event& event) {
-	return visit(overload(
-					 [](Error e) { return fmt::format("Error({})", e.message); },
-					 [](GroupBlockStart e) { return fmt::format("GroupBlockStart({}, {})", e.type, e.name); },
-					 [](GroupBlockEnd e) { return fmt::format("GroupBlockEnd({}, {})", e.type, e.name); },
-					 [](InlineBlock e) { return fmt::format("InlineBlock({}, {}, {})", e.type, e.name, e.filename); },
-					 [](StringTag e) { return fmt::format("StringTag({}, {})", e.key, e.value); },
-					 [](StringTagFromFile e) { return fmt::format("StringTagFromFile({}, {})", e.key, e.filename); },
-					 [](IntegerTag e) { return fmt::format("IntegerTag({}, {})", e.key, e.value); }),
-		event);
+	if (auto* e = mpark::get_if<Error>(&event)) {
+		return fmt::format("Error({})", e->message);
+
+	} else if (auto* e = mpark::get_if<GroupBlockStart>(&event)) {
+		return fmt::format("GroupBlockStart({}, {})", e->type, e->name);
+
+	} else if (auto* e = mpark::get_if<GroupBlockEnd>(&event)) {
+		return fmt::format("GroupBlockEnd({}, {})", e->type, e->name);
+
+	} else if (auto* e = mpark::get_if<InlineBlock>(&event)) {
+		return fmt::format("InlineBlock({}, {}, {})", e->type, e->name, e->filename);
+
+	} else if (auto* e = mpark::get_if<StringTag>(&event)) {
+		return fmt::format("StringTag({}, {})", e->key, e->value);
+
+	} else if (auto* e = mpark::get_if<StringTagFromFile>(&event)) {
+		return fmt::format("StringTagFromFile({}, {})", e->key, e->filename);
+
+	} else if (auto* e = mpark::get_if<IntegerTag>(&event)) {
+		return fmt::format("IntegerTag({}, {})", e->key, e->value);
+
+	} else {
+		return fmt::format("???");
+	}
 }

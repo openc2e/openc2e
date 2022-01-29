@@ -204,29 +204,6 @@ struct CAOSExpression {
 		: value(c), traceidx(idx) {}
 };
 
-class caosScript;
-
-struct saveVisit {
-  private:
-	caosScript* scr;
-
-  public:
-	saveVisit(class caosScript* s);
-	void operator()(const CAOSCmd& cmd) const;
-	void operator()(const caosValue& v) const { (void)v; }
-};
-
-struct evalVisit {
-  private:
-	caosScript* scr;
-	bool save_here;
-
-  public:
-	evalVisit(caosScript* s, bool save_here);
-	void operator()(const CAOSCmd& cmd) const;
-	void operator()(const caosValue& v) const;
-};
-
 class caosScript { //: Collectable {
   public:
 	const Dialect* d;
@@ -278,8 +255,8 @@ class caosScript { //: Collectable {
 	void putBackToken(caostoken*);
 	caostoken* getToken(logicaltokentype expected = ANYTOKEN);
 
-	friend struct saveVisit;
-	friend struct evalVisit;
+	friend void CAOSExpression::save(caosScript*) const;
+	friend void CAOSExpression::eval(caosScript* scr, bool save_here) const;
 };
 
 #endif

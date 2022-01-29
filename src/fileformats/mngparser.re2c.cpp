@@ -1,5 +1,4 @@
 #include "common/Exception.h"
-#include "common/overload.h"
 #include "mngparser.h"
 
 #include <assert.h>
@@ -579,22 +578,21 @@ std::vector<std::string> MNGScript::getWaveNames() const {
 	std::unordered_set<std::string> seen;
 	for (auto t : tracks) {
 		for (auto& l : t.layers) {
-			visit(overload(
-					  [&](const MNGAleotoricLayer& al) {
-						  for (auto v : al.voices) {
-							  if (seen.find(v.wave) == seen.end()) {
-								  seen.insert(v.wave);
-								  names.push_back(v.wave);
-							  }
-						  }
-					  },
-					  [&](const MNGLoopLayer& ll) {
-						  if (seen.find(ll.wave) == seen.end()) {
-							  seen.insert(ll.wave);
-							  names.push_back(ll.wave);
-						  }
-					  }),
-				l);
+			if (const MNGAleotoricLayer* al = mpark::get_if<MNGAleotoricLayer>(&l)) {
+				for (auto v : al->voices) {
+					if (seen.find(v.wave) == seen.end()) {
+						seen.insert(v.wave);
+						names.push_back(v.wave);
+					}
+				}
+			} else if (const MNGLoopLayer* ll = mpark::get_if<MNGLoopLayer>(&l)) {
+				if (seen.find(ll->wave) == seen.end()) {
+					seen.insert(ll->wave);
+					names.push_back(ll->wave);
+				}
+			} else {
+				std::terminate();
+			}
 		}
 	}
 	return names;

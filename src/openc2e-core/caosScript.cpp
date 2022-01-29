@@ -135,65 +135,6 @@ void caosScript::installInstallScript(unsigned char family, unsigned char genus,
 	world.scriptorium->addScript(installer->fmly, installer->gnus, installer->spcs, installer->scrp, installer);
 }
 
-
-saveVisit::saveVisit(caosScript* s)
-	: scr(s) {
-}
-
-void saveVisit::operator()(const CAOSCmd& cmd) const {
-	scr->errindex = scr->traceindex = cmd.traceidx - 1;
-	if (cmd.op->rettype != CI_VARIABLE) {
-		throw parseException(std::string("RValue ") + cmd.op->fullname + " used where LValue expected");
-	}
-	scr->emitOp(CAOS_RESTORE_AUX, cmd.arguments.size());
-	scr->emitOp(CAOS_SAVE_CMD, scr->d->cmd_index(cmd.op));
-}
-
-evalVisit::evalVisit(caosScript* s, bool save_here_)
-	: scr(s), save_here(save_here_) {
-}
-
-
-void evalVisit::operator()(const CAOSCmd& cmd) const {
-	for (size_t i = 0; i < cmd.arguments.size(); i++) {
-		bool save_there = (i < (size_t)cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE);
-		cmd.arguments[i]->eval(scr, save_there);
-	}
-	scr->traceindex = cmd.traceidx - 1;
-	// If we're to be invoked to save our result later,
-	// stash our args for that time.
-	if (save_here) {
-		// Note: These indices refer to stack positions, with 0 being the top.
-		// We thus transfer the arguments in reverse order, as the order will again be
-		// reversed when the stack is restored.
-		for (size_t i = 0; i < cmd.arguments.size(); i++)
-			scr->emitOp(CAOS_PUSH_AUX, i);
-	}
-	scr->emitOp(CAOS_CMD, scr->d->cmd_index(cmd.op));
-	// If we emit variable-result arguments as well, we need to move our
-	// result down below them.
-	// This is theoretical at the moment - no expression-type commands also
-	// write back to their args.
-
-	if (cmd.op->rettype != CI_COMMAND) {
-		int rotcount = 0;
-		for (int i = 0; i < cmd.op->argc; i++) {
-			if (cmd.op->argtypes[i] == CI_VARIABLE)
-				rotcount++;
-		}
-		if (rotcount)
-			scr->emitOp(CAOS_STACK_ROT, rotcount);
-	}
-	for (int i = cmd.arguments.size() - 1; i >= 0; i--) {
-		if (i < cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE)
-			cmd.arguments[i]->save(scr);
-	}
-}
-
-void evalVisit::operator()(const caosValue& v) const {
-	scr->emitConst(v);
-}
-
 void caosScript::emitConst(const caosValue& v) {
 	if (v.hasInt()) {
 		int val = v.getInt();
@@ -914,11 +855,63 @@ void caosScript::emitCmd(const char* name) {
 }
 
 void CAOSExpression::eval(caosScript* scr, bool save_here) const {
-	mpark::visit(evalVisit(scr, save_here), value);
+	if (auto* cmd_p = mpark::get_if<CAOSCmd>(&value)) {
+		const auto& cmd = *cmd_p;
+		for (size_t i = 0; i < cmd.arguments.size(); i++) {
+			bool save_there = (i < (size_t)cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE);
+			cmd.arguments[i]->eval(scr, save_there);
+		}
+		scr->traceindex = cmd.traceidx - 1;
+		// If we're to be invoked to save our result later,
+		// stash our args for that time.
+		if (save_here) {
+			// Note: These indices refer to stack positions, with 0 being the top.
+			// We thus transfer the arguments in reverse order, as the order will again be
+			// reversed when the stack is restored.
+			for (size_t i = 0; i < cmd.arguments.size(); i++)
+				scr->emitOp(CAOS_PUSH_AUX, i);
+		}
+		scr->emitOp(CAOS_CMD, scr->d->cmd_index(cmd.op));
+		// If we emit variable-result arguments as well, we need to move our
+		// result down below them.
+		// This is theoretical at the moment - no expression-type commands also
+		// write back to their args.
+
+		if (cmd.op->rettype != CI_COMMAND) {
+			int rotcount = 0;
+			for (int i = 0; i < cmd.op->argc; i++) {
+				if (cmd.op->argtypes[i] == CI_VARIABLE)
+					rotcount++;
+			}
+			if (rotcount)
+				scr->emitOp(CAOS_STACK_ROT, rotcount);
+		}
+		for (int i = cmd.arguments.size() - 1; i >= 0; i--) {
+			if (i < cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE)
+				cmd.arguments[i]->save(scr);
+		}
+
+	} else if (auto* v = mpark::get_if<caosValue>(&value)) {
+		scr->emitConst(*v);
+	} else {
+		std::terminate();
+	}
 }
 
 void CAOSExpression::save(caosScript* scr) const {
-	mpark::visit(saveVisit(scr), value);
+	if (auto* cmd = mpark::get_if<CAOSCmd>(&value)) {
+		scr->errindex = scr->traceindex = cmd->traceidx - 1;
+		if (cmd->op->rettype != CI_VARIABLE) {
+			throw parseException(std::string("RValue ") + cmd->op->fullname + " used where LValue expected");
+		}
+		scr->emitOp(CAOS_RESTORE_AUX, cmd->arguments.size());
+		scr->emitOp(CAOS_SAVE_CMD, scr->d->cmd_index(cmd->op));
+
+	} else if (auto* v = mpark::get_if<caosValue>(&value)) {
+		(void)v;
+	} else {
+		std::terminate();
+	}
 }
 
 

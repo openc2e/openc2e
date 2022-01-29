@@ -21,9 +21,10 @@
 
 #include "Engine.h" // version
 #include "World.h" // unid
-#include "common/overload.h"
 
 #include <fmt/core.h>
+
+using namespace mpark;
 
 const char* variableTypeToString(variableType type) {
 	switch (type) {
@@ -46,109 +47,26 @@ const char* variableTypeToString(variableType type) {
 	}
 }
 
-struct typeVisit {
-	variableType operator()(int) const { return CAOSINT; }
-	variableType operator()(float) const { return CAOSFLOAT; }
-	variableType operator()(const std::string&) const { return CAOSSTR; }
-	variableType operator()(const AgentRef&) const { return CAOSAGENT; }
-	variableType operator()(nulltype_tag) const { return CAOSNULL; }
-	variableType operator()(const bytestring_t&) const { return CAOSBYTESTRING; }
-	variableType operator()(const FaceValue&) const { return CAOSFACEVALUE; }
-	variableType operator()(const Vector<float>&) const { return CAOSVEC; }
-};
-
-#define BAD_TYPE(et, gt) \
-	std::conditional<std::is_fundamental<et>::value, et, std::add_lvalue_reference<std::add_const<et>::type>::type>::type \
-	operator()(const gt&) const { \
-		throw wrongCaosValueTypeException( \
-			"Wrong caosValue type: Expected " #et ", got " #gt); \
-	}
-
-struct intVisit {
-	int operator()(int i) const { return i; }
-	int operator()(float f) const {
-		// horror necessary for rounding without C99
-		int x = (int)f;
-		float diff = f - x;
-		if (f >= 0.0f) {
-			if (diff >= 0.5f)
-				return ++x;
-			else
-				return x;
-		} else {
-			if (diff <= -0.5f)
-				return --x;
-			else
-				return x;
-		}
-	}
-	int operator()(const FaceValue& fv) const { return fv.pose; }
-	int operator()(const Vector<float>& v) const {
-		return (int)v.getMagnitude();
-	}
-	BAD_TYPE(int, std::string);
-	BAD_TYPE(int, AgentRef);
-	BAD_TYPE(int, bytestring_t);
-	BAD_TYPE(int, nulltype_tag);
-};
-
-struct floatVisit {
-	float operator()(int i) const { return (float)i; }
-	float operator()(float f) const { return f; }
-	float operator()(const Vector<float>& v) const { return v.getMagnitude(); }
-	float operator()(const FaceValue& fv) const { return fv.pose; }
-	BAD_TYPE(float, std::string);
-	BAD_TYPE(float, AgentRef);
-	BAD_TYPE(float, bytestring_t);
-	BAD_TYPE(float, nulltype_tag);
-};
-
-struct stringVisit {
-	const std::string& operator()(const std::string& s) const {
-		return s;
-	}
-	const std::string& operator()(const FaceValue& fv) const {
-		return fv.sprite_filename;
-	}
-	BAD_TYPE(std::string, AgentRef);
-	BAD_TYPE(std::string, nulltype_tag);
-	BAD_TYPE(std::string, int);
-	BAD_TYPE(std::string, float);
-	BAD_TYPE(std::string, bytestring_t);
-	BAD_TYPE(std::string, Vector<float>);
-};
-
-struct agentVisit {
-	const AgentRef& operator()(const AgentRef& a) const {
-		return a;
-	}
-	BAD_TYPE(AgentRef, std::string);
-	BAD_TYPE(AgentRef, nulltype_tag);
-	const AgentRef& operator()(int i) const;
-	BAD_TYPE(AgentRef, float);
-	BAD_TYPE(AgentRef, bytestring_t);
-	BAD_TYPE(AgentRef, FaceValue);
-	BAD_TYPE(AgentRef, Vector<float>);
-};
-
-struct vectorVisit {
-	const Vector<float>& operator()(const Vector<float>& v) const {
-		return v;
-	}
-	BAD_TYPE(Vector<float>, std::string);
-	BAD_TYPE(Vector<float>, nulltype_tag);
-	BAD_TYPE(Vector<float>, int);
-	BAD_TYPE(Vector<float>, float);
-	BAD_TYPE(Vector<float>, bytestring_t);
-	BAD_TYPE(Vector<float>, FaceValue);
-	BAD_TYPE(Vector<float>, AgentRef);
-};
-
-
-#undef BAD_TYPE
-
 variableType caosValue::getType() const {
-	return visit(typeVisit(), value);
+	if (mpark::holds_alternative<int>(value)) {
+		return CAOSINT;
+	} else if (mpark::holds_alternative<float>(value)) {
+		return CAOSFLOAT;
+	} else if (mpark::holds_alternative<std::string>(value)) {
+		return CAOSSTR;
+	} else if (mpark::holds_alternative<AgentRef>(value)) {
+		return CAOSAGENT;
+	} else if (mpark::holds_alternative<nulltype_tag>(value)) {
+		return CAOSNULL;
+	} else if (mpark::holds_alternative<bytestring_t>(value)) {
+		return CAOSBYTESTRING;
+	} else if (mpark::holds_alternative<FaceValue>(value)) {
+		return CAOSFACEVALUE;
+	} else if (mpark::holds_alternative<Vector<float>>(value)) {
+		return CAOSVEC;
+	} else {
+		throw wrongCaosValueTypeException(fmt::format("getType not implemented for: {}", dump()));
+	}
 }
 
 void caosValue::reset() {
@@ -250,11 +168,44 @@ void caosValue::setVector(const Vector<float>& v) {
 }
 
 int caosValue::getInt() const {
-	return visit(intVisit(), value);
+	if (auto* i = mpark::get_if<int>(&value)) {
+		return *i;
+	} else if (auto* f = mpark::get_if<float>(&value)) {
+		// horror necessary for rounding without C99
+		int x = *f;
+		float diff = *f - x;
+		if (*f >= 0.0f) {
+			if (diff >= 0.5f)
+				return ++x;
+			else
+				return x;
+		} else {
+			if (diff <= -0.5f)
+				return --x;
+			else
+				return x;
+		}
+	} else if (auto* fv = mpark::get_if<FaceValue>(&value)) {
+		return fv->pose;
+	} else if (auto* v = mpark::get_if<Vector<float>>(&value)) {
+		return v->getMagnitude();
+	} else {
+		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected integer, got {}", dump()));
+	}
 }
 
 float caosValue::getFloat() const {
-	return visit(floatVisit(), value);
+	if (auto* i = mpark::get_if<int>(&value)) {
+		return *i;
+	} else if (auto* f = mpark::get_if<float>(&value)) {
+		return *f;
+	} else if (auto* v = mpark::get_if<Vector<float>>(&value)) {
+		return v->getMagnitude();
+	} else if (auto* fv = mpark::get_if<FaceValue>(&value)) {
+		return fv->pose;
+	} else {
+		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected integer, got {}", dump()));
+	}
 }
 
 void caosValue::getString(std::string& s) const {
@@ -262,28 +213,51 @@ void caosValue::getString(std::string& s) const {
 }
 
 const std::string& caosValue::getString() const {
-	return visit(stringVisit(), value);
+	if (auto* s = mpark::get_if<std::string>(&value)) {
+		return *s;
+	} else if (auto* fv = mpark::get_if<FaceValue>(&value)) {
+		return fv->sprite_filename;
+	} else {
+		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected string, got {}", dump()));
+	}
 }
 
 std::shared_ptr<Agent> caosValue::getAgent() const {
 	return getAgentRef().lock();
 }
 
+static AgentRef nullagentref;
+
 const AgentRef& caosValue::getAgentRef() const {
-	return visit(agentVisit(), value);
+	if (auto* a = mpark::get_if<AgentRef>(&value)) {
+		return *a;
+	} else if (auto* i = mpark::get_if<int>(&value)) {
+		// TODO: muh
+		if (engine.version == 2) {
+			if (i == 0) {
+				return nullagentref;
+			}
+
+			// TODO: unid magic?
+		}
+	}
+	throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected agent, got {}", dump()));
 }
 
 const bytestring_t& caosValue::getByteStr() const {
-	return visit(overload(
-					 [](const bytestring_t& bs) -> const bytestring_t& { return bs; },
-					 [](const auto&) -> const bytestring_t& {
-						 throw wrongCaosValueTypeException("Wrong caosValue type: Expected bytestring");
-					 }),
-		value);
+	if (auto* bs = mpark::get_if<bytestring_t>(&value)) {
+		return *bs;
+	} else {
+		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected bytestring, got {}", dump()));
+	}
 }
 
 const Vector<float>& caosValue::getVector() const {
-	return visit(vectorVisit(), value);
+	if (auto* v = mpark::get_if<Vector<float>>(&value)) {
+		return *v;
+	} else {
+		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected vector, got {}", dump()));
+	}
 }
 
 std::string caosValue::dump() const {
@@ -372,21 +346,6 @@ bool caosValue::operator<(const caosValue& v) const {
 	}
 
 	throw caosException(std::string("caosValue operator < couldn't compare ") + this->dump() + "and " + v.dump());
-}
-
-AgentRef nullagentref;
-
-// TODO: muh
-const AgentRef& agentVisit::operator()(int i) const {
-	if (engine.version == 2) {
-		if (i == 0) {
-			return nullagentref;
-		}
-
-		// TODO: unid magic?
-	}
-
-	throw wrongCaosValueTypeException("Wrong caosValue type: Expected agent, got int");
 }
 
 /* vim: set noet: */

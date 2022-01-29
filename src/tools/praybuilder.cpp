@@ -1,4 +1,3 @@
-#include "common/overload.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
 
@@ -49,58 +48,59 @@ int main(int argc, char** argv) {
 		std::map<std::string, unsigned int> int_tags;
 
 		for (auto res : events) {
-			visit(overload(
-					  [](PraySourceParser::Error) {
-						  /* handled already */
-					  },
-					  [&](PraySourceParser::GroupBlockStart) {
-						  string_tags = {};
-						  int_tags = {};
-					  },
-					  [&](PraySourceParser::GroupBlockEnd event) {
-						  writer.writeBlockTags(event.type, event.name, int_tags, string_tags);
-						  std::cout << "Tag block " << event.type << " \""
-									<< event.name << "\"\n";
-					  },
-					  [&](PraySourceParser::InlineBlock event) {
-						  std::cout << "Inline block " << event.type << " \""
-									<< event.name << "\" from file \"" << event.filename
-									<< "\"\n";
+			if (mpark::holds_alternative<PraySourceParser::Error>(res)) {
+				// handled already
 
-						  // TODO: check in same directory
-						  std::ifstream in((parent_path / event.filename).string());
-						  if (!in) {
-							  std::cout << "Couldn't open file \""
-										<< (parent_path / event.filename).string() << "\""
-										<< std::endl;
-							  exit(1);
-						  }
-						  std::vector<unsigned char> data((std::istreambuf_iterator<char>(in)),
-							  std::istreambuf_iterator<char>());
+			} else if (mpark::holds_alternative<PraySourceParser::GroupBlockStart>(res)) {
+				string_tags = {};
+				int_tags = {};
 
-						  writer.writeBlockRawData(event.type, event.name, data);
-					  },
-					  [&](PraySourceParser::StringTag event) {
-						  string_tags[event.key] = event.value;
-					  },
-					  [&](PraySourceParser::StringTagFromFile event) {
-						  // TODO: check in same directory
-						  std::ifstream in((parent_path / event.filename).string());
-						  if (!in) {
-							  std::cout << "Couldn't open file \""
-										<< (parent_path / event.filename).string() << "\""
-										<< std::endl;
-							  exit(1);
-						  }
-						  std::string val((std::istreambuf_iterator<char>(in)),
-							  std::istreambuf_iterator<char>());
+			} else if (auto* event = mpark::get_if<PraySourceParser::GroupBlockEnd>(&res)) {
+				writer.writeBlockTags(event->type, event->name, int_tags, string_tags);
+				std::cout << "Tag block " << event->type << " \""
+						  << event->name << "\"\n";
 
-						  string_tags[event.key] = val;
-					  },
-					  [&](PraySourceParser::IntegerTag event) {
-						  int_tags[event.key] = event.value;
-					  }),
-				res);
+			} else if (auto* event = mpark::get_if<PraySourceParser::InlineBlock>(&res)) {
+				std::cout << "Inline block " << event->type << " \""
+						  << event->name << "\" from file \"" << event->filename
+						  << "\"\n";
+
+				// TODO: check in same directory
+				std::ifstream in((parent_path / event->filename).string());
+				if (!in) {
+					std::cout << "Couldn't open file \""
+							  << (parent_path / event->filename).string() << "\""
+							  << std::endl;
+					exit(1);
+				}
+				std::vector<unsigned char> data((std::istreambuf_iterator<char>(in)),
+					std::istreambuf_iterator<char>());
+
+				writer.writeBlockRawData(event->type, event->name, data);
+
+			} else if (auto* event = mpark::get_if<PraySourceParser::StringTag>(&res)) {
+				string_tags[event->key] = event->value;
+
+			} else if (auto* event = mpark::get_if<PraySourceParser::StringTagFromFile>(&res)) {
+				// TODO: check in same directory
+				std::ifstream in((parent_path / event->filename).string());
+				if (!in) {
+					std::cout << "Couldn't open file \""
+							  << (parent_path / event->filename).string() << "\""
+							  << std::endl;
+					exit(1);
+				}
+				std::string val((std::istreambuf_iterator<char>(in)),
+					std::istreambuf_iterator<char>());
+
+				string_tags[event->key] = val;
+
+			} else if (auto* event = mpark::get_if<PraySourceParser::IntegerTag>(&res)) {
+				int_tags[event->key] = event->value;
+
+			} else {
+				std::cout << "Not Implemented: " << eventToString(res) << std::endl;
+			}
 		}
 
 		std::cout << "Done!" << std::endl;
