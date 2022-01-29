@@ -20,7 +20,7 @@ TextPart::TextPart(Agent* p, unsigned int _id, std::string spritefile, unsigned 
 		// TODO: if the sprite only has 96 frames, should we map text from CP-1252 to ASCII?
 		// Creatures 3's WhiteOnTransparentPasswordChars.s16 has only 96 frames (which matches ASCII printable characters + 0x7f/DEL)
 		// some other sprites on English installs of Creatures 3 have been reported to also only have 96 frames
-		fmt::print("warning: \"{}\" only has {} sprites, not enough to cover the full CP-1252 character set\n");
+		fmt::print("warning: \"{}\" only has {} sprites, not enough to cover the full CP-1252 character set\n", fontsprite, textsprite->numframes());
 	}
 	THROW_IFNOT(textsprite->numframes() == 224 || textsprite->numframes() == 96);
 
