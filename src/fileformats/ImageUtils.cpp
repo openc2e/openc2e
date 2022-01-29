@@ -53,51 +53,6 @@ MultiImage ReadImage(std::string path) {
 	throw Exception("Don't know how to read image '" + path + "'");
 }
 
-Image ToRGB24(const Image& oldimage) {
-	if (oldimage.format == if_rgb24)
-		return oldimage;
-
-	if (!(oldimage.format == if_rgb565 || oldimage.format == if_rgb555 || oldimage.format == if_bgr24)) {
-		throw Exception("Don't know how to convert non-RGB565-or-RGB555 format into RGB24");
-	}
-
-	Image newimage = oldimage;
-	newimage.data = shared_array<uint8_t>(newimage.width * newimage.height * 3);
-
-	for (size_t j = 0; j < oldimage.width * oldimage.height; ++j) {
-		uint16_t pixel = *(((uint16_t*)oldimage.data.data()) + j);
-		if (oldimage.format == if_rgb565) {
-			uint16_t r = (pixel & 0xF800) >> 11;
-			uint16_t g = (pixel & 0x07E0) >> 5;
-			uint16_t b = (pixel & 0x001F);
-			r = r * 255 / 31;
-			g = g * 255 / 63;
-			b = b * 255 / 31;
-			newimage.data[j * 3] = r;
-			newimage.data[j * 3 + 1] = g;
-			newimage.data[j * 3 + 2] = b;
-		} else if (oldimage.format == if_rgb555) {
-			uint16_t r = (pixel & 0x7C00) >> 10;
-			uint16_t g = (pixel & 0x03E0) >> 5;
-			uint16_t b = (pixel & 0x001F);
-			r = r * 255 / 31;
-			g = g * 255 / 31;
-			b = b * 255 / 31;
-			newimage.data[j * 3] = r;
-			newimage.data[j * 3 + 1] = g;
-			newimage.data[j * 3 + 2] = b;
-		} else if (oldimage.format == if_bgr24) {
-			uint8_t r = oldimage.data[j * 3 + 2];
-			uint8_t g = oldimage.data[j * 3 + 1];
-			uint8_t b = oldimage.data[j * 3];
-			newimage.data[j * 3] = r;
-			newimage.data[j * 3 + 1] = g;
-			newimage.data[j * 3 + 2] = b;
-		}
-	}
-	return newimage;
-}
-
 bool IsBackground(const MultiImage& images) {
 	if (images.size() == 464 || images.size() == 928) {
 		for (const auto& image : images) {

@@ -2,7 +2,7 @@
 #include "fileformats/ImageUtils.h"
 #include "fileformats/c1defaultpalette.h"
 #include "fileformats/paletteFile.h"
-#include "fileformats/pngImage.h"
+#include "tgaImage.h"
 
 #include <fmt/format.h>
 #include <fstream>
@@ -118,29 +118,17 @@ int main(int argc, char** argv) {
 	stitch_to_sheet(image);
 
 	shared_array<Color> palette;
-	if (image[0].format == if_index8) {
-		// TODO: case-sensitivity for the lose
-		if (fs::exists(input_path.replace_filename("PALETTE.DTA"))) {
-			palette = ReadPaletteFile(input_path.replace_filename("PALETTE.DTA"));
-		} else {
-			palette = getCreatures1DefaultPalette();
-		}
-		for (auto& i : image) {
-			i.palette = palette;
-		}
-	}
 
 	for (size_t i = 0; i < image.size(); ++i) {
 		std::string frame_filename = [&]() {
 			if (image.size() == 1) {
-				return stem + ".png";
+				return stem + ".tga";
 			} else {
-				return stem + fmt::format("_{:03}.png", i);
+				return stem + fmt::format("_{:03}.tga", i);
 			}
 		}();
 		fmt::print("{}\n", frame_filename);
 
-		std::ofstream out(frame_filename, std::ios::binary);
-		WritePngFile(image[i], out);
+		WriteTgaFile(image[i], frame_filename);
 	}
 }
