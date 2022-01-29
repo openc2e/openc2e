@@ -51,8 +51,6 @@ else()
 endif()
 
 if(WIN32 OR APPLE)
-	add_subdirectory(externals/libpng EXCLUDE_FROM_ALL)
-
 	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
 	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
 	if(BUILD_SHARED_LIBS)
@@ -62,8 +60,6 @@ if(WIN32 OR APPLE)
 	endif()
 	add_library(SDL2::Mixer ALIAS SDL2_mixer)
 else()
-	find_package(PNG REQUIRED)
-
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
 endif()
@@ -144,7 +140,7 @@ add_library(openc2e-fileformats STATIC
 target_include_directories(openc2e-fileformats PRIVATE src/fileformats)
 target_link_libraries(openc2e-fileformats
 	PUBLIC fmt ghc_filesystem openc2e-common
-	PRIVATE ZLIB::ZLIB PNG::PNG
+	PRIVATE ZLIB::ZLIB
 )
 
 add_library(openc2e-mngmusic STATIC
