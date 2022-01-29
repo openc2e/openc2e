@@ -128,10 +128,18 @@ unsigned int TextPart::calculateWordWidth(std::string word) {
 
 	unsigned int x = 0;
 	for (unsigned int i = 0; i < word.size(); i++) {
-		if (((unsigned char)word[i]) < 32)
+		if (((unsigned char)word[i]) < 32) {
+			// TODO: better way to log warnings from inside CAOS
+			fmt::print("warning: requested sprite for nonprintable character 0x{:02x}\n", word[i]);
 			continue; // TODO: replace with space or similar?
-		int spriteid = ((unsigned char)word[i]) - 32;
+		}
+		unsigned int spriteid = ((unsigned char)word[i]) - 32;
 
+		if (spriteid >= textsprite->numframes()) {
+			// TODO: better way to log warnings from inside CAOS
+			fmt::print("warning: \"{}\" only has {} sprites, but requested sprite {} for character 0x{:02x}\n", textsprite->getName(), textsprite->numframes(), spriteid, word[i]);
+			continue; // TODO: replace with space or similar?
+		}
 		x += textsprite->width(spriteid);
 		if (i != 0)
 			x += charspacing;
@@ -274,12 +282,14 @@ void TextPart::partRender(RenderTarget* renderer, int xoffset, int yoffset, Text
 
 			if (((unsigned char)lines[i].text[x]) < 32)
 				continue; // TODO: replace with space or similar?
-			int spriteid = ((unsigned char)lines[i].text[x]) - 32;
+			unsigned int spriteid = ((unsigned char)lines[i].text[x]) - 32;
 			RenderOptions render_opts;
 			render_opts.alpha = alpha;
 			renderer->renderCreaturesImage(sprite_to_use, spriteid, somex + currentx, yoff + currenty, render_opts);
 			if ((caretdata) && (caretdata->caretpos == lines[i].offset + x))
 				caretdata->renderCaret(renderer, somex + currentx, yoff + currenty);
+			if (spriteid >= textsprite->numframes())
+				continue; // TODO: replace with space or similar?
 			currentx += textsprite->width(spriteid) + charspacing;
 		}
 		if ((caretdata) && (caretdata->caretpos == lines[i].offset + lines[i].text.size()))
