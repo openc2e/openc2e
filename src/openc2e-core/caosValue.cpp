@@ -232,7 +232,7 @@ const AgentRef& caosValue::getAgentRef() const {
 	} else if (auto* i = value.get_if<int>()) {
 		// TODO: muh
 		if (engine.version == 2) {
-			if (i == 0) {
+			if (*i == 0) {
 				return nullagentref;
 			}
 
