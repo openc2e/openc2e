@@ -23,10 +23,10 @@
 #include "alloc_count.h"
 #include "bytestring.h"
 #include "caosException.h"
+#include "common/SimpleVariant.h"
 #include "physics.h"
 #include "serfwd.h"
 
-#include <mpark/variant.hpp>
 #include <string>
 
 class Agent;
@@ -64,7 +64,7 @@ class caosValue {
 	COUNT_ALLOC(caosValue)
 	FRIEND_SERIALIZE(caosValue)
   protected:
-	mpark::variant<int, float, AgentRef, std::string, bytestring_t, FaceValue, nulltype_tag, Vector<float>> value;
+	SimpleVariant<int, float, AgentRef, std::string, bytestring_t, FaceValue, nulltype_tag, Vector<float>> value;
 
   public:
 	caosValue();

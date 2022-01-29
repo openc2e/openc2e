@@ -116,14 +116,14 @@ void MNGMusic::stop() {
 }
 
 static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = nullptr) {
-	if (auto* float_value = mpark::get_if<float>(&e)) {
+	if (auto* float_value = e.get_if<float>()) {
 		return *float_value;
-	} else if (auto* variable = mpark::get_if<std::string>(&e)) {
+	} else if (auto* variable = e.get_if<std::string>()) {
 		if (layer == nullptr) {
 			throw MNGFileException("Variable '" + *variable + "' only valid inside Layer");
 		}
 		return layer->getVariable(*variable);
-	} else if (auto* function_p = mpark::get_if<heap_value<MNGFunction>>(&e)) {
+	} else if (auto* function_p = e.get_if<heap_value<MNGFunction>>()) {
 		auto function = *function_p;
 		switch (function->type) {
 			case MNG_ADD:
@@ -160,10 +160,10 @@ static AudioChannel playSample(const std::string& name, MNGFile* file, AudioBack
 }
 
 MusicStage::MusicStage(MNGStage node) {
-	pan = node.pan.value_or(0.0);
-	volume = node.volume.value_or(1.0);
-	delay = node.delay.value_or(1.0); // TODO: default? error if doesn't have one of these or tempodelay?
-	tempodelay = node.delay.value_or(1.0); // TODO: default?
+	pan = node.pan.value_or(0.0f);
+	volume = node.volume.value_or(1.0f);
+	delay = node.delay.value_or(1.0f); // TODO: default? error if doesn't have one of these or tempodelay?
+	tempodelay = node.delay.value_or(1.0f); // TODO: default?
 }
 
 MusicEffect::MusicEffect(MNGEffect node) {
@@ -230,8 +230,8 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack* p, 
 		effect = *toplevel_effect;
 	}
 	beatsynch = node.beatsynch; // TODO: default?
-	updaterate = node.updaterate.value_or(0.0); // TODO: default?
-	interval = node.interval.value_or(1.0); // TODO: default?
+	updaterate = node.updaterate.value_or(0.0f); // TODO: default?
+	interval = node.interval.value_or(1.0f); // TODO: default?
 	variables = node.variables;
 	updates = node.updates;
 	for (auto v : node.voices) {
@@ -453,20 +453,20 @@ MusicTrack::MusicTrack(MNGMusic* p, MNGFile* f, MNGScript script, MNGTrack n, Au
 	file = f;
 	parent = p;
 
-	volume = n.volume.value_or(1.0);
+	volume = n.volume.value_or(1.0f);
 	// TODO: what's the default fadein/fadeout?
 	// for now, changed this from 0.0f to 1.0f because otherwise c3 sounds silly
-	fadein = n.fadein.value_or(1.0);
-	fadeout = n.fadeout.value_or(1.0);
+	fadein = n.fadein.value_or(1.0f);
+	fadeout = n.fadeout.value_or(1.0f);
 	beatlength = n.beatlength.value_or(0.0f);
 
 	for (auto e : script.effects) {
 		effects.push_back(std::make_shared<MusicEffect>(e));
 	}
 	for (auto l : n.layers) {
-		if (MNGLoopLayer* ll = mpark::get_if<MNGLoopLayer>(&l)) {
+		if (MNGLoopLayer* ll = l.get_if<MNGLoopLayer>()) {
 			looplayers.push_back(std::make_shared<MusicLoopLayer>(*ll, this, b));
-		} else if (MNGAleotoricLayer* al = mpark::get_if<MNGAleotoricLayer>(&l)) {
+		} else if (MNGAleotoricLayer* al = l.get_if<MNGAleotoricLayer>()) {
 			aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(*al, this, b));
 		} else {
 			std::terminate();

@@ -105,11 +105,6 @@ AllocationCounterHeap<T> AllocationCounterHeap<T>::counter;
 		free(p); \
 		AllocationCounterHeap<classname>::counter.decrement(); \
 	} \
-	/* These next two are needed for mpark::variant; since we override operator new, we must \
-	 * also provide the declarations from <new> below. \
-	 */ \
-	static void* operator new(size_t, void* p) throw() { return p; } \
-	static void operator delete(void*, void*) throw() {} \
 \
   private:
 

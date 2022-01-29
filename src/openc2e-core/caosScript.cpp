@@ -462,7 +462,7 @@ std::shared_ptr<CAOSExpression> caosScript::readExpr(const enum ci_type xtype) {
 
 	std::string oldpayload = t->word();
 	std::shared_ptr<CAOSExpression> ce(new CAOSExpression(errindex, CAOSCmd()));
-	CAOSCmd* cmd = mpark::get_if<CAOSCmd>(&ce->value);
+	CAOSCmd* cmd = ce->value.get_if<CAOSCmd>();
 
 	if (t->word().size() == 4 && isdigit(t->word()[2]) && isdigit(t->word()[3])) {
 		if (!strncmp(t->word().c_str(), "va", 2) || !strncmp(t->word().c_str(), "ov", 2) || !strncmp(t->word().c_str(), "mv", 2)) {
@@ -855,7 +855,7 @@ void caosScript::emitCmd(const char* name) {
 }
 
 void CAOSExpression::eval(caosScript* scr, bool save_here) const {
-	if (auto* cmd_p = mpark::get_if<CAOSCmd>(&value)) {
+	if (auto* cmd_p = value.get_if<CAOSCmd>()) {
 		const auto& cmd = *cmd_p;
 		for (size_t i = 0; i < cmd.arguments.size(); i++) {
 			bool save_there = (i < (size_t)cmd.op->argc && cmd.op->argtypes[i] == CI_VARIABLE);
@@ -891,7 +891,7 @@ void CAOSExpression::eval(caosScript* scr, bool save_here) const {
 				cmd.arguments[i]->save(scr);
 		}
 
-	} else if (auto* v = mpark::get_if<caosValue>(&value)) {
+	} else if (auto* v = value.get_if<caosValue>()) {
 		scr->emitConst(*v);
 	} else {
 		std::terminate();
@@ -899,7 +899,7 @@ void CAOSExpression::eval(caosScript* scr, bool save_here) const {
 }
 
 void CAOSExpression::save(caosScript* scr) const {
-	if (auto* cmd = mpark::get_if<CAOSCmd>(&value)) {
+	if (auto* cmd = value.get_if<CAOSCmd>()) {
 		scr->errindex = scr->traceindex = cmd->traceidx - 1;
 		if (cmd->op->rettype != CI_VARIABLE) {
 			throw parseException(std::string("RValue ") + cmd->op->fullname + " used where LValue expected");
@@ -907,7 +907,7 @@ void CAOSExpression::save(caosScript* scr) const {
 		scr->emitOp(CAOS_RESTORE_AUX, cmd->arguments.size());
 		scr->emitOp(CAOS_SAVE_CMD, scr->d->cmd_index(cmd->op));
 
-	} else if (auto* v = mpark::get_if<caosValue>(&value)) {
+	} else if (auto* v = value.get_if<caosValue>()) {
 		(void)v;
 	} else {
 		std::terminate();

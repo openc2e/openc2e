@@ -49,7 +49,6 @@ This software package also includes some or all of the following libraries:
 * fmt - https://fmt.dev/
 * ghc_filesystem - https://github.com/gulrak/filesystem/
 * imgui - https://github.com/ocornut/imgui/
-* mpark_variant - https://github.com/mpark/variant
 * nativefiledialog - https://github.com/mlabbe/nativefiledialog
 * re2c - https://re2c.org/
 * SDL2 - https://www.libsdl.org/

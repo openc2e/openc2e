@@ -78,7 +78,6 @@ add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/imgui EXCLUDE_FROM_ALL)
-add_subdirectory(externals/mpark-variant EXCLUDE_FROM_ALL)
 add_subdirectory(externals/nativefiledialog EXCLUDE_FROM_ALL)
 
 # Pass flags to the compiler
@@ -145,7 +144,7 @@ add_library(openc2e-fileformats STATIC
 )
 target_include_directories(openc2e-fileformats PRIVATE src/fileformats)
 target_link_libraries(openc2e-fileformats
-	PUBLIC fmt ghc_filesystem mpark_variant openc2e-common
+	PUBLIC fmt ghc_filesystem openc2e-common
 	PRIVATE ZLIB::ZLIB PNG::PNG
 )
 
@@ -251,7 +250,6 @@ target_link_libraries(openc2e-core PUBLIC
 	cxxopts
 	fmt
 	ghc_filesystem
-	mpark_variant
 	openc2e-common
 	openc2e-fileformats
 	openc2e-mngmusic

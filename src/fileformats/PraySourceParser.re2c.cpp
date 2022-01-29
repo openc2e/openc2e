@@ -164,7 +164,7 @@ std::vector<PraySourceParser::Event> PraySourceParserImpl::run() {
 	while (true) {
 		std::vector<PraySourceParser::Event> newevents = next();
 		for (auto e : newevents) {
-			if (mpark::holds_alternative<Error>(e)) {
+			if (e.has<Error>()) {
 				return {e};
 			}
 		}
@@ -214,7 +214,7 @@ std::vector<PraySourceParser::Event> PraySourceParserImpl::next() {
 		return {};
 	}
 	PraySourceParser::Event result = parse_line();
-	if (mpark::holds_alternative<Error>(result)) {
+	if (result.has<Error>()) {
 		return {result};
 	}
 
@@ -346,25 +346,25 @@ std::vector<PraySourceParser::Event> PraySourceParser::parse(const std::string& 
 }
 
 std::string PraySourceParser::eventToString(const Event& event) {
-	if (auto* e = mpark::get_if<Error>(&event)) {
+	if (auto* e = event.get_if<Error>()) {
 		return fmt::format("Error({})", e->message);
 
-	} else if (auto* e = mpark::get_if<GroupBlockStart>(&event)) {
+	} else if (auto* e = event.get_if<GroupBlockStart>()) {
 		return fmt::format("GroupBlockStart({}, {})", e->type, e->name);
 
-	} else if (auto* e = mpark::get_if<GroupBlockEnd>(&event)) {
+	} else if (auto* e = event.get_if<GroupBlockEnd>()) {
 		return fmt::format("GroupBlockEnd({}, {})", e->type, e->name);
 
-	} else if (auto* e = mpark::get_if<InlineBlock>(&event)) {
+	} else if (auto* e = event.get_if<InlineBlock>()) {
 		return fmt::format("InlineBlock({}, {}, {})", e->type, e->name, e->filename);
 
-	} else if (auto* e = mpark::get_if<StringTag>(&event)) {
+	} else if (auto* e = event.get_if<StringTag>()) {
 		return fmt::format("StringTag({}, {})", e->key, e->value);
 
-	} else if (auto* e = mpark::get_if<StringTagFromFile>(&event)) {
+	} else if (auto* e = event.get_if<StringTagFromFile>()) {
 		return fmt::format("StringTagFromFile({}, {})", e->key, e->filename);
 
-	} else if (auto* e = mpark::get_if<IntegerTag>(&event)) {
+	} else if (auto* e = event.get_if<IntegerTag>()) {
 		return fmt::format("IntegerTag({}, {})", e->key, e->value);
 
 	} else {

@@ -24,8 +24,6 @@
 
 #include <fmt/core.h>
 
-using namespace mpark;
-
 const char* variableTypeToString(variableType type) {
 	switch (type) {
 		case CAOSNULL:
@@ -48,21 +46,21 @@ const char* variableTypeToString(variableType type) {
 }
 
 variableType caosValue::getType() const {
-	if (mpark::holds_alternative<int>(value)) {
+	if (value.has<int>()) {
 		return CAOSINT;
-	} else if (mpark::holds_alternative<float>(value)) {
+	} else if (value.has<float>()) {
 		return CAOSFLOAT;
-	} else if (mpark::holds_alternative<std::string>(value)) {
+	} else if (value.has<std::string>()) {
 		return CAOSSTR;
-	} else if (mpark::holds_alternative<AgentRef>(value)) {
+	} else if (value.has<AgentRef>()) {
 		return CAOSAGENT;
-	} else if (mpark::holds_alternative<nulltype_tag>(value)) {
+	} else if (value.has<nulltype_tag>()) {
 		return CAOSNULL;
-	} else if (mpark::holds_alternative<bytestring_t>(value)) {
+	} else if (value.has<bytestring_t>()) {
 		return CAOSBYTESTRING;
-	} else if (mpark::holds_alternative<FaceValue>(value)) {
+	} else if (value.has<FaceValue>()) {
 		return CAOSFACEVALUE;
-	} else if (mpark::holds_alternative<Vector<float>>(value)) {
+	} else if (value.has<Vector<float>>()) {
 		return CAOSVEC;
 	} else {
 		throw wrongCaosValueTypeException(fmt::format("getType not implemented for: {}", dump()));
@@ -168,9 +166,9 @@ void caosValue::setVector(const Vector<float>& v) {
 }
 
 int caosValue::getInt() const {
-	if (auto* i = mpark::get_if<int>(&value)) {
+	if (auto* i = value.get_if<int>()) {
 		return *i;
-	} else if (auto* f = mpark::get_if<float>(&value)) {
+	} else if (auto* f = value.get_if<float>()) {
 		// horror necessary for rounding without C99
 		int x = *f;
 		float diff = *f - x;
@@ -185,9 +183,9 @@ int caosValue::getInt() const {
 			else
 				return x;
 		}
-	} else if (auto* fv = mpark::get_if<FaceValue>(&value)) {
+	} else if (auto* fv = value.get_if<FaceValue>()) {
 		return fv->pose;
-	} else if (auto* v = mpark::get_if<Vector<float>>(&value)) {
+	} else if (auto* v = value.get_if<Vector<float>>()) {
 		return v->getMagnitude();
 	} else {
 		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected integer, got {}", dump()));
@@ -195,13 +193,13 @@ int caosValue::getInt() const {
 }
 
 float caosValue::getFloat() const {
-	if (auto* i = mpark::get_if<int>(&value)) {
+	if (auto* i = value.get_if<int>()) {
 		return *i;
-	} else if (auto* f = mpark::get_if<float>(&value)) {
+	} else if (auto* f = value.get_if<float>()) {
 		return *f;
-	} else if (auto* v = mpark::get_if<Vector<float>>(&value)) {
+	} else if (auto* v = value.get_if<Vector<float>>()) {
 		return v->getMagnitude();
-	} else if (auto* fv = mpark::get_if<FaceValue>(&value)) {
+	} else if (auto* fv = value.get_if<FaceValue>()) {
 		return fv->pose;
 	} else {
 		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected integer, got {}", dump()));
@@ -213,9 +211,9 @@ void caosValue::getString(std::string& s) const {
 }
 
 const std::string& caosValue::getString() const {
-	if (auto* s = mpark::get_if<std::string>(&value)) {
+	if (auto* s = value.get_if<std::string>()) {
 		return *s;
-	} else if (auto* fv = mpark::get_if<FaceValue>(&value)) {
+	} else if (auto* fv = value.get_if<FaceValue>()) {
 		return fv->sprite_filename;
 	} else {
 		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected string, got {}", dump()));
@@ -229,9 +227,9 @@ std::shared_ptr<Agent> caosValue::getAgent() const {
 static AgentRef nullagentref;
 
 const AgentRef& caosValue::getAgentRef() const {
-	if (auto* a = mpark::get_if<AgentRef>(&value)) {
+	if (auto* a = value.get_if<AgentRef>()) {
 		return *a;
-	} else if (auto* i = mpark::get_if<int>(&value)) {
+	} else if (auto* i = value.get_if<int>()) {
 		// TODO: muh
 		if (engine.version == 2) {
 			if (i == 0) {
@@ -245,7 +243,7 @@ const AgentRef& caosValue::getAgentRef() const {
 }
 
 const bytestring_t& caosValue::getByteStr() const {
-	if (auto* bs = mpark::get_if<bytestring_t>(&value)) {
+	if (auto* bs = value.get_if<bytestring_t>()) {
 		return *bs;
 	} else {
 		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected bytestring, got {}", dump()));
@@ -253,7 +251,7 @@ const bytestring_t& caosValue::getByteStr() const {
 }
 
 const Vector<float>& caosValue::getVector() const {
-	if (auto* v = mpark::get_if<Vector<float>>(&value)) {
+	if (auto* v = value.get_if<Vector<float>>()) {
 		return *v;
 	} else {
 		throw wrongCaosValueTypeException(fmt::format("Wrong caosValue type: Expected vector, got {}", dump()));

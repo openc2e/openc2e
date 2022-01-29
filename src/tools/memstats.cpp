@@ -12,7 +12,6 @@ std::string datapath; // because some files link to it
 
 int main() {
 #define PSIZE(t) printf("Size of (%s): %zu\n", #t, sizeof(t))
-	mpark::variant<int, float, AgentRef, std::string> variant;
 
 	PSIZE(Agent);
 	PSIZE(CompoundAgent);
@@ -20,7 +19,6 @@ int main() {
 	PSIZE(SimpleAgent);
 
 	PSIZE(AgentRef);
-	PSIZE(variant);
 	PSIZE(std::string);
 	PSIZE(caosValue);
 	PSIZE(caosVM);

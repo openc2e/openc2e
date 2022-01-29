@@ -1,6 +1,7 @@
 #pragma once
 
-#include <mpark/variant.hpp>
+#include "common/SimpleVariant.h"
+
 #include <string>
 #include <vector>
 
@@ -34,7 +35,7 @@ struct IntegerTag {
 	int value;
 };
 using Event =
-	mpark::variant<Error, GroupBlockStart, GroupBlockEnd,
+	SimpleVariant<Error, GroupBlockStart, GroupBlockEnd,
 		InlineBlock, StringTag, StringTagFromFile, IntegerTag>;
 
 std::vector<Event> parse(const std::string&);

@@ -1,9 +1,9 @@
 #pragma once
 
+#include "common/SimpleVariant.h"
 #include "common/heap_value.h"
 #include "common/optional.h"
 
-#include <mpark/variant.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -77,7 +77,7 @@ MNGScript mngparse(const std::vector<mngtoken>& tokens);
 
 struct MNGFunction;
 
-using MNGExpression = mpark::variant<float, std::string, heap_value<MNGFunction>>;
+using MNGExpression = SimpleVariant<float, std::string, heap_value<MNGFunction>>;
 
 struct MNGFunction {
 	mngtoktype::toktype type;
@@ -142,7 +142,7 @@ struct MNGLoopLayer {
 	std::vector<MNGUpdate> updates;
 };
 
-using MNGLayer = mpark::variant<MNGLoopLayer, MNGAleotoricLayer>;
+using MNGLayer = SimpleVariant<MNGLoopLayer, MNGAleotoricLayer>;
 
 struct MNGTrack {
 	std::string name;

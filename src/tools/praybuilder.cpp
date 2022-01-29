@@ -30,9 +30,8 @@ int main(int argc, char** argv) {
 		}
 
 		auto events = PraySourceParser::parse(str);
-		if (mpark::holds_alternative<PraySourceParser::Error>(events[0])) {
-			std::cout << "Error: "
-					  << mpark::get<PraySourceParser::Error>(events[0]).message << "\n";
+		if (auto* error = events[0].get_if<PraySourceParser::Error>()) {
+			std::cout << "Error: " << error->message << "\n";
 			return 1;
 		}
 
@@ -48,19 +47,19 @@ int main(int argc, char** argv) {
 		std::map<std::string, unsigned int> int_tags;
 
 		for (auto res : events) {
-			if (mpark::holds_alternative<PraySourceParser::Error>(res)) {
+			if (res.has<PraySourceParser::Error>()) {
 				// handled already
 
-			} else if (mpark::holds_alternative<PraySourceParser::GroupBlockStart>(res)) {
+			} else if (res.has<PraySourceParser::GroupBlockStart>()) {
 				string_tags = {};
 				int_tags = {};
 
-			} else if (auto* event = mpark::get_if<PraySourceParser::GroupBlockEnd>(&res)) {
+			} else if (auto* event = res.get_if<PraySourceParser::GroupBlockEnd>()) {
 				writer.writeBlockTags(event->type, event->name, int_tags, string_tags);
 				std::cout << "Tag block " << event->type << " \""
 						  << event->name << "\"\n";
 
-			} else if (auto* event = mpark::get_if<PraySourceParser::InlineBlock>(&res)) {
+			} else if (auto* event = res.get_if<PraySourceParser::InlineBlock>()) {
 				std::cout << "Inline block " << event->type << " \""
 						  << event->name << "\" from file \"" << event->filename
 						  << "\"\n";
@@ -78,10 +77,10 @@ int main(int argc, char** argv) {
 
 				writer.writeBlockRawData(event->type, event->name, data);
 
-			} else if (auto* event = mpark::get_if<PraySourceParser::StringTag>(&res)) {
+			} else if (auto* event = res.get_if<PraySourceParser::StringTag>()) {
 				string_tags[event->key] = event->value;
 
-			} else if (auto* event = mpark::get_if<PraySourceParser::StringTagFromFile>(&res)) {
+			} else if (auto* event = res.get_if<PraySourceParser::StringTagFromFile>()) {
 				// TODO: check in same directory
 				std::ifstream in((parent_path / event->filename).string());
 				if (!in) {
@@ -95,7 +94,7 @@ int main(int argc, char** argv) {
 
 				string_tags[event->key] = val;
 
-			} else if (auto* event = mpark::get_if<PraySourceParser::IntegerTag>(&res)) {
+			} else if (auto* event = res.get_if<PraySourceParser::IntegerTag>()) {
 				int_tags[event->key] = event->value;
 
 			} else {

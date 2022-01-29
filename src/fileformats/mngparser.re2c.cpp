@@ -81,7 +81,7 @@ MNGExpression MNGParserState::parse_expression() {
 		consume(MNG_COMMA); \
 		auto right = parse_expression(); \
 		consume(MNG_RPAREN); \
-		return MNGFunction(type, left, right); \
+		return heap_value<MNGFunction>(type, left, right); \
 	}
 
 	BINARY_OP(MNG_ADD);
@@ -578,14 +578,14 @@ std::vector<std::string> MNGScript::getWaveNames() const {
 	std::unordered_set<std::string> seen;
 	for (auto t : tracks) {
 		for (auto& l : t.layers) {
-			if (const MNGAleotoricLayer* al = mpark::get_if<MNGAleotoricLayer>(&l)) {
+			if (const MNGAleotoricLayer* al = l.get_if<MNGAleotoricLayer>()) {
 				for (auto v : al->voices) {
 					if (seen.find(v.wave) == seen.end()) {
 						seen.insert(v.wave);
 						names.push_back(v.wave);
 					}
 				}
-			} else if (const MNGLoopLayer* ll = mpark::get_if<MNGLoopLayer>(&l)) {
+			} else if (const MNGLoopLayer* ll = l.get_if<MNGLoopLayer>()) {
 				if (seen.find(ll->wave) == seen.end()) {
 					seen.insert(ll->wave);
 					names.push_back(ll->wave);

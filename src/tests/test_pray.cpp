@@ -22,7 +22,7 @@ eventsToString(const std::vector<PraySourceParser::Event>& events) {
 template <typename T, typename F>
 const T* matchEvent(const std::vector<PraySourceParser::Event>& events, F f) {
 	for (auto& e : events) {
-		auto matched = mpark::get_if<T>(&e);
+		auto* matched = e.get_if<T>();
 		if (matched && f(*matched)) {
 			return matched;
 		}

@@ -23,6 +23,7 @@
 #include "bytecode.h"
 #include "caosValue.h"
 #include "cmddata.h"
+#include "common/SimpleVariant.h"
 #include "common/shared_str.h"
 #include "dialect.h"
 #include "fileformats/caostoken.h"
@@ -34,7 +35,6 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <mpark/variant.hpp>
 #include <string>
 #include <vector>
 
@@ -191,7 +191,7 @@ struct CAOSCmd {
 };
 
 struct CAOSExpression {
-	mpark::variant<CAOSCmd, caosValue> value;
+	SimpleVariant<CAOSCmd, caosValue> value;
 	int traceidx;
 	void eval(caosScript* scr, bool save_here) const;
 	void save(caosScript* scr) const;
@@ -199,7 +199,7 @@ struct CAOSExpression {
 	CAOSExpression(const CAOSExpression& e)
 		: value(e.value), traceidx(e.traceidx) {}
 	CAOSExpression(int idx, const CAOSCmd& c)
-		: value(c), traceidx(idx) { mpark::get<CAOSCmd>(value).traceidx = traceidx; }
+		: value(c), traceidx(idx) { value.get<CAOSCmd>().traceidx = traceidx; }
 	CAOSExpression(int idx, const caosValue& c)
 		: value(c), traceidx(idx) {}
 };
