@@ -13,6 +13,7 @@ std::string ensure_cp1252(const std::string& str);
 // translate strings, throwing if it's not possible
 std::string cp1252_to_utf8(const std::string& cp1252_str);
 std::string utf8_to_cp1252(const std::string& utf8_str);
+std::string cp1252_to_ascii_lossy(const std::string& cp1252_str);
 
 // translate characters, throwing if it's not possible
 char32_t cp1252_to_codepoint(unsigned char cp1252_char);

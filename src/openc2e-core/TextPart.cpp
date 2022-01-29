@@ -15,11 +15,8 @@ TextPart::TextPart(Agent* p, unsigned int _id, std::string spritefile, unsigned 
 	: SpritePart(p, _id, spritefile, fimg, _x, _y, _z) {
 	textsprite = world.gallery->getImage(fontsprite);
 	THROW_IFNOT(textsprite);
-	if (textsprite->numframes() != 224) {
+	if (textsprite->numframes() != 96 && textsprite->numframes() != 224) {
 		// TODO: better way to log warnings from inside CAOS
-		// TODO: if the sprite only has 96 frames, should we map text from CP-1252 to ASCII?
-		// Creatures 3's WhiteOnTransparentPasswordChars.s16 has only 96 frames (which matches ASCII printable characters + 0x7f/DEL)
-		// some other sprites on English installs of Creatures 3 have been reported to also only have 96 frames
 		fmt::print("warning: \"{}\" only has {} sprites, not enough to cover the full CP-1252 character set\n", fontsprite, textsprite->numframes());
 	}
 	THROW_IFNOT(textsprite->numframes() == 224 || textsprite->numframes() == 96);
@@ -80,6 +77,14 @@ void TextPart::addTint(std::string tintinfo) {
 
 void TextPart::setText(std::string t) {
 	t = ensure_cp1252(t);
+
+	if (textsprite->numframes() == 96 || true) {
+		// if the sprite only has 96 frames, we map text from CP-1252 to ASCII.
+		// Certain version of Creatures 3's *Chars.s16 sprites have only 96 frames
+		// (which matches ASCII printable characters + 0x7f/DEL)
+		t = cp1252_to_ascii_lossy(t);
+	}
+
 	text.clear();
 	tints.clear();
 

@@ -200,6 +200,107 @@ std::string utf8_to_cp1252(const std::string& utf8_str) {
 	return cp1252_str;
 }
 
+static std::string cp1252_to_ascii_lossy(uint8_t cp1252_char) {
+	if (cp1252_char < 128) {
+		return std::string(1, static_cast<char>(cp1252_char));
+	}
+	switch (cp1252_char) {
+		case 0x82: return ",";
+		case 0x84: return ",,";
+		case 0x85: return "...";
+		case 0x88: return "^";
+		case 0x8A: return "S";
+		case 0x8B: return "<";
+		case 0x8C: return "OE";
+		case 0x8E: return "Z";
+		case 0x91: return "'";
+		case 0x92: return "'";
+		case 0x93: return "\"";
+		case 0x94: return "\"";
+		case 0x96: return "-";
+		case 0x97: return "-";
+		case 0x98: return "~";
+		case 0x9A: return "s";
+		case 0x9B: return ">";
+		case 0x9C: return "oe";
+		case 0x9E: return "z";
+		case 0xA0: return " ";
+		case 0xA6: return "|";
+		case 0xAB: return "<<";
+		case 0xBB: return ">>";
+		case 0xC0: return "A";
+		case 0xC1: return "A";
+		case 0xC2: return "A";
+		case 0xC3: return "A";
+		case 0xC4: return "A";
+		case 0xC5: return "A";
+		case 0xC6: return "AE";
+		case 0xC7: return "C";
+		case 0xC8: return "E";
+		case 0xC9: return "E";
+		case 0xCA: return "E";
+		case 0xCB: return "E";
+		case 0xCC: return "I";
+		case 0xCD: return "I";
+		case 0xCE: return "I";
+		case 0xCF: return "I";
+		case 0xD0: return "D";
+		case 0xD1: return "N";
+		case 0xD2: return "O";
+		case 0xD3: return "O";
+		case 0xD4: return "O";
+		case 0xD5: return "O";
+		case 0xD6: return "O";
+		case 0xD8: return "O";
+		case 0xD9: return "U";
+		case 0xDA: return "U";
+		case 0xDB: return "U";
+		case 0xDC: return "U";
+		case 0xDD: return "Y";
+		case 0xDF: return "ss";
+		case 0xE0: return "a";
+		case 0xE1: return "a";
+		case 0xE2: return "a";
+		case 0xE3: return "a";
+		case 0xE4: return "a";
+		case 0xE5: return "a";
+		case 0xE6: return "ae";
+		case 0xE7: return "c";
+		case 0xE8: return "e";
+		case 0xE9: return "e";
+		case 0xEA: return "e";
+		case 0xEB: return "e";
+		case 0xEC: return "i";
+		case 0xED: return "i";
+		case 0xEE: return "i";
+		case 0xEF: return "i";
+		case 0xF0: return "d";
+		case 0xF1: return "n";
+		case 0xF2: return "o";
+		case 0xF3: return "o";
+		case 0xF4: return "o";
+		case 0xF5: return "o";
+		case 0xF6: return "o";
+		case 0xF8: return "o";
+		case 0xF9: return "u";
+		case 0xFA: return "u";
+		case 0xFB: return "u";
+		case 0xFC: return "u";
+		case 0xFD: return "y";
+		case 0xFF: return "y";
+	}
+	return "?";
+}
+
+std::string cp1252_to_ascii_lossy(const std::string& cp1252_str) {
+	// TODO: assert CP1252 (e.g. not UTF8)?
+	std::string ascii_str;
+	for (uint8_t c : cp1252_str) {
+		ascii_str += cp1252_to_ascii_lossy(c);
+	}
+	return ascii_str;
+}
+
 std::string ensure_utf8(const std::string& str) {
 	if (str.substr(0, 3) == "\xef\xbb\xbf") {
 		return str.substr(3);
