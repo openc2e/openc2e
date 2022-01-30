@@ -108,7 +108,7 @@ MFCObject* MFCReader::read_object() {
 		// new object
 		MFCObject* value = classinfo.newfunc();
 		m_objects.emplace_back(value);
-		value->deserialize(*this);
+		value->read_from(*this);
 		return value;
 
 	} else if (pid & 0x8000) {
@@ -123,7 +123,7 @@ MFCObject* MFCReader::read_object() {
 		auto classinfo = it->second;
 		MFCObject* value = classinfo.newfunc();
 		m_objects.emplace_back(value);
-		value->deserialize(*this);
+		value->read_from(*this);
 		return value;
 
 	} else {

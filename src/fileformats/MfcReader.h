@@ -17,7 +17,7 @@ class MFCReader;
 class MFCObject {
   public:
 	virtual ~MFCObject() = default;
-	virtual void deserialize(MFCReader&) = 0;
+	virtual void read_from(MFCReader&) = 0;
 };
 
 class MFCReader {
