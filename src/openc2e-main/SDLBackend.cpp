@@ -316,7 +316,7 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 	}
 
 	if (!img.getTextureForFrame(frame)) {
-		img.getTextureForFrame(frame) = engine.backend->createTextureWithTransparentColor(img.getImageForFrame(frame), Color{0, 0, 0, 0xff});
+		img.getTextureForFrame(frame) = parent->createTextureWithTransparentColor(img.getImageForFrame(frame), Color{0, 0, 0, 0xff});
 	}
 
 	SDL_Texture* tex = img.getTextureForFrame(frame).as<SDL_Texture>();
@@ -502,14 +502,14 @@ void SDLBackend::delay(int msec) {
 	SDL_Delay(msec);
 }
 
+static constexpr int OPENC2E_MAX_FPS = 60;
+static constexpr int OPENC2E_MS_PER_FRAME = 1000 / OPENC2E_MAX_FPS;
+
 int SDLBackend::run() {
 	resize(800, 600);
 
-	const int OPENC2E_MAX_FPS = 60;
-
+	Uint32 last_frame_end = SDL_GetTicks();
 	while (!engine.done) {
-		Uint32 frame_start = SDL_GetTicks();
-
 		engine.tick();
 
 		// TODO: calculate scale etc here instead of in resizeNotify
@@ -520,12 +520,8 @@ int SDLBackend::run() {
 		Openc2eImGui::Update(window);
 		mainrendertarget.viewport_offset_top = Openc2eImGui::GetViewportOffsetTop();
 		mainrendertarget.viewport_offset_bottom = Openc2eImGui::GetViewportOffsetBottom();
-
 		world.drawWorld();
-
-		SDL_SetRenderTarget(renderer, nullptr);
 		Openc2eImGui::Render();
-
 		{
 			// TODO: hack to display the hand above ImGui windows
 			int adjustx = engine.camera->getX();
@@ -536,11 +532,12 @@ int SDLBackend::run() {
 		SDL_RenderPresent(renderer);
 
 		bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
-		Uint32 desired_ticks_per_frame = focused ? 1000 / OPENC2E_MAX_FPS : world.ticktime;
+		Uint32 desired_ticks_per_frame = focused ? OPENC2E_MS_PER_FRAME : world.ticktime;
 		Uint32 frame_end = SDL_GetTicks();
-		if (frame_end - frame_start < desired_ticks_per_frame) {
-			SDL_Delay(desired_ticks_per_frame - (frame_end - frame_start));
+		if (frame_end - last_frame_end < desired_ticks_per_frame) {
+			SDL_Delay(desired_ticks_per_frame - (frame_end - last_frame_end));
 		}
+		last_frame_end = frame_end;
 	}
 
 	return 0;
