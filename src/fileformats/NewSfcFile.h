@@ -418,7 +418,7 @@ struct MacroV1 : MFCObject {
 		selfdestruct = in.read32le();
 		inst = in.read32le();
 		script_length_maybe = in.read32le();
-		std::string script = in.read_ascii_mfcstring();
+		script = in.read_ascii_mfcstring();
 		ip = in.read32le();
 		for (size_t i = 0; i < 20; ++i) {
 			stack[i] = in.read32le();

@@ -103,6 +103,7 @@ add_library(openc2e-common STATIC
 	src/common/encoding.cpp
 	src/common/mappedfile.cpp
 	src/common/readfile.cpp
+	src/common/Repr.cpp
 	src/common/string_in.cpp
 	src/common/userlocale.cpp
 	src/common/case_insensitive_filesystem.cpp
@@ -291,6 +292,23 @@ target_link_libraries(openc2e
 	imgui_sdl
 	SDL2::SDL2
 	${CMAKE_DL_LIBS}
+)
+
+add_executable(opencreatures1
+	src/opencreatures1/main.cpp
+	src/opencreatures1/ImageManager.cpp
+	src/opencreatures1/PathManager.cpp
+	src/opencreatures1/SDLBackend.cpp
+	src/opencreatures1/C1MusicManager.cpp
+	src/openc2e-core/creaturesImage.cpp
+)
+target_link_libraries(opencreatures1
+	openc2e-common
+	openc2e-audiobackend
+	openc2e-fileformats
+	SDL2::SDL2
+	fmt
+	ghc_filesystem
 )
 
 add_executable(attparser src/tools/attparser.cpp)
