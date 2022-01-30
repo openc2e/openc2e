@@ -1,6 +1,6 @@
 #include "MNGMusic.h"
 
-#include "common/ascii_tolower.h"
+#include "common/Ascii.h"
 #include "common/endianlove.h"
 #include "common/find_if.h"
 
@@ -30,18 +30,18 @@ void MNGMusic::playSilence() {
 }
 
 void MNGMusic::playTrack(MNGFile* file, std::string trackname) {
-	trackname = ascii_tolower(trackname);
+	trackname = to_ascii_lowercase(trackname);
 
 	// TODO: these lowercase transformations are ridiculous, we should store inside MusicTrack
 	if (nexttrack && nexttrack->file == file) {
-		std::string nextname = ascii_tolower(nexttrack->getName());
+		std::string nextname = to_ascii_lowercase(nexttrack->getName());
 		if (nextname == trackname) {
 			// already moving to this track
 			return;
 		}
 	}
 	if (currenttrack && currenttrack->file == file) {
-		std::string thisname = ascii_tolower(currenttrack->getName());
+		std::string thisname = to_ascii_lowercase(currenttrack->getName());
 		if (thisname == trackname) {
 			// already playing this track!
 			if (!playing_silence && !nexttrack)
@@ -53,7 +53,7 @@ void MNGMusic::playTrack(MNGFile* file, std::string trackname) {
 	}
 
 	auto parsed_script = mngparse(file->script);
-	auto track = find_if(parsed_script.tracks, [&](const auto& t) { return ascii_tolower(t.name) == trackname; });
+	auto track = find_if(parsed_script.tracks, [&](const auto& t) { return to_ascii_lowercase(t.name) == trackname; });
 	if (!track) {
 		std::cout << "Couldn't find MNG track '" << trackname << "' ('" << file->name << "')!" << std::endl;
 		return; // TODO: exception?
@@ -181,7 +181,7 @@ MusicVoice::MusicVoice(MusicLayer* p, MNGVoice node) {
 
 	if (node.effect) {
 		auto toplevel_effect = find_if(parent->parent->effects,
-			[&](auto e) { return ascii_tolower(e->name) == ascii_tolower(*node.effect); });
+			[&](auto e) { return to_ascii_lowercase(e->name) == to_ascii_lowercase(*node.effect); });
 		if (!toplevel_effect) {
 			throw MNGFileException("couldn't find effect '" + *node.effect + "'");
 		}
@@ -223,7 +223,7 @@ MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack* p, 
 	volume = node.volume.value_or(1.0);
 	if (node.effect) {
 		auto toplevel_effect = find_if(parent->effects,
-			[&](auto e) { return ascii_tolower(e->name) == ascii_tolower(*node.effect); });
+			[&](auto e) { return to_ascii_lowercase(e->name) == to_ascii_lowercase(*node.effect); });
 		if (!toplevel_effect) {
 			throw MNGFileException("couldn't find effect '" + *node.effect + "'");
 		}

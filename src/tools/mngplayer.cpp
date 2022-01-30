@@ -1,4 +1,4 @@
-#include "common/ascii_tolower.h"
+#include "common/Ascii.h"
 #include "fileformats/mngfile.h"
 #include "libmngmusic/MNGMusic.h"
 #include "openc2e-audiobackend/SDLMixerBackend.h"
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 	auto backend = SDLMixerBackend::getInstance();
 	backend->init();
 
-	std::string ext = ascii_tolower(fs::path(filename).extension());
+	std::string ext = to_ascii_lowercase(fs::path(filename).extension());
 	if (ext == ".mng") {
 		MNGFile file(filename);
 

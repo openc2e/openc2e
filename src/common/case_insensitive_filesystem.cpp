@@ -1,6 +1,6 @@
 #include "case_insensitive_filesystem.h"
 
-#include "ascii_tolower.h"
+#include "Ascii.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -33,7 +33,7 @@ static void updateDirectory(fs::path dirname) {
 	assert(!dirname.empty());
 
 	// if the directory is already cached and matches what's on disk, then do nothing
-	fs::path lcdirname = ascii_tolower(dirname);
+	fs::path lcdirname = to_ascii_lowercase(dirname);
 	std::error_code mtime_error;
 	if (s_cache.count(lcdirname)
 		// avoid a check for directory existence by using the non-throwing overload
@@ -67,7 +67,7 @@ static void updateDirectory(fs::path dirname) {
 	// cache directory contents
 	s_cache[lcdirname] = {dirname, fs::last_write_time(dirname)};
 	for (const auto& entry : fs::directory_iterator(dirname)) {
-		s_cache[ascii_tolower(entry.path())] = {entry.path()};
+		s_cache[to_ascii_lowercase(entry.path())] = {entry.path()};
 	}
 }
 
@@ -81,7 +81,7 @@ fs::path resolve_filename(fs::path path) {
 	if (path.filename().empty()) {
 		path = path.parent_path();
 	}
-	fs::path lcpath = ascii_tolower(path);
+	fs::path lcpath = to_ascii_lowercase(path);
 
 	// if file exists in cache and on filesystem, return it
 	if (s_cache.count(lcpath) && fs::exists(s_cache[lcpath].realfilename)) {
@@ -96,7 +96,7 @@ fs::path resolve_filename(fs::path path) {
 }
 
 void add_entry(fs::path path) {
-	fs::path lcpath = ascii_tolower(path);
+	fs::path lcpath = to_ascii_lowercase(path);
 	if (s_cache.count(lcpath)) {
 		return;
 	}
@@ -107,7 +107,7 @@ directory_iterator::directory_iterator(fs::path dirname) {
 	// make sure dir is normal and ends with a trailing slash
 	dirname = dirname.lexically_normal() / "";
 	updateDirectory(dirname);
-	lcdirname = ascii_tolower(dirname);
+	lcdirname = to_ascii_lowercase(dirname);
 
 	it = s_cache.begin();
 	while (it != s_cache.end()) {

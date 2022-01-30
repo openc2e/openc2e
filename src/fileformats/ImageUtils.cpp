@@ -4,8 +4,8 @@
 #include "bmpImage.h"
 #include "c16Image.h"
 #include "charsetdta.h"
+#include "common/Ascii.h"
 #include "common/Exception.h"
-#include "common/ascii_tolower.h"
 #include "common/mappedfile.h"
 #include "common/spanstream.h"
 #include "s16Image.h"
@@ -23,7 +23,7 @@ MultiImage ReadImage(std::string path) {
 	}
 
 	std::string ext = fs::path(path).extension();
-	ext = ascii_tolower(ext);
+	ext = to_ascii_lowercase(ext);
 
 	mappedfile m(path);
 	spanstream in(m);
@@ -44,7 +44,7 @@ MultiImage ReadImage(std::string path) {
 	}
 
 	std::string filename = fs::path(path).filename();
-	filename = ascii_tolower(filename);
+	filename = to_ascii_lowercase(filename);
 
 	if (filename == "charset.dta" || filename == "eurocharset.dta") {
 		return ReadCharsetDtaFile(in);

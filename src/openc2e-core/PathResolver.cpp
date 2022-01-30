@@ -19,8 +19,8 @@
 #include "Engine.h"
 #include "World.h"
 #include "caosValue.h"
+#include "common/Ascii.h"
 #include "common/Exception.h"
-#include "common/ascii_tolower.h"
 #include "common/case_insensitive_filesystem.h"
 #include "common/namedifstream.h"
 #include "common/wildcard_match.h"
@@ -352,7 +352,7 @@ std::vector<fs::path> getBootstrapDirectories() {
 		}
 		auto bootstrap = getDirectory(data_directories[i], DIRECTORY_BOOTSTRAP);
 		for (auto d : case_insensitive_filesystem::directory_iterator(bootstrap)) {
-			fs::path s = ascii_tolower(fs::path(d).filename().string());
+			fs::path s = to_ascii_lowercase(fs::path(d).filename().string());
 			if (s == "000 switcher" || s == "000_switcher" || s == "startup") {
 				continue;
 			}

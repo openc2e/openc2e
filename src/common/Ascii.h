@@ -2,7 +2,7 @@
 
 #include <string>
 
-inline char ascii_tolower(char c) {
+inline char to_ascii_lowercase(char c) {
 	if (c >= 'A' && c <= 'Z') {
 		return c - ('Z' - 'z');
 	} else {
@@ -10,7 +10,7 @@ inline char ascii_tolower(char c) {
 	}
 }
 
-inline wchar_t ascii_tolower(wchar_t c) {
+inline wchar_t to_ascii_lowercase(wchar_t c) {
 	if (c >= 'A' && c <= 'Z') {
 		return c - ('Z' - 'z');
 	} else {
@@ -18,16 +18,16 @@ inline wchar_t ascii_tolower(wchar_t c) {
 	}
 }
 
-inline std::string ascii_tolower(std::string s) {
+inline std::string to_ascii_lowercase(std::string s) {
 	for (auto& c : s) {
-		c = ascii_tolower(c);
+		c = to_ascii_lowercase(c);
 	}
 	return s;
 }
 
-inline std::wstring ascii_tolower(std::wstring s) {
+inline std::wstring to_ascii_lowercase(std::wstring s) {
 	for (auto& c : s) {
-		c = ascii_tolower(c);
+		c = to_ascii_lowercase(c);
 	}
 	return s;
 }

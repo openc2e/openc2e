@@ -1,7 +1,7 @@
 #include "caosparser.h"
 
+#include "common/Ascii.h"
 #include "common/Exception.h"
-#include "common/ascii_tolower.h"
 #include "common/string_in.h"
 #include "dialect.h"
 
@@ -93,20 +93,20 @@ static CAOSNodePtr parse_condition(CAOSParserState& state) {
 	state.p += 1;
 
 	// TODO: are all of these allowed in C1/C2 ?
-	if (!string_in(ascii_tolower(comparison), {
-												  "eq",
-												  "ne",
-												  "gt",
-												  "ge",
-												  "lt",
-												  "le",
-												  "=",
-												  "<>",
-												  ">",
-												  ">=",
-												  "<",
-												  "<=",
-											  })) {
+	if (!string_in(to_ascii_lowercase(comparison), {
+													   "eq",
+													   "ne",
+													   "gt",
+													   "ge",
+													   "lt",
+													   "le",
+													   "=",
+													   "<>",
+													   ">",
+													   ">=",
+													   "<",
+													   "<=",
+												   })) {
 		throw Exception(fmt::format("Unknown comparison operator '{}'", comparison));
 	}
 	eat_whitespace(state);
@@ -120,7 +120,7 @@ static CAOSNodePtr parse_condition(CAOSParserState& state) {
 
 	bool ate_whitespace = maybe_eat_whitespace(state);
 	if (
-		ate_whitespace && string_in(ascii_tolower(state.tokens[state.p].value), {"and", "or"})) {
+		ate_whitespace && string_in(to_ascii_lowercase(state.tokens[state.p].value), {"and", "or"})) {
 		auto combiner = state.tokens[state.p].value;
 		state.p += 1;
 		auto remainder = parse_condition(state);
@@ -137,7 +137,7 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
 	assert_current_token_is(state, {caostoken::TOK_WORD});
 
 	// find a command from the first token
-	std::string command = ascii_tolower(state.tokens[state.p].value);
+	std::string command = to_ascii_lowercase(state.tokens[state.p].value);
 	std::string commandnormalized = command;
 	if (command.size() == 4 && command[0] == 'o' && command[1] == 'b' && command[2] == 'v' && isdigit(command[3])) {
 		commandnormalized = "obvx";
@@ -157,7 +157,7 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
 	// some commands are namespace placeholders
 	if (commandinfo && commandinfo->argc == 1 && commandinfo->argtypes[0] == CI_SUBCOMMAND) {
 		eat_whitespace(state);
-		command = command + " " + ascii_tolower(state.tokens[state.p].value);
+		command = command + " " + to_ascii_lowercase(state.tokens[state.p].value);
 		std::string lookup_key = (is_toplevel ? "cmd " : "expr ") + command;
 		commandinfo = state.dialect->find_command(lookup_key);
 		if (commandinfo == nullptr) {
@@ -171,7 +171,7 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
 	else {
 		auto set_p = state.p;
 		if (maybe_eat_whitespace(state) && current_token_is(state, {caostoken::TOK_WORD})) {
-			std::string newcommand = command + " " + ascii_tolower(state.tokens[state.p].value);
+			std::string newcommand = command + " " + to_ascii_lowercase(state.tokens[state.p].value);
 			std::string lookup_key = (is_toplevel ? "cmd " : "expr ") + newcommand;
 			auto newcommandinfo = state.dialect->find_command(lookup_key);
 			if (newcommandinfo) {
