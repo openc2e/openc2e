@@ -55,7 +55,11 @@ class EntityContainer {
 		}
 		if (new_id.index == NULL_INDEX) {
 			new_id = Id(m_sparse.size(), 0);
-			m_sparse.push_back(NULL_INDEX);
+			if (new_id.index == NULL_INDEX) {
+				// whoops, ran out of ids
+				std::terminate();
+			}
+			m_sparse.resize(m_sparse.size() + 1);
 		}
 		m_sparse[new_id.index] = m_dense.size();
 		m_dense.push_back(new_id.index);
