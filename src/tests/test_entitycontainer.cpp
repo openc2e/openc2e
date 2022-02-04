@@ -4,7 +4,7 @@
 
 
 template <typename T>
-class EntityContainer {
+class EntityPool {
   private:
 	using IndexType = uint16_t;
 	using VersionType = uint16_t;
@@ -20,7 +20,7 @@ class EntityContainer {
 	using ValueType = T;
 	struct Id {
 	  private:
-		friend EntityContainer;
+		friend EntityPool;
 		Id(IndexType index_, VersionType version_)
 			: index(index_), version(version_) {}
 		IndexType index;
@@ -119,7 +119,7 @@ class EntityContainer {
 };
 
 template <typename T>
-constexpr typename EntityContainer<T>::IndexType EntityContainer<T>::NULL_INDEX;
+constexpr typename EntityPool<T>::IndexType EntityPool<T>::NULL_INDEX;
 
 template <typename R>
 auto count(R&& range) {
@@ -133,70 +133,70 @@ struct MyTestItem {
 	int value = -1;
 };
 
-TEST(common, entitycontainer) {
-	EntityContainer<MyTestItem> items;
+TEST(common, entitypool) {
+	EntityPool<MyTestItem> pool;
 
 	// starts empty
-	EXPECT_EQ(items.size(), 0);
-	EXPECT_EQ(items.extent(), 0);
-	EXPECT_EQ(count(items), 0);
+	EXPECT_EQ(pool.size(), 0);
+	EXPECT_EQ(pool.extent(), 0);
+	EXPECT_EQ(count(pool), 0);
 
 	// add some values
-	auto first = items.add(5);
-	auto second = items.add(47);
-	auto third = items.add(132);
-	EXPECT_EQ(items.size(), 3);
-	EXPECT_EQ(items.extent(), 3);
-	EXPECT_EQ(count(items), 3);
+	auto first = pool.add(5);
+	auto second = pool.add(47);
+	auto third = pool.add(132);
+	EXPECT_EQ(pool.size(), 3);
+	EXPECT_EQ(pool.extent(), 3);
+	EXPECT_EQ(count(pool), 3);
 
-	EXPECT_TRUE(items.contains(first));
-	EXPECT_EQ(items.try_get(first)->value, 5);
+	EXPECT_TRUE(pool.contains(first));
+	EXPECT_EQ(pool.try_get(first)->value, 5);
 
-	EXPECT_TRUE(items.contains(second));
-	EXPECT_EQ(items.try_get(second)->value, 47);
+	EXPECT_TRUE(pool.contains(second));
+	EXPECT_EQ(pool.try_get(second)->value, 47);
 
-	EXPECT_TRUE(items.contains(third));
-	EXPECT_EQ(items.try_get(third)->value, 132);
+	EXPECT_TRUE(pool.contains(third));
+	EXPECT_EQ(pool.try_get(third)->value, 132);
 
 	// erase a value
-	items.erase(second);
-	EXPECT_EQ(items.size(), 2);
-	EXPECT_EQ(count(items), 2);
-	EXPECT_EQ(items.extent(), 3);
+	pool.erase(second);
+	EXPECT_EQ(pool.size(), 2);
+	EXPECT_EQ(count(pool), 2);
+	EXPECT_EQ(pool.extent(), 3);
 
-	EXPECT_TRUE(items.contains(first));
-	EXPECT_EQ(items.try_get(first)->value, 5);
+	EXPECT_TRUE(pool.contains(first));
+	EXPECT_EQ(pool.try_get(first)->value, 5);
 
-	EXPECT_FALSE(items.contains(second));
-	EXPECT_EQ(items.try_get(second), nullptr);
+	EXPECT_FALSE(pool.contains(second));
+	EXPECT_EQ(pool.try_get(second), nullptr);
 
-	EXPECT_TRUE(items.contains(third));
-	EXPECT_EQ(items.try_get(third)->value, 132);
+	EXPECT_TRUE(pool.contains(third));
+	EXPECT_EQ(pool.try_get(third)->value, 132);
 
 	// add a value after erasing a value
-	auto fourth = items.add(23);
-	EXPECT_EQ(items.size(), 3);
+	auto fourth = pool.add(23);
+	EXPECT_EQ(pool.size(), 3);
 	EXPECT_EQ(fourth, second); // recycle id
-	EXPECT_EQ(items.extent(), 3); // recycle id
-	EXPECT_EQ(count(items), 3);
+	EXPECT_EQ(pool.extent(), 3); // recycle id
+	EXPECT_EQ(count(pool), 3);
 
-	EXPECT_TRUE(items.contains(first));
-	EXPECT_EQ(items.try_get(first)->value, 5);
+	EXPECT_TRUE(pool.contains(first));
+	EXPECT_EQ(pool.try_get(first)->value, 5);
 
-	EXPECT_TRUE(items.contains(third));
-	EXPECT_EQ(items.try_get(third)->value, 132);
+	EXPECT_TRUE(pool.contains(third));
+	EXPECT_EQ(pool.try_get(third)->value, 132);
 
-	EXPECT_TRUE(items.contains(fourth));
-	EXPECT_EQ(items.try_get(fourth)->value, 23);
+	EXPECT_TRUE(pool.contains(fourth));
+	EXPECT_EQ(pool.try_get(fourth)->value, 23);
 
 	// change a value
-	items.try_get(fourth)->value = 81;
-	EXPECT_EQ(items.try_get(fourth)->value, 81);
+	pool.try_get(fourth)->value = 81;
+	EXPECT_EQ(pool.try_get(fourth)->value, 81);
 
 	// iterate values
-	EXPECT_EQ(count(items), 3);
+	EXPECT_EQ(count(pool), 3);
 	size_t i = 0;
-	for (const auto& item : items) {
+	for (const auto& item : pool) {
 		int expected = -1;
 		if (i == 0) {
 			expected = 5;
