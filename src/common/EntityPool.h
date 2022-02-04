@@ -164,6 +164,34 @@ class EntityPool {
 		return ret;
 	}
 
+	template <typename Compare>
+	void sort(Compare&& compare) {
+		// Create a vector of indices into m_values, then std::sort it. It's now
+		// a list of permuted indices which tell us where to move values so that
+		// they are sorted.
+		// This could be more optimized, see https://skypjack.github.io/2019-09-25-ecs-baf-part-5/
+		std::vector<IndexType> permutation(m_values.size());
+		for (IndexType i = 0; i < permutation.size(); ++i) {
+			permutation[i] = i;
+		}
+		std::sort(permutation.begin(), permutation.end(), [&](auto a, auto b) {
+			return compare(const_cast<const T&>(m_values[a]), const_cast<const T&>(m_values[b]));
+		});
+		for (IndexType pos = 0; pos < permutation.size(); ++pos) {
+			auto curr = pos;
+			auto next = permutation[curr];
+			while (curr != next) {
+				std::swap(permutation[curr], permutation[next]);
+				std::swap(m_sparse[curr], m_sparse[next]);
+				std::swap(m_dense[curr], m_dense[next]);
+				std::swap(m_values[curr], m_values[next]);
+				permutation[curr] = curr;
+				curr = next;
+				next = permutation[curr];
+			}
+		}
+	}
+
   private:
 	std::vector<IndexType> m_sparse;
 	std::vector<Id> m_dense;

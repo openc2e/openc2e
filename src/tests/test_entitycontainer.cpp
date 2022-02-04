@@ -137,3 +137,26 @@ TEST(common, entitypool_erase_during_enumeration) {
 		}
 	}
 }
+
+TEST(common, entitypool_sort) {
+	EntityPool<MyTestItem> pool;
+	auto zero = pool.add(3);
+	auto one = pool.add(2);
+	auto two = pool.add(1);
+	auto three = pool.add(0);
+
+	pool.sort([](const MyTestItem& a, const MyTestItem& b) {
+		return a.value < b.value;
+	});
+
+	auto it = pool.begin();
+	EXPECT_EQ(it++->value, 0);
+	EXPECT_EQ(it++->value, 1);
+	EXPECT_EQ(it++->value, 2);
+	EXPECT_EQ(it++->value, 3);
+
+	EXPECT_EQ(pool.try_get(zero)->value, 3);
+	EXPECT_EQ(pool.try_get(one)->value, 2);
+	EXPECT_EQ(pool.try_get(two)->value, 1);
+	EXPECT_EQ(pool.try_get(three)->value, 0);
+}
