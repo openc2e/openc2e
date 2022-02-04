@@ -3,47 +3,82 @@
 #include <vector>
 
 
-template <typename T, typename I = uint32_t>
+template <typename T>
 class EntityContainer {
-  public:
-	using IdType = I;
-	using ValueType = T;
-	static constexpr I NULL_ID = static_cast<I>(~0);
+  private:
+	using IndexType = uint16_t;
+	using VersionType = uint16_t;
 
-	I add(T value) {
-		I new_id = NULL_ID;
+	static const IndexType NULL_INDEX = static_cast<IndexType>(~0);
+
+	std::vector<IndexType> m_sparse;
+	std::vector<IndexType> m_dense;
+	std::vector<T> m_values;
+
+
+  public:
+	using ValueType = T;
+	struct Id {
+	  private:
+		friend EntityContainer;
+		Id(IndexType index_, VersionType version_)
+			: index(index_), version(version_) {}
+		IndexType index;
+		VersionType version;
+
+	  public:
+		constexpr Id() {
+			index = ~0;
+			version = ~0;
+		}
+		bool operator==(const Id& other) const {
+			return index == other.index && version == other.version;
+		}
+		bool operator!=(const Id& other) const {
+			return !(*this == other);
+		}
+		uint32_t to_integral() const {
+			return (version << 16) | index;
+		}
+	};
+	static_assert(sizeof(Id) == sizeof(std::declval<Id>().to_integral()), "");
+
+
+	Id add(T value) {
+		Id new_id;
 		for (size_t i = 0; i < m_sparse.size(); ++i) {
-			if (m_sparse[i] == NULL_ID) {
-				new_id = i;
+			if (m_sparse[i] == NULL_INDEX) {
+				new_id.index = i;
+				new_id.version = 0;
 				break;
 			}
 		}
-		if (new_id == NULL_ID) {
-			new_id = m_sparse.size();
-			m_sparse.push_back(NULL_ID);
+		if (new_id.index == NULL_INDEX) {
+			new_id = Id(m_sparse.size(), 0);
+			m_sparse.push_back(NULL_INDEX);
 		}
-		m_sparse[new_id] = m_dense.size();
-		m_dense.push_back(new_id);
+		m_sparse[new_id.index] = m_dense.size();
+		m_dense.push_back(new_id.index);
 		m_values.push_back(value);
 
 		return new_id;
 	}
 
-	T* try_get(I id) {
+	T* try_get(Id id) {
 		if (!contains(id)) {
 			return nullptr;
 		}
-		I dense_index = m_sparse[id];
+		IndexType dense_index = m_sparse[id.index];
 		return &m_values[dense_index];
 	}
 
-	void erase(I id) {
+	void erase(Id id) {
 		if (!contains(id)) {
 			return;
 		}
-		I dense_index = m_sparse[id];
+		IndexType dense_index = m_sparse[id.index];
 
-		m_sparse[id] = NULL_ID;
+		m_sparse[id.index] = NULL_INDEX;
 		m_sparse[m_dense.back()] = dense_index;
 
 		std::swap(m_dense[dense_index], m_dense.back());
@@ -52,14 +87,14 @@ class EntityContainer {
 		m_values.resize(m_values.size() - 1);
 	}
 
-	bool contains(I id) {
-		if (id >= m_sparse.size()) {
+	bool contains(Id id) {
+		if (id.index >= m_sparse.size()) {
 			return false;
 		}
-		if (m_sparse[id] == NULL_ID) {
+		if (m_sparse[id.index] == NULL_INDEX) {
 			return false;
 		}
-		return m_dense[m_sparse[id]] == id;
+		return m_dense[m_sparse[id.index]] == id.index;
 	}
 
 	size_t extent() const {
@@ -77,15 +112,10 @@ class EntityContainer {
 	auto end() {
 		return m_values.end();
 	}
-
-  private:
-	std::vector<I> m_sparse;
-	std::vector<I> m_dense;
-	std::vector<T> m_values;
 };
 
-template <typename T, typename I>
-constexpr I EntityContainer<T, I>::NULL_ID;
+template <typename T>
+constexpr typename EntityContainer<T>::IndexType EntityContainer<T>::NULL_INDEX;
 
 template <typename R>
 auto count(R&& range) {
