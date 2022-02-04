@@ -100,7 +100,7 @@ class EntityPool {
 		m_deleted.push_back(id);
 	}
 
-	bool contains(Id id) {
+	bool contains(Id id) const {
 		if (id.index >= m_sparse.size()) {
 			return false;
 		}
@@ -165,32 +165,37 @@ class EntityPool {
 	}
 
 	template <typename Compare>
-	void sort(Compare&& compare) {
-		// Create a vector of indices into m_values, then std::sort it. It's now
-		// a list of permuted indices which tell us where to move values so that
-		// they are sorted.
+	void stable_sort(Compare&& compare) {
+		// Create a vector of indices into m_values, then std::stable_sort it.
+		// It's then a list of permuted indices that tell us where to move values
+		// so that they are sorted.
 		// This could be more optimized, see https://skypjack.github.io/2019-09-25-ecs-baf-part-5/
 		std::vector<IndexType> permutation(m_values.size());
 		for (IndexType i = 0; i < permutation.size(); ++i) {
 			permutation[i] = i;
 		}
-		std::sort(permutation.begin(), permutation.end(), [&](auto a, auto b) {
+		std::stable_sort(permutation.begin(), permutation.end(), [&](auto a, auto b) {
 			return compare(const_cast<const T&>(m_values[a]), const_cast<const T&>(m_values[b]));
 		});
+
 		for (IndexType pos = 0; pos < permutation.size(); ++pos) {
 			auto curr = pos;
 			auto next = permutation[curr];
 			while (curr != next) {
-				std::swap(permutation[curr], permutation[next]);
-				std::swap(m_sparse[curr], m_sparse[next]);
-				std::swap(m_dense[curr], m_dense[next]);
-				std::swap(m_values[curr], m_values[next]);
+				auto a = permutation[curr], b = permutation[next];
+				std::swap(m_sparse[m_dense[a].index], m_sparse[m_dense[b].index]);
+				std::swap(m_dense[a], m_dense[b]);
+				std::swap(m_values[a], m_values[b]);
 				permutation[curr] = curr;
 				curr = next;
 				next = permutation[curr];
 			}
 		}
 	}
+
+	auto unsafe_sparse() { return m_sparse; }
+	auto unsafe_dense() { return m_dense; }
+	auto unsafe_values() { return m_values; }
 
   private:
 	std::vector<IndexType> m_sparse;

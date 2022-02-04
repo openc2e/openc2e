@@ -145,7 +145,7 @@ TEST(common, entitypool_sort) {
 	auto two = pool.add(1);
 	auto three = pool.add(0);
 
-	pool.sort([](const MyTestItem& a, const MyTestItem& b) {
+	pool.stable_sort([](const MyTestItem& a, const MyTestItem& b) {
 		return a.value < b.value;
 	});
 
@@ -159,4 +159,27 @@ TEST(common, entitypool_sort) {
 	EXPECT_EQ(pool.try_get(one)->value, 2);
 	EXPECT_EQ(pool.try_get(two)->value, 1);
 	EXPECT_EQ(pool.try_get(three)->value, 0);
+}
+
+TEST(common, entitypool_sort_scenario1) {
+	// this used to segfault
+	EntityPool<MyTestItem> pool;
+	auto zero = pool.add(1);
+	for (int i = 0; i < 3; ++i) {
+		pool.add(0);
+	}
+
+	EXPECT_NE(pool.try_get(zero), nullptr);
+
+	pool.stable_sort([](const MyTestItem& a, const MyTestItem& b) {
+		return a.value < b.value;
+	});
+
+	EXPECT_NE(pool.try_get(zero), nullptr);
+
+	auto it = pool.begin();
+	for (size_t i = 0; i < pool.size() - 1; ++i) {
+		EXPECT_EQ(it++->value, 0);
+	}
+	EXPECT_EQ(it->value, 1);
 }
