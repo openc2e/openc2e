@@ -311,7 +311,7 @@ unsigned int SDLRenderTarget::getHeight() const {
 }
 
 void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, RenderOptions options) {
-	if ((x + img.width(frame) <= 0 || x >= (int)getWidth()) && (y + img.height(frame) <= 0 || y >= (int)getHeight())) {
+	if (x + (int)img.width(frame) <= 0 || x >= (int)getWidth() || y + (int)img.height(frame) <= 0 || y >= (int)getHeight()) {
 		return;
 	}
 
