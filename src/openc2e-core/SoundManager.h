@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sound.h"
+#include "common/EntityPool.h"
 #include "openc2e-audiobackend/AudioBackend.h"
 
 #include <chrono>
@@ -28,42 +29,29 @@ class SoundManager {
   private:
 	friend class Sound;
 	struct SoundData {
-		SoundData() {
-			resetAndIncrementGeneration();
-		}
+		SoundData() = default;
 		SoundData(SoundData&&) = default;
 		SoundData& operator=(SoundData&&) = default;
 		SoundData(const SoundData&) = delete;
 		SoundData& operator=(const SoundData&) = delete;
 
 		bool isAlive();
-		void resetAndIncrementGeneration() {
-			generation++;
-			handle = {};
-			is_creature_voice = false;
-			positioned = false;
-			x = 0;
-			y = 0;
-			width = 0;
-			height = 0;
-			fade_start = {};
-			fade_length = {};
-		}
 
-		int generation = 0;
-		AudioChannel handle;
+		AudioChannel handle{};
 
-		bool is_creature_voice;
-		bool positioned;
-		float x;
-		float y;
-		float width;
-		float height;
+		bool is_creature_voice = false;
+		bool positioned = false;
+		float x = 0;
+		float y = 0;
+		float width = 0;
+		float height = 0;
 
-		std::chrono::time_point<std::chrono::steady_clock> fade_start;
-		fmilliseconds fade_length;
+		std::chrono::time_point<std::chrono::steady_clock> fade_start{};
+		fmilliseconds fade_length{};
 	};
-	std::vector<SoundData> sources;
+
+	EntityPool<SoundData> sources;
+	using SoundId = decltype(sources)::Id;
 
 	void updateVolume(SoundData& source);
 	void updateVolumes();

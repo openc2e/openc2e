@@ -1,129 +1,7 @@
+#include "common/EntityPool.h"
+
 #include <gtest/gtest.h>
 #include <iterator>
-#include <vector>
-
-
-template <typename T>
-class EntityPool {
-  private:
-	using IndexType = uint16_t;
-	using GenerationType = uint16_t;
-
-	static const IndexType NULL_INDEX = static_cast<IndexType>(~0);
-
-  public:
-	using ValueType = T;
-	struct Id {
-	  private:
-		friend EntityPool;
-		Id(IndexType index_, GenerationType generation_)
-			: index(index_), generation(generation_) {}
-		IndexType index;
-		GenerationType generation;
-
-	  public:
-		constexpr Id() {
-			index = ~0;
-			generation = ~0;
-		}
-		bool operator==(const Id& other) const {
-			return index == other.index && generation == other.generation;
-		}
-		bool operator!=(const Id& other) const {
-			return !(*this == other);
-		}
-		uint32_t to_integral() const {
-			return (generation << 16) | index;
-		}
-	};
-	static_assert(sizeof(Id) == sizeof(std::declval<Id>().to_integral()), "");
-
-
-	Id add(T value) {
-		Id new_id;
-		if (m_deleted.size()) {
-			new_id = m_deleted.back();
-			m_deleted.pop_back();
-		} else {
-			new_id = Id(m_sparse.size(), 0);
-			if (new_id.index == NULL_INDEX) {
-				// whoops, ran out of ids
-				std::terminate();
-			}
-		}
-		if (new_id.index >= m_sparse.size()) {
-			m_sparse.resize(new_id.index + 1);
-		}
-		m_sparse[new_id.index] = m_dense.size();
-		m_dense.push_back(new_id);
-		m_values.push_back(value);
-
-		return new_id;
-	}
-
-	T* try_get(Id id) {
-		if (!contains(id)) {
-			return nullptr;
-		}
-		IndexType dense_index = m_sparse[id.index];
-		return &m_values[dense_index];
-	}
-
-	void erase(Id id) {
-		if (!contains(id)) {
-			return;
-		}
-		IndexType dense_index = m_sparse[id.index];
-
-		m_sparse[id.index] = NULL_INDEX;
-		m_sparse[m_dense.back().index] = dense_index;
-
-		std::swap(m_dense[dense_index], m_dense.back());
-		std::swap(m_values[dense_index], m_values.back());
-		m_dense.pop_back();
-		m_values.pop_back();
-
-		id.generation++;
-		m_deleted.push_back(id);
-	}
-
-	bool contains(Id id) {
-		if (id.index >= m_sparse.size()) {
-			return false;
-		}
-		if (m_sparse[id.index] == NULL_INDEX) {
-			return false;
-		}
-		return m_dense[m_sparse[id.index]] == id;
-	}
-
-	size_t extent() const {
-		return m_sparse.size();
-	}
-
-	size_t size() const {
-		return m_values.size();
-	}
-
-	auto begin() {
-		return m_values.begin();
-	}
-
-	auto end() {
-		return m_values.end();
-	}
-
-  private:
-	std::vector<IndexType> m_sparse;
-	std::vector<Id> m_dense;
-	std::vector<T> m_values;
-	// Store a list of deleted IDs that we can recycle. This could be more
-	// optimized, see https://skypjack.github.io/2019-05-06-ecs-baf-part-3/
-	std::vector<Id> m_deleted;
-};
-
-template <typename T>
-constexpr typename EntityPool<T>::IndexType EntityPool<T>::NULL_INDEX;
 
 template <typename R>
 auto count(R&& range) {
@@ -211,5 +89,51 @@ TEST(common, entitypool) {
 		}
 		EXPECT_EQ(item.value, expected);
 		i++;
+	}
+
+	// iterate ids
+	for (auto i : pool.enumerate()) {
+		if (i.id == first) {
+			EXPECT_EQ(i.value->value, 5);
+		} else if (i.id == third) {
+			EXPECT_EQ(i.value->value, 132);
+		} else if (i.id == fourth) {
+			EXPECT_EQ(i.value->value, 81);
+		} else {
+			printf("unknown id %i\n", i.id.to_integral());
+			EXPECT_TRUE(false);
+		}
+	}
+}
+
+TEST(common, entitypool_erase_at_back_of_dense_array) {
+	// this used to segfault because there was a bug when erasing items at the back
+	// of the dense array
+	EntityPool<MyTestItem> pool;
+	auto first = pool.add(5);
+	pool.erase(first);
+	EXPECT_FALSE(pool.contains(first));
+	EXPECT_EQ(pool.try_get(first), nullptr);
+}
+
+TEST(common, entitypool_erase_during_enumeration) {
+	// this used to segfault
+	EntityPool<MyTestItem> pool;
+	auto zero = pool.add(0);
+	auto one = pool.add(1);
+	auto two = pool.add(2);
+
+	for (auto i : pool.enumerate()) {
+		if (i.id == zero) {
+			pool.erase(i.id);
+			continue;
+		}
+		if (i.id == one) {
+			EXPECT_EQ(i.value->value, 1);
+		} else if (i.id == two) {
+			EXPECT_EQ(i.value->value, 2);
+		} else {
+			EXPECT_TRUE(false);
+		}
 	}
 }

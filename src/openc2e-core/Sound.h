@@ -2,6 +2,8 @@
 
 #include "openc2e-audiobackend/AudioState.h"
 
+#include <stdint.h>
+
 class Sound {
   public:
 	Sound();
@@ -13,6 +15,5 @@ class Sound {
 
   private:
 	friend class SoundManager;
-	int index = -1;
-	int generation = -1;
+	uint32_t id = ~0;
 };

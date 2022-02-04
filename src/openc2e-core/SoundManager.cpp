@@ -45,31 +45,32 @@ bool SoundManager::SoundData::isAlive() {
 	if (handle && engine.audio->getChannelState(handle) == AUDIO_PLAYING) {
 		return true;
 	} else {
-		resetAndIncrementGeneration();
+		// resetAndIncrementGeneration();
 		return false;
 	}
 }
 
+SoundManager::SoundData* SoundManager::getSoundData(Sound& sound) {
+	static_assert(sizeof(Sound) == sizeof(SoundManager::SoundId), "");
+	SoundId id = *reinterpret_cast<SoundId*>(&sound); // TODO
+
+	SoundData* data = sources.try_get(id);
+	if (!data) {
+		return nullptr;
+	}
+
+	return data;
+}
+
 Sound SoundManager::getNewSound(AudioChannel handle, bool is_creature_voice) {
-	size_t i = 0;
-	for (; i < sources.size(); ++i) {
-		if (!sources[i].isAlive()) {
-			break;
-		}
-	}
-	if (i >= sources.size()) {
-		sources.resize(i + 1);
-	}
+	SoundData data;
+	data.handle = handle;
+	data.is_creature_voice = is_creature_voice;
+	updateVolume(data);
 
-	sources[i].handle = handle;
-	sources[i].is_creature_voice = is_creature_voice;
-	updateVolume(sources[i]);
-
-	Sound source;
-	source.index = i;
-	source.generation = sources[source.index].generation;
-
-	return source;
+	SoundId id = sources.add(std::move(data));
+	static_assert(sizeof(Sound) == sizeof(SoundManager::SoundId), "");
+	return *reinterpret_cast<Sound*>(&id); // TODO
 }
 
 bool SoundManager::areCreatureVoicesMuted() {
@@ -150,17 +151,14 @@ void SoundManager::updateVolume(SoundData& s) {
 }
 
 void SoundManager::updateVolumes() {
-	for (auto& s : sources) {
-		updateVolume(s);
+	for (auto i : sources.enumerate()) {
+		if (!i.value->isAlive()) {
+			// Make sure erasing during enumeration is okay!!!
+			sources.erase(i.id);
+			continue;
+		}
+		updateVolume(*i.value);
 	}
-}
-
-SoundManager::SoundData* SoundManager::getSoundData(Sound& source) {
-	if (source.index < 0 || static_cast<unsigned int>(source.index) >= sources.size() || source.generation != sources[source.index].generation || !sources[source.index].isAlive()) {
-		source = {};
-		return nullptr;
-	}
-	return &sources[source.index];
 }
 
 Sound SoundManager::playSound(std::string name, bool loop) {

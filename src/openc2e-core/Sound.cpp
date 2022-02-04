@@ -7,7 +7,14 @@
 Sound::Sound() = default;
 
 Sound::operator bool() {
-	return getState() == AUDIO_PLAYING;
+	if (id == static_cast<uint32_t>(~0)) {
+		return false;
+	}
+	if (getState() == AUDIO_PLAYING) {
+		return true;
+	}
+	id = static_cast<uint32_t>(~0);
+	return false;
 }
 
 void Sound::fadeOut() {
