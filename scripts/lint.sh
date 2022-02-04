@@ -26,8 +26,8 @@ if [ $CLANG_FORMAT_MAJOR != $REQUIRED_CLANG_FORMAT_MAJOR ]; then
 fi
 
 since_rev="${1:-HEAD}"
-
-modified_files=$(git diff --name-only --diff-filter=ACMRTUXB "${since_rev}" --)
+cd "$(git rev-parse --show-toplevel)"
+modified_files=$(git ls-files -o --exclude-standard  && git diff --name-only --diff-filter=ACMRTUXB "${since_rev}" --)
 for f in ${modified_files}; do
   if ! echo "${f}" | egrep -q "[.](cpp|c|mm|m|h)$"; then
     continue
@@ -35,7 +35,6 @@ for f in ${modified_files}; do
   if ! echo "${f}" | egrep -q "^(src|tests)"; then
     continue
   fi
-  f="$(git rev-parse --show-toplevel)/${f}"
 
   d=$($CLANG_FORMAT ${f} | (diff -u "${f}" - || true))
   if ! [ -z "${d}" ]; then
