@@ -7,38 +7,33 @@ template <typename T>
 class EntityPool {
   private:
 	using IndexType = uint16_t;
-	using VersionType = uint16_t;
+	using GenerationType = uint16_t;
 
 	static const IndexType NULL_INDEX = static_cast<IndexType>(~0);
-
-	std::vector<IndexType> m_sparse;
-	std::vector<IndexType> m_dense;
-	std::vector<T> m_values;
-
 
   public:
 	using ValueType = T;
 	struct Id {
 	  private:
 		friend EntityPool;
-		Id(IndexType index_, VersionType version_)
-			: index(index_), version(version_) {}
+		Id(IndexType index_, GenerationType generation_)
+			: index(index_), generation(generation_) {}
 		IndexType index;
-		VersionType version;
+		GenerationType generation;
 
 	  public:
 		constexpr Id() {
 			index = ~0;
-			version = ~0;
+			generation = ~0;
 		}
 		bool operator==(const Id& other) const {
-			return index == other.index && version == other.version;
+			return index == other.index && generation == other.generation;
 		}
 		bool operator!=(const Id& other) const {
 			return !(*this == other);
 		}
 		uint32_t to_integral() const {
-			return (version << 16) | index;
+			return (generation << 16) | index;
 		}
 	};
 	static_assert(sizeof(Id) == sizeof(std::declval<Id>().to_integral()), "");
@@ -46,20 +41,18 @@ class EntityPool {
 
 	Id add(T value) {
 		Id new_id;
-		for (size_t i = 0; i < m_sparse.size(); ++i) {
-			if (m_sparse[i] == NULL_INDEX) {
-				new_id.index = i;
-				new_id.version = 0;
-				break;
-			}
-		}
-		if (new_id.index == NULL_INDEX) {
+		if (m_deleted.size()) {
+			new_id = m_deleted.back();
+			m_deleted.pop_back();
+		} else {
 			new_id = Id(m_sparse.size(), 0);
 			if (new_id.index == NULL_INDEX) {
 				// whoops, ran out of ids
 				std::terminate();
 			}
-			m_sparse.resize(m_sparse.size() + 1);
+		}
+		if (new_id.index >= m_sparse.size()) {
+			m_sparse.resize(new_id.index + 1);
 		}
 		m_sparse[new_id.index] = m_dense.size();
 		m_dense.push_back(new_id.index);
@@ -89,6 +82,8 @@ class EntityPool {
 		std::swap(m_values[dense_index], m_values.back());
 		m_dense.resize(m_dense.size() - 1);
 		m_values.resize(m_values.size() - 1);
+
+		m_deleted.push_back(id);
 	}
 
 	bool contains(Id id) {
@@ -116,6 +111,12 @@ class EntityPool {
 	auto end() {
 		return m_values.end();
 	}
+
+  private:
+	std::vector<IndexType> m_sparse;
+	std::vector<Id> m_deleted;
+	std::vector<IndexType> m_dense;
+	std::vector<T> m_values;
 };
 
 template <typename T>
@@ -176,8 +177,8 @@ TEST(common, entitypool) {
 	// add a value after erasing a value
 	auto fourth = pool.add(23);
 	EXPECT_EQ(pool.size(), 3);
-	EXPECT_EQ(fourth, second); // recycle id
-	EXPECT_EQ(pool.extent(), 3); // recycle id
+	EXPECT_EQ(fourth, second); // recycle ids
+	EXPECT_EQ(pool.extent(), 3); // recycle ids
 	EXPECT_EQ(count(pool), 3);
 
 	EXPECT_TRUE(pool.contains(first));
