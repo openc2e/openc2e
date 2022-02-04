@@ -55,7 +55,7 @@ class EntityPool {
 			m_sparse.resize(new_id.index + 1);
 		}
 		m_sparse[new_id.index] = m_dense.size();
-		m_dense.push_back(new_id.index);
+		m_dense.push_back(new_id);
 		m_values.push_back(value);
 
 		return new_id;
@@ -76,13 +76,14 @@ class EntityPool {
 		IndexType dense_index = m_sparse[id.index];
 
 		m_sparse[id.index] = NULL_INDEX;
-		m_sparse[m_dense.back()] = dense_index;
+		m_sparse[m_dense.back().index] = dense_index;
 
 		std::swap(m_dense[dense_index], m_dense.back());
 		std::swap(m_values[dense_index], m_values.back());
-		m_dense.resize(m_dense.size() - 1);
-		m_values.resize(m_values.size() - 1);
+		m_dense.pop_back();
+		m_values.pop_back();
 
+		id.generation++;
 		m_deleted.push_back(id);
 	}
 
@@ -93,7 +94,7 @@ class EntityPool {
 		if (m_sparse[id.index] == NULL_INDEX) {
 			return false;
 		}
-		return m_dense[m_sparse[id.index]] == id.index;
+		return m_dense[m_sparse[id.index]] == id;
 	}
 
 	size_t extent() const {
@@ -114,9 +115,11 @@ class EntityPool {
 
   private:
 	std::vector<IndexType> m_sparse;
-	std::vector<Id> m_deleted;
-	std::vector<IndexType> m_dense;
+	std::vector<Id> m_dense;
 	std::vector<T> m_values;
+	// Store a list of deleted IDs that we can recycle. This could be more
+	// optimized, see https://skypjack.github.io/2019-05-06-ecs-baf-part-3/
+	std::vector<Id> m_deleted;
 };
 
 template <typename T>
@@ -177,8 +180,8 @@ TEST(common, entitypool) {
 	// add a value after erasing a value
 	auto fourth = pool.add(23);
 	EXPECT_EQ(pool.size(), 3);
-	EXPECT_EQ(fourth, second); // recycle ids
-	EXPECT_EQ(pool.extent(), 3); // recycle ids
+	EXPECT_NE(fourth, second); // don't recycle ids
+	EXPECT_EQ(pool.extent(), 3); // but do recycle sparse slots
 	EXPECT_EQ(count(pool), 3);
 
 	EXPECT_TRUE(pool.contains(first));
