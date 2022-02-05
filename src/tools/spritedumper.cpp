@@ -95,40 +95,42 @@ void stitch_to_sheet(MultiImage& image) {
 }
 
 int main(int argc, char** argv) {
-	if (argc != 2) {
-		fmt::print(stderr, "syntax: spritedumper filename\n");
+	if (argc < 2) {
+		fmt::print(stderr, "syntax: spritedumper filenames...\n");
 		exit(1);
 	}
 
-	fs::path input_path(argv[1]);
-	std::string stem = input_path.stem();
+	for (int i = 1; i < argc; ++i) {
+		fs::path input_path(argv[i]);
+		std::string stem = input_path.stem();
 
-	MultiImage image = [&] {
-		try {
-			return ImageUtils::ReadImage(input_path);
-		} catch (Exception& e) {
-			fmt::print(stderr, "Exception: {}\n", e.prettyPrint());
-			exit(1);
-		}
-	}();
-	if (ImageUtils::IsBackground(image)) {
-		image = {ImageUtils::StitchBackground(image)};
-	}
-
-	stitch_to_sheet(image);
-
-	shared_array<Color> palette;
-
-	for (size_t i = 0; i < image.size(); ++i) {
-		std::string frame_filename = [&]() {
-			if (image.size() == 1) {
-				return stem + ".tga";
-			} else {
-				return stem + fmt::format("_{:03}.tga", i);
+		MultiImage image = [&] {
+			try {
+				return ImageUtils::ReadImage(input_path);
+			} catch (Exception& e) {
+				fmt::print(stderr, "Exception: {}\n", e.prettyPrint());
+				exit(1);
 			}
 		}();
-		fmt::print("{}\n", frame_filename);
+		if (ImageUtils::IsBackground(image)) {
+			image = {ImageUtils::StitchBackground(image)};
+		}
 
-		WriteTgaFile(image[i], frame_filename);
+		stitch_to_sheet(image);
+
+		shared_array<Color> palette;
+
+		for (size_t i = 0; i < image.size(); ++i) {
+			std::string frame_filename = [&]() {
+				if (image.size() == 1) {
+					return stem + ".tga";
+				} else {
+					return stem + fmt::format("_{:03}.tga", i);
+				}
+			}();
+			fmt::print("{}\n", frame_filename);
+
+			WriteTgaFile(image[i], frame_filename);
+		}
 	}
 }

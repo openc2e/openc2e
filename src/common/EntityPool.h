@@ -127,6 +127,7 @@ class EntityPool {
 	}
 
 	auto enumerate() {
+		// TODO: make a const version
 		// TODO: make an actual iterator
 		// we do this backwards so that erasing during enumeration is okay
 
@@ -192,10 +193,6 @@ class EntityPool {
 			}
 		}
 	}
-
-	auto unsafe_sparse() { return m_sparse; }
-	auto unsafe_dense() { return m_dense; }
-	auto unsafe_values() { return m_values; }
 
   private:
 	std::vector<IndexType> m_sparse;

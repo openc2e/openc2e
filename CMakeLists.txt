@@ -77,7 +77,6 @@ add_subdirectory(externals/imgui EXCLUDE_FROM_ALL)
 add_subdirectory(externals/nativefiledialog EXCLUDE_FROM_ALL)
 
 # Pass flags to the compiler
-add_compile_definitions("_REENTRANT" "YYERROR_VERBOSE")
 if(WIN32)
 	add_compile_definitions("NOMINMAX")
 endif()
@@ -125,9 +124,10 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/c2cobfile.cpp
 	src/fileformats/genomeFile.cpp
 	src/fileformats/hedfile.cpp
-	src/fileformats/MfcReader.cpp
+	src/fileformats/MFCReader.cpp
 	src/fileformats/mngfile.cpp
 	${GEN}/fileformats/mngparser.cpp
+	src/fileformats/NewSFCFile.cpp
 	src/fileformats/paletteFile.cpp
 	src/fileformats/peFile.cpp
 	src/fileformats/PrayFileReader.cpp
@@ -296,10 +296,12 @@ target_link_libraries(openc2e
 
 add_executable(opencreatures1
 	src/opencreatures1/main.cpp
+	src/opencreatures1/C1MusicManager.cpp
 	src/opencreatures1/ImageManager.cpp
+	src/opencreatures1/MacroManager.cpp
 	src/opencreatures1/PathManager.cpp
 	src/opencreatures1/SDLBackend.cpp
-	src/opencreatures1/C1MusicManager.cpp
+	src/opencreatures1/SFCLoader.cpp
 	src/openc2e-core/creaturesImage.cpp
 )
 target_link_libraries(opencreatures1
@@ -388,7 +390,6 @@ add_executable(test_openc2e
 	src/tests/test_encoding.cpp
 	src/tests/test_pray.cpp
 	src/tests/test_common.cpp
-	src/tests/test_sparseset.cpp
 	src/tests/test_entitypool.cpp
 )
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)

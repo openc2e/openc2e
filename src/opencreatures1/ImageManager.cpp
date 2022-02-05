@@ -40,7 +40,7 @@ creaturesImage& ImageManager::get_image(std::string name, ImageType allowed_type
 	if (path.empty()) {
 		throw Exception(fmt::format("Couldn't find image {}", repr(name)));
 	}
-	creaturesImage image;
+	creaturesImage image(name);
 	image.images = ImageUtils::ReadImage(path);
 	if (ImageUtils::IsBackground(image.images)) {
 		// TODO: I guess do this here? Instead of being explicit?

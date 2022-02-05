@@ -34,6 +34,7 @@ class MFCReader {
 	uint8_t read8();
 	int8_t reads8();
 	uint16_t read16le();
+	int16_t reads16le();
 	uint32_t read32le();
 	int32_t reads32le();
 	template <typename T>

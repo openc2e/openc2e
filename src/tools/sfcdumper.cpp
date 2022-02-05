@@ -1,6 +1,5 @@
-// #include "fileformats/MfcReader.h"
 
-#include "fileformats/NewSfcFile.h"
+#include "fileformats/NewSFCFile.h"
 
 #include <fmt/core.h>
 #include <fstream>

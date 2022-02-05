@@ -1,7 +1,9 @@
-#include "fileformats/MfcReader.h"
+#pragma once
+
+#include "fileformats/MFCReader.h"
 
 #include <array>
-#include <fstream>
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -44,10 +46,10 @@ struct CGalleryV1 : MFCObject {
 
 struct RoomV1 {
 	// not CArchive serialized
-	uint32_t left;
-	uint32_t top;
-	uint32_t right;
-	uint32_t bottom;
+	int32_t left;
+	int32_t top;
+	int32_t right;
+	int32_t bottom;
 	uint32_t type;
 };
 
@@ -80,11 +82,11 @@ struct MapDataV1 : MFCObject {
 		uint32_t num_rooms = in.read32le();
 		for (size_t i = 0; i < num_rooms; ++i) {
 			RoomV1 room;
-			room.left = in.read32le();
-			room.top = in.read32le();
-			room.right = in.read32le();
-			room.bottom = in.read32le();
-			room.type = in.read32le();
+			room.left = in.reads32le();
+			room.top = in.reads32le();
+			room.right = in.reads32le();
+			room.bottom = in.reads32le();
+			room.type = in.reads32le();
 			rooms.push_back(room);
 		}
 		for (size_t i = 0; i < 261; ++i) {
@@ -107,9 +109,9 @@ struct EntityV1 : MFCObject {
 	CGalleryV1* sprite;
 	uint8_t current_sprite;
 	uint8_t image_offset;
-	uint32_t z_order; // TODO: should be signed?
-	uint32_t x;
-	uint32_t y;
+	int32_t z_order; // TODO: should be signed?
+	int32_t x;
+	int32_t y;
 	uint8_t has_animation;
 	uint8_t animation_frame; // only if has_animation is true
 	std::string animation_string; // only if has_animation is true
@@ -118,9 +120,9 @@ struct EntityV1 : MFCObject {
 		sprite = in.read_type<CGalleryV1>();
 		current_sprite = in.read8();
 		image_offset = in.read8();
-		z_order = in.read32le();
-		x = in.read32le();
-		y = in.read32le();
+		z_order = in.reads32le();
+		x = in.reads32le();
+		y = in.reads32le();
 		has_animation = in.read8();
 		if (has_animation) {
 			animation_frame = in.read8();
@@ -155,20 +157,20 @@ struct ObjectV1 : MFCObject {
 	uint8_t family;
 	uint8_t movement_status;
 	uint8_t attr;
-	uint32_t limit_left;
-	uint32_t limit_top;
-	uint32_t limit_right;
-	uint32_t limit_bottom;
+	int32_t limit_left;
+	int32_t limit_top;
+	int32_t limit_right;
+	int32_t limit_bottom;
 	ObjectV1* carrier;
 	uint8_t actv;
 	CGalleryV1* sprite;
-	uint32_t tick_time;
-	uint32_t tick_state;
+	uint32_t tick_value;
+	uint32_t ticks_since_last_tick_event;
 	ObjectV1* objp;
 	std::string current_sound;
-	uint32_t obv0;
-	uint32_t obv1;
-	uint32_t obv2;
+	int32_t obv0;
+	int32_t obv1;
+	int32_t obv2;
 	std::vector<ScriptV1> scripts;
 
 	void read_from(MFCReader& in) override {
@@ -178,20 +180,20 @@ struct ObjectV1 : MFCObject {
 		family = in.read8();
 		movement_status = in.read8();
 		attr = in.read8();
-		limit_left = in.read32le();
-		limit_top = in.read32le();
-		limit_right = in.read32le();
-		limit_bottom = in.read32le();
+		limit_left = in.reads32le();
+		limit_top = in.reads32le();
+		limit_right = in.reads32le();
+		limit_bottom = in.reads32le();
 		carrier = in.read_type<ObjectV1>();
 		actv = in.read8();
 		sprite = in.read_type<CGalleryV1>();
-		tick_time = in.read32le();
-		tick_state = in.read32le();
+		tick_value = in.read32le();
+		ticks_since_last_tick_event = in.read32le();
 		objp = in.read_type<ObjectV1>();
 		current_sound = in.read_ascii(4);
-		obv0 = in.read32le();
-		obv1 = in.read32le();
-		obv2 = in.read32le();
+		obv0 = in.reads32le();
+		obv1 = in.reads32le();
+		obv2 = in.reads32le();
 		uint32_t num_scripts = in.read32le();
 		for (size_t i = 0; i < num_scripts; ++i) {
 			ScriptV1 script;
@@ -203,7 +205,7 @@ struct ObjectV1 : MFCObject {
 
 struct SimpleObjectV1 : ObjectV1 {
 	EntityV1* part;
-	uint32_t zorder;
+	int32_t z_order;
 	std::array<uint8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
@@ -211,7 +213,7 @@ struct SimpleObjectV1 : ObjectV1 {
 		ObjectV1::read_from(in);
 
 		part = in.read_type<EntityV1>();
-		zorder = in.read32le();
+		z_order = in.reads32le();
 		click_bhvr[0] = in.read8();
 		click_bhvr[1] = in.read8();
 		click_bhvr[2] = in.read8();
@@ -300,10 +302,10 @@ struct VehicleV1 : CompoundObjectV1 {
 	int32_t yvel_times_256;
 	int32_t x_times_256;
 	int32_t y_times_256;
-	uint32_t cabin_left;
-	uint32_t cabin_top;
-	uint32_t cabin_right;
-	uint32_t cabin_bottom;
+	int32_t cabin_left;
+	int32_t cabin_top;
+	int32_t cabin_right;
+	int32_t cabin_bottom;
 	uint32_t bump;
 
 	void read_from(MFCReader& in) override {
@@ -312,10 +314,10 @@ struct VehicleV1 : CompoundObjectV1 {
 		yvel_times_256 = in.reads32le();
 		x_times_256 = in.reads32le();
 		y_times_256 = in.reads32le();
-		cabin_left = in.read32le();
-		cabin_top = in.read32le();
-		cabin_right = in.read32le();
-		cabin_bottom = in.read32le();
+		cabin_left = in.reads32le();
+		cabin_top = in.reads32le();
+		cabin_right = in.reads32le();
+		cabin_bottom = in.reads32le();
 		bump = in.read32le();
 	}
 };
@@ -330,8 +332,8 @@ struct BlackboardV1 : CompoundObjectV1 {
 	uint8_t background_color;
 	uint8_t chalk_color;
 	uint8_t alias_color;
-	uint8_t text_x_position;
-	uint8_t text_y_position;
+	int8_t text_x_position;
+	int8_t text_y_position;
 	std::array<BlackboardWord, 16> words;
 
 	void read_from(MFCReader& in) override {
@@ -339,8 +341,8 @@ struct BlackboardV1 : CompoundObjectV1 {
 		background_color = in.read8();
 		chalk_color = in.read8();
 		alias_color = in.read8();
-		text_x_position = in.read8();
-		text_y_position = in.read8();
+		text_x_position = in.reads8();
+		text_y_position = in.reads8();
 		for (size_t i = 0; i < 16; ++i) {
 			words[i].value = in.read32le();
 			words[i].text = in.read_ascii_nullterminated(11);
@@ -401,9 +403,9 @@ struct MacroV1 : MFCObject {
 	uint32_t script_length_maybe;
 	std::string script;
 	uint32_t ip;
-	std::array<uint32_t, 20> stack;
+	std::array<int32_t, 20> stack;
 	uint32_t sp;
-	std::array<uint32_t, 10> vars;
+	std::array<int32_t, 10> vars;
 	ObjectV1* ownr;
 	ObjectV1* from;
 	ObjectV1* exec;
@@ -421,11 +423,11 @@ struct MacroV1 : MFCObject {
 		script = in.read_ascii_mfcstring();
 		ip = in.read32le();
 		for (size_t i = 0; i < 20; ++i) {
-			stack[i] = in.read32le();
+			stack[i] = in.reads32le();
 		}
 		sp = in.read32le();
 		for (size_t i = 0; i < 10; ++i) {
-			vars[i] = in.read32le();
+			vars[i] = in.reads32le();
 		}
 		ownr = in.read_type<ObjectV1>();
 		from = in.read_type<ObjectV1>();
@@ -445,8 +447,8 @@ struct CreatureV1 : MFCObject {
 
 struct FavoritePlaceV1 {
 	std::string name;
-	uint16_t x;
-	uint16_t y;
+	int16_t x;
+	int16_t y;
 };
 
 struct SFCFile {
@@ -455,8 +457,8 @@ struct SFCFile {
 	std::vector<SceneryV1*> sceneries;
 	std::vector<ScriptV1> scripts;
 
-	uint32_t scrollx;
-	uint32_t scrolly;
+	int32_t scrollx;
+	int32_t scrolly;
 
 	CreatureV1* current_norn;
 	std::vector<FavoritePlaceV1> favorite_places;
@@ -479,97 +481,7 @@ struct SFCFile {
 	std::vector<std::unique_ptr<MFCObject>> mfc_objects;
 };
 
-SFCFile read_sfc_v1_file(std::istream& in) {
-	// set up types
-	MFCReader reader(in);
-	reader.register_class<MapDataV1>("MapData", 1);
-	reader.register_class<CGalleryV1>("CGallery", 1);
-	reader.register_class<PointerToolV1>("PointerTool", 1);
-	reader.register_class<EntityV1>("Entity", 1);
-	reader.register_class<CompoundObjectV1>("CompoundObject", 1);
-	reader.register_class<SimpleObjectV1>("SimpleObject", 1);
-	reader.register_class<VehicleV1>("Vehicle", 1);
-	reader.register_class<LiftV1>("Lift", 1);
-	reader.register_class<SceneryV1>("Scenery", 1);
-	reader.register_class<MacroV1>("Macro", 1);
-	reader.register_class<BlackboardV1>("Blackboard", 1);
-	reader.register_class<CallButtonV1>("CallButton", 1);
-
-	// read file
-	SFCFile sfc;
-	sfc.map = reader.read_type<MapDataV1>();
-
-	uint32_t num_objects = reader.read32le();
-	for (size_t i = 0; i < num_objects; ++i) {
-		sfc.objects.push_back(reader.read_type<ObjectV1>());
-	}
-
-	uint32_t num_sceneries = reader.read32le();
-	for (size_t i = 0; i < num_sceneries; ++i) {
-		sfc.sceneries.push_back(reader.read_type<SceneryV1>());
-	}
-
-	uint32_t num_scripts = reader.read32le();
-	for (size_t i = 0; i < num_scripts; ++i) {
-		ScriptV1 script;
-		script.read_from(reader);
-		sfc.scripts.push_back(script);
-	}
-
-	sfc.scrollx = reader.read32le();
-	sfc.scrolly = reader.read32le();
-
-	sfc.current_norn = reader.read_type<CreatureV1>();
-
-	for (size_t i = 0; i < 6; ++i) {
-		FavoritePlaceV1 favplace;
-		favplace.name = reader.read_ascii_mfcstring();
-		favplace.x = reader.read16le();
-		favplace.y = reader.read16le();
-		sfc.favorite_places.push_back(favplace);
-	}
-
-	uint16_t size_speech_history = reader.read16le();
-	for (size_t i = 0; i < size_speech_history; ++i) {
-		sfc.speech_history.push_back(reader.read_ascii_mfcstring());
-	}
-
-	uint32_t num_macros = reader.read32le();
-	for (size_t i = 0; i < num_macros; ++i) {
-		sfc.macros.push_back(reader.read_type<MacroV1>());
-	}
-
-	uint32_t num_death_row = reader.read32le();
-	for (size_t i = 0; i < num_death_row; ++i) {
-		sfc.death_row.push_back(reader.read_type<ObjectV1>());
-	}
-
-	uint32_t num_events = reader.read32le();
-	for (size_t i = 0; i < num_events; ++i) {
-		sfc.events.push_back(reader.read_type<ObjectV1>());
-	}
-
-	sfc.current_score = reader.read32le();
-	sfc.current_health = reader.read32le();
-	sfc.hatchery_eggs = reader.read32le();
-	sfc.natural_eggs = reader.read32le();
-	sfc.dead_norns = reader.read32le();
-	sfc.live_norns = reader.read32le();
-	sfc.breeders_score = reader.read32le();
-	sfc.tick = reader.read32le();
-
-	uint32_t num_stuffed_norns = reader.read32le();
-	for (size_t i = 0; i < num_stuffed_norns; ++i) {
-		sfc.stuffed_norns.push_back(reader.read_type<CreatureV1>());
-	}
-
-	sfc.mfc_objects = reader.release_objects();
-	return sfc;
-}
-
-SFCFile read_sfc_v1_file(const std::string& path) {
-	std::ifstream in(path, std::ios_base::binary);
-	return read_sfc_v1_file(in);
-}
+SFCFile read_sfc_v1_file(std::istream& in);
+SFCFile read_sfc_v1_file(const std::string& path);
 
 } // namespace sfc

@@ -2,6 +2,10 @@
 
 #include <string>
 
+inline bool is_ascii_digit(char c) {
+	return c >= '0' && c <= '9';
+}
+
 inline char to_ascii_lowercase(char c) {
 	if (c >= 'A' && c <= 'Z') {
 		return c - ('Z' - 'z');

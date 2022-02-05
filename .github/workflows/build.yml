@@ -28,7 +28,6 @@ jobs:
       
   build:
     name: build-${{ matrix.os }}
-    needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

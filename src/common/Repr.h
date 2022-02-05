@@ -8,5 +8,6 @@ class path;
 }
 } // namespace ghc
 
-std::string repr(const std::string& s);
-std::string repr(const ghc::filesystem::path& p);
+std::string repr(char);
+std::string repr(const std::string&);
+std::string repr(const ghc::filesystem::path&);

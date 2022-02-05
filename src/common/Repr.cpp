@@ -3,26 +3,32 @@
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
 
+std::string repr(char c) {
+	if (c == '\r') {
+		return "\\r";
+	} else if (c == '\n') {
+		return "\\n";
+	} else if (c == '\t') {
+		return "\\t";
+	} else if (c == '\'') {
+		return "\\'";
+	} else if (c == '\\') {
+		return "\\\\";
+	} else if (static_cast<uint8_t>(c) < 0x20 || static_cast<uint8_t>(c) >= 0x7f) {
+		// TODO: what about printable unicode?
+		return fmt::format("\\x{:02x}", static_cast<uint8_t>(c));
+	} else {
+		std::string s;
+		s += c;
+		return s;
+	}
+}
+
 std::string repr(const std::string& s) {
 	std::string result;
 	result += '\'';
-	for (uint8_t c : s) {
-		if (c == '\r') {
-			result += "\\r";
-		} else if (c == '\n') {
-			result += "\\n";
-		} else if (c == '\t') {
-			result += "\\t";
-		} else if (c == '\'') {
-			result += "\\'";
-		} else if (c == '\\') {
-			result += "\\\\";
-		} else if (c < 0x20 || c >= 0x7f) {
-			// TODO: what about printable unicode?
-			result += fmt::format("\\x{:02x}", c);
-		} else {
-			result += (char)c;
-		}
+	for (char c : s) {
+		result += repr(c);
 	}
 	result += '\'';
 	return result;

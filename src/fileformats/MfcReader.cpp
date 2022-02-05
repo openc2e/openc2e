@@ -1,4 +1,4 @@
-#include "MfcReader.h"
+#include "MFCReader.h"
 
 #include "common/encoding.h"
 #include "common/endianlove.h"
@@ -64,6 +64,7 @@ std::string MFCReader::read_ascii_mfcstring() {
 uint8_t MFCReader::read8() {
 	return ::read8(m_in);
 }
+
 int8_t MFCReader::reads8() {
 	uint8_t value = read8();
 	if (value <= INT8_MAX) {
@@ -71,12 +72,23 @@ int8_t MFCReader::reads8() {
 	}
 	return static_cast<int8_t>(value - INT8_MIN) + INT8_MIN;
 }
+
 uint16_t MFCReader::read16le() {
 	return ::read16le(m_in);
 }
+
+int16_t MFCReader::reads16le() {
+	uint16_t value = read16le();
+	if (value <= INT16_MAX) {
+		return static_cast<int16_t>(value);
+	}
+	return static_cast<int16_t>(value - INT16_MIN) + INT16_MIN;
+}
+
 uint32_t MFCReader::read32le() {
 	return ::read32le(m_in);
 }
+
 int32_t MFCReader::reads32le() {
 	uint32_t value = read32le();
 	if (value <= INT32_MAX) {
