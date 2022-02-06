@@ -101,6 +101,9 @@ class EntityPool {
 	}
 
 	bool contains(Id id) const {
+		if (id.index == NULL_INDEX) {
+			return false;
+		}
 		if (id.index >= m_sparse.size()) {
 			return false;
 		}

@@ -1,5 +1,8 @@
 #include "C1MusicManager.h"
+#include "C1SoundManager.h"
+#include "EventManager.h"
 #include "ImageManager.h"
+#include "MacroCommands.h"
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "ObjectManager.h"
@@ -52,8 +55,8 @@ class PointerManager {
 
 class TickManager {
   public:
-	TickManager(std::shared_ptr<ObjectManager> objects, std::shared_ptr<MacroManager> macros, std::shared_ptr<Scriptorium> scripts)
-		: m_objects(objects), m_macros(macros), m_scripts(scripts) {}
+	TickManager(std::shared_ptr<ObjectManager> objects, std::shared_ptr<EventManager> events)
+		: m_objects(objects), m_events(events) {}
 
 	void tick() {
 		// check object tick
@@ -63,28 +66,15 @@ class TickManager {
 				if (o->ticks_since_last_tick_event >= o->tick_value) {
 					o->ticks_since_last_tick_event = 0;
 
-					std::string script = m_scripts->get(o->family, o->genus, o->species, SCRIPT_TIMER);
-					if (script.empty()) {
-						fmt::print("WARNING: Couldn't find timer script for {}, {}, {}", o->family, o->genus, o->species);
-						continue;
-					}
-					fmt::print("Fired timer script for {}, {}, {}: {}\n", o->family, o->genus, o->species, script);
-
-					Macro m;
-					m.script = script;
-					m.ownr = o->uid;
-					m.targ = m.ownr;
-
-					// TODO: add a script even if it already has a running script?
-					m_macros->add(m);
+					m_events->queue_script(o, o, SCRIPT_TIMER);
+					fmt::print("Fired timer script for {}, {}, {}\n", o->family, o->genus, o->species);
 				}
 			}
 		}
 	}
 
 	std::shared_ptr<ObjectManager> m_objects;
-	std::shared_ptr<MacroManager> m_macros;
-	std::shared_ptr<Scriptorium> m_scripts;
+	std::shared_ptr<EventManager> m_events;
 };
 
 int main(int argc, char** argv) {
@@ -104,17 +94,27 @@ int main(int argc, char** argv) {
 	// set up global objects
 	auto g_backend = std::make_shared<SDLBackend>();
 	auto g_audio_backend = SDLMixerBackend::getInstance();
+	g_audio_backend->init(); // TODO: initialized early so SFC sounds can start.. is this right?
 	auto g_path_manager = std::make_shared<PathManager>(datapath);
 	auto g_image_manager = std::make_shared<ImageManager>(g_path_manager);
 	auto g_music_manager = std::make_shared<C1MusicManager>(g_path_manager, g_audio_backend);
 	auto g_viewport_manager = std::make_shared<ViewportManager>(g_backend);
 	auto g_renderable_manager = std::make_shared<RenderableManager>();
-	auto g_object_manager = std::make_shared<ObjectManager>();
+	auto g_object_manager = std::make_shared<ObjectManager>(g_renderable_manager);
 	auto g_pointer_manager = std::make_shared<PointerManager>(g_viewport_manager, g_object_manager, g_renderable_manager);
 	auto g_map = std::make_shared<MapManager>();
 	auto g_scriptorium = std::make_shared<Scriptorium>();
-	auto g_macros = std::make_shared<MacroManager>(g_object_manager, g_renderable_manager);
-	auto g_tick_manager = std::make_shared<TickManager>(g_object_manager, g_macros, g_scriptorium);
+	auto g_macros = std::make_shared<MacroManager>();
+	auto g_event_manager = std::make_shared<EventManager>(g_object_manager, g_macros, g_scriptorium);
+	auto g_tick_manager = std::make_shared<TickManager>(g_object_manager, g_event_manager);
+	auto g_sound_manager = std::make_shared<C1SoundManager>(g_audio_backend, g_path_manager, g_viewport_manager);
+
+	g_macros->ctx.objects = g_object_manager.get();
+	g_macros->ctx.renderables = g_renderable_manager.get();
+	g_macros->ctx.events = g_event_manager.get();
+	g_macros->ctx.sounds = g_sound_manager.get();
+
+	install_default_commands(g_macros->ctx);
 
 	// load palette
 	g_image_manager->load_default_palette();
@@ -132,11 +132,11 @@ int main(int argc, char** argv) {
 	std::chrono::time_point<std::chrono::steady_clock> time_of_last_tick{};
 
 	SFCLoader loader(sfc);
-	loader.load_viewport(*g_viewport_manager.get());
-	loader.load_map(*g_map.get());
-	loader.load_objects(*g_object_manager.get(), *g_renderable_manager.get(), *g_image_manager.get());
-	loader.load_scripts(*g_scriptorium.get());
-	loader.load_macros(*g_macros.get());
+	loader.load_viewport(g_viewport_manager);
+	loader.load_map(g_map);
+	loader.load_objects(g_object_manager, g_renderable_manager, g_image_manager, g_sound_manager);
+	loader.load_scripts(g_scriptorium);
+	loader.load_macros(g_macros);
 
 	// find our pointer
 	for (auto obj : g_object_manager->find_all<PointerTool>()) {
@@ -154,23 +154,11 @@ int main(int argc, char** argv) {
 
 	// fire init scripts
 	for (auto& o : *g_object_manager.get()) {
-		std::string script = g_scriptorium->get(o->family, o->genus, o->species, SCRIPT_INITIALIZE);
-		if (script.empty()) {
-			continue;
-		}
-		fmt::print("Fired init script for {}, {}, {}: {}\n", o->family, o->genus, o->species, script);
-
-		Macro m;
-		m.script = script;
-		m.ownr = o->uid;
-		m.targ = m.ownr;
-		// TODO: add a script even if it already has a running script?
-		g_macros->add(m);
+		g_event_manager->queue_script(o, o, SCRIPT_INITIALIZE);
 	}
 
 	// run loop
 	g_backend->init();
-	g_audio_backend->init();
 	uint32_t last_frame_end = SDL_GetTicks();
 	while (true) {
 		// handle ui events

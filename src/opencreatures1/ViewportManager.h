@@ -3,6 +3,7 @@
 #include "openc2e-core/Backend.h"
 #include "openc2e-core/keycodes.h"
 
+#include <cmath>
 #include <memory>
 
 static constexpr int CREATURES1_WORLD_WIDTH = 8352;
@@ -88,6 +89,23 @@ class ViewportManager {
 			scrollx -= CREATURES1_WORLD_WIDTH;
 		}
 	}
+
+	int32_t width() const {
+		return m_backend->getMainRenderTarget()->getWidth();
+	}
+
+	int32_t height() const {
+		return m_backend->getMainRenderTarget()->getHeight();
+	}
+
+	int32_t centerx() const {
+		return std::remainder(scrollx + width() / 2, CREATURES1_WORLD_WIDTH);
+	}
+
+	int32_t centery() const {
+		return scrolly + height() / 2;
+	}
+
 	int scrollx = 0;
 	int scrolly = 0;
 

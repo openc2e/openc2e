@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/EntityPool.h"
+#include "common/Repr.h"
 #include "openc2e-core/creaturesImage.h"
 
 #include <fmt/core.h>
@@ -24,6 +25,10 @@ class Renderable {
 		return object_sprite_base + part_sprite_base + sprite_index;
 	}
 
+	int32_t width() const {
+		return sprite.width(frame());
+	}
+
 	int32_t height() const {
 		return sprite.height(frame());
 	}
@@ -34,6 +39,12 @@ class Renderable {
 		animation_string = {};
 	}
 };
+
+inline std::string repr(const Renderable& r) {
+	return fmt::format("<Renderable x={} y={} z={} object_base={} part_base={} index={} sprite={} animation={}>",
+		r.x, r.y, r.z, r.object_sprite_base, r.part_sprite_base, r.sprite_index, repr(r.sprite.getName()),
+		r.has_animation ? fmt::format("{} anim_index={}", repr(r.animation_string), r.animation_frame) : "false");
+}
 
 class RenderableManager {
   private:
@@ -58,6 +69,7 @@ class RenderableManager {
 			if (!r.has_animation) {
 				continue;
 			}
+
 			if (r.animation_frame >= r.animation_string.size()) {
 				// already done
 				// TODO: are we on the correct frame already?
@@ -67,17 +79,15 @@ class RenderableManager {
 				r.animation_frame = 0;
 				continue;
 			}
-			r.animation_frame += 1;
-			if (r.animation_frame >= r.animation_string.size()) {
-				// done!
-				continue;
-			}
+
+			// some objects in Eden.sfc start at the 'R' character, so set frame
+			// before incrementing.
+			// TODO: assert isdigit
 			if (r.animation_string[r.animation_frame] == 'R') {
 				r.animation_frame = 0;
 			}
-
-			// TODO: assert isdigit
 			r.sprite_index = r.animation_string[r.animation_frame] - '0';
+			r.animation_frame += 1;
 		}
 	}
 

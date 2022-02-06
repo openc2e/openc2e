@@ -107,7 +107,7 @@ add_library(openc2e-common STATIC
 	src/common/userlocale.cpp
 	src/common/case_insensitive_filesystem.cpp
 )
-target_link_libraries(openc2e-common PRIVATE fmt ghc_filesystem)
+target_link_libraries(openc2e-common PUBLIC fmt PRIVATE ghc_filesystem)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
@@ -298,10 +298,13 @@ add_executable(opencreatures1
 	src/opencreatures1/main.cpp
 	src/opencreatures1/C1MusicManager.cpp
 	src/opencreatures1/ImageManager.cpp
+	src/opencreatures1/MacroCommands.cpp
 	src/opencreatures1/MacroManager.cpp
 	src/opencreatures1/PathManager.cpp
 	src/opencreatures1/SDLBackend.cpp
 	src/opencreatures1/SFCLoader.cpp
+	src/opencreatures1/C1Sound.cpp
+	src/opencreatures1/C1SoundManager.cpp
 	src/openc2e-core/creaturesImage.cpp
 )
 target_link_libraries(opencreatures1

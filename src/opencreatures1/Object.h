@@ -1,5 +1,6 @@
 #pragma once
 
+#include "C1Sound.h"
 #include "ObjectHandle.h"
 #include "RenderableManager.h"
 #include "common/Exception.h"
@@ -14,11 +15,20 @@ enum MovementStatus {
 	MOVEMENT_CARRIED = 4,
 };
 
+enum ActiveFlag : uint8_t {
+	ACTV_INACTIVE = 0,
+	ACTV_ACTIVE1 = 1,
+	ACTV_ACTIVE2 = 2,
+};
+
 struct Rect {
 	int32_t left;
 	int32_t top;
 	int32_t right;
 	int32_t bottom;
+
+	int32_t width() const { return right - left; }
+	int32_t height() const { return bottom - top; }
 };
 
 class Object {
@@ -31,12 +41,12 @@ class Object {
 	uint8_t attr;
 	Rect limit;
 	ObjectHandle carrier;
-	uint8_t actv;
+	ActiveFlag actv;
 	// creaturesImage sprite;
 	int32_t tick_value;
 	int32_t ticks_since_last_tick_event;
 	ObjectHandle objp;
-	// std::string current_sound;
+	C1Sound current_sound;
 	uint32_t obv0;
 	uint32_t obv1;
 	uint32_t obv2;
@@ -91,7 +101,7 @@ class CompoundObject : public Object {
   public:
 	std::vector<CompoundPart> parts;
 	std::array<Rect, 6> hotspots;
-	std::array<uint32_t, 6> functions_to_hotspots;
+	std::array<int32_t, 6> functions_to_hotspots;
 
 	RenderableHandle get_part(size_t i) override {
 		if (i >= parts.size()) {
@@ -100,3 +110,26 @@ class CompoundObject : public Object {
 		return parts[i].renderable;
 	}
 };
+
+struct Vehicle : public CompoundObject {
+	int32_t xvel_times_256;
+	int32_t yvel_times_256;
+	int32_t x_times_256;
+	int32_t y_times_256;
+	int32_t cabin_left;
+	int32_t cabin_top;
+	int32_t cabin_right;
+	int32_t cabin_bottom;
+	uint32_t bump;
+};
+
+inline std::string repr(const Object& o) {
+	return fmt::format("<Object cls=({} {} {}) uid={}>", o.family, o.genus, o.species, o.uid.id());
+}
+
+inline std::string repr(const Object* o) {
+	if (o == nullptr) {
+		return fmt::format("<Object null>");
+	}
+	return repr(*o);
+}

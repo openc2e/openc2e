@@ -30,6 +30,7 @@
 
 #include <array>
 #include <cassert>
+#include <imgui.h>
 #include <memory>
 
 // reasonable defaults
@@ -521,6 +522,10 @@ int SDLBackend::run() {
 		mainrendertarget.viewport_offset_top = Openc2eImGui::GetViewportOffsetTop();
 		mainrendertarget.viewport_offset_bottom = Openc2eImGui::GetViewportOffsetBottom();
 		world.drawWorld();
+		ImGui::SetNextWindowPos(ImVec2(0, 100));
+		ImGui::Begin("hi", nullptr); // , ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+		ImGui::Text("x %i\ny %i", world.hand()->pointerX(), world.hand()->pointerY());
+		ImGui::End();
 		Openc2eImGui::Render();
 		{
 			// TODO: hack to display the hand above ImGui windows

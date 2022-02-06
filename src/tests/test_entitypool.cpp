@@ -138,6 +138,13 @@ TEST(common, entitypool_erase_during_enumeration) {
 	}
 }
 
+TEST(common, entitypool_get_null_id) {
+	// this used to segfault
+	EntityPool<MyTestItem> pool;
+	EntityPool<MyTestItem>::Id id;
+	EXPECT_EQ(pool.contains(id), false);
+}
+
 TEST(common, entitypool_sort) {
 	EntityPool<MyTestItem> pool;
 	auto zero = pool.add(3);

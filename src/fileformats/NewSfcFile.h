@@ -190,7 +190,7 @@ struct ObjectV1 : MFCObject {
 		tick_value = in.read32le();
 		ticks_since_last_tick_event = in.read32le();
 		objp = in.read_type<ObjectV1>();
-		current_sound = in.read_ascii(4);
+		current_sound = in.read_ascii_nullterminated(4);
 		obv0 = in.reads32le();
 		obv1 = in.reads32le();
 		obv2 = in.reads32le();
@@ -269,7 +269,7 @@ struct HotSpotV1 {
 struct CompoundObjectV1 : ObjectV1 {
 	std::vector<CompoundPartV1> parts;
 	std::array<HotSpotV1, 6> hotspots;
-	std::array<uint32_t, 6> functions_to_hotspots;
+	std::array<int32_t, 6> functions_to_hotspots;
 
 	void read_from(MFCReader& in) override {
 		ObjectV1::read_from(in);
@@ -292,7 +292,7 @@ struct CompoundObjectV1 : ObjectV1 {
 			hotspots[i].bottom = in.reads32le();
 		}
 		for (size_t i = 0; i < 6; ++i) {
-			functions_to_hotspots[i] = in.read32le();
+			functions_to_hotspots[i] = in.reads32le();
 		}
 	}
 };

@@ -1,11 +1,12 @@
 #pragma once
 
 #include "ObjectHandle.h"
+#include "common/PointerView.h"
 #include "fileformats/NewSFCFile.h"
 
 #include <map>
 
-
+class C1SoundManager;
 class ImageManager;
 class MapManager;
 class ObjectManager;
@@ -16,13 +17,14 @@ class MacroManager;
 
 class SFCLoader {
   public:
-	SFCLoader(const sfc::SFCFile& sfc);
+	SFCLoader(const sfc::SFCFile&);
 
-	void load_viewport(ViewportManager& viewport);
-	void load_map(MapManager& map);
-	void load_objects(ObjectManager& objects, RenderableManager& renderables, ImageManager& images);
-	void load_scripts(Scriptorium& scriptorium);
-	void load_macros(MacroManager& macros);
+	void load_viewport(PointerView<ViewportManager>);
+	void load_map(PointerView<MapManager>);
+	void load_objects(PointerView<ObjectManager>, PointerView<RenderableManager>,
+		PointerView<ImageManager>, PointerView<C1SoundManager>);
+	void load_scripts(PointerView<Scriptorium>);
+	void load_macros(PointerView<MacroManager>);
 
 	std::map<sfc::ObjectV1*, ObjectHandle> sfc_object_mapping;
 
