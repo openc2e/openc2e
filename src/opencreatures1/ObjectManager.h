@@ -55,7 +55,7 @@ inline void move_object_to(PointerView<Object> obj, PointerView<RenderableManage
 			Renderable* part = renderables->try_get(obj->get_part(i));
 
 			part->x = x + p.x;
-			part->y = x + p.y;
+			part->y = y + p.y;
 		}
 	}
 
