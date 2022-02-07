@@ -5,8 +5,17 @@
 class ObjectHandle {
   public:
 	ObjectHandle() {}
+
 	uint32_t id() const {
 		return m_id;
+	}
+
+	bool operator==(const ObjectHandle& other) const {
+		return m_id == other.m_id;
+	}
+
+	bool operator!=(const ObjectHandle& other) const {
+		return !(*this == other);
 	}
 
   private:

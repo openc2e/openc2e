@@ -4,6 +4,7 @@
 #include "ObjectHandle.h"
 #include "ObjectManager.h"
 #include "Scriptorium.h"
+#include "common/Exception.h"
 #include "common/PointerView.h"
 
 class EventManager {
@@ -17,7 +18,7 @@ class EventManager {
 		return queue_script(from, to, eventno);
 	}
 
-	void queue_script(PointerView<Object> from, PointerView<Object> to, ScriptNumber eventno) {
+	void queue_script(PointerView<Object> from, PointerView<Object> to, ScriptNumber eventno, bool override_existing = false) {
 		if (!to) {
 			printf("WARNING: tried to run script %i on nonexistent object\n", eventno);
 			return;
@@ -34,7 +35,15 @@ class EventManager {
 		m.ownr = to->uid;
 		m.targ = m.ownr;
 		m.from = from ? from->uid : ObjectHandle();
-		// TODO: add a script even if it already has a running script?
+
+		if (override_existing) {
+			throw_exception("override_existing not implemented");
+		}
+		for (auto& m : macros->m_pool) {
+			if (m.ownr == to->uid) {
+				return;
+			}
+		}
 		macros->add(m);
 	}
 
