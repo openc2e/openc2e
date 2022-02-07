@@ -21,13 +21,13 @@ class C1MusicManager {
 	void update();
 
   private:
-     using c1clock = std::chrono::steady_clock;
-      
+	using c1clock = std::chrono::steady_clock;
+
 	void updateVolumes();
 
 	std::shared_ptr<AudioBackend> m_backend;
-    std::shared_ptr<PathManager> m_path_manager;
-    AudioChannel m_audio_channel;
+	std::shared_ptr<PathManager> m_path_manager;
+	AudioChannel m_audio_channel;
 	bool m_muted = false;
 	float m_volume = 1.0;
 	std::chrono::time_point<c1clock> m_timepoint_to_play_next_sound;
