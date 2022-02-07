@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm> // stable_sort
+#include <stdint.h>
 #include <utility>
 #include <vector>
 
