@@ -77,7 +77,10 @@ class TickManager {
 	std::shared_ptr<EventManager> m_events;
 };
 
-int main(int argc, char** argv) {
+// SDL tries stealing main on some platforms, which we don't want.
+#undef main
+
+extern "C" int main(int argc, char** argv) {
 	if (argc != 2) {
 		fmt::print(stderr, "Usage: {} path-to-creatures1-data\n", argv[0]);
 		return 1;
