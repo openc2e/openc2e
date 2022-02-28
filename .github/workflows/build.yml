@@ -39,12 +39,6 @@ jobs:
     - name: "Install dependencies (Ubuntu)"
       if: "startsWith(matrix.os, 'ubuntu-')"
       run: sudo apt-get update && sudo apt-get install libpng-dev libsdl2-dev libsdl2-mixer-dev zlib1g-dev
-    - name: "Set environment variables (Windows)"
-      if: runner.os == 'Windows'
-      shell: cmd
-      run: |
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" || exit
-        set >> $GITHUB_ENV || exit
     - name: "Configure"
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: "Build"
