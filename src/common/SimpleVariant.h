@@ -1,5 +1,6 @@
 #pragma once
 
+#include <exception>
 #include <stdio.h>
 #include <string>
 #include <type_traits>
