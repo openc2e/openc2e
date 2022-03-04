@@ -1,5 +1,6 @@
 #pragma once
 
+#include <exception>
 #include <algorithm> // stable_sort
 #include <stdint.h>
 #include <utility>
