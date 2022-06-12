@@ -1,7 +1,7 @@
 #pragma once
 
-#include <exception>
 #include <algorithm> // stable_sort
+#include <exception>
 #include <stdint.h>
 #include <utility>
 #include <vector>

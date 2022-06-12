@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <array>
 #include <iosfwd>
+#include <stdint.h>
 #include <vector>
 
 class attFile {
