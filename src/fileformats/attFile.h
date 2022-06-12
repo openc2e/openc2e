@@ -22,6 +22,7 @@
 #include <array>
 #include <iosfwd>
 #include <vector>
+#include <cstdint>
 
 class attFile {
   public:
