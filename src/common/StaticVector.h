@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <exception>
 
 template <typename T, size_t N>
 class StaticVector {
