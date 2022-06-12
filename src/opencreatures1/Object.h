@@ -114,8 +114,6 @@ class CompoundObject : public Object {
 struct Vehicle : public CompoundObject {
 	int32_t xvel_times_256;
 	int32_t yvel_times_256;
-	int32_t x_times_256;
-	int32_t y_times_256;
 	int32_t cabin_left;
 	int32_t cabin_top;
 	int32_t cabin_right;

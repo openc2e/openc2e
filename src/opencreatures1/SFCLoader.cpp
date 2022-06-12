@@ -25,8 +25,8 @@ static Renderable renderable_from_sfc_entity(SFCLoadContext& ctx, sfc::EntityV1&
 	}
 
 	Renderable r;
-	r.x = part.x;
-	r.y = part.y;
+	r.x_times_256 = part.x * 256;
+	r.y_times_256 = part.y * 256;
 	r.z = part.z_order;
 	r.object_sprite_base = part.sprite->first_sprite;
 	r.part_sprite_base = part.image_offset;
@@ -127,8 +127,8 @@ static Vehicle vehicle_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::Veh
 
 	obj.xvel_times_256 = veh.xvel_times_256;
 	obj.yvel_times_256 = veh.yvel_times_256;
-	obj.x_times_256 = veh.x_times_256;
-	obj.y_times_256 = veh.y_times_256;
+	// obj.x_times_256 = veh.x_times_256;
+	// obj.y_times_256 = veh.y_times_256;
 	obj.cabin_left = veh.cabin_left;
 	obj.cabin_top = veh.cabin_top;
 	obj.cabin_right = veh.cabin_right;
