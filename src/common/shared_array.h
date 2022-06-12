@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <assert.h>
 #include <memory>
 #include <stddef.h>
