@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
 		}
 		try {
 			fmt::print(caos1_format(script));
-		} catch (Exception e) {
+		} catch (const Exception& e) {
 			fmt::print("* exception formatting CAOS: {}\n", e.what());
 			fmt::print(script);
 		}
