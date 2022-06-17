@@ -12,12 +12,9 @@
 
 // Windows MFC serialized data / CArchive serialized data
 
-class MFCReader;
-
 class MFCObject {
   public:
 	virtual ~MFCObject() = default;
-	virtual void read_from(MFCReader&) = 0;
 };
 
 class MFCReader {
@@ -37,6 +34,7 @@ class MFCReader {
 	int16_t reads16le();
 	uint32_t read32le();
 	int32_t reads32le();
+
 	template <typename T>
 	T* read_type() {
 		MFCObject* base_object = read_object();
@@ -54,13 +52,25 @@ class MFCReader {
 	template <typename T>
 	void register_class(const std::string& name, int schema_number) {
 		ClassInfo info;
-		info.newfunc = [] { return static_cast<MFCObject*>(new T()); };
+		info.newfunc = [] {
+			return static_cast<MFCObject*>(new MFCObjectImpl<T>());
+		};
+		info.readfunc = [](MFCObject* obj, MFCReader& reader) {
+			// the inner static_cast is unchecked, but we know for sure that the
+			// MFCObject passed in is in fact an MFCObjectImpl<T> so we're safe
+			static_cast<T*>(static_cast<MFCObjectImpl<T>*>(obj))->read_from(reader);
+		};
 		m_classregistry[std::make_pair(name, schema_number)] = info;
 	}
 
   private:
+	template <typename T>
+	struct MFCObjectImpl : T, MFCObject {
+	};
+
 	struct ClassInfo {
 		MFCObject* (*newfunc)();
+		void (*readfunc)(MFCObject*, MFCReader&);
 	};
 
 	MFCObject* read_object();

@@ -20,13 +20,13 @@ struct ImageV1 {
 	uint32_t offset;
 };
 
-struct CGalleryV1 : MFCObject {
+struct CGalleryV1 {
 	std::string filename;
 	uint32_t first_sprite;
 	uint32_t refcount;
 	std::vector<ImageV1> images;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		uint32_t num_images = in.read32le();
 		filename = in.read_ascii(4);
 		first_sprite = in.read32le();
@@ -66,14 +66,14 @@ struct BacteriumV1 {
 	uint8_t toxin4;
 };
 
-struct MapDataV1 : MFCObject {
+struct MapDataV1 {
 	uint32_t time_of_day;
 	CGalleryV1* background;
 	std::vector<RoomV1> rooms;
 	std::array<uint32_t, 261> groundlevel;
 	std::array<BacteriumV1, 100> bacteria;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		(void)in.read32le(); // padding, unused
 		time_of_day = in.read32le();
 
@@ -105,7 +105,7 @@ struct MapDataV1 : MFCObject {
 	}
 };
 
-struct EntityV1 : MFCObject {
+struct EntityV1 {
 	CGalleryV1* sprite;
 	uint8_t current_sprite;
 	uint8_t image_offset;
@@ -116,7 +116,7 @@ struct EntityV1 : MFCObject {
 	uint8_t animation_frame; // only if has_animation is true
 	std::string animation_string; // only if has_animation is true
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		sprite = in.read_type<CGalleryV1>();
 		current_sprite = in.read8();
 		image_offset = in.read8();
@@ -151,7 +151,9 @@ struct ScriptV1 {
 };
 
 
-struct ObjectV1 : MFCObject {
+struct ObjectV1 {
+	virtual ~ObjectV1(){};
+
 	uint8_t species;
 	uint8_t genus;
 	uint8_t family;
@@ -173,7 +175,7 @@ struct ObjectV1 : MFCObject {
 	int32_t obv2;
 	std::vector<ScriptV1> scripts;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		(void)in.read8(); // eventno, unused
 		species = in.read8();
 		genus = in.read8();
@@ -209,7 +211,7 @@ struct SimpleObjectV1 : ObjectV1 {
 	std::array<uint8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		ObjectV1::read_from(in);
 
 		part = in.read_type<EntityV1>();
@@ -226,7 +228,7 @@ struct BubbleV1 : SimpleObjectV1 {
 	uint32_t creator;
 	std::string text;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		SimpleObjectV1::read_from(in);
 
 		life = in.read8();
@@ -241,7 +243,7 @@ struct PointerToolV1 : SimpleObjectV1 {
 	BubbleV1* bubble;
 	std::string text;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		SimpleObjectV1::read_from(in);
 
 		relx = in.reads32le();
@@ -271,7 +273,7 @@ struct CompoundObjectV1 : ObjectV1 {
 	std::array<HotSpotV1, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		ObjectV1::read_from(in);
 
 		uint32_t num_parts = in.read32le();
@@ -308,7 +310,7 @@ struct VehicleV1 : CompoundObjectV1 {
 	int32_t cabin_bottom;
 	uint32_t bump;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		CompoundObjectV1::read_from(in);
 		xvel_times_256 = in.reads32le();
 		yvel_times_256 = in.reads32le();
@@ -336,7 +338,7 @@ struct BlackboardV1 : CompoundObjectV1 {
 	int8_t text_y_position;
 	std::array<BlackboardWord, 16> words;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		CompoundObjectV1::read_from(in);
 		background_color = in.read8();
 		chalk_color = in.read8();
@@ -364,7 +366,7 @@ struct LiftV1 : VehicleV1 {
 	uint8_t delay_counter;
 	std::array<LiftFloor, 8> floors;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		VehicleV1::read_from(in);
 		num_floors = in.read32le();
 		next_or_current_floor = in.read32le();
@@ -381,7 +383,7 @@ struct CallButtonV1 : SimpleObjectV1 {
 	LiftV1* lift;
 	uint8_t button_id;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		SimpleObjectV1::read_from(in);
 		lift = in.read_type<LiftV1>();
 		button_id = in.read8();
@@ -391,13 +393,13 @@ struct CallButtonV1 : SimpleObjectV1 {
 struct SceneryV1 : ObjectV1 {
 	EntityV1* part;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		ObjectV1::read_from(in);
 		part = in.read_type<EntityV1>();
 	}
 };
 
-struct MacroV1 : MFCObject {
+struct MacroV1 {
 	uint32_t selfdestruct;
 	uint32_t inst;
 	uint32_t script_length_maybe;
@@ -416,7 +418,7 @@ struct MacroV1 : MFCObject {
 	uint32_t subroutine_address;
 	uint32_t wait;
 
-	void read_from(MFCReader& in) override {
+	void read_from(MFCReader& in) {
 		selfdestruct = in.read32le();
 		inst = in.read32le();
 		script_length_maybe = in.read32le();
@@ -441,7 +443,7 @@ struct MacroV1 : MFCObject {
 	}
 };
 
-struct CreatureV1 : MFCObject {
+struct CreatureV1 {
 	// not implemented
 };
 
