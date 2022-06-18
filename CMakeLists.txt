@@ -394,6 +394,7 @@ add_executable(test_openc2e
 	src/tests/test_pray.cpp
 	src/tests/test_common.cpp
 	src/tests/test_entitypool.cpp
+	src/tests/common/FixedPointTest.cpp
 )
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
 if(COMMAND gtest_discover_testsp)

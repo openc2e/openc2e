@@ -37,8 +37,8 @@ class PointerManager {
 	void update() {
 		PointerTool* pointer = m_objects->try_get<PointerTool>(m_pointer_tool);
 		Renderable* r = m_renderables->try_get(pointer->part);
-		r->x_times_256 = (m_screenx + m_viewport->scrollx - pointer->relx) * 256;
-		r->y_times_256 = (m_screeny + m_viewport->scrolly - pointer->rely) * 256;
+		r->x = m_screenx + m_viewport->scrollx - pointer->relx;
+		r->y = m_screeny + m_viewport->scrolly - pointer->rely;
 	}
 
 	void handle_event(const BackendEvent& event) {
@@ -202,8 +202,8 @@ extern "C" int main(int argc, char** argv) {
 		renderer->renderCreaturesImage(background, 0, -g_viewport_manager->scrollx + CREATURES1_WORLD_WIDTH, -g_viewport_manager->scrolly);
 		// // draw entities
 		for (auto& r : g_renderable_manager->iter_zorder()) {
-			int x = r.x_times_256 / 256 - g_viewport_manager->scrollx;
-			int y = r.y_times_256 / 256;
+			int x = r.x.trunc() - g_viewport_manager->scrollx;
+			int y = r.y.trunc();
 			// what to do if it's near the wraparound? just draw three times?
 			renderer->renderCreaturesImage(r.sprite, r.frame(), x, y - g_viewport_manager->scrolly);
 			renderer->renderCreaturesImage(r.sprite, r.frame(), x - CREATURES1_WORLD_WIDTH, y - g_viewport_manager->scrolly);

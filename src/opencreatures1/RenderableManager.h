@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/EntityPool.h"
+#include "common/FixedPoint.h"
 #include "common/Repr.h"
 #include "openc2e-core/creaturesImage.h"
 
@@ -10,8 +11,8 @@
 
 class Renderable {
   public:
-	int x_times_256 = 0;
-	int y_times_256 = 0;
+	fixed24_8_t x = 0;
+	fixed24_8_t y = 0;
 	int z = 0;
 	int object_sprite_base = 0;
 	int part_sprite_base = 0;
@@ -42,7 +43,7 @@ class Renderable {
 
 inline std::string repr(const Renderable& r) {
 	return fmt::format("<Renderable x={} y={} z={} object_base={} part_base={} index={} sprite={} animation={}>",
-		r.x_times_256 / 256.0, r.y_times_256 / 256.0, r.z, r.object_sprite_base, r.part_sprite_base, r.sprite_index, repr(r.sprite.getName()),
+		static_cast<float>(r.x), static_cast<float>(r.y), r.z, r.object_sprite_base, r.part_sprite_base, r.sprite_index, repr(r.sprite.getName()),
 		r.has_animation ? fmt::format("{} anim_index={}", repr(r.animation_string), r.animation_frame) : "false");
 }
 

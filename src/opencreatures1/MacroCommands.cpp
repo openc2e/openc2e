@@ -488,7 +488,7 @@ int32_t IntegerRV_XVEC(const MacroContext& ctx, const Macro& m) {
 		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
 	}
 
-	return veh->xvel_times_256;
+	return veh->xvel.raw();
 }
 
 void LValue_ACTV(const MacroContext& ctx, const Macro& m, int32_t value) {
@@ -526,7 +526,7 @@ void LValue_XVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	if (!veh) {
 		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
 	}
-	veh->xvel_times_256 = value;
+	veh->xvel = fixed24_8_t::from_raw(value);
 }
 
 void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
@@ -535,7 +535,7 @@ void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	if (!veh) {
 		throw_exception("Called YVEC on non-vehicle object: {}", repr(*o));
 	}
-	veh->yvel_times_256 = value;
+	veh->yvel = fixed24_8_t::from_raw(value);
 }
 
 void install_default_commands(MacroContext& ctx) {
