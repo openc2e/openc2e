@@ -8,7 +8,7 @@ auto count(R&& range) {
 	return std::distance(range.begin(), range.end());
 }
 
-TEST(common, sparseset) {
+TEST(SparseSet, SparseSet) {
 	SparseSet<uint8_t> s;
 	using ValueType = decltype(s)::ValueType;
 

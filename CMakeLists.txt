@@ -390,11 +390,14 @@ include(Openc2eOutputOnTestFailure)
 
 add_executable(test_openc2e
 	src/tests/test_caos.cpp
-	src/tests/test_encoding.cpp
 	src/tests/test_pray.cpp
-	src/tests/test_common.cpp
-	src/tests/test_entitypool.cpp
+	src/tests/common/DemangleTest.cpp
+	src/tests/common/EncodingTest.cpp
+	src/tests/common/EntityPoolTest.cpp
+	src/tests/common/EndsWithTest.cpp
 	src/tests/common/FixedPointTest.cpp
+	src/tests/common/SparseSetTest.cpp
+	src/tests/common/WildcardTest.cpp
 )
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
 if(COMMAND gtest_discover_testsp)

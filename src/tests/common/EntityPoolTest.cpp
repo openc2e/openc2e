@@ -15,7 +15,7 @@ struct MyTestItem {
 	int value = -1;
 };
 
-TEST(common, entitypool) {
+TEST(EntityPool, EntityPool) {
 	EntityPool<MyTestItem> pool;
 
 	// starts empty
@@ -106,7 +106,7 @@ TEST(common, entitypool) {
 	}
 }
 
-TEST(common, entitypool_erase_at_back_of_dense_array) {
+TEST(EntityPool, erase_at_back_of_dense_array) {
 	// this used to segfault because there was a bug when erasing items at the back
 	// of the dense array
 	EntityPool<MyTestItem> pool;
@@ -116,7 +116,7 @@ TEST(common, entitypool_erase_at_back_of_dense_array) {
 	EXPECT_EQ(pool.try_get(first), nullptr);
 }
 
-TEST(common, entitypool_erase_during_enumeration) {
+TEST(EntityPool, erase_during_enumeration) {
 	// this used to segfault
 	EntityPool<MyTestItem> pool;
 	auto zero = pool.add(0);
@@ -138,14 +138,14 @@ TEST(common, entitypool_erase_during_enumeration) {
 	}
 }
 
-TEST(common, entitypool_get_null_id) {
+TEST(EntityPool, get_null_id) {
 	// this used to segfault
 	EntityPool<MyTestItem> pool;
 	EntityPool<MyTestItem>::Id id;
 	EXPECT_EQ(pool.contains(id), false);
 }
 
-TEST(common, entitypool_sort) {
+TEST(EntityPool, sort) {
 	EntityPool<MyTestItem> pool;
 	auto zero = pool.add(3);
 	auto one = pool.add(2);
@@ -168,7 +168,7 @@ TEST(common, entitypool_sort) {
 	EXPECT_EQ(pool.try_get(three)->value, 0);
 }
 
-TEST(common, entitypool_sort_scenario1) {
+TEST(EntityPool, sort_scenario1) {
 	// this used to segfault
 	EntityPool<MyTestItem> pool;
 	auto zero = pool.add(1);
