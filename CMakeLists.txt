@@ -400,7 +400,7 @@ add_executable(test_openc2e
 	src/tests/common/WildcardTest.cpp
 )
 target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
-if(COMMAND gtest_discover_testsp)
+if(COMMAND gtest_discover_tests)
 	gtest_discover_tests(test_openc2e)
 else()
     gtest_add_tests(test_openc2e "" "")
