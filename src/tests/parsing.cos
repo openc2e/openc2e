@@ -1,2 +1,0 @@
-* ensure that single-quoted characters are parsed correctly
-dbg: asrt 'C' = 67
