@@ -2,8 +2,8 @@
 
 #include "Object.h"
 #include "ObjectHandle.h"
-#include "common/EntityPool.h"
 #include "common/PointerView.h"
+#include "common/SlotMap.h"
 
 #include <memory>
 
@@ -102,19 +102,7 @@ inline void move_object_by(PointerView<Object> obj, PointerView<RenderableManage
 class ObjectManager {
   private:
 	std::shared_ptr<RenderableManager> renderables;
-	EntityPool<std::unique_ptr<Object>>
-		m_pool;
-	using Id = decltype(m_pool)::Id;
-	static_assert(sizeof(ObjectHandle) == sizeof(Id), "");
-
-	ObjectHandle id_to_handle(Id id) {
-		// TODO
-		return *(ObjectHandle*)&id;
-	}
-	Id handle_to_id(ObjectHandle handle) {
-		// TODO
-		return *(Id*)&handle;
-	}
+	DenseSlotMap<std::unique_ptr<Object>> m_pool;
 
   public:
 	ObjectManager(std::shared_ptr<RenderableManager> renderables_)
@@ -123,14 +111,14 @@ class ObjectManager {
 	template <typename T>
 	ObjectHandle add(T obj) {
 		auto t = new T(std::move(obj));
-		ObjectHandle handle = id_to_handle(m_pool.add(std::unique_ptr<Object>(t)));
+		ObjectHandle handle = m_pool.add(std::unique_ptr<Object>(t));
 		t->uid = handle;
 		return handle;
 	}
 
 	template <typename T>
 	T* try_get(ObjectHandle handle) {
-		auto* obj = m_pool.try_get(handle_to_id(handle));
+		auto* obj = m_pool.try_get(handle);
 		if (!obj) {
 			return nullptr;
 		}
@@ -143,7 +131,7 @@ class ObjectManager {
 		std::vector<ObjectHandle> result;
 		for (auto i : m_pool.enumerate()) {
 			if (dynamic_cast<T*>(i.value->get())) {
-				result.push_back(id_to_handle(i.id));
+				result.push_back(i.id);
 			}
 		}
 		return result;

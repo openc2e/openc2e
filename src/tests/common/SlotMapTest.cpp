@@ -1,4 +1,4 @@
-#include "common/EntityPool.h"
+#include "common/SlotMap.h"
 
 #include <gtest/gtest.h>
 #include <iterator>
@@ -15,8 +15,8 @@ struct MyTestItem {
 	int value = -1;
 };
 
-TEST(EntityPool, EntityPool) {
-	EntityPool<MyTestItem> pool;
+TEST(SlotMap, DenseSlotMap) {
+	DenseSlotMap<MyTestItem> pool;
 
 	// starts empty
 	EXPECT_EQ(pool.size(), 0);
@@ -106,19 +106,19 @@ TEST(EntityPool, EntityPool) {
 	}
 }
 
-TEST(EntityPool, erase_at_back_of_dense_array) {
+TEST(SlotMap, erase_at_back_of_dense_array) {
 	// this used to segfault because there was a bug when erasing items at the back
 	// of the dense array
-	EntityPool<MyTestItem> pool;
+	DenseSlotMap<MyTestItem> pool;
 	auto first = pool.add(5);
 	pool.erase(first);
 	EXPECT_FALSE(pool.contains(first));
 	EXPECT_EQ(pool.try_get(first), nullptr);
 }
 
-TEST(EntityPool, erase_during_enumeration) {
+TEST(SlotMap, erase_during_enumeration) {
 	// this used to segfault
-	EntityPool<MyTestItem> pool;
+	DenseSlotMap<MyTestItem> pool;
 	auto zero = pool.add(0);
 	auto one = pool.add(1);
 	auto two = pool.add(2);
@@ -138,15 +138,15 @@ TEST(EntityPool, erase_during_enumeration) {
 	}
 }
 
-TEST(EntityPool, get_null_id) {
+TEST(SlotMap, get_null_id) {
 	// this used to segfault
-	EntityPool<MyTestItem> pool;
-	EntityPool<MyTestItem>::Id id;
+	DenseSlotMap<MyTestItem> pool;
+	DenseSlotMap<MyTestItem>::Key id;
 	EXPECT_EQ(pool.contains(id), false);
 }
 
-TEST(EntityPool, sort) {
-	EntityPool<MyTestItem> pool;
+TEST(SlotMap, sort) {
+	DenseSlotMap<MyTestItem> pool;
 	auto zero = pool.add(3);
 	auto one = pool.add(2);
 	auto two = pool.add(1);
@@ -168,9 +168,9 @@ TEST(EntityPool, sort) {
 	EXPECT_EQ(pool.try_get(three)->value, 0);
 }
 
-TEST(EntityPool, sort_scenario1) {
+TEST(SlotMap, sort_scenario1) {
 	// this used to segfault
-	EntityPool<MyTestItem> pool;
+	DenseSlotMap<MyTestItem> pool;
 	auto zero = pool.add(1);
 	for (int i = 0; i < 3; ++i) {
 		pool.add(0);

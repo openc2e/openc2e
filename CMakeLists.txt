@@ -393,9 +393,9 @@ add_executable(test_openc2e
 	src/tests/test_pray.cpp
 	src/tests/common/DemangleTest.cpp
 	src/tests/common/EncodingTest.cpp
-	src/tests/common/EntityPoolTest.cpp
 	src/tests/common/EndsWithTest.cpp
 	src/tests/common/FixedPointTest.cpp
+	src/tests/common/SlotMapTest.cpp
 	src/tests/common/SparseSetTest.cpp
 	src/tests/common/WildcardTest.cpp
 )

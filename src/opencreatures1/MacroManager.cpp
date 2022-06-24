@@ -284,7 +284,7 @@ void MacroManager::tick() {
 
 		ctx.debug = false;
 		if (ctx.debug) {
-			printf("DEBUG cls=(%i, %i, %i) uid=%i\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr.id());
+			printf("DEBUG cls=(%i, %i, %i) uid=%i\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr.to_integral());
 			printf("macro wait=%i - %s !!ip!! %s - subroutine %s %i\n", m->wait, m->script.substr(0, m->ip).c_str(), m->script.substr(m->ip).c_str(), m->subroutine_label.c_str(), m->subroutine_address);
 			printf("stack ");
 			// for (size_t i = 0;)
@@ -319,7 +319,7 @@ void MacroManager::tick() {
 				}
 			}
 		} catch (Exception& e) {
-			printf("DEBUG cls=(%i, %i, %i) uid=%i\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr.id());
+			printf("DEBUG cls=(%i, %i, %i) uid=%i\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr.to_integral());
 			printf("macro %s !!ip!! %s\n", m->script.substr(0, m->ip).c_str(), m->script.substr(m->ip).c_str());
 			fmt::print("error: {}\n", e.what());
 		}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sound.h"
-#include "common/EntityPool.h"
+#include "common/SlotMap.h"
 #include "openc2e-audiobackend/AudioBackend.h"
 
 #include <chrono>
@@ -50,8 +50,8 @@ class SoundManager {
 		fmilliseconds fade_length{};
 	};
 
-	EntityPool<SoundData> sources;
-	using SoundId = decltype(sources)::Id;
+	DenseSlotMap<SoundData> sources;
+	using SoundId = decltype(sources)::Key;
 
 	void updateVolume(SoundData& source);
 	void updateVolumes();

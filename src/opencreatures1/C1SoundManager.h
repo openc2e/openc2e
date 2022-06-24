@@ -1,7 +1,7 @@
 #pragma once
 
 #include "C1Sound.h"
-#include "common/EntityPool.h"
+#include "common/SlotMap.h"
 #include "openc2e-audiobackend/AudioBackend.h"
 #include "openc2e-audiobackend/AudioState.h"
 
@@ -48,8 +48,8 @@ class C1SoundManager {
 		fmilliseconds fade_length{};
 	};
 
-	EntityPool<SoundData> sources;
-	using SoundId = decltype(sources)::Id;
+	DenseSlotMap<SoundData> sources;
+	using SoundId = decltype(sources)::Key;
 
 	bool is_alive(SoundData& source);
 	void stop(SoundData& source);

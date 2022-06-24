@@ -1,24 +1,10 @@
 #pragma once
 
+#include "common/SlotMap.h"
+
+#include <memory>
 #include <stdint.h>
 
-class ObjectHandle {
-  public:
-	ObjectHandle() {}
+class Object;
 
-	uint32_t id() const {
-		return m_id;
-	}
-
-	bool operator==(const ObjectHandle& other) const {
-		return m_id == other.m_id;
-	}
-
-	bool operator!=(const ObjectHandle& other) const {
-		return !(*this == other);
-	}
-
-  private:
-	friend class ObjectManager;
-	uint32_t m_id = ~0;
-};
+using ObjectHandle = DenseSlotMap<std::unique_ptr<Object>>::Key;

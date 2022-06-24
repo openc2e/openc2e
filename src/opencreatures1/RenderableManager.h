@@ -1,8 +1,8 @@
 #pragma once
 
-#include "common/EntityPool.h"
 #include "common/FixedPoint.h"
 #include "common/Repr.h"
+#include "common/SlotMap.h"
 #include "openc2e-core/creaturesImage.h"
 
 #include <fmt/core.h>
@@ -50,10 +50,10 @@ inline std::string repr(const Renderable& r) {
 class RenderableManager {
   private:
 	bool m_needs_sorting;
-	EntityPool<Renderable> m_pool;
+	DenseSlotMap<Renderable> m_pool;
 
   public:
-	using Handle = decltype(m_pool)::Id;
+	using Handle = decltype(m_pool)::Key;
 
   public:
 	Handle add(Renderable e) {
