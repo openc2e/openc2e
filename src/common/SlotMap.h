@@ -2,6 +2,7 @@
 
 #include <algorithm> // stable_sort
 #include <exception>
+#include <fmt/core.h>
 #include <stdint.h>
 #include <utility>
 #include <vector>
@@ -208,3 +209,16 @@ class DenseSlotMap {
 	std::vector<Key> m_deleted;
 };
 
+
+template <>
+struct fmt::formatter<SlotMapKey> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(SlotMapKey val, FormatContext& ctx) {
+		return format_to(ctx.out(), "{}:{}", val.index, val.counter);
+	}
+};

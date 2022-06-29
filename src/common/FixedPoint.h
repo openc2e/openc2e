@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fmt/core.h>
 #include <stdint.h>
 #include <type_traits>
 
@@ -47,4 +48,18 @@ class fixed24_8_t {
 
   private:
 	int32_t m_value = 0;
+};
+
+
+template <>
+struct fmt::formatter<fixed24_8_t> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(fixed24_8_t value, FormatContext& ctx) {
+		return fmt::format_to(ctx.out(), "{}", static_cast<float>(value));
+	}
 };

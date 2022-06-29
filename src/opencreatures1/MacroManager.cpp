@@ -4,7 +4,6 @@
 #include "common/Exception.h"
 #include "common/Repr.h"
 
-#include <fmt/core.h>
 #include <map>
 
 
@@ -126,7 +125,7 @@ int32_t MacroContext::read_int(Macro& m) {
 		auto it = integerrv_funcs.find(tok);
 		if (it != integerrv_funcs.end()) {
 			if (debug) {
-				printf("read_int calling func %s\n", repr(tok).c_str());
+				fmt::print("read_int calling func {}\n", repr(tok));
 			}
 			return it->second(*this, m);
 		}
@@ -141,7 +140,7 @@ int32_t MacroContext::read_int(Macro& m) {
 		value *= -1;
 	}
 	if (debug) {
-		printf("read_int found integer literal\n");
+		fmt::print("read_int found integer literal\n");
 	}
 	return value;
 }
@@ -284,14 +283,14 @@ void MacroManager::tick() {
 
 		ctx.debug = false;
 		if (ctx.debug) {
-			printf("DEBUG cls=(%i, %i, %i) uid=%i\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr.to_integral());
-			printf("macro wait=%i - %s !!ip!! %s - subroutine %s %i\n", m->wait, m->script.substr(0, m->ip).c_str(), m->script.substr(m->ip).c_str(), m->subroutine_label.c_str(), m->subroutine_address);
-			printf("stack ");
+			fmt::print("DEBUG cls=({}, {}, {}) uid={}\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr);
+			fmt::print("macro wait={} - {} !!ip!! {} - subroutine {} {}\n", m->wait, m->script.substr(0, m->ip), m->script.substr(m->ip), m->subroutine_label, m->subroutine_address);
+			fmt::print("stack ");
 			// for (size_t i = 0;)
 			for (auto s : m->stack) {
-				printf("%i ", s);
+				fmt::print("{} ", s);
 			}
-			printf("\n");
+			fmt::print("\n");
 		}
 
 		// we don't want to let inst run forever...
@@ -319,8 +318,8 @@ void MacroManager::tick() {
 				}
 			}
 		} catch (Exception& e) {
-			printf("DEBUG cls=(%i, %i, %i) uid=%i\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr.to_integral());
-			printf("macro %s !!ip!! %s\n", m->script.substr(0, m->ip).c_str(), m->script.substr(m->ip).c_str());
+			fmt::print("DEBUG cls=({}, {}, {}) uid={}\n", ctx.get_ownr(*m)->family, ctx.get_ownr(*m)->genus, ctx.get_ownr(*m)->species, m->ownr);
+			fmt::print("macro {} !!ip!! {}\n", m->script.substr(0, m->ip), m->script.substr(m->ip));
 			fmt::print("error: {}\n", e.what());
 		}
 	}

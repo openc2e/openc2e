@@ -1,5 +1,6 @@
 #include "common/SlotMap.h"
 
+#include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <iterator>
 
@@ -100,7 +101,7 @@ TEST(SlotMap, DenseSlotMap) {
 		} else if (i.id == fourth) {
 			EXPECT_EQ(i.value->value, 81);
 		} else {
-			printf("unknown id %i\n", i.id.to_integral());
+			fmt::print("unknown id {}\n", i.id);
 			EXPECT_TRUE(false);
 		}
 	}

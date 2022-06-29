@@ -123,7 +123,7 @@ struct Vehicle : public CompoundObject {
 };
 
 inline std::string repr(const Object& o) {
-	return fmt::format("<Object cls=({} {} {}) uid={}>", o.family, o.genus, o.species, o.uid.to_integral());
+	return fmt::format("<Object cls=({} {} {}) uid={}>", o.family, o.genus, o.species, o.uid);
 }
 
 inline std::string repr(const Object* o) {
