@@ -244,7 +244,7 @@ Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color 
 			sdlformat = SDL_PIXELFORMAT_INDEX8;
 			break;
 		case if_rgb555:
-			sdlformat = SDL_PIXELFORMAT_RGB565;
+			sdlformat = SDL_PIXELFORMAT_RGB555;
 			break;
 		case if_rgb565:
 			sdlformat = SDL_PIXELFORMAT_RGB565;
