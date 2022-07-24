@@ -1,5 +1,6 @@
 #include "C1MusicManager.h"
 #include "C1SoundManager.h"
+#include "EngineContext.h"
 #include "EventManager.h"
 #include "ImageManager.h"
 #include "MacroCommands.h"
@@ -11,6 +12,7 @@
 #include "SDLBackend.h"
 #include "SFCLoader.h"
 #include "Scriptorium.h"
+#include "TimerSystem.h"
 #include "ViewportManager.h"
 #include "common/Repr.h"
 #include "fileformats/NewSFCFile.h"
@@ -53,29 +55,6 @@ class PointerManager {
 	std::shared_ptr<RenderableManager> m_renderables;
 };
 
-class TickManager {
-  public:
-	TickManager(std::shared_ptr<ObjectManager> objects, std::shared_ptr<EventManager> events)
-		: m_objects(objects), m_events(events) {}
-
-	void tick() {
-		// check object tick
-		for (auto& o : *m_objects.get()) {
-			if (o->tick_value > 0) {
-				o->ticks_since_last_tick_event += 1;
-				if (o->ticks_since_last_tick_event >= o->tick_value) {
-					o->ticks_since_last_tick_event = 0;
-
-					m_events->queue_script(o, o, SCRIPT_TIMER);
-					fmt::print("Fired timer script for {}, {}, {}\n", o->family, o->genus, o->species);
-				}
-			}
-		}
-	}
-
-	std::shared_ptr<ObjectManager> m_objects;
-	std::shared_ptr<EventManager> m_events;
-};
 
 // SDL tries stealing main on some platforms, which we don't want.
 #undef main
@@ -95,35 +74,38 @@ extern "C" int main(int argc, char** argv) {
 	fmt::print("* Creatures 1 Data: {}\n", repr(datapath));
 
 	// set up global objects
-	auto g_backend = std::make_shared<SDLBackend>();
-	auto g_audio_backend = SDLMixerBackend::getInstance();
-	g_audio_backend->init(); // TODO: initialized early so SFC sounds can start.. is this right?
-	auto g_path_manager = std::make_shared<PathManager>(datapath);
-	auto g_image_manager = std::make_shared<ImageManager>(g_path_manager);
-	auto g_music_manager = std::make_shared<C1MusicManager>(g_path_manager, g_audio_backend);
-	auto g_viewport_manager = std::make_shared<ViewportManager>(g_backend);
-	auto g_renderable_manager = std::make_shared<RenderableManager>();
-	auto g_object_manager = std::make_shared<ObjectManager>(g_renderable_manager);
-	auto g_pointer_manager = std::make_shared<PointerManager>(g_viewport_manager, g_object_manager, g_renderable_manager);
-	auto g_map = std::make_shared<MapManager>();
-	auto g_scriptorium = std::make_shared<Scriptorium>();
-	auto g_macros = std::make_shared<MacroManager>();
-	auto g_event_manager = std::make_shared<EventManager>(g_object_manager, g_macros, g_scriptorium);
-	auto g_tick_manager = std::make_shared<TickManager>(g_object_manager, g_event_manager);
-	auto g_sound_manager = std::make_shared<C1SoundManager>(g_audio_backend, g_path_manager, g_viewport_manager);
+	auto g_engine_context = std::make_shared<EngineContext>();
 
-	g_macros->ctx.objects = g_object_manager.get();
-	g_macros->ctx.renderables = g_renderable_manager.get();
-	g_macros->ctx.events = g_event_manager.get();
-	g_macros->ctx.sounds = g_sound_manager.get();
+	g_engine_context->backend = std::make_shared<SDLBackend>();
+	g_engine_context->audio_backend = SDLMixerBackend::getInstance();
+	g_engine_context->audio_backend->init(); // TODO: initialized early so SFC sounds can start.. is this right?
 
-	install_default_commands(g_macros->ctx);
+	g_engine_context->paths = std::make_shared<PathManager>(datapath);
+	g_engine_context->images = std::make_shared<ImageManager>(g_engine_context->paths);
+	g_engine_context->music = std::make_shared<C1MusicManager>(g_engine_context->paths, g_engine_context->audio_backend);
+	g_engine_context->viewport = std::make_shared<ViewportManager>(g_engine_context->backend);
+	g_engine_context->renderables = std::make_shared<RenderableManager>();
+	g_engine_context->objects = std::make_shared<ObjectManager>(g_engine_context->renderables);
+	g_engine_context->pointer = std::make_shared<PointerManager>(g_engine_context->viewport, g_engine_context->objects, g_engine_context->renderables);
+	g_engine_context->map = std::make_shared<MapManager>();
+	g_engine_context->scriptorium = std::make_shared<Scriptorium>();
+	g_engine_context->macros = std::make_shared<MacroManager>();
+	g_engine_context->events = std::make_shared<EventManager>(g_engine_context.get());
+	g_engine_context->timers = std::make_shared<TimerSystem>();
+	g_engine_context->sounds = std::make_shared<C1SoundManager>(g_engine_context->audio_backend, g_engine_context->paths, g_engine_context->viewport);
+
+	g_engine_context->macros->ctx.objects = g_engine_context->objects.get();
+	g_engine_context->macros->ctx.renderables = g_engine_context->renderables.get();
+	g_engine_context->macros->ctx.events = g_engine_context->events.get();
+	g_engine_context->macros->ctx.sounds = g_engine_context->sounds.get();
+
+	install_default_commands(g_engine_context->macros->ctx);
 
 	// load palette
-	g_image_manager->load_default_palette();
+	g_engine_context->images->load_default_palette();
 
 	// load Eden.sfc
-	auto eden_sfc_path = g_path_manager->find_path(PATH_TYPE_BASE, "Eden.sfc");
+	auto eden_sfc_path = g_engine_context->paths->find_path(PATH_TYPE_BASE, "Eden.sfc");
 	if (eden_sfc_path.empty()) {
 		fmt::print(stderr, "* Error: Couldn't find Eden.sfc\n");
 		return 1;
@@ -135,41 +117,41 @@ extern "C" int main(int argc, char** argv) {
 	std::chrono::time_point<std::chrono::steady_clock> time_of_last_tick{};
 
 	SFCLoader loader(sfc);
-	loader.load_viewport(g_viewport_manager);
-	loader.load_map(g_map);
-	loader.load_objects(g_object_manager, g_renderable_manager, g_image_manager, g_sound_manager);
-	loader.load_scripts(g_scriptorium);
-	loader.load_macros(g_macros);
+	loader.load_viewport(g_engine_context->viewport);
+	loader.load_map(g_engine_context->map);
+	loader.load_objects(g_engine_context->objects, g_engine_context->renderables, g_engine_context->images, g_engine_context->sounds);
+	loader.load_scripts(g_engine_context->scriptorium);
+	loader.load_macros(g_engine_context->macros);
 
 	// find our pointer
-	for (auto obj : g_object_manager->find_all<PointerTool>()) {
-		g_pointer_manager->m_pointer_tool = obj;
+	for (auto obj : g_engine_context->objects->find_all<PointerTool>()) {
+		g_engine_context->pointer->m_pointer_tool = obj;
 	}
 
 	// load background
 	auto background_name = sfc.map->background->filename;
 	fmt::print("* Background sprite: {}\n", repr(background_name));
-	auto background = g_image_manager->get_image(background_name, ImageManager::IMAGE_SPR);
+	auto background = g_engine_context->images->get_image(background_name, ImageManager::IMAGE_SPR);
 	// TODO: do any C1 metarooms have non-standard sizes?
 	if (background.width(0) != CREATURES1_WORLD_WIDTH || background.height(0) != CREATURES1_WORLD_HEIGHT) {
 		throw Exception(fmt::format("Expected Creatures 1 background size to be 8352x1200 but got {}x{}", background.width(0), background.height(0)));
 	}
 
 	// fire init scripts
-	for (auto& o : *g_object_manager.get()) {
-		g_event_manager->queue_script(o, o, SCRIPT_INITIALIZE);
+	for (auto& o : *g_engine_context->objects) {
+		g_engine_context->events->queue_script(o, o, SCRIPT_INITIALIZE);
 	}
 
 	// run loop
-	g_backend->init();
+	g_engine_context->backend->init();
 	uint32_t last_frame_end = SDL_GetTicks();
 	while (true) {
 		// handle ui events
 		BackendEvent event;
 		bool should_quit = false;
-		while (g_backend->pollEvent(event)) {
-			g_viewport_manager->handle_event(event);
-			g_pointer_manager->handle_event(event);
+		while (g_engine_context->backend->pollEvent(event)) {
+			g_engine_context->viewport->handle_event(event);
+			g_engine_context->pointer->handle_event(event);
 			if (event.type == eventquit) {
 				should_quit = true;
 			}
@@ -185,38 +167,38 @@ extern "C" int main(int argc, char** argv) {
 										.count();
 		if (time_since_last_tick >= 100) {
 			time_of_last_tick = std::chrono::steady_clock::now();
-			g_viewport_manager->tick();
-			g_object_manager->tick();
-			g_tick_manager->tick();
-			g_macros->tick();
-			g_renderable_manager->tick(); // after CAOS runs, otherwise the OVER command is too fast
+			g_engine_context->viewport->tick();
+			g_engine_context->objects->tick();
+			g_engine_context->timers->tick(g_engine_context.get());
+			g_engine_context->macros->tick();
+			g_engine_context->renderables->tick(); // after CAOS runs, otherwise the OVER command is too fast
 		}
 		// // some things can update as often as possible
-		g_music_manager->update();
-		g_pointer_manager->update();
+		g_engine_context->music->update();
+		g_engine_context->pointer->update();
 
 		// draw
-		auto renderer = g_backend->getMainRenderTarget();
+		auto renderer = g_engine_context->backend->getMainRenderTarget();
 		// // draw world (twice, to handle wraparound)
-		renderer->renderCreaturesImage(background, 0, -g_viewport_manager->scrollx, -g_viewport_manager->scrolly);
-		renderer->renderCreaturesImage(background, 0, -g_viewport_manager->scrollx + CREATURES1_WORLD_WIDTH, -g_viewport_manager->scrolly);
+		renderer->renderCreaturesImage(background, 0, -g_engine_context->viewport->scrollx, -g_engine_context->viewport->scrolly);
+		renderer->renderCreaturesImage(background, 0, -g_engine_context->viewport->scrollx + CREATURES1_WORLD_WIDTH, -g_engine_context->viewport->scrolly);
 		// // draw entities
-		for (auto& r : g_renderable_manager->iter_zorder()) {
-			int x = r.x.trunc() - g_viewport_manager->scrollx;
+		for (auto& r : g_engine_context->renderables->iter_zorder()) {
+			int x = r.x.trunc() - g_engine_context->viewport->scrollx;
 			int y = r.y.trunc();
 			// what to do if it's near the wraparound? just draw three times?
-			renderer->renderCreaturesImage(r.sprite, r.frame(), x, y - g_viewport_manager->scrolly);
-			renderer->renderCreaturesImage(r.sprite, r.frame(), x - CREATURES1_WORLD_WIDTH, y - g_viewport_manager->scrolly);
-			renderer->renderCreaturesImage(r.sprite, r.frame(), x + CREATURES1_WORLD_WIDTH, y - g_viewport_manager->scrolly);
+			renderer->renderCreaturesImage(r.sprite, r.frame(), x, y - g_engine_context->viewport->scrolly);
+			renderer->renderCreaturesImage(r.sprite, r.frame(), x - CREATURES1_WORLD_WIDTH, y - g_engine_context->viewport->scrolly);
+			renderer->renderCreaturesImage(r.sprite, r.frame(), x + CREATURES1_WORLD_WIDTH, y - g_engine_context->viewport->scrolly);
 		}
 		// // draw rooms
-		for (auto& room : g_map->rooms) {
+		for (auto& room : g_engine_context->map->rooms) {
 			// what to do if it's near the wraparound? just draw three times?
 			for (auto offset : {-CREATURES1_WORLD_WIDTH, 0, CREATURES1_WORLD_WIDTH}) {
-				auto left = room.left - g_viewport_manager->scrollx + offset;
-				auto top = room.top - g_viewport_manager->scrolly;
-				auto right = room.right - g_viewport_manager->scrollx + offset;
-				auto bottom = room.bottom - g_viewport_manager->scrolly;
+				auto left = room.left - g_engine_context->viewport->scrollx + offset;
+				auto top = room.top - g_engine_context->viewport->scrolly;
+				auto right = room.right - g_engine_context->viewport->scrollx + offset;
+				auto bottom = room.bottom - g_engine_context->viewport->scrolly;
 				int color;
 				if (room.type == 0) {
 					color = 0xFFFF00CC;
@@ -233,7 +215,7 @@ extern "C" int main(int argc, char** argv) {
 		}
 
 		// present and wait
-		SDL_RenderPresent(g_backend->renderer);
+		SDL_RenderPresent(g_engine_context->backend->renderer);
 
 		static constexpr int OPENC2E_MAX_FPS = 60;
 		static constexpr int OPENC2E_MS_PER_FRAME = 1000 / OPENC2E_MAX_FPS;

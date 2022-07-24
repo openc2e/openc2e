@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EngineContext.h"
 #include "MacroManager.h"
 #include "ObjectHandle.h"
 #include "ObjectManager.h"
@@ -9,12 +10,12 @@
 
 class EventManager {
   public:
-	EventManager(std::shared_ptr<ObjectManager> objects_, std::shared_ptr<MacroManager> macros_, std::shared_ptr<Scriptorium> scripts_)
-		: objects(objects_), macros(macros_), scripts(scripts_) {}
+	EventManager(EngineContext* ctx_)
+		: ctx(ctx_) {}
 
 	void queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno) {
-		auto* to = objects->try_get<Object>(to_id);
-		auto* from = objects->try_get<Object>(from_id);
+		auto* to = ctx->objects->try_get<Object>(to_id);
+		auto* from = ctx->objects->try_get<Object>(from_id);
 		return queue_script(from, to, eventno);
 	}
 
@@ -24,7 +25,7 @@ class EventManager {
 			return;
 		}
 
-		std::string script = scripts->get(to->family, to->genus, to->species, eventno);
+		std::string script = ctx->scriptorium->get(to->family, to->genus, to->species, eventno);
 		if (script.empty()) {
 			printf("WARNING: tried to run nonexistent script %i %i %i %i\n", to->family, to->genus, to->species, eventno);
 			return;
@@ -39,12 +40,12 @@ class EventManager {
 		if (override_existing) {
 			throw_exception("override_existing not implemented");
 		}
-		for (auto& m : macros->m_pool) {
+		for (auto& m : ctx->macros->m_pool) {
 			if (m.ownr == to->uid) {
 				return;
 			}
 		}
-		macros->add(m);
+		ctx->macros->add(m);
 	}
 
 	void mesg_writ(ObjectHandle from_id, ObjectHandle to_id, MessageNumber message) {
@@ -63,7 +64,5 @@ class EventManager {
 		queue_script(from_id, to_id, eventno);
 	}
 
-	std::shared_ptr<ObjectManager> objects;
-	std::shared_ptr<MacroManager> macros;
-	std::shared_ptr<Scriptorium> scripts;
+	EngineContext* ctx;
 };
