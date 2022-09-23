@@ -255,12 +255,23 @@ add_library(openc2e-core STATIC
 	src/openc2e-core/Vehicle.cpp
 	src/openc2e-core/VoiceData.cpp
 	src/openc2e-core/World.cpp
+	src/openc2e-core/openc2eimgui/AgentInjector.cpp
+	src/openc2e-core/openc2eimgui/BrainViewer.cpp
+	src/openc2e-core/openc2eimgui/C1ToolBar.cpp
+	src/openc2e-core/openc2eimgui/C2StatusBar.cpp
+	src/openc2e-core/openc2eimgui/C2ToolBar.cpp
+	src/openc2e-core/openc2eimgui/CreatureGrapher.cpp
+	src/openc2e-core/openc2eimgui/Hatchery.cpp
+	src/openc2e-core/openc2eimgui/ImGuiUtils.cpp
+	src/openc2e-core/openc2eimgui/MainMenu.cpp
+	src/openc2e-core/openc2eimgui/Openc2eImGui.cpp
 )
 target_include_directories(openc2e-core PRIVATE src/openc2e-core)
 target_link_libraries(openc2e-core PUBLIC
 	cxxopts
 	fmt
 	ghc_filesystem
+	imgui
 	openc2e-common
 	openc2e-fileformats
 	openc2e-mngmusic
@@ -287,22 +298,11 @@ target_link_libraries(imgui_sdl PRIVATE imgui)
 add_executable(openc2e
 	src/openc2e-main/main.cpp
 	src/openc2e-main/SDLBackend.cpp
-	src/openc2e-main/openc2eimgui/AgentInjector.cpp
-	src/openc2e-main/openc2eimgui/BrainViewer.cpp
-	src/openc2e-main/openc2eimgui/C1ToolBar.cpp
-	src/openc2e-main/openc2eimgui/C2StatusBar.cpp
-	src/openc2e-main/openc2eimgui/C2ToolBar.cpp
-	src/openc2e-main/openc2eimgui/CreatureGrapher.cpp
-	src/openc2e-main/openc2eimgui/Hatchery.cpp
-	src/openc2e-main/openc2eimgui/ImGuiUtils.cpp
-	src/openc2e-main/openc2eimgui/MainMenu.cpp
-	src/openc2e-main/openc2eimgui/Openc2eImGui.cpp
 )
 target_include_directories(openc2e PRIVATE src/openc2e-core)
 target_link_libraries(openc2e
 	openc2e-core
 	openc2e-audiobackend
-	imgui
 	imgui_sdl
 	SDL2::SDL2
 	${CMAKE_DL_LIBS}

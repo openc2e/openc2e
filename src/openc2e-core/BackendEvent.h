@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include <string>
 
 enum eventtype {
@@ -19,6 +20,7 @@ enum eventbuttons { buttonleft = 0x1,
 	buttonwheelup = 0x10 };
 
 struct BackendEvent {
+	uint32_t window_id;
 	eventtype type;
 	int x, y, xrel, yrel;
 	int key;

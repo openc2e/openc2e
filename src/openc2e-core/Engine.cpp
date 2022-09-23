@@ -43,6 +43,7 @@
 #include "imageManager.h"
 #include "keycodes.h"
 #include "openc2e-audiobackend/NullAudioBackend.h"
+#include "openc2eimgui/Openc2eImGui.h"
 #include "prayManager.h"
 
 #ifdef _WIN32
@@ -319,9 +320,15 @@ unsigned int Engine::msUntilTick() {
 
 void Engine::drawWorld() {
 	// draw the world
+
+	Openc2eImGui::Update();
+	backend->getMainRenderTarget()->setViewportOffsetTop(Openc2eImGui::GetViewportOffsetTop());
+	backend->getMainRenderTarget()->setViewportOffsetBottom(Openc2eImGui::GetViewportOffsetBottom());
+
 	if (dorendering || refreshdisplay) {
 		refreshdisplay = false;
-		world.drawWorld();
+
+		world.drawWorld(camera.get(), backend->getMainRenderTarget());
 	}
 }
 
@@ -1035,6 +1042,7 @@ bool Engine::initialSetup() {
 	b->init();
 	setBackend(b);
 	possible_backends.clear();
+	Openc2eImGui::Init();
 
 	if (cmdline_norun)
 		preferred_audiobackend = "null";

@@ -26,11 +26,11 @@
 #include "common/Exception.h"
 #include "creaturesImage.h"
 #include "keycodes.h"
-#include "openc2eimgui/Openc2eImGui.h"
 
 #include <array>
 #include <cassert>
 #include <imgui.h>
+#include <imgui_sdl/imgui_sdl.h>
 #include <memory>
 
 // reasonable defaults
@@ -60,6 +60,16 @@ void SDLBackend::resizeNotify(int _w, int _h) {
 void SDLBackend::setUserScale(float userscale_) {
 	userscale = userscale_;
 	resizeNotify(windowwidth, windowheight);
+}
+
+static void ImGuiInit(SDL_Window* window) {
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+	io.IniFilename = nullptr; // don't save settings
+	if (!ImGuiSDL_Init(window)) {
+		throw Exception("Couldn't initialize ImGui - are you using SDL's OpenGL backend?");
+	}
 }
 
 void SDLBackend::init() {
@@ -102,14 +112,26 @@ void SDLBackend::init() {
 	SDL_GetWindowSize(window, &windowwidth, &windowheight);
 	resizeNotify(windowwidth, windowheight);
 
-	Openc2eImGui::Init(window);
-
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
+
+	ImGuiInit(window);
 }
 
 void SDLBackend::shutdown() {
 	SDL_Quit();
+}
+
+static bool ImGuiConsumeEvent(const SDL_Event& event) {
+	ImGuiSDL_ProcessEvent(&event);
+	if (ImGui::GetIO().WantCaptureMouse && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL)) {
+		return true;
+	}
+	if (ImGui::GetIO().WantCaptureKeyboard && (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_TEXTINPUT)) {
+		return true;
+	}
+
+	return false;
 }
 
 bool SDLBackend::pollEvent(BackendEvent& e) {
@@ -118,7 +140,7 @@ retry:
 	if (!SDL_PollEvent(&event))
 		return false;
 
-	if (Openc2eImGui::ConsumeEvent(event)) {
+	if (ImGuiConsumeEvent(event)) {
 		goto retry;
 	}
 
@@ -127,6 +149,7 @@ retry:
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_RESIZED:
 					resizeNotify(event.window.data1, event.window.data2);
+					e.window_id = event.window.windowID;
 					e.type = eventresizewindow;
 					e.x = event.window.data1;
 					e.y = event.window.data2;
@@ -136,6 +159,7 @@ retry:
 			}
 
 		case SDL_MOUSEMOTION:
+			e.window_id = event.motion.windowID;
 			e.type = eventmousemove;
 			e.x = event.motion.x / userscale;
 			e.y = event.motion.y / userscale - mainrendertarget.viewport_offset_top;
@@ -152,6 +176,7 @@ retry:
 
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
+			e.window_id = event.button.windowID;
 			if (event.type == SDL_MOUSEBUTTONDOWN)
 				e.type = eventmousebuttondown;
 			else
@@ -167,6 +192,7 @@ retry:
 			break;
 
 		case SDL_MOUSEWHEEL:
+			e.window_id = event.wheel.windowID;
 			e.type = eventmousebuttondown;
 			if (event.wheel.y > 0) {
 				e.button = buttonwheeldown;
@@ -180,11 +206,13 @@ retry:
 			break;
 
 		case SDL_TEXTINPUT:
+			e.window_id = event.text.windowID;
 			e.type = eventtextinput;
 			e.text = event.text.text;
 			break;
 
 		case SDL_KEYUP: {
+			e.window_id = event.key.windowID;
 			int key = translateScancode(event.key.keysym.scancode);
 			if (key != -1) {
 				e.type = eventrawkeyup;
@@ -195,6 +223,7 @@ retry:
 		}
 
 		case SDL_KEYDOWN: {
+			e.window_id = event.key.windowID;
 			int key = translateScancode(event.key.keysym.scancode);
 			if (key != -1) {
 				e.type = eventrawkeydown;
@@ -309,6 +338,14 @@ unsigned int SDLRenderTarget::getWidth() const {
 }
 unsigned int SDLRenderTarget::getHeight() const {
 	return drawableheight / scale - viewport_offset_top - viewport_offset_bottom;
+}
+
+void SDLRenderTarget::setViewportOffsetTop(int offset_top) {
+	viewport_offset_top = offset_top;
+}
+
+void SDLRenderTarget::setViewportOffsetBottom(int offset_bottom) {
+	viewport_offset_bottom = offset_bottom;
 }
 
 void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, RenderOptions options) {
@@ -506,6 +543,7 @@ void SDLBackend::delay(int msec) {
 static constexpr int OPENC2E_MAX_FPS = 60;
 static constexpr int OPENC2E_MS_PER_FRAME = 1000 / OPENC2E_MAX_FPS;
 
+
 int SDLBackend::run() {
 	resize(800, 600);
 
@@ -518,11 +556,11 @@ int SDLBackend::run() {
 		// otherwise side panels get in weird locations. related to issue with panels
 		// when resizing in general?
 
-		Openc2eImGui::Update(window);
-		mainrendertarget.viewport_offset_top = Openc2eImGui::GetViewportOffsetTop();
-		mainrendertarget.viewport_offset_bottom = Openc2eImGui::GetViewportOffsetBottom();
-		world.drawWorld();
-		Openc2eImGui::Render();
+		ImGuiSDL_NewFrame(window);
+		ImGui::NewFrame();
+		engine.drawWorld();
+		ImGui::Render();
+		ImGuiSDL_RenderDrawData(ImGui::GetDrawData());
 		{
 			// TODO: hack to display the hand above ImGui windows
 			int adjustx = engine.camera->getX();

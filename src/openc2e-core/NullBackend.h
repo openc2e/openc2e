@@ -33,6 +33,8 @@ class NullRenderTarget : public RenderTarget {
 	virtual unsigned int getHeight() const { return 600; }
 	virtual void renderClear() {}
 	virtual void renderDone() {}
+	virtual void setViewportOffsetTop(int) {}
+	virtual void setViewportOffsetBottom(int) {}
 };
 
 class NullBackend : public Backend {

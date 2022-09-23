@@ -119,7 +119,6 @@ class World {
 	int findCategory(unsigned char family, unsigned char genus, unsigned short species);
 
 	void tick();
-	void drawWorld();
 	void drawWorld(class Camera* cam, RenderTarget* surface);
 
 	int newUNID(Agent* whofor);

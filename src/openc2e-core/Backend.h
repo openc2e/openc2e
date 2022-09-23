@@ -54,6 +54,8 @@ class RenderTarget {
 	virtual unsigned int getHeight() const = 0;
 	virtual void renderClear() = 0;
 	virtual void renderDone() = 0;
+	virtual void setViewportOffsetTop(int offset_top) = 0;
+	virtual void setViewportOffsetBottom(int offset_bottom) = 0;
 	virtual ~RenderTarget() {}
 };
 

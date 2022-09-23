@@ -34,6 +34,8 @@ class SDLRenderTarget : public RenderTarget {
 	SDL_Texture* texture;
 	int drawablewidth, drawableheight;
 	float scale = 1.0;
+	int viewport_offset_top = 0;
+	int viewport_offset_bottom = 0;
 
 	SDLRenderTarget(SDLBackend* p) { parent = p; }
 
@@ -45,6 +47,8 @@ class SDLRenderTarget : public RenderTarget {
 	unsigned int getHeight() const;
 	void renderClear();
 	void renderDone();
+	void setViewportOffsetTop(int offset_top);
+	void setViewportOffsetBottom(int offset_bottom);
 };
 
 class SDLBackend : public Backend {

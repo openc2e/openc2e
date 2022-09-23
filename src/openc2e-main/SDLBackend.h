@@ -47,6 +47,8 @@ class SDLRenderTarget : public RenderTarget {
 	unsigned int getHeight() const;
 	void renderClear();
 	void renderDone();
+	void setViewportOffsetTop(int offset_top);
+	void setViewportOffsetBottom(int offset_bottom);
 };
 
 class SDLBackend : public Backend {

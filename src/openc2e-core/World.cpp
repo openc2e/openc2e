@@ -385,10 +385,6 @@ std::shared_ptr<Agent> World::lookupUNID(int unid) {
 	return unidmap[unid].lock();
 }
 
-void World::drawWorld() {
-	drawWorld(engine.camera.get(), engine.backend->getMainRenderTarget());
-}
-
 void World::drawWorld(Camera* cam, RenderTarget* surface) {
 	assert(surface);
 	surface->renderClear();

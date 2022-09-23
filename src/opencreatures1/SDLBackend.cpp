@@ -117,6 +117,7 @@ retry:
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_RESIZED:
 					resizeNotify(event.window.data1, event.window.data2);
+					e.window_id = event.window.windowID;
 					e.type = eventresizewindow;
 					e.x = event.window.data1;
 					e.y = event.window.data2;
@@ -126,9 +127,10 @@ retry:
 			}
 
 		case SDL_MOUSEMOTION:
+			e.window_id = event.motion.windowID;
 			e.type = eventmousemove;
 			e.x = event.motion.x / userscale;
-			e.y = event.motion.y / userscale; // - mainrendertarget.viewport_offset_top;
+			e.y = event.motion.y / userscale - mainrendertarget.viewport_offset_top;
 			e.xrel = event.motion.xrel / userscale;
 			e.yrel = event.motion.yrel / userscale;
 			e.button = 0;
@@ -142,6 +144,7 @@ retry:
 
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
+			e.window_id = event.button.windowID;
 			if (event.type == SDL_MOUSEBUTTONDOWN)
 				e.type = eventmousebuttondown;
 			else
@@ -153,10 +156,11 @@ retry:
 				default: goto retry;
 			}
 			e.x = event.button.x / userscale;
-			e.y = event.button.y / userscale; // - mainrendertarget.viewport_offset_top;
+			e.y = event.button.y / userscale - mainrendertarget.viewport_offset_top;
 			break;
 
 		case SDL_MOUSEWHEEL:
+			e.window_id = event.wheel.windowID;
 			e.type = eventmousebuttondown;
 			if (event.wheel.y > 0) {
 				e.button = buttonwheeldown;
@@ -170,11 +174,13 @@ retry:
 			break;
 
 		case SDL_TEXTINPUT:
+			e.window_id = event.text.windowID;
 			e.type = eventtextinput;
 			e.text = event.text.text;
 			break;
 
 		case SDL_KEYUP: {
+			e.window_id = event.key.windowID;
 			int key = translateScancode(event.key.keysym.scancode);
 			if (key != -1) {
 				e.type = eventrawkeyup;
@@ -185,6 +191,7 @@ retry:
 		}
 
 		case SDL_KEYDOWN: {
+			e.window_id = event.key.windowID;
 			int key = translateScancode(event.key.keysym.scancode);
 			if (key != -1) {
 				e.type = eventrawkeydown;
@@ -212,7 +219,7 @@ void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int co
 	Uint8 a = (color >> 0) & 0xff;
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_SetRenderDrawColor(parent->renderer, r, g, b, a);
-	SDL_RenderDrawLine(parent->renderer, x1, y1 /* + viewport_offset_top */, x2, y2 /* + viewport_offset_top*/);
+	SDL_RenderDrawLine(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 
 Texture SDLBackend::createTexture(const Image& image) {
@@ -301,6 +308,14 @@ unsigned int SDLRenderTarget::getHeight() const {
 	return drawableheight / scale;
 }
 
+void SDLRenderTarget::setViewportOffsetTop(int offset_top) {
+	viewport_offset_top = offset_top;
+}
+
+void SDLRenderTarget::setViewportOffsetBottom(int offset_bottom) {
+	viewport_offset_bottom = offset_bottom;
+}
+
 void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, RenderOptions options) {
 	if (x + (int)img.width(frame) <= 0 || x >= (int)getWidth() || y + (int)img.height(frame) <= 0 || y >= (int)getHeight()) {
 		return;
@@ -324,7 +339,7 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 
 	SDL_Rect destrect;
 	destrect.x = x;
-	destrect.y = y; // + viewport_offset_top;
+	destrect.y = y + viewport_offset_top;
 	destrect.w = (options.override_drawsize ? options.overridden_drawwidth : srcrect.w) * options.scale;
 	destrect.h = (options.override_drawsize ? options.overridden_drawheight : srcrect.h) * options.scale;
 
@@ -350,7 +365,7 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget* s, int x, int y, int w, int
 
 	SDL_Rect r;
 	r.x = x;
-	r.y = y; // + viewport_offset_top;
+	r.y = y + viewport_offset_top;
 	r.w = w;
 	r.h = h;
 	SDL_SetRenderTarget(parent->renderer, texture);
