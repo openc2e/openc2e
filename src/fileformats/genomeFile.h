@@ -20,7 +20,7 @@
 #pragma once
 
 #include "common/Exception.h"
-#include "openc2e-core/creatures/lifestage.h"
+#include "openc2e/creatures/lifestage.h"
 
 #include <memory>
 #include <string>

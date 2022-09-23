@@ -172,109 +172,109 @@ add_library(openc2e_sdlbackend OBJECT
 )
 target_link_libraries(openc2e_sdlbackend PUBLIC openc2e-common imgui SDL2::SDL2 SDL2::Mixer ${CMAKE_DL_LIBS})
 
-add_library(openc2e-core STATIC
-	src/openc2e-core/Agent.cpp
-	src/openc2e-core/AgentHelpers.cpp
-	src/openc2e-core/AgentRef.cpp
-	src/openc2e-core/alloc_count.cpp
-	src/openc2e-core/creatures/Biochemistry.cpp
-	src/openc2e-core/Blackboard.cpp
-	src/openc2e-core/Bubble.cpp
-	src/openc2e-core/bytecode.cpp
-	src/openc2e-core/creatures/c2eBrain.cpp
-	src/openc2e-core/CallButton.cpp
-	src/openc2e-core/Camera.cpp
-	src/openc2e-core/caosException.cpp
-	src/openc2e-core/caosparser.cpp
-	src/openc2e-core/caosScript.cpp
-	src/openc2e-core/caosValue.cpp
-	src/openc2e-core/caos/caosVM_agent.cpp
-	src/openc2e-core/caos/caosVM_camera.cpp
-	src/openc2e-core/caos/caosVM_cdplayer.cpp
-	src/openc2e-core/caos/caosVM_compound.cpp
-	src/openc2e-core/caos/caosVM_core.cpp
-	src/openc2e-core/caos/caosVM_creatures.cpp
-	src/openc2e-core/caos/caosVM_debug.cpp
-	src/openc2e-core/caos/caosVM_files.cpp
-	src/openc2e-core/caos/caosVM_flow.cpp
-	src/openc2e-core/caos/caosVM_genetics.cpp
-	src/openc2e-core/caos/caosVM_history.cpp
-	src/openc2e-core/caos/caosVM_input.cpp
-	src/openc2e-core/caos/caosVM_map.cpp
-	src/openc2e-core/caos/caosVM_motion.cpp
-	src/openc2e-core/caos/caosVM_net.cpp
-	src/openc2e-core/caosVM.cpp
-	src/openc2e-core/caos/caosVM_ports.cpp
-	src/openc2e-core/caos/caosVM_resources.cpp
-	src/openc2e-core/caos/caosVM_scripts.cpp
-	src/openc2e-core/caos/caosVM_sounds.cpp
-	src/openc2e-core/caos/caosVM_time.cpp
-	src/openc2e-core/caos/caosVM_variables.cpp
-	src/openc2e-core/caos/caosVM_vectors.cpp
-	src/openc2e-core/caos/caosVM_vehicles.cpp
-	src/openc2e-core/caos/caosVM_world.cpp
-	src/openc2e-core/Catalogue.cpp
+add_library(openc2e_core OBJECT
+	src/openc2e/Agent.cpp
+	src/openc2e/AgentHelpers.cpp
+	src/openc2e/AgentRef.cpp
+	src/openc2e/alloc_count.cpp
+	src/openc2e/creatures/Biochemistry.cpp
+	src/openc2e/Blackboard.cpp
+	src/openc2e/Bubble.cpp
+	src/openc2e/bytecode.cpp
+	src/openc2e/creatures/c2eBrain.cpp
+	src/openc2e/CallButton.cpp
+	src/openc2e/Camera.cpp
+	src/openc2e/caosException.cpp
+	src/openc2e/caosparser.cpp
+	src/openc2e/caosScript.cpp
+	src/openc2e/caosValue.cpp
+	src/openc2e/caos/caosVM_agent.cpp
+	src/openc2e/caos/caosVM_camera.cpp
+	src/openc2e/caos/caosVM_cdplayer.cpp
+	src/openc2e/caos/caosVM_compound.cpp
+	src/openc2e/caos/caosVM_core.cpp
+	src/openc2e/caos/caosVM_creatures.cpp
+	src/openc2e/caos/caosVM_debug.cpp
+	src/openc2e/caos/caosVM_files.cpp
+	src/openc2e/caos/caosVM_flow.cpp
+	src/openc2e/caos/caosVM_genetics.cpp
+	src/openc2e/caos/caosVM_history.cpp
+	src/openc2e/caos/caosVM_input.cpp
+	src/openc2e/caos/caosVM_map.cpp
+	src/openc2e/caos/caosVM_motion.cpp
+	src/openc2e/caos/caosVM_net.cpp
+	src/openc2e/caosVM.cpp
+	src/openc2e/caos/caosVM_ports.cpp
+	src/openc2e/caos/caosVM_resources.cpp
+	src/openc2e/caos/caosVM_scripts.cpp
+	src/openc2e/caos/caosVM_sounds.cpp
+	src/openc2e/caos/caosVM_time.cpp
+	src/openc2e/caos/caosVM_variables.cpp
+	src/openc2e/caos/caosVM_vectors.cpp
+	src/openc2e/caos/caosVM_vehicles.cpp
+	src/openc2e/caos/caosVM_world.cpp
+	src/openc2e/Catalogue.cpp
 	${GEN}/cmddata.cpp
-	src/openc2e-core/CompoundAgent.cpp
-	src/openc2e-core/AnimatablePart.cpp
-	src/openc2e-core/ButtonPart.cpp
-	src/openc2e-core/CameraPart.cpp
-	src/openc2e-core/ChemicalNamesManager.cpp
-	src/openc2e-core/CobManager.cpp
-	src/openc2e-core/CompoundPart.cpp
-	src/openc2e-core/DullPart.cpp
-	src/openc2e-core/FixedTextPart.cpp
-	src/openc2e-core/GraphPart.cpp
-	src/openc2e-core/SpritePart.cpp
-	src/openc2e-core/TextPart.cpp
-	src/openc2e-core/TextEntryPart.cpp
-	src/openc2e-core/creatures/CompoundCreature.cpp
-	src/openc2e-core/creatures/Creature.cpp
-	src/openc2e-core/creatures/CreatureAgent.cpp
-	src/openc2e-core/creatures/CreatureAI.cpp
-	src/openc2e-core/dialect.cpp
-	src/openc2e-core/Engine.cpp
-	src/openc2e-core/historyManager.cpp
-	src/openc2e-core/imageManager.cpp
-	src/openc2e-core/Lift.cpp
-	src/openc2e-core/Map.cpp
-	src/openc2e-core/MetaRoom.cpp
-	src/openc2e-core/MusicManager.cpp
-	src/openc2e-core/net/socket.cpp
-	src/openc2e-core/NetBackend.cpp
-	src/openc2e-core/creatures/oldBrain.cpp
-	src/openc2e-core/parseException.cpp
-	src/openc2e-core/partzorder.cpp
-	src/openc2e-core/PathResolver.cpp
-	src/openc2e-core/physics.cpp
-	src/openc2e-core/PointerAgent.cpp
-	src/openc2e-core/Port.cpp
-	src/openc2e-core/prayManager.cpp
-	src/openc2e-core/renderable.cpp
-	src/openc2e-core/renderablezorder.cpp
-	src/openc2e-core/Room.cpp
-	src/openc2e-core/Scriptorium.cpp
-	src/openc2e-core/SFCFile.cpp
-	src/openc2e-core/SimpleAgent.cpp
-	src/openc2e-core/creatures/SkeletalCreature.cpp
-	src/openc2e-core/Sound.cpp
-	src/openc2e-core/SoundManager.cpp
-	src/openc2e-core/Vehicle.cpp
-	src/openc2e-core/VoiceData.cpp
-	src/openc2e-core/World.cpp
-	src/openc2e-core/openc2eimgui/AgentInjector.cpp
-	src/openc2e-core/openc2eimgui/BrainViewer.cpp
-	src/openc2e-core/openc2eimgui/C1ToolBar.cpp
-	src/openc2e-core/openc2eimgui/C2StatusBar.cpp
-	src/openc2e-core/openc2eimgui/C2ToolBar.cpp
-	src/openc2e-core/openc2eimgui/CreatureGrapher.cpp
-	src/openc2e-core/openc2eimgui/Hatchery.cpp
-	src/openc2e-core/openc2eimgui/ImGuiUtils.cpp
-	src/openc2e-core/openc2eimgui/MainMenu.cpp
-	src/openc2e-core/openc2eimgui/Openc2eImGui.cpp
+	src/openc2e/CompoundAgent.cpp
+	src/openc2e/AnimatablePart.cpp
+	src/openc2e/ButtonPart.cpp
+	src/openc2e/CameraPart.cpp
+	src/openc2e/ChemicalNamesManager.cpp
+	src/openc2e/CobManager.cpp
+	src/openc2e/CompoundPart.cpp
+	src/openc2e/DullPart.cpp
+	src/openc2e/FixedTextPart.cpp
+	src/openc2e/GraphPart.cpp
+	src/openc2e/SpritePart.cpp
+	src/openc2e/TextPart.cpp
+	src/openc2e/TextEntryPart.cpp
+	src/openc2e/creatures/CompoundCreature.cpp
+	src/openc2e/creatures/Creature.cpp
+	src/openc2e/creatures/CreatureAgent.cpp
+	src/openc2e/creatures/CreatureAI.cpp
+	src/openc2e/dialect.cpp
+	src/openc2e/Engine.cpp
+	src/openc2e/historyManager.cpp
+	src/openc2e/imageManager.cpp
+	src/openc2e/Lift.cpp
+	src/openc2e/Map.cpp
+	src/openc2e/MetaRoom.cpp
+	src/openc2e/MusicManager.cpp
+	src/openc2e/net/socket.cpp
+	src/openc2e/NetBackend.cpp
+	src/openc2e/creatures/oldBrain.cpp
+	src/openc2e/parseException.cpp
+	src/openc2e/partzorder.cpp
+	src/openc2e/PathResolver.cpp
+	src/openc2e/physics.cpp
+	src/openc2e/PointerAgent.cpp
+	src/openc2e/Port.cpp
+	src/openc2e/prayManager.cpp
+	src/openc2e/renderable.cpp
+	src/openc2e/renderablezorder.cpp
+	src/openc2e/Room.cpp
+	src/openc2e/Scriptorium.cpp
+	src/openc2e/SFCFile.cpp
+	src/openc2e/SimpleAgent.cpp
+	src/openc2e/creatures/SkeletalCreature.cpp
+	src/openc2e/Sound.cpp
+	src/openc2e/SoundManager.cpp
+	src/openc2e/Vehicle.cpp
+	src/openc2e/VoiceData.cpp
+	src/openc2e/World.cpp
+	src/openc2e/openc2eimgui/AgentInjector.cpp
+	src/openc2e/openc2eimgui/BrainViewer.cpp
+	src/openc2e/openc2eimgui/C1ToolBar.cpp
+	src/openc2e/openc2eimgui/C2StatusBar.cpp
+	src/openc2e/openc2eimgui/C2ToolBar.cpp
+	src/openc2e/openc2eimgui/CreatureGrapher.cpp
+	src/openc2e/openc2eimgui/Hatchery.cpp
+	src/openc2e/openc2eimgui/ImGuiUtils.cpp
+	src/openc2e/openc2eimgui/MainMenu.cpp
+	src/openc2e/openc2eimgui/Openc2eImGui.cpp
 )
-target_include_directories(openc2e-core PRIVATE src/openc2e-core)
-target_link_libraries(openc2e-core PUBLIC
+target_include_directories(openc2e_core PRIVATE src/openc2e)
+target_link_libraries(openc2e_core PUBLIC
 	cxxopts
 	fmt
 	ghc_filesystem
@@ -283,30 +283,22 @@ target_link_libraries(openc2e-core PUBLIC
 	openc2e-fileformats
 	openc2e-mngmusic
 )
-if(APPLE)
-	target_link_libraries(openc2e-core PUBLIC "-framework CoreFoundation")
-endif()
 if (OPENC2E_USE_SERIALIZATION)
-	target_sources(openc2e-core PRIVATE src/openc2e-core/caos/caosVM_ser_real.cpp)
-	target_link_libraries(openc2e-core PUBLIC Boost::serialization)
+	target_sources(openc2e_core PRIVATE src/openc2e/caos/caosVM_ser_real.cpp)
+	target_link_libraries(openc2e_core PUBLIC Boost::serialization)
 else()
-	target_sources(openc2e-core PRIVATE src/openc2e-core/caos/caosVM_ser_stub.cpp)
+	target_sources(openc2e_core PRIVATE src/openc2e/caos/caosVM_ser_stub.cpp)
 endif()
 
-add_executable(openc2e
-	src/openc2e-main/main.cpp
-)
-target_include_directories(openc2e PRIVATE src/openc2e-core)
-target_link_libraries(openc2e
-	openc2e-core
-	openc2e_sdlbackend
-)
+add_executable(openc2e src/openc2e/main.cpp)
+target_include_directories(openc2e PRIVATE src/openc2e)
+target_link_libraries(openc2e openc2e_core openc2e_sdlbackend)
 
 add_executable(test_openc2e
-	src/openc2e-core/tests/CaosTest.cpp
-	src/openc2e-core/tests/PrayTest.cpp
+	src/openc2e/tests/CaosTest.cpp
+	src/openc2e/tests/PrayTest.cpp
 )
-target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
+target_link_libraries(test_openc2e openc2e_core gtest gtest_main)
 
 add_library(opencreatures1_core STATIC
 	src/opencreatures1/C1MusicManager.cpp
@@ -341,13 +333,13 @@ add_executable(attparser src/tools/attparser.cpp)
 target_link_libraries(attparser openc2e-fileformats fmt)
 
 add_executable(caos_to_bytecode src/tools/caos_to_bytecode.cpp)
-target_link_libraries(caos_to_bytecode openc2e-core)
+target_link_libraries(caos_to_bytecode openc2e_core)
 
 add_executable(change_breed_slot src/tools/change_breed_slot.cpp)
 target_link_libraries(change_breed_slot openc2e-fileformats)
 
 add_executable(cobdumper src/tools/cobdumper.cpp)
-target_link_libraries(cobdumper openc2e-core)
+target_link_libraries(cobdumper openc2e_core)
 
 add_executable(creaturesarchivedumper src/tools/creaturesarchivedumper.cpp)
 target_link_libraries(creaturesarchivedumper openc2e-common fmt ghc_filesystem z)
@@ -401,7 +393,7 @@ target_link_libraries(spritedumper openc2e-fileformats fmt ghc_filesystem)
 add_executable(translate_voice
 	src/tools/translate_voice.cpp
 )
-target_link_libraries(translate_voice openc2e-fileformats openc2e-common openc2e-core openc2e_sdlbackend fmt ghc_filesystem)
+target_link_libraries(translate_voice openc2e-fileformats openc2e-common openc2e_core openc2e_sdlbackend fmt ghc_filesystem)
 
 # tests
 enable_testing()
@@ -413,7 +405,7 @@ gtest_discover_tests(test_opencreatures1)
 gtest_discover_tests(test_common)
 
 # Generated files
-file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/openc2e-core/caos/caosVM_*.cpp)
+file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/openc2e/caos/caosVM_*.cpp)
 add_custom_command(
 	OUTPUT ${GEN}/commandinfo.json
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"

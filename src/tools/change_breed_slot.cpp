@@ -4,7 +4,7 @@
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/genomeFile.h"
-#include "openc2e-core/creatures/lifestage.h"
+#include "openc2e/creatures/lifestage.h"
 
 #include <algorithm>
 #include <ctype.h>

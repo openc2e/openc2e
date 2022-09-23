@@ -4,8 +4,8 @@
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
-#include "openc2e-core/caosparser.h"
-#include "openc2e-core/dialect.h"
+#include "openc2e/caosparser.h"
+#include "openc2e/dialect.h"
 #include "tgaImage.h"
 
 #include <fmt/format.h>

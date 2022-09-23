@@ -1,5 +1,5 @@
-#include "openc2e-core/Catalogue.h"
-#include "openc2e-core/VoiceData.h"
+#include "openc2e/Catalogue.h"
+#include "openc2e/VoiceData.h"
 #include "sdlbackend/SDLMixerBackend.h"
 
 #include <algorithm>

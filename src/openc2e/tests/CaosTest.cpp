@@ -1,10 +1,10 @@
 #include "common/creaturesImage.h"
 #include "common/readfile.h"
-#include "openc2e-core/PathResolver.h"
-#include "openc2e-core/World.h"
-#include "openc2e-core/caosScript.h"
-#include "openc2e-core/caosVM.h"
-#include "openc2e-core/imageManager.h"
+#include "openc2e/PathResolver.h"
+#include "openc2e/World.h"
+#include "openc2e/caosScript.h"
+#include "openc2e/caosVM.h"
+#include "openc2e/imageManager.h"
 
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>

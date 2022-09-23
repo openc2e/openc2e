@@ -1,6 +1,6 @@
 #pragma once
 
-#include "openc2e-core/serfwd.h"
+#include "openc2e/serfwd.h"
 
 #include <memory>
 #include <string>
