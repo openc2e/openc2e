@@ -1,9 +1,9 @@
 #pragma once
 
+#include "common/audio/AudioBackend.h"
 #include "common/optional.h"
 #include "fileformats/mngfile.h"
 #include "fileformats/mngparser.h"
-#include "openc2e-audiobackend/AudioBackend.h"
 
 #include <chrono>
 #include <memory>

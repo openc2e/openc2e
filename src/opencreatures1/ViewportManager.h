@@ -1,7 +1,7 @@
 #pragma once
 
-#include "openc2e-core/Backend.h"
-#include "openc2e-core/keycodes.h"
+#include "common/backend/Backend.h"
+#include "common/backend/Keycodes.h"
 
 #include <cmath>
 #include <memory>

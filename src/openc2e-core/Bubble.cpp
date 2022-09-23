@@ -19,14 +19,14 @@
 
 #include "Bubble.h"
 
-#include "Backend.h"
 #include "Camera.h"
 #include "Engine.h"
 #include "SpritePart.h"
 #include "World.h"
-#include "creaturesImage.h"
+#include "common/backend/Backend.h"
+#include "common/backend/Keycodes.h"
+#include "common/creaturesImage.h"
 #include "imageManager.h"
-#include "keycodes.h"
 
 #include <cassert>
 

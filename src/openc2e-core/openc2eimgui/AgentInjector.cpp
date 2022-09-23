@@ -1,11 +1,11 @@
 #include "AgentInjector.h"
 
-#include "Backend.h"
 #include "CobManager.h"
 #include "Engine.h"
 #include "ImGuiUtils.h"
-#include "Texture.h"
 #include "World.h"
+#include "common/backend/Backend.h"
+#include "common/backend/BackendTexture.h"
 
 #include <ghc/filesystem.hpp>
 #include <imgui.h>

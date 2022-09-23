@@ -2,7 +2,7 @@
 
 #include "Engine.h"
 #include "SoundManager.h"
-#include "openc2e-audiobackend/AudioBackend.h"
+#include "common/audio/AudioBackend.h"
 
 Sound::Sound() = default;
 

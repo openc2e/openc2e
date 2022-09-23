@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Texture.h"
+#include "common/backend/BackendTexture.h"
 
 #include <imgui.h>
 #include <string>

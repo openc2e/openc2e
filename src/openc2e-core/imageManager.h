@@ -20,7 +20,7 @@
 #ifndef _IMAGEMANAGER_H
 #define _IMAGEMANAGER_H
 
-#include "creaturesImage.h"
+#include "common/creaturesImage.h"
 
 #include <map>
 #include <memory>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "openc2e-audiobackend/AudioState.h"
+#include "common/audio/AudioState.h"
 
 #include <stdint.h>
 

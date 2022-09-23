@@ -1,9 +1,9 @@
 #include "CameraPart.h"
 
-#include "Backend.h"
 #include "Camera.h"
 #include "Engine.h"
 #include "World.h"
+#include "common/backend/Backend.h"
 
 CameraPart::CameraPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 	unsigned int _z, unsigned int view_width, unsigned int view_height, unsigned int camera_width, unsigned int camera_height)

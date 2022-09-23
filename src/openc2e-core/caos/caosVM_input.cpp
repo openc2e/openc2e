@@ -17,11 +17,11 @@
  *
  */
 
-#include "Backend.h"
 #include "Engine.h"
 #include "PointerAgent.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/backend/Backend.h"
 
 #include <iostream>
 using std::cerr;

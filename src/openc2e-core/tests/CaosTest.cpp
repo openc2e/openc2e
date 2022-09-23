@@ -1,9 +1,9 @@
+#include "common/creaturesImage.h"
 #include "common/readfile.h"
 #include "openc2e-core/PathResolver.h"
 #include "openc2e-core/World.h"
 #include "openc2e-core/caosScript.h"
 #include "openc2e-core/caosVM.h"
-#include "openc2e-core/creaturesImage.h"
 #include "openc2e-core/imageManager.h"
 
 #include <gtest/gtest-spi.h>

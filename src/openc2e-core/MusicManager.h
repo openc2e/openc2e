@@ -20,7 +20,7 @@
 #ifndef _MUSICMANAGER_H
 #define _MUSICMANAGER_H
 
-#include "openc2e-audiobackend/AudioChannel.h"
+#include "common/audio/AudioChannel.h"
 
 #include <map>
 #include <memory>

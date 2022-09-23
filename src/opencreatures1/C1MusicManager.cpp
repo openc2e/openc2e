@@ -1,7 +1,7 @@
 #include "C1MusicManager.h"
 
 #include "PathManager.h"
-#include "openc2e-audiobackend/AudioBackend.h"
+#include "common/audio/AudioBackend.h"
 
 #include <fmt/core.h>
 

@@ -33,10 +33,10 @@
 #include "VoiceData.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/audio/AudioBackend.h"
+#include "common/creaturesImage.h"
 #include "common/namedifstream.h"
 #include "common/throw_ifnot.h"
-#include "creaturesImage.h"
-#include "openc2e-audiobackend/AudioBackend.h"
 
 #include <cassert>
 #include <fmt/core.h>

@@ -19,18 +19,14 @@
 
 #include "SDLBackend.h"
 
-#include "Camera.h"
-#include "Engine.h"
-#include "PointerAgent.h"
-#include "World.h"
 #include "common/Exception.h"
-#include "creaturesImage.h"
-#include "keycodes.h"
+#include "common/backend/Keycodes.h"
+#include "common/creaturesImage.h"
+#include "imgui_sdl.h"
 
 #include <array>
 #include <cassert>
 #include <imgui.h>
-#include <imgui_sdl/imgui_sdl.h>
 #include <memory>
 
 // reasonable defaults
@@ -72,19 +68,13 @@ static void ImGuiInit(SDL_Window* window) {
 	}
 }
 
-void SDLBackend::init() {
+void SDLBackend::init(const std::string& name) {
 	int init = SDL_INIT_VIDEO;
 
 	if (SDL_Init(init) < 0)
 		throw Exception(std::string("SDL error during initialization: ") + SDL_GetError());
 
-	std::string windowtitle;
-	if (engine.getGameName().size())
-		windowtitle = engine.getGameName() + " - ";
-	windowtitle += "openc2e";
-	std::string titlebar = windowtitle + " (development build)";
-
-	window = SDL_CreateWindow(titlebar.c_str(),
+	window = SDL_CreateWindow(name.c_str(),
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT,
@@ -536,48 +526,30 @@ void SDLBackend::setDefaultPalette(span<Color> palette) {
 	}
 }
 
-void SDLBackend::delay(int msec) {
-	SDL_Delay(msec);
+static constexpr int OPENC2E_MAX_FPS = 60;
+static constexpr int OPENC2E_MIN_FPS = 20;
+
+void SDLBackend::waitForNextDraw() {
+	// TODO: calculate scale etc here instead of in resizeNotify
+	// TODO: we have to calculate renderer sizes when the backend is initialized,
+	// otherwise side panels get in weird locations. related to issue with panels
+	// when resizing in general?
+
+	bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+	Uint32 desired_ticks_per_frame = 1000 / (focused ? OPENC2E_MAX_FPS : OPENC2E_MIN_FPS);
+	Uint32 frame_end = SDL_GetTicks();
+	if (frame_end - last_frame_end < desired_ticks_per_frame) {
+		SDL_Delay(desired_ticks_per_frame - (frame_end - last_frame_end));
+	}
+	last_frame_end = frame_end;
+
+	ImGuiSDL_NewFrame(window);
+	ImGui::NewFrame();
 }
 
-static constexpr int OPENC2E_MAX_FPS = 60;
-static constexpr int OPENC2E_MS_PER_FRAME = 1000 / OPENC2E_MAX_FPS;
+void SDLBackend::drawDone() {
+	ImGui::Render();
+	ImGuiSDL_RenderDrawData(ImGui::GetDrawData());
 
-
-int SDLBackend::run() {
-	resize(800, 600);
-
-	Uint32 last_frame_end = SDL_GetTicks();
-	while (!engine.done) {
-		engine.tick();
-
-		// TODO: calculate scale etc here instead of in resizeNotify
-		// TODO: we have to calculate renderer sizes when the backend is initialized,
-		// otherwise side panels get in weird locations. related to issue with panels
-		// when resizing in general?
-
-		ImGuiSDL_NewFrame(window);
-		ImGui::NewFrame();
-		engine.drawWorld();
-		ImGui::Render();
-		ImGuiSDL_RenderDrawData(ImGui::GetDrawData());
-		{
-			// TODO: hack to display the hand above ImGui windows
-			int adjustx = engine.camera->getX();
-			int adjusty = engine.camera->getY();
-			world.hand()->part(0)->render(getMainRenderTarget(), -adjustx, -adjusty);
-		}
-
-		SDL_RenderPresent(renderer);
-
-		bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
-		Uint32 desired_ticks_per_frame = focused ? OPENC2E_MS_PER_FRAME : world.ticktime;
-		Uint32 frame_end = SDL_GetTicks();
-		if (frame_end - last_frame_end < desired_ticks_per_frame) {
-			SDL_Delay(desired_ticks_per_frame - (frame_end - last_frame_end));
-		}
-		last_frame_end = frame_end;
-	}
-
-	return 0;
+	SDL_RenderPresent(renderer);
 }

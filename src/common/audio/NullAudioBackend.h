@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "openc2e-audiobackend/AudioBackend.h"
+#include "common/audio/AudioBackend.h"
 
 class NullAudioBackend : public AudioBackend {
   public:

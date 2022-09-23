@@ -20,17 +20,16 @@
 #include "CompoundPart.h"
 
 #include "Agent.h"
-#include "Backend.h"
 #include "Camera.h"
 #include "CameraPart.h"
 #include "CompoundAgent.h"
 #include "Engine.h"
 #include "World.h"
 #include "common/Exception.h"
+#include "common/backend/Backend.h"
+#include "common/creaturesImage.h"
 #include "common/encoding.h"
-#include "creaturesImage.h"
 #include "imageManager.h"
-#include "keycodes.h"
 
 #include <cassert>
 #include <memory>

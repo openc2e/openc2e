@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "Texture.h"
 #include "common/Image.h"
+#include "common/backend/BackendTexture.h"
 #include "common/shared_array.h"
 
 #include <cassert>

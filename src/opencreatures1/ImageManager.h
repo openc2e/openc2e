@@ -1,9 +1,9 @@
 #pragma once
 
 #include "common/Image.h"
+#include "common/creaturesImage.h"
 #include "fileformats/ImageUtils.h"
 #include "fileformats/paletteFile.h"
-#include "openc2e-core/creaturesImage.h"
 
 #include <map>
 #include <memory>

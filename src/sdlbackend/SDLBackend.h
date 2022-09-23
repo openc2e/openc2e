@@ -20,11 +20,12 @@
 #ifndef _SDLBACKEND_H
 #define _SDLBACKEND_H
 
-#include "openc2e-core/Backend.h"
+#include "common/backend/Backend.h"
 
 #include <SDL.h>
 #include <array>
 #include <memory>
+#include <string>
 
 class SDLRenderTarget : public RenderTarget {
 	friend class SDLBackend;
@@ -57,20 +58,21 @@ class SDLBackend : public Backend {
   protected:
 	SDL_Window* window = nullptr;
 	int windowwidth, windowheight;
+	SDL_Renderer* renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
 	std::array<SDL_Color, 256> default_palette;
 	float userscale = 1.0;
+	Uint32 last_frame_end = 0;
 
 	void resizeNotify(int _w, int _h);
 
 	SDL_Surface* getMainSDLSurface() { return SDL_GetWindowSurface(window); }
 
   public:
-	SDL_Renderer* renderer = nullptr;
-
 	SDLBackend();
-	void init();
-	int run();
+	void init(const std::string& name);
+	void waitForNextDraw();
+	void drawDone();
 	void shutdown();
 	void setUserScale(float scale);
 
@@ -91,7 +93,6 @@ class SDLBackend : public Backend {
 	int translateScancode(int key);
 
 	void setDefaultPalette(span<Color> palette);
-	void delay(int msec);
 };
 
 #endif

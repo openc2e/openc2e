@@ -4,7 +4,7 @@
 #include "ViewportManager.h"
 #include "common/Exception.h"
 #include "common/Repr.h"
-#include "openc2e-audiobackend/AudioBackend.h"
+#include "common/audio/AudioBackend.h"
 
 #include <cmath>
 #include <fmt/core.h>

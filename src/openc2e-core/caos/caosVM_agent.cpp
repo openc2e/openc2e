@@ -28,9 +28,9 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/creaturesImage.h"
 #include "common/throw_ifnot.h"
 #include "creatures/SkeletalCreature.h"
-#include "creaturesImage.h"
 
 #include <cassert>
 #include <climits>

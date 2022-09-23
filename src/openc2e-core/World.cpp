@@ -19,7 +19,6 @@
 
 #include "World.h"
 
-#include "Backend.h"
 #include "Camera.h"
 #include "Catalogue.h"
 #include "CompoundAgent.h" // for setFocus
@@ -34,9 +33,10 @@
 #include "SpritePart.h"
 #include "caosScript.h"
 #include "caosVM.h"
+#include "common/backend/Backend.h"
+#include "common/creaturesImage.h"
 #include "common/throw_ifnot.h"
 #include "creatures/CreatureAgent.h"
-#include "creaturesImage.h"
 #include "fileformats/genomeFile.h"
 #include "historyManager.h"
 #include "imageManager.h"

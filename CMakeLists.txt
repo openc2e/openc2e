@@ -99,13 +99,14 @@ include_directories(BEFORE
 
 # Targets
 add_library(openc2e-common OBJECT
+	src/common/case_insensitive_filesystem.cpp
+	src/common/creaturesImage.cpp
 	src/common/encoding.cpp
 	src/common/mappedfile.cpp
 	src/common/readfile.cpp
 	src/common/Repr.cpp
 	src/common/string_in.cpp
 	src/common/userlocale.cpp
-	src/common/case_insensitive_filesystem.cpp
 )
 target_link_libraries(openc2e-common
 	PUBLIC fmt
@@ -164,6 +165,13 @@ add_library(openc2e-mngmusic STATIC
 )
 target_link_libraries(openc2e-mngmusic PRIVATE openc2e-fileformats)
 
+add_library(openc2e_sdlbackend OBJECT
+	src/sdlbackend/imgui_sdl.cpp
+	src/sdlbackend/SDLBackend.cpp
+	src/sdlbackend/SDLMixerBackend.cpp
+)
+target_link_libraries(openc2e_sdlbackend PUBLIC openc2e-common imgui SDL2::SDL2 SDL2::Mixer ${CMAKE_DL_LIBS})
+
 add_library(openc2e-core STATIC
 	src/openc2e-core/Agent.cpp
 	src/openc2e-core/AgentHelpers.cpp
@@ -208,7 +216,6 @@ add_library(openc2e-core STATIC
 	src/openc2e-core/Catalogue.cpp
 	${GEN}/cmddata.cpp
 	src/openc2e-core/CompoundAgent.cpp
-	src/openc2e-core/creaturesImage.cpp
 	src/openc2e-core/AnimatablePart.cpp
 	src/openc2e-core/ButtonPart.cpp
 	src/openc2e-core/CameraPart.cpp
@@ -286,26 +293,13 @@ else()
 	target_sources(openc2e-core PRIVATE src/openc2e-core/caos/caosVM_ser_stub.cpp)
 endif()
 
-add_library(openc2e-audiobackend STATIC
-	src/openc2e-audiobackend/SDLMixerBackend.cpp
-)
-target_compile_definitions(openc2e-audiobackend PUBLIC "SDLMIXER_SUPPORT")
-target_link_libraries(openc2e-audiobackend PUBLIC openc2e-common SDL2::Mixer)
-
-add_library(imgui_sdl src/imgui_sdl/imgui_sdl.cpp)
-target_link_libraries(imgui_sdl PRIVATE imgui)
-
 add_executable(openc2e
 	src/openc2e-main/main.cpp
-	src/openc2e-main/SDLBackend.cpp
 )
 target_include_directories(openc2e PRIVATE src/openc2e-core)
 target_link_libraries(openc2e
 	openc2e-core
-	openc2e-audiobackend
-	imgui_sdl
-	SDL2::SDL2
-	${CMAKE_DL_LIBS}
+	openc2e_sdlbackend
 )
 
 add_executable(test_openc2e
@@ -320,24 +314,23 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/MacroCommands.cpp
 	src/opencreatures1/MacroManager.cpp
 	src/opencreatures1/PathManager.cpp
-	src/opencreatures1/SDLBackend.cpp
 	src/opencreatures1/SFCLoader.cpp
 	src/opencreatures1/C1Sound.cpp
 	src/opencreatures1/C1SoundManager.cpp
-	src/openc2e-core/creaturesImage.cpp
 )
 target_include_directories(opencreatures1_core PUBLIC src/opencreatures1)
 target_link_libraries(opencreatures1_core PUBLIC
 	openc2e-common
-	openc2e-audiobackend
 	openc2e-fileformats
 	SDL2::SDL2
 	fmt
 	ghc_filesystem
 )
 
-add_executable(opencreatures1 src/opencreatures1/main.cpp)
-target_link_libraries(opencreatures1 opencreatures1_core)
+add_executable(opencreatures1
+	src/opencreatures1/main.cpp
+)
+target_link_libraries(opencreatures1 opencreatures1_core openc2e_sdlbackend)
 
 add_executable(test_opencreatures1
 	src/opencreatures1/tests/ScriptoriumTest.cpp
@@ -368,7 +361,7 @@ target_link_libraries(mngbuild fmt ghc_filesystem openc2e-fileformats)
 add_executable(mngplayer
 	src/tools/mngplayer.cpp
 )
-target_link_libraries(mngplayer openc2e-audiobackend openc2e-mngmusic openc2e-fileformats fmt ghc_filesystem)
+target_link_libraries(mngplayer openc2e_sdlbackend openc2e-mngmusic openc2e-fileformats fmt ghc_filesystem)
 
 add_executable(mngplayer2
     src/mngplayer2/mngplayer2.cpp
@@ -379,11 +372,10 @@ target_link_libraries(mngplayer2
 	fmt
 	ghc_filesystem
 	imgui
-	imgui_sdl
 	nativefiledialog
-	openc2e-audiobackend
 	openc2e-fileformats
 	openc2e-mngmusic
+	openc2e_sdlbackend
 	${CMAKE_DL_LIBS}
 )
 if(WIN32)
@@ -409,7 +401,7 @@ target_link_libraries(spritedumper openc2e-fileformats fmt ghc_filesystem)
 add_executable(translate_voice
 	src/tools/translate_voice.cpp
 )
-target_link_libraries(translate_voice openc2e-fileformats openc2e-common openc2e-core openc2e-audiobackend fmt ghc_filesystem)
+target_link_libraries(translate_voice openc2e-fileformats openc2e-common openc2e-core openc2e_sdlbackend fmt ghc_filesystem)
 
 # tests
 enable_testing()

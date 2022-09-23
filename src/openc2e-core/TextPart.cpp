@@ -1,12 +1,12 @@
 #include "TextPart.h"
 
-#include "Backend.h"
 #include "Engine.h"
 #include "TextEntryPart.h"
 #include "World.h"
+#include "common/backend/Backend.h"
+#include "common/creaturesImage.h"
 #include "common/encoding.h"
 #include "common/throw_ifnot.h"
-#include "creaturesImage.h"
 #include "imageManager.h"
 
 #include <fmt/core.h>

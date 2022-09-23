@@ -2,7 +2,7 @@
 
 #include "Sound.h"
 #include "common/SlotMap.h"
-#include "openc2e-audiobackend/AudioBackend.h"
+#include "common/audio/AudioBackend.h"
 
 #include <chrono>
 #include <memory>

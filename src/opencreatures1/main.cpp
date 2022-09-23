@@ -9,16 +9,16 @@
 #include "ObjectManager.h"
 #include "PathManager.h"
 #include "RenderableManager.h"
-#include "SDLBackend.h"
 #include "SFCLoader.h"
 #include "Scriptorium.h"
 #include "TimerSystem.h"
 #include "ViewportManager.h"
 #include "common/Repr.h"
+#include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
 #include "fileformats/NewSFCFile.h"
-#include "openc2e-audiobackend/SDLMixerBackend.h"
-#include "openc2e-core/keycodes.h"
+#include "sdlbackend/SDLBackend.h"
+#include "sdlbackend/SDLMixerBackend.h"
 
 #include <SDL.h>
 #include <chrono>
@@ -146,9 +146,10 @@ extern "C" int main(int argc, char** argv) {
 	}
 
 	// run loop
-	g_engine_context->backend->init();
-	uint32_t last_frame_end = SDL_GetTicks();
+	g_engine_context->backend->init("opencreatures1");
 	while (true) {
+		g_engine_context->backend->waitForNextDraw();
+
 		// handle ui events
 		BackendEvent event;
 		bool should_quit = false;
@@ -217,17 +218,8 @@ extern "C" int main(int argc, char** argv) {
 			}
 		}
 
-		// present and wait
-		SDL_RenderPresent(g_engine_context->backend->renderer);
-
-		static constexpr int OPENC2E_MAX_FPS = 60;
-		static constexpr int OPENC2E_MS_PER_FRAME = 1000 / OPENC2E_MAX_FPS;
-
-		Uint32 frame_end = SDL_GetTicks();
-		if (frame_end - last_frame_end < OPENC2E_MS_PER_FRAME) {
-			SDL_Delay(OPENC2E_MS_PER_FRAME - (frame_end - last_frame_end));
-		}
-		last_frame_end = frame_end;
+		// present
+		g_engine_context->backend->drawDone();
 	}
 
 	return 0;

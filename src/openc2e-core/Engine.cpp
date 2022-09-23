@@ -21,11 +21,11 @@
 
 #include "Bubble.h"
 #include "Camera.h"
+#include "DullPart.h"
 #include "Map.h"
 #include "MetaRoom.h"
 #include "MusicManager.h"
 #include "NetBackend.h"
-#include "NullBackend.h"
 #include "PathResolver.h"
 #include "PointerAgent.h"
 #include "Room.h"
@@ -34,6 +34,9 @@
 #include "World.h"
 #include "caosScript.h" // for executeNetwork()
 #include "caosVM.h"
+#include "common/audio/NullAudioBackend.h"
+#include "common/backend/Keycodes.h"
+#include "common/backend/NullBackend.h"
 #include "common/case_insensitive_filesystem.h"
 #include "common/encoding.h"
 #include "common/find_if.h"
@@ -41,8 +44,7 @@
 #include "fileformats/cfgFile.h"
 #include "fileformats/peFile.h"
 #include "imageManager.h"
-#include "keycodes.h"
-#include "openc2e-audiobackend/NullAudioBackend.h"
+#include "openc2eimgui/ImGuiUtils.h"
 #include "openc2eimgui/Openc2eImGui.h"
 #include "prayManager.h"
 
@@ -327,9 +329,24 @@ void Engine::drawWorld() {
 
 	if (dorendering || refreshdisplay) {
 		refreshdisplay = false;
-
 		world.drawWorld(camera.get(), backend->getMainRenderTarget());
 	}
+
+	// TODO: hack to display the hand above ImGui windows
+	// ImGui stores draw instructions, and then gets rendered _after_ the world
+	// but we want to render the hand on top of everything
+	// TODO: also render everything the hand is holding?
+	auto hand = world.hand();
+	auto handpart = dynamic_cast<DullPart*>(hand->part(0));
+	auto texture = handpart->getSprite()->getTextureForFrame(handpart->getCurrentSprite());
+	auto x = hand->x + handpart->x - camera->getX();
+	auto y = hand->y + handpart->y - camera->getY() + Openc2eImGui::GetViewportOffsetTop();
+
+	auto drawlist = ImGui::GetForegroundDrawList();
+	drawlist->AddImage(
+		texture.as<ImTextureID>(),
+		ImVec2(x, y),
+		ImVec2(x + texture.width, y + texture.height));
 }
 
 void Engine::update() {
@@ -1039,7 +1056,7 @@ bool Engine::initialSetup() {
 	std::shared_ptr<Backend> b = possible_backends[preferred_backend];
 	if (!b)
 		throw Exception("No such backend " + preferred_backend);
-	b->init();
+	b->init(gamename.size() ? gamename + " - openc2e (development build)" : "openc2e (development build)");
 	setBackend(b);
 	possible_backends.clear();
 	Openc2eImGui::Init();

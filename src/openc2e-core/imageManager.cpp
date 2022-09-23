@@ -19,11 +19,11 @@
 
 #include "imageManager.h"
 
-#include "Backend.h"
 #include "Engine.h"
 #include "PathResolver.h"
 #include "World.h"
 #include "common/Exception.h"
+#include "common/backend/Backend.h"
 #include "fileformats/ImageUtils.h"
 #include "fileformats/hedfile.h"
 #include "fileformats/paletteFile.h"

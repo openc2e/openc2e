@@ -19,15 +19,13 @@
  */
 
 #include "Engine.h"
-#include "SDLBackend.h"
 #include "common/backtrace.h"
+#include "sdlbackend/SDLBackend.h"
+#include "sdlbackend/SDLMixerBackend.h"
 #include "version.h"
 
 #include <fmt/core.h>
 #include <memory>
-#ifdef SDLMIXER_SUPPORT
-#include "openc2e-audiobackend/SDLMixerBackend.h"
-#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -48,9 +46,7 @@ extern "C" int main(int argc, char* argv[]) {
 	fmt::print("openc2e ({}), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n", version);
 
 	engine.addPossibleBackend("sdl", std::shared_ptr<Backend>(new SDLBackend()));
-#ifdef SDLMIXER_SUPPORT
 	engine.addPossibleAudioBackend("sdlmixer", SDLMixerBackend::getInstance());
-#endif
 
 	// pass command-line flags to the engine, but do no other setup
 	if (!engine.parseCommandLine(argc, argv))
@@ -60,12 +56,23 @@ extern "C" int main(int argc, char* argv[]) {
 	if (!engine.initialSetup())
 		return 0;
 
-	int ret = engine.backend->run();
+	// run
+	while (true) {
+		engine.backend->waitForNextDraw();
+		if (engine.done) {
+			break;
+		}
+
+		engine.tick();
+		engine.drawWorld();
+
+		engine.backend->drawDone();
+	}
 
 	// we're done, be sure to shut stuff down
 	engine.shutdown();
 
-	return ret;
+	return 0;
 }
 
 /* vim: set noet: */

@@ -19,11 +19,11 @@
 
 #include "MetaRoom.h"
 
-#include "Backend.h"
 #include "Engine.h"
 #include "Map.h"
 #include "Room.h"
 #include "World.h"
+#include "common/backend/Backend.h"
 #include "common/throw_ifnot.h"
 #include "fileformats/blkImage.h"
 #include "imageManager.h"

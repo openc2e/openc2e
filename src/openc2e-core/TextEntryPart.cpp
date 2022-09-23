@@ -1,14 +1,14 @@
 #include "TextEntryPart.h"
 
 #include "Agent.h"
-#include "Backend.h"
 #include "Engine.h"
 #include "World.h"
+#include "common/backend/Backend.h"
+#include "common/backend/Keycodes.h"
+#include "common/creaturesImage.h"
 #include "common/encoding.h"
 #include "common/throw_ifnot.h"
-#include "creaturesImage.h"
 #include "imageManager.h"
-#include "keycodes.h"
 
 TextEntryPart::TextEntryPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,
 	unsigned int _z, unsigned int msgid, std::string fontsprite)

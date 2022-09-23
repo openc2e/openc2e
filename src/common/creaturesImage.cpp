@@ -17,7 +17,7 @@
  *
  */
 
-#include "creaturesImage.h"
+#include "common/creaturesImage.h"
 
 #include "common/Exception.h"
 

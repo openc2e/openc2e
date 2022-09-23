@@ -2,7 +2,7 @@
 
 #include "common/FixedPoint.h"
 #include "common/SlotMap.h"
-#include "openc2e-core/creaturesImage.h"
+#include "common/creaturesImage.h"
 
 #include <fmt/core.h>
 #include <string>

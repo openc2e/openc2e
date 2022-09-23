@@ -2,7 +2,7 @@
 #define S_CREATURESIMAGE_H 1
 
 #include "World.h"
-#include "creaturesImage.h"
+#include "common/creaturesImage.h"
 #include "serialization.h"
 
 typedef creaturesImage* p_img;

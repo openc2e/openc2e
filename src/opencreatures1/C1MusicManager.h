@@ -1,6 +1,6 @@
 #pragma once
 
-#include "openc2e-audiobackend/AudioChannel.h"
+#include "common/audio/AudioChannel.h"
 
 #include <chrono>
 #include <memory>

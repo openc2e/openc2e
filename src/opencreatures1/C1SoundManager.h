@@ -2,8 +2,8 @@
 
 #include "C1Sound.h"
 #include "common/SlotMap.h"
-#include "openc2e-audiobackend/AudioBackend.h"
-#include "openc2e-audiobackend/AudioState.h"
+#include "common/audio/AudioBackend.h"
+#include "common/audio/AudioState.h"
 
 #include <chrono>
 #include <memory>

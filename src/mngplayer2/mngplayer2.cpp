@@ -1,4 +1,5 @@
 #include "common/Exception.h"
+#include "common/audio/AudioBackend.h"
 #include "common/backtrace.h"
 #include "common/endianlove.h"
 #include "common/ends_with.h"
@@ -6,10 +7,9 @@
 #include "common/scope_guard.h"
 #include "common/zip.h"
 #include "fileformats/mngfile.h"
-#include "imgui_sdl/imgui_sdl.h"
 #include "libmngmusic/MNGMusic.h"
-#include "openc2e-audiobackend/AudioBackend.h"
-#include "openc2e-audiobackend/SDLMixerBackend.h"
+#include "sdlbackend/SDLMixerBackend.h"
+#include "sdlbackend/imgui_sdl.h"
 
 #include <SDL.h>
 #include <chrono>

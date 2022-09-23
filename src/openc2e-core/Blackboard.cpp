@@ -19,12 +19,12 @@
 
 #include "Blackboard.h"
 
-#include "Backend.h"
 #include "Engine.h"
 #include "World.h" // setFocus
 #include "caosValue.h"
+#include "common/backend/Backend.h"
+#include "common/backend/Keycodes.h"
 #include "imageManager.h"
-#include "keycodes.h"
 
 #include <cassert>
 

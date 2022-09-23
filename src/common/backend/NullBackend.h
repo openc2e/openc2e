@@ -42,8 +42,9 @@ class NullBackend : public Backend {
 	NullRenderTarget surface;
 
   public:
-	virtual void init() {}
-	virtual int run() { return 1; }
+	virtual void init(const std::string&) {}
+	virtual void waitForNextDraw() {}
+	virtual void drawDone() {}
 	virtual void shutdown() {}
 
 	virtual void resize(unsigned int, unsigned int) {}
@@ -64,7 +65,6 @@ class NullBackend : public Backend {
 
 	virtual void setDefaultPalette(span<Color>) {}
 	virtual unsigned int textWidth(std::string) { return 0; }
-	virtual void delay(int) {}
 };
 
 #endif

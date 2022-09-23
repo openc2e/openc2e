@@ -17,18 +17,15 @@
  *
  */
 
-#ifndef _BACKEND_H
-#define _BACKEND_H
+#pragma once
 
 #include "BackendEvent.h"
-#include "Texture.h"
+#include "BackendTexture.h"
 #include "common/Image.h"
 #include "common/span.h"
 
 #include <memory>
 #include <string>
-
-using std::shared_ptr;
 
 class creaturesImage;
 
@@ -61,7 +58,7 @@ class RenderTarget {
 
 class Backend {
   public:
-	virtual void init() = 0;
+	virtual void init(const std::string& name) = 0;
 	virtual void shutdown() = 0;
 
 	virtual unsigned int ticks() = 0;
@@ -78,9 +75,7 @@ class Backend {
 	virtual Texture createTexture(const Image& image) = 0;
 	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) = 0;
 
-	virtual int run() = 0;
-	virtual void delay(int msec) = 0;
+	virtual void waitForNextDraw() = 0;
+	virtual void drawDone() = 0;
 	virtual ~Backend() {}
 };
-
-#endif

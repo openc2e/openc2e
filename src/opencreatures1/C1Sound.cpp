@@ -1,7 +1,7 @@
 #include "C1Sound.h"
 
 #include "C1SoundManager.h"
-#include "openc2e-audiobackend/AudioBackend.h"
+#include "common/audio/AudioBackend.h"
 
 C1Sound::operator bool() {
 	if (id == static_cast<uint32_t>(~0)) {
