@@ -136,6 +136,8 @@ void c_SNDQ(caosVM* vm) {
 	VM_PARAM_STRING(filename);
 
 	valid_agent(vm->targ);
+	(void)delay;
+	(void)filename;
 
 	// This appears to be a CAOS command in every game, but isn't used in any official
 	// scripts.
@@ -355,6 +357,10 @@ void c_VOIC(caosVM* vm) {
 	VM_PARAM_INTEGER(age)
 	VM_PARAM_INTEGER(gender)
 	VM_PARAM_INTEGER(genus)
+
+	(void)age;
+	(void)gender;
+	(void)genus;
 
 	valid_agent(vm->targ);
 	// TODO
