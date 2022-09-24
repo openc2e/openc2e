@@ -102,7 +102,7 @@ extern "C" int main(int argc, char** argv) {
 	g_engine_context->macros->ctx.events = g_engine_context->events.get();
 	g_engine_context->macros->ctx.sounds = g_engine_context->sounds.get();
 
-	install_default_commands(g_engine_context->macros->ctx);
+	MacroCommands::install_default_commands(g_engine_context->macros->ctx);
 
 	// load palette
 	g_engine_context->images->load_default_palette();

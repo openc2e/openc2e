@@ -311,6 +311,7 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/C1MusicManager.cpp
 	src/opencreatures1/ImageManager.cpp
 	src/opencreatures1/MacroCommands.cpp
+	src/opencreatures1/MacroContext.cpp
 	src/opencreatures1/MacroManager.cpp
 	src/opencreatures1/PathManager.cpp
 	src/opencreatures1/SFCLoader.cpp
@@ -338,6 +339,7 @@ endif()
 target_link_libraries(opencreatures1 opencreatures1_core openc2e_sdlbackend)
 
 add_executable(test_opencreatures1
+	src/opencreatures1/tests/MacroTest.cpp
 	src/opencreatures1/tests/ScriptoriumTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")

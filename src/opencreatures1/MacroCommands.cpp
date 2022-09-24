@@ -538,8 +538,16 @@ void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	veh->yvel = fixed24_8_t::from_raw(value);
 }
 
-void install_default_commands(MacroContext& ctx) {
+void MacroCommands::install_math_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("addv")] = Command_ADDV;
+	ctx.command_funcs[Token("subv")] = Command_SUBV;
+	// TODO: mulv divv modv negv andv orrv
+	ctx.command_funcs[Token("rndv")] = Command_RNDV;
+}
+
+void MacroCommands::install_default_commands(MacroContext& ctx) {
+	install_math_commands(ctx);
+
 	ctx.command_funcs[Token("anim")] = Command_ANIM;
 	ctx.command_funcs[Token("dpas")] = Command_DPAS;
 	ctx.command_funcs[Token("doif")] = Command_DOIF;
@@ -557,14 +565,12 @@ void install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("pose")] = Command_POSE;
 	ctx.command_funcs[Token("repe")] = Command_REPE;
 	ctx.command_funcs[Token("reps")] = Command_REPS;
-	ctx.command_funcs[Token("rndv")] = Command_RNDV;
 	ctx.command_funcs[Token("setv")] = Command_SETV;
 	ctx.command_funcs[Token("sndc")] = Command_SNDC;
 	ctx.command_funcs[Token("snde")] = Command_SNDE;
 	ctx.command_funcs[Token("sndl")] = Command_SNDL;
 	ctx.command_funcs[Token("stim")] = Command_STIM;
 	ctx.command_funcs[Token("stpc")] = Command_STPC;
-	ctx.command_funcs[Token("subv")] = Command_SUBV;
 	ctx.command_funcs[Token("tick")] = Command_TICK;
 	ctx.command_funcs[Token("untl")] = Command_UNTL;
 	ctx.command_funcs[Token("wait")] = Command_WAIT;
