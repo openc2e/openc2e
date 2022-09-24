@@ -98,7 +98,7 @@ include_directories(BEFORE
 )
 
 # Targets
-add_library(openc2e-common STATIC
+add_library(openc2e-common OBJECT
 	src/common/encoding.cpp
 	src/common/mappedfile.cpp
 	src/common/readfile.cpp
@@ -107,7 +107,21 @@ add_library(openc2e-common STATIC
 	src/common/userlocale.cpp
 	src/common/case_insensitive_filesystem.cpp
 )
-target_link_libraries(openc2e-common PUBLIC fmt PRIVATE ghc_filesystem)
+target_link_libraries(openc2e-common
+	PUBLIC fmt
+	PRIVATE ghc_filesystem "$<$<PLATFORM_ID:Darwin>:-framework Foundation>"
+)
+
+add_executable(test_common
+	src/common/tests/DemangleTest.cpp
+	src/common/tests/EncodingTest.cpp
+	src/common/tests/EndsWithTest.cpp
+	src/common/tests/FixedPointTest.cpp
+	src/common/tests/SlotMapTest.cpp
+	src/common/tests/SparseSetTest.cpp
+	src/common/tests/WildcardTest.cpp
+)
+target_link_libraries(test_common openc2e-common gtest gtest_main)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
@@ -294,8 +308,13 @@ target_link_libraries(openc2e
 	${CMAKE_DL_LIBS}
 )
 
-add_executable(opencreatures1
-	src/opencreatures1/main.cpp
+add_executable(test_openc2e
+	src/openc2e-core/tests/CaosTest.cpp
+	src/openc2e-core/tests/PrayTest.cpp
+)
+target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
+
+add_library(opencreatures1_core STATIC
 	src/opencreatures1/C1MusicManager.cpp
 	src/opencreatures1/ImageManager.cpp
 	src/opencreatures1/MacroCommands.cpp
@@ -306,9 +325,9 @@ add_executable(opencreatures1
 	src/opencreatures1/C1Sound.cpp
 	src/opencreatures1/C1SoundManager.cpp
 	src/openc2e-core/creaturesImage.cpp
-	src/opencreatures1/tests/ScriptoriumTest.cpp
 )
-target_link_libraries(opencreatures1
+target_include_directories(opencreatures1_core PUBLIC src/opencreatures1)
+target_link_libraries(opencreatures1_core PUBLIC
 	openc2e-common
 	openc2e-audiobackend
 	openc2e-fileformats
@@ -316,6 +335,14 @@ target_link_libraries(opencreatures1
 	fmt
 	ghc_filesystem
 )
+
+add_executable(opencreatures1 src/opencreatures1/main.cpp)
+target_link_libraries(opencreatures1 opencreatures1_core)
+
+add_executable(test_opencreatures1
+	src/opencreatures1/tests/ScriptoriumTest.cpp
+)
+target_link_libraries(test_opencreatures1 opencreatures1_core gtest gtest_main)
 
 add_executable(attparser src/tools/attparser.cpp)
 target_link_libraries(attparser openc2e-fileformats fmt)
@@ -389,23 +416,9 @@ enable_testing()
 include(GoogleTest)
 include(Openc2eOutputOnTestFailure)
 
-add_executable(test_openc2e
-	src/tests/test_caos.cpp
-	src/tests/test_pray.cpp
-	src/tests/common/DemangleTest.cpp
-	src/tests/common/EncodingTest.cpp
-	src/tests/common/EndsWithTest.cpp
-	src/tests/common/FixedPointTest.cpp
-	src/tests/common/SlotMapTest.cpp
-	src/tests/common/SparseSetTest.cpp
-	src/tests/common/WildcardTest.cpp
-)
-target_link_libraries(test_openc2e openc2e-core gtest gtest_main)
-if(COMMAND gtest_discover_tests)
-	gtest_discover_tests(test_openc2e)
-else()
-    gtest_add_tests(test_openc2e "" "")
-endif()
+gtest_discover_tests(test_openc2e)
+gtest_discover_tests(test_opencreatures1)
+gtest_discover_tests(test_common)
 
 # Generated files
 file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/openc2e-core/caos/caosVM_*.cpp)
