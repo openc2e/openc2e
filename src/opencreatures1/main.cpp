@@ -15,6 +15,7 @@
 #include "TimerSystem.h"
 #include "ViewportManager.h"
 #include "common/Repr.h"
+#include "common/backtrace.h"
 #include "fileformats/NewSFCFile.h"
 #include "openc2e-audiobackend/SDLMixerBackend.h"
 #include "openc2e-core/keycodes.h"
@@ -64,6 +65,8 @@ extern "C" int main(int argc, char** argv) {
 		fmt::print(stderr, "Usage: {} path-to-creatures1-data\n", argv[0]);
 		return 1;
 	}
+
+	install_backtrace_printer();
 
 	std::string datapath = argv[1];
 	if (!fs::exists(datapath)) {

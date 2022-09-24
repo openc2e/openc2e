@@ -20,7 +20,7 @@
 
 #include "Engine.h"
 #include "SDLBackend.h"
-#include "backtrace.h"
+#include "common/backtrace.h"
 #include "version.h"
 
 #include <fmt/core.h>

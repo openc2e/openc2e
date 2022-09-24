@@ -1,4 +1,5 @@
 #include "common/Exception.h"
+#include "common/backtrace.h"
 #include "common/endianlove.h"
 #include "common/ends_with.h"
 #include "common/readfile.h"
@@ -9,7 +10,6 @@
 #include "libmngmusic/MNGMusic.h"
 #include "openc2e-audiobackend/AudioBackend.h"
 #include "openc2e-audiobackend/SDLMixerBackend.h"
-#include "openc2e-core/backtrace.h"
 
 #include <SDL.h>
 #include <chrono>
