@@ -159,4 +159,15 @@ class ObjectManager {
 			}
 		}
 	}
+
+	int32_t count_classifier(int32_t family, int32_t genus, int32_t species) {
+		int32_t result = 0;
+		for (auto& o : *this) {
+			if (
+				(o->family == family || family == 0) && (o->genus == genus || genus == 0) && (o->species == species || species == 0)) {
+				result++;
+			}
+		}
+		return result;
+	}
 };

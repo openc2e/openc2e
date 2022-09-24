@@ -481,6 +481,17 @@ int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
 	return bbox.left;
 }
 
+int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
+	ctx.read_arg_separator(m);
+	auto family = ctx.read_int(m);
+	ctx.read_arg_separator(m);
+	auto genus = ctx.read_int(m);
+	ctx.read_arg_separator(m);
+	auto species = ctx.read_int(m);
+
+	return ctx.objects->count_classifier(family, genus, species);
+}
+
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
 	Object* o = ctx.get_targ(m);
 	auto* veh = dynamic_cast<Vehicle*>(o);
@@ -582,6 +593,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.integerrv_funcs[Token("actv")] = IntegerRV_ACTV;
 	ctx.integerrv_funcs[Token("posb")] = IntegerRV_POSB;
 	ctx.integerrv_funcs[Token("posl")] = IntegerRV_POSL;
+	ctx.integerrv_funcs[Token("totl")] = IntegerRV_TOTL;
 	ctx.integerrv_funcs[Token("xvec")] = IntegerRV_XVEC;
 
 	ctx.lvalue_funcs[Token("actv")] = LValue_ACTV;
