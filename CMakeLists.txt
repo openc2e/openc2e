@@ -306,6 +306,7 @@ add_executable(opencreatures1
 	src/opencreatures1/C1Sound.cpp
 	src/opencreatures1/C1SoundManager.cpp
 	src/openc2e-core/creaturesImage.cpp
+	src/opencreatures1/tests/ScriptoriumTest.cpp
 )
 target_link_libraries(opencreatures1
 	openc2e-common
