@@ -1,6 +1,10 @@
 #pragma once
 
+#include "SafeCompare.h"
+
+#include <limits>
 #include <stdint.h>
+#include <type_traits>
 #include <typeinfo>
 
 class BadNumericCast : public std::bad_cast {
@@ -10,29 +14,13 @@ class BadNumericCast : public std::bad_cast {
 	}
 };
 
-template <typename To, typename From>
-To numeric_cast(From value);
-
-template <>
-inline uint32_t numeric_cast(int32_t value) {
-	if (value < 0) {
+template <typename To, typename From, typename = std::enable_if_t<std::is_arithmetic<To>::value && std::is_arithmetic<From>::value>>
+constexpr inline To numeric_cast(From value) {
+	if (cmp_greater(value, std::numeric_limits<To>::max())) {
 		throw BadNumericCast();
 	}
-	return static_cast<uint32_t>(value);
-}
-
-template <>
-inline int32_t numeric_cast(uint32_t value) {
-	if (value >= static_cast<uint32_t>(std::numeric_limits<int32_t>::max())) {
+	if (cmp_less(value, std::numeric_limits<To>::lowest())) {
 		throw BadNumericCast();
 	}
-	return static_cast<int32_t>(value);
-}
-
-template <>
-inline int32_t numeric_cast(size_t value) {
-	if (value >= static_cast<size_t>(std::numeric_limits<int32_t>::max())) {
-		throw BadNumericCast();
-	}
-	return static_cast<int32_t>(value);
+	return static_cast<To>(value);
 }

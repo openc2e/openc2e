@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #endif
 
+#include "common/NumericCast.h"
+
 /*
 
 This file used to handle integer encodings in a platform-neutral way using byte
@@ -53,13 +55,13 @@ static inline uint16_t byte_swap_16(uint16_t val) {
 	return _byteswap_ushort(val);
 #else
 	// this is optimized down to a rotation on Clang and GCC
-	return ((val & 0xff00) >> 8) | ((val & 0xff) << 8);
+	return static_cast<uint16_t>(((val & 0xff00) >> 8) | ((val & 0xff) << 8));
 #endif
 }
 
 static inline uint32_t byte_swap_32(uint32_t val) {
 	// this is optimized down to a bswap on Clang, GCC, and MSVC
-	return ((val & 0xff000000) >> 24) | ((val & 0xff0000) >> 8) | ((val & 0xff00) << 8) | ((val & 0xff) << 24);
+	return static_cast<uint32_t>(((val & 0xff000000) >> 24) | ((val & 0xff0000) >> 8) | ((val & 0xff00) << 8) | ((val & 0xff) << 24));
 }
 
 static inline uint8_t read8(std::istream& s) {
@@ -91,7 +93,7 @@ static inline void write16le(std::ostream& s, uint16_t v) {
 
 static inline void readmany16le(std::istream& s, uint16_t* out, size_t n) {
 	// this needs to be fast! it's used in the sprite file reading functions
-	s.read(reinterpret_cast<char*>(out), n * 2);
+	s.read(reinterpret_cast<char*>(out), numeric_cast<std::streamsize>(n * 2));
 	if (!is_little_endian()) {
 		for (size_t i = 0; i < n; ++i) {
 			out[i] = byte_swap_16(out[i]);
@@ -130,7 +132,7 @@ static inline void write16be(std::ostream& s, uint16_t v) {
 }
 
 static inline void readmany16be(std::istream& s, uint16_t* out, size_t n) {
-	s.read(reinterpret_cast<char*>(out), n * 2);
+	s.read(reinterpret_cast<char*>(out), numeric_cast<std::streamsize>(n * 2));
 	if (is_little_endian()) {
 		for (size_t i = 0; i < n; ++i) {
 			// gets optimized into fast SIMD instructions on Clang and MSVC at

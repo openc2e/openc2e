@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/NumericCast.h"
+
 #include <type_traits>
 #include <vector>
 
@@ -17,7 +19,7 @@ class SparseSet {
 		if (value >= sparse.size()) {
 			sparse.resize(value + 1, NULL_VALUE);
 		}
-		sparse[value] = dense.size() - 1;
+		sparse[value] = numeric_cast<T>(dense.size() - 1);
 	}
 
 	bool contains(T value) const {

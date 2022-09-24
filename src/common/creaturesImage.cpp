@@ -20,6 +20,7 @@
 #include "common/creaturesImage.h"
 
 #include "common/Exception.h"
+#include "common/NumericCast.h"
 
 #include <memory>
 #include <stdio.h>
@@ -37,7 +38,7 @@ unsigned int creaturesImage::numframes() const {
 		auto val = images[0].width / block_width * images[0].height / block_height;
 		return val;
 	}
-	return images.size();
+	return numeric_cast<unsigned int>(images.size());
 }
 
 unsigned int creaturesImage::width(unsigned int frame) const {

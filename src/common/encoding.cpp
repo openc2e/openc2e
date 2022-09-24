@@ -9,27 +9,27 @@
 std::string codepoint_to_utf8(char32_t c) {
 	std::array<uint8_t, 5> s = {0, 0, 0, 0, 0};
 	if (c <= 0x7f) {
-		s[0] = c;
+		s[0] = static_cast<uint8_t>(c);
 	} else if (c <= 0x7ff) {
-		s[0] = 0xc0 | (c >> 6);
-		s[1] = 0x80 | (c & 0x3f);
+		s[0] = static_cast<uint8_t>(0xc0 | (c >> 6));
+		s[1] = static_cast<uint8_t>(0x80 | (c & 0x3f));
 	} else if (c <= 0xffff) {
-		s[0] = 0xe0 | (c >> 12);
-		s[1] = 0x80 | ((c >> 6) & 0x3f);
-		s[2] = 0x80 | (c & 0x3f);
+		s[0] = static_cast<uint8_t>(0xe0 | (c >> 12));
+		s[1] = static_cast<uint8_t>(0x80 | ((c >> 6) & 0x3f));
+		s[2] = static_cast<uint8_t>(0x80 | (c & 0x3f));
 	} else if (c <= 0x10ffff) {
-		s[0] = 0xf0 | (c >> 18);
-		s[1] = 0x80 | ((c >> 12) & 0x3f);
-		s[2] = 0x80 | ((c >> 6) & 0x3f);
-		s[3] = 0x80 | (c & 0x3f);
+		s[0] = static_cast<uint8_t>(0xf0 | (c >> 18));
+		s[1] = static_cast<uint8_t>(0x80 | ((c >> 12) & 0x3f));
+		s[2] = static_cast<uint8_t>(0x80 | ((c >> 6) & 0x3f));
+		s[3] = static_cast<uint8_t>(0x80 | (c & 0x3f));
 	} else {
 		throw std::domain_error("Can't convert " + std::to_string(c) + " into UTF-8");
 	}
 	return std::string((char*)s.data());
 }
 
-static int utf8decode(const unsigned char* s, char32_t* c) {
-	int n = 0;
+static size_t utf8decode(const unsigned char* s, char32_t* c) {
+	size_t n = 0;
 	if (s[0] <= 0x7f) {
 		n = 1;
 		*c = (char32_t)s[0];
@@ -86,7 +86,8 @@ static bool utf8_is_combining_diacritical(char32_t codepoint) {
 	return codepoint >= 0x300 && codepoint <= 0x36f;
 }
 
-static char32_t utf8_combine_diacriticals(char32_t c, char32_t combining) {
+static char32_t utf8_combine_diacriticals(char cp1252_char, char32_t combining) {
+	unsigned char c = static_cast<unsigned char>(cp1252_char);
 	// basic NFC normalization for characters that exist in both Unicode and CP-1252
 	// clang-format off
 	if (combining == 0x300 && c == 0x41) return 0xc0;
@@ -153,7 +154,7 @@ static char32_t utf8_combine_diacriticals(char32_t c, char32_t combining) {
 
 static char32_t utf8_to_codepoint(const std::string& s, size_t& pos) {
 	char32_t c;
-	int bytes_read = utf8decode((unsigned char*)s.data() + pos, &c);
+	size_t bytes_read = utf8decode((unsigned char*)s.data() + pos, &c);
 	if (bytes_read == 0) {
 		throw std::domain_error("Invalid UTF-8 codepoint starting with " + std::to_string(s[pos]));
 	}
@@ -165,7 +166,7 @@ bool is_valid_utf8(const std::string& str) {
 	size_t pos = 0;
 	while (pos < str.size()) {
 		char32_t codepoint;
-		int bytes_read = utf8decode((unsigned char*)str.c_str() + pos, &codepoint);
+		size_t bytes_read = utf8decode((unsigned char*)str.c_str() + pos, &codepoint);
 		if (bytes_read == 0) {
 			return false;
 		}
@@ -176,7 +177,7 @@ bool is_valid_utf8(const std::string& str) {
 
 std::string cp1252_to_utf8(const std::string& cp1252_str) {
 	std::string utf8_str;
-	for (unsigned char c : cp1252_str) {
+	for (char c : cp1252_str) {
 		utf8_str += codepoint_to_utf8(cp1252_to_codepoint(c));
 	}
 	return utf8_str;
@@ -200,11 +201,12 @@ std::string utf8_to_cp1252(const std::string& utf8_str) {
 	return cp1252_str;
 }
 
-static std::string cp1252_to_ascii_lossy(uint8_t cp1252_char) {
-	if (cp1252_char < 128) {
-		return std::string(1, static_cast<char>(cp1252_char));
+static std::string cp1252_to_ascii_lossy(char cp1252_char) {
+	unsigned char c = static_cast<unsigned char>(cp1252_char);
+	if (c < 128) {
+		return std::string(1, cp1252_char);
 	}
-	switch (cp1252_char) {
+	switch (c) {
 		case 0x82: return ",";
 		case 0x84: return ",,";
 		case 0x85: return "...";
@@ -295,7 +297,7 @@ static std::string cp1252_to_ascii_lossy(uint8_t cp1252_char) {
 std::string cp1252_to_ascii_lossy(const std::string& cp1252_str) {
 	// TODO: assert CP1252 (e.g. not UTF8)?
 	std::string ascii_str;
-	for (uint8_t c : cp1252_str) {
+	for (char c : cp1252_str) {
 		ascii_str += cp1252_to_ascii_lossy(c);
 	}
 	return ascii_str;
@@ -325,14 +327,15 @@ mapping table available at
 ftp://ftp.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP1252.TXT
 */
 
-char32_t cp1252_to_codepoint(unsigned char cp1252_char) {
-	if (cp1252_char <= 0x7f) {
-		return cp1252_char;
+char32_t cp1252_to_codepoint(char cp1252_char) {
+	unsigned char c = static_cast<unsigned char>(cp1252_char);
+	if (c <= 0x7f) {
+		return c;
 	}
-	if (cp1252_char >= 0xa0 && cp1252_char <= 0xff) {
-		return cp1252_char;
+	if (c >= 0xa0 && c <= 0xff) {
+		return c;
 	}
-	switch (cp1252_char) {
+	switch (c) {
 		case 0x80: return 0x20ac;
 		case 0x82: return 0x201a;
 		case 0x83: return 0x0192;
@@ -365,41 +368,41 @@ char32_t cp1252_to_codepoint(unsigned char cp1252_char) {
 	throw std::domain_error("Unsupported CP-1252 character " + std::to_string(cp1252_char));
 }
 
-unsigned char unicode_to_cp1252(char32_t codepoint) {
+char unicode_to_cp1252(char32_t codepoint) {
 	if (codepoint <= 0x7f) {
-		return codepoint;
+		return static_cast<char>(codepoint);
 	}
 	if (codepoint >= 0xa0 && codepoint <= 0xff) {
-		return codepoint;
+		return static_cast<char>(codepoint);
 	}
 	switch (codepoint) {
-		case 0x20ac: return 0x80;
-		case 0x201a: return 0x82;
-		case 0x0192: return 0x83;
-		case 0x201e: return 0x84;
-		case 0x2026: return 0x85;
-		case 0x2020: return 0x86;
-		case 0x2021: return 0x87;
-		case 0x02c6: return 0x88;
-		case 0x2030: return 0x89;
-		case 0x0160: return 0x8a;
-		case 0x2039: return 0x8b;
-		case 0x0152: return 0x8c;
-		case 0x017d: return 0x8e;
-		case 0x2018: return 0x91;
-		case 0x2019: return 0x92;
-		case 0x201c: return 0x93;
-		case 0x201d: return 0x94;
-		case 0x2022: return 0x95;
-		case 0x2013: return 0x96;
-		case 0x2014: return 0x97;
-		case 0x02dc: return 0x98;
-		case 0x2122: return 0x99;
-		case 0x0161: return 0x9a;
-		case 0x203a: return 0x9b;
-		case 0x0153: return 0x9c;
-		case 0x017e: return 0x9e;
-		case 0x0178: return 0x9f;
+		case 0x20ac: return '\x80';
+		case 0x201a: return '\x82';
+		case 0x0192: return '\x83';
+		case 0x201e: return '\x84';
+		case 0x2026: return '\x85';
+		case 0x2020: return '\x86';
+		case 0x2021: return '\x87';
+		case 0x02c6: return '\x88';
+		case 0x2030: return '\x89';
+		case 0x0160: return '\x8a';
+		case 0x2039: return '\x8b';
+		case 0x0152: return '\x8c';
+		case 0x017d: return '\x8e';
+		case 0x2018: return '\x91';
+		case 0x2019: return '\x92';
+		case 0x201c: return '\x93';
+		case 0x201d: return '\x94';
+		case 0x2022: return '\x95';
+		case 0x2013: return '\x96';
+		case 0x2014: return '\x97';
+		case 0x02dc: return '\x98';
+		case 0x2122: return '\x99';
+		case 0x0161: return '\x9a';
+		case 0x203a: return '\x9b';
+		case 0x0153: return '\x9c';
+		case 0x017e: return '\x9e';
+		case 0x0178: return '\x9f';
 	}
 	throw std::domain_error("Code point " + std::to_string(codepoint) + " doesn't exist in CP-1252");
 }
@@ -423,10 +426,10 @@ bool cp1252_isprint(unsigned char c) {
 static char32_t utf16le_to_codepoint(uint8_t** p) {
 	assert(p);
 	assert(*p);
-	uint16_t c1 = read16le(*p);
+	char32_t c1 = read16le(*p);
 	*p += 2;
 	if (c1 >= 0xd800 && c1 < 0xdc00) {
-		uint16_t c2 = read16le(*p);
+		char32_t c2 = read16le(*p);
 		*p += 2;
 		if (c2 >= 0xdc00 && c2 < 0xe000) {
 			return ((c1 & 0x3ff) << 10) + (c2 & 0x3ff) + 0x10000;

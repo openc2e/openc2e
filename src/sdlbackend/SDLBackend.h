@@ -76,7 +76,7 @@ class SDLBackend : public Backend {
 	void shutdown();
 	void setUserScale(float scale);
 
-	void resize(unsigned int w, unsigned int h) { resizeNotify(w, h); }
+	void resize(int w, int h) { resizeNotify(w, h); }
 
 	bool pollEvent(BackendEvent& e);
 

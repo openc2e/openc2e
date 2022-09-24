@@ -54,8 +54,8 @@ mappedfile::mappedfile(const ghc::filesystem::path& filename) {
 	if (fno == -1) {
 		throw mappedfileerror(fmt::format("Error opening file, errno = {}", errno));
 	}
-	m_size = lseek(fno, 0, SEEK_END);
-	if (m_size == (size_t)-1) {
+	m_size = static_cast<size_t>(lseek(fno, 0, SEEK_END));
+	if (m_size == static_cast<size_t>(-1)) {
 		int seekerr = errno;
 		::close(fno); // TODO: handle error
 		throw mappedfileerror(fmt::format("Error seeking to end of file, errno = {}", seekerr));

@@ -3,6 +3,8 @@
 
 #include "userlocale.h"
 
+#include "common/NumericCast.h"
+
 #include <algorithm>
 
 #if defined(_WIN32)
@@ -44,7 +46,7 @@ std::vector<std::string> get_preferred_languages() {
 	for (CFIndex i = 0; i < CFArrayGetCount(cflanguages); ++i) {
 		CFStringRef cflang = static_cast<CFStringRef>(CFArrayGetValueAtIndex(cflanguages, i));
 		CFIndex bufsize = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cflang), kCFStringEncodingUTF8) + 1;
-		std::vector<char> buf(bufsize, '\0');
+		std::vector<char> buf(numeric_cast<size_t>(bufsize), '\0');
 		CFStringGetCString(cflang, buf.data(), bufsize, kCFStringEncodingUTF8);
 		std::string lang(buf.data());
 		languages.push_back(lang);

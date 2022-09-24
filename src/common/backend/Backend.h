@@ -65,7 +65,7 @@ class Backend {
 	virtual bool pollEvent(BackendEvent& e) = 0;
 	virtual bool keyDown(int key) = 0;
 
-	virtual void resize(unsigned int width, unsigned int height) = 0;
+	virtual void resize(int width, int height) = 0;
 
 	virtual RenderTarget* getMainRenderTarget() = 0;
 	virtual RenderTarget* newRenderTarget(unsigned int width, unsigned int height) = 0;

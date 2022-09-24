@@ -16,9 +16,9 @@ std::string utf8_to_cp1252(const std::string& utf8_str);
 std::string cp1252_to_ascii_lossy(const std::string& cp1252_str);
 
 // translate characters, throwing if it's not possible
-char32_t cp1252_to_codepoint(unsigned char cp1252_char);
+char32_t cp1252_to_codepoint(char cp1252_char);
 std::string codepoint_to_utf8(char32_t codepoint);
-unsigned char unicode_to_cp1252(char32_t codepoint);
+char unicode_to_cp1252(char32_t codepoint);
 std::string utf16le_to_utf8(uint8_t* data, size_t num_bytes);
 
 // helper functions

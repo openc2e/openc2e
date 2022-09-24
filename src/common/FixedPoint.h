@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/NumericCast.h"
+
 #include <fmt/core.h>
 #include <stdint.h>
 #include <type_traits>
@@ -10,7 +12,7 @@ class fixed24_8_t {
 
 	template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
 	fixed24_8_t(T t) {
-		m_value = t * (1 << 8);
+		m_value = numeric_cast<decltype(m_value)>(t * (1 << 8));
 	}
 
 	static fixed24_8_t from_raw(int32_t value) {

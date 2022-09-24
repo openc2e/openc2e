@@ -47,7 +47,7 @@ class NullBackend : public Backend {
 	virtual void drawDone() {}
 	virtual void shutdown() {}
 
-	virtual void resize(unsigned int, unsigned int) {}
+	virtual void resize(int, int) {}
 
 	virtual unsigned int ticks() { return 0; }
 	virtual bool pollEvent(BackendEvent&) { return false; }

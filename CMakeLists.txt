@@ -109,6 +109,9 @@ add_library(openc2e-common OBJECT
 	src/common/string_in.cpp
 	src/common/userlocale.cpp
 )
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_compile_options(openc2e-common PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+endif()
 target_link_libraries(openc2e-common
 	PUBLIC fmt
 	PRIVATE ghc_filesystem "$<$<PLATFORM_ID:Darwin>:-framework Foundation>"
@@ -123,6 +126,9 @@ add_executable(test_common
 	src/common/tests/SparseSetTest.cpp
 	src/common/tests/WildcardTest.cpp
 )
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_compile_options(test_common PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+endif()
 target_link_libraries(test_common openc2e-common gtest gtest_main)
 
 add_library(openc2e-fileformats STATIC
@@ -312,7 +318,7 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/C1SoundManager.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(opencreatures1_core PRIVATE -Wconversion -Wsign-conversion)
+	target_compile_options(opencreatures1_core PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_include_directories(opencreatures1_core PUBLIC src/opencreatures1)
 target_link_libraries(opencreatures1_core PUBLIC
@@ -326,11 +332,17 @@ target_link_libraries(opencreatures1_core PUBLIC
 add_executable(opencreatures1
 	src/opencreatures1/main.cpp
 )
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_compile_options(opencreatures1 PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+endif()
 target_link_libraries(opencreatures1 opencreatures1_core openc2e_sdlbackend)
 
 add_executable(test_opencreatures1
 	src/opencreatures1/tests/ScriptoriumTest.cpp
 )
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_compile_options(test_opencreatures1 PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+endif()
 target_link_libraries(test_opencreatures1 opencreatures1_core gtest gtest_main)
 
 add_executable(attparser src/tools/attparser.cpp)

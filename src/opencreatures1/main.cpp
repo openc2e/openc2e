@@ -191,9 +191,9 @@ extern "C" int main(int argc, char** argv) {
 			int x = r.x.trunc() - g_engine_context->viewport->scrollx;
 			int y = r.y.trunc();
 			// what to do if it's near the wraparound? just draw three times?
-			renderer->renderCreaturesImage(r.sprite, r.frame(), x, y - g_engine_context->viewport->scrolly);
-			renderer->renderCreaturesImage(r.sprite, r.frame(), x - CREATURES1_WORLD_WIDTH, y - g_engine_context->viewport->scrolly);
-			renderer->renderCreaturesImage(r.sprite, r.frame(), x + CREATURES1_WORLD_WIDTH, y - g_engine_context->viewport->scrolly);
+			renderer->renderCreaturesImage(r.sprite, numeric_cast<uint32_t>(r.frame()), x, y - g_engine_context->viewport->scrolly);
+			renderer->renderCreaturesImage(r.sprite, numeric_cast<uint32_t>(r.frame()), x - CREATURES1_WORLD_WIDTH, y - g_engine_context->viewport->scrolly);
+			renderer->renderCreaturesImage(r.sprite, numeric_cast<uint32_t>(r.frame()), x + CREATURES1_WORLD_WIDTH, y - g_engine_context->viewport->scrolly);
 		}
 		// // draw rooms
 		for (auto& room : g_engine_context->map->rooms) {
@@ -203,7 +203,7 @@ extern "C" int main(int argc, char** argv) {
 				auto top = room.top - g_engine_context->viewport->scrolly;
 				auto right = room.right - g_engine_context->viewport->scrollx + offset;
 				auto bottom = room.bottom - g_engine_context->viewport->scrolly;
-				int color;
+				uint32_t color;
 				if (room.type == 0) {
 					color = 0xFFFF00CC;
 				} else if (room.type == 1) {
