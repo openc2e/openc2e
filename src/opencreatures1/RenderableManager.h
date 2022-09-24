@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/FixedPoint.h"
+#include "common/NumericCast.h"
 #include "common/SlotMap.h"
 #include "common/creaturesImage.h"
 
@@ -26,11 +27,11 @@ class Renderable {
 	}
 
 	int32_t width() const {
-		return sprite.width(frame());
+		return numeric_cast<int32_t>(sprite.width(numeric_cast<uint32_t>(frame())));
 	}
 
 	int32_t height() const {
-		return sprite.height(frame());
+		return numeric_cast<int32_t>(sprite.height(numeric_cast<uint32_t>(frame())));
 	}
 
 	void clear_animation() {

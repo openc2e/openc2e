@@ -48,20 +48,20 @@ class Object {
 	int32_t ticks_since_last_tick_event;
 	ObjectHandle objp;
 	C1Sound current_sound;
-	uint32_t obv0;
-	uint32_t obv1;
-	uint32_t obv2;
+	int32_t obv0;
+	int32_t obv1;
+	int32_t obv2;
 
 	ObjectHandle uid;
 
-	virtual RenderableHandle get_part(size_t) { return {}; }
+	virtual RenderableHandle get_part(int32_t) { return {}; }
 };
 
 class Scenery : public Object {
   public:
 	RenderableHandle part;
 
-	RenderableHandle get_part(size_t i) override {
+	RenderableHandle get_part(int32_t i) override {
 		if (i == 0) {
 			return part;
 		}
@@ -72,11 +72,11 @@ class Scenery : public Object {
 class SimpleObject : public Object {
   public:
 	RenderableHandle part;
-	uint32_t z_order;
+	int32_t z_order;
 	std::array<uint8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
-	RenderableHandle get_part(size_t i) override {
+	RenderableHandle get_part(int32_t i) override {
 		if (i == 0) {
 			return part;
 		}
@@ -104,11 +104,12 @@ class CompoundObject : public Object {
 	std::array<Rect, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 
-	RenderableHandle get_part(size_t i) override {
-		if (i >= parts.size()) {
+	RenderableHandle get_part(int32_t i) override {
+		auto idx = numeric_cast<uint32_t>(i);
+		if (idx >= parts.size()) {
 			return {};
 		}
-		return parts[i].renderable;
+		return parts[idx].renderable;
 	}
 };
 

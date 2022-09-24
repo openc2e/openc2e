@@ -63,13 +63,13 @@ void Command_DOIF(MacroContext& ctx, Macro& m) {
 		}
 		m.ip++;
 		Token command = ctx.read_token(m);
-		if (command == token("doif")) {
+		if (command == Token("doif")) {
 			level += 1;
-		} else if (command == token("else") && level == 1) {
+		} else if (command == Token("else") && level == 1) {
 			// cool, skip to this else
 			ctx.read_command_separator(m);
 			return;
-		} else if (command == token("endi")) {
+		} else if (command == Token("endi")) {
 			level -= 1;
 			if (level == 0) {
 				// cool, skip to this endi
@@ -102,9 +102,9 @@ void Command_ELSE(MacroContext& ctx, Macro& m) {
 		}
 		m.ip++;
 		Token command = ctx.read_token(m);
-		if (command == token("doif")) {
+		if (command == Token("doif")) {
 			level += 1;
-		} else if (command == token("endi")) {
+		} else if (command == Token("endi")) {
 			level -= 1;
 			if (level == 0) {
 				ctx.read_command_separator(m);
@@ -127,7 +127,7 @@ void Command_ENDI(MacroContext& ctx, Macro& m) {
 
 void Command_EVER(MacroContext& ctx, Macro& m) {
 	// at the end of the loop, go back to start
-	m.ip = m.stack.back();
+	m.ip = numeric_cast<uint32_t>(m.stack.back());
 	ctx.instructions_left_this_tick++;
 }
 
@@ -150,7 +150,7 @@ void Command_INST(MacroContext& ctx, Macro& m) {
 
 void Command_LOOP(MacroContext& ctx, Macro& m) {
 	ctx.read_command_separator(m);
-	m.stack.push_back(m.ip);
+	m.stack.push_back(numeric_cast<int32_t>(m.ip));
 	ctx.instructions_left_this_tick++;
 }
 
@@ -158,7 +158,7 @@ void Command_MESG(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	ctx.read_arg_separator(m);
 	Token subcommand = ctx.read_token(m);
-	if (subcommand == token("writ")) {
+	if (subcommand == Token("writ")) {
 		ctx.read_arg_separator(m);
 		ObjectHandle to = ctx.read_object(m);
 		ctx.read_arg_separator(m);
@@ -230,7 +230,7 @@ void Command_REPE(MacroContext& ctx, Macro& m) {
 	}
 	iterations--;
 	if (iterations > 0) {
-		m.ip = loop_start;
+		m.ip = numeric_cast<uint32_t>(loop_start);
 	} else {
 		m.stack.pop_back(); // iterations
 		m.stack.pop_back(); // loop start
@@ -249,7 +249,7 @@ void Command_REPS(MacroContext& ctx, Macro& m) {
 		throw Exception(fmt::format("REPS called with bad value: {}", iterations));
 	}
 	ctx.read_command_separator(m);
-	m.stack.push_back(m.ip);
+	m.stack.push_back(numeric_cast<int32_t>(m.ip));
 	m.stack.push_back(iterations);
 	ctx.instructions_left_this_tick++;
 }
@@ -346,7 +346,7 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	ctx.read_arg_separator(m);
 	Token subcommand = ctx.read_token(m);
-	if (subcommand == token("sign")) {
+	if (subcommand == Token("sign")) {
 		for (int i = 0; i < 12; ++i) {
 			ctx.read_arg_separator(m);
 			ctx.read_int(m);
@@ -355,7 +355,7 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 
 		printf("WARNING: STIM SIGN not implemented\n");
 
-	} else if (subcommand == token("writ")) {
+	} else if (subcommand == Token("writ")) {
 		ctx.read_arg_separator(m);
 		ctx.read_object(m);
 		for (int i = 0; i < 12; ++i) {
@@ -366,7 +366,7 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 
 		printf("WARNING: STIM WRIT not implemented\n");
 
-	} else if (subcommand == token("shou")) {
+	} else if (subcommand == Token("shou")) {
 		for (int i = 0; i < 12; ++i) {
 			ctx.read_arg_separator(m);
 			ctx.read_int(m);
@@ -419,7 +419,7 @@ void Command_TICK(MacroContext& ctx, Macro& m) {
 }
 
 void Command_WAIT(MacroContext& ctx, Macro& m) {
-	size_t old_ip = m.ip - 4;
+	auto old_ip = m.ip - 4;
 
 	ctx.read_arg_separator(m);
 	int32_t wait_value = ctx.read_int(m);
@@ -449,7 +449,7 @@ void Command_UNTL(MacroContext& ctx, Macro& m) {
 		m.stack.pop_back();
 		ctx.read_command_separator(m);
 	} else {
-		m.ip = m.stack.back();
+		m.ip = numeric_cast<uint32_t>(m.stack.back());
 	}
 	ctx.instructions_left_this_tick++;
 }
@@ -539,46 +539,46 @@ void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 }
 
 void install_default_commands(MacroContext& ctx) {
-	ctx.command_funcs[token("addv")] = Command_ADDV;
-	ctx.command_funcs[token("anim")] = Command_ANIM;
-	ctx.command_funcs[token("dpas")] = Command_DPAS;
-	ctx.command_funcs[token("doif")] = Command_DOIF;
-	ctx.command_funcs[token("else")] = Command_ELSE;
-	ctx.command_funcs[token("endi")] = Command_ENDI;
-	ctx.command_funcs[token("ever")] = Command_EVER;
-	ctx.command_funcs[token("fade")] = Command_FADE;
-	ctx.command_funcs[token("gpas")] = Command_GPAS;
-	ctx.command_funcs[token("inst")] = Command_INST;
-	ctx.command_funcs[token("loop")] = Command_LOOP;
-	ctx.command_funcs[token("mesg")] = Command_MESG;
-	ctx.command_funcs[token("mvby")] = Command_MVBY;
-	ctx.command_funcs[token("over")] = Command_OVER;
-	ctx.command_funcs[token("part")] = Command_PART;
-	ctx.command_funcs[token("pose")] = Command_POSE;
-	ctx.command_funcs[token("repe")] = Command_REPE;
-	ctx.command_funcs[token("reps")] = Command_REPS;
-	ctx.command_funcs[token("rndv")] = Command_RNDV;
-	ctx.command_funcs[token("setv")] = Command_SETV;
-	ctx.command_funcs[token("sndc")] = Command_SNDC;
-	ctx.command_funcs[token("snde")] = Command_SNDE;
-	ctx.command_funcs[token("sndl")] = Command_SNDL;
-	ctx.command_funcs[token("stim")] = Command_STIM;
-	ctx.command_funcs[token("stpc")] = Command_STPC;
-	ctx.command_funcs[token("subv")] = Command_SUBV;
-	ctx.command_funcs[token("tick")] = Command_TICK;
-	ctx.command_funcs[token("untl")] = Command_UNTL;
-	ctx.command_funcs[token("wait")] = Command_WAIT;
+	ctx.command_funcs[Token("addv")] = Command_ADDV;
+	ctx.command_funcs[Token("anim")] = Command_ANIM;
+	ctx.command_funcs[Token("dpas")] = Command_DPAS;
+	ctx.command_funcs[Token("doif")] = Command_DOIF;
+	ctx.command_funcs[Token("else")] = Command_ELSE;
+	ctx.command_funcs[Token("endi")] = Command_ENDI;
+	ctx.command_funcs[Token("ever")] = Command_EVER;
+	ctx.command_funcs[Token("fade")] = Command_FADE;
+	ctx.command_funcs[Token("gpas")] = Command_GPAS;
+	ctx.command_funcs[Token("inst")] = Command_INST;
+	ctx.command_funcs[Token("loop")] = Command_LOOP;
+	ctx.command_funcs[Token("mesg")] = Command_MESG;
+	ctx.command_funcs[Token("mvby")] = Command_MVBY;
+	ctx.command_funcs[Token("over")] = Command_OVER;
+	ctx.command_funcs[Token("part")] = Command_PART;
+	ctx.command_funcs[Token("pose")] = Command_POSE;
+	ctx.command_funcs[Token("repe")] = Command_REPE;
+	ctx.command_funcs[Token("reps")] = Command_REPS;
+	ctx.command_funcs[Token("rndv")] = Command_RNDV;
+	ctx.command_funcs[Token("setv")] = Command_SETV;
+	ctx.command_funcs[Token("sndc")] = Command_SNDC;
+	ctx.command_funcs[Token("snde")] = Command_SNDE;
+	ctx.command_funcs[Token("sndl")] = Command_SNDL;
+	ctx.command_funcs[Token("stim")] = Command_STIM;
+	ctx.command_funcs[Token("stpc")] = Command_STPC;
+	ctx.command_funcs[Token("subv")] = Command_SUBV;
+	ctx.command_funcs[Token("tick")] = Command_TICK;
+	ctx.command_funcs[Token("untl")] = Command_UNTL;
+	ctx.command_funcs[Token("wait")] = Command_WAIT;
 
-	ctx.agentrv_funcs[token("from")] = AgentRV_FROM;
-	ctx.agentrv_funcs[token("ownr")] = AgentRV_OWNR;
-	ctx.agentrv_funcs[token("targ")] = AgentRV_TARG;
+	ctx.agentrv_funcs[Token("from")] = AgentRV_FROM;
+	ctx.agentrv_funcs[Token("ownr")] = AgentRV_OWNR;
+	ctx.agentrv_funcs[Token("targ")] = AgentRV_TARG;
 
-	ctx.integerrv_funcs[token("actv")] = IntegerRV_ACTV;
-	ctx.integerrv_funcs[token("posb")] = IntegerRV_POSB;
-	ctx.integerrv_funcs[token("posl")] = IntegerRV_POSL;
-	ctx.integerrv_funcs[token("xvec")] = IntegerRV_XVEC;
+	ctx.integerrv_funcs[Token("actv")] = IntegerRV_ACTV;
+	ctx.integerrv_funcs[Token("posb")] = IntegerRV_POSB;
+	ctx.integerrv_funcs[Token("posl")] = IntegerRV_POSL;
+	ctx.integerrv_funcs[Token("xvec")] = IntegerRV_XVEC;
 
-	ctx.lvalue_funcs[token("actv")] = LValue_ACTV;
-	ctx.lvalue_funcs[token("xvec")] = LValue_XVEC;
-	ctx.lvalue_funcs[token("yvec")] = LValue_YVEC;
+	ctx.lvalue_funcs[Token("actv")] = LValue_ACTV;
+	ctx.lvalue_funcs[Token("xvec")] = LValue_XVEC;
+	ctx.lvalue_funcs[Token("yvec")] = LValue_YVEC;
 }

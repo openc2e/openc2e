@@ -107,22 +107,39 @@ class Macro {
 	ObjectHandle exec;
 	ObjectHandle targ;
 	ObjectHandle _it_;
-	uint32_t part = 0;
+	int32_t part = 0;
 	std::string subroutine_label;
 	uint32_t subroutine_address = 0;
-	uint32_t wait = 0;
+	int32_t wait = 0;
 };
 
-enum class ShortToken : uint16_t {};
-enum class Token : uint32_t {};
+struct ShortToken {
+	explicit ShortToken(const char s[2])
+		: data{s[0], s[1]} {}
+	explicit ShortToken(const char (&s)[2])
+		: data{s[0], s[1]} {}
+	bool operator==(ShortToken other) const {
+		return data == other.data;
+	}
+	std::array<char, 2> data;
+};
+
+struct Token {
+	explicit Token(const char s[4])
+		: data{s[0], s[1], s[2], s[3]} {}
+	explicit Token(const char (&s)[4])
+		: data{s[0], s[1], s[2], s[3]} {}
+	bool operator<(Token other) const {
+		return *reinterpret_cast<const uint32_t*>(data.data()) < *reinterpret_cast<const uint32_t*>(other.data.data());
+	}
+	bool operator==(Token other) const {
+		return data == other.data;
+	}
+	std::array<char, 4> data;
+};
+
 std::string repr(ShortToken i);
 std::string repr(Token i);
-inline constexpr ShortToken shorttoken(const char s[2]) {
-	return static_cast<ShortToken>(s[0] | (s[1] << 8));
-}
-inline constexpr Token token(const char s[4]) {
-	return static_cast<Token>(s[0] | (s[1] << 8) | (s[2] << 16) | (s[3] << 24));
-}
 
 class MacroContext;
 

@@ -78,8 +78,8 @@ void C1SoundManager::update_volume(SoundData& s) {
 
 		// std::remainder gives the distance between x and centerx, taking
 		// into account world wraparound ("modular distance")
-		const float distx = std::remainder(s.x + s.width / 2 - centerx, CREATURES1_WORLD_WIDTH);
-		const float disty = s.y + s.height / 2 - centery;
+		const float distx = std::remainder(s.x + s.width / 2.0f - centerx, CREATURES1_WORLD_WIDTH * 1.0f);
+		const float disty = s.y + s.height / 2.0f - centery;
 
 		const float screen_width = viewport->width();
 		const float screen_height = viewport->height();

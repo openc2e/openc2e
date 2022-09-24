@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/NumericCast.h"
 #include "common/backend/Backend.h"
 #include "common/backend/Keycodes.h"
 
@@ -67,13 +68,11 @@ class ViewportManager {
 		}
 
 		// do the actual movement
-		if (scroll_velx || scroll_vely) {
-			scrollx += scroll_velx;
-			scrolly += scroll_vely;
-		}
+		scrollx += static_cast<int32_t>(scroll_velx);
+		scrolly += static_cast<int32_t>(scroll_vely);
 
 		// fix scroll
-		int window_height = m_backend->getMainRenderTarget()->getHeight();
+		int32_t window_height = numeric_cast<int32_t>(m_backend->getMainRenderTarget()->getHeight());
 		// can't go past top or bottom
 		if (scrolly < 0) {
 			scrolly = 0;
@@ -91,23 +90,23 @@ class ViewportManager {
 	}
 
 	int32_t width() const {
-		return m_backend->getMainRenderTarget()->getWidth();
+		return numeric_cast<int32_t>(m_backend->getMainRenderTarget()->getWidth());
 	}
 
 	int32_t height() const {
-		return m_backend->getMainRenderTarget()->getHeight();
+		return numeric_cast<int32_t>(m_backend->getMainRenderTarget()->getHeight());
 	}
 
 	int32_t centerx() const {
-		return std::remainder(scrollx + width() / 2, CREATURES1_WORLD_WIDTH);
+		return static_cast<int>(std::remainder(scrollx + width() / 2, CREATURES1_WORLD_WIDTH));
 	}
 
 	int32_t centery() const {
 		return scrolly + height() / 2;
 	}
 
-	int scrollx = 0;
-	int scrolly = 0;
+	int32_t scrollx = 0;
+	int32_t scrolly = 0;
 
   private:
 	static constexpr float SCROLL_ACCEL = 8;

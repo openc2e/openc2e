@@ -22,15 +22,15 @@ struct ImageV1 {
 
 struct CGalleryV1 {
 	std::string filename;
-	uint32_t first_sprite;
-	uint32_t refcount;
+	int32_t first_sprite;
+	int32_t refcount;
 	std::vector<ImageV1> images;
 
 	void read_from(MFCReader& in) {
 		uint32_t num_images = in.read32le();
 		filename = in.read_ascii(4);
-		first_sprite = in.read32le();
-		refcount = in.read32le();
+		first_sprite = in.reads32le();
+		refcount = in.reads32le();
 
 		for (size_t i = 0; i < num_images; ++i) {
 			ImageV1 image;
@@ -50,7 +50,7 @@ struct RoomV1 {
 	int32_t top;
 	int32_t right;
 	int32_t bottom;
-	uint32_t type;
+	int32_t type;
 };
 
 
@@ -166,8 +166,8 @@ struct ObjectV1 {
 	ObjectV1* carrier;
 	uint8_t actv;
 	CGalleryV1* sprite;
-	uint32_t tick_value;
-	uint32_t ticks_since_last_tick_event;
+	int32_t tick_value;
+	int32_t ticks_since_last_tick_event;
 	ObjectV1* objp;
 	std::string current_sound;
 	int32_t obv0;
@@ -189,8 +189,8 @@ struct ObjectV1 {
 		carrier = in.read_type<ObjectV1>();
 		actv = in.read8();
 		sprite = in.read_type<CGalleryV1>();
-		tick_value = in.read32le();
-		ticks_since_last_tick_event = in.read32le();
+		tick_value = in.reads32le();
+		ticks_since_last_tick_event = in.reads32le();
 		objp = in.read_type<ObjectV1>();
 		current_sound = in.read_ascii_nullterminated(4);
 		obv0 = in.reads32le();
@@ -225,14 +225,14 @@ struct SimpleObjectV1 : ObjectV1 {
 
 struct BubbleV1 : SimpleObjectV1 {
 	uint8_t life;
-	uint32_t creator;
+	int32_t creator;
 	std::string text;
 
 	void read_from(MFCReader& in) {
 		SimpleObjectV1::read_from(in);
 
 		life = in.read8();
-		creator = in.read32le(); // ???
+		creator = in.reads32le(); // ???
 		text = in.read_ascii_nullterminated(25);
 	}
 };
@@ -413,10 +413,10 @@ struct MacroV1 {
 	ObjectV1* exec;
 	ObjectV1* targ;
 	ObjectV1* _it_;
-	uint32_t part;
+	int32_t part;
 	std::string subroutine_label;
 	uint32_t subroutine_address;
-	uint32_t wait;
+	int32_t wait;
 
 	void read_from(MFCReader& in) {
 		selfdestruct = in.read32le();
@@ -436,10 +436,10 @@ struct MacroV1 {
 		exec = in.read_type<ObjectV1>();
 		targ = in.read_type<ObjectV1>();
 		_it_ = in.read_type<ObjectV1>();
-		part = in.read32le();
+		part = in.reads32le();
 		std::string subroutine_label = in.read_ascii(4);
 		subroutine_address = in.read32le();
-		wait = in.read32le();
+		wait = in.reads32le();
 	}
 };
 

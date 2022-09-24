@@ -40,10 +40,9 @@ void C1MusicManager::setMuted(bool muted) {
 	updateVolumes();
 }
 
-
 void C1MusicManager::updateVolumes() {
 	// reduce overall volume of clips to 80%
-	m_backend->setChannelVolume(m_audio_channel, m_muted ? 0 : m_volume * 0.8);
+	m_backend->setChannelVolume(m_audio_channel, m_muted ? 0 : m_volume * 0.8f);
 }
 
 void C1MusicManager::update() {

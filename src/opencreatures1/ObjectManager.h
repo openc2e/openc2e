@@ -58,7 +58,7 @@ inline void move_object_to(PointerView<Object> obj, PointerView<RenderableManage
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = renderables->try_get(obj->get_part(i));
+			Renderable* part = renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
 
 			part->x = x + p.x;
 			part->y = y + p.y;
@@ -91,7 +91,7 @@ inline void move_object_by(PointerView<Object> obj, PointerView<RenderableManage
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = renderables->try_get(obj->get_part(i));
+			Renderable* part = renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
 
 			part->x = main_part->x + p.x;
 			part->y = main_part->y + p.y;

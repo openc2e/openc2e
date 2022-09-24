@@ -3,6 +3,7 @@
 #include <algorithm> // stable_sort
 #include <exception>
 #include <fmt/core.h>
+#include <limits>
 #include <stdint.h>
 #include <utility>
 #include <vector>
@@ -19,6 +20,9 @@ struct SlotMapKey {
 	using IndexType = uint16_t;
 	using CounterType = uint16_t;
 
+	static constexpr auto MAX_INDEX = std::numeric_limits<IndexType>::max();
+	static constexpr auto MAX_COUNTER = std::numeric_limits<CounterType>::max();
+
 	SlotMapKey(IndexType index_, CounterType counter_)
 		: index(index_), counter(counter_) {}
 
@@ -26,17 +30,19 @@ struct SlotMapKey {
 	CounterType counter;
 
 	constexpr SlotMapKey()
-		: index(~0), counter(~0) {
+		: index(MAX_INDEX), counter(MAX_COUNTER) {
 	}
+
 	bool operator==(const SlotMapKey& other) const {
 		return index == other.index && counter == other.counter;
 	}
+
 	bool operator!=(const SlotMapKey& other) const {
 		return !(*this == other);
 	}
 
 	uint32_t to_integral() const {
-		return (counter << 16) | index;
+		return (static_cast<uint32_t>(counter) << 16) | static_cast<uint32_t>(index);
 	}
 };
 
@@ -59,16 +65,21 @@ class DenseSlotMap {
 			new_id = m_deleted.back();
 			m_deleted.pop_back();
 		} else {
-			new_id = Key(m_sparse.size(), 0);
-			if (new_id.index == NULL_INDEX) {
+			size_t idx = m_sparse.size();
+			if (idx >= NULL_INDEX) {
 				// whoops, ran out of ids
 				std::terminate();
 			}
+			new_id = Key(static_cast<IndexType>(idx), 0);
 		}
 		if (new_id.index >= m_sparse.size()) {
 			m_sparse.resize(new_id.index + 1);
 		}
-		m_sparse[new_id.index] = m_dense.size();
+		if (m_dense.size() >= NULL_INDEX) {
+			// whoops, should never get here
+			std::terminate();
+		}
+		m_sparse[new_id.index] = static_cast<IndexType>(m_dense.size());
 		m_dense.push_back(new_id);
 		m_values.push_back(std::move(value));
 
@@ -150,7 +161,7 @@ class DenseSlotMap {
 			ValueWrapper(std::vector<T>* values_p_, size_t index_)
 				: values_p(values_p_), index(index_) {}
 			std::vector<T>* values_p = nullptr;
-			size_t index = ~0;
+			size_t index = NULL_INDEX;
 		};
 		struct Pair {
 			Key id;

@@ -2,6 +2,7 @@
 
 #include "common/audio/AudioState.h"
 
+#include <limits>
 #include <stdint.h>
 
 class C1SoundManager;
@@ -17,5 +18,5 @@ class C1Sound {
   private:
 	friend class C1SoundManager;
 	C1SoundManager* soundmanager = nullptr;
-	uint32_t id = ~0;
+	uint32_t id = std::numeric_limits<uint32_t>::max();
 };

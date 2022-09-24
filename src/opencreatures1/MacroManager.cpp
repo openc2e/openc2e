@@ -8,24 +8,18 @@
 
 
 std::string repr(ShortToken i) {
-	char s[2];
-	s[0] = static_cast<uint16_t>(i);
-	s[1] = static_cast<uint16_t>(i) >> 8;
-	return std::string(s, s + 2);
+	return std::string(i.data.begin(), i.data.end());
 }
 
 std::string repr(Token i) {
-	char s[4];
-	s[0] = static_cast<uint32_t>(i);
-	s[1] = static_cast<uint32_t>(i) >> 8;
-	s[2] = static_cast<uint32_t>(i) >> 16;
-	s[3] = static_cast<uint32_t>(i) >> 24;
-	return std::string(s, s + 4);
+	return std::string(i.data.begin(), i.data.end());
 }
+
 
 ShortToken MacroContext::read_short_token(Macro& m) {
 	// TODO: assert allowed letters
-	ShortToken token = static_cast<ShortToken>(m.script[m.ip] | (m.script[m.ip + 1] << 8));
+	const char* s = m.script.c_str() + m.ip;
+	ShortToken token({s[0], s[1]});
 	m.ip += 2;
 	return token;
 }
@@ -33,7 +27,7 @@ ShortToken MacroContext::read_short_token(Macro& m) {
 Token MacroContext::read_token(Macro& m) {
 	// TODO: assert allowed letters
 	const char* s = m.script.c_str() + m.ip;
-	Token token = static_cast<Token>(s[0] | (s[1] << 8) | (s[2] << 16) | (s[3] << 24));
+	Token token({s[0], s[1], s[2], s[3]});
 	m.ip += 4;
 	return token;
 }
@@ -152,15 +146,15 @@ bool MacroContext::read_condition(Macro& m) {
 	read_arg_separator(m);
 	int32_t right = read_int(m);
 
-	if (comparison == shorttoken("gt")) {
+	if (comparison == ShortToken("gt")) {
 		return left > right;
-	} else if (comparison == shorttoken("ge")) {
+	} else if (comparison == ShortToken("ge")) {
 		return left >= right;
-	} else if (comparison == shorttoken("lt")) {
+	} else if (comparison == ShortToken("lt")) {
 		return left < right;
-	} else if (comparison == shorttoken("le")) {
+	} else if (comparison == ShortToken("le")) {
 		return left <= right;
-	} else if (comparison == shorttoken("eq")) {
+	} else if (comparison == ShortToken("eq")) {
 		return left == right;
 	} else {
 		throw Exception(fmt::format("Unknown comparison operator {}", repr(comparison)));
@@ -180,31 +174,31 @@ ObjectHandle MacroContext::read_object(Macro& m) {
 };
 
 bool MacroContext::try_get_variable(const Macro& m, Token varname, int32_t* value) const {
-	if (varname == token("var0")) {
+	if (varname == Token("var0")) {
 		*value = m.vars[0];
-	} else if (varname == token("var1")) {
+	} else if (varname == Token("var1")) {
 		*value = m.vars[1];
-	} else if (varname == token("var2")) {
+	} else if (varname == Token("var2")) {
 		*value = m.vars[2];
-	} else if (varname == token("var3")) {
+	} else if (varname == Token("var3")) {
 		*value = m.vars[3];
-	} else if (varname == token("var4")) {
+	} else if (varname == Token("var4")) {
 		*value = m.vars[4];
-	} else if (varname == token("var5")) {
+	} else if (varname == Token("var5")) {
 		*value = m.vars[5];
-	} else if (varname == token("var6")) {
+	} else if (varname == Token("var6")) {
 		*value = m.vars[6];
-	} else if (varname == token("var7")) {
+	} else if (varname == Token("var7")) {
 		*value = m.vars[7];
-	} else if (varname == token("var8")) {
+	} else if (varname == Token("var8")) {
 		*value = m.vars[8];
-	} else if (varname == token("var9")) {
+	} else if (varname == Token("var9")) {
 		*value = m.vars[9];
-	} else if (varname == token("obv0")) {
+	} else if (varname == Token("obv0")) {
 		*value = get_targ(m)->obv0;
-	} else if (varname == token("obv1")) {
+	} else if (varname == Token("obv1")) {
 		*value = get_targ(m)->obv1;
-	} else if (varname == token("obv2")) {
+	} else if (varname == Token("obv2")) {
 		*value = get_targ(m)->obv2;
 	} else {
 		return false;
@@ -216,31 +210,31 @@ bool MacroContext::try_get_variable(const Macro& m, Token varname, int32_t* valu
 }
 
 void MacroContext::set_variable(Macro& m, Token varname, int32_t value) {
-	if (varname == token("var0")) {
+	if (varname == Token("var0")) {
 		m.vars[0] = value;
-	} else if (varname == token("var1")) {
+	} else if (varname == Token("var1")) {
 		m.vars[1] = value;
-	} else if (varname == token("var2")) {
+	} else if (varname == Token("var2")) {
 		m.vars[2] = value;
-	} else if (varname == token("var3")) {
+	} else if (varname == Token("var3")) {
 		m.vars[3] = value;
-	} else if (varname == token("var4")) {
+	} else if (varname == Token("var4")) {
 		m.vars[4] = value;
-	} else if (varname == token("var5")) {
+	} else if (varname == Token("var5")) {
 		m.vars[5] = value;
-	} else if (varname == token("var6")) {
+	} else if (varname == Token("var6")) {
 		m.vars[6] = value;
-	} else if (varname == token("var7")) {
+	} else if (varname == Token("var7")) {
 		m.vars[7] = value;
-	} else if (varname == token("var8")) {
+	} else if (varname == Token("var8")) {
 		m.vars[8] = value;
-	} else if (varname == token("var9")) {
+	} else if (varname == Token("var9")) {
 		m.vars[9] = value;
-	} else if (varname == token("obv0")) {
+	} else if (varname == Token("obv0")) {
 		get_targ(m)->obv0 = value;
-	} else if (varname == token("obv1")) {
+	} else if (varname == Token("obv1")) {
 		get_targ(m)->obv1 = value;
-	} else if (varname == token("obv2")) {
+	} else if (varname == Token("obv2")) {
 		get_targ(m)->obv2 = value;
 	} else {
 		auto it = lvalue_funcs.find(varname);
@@ -298,11 +292,11 @@ void MacroManager::tick() {
 
 		try {
 			while (ctx.instructions_left_this_tick > 0) {
-				size_t original_ip = m->ip;
+				auto original_ip = m->ip;
 				ctx.instructions_left_this_tick--;
 				try {
 					Token command = ctx.read_token(*m);
-					if (command == token("endm") || command == token("stop")) {
+					if (command == Token("endm") || command == Token("stop")) {
 						// remove from list, check selfdestruct
 						m->ip = original_ip;
 						continue;

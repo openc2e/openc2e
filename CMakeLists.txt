@@ -311,6 +311,9 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/C1Sound.cpp
 	src/opencreatures1/C1SoundManager.cpp
 )
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_compile_options(opencreatures1_core PRIVATE -Wconversion -Wsign-conversion)
+endif()
 target_include_directories(opencreatures1_core PUBLIC src/opencreatures1)
 target_link_libraries(opencreatures1_core PUBLIC
 	openc2e-common
