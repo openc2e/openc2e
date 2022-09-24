@@ -466,22 +466,22 @@ ObjectHandle AgentRV_TARG(MacroContext&, Macro& macro) {
 	return macro.targ;
 }
 
-int32_t IntegerRV_ACTV(const MacroContext& ctx, const Macro& m) {
+int32_t IntegerRV_ACTV(MacroContext& ctx, Macro& m) {
 	auto* targ = ctx.get_targ(m);
 	return static_cast<int32_t>(targ->actv);
 }
 
-int32_t IntegerRV_POSB(const MacroContext& ctx, const Macro& m) {
+int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
 	auto bbox = get_object_bbox(ctx.get_targ(m), ctx.renderables);
 	return bbox.bottom;
 }
 
-int32_t IntegerRV_POSL(const MacroContext& ctx, const Macro& m) {
+int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
 	auto bbox = get_object_bbox(ctx.get_targ(m), ctx.renderables);
 	return bbox.left;
 }
 
-int32_t IntegerRV_XVEC(const MacroContext& ctx, const Macro& m) {
+int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
 	Object* o = ctx.get_targ(m);
 	auto* veh = dynamic_cast<Vehicle*>(o);
 	if (!veh) {

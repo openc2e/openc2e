@@ -41,7 +41,7 @@ struct Macro;
 
 using CommandFunc = void (*)(MacroContext&, Macro&);
 using AgentRVFunc = ObjectHandle (*)(MacroContext&, Macro&);
-using IntegerRVFunc = int32_t (*)(const MacroContext&, const Macro&);
+using IntegerRVFunc = int32_t (*)(MacroContext&, Macro&);
 using LValueFunc = void (*)(const MacroContext&, const Macro&, int32_t value);
 
 class EventManager;
