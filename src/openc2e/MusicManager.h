@@ -57,7 +57,7 @@ class MusicManager {
 	float midi_volume = 1.0;
 
 	AudioChannel creatures1_channel;
-	unsigned int creatures1_ticks_until_next_sound;
+	uint32_t creatures1_ticks_until_next_sound;
 	std::map<std::string, class MNGFile*> files;
 	std::unique_ptr<MNGMusic> mng_music;
 	std::string last_track;

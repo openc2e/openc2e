@@ -258,11 +258,11 @@ void Command_RNDV(MacroContext& ctx, Macro& m) {
 	ctx.read_arg_separator(m);
 	Token varname = ctx.read_token(m);
 	ctx.read_arg_separator(m);
-	uint32_t low = ctx.read_int(m);
+	int32_t low = ctx.read_int(m);
 	ctx.read_arg_separator(m);
-	uint32_t high = ctx.read_int(m);
+	int32_t high = ctx.read_int(m);
 
-	uint32_t generated = Random::randrange(low, high + 1);
+	int32_t generated = rand_int32(low, high);
 	if (ctx.debug) {
 		printf("RNDV info %s %i %i\n", repr(varname).c_str(), low, high);
 		printf("RNDV generated %i\n", generated);

@@ -20,6 +20,7 @@
 #include "c2eBrain.h"
 
 #include "c2eCreature.h"
+#include "common/Random.h"
 
 #include <algorithm>
 #include <cassert>
@@ -119,16 +120,16 @@ void c2eTract::setupTract() {
 		for (unsigned int i = 0; i < neuronsize; i++) {
 			unsigned int noconns = noconnections;
 			if (g->norandomconnections)
-				noconns = 1 + (rand() % noconnections);
+				noconns = rand_uint32(1, noconnections);
 
 			for (unsigned int j = 0; j < noconns; j++) {
 				c2eDendrite d;
 				if (g->src_noconnections == 0) {
-					d.source = src_neurons[rand() % src_neurons.size()];
+					d.source = rand_choice(src_neurons);
 					d.dest = dest_neurons[i];
 				} else {
 					d.source = src_neurons[i];
-					d.dest = dest_neurons[rand() % dest_neurons.size()];
+					d.dest = rand_choice(dest_neurons);
 				}
 				dendrites.push_back(d);
 			}
@@ -566,7 +567,7 @@ bool c2eSVRule::runRule(float acc, float srcneuron[8], float neuron[8], float sp
 			case 5: // random
 				// TODO: find a quicker RNG?
 				// TODO: untested
-				operandvalue = rand() / (float)RAND_MAX;
+				operandvalue = rand_float(0.0f, 1.0f);
 				break;
 
 			case 6: // source chemical

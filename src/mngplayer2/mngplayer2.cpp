@@ -1,4 +1,5 @@
 #include "common/Exception.h"
+#include "common/Random.h"
 #include "common/audio/AudioBackend.h"
 #include "common/backtrace.h"
 #include "common/endianlove.h"
@@ -201,8 +202,7 @@ static struct AppState {
 				eligible_tracknames.push_back(t.name);
 			}
 		}
-		int track_index = rand() % eligible_tracknames.size();
-		std::string newtrackname = eligible_tracknames[track_index];
+		std::string newtrackname = rand_choice(eligible_tracknames);
 		playMusic(newtrackname);
 	}
 
@@ -733,7 +733,6 @@ void InitSDL() {
 }
 
 void InitMNGMusic() {
-	srand(time(NULL));
 	app_state.backend = SDLMixerBackend::getInstance();
 	app_state.backend->init();
 	app_state.mng_music = std::make_unique<MNGMusic>(app_state.backend);

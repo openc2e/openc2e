@@ -24,15 +24,15 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/Random.h"
 #include "common/throw_ifnot.h"
 #include "creatures/CreatureAgent.h"
 
-#include <algorithm> // transform
+#include <algorithm> // swap, transform
 #include <cctype> // toupper/tolower
 #include <fmt/core.h>
 #include <math.h> // abs()/fabs()
 #include <memory>
-#include <stdlib.h> // rand()
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846 /* pi */
@@ -360,23 +360,6 @@ void c_MULV(caosVM* vm) {
 		throw badParamException();
 }
 
-int calculateRand(int value1, int value2) {
-	// TODO: i'm sure there's a better way to do this. tired. - fuzzie
-	int diff;
-	if (abs(value2) < abs(value1))
-		diff = abs(value1 - value2) + 1;
-	else
-		diff = abs(value2 - value1) + 1;
-	int val;
-	if (value2 < value1)
-		val = value2;
-	else
-		val = value1;
-	double r = rand() / ((unsigned int)RAND_MAX + 1.0);
-
-	return (int)(r * diff) + val;
-}
-
 /**
  RAND (integer) value1 (integer) value2 (integer)
  %status maybe
@@ -388,7 +371,10 @@ void v_RAND(caosVM* vm) {
 	VM_PARAM_INTEGER(value2)
 	VM_PARAM_INTEGER(value1)
 
-	vm->result.setInt(calculateRand(value1, value2));
+	if (value1 > value2) {
+		std::swap(value1, value2);
+	}
+	vm->result.setInt(rand_int32(value1, value2));
 }
 
 /**
@@ -1010,7 +996,10 @@ void c_RNDV(caosVM* vm) {
 	VM_PARAM_INTEGER(value1)
 	VM_PARAM_VARIABLE(var)
 
-	var->setInt(calculateRand(value1, value2));
+	if (value1 > value2) {
+		std::swap(value1, value2);
+	}
+	var->setInt(rand_int32(value1, value2));
 }
 
 /**

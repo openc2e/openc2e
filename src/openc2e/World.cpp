@@ -33,6 +33,7 @@
 #include "SpritePart.h"
 #include "caosScript.h"
 #include "caosVM.h"
+#include "common/Random.h"
 #include "common/backend/Backend.h"
 #include "common/creaturesImage.h"
 #include "common/throw_ifnot.h"
@@ -367,7 +368,7 @@ void World::setUNID(Agent* whofor, int unid) {
 
 int World::newUNID(Agent* whofor) {
 	do {
-		int unid = rand();
+		int unid = rand_int32(0, std::numeric_limits<int32_t>::max());
 		if (unid && unidmap[unid].expired()) {
 			setUNID(whofor, unid);
 			return unid;
@@ -607,7 +608,7 @@ std::shared_ptr<genomeFile> World::loadGenome(std::string& genefile) {
 	std::vector<fs::path> possibles = findGeneticsFiles(genefile + ".gen");
 	if (possibles.empty())
 		return std::shared_ptr<genomeFile>();
-	auto filename = possibles[(int)((float)possibles.size() * (rand() / (RAND_MAX + 1.0)))];
+	auto filename = rand_choice(possibles);
 
 	std::shared_ptr<genomeFile> p(new genomeFile());
 	std::ifstream gfile(filename, std::ios::binary);
@@ -627,10 +628,10 @@ void World::newMoniker(std::shared_ptr<genomeFile> g, std::string genefile, Agen
 std::string World::generateMoniker(std::string basename) {
 	if (engine.version < 3) {
 		/* old-style monikers are four characters in a format like 9GVC */
-		unsigned int n = 1 + (unsigned int)(9.0 * (rand() / (RAND_MAX + 1.0)));
+		unsigned int n = rand_uint32(1, 9);
 		std::string moniker = std::to_string(n);
 		for (unsigned int i = 0; i < 3; i++) {
-			unsigned int n = (unsigned int)(26.0 * (rand() / (RAND_MAX + 1.0)));
+			unsigned int n = rand_uint32(0, 25);
 			moniker += fmt::format("{:c}", (char)('A' + n));
 		}
 		return moniker;
@@ -644,7 +645,7 @@ std::string World::generateMoniker(std::string basename) {
 
 	std::string x = basename;
 	for (unsigned int i = 0; i < 4; i++) {
-		unsigned int n = (unsigned int)(0xfffff * (rand() / (RAND_MAX + 1.0)));
+		unsigned int n = rand_uint32(0, 0xfffff);
 		x = x + "-" + fmt::format("{:05x}", n);
 	}
 

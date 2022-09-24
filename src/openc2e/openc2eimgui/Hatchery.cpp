@@ -24,6 +24,7 @@
 #include "Engine.h"
 #include "ImGuiUtils.h"
 #include "World.h"
+#include "common/Random.h"
 #include "fileformats/bmpImage.h"
 #include "fileformats/c16Image.h"
 
@@ -82,8 +83,8 @@ void LoadHatchery() {
 			// Place eggs from 80-240 horizontally, 110-230 vertically
 			int x = 0, y = 0, tries = 0;
 			while (x == 0 && tries < 50) {
-				x = (rand() / (RAND_MAX + 1.0)) * (240 - 80 - s_omelette[i].width) + 80;
-				y = (rand() / (RAND_MAX + 1.0)) * (230 - 110 - s_omelette[i].height) + 110;
+				x = rand_int32(80, 240 - s_omelette[i].width);
+				y = rand_int32(110, 230 - s_omelette[i].height);
 				for (unsigned int j = 0; j < i; j++) {
 					float xdist = x - s_c2eggs[j].x;
 					xdist = xdist * xdist;

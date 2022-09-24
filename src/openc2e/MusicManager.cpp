@@ -24,6 +24,7 @@
 #include "SoundManager.h"
 #include "World.h"
 #include "caosValue.h"
+#include "common/Random.h"
 #include "libmngmusic/MNGMusic.h"
 
 #include <fmt/core.h>
@@ -166,9 +167,9 @@ void MusicManager::tick() {
 		if (creatures1_ticks_until_next_sound == 0 && backend->getChannelState(creatures1_channel) == AUDIO_STOPPED) {
 			auto sounds = findSoundFiles("MU*.wav");
 			if (sounds.size()) {
-				creatures1_channel = backend->playClip(sounds[rand() % sounds.size()]);
+				creatures1_channel = backend->playClip(rand_choice(sounds));
 			}
-			creatures1_ticks_until_next_sound = 50 + (rand() % 50);
+			creatures1_ticks_until_next_sound = rand_uint32(50, 99);
 		} else {
 			creatures1_ticks_until_next_sound--;
 		}

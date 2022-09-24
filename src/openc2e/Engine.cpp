@@ -93,8 +93,6 @@ Engine::Engine() {
 	ticktimeptr = 0;
 	version = 0; // TODO: something something
 
-	srand(time(NULL)); // good a place as any :)
-
 	cmdline_enable_sound = true;
 	cmdline_norun = false;
 

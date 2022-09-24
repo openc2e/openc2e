@@ -11,6 +11,7 @@
 #include "PointerAgent.h"
 #include "SoundManager.h"
 #include "World.h"
+#include "common/Random.h"
 #include "creatures/SkeletalCreature.h"
 #include "creatures/c2eCreature.h"
 #include "creatures/oldCreature.h"
@@ -30,7 +31,7 @@ static void NewDebugNorn() {
 		if (possibles.size() == 0) {
 			return;
 		}
-		auto genome_name = fs::path(possibles[rand() % possibles.size()]).stem().string();
+		auto genome_name = rand_choice(possibles).string();
 
 		auto genome = world.loadGenome(genome_name);
 		if (!genome) {
@@ -38,7 +39,7 @@ static void NewDebugNorn() {
 		}
 
 		SkeletalCreature* a = new SkeletalCreature(4);
-		bool is_female = rand() % 2 == 1;
+		bool is_female = rand_bool();
 		Creature* c = new c2eCreature(genome, is_female, 0, a);
 		a->setCreature(c);
 		a->finishInit();
@@ -78,7 +79,7 @@ static void NewDebugNorn() {
 
 		SkeletalCreature* a = new SkeletalCreature(4);
 
-		bool is_female = rand() % 2 == 1;
+		bool is_female = rand_bool();
 		oldCreature* c;
 		try {
 			if (engine.version == 1) {
@@ -113,7 +114,7 @@ static void NewDebugNorn() {
 static void NewRandomEgg() {
 	std::string eggscript;
 	/* create the egg obj */
-	eggscript = fmt::format("new: simp eggs 8 {} 2000 0\n", ((rand() % 6) * 8));
+	eggscript = fmt::format("new: simp eggs 8 {} 2000 0\n", rand_int32(0, 5) * 8);
 	/* set the pose */
 	eggscript += "pose 3\n";
 	/* set the correct class/attributes */
@@ -123,7 +124,7 @@ static void NewRandomEgg() {
 		eggscript += "setv cls2 2 5 2\nsetv attr 195\n";
 	/* create the genome */
 	if (engine.version == 1)
-		eggscript += fmt::format("new: gene tokn dad{} tokn mum{} obv0\n", (1 + rand() % 6), (1 + rand() % 6));
+		eggscript += fmt::format("new: gene tokn dad{} tokn mum{} obv0\n", rand_int32(1, 6), rand_int32(1, 6));
 	else if (engine.version == 2)
 		eggscript += "new: gene tokn norn tokn norn obv0\n";
 	/* set the gender */
@@ -134,9 +135,9 @@ static void NewRandomEgg() {
 	/* move it into place */
 	/* TODO: good positions? */
 	if (engine.version == 1)
-		eggscript += fmt::format("mvto {} 870\n", (2600 + rand() % 200));
+		eggscript += fmt::format("mvto {} 870\n", rand_int32(2600, 2799));
 	else if (engine.version == 2)
-		eggscript += fmt::format("mvto {} 750\n", (4900 + rand() % 350));
+		eggscript += fmt::format("mvto {} 750\n", rand_int32(4900, 5249));
 
 	/* c2: enable gravity */
 	if (engine.version == 2)

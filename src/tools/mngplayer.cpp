@@ -64,8 +64,6 @@ int main(int argc, char** argv) {
 
 		std::string trackname = argv[2];
 
-		srand(time(NULL));
-
 		MNGMusic mng_music(backend);
 		mng_music.playTrack(&file, trackname);
 		if (mng_music.playing_silence) {

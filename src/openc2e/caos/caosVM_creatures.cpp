@@ -20,6 +20,7 @@
 #include "Engine.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/Random.h"
 #include "common/throw_ifnot.h"
 #include "creatures/CompoundCreature.h"
 #include "creatures/SkeletalCreature.h"
@@ -1097,7 +1098,7 @@ void c_NEWC(caosVM* vm) {
 
 	// randomise sex if necessary
 	if (sex == 0)
-		sex = 1 + (int)(2.0 * (rand() / (RAND_MAX + 1.0)));
+		sex = rand_int32(1, 2);
 	THROW_IFNOT(sex == 1 || sex == 2); // TODO: correct?
 
 	// TODO: if variant is 0, randomise between 1 and 8
@@ -1157,7 +1158,7 @@ void c_NEW_CREA_c1(caosVM* vm) {
 
 	// randomise sex if necessary
 	if (sex == 0)
-		sex = 1 + (int)(2.0 * (rand() / (RAND_MAX + 1.0)));
+		sex = rand_int32(1, 2);
 	THROW_IFNOT(sex == 1 || sex == 2); // TODO: correct?
 
 	SkeletalCreature* a = new SkeletalCreature(4);
@@ -1206,7 +1207,7 @@ void c_NEW_CRAG(caosVM* vm) {
 
 	// randomise sex if necessary
 	if (sex == 0)
-		sex = 1 + (int)(2.0 * (rand() / (RAND_MAX + 1.0)));
+		sex = rand_int32(1, 2);
 	THROW_IFNOT(sex == 1 || sex == 2); // TODO: correct?
 
 	// TODO: if variant is 0, randomise between 1 and 8
@@ -1227,8 +1228,6 @@ void c_NEW_CRAG(caosVM* vm) {
 	vm->setTarg(a);
 }
 
-int calculateRand(int value1, int value2); // caosVM_variables.cpp
-
 /**
  LTCY (command) action (integer) min (integer) max (integer)
  %status maybe
@@ -1241,7 +1240,7 @@ void c_LTCY(caosVM* vm) {
 	THROW_IFNOT(min >= 0 && min <= 255);
 	VM_PARAM_INTEGER(action);
 
-	int n = calculateRand(min, max);
+	int n = rand_int32(min, max);
 
 	Creature* c = vm->getTargCreature();
 

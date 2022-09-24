@@ -21,6 +21,7 @@
 #include "World.h"
 #include "c2eBrain.h"
 #include "c2eCreature.h"
+#include "common/Random.h"
 #include "oldBrain.h"
 #include "oldCreature.h"
 
@@ -387,7 +388,7 @@ AgentRef oldCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> 
 	// TODO: proper selection method
 	(void)type;
 	if (possibles.size() > 0)
-		return possibles[rand() % possibles.size()];
+		return rand_choice(possibles);
 	else
 		return AgentRef();
 }
@@ -396,7 +397,7 @@ AgentRef c2eCreature::selectRepresentativeAgent(int type, std::vector<AgentRef> 
 	// TODO: proper selection method
 	(void)type;
 	if (possibles.size() > 0)
-		return possibles[rand() % possibles.size()];
+		return rand_choice(possibles);
 	else
 		return AgentRef();
 }

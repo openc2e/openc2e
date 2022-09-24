@@ -24,6 +24,7 @@
 #include "World.h"
 #include "caosValue.h"
 #include "common/Exception.h"
+#include "common/Random.h"
 #include "common/throw_ifnot.h"
 #include "creatures/Creature.h"
 #include "creatures/CreatureAgent.h"
@@ -181,8 +182,7 @@ std::string historyManager::newMoniker(std::shared_ptr<genomeFile> genome) {
 		}
 
 		if (extensions) {
-			unsigned int i = (int)(extensions->size() * (rand() / (RAND_MAX + 1.0)));
-			basename = (*extensions)[i];
+			basename = rand_choice(*extensions);
 		}
 	}
 

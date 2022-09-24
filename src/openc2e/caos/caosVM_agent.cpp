@@ -28,6 +28,7 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/Random.h"
 #include "common/creaturesImage.h"
 #include "common/throw_ifnot.h"
 #include "creatures/SkeletalCreature.h"
@@ -113,8 +114,7 @@ void c_RTAR(caosVM* vm) {
 
 	if (temp.size() == 0)
 		return;
-	int i = rand() % temp.size(); // TODO: better randomness
-	vm->setTarg(temp[i]);
+	vm->setTarg(rand_choice(temp));
 }
 
 /**
@@ -160,8 +160,7 @@ void c_TTAR(caosVM* vm) {
 
 	if (temp.size() == 0)
 		return;
-	int i = rand() % temp.size(); // TODO: better randomness
-	vm->setTarg(temp[i]);
+	vm->setTarg(rand_choice(temp));
 }
 
 /**
@@ -197,8 +196,7 @@ void c_STAR(caosVM* vm) {
 	if (agents.size() == 0) {
 		vm->setTarg(0);
 	} else {
-		unsigned int i = (int)(agents.size() * (rand() / (RAND_MAX + 1.0)));
-		vm->setTarg(agents[i]);
+		vm->setTarg(rand_choice(agents));
 	}
 }
 

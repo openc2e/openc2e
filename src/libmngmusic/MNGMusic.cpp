@@ -1,6 +1,7 @@
 #include "MNGMusic.h"
 
 #include "common/Ascii.h"
+#include "common/Random.h"
 #include "common/endianlove.h"
 #include "common/find_if.h"
 
@@ -141,7 +142,7 @@ static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = null
 			case MNG_RANDOM: {
 				float first = evaluateExpression(function->first, layer);
 				float second = evaluateExpression(function->second, layer);
-				return ((float)rand() / (float)RAND_MAX) * (second - first) + first;
+				return rand_float(first, second);
 			}
 			default:
 				// TODO: set up actual function names enum
@@ -328,7 +329,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 			available_voices.push_back(voice);
 		}
 		if (available_voices.size()) {
-			return last_voice = available_voices[rand() % available_voices.size()];
+			return last_voice = rand_choice(available_voices);
 		}
 		// try to avoid playing the same voice twice in a row, it sounds awful and
 		// doesn't seem to happen in the real engine

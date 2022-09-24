@@ -19,6 +19,7 @@
 
 #include "oldBrain.h"
 
+#include "common/Random.h"
 #include "oldCreature.h"
 
 #include <cassert>
@@ -269,7 +270,7 @@ unsigned char oldLobe::processSVRule(oldNeuron* cell, oldDendrite* dend, oldSVRu
 				if (i == rule.length)
 					return state;
 				unsigned char max = evaluateSVRuleConstant(cell, dend, rule.rules[i], rule);
-				state = (rand() % (max - min + 1)) + min;
+				state = rand_uint8(min, max);
 			} break;
 		}
 	}
@@ -394,19 +395,19 @@ void oldLobe::init() {
 			int value = 0;
 			switch (dend_info[type]->spread) {
 				case 0: // flat
-					value = rand() % (our_range + 1);
+					value = rand_int32(0, our_range);
 					break;
 				case 1: // normal
 					// TODO: really not sure how this is different from above
-					value = rand() % (our_range + 1);
+					value = rand_int32(0, our_range);
 					break;
 				case 2: // Saw
-					value = rand() % (our_range + 1);
+					value = rand_int32(0, our_range);
 					value *= 2;
 					value = abs(value - our_range);
 					break;
 				case 3: // waS
-					value = rand() % (our_range + 1);
+					value = rand_int32(0, our_range);
 					value *= 2;
 					value = abs(value - our_range);
 					value = our_range - value; // invert
@@ -453,8 +454,8 @@ void oldLobe::connect() {
 				unsigned int attempts = 0;
 			repeat_this_dend:
 				// for the other dendrites, find a source neuron to connect to using fanout
-				int src_x = (rand() % ((2 * fanout) + 1)) + divwidth_r - fanout;
-				int src_y = (rand() % ((2 * fanout) + 1)) + divwidth_r + divwidth;
+				int src_x = rand_int32(0, 2 * fanout) + divwidth_r - fanout;
+				int src_y = rand_int32(0, 2 * fanout) + divwidth_r + divwidth;
 				src_x = src_x % src->width;
 				if (src_x < 0)
 					src_x += src->width;
@@ -512,8 +513,8 @@ void oldLobe::connectDendrite(unsigned int type, oldDendrite& dend, oldNeuron* d
 
 	dend.src = dest;
 	dend.suscept = 0;
-	dend.stw = dend.ltw = rand() % (dend_info[type]->maxLTW - dend_info[type]->minLTW + 1) + dend_info[type]->minLTW;
-	dend.strength = rand() % (dend_info[type]->maxstr - dend_info[type]->minstr + 1) + dend_info[type]->minstr;
+	dend.stw = dend.ltw = rand_uint8(dend_info[type]->minLTW, dend_info[type]->maxLTW);
+	dend.strength = rand_uint8(dend_info[type]->minstr, dend_info[type]->maxstr);
 }
 
 void oldLobe::wipe() {
@@ -710,10 +711,7 @@ void oldLobe::neuronTryAllLooseMigration(unsigned int type, oldNeuron& neu) {
 	// shuffle source active neurons
 	for (unsigned int t = type; t <= type_limit; t++) {
 		for (unsigned int i = 0; i < src[t]->active_neurons[i]; i++) {
-			unsigned int j = rand() % src[t]->active_neurons.size();
-			unsigned int old = src[t]->active_neurons[j];
-			src[t]->active_neurons[j] = src[t]->active_neurons[i];
-			src[t]->active_neurons[i] = old;
+			std::swap(src[t]->active_neurons[i], rand_choice(src[t]->active_neurons));
 		}
 	}
 
@@ -779,8 +777,7 @@ void oldLobe::neuronTryMigration(unsigned int type, oldNeuron& neu, oldLobe* src
 	oldDendrite& dend = neu.dendrites[type][d];
 
 	// pick a random firing neuron in the source lobe
-	unsigned int n = rand() % src->active_neurons.size();
-	oldNeuron* srcneu = &src->neurons[src->active_neurons[n]];
+	oldNeuron* srcneu = &src->neurons[rand_choice(src->active_neurons)];
 
 	for (d = 0; d < neu.dendrites[type].size(); d++) {
 		// give up if we're already connected to chosen source neuron
