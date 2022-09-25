@@ -265,6 +265,10 @@ void v_SCOL(caosVM* vm) {
 	VM_PARAM_BYTESTR(upspeeds)
 	VM_PARAM_INTEGER(eormask)
 	VM_PARAM_INTEGER(andmask)
+	(void)downspeeds;
+	(void)upspeeds;
+	(void)eormask;
+	(void)andmask;
 
 	vm->result.setInt(0); // TODO
 }
@@ -277,6 +281,7 @@ void v_SCOL(caosVM* vm) {
 */
 void c_SCRL(caosVM* vm) {
 	VM_PARAM_INTEGER(enable)
+	(void)enable;
 
 	// TODO
 }
@@ -287,6 +292,7 @@ void c_SCRL(caosVM* vm) {
 */
 void c_MOUS(caosVM* vm) {
 	VM_PARAM_INTEGER(behaviour)
+	(void)behaviour;
 
 	// TODO
 }
