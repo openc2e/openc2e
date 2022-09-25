@@ -495,8 +495,6 @@ void World::drawWorld(Camera* cam, RenderTarget* surface) {
 				y + hand()->wireOriginAgent->y - adjusty, hand()->x - adjustx, hand()->y - adjusty, 0x00ff00ff);
 		}
 	}
-
-	surface->renderDone();
 }
 
 void World::executeInitScript(std::string x) {

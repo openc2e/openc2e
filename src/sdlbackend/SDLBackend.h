@@ -27,27 +27,30 @@
 #include <memory>
 #include <string>
 
-class SDLRenderTarget : public RenderTarget {
-	friend class SDLBackend;
+class SDLBackend;
 
-  protected:
-	class SDLBackend* parent;
-	SDL_Texture* texture;
-	int drawablewidth, drawableheight;
+class SDLRenderTarget : public RenderTarget {
+  public:
+	SDLBackend* parent;
+	SDL_Texture* texture = nullptr;
+	int drawablewidth = 0;
+	int drawableheight = 0;
 	float scale = 1.0;
 	int viewport_offset_top = 0;
 	int viewport_offset_bottom = 0;
 
-	SDLRenderTarget(SDLBackend* p) { parent = p; }
-
-  public:
+	SDLRenderTarget(SDLBackend* parent);
+	SDLRenderTarget(const SDLRenderTarget&) = delete;
+	SDLRenderTarget(SDLRenderTarget&&) = delete;
+	SDLRenderTarget& operator=(const SDLRenderTarget&) = delete;
+	SDLRenderTarget& operator=(SDLRenderTarget&&) = delete;
+	~SDLRenderTarget();
 	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options = {});
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int colour);
 	void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h);
 	unsigned int getWidth() const;
 	unsigned int getHeight() const;
 	void renderClear();
-	void renderDone();
 	void setViewportOffsetTop(int offset_top);
 	void setViewportOffsetBottom(int offset_bottom);
 };
@@ -59,7 +62,7 @@ class SDLBackend : public Backend {
 	SDL_Window* window = nullptr;
 	int windowwidth, windowheight;
 	SDL_Renderer* renderer = nullptr;
-	SDLRenderTarget mainrendertarget;
+	std::shared_ptr<SDLRenderTarget> mainrendertarget;
 	float userscale = 1.0;
 	Uint32 last_frame_end = 0;
 
@@ -84,9 +87,8 @@ class SDLBackend : public Backend {
 	Texture createTexture(const Image& image);
 	Texture createTextureWithTransparentColor(const Image& image, Color transparent);
 
-	RenderTarget* getMainRenderTarget() { return &mainrendertarget; }
-	RenderTarget* newRenderTarget(unsigned int width, unsigned int height);
-	void freeRenderTarget(RenderTarget* surf);
+	std::shared_ptr<RenderTarget> getMainRenderTarget();
+	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height);
 
 	bool keyDown(int key);
 	int translateScancode(int key);

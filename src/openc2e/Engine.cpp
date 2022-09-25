@@ -327,7 +327,7 @@ void Engine::drawWorld() {
 
 	if (dorendering || refreshdisplay) {
 		refreshdisplay = false;
-		world.drawWorld(camera.get(), backend->getMainRenderTarget());
+		world.drawWorld(camera.get(), backend->getMainRenderTarget().get());
 	}
 }
 

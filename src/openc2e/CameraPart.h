@@ -31,7 +31,7 @@ class CameraPart : public SpritePart {
   protected:
 	unsigned int viewheight, viewwidth, cameraheight, camerawidth;
 	std::shared_ptr<Camera> camera;
-	std::unique_ptr<RenderTarget, void (*)(RenderTarget*)> rendertarget;
+	std::shared_ptr<RenderTarget> rendertarget;
 
   public:
 	CameraPart(Agent* p, unsigned int _id, std::string spritefile, unsigned int fimg, int _x, int _y,

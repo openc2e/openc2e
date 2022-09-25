@@ -17,8 +17,7 @@
  *
  */
 
-#ifndef _NULLBACKEND_H
-#define _NULLBACKEND_H
+#pragma once
 
 #include "Backend.h"
 
@@ -32,14 +31,13 @@ class NullRenderTarget : public RenderTarget {
 	virtual unsigned int getWidth() const { return 800; }
 	virtual unsigned int getHeight() const { return 600; }
 	virtual void renderClear() {}
-	virtual void renderDone() {}
 	virtual void setViewportOffsetTop(int) {}
 	virtual void setViewportOffsetBottom(int) {}
 };
 
 class NullBackend : public Backend {
   protected:
-	NullRenderTarget surface;
+	std::shared_ptr<NullRenderTarget> mainrendertarget{std::make_shared<NullRenderTarget>()};
 
   public:
 	virtual void init(const std::string&, int, int) {}
@@ -56,14 +54,13 @@ class NullBackend : public Backend {
 	virtual bool selfRender() { return false; }
 	virtual void requestRender() {}
 
-	virtual RenderTarget* getMainRenderTarget() { return &surface; }
-	virtual RenderTarget* newRenderTarget(unsigned int, unsigned int) { return nullptr; }
-	virtual void freeRenderTarget(RenderTarget*) {}
+	virtual std::shared_ptr<RenderTarget> getMainRenderTarget() {
+		return std::dynamic_pointer_cast<RenderTarget>(mainrendertarget);
+	}
+	virtual std::shared_ptr<RenderTarget> newRenderTarget(unsigned int, unsigned int) { return {}; }
 
 	virtual Texture createTexture(const Image&) { return {}; }
 	virtual Texture createTextureWithTransparentColor(const Image&, Color) { return {}; }
 
 	virtual unsigned int textWidth(std::string) { return 0; }
 };
-
-#endif

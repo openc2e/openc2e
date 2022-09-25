@@ -54,7 +54,6 @@ class RenderTarget {
 	virtual unsigned int getWidth() const = 0;
 	virtual unsigned int getHeight() const = 0;
 	virtual void renderClear() = 0;
-	virtual void renderDone() = 0;
 	virtual void setViewportOffsetTop(int offset_top) = 0;
 	virtual void setViewportOffsetBottom(int offset_bottom) = 0;
 	virtual ~RenderTarget() {}
@@ -71,9 +70,8 @@ class Backend {
 
 	virtual void resize(int width, int height) = 0;
 
-	virtual RenderTarget* getMainRenderTarget() = 0;
-	virtual RenderTarget* newRenderTarget(unsigned int width, unsigned int height) = 0;
-	virtual void freeRenderTarget(RenderTarget* surf) = 0;
+	virtual std::shared_ptr<RenderTarget> getMainRenderTarget() = 0;
+	virtual std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height) = 0;
 
 	virtual Texture createTexture(const Image& image) = 0;
 	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) = 0;

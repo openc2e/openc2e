@@ -30,22 +30,22 @@
 #include <memory>
 
 SDLBackend::SDLBackend()
-	: mainrendertarget(this) {
-	mainrendertarget.texture = nullptr;
+	: mainrendertarget(std::make_shared<SDLRenderTarget>(this)) {
+	mainrendertarget->texture = nullptr;
 }
 
 void SDLBackend::resizeNotify(int _w, int _h) {
 	windowwidth = _w;
 	windowheight = _h;
 
-	SDL_GetRendererOutputSize(renderer, &mainrendertarget.drawablewidth, &mainrendertarget.drawableheight);
-	assert(mainrendertarget.drawablewidth / windowwidth == mainrendertarget.drawableheight / windowheight);
-	float oldscale = mainrendertarget.scale;
-	float newscale = mainrendertarget.drawablewidth / windowwidth * userscale;
+	SDL_GetRendererOutputSize(renderer, &mainrendertarget->drawablewidth, &mainrendertarget->drawableheight);
+	assert(mainrendertarget->drawablewidth / windowwidth == mainrendertarget->drawableheight / windowheight);
+	float oldscale = mainrendertarget->scale;
+	float newscale = mainrendertarget->drawablewidth / windowwidth * userscale;
 	if (abs(newscale) > 0.01 && abs(oldscale - newscale) > 0.01) {
 		printf("* SDL setting scale to %.2fx\n", newscale);
-		mainrendertarget.scale = newscale;
-		SDL_RenderSetScale(renderer, mainrendertarget.scale, mainrendertarget.scale);
+		mainrendertarget->scale = newscale;
+		SDL_RenderSetScale(renderer, mainrendertarget->scale, mainrendertarget->scale);
 	}
 }
 
@@ -163,7 +163,7 @@ retry:
 			e.window_id = event.motion.windowID;
 			e.type = eventmousemove;
 			e.x = event.motion.x / userscale;
-			e.y = event.motion.y / userscale - mainrendertarget.viewport_offset_top;
+			e.y = event.motion.y / userscale - mainrendertarget->viewport_offset_top;
 			e.xrel = event.motion.xrel / userscale;
 			e.yrel = event.motion.yrel / userscale;
 			e.button = 0;
@@ -189,7 +189,7 @@ retry:
 				default: goto retry;
 			}
 			e.x = event.button.x / userscale;
-			e.y = event.button.y / userscale - mainrendertarget.viewport_offset_top;
+			e.y = event.button.y / userscale - mainrendertarget->viewport_offset_top;
 			break;
 
 		case SDL_MOUSEWHEEL:
@@ -243,6 +243,17 @@ retry:
 	}
 
 	return true;
+}
+
+SDLRenderTarget::SDLRenderTarget(SDLBackend* parent_)
+	: parent(parent_) {
+}
+
+SDLRenderTarget::~SDLRenderTarget() {
+	if (texture != nullptr) {
+		printf("* SDL destroyed rendertarget texture %p\n", texture);
+		SDL_DestroyTexture(texture);
+	}
 }
 
 void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int color) {
@@ -385,12 +396,6 @@ void SDLRenderTarget::renderClear() {
 	SDL_RenderClear(parent->renderer);
 }
 
-void SDLRenderTarget::renderDone() {
-	if (this != &parent->mainrendertarget) {
-		return;
-	}
-}
-
 void SDLRenderTarget::blitRenderTarget(RenderTarget* s, int x, int y, int w, int h) {
 	SDLRenderTarget* src = dynamic_cast<SDLRenderTarget*>(s);
 	assert(src);
@@ -404,23 +409,20 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget* s, int x, int y, int w, int
 	SDL_RenderCopy(parent->renderer, src->texture, nullptr, &r);
 }
 
-RenderTarget* SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
+std::shared_ptr<RenderTarget> SDLBackend::getMainRenderTarget() {
+	return mainrendertarget;
+}
+
+std::shared_ptr<RenderTarget> SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
 	SDL_Texture* texture = SDL_CreateTexture(renderer, 0, SDL_TEXTUREACCESS_TARGET, w, h);
 	assert(texture);
+	printf("* SDL created rendertarget texture %p\n", texture);
 
-	SDLRenderTarget* newtarget = new SDLRenderTarget(this);
+	auto newtarget = std::make_shared<SDLRenderTarget>(this);
 	newtarget->texture = texture;
 	newtarget->drawablewidth = w;
 	newtarget->drawableheight = h;
-	return newtarget;
-}
-
-void SDLBackend::freeRenderTarget(RenderTarget* s) {
-	SDLRenderTarget* target = dynamic_cast<SDLRenderTarget*>(s);
-	assert(target);
-
-	SDL_DestroyTexture(target->texture);
-	delete target;
+	return std::dynamic_pointer_cast<RenderTarget>(newtarget);
 }
 
 // left out: menu, select, execute, snapshot, numeric keypad
