@@ -114,10 +114,25 @@ void SDLBackend::shutdown() {
 
 static bool ImGuiConsumeEvent(const SDL_Event& event) {
 	ImGuiSDL_ProcessEvent(&event);
-	if (ImGui::GetIO().WantCaptureMouse && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL)) {
+
+	auto& io = ImGui::GetIO();
+
+	static bool imguiHasCursorPrev = false;
+	bool imguiHasCursor = io.WantCaptureMouse || io.WantCaptureKeyboard;
+	if (imguiHasCursor != imguiHasCursorPrev) {
+		if (imguiHasCursor) {
+			io.ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
+		} else {
+			io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+			SDL_ShowCursor(false);
+		}
+		imguiHasCursorPrev = imguiHasCursor;
+	}
+
+	if (io.WantCaptureMouse && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL)) {
 		return true;
 	}
-	if (ImGui::GetIO().WantCaptureKeyboard && (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_TEXTINPUT)) {
+	if (io.WantCaptureKeyboard && (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_TEXTINPUT)) {
 		return true;
 	}
 

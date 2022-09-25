@@ -329,22 +329,6 @@ void Engine::drawWorld() {
 		refreshdisplay = false;
 		world.drawWorld(camera.get(), backend->getMainRenderTarget());
 	}
-
-	// TODO: hack to display the hand above ImGui windows
-	// ImGui stores draw instructions, and then gets rendered _after_ the world
-	// but we want to render the hand on top of everything
-	// TODO: also render everything the hand is holding?
-	auto hand = world.hand();
-	auto handpart = dynamic_cast<DullPart*>(hand->part(0));
-	auto texture = handpart->getSprite()->getTextureForFrame(handpart->getCurrentSprite());
-	auto x = hand->x + handpart->x - camera->getX();
-	auto y = hand->y + handpart->y - camera->getY() + Openc2eImGui::GetViewportOffsetTop();
-
-	auto drawlist = ImGui::GetForegroundDrawList();
-	drawlist->AddImage(
-		texture.as<ImTextureID>(),
-		ImVec2(x, y),
-		ImVec2(x + texture.width, y + texture.height));
 }
 
 void Engine::update() {
