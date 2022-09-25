@@ -75,6 +75,7 @@ void v_DATE(caosVM* vm) {
 */
 void v_HIST_DATE(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
+	(void)tick;
 
 	vm->result.setInt(0); // TODO
 }
@@ -98,6 +99,7 @@ void v_SEAN(caosVM* vm) {
 */
 void v_HIST_SEAN(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
+	(void)tick;
 
 	vm->result.setInt(0); // TODO
 }
@@ -120,6 +122,7 @@ void v_TIME(caosVM* vm) {
 */
 void v_HIST_TIME(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
+	(void)tick;
 
 	vm->result.setInt(0); // TODO
 }
@@ -143,6 +146,7 @@ void v_YEAR(caosVM* vm) {
 */
 void v_HIST_YEAR(caosVM* vm) {
 	VM_PARAM_INTEGER(tick)
+	(void)tick;
 
 	vm->result.setInt(0); // TODO
 }
@@ -163,6 +167,7 @@ void v_MSEC(caosVM* vm) {
 */
 void c_WPAU(caosVM* vm) {
 	VM_PARAM_INTEGER(paused)
+	(void)paused;
 
 	// TODO
 }
