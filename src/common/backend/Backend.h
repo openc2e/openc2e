@@ -75,7 +75,6 @@ class Backend {
 	virtual RenderTarget* newRenderTarget(unsigned int width, unsigned int height) = 0;
 	virtual void freeRenderTarget(RenderTarget* surf) = 0;
 
-	virtual void setDefaultPalette(span<Color> palette) = 0;
 	virtual Texture createTexture(const Image& image) = 0;
 	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) = 0;
 

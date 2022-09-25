@@ -297,18 +297,17 @@ Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color 
 	assert(surf);
 
 	if (image.format == if_index8) {
-		if (image.palette.data()) {
-			shared_array<SDL_Color> palette(image.palette.size());
-			for (size_t i = 0; i < image.palette.size(); ++i) {
-				palette[i].r = image.palette[i].r;
-				palette[i].g = image.palette[i].g;
-				palette[i].b = image.palette[i].b;
-				palette[i].a = image.palette[i].a;
-			}
-			SDL_SetPaletteColors(surf->format->palette, palette.data(), 0, palette.size());
-		} else {
-			SDL_SetPaletteColors(surf->format->palette, default_palette.data(), 0, default_palette.size());
+		if (!image.palette) {
+			throw Exception("Got indexed image without palette");
 		}
+		shared_array<SDL_Color> palette(image.palette.size());
+		for (size_t i = 0; i < image.palette.size(); ++i) {
+			palette[i].r = image.palette[i].r;
+			palette[i].g = image.palette[i].g;
+			palette[i].b = image.palette[i].b;
+			palette[i].a = image.palette[i].a;
+		}
+		SDL_SetPaletteColors(surf->format->palette, palette.data(), 0, palette.size());
 	}
 
 	// set colour-keying
@@ -523,18 +522,6 @@ bool SDLBackend::keyDown(int key) {
 	}
 
 	return false;
-}
-
-void SDLBackend::setDefaultPalette(span<Color> palette) {
-	if (palette.size() != 256) {
-		throw Exception("Default palette must have 256 colors");
-	}
-	for (unsigned int i = 0; i < 256; i++) {
-		default_palette[i].r = palette[i].r;
-		default_palette[i].g = palette[i].g;
-		default_palette[i].b = palette[i].b;
-		default_palette[i].a = palette[i].a;
-	}
 }
 
 static constexpr int OPENC2E_MAX_FPS = 60;

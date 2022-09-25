@@ -67,7 +67,7 @@ void imageManager::loadDefaultPalette() {
 		// TODO: case-sensitivity for the lose
 		path palpath(findMainDirectoryFile("Palettes/palette.dta"));
 		if (exists(palpath) && !is_directory(palpath)) {
-			engine.backend->setDefaultPalette(ReadPaletteFile(palpath));
+			default_palette = ReadPaletteFile(palpath);
 		} else {
 			throw Exception("Couldn't find C1 palette data!");
 		}
@@ -75,7 +75,7 @@ void imageManager::loadDefaultPalette() {
 }
 
 shared_array<Color> imageManager::getDefaultPalette() {
-	return palette;
+	return default_palette;
 }
 
 /*
@@ -109,6 +109,11 @@ std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& n
 			throw Exception(fmt::format("Expected Creatures 1 metaroom size to be 5x5 but got {}x{}", metaroom_width, metaroom_height));
 		}
 		if (img) {
+			for (auto& i : img->images) {
+				if (i.format == if_index8 && !i.palette) {
+					i.palette = default_palette;
+				}
+			}
 			if (img->images.size() != 464) {
 				throw Exception(fmt::format("'{}.spr' is not a valid Creatures 1 background, expected 464 frames but got {}", name, img->images.size()));
 			}
@@ -234,7 +239,7 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 	switch (format) {
 		case if_index8:
 			for (auto& image : images) {
-				image.palette = palette;
+				image.palette = default_palette;
 				for (size_t j = 0; j < image.data.size(); ++j) {
 					if (image.data[j] != 0) {
 						image.data[j] = textcolor;

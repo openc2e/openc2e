@@ -31,7 +31,7 @@ class imageManager {
 	friend class Openc2eTestHelper;
 	std::map<std::string, std::weak_ptr<creaturesImage> > images;
 	void addImage(std::shared_ptr<creaturesImage>);
-	shared_array<Color> palette;
+	shared_array<Color> default_palette;
 
   public:
 	void loadDefaultPalette();

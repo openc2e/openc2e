@@ -63,7 +63,6 @@ class NullBackend : public Backend {
 	virtual Texture createTexture(const Image&) { return {}; }
 	virtual Texture createTextureWithTransparentColor(const Image&, Color) { return {}; }
 
-	virtual void setDefaultPalette(span<Color>) {}
 	virtual unsigned int textWidth(std::string) { return 0; }
 };
 

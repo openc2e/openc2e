@@ -60,7 +60,6 @@ class SDLBackend : public Backend {
 	int windowwidth, windowheight;
 	SDL_Renderer* renderer = nullptr;
 	SDLRenderTarget mainrendertarget;
-	std::array<SDL_Color, 256> default_palette;
 	float userscale = 1.0;
 	Uint32 last_frame_end = 0;
 
@@ -91,8 +90,6 @@ class SDLBackend : public Backend {
 
 	bool keyDown(int key);
 	int translateScancode(int key);
-
-	void setDefaultPalette(span<Color> palette);
 };
 
 #endif
