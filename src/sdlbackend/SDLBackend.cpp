@@ -29,10 +29,6 @@
 #include <imgui.h>
 #include <memory>
 
-// reasonable defaults
-constexpr int OPENC2E_DEFAULT_WIDTH = 800;
-constexpr int OPENC2E_DEFAULT_HEIGHT = 600;
-
 SDLBackend::SDLBackend()
 	: mainrendertarget(this) {
 	mainrendertarget.texture = nullptr;
@@ -68,7 +64,7 @@ static void ImGuiInit(SDL_Window* window) {
 	}
 }
 
-void SDLBackend::init(const std::string& name) {
+void SDLBackend::init(const std::string& name, int width, int height) {
 	int init = SDL_INIT_VIDEO;
 
 	if (SDL_Init(init) < 0)
@@ -77,7 +73,7 @@ void SDLBackend::init(const std::string& name) {
 	window = SDL_CreateWindow(name.c_str(),
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT,
+		width, height,
 		SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 	if (!window) {
 		throw Exception(std::string("SDL error creating window: ") + SDL_GetError());

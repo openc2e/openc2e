@@ -27,6 +27,10 @@
 #include <memory>
 #include <string>
 
+// reasonable defaults
+constexpr int OPENC2E_DEFAULT_WIDTH = 800;
+constexpr int OPENC2E_DEFAULT_HEIGHT = 600;
+
 class creaturesImage;
 
 struct RenderOptions {
@@ -58,7 +62,7 @@ class RenderTarget {
 
 class Backend {
   public:
-	virtual void init(const std::string& name) = 0;
+	virtual void init(const std::string& name, int width, int height) = 0;
 	virtual void shutdown() = 0;
 
 	virtual unsigned int ticks() = 0;

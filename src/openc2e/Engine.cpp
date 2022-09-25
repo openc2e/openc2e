@@ -1038,7 +1038,10 @@ bool Engine::initialSetup() {
 	std::shared_ptr<Backend> b = possible_backends[preferred_backend];
 	if (!b)
 		throw Exception("No such backend " + preferred_backend);
-	b->init(gamename.size() ? gamename + " - openc2e (development build)" : "openc2e (development build)");
+	b->init(
+		gamename.size() ? gamename + " - openc2e (development build)" : "openc2e (development build)",
+		OPENC2E_DEFAULT_WIDTH,
+		OPENC2E_DEFAULT_HEIGHT);
 	setBackend(b);
 	possible_backends.clear();
 	Openc2eImGui::Init();

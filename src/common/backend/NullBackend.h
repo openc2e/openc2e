@@ -42,7 +42,7 @@ class NullBackend : public Backend {
 	NullRenderTarget surface;
 
   public:
-	virtual void init(const std::string&) {}
+	virtual void init(const std::string&, int, int) {}
 	virtual void waitForNextDraw() {}
 	virtual void drawDone() {}
 	virtual void shutdown() {}

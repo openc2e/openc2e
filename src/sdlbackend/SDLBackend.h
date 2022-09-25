@@ -70,7 +70,7 @@ class SDLBackend : public Backend {
 
   public:
 	SDLBackend();
-	void init(const std::string& name);
+	void init(const std::string& name, int width, int height);
 	void waitForNextDraw();
 	void drawDone();
 	void shutdown();

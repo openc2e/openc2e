@@ -146,7 +146,7 @@ extern "C" int main(int argc, char** argv) {
 	}
 
 	// run loop
-	g_engine_context->backend->init("opencreatures1");
+	g_engine_context->backend->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
 	while (true) {
 		g_engine_context->backend->waitForNextDraw();
 
