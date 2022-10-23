@@ -173,7 +173,6 @@ add_library(openc2e-mngmusic STATIC
 target_link_libraries(openc2e-mngmusic PRIVATE openc2e-fileformats)
 
 add_library(openc2e_sdlbackend OBJECT
-	src/sdlbackend/imgui_sdl.cpp
 	src/sdlbackend/SDLBackend.cpp
 	src/sdlbackend/SDLMixerBackend.cpp
 )

@@ -22,7 +22,8 @@
 #include "common/Exception.h"
 #include "common/backend/Keycodes.h"
 #include "common/creaturesImage.h"
-#include "imgui_sdl.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdlrenderer.h"
 
 #include <array>
 #include <cassert>
@@ -54,13 +55,17 @@ void SDLBackend::setUserScale(float userscale_) {
 	resizeNotify(windowwidth, windowheight);
 }
 
-static void ImGuiInit(SDL_Window* window) {
+static void ImGuiInit(SDL_Window* window, SDL_Renderer* renderer) {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 	io.IniFilename = nullptr; // don't save settings
-	if (!ImGuiSDL_Init(window)) {
-		throw Exception("Couldn't initialize ImGui - are you using SDL's OpenGL backend?");
+
+	if (!ImGui_ImplSDL2_InitForSDLRenderer(window, renderer)) {
+		throw Exception("Couldn't initialize ImGui SDL2");
+	}
+	if (!ImGui_ImplSDLRenderer_Init(renderer)) {
+		throw Exception("Couldn't initialize ImGui SDLRenderer");
 	}
 }
 
@@ -101,7 +106,7 @@ void SDLBackend::init(const std::string& name, int width, int height) {
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
 
-	ImGuiInit(window);
+	ImGuiInit(window, renderer);
 }
 
 void SDLBackend::shutdown() {
@@ -109,7 +114,7 @@ void SDLBackend::shutdown() {
 }
 
 static bool ImGuiConsumeEvent(const SDL_Event& event) {
-	ImGuiSDL_ProcessEvent(&event);
+	ImGui_ImplSDL2_ProcessEvent(&event);
 
 	auto& io = ImGui::GetIO();
 
@@ -543,13 +548,14 @@ void SDLBackend::waitForNextDraw() {
 	}
 	last_frame_end = frame_end;
 
-	ImGuiSDL_NewFrame(window);
+	ImGui_ImplSDLRenderer_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 }
 
 void SDLBackend::drawDone() {
 	ImGui::Render();
-	ImGuiSDL_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 
 	SDL_RenderPresent(renderer);
 }
