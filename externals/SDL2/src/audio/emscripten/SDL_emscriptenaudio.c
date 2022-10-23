@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,10 +23,8 @@
 #if SDL_AUDIO_DRIVER_EMSCRIPTEN
 
 #include "SDL_audio.h"
-#include "SDL_log.h"
 #include "../SDL_audio_c.h"
 #include "SDL_emscriptenaudio.h"
-#include "SDL_assert.h"
 
 #include <emscripten/emscripten.h>
 
@@ -61,6 +59,9 @@ HandleAudioProcess(_THIS)
         if (this->stream) {
             SDL_AudioStreamClear(this->stream);
         }
+
+        SDL_memset(this->work_buffer, this->spec.silence, this->spec.size);
+        FeedAudioDevice(this, this->work_buffer, this->spec.size);
         return;
     }
 
@@ -216,6 +217,9 @@ EMSCRIPTENAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscaptu
                 SDL2.audioContext = new AudioContext();
             } else if (typeof(webkitAudioContext) !== 'undefined') {
                 SDL2.audioContext = new webkitAudioContext();
+            }
+            if (SDL2.audioContext) {
+                autoResumeAudioContext(SDL2.audioContext);
             }
         }
         return SDL2.audioContext === undefined ? -1 : 0;

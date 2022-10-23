@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,7 +24,6 @@
 
 /* Output audio to Android */
 
-#include "SDL_assert.h"
 #include "SDL_audio.h"
 #include "../SDL_audio_c.h"
 #include "SDL_androidaudio.h"
@@ -58,8 +57,8 @@ ANDROIDAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
     test_format = SDL_FirstAudioFormat(this->spec.format);
     while (test_format != 0) { /* no "UNKNOWN" constant */
         if ((test_format == AUDIO_U8) ||
-			(test_format == AUDIO_S16) ||
-			(test_format == AUDIO_F32)) {
+            (test_format == AUDIO_S16) ||
+            (test_format == AUDIO_F32)) {
             this->spec.format = test_format;
             break;
         }

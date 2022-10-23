@@ -60,7 +60,7 @@ if(WIN32 OR APPLE)
 	endif()
 	add_library(SDL2::Mixer ALIAS SDL2_mixer)
 else()
-	find_package(SDL2 REQUIRED)
+	find_package(SDL2 2.0.18 REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
 endif()
 

@@ -1,12 +1,64 @@
-//===================== Copyright (c) Valve Corporation. All Rights Reserved. ======================
-//
-// Purpose: Defines methods and structures used to communicate with Valve controllers.
-//
-//==================================================================================================
+/*
+  Simple DirectMedia Layer
+  Copyright (C) 2020 Valve Corporation
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+*/
 #ifndef _CONTROLLER_STRUCTS_
 #define _CONTROLLER_STRUCTS_
 
 #pragma pack(1)
+
+#define HID_FEATURE_REPORT_BYTES 64
+
+// Header for all host <==> target messages
+typedef struct
+{
+	unsigned char type;
+	unsigned char length;
+} FeatureReportHeader;
+
+// Generic controller attribute structure
+typedef struct
+{
+	unsigned char attributeTag;
+	uint32_t attributeValue;
+} ControllerAttribute;
+
+// Generic controller settings structure
+typedef struct
+{
+	ControllerAttribute attributes[ ( HID_FEATURE_REPORT_BYTES - sizeof( FeatureReportHeader ) ) / sizeof( ControllerAttribute ) ];
+} MsgGetAttributes;
+
+
+// This is the only message struct that application code should use to interact with feature request messages. Any new
+// messages should be added to the union. The structures defined here should correspond to the ones defined in
+// ValveDeviceCore.cpp.
+//
+typedef struct
+{
+	FeatureReportHeader header;
+	union
+	{
+		MsgGetAttributes				getAttributes;
+	} payload;
+
+} FeatureReportMsg;
 
 // Roll this version forward anytime that you are breaking compatibility of existing
 // message types within ValveInReport_t or the header itself.  Hopefully this should
