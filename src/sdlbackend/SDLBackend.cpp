@@ -67,6 +67,23 @@ static void ImGuiInit(SDL_Window* window, SDL_Renderer* renderer) {
 	if (!ImGui_ImplSDLRenderer_Init(renderer)) {
 		throw Exception("Couldn't initialize ImGui SDLRenderer");
 	}
+
+	// fix for imgui#4768
+	{
+		ImGui_ImplSDLRenderer_DestroyFontsTexture();
+		ImGui_ImplSDLRenderer_Data* bd = ImGui_ImplSDLRenderer_GetBackendData();
+		unsigned char* pixels;
+		int width, height;
+		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+		bd->FontTexture = SDL_CreateTexture(bd->SDLRenderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width, height);
+		if (bd->FontTexture == nullptr) {
+			throw Exception("Couldn't create ImGui font texture");
+		}
+		SDL_UpdateTexture(bd->FontTexture, nullptr, pixels, 4 * width);
+		SDL_SetTextureBlendMode(bd->FontTexture, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureScaleMode(bd->FontTexture, SDL_ScaleModeNearest);
+		io.Fonts->SetTexID((ImTextureID)(intptr_t)bd->FontTexture);
+	}
 }
 
 void SDLBackend::init(const std::string& name, int width, int height) {
