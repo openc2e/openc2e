@@ -9,8 +9,8 @@
 #include "common/zip.h"
 #include "fileformats/mngfile.h"
 #include "libmngmusic/MNGMusic.h"
+#include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
-#include "sdlbackend/imgui_sdl.h"
 
 #include <SDL.h>
 #include <chrono>
@@ -30,8 +30,8 @@
 
 namespace fs = ghc::filesystem;
 
-constexpr int OPENC2E_DEFAULT_WIDTH = 300;
-constexpr int OPENC2E_DEFAULT_HEIGHT = 400;
+static SDLBackend backend;
+static bool should_quit = false;
 
 constexpr const char* ABOUT_TEXT = R"(MNGPlayer2 v1.0.1
 Copyright (C) 2021 the openc2e project
@@ -108,17 +108,6 @@ static fs::path replace_extension(fs::path p, std::string ext) {
 	return p;
 }
 
-static struct WindowState {
-	bool is_running = true;
-
-	int windowwidth = 0;
-	int windowheight = 0;
-	float scale = 1.0;
-
-	SDL_Renderer* renderer = nullptr;
-	SDL_Window* window = nullptr;
-} window_state;
-
 static bool ShowConfirmBox(const std::string& title, const std::string& message) {
 	const SDL_MessageBoxButtonData buttons[] = {
 		{SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "No"},
@@ -126,7 +115,7 @@ static bool ShowConfirmBox(const std::string& title, const std::string& message)
 	};
 	const SDL_MessageBoxData messageboxdata = {
 		SDL_MESSAGEBOX_INFORMATION,
-		window_state.window,
+		backend.window,
 		title.c_str(),
 		message.c_str(),
 		SDL_arraysize(buttons),
@@ -139,7 +128,6 @@ static bool ShowConfirmBox(const std::string& title, const std::string& message)
 	}
 	return buttonid == 1;
 }
-
 
 static struct AppState {
 	std::string fullpath;
@@ -154,7 +142,7 @@ static struct AppState {
 	char random_interval_buf[6] = "300";
 	std::chrono::steady_clock::time_point random_time_of_last_switch = {};
 
-	std::shared_ptr<SDLMixerBackend> backend = nullptr;
+	std::shared_ptr<SDLMixerBackend> audio_backend = nullptr;
 	std::unique_ptr<MNGMusic> mng_music;
 
 	float mood = 0.5;
@@ -240,7 +228,7 @@ static struct AppState {
 			return;
 		}
 		if (result != NFD_OKAY) {
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), window_state.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), backend.window);
 			return;
 		}
 
@@ -254,7 +242,7 @@ static struct AppState {
 			newscript = mngparse(newfile.script);
 		} catch (const std::exception& e) {
 			std::string message = std::string("Error opening file: ") + outPath + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), window_state.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), backend.window);
 			return;
 		}
 
@@ -277,7 +265,7 @@ static struct AppState {
 			return;
 		}
 		if (result != NFD_OKAY) {
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), window_state.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), backend.window);
 			return;
 		}
 
@@ -294,7 +282,7 @@ static struct AppState {
 
 				std::ifstream in(sample_filename, std::ios_base::binary);
 				if (!in.is_open()) {
-					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", sample_filename.c_str(), window_state.window);
+					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", sample_filename.c_str(), backend.window);
 					return;
 				}
 				// in.ignore(16); // skip wav header
@@ -305,7 +293,7 @@ static struct AppState {
 
 		} catch (const std::exception& e) {
 			std::string message = std::string("Error opening file: ") + outPath + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), window_state.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), backend.window);
 			return;
 		}
 
@@ -366,12 +354,12 @@ static struct AppState {
 
 		} catch (const std::exception& e) {
 			std::string message = "Error compiling script: " + output_path + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error compiling script", message.c_str(), window_state.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error compiling script", message.c_str(), backend.window);
 			return;
 		}
 
 		std::string message = "Compiled MNG script to '" + output_path + "'";
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), window_state.window);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), backend.window);
 	}
 
 	bool canDecompile() {
@@ -391,7 +379,7 @@ static struct AppState {
 		if (!fs::create_directories(output_directory)) {
 			if (!fs::is_directory(output_directory)) {
 				std::string message = "Couldn't create output directory " + output_directory.string();
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error saving file", message.c_str(), window_state.window);
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error saving file", message.c_str(), backend.window);
 				return;
 			}
 		}
@@ -412,12 +400,12 @@ static struct AppState {
 
 		} catch (const std::exception& e) {
 			std::string message = "Error decompiling file: " + output_directory.string() + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error decompiling file", message.c_str(), window_state.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error decompiling file", message.c_str(), backend.window);
 			return;
 		}
 
 		std::string message = "Decompiled MNG file to '" + output_directory.string() + "'";
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), window_state.window);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), backend.window);
 	}
 
 	void variablesUpdated() {
@@ -429,59 +417,6 @@ static struct AppState {
 		mng_music->setVolume(volume);
 	}
 } app_state;
-
-void resizeNotify(int _w, int _h) {
-	window_state.windowwidth = _w;
-	window_state.windowheight = _h;
-
-	int drawablewidth = 0;
-	int drawableheight = 0;
-
-	if (SDL_GetRendererOutputSize(window_state.renderer, &drawablewidth, &drawableheight) != 0) {
-		printf("SDL_GetRendererOutputSize error: %s\n", SDL_GetError());
-		return;
-	}
-	assert(drawablewidth / window_state.windowwidth == drawableheight / window_state.windowheight);
-	float oldscale = window_state.scale;
-	float newscale = drawablewidth / window_state.windowwidth;
-	if (abs(newscale) > 0.01 && abs(oldscale - newscale) > 0.01) {
-		printf("* SDL setting scale to %.2fx\n", newscale);
-		window_state.scale = newscale;
-		SDL_RenderSetScale(window_state.renderer, window_state.scale, window_state.scale);
-	}
-}
-
-void pollEvents() {
-	SDL_Event event;
-	while (true) {
-		if (!SDL_PollEvent(&event))
-			return;
-
-		ImGuiSDL_ProcessEvent(&event);
-		if (ImGui::GetIO().WantCaptureMouse && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL)) {
-			continue;
-		}
-		if (ImGui::GetIO().WantCaptureKeyboard && (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_TEXTINPUT)) {
-			continue;
-		}
-
-		switch (event.type) {
-			case SDL_WINDOWEVENT:
-				switch (event.window.event) {
-					case SDL_WINDOWEVENT_RESIZED:
-						resizeNotify(event.window.data1, event.window.data2);
-						continue;
-					default:
-						continue;
-				}
-			case SDL_QUIT:
-				window_state.is_running = false;
-				return;
-			default:
-				continue;
-		}
-	}
-}
 
 void TextCentered(const char* text) {
 	ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text).x) * 0.5f);
@@ -519,9 +454,6 @@ bool SelectableEx(const char* label, bool* selected) {
 }
 
 void DrawImGui() {
-	ImGuiSDL_NewFrame(window_state.window);
-	ImGui::NewFrame();
-
 	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
 	ImGui::Begin("##mainwindow", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -545,7 +477,7 @@ void DrawImGui() {
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Close")) {
-				window_state.is_running = false;
+				should_quit = true;
 			}
 			ImGui::EndMenu();
 		}
@@ -560,7 +492,7 @@ void DrawImGui() {
 		}
 		if (ImGui::BeginMenu("Help")) {
 			if (ImGui::MenuItem("About MNGPlayer2")) {
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "About MNGPlayer2", ABOUT_TEXT, window_state.window);
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "About MNGPlayer2", ABOUT_TEXT, backend.window);
 			}
 			ImGui::EndMenu();
 		}
@@ -686,104 +618,46 @@ void DrawImGui() {
 	TextCentered(app_state.filename.size() ? app_state.filename.c_str() : "No file loaded.");
 
 	ImGui::End();
-
-	ImGui::Render();
-	ImGuiSDL_RenderDrawData(ImGui::GetDrawData());
-}
-
-void InitSDL() {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		std::string message = std::string("SDL error during initialization: ") + SDL_GetError();
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message.c_str(), window_state.window);
-		exit(1);
-	}
-
-	window_state.window = SDL_CreateWindow("MNGPlayer2",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT,
-		SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-	if (!window_state.window) {
-		std::string message = std::string("SDL error creating window: ") + SDL_GetError();
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message.c_str(), window_state.window);
-		exit(1);
-	}
-
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl"); // for imgui_sdl
-	window_state.renderer = SDL_CreateRenderer(
-		window_state.window,
-		-1,
-		SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC);
-	if (!window_state.renderer) {
-		std::string message = std::string("SDL error creating renderer: ") + SDL_GetError();
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message.c_str(), window_state.window);
-		exit(1);
-	}
-
-	{
-		SDL_RendererInfo info;
-		info.name = nullptr;
-		SDL_GetRendererInfo(window_state.renderer, &info);
-		printf("* SDL Renderer: %s\n", info.name);
-	}
-	SDL_SetRenderTarget(window_state.renderer, nullptr);
-
-	SDL_GetWindowSize(window_state.window, &window_state.windowwidth, &window_state.windowheight);
-	resizeNotify(window_state.windowwidth, window_state.windowheight);
 }
 
 void InitMNGMusic() {
-	app_state.backend = SDLMixerBackend::getInstance();
-	app_state.backend->init();
-	app_state.mng_music = std::make_unique<MNGMusic>(app_state.backend);
+	app_state.audio_backend = SDLMixerBackend::getInstance();
+	app_state.audio_backend->init();
+	app_state.mng_music = std::make_unique<MNGMusic>(app_state.audio_backend);
 	app_state.variablesUpdated();
 }
 
-void InitImGui() {
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.IniFilename = nullptr; // don't save settings
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.FrameRounding = 0;
-	style.WindowRounding = 0;
-	style.WindowBorderSize = 0;
-
-	if (!ImGuiSDL_Init(window_state.window)) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing ImGui", window_state.window);
-		exit(1);
-	}
-}
-
 void RunMainLoop() {
-	const int max_fps = 60;
-	const int unfocused_fps = 20;
+	while (true) {
+		backend.waitForNextDraw();
 
-	while (window_state.is_running) {
-		Uint32 frame_start = SDL_GetTicks();
-
-		pollEvents();
-		app_state.Update();
-
-		// TODO: calculate scale etc here instead of in resizeNotify?
-		DrawImGui();
-		SDL_RenderPresent(window_state.renderer);
-
-		bool focused = SDL_GetWindowFlags(window_state.window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
-		Uint32 desired_ticks_per_frame = 1000 / (focused ? max_fps : unfocused_fps);
-		Uint32 frame_end = SDL_GetTicks();
-		if (frame_end - frame_start < desired_ticks_per_frame) {
-			SDL_Delay(desired_ticks_per_frame - (frame_end - frame_start));
+		// handle ui events
+		BackendEvent event;
+		while (backend.pollEvent(event)) {
+			if (event.type == eventquit) {
+				should_quit = true;
+			}
 		}
+		if (should_quit) {
+			break;
+		}
+
+		// draw
+		app_state.Update();
+		DrawImGui();
+		backend.drawDone();
 	}
 }
 
 int main(int, char**) {
 	install_backtrace_printer();
 
-	InitSDL();
+	try {
+		backend.init("MNGPlayer2", 300, 400);
+	} catch (Exception& e) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", e.what(), backend.window);
+	}
 	InitMNGMusic();
-	InitImGui();
 
 	RunMainLoop();
 	return 0;

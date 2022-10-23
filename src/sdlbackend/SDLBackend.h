@@ -59,7 +59,6 @@ class SDLBackend : public Backend {
 	friend class SDLRenderTarget;
 
   protected:
-	SDL_Window* window = nullptr;
 	int windowwidth, windowheight;
 	SDL_Renderer* renderer = nullptr;
 	std::shared_ptr<SDLRenderTarget> mainrendertarget;
@@ -71,6 +70,8 @@ class SDLBackend : public Backend {
 	SDL_Surface* getMainSDLSurface() { return SDL_GetWindowSurface(window); }
 
   public:
+	SDL_Window* window = nullptr;
+
 	SDLBackend();
 	void init(const std::string& name, int width, int height);
 	void waitForNextDraw();
