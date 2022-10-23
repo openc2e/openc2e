@@ -26,7 +26,7 @@
  %status stub
 */
 void c_LOAD(caosVM* vm) {
-	VM_PARAM_STRING(worldname)
+	VM_PARAM_STRING_UNUSED(worldname)
 
 	// TODO
 }
@@ -85,12 +85,12 @@ void v_WUID(caosVM* vm) {
  Sets an index in the mysterious global tint table to have the specified values. No, we have no idea what that means either.
 */
 void c_WTNT(caosVM* vm) {
-	VM_PARAM_INTEGER(swap)
-	VM_PARAM_INTEGER(rotation)
-	VM_PARAM_INTEGER(blue)
-	VM_PARAM_INTEGER(green)
-	VM_PARAM_INTEGER(red)
-	VM_PARAM_INTEGER(index)
+	VM_PARAM_INTEGER_UNUSED(swap)
+	VM_PARAM_INTEGER_UNUSED(rotation)
+	VM_PARAM_INTEGER_UNUSED(blue)
+	VM_PARAM_INTEGER_UNUSED(green)
+	VM_PARAM_INTEGER_UNUSED(red)
+	VM_PARAM_INTEGER_UNUSED(index)
 
 	// TODO
 }
@@ -110,7 +110,7 @@ void v_NWLD(caosVM* vm) {
  Create a new world directory to prepare for the creation of the specified world.
 */
 void c_WRLD(caosVM* vm) {
-	VM_PARAM_STRING(name)
+	VM_PARAM_STRING_UNUSED(name)
 
 	// TODO
 }
@@ -122,7 +122,7 @@ void c_WRLD(caosVM* vm) {
  Return the name of the specified world (zero-indexed, see NWLD).
 */
 void v_WRLD(caosVM* vm) {
-	VM_PARAM_INTEGER(world)
+	VM_PARAM_INTEGER_UNUSED(world)
 
 	THROW_IFNOT(false); // TODO
 }
@@ -132,7 +132,7 @@ void v_WRLD(caosVM* vm) {
  %status stub
 */
 void c_PSWD(caosVM* vm) {
-	VM_PARAM_STRING(password)
+	VM_PARAM_STRING_UNUSED(password)
 
 	// TODO
 }
@@ -144,7 +144,7 @@ void c_PSWD(caosVM* vm) {
  Return the password for the specified world (zero-indexed, see NWLD), or an empty string for no password.
 */
 void v_PSWD(caosVM* vm) {
-	VM_PARAM_INTEGER(world)
+	VM_PARAM_INTEGER_UNUSED(world)
 
 	vm->result.setString(""); // TODO
 }
@@ -156,7 +156,7 @@ void v_PSWD(caosVM* vm) {
  Return the world identifier for the specified world name, or -1 if it doesn't exist.
 */
 void v_WNTI(caosVM* vm) {
-	VM_PARAM_STRING(name)
+	VM_PARAM_STRING_UNUSED(name)
 
 	vm->result.setInt(-1); // TODO
 }
@@ -168,7 +168,7 @@ void v_WNTI(caosVM* vm) {
  Delete the specified world directory and all contents.
 */
 void c_DELW(caosVM* vm) {
-	VM_PARAM_STRING(name)
+	VM_PARAM_STRING_UNUSED(name)
 
 	THROW_IFNOT(false); // TODO
 }

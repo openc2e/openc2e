@@ -284,8 +284,8 @@ void c_DOOR(caosVM* vm) {
  %status stub
 */
 void v_DOOR(caosVM* vm) {
-	VM_PARAM_INTEGER(room2)
-	VM_PARAM_INTEGER(room1)
+	VM_PARAM_INTEGER_UNUSED(room2)
+	VM_PARAM_INTEGER_UNUSED(room1)
 
 	vm->result.setInt(-1); // TODO
 }
@@ -504,7 +504,7 @@ void v_GMAP(caosVM* vm) {
 */
 void c_LINK(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_INTEGER(perm)
+	VM_PARAM_INTEGER_UNUSED(perm)
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 
@@ -760,7 +760,7 @@ void c_DELM(caosVM* vm) {
  %status stub
 */
 void v_HIRP(caosVM* vm) {
-	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER_UNUSED(direction)
 	VM_PARAM_INTEGER(caindex)
 	THROW_IFNOT(0 <= caindex && caindex <= 19);
 	VM_PARAM_INTEGER(roomid)
@@ -776,7 +776,7 @@ void v_HIRP(caosVM* vm) {
  %status stub
 */
 void v_LORP(caosVM* vm) {
-	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER_UNUSED(direction)
 	VM_PARAM_INTEGER(caindex)
 	THROW_IFNOT(0 <= caindex && caindex <= 19);
 	VM_PARAM_INTEGER(roomid)
@@ -957,7 +957,7 @@ void v_WNDY(caosVM* vm) {
  %status stub
 */
 void c_DOCA(caosVM* vm) {
-	VM_PARAM_INTEGER(times)
+	VM_PARAM_INTEGER_UNUSED(times)
 
 	// TODO
 }
@@ -968,7 +968,7 @@ void c_DOCA(caosVM* vm) {
  %variants c2
 */
 void c_SETV_DOOR(caosVM* vm) {
-	VM_PARAM_INTEGER(value)
+	VM_PARAM_INTEGER_UNUSED(value)
 	VM_PARAM_INTEGER(room2)
 	VM_PARAM_INTEGER(room1)
 	VM_PARAM_INTEGER(perm)
@@ -1294,8 +1294,8 @@ void v_RMNO(caosVM* vm) {
  %variants c2
 */
 void v_RMN(caosVM* vm) {
-	VM_PARAM_INTEGER(door)
-	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER_UNUSED(door)
+	VM_PARAM_INTEGER_UNUSED(direction)
 
 	vm->result.setInt(0); // TODO
 }
@@ -1306,18 +1306,18 @@ void v_RMN(caosVM* vm) {
  %variants c2
 */
 void v_RMNR(caosVM* vm) {
-	VM_PARAM_INTEGER(door)
-	VM_PARAM_INTEGER(direction)
-	VM_PARAM_INTEGER(room)
+	VM_PARAM_INTEGER_UNUSED(door)
+	VM_PARAM_INTEGER_UNUSED(direction)
+	VM_PARAM_INTEGER_UNUSED(room)
 
 	vm->result.setInt(0); // TODO
 }
 void s_RMNR(caosVM* vm) {
-	VM_PARAM_INTEGER(door)
-	VM_PARAM_INTEGER(direction)
-	VM_PARAM_INTEGER(room)
+	VM_PARAM_INTEGER_UNUSED(door)
+	VM_PARAM_INTEGER_UNUSED(direction)
+	VM_PARAM_INTEGER_UNUSED(room)
 
-	VM_PARAM_INTEGER(newvalue)
+	VM_PARAM_INTEGER_UNUSED(newvalue)
 
 	// TODO
 }
@@ -1328,18 +1328,18 @@ void s_RMNR(caosVM* vm) {
  %variants c2
 */
 void v_RMND(caosVM* vm) {
-	VM_PARAM_INTEGER(door)
-	VM_PARAM_INTEGER(direction)
-	VM_PARAM_INTEGER(room)
+	VM_PARAM_INTEGER_UNUSED(door)
+	VM_PARAM_INTEGER_UNUSED(direction)
+	VM_PARAM_INTEGER_UNUSED(room)
 
 	vm->result.setInt(0); // TODO
 }
 void s_RMND(caosVM* vm) {
-	VM_PARAM_INTEGER(door)
-	VM_PARAM_INTEGER(direction)
-	VM_PARAM_INTEGER(room)
+	VM_PARAM_INTEGER_UNUSED(door)
+	VM_PARAM_INTEGER_UNUSED(direction)
+	VM_PARAM_INTEGER_UNUSED(room)
 
-	VM_PARAM_INTEGER(newvalue)
+	VM_PARAM_INTEGER_UNUSED(newvalue)
 
 	// TODO
 }
@@ -1349,8 +1349,8 @@ void s_RMND(caosVM* vm) {
  %variants c2
 */
 void c_DELN_c2(caosVM* vm) {
-	VM_PARAM_INTEGER(direction)
-	VM_PARAM_INTEGER(room)
+	VM_PARAM_INTEGER_UNUSED(direction)
+	VM_PARAM_INTEGER_UNUSED(room)
 
 	// TODO
 }

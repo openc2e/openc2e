@@ -31,7 +31,7 @@
 */
 void c_PRT_BANG(caosVM* vm) {
 	VM_VERIFY_SIZE(1)
-	VM_PARAM_INTEGER(strength)
+	VM_PARAM_INTEGER_UNUSED(strength)
 }
 
 /**

@@ -356,7 +356,7 @@ void v_PRAY_FORE(caosVM* vm) {
  recommended to be called after intensive PRAY usage, eg agent installation
 */
 void c_PRAY_GARB(caosVM* vm) {
-	VM_PARAM_INTEGER(force)
+	VM_PARAM_INTEGER_UNUSED(force)
 
 	// TODO
 }
@@ -366,9 +366,9 @@ void c_PRAY_GARB(caosVM* vm) {
  %status stub
 */
 void v_PRAY_IMPO(caosVM* vm) {
-	VM_PARAM_INTEGER(keepfile)
-	VM_PARAM_INTEGER(doit)
-	VM_PARAM_STRING(moniker)
+	VM_PARAM_INTEGER_UNUSED(keepfile)
+	VM_PARAM_INTEGER_UNUSED(doit)
+	VM_PARAM_STRING_UNUSED(moniker)
 
 	vm->result.setInt(4); // TODO
 }
@@ -461,10 +461,10 @@ void v_PRAY_KILL(caosVM* vm) {
 */
 void v_PRAY_MAKE(caosVM* vm) {
 	VM_PARAM_VARIABLE(report)
-	VM_PARAM_STRING(name)
-	VM_PARAM_INTEGER(prayspot)
-	VM_PARAM_STRING(journalname)
-	VM_PARAM_INTEGER(journalspot)
+	VM_PARAM_STRING_UNUSED(name)
+	VM_PARAM_INTEGER_UNUSED(prayspot)
+	VM_PARAM_STRING_UNUSED(journalname)
+	VM_PARAM_INTEGER_UNUSED(journalspot)
 
 	vm->result.setInt(1); // TODO
 	report->setString("hat u");
@@ -478,9 +478,9 @@ void v_PRAY_MAKE(caosVM* vm) {
 */
 void v_NET_MAKE(caosVM* vm) {
 	VM_PARAM_VARIABLE(report)
-	VM_PARAM_STRING(user)
-	VM_PARAM_STRING(journalname)
-	VM_PARAM_INTEGER(journalspot)
+	VM_PARAM_STRING_UNUSED(user)
+	VM_PARAM_STRING_UNUSED(journalname)
+	VM_PARAM_INTEGER_UNUSED(journalspot)
 
 	vm->result.setInt(1);
 	report->setString("Networking unsupported.");

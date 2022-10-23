@@ -363,15 +363,15 @@ void v_TRCK(caosVM* vm) {
  Setting the the endpoints to the same point will remove all lines for the agent.
 */
 void c_LINE(caosVM* vm) {
-	VM_PARAM_INTEGER(stipple_off)
-	VM_PARAM_INTEGER(stipple_on)
-	VM_PARAM_INTEGER(b)
-	VM_PARAM_INTEGER(g)
-	VM_PARAM_INTEGER(r)
-	VM_PARAM_INTEGER(y2)
-	VM_PARAM_INTEGER(x2)
-	VM_PARAM_INTEGER(y1)
-	VM_PARAM_INTEGER(x1)
+	VM_PARAM_INTEGER_UNUSED(stipple_off)
+	VM_PARAM_INTEGER_UNUSED(stipple_on)
+	VM_PARAM_INTEGER_UNUSED(b)
+	VM_PARAM_INTEGER_UNUSED(g)
+	VM_PARAM_INTEGER_UNUSED(r)
+	VM_PARAM_INTEGER_UNUSED(y2)
+	VM_PARAM_INTEGER_UNUSED(x2)
+	VM_PARAM_INTEGER_UNUSED(y1)
+	VM_PARAM_INTEGER_UNUSED(x1)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -429,9 +429,9 @@ void c_SCAM(caosVM* vm) {
  current center position of the camera's view will be used.
 */
 void c_ZOOM(caosVM* vm) {
-	VM_PARAM_INTEGER(y)
-	VM_PARAM_INTEGER(x)
-	VM_PARAM_INTEGER(pixels)
+	VM_PARAM_INTEGER_UNUSED(y)
+	VM_PARAM_INTEGER_UNUSED(x)
+	VM_PARAM_INTEGER_UNUSED(pixels)
 
 	// TODO
 }
@@ -443,12 +443,12 @@ void c_ZOOM(caosVM* vm) {
  Take a snapshot and save it to the given filename (don't include the extension). x/y are the centerpoint, width/height the size, and zoom the percentage to zoom out.
 */
 void c_SNAP(caosVM* vm) {
-	VM_PARAM_INTEGER(zoom)
-	VM_PARAM_INTEGER(height)
-	VM_PARAM_INTEGER(width)
-	VM_PARAM_INTEGER(y)
-	VM_PARAM_INTEGER(x)
-	VM_PARAM_STRING(filename)
+	VM_PARAM_INTEGER_UNUSED(zoom)
+	VM_PARAM_INTEGER_UNUSED(height)
+	VM_PARAM_INTEGER_UNUSED(width)
+	VM_PARAM_INTEGER_UNUSED(y)
+	VM_PARAM_INTEGER_UNUSED(x)
+	VM_PARAM_STRING_UNUSED(filename)
 
 	// TODO
 }
@@ -458,7 +458,7 @@ void c_SNAP(caosVM* vm) {
  %status stub
 */
 void v_LOFT(caosVM* vm) {
-	VM_PARAM_STRING(filename)
+	VM_PARAM_STRING_UNUSED(filename)
 
 	vm->result.setInt(0); // TODO
 }

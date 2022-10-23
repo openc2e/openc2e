@@ -89,7 +89,7 @@ void c_SPAS(caosVM* vm) {
 */
 void c_GPAS(caosVM* vm) {
 	VM_VERIFY_SIZE(4)
-	VM_PARAM_INTEGER(options)
+	VM_PARAM_INTEGER_UNUSED(options)
 	// TODO: assert ranges for these
 	VM_PARAM_INTEGER(species)
 	VM_PARAM_INTEGER(genus)
@@ -224,7 +224,7 @@ void c_CABP(caosVM* vm) {
  %status stub
 */
 void c_CABV(caosVM* vm) {
-	VM_PARAM_INTEGER(room_id)
+	VM_PARAM_INTEGER_UNUSED(room_id)
 
 	valid_agent(vm->targ);
 	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
@@ -306,8 +306,8 @@ void v_BUMP(caosVM* vm) {
  Teleport occupants of target vehicle to (x, y).
 */
 void c_TELE(caosVM* vm) {
-	VM_PARAM_INTEGER(y)
-	VM_PARAM_INTEGER(x)
+	VM_PARAM_INTEGER_UNUSED(y)
+	VM_PARAM_INTEGER_UNUSED(x)
 
 	valid_agent(vm->targ);
 	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());
@@ -324,7 +324,7 @@ void c_TELE(caosVM* vm) {
  Drop passengers of targ vehicle, like DPAS. If gravity is zero, passengers do not get gravity activated.
 */
 void c_DPS2(caosVM* vm) {
-	VM_PARAM_INTEGER(gravity)
+	VM_PARAM_INTEGER_UNUSED(gravity)
 
 	valid_agent(vm->targ);
 	Vehicle* v = dynamic_cast<Vehicle*>(vm->targ.get());

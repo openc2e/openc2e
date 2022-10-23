@@ -121,7 +121,7 @@ void c_PAT_DULL(caosVM* vm) {
  %variants sm
 */
 void c_PAT_DULL_sm(caosVM* vm) {
-	VM_PARAM_INTEGER(no_images)
+	VM_PARAM_INTEGER_UNUSED(no_images)
 
 	c_PAT_DULL(vm);
 }
@@ -146,7 +146,7 @@ void c_PAT_BUTT(caosVM* vm) {
 	// TODO: should x/y be int? original docs say 'decimal'
 	VM_PARAM_INTEGER(y)
 	VM_PARAM_INTEGER(x)
-	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_INTEGER_UNUSED(image_count)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_STRING(sprite)
 	VM_PARAM_INTEGER(part)
@@ -511,8 +511,8 @@ void v_NPGS(caosVM* vm) {
  Add the given value to the given line on a graph.
 */
 void c_GRPV(caosVM* vm) {
-	VM_PARAM_FLOAT(value)
-	VM_PARAM_INTEGER(line)
+	VM_PARAM_FLOAT_UNUSED(value)
+	VM_PARAM_INTEGER_UNUSED(line)
 
 	valid_agent(vm->targ);
 	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
@@ -533,11 +533,11 @@ void c_GRPV(caosVM* vm) {
  characteristics.
 */
 void c_GRPL(caosVM* vm) {
-	VM_PARAM_FLOAT(max)
-	VM_PARAM_FLOAT(min)
-	VM_PARAM_INTEGER(blue)
-	VM_PARAM_INTEGER(green)
-	VM_PARAM_INTEGER(red)
+	VM_PARAM_FLOAT_UNUSED(max)
+	VM_PARAM_FLOAT_UNUSED(min)
+	VM_PARAM_INTEGER_UNUSED(blue)
+	VM_PARAM_INTEGER_UNUSED(green)
+	VM_PARAM_INTEGER_UNUSED(red)
 
 	valid_agent(vm->targ);
 	CompoundAgent* c = dynamic_cast<CompoundAgent*>(vm->targ.get());
@@ -674,10 +674,10 @@ void c_BBD_VOCB(caosVM* vm) {
  Create a new C2 text part for a compound bubble object. Text will wrap as required to fit width.
 */
 void c_NEW_BBTX(caosVM* vm) {
-	VM_PARAM_INTEGER(width)
-	VM_PARAM_INTEGER(y)
-	VM_PARAM_INTEGER(x)
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(width)
+	VM_PARAM_INTEGER_UNUSED(y)
+	VM_PARAM_INTEGER_UNUSED(x)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -689,8 +689,8 @@ void c_NEW_BBTX(caosVM* vm) {
  %variants c2
 */
 void c_BBTX(caosVM* vm) {
-	VM_PARAM_INTEGER(stringindex)
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(stringindex)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -756,10 +756,10 @@ void c_KMSG(caosVM* vm) {
  Display the given text for the given number of ticks, in a bubble (type is 0 for speech or 1 for thought).
 */
 void c_BBLE(caosVM* vm) {
-	VM_PARAM_INTEGER(track)
-	VM_PARAM_INTEGER(type)
-	VM_PARAM_INTEGER(ticks)
-	VM_PARAM_STRING(text)
+	VM_PARAM_INTEGER_UNUSED(track)
+	VM_PARAM_INTEGER_UNUSED(type)
+	VM_PARAM_INTEGER_UNUSED(ticks)
+	VM_PARAM_STRING_UNUSED(text)
 
 	// TODO
 }
@@ -770,10 +770,10 @@ void c_BBLE(caosVM* vm) {
  %variants c2
 */
 void c_BBFD(caosVM* vm) {
-	VM_PARAM_INTEGER(blue)
-	VM_PARAM_INTEGER(green)
-	VM_PARAM_INTEGER(red)
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(blue)
+	VM_PARAM_INTEGER_UNUSED(green)
+	VM_PARAM_INTEGER_UNUSED(red)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	valid_agent(vm->targ);
 	// TODO

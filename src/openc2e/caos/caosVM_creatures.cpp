@@ -70,7 +70,7 @@ c2eCreature* getc2eCreature(Agent* a) {
  %variants c1 c2
 */
 void c_STM_SHOU(caosVM* vm) {
-	VM_PARAM_INTEGER(stimulusno)
+	VM_PARAM_INTEGER_UNUSED(stimulusno)
 
 	// TODO
 }
@@ -81,7 +81,7 @@ void c_STM_SHOU(caosVM* vm) {
  %variants c1 c2
 */
 void c_STM_SIGN(caosVM* vm) {
-	VM_PARAM_INTEGER(stimulusno)
+	VM_PARAM_INTEGER_UNUSED(stimulusno)
 
 	// TODO
 }
@@ -92,7 +92,7 @@ void c_STM_SIGN(caosVM* vm) {
  %variants c1 c2
 */
 void c_STM_TACT(caosVM* vm) {
-	VM_PARAM_INTEGER(stimulusno)
+	VM_PARAM_INTEGER_UNUSED(stimulusno)
 
 	// TODO
 }
@@ -122,8 +122,8 @@ void c_STM_WRIT(caosVM* vm) {
 */
 void c_STIM_SHOU(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_FLOAT(strength)
-	VM_PARAM_INTEGER(stimulus)
+	VM_PARAM_FLOAT_UNUSED(strength)
+	VM_PARAM_INTEGER_UNUSED(stimulus)
 
 	// TODO
 }
@@ -136,8 +136,8 @@ void c_STIM_SHOU(caosVM* vm) {
 */
 void c_STIM_SIGN(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_FLOAT(strength)
-	VM_PARAM_INTEGER(stimulus)
+	VM_PARAM_FLOAT_UNUSED(strength)
+	VM_PARAM_INTEGER_UNUSED(stimulus)
 
 	// TODO
 }
@@ -150,8 +150,8 @@ void c_STIM_SIGN(caosVM* vm) {
 */
 void c_STIM_TACT(caosVM* vm) {
 	VM_VERIFY_SIZE(3)
-	VM_PARAM_FLOAT(strength)
-	VM_PARAM_INTEGER(stimulus)
+	VM_PARAM_FLOAT_UNUSED(strength)
+	VM_PARAM_INTEGER_UNUSED(stimulus)
 
 	// TODO
 }
@@ -182,18 +182,18 @@ void c_STIM_WRIT(caosVM* vm) {
  %variants c1 c2
 */
 void c_STIM_SHOU_c2(caosVM* vm) {
-	VM_PARAM_INTEGER(amount3)
-	VM_PARAM_INTEGER(chem3)
-	VM_PARAM_INTEGER(amount2)
-	VM_PARAM_INTEGER(chem2)
-	VM_PARAM_INTEGER(amount1)
-	VM_PARAM_INTEGER(chem1)
-	VM_PARAM_INTEGER(amount0)
-	VM_PARAM_INTEGER(chem0)
-	VM_PARAM_INTEGER(features)
-	VM_PARAM_INTEGER(intensity)
-	VM_PARAM_INTEGER(input)
-	VM_PARAM_INTEGER(significance)
+	VM_PARAM_INTEGER_UNUSED(amount3)
+	VM_PARAM_INTEGER_UNUSED(chem3)
+	VM_PARAM_INTEGER_UNUSED(amount2)
+	VM_PARAM_INTEGER_UNUSED(chem2)
+	VM_PARAM_INTEGER_UNUSED(amount1)
+	VM_PARAM_INTEGER_UNUSED(chem1)
+	VM_PARAM_INTEGER_UNUSED(amount0)
+	VM_PARAM_INTEGER_UNUSED(chem0)
+	VM_PARAM_INTEGER_UNUSED(features)
+	VM_PARAM_INTEGER_UNUSED(intensity)
+	VM_PARAM_INTEGER_UNUSED(input)
+	VM_PARAM_INTEGER_UNUSED(significance)
 
 	// TODO
 }
@@ -204,18 +204,18 @@ void c_STIM_SHOU_c2(caosVM* vm) {
  %variants c1 c2
 */
 void c_STIM_SIGN_c2(caosVM* vm) {
-	VM_PARAM_INTEGER(amount3)
-	VM_PARAM_INTEGER(chem3)
-	VM_PARAM_INTEGER(amount2)
-	VM_PARAM_INTEGER(chem2)
-	VM_PARAM_INTEGER(amount1)
-	VM_PARAM_INTEGER(chem1)
-	VM_PARAM_INTEGER(amount0)
-	VM_PARAM_INTEGER(chem0)
-	VM_PARAM_INTEGER(features)
-	VM_PARAM_INTEGER(intensity)
-	VM_PARAM_INTEGER(input)
-	VM_PARAM_INTEGER(significance)
+	VM_PARAM_INTEGER_UNUSED(amount3)
+	VM_PARAM_INTEGER_UNUSED(chem3)
+	VM_PARAM_INTEGER_UNUSED(amount2)
+	VM_PARAM_INTEGER_UNUSED(chem2)
+	VM_PARAM_INTEGER_UNUSED(amount1)
+	VM_PARAM_INTEGER_UNUSED(chem1)
+	VM_PARAM_INTEGER_UNUSED(amount0)
+	VM_PARAM_INTEGER_UNUSED(chem0)
+	VM_PARAM_INTEGER_UNUSED(features)
+	VM_PARAM_INTEGER_UNUSED(intensity)
+	VM_PARAM_INTEGER_UNUSED(input)
+	VM_PARAM_INTEGER_UNUSED(significance)
 
 	// TODO
 }
@@ -226,18 +226,18 @@ void c_STIM_SIGN_c2(caosVM* vm) {
  %variants c1 c2
 */
 void c_STIM_TACT_c2(caosVM* vm) {
-	VM_PARAM_INTEGER(amount3)
-	VM_PARAM_INTEGER(chem3)
-	VM_PARAM_INTEGER(amount2)
-	VM_PARAM_INTEGER(chem2)
-	VM_PARAM_INTEGER(amount1)
-	VM_PARAM_INTEGER(chem1)
-	VM_PARAM_INTEGER(amount0)
-	VM_PARAM_INTEGER(chem0)
-	VM_PARAM_INTEGER(features)
-	VM_PARAM_INTEGER(intensity)
-	VM_PARAM_INTEGER(input)
-	VM_PARAM_INTEGER(significance)
+	VM_PARAM_INTEGER_UNUSED(amount3)
+	VM_PARAM_INTEGER_UNUSED(chem3)
+	VM_PARAM_INTEGER_UNUSED(amount2)
+	VM_PARAM_INTEGER_UNUSED(chem2)
+	VM_PARAM_INTEGER_UNUSED(amount1)
+	VM_PARAM_INTEGER_UNUSED(chem1)
+	VM_PARAM_INTEGER_UNUSED(amount0)
+	VM_PARAM_INTEGER_UNUSED(chem0)
+	VM_PARAM_INTEGER_UNUSED(features)
+	VM_PARAM_INTEGER_UNUSED(intensity)
+	VM_PARAM_INTEGER_UNUSED(input)
+	VM_PARAM_INTEGER_UNUSED(significance)
 
 	// TODO
 }
@@ -248,19 +248,19 @@ void c_STIM_TACT_c2(caosVM* vm) {
  %variants c1 c2
 */
 void c_STIM_WRIT_c2(caosVM* vm) {
-	VM_PARAM_INTEGER(amount3)
-	VM_PARAM_INTEGER(chem3)
-	VM_PARAM_INTEGER(amount2)
-	VM_PARAM_INTEGER(chem2)
-	VM_PARAM_INTEGER(amount1)
-	VM_PARAM_INTEGER(chem1)
-	VM_PARAM_INTEGER(amount0)
-	VM_PARAM_INTEGER(chem0)
-	VM_PARAM_INTEGER(features)
-	VM_PARAM_INTEGER(intensity)
-	VM_PARAM_INTEGER(input)
-	VM_PARAM_INTEGER(significance)
-	VM_PARAM_AGENT(creature)
+	VM_PARAM_INTEGER_UNUSED(amount3)
+	VM_PARAM_INTEGER_UNUSED(chem3)
+	VM_PARAM_INTEGER_UNUSED(amount2)
+	VM_PARAM_INTEGER_UNUSED(chem2)
+	VM_PARAM_INTEGER_UNUSED(amount1)
+	VM_PARAM_INTEGER_UNUSED(chem1)
+	VM_PARAM_INTEGER_UNUSED(amount0)
+	VM_PARAM_INTEGER_UNUSED(chem0)
+	VM_PARAM_INTEGER_UNUSED(features)
+	VM_PARAM_INTEGER_UNUSED(intensity)
+	VM_PARAM_INTEGER_UNUSED(input)
+	VM_PARAM_INTEGER_UNUSED(significance)
+	VM_PARAM_AGENT_UNUSED(creature)
 
 	// TODO
 	//oldCreature *c = getoldCreature(creature.get());
@@ -275,18 +275,18 @@ void c_STIM_WRIT_c2(caosVM* vm) {
  %variants c1 c2
 */
 void c_STIM_FROM_c1(caosVM* vm) {
-	VM_PARAM_INTEGER(amount3)
-	VM_PARAM_INTEGER(chem3)
-	VM_PARAM_INTEGER(amount2)
-	VM_PARAM_INTEGER(chem2)
-	VM_PARAM_INTEGER(amount1)
-	VM_PARAM_INTEGER(chem1)
-	VM_PARAM_INTEGER(amount0)
-	VM_PARAM_INTEGER(chem0)
-	VM_PARAM_INTEGER(features)
-	VM_PARAM_INTEGER(intensity)
-	VM_PARAM_INTEGER(input)
-	VM_PARAM_INTEGER(significance)
+	VM_PARAM_INTEGER_UNUSED(amount3)
+	VM_PARAM_INTEGER_UNUSED(chem3)
+	VM_PARAM_INTEGER_UNUSED(amount2)
+	VM_PARAM_INTEGER_UNUSED(chem2)
+	VM_PARAM_INTEGER_UNUSED(amount1)
+	VM_PARAM_INTEGER_UNUSED(chem1)
+	VM_PARAM_INTEGER_UNUSED(amount0)
+	VM_PARAM_INTEGER_UNUSED(chem0)
+	VM_PARAM_INTEGER_UNUSED(features)
+	VM_PARAM_INTEGER_UNUSED(intensity)
+	VM_PARAM_INTEGER_UNUSED(input)
+	VM_PARAM_INTEGER_UNUSED(significance)
 
 	valid_agent(vm->from.getAgent());
 	// TODO
@@ -300,14 +300,14 @@ void c_STIM_FROM_c1(caosVM* vm) {
 */
 void c_SWAY_SHOU(caosVM* vm) {
 	VM_VERIFY_SIZE(8)
-	VM_PARAM_FLOAT(adjust4)
-	VM_PARAM_INTEGER(drive4)
-	VM_PARAM_FLOAT(adjust3)
-	VM_PARAM_INTEGER(drive3)
-	VM_PARAM_FLOAT(adjust2)
-	VM_PARAM_INTEGER(drive2)
-	VM_PARAM_FLOAT(adjust1)
-	VM_PARAM_INTEGER(drive1)
+	VM_PARAM_FLOAT_UNUSED(adjust4)
+	VM_PARAM_INTEGER_UNUSED(drive4)
+	VM_PARAM_FLOAT_UNUSED(adjust3)
+	VM_PARAM_INTEGER_UNUSED(drive3)
+	VM_PARAM_FLOAT_UNUSED(adjust2)
+	VM_PARAM_INTEGER_UNUSED(drive2)
+	VM_PARAM_FLOAT_UNUSED(adjust1)
+	VM_PARAM_INTEGER_UNUSED(drive1)
 
 	valid_agent(vm->owner);
 	//TODO
@@ -321,14 +321,14 @@ void c_SWAY_SHOU(caosVM* vm) {
 */
 void c_SWAY_SIGN(caosVM* vm) {
 	VM_VERIFY_SIZE(8)
-	VM_PARAM_FLOAT(adjust4)
-	VM_PARAM_INTEGER(drive4)
-	VM_PARAM_FLOAT(adjust3)
-	VM_PARAM_INTEGER(drive3)
-	VM_PARAM_FLOAT(adjust2)
-	VM_PARAM_INTEGER(drive2)
-	VM_PARAM_FLOAT(adjust1)
-	VM_PARAM_INTEGER(drive1)
+	VM_PARAM_FLOAT_UNUSED(adjust4)
+	VM_PARAM_INTEGER_UNUSED(drive4)
+	VM_PARAM_FLOAT_UNUSED(adjust3)
+	VM_PARAM_INTEGER_UNUSED(drive3)
+	VM_PARAM_FLOAT_UNUSED(adjust2)
+	VM_PARAM_INTEGER_UNUSED(drive2)
+	VM_PARAM_FLOAT_UNUSED(adjust1)
+	VM_PARAM_INTEGER_UNUSED(drive1)
 
 	valid_agent(vm->owner);
 	//TODO
@@ -342,14 +342,14 @@ void c_SWAY_SIGN(caosVM* vm) {
 */
 void c_SWAY_TACT(caosVM* vm) {
 	VM_VERIFY_SIZE(8)
-	VM_PARAM_FLOAT(adjust4)
-	VM_PARAM_INTEGER(drive4)
-	VM_PARAM_FLOAT(adjust3)
-	VM_PARAM_INTEGER(drive3)
-	VM_PARAM_FLOAT(adjust2)
-	VM_PARAM_INTEGER(drive2)
-	VM_PARAM_FLOAT(adjust1)
-	VM_PARAM_INTEGER(drive1)
+	VM_PARAM_FLOAT_UNUSED(adjust4)
+	VM_PARAM_INTEGER_UNUSED(drive4)
+	VM_PARAM_FLOAT_UNUSED(adjust3)
+	VM_PARAM_INTEGER_UNUSED(drive3)
+	VM_PARAM_FLOAT_UNUSED(adjust2)
+	VM_PARAM_INTEGER_UNUSED(drive2)
+	VM_PARAM_FLOAT_UNUSED(adjust1)
+	VM_PARAM_INTEGER_UNUSED(drive1)
 
 	valid_agent(vm->owner);
 	//TODO
@@ -363,14 +363,14 @@ void c_SWAY_TACT(caosVM* vm) {
 */
 void c_SWAY_WRIT(caosVM* vm) {
 	VM_VERIFY_SIZE(8)
-	VM_PARAM_FLOAT(adjust4)
-	VM_PARAM_INTEGER(drive4)
-	VM_PARAM_FLOAT(adjust3)
-	VM_PARAM_INTEGER(drive3)
-	VM_PARAM_FLOAT(adjust2)
-	VM_PARAM_INTEGER(drive2)
-	VM_PARAM_FLOAT(adjust1)
-	VM_PARAM_INTEGER(drive1)
+	VM_PARAM_FLOAT_UNUSED(adjust4)
+	VM_PARAM_INTEGER_UNUSED(drive4)
+	VM_PARAM_FLOAT_UNUSED(adjust3)
+	VM_PARAM_INTEGER_UNUSED(drive3)
+	VM_PARAM_FLOAT_UNUSED(adjust2)
+	VM_PARAM_INTEGER_UNUSED(drive2)
+	VM_PARAM_FLOAT_UNUSED(adjust1)
+	VM_PARAM_INTEGER_UNUSED(drive1)
 	VM_PARAM_VALIDAGENT(creature)
 
 	valid_agent(vm->owner);
@@ -583,9 +583,9 @@ CAOS_LVALUE(NORN, (void)0,
  The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
 */
 void c_URGE_SHOU(caosVM* vm) {
-	VM_PARAM_FLOAT(verb_stim)
-	VM_PARAM_INTEGER(verb_id)
-	VM_PARAM_FLOAT(noun_stim)
+	VM_PARAM_FLOAT_UNUSED(verb_stim)
+	VM_PARAM_INTEGER_UNUSED(verb_id)
+	VM_PARAM_FLOAT_UNUSED(noun_stim)
 
 	valid_agent(vm->owner);
 
@@ -638,9 +638,9 @@ void c_URGE_SIGN(caosVM* vm) {
  The two stimuli parameters can range from -1.0 (discourage) to 1.0 (encourage).
 */
 void c_URGE_TACT(caosVM* vm) {
-	VM_PARAM_FLOAT(verb_stim)
-	VM_PARAM_INTEGER(verb_id)
-	VM_PARAM_FLOAT(noun_stim)
+	VM_PARAM_FLOAT_UNUSED(verb_stim)
+	VM_PARAM_INTEGER_UNUSED(verb_id)
+	VM_PARAM_FLOAT_UNUSED(noun_stim)
 
 	valid_agent(vm->owner);
 
@@ -655,10 +655,10 @@ void c_URGE_TACT(caosVM* vm) {
  (noun).  Provide a stim greater than 1 to force, and an id of -1 and a stim greater than 1 to unforce.
 */
 void c_URGE_WRIT(caosVM* vm) {
-	VM_PARAM_FLOAT(verb_stim)
-	VM_PARAM_INTEGER(verb_id)
-	VM_PARAM_FLOAT(noun_stim)
-	VM_PARAM_INTEGER(noun_id)
+	VM_PARAM_FLOAT_UNUSED(verb_stim)
+	VM_PARAM_INTEGER_UNUSED(verb_id)
+	VM_PARAM_FLOAT_UNUSED(noun_stim)
+	VM_PARAM_INTEGER_UNUSED(noun_id)
 	VM_PARAM_AGENT(creature)
 
 	if (!creature)
@@ -866,7 +866,7 @@ void c_APPR(caosVM* vm) {
  Makes the target Creature conscious if 0, or unconscious if 1.
 */
 void c_UNCS(caosVM* vm) {
-	VM_PARAM_INTEGER(unconscious)
+	VM_PARAM_INTEGER_UNUSED(unconscious)
 
 	vm->getTargCreature();
 	// TODO
@@ -889,7 +889,7 @@ void v_UNCS(caosVM* vm) {
  %status stub
 */
 void c_FACE(caosVM* vm) {
-	VM_PARAM_INTEGER(number)
+	VM_PARAM_INTEGER_UNUSED(number)
 
 	THROW_IFNOT(vm->targ);
 	SkeletalCreature* c = dynamic_cast<SkeletalCreature*>(vm->targ.get());
@@ -935,11 +935,11 @@ void c_LIKE(caosVM* vm) {
  Returns the filename for the specified part of a Creature, substituting as necessary.
 */
 void v_LIMB(caosVM* vm) {
-	VM_PARAM_INTEGER(variant)
-	VM_PARAM_INTEGER(age)
-	VM_PARAM_INTEGER(gender)
-	VM_PARAM_INTEGER(genus)
-	VM_PARAM_INTEGER(bodypart)
+	VM_PARAM_INTEGER_UNUSED(variant)
+	VM_PARAM_INTEGER_UNUSED(age)
+	VM_PARAM_INTEGER_UNUSED(gender)
+	VM_PARAM_INTEGER_UNUSED(genus)
+	VM_PARAM_INTEGER_UNUSED(bodypart)
 
 	vm->getTargCreature();
 	vm->result.setString(""); // TODO
@@ -952,7 +952,7 @@ void v_LIMB(caosVM* vm) {
  Makes the target Creature speak the specified speech to all creatures in hearing range.
 */
 void c_ORDR_SHOU(caosVM* vm) {
-	VM_PARAM_STRING(speech)
+	VM_PARAM_STRING_UNUSED(speech)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -965,7 +965,7 @@ void c_ORDR_SHOU(caosVM* vm) {
  Makes the target Creature speak the specified speech to all creatures that can see it.
 */
 void c_ORDR_SIGN(caosVM* vm) {
-	VM_PARAM_STRING(speech)
+	VM_PARAM_STRING_UNUSED(speech)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -978,7 +978,7 @@ void c_ORDR_SIGN(caosVM* vm) {
  Makes the target Creature speak the specified speech to all creatures that are touching it.
 */
 void c_ORDR_TACT(caosVM* vm) {
-	VM_PARAM_STRING(speech)
+	VM_PARAM_STRING_UNUSED(speech)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -991,7 +991,7 @@ void c_ORDR_TACT(caosVM* vm) {
  Makes the target Creature speak the specified speech to the specified creature.
 */
 void c_ORDR_WRIT(caosVM* vm) {
-	VM_PARAM_STRING(speech)
+	VM_PARAM_STRING_UNUSED(speech)
 	VM_PARAM_VALIDAGENT(creature)
 
 	valid_agent(vm->targ);
@@ -1460,7 +1460,7 @@ void v_ORGI(caosVM* vm) {
  %status stub
 */
 void c_SOUL(caosVM* vm) {
-	VM_PARAM_INTEGER(on)
+	VM_PARAM_INTEGER_UNUSED(on)
 	VM_PARAM_INTEGER(part)
 	THROW_IFNOT(part >= 0 && part <= 8);
 
@@ -1581,7 +1581,7 @@ void c_SAYN(caosVM* vm) {
  %variants c1 c2
 */
 void c_IMPT(caosVM* vm) {
-	VM_PARAM_INTEGER(nudge)
+	VM_PARAM_INTEGER_UNUSED(nudge)
 
 	// TODO: check for creature targ?
 	// TODO
@@ -1593,7 +1593,7 @@ void c_IMPT(caosVM* vm) {
  %variants c1 c2
 */
 void c_AIM(caosVM* vm){
-	VM_PARAM_INTEGER(actionno)
+	VM_PARAM_INTEGER_UNUSED(actionno)
 
 	// TODO: check for creature targ? who knows?
 	// TODO
@@ -1642,7 +1642,7 @@ void v_DRIV_c1(caosVM* vm) {
  Start dreaming and process (at most?) max instincts.
 */
 void c_DREA_c1(caosVM* vm) {
-	VM_PARAM_INTEGER(max)
+	VM_PARAM_INTEGER_UNUSED(max)
 
 	oldCreature* c = getoldCreature(vm->targ.get());
 	THROW_IFNOT(c);
@@ -1655,7 +1655,7 @@ void c_DREA_c1(caosVM* vm) {
  %status stub
 */
 void v_BRED(caosVM* vm) {
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	vm->result.setInt(0); // TODO
 }
@@ -1673,8 +1673,8 @@ void v_BVAR(caosVM* vm) {
  %status stub
 */
 void c_EXPR(caosVM* vm) {
-	VM_PARAM_INTEGER(ticks)
-	VM_PARAM_INTEGER(index)
+	VM_PARAM_INTEGER_UNUSED(ticks)
+	VM_PARAM_INTEGER_UNUSED(index)
 
 	// TODO
 }
@@ -1692,9 +1692,9 @@ void v_EXPR(caosVM* vm) {
  %status stub
 */
 void c_TNTC(caosVM* vm) {
-	VM_PARAM_INTEGER(commit)
-	VM_PARAM_INTEGER(part)
-	VM_PARAM_INTEGER(tintindex)
+	VM_PARAM_INTEGER_UNUSED(commit)
+	VM_PARAM_INTEGER_UNUSED(part)
+	VM_PARAM_INTEGER_UNUSED(tintindex)
 
 	// TODO
 }
@@ -1705,8 +1705,8 @@ void c_TNTC(caosVM* vm) {
  %variants c2
 */
 void c_INJR(caosVM* vm) {
-	VM_PARAM_INTEGER(amount)
-	VM_PARAM_INTEGER(organ)
+	VM_PARAM_INTEGER_UNUSED(amount)
+	VM_PARAM_INTEGER_UNUSED(organ)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -1718,7 +1718,7 @@ void c_INJR(caosVM* vm) {
  %variants c1 c2
 */
 void c_SAY(caosVM* vm) {
-	VM_PARAM_STRING(string)
+	VM_PARAM_STRING_UNUSED(string)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -1730,9 +1730,9 @@ void c_SAY(caosVM* vm) {
  %variants c2
 */
 void c_TRIG(caosVM* vm) {
-	VM_PARAM_INTEGER(amount)
-	VM_PARAM_INTEGER(cell)
-	VM_PARAM_INTEGER(lobe)
+	VM_PARAM_INTEGER_UNUSED(amount)
+	VM_PARAM_INTEGER_UNUSED(cell)
+	VM_PARAM_INTEGER_UNUSED(lobe)
 
 	valid_agent(vm->targ);
 	// TODO
@@ -1755,7 +1755,7 @@ void v_MONK(caosVM* vm) {
  %status stub
 */
 void c_MOTR(caosVM* vm) {
-	VM_PARAM_INTEGER(enable)
+	VM_PARAM_INTEGER_UNUSED(enable)
 
 	c2eCreature* c = getc2eCreature(vm->targ.get());
 	THROW_IFNOT(c);
@@ -1779,7 +1779,7 @@ void v_MOTR(caosVM* vm) {
  %status stub
 */
 void c_MIND(caosVM* vm) {
-	VM_PARAM_INTEGER(enable)
+	VM_PARAM_INTEGER_UNUSED(enable)
 
 	c2eCreature* c = getc2eCreature(vm->targ.get());
 	THROW_IFNOT(c);
@@ -1803,7 +1803,7 @@ void v_MIND(caosVM* vm) {
  %status stub
 */
 void c_STEP(caosVM* vm) {
-	VM_PARAM_INTEGER(faculty)
+	VM_PARAM_INTEGER_UNUSED(faculty)
 
 	c2eCreature* c = getc2eCreature(vm->targ.get());
 	THROW_IFNOT(c);
@@ -1834,7 +1834,7 @@ void v_SEEN(caosVM* vm) {
  Make the target creature process the specified number of instincts.
 */
 void c_DOIN(caosVM* vm) {
-	VM_PARAM_INTEGER(noinstincts)
+	VM_PARAM_INTEGER_UNUSED(noinstincts)
 
 	Creature* c = vm->getTargCreature();
 	THROW_IFNOT(c);
@@ -1862,8 +1862,8 @@ void v_INS(caosVM* vm) {
  %status stub
 */
 void c_BODY(caosVM* vm) {
-	VM_PARAM_INTEGER(layer)
-	VM_PARAM_INTEGER(set)
+	VM_PARAM_INTEGER_UNUSED(layer)
+	VM_PARAM_INTEGER_UNUSED(set)
 
 	// TODO
 }
@@ -1873,7 +1873,7 @@ void c_BODY(caosVM* vm) {
  %status stub
 */
 void v_BODY(caosVM* vm) {
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	vm->result.setInt(-1); // TODO
 }
@@ -1883,10 +1883,10 @@ void v_BODY(caosVM* vm) {
  %status stub
 */
 void c_DYED(caosVM* vm) {
-	VM_PARAM_INTEGER(layer)
-	VM_PARAM_INTEGER(set)
-	VM_PARAM_INTEGER(overlay)
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(layer)
+	VM_PARAM_INTEGER_UNUSED(set)
+	VM_PARAM_INTEGER_UNUSED(overlay)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	// TODO
 }
@@ -1896,7 +1896,7 @@ void c_DYED(caosVM* vm) {
  %status stub
 */
 void c_HAIR(caosVM* vm) {
-	VM_PARAM_INTEGER(ruffleness)
+	VM_PARAM_INTEGER_UNUSED(ruffleness)
 
 	// TODO
 }
@@ -1930,9 +1930,9 @@ void c_STRE(caosVM*) {
  %status stub
 */
 void c_SWAP(caosVM* vm) {
-	VM_PARAM_INTEGER(commit)
-	VM_PARAM_INTEGER(part)
-	VM_PARAM_INTEGER(variant)
+	VM_PARAM_INTEGER_UNUSED(commit)
+	VM_PARAM_INTEGER_UNUSED(part)
+	VM_PARAM_INTEGER_UNUSED(variant)
 
 	// TODO
 }
@@ -1942,9 +1942,9 @@ void c_SWAP(caosVM* vm) {
  %status stub
 */
 void c_WEAR(caosVM* vm) {
-	VM_PARAM_INTEGER(layer)
-	VM_PARAM_INTEGER(set)
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(layer)
+	VM_PARAM_INTEGER_UNUSED(set)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	// TODO
 }
@@ -1954,8 +1954,8 @@ void c_WEAR(caosVM* vm) {
  %status stub
 */
 void v_WEAR(caosVM* vm) {
-	VM_PARAM_INTEGER(layer)
-	VM_PARAM_INTEGER(part)
+	VM_PARAM_INTEGER_UNUSED(layer)
+	VM_PARAM_INTEGER_UNUSED(part)
 
 	vm->result.setInt(-1); // TODO
 }
@@ -1965,10 +1965,10 @@ void v_WEAR(caosVM* vm) {
  %status stub
 */
 void c_TNTO(caosVM* vm) {
-	VM_PARAM_INTEGER(layer)
-	VM_PARAM_INTEGER(set)
-	VM_PARAM_INTEGER(part)
-	VM_PARAM_INTEGER(tintindex)
+	VM_PARAM_INTEGER_UNUSED(layer)
+	VM_PARAM_INTEGER_UNUSED(set)
+	VM_PARAM_INTEGER_UNUSED(part)
+	VM_PARAM_INTEGER_UNUSED(tintindex)
 
 	// TODO
 }
@@ -2012,7 +2012,7 @@ void v_UFTY(caosVM* vm) {
  %status stub
 */
 void v_HEDX(caosVM* vm) {
-	VM_PARAM_INTEGER(index)
+	VM_PARAM_INTEGER_UNUSED(index)
 
 	vm->result.setFloat(0); // TODO
 }
@@ -2022,7 +2022,7 @@ void v_HEDX(caosVM* vm) {
  %status stub
 */
 void v_HEDY(caosVM* vm) {
-	VM_PARAM_INTEGER(index)
+	VM_PARAM_INTEGER_UNUSED(index)
 
 	vm->result.setFloat(0); // TODO
 }

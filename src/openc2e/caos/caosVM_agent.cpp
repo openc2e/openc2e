@@ -236,7 +236,7 @@ void c_NEW_SIMP(caosVM* vm) {
  %variants c1 c2
 */
 void c_NEW_SIMP_c2(caosVM* vm) {
-	VM_PARAM_INTEGER(clone)
+	VM_PARAM_INTEGER_UNUSED(clone)
 	VM_PARAM_INTEGER(plane)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
@@ -285,7 +285,7 @@ void c_NEW_COMP(caosVM* vm) {
  %variants c1 c2
 */
 void c_NEW_COMP_c1(caosVM* vm) {
-	VM_PARAM_INTEGER(clone)
+	VM_PARAM_INTEGER_UNUSED(clone)
 	VM_PARAM_INTEGER(first_image)
 	VM_PARAM_INTEGER(image_count)
 	VM_PARAM_STRING(sprite_file)
@@ -368,9 +368,9 @@ void c_NEW_BKBD(caosVM* vm) {
  %variants c2
 */
 void c_NEW_CBUB(caosVM* vm) {
-	VM_PARAM_INTEGER(stringid)
-	VM_PARAM_INTEGER(first_image)
-	VM_PARAM_INTEGER(image_count)
+	VM_PARAM_INTEGER_UNUSED(stringid)
+	VM_PARAM_INTEGER_UNUSED(first_image)
+	VM_PARAM_INTEGER_UNUSED(image_count)
 	VM_PARAM_STRING(sprite_file)
 
 	throw Exception("compound bubble objects are not supported yet"); // TODO
@@ -909,7 +909,7 @@ void c_MESG_WRIT(caosVM* vm) {
 */
 void c_MESG_WRT(caosVM* vm) {
 	VM_VERIFY_SIZE(5)
-	VM_PARAM_INTEGER(delay)
+	VM_PARAM_INTEGER_UNUSED(delay)
 	VM_PARAM_VALUE(param_2)
 	VM_PARAM_VALUE(param_1)
 	VM_PARAM_INTEGER(message_id)
@@ -1652,7 +1652,7 @@ void v_SEEE(caosVM* vm) {
  Returns the tint value for TARG agent. Pass 1 for red, 2 for blue, 3 for green, 4 for rotation or 5 for swap.
 */
 void v_TINT(caosVM* vm) {
-	VM_PARAM_INTEGER(attribute)
+	VM_PARAM_INTEGER_UNUSED(attribute)
 
 	valid_agent(vm->targ);
 	vm->result.setInt(0); // TODO
@@ -1665,11 +1665,11 @@ void v_TINT(caosVM* vm) {
  Works like the TINT command, but only applies the tint to the current frame, and discards the rest.
 */
 void c_TINO(caosVM* vm) {
-	VM_PARAM_INTEGER(swap)
-	VM_PARAM_INTEGER(rotation)
-	VM_PARAM_INTEGER(blue)
-	VM_PARAM_INTEGER(green)
-	VM_PARAM_INTEGER(red)
+	VM_PARAM_INTEGER_UNUSED(swap)
+	VM_PARAM_INTEGER_UNUSED(rotation)
+	VM_PARAM_INTEGER_UNUSED(blue)
+	VM_PARAM_INTEGER_UNUSED(green)
+	VM_PARAM_INTEGER_UNUSED(red)
 
 	// TODO
 }
@@ -1771,10 +1771,10 @@ void v_PCLS(caosVM* vm) {
  (using CORE), 0 if not.
 */
 void v_TCOR(caosVM* vm) {
-	VM_PARAM_FLOAT(rightx)
-	VM_PARAM_FLOAT(leftx)
-	VM_PARAM_FLOAT(bottomy)
-	VM_PARAM_FLOAT(topy)
+	VM_PARAM_FLOAT_UNUSED(rightx)
+	VM_PARAM_FLOAT_UNUSED(leftx)
+	VM_PARAM_FLOAT_UNUSED(bottomy)
+	VM_PARAM_FLOAT_UNUSED(topy)
 
 	valid_agent(vm->targ);
 	vm->result.setInt(1); // TODO
@@ -1804,7 +1804,7 @@ void c_CORE(caosVM* vm) {
  %status stub
 */
 void v_TWIN(caosVM* vm) {
-	VM_PARAM_INTEGER(null_vars)
+	VM_PARAM_INTEGER_UNUSED(null_vars)
 	VM_PARAM_VALIDAGENT(source)
 
 	vm->result.setAgent(0); // TODO
@@ -1887,7 +1887,7 @@ void c_SLIM(caosVM*) {
  %variants c1 c2
 */
 void c_BHVR_c2(caosVM* vm) {
-	VM_PARAM_INTEGER(touch)
+	VM_PARAM_INTEGER_UNUSED(touch)
 	VM_PARAM_INTEGER(click)
 
 	valid_agent(vm->targ);
@@ -2088,7 +2088,7 @@ void c_SCLE_sm(caosVM* vm) {
  %variants cv
 */
 void c_SCLE_cv(caosVM* vm) {
-	VM_PARAM_FLOAT(scaleby)
+	VM_PARAM_FLOAT_UNUSED(scaleby)
 	VM_PARAM_INTEGER(pose)
 
 	valid_agent(vm->targ);
@@ -2137,7 +2137,7 @@ void c_IMGE(caosVM* vm) {
  TODO: also might exist in Docking Station
 */
 void c_TNTW(caosVM* vm) {
-	VM_PARAM_INTEGER(index)
+	VM_PARAM_INTEGER_UNUSED(index)
 
 	// TODO
 }
@@ -2147,7 +2147,7 @@ void c_TNTW(caosVM* vm) {
  %status stub
 */
 void c_PRNT(caosVM* vm) {
-	VM_PARAM_INTEGER(pose)
+	VM_PARAM_INTEGER_UNUSED(pose)
 
 	// TODO
 }
@@ -2223,10 +2223,10 @@ void c_BLCK(caosVM* vm) {
  Enable/disable drawing of a shadow on the target agent with the specified intensity at the given x/y offset.
 */
 void c_SHAD(caosVM* vm) {
-	VM_PARAM_INTEGER(enable)
-	VM_PARAM_INTEGER(y)
-	VM_PARAM_INTEGER(x)
-	VM_PARAM_INTEGER(intensity)
+	VM_PARAM_INTEGER_UNUSED(enable)
+	VM_PARAM_INTEGER_UNUSED(y)
+	VM_PARAM_INTEGER_UNUSED(x)
+	VM_PARAM_INTEGER_UNUSED(intensity)
 
 	valid_agent(vm->targ);
 
@@ -2244,8 +2244,8 @@ void c_SHAD(caosVM* vm) {
  However, it does nothing under openc2e.
 */
 void c_SYS_CONV(caosVM* vm) {
-	VM_PARAM_INTEGER(show_progress)
-	VM_PARAM_STRING(filename)
+	VM_PARAM_INTEGER_UNUSED(show_progress)
+	VM_PARAM_STRING_UNUSED(filename)
 }
 
 /* vim: set noet: */

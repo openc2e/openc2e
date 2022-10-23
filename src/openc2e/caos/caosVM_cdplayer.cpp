@@ -61,7 +61,7 @@ void c_CD_INIT(caosVM*) {
  a previous paused track set the parameter to 1.
 */
 void c_CD_PAWS(caosVM* vm) {
-	VM_PARAM_INTEGER(on_off);
+	VM_PARAM_INTEGER_UNUSED(on_off);
 }
 
 /**
@@ -71,8 +71,8 @@ void c_CD_PAWS(caosVM* vm) {
  Tell the CD Player to play the given track.
 */
 void c_CD_PLAY(caosVM* vm) {
-	VM_PARAM_INTEGER(last_track);
-	VM_PARAM_INTEGER(first_track);
+	VM_PARAM_INTEGER_UNUSED(last_track);
+	VM_PARAM_INTEGER_UNUSED(first_track);
 }
 
 /**

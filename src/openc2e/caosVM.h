@@ -221,9 +221,29 @@ inline auto vmparamhelper<AgentRef>(const caosValue& val) {
 #define VM_PARAM_FLOAT(name) VM_PARAM_OF_TYPE(name, float)
 #define VM_PARAM_VECTOR(name) VM_PARAM_OF_TYPE(name, Vector<float>)
 #define VM_PARAM_AGENT(name) VM_PARAM_OF_TYPE(name, std::shared_ptr<Agent>)
+
+#define VM_PARAM_VALUE_UNUSED(name) \
+	VM_PARAM_VALUE(name##_); \
+	(void)name##_;
+#define VM_PARAM_STRING_UNUSED(name) \
+	VM_PARAM_STRING(name##_); \
+	(void)name##_;
+#define VM_PARAM_INTEGER_UNUSED(name) \
+	VM_PARAM_INTEGER(name##_); \
+	(void)name##_;
+#define VM_PARAM_FLOAT_UNUSED(name) \
+	VM_PARAM_FLOAT(name##_); \
+	(void)name##_;
+#define VM_PARAM_VECTOR_UNUSED(name) \
+	VM_PARAM_VECTOR(name##_); \
+	(void)name##_;
+#define VM_PARAM_AGENT_UNUSED(name) \
+	VM_PARAM_AGENT(name##_); \
+	(void)name##_;
+
 // TODO: is usage of valid_agent correct here, or should we be throw_ifnoting?
 #define VM_PARAM_VALIDAGENT(name) \
-	VM_PARAM_AGENT(name) \
+	VM_PARAM_AGENT(name); \
 	valid_agent(name);
 #define VM_PARAM_VARIABLE(name) \
 	caosVM__lval vm__lval_##name(vm); \

@@ -131,7 +131,7 @@ CAOS_LVALUE(GAME, VM_PARAM_STRING(name),
  %variants c2
 */
 CAOS_LVALUE(GAME_c2,
-	VM_PARAM_INTEGER(variable) VM_PARAM_INTEGER(category),
+	VM_PARAM_INTEGER_UNUSED(variable) VM_PARAM_INTEGER_UNUSED(category),
 	caosValue(),
 	(void)0) // TODO
 
@@ -425,7 +425,7 @@ void v_OC2E_DDIR(caosVM* vm) {
  Do something by providing a menu ID from the original Creatures 1 or Creatures 2 engines. This is obviously limited to the IDs that openc2e is aware of.
 */
 void c_SYS_CMND(caosVM* vm) {
-	VM_PARAM_INTEGER(menuid)
+	VM_PARAM_INTEGER_UNUSED(menuid)
 
 	// TODO
 }

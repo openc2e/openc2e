@@ -34,9 +34,9 @@
  Clone a genome. A new moniker is created.
 */
 void c_GENE_CLON(caosVM* vm) {
-	VM_PARAM_INTEGER(src_slot)
+	VM_PARAM_INTEGER_UNUSED(src_slot)
 	VM_PARAM_VALIDAGENT(src_agent)
-	VM_PARAM_INTEGER(dest_slot)
+	VM_PARAM_INTEGER_UNUSED(dest_slot)
 	VM_PARAM_VALIDAGENT(dest_agent)
 
 	// TODO
@@ -49,15 +49,15 @@ void c_GENE_CLON(caosVM* vm) {
  Cross two genomes, creating a new one.
 */
 void c_GENE_CROS(caosVM* vm) {
-	VM_PARAM_INTEGER(dad_mutation_degree)
-	VM_PARAM_INTEGER(dad_mutation_chance)
-	VM_PARAM_INTEGER(mum_mutation_degree)
-	VM_PARAM_INTEGER(mum_mutation_chance)
-	VM_PARAM_INTEGER(dad_slot)
+	VM_PARAM_INTEGER_UNUSED(dad_mutation_degree)
+	VM_PARAM_INTEGER_UNUSED(dad_mutation_chance)
+	VM_PARAM_INTEGER_UNUSED(mum_mutation_degree)
+	VM_PARAM_INTEGER_UNUSED(mum_mutation_chance)
+	VM_PARAM_INTEGER_UNUSED(dad_slot)
 	VM_PARAM_VALIDAGENT(dad_agent)
-	VM_PARAM_INTEGER(mum_slot)
+	VM_PARAM_INTEGER_UNUSED(mum_slot)
 	VM_PARAM_VALIDAGENT(mum_agent)
-	VM_PARAM_INTEGER(dest_slot)
+	VM_PARAM_INTEGER_UNUSED(dest_slot)
 	VM_PARAM_VALIDAGENT(dest_agent)
 
 	// TODO
@@ -70,7 +70,7 @@ void c_GENE_CROS(caosVM* vm) {
  Delete a genome from a slot.
 */
 void c_GENE_KILL(caosVM* vm) {
-	VM_PARAM_INTEGER(slot)
+	VM_PARAM_INTEGER_UNUSED(slot)
 	VM_PARAM_VALIDAGENT(agent)
 
 	// TODO
@@ -178,7 +178,7 @@ void v_MTOC(caosVM* vm) {
 */
 void c_NEW_GENE(caosVM* vm) {
 	VM_PARAM_VARIABLE(destination)
-	VM_PARAM_INTEGER(dad)
+	VM_PARAM_INTEGER_UNUSED(dad)
 	VM_PARAM_INTEGER(mum)
 
 	destination->setInt(mum); // TODO

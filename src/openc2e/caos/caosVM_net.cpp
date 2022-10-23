@@ -47,7 +47,7 @@ void v_NET_PASS(caosVM* vm) {
  Networking is not supported in openc2e, so does nothing.
 */
 void c_NET_LINE(caosVM* vm) {
-	VM_PARAM_INTEGER(connect)
+	VM_PARAM_INTEGER_UNUSED(connect)
 }
 
 /**

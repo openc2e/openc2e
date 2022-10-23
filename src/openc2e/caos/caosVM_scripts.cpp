@@ -235,8 +235,8 @@ void v_CODS(caosVM* vm) {
  Flags can be 1 for remove script, 2 for event scripts and 4 for install script.
 */
 void c_JECT(caosVM* vm) {
-	VM_PARAM_INTEGER(flags)
-	VM_PARAM_STRING(file)
+	VM_PARAM_INTEGER_UNUSED(flags)
+	VM_PARAM_STRING_UNUSED(file)
 
 	// TODO
 }

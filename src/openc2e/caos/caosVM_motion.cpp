@@ -236,7 +236,7 @@ void v_OBST_c2(caosVM* vm) {
  the given direction.
 */
 void v_OBSV(caosVM* vm) {
-	VM_PARAM_INTEGER(direction)
+	VM_PARAM_INTEGER_UNUSED(direction)
 
 	valid_agent(vm->targ);
 	// TODO: implement
@@ -288,8 +288,8 @@ void v_TMVT(caosVM* vm) {
 */
 void v_TMVF(caosVM* vm) {
 	VM_VERIFY_SIZE(2)
-	VM_PARAM_FLOAT(y)
-	VM_PARAM_FLOAT(x)
+	VM_PARAM_FLOAT_UNUSED(y)
+	VM_PARAM_FLOAT_UNUSED(x)
 
 	valid_agent(vm->targ);
 	vm->result.setInt(1); // TODO: don't hardcode
