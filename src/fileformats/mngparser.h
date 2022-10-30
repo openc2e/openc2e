@@ -1,7 +1,7 @@
 #pragma once
 
+#include "common/HeapValue.h"
 #include "common/SimpleVariant.h"
-#include "common/heap_value.h"
 #include "common/optional.h"
 
 #include <string>
@@ -77,7 +77,7 @@ MNGScript mngparse(const std::vector<mngtoken>& tokens);
 
 struct MNGFunction;
 
-using MNGExpression = SimpleVariant<float, std::string, heap_value<MNGFunction>>;
+using MNGExpression = SimpleVariant<float, std::string, HeapValue<MNGFunction>>;
 
 struct MNGFunction {
 	mngtoktype::toktype type;

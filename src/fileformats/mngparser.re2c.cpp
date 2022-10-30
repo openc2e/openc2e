@@ -81,7 +81,7 @@ MNGExpression MNGParserState::parse_expression() {
 		consume(MNG_COMMA); \
 		auto right = parse_expression(); \
 		consume(MNG_RPAREN); \
-		return heap_value<MNGFunction>(type, left, right); \
+		return HeapValue<MNGFunction>(type, left, right); \
 	}
 
 	BINARY_OP(MNG_ADD);

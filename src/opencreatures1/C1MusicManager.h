@@ -10,7 +10,7 @@ class PathManager;
 
 class C1MusicManager {
   public:
-	C1MusicManager(std::shared_ptr<PathManager>, std::shared_ptr<AudioBackend>);
+	C1MusicManager();
 	~C1MusicManager();
 
 	float getVolume();

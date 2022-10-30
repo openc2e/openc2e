@@ -10,12 +10,11 @@
 
 class EventManager {
   public:
-	EventManager(EngineContext* ctx_)
-		: ctx(ctx_) {}
+	EventManager() {}
 
 	void queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno) {
-		auto* to = ctx->objects->try_get<Object>(to_id);
-		auto* from = ctx->objects->try_get<Object>(from_id);
+		auto* to = g_engine_context.objects->try_get<Object>(to_id);
+		auto* from = g_engine_context.objects->try_get<Object>(from_id);
 		return queue_script(from, to, eventno);
 	}
 
@@ -25,7 +24,7 @@ class EventManager {
 			return;
 		}
 
-		std::string script = ctx->scriptorium->get(to->family, to->genus, to->species, eventno);
+		std::string script = g_engine_context.scriptorium->get(to->family, to->genus, to->species, eventno);
 		if (script.empty()) {
 			printf("WARNING: tried to run nonexistent script %i %i %i %i\n", to->family, to->genus, to->species, eventno);
 			return;
@@ -40,12 +39,12 @@ class EventManager {
 		if (override_existing) {
 			throw_exception("override_existing not implemented");
 		}
-		for (auto& m : ctx->macros->m_pool) {
+		for (auto& m : g_engine_context.macros->m_pool) {
 			if (m.ownr == to->uid) {
 				return;
 			}
 		}
-		ctx->macros->add(m);
+		g_engine_context.macros->add(m);
 	}
 
 	void mesg_writ(ObjectHandle from_id, ObjectHandle to_id, MessageNumber message) {
@@ -63,6 +62,4 @@ class EventManager {
 
 		queue_script(from_id, to_id, eventno);
 	}
-
-	EngineContext* ctx;
 };

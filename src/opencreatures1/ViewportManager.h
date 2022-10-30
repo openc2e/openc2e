@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EngineContext.h"
 #include "common/NumericCast.h"
 #include "common/backend/Backend.h"
 #include "common/backend/Keycodes.h"
@@ -12,8 +13,7 @@ static constexpr int CREATURES1_WORLD_HEIGHT = 1200;
 
 class ViewportManager {
   public:
-	ViewportManager(std::shared_ptr<Backend> backend)
-		: m_backend(backend) {}
+	ViewportManager() {}
 	void handle_event(const BackendEvent& event) {
 		if (!(event.type == eventrawkeyup || event.type == eventrawkeydown)) {
 			return;
@@ -72,7 +72,7 @@ class ViewportManager {
 		scrolly += static_cast<int32_t>(scroll_vely);
 
 		// fix scroll
-		int32_t window_height = numeric_cast<int32_t>(m_backend->getMainRenderTarget()->getHeight());
+		int32_t window_height = numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getHeight());
 		// can't go past top or bottom
 		if (scrolly < 0) {
 			scrolly = 0;
@@ -90,11 +90,11 @@ class ViewportManager {
 	}
 
 	int32_t width() const {
-		return numeric_cast<int32_t>(m_backend->getMainRenderTarget()->getWidth());
+		return numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getWidth());
 	}
 
 	int32_t height() const {
-		return numeric_cast<int32_t>(m_backend->getMainRenderTarget()->getHeight());
+		return numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getHeight());
 	}
 
 	int32_t centerx() const {
@@ -120,6 +120,4 @@ class ViewportManager {
 
 	float scroll_velx = 0;
 	float scroll_vely = 0;
-
-	std::shared_ptr<Backend> m_backend;
 };

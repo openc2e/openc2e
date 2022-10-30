@@ -165,7 +165,7 @@ void Command_MESG(MacroContext& ctx, Macro& m) {
 		int32_t message = ctx.read_int(m);
 		ctx.read_command_separator(m);
 
-		ctx.events->mesg_writ(m.ownr, to, MessageNumber(message));
+		g_engine_context.events->mesg_writ(m.ownr, to, MessageNumber(message));
 
 	} else {
 		throw Exception(fmt::format("Unknown command 'mesg {}'", repr(subcommand)));
@@ -180,7 +180,7 @@ void Command_MVBY(MacroContext& ctx, Macro& m) {
 
 	auto* obj = ctx.get_targ(m);
 
-	move_object_by(obj, ctx.renderables, xdiff, ydiff);
+	move_object_by(obj, xdiff, ydiff);
 
 	if (ctx.debug) {
 		printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
@@ -300,8 +300,8 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 		return;
 	}
 
-	C1Sound sound = ctx.sounds->play_sound(sound_name);
-	auto bbox = get_object_bbox(targ, ctx.renderables);
+	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
+	auto bbox = get_object_bbox(targ);
 	sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
 	targ->current_sound = sound;
 
@@ -313,8 +313,8 @@ void Command_SNDE(MacroContext& ctx, Macro& m) {
 	ctx.read_arg_separator(m);
 	std::string sound_name = ctx.read_filename_token(m);
 
-	C1Sound sound = ctx.sounds->play_sound(sound_name);
-	auto bbox = get_object_bbox(ctx.get_targ(m), ctx.renderables);
+	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
+	auto bbox = get_object_bbox(ctx.get_targ(m));
 	sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
 
 	ctx.read_command_separator(m);
@@ -334,8 +334,8 @@ void Command_SNDL(MacroContext& ctx, Macro& m) {
 		return;
 	}
 
-	C1Sound sound = ctx.sounds->play_sound(sound_name, true);
-	auto bbox = get_object_bbox(targ, ctx.renderables);
+	C1Sound sound = g_engine_context.sounds->play_sound(sound_name, true);
+	auto bbox = get_object_bbox(targ);
 	sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
 	targ->current_sound = sound;
 
@@ -472,12 +472,12 @@ int32_t IntegerRV_ACTV(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
-	auto bbox = get_object_bbox(ctx.get_targ(m), ctx.renderables);
+	auto bbox = get_object_bbox(ctx.get_targ(m));
 	return bbox.bottom;
 }
 
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
-	auto bbox = get_object_bbox(ctx.get_targ(m), ctx.renderables);
+	auto bbox = get_object_bbox(ctx.get_targ(m));
 	return bbox.left;
 }
 
@@ -489,7 +489,7 @@ int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
 	ctx.read_arg_separator(m);
 	auto species = ctx.read_int(m);
 
-	return ctx.objects->count_classifier(family, genus, species);
+	return g_engine_context.objects->count_classifier(family, genus, species);
 }
 
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
@@ -515,15 +515,15 @@ void LValue_ACTV(const MacroContext& ctx, const Macro& m, int32_t value) {
 
 	switch (new_actv) {
 		case ACTV_INACTIVE:
-			ctx.events->queue_script(ownr, targ, SCRIPT_DEACTIVATE);
+			g_engine_context.events->queue_script(ownr, targ, SCRIPT_DEACTIVATE);
 			targ->actv = ACTV_INACTIVE;
 			return;
 		case ACTV_ACTIVE1:
-			ctx.events->queue_script(ownr, targ, SCRIPT_ACTIVATE1);
+			g_engine_context.events->queue_script(ownr, targ, SCRIPT_ACTIVATE1);
 			targ->actv = ACTV_ACTIVE1;
 			return;
 		case ACTV_ACTIVE2:
-			ctx.events->queue_script(ownr, targ, SCRIPT_ACTIVATE2);
+			g_engine_context.events->queue_script(ownr, targ, SCRIPT_ACTIVATE2);
 			targ->actv = ACTV_ACTIVE2;
 			return;
 	}

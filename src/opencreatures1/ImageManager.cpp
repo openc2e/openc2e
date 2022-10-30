@@ -1,5 +1,6 @@
 #include "ImageManager.h"
 
+#include "EngineContext.h"
 #include "PathManager.h"
 #include "common/Ascii.h"
 #include "common/Exception.h"
@@ -11,12 +12,11 @@
 namespace fs = ghc::filesystem;
 
 
-ImageManager::ImageManager(std::shared_ptr<PathManager> path_manager)
-	: m_path_manager(path_manager) {
+ImageManager::ImageManager() {
 }
 
 void ImageManager::load_default_palette() {
-	auto palette_dta_path = m_path_manager->find_path(PATH_TYPE_IMAGE, "PALETTE.DTA");
+	auto palette_dta_path = g_engine_context.paths->find_path(PATH_TYPE_IMAGE, "PALETTE.DTA");
 	if (palette_dta_path.empty()) {
 		throw Exception("Couldn't find PALETTE.DTA");
 	}
@@ -35,7 +35,7 @@ creaturesImage& ImageManager::get_image(std::string name, ImageType allowed_type
 	// nope, try to find it
 	fs::path path;
 	if (allowed_types & IMAGE_SPR) {
-		path = m_path_manager->find_path(PATH_TYPE_IMAGE, name + ".spr");
+		path = g_engine_context.paths->find_path(PATH_TYPE_IMAGE, name + ".spr");
 	}
 	if (path.empty()) {
 		throw Exception(fmt::format("Couldn't find image {}", repr(name)));

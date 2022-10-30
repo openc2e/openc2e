@@ -12,13 +12,9 @@
 
 using fmilliseconds = std::chrono::duration<float, std::milli>;
 
-class AudioBackend;
-class PathManager;
-class ViewportManager;
-
 class C1SoundManager {
   public:
-	C1SoundManager(std::shared_ptr<AudioBackend> audio, std::shared_ptr<PathManager> paths, std::shared_ptr<ViewportManager> viewport);
+	C1SoundManager();
 	~C1SoundManager();
 
 	void tick();
@@ -59,8 +55,5 @@ class C1SoundManager {
 	SoundData* get_sound_data(C1Sound& source);
 	C1Sound get_new_sound(AudioChannel handle);
 
-	std::shared_ptr<AudioBackend> audio;
-	std::shared_ptr<PathManager> paths;
-	std::shared_ptr<ViewportManager> viewport;
 	bool muted = false;
 };

@@ -3,41 +3,41 @@
 #include <utility>
 
 template <typename T>
-class heap_value {
+class HeapValue {
   public:
 	template <typename... Args>
-	explicit heap_value(Args&&... args) {
+	explicit HeapValue(Args&&... args) {
 		ptr = new T(std::forward<Args>(args)...);
 	}
-	heap_value(const T& other) {
+	HeapValue(const T& other) {
 		ptr = new T(other);
 	}
-	heap_value(T&& other) {
+	HeapValue(T&& other) {
 		ptr = new T(std::move(other));
 	}
-	heap_value(const heap_value& other) {
+	HeapValue(const HeapValue& other) {
 		ptr = new T(*other.ptr);
 	}
-	heap_value(heap_value&& other) {
+	HeapValue(HeapValue&& other) {
 		ptr = new T(std::move(*other.ptr));
 	}
-	heap_value& operator=(const heap_value& other) {
+	HeapValue& operator=(const HeapValue& other) {
 		(*ptr) = (*other.ptr);
 		return *this;
 	}
-	heap_value& operator=(const T& other) {
+	HeapValue& operator=(const T& other) {
 		(*ptr) = other;
 		return *this;
 	}
-	heap_value& operator=(heap_value&& other) {
+	HeapValue& operator=(HeapValue&& other) {
 		(*ptr) = std::move(*other.ptr);
 		return *this;
 	}
-	heap_value& operator=(T&& other) {
+	HeapValue& operator=(T&& other) {
 		(*ptr) = std::move(other);
 		return *this;
 	}
-	~heap_value() {
+	~HeapValue() {
 		delete ptr;
 	}
 	T* get() {

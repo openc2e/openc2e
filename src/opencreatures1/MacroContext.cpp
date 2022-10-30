@@ -38,7 +38,7 @@ std::string MacroContext::read_filename_token(Macro& m) {
 }
 
 Object* MacroContext::get_ownr(const Macro& m) const {
-	auto* ownr = objects->try_get<Object>(m.ownr);
+	auto* ownr = g_engine_context.objects->try_get<Object>(m.ownr);
 	if (!ownr) {
 		throw Exception("ownr is not a valid agent reference");
 	}
@@ -46,14 +46,11 @@ Object* MacroContext::get_ownr(const Macro& m) const {
 }
 
 Object* MacroContext::maybe_get_ownr(const Macro& m) const {
-	if (!objects) {
-		return nullptr;
-	}
-	return objects->try_get<Object>(m.ownr);
+	return g_engine_context.objects->try_get<Object>(m.ownr);
 }
 
 Object* MacroContext::get_targ(const Macro& m) const {
-	auto* targ = objects->try_get<Object>(m.targ);
+	auto* targ = g_engine_context.objects->try_get<Object>(m.targ);
 	if (!targ) {
 		throw Exception("targ is not a valid agent reference");
 	}
@@ -61,7 +58,7 @@ Object* MacroContext::get_targ(const Macro& m) const {
 }
 
 Renderable* MacroContext::get_targ_part(const Macro& m) const {
-	auto* renderable = renderables->try_get(get_targ(m)->get_part(m.part));
+	auto* renderable = g_engine_context.renderables->try_get(get_targ(m)->get_part(m.part));
 	if (!renderable) {
 		throw Exception("part is not a valid part reference");
 	}

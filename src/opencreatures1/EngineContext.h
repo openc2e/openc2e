@@ -1,22 +1,35 @@
 #pragma once
 
+#include "common/HeapValue.h"
+
 #include <memory>
 
 class EngineContext {
   public:
+	// singleton, instantiated at bottom of file
+	EngineContext(const struct EngineContextConstructTag&);
+	EngineContext(const EngineContext&) = delete;
+	EngineContext(EngineContext&&) = delete;
+	EngineContext& operator=(const EngineContext&) = delete;
+	EngineContext& operator=(EngineContext&&) = delete;
+	void reset();
+
+	// all the parts
 	std::shared_ptr<class AudioBackend> audio_backend;
-	std::shared_ptr<class SDLBackend> backend;
-	std::shared_ptr<class EventManager> events;
-	std::shared_ptr<class ImageManager> images;
-	std::shared_ptr<class MacroManager> macros;
-	std::shared_ptr<class MapManager> map;
-	std::shared_ptr<class C1MusicManager> music;
-	std::shared_ptr<class ObjectManager> objects;
-	std::shared_ptr<class PathManager> paths;
-	std::shared_ptr<class PointerManager> pointer;
-	std::shared_ptr<class RenderableManager> renderables;
-	std::shared_ptr<class Scriptorium> scriptorium;
-	std::shared_ptr<class C1SoundManager> sounds;
-	std::shared_ptr<class ViewportManager> viewport;
-	std::shared_ptr<class TimerSystem> timers;
+	std::shared_ptr<class Backend> backend;
+	HeapValue<class EventManager> events;
+	HeapValue<class ImageManager> images;
+	HeapValue<class MacroManager> macros;
+	HeapValue<class MapManager> map;
+	HeapValue<class C1MusicManager> music;
+	HeapValue<class ObjectManager> objects;
+	HeapValue<class PathManager> paths;
+	HeapValue<class PointerManager> pointer;
+	HeapValue<class RenderableManager> renderables;
+	HeapValue<class Scriptorium> scriptorium;
+	HeapValue<class C1SoundManager> sounds;
+	HeapValue<class ViewportManager> viewport;
+	HeapValue<class TimerSystem> timers;
 };
+
+extern EngineContext g_engine_context;

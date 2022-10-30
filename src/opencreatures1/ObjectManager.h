@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EngineContext.h"
 #include "Object.h"
 #include "ObjectHandle.h"
 #include "common/PointerView.h"
@@ -7,12 +8,12 @@
 
 #include <memory>
 
-static inline Renderable* get_main_part(PointerView<Object> obj, PointerView<RenderableManager> renderables) {
+static inline Renderable* get_main_part(PointerView<Object> obj) {
 	if (!obj) {
 		throw_exception("Can't get main part of null object");
 	}
 
-	auto* main_part = renderables->try_get(obj->get_part(0));
+	auto* main_part = g_engine_context.renderables->try_get(obj->get_part(0));
 	if (!main_part) {
 		throw_exception("Can't get main part of object without any parts: {}", repr(*obj));
 	}
@@ -20,8 +21,8 @@ static inline Renderable* get_main_part(PointerView<Object> obj, PointerView<Ren
 	return main_part;
 }
 
-inline Rect get_object_bbox(PointerView<Object> obj, PointerView<RenderableManager> renderables) {
-	Renderable* main_part = get_main_part(obj, renderables);
+inline Rect get_object_bbox(PointerView<Object> obj) {
+	Renderable* main_part = get_main_part(obj);
 
 	Rect r;
 	// TODO: should we actually trunc these high-precision coordinates? This only
@@ -33,7 +34,7 @@ inline Rect get_object_bbox(PointerView<Object> obj, PointerView<RenderableManag
 	return r;
 }
 
-inline void move_object_to(PointerView<Object> obj, PointerView<RenderableManager> renderables, fixed24_8_t x, fixed24_8_t y) {
+inline void move_object_to(PointerView<Object> obj, fixed24_8_t x, fixed24_8_t y) {
 	// TODO: if the object's current x-position is 100.1 and the new x-position
 	// is 100 (low-precision), should we actually move it? do we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.
@@ -42,7 +43,7 @@ inline void move_object_to(PointerView<Object> obj, PointerView<RenderableManage
 		throw_exception("Tried to move a null object");
 	}
 
-	auto* main_part = renderables->try_get(obj->get_part(0));
+	auto* main_part = g_engine_context.renderables->try_get(obj->get_part(0));
 	if (!main_part) {
 		throw_exception("Tried to move an object without any parts: {}", repr(*obj));
 	}
@@ -58,7 +59,7 @@ inline void move_object_to(PointerView<Object> obj, PointerView<RenderableManage
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
+			Renderable* part = g_engine_context.renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
 
 			part->x = x + p.x;
 			part->y = y + p.y;
@@ -66,7 +67,7 @@ inline void move_object_to(PointerView<Object> obj, PointerView<RenderableManage
 	}
 }
 
-inline void move_object_by(PointerView<Object> obj, PointerView<RenderableManager> renderables, fixed24_8_t xdiff, fixed24_8_t ydiff) {
+inline void move_object_by(PointerView<Object> obj, fixed24_8_t xdiff, fixed24_8_t ydiff) {
 	// TODO: if the object's current x-position is 100.1 and the x-diff is 5 (low-
 	// precision), do we move it to 105.1 or 105? e.g. should we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.
@@ -75,7 +76,7 @@ inline void move_object_by(PointerView<Object> obj, PointerView<RenderableManage
 		throw_exception("Tried to move a null object");
 	}
 
-	auto* main_part = renderables->try_get(obj->get_part(0));
+	auto* main_part = g_engine_context.renderables->try_get(obj->get_part(0));
 	if (!main_part) {
 		throw_exception("Tried to move an object without any parts: {}", repr(*obj));
 	}
@@ -91,7 +92,7 @@ inline void move_object_by(PointerView<Object> obj, PointerView<RenderableManage
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
+			Renderable* part = g_engine_context.renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
 
 			part->x = main_part->x + p.x;
 			part->y = main_part->y + p.y;
@@ -101,12 +102,10 @@ inline void move_object_by(PointerView<Object> obj, PointerView<RenderableManage
 
 class ObjectManager {
   private:
-	std::shared_ptr<RenderableManager> renderables;
 	DenseSlotMap<std::unique_ptr<Object>> m_pool;
 
   public:
-	ObjectManager(std::shared_ptr<RenderableManager> renderables_)
-		: renderables(renderables_) {}
+	ObjectManager() {}
 
 	template <typename T>
 	ObjectHandle add(T obj) {
@@ -150,12 +149,12 @@ class ObjectManager {
 
 		for (auto& o : m_pool) {
 			if (o->current_sound) {
-				auto bbox = get_object_bbox(o, renderables);
+				auto bbox = get_object_bbox(o);
 				o->current_sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
 			}
 
 			if (auto* vehicle = dynamic_cast<Vehicle*>(o.get())) {
-				move_object_by(vehicle, renderables, vehicle->xvel, vehicle->yvel);
+				move_object_by(vehicle, vehicle->xvel, vehicle->yvel);
 			}
 		}
 	}

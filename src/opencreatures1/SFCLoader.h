@@ -19,12 +19,11 @@ class SFCLoader {
   public:
 	SFCLoader(const sfc::SFCFile&);
 
-	void load_viewport(PointerView<ViewportManager>);
-	void load_map(PointerView<MapManager>);
-	void load_objects(PointerView<ObjectManager>, PointerView<RenderableManager>,
-		PointerView<ImageManager>, PointerView<C1SoundManager>);
-	void load_scripts(PointerView<Scriptorium>);
-	void load_macros(PointerView<MacroManager>);
+	void load_viewport();
+	void load_map();
+	void load_objects();
+	void load_scripts();
+	void load_macros();
 
 	std::map<sfc::ObjectV1*, ObjectHandle> sfc_object_mapping;
 

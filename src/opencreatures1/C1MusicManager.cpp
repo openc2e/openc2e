@@ -1,5 +1,6 @@
 #include "C1MusicManager.h"
 
+#include "EngineContext.h"
 #include "PathManager.h"
 #include "common/Random.h"
 #include "common/audio/AudioBackend.h"
@@ -14,8 +15,7 @@ using namespace std::chrono;
 
 static constexpr int MS_PER_TICK = 100;
 
-C1MusicManager::C1MusicManager(std::shared_ptr<PathManager> path_manager, std::shared_ptr<AudioBackend> backend)
-	: m_backend(backend), m_path_manager(path_manager) {
+C1MusicManager::C1MusicManager() {
 	m_timepoint_to_play_next_sound = c1clock::now() + milliseconds(20 * MS_PER_TICK);
 }
 
@@ -42,15 +42,15 @@ void C1MusicManager::setMuted(bool muted) {
 
 void C1MusicManager::updateVolumes() {
 	// reduce overall volume of clips to 80%
-	m_backend->setChannelVolume(m_audio_channel, m_muted ? 0 : m_volume * 0.8f);
+	g_engine_context.audio_backend->setChannelVolume(m_audio_channel, m_muted ? 0 : m_volume * 0.8f);
 }
 
 void C1MusicManager::update() {
 	// play C1 music
-	if (m_timepoint_to_play_next_sound <= c1clock::now() && m_backend->getChannelState(m_audio_channel) == AUDIO_STOPPED) {
-		auto sounds = m_path_manager->find_path_wildcard(PATH_TYPE_SOUND, "MU*.wav");
+	if (m_timepoint_to_play_next_sound <= c1clock::now() && g_engine_context.audio_backend->getChannelState(m_audio_channel) == AUDIO_STOPPED) {
+		auto sounds = g_engine_context.paths->find_path_wildcard(PATH_TYPE_SOUND, "MU*.wav");
 		if (sounds.size()) {
-			m_audio_channel = m_backend->playClip(rand_choice(sounds));
+			m_audio_channel = g_engine_context.audio_backend->playClip(rand_choice(sounds));
 		}
 		auto ticks_until_next_sound = rand_int32(50, 99);
 		m_timepoint_to_play_next_sound = c1clock::now() + milliseconds(MS_PER_TICK * ticks_until_next_sound);

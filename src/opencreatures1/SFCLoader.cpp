@@ -1,6 +1,7 @@
 #include "SFCLoader.h"
 
 #include "C1SoundManager.h"
+#include "EngineContext.h"
 #include "ImageManager.h"
 #include "MacroManager.h"
 #include "MapManager.h"
@@ -9,14 +10,7 @@
 #include "Scriptorium.h"
 #include "ViewportManager.h"
 
-struct SFCLoadContext {
-	ObjectManager* objects = nullptr;
-	RenderableManager* renderables = nullptr;
-	ImageManager* images = nullptr;
-	C1SoundManager* sounds = nullptr;
-};
-
-static Renderable renderable_from_sfc_entity(SFCLoadContext& ctx, sfc::EntityV1& part) {
+static Renderable renderable_from_sfc_entity(sfc::EntityV1& part) {
 	if (part.x >= CREATURES1_WORLD_WIDTH) {
 		throw Exception(fmt::format("Expected x to be between [0, {}), but got {}", CREATURES1_WORLD_WIDTH, part.x));
 	}
@@ -31,7 +25,7 @@ static Renderable renderable_from_sfc_entity(SFCLoadContext& ctx, sfc::EntityV1&
 	r.object_sprite_base = part.sprite->first_sprite;
 	r.part_sprite_base = part.image_offset;
 	r.sprite_index = part.current_sprite - part.image_offset;
-	r.sprite = ctx.images->get_image(part.sprite->filename, ImageManager::IMAGE_SPR);
+	r.sprite = g_engine_context.images->get_image(part.sprite->filename, ImageManager::IMAGE_SPR);
 	r.has_animation = part.has_animation;
 	if (part.has_animation) {
 		r.animation_frame = part.animation_frame;
@@ -40,7 +34,7 @@ static Renderable renderable_from_sfc_entity(SFCLoadContext& ctx, sfc::EntityV1&
 	return r;
 }
 
-static Object object_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::ObjectV1& p) {
+static Object object_without_refs_from_sfc(const sfc::ObjectV1& p) {
 	Object obj;
 	obj.species = p.species;
 	obj.genus = p.genus;
@@ -57,7 +51,7 @@ static Object object_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::Objec
 	obj.tick_value = p.tick_value;
 	obj.ticks_since_last_tick_event = p.ticks_since_last_tick_event;
 	if (!p.current_sound.empty()) {
-		obj.current_sound = ctx.sounds->play_sound(p.current_sound, true);
+		obj.current_sound = g_engine_context.sounds->play_sound(p.current_sound, true);
 	}
 	// obj.objp = sfc_object_mapping.at(p.objp);
 	obj.obv0 = p.obv0;
@@ -66,23 +60,23 @@ static Object object_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::Objec
 	return obj;
 }
 
-static SimpleObject simple_object_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::SimpleObjectV1& p) {
+static SimpleObject simple_object_without_refs_from_sfc(const sfc::SimpleObjectV1& p) {
 	SimpleObject obj;
-	static_cast<Object&>(obj) = object_without_refs_from_sfc(ctx, p);
-	obj.part = ctx.renderables->add(renderable_from_sfc_entity(ctx, *p.part));
+	static_cast<Object&>(obj) = object_without_refs_from_sfc(p);
+	obj.part = g_engine_context.renderables->add(renderable_from_sfc_entity(*p.part));
 	obj.z_order = p.z_order;
 	obj.click_bhvr = p.click_bhvr;
 	obj.touch_bhvr = p.touch_bhvr;
 	return obj;
 }
 
-static CompoundObject compound_object_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::CompoundObjectV1& comp) {
+static CompoundObject compound_object_without_refs_from_sfc(const sfc::CompoundObjectV1& comp) {
 	CompoundObject obj;
-	static_cast<Object&>(obj) = object_without_refs_from_sfc(ctx, comp);
+	static_cast<Object&>(obj) = object_without_refs_from_sfc(comp);
 
 	for (auto& cp : comp.parts) {
 		CompoundPart part;
-		part.renderable = ctx.renderables->add(renderable_from_sfc_entity(ctx, *cp.entity));
+		part.renderable = g_engine_context.renderables->add(renderable_from_sfc_entity(*cp.entity));
 		part.x = cp.x;
 		part.y = cp.y;
 		obj.parts.push_back(part);
@@ -105,11 +99,11 @@ SFCLoader::SFCLoader(const sfc::SFCFile& sfc_)
 	sfc_object_mapping[nullptr] = {};
 }
 
-void SFCLoader::load_viewport(PointerView<ViewportManager> viewport) {
-	viewport->scrollx = sfc.scrollx;
-	viewport->scrolly = sfc.scrolly;
+void SFCLoader::load_viewport() {
+	g_engine_context.viewport->scrollx = sfc.scrollx;
+	g_engine_context.viewport->scrolly = sfc.scrolly;
 }
-void SFCLoader::load_map(PointerView<MapManager> map) {
+void SFCLoader::load_map() {
 	for (auto& r : sfc.map->rooms) {
 		Room room;
 		room.left = r.left;
@@ -117,13 +111,13 @@ void SFCLoader::load_map(PointerView<MapManager> map) {
 		room.right = r.right;
 		room.bottom = r.bottom;
 		room.type = r.type;
-		map->rooms.push_back(room);
+		g_engine_context.map->rooms.push_back(room);
 	}
 }
 
-static Vehicle vehicle_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::VehicleV1& veh) {
+static Vehicle vehicle_without_refs_from_sfc(const sfc::VehicleV1& veh) {
 	Vehicle obj;
-	static_cast<CompoundObject&>(obj) = compound_object_without_refs_from_sfc(ctx, veh);
+	static_cast<CompoundObject&>(obj) = compound_object_without_refs_from_sfc(veh);
 
 	obj.xvel = fixed24_8_t::from_raw(veh.xvel_times_256);
 	obj.yvel = fixed24_8_t::from_raw(veh.yvel_times_256);
@@ -140,75 +134,68 @@ static Vehicle vehicle_without_refs_from_sfc(SFCLoadContext& ctx, const sfc::Veh
 }
 
 
-void SFCLoader::load_objects(PointerView<ObjectManager> objects, PointerView<RenderableManager> renderables,
-	PointerView<ImageManager> images, PointerView<C1SoundManager> sounds) {
-	SFCLoadContext ctx;
-	ctx.images = images;
-	ctx.objects = objects;
-	ctx.renderables = renderables;
-	ctx.sounds = sounds;
-
+void SFCLoader::load_objects() {
 	// first load toplevel objects
 	for (auto* p : sfc.objects) {
 		if (auto* pt = dynamic_cast<sfc::PointerToolV1*>(p)) {
 			PointerTool obj;
-			static_cast<SimpleObject&>(obj) = simple_object_without_refs_from_sfc(ctx, *pt);
+			static_cast<SimpleObject&>(obj) = simple_object_without_refs_from_sfc(*pt);
 			obj.relx = pt->relx;
 			obj.rely = pt->rely;
 			// obj.bubble = pt->bubble;
 			obj.text = pt->text;
-			auto handle = objects->add(obj);
+			auto handle = g_engine_context.objects->add(obj);
 			sfc_object_mapping[p] = handle;
 
 		} else if (auto* simp = dynamic_cast<sfc::SimpleObjectV1*>(p)) {
-			SimpleObject obj = simple_object_without_refs_from_sfc(ctx, *simp);
-			sfc_object_mapping[p] = objects->add(obj);
+			SimpleObject obj = simple_object_without_refs_from_sfc(*simp);
+			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
 
 		} else if (auto* veh = dynamic_cast<sfc::VehicleV1*>(p)) {
-			Vehicle obj = vehicle_without_refs_from_sfc(ctx, *veh);
-			sfc_object_mapping[p] = objects->add(obj);
+			Vehicle obj = vehicle_without_refs_from_sfc(*veh);
+			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
 
 		} else if (auto* comp = dynamic_cast<sfc::CompoundObjectV1*>(p)) {
-			CompoundObject obj = compound_object_without_refs_from_sfc(ctx, *comp);
-			sfc_object_mapping[p] = objects->add(obj);
+			CompoundObject obj = compound_object_without_refs_from_sfc(*comp);
+			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
 
 		} else {
-			Object obj = object_without_refs_from_sfc(ctx, *p);
-			sfc_object_mapping[p] = objects->add(obj);
+			Object obj = object_without_refs_from_sfc(*p);
+			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
 		}
 	}
 	for (auto* p : sfc.sceneries) {
 		Scenery scen;
-		static_cast<Object&>(scen) = object_without_refs_from_sfc(ctx, *p);
-		scen.part = renderables->add(renderable_from_sfc_entity(ctx, *p->part));
-		sfc_object_mapping[p] = objects->add(scen);
+		static_cast<Object&>(scen) = object_without_refs_from_sfc(*p);
+		scen.part = g_engine_context.renderables->add(renderable_from_sfc_entity(*p->part));
+		sfc_object_mapping[p] = g_engine_context.objects->add(scen);
 	}
 	// patch up object references
 	for (auto* p : sfc.objects) {
 		ObjectHandle handle = sfc_object_mapping[p];
-		Object* obj = objects->try_get<Object>(handle);
+		Object* obj = g_engine_context.objects->try_get<Object>(handle);
 		obj->carrier = sfc_object_mapping[p->carrier];
 		obj->objp = sfc_object_mapping[p->objp];
 
 		if (auto* pt = dynamic_cast<sfc::PointerToolV1*>(p)) {
-			auto pointertool = objects->try_get<PointerTool>(handle);
+			auto pointertool = g_engine_context.objects->try_get<PointerTool>(handle);
 			pointertool->bubble = sfc_object_mapping[pt->bubble];
 		}
 	}
 	for (auto* p : sfc.sceneries) {
-		Object* obj = objects->try_get<Object>(sfc_object_mapping[p]);
+		Object* obj = g_engine_context.objects->try_get<Object>(sfc_object_mapping[p]);
 		obj->carrier = sfc_object_mapping[p->carrier];
 		obj->objp = sfc_object_mapping[p->objp];
 	}
 }
 
-void SFCLoader::load_scripts(PointerView<Scriptorium> scriptorium) {
+void SFCLoader::load_scripts() {
 	for (auto& s : sfc.scripts) {
-		scriptorium->add(s.family, s.genus, s.species, s.eventno, s.text);
+		g_engine_context.scriptorium->add(s.family, s.genus, s.species, s.eventno, s.text);
 	}
 }
 
-void SFCLoader::load_macros(PointerView<MacroManager> macros) {
+void SFCLoader::load_macros() {
 	for (auto* m : sfc.macros) {
 		Macro macro;
 		macro.selfdestruct = m->selfdestruct;
@@ -229,6 +216,6 @@ void SFCLoader::load_macros(PointerView<MacroManager> macros) {
 		macro.subroutine_address = m->subroutine_address;
 		macro.wait = m->wait;
 
-		macros->add(macro);
+		g_engine_context.macros->add(macro);
 	}
 }

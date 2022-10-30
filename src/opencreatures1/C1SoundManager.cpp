@@ -1,5 +1,6 @@
 #include "C1SoundManager.h"
 
+#include "EngineContext.h"
 #include "PathManager.h"
 #include "ViewportManager.h"
 #include "common/Exception.h"
@@ -9,9 +10,7 @@
 #include <cmath>
 #include <fmt/core.h>
 
-C1SoundManager::C1SoundManager(std::shared_ptr<AudioBackend> audio_,
-	std::shared_ptr<PathManager> paths_, std::shared_ptr<ViewportManager> viewport_)
-	: audio(audio_), paths(paths_), viewport(viewport_) {
+C1SoundManager::C1SoundManager() {
 }
 C1SoundManager::~C1SoundManager() {
 }
@@ -26,7 +25,7 @@ void C1SoundManager::set_muted(bool muted_) {
 }
 
 bool C1SoundManager::is_alive(SoundData& sound_data) {
-	if (sound_data.handle && audio->getChannelState(sound_data.handle) == AUDIO_PLAYING) {
+	if (sound_data.handle && g_engine_context.audio_backend->getChannelState(sound_data.handle) == AUDIO_PLAYING) {
 		return true;
 	} else {
 		return false;
@@ -73,16 +72,16 @@ void C1SoundManager::update_volume(SoundData& s) {
 	float volume = muted ? 0 : 1;
 
 	if (s.positioned) {
-		const auto centerx = viewport->centerx();
-		const auto centery = viewport->centery();
+		const auto centerx = g_engine_context.viewport->centerx();
+		const auto centery = g_engine_context.viewport->centery();
 
 		// std::remainder gives the distance between x and centerx, taking
 		// into account world wraparound ("modular distance")
 		const float distx = std::remainder(s.x + s.width / 2.0f - centerx, CREATURES1_WORLD_WIDTH * 1.0f);
 		const float disty = s.y + s.height / 2.0f - centery;
 
-		const float screen_width = viewport->width();
-		const float screen_height = viewport->height();
+		const float screen_width = g_engine_context.viewport->width();
+		const float screen_height = g_engine_context.viewport->height();
 
 		// If a sound is on-screen, then play it at full volume.
 		// If it's more than a screen offscreen, then mute it.
@@ -103,18 +102,18 @@ void C1SoundManager::update_volume(SoundData& s) {
 		// Pan sound as we get closer to screen edge
 		// TODO: Does this sound right?
 		float pan = clamp(distx / screen_width, -1, 1);
-		audio->setChannelPan(s.handle, pan);
+		g_engine_context.audio_backend->setChannelPan(s.handle, pan);
 	}
 
 	if (s.fade_start != decltype(s.fade_start)()) {
 		float volume_multiplier = 1 - (std::chrono::steady_clock::now() - s.fade_start) / s.fade_length;
 		if (volume_multiplier <= 0) {
-			audio->stopChannel(s.handle);
+			g_engine_context.audio_backend->stopChannel(s.handle);
 		}
 		volume *= volume_multiplier;
 	}
 
-	audio->setChannelVolume(s.handle, volume);
+	g_engine_context.audio_backend->setChannelVolume(s.handle, volume);
 }
 
 void C1SoundManager::update_volumes() {
@@ -132,14 +131,14 @@ C1Sound C1SoundManager::play_sound(std::string name, bool loop) {
 	if (name.size() == 0)
 		return {};
 
-	std::string filename = paths->find_path(PATH_TYPE_SOUND, name + ".wav");
+	std::string filename = g_engine_context.paths->find_path(PATH_TYPE_SOUND, name + ".wav");
 	if (filename.empty()) {
 		// creatures 1 ignores non-existent audio clips
 		fmt::print("WARNING: couldn't find audio clip {}\n", repr(name));
 		return {};
 	}
 
-	auto handle = audio->playClip(filename, loop);
+	auto handle = g_engine_context.audio_backend->playClip(filename, loop);
 	if (!handle) {
 		// note that more specific error messages can be thrown by implementations of playClip
 		throw_exception("failed to play audio clip {}{}", filename, loop ? " (loop)" : "");
@@ -149,11 +148,11 @@ C1Sound C1SoundManager::play_sound(std::string name, bool loop) {
 }
 
 void C1SoundManager::stop(SoundData& source_data) {
-	return audio->stopChannel(source_data.handle);
+	return g_engine_context.audio_backend->stopChannel(source_data.handle);
 }
 
 AudioState C1SoundManager::get_channel_state(SoundData& source_data) {
-	return audio->getChannelState(source_data.handle);
+	return g_engine_context.audio_backend->getChannelState(source_data.handle);
 }
 
 void C1SoundManager::tick() {

@@ -124,7 +124,7 @@ static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = null
 			throw MNGFileException("Variable '" + *variable + "' only valid inside Layer");
 		}
 		return layer->getVariable(*variable);
-	} else if (auto* function_p = e.get_if<heap_value<MNGFunction>>()) {
+	} else if (auto* function_p = e.get_if<HeapValue<MNGFunction>>()) {
 		auto function = *function_p;
 		switch (function->type) {
 			case MNG_ADD:

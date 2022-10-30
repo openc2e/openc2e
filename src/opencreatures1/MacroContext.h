@@ -89,11 +89,6 @@ class MacroContext {
 	bool debug = false;
 	int32_t instructions_left_this_tick = 0;
 
-	ObjectManager* objects = nullptr;
-	RenderableManager* renderables = nullptr;
-	EventManager* events = nullptr;
-	C1SoundManager* sounds = nullptr;
-
 	std::map<Token, CommandFunc> command_funcs;
 	std::map<Token, AgentRVFunc> agentrv_funcs;
 	std::map<Token, IntegerRVFunc> integerrv_funcs;
