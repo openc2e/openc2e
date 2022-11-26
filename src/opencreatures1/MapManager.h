@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/creaturesImage.h"
+
 class Room {
   public:
 	int left;
@@ -11,5 +13,6 @@ class Room {
 
 class MapManager {
   public:
+	creaturesImage background;
 	std::vector<Room> rooms;
 };
