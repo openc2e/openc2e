@@ -122,7 +122,6 @@ void draw_everything() {
 void update_everything() {
 	// these should update as often as possible, regardless of ticks
 	g_engine_context.music->update();
-	g_engine_context.pointer->update();
 
 	// some things can update only every "tick" - 1/10sec
 	static std::chrono::time_point<std::chrono::steady_clock> time_of_last_tick{};
@@ -138,6 +137,10 @@ void update_everything() {
 		// renderables tick after CAOS runs, otherwise the OVER command is too fast
 		g_engine_context.renderables->tick();
 	}
+
+	// these should update as often as possible, regardless of ticks
+	// update pointer after viewport
+	g_engine_context.pointer->update();
 }
 
 extern "C" int main(int argc, char** argv) {
