@@ -19,6 +19,9 @@ class SFCLoader {
   public:
 	SFCLoader(const sfc::SFCFile&);
 
+	void load_everything();
+
+  private:
 	void load_viewport();
 	void load_map();
 	void load_objects();
@@ -26,7 +29,5 @@ class SFCLoader {
 	void load_macros();
 
 	std::map<sfc::ObjectV1*, ObjectHandle> sfc_object_mapping;
-
-  private:
 	const sfc::SFCFile& sfc;
 };

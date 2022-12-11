@@ -67,6 +67,7 @@ struct BacteriumV1 {
 };
 
 struct MapDataV1 {
+	uint32_t unused_is_wrappable;
 	uint32_t time_of_day;
 	CGalleryV1* background;
 	std::vector<RoomV1> rooms;
@@ -74,7 +75,7 @@ struct MapDataV1 {
 	std::array<BacteriumV1, 100> bacteria;
 
 	void read_from(MFCReader& in) {
-		(void)in.read32le(); // padding, unused
+		unused_is_wrappable = in.read32le();
 		time_of_day = in.read32le();
 
 		background = in.read_type<CGalleryV1>();

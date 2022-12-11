@@ -52,25 +52,7 @@ void load_everything() {
 
 	// load world data
 	SFCLoader loader(sfc);
-	loader.load_viewport();
-	loader.load_map();
-	loader.load_objects();
-	loader.load_scripts();
-	loader.load_macros();
-
-	// find our pointer
-	for (auto obj : g_engine_context.objects->find_all<PointerTool>()) {
-		g_engine_context.pointer->m_pointer_tool = obj;
-	}
-
-	// load background
-	auto background_name = sfc.map->background->filename;
-	fmt::print("* Background sprite: {}\n", repr(background_name));
-	auto background = g_engine_context.map->background = g_engine_context.images->get_image(background_name, ImageManager::IMAGE_SPR);
-	// TODO: do any C1 metarooms have non-standard sizes?
-	if (background.width(0) != CREATURES1_WORLD_WIDTH || background.height(0) != CREATURES1_WORLD_HEIGHT) {
-		throw Exception(fmt::format("Expected Creatures 1 background size to be 8352x1200 but got {}x{}", background.width(0), background.height(0)));
-	}
+	loader.load_everything();
 
 	// fire init scripts
 	for (auto& o : *g_engine_context.objects) {

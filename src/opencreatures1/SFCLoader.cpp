@@ -6,9 +6,12 @@
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "ObjectManager.h"
+#include "PointerManager.h"
 #include "Renderable.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
+
+#include <fmt/ranges.h>
 
 static Renderable renderable_from_sfc_entity(sfc::EntityV1& part) {
 	if (part.x >= CREATURES1_WORLD_WIDTH) {
@@ -99,11 +102,61 @@ SFCLoader::SFCLoader(const sfc::SFCFile& sfc_)
 	sfc_object_mapping[nullptr] = {};
 }
 
+void SFCLoader::load_everything() {
+	fmt::print("INFO [SFCLoader] Loading map...\n");
+	load_map();
+
+	fmt::print("INFO [SFCLoader] Loading objects and sceneries...\n");
+	load_objects();
+	// find our pointer
+	for (auto obj : g_engine_context.objects->find_all<PointerTool>()) {
+		g_engine_context.pointer->m_pointer_tool = obj;
+	}
+
+	fmt::print("INFO [SFCLoader] Loading scriptorium...\n");
+	load_scripts();
+
+	fmt::print("INFO [SFCLoader] Loading viewport...\n");
+	load_viewport();
+
+	fmt::print("WARN [SFCLoader] Unsupported: current norn\n");
+	fmt::print("WARN [SFCLoader] Unsupported: favorite places\n");
+	fmt::print("WARN [SFCLoader] Unsupported: speech history\n");
+
+	fmt::print("INFO [SFCLoader] Loading macros...\n");
+	load_macros();
+
+	fmt::print("WARN [SFCLoader] Unsupported: death row objects\n");
+	fmt::print("WARN [SFCLoader] Unsupported: event objects\n");
+	fmt::print("WARN [SFCLoader] Unsupported: current score\n");
+	fmt::print("WARN [SFCLoader] Unsupported: current health\n");
+	fmt::print("WARN [SFCLoader] Unsupported: hatchery eggs\n");
+	fmt::print("WARN [SFCLoader] Unsupported: natural eggs\n");
+	fmt::print("WARN [SFCLoader] Unsupported: dead norns\n");
+	fmt::print("WARN [SFCLoader] Unsupported: live norns\n");
+	fmt::print("WARN [SFCLoader] Unsupported: breeder score\n");
+	fmt::print("WARN [SFCLoader] Unsupported: system tick\n");
+	fmt::print("WARN [SFCLoader] Unsupported: stuffed norns\n");
+}
+
 void SFCLoader::load_viewport() {
 	g_engine_context.viewport->scrollx = sfc.scrollx;
 	g_engine_context.viewport->scrolly = sfc.scrolly;
 }
 void SFCLoader::load_map() {
+	if (sfc.map->unused_is_wrappable != 0) {
+		fmt::print("WARN [SFCLoader] unused_is_wrappable = {}, expected 0\n", sfc.map->unused_is_wrappable);
+	}
+	fmt::print("WARN [SFCLoader] Unsupported: time_of_day = {}\n", sfc.map->time_of_day);
+
+	fmt::print("INFO [SFCLoader] Loading background = {}.spr\n", sfc.map->background->filename);
+	auto background = g_engine_context.map->background = g_engine_context.images->get_image(sfc.map->background->filename, ImageManager::IMAGE_SPR);
+	// TODO: do any C1 metarooms have non-standard sizes?
+	if (background.width(0) != CREATURES1_WORLD_WIDTH || background.height(0) != CREATURES1_WORLD_HEIGHT) {
+		throw Exception(fmt::format("Expected Creatures 1 background size to be 8352x1200 but got {}x{}", background.width(0), background.height(0)));
+	}
+
+	fmt::print("INFO [SFCLoader] Loading rooms...\n");
 	for (auto& r : sfc.map->rooms) {
 		Room room;
 		room.left = r.left;
@@ -113,6 +166,8 @@ void SFCLoader::load_map() {
 		room.type = r.type;
 		g_engine_context.map->rooms.push_back(room);
 	}
+	fmt::print("WARN [SFCLoader] Unsupported: ground_level\n");
+	fmt::print("WARN [SFCLoader] Unsupported: bacteria\n");
 }
 
 static Vehicle vehicle_without_refs_from_sfc(const sfc::VehicleV1& veh) {
@@ -137,6 +192,22 @@ static Vehicle vehicle_without_refs_from_sfc(const sfc::VehicleV1& veh) {
 void SFCLoader::load_objects() {
 	// first load toplevel objects
 	for (auto* p : sfc.objects) {
+		if (dynamic_cast<sfc::BubbleV1*>(p)) {
+			fmt::print("WARN [SFCLoader] Unsupported object type: Bubble\n");
+		}
+		if (dynamic_cast<sfc::CallButtonV1*>(p)) {
+			fmt::print("WARN [SFCLoader] Unsupported object type: CallButton\n");
+		}
+		if (dynamic_cast<sfc::LiftV1*>(p)) {
+			fmt::print("WARN [SFCLoader] Unsupported object type: Lift\n");
+		}
+		if (dynamic_cast<sfc::BlackboardV1*>(p)) {
+			fmt::print("WARN [SFCLoader] Unsupported object type: Blackboard\n");
+		}
+		if (dynamic_cast<sfc::CreatureV1*>(p)) {
+			fmt::print("WARN [SFCLoader] Unsupported object type: Creature\n");
+		}
+
 		if (auto* pt = dynamic_cast<sfc::PointerToolV1*>(p)) {
 			PointerTool obj;
 			static_cast<SimpleObject&>(obj) = simple_object_without_refs_from_sfc(*pt);
