@@ -10,7 +10,6 @@
 #include "ObjectManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
-#include "RenderableManager.h"
 #include "Scriptorium.h"
 #include "TimerSystem.h"
 #include "ViewportManager.h"

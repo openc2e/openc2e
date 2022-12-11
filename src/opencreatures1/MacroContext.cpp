@@ -58,7 +58,7 @@ Object* MacroContext::get_targ(const Macro& m) const {
 }
 
 Renderable* MacroContext::get_targ_part(const Macro& m) const {
-	auto* renderable = g_engine_context.renderables->try_get(get_targ(m)->get_part(m.part));
+	auto* renderable = get_targ(m)->get_renderable_for_part(m.part);
 	if (!renderable) {
 		throw Exception("part is not a valid part reference");
 	}

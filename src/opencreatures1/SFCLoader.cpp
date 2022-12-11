@@ -6,7 +6,7 @@
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "ObjectManager.h"
-#include "RenderableManager.h"
+#include "Renderable.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
 
@@ -63,7 +63,7 @@ static Object object_without_refs_from_sfc(const sfc::ObjectV1& p) {
 static SimpleObject simple_object_without_refs_from_sfc(const sfc::SimpleObjectV1& p) {
 	SimpleObject obj;
 	static_cast<Object&>(obj) = object_without_refs_from_sfc(p);
-	obj.part = g_engine_context.renderables->add(renderable_from_sfc_entity(*p.part));
+	obj.part = renderable_from_sfc_entity(*p.part);
 	obj.z_order = p.z_order;
 	obj.click_bhvr = p.click_bhvr;
 	obj.touch_bhvr = p.touch_bhvr;
@@ -76,7 +76,7 @@ static CompoundObject compound_object_without_refs_from_sfc(const sfc::CompoundO
 
 	for (auto& cp : comp.parts) {
 		CompoundPart part;
-		part.renderable = g_engine_context.renderables->add(renderable_from_sfc_entity(*cp.entity));
+		part.renderable = renderable_from_sfc_entity(*cp.entity);
 		part.x = cp.x;
 		part.y = cp.y;
 		obj.parts.push_back(part);
@@ -167,7 +167,7 @@ void SFCLoader::load_objects() {
 	for (auto* p : sfc.sceneries) {
 		Scenery scen;
 		static_cast<Object&>(scen) = object_without_refs_from_sfc(*p);
-		scen.part = g_engine_context.renderables->add(renderable_from_sfc_entity(*p->part));
+		scen.part = renderable_from_sfc_entity(*p->part);
 		sfc_object_mapping[p] = g_engine_context.objects->add(scen);
 	}
 	// patch up object references

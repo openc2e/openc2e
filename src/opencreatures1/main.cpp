@@ -9,7 +9,7 @@
 #include "ObjectManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
-#include "RenderableManager.h"
+#include "Renderable.h"
 #include "SFCLoader.h"
 #include "Scriptorium.h"
 #include "TimerSystem.h"
@@ -86,13 +86,26 @@ void draw_everything() {
 	renderer->renderCreaturesImage(g_engine_context.map->background, 0, -g_engine_context.viewport->scrollx + CREATURES1_WORLD_WIDTH, -g_engine_context.viewport->scrolly);
 
 	// draw entities
-	for (auto& r : g_engine_context.renderables->iter_zorder()) {
-		int x = r.x.trunc() - g_engine_context.viewport->scrollx;
-		int y = r.y.trunc();
+	std::vector<Renderable*> renderables;
+	for (auto& o : *g_engine_context.objects) {
+		for (int32_t partno = 0; true; ++partno) {
+			auto* r = o->get_renderable_for_part(partno);
+			if (!r) {
+				break;
+			}
+			renderables.push_back(r);
+		}
+	}
+	std::stable_sort(renderables.begin(), renderables.end(), [](auto* left, auto* right) {
+		return left->z < right->z;
+	});
+	for (auto* r : renderables) {
+		int x = r->x.trunc() - g_engine_context.viewport->scrollx;
+		int y = r->y.trunc();
 		// what to do if it's near the wraparound? just draw three times?
-		renderer->renderCreaturesImage(r.sprite, numeric_cast<uint32_t>(r.frame()), x, y - g_engine_context.viewport->scrolly);
-		renderer->renderCreaturesImage(r.sprite, numeric_cast<uint32_t>(r.frame()), x - CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
-		renderer->renderCreaturesImage(r.sprite, numeric_cast<uint32_t>(r.frame()), x + CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
+		renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x, y - g_engine_context.viewport->scrolly);
+		renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x - CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
+		renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x + CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
 	}
 
 	// draw rooms
@@ -119,6 +132,40 @@ void draw_everything() {
 	}
 }
 
+void update_animations() {
+	for (auto& o : *g_engine_context.objects) {
+		for (int32_t partno = 0; true; ++partno) {
+			auto* r = o->get_renderable_for_part(partno);
+			if (!r) {
+				break;
+			}
+
+			if (!r->has_animation) {
+				continue;
+			}
+
+			if (r->animation_frame >= r->animation_string.size()) {
+				// already done
+				// TODO: are we on the correct frame already?
+				// TODO: clear animation?
+				r->has_animation = false;
+				r->animation_string = {};
+				r->animation_frame = 0;
+				continue;
+			}
+
+			// some objects in Eden.sfc start at the 'R' character, so set frame
+			// before incrementing.
+			// TODO: assert isdigit
+			if (r->animation_string[r->animation_frame] == 'R') {
+				r->animation_frame = 0;
+			}
+			r->sprite_index = r->animation_string[r->animation_frame] - '0';
+			r->animation_frame += 1;
+		}
+	}
+}
+
 void update_everything() {
 	// these should update as often as possible, regardless of ticks
 	g_engine_context.music->update();
@@ -134,8 +181,8 @@ void update_everything() {
 		g_engine_context.objects->tick();
 		g_engine_context.timers->tick();
 		g_engine_context.macros->tick();
-		// renderables tick after CAOS runs, otherwise the OVER command is too fast
-		g_engine_context.renderables->tick();
+		// animations tick after CAOS runs, otherwise the OVER command is too fast
+		update_animations();
 	}
 
 	// these should update as often as possible, regardless of ticks

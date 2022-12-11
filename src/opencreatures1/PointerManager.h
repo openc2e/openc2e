@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ObjectManager.h"
-#include "RenderableManager.h"
 #include "ViewportManager.h"
 #include "common/backend/BackendEvent.h"
 
@@ -16,7 +15,7 @@ class PointerManager {
 
 	void update() {
 		PointerTool* pointer = g_engine_context.objects->try_get<PointerTool>(m_pointer_tool);
-		Renderable* r = g_engine_context.renderables->try_get(pointer->part);
+		Renderable* r = pointer->get_renderable_for_part(0);
 		r->x = m_screenx + g_engine_context.viewport->scrollx - pointer->relx;
 		r->y = m_screeny + g_engine_context.viewport->scrolly - pointer->rely;
 	}

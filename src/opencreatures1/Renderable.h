@@ -2,7 +2,6 @@
 
 #include "common/FixedPoint.h"
 #include "common/NumericCast.h"
-#include "common/SlotMap.h"
 #include "common/creaturesImage.h"
 
 #include <fmt/core.h>
@@ -60,64 +59,3 @@ struct fmt::formatter<Renderable> {
 		}
 	}
 };
-
-class RenderableManager {
-  private:
-	bool m_needs_sorting;
-	DenseSlotMap<Renderable> m_pool;
-
-  public:
-	using Handle = decltype(m_pool)::Key;
-
-  public:
-	Handle add(Renderable e) {
-		m_needs_sorting = true;
-		return m_pool.add(std::move(e));
-	}
-
-	Renderable* try_get(Handle handle) {
-		return m_pool.try_get(handle);
-	}
-
-	void tick() {
-		for (auto& r : m_pool) {
-			if (!r.has_animation) {
-				continue;
-			}
-
-			if (r.animation_frame >= r.animation_string.size()) {
-				// already done
-				// TODO: are we on the correct frame already?
-				// TODO: clear animation?
-				r.has_animation = false;
-				r.animation_string = {};
-				r.animation_frame = 0;
-				continue;
-			}
-
-			// some objects in Eden.sfc start at the 'R' character, so set frame
-			// before incrementing.
-			// TODO: assert isdigit
-			if (r.animation_string[r.animation_frame] == 'R') {
-				r.animation_frame = 0;
-			}
-			r.sprite_index = r.animation_string[r.animation_frame] - '0';
-			r.animation_frame += 1;
-		}
-	}
-
-	auto iter_zorder() {
-		if (m_needs_sorting) {
-			fmt::print("* [RenderableManager] Resorting entities by z-order\n");
-			m_pool.stable_sort([](const Renderable& left, const Renderable& right) { return left.z < right.z; });
-			m_needs_sorting = false;
-		}
-		return m_pool;
-	}
-
-	bool contains(Handle handle) const {
-		return m_pool.contains(handle);
-	}
-};
-
-using RenderableHandle = RenderableManager::Handle;

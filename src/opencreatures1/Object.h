@@ -1,8 +1,9 @@
 #pragma once
 
 #include "C1Sound.h"
+#include "EngineContext.h"
 #include "ObjectHandle.h"
-#include "RenderableManager.h"
+#include "Renderable.h"
 #include "common/Exception.h"
 #include "common/FixedPoint.h"
 
@@ -54,16 +55,16 @@ class Object {
 
 	ObjectHandle uid;
 
-	virtual RenderableHandle get_part(int32_t) { return {}; }
+	virtual Renderable* get_renderable_for_part(int32_t) { return nullptr; }
 };
 
 class Scenery : public Object {
   public:
-	RenderableHandle part;
+	Renderable part;
 
-	RenderableHandle get_part(int32_t i) override {
+	Renderable* get_renderable_for_part(int32_t i) override {
 		if (i == 0) {
-			return part;
+			return &part;
 		}
 		return {};
 	}
@@ -71,14 +72,14 @@ class Scenery : public Object {
 
 class SimpleObject : public Object {
   public:
-	RenderableHandle part;
+	Renderable part;
 	int32_t z_order;
 	std::array<uint8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
-	RenderableHandle get_part(int32_t i) override {
+	Renderable* get_renderable_for_part(int32_t i) override {
 		if (i == 0) {
-			return part;
+			return &part;
 		}
 		return {};
 	}
@@ -93,7 +94,7 @@ class PointerTool : public SimpleObject {
 };
 
 struct CompoundPart {
-	RenderableHandle renderable;
+	Renderable renderable;
 	int32_t x;
 	int32_t y;
 };
@@ -104,12 +105,12 @@ class CompoundObject : public Object {
 	std::array<Rect, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 
-	RenderableHandle get_part(int32_t i) override {
+	Renderable* get_renderable_for_part(int32_t i) override {
 		auto idx = numeric_cast<uint32_t>(i);
 		if (idx >= parts.size()) {
 			return {};
 		}
-		return parts[idx].renderable;
+		return &parts[idx].renderable;
 	}
 };
 

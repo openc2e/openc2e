@@ -13,7 +13,7 @@ static inline Renderable* get_main_part(PointerView<Object> obj) {
 		throw_exception("Can't get main part of null object");
 	}
 
-	auto* main_part = g_engine_context.renderables->try_get(obj->get_part(0));
+	auto* main_part = obj->get_renderable_for_part(0);
 	if (!main_part) {
 		throw_exception("Can't get main part of object without any parts: {}", repr(*obj));
 	}
@@ -43,7 +43,7 @@ inline void move_object_to(PointerView<Object> obj, fixed24_8_t x, fixed24_8_t y
 		throw_exception("Tried to move a null object");
 	}
 
-	auto* main_part = g_engine_context.renderables->try_get(obj->get_part(0));
+	auto* main_part = obj->get_renderable_for_part(0);
 	if (!main_part) {
 		throw_exception("Tried to move an object without any parts: {}", repr(*obj));
 	}
@@ -59,7 +59,7 @@ inline void move_object_to(PointerView<Object> obj, fixed24_8_t x, fixed24_8_t y
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = g_engine_context.renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
+			Renderable* part = obj->get_renderable_for_part(numeric_cast<int32_t>(i));
 
 			part->x = x + p.x;
 			part->y = y + p.y;
@@ -76,7 +76,7 @@ inline void move_object_by(PointerView<Object> obj, fixed24_8_t xdiff, fixed24_8
 		throw_exception("Tried to move a null object");
 	}
 
-	auto* main_part = g_engine_context.renderables->try_get(obj->get_part(0));
+	auto* main_part = obj->get_renderable_for_part(0);
 	if (!main_part) {
 		throw_exception("Tried to move an object without any parts: {}", repr(*obj));
 	}
@@ -92,7 +92,7 @@ inline void move_object_by(PointerView<Object> obj, fixed24_8_t xdiff, fixed24_8
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = g_engine_context.renderables->try_get(obj->get_part(numeric_cast<int32_t>(i)));
+			Renderable* part = obj->get_renderable_for_part(numeric_cast<int32_t>(i));
 
 			part->x = main_part->x + p.x;
 			part->y = main_part->y + p.y;

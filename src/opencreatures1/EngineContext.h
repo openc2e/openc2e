@@ -25,7 +25,6 @@ class EngineContext {
 	HeapValue<class ObjectManager> objects;
 	HeapValue<class PathManager> paths;
 	HeapValue<class PointerManager> pointer;
-	HeapValue<class RenderableManager> renderables;
 	HeapValue<class Scriptorium> scriptorium;
 	HeapValue<class C1SoundManager> sounds;
 	HeapValue<class ViewportManager> viewport;
