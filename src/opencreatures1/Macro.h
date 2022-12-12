@@ -27,4 +27,5 @@ struct Macro {
 	std::string subroutine_label;
 	uint32_t subroutine_address = 0;
 	int32_t wait = 0;
+	bool destroy_as_soon_as_possible = false;
 };

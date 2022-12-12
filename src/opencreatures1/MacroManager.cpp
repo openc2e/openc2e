@@ -13,17 +13,30 @@ void MacroManager::tick() {
 	// iterate in reverse, macros might be added/destroyed during iteration
 	for (size_t i = m_pool.size(); i > 0; --i) {
 		Macro& m = m_pool[i - 1];
+		if (m.destroy_as_soon_as_possible) {
+			m_pool.erase(m_pool.begin() + static_cast<long>(i - 1));
+			continue;
+		}
 		try {
 			ctx.tick_macro(m);
 		} catch (Exception& e) {
+			fmt::print("error: {}\n", e.what());
 			auto* owner = ctx.maybe_get_ownr(m);
 			if (owner) {
 				fmt::print("DEBUG cls=({}, {}, {}) uid={}\n", owner->family, owner->genus, owner->species, m.ownr);
 			} else {
 				fmt::print("DEBUG badownr uid={}\n", m.ownr);
 			}
-			fmt::print("macro {} !!ip!! {}\n", m.script.substr(0, m.ip), m.script.substr(m.ip));
-			fmt::print("error: {}\n", e.what());
+			fmt::print(
+				"macro {} !!ip!! {}\n",
+				m.script.substr(0, m.ip),
+				m.ip <= m.script.size() ? m.script.substr(m.ip > m.script.size()) : "");
+			fmt::print("\n");
+		}
+		if (m.destroy_as_soon_as_possible) {
+			// in case we kicked off another script that wants to replace us, wait
+			// until we're done running so we don't get weird errors
+			m_pool.erase(m_pool.begin() + static_cast<long>(i - 1));
 		}
 	}
 }

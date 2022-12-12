@@ -252,7 +252,7 @@ void MacroContext::tick_macro(Macro& m) {
 	debug = false;
 	if (debug) {
 		fmt::print("DEBUG cls=({}, {}, {}) uid={}\n", get_ownr(m)->family, get_ownr(m)->genus, get_ownr(m)->species, m.ownr);
-		fmt::print("macro wait={} - {} !!ip!! {} - subroutine {} {}\n", m.wait, m.script.substr(0, m.ip), m.script.substr(m.ip), m.subroutine_label, m.subroutine_address);
+		fmt::print("macro wait={} - {} !!ip!! {} - subroutine {} {}\n", m.wait, m.script.substr(0, m.ip), m.ip <= m.script.size() ? m.script.substr(m.ip) : "", m.subroutine_label, m.subroutine_address);
 		fmt::print("stack ");
 		// for (size_t i = 0;)
 		for (auto s : m.stack) {
@@ -264,7 +264,7 @@ void MacroContext::tick_macro(Macro& m) {
 	// we don't want to let inst run forever...
 	instructions_left_this_tick = m.inst ? 100 : 1;
 
-	while (instructions_left_this_tick > 0) {
+	while (instructions_left_this_tick > 0 && !m.destroy_as_soon_as_possible) {
 		auto original_ip = m.ip;
 		instructions_left_this_tick--;
 		try {
