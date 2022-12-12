@@ -12,15 +12,6 @@
 #include <string>
 #include <vector>
 
-enum MessageNumber {
-	MESSAGE_ACTIVATE1 = 0,
-	MESSAGE_ACTIVATE2 = 1,
-	MESSAGE_DEACTIVATE = 2,
-	MESSAGE_HIT = 3,
-	MESSAGE_PICKUP = 4,
-	MESSAGE_DROP = 5,
-};
-
 enum ScriptNumber {
 	SCRIPT_DEACTIVATE = 0,
 	SCRIPT_ACTIVATE1 = 1,

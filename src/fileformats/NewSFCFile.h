@@ -209,7 +209,7 @@ struct ObjectV1 {
 struct SimpleObjectV1 : ObjectV1 {
 	EntityV1* part;
 	int32_t z_order;
-	std::array<uint8_t, 3> click_bhvr;
+	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
 	void read_from(MFCReader& in) {
@@ -217,9 +217,9 @@ struct SimpleObjectV1 : ObjectV1 {
 
 		part = in.read_type<EntityV1>();
 		z_order = in.reads32le();
-		click_bhvr[0] = in.read8();
-		click_bhvr[1] = in.read8();
-		click_bhvr[2] = in.read8();
+		click_bhvr[0] = in.reads8();
+		click_bhvr[1] = in.reads8();
+		click_bhvr[2] = in.reads8();
 		touch_bhvr = in.read8();
 	}
 };

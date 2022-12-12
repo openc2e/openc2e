@@ -2,7 +2,9 @@
 
 #include "C1Sound.h"
 #include "EngineContext.h"
+#include "EventManager.h"
 #include "ObjectHandle.h"
+#include "PointerManager.h"
 #include "Renderable.h"
 #include "common/Exception.h"
 #include "common/FixedPoint.h"
@@ -23,6 +25,17 @@ enum ActiveFlag : uint8_t {
 	ACTV_ACTIVE2 = 2,
 };
 
+enum AttributeFlags : uint8_t {
+	ATTR_CARRYABLE = 1,
+	ATTR_MOUSEABLE = 2,
+	ATTR_ACTIVATEABLE = 4,
+	ATTR_CONTAINER = 8,
+	ATTR_INVISIBLE = 16,
+	ATTR_FLOATABLE = 32,
+	ATTR_WALLBOUND = 64,
+	ATTR_GROUNDBOUND = 128
+};
+
 struct Rect {
 	int32_t left;
 	int32_t top;
@@ -41,7 +54,7 @@ class SimpleObjectData {
   public:
 	Renderable part;
 	int32_t z_order;
-	std::array<uint8_t, 3> click_bhvr;
+	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 };
 
@@ -79,6 +92,8 @@ struct VehicleData {
 class Object {
   public:
 	virtual ~Object() = default;
+	ObjectHandle uid;
+
 	uint8_t species;
 	uint8_t genus;
 	uint8_t family;
@@ -96,8 +111,6 @@ class Object {
 	int32_t obv1;
 	int32_t obv2;
 
-	ObjectHandle uid;
-
 	std::unique_ptr<SceneryData> scenery_data;
 
 	std::unique_ptr<SimpleObjectData> simple_data;
@@ -106,24 +119,16 @@ class Object {
 	std::unique_ptr<CompoundObjectData> compound_data;
 	std::unique_ptr<VehicleData> vehicle_data;
 
-	virtual Renderable* get_renderable_for_part(int32_t partnum) {
-		if (scenery_data) {
-			if (partnum == 0) {
-				return &scenery_data->part;
-			}
-		} else if (simple_data) {
-			if (partnum == 0) {
-				return &simple_data->part;
-			}
-		} else if (compound_data) {
-			auto idx = numeric_cast<uint32_t>(partnum);
-			if (idx >= compound_data->parts.size()) {
-				return {};
-			}
-			return &compound_data->parts[idx].renderable;
-		}
-		return nullptr;
-	}
+	void handle_click();
+
+	void handle_mesg_activate1(Message);
+	void handle_mesg_activate2(Message);
+	void handle_mesg_deactivate(Message);
+	void handle_mesg_hit(Message);
+	void handle_mesg_pickup(Message);
+	void handle_mesg_drop(Message);
+
+	Renderable* get_renderable_for_part(int32_t partnum);
 };
 
 inline std::string repr(const Object& o) {

@@ -33,6 +33,22 @@ void Command_ANIM(MacroContext& ctx, Macro& m) {
 	ctx.read_command_separator(m);
 }
 
+void Command_DIVV(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	Token varname = ctx.read_token(m);
+	ctx.read_arg_separator(m);
+	int32_t divisor = ctx.read_int(m);
+
+	int32_t dividend;
+	if (!ctx.try_get_variable(m, varname, &dividend)) {
+		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+	}
+
+	ctx.set_variable(m, varname, dividend / divisor);
+
+	ctx.read_command_separator(m);
+}
 
 void Command_DOIF(MacroContext& ctx, Macro& m) {
 	ctx.read_arg_separator(m);
@@ -172,6 +188,23 @@ void Command_MESG(MacroContext& ctx, Macro& m) {
 	}
 }
 
+void Command_MULV(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	Token varname = ctx.read_token(m);
+	ctx.read_arg_separator(m);
+	int32_t multiplier = ctx.read_int(m);
+
+	int32_t multiplicand;
+	if (!ctx.try_get_variable(m, varname, &multiplicand)) {
+		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+	}
+
+	ctx.set_variable(m, varname, multiplicand * multiplier);
+
+	ctx.read_command_separator(m);
+}
+
 void Command_MVBY(MacroContext& ctx, Macro& m) {
 	ctx.read_arg_separator(m);
 	int32_t xdiff = ctx.read_int(m);
@@ -186,6 +219,39 @@ void Command_MVBY(MacroContext& ctx, Macro& m) {
 		printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
 			xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus, ctx.get_targ(m)->species, ctx.get_targ_part(m)->sprite.getName().c_str());
 	}
+
+	ctx.read_command_separator(m);
+}
+
+void Command_MVTO(MacroContext& ctx, Macro& m) {
+	ctx.read_arg_separator(m);
+	int32_t x = ctx.read_int(m);
+	ctx.read_arg_separator(m);
+	int32_t y = ctx.read_int(m);
+
+	auto* obj = ctx.get_targ(m);
+
+	move_object_to(obj, x, y);
+
+	// if (ctx.debug) {
+	// 	printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
+	// 		xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus, ctx.get_targ(m)->species, ctx.get_targ_part(m)->sprite.getName().c_str());
+	// }
+
+	ctx.read_command_separator(m);
+}
+
+void Command_NEGV(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	Token varname = ctx.read_token(m);
+
+	int32_t value;
+	if (!ctx.try_get_variable(m, varname, &value)) {
+		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+	}
+
+	ctx.set_variable(m, varname, -value);
 
 	ctx.read_command_separator(m);
 }
@@ -471,14 +537,44 @@ int32_t IntegerRV_ACTV(MacroContext& ctx, Macro& m) {
 	return static_cast<int32_t>(targ->actv);
 }
 
+int32_t IntegerRV_HGHT(MacroContext& ctx, Macro& m) {
+	return get_object_bbox(ctx.get_targ(m)).height();
+}
+
+int32_t IntegerRV_LIMB(MacroContext& ctx, Macro& m) {
+	auto* targ = ctx.get_targ(m);
+	return targ->limit.bottom;
+}
+
+int32_t IntegerRV_LIML(MacroContext& ctx, Macro& m) {
+	auto* targ = ctx.get_targ(m);
+	return targ->limit.left;
+}
+
+int32_t IntegerRV_LIMR(MacroContext& ctx, Macro& m) {
+	auto* targ = ctx.get_targ(m);
+	return targ->limit.right;
+}
+
+int32_t IntegerRV_LIMT(MacroContext& ctx, Macro& m) {
+	auto* targ = ctx.get_targ(m);
+	return targ->limit.top;
+}
+
 int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
-	auto bbox = get_object_bbox(ctx.get_targ(m));
-	return bbox.bottom;
+	return get_object_bbox(ctx.get_targ(m)).bottom;
 }
 
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
-	auto bbox = get_object_bbox(ctx.get_targ(m));
-	return bbox.left;
+	return get_object_bbox(ctx.get_targ(m)).left;
+}
+
+int32_t IntegerRV_POSR(MacroContext& ctx, Macro& m) {
+	return get_object_bbox(ctx.get_targ(m)).right;
+}
+
+int32_t IntegerRV_POST(MacroContext& ctx, Macro& m) {
+	return get_object_bbox(ctx.get_targ(m)).top;
 }
 
 int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
@@ -490,6 +586,10 @@ int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
 	auto species = ctx.read_int(m);
 
 	return g_engine_context.objects->count_classifier(family, genus, species);
+}
+
+int32_t IntegerRV_WDTH(MacroContext& ctx, Macro& m) {
+	return get_object_bbox(ctx.get_targ(m)).width();
 }
 
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
@@ -551,8 +651,11 @@ void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 
 void MacroCommands::install_math_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("addv")] = Command_ADDV;
+	ctx.command_funcs[Token("divv")] = Command_DIVV;
+	ctx.command_funcs[Token("mulv")] = Command_MULV;
+	ctx.command_funcs[Token("negv")] = Command_NEGV;
 	ctx.command_funcs[Token("subv")] = Command_SUBV;
-	// TODO: mulv divv modv negv andv orrv
+	// TODO: modv andv orrv
 	ctx.command_funcs[Token("rndv")] = Command_RNDV;
 }
 
@@ -571,6 +674,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("loop")] = Command_LOOP;
 	ctx.command_funcs[Token("mesg")] = Command_MESG;
 	ctx.command_funcs[Token("mvby")] = Command_MVBY;
+	ctx.command_funcs[Token("mvto")] = Command_MVTO;
 	ctx.command_funcs[Token("over")] = Command_OVER;
 	ctx.command_funcs[Token("part")] = Command_PART;
 	ctx.command_funcs[Token("pose")] = Command_POSE;
@@ -591,9 +695,17 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.agentrv_funcs[Token("targ")] = AgentRV_TARG;
 
 	ctx.integerrv_funcs[Token("actv")] = IntegerRV_ACTV;
+	ctx.integerrv_funcs[Token("hght")] = IntegerRV_HGHT;
+	ctx.integerrv_funcs[Token("limb")] = IntegerRV_LIMB;
+	ctx.integerrv_funcs[Token("liml")] = IntegerRV_LIML;
+	ctx.integerrv_funcs[Token("limr")] = IntegerRV_LIMR;
+	ctx.integerrv_funcs[Token("limt")] = IntegerRV_LIMT;
 	ctx.integerrv_funcs[Token("posb")] = IntegerRV_POSB;
 	ctx.integerrv_funcs[Token("posl")] = IntegerRV_POSL;
+	ctx.integerrv_funcs[Token("posr")] = IntegerRV_POSR;
+	ctx.integerrv_funcs[Token("post")] = IntegerRV_POST;
 	ctx.integerrv_funcs[Token("totl")] = IntegerRV_TOTL;
+	ctx.integerrv_funcs[Token("wdth")] = IntegerRV_WDTH;
 	ctx.integerrv_funcs[Token("xvec")] = IntegerRV_XVEC;
 
 	ctx.lvalue_funcs[Token("actv")] = LValue_ACTV;

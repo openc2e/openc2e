@@ -163,6 +163,7 @@ void update_everything() {
 		g_engine_context.objects->tick();
 		g_engine_context.timers->tick();
 		g_engine_context.macros->tick();
+		g_engine_context.events->tick();
 		// animations tick after CAOS runs, otherwise the OVER command is too fast
 		update_animations();
 	}
