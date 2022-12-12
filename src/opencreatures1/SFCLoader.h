@@ -28,6 +28,11 @@ class SFCLoader {
 	void load_scripts();
 	void load_macros();
 
+	void object_from_sfc(Object* obj, const sfc::ObjectV1& p);
+	void simple_object_from_sfc(Object* obj, const sfc::SimpleObjectV1& p);
+	void compound_object_from_sfc(Object* obj, const sfc::CompoundObjectV1& comp);
+	void vehicle_from_sfc(Object* obj, const sfc::VehicleV1& veh);
+
 	std::map<sfc::ObjectV1*, ObjectHandle> sfc_object_mapping;
 	const sfc::SFCFile& sfc;
 };

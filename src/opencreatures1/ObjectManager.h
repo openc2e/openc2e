@@ -8,7 +8,7 @@
 
 #include <memory>
 
-static inline Renderable* get_main_part(PointerView<Object> obj) {
+static inline Renderable* get_main_part(Object* obj) {
 	if (!obj) {
 		throw_exception("Can't get main part of null object");
 	}
@@ -21,7 +21,7 @@ static inline Renderable* get_main_part(PointerView<Object> obj) {
 	return main_part;
 }
 
-inline Rect get_object_bbox(PointerView<Object> obj) {
+inline Rect get_object_bbox(Object* obj) {
 	Renderable* main_part = get_main_part(obj);
 
 	Rect r;
@@ -34,7 +34,7 @@ inline Rect get_object_bbox(PointerView<Object> obj) {
 	return r;
 }
 
-inline void move_object_to(PointerView<Object> obj, fixed24_8_t x, fixed24_8_t y) {
+inline void move_object_to(Object* obj, fixed24_8_t x, fixed24_8_t y) {
 	// TODO: if the object's current x-position is 100.1 and the new x-position
 	// is 100 (low-precision), should we actually move it? do we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.
@@ -55,11 +55,11 @@ inline void move_object_to(PointerView<Object> obj, fixed24_8_t x, fixed24_8_t y
 	main_part->x = x;
 	main_part->y = y;
 
-	if (auto* comp = dynamic_cast<CompoundObject*>(obj.get())) {
+	if (auto* comp = obj->compound_data.get()) {
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = obj->get_renderable_for_part(numeric_cast<int32_t>(i));
+			Renderable* part = &p.renderable;
 
 			part->x = x + p.x;
 			part->y = y + p.y;
@@ -67,7 +67,7 @@ inline void move_object_to(PointerView<Object> obj, fixed24_8_t x, fixed24_8_t y
 	}
 }
 
-inline void move_object_by(PointerView<Object> obj, fixed24_8_t xdiff, fixed24_8_t ydiff) {
+inline void move_object_by(Object* obj, fixed24_8_t xdiff, fixed24_8_t ydiff) {
 	// TODO: if the object's current x-position is 100.1 and the x-diff is 5 (low-
 	// precision), do we move it to 105.1 or 105? e.g. should we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.
@@ -88,11 +88,11 @@ inline void move_object_by(PointerView<Object> obj, fixed24_8_t xdiff, fixed24_8
 	main_part->x += xdiff;
 	main_part->y += ydiff;
 
-	if (auto* comp = dynamic_cast<CompoundObject*>(obj.get())) {
+	if (auto* comp = obj->compound_data.get()) {
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			auto& p = comp->parts[i];
 
-			Renderable* part = obj->get_renderable_for_part(numeric_cast<int32_t>(i));
+			Renderable* part = &p.renderable;
 
 			part->x = main_part->x + p.x;
 			part->y = main_part->y + p.y;
@@ -107,33 +107,19 @@ class ObjectManager {
   public:
 	ObjectManager() {}
 
-	template <typename T>
-	ObjectHandle add(T obj) {
-		auto t = new T(std::move(obj));
+	ObjectHandle add() {
+		auto t = new Object();
 		ObjectHandle handle = m_pool.add(std::unique_ptr<Object>(t));
 		t->uid = handle;
 		return handle;
 	}
 
-	template <typename T>
-	T* try_get(ObjectHandle handle) {
+	Object* try_get(ObjectHandle handle) {
 		auto* obj = m_pool.try_get(handle);
 		if (!obj) {
 			return nullptr;
 		}
-		return dynamic_cast<T*>(obj->get());
-	}
-
-	template <typename T>
-	std::vector<ObjectHandle> find_all() {
-		// TODO: make this const
-		std::vector<ObjectHandle> result;
-		for (auto i : m_pool.enumerate()) {
-			if (dynamic_cast<T*>(i.value->get())) {
-				result.push_back(i.id);
-			}
-		}
-		return result;
+		return obj->get();
 	}
 
 	auto begin() {
@@ -149,12 +135,12 @@ class ObjectManager {
 
 		for (auto& o : m_pool) {
 			if (o->current_sound) {
-				auto bbox = get_object_bbox(o);
+				auto bbox = get_object_bbox(o.get());
 				o->current_sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
 			}
 
-			if (auto* vehicle = dynamic_cast<Vehicle*>(o.get())) {
-				move_object_by(vehicle, vehicle->xvel, vehicle->yvel);
+			if (auto* vehicle = o->vehicle_data.get()) {
+				move_object_by(o.get(), vehicle->xvel, vehicle->yvel);
 			}
 		}
 	}

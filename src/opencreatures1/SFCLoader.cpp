@@ -37,64 +37,58 @@ static Renderable renderable_from_sfc_entity(sfc::EntityV1& part) {
 	return r;
 }
 
-static Object object_without_refs_from_sfc(const sfc::ObjectV1& p) {
-	Object obj;
-	obj.species = p.species;
-	obj.genus = p.genus;
-	obj.family = p.family;
-	obj.movement_status = MovementStatus(p.movement_status);
-	obj.attr = p.attr;
-	obj.limit.left = p.limit_left;
-	obj.limit.top = p.limit_top;
-	obj.limit.right = p.limit_right;
-	obj.limit.bottom = p.limit_bottom;
-	// obj.carrier = sfc_object_mapping.at(p.carrier);
-	obj.actv = ActiveFlag(p.actv);
+void SFCLoader::object_from_sfc(Object* obj, const sfc::ObjectV1& p) {
+	obj->species = p.species;
+	obj->genus = p.genus;
+	obj->family = p.family;
+	obj->movement_status = MovementStatus(p.movement_status);
+	obj->attr = p.attr;
+	obj->limit.left = p.limit_left;
+	obj->limit.top = p.limit_top;
+	obj->limit.right = p.limit_right;
+	obj->limit.bottom = p.limit_bottom;
+	obj->carrier = sfc_object_mapping[p.carrier];
+	obj->actv = ActiveFlag(p.actv);
 	// creaturesImage sprite;
-	obj.tick_value = p.tick_value;
-	obj.ticks_since_last_tick_event = p.ticks_since_last_tick_event;
+	obj->tick_value = p.tick_value;
+	obj->ticks_since_last_tick_event = p.ticks_since_last_tick_event;
 	if (!p.current_sound.empty()) {
-		obj.current_sound = g_engine_context.sounds->play_sound(p.current_sound, true);
+		// TODO: don't start immediately, wait until window appears
+		obj->current_sound = g_engine_context.sounds->play_sound(p.current_sound, true);
 	}
-	// obj.objp = sfc_object_mapping.at(p.objp);
-	obj.obv0 = p.obv0;
-	obj.obv1 = p.obv1;
-	obj.obv2 = p.obv2;
-	return obj;
+	obj->objp = sfc_object_mapping[p.objp];
+	obj->obv0 = p.obv0;
+	obj->obv1 = p.obv1;
+	obj->obv2 = p.obv2;
 }
 
-static SimpleObject simple_object_without_refs_from_sfc(const sfc::SimpleObjectV1& p) {
-	SimpleObject obj;
-	static_cast<Object&>(obj) = object_without_refs_from_sfc(p);
-	obj.part = renderable_from_sfc_entity(*p.part);
-	obj.z_order = p.z_order;
-	obj.click_bhvr = p.click_bhvr;
-	obj.touch_bhvr = p.touch_bhvr;
-	return obj;
+void SFCLoader::simple_object_from_sfc(Object* obj, const sfc::SimpleObjectV1& p) {
+	obj->simple_data = std::make_unique<SimpleObjectData>();
+	obj->simple_data->part = renderable_from_sfc_entity(*p.part);
+	obj->simple_data->z_order = p.z_order;
+	obj->simple_data->click_bhvr = p.click_bhvr;
+	obj->simple_data->touch_bhvr = p.touch_bhvr;
 }
 
-static CompoundObject compound_object_without_refs_from_sfc(const sfc::CompoundObjectV1& comp) {
-	CompoundObject obj;
-	static_cast<Object&>(obj) = object_without_refs_from_sfc(comp);
+void SFCLoader::compound_object_from_sfc(Object* obj, const sfc::CompoundObjectV1& comp) {
+	obj->compound_data = std::make_unique<CompoundObjectData>();
 
 	for (auto& cp : comp.parts) {
 		CompoundPart part;
 		part.renderable = renderable_from_sfc_entity(*cp.entity);
 		part.x = cp.x;
 		part.y = cp.y;
-		obj.parts.push_back(part);
+		obj->compound_data->parts.push_back(part);
 	}
-	for (size_t i = 0; i < obj.hotspots.size(); ++i) {
-		obj.hotspots[i].left = comp.hotspots[i].left;
-		obj.hotspots[i].top = comp.hotspots[i].top;
-		obj.hotspots[i].right = comp.hotspots[i].right;
-		obj.hotspots[i].bottom = comp.hotspots[i].bottom;
+	for (size_t i = 0; i < obj->compound_data->hotspots.size(); ++i) {
+		obj->compound_data->hotspots[i].left = comp.hotspots[i].left;
+		obj->compound_data->hotspots[i].top = comp.hotspots[i].top;
+		obj->compound_data->hotspots[i].right = comp.hotspots[i].right;
+		obj->compound_data->hotspots[i].bottom = comp.hotspots[i].bottom;
 	}
-	for (size_t i = 0; i < obj.functions_to_hotspots.size(); ++i) {
-		obj.functions_to_hotspots[i] = comp.functions_to_hotspots[i];
+	for (size_t i = 0; i < obj->compound_data->functions_to_hotspots.size(); ++i) {
+		obj->compound_data->functions_to_hotspots[i] = comp.functions_to_hotspots[i];
 	}
-
-	return obj;
 }
 
 SFCLoader::SFCLoader(const sfc::SFCFile& sfc_)
@@ -108,10 +102,6 @@ void SFCLoader::load_everything() {
 
 	fmt::print("INFO [SFCLoader] Loading objects and sceneries...\n");
 	load_objects();
-	// find our pointer
-	for (auto obj : g_engine_context.objects->find_all<PointerTool>()) {
-		g_engine_context.pointer->m_pointer_tool = obj;
-	}
 
 	fmt::print("INFO [SFCLoader] Loading scriptorium...\n");
 	load_scripts();
@@ -170,93 +160,91 @@ void SFCLoader::load_map() {
 	fmt::print("WARN [SFCLoader] Unsupported: bacteria\n");
 }
 
-static Vehicle vehicle_without_refs_from_sfc(const sfc::VehicleV1& veh) {
-	Vehicle obj;
-	static_cast<CompoundObject&>(obj) = compound_object_without_refs_from_sfc(veh);
+void SFCLoader::vehicle_from_sfc(Object* obj, const sfc::VehicleV1& veh) {
+	obj->vehicle_data = std::make_unique<VehicleData>();
 
-	obj.xvel = fixed24_8_t::from_raw(veh.xvel_times_256);
-	obj.yvel = fixed24_8_t::from_raw(veh.yvel_times_256);
-	// TODO: assert the high-precision position and low-precision position are equal?
-	// obj.x_times_256 = veh.x_times_256;
-	// obj.y_times_256 = veh.y_times_256;
-	obj.cabin_left = veh.cabin_left;
-	obj.cabin_top = veh.cabin_top;
-	obj.cabin_right = veh.cabin_right;
-	obj.cabin_bottom = veh.cabin_bottom;
-	obj.bump = veh.bump;
+	obj->vehicle_data->xvel = fixed24_8_t::from_raw(veh.xvel_times_256);
+	obj->vehicle_data->yvel = fixed24_8_t::from_raw(veh.yvel_times_256);
 
-	return obj;
+	auto& obj_x = obj->compound_data->parts[0].renderable.x;
+	auto& obj_y = obj->compound_data->parts[0].renderable.y;
+	auto veh_x = fixed24_8_t::from_raw(veh.x_times_256);
+	auto veh_y = fixed24_8_t::from_raw(veh.y_times_256);
+	if (obj_x != veh_x || obj_y != veh_y) {
+		fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} overridden by VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
+		obj_x = veh_x;
+		obj_y = veh_y;
+	}
+
+	obj->vehicle_data->cabin_left = veh.cabin_left;
+	obj->vehicle_data->cabin_top = veh.cabin_top;
+	obj->vehicle_data->cabin_right = veh.cabin_right;
+	obj->vehicle_data->cabin_bottom = veh.cabin_bottom;
+	obj->vehicle_data->bump = veh.bump;
 }
 
 
 void SFCLoader::load_objects() {
-	// first load toplevel objects
+	// first, create empty toplevel objects
 	for (auto* p : sfc.objects) {
-		if (dynamic_cast<sfc::BubbleV1*>(p)) {
-			fmt::print("WARN [SFCLoader] Unsupported object type: Bubble\n");
-		}
-		if (dynamic_cast<sfc::CallButtonV1*>(p)) {
-			fmt::print("WARN [SFCLoader] Unsupported object type: CallButton\n");
-		}
-		if (dynamic_cast<sfc::LiftV1*>(p)) {
-			fmt::print("WARN [SFCLoader] Unsupported object type: Lift\n");
-		}
-		if (dynamic_cast<sfc::BlackboardV1*>(p)) {
-			fmt::print("WARN [SFCLoader] Unsupported object type: Blackboard\n");
-		}
-		if (dynamic_cast<sfc::CreatureV1*>(p)) {
-			fmt::print("WARN [SFCLoader] Unsupported object type: Creature\n");
+		auto handle = g_engine_context.objects->add();
+		sfc_object_mapping[p] = handle;
+	}
+	for (auto* p : sfc.sceneries) {
+		auto handle = g_engine_context.objects->add();
+		sfc_object_mapping[p] = handle;
+	}
+
+	// second, load data, including cross-object references
+	for (auto* p : sfc.objects) {
+		auto handle = sfc_object_mapping[p];
+		auto* obj = g_engine_context.objects->try_get(handle);
+
+		object_from_sfc(obj, *p);
+
+		if (auto* simp = dynamic_cast<sfc::SimpleObjectV1*>(p)) {
+			simple_object_from_sfc(obj, *simp);
+			if (dynamic_cast<sfc::BubbleV1*>(p)) {
+				fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type: Bubble\n", obj->family, obj->genus, obj->species);
+			}
+			if (dynamic_cast<sfc::CallButtonV1*>(p)) {
+				fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type CallButton\n", obj->family, obj->genus, obj->species);
+			}
+			if (auto* pt = dynamic_cast<sfc::PointerToolV1*>(p)) {
+				obj->pointer_data = std::make_unique<PointerToolData>();
+				obj->pointer_data->relx = pt->relx;
+				obj->pointer_data->rely = pt->rely;
+				obj->pointer_data->bubble = sfc_object_mapping[pt->bubble];
+				obj->pointer_data->text = pt->text;
+
+				g_engine_context.pointer->m_pointer_tool = handle;
+			}
 		}
 
-		if (auto* pt = dynamic_cast<sfc::PointerToolV1*>(p)) {
-			PointerTool obj;
-			static_cast<SimpleObject&>(obj) = simple_object_without_refs_from_sfc(*pt);
-			obj.relx = pt->relx;
-			obj.rely = pt->rely;
-			// obj.bubble = pt->bubble;
-			obj.text = pt->text;
-			auto handle = g_engine_context.objects->add(obj);
-			sfc_object_mapping[p] = handle;
+		else if (auto* comp = dynamic_cast<sfc::CompoundObjectV1*>(p)) {
+			compound_object_from_sfc(obj, *comp);
+			if (auto* veh = dynamic_cast<sfc::VehicleV1*>(p)) {
+				vehicle_from_sfc(obj, *veh);
+				if (dynamic_cast<sfc::LiftV1*>(p)) {
+					fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Lift\n", obj->family, obj->genus, obj->species);
+				}
+			}
+			if (dynamic_cast<sfc::BlackboardV1*>(p)) {
+				fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Blackboard\n", obj->family, obj->genus, obj->species);
+			}
+		}
 
-		} else if (auto* simp = dynamic_cast<sfc::SimpleObjectV1*>(p)) {
-			SimpleObject obj = simple_object_without_refs_from_sfc(*simp);
-			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
-
-		} else if (auto* veh = dynamic_cast<sfc::VehicleV1*>(p)) {
-			Vehicle obj = vehicle_without_refs_from_sfc(*veh);
-			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
-
-		} else if (auto* comp = dynamic_cast<sfc::CompoundObjectV1*>(p)) {
-			CompoundObject obj = compound_object_without_refs_from_sfc(*comp);
-			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
-
-		} else {
-			Object obj = object_without_refs_from_sfc(*p);
-			sfc_object_mapping[p] = g_engine_context.objects->add(obj);
+		else if (dynamic_cast<sfc::CreatureV1*>(p)) {
+			fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Creature\n", obj->family, obj->genus, obj->species);
 		}
 	}
 	for (auto* p : sfc.sceneries) {
-		Scenery scen;
-		static_cast<Object&>(scen) = object_without_refs_from_sfc(*p);
-		scen.part = renderable_from_sfc_entity(*p->part);
-		sfc_object_mapping[p] = g_engine_context.objects->add(scen);
-	}
-	// patch up object references
-	for (auto* p : sfc.objects) {
-		ObjectHandle handle = sfc_object_mapping[p];
-		Object* obj = g_engine_context.objects->try_get<Object>(handle);
-		obj->carrier = sfc_object_mapping[p->carrier];
-		obj->objp = sfc_object_mapping[p->objp];
+		auto* obj = g_engine_context.objects->try_get(sfc_object_mapping[p]);
 
-		if (auto* pt = dynamic_cast<sfc::PointerToolV1*>(p)) {
-			auto pointertool = g_engine_context.objects->try_get<PointerTool>(handle);
-			pointertool->bubble = sfc_object_mapping[pt->bubble];
-		}
-	}
-	for (auto* p : sfc.sceneries) {
-		Object* obj = g_engine_context.objects->try_get<Object>(sfc_object_mapping[p]);
-		obj->carrier = sfc_object_mapping[p->carrier];
-		obj->objp = sfc_object_mapping[p->objp];
+		object_from_sfc(obj, *p);
+
+		obj->scenery_data = std::make_unique<SceneryData>();
+		obj->scenery_data->part = renderable_from_sfc_entity(*p->part);
 	}
 }
 

@@ -25,6 +25,10 @@ class fixed24_8_t {
 		return m_value == other.m_value;
 	}
 
+	bool operator!=(fixed24_8_t other) const {
+		return !(*this == other);
+	}
+
 	fixed24_8_t operator+(fixed24_8_t other) {
 		fixed24_8_t result(*this);
 		result += other;

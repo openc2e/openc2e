@@ -494,7 +494,7 @@ int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
 
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
 	Object* o = ctx.get_targ(m);
-	auto* veh = dynamic_cast<Vehicle*>(o);
+	auto* veh = o->vehicle_data.get();
 	if (!veh) {
 		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
 	}
@@ -533,7 +533,7 @@ void LValue_ACTV(const MacroContext& ctx, const Macro& m, int32_t value) {
 
 void LValue_XVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	Object* o = ctx.get_targ(m);
-	auto* veh = dynamic_cast<Vehicle*>(o);
+	auto* veh = o->vehicle_data.get();
 	if (!veh) {
 		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
 	}
@@ -542,7 +542,7 @@ void LValue_XVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 
 void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	Object* o = ctx.get_targ(m);
-	auto* veh = dynamic_cast<Vehicle*>(o);
+	auto* veh = o->vehicle_data.get();
 	if (!veh) {
 		throw_exception("Called YVEC on non-vehicle object: {}", repr(*o));
 	}

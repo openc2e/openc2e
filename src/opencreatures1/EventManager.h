@@ -13,8 +13,8 @@ class EventManager {
 	EventManager() {}
 
 	void queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno) {
-		auto* to = g_engine_context.objects->try_get<Object>(to_id);
-		auto* from = g_engine_context.objects->try_get<Object>(from_id);
+		auto* to = g_engine_context.objects->try_get(to_id);
+		auto* from = g_engine_context.objects->try_get(from_id);
 		return queue_script(from, to, eventno);
 	}
 

@@ -33,6 +33,49 @@ struct Rect {
 	int32_t height() const { return bottom - top; }
 };
 
+struct SceneryData {
+	Renderable part;
+};
+
+class SimpleObjectData {
+  public:
+	Renderable part;
+	int32_t z_order;
+	std::array<uint8_t, 3> click_bhvr;
+	uint8_t touch_bhvr;
+};
+
+class PointerToolData {
+  public:
+	int32_t relx;
+	int32_t rely;
+	ObjectHandle bubble;
+	std::string text;
+};
+
+struct CompoundPart {
+	Renderable renderable;
+	int32_t x;
+	int32_t y;
+};
+
+class CompoundObjectData {
+  public:
+	std::vector<CompoundPart> parts;
+	std::array<Rect, 6> hotspots;
+	std::array<int32_t, 6> functions_to_hotspots;
+};
+
+struct VehicleData {
+	fixed24_8_t xvel;
+	fixed24_8_t yvel;
+	int32_t cabin_left;
+	int32_t cabin_top;
+	int32_t cabin_right;
+	int32_t cabin_bottom;
+	uint32_t bump;
+};
+
 class Object {
   public:
 	virtual ~Object() = default;
@@ -55,73 +98,32 @@ class Object {
 
 	ObjectHandle uid;
 
-	virtual Renderable* get_renderable_for_part(int32_t) { return nullptr; }
-};
+	std::unique_ptr<SceneryData> scenery_data;
 
-class Scenery : public Object {
-  public:
-	Renderable part;
+	std::unique_ptr<SimpleObjectData> simple_data;
+	std::unique_ptr<PointerToolData> pointer_data;
 
-	Renderable* get_renderable_for_part(int32_t i) override {
-		if (i == 0) {
-			return &part;
+	std::unique_ptr<CompoundObjectData> compound_data;
+	std::unique_ptr<VehicleData> vehicle_data;
+
+	virtual Renderable* get_renderable_for_part(int32_t partnum) {
+		if (scenery_data) {
+			if (partnum == 0) {
+				return &scenery_data->part;
+			}
+		} else if (simple_data) {
+			if (partnum == 0) {
+				return &simple_data->part;
+			}
+		} else if (compound_data) {
+			auto idx = numeric_cast<uint32_t>(partnum);
+			if (idx >= compound_data->parts.size()) {
+				return {};
+			}
+			return &compound_data->parts[idx].renderable;
 		}
-		return {};
+		return nullptr;
 	}
-};
-
-class SimpleObject : public Object {
-  public:
-	Renderable part;
-	int32_t z_order;
-	std::array<uint8_t, 3> click_bhvr;
-	uint8_t touch_bhvr;
-
-	Renderable* get_renderable_for_part(int32_t i) override {
-		if (i == 0) {
-			return &part;
-		}
-		return {};
-	}
-};
-
-class PointerTool : public SimpleObject {
-  public:
-	int32_t relx;
-	int32_t rely;
-	ObjectHandle bubble;
-	std::string text;
-};
-
-struct CompoundPart {
-	Renderable renderable;
-	int32_t x;
-	int32_t y;
-};
-
-class CompoundObject : public Object {
-  public:
-	std::vector<CompoundPart> parts;
-	std::array<Rect, 6> hotspots;
-	std::array<int32_t, 6> functions_to_hotspots;
-
-	Renderable* get_renderable_for_part(int32_t i) override {
-		auto idx = numeric_cast<uint32_t>(i);
-		if (idx >= parts.size()) {
-			return {};
-		}
-		return &parts[idx].renderable;
-	}
-};
-
-struct Vehicle : public CompoundObject {
-	fixed24_8_t xvel;
-	fixed24_8_t yvel;
-	int32_t cabin_left;
-	int32_t cabin_top;
-	int32_t cabin_right;
-	int32_t cabin_bottom;
-	uint32_t bump;
 };
 
 inline std::string repr(const Object& o) {

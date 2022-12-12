@@ -38,7 +38,7 @@ std::string MacroContext::read_filename_token(Macro& m) {
 }
 
 Object* MacroContext::get_ownr(const Macro& m) const {
-	auto* ownr = g_engine_context.objects->try_get<Object>(m.ownr);
+	auto* ownr = g_engine_context.objects->try_get(m.ownr);
 	if (!ownr) {
 		throw Exception("ownr is not a valid agent reference");
 	}
@@ -46,11 +46,11 @@ Object* MacroContext::get_ownr(const Macro& m) const {
 }
 
 Object* MacroContext::maybe_get_ownr(const Macro& m) const {
-	return g_engine_context.objects->try_get<Object>(m.ownr);
+	return g_engine_context.objects->try_get(m.ownr);
 }
 
 Object* MacroContext::get_targ(const Macro& m) const {
-	auto* targ = g_engine_context.objects->try_get<Object>(m.targ);
+	auto* targ = g_engine_context.objects->try_get(m.targ);
 	if (!targ) {
 		throw Exception("targ is not a valid agent reference");
 	}
