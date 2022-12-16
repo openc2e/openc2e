@@ -56,15 +56,13 @@ void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to
 
 	if (override_existing || eventno == SCRIPT_TIMER) {
 		// TODO: will we break anything doing this right now? should we wait until end of frame?
-		for (auto& existing : g_engine_context.macros->m_pool) {
-			if (existing.ownr == to->uid) {
-				if (eventno == SCRIPT_TIMER) {
-					// fmt::print("WARN [EventManager] Object {} {} {} skipping timer script because macro already exists\n", to->family, to->genus, to->species);
-					return;
-				}
-				fmt::print("WARN [EventManager] Object {} {} {} deleting existing macro and replacing with script {}, hope it doesn't break anything\n", to->family, to->genus, to->species, eventno);
-				existing.destroy_as_soon_as_possible = true;
+		if (g_engine_context.macros->has_macro_owned_by(m.ownr)) {
+			if (eventno == SCRIPT_TIMER) {
+				// fmt::print("WARN [EventManager] Object {} {} {} skipping timer script because macro already exists\n", to->family, to->genus, to->species);
+				return;
 			}
+			fmt::print("WARN [EventManager] Object {} {} {} deleting existing macro and replacing with script {}, hope it doesn't break anything\n", to->family, to->genus, to->species, eventno);
+			g_engine_context.macros->delete_macros_owned_by(m.ownr);
 		}
 	}
 	g_engine_context.macros->add(m);

@@ -264,7 +264,12 @@ void MacroContext::tick_macro(Macro& m) {
 	// we don't want to let inst run forever...
 	instructions_left_this_tick = m.inst ? 100 : 1;
 
-	while (instructions_left_this_tick > 0 && !m.destroy_as_soon_as_possible) {
+	while (instructions_left_this_tick > 0) {
+		if (m.destroy_as_soon_as_possible) {
+			fmt::print("DEBUG [MacroManager] stopping script because destroy_as_soon_as_possible was set. this might not be correct!\n");
+			break;
+		}
+
 		auto original_ip = m.ip;
 		instructions_left_this_tick--;
 		try {

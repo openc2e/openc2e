@@ -3,8 +3,26 @@
 #include "Object.h"
 #include "common/Exception.h"
 
+
 void MacroManager::add(Macro macro) {
 	m_pool.push_back(macro);
+}
+
+bool MacroManager::has_macro_owned_by(ObjectHandle ownr) const {
+	for (auto& m : m_pool) {
+		if (m.ownr == ownr) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void MacroManager::delete_macros_owned_by(ObjectHandle ownr) {
+	for (auto& m : m_pool) {
+		if (m.ownr == ownr) {
+			m.destroy_as_soon_as_possible = true;
+		}
+	}
 }
 
 void MacroManager::tick() {

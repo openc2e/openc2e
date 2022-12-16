@@ -83,9 +83,12 @@ enum ScriptNumber {
 class MacroManager {
   public:
 	void add(Macro macro);
+	bool has_macro_owned_by(ObjectHandle ownr) const;
+	void delete_macros_owned_by(ObjectHandle ownr);
 	void tick();
 
-	// private:
 	MacroContext ctx;
+
+  private:
 	std::vector<Macro> m_pool;
 };
