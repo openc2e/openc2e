@@ -6,6 +6,14 @@ inline bool is_ascii_digit(char c) {
 	return c >= '0' && c <= '9';
 }
 
+inline bool is_ascii_alpha(char c) {
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+}
+
+inline bool is_ascii_alnum(char c) {
+	return is_ascii_digit(c) || is_ascii_alpha(c);
+}
+
 inline char to_ascii_lowercase(char c) {
 	if (c >= 'A' && c <= 'Z') {
 		return c - ('Z' - 'z');
