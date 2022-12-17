@@ -411,61 +411,6 @@ void c_PLDS(caosVM* vm) {
 	// TODO
 }
 
-struct SineStream : AudioStream {
-	int position = 0;
-	bool stereo = true;
-	int frequency;
-	SineStream(int frequency_)
-		: frequency(frequency_) {}
-
-	// avoid panning?
-	virtual size_t produce(void* data, size_t len) {
-		int sampleCount = len / (stereo ? 4 : 2);
-		int p = 0;
-		signed short* buf = (signed short*)data;
-
-		for (int i = 0; i < sampleCount; i++) {
-			float t1 = sin(2 * M_PI * position * 350 / frequency);
-			buf[p++] = (SHRT_MAX / 2) * t1;
-			if (stereo) {
-				float t2 = sin(2 * M_PI * position * 440 / frequency);
-				buf[p++] = (SHRT_MAX / 2) * t2;
-			}
-			position++;
-		}
-		return len;
-	}
-};
-
-/**
- DBG: SINE (command) rate (integer) track (integer)
- %status stub
-
- Plays a sine wave coming from TARG
-
- track = 0 to fix the source at TARG's current location; track = 1 to follow
- view, track = 2 to inject it into the BGM source
- */
-void c_DBG_SINE(caosVM* vm) {
-	VM_PARAM_INTEGER(track);
-	VM_PARAM_INTEGER(rate);
-	if (track != 2) {
-		valid_agent(vm->targ);
-
-		if (vm->targ->sound) {
-			vm->targ->sound.stop();
-			vm->targ->sound = {};
-		}
-	}
-
-	auto stream = std::make_shared<SineStream>(rate);
-	// if (track == 2) {
-	// soundmanager.playMusic(stream);
-	// } else {
-	// TODO
-	// }
-}
-
 /**
  DBG: SBGM (command)
  %status maybe

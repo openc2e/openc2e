@@ -22,6 +22,7 @@
 #include "common/Exception.h"
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -119,10 +120,6 @@ void SDLMixerBackend::init() {
 }
 
 void SDLMixerBackend::shutdown() {
-	if (arbitrary_audio_chunk) {
-		Mix_FreeChunk(arbitrary_audio_chunk);
-		arbitrary_audio_chunk = nullptr;
-	}
 	Mix_CloseAudio();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
@@ -169,28 +166,6 @@ AudioChannel SDLMixerBackend::playWavData(const uint8_t* data, size_t size, bool
 		Mix_FreeChunk(chunk);
 		return {};
 	}
-	return int_to_audio_channel(channel);
-}
-
-AudioChannel SDLMixerBackend::playStream(AudioStream* stream) {
-	static std::array<uint8_t, SDLMIXERBACKEND_CHUNK_SIZE * 4> arbitrary_audio_data;
-
-	Mix_Chunk* arbitrary_audio_chunk = Mix_QuickLoad_RAW(arbitrary_audio_data.data(), arbitrary_audio_data.size());
-	if (!arbitrary_audio_chunk) {
-		return {};
-	}
-
-	int channel = playChannel(arbitrary_audio_chunk, true);
-	if (channel == -1) {
-		return {};
-	}
-	Mix_RegisterEffect(
-		channel, [](int channel, void* buf, int length_in_bytes, void* udata) {
-			(void)channel;
-			AudioStream* stream = (AudioStream*)udata;
-			stream->produce(buf, length_in_bytes);
-		},
-		NULL, stream);
 	return int_to_audio_channel(channel);
 }
 

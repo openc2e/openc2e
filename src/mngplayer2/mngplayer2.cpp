@@ -216,7 +216,6 @@ static struct AppState {
 
 	void setRandomInterval(int new_random_interval) {
 		random_interval = new_random_interval;
-		sprintf(random_interval_buf, "%d", new_random_interval);
 	}
 
 	void openFile() {

@@ -22,16 +22,16 @@
 #include "common/audio/AudioBackend.h"
 #include "common/singleton.h"
 
-#include <SDL_mixer.h>
 #include <memory>
 #include <vector>
+
+typedef struct _Mix_Music Mix_Music;
 
 class SDLMixerBackend : public AudioBackend, public Singleton<SDLMixerBackend> {
   private:
 	friend Singleton<SDLMixerBackend>;
 	SDLMixerBackend();
 	Mix_Music* midi = nullptr;
-	Mix_Chunk* arbitrary_audio_chunk = nullptr;
 
   public:
 	void init();
@@ -39,7 +39,6 @@ class SDLMixerBackend : public AudioBackend, public Singleton<SDLMixerBackend> {
 
 	AudioChannel playClip(const std::string& filename, bool looping = false);
 	AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false);
-	AudioChannel playStream(AudioStream*);
 
 	void setChannelVolume(AudioChannel, float);
 	void setChannelPan(AudioChannel, float pan);

@@ -25,20 +25,6 @@
 #include <memory>
 #include <string>
 
-/* Base class for sources of streaming data (eg, MNG music)
- *
- * produce() shall produce up to len bytes of data (to be stored in the buffer pointed to by 'data'),
- * and return however many it actually produced. If less than len bytes are produced, playback will cease
- * (and loop if applicable) once the current buffer of data is exhausted.
- *
- * The implementation should not make any assumptions about how often any of these functions
- * will be called, if at all.
- */
-struct AudioStream {
-	virtual ~AudioStream() {}
-	virtual size_t produce(void* data, size_t len_in_bytes) = 0;
-};
-
 class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
   protected:
 	AudioBackend() {}
@@ -50,7 +36,6 @@ class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
 
 	virtual AudioChannel playClip(const std::string& filename, bool looping = false) = 0;
 	virtual AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false) = 0;
-	virtual AudioChannel playStream(AudioStream*) = 0;
 
 	virtual void setChannelVolume(AudioChannel, float) = 0;
 	virtual void setChannelPan(AudioChannel, float pan) = 0;

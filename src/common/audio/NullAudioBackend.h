@@ -35,9 +35,6 @@ class NullAudioBackend : public AudioBackend {
 	virtual AudioChannel playWavData(const uint8_t*, size_t, bool) {
 		return {1};
 	}
-	AudioChannel playStream(AudioStream*) {
-		return {1};
-	}
 
 	void setChannelVolume(AudioChannel, float) {}
 	void setChannelPan(AudioChannel, float) {}
