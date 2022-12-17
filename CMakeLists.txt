@@ -106,6 +106,7 @@ add_library(openc2e-common OBJECT
 	src/common/readfile.cpp
 	src/common/Random.cpp
 	src/common/Repr.cpp
+	src/common/SimpleLexer.cpp
 	src/common/string_in.cpp
 	src/common/userlocale.cpp
 )
@@ -137,8 +138,8 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/bmpImage.cpp
 	${GEN}/fileformats/caoslexer.cpp
 	src/fileformats/caostoken.cpp
-	${GEN}/fileformats/catalogueFile.cpp
-	${GEN}/fileformats/cfgFile.cpp
+	src/fileformats/catalogueFile.cpp
+	src/fileformats/cfgFile.cpp
 	src/fileformats/charsetdta.cpp
 	src/fileformats/c1cobfile.cpp
 	src/fileformats/c1defaultpalette.cpp
@@ -154,7 +155,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/peFile.cpp
 	src/fileformats/PrayFileReader.cpp
 	src/fileformats/PrayFileWriter.cpp
-	${GEN}/fileformats/PraySourceParser.cpp
+	src/fileformats/PraySourceParser.cpp
 	src/fileformats/s16Image.cpp
 	src/fileformats/sprImage.cpp
 	src/fileformats/strFile.cpp
@@ -463,13 +464,6 @@ add_custom_command(
 # it seems these add_custom_command for re2c could be made
 # into a macro... e.g. RE2C(file1) RE2C(file2) etc...
 add_custom_command(
-	OUTPUT ${GEN}/cataloglexer.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/cataloglexer.cpp ${SRC}/src/cataloglexer.re2c.cpp
-	DEPENDS ${SRC}/src/cataloglexer.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
-add_custom_command(
 	OUTPUT ${GEN}/fileformats/caoslexer.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
 	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/caoslexer.cpp ${SRC}/src/fileformats/caoslexer.re2c.cpp
@@ -477,31 +471,10 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_command(
-	OUTPUT ${GEN}/fileformats/catalogueFile.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/catalogueFile.cpp ${SRC}/src/fileformats/catalogueFile.re2c.cpp
-	DEPENDS ${SRC}/src/fileformats/catalogueFile.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
-add_custom_command(
-	OUTPUT ${GEN}/fileformats/cfgFile.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/cfgFile.cpp ${SRC}/src/fileformats/cfgFile.re2c.cpp
-	DEPENDS ${SRC}/src/fileformats/cfgFile.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
-add_custom_command(
 	OUTPUT ${GEN}/fileformats/mngparser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
 	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mngparser.cpp ${SRC}/src/fileformats/mngparser.re2c.cpp
 	DEPENDS ${SRC}/src/fileformats/mngparser.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
-add_custom_command(
-	OUTPUT ${GEN}/fileformats/PraySourceParser.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/PraySourceParser.cpp ${SRC}/src/fileformats/PraySourceParser.re2c.cpp
-	DEPENDS ${SRC}/src/fileformats/PraySourceParser.re2c.cpp
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html)
