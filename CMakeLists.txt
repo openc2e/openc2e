@@ -168,6 +168,7 @@ target_link_libraries(openc2e-fileformats
 )
 
 add_executable(test_fileformats
+	src/fileformats/tests/CatalogueFileTest.cpp
 	src/fileformats/tests/CfgFileTest.cpp
 	src/fileformats/tests/PrayTest.cpp
 )
