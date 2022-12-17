@@ -28,18 +28,20 @@ void PointerManager::handle_event(const BackendEvent& event) {
 		Object* last_object = nullptr;
 
 		for (auto& obj : *g_engine_context.objects) {
-			// TODO: handle clicks on compound objects
-			if (!obj->simple_data) {
+			if (obj->pointer_data) {
 				continue;
 			}
 
 			auto bbox = get_object_bbox(obj.get());
-			if (x >= bbox.left && x <= bbox.right && y >= bbox.top && y <= bbox.bottom && obj->attr & ATTR_ACTIVATEABLE) {
-				fmt::print("found object! {} {} {}\n", obj->family, obj->genus, obj->species);
-				if (last_object != nullptr) {
-					fmt::print("ERRO [PointerManager] found multiple objects for click\n");
+			if (x >= bbox.left && x <= bbox.right && y >= bbox.top && y <= bbox.bottom) {
+				fmt::print("found {}\n", repr(obj.get()));
+				if (obj->simple_data && obj->attr & ATTR_ACTIVATEABLE) {
+					// TODO: handle clicks on compound objects
+					if (last_object != nullptr) {
+						fmt::print("ERRO [PointerManager] found multiple objects for click\n");
+					}
+					last_object = obj.get();
 				}
-				last_object = obj.get();
 			}
 		}
 

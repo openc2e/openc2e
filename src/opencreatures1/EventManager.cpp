@@ -2,8 +2,10 @@
 
 #include "EngineContext.h"
 #include "MacroManager.h"
+#include "Object.h"
 #include "ObjectHandle.h"
 #include "ObjectManager.h"
+#include "ObjectNames.h"
 #include "Scriptorium.h"
 #include "common/Exception.h"
 #include "common/PointerView.h"
@@ -30,6 +32,11 @@ void EventManager::queue_script(ObjectHandle from_id, ObjectHandle to_id, Script
 	return queue_script(from, to, eventno, override_existing);
 }
 
+std::string format_script(ScriptNumber eventno) {
+	return fmt::format("{}", scriptnumber_to_string(eventno),
+		eventno);
+}
+
 void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to, ScriptNumber eventno, bool override_existing) {
 	if (!to) {
 		printf("WARNING: tried to run script %i on nonexistent object\n", eventno);
@@ -44,7 +51,11 @@ void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to
 		std::string script = g_engine_context.scriptorium->get(to->family, 0, 0, eventno);
 	}
 	if (script.empty()) {
-		printf("WARNING: tried to run nonexistent script %i %i %i %i\n", to->family, to->genus, to->species, eventno);
+		if (eventno == SCRIPT_INITIALIZE) {
+			// skip, otherwise this raises a ton of (spurious?) warnings
+			return;
+		}
+		fmt::print("WARN [EventManager] tried to run nonexistent script {} {}\n", repr(to), format_script(eventno));
 		return;
 	}
 
@@ -61,7 +72,8 @@ void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to
 				// fmt::print("WARN [EventManager] Object {} {} {} skipping timer script because macro already exists\n", to->family, to->genus, to->species);
 				return;
 			}
-			fmt::print("WARN [EventManager] Object {} {} {} deleting existing macro and replacing with script {}, hope it doesn't break anything\n", to->family, to->genus, to->species, eventno);
+			fmt::print("WARN [EventManager] {} replacing macro with {}, hope it doesn't break anything\n",
+				repr(to), format_script(eventno));
 			g_engine_context.macros->delete_macros_owned_by(m.ownr);
 		}
 	}

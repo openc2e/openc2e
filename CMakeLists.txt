@@ -315,6 +315,7 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/MacroContext.cpp
 	src/opencreatures1/MacroManager.cpp
 	src/opencreatures1/Object.cpp
+	src/opencreatures1/ObjectNames.cpp
 	src/opencreatures1/PathManager.cpp
 	src/opencreatures1/PointerManager.cpp
 	src/opencreatures1/SFCLoader.cpp

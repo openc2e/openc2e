@@ -80,6 +80,8 @@ enum ScriptNumber {
 };
 
 
+std::string scriptnumber_to_string(ScriptNumber);
+
 class MacroManager {
   public:
 	void add(Macro macro);

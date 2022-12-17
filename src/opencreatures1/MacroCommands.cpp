@@ -361,7 +361,7 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 
 	// TODO: what if it already has a controlled sound?
 	if (targ->current_sound) {
-		fmt::print("WARNING: Object already has a controlled sound: {}\n", repr(targ));
+		fmt::print("WARN [SNDC] Object already has a controlled sound: {}\n", repr(targ));
 		ctx.read_command_separator(m);
 		return;
 	}
@@ -395,7 +395,7 @@ void Command_SNDL(MacroContext& ctx, Macro& m) {
 
 	// TODO: what if it already has a controlled sound?
 	if (targ->current_sound) {
-		fmt::print("WARNING: Object already has a controlled sound: {}\n", repr(targ));
+		fmt::print("WARN [SNDL] Object already has a controlled sound: {}\n", repr(targ));
 		ctx.read_command_separator(m);
 		return;
 	}

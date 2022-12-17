@@ -4,6 +4,7 @@
 #include "EngineContext.h"
 #include "EventManager.h"
 #include "ObjectHandle.h"
+#include "ObjectNames.h"
 #include "PointerManager.h"
 #include "Renderable.h"
 #include "common/Exception.h"
@@ -132,7 +133,7 @@ class Object {
 };
 
 inline std::string repr(const Object& o) {
-	return fmt::format("<Object cls=({} {} {}) uid={}>", o.family, o.genus, o.species, o.uid);
+	return fmt::format("Object {} {} {} uid {} \"{}\"", o.family, o.genus, o.species, o.uid.to_integral(), get_object_name(&o));
 }
 
 inline std::string repr(const Object* o) {
