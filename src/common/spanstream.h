@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/NumericCast.h"
+
 #include <iostream>
 
 class spanstream : public std::istream {
@@ -21,10 +23,10 @@ class spanstream : public std::istream {
 	class spanstreambuf : public std::streambuf {
 	  public:
 		spanstreambuf(const unsigned char* buffer_, size_t buffer_size_)
-			: buffer(buffer_), buffer_size(buffer_size_) {}
+			: buffer(buffer_), buffer_size(numeric_cast<std::streamsize>(buffer_size_)) {}
 
 		spanstreambuf(const char* buffer_, size_t buffer_size_)
-			: buffer(reinterpret_cast<const unsigned char*>(buffer_)), buffer_size(buffer_size_) {}
+			: spanstreambuf(reinterpret_cast<const unsigned char*>(buffer_), buffer_size_) {}
 
 	  protected:
 		pos_type seekpos(pos_type pos, std::ios_base::openmode which) override {
@@ -71,8 +73,8 @@ class spanstream : public std::istream {
 
 	  private:
 		const unsigned char* buffer;
-		size_t buffer_size;
-		size_t position = 0;
+		std::streamsize buffer_size;
+		std::streamsize position = 0;
 	};
 	spanstreambuf buf;
 };
