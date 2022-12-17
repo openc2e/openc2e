@@ -170,6 +170,7 @@ target_link_libraries(openc2e-fileformats
 add_executable(test_fileformats
 	src/fileformats/tests/CatalogueFileTest.cpp
 	src/fileformats/tests/CfgFileTest.cpp
+	src/fileformats/tests/MngTest.cpp
 	src/fileformats/tests/PrayTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
