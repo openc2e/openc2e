@@ -167,6 +167,14 @@ target_link_libraries(openc2e-fileformats
 	PRIVATE ZLIB::ZLIB
 )
 
+add_executable(test_fileformats
+	src/fileformats/tests/CfgFileTest.cpp
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_compile_options(test_fileformats PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+endif()
+target_link_libraries(test_fileformats openc2e-fileformats gtest gtest_main)
+
 add_library(openc2e-mngmusic STATIC
 	src/libmngmusic/MNGMusic.cpp
 )
@@ -426,6 +434,7 @@ include(Openc2eOutputOnTestFailure)
 gtest_discover_tests(test_openc2e)
 gtest_discover_tests(test_opencreatures1)
 gtest_discover_tests(test_common)
+gtest_discover_tests(test_fileformats)
 
 # Generated files
 file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/openc2e/caos/caosVM_*.cpp)
