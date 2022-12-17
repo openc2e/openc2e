@@ -319,6 +319,7 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/PathManager.cpp
 	src/opencreatures1/PointerManager.cpp
 	src/opencreatures1/SFCLoader.cpp
+	src/opencreatures1/TimerSystem.cpp
 	src/opencreatures1/C1Sound.cpp
 	src/opencreatures1/C1SoundManager.cpp
 )

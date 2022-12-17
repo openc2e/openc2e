@@ -58,7 +58,7 @@ std::string get_object_name(const Object* obj) {
 		{2, 8, 3, "Island Carrot Vendor"},
 		{2, 8, 7, "Empty object near greenhouse"},
 		{2, 8, 8, "Empty object in tree"},
-		{2, 8, 9, "Tree Cave Sound"},
+		{2, 8, 9, "Cave Sound"},
 		{2, 8, 15, "Ocean Dome Sound"},
 		{2, 9, 1, "Harp"},
 		{2, 9, 2, "Drum"},

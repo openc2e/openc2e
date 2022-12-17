@@ -26,7 +26,7 @@ void EventManager::tick() {
 	m_immediate_message_queue.clear();
 }
 
-void EventManager::queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno, bool override_existing) {
+bool EventManager::queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno, bool override_existing) {
 	auto* to = g_engine_context.objects->try_get(to_id);
 	auto* from = g_engine_context.objects->try_get(from_id);
 	return queue_script(from, to, eventno, override_existing);
@@ -37,10 +37,10 @@ std::string format_script(ScriptNumber eventno) {
 		eventno);
 }
 
-void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to, ScriptNumber eventno, bool override_existing) {
+bool EventManager::queue_script(PointerView<Object> from, PointerView<Object> to, ScriptNumber eventno, bool override_existing) {
 	if (!to) {
 		printf("WARNING: tried to run script %i on nonexistent object\n", eventno);
-		return;
+		return false;
 	}
 
 	std::string script = g_engine_context.scriptorium->get(to->family, to->genus, to->species, eventno);
@@ -53,10 +53,10 @@ void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to
 	if (script.empty()) {
 		if (eventno == SCRIPT_INITIALIZE) {
 			// skip, otherwise this raises a ton of (spurious?) warnings
-			return;
+			return false;
 		}
 		fmt::print("WARN [EventManager] tried to run nonexistent script {} {}\n", repr(to), format_script(eventno));
-		return;
+		return false;
 	}
 
 	Macro m;
@@ -70,7 +70,7 @@ void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to
 		if (g_engine_context.macros->has_macro_owned_by(m.ownr)) {
 			if (eventno == SCRIPT_TIMER) {
 				// fmt::print("WARN [EventManager] Object {} {} {} skipping timer script because macro already exists\n", to->family, to->genus, to->species);
-				return;
+				return true;
 			}
 			fmt::print("WARN [EventManager] {} replacing macro with {}, hope it doesn't break anything\n",
 				repr(to), format_script(eventno));
@@ -78,6 +78,7 @@ void EventManager::queue_script(PointerView<Object> from, PointerView<Object> to
 		}
 	}
 	g_engine_context.macros->add(m);
+	return true;
 }
 
 void EventManager::mesg_writ(ObjectHandle from_id, ObjectHandle to_id, MessageNumber message) {

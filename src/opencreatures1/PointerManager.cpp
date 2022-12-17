@@ -28,7 +28,7 @@ void PointerManager::handle_event(const BackendEvent& event) {
 		Object* last_object = nullptr;
 
 		for (auto& obj : *g_engine_context.objects) {
-			if (obj->pointer_data) {
+			if (obj->pointer_data || obj->scenery_data) {
 				continue;
 			}
 
