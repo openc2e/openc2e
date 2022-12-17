@@ -169,6 +169,7 @@ target_link_libraries(openc2e-fileformats
 
 add_executable(test_fileformats
 	src/fileformats/tests/CfgFileTest.cpp
+	src/fileformats/tests/PrayTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(test_fileformats PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
@@ -310,7 +311,6 @@ target_link_libraries(openc2e openc2e_core openc2e_sdlbackend)
 
 add_executable(test_openc2e
 	src/openc2e/tests/CaosTest.cpp
-	src/openc2e/tests/PrayTest.cpp
 )
 target_link_libraries(test_openc2e openc2e_core gtest gtest_main)
 
