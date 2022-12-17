@@ -80,6 +80,25 @@ TEST(praysourceparser, bom) {
 	}
 }
 
+TEST(praysourceparser, at_sign_values) {
+	// expect it to not error
+	PraySourceParser::parse(R"(
+        "en-GB"
+        group AGNT "My Agent"
+        "Agent Sprite" @ "mysprite.c16"
+
+        inline FILE "norn.gno" "norn.gno"
+    )");
+}
+
+TEST(praysourceparser, inline_blocks) {
+	// expect it to not error
+	PraySourceParser::parse(R"(
+        "en-GB"
+        inline FILE "norn.gno" "norn.gno"
+    )");
+}
+
 TEST(praysourceparser, windows1252_to_utf8) {
 	auto events = PraySourceParser::parse(std::string(R"(
         "en-GB"
