@@ -9,6 +9,13 @@ class Room {
 	int right;
 	int bottom;
 	int type;
+
+	int width() const {
+		return right - left;
+	}
+	int height() const {
+		return bottom - top;
+	}
 };
 
 class MapManager {
