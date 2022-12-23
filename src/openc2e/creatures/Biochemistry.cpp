@@ -619,9 +619,9 @@ void c2eOrgan::tick() {
 		// *** energy consumption
 		// chem 35 = ATP, chem 36 = ADP (TODO: fix hardcoding)
 		float atplevel = parent->getChemical(35);
-		bool hadenergy = false;
+		// bool hadenergy = false;
 		if (atplevel >= energycost) {
-			hadenergy = true;
+			// hadenergy = true;
 			parent->adjustChemical(35, -energycost);
 			parent->adjustChemical(36, energycost);
 
