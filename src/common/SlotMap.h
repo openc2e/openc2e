@@ -33,6 +33,10 @@ struct SlotMapKey {
 		: index(MAX_INDEX), counter(MAX_COUNTER) {
 	}
 
+	explicit operator bool() const {
+		return *this != SlotMapKey{};
+	}
+
 	bool operator==(const SlotMapKey& other) const {
 		return index == other.index && counter == other.counter;
 	}
