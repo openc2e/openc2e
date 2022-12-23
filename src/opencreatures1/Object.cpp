@@ -38,7 +38,7 @@ void Object::handle_mesg_activate1(Message) {
 	if (vehicle_data) {
 		// TODO: if from a creature and already act1, or doesn't allow act1, stim disappointment
 		actv = ACTV_ACTIVE1;
-		move_object_to(this, get_renderable_for_part(0)->x.trunc(), get_renderable_for_part(0)->y.trunc());
+		move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
 		g_engine_context.events->queue_script(nullptr, this, SCRIPT_ACTIVATE1);
 		return;
 	}
@@ -61,7 +61,7 @@ void Object::handle_mesg_deactivate(Message) {
 		if (actv != ACTV_INACTIVE) {
 			vehicle_data->xvel = 0;
 			vehicle_data->yvel = 0;
-			move_object_to(this, get_renderable_for_part(0)->x.trunc(), get_renderable_for_part(0)->y.trunc());
+			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
 			actv = ACTV_INACTIVE;
 			// TODO: from object?
 			g_engine_context.events->queue_script(nullptr, this, SCRIPT_DEACTIVATE);

@@ -22,17 +22,14 @@ static Renderable renderable_from_sfc_entity(sfc::EntityV1& part) {
 	}
 
 	Renderable r;
-	r.x = part.x;
-	r.y = part.y;
-	r.z = part.z_order;
-	r.object_sprite_base = part.sprite->first_sprite;
-	r.part_sprite_base = part.image_offset;
-	r.sprite_index = part.current_sprite - part.image_offset;
-	r.sprite = g_engine_context.images->get_image(part.sprite->filename, ImageManager::IMAGE_SPR);
-	r.has_animation = part.has_animation;
+	r.set_position(part.x, part.y);
+	r.set_z_order(part.z_order);
+	r.set_object_sprite_base(part.sprite->first_sprite);
+	r.set_part_sprite_base(part.image_offset);
+	r.set_sprite_index(part.current_sprite - part.image_offset);
+	r.set_sprite(g_engine_context.images->get_image(part.sprite->filename, ImageManager::IMAGE_SPR));
 	if (part.has_animation) {
-		r.animation_frame = part.animation_frame;
-		r.animation_string = part.animation_string;
+		r.set_animation(part.animation_frame, part.animation_string);
 	}
 	return r;
 }
@@ -43,10 +40,10 @@ void SFCLoader::object_from_sfc(Object* obj, const sfc::ObjectV1& p) {
 	obj->family = p.family;
 	obj->movement_status = MovementStatus(p.movement_status);
 	obj->attr = p.attr;
-	obj->limit.left = p.limit_left;
-	obj->limit.top = p.limit_top;
-	obj->limit.right = p.limit_right;
-	obj->limit.bottom = p.limit_bottom;
+	obj->limit.x = p.limit_left;
+	obj->limit.y = p.limit_top;
+	obj->limit.width = p.limit_right - p.limit_left;
+	obj->limit.height = p.limit_bottom - p.limit_top;
 	obj->carrier = sfc_object_mapping[p.carrier];
 	obj->actv = ActiveFlag(p.actv);
 	// creaturesImage sprite;
@@ -78,13 +75,13 @@ void SFCLoader::compound_object_from_sfc(Object* obj, const sfc::CompoundObjectV
 		part.renderable = renderable_from_sfc_entity(*cp.entity);
 		part.x = cp.x;
 		part.y = cp.y;
-		obj->compound_data->parts.push_back(part);
+		obj->compound_data->parts.emplace_back(std::move(part));
 	}
 	for (size_t i = 0; i < obj->compound_data->hotspots.size(); ++i) {
-		obj->compound_data->hotspots[i].left = comp.hotspots[i].left;
-		obj->compound_data->hotspots[i].top = comp.hotspots[i].top;
-		obj->compound_data->hotspots[i].right = comp.hotspots[i].right;
-		obj->compound_data->hotspots[i].bottom = comp.hotspots[i].bottom;
+		obj->compound_data->hotspots[i].x = comp.hotspots[i].left;
+		obj->compound_data->hotspots[i].y = comp.hotspots[i].top;
+		obj->compound_data->hotspots[i].width = comp.hotspots[i].right - comp.hotspots[i].left;
+		obj->compound_data->hotspots[i].height = comp.hotspots[i].bottom - comp.hotspots[i].top;
 	}
 	for (size_t i = 0; i < obj->compound_data->functions_to_hotspots.size(); ++i) {
 		obj->compound_data->functions_to_hotspots[i] = comp.functions_to_hotspots[i];
@@ -140,11 +137,12 @@ void SFCLoader::load_map() {
 	fmt::print("WARN [SFCLoader] Unsupported: time_of_day = {}\n", sfc.map->time_of_day);
 
 	fmt::print("INFO [SFCLoader] Loading background = {}.spr\n", sfc.map->background->filename);
-	auto background = g_engine_context.map->background = g_engine_context.images->get_image(sfc.map->background->filename, ImageManager::IMAGE_SPR);
+	auto background = g_engine_context.images->get_image(sfc.map->background->filename, ImageManager::IMAGE_SPR);
 	// TODO: do any C1 metarooms have non-standard sizes?
 	if (background.width(0) != CREATURES1_WORLD_WIDTH || background.height(0) != CREATURES1_WORLD_HEIGHT) {
 		throw Exception(fmt::format("Expected Creatures 1 background size to be 8352x1200 but got {}x{}", background.width(0), background.height(0)));
 	}
+	g_engine_context.map->set_background(background);
 
 	fmt::print("INFO [SFCLoader] Loading rooms...\n");
 	for (auto& r : sfc.map->rooms) {
@@ -154,7 +152,7 @@ void SFCLoader::load_map() {
 		room.right = r.right;
 		room.bottom = r.bottom;
 		room.type = r.type;
-		g_engine_context.map->rooms.push_back(room);
+		g_engine_context.map->add_room(std::move(room));
 	}
 	fmt::print("WARN [SFCLoader] Unsupported: ground_level\n");
 	fmt::print("WARN [SFCLoader] Unsupported: bacteria\n");
@@ -166,14 +164,13 @@ void SFCLoader::vehicle_from_sfc(Object* obj, const sfc::VehicleV1& veh) {
 	obj->vehicle_data->xvel = fixed24_8_t::from_raw(veh.xvel_times_256);
 	obj->vehicle_data->yvel = fixed24_8_t::from_raw(veh.yvel_times_256);
 
-	auto& obj_x = obj->compound_data->parts[0].renderable.x;
-	auto& obj_y = obj->compound_data->parts[0].renderable.y;
+	auto obj_x = obj->compound_data->parts[0].renderable.get_x();
+	auto obj_y = obj->compound_data->parts[0].renderable.get_y();
 	auto veh_x = fixed24_8_t::from_raw(veh.x_times_256);
 	auto veh_y = fixed24_8_t::from_raw(veh.y_times_256);
 	if (obj_x != veh_x || obj_y != veh_y) {
 		fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} overridden by VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
-		obj_x = veh_x;
-		obj_y = veh_y;
+		obj->compound_data->parts[0].renderable.set_position(veh_x, veh_y);
 	}
 
 	obj->vehicle_data->cabin_left = veh.cabin_left;

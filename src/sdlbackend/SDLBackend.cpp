@@ -20,6 +20,7 @@
 #include "SDLBackend.h"
 
 #include "common/Exception.h"
+#include "common/NumericCast.h"
 #include "common/backend/Keycodes.h"
 #include "common/creaturesImage.h"
 #include "imgui_impl_sdl.h"
@@ -381,8 +382,37 @@ void SDLRenderTarget::setViewportOffsetBottom(int offset_bottom) {
 	viewport_offset_bottom = offset_bottom;
 }
 
+
+void SDLRenderTarget::renderTexture(const Texture& tex_, Rect src, Rect dest, RenderOptions options) {
+	if (dest.right() + numeric_cast<int>(tex_.width) <= 0 || dest.x >= numeric_cast<int>(getWidth()) || dest.bottom() <= 0 || dest.y >= numeric_cast<int>(getHeight())) {
+		// cull non-visible textures
+		return;
+	}
+
+	SDL_Texture* tex = const_cast<SDL_Texture*>(tex_.as<SDL_Texture>());
+	assert(tex);
+
+	SDL_SetTextureAlphaMod(tex, options.alpha);
+	SDL_RendererFlip flip = options.mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+
+	SDL_Rect srcrect;
+	srcrect.x = src.x;
+	srcrect.y = src.y;
+	srcrect.w = src.width;
+	srcrect.h = src.height;
+
+	SDL_FRect destrect;
+	destrect.x = dest.x;
+	destrect.y = dest.y;
+	destrect.w = (options.override_drawsize ? options.overridden_drawwidth : dest.width) * options.scale;
+	destrect.h = (options.override_drawsize ? options.overridden_drawheight : dest.height) * options.scale;
+
+	SDL_SetRenderTarget(parent->renderer, texture);
+	SDL_RenderCopyExF(parent->renderer, tex, &srcrect, &destrect, 0, nullptr, flip);
+}
+
 void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, RenderOptions options) {
-	if (x + (int)img.width(frame) <= 0 || x >= (int)getWidth() || y + (int)img.height(frame) <= 0 || y >= (int)getHeight()) {
+	if (x + numeric_cast<int>(img.width(frame)) <= 0 || x >= numeric_cast<int>(getWidth()) || y + numeric_cast<int>(img.height(frame)) <= 0 || y >= numeric_cast<int>(getHeight())) {
 		return;
 	}
 
@@ -390,26 +420,19 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 		img.getTextureForFrame(frame) = parent->createTextureWithTransparentColor(img.getImageForFrame(frame), Color{0, 0, 0, 0xff});
 	}
 
-	SDL_Texture* tex = img.getTextureForFrame(frame).as<SDL_Texture>();
-	assert(tex);
+	Rect src;
+	src.x = img.getXOffsetForFrame(frame);
+	src.y = img.getYOffsetForFrame(frame);
+	src.width = img.width(frame);
+	src.height = img.height(frame);
 
-	SDL_SetTextureAlphaMod(tex, options.alpha);
-	SDL_RendererFlip flip = options.mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+	Rect dest;
+	dest.x = x;
+	dest.y = y + viewport_offset_top;
+	dest.width = (options.override_drawsize ? options.overridden_drawwidth : img.width(frame)) * options.scale;
+	dest.height = (options.override_drawsize ? options.overridden_drawheight : img.height(frame)) * options.scale;
 
-	SDL_Rect srcrect;
-	srcrect.x = img.getXOffsetForFrame(frame);
-	srcrect.y = img.getYOffsetForFrame(frame);
-	srcrect.w = img.width(frame);
-	srcrect.h = img.height(frame);
-
-	SDL_Rect destrect;
-	destrect.x = x;
-	destrect.y = y + viewport_offset_top;
-	destrect.w = (options.override_drawsize ? options.overridden_drawwidth : srcrect.w) * options.scale;
-	destrect.h = (options.override_drawsize ? options.overridden_drawheight : srcrect.h) * options.scale;
-
-	SDL_SetRenderTarget(parent->renderer, texture);
-	SDL_RenderCopyEx(parent->renderer, tex, &srcrect, &destrect, 0, nullptr, flip);
+	return renderTexture(img.getTextureForFrame(frame), src, dest, options);
 }
 
 void SDLRenderTarget::renderClear() {

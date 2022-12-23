@@ -99,6 +99,8 @@ include_directories(BEFORE
 
 # Targets
 add_library(openc2e-common OBJECT
+	src/common/render/RenderItemHandle.cpp
+	src/common/render/RenderSystem.cpp
 	src/common/case_insensitive_filesystem.cpp
 	src/common/creaturesImage.cpp
 	src/common/encoding.cpp
@@ -324,12 +326,15 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/MacroCommands.cpp
 	src/opencreatures1/MacroContext.cpp
 	src/opencreatures1/MacroManager.cpp
+	src/opencreatures1/MapManager.cpp
 	src/opencreatures1/Object.cpp
 	src/opencreatures1/ObjectNames.cpp
 	src/opencreatures1/PathManager.cpp
 	src/opencreatures1/PointerManager.cpp
+	src/opencreatures1/Renderable.cpp
 	src/opencreatures1/SFCLoader.cpp
 	src/opencreatures1/TimerSystem.cpp
+	src/opencreatures1/ViewportManager.cpp
 	src/opencreatures1/C1Sound.cpp
 	src/opencreatures1/C1SoundManager.cpp
 )

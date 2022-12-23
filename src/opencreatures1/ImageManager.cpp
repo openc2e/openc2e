@@ -5,6 +5,7 @@
 #include "common/Ascii.h"
 #include "common/Exception.h"
 #include "common/Repr.h"
+#include "common/backend/Backend.h"
 
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
@@ -49,6 +50,12 @@ creaturesImage& ImageManager::get_image(std::string name, ImageType allowed_type
 	for (auto& i : image.images) {
 		if (i.format == if_index8 && !i.palette) {
 			i.palette = m_default_palette;
+		}
+	}
+
+	for (unsigned int frame = 0; frame < image.numframes(); ++frame) {
+		if (image.width(frame) > 0 && image.height(frame) > 0 && !image.getTextureForFrame(frame)) {
+			image.getTextureForFrame(frame) = g_engine_context.backend->createTextureWithTransparentColor(image.getImageForFrame(frame), Color{0, 0, 0, 0xff});
 		}
 	}
 

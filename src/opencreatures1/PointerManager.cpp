@@ -8,8 +8,9 @@
 void PointerManager::update() {
 	Object* obj = g_engine_context.objects->try_get(m_pointer_tool);
 	Renderable* r = obj->get_renderable_for_part(0);
-	r->x = m_screenx + g_engine_context.viewport->scrollx - obj->pointer_data->relx;
-	r->y = m_screeny + g_engine_context.viewport->scrolly - obj->pointer_data->rely;
+	r->set_position(
+		m_screenx + g_engine_context.viewport->scrollx - obj->pointer_data->relx,
+		m_screeny + g_engine_context.viewport->scrolly - obj->pointer_data->rely);
 }
 
 void PointerManager::handle_event(const BackendEvent& event) {
@@ -33,7 +34,7 @@ void PointerManager::handle_event(const BackendEvent& event) {
 			}
 
 			auto bbox = get_object_bbox(obj.get());
-			if (x >= bbox.left && x <= bbox.right && y >= bbox.top && y <= bbox.bottom) {
+			if (x >= bbox.x && x <= bbox.right() && y >= bbox.y && y <= bbox.bottom()) {
 				fmt::print("found {}\n", repr(obj.get()));
 				if (obj->simple_data && obj->attr & ATTR_ACTIVATEABLE) {
 					// TODO: handle clicks on compound objects

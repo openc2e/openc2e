@@ -23,15 +23,7 @@ static inline Renderable* get_main_part(Object* obj) {
 
 inline Rect get_object_bbox(Object* obj) {
 	Renderable* main_part = get_main_part(obj);
-
-	Rect r;
-	// TODO: should we actually trunc these high-precision coordinates? This only
-	// matters for vehicles.
-	r.left = main_part->x.trunc();
-	r.right = main_part->x.trunc() + main_part->width();
-	r.top = main_part->y.trunc();
-	r.bottom = main_part->y.trunc() + main_part->height();
-	return r;
+	return main_part->get_bbox();
 }
 
 inline void move_object_to(Object* obj, fixed24_8_t x, fixed24_8_t y) {
@@ -48,21 +40,18 @@ inline void move_object_to(Object* obj, fixed24_8_t x, fixed24_8_t y) {
 		throw_exception("Tried to move an object without any parts: {}", repr(*obj));
 	}
 
-	if (main_part->x == x && main_part->y == y) {
+	// TODO: replace this with get_position and a Vector2?
+	if (main_part->get_x() == x && main_part->get_y() == y) {
 		return;
 	}
 
-	main_part->x = x;
-	main_part->y = y;
+	main_part->set_position(x, y);
 
 	if (auto* comp = obj->compound_data.get()) {
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
-			auto& p = comp->parts[i];
+			Renderable& p = comp->parts[i].renderable;
 
-			Renderable* part = &p.renderable;
-
-			part->x = x + p.x;
-			part->y = y + p.y;
+			p.set_position(x + p.get_x(), y + p.get_y());
 		}
 	}
 }
@@ -85,17 +74,13 @@ inline void move_object_by(Object* obj, fixed24_8_t xdiff, fixed24_8_t ydiff) {
 		return;
 	}
 
-	main_part->x += xdiff;
-	main_part->y += ydiff;
+	main_part->set_position(main_part->get_x() + xdiff, main_part->get_y() + ydiff);
 
 	if (auto* comp = obj->compound_data.get()) {
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
-			auto& p = comp->parts[i];
+			Renderable& p = comp->parts[i].renderable;
 
-			Renderable* part = &p.renderable;
-
-			part->x = main_part->x + p.x;
-			part->y = main_part->y + p.y;
+			p.set_position(main_part->get_x() + p.get_x(), main_part->get_y() + p.get_y());
 		}
 	}
 }
@@ -136,7 +121,7 @@ class ObjectManager {
 		for (auto& o : m_pool) {
 			if (o->current_sound) {
 				auto bbox = get_object_bbox(o.get());
-				o->current_sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
+				o->current_sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 			}
 
 			if (auto* vehicle = o->vehicle_data.get()) {

@@ -45,7 +45,8 @@ class SDLRenderTarget : public RenderTarget {
 	SDLRenderTarget& operator=(const SDLRenderTarget&) = delete;
 	SDLRenderTarget& operator=(SDLRenderTarget&&) = delete;
 	~SDLRenderTarget();
-	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options = {});
+	void renderTexture(const Texture& tex, Rect src, Rect dest, RenderOptions options);
+	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options);
 	void renderLine(int x1, int y1, int x2, int y2, unsigned int color);
 	void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h);
 	unsigned int getWidth() const;

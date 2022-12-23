@@ -25,6 +25,7 @@
 
 class NullRenderTarget : public RenderTarget {
   public:
+	virtual void renderTexture(const Texture&, Rect, Rect, RenderOptions) {}
 	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) {}
 	virtual void renderLine(int, int, int, int, unsigned int) {}
 	virtual void blitRenderTarget(RenderTarget*, int, int, int, int) {}

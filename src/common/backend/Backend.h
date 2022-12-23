@@ -22,6 +22,7 @@
 #include "BackendEvent.h"
 #include "BackendTexture.h"
 #include "common/Image.h"
+#include "common/math/Rect.h"
 #include "common/span.h"
 
 #include <memory>
@@ -44,6 +45,7 @@ struct RenderOptions {
 
 class RenderTarget {
   public:
+	virtual void renderTexture(const Texture& tex, Rect src, Rect dest, RenderOptions options = {}) = 0;
 	virtual void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options = {}) = 0;
 	void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, RenderOptions options = {}) {
 		assert(tex.get() != nullptr);

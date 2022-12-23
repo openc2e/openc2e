@@ -17,6 +17,7 @@
 #include "common/Repr.h"
 #include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
+#include "common/render/RenderSystem.h"
 #include "fileformats/NewSFCFile.h"
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
@@ -25,6 +26,7 @@
 #include <chrono>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
+#include <math.h>
 
 namespace fs = ghc::filesystem;
 
@@ -35,8 +37,14 @@ namespace fs = ghc::filesystem;
 void load_everything() {
 	// set up global objects
 	g_engine_context.backend = std::make_shared<SDLBackend>();
+	g_engine_context.backend->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
 	g_engine_context.audio_backend = SDLMixerBackend::getInstance();
 	g_engine_context.audio_backend->init(); // TODO: initialized early so SFC sounds can start.. is this right?
+
+	g_engine_context.rendersystem = std::make_shared<RenderSystem>(g_engine_context.backend.get());
+	g_engine_context.rendersystem->set_layer_wrap_width(LAYER_BACKGROUND, CREATURES1_WORLD_WIDTH);
+	g_engine_context.rendersystem->set_layer_wrap_width(LAYER_OBJECTS, CREATURES1_WORLD_WIDTH);
+	g_engine_context.rendersystem->set_layer_wrap_width(LAYER_ROOMS, CREATURES1_WORLD_WIDTH);
 
 	// load palette
 	g_engine_context.images->load_default_palette();
@@ -61,57 +69,82 @@ void load_everything() {
 }
 
 void draw_everything() {
-	auto renderer = g_engine_context.backend->getMainRenderTarget();
+	// {
+	//
+	//
+	// 	// background
+	//
+	//
+	// 	// object parts
+	// 	std::vector<RenderItemHandle> object_render_items;
+	// 	for (auto& o : *g_engine_context.objects) {
+	// 		for (int32_t partno = 0; true; ++partno) {
+	// 			auto* renderable = o->get_renderable_for_part(partno);
+	// 			if (!renderable) {
+	// 				break;
+	// 			}
+	//
+	// 			auto frame = numeric_cast<unsigned int>(renderable->frame());
+	// 			auto renderitem = rendersystem.create_render_item(LAYER_OBJECTS);
+	// 			rendersystem.set_render_item_texture(renderitem, renderable->sprite.getTextureForFrame(frame));
+	// 			rendersystem.set_render_item_position(renderitem, renderable->x.trunc(), renderable->y.trunc(), renderable->z);
+	// 			object_render_items.emplace_back(std::move(renderitem));
+	// 		}
+	// 	}
+	//
+	//
+	//
+	// 	rendersystem.draw();
+	// }
+	g_engine_context.rendersystem->draw();
+
+
+	// auto renderer = g_engine_context.backend->getMainRenderTarget();
 
 	// draw world (twice, to handle wraparound)
-	renderer->renderCreaturesImage(g_engine_context.map->background, 0, -g_engine_context.viewport->scrollx, -g_engine_context.viewport->scrolly);
-	renderer->renderCreaturesImage(g_engine_context.map->background, 0, -g_engine_context.viewport->scrollx + CREATURES1_WORLD_WIDTH, -g_engine_context.viewport->scrolly);
+	// renderer->renderCreaturesImage(g_engine_context.map->background, 0, -g_engine_context.viewport->scrollx, -g_engine_context.viewport->scrolly);
+	// renderer->renderCreaturesImage(g_engine_context.map->background, 0, -g_engine_context.viewport->scrollx + CREATURES1_WORLD_WIDTH, -g_engine_context.viewport->scrolly);
 
 	// draw entities
-	std::vector<Renderable*> renderables;
-	for (auto& o : *g_engine_context.objects) {
-		for (int32_t partno = 0; true; ++partno) {
-			auto* r = o->get_renderable_for_part(partno);
-			if (!r) {
-				break;
-			}
-			renderables.push_back(r);
-		}
-	}
-	std::stable_sort(renderables.begin(), renderables.end(), [](auto* left, auto* right) {
-		return left->z < right->z;
-	});
-	for (auto* r : renderables) {
-		int x = r->x.trunc() - g_engine_context.viewport->scrollx;
-		int y = r->y.trunc();
-		// what to do if it's near the wraparound? just draw three times?
-		renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x, y - g_engine_context.viewport->scrolly);
-		renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x - CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
-		renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x + CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
-	}
+	// std::vector<Renderable*> renderables;
+	// for (auto& o : *g_engine_context.objects) {
+	// 	for (int32_t partno = 0; true; ++partno) {
+	// 		auto* r = o->get_renderable_for_part(partno);
+	// 		if (!r) {
+	// 			break;
+	// 		}
+	// 		renderables.push_back(r);
+	// 	}
+	// }
+	// std::stable_sort(renderables.begin(), renderables.end(), [](auto* left, auto* right) {
+	// 	return left->z < right->z;
+	// });
+	// for (auto* r : renderables) {
+	// 	int x = r->x.trunc() - g_engine_context.viewport->scrollx;
+	// 	int y = r->y.trunc();
+	// 	// what to do if it's near the wraparound? just draw three times?
+	// 	renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x, y - g_engine_context.viewport->scrolly);
+	// 	renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x - CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
+	// 	renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x + CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
+	// }
 
-	// draw rooms
-	for (auto& room : g_engine_context.map->rooms) {
-		// what to do if it's near the wraparound? just draw three times?
-		for (auto offset : {-CREATURES1_WORLD_WIDTH, 0, CREATURES1_WORLD_WIDTH}) {
-			auto left = room.left - g_engine_context.viewport->scrollx + offset;
-			auto top = room.top - g_engine_context.viewport->scrolly;
-			auto right = room.right - g_engine_context.viewport->scrollx + offset;
-			auto bottom = room.bottom - g_engine_context.viewport->scrolly;
-			uint32_t color;
-			if (room.type == 0) {
-				color = 0xFFFF00CC;
-			} else if (room.type == 1) {
-				color = 0x00FFFFCC;
-			} else {
-				color = 0xFF00FFCC;
-			}
-			renderer->renderLine(left, top, right, top, color);
-			renderer->renderLine(right, top, right, bottom, color);
-			renderer->renderLine(left, top, left, bottom, color);
-			renderer->renderLine(left, bottom, right, bottom, color);
-		}
-	}
+	// // draw rooms
+	// for (auto& room : g_engine_context.map->rooms) {
+	// 	auto left = room.left - g_engine_context.viewport->scrollx;
+	// 	auto top = room.top - g_engine_context.viewport->scrolly;
+	// 	uint32_t color;
+	// 	if (room.type == 0) {
+	// 		color = 0xFFFF00CC;
+	// 	} else if (room.type == 1) {
+	// 		color = 0x00FFFFCC;
+	// 	} else {
+	// 		color = 0xFF00FFCC;
+	// 	}
+	// 	renderer->renderRect(left, top, room.width(), room.height(), color);
+	// 	// what to do if it's near the wraparound? just draw three times?
+	// 	renderer->renderRect(left + CREATURES1_WORLD_WIDTH, top, room.width(), room.height(), color);
+	// 	renderer->renderRect(left - CREATURES1_WORLD_WIDTH, top, room.width(), room.height(), color);
+	// }
 }
 
 void update_animations() {
@@ -122,28 +155,7 @@ void update_animations() {
 				break;
 			}
 
-			if (!r->has_animation) {
-				continue;
-			}
-
-			if (r->animation_frame >= r->animation_string.size()) {
-				// already done
-				// TODO: are we on the correct frame already?
-				// TODO: clear animation?
-				r->has_animation = false;
-				r->animation_string = {};
-				r->animation_frame = 0;
-				continue;
-			}
-
-			// some objects in Eden.sfc start at the 'R' character, so set frame
-			// before incrementing.
-			// TODO: assert isdigit
-			if (r->animation_string[r->animation_frame] == 'R') {
-				r->animation_frame = 0;
-			}
-			r->sprite_index = r->animation_string[r->animation_frame] - '0';
-			r->animation_frame += 1;
+			r->update_animation();
 		}
 	}
 }
@@ -192,7 +204,7 @@ extern "C" int main(int argc, char** argv) {
 	load_everything();
 
 	// run loop
-	g_engine_context.backend->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
+	// g_engine_context.backend->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
 	while (true) {
 		g_engine_context.backend->waitForNextDraw();
 

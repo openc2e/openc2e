@@ -9,6 +9,7 @@
 #include "Renderable.h"
 #include "common/Exception.h"
 #include "common/FixedPoint.h"
+#include "common/math/Rect.h"
 
 #include <array>
 
@@ -37,15 +38,6 @@ enum AttributeFlags : uint8_t {
 	ATTR_GROUNDBOUND = 128
 };
 
-struct Rect {
-	int32_t left;
-	int32_t top;
-	int32_t right;
-	int32_t bottom;
-
-	int32_t width() const { return right - left; }
-	int32_t height() const { return bottom - top; }
-};
 
 struct SceneryData {
 	Renderable part;

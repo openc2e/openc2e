@@ -1,6 +1,9 @@
 #pragma once
 
 #include "common/creaturesImage.h"
+#include "common/render/RenderItemHandle.h"
+
+#include <vector>
 
 class Room {
   public:
@@ -9,6 +12,8 @@ class Room {
 	int right;
 	int bottom;
 	int type;
+
+	RenderItemHandle renderitem;
 
 	int width() const {
 		return right - left;
@@ -20,6 +25,11 @@ class Room {
 
 class MapManager {
   public:
-	creaturesImage background;
+	void add_room(Room&&);
+	void set_background(creaturesImage background);
+
+  private:
 	std::vector<Room> rooms;
+	creaturesImage background;
+	RenderItemHandle background_renderitem;
 };

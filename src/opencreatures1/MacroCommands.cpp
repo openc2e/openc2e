@@ -26,9 +26,7 @@ void Command_ANIM(MacroContext& ctx, Macro& m) {
 	ctx.read_arg_separator(m);
 	std::string anim_string = ctx.read_bracket_string(m);
 	auto* r = ctx.get_targ_part(m);
-	r->has_animation = true;
-	r->animation_frame = 0;
-	r->animation_string = anim_string;
+	r->set_animation(0, anim_string);
 
 	ctx.read_command_separator(m);
 }
@@ -217,7 +215,7 @@ void Command_MVBY(MacroContext& ctx, Macro& m) {
 
 	if (ctx.debug) {
 		printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
-			xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus, ctx.get_targ(m)->species, ctx.get_targ_part(m)->sprite.getName().c_str());
+			xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus, ctx.get_targ(m)->species, ctx.get_targ_part(m)->get_sprite_name().c_str());
 	}
 
 	ctx.read_command_separator(m);
@@ -257,7 +255,7 @@ void Command_NEGV(MacroContext& ctx, Macro& m) {
 }
 
 void Command_OVER(MacroContext& ctx, Macro& m) {
-	if (ctx.get_targ_part(m)->has_animation) {
+	if (ctx.get_targ_part(m)->has_animation()) {
 		m.ip -= 4;
 	} else {
 		if (ctx.debug) {
@@ -282,7 +280,7 @@ void Command_POSE(MacroContext& ctx, Macro& m) {
 
 	auto* renderable = ctx.get_targ_part(m);
 	renderable->clear_animation();
-	renderable->sprite_index = pose;
+	renderable->set_sprite_index(pose);
 
 	ctx.read_command_separator(m);
 }
@@ -368,7 +366,7 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 
 	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
 	auto bbox = get_object_bbox(targ);
-	sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
+	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
 
 	ctx.read_command_separator(m);
@@ -381,7 +379,7 @@ void Command_SNDE(MacroContext& ctx, Macro& m) {
 
 	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
 	auto bbox = get_object_bbox(ctx.get_targ(m));
-	sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
+	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 
 	ctx.read_command_separator(m);
 }
@@ -402,7 +400,7 @@ void Command_SNDL(MacroContext& ctx, Macro& m) {
 
 	C1Sound sound = g_engine_context.sounds->play_sound(sound_name, true);
 	auto bbox = get_object_bbox(targ);
-	sound.set_position(bbox.left, bbox.top, bbox.width(), bbox.height());
+	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
 
 	ctx.read_command_separator(m);
@@ -538,43 +536,43 @@ int32_t IntegerRV_ACTV(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_HGHT(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).height();
+	return get_object_bbox(ctx.get_targ(m)).height;
 }
 
 int32_t IntegerRV_LIMB(MacroContext& ctx, Macro& m) {
 	auto* targ = ctx.get_targ(m);
-	return targ->limit.bottom;
+	return targ->limit.bottom();
 }
 
 int32_t IntegerRV_LIML(MacroContext& ctx, Macro& m) {
 	auto* targ = ctx.get_targ(m);
-	return targ->limit.left;
+	return targ->limit.x;
 }
 
 int32_t IntegerRV_LIMR(MacroContext& ctx, Macro& m) {
 	auto* targ = ctx.get_targ(m);
-	return targ->limit.right;
+	return targ->limit.right();
 }
 
 int32_t IntegerRV_LIMT(MacroContext& ctx, Macro& m) {
 	auto* targ = ctx.get_targ(m);
-	return targ->limit.top;
+	return targ->limit.y;
 }
 
 int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).bottom;
+	return get_object_bbox(ctx.get_targ(m)).bottom();
 }
 
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).left;
+	return get_object_bbox(ctx.get_targ(m)).x;
 }
 
 int32_t IntegerRV_POSR(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).right;
+	return get_object_bbox(ctx.get_targ(m)).right();
 }
 
 int32_t IntegerRV_POST(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).top;
+	return get_object_bbox(ctx.get_targ(m)).y;
 }
 
 int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
@@ -589,7 +587,7 @@ int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_WDTH(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).width();
+	return get_object_bbox(ctx.get_targ(m)).width;
 }
 
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
