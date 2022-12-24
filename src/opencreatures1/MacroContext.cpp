@@ -16,17 +16,27 @@ std::string repr(Token i) {
 
 ShortToken MacroContext::read_short_token(Macro& m) {
 	// TODO: assert allowed letters
-	const char* s = m.script.c_str() + m.ip;
-	ShortToken token({s[0], s[1]});
-	m.ip += 2;
+	ShortToken token;
+	for (size_t i = 0; i < 2; ++i) {
+		if (m.ip < m.script.size()) {
+			token.data[i] = m.script[m.ip++];
+		} else {
+			token.data[i] = '\0';
+		}
+	}
 	return token;
 }
 
 Token MacroContext::read_token(Macro& m) {
 	// TODO: assert allowed letters
-	const char* s = m.script.c_str() + m.ip;
-	Token token({s[0], s[1], s[2], s[3]});
-	m.ip += 4;
+	Token token;
+	for (size_t i = 0; i < 4; ++i) {
+		if (m.ip < m.script.size()) {
+			token.data[i] = m.script[m.ip++];
+		} else {
+			token.data[i] = '\0';
+		}
+	}
 	return token;
 }
 

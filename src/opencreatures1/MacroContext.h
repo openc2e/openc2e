@@ -9,6 +9,8 @@
 #include <string>
 
 struct ShortToken {
+	explicit ShortToken()
+		: data{0, 0} {}
 	explicit ShortToken(const char s[2])
 		: data{s[0], s[1]} {}
 	explicit ShortToken(const char (&s)[2])
@@ -20,6 +22,8 @@ struct ShortToken {
 };
 
 struct Token {
+	explicit Token()
+		: data{0, 0, 0, 0} {}
 	explicit Token(const char s[4])
 		: data{s[0], s[1], s[2], s[3]} {}
 	explicit Token(const char (&s)[4])
