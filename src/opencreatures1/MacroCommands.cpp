@@ -223,12 +223,29 @@ void Command_ENUM(MacroContext& ctx, Macro& m) {
 	int32_t species = ctx.read_int(m);
 	ctx.read_command_separator(m);
 
-	(void)family;
-	(void)genus;
-	(void)species;
-	printf("WARNING: ENUM not implemented\n");
+	if (family < 0 || family > 255 || genus < 0 || genus > 255 || species < 0 || species > 255) {
+		throw Exception(fmt::format("Invalid arguments to ENUM {} {} {}", family, genus, species));
+	}
 
-	// if no objects, go find the next NEXT
+	if (m.enum_result.size()) {
+		throw Exception("Nested calls to ENUM are not implemented");
+	}
+
+	for (auto& obj : *g_engine_context.objects) {
+		if ((obj->family == family || family == 0) && (obj->genus == genus || genus == 0) && (obj->species == species || species == 0)) {
+			m.enum_result.push_back(obj->uid);
+		}
+	}
+
+	// if we have results, then run the block
+	if (m.enum_result.size()) {
+		m.stack.push_back(static_cast<int32_t>(m.ip)); // where to jump back to
+		m.targ = m.enum_result.back();
+		m.enum_result.pop_back();
+		return;
+	}
+
+	// otherwise, if no objects, go find the next NEXT
 	// TODO: hacky and probably wrong! get a better parser
 	size_t level = 1;
 	while (true) {
@@ -246,7 +263,7 @@ void Command_ENUM(MacroContext& ctx, Macro& m) {
 		} else if (command == Token("next")) {
 			level -= 1;
 			if (level == 0) {
-				// cool, skip to this NEXT
+				// cool, skip past this NEXT
 				ctx.read_command_separator(m);
 				return;
 			}
@@ -368,6 +385,24 @@ void Command_NEGV(MacroContext& ctx, Macro& m) {
 	ctx.set_variable(m, varname, -value);
 
 	ctx.read_command_separator(m);
+}
+
+void Command_NEXT(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_command_separator(m);
+
+	while (m.enum_result.size()) {
+		ObjectHandle obj = m.enum_result.back();
+		m.enum_result.pop_back();
+		if (g_engine_context.objects->try_get(obj)) {
+			m.targ = obj;
+			m.ip = static_cast<uint32_t>(m.stack.back());
+			return;
+		}
+	}
+
+	// done with the ENUM, remove the block ip from the stack
+	m.stack.pop_back();
 }
 
 void Command_OVER(MacroContext& ctx, Macro& m) {
@@ -586,6 +621,17 @@ void Command_TARG(MacroContext& ctx, Macro& m) {
 	ObjectHandle new_targ = ctx.read_object(m);
 	ctx.set_targ(m, new_targ);
 	ctx.read_command_separator(m);
+}
+
+void Command_TELE(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	int32_t x = ctx.read_int(m);
+	ctx.read_arg_separator(m);
+	int32_t y = ctx.read_int(m);
+	ctx.read_command_separator(m);
+
+	printf("WARNING: TELE %i %i not implemented\n", x, y);
 }
 
 void Command_SUBV(MacroContext& ctx, Macro& m) {
@@ -809,6 +855,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("mesg")] = Command_MESG;
 	ctx.command_funcs[Token("mvby")] = Command_MVBY;
 	ctx.command_funcs[Token("mvto")] = Command_MVTO;
+	ctx.command_funcs[Token("next")] = Command_NEXT;
 	ctx.command_funcs[Token("over")] = Command_OVER;
 	ctx.command_funcs[Token("part")] = Command_PART;
 	ctx.command_funcs[Token("pose")] = Command_POSE;
@@ -821,6 +868,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("stim")] = Command_STIM;
 	ctx.command_funcs[Token("stpc")] = Command_STPC;
 	ctx.command_funcs[Token("targ")] = Command_TARG;
+	ctx.command_funcs[Token("tele")] = Command_TELE;
 	ctx.command_funcs[Token("tick")] = Command_TICK;
 	ctx.command_funcs[Token("untl")] = Command_UNTL;
 	ctx.command_funcs[Token("wait")] = Command_WAIT;

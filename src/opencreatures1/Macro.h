@@ -28,4 +28,7 @@ struct Macro {
 	uint32_t subroutine_address = 0;
 	int32_t wait = 0;
 	bool destroy_as_soon_as_possible = false;
+
+	// TODO: oof.
+	std::vector<ObjectHandle> enum_result;
 };
