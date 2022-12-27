@@ -1,86 +1,249 @@
 #include "Object.h"
 
 #include "ObjectManager.h"
+#include "common/Ascii.h"
+#include "common/NumericCast.h"
 
-void Object::handle_click() {
+void Object::handle_left_click(int32_t relx, int32_t rely) {
+	// When an object is the subject of a left click event, we queue up a message
+	// to ACTIVATE1, ACTIVATE2, or DEACTIVATE. But how do we know which message
+	// to send?
+
+	if (pointer_data) {
+		throw Exception("handle_click erroneously called on PointerTool");
+	}
+
+	// SimpleObjects have their click behavior controlled by BHVR - we index into
+	// their click BHVR array using their current ACTV (activation status), which
+	// gives us the message to send.
 	if (simple_data) {
-		if (pointer_data) {
-			throw Exception("handle_click erroneously called on PointerTool");
-		}
-
-		fmt::print("Got a click, click bhvr {} {} {}, actv {}\n", simple_data->click_bhvr[0], simple_data->click_bhvr[1], simple_data->click_bhvr[2], actv);
+		// fmt::print("Got a click, click bhvr {} {} {}, actv {}\n", simple_data->click_bhvr[0], simple_data->click_bhvr[1], simple_data->click_bhvr[2], actv);
 
 		int8_t click_message = simple_data->click_bhvr[actv];
-		fmt::print("click message {}\n", click_message);
+		// fmt::print("click message {}\n", click_message);
 		if (click_message == -1) {
+			// TODO: should we still make the mouse gesture?
 			return;
 		}
 		g_engine_context.events->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(click_message));
 
-		// TODO: let objects override the script when they get clicked on
+		// TODO: let objects override the pointer script when they get clicked on
 		g_engine_context.events->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
 		return;
 	}
+
+	// CompoundObjects are completely different. We check the clickable knobs
+	// (out of the six total knobs, the first three are for creatures, the
+	// second three are for the mouse) and their associated hotspots to see if
+	// any contain the click location.
 	if (compound_data) {
-		throw Exception("handle_click not implemented for CompoundObject");
+		// printf("handle_left_click %i %i\n", relx, rely);
+
+		for (size_t i = 3; i < 6; ++i) {
+			int32_t hotspot_idx = compound_data->functions_to_hotspots[i];
+			if (hotspot_idx == -1 || hotspot_idx < 0) {
+				// knob doesn't have hotspot attached
+				continue;
+			}
+			Rect hotspot = compound_data->hotspots[numeric_cast<size_t>(hotspot_idx)];
+			// TODO: check for bad hotspots?
+
+			if (hotspot.has_point(relx, rely)) {
+				// Found a clickable knob whose hotspot contains this click!
+				g_engine_context.events->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(i - 3));
+
+				// TODO: let objects override the pointer script when they get clicked on
+				g_engine_context.events->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
+				return;
+			}
+		}
+		// TODO: what if there are no knobs/hotspots?
+		return;
 	}
 	throw Exception("handle_click not implemented");
 }
 
-void Object::handle_mesg_activate1(Message) {
-	if (simple_data && !pointer_data) {
-		// TODO: if from a creature, already in act1 or touch_bhvr doesn't allow act1, stim disappointment
+void Object::handle_mesg_activate1(Message msg) {
+	if (simple_data) {
+		if (pointer_data) {
+			throw Exception("handle_mesg_activate1 not implemented on pointer");
+		}
+
+		// if (msg.from.creature_data) {
+		//   if (actv == ACTIVATE1 || !(touch_bhvr & ACTIVATE1)) {
+		//      msg.from.stim_disappoint();
+		//   }
+		// }
+
+		if (call_button_data) {
+			// if owner lift already at our floor, ignore
+			// tell lift to come here
+			// then do normal simple object stuff
+			throw Exception("handle_mesg_activate1 not implemented for CallButton");
+		}
+
 		actv = ACTV_ACTIVE1;
-		// TODO: from object?
-		g_engine_context.events->queue_script(nullptr, this, SCRIPT_ACTIVATE1);
+		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
 	}
-	if (vehicle_data) {
-		// TODO: if from a creature and already act1, or doesn't allow act1, stim disappointment
+
+	if (compound_data) {
+		if (lift_data) {
+			// different allowed check, must be ACTV = INACTIVE, OBJ0 == 0, and lower floor
+			// then normal compoundobject stuff
+			throw Exception("handle_mesg_activate1 not implemented for Lift");
+		}
+
+		// if (msg.from.creature_data) {
+		//   if (actv == ACTIVATE1 || !has_hotspot(CREATUREACTIVATE1) || !has_script(ACTIVATE1)) {
+		//     msg.from.stim_disappoint();
+		//   }
+		// }
+
+		if (vehicle_data) {
+			// truncate fixed point position
+			// TODO: is this right?
+			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
+		}
+
 		actv = ACTV_ACTIVE1;
-		move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
-		g_engine_context.events->queue_script(nullptr, this, SCRIPT_ACTIVATE1);
+		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
 	}
+
 	throw Exception(fmt::format("handle_mesg_activate1 not implemented on object {} {} {}", family, genus, species));
 }
-void Object::handle_mesg_activate2(Message) {
-	// TODO
-	// throw Exception("handle_mesg_activate2 not implemented");
-}
-void Object::handle_mesg_deactivate(Message) {
-	if (simple_data && !pointer_data) {
-		// TODO: if from a creature, already in deact or touch_bhvr doesn't allow deact, stim disappointment
-		actv = ACTV_INACTIVE;
-		// TODO: from object?
-		g_engine_context.events->queue_script(nullptr, this, SCRIPT_DEACTIVATE);
+
+void Object::handle_mesg_activate2(Message msg) {
+	if (simple_data) {
+		if (pointer_data) {
+			throw Exception("handle_mesg_activate2 not implemented on pointer");
+		}
+		if (call_button_data) {
+			// Call buttons never activate2, always activate1
+			return handle_mesg_activate1(msg);
+		}
+
+		// if (msg.from.creature_data) {
+		//   if (actv == ACTIVATE2 || !(touch_bhvr & ACTIVATE2)) {
+		//      msg.from.stim_disappoint();
+		//   }
+		// }
+
+		actv = ACTV_ACTIVE2;
+		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
 	}
-	if (vehicle_data) {
-		// TODO: if from a creature and already inactive, or can't be deactivated, stim disappointment
-		if (actv != ACTV_INACTIVE) {
+
+	if (compound_data) {
+		if (lift_data) {
+			// different allowed check, must be ACTV = INACTIVE, OBJ0 == 0, and _higher_ floor
+			// then normal stuff except we set ACTV to ACTIVE1 even though we call the ACTIVATE2 script!
+			throw Exception("handle_mesg_activate1 not implemented for Lift");
+		}
+
+		// if (msg.from.creature_data) {
+		//   if (actv == ACTIVATE2 || !has_hotspot(CREATUREACTIVATE2) || !has_script(ACTIVATE2)) {
+		//     msg.from.stim_disappoint();
+		//   }
+		// }
+
+		if (vehicle_data) {
+			// truncate fixed point position
+			// TODO: is this right?
+			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
+		}
+
+		actv = ACTV_ACTIVE2;
+		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
+		return;
+	}
+
+	throw Exception(fmt::format("handle_mesg_activate2 not implemented on object {} {} {}", family, genus, species));
+}
+
+void Object::handle_mesg_deactivate(Message msg) {
+	if (simple_data) {
+		if (pointer_data) {
+			throw Exception("handle_mesg_deactivate not implemented on pointer");
+		}
+
+		// if (msg.from.creature_data) {
+		//   if (actv == INACTIVE || !(touch_bhvr & DEACTIVATE)) {
+		//      msg.from.stim_disappoint();
+		//   }
+		// }
+
+		actv = ACTV_INACTIVE;
+		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
+		return;
+	}
+
+	if (compound_data) {
+		if (lift_data) {
+			// not allowed!!
+			// msg.from.stim_disappoint();
+			throw Exception("handle_mesg_deactivate not implemented for Lift");
+		}
+
+		// if (msg.from.creature_data) {
+		//   if (actv == INACTIVE || !has_hotspot(CREATUREDEACTIVATE) || !has_script(DEACTIVATE)) {
+		//     msg.from.stim_disappoint();
+		//   }
+		// }
+
+		if (vehicle_data) {
+			// truncate fixed point position
+			// TODO: is this right?
+			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
+			// stop!
 			vehicle_data->xvel = 0;
 			vehicle_data->yvel = 0;
-			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
-			actv = ACTV_INACTIVE;
-			// TODO: from object?
-			g_engine_context.events->queue_script(nullptr, this, SCRIPT_DEACTIVATE);
 		}
+
+		actv = ACTV_INACTIVE;
+		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
 		return;
 	}
-	throw Exception("handle_mesg_deactivate not implemented");
+
+	throw Exception(fmt::format("handle_mesg_deactivate not implemented on object {} {} {}", family, genus, species));
 }
+
 void Object::handle_mesg_hit(Message) {
 	throw Exception("handle_mesg_hit not implemented");
 }
+
 void Object::handle_mesg_pickup(Message) {
 	throw Exception("handle_mesg_pickup not implemented");
 }
+
 void Object::handle_mesg_drop(Message) {
 	throw Exception("handle_mesg_drop not implemented");
 }
 
+int32_t Object::get_z_order() const {
+	auto* main_part = get_renderable_for_part(0);
+	if (!main_part) {
+		throw_exception("Can't get main part of object without any parts: {}", repr(*this));
+	}
+
+	return main_part->get_z_order();
+}
+
+Rect Object::get_bbox() const {
+	auto* main_part = get_renderable_for_part(0);
+	if (!main_part) {
+		throw_exception("Can't get main part of object without any parts: {}", repr(*this));
+	}
+
+	return main_part->get_bbox();
+}
+
 Renderable* Object::get_renderable_for_part(int32_t partnum) {
+	return const_cast<Renderable*>(const_cast<const Object*>(this)->get_renderable_for_part(partnum));
+}
+
+const Renderable* Object::get_renderable_for_part(int32_t partnum) const {
 	if (scenery_data) {
 		if (partnum == 0) {
 			return &scenery_data->part;
@@ -97,4 +260,58 @@ Renderable* Object::get_renderable_for_part(int32_t partnum) {
 		return &compound_data->parts[idx].renderable;
 	}
 	return nullptr;
+}
+
+void Object::blackboard_show_word(int32_t word_index) {
+	if (word_index < 0 || numeric_cast<size_t>(word_index) >= blackboard_data->words.size()) {
+		throw Exception(fmt::format("Blackboard word index {} out of bounds", word_index));
+	}
+	const auto& word = blackboard_data->words[numeric_cast<size_t>(word_index)];
+
+	int32_t x = get_bbox().x + blackboard_data->text_x_position;
+	const int32_t y = get_bbox().y + blackboard_data->text_y_position;
+	// TODO: What should the actual z-order be? Should this be in a SortingGroup with the
+	// main blackboard part?
+	const int32_t z = get_z_order() + 1;
+
+	blackboard_hide_word();
+	for (size_t i = 0; i < word.text.size(); ++i) {
+		const unsigned int frame = static_cast<unsigned char>(to_ascii_uppercase(word.text[i]));
+		const auto texture = blackboard_data->charset_sprite.getTextureForFrame(frame);
+
+		auto renderitem = g_engine_context.rendersystem->render_item_create(LAYER_OBJECTS);
+		g_engine_context.rendersystem->render_item_set_texture(renderitem, texture);
+		g_engine_context.rendersystem->render_item_set_position(renderitem, x, y, z);
+		blackboard_data->text_render_items[i] = std::move(renderitem);
+
+		x += blackboard_data->charset_sprite.width(frame) + 1;
+	}
+}
+
+void Object::blackboard_hide_word() {
+	blackboard_data->text_render_items = {};
+}
+
+void Object::blackboard_enable_edit() {
+	printf("WARNING: blackboard_enable_edit not implemented\n");
+}
+
+void Object::blackboard_disable_edit() {
+	// TODO: no-op until we implement blackboard_enable_edit
+}
+
+void Object::blackboard_emit_eyesight(int32_t word_index) {
+	printf("WARNING: blackboard_emit_eyesight %i not implemented\n", word_index);
+}
+
+void Object::blackboard_emit_earshot(int32_t word_index) {
+	printf("WARNING: blackboard_emit_earshot %i not implemented\n", word_index);
+}
+
+void Object::vehicle_grab_passengers() {
+	printf("WARNING: vehicle_grab_passengers not implemented\n");
+}
+
+void Object::vehicle_drop_passengers() {
+	printf("WARNING: vehicle_drop_passengers not implemented\n");
 }

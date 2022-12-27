@@ -18,6 +18,7 @@ class ImageManager {
 	ImageManager();
 	void load_default_palette();
 	creaturesImage& get_image(std::string name, ImageType allowed_types);
+	creaturesImage get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor);
 
   private:
 	std::map<std::string, creaturesImage> m_cache;

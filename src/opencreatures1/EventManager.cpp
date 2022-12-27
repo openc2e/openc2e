@@ -12,13 +12,18 @@
 
 void EventManager::tick() {
 	for (auto& m : m_immediate_message_queue) {
+		auto* to = g_engine_context.objects->try_get(m.to);
+		if (!to) {
+			fmt::print("WARNING: discarding message with bad `to` object id\n");
+		}
+
 		switch (m.number) {
-			case MESSAGE_ACTIVATE1: m.to->handle_mesg_activate1(m); break;
-			case MESSAGE_ACTIVATE2: m.to->handle_mesg_activate2(m); break;
-			case MESSAGE_DEACTIVATE: m.to->handle_mesg_deactivate(m); break;
-			case MESSAGE_HIT: m.to->handle_mesg_hit(m); break;
-			case MESSAGE_PICKUP: m.to->handle_mesg_pickup(m); break;
-			case MESSAGE_DROP: m.to->handle_mesg_drop(m); break;
+			case MESSAGE_ACTIVATE1: to->handle_mesg_activate1(m); break;
+			case MESSAGE_ACTIVATE2: to->handle_mesg_activate2(m); break;
+			case MESSAGE_DEACTIVATE: to->handle_mesg_deactivate(m); break;
+			case MESSAGE_HIT: to->handle_mesg_hit(m); break;
+			case MESSAGE_PICKUP: to->handle_mesg_pickup(m); break;
+			case MESSAGE_DROP: to->handle_mesg_drop(m); break;
 			default:
 				throw Exception(fmt::format("Unknown message number {}", m.number));
 		}
@@ -72,8 +77,7 @@ bool EventManager::queue_script(PointerView<Object> from, PointerView<Object> to
 				// fmt::print("WARN [EventManager] Object {} {} {} skipping timer script because macro already exists\n", to->family, to->genus, to->species);
 				return true;
 			}
-			fmt::print("WARN [EventManager] {} replacing macro with {}, hope it doesn't break anything\n",
-				repr(to), format_script(eventno));
+			// fmt::print("WARN [EventManager] {} replacing macro with {}, hope it doesn't break anything\n", repr(to), format_script(eventno));
 			g_engine_context.macros->delete_macros_owned_by(m.ownr);
 		}
 	}
@@ -85,8 +89,8 @@ void EventManager::mesg_writ(ObjectHandle from_id, ObjectHandle to_id, MessageNu
 	// TODO: implement delayed messages
 
 	Message m;
-	m.from = g_engine_context.objects->try_get(from_id);
-	m.to = g_engine_context.objects->try_get(to_id);
+	m.from = from_id;
+	m.to = to_id;
 	m.number = message;
 
 	m_immediate_message_queue.push_back(m);

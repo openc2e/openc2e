@@ -67,6 +67,10 @@ Object* MacroContext::get_targ(const Macro& m) const {
 	return targ;
 }
 
+void MacroContext::set_targ(Macro& m, ObjectHandle new_targ) {
+	m.targ = new_targ;
+}
+
 Renderable* MacroContext::get_targ_part(const Macro& m) const {
 	auto* renderable = get_targ(m)->get_renderable_for_part(m.part);
 	if (!renderable) {
@@ -135,6 +139,16 @@ int32_t MacroContext::read_int(Macro& m) {
 			}
 			return it->second(*this, m);
 		}
+		// TODO: is this okay? it would be nice to keep strong-typing of agents
+		// vs. integers, although Creatures 1 itself seems to just keep everything
+		// as an integer
+		auto agent_it = agentrv_funcs.find(tok);
+		if (agent_it != agentrv_funcs.end()) {
+			if (debug) {
+				fmt::print("read_int calling agent func {}\n", repr(tok));
+			}
+			return static_cast<int32_t>(agent_it->second(*this, m).to_integral());
+		}
 		throw Exception(fmt::format("Expected integer but got {}", s + p - 4));
 	}
 	int32_t value = 0;
@@ -168,6 +182,8 @@ bool MacroContext::read_condition(Macro& m) {
 		return left <= right;
 	} else if (comparison == ShortToken("eq")) {
 		return left == right;
+	} else if (comparison == ShortToken("ne")) {
+		return left != right;
 	} else {
 		throw Exception(fmt::format("Unknown comparison operator {}", repr(comparison)));
 	}
@@ -298,8 +314,21 @@ void MacroContext::tick_macro(Macro& m) {
 			}
 			it->second(*this, m);
 		} catch (Exception& e) {
+			fmt::print("error: {}\n", e.what());
+			auto* owner = maybe_get_ownr(m);
+			if (owner) {
+				fmt::print("DEBUG cls=({}, {}, {}) uid={}\n", owner->family, owner->genus, owner->species, m.ownr);
+			} else {
+				fmt::print("DEBUG badownr uid={}\n", m.ownr);
+			}
+			fmt::print(
+				"macro {}!!ip!!{}\n",
+				m.script.substr(0, m.ip),
+				m.ip <= m.script.size() ? m.script.substr(m.ip) : "");
+			fmt::print("\n");
+
 			m.ip = original_ip;
-			throw;
+			return;
 		}
 	}
 }

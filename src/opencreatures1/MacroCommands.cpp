@@ -23,11 +23,85 @@ void Command_ADDV(MacroContext& ctx, Macro& m) {
 }
 
 void Command_ANIM(MacroContext& ctx, Macro& m) {
-	ctx.read_arg_separator(m);
+	if (m.script[m.ip] == '[') {
+		// The learning computer has a script that goes `anim[0123]` with no
+		// whitespace separating the ANIM command and the string argument.
+		// If we're followed directly by the string bracket, skip trying to
+		// parse a separator.
+	} else {
+		ctx.read_arg_separator(m);
+	}
+
 	std::string anim_string = ctx.read_bracket_string(m);
 	auto* r = ctx.get_targ_part(m);
 	r->set_animation(0, anim_string);
 
+	ctx.read_command_separator(m);
+}
+
+void Command_BASE(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	int32_t new_base = ctx.read_int(m);
+
+	auto* r = ctx.get_targ_part(m);
+	// TODO: I think we both set the new base and reset the pose to 0?
+	r->set_part_sprite_base(new_base);
+	r->set_sprite_index(0);
+
+	ctx.read_command_separator(m);
+}
+
+void Command_BBDcolon(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+
+	Token subcommand = ctx.read_token(m);
+	ctx.read_arg_separator(m);
+
+	if (subcommand == Token("word")) {
+		int32_t index = ctx.read_int(m);
+		ctx.read_arg_separator(m);
+		int32_t id = ctx.read_int(m);
+		ctx.read_arg_separator(m);
+		Token word = ctx.read_token(m);
+		fmt::print("WARNING: BBD: WORD {} {} {} not implemented\n", index, id, repr(word));
+
+	} else if (subcommand == Token("show")) {
+		int32_t enable = ctx.read_int(m);
+		auto targ = ctx.get_targ(m);
+		if (enable == 1) {
+			targ->blackboard_show_word(targ->obv0);
+		} else if (enable == 0) {
+			targ->blackboard_hide_word();
+		} else {
+			throw Exception(fmt::format("BBD: SHOW {} invalid argument", enable));
+		}
+
+	} else if (subcommand == Token("emit")) {
+		int32_t volume = ctx.read_int(m);
+		auto targ = ctx.get_targ(m);
+		if (volume > 0) {
+			targ->blackboard_emit_earshot(targ->obv0);
+		} else if (volume == 0) {
+			targ->blackboard_emit_eyesight(targ->obv0);
+		} else {
+			throw Exception(fmt::format("BBD: EMIT {} invalid argument", volume));
+		}
+
+	} else if (subcommand == Token("edit")) {
+		int32_t enable = ctx.read_int(m);
+		if (enable == 1) {
+			ctx.get_targ(m)->blackboard_enable_edit();
+		} else if (enable == 0) {
+			ctx.get_targ(m)->blackboard_disable_edit();
+		} else {
+			throw Exception(fmt::format("BBD: EDIT {} invalid argument", enable));
+		}
+
+	} else {
+		throw UnknownMacroCommand(fmt::format("unknown command bbd: {}", repr(subcommand)));
+	}
 	ctx.read_command_separator(m);
 }
 
@@ -97,9 +171,9 @@ void Command_DOIF(MacroContext& ctx, Macro& m) {
 }
 
 void Command_DPAS(MacroContext& ctx, Macro& m) {
-	printf("WARNING: DPAS not implemented\n");
 	ctx.instructions_left_this_tick++;
 	ctx.read_command_separator(m);
+	ctx.get_targ(m)->vehicle_drop_passengers();
 }
 
 void Command_ELSE(MacroContext& ctx, Macro& m) {
@@ -152,9 +226,9 @@ void Command_FADE(MacroContext& ctx, Macro& m) {
 }
 
 void Command_GPAS(MacroContext& ctx, Macro& m) {
-	printf("WARNING: GPAS not implemented\n");
 	ctx.instructions_left_this_tick++;
 	ctx.read_command_separator(m);
+	ctx.get_targ(m)->vehicle_grab_passengers();
 }
 
 void Command_INST(MacroContext& ctx, Macro& m) {
@@ -365,7 +439,7 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 	}
 
 	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
-	auto bbox = get_object_bbox(targ);
+	auto bbox = targ->get_bbox();
 	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
 
@@ -378,7 +452,7 @@ void Command_SNDE(MacroContext& ctx, Macro& m) {
 	std::string sound_name = ctx.read_filename_token(m);
 
 	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
-	auto bbox = get_object_bbox(ctx.get_targ(m));
+	auto bbox = ctx.get_targ(m)->get_bbox();
 	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 
 	ctx.read_command_separator(m);
@@ -399,7 +473,7 @@ void Command_SNDL(MacroContext& ctx, Macro& m) {
 	}
 
 	C1Sound sound = g_engine_context.sounds->play_sound(sound_name, true);
-	auto bbox = get_object_bbox(targ);
+	auto bbox = targ->get_bbox();
 	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
 
@@ -439,6 +513,17 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 
 		printf("WARNING: STIM SHOU not implemented\n");
 
+	} else if (subcommand == Token("from")) {
+		for (int i = 0; i < 12; ++i) {
+			ctx.read_arg_separator(m);
+			ctx.read_int(m);
+		}
+		ctx.read_command_separator(m);
+
+		// TODO: The Creatures 1 learning computer calls STIM FROM. It seems to
+		// be ignored.
+		printf("WARNING: Treating invalid STIM FROM command as a no-op\n");
+
 	} else {
 		throw Exception(fmt::format("Unknown command 'stim {}'", repr(subcommand)));
 	}
@@ -450,6 +535,14 @@ void Command_STPC(MacroContext& ctx, Macro& m) {
 	if (targ->current_sound) {
 		targ->current_sound.stop();
 	}
+	ctx.read_command_separator(m);
+}
+
+void Command_TARG(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	ObjectHandle new_targ = ctx.read_object(m);
+	ctx.set_targ(m, new_targ);
 	ctx.read_command_separator(m);
 }
 
@@ -526,6 +619,10 @@ ObjectHandle AgentRV_OWNR(MacroContext&, Macro& macro) {
 	return macro.ownr;
 }
 
+ObjectHandle AgentRV_PNTR(MacroContext&, Macro&) {
+	return g_engine_context.pointer->m_pointer_tool;
+}
+
 ObjectHandle AgentRV_TARG(MacroContext&, Macro& macro) {
 	return macro.targ;
 }
@@ -536,7 +633,7 @@ int32_t IntegerRV_ACTV(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_HGHT(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).height;
+	return ctx.get_targ(m)->get_bbox().height;
 }
 
 int32_t IntegerRV_LIMB(MacroContext& ctx, Macro& m) {
@@ -560,19 +657,19 @@ int32_t IntegerRV_LIMT(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).bottom();
+	return ctx.get_targ(m)->get_bbox().bottom();
 }
 
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).x;
+	return ctx.get_targ(m)->get_bbox().x;
 }
 
 int32_t IntegerRV_POSR(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).right();
+	return ctx.get_targ(m)->get_bbox().right();
 }
 
 int32_t IntegerRV_POST(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).y;
+	return ctx.get_targ(m)->get_bbox().y;
 }
 
 int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
@@ -587,7 +684,7 @@ int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_WDTH(MacroContext& ctx, Macro& m) {
-	return get_object_bbox(ctx.get_targ(m)).width;
+	return ctx.get_targ(m)->get_bbox().width;
 }
 
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
@@ -661,6 +758,8 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	install_math_commands(ctx);
 
 	ctx.command_funcs[Token("anim")] = Command_ANIM;
+	ctx.command_funcs[Token("base")] = Command_BASE;
+	ctx.command_funcs[Token("bbd:")] = Command_BBDcolon;
 	ctx.command_funcs[Token("dpas")] = Command_DPAS;
 	ctx.command_funcs[Token("doif")] = Command_DOIF;
 	ctx.command_funcs[Token("else")] = Command_ELSE;
@@ -684,12 +783,14 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("sndl")] = Command_SNDL;
 	ctx.command_funcs[Token("stim")] = Command_STIM;
 	ctx.command_funcs[Token("stpc")] = Command_STPC;
+	ctx.command_funcs[Token("targ")] = Command_TARG;
 	ctx.command_funcs[Token("tick")] = Command_TICK;
 	ctx.command_funcs[Token("untl")] = Command_UNTL;
 	ctx.command_funcs[Token("wait")] = Command_WAIT;
 
 	ctx.agentrv_funcs[Token("from")] = AgentRV_FROM;
 	ctx.agentrv_funcs[Token("ownr")] = AgentRV_OWNR;
+	ctx.agentrv_funcs[Token("pntr")] = AgentRV_PNTR;
 	ctx.agentrv_funcs[Token("targ")] = AgentRV_TARG;
 
 	ctx.integerrv_funcs[Token("actv")] = IntegerRV_ACTV;

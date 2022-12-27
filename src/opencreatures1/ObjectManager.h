@@ -8,23 +8,6 @@
 
 #include <memory>
 
-static inline Renderable* get_main_part(Object* obj) {
-	if (!obj) {
-		throw_exception("Can't get main part of null object");
-	}
-
-	auto* main_part = obj->get_renderable_for_part(0);
-	if (!main_part) {
-		throw_exception("Can't get main part of object without any parts: {}", repr(*obj));
-	}
-
-	return main_part;
-}
-
-inline Rect get_object_bbox(Object* obj) {
-	Renderable* main_part = get_main_part(obj);
-	return main_part->get_bbox();
-}
 
 inline void move_object_to(Object* obj, fixed24_8_t x, fixed24_8_t y) {
 	// TODO: if the object's current x-position is 100.1 and the new x-position
@@ -120,7 +103,7 @@ class ObjectManager {
 
 		for (auto& o : m_pool) {
 			if (o->current_sound) {
-				auto bbox = get_object_bbox(o.get());
+				auto bbox = o->get_bbox();
 				o->current_sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 			}
 

@@ -38,6 +38,11 @@ enum AttributeFlags : uint8_t {
 	ATTR_GROUNDBOUND = 128
 };
 
+enum TouchBehaviourFlags : uint8_t {
+	TOUCH_ACTIVATE1 = 1,
+	TOUCH_ACTIVATE2 = 2,
+	TOUCH_DEACTIVATE = 4
+};
 
 struct SceneryData {
 	Renderable part;
@@ -49,6 +54,14 @@ class SimpleObjectData {
 	int32_t z_order;
 	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
+};
+
+class BubbleData {
+	// TODO: implement me
+};
+
+class CallButtonData {
+	// TODO: implement me
 };
 
 class PointerToolData {
@@ -82,6 +95,31 @@ struct VehicleData {
 	uint32_t bump;
 };
 
+struct LiftData {
+	// TODO: implement me
+};
+
+struct BlackboardData {
+	struct BlackboardWord {
+		uint32_t value = 0;
+		std::string text;
+	};
+
+	uint8_t background_color = 0;
+	uint8_t chalk_color = 0;
+	uint8_t alias_color = 0;
+	int8_t text_x_position = 0;
+	int8_t text_y_position = 0;
+	std::array<BlackboardWord, 16> words;
+
+	creaturesImage charset_sprite;
+	std::array<RenderItemHandle, 11> text_render_items;
+};
+
+struct CreatureData {
+	// TODO: implement me
+};
+
 class Object {
   public:
 	virtual ~Object() = default;
@@ -108,11 +146,17 @@ class Object {
 
 	std::unique_ptr<SimpleObjectData> simple_data;
 	std::unique_ptr<PointerToolData> pointer_data;
+	std::unique_ptr<BubbleData> bubble_data;
+	std::unique_ptr<CallButtonData> call_button_data;
 
 	std::unique_ptr<CompoundObjectData> compound_data;
 	std::unique_ptr<VehicleData> vehicle_data;
+	std::unique_ptr<LiftData> lift_data;
+	std::unique_ptr<BlackboardData> blackboard_data;
 
-	void handle_click();
+	std::unique_ptr<CreatureData> creature_data;
+
+	void handle_left_click(int32_t relx, int32_t rely);
 
 	void handle_mesg_activate1(Message);
 	void handle_mesg_activate2(Message);
@@ -121,7 +165,20 @@ class Object {
 	void handle_mesg_pickup(Message);
 	void handle_mesg_drop(Message);
 
+	int32_t get_z_order() const;
+	Rect get_bbox() const;
 	Renderable* get_renderable_for_part(int32_t partnum);
+	const Renderable* get_renderable_for_part(int32_t partnum) const;
+
+	void blackboard_show_word(int32_t word_index);
+	void blackboard_hide_word();
+	void blackboard_enable_edit();
+	void blackboard_disable_edit();
+	void blackboard_emit_eyesight(int32_t word_index);
+	void blackboard_emit_earshot(int32_t word_index);
+
+	void vehicle_grab_passengers();
+	void vehicle_drop_passengers();
 };
 
 inline std::string repr(const Object& o) {

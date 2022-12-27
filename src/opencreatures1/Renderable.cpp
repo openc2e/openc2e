@@ -10,6 +10,11 @@ void Renderable::Renderable::set_position(fixed24_8_t x_, fixed24_8_t y_) {
 	update_renderitem();
 }
 
+void Renderable::set_z_order(int32_t z_) {
+	z = z_;
+	update_renderitem();
+}
+
 fixed24_8_t Renderable::get_x() const {
 	return x;
 }
@@ -17,9 +22,8 @@ fixed24_8_t Renderable::get_y() const {
 	return y;
 }
 
-void Renderable::set_z_order(int z_) {
-	z = z_;
-	update_renderitem();
+int32_t Renderable::get_z_order() const {
+	return z;
 }
 
 void Renderable::set_object_sprite_base(int object_sprite_base_) {

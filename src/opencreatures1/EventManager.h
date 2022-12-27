@@ -15,8 +15,8 @@ enum MessageNumber {
 };
 
 struct Message {
-	Object* from = nullptr;
-	Object* to = nullptr;
+	ObjectHandle from;
+	ObjectHandle to;
 	MessageNumber number;
 };
 

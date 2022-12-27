@@ -4,6 +4,7 @@
 #include "PathManager.h"
 #include "common/Ascii.h"
 #include "common/Exception.h"
+#include "common/NumericCast.h"
 #include "common/Repr.h"
 #include "common/backend/Backend.h"
 
@@ -14,6 +15,14 @@ namespace fs = ghc::filesystem;
 
 
 ImageManager::ImageManager() {
+}
+
+static void build_textures(creaturesImage& image) {
+	for (unsigned int frame = 0; frame < image.numframes(); ++frame) {
+		if (image.width(frame) > 0 && image.height(frame) > 0 && !image.getTextureForFrame(frame)) {
+			image.getTextureForFrame(frame) = g_engine_context.backend->createTextureWithTransparentColor(image.getImageForFrame(frame), Color{0, 0, 0, 0xff});
+		}
+	}
 }
 
 void ImageManager::load_default_palette() {
@@ -52,13 +61,44 @@ creaturesImage& ImageManager::get_image(std::string name, ImageType allowed_type
 			i.palette = m_default_palette;
 		}
 	}
-
-	for (unsigned int frame = 0; frame < image.numframes(); ++frame) {
-		if (image.width(frame) > 0 && image.height(frame) > 0 && !image.getTextureForFrame(frame)) {
-			image.getTextureForFrame(frame) = g_engine_context.backend->createTextureWithTransparentColor(image.getImageForFrame(frame), Color{0, 0, 0, 0xff});
-		}
-	}
+	build_textures(image);
 
 	m_cache[name] = image;
 	return m_cache[name];
+}
+
+creaturesImage ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor) {
+	// TODO: cache this?
+
+	fs::path path = g_engine_context.paths->find_path(PATH_TYPE_IMAGE, "charset.dta");
+	if (path.empty()) {
+		throw Exception("Couldn't find charset.dta");
+	}
+
+	creaturesImage image("charset.dta");
+	image.images = ImageUtils::ReadImage(path);
+
+	// TODO: how do the values in the CHARSET.DTA map to actual color values?
+	// just setting them all to the textcolor right now, but the real engines
+	// do some shading/aliasing
+	for (auto& i : image.images) {
+		if (i.format != if_index8) {
+			throw Exception("Expected charset.dta to have format if_index8");
+		}
+		i.palette = m_default_palette;
+		for (ptrdiff_t j = 0; j < numeric_cast<ptrdiff_t>(i.data.size()); ++j) {
+			if (i.data[j] == 0) {
+				i.data[j] = numeric_cast<uint8_t>(bgcolor);
+			} else if (i.data[j] == 1) {
+				i.data[j] = numeric_cast<uint8_t>(textcolor);
+			} else if (i.data[j] > 1) {
+				// Creatures 1 has some character pixels > 2 that just read colors
+				// randomly from memory. Don't do that, just give them the aliascolor.
+				i.data[j] = numeric_cast<uint8_t>(aliascolor);
+			}
+		}
+	}
+	build_textures(image);
+
+	return image;
 }

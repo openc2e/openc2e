@@ -28,9 +28,9 @@ Future improvements:
   position, viewport size, and drawn size for each camera. Keep track of which
   ones need to be rendered or not.
 
-* SortingGroup: support multi-sprite objects like Creatures, render all sprites
-  after another to prevent z-fighting with other objects. Sort RenderItems first
-  on SortingGroup z-index rather than their own z-index, and then on their own
+* SortingGroup: support multi-sprite objects like Creatures and Blackboards. Render
+  all sprites after another to prevent z-fighting with other objects. Sort RenderItems
+  first on SortingGroup z-index rather than their own z-index, and then on their own
   z-index against other items w/in the group.
 
 */

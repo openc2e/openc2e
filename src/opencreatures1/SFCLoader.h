@@ -31,6 +31,7 @@ class SFCLoader {
 	void object_from_sfc(Object* obj, const sfc::ObjectV1& p);
 	void simple_object_from_sfc(Object* obj, const sfc::SimpleObjectV1& p);
 	void compound_object_from_sfc(Object* obj, const sfc::CompoundObjectV1& comp);
+	void blackboard_from_sfc(Object* obj, const sfc::BlackboardV1& bbd);
 	void vehicle_from_sfc(Object* obj, const sfc::VehicleV1& veh);
 
 	std::map<sfc::ObjectV1*, ObjectHandle> sfc_object_mapping;

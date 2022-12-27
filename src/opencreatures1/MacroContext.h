@@ -86,6 +86,7 @@ class MacroContext {
 	Object* maybe_get_ownr(const Macro&) const;
 	Object* get_targ(const Macro&) const;
 	Renderable* get_targ_part(const Macro&) const;
+	void set_targ(Macro&, ObjectHandle);
 
 	bool try_get_variable(const Macro&, Token varname, int32_t* value) const;
 	void set_variable(Macro&, Token varname, int32_t value);

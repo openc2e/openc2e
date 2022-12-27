@@ -180,6 +180,21 @@ void SFCLoader::vehicle_from_sfc(Object* obj, const sfc::VehicleV1& veh) {
 	obj->vehicle_data->bump = veh.bump;
 }
 
+void SFCLoader::blackboard_from_sfc(Object* obj, const sfc::BlackboardV1& bbd) {
+	obj->blackboard_data = std::make_unique<BlackboardData>();
+
+	obj->blackboard_data->background_color = bbd.background_color;
+	obj->blackboard_data->chalk_color = bbd.chalk_color;
+	obj->blackboard_data->alias_color = bbd.alias_color;
+	obj->blackboard_data->text_x_position = bbd.text_x_position;
+	obj->blackboard_data->text_y_position = bbd.text_y_position;
+	for (size_t i = 0; i < bbd.words.size(); ++i) {
+		auto& word = bbd.words[i];
+		obj->blackboard_data->words[i].value = word.value;
+		obj->blackboard_data->words[i].text = word.text;
+	}
+	obj->blackboard_data->charset_sprite = g_engine_context.images->get_charset_dta(bbd.background_color, bbd.chalk_color, bbd.alias_color);
+}
 
 void SFCLoader::load_objects() {
 	// first, create empty toplevel objects
@@ -226,8 +241,8 @@ void SFCLoader::load_objects() {
 					fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Lift\n", obj->family, obj->genus, obj->species);
 				}
 			}
-			if (dynamic_cast<sfc::BlackboardV1*>(p)) {
-				fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Blackboard\n", obj->family, obj->genus, obj->species);
+			if (auto* bbd = dynamic_cast<sfc::BlackboardV1*>(p)) {
+				blackboard_from_sfc(obj, *bbd);
 			}
 		}
 
