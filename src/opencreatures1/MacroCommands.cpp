@@ -746,26 +746,16 @@ int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
 
 void LValue_ACTV(const MacroContext& ctx, const Macro& m, int32_t value) {
 	auto new_actv = ActiveFlag(value);
-	Object* ownr = ctx.get_ownr(m);
 	Object* targ = ctx.get_targ(m);
-
-	if (new_actv == targ->actv) {
-		return;
-	}
-
-	printf("setting active state %i!\n", new_actv);
 
 	switch (new_actv) {
 		case ACTV_INACTIVE:
-			g_engine_context.events->queue_script(ownr, targ, SCRIPT_DEACTIVATE);
 			targ->actv = ACTV_INACTIVE;
 			return;
 		case ACTV_ACTIVE1:
-			g_engine_context.events->queue_script(ownr, targ, SCRIPT_ACTIVATE1);
 			targ->actv = ACTV_ACTIVE1;
 			return;
 		case ACTV_ACTIVE2:
-			g_engine_context.events->queue_script(ownr, targ, SCRIPT_ACTIVATE2);
 			targ->actv = ACTV_ACTIVE2;
 			return;
 	}
