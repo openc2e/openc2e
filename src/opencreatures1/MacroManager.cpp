@@ -115,7 +115,7 @@ void MacroManager::tick() {
 			m_pool.erase(m_pool.begin() + static_cast<long>(i - 1));
 			continue;
 		}
-		ctx.tick_macro(m);
+		ctx.tick_macro(m, true);
 		if (m.destroy_as_soon_as_possible) {
 			// in case we kicked off another script that wants to replace us, wait
 			// until we're done running so we don't get weird errors

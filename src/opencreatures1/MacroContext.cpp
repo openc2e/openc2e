@@ -274,7 +274,7 @@ void MacroContext::set_variable(Macro& m, Token varname, int32_t value) {
 	}
 };
 
-void MacroContext::tick_macro(Macro& m) {
+void MacroContext::tick_macro(Macro& m, bool handle_errors) {
 	debug = false;
 	if (debug) {
 		fmt::print("DEBUG cls=({}, {}, {}) uid={}\n", get_ownr(m)->family, get_ownr(m)->genus, get_ownr(m)->species, m.ownr);
@@ -315,6 +315,14 @@ void MacroContext::tick_macro(Macro& m) {
 			}
 			it->second(*this, m);
 		} catch (Exception& e) {
+			// TODO: rather than this handle_errors bit, we should probably throw
+			// Exceptions that have all the information needed to build your own
+			// error message (mostly the instruction-pointer where the error occurred)
+			// and let the caller handle it themselves
+			if (!handle_errors) {
+				throw;
+			}
+
 			fmt::print("error: {}\n", e.what());
 			auto* owner = maybe_get_ownr(m);
 			if (owner) {

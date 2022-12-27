@@ -69,7 +69,7 @@ class UnexpectedEndOfMacro : public MacroError {
 
 class MacroContext {
   public:
-	void tick_macro(Macro&);
+	void tick_macro(Macro&, bool handle_errors = false);
 
 	ObjectHandle read_object(Macro&);
 
