@@ -22,6 +22,14 @@ inline char to_ascii_lowercase(char c) {
 	}
 }
 
+inline char to_ascii_uppercase(char c) {
+	if (c >= 'a' && c <= 'z') {
+		return c - ('z' - 'Z');
+	} else {
+		return c;
+	}
+}
+
 inline wchar_t to_ascii_lowercase(wchar_t c) {
 	if (c >= 'A' && c <= 'Z') {
 		return c - ('Z' - 'z');
