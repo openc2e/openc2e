@@ -14,8 +14,8 @@ void MapManager::add_room(Room&& room) {
 			color = 0xFF00FFCC;
 		}
 
-		room.renderitem = g_engine_context.rendersystem->create_render_item(LAYER_ROOMS);
-		g_engine_context.rendersystem->set_render_item_unfilled_rect(room.renderitem, room.left, room.top, room.width(), room.height(), color);
+		room.renderitem = g_engine_context.rendersystem->render_item_create(LAYER_ROOMS);
+		g_engine_context.rendersystem->render_item_set_unfilled_rect(room.renderitem, room.left, room.top, room.width(), room.height(), color);
 	}
 
 	rooms.emplace_back(std::move(room));
@@ -23,6 +23,6 @@ void MapManager::add_room(Room&& room) {
 
 void MapManager::set_background(creaturesImage background_) {
 	background = background_;
-	background_renderitem = g_engine_context.rendersystem->create_render_item(LAYER_BACKGROUND);
-	g_engine_context.rendersystem->set_render_item_texture(background_renderitem, background.getTextureForFrame(0));
+	background_renderitem = g_engine_context.rendersystem->render_item_create(LAYER_BACKGROUND);
+	g_engine_context.rendersystem->render_item_set_texture(background_renderitem, background.getTextureForFrame(0));
 }

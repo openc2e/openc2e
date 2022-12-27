@@ -7,17 +7,16 @@ RenderSystem::RenderSystem(Backend* backend)
 	: m_backend(backend) {
 }
 
-void RenderSystem::RenderSystem::set_layer_position(int layer, int32_t x, int32_t y) {
-	auto& ref = m_render_layers[layer];
-	ref.x = x;
-	ref.y = y;
+void RenderSystem::main_camera_set_position(int32_t x, int32_t y) {
+	m_main_camera_x = x;
+	m_main_camera_y = y;
 }
 
-void RenderSystem::set_layer_wrap_width(int layer, int32_t wrap_width) {
-	m_render_layers[layer].wrap_width = wrap_width;
+void RenderSystem::world_set_wrap_width(int32_t wrap_width) {
+	m_world_wrap_width = wrap_width;
 }
 
-RenderItemHandle RenderSystem::create_render_item(int layer) {
+RenderItemHandle RenderSystem::render_item_create(int layer) {
 	RenderItem item;
 	item.layer = layer;
 
@@ -28,7 +27,7 @@ RenderItemHandle RenderSystem::create_render_item(int layer) {
 	return handle;
 }
 
-void RenderSystem::set_render_item_position(const RenderItemHandle& handle, int32_t x, int32_t y, int32_t z) {
+void RenderSystem::render_item_set_position(const RenderItemHandle& handle, int32_t x, int32_t y, int32_t z) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->x = x;
 		item->y = y;
@@ -36,7 +35,7 @@ void RenderSystem::set_render_item_position(const RenderItemHandle& handle, int3
 	}
 }
 
-void RenderSystem::set_render_item_texture(const RenderItemHandle& handle, const Texture& tex) {
+void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const Texture& tex) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_TEXTURE;
 		item->tex = tex;
@@ -45,7 +44,7 @@ void RenderSystem::set_render_item_texture(const RenderItemHandle& handle, const
 	}
 }
 
-void RenderSystem::set_render_item_unfilled_rect(const RenderItemHandle& handle, int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
+void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle, int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_RECT;
 		item->x = x;
@@ -82,10 +81,8 @@ void RenderSystem::draw() {
 	});
 
 	for (auto* r : render_list) {
-		// TODO: optimize by only searching for layer when layer index changes
-		const RenderLayer& current_layer = m_render_layers[r->layer];
-		int32_t x = r->x - current_layer.x;
-		int32_t y = r->y - current_layer.y;
+		int32_t x = r->x - m_main_camera_x;
+		int32_t y = r->y - m_main_camera_y;
 
 		if (r->type == RENDER_TEXTURE) {
 			Rect src;
@@ -101,11 +98,11 @@ void RenderSystem::draw() {
 			dest.height = src.height;
 
 			renderer->renderTexture(r->tex, src, dest);
-			if (current_layer.wrap_width) {
+			if (m_world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				dest.x += current_layer.wrap_width;
+				dest.x += m_world_wrap_width;
 				renderer->renderTexture(r->tex, src, dest);
-				dest.x -= current_layer.wrap_width * 2;
+				dest.x -= m_world_wrap_width * 2;
 				renderer->renderTexture(r->tex, src, dest);
 			}
 
@@ -125,10 +122,10 @@ void RenderSystem::draw() {
 				renderer->renderLine(x1, y1, x1, y2, r->color);
 			};
 			renderRect(0);
-			if (current_layer.wrap_width) {
+			if (m_world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				renderRect(current_layer.wrap_width);
-				renderRect(-current_layer.wrap_width);
+				renderRect(m_world_wrap_width);
+				renderRect(-m_world_wrap_width);
 			}
 		}
 	}

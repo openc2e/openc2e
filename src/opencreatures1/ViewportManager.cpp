@@ -81,9 +81,7 @@ void ViewportManager::tick() {
 
 	// update rendersystem
 	// TODO: this doesn't feel like the best place for this
-	g_engine_context.rendersystem->set_layer_position(LAYER_BACKGROUND, scrollx, scrolly);
-	g_engine_context.rendersystem->set_layer_position(LAYER_OBJECTS, scrollx, scrolly);
-	g_engine_context.rendersystem->set_layer_position(LAYER_ROOMS, scrollx, scrolly);
+	g_engine_context.rendersystem->main_camera_set_position(scrollx, scrolly);
 }
 
 int32_t ViewportManager::width() const {

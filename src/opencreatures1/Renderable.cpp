@@ -108,9 +108,9 @@ std::string Renderable::get_sprite_name() const {
 
 void Renderable::update_renderitem() {
 	if (!renderitem) {
-		renderitem = g_engine_context.rendersystem->create_render_item(LAYER_OBJECTS);
+		renderitem = g_engine_context.rendersystem->render_item_create(LAYER_OBJECTS);
 	}
-	g_engine_context.rendersystem->set_render_item_texture(renderitem, sprite.getTextureForFrame(numeric_cast<unsigned int>(frame())));
+	g_engine_context.rendersystem->render_item_set_texture(renderitem, sprite.getTextureForFrame(numeric_cast<unsigned int>(frame())));
 	// TODO: subpixel precision?
-	g_engine_context.rendersystem->set_render_item_position(renderitem, x.trunc(), y.trunc(), z);
+	g_engine_context.rendersystem->render_item_set_position(renderitem, x.trunc(), y.trunc(), z);
 }

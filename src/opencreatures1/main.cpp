@@ -42,9 +42,7 @@ void load_everything() {
 	g_engine_context.audio_backend->init(); // TODO: initialized early so SFC sounds can start.. is this right?
 
 	g_engine_context.rendersystem = std::make_shared<RenderSystem>(g_engine_context.backend.get());
-	g_engine_context.rendersystem->set_layer_wrap_width(LAYER_BACKGROUND, CREATURES1_WORLD_WIDTH);
-	g_engine_context.rendersystem->set_layer_wrap_width(LAYER_OBJECTS, CREATURES1_WORLD_WIDTH);
-	g_engine_context.rendersystem->set_layer_wrap_width(LAYER_ROOMS, CREATURES1_WORLD_WIDTH);
+	g_engine_context.rendersystem->world_set_wrap_width(CREATURES1_WORLD_WIDTH);
 
 	// load palette
 	g_engine_context.images->load_default_palette();
@@ -85,9 +83,9 @@ void draw_everything() {
 	// 			}
 	//
 	// 			auto frame = numeric_cast<unsigned int>(renderable->frame());
-	// 			auto renderitem = rendersystem.create_render_item(LAYER_OBJECTS);
-	// 			rendersystem.set_render_item_texture(renderitem, renderable->sprite.getTextureForFrame(frame));
-	// 			rendersystem.set_render_item_position(renderitem, renderable->x.trunc(), renderable->y.trunc(), renderable->z);
+	// 			auto renderitem = rendersystem.render_item_create(LAYER_OBJECTS);
+	// 			rendersystem.render_item_set_texture(renderitem, renderable->sprite.getTextureForFrame(frame));
+	// 			rendersystem.render_item_set_position(renderitem, renderable->x.trunc(), renderable->y.trunc(), renderable->z);
 	// 			object_render_items.emplace_back(std::move(renderitem));
 	// 		}
 	// 	}
