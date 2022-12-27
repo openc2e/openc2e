@@ -302,8 +302,9 @@ void MacroContext::tick_macro(Macro& m) {
 			Token command = read_token(m);
 			if (command == Token("endm") || command == Token("stop")) {
 				// remove from list, check selfdestruct
+				m.destroy_as_soon_as_possible = true;
 				m.ip = original_ip;
-				continue;
+				break;
 			}
 			if (command == Token("\0\0\0\0")) {
 				throw UnexpectedEndOfMacro("Expected 'endm' or 'stop'");
