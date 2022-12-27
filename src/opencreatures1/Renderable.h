@@ -25,6 +25,7 @@ class Renderable {
 	void set_object_sprite_base(int object_sprite_base);
 	void set_part_sprite_base(int part_sprite_base);
 	void set_sprite_index(int sprite_index);
+	int32_t get_sprite_index() const;
 	int32_t frame() const;
 	void set_sprite(creaturesImage sprite);
 	std::string get_sprite_name() const;

@@ -104,6 +104,9 @@ void Renderable::set_sprite_index(int sprite_index_) {
 	update_renderitem();
 }
 
+int32_t Renderable::get_sprite_index() const {
+	return sprite_index;
+}
 
 std::string Renderable::get_sprite_name() const {
 	return sprite.getName();

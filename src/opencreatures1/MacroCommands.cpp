@@ -703,6 +703,10 @@ int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
 	return ctx.get_targ(m)->get_bbox().bottom();
 }
 
+int32_t IntegerRV_POSE(MacroContext& ctx, Macro& m) {
+	return ctx.get_targ_part(m)->get_sprite_index();
+}
+
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
 	return ctx.get_targ(m)->get_bbox().x;
 }
@@ -844,6 +848,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.integerrv_funcs[Token("limr")] = IntegerRV_LIMR;
 	ctx.integerrv_funcs[Token("limt")] = IntegerRV_LIMT;
 	ctx.integerrv_funcs[Token("posb")] = IntegerRV_POSB;
+	ctx.integerrv_funcs[Token("pose")] = IntegerRV_POSE;
 	ctx.integerrv_funcs[Token("posl")] = IntegerRV_POSL;
 	ctx.integerrv_funcs[Token("posr")] = IntegerRV_POSR;
 	ctx.integerrv_funcs[Token("post")] = IntegerRV_POST;
