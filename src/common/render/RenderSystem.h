@@ -56,7 +56,8 @@ class RenderSystem {
 	enum RenderItemType {
 		RENDER_NONE,
 		RENDER_TEXTURE,
-		RENDER_RECT
+		RENDER_RECT,
+		RENDER_LINE
 	};
 	struct RenderItem {
 		int32_t layer = 0;
@@ -87,6 +88,7 @@ class RenderSystem {
 	void render_item_set_position(const RenderItemHandle& key, int32_t x, int32_t y, int32_t z);
 	void render_item_set_texture(const RenderItemHandle& key, const Texture& tex);
 	void render_item_set_unfilled_rect(const RenderItemHandle& key, int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
+	void render_item_set_line(const RenderItemHandle& key, int32_t xstart, int32_t ystart, int32_t xend, int32_t yend, uint32_t color);
 
 	void render_item_set_layer(const RenderItemHandle& key, int32_t layer);
 	void render_item_set_position(const RenderItemHandle& key, int32_t x, int32_t y);

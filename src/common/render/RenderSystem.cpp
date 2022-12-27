@@ -62,6 +62,17 @@ void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle,
 	}
 }
 
+void RenderSystem::render_item_set_line(const RenderItemHandle& handle, int32_t xstart, int32_t ystart, int32_t xend, int32_t yend, uint32_t color) {
+	if (RenderItem* item = m_render_items.try_get(handle.key)) {
+		item->type = RENDER_LINE;
+		item->x = xstart;
+		item->y = ystart;
+		item->width = xend - xstart;
+		item->height = yend - ystart;
+		item->color = color;
+	}
+}
+
 void RenderSystem::draw() {
 	auto renderer = m_backend->getMainRenderTarget();
 
@@ -133,6 +144,13 @@ void RenderSystem::draw() {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
 				renderRect(m_world_wrap_width);
 				renderRect(-m_world_wrap_width);
+			}
+		} else if (r->type == RENDER_LINE) {
+			renderer->renderLine(x, y, x + r->width, y + r->height, r->color);
+			if (m_world_wrap_width) {
+				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
+				renderer->renderLine(x + m_world_wrap_width, y, x + m_world_wrap_width + r->width, y + r->height, r->color);
+				renderer->renderLine(x - m_world_wrap_width, y, x - m_world_wrap_width + r->width, y + r->height, r->color);
 			}
 		}
 	}
