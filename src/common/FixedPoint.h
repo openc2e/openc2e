@@ -29,6 +29,22 @@ class fixed24_8_t {
 		return !(*this == other);
 	}
 
+	bool operator<(fixed24_8_t other) const {
+		return m_value < other.m_value;
+	}
+
+	bool operator<=(fixed24_8_t other) const {
+		return m_value <= other.m_value;
+	}
+
+	bool operator>(fixed24_8_t other) const {
+		return m_value > other.m_value;
+	}
+
+	bool operator>=(fixed24_8_t other) const {
+		return m_value >= other.m_value;
+	}
+
 	fixed24_8_t operator+(fixed24_8_t other) {
 		fixed24_8_t result(*this);
 		result += other;
@@ -37,6 +53,17 @@ class fixed24_8_t {
 
 	fixed24_8_t& operator+=(fixed24_8_t other) {
 		m_value += other.m_value;
+		return *this;
+	}
+
+	fixed24_8_t operator-(fixed24_8_t other) {
+		fixed24_8_t result(*this);
+		result -= other;
+		return result;
+	}
+
+	fixed24_8_t& operator-=(fixed24_8_t other) {
+		m_value -= other.m_value;
 		return *this;
 	}
 
