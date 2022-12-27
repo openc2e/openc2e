@@ -213,6 +213,49 @@ void Command_ENDI(MacroContext& ctx, Macro& m) {
 	ctx.read_command_separator(m);
 }
 
+void Command_ENUM(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	int32_t family = ctx.read_int(m);
+	ctx.read_arg_separator(m);
+	int32_t genus = ctx.read_int(m);
+	ctx.read_arg_separator(m);
+	int32_t species = ctx.read_int(m);
+	ctx.read_command_separator(m);
+
+	(void)family;
+	(void)genus;
+	(void)species;
+	printf("WARNING: ENUM not implemented\n");
+
+	// if no objects, go find the next NEXT
+	// TODO: hacky and probably wrong! get a better parser
+	size_t level = 1;
+	while (true) {
+		if (m.script[m.ip] == '\0') {
+			throw Exception("Unexpected eoi while looking for NEXT");
+		}
+		if (!(m.script[m.ip] == ',' || m.script[m.ip] == ' ')) {
+			m.ip++;
+			continue;
+		}
+		m.ip++;
+		Token command = ctx.read_token(m);
+		if (command == Token("enum")) {
+			level += 1;
+		} else if (command == Token("next")) {
+			level -= 1;
+			if (level == 0) {
+				// cool, skip to this NEXT
+				ctx.read_command_separator(m);
+				return;
+			}
+		} else {
+			m.ip -= 3;
+		}
+	}
+}
+
 void Command_EVER(MacroContext& ctx, Macro& m) {
 	// at the end of the loop, go back to start
 	m.ip = numeric_cast<uint32_t>(m.stack.back());
@@ -764,6 +807,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("doif")] = Command_DOIF;
 	ctx.command_funcs[Token("else")] = Command_ELSE;
 	ctx.command_funcs[Token("endi")] = Command_ENDI;
+	ctx.command_funcs[Token("enum")] = Command_ENUM;
 	ctx.command_funcs[Token("ever")] = Command_EVER;
 	ctx.command_funcs[Token("fade")] = Command_FADE;
 	ctx.command_funcs[Token("gpas")] = Command_GPAS;
