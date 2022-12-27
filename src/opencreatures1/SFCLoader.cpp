@@ -143,6 +143,7 @@ void SFCLoader::load_map() {
 		throw Exception(fmt::format("Expected Creatures 1 background size to be 8352x1200 but got {}x{}", background.width(0), background.height(0)));
 	}
 	g_engine_context.map->set_background(background);
+	g_engine_context.map->set_groundlevel(sfc.map->groundlevel);
 
 	fmt::print("INFO [SFCLoader] Loading rooms...\n");
 	for (auto& r : sfc.map->rooms) {
@@ -154,7 +155,7 @@ void SFCLoader::load_map() {
 		room.type = r.type;
 		g_engine_context.map->add_room(std::move(room));
 	}
-	fmt::print("WARN [SFCLoader] Unsupported: ground_level\n");
+
 	fmt::print("WARN [SFCLoader] Unsupported: bacteria\n");
 }
 
