@@ -101,9 +101,7 @@ void Object::handle_mesg_activate1(Message msg) {
 		// }
 
 		if (vehicle_data) {
-			// truncate fixed point position
-			// TODO: is this right?
-			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
+			// TODO: truncate fixed point position?
 		}
 
 		actv = ACTV_ACTIVE1;
@@ -149,9 +147,7 @@ void Object::handle_mesg_activate2(Message msg) {
 		// }
 
 		if (vehicle_data) {
-			// truncate fixed point position
-			// TODO: is this right?
-			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
+			// TODO: truncate fixed point position?
 		}
 
 		actv = ACTV_ACTIVE2;
@@ -193,9 +189,7 @@ void Object::handle_mesg_deactivate(Message msg) {
 		// }
 
 		if (vehicle_data) {
-			// truncate fixed point position
-			// TODO: is this right?
-			move_object_to(this, get_renderable_for_part(0)->get_x().trunc(), get_renderable_for_part(0)->get_y().trunc());
+			// TODO: truncate fixed point position?
 			// stop!
 			vehicle_data->xvel = 0;
 			vehicle_data->yvel = 0;
@@ -219,6 +213,58 @@ void Object::handle_mesg_pickup(Message) {
 
 void Object::handle_mesg_drop(Message) {
 	throw Exception("handle_mesg_drop not implemented");
+}
+
+void Object::set_position(fixed24_8_t newx, fixed24_8_t newy) {
+	// TODO: if the object's current x-position is 100.1 and the new x-position
+	// is 100 (low-precision), should we actually move it? do we lose the
+	// high-precision part of the current position? This is only relevant to Vehicles.
+
+	auto* main_part = get_renderable_for_part(0);
+	if (!main_part) {
+		throw_exception("Tried to move an object without any parts: {}", repr(*this));
+	}
+
+	// TODO: replace this with get_position and a Vector2?
+	if (main_part->get_x() == newx && main_part->get_y() == newy) {
+		return;
+	}
+
+	// update compound parts
+	if (auto* comp = compound_data.get()) {
+		for (size_t i = 1; i < comp->parts.size(); ++i) {
+			Renderable& p = comp->parts[i].renderable;
+
+			fixed24_8_t relx = p.get_x() - main_part->get_x();
+			fixed24_8_t rely = p.get_y() - main_part->get_y();
+
+			p.set_position(newx + relx, newy + rely);
+		}
+	}
+
+	// now set main part position
+	main_part->set_position(newx, newy);
+
+	// update any controlled sound
+	if (current_sound) {
+		auto bbox = get_bbox();
+		current_sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
+	}
+}
+
+void Object::add_position(fixed24_8_t xdiff, fixed24_8_t ydiff) {
+	// TODO: if the object's current x-position is 100.1 and the x-diff is 5 (low-
+	// precision), do we move it to 105.1 or 105? e.g. should we lose the
+	// high-precision part of the current position? This is only relevant to Vehicles.
+
+	auto* main_part = get_renderable_for_part(0);
+	if (!main_part) {
+		throw_exception("Tried to move an object without any parts: {}", repr(*this));
+	}
+	if (xdiff == 0 && ydiff == 0) {
+		return;
+	}
+	set_position(main_part->get_x() + xdiff, main_part->get_y() + ydiff);
 }
 
 int32_t Object::get_z_order() const {
@@ -314,4 +360,11 @@ void Object::vehicle_grab_passengers() {
 
 void Object::vehicle_drop_passengers() {
 	printf("WARNING: vehicle_drop_passengers not implemented\n");
+}
+
+void Object::tick() {
+	// TODO: handle this in a separate VehicleSystem or VelocitySystem or PhysicsSystem or something?
+	if (vehicle_data) {
+		add_position(vehicle_data->xvel, vehicle_data->yvel);
+	}
 }

@@ -327,8 +327,7 @@ void Command_MVBY(MacroContext& ctx, Macro& m) {
 	int32_t ydiff = ctx.read_int(m);
 
 	auto* obj = ctx.get_targ(m);
-
-	move_object_by(obj, xdiff, ydiff);
+	obj->add_position(xdiff, ydiff);
 
 	if (ctx.debug) {
 		printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
@@ -346,7 +345,7 @@ void Command_MVTO(MacroContext& ctx, Macro& m) {
 
 	auto* obj = ctx.get_targ(m);
 
-	move_object_to(obj, x, y);
+	obj->set_position(x, y);
 
 	// if (ctx.debug) {
 	// 	printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
