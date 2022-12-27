@@ -1,10 +1,18 @@
 #include "Renderable.h"
 
 #include "EngineContext.h"
+#include "ViewportManager.h"
 #include "common/NumericCast.h"
 #include "common/render/RenderSystem.h"
 
 void Renderable::Renderable::set_position(fixed24_8_t x_, fixed24_8_t y_) {
+	// TODO: better way of handling world wrap?
+	if (x_ >= CREATURES1_WORLD_WIDTH) {
+		x_ -= CREATURES1_WORLD_WIDTH;
+	} else if (x_ < 0) {
+		x_ += CREATURES1_WORLD_WIDTH;
+	}
+
 	x = x_;
 	y = y_;
 	update_renderitem();
