@@ -8,6 +8,13 @@ RenderSystem::RenderSystem(Backend* backend)
 }
 
 void RenderSystem::main_camera_set_position(int32_t x, int32_t y) {
+	if (m_world_wrap_width) {
+		if (x < 0) {
+			x += m_world_wrap_width;
+		} else if (x >= m_world_wrap_width) {
+			x -= m_world_wrap_width;
+		}
+	}
 	m_main_camera_x = x;
 	m_main_camera_y = y;
 }
