@@ -97,7 +97,6 @@ void SDLBackend::init(const std::string& name, int width, int height) {
 		throw Exception(std::string("SDL error creating window: ") + SDL_GetError());
 	}
 
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl"); // for imgui_sdl
 	renderer = SDL_CreateRenderer(
 		window,
 		-1,
