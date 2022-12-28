@@ -281,8 +281,9 @@ void Command_EVER(MacroContext& ctx, Macro& m) {
 
 void Command_FADE(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
-	printf("WARNING: FADE not implemented\n");
 	ctx.read_command_separator(m);
+
+	ctx.get_targ(m)->current_sound.fade_out();
 }
 
 void Command_GPAS(MacroContext& ctx, Macro& m) {
@@ -567,19 +568,19 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 			ctx.read_int(m);
 		}
 		ctx.read_command_separator(m);
-
-		printf("WARNING: STIM SIGN not implemented\n");
+		ctx.get_targ(m)->stim_sign();
 
 	} else if (subcommand == Token("writ")) {
 		ctx.read_arg_separator(m);
-		ctx.read_object(m);
+		auto* subject = g_engine_context.objects->try_get(ctx.read_object(m));
 		for (int i = 0; i < 12; ++i) {
 			ctx.read_arg_separator(m);
 			ctx.read_int(m);
 		}
 		ctx.read_command_separator(m);
-
-		printf("WARNING: STIM WRIT not implemented\n");
+		if (subject) {
+			subject->creature_stim_writ();
+		}
 
 	} else if (subcommand == Token("shou")) {
 		for (int i = 0; i < 12; ++i) {
@@ -587,8 +588,7 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 			ctx.read_int(m);
 		}
 		ctx.read_command_separator(m);
-
-		printf("WARNING: STIM SHOU not implemented\n");
+		ctx.get_targ(m)->stim_shou();
 
 	} else if (subcommand == Token("tact")) {
 		for (int i = 0; i < 12; ++i) {

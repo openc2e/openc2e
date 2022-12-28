@@ -194,6 +194,10 @@ class Object {
 	void blackboard_emit_eyesight(int32_t word_index);
 	void blackboard_emit_earshot(int32_t word_index);
 
+	void stim_shou();
+	void stim_sign();
+
+	void creature_stim_writ();
 	void creature_stim_disappoint();
 
 	void vehicle_grab_passengers();

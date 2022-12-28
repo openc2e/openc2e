@@ -126,6 +126,5 @@ void Renderable::update_renderitem() {
 		renderitem = g_engine_context.rendersystem->render_item_create(LAYER_OBJECTS);
 	}
 	g_engine_context.rendersystem->render_item_set_texture(renderitem, sprite.getTextureForFrame(numeric_cast<unsigned int>(frame())));
-	// TODO: subpixel precision?
-	g_engine_context.rendersystem->render_item_set_position(renderitem, x.trunc(), y.trunc(), z);
+	g_engine_context.rendersystem->render_item_set_position(renderitem, static_cast<float>(x), static_cast<float>(y), z);
 }

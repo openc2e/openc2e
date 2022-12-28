@@ -4,6 +4,15 @@
 #include "common/Ascii.h"
 #include "common/NumericCast.h"
 
+static bool world_has_at_least_one_creature() {
+	for (auto& obj : *g_engine_context.objects) {
+		if (obj->creature_data) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Object::handle_left_click(int32_t relx, int32_t rely) {
 	// When an object is the subject of a left click event, we queue up a message
 	// to ACTIVATE1, ACTIVATE2, or DEACTIVATE. But how do we know which message
@@ -92,7 +101,6 @@ void Object::handle_mesg_activate1(Message msg) {
 		if (actv == ACTV_ACTIVE1 || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE1] == -1)) {
 			if (from)
 				from->creature_stim_disappoint();
-			fmt::print("compound object not allowed\n");
 			return;
 		}
 		if (lift_data) {
@@ -341,19 +349,28 @@ void Object::blackboard_disable_edit() {
 }
 
 void Object::blackboard_emit_eyesight(int32_t word_index) {
-	printf("WARNING: blackboard_emit_eyesight %i not implemented\n", word_index);
+	if (world_has_at_least_one_creature()) {
+		printf("WARNING: blackboard_emit_eyesight %i not implemented\n", word_index);
+	}
 }
 
 void Object::blackboard_emit_earshot(int32_t word_index) {
-	printf("WARNING: blackboard_emit_earshot %i not implemented\n", word_index);
+	if (world_has_at_least_one_creature()) {
+		printf("WARNING: blackboard_emit_earshot %i not implemented\n", word_index);
+	}
 }
 
+
 void Object::vehicle_grab_passengers() {
-	printf("WARNING: vehicle_grab_passengers not implemented\n");
+	if (world_has_at_least_one_creature()) {
+		printf("WARNING: vehicle_grab_passengers not implemented\n");
+	}
 }
 
 void Object::vehicle_drop_passengers() {
-	printf("WARNING: vehicle_drop_passengers not implemented\n");
+	if (world_has_at_least_one_creature()) {
+		printf("WARNING: vehicle_drop_passengers not implemented\n");
+	}
 }
 
 void Object::tick() {
@@ -423,8 +440,27 @@ void Object::tick() {
 	}
 }
 
+void Object::stim_shou() {
+	if (world_has_at_least_one_creature()) {
+		printf("WARNING: stim_shou not implemented\n");
+	}
+}
+
+void Object::stim_sign() {
+	if (world_has_at_least_one_creature()) {
+		printf("WARNING: stim_shou not implemented\n");
+	}
+}
+
+
 void Object::creature_stim_disappoint() {
 	if (creature_data) {
 		printf("WARNING: creature_stim_disappoint not implemented\n");
+	}
+}
+
+void Object::creature_stim_writ() {
+	if (creature_data) {
+		printf("WARNING: creature_stim_writ not implemented\n");
 	}
 }

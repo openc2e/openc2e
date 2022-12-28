@@ -18,7 +18,7 @@ void RenderSystem::main_camera_set_src_rect(Rect src) {
 	m_main_camera_src_rect = src;
 }
 
-void RenderSystem::main_camera_set_dest_rect(Rect src) {
+void RenderSystem::main_camera_set_dest_rect(RectF src) {
 	m_main_camera_dest_rect = src;
 }
 
@@ -37,7 +37,7 @@ RenderItemHandle RenderSystem::render_item_create(int layer) {
 	return handle;
 }
 
-void RenderSystem::render_item_set_position(const RenderItemHandle& handle, int32_t x, int32_t y, int32_t z) {
+void RenderSystem::render_item_set_position(const RenderItemHandle& handle, float x, float y, int32_t z) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->x = x;
 		item->y = y;
@@ -54,7 +54,7 @@ void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const
 	}
 }
 
-void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle, int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
+void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle, float x, float y, float w, float h, uint32_t color) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_RECT;
 		item->x = x;
@@ -65,7 +65,7 @@ void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle,
 	}
 }
 
-void RenderSystem::render_item_set_line(const RenderItemHandle& handle, int32_t xstart, int32_t ystart, int32_t xend, int32_t yend, uint32_t color) {
+void RenderSystem::render_item_set_line(const RenderItemHandle& handle, float xstart, float ystart, float xend, float yend, uint32_t color) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_LINE;
 		item->x = xstart;

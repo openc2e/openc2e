@@ -16,9 +16,9 @@ C1Sound::operator bool() {
 
 void C1Sound::fade_out() {
 	if (auto source_data = soundmanager->get_sound_data(*this)) {
-		// fade out over 15 ticks, which in C3/DS is 3/4 of a second
+		// fade out over 15 ticks, which in C1 is 1.5 seconds
 		source_data->fade_start = std::chrono::steady_clock::now();
-		source_data->fade_length = std::chrono::milliseconds(750);
+		source_data->fade_length = std::chrono::milliseconds(1500);
 	} else {
 		id = static_cast<uint32_t>(~0);
 	}

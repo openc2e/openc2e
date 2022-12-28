@@ -61,10 +61,10 @@ class RenderSystem {
 	};
 	struct RenderItem {
 		int32_t layer = 0;
-		int32_t x = 0;
-		int32_t y = 0;
-		int32_t width = 0;
-		int32_t height = 0;
+		float x = 0;
+		float y = 0;
+		float width = 0;
+		float height = 0;
 		int32_t z = 0;
 		RenderItemType type = RENDER_NONE;
 		uint32_t color = 0;
@@ -74,7 +74,7 @@ class RenderSystem {
 	Backend* m_backend = nullptr;
 	int32_t m_world_wrap_width = 0;
 	Rect m_main_camera_src_rect;
-	Rect m_main_camera_dest_rect;
+	RectF m_main_camera_dest_rect;
 	DenseSlotMap<RenderItem> m_render_items;
 
   public:
@@ -82,17 +82,17 @@ class RenderSystem {
 
 	void world_set_wrap_width(int32_t wrap_width);
 	void main_camera_set_src_rect(Rect);
-	void main_camera_set_dest_rect(Rect);
+	void main_camera_set_dest_rect(RectF);
 
 	RenderItemHandle render_item_create(int layer = 0);
 
-	void render_item_set_position(const RenderItemHandle& key, int32_t x, int32_t y, int32_t z);
+	void render_item_set_position(const RenderItemHandle& key, float x, float y, int32_t z);
 	void render_item_set_texture(const RenderItemHandle& key, const Texture& tex);
-	void render_item_set_unfilled_rect(const RenderItemHandle& key, int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
-	void render_item_set_line(const RenderItemHandle& key, int32_t xstart, int32_t ystart, int32_t xend, int32_t yend, uint32_t color);
+	void render_item_set_unfilled_rect(const RenderItemHandle& key, float x, float y, float w, float h, uint32_t color);
+	void render_item_set_line(const RenderItemHandle& key, float xstart, float ystart, float xend, float yend, uint32_t color);
 
 	void render_item_set_layer(const RenderItemHandle& key, int32_t layer);
-	void render_item_set_position(const RenderItemHandle& key, int32_t x, int32_t y);
+	void render_item_set_position(const RenderItemHandle& key, float x, float y);
 	void render_item_set_texture_size(const RenderItemHandle& key, int32_t w, int32_t h); // allows negative values, handles MIRA, SCLE, STRC. hmm.. how hard/easy to make this?
 	void render_item_set_z_order(const RenderItemHandle& key, int32_t z);
 	void render_item_set_shows_on_camera(const RenderItemHandle& key, bool photogenic); // to implement ATTR 256 Camera Shy

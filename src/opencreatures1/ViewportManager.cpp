@@ -4,7 +4,7 @@
 
 constexpr int32_t VIEWPORT_MARGIN_TOP = 20;
 constexpr int32_t VIEWPORT_MARGIN_BOTTOM = 20;
-constexpr float VIEWPORT_SCALE = 1.f;
+constexpr float VIEWPORT_SCALE = 1.0f;
 
 void ViewportManager::handle_event(const BackendEvent& event) {
 	if (!(event.type == eventrawkeyup || event.type == eventrawkeydown)) {
@@ -85,7 +85,7 @@ void ViewportManager::tick() {
 	// update rendersystem
 	// TODO: this doesn't feel like the best place for this
 	g_engine_context.rendersystem->main_camera_set_src_rect({scrollx, scrolly, numeric_cast<int32_t>(width() / VIEWPORT_SCALE), numeric_cast<int32_t>((height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE)});
-	g_engine_context.rendersystem->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, width(), height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM});
+	g_engine_context.rendersystem->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, numeric_cast<float>(width()), numeric_cast<float>(height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM)});
 }
 
 int32_t ViewportManager::window_x_to_world_x(int32_t winx) const {
