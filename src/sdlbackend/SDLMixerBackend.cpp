@@ -20,6 +20,7 @@
 #include "SDLMixerBackend.h"
 
 #include "common/Exception.h"
+#include "common/scope_guard.h"
 
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -38,7 +39,29 @@ enum {
 
 constexpr int SDLMIXERBACKEND_CHUNK_SIZE = 1024;
 
+struct MixChunkDeleter {
+	void operator()(Mix_Chunk* chunk) {
+		if (chunk) {
+			Mix_FreeChunk(chunk);
+		}
+	}
+};
+
+struct ChunkRef {
+	std::string name;
+	std::unique_ptr<Mix_Chunk, MixChunkDeleter> ptr;
+	int ref = 0;
+	void add_ref() {
+		ref++;
+	}
+	void release() {
+		ref--;
+	}
+};
+
 static std::vector<uint16_t> s_channel_to_generation;
+static std::vector<size_t> s_channel_to_chunk;
+static std::vector<ChunkRef> s_chunks;
 
 static int audiochannel_to_int(AudioChannel source) {
 	uint16_t channel = source.handle & 0xffff;
@@ -98,23 +121,17 @@ void SDLMixerBackend::init() {
 	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, SDLMIXERBACKEND_CHUNK_SIZE) < 0)
 		throw Exception(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
 
-	if (!Mix_Init(MIX_INIT_MID)) {
+	if (!(Mix_Init(MIX_INIT_MID) & MIX_INIT_MID)) {
 		printf("* SDLMixer: failed to load MIDI support: %s\n", Mix_GetError());
 	}
 
 	Mix_ChannelFinished([](int i) {
-		// free the chunk we just played
-		// DANGEROUS: each channel must use its own chunk! if you want channels to share data,
-		// create new chunks each time using Mix_QuickLoad_RAW(chunk->abuf, chunk->alen)
-		Mix_Chunk* chunk = Mix_GetChunk(i);
-		if (chunk) {
-			Mix_FreeChunk(chunk);
-		}
-		// track which handles we've given out are still valid
-		if ((unsigned int)i >= s_channel_to_generation.size()) {
+		// release reference to the chunk we just played
+		if ((unsigned int)i >= s_channel_to_generation.size() || (unsigned int)i >= s_channel_to_chunk.size()) {
 			printf("* SDLMixer: channel %i finished that we weren't tracking, this shouldn't happen\n", i);
 		} else {
 			s_channel_to_generation[i]++;
+			s_chunks[s_channel_to_chunk[i]].release();
 		}
 	});
 }
@@ -124,46 +141,90 @@ void SDLMixerBackend::shutdown() {
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-static int playChannel(Mix_Chunk* chunk, bool looping) {
-	int channel = Mix_PlayChannel(-1, chunk, (looping ? -1 : 0));
+static int playChannel(size_t chunk_idx, bool looping) {
+	int channel = Mix_PlayChannel(-1, s_chunks[chunk_idx].ptr.get(), (looping ? -1 : 0));
 	if (channel == -1) {
 		Mix_AllocateChannels(Mix_AllocateChannels(-1) + 1);
-		channel = Mix_PlayChannel(-1, chunk, (looping ? -1 : 0));
+		channel = Mix_PlayChannel(-1, s_chunks[chunk_idx].ptr.get(), (looping ? -1 : 0));
 	}
 	if (channel == -1) {
 		printf("Couldn't play source: %s\n", Mix_GetError());
 		return -1;
 	}
+	SDL_LockAudio();
 	if ((unsigned int)channel >= s_channel_to_generation.size()) {
-		SDL_LockAudio();
 		s_channel_to_generation.resize(channel + 1, 0);
-		SDL_UnlockAudio();
+		s_channel_to_chunk.resize(channel + 1);
 	}
+	s_channel_to_chunk[channel] = chunk_idx;
+	SDL_UnlockAudio();
 	return channel;
 }
 
-AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping) {
-	Mix_Chunk* chunk = Mix_LoadWAV(filename.c_str());
-	if (!chunk)
-		return {};
+static size_t add_chunk(std::string name, std::unique_ptr<Mix_Chunk, MixChunkDeleter>&& ptr) {
+	for (size_t i = 0; i < s_chunks.size(); ++i) {
+		if (s_chunks[i].ref == 0) {
+			s_chunks[i].name = name;
+			s_chunks[i].ptr = std::move(ptr);
+			s_chunks[i].ref = 1;
+			return i;
+		}
+		if (s_chunks[i].ref < 0) {
+			throw Exception("ChunkRef was less than zero!");
+		}
+	}
+	SDL_LockAudio();
+	// Lock because we might reallocate s_chunks
+	s_chunks.emplace_back(ChunkRef{name, std::move(ptr), 1});
+	SDL_UnlockAudio();
+	return s_chunks.size() - 1;
+}
 
-	int channel = playChannel(chunk, looping);
+AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping) {
+	// do we have this file already loaded?
+	size_t chunk_idx = (size_t)-1;
+	for (size_t i = 0; i < s_chunks.size(); ++i) {
+		if (s_chunks[i].name == filename && s_chunks[i].ptr) {
+			SDL_LockAudio();
+			s_chunks[i].add_ref();
+			SDL_UnlockAudio();
+			chunk_idx = i;
+			break;
+		}
+	}
+
+	// nope, have to load it from scratch
+	if (chunk_idx == (size_t)-1) {
+		std::unique_ptr<Mix_Chunk, MixChunkDeleter> chunk{Mix_LoadWAV(filename.c_str())};
+		if (!chunk) {
+			return {};
+		}
+		chunk_idx = add_chunk(filename, std::move(chunk));
+	}
+
+	// new channel to play this chunk
+	int channel = playChannel(chunk_idx, looping);
 	if (channel == -1) {
-		Mix_FreeChunk(chunk);
+		SDL_LockAudio();
+		s_chunks[chunk_idx].release();
+		SDL_UnlockAudio();
 		return {};
 	}
 	return int_to_audio_channel(channel);
 }
 
 AudioChannel SDLMixerBackend::playWavData(const uint8_t* data, size_t size, bool looping) {
-	Mix_Chunk* chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(data, size), SDL_TRUE);
+	std::unique_ptr<Mix_Chunk, MixChunkDeleter> chunk{Mix_LoadWAV_RW(SDL_RWFromConstMem(data, size), SDL_TRUE)};
 	if (!chunk) {
 		return {};
 	}
 
-	int channel = playChannel(chunk, looping);
+	size_t chunk_idx = add_chunk("", std::move(chunk));
+	int channel = playChannel(chunk_idx, looping);
 	if (channel == -1) {
-		Mix_FreeChunk(chunk);
+		SDL_LockAudio();
+		s_chunks[chunk_idx].release();
+		SDL_UnlockAudio();
 		return {};
 	}
 	return int_to_audio_channel(channel);
