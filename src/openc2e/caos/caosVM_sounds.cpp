@@ -268,7 +268,7 @@ void c_VOLM(caosVM* vm) {
 	if (type == 0) {
 		soundmanager.setVolume(scaled_volume);
 	} else if (type == 1) {
-		engine.musicmanager->setMIDIVolume(scaled_volume);
+		engine.musicmanager->midi_set_volume(scaled_volume);
 	} else if (type == 2) {
 		engine.musicmanager->setVolume(scaled_volume);
 	} else {

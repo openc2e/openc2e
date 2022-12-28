@@ -157,7 +157,7 @@ static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = null
 
 static AudioChannel playSample(const std::string& name, MNGFile* file, AudioBackend* backend, bool looping = false) {
 	const auto& sample = file->samples[file->getSampleForName(name)];
-	return backend->playWavData(sample.data(), sample.size(), looping);
+	return backend->play_wav_data(sample.data(), sample.size(), looping);
 }
 
 MusicStage::MusicStage(MNGStage node) {
@@ -280,7 +280,7 @@ void MusicAleotoricLayer::setVariable(std::string name, float value) {
 
 void MusicAleotoricLayer::stop() {
 	for (auto pw : playing_waves) {
-		backend->stopChannel(pw.channel);
+		backend->audio_channel_stop(pw.channel);
 	}
 	playing_waves = {};
 	queued_waves = {};
@@ -290,8 +290,8 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	float current_volume = volume * track_volume;
 
 	for (auto pw = playing_waves.begin(); pw != playing_waves.end();) {
-		if (backend->getChannelState(pw->channel) == AUDIO_PLAYING) {
-			backend->setChannelVolume(pw->channel, pw->volume * current_volume);
+		if (backend->audio_channel_get_state(pw->channel) == AUDIO_PLAYING) {
+			backend->audio_channel_set_volume(pw->channel, pw->volume * current_volume);
 			pw++;
 		} else {
 			pw = playing_waves.erase(pw);
@@ -300,8 +300,8 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	for (auto qw = queued_waves.begin(); qw != queued_waves.end();) {
 		if (mngclock::now() >= qw->start_time) {
 			auto channel = playSample(qw->wave_name, parent->file, backend);
-			backend->setChannelVolume(channel, qw->volume * current_volume);
-			backend->setChannelPan(channel, qw->pan);
+			backend->audio_channel_set_volume(channel, qw->volume * current_volume);
+			backend->audio_channel_set_pan(channel, qw->pan);
 			playing_waves.push_back({channel, qw->volume});
 			qw = queued_waves.erase(qw);
 		} else {
@@ -360,7 +360,7 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 			}
 		} else {
 			auto channel = playSample(voice->wave, parent->file, backend);
-			backend->setChannelVolume(channel, current_volume);
+			backend->audio_channel_set_volume(channel, current_volume);
 			playing_waves.push_back({channel, 1.0});
 		}
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
@@ -435,8 +435,8 @@ void MusicLoopLayer::update(float track_volume) {
 	}
 
 	float current_volume = volume * track_volume;
-	backend->setChannelVolume(channel, current_volume);
-	backend->setChannelPan(channel, pan);
+	backend->audio_channel_set_volume(channel, current_volume);
+	backend->audio_channel_set_pan(channel, pan);
 
 	if (mngclock::now() >= next_update_at) {
 		runUpdateBlock();
@@ -445,7 +445,7 @@ void MusicLoopLayer::update(float track_volume) {
 }
 
 void MusicLoopLayer::stop() {
-	backend->stopChannel(channel);
+	backend->audio_channel_stop(channel);
 	channel = {};
 }
 

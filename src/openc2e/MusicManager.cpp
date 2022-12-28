@@ -48,7 +48,7 @@ MusicManager::~MusicManager() {
 
 void MusicManager::stop() {
 	mng_music->stop();
-	backend->stopMIDI();
+	backend->midi_stop();
 }
 
 float MusicManager::getVolume() {
@@ -64,7 +64,7 @@ float MusicManager::getMIDIVolume() {
 	return midi_volume;
 }
 
-void MusicManager::setMIDIVolume(float volume) {
+void MusicManager::midi_set_volume(float volume) {
 	midi_volume = volume;
 	updateVolumes();
 }
@@ -90,8 +90,8 @@ void MusicManager::setMIDIMuted(bool muted) {
 
 void MusicManager::updateVolumes() {
 	mng_music->setVolume(music_muted ? 0 : music_volume);
-	backend->setMIDIVolume(isMIDIMuted() ? 0 : midi_volume);
-	backend->setChannelVolume(creatures1_channel, music_muted ? 0 : music_volume * 0.8);
+	backend->midi_set_volume(isMIDIMuted() ? 0 : midi_volume);
+	backend->audio_channel_set_volume(creatures1_channel, music_muted ? 0 : music_volume * 0.8);
 }
 
 void MusicManager::playTrack(std::string track) {
@@ -112,7 +112,7 @@ void MusicManager::playTrackForAtLeastThisManyMilliseconds(std::string track, un
 		mng_music->playSilence(); // or just stop it?
 
 		if (track == "") {
-			backend->stopMIDI();
+			backend->midi_stop();
 			return;
 		}
 
@@ -121,7 +121,7 @@ void MusicManager::playTrackForAtLeastThisManyMilliseconds(std::string track, un
 			fmt::print("Couldn't find MIDI file '{}'!\n", track);
 			return;
 		}
-		backend->playMIDIFile(filename);
+		backend->play_midi_file(filename);
 		how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
 		return;
 	}
@@ -164,10 +164,10 @@ void MusicManager::tick() {
 	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
 	// TODO: this should probably be in a separate C1MusicManager class
 	if (engine.version == 1) {
-		if (creatures1_ticks_until_next_sound == 0 && backend->getChannelState(creatures1_channel) == AUDIO_STOPPED) {
+		if (creatures1_ticks_until_next_sound == 0 && backend->audio_channel_get_state(creatures1_channel) == AUDIO_STOPPED) {
 			auto sounds = findSoundFiles("MU*.wav");
 			if (sounds.size()) {
-				creatures1_channel = backend->playClip(rand_choice(sounds));
+				creatures1_channel = backend->play_clip(rand_choice(sounds));
 			}
 			creatures1_ticks_until_next_sound = rand_uint32(50, 99);
 		} else {

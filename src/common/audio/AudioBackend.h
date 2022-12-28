@@ -34,15 +34,15 @@ class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
 	virtual void init() = 0;
 	virtual void shutdown() = 0;
 
-	virtual AudioChannel playClip(const std::string& filename, bool looping = false) = 0;
-	virtual AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false) = 0;
+	virtual AudioChannel play_clip(const std::string& filename, bool looping = false) = 0;
+	virtual AudioChannel play_wav_data(const uint8_t* data, size_t size, bool looping = false) = 0;
 
-	virtual void setChannelVolume(AudioChannel, float) = 0;
-	virtual void setChannelPan(AudioChannel, float pan) = 0;
-	virtual AudioState getChannelState(AudioChannel) = 0;
-	virtual void stopChannel(AudioChannel) = 0;
+	virtual void audio_channel_set_volume(AudioChannel, float) = 0;
+	virtual void audio_channel_set_pan(AudioChannel, float pan) = 0;
+	virtual AudioState audio_channel_get_state(AudioChannel) = 0;
+	virtual void audio_channel_stop(AudioChannel) = 0;
 
-	virtual void playMIDIFile(const std::string& filename) = 0;
-	virtual void setMIDIVolume(float) = 0;
-	virtual void stopMIDI() = 0;
+	virtual void play_midi_file(const std::string& filename) = 0;
+	virtual void midi_set_volume(float) = 0;
+	virtual void midi_stop() = 0;
 };

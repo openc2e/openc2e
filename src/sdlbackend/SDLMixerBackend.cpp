@@ -85,22 +85,22 @@ static AudioChannel int_to_audio_channel(int channel) {
 SDLMixerBackend::SDLMixerBackend() {
 }
 
-void SDLMixerBackend::playMIDIFile(const std::string& filename) {
+void SDLMixerBackend::play_midi_file(const std::string& filename) {
 	Mix_Music* music = Mix_LoadMUS(filename.c_str());
 	if (!music) {
 		printf("* SDLMixer: Couldn't load %s: %s\n", filename.c_str(), Mix_GetError());
 		return;
 	}
-	stopMIDI();
+	midi_stop();
 	Mix_PlayMusic(music, -1); // TODO: is looping forever correct?
 	midi = music;
 }
 
-void SDLMixerBackend::setMIDIVolume(float volume) {
+void SDLMixerBackend::midi_set_volume(float volume) {
 	Mix_VolumeMusic(volume * MIX_MAX_VOLUME);
 }
 
-void SDLMixerBackend::stopMIDI() {
+void SDLMixerBackend::midi_stop() {
 	if (midi) {
 		Mix_HaltMusic();
 		Mix_FreeMusic(midi);
@@ -180,7 +180,7 @@ static size_t add_chunk(std::string name, std::unique_ptr<Mix_Chunk, MixChunkDel
 	return s_chunks.size() - 1;
 }
 
-AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping) {
+AudioChannel SDLMixerBackend::play_clip(const std::string& filename, bool looping) {
 	// do we have this file already loaded?
 	size_t chunk_idx = (size_t)-1;
 	for (size_t i = 0; i < s_chunks.size(); ++i) {
@@ -213,7 +213,7 @@ AudioChannel SDLMixerBackend::playClip(const std::string& filename, bool looping
 	return int_to_audio_channel(channel);
 }
 
-AudioChannel SDLMixerBackend::playWavData(const uint8_t* data, size_t size, bool looping) {
+AudioChannel SDLMixerBackend::play_wav_data(const uint8_t* data, size_t size, bool looping) {
 	std::unique_ptr<Mix_Chunk, MixChunkDeleter> chunk{Mix_LoadWAV_RW(SDL_RWFromConstMem(data, size), SDL_TRUE)};
 	if (!chunk) {
 		return {};
@@ -230,14 +230,14 @@ AudioChannel SDLMixerBackend::playWavData(const uint8_t* data, size_t size, bool
 	return int_to_audio_channel(channel);
 }
 
-void SDLMixerBackend::setChannelVolume(AudioChannel source, float v) {
+void SDLMixerBackend::audio_channel_set_volume(AudioChannel source, float v) {
 	int channel = audiochannel_to_int(source);
 	if (channel == -1)
 		return;
 	Mix_Volume(channel, v * MIX_MAX_VOLUME);
 }
 
-void SDLMixerBackend::setChannelPan(AudioChannel source, float pan) {
+void SDLMixerBackend::audio_channel_set_pan(AudioChannel source, float pan) {
 	int channel = audiochannel_to_int(source);
 	if (channel == -1)
 		return;
@@ -250,7 +250,7 @@ void SDLMixerBackend::setChannelPan(AudioChannel source, float pan) {
 	}
 }
 
-AudioState SDLMixerBackend::getChannelState(AudioChannel source) {
+AudioState SDLMixerBackend::audio_channel_get_state(AudioChannel source) {
 	int channel = audiochannel_to_int(source);
 	if (channel != -1 && Mix_Playing(channel)) {
 		return AUDIO_PLAYING;
@@ -258,7 +258,7 @@ AudioState SDLMixerBackend::getChannelState(AudioChannel source) {
 	return AUDIO_STOPPED;
 }
 
-void SDLMixerBackend::stopChannel(AudioChannel source) {
+void SDLMixerBackend::audio_channel_stop(AudioChannel source) {
 	int channel = audiochannel_to_int(source);
 	if (channel == -1)
 		return;

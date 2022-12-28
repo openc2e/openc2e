@@ -25,7 +25,7 @@ void C1SoundManager::set_muted(bool muted_) {
 }
 
 bool C1SoundManager::is_alive(SoundData& sound_data) {
-	if (sound_data.handle && g_engine_context.audio_backend->getChannelState(sound_data.handle) == AUDIO_PLAYING) {
+	if (sound_data.handle && g_engine_context.audio_backend->audio_channel_get_state(sound_data.handle) == AUDIO_PLAYING) {
 		return true;
 	} else {
 		return false;
@@ -102,18 +102,18 @@ void C1SoundManager::update_volume(SoundData& s) {
 		// Pan sound as we get closer to screen edge
 		// TODO: Does this sound right?
 		float pan = clamp(distx / screen_width, -1, 1);
-		g_engine_context.audio_backend->setChannelPan(s.handle, pan);
+		g_engine_context.audio_backend->audio_channel_set_pan(s.handle, pan);
 	}
 
 	if (s.fade_start != decltype(s.fade_start)()) {
 		float volume_multiplier = 1 - (std::chrono::steady_clock::now() - s.fade_start) / s.fade_length;
 		if (volume_multiplier <= 0) {
-			g_engine_context.audio_backend->stopChannel(s.handle);
+			g_engine_context.audio_backend->audio_channel_stop(s.handle);
 		}
 		volume *= volume_multiplier;
 	}
 
-	g_engine_context.audio_backend->setChannelVolume(s.handle, volume);
+	g_engine_context.audio_backend->audio_channel_set_volume(s.handle, volume);
 }
 
 void C1SoundManager::update_volumes() {
@@ -138,9 +138,9 @@ C1Sound C1SoundManager::play_sound(std::string name, bool loop) {
 		return {};
 	}
 
-	auto handle = g_engine_context.audio_backend->playClip(filename, loop);
+	auto handle = g_engine_context.audio_backend->play_clip(filename, loop);
 	if (!handle) {
-		// note that more specific error messages can be thrown by implementations of playClip
+		// note that more specific error messages can be thrown by implementations of play_clip
 		throw_exception("failed to play audio clip {}{}", filename, loop ? " (loop)" : "");
 	}
 
@@ -148,11 +148,11 @@ C1Sound C1SoundManager::play_sound(std::string name, bool loop) {
 }
 
 void C1SoundManager::stop(SoundData& source_data) {
-	return g_engine_context.audio_backend->stopChannel(source_data.handle);
+	return g_engine_context.audio_backend->audio_channel_stop(source_data.handle);
 }
 
 AudioState C1SoundManager::get_channel_state(SoundData& source_data) {
-	return g_engine_context.audio_backend->getChannelState(source_data.handle);
+	return g_engine_context.audio_backend->audio_channel_get_state(source_data.handle);
 }
 
 void C1SoundManager::tick() {

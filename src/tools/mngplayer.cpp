@@ -77,13 +77,13 @@ int main(int argc, char** argv) {
 		}
 
 	} else if (ext == ".mid" || ext == ".midi") {
-		backend->playMIDIFile(filename);
+		backend->play_midi_file(filename);
 		Event sleep_forever;
 		sleep_forever.wait();
 
 	} else if (ext == ".wav") {
-		auto channel = backend->playClip(filename);
-		while (backend->getChannelState(channel) == AUDIO_PLAYING) {
+		auto channel = backend->play_clip(filename);
+		while (backend->audio_channel_get_state(channel) == AUDIO_PLAYING) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 

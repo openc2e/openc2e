@@ -51,14 +51,14 @@ int main(int argc, char** argv) {
 		fmt::print("{} {}ms\n", entry.name.size() > 0 ? entry.name : "(silence)", delay_ms);
 
 		if (entry.name.size() > 0) {
-			channels.push_back(backend->playClip(fs::path(datadirectory) / "Sounds" / (entry.name + ".wav")));
+			channels.push_back(backend->play_clip(fs::path(datadirectory) / "Sounds" / (entry.name + ".wav")));
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
 	}
 	while (true) {
 		if (std::all_of(channels.begin(), channels.end(), [&](auto c) {
-				return backend->getChannelState(c) == AUDIO_STOPPED;
+				return backend->audio_channel_get_state(c) == AUDIO_STOPPED;
 			})) {
 			break;
 		}

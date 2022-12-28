@@ -38,7 +38,7 @@ class MusicManager {
 	float getVolume();
 	void setVolume(float volume);
 	float getMIDIVolume();
-	void setMIDIVolume(float volume);
+	void midi_set_volume(float volume);
 	bool isMuted();
 	void setMuted(bool muted);
 	bool isMIDIMuted();

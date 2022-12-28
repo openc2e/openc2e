@@ -27,26 +27,26 @@ class NullAudioBackend : public AudioBackend {
 	void init() {}
 	void shutdown() {}
 
-	AudioChannel playClip(const std::string& filename, bool) {
+	AudioChannel play_clip(const std::string& filename, bool) {
 		if (filename.size() == 0)
 			return {};
 		return {1};
 	}
-	virtual AudioChannel playWavData(const uint8_t*, size_t, bool) {
+	virtual AudioChannel play_wav_data(const uint8_t*, size_t, bool) {
 		return {1};
 	}
 
-	void setChannelVolume(AudioChannel, float) {}
-	void setChannelPan(AudioChannel, float) {}
-	AudioState getChannelState(AudioChannel) {
+	void audio_channel_set_volume(AudioChannel, float) {}
+	void audio_channel_set_pan(AudioChannel, float) {}
+	AudioState audio_channel_get_state(AudioChannel) {
 		// TODO: pretend to play audio for the correct duration, so that consumers
 		// of this API don't assume all sounds fail to play.
 		return AUDIO_STOPPED;
 	}
 
-	void stopChannel(AudioChannel) {}
+	void audio_channel_stop(AudioChannel) {}
 
-	void playMIDIFile(const std::string&) {}
-	void setMIDIVolume(float) {}
-	void stopMIDI() {}
+	void play_midi_file(const std::string&) {}
+	void midi_set_volume(float) {}
+	void midi_stop() {}
 };

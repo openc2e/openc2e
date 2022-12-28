@@ -37,15 +37,15 @@ class SDLMixerBackend : public AudioBackend, public Singleton<SDLMixerBackend> {
 	void init();
 	void shutdown();
 
-	AudioChannel playClip(const std::string& filename, bool looping = false);
-	AudioChannel playWavData(const uint8_t* data, size_t size, bool looping = false);
+	AudioChannel play_clip(const std::string& filename, bool looping = false);
+	AudioChannel play_wav_data(const uint8_t* data, size_t size, bool looping = false);
 
-	void setChannelVolume(AudioChannel, float);
-	void setChannelPan(AudioChannel, float pan);
-	AudioState getChannelState(AudioChannel);
-	void stopChannel(AudioChannel);
+	void audio_channel_set_volume(AudioChannel, float);
+	void audio_channel_set_pan(AudioChannel, float pan);
+	AudioState audio_channel_get_state(AudioChannel);
+	void audio_channel_stop(AudioChannel);
 
-	void playMIDIFile(const std::string& filename);
-	void setMIDIVolume(float);
-	void stopMIDI();
+	void play_midi_file(const std::string& filename);
+	void midi_set_volume(float);
+	void midi_stop();
 };

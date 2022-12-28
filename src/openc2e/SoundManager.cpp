@@ -42,7 +42,7 @@ void SoundManager::setMuted(bool muted) {
 }
 
 bool SoundManager::SoundData::isAlive() {
-	if (handle && engine.audio->getChannelState(handle) == AUDIO_PLAYING) {
+	if (handle && engine.audio->audio_channel_get_state(handle) == AUDIO_PLAYING) {
 		return true;
 	} else {
 		// resetAndIncrementGeneration();
@@ -130,7 +130,7 @@ void SoundManager::updateVolume(SoundData& s) {
 			// Pan sound as we get closer to screen edge
 			// TODO: Does this sound right?
 			float pan = clamp(distx / screen_width, -1, 1);
-			engine.audio->setChannelPan(s.handle, pan);
+			engine.audio->audio_channel_set_pan(s.handle, pan);
 		} else if (!room) {
 			// TODO: think about volume when positioning outside-metaroom agents
 			volume = 0;
@@ -142,12 +142,12 @@ void SoundManager::updateVolume(SoundData& s) {
 	if (s.fade_start != decltype(s.fade_start)()) {
 		float volume_multiplier = 1 - (std::chrono::steady_clock::now() - s.fade_start) / s.fade_length;
 		if (volume_multiplier <= 0) {
-			engine.audio->stopChannel(s.handle);
+			engine.audio->audio_channel_stop(s.handle);
 		}
 		volume *= volume_multiplier;
 	}
 
-	engine.audio->setChannelVolume(s.handle, volume);
+	engine.audio->audio_channel_set_volume(s.handle, volume);
 }
 
 void SoundManager::updateVolumes() {
@@ -172,9 +172,9 @@ Sound SoundManager::playSound(std::string name, bool loop) {
 		throw Exception(fmt::format("No such clip '{}.wav'", name));
 	}
 
-	auto handle = engine.audio->playClip(filename, loop);
+	auto handle = engine.audio->play_clip(filename, loop);
 	if (!handle) {
-		// note that more specific error messages can be thrown by implementations of playClip
+		// note that more specific error messages can be thrown by implementations of play_clip
 		throw Exception("failed to load audio clip " + filename);
 	}
 
@@ -192,9 +192,9 @@ Sound SoundManager::playVoice(std::string name) {
 		throw Exception(fmt::format("No such clip '{}.wav'", name));
 	}
 
-	auto handle = engine.audio->playClip(filename);
+	auto handle = engine.audio->play_clip(filename);
 	if (!handle) {
-		// note that more specific error messages can be thrown by implementations of playClip
+		// note that more specific error messages can be thrown by implementations of play_clip
 		throw Exception("failed to load audio clip " + filename);
 	}
 
