@@ -7,16 +7,19 @@ RenderSystem::RenderSystem(Backend* backend)
 	: m_backend(backend) {
 }
 
-void RenderSystem::main_camera_set_position(int32_t x, int32_t y) {
+void RenderSystem::main_camera_set_src_rect(Rect src) {
 	if (m_world_wrap_width) {
-		if (x < 0) {
-			x += m_world_wrap_width;
-		} else if (x >= m_world_wrap_width) {
-			x -= m_world_wrap_width;
+		if (src.x < 0) {
+			src.x += m_world_wrap_width;
+		} else if (src.x >= m_world_wrap_width) {
+			src.x -= m_world_wrap_width;
 		}
 	}
-	m_main_camera_x = x;
-	m_main_camera_y = y;
+	m_main_camera_src_rect = src;
+}
+
+void RenderSystem::main_camera_set_dest_rect(Rect src) {
+	m_main_camera_dest_rect = src;
 }
 
 void RenderSystem::world_set_wrap_width(int32_t wrap_width) {
@@ -75,6 +78,7 @@ void RenderSystem::render_item_set_line(const RenderItemHandle& handle, int32_t 
 
 void RenderSystem::draw() {
 	auto renderer = m_backend->getMainRenderTarget();
+	renderer->renderClear();
 
 	std::vector<RenderItem*> render_list;
 	render_list.reserve(m_render_items.size());
@@ -98,9 +102,33 @@ void RenderSystem::draw() {
 		return left < right;
 	});
 
+	// What's the transformation for this camera? First, let's transform source space to dest space
+
+	// destx = srcx * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_dest_rect.x
+	// desty = srcy * (m_main_camera_dest_rect.height / m_main_camera_source_rect.height) + m_main_camera_dest_rect.y
+
+	// Now, let's transfom world space to source space
+	// srcx = worldx + m_main_camera_src_rect.x
+	// srcy = worldy + m_main_camera_src_rect.y
+
+	// Putting it together, we have
+	// destx = (worldx + m_main_camera_src_rect.x) * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_dest_rect.x
+	//       = worldx * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_src_rect.x * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_dest_rect.x
+	//       = worldx * xscale + xadjust
+
+
+	const float xscale = 1.f * m_main_camera_dest_rect.width / m_main_camera_src_rect.width;
+	const float xadjust = m_main_camera_src_rect.x * xscale - m_main_camera_dest_rect.x;
+	const float yscale = 1.f * m_main_camera_dest_rect.height / m_main_camera_src_rect.height;
+	const float yadjust = m_main_camera_src_rect.y * yscale - m_main_camera_dest_rect.y;
+
+	const float worldadjust = m_world_wrap_width * xscale;
+
 	for (auto* r : render_list) {
-		int32_t x = r->x - m_main_camera_x;
-		int32_t y = r->y - m_main_camera_y;
+		float x = r->x * xscale - xadjust;
+		float y = r->y * yscale - yadjust;
+		float w = r->width * xscale;
+		float h = r->height * yscale;
 
 		if (r->type == RENDER_TEXTURE) {
 			Rect src;
@@ -109,27 +137,27 @@ void RenderSystem::draw() {
 			src.width = numeric_cast<int32_t>(r->tex.width);
 			src.height = numeric_cast<int32_t>(r->tex.height);
 
-			Rect dest;
+			RectF dest;
 			dest.x = x;
 			dest.y = y;
-			dest.width = src.width;
-			dest.height = src.height;
+			dest.width = w;
+			dest.height = h;
 
 			renderer->renderTexture(r->tex, src, dest);
 			if (m_world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				dest.x += m_world_wrap_width;
+				dest.x += worldadjust;
 				renderer->renderTexture(r->tex, src, dest);
-				dest.x -= m_world_wrap_width * 2;
+				dest.x -= worldadjust * 2;
 				renderer->renderTexture(r->tex, src, dest);
 			}
 
 		} else if (r->type == RENDER_RECT) {
-			const auto renderRect = [&](int xadjust) {
-				const int x1 = x + xadjust;
-				const int x2 = x + r->width + xadjust;
-				const int y1 = y;
-				const int y2 = y + r->height;
+			const auto renderRect = [&](auto a) {
+				const float x1 = x + a;
+				const float x2 = x + w + a;
+				const float y1 = y;
+				const float y2 = y + h;
 				// top
 				renderer->renderLine(x1, y1, x2, y1, r->color);
 				// right
@@ -142,15 +170,15 @@ void RenderSystem::draw() {
 			renderRect(0);
 			if (m_world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				renderRect(m_world_wrap_width);
-				renderRect(-m_world_wrap_width);
+				renderRect(worldadjust);
+				renderRect(-worldadjust);
 			}
 		} else if (r->type == RENDER_LINE) {
-			renderer->renderLine(x, y, x + r->width, y + r->height, r->color);
+			renderer->renderLine(x, y, x + w, y + h, r->color);
 			if (m_world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				renderer->renderLine(x + m_world_wrap_width, y, x + m_world_wrap_width + r->width, y + r->height, r->color);
-				renderer->renderLine(x - m_world_wrap_width, y, x - m_world_wrap_width + r->width, y + r->height, r->color);
+				renderer->renderLine(x + worldadjust, y, x + worldadjust + w, y + h, r->color);
+				renderer->renderLine(x - worldadjust, y, x - worldadjust + w, y + h, r->color);
 			}
 		}
 	}

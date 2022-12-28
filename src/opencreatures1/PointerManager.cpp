@@ -9,8 +9,8 @@ void PointerManager::update() {
 	Object* obj = g_engine_context.objects->try_get(m_pointer_tool);
 	Renderable* r = obj->get_renderable_for_part(0);
 	r->set_position(
-		m_screenx + g_engine_context.viewport->scrollx - obj->pointer_data->relx,
-		m_screeny + g_engine_context.viewport->scrolly - obj->pointer_data->rely);
+		g_engine_context.viewport->window_x_to_world_x(m_screenx) - obj->pointer_data->relx,
+		g_engine_context.viewport->window_y_to_world_y(m_screeny) - obj->pointer_data->rely);
 }
 
 void PointerManager::handle_event(const BackendEvent& event) {
@@ -29,15 +29,8 @@ void PointerManager::handle_event(const BackendEvent& event) {
 
 		Object* pntr = g_engine_context.objects->try_get(m_pointer_tool);
 
-		int worldx = g_engine_context.viewport->scrollx + event.x + pntr->pointer_data->relx;
-		// TODO: better way to handle world wrap?
-		if (worldx >= CREATURES1_WORLD_WIDTH) {
-			worldx -= CREATURES1_WORLD_WIDTH;
-		}
-		if (worldx < 0) {
-			worldx += CREATURES1_WORLD_WIDTH;
-		}
-		int worldy = g_engine_context.viewport->scrolly + event.y + pntr->pointer_data->rely;
+		int worldx = g_engine_context.viewport->window_x_to_world_x(event.x) + pntr->pointer_data->relx;
+		int worldy = g_engine_context.viewport->window_y_to_world_y(event.y) + pntr->pointer_data->rely;
 
 		fmt::print("click @ {} {}\n", worldx, worldy);
 

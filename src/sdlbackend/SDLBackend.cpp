@@ -279,14 +279,14 @@ SDLRenderTarget::~SDLRenderTarget() {
 	}
 }
 
-void SDLRenderTarget::renderLine(int x1, int y1, int x2, int y2, unsigned int color) {
+void SDLRenderTarget::renderLine(float x1, float y1, float x2, float y2, unsigned int color) {
 	Uint8 r = (color >> 24) & 0xff;
 	Uint8 g = (color >> 16) & 0xff;
 	Uint8 b = (color >> 8) & 0xff;
 	Uint8 a = (color >> 0) & 0xff;
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_SetRenderDrawColor(parent->renderer, r, g, b, a);
-	SDL_RenderDrawLine(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
+	SDL_RenderDrawLineF(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 
 Texture SDLBackend::createTexture(const Image& image) {
@@ -383,8 +383,8 @@ void SDLRenderTarget::setViewportOffsetBottom(int offset_bottom) {
 }
 
 
-void SDLRenderTarget::renderTexture(const Texture& tex_, Rect src, Rect dest, RenderOptions options) {
-	if (dest.right() + numeric_cast<int>(tex_.width) <= 0 || dest.x >= numeric_cast<int>(getWidth()) || dest.bottom() <= 0 || dest.y >= numeric_cast<int>(getHeight())) {
+void SDLRenderTarget::renderTexture(const Texture& tex_, Rect src, RectF dest, RenderOptions options) {
+	if (dest.right() + tex_.width <= 0 || dest.x >= getWidth() || dest.bottom() <= 0 || dest.y >= getHeight()) {
 		// cull non-visible textures
 		return;
 	}
@@ -426,7 +426,7 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 	src.width = img.width(frame);
 	src.height = img.height(frame);
 
-	Rect dest;
+	RectF dest;
 	dest.x = x;
 	dest.y = y + viewport_offset_top;
 	dest.width = (options.override_drawsize ? options.overridden_drawwidth : img.width(frame)) * options.scale;

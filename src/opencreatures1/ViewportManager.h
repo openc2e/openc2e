@@ -25,6 +25,9 @@ class ViewportManager {
 
 	int32_t centery() const;
 
+	int32_t window_x_to_world_x(int32_t) const;
+	int32_t window_y_to_world_y(int32_t) const;
+
 	int32_t scrollx = 0;
 	int32_t scrolly = 0;
 

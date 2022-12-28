@@ -23,6 +23,7 @@
 #include "BackendTexture.h"
 #include "common/Image.h"
 #include "common/math/Rect.h"
+#include "common/math/RectF.h"
 #include "common/span.h"
 
 #include <memory>
@@ -45,13 +46,13 @@ struct RenderOptions {
 
 class RenderTarget {
   public:
-	virtual void renderTexture(const Texture& tex, Rect src, Rect dest, RenderOptions options = {}) = 0;
+	virtual void renderTexture(const Texture& tex, Rect src, RectF dest, RenderOptions options = {}) = 0;
 	virtual void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options = {}) = 0;
 	void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, RenderOptions options = {}) {
 		assert(tex.get() != nullptr);
 		renderCreaturesImage(*tex.get(), frame, x, y, options);
 	}
-	virtual void renderLine(int x1, int y1, int x2, int y2, unsigned int color) = 0;
+	virtual void renderLine(float x1, float y1, float x2, float y2, unsigned int color) = 0;
 	virtual void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h) = 0;
 	virtual unsigned int getWidth() const = 0;
 	virtual unsigned int getHeight() const = 0;

@@ -73,15 +73,16 @@ class RenderSystem {
 
 	Backend* m_backend = nullptr;
 	int32_t m_world_wrap_width = 0;
-	int32_t m_main_camera_x = 0;
-	int32_t m_main_camera_y = 0;
+	Rect m_main_camera_src_rect;
+	Rect m_main_camera_dest_rect;
 	DenseSlotMap<RenderItem> m_render_items;
 
   public:
 	RenderSystem(Backend* backend);
 
 	void world_set_wrap_width(int32_t wrap_width);
-	void main_camera_set_position(int32_t x, int32_t y);
+	void main_camera_set_src_rect(Rect);
+	void main_camera_set_dest_rect(Rect);
 
 	RenderItemHandle render_item_create(int layer = 0);
 

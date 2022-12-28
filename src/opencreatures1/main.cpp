@@ -66,85 +66,6 @@ void load_everything() {
 	}
 }
 
-void draw_everything() {
-	// {
-	//
-	//
-	// 	// background
-	//
-	//
-	// 	// object parts
-	// 	std::vector<RenderItemHandle> object_render_items;
-	// 	for (auto& o : *g_engine_context.objects) {
-	// 		for (int32_t partno = 0; true; ++partno) {
-	// 			auto* renderable = o->get_renderable_for_part(partno);
-	// 			if (!renderable) {
-	// 				break;
-	// 			}
-	//
-	// 			auto frame = numeric_cast<unsigned int>(renderable->frame());
-	// 			auto renderitem = rendersystem.render_item_create(LAYER_OBJECTS);
-	// 			rendersystem.render_item_set_texture(renderitem, renderable->sprite.getTextureForFrame(frame));
-	// 			rendersystem.render_item_set_position(renderitem, renderable->x.trunc(), renderable->y.trunc(), renderable->z);
-	// 			object_render_items.emplace_back(std::move(renderitem));
-	// 		}
-	// 	}
-	//
-	//
-	//
-	// 	rendersystem.draw();
-	// }
-	g_engine_context.rendersystem->draw();
-
-
-	// auto renderer = g_engine_context.backend->getMainRenderTarget();
-
-	// draw world (twice, to handle wraparound)
-	// renderer->renderCreaturesImage(g_engine_context.map->background, 0, -g_engine_context.viewport->scrollx, -g_engine_context.viewport->scrolly);
-	// renderer->renderCreaturesImage(g_engine_context.map->background, 0, -g_engine_context.viewport->scrollx + CREATURES1_WORLD_WIDTH, -g_engine_context.viewport->scrolly);
-
-	// draw entities
-	// std::vector<Renderable*> renderables;
-	// for (auto& o : *g_engine_context.objects) {
-	// 	for (int32_t partno = 0; true; ++partno) {
-	// 		auto* r = o->get_renderable_for_part(partno);
-	// 		if (!r) {
-	// 			break;
-	// 		}
-	// 		renderables.push_back(r);
-	// 	}
-	// }
-	// std::stable_sort(renderables.begin(), renderables.end(), [](auto* left, auto* right) {
-	// 	return left->z < right->z;
-	// });
-	// for (auto* r : renderables) {
-	// 	int x = r->x.trunc() - g_engine_context.viewport->scrollx;
-	// 	int y = r->y.trunc();
-	// 	// what to do if it's near the wraparound? just draw three times?
-	// 	renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x, y - g_engine_context.viewport->scrolly);
-	// 	renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x - CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
-	// 	renderer->renderCreaturesImage(r->sprite, numeric_cast<uint32_t>(r->frame()), x + CREATURES1_WORLD_WIDTH, y - g_engine_context.viewport->scrolly);
-	// }
-
-	// // draw rooms
-	// for (auto& room : g_engine_context.map->rooms) {
-	// 	auto left = room.left - g_engine_context.viewport->scrollx;
-	// 	auto top = room.top - g_engine_context.viewport->scrolly;
-	// 	uint32_t color;
-	// 	if (room.type == 0) {
-	// 		color = 0xFFFF00CC;
-	// 	} else if (room.type == 1) {
-	// 		color = 0x00FFFFCC;
-	// 	} else {
-	// 		color = 0xFF00FFCC;
-	// 	}
-	// 	renderer->renderRect(left, top, room.width(), room.height(), color);
-	// 	// what to do if it's near the wraparound? just draw three times?
-	// 	renderer->renderRect(left + CREATURES1_WORLD_WIDTH, top, room.width(), room.height(), color);
-	// 	renderer->renderRect(left - CREATURES1_WORLD_WIDTH, top, room.width(), room.height(), color);
-	// }
-}
-
 void update_animations() {
 	for (auto& o : *g_engine_context.objects) {
 		for (int32_t partno = 0; true; ++partno) {
@@ -224,7 +145,7 @@ extern "C" int main(int argc, char** argv) {
 		update_everything();
 
 		// draw
-		draw_everything();
+		g_engine_context.rendersystem->draw();
 
 		// present
 		g_engine_context.backend->drawDone();

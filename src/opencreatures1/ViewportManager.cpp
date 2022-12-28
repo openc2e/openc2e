@@ -2,6 +2,9 @@
 
 #include "common/render/RenderSystem.h"
 
+constexpr int32_t VIEWPORT_MARGIN_TOP = 20;
+constexpr int32_t VIEWPORT_MARGIN_BOTTOM = 20;
+constexpr float VIEWPORT_SCALE = 1.f;
 
 void ViewportManager::handle_event(const BackendEvent& event) {
 	if (!(event.type == eventrawkeyup || event.type == eventrawkeydown)) {
@@ -62,13 +65,13 @@ void ViewportManager::tick() {
 	scrolly += static_cast<int32_t>(scroll_vely);
 
 	// fix scroll
-	int32_t window_height = numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getHeight());
+	int32_t viewport_height = numeric_cast<int32_t>((numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getHeight()) - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE);
 	// can't go past top or bottom
 	if (scrolly < 0) {
 		scrolly = 0;
 		scroll_vely = 0;
-	} else if (CREATURES1_WORLD_HEIGHT - scrolly < window_height) {
-		scrolly = CREATURES1_WORLD_HEIGHT - window_height;
+	} else if (CREATURES1_WORLD_HEIGHT - scrolly < viewport_height) {
+		scrolly = CREATURES1_WORLD_HEIGHT - viewport_height;
 		scroll_vely = 0;
 	}
 	// wraparound left and right
@@ -81,7 +84,24 @@ void ViewportManager::tick() {
 
 	// update rendersystem
 	// TODO: this doesn't feel like the best place for this
-	g_engine_context.rendersystem->main_camera_set_position(scrollx, scrolly);
+	g_engine_context.rendersystem->main_camera_set_src_rect({scrollx, scrolly, numeric_cast<int32_t>(width() / VIEWPORT_SCALE), numeric_cast<int32_t>((height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE)});
+	g_engine_context.rendersystem->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, width(), height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM});
+}
+
+int32_t ViewportManager::window_x_to_world_x(int32_t winx) const {
+	int32_t worldx = numeric_cast<int32_t>(winx / VIEWPORT_SCALE) + scrollx;
+	// TODO: better way to handle world wrap?
+	if (worldx >= CREATURES1_WORLD_WIDTH) {
+		worldx -= CREATURES1_WORLD_WIDTH;
+	}
+	if (worldx < 0) {
+		worldx += CREATURES1_WORLD_WIDTH;
+	}
+	return worldx;
+}
+
+int32_t ViewportManager::window_y_to_world_y(int32_t winy) const {
+	return numeric_cast<int32_t>(winy / VIEWPORT_SCALE) + scrolly - VIEWPORT_MARGIN_TOP;
 }
 
 int32_t ViewportManager::width() const {

@@ -25,9 +25,9 @@
 
 class NullRenderTarget : public RenderTarget {
   public:
-	virtual void renderTexture(const Texture&, Rect, Rect, RenderOptions) {}
+	virtual void renderTexture(const Texture&, Rect, RectF, RenderOptions) {}
 	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) {}
-	virtual void renderLine(int, int, int, int, unsigned int) {}
+	virtual void renderLine(float, float, float, float, unsigned int) {}
 	virtual void blitRenderTarget(RenderTarget*, int, int, int, int) {}
 	virtual unsigned int getWidth() const { return 800; }
 	virtual unsigned int getHeight() const { return 600; }
