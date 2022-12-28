@@ -42,6 +42,7 @@ class SDLMixerBackend : public AudioBackend, public Singleton<SDLMixerBackend> {
 
 	void audio_channel_set_volume(AudioChannel, float);
 	void audio_channel_set_pan(AudioChannel, float pan);
+	void audio_channel_fade_out(AudioChannel, int32_t milliseconds);
 	AudioState audio_channel_get_state(AudioChannel);
 	void audio_channel_stop(AudioChannel);
 

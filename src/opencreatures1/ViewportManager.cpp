@@ -1,5 +1,6 @@
 #include "ViewportManager.h"
 
+#include "C1SoundManager.h"
 #include "common/render/RenderSystem.h"
 
 constexpr int32_t VIEWPORT_MARGIN_TOP = 20;
@@ -82,10 +83,17 @@ void ViewportManager::tick() {
 	}
 
 
-	// update rendersystem
+	// update rendersystem and soundmanager
 	// TODO: this doesn't feel like the best place for this
-	g_engine_context.rendersystem->main_camera_set_src_rect({scrollx, scrolly, numeric_cast<int32_t>(width() / VIEWPORT_SCALE), numeric_cast<int32_t>((height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE)});
+	Rect viewport{
+		scrollx,
+		scrolly,
+		numeric_cast<int32_t>(width() / VIEWPORT_SCALE),
+		numeric_cast<int32_t>((height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE)};
+
+	g_engine_context.rendersystem->main_camera_set_src_rect(viewport);
 	g_engine_context.rendersystem->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, numeric_cast<float>(width()), numeric_cast<float>(height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM)});
+	g_engine_context.sounds->set_listener_position(viewport);
 }
 
 int32_t ViewportManager::window_x_to_world_x(int32_t winx) const {

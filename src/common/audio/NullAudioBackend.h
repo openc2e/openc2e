@@ -38,6 +38,7 @@ class NullAudioBackend : public AudioBackend {
 
 	void audio_channel_set_volume(AudioChannel, float) {}
 	void audio_channel_set_pan(AudioChannel, float) {}
+	void audio_channel_fade_out(AudioChannel, int32_t) {}
 	AudioState audio_channel_get_state(AudioChannel) {
 		// TODO: pretend to play audio for the correct duration, so that consumers
 		// of this API don't assume all sounds fail to play.

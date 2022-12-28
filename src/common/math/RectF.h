@@ -15,10 +15,10 @@ struct RectF {
 		return pointx >= x && pointx < right() && pointy >= y && pointy < bottom();
 	}
 
-	bool operator==(const Rect& other) const {
+	bool operator==(const RectF& other) const {
 		return x == other.x && y == other.y && width == other.width && height == other.height;
 	}
-	bool operator!=(const Rect& other) const {
+	bool operator!=(const RectF& other) const {
 		return !(*this == other);
 	}
 };

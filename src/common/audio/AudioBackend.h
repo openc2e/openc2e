@@ -39,6 +39,7 @@ class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
 
 	virtual void audio_channel_set_volume(AudioChannel, float) = 0;
 	virtual void audio_channel_set_pan(AudioChannel, float pan) = 0;
+	virtual void audio_channel_fade_out(AudioChannel, int32_t milliseconds) = 0;
 	virtual AudioState audio_channel_get_state(AudioChannel) = 0;
 	virtual void audio_channel_stop(AudioChannel) = 0;
 

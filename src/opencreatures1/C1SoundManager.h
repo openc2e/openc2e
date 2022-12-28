@@ -4,6 +4,8 @@
 #include "common/SlotMap.h"
 #include "common/audio/AudioBackend.h"
 #include "common/audio/AudioState.h"
+#include "common/math/Rect.h"
+#include "common/math/RectF.h"
 
 #include <chrono>
 #include <memory>
@@ -17,42 +19,31 @@ class C1SoundManager {
 	C1SoundManager();
 	~C1SoundManager();
 
-	void tick();
+	void set_listener_position(Rect);
+	void set_listener_world_wrap_width(int32_t wrap_width);
 	C1Sound play_sound(std::string filename, bool loop = false);
 
 	bool is_muted();
 	void set_muted(bool);
 
   private:
-	friend class C1Sound;
 	struct SoundData {
-		SoundData() = default;
-		SoundData(SoundData&&) = default;
-		SoundData& operator=(SoundData&&) = default;
-		SoundData(const SoundData&) = delete;
-		SoundData& operator=(const SoundData&) = delete;
-
-		AudioChannel handle{};
-
-		bool positioned = false;
-		float x = 0;
-		float y = 0;
-		float width = 0;
-		float height = 0;
-
-		std::chrono::time_point<std::chrono::steady_clock> fade_start{};
-		fmilliseconds fade_length{};
+		AudioChannel channel;
+		RectF position;
 	};
 
-	DenseSlotMap<SoundData> sources;
-	using SoundId = decltype(sources)::Key;
+	std::vector<SoundData> data;
+	Rect listener;
+	int32_t world_wrap_width = 0;
 
-	bool is_alive(SoundData& source);
-	void stop(SoundData& source);
-	AudioState get_channel_state(SoundData& source);
-	void update_volume(SoundData& source);
+	friend class C1Sound;
+
+	bool is_alive(AudioChannel);
+	void stop(AudioChannel);
+	AudioState get_channel_state(AudioChannel);
+	void update_volume(SoundData&);
 	void update_volumes();
-	SoundData* get_sound_data(C1Sound& source);
+	SoundData* get_sound_data(AudioChannel source);
 	C1Sound get_new_sound(AudioChannel handle);
 
 	bool muted = false;

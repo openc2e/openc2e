@@ -43,6 +43,7 @@ void load_everything() {
 
 	g_engine_context.rendersystem = std::make_shared<RenderSystem>(g_engine_context.backend.get());
 	g_engine_context.rendersystem->world_set_wrap_width(CREATURES1_WORLD_WIDTH);
+	g_engine_context.sounds->set_listener_world_wrap_width(CREATURES1_WORLD_WIDTH);
 
 	// load palette
 	g_engine_context.images->load_default_palette();

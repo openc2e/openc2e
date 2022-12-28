@@ -1,14 +1,13 @@
 #pragma once
 
+#include "common/audio/AudioChannel.h"
 #include "common/audio/AudioState.h"
-
-#include <limits>
-#include <stdint.h>
 
 class C1SoundManager;
 
 class C1Sound {
   public:
+	C1Sound() {}
 	explicit operator bool();
 	void fade_out();
 	void stop();
@@ -17,6 +16,7 @@ class C1Sound {
 
   private:
 	friend class C1SoundManager;
-	C1SoundManager* soundmanager = nullptr;
-	uint32_t id = std::numeric_limits<uint32_t>::max();
+	C1Sound(AudioChannel channel_)
+		: channel(channel_) {}
+	AudioChannel channel;
 };

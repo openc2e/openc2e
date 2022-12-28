@@ -250,6 +250,13 @@ void SDLMixerBackend::audio_channel_set_pan(AudioChannel source, float pan) {
 	}
 }
 
+void SDLMixerBackend::audio_channel_fade_out(AudioChannel source, int32_t milliseconds) {
+	int channel = audiochannel_to_int(source);
+	if (channel == -1)
+		return;
+	Mix_FadeOutChannel(channel, milliseconds);
+}
+
 AudioState SDLMixerBackend::audio_channel_get_state(AudioChannel source) {
 	int channel = audiochannel_to_int(source);
 	if (channel != -1 && Mix_Playing(channel)) {

@@ -2,7 +2,6 @@
 
 #include "EngineContext.h"
 #include "PathManager.h"
-#include "ViewportManager.h"
 #include "common/Exception.h"
 #include "common/Repr.h"
 #include "common/audio/AudioBackend.h"
@@ -24,38 +23,22 @@ void C1SoundManager::set_muted(bool muted_) {
 	update_volumes();
 }
 
-bool C1SoundManager::is_alive(SoundData& sound_data) {
-	if (sound_data.handle && g_engine_context.audio_backend->audio_channel_get_state(sound_data.handle) == AUDIO_PLAYING) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-C1SoundManager::SoundData* C1SoundManager::get_sound_data(C1Sound& sound) {
-	static_assert(sizeof(C1Sound::id) == sizeof(C1SoundManager::SoundId), "");
-	SoundId id = *reinterpret_cast<SoundId*>(&sound.id); // TODO
-
-	SoundData* data = sources.try_get(id);
-	if (!data) {
+C1SoundManager::SoundData* C1SoundManager::get_sound_data(AudioChannel channel) {
+	if (!channel) {
 		return nullptr;
 	}
 
-	return data;
-}
+	uint16_t index = channel.handle & 0xffff;
 
-C1Sound C1SoundManager::get_new_sound(AudioChannel handle) {
-	SoundData data;
-	data.handle = handle;
-	update_volume(data);
+	if (index >= data.size()) {
+		return nullptr;
+	}
+	SoundData* sounddata = &data[index];
+	if (sounddata->channel != channel) {
+		return nullptr;
+	}
 
-	SoundId id = sources.add(std::move(data));
-
-	C1Sound sound;
-	static_assert(sizeof(C1Sound::id) == sizeof(C1SoundManager::SoundId), "");
-	sound.id = *reinterpret_cast<uint32_t*>(&id); // TODO
-	sound.soundmanager = this;
-	return sound;
+	return sounddata;
 }
 
 template <typename T, typename U, typename V>
@@ -65,23 +48,23 @@ auto clamp(T value, U low, V high) {
 }
 
 void C1SoundManager::update_volume(SoundData& s) {
-	if (!is_alive(s)) {
+	if (g_engine_context.audio_backend->audio_channel_get_state(s.channel) != AUDIO_PLAYING) {
 		return;
 	}
 
 	float volume = muted ? 0 : 1;
 
-	if (s.positioned) {
-		const auto centerx = g_engine_context.viewport->centerx();
-		const auto centery = g_engine_context.viewport->centery();
+	if (s.position != RectF{}) {
+		const auto centerx = listener.x + listener.width / 2;
+		const auto centery = listener.y + listener.height / 2;
 
 		// std::remainder gives the distance between x and centerx, taking
 		// into account world wraparound ("modular distance")
-		const float distx = std::remainder(s.x + s.width / 2.0f - centerx, CREATURES1_WORLD_WIDTH * 1.0f);
-		const float disty = s.y + s.height / 2.0f - centery;
+		const float distx = std::remainder(s.position.x + s.position.width / 2.0f - centerx, (world_wrap_width ? world_wrap_width : 1) * 1.0f);
+		const float disty = s.position.y + s.position.height / 2.0f - centery;
 
-		const float screen_width = g_engine_context.viewport->width();
-		const float screen_height = g_engine_context.viewport->height();
+		const float screen_width = listener.width;
+		const float screen_height = listener.height;
 
 		// If a sound is on-screen, then play it at full volume.
 		// If it's more than a screen offscreen, then mute it.
@@ -102,28 +85,15 @@ void C1SoundManager::update_volume(SoundData& s) {
 		// Pan sound as we get closer to screen edge
 		// TODO: Does this sound right?
 		float pan = clamp(distx / screen_width, -1, 1);
-		g_engine_context.audio_backend->audio_channel_set_pan(s.handle, pan);
+		g_engine_context.audio_backend->audio_channel_set_pan(s.channel, pan);
 	}
 
-	if (s.fade_start != decltype(s.fade_start)()) {
-		float volume_multiplier = 1 - (std::chrono::steady_clock::now() - s.fade_start) / s.fade_length;
-		if (volume_multiplier <= 0) {
-			g_engine_context.audio_backend->audio_channel_stop(s.handle);
-		}
-		volume *= volume_multiplier;
-	}
-
-	g_engine_context.audio_backend->audio_channel_set_volume(s.handle, volume);
+	g_engine_context.audio_backend->audio_channel_set_volume(s.channel, volume);
 }
 
 void C1SoundManager::update_volumes() {
-	for (auto i : sources.enumerate()) {
-		if (!is_alive(*i.value)) {
-			// Make sure erasing during enumeration is okay!!!
-			sources.erase(i.id);
-			continue;
-		}
-		update_volume(*i.value);
+	for (auto& s : data) {
+		update_volume(s);
 	}
 }
 
@@ -138,27 +108,28 @@ C1Sound C1SoundManager::play_sound(std::string name, bool loop) {
 		return {};
 	}
 
-	auto handle = g_engine_context.audio_backend->play_clip(filename, loop);
-	if (!handle) {
+	auto channel = g_engine_context.audio_backend->play_clip(filename, loop);
+	if (!channel) {
 		// note that more specific error messages can be thrown by implementations of play_clip
 		throw_exception("failed to play audio clip {}{}", filename, loop ? " (loop)" : "");
 	}
 
-	return get_new_sound(handle);
+	uint16_t index = channel.handle & 0xffff;
+	if (index >= data.size()) {
+		data.resize(index + 1);
+	}
+	data[index] = {};
+	data[index].channel = channel;
+
+	return C1Sound{channel};
 }
 
-void C1SoundManager::stop(SoundData& source_data) {
-	return g_engine_context.audio_backend->audio_channel_stop(source_data.handle);
-}
-
-AudioState C1SoundManager::get_channel_state(SoundData& source_data) {
-	return g_engine_context.audio_backend->audio_channel_get_state(source_data.handle);
-}
-
-void C1SoundManager::tick() {
-	// update sounds
-	// TODO: is this slow?
+void C1SoundManager::set_listener_position(Rect listener_) {
+	listener = listener_;
 	update_volumes();
 }
 
-/* vim: set noet: */
+void C1SoundManager::set_listener_world_wrap_width(int32_t world_wrap_width_) {
+	world_wrap_width = world_wrap_width_;
+	update_volumes();
+}
