@@ -31,13 +31,18 @@
 #include <memory>
 #include <string.h>
 
+// Try to run at 44,100 Hz. Across supported games, the most common sound
+// file sampling rates are 11,025 Hz, 22,050 Hz, 32,075 Hz and 44,100 Hz.
+// There are only three sounds above 44,100 (all in Creatures Village, at
+// 48,000 Hz).
+constexpr int SDLMIXERBACKEND_FREQUENCY = 44100;
+constexpr int SDLMIXERBACKEND_CHUNK_SIZE = 1024;
+
 #if SDL_MIXER_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 2)
 enum {
 	MIX_INIT_MID = MIX_INIT_FLUIDSYNTH
 };
 #endif
-
-constexpr int SDLMIXERBACKEND_CHUNK_SIZE = 1024;
 
 struct MixChunkDeleter {
 	void operator()(Mix_Chunk* chunk) {
@@ -108,18 +113,40 @@ void SDLMixerBackend::midi_stop() {
 	}
 }
 
+static std::string sdl_audioformat_to_string(SDL_AudioFormat fmt) {
+	switch (fmt) {
+		case AUDIO_U8: return "AUDIO_U8";
+		case AUDIO_S8: return "AUDIO_S8";
+		case AUDIO_U16LSB: return "AUDIO_U16LSB";
+		case AUDIO_U16MSB: return "AUDIO_U16MSB";
+		case AUDIO_S16LSB: return "AUDIO_S16LSB";
+		case AUDIO_S16MSB: return "AUDIO_S16MSB";
+		case AUDIO_S32LSB: return "AUDIO_S32LSB";
+		case AUDIO_S32MSB: return "AUDIO_S32MSB";
+		case AUDIO_F32LSB: return "AUDIO_F32LSB";
+		case AUDIO_F32MSB: return "AUDIO_F32MSB";
+		default: return fmt::format("{}", fmt);
+	}
+}
+
 void SDLMixerBackend::init() {
 	// TODO: ensure SDLBackend is in use?
 
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 		throw Exception(std::string("SDL error during sound initialization: ") + SDL_GetError());
 
-	// Try to run at 44,100 Hz. Across supported games, the most common sound
-	// file sampling rates are 11,025 Hz, 22,050 Hz, 32,075 Hz and 44,100 Hz.
-	// There are only three sounds above 44,100 (all in Creatures Village, at
-	// 48,000 Hz).
-	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, SDLMIXERBACKEND_CHUNK_SIZE) < 0)
+	if (Mix_OpenAudioDevice(SDLMIXERBACKEND_FREQUENCY, AUDIO_F32SYS, 2,
+			SDLMIXERBACKEND_CHUNK_SIZE, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE) < 0) {
 		throw Exception(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
+	}
+
+	int actual_frequency;
+	SDL_AudioFormat actual_format;
+	int actual_channels;
+	if (Mix_QuerySpec(&actual_frequency, &actual_format, &actual_channels) == 1) {
+		fmt::print("* SDL Mixer: format={} channels={} freq={}Hz\n",
+			sdl_audioformat_to_string(actual_format), actual_channels, actual_frequency);
+	}
 
 	if (!(Mix_Init(MIX_INIT_MID) & MIX_INIT_MID)) {
 		printf("* SDLMixer: failed to load MIDI support: %s\n", Mix_GetError());
