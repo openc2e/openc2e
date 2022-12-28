@@ -18,7 +18,7 @@ static char unescape(char c) {
 }
 
 static bool is_bareword_body(char c) {
-	return is_ascii_alnum(c) || c == '.' || c == '_' || c == '-' || c == ':' || c == '+';
+	return is_ascii_alnum(c) || c == '.' || c == '_' || c == '-' || c == ':' || c == '+' || c == '#' || c == '!' || c == '*';
 }
 
 std::string SimpleToken::value() const {
