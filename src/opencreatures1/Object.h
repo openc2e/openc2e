@@ -48,24 +48,23 @@ struct SceneryData {
 	Renderable part;
 };
 
-class SimpleObjectData {
-  public:
+struct SimpleObjectData {
 	Renderable part;
 	int32_t z_order;
 	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 };
 
-class BubbleData {
+struct BubbleData {
 	// TODO: implement me
 };
 
-class CallButtonData {
-	// TODO: implement me
+struct CallButtonData {
+	ObjectHandle lift;
+	uint8_t floor;
 };
 
-class PointerToolData {
-  public:
+struct PointerToolData {
 	int32_t relx;
 	int32_t rely;
 	ObjectHandle bubble;
@@ -78,8 +77,16 @@ struct CompoundPart {
 	int32_t y;
 };
 
-class CompoundObjectData {
-  public:
+enum HotspotFunction {
+	HOTSPOT_CREATUREACTIVATE1,
+	HOTSPOT_CREATUREACTIVATE2,
+	HOTSPOT_CREATUREDEACTIVATE,
+	HOTSPOT_MOUSEACTIVATE1,
+	HOTSPOT_MOUSEACTIVATE2,
+	HOTSPOT_MOUSEDEACTIVATE,
+};
+
+struct CompoundObjectData {
 	std::vector<CompoundPart> parts;
 	std::array<Rect, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
@@ -96,7 +103,13 @@ struct VehicleData {
 };
 
 struct LiftData {
-	// TODO: implement me
+	struct LiftFloor {
+		int32_t y;
+		ObjectHandle call_button;
+	};
+
+	int32_t next_or_current_floor = -1;
+	StaticVector<LiftFloor, 8> floors;
 };
 
 struct BlackboardData {
@@ -161,6 +174,7 @@ class Object {
 	void handle_mesg_activate1(Message);
 	void handle_mesg_activate2(Message);
 	void handle_mesg_deactivate(Message);
+
 	void handle_mesg_hit(Message);
 	void handle_mesg_pickup(Message);
 	void handle_mesg_drop(Message);
@@ -179,6 +193,8 @@ class Object {
 	void blackboard_disable_edit();
 	void blackboard_emit_eyesight(int32_t word_index);
 	void blackboard_emit_earshot(int32_t word_index);
+
+	void creature_stim_disappoint();
 
 	void vehicle_grab_passengers();
 	void vehicle_drop_passengers();

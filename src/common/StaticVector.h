@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/NumericCast.h"
+
 #include <array>
 #include <exception>
 
@@ -75,6 +77,14 @@ class StaticVector {
 		return *(data() + i);
 	}
 
+	T& operator[](int32_t i) {
+		return (*this)[numeric_cast<size_t>(i)];
+	}
+
+	const T& operator[](int32_t i) const {
+		return (*this)[numeric_cast<size_t>(i)];
+	}
+
 	void clear() {
 		while (size_) {
 			pop_back();
@@ -124,6 +134,10 @@ class StaticVector {
 
 	size_t size() const {
 		return size_;
+	}
+
+	int32_t ssize() const {
+		return numeric_cast<int32_t>(size());
 	}
 
 	size_t capacity() const {

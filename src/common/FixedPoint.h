@@ -45,10 +45,18 @@ class fixed24_8_t {
 		return m_value >= other.m_value;
 	}
 
+	friend bool operator>=(int32_t left, fixed24_8_t right) {
+		return fixed24_8_t(left) >= right;
+	}
+
 	fixed24_8_t operator+(fixed24_8_t other) {
 		fixed24_8_t result(*this);
 		result += other;
 		return result;
+	}
+
+	friend fixed24_8_t operator+(int32_t left, fixed24_8_t right) {
+		return fixed24_8_t(left) + right;
 	}
 
 	fixed24_8_t& operator+=(fixed24_8_t other) {
@@ -82,7 +90,6 @@ class fixed24_8_t {
   private:
 	int32_t m_value = 0;
 };
-
 
 template <>
 struct fmt::formatter<fixed24_8_t> {

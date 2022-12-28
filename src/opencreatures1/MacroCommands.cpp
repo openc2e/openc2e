@@ -590,6 +590,15 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 
 		printf("WARNING: STIM SHOU not implemented\n");
 
+	} else if (subcommand == Token("tact")) {
+		for (int i = 0; i < 12; ++i) {
+			ctx.read_arg_separator(m);
+			ctx.read_int(m);
+		}
+		ctx.read_command_separator(m);
+
+		printf("WARNING: STIM TACT not implemented\n");
+
 	} else if (subcommand == Token("from")) {
 		for (int i = 0; i < 12; ++i) {
 			ctx.read_arg_separator(m);

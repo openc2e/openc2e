@@ -64,130 +64,125 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 }
 
 void Object::handle_mesg_activate1(Message msg) {
+	auto* from = g_engine_context.objects->try_get(msg.from);
+	if (pointer_data) {
+		throw Exception("handle_mesg_activate1 not implemented on pointer");
+	}
 	if (simple_data) {
-		if (pointer_data) {
-			throw Exception("handle_mesg_activate1 not implemented on pointer");
+		if (actv == ACTV_ACTIVE1 || (from && from->creature_data && !(simple_data->touch_bhvr & TOUCH_ACTIVATE1))) {
+			if (from)
+				from->creature_stim_disappoint();
+			return;
 		}
-
-		// if (msg.from.creature_data) {
-		//   if (actv == ACTIVATE1 || !(touch_bhvr & ACTIVATE1)) {
-		//      msg.from.stim_disappoint();
-		//   }
-		// }
-
 		if (call_button_data) {
-			// if owner lift already at our floor, ignore
-			// tell lift to come here
-			// then do normal simple object stuff
-			throw Exception("handle_mesg_activate1 not implemented for CallButton");
-		}
+			auto* lift = g_engine_context.objects->try_get(call_button_data->lift);
+			if (lift->actv == ACTV_INACTIVE && lift->lift_data->next_or_current_floor == call_button_data->floor) {
+				// already here, don't stim disappointment though
+				return;
+			}
 
+			// tell lift to come here eventually
+			lift->lift_data->floors[call_button_data->floor].call_button = this->uid;
+		}
 		actv = ACTV_ACTIVE1;
 		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
 	}
-
 	if (compound_data) {
-		if (lift_data) {
-			// different allowed check, must be ACTV = INACTIVE, OBJ0 == 0, and lower floor
-			// then normal compoundobject stuff
-			throw Exception("handle_mesg_activate1 not implemented for Lift");
+		if (actv == ACTV_ACTIVE1 || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE1] == -1)) {
+			if (from)
+				from->creature_stim_disappoint();
+			fmt::print("compound object not allowed\n");
+			return;
 		}
-
-		// if (msg.from.creature_data) {
-		//   if (actv == ACTIVATE1 || !has_hotspot(CREATUREACTIVATE1) || !has_script(ACTIVATE1)) {
-		//     msg.from.stim_disappoint();
-		//   }
-		// }
-
-		if (vehicle_data) {
-			// TODO: truncate fixed point position?
+		if (lift_data) {
+			if (actv != ACTV_INACTIVE || obv0 != 0 || lift_data->next_or_current_floor + 1 >= lift_data->floors.ssize()) {
+				// different allowed check, must be ACTV = INACTIVE, OBV0 == 0, and lower floor
+				if (from)
+					from->creature_stim_disappoint();
+				return;
+			}
+			lift_data->next_or_current_floor++;
 		}
 
 		actv = ACTV_ACTIVE1;
 		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
 	}
-
 	throw Exception(fmt::format("handle_mesg_activate1 not implemented on object {} {} {}", family, genus, species));
 }
 
 void Object::handle_mesg_activate2(Message msg) {
+	auto* from = g_engine_context.objects->try_get(msg.from);
+	if (pointer_data) {
+		throw Exception("handle_mesg_activate2 not implemented on pointer");
+	}
 	if (simple_data) {
-		if (pointer_data) {
-			throw Exception("handle_mesg_activate2 not implemented on pointer");
+		if (actv == ACTV_ACTIVE2 || (from && from->creature_data && !(simple_data->touch_bhvr & TOUCH_ACTIVATE2))) {
+			if (from)
+				from->creature_stim_disappoint();
+			return;
 		}
 		if (call_button_data) {
 			// Call buttons never activate2, always activate1
 			return handle_mesg_activate1(msg);
 		}
-
-		// if (msg.from.creature_data) {
-		//   if (actv == ACTIVATE2 || !(touch_bhvr & ACTIVATE2)) {
-		//      msg.from.stim_disappoint();
-		//   }
-		// }
-
 		actv = ACTV_ACTIVE2;
 		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
 	}
-
 	if (compound_data) {
-		if (lift_data) {
-			// different allowed check, must be ACTV = INACTIVE, OBJ0 == 0, and _higher_ floor
-			// then normal stuff except we set ACTV to ACTIVE1 even though we call the ACTIVATE2 script!
-			throw Exception("handle_mesg_activate1 not implemented for Lift");
+		if (actv == ACTV_ACTIVE2 || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE2] == -1)) {
+			if (from)
+				from->creature_stim_disappoint();
+			return;
 		}
-
-		// if (msg.from.creature_data) {
-		//   if (actv == ACTIVATE2 || !has_hotspot(CREATUREACTIVATE2) || !has_script(ACTIVATE2)) {
-		//     msg.from.stim_disappoint();
-		//   }
-		// }
-
-		if (vehicle_data) {
-			// TODO: truncate fixed point position?
+		if (lift_data) {
+			if (actv != ACTV_INACTIVE || obv0 != 0 || lift_data->next_or_current_floor == 0) {
+				// different allowed check, must be ACTV = INACTIVE, OBV0 == 0, and higher floor
+				if (from)
+					from->creature_stim_disappoint();
+				return;
+			}
+			// TODO: maybe set it to ACTV_ACTIVE1 instead?
+			lift_data->next_or_current_floor--;
 		}
 
 		actv = ACTV_ACTIVE2;
 		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
 	}
-
 	throw Exception(fmt::format("handle_mesg_activate2 not implemented on object {} {} {}", family, genus, species));
 }
 
 void Object::handle_mesg_deactivate(Message msg) {
+	auto* from = g_engine_context.objects->try_get(msg.from);
+	if (pointer_data) {
+		throw Exception("handle_mesg_deactivate not implemented on pointer");
+	}
 	if (simple_data) {
-		if (pointer_data) {
-			throw Exception("handle_mesg_deactivate not implemented on pointer");
+		if (actv == ACTV_INACTIVE || (from && from->creature_data && !(simple_data->touch_bhvr & TOUCH_DEACTIVATE))) {
+			if (from)
+				from->creature_stim_disappoint();
+			return;
 		}
-
-		// if (msg.from.creature_data) {
-		//   if (actv == INACTIVE || !(touch_bhvr & DEACTIVATE)) {
-		//      msg.from.stim_disappoint();
-		//   }
-		// }
 
 		actv = ACTV_INACTIVE;
 		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
 		return;
 	}
-
 	if (compound_data) {
+		if (actv == ACTV_INACTIVE || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREDEACTIVATE] == -1)) {
+			if (from)
+				from->creature_stim_disappoint();
+			return;
+		}
 		if (lift_data) {
 			// not allowed!!
-			// msg.from.stim_disappoint();
-			throw Exception("handle_mesg_deactivate not implemented for Lift");
+			if (from)
+				from->creature_stim_disappoint();
+			return;
 		}
-
-		// if (msg.from.creature_data) {
-		//   if (actv == INACTIVE || !has_hotspot(CREATUREDEACTIVATE) || !has_script(DEACTIVATE)) {
-		//     msg.from.stim_disappoint();
-		//   }
-		// }
-
 		if (vehicle_data) {
 			// TODO: truncate fixed point position?
 			// stop!
@@ -199,7 +194,6 @@ void Object::handle_mesg_deactivate(Message msg) {
 		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
 		return;
 	}
-
 	throw Exception(fmt::format("handle_mesg_deactivate not implemented on object {} {} {}", family, genus, species));
 }
 
@@ -365,6 +359,72 @@ void Object::vehicle_drop_passengers() {
 void Object::tick() {
 	// TODO: handle this in a separate VehicleSystem or VelocitySystem or PhysicsSystem or something?
 	if (vehicle_data) {
+		if (lift_data && vehicle_data->yvel != 0) {
+			auto current_cabin_bottom = get_bbox().y + vehicle_data->cabin_bottom;
+			auto next_cabin_bottom = current_cabin_bottom + vehicle_data->yvel;
+
+			auto next_floor_y = lift_data->floors[lift_data->next_or_current_floor].y;
+
+			if ((vehicle_data->yvel > 0 && next_cabin_bottom >= next_floor_y) || (vehicle_data->yvel < 0 && next_cabin_bottom <= next_floor_y)) {
+				set_position(get_bbox().x + vehicle_data->xvel, next_floor_y - vehicle_data->cabin_bottom);
+				// stop!
+				vehicle_data->xvel = 0;
+				vehicle_data->yvel = 0;
+				if (actv != ACTV_INACTIVE) {
+					actv = ACTV_INACTIVE;
+					g_engine_context.events->queue_script(this, this, SCRIPT_DEACTIVATE);
+				}
+
+				if (auto call_button = lift_data->floors[lift_data->next_or_current_floor].call_button) {
+					lift_data->floors[lift_data->next_or_current_floor].call_button = {};
+					g_engine_context.objects->try_get(call_button)->actv = ACTV_INACTIVE;
+					g_engine_context.events->queue_script(this->uid, call_button, SCRIPT_DEACTIVATE);
+				}
+				return;
+			}
+		}
+
 		add_position(vehicle_data->xvel, vehicle_data->yvel);
+	}
+
+	if (lift_data && actv == ACTV_INACTIVE && obv0 == 0) {
+		// any callers?
+
+		auto current_cabin_bottom = get_bbox().y + vehicle_data->cabin_bottom;
+
+		int32_t best_y;
+		int32_t best_floor;
+		ObjectHandle best_call_button;
+		for (size_t i = 0; i < lift_data->floors.size(); ++i) {
+			auto& floor = lift_data->floors[i];
+			if (floor.call_button) {
+				if (!g_engine_context.objects->try_get(floor.call_button)) {
+					floor.call_button = {};
+					continue;
+				}
+				if (!best_call_button || abs(current_cabin_bottom - floor.y) < abs(current_cabin_bottom - best_y)) {
+					best_y = floor.y;
+					best_floor = numeric_cast<int32_t>(i);
+					best_call_button = floor.call_button;
+				}
+			}
+		}
+		if (best_call_button) {
+			if (best_y >= current_cabin_bottom) {
+				lift_data->next_or_current_floor = best_floor;
+				actv = ACTV_ACTIVE1;
+				g_engine_context.events->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE1);
+			} else {
+				lift_data->next_or_current_floor = best_floor;
+				actv = ACTV_ACTIVE2;
+				g_engine_context.events->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE2);
+			}
+		}
+	}
+}
+
+void Object::creature_stim_disappoint() {
+	if (creature_data) {
+		printf("WARNING: creature_stim_disappoint not implemented\n");
 	}
 }

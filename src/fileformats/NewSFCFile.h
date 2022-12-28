@@ -357,24 +357,24 @@ struct CallButtonV1;
 
 struct LiftV1 : VehicleV1 {
 	struct LiftFloor {
-		uint32_t y;
+		int32_t y;
 		CallButtonV1* call_button;
 	};
 
-	uint32_t num_floors;
-	uint32_t next_or_current_floor;
+	int32_t num_floors;
+	int32_t next_or_current_floor;
 	int32_t current_call_button;
 	uint8_t delay_counter;
 	std::array<LiftFloor, 8> floors;
 
 	void read_from(MFCReader& in) {
 		VehicleV1::read_from(in);
-		num_floors = in.read32le();
-		next_or_current_floor = in.read32le();
+		num_floors = in.reads32le();
+		next_or_current_floor = in.reads32le();
 		current_call_button = in.reads32le();
 		delay_counter = in.read8();
 		for (size_t i = 0; i < 8; ++i) {
-			floors[i].y = in.read32le();
+			floors[i].y = in.reads32le();
 			floors[i].call_button = in.read_type<CallButtonV1>();
 		}
 	}
@@ -382,12 +382,12 @@ struct LiftV1 : VehicleV1 {
 
 struct CallButtonV1 : SimpleObjectV1 {
 	LiftV1* lift;
-	uint8_t button_id;
+	uint8_t floor;
 
 	void read_from(MFCReader& in) {
 		SimpleObjectV1::read_from(in);
 		lift = in.read_type<LiftV1>();
-		button_id = in.read8();
+		floor = in.read8();
 	}
 };
 

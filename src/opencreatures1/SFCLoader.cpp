@@ -181,6 +181,19 @@ void SFCLoader::vehicle_from_sfc(Object* obj, const sfc::VehicleV1& veh) {
 	obj->vehicle_data->bump = veh.bump;
 }
 
+void SFCLoader::lift_from_sfc(Object* obj, const sfc::LiftV1& lift) {
+	obj->lift_data = std::make_unique<LiftData>();
+
+	obj->lift_data->next_or_current_floor = lift.next_or_current_floor;
+	// obj->lift_data->current_call_button = lift.current_call_button;
+	// obj->lift_data->delay_counter = lift.delay_counter;
+
+	for (size_t i = 0; i < numeric_cast<size_t>(lift.num_floors); ++i) {
+		obj->lift_data->floors.push_back({lift.floors[i].y,
+			sfc_object_mapping[lift.floors[i].call_button]});
+	}
+}
+
 void SFCLoader::blackboard_from_sfc(Object* obj, const sfc::BlackboardV1& bbd) {
 	obj->blackboard_data = std::make_unique<BlackboardData>();
 
@@ -220,8 +233,10 @@ void SFCLoader::load_objects() {
 			if (dynamic_cast<sfc::BubbleV1*>(p)) {
 				fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type: Bubble\n", obj->family, obj->genus, obj->species);
 			}
-			if (dynamic_cast<sfc::CallButtonV1*>(p)) {
-				fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type CallButton\n", obj->family, obj->genus, obj->species);
+			if (auto* cb = dynamic_cast<sfc::CallButtonV1*>(p)) {
+				obj->call_button_data = std::make_unique<CallButtonData>();
+				obj->call_button_data->lift = sfc_object_mapping[cb->lift];
+				obj->call_button_data->floor = cb->floor;
 			}
 			if (auto* pt = dynamic_cast<sfc::PointerToolV1*>(p)) {
 				obj->pointer_data = std::make_unique<PointerToolData>();
@@ -238,8 +253,8 @@ void SFCLoader::load_objects() {
 			compound_object_from_sfc(obj, *comp);
 			if (auto* veh = dynamic_cast<sfc::VehicleV1*>(p)) {
 				vehicle_from_sfc(obj, *veh);
-				if (dynamic_cast<sfc::LiftV1*>(p)) {
-					fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Lift\n", obj->family, obj->genus, obj->species);
+				if (auto* lift = dynamic_cast<sfc::LiftV1*>(p)) {
+					lift_from_sfc(obj, *lift);
 				}
 			}
 			if (auto* bbd = dynamic_cast<sfc::BlackboardV1*>(p)) {
