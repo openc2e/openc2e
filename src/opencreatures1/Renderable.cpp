@@ -5,7 +5,7 @@
 #include "common/NumericCast.h"
 #include "common/render/RenderSystem.h"
 
-void Renderable::Renderable::set_position(fixed24_8_t x_, fixed24_8_t y_) {
+void Renderable::Renderable::set_position(float x_, float y_) {
 	// TODO: better way of handling world wrap?
 	if (x_ >= CREATURES1_WORLD_WIDTH) {
 		x_ -= CREATURES1_WORLD_WIDTH;
@@ -23,10 +23,10 @@ void Renderable::set_z_order(int32_t z_) {
 	update_renderitem();
 }
 
-fixed24_8_t Renderable::get_x() const {
+float Renderable::get_x() const {
 	return x;
 }
-fixed24_8_t Renderable::get_y() const {
+float Renderable::get_y() const {
 	return y;
 }
 
@@ -49,9 +49,9 @@ Rect Renderable::get_bbox() const {
 	Rect r;
 	// TODO: should we actually trunc these high-precision coordinates? This only
 	// matters for vehicles.
-	r.x = x.trunc();
+	r.x = numeric_cast<int32_t>(x);
 	r.width = width();
-	r.y = y.trunc();
+	r.y = numeric_cast<int32_t>(y);
 	r.height = height();
 	return r;
 }

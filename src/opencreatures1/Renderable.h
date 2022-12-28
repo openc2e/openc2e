@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/FixedPoint.h"
+
 #include "common/NumericCast.h"
 #include "common/creaturesImage.h"
 #include "common/math/Rect.h"
@@ -12,10 +12,10 @@
 
 class Renderable {
   public:
-	void set_position(fixed24_8_t x, fixed24_8_t y);
+	void set_position(float x, float y);
 	void set_z_order(int32_t z);
-	fixed24_8_t get_x() const;
-	fixed24_8_t get_y() const;
+	float get_x() const;
+	float get_y() const;
 	int32_t get_z_order() const;
 
 	int32_t width() const;
@@ -40,8 +40,8 @@ class Renderable {
 
 	void update_renderitem();
 
-	fixed24_8_t x = 0;
-	fixed24_8_t y = 0;
+	float x = 0;
+	float y = 0;
 	int32_t z = 0;
 	int object_sprite_base = 0;
 	int part_sprite_base = 0;

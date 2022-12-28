@@ -124,7 +124,6 @@ add_executable(test_common
 	src/common/tests/DemangleTest.cpp
 	src/common/tests/EncodingTest.cpp
 	src/common/tests/EndsWithTest.cpp
-	src/common/tests/FixedPointTest.cpp
 	src/common/tests/SlotMapTest.cpp
 	src/common/tests/WildcardTest.cpp
 )

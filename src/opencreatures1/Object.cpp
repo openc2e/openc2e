@@ -217,7 +217,7 @@ void Object::handle_mesg_drop(Message) {
 	throw Exception("handle_mesg_drop not implemented");
 }
 
-void Object::set_position(fixed24_8_t newx, fixed24_8_t newy) {
+void Object::set_position(float newx, float newy) {
 	// TODO: if the object's current x-position is 100.1 and the new x-position
 	// is 100 (low-precision), should we actually move it? do we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.
@@ -237,8 +237,8 @@ void Object::set_position(fixed24_8_t newx, fixed24_8_t newy) {
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			Renderable& p = comp->parts[i].renderable;
 
-			fixed24_8_t relx = p.get_x() - main_part->get_x();
-			fixed24_8_t rely = p.get_y() - main_part->get_y();
+			float relx = p.get_x() - main_part->get_x();
+			float rely = p.get_y() - main_part->get_y();
 
 			p.set_position(newx + relx, newy + rely);
 		}
@@ -254,7 +254,7 @@ void Object::set_position(fixed24_8_t newx, fixed24_8_t newy) {
 	}
 }
 
-void Object::add_position(fixed24_8_t xdiff, fixed24_8_t ydiff) {
+void Object::add_position(float xdiff, float ydiff) {
 	// TODO: if the object's current x-position is 100.1 and the x-diff is 5 (low-
 	// precision), do we move it to 105.1 or 105? e.g. should we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.

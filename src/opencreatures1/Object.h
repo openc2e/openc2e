@@ -8,7 +8,6 @@
 #include "PointerManager.h"
 #include "Renderable.h"
 #include "common/Exception.h"
-#include "common/FixedPoint.h"
 #include "common/math/Rect.h"
 
 #include <array>
@@ -93,8 +92,8 @@ struct CompoundObjectData {
 };
 
 struct VehicleData {
-	fixed24_8_t xvel;
-	fixed24_8_t yvel;
+	float xvel;
+	float yvel;
 	int32_t cabin_left;
 	int32_t cabin_top;
 	int32_t cabin_right;
@@ -179,8 +178,8 @@ class Object {
 	void handle_mesg_pickup(Message);
 	void handle_mesg_drop(Message);
 
-	void set_position(fixed24_8_t x, fixed24_8_t y);
-	void add_position(fixed24_8_t xdiff, fixed24_8_t ydiff);
+	void set_position(float x, float y);
+	void add_position(float xdiff, float ydiff);
 
 	int32_t get_z_order() const;
 	Rect get_bbox() const;

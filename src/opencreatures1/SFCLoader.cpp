@@ -162,16 +162,17 @@ void SFCLoader::load_map() {
 void SFCLoader::vehicle_from_sfc(Object* obj, const sfc::VehicleV1& veh) {
 	obj->vehicle_data = std::make_unique<VehicleData>();
 
-	obj->vehicle_data->xvel = fixed24_8_t::from_raw(veh.xvel_times_256);
-	obj->vehicle_data->yvel = fixed24_8_t::from_raw(veh.yvel_times_256);
+	obj->vehicle_data->xvel = veh.xvel_times_256 / 256.f;
+	obj->vehicle_data->yvel = veh.yvel_times_256 / 256.f;
 
 	auto obj_x = obj->compound_data->parts[0].renderable.get_x();
 	auto obj_y = obj->compound_data->parts[0].renderable.get_y();
-	auto veh_x = fixed24_8_t::from_raw(veh.x_times_256);
-	auto veh_y = fixed24_8_t::from_raw(veh.y_times_256);
+	auto veh_x = veh.x_times_256 / 256.f;
+	auto veh_y = veh.y_times_256 / 256.f;
 	if (obj_x != veh_x || obj_y != veh_y) {
 		fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} overridden by VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
 		obj->compound_data->parts[0].renderable.set_position(veh_x, veh_y);
+		fmt::print("TODO: should we add the floating point bit to other parts' positions as well?\n");
 	}
 
 	obj->vehicle_data->cabin_left = veh.cabin_left;
