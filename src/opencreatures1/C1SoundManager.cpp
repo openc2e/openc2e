@@ -120,16 +120,24 @@ C1Sound C1SoundManager::play_sound(std::string name, bool loop) {
 	}
 	data[index] = {};
 	data[index].channel = channel;
+	data[index].name = name;
+
 
 	return C1Sound{channel};
 }
 
 void C1SoundManager::set_listener_position(Rect listener_) {
+	if (listener == listener_) {
+		return;
+	}
 	listener = listener_;
 	update_volumes();
 }
 
 void C1SoundManager::set_listener_world_wrap_width(int32_t world_wrap_width_) {
+	if (world_wrap_width == world_wrap_width_) {
+		return;
+	}
 	world_wrap_width = world_wrap_width_;
 	update_volumes();
 }

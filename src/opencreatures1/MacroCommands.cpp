@@ -506,56 +506,50 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	ctx.read_arg_separator(m);
 	std::string sound_name = ctx.read_filename_token(m);
+	ctx.read_command_separator(m);
 
 	auto* targ = ctx.get_targ(m);
 
-	// TODO: what if it already has a controlled sound?
-	if (targ->current_sound) {
-		fmt::print("WARN [SNDC] Object already has a controlled sound: {}\n", repr(targ));
-		ctx.read_command_separator(m);
+	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
+	if (!sound) {
 		return;
 	}
 
-	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
+	targ->current_sound.fade_out();
 	auto bbox = targ->get_bbox();
 	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
-
-	ctx.read_command_separator(m);
 }
 
 void Command_SNDE(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	ctx.read_arg_separator(m);
 	std::string sound_name = ctx.read_filename_token(m);
+	ctx.read_command_separator(m);
 
+	// not controlled, don't override existing sounds or move with object
 	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
 	auto bbox = ctx.get_targ(m)->get_bbox();
 	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
-
-	ctx.read_command_separator(m);
 }
 
 void Command_SNDL(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	ctx.read_arg_separator(m);
 	std::string sound_name = ctx.read_filename_token(m);
+	ctx.read_command_separator(m);
 
 	auto* targ = ctx.get_targ(m);
 
-	// TODO: what if it already has a controlled sound?
-	if (targ->current_sound) {
-		fmt::print("WARN [SNDL] Object already has a controlled sound: {}\n", repr(targ));
-		ctx.read_command_separator(m);
+	C1Sound sound = g_engine_context.sounds->play_sound(sound_name, true);
+	if (!sound) {
 		return;
 	}
 
-	C1Sound sound = g_engine_context.sounds->play_sound(sound_name, true);
+	targ->current_sound.fade_out();
 	auto bbox = targ->get_bbox();
 	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
-
-	ctx.read_command_separator(m);
 }
 
 void Command_STIM(MacroContext& ctx, Macro& m) {

@@ -30,6 +30,7 @@ class C1SoundManager {
 	struct SoundData {
 		AudioChannel channel;
 		RectF position;
+		std::string name;
 	};
 
 	std::vector<SoundData> data;

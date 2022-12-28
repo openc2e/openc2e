@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fmt/core.h>
 #include <stdint.h>
 
 struct RectF {
@@ -20,5 +21,18 @@ struct RectF {
 	}
 	bool operator!=(const RectF& other) const {
 		return !(*this == other);
+	}
+};
+
+template <>
+struct fmt::formatter<RectF> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(RectF val, FormatContext& ctx) {
+		return format_to(ctx.out(), "RectF({},{} + {},{})", val.x, val.y, val.width, val.height);
 	}
 };

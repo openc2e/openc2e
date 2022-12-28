@@ -275,6 +275,15 @@ void SFCLoader::load_objects() {
 		obj->scenery_data = std::make_unique<SceneryData>();
 		obj->scenery_data->part = renderable_from_sfc_entity(*p->part);
 	}
+
+	// Fix up objects
+	for (auto& obj : *g_engine_context.objects) {
+		// refresh controlled sound positions
+		if (obj->current_sound) {
+			auto bbox = obj->get_bbox();
+			obj->current_sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
+		}
+	}
 }
 
 void SFCLoader::load_scripts() {
