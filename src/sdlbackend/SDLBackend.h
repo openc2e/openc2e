@@ -63,7 +63,6 @@ class SDLBackend : public Backend {
 	int windowwidth, windowheight;
 	SDL_Renderer* renderer = nullptr;
 	std::shared_ptr<SDLRenderTarget> mainrendertarget;
-	float userscale = 1.0;
 	Uint32 last_frame_end = 0;
 
 	void resizeNotify(int _w, int _h);
@@ -78,7 +77,6 @@ class SDLBackend : public Backend {
 	void waitForNextDraw();
 	void drawDone();
 	void shutdown();
-	void setUserScale(float scale);
 
 	void resize(int w, int h) { resizeNotify(w, h); }
 
