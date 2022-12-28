@@ -127,9 +127,9 @@ void SFCLoader::load_everything() {
 }
 
 void SFCLoader::load_viewport() {
-	g_engine_context.viewport->scrollx = sfc.scrollx;
-	g_engine_context.viewport->scrolly = sfc.scrolly;
+	g_engine_context.viewport->set_scroll_position(sfc.scrollx, sfc.scrolly);
 }
+
 void SFCLoader::load_map() {
 	if (sfc.map->unused_is_wrappable != 0) {
 		fmt::print("WARN [SFCLoader] unused_is_wrappable = {}, expected 0\n", sfc.map->unused_is_wrappable);

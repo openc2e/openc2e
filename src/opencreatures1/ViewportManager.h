@@ -28,8 +28,7 @@ class ViewportManager {
 	int32_t window_x_to_world_x(int32_t) const;
 	int32_t window_y_to_world_y(int32_t) const;
 
-	int32_t scrollx = 0;
-	int32_t scrolly = 0;
+	void set_scroll_position(int32_t scrollx, int32_t scrolly);
 
   private:
 	static constexpr float SCROLL_ACCEL = 8;
@@ -40,6 +39,10 @@ class ViewportManager {
 	bool scroll_right = false;
 	bool scroll_up = false;
 	bool scroll_down = false;
+
+
+	int32_t scrollx = 0;
+	int32_t scrolly = 0;
 
 	float scroll_velx = 0;
 	float scroll_vely = 0;

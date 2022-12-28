@@ -119,3 +119,8 @@ int32_t ViewportManager::centerx() const {
 int32_t ViewportManager::centery() const {
 	return scrolly + height() / 2;
 }
+
+void ViewportManager::set_scroll_position(int32_t scrollx_, int32_t scrolly_) {
+	scrollx = scrollx_;
+	scrolly = scrolly_;
+}
