@@ -6,8 +6,9 @@
 #include "common/Repr.h"
 #include "common/audio/AudioBackend.h"
 
-#include <cmath>
+#include <assert.h>
 #include <fmt/core.h>
+#include <math.h>
 
 constexpr bool SOUND_MANAGER_DEBUG = false;
 
@@ -56,13 +57,31 @@ struct DistanceInfo {
 	float pan;
 };
 
+static float logarithmic_attenuation(float x, float x_near, float x_far) {
+	// NOTE: `near` and `far` are special keywords on Windows, can't use them
+
+	// logarithmic attenuation function:
+	// given a value `x`, make it drop off starting at `x_near` and ending at `x_far`
+	// -log2(x) is 1 at 0.5 and 0 at 1
+	// so, adjust our input to that range:
+	// -log2( (x - x_near) / (x_far - x_near) / 2 + 0.5f )
+
+	if (x <= x_near) {
+		return 1;
+	}
+	if (x >= x_far) {
+		return 0;
+	}
+	return clamp(-log2f((x - x_near) / (x_far - x_near) / 2 + 0.5f), 0, 1);
+}
+
 static DistanceInfo calculate_distance(RectF listener, int32_t world_wrap_width, RectF sound) {
 	const auto centerx = listener.x + listener.width / 2;
 	const auto centery = listener.y + listener.height / 2;
 
 	// std::remainder gives the distance between x and centerx, taking
 	// into account world wraparound ("modular distance")
-	const float distx = std::remainder(
+	const float distx = remainderf(
 		sound.x + sound.width / 2.0f - centerx,
 		(world_wrap_width ? world_wrap_width : 1) * 1.0f);
 	const float disty = sound.y + sound.height / 2.0f - centery;
@@ -70,20 +89,14 @@ static DistanceInfo calculate_distance(RectF listener, int32_t world_wrap_width,
 	const float screen_width = listener.width;
 	const float screen_height = listener.height;
 
-	// If a sound is on-screen, then play it at full volume.
-	// If it's more than a screen offscreen, then mute it.
+	// If a sound is the center half-box of the screen, then play it at full volume.
+	// If it's more than a half-screen offscreen, then mute it.
 	// TODO: Does this sound right?
-	const float starts_fading = 0.5;
-	const float cutoff = 1.5;
-	// the math
-	float volx = 1.0;
-	if (std::abs(distx) / screen_width > starts_fading) {
-		volx = clamp(1 - (std::abs(distx) / screen_width - starts_fading) / (cutoff - starts_fading), 0, 1);
-	}
-	float voly = 1.0;
-	if (std::abs(disty) / screen_height > starts_fading) {
-		voly = clamp(1 - (std::abs(disty) / screen_height - starts_fading) / (cutoff - starts_fading), 0, 1);
-	}
+	const float starts_fading = 0.25;
+	const float cutoff = 0.75;
+
+	float volx = logarithmic_attenuation(fabsf(distx) / screen_width, starts_fading, cutoff);
+	float voly = logarithmic_attenuation(fabsf(disty) / screen_height, starts_fading, cutoff);
 	float volume = std::min(volx, voly);
 
 	// Pan sound as we get closer to screen edge
