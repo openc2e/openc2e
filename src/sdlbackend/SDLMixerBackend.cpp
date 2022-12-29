@@ -237,6 +237,11 @@ AudioChannel SDLMixerBackend::play_clip(const std::string& filename, bool loopin
 		SDL_UnlockAudio();
 		return {};
 	}
+
+	// set panning, which will reduce volume by ~3db
+	// (assumes mono audio, which isn't always true, there are a few true
+	// stereo WAV files)
+	audio_channel_set_pan(int_to_audio_channel(channel), 0.0);
 	return int_to_audio_channel(channel);
 }
 
@@ -254,6 +259,10 @@ AudioChannel SDLMixerBackend::play_wav_data(const uint8_t* data, size_t size, bo
 		SDL_UnlockAudio();
 		return {};
 	}
+
+	// set panning, which will reduce volume by ~3db
+	// (assumes mono audio, which is always true for MNG data)
+	audio_channel_set_pan(int_to_audio_channel(channel), 0.0);
 	return int_to_audio_channel(channel);
 }
 
@@ -268,13 +277,17 @@ void SDLMixerBackend::audio_channel_set_pan(AudioChannel source, float pan) {
 	int channel = audiochannel_to_int(source);
 	if (channel == -1)
 		return;
-	if (pan > 0) {
-		pan = pan > 1 ? 1 : pan;
-		Mix_SetPanning(channel, 255 * (1 - pan), 255);
-	} else {
-		pan = pan < -1 ? -1 : pan;
-		Mix_SetPanning(channel, 255, 255 * (1 + pan));
-	}
+
+	pan = SDL_clamp(pan, -1, 1);
+
+	// sin/cos panning algorithm
+	// assumes mono audio that has been duplicated to two channels
+	// (not always true, there are a few game WAV files that are stereo. but
+	// we can't handle panning true stereo without writing our own Mixer Effect.)
+	float x = (pan + 1) / 2;
+	float left = cos(x * M_PI / 2);
+	float right = sin(x * M_PI / 2);
+	Mix_SetPanning(channel, 255 * left, 255 * right);
 }
 
 void SDLMixerBackend::audio_channel_fade_out(AudioChannel source, int32_t milliseconds) {
