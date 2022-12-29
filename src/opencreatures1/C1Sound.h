@@ -8,6 +8,12 @@ class C1SoundManager;
 class C1Sound {
   public:
 	C1Sound() {}
+	C1Sound(const C1Sound&) = delete;
+	C1Sound& operator=(const C1Sound&) = delete;
+	C1Sound(C1Sound&& other);
+	C1Sound& operator=(C1Sound&& other);
+	~C1Sound();
+
 	explicit operator bool();
 	void fade_out();
 	void stop();

@@ -514,7 +514,7 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 		return;
 	}
 	targ->current_sound.fade_out();
-	targ->current_sound = sound;
+	targ->current_sound = std::move(sound);
 }
 
 void Command_SNDE(MacroContext& ctx, Macro& m) {
@@ -541,7 +541,7 @@ void Command_SNDL(MacroContext& ctx, Macro& m) {
 	}
 
 	targ->current_sound.fade_out();
-	targ->current_sound = sound;
+	targ->current_sound = std::move(sound);
 }
 
 void Command_STIM(MacroContext& ctx, Macro& m) {

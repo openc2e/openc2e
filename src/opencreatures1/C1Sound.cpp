@@ -4,6 +4,27 @@
 #include "EngineContext.h"
 #include "common/audio/AudioBackend.h"
 
+C1Sound::C1Sound(C1Sound&& other) {
+	channel = other.channel;
+	other.channel = {};
+}
+
+C1Sound& C1Sound::operator=(C1Sound&& other) {
+	fade_out();
+	channel = other.channel;
+	other.channel = {};
+	return *this;
+}
+
+C1Sound::~C1Sound() {
+	// TODO: stop or fade out?
+	// Ideally this is only called when an Object is destroyed, and otherwise
+	// existing controlled sounds are handled when new ones are set
+	if (channel) {
+		stop();
+	}
+}
+
 C1Sound::operator bool() {
 	if (!channel) {
 		return false;
