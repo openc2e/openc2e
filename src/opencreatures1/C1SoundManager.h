@@ -19,9 +19,11 @@ class C1SoundManager {
 	C1SoundManager();
 	~C1SoundManager();
 
-	void set_listener_position(Rect);
+	void set_listener_position(RectF);
 	void set_listener_world_wrap_width(int32_t wrap_width);
+
 	C1Sound play_sound(std::string filename, bool loop = false);
+	C1Sound play_positioned_sound(std::string filename, RectF initial_position, bool loop = false);
 
 	bool is_muted();
 	void set_muted(bool);
@@ -31,10 +33,12 @@ class C1SoundManager {
 		AudioChannel channel;
 		RectF position;
 		std::string name;
+		bool looping = false;
 	};
 
 	std::vector<SoundData> data;
-	Rect listener;
+
+	RectF listener;
 	int32_t world_wrap_width = 0;
 
 	friend class C1Sound;

@@ -1,9 +1,9 @@
 #include "C1MusicManager.h"
 
+#include "C1SoundManager.h"
 #include "EngineContext.h"
 #include "PathManager.h"
 #include "common/Random.h"
-#include "common/audio/AudioBackend.h"
 
 #include <fmt/core.h>
 
@@ -42,15 +42,16 @@ void C1MusicManager::setMuted(bool muted) {
 
 void C1MusicManager::updateVolumes() {
 	// reduce overall volume of clips to 80%
-	g_engine_context.audio_backend->audio_channel_set_volume(m_audio_channel, m_muted ? 0 : m_volume * 0.8f);
+	m_sound.set_volume(m_muted ? 0 : m_volume * 0.8f);
 }
 
 void C1MusicManager::update() {
 	// play C1 music
-	if (m_timepoint_to_play_next_sound <= c1clock::now() && g_engine_context.audio_backend->audio_channel_get_state(m_audio_channel) == AUDIO_STOPPED) {
+	if (m_timepoint_to_play_next_sound <= c1clock::now() && m_sound.get_state() == AUDIO_STOPPED) {
 		auto sounds = g_engine_context.paths->find_path_wildcard(PATH_TYPE_SOUND, "MU*.wav");
 		if (sounds.size()) {
-			m_audio_channel = g_engine_context.audio_backend->play_clip(rand_choice(sounds));
+			auto name = rand_choice(sounds).string();
+			m_sound = g_engine_context.sounds->play_sound(name.substr(0, name.size() - 4));
 		}
 		auto ticks_until_next_sound = rand_int32(50, 99);
 		m_timepoint_to_play_next_sound = c1clock::now() + milliseconds(MS_PER_TICK * ticks_until_next_sound);

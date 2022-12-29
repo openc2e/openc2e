@@ -24,6 +24,10 @@ void C1Sound::stop() {
 	g_engine_context.audio_backend->audio_channel_stop(channel);
 }
 
+void C1Sound::set_volume(float volume) {
+	g_engine_context.audio_backend->audio_channel_set_volume(channel, volume);
+}
+
 void C1Sound::set_position(float x, float y, float width, float height) {
 	if (auto* data = g_engine_context.sounds->get_sound_data(channel)) {
 		data->position.x = x;

@@ -509,15 +509,11 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 	ctx.read_command_separator(m);
 
 	auto* targ = ctx.get_targ(m);
-
-	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
+	C1Sound sound = g_engine_context.sounds->play_positioned_sound(sound_name, targ->get_bbox());
 	if (!sound) {
 		return;
 	}
-
 	targ->current_sound.fade_out();
-	auto bbox = targ->get_bbox();
-	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
 }
 
@@ -527,10 +523,9 @@ void Command_SNDE(MacroContext& ctx, Macro& m) {
 	std::string sound_name = ctx.read_filename_token(m);
 	ctx.read_command_separator(m);
 
+	auto* targ = ctx.get_targ(m);
 	// not controlled, don't override existing sounds or move with object
-	C1Sound sound = g_engine_context.sounds->play_sound(sound_name);
-	auto bbox = ctx.get_targ(m)->get_bbox();
-	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
+	g_engine_context.sounds->play_positioned_sound(sound_name, targ->get_bbox());
 }
 
 void Command_SNDL(MacroContext& ctx, Macro& m) {
@@ -540,15 +535,12 @@ void Command_SNDL(MacroContext& ctx, Macro& m) {
 	ctx.read_command_separator(m);
 
 	auto* targ = ctx.get_targ(m);
-
-	C1Sound sound = g_engine_context.sounds->play_sound(sound_name, true);
+	C1Sound sound = g_engine_context.sounds->play_positioned_sound(sound_name, targ->get_bbox(), true);
 	if (!sound) {
 		return;
 	}
 
 	targ->current_sound.fade_out();
-	auto bbox = targ->get_bbox();
-	sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
 	targ->current_sound = sound;
 }
 

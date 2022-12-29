@@ -1,5 +1,6 @@
 #pragma once
 
+#include "C1Sound.h"
 #include "common/audio/AudioChannel.h"
 
 #include <chrono>
@@ -25,9 +26,7 @@ class C1MusicManager {
 
 	void updateVolumes();
 
-	std::shared_ptr<AudioBackend> m_backend;
-	std::shared_ptr<PathManager> m_path_manager;
-	AudioChannel m_audio_channel;
+	C1Sound m_sound;
 	bool m_muted = false;
 	float m_volume = 1.0;
 	std::chrono::time_point<c1clock> m_timepoint_to_play_next_sound;

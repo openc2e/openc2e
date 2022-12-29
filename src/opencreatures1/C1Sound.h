@@ -13,6 +13,7 @@ class C1Sound {
 	void stop();
 	void set_position(float x, float y, float width, float height);
 	AudioState get_state();
+	void set_volume(float);
 
   private:
 	friend class C1SoundManager;

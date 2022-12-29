@@ -49,10 +49,8 @@ void SFCLoader::object_from_sfc(Object* obj, const sfc::ObjectV1& p) {
 	// creaturesImage sprite;
 	obj->tick_value = p.tick_value;
 	obj->ticks_since_last_tick_event = p.ticks_since_last_tick_event;
-	if (!p.current_sound.empty()) {
-		// TODO: don't start immediately, wait until window appears
-		obj->current_sound = g_engine_context.sounds->play_sound(p.current_sound, true);
-	}
+	// Set the sound later, once we've loaded the object's position from its Entities
+	// obj->current_sound = p.current_sound;
 	obj->objp = sfc_object_mapping[p.objp];
 	obj->obv0 = p.obv0;
 	obj->obv1 = p.obv1;
@@ -266,6 +264,13 @@ void SFCLoader::load_objects() {
 		else if (dynamic_cast<sfc::CreatureV1*>(p)) {
 			fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Creature\n", obj->family, obj->genus, obj->species);
 		}
+
+		if (!p->current_sound.empty()) {
+			// these won't be audible immediately, since the SoundManager thinks
+			// they're out of hearing range yet. once the game starts and the
+			// listener viewport gets set these will start being audible.
+			obj->current_sound = g_engine_context.sounds->play_positioned_sound(p->current_sound, obj->get_bbox(), true);
+		}
 	}
 	for (auto* p : sfc.sceneries) {
 		auto* obj = g_engine_context.objects->try_get(sfc_object_mapping[p]);
@@ -274,15 +279,6 @@ void SFCLoader::load_objects() {
 
 		obj->scenery_data = std::make_unique<SceneryData>();
 		obj->scenery_data->part = renderable_from_sfc_entity(*p->part);
-	}
-
-	// Fix up objects
-	for (auto& obj : *g_engine_context.objects) {
-		// refresh controlled sound positions
-		if (obj->current_sound) {
-			auto bbox = obj->get_bbox();
-			obj->current_sound.set_position(bbox.x, bbox.y, bbox.width, bbox.height);
-		}
 	}
 }
 

@@ -42,7 +42,7 @@ std::vector<fs::path> PathManager::find_path_wildcard(PathType type, const std::
 	std::vector<fs::path> results;
 	for (const auto& entry : case_insensitive_filesystem::directory_iterator(dirname)) {
 		if (wildcard_match(pattern, entry.lexically_relative(dirname).string())) {
-			results.push_back(entry);
+			results.push_back(entry.lexically_relative(dirname));
 		}
 	}
 
