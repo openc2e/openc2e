@@ -51,7 +51,6 @@ This software package also includes some or all of the following libraries:
 * ghc_filesystem - https://github.com/gulrak/filesystem/
 * imgui - https://github.com/ocornut/imgui/
 * nativefiledialog - https://github.com/mlabbe/nativefiledialog
-* re2c - https://re2c.org/
 * SDL2 - https://www.libsdl.org/
 * SDL2_mixer - https://www.libsdl.org/projects/SDL_mixer/
 )";

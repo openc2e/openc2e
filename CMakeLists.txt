@@ -38,12 +38,6 @@ endif()
 # Find / include dependencies
 find_package(Python REQUIRED)
 
-find_program(RE2C_EXECUTABLE re2c)
-if(NOT RE2C_EXECUTABLE)
-	add_subdirectory(externals/re2c EXCLUDE_FROM_ALL)
-	set(RE2C_EXECUTABLE re2c)
-endif()
-
 if(WIN32)
 	add_subdirectory(externals/zlib EXCLUDE_FROM_ALL)
 else()

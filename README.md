@@ -43,7 +43,6 @@ openc2e depends on:
 
 * SDL2
   * SDL2_mixer
-* re2c
 * Python
 * CMake
 * Boost.Serialization (optional)

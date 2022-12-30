@@ -1,6 +1,0 @@
-to configure git repo:
-    $ ssh -t skvadrik,re2c@shell.sourceforge.net create
-    ...
-    $ cd /home/git/p/re2c
-    $ cd code-git.git/
-    $ mcedit config

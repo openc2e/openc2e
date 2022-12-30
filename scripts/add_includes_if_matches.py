@@ -4,7 +4,6 @@ import re
 files = (
     glob.glob("src/**/*.c", recursive=True)
     + glob.glob("src/**/*.cpp", recursive=True)
-    + glob.glob("src/**/*.re2c", recursive=True)
     + glob.glob("src/**/*.h", recursive=True)
     + glob.glob("src/**/*.hpp", recursive=True)
 )
