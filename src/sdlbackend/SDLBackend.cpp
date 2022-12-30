@@ -31,6 +31,11 @@
 #include <imgui.h>
 #include <memory>
 
+Backend* SDLBackend::get_instance() {
+	static SDLBackend s_sdl_backend;
+	return &s_sdl_backend;
+}
+
 SDLBackend::SDLBackend()
 	: mainrendertarget(std::make_shared<SDLRenderTarget>(this)) {
 	mainrendertarget->texture = nullptr;

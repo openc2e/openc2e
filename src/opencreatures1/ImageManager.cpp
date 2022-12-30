@@ -20,7 +20,7 @@ ImageManager::ImageManager() {
 static void build_textures(creaturesImage& image) {
 	for (unsigned int frame = 0; frame < image.numframes(); ++frame) {
 		if (image.width(frame) > 0 && image.height(frame) > 0 && !image.getTextureForFrame(frame)) {
-			image.getTextureForFrame(frame) = g_engine_context.backend->createTextureWithTransparentColor(image.getImageForFrame(frame), Color{0, 0, 0, 0xff});
+			image.getTextureForFrame(frame) = get_backend()->createTextureWithTransparentColor(image.getImageForFrame(frame), Color{0, 0, 0, 0xff});
 		}
 	}
 }

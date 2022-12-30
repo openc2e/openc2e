@@ -30,7 +30,7 @@
 
 namespace fs = ghc::filesystem;
 
-static SDLBackend backend;
+static SDLBackend* backend;
 static bool should_quit = false;
 
 constexpr const char* ABOUT_TEXT = R"(MNGPlayer2 v1.0.1
@@ -115,7 +115,7 @@ static bool ShowConfirmBox(const std::string& title, const std::string& message)
 	};
 	const SDL_MessageBoxData messageboxdata = {
 		SDL_MESSAGEBOX_INFORMATION,
-		backend.window,
+		backend->window,
 		title.c_str(),
 		message.c_str(),
 		SDL_arraysize(buttons),
@@ -227,7 +227,7 @@ static struct AppState {
 			return;
 		}
 		if (result != NFD_OKAY) {
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), backend.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), backend->window);
 			return;
 		}
 
@@ -241,7 +241,7 @@ static struct AppState {
 			newscript = mngparse(newfile.script);
 		} catch (const std::exception& e) {
 			std::string message = std::string("Error opening file: ") + outPath + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), backend.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), backend->window);
 			return;
 		}
 
@@ -264,7 +264,7 @@ static struct AppState {
 			return;
 		}
 		if (result != NFD_OKAY) {
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), backend.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", NFD_GetError(), backend->window);
 			return;
 		}
 
@@ -281,7 +281,7 @@ static struct AppState {
 
 				std::ifstream in(sample_filename, std::ios_base::binary);
 				if (!in.is_open()) {
-					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", sample_filename.c_str(), backend.window);
+					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", sample_filename.c_str(), backend->window);
 					return;
 				}
 				// in.ignore(16); // skip wav header
@@ -292,7 +292,7 @@ static struct AppState {
 
 		} catch (const std::exception& e) {
 			std::string message = std::string("Error opening file: ") + outPath + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), backend.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", message.c_str(), backend->window);
 			return;
 		}
 
@@ -353,12 +353,12 @@ static struct AppState {
 
 		} catch (const std::exception& e) {
 			std::string message = "Error compiling script: " + output_path + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error compiling script", message.c_str(), backend.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error compiling script", message.c_str(), backend->window);
 			return;
 		}
 
 		std::string message = "Compiled MNG script to '" + output_path + "'";
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), backend.window);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), backend->window);
 	}
 
 	bool canDecompile() {
@@ -378,7 +378,7 @@ static struct AppState {
 		if (!fs::create_directories(output_directory)) {
 			if (!fs::is_directory(output_directory)) {
 				std::string message = "Couldn't create output directory " + output_directory.string();
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error saving file", message.c_str(), backend.window);
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error saving file", message.c_str(), backend->window);
 				return;
 			}
 		}
@@ -399,12 +399,12 @@ static struct AppState {
 
 		} catch (const std::exception& e) {
 			std::string message = "Error decompiling file: " + output_directory.string() + "\n\n" + e.what();
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error decompiling file", message.c_str(), backend.window);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error decompiling file", message.c_str(), backend->window);
 			return;
 		}
 
 		std::string message = "Decompiled MNG file to '" + output_directory.string() + "'";
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), backend.window);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Done!", message.c_str(), backend->window);
 	}
 
 	void variablesUpdated() {
@@ -491,7 +491,7 @@ void DrawImGui() {
 		}
 		if (ImGui::BeginMenu("Help")) {
 			if (ImGui::MenuItem("About MNGPlayer2")) {
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "About MNGPlayer2", ABOUT_TEXT, backend.window);
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "About MNGPlayer2", ABOUT_TEXT, backend->window);
 			}
 			ImGui::EndMenu();
 		}
@@ -628,11 +628,11 @@ void InitMNGMusic() {
 
 void RunMainLoop() {
 	while (true) {
-		backend.waitForNextDraw();
+		backend->waitForNextDraw();
 
 		// handle ui events
 		BackendEvent event;
-		while (backend.pollEvent(event)) {
+		while (backend->pollEvent(event)) {
 			if (event.type == eventquit) {
 				should_quit = true;
 			}
@@ -644,7 +644,7 @@ void RunMainLoop() {
 		// draw
 		app_state.Update();
 		DrawImGui();
-		backend.drawDone();
+		backend->drawDone();
 	}
 }
 
@@ -652,9 +652,10 @@ int main(int, char**) {
 	install_backtrace_printer();
 
 	try {
-		backend.init("MNGPlayer2", 300, 400);
+		backend = static_cast<SDLBackend*>(SDLBackend::get_instance());
+		backend->init("MNGPlayer2", 300, 400);
 	} catch (Exception& e) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", e.what(), backend.window);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", e.what(), backend->window);
 	}
 	InitMNGMusic();
 

@@ -36,12 +36,13 @@ namespace fs = ghc::filesystem;
 
 void load_everything() {
 	// set up global objects
-	g_engine_context.backend = std::make_shared<SDLBackend>();
-	g_engine_context.backend->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
+	set_backend(SDLBackend::get_instance());
+	get_backend()->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
+
 	g_engine_context.audio_backend = SDLMixerBackend::getInstance();
 	g_engine_context.audio_backend->init(); // TODO: initialized early so SFC sounds can start.. is this right?
 
-	g_engine_context.rendersystem = std::make_shared<RenderSystem>(g_engine_context.backend.get());
+	g_engine_context.rendersystem = std::make_shared<RenderSystem>();
 	g_engine_context.rendersystem->world_set_wrap_width(CREATURES1_WORLD_WIDTH);
 	g_engine_context.sounds->set_listener_world_wrap_width(CREATURES1_WORLD_WIDTH);
 
@@ -124,14 +125,14 @@ extern "C" int main(int argc, char** argv) {
 	load_everything();
 
 	// run loop
-	// g_engine_context.backend->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
+	// get_backend()->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
 	while (true) {
-		g_engine_context.backend->waitForNextDraw();
+		get_backend()->waitForNextDraw();
 
 		// handle ui events
 		BackendEvent event;
 		bool should_quit = false;
-		while (g_engine_context.backend->pollEvent(event)) {
+		while (get_backend()->pollEvent(event)) {
 			g_engine_context.viewport->handle_event(event);
 			g_engine_context.pointer->handle_event(event);
 			if (event.type == eventquit) {
@@ -149,7 +150,7 @@ extern "C" int main(int argc, char** argv) {
 		g_engine_context.rendersystem->draw();
 
 		// present
-		g_engine_context.backend->drawDone();
+		get_backend()->drawDone();
 	}
 
 	return 0;

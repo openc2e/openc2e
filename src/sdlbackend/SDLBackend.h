@@ -65,14 +65,19 @@ class SDLBackend : public Backend {
 	std::shared_ptr<SDLRenderTarget> mainrendertarget;
 	Uint32 last_frame_end = 0;
 
-	void resizeNotify(int _w, int _h);
+	SDLBackend();
+	SDLBackend(const SDLBackend&) = delete;
+	SDLBackend(SDLBackend&&) = delete;
+	SDLBackend& operator=(const SDLBackend&) = delete;
+	SDLBackend& operator=(SDLBackend&&) = delete;
 
+	void resizeNotify(int _w, int _h);
 	SDL_Surface* getMainSDLSurface() { return SDL_GetWindowSurface(window); }
 
   public:
 	SDL_Window* window = nullptr;
 
-	SDLBackend();
+	static Backend* get_instance();
 	void init(const std::string& name, int width, int height);
 	void waitForNextDraw();
 	void drawDone();

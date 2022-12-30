@@ -66,7 +66,7 @@ void ViewportManager::tick() {
 	scrolly += static_cast<int32_t>(scroll_vely);
 
 	// fix scroll
-	int32_t viewport_height = numeric_cast<int32_t>((numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getHeight()) - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE);
+	int32_t viewport_height = numeric_cast<int32_t>((numeric_cast<int32_t>(get_backend()->getMainRenderTarget()->getHeight()) - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE);
 	// can't go past top or bottom
 	if (scrolly < 0) {
 		scrolly = 0;
@@ -113,11 +113,11 @@ int32_t ViewportManager::window_y_to_world_y(int32_t winy) const {
 }
 
 int32_t ViewportManager::width() const {
-	return numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getWidth());
+	return numeric_cast<int32_t>(get_backend()->getMainRenderTarget()->getWidth());
 }
 
 int32_t ViewportManager::height() const {
-	return numeric_cast<int32_t>(g_engine_context.backend->getMainRenderTarget()->getHeight());
+	return numeric_cast<int32_t>(get_backend()->getMainRenderTarget()->getHeight());
 }
 
 int32_t ViewportManager::centerx() const {

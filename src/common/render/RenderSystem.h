@@ -37,8 +37,9 @@ Future improvements:
 
 #include "RenderItemHandle.h"
 #include "common/SlotMap.h"
-#include "common/backend/Backend.h"
 #include "common/backend/BackendTexture.h"
+#include "common/math/Rect.h"
+#include "common/math/RectF.h"
 
 #include <map>
 #include <stdint.h>
@@ -71,14 +72,13 @@ class RenderSystem {
 		Texture tex;
 	};
 
-	Backend* m_backend = nullptr;
 	int32_t m_world_wrap_width = 0;
 	Rect m_main_camera_src_rect;
 	RectF m_main_camera_dest_rect;
 	DenseSlotMap<RenderItem> m_render_items;
 
   public:
-	RenderSystem(Backend* backend);
+	RenderSystem();
 
 	void world_set_wrap_width(int32_t wrap_width);
 	void main_camera_set_src_rect(Rect);

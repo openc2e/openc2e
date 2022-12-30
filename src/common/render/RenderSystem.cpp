@@ -1,10 +1,10 @@
 #include "RenderSystem.h"
 
 #include "common/NumericCast.h"
+#include "common/backend/Backend.h"
 
 
-RenderSystem::RenderSystem(Backend* backend)
-	: m_backend(backend) {
+RenderSystem::RenderSystem() {
 }
 
 void RenderSystem::main_camera_set_src_rect(Rect src) {
@@ -77,7 +77,7 @@ void RenderSystem::render_item_set_line(const RenderItemHandle& handle, float xs
 }
 
 void RenderSystem::draw() {
-	auto renderer = m_backend->getMainRenderTarget();
+	auto renderer = get_backend()->getMainRenderTarget();
 	renderer->renderClear();
 
 	std::vector<RenderItem*> render_list;

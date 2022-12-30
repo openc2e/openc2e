@@ -39,8 +39,15 @@ class NullRenderTarget : public RenderTarget {
 class NullBackend : public Backend {
   protected:
 	std::shared_ptr<NullRenderTarget> mainrendertarget{std::make_shared<NullRenderTarget>()};
+	NullBackend() {}
+	NullBackend(const NullBackend&) = delete;
+	NullBackend(NullBackend&&) = delete;
+	NullBackend& operator=(const NullBackend&) = delete;
+	NullBackend& operator=(NullBackend&&) = delete;
 
   public:
+	static Backend* get_instance();
+
 	virtual void init(const std::string&, int, int) {}
 	virtual void waitForNextDraw() {}
 	virtual void drawDone() {}

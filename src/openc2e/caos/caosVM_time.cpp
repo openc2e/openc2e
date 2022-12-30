@@ -156,7 +156,7 @@ void v_HIST_YEAR(caosVM* vm) {
  %status maybe
 */
 void v_MSEC(caosVM* vm) {
-	vm->result.setInt(engine.backend->ticks());
+	vm->result.setInt(get_backend()->ticks());
 }
 
 /**

@@ -45,7 +45,7 @@ extern "C" int main(int argc, char* argv[]) {
 #endif
 	fmt::print("openc2e ({}), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n", version);
 
-	engine.addPossibleBackend("sdl", std::shared_ptr<Backend>(new SDLBackend()));
+	engine.addPossibleBackend("sdl", SDLBackend::get_instance());
 	engine.addPossibleAudioBackend("sdlmixer", SDLMixerBackend::getInstance());
 
 	// pass command-line flags to the engine, but do no other setup
@@ -58,7 +58,7 @@ extern "C" int main(int argc, char* argv[]) {
 
 	// run
 	while (true) {
-		engine.backend->waitForNextDraw();
+		get_backend()->waitForNextDraw();
 		if (engine.done) {
 			break;
 		}
@@ -66,7 +66,7 @@ extern "C" int main(int argc, char* argv[]) {
 		engine.tick();
 		engine.drawWorld();
 
-		engine.backend->drawDone();
+		get_backend()->drawDone();
 	}
 
 	// we're done, be sure to shut stuff down

@@ -83,3 +83,7 @@ class Backend {
 	virtual void drawDone() = 0;
 	virtual ~Backend() {}
 };
+
+// global instance
+Backend* get_backend();
+void set_backend(Backend*);

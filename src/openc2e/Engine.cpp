@@ -98,7 +98,7 @@ Engine::Engine() {
 
 	exefile = 0;
 
-	addPossibleBackend("null", std::shared_ptr<Backend>(new NullBackend()));
+	addPossibleBackend("null", NullBackend::get_instance());
 	addPossibleAudioBackend("null", std::shared_ptr<AudioBackend>(new NullAudioBackend()));
 
 	camera.reset(new MainCamera);
@@ -107,8 +107,8 @@ Engine::Engine() {
 Engine::~Engine() {
 }
 
-void Engine::addPossibleBackend(std::string s, std::shared_ptr<Backend> b) {
-	assert(!backend);
+void Engine::addPossibleBackend(std::string s, Backend* b) {
+	assert(!get_backend());
 	assert(b);
 	preferred_backend = s;
 	possible_backends[s] = b;
@@ -121,9 +121,9 @@ void Engine::addPossibleAudioBackend(std::string s, std::shared_ptr<AudioBackend
 	possible_audiobackends[s] = b;
 }
 
-void Engine::setBackend(std::shared_ptr<Backend> b) {
-	backend = b;
-	lasttimestamp = backend->ticks();
+void Engine::setBackend(Backend* b) {
+	set_backend(b);
+	lasttimestamp = get_backend()->ticks();
 }
 
 static std::vector<std::string> read_wordlist(peFile* exefile, PeLanguage lang) {
@@ -314,7 +314,7 @@ unsigned int Engine::msUntilTick() {
 	if (world.paused)
 		return world.ticktime; // TODO: correct?
 
-	int ival = (tickdata + world.ticktime) - backend->ticks();
+	int ival = (tickdata + world.ticktime) - get_backend()->ticks();
 	return (ival < 0) ? 0 : ival;
 }
 
@@ -322,17 +322,17 @@ void Engine::drawWorld() {
 	// draw the world
 
 	Openc2eImGui::Update();
-	backend->getMainRenderTarget()->setViewportOffsetTop(Openc2eImGui::GetViewportOffsetTop());
-	backend->getMainRenderTarget()->setViewportOffsetBottom(Openc2eImGui::GetViewportOffsetBottom());
+	get_backend()->getMainRenderTarget()->setViewportOffsetTop(Openc2eImGui::GetViewportOffsetTop());
+	get_backend()->getMainRenderTarget()->setViewportOffsetBottom(Openc2eImGui::GetViewportOffsetBottom());
 
 	if (dorendering || refreshdisplay) {
 		refreshdisplay = false;
-		world.drawWorld(camera.get(), backend->getMainRenderTarget().get());
+		world.drawWorld(camera.get(), get_backend()->getMainRenderTarget().get());
 	}
 }
 
 void Engine::update() {
-	tickdata = backend->ticks();
+	tickdata = get_backend()->ticks();
 
 	// tick the world
 	world.tick();
@@ -344,7 +344,7 @@ void Engine::update() {
 	musicmanager->tick();
 
 	// update our data for things like pace, race, ticktime, etc
-	ticktimes[ticktimeptr] = backend->ticks() - tickdata;
+	ticktimes[ticktimeptr] = get_backend()->ticks() - tickdata;
 	ticktimeptr++;
 	if (ticktimeptr == 10)
 		ticktimeptr = 0;
@@ -353,15 +353,15 @@ void Engine::update() {
 		avgtime += ((float)ticktime / world.ticktime);
 	world.pace = avgtime / 10;
 
-	world.race = backend->ticks() - lasttimestamp;
-	lasttimestamp = backend->ticks();
+	world.race = get_backend()->ticks() - lasttimestamp;
+	lasttimestamp = get_backend()->ticks();
 }
 
 bool Engine::tick() {
-	assert(backend);
+	assert(get_backend());
 
 	// tick if necessary
-	bool needupdate = fastticks || !backend->ticks() || (backend->ticks() - tickdata >= world.ticktime - 5);
+	bool needupdate = fastticks || !get_backend()->ticks() || (get_backend()->ticks() - tickdata >= world.ticktime - 5);
 	if (needupdate && !world.paused) {
 		if (fastticks) {
 			using clock = std::chrono::steady_clock;
@@ -394,7 +394,7 @@ void Engine::handleKeyboardScrolling() {
 	if (v.hasInt()) {
 		switch (v.getInt()) {
 			case 1: // enable if CTRL is held
-				wasdMode = backend->keyDown(17); // CTRL
+				wasdMode = get_backend()->keyDown(17); // CTRL
 				break;
 			case 2: // enable unconditionally
 				// (this needs agent support to suppress chat bubbles etc)
@@ -412,10 +412,10 @@ void Engine::handleKeyboardScrolling() {
 	}
 
 	// check keys
-	bool leftdown = backend->keyDown(37) || (wasdMode && a_down);
-	bool rightdown = backend->keyDown(39) || (wasdMode && d_down);
-	bool updown = backend->keyDown(38) || (wasdMode && w_down);
-	bool downdown = backend->keyDown(40) || (wasdMode && s_down);
+	bool leftdown = get_backend()->keyDown(37) || (wasdMode && a_down);
+	bool rightdown = get_backend()->keyDown(39) || (wasdMode && d_down);
+	bool updown = get_backend()->keyDown(38) || (wasdMode && w_down);
+	bool downdown = get_backend()->keyDown(40) || (wasdMode && s_down);
 
 	if (leftdown)
 		velx -= accelspeed;
@@ -459,7 +459,7 @@ void Engine::processEvents() {
 	net->handleEvents();
 
 	BackendEvent event;
-	while (backend->pollEvent(event)) {
+	while (get_backend()->pollEvent(event)) {
 		switch (event.type) {
 			case eventresizewindow:
 				handleResizedWindow();
@@ -646,7 +646,7 @@ void Engine::handleRawKeyDown(BackendEvent& event) {
 	// handle debug keys, if they're enabled
 	caosValue v = world.variables["engine_debug_keys"];
 	if (v.hasInt() && v.getInt() == 1) {
-		if (backend->keyDown(OPENC2E_KEY_SHIFT)) {
+		if (get_backend()->keyDown(OPENC2E_KEY_SHIFT)) {
 			MetaRoom* n; // for pageup/pagedown
 
 			switch (event.key) {
@@ -1035,7 +1035,7 @@ bool Engine::initialSetup() {
 		preferred_backend = "null";
 	if (preferred_backend != "null")
 		std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;
-	std::shared_ptr<Backend> b = possible_backends[preferred_backend];
+	Backend* b = possible_backends[preferred_backend];
 	if (!b)
 		throw Exception("No such backend " + preferred_backend);
 	b->init(
@@ -1181,7 +1181,7 @@ bool Engine::initialSetup() {
 void Engine::shutdown() {
 	world.shutdown();
 	audio->shutdown();
-	backend->shutdown();
+	get_backend()->shutdown();
 	net->shutdown();
 }
 

@@ -46,7 +46,7 @@ class Engine {
 
 	std::string gamename;
 
-	std::map<std::string, std::shared_ptr<Backend> > possible_backends;
+	std::map<std::string, Backend*> possible_backends;
 	std::map<std::string, std::shared_ptr<class AudioBackend> > possible_audiobackends;
 	std::string preferred_backend, preferred_audiobackend;
 
@@ -64,7 +64,6 @@ class Engine {
   public:
 	std::map<std::string, caosValue> eame_variables; // non-serialised
 
-	std::shared_ptr<Backend> backend;
 	std::shared_ptr<class AudioBackend> audio;
 	std::shared_ptr<class NetBackend> net;
 	std::unique_ptr<class MusicManager> musicmanager;
@@ -90,7 +89,7 @@ class Engine {
 
 	Engine();
 	~Engine();
-	void setBackend(std::shared_ptr<Backend> b);
+	void setBackend(Backend* b);
 	std::string executeNetwork(std::string in);
 	unsigned int msUntilTick();
 	void drawWorld();
@@ -98,7 +97,7 @@ class Engine {
 	bool tick();
 	void processEvents();
 
-	void addPossibleBackend(std::string, std::shared_ptr<Backend>);
+	void addPossibleBackend(std::string, Backend*);
 	void addPossibleAudioBackend(std::string, std::shared_ptr<AudioBackend>);
 
 	bool parseCommandLine(int argc, char* argv[]);

@@ -159,7 +159,7 @@ void v_IMSK(caosVM* vm) {
 void v_KEYD(caosVM* vm) {
 	VM_PARAM_INTEGER(keycode) // keycodes are crazy broken windows things
 
-	if (engine.backend->keyDown(keycode))
+	if (get_backend()->keyDown(keycode))
 		vm->result.setInt(1);
 	else
 		vm->result.setInt(0);

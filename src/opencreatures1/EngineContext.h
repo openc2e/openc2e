@@ -16,7 +16,6 @@ class EngineContext {
 
 	// all the parts
 	std::shared_ptr<class AudioBackend> audio_backend;
-	std::shared_ptr<class Backend> backend;
 	std::shared_ptr<class RenderSystem> rendersystem;
 	HeapValue<class EventManager> events;
 	HeapValue<class ImageManager> images;
