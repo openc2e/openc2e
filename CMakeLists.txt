@@ -153,7 +153,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/hedfile.cpp
 	src/fileformats/MFCReader.cpp
 	src/fileformats/mngfile.cpp
-	${GEN}/fileformats/mngparser.cpp
+	src/fileformats/mngparser.cpp
 	src/fileformats/NewSFCFile.cpp
 	src/fileformats/paletteFile.cpp
 	src/fileformats/peFile.cpp
@@ -468,18 +468,8 @@ add_custom_command(
 	DEPENDS scripts/writecmds.py ${GEN}/commandinfo.json
 	WORKING_DIRECTORY ${SRC})
 
-# it seems these add_custom_command for re2c could be made
-# into a macro... e.g. RE2C(file1) RE2C(file2) etc...
-add_custom_command(
-	OUTPUT ${GEN}/fileformats/mngparser.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mngparser.cpp ${SRC}/src/fileformats/mngparser.re2c.cpp
-	DEPENDS ${SRC}/src/fileformats/mngparser.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html)
 add_custom_target(generated DEPENDS
-	${GEN}/mngparser.cpp
 	${GEN}/cmddata.cpp
 )
 

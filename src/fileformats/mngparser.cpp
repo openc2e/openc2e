@@ -1,5 +1,7 @@
-#include "common/Exception.h"
 #include "mngparser.h"
+
+#include "common/Ascii.h"
+#include "common/Exception.h"
 
 #include <assert.h>
 #include <unordered_set>
@@ -409,69 +411,111 @@ std::vector<mngtoken> mnglex(const std::string& script) {
 std::vector<mngtoken> mnglex(const char* p) {
 	std::vector<mngtoken> v;
 	const char* basep;
-	const char* YYMARKER = NULL;
 	assert(p);
 
 start:
 	basep = p;
 
-#define push_token(type) \
-	v.push_back(mngtoken(type)); \
-	goto start;
 #define push_value(type) \
 	v.push_back(mngtoken(type, std::string(basep, p - basep))); \
 	goto start;
+#define match_word_literal(string_value, token_type) \
+	if (strncmp(string_value, p, strlen(string_value)) == 0 && !is_ascii_alnum(p[strlen(string_value)])) { \
+		p += strlen(string_value); \
+		push_value(token_type); \
+	}
+#define match_symbol_literal(symbol_value, token_type) \
+	if (strncmp(symbol_value, p, strlen(symbol_value)) == 0) { \
+		p += strlen(symbol_value); \
+		push_value(token_type); \
+	}
 
-	/*!re2c
-	re2c:define:YYCTYPE = "unsigned char";
-	re2c:define:YYCURSOR = p;
-	re2c:yyfill:enable = 0;
-	re2c:yych:conversion = 1;
-	re2c:indent:top = 1;
+	if (p[0] == '\0') {
+		goto eoi;
+	}
+	if (p[0] == '\r' && p[1] == '\n') {
+		p += 2;
+		push_value(MNG_NEWLINE);
+	}
+	if (p[0] == '\n') {
+		p += 1;
+		push_value(MNG_NEWLINE);
+	}
+	if (p[0] == ' ' || p[0] == '\t' || p[0] == '\r') {
+		while (p[0] == ' ' || p[0] == '\t' || p[0] == '\r') {
+			p++;
+		}
+		push_value(MNG_WHITESPACE);
+	}
 
-	eoi = [\000];
+	match_word_literal("Add", MNG_ADD);
+	match_word_literal("AleotoricLayer", MNG_ALEOTORICLAYER);
+	match_word_literal("BeatLength", MNG_BEATLENGTH);
+	match_word_literal("BeatSynch", MNG_BEATSYNCH);
+	match_word_literal("Condition", MNG_CONDITION);
+	match_word_literal("CosineWave", MNG_COSINEWAVE);
+	match_word_literal("Delay", MNG_DELAY);
+	match_word_literal("Divide", MNG_DIVIDE);
+	match_word_literal("Effect", MNG_EFFECT);
+	match_word_literal("FadeIn", MNG_FADEIN);
+	match_word_literal("FadeOut", MNG_FADEOUT);
+	match_word_literal("Interval", MNG_INTERVAL);
+	match_word_literal("LoopLayer", MNG_LOOPLAYER);
+	match_word_literal("Multiply", MNG_MULTIPLY);
+	match_word_literal("Pan", MNG_PAN);
+	match_word_literal("Random", MNG_RANDOM);
+	match_word_literal("SineWave", MNG_SINEWAVE);
+	match_word_literal("Stage", MNG_STAGE);
+	match_word_literal("Subtract", MNG_SUBTRACT);
+	match_word_literal("TempoDelay", MNG_TEMPODELAY);
+	match_word_literal("Track", MNG_TRACK);
+	match_word_literal("UpdateRate", MNG_UPDATERATE); // must come before Update
+	match_word_literal("Update", MNG_UPDATE); // must come after UpdateRate
+	match_word_literal("Variable", MNG_VARIABLE);
+	match_word_literal("Voice", MNG_VOICE);
+	match_word_literal("Volume", MNG_VOLUME);
+	match_word_literal("Wave", MNG_WAVE);
 
-    eoi { goto eoi; }
-    ("\r\n" | "\n") { push_value(MNG_NEWLINE); }
-    [ \t\r]+    { push_value(MNG_WHITESPACE); }
-    "Variable"  { push_token(MNG_VARIABLE); }
-    "Effect"    { push_token(MNG_EFFECT); }
-    "Track"     { push_token(MNG_TRACK); }
-    "Stage"     { push_token(MNG_STAGE); }
-    "Pan"       { push_value(MNG_PAN); }
-    "Volume"    { push_value(MNG_VOLUME); }
-    "Delay"     { push_token(MNG_DELAY); }
-    "TempoDelay" { push_token(MNG_TEMPODELAY); }
-    "Random"    { push_token(MNG_RANDOM); }
-    "FadeIn"    { push_token(MNG_FADEIN); }
-    "FadeOut"   { push_token(MNG_FADEOUT); }
-    "BeatLength" { push_token(MNG_BEATLENGTH); }
-    "AleotoricLayer" { push_token(MNG_ALEOTORICLAYER); }
-    "LoopLayer" { push_token(MNG_LOOPLAYER); }
-    "Update"    { push_token(MNG_UPDATE); }
-    "Add"       { push_token(MNG_ADD); }
-    "Subtract"  { push_token(MNG_SUBTRACT); }
-    "Multiply"  { push_token(MNG_MULTIPLY); }
-    "Divide"    { push_token(MNG_DIVIDE); }
-    "SineWave"  { push_token(MNG_SINEWAVE); }
-    "CosineWave" { push_token(MNG_COSINEWAVE); }
-    "Voice"     { push_token(MNG_VOICE); }
-    "Interval"  { push_value(MNG_INTERVAL); }
-    "Condition" { push_token(MNG_CONDITION); }
-    "BeatSynch" { push_token(MNG_BEATSYNCH); }
-    "UpdateRate" { push_token(MNG_UPDATERATE); }
-    "Wave"      { push_token(MNG_WAVE); }
-    [A-Za-z]([A-Za-z0-9])* { push_value(MNG_CONST_NAME); }
-    [-]?[0-9]+([.][0-9]+)? { push_value(MNG_CONST_NUMBER); }
-    "(" { push_token(MNG_LPAREN); }
-    ")" { push_token(MNG_RPAREN); }
-    "{" { push_token(MNG_LCURLY); }
-    "}" { push_token(MNG_RCURLY); }
-    "," { push_token(MNG_COMMA); }
-    "=" { push_token(MNG_EQUALS); }
-    "//"[^\r\n\000]* { push_value(MNG_COMMENT); }
-    . { push_value(MNG_ERROR); }
-*/
+	if (is_ascii_alpha(p[0])) {
+		while (is_ascii_alnum(p[0])) {
+			p++;
+		}
+		push_value(MNG_CONST_NAME);
+	}
+
+	if (is_ascii_digit(p[0]) || (p[0] == '-' && is_ascii_digit(p[1]))) {
+		p++;
+		while (is_ascii_digit(p[0])) {
+			p++;
+		}
+		if (p[0] == '.' && is_ascii_digit(p[1])) {
+			p++;
+		}
+		while (is_ascii_digit(p[0])) {
+			p++;
+		}
+		push_value(MNG_CONST_NUMBER);
+	}
+
+	match_symbol_literal("(", MNG_LPAREN);
+	match_symbol_literal(")", MNG_RPAREN);
+	match_symbol_literal("{", MNG_LCURLY);
+	match_symbol_literal("}", MNG_RCURLY);
+	match_symbol_literal(",", MNG_COMMA);
+	match_symbol_literal("=", MNG_EQUALS);
+
+	if (p[0] == '/' && p[1] == '/') {
+		p += 2;
+		while (!(
+			p[0] == '\n' || (p[0] == '\r' && p[1] == '\n') || p[0] == '\0')) {
+			p++;
+		}
+		push_value(MNG_COMMENT);
+	}
+
+	// otherwise
+	p++;
+	push_value(MNG_ERROR);
 
 eoi:
 	v.push_back(mngtoken(MNG_EOI));
@@ -563,7 +607,7 @@ std::string mngtoktype::to_string(mngtoktype::toktype type) {
 	}
 }
 
-std::string mngtoken::dump() {
+std::string mngtoken::dump() const {
 	if (type == MNG_CONST_NAME) {
 		return mngtoktype::to_string(type) + " " + value;
 	}

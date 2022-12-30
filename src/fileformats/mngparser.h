@@ -64,7 +64,7 @@ struct mngtoken {
 	mngtoken(mngtoktype::toktype type_, std::string value_)
 		: type(type_), value(value_) {}
 
-	std::string dump();
+	std::string dump() const;
 };
 
 std::vector<mngtoken> mnglex(const std::string& script);
