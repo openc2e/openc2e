@@ -118,7 +118,7 @@ void C1SoundManager::update_volume(SoundData& s) {
 		return;
 	}
 
-	float volume = muted ? 0 : 1;
+	float volume = muted ? 0 : s.volume;
 
 	if (s.position != RectF{}) {
 		auto distance = calculate_distance(listener, world_wrap_width, s.position);

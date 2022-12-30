@@ -32,6 +32,7 @@ class C1SoundManager {
 		RectF position;
 		std::string name;
 		bool looping = false;
+		float volume = 1.0;
 	};
 
 	std::vector<SoundData> data;

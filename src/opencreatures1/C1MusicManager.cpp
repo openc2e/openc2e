@@ -55,7 +55,8 @@ void C1MusicManager::update() {
 		}
 		auto ticks_until_next_sound = rand_int32(50, 99);
 		m_timepoint_to_play_next_sound = c1clock::now() + milliseconds(MS_PER_TICK * ticks_until_next_sound);
+
+		// set volume based on new volumes, muting, etc
+		updateVolumes();
 	}
-	// update volumes based on new volumes, muting, etc
-	updateVolumes();
 }

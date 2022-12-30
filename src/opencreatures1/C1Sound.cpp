@@ -46,7 +46,13 @@ void C1Sound::stop() {
 }
 
 void C1Sound::set_volume(float volume) {
-	get_audio_backend()->audio_channel_set_volume(channel, volume);
+	if (auto* data = g_engine_context.sounds->get_sound_data(channel)) {
+		// do this rather than directly with the audio backend because
+		// SoundManager does some of its own volume management with distance
+		// attenuation, muting, etc., and will override anything we set directly
+		// with the backend
+		data->volume = volume;
+	}
 }
 
 void C1Sound::set_position(float x, float y, float width, float height) {
