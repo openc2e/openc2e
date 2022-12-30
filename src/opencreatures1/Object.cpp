@@ -327,9 +327,9 @@ void Object::blackboard_show_word(int32_t word_index) {
 		const unsigned int frame = static_cast<unsigned char>(to_ascii_uppercase(word.text[i]));
 		const auto texture = blackboard_data->charset_sprite.getTextureForFrame(frame);
 
-		auto renderitem = g_engine_context.rendersystem->render_item_create(LAYER_OBJECTS);
-		g_engine_context.rendersystem->render_item_set_texture(renderitem, texture);
-		g_engine_context.rendersystem->render_item_set_position(renderitem, x, y, z);
+		auto renderitem = get_rendersystem()->render_item_create(LAYER_OBJECTS);
+		get_rendersystem()->render_item_set_texture(renderitem, texture);
+		get_rendersystem()->render_item_set_position(renderitem, x, y, z);
 		blackboard_data->text_render_items[i] = std::move(renderitem);
 
 		x += blackboard_data->charset_sprite.width(frame) + 1;

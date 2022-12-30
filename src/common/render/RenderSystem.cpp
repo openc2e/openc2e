@@ -3,8 +3,14 @@
 #include "common/NumericCast.h"
 #include "common/backend/Backend.h"
 
+struct RenderSystemConstructTag {};
 
-RenderSystem::RenderSystem() {
+RenderSystem* get_rendersystem() {
+	static RenderSystem s_render_system{RenderSystemConstructTag{}};
+	return &s_render_system;
+}
+
+RenderSystem::RenderSystem(const RenderSystemConstructTag&) {
 }
 
 void RenderSystem::main_camera_set_src_rect(Rect src) {

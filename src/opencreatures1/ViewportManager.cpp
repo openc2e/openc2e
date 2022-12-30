@@ -91,8 +91,8 @@ void ViewportManager::tick() {
 		numeric_cast<int32_t>(width() / VIEWPORT_SCALE),
 		numeric_cast<int32_t>((height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE)};
 
-	g_engine_context.rendersystem->main_camera_set_src_rect(viewport);
-	g_engine_context.rendersystem->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, numeric_cast<float>(width()), numeric_cast<float>(height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM)});
+	get_rendersystem()->main_camera_set_src_rect(viewport);
+	get_rendersystem()->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, numeric_cast<float>(width()), numeric_cast<float>(height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM)});
 	g_engine_context.sounds->set_listener_position(viewport);
 }
 

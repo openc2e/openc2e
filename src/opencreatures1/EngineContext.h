@@ -15,7 +15,6 @@ class EngineContext {
 	void reset();
 
 	// all the parts
-	std::shared_ptr<class RenderSystem> rendersystem;
 	HeapValue<class EventManager> events;
 	HeapValue<class ImageManager> images;
 	HeapValue<class MacroManager> macros;

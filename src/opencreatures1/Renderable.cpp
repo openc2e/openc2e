@@ -123,8 +123,8 @@ std::string Renderable::get_sprite_name() const {
 
 void Renderable::update_renderitem() {
 	if (!renderitem) {
-		renderitem = g_engine_context.rendersystem->render_item_create(LAYER_OBJECTS);
+		renderitem = get_rendersystem()->render_item_create(LAYER_OBJECTS);
 	}
-	g_engine_context.rendersystem->render_item_set_texture(renderitem, sprite.getTextureForFrame(numeric_cast<unsigned int>(frame())));
-	g_engine_context.rendersystem->render_item_set_position(renderitem, static_cast<float>(x), static_cast<float>(y), z);
+	get_rendersystem()->render_item_set_texture(renderitem, sprite.getTextureForFrame(numeric_cast<unsigned int>(frame())));
+	get_rendersystem()->render_item_set_position(renderitem, static_cast<float>(x), static_cast<float>(y), z);
 }

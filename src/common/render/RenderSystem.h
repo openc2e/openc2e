@@ -78,7 +78,11 @@ class RenderSystem {
 	DenseSlotMap<RenderItem> m_render_items;
 
   public:
-	RenderSystem();
+	RenderSystem(const struct RenderSystemConstructTag&);
+	RenderSystem(const RenderSystem&) = delete;
+	RenderSystem(RenderSystem&&) = delete;
+	RenderSystem& operator=(const RenderSystem&) = delete;
+	RenderSystem& operator=(RenderSystem&&) = delete;
 
 	void world_set_wrap_width(int32_t wrap_width);
 	void main_camera_set_src_rect(Rect);
@@ -99,3 +103,6 @@ class RenderSystem {
 
 	void draw();
 };
+
+// global instance
+RenderSystem* get_rendersystem();

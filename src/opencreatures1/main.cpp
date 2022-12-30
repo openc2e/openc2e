@@ -42,8 +42,7 @@ void load_everything() {
 	set_audio_backend(SDLMixerBackend::get_instance());
 	get_audio_backend()->init(); // TODO: initialized early so SFC sounds can start.. is this right?
 
-	g_engine_context.rendersystem = std::make_shared<RenderSystem>();
-	g_engine_context.rendersystem->world_set_wrap_width(CREATURES1_WORLD_WIDTH);
+	get_rendersystem()->world_set_wrap_width(CREATURES1_WORLD_WIDTH);
 	g_engine_context.sounds->set_listener_world_wrap_width(CREATURES1_WORLD_WIDTH);
 
 	// load palette
@@ -147,7 +146,7 @@ extern "C" int main(int argc, char** argv) {
 		update_everything();
 
 		// draw
-		g_engine_context.rendersystem->draw();
+		get_rendersystem()->draw();
 
 		// present
 		get_backend()->drawDone();
