@@ -87,7 +87,9 @@ static AudioChannel int_to_audio_channel(int channel) {
 		(uint32_t)channel | ((uint32_t)s_channel_to_generation[channel]) << 16};
 }
 
-SDLMixerBackend::SDLMixerBackend() {
+AudioBackend* SDLMixerBackend::get_instance() {
+	static SDLMixerBackend s_sdl_mixer_backend;
+	return &s_sdl_mixer_backend;
 }
 
 void SDLMixerBackend::play_midi_file(const std::string& filename) {

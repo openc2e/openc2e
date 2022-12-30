@@ -25,6 +25,7 @@
 #include "World.h"
 #include "caosValue.h"
 #include "common/Random.h"
+#include "common/audio/AudioBackend.h"
 #include "libmngmusic/MNGMusic.h"
 
 #include <fmt/core.h>
@@ -35,8 +36,8 @@
 #include "Room.h"
 #include "World.h"
 
-MusicManager::MusicManager(const std::shared_ptr<AudioBackend>& backend_)
-	: backend(backend_), creatures1_ticks_until_next_sound(20), mng_music(std::make_unique<MNGMusic>(backend_)) {
+MusicManager::MusicManager()
+	: creatures1_ticks_until_next_sound(20), mng_music(std::make_unique<MNGMusic>()) {
 }
 
 MusicManager::~MusicManager() {
@@ -48,7 +49,7 @@ MusicManager::~MusicManager() {
 
 void MusicManager::stop() {
 	mng_music->stop();
-	backend->midi_stop();
+	get_audio_backend()->midi_stop();
 }
 
 float MusicManager::getVolume() {
@@ -90,8 +91,8 @@ void MusicManager::setMIDIMuted(bool muted) {
 
 void MusicManager::updateVolumes() {
 	mng_music->setVolume(music_muted ? 0 : music_volume);
-	backend->midi_set_volume(isMIDIMuted() ? 0 : midi_volume);
-	backend->audio_channel_set_volume(creatures1_channel, music_muted ? 0 : music_volume * 0.8);
+	get_audio_backend()->midi_set_volume(isMIDIMuted() ? 0 : midi_volume);
+	get_audio_backend()->audio_channel_set_volume(creatures1_channel, music_muted ? 0 : music_volume * 0.8);
 }
 
 void MusicManager::playTrack(std::string track) {
@@ -112,7 +113,7 @@ void MusicManager::playTrackForAtLeastThisManyMilliseconds(std::string track, un
 		mng_music->playSilence(); // or just stop it?
 
 		if (track == "") {
-			backend->midi_stop();
+			get_audio_backend()->midi_stop();
 			return;
 		}
 
@@ -121,7 +122,7 @@ void MusicManager::playTrackForAtLeastThisManyMilliseconds(std::string track, un
 			fmt::print("Couldn't find MIDI file '{}'!\n", track);
 			return;
 		}
-		backend->play_midi_file(filename);
+		get_audio_backend()->play_midi_file(filename);
 		how_long_before_changing_track_ms = _how_long_before_changing_track_ms;
 		return;
 	}
@@ -164,10 +165,10 @@ void MusicManager::tick() {
 	// TODO: this should be linked to 'real' time, so it doesn't go crazy when game speed is modified
 	// TODO: this should probably be in a separate C1MusicManager class
 	if (engine.version == 1) {
-		if (creatures1_ticks_until_next_sound == 0 && backend->audio_channel_get_state(creatures1_channel) == AUDIO_STOPPED) {
+		if (creatures1_ticks_until_next_sound == 0 && get_audio_backend()->audio_channel_get_state(creatures1_channel) == AUDIO_STOPPED) {
 			auto sounds = findSoundFiles("MU*.wav");
 			if (sounds.size()) {
-				creatures1_channel = backend->play_clip(rand_choice(sounds));
+				creatures1_channel = get_audio_backend()->play_clip(rand_choice(sounds));
 			}
 			creatures1_ticks_until_next_sound = rand_uint32(50, 99);
 		} else {

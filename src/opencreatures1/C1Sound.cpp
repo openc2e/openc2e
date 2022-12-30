@@ -38,15 +38,15 @@ C1Sound::operator bool() {
 
 void C1Sound::fade_out() {
 	// fade out over 15 ticks, which in C1 is 1.5 seconds
-	g_engine_context.audio_backend->audio_channel_fade_out(channel, 1500);
+	get_audio_backend()->audio_channel_fade_out(channel, 1500);
 }
 
 void C1Sound::stop() {
-	g_engine_context.audio_backend->audio_channel_stop(channel);
+	get_audio_backend()->audio_channel_stop(channel);
 }
 
 void C1Sound::set_volume(float volume) {
-	g_engine_context.audio_backend->audio_channel_set_volume(channel, volume);
+	get_audio_backend()->audio_channel_set_volume(channel, volume);
 }
 
 void C1Sound::set_position(float x, float y, float width, float height) {
@@ -60,5 +60,5 @@ void C1Sound::set_position(float x, float y, float width, float height) {
 }
 
 AudioState C1Sound::get_state() {
-	return g_engine_context.audio_backend->audio_channel_get_state(channel);
+	return get_audio_backend()->audio_channel_get_state(channel);
 }

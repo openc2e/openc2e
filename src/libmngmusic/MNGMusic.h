@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/audio/AudioBackend.h"
+#include "common/audio/AudioChannel.h"
 #include "common/optional.h"
 #include "fileformats/mngfile.h"
 #include "fileformats/mngparser.h"
@@ -20,7 +20,6 @@ class MNGMusic {
   private:
 	void playTrack(std::shared_ptr<class MusicTrack> track);
 	std::shared_ptr<class MusicTrack> currenttrack, nexttrack;
-	std::shared_ptr<AudioBackend> backend;
 	float volume = 1.0;
 	float mood = 1.0;
 	float threat = 0.5;
@@ -29,7 +28,7 @@ class MNGMusic {
 	friend class MusicAleotoricLayer;
 
   public:
-	MNGMusic(const std::shared_ptr<AudioBackend>& backend);
+	MNGMusic();
 	~MNGMusic();
 	void update();
 	void setVolume(float);
@@ -105,11 +104,10 @@ class MusicAleotoricLayer : public MusicLayer {
 	std::shared_ptr<MusicVoice> last_voice;
 	std::vector<QueuedWave> queued_waves;
 	std::vector<PlayingWave> playing_waves;
-	AudioBackend* backend;
 	float interval;
 	optional<float> beatsynch;
 
-	MusicAleotoricLayer(MNGAleotoricLayer n, MusicTrack* p, AudioBackend* b);
+	MusicAleotoricLayer(MNGAleotoricLayer n, MusicTrack* p);
 	void update(float track_volume, float track_beatlength);
 	void stop();
 	float getVariable(std::string name);
@@ -121,10 +119,9 @@ class MusicLoopLayer : public MusicLayer {
 	std::string wave;
 	AudioChannel channel;
 	mngtimepoint next_update_at;
-	AudioBackend* backend;
 	float pan = 0.0;
 
-	MusicLoopLayer(MNGLoopLayer n, MusicTrack* p, AudioBackend* b);
+	MusicLoopLayer(MNGLoopLayer n, MusicTrack* p);
 	void update(float track_volume);
 	void stop();
 	float getVariable(std::string name);
@@ -143,7 +140,7 @@ class MusicTrack {
 
 	float fadein, fadeout, beatlength, volume;
 
-	MusicTrack(MNGMusic* p, MNGFile* f, MNGScript s, MNGTrack n, AudioBackend* b);
+	MusicTrack(MNGMusic* p, MNGFile* f, MNGScript s, MNGTrack n);
 	void update(float system_volume);
 	void stop();
 	void startFadeIn();

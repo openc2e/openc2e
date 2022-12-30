@@ -26,12 +26,11 @@
 #include <memory>
 #include <string>
 
-class AudioBackend;
 class MNGMusic;
 
 class MusicManager {
   public:
-	MusicManager(const std::shared_ptr<AudioBackend>& backend);
+	MusicManager();
 	~MusicManager();
 	void stop();
 
@@ -51,7 +50,6 @@ class MusicManager {
   private:
 	void updateVolumes();
 
-	std::shared_ptr<AudioBackend> backend;
 	bool music_muted = false;
 	float music_volume = 1.0;
 	float midi_volume = 1.0;

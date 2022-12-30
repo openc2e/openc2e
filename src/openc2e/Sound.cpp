@@ -27,7 +27,7 @@ void Sound::fadeOut() {
 
 void Sound::stop() {
 	if (auto source_data = soundmanager.getSoundData(*this)) {
-		engine.audio->audio_channel_stop(source_data->handle);
+		get_audio_backend()->audio_channel_stop(source_data->handle);
 		// data will be destroyed later in tick() ?
 	}
 }
@@ -45,7 +45,7 @@ void Sound::setPosition(float x, float y, float width, float height) {
 
 AudioState Sound::getState() {
 	if (auto source_data = soundmanager.getSoundData(*this)) {
-		return engine.audio->audio_channel_get_state(source_data->handle);
+		return get_audio_backend()->audio_channel_get_state(source_data->handle);
 	} else {
 		return AUDIO_STOPPED;
 	}

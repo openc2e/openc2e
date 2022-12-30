@@ -1,4 +1,5 @@
 #include "common/Ascii.h"
+#include "common/audio/AudioBackend.h"
 #include "fileformats/mngfile.h"
 #include "libmngmusic/MNGMusic.h"
 #include "sdlbackend/SDLMixerBackend.h"
@@ -46,8 +47,8 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	auto backend = SDLMixerBackend::getInstance();
-	backend->init();
+	set_audio_backend(SDLMixerBackend::get_instance());
+	get_audio_backend()->init();
 
 	std::string ext = to_ascii_lowercase(fs::path(filename).extension());
 	if (ext == ".mng") {
@@ -64,7 +65,7 @@ int main(int argc, char** argv) {
 
 		std::string trackname = argv[2];
 
-		MNGMusic mng_music(backend);
+		MNGMusic mng_music;
 		mng_music.playTrack(&file, trackname);
 		if (mng_music.playing_silence) {
 			// If the track doesn't exist
@@ -77,13 +78,13 @@ int main(int argc, char** argv) {
 		}
 
 	} else if (ext == ".mid" || ext == ".midi") {
-		backend->play_midi_file(filename);
+		get_audio_backend()->play_midi_file(filename);
 		Event sleep_forever;
 		sleep_forever.wait();
 
 	} else if (ext == ".wav") {
-		auto channel = backend->play_clip(filename);
-		while (backend->audio_channel_get_state(channel) == AUDIO_PLAYING) {
+		auto channel = get_audio_backend()->play_clip(filename);
+		while (get_audio_backend()->audio_channel_get_state(channel) == AUDIO_PLAYING) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 

@@ -1,3 +1,4 @@
+#include "common/audio/AudioBackend.h"
 #include "openc2e/Catalogue.h"
 #include "openc2e/VoiceData.h"
 #include "sdlbackend/SDLMixerBackend.h"
@@ -40,8 +41,8 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	auto backend = SDLMixerBackend::getInstance();
-	backend->init();
+	set_audio_backend(SDLMixerBackend::get_instance());
+	get_audio_backend()->init();
 
 	fmt::print("{} ->\n", sentence);
 	std::vector<AudioChannel> channels;
@@ -51,14 +52,14 @@ int main(int argc, char** argv) {
 		fmt::print("{} {}ms\n", entry.name.size() > 0 ? entry.name : "(silence)", delay_ms);
 
 		if (entry.name.size() > 0) {
-			channels.push_back(backend->play_clip(fs::path(datadirectory) / "Sounds" / (entry.name + ".wav")));
+			channels.push_back(get_audio_backend()->play_clip(fs::path(datadirectory) / "Sounds" / (entry.name + ".wav")));
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
 	}
 	while (true) {
 		if (std::all_of(channels.begin(), channels.end(), [&](auto c) {
-				return backend->audio_channel_get_state(c) == AUDIO_STOPPED;
+				return get_audio_backend()->audio_channel_get_state(c) == AUDIO_STOPPED;
 			})) {
 			break;
 		}

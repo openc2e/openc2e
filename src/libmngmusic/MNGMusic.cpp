@@ -2,6 +2,7 @@
 
 #include "common/Ascii.h"
 #include "common/Random.h"
+#include "common/audio/AudioBackend.h"
 #include "common/endianlove.h"
 #include "common/find_if.h"
 
@@ -15,8 +16,7 @@
 
 using namespace mngtoktype;
 
-MNGMusic::MNGMusic(const std::shared_ptr<AudioBackend>& b)
-	: backend(b) {
+MNGMusic::MNGMusic() {
 }
 MNGMusic::~MNGMusic() {
 	stop();
@@ -60,7 +60,7 @@ void MNGMusic::playTrack(MNGFile* file, std::string trackname) {
 		return; // TODO: exception?
 	}
 
-	playTrack(std::make_shared<MusicTrack>(this, file, parsed_script, *track, backend.get()));
+	playTrack(std::make_shared<MusicTrack>(this, file, parsed_script, *track));
 }
 
 void MNGMusic::playTrack(std::shared_ptr<MusicTrack> track) {
@@ -155,9 +155,9 @@ static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = null
 	}
 }
 
-static AudioChannel playSample(const std::string& name, MNGFile* file, AudioBackend* backend, bool looping = false) {
+static AudioChannel playSample(const std::string& name, MNGFile* file, bool looping = false) {
 	const auto& sample = file->samples[file->getSampleForName(name)];
-	return backend->play_wav_data(sample.data(), sample.size(), looping);
+	return get_audio_backend()->play_wav_data(sample.data(), sample.size(), looping);
 }
 
 MusicStage::MusicStage(MNGStage node) {
@@ -216,9 +216,8 @@ void MusicVoice::runUpdateBlock() {
 	}
 }
 
-MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack* p, AudioBackend* b) {
+MusicAleotoricLayer::MusicAleotoricLayer(MNGAleotoricLayer node, MusicTrack* p) {
 	parent = p;
-	backend = b;
 	name = node.name;
 
 	volume = node.volume.value_or(1.0);
@@ -280,7 +279,7 @@ void MusicAleotoricLayer::setVariable(std::string name, float value) {
 
 void MusicAleotoricLayer::stop() {
 	for (auto pw : playing_waves) {
-		backend->audio_channel_stop(pw.channel);
+		get_audio_backend()->audio_channel_stop(pw.channel);
 	}
 	playing_waves = {};
 	queued_waves = {};
@@ -290,8 +289,8 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	float current_volume = volume * track_volume;
 
 	for (auto pw = playing_waves.begin(); pw != playing_waves.end();) {
-		if (backend->audio_channel_get_state(pw->channel) == AUDIO_PLAYING) {
-			backend->audio_channel_set_volume(pw->channel, pw->volume * current_volume);
+		if (get_audio_backend()->audio_channel_get_state(pw->channel) == AUDIO_PLAYING) {
+			get_audio_backend()->audio_channel_set_volume(pw->channel, pw->volume * current_volume);
 			pw++;
 		} else {
 			pw = playing_waves.erase(pw);
@@ -299,9 +298,9 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	}
 	for (auto qw = queued_waves.begin(); qw != queued_waves.end();) {
 		if (mngclock::now() >= qw->start_time) {
-			auto channel = playSample(qw->wave_name, parent->file, backend);
-			backend->audio_channel_set_volume(channel, qw->volume * current_volume);
-			backend->audio_channel_set_pan(channel, qw->pan);
+			auto channel = playSample(qw->wave_name, parent->file);
+			get_audio_backend()->audio_channel_set_volume(channel, qw->volume * current_volume);
+			get_audio_backend()->audio_channel_set_pan(channel, qw->pan);
 			playing_waves.push_back({channel, qw->volume});
 			qw = queued_waves.erase(qw);
 		} else {
@@ -359,8 +358,8 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 				queued_waves.push_back({voice->wave, start_offset, volume_value, pan_value});
 			}
 		} else {
-			auto channel = playSample(voice->wave, parent->file, backend);
-			backend->audio_channel_set_volume(channel, current_volume);
+			auto channel = playSample(voice->wave, parent->file);
+			get_audio_backend()->audio_channel_set_volume(channel, current_volume);
 			playing_waves.push_back({channel, 1.0});
 		}
 		/* not sure where this should be run exactly.. see C2's UpperTemple for odd example
@@ -382,9 +381,8 @@ void MusicAleotoricLayer::update(float track_volume, float track_beatlength) {
 	next_voice_at = mngclock::now() + dseconds(our_interval);
 }
 
-MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack* p, AudioBackend* b) {
+MusicLoopLayer::MusicLoopLayer(MNGLoopLayer node, MusicTrack* p) {
 	parent = p;
-	backend = b;
 
 	wave = node.wave;
 	volume = node.volume.value_or(1.0);
@@ -431,12 +429,12 @@ void MusicLoopLayer::setVariable(std::string name, float value) {
 
 void MusicLoopLayer::update(float track_volume) {
 	if (!channel) {
-		channel = playSample(wave, parent->file, backend, true);
+		channel = playSample(wave, parent->file, true);
 	}
 
 	float current_volume = volume * track_volume;
-	backend->audio_channel_set_volume(channel, current_volume);
-	backend->audio_channel_set_pan(channel, pan);
+	get_audio_backend()->audio_channel_set_volume(channel, current_volume);
+	get_audio_backend()->audio_channel_set_pan(channel, pan);
 
 	if (mngclock::now() >= next_update_at) {
 		runUpdateBlock();
@@ -445,11 +443,11 @@ void MusicLoopLayer::update(float track_volume) {
 }
 
 void MusicLoopLayer::stop() {
-	backend->audio_channel_stop(channel);
+	get_audio_backend()->audio_channel_stop(channel);
 	channel = {};
 }
 
-MusicTrack::MusicTrack(MNGMusic* p, MNGFile* f, MNGScript script, MNGTrack n, AudioBackend* b) {
+MusicTrack::MusicTrack(MNGMusic* p, MNGFile* f, MNGScript script, MNGTrack n) {
 	node = n;
 	file = f;
 	parent = p;
@@ -466,9 +464,9 @@ MusicTrack::MusicTrack(MNGMusic* p, MNGFile* f, MNGScript script, MNGTrack n, Au
 	}
 	for (auto l : n.layers) {
 		if (MNGLoopLayer* ll = l.get_if<MNGLoopLayer>()) {
-			looplayers.push_back(std::make_shared<MusicLoopLayer>(*ll, this, b));
+			looplayers.push_back(std::make_shared<MusicLoopLayer>(*ll, this));
 		} else if (MNGAleotoricLayer* al = l.get_if<MNGAleotoricLayer>()) {
-			aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(*al, this, b));
+			aleotoriclayers.push_back(std::make_shared<MusicAleotoricLayer>(*al, this));
 		} else {
 			std::terminate();
 		}

@@ -25,10 +25,7 @@
 #include <memory>
 #include <string>
 
-class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
-  protected:
-	AudioBackend() {}
-
+class AudioBackend {
   public:
 	virtual ~AudioBackend() {}
 	virtual void init() = 0;
@@ -47,3 +44,7 @@ class AudioBackend : public std::enable_shared_from_this<AudioBackend> {
 	virtual void midi_set_volume(float) = 0;
 	virtual void midi_stop() = 0;
 };
+
+// global instance
+AudioBackend* get_audio_backend();
+void set_audio_backend(AudioBackend*);

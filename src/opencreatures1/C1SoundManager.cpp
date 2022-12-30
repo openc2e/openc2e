@@ -114,7 +114,7 @@ static DistanceInfo calculate_distance(RectF listener, int32_t world_wrap_width,
 
 
 void C1SoundManager::update_volume(SoundData& s) {
-	if (g_engine_context.audio_backend->audio_channel_get_state(s.channel) != AUDIO_PLAYING) {
+	if (get_audio_backend()->audio_channel_get_state(s.channel) != AUDIO_PLAYING) {
 		return;
 	}
 
@@ -123,10 +123,10 @@ void C1SoundManager::update_volume(SoundData& s) {
 	if (s.position != RectF{}) {
 		auto distance = calculate_distance(listener, world_wrap_width, s.position);
 		volume *= distance.volume;
-		g_engine_context.audio_backend->audio_channel_set_pan(s.channel, distance.pan);
+		get_audio_backend()->audio_channel_set_pan(s.channel, distance.pan);
 	}
 
-	g_engine_context.audio_backend->audio_channel_set_volume(s.channel, volume);
+	get_audio_backend()->audio_channel_set_volume(s.channel, volume);
 }
 
 void C1SoundManager::update_volumes() {
@@ -165,7 +165,7 @@ C1Sound C1SoundManager::play_positioned_sound(std::string name, RectF initial_po
 		return {};
 	}
 
-	auto channel = g_engine_context.audio_backend->play_clip(filename, loop);
+	auto channel = get_audio_backend()->play_clip(filename, loop);
 	if (!channel) {
 		// note that more specific error messages can be thrown by implementations of play_clip
 		throw_exception("failed to play audio clip {}{}", filename, loop ? " (loop)" : "");
@@ -189,7 +189,7 @@ void C1SoundManager::set_listener_position(RectF listener_) {
 	if (SOUND_MANAGER_DEBUG) {
 		fmt::print("C1SoundManager::set_listener_position\n");
 		for (auto& s : data) {
-			if (g_engine_context.audio_backend->audio_channel_get_state(s.channel) == AUDIO_PLAYING) {
+			if (get_audio_backend()->audio_channel_get_state(s.channel) == AUDIO_PLAYING) {
 				fmt::print("channel={} name={} loop={} position={}\n", s.channel.handle, s.name, s.looping, s.position);
 			}
 		}

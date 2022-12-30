@@ -20,20 +20,26 @@
 #pragma once
 
 #include "common/audio/AudioBackend.h"
-#include "common/singleton.h"
 
 #include <memory>
 #include <vector>
 
 typedef struct _Mix_Music Mix_Music;
 
-class SDLMixerBackend : public AudioBackend, public Singleton<SDLMixerBackend> {
+class SDLMixerBackend : public AudioBackend {
   private:
-	friend Singleton<SDLMixerBackend>;
-	SDLMixerBackend();
+	SDLMixerBackend() {}
+	SDLMixerBackend(const SDLMixerBackend&) = delete;
+	SDLMixerBackend(SDLMixerBackend&&) = delete;
+	SDLMixerBackend& operator=(const SDLMixerBackend&) = delete;
+	SDLMixerBackend& operator=(SDLMixerBackend&&) = delete;
+
+
 	Mix_Music* midi = nullptr;
 
   public:
+	static AudioBackend* get_instance();
+
 	void init();
 	void shutdown();
 

@@ -22,8 +22,16 @@
 #include "common/audio/AudioBackend.h"
 
 class NullAudioBackend : public AudioBackend {
+  protected:
+	NullAudioBackend() {}
+	NullAudioBackend(const NullAudioBackend&) = delete;
+	NullAudioBackend(NullAudioBackend&&) = delete;
+	NullAudioBackend& operator=(const NullAudioBackend&) = delete;
+	NullAudioBackend& operator=(NullAudioBackend&&) = delete;
+
   public:
-	NullAudioBackend() = default;
+	static AudioBackend* get_instance();
+
 	void init() {}
 	void shutdown() {}
 

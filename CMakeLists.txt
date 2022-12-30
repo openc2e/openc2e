@@ -99,6 +99,8 @@ include_directories(BEFORE
 
 # Targets
 add_library(openc2e-common OBJECT
+	src/common/audio/AudioBackend.cpp
+	src/common/audio/NullAudioBackend.cpp
 	src/common/backend/Backend.cpp
 	src/common/backend/NullBackend.cpp
 	src/common/render/RenderItemHandle.cpp

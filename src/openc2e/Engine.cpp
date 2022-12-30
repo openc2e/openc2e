@@ -99,7 +99,7 @@ Engine::Engine() {
 	exefile = 0;
 
 	addPossibleBackend("null", NullBackend::get_instance());
-	addPossibleAudioBackend("null", std::shared_ptr<AudioBackend>(new NullAudioBackend()));
+	addPossibleAudioBackend("null", NullAudioBackend::get_instance());
 
 	camera.reset(new MainCamera);
 }
@@ -114,8 +114,8 @@ void Engine::addPossibleBackend(std::string s, Backend* b) {
 	possible_backends[s] = b;
 }
 
-void Engine::addPossibleAudioBackend(std::string s, std::shared_ptr<AudioBackend> b) {
-	assert(!audio);
+void Engine::addPossibleAudioBackend(std::string s, AudioBackend* b) {
+	assert(!get_audio_backend());
 	assert(b);
 	preferred_audiobackend = s;
 	possible_audiobackends[s] = b;
@@ -1050,17 +1050,17 @@ bool Engine::initialSetup() {
 		preferred_audiobackend = "null";
 	if (preferred_audiobackend != "null")
 		std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;
-	std::shared_ptr<AudioBackend> a = possible_audiobackends[preferred_audiobackend];
+	AudioBackend* a = possible_audiobackends[preferred_audiobackend];
 	if (!a)
 		throw Exception("No such audio backend " + preferred_audiobackend);
 	try {
 		a->init();
-		audio = a;
+		set_audio_backend(a);
 	} catch (Exception& e) {
 		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl
 				  << "* Continuing without sound." << std::endl;
-		audio = std::shared_ptr<AudioBackend>(new NullAudioBackend());
-		audio->init();
+		set_audio_backend(NullAudioBackend::get_instance());
+		get_audio_backend()->init();
 	}
 	possible_audiobackends.clear();
 
@@ -1084,7 +1084,7 @@ bool Engine::initialSetup() {
 	world.gallery->loadDefaultPalette();
 
 	// audio
-	musicmanager = std::make_unique<MusicManager>(audio);
+	musicmanager = std::make_unique<MusicManager>();
 	if (!cmdline_enable_sound) {
 		soundmanager.setMuted(true);
 		musicmanager->setMuted(true);
@@ -1180,7 +1180,7 @@ bool Engine::initialSetup() {
 
 void Engine::shutdown() {
 	world.shutdown();
-	audio->shutdown();
+	get_audio_backend()->shutdown();
 	get_backend()->shutdown();
 	net->shutdown();
 }

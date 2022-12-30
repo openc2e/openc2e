@@ -46,7 +46,7 @@ extern "C" int main(int argc, char* argv[]) {
 	fmt::print("openc2e ({}), built " __DATE__ " " __TIME__ "\nCopyright (c) 2004-2008 Alyssa Milburn and others\n\n", version);
 
 	engine.addPossibleBackend("sdl", SDLBackend::get_instance());
-	engine.addPossibleAudioBackend("sdlmixer", SDLMixerBackend::getInstance());
+	engine.addPossibleAudioBackend("sdlmixer", SDLMixerBackend::get_instance());
 
 	// pass command-line flags to the engine, but do no other setup
 	if (!engine.parseCommandLine(argc, argv))

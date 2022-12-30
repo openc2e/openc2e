@@ -39,8 +39,8 @@ void load_everything() {
 	set_backend(SDLBackend::get_instance());
 	get_backend()->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
 
-	g_engine_context.audio_backend = SDLMixerBackend::getInstance();
-	g_engine_context.audio_backend->init(); // TODO: initialized early so SFC sounds can start.. is this right?
+	set_audio_backend(SDLMixerBackend::get_instance());
+	get_audio_backend()->init(); // TODO: initialized early so SFC sounds can start.. is this right?
 
 	g_engine_context.rendersystem = std::make_shared<RenderSystem>();
 	g_engine_context.rendersystem->world_set_wrap_width(CREATURES1_WORLD_WIDTH);

@@ -142,7 +142,6 @@ static struct AppState {
 	char random_interval_buf[6] = "300";
 	std::chrono::steady_clock::time_point random_time_of_last_switch = {};
 
-	std::shared_ptr<SDLMixerBackend> audio_backend = nullptr;
 	std::unique_ptr<MNGMusic> mng_music;
 
 	float mood = 0.5;
@@ -620,9 +619,9 @@ void DrawImGui() {
 }
 
 void InitMNGMusic() {
-	app_state.audio_backend = SDLMixerBackend::getInstance();
-	app_state.audio_backend->init();
-	app_state.mng_music = std::make_unique<MNGMusic>(app_state.audio_backend);
+	set_audio_backend(SDLMixerBackend::get_instance());
+	get_audio_backend()->init();
+	app_state.mng_music = std::make_unique<MNGMusic>();
 	app_state.variablesUpdated();
 }
 

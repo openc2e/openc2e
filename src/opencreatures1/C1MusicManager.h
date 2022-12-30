@@ -6,7 +6,6 @@
 #include <chrono>
 #include <memory>
 
-class AudioBackend;
 class PathManager;
 
 class C1MusicManager {

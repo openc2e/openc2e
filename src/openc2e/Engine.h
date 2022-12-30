@@ -47,7 +47,7 @@ class Engine {
 	std::string gamename;
 
 	std::map<std::string, Backend*> possible_backends;
-	std::map<std::string, std::shared_ptr<class AudioBackend> > possible_audiobackends;
+	std::map<std::string, AudioBackend*> possible_audiobackends;
 	std::string preferred_backend, preferred_audiobackend;
 
 	void handleKeyboardScrolling();
@@ -64,7 +64,6 @@ class Engine {
   public:
 	std::map<std::string, caosValue> eame_variables; // non-serialised
 
-	std::shared_ptr<class AudioBackend> audio;
 	std::shared_ptr<class NetBackend> net;
 	std::unique_ptr<class MusicManager> musicmanager;
 	std::string getBackendName() { return preferred_backend; }
@@ -98,7 +97,7 @@ class Engine {
 	void processEvents();
 
 	void addPossibleBackend(std::string, Backend*);
-	void addPossibleAudioBackend(std::string, std::shared_ptr<AudioBackend>);
+	void addPossibleAudioBackend(std::string, AudioBackend*);
 
 	bool parseCommandLine(int argc, char* argv[]);
 	bool initialSetup();
