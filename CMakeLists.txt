@@ -140,7 +140,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
 	src/fileformats/blkImage.cpp
 	src/fileformats/bmpImage.cpp
-	${GEN}/fileformats/caoslexer.cpp
+	src/fileformats/caoslexer.cpp
 	src/fileformats/caostoken.cpp
 	src/fileformats/catalogueFile.cpp
 	src/fileformats/cfgFile.cpp
@@ -471,13 +471,6 @@ add_custom_command(
 # it seems these add_custom_command for re2c could be made
 # into a macro... e.g. RE2C(file1) RE2C(file2) etc...
 add_custom_command(
-	OUTPUT ${GEN}/fileformats/caoslexer.cpp
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
-	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/caoslexer.cpp ${SRC}/src/fileformats/caoslexer.re2c.cpp
-	DEPENDS ${SRC}/src/fileformats/caoslexer.re2c.cpp
-	WORKING_DIRECTORY ${SRC})
-
-add_custom_command(
 	OUTPUT ${GEN}/fileformats/mngparser.cpp
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}/fileformats"
 	COMMAND ${RE2C_EXECUTABLE} -o ${GEN}/fileformats/mngparser.cpp ${SRC}/src/fileformats/mngparser.re2c.cpp
@@ -486,7 +479,6 @@ add_custom_command(
 
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html)
 add_custom_target(generated DEPENDS
-	${GEN}/caoslexer.cpp
 	${GEN}/mngparser.cpp
 	${GEN}/cmddata.cpp
 )
