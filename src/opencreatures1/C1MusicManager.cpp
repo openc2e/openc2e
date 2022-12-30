@@ -41,8 +41,8 @@ void C1MusicManager::setMuted(bool muted) {
 }
 
 void C1MusicManager::updateVolumes() {
-	// reduce overall volume of clips to 80%
-	m_sound.set_volume(m_muted ? 0 : m_volume * 0.8f);
+	// reduce overall volume of clips to 50% (80% in the official engine)
+	m_sound.set_volume(m_muted ? 0 : m_volume * 0.5f);
 }
 
 void C1MusicManager::update() {

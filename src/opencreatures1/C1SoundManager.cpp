@@ -14,6 +14,7 @@ constexpr bool SOUND_MANAGER_DEBUG = false;
 
 C1SoundManager::C1SoundManager() {
 }
+
 C1SoundManager::~C1SoundManager() {
 }
 
