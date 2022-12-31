@@ -1,6 +1,6 @@
 #include "MacroCommands.h"
 
-#include "C1Sound.h"
+#include "C1ControlledSound.h"
 #include "C1SoundManager.h"
 #include "EventManager.h"
 #include "Object.h"
@@ -509,7 +509,7 @@ void Command_SNDC(MacroContext& ctx, Macro& m) {
 	ctx.read_command_separator(m);
 
 	auto* targ = ctx.get_targ(m);
-	C1Sound sound = g_engine_context.sounds->play_positioned_sound(sound_name, targ->get_bbox());
+	C1ControlledSound sound = g_engine_context.sounds->play_controlled_sound(sound_name, targ->get_bbox());
 	if (!sound) {
 		return;
 	}
@@ -525,7 +525,7 @@ void Command_SNDE(MacroContext& ctx, Macro& m) {
 
 	auto* targ = ctx.get_targ(m);
 	// not controlled, don't override existing sounds or move with object
-	g_engine_context.sounds->play_positioned_sound(sound_name, targ->get_bbox());
+	g_engine_context.sounds->play_uncontrolled_sound(sound_name, targ->get_bbox());
 }
 
 void Command_SNDL(MacroContext& ctx, Macro& m) {
@@ -535,7 +535,7 @@ void Command_SNDL(MacroContext& ctx, Macro& m) {
 	ctx.read_command_separator(m);
 
 	auto* targ = ctx.get_targ(m);
-	C1Sound sound = g_engine_context.sounds->play_positioned_sound(sound_name, targ->get_bbox(), true);
+	C1ControlledSound sound = g_engine_context.sounds->play_controlled_sound(sound_name, targ->get_bbox(), true);
 	if (!sound) {
 		return;
 	}

@@ -1,22 +1,22 @@
-#include "C1Sound.h"
+#include "C1ControlledSound.h"
 
 #include "C1SoundManager.h"
 #include "EngineContext.h"
 #include "common/audio/AudioBackend.h"
 
-C1Sound::C1Sound(C1Sound&& other) {
+C1ControlledSound::C1ControlledSound(C1ControlledSound&& other) {
 	channel = other.channel;
 	other.channel = {};
 }
 
-C1Sound& C1Sound::operator=(C1Sound&& other) {
+C1ControlledSound& C1ControlledSound::operator=(C1ControlledSound&& other) {
 	fade_out();
 	channel = other.channel;
 	other.channel = {};
 	return *this;
 }
 
-C1Sound::~C1Sound() {
+C1ControlledSound::~C1ControlledSound() {
 	// TODO: stop or fade out?
 	// Ideally this is only called when an Object is destroyed, and otherwise
 	// existing controlled sounds are handled when new ones are set
@@ -25,7 +25,7 @@ C1Sound::~C1Sound() {
 	}
 }
 
-C1Sound::operator bool() {
+C1ControlledSound::operator bool() {
 	if (!channel) {
 		return false;
 	}
@@ -36,16 +36,16 @@ C1Sound::operator bool() {
 	return false;
 }
 
-void C1Sound::fade_out() {
+void C1ControlledSound::fade_out() {
 	// fade out over 15 ticks, which in C1 is 1.5 seconds
 	get_audio_backend()->audio_channel_fade_out(channel, 1500);
 }
 
-void C1Sound::stop() {
+void C1ControlledSound::stop() {
 	get_audio_backend()->audio_channel_stop(channel);
 }
 
-void C1Sound::set_volume(float volume) {
+void C1ControlledSound::set_volume(float volume) {
 	if (auto* data = g_engine_context.sounds->get_sound_data(channel)) {
 		// do this rather than directly with the audio backend because
 		// SoundManager does some of its own volume management with distance
@@ -55,7 +55,7 @@ void C1Sound::set_volume(float volume) {
 	}
 }
 
-void C1Sound::set_position(float x, float y, float width, float height) {
+void C1ControlledSound::set_position(float x, float y, float width, float height) {
 	if (auto* data = g_engine_context.sounds->get_sound_data(channel)) {
 		data->position.x = x;
 		data->position.y = y;
@@ -65,6 +65,6 @@ void C1Sound::set_position(float x, float y, float width, float height) {
 	}
 }
 
-AudioState C1Sound::get_state() {
+AudioState C1ControlledSound::get_state() {
 	return get_audio_backend()->audio_channel_get_state(channel);
 }

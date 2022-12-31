@@ -267,9 +267,9 @@ void SFCLoader::load_objects() {
 
 		if (!p->current_sound.empty()) {
 			// these won't be audible immediately, since the SoundManager thinks
-			// they're out of hearing range yet. once the game starts and the
+			// they're out of hearing range. once the game starts and the
 			// listener viewport gets set these will start being audible.
-			obj->current_sound = g_engine_context.sounds->play_positioned_sound(p->current_sound, obj->get_bbox(), true);
+			obj->current_sound = g_engine_context.sounds->play_controlled_sound(p->current_sound, obj->get_bbox(), true);
 		}
 	}
 	for (auto* p : sfc.sceneries) {

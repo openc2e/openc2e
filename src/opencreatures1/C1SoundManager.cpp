@@ -1,5 +1,6 @@
 #include "C1SoundManager.h"
 
+#include "C1ControlledSound.h"
 #include "EngineContext.h"
 #include "PathManager.h"
 #include "common/Exception.h"
@@ -135,11 +136,7 @@ void C1SoundManager::update_volumes() {
 	}
 }
 
-C1Sound C1SoundManager::play_sound(std::string name, bool loop) {
-	return play_positioned_sound(name, RectF{}, loop);
-}
-
-C1Sound C1SoundManager::play_positioned_sound(std::string name, RectF initial_position, bool loop) {
+AudioChannel C1SoundManager::play_sound_helper(std::string name, RectF initial_position, bool loop) {
 	if (name.size() == 0) {
 		return {};
 	}
@@ -181,8 +178,15 @@ C1Sound C1SoundManager::play_positioned_sound(std::string name, RectF initial_po
 	data[index].position = initial_position;
 	data[index].looping = loop;
 	update_volume(data[index]);
+	return channel;
+}
 
-	return C1Sound{channel};
+void C1SoundManager::play_uncontrolled_sound(std::string name, RectF initial_position) {
+	play_sound_helper(name, initial_position, false);
+}
+
+C1ControlledSound C1SoundManager::play_controlled_sound(std::string name, RectF initial_position, bool loop) {
+	return C1ControlledSound{play_sound_helper(name, initial_position, loop)};
 }
 
 void C1SoundManager::set_listener_position(RectF listener_) {

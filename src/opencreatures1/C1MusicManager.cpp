@@ -51,7 +51,7 @@ void C1MusicManager::update() {
 		auto sounds = g_engine_context.paths->find_path_wildcard(PATH_TYPE_SOUND, "MU*.wav");
 		if (sounds.size()) {
 			auto name = rand_choice(sounds).string();
-			m_sound = g_engine_context.sounds->play_sound(name.substr(0, name.size() - 4));
+			m_sound = g_engine_context.sounds->play_controlled_sound(name.substr(0, name.size() - 4));
 		}
 		auto ticks_until_next_sound = rand_int32(50, 99);
 		m_timepoint_to_play_next_sound = c1clock::now() + milliseconds(MS_PER_TICK * ticks_until_next_sound);

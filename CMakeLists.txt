@@ -332,7 +332,7 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/SFCLoader.cpp
 	src/opencreatures1/TimerSystem.cpp
 	src/opencreatures1/ViewportManager.cpp
-	src/opencreatures1/C1Sound.cpp
+	src/opencreatures1/C1ControlledSound.cpp
 	src/opencreatures1/C1SoundManager.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")

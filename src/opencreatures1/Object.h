@@ -1,6 +1,6 @@
 #pragma once
 
-#include "C1Sound.h"
+#include "C1ControlledSound.h"
 #include "EngineContext.h"
 #include "EventManager.h"
 #include "ObjectHandle.h"
@@ -149,7 +149,7 @@ class Object {
 	int32_t tick_value;
 	int32_t ticks_since_last_tick_event;
 	ObjectHandle objp;
-	C1Sound current_sound;
+	C1ControlledSound current_sound;
 	int32_t obv0;
 	int32_t obv1;
 	int32_t obv2;
