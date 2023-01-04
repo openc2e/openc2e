@@ -316,6 +316,7 @@ add_executable(test_openc2e
 target_link_libraries(test_openc2e openc2e_core gtest gtest_main)
 
 add_library(opencreatures1_core STATIC
+	src/opencreatures1/Biochemistry.cpp
 	src/opencreatures1/C1MusicManager.cpp
 	src/opencreatures1/EngineContext.cpp
 	src/opencreatures1/EventManager.cpp
@@ -356,6 +357,7 @@ endif()
 target_link_libraries(opencreatures1 opencreatures1_core openc2e_sdlbackend)
 
 add_executable(test_opencreatures1
+	src/opencreatures1/tests/BiochemistryTest.cpp
 	src/opencreatures1/tests/MacroTest.cpp
 	src/opencreatures1/tests/ScriptoriumTest.cpp
 )
