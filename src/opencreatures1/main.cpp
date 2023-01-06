@@ -22,6 +22,10 @@
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
 
+#ifdef _WIN32
+#include "common/WindowsRegistry.h"
+#endif
+
 #include <SDL.h>
 #include <chrono>
 #include <fmt/core.h>
@@ -106,14 +110,26 @@ void update_everything() {
 }
 
 extern "C" int main(int argc, char** argv) {
-	if (argc != 2) {
-		fmt::print(stderr, "Usage: {} path-to-creatures1-data\n", argv[0]);
-		return 1;
-	}
-
 	install_backtrace_printer();
 
-	std::string datapath = argv[1];
+	std::string datapath;
+	if (argc != 2) {
+#ifdef _WIN32
+		datapath = registry_get_string_value(REGISTRY_HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Gameware Development\\Creatures 1\\1.0", "Main Directory");
+		if (datapath.empty()) {
+			fmt::print(stderr, "Couldn't find Creatures 1 registry key\n");
+			fmt::print(stderr, "Usage: {} [path-to-creatures1-data]\n", argv[0]);
+			return 1;
+		}
+#else
+		fmt::print(stderr, "Usage: {} path-to-creatures1-data\n", argv[0]);
+		return 1;
+#endif
+	}
+
+	if (datapath.empty()) {
+		datapath = argv[1];
+	}
 	if (!fs::exists(datapath)) {
 		fmt::print(stderr, "* Error: Data path {} does not exist\n", repr(datapath));
 		return 1;

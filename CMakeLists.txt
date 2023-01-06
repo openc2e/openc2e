@@ -109,6 +109,7 @@ add_library(openc2e-common OBJECT
 	src/common/SimpleLexer.cpp
 	src/common/string_in.cpp
 	src/common/userlocale.cpp
+	src/common/WindowsRegistry.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(openc2e-common PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
