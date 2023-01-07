@@ -168,5 +168,10 @@ extern "C" int main(int argc, char** argv) {
 		get_backend()->drawDone();
 	}
 
+	// explicitly destroy game data
+	// C1ControlledSounds need to be destroyed before the AudioBackend is destroyed,
+	// because they'll try to stop their AudioChannel.
+	g_engine_context.reset();
+
 	return 0;
 }
