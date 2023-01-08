@@ -112,9 +112,8 @@ void SDLBackend::init(const std::string& name, int width, int height) {
 
 	{
 		SDL_RendererInfo info;
-		info.name = nullptr;
 		SDL_GetRendererInfo(renderer, &info);
-		printf("* SDL Renderer: %s\n", info.name);
+		fmt::print("* SDL Renderer: {} max_texture_size={}x{}\n", info.name, info.max_texture_width, info.max_texture_height);
 	}
 
 	SDL_GetWindowSize(window, &windowwidth, &windowheight);
