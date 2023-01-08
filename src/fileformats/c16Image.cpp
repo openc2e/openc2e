@@ -42,6 +42,7 @@ MultiImage ReadC16File(std::istream& in) {
 		images[i].width = read16le(in);
 		images[i].height = read16le(in);
 		images[i].format = imgformat;
+		images[i].colorkey = Color{0, 0, 0, 255};
 		lineoffsets[i].resize(images[i].height);
 		if (images[i].height > 0) {
 			lineoffsets[i][0] = offset;

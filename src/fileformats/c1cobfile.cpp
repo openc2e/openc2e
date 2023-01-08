@@ -59,6 +59,7 @@ c1cobfile read_c1cobfile(std::istream& in) {
 		for (size_t i = 0; i < cob.picture.height; ++i) {
 			in.read((char*)cob.picture.data.data() + cob.picture.width * (cob.picture.height - 1 - i), cob.picture.width);
 		}
+		cob.picture.colorkey = Color{0, 0, 0, 255};
 	}
 
 	cob.name = read_string(in);

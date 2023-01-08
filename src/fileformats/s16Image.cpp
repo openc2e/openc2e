@@ -20,6 +20,7 @@ MultiImage ReadS16File(std::istream& in) {
 		images[i].width = read16le(in);
 		images[i].height = read16le(in);
 		images[i].format = imgformat;
+		images[i].colorkey = Color{0, 0, 0, 255};
 	}
 
 	for (unsigned int i = 0; i < numframes; i++) {

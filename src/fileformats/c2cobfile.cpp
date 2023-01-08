@@ -175,6 +175,7 @@ cobAgentBlock::cobAgentBlock(cobBlock* p) {
 	thumbnail.height = read16le(file);
 	thumbnail.format = if_rgb565;
 	thumbnail.data = shared_array<uint8_t>(2 * thumbnail.width * thumbnail.height);
+	thumbnail.colorkey = Color{0, 0, 0, 255};
 	file.read((char*)thumbnail.data.data(), 2 * thumbnail.width * thumbnail.height);
 }
 

@@ -65,5 +65,5 @@ class NullBackend : public Backend {
 	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int, unsigned int) override { return {}; }
 
 	Texture createTexture(unsigned int, unsigned int) override { return {}; }
-	void updateTextureWithTransparentColor(Texture&, Rect, const Image&, Color) override{};
+	void updateTexture(Texture&, Rect, const Image&) override{};
 };

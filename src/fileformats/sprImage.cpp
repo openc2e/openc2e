@@ -31,12 +31,14 @@ static MultiImage ReadPrototypeSprFile(std::istream& in, int numframes, uint32_t
 	images[0].width = (first_offset & 0xff0000) >> 16;
 	images[0].height = (first_offset & 0xff000000) >> 24;
 	images[0].format = if_index8;
+	images[0].colorkey = Color{0, 0, 0, 255};
 
 	for (int i = 1; i < numframes; i++) {
 		offsets[i] = read16le(in);
 		images[i].width = read8(in);
 		images[i].height = read8(in);
 		images[i].format = if_index8;
+		images[i].colorkey = Color{0, 0, 0, 255};
 	}
 
 	for (int i = 0; i < numframes; i++) {
@@ -65,6 +67,7 @@ MultiImage ReadSprFile(std::istream& in) {
 		images[i].height = read16le(in);
 		images[i].format = if_index8;
 		images[i].palette = getCreatures1DefaultPalette();
+		images[i].colorkey = Color{0, 0, 0, 255};
 	}
 
 	// // check for Terra Nornia's corrupt background sprite

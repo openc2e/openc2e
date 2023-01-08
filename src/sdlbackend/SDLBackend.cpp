@@ -308,7 +308,7 @@ struct SDLSurfaceDeleter {
 	}
 };
 
-void SDLBackend::updateTextureWithTransparentColor(Texture& tex, Rect location, const Image& image, Color transparent) {
+void SDLBackend::updateTexture(Texture& tex, Rect location, const Image& image) {
 	assert(tex);
 	assert(image.data);
 	assert(image.width > 0);
@@ -363,15 +363,15 @@ void SDLBackend::updateTextureWithTransparentColor(Texture& tex, Rect location, 
 	}
 
 	// set colour-keying
-	if (transparent.a > 0) {
-		if (transparent.a != 255) {
+	if (image.colorkey.a > 0) {
+		if (image.colorkey.a != 255) {
 			throw Exception("Expected alpha value of transparent color to be 255");
 		}
 		Uint32 sdlcolorkey = SDL_MapRGB(
 			surf->format,
-			transparent.r,
-			transparent.g,
-			transparent.b);
+			image.colorkey.r,
+			image.colorkey.g,
+			image.colorkey.b);
 		SDL_SetColorKey(surf.get(), SDL_TRUE, sdlcolorkey);
 	}
 
@@ -444,7 +444,7 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 	}
 
 	if (!img.getTextureForFrame(frame)) {
-		img.getTextureForFrame(frame) = parent->createTextureWithTransparentColor(img.getImageForFrame(frame), Color{0, 0, 0, 0xff});
+		img.getTextureForFrame(frame) = parent->createTextureFromImage(img.getImageForFrame(frame));
 	}
 
 	Rect src;

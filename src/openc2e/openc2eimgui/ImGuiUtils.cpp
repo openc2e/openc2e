@@ -27,7 +27,8 @@ Texture GetTextureFromExeFileWithTransparentTopLeft(uint32_t resource) {
 	auto image = engine.getExeFile()->getBitmap(resource);
 	// TODO: don't make all pixels of this color transparent, only pixels of this
 	// color that are connected to the edges of the image
-	return get_backend()->createTextureWithTransparentColor(image, ImageUtils::GetPixelColor(image, 0, 0));
+	image.colorkey = ImageUtils::GetPixelColor(image, 0, 0);
+	return get_backend()->createTextureFromImage(image);
 }
 
 std::vector<Texture> LoadImageWithTransparentTopLeft(const std::string& name) {
@@ -39,7 +40,8 @@ std::vector<Texture> LoadImageWithTransparentTopLeft(const std::string& name) {
 	MultiImage images = ImageUtils::ReadImage(path);
 	std::vector<Texture> textures(images.size());
 	for (size_t i = 0; i < images.size(); ++i) {
-		textures[i] = get_backend()->createTextureWithTransparentColor(images[i], ImageUtils::GetPixelColor(images[i], 0, 0));
+		images[i].colorkey = ImageUtils::GetPixelColor(images[i], 0, 0);
+		textures[i] = get_backend()->createTextureFromImage(images[i]);
 	}
 	return textures;
 }

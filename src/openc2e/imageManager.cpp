@@ -184,6 +184,7 @@ std::shared_ptr<creaturesImage> imageManager::getImage(const std::string& name) 
 	} else if (engine.bmprenderer) {
 		img = tryOpenImage(name + ".bmp");
 		if (img) {
+			img->images[0].colorkey = Color{0, 0, 0, 255};
 			path hedfilename(findImageFile(name + ".hed"));
 			if (!hedfilename.empty()) {
 				hedfile hed = read_hedfile(hedfilename);
