@@ -288,11 +288,28 @@ void SDLRenderTarget::renderLine(float x1, float y1, float x2, float y2, unsigne
 	SDL_RenderDrawLineF(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 
-Texture SDLBackend::createTextureFromImage(const Image& image) {
-	return createTextureWithTransparentColor(image, Color{});
+Texture SDLBackend::createTexture(unsigned int width, unsigned int height) {
+	// TODO: make sure we get an alpha-capable texture format. seems to always
+	// happen by default, but should check just in case.
+	Texture tex(
+		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_STATIC, width, height),
+		width, height, &SDL_DestroyTexture);
+	if (!tex) {
+		throw Exception(fmt::format("error creating texture: {}", SDL_GetError()));
+	}
+	// enable alpha blending
+	SDL_SetTextureBlendMode(tex.as<SDL_Texture>(), SDL_BLENDMODE_BLEND);
+	return tex;
 }
 
-Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color transparent_color) {
+struct SDLSurfaceDeleter {
+	void operator()(SDL_Surface* ptr) {
+		SDL_FreeSurface(ptr);
+	}
+};
+
+void SDLBackend::updateTextureWithTransparentColor(Texture& tex, Rect location, const Image& image, Color transparent) {
+	assert(tex);
 	assert(image.data);
 	assert(image.width > 0);
 	assert(image.height > 0);
@@ -300,7 +317,7 @@ Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color 
 		assert(image.palette.data() == nullptr);
 	}
 
-	// create surface
+	// map our format enum to SDL's format enum
 	Uint32 sdlformat = SDL_PIXELFORMAT_UNKNOWN;
 	switch (image.format) {
 		case if_index8:
@@ -320,15 +337,17 @@ Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color 
 			break;
 	}
 
-	SDL_Surface* surf = SDL_CreateRGBSurfaceWithFormatFrom(
+	// create initial surface
+	std::unique_ptr<SDL_Surface, SDLSurfaceDeleter> surf{SDL_CreateRGBSurfaceWithFormatFrom(
 		const_cast<uint8_t*>(image.data.data()),
 		image.width,
 		image.height,
 		SDL_BITSPERPIXEL(sdlformat), // depth
 		image.width * SDL_BYTESPERPIXEL(sdlformat), // pitch
-		sdlformat);
+		sdlformat)};
 	assert(surf);
 
+	// set palette
 	if (image.format == if_index8) {
 		if (!image.palette) {
 			throw Exception("Got indexed image without palette");
@@ -344,26 +363,35 @@ Texture SDLBackend::createTextureWithTransparentColor(const Image& image, Color 
 	}
 
 	// set colour-keying
-	if (transparent_color.a > 0) {
-		if (transparent_color.a != 255) {
+	if (transparent.a > 0) {
+		if (transparent.a != 255) {
 			throw Exception("Expected alpha value of transparent color to be 255");
 		}
 		Uint32 sdlcolorkey = SDL_MapRGB(
 			surf->format,
-			transparent_color.r,
-			transparent_color.g,
-			transparent_color.b);
-		SDL_SetColorKey(surf, SDL_TRUE, sdlcolorkey);
+			transparent.r,
+			transparent.g,
+			transparent.b);
+		SDL_SetColorKey(surf.get(), SDL_TRUE, sdlcolorkey);
 	}
 
-	// create texture
-	Texture tex(
-		SDL_CreateTextureFromSurface(renderer, surf),
-		image.width,
-		image.height,
-		&SDL_DestroyTexture);
-	assert(tex);
-	return tex;
+	// convert surface to texture format
+	uint32_t tex_format;
+	SDL_QueryTexture(tex.as<SDL_Texture>(), &tex_format, nullptr, nullptr, nullptr);
+	std::unique_ptr<SDL_Surface, SDLSurfaceDeleter> converted{
+		SDL_ConvertSurfaceFormat(surf.get(), tex_format, 0)};
+	assert(converted);
+
+	// update texture
+	SDL_Rect rect;
+	rect.x = location.x;
+	rect.y = location.y;
+	rect.w = location.width;
+	rect.h = location.height;
+	if (SDL_UpdateTexture(tex.as<SDL_Texture>(), location == Rect{} ? nullptr : &rect,
+			converted->pixels, converted->pitch) != 0) {
+		throw Exception(fmt::format("error updating texture: {}", SDL_GetError()));
+	};
 }
 
 unsigned int SDLRenderTarget::getWidth() const {

@@ -91,8 +91,8 @@ class SDLBackend : public Backend {
 
 	unsigned int ticks() override { return SDL_GetTicks(); }
 
-	Texture createTextureFromImage(const Image& image) override;
-	Texture createTextureWithTransparentColor(const Image& image, Color transparent) override;
+	Texture createTexture(unsigned int width, unsigned int height) override;
+	void updateTextureWithTransparentColor(Texture& tex, Rect location, const Image& image, Color transparent) override;
 
 	std::shared_ptr<RenderTarget> getMainRenderTarget() override;
 	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height) override;
