@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Rect.h"
-
 #include "common/NumericCast.h"
+
 #include <fmt/core.h>
 #include <stdint.h>
 
