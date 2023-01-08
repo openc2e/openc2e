@@ -45,15 +45,16 @@ class SDLRenderTarget : public RenderTarget {
 	SDLRenderTarget& operator=(const SDLRenderTarget&) = delete;
 	SDLRenderTarget& operator=(SDLRenderTarget&&) = delete;
 	~SDLRenderTarget();
-	void renderTexture(const Texture& tex, Rect src, RectF dest, RenderOptions options);
-	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options);
-	void renderLine(float x1, float y1, float x2, float y2, unsigned int color);
-	void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h);
-	unsigned int getWidth() const;
-	unsigned int getHeight() const;
-	void renderClear();
-	void setViewportOffsetTop(int offset_top);
-	void setViewportOffsetBottom(int offset_bottom);
+
+	void renderTexture(const Texture& tex, Rect src, RectF dest, RenderOptions options) override;
+	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options) override;
+	void renderLine(float x1, float y1, float x2, float y2, unsigned int color) override;
+	void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h) override;
+	unsigned int getWidth() const override;
+	unsigned int getHeight() const override;
+	void renderClear() override;
+	void setViewportOffsetTop(int offset_top) override;
+	void setViewportOffsetBottom(int offset_bottom) override;
 };
 
 class SDLBackend : public Backend {
@@ -71,32 +72,32 @@ class SDLBackend : public Backend {
 	SDLBackend& operator=(const SDLBackend&) = delete;
 	SDLBackend& operator=(SDLBackend&&) = delete;
 
-	void resizeNotify(int _w, int _h);
 	SDL_Surface* getMainSDLSurface() { return SDL_GetWindowSurface(window); }
+	void resizeNotify(int _w, int _h);
+	int translateScancode(int key);
 
   public:
 	SDL_Window* window = nullptr;
 
 	static Backend* get_instance();
-	void init(const std::string& name, int width, int height);
-	void waitForNextDraw();
-	void drawDone();
-	void shutdown();
+	void init(const std::string& name, int width, int height) override;
+	void waitForNextDraw() override;
+	void drawDone() override;
+	void shutdown() override;
 
-	void resize(int w, int h) { resizeNotify(w, h); }
+	void resize(int w, int h) override { resizeNotify(w, h); }
 
-	bool pollEvent(BackendEvent& e);
+	bool pollEvent(BackendEvent& e) override;
 
-	unsigned int ticks() { return SDL_GetTicks(); }
+	unsigned int ticks() override { return SDL_GetTicks(); }
 
-	Texture createTextureFromImage(const Image& image);
-	Texture createTextureWithTransparentColor(const Image& image, Color transparent);
+	Texture createTextureFromImage(const Image& image) override;
+	Texture createTextureWithTransparentColor(const Image& image, Color transparent) override;
 
-	std::shared_ptr<RenderTarget> getMainRenderTarget();
-	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height);
+	std::shared_ptr<RenderTarget> getMainRenderTarget() override;
+	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height) override;
 
-	bool keyDown(int key);
-	int translateScancode(int key);
+	bool keyDown(int key) override;
 };
 
 #endif

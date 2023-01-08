@@ -25,15 +25,15 @@
 
 class NullRenderTarget : public RenderTarget {
   public:
-	virtual void renderTexture(const Texture&, Rect, RectF, RenderOptions) {}
-	virtual void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) {}
-	virtual void renderLine(float, float, float, float, unsigned int) {}
-	virtual void blitRenderTarget(RenderTarget*, int, int, int, int) {}
-	virtual unsigned int getWidth() const { return 800; }
-	virtual unsigned int getHeight() const { return 600; }
-	virtual void renderClear() {}
-	virtual void setViewportOffsetTop(int) {}
-	virtual void setViewportOffsetBottom(int) {}
+	void renderTexture(const Texture&, Rect, RectF, RenderOptions) override {}
+	void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) override {}
+	void renderLine(float, float, float, float, unsigned int) override {}
+	void blitRenderTarget(RenderTarget*, int, int, int, int) override {}
+	unsigned int getWidth() const override { return 800; }
+	unsigned int getHeight() const override { return 600; }
+	void renderClear() override {}
+	void setViewportOffsetTop(int) override {}
+	void setViewportOffsetBottom(int) override {}
 };
 
 class NullBackend : public Backend {
@@ -48,27 +48,22 @@ class NullBackend : public Backend {
   public:
 	static Backend* get_instance();
 
-	virtual void init(const std::string&, int, int) {}
-	virtual void waitForNextDraw() {}
-	virtual void drawDone() {}
-	virtual void shutdown() {}
+	void init(const std::string&, int, int) override {}
+	void waitForNextDraw() override {}
+	void drawDone() override {}
+	void shutdown() override {}
 
-	virtual void resize(int, int) {}
+	void resize(int, int) override {}
 
-	virtual unsigned int ticks() { return 0; }
-	virtual bool pollEvent(BackendEvent&) { return false; }
-	virtual bool keyDown(int) { return false; }
+	unsigned int ticks() override { return 0; }
+	bool pollEvent(BackendEvent&) override { return false; }
+	bool keyDown(int) override { return false; }
 
-	virtual bool selfRender() { return false; }
-	virtual void requestRender() {}
-
-	virtual std::shared_ptr<RenderTarget> getMainRenderTarget() {
+	std::shared_ptr<RenderTarget> getMainRenderTarget() override {
 		return std::dynamic_pointer_cast<RenderTarget>(mainrendertarget);
 	}
-	virtual std::shared_ptr<RenderTarget> newRenderTarget(unsigned int, unsigned int) { return {}; }
+	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int, unsigned int) override { return {}; }
 
-	virtual Texture createTextureFromImage(const Image&) { return {}; }
-	virtual Texture createTextureWithTransparentColor(const Image&, Color) { return {}; }
-
-	virtual unsigned int textWidth(std::string) { return 0; }
+	Texture createTextureFromImage(const Image&) override { return {}; }
+	Texture createTextureWithTransparentColor(const Image&, Color) override { return {}; }
 };
