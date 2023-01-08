@@ -1269,13 +1269,14 @@ void Agent::kill() {
 		vm = 0;
 	}
 
-	zotstack();
-	agents_iter->reset();
-
 	if (sound) {
 		sound.stop();
 		sound = {};
 	}
+
+	// these may cause the agent to be destroyed, if they have the only reference
+	zotstack();
+	agents_iter->reset();
 }
 
 unsigned int Agent::getZOrder() const {
