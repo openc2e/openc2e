@@ -1,5 +1,7 @@
 #include "Biochemistry.h"
 
+#include "common/math/Saturating.h"
+
 const uint32_t EVERY[32] = {
 	0,
 	0,
@@ -80,4 +82,29 @@ uint8_t decay_chemical(uint8_t concentration, uint8_t rate, uint32_t current_bio
 		return static_cast<uint8_t>(concentration * MULTIPLIERS[rate]);
 	}
 	return concentration;
+}
+
+void run_chemical_reaction(ChemicalData& chemicals, const ChemicalReaction& rxn, uint32_t current_biotick) {
+	uint8_t availability = 255;
+	if (rxn.r1_chem != 0 && rxn.r1_prop != 0) {
+		availability = chemicals[rxn.r1_chem].concentration / rxn.r1_prop;
+	}
+	if (rxn.r2_chem != 0 && rxn.r2_prop != 0) {
+		uint8_t availability2 = chemicals[rxn.r2_chem].concentration / rxn.r2_prop;
+		availability = availability2 < availability ? availability2 : availability;
+	}
+
+	if (availability == 0) {
+		return;
+	}
+
+	uint8_t diff = availability - decay_chemical(availability, rxn.rate, current_biotick);
+	if (diff == 0) {
+		return;
+	}
+
+	chemicals[rxn.r1_chem].concentration = sub_sat(chemicals[rxn.r1_chem].concentration, mul_sat(diff, rxn.r1_prop));
+	chemicals[rxn.r2_chem].concentration = sub_sat(chemicals[rxn.r2_chem].concentration, mul_sat(diff, rxn.r2_prop));
+	chemicals[rxn.p1_chem].concentration = add_sat(chemicals[rxn.p1_chem].concentration, mul_sat(diff, rxn.p1_prop));
+	chemicals[rxn.p2_chem].concentration = add_sat(chemicals[rxn.p2_chem].concentration, mul_sat(diff, rxn.p2_prop));
 }
