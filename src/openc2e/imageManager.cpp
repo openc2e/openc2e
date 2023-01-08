@@ -219,10 +219,6 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 	uint32_t aliascolor) {
 	// TODO: cache this?
 
-	// TODO: use bgcolor and aliascolor
-	(void)bgcolor;
-	(void)aliascolor;
-
 	std::string filename = findImageFile("EuroCharset.dta");
 	if (filename.empty()) {
 		filename = findImageFile("CHARSET.DTA");
@@ -233,27 +229,39 @@ std::shared_ptr<creaturesImage> imageManager::getCharsetDta(imageformat format,
 
 	MultiImage images = ImageUtils::ReadImage(filename);
 
-	// TODO: how do the values in the CHARSET.DTA map to actual color values?
-	// just setting them all to the textcolor right now, but the real engines
-	// do some shading/aliasing
 	switch (format) {
 		case if_index8:
 			for (auto& image : images) {
 				image.palette = default_palette;
 				for (size_t j = 0; j < image.data.size(); ++j) {
-					if (image.data[j] != 0) {
+					if (image.data[j] == 0) {
+						image.data[j] = bgcolor;
+					} else if (image.data[j] == 1) {
 						image.data[j] = textcolor;
+					} else {
+						// Creatures 1 has some character pixels > 2 that just read colors
+						// randomly from memory. Don't do that, just give them the aliascolor.
+						image.data[j] = aliascolor;
 					}
 				}
 			}
 			break;
 		case if_bgr24: {
 			shared_array<Color> palette(256);
-			palette[0] = Color{0, 0, 0, 0xff}; // black is set as the transparent color
-			for (int i = 1; i < 256; i++) {
-				palette[i].r = (textcolor >> 16) & 0xff;
-				palette[i].g = (textcolor >> 8) & 0xff;
-				palette[i].b = textcolor & 0xff;
+			palette[0] = Color{
+				static_cast<uint8_t>(bgcolor >> 16),
+				static_cast<uint8_t>(bgcolor >> 8),
+				static_cast<uint8_t>(bgcolor),
+				0xff};
+			palette[1] = Color{
+				static_cast<uint8_t>(textcolor >> 16),
+				static_cast<uint8_t>(textcolor >> 8),
+				static_cast<uint8_t>(textcolor),
+				0xff};
+			for (int i = 2; i < 256; i++) {
+				palette[i].r = aliascolor >> 16;
+				palette[i].g = aliascolor >> 8;
+				palette[i].b = aliascolor;
 				palette[i].a = 0xff;
 			}
 			for (auto& image : images) {
