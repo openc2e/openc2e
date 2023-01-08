@@ -102,10 +102,7 @@ void SDLBackend::init(const std::string& name, int width, int height) {
 		throw Exception(std::string("SDL error creating window: ") + SDL_GetError());
 	}
 
-	renderer = SDL_CreateRenderer(
-		window,
-		-1,
-		SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC);
 	if (!renderer) {
 		throw Exception(std::string("SDL error creating renderer: ") + SDL_GetError());
 	}
