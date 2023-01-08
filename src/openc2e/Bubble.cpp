@@ -126,8 +126,8 @@ Bubble* Bubble::newBubble(Agent* parent, bool speech, std::string text) {
 	int yoffset = (engine.version == 1) ? 3 : 8;
 	int twidth = (engine.version == 1) ? 144 : 95; // extended to fit text upon setText()
 
-	unsigned int textcolor = (engine.version == 1) ? 0xb : 0x080808; // TODO
-	unsigned int bgcolor = (engine.version == 1) ? 0x1 : 0xFFFFFF; // TODO
+	unsigned int textcolor = (engine.version == 1) ? 0xb : 0x080810; // TODO
+	unsigned int bgcolor = (engine.version == 1) ? 0x1 : 0xC0FFFF; // TODO
 
 	Bubble* ourBubble = new Bubble(2, 1, 2, plane, "syst", pose, engine.version == 1 ? 1 : 3, xoffset, yoffset, twidth, 12, textcolor, bgcolor);
 	ourBubble->finishInit();
