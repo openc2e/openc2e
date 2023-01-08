@@ -89,7 +89,7 @@ class SDLBackend : public Backend {
 
 	unsigned int ticks() { return SDL_GetTicks(); }
 
-	Texture createTexture(const Image& image);
+	Texture createTextureFromImage(const Image& image);
 	Texture createTextureWithTransparentColor(const Image& image, Color transparent);
 
 	std::shared_ptr<RenderTarget> getMainRenderTarget();

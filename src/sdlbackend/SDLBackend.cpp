@@ -288,7 +288,7 @@ void SDLRenderTarget::renderLine(float x1, float y1, float x2, float y2, unsigne
 	SDL_RenderDrawLineF(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 
-Texture SDLBackend::createTexture(const Image& image) {
+Texture SDLBackend::createTextureFromImage(const Image& image) {
 	return createTextureWithTransparentColor(image, Color{});
 }
 

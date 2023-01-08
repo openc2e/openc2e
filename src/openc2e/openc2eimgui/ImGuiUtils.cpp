@@ -20,7 +20,7 @@ void Image(Texture texture) {
 }
 
 Texture GetTextureFromExeFile(uint32_t resource) {
-	return get_backend()->createTexture(engine.getExeFile()->getBitmap(resource));
+	return get_backend()->createTextureFromImage(engine.getExeFile()->getBitmap(resource));
 }
 
 Texture GetTextureFromExeFileWithTransparentTopLeft(uint32_t resource) {

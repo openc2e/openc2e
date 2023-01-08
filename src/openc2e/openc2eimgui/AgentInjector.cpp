@@ -73,7 +73,7 @@ void DrawAgentInjector() {
 		}
 
 		if (!s_cob_texture && s_object_selected_index < s_object_injector.objects.size()) {
-			s_cob_texture = get_backend()->createTexture(
+			s_cob_texture = get_backend()->createTextureFromImage(
 				s_object_injector.getPicture(s_object_injector.objects[s_object_selected_index]));
 		}
 		DrawAgentPreview(s_cob_texture);

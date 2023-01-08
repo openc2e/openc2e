@@ -76,7 +76,7 @@ class Backend {
 	virtual std::shared_ptr<RenderTarget> getMainRenderTarget() = 0;
 	virtual std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height) = 0;
 
-	virtual Texture createTexture(const Image& image) = 0;
+	virtual Texture createTextureFromImage(const Image& image) = 0;
 	virtual Texture createTextureWithTransparentColor(const Image& image, Color transparent) = 0;
 
 	virtual void waitForNextDraw() = 0;

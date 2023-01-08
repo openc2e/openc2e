@@ -67,7 +67,7 @@ class NullBackend : public Backend {
 	}
 	virtual std::shared_ptr<RenderTarget> newRenderTarget(unsigned int, unsigned int) { return {}; }
 
-	virtual Texture createTexture(const Image&) { return {}; }
+	virtual Texture createTextureFromImage(const Image&) { return {}; }
 	virtual Texture createTextureWithTransparentColor(const Image&, Color) { return {}; }
 
 	virtual unsigned int textWidth(std::string) { return 0; }
