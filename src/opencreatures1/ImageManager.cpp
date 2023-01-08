@@ -17,12 +17,37 @@ namespace fs = ghc::filesystem;
 ImageManager::ImageManager() {
 }
 
-static void build_textures(creaturesImage& image) {
-	for (unsigned int frame = 0; frame < image.numframes(); ++frame) {
-		if (image.width(frame) > 0 && image.height(frame) > 0 && !image.getTextureForFrame(frame)) {
-			image.getTextureForFrame(frame) = get_backend()->createTextureFromImage(image.getImageForFrame(frame));
+static SpriteGallery build_gallery(const std::string& name, MultiImage images) {
+	// stupid simple atlas-ing, can make this better
+
+	unsigned int total_width = 0;
+	unsigned int max_height = 0;
+	for (const auto& img : images) {
+		total_width += img.width;
+		if (img.height > max_height) {
+			max_height = img.height;
 		}
 	}
+
+	SpriteGallery gallery;
+	gallery.name = name;
+	gallery.texture = get_backend()->createTexture(total_width, max_height);
+
+	unsigned int current_x = 0;
+	for (const auto& img : images) {
+		Rect location{
+			numeric_cast<int32_t>(current_x),
+			0,
+			numeric_cast<int32_t>(img.width),
+			numeric_cast<int32_t>(img.height)};
+		gallery.texture_locations.push_back(location);
+		if (img.width > 0 && img.height > 0) {
+			// Creatures 1 has a few sprites with 0x0 size at end of files
+			get_backend()->updateTexture(gallery.texture, location, img);
+		}
+		current_x += img.width;
+	}
+	return gallery;
 }
 
 void ImageManager::load_default_palette() {
@@ -33,7 +58,7 @@ void ImageManager::load_default_palette() {
 	m_default_palette = ReadPaletteFile(palette_dta_path);
 }
 
-creaturesImage& ImageManager::get_image(std::string name, ImageType allowed_types) {
+const SpriteGallery& ImageManager::get_image(std::string name, ImageType allowed_types) {
 	name = to_ascii_lowercase(name);
 
 	// do we have it loaded already?
@@ -50,24 +75,22 @@ creaturesImage& ImageManager::get_image(std::string name, ImageType allowed_type
 	if (path.empty()) {
 		throw Exception(fmt::format("Couldn't find image {}", repr(name)));
 	}
-	creaturesImage image(name);
-	image.images = ImageUtils::ReadImage(path);
-	if (ImageUtils::IsBackground(image.images)) {
+
+	auto images = ImageUtils::ReadImage(path);
+	if (ImageUtils::IsBackground(images)) {
 		// TODO: I guess do this here? Instead of being explicit?
-		image.images = {ImageUtils::StitchBackground(image.images)};
+		images = {ImageUtils::StitchBackground(images)};
 	}
-	for (auto& i : image.images) {
+	for (auto& i : images) {
 		if (i.format == if_index8 && !i.palette) {
 			i.palette = m_default_palette;
 		}
 	}
-	build_textures(image);
-
-	m_cache[name] = image;
+	m_cache[name] = build_gallery(name, images);
 	return m_cache[name];
 }
 
-creaturesImage ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor) {
+SpriteGallery ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor) {
 	// TODO: cache this?
 
 	fs::path path = g_engine_context.paths->find_path(PATH_TYPE_IMAGE, "charset.dta");
@@ -75,13 +98,8 @@ creaturesImage ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolo
 		throw Exception("Couldn't find charset.dta");
 	}
 
-	creaturesImage image("charset.dta");
-	image.images = ImageUtils::ReadImage(path);
-
-	// TODO: how do the values in the CHARSET.DTA map to actual color values?
-	// just setting them all to the textcolor right now, but the real engines
-	// do some shading/aliasing
-	for (auto& i : image.images) {
+	auto images = ImageUtils::ReadImage(path);
+	for (auto& i : images) {
 		if (i.format != if_index8) {
 			throw Exception("Expected charset.dta to have format if_index8");
 		}
@@ -98,7 +116,6 @@ creaturesImage ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolo
 			}
 		}
 	}
-	build_textures(image);
 
-	return image;
+	return build_gallery("charset.dta", images);
 }

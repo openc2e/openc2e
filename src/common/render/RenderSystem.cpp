@@ -45,28 +45,29 @@ RenderItemHandle RenderSystem::render_item_create(int layer) {
 
 void RenderSystem::render_item_set_position(const RenderItemHandle& handle, float x, float y, int32_t z) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
-		item->x = x;
-		item->y = y;
+		item->dest.x = x;
+		item->dest.y = y;
 		item->z = z;
 	}
 }
 
-void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const Texture& tex) {
+void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const Texture& tex, Rect location) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_TEXTURE;
 		item->tex = tex;
-		item->width = numeric_cast<int32_t>(tex.width);
-		item->height = numeric_cast<int32_t>(tex.height);
+		item->src = location;
+		item->dest.width = location.width;
+		item->dest.height = location.height;
 	}
 }
 
 void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle, float x, float y, float w, float h, uint32_t color) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_RECT;
-		item->x = x;
-		item->y = y;
-		item->width = w;
-		item->height = h;
+		item->dest.x = x;
+		item->dest.y = y;
+		item->dest.width = w;
+		item->dest.height = h;
 		item->color = color;
 	}
 }
@@ -74,10 +75,10 @@ void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle,
 void RenderSystem::render_item_set_line(const RenderItemHandle& handle, float xstart, float ystart, float xend, float yend, uint32_t color) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_LINE;
-		item->x = xstart;
-		item->y = ystart;
-		item->width = xend - xstart;
-		item->height = yend - ystart;
+		item->dest.x = xstart;
+		item->dest.y = ystart;
+		item->dest.width = xend - xstart;
+		item->dest.height = yend - ystart;
 		item->color = color;
 	}
 }
@@ -90,20 +91,24 @@ void RenderSystem::draw() {
 	render_list.reserve(m_render_items.size());
 	for (auto& r : m_render_items) {
 		// TODO: speed up by culling non-visible items, so we don't need to
-		// sort them. won't affect result as SDLBackend already culls draw
-		// calls
+		// sort them and we get a higher likelihood of batching textures. remember
+		// to cull taking world wrap into account
 		render_list.push_back(&r);
 	}
 	std::sort(render_list.begin(), render_list.end(), [](auto* left, auto* right) {
 		// TODO: speed up by caching composite sort key on renderitem, secondly
 		// by including it in this vector to make sort faster
-		// TODO: speed up rendering later by putting items with the same texture
-		// next to each other
 		if (left->layer != right->layer) {
 			return left->layer < right->layer;
 		}
 		if (left->z != right->z) {
 			return left->z < right->z;
+		}
+		if (left->tex != right->tex) {
+			return left->tex < right->tex;
+		}
+		if (left->type != right->type) {
+			return left->type < right->type;
 		}
 		return left < right;
 	});
@@ -131,31 +136,25 @@ void RenderSystem::draw() {
 	const float worldadjust = m_world_wrap_width * xscale;
 
 	for (auto* r : render_list) {
-		float x = r->x * xscale - xadjust;
-		float y = r->y * yscale - yadjust;
-		float w = r->width * xscale;
-		float h = r->height * yscale;
+		float x = r->dest.x * xscale - xadjust;
+		float y = r->dest.y * yscale - yadjust;
+		float w = r->dest.width * xscale;
+		float h = r->dest.height * yscale;
 
 		if (r->type == RENDER_TEXTURE) {
-			Rect src;
-			src.x = 0;
-			src.y = 0;
-			src.width = numeric_cast<int32_t>(r->tex.width);
-			src.height = numeric_cast<int32_t>(r->tex.height);
-
 			RectF dest;
 			dest.x = x;
 			dest.y = y;
 			dest.width = w;
 			dest.height = h;
 
-			renderer->renderTexture(r->tex, src, dest);
+			renderer->renderTexture(r->tex, r->src, dest);
 			if (m_world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
 				dest.x += worldadjust;
-				renderer->renderTexture(r->tex, src, dest);
+				renderer->renderTexture(r->tex, r->src, dest);
 				dest.x -= worldadjust * 2;
-				renderer->renderTexture(r->tex, src, dest);
+				renderer->renderTexture(r->tex, r->src, dest);
 			}
 
 		} else if (r->type == RENDER_RECT) {

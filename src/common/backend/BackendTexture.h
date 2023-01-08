@@ -14,6 +14,18 @@ class Texture {
 		return ptr.get() != nullptr;
 	}
 
+	bool operator==(const Texture& other) const {
+		return ptr == other.ptr;
+	}
+
+	bool operator!=(const Texture& other) const {
+		return !(*this == other);
+	}
+
+	bool operator<(const Texture& other) const {
+		return ptr < other.ptr;
+	}
+
 	template <typename T>
 	T* as() {
 		return reinterpret_cast<T*>(ptr.get());

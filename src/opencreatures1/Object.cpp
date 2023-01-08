@@ -325,14 +325,15 @@ void Object::blackboard_show_word(int32_t word_index) {
 	blackboard_hide_word();
 	for (size_t i = 0; i < word.text.size(); ++i) {
 		const unsigned int frame = static_cast<unsigned char>(to_ascii_uppercase(word.text[i]));
-		const auto texture = blackboard_data->charset_sprite.getTextureForFrame(frame);
 
 		auto renderitem = get_rendersystem()->render_item_create(LAYER_OBJECTS);
-		get_rendersystem()->render_item_set_texture(renderitem, texture);
+		get_rendersystem()->render_item_set_texture(renderitem,
+			blackboard_data->charset_sprite.texture,
+			blackboard_data->charset_sprite.texture_locations[frame]);
 		get_rendersystem()->render_item_set_position(renderitem, x, y, z);
 		blackboard_data->text_render_items[i] = std::move(renderitem);
 
-		x += blackboard_data->charset_sprite.width(frame) + 1;
+		x += blackboard_data->charset_sprite.width(numeric_cast<int32_t>(frame)) + 1;
 	}
 }
 

@@ -2,9 +2,9 @@
 
 
 #include "common/NumericCast.h"
-#include "common/creaturesImage.h"
 #include "common/math/Rect.h"
 #include "common/render/RenderSystem.h"
+#include "opencreatures1/SpriteGallery.h"
 
 #include <fmt/core.h>
 #include <string>
@@ -27,7 +27,7 @@ class Renderable {
 	void set_sprite_index(int sprite_index);
 	int32_t get_sprite_index() const;
 	int32_t frame() const;
-	void set_sprite(creaturesImage sprite);
+	void set_sprite(const SpriteGallery& sprite);
 	std::string get_sprite_name() const;
 
 	bool has_animation() const;
@@ -46,7 +46,7 @@ class Renderable {
 	int object_sprite_base = 0;
 	int part_sprite_base = 0;
 	int sprite_index = 0;
-	creaturesImage sprite;
+	SpriteGallery sprite;
 	bool has_animation_ = false;
 	unsigned int animation_frame = 0; // only if has_animation is true
 	std::string animation_string; // only if has_animation is true
@@ -65,7 +65,7 @@ struct fmt::formatter<Renderable> {
 	auto format(const Renderable& r, FormatContext& ctx) {
 		auto out = format_to(ctx.out(),
 			"<Renderable x={} y={} z={} object_base={} part_base={} index={} sprite={}",
-			r.x, r.y, r.z, r.object_sprite_base, r.part_sprite_base, r.sprite_index, r.sprite.getName());
+			r.x, r.y, r.z, r.object_sprite_base, r.part_sprite_base, r.sprite_index, r.sprite.name);
 		if (r.has_animation()) {
 			return format_to(out, " animation={} anim_index={}>", r.animation_string, r.animation_frame);
 		} else {

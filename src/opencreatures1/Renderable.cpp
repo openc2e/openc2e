@@ -40,7 +40,7 @@ void Renderable::set_object_sprite_base(int object_sprite_base_) {
 void Renderable::set_part_sprite_base(int part_sprite_base_) {
 	part_sprite_base = part_sprite_base_;
 }
-void Renderable::set_sprite(creaturesImage sprite_) {
+void Renderable::set_sprite(const SpriteGallery& sprite_) {
 	sprite = sprite_;
 	update_renderitem();
 }
@@ -61,11 +61,11 @@ int32_t Renderable::frame() const {
 }
 
 int32_t Renderable::width() const {
-	return numeric_cast<int32_t>(sprite.width(numeric_cast<uint32_t>(frame())));
+	return sprite.width(frame());
 }
 
 int32_t Renderable::height() const {
-	return numeric_cast<int32_t>(sprite.height(numeric_cast<uint32_t>(frame())));
+	return sprite.height(frame());
 }
 
 void Renderable::set_animation(unsigned int animation_frame_, std::string animation_string_) {
@@ -117,14 +117,21 @@ int32_t Renderable::get_sprite_index() const {
 }
 
 std::string Renderable::get_sprite_name() const {
-	return sprite.getName();
+	return sprite.name;
 }
 
 
 void Renderable::update_renderitem() {
+	if (!sprite) {
+		renderitem = {};
+		return;
+	}
 	if (!renderitem) {
 		renderitem = get_rendersystem()->render_item_create(LAYER_OBJECTS);
 	}
-	get_rendersystem()->render_item_set_texture(renderitem, sprite.getTextureForFrame(numeric_cast<unsigned int>(frame())));
+
+	get_rendersystem()->render_item_set_texture(renderitem,
+		sprite.texture,
+		sprite.texture_locations[numeric_cast<size_t>(frame())]);
 	get_rendersystem()->render_item_set_position(renderitem, static_cast<float>(x), static_cast<float>(y), z);
 }

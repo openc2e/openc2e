@@ -48,8 +48,7 @@ Future improvements:
 enum LayerIndex : int32_t {
 	LAYER_BACKGROUND,
 	LAYER_OBJECTS,
-	LAYER_ROOMS,
-	LAYER_UI
+	LAYER_DEBUG
 };
 
 class RenderSystem {
@@ -62,10 +61,8 @@ class RenderSystem {
 	};
 	struct RenderItem {
 		int32_t layer = 0;
-		float x = 0;
-		float y = 0;
-		float width = 0;
-		float height = 0;
+		Rect src{};
+		RectF dest{};
 		int32_t z = 0;
 		RenderItemType type = RENDER_NONE;
 		uint32_t color = 0;
@@ -91,7 +88,7 @@ class RenderSystem {
 	RenderItemHandle render_item_create(int layer = 0);
 
 	void render_item_set_position(const RenderItemHandle& key, float x, float y, int32_t z);
-	void render_item_set_texture(const RenderItemHandle& key, const Texture& tex);
+	void render_item_set_texture(const RenderItemHandle& key, const Texture& tex, Rect location);
 	void render_item_set_unfilled_rect(const RenderItemHandle& key, float x, float y, float w, float h, uint32_t color);
 	void render_item_set_line(const RenderItemHandle& key, float xstart, float ystart, float xend, float yend, uint32_t color);
 
