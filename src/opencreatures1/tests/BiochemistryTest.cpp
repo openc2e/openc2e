@@ -76,7 +76,7 @@ TEST(Biochemistry, reaction) {
 	// p1 = 0 + 13 * 4 = 52
 	// p2 = 0 + 13 * 8 = 104
 
-	ChemicalData chemicals;
+	ChemicalStates chemicals;
 	chemicals[58].concentration = 153;
 	chemicals[58].decay = 248;
 	chemicals[61].concentration = 74;

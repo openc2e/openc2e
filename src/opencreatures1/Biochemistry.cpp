@@ -74,7 +74,7 @@ const float MULTIPLIERS[32] = {
 
 uint8_t decay_chemical(uint8_t concentration, uint8_t rate, uint32_t current_biotick) {
 	// TODO: this might be faster to keep in the header so the compiler can inline it
-	// TODO: move rate into the ChemicalData itself, and only serialize as 0-255 ?
+	// TODO: move shifted rate into the ChemicalState itself, and only serialize as 0-255 ?
 	rate >>= 3;
 
 	auto every = EVERY[rate];
@@ -84,7 +84,7 @@ uint8_t decay_chemical(uint8_t concentration, uint8_t rate, uint32_t current_bio
 	return concentration;
 }
 
-void run_chemical_reaction(ChemicalData& chemicals, const ChemicalReaction& rxn, uint32_t current_biotick) {
+void run_chemical_reaction(ChemicalStates& chemicals, const ChemicalReaction& rxn, uint32_t current_biotick) {
 	uint8_t availability = 255;
 	if (rxn.r1_chem != 0 && rxn.r1_prop != 0) {
 		availability = chemicals[rxn.r1_chem].concentration / rxn.r1_prop;

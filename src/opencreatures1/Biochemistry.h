@@ -3,12 +3,12 @@
 #include <array>
 #include <stdint.h>
 
-struct Chemical {
+struct ChemicalState {
 	uint8_t concentration = 0;
 	uint8_t decay = 0;
 };
 
-using ChemicalData = std::array<Chemical, 256>;
+using ChemicalStates = std::array<ChemicalState, 256>;
 
 struct ChemicalReaction {
 	uint8_t r1_prop = 0;
@@ -23,4 +23,4 @@ struct ChemicalReaction {
 };
 
 uint8_t decay_chemical(uint8_t concentration, uint8_t rate, uint32_t current_biotick);
-void run_chemical_reaction(ChemicalData& chemicals, const ChemicalReaction& rxn, uint32_t current_biotick);
+void run_chemical_reaction(ChemicalStates& chemicals, const ChemicalReaction& rxn, uint32_t current_biotick);

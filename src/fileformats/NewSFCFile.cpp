@@ -97,4 +97,36 @@ SFCFile read_sfc_v1_file(std::istream& in) {
 	return sfc;
 }
 
+EXPFile read_exp_v1_file(const std::string& path) {
+	std::ifstream in(path, std::ios_base::binary);
+	return read_exp_v1_file(in);
+}
+
+EXPFile read_exp_v1_file(std::istream& in) {
+	// set up types
+	MFCReader reader(in);
+	reader.register_class<CGalleryV1>("CGallery", 1);
+	reader.register_class<BodyV1>("Body", 1);
+	reader.register_class<LimbV1>("Limb", 1);
+	reader.register_class<CBrainV1>("CBrain", 1);
+	reader.register_class<CBiochemistryV1>("CBiochemistry", 1);
+	reader.register_class<CInstinctV1>("CInstinct", 1);
+	reader.register_class<CreatureV1>("Creature", 1);
+	reader.register_class<CGenomeV1>("CGenome", 1);
+
+	// read file
+	EXPFile exp;
+	exp.creature = reader.read_type<CreatureV1>();
+	exp.genome = reader.read_type<CGenomeV1>();
+
+	if (exp.creature->zygote != std::string("\0\0\0\0", 4)) {
+		exp.child_genome = reader.read_type<CGenomeV1>();
+	} else {
+		exp.child_genome = nullptr;
+	}
+
+	exp.mfc_objects = reader.release_objects();
+	return exp;
+}
+
 } // namespace sfc

@@ -382,6 +382,9 @@ target_link_libraries(cobdumper openc2e_core)
 add_executable(creaturesarchivedumper src/tools/creaturesarchivedumper.cpp)
 target_link_libraries(creaturesarchivedumper openc2e-common fmt ghc_filesystem z)
 
+add_executable(expdumper src/tools/expdumper.cpp)
+target_link_libraries(expdumper openc2e-fileformats fmt ghc_filesystem)
+
 add_executable(mngdumper src/tools/mngdumper.cpp)
 target_link_libraries(mngdumper fmt ghc_filesystem openc2e-fileformats)
 

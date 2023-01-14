@@ -28,6 +28,7 @@ class MFCReader {
 	std::string read_ascii(size_t n);
 	std::string read_ascii_nullterminated(size_t n);
 	std::string read_ascii_mfcstring();
+	void read_exact(uint8_t* out, size_t n);
 	uint8_t read8();
 	int8_t reads8();
 	uint16_t read16le();

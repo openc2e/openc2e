@@ -61,6 +61,13 @@ std::string MFCReader::read_ascii_mfcstring() {
 	return read_ascii(length);
 }
 
+void MFCReader::read_exact(uint8_t* out, size_t n) {
+	m_in.read(reinterpret_cast<char*>(out), n);
+	if (!m_in) {
+		throw Exception(fmt::format("Could only read {} out of {} bytes", m_in.gcount(), n));
+	}
+}
+
 uint8_t MFCReader::read8() {
 	return ::read8(m_in);
 }
