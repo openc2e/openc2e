@@ -33,7 +33,29 @@ std::string MFCReader::read_ascii(size_t n) {
 	return val;
 }
 
-std::string MFCReader::read_ascii_nullterminated(size_t n) {
+void MFCReader::ascii_dword(std::string& out) {
+	out = read_ascii(4);
+	if (out == std::string("\0\0\0\0", 4)) {
+		out = {};
+	}
+	auto first_nul = out.find('\0');
+	if (first_nul != std::string::npos) {
+		throw Exception(fmt::format("Expected ASCII 4-byte string, got \"{}\"", out));
+	}
+}
+
+void MFCReader::ascii_mfcstring(std::string& out) {
+	uint32_t length = ::read8(m_in);
+	if (length == 0xFF) {
+		length = ::read16le(m_in);
+	}
+	if (length == 0xFFFF) {
+		length = ::read32le(m_in);
+	}
+	out = read_ascii(length);
+}
+
+void MFCReader::ascii_nullterminated(std::string& out, size_t n) {
 	std::string val(n, '\0');
 	m_in.read(&val[0], n);
 
@@ -46,74 +68,77 @@ std::string MFCReader::read_ascii_nullterminated(size_t n) {
 		// TODO: debug representation?
 		throw std::domain_error(fmt::format("Invalid ASCII string: '{}'", val));
 	}
-	return val;
+	out = val;
 }
 
-std::string MFCReader::read_ascii_mfcstring() {
-	uint32_t length = read8();
-	if (length == 0xFF) {
-		length = read16le();
-	}
-	if (length == 0xFFFF) {
-		length = read32le();
-	}
-
-	return read_ascii(length);
+void MFCReader::size_u8(ResizableContainerView out) {
+	out.resize(::read8(m_in));
 }
 
-void MFCReader::read_exact(uint8_t* out, size_t n) {
-	m_in.read(reinterpret_cast<char*>(out), n);
-	if (!m_in) {
-		throw Exception(fmt::format("Could only read {} out of {} bytes", m_in.gcount(), n));
-	}
+void MFCReader::size_u16(ResizableContainerView out) {
+	out.resize(::read16le(m_in));
 }
 
-uint8_t MFCReader::read8() {
-	return ::read8(m_in);
+void MFCReader::size_u32(ResizableContainerView out) {
+	out.resize(::read32le(m_in));
 }
 
-int8_t MFCReader::reads8() {
-	uint8_t value = read8();
+void MFCReader::operator()(uint8_t& out) {
+	out = ::read8(m_in);
+}
+
+void MFCReader::operator()(int8_t& out) {
+	uint8_t value = ::read8(m_in);
 	if (value <= INT8_MAX) {
-		return static_cast<int8_t>(value);
+		out = static_cast<int8_t>(value);
+	} else {
+		out = static_cast<int8_t>(value - INT8_MIN) + INT8_MIN;
 	}
-	return static_cast<int8_t>(value - INT8_MIN) + INT8_MIN;
 }
 
-uint16_t MFCReader::read16le() {
-	return ::read16le(m_in);
+void MFCReader::operator()(uint16_t& out) {
+	out = ::read16le(m_in);
 }
 
-int16_t MFCReader::reads16le() {
-	uint16_t value = read16le();
+void MFCReader::operator()(int16_t& out) {
+	uint16_t value = ::read16le(m_in);
 	if (value <= INT16_MAX) {
-		return static_cast<int16_t>(value);
+		out = static_cast<int16_t>(value);
+	} else {
+		out = static_cast<int16_t>(value - INT16_MIN) + INT16_MIN;
 	}
-	return static_cast<int16_t>(value - INT16_MIN) + INT16_MIN;
 }
 
-uint32_t MFCReader::read32le() {
-	return ::read32le(m_in);
+void MFCReader::operator()(uint32_t& out) {
+	out = ::read32le(m_in);
 }
 
-int32_t MFCReader::reads32le() {
-	uint32_t value = read32le();
+void MFCReader::operator()(int32_t& out) {
+	uint32_t value = ::read32le(m_in);
 	if (value <= INT32_MAX) {
-		return static_cast<int32_t>(value);
+		out = static_cast<int32_t>(value);
+	} else {
+		out = static_cast<int32_t>(value - INT32_MIN) + INT32_MIN;
 	}
-	return static_cast<int32_t>(value - INT32_MIN) + INT32_MIN;
+}
+
+void MFCReader::operator()(std::vector<uint8_t>& out) {
+	m_in.read(reinterpret_cast<char*>(out.data()), out.size());
+	if (!m_in) {
+		throw Exception(fmt::format("Could only read {} out of {} bytes", m_in.gcount(), out.size()));
+	}
 }
 
 MFCObject* MFCReader::read_object() {
-	uint16_t pid = read16le();
+	uint16_t pid = ::read16le(m_in);
 	if (pid == 0x7FFF) {
 		// 32-bit PIDs
 		throw Exception("32-bit ID support is not implemented");
 
 	} else if (pid == 0xFFFF) {
 		// new object of a new class
-		int schema_number = read16le();
-		int name_length = read16le();
+		int schema_number = ::read16le(m_in);
+		int name_length = ::read16le(m_in);
 		std::string name = read_ascii(name_length);
 
 		auto it = m_classregistry.find(std::make_pair(name, schema_number));

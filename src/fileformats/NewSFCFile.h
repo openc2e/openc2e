@@ -26,20 +26,18 @@ struct CGalleryV1 {
 	int32_t refcount;
 	std::vector<ImageV1> images;
 
-	void read_from(MFCReader& in) {
-		uint32_t num_images = in.read32le();
-		filename = in.read_ascii(4);
-		first_sprite = in.reads32le();
-		refcount = in.reads32le();
+	void serialize(MFCReader& in) {
+		in.size_u32(images);
+		in.ascii_dword(filename);
+		in(first_sprite);
+		in(refcount);
 
-		for (size_t i = 0; i < num_images; ++i) {
-			ImageV1 image;
-			image.parent = in.read_type<CGalleryV1>();
-			image.status = in.read8();
-			image.width = in.read32le();
-			image.height = in.read32le();
-			image.offset = in.read32le();
-			images.push_back(image);
+		for (auto& image : images) {
+			in(image.parent);
+			in(image.status);
+			in(image.width);
+			in(image.height);
+			in(image.offset);
 		}
 	}
 };
@@ -74,34 +72,31 @@ struct MapDataV1 {
 	std::array<uint32_t, 261> groundlevel;
 	std::array<BacteriumV1, 100> bacteria;
 
-	void read_from(MFCReader& in) {
-		unused_is_wrappable = in.read32le();
-		time_of_day = in.read32le();
+	void serialize(MFCReader& in) {
+		in(unused_is_wrappable);
+		in(time_of_day);
+		in(background);
 
-		background = in.read_type<CGalleryV1>();
-
-		uint32_t num_rooms = in.read32le();
-		for (size_t i = 0; i < num_rooms; ++i) {
-			RoomV1 room;
-			room.left = in.reads32le();
-			room.top = in.reads32le();
-			room.right = in.reads32le();
-			room.bottom = in.reads32le();
-			room.type = in.reads32le();
-			rooms.push_back(room);
+		in.size_u32(rooms);
+		for (auto& room : rooms) {
+			in(room.left);
+			in(room.top);
+			in(room.right);
+			in(room.bottom);
+			in(room.type);
 		}
-		for (size_t i = 0; i < 261; ++i) {
-			groundlevel[i] = in.read32le();
+		for (auto& g : groundlevel) {
+			in(g);
 		}
-		for (size_t i = 0; i < 100; ++i) {
-			bacteria[i].state = in.read8();
-			bacteria[i].antigen = in.read8();
-			bacteria[i].fatal_level = in.read8();
-			bacteria[i].infect_level = in.read8();
-			bacteria[i].toxin1 = in.read8();
-			bacteria[i].toxin2 = in.read8();
-			bacteria[i].toxin3 = in.read8();
-			bacteria[i].toxin4 = in.read8();
+		for (auto& b : bacteria) {
+			in(b.state);
+			in(b.antigen);
+			in(b.fatal_level);
+			in(b.infect_level);
+			in(b.toxin1);
+			in(b.toxin2);
+			in(b.toxin3);
+			in(b.toxin4);
 		}
 	}
 };
@@ -117,18 +112,18 @@ struct EntityV1 {
 	uint8_t animation_frame; // only if has_animation is true
 	std::string animation_string; // only if has_animation is true
 
-	void read_from(MFCReader& in) {
-		sprite = in.read_type<CGalleryV1>();
-		current_sprite = in.read8();
-		image_offset = in.read8();
-		z_order = in.reads32le();
-		x = in.reads32le();
-		y = in.reads32le();
-		has_animation = in.read8();
+	void serialize(MFCReader& in) {
+		in(sprite);
+		in(current_sprite);
+		in(image_offset);
+		in(z_order);
+		in(x);
+		in(y);
+		in(has_animation);
 		if (has_animation) {
-			animation_frame = in.read8();
+			in(animation_frame);
 			// TODO: Assert real animation string?
-			animation_string = in.read_ascii_nullterminated(32);
+			in.ascii_nullterminated(animation_string, 32);
 		}
 	}
 };
@@ -142,18 +137,18 @@ struct ScriptV1 {
 	uint8_t family;
 	std::string text;
 
-	void read_from(MFCReader& in) {
-		eventno = in.read8();
-		species = in.read8();
-		genus = in.read8();
-		family = in.read8();
-		text = in.read_ascii_mfcstring();
+	void serialize(MFCReader& in) {
+		in(eventno);
+		in(species);
+		in(genus);
+		in(family);
+		in.ascii_mfcstring(text);
 	}
 };
 
 
 struct ObjectV1 {
-	virtual ~ObjectV1(){};
+	virtual ~ObjectV1() {}
 
 	uint8_t species;
 	uint8_t genus;
@@ -176,32 +171,32 @@ struct ObjectV1 {
 	int32_t obv2;
 	std::vector<ScriptV1> scripts;
 
-	void read_from(MFCReader& in) {
-		(void)in.read8(); // eventno, unused
-		species = in.read8();
-		genus = in.read8();
-		family = in.read8();
-		movement_status = in.read8();
-		attr = in.read8();
-		limit_left = in.reads32le();
-		limit_top = in.reads32le();
-		limit_right = in.reads32le();
-		limit_bottom = in.reads32le();
-		carrier = in.read_type<ObjectV1>();
-		actv = in.read8();
-		sprite = in.read_type<CGalleryV1>();
-		tick_value = in.reads32le();
-		ticks_since_last_tick_event = in.reads32le();
-		objp = in.read_type<ObjectV1>();
-		current_sound = in.read_ascii_nullterminated(4);
-		obv0 = in.reads32le();
-		obv1 = in.reads32le();
-		obv2 = in.reads32le();
-		uint32_t num_scripts = in.read32le();
-		for (size_t i = 0; i < num_scripts; ++i) {
-			ScriptV1 script;
-			script.read_from(in);
-			scripts.push_back(script);
+	void serialize(MFCReader& in) {
+		uint8_t unused_eventno = 0;
+		in(unused_eventno);
+
+		in(species);
+		in(genus);
+		in(family);
+		in(movement_status);
+		in(attr);
+		in(limit_left);
+		in(limit_top);
+		in(limit_right);
+		in(limit_bottom);
+		in(carrier);
+		in(actv);
+		in(sprite);
+		in(tick_value);
+		in(ticks_since_last_tick_event);
+		in(objp);
+		in.ascii_dword(current_sound);
+		in(obv0);
+		in(obv1);
+		in(obv2);
+		in.size_u32(scripts);
+		for (auto& s : scripts) {
+			s.serialize(in);
 		}
 	}
 };
@@ -212,29 +207,29 @@ struct SimpleObjectV1 : ObjectV1 {
 	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
-	void read_from(MFCReader& in) {
-		ObjectV1::read_from(in);
+	void serialize(MFCReader& in) {
+		ObjectV1::serialize(in);
 
-		part = in.read_type<EntityV1>();
-		z_order = in.reads32le();
-		click_bhvr[0] = in.reads8();
-		click_bhvr[1] = in.reads8();
-		click_bhvr[2] = in.reads8();
-		touch_bhvr = in.read8();
+		in(part);
+		in(z_order);
+		in(click_bhvr[0]);
+		in(click_bhvr[1]);
+		in(click_bhvr[2]);
+		in(touch_bhvr);
 	}
 };
 
 struct BubbleV1 : SimpleObjectV1 {
 	uint8_t life;
-	int32_t creator;
+	ObjectV1* creator;
 	std::string text;
 
-	void read_from(MFCReader& in) {
-		SimpleObjectV1::read_from(in);
+	void serialize(MFCReader& in) {
+		SimpleObjectV1::serialize(in);
 
-		life = in.read8();
-		creator = in.reads32le(); // ???
-		text = in.read_ascii_nullterminated(25);
+		in(life);
+		in(creator); // ???
+		in.ascii_nullterminated(text, 25);
 	}
 };
 
@@ -244,13 +239,13 @@ struct PointerToolV1 : SimpleObjectV1 {
 	BubbleV1* bubble;
 	std::string text;
 
-	void read_from(MFCReader& in) {
-		SimpleObjectV1::read_from(in);
+	void serialize(MFCReader& in) {
+		SimpleObjectV1::serialize(in);
 
-		relx = in.reads32le();
-		rely = in.reads32le();
-		bubble = in.read_type<BubbleV1>();
-		text = in.read_ascii_nullterminated(25);
+		in(relx);
+		in(rely);
+		in(bubble);
+		in.ascii_nullterminated(text, 25);
 	}
 };
 
@@ -274,28 +269,26 @@ struct CompoundObjectV1 : ObjectV1 {
 	std::array<HotSpotV1, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 
-	void read_from(MFCReader& in) {
-		ObjectV1::read_from(in);
+	void serialize(MFCReader& in) {
+		ObjectV1::serialize(in);
 
-		uint32_t num_parts = in.read32le();
-		for (size_t i = 0; i < num_parts; ++i) {
-			CompoundPartV1 part;
-			part.entity = in.read_type<EntityV1>();
+		in.size_u32(parts);
+		for (auto& part : parts) {
+			in(part.entity);
 			if (part.entity == nullptr) {
 				throw Exception("whoops, entity is null");
 			}
-			part.x = in.reads32le();
-			part.y = in.reads32le();
-			parts.push_back(part);
+			in(part.x);
+			in(part.y);
 		}
-		for (size_t i = 0; i < 6; ++i) {
-			hotspots[i].left = in.reads32le();
-			hotspots[i].top = in.reads32le();
-			hotspots[i].right = in.reads32le();
-			hotspots[i].bottom = in.reads32le();
+		for (auto& h : hotspots) {
+			in(h.left);
+			in(h.top);
+			in(h.right);
+			in(h.bottom);
 		}
-		for (size_t i = 0; i < 6; ++i) {
-			functions_to_hotspots[i] = in.reads32le();
+		for (auto& f : functions_to_hotspots) {
+			in(f);
 		}
 	}
 };
@@ -311,17 +304,17 @@ struct VehicleV1 : CompoundObjectV1 {
 	int32_t cabin_bottom;
 	uint32_t bump;
 
-	void read_from(MFCReader& in) {
-		CompoundObjectV1::read_from(in);
-		xvel_times_256 = in.reads32le();
-		yvel_times_256 = in.reads32le();
-		x_times_256 = in.reads32le();
-		y_times_256 = in.reads32le();
-		cabin_left = in.reads32le();
-		cabin_top = in.reads32le();
-		cabin_right = in.reads32le();
-		cabin_bottom = in.reads32le();
-		bump = in.read32le();
+	void serialize(MFCReader& in) {
+		CompoundObjectV1::serialize(in);
+		in(xvel_times_256);
+		in(yvel_times_256);
+		in(x_times_256);
+		in(y_times_256);
+		in(cabin_left);
+		in(cabin_top);
+		in(cabin_right);
+		in(cabin_bottom);
+		in(bump);
 	}
 };
 
@@ -339,16 +332,16 @@ struct BlackboardV1 : CompoundObjectV1 {
 	int8_t text_y_position;
 	std::array<BlackboardWord, 16> words;
 
-	void read_from(MFCReader& in) {
-		CompoundObjectV1::read_from(in);
-		background_color = in.read8();
-		chalk_color = in.read8();
-		alias_color = in.read8();
-		text_x_position = in.reads8();
-		text_y_position = in.reads8();
-		for (size_t i = 0; i < 16; ++i) {
-			words[i].value = in.read32le();
-			words[i].text = in.read_ascii_nullterminated(11);
+	void serialize(MFCReader& in) {
+		CompoundObjectV1::serialize(in);
+		in(background_color);
+		in(chalk_color);
+		in(alias_color);
+		in(text_x_position);
+		in(text_y_position);
+		for (auto& w : words) {
+			in(w.value);
+			in.ascii_nullterminated(w.text, 11);
 		}
 	}
 };
@@ -367,15 +360,15 @@ struct LiftV1 : VehicleV1 {
 	uint8_t delay_counter;
 	std::array<LiftFloor, 8> floors;
 
-	void read_from(MFCReader& in) {
-		VehicleV1::read_from(in);
-		num_floors = in.reads32le();
-		next_or_current_floor = in.reads32le();
-		current_call_button = in.reads32le();
-		delay_counter = in.read8();
-		for (size_t i = 0; i < 8; ++i) {
-			floors[i].y = in.reads32le();
-			floors[i].call_button = in.read_type<CallButtonV1>();
+	void serialize(MFCReader& in) {
+		VehicleV1::serialize(in);
+		in(num_floors);
+		in(next_or_current_floor);
+		in(current_call_button);
+		in(delay_counter);
+		for (auto& f : floors) {
+			in(f.y);
+			in(f.call_button);
 		}
 	}
 };
@@ -384,19 +377,19 @@ struct CallButtonV1 : SimpleObjectV1 {
 	LiftV1* lift;
 	uint8_t floor;
 
-	void read_from(MFCReader& in) {
-		SimpleObjectV1::read_from(in);
-		lift = in.read_type<LiftV1>();
-		floor = in.read8();
+	void serialize(MFCReader& in) {
+		SimpleObjectV1::serialize(in);
+		in(lift);
+		in(floor);
 	}
 };
 
 struct SceneryV1 : ObjectV1 {
 	EntityV1* part;
 
-	void read_from(MFCReader& in) {
-		ObjectV1::read_from(in);
-		part = in.read_type<EntityV1>();
+	void serialize(MFCReader& in) {
+		ObjectV1::serialize(in);
+		in(part);
 	}
 };
 
@@ -419,28 +412,28 @@ struct MacroV1 {
 	uint32_t subroutine_address;
 	int32_t wait;
 
-	void read_from(MFCReader& in) {
-		selfdestruct = in.read32le();
-		inst = in.read32le();
-		script_length_maybe = in.read32le();
-		script = in.read_ascii_mfcstring();
-		ip = in.read32le();
-		for (size_t i = 0; i < 20; ++i) {
-			stack[i] = in.reads32le();
+	void serialize(MFCReader& in) {
+		in(selfdestruct);
+		in(inst);
+		in(script_length_maybe);
+		in.ascii_mfcstring(script);
+		in(ip);
+		for (auto& s : stack) {
+			in(s);
 		}
-		sp = in.read32le();
-		for (size_t i = 0; i < 10; ++i) {
-			vars[i] = in.reads32le();
+		in(sp);
+		for (auto& v : vars) {
+			in(v);
 		}
-		ownr = in.read_type<ObjectV1>();
-		from = in.read_type<ObjectV1>();
-		exec = in.read_type<ObjectV1>();
-		targ = in.read_type<ObjectV1>();
-		_it_ = in.read_type<ObjectV1>();
-		part = in.reads32le();
-		subroutine_label = in.read_ascii(4);
-		subroutine_address = in.read32le();
-		wait = in.reads32le();
+		in(ownr);
+		in(from);
+		in(exec);
+		in(targ);
+		in(_it_);
+		in(part);
+		in.ascii_dword(subroutine_label);
+		in(subroutine_address);
+		in(wait);
 	}
 };
 
@@ -448,10 +441,10 @@ struct BodyPartV1 : EntityV1 {
 	uint32_t angle;
 	uint32_t view;
 
-	void read_from(MFCReader& in) {
-		EntityV1::read_from(in);
-		angle = in.read32le();
-		view = in.read32le();
+	void serialize(MFCReader& in) {
+		EntityV1::serialize(in);
+		in(angle);
+		in(view);
 	}
 };
 
@@ -463,12 +456,12 @@ struct PositionU8 {
 struct BodyV1 : BodyPartV1 {
 	std::array<std::array<PositionU8, 10>, 6> body_data;
 
-	void read_from(MFCReader& in) {
-		BodyPartV1::read_from(in);
+	void serialize(MFCReader& in) {
+		BodyPartV1::serialize(in);
 		for (auto& pose : body_data) {
 			for (auto& coords : pose) {
-				coords.x = in.read8();
-				coords.y = in.read8();
+				in(coords.x);
+				in(coords.y);
 			}
 		}
 	}
@@ -485,15 +478,15 @@ struct LimbV1 : BodyPartV1 {
 	std::array<LimbData, 10> limb_data;
 	LimbV1* next = nullptr;
 
-	void read_from(MFCReader& in) {
-		BodyPartV1::read_from(in);
+	void serialize(MFCReader& in) {
+		BodyPartV1::serialize(in);
 		for (auto& l : limb_data) {
-			l.startx = in.read8();
-			l.starty = in.read8();
-			l.endx = in.read8();
-			l.endy = in.read8();
+			in(l.startx);
+			in(l.starty);
+			in(l.endx);
+			in(l.endy);
 		}
-		next = in.read_type<LimbV1>();
+		in(next);
 	}
 };
 
@@ -548,33 +541,33 @@ struct DendriteTypeV1 {
 	std::array<uint8_t, 10> suscept_svrule;
 	std::array<uint8_t, 10> reinforce_svrule;
 
-	void read_from(MFCReader& in) {
-		source_lobe = in.read32le();
-		min = in.read8();
-		max = in.read8();
-		spread = in.read8();
-		fanout = in.read8();
-		min_ltw = in.read8();
-		max_ltw = in.read8();
-		min_strength = in.read8();
-		max_strength = in.read8();
-		migration = in.read8();
-		relax_suscept = in.read8();
-		relax_stw = in.read8();
-		ltw_gain_rate = in.read8();
-		gain_rate = in.read8();
-		lose_rate = in.read8();
+	void serialize(MFCReader& in) {
+		in(source_lobe);
+		in(min);
+		in(max);
+		in(spread);
+		in(fanout);
+		in(min_ltw);
+		in(max_ltw);
+		in(min_strength);
+		in(max_strength);
+		in(migration);
+		in(relax_suscept);
+		in(relax_stw);
+		in(ltw_gain_rate);
+		in(gain_rate);
+		in(lose_rate);
 		for (auto& i : gain_svrule) {
-			i = in.read8();
+			in(i);
 		}
 		for (auto& i : lose_svrule) {
-			i = in.read8();
+			in(i);
 		}
 		for (auto& i : suscept_svrule) {
-			i = in.read8();
+			in(i);
 		}
 		for (auto& i : reinforce_svrule) {
-			i = in.read8();
+			in(i);
 		}
 	}
 };
@@ -599,28 +592,28 @@ struct LobeV1 {
 	uint32_t num_neurons;
 	uint32_t num_dendrites;
 
-	void read_from(MFCReader& in) {
-		x = in.read32le();
-		y = in.read32le();
-		width = in.read32le();
-		height = in.read32le();
-		perceptible = in.read32le();
-		activity = in.read8();
+	void serialize(MFCReader& in) {
+		in(x);
+		in(y);
+		in(width);
+		in(height);
+		in(perceptible);
+		in(activity);
 		for (auto& c : chemicals) {
-			c = in.read8();
+			in(c);
 		}
-		threshold = in.read8();
-		leakage = in.read8();
-		reststate = in.read8();
-		inputgain = in.read8();
+		in(threshold);
+		in(leakage);
+		in(reststate);
+		in(inputgain);
 		for (auto& sv : svrule) {
-			sv = in.read8();
+			in(sv);
 		}
-		flags = in.read8();
-		d0_type.read_from(in);
-		d1_type.read_from(in);
-		num_neurons = in.read32le();
-		num_dendrites = in.read32le();
+		in(flags);
+		d0_type.serialize(in);
+		d1_type.serialize(in);
+		in(num_neurons);
+		in(num_dendrites);
 	}
 };
 
@@ -634,14 +627,14 @@ struct DendriteV1 {
 	uint8_t ltw;
 	uint8_t strength;
 
-	void read_from(MFCReader& in) {
-		source_index = in.read32le();
-		home_x = in.read8();
-		home_y = in.read8();
-		suscept = in.read8();
-		stw = in.read8();
-		ltw = in.read8();
-		strength = in.read8();
+	void serialize(MFCReader& in) {
+		in(source_index);
+		in(home_x);
+		in(home_y);
+		in(suscept);
+		in(stw);
+		in(ltw);
+		in(strength);
 	}
 };
 
@@ -658,24 +651,22 @@ struct NeuronV1 {
 	uint32_t dendrite1_index;
 	std::vector<DendriteV1> dendrites1;
 
-	void read_from(MFCReader& in) {
-		x = in.read8();
-		y = in.read8();
-		output = in.read8();
-		state = in.read8();
-		wta_disable = in.read8();
-		exclusive = in.read8();
-		uint8_t dendrites0_size = in.read8();
-		dendrite0_index = in.read32le();
-		dendrites0.resize(dendrites0_size);
+	void serialize(MFCReader& in) {
+		in(x);
+		in(y);
+		in(output);
+		in(state);
+		in(wta_disable);
+		in(exclusive);
+		in.size_u8(dendrites0);
+		in(dendrite0_index);
 		for (auto& d : dendrites0) {
-			d.read_from(in);
+			d.serialize(in);
 		}
-		uint8_t dendrites1_size = in.read8();
-		dendrite1_index = in.read32le();
-		dendrites1.resize(dendrites1_size);
+		in.size_u8(dendrites1);
+		in(dendrite1_index);
 		for (auto& d : dendrites1) {
-			d.read_from(in);
+			d.serialize(in);
 		}
 	}
 };
@@ -684,15 +675,14 @@ struct CBrainV1 {
 	std::vector<LobeV1> lobes;
 	std::vector<NeuronV1> neurons;
 
-	void read_from(MFCReader& in) {
-		uint32_t num_lobes = in.read32le();
-		lobes.resize(num_lobes);
+	void serialize(MFCReader& in) {
+		in.size_u32(lobes);
 		for (auto& l : lobes) {
-			l.read_from(in);
+			l.serialize(in);
 			neurons.resize(neurons.size() + l.num_neurons);
 		}
 		for (auto& n : neurons) {
-			n.read_from(in);
+			n.serialize(in);
 		}
 	}
 };
@@ -716,15 +706,15 @@ struct EmitterV1 {
 	uint8_t gain;
 	uint8_t effect;
 
-	void read_from(MFCReader& in) {
-		organ = in.read8();
-		tissue = in.read8();
-		locus = in.read8();
-		chemical = in.read8();
-		threshold = in.read8();
-		rate = in.read8();
-		gain = in.read8();
-		effect = in.read8();
+	void serialize(MFCReader& in) {
+		in(organ);
+		in(tissue);
+		in(locus);
+		in(chemical);
+		in(threshold);
+		in(rate);
+		in(gain);
+		in(effect);
 	}
 };
 
@@ -739,15 +729,15 @@ struct ReceptorV1 {
 	uint8_t gain;
 	uint8_t effect;
 
-	void read_from(MFCReader& in) {
-		organ = in.read8();
-		tissue = in.read8();
-		locus = in.read8();
-		chemical = in.read8();
-		threshold = in.read8();
-		nominal = in.read8();
-		gain = in.read8();
-		effect = in.read8();
+	void serialize(MFCReader& in) {
+		in(organ);
+		in(tissue);
+		in(locus);
+		in(chemical);
+		in(threshold);
+		in(nominal);
+		in(gain);
+		in(effect);
 	}
 };
 
@@ -763,16 +753,16 @@ struct ReactionV1 {
 	uint8_t p2_amount;
 	uint8_t p2_chem;
 
-	void read_from(MFCReader& in) {
-		r1_amount = in.read8();
-		r1_chem = in.read8();
-		r2_amount = in.read8();
-		r2_chem = in.read8();
-		rate = in.read8();
-		p1_amount = in.read8();
-		p1_chem = in.read8();
-		p2_amount = in.read8();
-		p2_chem = in.read8();
+	void serialize(MFCReader& in) {
+		in(r1_amount);
+		in(r1_chem);
+		in(r2_amount);
+		in(r2_chem);
+		in(rate);
+		in(p1_amount);
+		in(p1_chem);
+		in(p2_amount);
+		in(p2_chem);
 	}
 };
 
@@ -783,23 +773,23 @@ struct CBiochemistryV1 {
 	std::vector<ReceptorV1> receptors;
 	std::vector<ReactionV1> reactions;
 
-	void read_from(MFCReader& in) {
-		owner = in.read_type<CreatureV1>();
-		emitters.resize(in.read32le());
-		receptors.resize(in.read32le());
-		reactions.resize(in.read32le());
+	void serialize(MFCReader& in) {
+		in(owner);
+		in.size_u32(emitters);
+		in.size_u32(receptors);
+		in.size_u32(reactions);
 		for (auto& c : chemicals) {
-			c.concentration = in.read8();
-			c.decay = in.read8();
+			in(c.concentration);
+			in(c.decay);
 		}
 		for (auto& e : emitters) {
-			e.read_from(in);
+			e.serialize(in);
 		}
 		for (auto& r : receptors) {
-			r.read_from(in);
+			r.serialize(in);
 		}
 		for (auto& r : reactions) {
-			r.read_from(in);
+			r.serialize(in);
 		}
 	}
 };
@@ -817,15 +807,15 @@ struct CInstinctV1 {
 	uint32_t reinforcement_amount;
 	uint32_t phase;
 
-	void read_from(MFCReader& in) {
+	void serialize(MFCReader& in) {
 		for (auto& d : dendrites) {
-			d.lobe = in.read32le();
-			d.cell = in.read32le();
+			in(d.lobe);
+			in(d.cell);
 		}
-		motor_decision = in.read32le();
-		reinforcement_chemical = in.read32le();
-		reinforcement_amount = in.read32le();
-		phase = in.read32le();
+		in(motor_decision);
+		in(reinforcement_chemical);
+		in(reinforcement_amount);
+		in(phase);
 	}
 };
 
@@ -886,101 +876,100 @@ struct CreatureV1 : ObjectV1 {
 	std::string history_owner_address;
 	std::string history_owner_email;
 
-	void read_from(MFCReader& in) {
-		ObjectV1::read_from(in);
-		moniker = in.read_ascii(4);
-		mother = in.read_ascii(4);
-		father = in.read_ascii(4);
-		body = in.read_type<BodyV1>();
-		head = in.read_type<LimbV1>();
-		left_thigh = in.read_type<LimbV1>();
-		right_thigh = in.read_type<LimbV1>();
-		left_arm = in.read_type<LimbV1>();
-		right_arm = in.read_type<LimbV1>();
-		tail = in.read_type<LimbV1>();
-		direction = in.read8();
-		downfoot = in.read8();
-		footx = in.read32le();
-		footy = in.read32le();
-		z_order = in.read32le();
-		current_pose = in.read_ascii_mfcstring();
-		expression = in.read8();
-		eyes_open = in.read8();
-		asleep = in.read8();
+	void serialize(MFCReader& in) {
+		ObjectV1::serialize(in);
+		in.ascii_dword(moniker);
+		in.ascii_dword(mother);
+		in.ascii_dword(father);
+		in(body);
+		in(head);
+		in(left_thigh);
+		in(right_thigh);
+		in(left_arm);
+		in(right_arm);
+		in(tail);
+		in(direction);
+		in(downfoot);
+		in(footx);
+		in(footy);
+		in(z_order);
+		in.ascii_mfcstring(current_pose);
+		in(expression);
+		in(eyes_open);
+		in(asleep);
 		for (auto& p : poses) {
-			p = in.read_ascii_mfcstring();
+			in.ascii_mfcstring(p);
 		}
 		for (auto& g : gait_animations) {
-			g = in.read_ascii_mfcstring();
+			in.ascii_mfcstring(g);
 		}
 		for (auto& v : vocabulary) {
-			v.in = in.read_ascii_mfcstring();
-			v.out = in.read_ascii_mfcstring();
-			v.strength = in.read32le();
+			in.ascii_mfcstring(v.in);
+			in.ascii_mfcstring(v.out);
+			in(v.strength);
 		}
 		for (auto& p : object_positions) {
-			p.x = in.reads32le();
-			p.y = in.reads32le();
+			in(p.x);
+			in(p.y);
 		}
 		for (auto& s : stimuli) {
-			s.significance = in.read8();
-			s.input = in.read8();
-			s.intensity = in.read8();
-			s.flags = in.read8();
-			s.chem0 = in.read8();
-			s.amount0 = in.read8();
-			s.chem1 = in.read8();
-			s.amount1 = in.read8();
-			s.chem2 = in.read8();
-			s.amount2 = in.read8();
-			s.chem3 = in.read8();
-			s.amount3 = in.read8();
+			in(s.significance);
+			in(s.input);
+			in(s.intensity);
+			in(s.flags);
+			in(s.chem0);
+			in(s.amount0);
+			in(s.chem1);
+			in(s.amount1);
+			in(s.chem2);
+			in(s.amount2);
+			in(s.chem3);
+			in(s.amount3);
 		}
 
-		brain = in.read_type<CBrainV1>();
-		biochemistry = in.read_type<CBiochemistryV1>();
-		sex = in.read8();
-		age = in.read8();
-		biotick = in.read32le();
-		gamete = in.read_ascii(4);
-		zygote = in.read_ascii(4);
-		dead = in.read8();
-		age_ticks = in.read32le();
-		uint32_t num_instincts = in.read32le();
-		instincts.resize(num_instincts);
-		dreaming = in.read32le();
+		in(brain);
+		in(biochemistry);
+		in(sex);
+		in(age);
+		in(biotick);
+		in.ascii_dword(gamete);
+		in.ascii_dword(zygote);
+		in(dead);
+		in(age_ticks);
+		in.size_u32(instincts);
+		in(dreaming);
 		for (auto& i : instincts) {
-			i = in.read_type<CInstinctV1>();
+			in(i);
 		}
 		for (auto& g : goals) {
 			for (auto& drive : g) {
-				drive = in.read32le();
+				in(drive);
 			}
 		}
-		zzzz = in.read_type<SimpleObjectV1>();
+		in(zzzz);
 		for (auto& v : voices_lookup) {
 			for (auto& s : v) {
 				// TODO: is this the right order? how does voice data work again?
-				s = in.read32le();
+				in(s);
 			}
 		}
 		for (auto& v : voices) {
-			v.name = in.read_ascii(4);
-			v.delay_ticks = in.read32le();
+			in.ascii_dword(v.name);
+			in(v.delay_ticks);
 		}
 
 		// these monikers are super weird.. they're MFC strings that are the
 		// reversed and hex-encoded version of the original string characters
-		history_moniker = in.read_ascii_mfcstring();
-		history_name = in.read_ascii_mfcstring();
-		history_moms_moniker = in.read_ascii_mfcstring();
-		history_dads_moniker = in.read_ascii_mfcstring();
-		history_birthday = in.read_ascii_mfcstring();
-		history_birthplace = in.read_ascii_mfcstring();
-		history_owner_name = in.read_ascii_mfcstring();
-		history_owner_phone = in.read_ascii_mfcstring();
-		history_owner_address = in.read_ascii_mfcstring();
-		history_owner_email = in.read_ascii_mfcstring();
+		in.ascii_mfcstring(history_moniker);
+		in.ascii_mfcstring(history_name);
+		in.ascii_mfcstring(history_moms_moniker);
+		in.ascii_mfcstring(history_dads_moniker);
+		in.ascii_mfcstring(history_birthday);
+		in.ascii_mfcstring(history_birthplace);
+		in.ascii_mfcstring(history_owner_name);
+		in.ascii_mfcstring(history_owner_phone);
+		in.ascii_mfcstring(history_owner_address);
+		in.ascii_mfcstring(history_owner_email);
 	}
 };
 
@@ -992,13 +981,12 @@ struct CGenomeV1 {
 	// TODO: should we actually parse this? sometimes it has weird extra data
 	// that doesn't all get parsed, might be useful to keep it around.
 
-	void read_from(MFCReader& in) {
-		uint32_t data_length = in.read32le();
-		moniker = in.read_ascii(4);
-		sex = in.read32le();
-		life_stage = in.read8();
-		data.resize(data_length);
-		in.read_exact(data.data(), data_length);
+	void serialize(MFCReader& in) {
+		in.size_u32(data);
+		in.ascii_dword(moniker);
+		in(sex);
+		in(life_stage);
+		in(data);
 	}
 };
 
@@ -1018,7 +1006,7 @@ struct SFCFile {
 	int32_t scrolly;
 
 	CreatureV1* current_norn;
-	std::vector<FavoritePlaceV1> favorite_places;
+	std::array<FavoritePlaceV1, 6> favorite_places;
 	std::vector<std::string> speech_history;
 	std::vector<MacroV1*> macros;
 	std::vector<ObjectV1*> death_row;

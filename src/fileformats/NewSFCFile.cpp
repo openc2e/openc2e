@@ -27,70 +27,65 @@ SFCFile read_sfc_v1_file(std::istream& in) {
 
 	// read file
 	SFCFile sfc;
-	sfc.map = reader.read_type<MapDataV1>();
+	reader(sfc.map);
 
-	uint32_t num_objects = reader.read32le();
-	for (size_t i = 0; i < num_objects; ++i) {
-		sfc.objects.push_back(reader.read_type<ObjectV1>());
+	reader.size_u32(sfc.objects);
+	for (auto& o : sfc.objects) {
+		reader(o);
 	}
 
-	uint32_t num_sceneries = reader.read32le();
-	for (size_t i = 0; i < num_sceneries; ++i) {
-		sfc.sceneries.push_back(reader.read_type<SceneryV1>());
+	reader.size_u32(sfc.sceneries);
+	for (auto& s : sfc.sceneries) {
+		reader(s);
 	}
 
-	uint32_t num_scripts = reader.read32le();
-	for (size_t i = 0; i < num_scripts; ++i) {
-		ScriptV1 script;
-		script.read_from(reader);
-		sfc.scripts.push_back(script);
+	reader.size_u32(sfc.scripts);
+	for (auto& script : sfc.scripts) {
+		script.serialize(reader);
 	}
 
-	sfc.scrollx = reader.reads32le();
-	sfc.scrolly = reader.reads32le();
+	reader(sfc.scrollx);
+	reader(sfc.scrolly);
+	reader(sfc.current_norn);
 
-	sfc.current_norn = reader.read_type<CreatureV1>();
-
-	for (size_t i = 0; i < 6; ++i) {
-		FavoritePlaceV1 favplace;
-		favplace.name = reader.read_ascii_mfcstring();
-		favplace.x = reader.reads16le();
-		favplace.y = reader.reads16le();
-		sfc.favorite_places.push_back(favplace);
+	for (auto& favplace : sfc.favorite_places) {
+		reader.ascii_mfcstring(favplace.name);
+		reader(favplace.x);
+		reader(favplace.y);
 	}
 
-	uint16_t size_speech_history = reader.read16le();
-	for (size_t i = 0; i < size_speech_history; ++i) {
-		sfc.speech_history.push_back(reader.read_ascii_mfcstring());
+	reader.size_u16(sfc.speech_history);
+	for (auto& s : sfc.speech_history) {
+		reader.ascii_mfcstring(s);
 	}
 
-	uint32_t num_macros = reader.read32le();
-	for (size_t i = 0; i < num_macros; ++i) {
-		sfc.macros.push_back(reader.read_type<MacroV1>());
+	reader.size_u32(sfc.macros);
+	for (auto& m : sfc.macros) {
+		reader(m);
 	}
 
-	uint32_t num_death_row = reader.read32le();
-	for (size_t i = 0; i < num_death_row; ++i) {
-		sfc.death_row.push_back(reader.read_type<ObjectV1>());
+	reader.size_u32(sfc.death_row);
+	for (auto& d : sfc.death_row) {
+		reader(d);
 	}
 
-	uint32_t num_events = reader.read32le();
-	for (size_t i = 0; i < num_events; ++i) {
-		sfc.events.push_back(reader.read_type<ObjectV1>());
+	reader.size_u32(sfc.events);
+	for (auto& e : sfc.events) {
+		reader(e);
 	}
 
-	sfc.current_score = reader.read32le();
-	sfc.current_health = reader.read32le();
-	sfc.hatchery_eggs = reader.read32le();
-	sfc.natural_eggs = reader.read32le();
-	sfc.dead_norns = reader.read32le();
-	sfc.live_norns = reader.read32le();
-	sfc.breeders_score = reader.read32le();
-	sfc.tick = reader.read32le();
+	reader(sfc.current_score);
+	reader(sfc.current_health);
+	reader(sfc.hatchery_eggs);
+	reader(sfc.natural_eggs);
+	reader(sfc.dead_norns);
+	reader(sfc.live_norns);
+	reader(sfc.breeders_score);
+	reader(sfc.tick);
 
-	uint32_t num_stuffed_norns = reader.read32le();
-	for (size_t i = 0; i < num_stuffed_norns; ++i) {
-		sfc.stuffed_norns.push_back(reader.read_type<CreatureV1>());
+	reader.size_u32(sfc.stuffed_norns);
+	for (auto& n : sfc.stuffed_norns) {
+		reader(n);
 	}
 
 	sfc.mfc_objects = reader.release_objects();
@@ -116,11 +111,11 @@ EXPFile read_exp_v1_file(std::istream& in) {
 
 	// read file
 	EXPFile exp;
-	exp.creature = reader.read_type<CreatureV1>();
-	exp.genome = reader.read_type<CGenomeV1>();
+	reader(exp.creature);
+	reader(exp.genome);
 
-	if (exp.creature->zygote != std::string("\0\0\0\0", 4)) {
-		exp.child_genome = reader.read_type<CGenomeV1>();
+	if (exp.creature->zygote.size()) {
+		reader(exp.child_genome);
 	} else {
 		exp.child_genome = nullptr;
 	}

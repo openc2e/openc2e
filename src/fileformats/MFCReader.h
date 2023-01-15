@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/Exception.h"
+#include "common/ResizableContainerView.h"
 
 #include <iosfwd>
 #include <map>
@@ -25,30 +26,36 @@ class MFCReader {
 	const std::vector<std::unique_ptr<MFCObject>>& objects() const;
 	std::vector<std::unique_ptr<MFCObject>>&& release_objects();
 
-	std::string read_ascii(size_t n);
-	std::string read_ascii_nullterminated(size_t n);
-	std::string read_ascii_mfcstring();
-	void read_exact(uint8_t* out, size_t n);
-	uint8_t read8();
-	int8_t reads8();
-	uint16_t read16le();
-	int16_t reads16le();
-	uint32_t read32le();
-	int32_t reads32le();
+	void ascii_dword(std::string&);
+	void ascii_mfcstring(std::string&);
+	void ascii_nullterminated(std::string&, size_t);
+
+	void size_u8(ResizableContainerView out);
+	void size_u16(ResizableContainerView out);
+	void size_u32(ResizableContainerView out);
+
+	void operator()(uint8_t&);
+	void operator()(int8_t&);
+	void operator()(uint16_t&);
+	void operator()(int16_t&);
+	void operator()(uint32_t&);
+	void operator()(int32_t&);
+	void operator()(std::vector<uint8_t>&);
 
 	template <typename T>
-	T* read_type() {
+	void operator()(T*& out) {
 		MFCObject* base_object = read_object();
 		if (base_object == nullptr) {
-			return nullptr;
+			out = nullptr;
+			return;
 		}
-		T* object = dynamic_cast<T*>(base_object);
-		if (object == nullptr) {
+		out = dynamic_cast<T*>(base_object);
+		if (out == nullptr) {
 			// TODO: name of type we got, name of type we expected
 			throw Exception("Wrong object type");
 		}
-		return object;
 	}
+
 
 	template <typename T>
 	void register_class(const std::string& name, int schema_number) {
@@ -59,7 +66,7 @@ class MFCReader {
 		info.readfunc = [](MFCObject* obj, MFCReader& reader) {
 			// the inner static_cast is unchecked, but we know for sure that the
 			// MFCObject passed in is in fact an MFCObjectImpl<T> so we're safe
-			static_cast<T*>(static_cast<MFCObjectImpl<T>*>(obj))->read_from(reader);
+			static_cast<T*>(static_cast<MFCObjectImpl<T>*>(obj))->serialize(reader);
 		};
 		m_classregistry[std::make_pair(name, schema_number)] = info;
 	}
@@ -75,6 +82,7 @@ class MFCReader {
 	};
 
 	MFCObject* read_object();
+	std::string read_ascii(size_t n);
 
 	std::istream& m_in;
 
