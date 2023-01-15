@@ -2,7 +2,6 @@
 
 #include "common/NumericCast.h"
 
-#include <array>
 #include <exception>
 
 template <typename T, size_t N>
@@ -16,6 +15,7 @@ class StaticVector {
 	}
 
 	StaticVector& operator=(const StaticVector& other) {
+		// TODO: call copy assignment on items that exist
 		clear();
 		size_ = other.size_;
 		for (size_t i = 0; i < size_; ++i) {
@@ -30,6 +30,7 @@ class StaticVector {
 	}
 
 	StaticVector& operator=(StaticVector&& other) {
+		// TODO: call move assignment on items that exist
 		clear();
 		size_ = other.size_;
 		for (size_t i = 0; i < size_; ++i) {
@@ -125,11 +126,11 @@ class StaticVector {
 	}
 
 	T* data() {
-		return reinterpret_cast<T*>(data_);
+		return &data_[0].value;
 	}
 
 	const T* data() const {
-		return reinterpret_cast<const T*>(data_);
+		return &data_[0].value;
 	}
 
 	size_t size() const {
@@ -145,6 +146,9 @@ class StaticVector {
 	}
 
   private:
-	std::aligned_storage_t<sizeof(T), alignof(T)> data_[N];
+	union U {
+		U() {}
+		T value;
+	} data_[N];
 	size_t size_ = 0;
 };
