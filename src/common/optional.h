@@ -11,7 +11,7 @@ class bad_optional_access : public std::exception {
 template <class T>
 class optional {
   public:
-	optional() = default;
+	optional() {}
 	template <class U>
 	optional(U value) {
 		has_value_ = true;
@@ -45,7 +45,7 @@ class optional {
 	}
 	~optional() {
 		if (has_value_) {
-			(&**this)->~T();
+			storage_.~T();
 			has_value_ = false;
 		}
 	}
@@ -56,16 +56,16 @@ class optional {
 		return has_value_;
 	}
 	T& operator*() {
-		return *reinterpret_cast<T*>(&storage_);
+		return storage_;
 	}
 	const T& operator*() const {
-		return *reinterpret_cast<const T*>(&storage_);
+		return storage_;
 	}
 	T* operator->() {
-		return reinterpret_cast<T*>(&storage_);
+		return &storage_;
 	}
 	const T* operator->() const {
-		return reinterpret_cast<const T*>(&storage_);
+		return &storage_;
 	}
 
 	T& value() {
@@ -85,7 +85,9 @@ class optional {
 
   private:
 	bool has_value_ = false;
-	alignas(T) uint8_t storage_[sizeof(T)];
+	union {
+		T storage_;
+	};
 };
 
 template <class T>
