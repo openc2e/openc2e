@@ -71,8 +71,6 @@ class Backend {
 	virtual bool pollEvent(BackendEvent& e) = 0;
 	virtual bool keyDown(int key) = 0;
 
-	virtual void resize(int width, int height) = 0;
-
 	virtual std::shared_ptr<RenderTarget> getMainRenderTarget() = 0;
 	virtual std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height) = 0;
 

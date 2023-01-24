@@ -41,21 +41,6 @@ SDLBackend::SDLBackend()
 	mainrendertarget->texture = nullptr;
 }
 
-void SDLBackend::resizeNotify(int _w, int _h) {
-	windowwidth = _w;
-	windowheight = _h;
-
-	SDL_GetRendererOutputSize(renderer, &mainrendertarget->drawablewidth, &mainrendertarget->drawableheight);
-	assert(mainrendertarget->drawablewidth / windowwidth == mainrendertarget->drawableheight / windowheight);
-	float oldscale = mainrendertarget->scale;
-	float newscale = mainrendertarget->drawablewidth / windowwidth;
-	if (abs(newscale) > 0.01 && abs(oldscale - newscale) > 0.01) {
-		printf("* SDL setting scale to %.2fx\n", newscale);
-		mainrendertarget->scale = newscale;
-		SDL_RenderSetScale(renderer, mainrendertarget->scale, mainrendertarget->scale);
-	}
-}
-
 static void ImGuiInit(SDL_Window* window, SDL_Renderer* renderer) {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
@@ -113,9 +98,6 @@ void SDLBackend::init(const std::string& name, int width, int height) {
 		fmt::print("* SDL Renderer: {} max_texture_size={}x{}\n", info.name, info.max_texture_width, info.max_texture_height);
 	}
 
-	SDL_GetWindowSize(window, &windowwidth, &windowheight);
-	resizeNotify(windowwidth, windowheight);
-
 	SDL_ShowCursor(false);
 	SDL_StartTextInput();
 
@@ -167,7 +149,6 @@ retry:
 		case SDL_WINDOWEVENT:
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_RESIZED:
-					resizeNotify(event.window.data1, event.window.data2);
 					e.window_id = event.window.windowID;
 					e.type = eventresizewindow;
 					e.x = event.window.data1;
@@ -391,10 +372,23 @@ void SDLBackend::updateTexture(Texture& tex, Rect location, const Image& image) 
 }
 
 unsigned int SDLRenderTarget::getWidth() const {
-	return drawablewidth / scale;
+	int width;
+	if (texture) {
+		SDL_QueryTexture(texture, nullptr, nullptr, &width, nullptr);
+	} else {
+		SDL_GetWindowSize(parent->window, &width, nullptr);
+	}
+	return width;
 }
 unsigned int SDLRenderTarget::getHeight() const {
-	return drawableheight / scale - viewport_offset_top - viewport_offset_bottom;
+	int height;
+	if (texture) {
+		SDL_QueryTexture(texture, nullptr, nullptr, nullptr, &height);
+		return height;
+	} else {
+		SDL_GetWindowSize(parent->window, nullptr, &height);
+		return height - viewport_offset_top - viewport_offset_bottom;
+	}
 }
 
 void SDLRenderTarget::setViewportOffsetTop(int offset_top) {
@@ -488,8 +482,6 @@ std::shared_ptr<RenderTarget> SDLBackend::newRenderTarget(unsigned int w, unsign
 
 	auto newtarget = std::make_shared<SDLRenderTarget>(this);
 	newtarget->texture = texture;
-	newtarget->drawablewidth = w;
-	newtarget->drawableheight = h;
 	return std::dynamic_pointer_cast<RenderTarget>(newtarget);
 }
 
@@ -598,10 +590,15 @@ static constexpr int OPENC2E_MAX_FPS = 60;
 static constexpr int OPENC2E_MIN_FPS = 20;
 
 void SDLBackend::waitForNextDraw() {
-	// TODO: calculate scale etc here instead of in resizeNotify
 	// TODO: we have to calculate renderer sizes when the backend is initialized,
 	// otherwise side panels get in weird locations. related to issue with panels
 	// when resizing in general?
+
+	int windowwidth, windowheight;
+	int drawablewidth, drawableheight;
+	SDL_GetWindowSize(window, &windowwidth, &windowheight);
+	SDL_GetRendererOutputSize(renderer, &drawablewidth, &drawableheight);
+	SDL_RenderSetScale(renderer, drawablewidth * 1.f / windowwidth, drawableheight * 1.f / windowheight);
 
 	bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
 	Uint32 desired_ticks_per_frame = 1000 / (focused ? OPENC2E_MAX_FPS : OPENC2E_MIN_FPS);

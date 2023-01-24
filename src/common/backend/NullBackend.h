@@ -53,8 +53,6 @@ class NullBackend : public Backend {
 	void drawDone() override {}
 	void shutdown() override {}
 
-	void resize(int, int) override {}
-
 	unsigned int ticks() override { return 0; }
 	bool pollEvent(BackendEvent&) override { return false; }
 	bool keyDown(int) override { return false; }

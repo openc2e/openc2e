@@ -33,9 +33,6 @@ class SDLRenderTarget : public RenderTarget {
   public:
 	SDLBackend* parent;
 	SDL_Texture* texture = nullptr;
-	int drawablewidth = 0;
-	int drawableheight = 0;
-	float scale = 1.0;
 	int viewport_offset_top = 0;
 	int viewport_offset_bottom = 0;
 
@@ -61,7 +58,6 @@ class SDLBackend : public Backend {
 	friend class SDLRenderTarget;
 
   protected:
-	int windowwidth, windowheight;
 	SDL_Renderer* renderer = nullptr;
 	std::shared_ptr<SDLRenderTarget> mainrendertarget;
 	Uint32 last_frame_end = 0;
@@ -73,7 +69,6 @@ class SDLBackend : public Backend {
 	SDLBackend& operator=(SDLBackend&&) = delete;
 
 	SDL_Surface* getMainSDLSurface() { return SDL_GetWindowSurface(window); }
-	void resizeNotify(int _w, int _h);
 	int translateScancode(int key);
 
   public:
@@ -84,8 +79,6 @@ class SDLBackend : public Backend {
 	void waitForNextDraw() override;
 	void drawDone() override;
 	void shutdown() override;
-
-	void resize(int w, int h) override { resizeNotify(w, h); }
 
 	bool pollEvent(BackendEvent& e) override;
 
