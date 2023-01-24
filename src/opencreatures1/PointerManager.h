@@ -7,8 +7,8 @@ class PointerManager {
   public:
 	ObjectHandle m_pointer_tool;
 
-	int m_screenx;
-	int m_screeny;
+	float m_screenx;
+	float m_screeny;
 
 	PointerManager() {}
 	void update();

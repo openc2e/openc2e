@@ -22,7 +22,8 @@ enum eventbuttons { buttonleft = 0x1,
 struct BackendEvent {
 	uint32_t window_id;
 	eventtype type;
-	int x, y, xrel, yrel;
+	float x, y;
+	int xrel, yrel;
 	int key;
 	unsigned int button;
 	std::string text;

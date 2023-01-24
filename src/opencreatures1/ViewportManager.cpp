@@ -96,7 +96,7 @@ void ViewportManager::tick() {
 	g_engine_context.sounds->set_listener_position(viewport);
 }
 
-int32_t ViewportManager::window_x_to_world_x(int32_t winx) const {
+int32_t ViewportManager::window_x_to_world_x(float winx) const {
 	int32_t worldx = numeric_cast<int32_t>(winx / VIEWPORT_SCALE) + scrollx;
 	// TODO: better way to handle world wrap?
 	if (worldx >= CREATURES1_WORLD_WIDTH) {
@@ -108,7 +108,7 @@ int32_t ViewportManager::window_x_to_world_x(int32_t winx) const {
 	return worldx;
 }
 
-int32_t ViewportManager::window_y_to_world_y(int32_t winy) const {
+int32_t ViewportManager::window_y_to_world_y(float winy) const {
 	return numeric_cast<int32_t>(winy / VIEWPORT_SCALE) + scrolly - VIEWPORT_MARGIN_TOP;
 }
 
