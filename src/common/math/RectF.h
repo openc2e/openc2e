@@ -16,10 +16,10 @@ struct RectF {
 	RectF(float x_, float y_, float width_, float height_)
 		: x(x_), y(y_), width(width_), height(height_) {}
 	RectF(Rect other)
-		: x(numeric_cast<float>(other.x)),
-		  y(numeric_cast<float>(other.y)),
-		  width(numeric_cast<float>(other.width)),
-		  height(numeric_cast<float>(other.height)) {}
+		: x(other.x),
+		  y(other.y),
+		  width(other.width),
+		  height(other.height) {}
 
 	float right() const { return x + width; }
 	float bottom() const { return y + height; }

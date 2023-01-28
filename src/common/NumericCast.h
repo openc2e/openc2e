@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SafeCompare.h"
-
 #include <limits>
 #include <stdint.h>
 #include <type_traits>
@@ -14,13 +12,39 @@ class BadNumericCast : public std::bad_cast {
 	}
 };
 
-template <typename To, typename From, typename = std::enable_if_t<std::is_arithmetic<To>::value && std::is_arithmetic<From>::value>>
-constexpr inline To numeric_cast(From value) {
-	if (cmp_greater(value, std::numeric_limits<To>::max())) {
-		throw BadNumericCast();
+template <typename To, typename From>
+constexpr inline auto numeric_cast(From value)
+	-> std::enable_if_t<std::is_integral<To>::value && std::is_integral<From>::value, To> {
+	// an integer type's maximum value will always fit as unsigned,
+	// and its minimum value will always fit as signed
+	constexpr auto high = static_cast<std::make_unsigned_t<To>>(std::numeric_limits<To>::max());
+	constexpr auto low = static_cast<std::make_signed_t<To>>(std::numeric_limits<To>::lowest());
+
+	if (
+		// first check: if the value > 0, we can safely cast it to unsigned and
+		// then compare it against the new maximum. if value <= 0, it can't be
+		// over the new maximum
+		(value > 0 && static_cast<std::make_unsigned_t<From>>(value) > high)
+		// second check: if the value is signed, we can compare it against the
+		// new minimum. if the value is unsigned, it can't be under the new minimum.
+		|| (std::is_signed<From>::value && static_cast<std::make_signed_t<From>>(value) < low)) {
+		throw BadNumericCast{};
 	}
-	if (cmp_less(value, std::numeric_limits<To>::lowest())) {
-		throw BadNumericCast();
+	return static_cast<To>(value);
+}
+
+template <typename To>
+constexpr inline auto numeric_cast(float value)
+	-> std::enable_if_t<std::is_integral<To>::value, To> {
+	if ((value >= (std::numeric_limits<To>::max() / 2 + 1) * 2.0f) || (value - std::numeric_limits<To>::lowest() <= -1.0f)) {
+		throw BadNumericCast{};
 	}
+	return static_cast<To>(value);
+}
+
+template <typename To, typename From>
+constexpr inline auto numeric_cast(From value)
+	-> std::enable_if_t<std::is_floating_point<To>::value && std::is_integral<From>::value, To> {
+	// converting integers to floating point is always safe (though not necessarily exact)
 	return static_cast<To>(value);
 }
