@@ -147,3 +147,8 @@ static inline uint32_t read32be(std::istream& s) {
 	s.read(reinterpret_cast<char*>(&t), 4);
 	return is_little_endian() ? byte_swap_32(t) : t;
 }
+
+static inline void write32be(std::ostream& s, uint32_t v) {
+	uint32_t t = is_little_endian() ? byte_swap_32(v) : v;
+	s.write(reinterpret_cast<char*>(&t), 4);
+}

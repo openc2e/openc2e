@@ -280,4 +280,46 @@ Color GetPixelColor(const Image& image, unsigned int x, unsigned int y) {
 	}
 }
 
+Image ToRGB24(const Image& oldimage) {
+	if (oldimage.format == if_rgb24)
+		return oldimage;
+
+	Image newimage = oldimage;
+	newimage.data = shared_array<uint8_t>(newimage.width * newimage.height * 3);
+	newimage.format = if_rgb24;
+
+	for (int j = 0; j < oldimage.width * oldimage.height; ++j) {
+		uint8_t r, g, b;
+		if (oldimage.format == if_rgb565) {
+			uint16_t pixel = *(((uint16_t*)oldimage.data.data()) + j);
+			r = ((pixel & 0xF800) >> 11) * 255 / 31;
+			g = ((pixel & 0x07E0) >> 5) * 255 / 63;
+			b = ((pixel & 0x001F)) * 255 / 31;
+
+		} else if (oldimage.format == if_rgb555) {
+			uint16_t pixel = *(((uint16_t*)oldimage.data.data()) + j);
+			r = ((pixel & 0x7C00) >> 10) * 255 / 31;
+			g = ((pixel & 0x03E0) >> 5) * 255 / 31;
+			b = ((pixel & 0x001F)) * 255 / 31;
+
+		} else if (oldimage.format == if_bgr24) {
+			r = oldimage.data[j * 3 + 2];
+			g = oldimage.data[j * 3 + 1];
+			b = oldimage.data[j * 3];
+
+		} else if (oldimage.format == if_index8) {
+			r = oldimage.palette[oldimage.data[j]].r;
+			g = oldimage.palette[oldimage.data[j]].g;
+			b = oldimage.palette[oldimage.data[j]].b;
+
+		} else {
+			throw Exception("Expected format RGB565, RGB555, BGR24, or INDEX8");
+		}
+		newimage.data[j * 3] = r;
+		newimage.data[j * 3 + 1] = g;
+		newimage.data[j * 3 + 2] = b;
+	}
+	return newimage;
+}
+
 } // namespace ImageUtils

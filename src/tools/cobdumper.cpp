@@ -4,9 +4,9 @@
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
+#include "fileformats/pngImage.h"
 #include "openc2e/caosparser.h"
 #include "openc2e/dialect.h"
-#include "tgaImage.h"
 
 #include <fmt/format.h>
 #include <fstream>
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
 		}
 	} else if (memcmp(magic, "\x01\x00", 2) == 0) {
 		c1cobfile cob = read_c1cobfile(in);
-		std::string sprite_filename = stem.string() + ".tga";
+		std::string sprite_filename = stem.string() + ".png";
 		fmt::print("*# COB-Name \"{}\"\n", cob.name);
 		if (cob.picture) {
 			fmt::print("*# Picture \"{}\"\n", sprite_filename);
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
 		}
 
 		if (cob.picture) {
-			WriteTgaFile(cob.picture, sprite_filename);
+			WritePngFile(cob.picture, sprite_filename);
 		}
 
 	} else {

@@ -153,6 +153,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/NewSFCFile.cpp
 	src/fileformats/paletteFile.cpp
 	src/fileformats/peFile.cpp
+	src/fileformats/pngImage.cpp
 	src/fileformats/PrayFileReader.cpp
 	src/fileformats/PrayFileWriter.cpp
 	src/fileformats/PraySourceParser.cpp

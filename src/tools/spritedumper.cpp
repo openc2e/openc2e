@@ -2,7 +2,7 @@
 #include "fileformats/ImageUtils.h"
 #include "fileformats/c1defaultpalette.h"
 #include "fileformats/paletteFile.h"
-#include "tgaImage.h"
+#include "fileformats/pngImage.h"
 
 #include <fmt/format.h>
 #include <fstream>
@@ -123,14 +123,14 @@ int main(int argc, char** argv) {
 		for (size_t i = 0; i < image.size(); ++i) {
 			std::string frame_filename = [&]() {
 				if (image.size() == 1) {
-					return stem + ".tga";
+					return stem + ".png";
 				} else {
-					return stem + fmt::format("_{:03}.tga", i);
+					return stem + fmt::format("_{:03}.png", i);
 				}
 			}();
 			fmt::print("{}\n", frame_filename);
 
-			WriteTgaFile(image[i], frame_filename);
+			WritePngFile(image[i], frame_filename);
 		}
 	}
 }
