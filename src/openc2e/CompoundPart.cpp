@@ -42,10 +42,11 @@ void CompoundPart::render(RenderTarget* renderer, int xoffset, int yoffset) {
 			int xoff = xoffset + (int)parent->x + x;
 			int yoff = yoffset + (int)parent->y + y;
 
-			renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), 0xFF1EFFCC);
-			renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), 0xFF1EFFCC);
-			renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), 0xFF1EFFCC);
-			renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, 0xFF1EFFCC);
+			Color color{0xff, 0x1e, 0xff, 0xcc};
+			renderer->renderLine(xoff + (getWidth() / 2), yoff, xoff + getWidth(), yoff + (getHeight() / 2), color);
+			renderer->renderLine(xoff + getWidth(), yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff + getHeight(), color);
+			renderer->renderLine(xoff + (getWidth() / 2), yoff + getHeight(), xoff, yoff + (getHeight() / 2), color);
+			renderer->renderLine(xoff, yoff + (getHeight() / 2), xoff + (getWidth() / 2), yoff, color);
 		}
 	}
 }

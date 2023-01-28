@@ -36,6 +36,7 @@ Future improvements:
 */
 
 #include "RenderItemHandle.h"
+#include "common/Color.h"
 #include "common/SlotMap.h"
 #include "common/backend/BackendTexture.h"
 #include "common/math/Rect.h"
@@ -65,7 +66,7 @@ class RenderSystem {
 		RectF dest{};
 		int32_t z = 0;
 		RenderItemType type = RENDER_NONE;
-		uint32_t color = 0;
+		Color color;
 		Texture tex;
 	};
 
@@ -89,8 +90,8 @@ class RenderSystem {
 
 	void render_item_set_position(const RenderItemHandle& key, float x, float y, int32_t z);
 	void render_item_set_texture(const RenderItemHandle& key, const Texture& tex, Rect location);
-	void render_item_set_unfilled_rect(const RenderItemHandle& key, float x, float y, float w, float h, uint32_t color);
-	void render_item_set_line(const RenderItemHandle& key, float xstart, float ystart, float xend, float yend, uint32_t color);
+	void render_item_set_unfilled_rect(const RenderItemHandle& key, float x, float y, float w, float h, Color color);
+	void render_item_set_line(const RenderItemHandle& key, float xstart, float ystart, float xend, float yend, Color color);
 
 	void render_item_set_layer(const RenderItemHandle& key, int32_t layer);
 	void render_item_set_position(const RenderItemHandle& key, float x, float y);

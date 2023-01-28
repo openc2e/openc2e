@@ -45,7 +45,7 @@ class SDLRenderTarget : public RenderTarget {
 
 	void renderTexture(const Texture& tex, Rect src, RectF dest, RenderOptions options) override;
 	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options) override;
-	void renderLine(float x1, float y1, float x2, float y2, unsigned int color) override;
+	void renderLine(float x1, float y1, float x2, float y2, Color color) override;
 	void blitRenderTarget(RenderTarget* src, float x, float y, float w, float h) override;
 	int32_t getWidth() const override;
 	int32_t getHeight() const override;

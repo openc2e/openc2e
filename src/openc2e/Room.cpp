@@ -143,7 +143,7 @@ void Room::resetTick() {
 		i = 0.0f;
 }
 
-void Room::renderBorders(RenderTarget* surface, int adjustx, int adjusty, unsigned int col) {
+void Room::renderBorders(RenderTarget* surface, int adjustx, int adjusty, Color col) {
 	// ceiling
 	surface->renderLine(x_left - adjustx, y_left_ceiling - adjusty,
 		x_right - adjustx, y_right_ceiling - adjusty,

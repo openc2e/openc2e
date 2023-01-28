@@ -253,13 +253,9 @@ SDLRenderTarget::~SDLRenderTarget() {
 	}
 }
 
-void SDLRenderTarget::renderLine(float x1, float y1, float x2, float y2, unsigned int color) {
-	Uint8 r = (color >> 24) & 0xff;
-	Uint8 g = (color >> 16) & 0xff;
-	Uint8 b = (color >> 8) & 0xff;
-	Uint8 a = (color >> 0) & 0xff;
+void SDLRenderTarget::renderLine(float x1, float y1, float x2, float y2, Color color) {
 	SDL_SetRenderTarget(parent->renderer, texture);
-	SDL_SetRenderDrawColor(parent->renderer, r, g, b, a);
+	SDL_SetRenderDrawColor(parent->renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderDrawLineF(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 

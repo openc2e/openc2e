@@ -307,13 +307,14 @@ void SkeletalCreature::render(RenderTarget* renderer, int xoffset, int yoffset) 
 
 		if (displaycore) {
 			// TODO: we draw a lot of points twice here :)
+			Color color{0xff, 0x1e, 0xff, 0xcc};
 			int atx = attachmentX(i, 0) + xoffset, aty = attachmentY(i, 0) + yoffset;
-			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF1EFFCC);
-			renderer->renderLine(atx, aty - 1, atx, aty + 1, 0xFF1EFFCC);
+			renderer->renderLine(atx - 1, aty, atx + 1, aty, color);
+			renderer->renderLine(atx, aty - 1, atx, aty + 1, color);
 			atx = attachmentX(i, 1) + xoffset;
 			aty = attachmentY(i, 1) + yoffset;
-			renderer->renderLine(atx - 1, aty, atx + 1, aty, 0xFF1EFFCC);
-			renderer->renderLine(atx, aty - 1, atx, aty + 1, 0xFF1EFFCC);
+			renderer->renderLine(atx - 1, aty, atx + 1, aty, color);
+			renderer->renderLine(atx, aty - 1, atx, aty + 1, color);
 		}
 	}
 }

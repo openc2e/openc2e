@@ -1,8 +1,9 @@
 #pragma once
 
+#include "common/Color.h"
 #include "common/shared_array.h"
 
-#include <memory>
+#include <stdint.h>
 #include <vector>
 
 
@@ -12,14 +13,6 @@ enum imageformat {
 	if_rgb565,
 	if_bgr24,
 	if_rgb24
-};
-
-class Color {
-  public:
-	uint8_t r = 0;
-	uint8_t g = 0;
-	uint8_t b = 0;
-	uint8_t a = 0;
 };
 
 class Image {

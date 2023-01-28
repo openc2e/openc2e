@@ -61,7 +61,7 @@ void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const
 	}
 }
 
-void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle, float x, float y, float w, float h, uint32_t color) {
+void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle, float x, float y, float w, float h, Color color) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_RECT;
 		item->dest.x = x;
@@ -72,7 +72,7 @@ void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle,
 	}
 }
 
-void RenderSystem::render_item_set_line(const RenderItemHandle& handle, float xstart, float ystart, float xend, float yend, uint32_t color) {
+void RenderSystem::render_item_set_line(const RenderItemHandle& handle, float xstart, float ystart, float xend, float yend, Color color) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_LINE;
 		item->dest.x = xstart;

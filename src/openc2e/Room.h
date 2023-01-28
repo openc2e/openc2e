@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "common/Color.h"
 #include "physics.h"
 
 #include <map>
@@ -74,7 +75,7 @@ class Room {
 	void postTick();
 	void resetTick();
 
-	void renderBorders(RenderTarget* surf, int xoffset, int yoffset, unsigned int col);
+	void renderBorders(RenderTarget* surf, int xoffset, int yoffset, Color col);
 };
 
 /* vim: set noet: */

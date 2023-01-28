@@ -448,14 +448,14 @@ void World::drawWorld(Camera* cam, RenderTarget* surface) {
 					continue;
 				InputPort* target = c->first->inports[c->second].get();
 				surface->renderLine(a->x + p->second->x - adjustx, a->y + p->second->y - adjusty,
-					c->first->x + target->x - adjustx, c->first->y + target->y - adjusty, 0x00ff00ff);
+					c->first->x + target->x - adjustx, c->first->y + target->y - adjusty, Color{0, 0xff, 0, 0xff});
 			}
 		}
 	}
 
 	if (showrooms) {
 		std::shared_ptr<Room> room_under_hand = map->roomAt(hand()->x, hand()->y);
-		auto draw_room = [&](const auto& r, unsigned int color) {
+		auto draw_room = [&](const auto& r, Color color) {
 			// rooms don't wrap over the boundary, so just draw twice
 			r->renderBorders(surface, adjustx, adjusty, color);
 			if (m->wraparound()) {
@@ -464,14 +464,14 @@ void World::drawWorld(Camera* cam, RenderTarget* surface) {
 		};
 		for (const auto& r : cam->getMetaRoom()->rooms) {
 			if (!room_under_hand || (r != room_under_hand && !map->hasDoor(room_under_hand, r))) {
-				draw_room(r, 0xFFFF00CC);
+				draw_room(r, Color{0xff, 0xff, 0, 0xcc});
 			}
 		}
 		if (room_under_hand) {
 			for (const auto& door : room_under_hand->getDoors()) {
-				draw_room(door.first, 0x00FFFFCC);
+				draw_room(door.first, Color{0, 0xff, 0xff, 0xcc});
 			}
-			draw_room(room_under_hand, 0xFF00FFCC);
+			draw_room(room_under_hand, Color{0xff, 0, 0xff, 0xcc});
 		}
 	}
 
@@ -492,7 +492,7 @@ void World::drawWorld(Camera* cam, RenderTarget* surface) {
 				y = in->y;
 			}
 			surface->renderLine(x + hand()->wireOriginAgent->x - adjustx,
-				y + hand()->wireOriginAgent->y - adjusty, hand()->x - adjustx, hand()->y - adjusty, 0x00ff00ff);
+				y + hand()->wireOriginAgent->y - adjusty, hand()->x - adjustx, hand()->y - adjusty, Color{0, 0xff, 0, 0xff});
 		}
 	}
 }

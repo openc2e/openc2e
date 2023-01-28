@@ -6,13 +6,13 @@
 
 void MapManager::add_room(Room&& room) {
 	if (!room.renderitem) {
-		uint32_t color;
+		Color color;
 		if (room.type == 0) {
-			color = 0xFFFF00CC;
+			color = {0xff, 0xff, 0, 0xcc};
 		} else if (room.type == 1) {
-			color = 0x00FFFFCC;
+			color = {0, 0xff, 0xff, 0xcc};
 		} else {
-			color = 0xFF00FFCC;
+			color = {0xff, 0, 0xff, 0xcc};
 		}
 
 		room.renderitem = get_rendersystem()->render_item_create(LAYER_DEBUG);
@@ -36,7 +36,7 @@ void MapManager::set_groundlevel(const std::array<uint32_t, 261>& groundlevel_) 
 		int32_t xend = numeric_cast<int32_t>((i + 1) * 32);
 		int32_t ystart = numeric_cast<int32_t>(groundlevel[i]);
 		int32_t yend = numeric_cast<int32_t>(i == 260 ? groundlevel[0] : groundlevel[i + 1]);
-		uint32_t color = 0xFFFFFFCC;
+		Color color{0xff, 0xff, 0xff, 0xcc};
 		get_rendersystem()->render_item_set_line(groundlevel_renderitems[i], xstart, ystart, xend, yend, color);
 	}
 }

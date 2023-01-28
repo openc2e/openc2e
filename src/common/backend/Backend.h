@@ -53,7 +53,7 @@ class RenderTarget {
 		assert(tex.get() != nullptr);
 		renderCreaturesImage(*tex.get(), frame, x, y, options);
 	}
-	virtual void renderLine(float x1, float y1, float x2, float y2, unsigned int color) = 0;
+	virtual void renderLine(float x1, float y1, float x2, float y2, Color color) = 0;
 	virtual void blitRenderTarget(RenderTarget* src, float x, float y, float w, float h) = 0;
 	virtual int32_t getWidth() const = 0;
 	virtual int32_t getHeight() const = 0;

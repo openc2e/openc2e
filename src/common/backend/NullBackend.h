@@ -27,7 +27,7 @@ class NullRenderTarget : public RenderTarget {
   public:
 	void renderTexture(const Texture&, Rect, RectF, RenderOptions) override {}
 	void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) override {}
-	void renderLine(float, float, float, float, unsigned int) override {}
+	void renderLine(float, float, float, float, Color) override {}
 	void blitRenderTarget(RenderTarget*, float, float, float, float) override {}
 	int32_t getWidth() const override { return 800; }
 	int32_t getHeight() const override { return 600; }
