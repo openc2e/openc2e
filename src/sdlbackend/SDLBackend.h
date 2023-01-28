@@ -68,7 +68,6 @@ class SDLBackend : public Backend {
 	SDLBackend& operator=(const SDLBackend&) = delete;
 	SDLBackend& operator=(SDLBackend&&) = delete;
 
-	SDL_Surface* getMainSDLSurface() { return SDL_GetWindowSurface(window); }
 	int translateScancode(int key);
 
   public:
