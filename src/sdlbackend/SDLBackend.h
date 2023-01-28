@@ -46,9 +46,9 @@ class SDLRenderTarget : public RenderTarget {
 	void renderTexture(const Texture& tex, Rect src, RectF dest, RenderOptions options) override;
 	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options) override;
 	void renderLine(float x1, float y1, float x2, float y2, unsigned int color) override;
-	void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h) override;
-	unsigned int getWidth() const override;
-	unsigned int getHeight() const override;
+	void blitRenderTarget(RenderTarget* src, float x, float y, float w, float h) override;
+	int32_t getWidth() const override;
+	int32_t getHeight() const override;
 	void renderClear() override;
 	void setViewportOffsetTop(int offset_top) override;
 	void setViewportOffsetBottom(int offset_bottom) override;
@@ -60,7 +60,7 @@ class SDLBackend : public Backend {
   protected:
 	SDL_Renderer* renderer = nullptr;
 	std::shared_ptr<SDLRenderTarget> mainrendertarget;
-	Uint32 last_frame_end = 0;
+	uint32_t last_frame_end = 0;
 
 	SDLBackend();
 	SDLBackend(const SDLBackend&) = delete;
@@ -75,7 +75,7 @@ class SDLBackend : public Backend {
 	SDL_Window* window = nullptr;
 
 	static Backend* get_instance();
-	void init(const std::string& name, int width, int height) override;
+	void init(const std::string& name, int32_t width, int32_t height) override;
 	void waitForNextDraw() override;
 	void drawDone() override;
 	void shutdown() override;
@@ -84,13 +84,13 @@ class SDLBackend : public Backend {
 
 	unsigned int ticks() override { return SDL_GetTicks(); }
 
-	Texture createTexture(unsigned int width, unsigned int height) override;
+	Texture createTexture(int32_t width, int32_t height) override;
 	void updateTexture(Texture& tex, Rect location, const Image& image) override;
 
 	std::shared_ptr<RenderTarget> getMainRenderTarget() override;
-	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height) override;
+	std::shared_ptr<RenderTarget> newRenderTarget(int32_t width, int32_t height) override;
 
-	bool keyDown(int key) override;
+	bool keyDown(Openc2eKeycode key) override;
 };
 
 #endif

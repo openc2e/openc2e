@@ -77,7 +77,7 @@ void stitch_to_sheet(MultiImage& image) {
 			current_row_height = 0;
 		}
 		// copy
-		for (size_t y = 0; y < i.height; y++) {
+		for (int y = 0; y < i.height; y++) {
 			auto rowstart = ((uint8_t*)i.data.data()) + y * i.width * depth;
 			auto rowend = rowstart + i.width * depth;
 			auto insertpos = &data[(current_y + y) * total_width * depth + current_x * depth];

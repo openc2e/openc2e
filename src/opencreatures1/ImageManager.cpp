@@ -20,8 +20,8 @@ ImageManager::ImageManager() {
 static SpriteGallery build_gallery(const std::string& name, MultiImage images) {
 	// stupid simple atlas-ing, can make this better
 
-	unsigned int total_width = 0;
-	unsigned int max_height = 0;
+	int32_t total_width = 0;
+	int32_t max_height = 0;
 	for (const auto& img : images) {
 		total_width += img.width;
 		if (img.height > max_height) {
@@ -33,7 +33,7 @@ static SpriteGallery build_gallery(const std::string& name, MultiImage images) {
 	gallery.name = name;
 	gallery.texture = get_backend()->createTexture(total_width, max_height);
 
-	unsigned int current_x = 0;
+	int32_t current_x = 0;
 	for (const auto& img : images) {
 		Rect location{
 			numeric_cast<int32_t>(current_x),

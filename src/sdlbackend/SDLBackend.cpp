@@ -72,10 +72,8 @@ static void ImGuiInit(SDL_Window* window, SDL_Renderer* renderer) {
 	}
 }
 
-void SDLBackend::init(const std::string& name, int width, int height) {
-	int init = SDL_INIT_VIDEO;
-
-	if (SDL_Init(init) < 0)
+void SDLBackend::init(const std::string& name, int32_t width, int32_t height) {
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		throw Exception(std::string("SDL error during initialization: ") + SDL_GetError());
 
 	window = SDL_CreateWindow(name.c_str(),
@@ -265,7 +263,7 @@ void SDLRenderTarget::renderLine(float x1, float y1, float x2, float y2, unsigne
 	SDL_RenderDrawLineF(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 
-Texture SDLBackend::createTexture(unsigned int width, unsigned int height) {
+Texture SDLBackend::createTexture(int32_t width, int32_t height) {
 	// TODO: make sure we get an alpha-capable texture format. seems to always
 	// happen by default, but should check just in case.
 	Texture tex(
@@ -371,24 +369,23 @@ void SDLBackend::updateTexture(Texture& tex, Rect location, const Image& image) 
 	};
 }
 
-unsigned int SDLRenderTarget::getWidth() const {
+int32_t SDLRenderTarget::getWidth() const {
 	int width;
 	if (texture) {
 		SDL_QueryTexture(texture, nullptr, nullptr, &width, nullptr);
 	} else {
 		SDL_GetWindowSize(parent->window, &width, nullptr);
 	}
-	return width;
+	return numeric_cast<int32_t>(width);
 }
-unsigned int SDLRenderTarget::getHeight() const {
+int32_t SDLRenderTarget::getHeight() const {
 	int height;
 	if (texture) {
 		SDL_QueryTexture(texture, nullptr, nullptr, nullptr, &height);
-		return height;
 	} else {
 		SDL_GetWindowSize(parent->window, nullptr, &height);
-		return height - viewport_offset_top - viewport_offset_bottom;
 	}
+	return numeric_cast<int32_t>(height - viewport_offset_top - viewport_offset_bottom);
 }
 
 void SDLRenderTarget::setViewportOffsetTop(int offset_top) {
@@ -398,7 +395,6 @@ void SDLRenderTarget::setViewportOffsetTop(int offset_top) {
 void SDLRenderTarget::setViewportOffsetBottom(int offset_bottom) {
 	viewport_offset_bottom = offset_bottom;
 }
-
 
 void SDLRenderTarget::renderTexture(const Texture& tex_, Rect src, RectF dest, RenderOptions options) {
 	if (dest.right() + tex_.width <= 0 || dest.x >= getWidth() || dest.bottom() <= 0 || dest.y >= getHeight()) {
@@ -458,24 +454,24 @@ void SDLRenderTarget::renderClear() {
 	SDL_RenderClear(parent->renderer);
 }
 
-void SDLRenderTarget::blitRenderTarget(RenderTarget* s, int x, int y, int w, int h) {
+void SDLRenderTarget::blitRenderTarget(RenderTarget* s, float x, float y, float w, float h) {
 	SDLRenderTarget* src = dynamic_cast<SDLRenderTarget*>(s);
 	assert(src);
 
-	SDL_Rect r;
+	SDL_FRect r;
 	r.x = x;
 	r.y = y + viewport_offset_top;
 	r.w = w;
 	r.h = h;
 	SDL_SetRenderTarget(parent->renderer, texture);
-	SDL_RenderCopy(parent->renderer, src->texture, nullptr, &r);
+	SDL_RenderCopyF(parent->renderer, src->texture, nullptr, &r);
 }
 
 std::shared_ptr<RenderTarget> SDLBackend::getMainRenderTarget() {
 	return mainrendertarget;
 }
 
-std::shared_ptr<RenderTarget> SDLBackend::newRenderTarget(unsigned int w, unsigned int h) {
+std::shared_ptr<RenderTarget> SDLBackend::newRenderTarget(int32_t w, int32_t h) {
 	SDL_Texture* texture = SDL_CreateTexture(renderer, 0, SDL_TEXTUREACCESS_TARGET, w, h);
 	assert(texture);
 	printf("* SDL created rendertarget texture %p\n", texture);
@@ -487,7 +483,8 @@ std::shared_ptr<RenderTarget> SDLBackend::newRenderTarget(unsigned int w, unsign
 
 // left out: menu, select, execute, snapshot, numeric keypad
 struct _keytrans {
-	int sdl, openc2e;
+	int sdl;
+	Openc2eKeycode openc2e;
 };
 static const std::array<_keytrans, 72> keytrans = {{
 	{SDL_SCANCODE_BACKSPACE, OPENC2E_KEY_BACKSPACE},
@@ -496,8 +493,8 @@ static const std::array<_keytrans, 72> keytrans = {{
 	{SDL_SCANCODE_RETURN, OPENC2E_KEY_RETURN},
 	{SDL_SCANCODE_RSHIFT, OPENC2E_KEY_SHIFT},
 	{SDL_SCANCODE_LSHIFT, OPENC2E_KEY_SHIFT},
-	{SDL_SCANCODE_RCTRL, OPENC2E_KEY_CONTROL},
-	{SDL_SCANCODE_LCTRL, OPENC2E_KEY_CONTROL},
+	{SDL_SCANCODE_RCTRL, OPENC2E_KEY_CTRL},
+	{SDL_SCANCODE_LCTRL, OPENC2E_KEY_CTRL},
 	{SDL_SCANCODE_PAUSE, OPENC2E_KEY_PAUSE},
 	{SDL_SCANCODE_CAPSLOCK, OPENC2E_KEY_CAPSLOCK},
 	{SDL_SCANCODE_ESCAPE, OPENC2E_KEY_ESCAPE},
@@ -574,7 +571,7 @@ int SDLBackend::translateScancode(int key) {
 }
 
 // TODO: this is possibly not a great idea, we should maybe maintain our own state table
-bool SDLBackend::keyDown(int key) {
+bool SDLBackend::keyDown(Openc2eKeycode key) {
 	const Uint8* keystate = SDL_GetKeyboardState(nullptr);
 
 	for (auto keytran : keytrans) {

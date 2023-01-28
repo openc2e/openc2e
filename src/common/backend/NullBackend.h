@@ -28,9 +28,9 @@ class NullRenderTarget : public RenderTarget {
 	void renderTexture(const Texture&, Rect, RectF, RenderOptions) override {}
 	void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) override {}
 	void renderLine(float, float, float, float, unsigned int) override {}
-	void blitRenderTarget(RenderTarget*, int, int, int, int) override {}
-	unsigned int getWidth() const override { return 800; }
-	unsigned int getHeight() const override { return 600; }
+	void blitRenderTarget(RenderTarget*, float, float, float, float) override {}
+	int32_t getWidth() const override { return 800; }
+	int32_t getHeight() const override { return 600; }
 	void renderClear() override {}
 	void setViewportOffsetTop(int) override {}
 	void setViewportOffsetBottom(int) override {}
@@ -48,20 +48,20 @@ class NullBackend : public Backend {
   public:
 	static Backend* get_instance();
 
-	void init(const std::string&, int, int) override {}
+	void init(const std::string&, int32_t, int32_t) override {}
 	void waitForNextDraw() override {}
 	void drawDone() override {}
 	void shutdown() override {}
 
 	unsigned int ticks() override { return 0; }
 	bool pollEvent(BackendEvent&) override { return false; }
-	bool keyDown(int) override { return false; }
+	bool keyDown(Openc2eKeycode) override { return false; }
 
 	std::shared_ptr<RenderTarget> getMainRenderTarget() override {
 		return std::dynamic_pointer_cast<RenderTarget>(mainrendertarget);
 	}
-	std::shared_ptr<RenderTarget> newRenderTarget(unsigned int, unsigned int) override { return {}; }
+	std::shared_ptr<RenderTarget> newRenderTarget(int32_t, int32_t) override { return {}; }
 
-	Texture createTexture(unsigned int, unsigned int) override { return {}; }
+	Texture createTexture(int32_t, int32_t) override { return {}; }
 	void updateTexture(Texture&, Rect, const Image&) override{};
 };

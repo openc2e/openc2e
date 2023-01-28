@@ -21,6 +21,7 @@
 
 #include "BackendEvent.h"
 #include "BackendTexture.h"
+#include "Keycodes.h"
 #include "common/Image.h"
 #include "common/math/Rect.h"
 #include "common/math/RectF.h"
@@ -30,8 +31,8 @@
 #include <string>
 
 // reasonable defaults
-constexpr int OPENC2E_DEFAULT_WIDTH = 800;
-constexpr int OPENC2E_DEFAULT_HEIGHT = 600;
+constexpr int32_t OPENC2E_DEFAULT_WIDTH = 800;
+constexpr int32_t OPENC2E_DEFAULT_HEIGHT = 600;
 
 class creaturesImage;
 
@@ -53,9 +54,9 @@ class RenderTarget {
 		renderCreaturesImage(*tex.get(), frame, x, y, options);
 	}
 	virtual void renderLine(float x1, float y1, float x2, float y2, unsigned int color) = 0;
-	virtual void blitRenderTarget(RenderTarget* src, int x, int y, int w, int h) = 0;
-	virtual unsigned int getWidth() const = 0;
-	virtual unsigned int getHeight() const = 0;
+	virtual void blitRenderTarget(RenderTarget* src, float x, float y, float w, float h) = 0;
+	virtual int32_t getWidth() const = 0;
+	virtual int32_t getHeight() const = 0;
 	virtual void renderClear() = 0;
 	virtual void setViewportOffsetTop(int offset_top) = 0;
 	virtual void setViewportOffsetBottom(int offset_bottom) = 0;
@@ -64,17 +65,17 @@ class RenderTarget {
 
 class Backend {
   public:
-	virtual void init(const std::string& name, int width, int height) = 0;
+	virtual void init(const std::string& name, int32_t width, int32_t height) = 0;
 	virtual void shutdown() = 0;
 
 	virtual unsigned int ticks() = 0;
 	virtual bool pollEvent(BackendEvent& e) = 0;
-	virtual bool keyDown(int key) = 0;
+	virtual bool keyDown(Openc2eKeycode key) = 0;
 
 	virtual std::shared_ptr<RenderTarget> getMainRenderTarget() = 0;
-	virtual std::shared_ptr<RenderTarget> newRenderTarget(unsigned int width, unsigned int height) = 0;
+	virtual std::shared_ptr<RenderTarget> newRenderTarget(int32_t width, int32_t height) = 0;
 
-	virtual Texture createTexture(unsigned int width, unsigned int height) = 0;
+	virtual Texture createTexture(int32_t width, int32_t height) = 0;
 	virtual void updateTexture(Texture& tex, Rect location, const Image& image) = 0;
 	Texture createTextureFromImage(const Image& image) {
 		Texture tex = createTexture(image.width, image.height);

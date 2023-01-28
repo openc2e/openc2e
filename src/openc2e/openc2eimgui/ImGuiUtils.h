@@ -44,10 +44,10 @@ bool ImageButton(Texture texture, bool enabled = true);
 class TextureRect {
   public:
 	Texture parent;
-	unsigned int x;
-	unsigned int y;
-	unsigned int w;
-	unsigned int h;
+	int32_t x;
+	int32_t y;
+	int32_t w;
+	int32_t h;
 };
 bool ImageButton(TextureRect texture, bool enabled = true);
 

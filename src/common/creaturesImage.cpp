@@ -35,7 +35,7 @@ imageformat creaturesImage::format(unsigned int frame) const {
 
 unsigned int creaturesImage::numframes() const {
 	if (block_width || block_height) {
-		auto val = images[0].width / block_width * images[0].height / block_height;
+		auto val = numeric_cast<unsigned int>(images[0].width) / block_width * numeric_cast<unsigned int>(images[0].height) / block_height;
 		return val;
 	}
 	return numeric_cast<unsigned int>(images.size());
@@ -45,14 +45,14 @@ unsigned int creaturesImage::width(unsigned int frame) const {
 	if (block_width) {
 		return block_width;
 	}
-	return images[frame].width;
+	return numeric_cast<unsigned int>(images[frame].width);
 }
 
 unsigned int creaturesImage::height(unsigned int frame) const {
 	if (block_height) {
 		return block_height;
 	}
-	return images[frame].height;
+	return numeric_cast<unsigned int>(images[frame].height);
 }
 
 const void* creaturesImage::data(unsigned int frame) const {
@@ -90,14 +90,14 @@ Texture& creaturesImage::getTextureForFrame(unsigned int frame) {
 
 unsigned int creaturesImage::getXOffsetForFrame(unsigned int frame) const {
 	if (block_width) {
-		return block_width * (frame % (images[0].width / block_width));
+		return block_width * (frame % (numeric_cast<unsigned int>(images[0].width) / block_width));
 	}
 	return 0;
 }
 
 unsigned int creaturesImage::getYOffsetForFrame(unsigned int frame) const {
 	if (block_width && block_height) {
-		return block_height * (frame / (images[0].width / block_width));
+		return block_height * (frame / (numeric_cast<unsigned int>(images[0].width) / block_width));
 	}
 	return 0;
 }
@@ -110,7 +110,7 @@ bool creaturesImage::transparentAt(unsigned int frame, unsigned int x, unsigned 
 
 	// Docking Station's snotrock triggers this, as does something in Creatures Village.
 	// TODO: why does it happen??
-	if (x >= images[frame].width || y >= images[frame].height)
+	if (x >= numeric_cast<unsigned int>(images[frame].width) || y >= numeric_cast<unsigned int>(images[frame].height))
 		return true;
 
 	imageformat imgformat = format(frame);

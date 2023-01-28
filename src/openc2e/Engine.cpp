@@ -394,7 +394,7 @@ void Engine::handleKeyboardScrolling() {
 	if (v.hasInt()) {
 		switch (v.getInt()) {
 			case 1: // enable if CTRL is held
-				wasdMode = get_backend()->keyDown(17); // CTRL
+				wasdMode = get_backend()->keyDown(OPENC2E_KEY_CTRL);
 				break;
 			case 2: // enable unconditionally
 				// (this needs agent support to suppress chat bubbles etc)
@@ -412,10 +412,10 @@ void Engine::handleKeyboardScrolling() {
 	}
 
 	// check keys
-	bool leftdown = get_backend()->keyDown(37) || (wasdMode && a_down);
-	bool rightdown = get_backend()->keyDown(39) || (wasdMode && d_down);
-	bool updown = get_backend()->keyDown(38) || (wasdMode && w_down);
-	bool downdown = get_backend()->keyDown(40) || (wasdMode && s_down);
+	bool leftdown = get_backend()->keyDown(OPENC2E_KEY_LEFT) || (wasdMode && a_down);
+	bool rightdown = get_backend()->keyDown(OPENC2E_KEY_RIGHT) || (wasdMode && d_down);
+	bool updown = get_backend()->keyDown(OPENC2E_KEY_UP) || (wasdMode && w_down);
+	bool downdown = get_backend()->keyDown(OPENC2E_KEY_DOWN) || (wasdMode && s_down);
 
 	if (leftdown)
 		velx -= accelspeed;

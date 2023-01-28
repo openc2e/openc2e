@@ -30,7 +30,7 @@ MultiImage ReadC16File(std::istream& in) {
 	bool is_565 = (flags & 0x01);
 	THROW_IFNOT(flags & 0x02);
 	imageformat imgformat = is_565 ? if_rgb565 : if_rgb555;
-	auto numframes = read16le(in);
+	uint16_t numframes = read16le(in);
 
 	MultiImage images(numframes);
 
@@ -47,7 +47,7 @@ MultiImage ReadC16File(std::istream& in) {
 		if (images[i].height > 0) {
 			lineoffsets[i][0] = offset;
 		}
-		for (unsigned int j = 1; j < images[i].height; j++) {
+		for (int j = 1; j < images[i].height; j++) {
 			lineoffsets[i][j] = read32le(in);
 		}
 	}
@@ -57,10 +57,10 @@ MultiImage ReadC16File(std::istream& in) {
 	size_t curpos = in.tellg();
 
 	// todo: we assume the file format is valid here. we shouldn't.
-	for (unsigned int i = 0; i < numframes; i++) {
+	for (size_t i = 0; i < numframes; i++) {
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height * 2);
 		uint16_t* bufferpos = (uint16_t*)images[i].data.data();
-		for (unsigned int j = 0; j < images[i].height; j++) {
+		for (int j = 0; j < images[i].height; j++) {
 			if (lineoffsets[i][j] != curpos) {
 				// TODO: log warning?
 				in.seekg(lineoffsets[i][j], std::ios::beg);

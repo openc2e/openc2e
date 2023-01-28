@@ -7,7 +7,7 @@ class Texture {
 	Texture(){};
 
 	template <typename T>
-	Texture(T* ptr_, unsigned int width_, unsigned int height_, void (*deleter_)(T*))
+	Texture(T* ptr_, int32_t width_, int32_t height_, void (*deleter_)(T*))
 		: ptr(ptr_, deleter_), width(width_), height(height_) {}
 
 	explicit operator bool() const {
@@ -37,6 +37,6 @@ class Texture {
 	}
 
 	std::shared_ptr<void> ptr;
-	unsigned int width = 0;
-	unsigned int height = 0;
+	int32_t width = 0;
+	int32_t height = 0;
 };

@@ -24,8 +24,8 @@ class Color {
 
 class Image {
   public:
-	unsigned int width = 0;
-	unsigned int height = 0;
+	int32_t width = 0;
+	int32_t height = 0;
 	imageformat format;
 	shared_array<uint8_t> data;
 	shared_array<Color> palette;

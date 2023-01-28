@@ -44,6 +44,13 @@ constexpr inline auto numeric_cast(float value)
 
 template <typename To, typename From>
 constexpr inline auto numeric_cast(From value)
+	-> std::enable_if_t<std::is_enum<To>::value && std::is_arithmetic<From>::value, To> {
+	// if casting to an enum, make sure the original value fits in the underlying type
+	return static_cast<To>(numeric_cast<std::underlying_type_t<To>>(value));
+}
+
+template <typename To, typename From>
+constexpr inline auto numeric_cast(From value)
 	-> std::enable_if_t<std::is_floating_point<To>::value && std::is_integral<From>::value, To> {
 	// converting integers to floating point is always safe (though not necessarily exact)
 	return static_cast<To>(value);

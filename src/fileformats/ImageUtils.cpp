@@ -169,8 +169,8 @@ Image Tint(const Image& oldimage, unsigned char r, unsigned char g, unsigned cha
 	newimage.format = oldimage.format;
 	newimage.data = shared_array<uint8_t>(oldimage.data.size());
 
-	for (unsigned int j = 0; j < oldimage.height; j++) {
-		for (unsigned int k = 0; k < oldimage.width; k++) {
+	for (int j = 0; j < oldimage.height; j++) {
+		for (int k = 0; k < oldimage.width; k++) {
 			unsigned short v = ((unsigned short*)oldimage.data.data())[(j * oldimage.width) + k];
 			if (v == 0) {
 				((unsigned short*)newimage.data.data())[(j * newimage.width) + k] = 0;

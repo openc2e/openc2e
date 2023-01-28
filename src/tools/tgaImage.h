@@ -15,7 +15,7 @@ Image ToBGR24(const Image& oldimage) {
 	newimage.data = shared_array<uint8_t>(newimage.width * newimage.height * 3);
 	newimage.format = if_bgr24;
 
-	for (size_t j = 0; j < oldimage.width * oldimage.height; ++j) {
+	for (int j = 0; j < oldimage.width * oldimage.height; ++j) {
 		uint8_t r, g, b;
 		if (oldimage.format == if_rgb565) {
 			uint16_t pixel = *(((uint16_t*)oldimage.data.data()) + j);
