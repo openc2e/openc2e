@@ -1,36 +1,41 @@
 #pragma once
 
 #include <iterator>
+#include <type_traits>
 
-class range {
+template <typename T>
+class IotaViewImpl {
   public:
-	range(int start, int end)
+	IotaViewImpl(T start, T end)
 		: start_(start), end_(end) {}
-	range(int end)
-		: end_(end) {}
 
 	class iterator {
 	  public:
-		iterator(int i_)
+		iterator(T i_)
 			: i(i_) {}
 		iterator operator++() { return iterator(i++); }
 		bool operator!=(iterator other) { return i != other.i; }
-		int operator*() { return i; }
+		T operator*() { return i; }
 
-		using difference_type = int;
-		using value_type = int;
-		using pointer = int;
-		using reference = int;
+		using difference_type = std::make_signed_t<T>;
+		using value_type = T;
+		using pointer = T;
+		using reference = T;
 		using iterator_category = std::forward_iterator_tag;
 
 	  private:
-		int i;
+		T i;
 	};
 
 	iterator begin() const { return iterator(start_); }
 	iterator end() const { return iterator(end_); }
 
   private:
-	const int start_ = 0;
-	const int end_;
+	const T start_;
+	const T end_;
 };
+
+template <typename T>
+auto iota_view(T start, T end) {
+	return IotaViewImpl<T>(start, end);
+}
