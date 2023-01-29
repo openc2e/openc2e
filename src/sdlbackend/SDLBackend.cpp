@@ -582,33 +582,50 @@ bool SDLBackend::keyDown(Openc2eKeycode key) {
 static constexpr int OPENC2E_MAX_FPS = 60;
 static constexpr int OPENC2E_MIN_FPS = 20;
 
-void SDLBackend::waitForNextDraw() {
-	// TODO: we have to calculate renderer sizes when the backend is initialized,
-	// otherwise side panels get in weird locations. related to issue with panels
-	// when resizing in general?
+static bool should_quit = false;
 
-	int windowwidth, windowheight;
-	int drawablewidth, drawableheight;
-	SDL_GetWindowSize(window, &windowwidth, &windowheight);
-	SDL_GetRendererOutputSize(renderer, &drawablewidth, &drawableheight);
-	SDL_RenderSetScale(renderer, drawablewidth * 1.f / windowwidth, drawableheight * 1.f / windowheight);
-
-	bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
-	Uint32 desired_ticks_per_frame = 1000 / (focused ? OPENC2E_MAX_FPS : OPENC2E_MIN_FPS);
-	Uint32 frame_end = SDL_GetTicks();
-	if (frame_end - last_frame_end < desired_ticks_per_frame) {
-		SDL_Delay(desired_ticks_per_frame - (frame_end - last_frame_end));
+int sdl_event_watcher(void* userdata, SDL_Event* event) {
+	(void)userdata;
+	if (event->type == SDL_QUIT) {
+		should_quit = true;
 	}
-	last_frame_end = frame_end;
-
-	ImGui_ImplSDLRenderer_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
+	return 1;
 }
 
-void SDLBackend::drawDone() {
-	ImGui::Render();
-	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+void SDLBackend::run(std::function<bool()> update_callback) {
+	SDL_AddEventWatch(sdl_event_watcher, nullptr);
 
-	SDL_RenderPresent(renderer);
+	while (true) {
+		// TODO: we have to calculate renderer sizes when the backend is initialized,
+		// otherwise side panels get in weird locations. related to issue with panels
+		// when resizing in general?
+
+		int windowwidth, windowheight;
+		int drawablewidth, drawableheight;
+		SDL_GetWindowSize(window, &windowwidth, &windowheight);
+		SDL_GetRendererOutputSize(renderer, &drawablewidth, &drawableheight);
+		SDL_RenderSetScale(renderer, drawablewidth * 1.f / windowwidth, drawableheight * 1.f / windowheight);
+
+		bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+		Uint32 desired_ticks_per_frame = 1000 / (focused ? OPENC2E_MAX_FPS : OPENC2E_MIN_FPS);
+		Uint32 frame_end = SDL_GetTicks();
+		if (frame_end - last_frame_end < desired_ticks_per_frame) {
+			SDL_Delay(desired_ticks_per_frame - (frame_end - last_frame_end));
+		}
+		last_frame_end = frame_end;
+
+		ImGui_ImplSDLRenderer_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+
+		bool result = update_callback();
+		if (should_quit || !result) {
+			break;
+		}
+
+		ImGui::Render();
+		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
+		SDL_RenderPresent(renderer);
+	}
 }

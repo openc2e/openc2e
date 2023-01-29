@@ -56,18 +56,14 @@ extern "C" int main(int argc, char* argv[]) {
 	if (!engine.initialSetup())
 		return 0;
 
-	// run
-	while (true) {
-		get_backend()->waitForNextDraw();
-		if (engine.done) {
-			break;
-		}
-
+	get_backend()->run([] {
 		engine.tick();
+		if (engine.done) {
+			return false;
+		}
 		engine.drawWorld();
-
-		get_backend()->drawDone();
-	}
+		return true;
+	});
 
 	// we're done, be sure to shut stuff down
 	engine.shutdown();

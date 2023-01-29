@@ -49,8 +49,6 @@ class NullBackend : public Backend {
 	static Backend* get_instance();
 
 	void init(const std::string&, int32_t, int32_t) override {}
-	void waitForNextDraw() override {}
-	void drawDone() override {}
 	void shutdown() override {}
 
 	unsigned int ticks() override { return 0; }
@@ -63,5 +61,7 @@ class NullBackend : public Backend {
 	std::shared_ptr<RenderTarget> newRenderTarget(int32_t, int32_t) override { return {}; }
 
 	Texture createTexture(int32_t, int32_t) override { return {}; }
-	void updateTexture(Texture&, Rect, const Image&) override{};
+	void updateTexture(Texture&, Rect, const Image&) override {}
+
+	void run(std::function<bool()>) override {}
 };

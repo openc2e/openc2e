@@ -235,6 +235,7 @@ void World::tick() {
 		// due to destruction ordering we must explicitly destroy all agents here
 		agents.clear();
 		engine.done = true;
+		return;
 	}
 
 	// Tick all agents, deleting as necessary.

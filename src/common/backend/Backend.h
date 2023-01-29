@@ -83,8 +83,8 @@ class Backend {
 		return tex;
 	}
 
-	virtual void waitForNextDraw() = 0;
-	virtual void drawDone() = 0;
+	virtual void run(std::function<bool()> render_callback) = 0;
+
 	virtual ~Backend() {}
 };
 

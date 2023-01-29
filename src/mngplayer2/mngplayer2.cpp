@@ -624,28 +624,6 @@ void InitMNGMusic() {
 	app_state.variablesUpdated();
 }
 
-void RunMainLoop() {
-	while (true) {
-		backend->waitForNextDraw();
-
-		// handle ui events
-		BackendEvent event;
-		while (backend->pollEvent(event)) {
-			if (event.type == eventquit) {
-				should_quit = true;
-			}
-		}
-		if (should_quit) {
-			break;
-		}
-
-		// draw
-		app_state.Update();
-		DrawImGui();
-		backend->drawDone();
-	}
-}
-
 int main(int, char**) {
 	install_backtrace_printer();
 
@@ -657,6 +635,16 @@ int main(int, char**) {
 	}
 	InitMNGMusic();
 
-	RunMainLoop();
+	backend->run([] {
+		// handle ui events
+		BackendEvent event;
+		while (backend->pollEvent(event)) {
+		}
+
+		// draw
+		app_state.Update();
+		DrawImGui();
+		return true;
+	});
 	return 0;
 }

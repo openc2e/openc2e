@@ -140,22 +140,12 @@ extern "C" int main(int argc, char** argv) {
 	load_everything();
 
 	// run loop
-	// get_backend()->init("opencreatures1", OPENC2E_DEFAULT_WIDTH, OPENC2E_DEFAULT_HEIGHT);
-	while (true) {
-		get_backend()->waitForNextDraw();
-
+	get_backend()->run([&] {
 		// handle ui events
 		BackendEvent event;
-		bool should_quit = false;
 		while (get_backend()->pollEvent(event)) {
 			g_engine_context.viewport->handle_event(event);
 			g_engine_context.pointer->handle_event(event);
-			if (event.type == eventquit) {
-				should_quit = true;
-			}
-		}
-		if (should_quit) {
-			break;
 		}
 
 		// update world
@@ -163,10 +153,8 @@ extern "C" int main(int argc, char** argv) {
 
 		// draw
 		get_rendersystem()->draw();
-
-		// present
-		get_backend()->drawDone();
-	}
+		return true;
+	});
 
 	// explicitly destroy game data
 	// C1ControlledSounds need to be destroyed before the AudioBackend is destroyed,

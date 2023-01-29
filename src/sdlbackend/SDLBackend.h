@@ -75,8 +75,7 @@ class SDLBackend : public Backend {
 
 	static Backend* get_instance();
 	void init(const std::string& name, int32_t width, int32_t height) override;
-	void waitForNextDraw() override;
-	void drawDone() override;
+	void run(std::function<bool()> render_callback) override;
 	void shutdown() override;
 
 	bool pollEvent(BackendEvent& e) override;
