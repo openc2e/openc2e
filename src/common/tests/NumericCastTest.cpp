@@ -24,6 +24,8 @@ from_only_types = [
 ]
 
 def literal(type, value):
+    if type != "float":
+        value = int(value)
     if type == "uint64_t":
         return f"{value}ull"
     if type == "int64_t":
@@ -49,18 +51,18 @@ def lower(type, value):
         while True:
             packed = struct.unpack('f', struct.pack('f', value))[0]
             if packed <= value:
-                return literal(type, packed)
+                return packed
             value = nextafter(value, float("-inf"))
-    return literal(type, value)
+    return value
 
 def higher(type, value):
     if type == 'float':
         while True:
             packed = struct.unpack('f', struct.pack('f', value))[0]
             if packed >= value:
-                return literal(type, packed)
+                return packed
             value = nextafter(value)
-    return literal(type, value)
+    return value
 
 for to, to_low, to_high in types:
     for from_, from_low, from_high in types + from_only_types:
@@ -68,21 +70,21 @@ for to, to_low, to_high in types:
         print(f"\t{from_} value;")
 
         if from_low < to_low:
-            print("\tvalue = {};".format(lower(from_, to_low - 1)))
+            print("\tvalue = {};".format(literal(from_, lower(from_, to_low - 1))))
             print(f"\tEXPECT_THROW(numeric_cast<{to}>(value), BadNumericCast);")
-            print("\tvalue = {};".format(higher(from_, to_low)))
-            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, higher(from_, to_low)))
+            print("\tvalue = {};".format(literal(from_, higher(from_, to_low))))
+            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, literal(to, higher(from_, to_low))))
         else:
             print("\tvalue = {};".format(literal(from_, from_low)))
-            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, literal(from_, from_low)))
+            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, literal(to, from_low)))
         if from_high > to_high:
-            print("\tvalue = {};".format(higher(from_, to_high + 1)))
+            print("\tvalue = {};".format(literal(from_, higher(from_, to_high + 1))))
             print(f"\tEXPECT_THROW(numeric_cast<{to}>(value), BadNumericCast);")
-            print("\tvalue = {};".format(lower(from_, to_high)))
-            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, lower(from_, to_high)))
+            print("\tvalue = {};".format(literal(from_, lower(from_, to_high))))
+            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, literal(to, lower(from_, to_high))))
         else:
             print("\tvalue = {};".format(literal(from_, from_high)))
-            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, literal(from_, from_high)))
+            print("\tEXPECT_EQ(numeric_cast<{}>(value), {});".format(to, literal(to, from_high)))
         print("}")
         print()
 */
@@ -152,11 +154,11 @@ TEST(NumericCast, int32_to_uint8) {
 TEST(NumericCast, uint64_to_uint8) {
 	uint64_t value;
 	value = 0ull;
-	EXPECT_EQ(numeric_cast<uint8_t>(value), 0ull);
+	EXPECT_EQ(numeric_cast<uint8_t>(value), 0);
 	value = 256ull;
 	EXPECT_THROW(numeric_cast<uint8_t>(value), BadNumericCast);
 	value = 255ull;
-	EXPECT_EQ(numeric_cast<uint8_t>(value), 255ull);
+	EXPECT_EQ(numeric_cast<uint8_t>(value), 255);
 }
 
 TEST(NumericCast, int64_to_uint8) {
@@ -164,11 +166,11 @@ TEST(NumericCast, int64_to_uint8) {
 	value = -1ll;
 	EXPECT_THROW(numeric_cast<uint8_t>(value), BadNumericCast);
 	value = 0ll;
-	EXPECT_EQ(numeric_cast<uint8_t>(value), 0ll);
+	EXPECT_EQ(numeric_cast<uint8_t>(value), 0);
 	value = 256ll;
 	EXPECT_THROW(numeric_cast<uint8_t>(value), BadNumericCast);
 	value = 255ll;
-	EXPECT_EQ(numeric_cast<uint8_t>(value), 255ll);
+	EXPECT_EQ(numeric_cast<uint8_t>(value), 255);
 }
 
 TEST(NumericCast, float_to_uint8) {
@@ -176,11 +178,11 @@ TEST(NumericCast, float_to_uint8) {
 	value = -1.000000f;
 	EXPECT_THROW(numeric_cast<uint8_t>(value), BadNumericCast);
 	value = 0.000000f;
-	EXPECT_EQ(numeric_cast<uint8_t>(value), 0.000000f);
+	EXPECT_EQ(numeric_cast<uint8_t>(value), 0);
 	value = 256.000000f;
 	EXPECT_THROW(numeric_cast<uint8_t>(value), BadNumericCast);
 	value = 255.000000f;
-	EXPECT_EQ(numeric_cast<uint8_t>(value), 255.000000f);
+	EXPECT_EQ(numeric_cast<uint8_t>(value), 255);
 }
 
 TEST(NumericCast, uint8_to_int8) {
@@ -248,11 +250,11 @@ TEST(NumericCast, int32_to_int8) {
 TEST(NumericCast, uint64_to_int8) {
 	uint64_t value;
 	value = 0ull;
-	EXPECT_EQ(numeric_cast<int8_t>(value), 0ull);
+	EXPECT_EQ(numeric_cast<int8_t>(value), 0);
 	value = 128ull;
 	EXPECT_THROW(numeric_cast<int8_t>(value), BadNumericCast);
 	value = 127ull;
-	EXPECT_EQ(numeric_cast<int8_t>(value), 127ull);
+	EXPECT_EQ(numeric_cast<int8_t>(value), 127);
 }
 
 TEST(NumericCast, int64_to_int8) {
@@ -260,11 +262,11 @@ TEST(NumericCast, int64_to_int8) {
 	value = -129ll;
 	EXPECT_THROW(numeric_cast<int8_t>(value), BadNumericCast);
 	value = -128ll;
-	EXPECT_EQ(numeric_cast<int8_t>(value), -128ll);
+	EXPECT_EQ(numeric_cast<int8_t>(value), -128);
 	value = 128ll;
 	EXPECT_THROW(numeric_cast<int8_t>(value), BadNumericCast);
 	value = 127ll;
-	EXPECT_EQ(numeric_cast<int8_t>(value), 127ll);
+	EXPECT_EQ(numeric_cast<int8_t>(value), 127);
 }
 
 TEST(NumericCast, float_to_int8) {
@@ -272,11 +274,11 @@ TEST(NumericCast, float_to_int8) {
 	value = -129.000000f;
 	EXPECT_THROW(numeric_cast<int8_t>(value), BadNumericCast);
 	value = -128.000000f;
-	EXPECT_EQ(numeric_cast<int8_t>(value), -128.000000f);
+	EXPECT_EQ(numeric_cast<int8_t>(value), -128);
 	value = 128.000000f;
 	EXPECT_THROW(numeric_cast<int8_t>(value), BadNumericCast);
 	value = 127.000000f;
-	EXPECT_EQ(numeric_cast<int8_t>(value), 127.000000f);
+	EXPECT_EQ(numeric_cast<int8_t>(value), 127);
 }
 
 TEST(NumericCast, uint8_to_uint16) {
@@ -340,11 +342,11 @@ TEST(NumericCast, int32_to_uint16) {
 TEST(NumericCast, uint64_to_uint16) {
 	uint64_t value;
 	value = 0ull;
-	EXPECT_EQ(numeric_cast<uint16_t>(value), 0ull);
+	EXPECT_EQ(numeric_cast<uint16_t>(value), 0);
 	value = 65536ull;
 	EXPECT_THROW(numeric_cast<uint16_t>(value), BadNumericCast);
 	value = 65535ull;
-	EXPECT_EQ(numeric_cast<uint16_t>(value), 65535ull);
+	EXPECT_EQ(numeric_cast<uint16_t>(value), 65535);
 }
 
 TEST(NumericCast, int64_to_uint16) {
@@ -352,11 +354,11 @@ TEST(NumericCast, int64_to_uint16) {
 	value = -1ll;
 	EXPECT_THROW(numeric_cast<uint16_t>(value), BadNumericCast);
 	value = 0ll;
-	EXPECT_EQ(numeric_cast<uint16_t>(value), 0ll);
+	EXPECT_EQ(numeric_cast<uint16_t>(value), 0);
 	value = 65536ll;
 	EXPECT_THROW(numeric_cast<uint16_t>(value), BadNumericCast);
 	value = 65535ll;
-	EXPECT_EQ(numeric_cast<uint16_t>(value), 65535ll);
+	EXPECT_EQ(numeric_cast<uint16_t>(value), 65535);
 }
 
 TEST(NumericCast, float_to_uint16) {
@@ -364,11 +366,11 @@ TEST(NumericCast, float_to_uint16) {
 	value = -1.000000f;
 	EXPECT_THROW(numeric_cast<uint16_t>(value), BadNumericCast);
 	value = 0.000000f;
-	EXPECT_EQ(numeric_cast<uint16_t>(value), 0.000000f);
+	EXPECT_EQ(numeric_cast<uint16_t>(value), 0);
 	value = 65536.000000f;
 	EXPECT_THROW(numeric_cast<uint16_t>(value), BadNumericCast);
 	value = 65535.000000f;
-	EXPECT_EQ(numeric_cast<uint16_t>(value), 65535.000000f);
+	EXPECT_EQ(numeric_cast<uint16_t>(value), 65535);
 }
 
 TEST(NumericCast, uint8_to_int16) {
@@ -430,11 +432,11 @@ TEST(NumericCast, int32_to_int16) {
 TEST(NumericCast, uint64_to_int16) {
 	uint64_t value;
 	value = 0ull;
-	EXPECT_EQ(numeric_cast<int16_t>(value), 0ull);
+	EXPECT_EQ(numeric_cast<int16_t>(value), 0);
 	value = 32768ull;
 	EXPECT_THROW(numeric_cast<int16_t>(value), BadNumericCast);
 	value = 32767ull;
-	EXPECT_EQ(numeric_cast<int16_t>(value), 32767ull);
+	EXPECT_EQ(numeric_cast<int16_t>(value), 32767);
 }
 
 TEST(NumericCast, int64_to_int16) {
@@ -442,11 +444,11 @@ TEST(NumericCast, int64_to_int16) {
 	value = -32769ll;
 	EXPECT_THROW(numeric_cast<int16_t>(value), BadNumericCast);
 	value = -32768ll;
-	EXPECT_EQ(numeric_cast<int16_t>(value), -32768ll);
+	EXPECT_EQ(numeric_cast<int16_t>(value), -32768);
 	value = 32768ll;
 	EXPECT_THROW(numeric_cast<int16_t>(value), BadNumericCast);
 	value = 32767ll;
-	EXPECT_EQ(numeric_cast<int16_t>(value), 32767ll);
+	EXPECT_EQ(numeric_cast<int16_t>(value), 32767);
 }
 
 TEST(NumericCast, float_to_int16) {
@@ -454,11 +456,11 @@ TEST(NumericCast, float_to_int16) {
 	value = -32769.000000f;
 	EXPECT_THROW(numeric_cast<int16_t>(value), BadNumericCast);
 	value = -32768.000000f;
-	EXPECT_EQ(numeric_cast<int16_t>(value), -32768.000000f);
+	EXPECT_EQ(numeric_cast<int16_t>(value), -32768);
 	value = 32768.000000f;
 	EXPECT_THROW(numeric_cast<int16_t>(value), BadNumericCast);
 	value = 32767.000000f;
-	EXPECT_EQ(numeric_cast<int16_t>(value), 32767.000000f);
+	EXPECT_EQ(numeric_cast<int16_t>(value), 32767);
 }
 
 TEST(NumericCast, uint8_to_uint32) {
@@ -518,11 +520,11 @@ TEST(NumericCast, int32_to_uint32) {
 TEST(NumericCast, uint64_to_uint32) {
 	uint64_t value;
 	value = 0ull;
-	EXPECT_EQ(numeric_cast<uint32_t>(value), 0ull);
+	EXPECT_EQ(numeric_cast<uint32_t>(value), 0);
 	value = 4294967296ull;
 	EXPECT_THROW(numeric_cast<uint32_t>(value), BadNumericCast);
 	value = 4294967295ull;
-	EXPECT_EQ(numeric_cast<uint32_t>(value), 4294967295ull);
+	EXPECT_EQ(numeric_cast<uint32_t>(value), 4294967295);
 }
 
 TEST(NumericCast, int64_to_uint32) {
@@ -530,11 +532,11 @@ TEST(NumericCast, int64_to_uint32) {
 	value = -1ll;
 	EXPECT_THROW(numeric_cast<uint32_t>(value), BadNumericCast);
 	value = 0ll;
-	EXPECT_EQ(numeric_cast<uint32_t>(value), 0ll);
+	EXPECT_EQ(numeric_cast<uint32_t>(value), 0);
 	value = 4294967296ll;
 	EXPECT_THROW(numeric_cast<uint32_t>(value), BadNumericCast);
 	value = 4294967295ll;
-	EXPECT_EQ(numeric_cast<uint32_t>(value), 4294967295ll);
+	EXPECT_EQ(numeric_cast<uint32_t>(value), 4294967295);
 }
 
 TEST(NumericCast, float_to_uint32) {
@@ -542,11 +544,11 @@ TEST(NumericCast, float_to_uint32) {
 	value = -1.000000f;
 	EXPECT_THROW(numeric_cast<uint32_t>(value), BadNumericCast);
 	value = 0.000000f;
-	EXPECT_EQ(numeric_cast<uint32_t>(value), 0.000000f);
+	EXPECT_EQ(numeric_cast<uint32_t>(value), 0);
 	value = 4294967296.000000f;
 	EXPECT_THROW(numeric_cast<uint32_t>(value), BadNumericCast);
 	value = 4294966784.000000f;
-	EXPECT_EQ(numeric_cast<uint32_t>(value), 4294966784.000000f);
+	EXPECT_EQ(numeric_cast<uint32_t>(value), 4294966784);
 }
 
 TEST(NumericCast, uint8_to_int32) {
@@ -602,11 +604,11 @@ TEST(NumericCast, int32_to_int32) {
 TEST(NumericCast, uint64_to_int32) {
 	uint64_t value;
 	value = 0ull;
-	EXPECT_EQ(numeric_cast<int32_t>(value), 0ull);
+	EXPECT_EQ(numeric_cast<int32_t>(value), 0);
 	value = 2147483648ull;
 	EXPECT_THROW(numeric_cast<int32_t>(value), BadNumericCast);
 	value = 2147483647ull;
-	EXPECT_EQ(numeric_cast<int32_t>(value), 2147483647ull);
+	EXPECT_EQ(numeric_cast<int32_t>(value), 2147483647);
 }
 
 TEST(NumericCast, int64_to_int32) {
@@ -614,11 +616,11 @@ TEST(NumericCast, int64_to_int32) {
 	value = -2147483649ll;
 	EXPECT_THROW(numeric_cast<int32_t>(value), BadNumericCast);
 	value = -2147483648ll;
-	EXPECT_EQ(numeric_cast<int32_t>(value), -2147483648ll);
+	EXPECT_EQ(numeric_cast<int32_t>(value), -2147483648);
 	value = 2147483648ll;
 	EXPECT_THROW(numeric_cast<int32_t>(value), BadNumericCast);
 	value = 2147483647ll;
-	EXPECT_EQ(numeric_cast<int32_t>(value), 2147483647ll);
+	EXPECT_EQ(numeric_cast<int32_t>(value), 2147483647);
 }
 
 TEST(NumericCast, float_to_int32) {
@@ -626,19 +628,19 @@ TEST(NumericCast, float_to_int32) {
 	value = -2147483904.000000f;
 	EXPECT_THROW(numeric_cast<int32_t>(value), BadNumericCast);
 	value = -2147483648.000000f;
-	EXPECT_EQ(numeric_cast<int32_t>(value), -2147483648.000000f);
+	EXPECT_EQ(numeric_cast<int32_t>(value), -2147483648);
 	value = 2147483648.000000f;
 	EXPECT_THROW(numeric_cast<int32_t>(value), BadNumericCast);
 	value = 2147483392.000000f;
-	EXPECT_EQ(numeric_cast<int32_t>(value), 2147483392.000000f);
+	EXPECT_EQ(numeric_cast<int32_t>(value), 2147483392);
 }
 
 TEST(NumericCast, uint8_to_uint64) {
 	uint8_t value;
 	value = 0;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 255;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 255);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 255ull);
 }
 
 TEST(NumericCast, int8_to_uint64) {
@@ -646,17 +648,17 @@ TEST(NumericCast, int8_to_uint64) {
 	value = -1;
 	EXPECT_THROW(numeric_cast<uint64_t>(value), BadNumericCast);
 	value = 0;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 127;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 127);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 127ull);
 }
 
 TEST(NumericCast, uint16_to_uint64) {
 	uint16_t value;
 	value = 0;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 65535;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 65535);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 65535ull);
 }
 
 TEST(NumericCast, int16_to_uint64) {
@@ -664,17 +666,17 @@ TEST(NumericCast, int16_to_uint64) {
 	value = -1;
 	EXPECT_THROW(numeric_cast<uint64_t>(value), BadNumericCast);
 	value = 0;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 32767;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 32767);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 32767ull);
 }
 
 TEST(NumericCast, uint32_to_uint64) {
 	uint32_t value;
 	value = 0;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 4294967295;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 4294967295);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 4294967295ull);
 }
 
 TEST(NumericCast, int32_to_uint64) {
@@ -682,9 +684,9 @@ TEST(NumericCast, int32_to_uint64) {
 	value = -1;
 	EXPECT_THROW(numeric_cast<uint64_t>(value), BadNumericCast);
 	value = 0;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 2147483647;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 2147483647);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 2147483647ull);
 }
 
 TEST(NumericCast, uint64_to_uint64) {
@@ -700,9 +702,9 @@ TEST(NumericCast, int64_to_uint64) {
 	value = -1ll;
 	EXPECT_THROW(numeric_cast<uint64_t>(value), BadNumericCast);
 	value = 0ll;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ll);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 9223372036854775807ll;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 9223372036854775807ll);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 9223372036854775807ull);
 }
 
 TEST(NumericCast, float_to_uint64) {
@@ -710,69 +712,69 @@ TEST(NumericCast, float_to_uint64) {
 	value = -1.000000f;
 	EXPECT_THROW(numeric_cast<uint64_t>(value), BadNumericCast);
 	value = 0.000000f;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 0.000000f);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 0ull);
 	value = 18446744073709551616.000000f;
 	EXPECT_THROW(numeric_cast<uint64_t>(value), BadNumericCast);
 	value = 18446741874686296064.000000f;
-	EXPECT_EQ(numeric_cast<uint64_t>(value), 18446741874686296064.000000f);
+	EXPECT_EQ(numeric_cast<uint64_t>(value), 18446741874686296064ull);
 }
 
 TEST(NumericCast, uint8_to_int64) {
 	uint8_t value;
 	value = 0;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 0ll);
 	value = 255;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 255);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 255ll);
 }
 
 TEST(NumericCast, int8_to_int64) {
 	int8_t value;
 	value = -128;
-	EXPECT_EQ(numeric_cast<int64_t>(value), -128);
+	EXPECT_EQ(numeric_cast<int64_t>(value), -128ll);
 	value = 127;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 127);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 127ll);
 }
 
 TEST(NumericCast, uint16_to_int64) {
 	uint16_t value;
 	value = 0;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 0ll);
 	value = 65535;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 65535);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 65535ll);
 }
 
 TEST(NumericCast, int16_to_int64) {
 	int16_t value;
 	value = -32768;
-	EXPECT_EQ(numeric_cast<int64_t>(value), -32768);
+	EXPECT_EQ(numeric_cast<int64_t>(value), -32768ll);
 	value = 32767;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 32767);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 32767ll);
 }
 
 TEST(NumericCast, uint32_to_int64) {
 	uint32_t value;
 	value = 0;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 0);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 0ll);
 	value = 4294967295;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 4294967295);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 4294967295ll);
 }
 
 TEST(NumericCast, int32_to_int64) {
 	int32_t value;
 	value = -2147483648;
-	EXPECT_EQ(numeric_cast<int64_t>(value), -2147483648);
+	EXPECT_EQ(numeric_cast<int64_t>(value), -2147483648ll);
 	value = 2147483647;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 2147483647);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 2147483647ll);
 }
 
 TEST(NumericCast, uint64_to_int64) {
 	uint64_t value;
 	value = 0ull;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 0ull);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 0ll);
 	value = 9223372036854775808ull;
 	EXPECT_THROW(numeric_cast<int64_t>(value), BadNumericCast);
 	value = 9223372036854775807ull;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 9223372036854775807ull);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 9223372036854775807ll);
 }
 
 TEST(NumericCast, int64_to_int64) {
@@ -788,9 +790,9 @@ TEST(NumericCast, float_to_int64) {
 	value = -9223373136366403584.000000f;
 	EXPECT_THROW(numeric_cast<int64_t>(value), BadNumericCast);
 	value = -9223372036854775808.000000f;
-	EXPECT_EQ(numeric_cast<int64_t>(value), -9223372036854775808.000000f);
+	EXPECT_EQ(numeric_cast<int64_t>(value), -9223372036854775807ll - 1ll);
 	value = 9223372036854775808.000000f;
 	EXPECT_THROW(numeric_cast<int64_t>(value), BadNumericCast);
 	value = 9223370937343148032.000000f;
-	EXPECT_EQ(numeric_cast<int64_t>(value), 9223370937343148032.000000f);
+	EXPECT_EQ(numeric_cast<int64_t>(value), 9223370937343148032ll);
 }
