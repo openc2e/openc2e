@@ -450,15 +450,15 @@ void SDLRenderTarget::renderClear() {
 	SDL_RenderClear(parent->renderer);
 }
 
-void SDLRenderTarget::blitRenderTarget(RenderTarget* s, float x, float y, float w, float h) {
+void SDLRenderTarget::blitRenderTarget(RenderTarget* s, RectF dest) {
 	SDLRenderTarget* src = dynamic_cast<SDLRenderTarget*>(s);
 	assert(src);
 
 	SDL_FRect r;
-	r.x = x;
-	r.y = y + viewport_offset_top;
-	r.w = w;
-	r.h = h;
+	r.x = dest.x;
+	r.y = dest.y + viewport_offset_top;
+	r.w = dest.width;
+	r.h = dest.height;
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_RenderCopyF(parent->renderer, src->texture, nullptr, &r);
 }

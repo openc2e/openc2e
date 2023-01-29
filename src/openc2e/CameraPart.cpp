@@ -26,7 +26,7 @@ void CameraPart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 		}
 	}
 
-	renderer->blitRenderTarget(rendertarget.get(), xoffset + x, yoffset + y, camerawidth, cameraheight);
+	renderer->blitRenderTarget(rendertarget.get(), RectF(xoffset + x, yoffset + y, camerawidth, cameraheight));
 
 	SpritePart::partRender(renderer, xoffset, yoffset);
 }
