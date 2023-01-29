@@ -26,18 +26,19 @@ struct CGalleryV1 {
 	int32_t refcount;
 	std::vector<ImageV1> images;
 
-	void serialize(MFCReader& in) {
-		in.size_u32(images);
-		in.ascii_dword(filename);
-		in(first_sprite);
-		in(refcount);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar.size_u32(images);
+		ar.ascii_dword(filename);
+		ar(first_sprite);
+		ar(refcount);
 
 		for (auto& image : images) {
-			in(image.parent);
-			in(image.status);
-			in(image.width);
-			in(image.height);
-			in(image.offset);
+			ar(image.parent);
+			ar(image.status);
+			ar(image.width);
+			ar(image.height);
+			ar(image.offset);
 		}
 	}
 };
@@ -72,31 +73,32 @@ struct MapDataV1 {
 	std::array<uint32_t, 261> groundlevel;
 	std::array<BacteriumV1, 100> bacteria;
 
-	void serialize(MFCReader& in) {
-		in(unused_is_wrappable);
-		in(time_of_day);
-		in(background);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(unused_is_wrappable);
+		ar(time_of_day);
+		ar(background);
 
-		in.size_u32(rooms);
+		ar.size_u32(rooms);
 		for (auto& room : rooms) {
-			in(room.left);
-			in(room.top);
-			in(room.right);
-			in(room.bottom);
-			in(room.type);
+			ar(room.left);
+			ar(room.top);
+			ar(room.right);
+			ar(room.bottom);
+			ar(room.type);
 		}
 		for (auto& g : groundlevel) {
-			in(g);
+			ar(g);
 		}
 		for (auto& b : bacteria) {
-			in(b.state);
-			in(b.antigen);
-			in(b.fatal_level);
-			in(b.infect_level);
-			in(b.toxin1);
-			in(b.toxin2);
-			in(b.toxin3);
-			in(b.toxin4);
+			ar(b.state);
+			ar(b.antigen);
+			ar(b.fatal_level);
+			ar(b.infect_level);
+			ar(b.toxin1);
+			ar(b.toxin2);
+			ar(b.toxin3);
+			ar(b.toxin4);
 		}
 	}
 };
@@ -112,18 +114,19 @@ struct EntityV1 {
 	uint8_t animation_frame; // only if has_animation is true
 	std::string animation_string; // only if has_animation is true
 
-	void serialize(MFCReader& in) {
-		in(sprite);
-		in(current_sprite);
-		in(image_offset);
-		in(z_order);
-		in(x);
-		in(y);
-		in(has_animation);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(sprite);
+		ar(current_sprite);
+		ar(image_offset);
+		ar(z_order);
+		ar(x);
+		ar(y);
+		ar(has_animation);
 		if (has_animation) {
-			in(animation_frame);
+			ar(animation_frame);
 			// TODO: Assert real animation string?
-			in.ascii_nullterminated(animation_string, 32);
+			ar.ascii_nullterminated(animation_string, 32);
 		}
 	}
 };
@@ -137,12 +140,13 @@ struct ScriptV1 {
 	uint8_t family;
 	std::string text;
 
-	void serialize(MFCReader& in) {
-		in(eventno);
-		in(species);
-		in(genus);
-		in(family);
-		in.ascii_mfcstring(text);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(eventno);
+		ar(species);
+		ar(genus);
+		ar(family);
+		ar.ascii_mfcstring(text);
 	}
 };
 
@@ -171,32 +175,33 @@ struct ObjectV1 {
 	int32_t obv2;
 	std::vector<ScriptV1> scripts;
 
-	void serialize(MFCReader& in) {
+	template <typename Archive>
+	void serialize(Archive& ar) {
 		uint8_t unused_eventno = 0;
-		in(unused_eventno);
+		ar(unused_eventno);
 
-		in(species);
-		in(genus);
-		in(family);
-		in(movement_status);
-		in(attr);
-		in(limit_left);
-		in(limit_top);
-		in(limit_right);
-		in(limit_bottom);
-		in(carrier);
-		in(actv);
-		in(sprite);
-		in(tick_value);
-		in(ticks_since_last_tick_event);
-		in(objp);
-		in.ascii_dword(current_sound);
-		in(obv0);
-		in(obv1);
-		in(obv2);
-		in.size_u32(scripts);
+		ar(species);
+		ar(genus);
+		ar(family);
+		ar(movement_status);
+		ar(attr);
+		ar(limit_left);
+		ar(limit_top);
+		ar(limit_right);
+		ar(limit_bottom);
+		ar(carrier);
+		ar(actv);
+		ar(sprite);
+		ar(tick_value);
+		ar(ticks_since_last_tick_event);
+		ar(objp);
+		ar.ascii_dword(current_sound);
+		ar(obv0);
+		ar(obv1);
+		ar(obv2);
+		ar.size_u32(scripts);
 		for (auto& s : scripts) {
-			s.serialize(in);
+			s.serialize(ar);
 		}
 	}
 };
@@ -207,15 +212,16 @@ struct SimpleObjectV1 : ObjectV1 {
 	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
-	void serialize(MFCReader& in) {
-		ObjectV1::serialize(in);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ObjectV1::serialize(ar);
 
-		in(part);
-		in(z_order);
-		in(click_bhvr[0]);
-		in(click_bhvr[1]);
-		in(click_bhvr[2]);
-		in(touch_bhvr);
+		ar(part);
+		ar(z_order);
+		ar(click_bhvr[0]);
+		ar(click_bhvr[1]);
+		ar(click_bhvr[2]);
+		ar(touch_bhvr);
 	}
 };
 
@@ -224,12 +230,13 @@ struct BubbleV1 : SimpleObjectV1 {
 	ObjectV1* creator;
 	std::string text;
 
-	void serialize(MFCReader& in) {
-		SimpleObjectV1::serialize(in);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		SimpleObjectV1::serialize(ar);
 
-		in(life);
-		in(creator); // ???
-		in.ascii_nullterminated(text, 25);
+		ar(life);
+		ar(creator); // ???
+		ar.ascii_nullterminated(text, 25);
 	}
 };
 
@@ -239,13 +246,14 @@ struct PointerToolV1 : SimpleObjectV1 {
 	BubbleV1* bubble;
 	std::string text;
 
-	void serialize(MFCReader& in) {
-		SimpleObjectV1::serialize(in);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		SimpleObjectV1::serialize(ar);
 
-		in(relx);
-		in(rely);
-		in(bubble);
-		in.ascii_nullterminated(text, 25);
+		ar(relx);
+		ar(rely);
+		ar(bubble);
+		ar.ascii_nullterminated(text, 25);
 	}
 };
 
@@ -269,26 +277,27 @@ struct CompoundObjectV1 : ObjectV1 {
 	std::array<HotSpotV1, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 
-	void serialize(MFCReader& in) {
-		ObjectV1::serialize(in);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ObjectV1::serialize(ar);
 
-		in.size_u32(parts);
+		ar.size_u32(parts);
 		for (auto& part : parts) {
-			in(part.entity);
+			ar(part.entity);
 			if (part.entity == nullptr) {
 				throw Exception("whoops, entity is null");
 			}
-			in(part.x);
-			in(part.y);
+			ar(part.x);
+			ar(part.y);
 		}
 		for (auto& h : hotspots) {
-			in(h.left);
-			in(h.top);
-			in(h.right);
-			in(h.bottom);
+			ar(h.left);
+			ar(h.top);
+			ar(h.right);
+			ar(h.bottom);
 		}
 		for (auto& f : functions_to_hotspots) {
-			in(f);
+			ar(f);
 		}
 	}
 };
@@ -304,17 +313,18 @@ struct VehicleV1 : CompoundObjectV1 {
 	int32_t cabin_bottom;
 	uint32_t bump;
 
-	void serialize(MFCReader& in) {
-		CompoundObjectV1::serialize(in);
-		in(xvel_times_256);
-		in(yvel_times_256);
-		in(x_times_256);
-		in(y_times_256);
-		in(cabin_left);
-		in(cabin_top);
-		in(cabin_right);
-		in(cabin_bottom);
-		in(bump);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		CompoundObjectV1::serialize(ar);
+		ar(xvel_times_256);
+		ar(yvel_times_256);
+		ar(x_times_256);
+		ar(y_times_256);
+		ar(cabin_left);
+		ar(cabin_top);
+		ar(cabin_right);
+		ar(cabin_bottom);
+		ar(bump);
 	}
 };
 
@@ -332,16 +342,17 @@ struct BlackboardV1 : CompoundObjectV1 {
 	int8_t text_y_position;
 	std::array<BlackboardWord, 16> words;
 
-	void serialize(MFCReader& in) {
-		CompoundObjectV1::serialize(in);
-		in(background_color);
-		in(chalk_color);
-		in(alias_color);
-		in(text_x_position);
-		in(text_y_position);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		CompoundObjectV1::serialize(ar);
+		ar(background_color);
+		ar(chalk_color);
+		ar(alias_color);
+		ar(text_x_position);
+		ar(text_y_position);
 		for (auto& w : words) {
-			in(w.value);
-			in.ascii_nullterminated(w.text, 11);
+			ar(w.value);
+			ar.ascii_nullterminated(w.text, 11);
 		}
 	}
 };
@@ -360,15 +371,16 @@ struct LiftV1 : VehicleV1 {
 	uint8_t delay_counter;
 	std::array<LiftFloor, 8> floors;
 
-	void serialize(MFCReader& in) {
-		VehicleV1::serialize(in);
-		in(num_floors);
-		in(next_or_current_floor);
-		in(current_call_button);
-		in(delay_counter);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		VehicleV1::serialize(ar);
+		ar(num_floors);
+		ar(next_or_current_floor);
+		ar(current_call_button);
+		ar(delay_counter);
 		for (auto& f : floors) {
-			in(f.y);
-			in(f.call_button);
+			ar(f.y);
+			ar(f.call_button);
 		}
 	}
 };
@@ -377,19 +389,21 @@ struct CallButtonV1 : SimpleObjectV1 {
 	LiftV1* lift;
 	uint8_t floor;
 
-	void serialize(MFCReader& in) {
-		SimpleObjectV1::serialize(in);
-		in(lift);
-		in(floor);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		SimpleObjectV1::serialize(ar);
+		ar(lift);
+		ar(floor);
 	}
 };
 
 struct SceneryV1 : ObjectV1 {
 	EntityV1* part;
 
-	void serialize(MFCReader& in) {
-		ObjectV1::serialize(in);
-		in(part);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ObjectV1::serialize(ar);
+		ar(part);
 	}
 };
 
@@ -412,28 +426,29 @@ struct MacroV1 {
 	uint32_t subroutine_address;
 	int32_t wait;
 
-	void serialize(MFCReader& in) {
-		in(selfdestruct);
-		in(inst);
-		in(script_length_maybe);
-		in.ascii_mfcstring(script);
-		in(ip);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(selfdestruct);
+		ar(inst);
+		ar(script_length_maybe);
+		ar.ascii_mfcstring(script);
+		ar(ip);
 		for (auto& s : stack) {
-			in(s);
+			ar(s);
 		}
-		in(sp);
+		ar(sp);
 		for (auto& v : vars) {
-			in(v);
+			ar(v);
 		}
-		in(ownr);
-		in(from);
-		in(exec);
-		in(targ);
-		in(_it_);
-		in(part);
-		in.ascii_dword(subroutine_label);
-		in(subroutine_address);
-		in(wait);
+		ar(ownr);
+		ar(from);
+		ar(exec);
+		ar(targ);
+		ar(_it_);
+		ar(part);
+		ar.ascii_dword(subroutine_label);
+		ar(subroutine_address);
+		ar(wait);
 	}
 };
 
@@ -441,10 +456,11 @@ struct BodyPartV1 : EntityV1 {
 	uint32_t angle;
 	uint32_t view;
 
-	void serialize(MFCReader& in) {
-		EntityV1::serialize(in);
-		in(angle);
-		in(view);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		EntityV1::serialize(ar);
+		ar(angle);
+		ar(view);
 	}
 };
 
@@ -456,12 +472,13 @@ struct PositionU8 {
 struct BodyV1 : BodyPartV1 {
 	std::array<std::array<PositionU8, 10>, 6> body_data;
 
-	void serialize(MFCReader& in) {
-		BodyPartV1::serialize(in);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		BodyPartV1::serialize(ar);
 		for (auto& pose : body_data) {
 			for (auto& coords : pose) {
-				in(coords.x);
-				in(coords.y);
+				ar(coords.x);
+				ar(coords.y);
 			}
 		}
 	}
@@ -478,15 +495,16 @@ struct LimbV1 : BodyPartV1 {
 	std::array<LimbData, 10> limb_data;
 	LimbV1* next = nullptr;
 
-	void serialize(MFCReader& in) {
-		BodyPartV1::serialize(in);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		BodyPartV1::serialize(ar);
 		for (auto& l : limb_data) {
-			in(l.startx);
-			in(l.starty);
-			in(l.endx);
-			in(l.endy);
+			ar(l.startx);
+			ar(l.starty);
+			ar(l.endx);
+			ar(l.endy);
 		}
-		in(next);
+		ar(next);
 	}
 };
 
@@ -541,33 +559,34 @@ struct DendriteTypeV1 {
 	std::array<uint8_t, 10> suscept_svrule;
 	std::array<uint8_t, 10> reinforce_svrule;
 
-	void serialize(MFCReader& in) {
-		in(source_lobe);
-		in(min);
-		in(max);
-		in(spread);
-		in(fanout);
-		in(min_ltw);
-		in(max_ltw);
-		in(min_strength);
-		in(max_strength);
-		in(migration);
-		in(relax_suscept);
-		in(relax_stw);
-		in(ltw_gain_rate);
-		in(gain_rate);
-		in(lose_rate);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(source_lobe);
+		ar(min);
+		ar(max);
+		ar(spread);
+		ar(fanout);
+		ar(min_ltw);
+		ar(max_ltw);
+		ar(min_strength);
+		ar(max_strength);
+		ar(migration);
+		ar(relax_suscept);
+		ar(relax_stw);
+		ar(ltw_gain_rate);
+		ar(gain_rate);
+		ar(lose_rate);
 		for (auto& i : gain_svrule) {
-			in(i);
+			ar(i);
 		}
 		for (auto& i : lose_svrule) {
-			in(i);
+			ar(i);
 		}
 		for (auto& i : suscept_svrule) {
-			in(i);
+			ar(i);
 		}
 		for (auto& i : reinforce_svrule) {
-			in(i);
+			ar(i);
 		}
 	}
 };
@@ -592,28 +611,29 @@ struct LobeV1 {
 	uint32_t num_neurons;
 	uint32_t num_dendrites;
 
-	void serialize(MFCReader& in) {
-		in(x);
-		in(y);
-		in(width);
-		in(height);
-		in(perceptible);
-		in(activity);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(x);
+		ar(y);
+		ar(width);
+		ar(height);
+		ar(perceptible);
+		ar(activity);
 		for (auto& c : chemicals) {
-			in(c);
+			ar(c);
 		}
-		in(threshold);
-		in(leakage);
-		in(reststate);
-		in(inputgain);
+		ar(threshold);
+		ar(leakage);
+		ar(reststate);
+		ar(inputgain);
 		for (auto& sv : svrule) {
-			in(sv);
+			ar(sv);
 		}
-		in(flags);
-		d0_type.serialize(in);
-		d1_type.serialize(in);
-		in(num_neurons);
-		in(num_dendrites);
+		ar(flags);
+		d0_type.serialize(ar);
+		d1_type.serialize(ar);
+		ar(num_neurons);
+		ar(num_dendrites);
 	}
 };
 
@@ -627,14 +647,15 @@ struct DendriteV1 {
 	uint8_t ltw;
 	uint8_t strength;
 
-	void serialize(MFCReader& in) {
-		in(source_index);
-		in(home_x);
-		in(home_y);
-		in(suscept);
-		in(stw);
-		in(ltw);
-		in(strength);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(source_index);
+		ar(home_x);
+		ar(home_y);
+		ar(suscept);
+		ar(stw);
+		ar(ltw);
+		ar(strength);
 	}
 };
 
@@ -651,22 +672,23 @@ struct NeuronV1 {
 	uint32_t dendrite1_index;
 	std::vector<DendriteV1> dendrites1;
 
-	void serialize(MFCReader& in) {
-		in(x);
-		in(y);
-		in(output);
-		in(state);
-		in(wta_disable);
-		in(exclusive);
-		in.size_u8(dendrites0);
-		in(dendrite0_index);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(x);
+		ar(y);
+		ar(output);
+		ar(state);
+		ar(wta_disable);
+		ar(exclusive);
+		ar.size_u8(dendrites0);
+		ar(dendrite0_index);
 		for (auto& d : dendrites0) {
-			d.serialize(in);
+			d.serialize(ar);
 		}
-		in.size_u8(dendrites1);
-		in(dendrite1_index);
+		ar.size_u8(dendrites1);
+		ar(dendrite1_index);
 		for (auto& d : dendrites1) {
-			d.serialize(in);
+			d.serialize(ar);
 		}
 	}
 };
@@ -675,14 +697,15 @@ struct CBrainV1 {
 	std::vector<LobeV1> lobes;
 	std::vector<NeuronV1> neurons;
 
-	void serialize(MFCReader& in) {
-		in.size_u32(lobes);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar.size_u32(lobes);
 		for (auto& l : lobes) {
-			l.serialize(in);
+			l.serialize(ar);
 			neurons.resize(neurons.size() + l.num_neurons);
 		}
 		for (auto& n : neurons) {
-			n.serialize(in);
+			n.serialize(ar);
 		}
 	}
 };
@@ -706,15 +729,16 @@ struct EmitterV1 {
 	uint8_t gain;
 	uint8_t effect;
 
-	void serialize(MFCReader& in) {
-		in(organ);
-		in(tissue);
-		in(locus);
-		in(chemical);
-		in(threshold);
-		in(rate);
-		in(gain);
-		in(effect);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(organ);
+		ar(tissue);
+		ar(locus);
+		ar(chemical);
+		ar(threshold);
+		ar(rate);
+		ar(gain);
+		ar(effect);
 	}
 };
 
@@ -729,15 +753,16 @@ struct ReceptorV1 {
 	uint8_t gain;
 	uint8_t effect;
 
-	void serialize(MFCReader& in) {
-		in(organ);
-		in(tissue);
-		in(locus);
-		in(chemical);
-		in(threshold);
-		in(nominal);
-		in(gain);
-		in(effect);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(organ);
+		ar(tissue);
+		ar(locus);
+		ar(chemical);
+		ar(threshold);
+		ar(nominal);
+		ar(gain);
+		ar(effect);
 	}
 };
 
@@ -753,16 +778,17 @@ struct ReactionV1 {
 	uint8_t p2_amount;
 	uint8_t p2_chem;
 
-	void serialize(MFCReader& in) {
-		in(r1_amount);
-		in(r1_chem);
-		in(r2_amount);
-		in(r2_chem);
-		in(rate);
-		in(p1_amount);
-		in(p1_chem);
-		in(p2_amount);
-		in(p2_chem);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(r1_amount);
+		ar(r1_chem);
+		ar(r2_amount);
+		ar(r2_chem);
+		ar(rate);
+		ar(p1_amount);
+		ar(p1_chem);
+		ar(p2_amount);
+		ar(p2_chem);
 	}
 };
 
@@ -773,23 +799,24 @@ struct CBiochemistryV1 {
 	std::vector<ReceptorV1> receptors;
 	std::vector<ReactionV1> reactions;
 
-	void serialize(MFCReader& in) {
-		in(owner);
-		in.size_u32(emitters);
-		in.size_u32(receptors);
-		in.size_u32(reactions);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(owner);
+		ar.size_u32(emitters);
+		ar.size_u32(receptors);
+		ar.size_u32(reactions);
 		for (auto& c : chemicals) {
-			in(c.concentration);
-			in(c.decay);
+			ar(c.concentration);
+			ar(c.decay);
 		}
 		for (auto& e : emitters) {
-			e.serialize(in);
+			e.serialize(ar);
 		}
 		for (auto& r : receptors) {
-			r.serialize(in);
+			r.serialize(ar);
 		}
 		for (auto& r : reactions) {
-			r.serialize(in);
+			r.serialize(ar);
 		}
 	}
 };
@@ -807,15 +834,16 @@ struct CInstinctV1 {
 	uint32_t reinforcement_amount;
 	uint32_t phase;
 
-	void serialize(MFCReader& in) {
+	template <typename Archive>
+	void serialize(Archive& ar) {
 		for (auto& d : dendrites) {
-			in(d.lobe);
-			in(d.cell);
+			ar(d.lobe);
+			ar(d.cell);
 		}
-		in(motor_decision);
-		in(reinforcement_chemical);
-		in(reinforcement_amount);
-		in(phase);
+		ar(motor_decision);
+		ar(reinforcement_chemical);
+		ar(reinforcement_amount);
+		ar(phase);
 	}
 };
 
@@ -876,100 +904,101 @@ struct CreatureV1 : ObjectV1 {
 	std::string history_owner_address;
 	std::string history_owner_email;
 
-	void serialize(MFCReader& in) {
-		ObjectV1::serialize(in);
-		in.ascii_dword(moniker);
-		in.ascii_dword(mother);
-		in.ascii_dword(father);
-		in(body);
-		in(head);
-		in(left_thigh);
-		in(right_thigh);
-		in(left_arm);
-		in(right_arm);
-		in(tail);
-		in(direction);
-		in(downfoot);
-		in(footx);
-		in(footy);
-		in(z_order);
-		in.ascii_mfcstring(current_pose);
-		in(expression);
-		in(eyes_open);
-		in(asleep);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ObjectV1::serialize(ar);
+		ar.ascii_dword(moniker);
+		ar.ascii_dword(mother);
+		ar.ascii_dword(father);
+		ar(body);
+		ar(head);
+		ar(left_thigh);
+		ar(right_thigh);
+		ar(left_arm);
+		ar(right_arm);
+		ar(tail);
+		ar(direction);
+		ar(downfoot);
+		ar(footx);
+		ar(footy);
+		ar(z_order);
+		ar.ascii_mfcstring(current_pose);
+		ar(expression);
+		ar(eyes_open);
+		ar(asleep);
 		for (auto& p : poses) {
-			in.ascii_mfcstring(p);
+			ar.ascii_mfcstring(p);
 		}
 		for (auto& g : gait_animations) {
-			in.ascii_mfcstring(g);
+			ar.ascii_mfcstring(g);
 		}
 		for (auto& v : vocabulary) {
-			in.ascii_mfcstring(v.in);
-			in.ascii_mfcstring(v.out);
-			in(v.strength);
+			ar.ascii_mfcstring(v.in);
+			ar.ascii_mfcstring(v.out);
+			ar(v.strength);
 		}
 		for (auto& p : object_positions) {
-			in(p.x);
-			in(p.y);
+			ar(p.x);
+			ar(p.y);
 		}
 		for (auto& s : stimuli) {
-			in(s.significance);
-			in(s.input);
-			in(s.intensity);
-			in(s.flags);
-			in(s.chem0);
-			in(s.amount0);
-			in(s.chem1);
-			in(s.amount1);
-			in(s.chem2);
-			in(s.amount2);
-			in(s.chem3);
-			in(s.amount3);
+			ar(s.significance);
+			ar(s.input);
+			ar(s.intensity);
+			ar(s.flags);
+			ar(s.chem0);
+			ar(s.amount0);
+			ar(s.chem1);
+			ar(s.amount1);
+			ar(s.chem2);
+			ar(s.amount2);
+			ar(s.chem3);
+			ar(s.amount3);
 		}
 
-		in(brain);
-		in(biochemistry);
-		in(sex);
-		in(age);
-		in(biotick);
-		in.ascii_dword(gamete);
-		in.ascii_dword(zygote);
-		in(dead);
-		in(age_ticks);
-		in.size_u32(instincts);
-		in(dreaming);
+		ar(brain);
+		ar(biochemistry);
+		ar(sex);
+		ar(age);
+		ar(biotick);
+		ar.ascii_dword(gamete);
+		ar.ascii_dword(zygote);
+		ar(dead);
+		ar(age_ticks);
+		ar.size_u32(instincts);
+		ar(dreaming);
 		for (auto& i : instincts) {
-			in(i);
+			ar(i);
 		}
 		for (auto& g : goals) {
 			for (auto& drive : g) {
-				in(drive);
+				ar(drive);
 			}
 		}
-		in(zzzz);
+		ar(zzzz);
 		for (auto& v : voices_lookup) {
 			for (auto& s : v) {
 				// TODO: is this the right order? how does voice data work again?
-				in(s);
+				ar(s);
 			}
 		}
 		for (auto& v : voices) {
-			in.ascii_dword(v.name);
-			in(v.delay_ticks);
+			ar.ascii_dword(v.name);
+			ar(v.delay_ticks);
 		}
 
 		// these monikers are super weird.. they're MFC strings that are the
 		// reversed and hex-encoded version of the original string characters
-		in.ascii_mfcstring(history_moniker);
-		in.ascii_mfcstring(history_name);
-		in.ascii_mfcstring(history_moms_moniker);
-		in.ascii_mfcstring(history_dads_moniker);
-		in.ascii_mfcstring(history_birthday);
-		in.ascii_mfcstring(history_birthplace);
-		in.ascii_mfcstring(history_owner_name);
-		in.ascii_mfcstring(history_owner_phone);
-		in.ascii_mfcstring(history_owner_address);
-		in.ascii_mfcstring(history_owner_email);
+		ar.ascii_mfcstring(history_moniker);
+		ar.ascii_mfcstring(history_name);
+		ar.ascii_mfcstring(history_moms_moniker);
+		ar.ascii_mfcstring(history_dads_moniker);
+		ar.ascii_mfcstring(history_birthday);
+		ar.ascii_mfcstring(history_birthplace);
+		ar.ascii_mfcstring(history_owner_name);
+		ar.ascii_mfcstring(history_owner_phone);
+		ar.ascii_mfcstring(history_owner_address);
+		ar.ascii_mfcstring(history_owner_email);
 	}
 };
 
@@ -981,12 +1010,13 @@ struct CGenomeV1 {
 	// TODO: should we actually parse this? sometimes it has weird extra data
 	// that doesn't all get parsed, might be useful to keep it around.
 
-	void serialize(MFCReader& in) {
-		in.size_u32(data);
-		in.ascii_dword(moniker);
-		in(sex);
-		in(life_stage);
-		in(data);
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar.size_u32(data);
+		ar.ascii_dword(moniker);
+		ar(sex);
+		ar(life_stage);
+		ar(data);
 	}
 };
 
