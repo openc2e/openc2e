@@ -22,6 +22,8 @@
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
 
+#include <imgui.h>
+
 #ifdef _WIN32
 #include "common/WindowsRegistry.h"
 #endif
@@ -146,6 +148,31 @@ extern "C" int main(int argc, char** argv) {
 		while (get_backend()->pollEvent(event)) {
 			g_engine_context.viewport->handle_event(event);
 			g_engine_context.pointer->handle_event(event);
+		}
+
+		// imgui
+		if (ImGui::GetIO().MouseClicked[0] && ImGui::GetIO().KeyMods & ImGuiModFlags_Super) {
+			ImGui::OpenPopup("Menu");
+		}
+		if (ImGui::BeginPopup("Menu")) {
+			if (ImGui::BeginMenu("File")) {
+				ImGui::MenuItem("Quit", nullptr, false, false);
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Debug")) {
+				ImGui::MenuItem("Show Map", nullptr, false, false);
+				ImGui::MenuItem("Create a new (debug) Norn", nullptr, false, false);
+				ImGui::MenuItem("Create a random egg", nullptr, false, false);
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Tools")) {
+				ImGui::MenuItem("Hatchery", nullptr, false, false);
+				ImGui::MenuItem("Agent Injector", nullptr, false, false);
+				ImGui::MenuItem("Brain Viewer", nullptr, false, false);
+				ImGui::MenuItem("Creature Grapher", nullptr, false, false);
+				ImGui::EndMenu();
+			}
+			ImGui::EndPopup();
 		}
 
 		// update world
