@@ -10,7 +10,8 @@ ____                _           ______   __   _
 
 Simple retained-mode renderer for openc2e.
 
-Three concepts (so far): RenderItems, RenderLayers, and the Main Camera
+Five concepts (so far): RenderItems, RenderLayers, WorldWrap, the Main Camera, and
+the Main Viewport.
 
 * RenderItems: Objects which wish to draw on the screen should call render_item_create()
   and then set the various properties, including e.g. the texture, a rect,
@@ -20,7 +21,12 @@ Three concepts (so far): RenderItems, RenderLayers, and the Main Camera
   high-level z-order (e.g. background should always be behind everything, UI
   should always be above agents).
 
+* WorldWrap is the width of the world, after which RenderItems start wrapping back
+  around (needed for Creatures 1).
+
 * MainCamera is the position of the camera looking at the world.
+
+* MainViewport is the where the MainCamera is drawn onto the actual screen.
 
 Future improvements:
 
@@ -72,7 +78,7 @@ class RenderSystem {
 
 	int32_t m_world_wrap_width = 0;
 	Rect m_main_camera_src_rect;
-	RectF m_main_camera_dest_rect;
+	RectF m_main_viewport_dest_rect;
 	DenseSlotMap<RenderItem> m_render_items;
 
   public:
@@ -82,10 +88,19 @@ class RenderSystem {
 	RenderSystem& operator=(const RenderSystem&) = delete;
 	RenderSystem& operator=(RenderSystem&&) = delete;
 
-	void world_set_wrap_width(int32_t wrap_width);
+	// MainCamera
 	void main_camera_set_src_rect(Rect);
-	void main_camera_set_dest_rect(RectF);
+	const Rect& main_camera_get_src_rect() const;
 
+	// MainViewport
+	void main_viewport_set_dest_rect(RectF);
+	const RectF& main_viewport_get_dest_rect() const;
+
+	// WorldWrap
+	void world_set_wrap_width(int32_t wrap_width);
+	int32_t world_get_wrap_width() const;
+
+	// RenderItems
 	RenderItemHandle render_item_create(int layer = 0);
 
 	void render_item_set_position(const RenderItemHandle& key, float x, float y, int32_t z);

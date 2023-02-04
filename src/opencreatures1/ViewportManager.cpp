@@ -84,7 +84,6 @@ void ViewportManager::tick() {
 		scrollx -= CREATURES1_WORLD_WIDTH;
 	}
 
-
 	// update rendersystem and soundmanager
 	// TODO: this doesn't feel like the best place for this
 	Rect viewport{
@@ -94,24 +93,32 @@ void ViewportManager::tick() {
 		viewport_height};
 
 	get_rendersystem()->main_camera_set_src_rect(viewport);
-	get_rendersystem()->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, width, height - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM});
+	get_rendersystem()->main_viewport_set_dest_rect({0, VIEWPORT_MARGIN_TOP, width, height - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM});
 	g_engine_context.sounds->set_listener_position(viewport);
 }
 
 int32_t ViewportManager::window_x_to_world_x(float winx) const {
-	int32_t worldx = numeric_cast<int32_t>(winx / VIEWPORT_SCALE) + scrollx;
-	// TODO: better way to handle world wrap?
-	if (worldx >= CREATURES1_WORLD_WIDTH) {
-		worldx -= CREATURES1_WORLD_WIDTH;
-	}
-	if (worldx < 0) {
-		worldx += CREATURES1_WORLD_WIDTH;
+	// TODO: move this to RenderSystem?
+	Rect camera = get_rendersystem()->main_camera_get_src_rect();
+	RectF viewport = get_rendersystem()->main_viewport_get_dest_rect();
+	int32_t world_wrap = get_rendersystem()->world_get_wrap_width();
+
+	int32_t worldx = int32_t((winx - viewport.x) / viewport.width * camera.width + camera.x);
+	if (world_wrap) {
+		if (worldx >= world_wrap) {
+			worldx -= world_wrap;
+		} else if (worldx < 0) {
+			worldx += world_wrap;
+		}
 	}
 	return worldx;
 }
 
 int32_t ViewportManager::window_y_to_world_y(float winy) const {
-	return numeric_cast<int32_t>(winy / VIEWPORT_SCALE) + scrolly - VIEWPORT_MARGIN_TOP;
+	// TODO: move this to RenderSystem?
+	Rect camera = get_rendersystem()->main_camera_get_src_rect();
+	RectF viewport = get_rendersystem()->main_viewport_get_dest_rect();
+	return int32_t((winy - viewport.y) / viewport.height * camera.height + camera.y);
 }
 
 void ViewportManager::set_scroll_position(int32_t scrollx_, int32_t scrolly_) {

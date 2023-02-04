@@ -24,12 +24,24 @@ void RenderSystem::main_camera_set_src_rect(Rect src) {
 	m_main_camera_src_rect = src;
 }
 
-void RenderSystem::main_camera_set_dest_rect(RectF src) {
-	m_main_camera_dest_rect = src;
+const Rect& RenderSystem::main_camera_get_src_rect() const {
+	return m_main_camera_src_rect;
+}
+
+void RenderSystem::main_viewport_set_dest_rect(RectF src) {
+	m_main_viewport_dest_rect = src;
+}
+
+const RectF& RenderSystem::main_viewport_get_dest_rect() const {
+	return m_main_viewport_dest_rect;
 }
 
 void RenderSystem::world_set_wrap_width(int32_t wrap_width) {
 	m_world_wrap_width = wrap_width;
+}
+
+int32_t RenderSystem::world_get_wrap_width() const {
+	return m_world_wrap_width;
 }
 
 RenderItemHandle RenderSystem::render_item_create(int layer) {
@@ -86,6 +98,7 @@ void RenderSystem::render_item_set_line(const RenderItemHandle& handle, float xs
 void RenderSystem::draw() {
 	auto renderer = get_backend()->getMainRenderTarget();
 	renderer->renderClear();
+	renderer->setClip(m_main_viewport_dest_rect);
 
 	std::vector<RenderItem*> render_list;
 	render_list.reserve(m_render_items.size());
@@ -115,23 +128,23 @@ void RenderSystem::draw() {
 
 	// What's the transformation for this camera? First, let's transform source space to dest space
 
-	// destx = srcx * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_dest_rect.x
-	// desty = srcy * (m_main_camera_dest_rect.height / m_main_camera_source_rect.height) + m_main_camera_dest_rect.y
+	// destx = srcx * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_viewport_dest_rect.x
+	// desty = srcy * (m_main_viewport_dest_rect.height / m_main_camera_src_rect.height) + m_main_viewport_dest_rect.y
 
 	// Now, let's transfom world space to source space
 	// srcx = worldx + m_main_camera_src_rect.x
 	// srcy = worldy + m_main_camera_src_rect.y
 
 	// Putting it together, we have
-	// destx = (worldx + m_main_camera_src_rect.x) * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_dest_rect.x
-	//       = worldx * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_src_rect.x * (m_main_camera_dest_rect.width / m_main_camera_source_rect.width) + m_main_camera_dest_rect.x
+	// destx = (worldx + m_main_camera_src_rect.x) * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_viewport_dest_rect.x
+	//       = worldx * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_camera_src_rect.x * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_viewport_dest_rect.x
 	//       = worldx * xscale + xadjust
 
 
-	const float xscale = 1.f * m_main_camera_dest_rect.width / m_main_camera_src_rect.width;
-	const float xadjust = m_main_camera_src_rect.x * xscale - m_main_camera_dest_rect.x;
-	const float yscale = 1.f * m_main_camera_dest_rect.height / m_main_camera_src_rect.height;
-	const float yadjust = m_main_camera_src_rect.y * yscale - m_main_camera_dest_rect.y;
+	const float xscale = 1.f * m_main_viewport_dest_rect.width / m_main_camera_src_rect.width;
+	const float xadjust = m_main_camera_src_rect.x * xscale - m_main_viewport_dest_rect.x;
+	const float yscale = 1.f * m_main_viewport_dest_rect.height / m_main_camera_src_rect.height;
+	const float yadjust = m_main_camera_src_rect.y * yscale - m_main_viewport_dest_rect.y;
 
 	const float worldadjust = m_world_wrap_width * xscale;
 
