@@ -66,7 +66,9 @@ void ViewportManager::tick() {
 	scrolly += static_cast<int32_t>(scroll_vely);
 
 	// fix scroll
-	int32_t viewport_height = numeric_cast<int32_t>((numeric_cast<int32_t>(get_backend()->getMainRenderTarget()->getHeight()) - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE);
+	const float width = get_backend()->getMainRenderTarget()->getWidth();
+	const float height = get_backend()->getMainRenderTarget()->getHeight();
+	const int32_t viewport_height = numeric_cast<int32_t>((height - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE);
 	// can't go past top or bottom
 	if (scrolly < 0) {
 		scrolly = 0;
@@ -88,11 +90,11 @@ void ViewportManager::tick() {
 	Rect viewport{
 		scrollx,
 		scrolly,
-		numeric_cast<int32_t>(width() / VIEWPORT_SCALE),
-		numeric_cast<int32_t>((height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE)};
+		numeric_cast<int32_t>(width / VIEWPORT_SCALE),
+		viewport_height};
 
 	get_rendersystem()->main_camera_set_src_rect(viewport);
-	get_rendersystem()->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, numeric_cast<float>(width()), numeric_cast<float>(height() - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM)});
+	get_rendersystem()->main_camera_set_dest_rect({0, VIEWPORT_MARGIN_TOP, width, height - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM});
 	g_engine_context.sounds->set_listener_position(viewport);
 }
 
@@ -110,22 +112,6 @@ int32_t ViewportManager::window_x_to_world_x(float winx) const {
 
 int32_t ViewportManager::window_y_to_world_y(float winy) const {
 	return numeric_cast<int32_t>(winy / VIEWPORT_SCALE) + scrolly - VIEWPORT_MARGIN_TOP;
-}
-
-int32_t ViewportManager::width() const {
-	return numeric_cast<int32_t>(get_backend()->getMainRenderTarget()->getWidth());
-}
-
-int32_t ViewportManager::height() const {
-	return numeric_cast<int32_t>(get_backend()->getMainRenderTarget()->getHeight());
-}
-
-int32_t ViewportManager::centerx() const {
-	return static_cast<int>(std::remainder(scrollx + width() / 2, CREATURES1_WORLD_WIDTH));
-}
-
-int32_t ViewportManager::centery() const {
-	return scrolly + height() / 2;
 }
 
 void ViewportManager::set_scroll_position(int32_t scrollx_, int32_t scrolly_) {

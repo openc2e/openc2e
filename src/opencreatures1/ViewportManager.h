@@ -17,14 +17,6 @@ class ViewportManager {
 	void handle_event(const BackendEvent& event);
 	void tick();
 
-	int32_t width() const;
-
-	int32_t height() const;
-
-	int32_t centerx() const;
-
-	int32_t centery() const;
-
 	int32_t window_x_to_world_x(float) const;
 	int32_t window_y_to_world_y(float) const;
 
@@ -39,7 +31,6 @@ class ViewportManager {
 	bool scroll_right = false;
 	bool scroll_up = false;
 	bool scroll_down = false;
-
 
 	int32_t scrollx = 0;
 	int32_t scrolly = 0;

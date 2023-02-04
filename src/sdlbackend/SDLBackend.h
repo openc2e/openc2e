@@ -47,8 +47,11 @@ class SDLRenderTarget : public RenderTarget {
 	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options) override;
 	void renderLine(float x1, float y1, float x2, float y2, Color color) override;
 	void blitRenderTarget(RenderTarget* src, RectF dest) override;
+
+	// dimensions in logical window points (device-independent pixels), not pixels
 	int32_t getWidth() const override;
 	int32_t getHeight() const override;
+
 	void renderClear() override;
 	void setViewportOffsetTop(int offset_top) override;
 	void setViewportOffsetBottom(int offset_bottom) override;
