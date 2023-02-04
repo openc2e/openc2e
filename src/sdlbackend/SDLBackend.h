@@ -51,6 +51,7 @@ class SDLRenderTarget : public RenderTarget {
 	// dimensions in logical window points (device-independent pixels), not pixels
 	int32_t getWidth() const override;
 	int32_t getHeight() const override;
+	void setClip(RectF dest) override;
 
 	void renderClear() override;
 	void setViewportOffsetTop(int offset_top) override;

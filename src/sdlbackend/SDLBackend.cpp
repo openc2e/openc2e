@@ -384,6 +384,18 @@ int32_t SDLRenderTarget::getHeight() const {
 	return numeric_cast<int32_t>(height - viewport_offset_top - viewport_offset_bottom);
 }
 
+void SDLRenderTarget::setClip(RectF dest) {
+	// TODO: SDL_RenderSetClipRectF doesn't seem to exist?
+	SDL_Rect clip;
+	clip.x = dest.x;
+	clip.y = dest.y;
+	clip.w = dest.width;
+	clip.h = dest.height;
+	if (SDL_RenderSetClipRect(parent->renderer, dest == RectF{} ? nullptr : &clip) != 0) {
+		throw Exception(fmt::format("error in SDL_RenderSetClipRect(): {}", SDL_GetError()));
+	}
+}
+
 void SDLRenderTarget::setViewportOffsetTop(int offset_top) {
 	viewport_offset_top = offset_top;
 }

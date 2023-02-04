@@ -31,6 +31,7 @@ class NullRenderTarget : public RenderTarget {
 	void blitRenderTarget(RenderTarget*, RectF) override {}
 	int32_t getWidth() const override { return 800; }
 	int32_t getHeight() const override { return 600; }
+	void setClip(RectF) override {}
 	void renderClear() override {}
 	void setViewportOffsetTop(int) override {}
 	void setViewportOffsetBottom(int) override {}

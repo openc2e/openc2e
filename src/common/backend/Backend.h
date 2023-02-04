@@ -57,6 +57,7 @@ class RenderTarget {
 	virtual void blitRenderTarget(RenderTarget* src, RectF dest) = 0;
 	virtual int32_t getWidth() const = 0;
 	virtual int32_t getHeight() const = 0;
+	virtual void setClip(RectF dest) = 0;
 	virtual void renderClear() = 0;
 	virtual void setViewportOffsetTop(int offset_top) = 0;
 	virtual void setViewportOffsetBottom(int offset_bottom) = 0;
