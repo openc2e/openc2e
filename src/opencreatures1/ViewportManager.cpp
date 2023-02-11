@@ -3,8 +3,6 @@
 #include "C1SoundManager.h"
 #include "common/render/RenderSystem.h"
 
-constexpr int32_t VIEWPORT_MARGIN_TOP = 20;
-constexpr int32_t VIEWPORT_MARGIN_BOTTOM = 20;
 constexpr float VIEWPORT_SCALE = 1.0f;
 
 void ViewportManager::handle_event(const BackendEvent& event) {
@@ -65,10 +63,16 @@ void ViewportManager::tick() {
 	scrollx += static_cast<int32_t>(scroll_velx);
 	scrolly += static_cast<int32_t>(scroll_vely);
 
-	// fix scroll
+	// update based on new scroll
+	update();
+}
+
+void ViewportManager::update() {
 	const float width = get_backend()->getMainRenderTarget()->getWidth();
 	const float height = get_backend()->getMainRenderTarget()->getHeight();
-	const int32_t viewport_height = numeric_cast<int32_t>((height - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM) / VIEWPORT_SCALE);
+	const int32_t viewport_height = numeric_cast<int32_t>((height - margin_top - margin_bottom) / VIEWPORT_SCALE);
+
+	// clamp scroll
 	// can't go past top or bottom
 	if (scrolly < 0) {
 		scrolly = 0;
@@ -93,7 +97,7 @@ void ViewportManager::tick() {
 		viewport_height};
 
 	get_rendersystem()->main_camera_set_src_rect(viewport);
-	get_rendersystem()->main_viewport_set_dest_rect({0, VIEWPORT_MARGIN_TOP, width, height - VIEWPORT_MARGIN_TOP - VIEWPORT_MARGIN_BOTTOM});
+	get_rendersystem()->main_viewport_set_dest_rect({0, margin_top, width, height - margin_top - margin_bottom});
 	g_engine_context.sounds->set_listener_position(viewport);
 }
 
@@ -124,4 +128,9 @@ int32_t ViewportManager::window_y_to_world_y(float winy) const {
 void ViewportManager::set_scroll_position(int32_t scrollx_, int32_t scrolly_) {
 	scrollx = scrollx_;
 	scrolly = scrolly_;
+}
+
+void ViewportManager::set_margin_bottom(float margin_bottom_) {
+	margin_bottom = margin_bottom_;
+	update();
 }

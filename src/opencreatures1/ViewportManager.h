@@ -22,7 +22,12 @@ class ViewportManager {
 
 	void set_scroll_position(int32_t scrollx, int32_t scrolly);
 
+	void set_margin_top(float);
+	void set_margin_bottom(float);
+
   private:
+	void update();
+
 	static constexpr float SCROLL_ACCEL = 8;
 	static constexpr float SCROLL_DECEL = 0.5;
 	static constexpr float SCROLL_MAX = 64;
@@ -37,4 +42,7 @@ class ViewportManager {
 
 	float scroll_velx = 0;
 	float scroll_vely = 0;
+
+	float margin_top = 0;
+	float margin_bottom = 0;
 };

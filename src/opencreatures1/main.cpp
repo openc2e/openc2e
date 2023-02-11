@@ -111,6 +111,64 @@ void update_everything() {
 	g_engine_context.pointer->update();
 }
 
+int32_t get_fps() {
+	static std::chrono::steady_clock::time_point time_of_last_render{};
+	static std::array<std::chrono::milliseconds::rep, 60> rendertimes{};
+	static size_t rendertimeptr = 0;
+
+	auto n = std::chrono::steady_clock::now();
+	rendertimes[rendertimeptr++] =
+		std::chrono::duration_cast<std::chrono::milliseconds>(n - time_of_last_render).count();
+	if (rendertimeptr == rendertimes.size()) {
+		rendertimeptr = 0;
+	}
+	time_of_last_render = n;
+	float avgtime = 0;
+	for (auto t : rendertimes) {
+		avgtime += t;
+	}
+	avgtime /= rendertimes.size();
+	return static_cast<int32_t>(std::round(1000 / avgtime));
+}
+
+void draw_imgui_bottombar() {
+	// draw status bar on bottom of window
+	ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y), 0, ImVec2(0.0f, 1.0f));
+	ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, 0));
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	if (ImGui::Begin("BottomBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+		ImGui::Text("opencreatures1 - %i fps", get_fps());
+	}
+	ImGui::PopStyleVar(ImGuiStyleVar_WindowBorderSize);
+}
+
+void draw_imgui_rightclick_menu() {
+	if (ImGui::GetIO().MouseClicked[0] && ImGui::GetIO().KeyMods & ImGuiModFlags_Super) {
+		ImGui::OpenPopup("Menu");
+	}
+	if (ImGui::BeginPopup("Menu")) {
+		if (ImGui::BeginMenu("File")) {
+			ImGui::MenuItem("Quit", nullptr, false, false);
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Debug")) {
+			ImGui::MenuItem("Show Map", nullptr, false, false);
+			ImGui::MenuItem("Create a new (debug) Norn", nullptr, false, false);
+			ImGui::MenuItem("Create a random egg", nullptr, false, false);
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Tools")) {
+			ImGui::MenuItem("Hatchery", nullptr, false, false);
+			ImGui::MenuItem("Agent Injector", nullptr, false, false);
+			ImGui::MenuItem("Brain Viewer", nullptr, false, false);
+			ImGui::MenuItem("Creature Grapher", nullptr, false, false);
+			ImGui::EndMenu();
+		}
+		ImGui::EndPopup();
+	}
+}
+
 extern "C" int main(int argc, char** argv) {
 	install_backtrace_printer();
 
@@ -151,29 +209,8 @@ extern "C" int main(int argc, char** argv) {
 		}
 
 		// imgui
-		if (ImGui::GetIO().MouseClicked[0] && ImGui::GetIO().KeyMods & ImGuiModFlags_Super) {
-			ImGui::OpenPopup("Menu");
-		}
-		if (ImGui::BeginPopup("Menu")) {
-			if (ImGui::BeginMenu("File")) {
-				ImGui::MenuItem("Quit", nullptr, false, false);
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Debug")) {
-				ImGui::MenuItem("Show Map", nullptr, false, false);
-				ImGui::MenuItem("Create a new (debug) Norn", nullptr, false, false);
-				ImGui::MenuItem("Create a random egg", nullptr, false, false);
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Tools")) {
-				ImGui::MenuItem("Hatchery", nullptr, false, false);
-				ImGui::MenuItem("Agent Injector", nullptr, false, false);
-				ImGui::MenuItem("Brain Viewer", nullptr, false, false);
-				ImGui::MenuItem("Creature Grapher", nullptr, false, false);
-				ImGui::EndMenu();
-			}
-			ImGui::EndPopup();
-		}
+		draw_imgui_bottombar();
+		draw_imgui_rightclick_menu();
 
 		// update world
 		update_everything();
