@@ -64,7 +64,6 @@ class SDLBackend : public Backend {
   protected:
 	SDL_Renderer* renderer = nullptr;
 	std::shared_ptr<SDLRenderTarget> mainrendertarget;
-	uint32_t last_frame_end = 0;
 
 	SDLBackend();
 	SDLBackend(const SDLBackend&) = delete;

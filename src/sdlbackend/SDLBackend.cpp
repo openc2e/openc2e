@@ -85,7 +85,7 @@ void SDLBackend::init(const std::string& name, int32_t width, int32_t height) {
 		throw Exception(std::string("SDL error creating window: ") + SDL_GetError());
 	}
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE);
 	if (!renderer) {
 		throw Exception(std::string("SDL error creating renderer: ") + SDL_GetError());
 	}
@@ -607,6 +607,8 @@ int sdl_event_watcher(void* userdata, SDL_Event* event) {
 void SDLBackend::run(std::function<bool()> update_callback) {
 	SDL_AddEventWatch(sdl_event_watcher, nullptr);
 
+	uint32_t last_frame_end = 0;
+
 	while (true) {
 		// TODO: we have to calculate renderer sizes when the backend is initialized,
 		// otherwise side panels get in weird locations. related to issue with panels
@@ -624,7 +626,7 @@ void SDLBackend::run(std::function<bool()> update_callback) {
 		if (frame_end - last_frame_end < desired_ticks_per_frame) {
 			SDL_Delay(desired_ticks_per_frame - (frame_end - last_frame_end));
 		}
-		last_frame_end = frame_end;
+		last_frame_end = SDL_GetTicks();
 
 		ImGui_ImplSDLRenderer_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
