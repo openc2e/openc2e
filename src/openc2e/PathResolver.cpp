@@ -227,63 +227,49 @@ fs::path getOtherWorldJournalPath(fs::path) {
 
 std::ofstream createUserBackgroundFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Backgrounds";
-	if (!fs::exists(dir)) {
-		fs::create_directory(dir);
-	}
+	fs::create_directory(dir);
 	case_insensitive_filesystem::add_entry(dir / name);
 	return std::ofstream(dir / name, std::ios_base::binary);
 }
 
 std::ofstream createUserBodyDataFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Body Data";
-	if (!fs::exists(dir)) {
-		fs::create_directory(dir);
-	}
+	fs::create_directory(dir);
 	case_insensitive_filesystem::add_entry(dir / name);
 	return std::ofstream(dir / name, std::ios_base::binary);
 }
 
 std::ofstream createUserCatalogueFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Catalogue";
-	if (!fs::exists(dir)) {
-		fs::create_directory(dir);
-	}
+	fs::create_directory(dir);
 	case_insensitive_filesystem::add_entry(dir / name);
 	return std::ofstream(dir / name, std::ios_base::binary);
 }
 
 std::ofstream createUserGeneticsFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Genetics";
-	if (!fs::exists(dir)) {
-		fs::create_directory(dir);
-	}
+	fs::create_directory(dir);
 	case_insensitive_filesystem::add_entry(dir / name);
 	return std::ofstream(dir / name, std::ios_base::binary);
 }
 
 std::ofstream createUserImageFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Images";
-	if (!fs::exists(dir)) {
-		fs::create_directory(dir);
-	}
+	fs::create_directory(dir);
 	case_insensitive_filesystem::add_entry(dir / name);
 	return std::ofstream(dir / name, std::ios_base::binary);
 }
 
 std::ofstream createUserOverlayDataFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Overlay Data";
-	if (!fs::exists(dir)) {
-		fs::create_directory(dir);
-	}
+	fs::create_directory(dir);
 	case_insensitive_filesystem::add_entry(dir / name);
 	return std::ofstream(dir / name, std::ios_base::binary);
 }
 
 std::ofstream createUserSoundFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Sounds";
-	if (!fs::exists(dir)) {
-		fs::create_directory(dir);
-	}
+	fs::create_directory(dir);
 	case_insensitive_filesystem::add_entry(dir / name);
 	return std::ofstream(dir / name, std::ios_base::binary);
 }
