@@ -78,6 +78,7 @@ class Engine {
 	}
 
 	std::string getGameName() { return gamename; }
+	uint32_t get_ticks_msec() const;
 
 	bool done;
 	bool dorendering, fastticks, refreshdisplay;

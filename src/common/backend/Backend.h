@@ -69,7 +69,6 @@ class Backend {
 	virtual void init(const std::string& name, int32_t width, int32_t height) = 0;
 	virtual void shutdown() = 0;
 
-	virtual unsigned int ticks() = 0;
 	virtual bool pollEvent(BackendEvent& e) = 0;
 	virtual bool keyDown(Openc2eKeycode key) = 0;
 

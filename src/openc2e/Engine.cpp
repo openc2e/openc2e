@@ -123,7 +123,7 @@ void Engine::addPossibleAudioBackend(std::string s, AudioBackend* b) {
 
 void Engine::setBackend(Backend* b) {
 	set_backend(b);
-	lasttimestamp = get_backend()->ticks();
+	lasttimestamp = get_ticks_msec();
 }
 
 static std::vector<std::string> read_wordlist(peFile* exefile, PeLanguage lang) {
@@ -314,7 +314,7 @@ unsigned int Engine::msUntilTick() {
 	if (world.paused)
 		return world.ticktime; // TODO: correct?
 
-	int ival = (tickdata + world.ticktime) - get_backend()->ticks();
+	int ival = (tickdata + world.ticktime) - get_ticks_msec();
 	return (ival < 0) ? 0 : ival;
 }
 
@@ -331,8 +331,14 @@ void Engine::drawWorld() {
 	}
 }
 
+static std::chrono::steady_clock::time_point program_started = std::chrono::steady_clock::now();
+uint32_t Engine::get_ticks_msec() const {
+	// TODO: this will wrap every ~49 days, not good. Use a 64-bit result or handle this differently
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - program_started).count();
+}
+
 void Engine::update() {
-	tickdata = get_backend()->ticks();
+	tickdata = get_ticks_msec();
 
 	// tick the world
 	world.tick();
@@ -344,7 +350,7 @@ void Engine::update() {
 	musicmanager->tick();
 
 	// update our data for things like pace, race, ticktime, etc
-	ticktimes[ticktimeptr] = get_backend()->ticks() - tickdata;
+	ticktimes[ticktimeptr] = get_ticks_msec() - tickdata;
 	ticktimeptr++;
 	if (ticktimeptr == 10)
 		ticktimeptr = 0;
@@ -353,15 +359,15 @@ void Engine::update() {
 		avgtime += ((float)ticktime / world.ticktime);
 	world.pace = avgtime / 10;
 
-	world.race = get_backend()->ticks() - lasttimestamp;
-	lasttimestamp = get_backend()->ticks();
+	world.race = get_ticks_msec() - lasttimestamp;
+	lasttimestamp = get_ticks_msec();
 }
 
 bool Engine::tick() {
 	assert(get_backend());
 
 	// tick if necessary
-	bool needupdate = fastticks || !get_backend()->ticks() || (get_backend()->ticks() - tickdata >= world.ticktime - 5);
+	bool needupdate = fastticks || !get_ticks_msec() || (get_ticks_msec() - tickdata >= world.ticktime - 5);
 	if (needupdate && !world.paused) {
 		if (fastticks) {
 			using clock = std::chrono::steady_clock;

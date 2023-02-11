@@ -154,9 +154,12 @@ void v_HIST_YEAR(caosVM* vm) {
 /**
  MSEC (integer)
  %status maybe
+
+ Returns a time stamp measured in milliseconds. It is not specified when the time
+is measured from; the stamp is only guaranteed to be consistent during one session.
 */
 void v_MSEC(caosVM* vm) {
-	vm->result.setInt(get_backend()->ticks());
+	vm->result.setInt(engine.get_ticks_msec());
 }
 
 /**

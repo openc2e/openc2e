@@ -83,8 +83,6 @@ class SDLBackend : public Backend {
 
 	bool pollEvent(BackendEvent& e) override;
 
-	unsigned int ticks() override { return SDL_GetTicks(); }
-
 	Texture createTexture(int32_t width, int32_t height) override;
 	void updateTexture(Texture& tex, Rect location, const Image& image) override;
 

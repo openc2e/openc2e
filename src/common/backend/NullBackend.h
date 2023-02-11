@@ -52,7 +52,6 @@ class NullBackend : public Backend {
 	void init(const std::string&, int32_t, int32_t) override {}
 	void shutdown() override {}
 
-	unsigned int ticks() override { return 0; }
 	bool pollEvent(BackendEvent&) override { return false; }
 	bool keyDown(Openc2eKeycode) override { return false; }
 
