@@ -132,6 +132,10 @@ static std::vector<fs::path> findByWildcard(FileDirectory type, std::string wild
 	// TODO: check user directory before or after data directories?
 	for (auto d : data_directories) {
 		auto dirname = getDirectory(d, type);
+		if (!fs::path(wild).parent_path().empty()) {
+			dirname /= fs::path(wild).parent_path();
+			wild = fs::path(wild).filename().string();
+		}
 		for (const auto& entry : case_insensitive_filesystem::directory_iterator(dirname)) {
 			if (wildcard_match(wild, entry.lexically_relative(dirname).native())) {
 				results.push_back(entry);
