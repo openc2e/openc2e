@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ghc/filesystem.hpp>
+#include <iosfwd>
 #include <unordered_map>
 
 namespace case_insensitive_filesystem {
@@ -13,7 +14,7 @@ struct cacheinfo {
 };
 
 fs::path resolve_filename(fs::path path);
-void add_entry(fs::path); // sort of a hack, whatever
+std::ofstream ofstream(const fs::path&);
 
 class directory_iterator {
   public:

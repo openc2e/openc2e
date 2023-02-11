@@ -228,50 +228,43 @@ fs::path getOtherWorldJournalPath(fs::path) {
 std::ofstream createUserBackgroundFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Backgrounds";
 	fs::create_directory(dir);
-	case_insensitive_filesystem::add_entry(dir / name);
-	return std::ofstream(dir / name, std::ios_base::binary);
+	return case_insensitive_filesystem::ofstream(dir / name);
 }
 
 std::ofstream createUserBodyDataFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Body Data";
 	fs::create_directory(dir);
-	case_insensitive_filesystem::add_entry(dir / name);
-	return std::ofstream(dir / name, std::ios_base::binary);
+	return case_insensitive_filesystem::ofstream(dir / name);
 }
 
 std::ofstream createUserCatalogueFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Catalogue";
 	fs::create_directory(dir);
-	case_insensitive_filesystem::add_entry(dir / name);
-	return std::ofstream(dir / name, std::ios_base::binary);
+	return case_insensitive_filesystem::ofstream(dir / name);
 }
 
 std::ofstream createUserGeneticsFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Genetics";
 	fs::create_directory(dir);
-	case_insensitive_filesystem::add_entry(dir / name);
-	return std::ofstream(dir / name, std::ios_base::binary);
+	return case_insensitive_filesystem::ofstream(dir / name);
 }
 
 std::ofstream createUserImageFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Images";
 	fs::create_directory(dir);
-	case_insensitive_filesystem::add_entry(dir / name);
-	return std::ofstream(dir / name, std::ios_base::binary);
+	return case_insensitive_filesystem::ofstream(dir / name);
 }
 
 std::ofstream createUserOverlayDataFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Overlay Data";
 	fs::create_directory(dir);
-	case_insensitive_filesystem::add_entry(dir / name);
-	return std::ofstream(dir / name, std::ios_base::binary);
+	return case_insensitive_filesystem::ofstream(dir / name);
 }
 
 std::ofstream createUserSoundFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Sounds";
 	fs::create_directory(dir);
-	case_insensitive_filesystem::add_entry(dir / name);
-	return std::ofstream(dir / name, std::ios_base::binary);
+	return case_insensitive_filesystem::ofstream(dir / name);
 }
 
 std::vector<fs::path> findAgentFiles(std::string wild) {

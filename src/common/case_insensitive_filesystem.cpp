@@ -29,7 +29,7 @@ static bool path_startswith(const fs::path& path, fs::path prefix) {
 	return std::equal(prefix.begin(), end, path.begin());
 }
 
-static void updateDirectory(fs::path dirname) {
+static void update_directory(fs::path dirname) {
 	assert(!dirname.empty());
 
 	// if the directory is already cached and matches what's on disk, then do nothing
@@ -87,7 +87,7 @@ fs::path resolve_filename(fs::path path) {
 	if (s_cache.count(lcpath) && fs::exists(s_cache[lcpath].realfilename)) {
 		return s_cache[lcpath].realfilename;
 	}
-	updateDirectory(path.parent_path());
+	update_directory(path.parent_path());
 
 	if (s_cache.count(lcpath)) {
 		return s_cache[lcpath].realfilename;
@@ -95,18 +95,21 @@ fs::path resolve_filename(fs::path path) {
 	return "";
 }
 
-void add_entry(fs::path path) {
-	fs::path lcpath = to_ascii_lowercase(path);
-	if (s_cache.count(lcpath)) {
-		return;
+std::ofstream ofstream(const fs::path& path) {
+	std::error_code err;
+	auto canonpath = case_insensitive_filesystem::canonical(path, err);
+	if (err) {
+		std::ofstream out;
+		out.setstate(std::ios_base::failbit);
+		return out;
 	}
-	s_cache[lcpath] = {path};
+	return std::ofstream(canonpath, std::ios_base::binary);
 }
 
 directory_iterator::directory_iterator(fs::path dirname) {
 	// make sure dir is normal and ends with a trailing slash
 	dirname = dirname.lexically_normal() / "";
-	updateDirectory(dirname);
+	update_directory(dirname);
 	lcdirname = to_ascii_lowercase(dirname);
 
 	it = s_cache.begin();
