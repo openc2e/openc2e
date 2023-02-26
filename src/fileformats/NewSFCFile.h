@@ -1057,9 +1057,9 @@ struct SFCFile {
 };
 
 struct EXPFile {
-	CreatureV1* creature;
-	CGenomeV1* genome;
-	CGenomeV1* child_genome;
+	CreatureV1* creature = nullptr;
+	CGenomeV1* genome = nullptr;
+	CGenomeV1* child_genome = nullptr;
 
 	std::vector<std::unique_ptr<MFCObject>> mfc_objects;
 };

@@ -112,12 +112,17 @@ EXPFile read_exp_v1_file(std::istream& in) {
 	// read file
 	EXPFile exp;
 	reader(exp.creature);
-	reader(exp.genome);
-
-	if (exp.creature->zygote.size()) {
-		reader(exp.child_genome);
-	} else {
+	if (in.peek(), in.eof()) {
+		// we do this stupid conditional because some EXP files floating around
+		// just totally skip the ending genome. in that case, just treat it as
+		// null I guess?
+		exp.genome = nullptr;
 		exp.child_genome = nullptr;
+	} else {
+		reader(exp.genome);
+		if (exp.creature->zygote.size()) {
+			reader(exp.child_genome);
+		}
 	}
 
 	exp.mfc_objects = reader.release_objects();
