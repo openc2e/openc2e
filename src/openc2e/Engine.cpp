@@ -748,16 +748,17 @@ static void opt_version() {
 }
 
 static std::string detectGameType(fs::path directory) {
-	if (!case_insensitive_filesystem::resolve_filename(directory / "creatures.exe").empty()) {
+	if (case_insensitive_filesystem::exists(directory / "creatures.exe")) {
 		return "c1";
 	}
-	if (!case_insensitive_filesystem::resolve_filename(directory / "creatures2.exe").empty()) {
+	if (case_insensitive_filesystem::exists(directory / "creatures2.exe")) {
 		return "c2";
 	}
 
 	auto catalogue_directory = directory / "Catalogue";
-	auto machine_cfg_filename = case_insensitive_filesystem::resolve_filename(directory / "machine.cfg");
-	if (!machine_cfg_filename.empty()) {
+	std::error_code err;
+	auto machine_cfg_filename = case_insensitive_filesystem::canonical(directory / "machine.cfg", err);
+	if (!err) {
 		auto machine_cfg = readcfgfile(machine_cfg_filename);
 		if (machine_cfg.count("Catalogue Directory")) {
 			catalogue_directory = machine_cfg["Catalogue Directory"];
@@ -767,16 +768,16 @@ static std::string detectGameType(fs::path directory) {
 		}
 	}
 
-	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Docking Station.catalogue").empty()) {
+	if (case_insensitive_filesystem::exists(catalogue_directory / "Docking Station.catalogue")) {
 		return "ds";
 	}
-	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Creatures 3.catalogue").empty()) {
+	if (case_insensitive_filesystem::exists(catalogue_directory / "Creatures 3.catalogue")) {
 		return "c3";
 	}
-	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Creatures Adventures.catalogue").empty()) {
+	if (case_insensitive_filesystem::exists(catalogue_directory / "Creatures Adventures.catalogue")) {
 		return "cv";
 	}
-	if (!case_insensitive_filesystem::resolve_filename(catalogue_directory / "Sea Monkeys.catalogue").empty()) {
+	if (case_insensitive_filesystem::exists(catalogue_directory / "Sea Monkeys.catalogue")) {
 		return "sm";
 	}
 	throw Exception("Couldn't auto-detect game type");
@@ -784,8 +785,9 @@ static std::string detectGameType(fs::path directory) {
 
 static std::vector<DataDirectory> data_directories_from_machine_cfg(fs::path machine_cfg_filename) {
 	auto parent_directory = machine_cfg_filename.parent_path();
-	machine_cfg_filename = case_insensitive_filesystem::resolve_filename(machine_cfg_filename);
-	if (machine_cfg_filename.empty()) {
+	std::error_code err;
+	machine_cfg_filename = case_insensitive_filesystem::canonical(machine_cfg_filename, err);
+	if (err) {
 		return {parent_directory};
 	}
 

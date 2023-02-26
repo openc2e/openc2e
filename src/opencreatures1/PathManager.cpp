@@ -29,7 +29,9 @@ fs::path PathManager::find_path(PathType type, const std::string& name) {
 		throw Exception("PathManager main_dir is not set!");
 	}
 	auto dirname = append_path_type(m_main_dir, type);
-	return case_insensitive_filesystem::resolve_filename(dirname / name);
+	std::error_code err;
+	// ignore error, just return empty path
+	return case_insensitive_filesystem::canonical(dirname / name, err);
 }
 
 std::vector<fs::path> PathManager::find_path_wildcard(PathType type, const std::string& pattern) {

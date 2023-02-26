@@ -57,10 +57,6 @@ std::vector<fs::path> getMainDirectories() {
 	return result;
 }
 
-static fs::path resolveFile(fs::path path) {
-	return case_insensitive_filesystem::resolve_filename(path);
-}
-
 enum FileDirectory {
 	DIRECTORY_MAIN,
 	DIRECTORY_BACKGROUNDS,
@@ -118,9 +114,10 @@ static fs::path getDirectory(const DataDirectory& d, FileDirectory type) {
 
 static fs::path findFile(FileDirectory type, fs::path name) {
 	// TODO: check user directory before or after data directories?
+	std::error_code err;
 	for (auto d : data_directories) {
-		fs::path resolved = resolveFile(getDirectory(d, type) / name);
-		if (!resolved.empty()) {
+		fs::path resolved = case_insensitive_filesystem::canonical(getDirectory(d, type) / name, err);
+		if (!err) {
 			return resolved;
 		}
 	}
@@ -310,16 +307,17 @@ fs::path getWorldSwitcherBootstrapDirectory() {
 	assert(data_directories.size() > 0);
 	auto directory = getDirectory(data_directories[0], DIRECTORY_BOOTSTRAP);
 
-	auto bootstrap = resolveFile(directory / "000 Switcher");
-	if (!bootstrap.empty()) {
+	std::error_code err;
+	auto bootstrap = case_insensitive_filesystem::canonical(directory / "000 Switcher", err);
+	if (!err) {
 		return bootstrap;
 	}
-	bootstrap = resolveFile(directory / "000_Switcher");
-	if (!bootstrap.empty()) {
+	bootstrap = case_insensitive_filesystem::canonical(directory / "000_Switcher", err);
+	if (!err) {
 		return bootstrap;
 	}
-	bootstrap = resolveFile(directory / "Startup");
-	if (!bootstrap.empty()) {
+	bootstrap = case_insensitive_filesystem::canonical(directory / "Startup", err);
+	if (!err) {
 		return bootstrap;
 	}
 	throw Exception("couldn't find '000 Switcher' or 'Startup' bootstrap directory");

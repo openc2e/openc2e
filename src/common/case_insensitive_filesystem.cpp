@@ -56,8 +56,9 @@ static void update_directory(fs::path dirname) {
 	std::error_code directory_iterator_error;
 	auto iter = fs::directory_iterator(dirname, directory_iterator_error);
 	if (directory_iterator_error) {
-		dirname = resolve_filename(dirname);
-		if (dirname == "") {
+		std::error_code err;
+		dirname = case_insensitive_filesystem::canonical(dirname, err);
+		if (err) {
 			s_cache[lcdirname] = {dirname, fs::file_time_type::min()}; // I guess?
 			return;
 		}
@@ -71,28 +72,36 @@ static void update_directory(fs::path dirname) {
 	}
 }
 
-fs::path resolve_filename(fs::path path) {
+fs::path canonical(const fs::path& path, std::error_code& ec) {
 	if (path.empty()) {
-		return "";
-	}
-	if (!path.is_absolute()) {
-		path = fs::absolute(path);
-	}
-	if (path.filename().empty()) {
-		path = path.parent_path();
+		ec = std::make_error_code(std::errc::invalid_argument);
+		return {};
 	}
 	fs::path lcpath = to_ascii_lowercase(path);
+	if (!lcpath.is_absolute()) {
+		lcpath = fs::absolute(lcpath);
+	}
+	if (lcpath.filename().empty()) {
+		lcpath = lcpath.parent_path();
+	}
 
 	// if file exists in cache and on filesystem, return it
 	if (s_cache.count(lcpath) && fs::exists(s_cache[lcpath].realfilename)) {
 		return s_cache[lcpath].realfilename;
 	}
-	update_directory(path.parent_path());
+	update_directory(lcpath.parent_path());
 
 	if (s_cache.count(lcpath)) {
 		return s_cache[lcpath].realfilename;
 	}
-	return "";
+	ec = std::make_error_code(std::errc::no_such_file_or_directory);
+	return {};
+}
+
+bool exists(const fs::path& path) {
+	std::error_code err;
+	auto canonpath = case_insensitive_filesystem::canonical(path, err);
+	return !err;
 }
 
 std::ofstream ofstream(const fs::path& path) {
@@ -106,11 +115,11 @@ std::ofstream ofstream(const fs::path& path) {
 	return std::ofstream(canonpath, std::ios_base::binary);
 }
 
-directory_iterator::directory_iterator(fs::path dirname) {
+directory_iterator::directory_iterator(const fs::path& dirname) {
 	// make sure dir is normal and ends with a trailing slash
-	dirname = dirname.lexically_normal() / "";
-	update_directory(dirname);
-	lcdirname = to_ascii_lowercase(dirname);
+	auto normaldirname = dirname.lexically_normal() / "";
+	update_directory(normaldirname);
+	lcdirname = to_ascii_lowercase(normaldirname);
 
 	it = s_cache.begin();
 	while (it != s_cache.end()) {

@@ -2,6 +2,7 @@
 
 #include <ghc/filesystem.hpp>
 #include <iosfwd>
+#include <system_error>
 #include <unordered_map>
 
 namespace case_insensitive_filesystem {
@@ -13,12 +14,13 @@ struct cacheinfo {
 	fs::file_time_type mtime = fs::file_time_type::min();
 };
 
-fs::path resolve_filename(fs::path path);
+fs::path canonical(const fs::path&, std::error_code&);
+bool exists(const fs::path&);
 std::ofstream ofstream(const fs::path&);
 
 class directory_iterator {
   public:
-	directory_iterator(fs::path dirname);
+	directory_iterator(const fs::path& dirname);
 	const fs::path& operator*() const;
 	directory_iterator& operator++();
 	bool operator==(const directory_iterator&) const;
