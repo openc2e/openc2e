@@ -122,7 +122,7 @@ void MFCReader::operator()(int32_t& out) {
 	}
 }
 
-void MFCReader::operator()(std::vector<uint8_t>& out) {
+void MFCReader::operator()(span<uint8_t> out) {
 	m_in.read(reinterpret_cast<char*>(out.data()), out.size());
 	if (!m_in) {
 		throw Exception(fmt::format("Could only read {} out of {} bytes", m_in.gcount(), out.size()));

@@ -2,6 +2,7 @@
 
 #include "common/Exception.h"
 #include "common/ResizableContainerView.h"
+#include "common/span.h"
 
 #include <iosfwd>
 #include <map>
@@ -40,7 +41,7 @@ class MFCReader {
 	void operator()(int16_t&);
 	void operator()(uint32_t&);
 	void operator()(int32_t&);
-	void operator()(std::vector<uint8_t>&);
+	void operator()(span<uint8_t>);
 
 	template <typename T>
 	void operator()(T*& out) {
