@@ -72,6 +72,19 @@ void MFCReader::ascii_nullterminated(std::string& out, size_t n) {
 	out = val;
 }
 
+void MFCReader::win1252_mfcstring(std::string& out) {
+	uint32_t length = ::read8(m_in);
+	if (length == 0xFF) {
+		length = ::read16le(m_in);
+	}
+	if (length == 0xFFFF) {
+		length = ::read32le(m_in);
+	}
+	std::string val(length, '\0');
+	m_in.read(&val[0], length);
+	out = cp1252_to_utf8(val);
+}
+
 void MFCReader::size_u8(ResizableContainerView out) {
 	out.resize(::read8(m_in));
 }

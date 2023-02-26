@@ -30,6 +30,7 @@ class MFCReader {
 	void ascii_dword(std::string&);
 	void ascii_mfcstring(std::string&);
 	void ascii_nullterminated(std::string&, size_t);
+	void win1252_mfcstring(std::string&);
 
 	void size_u8(ResizableContainerView out);
 	void size_u16(ResizableContainerView out);

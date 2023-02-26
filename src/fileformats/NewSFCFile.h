@@ -994,11 +994,11 @@ struct CreatureV1 : ObjectV1 {
 		ar.ascii_mfcstring(history_moms_moniker);
 		ar.ascii_mfcstring(history_dads_moniker);
 		ar.ascii_mfcstring(history_birthday);
-		ar.ascii_mfcstring(history_birthplace);
-		ar.ascii_mfcstring(history_owner_name);
-		ar.ascii_mfcstring(history_owner_phone);
-		ar.ascii_mfcstring(history_owner_address);
-		ar.ascii_mfcstring(history_owner_email);
+		ar.win1252_mfcstring(history_birthplace);
+		ar.win1252_mfcstring(history_owner_name);
+		ar.win1252_mfcstring(history_owner_phone);
+		ar.win1252_mfcstring(history_owner_address);
+		ar.win1252_mfcstring(history_owner_email);
 	}
 };
 
