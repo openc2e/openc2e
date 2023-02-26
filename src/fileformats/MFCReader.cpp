@@ -10,6 +10,7 @@
 
 MFCReader::MFCReader(std::istream& in)
 	: m_in(in) {
+	in.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 	m_objects.emplace_back(nullptr);
 }
 

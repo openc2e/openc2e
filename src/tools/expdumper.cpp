@@ -366,7 +366,11 @@ int main(int argc, char** argv) {
 	print_genome(exp.child_genome);
 
 	// check if we read all of it
-	in.peek();
+	if (!in.eof()) {
+		// stupid iostreams throw an error if you try to peek a file that's at EOF,
+		// _after_ you've already peeked once to tell if it's at EOF. stupid stupid stupid.
+		in.peek();
+	}
 	fmt::print("read entire file? {}\n", in.eof());
 	fmt::print("total number of MFC objects {}\n", exp.mfc_objects.size());
 }
