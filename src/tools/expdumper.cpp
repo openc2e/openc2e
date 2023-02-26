@@ -1,3 +1,4 @@
+#include "common/Repr.h"
 #include "common/backtrace.h"
 #include "fileformats/NewSFCFile.h"
 
@@ -327,7 +328,23 @@ int main(int argc, char** argv) {
 	}
 
 	fmt::print("  voice_lookup_table = [ ... ]\n");
-	fmt::print("  voices = [ ... ]\n");
+	fmt::print("  voices = [\n");
+	for (size_t i = 0; i < exp.creature->voices.size(); ++i) {
+		auto& voice = exp.creature->voices[i];
+
+		auto voicename = [&]() -> std::string {
+			if (voice.name == std::array<uint8_t, 4>{0, 0, 0, 0}) {
+				return "null";
+			}
+			if (voice.name == std::array<uint8_t, 4>{0, 0, 0, 1}) {
+				return "\"\\0\\0\\0\\1\"";
+			}
+			return std::string("\"") + std::string((char*)&voice.name[0], 4) + "\"";
+		}();
+
+		fmt::print("    {}: Voice name={} delay={}\n", i, voicename, voice.delay_ticks);
+	}
+	fmt::print("  )]\n");
 
 	fmt::print("  history_moniker = \"{}\"\n", exp.creature->history_moniker);
 	fmt::print("  history_name = \"{}\"\n", exp.creature->history_name);
