@@ -1,4 +1,4 @@
-
+#include "common/backtrace.h"
 #include "fileformats/NewSFCFile.h"
 
 #include <fmt/core.h>
@@ -71,6 +71,8 @@ static void print_dendrite(const sfc::DendriteV1& dendrite) {
 }
 
 int main(int argc, char** argv) {
+	install_backtrace_printer();
+
 	if (argc != 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
 		fmt::print(stderr, "USAGE: {} FILE\n", argv[0]);
 		return 1;
