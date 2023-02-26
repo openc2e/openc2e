@@ -849,7 +849,7 @@ struct CInstinctV1 {
 
 struct VoiceV1 {
 	// not CArchive serialized
-	std::string name;
+	std::array<uint8_t, 4> name; // either a four-character ASCII token, "\0\0\0\0", or "\0\0\0\1"
 	uint32_t delay_ticks;
 };
 
@@ -983,7 +983,7 @@ struct CreatureV1 : ObjectV1 {
 			}
 		}
 		for (auto& v : voices) {
-			ar.ascii_dword(v.name);
+			ar(v.name);
 			ar(v.delay_ticks);
 		}
 
