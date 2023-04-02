@@ -67,7 +67,7 @@ sudo apt-get install \
 Install dependencies using [Homebrew](https://brew.sh):
 
 ```bash
-brew install cmake qt
+brew install cmake
 ```
 
 ### Windows
