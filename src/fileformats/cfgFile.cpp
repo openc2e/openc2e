@@ -1,12 +1,19 @@
 #include "cfgFile.h"
 
-#include "common/Ascii.h"
 #include "common/Exception.h"
-#include "common/SimpleLexer.h"
 #include "common/readfile.h"
 
 #include <assert.h>
 #include <fstream>
+
+static char unescape(char c) {
+	switch (c) {
+		case 'n': return '\n';
+		case 'r': return '\r';
+		case 't': return '\t';
+		default: return c;
+	}
+}
 
 enum cfgtokentype {
 	CFG_STRING,
@@ -23,7 +30,7 @@ struct cfgtoken {
 	std::string raw;
 
 	cfgtoken(cfgtokentype type_, std::string raw_)
-		: type(type_), raw(raw_) {}
+		: type(type_), raw(std::move(raw_)) {}
 
 	const char* c_str() const {
 		return raw.c_str();
@@ -34,8 +41,17 @@ struct cfgtoken {
 			return raw;
 		}
 		if (type == CFG_STRING) {
-			// remove quotes
-			return raw.substr(1, raw.size() - 2);
+			// remove double quotes and unescape characters
+			std::string newvalue;
+			for (size_t i = 1; i < raw.size() - 1; ++i) {
+				if (raw[i] == '\\') {
+					++i;
+					newvalue += unescape(raw[i]);
+				} else {
+					newvalue += raw[i];
+				}
+			}
+			return newvalue;
 		}
 		throw Exception("cfgtoken::value() not a string");
 	}
