@@ -1,6 +1,8 @@
 #include "Object.h"
 
+#include "MacroManager.h"
 #include "ObjectManager.h"
+#include "ObjectMessageManager.h"
 #include "common/Ascii.h"
 #include "common/NumericCast.h"
 
@@ -34,10 +36,10 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 			// TODO: should we still make the mouse gesture?
 			return;
 		}
-		g_engine_context.events->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(click_message));
+		g_engine_context.messages->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(click_message));
 
 		// TODO: let objects override the pointer script when they get clicked on
-		g_engine_context.events->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
+		g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
 		return;
 	}
 
@@ -59,10 +61,10 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 
 			if (hotspot.has_point(relx, rely)) {
 				// Found a clickable knob whose hotspot contains this click!
-				g_engine_context.events->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(i - 3));
+				g_engine_context.messages->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(i - 3));
 
 				// TODO: let objects override the pointer script when they get clicked on
-				g_engine_context.events->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
+				g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
 				return;
 			}
 		}
@@ -94,7 +96,7 @@ void Object::handle_mesg_activate1(Message msg) {
 			lift->lift_data->floors[call_button_data->floor].call_button = this->uid;
 		}
 		actv = ACTV_ACTIVE1;
-		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
+		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
 	}
 	if (compound_data) {
@@ -114,7 +116,7 @@ void Object::handle_mesg_activate1(Message msg) {
 		}
 
 		actv = ACTV_ACTIVE1;
-		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
+		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
 	}
 	throw Exception(fmt::format("handle_mesg_activate1 not implemented on object {} {} {}", family, genus, species));
@@ -136,7 +138,7 @@ void Object::handle_mesg_activate2(Message msg) {
 			return handle_mesg_activate1(msg);
 		}
 		actv = ACTV_ACTIVE2;
-		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
+		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
 	}
 	if (compound_data) {
@@ -157,7 +159,7 @@ void Object::handle_mesg_activate2(Message msg) {
 		}
 
 		actv = ACTV_ACTIVE2;
-		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
+		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
 	}
 	throw Exception(fmt::format("handle_mesg_activate2 not implemented on object {} {} {}", family, genus, species));
@@ -176,7 +178,7 @@ void Object::handle_mesg_deactivate(Message msg) {
 		}
 
 		actv = ACTV_INACTIVE;
-		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
+		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
 		return;
 	}
 	if (compound_data) {
@@ -199,7 +201,7 @@ void Object::handle_mesg_deactivate(Message msg) {
 		}
 
 		actv = ACTV_INACTIVE;
-		g_engine_context.events->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
+		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
 		return;
 	}
 	throw Exception(fmt::format("handle_mesg_deactivate not implemented on object {} {} {}", family, genus, species));
@@ -390,13 +392,13 @@ void Object::tick() {
 				vehicle_data->yvel = 0;
 				if (actv != ACTV_INACTIVE) {
 					actv = ACTV_INACTIVE;
-					g_engine_context.events->queue_script(this, this, SCRIPT_DEACTIVATE);
+					g_engine_context.macros->queue_script(this, this, SCRIPT_DEACTIVATE);
 				}
 
 				if (auto call_button = lift_data->floors[lift_data->next_or_current_floor].call_button) {
 					lift_data->floors[lift_data->next_or_current_floor].call_button = {};
 					g_engine_context.objects->try_get(call_button)->actv = ACTV_INACTIVE;
-					g_engine_context.events->queue_script(this->uid, call_button, SCRIPT_DEACTIVATE);
+					g_engine_context.macros->queue_script(this->uid, call_button, SCRIPT_DEACTIVATE);
 				}
 				return;
 			}
@@ -431,11 +433,11 @@ void Object::tick() {
 			if (best_y >= current_cabin_bottom) {
 				lift_data->next_or_current_floor = best_floor;
 				actv = ACTV_ACTIVE1;
-				g_engine_context.events->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE1);
+				g_engine_context.macros->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE1);
 			} else {
 				lift_data->next_or_current_floor = best_floor;
 				actv = ACTV_ACTIVE2;
-				g_engine_context.events->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE2);
+				g_engine_context.macros->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE2);
 			}
 		}
 	}

@@ -1,8 +1,7 @@
-
-
 #include "TimerSystem.h"
 
 #include "EngineContext.h"
+#include "MacroManager.h"
 #include "Object.h"
 #include "ObjectManager.h"
 
@@ -20,7 +19,7 @@ void TimerSystem::tick() {
 
 		o->ticks_since_last_tick_event = 0;
 
-		if (!g_engine_context.events->queue_script(o, o, SCRIPT_TIMER)) {
+		if (!g_engine_context.macros->queue_script(o.get(), o.get(), SCRIPT_TIMER)) {
 			fmt::print("ERRO [TimerSystem] Disabling timer for {}\n", repr(o.get()));
 			o->tick_value = 0;
 		}

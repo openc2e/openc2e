@@ -42,7 +42,7 @@ enum ScriptNumber {
 	SCRIPT_EXTRA_UNDEFINED3 = 30,
 	SCRIPT_EXTRA_UNDEFINED4 = 31,
 
-	// - introspective
+	// introspective
 	SCRIPT_INTRO_QUIESCENT = 32,
 	SCRIPT_INTRO_ACTIVATE1 = 33,
 	SCRIPT_INTRO_ACTIVATE2 = 34,
@@ -88,6 +88,8 @@ class MacroManager {
 	bool has_macro_owned_by(ObjectHandle ownr) const;
 	void delete_macros_owned_by(ObjectHandle ownr);
 	void tick();
+	bool queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno, bool override_existing = true);
+	bool queue_script(Object* from, Object* to, ScriptNumber eventno, bool override_existing = true);
 
 	MacroContext ctx;
 

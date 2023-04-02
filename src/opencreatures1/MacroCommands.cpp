@@ -2,9 +2,9 @@
 
 #include "C1ControlledSound.h"
 #include "C1SoundManager.h"
-#include "EventManager.h"
 #include "Object.h"
 #include "ObjectManager.h"
+#include "ObjectMessageManager.h"
 #include "common/Random.h"
 
 void Command_ADDV(MacroContext& ctx, Macro& m) {
@@ -314,7 +314,7 @@ void Command_MESG(MacroContext& ctx, Macro& m) {
 		int32_t message = ctx.read_int(m);
 		ctx.read_command_separator(m);
 
-		g_engine_context.events->mesg_writ(m.ownr, to, MessageNumber(message));
+		g_engine_context.messages->mesg_writ(m.ownr, to, MessageNumber(message));
 
 	} else {
 		throw Exception(fmt::format("Unknown command 'mesg {}'", repr(subcommand)));

@@ -2,12 +2,12 @@
 
 #include "C1MusicManager.h"
 #include "C1SoundManager.h"
-#include "EventManager.h"
 #include "ImageManager.h"
 #include "MacroCommands.h"
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "ObjectManager.h"
+#include "ObjectMessageManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
 #include "Scriptorium.h"

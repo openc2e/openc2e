@@ -15,7 +15,7 @@ class EngineContext {
 	void reset();
 
 	// all the parts
-	HeapValue<class EventManager> events;
+	HeapValue<class ObjectMessageManager> messages;
 	HeapValue<class ImageManager> images;
 	HeapValue<class MacroManager> macros;
 	HeapValue<class MapManager> map;

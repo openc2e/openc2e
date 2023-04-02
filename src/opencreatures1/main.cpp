@@ -1,12 +1,12 @@
 #include "C1MusicManager.h"
 #include "C1SoundManager.h"
 #include "EngineContext.h"
-#include "EventManager.h"
 #include "ImageManager.h"
 #include "MacroCommands.h"
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "ObjectManager.h"
+#include "ObjectMessageManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
 #include "Renderable.h"
@@ -69,7 +69,7 @@ void load_everything() {
 
 	// fire init scripts
 	for (auto& o : *g_engine_context.objects) {
-		g_engine_context.events->queue_script(o, o, SCRIPT_INITIALIZE);
+		g_engine_context.macros->queue_script(o.get(), o.get(), SCRIPT_INITIALIZE);
 	}
 }
 
@@ -101,7 +101,7 @@ void update_everything() {
 		g_engine_context.objects->tick();
 		g_engine_context.timers->tick();
 		g_engine_context.macros->tick();
-		g_engine_context.events->tick();
+		g_engine_context.messages->tick();
 		// animations tick after CAOS runs, otherwise the OVER command is too fast
 		update_animations();
 	}
