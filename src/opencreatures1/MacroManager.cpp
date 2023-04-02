@@ -91,26 +91,43 @@ bool MacroManager::queue_script(ObjectHandle from_id, ObjectHandle to_id, Script
 	return queue_script(from, to, eventno, override_existing);
 }
 
+bool MacroManager::queue_script(ObjectHandle from_id, ObjectHandle to_id, uint8_t family, uint8_t genus, uint8_t species, ScriptNumber eventno, bool override_existing) {
+	auto* to = g_engine_context.objects->try_get(to_id);
+	auto* from = g_engine_context.objects->try_get(from_id);
+	return queue_script(from, to, family, genus, species, eventno, override_existing);
+}
+
 static std::string format_script(ScriptNumber eventno) {
 	return fmt::format("{}", scriptnumber_to_string(eventno), eventno);
 }
 
 bool MacroManager::queue_script(Object* from, Object* to, ScriptNumber eventno, bool override_existing) {
+	// most of the time, we just want an object to run its own script
+	return queue_script(from, to, to->family, to->genus, to->species, eventno, override_existing);
+}
+
+bool MacroManager::queue_script(Object* from, Object* to, uint8_t family, uint8_t genus, uint8_t species, ScriptNumber eventno, bool override_existing) {
+	// occasionally, we want an object to run a script from _another_ classifier — e.g. objects can override pointer animations
+
 	if (!to) {
 		printf("WARNING: tried to run script %i on nonexistent object\n", eventno);
 		return false;
 	}
 
-	std::string script = g_engine_context.scriptorium->get(to->family, to->genus, to->species, eventno);
+	std::string script = g_engine_context.scriptorium->get(family, genus, species, eventno);
 	if (script.empty()) {
-		std::string script = g_engine_context.scriptorium->get(to->family, to->genus, 0, eventno);
+		std::string script = g_engine_context.scriptorium->get(family, genus, 0, eventno);
 	}
 	if (script.empty()) {
-		std::string script = g_engine_context.scriptorium->get(to->family, 0, 0, eventno);
+		std::string script = g_engine_context.scriptorium->get(family, 0, 0, eventno);
 	}
 	if (script.empty()) {
 		if (eventno == SCRIPT_INITIALIZE) {
 			// skip, otherwise this raises a ton of (spurious?) warnings
+			return false;
+		}
+		if (!(family == to->family && genus == to->genus && species == to->species)) {
+			// skip, otherwise this raises warnings when the pointer does something (and we'll handle the return result anyways)
 			return false;
 		}
 		fmt::print("WARN [MacroManager] tried to run nonexistent script {} {}\n", repr(to), format_script(eventno));

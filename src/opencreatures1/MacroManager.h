@@ -90,6 +90,8 @@ class MacroManager {
 	void tick();
 	bool queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno, bool override_existing = true);
 	bool queue_script(Object* from, Object* to, ScriptNumber eventno, bool override_existing = true);
+	bool queue_script(ObjectHandle from_id, ObjectHandle to_id, uint8_t family, uint8_t genus, uint8_t species, ScriptNumber eventno, bool override_existing = true);
+	bool queue_script(Object* from, Object* to, uint8_t family, uint8_t genus, uint8_t species, ScriptNumber eventno, bool override_existing = true);
 
 	MacroContext ctx;
 

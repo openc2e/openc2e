@@ -38,8 +38,10 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 		}
 		g_engine_context.messages->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(click_message));
 
-		// TODO: let objects override the pointer script when they get clicked on
-		g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
+		// let objects override the pointer script when they get clicked on. This seems to be only used by the Drum in the base world.
+		if (!g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, family, genus, species, SCRIPT_POINTER_ACTIVATE1)) {
+			g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
+		}
 		return;
 	}
 
@@ -63,8 +65,10 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 				// Found a clickable knob whose hotspot contains this click!
 				g_engine_context.messages->mesg_writ(g_engine_context.pointer->m_pointer_tool, this->uid, MessageNumber(i - 3));
 
-				// TODO: let objects override the pointer script when they get clicked on
-				g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
+				// let objects override the pointer script when they get clicked on. This seems to be only used by the Drum (a SimpleObject) in the base world.
+				if (!g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, family, genus, species, SCRIPT_POINTER_ACTIVATE1)) {
+					g_engine_context.macros->queue_script(g_engine_context.pointer->m_pointer_tool, g_engine_context.pointer->m_pointer_tool, SCRIPT_POINTER_ACTIVATE1);
+				}
 				return;
 			}
 		}
