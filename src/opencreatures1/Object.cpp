@@ -377,7 +377,24 @@ void Object::vehicle_drop_passengers() {
 }
 
 void Object::tick() {
-	// TODO: handle this in a separate VehicleSystem or VelocitySystem or PhysicsSystem or something?
+	// TODO: if this function gets too slow, break out various bits into separate Systems that only
+	// know about Objects that need to be updated (e.g. an Object would have a TimerSystemHandle into
+	// the TimerSystem, and the TimerSystem only updates timer scripts for its managed objects).
+
+	// timer updates
+	if (tick_value > 0) {
+		ticks_since_last_tick_event += 1;
+		if (ticks_since_last_tick_event >= tick_value) {
+			ticks_since_last_tick_event = 0;
+			if (!g_engine_context.macros->queue_script(this, this, SCRIPT_TIMER)) {
+				fmt::print("ERRO [Object::tick] Disabling timer for {}\n", repr(this));
+				tick_value = 0;
+			}
+			// fmt::print("Fired timer script for {}, {}, {}\n", family, genus, species);
+		}
+	}
+
+	// vehicle position updates
 	if (vehicle_data) {
 		if (lift_data && vehicle_data->yvel != 0) {
 			auto current_cabin_bottom = get_bbox().y + vehicle_data->cabin_bottom;
@@ -407,6 +424,7 @@ void Object::tick() {
 		add_position(vehicle_data->xvel, vehicle_data->yvel);
 	}
 
+	// lift caller updates
 	if (lift_data && actv == ACTV_INACTIVE && obv0 == 0) {
 		// any callers?
 

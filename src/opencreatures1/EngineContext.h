@@ -26,7 +26,6 @@ class EngineContext {
 	HeapValue<class Scriptorium> scriptorium;
 	HeapValue<class C1SoundManager> sounds;
 	HeapValue<class ViewportManager> viewport;
-	HeapValue<class TimerSystem> timers;
 };
 
 extern EngineContext g_engine_context;

@@ -12,7 +12,6 @@
 #include "Renderable.h"
 #include "SFCLoader.h"
 #include "Scriptorium.h"
-#include "TimerSystem.h"
 #include "ViewportManager.h"
 #include "common/Repr.h"
 #include "common/backend/Keycodes.h"
@@ -99,7 +98,6 @@ void update_everything() {
 		time_of_last_tick = std::chrono::steady_clock::now();
 		g_engine_context.viewport->tick();
 		g_engine_context.objects->tick();
-		g_engine_context.timers->tick();
 		g_engine_context.macros->tick();
 		g_engine_context.messages->tick();
 		// animations tick after CAOS runs, otherwise the OVER command is too fast

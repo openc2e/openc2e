@@ -11,7 +11,6 @@
 #include "PathManager.h"
 #include "PointerManager.h"
 #include "Scriptorium.h"
-#include "TimerSystem.h"
 #include "ViewportManager.h"
 
 struct EngineContextConstructTag {};
