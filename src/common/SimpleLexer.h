@@ -44,7 +44,6 @@ struct SimpleToken {
 
 struct SimpleLexerConfiguration {
 	bool asterisk_comments = false;
-	bool number_sign_comments = false;
 	bool paren_asterisk_comments = false;
 };
 

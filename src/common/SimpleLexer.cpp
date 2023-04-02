@@ -103,7 +103,7 @@ start:
 
 	if (p[0] == '\0') {
 		goto eoi;
-	} else if ((conf.asterisk_comments && p[0] == '*') || (conf.number_sign_comments && p[0] == '#')) {
+	} else if (conf.asterisk_comments && p[0] == '*') {
 		p++;
 		while (!(p[0] == '\0' || p[0] == '\n' || (p[0] == '\r' && p[1] == '\n'))) {
 			p++;
