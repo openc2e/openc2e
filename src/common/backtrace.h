@@ -6,6 +6,7 @@
 #include <windows.h>
 // #include <psapi.h>
 #include <dbghelp.h>
+#include <string.h>
 #pragma comment(lib, "dbghelp.lib")
 
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo) {
@@ -137,6 +138,7 @@ LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo) {
 #include <inttypes.h>
 #include <signal.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #ifdef __GNUG__
