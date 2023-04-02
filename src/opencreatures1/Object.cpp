@@ -80,10 +80,13 @@ void Object::handle_mesg_activate1(Message msg) {
 		throw Exception("handle_mesg_activate1 not implemented on pointer");
 	}
 	if (simple_data) {
-		if (actv == ACTV_ACTIVE1 || (from && from->creature_data && !(simple_data->touch_bhvr & TOUCH_ACTIVATE1))) {
-			if (from)
-				from->creature_stim_disappoint();
-			return;
+		if (from && from->creature_data) {
+			if (call_button_data && (actv == ACTV_ACTIVE1 || actv == ACTV_ACTIVE2)) {
+				return from->creature_stim_disappoint();
+			}
+			if (actv == ACTV_ACTIVE1 || !(simple_data->touch_bhvr & TOUCH_ACTIVATE1)) {
+				return from->creature_stim_disappoint();
+			}
 		}
 		if (call_button_data) {
 			auto* lift = g_engine_context.objects->try_get(call_button_data->lift);
@@ -100,6 +103,7 @@ void Object::handle_mesg_activate1(Message msg) {
 		return;
 	}
 	if (compound_data) {
+		// TODO: also disappoint and exit early if script doesn't exist
 		if (actv == ACTV_ACTIVE1 || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE1] == -1)) {
 			if (from)
 				from->creature_stim_disappoint();
@@ -127,21 +131,22 @@ void Object::handle_mesg_activate2(Message msg) {
 	if (pointer_data) {
 		throw Exception("handle_mesg_activate2 not implemented on pointer");
 	}
+	if (call_button_data) {
+		// Call buttons never activate2, always activate1
+		return handle_mesg_activate1(msg);
+	}
 	if (simple_data) {
-		if (actv == ACTV_ACTIVE2 || (from && from->creature_data && !(simple_data->touch_bhvr & TOUCH_ACTIVATE2))) {
-			if (from)
-				from->creature_stim_disappoint();
-			return;
-		}
-		if (call_button_data) {
-			// Call buttons never activate2, always activate1
-			return handle_mesg_activate1(msg);
+		if (from && from->creature_data) {
+			if (actv == ACTV_ACTIVE2 || !(simple_data->touch_bhvr & TOUCH_ACTIVATE2)) {
+				return from->creature_stim_disappoint();
+			}
 		}
 		actv = ACTV_ACTIVE2;
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
 	}
 	if (compound_data) {
+		// TODO: also disappoint and exit early if script doesn't exist
 		if (actv == ACTV_ACTIVE2 || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE2] == -1)) {
 			if (from)
 				from->creature_stim_disappoint();
@@ -171,10 +176,10 @@ void Object::handle_mesg_deactivate(Message msg) {
 		throw Exception("handle_mesg_deactivate not implemented on pointer");
 	}
 	if (simple_data) {
-		if (actv == ACTV_INACTIVE || (from && from->creature_data && !(simple_data->touch_bhvr & TOUCH_DEACTIVATE))) {
-			if (from)
-				from->creature_stim_disappoint();
-			return;
+		if (from && from->creature_data) {
+			if (actv == ACTV_INACTIVE || !(simple_data->touch_bhvr & TOUCH_DEACTIVATE)) {
+				return from->creature_stim_disappoint();
+			}
 		}
 
 		actv = ACTV_INACTIVE;
@@ -182,6 +187,7 @@ void Object::handle_mesg_deactivate(Message msg) {
 		return;
 	}
 	if (compound_data) {
+		// TODO: also disappoint and exit early if script doesn't exist
 		if (actv == ACTV_INACTIVE || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREDEACTIVATE] == -1)) {
 			if (from)
 				from->creature_stim_disappoint();
