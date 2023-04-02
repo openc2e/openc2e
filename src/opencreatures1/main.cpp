@@ -72,19 +72,6 @@ void load_everything() {
 	}
 }
 
-void update_animations() {
-	for (auto& o : *g_engine_context.objects) {
-		for (int32_t partno = 0; true; ++partno) {
-			auto* r = o->get_renderable_for_part(partno);
-			if (!r) {
-				break;
-			}
-
-			r->update_animation();
-		}
-	}
-}
-
 void update_everything() {
 	// these should update as often as possible, regardless of ticks
 	g_engine_context.music->update();
@@ -100,8 +87,6 @@ void update_everything() {
 		g_engine_context.objects->tick();
 		g_engine_context.macros->tick();
 		g_engine_context.messages->tick();
-		// animations tick after CAOS runs, otherwise the OVER command is too fast
-		update_animations();
 	}
 
 	// these should update as often as possible, regardless of ticks

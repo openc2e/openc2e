@@ -394,6 +394,15 @@ void Object::tick() {
 		}
 	}
 
+	// animation updates
+	for (int32_t partno = 0; true; ++partno) {
+		auto* r = get_renderable_for_part(partno);
+		if (!r) {
+			break;
+		}
+		r->update_animation();
+	}
+
 	// vehicle position updates
 	if (vehicle_data) {
 		if (lift_data && vehicle_data->yvel != 0) {
