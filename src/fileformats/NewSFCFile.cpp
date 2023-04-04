@@ -1,5 +1,7 @@
 #include "NewSFCFile.h"
 
+#include "MFCReader.h"
+
 #include <fstream>
 
 namespace sfc {

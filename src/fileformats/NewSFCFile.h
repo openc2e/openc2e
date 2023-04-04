@@ -1,6 +1,7 @@
 #pragma once
 
-#include "fileformats/MFCReader.h"
+#include "common/Exception.h"
+#include "fileformats/MFCObject.h"
 
 #include <array>
 #include <iosfwd>

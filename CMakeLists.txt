@@ -148,6 +148,7 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/genomeFile.cpp
 	src/fileformats/hedfile.cpp
 	src/fileformats/MFCReader.cpp
+	src/fileformats/MFCWriter.cpp
 	src/fileformats/mngfile.cpp
 	src/fileformats/mngparser.cpp
 	src/fileformats/NewSFCFile.cpp

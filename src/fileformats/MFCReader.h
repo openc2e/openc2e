@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MFCObject.h"
 #include "common/Exception.h"
 #include "common/ResizableContainerView.h"
 #include "common/span.h"
@@ -13,11 +14,6 @@
 #include <vector>
 
 // Windows MFC serialized data / CArchive serialized data
-
-class MFCObject {
-  public:
-	virtual ~MFCObject() = default;
-};
 
 class MFCReader {
   public:

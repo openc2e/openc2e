@@ -81,6 +81,12 @@ static inline void write8(std::ostream& s, uint8_t v) {
 	s.write(reinterpret_cast<char*>(&v), 1);
 }
 
+static inline void writesigned8(std::ostream& s, int8_t v_) {
+	// assumes two's complement
+	uint8_t v = static_cast<uint8_t>(v_);
+	s.write(reinterpret_cast<char*>(&v), 1);
+}
+
 static inline uint16_t read16le(const uint8_t* buf) {
 	uint16_t val;
 	memcpy(&val, buf, 2);
@@ -102,6 +108,13 @@ static inline int16_t readsigned16le(std::istream& s) {
 }
 
 static inline void write16le(std::ostream& s, uint16_t v) {
+	uint16_t t = is_little_endian() ? v : byte_swap_16(v);
+	s.write(reinterpret_cast<char*>(&t), 2);
+}
+
+static inline void writesigned16le(std::ostream& s, int16_t v_) {
+	// assumes two's complement
+	uint16_t v = static_cast<uint16_t>(v_);
 	uint16_t t = is_little_endian() ? v : byte_swap_16(v);
 	s.write(reinterpret_cast<char*>(&t), 2);
 }
@@ -131,6 +144,13 @@ static inline int32_t readsigned32le(std::istream& s) {
 }
 
 static inline void write32le(std::ostream& s, uint32_t v) {
+	uint32_t t = is_little_endian() ? v : byte_swap_32(v);
+	s.write(reinterpret_cast<char*>(&t), 4);
+}
+
+static inline void writesigned32le(std::ostream& s, int32_t v_) {
+	// assumes two's complement
+	uint32_t v = static_cast<uint32_t>(v_);
 	uint32_t t = is_little_endian() ? v : byte_swap_32(v);
 	s.write(reinterpret_cast<char*>(&t), 4);
 }
