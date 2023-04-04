@@ -103,12 +103,7 @@ void MFCReader::operator()(uint8_t& out) {
 }
 
 void MFCReader::operator()(int8_t& out) {
-	uint8_t value = ::read8(m_in);
-	if (value <= INT8_MAX) {
-		out = static_cast<int8_t>(value);
-	} else {
-		out = static_cast<int8_t>(value - INT8_MIN) + INT8_MIN;
-	}
+	out = ::readsigned8(m_in);
 }
 
 void MFCReader::operator()(uint16_t& out) {
@@ -116,12 +111,7 @@ void MFCReader::operator()(uint16_t& out) {
 }
 
 void MFCReader::operator()(int16_t& out) {
-	uint16_t value = ::read16le(m_in);
-	if (value <= INT16_MAX) {
-		out = static_cast<int16_t>(value);
-	} else {
-		out = static_cast<int16_t>(value - INT16_MIN) + INT16_MIN;
-	}
+	out = ::readsigned16le(m_in);
 }
 
 void MFCReader::operator()(uint32_t& out) {
@@ -129,12 +119,7 @@ void MFCReader::operator()(uint32_t& out) {
 }
 
 void MFCReader::operator()(int32_t& out) {
-	uint32_t value = ::read32le(m_in);
-	if (value <= INT32_MAX) {
-		out = static_cast<int32_t>(value);
-	} else {
-		out = static_cast<int32_t>(value - INT32_MIN) + INT32_MIN;
-	}
+	out = ::readsigned32le(m_in);
 }
 
 void MFCReader::operator()(span<uint8_t> out) {
