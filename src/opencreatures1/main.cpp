@@ -53,14 +53,18 @@ void load_everything() {
 	// load palette
 	g_engine_context.images->load_default_palette();
 
-	// load Eden.sfc
-	auto eden_sfc_path = g_engine_context.paths->find_path(PATH_TYPE_MAIN, "Eden.sfc");
-	if (eden_sfc_path.empty()) {
+	// load World.sfc/Eden.sfc
+	auto sfc_path = g_engine_context.paths->find_path(PATH_TYPE_MAIN, "World.sfc");
+	if (sfc_path.empty()) {
+		fmt::print(stderr, "* Couldn't find World.sfc\n");
+		sfc_path = g_engine_context.paths->find_path(PATH_TYPE_MAIN, "Eden.sfc");
+	}
+	if (sfc_path.empty()) {
 		fmt::print(stderr, "* Error: Couldn't find Eden.sfc\n");
 		exit(1);
 	}
-	fmt::print("* Found Eden.sfc: {}\n", repr(eden_sfc_path));
-	auto sfc = sfc::read_sfc_v1_file(eden_sfc_path);
+	fmt::print("* Loading world: {}\n", repr(sfc_path));
+	auto sfc = sfc::read_sfc_v1_file(sfc_path);
 
 	// load world data
 	sfc_load_everything(sfc);
