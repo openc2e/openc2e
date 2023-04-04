@@ -20,7 +20,7 @@ struct ImageV1 {
 	uint32_t offset;
 };
 
-struct CGalleryV1 {
+struct CGalleryV1 : MFCObject {
 	std::string filename;
 	int32_t first_sprite;
 	int32_t refcount;
@@ -65,7 +65,7 @@ struct BacteriumV1 {
 	uint8_t toxin4;
 };
 
-struct MapDataV1 {
+struct MapDataV1 : MFCObject {
 	uint32_t unused_is_wrappable;
 	uint32_t time_of_day;
 	CGalleryV1* background;
@@ -103,7 +103,7 @@ struct MapDataV1 {
 	}
 };
 
-struct EntityV1 {
+struct EntityV1 : MFCObject {
 	CGalleryV1* sprite;
 	uint8_t current_sprite;
 	uint8_t image_offset;
@@ -151,9 +151,7 @@ struct ScriptV1 {
 };
 
 
-struct ObjectV1 {
-	virtual ~ObjectV1() {}
-
+struct ObjectV1 : MFCObject {
 	uint8_t species;
 	uint8_t genus;
 	uint8_t family;
@@ -407,7 +405,7 @@ struct SceneryV1 : ObjectV1 {
 	}
 };
 
-struct MacroV1 {
+struct MacroV1 : MFCObject {
 	uint32_t selfdestruct;
 	uint32_t inst;
 	uint32_t script_length_maybe;
@@ -693,7 +691,7 @@ struct NeuronV1 {
 	}
 };
 
-struct CBrainV1 {
+struct CBrainV1 : MFCObject {
 	std::vector<LobeV1> lobes;
 	std::vector<NeuronV1> neurons;
 
@@ -792,7 +790,7 @@ struct ReactionV1 {
 	}
 };
 
-struct CBiochemistryV1 {
+struct CBiochemistryV1 : MFCObject {
 	CreatureV1* owner;
 	std::array<ChemicalDataV1, 256> chemicals;
 	std::vector<EmitterV1> emitters;
@@ -827,7 +825,7 @@ struct InstinctDendriteV1 {
 	uint32_t cell;
 };
 
-struct CInstinctV1 {
+struct CInstinctV1 : MFCObject {
 	std::array<InstinctDendriteV1, 3> dendrites;
 	uint32_t motor_decision;
 	uint32_t reinforcement_chemical;
@@ -1002,7 +1000,7 @@ struct CreatureV1 : ObjectV1 {
 	}
 };
 
-struct CGenomeV1 {
+struct CGenomeV1 : MFCObject {
 	std::string moniker;
 	uint32_t sex;
 	uint8_t life_stage;
@@ -1021,6 +1019,7 @@ struct CGenomeV1 {
 };
 
 struct FavoritePlaceV1 {
+	// not CArchive serialized
 	std::string name;
 	int16_t x;
 	int16_t y;

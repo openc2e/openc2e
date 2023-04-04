@@ -58,26 +58,21 @@ class MFCReader {
 		}
 	}
 
-
 	template <typename T>
 	void register_class(const std::string& name, int schema_number) {
 		ClassInfo info;
 		info.newfunc = [] {
-			return static_cast<MFCObject*>(new MFCObjectImpl<T>());
+			return static_cast<MFCObject*>(new T());
 		};
 		info.readfunc = [](MFCObject* obj, MFCReader& reader) {
-			// the inner static_cast is unchecked, but we know for sure that the
-			// MFCObject passed in is in fact an MFCObjectImpl<T> so we're safe
-			static_cast<T*>(static_cast<MFCObjectImpl<T>*>(obj))->serialize(reader);
+			// the static_cast is unchecked, but we know for sure that the
+			// MFCObject passed in is in fact a T so we're safe
+			static_cast<T*>(obj)->serialize(reader);
 		};
 		m_classregistry[std::make_pair(name, schema_number)] = info;
 	}
 
   private:
-	template <typename T>
-	struct MFCObjectImpl : T, MFCObject {
-	};
-
 	struct ClassInfo {
 		MFCObject* (*newfunc)();
 		void (*readfunc)(MFCObject*, MFCReader&);
