@@ -1054,6 +1054,59 @@ struct SFCFile {
 	std::vector<CreatureV1*> stuffed_norns;
 
 	std::vector<std::unique_ptr<MFCObject>> mfc_objects;
+
+	template <typename Archive>
+	void serialize(Archive& ar) {
+		ar(map);
+		ar.size_u32(objects);
+		for (auto& o : objects) {
+			ar(o);
+		}
+		ar.size_u32(sceneries);
+		for (auto& s : sceneries) {
+			ar(s);
+		}
+		ar.size_u32(scripts);
+		for (auto& script : scripts) {
+			script.serialize(ar);
+		}
+		ar(scrollx);
+		ar(scrolly);
+		ar(current_norn);
+		for (auto& favplace : favorite_places) {
+			ar.ascii_mfcstring(favplace.name);
+			ar(favplace.x);
+			ar(favplace.y);
+		}
+		ar.size_u16(speech_history);
+		for (auto& s : speech_history) {
+			ar.ascii_mfcstring(s);
+		}
+		ar.size_u32(macros);
+		for (auto& m : macros) {
+			ar(m);
+		}
+		ar.size_u32(death_row);
+		for (auto& d : death_row) {
+			ar(d);
+		}
+		ar.size_u32(events);
+		for (auto& e : events) {
+			ar(e);
+		}
+		ar(current_score);
+		ar(current_health);
+		ar(hatchery_eggs);
+		ar(natural_eggs);
+		ar(dead_norns);
+		ar(live_norns);
+		ar(breeders_score);
+		ar(tick);
+		ar.size_u32(stuffed_norns);
+		for (auto& n : stuffed_norns) {
+			ar(n);
+		}
+	}
 };
 
 struct EXPFile {

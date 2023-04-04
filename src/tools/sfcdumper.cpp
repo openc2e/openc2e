@@ -1,4 +1,3 @@
-
 #include "fileformats/NewSFCFile.h"
 
 #include <fmt/core.h>

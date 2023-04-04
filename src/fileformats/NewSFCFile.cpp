@@ -27,67 +27,7 @@ SFCFile read_sfc_v1_file(std::istream& in) {
 
 	// read file
 	SFCFile sfc;
-	reader(sfc.map);
-
-	reader.size_u32(sfc.objects);
-	for (auto& o : sfc.objects) {
-		reader(o);
-	}
-
-	reader.size_u32(sfc.sceneries);
-	for (auto& s : sfc.sceneries) {
-		reader(s);
-	}
-
-	reader.size_u32(sfc.scripts);
-	for (auto& script : sfc.scripts) {
-		script.serialize(reader);
-	}
-
-	reader(sfc.scrollx);
-	reader(sfc.scrolly);
-	reader(sfc.current_norn);
-
-	for (auto& favplace : sfc.favorite_places) {
-		reader.ascii_mfcstring(favplace.name);
-		reader(favplace.x);
-		reader(favplace.y);
-	}
-
-	reader.size_u16(sfc.speech_history);
-	for (auto& s : sfc.speech_history) {
-		reader.ascii_mfcstring(s);
-	}
-
-	reader.size_u32(sfc.macros);
-	for (auto& m : sfc.macros) {
-		reader(m);
-	}
-
-	reader.size_u32(sfc.death_row);
-	for (auto& d : sfc.death_row) {
-		reader(d);
-	}
-
-	reader.size_u32(sfc.events);
-	for (auto& e : sfc.events) {
-		reader(e);
-	}
-
-	reader(sfc.current_score);
-	reader(sfc.current_health);
-	reader(sfc.hatchery_eggs);
-	reader(sfc.natural_eggs);
-	reader(sfc.dead_norns);
-	reader(sfc.live_norns);
-	reader(sfc.breeders_score);
-	reader(sfc.tick);
-
-	reader.size_u32(sfc.stuffed_norns);
-	for (auto& n : sfc.stuffed_norns) {
-		reader(n);
-	}
-
+	sfc.serialize(reader);
 	sfc.mfc_objects = reader.release_objects();
 	return sfc;
 }
