@@ -63,8 +63,7 @@ void load_everything() {
 	auto sfc = sfc::read_sfc_v1_file(eden_sfc_path);
 
 	// load world data
-	SFCLoader loader(sfc);
-	loader.load_everything();
+	sfc_load_everything(sfc);
 
 	// fire init scripts
 	for (auto& o : *g_engine_context.objects) {
