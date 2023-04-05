@@ -7,6 +7,9 @@
 
 void PointerManager::update() {
 	Object* obj = g_engine_context.objects->try_get(m_pointer_tool);
+	if (!obj) {
+		return;
+	}
 	Renderable* r = obj->get_renderable_for_part(0);
 	r->set_position(
 		g_engine_context.viewport->window_x_to_world_x(m_screenx) - obj->pointer_data->relx,
@@ -27,10 +30,14 @@ void PointerManager::handle_event(const BackendEvent& event) {
 		// must have all of their parts w/in the bounding box of the first/main part.
 		// We use the main part's z-order as the object overall z-order.
 
-		Object* pntr = g_engine_context.objects->try_get(m_pointer_tool);
+		int worldx = g_engine_context.viewport->window_x_to_world_x(event.x);
+		int worldy = g_engine_context.viewport->window_y_to_world_y(event.y);
 
-		int worldx = g_engine_context.viewport->window_x_to_world_x(event.x) + pntr->pointer_data->relx;
-		int worldy = g_engine_context.viewport->window_y_to_world_y(event.y) + pntr->pointer_data->rely;
+		Object* pntr = g_engine_context.objects->try_get(m_pointer_tool);
+		if (pntr) {
+			worldx += pntr->pointer_data->relx;
+			worldy += pntr->pointer_data->rely;
+		}
 
 		fmt::print("click @ {} {}\n", worldx, worldy);
 
