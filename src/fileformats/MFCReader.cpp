@@ -17,14 +17,6 @@ MFCReader::MFCReader(std::istream& in)
 MFCReader::~MFCReader() {
 }
 
-const std::vector<std::unique_ptr<MFCObject>>& MFCReader::objects() const {
-	return m_objects;
-}
-
-std::vector<std::unique_ptr<MFCObject>>&& MFCReader::release_objects() {
-	return std::move(m_objects);
-}
-
 std::string MFCReader::read_ascii(size_t n) {
 	std::string val(n, '\0');
 	m_in.read(&val[0], n);
@@ -129,7 +121,7 @@ void MFCReader::operator()(span<uint8_t> out) {
 	}
 }
 
-MFCObject* MFCReader::read_object() {
+std::shared_ptr<MFCObject> MFCReader::read_object() {
 	uint16_t pid = ::read16le(m_in);
 	if (pid == 0x7FFF) {
 		// 32-bit PIDs
@@ -150,9 +142,9 @@ MFCObject* MFCReader::read_object() {
 		m_objects.emplace_back(nullptr); // to increment the pids
 
 		// new object
-		MFCObject* value = classinfo.newfunc();
+		std::shared_ptr<MFCObject> value = classinfo.newfunc();
 		m_objects.emplace_back(value);
-		classinfo.readfunc(value, *this);
+		classinfo.readfunc(value.get(), *this);
 		return value;
 
 	} else if (pid & 0x8000) {
@@ -165,9 +157,9 @@ MFCObject* MFCReader::read_object() {
 		}
 		// new object
 		auto classinfo = it->second;
-		MFCObject* value = classinfo.newfunc();
+		std::shared_ptr<MFCObject> value = classinfo.newfunc();
 		m_objects.emplace_back(value);
-		classinfo.readfunc(value, *this);
+		classinfo.readfunc(value.get(), *this);
 		return value;
 
 	} else {
@@ -178,6 +170,6 @@ MFCObject* MFCReader::read_object() {
 		if (m_classids.find(pid) != m_classids.end()) {
 			throw Exception(fmt::format("Referenced object ID {}, but it was a class", pid));
 		}
-		return m_objects[pid].get();
+		return m_objects[pid];
 	}
 }

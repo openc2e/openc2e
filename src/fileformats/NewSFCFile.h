@@ -69,7 +69,7 @@ struct BacteriumV1 {
 struct MapDataV1 : MFCObject {
 	uint32_t unused_is_wrappable;
 	uint32_t time_of_day;
-	CGalleryV1* background;
+	std::shared_ptr<CGalleryV1> background;
 	std::vector<RoomV1> rooms;
 	std::array<uint32_t, 261> groundlevel;
 	std::array<BacteriumV1, 100> bacteria;
@@ -105,7 +105,7 @@ struct MapDataV1 : MFCObject {
 };
 
 struct EntityV1 : MFCObject {
-	CGalleryV1* sprite;
+	std::shared_ptr<CGalleryV1> sprite;
 	uint8_t current_sprite;
 	uint8_t image_offset;
 	int32_t z_order; // TODO: should be signed?
@@ -164,7 +164,7 @@ struct ObjectV1 : MFCObject {
 	int32_t limit_bottom;
 	ObjectV1* carrier;
 	uint8_t actv;
-	CGalleryV1* sprite;
+	std::shared_ptr<CGalleryV1> sprite;
 	int32_t tick_value;
 	int32_t ticks_since_last_tick_event;
 	ObjectV1* objp;
@@ -206,7 +206,7 @@ struct ObjectV1 : MFCObject {
 };
 
 struct SimpleObjectV1 : ObjectV1 {
-	EntityV1* part;
+	std::shared_ptr<EntityV1> part;
 	int32_t z_order;
 	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
@@ -258,7 +258,7 @@ struct PointerToolV1 : SimpleObjectV1 {
 
 struct CompoundPartV1 {
 	// not CArchive serialized
-	EntityV1* entity;
+	std::shared_ptr<EntityV1> entity;
 	int32_t x;
 	int32_t y;
 };
@@ -397,7 +397,7 @@ struct CallButtonV1 : SimpleObjectV1 {
 };
 
 struct SceneryV1 : ObjectV1 {
-	EntityV1* part;
+	std::shared_ptr<EntityV1> part;
 
 	template <typename Archive>
 	void serialize(Archive& ar) {
@@ -492,7 +492,7 @@ struct LimbData {
 
 struct LimbV1 : BodyPartV1 {
 	std::array<LimbData, 10> limb_data;
-	LimbV1* next = nullptr;
+	std::shared_ptr<LimbV1> next;
 
 	template <typename Archive>
 	void serialize(Archive& ar) {
@@ -856,13 +856,13 @@ struct CreatureV1 : ObjectV1 {
 	std::string moniker;
 	std::string mother;
 	std::string father;
-	BodyV1* body;
-	LimbV1* head;
-	LimbV1* left_thigh;
-	LimbV1* right_thigh;
-	LimbV1* left_arm;
-	LimbV1* right_arm;
-	LimbV1* tail;
+	std::shared_ptr<BodyV1> body;
+	std::shared_ptr<LimbV1> head;
+	std::shared_ptr<LimbV1> left_thigh;
+	std::shared_ptr<LimbV1> right_thigh;
+	std::shared_ptr<LimbV1> left_arm;
+	std::shared_ptr<LimbV1> right_arm;
+	std::shared_ptr<LimbV1> tail;
 	uint8_t direction;
 	uint8_t downfoot;
 	uint32_t footx;
@@ -877,8 +877,8 @@ struct CreatureV1 : ObjectV1 {
 	std::array<VocabWordV1, 80> vocabulary;
 	std::array<PositionV1, 40> object_positions;
 	std::array<StimulusV1, 36> stimuli;
-	CBrainV1* brain;
-	CBiochemistryV1* biochemistry;
+	std::shared_ptr<CBrainV1> brain;
+	std::shared_ptr<CBiochemistryV1> biochemistry;
 	uint8_t sex;
 	uint8_t age;
 	uint32_t biotick;
@@ -887,9 +887,9 @@ struct CreatureV1 : ObjectV1 {
 	uint8_t dead;
 	uint32_t age_ticks;
 	uint32_t dreaming;
-	std::vector<CInstinctV1*> instincts;
+	std::vector<std::shared_ptr<CInstinctV1>> instincts;
 	std::array<std::array<uint32_t, 16>, 40> goals;
-	SimpleObjectV1* zzzz;
+	std::shared_ptr<SimpleObjectV1> zzzz;
 	std::array<std::array<uint32_t, 3>, 27> voices_lookup;
 	std::array<VoiceV1, 32> voices;
 	std::string history_moniker;
@@ -1027,9 +1027,9 @@ struct FavoritePlaceV1 {
 };
 
 struct SFCFile {
-	MapDataV1* map;
-	std::vector<ObjectV1*> objects;
-	std::vector<SceneryV1*> sceneries;
+	std::shared_ptr<MapDataV1> map;
+	std::vector<std::shared_ptr<ObjectV1>> objects;
+	std::vector<std::shared_ptr<SceneryV1>> sceneries;
 	std::vector<ScriptV1> scripts;
 
 	int32_t scrollx;
@@ -1038,7 +1038,7 @@ struct SFCFile {
 	CreatureV1* current_norn;
 	std::array<FavoritePlaceV1, 6> favorite_places;
 	std::vector<std::string> speech_history;
-	std::vector<MacroV1*> macros;
+	std::vector<std::shared_ptr<MacroV1>> macros;
 	std::vector<ObjectV1*> death_row;
 	std::vector<ObjectV1*> events;
 
@@ -1052,8 +1052,6 @@ struct SFCFile {
 	uint32_t tick;
 
 	std::vector<CreatureV1*> stuffed_norns;
-
-	std::vector<std::unique_ptr<MFCObject>> mfc_objects;
 
 	template <typename Archive>
 	void serialize(Archive& ar) {
@@ -1110,11 +1108,9 @@ struct SFCFile {
 };
 
 struct EXPFile {
-	CreatureV1* creature = nullptr;
-	CGenomeV1* genome = nullptr;
-	CGenomeV1* child_genome = nullptr;
-
-	std::vector<std::unique_ptr<MFCObject>> mfc_objects;
+	std::shared_ptr<CreatureV1> creature;
+	std::shared_ptr<CGenomeV1> genome;
+	std::shared_ptr<CGenomeV1> child_genome;
 };
 
 SFCFile read_sfc_v1_file(std::istream& in);

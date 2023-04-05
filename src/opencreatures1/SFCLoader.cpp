@@ -149,12 +149,12 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 
 	if (auto* scen = dynamic_cast<const sfc::SceneryV1*>(p)) {
 		obj->scenery_data = std::make_unique<SceneryData>();
-		obj->scenery_data->part = renderable_from_sfc_entity(scen->part);
+		obj->scenery_data->part = renderable_from_sfc_entity(scen->part.get());
 	}
 
 	if (auto* simp = dynamic_cast<const sfc::SimpleObjectV1*>(p)) {
 		obj->simple_data = std::make_unique<SimpleObjectData>();
-		obj->simple_data->part = renderable_from_sfc_entity(simp->part);
+		obj->simple_data->part = renderable_from_sfc_entity(simp->part.get());
 		obj->simple_data->z_order = simp->z_order;
 		obj->simple_data->click_bhvr = simp->click_bhvr;
 		obj->simple_data->touch_bhvr = simp->touch_bhvr;
@@ -183,7 +183,7 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 		obj->compound_data = std::make_unique<CompoundObjectData>();
 		for (auto& cp : comp->parts) {
 			obj->compound_data->parts.emplace_back();
-			obj->compound_data->parts.back().renderable = renderable_from_sfc_entity(cp.entity);
+			obj->compound_data->parts.back().renderable = renderable_from_sfc_entity(cp.entity.get());
 			obj->compound_data->parts.back().x = cp.x;
 			obj->compound_data->parts.back().y = cp.y;
 		}
@@ -271,22 +271,22 @@ void SFCLoader::load_objects_and_sceneries() {
 	// the mapping to fix up later pointers.)
 
 	// first, create empty toplevel objects
-	for (auto* p : sfc.objects) {
+	for (const auto& p : sfc.objects) {
 		auto handle = g_engine_context.objects->add();
-		sfc_object_mapping[p] = handle;
+		sfc_object_mapping[p.get()] = handle;
 	}
-	for (auto* p : sfc.sceneries) {
+	for (const auto& p : sfc.sceneries) {
 		auto handle = g_engine_context.objects->add();
-		sfc_object_mapping[p] = handle;
+		sfc_object_mapping[p.get()] = handle;
 	}
 
 	// second, load data, including cross-object references
-	for (auto* p : sfc.objects) {
-		load_object(p);
+	for (const auto& p : sfc.objects) {
+		load_object(p.get());
 	}
 	fmt::print("INFO [SFCLoader] Loaded {} objects\n", sfc.objects.size());
-	for (auto* p : sfc.sceneries) {
-		load_object(p);
+	for (const auto& p : sfc.sceneries) {
+		load_object(p.get());
 	}
 	fmt::print("INFO [SFCLoader] Loaded {} sceneries\n", sfc.sceneries.size());
 }
@@ -298,7 +298,7 @@ void SFCLoader::load_scripts() {
 }
 
 void SFCLoader::load_macros() {
-	for (auto* m : sfc.macros) {
+	for (const auto& m : sfc.macros) {
 		Macro macro;
 		macro.selfdestruct = m->selfdestruct;
 		macro.inst = m->inst;

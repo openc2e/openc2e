@@ -30,7 +30,6 @@ SFCFile read_sfc_v1_file(std::istream& in) {
 	// read file
 	SFCFile sfc;
 	sfc.serialize(reader);
-	sfc.mfc_objects = reader.release_objects();
 	return sfc;
 }
 
@@ -66,8 +65,6 @@ EXPFile read_exp_v1_file(std::istream& in) {
 			reader(exp.child_genome);
 		}
 	}
-
-	exp.mfc_objects = reader.release_objects();
 	return exp;
 }
 

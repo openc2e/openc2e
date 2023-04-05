@@ -6,7 +6,7 @@
 #include <fstream>
 
 
-static void print_limb(sfc::LimbV1* limb, const std::string& indent) {
+static void print_limb(std::shared_ptr<sfc::LimbV1> limb, const std::string& indent) {
 	if (!limb) {
 		fmt::print("null\n");
 		return;
@@ -30,7 +30,7 @@ static void print_limb(sfc::LimbV1* limb, const std::string& indent) {
 	fmt::print("{}}}\n", indent);
 }
 
-static void print_genome(sfc::CGenomeV1* genome) {
+static void print_genome(std::shared_ptr<sfc::CGenomeV1> genome) {
 	if (!genome) {
 		fmt::print("null\n");
 		return;
@@ -372,5 +372,4 @@ int main(int argc, char** argv) {
 		in.peek();
 	}
 	fmt::print("read entire file? {}\n", in.eof());
-	fmt::print("total number of MFC objects {}\n", exp.mfc_objects.size());
 }

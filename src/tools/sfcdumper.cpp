@@ -19,7 +19,6 @@ int main(int argc, char** argv) {
 	in.peek();
 	fmt::print("read entire file? {}\n", in.eof());
 
-	fmt::print("total number of MFC objects {}\n", sfc.mfc_objects.size());
 	fmt::print("number of objects {}\n", sfc.objects.size());
 	fmt::print("number of sceneries {}\n", sfc.sceneries.size());
 	fmt::print("number of scripts {}\n", sfc.scripts.size());

@@ -36,8 +36,13 @@ class MFCWriter {
 	void operator()(span<const uint8_t>);
 
 	template <typename T>
-	void operator()(T*& obj) {
+	void operator()(T* obj) {
 		write_object(obj, obj ? typeid(*obj) : typeid(nullptr));
+	}
+
+	template <typename T>
+	void operator()(const std::shared_ptr<T>& obj) {
+		return (*this)(obj.get());
 	}
 
 	template <typename T>
