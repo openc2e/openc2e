@@ -14,7 +14,7 @@ struct CGalleryV1;
 
 struct ImageV1 {
 	// not CArchive serialized
-	CGalleryV1* parent;
+	CGalleryV1* parent = nullptr;
 	uint8_t status;
 	uint32_t width;
 	uint32_t height;
@@ -162,12 +162,12 @@ struct ObjectV1 : MFCObject {
 	int32_t limit_top;
 	int32_t limit_right;
 	int32_t limit_bottom;
-	ObjectV1* carrier;
+	ObjectV1* carrier = nullptr;
 	uint8_t actv;
 	std::shared_ptr<CGalleryV1> sprite;
 	int32_t tick_value;
 	int32_t ticks_since_last_tick_event;
-	ObjectV1* objp;
+	ObjectV1* objp = nullptr;
 	std::string current_sound;
 	int32_t obv0;
 	int32_t obv1;
@@ -226,7 +226,7 @@ struct SimpleObjectV1 : ObjectV1 {
 
 struct BubbleV1 : SimpleObjectV1 {
 	uint8_t life;
-	ObjectV1* creator;
+	ObjectV1* creator = nullptr;
 	std::string text;
 
 	template <typename Archive>
@@ -242,7 +242,7 @@ struct BubbleV1 : SimpleObjectV1 {
 struct PointerToolV1 : SimpleObjectV1 {
 	int32_t relx;
 	int32_t rely;
-	BubbleV1* bubble;
+	BubbleV1* bubble = nullptr;
 	std::string text;
 
 	template <typename Archive>
@@ -361,7 +361,7 @@ struct CallButtonV1;
 struct LiftV1 : VehicleV1 {
 	struct LiftFloor {
 		int32_t y;
-		CallButtonV1* call_button;
+		CallButtonV1* call_button = nullptr;
 	};
 
 	int32_t num_floors;
@@ -385,7 +385,7 @@ struct LiftV1 : VehicleV1 {
 };
 
 struct CallButtonV1 : SimpleObjectV1 {
-	LiftV1* lift;
+	LiftV1* lift = nullptr;
 	uint8_t floor;
 
 	template <typename Archive>
@@ -415,11 +415,11 @@ struct MacroV1 : MFCObject {
 	std::array<int32_t, 20> stack;
 	uint32_t sp;
 	std::array<int32_t, 10> vars;
-	ObjectV1* ownr;
-	ObjectV1* from;
-	ObjectV1* exec;
-	ObjectV1* targ;
-	ObjectV1* _it_;
+	ObjectV1* ownr = nullptr;
+	ObjectV1* from = nullptr;
+	ObjectV1* exec = nullptr;
+	ObjectV1* targ = nullptr;
+	ObjectV1* _it_ = nullptr;
 	int32_t part;
 	std::string subroutine_label;
 	uint32_t subroutine_address;
@@ -792,7 +792,7 @@ struct ReactionV1 {
 };
 
 struct CBiochemistryV1 : MFCObject {
-	CreatureV1* owner;
+	CreatureV1* owner = nullptr;
 	std::array<ChemicalDataV1, 256> chemicals;
 	std::vector<EmitterV1> emitters;
 	std::vector<ReceptorV1> receptors;
@@ -1035,7 +1035,7 @@ struct SFCFile {
 	int32_t scrollx;
 	int32_t scrolly;
 
-	CreatureV1* current_norn;
+	CreatureV1* current_norn = nullptr;
 	std::array<FavoritePlaceV1, 6> favorite_places;
 	std::vector<std::string> speech_history;
 	std::vector<std::shared_ptr<MacroV1>> macros;
