@@ -75,6 +75,9 @@ void SFCLoader::load_map() {
 
 	fmt::print("INFO [SFCLoader] Loading background = {}.spr\n", sfc.map->background->filename);
 	auto background = g_engine_context.images->get_image(sfc.map->background->filename, ImageManager::IMAGE_SPR);
+	if (sfc.map->background->first_sprite != 0) {
+		fmt::print("WARN [SFCLoader] map background first sprite = {}, expected 0", sfc.map->background->first_sprite);
+	}
 	// TODO: do any C1 metarooms have non-standard sizes?
 	if (background.width(0) != CREATURES1_WORLD_WIDTH || background.height(0) != CREATURES1_WORLD_HEIGHT) {
 		throw Exception(fmt::format("Expected Creatures 1 background size to be 8352x1200 but got {}x{}", background.width(0), background.height(0)));
