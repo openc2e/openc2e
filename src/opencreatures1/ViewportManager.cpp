@@ -82,10 +82,8 @@ void ViewportManager::update() {
 		scroll_vely = 0;
 	}
 	// wraparound left and right
-	if (scrollx < 0) {
-		scrollx = CREATURES1_WORLD_WIDTH + scrollx;
-	} else if (scrollx >= CREATURES1_WORLD_WIDTH) {
-		scrollx -= CREATURES1_WORLD_WIDTH;
+	if (scrollx < 0 || scrollx >= CREATURES1_WORLD_WIDTH) {
+		scrollx = scrollx % CREATURES1_WORLD_WIDTH;
 	}
 
 	// update rendersystem and soundmanager

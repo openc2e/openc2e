@@ -64,6 +64,7 @@ void SFCLoader::load_everything() {
 }
 
 void SFCLoader::load_viewport() {
+	fmt::print("INFO [SFCLoader] Viewport {}, {}\n", sfc.scrollx, sfc.scrolly);
 	g_engine_context.viewport->set_scroll_position(sfc.scrollx, sfc.scrolly);
 }
 
