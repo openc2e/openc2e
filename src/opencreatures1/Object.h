@@ -125,7 +125,7 @@ struct BlackboardData {
 	int8_t text_y_position = 0;
 	std::array<BlackboardWord, 16> words;
 
-	SpriteGallery charset_sprite;
+	ImageGallery charset_sprite;
 	std::array<RenderItemHandle, 11> text_render_items;
 };
 

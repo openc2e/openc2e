@@ -4,7 +4,7 @@
 #include "common/NumericCast.h"
 #include "common/math/Rect.h"
 #include "common/render/RenderSystem.h"
-#include "opencreatures1/SpriteGallery.h"
+#include "opencreatures1/ImageGallery.h"
 
 #include <fmt/core.h>
 #include <string>
@@ -12,10 +12,10 @@
 
 class Renderable {
   public:
-	void set_sprite(const SpriteGallery& sprite);
+	void set_sprite(const ImageGallery& sprite);
 	std::string get_sprite_name() const;
 
-	// TODO: this should be in SpriteGallery to match C1
+	// TODO: this should be in ImageGallery to match C1
 	void set_absolute_base(int32_t absolute_base);
 	int32_t get_absolute_base() const { return absolute_base; };
 
@@ -46,7 +46,7 @@ class Renderable {
 
 	void update_renderitem();
 
-	SpriteGallery sprite;
+	ImageGallery sprite;
 	int32_t absolute_base = 0;
 	int32_t base = 0;
 	int32_t pose = 0;

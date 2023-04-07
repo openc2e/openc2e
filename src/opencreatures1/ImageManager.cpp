@@ -17,7 +17,7 @@ namespace fs = ghc::filesystem;
 ImageManager::ImageManager() {
 }
 
-static SpriteGallery build_gallery(const std::string& name, MultiImage images) {
+static ImageGallery build_gallery(const std::string& name, MultiImage images) {
 	// stupid simple atlas-ing, can make this better
 
 	int32_t total_width = 0;
@@ -29,7 +29,7 @@ static SpriteGallery build_gallery(const std::string& name, MultiImage images) {
 		}
 	}
 
-	SpriteGallery gallery;
+	ImageGallery gallery;
 	gallery.name = name;
 	gallery.texture = get_backend()->createTexture(total_width, max_height);
 
@@ -58,7 +58,7 @@ void ImageManager::load_default_palette() {
 	m_default_palette = ReadPaletteFile(palette_dta_path);
 }
 
-const SpriteGallery& ImageManager::get_image(std::string name, ImageType allowed_types) {
+const ImageGallery& ImageManager::get_image(std::string name, ImageType allowed_types) {
 	name = to_ascii_lowercase(name);
 
 	// do we have it loaded already?
@@ -90,7 +90,7 @@ const SpriteGallery& ImageManager::get_image(std::string name, ImageType allowed
 	return m_cache[name];
 }
 
-SpriteGallery ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor) {
+ImageGallery ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor) {
 	// TODO: cache this?
 
 	fs::path path = g_engine_context.paths->find_path(PATH_TYPE_IMAGE, "charset.dta");

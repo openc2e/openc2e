@@ -40,7 +40,7 @@ void Renderable::set_absolute_base(int object_sprite_base_) {
 void Renderable::set_base(int part_sprite_base_) {
 	base = part_sprite_base_;
 }
-void Renderable::set_sprite(const SpriteGallery& sprite_) {
+void Renderable::set_sprite(const ImageGallery& sprite_) {
 	sprite = sprite_;
 	update_renderitem();
 }

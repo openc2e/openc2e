@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-class SpriteGallery {
+class ImageGallery {
   public:
 	std::string name;
 	// std::vector<Image> images;

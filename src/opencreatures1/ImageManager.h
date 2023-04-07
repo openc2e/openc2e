@@ -2,7 +2,7 @@
 
 #include "fileformats/ImageUtils.h"
 #include "fileformats/paletteFile.h"
-#include "opencreatures1/SpriteGallery.h"
+#include "opencreatures1/ImageGallery.h"
 
 #include <map>
 #include <memory>
@@ -16,10 +16,10 @@ class ImageManager {
 
 	ImageManager();
 	void load_default_palette();
-	const SpriteGallery& get_image(std::string name, ImageType allowed_types);
-	SpriteGallery get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor);
+	const ImageGallery& get_image(std::string name, ImageType allowed_types);
+	ImageGallery get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor);
 
   private:
-	std::map<std::string, SpriteGallery> m_cache;
+	std::map<std::string, ImageGallery> m_cache;
 	shared_array<Color> m_default_palette;
 };

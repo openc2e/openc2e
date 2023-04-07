@@ -22,7 +22,7 @@ void MapManager::add_room(Room&& room) {
 	rooms.emplace_back(std::move(room));
 }
 
-void MapManager::set_background(SpriteGallery background_) {
+void MapManager::set_background(ImageGallery background_) {
 	background = background_;
 	background_renderitem = get_rendersystem()->render_item_create(LAYER_BACKGROUND);
 	get_rendersystem()->render_item_set_texture(background_renderitem, background.texture, background.texture_locations[0]);
