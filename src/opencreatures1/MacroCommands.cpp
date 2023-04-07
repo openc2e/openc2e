@@ -46,8 +46,8 @@ void Command_BASE(MacroContext& ctx, Macro& m) {
 
 	auto* r = ctx.get_targ_part(m);
 	// TODO: I think we both set the new base and reset the pose to 0?
-	r->set_part_sprite_base(new_base);
-	r->set_sprite_index(0);
+	r->set_base(new_base);
+	r->set_pose(0);
 
 	ctx.read_command_separator(m);
 }
@@ -432,7 +432,7 @@ void Command_POSE(MacroContext& ctx, Macro& m) {
 
 	auto* renderable = ctx.get_targ_part(m);
 	renderable->clear_animation();
-	renderable->set_sprite_index(pose);
+	renderable->set_pose(pose);
 
 	ctx.read_command_separator(m);
 }
@@ -744,7 +744,7 @@ int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_POSE(MacroContext& ctx, Macro& m) {
-	return ctx.get_targ_part(m)->get_sprite_index();
+	return ctx.get_targ_part(m)->get_pose();
 }
 
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {

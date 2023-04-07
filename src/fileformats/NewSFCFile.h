@@ -106,8 +106,8 @@ struct MapDataV1 : MFCObject {
 
 struct EntityV1 : MFCObject {
 	std::shared_ptr<CGalleryV1> sprite;
-	uint8_t current_sprite;
-	uint8_t image_offset;
+	uint8_t sprite_pose_plus_base;
+	uint8_t sprite_base;
 	int32_t z_order; // TODO: should be signed?
 	int32_t x;
 	int32_t y;
@@ -118,8 +118,8 @@ struct EntityV1 : MFCObject {
 	template <typename Archive>
 	void serialize(Archive& ar) {
 		ar(sprite);
-		ar(current_sprite);
-		ar(image_offset);
+		ar(sprite_pose_plus_base);
+		ar(sprite_base);
 		ar(z_order);
 		ar(x);
 		ar(y);

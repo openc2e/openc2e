@@ -34,11 +34,11 @@ int32_t Renderable::get_z_order() const {
 	return z;
 }
 
-void Renderable::set_object_sprite_base(int object_sprite_base_) {
-	object_sprite_base = object_sprite_base_;
+void Renderable::set_absolute_base(int object_sprite_base_) {
+	absolute_base = object_sprite_base_;
 }
-void Renderable::set_part_sprite_base(int part_sprite_base_) {
-	part_sprite_base = part_sprite_base_;
+void Renderable::set_base(int part_sprite_base_) {
+	base = part_sprite_base_;
 }
 void Renderable::set_sprite(const SpriteGallery& sprite_) {
 	sprite = sprite_;
@@ -57,7 +57,7 @@ Rect Renderable::get_bbox() const {
 }
 
 int32_t Renderable::frame() const {
-	return object_sprite_base + part_sprite_base + sprite_index;
+	return absolute_base + base + pose;
 }
 
 int32_t Renderable::width() const {
@@ -116,17 +116,17 @@ void Renderable::update_animation() {
 	if (animation_string[animation_frame] == 'R') {
 		animation_frame = 0;
 	}
-	set_sprite_index(animation_string[animation_frame] - '0');
+	set_pose(animation_string[animation_frame] - '0');
 	animation_frame += 1;
 }
 
-void Renderable::set_sprite_index(int sprite_index_) {
-	sprite_index = sprite_index_;
+void Renderable::set_pose(int sprite_index_) {
+	pose = sprite_index_;
 	update_renderitem();
 }
 
-int32_t Renderable::get_sprite_index() const {
-	return sprite_index;
+int32_t Renderable::get_pose() const {
+	return pose;
 }
 
 std::string Renderable::get_sprite_name() const {

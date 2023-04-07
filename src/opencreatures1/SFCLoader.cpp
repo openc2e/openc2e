@@ -113,9 +113,9 @@ Renderable SFCLoader::renderable_from_sfc_entity(const sfc::EntityV1* part) {
 	Renderable r;
 	r.set_position(part->x, part->y);
 	r.set_z_order(part->z_order);
-	r.set_object_sprite_base(part->sprite->first_sprite);
-	r.set_part_sprite_base(part->image_offset);
-	r.set_sprite_index(part->current_sprite - part->image_offset);
+	r.set_absolute_base(part->sprite->first_sprite);
+	r.set_base(part->sprite_base);
+	r.set_pose(part->sprite_pose_plus_base - part->sprite_base);
 	r.set_sprite(g_engine_context.images->get_image(part->sprite->filename, ImageManager::IMAGE_SPR));
 	if (part->has_animation) {
 		r.set_animation(part->animation_frame, part->animation_string);
