@@ -12,7 +12,16 @@
 class ImageGallery {
   public:
 	std::string name;
-	// std::vector<Image> images;
+	int32_t absolute_base = 0;
+	int32_t image_count = 0;
+
+	// TODO:
+	// ideally, this Texture and texture locations / atlas would be extracted and made
+	// it's own, shared and cached object.  currently we load all sprites in the file
+	// but then only share this ImageGallery between objetcts with the same absolute
+	// base and image count.
+	// alternately, we could act _more_ like Creatures 1 and only load the sprites that
+	// are needed for this gallery.
 	Texture texture;
 	std::vector<Rect> texture_locations;
 

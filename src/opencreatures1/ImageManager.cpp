@@ -17,7 +17,7 @@ namespace fs = ghc::filesystem;
 ImageManager::ImageManager() {
 }
 
-static ImageGallery build_gallery(const std::string& name, MultiImage images) {
+static ImageGallery build_gallery(const std::string& name, int32_t absolute_base, int32_t image_count, MultiImage images) {
 	// stupid simple atlas-ing, can make this better
 
 	int32_t total_width = 0;
@@ -31,6 +31,8 @@ static ImageGallery build_gallery(const std::string& name, MultiImage images) {
 
 	ImageGallery gallery;
 	gallery.name = name;
+	gallery.absolute_base = absolute_base;
+	gallery.image_count = image_count;
 	gallery.texture = get_backend()->createTexture(total_width, max_height);
 
 	int32_t current_x = 0;
@@ -58,11 +60,12 @@ void ImageManager::load_default_palette() {
 	m_default_palette = ReadPaletteFile(palette_dta_path);
 }
 
-const ImageGallery& ImageManager::get_image(std::string name, ImageType allowed_types) {
+const ImageGallery& ImageManager::get_image(std::string name, int32_t absolute_base, int32_t image_count, ImageType allowed_types) {
 	name = to_ascii_lowercase(name);
 
 	// do we have it loaded already?
-	auto it = m_cache.find(name);
+	ImageGalleryKey key{name, absolute_base, image_count};
+	auto it = m_cache.find(key);
 	if (it != m_cache.end()) {
 		return it->second;
 	}
@@ -86,8 +89,8 @@ const ImageGallery& ImageManager::get_image(std::string name, ImageType allowed_
 			i.palette = m_default_palette;
 		}
 	}
-	m_cache[name] = build_gallery(name, images);
-	return m_cache[name];
+	m_cache[key] = build_gallery(name, absolute_base, image_count, images);
+	return m_cache[key];
 }
 
 ImageGallery ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor, uint32_t aliascolor) {
@@ -117,5 +120,5 @@ ImageGallery ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor,
 		}
 	}
 
-	return build_gallery("charset.dta", images);
+	return build_gallery("charset.dta", 0, numeric_cast<int32_t>(images.size()), images);
 }

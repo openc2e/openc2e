@@ -23,7 +23,7 @@ struct ImageV1 {
 
 struct CGalleryV1 : MFCObject {
 	std::string filename;
-	int32_t first_sprite;
+	int32_t absolute_base;
 	int32_t refcount;
 	std::vector<ImageV1> images;
 
@@ -31,7 +31,7 @@ struct CGalleryV1 : MFCObject {
 	void serialize(Archive& ar) {
 		ar.size_u32(images);
 		ar.ascii_dword(filename);
-		ar(first_sprite);
+		ar(absolute_base);
 		ar(refcount);
 
 		for (auto& image : images) {
@@ -105,7 +105,7 @@ struct MapDataV1 : MFCObject {
 };
 
 struct EntityV1 : MFCObject {
-	std::shared_ptr<CGalleryV1> sprite;
+	std::shared_ptr<CGalleryV1> gallery;
 	uint8_t sprite_pose_plus_base;
 	uint8_t sprite_base;
 	int32_t z_order; // TODO: should be signed?
@@ -117,7 +117,7 @@ struct EntityV1 : MFCObject {
 
 	template <typename Archive>
 	void serialize(Archive& ar) {
-		ar(sprite);
+		ar(gallery);
 		ar(sprite_pose_plus_base);
 		ar(sprite_base);
 		ar(z_order);
@@ -164,7 +164,7 @@ struct ObjectV1 : MFCObject {
 	int32_t limit_bottom;
 	ObjectV1* carrier = nullptr;
 	uint8_t actv;
-	std::shared_ptr<CGalleryV1> sprite;
+	std::shared_ptr<CGalleryV1> gallery;
 	int32_t tick_value;
 	int32_t ticks_since_last_tick_event;
 	ObjectV1* objp = nullptr;
@@ -190,7 +190,7 @@ struct ObjectV1 : MFCObject {
 		ar(limit_bottom);
 		ar(carrier);
 		ar(actv);
-		ar(sprite);
+		ar(gallery);
 		ar(tick_value);
 		ar(ticks_since_last_tick_event);
 		ar(objp);

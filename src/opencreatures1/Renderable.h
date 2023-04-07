@@ -12,12 +12,8 @@
 
 class Renderable {
   public:
-	void set_sprite(const ImageGallery& sprite);
-	std::string get_sprite_name() const;
-
-	// TODO: this should be in ImageGallery to match C1
-	void set_absolute_base(int32_t absolute_base);
-	int32_t get_absolute_base() const { return absolute_base; };
+	void set_gallery(const ImageGallery& gallery);
+	const ImageGallery& get_gallery() const;
 
 	void set_base(int base);
 	int32_t get_base() const { return base; }
@@ -46,8 +42,7 @@ class Renderable {
 
 	void update_renderitem();
 
-	ImageGallery sprite;
-	int32_t absolute_base = 0;
+	ImageGallery gallery;
 	int32_t base = 0;
 	int32_t pose = 0;
 	float x = 0;
@@ -71,11 +66,11 @@ struct fmt::formatter<Renderable> {
 	auto format(const Renderable& r, FormatContext& ctx) {
 		if (r.has_animation()) {
 			return format_to(ctx.out(),
-				"<Renderable x={} y={} z={} abba={} base={} pose={} sprite={} animation={} anim_index={}>",
-				r.x, r.y, r.z, r.absolute_base, r.base, r.pose, r.sprite.name, r.animation_string, r.animation_frame);
+				"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation={} anim_index={}>",
+				r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name, r.animation_string, r.animation_frame);
 		}
 		return format_to(ctx.out(),
-			"<Renderable x={} y={} z={} abba={} base={} pose={} sprite={} animation=false>",
-			r.x, r.y, r.z, r.absolute_base, r.base, r.pose, r.sprite.name);
+			"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation=false>",
+			r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name);
 	}
 };

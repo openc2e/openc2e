@@ -349,7 +349,8 @@ void Command_MVBY(MacroContext& ctx, Macro& m) {
 
 	if (ctx.debug) {
 		printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
-			xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus, ctx.get_targ(m)->species, ctx.get_targ_part(m)->get_sprite_name().c_str());
+			xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus,
+			ctx.get_targ(m)->species, ctx.get_targ_part(m)->get_gallery().name.c_str());
 	}
 
 	ctx.read_command_separator(m);

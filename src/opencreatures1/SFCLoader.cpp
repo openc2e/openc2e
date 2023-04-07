@@ -75,9 +75,13 @@ void SFCLoader::load_map() {
 	fmt::print("WARN [SFCLoader] Unsupported: time_of_day = {}\n", sfc.map->time_of_day);
 
 	fmt::print("INFO [SFCLoader] Loading background = {}.spr\n", sfc.map->background->filename);
-	auto background = g_engine_context.images->get_image(sfc.map->background->filename, ImageManager::IMAGE_SPR);
-	if (sfc.map->background->first_sprite != 0) {
-		fmt::print("WARN [SFCLoader] map background first sprite = {}, expected 0", sfc.map->background->first_sprite);
+	auto background = g_engine_context.images->get_image(
+		sfc.map->background->filename,
+		sfc.map->background->absolute_base,
+		numeric_cast<int32_t>(sfc.map->background->images.size()),
+		ImageManager::IMAGE_SPR);
+	if (sfc.map->background->absolute_base != 0) {
+		fmt::print("WARN [SFCLoader] map background absolute base = {}, expected 0", sfc.map->background->absolute_base);
 	}
 	// TODO: do any C1 metarooms have non-standard sizes?
 	if (background.width(0) != CREATURES1_WORLD_WIDTH || background.height(0) != CREATURES1_WORLD_HEIGHT) {
@@ -113,10 +117,13 @@ Renderable SFCLoader::renderable_from_sfc_entity(const sfc::EntityV1* part) {
 	Renderable r;
 	r.set_position(part->x, part->y);
 	r.set_z_order(part->z_order);
-	r.set_absolute_base(part->sprite->first_sprite);
 	r.set_base(part->sprite_base);
 	r.set_pose(part->sprite_pose_plus_base - part->sprite_base);
-	r.set_sprite(g_engine_context.images->get_image(part->sprite->filename, ImageManager::IMAGE_SPR));
+	r.set_gallery(g_engine_context.images->get_image(
+		part->gallery->filename,
+		part->gallery->absolute_base,
+		numeric_cast<int32_t>(part->gallery->images.size()),
+		ImageManager::IMAGE_SPR));
 	if (part->has_animation) {
 		r.set_animation(part->animation_frame, part->animation_string);
 	}

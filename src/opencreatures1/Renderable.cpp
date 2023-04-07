@@ -34,15 +34,17 @@ int32_t Renderable::get_z_order() const {
 	return z;
 }
 
-void Renderable::set_absolute_base(int object_sprite_base_) {
-	absolute_base = object_sprite_base_;
-}
 void Renderable::set_base(int part_sprite_base_) {
 	base = part_sprite_base_;
 }
-void Renderable::set_sprite(const ImageGallery& sprite_) {
-	sprite = sprite_;
+
+void Renderable::set_gallery(const ImageGallery& gallery_) {
+	gallery = gallery_;
 	update_renderitem();
+}
+
+const ImageGallery& Renderable::get_gallery() const {
+	return gallery;
 }
 
 Rect Renderable::get_bbox() const {
@@ -57,15 +59,15 @@ Rect Renderable::get_bbox() const {
 }
 
 int32_t Renderable::frame() const {
-	return absolute_base + base + pose;
+	return gallery.absolute_base + base + pose;
 }
 
 int32_t Renderable::width() const {
-	return sprite.width(frame());
+	return gallery.width(frame());
 }
 
 int32_t Renderable::height() const {
-	return sprite.height(frame());
+	return gallery.height(frame());
 }
 
 void Renderable::set_animation(unsigned int animation_frame_, std::string animation_string_) {
@@ -129,13 +131,8 @@ int32_t Renderable::get_pose() const {
 	return pose;
 }
 
-std::string Renderable::get_sprite_name() const {
-	return sprite.name;
-}
-
-
 void Renderable::update_renderitem() {
-	if (!sprite) {
+	if (!gallery) {
 		renderitem = {};
 		return;
 	}
@@ -144,7 +141,7 @@ void Renderable::update_renderitem() {
 	}
 
 	get_rendersystem()->render_item_set_texture(renderitem,
-		sprite.texture,
-		sprite.texture_locations[numeric_cast<size_t>(frame())]);
+		gallery.texture,
+		gallery.texture_locations[numeric_cast<size_t>(frame())]);
 	get_rendersystem()->render_item_set_position(renderitem, static_cast<float>(x), static_cast<float>(y), z);
 }
