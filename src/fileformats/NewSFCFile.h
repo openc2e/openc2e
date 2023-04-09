@@ -1115,6 +1115,8 @@ struct EXPFile {
 
 SFCFile read_sfc_v1_file(std::istream& in);
 SFCFile read_sfc_v1_file(const std::string& path);
+void write_sfc_v1_file(std::ostream& out, SFCFile&);
+void write_sfc_v1_file(const std::string& path, SFCFile&);
 
 EXPFile read_exp_v1_file(std::istream& in);
 EXPFile read_exp_v1_file(const std::string& path);

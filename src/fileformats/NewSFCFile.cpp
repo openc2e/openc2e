@@ -1,6 +1,7 @@
 #include "NewSFCFile.h"
 
 #include "MFCReader.h"
+#include "MFCWriter.h"
 
 #include <fstream>
 
@@ -31,6 +32,30 @@ SFCFile read_sfc_v1_file(std::istream& in) {
 	SFCFile sfc;
 	sfc.serialize(reader);
 	return sfc;
+}
+
+void write_sfc_v1_file(const std::string& path, SFCFile& sfc) {
+	std::ofstream out(path, std::ios_base::binary);
+	return write_sfc_v1_file(out, sfc);
+}
+
+void write_sfc_v1_file(std::ostream& out, SFCFile& sfc) {
+	MFCWriter writer(out);
+	writer.register_class<sfc::MapDataV1>("MapData", 1);
+	writer.register_class<sfc::CGalleryV1>("CGallery", 1);
+	writer.register_class<sfc::PointerToolV1>("PointerTool", 1);
+	writer.register_class<sfc::EntityV1>("Entity", 1);
+	writer.register_class<sfc::CompoundObjectV1>("CompoundObject", 1);
+	writer.register_class<sfc::SimpleObjectV1>("SimpleObject", 1);
+	writer.register_class<sfc::VehicleV1>("Vehicle", 1);
+	writer.register_class<sfc::LiftV1>("Lift", 1);
+	writer.register_class<sfc::SceneryV1>("Scenery", 1);
+	writer.register_class<sfc::MacroV1>("Macro", 1);
+	writer.register_class<sfc::BlackboardV1>("Blackboard", 1);
+	writer.register_class<sfc::CallButtonV1>("CallButton", 1);
+
+	// write file
+	sfc.serialize(writer);
 }
 
 EXPFile read_exp_v1_file(const std::string& path) {
