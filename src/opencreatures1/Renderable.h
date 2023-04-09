@@ -20,7 +20,6 @@ class Renderable {
 
 	void set_pose(int pose);
 	int32_t get_pose() const;
-	int32_t frame() const;
 
 	void set_position(float x, float y);
 	float get_x() const;
@@ -40,6 +39,7 @@ class Renderable {
   private:
 	friend struct fmt::formatter<Renderable>;
 
+	int32_t frame() const;
 	void update_renderitem();
 
 	ImageGallery gallery;

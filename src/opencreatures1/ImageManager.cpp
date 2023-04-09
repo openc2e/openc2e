@@ -32,7 +32,6 @@ static ImageGallery build_gallery(const std::string& name, int32_t absolute_base
 	ImageGallery gallery;
 	gallery.name = name;
 	gallery.absolute_base = absolute_base;
-	gallery.image_count = image_count;
 	gallery.texture = get_backend()->createTexture(total_width, max_height);
 
 	int32_t current_x = 0;
@@ -83,7 +82,10 @@ const ImageGallery& ImageManager::get_image(std::string name, int32_t absolute_b
 	if (ImageUtils::IsBackground(images)) {
 		// TODO: I guess do this here? Instead of being explicit?
 		images = {ImageUtils::StitchBackground(images)};
+	} else {
+		images.assign(images.begin() + absolute_base, images.begin() + absolute_base + image_count);
 	}
+
 	for (auto& i : images) {
 		if (i.format == if_index8 && !i.palette) {
 			i.palette = m_default_palette;

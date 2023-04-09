@@ -59,7 +59,7 @@ Rect Renderable::get_bbox() const {
 }
 
 int32_t Renderable::frame() const {
-	return gallery.absolute_base + base + pose;
+	return base + pose;
 }
 
 int32_t Renderable::width() const {

@@ -1,7 +1,5 @@
 #pragma once
 
-// based off of openc2e's creaturesImage
-
 #include "common/NumericCast.h"
 #include "common/backend/BackendTexture.h"
 #include "common/math/Rect.h"
@@ -13,15 +11,11 @@ class ImageGallery {
   public:
 	std::string name;
 	int32_t absolute_base = 0;
-	int32_t image_count = 0;
 
 	// TODO:
-	// ideally, this Texture and texture locations / atlas would be extracted and made
-	// it's own, shared and cached object.  currently we load all sprites in the file
-	// but then only share this ImageGallery between objetcts with the same absolute
-	// base and image count.
-	// alternately, we could act _more_ like Creatures 1 and only load the sprites that
-	// are needed for this gallery.
+	// should we pull out Texture and texture locations / atlas into their own, shared
+	// and cached object? then we could load all sprites in the file once and share
+	// it between all objects with similar galleries
 	Texture texture;
 	std::vector<Rect> texture_locations;
 
