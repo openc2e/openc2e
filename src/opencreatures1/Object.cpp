@@ -1,8 +1,8 @@
 #include "Object.h"
 
 #include "MacroManager.h"
+#include "MessageManager.h"
 #include "ObjectManager.h"
-#include "ObjectMessageManager.h"
 #include "common/Ascii.h"
 #include "common/NumericCast.h"
 

@@ -2,9 +2,9 @@
 
 #include "C1ControlledSound.h"
 #include "C1SoundManager.h"
+#include "MessageManager.h"
 #include "Object.h"
 #include "ObjectManager.h"
-#include "ObjectMessageManager.h"
 #include "common/Random.h"
 
 void Command_ADDV(MacroContext& ctx, Macro& m) {

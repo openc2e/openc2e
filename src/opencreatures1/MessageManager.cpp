@@ -1,4 +1,4 @@
-#include "ObjectMessageManager.h"
+#include "MessageManager.h"
 
 #include "EngineContext.h"
 #include "MacroManager.h"
@@ -10,7 +10,7 @@
 #include "common/Exception.h"
 #include "common/PointerView.h"
 
-void ObjectMessageManager::tick() {
+void MessageManager::tick() {
 	for (auto& m : m_immediate_message_queue) {
 		auto* to = g_engine_context.objects->try_get(m.to);
 		if (!to) {
@@ -31,7 +31,7 @@ void ObjectMessageManager::tick() {
 	m_immediate_message_queue.clear();
 }
 
-void ObjectMessageManager::mesg_writ(ObjectHandle from_id, ObjectHandle to_id, MessageNumber message) {
+void MessageManager::mesg_writ(ObjectHandle from_id, ObjectHandle to_id, MessageNumber message) {
 	// TODO: implement delayed messages
 
 	Message m;

@@ -2,8 +2,8 @@
 
 #include "C1ControlledSound.h"
 #include "EngineContext.h"
+#include "MessageManager.h"
 #include "ObjectHandle.h"
-#include "ObjectMessageManager.h"
 #include "ObjectNames.h"
 #include "PointerManager.h"
 #include "Renderable.h"

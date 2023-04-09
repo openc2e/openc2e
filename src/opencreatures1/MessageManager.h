@@ -30,9 +30,9 @@ struct Message {
 	MessageNumber number;
 };
 
-class ObjectMessageManager {
+class MessageManager {
   public:
-	ObjectMessageManager() {}
+	MessageManager() {}
 	void tick();
 
 	void mesg_writ(ObjectHandle from_id, ObjectHandle to_id, MessageNumber message);
