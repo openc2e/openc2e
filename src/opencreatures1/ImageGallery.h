@@ -11,6 +11,7 @@ class ImageGallery {
   public:
 	std::string name;
 	int32_t absolute_base = 0;
+	std::vector<int32_t> offsets;
 
 	// TODO:
 	// should we pull out Texture and texture locations / atlas into their own, shared

@@ -7,6 +7,9 @@
 #include "common/NumericCast.h"
 #include "common/Repr.h"
 #include "common/backend/Backend.h"
+#include "fileformats/ImageUtils.h"
+#include "fileformats/paletteFile.h"
+#include "fileformats/sprImage.h"
 
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
@@ -17,7 +20,7 @@ namespace fs = ghc::filesystem;
 ImageManager::ImageManager() {
 }
 
-static ImageGallery build_gallery(const std::string& name, int32_t absolute_base, int32_t image_count, MultiImage images) {
+static ImageGallery build_gallery(const std::string& name, int32_t absolute_base, const std::vector<int32_t>& offsets, const MultiImage& images) {
 	// stupid simple atlas-ing, can make this better
 
 	int32_t total_width = 0;
@@ -32,6 +35,7 @@ static ImageGallery build_gallery(const std::string& name, int32_t absolute_base
 	ImageGallery gallery;
 	gallery.name = name;
 	gallery.absolute_base = absolute_base;
+	gallery.offsets = offsets;
 	gallery.texture = get_backend()->createTexture(total_width, max_height);
 
 	int32_t current_x = 0;
@@ -60,6 +64,10 @@ void ImageManager::load_default_palette() {
 }
 
 const ImageGallery& ImageManager::get_image(std::string name, int32_t absolute_base, int32_t image_count, ImageType allowed_types) {
+	if (image_count <= 0) {
+		throw Exception(fmt::format("ImageManager::get_image called with image_count=0 (name={})", repr(name)));
+	}
+
 	name = to_ascii_lowercase(name);
 
 	// do we have it loaded already?
@@ -78,20 +86,22 @@ const ImageGallery& ImageManager::get_image(std::string name, int32_t absolute_b
 		throw Exception(fmt::format("Couldn't find image {}", repr(name)));
 	}
 
-	auto images = ImageUtils::ReadImage(path);
-	if (ImageUtils::IsBackground(images)) {
-		// TODO: I guess do this here? Instead of being explicit?
-		images = {ImageUtils::StitchBackground(images)};
-	} else {
-		images.assign(images.begin() + absolute_base, images.begin() + absolute_base + image_count);
-	}
+	// TODO: faster to memory map file?
+	std::ifstream in(path, std::ifstream::binary);
+	auto data = ReadSprFileWithMetadata(in, absolute_base, image_count);
 
-	for (auto& i : images) {
+	for (auto& i : data.images) {
 		if (i.format == if_index8 && !i.palette) {
 			i.palette = m_default_palette;
 		}
 	}
-	m_cache[key] = build_gallery(name, absolute_base, image_count, images);
+
+	if (allowed_types & IMAGE_IS_BACKGROUND) {
+		// ugly, stitch directly into a Texture?
+		data.images = {ImageUtils::StitchBackground(data.images)};
+	}
+
+	m_cache[key] = build_gallery(name, absolute_base, data.offsets, data.images);
 	return m_cache[key];
 }
 
@@ -122,5 +132,5 @@ ImageGallery ImageManager::get_charset_dta(uint32_t bgcolor, uint32_t textcolor,
 		}
 	}
 
-	return build_gallery("charset.dta", 0, numeric_cast<int32_t>(images.size()), images);
+	return build_gallery("charset.dta", 0, std::vector<int32_t>{}, images);
 }

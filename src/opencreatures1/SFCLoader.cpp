@@ -79,7 +79,7 @@ void SFCLoader::load_map() {
 		sfc.map->background->filename,
 		sfc.map->background->absolute_base,
 		numeric_cast<int32_t>(sfc.map->background->images.size()),
-		ImageManager::IMAGE_SPR);
+		static_cast<ImageManager::ImageType>(ImageManager::IMAGE_SPR | ImageManager::IMAGE_IS_BACKGROUND));
 	if (sfc.map->background->absolute_base != 0) {
 		fmt::print("WARN [SFCLoader] map background absolute base = {}, expected 0", sfc.map->background->absolute_base);
 	}

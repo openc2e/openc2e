@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fileformats/ImageUtils.h"
-#include "fileformats/paletteFile.h"
+#include "common/Color.h"
+#include "common/shared_array.h"
 #include "opencreatures1/ImageGallery.h"
 
 #include <map>

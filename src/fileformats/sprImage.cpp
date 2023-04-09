@@ -20,7 +20,10 @@
 #include "sprImage.h"
 
 #include "c1defaultpalette.h"
+#include "common/Exception.h"
 #include "common/endianlove.h"
+
+#include <fmt/core.h>
 
 static MultiImage ReadPrototypeSprFile(std::istream& in, int numframes, uint32_t first_offset) {
 	MultiImage images(numframes);
@@ -49,6 +52,46 @@ static MultiImage ReadPrototypeSprFile(std::istream& in, int numframes, uint32_t
 	}
 
 	return images;
+}
+
+
+SprFileData ReadSprFileWithMetadata(std::istream& in, int32_t absolute_base, int32_t image_count) {
+	uint16_t total_image_count = read16le(in);
+	std::vector<int32_t> offsets(image_count);
+	MultiImage images(image_count);
+
+	if (absolute_base + image_count > total_image_count) {
+		throw Exception(fmt::format("Tried to load {} images starting at {}, but file only has {} total",
+			image_count, absolute_base, total_image_count));
+	}
+
+	// skip metadata up until absolute base
+	// each metadata block is 8 bytes - 4 byte offset, 2 byte width, 2 byte height
+	in.ignore(8 * absolute_base);
+
+	// read metadata
+	for (uint16_t i = 0; i < image_count; ++i) {
+		offsets[i] = readsigned32le(in);
+		images[i].width = read16le(in);
+		images[i].height = read16le(in);
+		images[i].format = if_index8;
+		images[i].palette = getCreatures1DefaultPalette();
+		images[i].colorkey = Color{0, 0, 0, 255};
+	}
+
+	// skip remaining metadata
+	for (uint16_t i = 0; i < total_image_count - absolute_base - image_count; i++) {
+		in.ignore(8 * absolute_base);
+	}
+
+	// now read actual data
+	for (int32_t i = 0; i < image_count; i++) {
+		// TODO: don't seek if possible, it can be slower than just reading linearly
+		in.seekg(offsets[i]);
+		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
+		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
+	}
+	return SprFileData{images, offsets};
 }
 
 MultiImage ReadSprFile(std::istream& in) {

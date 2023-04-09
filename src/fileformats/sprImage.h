@@ -21,4 +21,14 @@
 
 #include "common/Image.h"
 
+#include <iosfwd>
+#include <stdint.h>
+#include <vector>
+
+struct SprFileData {
+	std::vector<Image> images;
+	std::vector<int32_t> offsets;
+};
+
 MultiImage ReadSprFile(std::istream& in);
+SprFileData ReadSprFileWithMetadata(std::istream& in, int32_t absolute_base, int32_t image_count);

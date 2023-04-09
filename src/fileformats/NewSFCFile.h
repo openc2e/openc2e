@@ -16,9 +16,9 @@ struct ImageV1 {
 	// not CArchive serialized
 	CGalleryV1* parent = nullptr;
 	uint8_t status;
-	uint32_t width;
-	uint32_t height;
-	uint32_t offset;
+	int32_t width;
+	int32_t height;
+	int32_t offset;
 };
 
 struct CGalleryV1 : MFCObject {
