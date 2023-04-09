@@ -305,6 +305,18 @@ void SFCLoader::load_scripts() {
 	}
 }
 
+void sfc_dump_scripts(sfc::SFCFile& sfc) {
+	for (auto& p : *g_engine_context.scriptorium) {
+		sfc::ScriptV1 script;
+		script.family = p.first.family;
+		script.genus = p.first.genus;
+		script.species = p.first.species;
+		script.eventno = p.first.eventno;
+		script.text = p.second;
+		sfc.scripts.push_back(script);
+	}
+}
+
 void SFCLoader::load_macros() {
 	for (const auto& m : sfc.macros) {
 		Macro macro;
@@ -377,10 +389,8 @@ static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gal
 
 sfc::SFCFile sfc_dump_everything() {
 	sfc::SFCFile sfc;
+	fmt::print("INFO [SFCWriter] Writing map...\n");
 	sfc.map = sfc_dump_map();
-
-	sfc.scrollx = g_engine_context.viewport->get_scrollx();
-	sfc.scrolly = g_engine_context.viewport->get_scrolly();
 
 	for (auto& obj : *g_engine_context.objects) {
 		if (!obj->scenery_data) {
@@ -428,6 +438,16 @@ sfc::SFCFile sfc_dump_everything() {
 
 		sfc.sceneries.emplace_back(scen);
 	}
+
+	fmt::print("INFO [SFCWriter] Writing scriptorium...\n");
+	sfc_dump_scripts(sfc);
+
+	fmt::print("INFO [SFCWriter] Writing viewport...\n");
+	sfc.scrollx = g_engine_context.viewport->get_scrollx();
+	sfc.scrolly = g_engine_context.viewport->get_scrolly();
+
+	fmt::print("INFO [SFCWriter] Writing macros...\n");
+	// load_macros();
 
 	return sfc;
 }
