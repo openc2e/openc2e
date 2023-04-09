@@ -25,6 +25,9 @@ class ViewportManager {
 	void set_margin_top(float);
 	void set_margin_bottom(float);
 
+	int32_t get_scrollx() const { return scrollx; }
+	int32_t get_scrolly() const { return scrolly; }
+
   private:
 	void update();
 

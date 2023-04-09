@@ -334,3 +334,100 @@ void sfc_load_everything(const sfc::SFCFile& sfc) {
 	SFCLoader loader(sfc);
 	loader.load_everything();
 }
+
+static std::shared_ptr<sfc::MapDataV1> sfc_dump_map() {
+	auto map = std::make_shared<sfc::MapDataV1>();
+	map->background = std::make_shared<sfc::CGalleryV1>();
+	map->background->filename = g_engine_context.map->get_background().name;
+	map->background->absolute_base = g_engine_context.map->get_background().absolute_base;
+	map->background->refcount = 1;
+
+	// don't use sfc_dump_gallery, because map galleries are stitched together unlike normal sprites.
+	// we hardcode the tile sizes here since they're always the same, instead of storing the original
+	// sizes on the gallery.
+	for (auto offset : g_engine_context.map->get_background().offsets) {
+		map->background->images.emplace_back();
+		auto& image = map->background->images.back();
+		image.parent = map->background.get();
+		image.status = 0; // seems to work???
+		image.width = 144;
+		image.height = 150;
+		image.offset = offset;
+	}
+	return map;
+}
+
+static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gallery) {
+	auto sfc = std::make_shared<sfc::CGalleryV1>();
+	sfc->filename = gallery.name;
+	sfc->absolute_base = gallery.absolute_base;
+	sfc->refcount = 1; // TODO
+	sfc->images.resize(numeric_cast<size_t>(gallery.size()));
+
+	for (size_t i = 0; i < sfc->images.size(); ++i) {
+		auto& img = sfc->images[i];
+		img.parent = sfc.get();
+		img.status = 0; // seems to work???
+		img.width = gallery.width(numeric_cast<int32_t>(i));
+		img.height = gallery.height(numeric_cast<int32_t>(i));
+		img.offset = gallery.offsets[i];
+	}
+	return sfc;
+}
+
+sfc::SFCFile sfc_dump_everything() {
+	sfc::SFCFile sfc;
+	sfc.map = sfc_dump_map();
+
+	sfc.scrollx = g_engine_context.viewport->get_scrollx();
+	sfc.scrolly = g_engine_context.viewport->get_scrolly();
+
+	for (auto& obj : *g_engine_context.objects) {
+		if (!obj->scenery_data) {
+			continue;
+		}
+
+		auto gallery = sfc_dump_gallery(obj->scenery_data->part.get_gallery());
+
+		auto part = std::make_shared<sfc::EntityV1>();
+		part->gallery = gallery;
+		part->sprite_pose_plus_base = numeric_cast<uint8_t>(obj->scenery_data->part.get_pose() + obj->scenery_data->part.get_base());
+		part->sprite_base = numeric_cast<uint8_t>(obj->scenery_data->part.get_base());
+		part->z_order = obj->scenery_data->part.get_z_order();
+		part->x = numeric_cast<int32_t>(obj->scenery_data->part.get_x());
+		part->y = numeric_cast<int32_t>(obj->scenery_data->part.get_y());
+		part->has_animation = obj->scenery_data->part.has_animation();
+		// part->animation_frame = obj->scenery_data->part.get_animation_frame(); // only if has_animation is true
+		// part->animation_string = obj->scenery_data->part.get_animation_string();
+
+		auto scen = std::make_shared<sfc::SceneryV1>();
+		// ObjectV1
+		scen->species = obj->species;
+		scen->genus = obj->genus;
+		scen->family = obj->family;
+		scen->movement_status = obj->movement_status;
+		scen->attr = obj->attr;
+		scen->limit_left = obj->limit.x;
+		scen->limit_top = obj->limit.y;
+		scen->limit_right = obj->limit.right();
+		scen->limit_bottom = obj->limit.bottom();
+		// scen->carrier = obj->carrier;
+		scen->actv = obj->actv;
+		scen->gallery = gallery;
+		scen->tick_value = obj->tick_value;
+		scen->ticks_since_last_tick_event = obj->ticks_since_last_tick_event;
+		// scen->objp = obj->objp;
+		// scen->current_sound = obj->current_sound;
+		scen->obv0 = obj->obv0;
+		scen->obv1 = obj->obv1;
+		scen->obv2 = obj->obv2;
+		// scen->scripts = obj->scripts;
+
+		//SceneryV1
+		scen->part = part;
+
+		sfc.sceneries.emplace_back(scen);
+	}
+
+	return sfc;
+}

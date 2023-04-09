@@ -17,7 +17,6 @@
 #include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
 #include "common/render/RenderSystem.h"
-#include "fileformats/NewSFCFile.h"
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
 
@@ -53,8 +52,12 @@ void load_everything() {
 	// load palette
 	g_engine_context.images->load_default_palette();
 
-	// load World.sfc/Eden.sfc
-	auto sfc_path = g_engine_context.paths->find_path(PATH_TYPE_MAIN, "World.sfc");
+	// load World.openc1.sfc/World.sfc/Eden.sfc
+	auto sfc_path = g_engine_context.paths->find_path(PATH_TYPE_MAIN, "World.openc1.sfc");
+	if (sfc_path.empty()) {
+		fmt::print(stderr, "* Couldn't find World.openc1.sfc\n");
+		sfc_path = g_engine_context.paths->find_path(PATH_TYPE_MAIN, "World.sfc");
+	}
 	if (sfc_path.empty()) {
 		fmt::print(stderr, "* Couldn't find World.sfc\n");
 		sfc_path = g_engine_context.paths->find_path(PATH_TYPE_MAIN, "Eden.sfc");
@@ -205,6 +208,12 @@ extern "C" int main(int argc, char** argv) {
 		get_rendersystem()->draw();
 		return true;
 	});
+
+	// save world data
+	auto sfc = sfc_dump_everything();
+	auto out = g_engine_context.paths->ofstream(PATH_TYPE_MAIN, "World.openc1.sfc");
+	write_sfc_v1_file(out, sfc);
+	fmt::print("* Saved world to: World.openc1.sfc\n");
 
 	// explicitly destroy game data
 	// C1ControlledSounds need to be destroyed before the AudioBackend is destroyed,
