@@ -27,9 +27,13 @@ class Room {
 class MapManager {
   public:
 	void add_room(Room&&);
+	const auto& get_rooms() const { return rooms; }
+
 	void set_background(ImageGallery background);
-	void set_groundlevel(const std::array<uint32_t, 261>&);
 	const ImageGallery& get_background() const { return background; }
+
+	void set_groundlevel(const std::array<uint32_t, 261>&);
+	const auto& get_groundlevel() const { return groundlevel; }
 
   private:
 	std::vector<Room> rooms;

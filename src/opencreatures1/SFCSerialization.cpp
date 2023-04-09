@@ -106,6 +106,43 @@ void SFCLoader::load_map() {
 	fmt::print("WARN [SFCLoader] Unsupported: bacteria\n");
 }
 
+static std::shared_ptr<sfc::MapDataV1> sfc_dump_map() {
+	auto map = std::make_shared<sfc::MapDataV1>();
+	map->background = std::make_shared<sfc::CGalleryV1>();
+	map->background->filename = g_engine_context.map->get_background().name;
+	map->background->absolute_base = g_engine_context.map->get_background().absolute_base;
+	map->background->refcount = 1;
+
+	// don't use sfc_dump_gallery, because map galleries are stitched together unlike normal sprites.
+	// we hardcode the tile sizes here since they're always the same, instead of storing the original
+	// sizes on the gallery.
+	for (auto offset : g_engine_context.map->get_background().offsets) {
+		map->background->images.emplace_back();
+		auto& image = map->background->images.back();
+		image.parent = map->background.get();
+		image.status = 0; // seems to work???
+		image.width = 144;
+		image.height = 150;
+		image.offset = offset;
+	}
+
+	fmt::print("INFO [SFCWriter] Writing rooms...\n");
+	for (auto& r : g_engine_context.map->get_rooms()) {
+		sfc::RoomV1 room;
+		room.left = r.left;
+		room.top = r.top;
+		room.right = r.right;
+		room.bottom = r.bottom;
+		room.type = r.type;
+		map->rooms.push_back(room);
+	}
+
+	fmt::print("INFO [SFCWriter] Writing groundlevel...\n");
+	map->groundlevel = g_engine_context.map->get_groundlevel();
+
+	return map;
+}
+
 Renderable SFCLoader::renderable_from_sfc_entity(const sfc::EntityV1* part) {
 	if (part->x >= CREATURES1_WORLD_WIDTH) {
 		throw Exception(fmt::format("Expected x to be between [0, {}), but got {}", CREATURES1_WORLD_WIDTH, part->x));
@@ -345,28 +382,6 @@ void SFCLoader::load_macros() {
 void sfc_load_everything(const sfc::SFCFile& sfc) {
 	SFCLoader loader(sfc);
 	loader.load_everything();
-}
-
-static std::shared_ptr<sfc::MapDataV1> sfc_dump_map() {
-	auto map = std::make_shared<sfc::MapDataV1>();
-	map->background = std::make_shared<sfc::CGalleryV1>();
-	map->background->filename = g_engine_context.map->get_background().name;
-	map->background->absolute_base = g_engine_context.map->get_background().absolute_base;
-	map->background->refcount = 1;
-
-	// don't use sfc_dump_gallery, because map galleries are stitched together unlike normal sprites.
-	// we hardcode the tile sizes here since they're always the same, instead of storing the original
-	// sizes on the gallery.
-	for (auto offset : g_engine_context.map->get_background().offsets) {
-		map->background->images.emplace_back();
-		auto& image = map->background->images.back();
-		image.parent = map->background.get();
-		image.status = 0; // seems to work???
-		image.width = 144;
-		image.height = 150;
-		image.offset = offset;
-	}
-	return map;
 }
 
 static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gallery) {
