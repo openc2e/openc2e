@@ -410,7 +410,6 @@ struct SceneryV1 : ObjectV1 {
 struct MacroV1 : MFCObject {
 	uint32_t selfdestruct;
 	uint32_t inst;
-	uint32_t script_length_maybe;
 	std::string script;
 	uint32_t ip;
 	std::array<int32_t, 20> stack;
@@ -430,7 +429,8 @@ struct MacroV1 : MFCObject {
 	void serialize(Archive& ar) {
 		ar(selfdestruct);
 		ar(inst);
-		ar(script_length_maybe);
+		uint32_t script_length_duplicate = (uint32_t)script.size();
+		ar(script_length_duplicate);
 		ar.ascii_mfcstring(script);
 		ar(ip);
 		for (auto& s : stack) {

@@ -95,6 +95,14 @@ class MacroManager {
 
 	MacroContext ctx;
 
+	auto begin() const {
+		return m_pool.begin();
+	}
+
+	auto end() const {
+		return m_pool.end();
+	}
+
   private:
 	std::vector<Macro> m_pool;
 };

@@ -269,7 +269,9 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 		obj->lift_data->current_call_button = lift->current_call_button;
 		// TODO
 		// obj->lift_data->delay_ticks_divided_by_36 = lift->delay_ticks_divided_by_36;
-		fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_36\n");
+		if (lift->delay_ticks_divided_by_36 != 0) {
+			fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_36 = {}\n", lift->delay_ticks_divided_by_36);
+		}
 		for (size_t i = 0; i < numeric_cast<size_t>(lift->num_floors); ++i) {
 			// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
 			obj->lift_data->floors.push_back(lift->floors[i]);
@@ -404,57 +406,262 @@ static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gal
 	return sfc;
 }
 
+static std::shared_ptr<sfc::EntityV1> sfc_dump_entity(const Renderable& r) {
+	// TODO: gallery should at least be shared between all parts on an object?
+	auto gallery = sfc_dump_gallery(r.get_gallery());
+
+	auto entity = std::make_shared<sfc::EntityV1>();
+	entity->gallery = gallery;
+	entity->sprite_pose_plus_base = numeric_cast<uint8_t>(r.get_pose() + r.get_base());
+	entity->sprite_base = numeric_cast<uint8_t>(r.get_base());
+	entity->z_order = r.get_z_order();
+	entity->x = numeric_cast<int32_t>(r.get_x());
+	entity->y = numeric_cast<int32_t>(r.get_y());
+	entity->has_animation = r.has_animation();
+	if (entity->has_animation) {
+		entity->animation_frame = r.get_animation_frame(); // only if has_animation is true
+		entity->animation_string = r.get_animation_string();
+	}
+
+	return entity;
+}
+
+static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
+	// so, similarly to _loading_ from the SFC, this is tricky since SFC objects
+	// can encode points to other objects. we keep a map of all ObjectHandles we've
+	// so far, and convert ObjectHandles / copy them to the SFCFile on the fly.
+
+	std::map<Object*, std::shared_ptr<sfc::ObjectV1>> sfc_object_mapping;
+	std::function<std::shared_ptr<sfc::ObjectV1>(Object*)> dump_object;
+	dump_object = [&](Object* p) -> std::shared_ptr<sfc::ObjectV1> {
+		if (!p) {
+			return nullptr;
+		}
+
+		auto it = sfc_object_mapping.find(p);
+		if (it != sfc_object_mapping.end()) {
+			// already processed/processing this one
+			return it->second;
+		}
+
+		std::shared_ptr<sfc::ObjectV1> obj;
+		std::shared_ptr<sfc::CGalleryV1> gallery;
+
+		if (p->scenery_data) {
+			auto scen = std::make_shared<sfc::SceneryV1>();
+			sfc_object_mapping[p] = obj = scen;
+
+			auto part = sfc_dump_entity(p->scenery_data->part);
+			gallery = part->gallery;
+
+			// SceneryV1
+			scen->part = part;
+		}
+
+		else if (p->simple_data) {
+			std::shared_ptr<sfc::SimpleObjectV1> simp;
+			if (p->bubble_data) {
+				fmt::print("WARN [SFCWriter] Unsupported type: Bubble\n");
+			} else if (p->call_button_data) {
+				auto cbtn = std::make_shared<sfc::CallButtonV1>();
+				sfc_object_mapping[p] = obj = simp = cbtn;
+
+				// CallButtonV1
+				cbtn->lift = dynamic_cast<sfc::LiftV1*>(
+					dump_object(g_engine_context.objects->try_get(p->call_button_data->lift)).get());
+				cbtn->floor = p->call_button_data->floor;
+
+			} else if (p->pointer_data) {
+				auto pntr = std::make_shared<sfc::PointerToolV1>();
+				sfc_object_mapping[p] = obj = simp = pntr;
+
+				// PointerToolV1
+				pntr->relx = p->pointer_data->relx;
+				pntr->rely = p->pointer_data->rely;
+				pntr->bubble = dynamic_cast<sfc::BubbleV1*>(
+					dump_object(g_engine_context.objects->try_get(p->pointer_data->bubble)).get());
+				pntr->text = p->pointer_data->text;
+			}
+
+			if (!simp) {
+				simp = std::make_shared<sfc::SimpleObjectV1>();
+				sfc_object_mapping[p] = obj = simp;
+			}
+
+			auto part = sfc_dump_entity(p->simple_data->part);
+			gallery = part->gallery;
+
+			//SimpleObjectV1
+			simp->part = part;
+			simp->z_order = p->simple_data->z_order;
+			simp->click_bhvr = p->simple_data->click_bhvr;
+			simp->touch_bhvr = p->simple_data->touch_bhvr;
+		}
+
+		else if (p->compound_data) {
+			std::shared_ptr<sfc::CompoundObjectV1> comp;
+
+			if (p->vehicle_data) {
+				std::shared_ptr<sfc::VehicleV1> veh;
+
+				if (p->lift_data) {
+					auto lift = std::make_shared<sfc::LiftV1>();
+					sfc_object_mapping[p] = obj = comp = veh = lift;
+
+					// LiftV1
+					lift->num_floors = numeric_cast<int32_t>(p->lift_data->floors.size());
+					lift->next_or_current_floor = p->lift_data->next_or_current_floor;
+					lift->current_call_button = p->lift_data->current_call_button;
+					lift->delay_ticks_divided_by_36 = 0; // TODO
+					for (size_t i = 0; i < p->lift_data->floors.size(); ++i) {
+						lift->floors[i] = p->lift_data->floors[i];
+					}
+					for (size_t i = 0; i < p->lift_data->activated_call_buttons.size(); ++i) {
+						lift->activated_call_buttons[i] = dynamic_cast<sfc::CallButtonV1*>(
+							dump_object(g_engine_context.objects->try_get(p->lift_data->activated_call_buttons[i])).get());
+					}
+				}
+
+				if (!veh) {
+					veh = std::make_shared<sfc::VehicleV1>();
+					sfc_object_mapping[p] = obj = comp = veh;
+				}
+				// VehicleV1
+				// TODO: round or truncate velocity? does it matter?
+				veh->x_times_256 = numeric_cast<int32_t>(p->compound_data->parts[0].renderable.get_x() * 256);
+				veh->y_times_256 = numeric_cast<int32_t>(p->compound_data->parts[0].renderable.get_y() * 256);
+				veh->xvel_times_256 = numeric_cast<int32_t>(p->vehicle_data->xvel * 256);
+				veh->yvel_times_256 = numeric_cast<int32_t>(p->vehicle_data->yvel * 256);
+				veh->cabin_left = p->vehicle_data->cabin_left;
+				veh->cabin_top = p->vehicle_data->cabin_top;
+				veh->cabin_right = p->vehicle_data->cabin_right;
+				veh->cabin_bottom = p->vehicle_data->cabin_bottom;
+				veh->bump = p->vehicle_data->bump;
+
+			} else if (p->blackboard_data) {
+				auto bbd = std::make_shared<sfc::BlackboardV1>();
+				sfc_object_mapping[p] = obj = comp = bbd;
+
+				// BlackboardV1
+				bbd->background_color = p->blackboard_data->background_color;
+				bbd->chalk_color = p->blackboard_data->chalk_color;
+				bbd->alias_color = p->blackboard_data->alias_color;
+				bbd->text_x_position = p->blackboard_data->text_x_position;
+				bbd->text_y_position = p->blackboard_data->text_y_position;
+				for (size_t i = 0; i < bbd->words.size(); ++i) {
+					bbd->words[i].value = p->blackboard_data->words[i].value;
+					bbd->words[i].text = p->blackboard_data->words[i].text;
+				}
+			}
+
+			if (!comp) {
+				comp = std::make_shared<sfc::CompoundObjectV1>();
+				sfc_object_mapping[p] = obj = comp;
+			}
+
+			// CompoundObjectV1
+			for (auto& part : p->compound_data->parts) {
+				sfc::CompoundPartV1 sfcpart;
+				sfcpart.entity = sfc_dump_entity(part.renderable);
+				if (!gallery) {
+					gallery = sfcpart.entity->gallery;
+				}
+				sfcpart.x = part.x;
+				sfcpart.y = part.y;
+				comp->parts.push_back(sfcpart);
+			}
+			for (size_t i = 0; i < comp->hotspots.size(); ++i) {
+				comp->hotspots[i].left = p->compound_data->hotspots[i].x;
+				comp->hotspots[i].top = p->compound_data->hotspots[i].y;
+				comp->hotspots[i].right = p->compound_data->hotspots[i].right();
+				comp->hotspots[i].bottom = p->compound_data->hotspots[i].bottom();
+			}
+			comp->functions_to_hotspots = p->compound_data->functions_to_hotspots;
+		}
+
+		else if (p->creature_data) {
+			fmt::print("WARN [SFCWriter] Unsupported type: Creature\n");
+			return nullptr;
+		}
+
+		// ObjectV1
+		obj->species = p->species;
+		obj->genus = p->genus;
+		obj->family = p->family;
+		obj->movement_status = p->movement_status;
+		obj->attr = p->attr;
+		obj->limit_left = p->limit.x;
+		obj->limit_top = p->limit.y;
+		obj->limit_right = p->limit.right();
+		obj->limit_bottom = p->limit.bottom();
+		obj->carrier = dump_object(g_engine_context.objects->try_get(p->carrier)).get();
+		obj->actv = p->actv;
+		obj->gallery = gallery;
+		obj->tick_value = p->tick_value;
+		obj->ticks_since_last_tick_event = p->ticks_since_last_tick_event;
+		obj->objp = dump_object(g_engine_context.objects->try_get(p->objp)).get();
+		if (p->current_sound.get_looping()) {
+			obj->current_sound = p->current_sound.get_name();
+		}
+		obj->obv0 = p->obv0;
+		obj->obv1 = p->obv1;
+		obj->obv2 = p->obv2;
+		// TODO: I think we can skip scripts here, since they'll be loaded from the global
+		// scriptorium anyways?
+		// obj->scripts = p->scripts;
+
+		if (p->scenery_data) {
+			sfc.sceneries.push_back(std::dynamic_pointer_cast<sfc::SceneryV1>(obj));
+		} else {
+			sfc.objects.push_back(obj);
+		}
+		return obj;
+	};
+
+	fmt::print("INFO [SFCWriter] Writing objects and sceneries...\n");
+	for (auto& p : *g_engine_context.objects) {
+		dump_object(p.get());
+	}
+
+	fmt::print("INFO [SFCWriter] Writing macros...\n");
+	for (auto& m : *g_engine_context.macros) {
+		auto mac = std::make_shared<sfc::MacroV1>();
+		mac->selfdestruct = m.selfdestruct;
+		mac->inst = m.inst;
+		mac->script = m.script;
+		mac->ip = m.ip;
+		for (size_t i = 0; i < m.stack.size(); ++i) {
+			mac->stack[i] = m.stack[i];
+		}
+		mac->sp = numeric_cast<uint32_t>(m.stack.size());
+		mac->vars = m.vars;
+		mac->ownr = dump_object(g_engine_context.objects->try_get(m.ownr)).get();
+		mac->from = dump_object(g_engine_context.objects->try_get(m.from)).get();
+		mac->exec = dump_object(g_engine_context.objects->try_get(m.exec)).get();
+		mac->targ = dump_object(g_engine_context.objects->try_get(m.targ)).get();
+		mac->_it_ = dump_object(g_engine_context.objects->try_get(m._it_)).get();
+		mac->part = m.part;
+		mac->subroutine_label = m.subroutine_label;
+		mac->subroutine_address = m.subroutine_address;
+		mac->wait = m.wait;
+
+		if (m.destroy_as_soon_as_possible) {
+			printf("WARN [SFCWriter] Macro.destroy_as_soon_as_possible unsupported\n");
+		}
+		if (m.enum_result.size()) {
+			printf("ERROR [SFCWriter] Macro.enum_result unsupported\n");
+		}
+
+		sfc.macros.push_back(mac);
+	}
+}
+
 sfc::SFCFile sfc_dump_everything() {
 	sfc::SFCFile sfc;
 	fmt::print("INFO [SFCWriter] Writing map...\n");
 	sfc.map = sfc_dump_map();
 
-	for (auto& obj : *g_engine_context.objects) {
-		if (!obj->scenery_data) {
-			continue;
-		}
-
-		auto gallery = sfc_dump_gallery(obj->scenery_data->part.get_gallery());
-
-		auto part = std::make_shared<sfc::EntityV1>();
-		part->gallery = gallery;
-		part->sprite_pose_plus_base = numeric_cast<uint8_t>(obj->scenery_data->part.get_pose() + obj->scenery_data->part.get_base());
-		part->sprite_base = numeric_cast<uint8_t>(obj->scenery_data->part.get_base());
-		part->z_order = obj->scenery_data->part.get_z_order();
-		part->x = numeric_cast<int32_t>(obj->scenery_data->part.get_x());
-		part->y = numeric_cast<int32_t>(obj->scenery_data->part.get_y());
-		part->has_animation = obj->scenery_data->part.has_animation();
-		// part->animation_frame = obj->scenery_data->part.get_animation_frame(); // only if has_animation is true
-		// part->animation_string = obj->scenery_data->part.get_animation_string();
-
-		auto scen = std::make_shared<sfc::SceneryV1>();
-		// ObjectV1
-		scen->species = obj->species;
-		scen->genus = obj->genus;
-		scen->family = obj->family;
-		scen->movement_status = obj->movement_status;
-		scen->attr = obj->attr;
-		scen->limit_left = obj->limit.x;
-		scen->limit_top = obj->limit.y;
-		scen->limit_right = obj->limit.right();
-		scen->limit_bottom = obj->limit.bottom();
-		// scen->carrier = obj->carrier;
-		scen->actv = obj->actv;
-		scen->gallery = gallery;
-		scen->tick_value = obj->tick_value;
-		scen->ticks_since_last_tick_event = obj->ticks_since_last_tick_event;
-		// scen->objp = obj->objp;
-		// scen->current_sound = obj->current_sound;
-		scen->obv0 = obj->obv0;
-		scen->obv1 = obj->obv1;
-		scen->obv2 = obj->obv2;
-		// scen->scripts = obj->scripts;
-
-		//SceneryV1
-		scen->part = part;
-
-		sfc.sceneries.emplace_back(scen);
-	}
+	sfc_dump_objects_and_sceneries_and_macros(sfc);
 
 	fmt::print("INFO [SFCWriter] Writing scriptorium...\n");
 	sfc_dump_scripts(sfc);
@@ -462,9 +669,6 @@ sfc::SFCFile sfc_dump_everything() {
 	fmt::print("INFO [SFCWriter] Writing viewport...\n");
 	sfc.scrollx = g_engine_context.viewport->get_scrollx();
 	sfc.scrolly = g_engine_context.viewport->get_scrolly();
-
-	fmt::print("INFO [SFCWriter] Writing macros...\n");
-	// load_macros();
 
 	return sfc;
 }
