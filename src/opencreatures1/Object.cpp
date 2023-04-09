@@ -94,6 +94,11 @@ void Object::handle_mesg_activate1(Message msg) {
 		}
 		if (call_button_data) {
 			auto* lift = g_engine_context.objects->try_get(call_button_data->lift);
+			if (!lift) {
+				// whoops, lift doesn't exist
+				printf("WARNING: Tried to activate1 a callbutton with non-existent lift!\n");
+				return;
+			}
 			if (lift->actv == ACTV_INACTIVE && lift->lift_data->next_or_current_floor == call_button_data->floor) {
 				// already here, don't stim disappointment though
 				return;
