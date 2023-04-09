@@ -3,6 +3,8 @@
 #include "common/audio/AudioChannel.h"
 #include "common/audio/AudioState.h"
 
+#include <string>
+
 class C1SoundManager;
 
 class C1ControlledSound {
@@ -18,8 +20,10 @@ class C1ControlledSound {
 	void fade_out();
 	void stop();
 	void set_position(float x, float y, float width, float height);
-	AudioState get_state();
 	void set_volume(float);
+	AudioState get_state();
+	std::string get_name() const;
+	bool get_looping() const;
 
   private:
 	friend C1SoundManager;

@@ -68,3 +68,18 @@ void C1ControlledSound::set_position(float x, float y, float width, float height
 AudioState C1ControlledSound::get_state() {
 	return get_audio_backend()->audio_channel_get_state(channel);
 }
+
+
+std::string C1ControlledSound::get_name() const {
+	if (auto* data = g_engine_context.sounds->get_sound_data(channel)) {
+		return data->name;
+	}
+	return "";
+}
+
+bool C1ControlledSound::get_looping() const {
+	if (auto* data = g_engine_context.sounds->get_sound_data(channel)) {
+		return data->looping;
+	}
+	return false;
+}
