@@ -70,7 +70,7 @@ int32_t Renderable::height() const {
 	return gallery.height(frame());
 }
 
-void Renderable::set_animation(unsigned int animation_frame_, std::string animation_string_) {
+void Renderable::set_animation(uint8_t animation_frame_, std::string animation_string_) {
 	has_animation_ = true;
 	animation_frame = animation_frame_;
 	animation_string = animation_string_;

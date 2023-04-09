@@ -28,7 +28,8 @@ class Renderable {
 	int32_t get_z_order() const;
 
 	bool has_animation() const;
-	void set_animation(unsigned int animation_frame_, std::string animation_string_);
+	void set_animation(uint8_t animation_frame_, std::string animation_string_);
+	uint8_t get_animation_frame() const { return animation_frame; }
 	void update_animation();
 	void clear_animation();
 
@@ -49,7 +50,7 @@ class Renderable {
 	float y = 0;
 	int32_t z = 0;
 	bool has_animation_ = false;
-	unsigned int animation_frame = 0; // only if has_animation is true
+	uint8_t animation_frame = 0; // only if has_animation is true
 	std::string animation_string; // only if has_animation is true
 
 	RenderItemHandle renderitem;
