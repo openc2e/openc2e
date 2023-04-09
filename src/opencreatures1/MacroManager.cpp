@@ -103,6 +103,10 @@ static std::string format_script(ScriptNumber eventno) {
 
 bool MacroManager::queue_script(Object* from, Object* to, ScriptNumber eventno, bool override_existing) {
 	// most of the time, we just want an object to run its own script
+	if (!to) {
+		printf("WARNING: tried to run script %i on nonexistent object\n", eventno);
+		return false;
+	}
 	return queue_script(from, to, to->family, to->genus, to->species, eventno, override_existing);
 }
 
