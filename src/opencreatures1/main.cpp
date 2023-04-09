@@ -10,7 +10,7 @@
 #include "PathManager.h"
 #include "PointerManager.h"
 #include "Renderable.h"
-#include "SFCLoader.h"
+#include "SFCSerialization.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
 #include "common/Repr.h"

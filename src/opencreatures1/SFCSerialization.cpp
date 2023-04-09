@@ -1,4 +1,4 @@
-#include "SFCLoader.h"
+#include "SFCSerialization.h"
 
 #include "C1SoundManager.h"
 #include "EngineContext.h"
