@@ -108,9 +108,7 @@ std::ofstream ofstream(const fs::path& path) {
 	std::error_code err;
 	auto canonpath = case_insensitive_filesystem::canonical(path, err);
 	if (err) {
-		std::ofstream out;
-		out.setstate(std::ios_base::failbit);
-		return out;
+		return std::ofstream(path, std::ios_base::binary);
 	}
 	return std::ofstream(canonpath, std::ios_base::binary);
 }
