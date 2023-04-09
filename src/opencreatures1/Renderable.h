@@ -30,6 +30,7 @@ class Renderable {
 	bool has_animation() const;
 	void set_animation(uint8_t animation_frame_, std::string animation_string_);
 	uint8_t get_animation_frame() const { return animation_frame; }
+	const std::string& get_animation_string() const { return animation_string; }
 	void update_animation();
 	void clear_animation();
 
