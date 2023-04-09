@@ -268,9 +268,9 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 		obj->lift_data->next_or_current_floor = lift->next_or_current_floor;
 		obj->lift_data->current_call_button = lift->current_call_button;
 		// TODO
-		// obj->lift_data->delay_ticks_divided_by_36 = lift->delay_ticks_divided_by_36;
-		if (lift->delay_ticks_divided_by_36 != 0) {
-			fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_36 = {}\n", lift->delay_ticks_divided_by_36);
+		// obj->lift_data->delay_ticks_divided_by_32 = lift->delay_ticks_divided_by_32;
+		if (lift->delay_ticks_divided_by_32 != 0) {
+			fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_32 = {}\n", lift->delay_ticks_divided_by_32);
 		}
 		for (size_t i = 0; i < numeric_cast<size_t>(lift->num_floors); ++i) {
 			// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
@@ -512,7 +512,7 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 					lift->num_floors = numeric_cast<int32_t>(p->lift_data->floors.size());
 					lift->next_or_current_floor = p->lift_data->next_or_current_floor;
 					lift->current_call_button = p->lift_data->current_call_button;
-					lift->delay_ticks_divided_by_36 = 0; // TODO
+					lift->delay_ticks_divided_by_32 = 0; // TODO
 					for (size_t i = 0; i < p->lift_data->floors.size(); ++i) {
 						lift->floors[i] = p->lift_data->floors[i];
 					}
