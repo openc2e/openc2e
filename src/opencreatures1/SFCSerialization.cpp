@@ -252,9 +252,17 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 		auto veh_x = veh->x_times_256 / 256.f;
 		auto veh_y = veh->y_times_256 / 256.f;
 		if (obj_x != veh_x || obj_y != veh_y) {
-			fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} overridden by VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
-			obj->compound_data->parts[0].renderable.set_position(veh_x, veh_y);
-			fmt::print("TODO: should we add the floating point bit to other parts' positions as well?\n");
+			fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} adjusted for VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
+			auto diff_x = veh_x - obj_x;
+			auto diff_y = veh_y - obj_y;
+			// All parts need to be adjusted, not just the main one. If only the main one
+			// changes, things start to get weird — look at the cable car buttons after
+			// multiple load/save cycles whilst activating the buttons. They seem to "shimmy"
+			// up and down (classic floating point issue) and eventually drift after enough
+			// serialization cycles.
+			for (auto& cp : obj->compound_data->parts) {
+				cp.renderable.set_position(cp.renderable.get_x() + diff_x, cp.renderable.get_y() + diff_y);
+			}
 		}
 		obj->vehicle_data->cabin_left = veh->cabin_left;
 		obj->vehicle_data->cabin_top = veh->cabin_top;
