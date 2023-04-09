@@ -266,14 +266,16 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 	if (auto* lift = dynamic_cast<const sfc::LiftV1*>(p)) {
 		obj->lift_data = std::make_unique<LiftData>();
 		obj->lift_data->next_or_current_floor = lift->next_or_current_floor;
-		// TODO:
-		// obj->lift_data->current_call_button = lift->current_call_button;
-		fmt::print("WARN [SFCLoader] Unsupported: LiftData.current_call_button\n");
-		// obj->lift_data->delay_counter = lift->delay_counter;
-		fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_counter\n");
+		obj->lift_data->current_call_button = lift->current_call_button;
+		// TODO
+		// obj->lift_data->delay_ticks_divided_by_36 = lift->delay_ticks_divided_by_36;
+		fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_36\n");
 		for (size_t i = 0; i < numeric_cast<size_t>(lift->num_floors); ++i) {
-			obj->lift_data->floors.push_back({lift->floors[i].y,
-				sfc_object_mapping[lift->floors[i].call_button]});
+			// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
+			obj->lift_data->floors.push_back(lift->floors[i]);
+		}
+		for (size_t i = 0; i < lift->activated_call_buttons.size(); ++i) {
+			obj->lift_data->activated_call_buttons[i] = sfc_object_mapping[lift->activated_call_buttons[i]];
 		}
 	}
 

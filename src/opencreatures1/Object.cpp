@@ -105,7 +105,13 @@ void Object::handle_mesg_activate1(Message msg) {
 			}
 
 			// tell lift to come here eventually
-			lift->lift_data->floors[call_button_data->floor].call_button = this->uid;
+			// told the lift to do the thing
+			for (auto& cb : lift->lift_data->activated_call_buttons) {
+				if (g_engine_context.objects->try_get(cb) == nullptr) {
+					cb = this->uid;
+					break;
+				}
+			}
 		}
 		actv = ACTV_ACTIVE1;
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
@@ -424,7 +430,7 @@ void Object::tick() {
 			auto current_cabin_bottom = get_bbox().y + vehicle_data->cabin_bottom;
 			auto next_cabin_bottom = current_cabin_bottom + vehicle_data->yvel;
 
-			auto next_floor_y = lift_data->floors[lift_data->next_or_current_floor].y;
+			auto next_floor_y = lift_data->floors[lift_data->next_or_current_floor];
 
 			if ((vehicle_data->yvel > 0 && next_cabin_bottom >= next_floor_y) || (vehicle_data->yvel < 0 && next_cabin_bottom <= next_floor_y)) {
 				set_position(get_bbox().x + vehicle_data->xvel, next_floor_y - vehicle_data->cabin_bottom);
@@ -436,8 +442,8 @@ void Object::tick() {
 					g_engine_context.macros->queue_script(this, this, SCRIPT_DEACTIVATE);
 				}
 
-				if (auto call_button = lift_data->floors[lift_data->next_or_current_floor].call_button) {
-					lift_data->floors[lift_data->next_or_current_floor].call_button = {};
+				if (auto call_button = lift_data->activated_call_buttons[numeric_cast<size_t>(lift_data->current_call_button)]) {
+					lift_data->activated_call_buttons[numeric_cast<size_t>(lift_data->current_call_button)] = {};
 					g_engine_context.objects->try_get(call_button)->actv = ACTV_INACTIVE;
 					g_engine_context.macros->queue_script(this->uid, call_button, SCRIPT_DEACTIVATE);
 				}
@@ -455,29 +461,27 @@ void Object::tick() {
 		auto current_cabin_bottom = get_bbox().y + vehicle_data->cabin_bottom;
 
 		int32_t best_y;
-		int32_t best_floor;
-		ObjectHandle best_call_button;
-		for (size_t i = 0; i < lift_data->floors.size(); ++i) {
-			auto& floor = lift_data->floors[i];
-			if (floor.call_button) {
-				if (!g_engine_context.objects->try_get(floor.call_button)) {
-					floor.call_button = {};
-					continue;
-				}
-				if (!best_call_button || abs(current_cabin_bottom - floor.y) < abs(current_cabin_bottom - best_y)) {
-					best_y = floor.y;
-					best_floor = numeric_cast<int32_t>(i);
-					best_call_button = floor.call_button;
+		int32_t best_floor_id;
+		int32_t best_call_button_index = -1;
+		for (size_t i = 0; i < lift_data->activated_call_buttons.size(); ++i) {
+			auto& cb_handle = lift_data->activated_call_buttons[i];
+			if (auto* cb = g_engine_context.objects->try_get(cb_handle)) {
+				auto& floor = lift_data->floors[cb->call_button_data->floor];
+				if (best_call_button_index == -1 || abs(current_cabin_bottom - floor) < abs(current_cabin_bottom - best_y)) {
+					best_y = floor;
+					best_floor_id = numeric_cast<int32_t>(cb->call_button_data->floor);
+					best_call_button_index = numeric_cast<int32_t>(i);
 				}
 			}
 		}
-		if (best_call_button) {
+		if (best_call_button_index != -1) {
+			lift_data->current_call_button = best_call_button_index;
 			if (best_y >= current_cabin_bottom) {
-				lift_data->next_or_current_floor = best_floor;
+				lift_data->next_or_current_floor = best_floor_id;
 				actv = ACTV_ACTIVE1;
 				g_engine_context.macros->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE1);
 			} else {
-				lift_data->next_or_current_floor = best_floor;
+				lift_data->next_or_current_floor = best_floor_id;
 				actv = ACTV_ACTIVE2;
 				g_engine_context.macros->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE2);
 			}
