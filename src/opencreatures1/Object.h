@@ -8,6 +8,7 @@
 #include "PointerManager.h"
 #include "Renderable.h"
 #include "common/Exception.h"
+#include "common/StaticSet.h"
 #include "common/StaticVector.h"
 #include "common/math/Rect.h"
 
@@ -104,10 +105,8 @@ struct VehicleData {
 
 struct LiftData {
 	int32_t next_or_current_floor = -1;
-	int32_t current_call_button = -1;
 	StaticVector<int32_t, 8> floors;
-	// TODO: replace this with a StaticSet, maybe?
-	std::array<ObjectHandle, 8> activated_call_buttons;
+	StaticSet<ObjectHandle, 8> activated_call_buttons;
 };
 
 struct BlackboardData {

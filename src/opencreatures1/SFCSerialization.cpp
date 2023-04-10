@@ -10,6 +10,8 @@
 #include "Renderable.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
+#include "common/Ranges.h"
+#include "common/enumerate.h"
 
 #include <fmt/ranges.h>
 
@@ -274,7 +276,8 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 	if (auto* lift = dynamic_cast<const sfc::LiftV1*>(p)) {
 		obj->lift_data = std::make_unique<LiftData>();
 		obj->lift_data->next_or_current_floor = lift->next_or_current_floor;
-		obj->lift_data->current_call_button = lift->current_call_button;
+		// unneeded
+		// obj->lift_data->current_call_button = lift->current_call_button;
 		// TODO
 		// obj->lift_data->delay_ticks_divided_by_32 = lift->delay_ticks_divided_by_32;
 		if (lift->delay_ticks_divided_by_32 != 0) {
@@ -284,8 +287,10 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 			// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
 			obj->lift_data->floors.push_back(lift->floors[i]);
 		}
-		for (size_t i = 0; i < lift->activated_call_buttons.size(); ++i) {
-			obj->lift_data->activated_call_buttons[i] = sfc_object_mapping[lift->activated_call_buttons[i]];
+		for (auto* cb : lift->activated_call_buttons) {
+			if (auto& handle = sfc_object_mapping[cb]) {
+				obj->lift_data->activated_call_buttons.insert(handle);
+			}
 		}
 	}
 
@@ -519,14 +524,24 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 					// LiftV1
 					lift->num_floors = numeric_cast<int32_t>(p->lift_data->floors.size());
 					lift->next_or_current_floor = p->lift_data->next_or_current_floor;
-					lift->current_call_button = p->lift_data->current_call_button;
+
+					// Would like to do this based on index w/in the serialized array, but
+					// we're not guaranteed to have the CallButtons serialized by this point...
+					// Since CallButtons have a pointer to their parent Lift, we might start
+					// serializing a CallButton and immediately switch to serializing the Lift,
+					// without fleshing out the CallButton struct until the Lift is finished.
+					lift->current_call_button = index_if(p->lift_data->activated_call_buttons, [&](auto& handle) {
+						auto* cb = g_engine_context.objects->try_get(handle);
+						return cb && cb->call_button_data->floor == lift->next_or_current_floor;
+					});
+
 					lift->delay_ticks_divided_by_32 = 0; // TODO
 					for (size_t i = 0; i < p->lift_data->floors.size(); ++i) {
 						lift->floors[i] = p->lift_data->floors[i];
 					}
-					for (size_t i = 0; i < p->lift_data->activated_call_buttons.size(); ++i) {
-						lift->activated_call_buttons[i] = dynamic_cast<sfc::CallButtonV1*>(
-							dump_object(g_engine_context.objects->try_get(p->lift_data->activated_call_buttons[i])).get());
+					for (auto it : enumerate(p->lift_data->activated_call_buttons)) {
+						lift->activated_call_buttons[it.i] = dynamic_cast<sfc::CallButtonV1*>(
+							dump_object(g_engine_context.objects->try_get(it.value())).get());
 					}
 				}
 

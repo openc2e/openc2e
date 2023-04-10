@@ -5,6 +5,7 @@
 #include "ObjectManager.h"
 #include "common/Ascii.h"
 #include "common/NumericCast.h"
+#include "common/Ranges.h"
 
 static bool world_has_at_least_one_creature() {
 	for (auto& obj : *g_engine_context.objects) {
@@ -106,12 +107,7 @@ void Object::handle_mesg_activate1(Message msg) {
 
 			// tell lift to come here eventually
 			// told the lift to do the thing
-			for (auto& cb : lift->lift_data->activated_call_buttons) {
-				if (g_engine_context.objects->try_get(cb) == nullptr) {
-					cb = this->uid;
-					break;
-				}
-			}
+			lift->lift_data->activated_call_buttons.insert(this->uid);
 		}
 		actv = ACTV_ACTIVE1;
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
@@ -441,12 +437,18 @@ void Object::tick() {
 					actv = ACTV_INACTIVE;
 					g_engine_context.macros->queue_script(this, this, SCRIPT_DEACTIVATE);
 				}
-
-				if (auto call_button = lift_data->activated_call_buttons[numeric_cast<size_t>(lift_data->current_call_button)]) {
-					lift_data->activated_call_buttons[numeric_cast<size_t>(lift_data->current_call_button)] = {};
-					g_engine_context.objects->try_get(call_button)->actv = ACTV_INACTIVE;
-					g_engine_context.macros->queue_script(this->uid, call_button, SCRIPT_DEACTIVATE);
-				}
+				erase_if(lift_data->activated_call_buttons, [&](auto& cb) {
+					auto call_button = g_engine_context.objects->try_get(cb);
+					if (call_button == nullptr) {
+						return true;
+					}
+					if (call_button->call_button_data->floor == lift_data->next_or_current_floor) {
+						call_button->actv = ACTV_INACTIVE;
+						g_engine_context.macros->queue_script(this, call_button, SCRIPT_DEACTIVATE);
+						return true;
+					}
+					return false;
+				});
 				return;
 			}
 		}
@@ -462,20 +464,22 @@ void Object::tick() {
 
 		int32_t best_y;
 		int32_t best_floor_id;
-		int32_t best_call_button_index = -1;
-		for (size_t i = 0; i < lift_data->activated_call_buttons.size(); ++i) {
-			auto& cb_handle = lift_data->activated_call_buttons[i];
-			if (auto* cb = g_engine_context.objects->try_get(cb_handle)) {
-				auto& floor = lift_data->floors[cb->call_button_data->floor];
-				if (best_call_button_index == -1 || abs(current_cabin_bottom - floor) < abs(current_cabin_bottom - best_y)) {
-					best_y = floor;
-					best_floor_id = numeric_cast<int32_t>(cb->call_button_data->floor);
-					best_call_button_index = numeric_cast<int32_t>(i);
-				}
+		ObjectHandle best_call_button;
+		erase_if(lift_data->activated_call_buttons, [&](auto& handle) {
+			auto* cb = g_engine_context.objects->try_get(handle);
+			if (cb == nullptr) {
+				return true;
 			}
-		}
-		if (best_call_button_index != -1) {
-			lift_data->current_call_button = best_call_button_index;
+			auto& floor = lift_data->floors[cb->call_button_data->floor];
+			if (!best_call_button || abs(current_cabin_bottom - floor) < abs(current_cabin_bottom - best_y)) {
+				best_y = floor;
+				best_floor_id = numeric_cast<int32_t>(cb->call_button_data->floor);
+				best_call_button = handle;
+			}
+			return false;
+		});
+
+		if (best_call_button) {
 			if (best_y >= current_cabin_bottom) {
 				lift_data->next_or_current_floor = best_floor_id;
 				actv = ACTV_ACTIVE1;
