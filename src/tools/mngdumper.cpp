@@ -1,5 +1,5 @@
+#include "common/Ranges.h"
 #include "common/endianlove.h"
-#include "common/zip.h"
 #include "fileformats/mngfile.h"
 
 #include <fmt/format.h>

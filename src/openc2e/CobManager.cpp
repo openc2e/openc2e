@@ -5,8 +5,8 @@
 #include "World.h"
 #include "common/Ascii.h"
 #include "common/Exception.h"
+#include "common/Ranges.h"
 #include "common/case_insensitive_filesystem.h"
-#include "common/find_if.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 

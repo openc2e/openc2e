@@ -34,12 +34,12 @@
 #include "World.h"
 #include "caosScript.h" // for executeNetwork()
 #include "caosVM.h"
+#include "common/Ranges.h"
 #include "common/audio/NullAudioBackend.h"
 #include "common/backend/Keycodes.h"
 #include "common/backend/NullBackend.h"
 #include "common/case_insensitive_filesystem.h"
 #include "common/encoding.h"
-#include "common/find_if.h"
 #include "common/userlocale.h"
 #include "fileformats/cfgFile.h"
 #include "fileformats/peFile.h"

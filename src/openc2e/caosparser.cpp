@@ -2,7 +2,7 @@
 
 #include "common/Ascii.h"
 #include "common/Exception.h"
-#include "common/string_in.h"
+#include "common/Ranges.h"
 #include "dialect.h"
 
 #include <ctype.h>
@@ -93,20 +93,21 @@ static CAOSNodePtr parse_condition(CAOSParserState& state) {
 	state.p += 1;
 
 	// TODO: are all of these allowed in C1/C2 ?
-	if (!string_in(to_ascii_lowercase(comparison), {
-													   "eq",
-													   "ne",
-													   "gt",
-													   "ge",
-													   "lt",
-													   "le",
-													   "=",
-													   "<>",
-													   ">",
-													   ">=",
-													   "<",
-													   "<=",
-												   })) {
+	if (!contains({
+					  "eq",
+					  "ne",
+					  "gt",
+					  "ge",
+					  "lt",
+					  "le",
+					  "=",
+					  "<>",
+					  ">",
+					  ">=",
+					  "<",
+					  "<=",
+				  },
+			to_ascii_lowercase(comparison))) {
 		throw Exception(fmt::format("Unknown comparison operator '{}'", comparison));
 	}
 	eat_whitespace(state);
@@ -120,7 +121,7 @@ static CAOSNodePtr parse_condition(CAOSParserState& state) {
 
 	bool ate_whitespace = maybe_eat_whitespace(state);
 	if (
-		ate_whitespace && string_in(to_ascii_lowercase(state.tokens[state.p].value), {"and", "or"})) {
+		ate_whitespace && contains({"and", "or"}, to_ascii_lowercase(state.tokens[state.p].value))) {
 		auto combiner = state.tokens[state.p].value;
 		state.p += 1;
 		auto remainder = parse_condition(state);

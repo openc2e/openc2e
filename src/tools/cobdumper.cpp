@@ -1,6 +1,6 @@
 #include "common/Exception.h"
+#include "common/Ranges.h"
 #include "common/endianlove.h"
-#include "common/string_in.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
@@ -46,11 +46,11 @@ std::string caos1_format(const std::string& text) {
 	int indent = 0;
 	for (auto c : toplevel) {
 		auto ccn = (CAOSCommandNode*)c.get();
-		if (string_in(ccn->name, {"elif", "else", "endi", "ever", "next", "repe", "retn", "untl"})) {
+		if (contains({"elif", "else", "endi", "ever", "next", "repe", "retn", "untl"}, ccn->name)) {
 			indent = std::max(indent - 1, 0);
-		} else if (string_in(ccn->name, {"endm"})) {
+		} else if (contains({"endm"}, ccn->name)) {
 			indent = 0;
-		} else if (string_in(ccn->name, {"iscr", "rscr", "scrp"})) {
+		} else if (contains({"iscr", "rscr", "scrp"}, ccn->name)) {
 			indent = 0;
 			if (out.size() > 0) {
 				out += "\n";
@@ -60,11 +60,11 @@ std::string caos1_format(const std::string& text) {
 			out += "    ";
 		}
 		caos1_format_visitor(c, out);
-		if (string_in(ccn->name, {"doif", "elif", "else", "enum", "epas", "esee", "etch", "iscr", "loop", "reps", "scrp", "subr"})) {
+		if (contains({"doif", "elif", "else", "enum", "epas", "esee", "etch", "iscr", "loop", "reps", "scrp", "subr"}, ccn->name)) {
 			indent++;
 		}
 		out += "\n";
-		if (string_in(ccn->name, {"wait"})) {
+		if (contains({"wait"}, ccn->name)) {
 			out += "\n";
 		}
 	}

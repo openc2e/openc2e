@@ -4,9 +4,7 @@
 #include "Engine.h"
 #include "PathResolver.h"
 #include "World.h"
-#include "common/IotaView.h"
 #include "common/Ranges.h"
-#include "common/to_vector.h"
 #include "common/trim.h"
 #include "fileformats/strFile.h"
 #include "fileformats/verticalbarFile.h"
@@ -34,7 +32,7 @@ const std::vector<std::string>& ChemicalNamesManager::getChemicalNames() {
 	if (chemical_names.size() < 256) {
 		chemical_names.resize(256);
 	}
-	for (auto i : iota_view(0, 256)) {
+	for (auto i : irange(256)) {
 		chemical_names[i] = trim(chemical_names[i]);
 		if (chemical_names[i].empty()) {
 			chemical_names[i] = fmt::format("<{}>", i);
@@ -45,7 +43,7 @@ const std::vector<std::string>& ChemicalNamesManager::getChemicalNames() {
 
 const std::vector<std::pair<std::string, std::vector<int>>>& ChemicalNamesManager::getChemicalGroups() {
 	if (!chemical_groups_loaded) {
-		chemical_groups.emplace_back("All", to_vector(iota_view(0, 256)));
+		chemical_groups.emplace_back("All", into_vector(irange(256)));
 
 		if (engine.version == 2) {
 			// c2 has a ChemGroups file with useful data.

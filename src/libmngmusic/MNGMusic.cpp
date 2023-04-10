@@ -2,9 +2,9 @@
 
 #include "common/Ascii.h"
 #include "common/Random.h"
+#include "common/Ranges.h"
 #include "common/audio/AudioBackend.h"
 #include "common/endianlove.h"
-#include "common/find_if.h"
 
 #include <algorithm>
 #include <cmath> // for cos/sin

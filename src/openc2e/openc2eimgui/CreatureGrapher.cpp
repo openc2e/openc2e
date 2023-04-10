@@ -3,7 +3,6 @@
 #include "ChemicalNamesManager.h"
 #include "ImGuiUtils.h"
 #include "World.h"
-#include "common/IotaView.h"
 #include "common/Ranges.h"
 #include "creatures/CreatureAgent.h"
 #include "creatures/c2eCreature.h"
@@ -42,13 +41,13 @@ void DrawCreatureGrapher() {
 			if (s_selected_creature) {
 				c2eCreature* cc = dynamic_cast<c2eCreature*>(s_selected_creature->getCreature());
 				if (cc) {
-					for (auto i : iota_view(0, 256)) {
+					for (auto i : irange(256)) {
 						s_data[i][s_data_position] = cc->getChemical(i);
 					}
 				}
 				oldCreature* oc = dynamic_cast<oldCreature*>(s_selected_creature->getCreature());
 				if (oc) {
-					for (auto i : iota_view(0, 256)) {
+					for (auto i : irange(256)) {
 						s_data[i][s_data_position] = oc->getChemical(i);
 					}
 				}
