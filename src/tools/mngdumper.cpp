@@ -1,5 +1,4 @@
 #include "common/endianlove.h"
-#include "common/enumerate.h"
 #include "common/zip.h"
 #include "fileformats/mngfile.h"
 

@@ -4,7 +4,7 @@
 #include "ImGuiUtils.h"
 #include "World.h"
 #include "common/IotaView.h"
-#include "common/enumerate.h"
+#include "common/Ranges.h"
 #include "creatures/CreatureAgent.h"
 #include "creatures/c2eCreature.h"
 #include "creatures/oldCreature.h"
@@ -71,8 +71,8 @@ void DrawCreatureGrapher() {
 
 		if (ImGui::ListBoxHeader("##Creature Grapher - Chemical Groups", ImVec2(content_width / 2, 0))) {
 			for (auto g : enumerate(s_chemical_names_manager.getChemicalGroups())) {
-				if (ImGui::Selectable(g->first.c_str(), g.i == s_selected_chemical_group)) {
-					s_selected_chemical_group = g.i;
+				if (ImGui::Selectable(g.second.first.c_str(), g.first == s_selected_chemical_group)) {
+					s_selected_chemical_group = g.first;
 				}
 			}
 			ImGui::ListBoxFooter();

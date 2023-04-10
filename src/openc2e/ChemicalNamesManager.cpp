@@ -5,7 +5,7 @@
 #include "PathResolver.h"
 #include "World.h"
 #include "common/IotaView.h"
-#include "common/enumerate.h"
+#include "common/Ranges.h"
 #include "common/to_vector.h"
 #include "common/trim.h"
 #include "fileformats/strFile.h"
@@ -64,9 +64,9 @@ const std::vector<std::pair<std::string, std::vector<int>>>& ChemicalNamesManage
 		} else if (catalogue.hasTag("chemical graphing groups")) {
 			// Creatures 3 has groups in the catalogue file
 			const auto& groupnames = catalogue.getTag("chemical graphing groups");
-			for (auto groupname : enumerate(groupnames)) {
+			for (auto it : enumerate(groupnames)) {
 				std::vector<int> chemids;
-				std::string tagname = fmt::format("chemical graphing group {}", groupname.i + 1);
+				std::string tagname = fmt::format("chemical graphing group {}", it.first + 1);
 				if (catalogue.hasTag(tagname)) {
 					const auto& chemids_tag = catalogue.getTag(tagname);
 					for (auto c : chemids_tag) {
@@ -76,7 +76,7 @@ const std::vector<std::pair<std::string, std::vector<int>>>& ChemicalNamesManage
 						}
 					}
 				}
-				chemical_groups.emplace_back(groupname.value(), chemids);
+				chemical_groups.emplace_back(it.second, chemids);
 			}
 		}
 

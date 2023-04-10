@@ -11,7 +11,6 @@
 #include "Scriptorium.h"
 #include "ViewportManager.h"
 #include "common/Ranges.h"
-#include "common/enumerate.h"
 
 #include <fmt/ranges.h>
 
@@ -540,8 +539,8 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 						lift->floors[i] = p->lift_data->floors[i];
 					}
 					for (auto it : enumerate(p->lift_data->activated_call_buttons)) {
-						lift->activated_call_buttons[it.i] = dynamic_cast<sfc::CallButtonV1*>(
-							dump_object(g_engine_context.objects->try_get(it.value())).get());
+						lift->activated_call_buttons[it.first] = dynamic_cast<sfc::CallButtonV1*>(
+							dump_object(g_engine_context.objects->try_get(it.second)).get());
 					}
 				}
 
