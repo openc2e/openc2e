@@ -127,6 +127,7 @@ std::string get_object_name(const Object* obj) {
 		{3, 4, 1, "Slide Projector"},
 		{3, 5, 1, "Cannon"},
 		{4, 1, 0, "Norn"},
+		{4, 1, 1, "Norn"},
 		{4, 2, 0, "Grendel"},
 		{4, 3, 0, "Ettin"},
 		{4, 4, 0, "Shee"},
