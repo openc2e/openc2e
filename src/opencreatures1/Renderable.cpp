@@ -63,10 +63,16 @@ int32_t Renderable::frame() const {
 }
 
 int32_t Renderable::width() const {
+	if (!gallery) {
+		return 0;
+	}
 	return gallery.width(frame());
 }
 
 int32_t Renderable::height() const {
+	if (!gallery) {
+		return 0;
+	}
 	return gallery.height(frame());
 }
 
