@@ -196,7 +196,7 @@ ObjectHandle MacroContext::read_object(Macro& m) {
 	Token tok = read_token(m);
 	auto it = agentrv_funcs.find(tok);
 	if (it == agentrv_funcs.end()) {
-		throw Exception(fmt::format("Expected object, but got {}", repr(s + p)));
+		throw Exception(fmt::format("Expected object, but got {}", repr(s + p - 4)));
 	}
 	return it->second(*this, m);
 };
