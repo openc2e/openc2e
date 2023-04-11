@@ -3,7 +3,6 @@
 #include "EngineContext.h"
 #include "Object.h"
 #include "ObjectHandle.h"
-#include "common/PointerView.h"
 #include "common/SlotMap.h"
 
 #include <memory>
