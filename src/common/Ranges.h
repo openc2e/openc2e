@@ -4,6 +4,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 template <typename R, typename T>
 bool contains(const R& r, T&& value) {
