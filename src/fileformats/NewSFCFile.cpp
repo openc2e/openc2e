@@ -28,6 +28,14 @@ SFCFile read_sfc_v1_file(std::istream& in) {
 	reader.register_class<BlackboardV1>("Blackboard", 1);
 	reader.register_class<CallButtonV1>("CallButton", 1);
 
+	reader.register_class<CreatureV1>("Creature", 1);
+	reader.register_class<BodyV1>("Body", 1);
+	reader.register_class<LimbV1>("Limb", 1);
+	reader.register_class<CBrainV1>("CBrain", 1);
+	reader.register_class<CBiochemistryV1>("CBiochemistry", 1);
+	reader.register_class<CInstinctV1>("CInstinct", 1);
+	reader.register_class<CGenomeV1>("CGenome", 1);
+
 	// read file
 	SFCFile sfc;
 	sfc.serialize(reader);
@@ -67,12 +75,12 @@ EXPFile read_exp_v1_file(std::istream& in) {
 	// set up types
 	MFCReader reader(in);
 	reader.register_class<CGalleryV1>("CGallery", 1);
+	reader.register_class<CreatureV1>("Creature", 1);
 	reader.register_class<BodyV1>("Body", 1);
 	reader.register_class<LimbV1>("Limb", 1);
 	reader.register_class<CBrainV1>("CBrain", 1);
 	reader.register_class<CBiochemistryV1>("CBiochemistry", 1);
 	reader.register_class<CInstinctV1>("CInstinct", 1);
-	reader.register_class<CreatureV1>("Creature", 1);
 	reader.register_class<CGenomeV1>("CGenome", 1);
 
 	// read file
