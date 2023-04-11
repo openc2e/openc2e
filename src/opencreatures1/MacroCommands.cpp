@@ -170,6 +170,12 @@ void Command_DOIF(MacroContext& ctx, Macro& m) {
 	}
 }
 
+void Command_DONE(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_command_separator(m);
+	printf("WARNING: DONE not implemented\n");
+}
+
 void Command_DPAS(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	ctx.read_command_separator(m);
@@ -602,6 +608,43 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 	}
 }
 
+void Command_STMpound(MacroContext& ctx, Macro& m) {
+	ctx.instructions_left_this_tick++;
+	ctx.read_arg_separator(m);
+	Token subcommand = ctx.read_token(m);
+	if (subcommand == Token("sign")) {
+		ctx.read_arg_separator(m);
+		ctx.read_int(m);
+		ctx.read_command_separator(m);
+		printf("WARNING: STM# SIGN not implemented\n");
+
+	} else if (subcommand == Token("writ")) {
+		ctx.read_arg_separator(m);
+		ctx.read_object(m);
+		ctx.read_arg_separator(m);
+		ctx.read_int(m);
+		ctx.read_command_separator(m);
+		printf("WARNING: STM# WRIT not implemented\n");
+
+	} else if (subcommand == Token("tact")) {
+		ctx.read_arg_separator(m);
+		ctx.read_int(m);
+		ctx.read_command_separator(m);
+
+		printf("WARNING: STM# TACT not implemented\n");
+
+	} else if (subcommand == Token("shou")) {
+		ctx.read_arg_separator(m);
+		ctx.read_int(m);
+		ctx.read_command_separator(m);
+
+		printf("WARNING: STM# SHOU not implemented\n");
+
+	} else {
+		throw Exception(fmt::format("Unknown command 'STM# {}'", repr(subcommand)));
+	}
+}
+
 void Command_STPC(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	auto* targ = ctx.get_targ(m);
@@ -693,6 +736,16 @@ void Command_UNTL(MacroContext& ctx, Macro& m) {
 		m.ip = numeric_cast<uint32_t>(m.stack.back());
 	}
 	ctx.instructions_left_this_tick++;
+}
+
+ObjectHandle AgentRV__IT_(MacroContext& ctx, Macro& m) {
+	// TODO: is this correct for creatures?
+	if (auto* ownr = ctx.maybe_get_ownr(m)) {
+		if (ownr->creature_data) {
+			printf("WARN called _IT_ on Creature, not sure if this is implemented correctly\n");
+		}
+	}
+	return m._it_;
 }
 
 ObjectHandle AgentRV_FROM(MacroContext&, Macro& macro) {
@@ -840,6 +893,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("bbd:")] = Command_BBDcolon;
 	ctx.command_funcs[Token("dpas")] = Command_DPAS;
 	ctx.command_funcs[Token("doif")] = Command_DOIF;
+	ctx.command_funcs[Token("done")] = Command_DONE;
 	ctx.command_funcs[Token("else")] = Command_ELSE;
 	ctx.command_funcs[Token("endi")] = Command_ENDI;
 	ctx.command_funcs[Token("enum")] = Command_ENUM;
@@ -862,6 +916,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("snde")] = Command_SNDE;
 	ctx.command_funcs[Token("sndl")] = Command_SNDL;
 	ctx.command_funcs[Token("stim")] = Command_STIM;
+	ctx.command_funcs[Token("stm#")] = Command_STMpound;
 	ctx.command_funcs[Token("stpc")] = Command_STPC;
 	ctx.command_funcs[Token("targ")] = Command_TARG;
 	ctx.command_funcs[Token("tele")] = Command_TELE;
@@ -869,6 +924,7 @@ void MacroCommands::install_default_commands(MacroContext& ctx) {
 	ctx.command_funcs[Token("untl")] = Command_UNTL;
 	ctx.command_funcs[Token("wait")] = Command_WAIT;
 
+	ctx.agentrv_funcs[Token("_it_")] = AgentRV__IT_;
 	ctx.agentrv_funcs[Token("from")] = AgentRV_FROM;
 	ctx.agentrv_funcs[Token("ownr")] = AgentRV_OWNR;
 	ctx.agentrv_funcs[Token("pntr")] = AgentRV_PNTR;
