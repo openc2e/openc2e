@@ -13,7 +13,7 @@ static void print_limb(std::shared_ptr<sfc::LimbV1> limb, const std::string& ind
 	}
 	fmt::print("Limb {{\n");
 	// fmt::print("{}  sprite = \"{}\"\n", indent, limb->sprite->filename);
-	// fmt::print("{}  frame = \"{}\"\n", indent, limb->current_sprite);
+	fmt::print("{}  sprite_base = {}\n", indent, limb->sprite_base);
 	fmt::print("{}  position = ({},{})\n", indent, limb->x, limb->y);
 	fmt::print("{}  z_order = {}\n", indent, limb->z_order);
 	fmt::print("{}  angle = {}\n", indent, limb->angle);
