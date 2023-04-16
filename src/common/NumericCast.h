@@ -1,16 +1,8 @@
 #pragma once
 
 #include <limits>
-#include <stdint.h>
+#include <stdexcept>
 #include <type_traits>
-#include <typeinfo>
-
-class BadNumericCast : public std::bad_cast {
-  public:
-	const char* what() const noexcept {
-		return "bad numeric cast";
-	}
-};
 
 template <typename To, typename From>
 constexpr inline auto numeric_cast(From value)
@@ -28,7 +20,7 @@ constexpr inline auto numeric_cast(From value)
 		// second check: if the value is signed, we can compare it against the
 		// new minimum. if the value is unsigned, it can't be under the new minimum.
 		|| (std::is_signed<From>::value && static_cast<std::make_signed_t<From>>(value) < low)) {
-		throw BadNumericCast{};
+		throw std::overflow_error{"bad numeric_cast"};
 	}
 	return static_cast<To>(value);
 }
@@ -37,7 +29,7 @@ template <typename To>
 constexpr inline auto numeric_cast(float value)
 	-> std::enable_if_t<std::is_integral<To>::value, To> {
 	if ((value >= (std::numeric_limits<To>::max() / 2 + 1) * 2.0f) || (value - std::numeric_limits<To>::lowest() <= -1.0f)) {
-		throw BadNumericCast{};
+		throw std::overflow_error{"bad numeric_cast"};
 	}
 	return static_cast<To>(value);
 }
