@@ -16,6 +16,7 @@
 #include <chrono>
 #include <cstring>
 #include <fmt/core.h>
+#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>

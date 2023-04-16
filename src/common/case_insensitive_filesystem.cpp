@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <system_error>
 #include <unordered_map>

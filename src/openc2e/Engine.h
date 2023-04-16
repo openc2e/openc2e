@@ -23,6 +23,8 @@
 #include <ghc/filesystem.hpp>
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 class caosValue;
 class Backend;
