@@ -4,6 +4,7 @@
 
 #include <exception>
 #include <stdint.h>
+#include <utility>
 
 class bad_optional_access : public std::exception {
 };
