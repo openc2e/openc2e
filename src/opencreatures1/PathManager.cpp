@@ -38,13 +38,13 @@ std::vector<fs::path> PathManager::find_path_wildcard(PathType type, const std::
 	if (m_main_dir.empty()) {
 		throw Exception("PathManager main_dir is not set!");
 	}
-
 	auto dirname = append_path_type(m_main_dir, type);
 
+	// assume pattern is a single filename, cannot have directory separators
 	std::vector<fs::path> results;
 	for (const auto& entry : case_insensitive_filesystem::directory_iterator(dirname)) {
-		if (wildcard_match(pattern, entry.lexically_relative(dirname).string())) {
-			results.push_back(entry.lexically_relative(dirname));
+		if (wildcard_match(pattern, entry.filename().string())) {
+			results.push_back(entry.filename());
 		}
 	}
 

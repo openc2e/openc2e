@@ -68,7 +68,7 @@ static void update_directory(fs::path dirname) {
 
 	// cache directory contents
 	s_cache[lcdirname] = {dirname, fs::last_write_time(dirname)};
-	for (const auto& entry : fs::directory_iterator(dirname)) {
+	for (const auto& entry : iter) {
 		s_cache[to_ascii_lowercase(entry.path())] = {entry.path()};
 	}
 }
@@ -78,20 +78,21 @@ fs::path canonical(const fs::path& path, std::error_code& ec) {
 		ec = std::make_error_code(std::errc::invalid_argument);
 		return {};
 	}
-	fs::path lcpath = to_ascii_lowercase(path);
-	if (!lcpath.is_absolute()) {
-		lcpath = fs::absolute(lcpath);
+	// make the path absolute, normalized, and no trailing slash.
+	fs::path abspath = fs::absolute(path).lexically_normal();
+	if (abspath.filename().empty()) {
+		abspath = abspath.parent_path();
 	}
-	if (lcpath.filename().empty()) {
-		lcpath = lcpath.parent_path();
-	}
+	// for cache comparisons we need the whole path lowercased.
+	fs::path lcpath = to_ascii_lowercase(abspath);
 
 	// if file exists in cache and on filesystem, return it
 	if (s_cache.count(lcpath) && fs::exists(s_cache[lcpath].realfilename)) {
 		return s_cache[lcpath].realfilename;
 	}
-	update_directory(lcpath.parent_path());
 
+	// otherwise, update directory cache and then check if we found it
+	update_directory(abspath.parent_path());
 	if (s_cache.count(lcpath)) {
 		return s_cache[lcpath].realfilename;
 	}
@@ -115,11 +116,15 @@ std::ofstream ofstream(const fs::path& path) {
 }
 
 directory_iterator::directory_iterator(const fs::path& dirname) {
-	// make sure dir is normal and ends with a trailing slash
-	auto normaldirname = dirname.lexically_normal() / "";
-	update_directory(normaldirname);
-	lcdirname = to_ascii_lowercase(normaldirname);
+	// make the path absolute, normalized, and ends with a trailing slash.
+	fs::path absdirname = fs::absolute(dirname / "").lexically_normal();
+	// for cache comparisons we need the whole path lowercased.
+	lcdirname = to_ascii_lowercase(absdirname);
 
+	// TODO: don't update cached directory contents if they're already fresh enough
+	update_directory(absdirname);
+
+	// iterate results from the cache
 	it = s_cache.begin();
 	while (it != s_cache.end()) {
 		if (path_startswith(it->first, lcdirname) && it->first != lcdirname) {
