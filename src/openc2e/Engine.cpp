@@ -916,11 +916,12 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 	cxxopts::Options desc("openc2e", "");
 	desc.add_options()("h,help", "Display help on command-line options");
 	desc.add_options()("V,version", "Display openc2e version");
+	desc.add_options()("d,data-path", "Sets or adds a path to a data directory", cxxopts::value<std::vector<std::string>>(data_vec));
+	desc.add_options()("g,gametype", "Identify gametype (e.g. c1, c2, c3, cv, sm)", cxxopts::value<std::string>());
 	desc.add_options()("s,silent", "Disable all sounds");
 	desc.add_options()("l,language", "Select the language; default is '" + language + "'", cxxopts::value<std::string>(language));
 	desc.add_options()("k,backend", available_backends, cxxopts::value<std::string>(preferred_backend));
 	desc.add_options()("o,audiobackend", available_audiobackends, cxxopts::value<std::string>(preferred_audiobackend));
-	desc.add_options()("d,data-path", "Sets or adds a path to a data directory", cxxopts::value<std::vector<std::string>>(data_vec));
 	desc.add_options()("b,bootstrap", "Sets or adds a path or COS file to bootstrap from", cxxopts::value<std::vector<std::string>>(cmdline_bootstrap));
 	desc.add_options()("m,gamename", "Set the game name", cxxopts::value<std::string>(gamename));
 	desc.add_options()("n,norun", "Don't run the game, just execute scripts");
@@ -962,7 +963,11 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 	}
 
 	// detect game type from first data directory
-	gametype = detectGameType(data_vec[0]).c_str();
+	if (!vm.count("gametype")) {
+		gametype = detectGameType(data_vec[0]).c_str();
+	} else {
+		gametype = vm["gametype"].as<std::string>();
+	};
 	fmt::print("* Detected game type: {}\n", gametype);
 
 	// set engine version
