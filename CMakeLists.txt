@@ -106,7 +106,6 @@ add_library(openc2e-common OBJECT
 	src/common/readfile.cpp
 	src/common/Random.cpp
 	src/common/Repr.cpp
-	src/common/SimpleLexer.cpp
 	src/common/userlocale.cpp
 	src/common/WindowsRegistry.cpp
 )

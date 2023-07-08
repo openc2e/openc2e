@@ -58,6 +58,18 @@ TEST(caos, assert) {
 	}
 }
 
+TEST(caos, barewords) {
+	auto sprite = Openc2eTestHelper::addBlnkSprite();
+	run_script("c3", R"(
+		setv va00 5
+		new: simp 3 2 1 "blnk" 2 0 0
+		emit 1 _p1_
+		subr eye-roll
+		retn
+	)");
+	world.gallery = std::make_unique<imageManager>();
+}
+
 TEST(caos, file) {
 	struct auto_data_directories {
 		decltype(data_directories) original_data_directories;
@@ -334,15 +346,16 @@ TEST(caos, simpleagent) {
 		ANIM [0]
 		DBG: ASRT POSE eq 1
 	)");
+	world.gallery = std::make_unique<imageManager>();
 }
 
 TEST(caos, special_lexing) {
 	auto special_lexing_script = R"(
 		SETV VAR0 0
-		GSUB 2bed
+		GSUB go_to_bed
 		DBG: ASRT VAR0 EQ 1
 
-		SUBR 2bed
+		SUBR go_to_bed
 		  DBG: ASRT VAR0 EQ 0
 		  ADDV VAR0 1
 		RETN
@@ -351,6 +364,19 @@ TEST(caos, special_lexing) {
 	)";
 	run_script("c1", special_lexing_script);
 	run_script("c2", special_lexing_script);
+}
+
+TEST(caos, numbers) {
+	run_script("c3", R"(
+		setv va00 0
+		setv va00 1
+		setv va00 -5
+		setv va00 0.4
+		setv va00 -3.2
+		setv va00 -.4
+		setv va00 .3
+		setv va00 3.
+	)");
 }
 
 TEST(caos, strings) {
