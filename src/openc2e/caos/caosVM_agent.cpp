@@ -1547,17 +1547,7 @@ void v_DISQ(caosVM* vm) {
 	vm->result.setFloat(x * x + y * y);
 }
 
-/**
- ALPH (command) transparency (integer) enable (integer)
- %status maybe
-
- Sets the degree of alpha blending on the TARG agent, to a value from 0 (solid) to 256 
- (invisible). The second parameter will turn alpha blending on and off.
-*/
-void c_ALPH(caosVM* vm) {
-	VM_PARAM_INTEGER(enable)
-	VM_PARAM_INTEGER(transparency)
-
+static void alph_impl(caosVM* vm, int32_t transparency, int32_t enable) {
 	THROW_IFNOT(transparency >= 0 && transparency <= 256);
 	if (transparency == 256) {
 		transparency = 255;
@@ -1576,6 +1566,34 @@ void c_ALPH(caosVM* vm) {
 		THROW_IFNOT(p);
 		p->alpha = alpha;
 	}
+}
+
+/**
+ ALPH (command) transparency (integer) enable (integer)
+ %status maybe
+ %variants c3 sm
+
+ Sets the degree of alpha blending on the TARG agent, to a value from 0 (solid) to 256
+ (invisible). The second parameter will turn alpha blending on and off.
+*/
+void c_ALPH(caosVM* vm) {
+	VM_PARAM_INTEGER(enable)
+	VM_PARAM_INTEGER(transparency)
+	alph_impl(vm, transparency, enable);
+}
+
+/**
+ ALPH (command) enable(integer) transparency (integer)
+ %status maybe
+ %variants cv
+
+ Sets the degree of alpha blending on the TARG agent, to a value from 0 (solid) to 256
+ (invisible). The first parameter will turn alpha blending on and off.
+*/
+void c_ALPH_cv(caosVM* vm) {
+	VM_PARAM_INTEGER(transparency)
+	VM_PARAM_INTEGER(enable)
+	alph_impl(vm, transparency, enable);
 }
 
 /**
