@@ -202,15 +202,15 @@ caosScript::logicaltokentype caosScript::logicalType(const caostoken& t) {
 		case caostoken::TOK_EOI:
 			return EOI;
 		case caostoken::TOK_ERROR:
-			throw parseException("no logical type for a lexer error token");
+			throw parseException("no logical type for a lexer error token", t.lineno);
 		case caostoken::TOK_COMMENT:
-			throw parseException("no logical type for a comment token");
+			throw parseException("no logical type for a comment token", t.lineno);
 		case caostoken::TOK_WHITESPACE:
-			throw parseException("no logical type for a whitespace token");
+			throw parseException("no logical type for a whitespace token", t.lineno);
 		case caostoken::TOK_NEWLINE:
-			throw parseException("no logical type for a newline token");
+			throw parseException("no logical type for a newline token", t.lineno);
 		case caostoken::TOK_COMMA:
-			throw parseException("no logical type for a comma token");
+			throw parseException("no logical type for a comma token", t.lineno);
 	}
 }
 

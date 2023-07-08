@@ -8,7 +8,10 @@
 
 class parseException : public Exception {
   public:
-	using Exception::Exception;
+	explicit parseException(std::string message)
+		: Exception(message) {}
+	parseException(std::string message, int lineno_)
+		: Exception(message), lineno{lineno_} {}
 
 	std::shared_ptr<std::vector<struct caostoken> > context;
 	int ctxoffset;
