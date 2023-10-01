@@ -174,23 +174,42 @@ extern "C" int main(int argc, char** argv) {
 	install_backtrace_printer();
 
 	std::string datapath;
-	if (argc != 2) {
+	bool error = false;
+	bool help = false;
+	bool save = true;
+	int argidx = 1;
+	while (argc - argidx > 0) {
+		if (std::string(argv[argidx]) == "--help" || std::string(argv[argidx]) == "-h") {
+			help = true;
+			argidx++;
+		} else if (std::string(argv[argidx]) == "--no-save") {
+			save = false;
+			argidx++;
+		} else if (argc - argidx == 1) {
+			datapath = argv[argidx];
+			argidx++;
+		} else {
+			fmt::print(stderr, "Unknown argument: {}\n", argv[argidx]);
+			error = true;
+			argidx++;
+		}
+	}
+	if (datapath.empty() && !help) {
 #ifdef _WIN32
 		datapath = registry_get_string_value(REGISTRY_HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Gameware Development\\Creatures 1\\1.0", "Main Directory");
 		if (datapath.empty()) {
 			fmt::print(stderr, "Couldn't find Creatures 1 registry key\n");
-			fmt::print(stderr, "Usage: {} [path-to-creatures1-data]\n", argv[0]);
-			return 1;
+			error = true;
 		}
 #else
-		fmt::print(stderr, "Usage: {} path-to-creatures1-data\n", argv[0]);
-		return 1;
+		error = true;
 #endif
 	}
-
-	if (datapath.empty()) {
-		datapath = argv[1];
+	if (help || error) {
+		fmt::print(error ? stderr : stdout, "Usage: {} [--no-save] path-to-creatures1-data\n", argv[0]);
+		return error ? 1 : 0;
 	}
+
 	if (!fs::exists(datapath)) {
 		fmt::print(stderr, "* Error: Data path {} does not exist\n", repr(datapath));
 		return 1;
@@ -222,10 +241,14 @@ extern "C" int main(int argc, char** argv) {
 	});
 
 	// save world data
-	auto sfc = sfc_dump_everything();
-	auto out = g_engine_context.paths->ofstream(PATH_TYPE_MAIN, "World.openc1.sfc");
-	write_sfc_v1_file(out, sfc);
-	fmt::print("* Saved world to: World.openc1.sfc\n");
+	if (save) {
+		auto sfc = sfc_dump_everything();
+		auto out = g_engine_context.paths->ofstream(PATH_TYPE_MAIN, "World.openc1.sfc");
+		write_sfc_v1_file(out, sfc);
+		fmt::print("* Saved world to: World.openc1.sfc\n");
+	} else {
+		fmt::print("* Not saving\n");
+	}
 
 	// explicitly destroy game data
 	// C1ControlledSounds need to be destroyed before the AudioBackend is destroyed,
