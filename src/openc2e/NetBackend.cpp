@@ -72,7 +72,7 @@ void NetBackend::handleEvents() {
 
 		// pass the data onto the engine, and send back our response
 		std::string tosend = engine.executeNetwork(data);
-		socksendblocking(connection, tosend.c_str(), tosend.size(), 0);
+		socksendblocking(connection, tosend.data(), tosend.size(), 0);
 
 		// and finally, close the connection
 		sockdestroy(connection);

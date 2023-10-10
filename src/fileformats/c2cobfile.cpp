@@ -29,7 +29,7 @@
 
 c2cobfile::c2cobfile(std::string _path)
 	: path(_path) {
-	file.open(path.c_str(), std::ios::binary);
+	file.open(path, std::ios::binary);
 
 	if (!file.is_open())
 		throw Exception(std::string("couldn't open COB file \"") + path + "\"");

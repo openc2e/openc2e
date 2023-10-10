@@ -34,7 +34,7 @@
 void c_SERS_MAPP(caosVM* vm) {
 	VM_PARAM_STRING(filename)
 #if 0
-	std::ofstream outf(filename.c_str(), std::ios::binary);
+	std::ofstream outf(filename, std::ios::binary);
 	{
 		boost::archive::text_oarchive oa(outf);
 		oa << (const Map &)world.map;
@@ -48,7 +48,7 @@ void c_SERS_MAPP(caosVM* vm) {
 void c_SERL_MAPP(caosVM* vm) {
 	VM_PARAM_STRING(filename);
 #if 0
-	std::ifstream inf(filename.c_str(), std::ios::binary);
+	std::ifstream inf(filename, std::ios::binary);
 	{
 		boost::archive::text_iarchive ia(inf);
 		try {
@@ -66,7 +66,7 @@ void c_SERL_MAPP(caosVM* vm) {
 
 void c_SERS_SCRP(caosVM* vm) {
 	VM_PARAM_STRING(filename);
-	std::ofstream ofs(filename.c_str(), std::ios::binary);
+	std::ofstream ofs(filename, std::ios::binary);
 	{
 		boost::archive::text_oarchive oa(ofs);
 		oa << (const Scriptorium&)world.scriptorium;
@@ -76,7 +76,7 @@ void c_SERS_SCRP(caosVM* vm) {
 
 void c_SERL_SCRP(caosVM* vm) {
 	VM_PARAM_STRING(filename);
-	std::ifstream inf(filename.c_str(), std::ios::binary);
+	std::ifstream inf(filename, std::ios::binary);
 	{
 		boost::archive::text_iarchive ia(inf);
 		try {

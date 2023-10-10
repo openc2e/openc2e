@@ -95,7 +95,7 @@ AudioBackend* SDLMixerBackend::get_instance() {
 void SDLMixerBackend::play_midi_file(const std::string& filename) {
 	Mix_Music* music = Mix_LoadMUS(filename.c_str());
 	if (!music) {
-		printf("* SDLMixer: Couldn't load %s: %s\n", filename.c_str(), Mix_GetError());
+		fmt::print("* SDLMixer: Couldn't load {}: {}\n", filename, Mix_GetError());
 		return;
 	}
 	midi_stop();

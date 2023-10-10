@@ -70,7 +70,7 @@ POST_LOAD(script) {
 	for (size_t i = 0; i < obj.ops.size(); i++) {
 		if (obj.ops[i].opcode == CAOS_CMD || obj.ops[i].opcode == CAOS_SAVE_CMD) {
 			std::string cmdname = (*trans_map)[obj.ops[i].argument];
-			const cmdinfo* ci = d->find_command(cmdname.c_str());
+			const cmdinfo* ci = d->find_command(cmdname);
 			if (!ci) {
 				throw Exception(
 					fmt::format("Deserialization error: Unknown key '{}' in dialect '{}'", cmdname, name));

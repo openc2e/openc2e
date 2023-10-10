@@ -306,7 +306,7 @@ c2eCreature::c2eCreature(std::shared_ptr<genomeFile> g, bool is_female, unsigned
 		throw Exception("c2eCreature was unable to read the 'Action Script To Neuron Mappings' catalogue tag");
 	const std::vector<std::string>& mappinginfotag = catalogue.getTag("Action Script To Neuron Mappings");
 	for (const auto& i : mappinginfotag)
-		mappinginfo.push_back(atoi(i.c_str()));
+		mappinginfo.push_back(std::stoi(i));
 
 	// TODO: should we really hard-code this?
 	chosenagents.resize(40);

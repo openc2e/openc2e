@@ -20,6 +20,7 @@
 #include "VoiceData.h"
 
 #include "Catalogue.h"
+#include "common/NumericCast.h"
 #include "common/endianlove.h"
 
 #include <cassert>
@@ -67,7 +68,7 @@ VoiceData::VoiceData(std::string tagname) {
 		return;
 	const std::vector<std::string>& lookupdata = catalogue.getTag(languagetag);
 	for (const auto& i : lookupdata) {
-		uint32_t data = strtoul(i.c_str(), NULL, 16);
+		uint32_t data = numeric_cast<uint32_t>(std::stol(i, nullptr, 16));
 		lookup_table.push_back(data);
 	}
 	if (lookup_table.size() != 3 * 27)
@@ -79,7 +80,7 @@ VoiceData::VoiceData(std::string tagname) {
 	for (unsigned int i = 1; i < tagdata.size() - 1; i += 2) {
 		VoiceEntry entry;
 		entry.name = tagdata[i];
-		entry.delay_ticks = atoi(tagdata[i + 1].c_str());
+		entry.delay_ticks = std::stoi(tagdata[i + 1]);
 		voices.push_back(entry);
 	}
 

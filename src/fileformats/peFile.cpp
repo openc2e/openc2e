@@ -32,7 +32,7 @@
 
 peFile::peFile(fs::path filepath) {
 	path = filepath;
-	file.open(path.string().c_str(), std::ios::binary);
+	file.open(path.string(), std::ios::binary);
 
 	if (!file.is_open())
 		throw Exception(std::string("couldn't open PE file \"") + path.string() + "\"");

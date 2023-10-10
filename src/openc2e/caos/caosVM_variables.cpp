@@ -847,7 +847,7 @@ void v_SUBS(caosVM* vm) {
 void v_STOI(caosVM* vm) {
 	VM_PARAM_STRING(string)
 
-	vm->result.setInt(atoi(string.c_str()));
+	vm->result.setInt(std::stoi(string));
 }
 
 /**
@@ -859,7 +859,7 @@ void v_STOI(caosVM* vm) {
 void v_STOF(caosVM* vm) {
 	VM_PARAM_STRING(string)
 
-	vm->result.setFloat(atof(string.c_str()));
+	vm->result.setFloat(std::stof(string));
 }
 
 /**

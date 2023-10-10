@@ -15,12 +15,6 @@ static int cmd_cmp(const void* pa, const void* pb) {
 	return strcmp(a->lookup_key, b->lookup_key);
 }
 
-static const cmdinfo* find_cmd(const struct cmdinfo* tbl, int cnt, const char* name) {
-	cmdinfo key;
-	key.lookup_key = name;
-	return (const cmdinfo*)bsearch((void*)&key, (void*)tbl, cnt, sizeof key, cmd_cmp);
-}
-
 static int count_cmds(const struct cmdinfo* tbl) {
 	int i = 0;
 	while (tbl[i].lookup_key)
@@ -33,7 +27,9 @@ Dialect::Dialect(const cmdinfo* cmds_, const std::string& n)
 }
 
 const cmdinfo* Dialect::find_command(const char* name) const {
-	return find_cmd(cmds, cmdcnt, name);
+	cmdinfo key;
+	key.lookup_key = name;
+	return (const cmdinfo*)bsearch((void*)&key, (void*)cmds, cmdcnt, sizeof key, cmd_cmp);
 }
 
 const struct cmdinfo* Dialect::getcmd(int idx) const {

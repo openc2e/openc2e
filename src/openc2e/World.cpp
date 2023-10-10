@@ -502,7 +502,7 @@ void World::executeInitScript(std::string x) {
 	assert(fs::exists(x));
 	assert(!fs::is_directory(x));
 
-	std::ifstream s(x.c_str());
+	std::ifstream s(x);
 	assert(s.is_open());
 	//std::cout << "executing script " << x << "...\n";
 	//std::cout.flush(); std::cerr.flush();
@@ -549,7 +549,7 @@ void World::executeBootstrap(bool switcher) {
 		std::string edenpath = findMainDirectoryFile("Eden.sfc");
 		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
 			SFCFile sfc;
-			std::ifstream f(edenpath.c_str(), std::ios::binary);
+			std::ifstream f(edenpath, std::ios::binary);
 			f >> std::noskipws;
 			sfc.read(&f);
 			sfc.copyToWorld();
@@ -572,7 +572,7 @@ void World::executeBootstrap(bool switcher) {
 		}
 
 		for (auto d : getBootstrapDirectories()) {
-			printf("* Executing scripts from: %s\n", d.string().c_str());
+			fmt::print("* Executing scripts from: {}\n", d.string());
 			executeBootstrap(d);
 		}
 	}

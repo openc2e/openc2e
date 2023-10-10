@@ -22,6 +22,7 @@
 #include "common/Exception.h"
 #include "common/NumericCast.h"
 
+#include <fmt/core.h>
 #include <memory>
 #include <stdio.h>
 
@@ -131,8 +132,8 @@ void creaturesImage::setBlockSize(unsigned int width, unsigned int height) {
 		throw Exception("Can't set block size on image with more than one frame");
 	}
 	if ((block_width || block_height) && (block_width != width || block_height != height)) {
-		printf("Warning: setting block size %ix%i on image '%s' that already has block size %ix%i\n",
-			width, height, name.c_str(), block_width, block_height);
+		fmt::print("Warning: setting block size {}x{} on image '{}' that already has block size {}x{}\n",
+			width, height, name, block_width, block_height);
 	}
 	block_width = width;
 	block_height = height;

@@ -274,9 +274,9 @@ void c_VOLM(caosVM* vm) {
 	} else {
 		// In Creatures Village's !startup.cos
 		// TODO: do a full stacktrace like CaosException?
-		printf(
-			"exec of \"%s\" raised warning: VOLM: Can't set volume of audio type %i\n",
-			vm->currentscript->filename.size() ? vm->currentscript->filename.c_str() : "(null)",
+		fmt::print(
+			"exec of \"{}\" raised warning: VOLM: Can't set volume of audio type {}\n",
+			vm->currentscript->filename.size() ? vm->currentscript->filename : "(null)",
 			type);
 	}
 }

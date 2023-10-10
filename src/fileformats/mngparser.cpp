@@ -4,6 +4,7 @@
 #include "common/Exception.h"
 
 #include <assert.h>
+#include <fmt/core.h>
 #include <unordered_set>
 
 using namespace mngtoktype;
@@ -52,12 +53,12 @@ mngtoken MNGParserState::consume(toktype type) {
 		return consume();
 	} else {
 		// TODO: better error reporting
-		printf("Unexpected token: %s\n", peek().dump().c_str());
-		printf("Expected: %s\n", mngtoktype::to_string(type).c_str());
-		printf("Around:\n");
+		fmt::print("Unexpected token: {}\n", peek().dump());
+		fmt::print("Expected: {}\n", mngtoktype::to_string(type));
+		fmt::print("Around:\n");
 		for (int i = -5; i < 5; ++i) {
 			if (i >= 0 && p + i < tokens.size()) {
-				printf("%s\n", tokens[p + i].dump().c_str());
+				fmt::print("{}\n", tokens[p + i].dump());
 			}
 		}
 		throw Exception("Unexpected token: " + peek().dump());

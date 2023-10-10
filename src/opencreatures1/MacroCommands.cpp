@@ -354,9 +354,9 @@ void Command_MVBY(MacroContext& ctx, Macro& m) {
 	obj->add_position(xdiff, ydiff);
 
 	if (ctx.debug) {
-		printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
+		fmt::print("did a mvby  x={} y={} cls=({}, {}, {}) spr={}!\n",
 			xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus,
-			ctx.get_targ(m)->species, ctx.get_targ_part(m)->get_gallery().name.c_str());
+			ctx.get_targ(m)->species, ctx.get_targ_part(m)->get_gallery().name);
 	}
 
 	ctx.read_command_separator(m);
@@ -373,8 +373,8 @@ void Command_MVTO(MacroContext& ctx, Macro& m) {
 	obj->set_position(x, y);
 
 	// if (ctx.debug) {
-	// 	printf("did a mvby  x=%i y=%i cls=(%i, %i, %i) spr=%s!\n",
-	// 		xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus, ctx.get_targ(m)->species, ctx.get_targ_part(m)->sprite.getName().c_str());
+	// 	fmt::print("did a mvby  x={} y={} cls=({}, {}, {}) spr={}!\n",
+	// 		xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus, ctx.get_targ(m)->species, ctx.get_targ_part(m)->sprite.getName());
 	// }
 
 	ctx.read_command_separator(m);
@@ -487,8 +487,8 @@ void Command_RNDV(MacroContext& ctx, Macro& m) {
 
 	int32_t generated = rand_int32(low, high);
 	if (ctx.debug) {
-		printf("RNDV info %s %i %i\n", repr(varname).c_str(), low, high);
-		printf("RNDV generated %i\n", generated);
+		fmt::print("RNDV info {} {} {}\n", repr(varname), low, high);
+		fmt::print("RNDV generated {}\n", generated);
 	}
 	ctx.set_variable(m, varname, generated);
 

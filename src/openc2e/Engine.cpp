@@ -962,7 +962,7 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 	}
 
 	// detect game type from first data directory
-	gametype = detectGameType(data_vec[0]).c_str();
+	gametype = detectGameType(data_vec[0]);
 	fmt::print("* Detected game type: {}\n", gametype);
 
 	// set engine version
@@ -1015,7 +1015,7 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 			throw Exception("data path '" + *it + "' doesn't exist");
 		}
 		if (find_if(data_directories, [&](auto d) { return fs::absolute(d.main) == fs::absolute(*it); })) {
-			printf("* Warning: ignoring duplicate data directory %s\n", it->c_str());
+			fmt::print("* Warning: ignoring duplicate data directory {}\n", *it);
 			continue;
 		}
 		data_directories.push_back(fs::path(*it));
@@ -1078,11 +1078,11 @@ bool Engine::initialSetup() {
 		// inform the user of the port used, and store it in the relevant file
 		std::cout << "* Listening for connections on port " << listenport << "." << std::endl;
 #ifndef _WIN32
-		fs::path p = fs::path(homeDirectory().string() + "/.creaturesengine");
+		fs::path p = homeDirectory() / ".creaturesengine";
 		if (!fs::exists(p))
 			fs::create_directory(p);
 		if (fs::is_directory(p)) {
-			std::ofstream f((p.string() + "/port").c_str(), std::ios::trunc);
+			std::ofstream f(p / "port", std::ios::trunc);
 			f << std::to_string(listenport);
 		}
 #endif
@@ -1154,7 +1154,7 @@ bool Engine::initialSetup() {
 					throw Exception("non-existant bootstrap file provided in C1/C2 mode");
 				// TODO: the default SFCFile loading code is in World, maybe this should be too..
 				SFCFile sfc;
-				std::ifstream f(scriptdir.string().c_str(), std::ios::binary);
+				std::ifstream f(scriptdir, std::ios::binary);
 				f >> std::noskipws;
 				sfc.read(&f);
 				sfc.copyToWorld();

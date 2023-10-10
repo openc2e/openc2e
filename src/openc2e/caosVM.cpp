@@ -291,7 +291,7 @@ inline void caosVM::runOp() {
 			fmt::print(
 				stderr,
 				"optrace({}): INST={} TS={} {} @{:08d} top={} depth={} {}\n",
-				scr->filename.c_str(), (int)inst, (int)timeslice,
+				scr->filename, (int)inst, (int)timeslice,
 				(void*)this, cip,
 				(valueStack.empty() ? std::string("(empty)") : valueStack.back().dump()),
 				valueStack.size(),

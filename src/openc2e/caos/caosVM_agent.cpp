@@ -665,7 +665,7 @@ void c_ANMS(caosVM* vm) {
 	for (char i : poselist) {
 		if (i == ' ') {
 			if (!t.empty()) {
-				int n = atoi(t.c_str());
+				int n = std::stoi(t);
 				THROW_IFNOT(n >= 0 && n < 256);
 				animation.push_back(n);
 				t.clear();

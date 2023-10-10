@@ -110,7 +110,7 @@ void c_FILE_IOPE(caosVM* vm) {
 	c_FILE_ICLO(vm);
 
 	std::string fullfilename = calculateJournalFilename(directory, filename);
-	vm->inputstream = new std::ifstream(fullfilename.c_str());
+	vm->inputstream = new std::ifstream(fullfilename);
 
 	if (vm->inputstream->fail()) {
 		delete vm->inputstream;
@@ -176,9 +176,9 @@ void c_FILE_OOPE(caosVM* vm) {
 	std::string fullfilename = calculateJournalFilename(directory, filename);
 
 	if (append)
-		vm->outputstream = new std::ofstream(fullfilename.c_str(), std::ios::app);
+		vm->outputstream = new std::ofstream(fullfilename, std::ios::app);
 	else
-		vm->outputstream = new std::ofstream(fullfilename.c_str(), std::ios::trunc);
+		vm->outputstream = new std::ofstream(fullfilename, std::ios::trunc);
 
 	if (vm->outputstream->fail()) {
 		vm->outputstream = 0;
