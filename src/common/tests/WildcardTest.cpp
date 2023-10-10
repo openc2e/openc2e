@@ -11,4 +11,6 @@ TEST(Wildcard, wildcard_match) {
 	EXPECT_TRUE(wildcard_match("hel?o", "hello"));
 	EXPECT_TRUE(wildcard_match("h*o", "hello"));
 	EXPECT_TRUE(wildcard_match("h*l*o", "hello"));
+	EXPECT_TRUE(wildcard_match("*.agent", "test.agent"));
+	EXPECT_FALSE(wildcard_match("*.agent", "test.agents"));
 }

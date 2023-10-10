@@ -1,29 +1,28 @@
 #pragma once
 
-#include <string>
+#include "StringView.h"
 
-inline bool wildcard_match_helper(const char* pattern, const char* value) {
-	// TODO: string_view would be nicer than raw char pointers, and allow us to
-	// use only a single function...
+bool wildcard_match(StringView pattern, StringView value) {
 	while (true) {
-		if (*pattern == '\0' && *value == '\0') {
+		if (pattern.empty() && value.empty()) {
 			return true;
 		}
-		if (*pattern == '*' && *(pattern + 1) != '\0' && *value == '\0') {
+		if (pattern.empty()) {
 			return false;
 		}
-		if (*pattern == '?' || *pattern == *value) {
-			pattern += 1;
-			value += 1;
+		if (value.empty()) {
+			return pattern.size() == 1 && pattern[0] == '*';
+		}
+		if (pattern[0] == '?' || pattern[0] == value[0]) {
+			pattern = pattern.substr(1);
+			value = value.substr(1);
 			continue;
 		}
-		if (*pattern == '*') {
-			return wildcard_match_helper(pattern, value + 1) || wildcard_match_helper(pattern + 1, value);
+		if (pattern[0] == '*') {
+			// TODO: this recursive/branching implementation is ugly. can we do it linearly
+			// without using too much extra memory? maybe using a static vector?
+			return wildcard_match(pattern, value.substr(1)) || wildcard_match(pattern.substr(1), value);
 		}
 		return false;
 	}
-}
-
-inline bool wildcard_match(const std::string& pattern, const std::string& value) {
-	return wildcard_match_helper(pattern.c_str(), value.c_str());
 }
