@@ -13,7 +13,9 @@
 #include "SFCSerialization.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
+#include "common/OptionsParser.h"
 #include "common/Repr.h"
+#include "common/StringView.h"
 #include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
 #include "common/render/RenderSystem.h"
@@ -173,41 +175,22 @@ void draw_imgui_rightclick_menu() {
 extern "C" int main(int argc, char** argv) {
 	install_backtrace_printer();
 
+	bool no_save = false;
 	std::string datapath;
-	bool error = false;
-	bool help = false;
-	bool save = true;
-	int argidx = 1;
-	while (argc - argidx > 0) {
-		if (std::string(argv[argidx]) == "--help" || std::string(argv[argidx]) == "-h") {
-			help = true;
-			argidx++;
-		} else if (std::string(argv[argidx]) == "--no-save") {
-			save = false;
-			argidx++;
-		} else if (argc - argidx == 1) {
-			datapath = argv[argidx];
-			argidx++;
-		} else {
-			fmt::print(stderr, "Unknown argument: {}\n", argv[argidx]);
-			error = true;
-			argidx++;
-		}
-	}
-	if (datapath.empty() && !help) {
+	auto opts = OptionsParser{}
+					.opt("--no-save", &no_save)
+					.opt("datapath", &datapath)
+					.parse(argc, argv);
 #ifdef _WIN32
+	if (datapath.empty()) {
 		datapath = registry_get_string_value(REGISTRY_HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Gameware Development\\Creatures 1\\1.0", "Main Directory");
 		if (datapath.empty()) {
 			fmt::print(stderr, "Couldn't find Creatures 1 registry key\n");
-			error = true;
 		}
-#else
-		error = true;
-#endif
 	}
-	if (help || error) {
-		fmt::print(error ? stderr : stdout, "Usage: {} [--no-save] path-to-creatures1-data\n", argv[0]);
-		return error ? 1 : 0;
+#endif
+	if (datapath.empty()) {
+		opts.print_usage_and_fail();
 	}
 
 	if (!fs::exists(datapath)) {
@@ -241,13 +224,13 @@ extern "C" int main(int argc, char** argv) {
 	});
 
 	// save world data
-	if (save) {
+	if (no_save) {
+		fmt::print("* Not saving\n");
+	} else {
 		auto sfc = sfc_dump_everything();
 		auto out = g_engine_context.paths->ofstream(PATH_TYPE_MAIN, "World.openc1.sfc");
 		write_sfc_v1_file(out, sfc);
 		fmt::print("* Saved world to: World.openc1.sfc\n");
-	} else {
-		fmt::print("* Not saving\n");
 	}
 
 	// explicitly destroy game data
