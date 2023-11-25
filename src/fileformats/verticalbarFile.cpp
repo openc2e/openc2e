@@ -11,9 +11,15 @@ std::vector<std::vector<std::string>> ReadVerticalBarSeparatedValuesFile(const s
 	}
 
 	std::vector<std::vector<std::string>> lines;
-	while (in.good()) {
+	while (true) {
 		std::string line;
 		getline(in, line);
+		if (line.empty() && in.eof()) {
+			break;
+		}
+		if (in.bad()) {
+			throw Exception("error reading file " + path);
+		}
 		if (line.empty() || line[0] == '#') {
 			continue;
 		}
