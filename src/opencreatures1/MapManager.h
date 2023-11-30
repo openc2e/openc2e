@@ -8,18 +8,18 @@
 
 class Room {
   public:
-	int left;
-	int top;
-	int right;
-	int bottom;
-	int type;
+	int32_t left;
+	int32_t top;
+	int32_t right;
+	int32_t bottom;
+	int32_t type;
 
 	RenderItemHandle renderitem;
 
-	int width() const {
+	int32_t width() const {
 		return right - left;
 	}
-	int height() const {
+	int32_t height() const {
 		return bottom - top;
 	}
 };
