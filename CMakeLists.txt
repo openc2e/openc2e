@@ -128,7 +128,7 @@ add_executable(test_common
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(test_common PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
-target_link_libraries(test_common openc2e-common gtest gtest_main)
+target_link_libraries(test_common openc2e-common gtest_main)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
@@ -177,7 +177,7 @@ add_executable(test_fileformats
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(test_fileformats PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
-target_link_libraries(test_fileformats openc2e-fileformats gtest gtest_main)
+target_link_libraries(test_fileformats openc2e-fileformats gtest_main)
 
 add_library(openc2e-mngmusic STATIC
 	src/libmngmusic/MNGMusic.cpp
@@ -314,7 +314,7 @@ target_link_libraries(openc2e openc2e_core openc2e_sdlbackend)
 add_executable(test_openc2e
 	src/openc2e/tests/CaosTest.cpp
 )
-target_link_libraries(test_openc2e openc2e_core gtest gtest_main)
+target_link_libraries(test_openc2e openc2e_core gtest_main)
 
 add_library(opencreatures1_core STATIC
 	src/opencreatures1/Biochemistry.cpp
@@ -363,7 +363,7 @@ add_executable(test_opencreatures1
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(test_opencreatures1 PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
-target_link_libraries(test_opencreatures1 opencreatures1_core gtest gtest_main)
+target_link_libraries(test_opencreatures1 opencreatures1_core gtest_main)
 
 add_executable(attparser src/tools/attparser.cpp)
 target_link_libraries(attparser openc2e-fileformats)
