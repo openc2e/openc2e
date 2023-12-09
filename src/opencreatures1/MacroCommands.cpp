@@ -237,7 +237,7 @@ void Command_ENUM(MacroContext& ctx, Macro& m) {
 		throw Exception("Nested calls to ENUM are not implemented");
 	}
 
-	for (auto& obj : *g_engine_context.objects) {
+	for (auto* obj : *g_engine_context.objects) {
 		if ((obj->family == family || family == 0) && (obj->genus == genus || genus == 0) && (obj->species == species || species == 0)) {
 			m.enum_result.push_back(obj->uid);
 		}
@@ -438,7 +438,7 @@ void Command_POSE(MacroContext& ctx, Macro& m) {
 	int32_t pose = ctx.read_int(m);
 	ctx.read_command_separator(m);
 
-	if (ctx.get_targ(m)->creature_data) {
+	if (ctx.get_targ(m)->as_creature()) {
 		printf("WARN called POSE on Creature, not implemented\n");
 		return;
 	}
@@ -745,7 +745,7 @@ void Command_UNTL(MacroContext& ctx, Macro& m) {
 ObjectHandle AgentRV__IT_(MacroContext& ctx, Macro& m) {
 	// TODO: is this correct for creatures?
 	if (auto* ownr = ctx.maybe_get_ownr(m)) {
-		if (ownr->creature_data) {
+		if (ownr->as_creature()) {
 			printf("WARN called _IT_ on Creature, not sure if this is implemented correctly\n");
 		}
 	}
@@ -802,7 +802,7 @@ int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_POSE(MacroContext& ctx, Macro& m) {
-	if (ctx.get_targ(m)->creature_data) {
+	if (ctx.get_targ(m)->as_creature()) {
 		printf("WARN called POSE on Creature, not implemented\n");
 		return 0;
 	}
@@ -838,7 +838,7 @@ int32_t IntegerRV_WDTH(MacroContext& ctx, Macro& m) {
 
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
 	Object* o = ctx.get_targ(m);
-	auto* veh = o->vehicle_data.get();
+	auto* veh = o->as_vehicle();
 	if (!veh) {
 		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
 	}
@@ -867,7 +867,7 @@ void LValue_ACTV(const MacroContext& ctx, const Macro& m, int32_t value) {
 
 void LValue_XVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	Object* o = ctx.get_targ(m);
-	auto* veh = o->vehicle_data.get();
+	auto* veh = o->as_vehicle();
 	if (!veh) {
 		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
 	}
@@ -876,7 +876,7 @@ void LValue_XVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 
 void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	Object* o = ctx.get_targ(m);
-	auto* veh = o->vehicle_data.get();
+	auto* veh = o->as_vehicle();
 	if (!veh) {
 		throw_exception("Called YVEC on non-vehicle object: {}", repr(*o));
 	}

@@ -75,8 +75,8 @@ void load_everything() {
 	sfc_load_everything(sfc);
 
 	// fire init scripts
-	for (auto& o : *g_engine_context.objects) {
-		g_engine_context.macros->queue_script(o.get(), o.get(), SCRIPT_INITIALIZE);
+	for (auto* o : *g_engine_context.objects) {
+		g_engine_context.macros->queue_script(o, o, SCRIPT_INITIALIZE);
 	}
 }
 

@@ -8,12 +8,92 @@
 #include "common/Ranges.h"
 
 static bool world_has_at_least_one_creature() {
-	for (auto& obj : *g_engine_context.objects) {
-		if (obj->creature_data) {
+	for (auto* obj : *g_engine_context.objects) {
+		if (obj->as_creature()) {
 			return true;
 		}
 	}
 	return false;
+}
+
+Scenery* Object::as_scenery() {
+	return dynamic_cast<Scenery*>(this);
+}
+
+SimpleObject* Object::as_simple_object() {
+	return dynamic_cast<SimpleObject*>(this);
+}
+
+Bubble* Object::as_bubble() {
+	return dynamic_cast<Bubble*>(this);
+}
+
+CallButton* Object::as_call_button() {
+	return dynamic_cast<CallButton*>(this);
+}
+
+PointerTool* Object::as_pointer_tool() {
+	return dynamic_cast<PointerTool*>(this);
+}
+
+CompoundObject* Object::as_compound_object() {
+	return dynamic_cast<CompoundObject*>(this);
+}
+
+Vehicle* Object::as_vehicle() {
+	return dynamic_cast<Vehicle*>(this);
+}
+
+Lift* Object::as_lift() {
+	return dynamic_cast<Lift*>(this);
+}
+
+Blackboard* Object::as_blackboard() {
+	return dynamic_cast<Blackboard*>(this);
+}
+
+Creature* Object::as_creature() {
+	return dynamic_cast<Creature*>(this);
+}
+
+const Scenery* Object::as_scenery() const {
+	return dynamic_cast<const Scenery*>(this);
+}
+
+const SimpleObject* Object::as_simple_object() const {
+	return dynamic_cast<const SimpleObject*>(this);
+}
+
+const Bubble* Object::as_bubble() const {
+	return dynamic_cast<const Bubble*>(this);
+}
+
+const CallButton* Object::as_call_button() const {
+	return dynamic_cast<const CallButton*>(this);
+}
+
+const PointerTool* Object::as_pointer_tool() const {
+	return dynamic_cast<const PointerTool*>(this);
+}
+
+const CompoundObject* Object::as_compound_object() const {
+	return dynamic_cast<const CompoundObject*>(this);
+}
+
+const Vehicle* Object::as_vehicle() const {
+	return dynamic_cast<const Vehicle*>(this);
+}
+
+const Lift* Object::as_lift() const {
+	return dynamic_cast<const Lift*>(this);
+}
+
+const Blackboard* Object::as_blackboard() const {
+	return dynamic_cast<const Blackboard*>(this);
+}
+
+const Creature* Object::as_creature() const {
+	return dynamic_cast<const Creature*>(this);
 }
 
 void Object::handle_left_click(int32_t relx, int32_t rely) {
@@ -21,17 +101,17 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 	// to ACTIVATE1, ACTIVATE2, or DEACTIVATE. But how do we know which message
 	// to send?
 
-	if (pointer_data) {
+	if (as_pointer_tool()) {
 		throw Exception("handle_click erroneously called on PointerTool");
 	}
 
 	// SimpleObjects have their click behavior controlled by BHVR - we index into
 	// their click BHVR array using their current ACTV (activation status), which
 	// gives us the message to send.
-	if (simple_data) {
-		// fmt::print("Got a click, click bhvr {} {} {}, actv {}\n", simple_data->click_bhvr[0], simple_data->click_bhvr[1], simple_data->click_bhvr[2], actv);
+	if (as_simple_object()) {
+		// fmt::print("Got a click, click bhvr {} {} {}, actv {}\n", as_simple_object()->click_bhvr[0], as_simple_object()->click_bhvr[1], as_simple_object()->click_bhvr[2], actv);
 
-		int8_t click_message = simple_data->click_bhvr[actv];
+		int8_t click_message = as_simple_object()->click_bhvr[actv];
 		// fmt::print("click message {}\n", click_message);
 		if (click_message == -1) {
 			// TODO: should we still make the mouse gesture?
@@ -50,16 +130,16 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 	// (out of the six total knobs, the first three are for creatures, the
 	// second three are for the mouse) and their associated hotspots to see if
 	// any contain the click location.
-	if (compound_data) {
+	if (as_compound_object()) {
 		// printf("handle_left_click %i %i\n", relx, rely);
 
 		for (size_t i = 3; i < 6; ++i) {
-			int32_t hotspot_idx = compound_data->functions_to_hotspots[i];
+			int32_t hotspot_idx = as_compound_object()->functions_to_hotspots[i];
 			if (hotspot_idx == -1 || hotspot_idx < 0) {
 				// knob doesn't have hotspot attached
 				continue;
 			}
-			Rect hotspot = compound_data->hotspots[numeric_cast<size_t>(hotspot_idx)];
+			Rect hotspot = as_compound_object()->hotspots[numeric_cast<size_t>(hotspot_idx)];
 			// TODO: check for bad hotspots?
 
 			if (hotspot.has_point(relx, rely)) {
@@ -76,58 +156,59 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 		// TODO: what if there are no knobs/hotspots?
 		return;
 	}
+
 	throw Exception("handle_click not implemented");
 }
 
 void Object::handle_mesg_activate1(Message msg) {
 	auto* from = g_engine_context.objects->try_get(msg.from);
-	if (pointer_data) {
+	if (as_pointer_tool()) {
 		throw Exception("handle_mesg_activate1 not implemented on pointer");
 	}
-	if (simple_data) {
-		if (from && from->creature_data) {
-			if (call_button_data && (actv == ACTV_ACTIVE1 || actv == ACTV_ACTIVE2)) {
+	if (as_simple_object()) {
+		if (from && from->as_creature()) {
+			if (as_call_button() && (actv == ACTV_ACTIVE1 || actv == ACTV_ACTIVE2)) {
 				return from->creature_stim_disappoint();
 			}
-			if (actv == ACTV_ACTIVE1 || !(simple_data->touch_bhvr & TOUCH_ACTIVATE1)) {
+			if (actv == ACTV_ACTIVE1 || !(as_simple_object()->touch_bhvr & TOUCH_ACTIVATE1)) {
 				return from->creature_stim_disappoint();
 			}
 		}
-		if (call_button_data) {
-			auto* lift = g_engine_context.objects->try_get(call_button_data->lift);
+		if (as_call_button()) {
+			auto* lift = g_engine_context.objects->try_get(as_call_button()->lift);
 			if (!lift) {
 				// whoops, lift doesn't exist
 				printf("WARNING: Tried to activate1 a callbutton with non-existent lift!\n");
 				return;
 			}
-			if (lift->actv == ACTV_INACTIVE && lift->lift_data->next_or_current_floor == call_button_data->floor) {
+			if (lift->actv == ACTV_INACTIVE && lift->as_lift()->next_or_current_floor == as_call_button()->floor) {
 				// already here, don't stim disappointment though
 				return;
 			}
 
 			// tell lift to come here eventually
 			// told the lift to do the thing
-			lift->lift_data->activated_call_buttons.insert(this->uid);
+			lift->as_lift()->activated_call_buttons.insert(this->uid);
 		}
 		actv = ACTV_ACTIVE1;
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
 	}
-	if (compound_data) {
+	if (as_compound_object()) {
 		// TODO: also disappoint and exit early if script doesn't exist
-		if (actv == ACTV_ACTIVE1 || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE1] == -1)) {
+		if (actv == ACTV_ACTIVE1 || (from && from->as_creature() && as_compound_object()->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE1] == -1)) {
 			if (from)
 				from->creature_stim_disappoint();
 			return;
 		}
-		if (lift_data) {
-			if (actv != ACTV_INACTIVE || obv0 != 0 || lift_data->next_or_current_floor + 1 >= lift_data->floors.ssize()) {
+		if (as_lift()) {
+			if (actv != ACTV_INACTIVE || obv0 != 0 || as_lift()->next_or_current_floor + 1 >= as_lift()->floors.ssize()) {
 				// different allowed check, must be ACTV = INACTIVE, OBV0 == 0, and lower floor
 				if (from)
 					from->creature_stim_disappoint();
 				return;
 			}
-			lift_data->next_or_current_floor++;
+			as_lift()->next_or_current_floor++;
 		}
 
 		actv = ACTV_ACTIVE1;
@@ -139,16 +220,16 @@ void Object::handle_mesg_activate1(Message msg) {
 
 void Object::handle_mesg_activate2(Message msg) {
 	auto* from = g_engine_context.objects->try_get(msg.from);
-	if (pointer_data) {
+	if (as_pointer_tool()) {
 		throw Exception("handle_mesg_activate2 not implemented on pointer");
 	}
-	if (call_button_data) {
+	if (as_call_button()) {
 		// Call buttons never activate2, always activate1
 		return handle_mesg_activate1(msg);
 	}
-	if (simple_data) {
-		if (from && from->creature_data) {
-			if (actv == ACTV_ACTIVE2 || !(simple_data->touch_bhvr & TOUCH_ACTIVATE2)) {
+	if (as_simple_object()) {
+		if (from && from->as_creature()) {
+			if (actv == ACTV_ACTIVE2 || !(as_simple_object()->touch_bhvr & TOUCH_ACTIVATE2)) {
 				return from->creature_stim_disappoint();
 			}
 		}
@@ -156,22 +237,22 @@ void Object::handle_mesg_activate2(Message msg) {
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
 	}
-	if (compound_data) {
+	if (as_compound_object()) {
 		// TODO: also disappoint and exit early if script doesn't exist
-		if (actv == ACTV_ACTIVE2 || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE2] == -1)) {
+		if (actv == ACTV_ACTIVE2 || (from && from->as_creature() && as_compound_object()->functions_to_hotspots[HOTSPOT_CREATUREACTIVATE2] == -1)) {
 			if (from)
 				from->creature_stim_disappoint();
 			return;
 		}
-		if (lift_data) {
-			if (actv != ACTV_INACTIVE || obv0 != 0 || lift_data->next_or_current_floor == 0) {
+		if (as_lift()) {
+			if (actv != ACTV_INACTIVE || obv0 != 0 || as_lift()->next_or_current_floor == 0) {
 				// different allowed check, must be ACTV = INACTIVE, OBV0 == 0, and higher floor
 				if (from)
 					from->creature_stim_disappoint();
 				return;
 			}
 			// TODO: maybe set it to ACTV_ACTIVE1 instead?
-			lift_data->next_or_current_floor--;
+			as_lift()->next_or_current_floor--;
 		}
 
 		actv = ACTV_ACTIVE2;
@@ -183,12 +264,12 @@ void Object::handle_mesg_activate2(Message msg) {
 
 void Object::handle_mesg_deactivate(Message msg) {
 	auto* from = g_engine_context.objects->try_get(msg.from);
-	if (pointer_data) {
+	if (as_pointer_tool()) {
 		throw Exception("handle_mesg_deactivate not implemented on pointer");
 	}
-	if (simple_data) {
-		if (from && from->creature_data) {
-			if (actv == ACTV_INACTIVE || !(simple_data->touch_bhvr & TOUCH_DEACTIVATE)) {
+	if (as_simple_object()) {
+		if (from && from->as_creature()) {
+			if (actv == ACTV_INACTIVE || !(as_simple_object()->touch_bhvr & TOUCH_DEACTIVATE)) {
 				return from->creature_stim_disappoint();
 			}
 		}
@@ -197,24 +278,24 @@ void Object::handle_mesg_deactivate(Message msg) {
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_DEACTIVATE);
 		return;
 	}
-	if (compound_data) {
+	if (as_compound_object()) {
 		// TODO: also disappoint and exit early if script doesn't exist
-		if (actv == ACTV_INACTIVE || (from && from->creature_data && compound_data->functions_to_hotspots[HOTSPOT_CREATUREDEACTIVATE] == -1)) {
+		if (actv == ACTV_INACTIVE || (from && from->as_creature() && as_compound_object()->functions_to_hotspots[HOTSPOT_CREATUREDEACTIVATE] == -1)) {
 			if (from)
 				from->creature_stim_disappoint();
 			return;
 		}
-		if (lift_data) {
+		if (as_lift()) {
 			// not allowed!!
 			if (from)
 				from->creature_stim_disappoint();
 			return;
 		}
-		if (vehicle_data) {
+		if (as_vehicle()) {
 			// TODO: truncate fixed point position?
 			// stop!
-			vehicle_data->xvel = 0;
-			vehicle_data->yvel = 0;
+			as_vehicle()->xvel = 0;
+			as_vehicle()->yvel = 0;
 		}
 
 		actv = ACTV_INACTIVE;
@@ -252,7 +333,7 @@ void Object::set_position(float newx, float newy) {
 	}
 
 	// update compound parts
-	if (auto* comp = compound_data.get()) {
+	if (auto* comp = as_compound_object()) {
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			Renderable& p = comp->parts[i].renderable;
 
@@ -311,32 +392,32 @@ Renderable* Object::get_renderable_for_part(int32_t partnum) {
 }
 
 const Renderable* Object::get_renderable_for_part(int32_t partnum) const {
-	if (scenery_data) {
+	if (as_scenery()) {
 		if (partnum == 0) {
-			return &scenery_data->part;
+			return &as_scenery()->part;
 		}
-	} else if (simple_data) {
+	} else if (as_simple_object()) {
 		if (partnum == 0) {
-			return &simple_data->part;
+			return &as_simple_object()->part;
 		}
-	} else if (compound_data) {
+	} else if (as_compound_object()) {
 		auto idx = numeric_cast<uint32_t>(partnum);
-		if (idx >= compound_data->parts.size()) {
+		if (idx >= as_compound_object()->parts.size()) {
 			return {};
 		}
-		return &compound_data->parts[idx].renderable;
+		return &as_compound_object()->parts[idx].renderable;
 	}
 	return nullptr;
 }
 
 void Object::blackboard_show_word(int32_t word_index) {
-	if (word_index < 0 || numeric_cast<size_t>(word_index) >= blackboard_data->words.size()) {
+	if (word_index < 0 || numeric_cast<size_t>(word_index) >= as_blackboard()->words.size()) {
 		throw Exception(fmt::format("Blackboard word index {} out of bounds", word_index));
 	}
-	const auto& word = blackboard_data->words[numeric_cast<size_t>(word_index)];
+	const auto& word = as_blackboard()->words[numeric_cast<size_t>(word_index)];
 
-	int32_t x = get_bbox().x + blackboard_data->text_x_position;
-	const int32_t y = get_bbox().y + blackboard_data->text_y_position;
+	int32_t x = get_bbox().x + as_blackboard()->text_x_position;
+	const int32_t y = get_bbox().y + as_blackboard()->text_y_position;
 	// TODO: What should the actual z-order be? Should this be in a SortingGroup with the
 	// main blackboard part?
 	const int32_t z = get_z_order() + 1;
@@ -347,17 +428,17 @@ void Object::blackboard_show_word(int32_t word_index) {
 
 		auto renderitem = get_rendersystem()->render_item_create(LAYER_OBJECTS);
 		get_rendersystem()->render_item_set_texture(renderitem,
-			blackboard_data->charset_sprite.texture,
-			blackboard_data->charset_sprite.texture_locations[frame]);
+			as_blackboard()->charset_sprite.texture,
+			as_blackboard()->charset_sprite.texture_locations[frame]);
 		get_rendersystem()->render_item_set_position(renderitem, x, y, z);
-		blackboard_data->text_render_items[i] = std::move(renderitem);
+		as_blackboard()->text_render_items[i] = std::move(renderitem);
 
-		x += blackboard_data->charset_sprite.width(numeric_cast<int32_t>(frame)) + 1;
+		x += as_blackboard()->charset_sprite.width(numeric_cast<int32_t>(frame)) + 1;
 	}
 }
 
 void Object::blackboard_hide_word() {
-	blackboard_data->text_render_items = {};
+	as_blackboard()->text_render_items = {};
 }
 
 void Object::blackboard_enable_edit() {
@@ -421,28 +502,28 @@ void Object::tick() {
 	}
 
 	// vehicle position updates
-	if (vehicle_data) {
-		if (lift_data && vehicle_data->yvel != 0) {
-			auto current_cabin_bottom = get_bbox().y + vehicle_data->cabin_bottom;
-			auto next_cabin_bottom = current_cabin_bottom + vehicle_data->yvel;
+	if (as_vehicle()) {
+		if (as_lift() && as_vehicle()->yvel != 0) {
+			auto current_cabin_bottom = get_bbox().y + as_vehicle()->cabin_bottom;
+			auto next_cabin_bottom = current_cabin_bottom + as_vehicle()->yvel;
 
-			auto next_floor_y = lift_data->floors[lift_data->next_or_current_floor];
+			auto next_floor_y = as_lift()->floors[as_lift()->next_or_current_floor];
 
-			if ((vehicle_data->yvel > 0 && next_cabin_bottom >= next_floor_y) || (vehicle_data->yvel < 0 && next_cabin_bottom <= next_floor_y)) {
-				set_position(get_bbox().x + vehicle_data->xvel, next_floor_y - vehicle_data->cabin_bottom);
+			if ((as_vehicle()->yvel > 0 && next_cabin_bottom >= next_floor_y) || (as_vehicle()->yvel < 0 && next_cabin_bottom <= next_floor_y)) {
+				set_position(get_bbox().x + as_vehicle()->xvel, next_floor_y - as_vehicle()->cabin_bottom);
 				// stop!
-				vehicle_data->xvel = 0;
-				vehicle_data->yvel = 0;
+				as_vehicle()->xvel = 0;
+				as_vehicle()->yvel = 0;
 				if (actv != ACTV_INACTIVE) {
 					actv = ACTV_INACTIVE;
 					g_engine_context.macros->queue_script(this, this, SCRIPT_DEACTIVATE);
 				}
-				erase_if(lift_data->activated_call_buttons, [&](auto& cb) {
+				erase_if(as_lift()->activated_call_buttons, [&](auto& cb) {
 					auto call_button = g_engine_context.objects->try_get(cb);
 					if (call_button == nullptr) {
 						return true;
 					}
-					if (call_button->call_button_data->floor == lift_data->next_or_current_floor) {
+					if (call_button->as_call_button()->floor == as_lift()->next_or_current_floor) {
 						call_button->actv = ACTV_INACTIVE;
 						g_engine_context.macros->queue_script(this, call_button, SCRIPT_DEACTIVATE);
 						return true;
@@ -453,27 +534,27 @@ void Object::tick() {
 			}
 		}
 
-		add_position(vehicle_data->xvel, vehicle_data->yvel);
+		add_position(as_vehicle()->xvel, as_vehicle()->yvel);
 	}
 
 	// lift caller updates
-	if (lift_data && actv == ACTV_INACTIVE && obv0 == 0) {
+	if (as_lift() && actv == ACTV_INACTIVE && obv0 == 0) {
 		// any callers?
 
-		auto current_cabin_bottom = get_bbox().y + vehicle_data->cabin_bottom;
+		auto current_cabin_bottom = get_bbox().y + as_vehicle()->cabin_bottom;
 
 		int32_t best_y;
 		int32_t best_floor_id;
 		ObjectHandle best_call_button;
-		erase_if(lift_data->activated_call_buttons, [&](auto& handle) {
+		erase_if(as_lift()->activated_call_buttons, [&](auto& handle) {
 			auto* cb = g_engine_context.objects->try_get(handle);
 			if (cb == nullptr) {
 				return true;
 			}
-			auto& floor = lift_data->floors[cb->call_button_data->floor];
+			auto& floor = as_lift()->floors[cb->as_call_button()->floor];
 			if (!best_call_button || abs(current_cabin_bottom - floor) < abs(current_cabin_bottom - best_y)) {
 				best_y = floor;
-				best_floor_id = numeric_cast<int32_t>(cb->call_button_data->floor);
+				best_floor_id = numeric_cast<int32_t>(cb->as_call_button()->floor);
 				best_call_button = handle;
 			}
 			return false;
@@ -481,11 +562,11 @@ void Object::tick() {
 
 		if (best_call_button) {
 			if (best_y >= current_cabin_bottom) {
-				lift_data->next_or_current_floor = best_floor_id;
+				as_lift()->next_or_current_floor = best_floor_id;
 				actv = ACTV_ACTIVE1;
 				g_engine_context.macros->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE1);
 			} else {
-				lift_data->next_or_current_floor = best_floor_id;
+				as_lift()->next_or_current_floor = best_floor_id;
 				actv = ACTV_ACTIVE2;
 				g_engine_context.macros->queue_script(this->uid, this->uid, SCRIPT_ACTIVATE2);
 			}
@@ -507,13 +588,13 @@ void Object::stim_sign() {
 
 
 void Object::creature_stim_disappoint() {
-	if (creature_data) {
+	if (as_creature()) {
 		printf("WARNING: creature_stim_disappoint not implemented\n");
 	}
 }
 
 void Object::creature_stim_writ() {
-	if (creature_data) {
+	if (as_creature()) {
 		printf("WARNING: creature_stim_writ not implemented\n");
 	}
 }

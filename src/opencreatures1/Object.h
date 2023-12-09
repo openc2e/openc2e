@@ -45,90 +45,16 @@ enum TouchBehaviourFlags : uint8_t {
 	TOUCH_DEACTIVATE = 4
 };
 
-struct SceneryData {
-	Renderable part;
-};
-
-struct SimpleObjectData {
-	Renderable part;
-	int32_t z_order;
-	std::array<int8_t, 3> click_bhvr;
-	uint8_t touch_bhvr;
-};
-
-struct BubbleData {
-	// TODO: implement me
-};
-
-struct CallButtonData {
-	ObjectHandle lift;
-	uint8_t floor;
-};
-
-struct PointerToolData {
-	int32_t relx;
-	int32_t rely;
-	ObjectHandle bubble;
-	std::string text;
-};
-
-struct CompoundPart {
-	Renderable renderable;
-	int32_t x;
-	int32_t y;
-};
-
-enum HotspotFunction {
-	HOTSPOT_CREATUREACTIVATE1,
-	HOTSPOT_CREATUREACTIVATE2,
-	HOTSPOT_CREATUREDEACTIVATE,
-	HOTSPOT_MOUSEACTIVATE1,
-	HOTSPOT_MOUSEACTIVATE2,
-	HOTSPOT_MOUSEDEACTIVATE,
-};
-
-struct CompoundObjectData {
-	std::vector<CompoundPart> parts;
-	std::array<Rect, 6> hotspots;
-	std::array<int32_t, 6> functions_to_hotspots;
-};
-
-struct VehicleData {
-	float xvel;
-	float yvel;
-	int32_t cabin_left;
-	int32_t cabin_top;
-	int32_t cabin_right;
-	int32_t cabin_bottom;
-	uint32_t bump;
-};
-
-struct LiftData {
-	int32_t next_or_current_floor = -1;
-	StaticVector<int32_t, 8> floors;
-	StaticSet<ObjectHandle, 8> activated_call_buttons;
-};
-
-struct BlackboardData {
-	struct BlackboardWord {
-		uint32_t value = 0;
-		std::string text;
-	};
-
-	uint8_t background_color = 0;
-	uint8_t chalk_color = 0;
-	uint8_t alias_color = 0;
-	int8_t text_x_position = 0;
-	int8_t text_y_position = 0;
-	std::array<BlackboardWord, 16> words;
-
-	ImageGallery charset_sprite;
-	std::array<RenderItemHandle, 11> text_render_items;
-};
-
-struct CreatureData {
-	// TODO: implement me
-};
+struct Scenery;
+struct SimpleObject;
+struct Bubble;
+struct CallButton;
+struct PointerTool;
+struct CompoundObject;
+struct Vehicle;
+struct Lift;
+struct Blackboard;
+struct Creature;
 
 class Object {
   public:
@@ -152,19 +78,27 @@ class Object {
 	int32_t obv1;
 	int32_t obv2;
 
-	std::unique_ptr<SceneryData> scenery_data;
+	Scenery* as_scenery();
+	SimpleObject* as_simple_object();
+	Bubble* as_bubble();
+	CallButton* as_call_button();
+	PointerTool* as_pointer_tool();
+	CompoundObject* as_compound_object();
+	Vehicle* as_vehicle();
+	Lift* as_lift();
+	Blackboard* as_blackboard();
+	Creature* as_creature();
 
-	std::unique_ptr<SimpleObjectData> simple_data;
-	std::unique_ptr<PointerToolData> pointer_data;
-	std::unique_ptr<BubbleData> bubble_data;
-	std::unique_ptr<CallButtonData> call_button_data;
-
-	std::unique_ptr<CompoundObjectData> compound_data;
-	std::unique_ptr<VehicleData> vehicle_data;
-	std::unique_ptr<LiftData> lift_data;
-	std::unique_ptr<BlackboardData> blackboard_data;
-
-	std::unique_ptr<CreatureData> creature_data;
+	const Scenery* as_scenery() const;
+	const SimpleObject* as_simple_object() const;
+	const Bubble* as_bubble() const;
+	const CallButton* as_call_button() const;
+	const PointerTool* as_pointer_tool() const;
+	const CompoundObject* as_compound_object() const;
+	const Vehicle* as_vehicle() const;
+	const Lift* as_lift() const;
+	const Blackboard* as_blackboard() const;
+	const Creature* as_creature() const;
 
 	void handle_left_click(int32_t relx, int32_t rely);
 
@@ -201,6 +135,91 @@ class Object {
 	void vehicle_drop_passengers();
 
 	void tick();
+};
+
+struct Scenery : Object {
+	Renderable part;
+};
+
+struct SimpleObject : Object {
+	Renderable part;
+	int32_t z_order;
+	std::array<int8_t, 3> click_bhvr;
+	uint8_t touch_bhvr;
+};
+
+struct Bubble : SimpleObject {
+	// TODO: implement me
+};
+
+struct CallButton : SimpleObject {
+	ObjectHandle lift;
+	uint8_t floor;
+};
+
+struct PointerTool : SimpleObject {
+	int32_t relx;
+	int32_t rely;
+	ObjectHandle bubble;
+	std::string text;
+};
+
+struct CompoundPart {
+	Renderable renderable;
+	int32_t x;
+	int32_t y;
+};
+
+enum HotspotFunction {
+	HOTSPOT_CREATUREACTIVATE1,
+	HOTSPOT_CREATUREACTIVATE2,
+	HOTSPOT_CREATUREDEACTIVATE,
+	HOTSPOT_MOUSEACTIVATE1,
+	HOTSPOT_MOUSEACTIVATE2,
+	HOTSPOT_MOUSEDEACTIVATE,
+};
+
+struct CompoundObject : Object {
+	std::vector<CompoundPart> parts;
+	std::array<Rect, 6> hotspots;
+	std::array<int32_t, 6> functions_to_hotspots;
+};
+
+struct Vehicle : CompoundObject {
+	float xvel;
+	float yvel;
+	int32_t cabin_left;
+	int32_t cabin_top;
+	int32_t cabin_right;
+	int32_t cabin_bottom;
+	uint32_t bump;
+};
+
+struct Lift : Vehicle {
+	int32_t next_or_current_floor = -1;
+	StaticVector<int32_t, 8> floors;
+	StaticSet<ObjectHandle, 8> activated_call_buttons;
+};
+
+struct Blackboard : CompoundObject {
+	struct BlackboardWord {
+		uint32_t value = 0;
+		std::string text;
+	};
+
+	uint8_t background_color = 0;
+	uint8_t chalk_color = 0;
+	uint8_t alias_color = 0;
+	int8_t text_x_position = 0;
+	int8_t text_y_position = 0;
+	std::array<BlackboardWord, 16> words;
+
+	ImageGallery charset_sprite;
+	std::array<RenderItemHandle, 11> text_render_items;
+};
+
+struct Creature : Object {
+	// TODO: implement me
 };
 
 inline std::string repr(const Object& o) {

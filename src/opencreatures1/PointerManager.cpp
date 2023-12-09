@@ -12,8 +12,8 @@ void PointerManager::update() {
 	}
 	Renderable* r = obj->get_renderable_for_part(0);
 	r->set_position(
-		g_engine_context.viewport->window_x_to_world_x(m_screenx) - obj->pointer_data->relx,
-		g_engine_context.viewport->window_y_to_world_y(m_screeny) - obj->pointer_data->rely);
+		g_engine_context.viewport->window_x_to_world_x(m_screenx) - obj->as_pointer_tool()->relx,
+		g_engine_context.viewport->window_y_to_world_y(m_screeny) - obj->as_pointer_tool()->rely);
 }
 
 void PointerManager::handle_event(const BackendEvent& event) {
@@ -35,8 +35,8 @@ void PointerManager::handle_event(const BackendEvent& event) {
 
 		Object* pntr = g_engine_context.objects->try_get(m_pointer_tool);
 		if (pntr) {
-			worldx += pntr->pointer_data->relx;
-			worldy += pntr->pointer_data->rely;
+			worldx += pntr->as_pointer_tool()->relx;
+			worldy += pntr->as_pointer_tool()->rely;
 		}
 
 		fmt::print("click @ {} {}\n", worldx, worldy);
@@ -47,8 +47,8 @@ void PointerManager::handle_event(const BackendEvent& event) {
 		// can start by just iterating all objects, but later on we can optimize
 		// this, ENUM, ESEE, collisions, etc. if we have all of the similar logic
 		// in the same place.
-		for (auto& obj : *g_engine_context.objects) {
-			if (obj->pointer_data) {
+		for (auto* obj : *g_engine_context.objects) {
+			if (obj->as_pointer_tool()) {
 				// pointer can't click on itself
 				continue;
 			}
@@ -62,8 +62,8 @@ void PointerManager::handle_event(const BackendEvent& event) {
 			bool contains_click = (bbox.has_point(worldx, worldy) || bbox.has_point(worldx + CREATURES1_WORLD_WIDTH, worldy) || bbox.has_point(worldx - CREATURES1_WORLD_WIDTH, worldy));
 			bool topmost = (best_object == nullptr || obj->get_z_order() > best_object->get_z_order());
 			if (contains_click && topmost) {
-				fmt::print("found {}\n", repr(obj.get()));
-				best_object = obj.get();
+				fmt::print("found {}\n", repr(obj));
+				best_object = obj;
 			}
 		}
 

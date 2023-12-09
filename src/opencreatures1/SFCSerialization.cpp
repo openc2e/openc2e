@@ -194,16 +194,14 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 	obj->obv2 = p->obv2;
 
 	if (auto* scen = dynamic_cast<const sfc::SceneryV1*>(p)) {
-		obj->scenery_data = std::make_unique<SceneryData>();
-		obj->scenery_data->part = renderable_from_sfc_entity(scen->part.get());
+		obj->as_scenery()->part = renderable_from_sfc_entity(scen->part.get());
 	}
 
 	if (auto* simp = dynamic_cast<const sfc::SimpleObjectV1*>(p)) {
-		obj->simple_data = std::make_unique<SimpleObjectData>();
-		obj->simple_data->part = renderable_from_sfc_entity(simp->part.get());
-		obj->simple_data->z_order = simp->z_order;
-		obj->simple_data->click_bhvr = simp->click_bhvr;
-		obj->simple_data->touch_bhvr = simp->touch_bhvr;
+		obj->as_simple_object()->part = renderable_from_sfc_entity(simp->part.get());
+		obj->as_simple_object()->z_order = simp->z_order;
+		obj->as_simple_object()->click_bhvr = simp->click_bhvr;
+		obj->as_simple_object()->touch_bhvr = simp->touch_bhvr;
 	}
 
 	if (dynamic_cast<const sfc::BubbleV1*>(p)) {
@@ -211,45 +209,41 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 	}
 
 	if (auto* cb = dynamic_cast<const sfc::CallButtonV1*>(p)) {
-		obj->call_button_data = std::make_unique<CallButtonData>();
-		obj->call_button_data->lift = sfc_object_mapping[cb->lift];
-		obj->call_button_data->floor = cb->floor;
+		obj->as_call_button()->lift = sfc_object_mapping[cb->lift];
+		obj->as_call_button()->floor = cb->floor;
 	}
 
 	if (auto* pt = dynamic_cast<const sfc::PointerToolV1*>(p)) {
-		obj->pointer_data = std::make_unique<PointerToolData>();
-		obj->pointer_data->relx = pt->relx;
-		obj->pointer_data->rely = pt->rely;
-		obj->pointer_data->bubble = sfc_object_mapping[pt->bubble];
-		obj->pointer_data->text = pt->text;
+		obj->as_pointer_tool()->relx = pt->relx;
+		obj->as_pointer_tool()->rely = pt->rely;
+		obj->as_pointer_tool()->bubble = sfc_object_mapping[pt->bubble];
+		obj->as_pointer_tool()->text = pt->text;
 		g_engine_context.pointer->m_pointer_tool = handle;
 	}
 
 	if (auto* comp = dynamic_cast<const sfc::CompoundObjectV1*>(p)) {
-		obj->compound_data = std::make_unique<CompoundObjectData>();
 		for (auto& cp : comp->parts) {
-			obj->compound_data->parts.emplace_back();
-			obj->compound_data->parts.back().renderable = renderable_from_sfc_entity(cp.entity.get());
-			obj->compound_data->parts.back().x = cp.x;
-			obj->compound_data->parts.back().y = cp.y;
+			obj->as_compound_object()->parts.emplace_back();
+			obj->as_compound_object()->parts.back().renderable = renderable_from_sfc_entity(cp.entity.get());
+			obj->as_compound_object()->parts.back().x = cp.x;
+			obj->as_compound_object()->parts.back().y = cp.y;
 		}
-		for (size_t i = 0; i < obj->compound_data->hotspots.size(); ++i) {
-			obj->compound_data->hotspots[i].x = comp->hotspots[i].left;
-			obj->compound_data->hotspots[i].y = comp->hotspots[i].top;
-			obj->compound_data->hotspots[i].width = comp->hotspots[i].right - comp->hotspots[i].left;
-			obj->compound_data->hotspots[i].height = comp->hotspots[i].bottom - comp->hotspots[i].top;
+		for (size_t i = 0; i < obj->as_compound_object()->hotspots.size(); ++i) {
+			obj->as_compound_object()->hotspots[i].x = comp->hotspots[i].left;
+			obj->as_compound_object()->hotspots[i].y = comp->hotspots[i].top;
+			obj->as_compound_object()->hotspots[i].width = comp->hotspots[i].right - comp->hotspots[i].left;
+			obj->as_compound_object()->hotspots[i].height = comp->hotspots[i].bottom - comp->hotspots[i].top;
 		}
-		for (size_t i = 0; i < obj->compound_data->functions_to_hotspots.size(); ++i) {
-			obj->compound_data->functions_to_hotspots[i] = comp->functions_to_hotspots[i];
+		for (size_t i = 0; i < obj->as_compound_object()->functions_to_hotspots.size(); ++i) {
+			obj->as_compound_object()->functions_to_hotspots[i] = comp->functions_to_hotspots[i];
 		}
 	}
 
 	if (auto* veh = dynamic_cast<const sfc::VehicleV1*>(p)) {
-		obj->vehicle_data = std::make_unique<VehicleData>();
-		obj->vehicle_data->xvel = veh->xvel_times_256 / 256.f;
-		obj->vehicle_data->yvel = veh->yvel_times_256 / 256.f;
-		auto obj_x = obj->compound_data->parts[0].renderable.get_x();
-		auto obj_y = obj->compound_data->parts[0].renderable.get_y();
+		obj->as_vehicle()->xvel = veh->xvel_times_256 / 256.f;
+		obj->as_vehicle()->yvel = veh->yvel_times_256 / 256.f;
+		auto obj_x = obj->as_compound_object()->parts[0].renderable.get_x();
+		auto obj_y = obj->as_compound_object()->parts[0].renderable.get_y();
 		auto veh_x = veh->x_times_256 / 256.f;
 		auto veh_y = veh->y_times_256 / 256.f;
 		if (obj_x != veh_x || obj_y != veh_y) {
@@ -261,51 +255,49 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 			// multiple load/save cycles whilst activating the buttons. They seem to "shimmy"
 			// up and down (classic floating point issue) and eventually drift after enough
 			// serialization cycles.
-			for (auto& cp : obj->compound_data->parts) {
+			for (auto& cp : obj->as_compound_object()->parts) {
 				cp.renderable.set_position(cp.renderable.get_x() + diff_x, cp.renderable.get_y() + diff_y);
 			}
 		}
-		obj->vehicle_data->cabin_left = veh->cabin_left;
-		obj->vehicle_data->cabin_top = veh->cabin_top;
-		obj->vehicle_data->cabin_right = veh->cabin_right;
-		obj->vehicle_data->cabin_bottom = veh->cabin_bottom;
-		obj->vehicle_data->bump = veh->bump;
+		obj->as_vehicle()->cabin_left = veh->cabin_left;
+		obj->as_vehicle()->cabin_top = veh->cabin_top;
+		obj->as_vehicle()->cabin_right = veh->cabin_right;
+		obj->as_vehicle()->cabin_bottom = veh->cabin_bottom;
+		obj->as_vehicle()->bump = veh->bump;
 	}
 
 	if (auto* lift = dynamic_cast<const sfc::LiftV1*>(p)) {
-		obj->lift_data = std::make_unique<LiftData>();
-		obj->lift_data->next_or_current_floor = lift->next_or_current_floor;
+		obj->as_lift()->next_or_current_floor = lift->next_or_current_floor;
 		// unneeded
-		// obj->lift_data->current_call_button = lift->current_call_button;
+		// obj->as_lift()->current_call_button = lift->current_call_button;
 		// TODO
-		// obj->lift_data->delay_ticks_divided_by_32 = lift->delay_ticks_divided_by_32;
+		// obj->as_lift()->delay_ticks_divided_by_32 = lift->delay_ticks_divided_by_32;
 		if (lift->delay_ticks_divided_by_32 != 0) {
 			fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_32 = {}\n", lift->delay_ticks_divided_by_32);
 		}
 		for (size_t i = 0; i < numeric_cast<size_t>(lift->num_floors); ++i) {
 			// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
-			obj->lift_data->floors.push_back(lift->floors[i]);
+			obj->as_lift()->floors.push_back(lift->floors[i]);
 		}
 		for (auto* cb : lift->activated_call_buttons) {
 			if (auto& handle = sfc_object_mapping[cb]) {
-				obj->lift_data->activated_call_buttons.insert(handle);
+				obj->as_lift()->activated_call_buttons.insert(handle);
 			}
 		}
 	}
 
 	if (auto* bbd = dynamic_cast<const sfc::BlackboardV1*>(p)) {
-		obj->blackboard_data = std::make_unique<BlackboardData>();
-		obj->blackboard_data->background_color = bbd->background_color;
-		obj->blackboard_data->chalk_color = bbd->chalk_color;
-		obj->blackboard_data->alias_color = bbd->alias_color;
-		obj->blackboard_data->text_x_position = bbd->text_x_position;
-		obj->blackboard_data->text_y_position = bbd->text_y_position;
+		obj->as_blackboard()->background_color = bbd->background_color;
+		obj->as_blackboard()->chalk_color = bbd->chalk_color;
+		obj->as_blackboard()->alias_color = bbd->alias_color;
+		obj->as_blackboard()->text_x_position = bbd->text_x_position;
+		obj->as_blackboard()->text_y_position = bbd->text_y_position;
 		for (size_t i = 0; i < bbd->words.size(); ++i) {
 			auto& word = bbd->words[i];
-			obj->blackboard_data->words[i].value = word.value;
-			obj->blackboard_data->words[i].text = word.text;
+			obj->as_blackboard()->words[i].value = word.value;
+			obj->as_blackboard()->words[i].text = word.text;
 		}
-		obj->blackboard_data->charset_sprite = g_engine_context.images->get_charset_dta(bbd->background_color, bbd->chalk_color, bbd->alias_color);
+		obj->as_blackboard()->charset_sprite = g_engine_context.images->get_charset_dta(bbd->background_color, bbd->chalk_color, bbd->alias_color);
 	}
 
 	if (dynamic_cast<const sfc::CreatureV1*>(p)) {
@@ -333,16 +325,44 @@ void SFCLoader::load_objects_and_sceneries() {
 
 	// first, create empty toplevel objects
 	for (const auto& p : sfc.objects) {
-		auto handle = g_engine_context.objects->add();
+		ObjectHandle handle;
+		auto sfc_object = p.get();
+		auto&& sfc_type = typeid(*sfc_object);
+		if (sfc_type == typeid(sfc::SimpleObjectV1)) {
+			handle = g_engine_context.objects->add<SimpleObject>();
+		} else if (sfc_type == typeid(sfc::BubbleV1)) {
+			handle = g_engine_context.objects->add<Bubble>();
+		} else if (sfc_type == typeid(sfc::CallButtonV1)) {
+			handle = g_engine_context.objects->add<CallButton>();
+		} else if (sfc_type == typeid(sfc::PointerToolV1)) {
+			handle = g_engine_context.objects->add<PointerTool>();
+		} else if (sfc_type == typeid(sfc::CompoundObjectV1)) {
+			handle = g_engine_context.objects->add<CompoundObject>();
+		} else if (sfc_type == typeid(sfc::VehicleV1)) {
+			handle = g_engine_context.objects->add<Vehicle>();
+		} else if (sfc_type == typeid(sfc::LiftV1)) {
+			handle = g_engine_context.objects->add<Lift>();
+		} else if (sfc_type == typeid(sfc::BlackboardV1)) {
+			handle = g_engine_context.objects->add<Blackboard>();
+		} else if (sfc_type == typeid(sfc::CreatureV1)) {
+			continue;
+		} else {
+			throw Exception("Unknown object type");
+		}
 		sfc_object_mapping[p.get()] = handle;
 	}
 	for (const auto& p : sfc.sceneries) {
-		auto handle = g_engine_context.objects->add();
+		auto handle = g_engine_context.objects->add<Scenery>();
 		sfc_object_mapping[p.get()] = handle;
 	}
 
 	// second, load data, including cross-object references
 	for (const auto& p : sfc.objects) {
+		auto sfc_object = p.get();
+		auto&& sfc_type = typeid(*sfc_object);
+		if (sfc_type == typeid(sfc::CreatureV1)) {
+			continue;
+		}
 		load_object(p.get());
 	}
 	fmt::print("INFO [SFCLoader] Loaded {} objects\n", sfc.objects.size());
@@ -459,40 +479,40 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 		std::shared_ptr<sfc::ObjectV1> obj;
 		std::shared_ptr<sfc::CGalleryV1> gallery;
 
-		if (p->scenery_data) {
+		if (p->as_scenery()) {
 			auto scen = std::make_shared<sfc::SceneryV1>();
 			sfc_object_mapping[p] = obj = scen;
 
-			auto part = sfc_dump_entity(p->scenery_data->part);
+			auto part = sfc_dump_entity(p->as_scenery()->part);
 			gallery = part->gallery;
 
 			// SceneryV1
 			scen->part = part;
 		}
 
-		else if (p->simple_data) {
+		else if (p->as_simple_object()) {
 			std::shared_ptr<sfc::SimpleObjectV1> simp;
-			if (p->bubble_data) {
+			if (p->as_bubble()) {
 				fmt::print("WARN [SFCWriter] Unsupported type: Bubble\n");
-			} else if (p->call_button_data) {
+			} else if (p->as_call_button()) {
 				auto cbtn = std::make_shared<sfc::CallButtonV1>();
 				sfc_object_mapping[p] = obj = simp = cbtn;
 
 				// CallButtonV1
 				cbtn->lift = dynamic_cast<sfc::LiftV1*>(
-					dump_object(g_engine_context.objects->try_get(p->call_button_data->lift)).get());
-				cbtn->floor = p->call_button_data->floor;
+					dump_object(g_engine_context.objects->try_get(p->as_call_button()->lift)).get());
+				cbtn->floor = p->as_call_button()->floor;
 
-			} else if (p->pointer_data) {
+			} else if (p->as_pointer_tool()) {
 				auto pntr = std::make_shared<sfc::PointerToolV1>();
 				sfc_object_mapping[p] = obj = simp = pntr;
 
 				// PointerToolV1
-				pntr->relx = p->pointer_data->relx;
-				pntr->rely = p->pointer_data->rely;
+				pntr->relx = p->as_pointer_tool()->relx;
+				pntr->rely = p->as_pointer_tool()->rely;
 				pntr->bubble = dynamic_cast<sfc::BubbleV1*>(
-					dump_object(g_engine_context.objects->try_get(p->pointer_data->bubble)).get());
-				pntr->text = p->pointer_data->text;
+					dump_object(g_engine_context.objects->try_get(p->as_pointer_tool()->bubble)).get());
+				pntr->text = p->as_pointer_tool()->text;
 			}
 
 			if (!simp) {
@@ -500,45 +520,45 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 				sfc_object_mapping[p] = obj = simp;
 			}
 
-			auto part = sfc_dump_entity(p->simple_data->part);
+			auto part = sfc_dump_entity(p->as_simple_object()->part);
 			gallery = part->gallery;
 
 			//SimpleObjectV1
 			simp->part = part;
-			simp->z_order = p->simple_data->z_order;
-			simp->click_bhvr = p->simple_data->click_bhvr;
-			simp->touch_bhvr = p->simple_data->touch_bhvr;
+			simp->z_order = p->as_simple_object()->z_order;
+			simp->click_bhvr = p->as_simple_object()->click_bhvr;
+			simp->touch_bhvr = p->as_simple_object()->touch_bhvr;
 		}
 
-		else if (p->compound_data) {
+		else if (p->as_compound_object()) {
 			std::shared_ptr<sfc::CompoundObjectV1> comp;
 
-			if (p->vehicle_data) {
+			if (p->as_vehicle()) {
 				std::shared_ptr<sfc::VehicleV1> veh;
 
-				if (p->lift_data) {
+				if (p->as_lift()) {
 					auto lift = std::make_shared<sfc::LiftV1>();
 					sfc_object_mapping[p] = obj = comp = veh = lift;
 
 					// LiftV1
-					lift->num_floors = numeric_cast<int32_t>(p->lift_data->floors.size());
-					lift->next_or_current_floor = p->lift_data->next_or_current_floor;
+					lift->num_floors = numeric_cast<int32_t>(p->as_lift()->floors.size());
+					lift->next_or_current_floor = p->as_lift()->next_or_current_floor;
 
 					// Would like to do this based on index w/in the serialized array, but
 					// we're not guaranteed to have the CallButtons serialized by this point...
 					// Since CallButtons have a pointer to their parent Lift, we might start
 					// serializing a CallButton and immediately switch to serializing the Lift,
 					// without fleshing out the CallButton struct until the Lift is finished.
-					lift->current_call_button = index_if(p->lift_data->activated_call_buttons, [&](auto& handle) {
+					lift->current_call_button = index_if(p->as_lift()->activated_call_buttons, [&](auto& handle) {
 						auto* cb = g_engine_context.objects->try_get(handle);
-						return cb && cb->call_button_data->floor == lift->next_or_current_floor;
+						return cb && cb->as_call_button()->floor == lift->next_or_current_floor;
 					});
 
 					lift->delay_ticks_divided_by_32 = 0; // TODO
-					for (size_t i = 0; i < p->lift_data->floors.size(); ++i) {
-						lift->floors[i] = p->lift_data->floors[i];
+					for (size_t i = 0; i < p->as_lift()->floors.size(); ++i) {
+						lift->floors[i] = p->as_lift()->floors[i];
 					}
-					for (auto it : enumerate(p->lift_data->activated_call_buttons)) {
+					for (auto it : enumerate(p->as_lift()->activated_call_buttons)) {
 						lift->activated_call_buttons[it.first] = dynamic_cast<sfc::CallButtonV1*>(
 							dump_object(g_engine_context.objects->try_get(it.second)).get());
 					}
@@ -550,29 +570,29 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 				}
 				// VehicleV1
 				// TODO: round or truncate velocity? does it matter?
-				veh->x_times_256 = numeric_cast<int32_t>(p->compound_data->parts[0].renderable.get_x() * 256);
-				veh->y_times_256 = numeric_cast<int32_t>(p->compound_data->parts[0].renderable.get_y() * 256);
-				veh->xvel_times_256 = numeric_cast<int32_t>(p->vehicle_data->xvel * 256);
-				veh->yvel_times_256 = numeric_cast<int32_t>(p->vehicle_data->yvel * 256);
-				veh->cabin_left = p->vehicle_data->cabin_left;
-				veh->cabin_top = p->vehicle_data->cabin_top;
-				veh->cabin_right = p->vehicle_data->cabin_right;
-				veh->cabin_bottom = p->vehicle_data->cabin_bottom;
-				veh->bump = p->vehicle_data->bump;
+				veh->x_times_256 = numeric_cast<int32_t>(p->as_compound_object()->parts[0].renderable.get_x() * 256);
+				veh->y_times_256 = numeric_cast<int32_t>(p->as_compound_object()->parts[0].renderable.get_y() * 256);
+				veh->xvel_times_256 = numeric_cast<int32_t>(p->as_vehicle()->xvel * 256);
+				veh->yvel_times_256 = numeric_cast<int32_t>(p->as_vehicle()->yvel * 256);
+				veh->cabin_left = p->as_vehicle()->cabin_left;
+				veh->cabin_top = p->as_vehicle()->cabin_top;
+				veh->cabin_right = p->as_vehicle()->cabin_right;
+				veh->cabin_bottom = p->as_vehicle()->cabin_bottom;
+				veh->bump = p->as_vehicle()->bump;
 
-			} else if (p->blackboard_data) {
+			} else if (p->as_blackboard()) {
 				auto bbd = std::make_shared<sfc::BlackboardV1>();
 				sfc_object_mapping[p] = obj = comp = bbd;
 
 				// BlackboardV1
-				bbd->background_color = p->blackboard_data->background_color;
-				bbd->chalk_color = p->blackboard_data->chalk_color;
-				bbd->alias_color = p->blackboard_data->alias_color;
-				bbd->text_x_position = p->blackboard_data->text_x_position;
-				bbd->text_y_position = p->blackboard_data->text_y_position;
+				bbd->background_color = p->as_blackboard()->background_color;
+				bbd->chalk_color = p->as_blackboard()->chalk_color;
+				bbd->alias_color = p->as_blackboard()->alias_color;
+				bbd->text_x_position = p->as_blackboard()->text_x_position;
+				bbd->text_y_position = p->as_blackboard()->text_y_position;
 				for (size_t i = 0; i < bbd->words.size(); ++i) {
-					bbd->words[i].value = p->blackboard_data->words[i].value;
-					bbd->words[i].text = p->blackboard_data->words[i].text;
+					bbd->words[i].value = p->as_blackboard()->words[i].value;
+					bbd->words[i].text = p->as_blackboard()->words[i].text;
 				}
 			}
 
@@ -582,7 +602,7 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 			}
 
 			// CompoundObjectV1
-			for (auto& part : p->compound_data->parts) {
+			for (auto& part : p->as_compound_object()->parts) {
 				sfc::CompoundPartV1 sfcpart;
 				sfcpart.entity = sfc_dump_entity(part.renderable);
 				if (!gallery) {
@@ -593,15 +613,15 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 				comp->parts.push_back(sfcpart);
 			}
 			for (size_t i = 0; i < comp->hotspots.size(); ++i) {
-				comp->hotspots[i].left = p->compound_data->hotspots[i].x;
-				comp->hotspots[i].top = p->compound_data->hotspots[i].y;
-				comp->hotspots[i].right = p->compound_data->hotspots[i].right();
-				comp->hotspots[i].bottom = p->compound_data->hotspots[i].bottom();
+				comp->hotspots[i].left = p->as_compound_object()->hotspots[i].x;
+				comp->hotspots[i].top = p->as_compound_object()->hotspots[i].y;
+				comp->hotspots[i].right = p->as_compound_object()->hotspots[i].right();
+				comp->hotspots[i].bottom = p->as_compound_object()->hotspots[i].bottom();
 			}
-			comp->functions_to_hotspots = p->compound_data->functions_to_hotspots;
+			comp->functions_to_hotspots = p->as_compound_object()->functions_to_hotspots;
 		}
 
-		else if (p->creature_data) {
+		else if (p->as_creature()) {
 			fmt::print("WARN [SFCWriter] Unsupported type: Creature\n");
 			return nullptr;
 		}
@@ -632,7 +652,7 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 		// scriptorium anyways?
 		// obj->scripts = p->scripts;
 
-		if (p->scenery_data) {
+		if (p->as_scenery()) {
 			sfc.sceneries.push_back(std::dynamic_pointer_cast<sfc::SceneryV1>(obj));
 		} else {
 			sfc.objects.push_back(obj);
@@ -641,8 +661,8 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 	};
 
 	fmt::print("INFO [SFCWriter] Writing objects and sceneries...\n");
-	for (auto& p : *g_engine_context.objects) {
-		dump_object(p.get());
+	for (auto* p : *g_engine_context.objects) {
+		dump_object(p);
 	}
 
 	fmt::print("INFO [SFCWriter] Writing macros...\n");
