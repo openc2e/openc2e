@@ -436,12 +436,16 @@ void Command_PART(MacroContext& ctx, Macro& m) {
 void Command_POSE(MacroContext& ctx, Macro& m) {
 	ctx.read_arg_separator(m);
 	int32_t pose = ctx.read_int(m);
+	ctx.read_command_separator(m);
+
+	if (ctx.get_targ(m)->creature_data) {
+		printf("WARN called POSE on Creature, not implemented\n");
+		return;
+	}
 
 	auto* renderable = ctx.get_targ_part(m);
 	renderable->clear_animation();
 	renderable->set_pose(pose);
-
-	ctx.read_command_separator(m);
 }
 
 void Command_REPE(MacroContext& ctx, Macro& m) {
@@ -798,6 +802,10 @@ int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_POSE(MacroContext& ctx, Macro& m) {
+	if (ctx.get_targ(m)->creature_data) {
+		printf("WARN called POSE on Creature, not implemented\n");
+		return 0;
+	}
 	return ctx.get_targ_part(m)->get_pose();
 }
 
