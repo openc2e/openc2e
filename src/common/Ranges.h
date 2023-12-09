@@ -157,6 +157,63 @@ auto irange(T start, T end) {
 	return IotaView<T>(start, end);
 }
 
+template <typename Func>
+struct TransformIteratorBase {
+	TransformIteratorBase(const Func& f)
+		: func(f) {}
+	// for empty base class optimization
+	Func func;
+};
+
+template <typename It, typename Func>
+struct TransformIterator : TransformIteratorBase<Func> {
+	TransformIterator(It t, Func f)
+		: TransformIteratorBase<Func>(f), iterator(t) {}
+	decltype(auto) operator*() {
+		return this->func(*iterator);
+	}
+	bool operator==(const TransformIterator& other) const {
+		return iterator == other.iterator;
+	}
+	bool operator!=(const TransformIterator& other) const {
+		return iterator != other.iterator;
+	}
+	auto& operator++() {
+		++iterator;
+		return *this;
+	}
+
+	It iterator;
+};
+
+template <typename Func>
+struct TransformViewBase {
+	TransformViewBase(const Func& f)
+		: func(f) {}
+	// for empty base class optimization
+	Func func;
+};
+
+template <typename Range, typename Func>
+struct TransformView : TransformViewBase<Func> {
+	TransformView(Range& r, const Func& f)
+		: TransformViewBase<Func>(f), range(r) {}
+
+	decltype(auto) begin() {
+		return TransformIterator<decltype(range.begin()), Func>(range.begin(), this->func);
+	}
+	decltype(auto) end() {
+		return TransformIterator<decltype(range.end()), Func>(range.end(), this->func);
+	}
+
+	Range& range;
+};
+
+template <typename R, typename F>
+auto make_transform_view(R&& r, F&& f) {
+	return TransformView<R, F>(std::forward<R>(r), std::forward<F>(f));
+}
+
 template <typename T, typename U>
 struct ZipView {
 	struct iterator {
