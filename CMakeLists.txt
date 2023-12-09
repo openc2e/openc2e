@@ -399,14 +399,10 @@ add_executable(mngplayer2
     src/mngplayer2/mngplayer2.rc
 )
 target_link_libraries(mngplayer2
-	SDL2::SDL2
 	ghc_filesystem
-	imgui
 	nativefiledialog
-	openc2e-fileformats
 	openc2e-mngmusic
 	openc2e_sdlbackend
-	${CMAKE_DL_LIBS}
 )
 if(WIN32)
 	target_link_libraries(mngplayer2 SDL2main)
