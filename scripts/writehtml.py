@@ -118,7 +118,7 @@ for cmd in data["ops"]:
     )
 
 print(
-    """\t</ul><hr />
+    """\t</ul>
 \t<h6>Expressions</h6>
 \t<ul>"""
 )
@@ -136,7 +136,7 @@ for cmd in data["ops"]:
 print('</ul></div><div id="content">')
 for cat in catl:
     print('<div class="category" id="c_{}">'.format(cat["anchor"]))
-    print("<h2>{}</h2><hr/>".format(cat["name"]))
+    print("<h2>{}</h2>".format(cat["name"]))
     for op in cat["ents"]:
         print('<div class="command" id="k_{}">'.format(op["uniquename"]))
         print('<div class="header">')
@@ -145,29 +145,28 @@ for cat in catl:
         for arg in op.get("arguments", []):
             print('<span class="argname">{}</span>'.format(arg["name"]))
             print('<span class="argtype">({})</span>'.format(arg["type"]))
-        print('</div><div class="description">')
-        if op.get("description"):
-            print('<div class="docs">{}</div>'.format(op["description"]))
-        else:
-            print('<div class="nodocs">This command is currently undocumented.</div>')
-        print('</div><div class="status">')
+        print('</div>')
+
         if op["status"] in st_insert:
-            print('<div class="{}">'.format(st_insert[op["status"]][0]))
+            print('<div class="status {}">'.format(st_insert[op["status"]][0]))
             print(st_insert[op["status"]][1])
             print("</div>")
         else:
             print(
-                '<div class="st_wtf">This command has an unknown status tag of {}.'.format(
+                '<div class="status st_wtf">This command has an unknown status tag of {}.'.format(
                     op["status"]
                 )
             )
-            print(
-                "Please beat whoever set that status with a shovel or some other heavy object."
-            )
             print("</div>")
-        print("</div>")
-        print('<div class="administrivia"><ul>')
 
+        print('<div class="description">')
+        if op.get("description"):
+            print('<div class="docs">{}</div>'.format(op["description"]))
+        else:
+            print('<div class="nodocs">This command is currently undocumented.</div>')
+        print('</div>')
+
+        print('<div class="administrivia"><ul>')
         print("<li>Implemented in: {}</li>".format(op["filename"]))
         print(
             "<li>Implementation functions (may be wrong): {}</li>".format(

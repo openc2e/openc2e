@@ -1,5 +1,5 @@
 body {
-    font-family: verdana, arial, helvetica, sans-serif;
+    font-family: sans-serif;
 }
 
 #index li {
@@ -11,9 +11,13 @@ body {
     float: left;
     clear: left;
     font-size: x-small;
-    border: 1px black solid;
+    border: 1px #a2a9b1 solid;
     width: 10em;
-    background: #cee6f8;
+    background: #f6f6f6;
+}
+
+#sidebar ul {
+    padding-left: 2.5em;
 }
 
 #sidebar h6 {
@@ -34,19 +38,20 @@ body {
 }
 
 .command {
-    border-style: groove;
+    border: 1px solid #a2a9b1;
     margin-bottom: 1em;
     margin-left: 8em;
 }
 
 .header {
     border-bottom: groove;
-    background: #f8f8ff;
+    background: #eaecf0;
 }
 
 .cmdname {
-    color: navy;
-    font-size: larger
+    color: #0645ad;
+    font-weight: bold;
+    font-size: larger;
 }
 
 .cmdtype {
@@ -69,8 +74,6 @@ body {
 }
 
 .description {
-    border-bottom: groove;
-    background-color: #f8f8f8;
 }
 
 .administrivia {
@@ -93,19 +96,22 @@ body {
 }
 
 .status {
-    border-bottom: groove;
     font-size: smaller;
 }
 
 
 .st_ok {
-    background-color: #88ff88;
+    border-left: 0.5em solid #88ff88;
 }
 
 .st_todo {
-    background-color: #ff8888;
+    border-left: 0.5em solid #ff8888;
 }
 
 .st_maybe {
-    background-color: #8888ff;
+    border-left: 0.5em solid #8888ff;
+}
+
+.header, .description, .status, .administrivia {
+    padding: 0.2em 0.4em;
 }
