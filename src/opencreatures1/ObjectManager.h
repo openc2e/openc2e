@@ -19,12 +19,17 @@ class ObjectManager {
   public:
 	ObjectManager() {}
 
-	template <typename T, typename = std::enable_if_t<std::is_base_of<Object, T>::value>>
-	ObjectHandle add() {
+	template <typename T>
+	auto add() -> std::enable_if_t<std::is_base_of<Object, T>::value, ObjectHandle> {
 		auto t = new T();
 		ObjectHandle handle = m_pool.add(std::unique_ptr<Object>(t));
 		t->uid = handle;
 		return handle;
+	}
+
+	template <typename T>
+	auto add() -> std::enable_if_t<std::is_pointer<T>::value, ObjectHandle> {
+		return add<std::remove_pointer_t<T>>();
 	}
 
 	Object* try_get(ObjectHandle handle) {

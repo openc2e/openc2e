@@ -27,6 +27,18 @@ struct SFCLoader {
 	void load_scripts();
 	void load_macros();
 
+	void load_object(const sfc::ObjectV1*, Object*);
+	void load_object(const sfc::SceneryV1*, Scenery*);
+	void load_object(const sfc::SimpleObjectV1*, SimpleObject*);
+	void load_object(const sfc::BubbleV1*, Bubble*);
+	void load_object(const sfc::CallButtonV1*, CallButton*);
+	void load_object(const sfc::PointerToolV1*, PointerTool*);
+	void load_object(const sfc::CompoundObjectV1*, CompoundObject*);
+	void load_object(const sfc::VehicleV1*, Vehicle*);
+	void load_object(const sfc::LiftV1*, Lift*);
+	void load_object(const sfc::BlackboardV1*, Blackboard*);
+	void load_object(const sfc::CreatureV1*, Creature*);
+
 	const sfc::SFCFile& sfc;
 	std::map<const sfc::ObjectV1*, ObjectHandle> sfc_object_mapping;
 };
@@ -168,10 +180,7 @@ Renderable SFCLoader::renderable_from_sfc_entity(const sfc::EntityV1* part) {
 	return r;
 }
 
-void SFCLoader::load_object(const sfc::ObjectV1* p) {
-	// get the empty Object mapped to this sfc::ObjectV1
-	auto handle = sfc_object_mapping[p];
-	auto* obj = g_engine_context.objects->try_get(handle);
+void SFCLoader::load_object(const sfc::ObjectV1* p, Object* obj) {
 	obj->species = p->species;
 	obj->genus = p->genus;
 	obj->family = p->family;
@@ -192,120 +201,166 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 	obj->obv0 = p->obv0;
 	obj->obv1 = p->obv1;
 	obj->obv2 = p->obv2;
+}
 
-	if (auto* scen = dynamic_cast<const sfc::SceneryV1*>(p)) {
-		obj->as_scenery()->part = renderable_from_sfc_entity(scen->part.get());
+void SFCLoader::load_object(const sfc::SceneryV1* scen, Scenery* obj) {
+	load_object(static_cast<const sfc::ObjectV1*>(scen), static_cast<Object*>(obj));
+	obj->part = renderable_from_sfc_entity(scen->part.get());
+}
+
+void SFCLoader::load_object(const sfc::SimpleObjectV1* simp, SimpleObject* obj) {
+	load_object(static_cast<const sfc::ObjectV1*>(simp), static_cast<Object*>(obj));
+	obj->part = renderable_from_sfc_entity(simp->part.get());
+	obj->z_order = simp->z_order;
+	obj->click_bhvr = simp->click_bhvr;
+	obj->touch_bhvr = simp->touch_bhvr;
+}
+
+void SFCLoader::load_object(const sfc::BubbleV1* bub, Bubble* obj) {
+	load_object(static_cast<const sfc::SimpleObjectV1*>(bub), static_cast<SimpleObject*>(obj));
+	fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type: Bubble\n", obj->family, obj->genus, obj->species);
+}
+
+void SFCLoader::load_object(const sfc::CallButtonV1* cb, CallButton* obj) {
+	load_object(static_cast<const sfc::SimpleObjectV1*>(cb), static_cast<SimpleObject*>(obj));
+	obj->lift = sfc_object_mapping[cb->lift];
+	obj->floor = cb->floor;
+}
+
+void SFCLoader::load_object(const sfc::PointerToolV1* pt, PointerTool* obj) {
+	load_object(static_cast<const sfc::SimpleObjectV1*>(pt), static_cast<SimpleObject*>(obj));
+	obj->relx = pt->relx;
+	obj->rely = pt->rely;
+	obj->bubble = sfc_object_mapping[pt->bubble];
+	obj->text = pt->text;
+	g_engine_context.pointer->m_pointer_tool = obj->uid;
+}
+
+void SFCLoader::load_object(const sfc::CompoundObjectV1* comp, CompoundObject* obj) {
+	load_object(static_cast<const sfc::ObjectV1*>(comp), static_cast<Object*>(obj));
+
+	for (auto& cp : comp->parts) {
+		obj->parts.emplace_back();
+		obj->parts.back().renderable = renderable_from_sfc_entity(cp.entity.get());
+		obj->parts.back().x = cp.x;
+		obj->parts.back().y = cp.y;
 	}
-
-	if (auto* simp = dynamic_cast<const sfc::SimpleObjectV1*>(p)) {
-		obj->as_simple_object()->part = renderable_from_sfc_entity(simp->part.get());
-		obj->as_simple_object()->z_order = simp->z_order;
-		obj->as_simple_object()->click_bhvr = simp->click_bhvr;
-		obj->as_simple_object()->touch_bhvr = simp->touch_bhvr;
+	for (size_t i = 0; i < obj->hotspots.size(); ++i) {
+		obj->hotspots[i].x = comp->hotspots[i].left;
+		obj->hotspots[i].y = comp->hotspots[i].top;
+		obj->hotspots[i].width = comp->hotspots[i].right - comp->hotspots[i].left;
+		obj->hotspots[i].height = comp->hotspots[i].bottom - comp->hotspots[i].top;
 	}
-
-	if (dynamic_cast<const sfc::BubbleV1*>(p)) {
-		fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type: Bubble\n", obj->family, obj->genus, obj->species);
+	for (size_t i = 0; i < obj->functions_to_hotspots.size(); ++i) {
+		obj->functions_to_hotspots[i] = comp->functions_to_hotspots[i];
 	}
+}
 
-	if (auto* cb = dynamic_cast<const sfc::CallButtonV1*>(p)) {
-		obj->as_call_button()->lift = sfc_object_mapping[cb->lift];
-		obj->as_call_button()->floor = cb->floor;
-	}
+void SFCLoader::load_object(const sfc::VehicleV1* veh, Vehicle* obj) {
+	load_object(static_cast<const sfc::CompoundObjectV1*>(veh), static_cast<CompoundObject*>(obj));
 
-	if (auto* pt = dynamic_cast<const sfc::PointerToolV1*>(p)) {
-		obj->as_pointer_tool()->relx = pt->relx;
-		obj->as_pointer_tool()->rely = pt->rely;
-		obj->as_pointer_tool()->bubble = sfc_object_mapping[pt->bubble];
-		obj->as_pointer_tool()->text = pt->text;
-		g_engine_context.pointer->m_pointer_tool = handle;
-	}
-
-	if (auto* comp = dynamic_cast<const sfc::CompoundObjectV1*>(p)) {
-		for (auto& cp : comp->parts) {
-			obj->as_compound_object()->parts.emplace_back();
-			obj->as_compound_object()->parts.back().renderable = renderable_from_sfc_entity(cp.entity.get());
-			obj->as_compound_object()->parts.back().x = cp.x;
-			obj->as_compound_object()->parts.back().y = cp.y;
-		}
-		for (size_t i = 0; i < obj->as_compound_object()->hotspots.size(); ++i) {
-			obj->as_compound_object()->hotspots[i].x = comp->hotspots[i].left;
-			obj->as_compound_object()->hotspots[i].y = comp->hotspots[i].top;
-			obj->as_compound_object()->hotspots[i].width = comp->hotspots[i].right - comp->hotspots[i].left;
-			obj->as_compound_object()->hotspots[i].height = comp->hotspots[i].bottom - comp->hotspots[i].top;
-		}
-		for (size_t i = 0; i < obj->as_compound_object()->functions_to_hotspots.size(); ++i) {
-			obj->as_compound_object()->functions_to_hotspots[i] = comp->functions_to_hotspots[i];
-		}
-	}
-
-	if (auto* veh = dynamic_cast<const sfc::VehicleV1*>(p)) {
-		obj->as_vehicle()->xvel = veh->xvel_times_256 / 256.f;
-		obj->as_vehicle()->yvel = veh->yvel_times_256 / 256.f;
-		auto obj_x = obj->as_compound_object()->parts[0].renderable.get_x();
-		auto obj_y = obj->as_compound_object()->parts[0].renderable.get_y();
-		auto veh_x = veh->x_times_256 / 256.f;
-		auto veh_y = veh->y_times_256 / 256.f;
-		if (obj_x != veh_x || obj_y != veh_y) {
-			fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} adjusted for VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
-			auto diff_x = veh_x - obj_x;
-			auto diff_y = veh_y - obj_y;
-			// All parts need to be adjusted, not just the main one. If only the main one
-			// changes, things start to get weird — look at the cable car buttons after
-			// multiple load/save cycles whilst activating the buttons. They seem to "shimmy"
-			// up and down (classic floating point issue) and eventually drift after enough
-			// serialization cycles.
-			for (auto& cp : obj->as_compound_object()->parts) {
-				cp.renderable.set_position(cp.renderable.get_x() + diff_x, cp.renderable.get_y() + diff_y);
-			}
-		}
-		obj->as_vehicle()->cabin_left = veh->cabin_left;
-		obj->as_vehicle()->cabin_top = veh->cabin_top;
-		obj->as_vehicle()->cabin_right = veh->cabin_right;
-		obj->as_vehicle()->cabin_bottom = veh->cabin_bottom;
-		obj->as_vehicle()->bump = veh->bump;
-	}
-
-	if (auto* lift = dynamic_cast<const sfc::LiftV1*>(p)) {
-		obj->as_lift()->next_or_current_floor = lift->next_or_current_floor;
-		// unneeded
-		// obj->as_lift()->current_call_button = lift->current_call_button;
-		// TODO
-		// obj->as_lift()->delay_ticks_divided_by_32 = lift->delay_ticks_divided_by_32;
-		if (lift->delay_ticks_divided_by_32 != 0) {
-			fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_32 = {}\n", lift->delay_ticks_divided_by_32);
-		}
-		for (size_t i = 0; i < numeric_cast<size_t>(lift->num_floors); ++i) {
-			// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
-			obj->as_lift()->floors.push_back(lift->floors[i]);
-		}
-		for (auto* cb : lift->activated_call_buttons) {
-			if (auto& handle = sfc_object_mapping[cb]) {
-				obj->as_lift()->activated_call_buttons.insert(handle);
-			}
+	// need the compound parts to already be defined
+	obj->xvel = veh->xvel_times_256 / 256.f;
+	obj->yvel = veh->yvel_times_256 / 256.f;
+	auto obj_x = obj->parts[0].renderable.get_x();
+	auto obj_y = obj->parts[0].renderable.get_y();
+	auto veh_x = veh->x_times_256 / 256.f;
+	auto veh_y = veh->y_times_256 / 256.f;
+	if (obj_x != veh_x || obj_y != veh_y) {
+		fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} adjusted for VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
+		auto diff_x = veh_x - obj_x;
+		auto diff_y = veh_y - obj_y;
+		// All parts need to be adjusted, not just the main one. If only the main one
+		// changes, things start to get weird — look at the cable car buttons after
+		// multiple load/save cycles whilst activating the buttons. They seem to "shimmy"
+		// up and down (classic floating point issue) and eventually drift after enough
+		// serialization cycles.
+		for (auto& cp : obj->parts) {
+			cp.renderable.set_position(cp.renderable.get_x() + diff_x, cp.renderable.get_y() + diff_y);
 		}
 	}
+	obj->cabin_left = veh->cabin_left;
+	obj->cabin_top = veh->cabin_top;
+	obj->cabin_right = veh->cabin_right;
+	obj->cabin_bottom = veh->cabin_bottom;
+	obj->bump = veh->bump;
+}
 
-	if (auto* bbd = dynamic_cast<const sfc::BlackboardV1*>(p)) {
-		obj->as_blackboard()->background_color = bbd->background_color;
-		obj->as_blackboard()->chalk_color = bbd->chalk_color;
-		obj->as_blackboard()->alias_color = bbd->alias_color;
-		obj->as_blackboard()->text_x_position = bbd->text_x_position;
-		obj->as_blackboard()->text_y_position = bbd->text_y_position;
-		for (size_t i = 0; i < bbd->words.size(); ++i) {
-			auto& word = bbd->words[i];
-			obj->as_blackboard()->words[i].value = word.value;
-			obj->as_blackboard()->words[i].text = word.text;
-		}
-		obj->as_blackboard()->charset_sprite = g_engine_context.images->get_charset_dta(bbd->background_color, bbd->chalk_color, bbd->alias_color);
+void SFCLoader::load_object(const sfc::LiftV1* lift, Lift* obj) {
+	load_object(static_cast<const sfc::VehicleV1*>(lift), static_cast<Vehicle*>(obj));
+
+	obj->next_or_current_floor = lift->next_or_current_floor;
+	// unneeded
+	// obj->current_call_button = lift->current_call_button;
+	// TODO
+	// obj->delay_ticks_divided_by_32 = lift->delay_ticks_divided_by_32;
+	if (lift->delay_ticks_divided_by_32 != 0) {
+		fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_32 = {}\n", lift->delay_ticks_divided_by_32);
 	}
+	for (size_t i = 0; i < numeric_cast<size_t>(lift->num_floors); ++i) {
+		// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
+		obj->floors.push_back(lift->floors[i]);
+	}
+	for (auto* cb : lift->activated_call_buttons) {
+		if (auto& handle = sfc_object_mapping[cb]) {
+			obj->activated_call_buttons.insert(handle);
+		}
+	}
+}
 
-	if (dynamic_cast<const sfc::CreatureV1*>(p)) {
-		fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Creature\n", obj->family, obj->genus, obj->species);
+void SFCLoader::load_object(const sfc::BlackboardV1* bbd, Blackboard* obj) {
+	load_object(static_cast<const sfc::CompoundObjectV1*>(bbd), static_cast<CompoundObject*>(obj));
+
+	obj->background_color = bbd->background_color;
+	obj->chalk_color = bbd->chalk_color;
+	obj->alias_color = bbd->alias_color;
+	obj->text_x_position = bbd->text_x_position;
+	obj->text_y_position = bbd->text_y_position;
+	for (size_t i = 0; i < bbd->words.size(); ++i) {
+		auto& word = bbd->words[i];
+		obj->words[i].value = word.value;
+		obj->words[i].text = word.text;
+	}
+	obj->charset_sprite = g_engine_context.images->get_charset_dta(bbd->background_color, bbd->chalk_color, bbd->alias_color);
+}
+
+void SFCLoader::load_object(const sfc::CreatureV1*, Creature* obj) {
+	fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Creature\n", obj->family, obj->genus, obj->species);
+}
+
+void SFCLoader::load_object(const sfc::ObjectV1* p) {
+	// get the empty Object mapped to this sfc::ObjectV1
+	auto handle = sfc_object_mapping[p];
+	auto* obj = g_engine_context.objects->try_get(handle);
+
+	auto&& sfc_type = typeid(*p);
+	if (sfc_type == typeid(sfc::SceneryV1)) {
+		load_object(static_cast<const sfc::SceneryV1*>(p), static_cast<Scenery*>(obj));
+	} else if (sfc_type == typeid(sfc::SimpleObjectV1)) {
+		load_object(static_cast<const sfc::SimpleObjectV1*>(p), static_cast<SimpleObject*>(obj));
+	} else if (sfc_type == typeid(sfc::BubbleV1)) {
+		load_object(static_cast<const sfc::BubbleV1*>(p), static_cast<Bubble*>(obj));
+	} else if (sfc_type == typeid(sfc::CallButtonV1)) {
+		load_object(static_cast<const sfc::CallButtonV1*>(p), static_cast<CallButton*>(obj));
+	} else if (sfc_type == typeid(sfc::PointerToolV1)) {
+		load_object(static_cast<const sfc::PointerToolV1*>(p), static_cast<PointerTool*>(obj));
+	} else if (sfc_type == typeid(sfc::CompoundObjectV1)) {
+		load_object(static_cast<const sfc::CompoundObjectV1*>(p), static_cast<CompoundObject*>(obj));
+	} else if (sfc_type == typeid(sfc::VehicleV1)) {
+		load_object(static_cast<const sfc::VehicleV1*>(p), static_cast<Vehicle*>(obj));
+	} else if (sfc_type == typeid(sfc::LiftV1)) {
+		load_object(static_cast<const sfc::LiftV1*>(p), static_cast<Lift*>(obj));
+	} else if (sfc_type == typeid(sfc::BlackboardV1)) {
+		load_object(static_cast<const sfc::BlackboardV1*>(p), static_cast<Blackboard*>(obj));
+	} else if (sfc_type == typeid(sfc::CreatureV1)) {
+		load_object(static_cast<const sfc::CreatureV1*>(p), static_cast<Creature*>(obj));
+	} else {
+		throw Exception("Unknown object type");
 	}
 
 	// do this _after_ loading the SimpleObject or CompoundObject data,
 	// since only then do we know the object's position / bounding box
+	// TODO: should probably somewhere else? like global initialization after everything's been loaded?
 	if (!p->current_sound.empty()) {
 		// these won't be audible immediately, since the SoundManager thinks
 		// they're out of hearing range. once the game starts and the
