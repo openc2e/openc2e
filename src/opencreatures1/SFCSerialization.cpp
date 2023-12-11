@@ -515,211 +515,217 @@ static std::shared_ptr<sfc::EntityV1> sfc_dump_entity(const Renderable& r) {
 	return entity;
 }
 
-static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
+struct SFCSerializer {
+	std::shared_ptr<sfc::ObjectV1> dump_object(Object*);
+
+	sfc::SFCFile sfc;
+	std::map<Object*, std::shared_ptr<sfc::ObjectV1>> sfc_object_mapping;
+};
+
+std::shared_ptr<sfc::ObjectV1> SFCSerializer::dump_object(Object* p) {
+	if (!p) {
+		return nullptr;
+	}
+
+	auto it = sfc_object_mapping.find(p);
+	if (it != sfc_object_mapping.end()) {
+		// already processed/processing this one
+		return it->second;
+	}
+
+	std::shared_ptr<sfc::ObjectV1> obj;
+	std::shared_ptr<sfc::CGalleryV1> gallery;
+
+	if (p->as_scenery()) {
+		auto scen = std::make_shared<sfc::SceneryV1>();
+		sfc_object_mapping[p] = obj = scen;
+
+		auto part = sfc_dump_entity(p->as_scenery()->part);
+		gallery = part->gallery;
+
+		// SceneryV1
+		scen->part = part;
+	}
+
+	else if (p->as_simple_object()) {
+		std::shared_ptr<sfc::SimpleObjectV1> simp;
+		if (p->as_bubble()) {
+			fmt::print("WARN [SFCWriter] Unsupported type: Bubble\n");
+		} else if (p->as_call_button()) {
+			auto cbtn = std::make_shared<sfc::CallButtonV1>();
+			sfc_object_mapping[p] = obj = simp = cbtn;
+
+			// CallButtonV1
+			cbtn->lift = dynamic_cast<sfc::LiftV1*>(
+				dump_object(g_engine_context.objects->try_get(p->as_call_button()->lift)).get());
+			cbtn->floor = p->as_call_button()->floor;
+
+		} else if (p->as_pointer_tool()) {
+			auto pntr = std::make_shared<sfc::PointerToolV1>();
+			sfc_object_mapping[p] = obj = simp = pntr;
+
+			// PointerToolV1
+			pntr->relx = p->as_pointer_tool()->relx;
+			pntr->rely = p->as_pointer_tool()->rely;
+			pntr->bubble = dynamic_cast<sfc::BubbleV1*>(
+				dump_object(g_engine_context.objects->try_get(p->as_pointer_tool()->bubble)).get());
+			pntr->text = p->as_pointer_tool()->text;
+		}
+
+		if (!simp) {
+			simp = std::make_shared<sfc::SimpleObjectV1>();
+			sfc_object_mapping[p] = obj = simp;
+		}
+
+		auto part = sfc_dump_entity(p->as_simple_object()->part);
+		gallery = part->gallery;
+
+		//SimpleObjectV1
+		simp->part = part;
+		simp->z_order = p->as_simple_object()->z_order;
+		simp->click_bhvr = p->as_simple_object()->click_bhvr;
+		simp->touch_bhvr = p->as_simple_object()->touch_bhvr;
+	}
+
+	else if (p->as_compound_object()) {
+		std::shared_ptr<sfc::CompoundObjectV1> comp;
+
+		if (p->as_vehicle()) {
+			std::shared_ptr<sfc::VehicleV1> veh;
+
+			if (p->as_lift()) {
+				auto lift = std::make_shared<sfc::LiftV1>();
+				sfc_object_mapping[p] = obj = comp = veh = lift;
+
+				// LiftV1
+				lift->num_floors = numeric_cast<int32_t>(p->as_lift()->floors.size());
+				lift->next_or_current_floor = p->as_lift()->next_or_current_floor;
+
+				// Would like to do this based on index w/in the serialized array, but
+				// we're not guaranteed to have the CallButtons serialized by this point...
+				// Since CallButtons have a pointer to their parent Lift, we might start
+				// serializing a CallButton and immediately switch to serializing the Lift,
+				// without fleshing out the CallButton struct until the Lift is finished.
+				lift->current_call_button = index_if(p->as_lift()->activated_call_buttons, [&](auto& handle) {
+					auto* cb = g_engine_context.objects->try_get(handle);
+					return cb && cb->as_call_button()->floor == lift->next_or_current_floor;
+				});
+
+				lift->delay_ticks_divided_by_32 = 0; // TODO
+				for (size_t i = 0; i < p->as_lift()->floors.size(); ++i) {
+					lift->floors[i] = p->as_lift()->floors[i];
+				}
+				for (auto it : enumerate(p->as_lift()->activated_call_buttons)) {
+					lift->activated_call_buttons[it.first] = dynamic_cast<sfc::CallButtonV1*>(
+						dump_object(g_engine_context.objects->try_get(it.second)).get());
+				}
+			}
+
+			if (!veh) {
+				veh = std::make_shared<sfc::VehicleV1>();
+				sfc_object_mapping[p] = obj = comp = veh;
+			}
+			// VehicleV1
+			// TODO: round or truncate velocity? does it matter?
+			veh->x_times_256 = numeric_cast<int32_t>(p->as_compound_object()->parts[0].renderable.get_x() * 256);
+			veh->y_times_256 = numeric_cast<int32_t>(p->as_compound_object()->parts[0].renderable.get_y() * 256);
+			veh->xvel_times_256 = numeric_cast<int32_t>(p->as_vehicle()->xvel * 256);
+			veh->yvel_times_256 = numeric_cast<int32_t>(p->as_vehicle()->yvel * 256);
+			veh->cabin_left = p->as_vehicle()->cabin_left;
+			veh->cabin_top = p->as_vehicle()->cabin_top;
+			veh->cabin_right = p->as_vehicle()->cabin_right;
+			veh->cabin_bottom = p->as_vehicle()->cabin_bottom;
+			veh->bump = p->as_vehicle()->bump;
+
+		} else if (p->as_blackboard()) {
+			auto bbd = std::make_shared<sfc::BlackboardV1>();
+			sfc_object_mapping[p] = obj = comp = bbd;
+
+			// BlackboardV1
+			bbd->background_color = p->as_blackboard()->background_color;
+			bbd->chalk_color = p->as_blackboard()->chalk_color;
+			bbd->alias_color = p->as_blackboard()->alias_color;
+			bbd->text_x_position = p->as_blackboard()->text_x_position;
+			bbd->text_y_position = p->as_blackboard()->text_y_position;
+			for (size_t i = 0; i < bbd->words.size(); ++i) {
+				bbd->words[i].value = p->as_blackboard()->words[i].value;
+				bbd->words[i].text = p->as_blackboard()->words[i].text;
+			}
+		}
+
+		if (!comp) {
+			comp = std::make_shared<sfc::CompoundObjectV1>();
+			sfc_object_mapping[p] = obj = comp;
+		}
+
+		// CompoundObjectV1
+		for (auto& part : p->as_compound_object()->parts) {
+			sfc::CompoundPartV1 sfcpart;
+			sfcpart.entity = sfc_dump_entity(part.renderable);
+			if (!gallery) {
+				gallery = sfcpart.entity->gallery;
+			}
+			sfcpart.x = part.x;
+			sfcpart.y = part.y;
+			comp->parts.push_back(sfcpart);
+		}
+		for (size_t i = 0; i < comp->hotspots.size(); ++i) {
+			comp->hotspots[i].left = p->as_compound_object()->hotspots[i].x;
+			comp->hotspots[i].top = p->as_compound_object()->hotspots[i].y;
+			comp->hotspots[i].right = p->as_compound_object()->hotspots[i].right();
+			comp->hotspots[i].bottom = p->as_compound_object()->hotspots[i].bottom();
+		}
+		comp->functions_to_hotspots = p->as_compound_object()->functions_to_hotspots;
+	}
+
+	else if (p->as_creature()) {
+		fmt::print("WARN [SFCWriter] Unsupported type: Creature\n");
+		return nullptr;
+	}
+
+	// ObjectV1
+	obj->species = p->species;
+	obj->genus = p->genus;
+	obj->family = p->family;
+	obj->movement_status = p->movement_status;
+	obj->attr = p->attr;
+	obj->limit_left = p->limit.x;
+	obj->limit_top = p->limit.y;
+	obj->limit_right = p->limit.right();
+	obj->limit_bottom = p->limit.bottom();
+	obj->carrier = dump_object(g_engine_context.objects->try_get(p->carrier)).get();
+	obj->actv = p->actv;
+	obj->gallery = gallery;
+	obj->tick_value = p->tick_value;
+	obj->ticks_since_last_tick_event = p->ticks_since_last_tick_event;
+	obj->objp = dump_object(g_engine_context.objects->try_get(p->objp)).get();
+	if (p->current_sound.get_looping()) {
+		obj->current_sound = p->current_sound.get_name();
+	}
+	obj->obv0 = p->obv0;
+	obj->obv1 = p->obv1;
+	obj->obv2 = p->obv2;
+	// TODO: I think we can skip scripts here, since they'll be loaded from the global
+	// scriptorium anyways?
+	// obj->scripts = p->scripts;
+
+	if (p->as_scenery()) {
+		sfc.sceneries.push_back(std::dynamic_pointer_cast<sfc::SceneryV1>(obj));
+	} else {
+		sfc.objects.push_back(obj);
+	}
+	return obj;
+};
+
+
+static void sfc_dump_objects_and_sceneries_and_macros(SFCSerializer& ctx) {
 	// so, similarly to _loading_ from the SFC, this is tricky since SFC objects
 	// can encode points to other objects. we keep a map of all ObjectHandles we've
 	// seen so far, and convert ObjectHandles / copy them to the SFCFile on the fly.
 
-	std::map<Object*, std::shared_ptr<sfc::ObjectV1>> sfc_object_mapping;
-	std::function<std::shared_ptr<sfc::ObjectV1>(Object*)> dump_object;
-	dump_object = [&](Object* p) -> std::shared_ptr<sfc::ObjectV1> {
-		if (!p) {
-			return nullptr;
-		}
-
-		auto it = sfc_object_mapping.find(p);
-		if (it != sfc_object_mapping.end()) {
-			// already processed/processing this one
-			return it->second;
-		}
-
-		std::shared_ptr<sfc::ObjectV1> obj;
-		std::shared_ptr<sfc::CGalleryV1> gallery;
-
-		if (p->as_scenery()) {
-			auto scen = std::make_shared<sfc::SceneryV1>();
-			sfc_object_mapping[p] = obj = scen;
-
-			auto part = sfc_dump_entity(p->as_scenery()->part);
-			gallery = part->gallery;
-
-			// SceneryV1
-			scen->part = part;
-		}
-
-		else if (p->as_simple_object()) {
-			std::shared_ptr<sfc::SimpleObjectV1> simp;
-			if (p->as_bubble()) {
-				fmt::print("WARN [SFCWriter] Unsupported type: Bubble\n");
-			} else if (p->as_call_button()) {
-				auto cbtn = std::make_shared<sfc::CallButtonV1>();
-				sfc_object_mapping[p] = obj = simp = cbtn;
-
-				// CallButtonV1
-				cbtn->lift = dynamic_cast<sfc::LiftV1*>(
-					dump_object(g_engine_context.objects->try_get(p->as_call_button()->lift)).get());
-				cbtn->floor = p->as_call_button()->floor;
-
-			} else if (p->as_pointer_tool()) {
-				auto pntr = std::make_shared<sfc::PointerToolV1>();
-				sfc_object_mapping[p] = obj = simp = pntr;
-
-				// PointerToolV1
-				pntr->relx = p->as_pointer_tool()->relx;
-				pntr->rely = p->as_pointer_tool()->rely;
-				pntr->bubble = dynamic_cast<sfc::BubbleV1*>(
-					dump_object(g_engine_context.objects->try_get(p->as_pointer_tool()->bubble)).get());
-				pntr->text = p->as_pointer_tool()->text;
-			}
-
-			if (!simp) {
-				simp = std::make_shared<sfc::SimpleObjectV1>();
-				sfc_object_mapping[p] = obj = simp;
-			}
-
-			auto part = sfc_dump_entity(p->as_simple_object()->part);
-			gallery = part->gallery;
-
-			//SimpleObjectV1
-			simp->part = part;
-			simp->z_order = p->as_simple_object()->z_order;
-			simp->click_bhvr = p->as_simple_object()->click_bhvr;
-			simp->touch_bhvr = p->as_simple_object()->touch_bhvr;
-		}
-
-		else if (p->as_compound_object()) {
-			std::shared_ptr<sfc::CompoundObjectV1> comp;
-
-			if (p->as_vehicle()) {
-				std::shared_ptr<sfc::VehicleV1> veh;
-
-				if (p->as_lift()) {
-					auto lift = std::make_shared<sfc::LiftV1>();
-					sfc_object_mapping[p] = obj = comp = veh = lift;
-
-					// LiftV1
-					lift->num_floors = numeric_cast<int32_t>(p->as_lift()->floors.size());
-					lift->next_or_current_floor = p->as_lift()->next_or_current_floor;
-
-					// Would like to do this based on index w/in the serialized array, but
-					// we're not guaranteed to have the CallButtons serialized by this point...
-					// Since CallButtons have a pointer to their parent Lift, we might start
-					// serializing a CallButton and immediately switch to serializing the Lift,
-					// without fleshing out the CallButton struct until the Lift is finished.
-					lift->current_call_button = index_if(p->as_lift()->activated_call_buttons, [&](auto& handle) {
-						auto* cb = g_engine_context.objects->try_get(handle);
-						return cb && cb->as_call_button()->floor == lift->next_or_current_floor;
-					});
-
-					lift->delay_ticks_divided_by_32 = 0; // TODO
-					for (size_t i = 0; i < p->as_lift()->floors.size(); ++i) {
-						lift->floors[i] = p->as_lift()->floors[i];
-					}
-					for (auto it : enumerate(p->as_lift()->activated_call_buttons)) {
-						lift->activated_call_buttons[it.first] = dynamic_cast<sfc::CallButtonV1*>(
-							dump_object(g_engine_context.objects->try_get(it.second)).get());
-					}
-				}
-
-				if (!veh) {
-					veh = std::make_shared<sfc::VehicleV1>();
-					sfc_object_mapping[p] = obj = comp = veh;
-				}
-				// VehicleV1
-				// TODO: round or truncate velocity? does it matter?
-				veh->x_times_256 = numeric_cast<int32_t>(p->as_compound_object()->parts[0].renderable.get_x() * 256);
-				veh->y_times_256 = numeric_cast<int32_t>(p->as_compound_object()->parts[0].renderable.get_y() * 256);
-				veh->xvel_times_256 = numeric_cast<int32_t>(p->as_vehicle()->xvel * 256);
-				veh->yvel_times_256 = numeric_cast<int32_t>(p->as_vehicle()->yvel * 256);
-				veh->cabin_left = p->as_vehicle()->cabin_left;
-				veh->cabin_top = p->as_vehicle()->cabin_top;
-				veh->cabin_right = p->as_vehicle()->cabin_right;
-				veh->cabin_bottom = p->as_vehicle()->cabin_bottom;
-				veh->bump = p->as_vehicle()->bump;
-
-			} else if (p->as_blackboard()) {
-				auto bbd = std::make_shared<sfc::BlackboardV1>();
-				sfc_object_mapping[p] = obj = comp = bbd;
-
-				// BlackboardV1
-				bbd->background_color = p->as_blackboard()->background_color;
-				bbd->chalk_color = p->as_blackboard()->chalk_color;
-				bbd->alias_color = p->as_blackboard()->alias_color;
-				bbd->text_x_position = p->as_blackboard()->text_x_position;
-				bbd->text_y_position = p->as_blackboard()->text_y_position;
-				for (size_t i = 0; i < bbd->words.size(); ++i) {
-					bbd->words[i].value = p->as_blackboard()->words[i].value;
-					bbd->words[i].text = p->as_blackboard()->words[i].text;
-				}
-			}
-
-			if (!comp) {
-				comp = std::make_shared<sfc::CompoundObjectV1>();
-				sfc_object_mapping[p] = obj = comp;
-			}
-
-			// CompoundObjectV1
-			for (auto& part : p->as_compound_object()->parts) {
-				sfc::CompoundPartV1 sfcpart;
-				sfcpart.entity = sfc_dump_entity(part.renderable);
-				if (!gallery) {
-					gallery = sfcpart.entity->gallery;
-				}
-				sfcpart.x = part.x;
-				sfcpart.y = part.y;
-				comp->parts.push_back(sfcpart);
-			}
-			for (size_t i = 0; i < comp->hotspots.size(); ++i) {
-				comp->hotspots[i].left = p->as_compound_object()->hotspots[i].x;
-				comp->hotspots[i].top = p->as_compound_object()->hotspots[i].y;
-				comp->hotspots[i].right = p->as_compound_object()->hotspots[i].right();
-				comp->hotspots[i].bottom = p->as_compound_object()->hotspots[i].bottom();
-			}
-			comp->functions_to_hotspots = p->as_compound_object()->functions_to_hotspots;
-		}
-
-		else if (p->as_creature()) {
-			fmt::print("WARN [SFCWriter] Unsupported type: Creature\n");
-			return nullptr;
-		}
-
-		// ObjectV1
-		obj->species = p->species;
-		obj->genus = p->genus;
-		obj->family = p->family;
-		obj->movement_status = p->movement_status;
-		obj->attr = p->attr;
-		obj->limit_left = p->limit.x;
-		obj->limit_top = p->limit.y;
-		obj->limit_right = p->limit.right();
-		obj->limit_bottom = p->limit.bottom();
-		obj->carrier = dump_object(g_engine_context.objects->try_get(p->carrier)).get();
-		obj->actv = p->actv;
-		obj->gallery = gallery;
-		obj->tick_value = p->tick_value;
-		obj->ticks_since_last_tick_event = p->ticks_since_last_tick_event;
-		obj->objp = dump_object(g_engine_context.objects->try_get(p->objp)).get();
-		if (p->current_sound.get_looping()) {
-			obj->current_sound = p->current_sound.get_name();
-		}
-		obj->obv0 = p->obv0;
-		obj->obv1 = p->obv1;
-		obj->obv2 = p->obv2;
-		// TODO: I think we can skip scripts here, since they'll be loaded from the global
-		// scriptorium anyways?
-		// obj->scripts = p->scripts;
-
-		if (p->as_scenery()) {
-			sfc.sceneries.push_back(std::dynamic_pointer_cast<sfc::SceneryV1>(obj));
-		} else {
-			sfc.objects.push_back(obj);
-		}
-		return obj;
-	};
-
 	fmt::print("INFO [SFCWriter] Writing objects and sceneries...\n");
 	for (auto* p : *g_engine_context.objects) {
-		dump_object(p);
+		ctx.dump_object(p);
 	}
 
 	fmt::print("INFO [SFCWriter] Writing macros...\n");
@@ -734,11 +740,11 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 		}
 		mac->sp = numeric_cast<uint32_t>(m.stack.size());
 		mac->vars = m.vars;
-		mac->ownr = dump_object(g_engine_context.objects->try_get(m.ownr)).get();
-		mac->from = dump_object(g_engine_context.objects->try_get(m.from)).get();
-		mac->exec = dump_object(g_engine_context.objects->try_get(m.exec)).get();
-		mac->targ = dump_object(g_engine_context.objects->try_get(m.targ)).get();
-		mac->_it_ = dump_object(g_engine_context.objects->try_get(m._it_)).get();
+		mac->ownr = ctx.dump_object(g_engine_context.objects->try_get(m.ownr)).get();
+		mac->from = ctx.dump_object(g_engine_context.objects->try_get(m.from)).get();
+		mac->exec = ctx.dump_object(g_engine_context.objects->try_get(m.exec)).get();
+		mac->targ = ctx.dump_object(g_engine_context.objects->try_get(m.targ)).get();
+		mac->_it_ = ctx.dump_object(g_engine_context.objects->try_get(m._it_)).get();
 		mac->part = m.part;
 		mac->subroutine_label = m.subroutine_label;
 		mac->subroutine_address = m.subroutine_address;
@@ -751,23 +757,24 @@ static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 			printf("ERROR [SFCWriter] Macro.enum_result unsupported\n");
 		}
 
-		sfc.macros.push_back(mac);
+		ctx.sfc.macros.push_back(mac);
 	}
 }
 
 sfc::SFCFile sfc_dump_everything() {
-	sfc::SFCFile sfc;
-	fmt::print("INFO [SFCWriter] Writing map...\n");
-	sfc.map = sfc_dump_map();
+	SFCSerializer ctx;
 
-	sfc_dump_objects_and_sceneries_and_macros(sfc);
+	fmt::print("INFO [SFCWriter] Writing map...\n");
+	ctx.sfc.map = sfc_dump_map();
+
+	sfc_dump_objects_and_sceneries_and_macros(ctx);
 
 	fmt::print("INFO [SFCWriter] Writing scriptorium...\n");
-	sfc_dump_scripts(sfc);
+	sfc_dump_scripts(ctx.sfc);
 
 	fmt::print("INFO [SFCWriter] Writing viewport...\n");
-	sfc.scrollx = g_engine_context.viewport->get_scrollx();
-	sfc.scrolly = g_engine_context.viewport->get_scrolly();
+	ctx.sfc.scrollx = g_engine_context.viewport->get_scrollx();
+	ctx.sfc.scrolly = g_engine_context.viewport->get_scrolly();
 
-	return sfc;
+	return ctx.sfc;
 }
