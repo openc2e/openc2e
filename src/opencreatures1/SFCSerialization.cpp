@@ -22,7 +22,7 @@ struct SFCLoader {
 	void load_viewport();
 	void load_map();
 	void load_objects_and_sceneries();
-	void load_object(const sfc::ObjectV1* p);
+	ObjectHandle load_object(const sfc::ObjectV1* p);
 	Renderable renderable_from_sfc_entity(const sfc::EntityV1* part);
 	void load_scripts();
 	void load_macros();
@@ -190,14 +190,14 @@ void SFCLoader::load_object(const sfc::ObjectV1* p, Object* obj) {
 	obj->limit.y = p->limit_top;
 	obj->limit.width = p->limit_right - p->limit_left;
 	obj->limit.height = p->limit_bottom - p->limit_top;
-	obj->carrier = sfc_object_mapping[p->carrier];
+	obj->carrier = load_object(p->carrier);
 	obj->actv = ActiveFlag(p->actv);
 	// creaturesImage sprite;
 	obj->tick_value = p->tick_value;
 	obj->ticks_since_last_tick_event = p->ticks_since_last_tick_event;
 	// Set the sound later, once we've loaded the object's position from its Entities
 	// obj->current_sound = p->current_sound;
-	obj->objp = sfc_object_mapping[p->objp];
+	obj->objp = load_object(p->objp);
 	obj->obv0 = p->obv0;
 	obj->obv1 = p->obv1;
 	obj->obv2 = p->obv2;
@@ -223,7 +223,7 @@ void SFCLoader::load_object(const sfc::BubbleV1* bub, Bubble* obj) {
 
 void SFCLoader::load_object(const sfc::CallButtonV1* cb, CallButton* obj) {
 	load_object(static_cast<const sfc::SimpleObjectV1*>(cb), static_cast<SimpleObject*>(obj));
-	obj->lift = sfc_object_mapping[cb->lift];
+	obj->lift = load_object(cb->lift);
 	obj->floor = cb->floor;
 }
 
@@ -231,7 +231,7 @@ void SFCLoader::load_object(const sfc::PointerToolV1* pt, PointerTool* obj) {
 	load_object(static_cast<const sfc::SimpleObjectV1*>(pt), static_cast<SimpleObject*>(obj));
 	obj->relx = pt->relx;
 	obj->rely = pt->rely;
-	obj->bubble = sfc_object_mapping[pt->bubble];
+	obj->bubble = load_object(pt->bubble);
 	obj->text = pt->text;
 	g_engine_context.pointer->m_pointer_tool = obj->uid;
 }
@@ -302,7 +302,7 @@ void SFCLoader::load_object(const sfc::LiftV1* lift, Lift* obj) {
 		obj->floors.push_back(lift->floors[i]);
 	}
 	for (auto* cb : lift->activated_call_buttons) {
-		if (auto& handle = sfc_object_mapping[cb]) {
+		if (auto&& handle = load_object(cb)) {
 			obj->activated_call_buttons.insert(handle);
 		}
 	}
@@ -328,12 +328,49 @@ void SFCLoader::load_object(const sfc::CreatureV1*, Creature* obj) {
 	fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Creature\n", obj->family, obj->genus, obj->species);
 }
 
-void SFCLoader::load_object(const sfc::ObjectV1* p) {
-	// get the empty Object mapped to this sfc::ObjectV1
-	auto handle = sfc_object_mapping[p];
+ObjectHandle SFCLoader::load_object(const sfc::ObjectV1* p) {
+	// null pointer?
+	if (p == nullptr) {
+		return {};
+	}
+
+	// has it been created yet?
+	auto it = sfc_object_mapping.find(p);
+	if (it != sfc_object_mapping.end()) {
+		return it->second;
+	}
+
+	// do the type mapping game
+	// TODO: ugh
+	ObjectHandle handle;
+	auto&& sfc_type = typeid(*p);
+	if (sfc_type == typeid(sfc::SceneryV1)) {
+		handle = g_engine_context.objects->add<Scenery>();
+	} else if (sfc_type == typeid(sfc::SimpleObjectV1)) {
+		handle = g_engine_context.objects->add<SimpleObject>();
+	} else if (sfc_type == typeid(sfc::BubbleV1)) {
+		handle = g_engine_context.objects->add<Bubble>();
+	} else if (sfc_type == typeid(sfc::CallButtonV1)) {
+		handle = g_engine_context.objects->add<CallButton>();
+	} else if (sfc_type == typeid(sfc::PointerToolV1)) {
+		handle = g_engine_context.objects->add<PointerTool>();
+	} else if (sfc_type == typeid(sfc::CompoundObjectV1)) {
+		handle = g_engine_context.objects->add<CompoundObject>();
+	} else if (sfc_type == typeid(sfc::VehicleV1)) {
+		handle = g_engine_context.objects->add<Vehicle>();
+	} else if (sfc_type == typeid(sfc::LiftV1)) {
+		handle = g_engine_context.objects->add<Lift>();
+	} else if (sfc_type == typeid(sfc::BlackboardV1)) {
+		handle = g_engine_context.objects->add<Blackboard>();
+	} else if (sfc_type == typeid(sfc::CreatureV1)) {
+		handle = g_engine_context.objects->add<Creature>();
+	} else {
+		throw Exception("Unknown object type");
+	}
+
+	sfc_object_mapping[p] = handle;
 	auto* obj = g_engine_context.objects->try_get(handle);
 
-	auto&& sfc_type = typeid(*p);
 	if (sfc_type == typeid(sfc::SceneryV1)) {
 		load_object(static_cast<const sfc::SceneryV1*>(p), static_cast<Scenery*>(obj));
 	} else if (sfc_type == typeid(sfc::SimpleObjectV1)) {
@@ -367,51 +404,16 @@ void SFCLoader::load_object(const sfc::ObjectV1* p) {
 		// listener viewport gets set these will start being audible.
 		obj->current_sound = g_engine_context.sounds->play_controlled_sound(p->current_sound, obj->get_bbox(), true);
 	}
+
+	return handle;
 }
 
 void SFCLoader::load_objects_and_sceneries() {
 	// this part's a little tricky, since SFC objects can encode pointers to other
-	// objects. we handle this by loading all objects empty first, and then do a
-	// second pass where we actual fill in data — including remapping the pointers
-	// to the newly created objects.
-	// (as an alternative, we could try to do this in a depth-first style, where
-	// loading an object also loads objects it has pointers to. we would still need
-	// the mapping to fix up later pointers.)
-
-	// first, create empty toplevel objects
-	for (const auto& p : sfc.objects) {
-		ObjectHandle handle;
-		auto sfc_object = p.get();
-		auto&& sfc_type = typeid(*sfc_object);
-		if (sfc_type == typeid(sfc::SimpleObjectV1)) {
-			handle = g_engine_context.objects->add<SimpleObject>();
-		} else if (sfc_type == typeid(sfc::BubbleV1)) {
-			handle = g_engine_context.objects->add<Bubble>();
-		} else if (sfc_type == typeid(sfc::CallButtonV1)) {
-			handle = g_engine_context.objects->add<CallButton>();
-		} else if (sfc_type == typeid(sfc::PointerToolV1)) {
-			handle = g_engine_context.objects->add<PointerTool>();
-		} else if (sfc_type == typeid(sfc::CompoundObjectV1)) {
-			handle = g_engine_context.objects->add<CompoundObject>();
-		} else if (sfc_type == typeid(sfc::VehicleV1)) {
-			handle = g_engine_context.objects->add<Vehicle>();
-		} else if (sfc_type == typeid(sfc::LiftV1)) {
-			handle = g_engine_context.objects->add<Lift>();
-		} else if (sfc_type == typeid(sfc::BlackboardV1)) {
-			handle = g_engine_context.objects->add<Blackboard>();
-		} else if (sfc_type == typeid(sfc::CreatureV1)) {
-			continue;
-		} else {
-			throw Exception("Unknown object type");
-		}
-		sfc_object_mapping[p.get()] = handle;
-	}
-	for (const auto& p : sfc.sceneries) {
-		auto handle = g_engine_context.objects->add<Scenery>();
-		sfc_object_mapping[p.get()] = handle;
-	}
-
-	// second, load data, including cross-object references
+	// objects. we keep a map of all sfc::ObjectV1* pointers we've seen so far, and
+	// convert new pointers / load actual Objects on the fly. (note that references
+	// can be cyclical, so the map must also keep a list of all pointers _in the process_
+	// of being loaded.)
 	for (const auto& p : sfc.objects) {
 		auto sfc_object = p.get();
 		auto&& sfc_type = typeid(*sfc_object);
@@ -456,11 +458,11 @@ void SFCLoader::load_macros() {
 			macro.stack.push_back(m->stack[i]);
 		}
 		macro.vars = m->vars;
-		macro.ownr = sfc_object_mapping[m->ownr];
-		macro.from = sfc_object_mapping[m->from];
-		macro.exec = sfc_object_mapping[m->exec];
-		macro.targ = sfc_object_mapping[m->targ];
-		macro._it_ = sfc_object_mapping[m->_it_];
+		macro.ownr = load_object(m->ownr);
+		macro.from = load_object(m->from);
+		macro.exec = load_object(m->exec);
+		macro.targ = load_object(m->targ);
+		macro._it_ = load_object(m->_it_);
 		macro.part = m->part;
 		macro.subroutine_label = m->subroutine_label;
 		macro.subroutine_address = m->subroutine_address;
@@ -516,7 +518,7 @@ static std::shared_ptr<sfc::EntityV1> sfc_dump_entity(const Renderable& r) {
 static void sfc_dump_objects_and_sceneries_and_macros(sfc::SFCFile& sfc) {
 	// so, similarly to _loading_ from the SFC, this is tricky since SFC objects
 	// can encode points to other objects. we keep a map of all ObjectHandles we've
-	// so far, and convert ObjectHandles / copy them to the SFCFile on the fly.
+	// seen so far, and convert ObjectHandles / copy them to the SFCFile on the fly.
 
 	std::map<Object*, std::shared_ptr<sfc::ObjectV1>> sfc_object_mapping;
 	std::function<std::shared_ptr<sfc::ObjectV1>(Object*)> dump_object;
