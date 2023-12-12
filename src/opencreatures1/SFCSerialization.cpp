@@ -175,12 +175,14 @@ static Renderable sfc_load_renderable(const sfc::EntityV1* part) {
 	return r;
 }
 
-static std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r) {
-	// TODO: gallery should at least be shared between all parts on an object?
-	auto gallery = sfc_dump_gallery(r.get_gallery());
-
+static std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r, const std::shared_ptr<sfc::CGalleryV1>& gallery = {}) {
 	auto entity = std::make_shared<sfc::EntityV1>();
-	entity->gallery = gallery;
+	if (gallery) {
+		// so we can share gallery between all parts on a compound object / creature
+		entity->gallery = gallery;
+	} else {
+		entity->gallery = sfc_dump_gallery(r.get_gallery());
+	}
 	entity->sprite_pose_plus_base = numeric_cast<uint8_t>(r.get_pose() + r.get_base());
 	entity->sprite_base = numeric_cast<uint8_t>(r.get_base());
 	entity->z_order = r.get_z_order();
@@ -333,7 +335,7 @@ static void serialize_object(Ctx&& ctx, sfc::CompoundObjectV1* comp, CompoundObj
 	if (ctx.is_storing()) {
 		for (auto& part : obj->parts) {
 			sfc::CompoundPartV1 sfcpart;
-			sfcpart.entity = sfc_dump_renderable(part.renderable);
+			sfcpart.entity = sfc_dump_renderable(part.renderable, comp->gallery);
 			if (!comp->gallery) {
 				comp->gallery = sfcpart.entity->gallery;
 			}
