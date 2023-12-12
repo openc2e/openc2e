@@ -427,7 +427,7 @@ target_link_libraries(spritedumper openc2e-fileformats ghc_filesystem)
 add_executable(translate_voice
 	src/tools/translate_voice.cpp
 )
-target_link_libraries(translate_voice openc2e-fileformats openc2e-common openc2e_core openc2e_sdlbackend ghc_filesystem)
+target_link_libraries(translate_voice openc2e-common openc2e_core openc2e_sdlbackend ghc_filesystem)
 
 # tests
 enable_testing()
