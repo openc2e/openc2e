@@ -277,6 +277,16 @@ static void serialize_object(Ctx&& ctx, sfc::ObjectV1* p, Object* obj) {
 		obj->obv0 = p->obv0;
 		obj->obv1 = p->obv1;
 		obj->obv2 = p->obv2;
+
+		// do this _after_ loading the SimpleObject or CompoundObject data,
+		// since only then do we know the object's position / bounding box
+		// TODO: should probably somewhere else? like global initialization after everything's been loaded?
+		if (!p->current_sound.empty()) {
+			// these won't be audible immediately, since the SoundManager thinks
+			// they're out of hearing range. once the game starts and the
+			// listener viewport gets set these will start being audible.
+			obj->current_sound = g_engine_context.sounds->play_controlled_sound(p->current_sound, obj->get_bbox(), true);
+		}
 	}
 }
 
@@ -531,16 +541,6 @@ static bool create_engine_object(SFCLoader* ctx, sfc::ObjectV1* p) {
 	ctx->sfc_object_mapping[p] = handle;
 	auto* obj = g_engine_context.objects->try_get(handle);
 	serialize_object(*ctx, static_cast<T*>(p), static_cast<U*>(obj));
-
-	// do this _after_ loading the SimpleObject or CompoundObject data,
-	// since only then do we know the object's position / bounding box
-	// TODO: should probably somewhere else? like global initialization after everything's been loaded?
-	if (!p->current_sound.empty()) {
-		// these won't be audible immediately, since the SoundManager thinks
-		// they're out of hearing range. once the game starts and the
-		// listener viewport gets set these will start being audible.
-		obj->current_sound = g_engine_context.sounds->play_controlled_sound(p->current_sound, obj->get_bbox(), true);
-	}
 	return true;
 }
 
