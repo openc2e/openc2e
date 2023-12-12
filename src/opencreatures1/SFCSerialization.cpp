@@ -164,7 +164,25 @@ static std::shared_ptr<sfc::MapDataV1> sfc_dump_map() {
 	return map;
 }
 
-static Renderable renderable_from_sfc_entity(const sfc::EntityV1* part) {
+static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gallery) {
+	auto sfc = std::make_shared<sfc::CGalleryV1>();
+	sfc->filename = gallery.name;
+	sfc->absolute_base = gallery.absolute_base;
+	sfc->refcount = 1; // TODO
+	sfc->images.resize(numeric_cast<size_t>(gallery.size()));
+
+	for (size_t i = 0; i < sfc->images.size(); ++i) {
+		auto& img = sfc->images[i];
+		img.parent = sfc.get();
+		img.status = 0; // seems to work???
+		img.width = gallery.width(numeric_cast<int32_t>(i));
+		img.height = gallery.height(numeric_cast<int32_t>(i));
+		img.offset = gallery.offsets[i];
+	}
+	return sfc;
+}
+
+static Renderable sfc_load_renderable(const sfc::EntityV1* part) {
 	if (part->x >= CREATURES1_WORLD_WIDTH) {
 		throw Exception(fmt::format("Expected x to be between [0, {}), but got {}", CREATURES1_WORLD_WIDTH, part->x));
 	}
@@ -188,25 +206,7 @@ static Renderable renderable_from_sfc_entity(const sfc::EntityV1* part) {
 	return r;
 }
 
-static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gallery) {
-	auto sfc = std::make_shared<sfc::CGalleryV1>();
-	sfc->filename = gallery.name;
-	sfc->absolute_base = gallery.absolute_base;
-	sfc->refcount = 1; // TODO
-	sfc->images.resize(numeric_cast<size_t>(gallery.size()));
-
-	for (size_t i = 0; i < sfc->images.size(); ++i) {
-		auto& img = sfc->images[i];
-		img.parent = sfc.get();
-		img.status = 0; // seems to work???
-		img.width = gallery.width(numeric_cast<int32_t>(i));
-		img.height = gallery.height(numeric_cast<int32_t>(i));
-		img.offset = gallery.offsets[i];
-	}
-	return sfc;
-}
-
-static std::shared_ptr<sfc::EntityV1> sfc_dump_entity(const Renderable& r) {
+static std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r) {
 	// TODO: gallery should at least be shared between all parts on an object?
 	auto gallery = sfc_dump_gallery(r.get_gallery());
 
@@ -293,10 +293,10 @@ static void serialize_object(Ctx&& ctx, sfc::ObjectV1* p, Object* obj) {
 template <typename Ctx>
 static void serialize_object(Ctx&& ctx, sfc::SceneryV1* scen, Scenery* obj) {
 	if (ctx.is_storing()) {
-		scen->part = sfc_dump_entity(obj->part);
+		scen->part = sfc_dump_renderable(obj->part);
 		static_cast<sfc::ObjectV1*>(scen)->gallery = scen->part->gallery;
 	} else {
-		obj->part = renderable_from_sfc_entity(scen->part.get());
+		obj->part = sfc_load_renderable(scen->part.get());
 	}
 	serialize_object(ctx, static_cast<sfc::ObjectV1*>(scen), static_cast<Object*>(obj));
 }
@@ -304,13 +304,13 @@ static void serialize_object(Ctx&& ctx, sfc::SceneryV1* scen, Scenery* obj) {
 template <typename Ctx>
 static void serialize_object(Ctx&& ctx, sfc::SimpleObjectV1* simp, SimpleObject* obj) {
 	if (ctx.is_storing()) {
-		simp->part = sfc_dump_entity(obj->part);
+		simp->part = sfc_dump_renderable(obj->part);
 		static_cast<sfc::ObjectV1*>(simp)->gallery = simp->part->gallery;
 		simp->z_order = obj->z_order;
 		simp->click_bhvr = obj->click_bhvr;
 		simp->touch_bhvr = obj->touch_bhvr;
 	} else {
-		obj->part = renderable_from_sfc_entity(simp->part.get());
+		obj->part = sfc_load_renderable(simp->part.get());
 		obj->z_order = simp->z_order;
 		obj->click_bhvr = simp->click_bhvr;
 		obj->touch_bhvr = simp->touch_bhvr;
@@ -364,7 +364,7 @@ static void serialize_object(Ctx&& ctx, sfc::CompoundObjectV1* comp, CompoundObj
 	if (ctx.is_storing()) {
 		for (auto& part : obj->parts) {
 			sfc::CompoundPartV1 sfcpart;
-			sfcpart.entity = sfc_dump_entity(part.renderable);
+			sfcpart.entity = sfc_dump_renderable(part.renderable);
 			if (!comp->gallery) {
 				comp->gallery = sfcpart.entity->gallery;
 			}
@@ -382,7 +382,7 @@ static void serialize_object(Ctx&& ctx, sfc::CompoundObjectV1* comp, CompoundObj
 	} else {
 		for (auto& cp : comp->parts) {
 			obj->parts.emplace_back();
-			obj->parts.back().renderable = renderable_from_sfc_entity(cp.entity.get());
+			obj->parts.back().renderable = sfc_load_renderable(cp.entity.get());
 			obj->parts.back().x = cp.x;
 			obj->parts.back().y = cp.y;
 		}
