@@ -452,8 +452,8 @@ struct MacroV1 : MFCObject {
 };
 
 struct BodyPartV1 : EntityV1 {
-	uint32_t angle;
-	uint32_t view;
+	int32_t angle;
+	int32_t view;
 
 	template <typename Archive>
 	void serialize(Archive& ar) {
@@ -463,21 +463,24 @@ struct BodyPartV1 : EntityV1 {
 	}
 };
 
-struct PositionU8 {
-	uint8_t x;
-	uint8_t y;
+struct Vector2i8 {
+	int8_t x;
+	int8_t y;
 };
 
 struct BodyV1 : BodyPartV1 {
-	std::array<std::array<PositionU8, 10>, 6> body_data;
+	std::array<std::array<Vector2i8, 10>, 6> body_data;
 
 	template <typename Archive>
 	void serialize(Archive& ar) {
 		BodyPartV1::serialize(ar);
-		for (auto& pose : body_data) {
-			for (auto& coords : pose) {
-				ar(coords.x);
-				ar(coords.y);
+
+		// stored in column-major order, unlike ATT files which
+		// are in row-major order
+		for (auto& part : body_data) {
+			for (auto& pose : part) {
+				ar(pose.x);
+				ar(pose.y);
 			}
 		}
 	}
@@ -514,7 +517,7 @@ struct VocabWordV1 {
 	uint32_t strength;
 };
 
-struct PositionV1 {
+struct Vector2i {
 	// not CArchive serialized
 	int32_t x;
 	int32_t y;
@@ -699,9 +702,20 @@ struct CBrainV1 : MFCObject {
 	template <typename Archive>
 	void serialize(Archive& ar) {
 		ar.size_u32(lobes);
+		size_t total_neurons = 0;
 		for (auto& l : lobes) {
 			l.serialize(ar);
-			neurons.resize(neurons.size() + l.num_neurons);
+			total_neurons += l.num_neurons;
+		}
+		if (neurons.size() == 0) {
+			// we're reading, resize to the correct size
+			neurons.resize(total_neurons);
+		} else {
+			// we're writing, make sure the numbers match up
+			// TODO: should we just drop extra neurons...?
+			if (neurons.size() != total_neurons) {
+				throw Exception("whoops, neuron count doesn't line up");
+			}
 		}
 		for (auto& n : neurons) {
 			n.serialize(ar);
@@ -864,9 +878,9 @@ struct CreatureV1 : ObjectV1 {
 	std::shared_ptr<LimbV1> right_arm;
 	std::shared_ptr<LimbV1> tail;
 	uint8_t direction;
-	uint8_t downfoot;
-	uint32_t footx;
-	uint32_t footy;
+	uint8_t downfoot_left;
+	int32_t footx;
+	int32_t footy;
 	uint32_t z_order;
 	std::string current_pose;
 	uint8_t expression;
@@ -875,7 +889,7 @@ struct CreatureV1 : ObjectV1 {
 	std::array<std::string, 100> poses;
 	std::array<std::string, 8> gait_animations;
 	std::array<VocabWordV1, 80> vocabulary;
-	std::array<PositionV1, 40> object_positions;
+	std::array<Vector2i, 40> object_positions;
 	std::array<StimulusV1, 36> stimuli;
 	std::shared_ptr<CBrainV1> brain;
 	std::shared_ptr<CBiochemistryV1> biochemistry;
@@ -917,7 +931,7 @@ struct CreatureV1 : ObjectV1 {
 		ar(right_arm);
 		ar(tail);
 		ar(direction);
-		ar(downfoot);
+		ar(downfoot_left);
 		ar(footx);
 		ar(footy);
 		ar(z_order);

@@ -37,7 +37,7 @@ class MFCWriter {
 
 	template <typename T>
 	void operator()(T* obj) {
-		write_object(obj, obj ? typeid(*obj) : typeid(nullptr));
+		write_object(obj, obj ? typeid(*obj) : typeid(T));
 	}
 
 	template <typename T>

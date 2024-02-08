@@ -62,6 +62,14 @@ void write_sfc_v1_file(std::ostream& out, SFCFile& sfc) {
 	writer.register_class<sfc::BlackboardV1>("Blackboard", 1);
 	writer.register_class<sfc::CallButtonV1>("CallButton", 1);
 
+	writer.register_class<CreatureV1>("Creature", 1);
+	writer.register_class<BodyV1>("Body", 1);
+	writer.register_class<LimbV1>("Limb", 1);
+	writer.register_class<CBrainV1>("CBrain", 1);
+	writer.register_class<CBiochemistryV1>("CBiochemistry", 1);
+	writer.register_class<CInstinctV1>("CInstinct", 1);
+	writer.register_class<CGenomeV1>("CGenome", 1);
+
 	// write file
 	sfc.serialize(writer);
 }
