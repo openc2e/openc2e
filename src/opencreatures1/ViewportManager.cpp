@@ -88,7 +88,7 @@ void ViewportManager::update() {
 
 	// update rendersystem and soundmanager
 	// TODO: this doesn't feel like the best place for this
-	Rect viewport{
+	Rect2i viewport{
 		scrollx,
 		scrolly,
 		numeric_cast<int32_t>(width / VIEWPORT_SCALE),
@@ -101,8 +101,8 @@ void ViewportManager::update() {
 
 int32_t ViewportManager::window_x_to_world_x(float winx) const {
 	// TODO: move this to RenderSystem?
-	Rect camera = get_rendersystem()->main_camera_get_src_rect();
-	RectF viewport = get_rendersystem()->main_viewport_get_dest_rect();
+	Rect2i camera = get_rendersystem()->main_camera_get_src_rect();
+	Rect2f viewport = get_rendersystem()->main_viewport_get_dest_rect();
 	int32_t world_wrap = get_rendersystem()->world_get_wrap_width();
 
 	int32_t worldx = int32_t((winx - viewport.x) / viewport.width * camera.width + camera.x);
@@ -118,8 +118,8 @@ int32_t ViewportManager::window_x_to_world_x(float winx) const {
 
 int32_t ViewportManager::window_y_to_world_y(float winy) const {
 	// TODO: move this to RenderSystem?
-	Rect camera = get_rendersystem()->main_camera_get_src_rect();
-	RectF viewport = get_rendersystem()->main_viewport_get_dest_rect();
+	Rect2i camera = get_rendersystem()->main_camera_get_src_rect();
+	Rect2f viewport = get_rendersystem()->main_viewport_get_dest_rect();
 	return int32_t((winy - viewport.y) / viewport.height * camera.height + camera.y);
 }
 

@@ -3,7 +3,7 @@
 #include "common/SlotMap.h"
 #include "common/audio/AudioChannel.h"
 #include "common/audio/AudioState.h"
-#include "common/math/RectF.h"
+#include "common/math/Rect.h"
 
 #include <chrono>
 #include <string>
@@ -18,16 +18,16 @@ class C1SoundManager {
 	C1SoundManager();
 	~C1SoundManager();
 
-	void set_listener_position(RectF);
+	void set_listener_position(Rect2f);
 	void set_listener_world_wrap_width(int32_t wrap_width);
 
 	// play a sound effect tied to the returned C1ControlledSound handle. if the
 	// handle is destroyed the sound is stopped.
 	[[nodiscard]] C1ControlledSound play_controlled_sound(
-		std::string filename, RectF initial_position = {}, bool loop = false);
+		std::string filename, Rect2f initial_position = {}, bool loop = false);
 	// play a non-looping sound effect from a world position. will play until the sound
 	// has finished.
-	void play_uncontrolled_sound(std::string filename, RectF initial_position);
+	void play_uncontrolled_sound(std::string filename, Rect2f initial_position);
 
 	bool is_muted();
 	void set_muted(bool);
@@ -35,7 +35,7 @@ class C1SoundManager {
   private:
 	struct SoundData {
 		AudioChannel channel;
-		RectF position;
+		Rect2f position;
 		std::string name;
 		bool looping = false;
 		float volume = 1.0;
@@ -43,7 +43,7 @@ class C1SoundManager {
 
 	std::vector<SoundData> data;
 
-	RectF listener;
+	Rect2f listener;
 	int32_t world_wrap_width = 0;
 
 	friend C1ControlledSound;
@@ -54,7 +54,7 @@ class C1SoundManager {
 	void update_volume(SoundData&);
 	void update_volumes();
 	SoundData* get_sound_data(AudioChannel source);
-	AudioChannel play_sound_helper(std::string filename, RectF initial_position, bool loop);
+	AudioChannel play_sound_helper(std::string filename, Rect2f initial_position, bool loop);
 
 	bool muted = false;
 };

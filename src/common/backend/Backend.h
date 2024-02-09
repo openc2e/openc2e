@@ -24,7 +24,6 @@
 #include "Keycodes.h"
 #include "common/Image.h"
 #include "common/math/Rect.h"
-#include "common/math/RectF.h"
 #include "common/span.h"
 
 #include <memory>
@@ -47,17 +46,17 @@ struct RenderOptions {
 
 class RenderTarget {
   public:
-	virtual void renderTexture(const Texture& tex, Rect src, RectF dest, RenderOptions options = {}) = 0;
+	virtual void renderTexture(const Texture& tex, Rect2i src, Rect2f dest, RenderOptions options = {}) = 0;
 	virtual void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options = {}) = 0;
 	void renderCreaturesImage(const std::shared_ptr<creaturesImage>& tex, unsigned int frame, int x, int y, RenderOptions options = {}) {
 		assert(tex.get() != nullptr);
 		renderCreaturesImage(*tex.get(), frame, x, y, options);
 	}
 	virtual void renderLine(float x1, float y1, float x2, float y2, Color color) = 0;
-	virtual void blitRenderTarget(RenderTarget* src, RectF dest) = 0;
+	virtual void blitRenderTarget(RenderTarget* src, Rect2f dest) = 0;
 	virtual int32_t getWidth() const = 0;
 	virtual int32_t getHeight() const = 0;
-	virtual void setClip(RectF dest) = 0;
+	virtual void setClip(Rect2f dest) = 0;
 	virtual void renderClear() = 0;
 	virtual void setViewportOffsetTop(int offset_top) = 0;
 	virtual void setViewportOffsetBottom(int offset_bottom) = 0;
@@ -76,10 +75,10 @@ class Backend {
 	virtual std::shared_ptr<RenderTarget> newRenderTarget(int32_t width, int32_t height) = 0;
 
 	virtual Texture createTexture(int32_t width, int32_t height) = 0;
-	virtual void updateTexture(Texture& tex, Rect location, const Image& image) = 0;
+	virtual void updateTexture(Texture& tex, Rect2i location, const Image& image) = 0;
 	Texture createTextureFromImage(const Image& image) {
 		Texture tex = createTexture(image.width, image.height);
-		updateTexture(tex, Rect{}, image);
+		updateTexture(tex, Rect2i{}, image);
 		return tex;
 	}
 

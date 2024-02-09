@@ -25,13 +25,13 @@
 
 class NullRenderTarget : public RenderTarget {
   public:
-	void renderTexture(const Texture&, Rect, RectF, RenderOptions) override {}
+	void renderTexture(const Texture&, Rect2i, Rect2f, RenderOptions) override {}
 	void renderCreaturesImage(creaturesImage&, unsigned int, int, int, RenderOptions) override {}
 	void renderLine(float, float, float, float, Color) override {}
-	void blitRenderTarget(RenderTarget*, RectF) override {}
+	void blitRenderTarget(RenderTarget*, Rect2f) override {}
 	int32_t getWidth() const override { return 800; }
 	int32_t getHeight() const override { return 600; }
-	void setClip(RectF) override {}
+	void setClip(Rect2f) override {}
 	void renderClear() override {}
 	void setViewportOffsetTop(int) override {}
 	void setViewportOffsetBottom(int) override {}
@@ -61,7 +61,7 @@ class NullBackend : public Backend {
 	std::shared_ptr<RenderTarget> newRenderTarget(int32_t, int32_t) override { return {}; }
 
 	Texture createTexture(int32_t, int32_t) override { return {}; }
-	void updateTexture(Texture&, Rect, const Image&) override {}
+	void updateTexture(Texture&, Rect2i, const Image&) override {}
 
 	void run(std::function<bool()>) override {}
 };

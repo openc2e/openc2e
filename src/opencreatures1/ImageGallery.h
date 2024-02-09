@@ -18,7 +18,7 @@ class ImageGallery {
 	// and cached object? then we could load all sprites in the file once and share
 	// it between all objects with similar galleries
 	Texture texture;
-	std::vector<Rect> texture_locations;
+	std::vector<Rect2i> texture_locations;
 
 	explicit operator bool() const {
 		return !name.empty() || texture || !texture_locations.empty();

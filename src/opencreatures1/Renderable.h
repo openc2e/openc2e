@@ -36,7 +36,7 @@ class Renderable {
 
 	int32_t width() const;
 	int32_t height() const;
-	Rect get_bbox() const;
+	Rect2i get_bbox() const;
 
   private:
 	friend struct fmt::formatter<Renderable>;

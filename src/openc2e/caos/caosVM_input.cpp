@@ -21,6 +21,7 @@
 #include "PointerAgent.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/NumericCast.h"
 #include "common/backend/Backend.h"
 
 #include <iostream>

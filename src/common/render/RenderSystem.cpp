@@ -13,7 +13,7 @@ RenderSystem* get_rendersystem() {
 RenderSystem::RenderSystem(const RenderSystemConstructTag&) {
 }
 
-void RenderSystem::main_camera_set_src_rect(Rect src) {
+void RenderSystem::main_camera_set_src_rect(Rect2i src) {
 	if (m_world_wrap_width) {
 		if (src.x < 0) {
 			src.x += m_world_wrap_width;
@@ -24,15 +24,15 @@ void RenderSystem::main_camera_set_src_rect(Rect src) {
 	m_main_camera_src_rect = src;
 }
 
-const Rect& RenderSystem::main_camera_get_src_rect() const {
+const Rect2i& RenderSystem::main_camera_get_src_rect() const {
 	return m_main_camera_src_rect;
 }
 
-void RenderSystem::main_viewport_set_dest_rect(RectF src) {
+void RenderSystem::main_viewport_set_dest_rect(Rect2f src) {
 	m_main_viewport_dest_rect = src;
 }
 
-const RectF& RenderSystem::main_viewport_get_dest_rect() const {
+const Rect2f& RenderSystem::main_viewport_get_dest_rect() const {
 	return m_main_viewport_dest_rect;
 }
 
@@ -63,7 +63,7 @@ void RenderSystem::render_item_set_position(const RenderItemHandle& handle, floa
 	}
 }
 
-void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const Texture& tex, Rect location) {
+void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const Texture& tex, Rect2i location) {
 	if (RenderItem* item = m_render_items.try_get(handle.key)) {
 		item->type = RENDER_TEXTURE;
 		item->tex = tex;
@@ -155,7 +155,7 @@ void RenderSystem::draw() {
 		float h = r->dest.height * yscale;
 
 		if (r->type == RENDER_TEXTURE) {
-			RectF dest;
+			Rect2f dest;
 			dest.x = x;
 			dest.y = y;
 			dest.width = w;

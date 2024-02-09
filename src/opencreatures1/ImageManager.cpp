@@ -40,11 +40,11 @@ static ImageGallery build_gallery(const std::string& name, int32_t absolute_base
 
 	int32_t current_x = 0;
 	for (const auto& img : images) {
-		Rect location{
-			numeric_cast<int32_t>(current_x),
+		Rect2i location{
+			current_x,
 			0,
-			numeric_cast<int32_t>(img.width),
-			numeric_cast<int32_t>(img.height)};
+			img.width,
+			img.height};
 		gallery.texture_locations.push_back(location);
 		if (img.width > 0 && img.height > 0) {
 			// Creatures 1 has a few sprites with 0x0 size at end of files

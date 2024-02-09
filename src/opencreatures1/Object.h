@@ -66,7 +66,7 @@ class Object {
 	uint8_t family;
 	MovementStatus movement_status;
 	uint8_t attr;
-	Rect limit;
+	Rect2i limit;
 	ObjectHandle carrier;
 	ActiveFlag actv;
 	// creaturesImage sprite;
@@ -114,7 +114,7 @@ class Object {
 	void add_position(float xdiff, float ydiff);
 
 	int32_t get_z_order() const;
-	Rect get_bbox() const;
+	Rect2i get_bbox() const;
 	Renderable* get_renderable_for_part(int32_t partnum);
 	const Renderable* get_renderable_for_part(int32_t partnum) const;
 
@@ -181,7 +181,7 @@ enum HotspotFunction {
 
 struct CompoundObject : Object {
 	std::vector<CompoundPart> parts;
-	std::array<Rect, 6> hotspots;
+	std::array<Rect2i, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 };
 

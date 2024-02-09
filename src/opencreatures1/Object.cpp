@@ -139,7 +139,7 @@ void Object::handle_left_click(int32_t relx, int32_t rely) {
 				// knob doesn't have hotspot attached
 				continue;
 			}
-			Rect hotspot = as_compound_object()->hotspots[numeric_cast<size_t>(hotspot_idx)];
+			auto hotspot = as_compound_object()->hotspots[numeric_cast<size_t>(hotspot_idx)];
 			// TODO: check for bad hotspots?
 
 			if (hotspot.has_point(relx, rely)) {
@@ -378,7 +378,7 @@ int32_t Object::get_z_order() const {
 	return main_part->get_z_order();
 }
 
-Rect Object::get_bbox() const {
+Rect2i Object::get_bbox() const {
 	auto* main_part = get_renderable_for_part(0);
 	if (!main_part) {
 		throw_exception("Can't get main part of object without any parts: {}", repr(*this));

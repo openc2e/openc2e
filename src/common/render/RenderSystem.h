@@ -46,7 +46,6 @@ Future improvements:
 #include "common/SlotMap.h"
 #include "common/backend/BackendTexture.h"
 #include "common/math/Rect.h"
-#include "common/math/RectF.h"
 
 #include <map>
 #include <stdint.h>
@@ -68,8 +67,8 @@ class RenderSystem {
 	};
 	struct RenderItem {
 		int32_t layer = 0;
-		Rect src{};
-		RectF dest{};
+		Rect2i src{};
+		Rect2f dest{};
 		int32_t z = 0;
 		RenderItemType type = RENDER_NONE;
 		Color color;
@@ -77,8 +76,8 @@ class RenderSystem {
 	};
 
 	int32_t m_world_wrap_width = 0;
-	Rect m_main_camera_src_rect;
-	RectF m_main_viewport_dest_rect;
+	Rect2i m_main_camera_src_rect;
+	Rect2f m_main_viewport_dest_rect;
 	DenseSlotMap<RenderItem> m_render_items;
 
   public:
@@ -89,12 +88,12 @@ class RenderSystem {
 	RenderSystem& operator=(RenderSystem&&) = delete;
 
 	// MainCamera
-	void main_camera_set_src_rect(Rect);
-	const Rect& main_camera_get_src_rect() const;
+	void main_camera_set_src_rect(Rect2i);
+	const Rect2i& main_camera_get_src_rect() const;
 
 	// MainViewport
-	void main_viewport_set_dest_rect(RectF);
-	const RectF& main_viewport_get_dest_rect() const;
+	void main_viewport_set_dest_rect(Rect2f);
+	const Rect2f& main_viewport_get_dest_rect() const;
 
 	// WorldWrap
 	void world_set_wrap_width(int32_t wrap_width);
@@ -104,7 +103,7 @@ class RenderSystem {
 	RenderItemHandle render_item_create(int layer = 0);
 
 	void render_item_set_position(const RenderItemHandle& key, float x, float y, int32_t z);
-	void render_item_set_texture(const RenderItemHandle& key, const Texture& tex, Rect location);
+	void render_item_set_texture(const RenderItemHandle& key, const Texture& tex, Rect2i location);
 	void render_item_set_unfilled_rect(const RenderItemHandle& key, float x, float y, float w, float h, Color color);
 	void render_item_set_line(const RenderItemHandle& key, float xstart, float ystart, float xend, float yend, Color color);
 

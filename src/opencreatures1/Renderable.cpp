@@ -47,8 +47,8 @@ const ImageGallery& Renderable::get_gallery() const {
 	return gallery;
 }
 
-Rect Renderable::get_bbox() const {
-	Rect r;
+Rect2i Renderable::get_bbox() const {
+	Rect2i r;
 	// TODO: should we actually trunc these high-precision coordinates? This only
 	// matters for vehicles.
 	r.x = numeric_cast<int32_t>(x);

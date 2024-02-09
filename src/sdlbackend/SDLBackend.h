@@ -43,15 +43,15 @@ class SDLRenderTarget : public RenderTarget {
 	SDLRenderTarget& operator=(SDLRenderTarget&&) = delete;
 	~SDLRenderTarget();
 
-	void renderTexture(const Texture& tex, Rect src, RectF dest, RenderOptions options) override;
+	void renderTexture(const Texture& tex, Rect2i src, Rect2f dest, RenderOptions options) override;
 	void renderCreaturesImage(creaturesImage& tex, unsigned int frame, int x, int y, RenderOptions options) override;
 	void renderLine(float x1, float y1, float x2, float y2, Color color) override;
-	void blitRenderTarget(RenderTarget* src, RectF dest) override;
+	void blitRenderTarget(RenderTarget* src, Rect2f dest) override;
 
 	// dimensions in logical window points (device-independent pixels), not pixels
 	int32_t getWidth() const override;
 	int32_t getHeight() const override;
-	void setClip(RectF dest) override;
+	void setClip(Rect2f dest) override;
 
 	void renderClear() override;
 	void setViewportOffsetTop(int offset_top) override;
@@ -84,7 +84,7 @@ class SDLBackend : public Backend {
 	bool pollEvent(BackendEvent& e) override;
 
 	Texture createTexture(int32_t width, int32_t height) override;
-	void updateTexture(Texture& tex, Rect location, const Image& image) override;
+	void updateTexture(Texture& tex, Rect2i location, const Image& image) override;
 
 	std::shared_ptr<RenderTarget> getMainRenderTarget() override;
 	std::shared_ptr<RenderTarget> newRenderTarget(int32_t width, int32_t height) override;

@@ -77,7 +77,7 @@ static float logarithmic_attenuation(float x, float x_near, float x_far) {
 	return clamp(-log2f((x - x_near) / (x_far - x_near) / 2 + 0.5f), 0, 1);
 }
 
-static DistanceInfo calculate_distance(RectF listener, int32_t world_wrap_width, RectF sound) {
+static DistanceInfo calculate_distance(Rect2f listener, int32_t world_wrap_width, Rect2f sound) {
 	const auto centerx = listener.x + listener.width / 2;
 	const auto centery = listener.y + listener.height / 2;
 
@@ -121,7 +121,7 @@ void C1SoundManager::update_volume(SoundData& s) {
 
 	float volume = muted ? 0 : s.volume;
 
-	if (s.position != RectF{}) {
+	if (s.position != Rect2f{}) {
 		auto distance = calculate_distance(listener, world_wrap_width, s.position);
 		volume *= distance.volume;
 		get_audio_backend()->audio_channel_set_pan(s.channel, distance.pan);
@@ -136,12 +136,12 @@ void C1SoundManager::update_volumes() {
 	}
 }
 
-AudioChannel C1SoundManager::play_sound_helper(std::string name, RectF initial_position, bool loop) {
+AudioChannel C1SoundManager::play_sound_helper(std::string name, Rect2f initial_position, bool loop) {
 	if (name.size() == 0) {
 		return {};
 	}
 
-	if (initial_position != RectF{}) {
+	if (initial_position != Rect2f{}) {
 		auto distance = calculate_distance(listener, world_wrap_width, initial_position);
 		if (distance.volume <= 0) {
 			if (loop) {
@@ -181,15 +181,15 @@ AudioChannel C1SoundManager::play_sound_helper(std::string name, RectF initial_p
 	return channel;
 }
 
-void C1SoundManager::play_uncontrolled_sound(std::string name, RectF initial_position) {
+void C1SoundManager::play_uncontrolled_sound(std::string name, Rect2f initial_position) {
 	play_sound_helper(name, initial_position, false);
 }
 
-C1ControlledSound C1SoundManager::play_controlled_sound(std::string name, RectF initial_position, bool loop) {
+C1ControlledSound C1SoundManager::play_controlled_sound(std::string name, Rect2f initial_position, bool loop) {
 	return C1ControlledSound{play_sound_helper(name, initial_position, loop)};
 }
 
-void C1SoundManager::set_listener_position(RectF listener_) {
+void C1SoundManager::set_listener_position(Rect2f listener_) {
 	if (SOUND_MANAGER_DEBUG) {
 		fmt::print("C1SoundManager::set_listener_position\n");
 		for (auto& s : data) {

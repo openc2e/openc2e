@@ -279,7 +279,7 @@ struct SDLSurfaceDeleter {
 	}
 };
 
-void SDLBackend::updateTexture(Texture& tex, Rect location, const Image& image) {
+void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image) {
 	assert(tex);
 	assert(image.data);
 	assert(image.width > 0);
@@ -359,7 +359,7 @@ void SDLBackend::updateTexture(Texture& tex, Rect location, const Image& image) 
 	rect.y = location.y;
 	rect.w = location.width;
 	rect.h = location.height;
-	if (SDL_UpdateTexture(tex.as<SDL_Texture>(), location == Rect{} ? nullptr : &rect,
+	if (SDL_UpdateTexture(tex.as<SDL_Texture>(), location == Rect2i{} ? nullptr : &rect,
 			converted->pixels, converted->pitch) != 0) {
 		throw Exception(fmt::format("error updating texture: {}", SDL_GetError()));
 	};
@@ -384,14 +384,14 @@ int32_t SDLRenderTarget::getHeight() const {
 	return numeric_cast<int32_t>(height - viewport_offset_top - viewport_offset_bottom);
 }
 
-void SDLRenderTarget::setClip(RectF dest) {
+void SDLRenderTarget::setClip(Rect2f dest) {
 	// TODO: SDL_RenderSetClipRectF doesn't seem to exist?
 	SDL_Rect clip;
 	clip.x = dest.x;
 	clip.y = dest.y;
 	clip.w = dest.width;
 	clip.h = dest.height;
-	if (SDL_RenderSetClipRect(parent->renderer, dest == RectF{} ? nullptr : &clip) != 0) {
+	if (SDL_RenderSetClipRect(parent->renderer, dest == Rect2f{} ? nullptr : &clip) != 0) {
 		throw Exception(fmt::format("error in SDL_RenderSetClipRect(): {}", SDL_GetError()));
 	}
 }
@@ -404,7 +404,7 @@ void SDLRenderTarget::setViewportOffsetBottom(int offset_bottom) {
 	viewport_offset_bottom = offset_bottom;
 }
 
-void SDLRenderTarget::renderTexture(const Texture& tex_, Rect src, RectF dest, RenderOptions options) {
+void SDLRenderTarget::renderTexture(const Texture& tex_, Rect2i src, Rect2f dest, RenderOptions options) {
 	if (dest.right() + tex_.width <= 0 || dest.x >= getWidth() || dest.bottom() <= 0 || dest.y >= getHeight()) {
 		// cull non-visible textures
 		return;
@@ -441,13 +441,13 @@ void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int fra
 		img.getTextureForFrame(frame) = parent->createTextureFromImage(img.getImageForFrame(frame));
 	}
 
-	Rect src;
+	Rect2i src;
 	src.x = img.getXOffsetForFrame(frame);
 	src.y = img.getYOffsetForFrame(frame);
 	src.width = img.width(frame);
 	src.height = img.height(frame);
 
-	RectF dest;
+	Rect2f dest;
 	dest.x = x;
 	dest.y = y + viewport_offset_top;
 	dest.width = (options.override_drawsize ? options.overridden_drawwidth : img.width(frame)) * options.scale;
@@ -462,7 +462,7 @@ void SDLRenderTarget::renderClear() {
 	SDL_RenderClear(parent->renderer);
 }
 
-void SDLRenderTarget::blitRenderTarget(RenderTarget* s, RectF dest) {
+void SDLRenderTarget::blitRenderTarget(RenderTarget* s, Rect2f dest) {
 	SDLRenderTarget* src = dynamic_cast<SDLRenderTarget*>(s);
 	assert(src);
 

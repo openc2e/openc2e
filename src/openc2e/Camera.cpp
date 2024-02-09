@@ -25,6 +25,7 @@
 #include "Map.h"
 #include "MetaRoom.h"
 #include "World.h"
+#include "common/NumericCast.h"
 #include "common/backend/Backend.h"
 
 #include <cassert>
