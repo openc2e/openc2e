@@ -82,10 +82,10 @@ void serialize_map(Ctx&& ctx) {
 		fmt::print("INFO [SFCWriter] Writing rooms...\n");
 		for (auto& r : g_engine_context.map->get_rooms()) {
 			sfc::RoomV1 room;
-			room.left = r.left;
-			room.top = r.top;
-			room.right = r.right;
-			room.bottom = r.bottom;
+			room.rect.left = r.left;
+			room.rect.top = r.top;
+			room.rect.right = r.right;
+			room.rect.bottom = r.bottom;
 			room.type = r.type;
 			map->rooms.push_back(room);
 		}
@@ -118,10 +118,10 @@ void serialize_map(Ctx&& ctx) {
 		fmt::print("INFO [SFCLoader] Loading rooms...\n");
 		for (auto& r : ctx.sfc.map->rooms) {
 			Room room;
-			room.left = r.left;
-			room.top = r.top;
-			room.right = r.right;
-			room.bottom = r.bottom;
+			room.left = r.rect.left;
+			room.top = r.rect.top;
+			room.right = r.rect.right;
+			room.bottom = r.rect.bottom;
 			room.type = r.type;
 			g_engine_context.map->add_room(std::move(room));
 		}
@@ -205,10 +205,7 @@ static void serialize_object(Ctx&& ctx, sfc::ObjectV1* p, Object* obj) {
 		p->family = obj->family;
 		p->movement_status = obj->movement_status;
 		p->attr = obj->attr;
-		p->limit_left = obj->limit.x;
-		p->limit_top = obj->limit.y;
-		p->limit_right = obj->limit.right();
-		p->limit_bottom = obj->limit.bottom();
+		p->limit = obj->limit;
 		p->carrier = ctx.dump_object(g_engine_context.objects->try_get(obj->carrier)).get();
 		p->actv = obj->actv;
 		if (p->gallery == nullptr) {
@@ -233,10 +230,7 @@ static void serialize_object(Ctx&& ctx, sfc::ObjectV1* p, Object* obj) {
 		obj->family = p->family;
 		obj->movement_status = MovementStatus(p->movement_status);
 		obj->attr = p->attr;
-		obj->limit.x = p->limit_left;
-		obj->limit.y = p->limit_top;
-		obj->limit.width = p->limit_right - p->limit_left;
-		obj->limit.height = p->limit_bottom - p->limit_top;
+		obj->limit = p->limit;
 		obj->carrier = ctx.load_object(p->carrier);
 		obj->actv = ActiveFlag(p->actv);
 		// creaturesImage sprite;
@@ -344,10 +338,7 @@ static void serialize_object(Ctx&& ctx, sfc::CompoundObjectV1* comp, CompoundObj
 			comp->parts.push_back(sfcpart);
 		}
 		for (size_t i = 0; i < comp->hotspots.size(); ++i) {
-			comp->hotspots[i].left = obj->hotspots[i].x;
-			comp->hotspots[i].top = obj->hotspots[i].y;
-			comp->hotspots[i].right = obj->hotspots[i].right();
-			comp->hotspots[i].bottom = obj->hotspots[i].bottom();
+			comp->hotspots[i] = obj->hotspots[i];
 		}
 		comp->functions_to_hotspots = obj->functions_to_hotspots;
 	} else {
@@ -358,14 +349,9 @@ static void serialize_object(Ctx&& ctx, sfc::CompoundObjectV1* comp, CompoundObj
 			obj->parts.back().y = cp.y;
 		}
 		for (size_t i = 0; i < obj->hotspots.size(); ++i) {
-			obj->hotspots[i].x = comp->hotspots[i].left;
-			obj->hotspots[i].y = comp->hotspots[i].top;
-			obj->hotspots[i].width = comp->hotspots[i].right - comp->hotspots[i].left;
-			obj->hotspots[i].height = comp->hotspots[i].bottom - comp->hotspots[i].top;
+			obj->hotspots[i] = comp->hotspots[i];
 		}
-		for (size_t i = 0; i < obj->functions_to_hotspots.size(); ++i) {
-			obj->functions_to_hotspots[i] = comp->functions_to_hotspots[i];
-		}
+		obj->functions_to_hotspots = comp->functions_to_hotspots;
 	}
 	serialize_object(ctx, static_cast<sfc::ObjectV1*>(comp), static_cast<Object*>(obj));
 }
@@ -382,10 +368,7 @@ static void serialize_object(Ctx&& ctx, sfc::VehicleV1* veh, Vehicle* obj) {
 		veh->y_times_256 = numeric_cast<int32_t>(obj->parts[0].renderable.get_y() * 256);
 		veh->xvel_times_256 = numeric_cast<int32_t>(obj->xvel * 256);
 		veh->yvel_times_256 = numeric_cast<int32_t>(obj->yvel * 256);
-		veh->cabin_left = obj->cabin_left;
-		veh->cabin_top = obj->cabin_top;
-		veh->cabin_right = obj->cabin_right;
-		veh->cabin_bottom = obj->cabin_bottom;
+		veh->cabin = obj->cabin;
 		veh->bump = obj->bump;
 	} else {
 		// need the compound parts to already be defined
@@ -412,10 +395,7 @@ static void serialize_object(Ctx&& ctx, sfc::VehicleV1* veh, Vehicle* obj) {
 				cp.renderable.set_position(cp.renderable.get_x() + diff_x, cp.renderable.get_y() + diff_y);
 			}
 		}
-		obj->cabin_left = veh->cabin_left;
-		obj->cabin_top = veh->cabin_top;
-		obj->cabin_right = veh->cabin_right;
-		obj->cabin_bottom = veh->cabin_bottom;
+		obj->cabin = veh->cabin;
 		obj->bump = veh->bump;
 	}
 }

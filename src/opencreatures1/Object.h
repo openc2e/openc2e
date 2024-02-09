@@ -188,10 +188,7 @@ struct CompoundObject : Object {
 struct Vehicle : CompoundObject {
 	float xvel;
 	float yvel;
-	int32_t cabin_left;
-	int32_t cabin_top;
-	int32_t cabin_right;
-	int32_t cabin_bottom;
+	Rect2i cabin;
 	uint32_t bump;
 };
 

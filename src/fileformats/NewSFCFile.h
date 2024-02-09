@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/Exception.h"
+#include "common/math/Rect.h"
 #include "fileformats/MFCObject.h"
 
 #include <array>
@@ -9,6 +10,21 @@
 #include <vector>
 
 namespace sfc {
+
+struct Rect {
+	// https://learn.microsoft.com/en-us/windows/win32/api/windef/ns-windef-rect
+	int32_t left;
+	int32_t top;
+	int32_t right;
+	int32_t bottom;
+
+	Rect() {}
+	Rect(Rect2i other)
+		: left(other.x), top(other.y), right(other.x + other.width), bottom(other.y + other.height) {}
+	operator Rect2i() {
+		return Rect2i{left, top, right - left, bottom - top};
+	}
+};
 
 struct CGalleryV1;
 
@@ -46,10 +62,7 @@ struct CGalleryV1 : MFCObject {
 
 struct RoomV1 {
 	// not CArchive serialized
-	int32_t left;
-	int32_t top;
-	int32_t right;
-	int32_t bottom;
+	Rect rect;
 	int32_t type;
 };
 
@@ -82,10 +95,10 @@ struct MapDataV1 : MFCObject {
 
 		ar.size_u32(rooms);
 		for (auto& room : rooms) {
-			ar(room.left);
-			ar(room.top);
-			ar(room.right);
-			ar(room.bottom);
+			ar(room.rect.left);
+			ar(room.rect.top);
+			ar(room.rect.right);
+			ar(room.rect.bottom);
 			ar(room.type);
 		}
 		for (auto& g : groundlevel) {
@@ -158,10 +171,7 @@ struct ObjectV1 : MFCObject {
 	uint8_t family;
 	uint8_t movement_status;
 	uint8_t attr;
-	int32_t limit_left;
-	int32_t limit_top;
-	int32_t limit_right;
-	int32_t limit_bottom;
+	Rect limit;
 	ObjectV1* carrier = nullptr;
 	uint8_t actv;
 	std::shared_ptr<CGalleryV1> gallery;
@@ -184,10 +194,10 @@ struct ObjectV1 : MFCObject {
 		ar(family);
 		ar(movement_status);
 		ar(attr);
-		ar(limit_left);
-		ar(limit_top);
-		ar(limit_right);
-		ar(limit_bottom);
+		ar(limit.left);
+		ar(limit.top);
+		ar(limit.right);
+		ar(limit.bottom);
 		ar(carrier);
 		ar(actv);
 		ar(gallery);
@@ -263,17 +273,9 @@ struct CompoundPartV1 {
 	int32_t y;
 };
 
-struct HotSpotV1 {
-	// not CArchive serialized
-	int32_t left;
-	int32_t top;
-	int32_t right;
-	int32_t bottom;
-};
-
 struct CompoundObjectV1 : ObjectV1 {
 	std::vector<CompoundPartV1> parts;
-	std::array<HotSpotV1, 6> hotspots;
+	std::array<Rect, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 
 	template <typename Archive>
@@ -306,10 +308,7 @@ struct VehicleV1 : CompoundObjectV1 {
 	int32_t yvel_times_256;
 	int32_t x_times_256;
 	int32_t y_times_256;
-	int32_t cabin_left;
-	int32_t cabin_top;
-	int32_t cabin_right;
-	int32_t cabin_bottom;
+	Rect cabin;
 	uint32_t bump;
 
 	template <typename Archive>
@@ -319,10 +318,10 @@ struct VehicleV1 : CompoundObjectV1 {
 		ar(yvel_times_256);
 		ar(x_times_256);
 		ar(y_times_256);
-		ar(cabin_left);
-		ar(cabin_top);
-		ar(cabin_right);
-		ar(cabin_bottom);
+		ar(cabin.left);
+		ar(cabin.top);
+		ar(cabin.right);
+		ar(cabin.bottom);
 		ar(bump);
 	}
 };

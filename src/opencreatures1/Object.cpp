@@ -504,13 +504,13 @@ void Object::tick() {
 	// vehicle position updates
 	if (as_vehicle()) {
 		if (as_lift() && as_vehicle()->yvel != 0) {
-			auto current_cabin_bottom = get_bbox().y + as_vehicle()->cabin_bottom;
+			auto current_cabin_bottom = get_bbox().y + as_vehicle()->cabin.bottom();
 			auto next_cabin_bottom = current_cabin_bottom + as_vehicle()->yvel;
 
 			auto next_floor_y = as_lift()->floors[as_lift()->next_or_current_floor];
 
 			if ((as_vehicle()->yvel > 0 && next_cabin_bottom >= next_floor_y) || (as_vehicle()->yvel < 0 && next_cabin_bottom <= next_floor_y)) {
-				set_position(get_bbox().x + as_vehicle()->xvel, next_floor_y - as_vehicle()->cabin_bottom);
+				set_position(get_bbox().x + as_vehicle()->xvel, next_floor_y - as_vehicle()->cabin.bottom());
 				// stop!
 				as_vehicle()->xvel = 0;
 				as_vehicle()->yvel = 0;
@@ -541,7 +541,7 @@ void Object::tick() {
 	if (as_lift() && actv == ACTV_INACTIVE && obv0 == 0) {
 		// any callers?
 
-		auto current_cabin_bottom = get_bbox().y + as_vehicle()->cabin_bottom;
+		auto current_cabin_bottom = get_bbox().y + as_vehicle()->cabin.bottom();
 
 		int32_t best_y;
 		int32_t best_floor_id;
