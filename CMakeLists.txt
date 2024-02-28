@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.3)
 project(openc2e)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 set(BIN "${CMAKE_CURRENT_BINARY_DIR}")
 set(GEN "${BIN}/generated")

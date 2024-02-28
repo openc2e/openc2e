@@ -20,6 +20,7 @@
 #ifndef _VOICEDATA_H
 #define _VOICEDATA_H
 
+#include <cstdint>
 #include <istream>
 #include <string>
 #include <vector>
