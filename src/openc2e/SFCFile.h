@@ -20,6 +20,7 @@
 #ifndef _SFCFILE_H
 #define _SFCFILE_H
 
+#include <cstdint>
 #include <istream>
 #include <map>
 #include <string>

@@ -21,6 +21,7 @@
 
 #include "common/Exception.h"
 
+#include <cstdint>
 #include <ghc/filesystem.hpp>
 #include <iostream>
 #include <istream>
