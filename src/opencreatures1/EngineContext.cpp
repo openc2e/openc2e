@@ -7,11 +7,11 @@
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "MessageManager.h"
-#include "ObjectManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
+#include "objects/ObjectManager.h"
 
 struct EngineContextConstructTag {};
 

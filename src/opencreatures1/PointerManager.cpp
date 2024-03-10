@@ -1,8 +1,9 @@
 #include "PointerManager.h"
 
-#include "ObjectManager.h"
 #include "ViewportManager.h"
 #include "common/backend/BackendEvent.h"
+#include "objects/ObjectManager.h"
+#include "objects/PointerTool.h"
 
 
 void PointerManager::update() {

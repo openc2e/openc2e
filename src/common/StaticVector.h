@@ -3,6 +3,7 @@
 #include "common/NumericCast.h"
 
 #include <stdexcept>
+#include <utility>
 
 template <typename T, size_t N>
 class StaticVector {

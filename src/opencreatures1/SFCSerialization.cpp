@@ -5,12 +5,22 @@
 #include "ImageManager.h"
 #include "MacroManager.h"
 #include "MapManager.h"
-#include "ObjectManager.h"
 #include "PointerManager.h"
 #include "Renderable.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
 #include "common/Ranges.h"
+#include "objects/Blackboard.h"
+#include "objects/Bubble.h"
+#include "objects/CallButton.h"
+#include "objects/CompoundObject.h"
+#include "objects/Creature.h"
+#include "objects/Lift.h"
+#include "objects/ObjectManager.h"
+#include "objects/PointerTool.h"
+#include "objects/Scenery.h"
+#include "objects/SimpleObject.h"
+#include "objects/Vehicle.h"
 
 #include <fmt/ranges.h>
 

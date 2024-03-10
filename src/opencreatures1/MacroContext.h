@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ObjectHandle.h"
 #include "common/Exception.h"
+#include "objects/ObjectHandle.h"
 
 #include <array>
 #include <map>

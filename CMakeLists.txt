@@ -329,8 +329,6 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/MacroManager.cpp
 	src/opencreatures1/MapManager.cpp
 	src/opencreatures1/MessageManager.cpp
-	src/opencreatures1/Object.cpp
-	src/opencreatures1/ObjectNames.cpp
 	src/opencreatures1/PathManager.cpp
 	src/opencreatures1/PointerManager.cpp
 	src/opencreatures1/Renderable.cpp
@@ -338,6 +336,9 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/ViewportManager.cpp
 	src/opencreatures1/C1ControlledSound.cpp
 	src/opencreatures1/C1SoundManager.cpp
+	src/opencreatures1/objects/Blackboard.cpp
+	src/opencreatures1/objects/Object.cpp
+	src/opencreatures1/objects/ObjectNames.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(opencreatures1_core PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)

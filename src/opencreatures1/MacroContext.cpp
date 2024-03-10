@@ -1,9 +1,9 @@
 #include "MacroContext.h"
 
 #include "Macro.h"
-#include "ObjectManager.h"
 #include "common/Ascii.h"
 #include "common/Repr.h"
+#include "objects/ObjectManager.h"
 
 std::string repr(ShortToken i) {
 	return std::string(i.data.begin(), i.data.end());

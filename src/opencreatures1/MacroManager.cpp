@@ -1,8 +1,8 @@
 #include "MacroManager.h"
 
-#include "Object.h"
-#include "ObjectManager.h"
 #include "common/Exception.h"
+#include "objects/Object.h"
+#include "objects/ObjectManager.h"
 
 std::string scriptnumber_to_string(ScriptNumber eventno) {
 	struct scriptname {

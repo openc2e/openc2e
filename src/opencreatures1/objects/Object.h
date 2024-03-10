@@ -118,13 +118,6 @@ class Object {
 	Renderable* get_renderable_for_part(int32_t partnum);
 	const Renderable* get_renderable_for_part(int32_t partnum) const;
 
-	void blackboard_show_word(int32_t word_index);
-	void blackboard_hide_word();
-	void blackboard_enable_edit();
-	void blackboard_disable_edit();
-	void blackboard_emit_eyesight(int32_t word_index);
-	void blackboard_emit_earshot(int32_t word_index);
-
 	void stim_shou();
 	void stim_sign();
 
@@ -135,88 +128,6 @@ class Object {
 	void vehicle_drop_passengers();
 
 	void tick();
-};
-
-struct Scenery : Object {
-	Renderable part;
-};
-
-struct SimpleObject : Object {
-	Renderable part;
-	int32_t z_order;
-	std::array<int8_t, 3> click_bhvr;
-	uint8_t touch_bhvr;
-};
-
-struct Bubble : SimpleObject {
-	// TODO: implement me
-};
-
-struct CallButton : SimpleObject {
-	ObjectHandle lift;
-	uint8_t floor;
-};
-
-struct PointerTool : SimpleObject {
-	int32_t relx;
-	int32_t rely;
-	ObjectHandle bubble;
-	std::string text;
-};
-
-struct CompoundPart {
-	Renderable renderable;
-	int32_t x;
-	int32_t y;
-};
-
-enum HotspotFunction {
-	HOTSPOT_CREATUREACTIVATE1,
-	HOTSPOT_CREATUREACTIVATE2,
-	HOTSPOT_CREATUREDEACTIVATE,
-	HOTSPOT_MOUSEACTIVATE1,
-	HOTSPOT_MOUSEACTIVATE2,
-	HOTSPOT_MOUSEDEACTIVATE,
-};
-
-struct CompoundObject : Object {
-	std::vector<CompoundPart> parts;
-	std::array<Rect2i, 6> hotspots;
-	std::array<int32_t, 6> functions_to_hotspots;
-};
-
-struct Vehicle : CompoundObject {
-	float xvel;
-	float yvel;
-	Rect2i cabin;
-	uint32_t bump;
-};
-
-struct Lift : Vehicle {
-	int32_t next_or_current_floor = -1;
-	StaticVector<int32_t, 8> floors;
-	StaticSet<ObjectHandle, 8> activated_call_buttons;
-};
-
-struct Blackboard : CompoundObject {
-	struct BlackboardWord {
-		uint32_t value = 0;
-		std::string text;
-	};
-
-	uint8_t background_color = 0;
-	uint8_t chalk_color = 0;
-	uint8_t alias_color = 0;
-	int8_t text_x_position = 0;
-	int8_t text_y_position = 0;
-	std::array<BlackboardWord, 16> words;
-
-	ImageGallery charset_sprite;
-	std::array<RenderItemHandle, 11> text_render_items;
-};
-
-struct Creature : Object {
-	// TODO: implement me
 };
 
 inline std::string repr(const Object& o) {

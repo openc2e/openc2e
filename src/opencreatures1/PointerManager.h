@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ObjectHandle.h"
 #include "common/backend/BackendEvent.h"
+#include "objects/ObjectHandle.h"
 
 class PointerManager {
   public:

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ObjectHandle.h"
 #include "Scriptorium.h"
+#include "objects/ObjectHandle.h"
 
 /*
 

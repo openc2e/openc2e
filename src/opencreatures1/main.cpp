@@ -6,7 +6,6 @@
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "MessageManager.h"
-#include "ObjectManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
 #include "Renderable.h"
@@ -19,6 +18,7 @@
 #include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
 #include "common/render/RenderSystem.h"
+#include "objects/ObjectManager.h"
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
 

@@ -2,8 +2,8 @@
 
 #include "Macro.h"
 #include "MacroContext.h"
-#include "ObjectHandle.h"
 #include "common/StaticVector.h"
+#include "objects/ObjectHandle.h"
 
 #include <array>
 #include <fmt/core.h>

@@ -3,9 +3,11 @@
 #include "C1ControlledSound.h"
 #include "C1SoundManager.h"
 #include "MessageManager.h"
-#include "Object.h"
-#include "ObjectManager.h"
 #include "common/Random.h"
+#include "objects/Blackboard.h"
+#include "objects/Object.h"
+#include "objects/ObjectManager.h"
+#include "objects/Vehicle.h"
 
 void Command_ADDV(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
@@ -56,6 +58,9 @@ void Command_BBDcolon(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;
 	ctx.read_arg_separator(m);
 
+	auto targ = ctx.get_targ(m);
+	auto bbd = targ->as_blackboard();
+
 	Token subcommand = ctx.read_token(m);
 	ctx.read_arg_separator(m);
 
@@ -69,22 +74,20 @@ void Command_BBDcolon(MacroContext& ctx, Macro& m) {
 
 	} else if (subcommand == Token("show")) {
 		int32_t enable = ctx.read_int(m);
-		auto targ = ctx.get_targ(m);
 		if (enable == 1) {
-			targ->blackboard_show_word(targ->obv0);
+			bbd->blackboard_show_word(targ->obv0);
 		} else if (enable == 0) {
-			targ->blackboard_hide_word();
+			bbd->blackboard_hide_word();
 		} else {
 			throw Exception(fmt::format("BBD: SHOW {} invalid argument", enable));
 		}
 
 	} else if (subcommand == Token("emit")) {
 		int32_t volume = ctx.read_int(m);
-		auto targ = ctx.get_targ(m);
 		if (volume > 0) {
-			targ->blackboard_emit_earshot(targ->obv0);
+			bbd->blackboard_emit_earshot(targ->obv0);
 		} else if (volume == 0) {
-			targ->blackboard_emit_eyesight(targ->obv0);
+			bbd->blackboard_emit_eyesight(targ->obv0);
 		} else {
 			throw Exception(fmt::format("BBD: EMIT {} invalid argument", volume));
 		}
@@ -92,9 +95,9 @@ void Command_BBDcolon(MacroContext& ctx, Macro& m) {
 	} else if (subcommand == Token("edit")) {
 		int32_t enable = ctx.read_int(m);
 		if (enable == 1) {
-			ctx.get_targ(m)->blackboard_enable_edit();
+			bbd->blackboard_enable_edit();
 		} else if (enable == 0) {
-			ctx.get_targ(m)->blackboard_disable_edit();
+			bbd->blackboard_disable_edit();
 		} else {
 			throw Exception(fmt::format("BBD: EDIT {} invalid argument", enable));
 		}
