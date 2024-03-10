@@ -1187,10 +1187,16 @@ bool Engine::initialSetup() {
 }
 
 void Engine::shutdown() {
+	// first kill all world state, then start killing backend components
 	world.shutdown();
+
+	// musicmanager might still hold audio handles, so release them before
+	// (1) the audio backend gets shut down and (2) this engine object is
+	// destructed which may happen after audio backend statics get destructed
+	musicmanager.reset();
+
+	// backends should be okay to kill now
 	get_audio_backend()->shutdown();
 	get_backend()->shutdown();
 	net->shutdown();
 }
-
-/* vim: set noet: */
