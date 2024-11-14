@@ -53,13 +53,13 @@ jobs:
       run: cmake --install build --config RelWithDebInfo --prefix "mngplayer2-${{ github.sha }}-${{ runner.os }}" --component mngplayer2
     - name: "Upload distribution artifact"
       if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: openc2e-${{ github.sha }}-${{ runner.os }}
         path: openc2e-${{ github.sha }}-${{ runner.os }}
     - name: "Upload distribution artifact"
       if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: MNGPlayer2-${{ github.sha }}-${{ runner.os }}
         path: mngplayer2-${{ github.sha }}-${{ runner.os }}
