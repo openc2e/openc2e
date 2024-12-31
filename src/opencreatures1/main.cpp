@@ -84,29 +84,36 @@ void update_everything() {
 	// these should update as often as possible, regardless of ticks
 	g_engine_context.music->update();
 
-	// some things can update only every "tick" - 1/10sec
+	// some things can update only every "tick" - usually described as
+	// 1/10sec but actually every 90 milliseconds, or 1/11.1̅ sec
 	using namespace std::chrono;
-	static time_point<steady_clock> time_of_last_frame{steady_clock::now()};
-	static time_point<steady_clock> time_of_last_tick{steady_clock::now()};
+	static steady_clock::duration accumulator{0};
+	static time_point<steady_clock> prev_frame_time{steady_clock::now()};
 	auto now = steady_clock::now();
-	auto time_since_last_frame = duration_cast<milliseconds>(now - time_of_last_frame).count();
-	auto time_since_last_tick = duration_cast<milliseconds>(now - time_of_last_tick).count();
-	time_of_last_frame = now;
-	if (time_since_last_tick >= 100 - time_since_last_frame / 2) {
-		// printf("time_since_last_frame %lli time_since_last_tick %lli (%+lli)\n",
-		// 	time_since_last_frame,
-		// 	time_since_last_tick,
-		// 	time_since_last_tick - 100);
-		time_of_last_tick = now;
-		if (time_since_last_tick < 100) {
-			time_of_last_tick += milliseconds(100 - time_since_last_tick);
-		} else if (time_since_last_tick > 100) {
-			time_of_last_tick -= milliseconds(time_since_last_tick % 100);
+	accumulator += (now - prev_frame_time);
+	prev_frame_time = now;
+
+	while (accumulator >= milliseconds(90)) {
+		if (accumulator >= milliseconds(180)) {
+			printf("multiple ticks, accumulator %lli ms\n", duration_cast<milliseconds>(accumulator).count());
 		}
+
+		accumulator -= milliseconds(90);
+
 		g_engine_context.viewport->tick();
 		g_engine_context.objects->tick();
 		g_engine_context.macros->tick();
 		g_engine_context.messages->tick();
+
+		static auto prev_second = duration_cast<seconds>(steady_clock::now().time_since_epoch());
+		static uint64_t ticks = 0;
+		auto current_second = duration_cast<seconds>(steady_clock::now().time_since_epoch());
+		if (current_second != prev_second) {
+			prev_second = current_second;
+			printf("ticks this second %lli\n", ticks);
+			ticks = 0;
+		}
+		ticks++;
 	}
 
 	// these should update as often as possible, regardless of ticks
