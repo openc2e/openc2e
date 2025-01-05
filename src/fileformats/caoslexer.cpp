@@ -184,7 +184,6 @@ start:
 str:
 	if (p[0] == '\0') {
 		push_value(caostoken::TOK_ERROR);
-		goto eoi;
 	} else if (p[0] == '\r' || p[0] == '\n') {
 		p++;
 		push_value(caostoken::TOK_ERROR);
