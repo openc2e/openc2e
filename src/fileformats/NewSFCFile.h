@@ -6,6 +6,7 @@
 
 #include <array>
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <vector>
 
