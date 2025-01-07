@@ -26,6 +26,7 @@
 #include "common/math/Rect.h"
 #include "common/span.h"
 
+#include <functional>
 #include <memory>
 #include <string>
 
