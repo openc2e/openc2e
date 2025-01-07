@@ -243,9 +243,13 @@ std::vector<CAOSNodePtr> parse(const std::vector<caostoken>& tokens, Dialect* di
 }
 
 template <>
-struct fmt::formatter<ci_type> : public formatter<string_view> {
+struct fmt::formatter<ci_type> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
 	template <typename FormatContext>
-	auto format(const ci_type& ci, FormatContext& ctx) {
+	auto format(const ci_type& ci, FormatContext& ctx) const {
 		std::string name;
 		switch (ci) {
 			case CI_OTHER: name = "CI_OTHER"; break;
@@ -262,14 +266,18 @@ struct fmt::formatter<ci_type> : public formatter<string_view> {
 			case CI_ANYVALUE: name = "CI_ANYVALUE"; break;
 			case CI_CONDITION: name = "CI_CONDITION"; break;
 		}
-		return formatter<string_view>::format(name, ctx);
+		return format_to(ctx.out(), "{}", name);
 	}
 };
 
 template <>
-struct fmt::formatter<caostoken::toktype> : public formatter<string_view> {
+struct fmt::formatter<caostoken::toktype> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
 	template <typename FormatContext>
-	auto format(const caostoken::toktype& t, FormatContext& ctx) {
+	auto format(const caostoken::toktype& t, FormatContext& ctx) const {
 		std::string name;
 		switch (t) {
 			case caostoken::TOK_WORD: name = "TOK_WORD"; break;
@@ -286,6 +294,6 @@ struct fmt::formatter<caostoken::toktype> : public formatter<string_view> {
 			case caostoken::TOK_EOI: name = "TOK_EOI"; break;
 			case caostoken::TOK_ERROR: name = "TOK_ERROR"; break;
 		}
-		return formatter<string_view>::format(name, ctx);
+		return format_to(ctx.out(), "{}", name);
 	}
 };

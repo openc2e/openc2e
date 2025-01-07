@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	fmt::print("stream position = {}\n", s.tellg());
+	fmt::print("stream position = {}\n", static_cast<size_t>(s.tellg()));
 
 	std::vector<uint8_t> decompressed_data(data.size() * 20); // TODO: ???
 	uLongf usize = decompressed_data.size();

@@ -28,6 +28,19 @@ enum ActiveFlag : uint8_t {
 	ACTV_ACTIVE2 = 2,
 };
 
+template <>
+struct fmt::formatter<ActiveFlag> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(ActiveFlag a, FormatContext& ctx) const {
+		return format_to(ctx.out(), "{}", std::to_string(a));
+	}
+};
+
 enum AttributeFlags : uint8_t {
 	ATTR_CARRYABLE = 1,
 	ATTR_MOUSEABLE = 2,

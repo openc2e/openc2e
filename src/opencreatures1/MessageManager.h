@@ -24,6 +24,19 @@ enum MessageNumber {
 	MESSAGE_DROP = 5,
 };
 
+template <>
+struct fmt::formatter<MessageNumber> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(MessageNumber n, FormatContext& ctx) const {
+		return format_to(ctx.out(), "{}", std::to_string(n));
+	}
+};
+
 struct Message {
 	ObjectHandle from;
 	ObjectHandle to;

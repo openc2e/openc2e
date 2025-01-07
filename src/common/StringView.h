@@ -78,7 +78,7 @@ struct fmt::formatter<StringView> {
 		return ctx.begin();
 	}
 
-	auto format(StringView sv, format_context& ctx) {
+	auto format(StringView sv, format_context& ctx) const {
 		auto out = ctx.out();
 		for (auto c : sv) {
 			*out++ = c;

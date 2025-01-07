@@ -82,7 +82,7 @@ std::string scriptnumber_to_string(ScriptNumber eventno) {
 			return s.name;
 		}
 	}
-	return "";
+	return std::to_string(eventno);
 }
 
 bool MacroManager::queue_script(ObjectHandle from_id, ObjectHandle to_id, ScriptNumber eventno, bool override_existing) {
@@ -95,10 +95,6 @@ bool MacroManager::queue_script(ObjectHandle from_id, ObjectHandle to_id, uint8_
 	auto* to = g_engine_context.objects->try_get(to_id);
 	auto* from = g_engine_context.objects->try_get(from_id);
 	return queue_script(from, to, family, genus, species, eventno, override_existing);
-}
-
-static std::string format_script(ScriptNumber eventno) {
-	return fmt::format("{}", scriptnumber_to_string(eventno), eventno);
 }
 
 bool MacroManager::queue_script(Object* from, Object* to, ScriptNumber eventno, bool override_existing) {
@@ -134,7 +130,7 @@ bool MacroManager::queue_script(Object* from, Object* to, uint8_t family, uint8_
 			// skip, otherwise this raises warnings when the pointer does something (and we'll handle the return result anyways)
 			return false;
 		}
-		fmt::print("WARN [MacroManager] tried to run nonexistent script {} {}\n", repr(to), format_script(eventno));
+		fmt::print("WARN [MacroManager] tried to run nonexistent script {} {}\n", repr(to), eventno);
 		return false;
 	}
 
@@ -151,7 +147,7 @@ bool MacroManager::queue_script(Object* from, Object* to, uint8_t family, uint8_
 				// fmt::print("WARN [MacroManager] Object {} {} {} skipping timer script because macro already exists\n", to->family, to->genus, to->species);
 				return true;
 			}
-			// fmt::print("WARN [MacroManager] {} replacing macro with {}, hope it doesn't break anything\n", repr(to), format_script(eventno));
+			// fmt::print("WARN [MacroManager] {} replacing macro with {}, hope it doesn't break anything\n", repr(to), eventno);
 			delete_macros_owned_by(m.ownr);
 		}
 	}

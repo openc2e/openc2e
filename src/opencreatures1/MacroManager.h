@@ -82,6 +82,19 @@ enum ScriptNumber {
 
 std::string scriptnumber_to_string(ScriptNumber);
 
+template <>
+struct fmt::formatter<ScriptNumber> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(ScriptNumber n, FormatContext& ctx) const {
+		return format_to(ctx.out(), "{}", scriptnumber_to_string(n));
+	}
+};
+
 class MacroManager {
   public:
 	void add(Macro macro);

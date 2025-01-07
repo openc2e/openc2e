@@ -233,7 +233,7 @@ struct fmt::formatter<SlotMapKey> {
 	}
 
 	template <typename FormatContext>
-	auto format(SlotMapKey val, FormatContext& ctx) {
+	auto format(SlotMapKey val, FormatContext& ctx) const {
 		return format_to(ctx.out(), "{}:{}", val.index, val.counter);
 	}
 };

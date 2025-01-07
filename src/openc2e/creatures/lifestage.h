@@ -19,6 +19,7 @@
 #ifndef _C2E_LIFESTAGE_H
 #define _C2E_LIFESTAGE_H
 
+#include <fmt/core.h>
 #include <string>
 
 /*
@@ -45,6 +46,19 @@ inline std::string lifestage_to_name(lifestage l) {
 		default: return std::to_string(l);
 	}
 }
+
+template <>
+struct fmt::formatter<lifestage> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(lifestage l, FormatContext& ctx) const {
+		return format_to(ctx.out(), "{}", lifestage_to_name(l));
+	}
+};
 
 #endif
 

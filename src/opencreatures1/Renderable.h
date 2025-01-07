@@ -65,7 +65,7 @@ struct fmt::formatter<Renderable> {
 	}
 
 	template <typename FormatContext>
-	auto format(const Renderable& r, FormatContext& ctx) {
+	auto format(const Renderable& r, FormatContext& ctx) const {
 		if (r.has_animation()) {
 			return format_to(ctx.out(),
 				"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation={} anim_index={}>",

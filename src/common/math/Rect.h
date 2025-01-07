@@ -94,7 +94,7 @@ struct fmt::formatter<Rect2f> {
 	}
 
 	template <typename FormatContext>
-	auto format(Rect2f val, FormatContext& ctx) {
+	auto format(Rect2f val, FormatContext& ctx) const {
 		return format_to(ctx.out(), "Rect2f({},{} + {},{})", val.x, val.y, val.width, val.height);
 	}
 };
