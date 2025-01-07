@@ -334,7 +334,7 @@ void Object::set_position(float newx, float newy) {
 
 	auto* main_part = get_renderable_for_part(0);
 	if (!main_part) {
-		throw_exception("Tried to move an object without any parts: {}", repr(*this));
+		throw_exception("Tried to move an object without any parts: {}", *this);
 	}
 
 	// TODO: replace this with get_position and a Vector2?
@@ -371,7 +371,7 @@ void Object::add_position(float xdiff, float ydiff) {
 
 	auto* main_part = get_renderable_for_part(0);
 	if (!main_part) {
-		throw_exception("Tried to move an object without any parts: {}", repr(*this));
+		throw_exception("Tried to move an object without any parts: {}", *this);
 	}
 	if (xdiff == 0 && ydiff == 0) {
 		return;
@@ -382,7 +382,7 @@ void Object::add_position(float xdiff, float ydiff) {
 int32_t Object::get_z_order() const {
 	auto* main_part = get_renderable_for_part(0);
 	if (!main_part) {
-		throw_exception("Can't get main part of object without any parts: {}", repr(*this));
+		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
 
 	return main_part->get_z_order();
@@ -391,7 +391,7 @@ int32_t Object::get_z_order() const {
 Rect2i Object::get_bbox() const {
 	auto* main_part = get_renderable_for_part(0);
 	if (!main_part) {
-		throw_exception("Can't get main part of object without any parts: {}", repr(*this));
+		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
 
 	return main_part->get_bbox();
@@ -443,7 +443,7 @@ void Object::tick() {
 		if (ticks_since_last_tick_event >= tick_value) {
 			ticks_since_last_tick_event = 0;
 			if (!g_engine_context.macros->queue_script(this, this, SCRIPT_TIMER)) {
-				fmt::print("ERRO [Object::tick] Disabling timer for {}\n", repr(this));
+				fmt::print("ERRO [Object::tick] Disabling timer for {}\n", *this);
 				tick_value = 0;
 			}
 			// fmt::print("Fired timer script for {}, {}, {}\n", family, genus, species);

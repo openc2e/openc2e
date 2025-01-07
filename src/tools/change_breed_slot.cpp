@@ -117,7 +117,7 @@ std::vector<uint8_t> change_genome(const std::vector<uint8_t>& data, int new_spe
 				part_number_to_name(cag->part),
 				species_number_to_name(cag->species),
 				breed_slot_to_name(cag->variant),
-				lifestage_to_name(cag->header.switchontime),
+				cag->header.switchontime,
 				gender,
 				cag->header.variant);
 
@@ -155,7 +155,7 @@ std::string get_new_filename(std::string filename, int new_species_number, int n
 		(char)toupper(stem[3]),
 		(char)toupper(stem[0]),
 		((stem[1] - '0') < 4 ? "Male" : "Female"),
-		lifestage_to_name((lifestage)(stem[2] - '0')));
+		(lifestage)(stem[2] - '0'));
 
 	std::string newname = fmt::format(
 		"{}{}{}{}{}",

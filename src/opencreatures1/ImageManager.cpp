@@ -5,7 +5,6 @@
 #include "common/Ascii.h"
 #include "common/Exception.h"
 #include "common/NumericCast.h"
-#include "common/Repr.h"
 #include "common/backend/Backend.h"
 #include "fileformats/ImageUtils.h"
 #include "fileformats/paletteFile.h"
@@ -65,7 +64,7 @@ void ImageManager::load_default_palette() {
 
 const ImageGallery& ImageManager::get_image(std::string name, int32_t absolute_base, int32_t image_count, ImageType allowed_types) {
 	if (image_count <= 0) {
-		throw Exception(fmt::format("ImageManager::get_image called with image_count=0 (name={})", repr(name)));
+		throw Exception(fmt::format("ImageManager::get_image called with image_count=0 (name={:?})", name));
 	}
 
 	name = to_ascii_lowercase(name);
@@ -83,7 +82,7 @@ const ImageGallery& ImageManager::get_image(std::string name, int32_t absolute_b
 		path = g_engine_context.paths->find_path(PATH_TYPE_IMAGE, name + ".spr");
 	}
 	if (path.empty()) {
-		throw Exception(fmt::format("Couldn't find image {}", repr(name)));
+		throw Exception(fmt::format("Couldn't find image {:?}", name));
 	}
 
 	// TODO: faster to memory map file?

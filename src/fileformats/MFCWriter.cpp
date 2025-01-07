@@ -1,6 +1,5 @@
 #include "MFCWriter.h"
 
-#include "common/Repr.h"
 #include "common/encoding.h"
 #include "common/endianlove.h"
 
@@ -18,7 +17,7 @@ MFCWriter::~MFCWriter() {
 
 void MFCWriter::ascii_dword(const std::string& val) {
 	if (!is_valid_ascii(reinterpret_cast<const uint8_t*>(val.data()), val.size())) {
-		throw Exception(fmt::format("Invalid ASCII string: '{}'", repr(val)));
+		throw Exception(fmt::format("Invalid ASCII string: {:?}", val));
 	}
 
 	if (val.size() == 0) {
@@ -26,13 +25,13 @@ void MFCWriter::ascii_dword(const std::string& val) {
 	} else if (val.size() == 4) {
 		m_out.write(val.c_str(), val.size());
 	} else {
-		throw Exception(fmt::format("Expected ASCII 4-byte string, got {}", repr(val)));
+		throw Exception(fmt::format("Expected ASCII 4-byte string, got {:?}", val));
 	}
 }
 
 void MFCWriter::ascii_mfcstring(const std::string& val) {
 	if (!is_valid_ascii(reinterpret_cast<const uint8_t*>(val.data()), val.size())) {
-		throw Exception(fmt::format("Invalid ASCII string: '{}'", repr(val)));
+		throw Exception(fmt::format("Invalid ASCII string: {:?}", val));
 	}
 	if (val.size() < 0xFF) {
 		::write8(m_out, val.size());
@@ -68,7 +67,7 @@ void MFCWriter::ascii_nullterminated(const std::string& val, size_t n) {
 	}
 
 	if (!is_valid_ascii(reinterpret_cast<const uint8_t*>(val.data()), val.size())) {
-		throw Exception(fmt::format("Invalid ASCII string: '{}'", repr(val)));
+		throw Exception(fmt::format("Invalid ASCII string: {:?}", val));
 	}
 
 	m_out.write(val.c_str(), val.size());

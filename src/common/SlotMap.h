@@ -225,15 +225,6 @@ class DenseSlotMap {
 };
 
 
-template <>
-struct fmt::formatter<SlotMapKey> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
-	}
-
-	template <typename FormatContext>
-	auto format(SlotMapKey val, FormatContext& ctx) const {
-		return format_to(ctx.out(), "{}:{}", val.index, val.counter);
-	}
-};
+inline auto format_as(SlotMapKey val) {
+	return fmt::format("{}:{}", val.index, val.counter);
+}

@@ -34,7 +34,7 @@ enum lifestage { baby = 0,
 	old = 5,
 	senile = 6 };
 
-inline std::string lifestage_to_name(lifestage l) {
+inline std::string format_as(lifestage l) {
 	switch (l) {
 		case baby: return "Baby";
 		case child: return "Child";
@@ -46,19 +46,6 @@ inline std::string lifestage_to_name(lifestage l) {
 		default: return std::to_string(l);
 	}
 }
-
-template <>
-struct fmt::formatter<lifestage> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
-	}
-
-	template <typename FormatContext>
-	auto format(lifestage l, FormatContext& ctx) const {
-		return format_to(ctx.out(), "{}", lifestage_to_name(l));
-	}
-};
 
 #endif
 

@@ -13,7 +13,6 @@
 #include "Scriptorium.h"
 #include "ViewportManager.h"
 #include "common/OptionsParser.h"
-#include "common/Repr.h"
 #include "common/StringView.h"
 #include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
@@ -68,7 +67,7 @@ void load_everything() {
 		fmt::print(stderr, "* Error: Couldn't find Eden.sfc\n");
 		exit(1);
 	}
-	fmt::print("* Loading world: {}\n", repr(sfc_path));
+	fmt::print("* Loading world: {:?}\n", sfc_path.string());
 	auto sfc = sfc::read_sfc_v1_file(sfc_path);
 
 	// load world data
@@ -201,11 +200,11 @@ extern "C" int main(int argc, char** argv) {
 	}
 
 	if (!fs::exists(datapath)) {
-		fmt::print(stderr, "* Error: Data path {} does not exist\n", repr(datapath));
+		fmt::print(stderr, "* Error: Data path {:?} does not exist\n", datapath);
 		return 1;
 	}
 
-	fmt::print("* Creatures 1 Data: {}\n", repr(datapath));
+	fmt::print("* Creatures 1 Data: {:?}\n", datapath);
 	g_engine_context.paths->set_main_directory(datapath);
 	load_everything();
 

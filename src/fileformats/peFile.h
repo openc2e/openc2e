@@ -105,6 +105,7 @@ class peFile {
 
 	std::vector<resourceInfo> resources;
 
-	static std::string resource_type_to_string(PeResourceType);
 	static std::string language_to_string(PeLanguage, PeSubLanguage);
 };
+
+std::string format_as(PeResourceType);

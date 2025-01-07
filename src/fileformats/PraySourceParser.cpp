@@ -38,11 +38,7 @@ struct PrayToken {
 	bool is_one_of(std::initializer_list<PrayTokenType>) const;
 	bool is_integer() const;
 	bool is_atsign() const;
-
-	std::string repr() const;
-	const char* c_str() const;
 };
-
 
 static char unescape(char c) {
 	switch (c) {
@@ -92,12 +88,11 @@ bool PrayToken::is_atsign() const {
 	return type == PRAY_ATSIGN;
 }
 
-std::string PrayToken::repr() const {
-	// TODO: escape characters
-	return std::string(c_str()) + " " + raw_value;
+std::string format_as(const PrayToken& t) {
+	return fmt::format("{} {:?}", t.type, t.raw_value);
 }
 
-const char* PrayToken::c_str() const {
+auto format_as(PrayTokenType type) {
 	switch (type) {
 		case PRAY_BAREWORD: return "string";
 		case PRAY_STRING: return "string";
@@ -282,7 +277,7 @@ std::vector<PraySourceParser::Event> PraySourceParserImpl::next() {
 		}
 	}
 	if (!seen_en_gb) {
-		return {Error{"Expected \"en-GB\", got " + token.repr()}};
+		return {Error{fmt::format("Expected \"en-GB\", got {}", token)}};
 	}
 
 	// generate synthetic "GroupBlock" lines
@@ -306,7 +301,7 @@ std::vector<PraySourceParser::Event> PraySourceParserImpl::next() {
 		return {result};
 	}
 	if (token.type != PRAY_NEWLINE) {
-		return {Error{"Expected newline, got " + token.repr()}};
+		return {Error{fmt::format("Expected newline, got {}", token)}};
 	}
 	next_token();
 
@@ -315,7 +310,7 @@ std::vector<PraySourceParser::Event> PraySourceParserImpl::next() {
 
 PraySourceParser::Event PraySourceParserImpl::parse_line() {
 	if (token.type == PRAY_ERROR) {
-		return Error{token.repr()};
+		return Error{format_as(token)};
 	}
 
 	if (token.type == PRAY_STRING) {
@@ -323,8 +318,7 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 		next_token();
 
 		if (!parse_some_ws()) {
-			return Error{"Expected whitespace or newline after string, got " +
-						 token.repr()};
+			return Error{fmt::format("Expected whitespace or newline after string, got {}", token)};
 		}
 
 		if (token.type == PRAY_STRING) {
@@ -334,11 +328,11 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 		} else if (token.is_atsign()) {
 			next_token();
 			if (!parse_some_ws()) {
-				return Error{"Expected whitespace after '@', got " +
-							 token.repr()};
+				return Error{fmt::format("Expected whitespace after '@', got {}",
+					token)};
 			}
 			if (token.type != PRAY_STRING) {
-				return Error{"Expected string after '@', got " + token.repr()};
+				return Error{fmt::format("Expected string after '@', got {}", token)};
 			}
 			std::string value = token.value();
 			next_token();
@@ -348,8 +342,7 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 			next_token();
 			return IntegerTag{key, value};
 		} else {
-			return Error{"Expected string, integer, or '@', got " +
-						 token.repr()};
+			return Error{fmt::format("Expected string, integer, or '@', got {}", token)};
 		}
 	}
 
@@ -358,16 +351,15 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 		next_token();
 
 		if (directive != "group" && directive != "inline") {
-			return Error{"Expected 'group' or 'inline', got " + token.repr()};
+			return Error{fmt::format("Expected 'group' or 'inline', got {}", token)};
 		}
 
 		if (!parse_some_ws()) {
-			return Error{"Expected whitespace after '" + directive + "', got " +
-						 token.repr()};
+			return Error{fmt::format("Expected whitespace after '{}', got {}", directive, token)};
 		}
 
 		if (token.type != PRAY_BAREWORD) {
-			return Error{"Expected block type, got " + token.repr()};
+			return Error{fmt::format("Expected block type, got {}", token)};
 		}
 		std::string type = token.value();
 		next_token();
@@ -378,7 +370,7 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 
 		if (directive == "group") {
 			if (token.type != PRAY_STRING) {
-				return Error{"Expected block name, got " + token.repr()};
+				return Error{fmt::format("Expected block name, got {}", token)};
 			}
 			std::string name = token.value();
 			next_token();
@@ -390,7 +382,7 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 
 		} else if (directive == "inline") {
 			if (token.type != PRAY_STRING) {
-				return Error{"Expected block label, got " + token.repr()};
+				return Error{fmt::format("Expected block label, got {}", token)};
 			}
 			std::string label = token.value();
 			next_token();
@@ -399,7 +391,7 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 				return Error{""};
 
 			if (token.type != PRAY_STRING) {
-				return Error{"Expected quoted filename, got " + token.repr()};
+				return Error{fmt::format("Expected quoted filename, got {}", token)};
 			}
 			std::string filename = token.value();
 			next_token();
@@ -408,7 +400,7 @@ PraySourceParser::Event PraySourceParserImpl::parse_line() {
 		}
 	}
 
-	return Error{"Expected string or bareword, got: " + token.repr()};
+	return Error{fmt::format("Expected string or bareword, got: {}", token)};
 }
 
 bool PraySourceParserImpl::parse_some_ws() {
@@ -432,7 +424,7 @@ std::vector<PraySourceParser::Event> PraySourceParser::parse(const std::string& 
 	return PraySourceParserImpl(s.c_str()).run();
 }
 
-std::string PraySourceParser::eventToString(const Event& event) {
+std::string format_as(const Event& event) {
 	if (auto* e = event.get_if<Error>()) {
 		return fmt::format("Error({})", e->message);
 
@@ -455,6 +447,6 @@ std::string PraySourceParser::eventToString(const Event& event) {
 		return fmt::format("IntegerTag({}, {})", e->key, e->value);
 
 	} else {
-		return fmt::format("???");
+		return "???";
 	}
 }

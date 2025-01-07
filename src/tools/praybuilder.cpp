@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
 				int_tags[event->key] = event->value;
 
 			} else {
-				std::cout << "Not Implemented: " << eventToString(res) << std::endl;
+				std::cout << "Not Implemented: " << format_as(res) << std::endl;
 			}
 		}
 

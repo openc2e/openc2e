@@ -37,8 +37,8 @@ struct Token {
 	std::array<char, 4> data;
 };
 
-std::string repr(ShortToken i);
-std::string repr(Token i);
+std::string format_as(ShortToken i);
+std::string format_as(Token i);
 
 class MacroContext;
 struct Macro;

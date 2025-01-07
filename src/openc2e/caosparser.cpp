@@ -242,58 +242,38 @@ std::vector<CAOSNodePtr> parse(const std::vector<caostoken>& tokens, Dialect* di
 	return toplevel;
 }
 
-template <>
-struct fmt::formatter<ci_type> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
+auto format_as(const ci_type& ci) {
+	switch (ci) {
+		case CI_OTHER: return "CI_OTHER";
+		case CI_COMMAND: return "CI_COMMAND";
+		case CI_NUMERIC: return "CI_NUMERIC";
+		case CI_STRING: return "CI_STRING";
+		case CI_AGENT: return "CI_AGENT";
+		case CI_VARIABLE: return "CI_VARIABLE";
+		case CI_BYTESTR: return "CI_BYTESTR";
+		case CI_FACEVALUE: return "CI_FACEVALUE";
+		case CI_VECTOR: return "CI_VECTOR";
+		case CI_BAREWORD: return "CI_BAREWORD";
+		case CI_SUBCOMMAND: return "CI_SUBCOMMAND";
+		case CI_ANYVALUE: return "CI_ANYVALUE";
+		case CI_CONDITION: return "CI_CONDITION";
 	}
-	template <typename FormatContext>
-	auto format(const ci_type& ci, FormatContext& ctx) const {
-		std::string name;
-		switch (ci) {
-			case CI_OTHER: name = "CI_OTHER"; break;
-			case CI_COMMAND: name = "CI_COMMAND"; break;
-			case CI_NUMERIC: name = "CI_NUMERIC"; break;
-			case CI_STRING: name = "CI_STRING"; break;
-			case CI_AGENT: name = "CI_AGENT"; break;
-			case CI_VARIABLE: name = "CI_VARIABLE"; break;
-			case CI_BYTESTR: name = "CI_BYTESTR"; break;
-			case CI_FACEVALUE: name = "CI_FACEVALUE"; break;
-			case CI_VECTOR: name = "CI_VECTOR"; break;
-			case CI_BAREWORD: name = "CI_BAREWORD"; break;
-			case CI_SUBCOMMAND: name = "CI_SUBCOMMAND"; break;
-			case CI_ANYVALUE: name = "CI_ANYVALUE"; break;
-			case CI_CONDITION: name = "CI_CONDITION"; break;
-		}
-		return format_to(ctx.out(), "{}", name);
-	}
-};
+}
 
-template <>
-struct fmt::formatter<caostoken::toktype> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
+auto format_as(const caostoken::toktype& t) {
+	switch (t) {
+		case caostoken::TOK_WORD: return "TOK_WORD";
+		case caostoken::TOK_BYTESTR: return "TOK_BYTESTR";
+		case caostoken::TOK_STRING: return "TOK_STRING";
+		case caostoken::TOK_CHAR: return "TOK_CHAR";
+		case caostoken::TOK_BINARY: return "TOK_BINARY";
+		case caostoken::TOK_INT: return "TOK_INT";
+		case caostoken::TOK_FLOAT: return "TOK_FLOAT";
+		case caostoken::TOK_COMMENT: return "TOK_COMMENT";
+		case caostoken::TOK_WHITESPACE: return "TOK_WHITESPACE";
+		case caostoken::TOK_NEWLINE: return "TOK_NEWLINE";
+		case caostoken::TOK_COMMA: return "TOK_COMMA";
+		case caostoken::TOK_EOI: return "TOK_EOI";
+		case caostoken::TOK_ERROR: return "TOK_ERROR";
 	}
-	template <typename FormatContext>
-	auto format(const caostoken::toktype& t, FormatContext& ctx) const {
-		std::string name;
-		switch (t) {
-			case caostoken::TOK_WORD: name = "TOK_WORD"; break;
-			case caostoken::TOK_BYTESTR: name = "TOK_BYTESTR"; break;
-			case caostoken::TOK_STRING: name = "TOK_STRING"; break;
-			case caostoken::TOK_CHAR: name = "TOK_CHAR"; break;
-			case caostoken::TOK_BINARY: name = "TOK_BINARY"; break;
-			case caostoken::TOK_INT: name = "TOK_INT"; break;
-			case caostoken::TOK_FLOAT: name = "TOK_FLOAT"; break;
-			case caostoken::TOK_COMMENT: name = "TOK_COMMENT"; break;
-			case caostoken::TOK_WHITESPACE: name = "TOK_WHITESPACE"; break;
-			case caostoken::TOK_NEWLINE: name = "TOK_NEWLINE"; break;
-			case caostoken::TOK_COMMA: name = "TOK_COMMA"; break;
-			case caostoken::TOK_EOI: name = "TOK_EOI"; break;
-			case caostoken::TOK_ERROR: name = "TOK_ERROR"; break;
-		}
-		return format_to(ctx.out(), "{}", name);
-	}
-};
+}

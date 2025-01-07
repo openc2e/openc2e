@@ -63,7 +63,7 @@ void PointerManager::handle_event(const BackendEvent& event) {
 			bool contains_click = (bbox.has_point(worldx, worldy) || bbox.has_point(worldx + CREATURES1_WORLD_WIDTH, worldy) || bbox.has_point(worldx - CREATURES1_WORLD_WIDTH, worldy));
 			bool topmost = (best_object == nullptr || obj->get_z_order() > best_object->get_z_order());
 			if (contains_click && topmost) {
-				fmt::print("found {}\n", repr(obj));
+				fmt::print("found {}\n", format_as(obj));
 				best_object = obj;
 			}
 		}

@@ -215,7 +215,7 @@ std::vector<std::string> peFile::getResourceStrings(resourceInfo r) {
 	return strings;
 }
 
-std::string peFile::resource_type_to_string(PeResourceType type) {
+std::string format_as(PeResourceType type) {
 	switch (type) {
 		case PE_RESOURCETYPE_CURSOR: return "cursor";
 		case PE_RESOURCETYPE_BITMAP: return "bitmap";

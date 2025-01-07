@@ -16,6 +16,6 @@ void throw_exception(const char* message) {
 }
 
 template <typename T = Exception, typename... Args>
-void throw_exception(const char* fmt, Args... args) {
-	throw T(fmt::format(fmt, args...));
+void throw_exception(const char* fmt, Args&&... args) {
+	throw T(fmt::format(fmt, std::forward<Args>(args)...));
 }

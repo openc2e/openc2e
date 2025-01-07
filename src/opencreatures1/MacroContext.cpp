@@ -2,14 +2,13 @@
 
 #include "Macro.h"
 #include "common/Ascii.h"
-#include "common/Repr.h"
 #include "objects/ObjectManager.h"
 
-std::string repr(ShortToken i) {
+std::string format_as(ShortToken i) {
 	return std::string(i.data.begin(), i.data.end());
 }
 
-std::string repr(Token i) {
+std::string format_as(Token i) {
 	return std::string(i.data.begin(), i.data.end());
 }
 
@@ -85,7 +84,7 @@ void MacroContext::read_command_separator(Macro& m) {
 			m.ip++;
 		}
 	} else {
-		throw Exception(fmt::format("Expected whitespace, comma, or eoi after command but got {}", repr(m.script.substr(m.ip))));
+		throw Exception(fmt::format("Expected whitespace, comma, or eoi after command but got {:?}", m.script.substr(m.ip)));
 	}
 }
 
@@ -93,7 +92,7 @@ void MacroContext::read_arg_separator(Macro& m) {
 	if (m.script[m.ip] == ' ') {
 		m.ip++;
 	} else {
-		throw Exception(fmt::format("Expected whitespace before next argument but got {}", repr(m.script.substr(m.ip))));
+		throw Exception(fmt::format("Expected whitespace before next argument but got {:?}", m.script.substr(m.ip)));
 	}
 }
 
@@ -102,7 +101,7 @@ std::string MacroContext::read_bracket_string(Macro& m) {
 	uint32_t& p = m.ip;
 
 	if (s[p] != '[') {
-		throw Exception(fmt::format("Expected '[' but got {}", repr(s[p])));
+		throw Exception(fmt::format("Expected '[' but got {:?}", s[p]));
 	}
 	p++;
 	std::string value;
@@ -135,7 +134,7 @@ int32_t MacroContext::read_int(Macro& m) {
 		auto it = integerrv_funcs.find(tok);
 		if (it != integerrv_funcs.end()) {
 			if (debug) {
-				fmt::print("read_int calling func {}\n", repr(tok));
+				fmt::print("read_int calling func {}\n", tok);
 			}
 			return it->second(*this, m);
 		}
@@ -145,7 +144,7 @@ int32_t MacroContext::read_int(Macro& m) {
 		auto agent_it = agentrv_funcs.find(tok);
 		if (agent_it != agentrv_funcs.end()) {
 			if (debug) {
-				fmt::print("read_int calling agent func {}\n", repr(tok));
+				fmt::print("read_int calling agent func {}\n", tok);
 			}
 			return static_cast<int32_t>(agent_it->second(*this, m).to_integral());
 		}
@@ -185,7 +184,7 @@ bool MacroContext::read_condition(Macro& m) {
 	} else if (comparison == ShortToken("ne")) {
 		return left != right;
 	} else {
-		throw Exception(fmt::format("Unknown comparison operator {}", repr(comparison)));
+		throw Exception(fmt::format("Unknown comparison operator {}", comparison));
 	}
 }
 
@@ -196,7 +195,7 @@ ObjectHandle MacroContext::read_object(Macro& m) {
 	Token tok = read_token(m);
 	auto it = agentrv_funcs.find(tok);
 	if (it == agentrv_funcs.end()) {
-		throw Exception(fmt::format("Expected object, but got {}", repr(s + p - 4)));
+		throw Exception(fmt::format("Expected object, but got {:?}", s + p - 4));
 	}
 	return it->second(*this, m);
 };
@@ -232,7 +231,7 @@ bool MacroContext::try_get_variable(const Macro& m, Token varname, int32_t* valu
 		return false;
 	}
 	if (debug) {
-		fmt::print("{} -> {}\n", repr(varname), *value);
+		fmt::print("{:?} -> {}\n", varname, *value);
 	}
 	return true;
 }
@@ -270,7 +269,7 @@ void MacroContext::set_variable(Macro& m, Token varname, int32_t value) {
 			it->second(*this, m, value);
 			return;
 		}
-		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+		throw Exception(fmt::format("Unknown variable {:?}", varname));
 	}
 };
 
@@ -311,7 +310,7 @@ void MacroContext::tick_macro(Macro& m, bool handle_errors) {
 			}
 			auto it = command_funcs.find(command);
 			if (it == command_funcs.end()) {
-				throw UnknownMacroCommand(fmt::format("Unknown command {}", repr(command)));
+				throw UnknownMacroCommand(fmt::format("Unknown command {:?}", command));
 			}
 			it->second(*this, m);
 		} catch (Exception& e) {

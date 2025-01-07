@@ -4,7 +4,6 @@
 #include "EngineContext.h"
 #include "PathManager.h"
 #include "common/Exception.h"
-#include "common/Repr.h"
 #include "common/audio/AudioBackend.h"
 
 #include <assert.h>
@@ -158,7 +157,7 @@ AudioChannel C1SoundManager::play_sound_helper(std::string name, Rect2f initial_
 	std::string filename = g_engine_context.paths->find_path(PATH_TYPE_SOUND, name + ".wav");
 	if (filename.empty()) {
 		// creatures 1 ignores non-existent audio clips
-		fmt::print("WARNING: couldn't find audio clip {}\n", repr(name));
+		fmt::print("WARNING: couldn't find audio clip {:?}\n", name);
 		return {};
 	}
 

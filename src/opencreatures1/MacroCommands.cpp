@@ -18,7 +18,7 @@ void Command_ADDV(MacroContext& ctx, Macro& m) {
 
 	int32_t left;
 	if (!ctx.try_get_variable(m, varname, &left)) {
-		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+		throw Exception(fmt::format("Unknown variable {:?}", varname));
 	}
 	ctx.set_variable(m, varname, left + right);
 	ctx.read_command_separator(m);
@@ -70,7 +70,7 @@ void Command_BBDcolon(MacroContext& ctx, Macro& m) {
 		int32_t id = ctx.read_int(m);
 		ctx.read_arg_separator(m);
 		Token word = ctx.read_token(m);
-		fmt::print("WARNING: BBD: WORD {} {} {} not implemented\n", index, id, repr(word));
+		fmt::print("WARNING: BBD: WORD {} {} {:?} not implemented\n", index, id, word);
 
 	} else if (subcommand == Token("show")) {
 		int32_t enable = ctx.read_int(m);
@@ -103,7 +103,7 @@ void Command_BBDcolon(MacroContext& ctx, Macro& m) {
 		}
 
 	} else {
-		throw UnknownMacroCommand(fmt::format("unknown command bbd: {}", repr(subcommand)));
+		throw UnknownMacroCommand(fmt::format("unknown command bbd: {:?}", subcommand));
 	}
 	ctx.read_command_separator(m);
 }
@@ -117,7 +117,7 @@ void Command_DIVV(MacroContext& ctx, Macro& m) {
 
 	int32_t dividend;
 	if (!ctx.try_get_variable(m, varname, &dividend)) {
-		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+		throw Exception(fmt::format("Unknown variable {:?}", varname));
 	}
 
 	ctx.set_variable(m, varname, dividend / divisor);
@@ -326,7 +326,7 @@ void Command_MESG(MacroContext& ctx, Macro& m) {
 		g_engine_context.messages->mesg_writ(m.ownr, to, MessageNumber(message));
 
 	} else {
-		throw Exception(fmt::format("Unknown command 'mesg {}'", repr(subcommand)));
+		throw Exception(fmt::format("Unknown command 'mesg {:?}'", subcommand));
 	}
 }
 
@@ -339,7 +339,7 @@ void Command_MULV(MacroContext& ctx, Macro& m) {
 
 	int32_t multiplicand;
 	if (!ctx.try_get_variable(m, varname, &multiplicand)) {
-		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+		throw Exception(fmt::format("Unknown variable {:?}", varname));
 	}
 
 	ctx.set_variable(m, varname, multiplicand * multiplier);
@@ -390,7 +390,7 @@ void Command_NEGV(MacroContext& ctx, Macro& m) {
 
 	int32_t value;
 	if (!ctx.try_get_variable(m, varname, &value)) {
-		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+		throw Exception(fmt::format("Unknown variable {:?}", varname));
 	}
 
 	ctx.set_variable(m, varname, -value);
@@ -494,7 +494,7 @@ void Command_RNDV(MacroContext& ctx, Macro& m) {
 
 	int32_t generated = rand_int32(low, high);
 	if (ctx.debug) {
-		fmt::print("RNDV info {} {} {}\n", repr(varname), low, high);
+		fmt::print("RNDV info {:?} {} {}\n", varname, low, high);
 		fmt::print("RNDV generated {}\n", generated);
 	}
 	ctx.set_variable(m, varname, generated);
@@ -611,7 +611,7 @@ void Command_STIM(MacroContext& ctx, Macro& m) {
 		printf("WARNING: Treating invalid STIM FROM command as a no-op\n");
 
 	} else {
-		throw Exception(fmt::format("Unknown command 'stim {}'", repr(subcommand)));
+		throw Exception(fmt::format("Unknown command 'stim {:?}'", subcommand));
 	}
 }
 
@@ -648,7 +648,7 @@ void Command_STMpound(MacroContext& ctx, Macro& m) {
 		printf("WARNING: STM# SHOU not implemented\n");
 
 	} else {
-		throw Exception(fmt::format("Unknown command 'STM# {}'", repr(subcommand)));
+		throw Exception(fmt::format("Unknown command 'STM# {:?}'", subcommand));
 	}
 }
 
@@ -689,7 +689,7 @@ void Command_SUBV(MacroContext& ctx, Macro& m) {
 
 	int32_t minuend;
 	if (!ctx.try_get_variable(m, varname, &minuend)) {
-		throw Exception(fmt::format("Unknown variable {}", repr(varname)));
+		throw Exception(fmt::format("Unknown variable {:?}", varname));
 	}
 
 	ctx.set_variable(m, varname, minuend - subtrahend);
@@ -843,7 +843,7 @@ int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {
 	Object* o = ctx.get_targ(m);
 	auto* veh = o->as_vehicle();
 	if (!veh) {
-		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
+		throw_exception("Called XVEC on non-vehicle object: {:?}", *o);
 	}
 
 	return numeric_cast<int32_t>(veh->xvel * 256);
@@ -872,7 +872,7 @@ void LValue_XVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	Object* o = ctx.get_targ(m);
 	auto* veh = o->as_vehicle();
 	if (!veh) {
-		throw_exception("Called XVEC on non-vehicle object: {}", repr(*o));
+		throw_exception("Called XVEC on non-vehicle object: {:?}", *o);
 	}
 	veh->xvel = value / 256.f;
 }
@@ -881,7 +881,7 @@ void LValue_YVEC(const MacroContext& ctx, const Macro& m, int32_t value) {
 	Object* o = ctx.get_targ(m);
 	auto* veh = o->as_vehicle();
 	if (!veh) {
-		throw_exception("Called YVEC on non-vehicle object: {}", repr(*o));
+		throw_exception("Called YVEC on non-vehicle object: {:?}", *o);
 	}
 	veh->yvel = value / 256.f;
 }

@@ -72,17 +72,6 @@ class StringView {
 	size_t size_ = 0;
 };
 
-template <>
-struct fmt::formatter<StringView> {
-	constexpr auto parse(format_parse_context& ctx) {
-		return ctx.begin();
-	}
-
-	auto format(StringView sv, format_context& ctx) const {
-		auto out = ctx.out();
-		for (auto c : sv) {
-			*out++ = c;
-		}
-		return out;
-	}
-};
+inline auto format_as(StringView sv) {
+	return fmt::format("{:.{}}", sv.data(), sv.size());
+}

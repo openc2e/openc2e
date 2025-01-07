@@ -86,15 +86,6 @@ struct Rect2f {
 	}
 };
 
-template <>
-struct fmt::formatter<Rect2f> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
-	}
-
-	template <typename FormatContext>
-	auto format(Rect2f val, FormatContext& ctx) const {
-		return format_to(ctx.out(), "Rect2f({},{} + {},{})", val.x, val.y, val.width, val.height);
-	}
-};
+inline auto format_as(Rect2f val) {
+	return fmt::format("Rect2f({},{} + {},{})", val.x, val.y, val.width, val.height);
+}

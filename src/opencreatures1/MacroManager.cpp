@@ -4,7 +4,7 @@
 #include "objects/Object.h"
 #include "objects/ObjectManager.h"
 
-std::string scriptnumber_to_string(ScriptNumber eventno) {
+std::string format_as(ScriptNumber eventno) {
 	struct scriptname {
 		ScriptNumber eventno;
 		const char* name;
@@ -130,7 +130,7 @@ bool MacroManager::queue_script(Object* from, Object* to, uint8_t family, uint8_
 			// skip, otherwise this raises warnings when the pointer does something (and we'll handle the return result anyways)
 			return false;
 		}
-		fmt::print("WARN [MacroManager] tried to run nonexistent script {} {}\n", repr(to), eventno);
+		fmt::print("WARN [MacroManager] tried to run nonexistent script {} {}\n", format_as(to), eventno);
 		return false;
 	}
 
@@ -147,7 +147,7 @@ bool MacroManager::queue_script(Object* from, Object* to, uint8_t family, uint8_
 				// fmt::print("WARN [MacroManager] Object {} {} {} skipping timer script because macro already exists\n", to->family, to->genus, to->species);
 				return true;
 			}
-			// fmt::print("WARN [MacroManager] {} replacing macro with {}, hope it doesn't break anything\n", repr(to), eventno);
+			// fmt::print("WARN [MacroManager] {} replacing macro with {}, hope it doesn't break anything\n", to, eventno);
 			delete_macros_owned_by(m.ownr);
 		}
 	}

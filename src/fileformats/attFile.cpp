@@ -5,23 +5,6 @@
 #include <fmt/core.h>
 #include <iostream>
 
-std::string _debugrepr_at(std::vector<uint8_t>& bytes, size_t p) {
-	if (p >= bytes.size()) {
-		return "end of input";
-	}
-	auto b = bytes[p];
-	if (b == '\r') {
-		return "'\\r'";
-	} else if (b == '\n') {
-		return "'\\n'";
-	} else if (b == '\t') {
-		return "'\\t'";
-	} else if (isprint(b)) {
-		return fmt::format("'{:c}'", b);
-	} else {
-		return fmt::format("'\\x{:02x}'", b);
-	}
-}
 
 bool _is_space_at(const std::vector<uint8_t>& bytes, size_t p) {
 	if (p >= bytes.size()) {
@@ -98,7 +81,7 @@ attFile ReadAttFile(std::istream& in) {
 				break;
 			}
 			if (!_isdigit_at(bytes, p)) {
-				throw std::runtime_error(fmt::format("Expected digit, found {}\n", _debugrepr_at(bytes, p)));
+				throw std::runtime_error(fmt::format("Expected digit, found {:?}\n", (char)bytes[p]));
 			}
 			if (att.noattachments[att.nolines] >= att.attachments[0].size()) {
 				throw std::runtime_error(fmt::format("Too many integers on one line, found {}", att.noattachments[att.nolines]));

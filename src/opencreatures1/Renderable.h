@@ -39,7 +39,7 @@ class Renderable {
 	Rect2i get_bbox() const;
 
   private:
-	friend struct fmt::formatter<Renderable>;
+	friend std::string format_as(const Renderable& r);
 
 	int32_t frame() const;
 	void update_renderitem();
@@ -57,22 +57,13 @@ class Renderable {
 	RenderItemHandle renderitem;
 };
 
-template <>
-struct fmt::formatter<Renderable> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
+inline std::string format_as(const Renderable& r) {
+	if (r.has_animation()) {
+		return fmt::format(
+			"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation={} anim_index={}>",
+			r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name, r.animation_string, r.animation_frame);
 	}
-
-	template <typename FormatContext>
-	auto format(const Renderable& r, FormatContext& ctx) const {
-		if (r.has_animation()) {
-			return format_to(ctx.out(),
-				"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation={} anim_index={}>",
-				r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name, r.animation_string, r.animation_frame);
-		}
-		return format_to(ctx.out(),
-			"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation=false>",
-			r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name);
-	}
-};
+	return fmt::format(
+		"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation=false>",
+		r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name);
+}

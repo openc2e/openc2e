@@ -28,18 +28,9 @@ enum ActiveFlag : uint8_t {
 	ACTV_ACTIVE2 = 2,
 };
 
-template <>
-struct fmt::formatter<ActiveFlag> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
-	}
-
-	template <typename FormatContext>
-	auto format(ActiveFlag a, FormatContext& ctx) const {
-		return format_to(ctx.out(), "{}", std::to_string(a));
-	}
-};
+inline std::string format_as(ActiveFlag a) {
+	return std::to_string(a);
+}
 
 enum AttributeFlags : uint8_t {
 	ATTR_CARRYABLE = 1,
@@ -143,13 +134,17 @@ class Object {
 	void tick();
 };
 
-inline std::string repr(const Object& o) {
+inline std::string format_as(const Object& o) {
 	return fmt::format("Object {} {} {} uid {} \"{}\"", o.family, o.genus, o.species, o.uid.to_integral(), get_object_name(&o));
 }
 
-inline std::string repr(const Object* o) {
+inline std::string format_as(const Object* o) {
+	// formatting pointers is, unfortunately, not allowed by fmt. provide
+	// this function for code to use anyways since it matches the naming
+	// convention.
+	// is there really no better way to do this??
 	if (o == nullptr) {
-		return fmt::format("<Object null>");
+		return "<Object null>";
 	}
-	return repr(*o);
+	return format_as(*o);
 }

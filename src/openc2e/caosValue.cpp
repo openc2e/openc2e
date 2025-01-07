@@ -24,7 +24,7 @@
 
 #include <fmt/core.h>
 
-const char* variableTypeToString(variableType type) {
+const char* format_as(variableType type) {
 	switch (type) {
 		case CAOSNULL:
 			return "null";

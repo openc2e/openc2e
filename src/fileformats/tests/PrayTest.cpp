@@ -14,7 +14,7 @@ eventsToString(const std::vector<PraySourceParser::Event>& events) {
 		if (all_events.size() > 0) {
 			all_events += "\n";
 		}
-		all_events += PraySourceParser::eventToString(e);
+		all_events += format_as(e);
 	}
 	return all_events;
 }

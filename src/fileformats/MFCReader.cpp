@@ -1,6 +1,5 @@
 #include "MFCReader.h"
 
-#include "common/Repr.h"
 #include "common/encoding.h"
 #include "common/endianlove.h"
 
@@ -21,8 +20,7 @@ std::string MFCReader::read_ascii(size_t n) {
 	std::string val(n, '\0');
 	m_in.read(&val[0], n);
 	if (!is_valid_ascii(reinterpret_cast<const uint8_t*>(val.data()), val.size())) {
-		// TODO: debug representation?
-		throw std::domain_error(fmt::format("Invalid ASCII string: '{}'", repr(val)));
+		throw std::domain_error(fmt::format("Invalid ASCII string: {:?}", val));
 	}
 	return val;
 }
@@ -34,7 +32,7 @@ void MFCReader::ascii_dword(std::string& out) {
 	}
 	auto first_nul = out.find('\0');
 	if (first_nul != std::string::npos) {
-		throw Exception(fmt::format("Expected ASCII 4-byte string, got {}", repr(out)));
+		throw Exception(fmt::format("Expected ASCII 4-byte string, got {:?}", out));
 	}
 }
 
@@ -59,8 +57,7 @@ void MFCReader::ascii_nullterminated(std::string& out, size_t n) {
 	}
 
 	if (!is_valid_ascii(reinterpret_cast<const uint8_t*>(val.data()), val.size())) {
-		// TODO: debug representation?
-		throw std::domain_error(fmt::format("Invalid ASCII string: '{}'", repr(val)));
+		throw std::domain_error(fmt::format("Invalid ASCII string: {:?}", val));
 	}
 	out = val;
 }
