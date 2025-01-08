@@ -32,14 +32,17 @@ if shutil.which(f"clang-format-{REQUIRED_CLANG_FORMAT_MAJOR}"):
     clang_format = f"clang-format-{REQUIRED_CLANG_FORMAT_MAJOR}"
 elif shutil.which("clang-format"):
     clang_format = "clang-format"
-    clang_format_version = run(clang_format, "--version").rstrip().split(" ")[2]
-    clang_format_major = int(clang_format_version.split(".")[0])
-    if clang_format_major != REQUIRED_CLANG_FORMAT_MAJOR:
-        eprint(f"warning: clang-format is wrong version (wanted {REQUIRED_CLANG_FORMAT_MAJOR}, got {clang_format_version})")
 else:
     eprint("error: clang-format is not installed.")
     eprint(f"Install clang-format version {REQUIRED_CLANG_FORMAT_MAJOR}")
     exit(1)
+
+clang_format_version = run(clang_format, "--version").rstrip().split(" ")[2]
+clang_format_major = int(clang_format_version.split(".")[0])
+if verbose:
+    eprint(f"using {clang_format} version {clang_format_version}")
+if clang_format_major != REQUIRED_CLANG_FORMAT_MAJOR:
+    eprint(f"warning: clang-format is wrong version (wanted {REQUIRED_CLANG_FORMAT_MAJOR}, got {clang_format_version})")
 
 since_rev = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
 os.chdir(run("git", "rev-parse", "--show-toplevel").rstrip())
