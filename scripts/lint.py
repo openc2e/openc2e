@@ -22,6 +22,12 @@ def run(*args):
 def eprint(*args):
     print(*args, file=sys.stderr)
 
+if '-v' in sys.argv:
+    verbose = True
+    sys.argv.remove('-v')
+else:
+    verbose = False
+
 if shutil.which(f"clang-format-{REQUIRED_CLANG_FORMAT_MAJOR}"):
     clang_format = f"clang-format-{REQUIRED_CLANG_FORMAT_MAJOR}"
 elif shutil.which("clang-format"):
@@ -47,6 +53,8 @@ for fname in sorted(untracked_files + changed_files):
         continue
     if not re.search(r"^src[/\\]", fname):
         continue
+    if verbose:
+        eprint(fname)
 
     original = open(fname, "r").read()
     formatted = run(clang_format, fname)
