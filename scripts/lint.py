@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import difflib
+import glob
 import os
 import shutil
 import subprocess
@@ -37,8 +38,11 @@ else:
 since_rev = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
 os.chdir(run("git", "rev-parse", "--show-toplevel").rstrip())
 untracked_files = run("git", "ls-files", "-o", "--exclude-standard").split()
-changed_files = run("git", "diff", "--name-only", "--diff-filter=ACMRTUXB", since_rev, "--").split()
-for fname in untracked_files + changed_files:
+if since_rev == "0000000": # the null SHA means "lint everything"
+    changed_files = glob.glob("**", recursive=True)
+else:
+    changed_files = run("git", "diff", "--name-only", "--diff-filter=ACMRTUXB", since_rev, "--").split()
+for fname in sorted(untracked_files + changed_files):
     if not re.search(r"(?i)\.(cpp|c|mm|m|h)$", fname):
         continue
     if not re.search(r"^src[/\\]", fname):
