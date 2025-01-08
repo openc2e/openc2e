@@ -6,6 +6,7 @@
 #include <windows.h>
 // #include <psapi.h>
 #include <dbghelp.h>
+#include <stdio.h>
 #include <string.h>
 #pragma comment(lib, "dbghelp.lib")
 
