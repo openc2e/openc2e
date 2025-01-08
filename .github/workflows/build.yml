@@ -21,10 +21,13 @@ jobs:
     steps:
     - name: "Check out source"
       uses: actions/checkout@v3
-    - name: "Download clang-format"
-      run: "wget -o- https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-10_linux-amd64 && chmod +x clang-format-10_linux-amd64"
+    - name: "Install clang-format"
+      run: |
+        wget https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-10_linux-amd64
+        chmod +x clang-format-10_linux-amd64
+        mv clang-format-10_linux-amd64 /usr/local/bin/clang-format
     - name: "clang-format"
-      run: "./clang-format-10_linux-amd64 -i src/**/*.cpp src/**/*.h && git diff --exit-code"
+      run: ./scripts/lint.py -v 0000000 # diff from null sha is every file
       
   build:
     name: build-${{ matrix.os }}
